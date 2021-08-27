@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3FDFD3F92B7
+	by mail.lfdr.de (Postfix) with ESMTP id 892F73F92B8
 	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 05:13:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244143AbhH0DNd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Aug 2021 23:13:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36192 "EHLO
+        id S244149AbhH0DNf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Aug 2021 23:13:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36196 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244100AbhH0DNc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Aug 2021 23:13:32 -0400
+        with ESMTP id S244100AbhH0DNe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Aug 2021 23:13:34 -0400
 Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 805E8C061757
-        for <kvm@vger.kernel.org>; Thu, 26 Aug 2021 20:12:44 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id z10-20020a170903018a00b00134def0a883so370685plg.0
-        for <kvm@vger.kernel.org>; Thu, 26 Aug 2021 20:12:44 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CCE0C061757
+        for <kvm@vger.kernel.org>; Thu, 26 Aug 2021 20:12:46 -0700 (PDT)
+Received: by mail-pl1-x64a.google.com with SMTP id h5-20020a170902704500b00137e251c362so606905plt.10
+        for <kvm@vger.kernel.org>; Thu, 26 Aug 2021 20:12:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=lvY+8GWji/ARTEhKIY5rBNP81l9FgFJzeMAybYzicOI=;
-        b=sx/fDyVK+kVJAZiNNBRgwWLKTJZUtcY7LNauRS1BPDHfsrUWdmEChMkz3yy+K7GLZA
-         4e9prciwNURGaxaZOND14RQ2Et8EiCc/YPPlmzBofonvZQw89Cl/GroasAgm9kkK5u+4
-         8ds1Da0pbPEVgefnP572VieQSLHMPWVnAgXZ6kWGISP4HOWgzw3qWsUGFmT7nWgHxzkU
-         KDD2E2WgWTvbG4kjWxuv8rEsBFqAmR6eMk4yb0Ek3y204h1/GLhv9npHxcvAyuDMBmSP
-         WZo99Mnm7Yc1qCrIt71jcLTu935mNgLPE/cV8f6QoLHp8aSk3dCQXbYbUxUKQnBqjIdx
-         3aXg==
+        bh=cuN0ollxjDV2DaaXoouEXtDeSL4O0HORunjVAJir1EM=;
+        b=fPij6UYNMIqXWvZFmfEq5DLfP9i7hwzdhyrY1gE3x9U7gAlV7ObTDdSPres2nM/pUh
+         cMtEwrZVK7zG4Lhk/Dr6aCjEXCLbSy4y5u5QV2ZfH8UZv65T9awCCOKZqgQodznszu07
+         hEaspyGMb6sTa7QDK7trVC81oGiDvewgQJZR71Ux2eFVKwSAEmzzBLlmCsrrmWUGa1Yx
+         w1nmENx0UEjyzWVyhfXpUodztKNUtl9kab1Bu7y4HaLWiibK/WKQxi2u5JG01oJ44rgr
+         +CzqKv5MMLDKakgUtB6h0yZIhbi4Zblm0CPBBxyTrib6LllfJQpvHV+vp4fcp6ccL+BH
+         sFrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=lvY+8GWji/ARTEhKIY5rBNP81l9FgFJzeMAybYzicOI=;
-        b=IG6iJZ7av8SUUjiXvQwvE9VYEWIMzJzHxNAvUmTt1ihskmeE7OqanW03nfkwYgY1pB
-         8mkuqaKpxYeIzKxQ5w6UxCPmpVR5xrAjPNHjwd3sxQkgErP21Xvdr7JT+SGyjaCLbZ07
-         91eWYFlrzJhqimlkXi5W+LWYLhzvcs5ydQUio8e4txwpf1ELK2eFjb2Fp+4zovbkjRTx
-         zCJvcCxLVIbdaWiSAfvUDBrI/R/Os4r0Riig6gLUv99DmM8RaRuxFGRHnuEuuEv9XBJF
-         AoSyU4OLvaG5Y3XuSu6WWe1MRK4idUjhNoLnQi14FBrk5ZGAkxMzmpe/mTSKIPqubZKU
-         n1Sg==
-X-Gm-Message-State: AOAM530i2qQ1nyCvPkq1oGg/ogHS+LedLbzboG/phI4z/2irQNRMoqGi
-        dDhuD0kwue13drz4du4fGRYtKX/IQhqPlKpfDBBtWciZvLSf+DrcYvkoDiRJ8day87oeokrw4sp
-        J3Ibw+D0IYdbaxKcXQ1sD+YTFtki9magfLXY9W0lAf6cQFfHc+ymLVtQjnLQHIPypN1t3
-X-Google-Smtp-Source: ABdhPJxWe5g2ygm8GXyFdJBIbX2JQ0WzOsGIZrR+oLfCDHCIQ8fLAdInL4MyS0i8e0sJ4ARgcZUTTgAGDAqVXO5b
+        bh=cuN0ollxjDV2DaaXoouEXtDeSL4O0HORunjVAJir1EM=;
+        b=ITBQM955h9K6ZlPdI9o6Saw18mLeaDs2Lf0bZUwWbVW9CH1CyWaXaTqSyS52Ladyzb
+         wCZncU4+Q5LClK3GSUbcRWPqeV8zEhczs1lqtLN1lpI0xyT3WgEc4Tv2+uDb1aw5Q1N8
+         Uzdi9liHnYfmnHiQywoMCFiq9f9AXs8Eq6050XizJ02tVAG2o3nzrjT86Dy/wZ102sFh
+         aulAxydNXMFESD1/cRh3OOeJuBgbjYLEw/S0H7G50wLIo1GjBtd6n36181/fngE4bMw5
+         hiHpGGtbUyjzvFVzgsEv9yzjaUED4ihpH7MEMoCjr51aVyGlPg33R23zI/WPxYoEvwSv
+         FTzg==
+X-Gm-Message-State: AOAM530ZHsgI7CYx7R5N6t+AuVSlO1NELLEq1CyPmpOgnzf4I5AEi0Sl
+        8MqkH34EjMN+3YYdbmScHZCRk63MZl3jNKm1YlB7hOpwQ3WTFxPaDiaj8Hnnx7tdsnGiaLAx/FN
+        tm8jnQaCkPCn/wDJlbDBukXrFrUzJbht1xwX96urjAcuaGyYOK4St7YicjGQ2FHpQMJmp
+X-Google-Smtp-Source: ABdhPJxc224gwn0ff3V2VKSMQCy0L3Z40ttBYtS4iOxip53RYOh6O/Jm/89BmIAZtZE+E4Kcc2p3HIlKT4vZ5D1L
 X-Received: from zxwang42.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:2936])
- (user=zixuanwang job=sendgmr) by 2002:a62:dd83:0:b029:30f:d69:895f with SMTP
- id w125-20020a62dd830000b029030f0d69895fmr6922410pff.17.1630033963875; Thu,
- 26 Aug 2021 20:12:43 -0700 (PDT)
-Date:   Fri, 27 Aug 2021 03:12:16 +0000
+ (user=zixuanwang job=sendgmr) by 2002:a62:38c9:0:b0:3f2:6ab2:1828 with SMTP
+ id f192-20020a6238c9000000b003f26ab21828mr4784538pfa.37.1630033965667; Thu,
+ 26 Aug 2021 20:12:45 -0700 (PDT)
+Date:   Fri, 27 Aug 2021 03:12:17 +0000
 In-Reply-To: <20210827031222.2778522-1-zixuanwang@google.com>
-Message-Id: <20210827031222.2778522-12-zixuanwang@google.com>
+Message-Id: <20210827031222.2778522-13-zixuanwang@google.com>
 Mime-Version: 1.0
 References: <20210827031222.2778522-1-zixuanwang@google.com>
 X-Mailer: git-send-email 2.33.0.259.gc128427fd7-goog
-Subject: [kvm-unit-tests PATCH v2 11/17] x86 AMD SEV: Initial support
+Subject: [kvm-unit-tests PATCH v2 12/17] x86 AMD SEV: Page table with c-bit
 From:   Zixuan Wang <zixuanwang@google.com>
 To:     kvm@vger.kernel.org, pbonzini@redhat.com, drjones@redhat.com
 Cc:     marcorr@google.com, baekhw@google.com, tmroeder@google.com,
@@ -64,304 +64,142 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-AMD Secure Encrypted Virtualization (SEV) is a hardware accelerated
-memory encryption feature that protects guest VMs from host attacks.
+AMD SEV introduces c-bit to page table entries. To work with AMD SEV:
 
-This commit provides set up code and a test case for AMD SEV. The set up
-code checks if SEV is supported and enabled, and then sets SEV c-bit for
-each page table entry.
+   1. c-bit should be set for new page table entries
+   2. address calculation should not use c-bit as part of address
 
-Co-developed-by: Hyunwook (Wooky) Baek <baekhw@google.com>
-Signed-off-by: Hyunwook (Wooky) Baek <baekhw@google.com>
 Signed-off-by: Zixuan Wang <zixuanwang@google.com>
 ---
- lib/x86/amd_sev.c   | 77 +++++++++++++++++++++++++++++++++++++++++++++
- lib/x86/amd_sev.h   | 45 ++++++++++++++++++++++++++
- lib/x86/asm/setup.h |  1 +
- lib/x86/setup.c     | 15 +++++++++
- x86/Makefile.common |  1 +
- x86/Makefile.x86_64 |  3 ++
- x86/amd_sev.c       | 64 +++++++++++++++++++++++++++++++++++++
- 7 files changed, 206 insertions(+)
- create mode 100644 lib/x86/amd_sev.c
- create mode 100644 lib/x86/amd_sev.h
- create mode 100644 x86/amd_sev.c
+ lib/x86/amd_sev.c  | 10 ++++++++++
+ lib/x86/amd_sev.h  |  1 +
+ lib/x86/asm/page.h | 27 ++++++++++++++++++++++++---
+ lib/x86/vm.c       | 18 ++++++++++++++----
+ 4 files changed, 49 insertions(+), 7 deletions(-)
 
 diff --git a/lib/x86/amd_sev.c b/lib/x86/amd_sev.c
-new file mode 100644
-index 0000000..5498ed6
---- /dev/null
+index 5498ed6..f5e3585 100644
+--- a/lib/x86/amd_sev.c
 +++ b/lib/x86/amd_sev.c
-@@ -0,0 +1,77 @@
-+/*
-+ * AMD SEV support in KVM-Unit-Tests
-+ *
-+ * Copyright (c) 2021, Google Inc
-+ *
-+ * Authors:
-+ *   Zixuan Wang <zixuanwang@google.com>
-+ *
-+ * SPDX-License-Identifier: LGPL-2.0-or-later
-+ */
+@@ -75,3 +75,13 @@ unsigned long long get_amd_sev_c_bit_mask(void)
+ 		return 0;
+ 	}
+ }
 +
-+#include "amd_sev.h"
-+#include "x86/processor.h"
-+
-+static unsigned long long amd_sev_c_bit_pos;
-+
-+bool amd_sev_enabled(void)
-+{
-+	struct cpuid cpuid_out;
-+	static bool sev_enabled;
-+	static bool initialized = false;
-+
-+	/* Check CPUID and MSR for SEV status and store it for future function calls. */
-+	if (!initialized) {
-+		sev_enabled = false;
-+		initialized = true;
-+
-+		/* Test if we can query SEV features */
-+		cpuid_out = cpuid(CPUID_FN_LARGEST_EXT_FUNC_NUM);
-+		if (cpuid_out.a < CPUID_FN_ENCRYPT_MEM_CAPAB) {
-+			return sev_enabled;
-+		}
-+
-+		/* Test if SEV is supported */
-+		cpuid_out = cpuid(CPUID_FN_ENCRYPT_MEM_CAPAB);
-+		if (!(cpuid_out.a & SEV_SUPPORT_MASK)) {
-+			return sev_enabled;
-+		}
-+
-+		/* Test if SEV is enabled */
-+		if (!(rdmsr(MSR_SEV_STATUS) & SEV_ENABLED_MASK)) {
-+			return sev_enabled;
-+		}
-+
-+		sev_enabled = true;
-+	}
-+
-+	return sev_enabled;
-+}
-+
-+efi_status_t setup_amd_sev(void)
-+{
-+	struct cpuid cpuid_out;
-+
-+	if (!amd_sev_enabled()) {
-+		return EFI_UNSUPPORTED;
-+	}
-+
-+	/*
-+	 * Extract C-Bit position from ebx[5:0]
-+	 * AMD64 Architecture Programmer's Manual Volume 3
-+	 *   - Section " Function 8000_001Fh - Encrypted Memory Capabilities"
-+	 */
-+	cpuid_out = cpuid(CPUID_FN_ENCRYPT_MEM_CAPAB);
-+	amd_sev_c_bit_pos = (unsigned long long)(cpuid_out.b & 0x3f);
-+
-+	return EFI_SUCCESS;
-+}
-+
-+unsigned long long get_amd_sev_c_bit_mask(void)
++unsigned long long get_amd_sev_addr_upperbound(void)
 +{
 +	if (amd_sev_enabled()) {
-+		return 1ull << amd_sev_c_bit_pos;
++		return amd_sev_c_bit_pos - 1;
 +	} else {
-+		return 0;
++		/* Default memory upper bound */
++		return PT_ADDR_UPPER_BOUND_DEFAULT;
 +	}
 +}
 diff --git a/lib/x86/amd_sev.h b/lib/x86/amd_sev.h
-new file mode 100644
-index 0000000..516d500
---- /dev/null
+index 516d500..2780560 100644
+--- a/lib/x86/amd_sev.h
 +++ b/lib/x86/amd_sev.h
-@@ -0,0 +1,45 @@
-+/*
-+ * AMD SEV support in KVM-Unit-Tests
-+ *
-+ * Copyright (c) 2021, Google Inc
-+ *
-+ * Authors:
-+ *   Zixuan Wang <zixuanwang@google.com>
-+ *
-+ * SPDX-License-Identifier: LGPL-2.0-or-later
-+ */
-+
-+#ifndef _X86_AMD_SEV_H_
-+#define _X86_AMD_SEV_H_
-+
+@@ -39,6 +39,7 @@ bool amd_sev_enabled(void);
+ efi_status_t setup_amd_sev(void);
+ 
+ unsigned long long get_amd_sev_c_bit_mask(void);
++unsigned long long get_amd_sev_addr_upperbound(void);
+ 
+ #endif /* TARGET_EFI */
+ 
+diff --git a/lib/x86/asm/page.h b/lib/x86/asm/page.h
+index f6f740b..c25bc66 100644
+--- a/lib/x86/asm/page.h
++++ b/lib/x86/asm/page.h
+@@ -25,6 +25,12 @@ typedef unsigned long pgd_t;
+ #define LARGE_PAGE_SIZE	(1024 * PAGE_SIZE)
+ #endif
+ 
 +#ifdef TARGET_EFI
-+
-+#include "libcflat.h"
-+#include "desc.h"
-+#include "asm/page.h"
-+#include "efi.h"
-+
-+/*
-+ * AMD Programmer's Manual Volume 3
-+ *   - Section "Function 8000_0000h - Maximum Extended Function Number and Vendor String"
-+ *   - Section "Function 8000_001Fh - Encrypted Memory Capabilities"
-+ */
-+#define CPUID_FN_LARGEST_EXT_FUNC_NUM 0x80000000
-+#define CPUID_FN_ENCRYPT_MEM_CAPAB    0x8000001f
-+#define SEV_SUPPORT_MASK              0b10
-+
-+/*
-+ * AMD Programmer's Manual Volume 2
-+ *   - Section "SEV_STATUS MSR"
-+ */
-+#define MSR_SEV_STATUS   0xc0010131
-+#define SEV_ENABLED_MASK 0b1
-+
-+bool amd_sev_enabled(void);
-+efi_status_t setup_amd_sev(void);
-+
-+unsigned long long get_amd_sev_c_bit_mask(void);
-+
++/* lib/x86/amd_sev.c */
++extern unsigned long long get_amd_sev_c_bit_mask(void);
++extern unsigned long long get_amd_sev_addr_upperbound(void);
 +#endif /* TARGET_EFI */
 +
-+#endif /* _X86_AMD_SEV_H_ */
-diff --git a/lib/x86/asm/setup.h b/lib/x86/asm/setup.h
-index 16bad0f..d494528 100644
---- a/lib/x86/asm/setup.h
-+++ b/lib/x86/asm/setup.h
-@@ -8,6 +8,7 @@
- #include "x86/smp.h"
- #include "asm/page.h"
- #include "efi.h"
-+#include "x86/amd_sev.h"
+ #define PT_PRESENT_MASK		(1ull << 0)
+ #define PT_WRITABLE_MASK	(1ull << 1)
+ #define PT_USER_MASK		(1ull << 2)
+@@ -33,10 +39,25 @@ typedef unsigned long pgd_t;
+ #define PT_PAGE_SIZE_MASK	(1ull << 7)
+ #define PT_GLOBAL_MASK		(1ull << 8)
+ #define PT64_NX_MASK		(1ull << 63)
+-#define PT_ADDR_MASK		GENMASK_ULL(51, 12)
  
- /*
-  * efi_bootinfo_t: stores EFI-related machine info retrieved by
-diff --git a/lib/x86/setup.c b/lib/x86/setup.c
-index 03598fe..bdda337 100644
---- a/lib/x86/setup.c
-+++ b/lib/x86/setup.c
-@@ -215,6 +215,18 @@ efi_status_t setup_efi_pre_boot(unsigned long *mapkey, efi_bootinfo_t *efi_booti
- 		return status;
- 	}
- 
-+	status = setup_amd_sev();
-+	if (status != EFI_SUCCESS) {
-+		switch (status) {
-+		case EFI_UNSUPPORTED:
-+			/* Continue if AMD SEV is not supported */
-+			break;
-+		default:
-+			printf("Set up AMD SEV failed\n");
-+			return status;
-+		}
-+	}
+-#define PDPTE64_PAGE_SIZE_MASK	  (1ull << 7)
+-#define PDPTE64_RSVD_MASK	  GENMASK_ULL(51, cpuid_maxphyaddr())
++/*
++ * Without AMD SEV, the default address upper bound is 51 (i.e., pte bit 51 and
++ * lower bits are addresses). But with AMD SEV enabled, the upper bound is one
++ * bit lower than the c-bit position.
++ */
++#define PT_ADDR_UPPER_BOUND_DEFAULT	(51)
 +
- 	return EFI_SUCCESS;
++#ifdef TARGET_EFI
++#define PT_ADDR_UPPER_BOUND	(get_amd_sev_addr_upperbound())
++#else
++#define PT_ADDR_UPPER_BOUND	(PT_ADDR_UPPER_BOUND_DEFAULT)
++#endif /* TARGET_EFI */
++
++#define PT_ADDR_LOWER_BOUND	(PAGE_SHIFT)
++#define PT_ADDR_MASK		GENMASK_ULL(PT_ADDR_UPPER_BOUND, PT_ADDR_LOWER_BOUND)
++
++#define PDPTE64_PAGE_SIZE_MASK	(1ull << 7)
++#define PDPTE64_RSVD_MASK	GENMASK_ULL(PT_ADDR_UPPER_BOUND, cpuid_maxphyaddr())
+ 
+ #define PT_AD_MASK              (PT_ACCESSED_MASK | PT_DIRTY_MASK)
+ 
+diff --git a/lib/x86/vm.c b/lib/x86/vm.c
+index 5cd2ee4..0ebc860 100644
+--- a/lib/x86/vm.c
++++ b/lib/x86/vm.c
+@@ -26,6 +26,9 @@ pteval_t *install_pte(pgd_t *cr3,
+                 pt_page = 0;
+ 	    memset(new_pt, 0, PAGE_SIZE);
+ 	    pt[offset] = virt_to_phys(new_pt) | PT_PRESENT_MASK | PT_WRITABLE_MASK | pte_opt_mask;
++#ifdef TARGET_EFI
++	    pt[offset] |= get_amd_sev_c_bit_mask();
++#endif /* TARGET_EFI */
+ 	}
+ 	pt = phys_to_virt(pt[offset] & PT_ADDR_MASK);
+     }
+@@ -63,7 +66,7 @@ struct pte_search find_pte_level(pgd_t *cr3, void *virt,
+ 		if (r.level == lowest_level)
+ 			return r;
+ 
+-		pt = phys_to_virt(pte & 0xffffffffff000ull);
++		pt = phys_to_virt(pte & PT_ADDR_MASK);
+ 	}
  }
  
-@@ -233,6 +245,9 @@ static void setup_page_table(void)
- 	/* Set default flags */
- 	flags = PT_PRESENT_MASK | PT_WRITABLE_MASK | PT_USER_MASK;
+@@ -94,13 +97,20 @@ pteval_t *get_pte_level(pgd_t *cr3, void *virt, int pte_level)
  
-+	/* Set AMD SEV C-Bit for page table entries */
-+	flags |= get_amd_sev_c_bit_mask();
-+
- 	/* Level 5 */
- 	curr_pt = (pgd_t *)&ptl5;
- 	curr_pt[0] = ((phys_addr_t)&ptl4) | flags;
-diff --git a/x86/Makefile.common b/x86/Makefile.common
-index 959379c..0913083 100644
---- a/x86/Makefile.common
-+++ b/x86/Makefile.common
-@@ -23,6 +23,7 @@ cflatobjs += lib/x86/stack.o
- cflatobjs += lib/x86/fault_test.o
- cflatobjs += lib/x86/delay.o
- ifeq ($(TARGET_EFI),y)
-+cflatobjs += lib/x86/amd_sev.o
- cflatobjs += lib/x86/setup.o
- cflatobjs += lib/efi.o
- cflatobjs += x86/efi/reloc_x86_64.o
-diff --git a/x86/Makefile.x86_64 b/x86/Makefile.x86_64
-index 7e8a57a..8304939 100644
---- a/x86/Makefile.x86_64
-+++ b/x86/Makefile.x86_64
-@@ -32,6 +32,9 @@ tests += $(TEST_DIR)/pks.$(exe)
- tests += $(TEST_DIR)/pmu_lbr.$(exe)
- tests += $(TEST_DIR)/emulator.$(exe)
- tests += $(TEST_DIR)/vmware_backdoors.$(exe)
-+ifeq ($(TARGET_EFI),y)
-+tests += $(TEST_DIR)/amd_sev.$(exe)
-+endif
+ pteval_t *install_large_page(pgd_t *cr3, phys_addr_t phys, void *virt)
+ {
+-    return install_pte(cr3, 2, virt,
+-		       phys | PT_PRESENT_MASK | PT_WRITABLE_MASK | pte_opt_mask | PT_PAGE_SIZE_MASK, 0);
++    phys_addr_t flags = PT_PRESENT_MASK | PT_WRITABLE_MASK | pte_opt_mask | PT_PAGE_SIZE_MASK;
++#ifdef TARGET_EFI
++    flags |= get_amd_sev_c_bit_mask();
++#endif /* TARGET_EFI */
++    return install_pte(cr3, 2, virt, phys | flags, 0);
+ }
  
- # The following test cases are disabled when building EFI tests because they
- # use absolute addresses in their inline assembly code, which cannot compile
-diff --git a/x86/amd_sev.c b/x86/amd_sev.c
-new file mode 100644
-index 0000000..a07a48f
---- /dev/null
-+++ b/x86/amd_sev.c
-@@ -0,0 +1,64 @@
-+/*
-+ * AMD SEV test cases
-+ *
-+ * Copyright (c) 2021, Google Inc
-+ *
-+ * Authors:
-+ *   Hyunwook (Wooky) Baek <baekhw@google.com>
-+ *   Zixuan Wang <zixuanwang@google.com>
-+ *
-+ * SPDX-License-Identifier: LGPL-2.0-or-later
-+ */
-+
-+#include "libcflat.h"
-+#include "x86/processor.h"
-+#include "x86/amd_sev.h"
-+
-+#define EXIT_SUCCESS 0
-+#define EXIT_FAILURE 1
-+
-+static int test_sev_activation(void)
-+{
-+	struct cpuid cpuid_out;
-+	u64 msr_out;
-+
-+	printf("SEV activation test is loaded.\n");
-+
-+	/* Tests if CPUID function to check SEV is implemented */
-+	cpuid_out = cpuid(CPUID_FN_LARGEST_EXT_FUNC_NUM);
-+	printf("CPUID Fn8000_0000[EAX]: 0x%08x\n", cpuid_out.a);
-+	if (cpuid_out.a < CPUID_FN_ENCRYPT_MEM_CAPAB) {
-+		printf("CPUID does not support FN%08x\n",
-+		       CPUID_FN_ENCRYPT_MEM_CAPAB);
-+		return EXIT_FAILURE;
-+	}
-+
-+	/* Tests if SEV is supported */
-+	cpuid_out = cpuid(CPUID_FN_ENCRYPT_MEM_CAPAB);
-+	printf("CPUID Fn8000_001F[EAX]: 0x%08x\n", cpuid_out.a);
-+	printf("CPUID Fn8000_001F[EBX]: 0x%08x\n", cpuid_out.b);
-+	if (!(cpuid_out.a & SEV_SUPPORT_MASK)) {
-+		printf("SEV is not supported.\n");
-+		return EXIT_FAILURE;
-+	}
-+	printf("SEV is supported\n");
-+
-+	/* Tests if SEV is enabled */
-+	msr_out = rdmsr(MSR_SEV_STATUS);
-+	printf("MSR C001_0131[EAX]: 0x%08lx\n", msr_out & 0xffffffff);
-+	if (!(msr_out & SEV_ENABLED_MASK)) {
-+		printf("SEV is not enabled.\n");
-+		return EXIT_FAILURE;
-+	}
-+	printf("SEV is enabled\n");
-+
-+	return EXIT_SUCCESS;
-+}
-+
-+int main(void)
-+{
-+	int rtn;
-+	rtn = test_sev_activation();
-+	report(rtn == EXIT_SUCCESS, "SEV activation test.");
-+	return report_summary();
-+}
+ pteval_t *install_page(pgd_t *cr3, phys_addr_t phys, void *virt)
+ {
+-    return install_pte(cr3, 1, virt, phys | PT_PRESENT_MASK | PT_WRITABLE_MASK | pte_opt_mask, 0);
++    phys_addr_t flags = PT_PRESENT_MASK | PT_WRITABLE_MASK | pte_opt_mask;
++#ifdef TARGET_EFI
++    flags |= get_amd_sev_c_bit_mask();
++#endif /* TARGET_EFI */
++    return install_pte(cr3, 1, virt, phys | flags, 0);
+ }
+ 
+ void install_pages(pgd_t *cr3, phys_addr_t phys, size_t len, void *virt)
 -- 
 2.33.0.259.gc128427fd7-goog
 
