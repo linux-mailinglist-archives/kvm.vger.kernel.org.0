@@ -2,530 +2,232 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D9D433F9C9C
-	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 18:37:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E3F6F3F9C9F
+	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 18:37:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232941AbhH0QhJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Aug 2021 12:37:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49868 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230038AbhH0QhH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Aug 2021 12:37:07 -0400
-Received: from mail-vs1-xe2a.google.com (mail-vs1-xe2a.google.com [IPv6:2607:f8b0:4864:20::e2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64318C061757
-        for <kvm@vger.kernel.org>; Fri, 27 Aug 2021 09:36:18 -0700 (PDT)
-Received: by mail-vs1-xe2a.google.com with SMTP id t4so5034546vsm.5
-        for <kvm@vger.kernel.org>; Fri, 27 Aug 2021 09:36:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=nFiQiOvIx+N82BQ9SAa4EqJhljbHwhyIContW19g9yM=;
-        b=s1HMejfaao0vwsGP3KWxN1+U1STZcYJMoZyVrKQxw287X5YwR0JNjWBO/S1ePp2Bkt
-         IZBXm3iqfWky0F0/pb5U5TxQflwRChbs2g9TZiDHJ/sBrPbGC/r4TLP5Oitl+etVlEfF
-         2JZfv9YH9cdZqrgecGth2UUDf+NbJDTFjlV9/m2hTzundVPuosV9Ww/UFCubyyx4Wgxc
-         4NrooUqTDRkyySmfLgaxtNWexx9GL8kxfWLMR7qCH3npNmObazsFriSkUn1UUW0RoMZw
-         svSu7XRV17JDYhJmxBsNH2+b2bdaOtHmFBWUxut7zqlseI3994VHzvqZQmkLWmqytsI9
-         qE0w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=nFiQiOvIx+N82BQ9SAa4EqJhljbHwhyIContW19g9yM=;
-        b=hL3BIEgrgmzehT7/tUKRWLCNzEnizurvDdp/mPaQyapLRkbcmbaQRi8GeEGdjCIMUi
-         7PK1geFvgUu/16N61/Iw+5oLI5yMm3dxpUIDKYp8LH5IoFvFPD5iQ2+8vVv/YZAYc/Wp
-         YCR83z5J+ZreGDe54CIJL7NdyGmOv4ZHIwKXQRYP72BqTXGDuc9X5y2xQl08JFZQ3byC
-         lXonO/w5FmINtzW1nSbcFQt4xaaKtvrZKnQ5NNdJQoG6Kmg0G2DEBKVqvWcJv+j0FWqU
-         XFWBIctMtQIfVqnkrpUvb1Z0ZaiUpCU07wQttHltakbf8pSURpp0paCzql6Wn+Yler0D
-         DR+w==
-X-Gm-Message-State: AOAM533QK9as5U7spbjRlcddk6/s3FGHN0V+5mk3laLzH2bBHjkl9tDB
-        LoZ7vA6A1Q7lgybFdYeTbC/Sv24gPfAZEGEuE5Yl6w==
-X-Google-Smtp-Source: ABdhPJx5b3vmJR10GW0CjymdMn7zE7I/5iXMeBDau+XjdSADpsrI+k1EDhI3EcxhdDjZuuu3DQC8tegzH8BS9rKvTDA=
-X-Received: by 2002:a05:6102:dd0:: with SMTP id e16mr7872617vst.7.1630082177278;
- Fri, 27 Aug 2021 09:36:17 -0700 (PDT)
+        id S231300AbhH0Qhq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Aug 2021 12:37:46 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42948 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229854AbhH0Qhp (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 27 Aug 2021 12:37:45 -0400
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 17RGXT2X155565;
+        Fri, 27 Aug 2021 12:36:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=mfM0/5nznkJ6+pFJS0/IEBbQq8YC8Neshd5/N4K+5e0=;
+ b=jMMwvR4UaKeoKgkuaL9tXiQzQyC0pUemp43uIHy9dugaTXh/VBf5qGxHSOjRiZHPzvud
+ cZvR9e2fsILmIYdkX0+2fv1C4yS84Bf/iM1v8rclEa59NyH/wXHZJIAxhqsOn8LeJOZL
+ 7m0yePPjUryLLiMy20Kzp/sOUTKjV5OiPUdo6s/Lw3VXJNqaO4UIINyUGAloTUc9o0Ab
+ qvQ2/imv1b+GVXfWLmPCqj9riL9Y55sSiqF4ggK9sxvzwetY2S3bN8EgSafhAhdrHQ6t
+ 0OoNvAD8AAOGYShVA9Cu/DrbrOZi4v4KfiEGTZo9U8X0o37mRLSUp9y/4FXeOA+RmaY2 gA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3aq3ne82uy-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 27 Aug 2021 12:36:55 -0400
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 17RGXnxG156395;
+        Fri, 27 Aug 2021 12:36:55 -0400
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3aq3ne82u9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 27 Aug 2021 12:36:55 -0400
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 17RGRb7c014842;
+        Fri, 27 Aug 2021 16:36:53 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma04ams.nl.ibm.com with ESMTP id 3ajs493tgh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 27 Aug 2021 16:36:53 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 17RGan8r33554852
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 27 Aug 2021 16:36:49 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A6CC7A405F;
+        Fri, 27 Aug 2021 16:36:49 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2B0EBA4054;
+        Fri, 27 Aug 2021 16:36:49 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.145.50.110])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 27 Aug 2021 16:36:49 +0000 (GMT)
+Subject: Re: [PATCH 1/1] KVM: s390: index kvm->arch.idle_mask by vcpu_idx
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>
+Cc:     Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        stable@vger.kernel.org, Michael Mueller <mimu@linux.ibm.com>
+References: <20210827125429.1912577-1-pasic@linux.ibm.com>
+ <20210827160616.532d6699@p-imbrenda>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Message-ID: <e9d2f79c-b784-bc6b-88dc-2d0f7cc08dbe@de.ibm.com>
+Date:   Fri, 27 Aug 2021 18:36:48 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-References: <20210818184311.517295-1-rananta@google.com> <20210818184311.517295-11-rananta@google.com>
- <YSgNiY5iAI8BFN7G@google.com>
-In-Reply-To: <YSgNiY5iAI8BFN7G@google.com>
-From:   Raghavendra Rao Ananta <rananta@google.com>
-Date:   Fri, 27 Aug 2021 09:36:05 -0700
-Message-ID: <CAJHc60yde6-NqvpWKxFBsVP=q1DjK27270VOkyZyLTRx04K1iA@mail.gmail.com>
-Subject: Re: [PATCH v2 10/10] KVM: arm64: selftests: Add arch_timer test
-To:     Ricardo Koller <ricarkol@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Peter Shier <pshier@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Jing Zhang <jingzhangos@google.com>, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20210827160616.532d6699@p-imbrenda>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: cpRrVZT10NGT7EOqsMVLAhs6Bi64PxjU
+X-Proofpoint-GUID: b70fr0IFHIywE5V8rJSjT6o3Xs245CxO
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-08-27_04:2021-08-26,2021-08-27 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ mlxlogscore=999 spamscore=0 malwarescore=0 bulkscore=0 clxscore=1015
+ lowpriorityscore=0 adultscore=0 priorityscore=1501 mlxscore=0 phishscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2107140000 definitions=main-2108270098
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 26, 2021 at 2:54 PM Ricardo Koller <ricarkol@google.com> wrote:
->
-> On Wed, Aug 18, 2021 at 06:43:11PM +0000, Raghavendra Rao Ananta wrote:
-> > Add a KVM selftest to validate the arch_timer functionality.
-> > Primarily, the test sets up periodic timer interrupts and
-> > validates the basic architectural expectations upon its receipt.
-> >
-> > The test provides command-line options to configure the period
-> > of the timer, number of iterations, and number of vCPUs.
-> >
-> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> > ---
-> >  tools/testing/selftests/kvm/.gitignore        |   1 +
-> >  tools/testing/selftests/kvm/Makefile          |   1 +
-> >  .../selftests/kvm/aarch64/arch_timer.c        | 382 ++++++++++++++++++
-> >  3 files changed, 384 insertions(+)
-> >  create mode 100644 tools/testing/selftests/kvm/aarch64/arch_timer.c
-> >
-> > diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-> > index 0709af0144c8..5f6cf0c76cf8 100644
-> > --- a/tools/testing/selftests/kvm/.gitignore
-> > +++ b/tools/testing/selftests/kvm/.gitignore
-> > @@ -1,4 +1,5 @@
-> >  # SPDX-License-Identifier: GPL-2.0-only
-> > +/aarch64/arch_timer
-> >  /aarch64/debug-exceptions
-> >  /aarch64/get-reg-list
-> >  /aarch64/vgic_init
-> > diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> > index a170166334a3..62a2c3e4b50c 100644
-> > --- a/tools/testing/selftests/kvm/Makefile
-> > +++ b/tools/testing/selftests/kvm/Makefile
-> > @@ -84,6 +84,7 @@ TEST_GEN_PROGS_x86_64 += set_memory_region_test
-> >  TEST_GEN_PROGS_x86_64 += steal_time
-> >  TEST_GEN_PROGS_x86_64 += kvm_binary_stats_test
-> >
-> > +TEST_GEN_PROGS_aarch64 += aarch64/arch_timer
-> >  TEST_GEN_PROGS_aarch64 += aarch64/debug-exceptions
-> >  TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list
-> >  TEST_GEN_PROGS_aarch64 += aarch64/vgic_init
-> > diff --git a/tools/testing/selftests/kvm/aarch64/arch_timer.c b/tools/testing/selftests/kvm/aarch64/arch_timer.c
-> > new file mode 100644
-> > index 000000000000..88333fe1e567
-> > --- /dev/null
-> > +++ b/tools/testing/selftests/kvm/aarch64/arch_timer.c
-> > @@ -0,0 +1,382 @@
-> > +// SPDX-License-Identifier: GPL-2.0-only
-> > +/*
-> > + * arch_timer.c - Tests the aarch64 timer IRQ functionality
-> > + *
-> > + * The test validates both the virtual and physical timer IRQs using
-> > + * CVAL and TVAL registers. This consitutes the four stages in the test.
-> > + * The guest's main thread configures the timer interrupt for a stage
-> > + * and waits for it to fire, with a timeout equal to the timer period.
-> > + * It asserts that the timeout doesn't exceed the timer period.
-> > + *
-> > + * On the other hand, upon receipt of an interrupt, the guest's interrupt
-> > + * handler validates the interrupt by checking if the architectural state
-> > + * is in compliance with the specifications.
-> > + *
-> > + * The test provides command-line options to configure the timer's
-> > + * period (-p), number of vCPUs (-n), and iterations per stage (-i).
-> > + *
-> > + * Copyright (c) 2021, Google LLC.
-> > + */
-> > +
-> > +#define _GNU_SOURCE
-> > +
-> > +#include <stdlib.h>
-> > +#include <pthread.h>
-> > +#include <linux/kvm.h>
-> > +#include <linux/sizes.h>
-> > +
-> > +#include "kvm_util.h"
-> > +#include "processor.h"
-> > +#include "delay.h"
-> > +#include "arch_timer.h"
-> > +#include "gic.h"
-> > +
-> > +#define NR_VCPUS_DEF                 4
-> > +#define NR_TEST_ITERS_DEF            5
-> > +#define TIMER_TEST_PERIOD_MS_DEF     10
-> > +#define TIMER_TEST_ERR_MARGIN_US     100
-> > +
-> > +struct test_args {
-> > +     int nr_vcpus;
-> > +     int nr_iter;
-> > +     int timer_period_ms;
-> > +};
-> > +
-> > +static struct test_args test_args = {
-> > +     .nr_vcpus = NR_VCPUS_DEF,
-> > +     .nr_iter = NR_TEST_ITERS_DEF,
-> > +     .timer_period_ms = TIMER_TEST_PERIOD_MS_DEF,
-> > +};
-> > +
-> > +#define msecs_to_usecs(msec)         ((msec) * 1000LL)
-> > +
-> > +#define VTIMER_IRQ                   27
-> > +#define PTIMER_IRQ                   30
-> > +
-> > +#define REDIST_REGION_ATTR_ADDR(count, base, flags, index) \
-> > +     (((uint64_t)(count) << 52) | \
-> > +     ((uint64_t)((base) >> 16) << 16) | \
-> > +     ((uint64_t)(flags) << 12) | \
-> > +     index)
-> > +
-> > +#define GICD_BASE_GPA                        0x8000000ULL
-> > +#define GICR_BASE_GPA                        0x80A0000ULL
-> > +
-> > +enum guest_stage {
-> > +     GUEST_STAGE_VTIMER_CVAL = 1,
-> > +     GUEST_STAGE_VTIMER_TVAL,
-> > +     GUEST_STAGE_PTIMER_CVAL,
-> > +     GUEST_STAGE_PTIMER_TVAL,
-> > +     GUEST_STAGE_MAX,
-> > +};
-> > +
-> > +/* Sahred variables between host and guest */
-> > +struct test_vcpu_shared_data {
-> > +     int nr_iter;
-> > +     enum guest_stage guest_stage;
-> > +     uint64_t xcnt;
-> > +};
-> > +
-> > +struct test_vcpu {
-> > +     uint32_t vcpuid;
-> > +     pthread_t pt_vcpu_run;
-> > +     struct kvm_vm *vm;
-> > +};
-> > +
-> > +static struct test_vcpu test_vcpu[KVM_MAX_VCPUS];
-> > +static struct test_vcpu_shared_data vcpu_shared_data[KVM_MAX_VCPUS];
-> > +
-> > +static void
-> > +guest_configure_timer_action(struct test_vcpu_shared_data *shared_data)
-> > +{
-> > +     switch (shared_data->guest_stage) {
-> > +     case GUEST_STAGE_VTIMER_CVAL:
-> > +             timer_set_next_cval_ms(VIRTUAL, test_args.timer_period_ms);
-> > +             shared_data->xcnt = timer_get_cntct(VIRTUAL);
-> > +             timer_set_ctl(VIRTUAL, CTL_ENABLE);
-> > +             break;
-> > +     case GUEST_STAGE_VTIMER_TVAL:
-> > +             timer_set_next_tval_ms(VIRTUAL, test_args.timer_period_ms);
-> > +             shared_data->xcnt = timer_get_cntct(VIRTUAL);
-> > +             timer_set_ctl(VIRTUAL, CTL_ENABLE);
-> > +             break;
-> > +     case GUEST_STAGE_PTIMER_CVAL:
-> > +             timer_set_next_cval_ms(PHYSICAL, test_args.timer_period_ms);
-> > +             shared_data->xcnt = timer_get_cntct(PHYSICAL);
-> > +             timer_set_ctl(PHYSICAL, CTL_ENABLE);
-> > +             break;
-> > +     case GUEST_STAGE_PTIMER_TVAL:
-> > +             timer_set_next_tval_ms(PHYSICAL, test_args.timer_period_ms);
-> > +             shared_data->xcnt = timer_get_cntct(PHYSICAL);
-> > +             timer_set_ctl(PHYSICAL, CTL_ENABLE);
-> > +             break;
-> > +     default:
-> > +             GUEST_ASSERT(0);
-> > +     }
-> > +}
-> > +
-> > +static void guest_validate_irq(unsigned int intid,
-> > +                             struct test_vcpu_shared_data *shared_data)
-> > +{
-> > +     enum guest_stage stage = shared_data->guest_stage;
-> > +     uint64_t xcnt = 0, xcnt_diff_us, cval = 0;
-> > +     unsigned long xctl = 0;
-> > +     unsigned int timer_irq = 0;
-> > +
-> > +     if (stage == GUEST_STAGE_VTIMER_CVAL ||
-> > +             stage == GUEST_STAGE_VTIMER_TVAL) {
-> > +             xctl = timer_get_ctl(VIRTUAL);
-> > +             timer_set_ctl(VIRTUAL, CTL_IMASK);
-> > +             xcnt = timer_get_cntct(VIRTUAL);
-> > +             cval = timer_get_cval(VIRTUAL);
-> > +             timer_irq = VTIMER_IRQ;
-> > +     } else if (stage == GUEST_STAGE_PTIMER_CVAL ||
-> > +             stage == GUEST_STAGE_PTIMER_TVAL) {
-> > +             xctl = timer_get_ctl(PHYSICAL);
-> > +             timer_set_ctl(PHYSICAL, CTL_IMASK);
-> > +             xcnt = timer_get_cntct(PHYSICAL);
-> > +             cval = timer_get_cval(PHYSICAL);
-> > +             timer_irq = PTIMER_IRQ;
-> > +     } else {
-> > +             GUEST_ASSERT(0);
-> > +     }
-> > +
-> > +     xcnt_diff_us = cycles_to_usec(xcnt - shared_data->xcnt);
-> > +
-> > +     /* Make sure we are dealing with the correct timer IRQ */
-> > +     GUEST_ASSERT_2(intid == timer_irq, intid, timer_irq);
-> > +
-> > +     /* Basic 'timer codition met' check */
-> > +     GUEST_ASSERT_3(xcnt >= cval, xcnt, cval, xcnt_diff_us);
-> > +     GUEST_ASSERT_1(xctl & CTL_ISTATUS, xctl);
-> > +}
-> > +
-> > +static void guest_irq_handler(struct ex_regs *regs)
-> > +{
-> > +     unsigned int intid = gic_get_and_ack_irq();
-> > +     uint32_t cpu = get_vcpuid();
-> > +     struct test_vcpu_shared_data *shared_data = &vcpu_shared_data[cpu];
-> > +
-> > +     guest_validate_irq(intid, shared_data);
-> > +
-> > +     WRITE_ONCE(shared_data->nr_iter, shared_data->nr_iter + 1);
-> > +
-> > +     gic_set_eoi(intid);
-> > +}
-> > +
-> > +static void guest_run_stage(struct test_vcpu_shared_data *shared_data,
-> > +                             enum guest_stage stage)
-> > +{
-> > +     uint32_t irq_iter, config_iter;
-> > +
-> > +     shared_data->guest_stage = stage;
-> > +     shared_data->nr_iter = 0;
-> > +
-> > +     for (config_iter = 0; config_iter < test_args.nr_iter; config_iter++) {
-> > +             /* Setup the next interrupt */
-> > +             guest_configure_timer_action(shared_data);
-> > +
-> > +             /* Setup a timeout for the interrupt to arrive */
-> > +             udelay(msecs_to_usecs(test_args.timer_period_ms) +
-> > +                     TIMER_TEST_ERR_MARGIN_US);
-> > +
-> > +             irq_iter = READ_ONCE(shared_data->nr_iter);
-> > +             GUEST_ASSERT_2(config_iter + 1 == irq_iter,
-> > +                             config_iter + 1, irq_iter);
-> > +     };
-> > +}
-> > +
-> > +static void guest_code(void)
-> > +{
-> > +     uint32_t cpu = get_vcpuid();
-> > +     struct test_vcpu_shared_data *shared_data = &vcpu_shared_data[cpu];
-> > +
-> > +     local_irq_disable();
-> > +
-> > +     gic_init(GIC_V3, test_args.nr_vcpus,
-> > +             (void *)GICD_BASE_GPA, (void *)GICR_BASE_GPA);
-> > +
-> > +     timer_set_ctl(VIRTUAL, CTL_IMASK);
-> > +     timer_set_ctl(PHYSICAL, CTL_IMASK);
-> > +
-> > +     gic_irq_enable(VTIMER_IRQ);
-> > +     gic_irq_enable(PTIMER_IRQ);
-> > +     local_irq_enable();
-> > +
-> > +     guest_run_stage(shared_data, GUEST_STAGE_VTIMER_CVAL);
-> > +     guest_run_stage(shared_data, GUEST_STAGE_VTIMER_TVAL);
-> > +     guest_run_stage(shared_data, GUEST_STAGE_PTIMER_CVAL);
-> > +     guest_run_stage(shared_data, GUEST_STAGE_PTIMER_TVAL);
-> > +
-> > +     GUEST_DONE();
-> > +}
-> > +
-> > +static void *test_vcpu_run(void *arg)
-> > +{
-> > +     struct ucall uc;
-> > +     struct test_vcpu *vcpu = arg;
-> > +     struct kvm_vm *vm = vcpu->vm;
-> > +     uint32_t vcpuid = vcpu->vcpuid;
-> > +     struct test_vcpu_shared_data *shared_data = &vcpu_shared_data[vcpuid];
-> > +
-> > +     vcpu_run(vm, vcpuid);
-> > +
-> > +     switch (get_ucall(vm, vcpuid, &uc)) {
-> > +     case UCALL_SYNC:
-> > +     case UCALL_DONE:
-> > +             break;
-> > +     case UCALL_ABORT:
-> > +             sync_global_from_guest(vm, *shared_data);
-> > +             TEST_ASSERT(false,
-> > +                     "%s at %s:%ld\n\tvalues: %lu, %lu; %lu, vcpu: %u; stage: %u; iter: %u",
-> > +                     (const char *)uc.args[0], __FILE__, uc.args[1],
-> > +                     uc.args[2], uc.args[3], uc.args[4], vcpuid,
-> > +                     shared_data->guest_stage, shared_data->nr_iter);
-> > +             break;
-> > +     default:
-> > +             TEST_FAIL("Unexpected guest exit\n");
-> > +     }
-> > +
-> > +     return NULL;
-> > +}
-> > +
-> > +static void test_run(struct kvm_vm *vm)
-> > +{
-> > +     int i, ret;
-> > +
-> > +     for (i = 0; i < test_args.nr_vcpus; i++) {
-> > +             ret = pthread_create(&test_vcpu[i].pt_vcpu_run, NULL,
-> > +                             test_vcpu_run, &test_vcpu[i]);
-> > +             TEST_ASSERT(!ret, "Failed to create vCPU-%d pthread\n", i);
-> > +     }
-> > +
-> > +     for (i = 0; i < test_args.nr_vcpus; i++)
-> > +             pthread_join(test_vcpu[i].pt_vcpu_run, NULL);
-> > +}
-> > +
-> > +static void test_vm_setup_gic(struct kvm_vm *vm, unsigned int n_gicr_pages)
->
-> I think it's nicer if this takes nr_vcpus instead of gicr_pages.
->
-> And, it possible, it would be doubly nice if it could be be made a
-> library function (e.g., inside lib/aarch64/vgic.c?).
->
-Yeah, great idea. I had the same suggestion from Reiji as well.
 
-> > +{
-> > +     uint64_t addr;
-> > +     int gic_fd;
-> > +
-> > +     gic_fd = kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_V3, false);
-> > +
-> > +     addr = GICD_BASE_GPA;
-> > +     kvm_device_access(gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
-> > +                             KVM_VGIC_V3_ADDR_TYPE_DIST, &addr, true);
-> > +     virt_pg_map(vm, GICD_BASE_GPA, GICD_BASE_GPA);
->
-> Not really a big deal at the moment, but if KVM implemented ESPIs, then
-> a 4k page wouldn't be enough. Why not map 64Ks as there's space for it?
->
-Let's fix it while we are adding a new lib function.
-> > +
-> > +     addr = REDIST_REGION_ATTR_ADDR(test_args.nr_vcpus, GICR_BASE_GPA, 0, 0);
-> > +     kvm_device_access(gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
-> > +                     KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
-> > +     virt_map(vm, GICR_BASE_GPA, GICR_BASE_GPA, n_gicr_pages);
-> > +
-> > +     kvm_device_access(gic_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
-> > +                             KVM_DEV_ARM_VGIC_CTRL_INIT, NULL, true);
-> > +}
-> > +
-> > +static struct kvm_vm *test_vm_create(void)
-> > +{
-> > +     struct kvm_vm *vm;
-> > +     unsigned int i, n_gicr_pages;
-> > +     int nr_vcpus = test_args.nr_vcpus;
-> > +
-> > +     /* Reserve additional pages for GICR MMIO based on nr_vcpus */
-> > +     n_gicr_pages = vm_calc_num_guest_pages(VM_MODE_DEFAULT,
-> > +                                             2 * SZ_64K * nr_vcpus);
->
-> Might be better to use vm_get_page_size instead as it doesn't need the
-> mode arg. Note that you would have to call it after creating the vm
-> (vm_create..), but the nice thing is that that call uses the actual mode
-> that the vm was created with. I propose moving this pages calculation to
-> inside test_vm_setup_gic, which could take the number of vcpus as an arg
-> (instead of nr_pages).
->
-My idea was to reserve all the pages that we need in one go and the fact that
-we know that we'd be creating a VM in a 'default' mode. But now that we are
-moving to a lib function, I'll move the logic there.
 
-Thanks for the suggestions.
+On 27.08.21 16:06, Claudio Imbrenda wrote:
+> On Fri, 27 Aug 2021 14:54:29 +0200
+> Halil Pasic <pasic@linux.ibm.com> wrote:
+> 
+>> While in practice vcpu->vcpu_idx ==  vcpu->vcp_id is often true,
+>> it may not always be, and we must not rely on this.
+> 
+> why?
+> 
+> maybe add a simple explanation of why vcpu_idx and vcpu_id can be
+> different, namely:
+> KVM decides the vcpu_idx, userspace decides the vcpu_id, thus the two
+> might not match
+> 
+>>
+>> Currently kvm->arch.idle_mask is indexed by vcpu_id, which implies
+>> that code like
+>> for_each_set_bit(vcpu_id, kvm->arch.idle_mask, online_vcpus) {
+>>                  vcpu = kvm_get_vcpu(kvm, vcpu_id);
+> 
+> you can also add a sentence to clarify that kvm_get_vcpu expects an
+> vcpu_idx, not an vcpu_id.
+> 
+>> 		do_stuff(vcpu);
 
-Regards,
-Raghavendra
-> > +
-> > +     vm = vm_create_default_with_vcpus(nr_vcpus, n_gicr_pages, 0,
-> > +                                             guest_code, NULL);
-> > +
-> > +     vm_init_descriptor_tables(vm);
-> > +     vm_install_exception_handler(vm, VECTOR_IRQ_CURRENT, guest_irq_handler);
-> > +
-> > +     for (i = 0; i < nr_vcpus; i++) {
-> > +             vcpu_init_descriptor_tables(vm, i);
-> > +
-> > +             test_vcpu[i].vcpuid = i;
-> > +             test_vcpu[i].vm = vm;
-> > +     }
-> > +
-> > +     ucall_init(vm, NULL);
-> > +     test_vm_setup_gic(vm, n_gicr_pages);
-> > +
-> > +     /* Make all the test's cmdline args visible to the guest */
-> > +     sync_global_to_guest(vm, test_args);
-> > +
-> > +     return vm;
-> > +}
-> > +
-> > +static void test_print_help(char *name)
-> > +{
-> > +     pr_info("Usage: %s [-h] [-n nr_vcpus] [-i iterations] [-p timer_period_ms]\n",
-> > +             name);
-> > +     pr_info("\t-n: Number of vCPUs to configure (default: %u; max: %u)\n",
-> > +             NR_VCPUS_DEF, KVM_MAX_VCPUS);
-> > +     pr_info("\t-i: Number of iterations per stage (default: %u)\n",
-> > +             NR_TEST_ITERS_DEF);
-> > +     pr_info("\t-p: Periodicity (in ms) of the guest timer (default: %u)\n",
-> > +             TIMER_TEST_PERIOD_MS_DEF);
-> > +     pr_info("\t-h: print this help screen\n");
-> > +}
-> > +
-> > +static bool parse_args(int argc, char *argv[])
-> > +{
-> > +     int opt;
-> > +
-> > +     while ((opt = getopt(argc, argv, "hn:i:p:")) != -1) {
-> > +             switch (opt) {
-> > +             case 'n':
-> > +                     test_args.nr_vcpus = atoi(optarg);
-> > +                     if (test_args.nr_vcpus <= 0) {
-> > +                             pr_info("Positive value needed for -n\n");
-> > +                             goto err;
-> > +                     } else if (test_args.nr_vcpus > KVM_MAX_VCPUS) {
-> > +                             pr_info("Max allowed vCPUs: %u\n",
-> > +                                     KVM_MAX_VCPUS);
-> > +                             goto err;
-> > +                     }
-> > +                     break;
-> > +             case 'i':
-> > +                     test_args.nr_iter = atoi(optarg);
-> > +                     if (test_args.nr_iter <= 0) {
-> > +                             pr_info("Positive value needed for -i\n");
-> > +                             goto err;
-> > +                     }
-> > +                     break;
-> > +             case 'p':
-> > +                     test_args.timer_period_ms = atoi(optarg);
-> > +                     if (test_args.timer_period_ms <= 0) {
-> > +                             pr_info("Positive value needed for -p\n");
-> > +                             goto err;
-> > +                     }
-> > +                     break;
-> > +             case 'h':
-> > +             default:
-> > +                     goto err;
-> > +             }
-> > +     }
-> > +
-> > +     return true;
-> > +
-> > +err:
-> > +     test_print_help(argv[0]);
-> > +     return false;
-> > +}
-> > +
-> > +int main(int argc, char *argv[])
-> > +{
-> > +     struct kvm_vm *vm;
-> > +
-> > +     /* Tell stdout not to buffer its content */
-> > +     setbuf(stdout, NULL);
-> > +
-> > +     if (!parse_args(argc, argv))
-> > +             exit(KSFT_SKIP);
-> > +
-> > +     vm = test_vm_create();
-> > +     test_run(vm);
-> > +     kvm_vm_free(vm);
-> > +
-> > +     return 0;
-> > +}
-> > --
-> > 2.33.0.rc1.237.g0d66db33f3-goog
-> >
->
-> Thanks,
-> Ricardo
+I will modify the patch description accordingly before sending to Paolo.
+Thanks for noticing.
+
+
+>> }
+>> is not legit. The trouble is, we do actually use kvm->arch.idle_mask
+>> like this. To fix this problem we have two options. Either use
+>> kvm_get_vcpu_by_id(vcpu_id), which would loop to find the right vcpu_id,
+>> or switch to indexing via vcpu_idx. The latter is preferable for obvious
+>> reasons.
+>>
+>> Let us make switch from indexing kvm->arch.idle_mask by vcpu_id to
+>> indexing it by vcpu_idx.  To keep gisa_int.kicked_mask indexed by the
+>> same index as idle_mask lets make the same change for it as well.
+>>
+>> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
+>> Fixes: 1ee0bc559dc3 ("KVM: s390: get rid of local_int array")
+> 
+> otherwise looks good to me.
+> 
+> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> 
+>> Cc: <stable@vger.kernel.org> # 3.15+
+>> ---
+>>   arch/s390/include/asm/kvm_host.h |  1 +
+>>   arch/s390/kvm/interrupt.c        | 12 ++++++------
+>>   arch/s390/kvm/kvm-s390.c         |  2 +-
+>>   arch/s390/kvm/kvm-s390.h         |  2 +-
+>>   4 files changed, 9 insertions(+), 8 deletions(-)
+>>
+>> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+>> index 161a9e12bfb8..630eab0fa176 100644
+>> --- a/arch/s390/include/asm/kvm_host.h
+>> +++ b/arch/s390/include/asm/kvm_host.h
+>> @@ -957,6 +957,7 @@ struct kvm_arch{
+>>   	atomic64_t cmma_dirty_pages;
+>>   	/* subset of available cpu features enabled by user space */
+>>   	DECLARE_BITMAP(cpu_feat, KVM_S390_VM_CPU_FEAT_NR_BITS);
+>> +	/* indexed by vcpu_idx */
+>>   	DECLARE_BITMAP(idle_mask, KVM_MAX_VCPUS);
+>>   	struct kvm_s390_gisa_interrupt gisa_int;
+>>   	struct kvm_s390_pv pv;
+>> diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
+>> index d548d60caed2..16256e17a544 100644
+>> --- a/arch/s390/kvm/interrupt.c
+>> +++ b/arch/s390/kvm/interrupt.c
+>> @@ -419,13 +419,13 @@ static unsigned long deliverable_irqs(struct kvm_vcpu *vcpu)
+>>   static void __set_cpu_idle(struct kvm_vcpu *vcpu)
+>>   {
+>>   	kvm_s390_set_cpuflags(vcpu, CPUSTAT_WAIT);
+>> -	set_bit(vcpu->vcpu_id, vcpu->kvm->arch.idle_mask);
+>> +	set_bit(kvm_vcpu_get_idx(vcpu), vcpu->kvm->arch.idle_mask);
+>>   }
+>>   
+>>   static void __unset_cpu_idle(struct kvm_vcpu *vcpu)
+>>   {
+>>   	kvm_s390_clear_cpuflags(vcpu, CPUSTAT_WAIT);
+>> -	clear_bit(vcpu->vcpu_id, vcpu->kvm->arch.idle_mask);
+>> +	clear_bit(kvm_vcpu_get_idx(vcpu), vcpu->kvm->arch.idle_mask);
+>>   }
+>>   
+>>   static void __reset_intercept_indicators(struct kvm_vcpu *vcpu)
+>> @@ -3050,18 +3050,18 @@ int kvm_s390_get_irq_state(struct kvm_vcpu *vcpu, __u8 __user *buf, int len)
+>>   
+>>   static void __airqs_kick_single_vcpu(struct kvm *kvm, u8 deliverable_mask)
+>>   {
+>> -	int vcpu_id, online_vcpus = atomic_read(&kvm->online_vcpus);
+>> +	int vcpu_idx, online_vcpus = atomic_read(&kvm->online_vcpus);
+>>   	struct kvm_s390_gisa_interrupt *gi = &kvm->arch.gisa_int;
+>>   	struct kvm_vcpu *vcpu;
+>>   
+>> -	for_each_set_bit(vcpu_id, kvm->arch.idle_mask, online_vcpus) {
+>> -		vcpu = kvm_get_vcpu(kvm, vcpu_id);
+>> +	for_each_set_bit(vcpu_idx, kvm->arch.idle_mask, online_vcpus) {
+>> +		vcpu = kvm_get_vcpu(kvm, vcpu_idx);
+>>   		if (psw_ioint_disabled(vcpu))
+>>   			continue;
+>>   		deliverable_mask &= (u8)(vcpu->arch.sie_block->gcr[6] >> 24);
+>>   		if (deliverable_mask) {
+>>   			/* lately kicked but not yet running */
+>> -			if (test_and_set_bit(vcpu_id, gi->kicked_mask))
+>> +			if (test_and_set_bit(vcpu_idx, gi->kicked_mask))
+>>   				return;
+>>   			kvm_s390_vcpu_wakeup(vcpu);
+>>   			return;
+>> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+>> index 4527ac7b5961..8580543c5bc3 100644
+>> --- a/arch/s390/kvm/kvm-s390.c
+>> +++ b/arch/s390/kvm/kvm-s390.c
+>> @@ -4044,7 +4044,7 @@ static int vcpu_pre_run(struct kvm_vcpu *vcpu)
+>>   		kvm_s390_patch_guest_per_regs(vcpu);
+>>   	}
+>>   
+>> -	clear_bit(vcpu->vcpu_id, vcpu->kvm->arch.gisa_int.kicked_mask);
+>> +	clear_bit(kvm_vcpu_get_idx(vcpu), vcpu->kvm->arch.gisa_int.kicked_mask);
+>>   
+>>   	vcpu->arch.sie_block->icptcode = 0;
+>>   	cpuflags = atomic_read(&vcpu->arch.sie_block->cpuflags);
+>> diff --git a/arch/s390/kvm/kvm-s390.h b/arch/s390/kvm/kvm-s390.h
+>> index 9fad25109b0d..ecd741ee3276 100644
+>> --- a/arch/s390/kvm/kvm-s390.h
+>> +++ b/arch/s390/kvm/kvm-s390.h
+>> @@ -79,7 +79,7 @@ static inline int is_vcpu_stopped(struct kvm_vcpu *vcpu)
+>>   
+>>   static inline int is_vcpu_idle(struct kvm_vcpu *vcpu)
+>>   {
+>> -	return test_bit(vcpu->vcpu_id, vcpu->kvm->arch.idle_mask);
+>> +	return test_bit(kvm_vcpu_get_idx(vcpu), vcpu->kvm->arch.idle_mask);
+>>   }
+>>   
+>>   static inline int kvm_is_ucontrol(struct kvm *kvm)
+>>
+>> base-commit: 77dd11439b86e3f7990e4c0c9e0b67dca82750ba
+> 
