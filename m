@@ -2,96 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2A1643F982C
-	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 12:38:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8FB1A3F984A
+	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 12:52:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244945AbhH0Kg7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Aug 2021 06:36:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:38187 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233315AbhH0Kg6 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 27 Aug 2021 06:36:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630060569;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Ei+1cHIOQVyfLzvdswZ/VxfoLUx7LjHVn7EKejLifHE=;
-        b=MWAPWQyfJEfCN86Ix6vI1vMDq1sU9OpawgutOAZyi4Zbib5WAW6s8t7s+PrWNacQJZpXSE
-        wjCh7l05h4RB6uoy+6T+3Td8Q/cZhe8l5MlqBLbkScz/gbuYfESwfAhngVUsUBG5HOJFcS
-        9vm0C3DsxUvBXkGj9K6JNBmMD1eF3VY=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-158-UY8xzir8OkSGhQX8-6qrtQ-1; Fri, 27 Aug 2021 06:36:08 -0400
-X-MC-Unique: UY8xzir8OkSGhQX8-6qrtQ-1
-Received: by mail-wm1-f71.google.com with SMTP id j33-20020a05600c1c21b02902e6828f7a20so1599400wms.7
-        for <kvm@vger.kernel.org>; Fri, 27 Aug 2021 03:36:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Ei+1cHIOQVyfLzvdswZ/VxfoLUx7LjHVn7EKejLifHE=;
-        b=byZd7AwDeE7556OgxYz3C9W2NIyVarj4Rj9jalLrkvmxyCksIp8OyiC+bPli4exM3h
-         RhGxDgLe7OVQUsM75xOe9HrcUqgPFsTvW0WzK4tJaaH0EEh1KqjON7PK1haB9+3yoEEz
-         ak/Bb93R6tNj3BOBU8bYrJZxbUVeLrFv/PhwsMO5TJ+OSm2IXGGt52caSKn+PTmGCWFz
-         qVb+OxFo57MWaNh2PTWaB7hHsphetiylWZJN4oarharbkUFzY3at2z2C7JNw+URixzSK
-         E7W9lBRKV31Vl6YlOC+HX17KYIqzI7ebG1Viee4NUeV4STXJ99ivz3XLZ+4sXZ22xzOd
-         xt1A==
-X-Gm-Message-State: AOAM531eIsr+fnLTQGx1wkMQbY8tglix9mylHvWEFLLQrPQmHK+ARY8g
-        jO/y+G+m3Q07+UZwEC9EeiBw6bUdXK/TkeZO31o80+/AL4/Kcp5FLCtp7+TyTZ81Qn6pBmPOk8b
-        8XjQVEGcswe04
-X-Received: by 2002:adf:9ccc:: with SMTP id h12mr9310906wre.385.1630060567461;
-        Fri, 27 Aug 2021 03:36:07 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwnlVOby2/EKTguVA+pPT2bseGt95mJtgyNerjyar7lkM9GFfM9TMrbXxge7CyBijFdVrP2Ng==
-X-Received: by 2002:adf:9ccc:: with SMTP id h12mr9310895wre.385.1630060567300;
-        Fri, 27 Aug 2021 03:36:07 -0700 (PDT)
-Received: from thuth.remote.csb (dynamic-046-114-148-182.46.114.pool.telefonica.de. [46.114.148.182])
-        by smtp.gmail.com with ESMTPSA id r1sm9621112wmn.46.2021.08.27.03.36.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 27 Aug 2021 03:36:06 -0700 (PDT)
-Subject: Re: [PATCH kvm-unit-tests] Makefile: Don't trust PWD
-To:     Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org
-Cc:     pmorel@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
-        cohuck@redhat.com, imbrenda@linux.ibm.com, pbonzini@redhat.com
-References: <20210827103115.309774-1-drjones@redhat.com>
-From:   Thomas Huth <thuth@redhat.com>
-Message-ID: <566ab64b-03eb-b4e6-ddff-39524f256578@redhat.com>
-Date:   Fri, 27 Aug 2021 12:36:05 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.12.0
+        id S244973AbhH0Kxj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Aug 2021 06:53:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56438 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S244860AbhH0Kxi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Aug 2021 06:53:38 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A8D9C061757;
+        Fri, 27 Aug 2021 03:52:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=OvP4Yc4jC04J0qjspa8OOFxuL+jnhRGg3XpJSSUjD4o=; b=dSa6gg/k/uLkIao8HV8YKHe55R
+        QJNUW1DSGmJFIQkoPB+Yq9DSt+RE29HdMkm2cJByn2hw71NQjxJsEPWO+21wDTQDfhVhvu8BkQjf+
+        L2krqmyZ3aAWLWTmA2aYMCQduTwu64ujYtSfjBEUhfAlVzmTqYLy4o2Ws9e1IwuEUwmRG03uA93za
+        1BcwsEtY0TALxF7lF4k1iZju+DOeaUy6K5KSj20dObZE8KmsuxkJigtb+xm3AzeIgXlZyxOHnS/+B
+        4KvrvAwWmfWEjBAXOKEuxfukFtVoVnSRlyFVxwDa8h8JGPBd0g9VYSiib1uZ+XvyETPfQlMGdpOrv
+        2P9m3iwg==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mJZOS-00ESWc-Uh; Fri, 27 Aug 2021 10:47:37 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 69DD6300024;
+        Fri, 27 Aug 2021 12:47:25 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 4ECD229A12A47; Fri, 27 Aug 2021 12:47:25 +0200 (CEST)
+Date:   Fri, 27 Aug 2021 12:47:25 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Like Xu <like.xu.linux@gmail.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Jiri Olsa <jolsa@redhat.com>,
+        Namhyung Kim <namhyung@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-csky@vger.kernel.org, linux-riscv@lists.infradead.org,
+        kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
+        Artem Kashkanov <artem.kashkanov@intel.com>,
+        Zhu Lingshan <lingshan.zhu@intel.com>,
+        Will Deacon <will@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Marc Zyngier <maz@kernel.org>, Guo Ren <guoren@kernel.org>,
+        Nick Hu <nickhu@andestech.com>,
+        Greentime Hu <green.hu@gmail.com>,
+        Vincent Chen <deanbo422@gmail.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Borislav Petkov <bp@alien8.de>, x86@kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Juergen Gross <jgross@suse.com>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Jason Baron <jbaron@akamai.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Ard Biesheuvel <ardb@kernel.org>
+Subject: Re: [PATCH 00/15] perf: KVM: Fix, optimize, and clean up callbacks
+Message-ID: <YSjCvbWE6sZ29dPr@hirez.programming.kicks-ass.net>
+References: <20210827005718.585190-1-seanjc@google.com>
+ <fd3dcd6c-b3d5-4453-93fb-b46d0595534e@gmail.com>
+ <YSiX9OPcrDsr3P4C@hirez.programming.kicks-ass.net>
+ <3bd4955a-1219-20b0-058b-d23f1e30aa77@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20210827103115.309774-1-drjones@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3bd4955a-1219-20b0-058b-d23f1e30aa77@gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 27/08/2021 12.31, Andrew Jones wrote:
-> It's possible that PWD is already set to something which isn't
-> the full path of the current working directory. Let's make sure
-> it is.
+On Fri, Aug 27, 2021 at 04:01:45PM +0800, Like Xu wrote:
+> On 27/8/2021 3:44 pm, Peter Zijlstra wrote:
+
+> > You just have to make sure all static_call() invocations that started
+> > before unreg are finished before continuing with the unload.
+> > synchronize_rcu() can help with that.
 > 
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
-> ---
->   Makefile | 1 +
->   1 file changed, 1 insertion(+)
+> Do you mean something like that:
 > 
-> diff --git a/Makefile b/Makefile
-> index f7b9f28c9319..a65f225b7d5c 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -1,4 +1,5 @@
->   SHELL := /usr/bin/env bash
-> +PWD := $(shell pwd)
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 64e310ff4f3a..e7d310af7509 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -8465,6 +8465,7 @@ void kvm_arch_exit(void)
+>  #endif
+>  	kvm_lapic_exit();
+>  	perf_unregister_guest_info_callbacks(&kvm_guest_cbs);
+> +	synchronize_rcu();
+> 
+>  	if (!boot_cpu_has(X86_FEATURE_CONSTANT_TSC))
+>  		cpufreq_unregister_notifier(&kvmclock_cpufreq_notifier_block,
+> diff --git a/kernel/events/core.c b/kernel/events/core.c
+> index e466fc8176e1..63ae56c5d133 100644
+> --- a/kernel/events/core.c
+> +++ b/kernel/events/core.c
+> @@ -6508,6 +6508,7 @@ EXPORT_SYMBOL_GPL(perf_register_guest_info_callbacks);
+>  int perf_unregister_guest_info_callbacks(struct perf_guest_info_callbacks *cbs)
+>  {
+>  	perf_guest_cbs = NULL;
+> +	arch_perf_update_guest_cbs();
 
-I think we should rather use $(CURDIR) in Makefiles instead, since this is 
-the official way that GNU Make handles the current working directory.
+I'm thinking the synchronize_rcu() should go here, and access to
+perf_guest_cbs should be wrapped to yell when called with preemption
+enabled.
 
-By the way, is this cscope thing also supposed to work in out-of-tree builds?
+But yes..
 
-  Thomas
-
+>  	return 0;
+>  }
+>  EXPORT_SYMBOL_GPL(perf_unregister_guest_info_callbacks);
+> 
+> > 
+> > This is module unload 101. Nothing specific to static_call().
+> > 
