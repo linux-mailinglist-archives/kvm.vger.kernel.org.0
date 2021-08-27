@@ -2,35 +2,35 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 03A3B3F9A38
-	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 15:33:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 787DA3F9A3C
+	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 15:33:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245243AbhH0Ndu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Aug 2021 09:33:50 -0400
-Received: from smtp-fw-6001.amazon.com ([52.95.48.154]:23944 "EHLO
-        smtp-fw-6001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245156AbhH0Ndt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Aug 2021 09:33:49 -0400
+        id S245261AbhH0Ndy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Aug 2021 09:33:54 -0400
+Received: from smtp-fw-9102.amazon.com ([207.171.184.29]:29004 "EHLO
+        smtp-fw-9102.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S245275AbhH0Ndx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Aug 2021 09:33:53 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1630071182; x=1661607182;
+  t=1630071185; x=1661607185;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=wh/CawUQ7CY8Snqcn644V6JnliWp+GzBGu4r/WJhUOI=;
-  b=SS4xoNx3/xAI9fdeFSbRw81PUk+rE47COWNooECPyAMiGJ2ea52V8CXx
-   zSl6E/dNXyCk8s/hPSalptJBKorLSrqSX6KPTR2sjLDDKV9eK3Lgm7tUb
-   s2B1+JuINKUzCGBM5mnWyel0ZT0jf8ZIHZxL5xZdd/XZUQ3JbLaU+yYcJ
-   U=;
+  bh=13gdSUSTjJs/ViYAWMGsJ2rsmzPqo9NDHMscb4elG0s=;
+  b=ApROaPDB3Wzrq2ueRqBM5ldPw1PovIwvgw16MFqDcHcLxffMjjbLDrva
+   B7xOqyP8KGcK22MJMtOyTAmEkKdg0htfBp4JbNKLniRml0jeh8f614tVX
+   zW63Hu4YSBPiCs7DeerqnSSSL+Rode3pyI00u6J51JeYEt7/5uyyA5H0G
+   8=;
 X-IronPort-AV: E=Sophos;i="5.84,356,1620691200"; 
-   d="scan'208";a="137217030"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-2a-c5104f52.us-west-2.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-6001.iad6.amazon.com with ESMTP; 27 Aug 2021 13:32:52 +0000
+   d="scan'208";a="155617234"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-2b-5bdc5131.us-west-2.amazon.com) ([10.25.36.214])
+  by smtp-border-fw-9102.sea19.amazon.com with ESMTP; 27 Aug 2021 13:32:57 +0000
 Received: from EX13D16EUB003.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
-        by email-inbound-relay-2a-c5104f52.us-west-2.amazon.com (Postfix) with ESMTPS id 0AEBCA17F3;
-        Fri, 27 Aug 2021 13:32:50 +0000 (UTC)
+        by email-inbound-relay-2b-5bdc5131.us-west-2.amazon.com (Postfix) with ESMTPS id 9615DA262C;
+        Fri, 27 Aug 2021 13:32:55 +0000 (UTC)
 Received: from 38f9d34ed3b1.ant.amazon.com (10.43.161.176) by
  EX13D16EUB003.ant.amazon.com (10.43.166.99) with Microsoft SMTP Server (TLS)
- id 15.0.1497.23; Fri, 27 Aug 2021 13:32:44 +0000
+ id 15.0.1497.23; Fri, 27 Aug 2021 13:32:49 +0000
 From:   Andra Paraschiv <andraprs@amazon.com>
 To:     linux-kernel <linux-kernel@vger.kernel.org>
 CC:     Alexandru Ciobotaru <alcioa@amazon.com>,
@@ -44,9 +44,9 @@ CC:     Alexandru Ciobotaru <alcioa@amazon.com>,
         kvm <kvm@vger.kernel.org>,
         ne-devel-upstream <ne-devel-upstream@amazon.com>,
         Andra Paraschiv <andraprs@amazon.com>
-Subject: [PATCH v2 1/7] nitro_enclaves: Enable Arm64 support
-Date:   Fri, 27 Aug 2021 16:32:24 +0300
-Message-ID: <20210827133230.29816-2-andraprs@amazon.com>
+Subject: [PATCH v2 2/7] nitro_enclaves: Update documentation for Arm64 support
+Date:   Fri, 27 Aug 2021 16:32:25 +0300
+Message-ID: <20210827133230.29816-3-andraprs@amazon.com>
 X-Mailer: git-send-email 2.20.1 (Apple Git-117)
 In-Reply-To: <20210827133230.29816-1-andraprs@amazon.com>
 References: <20210827133230.29816-1-andraprs@amazon.com>
@@ -60,45 +60,74 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Update the kernel config to enable the Nitro Enclaves kernel driver for
-Arm64 support.
+Add references for hugepages and booting steps for Arm64.
+
+Include info about the current supported architectures for the
+NE kernel driver.
 
 Changelog
 
 v1 -> v2
 
-* No changes.
+* Add information about supported architectures for the NE kernel
+driver.
 
 Signed-off-by: Andra Paraschiv <andraprs@amazon.com>
-Acked-by: Stefano Garzarella <sgarzare@redhat.com>
 ---
- drivers/virt/nitro_enclaves/Kconfig | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
+ Documentation/virt/ne_overview.rst | 21 +++++++++++++--------
+ 1 file changed, 13 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/virt/nitro_enclaves/Kconfig b/drivers/virt/nitro_enclaves/Kconfig
-index 8c9387a232df8..f53740b941c0f 100644
---- a/drivers/virt/nitro_enclaves/Kconfig
-+++ b/drivers/virt/nitro_enclaves/Kconfig
-@@ -1,17 +1,13 @@
- # SPDX-License-Identifier: GPL-2.0
- #
--# Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-+# Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+diff --git a/Documentation/virt/ne_overview.rst b/Documentation/virt/ne_overview.rst
+index 39b0c8fe2654a..74c2f5919c886 100644
+--- a/Documentation/virt/ne_overview.rst
++++ b/Documentation/virt/ne_overview.rst
+@@ -14,12 +14,15 @@ instances [1].
+ For example, an application that processes sensitive data and runs in a VM,
+ can be separated from other applications running in the same VM. This
+ application then runs in a separate VM than the primary VM, namely an enclave.
++It runs alongside the VM that spawned it. This setup matches low latency
++applications needs.
  
- # Amazon Nitro Enclaves (NE) support.
- # Nitro is a hypervisor that has been developed by Amazon.
+-An enclave runs alongside the VM that spawned it. This setup matches low latency
+-applications needs. The resources that are allocated for the enclave, such as
+-memory and CPUs, are carved out of the primary VM. Each enclave is mapped to a
+-process running in the primary VM, that communicates with the NE driver via an
+-ioctl interface.
++The current supported architectures for the NE kernel driver, available in the
++upstream Linux kernel, are x86 and ARM64.
++
++The resources that are allocated for the enclave, such as memory and CPUs, are
++carved out of the primary VM. Each enclave is mapped to a process running in the
++primary VM, that communicates with the NE kernel driver via an ioctl interface.
  
--# TODO: Add dependency for ARM64 once NE is supported on Arm platforms. For now,
--# the NE kernel driver can be built for aarch64 arch.
--# depends on (ARM64 || X86) && HOTPLUG_CPU && PCI && SMP
--
- config NITRO_ENCLAVES
- 	tristate "Nitro Enclaves Support"
--	depends on X86 && HOTPLUG_CPU && PCI && SMP
-+	depends on (ARM64 || X86) && HOTPLUG_CPU && PCI && SMP
- 	help
- 	  This driver consists of support for enclave lifetime management
- 	  for Nitro Enclaves (NE).
+ In this sense, there are two components:
+ 
+@@ -43,8 +46,8 @@ for the enclave VM. An enclave does not have persistent storage attached.
+ The memory regions carved out of the primary VM and given to an enclave need to
+ be aligned 2 MiB / 1 GiB physically contiguous memory regions (or multiple of
+ this size e.g. 8 MiB). The memory can be allocated e.g. by using hugetlbfs from
+-user space [2][3]. The memory size for an enclave needs to be at least 64 MiB.
+-The enclave memory and CPUs need to be from the same NUMA node.
++user space [2][3][7]. The memory size for an enclave needs to be at least
++64 MiB. The enclave memory and CPUs need to be from the same NUMA node.
+ 
+ An enclave runs on dedicated cores. CPU 0 and its CPU siblings need to remain
+ available for the primary VM. A CPU pool has to be set for NE purposes by an
+@@ -61,7 +64,7 @@ device is placed in memory below the typical 4 GiB.
+ The application that runs in the enclave needs to be packaged in an enclave
+ image together with the OS ( e.g. kernel, ramdisk, init ) that will run in the
+ enclave VM. The enclave VM has its own kernel and follows the standard Linux
+-boot protocol [6].
++boot protocol [6][8].
+ 
+ The kernel bzImage, the kernel command line, the ramdisk(s) are part of the
+ Enclave Image Format (EIF); plus an EIF header including metadata such as magic
+@@ -93,3 +96,5 @@ enclave process can exit.
+ [4] https://www.kernel.org/doc/html/latest/admin-guide/kernel-parameters.html
+ [5] https://man7.org/linux/man-pages/man7/vsock.7.html
+ [6] https://www.kernel.org/doc/html/latest/x86/boot.html
++[7] https://www.kernel.org/doc/html/latest/arm64/hugetlbpage.html
++[8] https://www.kernel.org/doc/html/latest/arm64/booting.html
 -- 
 2.20.1 (Apple Git-117)
 
