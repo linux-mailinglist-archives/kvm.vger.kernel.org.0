@@ -2,143 +2,219 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A6B8F3F9A77
-	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 15:51:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D92143F9A9E
+	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 16:07:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241291AbhH0Nvs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Aug 2021 09:51:48 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:37258 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232257AbhH0Nvq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Aug 2021 09:51:46 -0400
-Received: from zn.tnic (p200300ec2f1117006e0d6268a9fc7b3e.dip0.t-ipconnect.de [IPv6:2003:ec:2f11:1700:6e0d:6268:a9fc:7b3e])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 59FAE1EC0537;
-        Fri, 27 Aug 2021 15:50:52 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1630072252;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=MgcfjTqcSY9gu+zATu+viDfC+xRfq+ze2XUVEcy5kJQ=;
-        b=cO0UcApzABFyvPv+e6G4bGRLUXS/CNO2/DFEGytg7MS8u7V43idZQCwPExuB4RZ2dTpRkF
-        ZxrfGsWj2Lzr+LOSyR0G1Fy/jCw1vouDlF4GKT7VnZ9xWps8tPd6rZuQft0qi4nHtT/Sfa
-        fAPo0aIk+YOA4sfiUsRttbNgb58ivFI=
-Date:   Fri, 27 Aug 2021 15:51:29 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH Part1 v5 29/38] x86/boot: add a pointer to Confidential
- Computing blob in bootparams
-Message-ID: <YSjt4YDQR8vDeOdI@zn.tnic>
-References: <20210820151933.22401-1-brijesh.singh@amd.com>
- <20210820151933.22401-30-brijesh.singh@amd.com>
+        id S245276AbhH0OHR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Aug 2021 10:07:17 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39312 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231907AbhH0OHQ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 27 Aug 2021 10:07:16 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 17RE4VL5189587;
+        Fri, 27 Aug 2021 10:06:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=sgwVAJcqE0rDWtTZ6AJ38qg4lT3MJsxVdgbPhaYwVoI=;
+ b=D+SUDAuuY+Jdce96pysiTUiGY2FwDh8lgRR2557+doTzVqJUJFgjPYBTGsluHjC+Ko7G
+ qWglldbYcAj/mI+ALjArx6PYqrJeOryrrrIooHjk4XK2VBWEdZzQSQ5Tge4kTUfxDp6m
+ w5Km1weRjifg/gu2KwqhrSu8Afw/u25rFDS+3dcc6CLExJZCn+0xKDecUJKVP3cO2hWT
+ JWPaGe8v7N6RNAsCjZpEC/HPHl9VEYfArTb/WDRD+QY0lBWx68VFm2L5Wzju1oZ5XwpN
+ d9KxC7ZY/IAlYJ4MdZX5/zFemrzLKK/9jqhveckKmsWad04ygE4SUXRF34jdW8K2m5uI Og== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3apver80fp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 27 Aug 2021 10:06:26 -0400
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 17RE5E60194316;
+        Fri, 27 Aug 2021 10:06:25 -0400
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3apver80bx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 27 Aug 2021 10:06:25 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 17RDve9g017081;
+        Fri, 27 Aug 2021 14:06:23 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma03ams.nl.ibm.com with ESMTP id 3ajs48km83-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 27 Aug 2021 14:06:23 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 17RE6JUb33292768
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 27 Aug 2021 14:06:19 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7FBE152059;
+        Fri, 27 Aug 2021 14:06:19 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.145.13.169])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id D1A6852063;
+        Fri, 27 Aug 2021 14:06:18 +0000 (GMT)
+Date:   Fri, 27 Aug 2021 16:06:16 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Halil Pasic <pasic@linux.ibm.com>
+Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        stable@vger.kernel.org, Michael Mueller <mimu@linux.ibm.com>
+Subject: Re: [PATCH 1/1] KVM: s390: index kvm->arch.idle_mask by vcpu_idx
+Message-ID: <20210827160616.532d6699@p-imbrenda>
+In-Reply-To: <20210827125429.1912577-1-pasic@linux.ibm.com>
+References: <20210827125429.1912577-1-pasic@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20210820151933.22401-30-brijesh.singh@amd.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: _9EcOdcMaTV3lvmIfWHyn5Wxy8xo9y3B
+X-Proofpoint-GUID: pZ2WiLbKyw6Jvb4Plinox0nbQh7DuH-W
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-08-27_04:2021-08-26,2021-08-27 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 phishscore=0
+ adultscore=0 malwarescore=0 lowpriorityscore=0 bulkscore=0 suspectscore=0
+ mlxlogscore=999 mlxscore=0 priorityscore=1501 impostorscore=0 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2107140000
+ definitions=main-2108270089
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 20, 2021 at 10:19:24AM -0500, Brijesh Singh wrote:
-> From: Michael Roth <michael.roth@amd.com>
-> 
-> The previously defined Confidential Computing blob is provided to the
-> kernel via a setup_data structure or EFI config table entry. Currently
-> these are both checked for by boot/compressed kernel to access the
-> CPUID table address within it for use with SEV-SNP CPUID enforcement.
-> 
-> To also enable SEV-SNP CPUID enforcement for the run-time kernel,
-> similar early access to the CPUID table is needed early on while it's
-> still using the identity-mapped page table set up by boot/compressed,
-> where global pointers need to be accessed via fixup_pointer().
-> 
-> This is much of an issue for accessing setup_data, and the EFI config
-> table helper code currently used in boot/compressed *could* be used in
-> this case as well since they both rely on identity-mapping. However, it
-> has some reliance on EFI helpers/string constants that would need to be
-> accessed via fixup_pointer(), and fixing it up while making it
-> shareable between boot/compressed and run-time kernel is fragile and
-> introduces a good bit of uglyness.
-> 
-> Instead, this patch adds a boot_params->cc_blob_address pointer that
+On Fri, 27 Aug 2021 14:54:29 +0200
+Halil Pasic <pasic@linux.ibm.com> wrote:
 
-Avoid having "This patch" or "This commit" in the commit message. It is
-tautologically useless.
+> While in practice vcpu->vcpu_idx ==  vcpu->vcp_id is often true,
+> it may not always be, and we must not rely on this.
 
-Also, do
+why?
 
-$ git grep 'This patch' Documentation/process
+maybe add a simple explanation of why vcpu_idx and vcpu_id can be
+different, namely:
+KVM decides the vcpu_idx, userspace decides the vcpu_id, thus the two
+might not match 
 
-for more details.
-
-> boot/compressed can initialize so that the run-time kernel can access
-> the prelocated CC blob that way instead.
 > 
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> Currently kvm->arch.idle_mask is indexed by vcpu_id, which implies
+> that code like
+> for_each_set_bit(vcpu_id, kvm->arch.idle_mask, online_vcpus) {
+>                 vcpu = kvm_get_vcpu(kvm, vcpu_id);
+
+you can also add a sentence to clarify that kvm_get_vcpu expects an
+vcpu_idx, not an vcpu_id.
+
+> 		do_stuff(vcpu);
+> }
+> is not legit. The trouble is, we do actually use kvm->arch.idle_mask
+> like this. To fix this problem we have two options. Either use
+> kvm_get_vcpu_by_id(vcpu_id), which would loop to find the right vcpu_id,
+> or switch to indexing via vcpu_idx. The latter is preferable for obvious
+> reasons.
+> 
+> Let us make switch from indexing kvm->arch.idle_mask by vcpu_id to
+> indexing it by vcpu_idx.  To keep gisa_int.kicked_mask indexed by the
+> same index as idle_mask lets make the same change for it as well.
+> 
+> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
+> Fixes: 1ee0bc559dc3 ("KVM: s390: get rid of local_int array")
+
+otherwise looks good to me.
+
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+
+> Cc: <stable@vger.kernel.org> # 3.15+
 > ---
->  arch/x86/include/asm/bootparam_utils.h | 1 +
->  arch/x86/include/uapi/asm/bootparam.h  | 3 ++-
->  2 files changed, 3 insertions(+), 1 deletion(-)
+>  arch/s390/include/asm/kvm_host.h |  1 +
+>  arch/s390/kvm/interrupt.c        | 12 ++++++------
+>  arch/s390/kvm/kvm-s390.c         |  2 +-
+>  arch/s390/kvm/kvm-s390.h         |  2 +-
+>  4 files changed, 9 insertions(+), 8 deletions(-)
 > 
-> diff --git a/arch/x86/include/asm/bootparam_utils.h b/arch/x86/include/asm/bootparam_utils.h
-> index 981fe923a59f..53e9b0620d96 100644
-> --- a/arch/x86/include/asm/bootparam_utils.h
-> +++ b/arch/x86/include/asm/bootparam_utils.h
-> @@ -74,6 +74,7 @@ static void sanitize_boot_params(struct boot_params *boot_params)
->  			BOOT_PARAM_PRESERVE(hdr),
->  			BOOT_PARAM_PRESERVE(e820_table),
->  			BOOT_PARAM_PRESERVE(eddbuf),
-> +			BOOT_PARAM_PRESERVE(cc_blob_address),
->  		};
+> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+> index 161a9e12bfb8..630eab0fa176 100644
+> --- a/arch/s390/include/asm/kvm_host.h
+> +++ b/arch/s390/include/asm/kvm_host.h
+> @@ -957,6 +957,7 @@ struct kvm_arch{
+>  	atomic64_t cmma_dirty_pages;
+>  	/* subset of available cpu features enabled by user space */
+>  	DECLARE_BITMAP(cpu_feat, KVM_S390_VM_CPU_FEAT_NR_BITS);
+> +	/* indexed by vcpu_idx */
+>  	DECLARE_BITMAP(idle_mask, KVM_MAX_VCPUS);
+>  	struct kvm_s390_gisa_interrupt gisa_int;
+>  	struct kvm_s390_pv pv;
+> diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
+> index d548d60caed2..16256e17a544 100644
+> --- a/arch/s390/kvm/interrupt.c
+> +++ b/arch/s390/kvm/interrupt.c
+> @@ -419,13 +419,13 @@ static unsigned long deliverable_irqs(struct kvm_vcpu *vcpu)
+>  static void __set_cpu_idle(struct kvm_vcpu *vcpu)
+>  {
+>  	kvm_s390_set_cpuflags(vcpu, CPUSTAT_WAIT);
+> -	set_bit(vcpu->vcpu_id, vcpu->kvm->arch.idle_mask);
+> +	set_bit(kvm_vcpu_get_idx(vcpu), vcpu->kvm->arch.idle_mask);
+>  }
 >  
->  		memset(&scratch, 0, sizeof(scratch));
-> diff --git a/arch/x86/include/uapi/asm/bootparam.h b/arch/x86/include/uapi/asm/bootparam.h
-> index 1ac5acca72ce..bea5cdcdf532 100644
-> --- a/arch/x86/include/uapi/asm/bootparam.h
-> +++ b/arch/x86/include/uapi/asm/bootparam.h
-> @@ -188,7 +188,8 @@ struct boot_params {
->  	__u32 ext_ramdisk_image;			/* 0x0c0 */
->  	__u32 ext_ramdisk_size;				/* 0x0c4 */
->  	__u32 ext_cmd_line_ptr;				/* 0x0c8 */
-> -	__u8  _pad4[116];				/* 0x0cc */
-> +	__u8  _pad4[112];				/* 0x0cc */
-> +	__u32 cc_blob_address;				/* 0x13c */
+>  static void __unset_cpu_idle(struct kvm_vcpu *vcpu)
+>  {
+>  	kvm_s390_clear_cpuflags(vcpu, CPUSTAT_WAIT);
+> -	clear_bit(vcpu->vcpu_id, vcpu->kvm->arch.idle_mask);
+> +	clear_bit(kvm_vcpu_get_idx(vcpu), vcpu->kvm->arch.idle_mask);
+>  }
+>  
+>  static void __reset_intercept_indicators(struct kvm_vcpu *vcpu)
+> @@ -3050,18 +3050,18 @@ int kvm_s390_get_irq_state(struct kvm_vcpu *vcpu, __u8 __user *buf, int len)
+>  
+>  static void __airqs_kick_single_vcpu(struct kvm *kvm, u8 deliverable_mask)
+>  {
+> -	int vcpu_id, online_vcpus = atomic_read(&kvm->online_vcpus);
+> +	int vcpu_idx, online_vcpus = atomic_read(&kvm->online_vcpus);
+>  	struct kvm_s390_gisa_interrupt *gi = &kvm->arch.gisa_int;
+>  	struct kvm_vcpu *vcpu;
+>  
+> -	for_each_set_bit(vcpu_id, kvm->arch.idle_mask, online_vcpus) {
+> -		vcpu = kvm_get_vcpu(kvm, vcpu_id);
+> +	for_each_set_bit(vcpu_idx, kvm->arch.idle_mask, online_vcpus) {
+> +		vcpu = kvm_get_vcpu(kvm, vcpu_idx);
+>  		if (psw_ioint_disabled(vcpu))
+>  			continue;
+>  		deliverable_mask &= (u8)(vcpu->arch.sie_block->gcr[6] >> 24);
+>  		if (deliverable_mask) {
+>  			/* lately kicked but not yet running */
+> -			if (test_and_set_bit(vcpu_id, gi->kicked_mask))
+> +			if (test_and_set_bit(vcpu_idx, gi->kicked_mask))
+>  				return;
+>  			kvm_s390_vcpu_wakeup(vcpu);
+>  			return;
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index 4527ac7b5961..8580543c5bc3 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -4044,7 +4044,7 @@ static int vcpu_pre_run(struct kvm_vcpu *vcpu)
+>  		kvm_s390_patch_guest_per_regs(vcpu);
+>  	}
+>  
+> -	clear_bit(vcpu->vcpu_id, vcpu->kvm->arch.gisa_int.kicked_mask);
+> +	clear_bit(kvm_vcpu_get_idx(vcpu), vcpu->kvm->arch.gisa_int.kicked_mask);
+>  
+>  	vcpu->arch.sie_block->icptcode = 0;
+>  	cpuflags = atomic_read(&vcpu->arch.sie_block->cpuflags);
+> diff --git a/arch/s390/kvm/kvm-s390.h b/arch/s390/kvm/kvm-s390.h
+> index 9fad25109b0d..ecd741ee3276 100644
+> --- a/arch/s390/kvm/kvm-s390.h
+> +++ b/arch/s390/kvm/kvm-s390.h
+> @@ -79,7 +79,7 @@ static inline int is_vcpu_stopped(struct kvm_vcpu *vcpu)
+>  
+>  static inline int is_vcpu_idle(struct kvm_vcpu *vcpu)
+>  {
+> -	return test_bit(vcpu->vcpu_id, vcpu->kvm->arch.idle_mask);
+> +	return test_bit(kvm_vcpu_get_idx(vcpu), vcpu->kvm->arch.idle_mask);
+>  }
+>  
+>  static inline int kvm_is_ucontrol(struct kvm *kvm)
+> 
+> base-commit: 77dd11439b86e3f7990e4c0c9e0b67dca82750ba
 
-So I know I've heard grub being mentioned in conjunction with this: if
-you are ever going to pass this through the boot loader, then you'd need
-to update Documentation/x86/zero-page.rst too to state that this field
-can be written by the boot loader too.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
