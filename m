@@ -2,274 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 80BD43F9FA4
-	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 21:10:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4A1E43FA034
+	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 21:58:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231127AbhH0TK0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Aug 2021 15:10:26 -0400
-Received: from mail.efficios.com ([167.114.26.124]:53444 "EHLO
-        mail.efficios.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230446AbhH0TKZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Aug 2021 15:10:25 -0400
-Received: from localhost (localhost [127.0.0.1])
-        by mail.efficios.com (Postfix) with ESMTP id 35CF8381D4D;
-        Fri, 27 Aug 2021 15:09:35 -0400 (EDT)
-Received: from mail.efficios.com ([127.0.0.1])
-        by localhost (mail03.efficios.com [127.0.0.1]) (amavisd-new, port 10032)
-        with ESMTP id bdpbmavpTcDf; Fri, 27 Aug 2021 15:09:34 -0400 (EDT)
-Received: from localhost (localhost [127.0.0.1])
-        by mail.efficios.com (Postfix) with ESMTP id 70AB2381CCB;
-        Fri, 27 Aug 2021 15:09:34 -0400 (EDT)
-DKIM-Filter: OpenDKIM Filter v2.10.3 mail.efficios.com 70AB2381CCB
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=efficios.com;
-        s=default; t=1630091374;
-        bh=a+xsJEpOCH31ksEHBk6kwF1tUR+tILdkL5tisWRdxI0=;
-        h=Date:From:To:Message-ID:MIME-Version;
-        b=cZCl7fQ/RTUAu0JMKb52619qhmst5OKPbEtnktbVMX/PIHufPwNIz98Ws9VY3/hy4
-         tL/OEN4pzYr3Qp9c6LsakEcVPL42DmIBvwb0DHeXYpf+36mtzHghXaDhPpzwd132KK
-         hEGDyCXfz7EzVSVP6SPQEDmeEGlUwzPCYdoSc1QaK5k5qgXsewClns9NDZ5b/ANSk9
-         QAIBXoJdR3MOeo9N8iFtFpTi7L41mC/UV6LCTb8bhnUV6jRlXRnwh3eKkShIA/awvz
-         X6y/j+YsW2oArKIqHNlYlgPu+EvmE4w8fkZeC4LXw6VXW0bGAFOxuNvAsFq0SA9oq1
-         ckDQ0iaaY4cpQ==
-X-Virus-Scanned: amavisd-new at efficios.com
-Received: from mail.efficios.com ([127.0.0.1])
-        by localhost (mail03.efficios.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id nRsCb8Qy1cNv; Fri, 27 Aug 2021 15:09:34 -0400 (EDT)
-Received: from mail03.efficios.com (mail03.efficios.com [167.114.26.124])
-        by mail.efficios.com (Postfix) with ESMTP id 3381D381E39;
-        Fri, 27 Aug 2021 15:09:34 -0400 (EDT)
-Date:   Fri, 27 Aug 2021 15:09:34 -0400 (EDT)
-From:   Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     dvhart <dvhart@infradead.org>,
-        "Russell King, ARM Linux" <linux@armlinux.org.uk>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Guo Ren <guoren@kernel.org>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Heiko Carstens <hca@linux.ibm.com>, gor <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        rostedt <rostedt@goodmis.org>, Ingo Molnar <mingo@redhat.com>,
-        Oleg Nesterov <oleg@redhat.com>,
+        id S231586AbhH0T6G (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Aug 2021 15:58:06 -0400
+Received: from mail-dm6nam12on2040.outbound.protection.outlook.com ([40.107.243.40]:40544
+        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S231320AbhH0T6G (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Aug 2021 15:58:06 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=bWlVNnMa5m2mmiKcEmC+g4ckkmLVXyFWsLaEMEljNkgffoqn/St380bCydFojGYyHcbSgZcgggckDhw23T0CECTmIkCmFCX2i9A7WFNFYQ/Ic9tmWq1fojstKON2cbpXz5TU5fwzhN8L23+7byD0cLJNvGXuZzhtljgHzNW6z2Vt5yKek1me5wDOLT2b64D1eMD2XKGuKjdU/V4pkSGZDTiq7yg2M9nZS36FjjV77jjjO51/oQIpz5jDwV4Geg1pitxrDi9X2tncup7GVXsOfKSUaS1UGeY+5+v1UrzSpZkFu9VqoIOy7EM+A3RTTIfcmw3xfk3h1Gjev+gbFl6N5Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=45lorxETpuLzOCXmuT85eyDCRKXJ32uCX451Wwx2UwQ=;
+ b=BRtNxYmXZJcSDvy2ERSWnbpSAhTy65XLEFi6u8Yy0U5JkdZoIMxT4Gh6nXRRQNPw/PVUW93Fl2xLJhSfpPgALnGzCHt5Z//su0ysK4Lm4Pz4zg6FRf9hrHsdX2KRMGhX9qCP1Ek5Ko+BVnZodZZcSwE7Au7UK5MKVboXe7eFqWxCWyFKO8s/PGi5v+wAorRLc53cytKdwKQLvXPt29Bz4WLZStdebI+m141/wXYfYWEyH2bac3nLuvLtrHB4DRjez7+ldSm+Ft2Yx/BpOzCTiSGd6Z2IZsqQrj7yBI9B9RHqhEfBQAhT2dc3dMGMVedJPSP/g2cyLOS9ykLzyYLQZg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=45lorxETpuLzOCXmuT85eyDCRKXJ32uCX451Wwx2UwQ=;
+ b=2KeCB5QveeEa1utbvITsTVsoyXBcEaz7WNho+/EJUlmUK0ghvauV8434GCXJVVHTwA3m4awPt3FhF0atcF2N8+viC+nF7B+ZUkEukYpEOIuUpxCiRoaAwcfYt8ocvOFvcUzpCFco+0eCOmiZZzfPcmrVfDsQJk1xoJDWy5tG70Y=
+Authentication-Results: linux.intel.com; dkim=none (message not signed)
+ header.d=none;linux.intel.com; dmarc=none action=none header.from=amd.com;
+Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
+ by DM4PR12MB5375.namprd12.prod.outlook.com (2603:10b6:5:39a::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4415.14; Fri, 27 Aug
+ 2021 19:57:15 +0000
+Received: from DM4PR12MB5229.namprd12.prod.outlook.com
+ ([fe80::d560:d21:cd59:9418]) by DM4PR12MB5229.namprd12.prod.outlook.com
+ ([fe80::d560:d21:cd59:9418%6]) with mapi id 15.20.4457.023; Fri, 27 Aug 2021
+ 19:57:15 +0000
+Subject: Re: [PATCH Part1 v5 33/38] x86/sev: Provide support for SNP guest
+ request NAEs
+To:     Brijesh Singh <brijesh.singh@amd.com>,
+        Borislav Petkov <bp@alien8.de>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
         Thomas Gleixner <tglx@linutronix.de>,
-        Peter Zijlstra <peterz@infradead.org>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
         Andy Lutomirski <luto@kernel.org>,
-        paulmck <paulmck@kernel.org>, Boqun Feng <boqun.feng@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, shuah <shuah@kernel.org>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        linux-csky <linux-csky@vger.kernel.org>,
-        linux-mips <linux-mips@vger.kernel.org>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>,
-        linux-kselftest <linux-kselftest@vger.kernel.org>,
-        Peter Foley <pefoley@google.com>,
-        Shakeel Butt <shakeelb@google.com>,
-        Ben Gardon <bgardon@google.com>
-Message-ID: <339641531.29941.1630091374065.JavaMail.zimbra@efficios.com>
-In-Reply-To: <YSgpy8iXXXUQ+b/k@google.com>
-References: <20210820225002.310652-1-seanjc@google.com> <20210820225002.310652-5-seanjc@google.com> <766990430.21713.1629731934069.JavaMail.zimbra@efficios.com> <282257549.21721.1629732017655.JavaMail.zimbra@efficios.com> <YSblqrrpKcORzilX@google.com> <1700758714.29394.1630003332081.JavaMail.zimbra@efficios.com> <YSgpy8iXXXUQ+b/k@google.com>
-Subject: Re: [PATCH v2 4/5] KVM: selftests: Add a test for KVM_RUN+rseq to
- detect task migration bugs
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
+References: <20210820151933.22401-1-brijesh.singh@amd.com>
+ <20210820151933.22401-34-brijesh.singh@amd.com> <YSkkaaXrg6+cnb9+@zn.tnic>
+ <4acd17bc-bdb0-c4cc-97af-8842f8836c8e@amd.com>
+From:   Tom Lendacky <thomas.lendacky@amd.com>
+Message-ID: <20005c9e-fd82-5c96-7bfb-8b072e5d66e6@amd.com>
+Date:   Fri, 27 Aug 2021 14:57:11 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
+In-Reply-To: <4acd17bc-bdb0-c4cc-97af-8842f8836c8e@amd.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [167.114.26.124]
-X-Mailer: Zimbra 8.8.15_GA_4101 (ZimbraWebClient - FF91 (Linux)/8.8.15_GA_4059)
-Thread-Topic: selftests: Add a test for KVM_RUN+rseq to detect task migration bugs
-Thread-Index: Cat4/nZnF/JdYT0CBeoaNK9t7xzyjQ==
+X-ClientProxiedBy: SN4PR0701CA0030.namprd07.prod.outlook.com
+ (2603:10b6:803:2d::23) To DM4PR12MB5229.namprd12.prod.outlook.com
+ (2603:10b6:5:398::12)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from office-ryzen.texastahm.com (67.79.209.213) by SN4PR0701CA0030.namprd07.prod.outlook.com (2603:10b6:803:2d::23) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4457.20 via Frontend Transport; Fri, 27 Aug 2021 19:57:12 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: cf6701e8-bb82-4482-0b6c-08d96994ddc2
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5375:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <DM4PR12MB5375F28EA65A3ABE872683F3ECC89@DM4PR12MB5375.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 9+4MEAzucWBTEptvAPZXYipDhqIVeYoM6lsS8Adz2+Lbk/em72h4a6F2ruHmjbnKY5QGM1k6L7xZ/JWdLtafT5mOO+WSjqB4wTwdKDi2UL4a+phaLIiRGbIExbel2dM/RTbxpxf9lTASneDyPhybTCnwvfQNvFvIuhsuJCNaGnDsrdWYcoTBh+kh/jQGfxry3utMwpHnEKi5zEV6rMKSu+SJnNSRcLtAG7IFk71IE3KkzqZdxyKNTfCQKOGsvpaBR7Ya3U7s1eG3EiVIN35LVwS9PANExf9OdlDLo3aWBtvyZIVuTreQs8ku2j/LftSNyUdE9zEXlq6n2UOuiV2y5zDdQpDAdjDPWR9o/JaZgnbPhYQVufrCJfew6u4CW28E0shf1bCTJLtP7EdeZATg4yV7zCK5ww3mp8TMAE2UgKVOyC0CfloewaQ2SxYamEe9S1eqI+s/1pff2Ali1FzMUrBnODu48X/bMiT8S0V3OM9sH/EuHeIN0OX3pCmUItS2f7KQKRd0mvaydvVVCATyqxbUoZOWs+UMHBKIN9I/iR325Fpyuh5nFPV/0OmYv1Ot4fYl0AzrFWfzq4EAYNXsatlCTUqvIx0pNX6a/TqLoeer79WkldIYObeRebWTW73xCtYc1TqEgUrsxdFxiBRlPpd0j6qqJKX38aCOsIJdWblm7U0UVXoRG34kaz6to3s++AyMoReQHdn764UmtohpVnJsGtd2T6xY2QJltKDjyEk=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(396003)(136003)(346002)(376002)(39860400002)(36756003)(110136005)(66946007)(478600001)(66556008)(2616005)(26005)(66476007)(2906002)(4744005)(186003)(54906003)(8676002)(6486002)(38100700002)(8936002)(31696002)(6506007)(86362001)(7406005)(6512007)(83380400001)(956004)(53546011)(31686004)(5660300002)(4326008)(316002)(7416002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?eHUvamF1V1MyOFY3MmJyeFE5c2JWQk5KbGMzNzI2bXg0eGxpbUFZbXp3RUhN?=
+ =?utf-8?B?NklDb09CQk1SUTFqWXM5YjFMbFVVVkFBZW0vOHBabUxRdzBwdVRSVCtOMXNV?=
+ =?utf-8?B?SE1KTU5XSnFEcE5zb3VOZks1ZVVtYW0zRHV3cEZVbmU3ZWFjZEhuMWt4T2tG?=
+ =?utf-8?B?bjJFNUJyeVhKSkdKUndVRzYvVTVValFJNVlhejE4SGpUT0JSRjJJV2FkcllN?=
+ =?utf-8?B?c1lRSkdpK203QVNpTzNPLzNPdkVXWmlrNi91WVpMZXo0aTZyRFUwYkJtZlFS?=
+ =?utf-8?B?RWNwazlyb1NMUlNSWVVmdGowM1h4elFyTjJmRU5GQ0R5UDdhQ0lvSEt0RXda?=
+ =?utf-8?B?S04wRElwOWhYeVFyRmhpNEJnZEFDdlFnQytnSnpnVE1Zc25BYmFvalNJYm40?=
+ =?utf-8?B?QXR3d0FndlYvNS9PZVlsbFdhTkY5bEdLR0t6K3pPNmVPdkVlNG1EVVNoVnV1?=
+ =?utf-8?B?bHcxWDFXc01hbGZaMlZqT1VlSkRtak85ODhJMHJoczlQWTM2Q2NQNms3WGFM?=
+ =?utf-8?B?c296ZGozTEUvQlNJQkZ4YkcyRk1yWWt2YXV6UWRldWxpaEdCbFdTalVjR1VF?=
+ =?utf-8?B?Z1U0OFZDMnE0Rkh0YnlzWC9aTlNFdVBPM05LL3d5ZEZsZFo1ZU50WlJUcHBB?=
+ =?utf-8?B?VWlTU0lZbXQvZFd4c29CbXJ6SXh0azNTSW1XcFZrdUxjWEVPeWhremZHNlNM?=
+ =?utf-8?B?WlZLNkQyY3Q2Ty9lTnpWaWJDOFg2MlExMzQ3aU1HNXZNdU1XVEtxemFNUWRw?=
+ =?utf-8?B?bUVvUWhYbDF4RGE0SEJyeG5VVVBnd3E3eWYwODhReDRWbm9lVlc1ZXR4elBk?=
+ =?utf-8?B?U0ladlViYXNZcmg0OFF3OU5Cdm1WblVPMFE0WmE4OXpoOHBNMnQxM3dvM0dn?=
+ =?utf-8?B?S3FBbzE3dkQ2NHFnV1NZdll2Mm93RStOZDBaenpYb2tBRG1sbjlmclZMNzVq?=
+ =?utf-8?B?ZU9HR3NqWWdRR2haRGlKYnFCWitvU1VYQTFUSzVFYkFNS3FtS21ucHk3bWVj?=
+ =?utf-8?B?ZzNPMGVBaTlPUy9wOU1DOHUzTFFjdThBbjBFZi9uOXVxTGtGSE9CWW9GVWRH?=
+ =?utf-8?B?SDI1VzNkdzQ2OFlPNitmY0tVZjM3dmswamJOdDVBa2kreTM2bzhON0pCcTR3?=
+ =?utf-8?B?anRBZWRackpqbTIxS3E3U3haTERFNGw1MzErTG1lalhLTEFBNlV5c1RSK3FJ?=
+ =?utf-8?B?aTFaRFlza0ZGcHpwMlhRVXUvc1ExVHFsVFZOME5iT1FqQVVaZUhPaWtRTm5W?=
+ =?utf-8?B?SjNIRG5yMldkMlZQZFFyeHZ0WTREOEpUMlowUXRQZUhhRmZWNnRoSWtCS0J2?=
+ =?utf-8?B?Wi9Bb0dBaHp2ZzA0ZGFlNEhxUlFjMTFyQ1hSNDd5U3NtWkhPVUg2Mjl6cUZq?=
+ =?utf-8?B?T0NLZVZqSGpCNjVscElVblEwVi9iRWkrRm9FQTFKam1QdXQwVUVsNVltU3gv?=
+ =?utf-8?B?RkZpZktqMjJkVEVGZWtLUm52dzZpUnJWVWZwRk9OTWY3dU85aUY2WUpvbVcw?=
+ =?utf-8?B?d1JnRjNjeFRBc2VKT3ZsQ3FXNmovcUNBSUZkenlLeUhjeVUvTGZpNEJzbUU4?=
+ =?utf-8?B?OFFIVTl3and1RnVIZ1ZPVEQ1YnBmRmFqYkQxUnRlTlJPMjdUNlJrQThwUGI2?=
+ =?utf-8?B?RUZQSGQvZEtSYUxHT2p3T3NReGJKalJkc2ZROUdRaTFHR2dBRUVla2hybmJn?=
+ =?utf-8?B?K3U1cWYrT2FyeUx6YzdTRk9vMEE5UTNaN0VlQjY3NUN4a0hDYnJGOTIzbTRN?=
+ =?utf-8?Q?fFlQvp38R3y2BfKtSGJmQZXkEeSXcj7ucGiW1EA?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: cf6701e8-bb82-4482-0b6c-08d96994ddc2
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Aug 2021 19:57:14.9399
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 29xwPnnqrSd3Rg8gR30P0NNqWPzHX9o1QveRU+zs/ZQB4uZOAtBFEetG8P4eMfiVvJE2BR882kmX13V1Zo+CWA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5375
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 8/27/21 1:07 PM, Brijesh Singh wrote:
+> On 8/27/21 12:44 PM, Borislav Petkov wrote:
+>> On Fri, Aug 20, 2021 at 10:19:28AM -0500, Brijesh Singh wrote:
 
+...
 
------ On Aug 26, 2021, at 7:54 PM, Sean Christopherson seanjc@google.com wrote:
+>>> +
+>>> +/*
+>>> + * The error code when the data_npages is too small. The error code
+>>> + * is defined in the GHCB specification.
+>>> + */
+>>> +#define SNP_GUEST_REQ_INVALID_LEN	0x100000000ULL
+>> so basically
+>>
+>> BIT_ULL(32)
+> 
+> Noted.
 
-> On Thu, Aug 26, 2021, Mathieu Desnoyers wrote:
->> ----- On Aug 25, 2021, at 8:51 PM, Sean Christopherson seanjc@google.com wrote:
->> >> >> +		r = sched_setaffinity(0, sizeof(allowed_mask), &allowed_mask);
->> >> >> +		TEST_ASSERT(!r, "sched_setaffinity failed, errno = %d (%s)",
->> >> >> +			    errno, strerror(errno));
->> >> >> +		atomic_inc(&seq_cnt);
->> >> >> +
->> >> >> +		CPU_CLR(cpu, &allowed_mask);
->> >> >> +
->> >> >> +		/*
->> >> >> +		 * Let the read-side get back into KVM_RUN to improve the odds
->> >> >> +		 * of task migration coinciding with KVM's run loop.
->> >> > 
->> >> > This comment should be about increasing the odds of letting the seqlock
->> >> > read-side complete. Otherwise, the delay between the two back-to-back
->> >> > atomic_inc is so small that the seqlock read-side may never have time to
->> >> > complete the reading the rseq cpu id and the sched_getcpu() call, and can
->> >> > retry forever.
->> > 
->> > Hmm, but that's not why there's a delay.  I'm not arguing that a livelock isn't
->> > possible (though that syscall would have to be screaming fast),
->> 
->> I don't think we have the same understanding of the livelock scenario. AFAIU the
->> livelock
->> would be caused by a too-small delay between the two consecutive atomic_inc()
->> from one
->> loop iteration to the next compared to the time it takes to perform a read-side
->> critical
->> section of the seqlock. Back-to-back atomic_inc can be performed very quickly,
->> so I
->> doubt that the sched_getcpu implementation have good odds to be fast enough to
->> complete
->> in that narrow window, leading to lots of read seqlock retry.
-> 
-> Ooooh, yeah, brain fart on my side.  I was thinking of the two atomic_inc() in
-> the
-> same loop iteration and completely ignoring the next iteration.  Yes, I 100%
-> agree
-> that a delay to ensure forward progress is needed.  An assertion in main() that
-> the
-> reader complete at least some reasonable number of KVM_RUNs is also probably a
-> good
-> idea, e.g. to rule out a false pass due to the reader never making forward
-> progress.
-
-Agreed.
-
-> 
-> FWIW, the do-while loop does make forward progress without a delay, but at ~50%
-> throughput, give or take.
-
-I did not expect absolutely no progress, but a significant slow down of
-the read-side.
-
-> 
->> > but the primary motivation is very much to allow the read-side enough time
->> > to get back into KVM proper.
->> 
->> I'm puzzled by your statement. AFAIU, let's say we don't have the delay, then we
->> have:
->> 
->> migration thread                             KVM_RUN/read-side thread
->> -----------------------------------------------------------------------------------
->>                                              - ioctl(KVM_RUN)
->> - atomic_inc_seq_cst(&seqcnt)
->> - sched_setaffinity
->> - atomic_inc_seq_cst(&seqcnt)
->>                                              - a = atomic_load(&seqcnt) & ~1
->>                                              - smp_rmb()
->>                                              - b = LOAD_ONCE(__rseq_abi->cpu_id);
->>                                              - sched_getcpu()
->>                                              - smp_rmb()
->>                                              - re-load seqcnt/compare (succeeds)
->>                                                - Can only succeed if entire read-side happens while the seqcnt
->>                                                  is in an even numbered state.
->>                                              - if (a != b) abort()
->>   /* no delay. Even counter state is very
->>      short. */
->> - atomic_inc_seq_cst(&seqcnt)
->>   /* Let's suppose the lack of delay causes the
->>      setaffinity to complete too early compared
->>      with KVM_RUN ioctl */
->> - sched_setaffinity
->> - atomic_inc_seq_cst(&seqcnt)
->> 
->>   /* no delay. Even counter state is very
->>      short. */
->> - atomic_inc_seq_cst(&seqcnt)
->>   /* Then a setaffinity from a following
->>      migration thread loop will run
->>      concurrently with KVM_RUN */
->>                                              - ioctl(KVM_RUN)
->> - sched_setaffinity
->> - atomic_inc_seq_cst(&seqcnt)
->> 
->> As pointed out here, if the first setaffinity runs too early compared with
->> KVM_RUN,
->> a following setaffinity will run concurrently with it. However, the fact that
->> the even counter state is very short may very well hurt progress of the read
->> seqlock.
-> 
-> *sigh*
-> 
-> Several hours later, I think I finally have my head wrapped around everything.
-> 
-> Due to the way the test is written and because of how KVM's run loop works,
-> TIF_NOTIFY_RESUME or TIF_NEED_RESCHED effectively has to be set before KVM
-> actually
-> enters the guest, otherwise KVM will exit to userspace without touching the
-> flag,
-> i.e. it will be handled by the normal exit_to_user_mode_loop().
-> 
-> Where I got lost was trying to figure out why I couldn't make the bug reproduce
-> by
-> causing the guest to exit to KVM, but not userspace, in which case KVM should
-> easily trigger the problematic flow as the window for sched_getcpu() to collide
-> with KVM would be enormous.  The reason I didn't go down this route for the
-> "official" test is that, unless there's something clever I'm overlooking, it
-> requires arch specific guest code, and ialso I don't know that forcing an exit
-> would even be necessary/sufficient on other architectures.
-> 
-> Anyways, I was trying to confirm that the bug was being hit without a delay,
-> while
-> still retaining the sequence retry in the test.  The test doesn't fail because
-> the
-> back-to-back atomic_inc() changes seqcnt too fast.  The read-side makes forward
-> progress, but it never observes failure because the do-while loop only ever
-> completes after another sched_setaffinity(), never after the one that collides
-> with KVM because it takes too long to get out of ioctl(KVM_RUN) and back to the
-> test.  I.e. the atomic_inc() in the next loop iteration (makes seq_cnt odd)
-> always
-> completes before the check, and so the check ends up spinning until another
-> migration, which correctly updates rseq.  This was expected and didn't confuse
-> me.
-> 
-> What confused me is that I was trying to confirm the bug was being hit from
-> within
-> the kernel by confirming KVM observed TIF_NOTIFY_RESUME, but I misunderstood
-> when
-> TIF_NOTIFY_RESUME would get set.  KVM can observe TIF_NOTIFY_RESUME directly,
-> but
-> it's rare, and I suspect happens iff sched_setaffinity() hits the small window
-> where
-> it collides with KVM_RUN before KVM enters the guest.
-> 
-> More commonly, the bug occurs when KVM sees TIF_NEED_RESCHED.  In that case, KVM
-> calls xfer_to_guest_mode_work(), which does schedule() and _that_ sets
-> TIF_NOTIFY_RESUME.  xfer_to_guest_mode_work() then mishandles TIF_NOTIFY_RESUME
-> and the bug is hit, but my confirmation logic in KVM never fired.
-> 
-> So there are effectively three reasons we want a delay:
-> 
->  1. To allow sched_setaffinity() to coincide with ioctl(KVM_RUN) before KVM can
->     enter the guest so that the guest doesn't need an arch-specific VM-Exit source.
-> 
->  2. To let ioctl(KVM_RUN) make its way back to the test before the next round
->     of migration.
-> 
->  3. To ensure the read-side can make forward progress, e.g. if sched_getcpu()
->     involves a syscall.
-> 
-> 
-> After looking at KVM for arm64 and s390, #1 is a bit tenuous because x86 is the
-> only arch that currently uses xfer_to_guest_mode_work(), i.e. the test could be
-> tweaked to be overtly x86-specific.  But since a delay is needed for #2 and #3,
-> I'd prefer to rely on it for #1 as well in the hopes that this test provides
-> coverage for arm64 and/or s390 if they're ever converted to use the common
-> xfer_to_guest_mode_work().
-
-Now that we have this understanding of why we need the delay, it would be good to
-write this down in a comment within the test.
-
-Does it reproduce if we randomize the delay to have it picked randomly from 0us
-to 100us (with 1us step) ? It would remove a lot of the needs for arch-specific
-magic delay value.
+The main thing about this is that it is an error code from the HV on 
+extended guest requests. The HV error code sits in the high-order 32-bits 
+of the SW_EXIT_INFO_2 field. So defining it either way seems a bit 
+confusing. To me, the value should just be 1ULL and then it should be 
+shifted when assigning it to the SW_EXIT_INFO_2.
 
 Thanks,
+Tom
 
-Mathieu
-
--- 
-Mathieu Desnoyers
-EfficiOS Inc.
-http://www.efficios.com
+> 
