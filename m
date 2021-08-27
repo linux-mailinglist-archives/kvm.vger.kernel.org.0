@@ -2,157 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C2A283FA152
-	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 23:58:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 774CE3FA173
+	for <lists+kvm@lfdr.de>; Sat, 28 Aug 2021 00:19:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232129AbhH0V71 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Aug 2021 17:59:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39408 "EHLO
+        id S232105AbhH0WTr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Aug 2021 18:19:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43960 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231947AbhH0V7Z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Aug 2021 17:59:25 -0400
-Received: from mail-qk1-x749.google.com (mail-qk1-x749.google.com [IPv6:2607:f8b0:4864:20::749])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12891C0613D9
-        for <kvm@vger.kernel.org>; Fri, 27 Aug 2021 14:58:36 -0700 (PDT)
-Received: by mail-qk1-x749.google.com with SMTP id k12-20020a05620a0b8c00b003d5c8646ec2so1618660qkh.20
-        for <kvm@vger.kernel.org>; Fri, 27 Aug 2021 14:58:36 -0700 (PDT)
+        with ESMTP id S231906AbhH0WTq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Aug 2021 18:19:46 -0400
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B22EC0613D9
+        for <kvm@vger.kernel.org>; Fri, 27 Aug 2021 15:18:57 -0700 (PDT)
+Received: by mail-pf1-x430.google.com with SMTP id x16so6841480pfh.2
+        for <kvm@vger.kernel.org>; Fri, 27 Aug 2021 15:18:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=cnx8MV/iIdfnNKhivOjhJ2a0G3hLtk8JhdyLdiJTHU4=;
-        b=LtCeEPuf1s00VFa7aOcMIfwN9jnd75qkZ9gzNqNQcwWEniYjs/3D83bO9UERdXmvO5
-         oKO4gs34e+D0zEuC72QhnZ20J7YtfCJqOFD8TNukOsGZV3UDmxFtnw4ezBuz88Z9iSGx
-         J44TeYACFHGC7svMAzgfZf4iXmRaJJr9ITLzBgtCKxN1i35WammzXpmheHhpsMCypyUB
-         3t05X8MQx/o65j+lj6xtcFotBr8utSSOjLvAQGjMfGvGdSaeV3tw6xAh4LlZzayASEMf
-         vPMlSXiIYMBgIZE7L0RqsKIN51viU0dZkXU6c92hws6Uk/kfRLXh2AKkeAqZ77olLufS
-         wMWA==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=Rd2j1K7U4hRg00mMM07NvFIy1Z4HrCM8V2x0jTRZdHc=;
+        b=Ir0TCeJ/oEbBpLCFe3DigxZyeNESMUbjXWFtm1bmgt5YKV0hkbuJC3dJVW7OhLbAYW
+         +CNFaoOcUPqHJVf9zdoevfwQEwaVfK040RXUOHFWgMWxLAAxp0xml+kSW7SHxsweEJe/
+         BY2m5dfkHfvXcKceHJf0H659WAY7HhITZt8TS4NCzCeyZvTfTi5eOxTJx+fvAXfQbbF1
+         D8C85ucITkf1U4rC+rnF1l6C9PW/QXV/LLiIF9IvfD89GiHBX5uwCUV1Ots0Oaq+XSpe
+         mau9V6tRrcLxcPyKK2aQ/onBId9GLdt6RecXowjcw4UOBOUlt4xSmOyrjeeuhojAN0qF
+         ixqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=cnx8MV/iIdfnNKhivOjhJ2a0G3hLtk8JhdyLdiJTHU4=;
-        b=Tx6IFg1hC4paMr5YugUhP/4qr1S/rf/jzXzsDhpDZUTUfILcOTj2DkqbwzS746lBZY
-         CJm2KFYzAtc+4UCEd4PnW3V5cDSjz9Nsx7QPxvqFMrr4ZGO9EaIY9f2UuTvt1U2guSYY
-         isCXxlVlopNJOurqWJagbEC/PBsc0DvSuD3f6dg9R0kOpW1KjFh+HxVBrgan5sV0h8Cf
-         QAg148mHYTsbRmAWDPX3j6rGgvGJ619cpyPBWQ3W5NyYviim/gPbethKvrApvpX5tdMQ
-         U35KKWc+IFBVYmn69jZ/GhXPW53BbqZ/koNLrCcLDTZGmgtbhvFMHXs/MdrkQw5gV8Sj
-         CbEA==
-X-Gm-Message-State: AOAM530ixESOwTernfiDTkPkhw+gn3iQnPQ8Ich9yNpfKMMIBiQcnlHW
-        g6v7r5dsxr5qlCYjD8yi2wUXcZjcu9aIM58xCDKWTJ/rbJjJEL15GrdCdPu/Rc73SGk8oLkfS8T
-        XwVyPI/S7GDo2A9hcczKUMUTaYwBJjZtCWrtPzza6+GU5LynEIQeyxvqFFw==
-X-Google-Smtp-Source: ABdhPJxlN8oeb0z4aA4E8CXHbvnDa6MT2IGvjTVLccWcC0CvIbwsk0TsHuuWIaBNDYgrU4hQng0Vn3csM6U=
-X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a05:6214:1843:: with SMTP id
- d3mr12228530qvy.10.1630101515145; Fri, 27 Aug 2021 14:58:35 -0700 (PDT)
-Date:   Fri, 27 Aug 2021 21:58:27 +0000
-In-Reply-To: <20210827215827.3774670-1-oupton@google.com>
-Message-Id: <20210827215827.3774670-3-oupton@google.com>
-Mime-Version: 1.0
-References: <20210819223640.3564975-1-oupton@google.com> <20210827215827.3774670-1-oupton@google.com>
-X-Mailer: git-send-email 2.33.0.259.gc128427fd7-goog
-Subject: [RFC kvmtool PATCH 2/2] arm64: Add support for KVM_CAP_ARM_SYSTEM_SUSPEND
-From:   Oliver Upton <oupton@google.com>
-To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc:     Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>, reijiw@google.com,
-        Andrew Jones <drjones@redhat.com>,
-        Will Deacon <will@kernel.org>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Oliver Upton <oupton@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Rd2j1K7U4hRg00mMM07NvFIy1Z4HrCM8V2x0jTRZdHc=;
+        b=OVG+4pXCSTSWknJ7ay3e+H0qlLPQkos9FRO7mqfJVo9PVq/Esuer3ms6JPlafkpSsa
+         BYPKV9RFQ0KretjGMUVNOnylqxi7qf+w2lDc9PK/IPlo6LqMkg44KEXorulfdzCu4MlY
+         qlw+83auBCF7g++v34kvp8SkIYzChgViPOg0zkGLx9auR2daprf7u6LVLP/tbnFAJ1Kv
+         43PLAio+/31JxKlfeBvKDhWD/zM+F9G5BfIIT579pKh1UIt3H+gGrUKdEBxKbGCQ4uoJ
+         UkSeoBAxXflwSl1Q0pxGL98UPzeqCj0X1ntG0V509b9lB/CMQz1Ob//0k1M1/Df+iRE/
+         E0kQ==
+X-Gm-Message-State: AOAM533K99VbTEAucGjYa5qYM74uYW/R3YBjC3bdsR+RInOm0GiraEtL
+        WfIg6UdlrrlGOIk8RTsowgNy8A==
+X-Google-Smtp-Source: ABdhPJzuJP6dIT72j2d/aCBLY9krrtGRa2afNkv9q820gAKetasQmVhVHa+tvbyJjtZXZL8dDZGGhg==
+X-Received: by 2002:a62:6007:0:b029:3cd:e67a:ef9e with SMTP id u7-20020a6260070000b02903cde67aef9emr11198834pfb.72.1630102736650;
+        Fri, 27 Aug 2021 15:18:56 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id q1sm6782229pfj.132.2021.08.27.15.18.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 27 Aug 2021 15:18:56 -0700 (PDT)
+Date:   Fri, 27 Aug 2021 22:18:52 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     David Hildenbrand <david@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Borislav Petkov <bp@alien8.de>,
+        Andy Lutomirski <luto@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Joerg Roedel <jroedel@suse.de>,
+        Andi Kleen <ak@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Varad Gautam <varad.gautam@suse.com>,
+        Dario Faggioli <dfaggioli@suse.com>, x86@kernel.org,
+        linux-mm@kvack.org, linux-coco@lists.linux.dev,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Kuppuswamy Sathyanarayanan 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>
+Subject: Re: [RFC] KVM: mm: fd-based approach for supporting KVM guest
+ private memory
+Message-ID: <YSlkzLblHfiiPyVM@google.com>
+References: <20210824005248.200037-1-seanjc@google.com>
+ <307d385a-a263-276f-28eb-4bc8dd287e32@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <307d385a-a263-276f-28eb-4bc8dd287e32@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM now allows a guest to issue the SYSTEM_SUSPEND PSCI call with buy-in
-from the VMM. Opt in to the new capability and handle the
-KVM_SYSTEM_EVENT_SUSPEND exit subtype by ignoring the guest request and
-entering KVM again. Since KVM has already configured the guest to
-resume, this will result in the guest immediately coming out of reset.
+On Thu, Aug 26, 2021, David Hildenbrand wrote:
+> You'll end up with a VMA that corresponds to the whole file in a single
+> process only, and that cannot vanish, not even in parts.
 
-Signed-off-by: Oliver Upton <oupton@google.com>
----
- arm/kvm.c         | 12 ++++++++++++
- include/kvm/kvm.h |  1 +
- kvm-cpu.c         |  5 +++++
- kvm.c             |  7 +++++++
- 4 files changed, 25 insertions(+)
+How would userspace tell the kernel to free parts of memory that it doesn't want
+assigned to the guest, e.g. to free memory that the guest has converted to
+not-private?
 
-diff --git a/arm/kvm.c b/arm/kvm.c
-index 5aea18f..0a53c46 100644
---- a/arm/kvm.c
-+++ b/arm/kvm.c
-@@ -59,6 +59,18 @@ void kvm__arch_set_cmdline(char *cmdline, bool video)
- 
- void kvm__arch_init(struct kvm *kvm, const char *hugetlbfs_path, u64 ram_size)
- {
-+	if (kvm__supports_vm_extension(kvm, KVM_CAP_ARM_SYSTEM_SUSPEND)) {
-+		struct kvm_enable_cap cap = {
-+			.cap = KVM_CAP_ARM_SYSTEM_SUSPEND
-+		};
-+		int err;
-+
-+		err = kvm__enable_vm_extension(kvm, &cap);
-+		if (err)
-+			die("Failed to enable KVM_CAP_ARM_SYSTEM_SUSPEND "
-+			    "[err %d]", err);
-+	}
-+
- 	/*
- 	 * Allocate guest memory. We must align our buffer to 64K to
- 	 * correlate with the maximum guest page size for virtio-mmio.
-diff --git a/include/kvm/kvm.h b/include/kvm/kvm.h
-index 56e9c8e..c797516 100644
---- a/include/kvm/kvm.h
-+++ b/include/kvm/kvm.h
-@@ -236,6 +236,7 @@ static inline bool host_ptr_in_ram(struct kvm *kvm, void *p)
- 
- bool kvm__supports_extension(struct kvm *kvm, unsigned int extension);
- bool kvm__supports_vm_extension(struct kvm *kvm, unsigned int extension);
-+int kvm__enable_vm_extension(struct kvm *kvm, struct kvm_enable_cap *cap);
- 
- static inline void kvm__set_thread_name(const char *name)
- {
-diff --git a/kvm-cpu.c b/kvm-cpu.c
-index 7dec088..1fedacf 100644
---- a/kvm-cpu.c
-+++ b/kvm-cpu.c
-@@ -236,6 +236,11 @@ int kvm_cpu__start(struct kvm_cpu *cpu)
- 				 */
- 				kvm__reboot(cpu->kvm);
- 				goto exit_kvm;
-+			case KVM_SYSTEM_EVENT_SUSPEND:
-+				/*
-+				 * Ignore the guest; kvm will resume it normally
-+				 */
-+				break;
- 			};
- 			break;
- 		default: {
-diff --git a/kvm.c b/kvm.c
-index e327541..66815b4 100644
---- a/kvm.c
-+++ b/kvm.c
-@@ -123,6 +123,13 @@ bool kvm__supports_vm_extension(struct kvm *kvm, unsigned int extension)
- 	return ret;
- }
- 
-+int kvm__enable_vm_extension(struct kvm *kvm, struct kvm_enable_cap *cap)
-+{
-+	int ret = ioctl(kvm->vm_fd, KVM_ENABLE_CAP, cap);
-+
-+	return ret ? errno : 0;
-+}
-+
- bool kvm__supports_extension(struct kvm *kvm, unsigned int extension)
- {
- 	int ret;
--- 
-2.33.0.259.gc128427fd7-goog
+> Define "ordinary" user memory slots as overlay on top of "encrypted" memory
+> slots.  Inside KVM, bail out if you encounter such a VMA inside a normal
+> user memory slot. When creating a "encryped" user memory slot, require that
+> the whole VMA is covered at creation time. You know the VMA can't change
+> later.
 
+This can work for the basic use cases, but even then I'd strongly prefer not to
+tie memslot correctness to the VMAs.  KVM doesn't truly care what lies behind
+the virtual address of a memslot, and when it does care, it tends to do poorly,
+e.g. see the whole PFNMAP snafu.  KVM cares about the pfn<->gfn mappings, and
+that's reflected in the infrastructure.  E.g. KVM relies on the mmu_notifiers
+to handle mprotect()/munmap()/etc...
+
+As is, I don't think KVM would get any kind of notification if userpaces unmaps
+the VMA for a private memslot that does not have any entries in the host page
+tables.   I'm sure it's a solvable problem, e.g. by ensuring at least one page
+is touched by the backing store, but I don't think the end result would be any
+prettier than a dedicated API for KVM to consume.
+
+Relying on VMAs, and thus the mmu_notifiers, also doesn't provide line of sight
+to page migration or swap.  For those types of operations, KVM currently just
+reacts to invalidation notifications by zapping guest PTEs, and then gets the
+new pfn when the guest re-faults on the page.  That sequence doesn't work for
+TDX or SEV-SNP because the trusteday agent needs to do the memcpy() of the page
+contents, i.e. the host needs to call into KVM for the actual migration.
+
+There's also the memory footprint side of things; the fd-based approach avoids
+having to create host page tables for memory that by definition will never be
+used by the host.
