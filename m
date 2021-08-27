@@ -2,109 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 05AB03F94FC
-	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 09:19:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 52EE43F94F0
+	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 09:17:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244407AbhH0HUX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Aug 2021 03:20:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34952 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231592AbhH0HUU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Aug 2021 03:20:20 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C1D3C061757;
-        Fri, 27 Aug 2021 00:19:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=ZQ3CU43IWogsKyG+uqc1TCqPH8QEEhdztK1oMhkx3lw=; b=UEWQ5QT1Y91/ArLjsjiq9W9wMI
-        4duU1mRjJn7JeeiAF847EnVYvfwy4Rfpdir+x9o7riPAQa7etq+VNF8POzrhtbCqJR9z1sDHo+02+
-        HbRjsvwxweLsyjOac0MdoWbdd7InTqsNF0dlSuTIm9XrvQy3b/4YvfSEiVegiut0LsQRQ6jPkb8bY
-        IfuvY98Og8QSy5GUJ7lJvsT1gSp6DIN+Jh1ydVw5QcNhrxKH4onHt1u2fN6HncmwxCS76O+WauSkn
-        5Gg/ot5B8Psq7tBf27BAosAhcGQs4x7CwCAan6H6s6t6hdJz/pw7lyH6HaF3gC9dwlVv0nm5ojf50
-        S3+xyWHg==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mJW5C-00EFBb-NY; Fri, 27 Aug 2021 07:15:47 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 915013001CD;
-        Fri, 27 Aug 2021 09:15:17 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 708F32C597E4C; Fri, 27 Aug 2021 09:15:17 +0200 (CEST)
-Date:   Fri, 27 Aug 2021 09:15:17 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Marc Zyngier <maz@kernel.org>, Guo Ren <guoren@kernel.org>,
-        Nick Hu <nickhu@andestech.com>,
-        Greentime Hu <green.hu@gmail.com>,
-        Vincent Chen <deanbo422@gmail.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Borislav Petkov <bp@alien8.de>, x86@kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Juergen Gross <jgross@suse.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@redhat.com>,
-        Namhyung Kim <namhyung@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-csky@vger.kernel.org, linux-riscv@lists.infradead.org,
-        kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
-        Artem Kashkanov <artem.kashkanov@intel.com>,
-        Like Xu <like.xu.linux@gmail.com>,
-        Zhu Lingshan <lingshan.zhu@intel.com>
-Subject: Re: [PATCH 05/15] perf: Track guest callbacks on a per-CPU basis
-Message-ID: <YSiRBQQE7md7ZrNC@hirez.programming.kicks-ass.net>
-References: <20210827005718.585190-1-seanjc@google.com>
- <20210827005718.585190-6-seanjc@google.com>
+        id S235220AbhH0HSq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Aug 2021 03:18:46 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25648 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S244332AbhH0HSp (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 27 Aug 2021 03:18:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1630048676;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=zokzz+bzAXSf7i3x6Blv6DyelumaP1+GzIzKZycrfQw=;
+        b=A0zJPeoYZs+q0HOFjvjatuTSIYAAtL/qPOehfbL+7tK7fVdx9sUmW4rbxqN0ED9bCjvaPj
+        HsXTrgALBi+Y3urOiLQBI+yNQ7ulZn8CLoADgQISoJ0+1fiRY3naLHgpXdaJaxKpcxn3O8
+        KIqoEkXjLRLtdrfVar8pVH7Vckmyd10=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-87-gQ2kfQCJOvCxgo0DRka7EA-1; Fri, 27 Aug 2021 03:17:54 -0400
+X-MC-Unique: gQ2kfQCJOvCxgo0DRka7EA-1
+Received: by mail-wm1-f69.google.com with SMTP id z18-20020a1c7e120000b02902e69f6fa2e0so1736789wmc.9
+        for <kvm@vger.kernel.org>; Fri, 27 Aug 2021 00:17:54 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=zokzz+bzAXSf7i3x6Blv6DyelumaP1+GzIzKZycrfQw=;
+        b=M5UGRVlwUAwNXK4+8qQa3+hdt3x/aq1i2OvgnIR+qZOWJatEklJAyELwZ+sAAw41QQ
+         SjHcmSfRhFS9NdSABh5+onAEMmf7ZdH0gxyRakidZZ2YGOl4PRQK3gGZ2B9PRlozm++a
+         iXIzeYQ0wfHxV/mkv1V6GBWwSVSW/OOYfr/LSinHdIaHCy4Ai/oyZCQ5zQman3Q0mrgs
+         osTXgRN0Hvy4IvsU3X6s1YUt645rK7RJIVcnHscaIuElETVLhQB5fdLVtPBmJhqM57Cm
+         jpbQzCBoy8S877EUjX1klIpEDz6DSVFEvSg/IgwXJvzR54MswkwiLAj843xoWdlZIwXl
+         TiYg==
+X-Gm-Message-State: AOAM5337hN1IBo6yxZ+EHS7Mo4UqK+460ziPxsraG5/sEHioNb8eUuBh
+        /vAYE1yNYJ3Y4GHiYW2CZyWOziC79Ez1Db40jxbJVz5DPNBYImZOUi+U4EhWBXcGKG7Qlhv1byG
+        T9BMoFW6GE4gU
+X-Received: by 2002:a7b:c387:: with SMTP id s7mr17617820wmj.26.1630048673578;
+        Fri, 27 Aug 2021 00:17:53 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzQ1MwCNV3XDJZouyQqsDbByJSfBXZPqGyg72LECbBbxQ1E/nGZu1vMYc07MDvbNErPZJ9+2w==
+X-Received: by 2002:a7b:c387:: with SMTP id s7mr17617801wmj.26.1630048673348;
+        Fri, 27 Aug 2021 00:17:53 -0700 (PDT)
+Received: from thuth.remote.csb (dynamic-046-114-148-182.46.114.pool.telefonica.de. [46.114.148.182])
+        by smtp.gmail.com with ESMTPSA id o8sm4393593wmp.42.2021.08.27.00.17.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 27 Aug 2021 00:17:52 -0700 (PDT)
+Subject: Re: [kvm-unit-tests PATCH v2 2/3] s390x: uv-host: Explain why we set
+ up the home space and remove the space change
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
+        david@redhat.com, cohuck@redhat.com
+References: <20210820114000.166527-1-frankja@linux.ibm.com>
+ <20210820114000.166527-3-frankja@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+Message-ID: <7745cd84-f250-4559-c8f3-a0751324d987@redhat.com>
+Date:   Fri, 27 Aug 2021 09:17:51 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.12.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210827005718.585190-6-seanjc@google.com>
+In-Reply-To: <20210820114000.166527-3-frankja@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 26, 2021 at 05:57:08PM -0700, Sean Christopherson wrote:
-> Use a per-CPU pointer to track perf's guest callbacks so that KVM can set
-> the callbacks more precisely and avoid a lurking NULL pointer dereference.
+On 20/08/2021 13.39, Janosch Frank wrote:
+> UV home addresses don't require us to be in home space but we need to
+> have it set up so hw/fw can use the home asce to translate home
+> virtual addresses.
+> 
+> Hence we add a comment why we're setting up the home asce and remove
+> the address space since it's unneeded.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> ---
+>   s390x/uv-host.c | 11 ++++++++---
+>   1 file changed, 8 insertions(+), 3 deletions(-)
+> 
+> diff --git a/s390x/uv-host.c b/s390x/uv-host.c
+> index 426a67f6..28035707 100644
+> --- a/s390x/uv-host.c
+> +++ b/s390x/uv-host.c
+> @@ -444,13 +444,18 @@ static void test_clear(void)
+>   
+>   static void setup_vmem(void)
+>   {
+> -	uint64_t asce, mask;
+> +	uint64_t asce;
+>   
+>   	setup_mmu(get_max_ram_size(), NULL);
+> +	/*
+> +	 * setup_mmu() will enable DAT and set the primary address
+> +	 * space but we need to have a valid home space since UV calls
+> +	 * take home space virtual addresses.
+> +	 *
+> +	 * Hence we just copy the primary asce into the home space.
+> +	 */
+>   	asce = stctg(1);
+>   	lctlg(13, asce);
+> -	mask = extract_psw_mask() | 0x0000C00000000000UL;
+> -	load_psw_mask(mask);
+>   }
+>   
+>   int main(void)
+> 
 
-I'm completely failing to see how per-cpu helps anything here...
-
-> On x86, KVM supports being built as a module and thus can be unloaded.
-> And because the shared callbacks are referenced from IRQ/NMI context,
-> unloading KVM can run concurrently with perf, and thus all of perf's
-> checks for a NULL perf_guest_cbs are flawed as perf_guest_cbs could be
-> nullified between the check and dereference.
-
-No longer allowing KVM to be a module would be *AWESOME*. I detest how
-much we have to export for KVM :/
-
-Still, what stops KVM from doing a coherent unreg? Even the
-static_call() proposed in the other patch, unreg can do
-static_call_update() + synchronize_rcu() to ensure everybody sees the
-updated pointer (would require a quick audit to see all users are with
-preempt disabled, but I think your using per-cpu here already imposes
-the same).
-
+Acked-by: Thomas Huth <thuth@redhat.com>
 
