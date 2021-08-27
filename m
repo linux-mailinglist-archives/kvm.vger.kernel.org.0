@@ -2,124 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9EA4E3FA17E
-	for <lists+kvm@lfdr.de>; Sat, 28 Aug 2021 00:29:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3A3BB3FA1C5
+	for <lists+kvm@lfdr.de>; Sat, 28 Aug 2021 01:23:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232251AbhH0W3u (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Aug 2021 18:29:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46208 "EHLO
+        id S232533AbhH0XY1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Aug 2021 19:24:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58232 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232134AbhH0W3t (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Aug 2021 18:29:49 -0400
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B42DDC0613D9
-        for <kvm@vger.kernel.org>; Fri, 27 Aug 2021 15:28:59 -0700 (PDT)
-Received: by mail-pl1-x62c.google.com with SMTP id c4so4805091plh.7
-        for <kvm@vger.kernel.org>; Fri, 27 Aug 2021 15:28:59 -0700 (PDT)
+        with ESMTP id S232437AbhH0XYY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Aug 2021 19:24:24 -0400
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CC14C06179A
+        for <kvm@vger.kernel.org>; Fri, 27 Aug 2021 16:23:35 -0700 (PDT)
+Received: by mail-pj1-x1031.google.com with SMTP id w19-20020a17090aaf9300b00191e6d10a19so5887684pjq.1
+        for <kvm@vger.kernel.org>; Fri, 27 Aug 2021 16:23:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=Kcz/OcOk78cxC9xSl0rIRLhu0Wg6VNLvHKoD96Y0zU4=;
-        b=JSfG3SMSCC9NBv4yyAkJXKMCG8K50uUZ9UT0zpseTaWzxZqw7s2EkKqGCUkqY2hEEO
-         rTAN5Wi3ymSOi052g5pSN+AYYo2jhO/xEnmmSqM83ebsws8hkJXfqzXn5hmRkEaeRHXA
-         tzfo43wq7M4o16hRkaVL/5ait942tSAHvDNMqYnAkg3QXfq71LkI6xV86h9PyzZVVcpn
-         p09Z7AznbqxQrUlt77vweBgDktY/D8IaBnrWZqY7Gz1E22yuuoHGV/Ci1ICTIEHARo7U
-         xZOjtz78b+ZRmwN2VCOjYpDOISpwNFmKomLi7QW8XakSn7tWhLJ9jAeWAYvJiBwm7wMb
-         T5DQ==
+        bh=TQth0zKaZ1g898XhTaLjgqI+BqtTYpmEnIJq3AsLCJk=;
+        b=BAuX2ol8F6dvdcYTLPau4K0GBYzUoQCSuqStZCATywk1xJsRcTN/zbnvR40BRHvYRj
+         p2MT9UNw+pSe1w4FqYAzJww2vX26GF4Etd+uOuVWgHJFd4agO5hpaKs4rD3Z8IuIiQ64
+         bceibC9z39TyoUF5r/ZBJugD41m33rR/4wmX0JjHH4Ox3VO0sQvCLcKc4rCPjZl3kpp/
+         z2ewywcdb4obgJrlPAWwwSgAREPIfSw6ixPLrZU+orCqHvOzAJIbsJDGYnOKI/KJzI5+
+         MS27DWV8OUcVAL9tLPc5IpbSctooG5g35qhato+7vW1AY9AOSyjT1rpopwB7U0ojjXOG
+         jR7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=Kcz/OcOk78cxC9xSl0rIRLhu0Wg6VNLvHKoD96Y0zU4=;
-        b=gRMgfFlfq88ecIsOQC/mj9AYvBQDq8Ga0Hrnw1W9VLyd3goBR9VIsaZF33zeNNzMKt
-         ktBT0LgzQICffZmbsQc983Y+yskmMmwTW3wyuXYGJJhJmCgur2/W1buU0XzaPeW3QYHO
-         dRY9KbMR3kT9qL+yJKJaRbFcY55uwMCkrBoGeOHarE6IaCs+5+yfaT4uYW2bsQLuBCzX
-         YSpHR6pPb3OJmCcSAl/x8ZDYdUDiO81QVVouxk0FVPInJNVnnw3aap+846F63onLRaVD
-         SinUJ+JhtNhw5Snrq2xPKTrZfZ/4OuclpU85ORbOS36/VfchjyY0TPGI9tSxwXbD7tih
-         Yfcw==
-X-Gm-Message-State: AOAM531F8/mitGqyBo6KGAGSXrNkuopkQ8uNC8upETTaBZn8/DcQW/A0
-        uqpAxzQuzltPO6dKC7TR8uT/Rg==
-X-Google-Smtp-Source: ABdhPJxkNLsbF9Xpeyfdy+wpf433FXdU+W+o0pck9+d5DrE9KJ2PeRK+v2c385q0qdLbxd5O5brffg==
-X-Received: by 2002:a17:90a:1957:: with SMTP id 23mr12592991pjh.141.1630103339086;
-        Fri, 27 Aug 2021 15:28:59 -0700 (PDT)
+        bh=TQth0zKaZ1g898XhTaLjgqI+BqtTYpmEnIJq3AsLCJk=;
+        b=sT2fuowJiN/FaR4MBHMUOwDBf5naZwPJbQSLFV9yzs73fK3+7JFjLv2yjF4p+vSdm5
+         ntLsNV8hsZccvFdv51/WKY9lz8xF4tJ9lowx901JWKJbSQvYTGIWEzYX9wwpXgHle664
+         sIinzOhQ3mIdlixHPciKzEalwJHrUEaB6duUay4RHp0fqxZTz+BlCYpInYMaYCiej0Ez
+         fDu8+4bL1MwVMD9Aoa2Uw3yKK1FStIkNAiJWJcwmGc891F6qrWq6tdJc8cxnmw4Myk6G
+         3KHn0iRd3kzAfEPfPtjLArm12yNxiIaPaXEviootsTn4wD7jbFblrjsGjXx5THvbO2ln
+         d45g==
+X-Gm-Message-State: AOAM530dcozTYix1COJQ9Xe3yk/4TM/pQoC8Y7WX2z/jxM7x8COMEKsQ
+        we5Wd0ekf3vVMGV3KX+LAR+07A==
+X-Google-Smtp-Source: ABdhPJwmCb6NSZOc/5AwINtm/0AHRKcukC2PPcNvrpcQ6DjdUz8MDW9KTFWzGmyEhc2uaUezQAIkrA==
+X-Received: by 2002:a17:90a:fe8e:: with SMTP id co14mr10854117pjb.200.1630106614660;
+        Fri, 27 Aug 2021 16:23:34 -0700 (PDT)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id a23sm2263182pfo.120.2021.08.27.15.28.58
+        by smtp.gmail.com with ESMTPSA id h13sm7335943pgh.93.2021.08.27.16.23.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Aug 2021 15:28:58 -0700 (PDT)
-Date:   Fri, 27 Aug 2021 22:28:54 +0000
+        Fri, 27 Aug 2021 16:23:33 -0700 (PDT)
+Date:   Fri, 27 Aug 2021 23:23:30 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Andy Lutomirski <luto@kernel.org>
-Cc:     David Hildenbrand <david@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Borislav Petkov <bp@alien8.de>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Joerg Roedel <jroedel@suse.de>,
-        Andi Kleen <ak@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
+To:     Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+Cc:     dvhart <dvhart@infradead.org>,
+        "Russell King, ARM Linux" <linux@armlinux.org.uk>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Guo Ren <guoren@kernel.org>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Heiko Carstens <hca@linux.ibm.com>, gor <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        rostedt <rostedt@goodmis.org>, Ingo Molnar <mingo@redhat.com>,
+        Oleg Nesterov <oleg@redhat.com>,
         Thomas Gleixner <tglx@linutronix.de>,
-        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Varad Gautam <varad.gautam@suse.com>,
-        Dario Faggioli <dfaggioli@suse.com>,
-        the arch/x86 maintainers <x86@kernel.org>,
-        linux-mm@kvack.org, linux-coco@lists.linux.dev,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Sathyanarayanan Kuppuswamy 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>
-Subject: Re: [RFC] KVM: mm: fd-based approach for supporting KVM guest
- private memory
-Message-ID: <YSlnJpWh8fdpddTA@google.com>
-References: <20210824005248.200037-1-seanjc@google.com>
- <307d385a-a263-276f-28eb-4bc8dd287e32@redhat.com>
- <40af9d25-c854-8846-fdab-13fe70b3b279@kernel.org>
- <cfe75e39-5927-c02a-b8bc-4de026bb7b3b@redhat.com>
- <73319f3c-6f5e-4f39-a678-7be5fddd55f2@www.fastmail.com>
+        Peter Zijlstra <peterz@infradead.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        paulmck <paulmck@kernel.org>, Boqun Feng <boqun.feng@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, shuah <shuah@kernel.org>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        linux-csky <linux-csky@vger.kernel.org>,
+        linux-mips <linux-mips@vger.kernel.org>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>,
+        linux-kselftest <linux-kselftest@vger.kernel.org>,
+        Peter Foley <pefoley@google.com>,
+        Shakeel Butt <shakeelb@google.com>,
+        Ben Gardon <bgardon@google.com>
+Subject: Re: [PATCH v2 4/5] KVM: selftests: Add a test for KVM_RUN+rseq to
+ detect task migration bugs
+Message-ID: <YSlz8h9SWgeuicak@google.com>
+References: <20210820225002.310652-1-seanjc@google.com>
+ <20210820225002.310652-5-seanjc@google.com>
+ <766990430.21713.1629731934069.JavaMail.zimbra@efficios.com>
+ <282257549.21721.1629732017655.JavaMail.zimbra@efficios.com>
+ <YSblqrrpKcORzilX@google.com>
+ <1700758714.29394.1630003332081.JavaMail.zimbra@efficios.com>
+ <YSgpy8iXXXUQ+b/k@google.com>
+ <339641531.29941.1630091374065.JavaMail.zimbra@efficios.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <73319f3c-6f5e-4f39-a678-7be5fddd55f2@www.fastmail.com>
+In-Reply-To: <339641531.29941.1630091374065.JavaMail.zimbra@efficios.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 27, 2021, Andy Lutomirski wrote:
-> 
-> On Thu, Aug 26, 2021, at 2:26 PM, David Hildenbrand wrote:
-> > On 26.08.21 19:05, Andy Lutomirski wrote:
-> 
-> > > Oof.  That's quite a requirement.  What's the point of the VMA once all
-> > > this is done?
+On Fri, Aug 27, 2021, Mathieu Desnoyers wrote:
+> > So there are effectively three reasons we want a delay:
 > > 
-> > You can keep using things like mbind(), madvise(), ... and the GUP code 
-> > with a special flag might mostly just do what you want. You won't have 
-> > to reinvent too many wheels on the page fault logic side at least.
+> >  1. To allow sched_setaffinity() to coincide with ioctl(KVM_RUN) before KVM can
+> >     enter the guest so that the guest doesn't need an arch-specific VM-Exit source.
+> > 
+> >  2. To let ioctl(KVM_RUN) make its way back to the test before the next round
+> >     of migration.
+> > 
+> >  3. To ensure the read-side can make forward progress, e.g. if sched_getcpu()
+> >     involves a syscall.
+> > 
+> > 
+> > After looking at KVM for arm64 and s390, #1 is a bit tenuous because x86 is the
+> > only arch that currently uses xfer_to_guest_mode_work(), i.e. the test could be
+> > tweaked to be overtly x86-specific.  But since a delay is needed for #2 and #3,
+> > I'd prefer to rely on it for #1 as well in the hopes that this test provides
+> > coverage for arm64 and/or s390 if they're ever converted to use the common
+> > xfer_to_guest_mode_work().
+> 
+> Now that we have this understanding of why we need the delay, it would be good to
+> write this down in a comment within the test.
 
-Ya, Kirill's RFC more or less proved a special GUP flag would indeed Just Work.
-However, the KVM page fault side of things would require only a handful of small
-changes to send private memslots down a different path.  Compared to the rest of
-the enabling, it's quite minor.
+Ya, I'll get a new version out next week.
 
-The counter to that is other KVM architectures would need to learn how to use the
-new APIs, though I suspect that there will be a fair bit of arch enabling regardless
-of what route we take.
+> Does it reproduce if we randomize the delay to have it picked randomly from 0us
+> to 100us (with 1us step) ? It would remove a lot of the needs for arch-specific
+> magic delay value.
 
-> You can keep calling the functions.  The implementations working is a
-> different story: you can't just unmap (pte_numa-style or otherwise) a private
-> guest page to quiesce it, move it with memcpy(), and then fault it back in.
+My less-than-scientific testing shows that it can reproduce at delays up to ~500us,
+but above ~10us the reproducibility starts to drop.  The bug still reproduces
+reliably, it just takes more iterations, and obviously the test runs a bit slower.
 
-Ya, I brought this up in my earlier reply.  Even the initial implementation (without
-real NUMA support) would likely be painful, e.g. the KVM TDX RFC/PoC adds dedicated
-logic in KVM to handle the case where NUMA balancing zaps a _pinned_ page and then
-KVM fault in the same pfn.  It's not thaaat ugly, but it's arguably more invasive
-to KVM's page fault flows than a new fd-based private memslot scheme.
+Any objection to using a 1-10us delay, e.g. a simple usleep((i % 10) + 1)?
