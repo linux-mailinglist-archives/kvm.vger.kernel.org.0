@@ -2,156 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6BA923F9AB7
-	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 16:15:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 618493F9ABD
+	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 16:17:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245279AbhH0OPc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Aug 2021 10:15:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45444 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241260AbhH0OPb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Aug 2021 10:15:31 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 132D3C061757;
-        Fri, 27 Aug 2021 07:14:43 -0700 (PDT)
-Received: from zn.tnic (p200300ec2f1117006e0d6268a9fc7b3e.dip0.t-ipconnect.de [IPv6:2003:ec:2f11:1700:6e0d:6268:a9fc:7b3e])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 2FD8E1EC0493;
-        Fri, 27 Aug 2021 16:14:37 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1630073677;
+        id S231837AbhH0OSb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Aug 2021 10:18:31 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38139 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230108AbhH0OSb (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 27 Aug 2021 10:18:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1630073862;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=3hBv70kaJ7xEYPUSElnsV+8ktxYO20ij25UtBpP2GHs=;
-        b=RvUnxtHP5ZBZ7z5DJaIp60qjgWYo4OZEBia83SzIl3zY4GMzFkUSp0X8fXVP4csuFG9OL7
-        cwZQf9i50aJTbvYkf29NQruKb+VvUU37WJVWvPmbdC1X59BTOfEV0O0yIhxB0pnKNH23+N
-        bxOk1W2hd7hfH8IjKvYrjLnoIREET4E=
-Date:   Fri, 27 Aug 2021 16:15:14 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH Part1 v5 30/38] x86/compressed/64: store Confidential
- Computing blob address in bootparams
-Message-ID: <YSjzcgQDubOY1pGI@zn.tnic>
-References: <20210820151933.22401-1-brijesh.singh@amd.com>
- <20210820151933.22401-31-brijesh.singh@amd.com>
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=GvsE54zH/Q6lwEJkx0yPhkkdoX0CrsLr4U5mSYQur+k=;
+        b=De/NpmzGpYAZLuD4UqXrZvgmtgvCEd0D1Ew5e4R3EeEXQSv73MwhJqNfCyAdqBuYoFP4BH
+        bL95jkM/JMteG1NXdvHCSE5TvufAyBwn8m5hbQbLLiOvYRuZ8OJh4jQHHGv0PiyJ9NCVsn
+        ktZv4ic6ZSmigoMP2D/BKYNA+X0AtT8=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-425-Ve_KbAvAM5uJw0nQHuhK6g-1; Fri, 27 Aug 2021 10:17:40 -0400
+X-MC-Unique: Ve_KbAvAM5uJw0nQHuhK6g-1
+Received: by mail-wm1-f70.google.com with SMTP id h1-20020a05600c350100b002e751bf6733so1802400wmq.8
+        for <kvm@vger.kernel.org>; Fri, 27 Aug 2021 07:17:40 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=GvsE54zH/Q6lwEJkx0yPhkkdoX0CrsLr4U5mSYQur+k=;
+        b=PP9Xfh22CVjhPYmtARRlyzvC6E8tE04HD66GxvKvDP9KGd2Ftdp+yBfU5cVu+t8SZx
+         feRb7iBURUPpdnRAgAgNfS47gOvUMUPt59y8EwtKt8qX5FCZFYZPLaBOGxXTKsfZkwbB
+         I1Aqo8h+PrZhVLgLBa+dvhg6Vyen6CMjyNth5Y5fpSnC6na4bdcPXgUnZAiQ5QkgVdI+
+         N09r4DHaR/AlV7Z5ohsBEEBERoVwG9lIYsFjhR6fYkyKoIRNdJRhTCtk3ep/Twa601DS
+         aGv4+5thFYDePPP1vGR99CJSOUgllgCcHXeAmPQmIjtH95u4bXlAlykwjNpa/GaLlPwq
+         dEhg==
+X-Gm-Message-State: AOAM53099QQrVOumIKS8Ta4vxezzM4N2V75KjmIY8NVX1WlNvQ2M8kcu
+        VKqeNjwx27suQK/nnHirk0kKSVGdtqq4WFuLqI/5ja7lNaLW+zdlmDxBWQMTlXGfGdROXC01lMN
+        ucVCTevETlyiX
+X-Received: by 2002:adf:c785:: with SMTP id l5mr10747564wrg.360.1630073859586;
+        Fri, 27 Aug 2021 07:17:39 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxhWQT/gKMwUWWXonhtMPa7OWc5O0g75JajRoLb0idXm1tUR4ztDcuyOh7elIiCthS8Cz+QHg==
+X-Received: by 2002:adf:c785:: with SMTP id l5mr10747535wrg.360.1630073859391;
+        Fri, 27 Aug 2021 07:17:39 -0700 (PDT)
+Received: from thuth.remote.csb (dynamic-046-114-148-182.46.114.pool.telefonica.de. [46.114.148.182])
+        by smtp.gmail.com with ESMTPSA id k16sm6598673wrx.87.2021.08.27.07.17.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 27 Aug 2021 07:17:38 -0700 (PDT)
+Subject: Re: [PATCH kvm-unit-tests v2] Makefile: Don't trust PWD
+To:     Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org
+Cc:     pmorel@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
+        cohuck@redhat.com, imbrenda@linux.ibm.com, pbonzini@redhat.com
+References: <20210827105407.313916-1-drjones@redhat.com>
+From:   Thomas Huth <thuth@redhat.com>
+Message-ID: <60b4fab4-0337-ebd3-48f9-ba74faa6caec@redhat.com>
+Date:   Fri, 27 Aug 2021 16:17:37 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.12.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20210820151933.22401-31-brijesh.singh@amd.com>
+In-Reply-To: <20210827105407.313916-1-drjones@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 20, 2021 at 10:19:25AM -0500, Brijesh Singh wrote:
-> From: Michael Roth <michael.roth@amd.com>
+On 27/08/2021 12.54, Andrew Jones wrote:
+> PWD comes from the environment and it's possible that it's already
+> set to something which isn't the full path of the current working
+> directory. Use the make variable $(CURDIR) instead.
 > 
-> When the Confidential Computing blob is located by the boot/compressed
-> kernel, store a pointer to it in bootparams->cc_blob_address to avoid
-> the need for the run-time kernel to rescan the EFI config table to find
-> it again.
-> 
-> Since this function is also shared by the run-time kernel, this patch
-
-Here's "this patch" again... but you know what to do.
-
-> also adds the logic to make use of bootparams->cc_blob_address when it
-> has been initialized.
-> 
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> Suggested-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
 > ---
->  arch/x86/kernel/sev-shared.c | 40 ++++++++++++++++++++++++++----------
->  1 file changed, 29 insertions(+), 11 deletions(-)
+>   Makefile | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/arch/x86/kernel/sev-shared.c b/arch/x86/kernel/sev-shared.c
-> index 651980ddbd65..6f70ba293c5e 100644
-> --- a/arch/x86/kernel/sev-shared.c
-> +++ b/arch/x86/kernel/sev-shared.c
-> @@ -868,7 +868,6 @@ static enum es_result vc_handle_rdtsc(struct ghcb *ghcb,
->  	return ES_OK;
->  }
->  
-> -#ifdef BOOT_COMPRESSED
->  static struct setup_data *get_cc_setup_data(struct boot_params *bp)
->  {
->  	struct setup_data *hdr = (struct setup_data *)bp->hdr.setup_data;
-> @@ -888,6 +887,16 @@ static struct setup_data *get_cc_setup_data(struct boot_params *bp)
->   *   1) Search for CC blob in the following order/precedence:
->   *      - via linux boot protocol / setup_data entry
->   *      - via EFI configuration table
-> + *   2) If found, initialize boot_params->cc_blob_address to point to the
-> + *      blob so that uncompressed kernel can easily access it during very
-> + *      early boot without the need to re-parse EFI config table
-> + *   3) Return a pointer to the CC blob, NULL otherwise.
-> + *
-> + * For run-time/uncompressed kernel:
-> + *
-> + *   1) Search for CC blob in the following order/precedence:
-> + *      - via linux boot protocol / setup_data entry
+> diff --git a/Makefile b/Makefile
+> index f7b9f28c9319..6792b93c4e16 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -119,7 +119,7 @@ cscope: cscope_dirs = lib lib/libfdt lib/linux $(TEST_DIR) $(ARCH_LIBDIRS) lib/a
+>   cscope:
+>   	$(RM) ./cscope.*
+>   	find -L $(cscope_dirs) -maxdepth 1 \
+> -		-name '*.[chsS]' -exec realpath --relative-base=$(PWD) {} \; | sort -u > ./cscope.files
+> +		-name '*.[chsS]' -exec realpath --relative-base=$(CURDIR) {} \; | sort -u > ./cscope.files
+>   	cscope -bk
+>   
+>   .PHONY: tags
+> 
 
-Why would you do this again if the boot/compressed kernel has already
-searched for it?
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
-> + *      - via boot_params->cc_blob_address
-
-Yes, that is the only thing you need to do in the runtime kernel - see
-if cc_blob_address is not 0. And all the work has been done by the
-decompressor kernel already.
-
->   *   2) Return a pointer to the CC blob, NULL otherwise.
->   */
->  static struct cc_blob_sev_info *sev_snp_probe_cc_blob(struct boot_params *bp)
-> @@ -897,9 +906,11 @@ static struct cc_blob_sev_info *sev_snp_probe_cc_blob(struct boot_params *bp)
->  		struct setup_data header;
->  		u32 cc_blob_address;
->  	} *sd;
-> +#ifdef __BOOT_COMPRESSED
->  	unsigned long conf_table_pa;
->  	unsigned int conf_table_len;
->  	bool efi_64;
-> +#endif
-
-That function turns into an unreadable mess with that #ifdef
-__BOOT_COMPRESSED slapped everywhere.
-
-It seems the cleanest thing to do is to do what we do with
-acpi_rsdp_addr: do all the parsing in boot/compressed/ and pass it on
-through boot_params. Kernel proper simply reads the pointer.
-
-Which means, you can stick all that cc_blob figuring out functionality
-in arch/x86/boot/compressed/sev.c instead.
-
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
