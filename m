@@ -2,128 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EC6393F9567
-	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 09:50:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CF4DD3F95AA
+	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 10:00:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244487AbhH0HuF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Aug 2021 03:50:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41668 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244460AbhH0Ht7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Aug 2021 03:49:59 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3EE94C061757;
-        Fri, 27 Aug 2021 00:49:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=mwqNvZJA9dIpDEWigadLmAt4ekXHrBRvbcdnGdey0lE=; b=I/IvqbDlSMWcIbpdOOAXfLAePd
-        VnuHf80Ij7eT65HZ/ZmLgO4WMPy4itQhDo5T0oqUnYiX+gy+Rpm1rDaH4yfbNkb40sVQ1Gs3+K6Uq
-        CAc6W/5Ofu26xIMuG6qfRfTVilpdhWEX2zSVyoNEfY39xPi+5hJeAJd/b2amtCtk8saRHvdqd3spd
-        k3S7rVNP4X1Ahst2d+VG5ZMlKiq+sDTGG7S40hJJ0KnXYxsSWY1gkda21RFgy0QIi2/QZhbbB2Vlz
-        96YSYnpgLCOvEhsZUVTk4sOSCYRU5PzhafRroNnuKOSTjrZC6AYQI4zn9xh9YCEYcHiHS9VshLf0l
-        /zvt21FA==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mJWXo-00EGbQ-KU; Fri, 27 Aug 2021 07:45:12 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 7022A30035D;
-        Fri, 27 Aug 2021 09:44:52 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 549952C6670ED; Fri, 27 Aug 2021 09:44:52 +0200 (CEST)
-Date:   Fri, 27 Aug 2021 09:44:52 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@redhat.com>,
-        Namhyung Kim <namhyung@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-csky@vger.kernel.org, linux-riscv@lists.infradead.org,
-        kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
-        Artem Kashkanov <artem.kashkanov@intel.com>,
-        Zhu Lingshan <lingshan.zhu@intel.com>,
-        Will Deacon <will@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Marc Zyngier <maz@kernel.org>, Guo Ren <guoren@kernel.org>,
-        Nick Hu <nickhu@andestech.com>,
-        Greentime Hu <green.hu@gmail.com>,
-        Vincent Chen <deanbo422@gmail.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Borislav Petkov <bp@alien8.de>, x86@kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Juergen Gross <jgross@suse.com>,
-        Josh Poimboeuf <jpoimboe@redhat.com>,
-        Jason Baron <jbaron@akamai.com>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Ard Biesheuvel <ardb@kernel.org>
-Subject: Re: [PATCH 00/15] perf: KVM: Fix, optimize, and clean up callbacks
-Message-ID: <YSiX9OPcrDsr3P4C@hirez.programming.kicks-ass.net>
-References: <20210827005718.585190-1-seanjc@google.com>
- <fd3dcd6c-b3d5-4453-93fb-b46d0595534e@gmail.com>
+        id S244495AbhH0IBG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Aug 2021 04:01:06 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:8786 "EHLO
+        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S244429AbhH0IBF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Aug 2021 04:01:05 -0400
+Received: from dggemv711-chm.china.huawei.com (unknown [172.30.72.56])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4GwsYx4l8vzYv2y;
+        Fri, 27 Aug 2021 15:59:33 +0800 (CST)
+Received: from dggpeml500016.china.huawei.com (7.185.36.70) by
+ dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Fri, 27 Aug 2021 16:00:08 +0800
+Received: from DESKTOP-27KDQMV.china.huawei.com (10.174.148.223) by
+ dggpeml500016.china.huawei.com (7.185.36.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Fri, 27 Aug 2021 16:00:07 +0800
+From:   "Longpeng(Mike)" <longpeng2@huawei.com>
+To:     <pbonzini@redhat.com>
+CC:     <seanjc@google.com>, <vkuznets@redhat.com>,
+        <wanpengli@tencent.com>, <jmattson@google.com>, <joro@8bytes.org>,
+        <tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
+        <hpa@zytor.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <arei.gonglei@huawei.com>,
+        "Longpeng(Mike)" <longpeng2@huawei.com>
+Subject: [PATCH] kvm: irqfd: avoid update unmodified entries of the routing
+Date:   Fri, 27 Aug 2021 16:00:03 +0800
+Message-ID: <20210827080003.2689-1-longpeng2@huawei.com>
+X-Mailer: git-send-email 2.25.0.windows.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fd3dcd6c-b3d5-4453-93fb-b46d0595534e@gmail.com>
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.174.148.223]
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ dggpeml500016.china.huawei.com (7.185.36.70)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 27, 2021 at 02:52:25PM +0800, Like Xu wrote:
-> + STATIC BRANCH/CALL friends.
-> 
-> On 27/8/2021 8:57 am, Sean Christopherson wrote:
-> > This started out as a small series[1] to fix a KVM bug related to Intel PT
-> > interrupt handling and snowballed horribly.
-> > 
-> > The main problem being addressed is that the perf_guest_cbs are shared by
-> > all CPUs, can be nullified by KVM during module unload, and are not
-> > protected against concurrent access from NMI context.
-> 
-> Shouldn't this be a generic issue of the static_call() usage ?
-> 
-> At the beginning, we set up the static entry assuming perf_guest_cbs != NULL:
-> 
-> 	if (perf_guest_cbs && perf_guest_cbs->handle_intel_pt_intr) {
-> 		static_call_update(x86_guest_handle_intel_pt_intr,
-> 				   perf_guest_cbs->handle_intel_pt_intr);
-> 	}
-> 
-> and then we unset the perf_guest_cbs and do the static function call like this:
-> 
-> DECLARE_STATIC_CALL(x86_guest_handle_intel_pt_intr,
-> *(perf_guest_cbs->handle_intel_pt_intr));
-> static int handle_pmi_common(struct pt_regs *regs, u64 status)
-> {
-> 		...
-> 		if (!static_call(x86_guest_handle_intel_pt_intr)())
-> 			intel_pt_interrupt();
-> 		...
-> }
+All of the irqfds would to be updated when update the irq
+routing, it's too expensive if there're too many irqfds.
 
-You just have to make sure all static_call() invocations that started
-before unreg are finished before continuing with the unload.
-synchronize_rcu() can help with that.
+However we can reduce the cost by avoid some unnecessary
+updates. For irqs of MSI type on X86, the update can be
+saved if the msi values are not change.
 
-This is module unload 101. Nothing specific to static_call().
+The vfio migration could receives benefit from this optimi-
+zaiton. The test VM has 128 vcpus and 8 VF (with 65 vectors
+enabled), so the VM has more than 520 irqfds. We mesure the
+cost of the vfio_msix_enable (in QEMU, it would set routing
+for each irqfd) for each VF, and we can see the total cost
+can be significantly reduced.
+
+                Origin         Apply this Patch
+1st             8              4
+2nd             15             5
+3rd             22             6
+4th             24             6
+5th             36             7
+6th             44             7
+7th             51             8
+8th             58             8
+Total           258ms          51ms
+
+We're also tring to optimize the QEMU part [1], but it's still
+worth to optimize the KVM to gain more benefits.
+
+[1] https://lists.gnu.org/archive/html/qemu-devel/2021-08/msg04215.html
+
+Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
+---
+ arch/x86/kvm/x86.c       |  9 +++++++++
+ include/linux/kvm_host.h |  2 ++
+ virt/kvm/eventfd.c       | 15 ++++++++++++++-
+ 3 files changed, 25 insertions(+), 1 deletion(-)
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index e5d5c5e..22cf20e 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -12023,6 +12023,15 @@ int kvm_arch_update_irqfd_routing(struct kvm *kvm, unsigned int host_irq,
+ 	return static_call(kvm_x86_update_pi_irte)(kvm, host_irq, guest_irq, set);
+ }
+ 
++bool kvm_arch_irqfd_route_changed(struct kvm_kernel_irq_routing_entry *old,
++				  struct kvm_kernel_irq_routing_entry *new)
++{
++	if (new->type != KVM_IRQ_ROUTING_MSI)
++		return true;
++
++	return !!memcmp(&old->msi, &new->msi, sizeof(new->msi));
++}
++
+ bool kvm_vector_hashing_enabled(void)
+ {
+ 	return vector_hashing;
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index ae7735b..c0954ae 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -1621,6 +1621,8 @@ void kvm_arch_irq_bypass_del_producer(struct irq_bypass_consumer *,
+ void kvm_arch_irq_bypass_start(struct irq_bypass_consumer *);
+ int kvm_arch_update_irqfd_routing(struct kvm *kvm, unsigned int host_irq,
+ 				  uint32_t guest_irq, bool set);
++bool kvm_arch_irqfd_route_changed(struct kvm_kernel_irq_routing_entry *,
++				  struct kvm_kernel_irq_routing_entry *);
+ #endif /* CONFIG_HAVE_KVM_IRQ_BYPASS */
+ 
+ #ifdef CONFIG_HAVE_KVM_INVALID_WAKEUPS
+diff --git a/virt/kvm/eventfd.c b/virt/kvm/eventfd.c
+index e996989..2ad013b 100644
+--- a/virt/kvm/eventfd.c
++++ b/virt/kvm/eventfd.c
+@@ -281,6 +281,13 @@ int  __attribute__((weak)) kvm_arch_update_irqfd_routing(
+ {
+ 	return 0;
+ }
++
++bool __attribute__((weak)) kvm_arch_irqfd_route_changed(
++				struct kvm_kernel_irq_routing_entry *old,
++				struct kvm_kernel_irq_routing_entry *new)
++{
++	return true;
++}
+ #endif
+ 
+ static int
+@@ -615,10 +622,16 @@ void kvm_irq_routing_update(struct kvm *kvm)
+ 	spin_lock_irq(&kvm->irqfds.lock);
+ 
+ 	list_for_each_entry(irqfd, &kvm->irqfds.items, list) {
++#ifdef CONFIG_HAVE_KVM_IRQ_BYPASS
++		/* Under irqfds.lock, so can read irq_entry safely */
++		struct kvm_kernel_irq_routing_entry old = irqfd->irq_entry;
++#endif
++
+ 		irqfd_update(kvm, irqfd);
+ 
+ #ifdef CONFIG_HAVE_KVM_IRQ_BYPASS
+-		if (irqfd->producer) {
++		if (irqfd->producer &&
++		    kvm_arch_irqfd_route_changed(&old, &irqfd->irq_entry)) {
+ 			int ret = kvm_arch_update_irqfd_routing(
+ 					irqfd->kvm, irqfd->producer->irq,
+ 					irqfd->gsi, 1);
+-- 
+1.8.3.1
+
