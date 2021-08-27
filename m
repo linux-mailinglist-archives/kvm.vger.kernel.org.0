@@ -2,162 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ADFF93F9AEB
-	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 16:36:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2207E3F9B05
+	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 16:43:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233484AbhH0Ogd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Aug 2021 10:36:33 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:58062 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232477AbhH0Ogc (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 27 Aug 2021 10:36:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630074943;
+        id S234300AbhH0OoI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Aug 2021 10:44:08 -0400
+Received: from mail.skyhub.de ([5.9.137.197]:44492 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231327AbhH0OoI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Aug 2021 10:44:08 -0400
+Received: from zn.tnic (p200300ec2f1117006e0d6268a9fc7b3e.dip0.t-ipconnect.de [IPv6:2003:ec:2f11:1700:6e0d:6268:a9fc:7b3e])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id D16451EC0493;
+        Fri, 27 Aug 2021 16:43:13 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1630075393;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=MI7XqhEPHQ0KdrOH7I14agQ5SNxf4ytxsbZUk5i/1a4=;
-        b=X1kqypNKncGI07gdP2I2LlWb022qwAX+xwGhK6MLNrxOP3pj/vZxRPpR+cDa99iejntF80
-        1EFN7rEn/W4BV7JgVSNKbjTfvRDo5wxjKC358X88JYIcwN/mYKuY2OSvbJBFmaZ2SzRhdw
-        sW2kcqFkfVrBAzJ+sgM/Ljp03i9rumk=
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
- [209.85.166.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-564-FXZD1WFON-KH17A9CMsV3A-1; Fri, 27 Aug 2021 10:35:41 -0400
-X-MC-Unique: FXZD1WFON-KH17A9CMsV3A-1
-Received: by mail-io1-f72.google.com with SMTP id f1-20020a5edf01000000b005b85593f933so4085549ioq.14
-        for <kvm@vger.kernel.org>; Fri, 27 Aug 2021 07:35:41 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=MI7XqhEPHQ0KdrOH7I14agQ5SNxf4ytxsbZUk5i/1a4=;
-        b=KyACZU8W2UlRd0J+kRonIhw8+MnuMrTF/BPGUxDuZ6msoeKmTaEgQCKXHsa+vsfzBC
-         RnrOlnUFq3TvpmaKMUcCwYLBngStS7Nk0gOF77lucl8TIuE0INSeMdfwPPZWR1qPyHj3
-         xEtgYuo5kJhAKU5o1piv15h2PnsNilJVTXsZrxOx4r7S5CCqYFGcO5PNI0ssgNfcMpm6
-         2cxpo0MFGSNGJD0hKCw4ty0wqgaXKPtb6iFA7z23iU6djOU+v+lLB2rygway10ZlyLNx
-         ceR4YSfpU4lcDKyaH9gRp4TpMrIrsQKxQUpAkE/dy+Z0cNYY93EiqV232zzmI2gMjimU
-         fNnw==
-X-Gm-Message-State: AOAM531QstyFsEafqDljANBT3W18+zsTU9aI2BrDATBSzk8NEn7iiEpq
-        CSuHiUk2HOZUoB3fYDtBazumM/K2bHh/Hr4NgzbQW3ejP6VQKz62K2Y9QpfAkkkCVCcnCe7tgL6
-        B2L+J1NnHiZKX
-X-Received: by 2002:a6b:5c17:: with SMTP id z23mr7384482ioh.3.1630074940816;
-        Fri, 27 Aug 2021 07:35:40 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx+CLjWgtsCi9oNdw60RVFvrcdC1pkSocHH0MY0/zSm9ztI54sLuhAqJOLqiN/jETE61gHCdQ==
-X-Received: by 2002:a6b:5c17:: with SMTP id z23mr7384396ioh.3.1630074939672;
-        Fri, 27 Aug 2021 07:35:39 -0700 (PDT)
-Received: from redhat.com (c-73-14-100-188.hsd1.co.comcast.net. [73.14.100.188])
-        by smtp.gmail.com with ESMTPSA id o11sm3499022ilf.86.2021.08.27.07.35.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Aug 2021 07:35:39 -0700 (PDT)
-Date:   Fri, 27 Aug 2021 08:35:38 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Diana Craciun <diana.craciun@oss.nxp.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Eric Auger <eric.auger@redhat.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH 04/14] vfio: factor out a vfio_group_find_or_alloc
- helper
-Message-ID: <20210827083538.2fdb8676.alex.williamson@redhat.com>
-In-Reply-To: <20210826233558.GT1721383@nvidia.com>
-References: <20210826133424.3362-1-hch@lst.de>
-        <20210826133424.3362-5-hch@lst.de>
-        <20210826135413.239e6d4e.alex.williamson@redhat.com>
-        <20210826233558.GT1721383@nvidia.com>
-Organization: Red Hat
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=JnpD/7q7WF7NuQTfcoCi3R50uMQ/1+7oFap3seyqFiU=;
+        b=e26r5thZw3XobM2ye3EddiEyjsURteB1VBnb9DqalDrz/BfqeAqavI3AfDm3wWbyRpHNYf
+        KaaDG9MPIkesEZZlZNR1sFhG8o8pPc4me7+aevWWCAlge78mDHfvYrrKAql2Ceq4wAet5Z
+        tCUyonEcyXAV+onAyLO+agfkeabOE2s=
+Date:   Fri, 27 Aug 2021 16:43:51 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH Part1 v5 31/38] x86/compressed/64: add identity mapping
+ for Confidential Computing blob
+Message-ID: <YSj6J+TFnJzueCAQ@zn.tnic>
+References: <20210820151933.22401-1-brijesh.singh@amd.com>
+ <20210820151933.22401-32-brijesh.singh@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20210820151933.22401-32-brijesh.singh@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 26 Aug 2021 20:35:58 -0300
-Jason Gunthorpe <jgg@nvidia.com> wrote:
+On Fri, Aug 20, 2021 at 10:19:26AM -0500, Brijesh Singh wrote:
+> diff --git a/arch/x86/boot/compressed/ident_map_64.c b/arch/x86/boot/compressed/ident_map_64.c
+> index 3cf7a7575f5c..54374e0f0257 100644
+> --- a/arch/x86/boot/compressed/ident_map_64.c
+> +++ b/arch/x86/boot/compressed/ident_map_64.c
+> @@ -37,6 +37,9 @@
+>  #include <asm/setup.h>	/* For COMMAND_LINE_SIZE */
+>  #undef _SETUP
+>  
+> +#define __BOOT_COMPRESSED
+> +#include <asm/sev.h> /* For sev_snp_active() + ConfidentialComputing blob */
+> +
 
-> On Thu, Aug 26, 2021 at 01:54:13PM -0600, Alex Williamson wrote:
-> > On Thu, 26 Aug 2021 15:34:14 +0200
-> > Christoph Hellwig <hch@lst.de> wrote:
-> >   
-> > > Factor out a helper to find or allocate the vfio_group to reduce the
-> > > spagetthi code in vfio_register_group_dev a little.
-> > > 
-> > > Signed-off-by: Christoph Hellwig <hch@lst.de>
-> > > Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
-> > >  drivers/vfio/vfio.c | 59 ++++++++++++++++++++++++++-------------------
-> > >  1 file changed, 34 insertions(+), 25 deletions(-)
-> > > 
-> > > diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
-> > > index 18e4c7906d1b3f..852fe22125520d 100644
-> > > +++ b/drivers/vfio/vfio.c
-> > > @@ -823,10 +823,38 @@ void vfio_uninit_group_dev(struct vfio_device *device)
-> > >  }
-> > >  EXPORT_SYMBOL_GPL(vfio_uninit_group_dev);
-> > >  
-> > > +struct vfio_group *vfio_group_find_or_alloc(struct device *dev)
-> > > +{
-> > > +	struct iommu_group *iommu_group;
-> > > +	struct vfio_group *group;
-> > > +
-> > > +	iommu_group = vfio_iommu_group_get(dev);
-> > > +	if (!iommu_group)
-> > > +		return ERR_PTR(-EINVAL);
-> > > +
-> > > +	/* a found vfio_group already holds a reference to the iommu_group */
-> > > +	group = vfio_group_get_from_iommu(iommu_group);
-> > > +	if (group)
-> > > +		goto out_put;
-> > > +
-> > > +	/* a newly created vfio_group keeps the reference. */
-> > > +	group = vfio_create_group(iommu_group);
-> > > +	if (IS_ERR(group))
-> > > +		goto out_put;
-> > > +	return group;
-> > > +
-> > > +out_put:
-> > > +#ifdef CONFIG_VFIO_NOIOMMU
-> > > +	if (iommu_group_get_iommudata(iommu_group) == &noiommu)
-> > > +		iommu_group_remove_device(dev);
-> > > +#endif  
-> > 
-> > When we get here via the first goto above, it doesn't match the code
-> > we're removing below.   
-> 
-> If we are in noiommu mode then the group is a new singleton group and
-> vfio_group_get_from_iommu() cannot succeed, so the out_put cannot
-> trigger for the noiommu path.
-> 
-> This is all improved in patch 6 where the logic becomes clear:
-> 
-> +	iommu_group = iommu_group_get(dev);
-> +#ifdef CONFIG_VFIO_NOIOMMU
-> +	if (!iommu_group && noiommu && !iommu_present(dev->bus)) {
-> +		/*
-> +		 * With noiommu enabled, create an IOMMU group for devices that
-> +		 * don't already have one and don't have an iommu_ops on their
-> +		 * bus.  Taint the kernel because we're about to give a DMA
-> +		 * capable device to a user without IOMMU protection.
-> +		 */
-> +		group = vfio_noiommu_group_alloc(dev);
-> +		if (group) {
-> +			add_taint(TAINT_USER, LOCKDEP_STILL_OK);
-> +			dev_warn(dev, "Adding kernel taint for vfio-noiommu group on device\n");
-> +		}
-> +		return group;
-> 
-> Eg we never do a pointless vfio_group_get_from_iommu() on a no-iommu
-> group in the first place, we just create everything directly.
-> 
-> It would be fine to add an extra label and then remove it in patch 6,
-> but it is also fine this way and properly cleaned by the end.
+When you move all the cc_blob parsing to the compressed kernel, all that
+ugly ifdeffery won't be needed.
 
-I agree that it's resolved later in the series, but it's confusing
-here, particularly because in patch 1 we need to come to the conclusion
-that path is unreachable, thus the different return paths, then we
-ignore it here with a common exit.  Thanks,
+>  extern unsigned long get_cmd_line_ptr(void);
+>  
+>  /* Used by PAGE_KERN* macros: */
+> @@ -163,6 +166,21 @@ void initialize_identity_maps(void *rmode)
+>  	cmdline = get_cmd_line_ptr();
+>  	add_identity_map(cmdline, cmdline + COMMAND_LINE_SIZE);
 
-Alex
+Carve that ...
 
+> +	/*
+> +	 * The ConfidentialComputing blob is used very early in uncompressed
+> +	 * kernel to find CPUID memory to handle cpuid instructions. Make sure
+> +	 * an identity-mapping exists so they can be accessed after switchover.
+> +	 */
+> +	if (sev_snp_enabled()) {
+> +		struct cc_blob_sev_info *cc_info =
+> +			(void *)(unsigned long)boot_params->cc_blob_address;
+> +
+> +		add_identity_map((unsigned long)cc_info,
+> +				 (unsigned long)cc_info + sizeof(*cc_info));
+> +		add_identity_map((unsigned long)cc_info->cpuid_phys,
+> +				 (unsigned long)cc_info->cpuid_phys + cc_info->cpuid_len);
+> +	}
+> +
+>  	/* Load the new page-table. */
+>  	sev_verify_cbit(top_level_pgt);
+
+... up to here into a separate function called sev_prep_identity_maps()
+so that SEV-specific code flow is not in the generic code path.
+
+>  	write_cr3(top_level_pgt);
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
