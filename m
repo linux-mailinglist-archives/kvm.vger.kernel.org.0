@@ -2,77 +2,176 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BAAF43FA0F2
-	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 23:01:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C6B433FA111
+	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 23:19:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231728AbhH0VBu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Aug 2021 17:01:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54618 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231572AbhH0VBt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Aug 2021 17:01:49 -0400
-Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A61C1C0613D9
-        for <kvm@vger.kernel.org>; Fri, 27 Aug 2021 14:01:00 -0700 (PDT)
-Received: by mail-pg1-x533.google.com with SMTP id g184so6925434pgc.6
-        for <kvm@vger.kernel.org>; Fri, 27 Aug 2021 14:01:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=tI9HaMdZqkoEnotuhkZgxR2Gc8e4BrKX2M4IPXxMnmc=;
-        b=eORG6cTFVBzvjQlKb0t4WrPnjrfgcop0ivusY7ffhvlya+zHiy1ug0uTSELeH6vvFx
-         VsS2QTwuL2YYMqjw52935/8Svg0+YeQEgxlnNDN+obOsU6mNGGsMYKJ7j2CCWLspu+F9
-         ya6gDS7MTd56GIQU0i4yJJ5B2Xis0az9id56bSd2WPs0W1hda4X3Xyk8ucKr1dig7XsB
-         KtmPyK5rvLUBXlg2bgZgJ3qfyc3ZUp7ShSPDbTkMF4+hX/OoewiwkFhVah4+Hjn8SjiP
-         fgGoT8aiOsqY922blOu/4yQPeDqA2kuUqhhf/ZfsAgo37j6wcwCz1FC9KI3xOokv8wdd
-         zwlg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=tI9HaMdZqkoEnotuhkZgxR2Gc8e4BrKX2M4IPXxMnmc=;
-        b=DwGHKYMEEr5tBLXdDYZhJkgHhGwiU+O7J68A9ikdpICEA+vSniPUSjH6ldRVXwdujM
-         36nYsj5KLfm1KTkrAuu3fu90umdQjZ4ozM/exYLRobMHatIPjfNClwhxviQ1AkJE5wa6
-         kIFJb4B0UP4B1KmxswsB1A4jeKGsTx8zo6UT0Kg8nU/nDpYkoLC2mIc1Ab7InRN+4dyV
-         l6ebvnTtk4yi41hzZEMDDELSVcGk+e3emvu/ryrkm2CBDJp3Gv5gVopAWYPEWoqsHNe1
-         5Wm8Bm79Hq/3bQU4Ly38F+iambe9wNlPCsoXFbrCh9rU48C5lLrkuIa0iILpkPyAIbSg
-         Om0A==
-X-Gm-Message-State: AOAM531savU7txTJmpgeMqf8yCEW0XNou2gi0lNCqf/V0lNeniQPY2gr
-        evaOKiZdSLK9QWl9HmjVeOapSw==
-X-Google-Smtp-Source: ABdhPJznM9fpAh+AvFST7AUQYXH02fD9bOsT8exCbASeNEsRYI4fihaJrWE7eUH0BtDdO2RhLfMN8g==
-X-Received: by 2002:aa7:8246:0:b029:39a:1e0a:cd48 with SMTP id e6-20020aa782460000b029039a1e0acd48mr10845556pfn.14.1630098059922;
-        Fri, 27 Aug 2021 14:00:59 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id o10sm6871191pfk.212.2021.08.27.14.00.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Aug 2021 14:00:59 -0700 (PDT)
-Date:   Fri, 27 Aug 2021 21:00:55 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Bill Wendling <morbo@google.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Roman Bolshakov <r.bolshakov@yadro.com>,
-        David Matlack <dmatlack@google.com>
-Subject: Re: [PATCH] libcflag: define the "noinline" macro
-Message-ID: <YSlSh+xe0k4hK7Le@google.com>
-References: <20210826210406.18490-1-morbo@google.com>
+        id S231917AbhH0VUW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Aug 2021 17:20:22 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:39330 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231883AbhH0VUV (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 27 Aug 2021 17:20:21 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 17RLAZm2158605;
+        Fri, 27 Aug 2021 17:19:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=u7sQHkmMVCWEQ+xt8UpkVUhX3C0XhIyAKQkPPvYoi1Q=;
+ b=E7xY5XIzDc53Kzg9lY8jkTRcinj8LX6qCpKAefRm+SHfNfqdROElMbqtwNnjf1oBHydP
+ YerYDRy+474agy3GgY2t7CMHX6Gu3HPWpWwRIY7ksA6iSt2vRTpfV23QGCTdZd6ePEgQ
+ 9p748MYkKLXrX9mtOLs3iHbRob7q3f8wc0ZrnWH9g7giA7Qv3bL2J4UJNp/edXPpwVeU
+ DtnYo+q18TVMg7vPvhdmFqSsyXbn9RyM+C7cIopPXXoBYZUWZ0AVM+DOUNZxl3Yrv52/
+ of9jMmd38l8RbJEx2C20AC3OH1LvmmMrvuX2V6HjPB/hi+DTHTNhARZjUTsAO9dwARYI 7A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3aq75j8qq1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 27 Aug 2021 17:19:31 -0400
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 17RLBOMN163530;
+        Fri, 27 Aug 2021 17:19:30 -0400
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3aq75j8qpb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 27 Aug 2021 17:19:30 -0400
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 17RLHdBd026989;
+        Fri, 27 Aug 2021 21:19:29 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma05fra.de.ibm.com with ESMTP id 3ajs48j84t-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 27 Aug 2021 21:19:29 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 17RLJPPm35848604
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 27 Aug 2021 21:19:25 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8F4FC42041;
+        Fri, 27 Aug 2021 21:19:25 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B657942049;
+        Fri, 27 Aug 2021 21:19:24 +0000 (GMT)
+Received: from li-e979b1cc-23ba-11b2-a85c-dfd230f6cf82 (unknown [9.171.80.46])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with SMTP;
+        Fri, 27 Aug 2021 21:19:24 +0000 (GMT)
+Date:   Fri, 27 Aug 2021 23:19:21 +0200
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        stable@vger.kernel.org, Michael Mueller <mimu@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>
+Subject: Re: [PATCH 1/1] KVM: s390: index kvm->arch.idle_mask by vcpu_idx
+Message-ID: <20210827231921.267ad3df.pasic@linux.ibm.com>
+In-Reply-To: <20210827160616.532d6699@p-imbrenda>
+References: <20210827125429.1912577-1-pasic@linux.ibm.com>
+        <20210827160616.532d6699@p-imbrenda>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210826210406.18490-1-morbo@google.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: flYt4X4CxFJtdIKA-hZi8DCd9QyZXomU
+X-Proofpoint-ORIG-GUID: rDOrGoWkUmPCfTxYp7kRBUf49-RAlFkF
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-08-27_06:2021-08-27,2021-08-27 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 malwarescore=0
+ priorityscore=1501 mlxlogscore=999 spamscore=0 suspectscore=0 mlxscore=0
+ adultscore=0 phishscore=0 bulkscore=0 lowpriorityscore=0 impostorscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2107140000
+ definitions=main-2108270124
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 26, 2021, Bill Wendling wrote:
-> Define "noline" macro to reduce the amount of typing for functions using
-> the "noinline" attribute.
+On Fri, 27 Aug 2021 16:06:16 +0200
+Claudio Imbrenda <imbrenda@linux.ibm.com> wrote:
+
+> On Fri, 27 Aug 2021 14:54:29 +0200
+> Halil Pasic <pasic@linux.ibm.com> wrote:
 > 
-> Signed-off-by: Bill Wendling <morbo@google.com>
-> ---
+> > While in practice vcpu->vcpu_idx ==  vcpu->vcp_id is often true,
 
-Reviewed-by: Sean Christopherson <seanjc@google.com>
+s/vcp_id/vcpu_id/
 
-For your own sanity, you'll probably want to send this as part of your other
-series to fix clang's zealous inlining, there's a decent chance Paolo won't get
-to this for several weeks.
+> > it may not always be, and we must not rely on this.  
+> 
+> why?
+> 
+> maybe add a simple explanation of why vcpu_idx and vcpu_id can be
+> different, namely:
+> KVM decides the vcpu_idx, userspace decides the vcpu_id, thus the two
+> might not match 
+
+Not sure that is a good explanation. A quote from
+Documentation/virt/kvm/api.rst:
+
+"""
+4.7 KVM_CREATE_VCPU
+-------------------
+
+:Capability: basic
+:Architectures: all
+:Type: vm ioctl
+:Parameters: vcpu id (apic id on x86)
+:Returns: vcpu fd on success, -1 on error
+                
+This API adds a vcpu to a virtual machine. No more than max_vcpus may be added.
+The vcpu id is an integer in the range [0, max_vcpu_id).
+        
+The recommended max_vcpus value can be retrieved using the KVM_CAP_NR_VCPUS of
+the KVM_CHECK_EXTENSION ioctl() at run-time.
+The maximum possible value for max_vcpus can be retrieved using the
+KVM_CAP_MAX_VCPUS of the KVM_CHECK_EXTENSION ioctl() at run-time.
+"""
+
+Based on that and a quick look at the code, it looks to me like the
+set of valid vcpu_id values are a subset of the range of vcpu_idx-es,
+i.e. that kvm could decide to choose vcpu_id for the value of vcpu_idx.
+I don't think it should, but it could. Were the set of valid vcpu_id
+values not a subset of the set of supported vcpu_idx values, then one
+could argue that this is why.
+
+I didn't want to get into explaining the why, I just wanted to state the
+fact.
+
+> 
+> > 
+> > Currently kvm->arch.idle_mask is indexed by vcpu_id, which implies
+> > that code like
+> > for_each_set_bit(vcpu_id, kvm->arch.idle_mask, online_vcpus) {
+> >                 vcpu = kvm_get_vcpu(kvm, vcpu_id);  
+> 
+> you can also add a sentence to clarify that kvm_get_vcpu expects an
+> vcpu_idx, not an vcpu_id.
+
+maybe ...
+
+> 
+> > 		do_stuff(vcpu);
+> > }
+> > is not legit. The trouble is, we do actually use kvm->arch.idle_mask
+
+... s/legit\./legit, because kvm_get_vcpu() expects a vcpu_idx and not a
+vcpu_id.
+
+But I agree kvm_get_vcpu(kvm, vcpu_id); does not scream BUG at me while
+kvm_get_vcpu_by_idx(kvm, vcpu_id) would look much more suspicious.
+
+[..]
+> 
+> otherwise looks good to me.
+> 
+> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+
+Thanks for your reveiew!
+
+Halil
+
+[..]
