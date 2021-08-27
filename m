@@ -2,111 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 247583F9BFD
-	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 17:52:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B1DB03F9C32
+	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 18:12:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245512AbhH0Pv2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Aug 2021 11:51:28 -0400
-Received: from smtp-fw-9102.amazon.com ([207.171.184.29]:46050 "EHLO
-        smtp-fw-9102.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245509AbhH0Pv1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Aug 2021 11:51:27 -0400
+        id S245479AbhH0QMp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Aug 2021 12:12:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44090 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234391AbhH0QMo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Aug 2021 12:12:44 -0400
+Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9931AC061757
+        for <kvm@vger.kernel.org>; Fri, 27 Aug 2021 09:11:54 -0700 (PDT)
+Received: by mail-ed1-x52d.google.com with SMTP id n11so10570688edv.11
+        for <kvm@vger.kernel.org>; Fri, 27 Aug 2021 09:11:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1630079438; x=1661615438;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=i0j/X6GVx88IEMduyTxlPnzYI3HNiRgbOvXelXh/NoM=;
-  b=S4B5YNbXuMwkOsmU254+UiKjrdE49emrT47idKYJIvLHgPDUkboPTv3I
-   TgYYIpV4B3E/Yi1VQczYPiWbFZbRWD4MWNcXKj8BmfhRXvxMKKW2GceiC
-   JhxEDkIKA0N9uKI7zJAWpI537TSw0LGdALBEsfgSXtokjWOFae8Oyn24R
-   M=;
-X-IronPort-AV: E=Sophos;i="5.84,357,1620691200"; 
-   d="scan'208";a="155652121"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-2b-859fe132.us-west-2.amazon.com) ([10.25.36.214])
-  by smtp-border-fw-9102.sea19.amazon.com with ESMTP; 27 Aug 2021 15:50:32 +0000
-Received: from EX13D16EUB003.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
-        by email-inbound-relay-2b-859fe132.us-west-2.amazon.com (Postfix) with ESMTPS id 5161A2202AF;
-        Fri, 27 Aug 2021 15:50:31 +0000 (UTC)
-Received: from 38f9d34ed3b1.ant.amazon.com (10.43.162.52) by
- EX13D16EUB003.ant.amazon.com (10.43.166.99) with Microsoft SMTP Server (TLS)
- id 15.0.1497.23; Fri, 27 Aug 2021 15:50:24 +0000
-From:   Andra Paraschiv <andraprs@amazon.com>
-To:     linux-kernel <linux-kernel@vger.kernel.org>
-CC:     Alexandru Ciobotaru <alcioa@amazon.com>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        Kamal Mostafa <kamal@canonical.com>,
-        "Alexandru Vasile" <lexnv@amazon.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Stefano Garzarella" <sgarzare@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        kvm <kvm@vger.kernel.org>,
-        ne-devel-upstream <ne-devel-upstream@amazon.com>,
-        Andra Paraschiv <andraprs@amazon.com>
-Subject: [PATCH v3 7/7] nitro_enclaves: Add fixes for checkpatch blank line reports
-Date:   Fri, 27 Aug 2021 18:49:30 +0300
-Message-ID: <20210827154930.40608-8-andraprs@amazon.com>
-X-Mailer: git-send-email 2.20.1 (Apple Git-117)
-In-Reply-To: <20210827154930.40608-1-andraprs@amazon.com>
-References: <20210827154930.40608-1-andraprs@amazon.com>
+        d=gmail.com; s=20161025;
+        h=mime-version:reply-to:from:date:message-id:subject:to
+         :content-transfer-encoding;
+        bh=CGAO6nSx8Y6hL0Rzi1Sw6miu+cDtGyCuPQ9lSMFguxo=;
+        b=HqWmsM8E/l4itOiyocESU1cNFdbaLs5fhwzv4nXo3gR0MWCTbmt0G7/HzWFKudjuTu
+         1TyW7y9x+2lNMP+/CgHKptPHbBQWTsuDNry1ts5t+KvcJZr0ks3Q7CYfuQcg1v4YjEpj
+         cYmBviRYPhZvi/TKZ7Vynj8GrMN2nb4izDHLPEplWXLADfIXPZHI56odn39PdOS2VFbg
+         9I7NAXpnqkkuPZyoBLkixuCPVviN4jMxzVVsVftMq3lvfZv27rCY+lSJ52kM2Yom/54K
+         Vukg+JMDCNcjta+ec2nrJLoU++DyupC8Lc+3LoAsjUS3a0j4ovmucdi/hdjHE5i7KHGo
+         Zk/A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
+         :subject:to:content-transfer-encoding;
+        bh=CGAO6nSx8Y6hL0Rzi1Sw6miu+cDtGyCuPQ9lSMFguxo=;
+        b=QFU4YbV/vHVVOszuEYAP0UnFua/OmC0hU7NLRxriYV2DDrHukzhYQoj2Tt2kYQLoSk
+         cyR37ObSuJmF9SNErlU5V8P1NJef7Cio1GdSTdcoDlN6SkloOgHZkowveUOMVFlrMNMo
+         haoFQS21HsoV23CszqKu0QRsAOwMlWuwqFN6VK3zpO+jY2xT8a9rH5F6O71BZQZEQmL2
+         uq6KTnuIyKPdD2KD8HmvOKbvaIR8i/V1TxyfAO4isE4gVdLPv7U7KyBRti1+Ep44uT1n
+         KNT+zvpNvmZiYqJ3bA9iNxr/tuDtV48ndpiGkRzVvHaxTffF/7fDlLX3eHw9cjrD9+ed
+         Jy4A==
+X-Gm-Message-State: AOAM530Z4TJRVJHuhkGR/lDS3kzLXBoGeM5jUBWLcDlOFuy1avOMI7cS
+        63OrwYjXtFRwHU3m5vnX/cYRVPlH2dM4oxT9sa4=
+X-Google-Smtp-Source: ABdhPJwFRtuZIuZwxAU6ETqdRqy+RxwAyqqhr6fp8XcjkUJjB0Y9g2v51i1BVIFN1CdgilbKIKEXQNRnWTF8abLTt1Y=
+X-Received: by 2002:aa7:cfcb:: with SMTP id r11mr10646859edy.14.1630080713024;
+ Fri, 27 Aug 2021 09:11:53 -0700 (PDT)
 MIME-Version: 1.0
-X-Originating-IP: [10.43.162.52]
-X-ClientProxiedBy: EX13D04UWB004.ant.amazon.com (10.43.161.103) To
- EX13D16EUB003.ant.amazon.com (10.43.166.99)
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Received: by 2002:a50:870b:0:0:0:0:0 with HTTP; Fri, 27 Aug 2021 09:11:52
+ -0700 (PDT)
+Reply-To: jesspayne769@gmail.com
+From:   Jess Payne <payenalger@gmail.com>
+Date:   Fri, 27 Aug 2021 09:11:52 -0700
+Message-ID: <CALz=ZDae80obMNq=O+cCTULU-KjseYRubEpH_ZG3d4=dPB5AMg@mail.gmail.com>
+Subject: =?UTF-8?B?5oiR6ZyA6KaB5L2g55qE5biu5YqpIC8gSSBuZWVkIHlvdXIgYXNzaXN0YW5jZQ==?=
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Remove blank lines that are not necessary, fixing the checkpatch script
-reports. While at it, add a blank line after the switch default block,
-similar to the other parts of the codebase.
-
-Signed-off-by: Andra Paraschiv <andraprs@amazon.com>
----
-Changelog
-
-v1 -> v2
-
-* No codebase changes, it was split from the patch 3 in the v1 of the
-patch series.
-
-v2 -> v3
-
-* Move changelog after the "---" line.
----
- samples/nitro_enclaves/ne_ioctl_sample.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
-
-diff --git a/samples/nitro_enclaves/ne_ioctl_sample.c b/samples/nitro_enclaves/ne_ioctl_sample.c
-index 6a60990b2e202..765b131c73190 100644
---- a/samples/nitro_enclaves/ne_ioctl_sample.c
-+++ b/samples/nitro_enclaves/ne_ioctl_sample.c
-@@ -185,7 +185,6 @@ static int ne_create_vm(int ne_dev_fd, unsigned long *slot_uid, int *enclave_fd)
- 	return 0;
- }
- 
--
- /**
-  * ne_poll_enclave_fd() - Thread function for polling the enclave fd.
-  * @data:	Argument provided for the polling function.
-@@ -560,8 +559,8 @@ static int ne_add_vcpu(int enclave_fd, unsigned int *vcpu_id)
- 
- 		default:
- 			printf("Error in add vcpu [%m]\n");
--
- 		}
-+
- 		return rc;
- 	}
- 
--- 
-2.20.1 (Apple Git-117)
-
-
-
-
-Amazon Development Center (Romania) S.R.L. registered office: 27A Sf. Lazar Street, UBC5, floor 2, Iasi, Iasi County, 700045, Romania. Registered in Romania. Registration number J22/2621/2005.
-
+5oiR5piv5p2w6KW/5L2p5oGp5Lit5aOr5aSr5Lq644CCDQoNCuWcqOe+juWbvemZhuWGm+eahOWG
+m+S6i+mDqOmXqOOAgiBVU0EsIEEgU2VyZ2VhbnQsIDMyLA0K5oiR5Y2V6Lqr77yM5p2l6Ieq576O
+5Zu955Sw57qz6KW/5bee5YWL5Yip5aSr5YWw5biC77yM55uu5YmN6am75omO5Zyo6Zi/5a+M5rGX
+5ZaA5biD5bCU77yM5Zyo576O5Yab5pKk5Ye66Zi/5a+M5rGX5ZCO5omn6KGM54m55q6K5Lu75Yqh
+77yM6K+35a+56L+Z5Lqb5L+h5oGv5L+d5a+G77yM5Zug5Li65oiR5Lus5LiN5YWB6K645rOE6Zyy
+5oiR5Lus55qE54m55q6K5L2/5ZG944CC5L2G5oiR5b+F6aG75ZGK6K+J5L2g6L+Z5LiA54K577yM
+5Zug5Li65oiR6ZyA6KaB5L2g55qE5biu5Yqp44CCDQoNCuaIkeaYr+S4gOS4quWFhea7oeeIseW/
+g+OAgeivmuWunuWSjOa3seaDheeahOS6uu+8jOWFt+acieiJr+WlveeahOW5vem7mOaEn++8jOaI
+keWWnOasoue7k+ivhuaWsOaci+WPi+W5tuS6huino+S7luS7rOeahOeUn+a0u+aWueW8j++8jOaI
+keWWnOasoueci+WIsOWkp+a1t+eahOazoua1quWSjOWxseiEieeahOe+juS4veS7peWPiuWkp+iH
+queEtuaJgOaLpeacieeahOS4gOWIh+aPkOS+m+OAguW+iOmrmOWFtOiDveabtOWkmuWcsOS6huin
+o+aCqO+8jOaIkeiupOS4uuaIkeS7rOWPr+S7peW7uueri+iJr+WlveeahOWVhuS4muWPi+iwiuOA
+gg0KDQrmiJHkuIDnm7TlvojkuI3lvIDlv4PvvIzlm6DkuLrov5nkupvlubTmnaXnlJ/mtLvlr7nm
+iJHkuI3lhazlubPvvJvmiJHlpLHljrvkuobniLbmr43vvIzpgqPlubTmiJEgMjENCuWygeOAguaI
+keeItuS6sueahOWQjeWtl+aYr+W4leeJuemHjOaWr+S9qeaBqe+8jOaIkeeahOavjeS6suaYr+eO
+m+S4veS9qeaBqeOAguayoeacieS6uuW4ruWKqeaIke+8jOS9huW+iOmrmOWFtOaIkee7iOS6juWc
+qOe+juWGm+S4reaJvuWIsOS6huiHquW3seOAgg0KDQrmiJHnu5PlqZrnlJ/kuoblranlrZDvvIzk
+vYbku5bmrbvkuobvvIzkuI3kuYXmiJHkuIjlpKvlvIDlp4vmrLrpqpfmiJHvvIzmiYDku6XmiJHk
+uI3lvpfkuI3mlL7lvIPlqZrlp7vjgILmiJHkuZ/lvojlubjov5DvvIzlnKjmiJHnmoTlm73lrrbn
+vo7lm73lkozpmL/lr4zmsZflloDluIPlsJTov5nph4zmi6XmnInmiJHnlJ/mtLvkuK3miYDpnIDn
+moTkuIDliIfvvIzkvYbmsqHmnInkurrkuLrmiJHmj5Dkvpvlu7rorq7jgILmiJHpnIDopoHkuIDk
+uKror5rlrp7nmoTkurrmnaXkv6Hku7vvvIzlubbkuJTku5bov5jkvJrlu7rorq7miJHlpoLkvZXm
+ipXotYTmiJHnmoTpkrHjgILlm6DkuLrmiJHmmK/miJHniLbmr43lnKjku5bku6zljrvkuJbliY3n
+lJ/kuIvnmoTllK/kuIDkuIDkuKrlpbPlranjgIINCg0K5oiR5LiN6K6k6K+G5L2g5pys5Lq677yM
+5L2G5oiR6K6k5Li65pyJ5LiA5Liq5YC85b6X5L+h6LWW55qE5aW95Lq677yM5LuW5Y+v5Lul5bu6
+56uL55yf5q2j55qE5L+h5Lu75ZKM6Imv5aW955qE5ZWG5Lia5Y+L6LCK77yM5aaC5p6c5L2g55yf
+55qE5pyJ5LiA5Liq6K+a5a6e55qE5ZCN5a2X77yM5oiR5Lmf5pyJ5LiA5Lqb5Lic6KW/6KaB5ZKM
+5L2g5YiG5Lqr55u45L+h44CC5Zyo5L2g6Lqr5LiK77yM5Zug5Li65oiR6ZyA6KaB5L2g55qE5biu
+5Yqp44CC5oiR5oul5pyJ5oiR5Zyo6Zi/5a+M5rGX5ZaA5biD5bCU6L+Z6YeM6LWa5Yiw55qE5oC7
+6aKd77yIMjUwDQrkuIfnvo7lhYPvvInjgILmiJHkvJrlnKjkuIvkuIDlsIHnlLXlrZDpgq7ku7bk
+uK3lkYror4nkvaDmiJHmmK/lpoLkvZXlgZrliLDnmoTvvIzkuI3opoHmg4rmhYzvvIzku5bku6zm
+sqHmnInpo47pmanvvIzmiJHov5jlsIbov5nkuKrpkrHnrrHlrZjmlL7lnKjkuI7nuqLljYHlrZfk
+vJrmnInogZTns7vnmoTkurrpgZPkuLvkuYnljLvnlJ/pgqPph4zvvIzkvYbor7forrDkvY8uLi4u
+Li7ljLvnlJ/kuI3nn6XpgZPnm5LlrZDph4zmnInku4DkuYjmiJHlkYror4nku5bvvIzmoLnmja7o
+gZTlkIjlm73ms5XlvovvvIzlroPku6zmmK/miJHnmoTkuKrkurrnianlk4HvvIjlt6XlhbfljIXv
+vInjgILmiJHluIzmnJvmgqjlsIboh6rlt7HkvZzkuLrmiJHnmoTlj5fnm4rkurrmnaXmjqXmlLbo
+tYTph5HlubblnKjmiJHlnKjov5nph4zlrozmiJDlkI7noa7kv53otYTph5Hlronlhajlubbojrfl
+vpfmiJHnmoTlhpvkuovpgJrooYzor4Hku6XlnKjmgqjnmoTlm73lrrbkuI7mgqjkvJrpnaLvvJvk
+uI3opoHlrrPmgJXnm5LlrZDkvJrkvZzkuLrnpLznianpgIHnu5nmgqjjgIINCg0K56yU6K6wO+aI
+keS4jeefpemBk+aIkeS7rOimgeWcqOi/memHjOWRhuWkmuS5he+8jOaIkeeahOWRvei/kO+8jOWb
+oOS4uuaIkeWcqOi/memHjOS4pOasoeeCuOW8ueiireWHu+S4reW5uOWtmOS4i+adpe+8jOi/meS/
+g+S9v+aIkeWvu+aJvuS4gOS4quWAvOW+l+S/oei1lueahOS6uuadpeW4ruWKqeaIkeaOpeaUtuWS
+jOaKlei1hOWfuumHke+8jOWboOS4uuaIkeWwhuadpeWIsOS9oOS7rOeahOWbveWutuWHuui6q+aK
+lei1hO+8jOW8gOWni+aWsOeUn+a0u++8jOS4jeWGjeW9k+WFteOAgg0KDQrlpoLmnpzmgqjmhL/m
+hI/osKjmhY7lpITnkIbvvIzor7flm57lpI3miJHjgILmiJHkvJrlkYror4nkvaDmjqXkuIvmnaXn
+moTmtYHnqIvvvIzlubblkJHkvaDlj5HpgIHmm7TlpJrlhbPkuo7otYTph5HlrZjmlL7lnLDngrnn
+moTkv6Hmga/vvIzku6Xlj4rmiJHku6zlpoLkvZXlnKjkurrpgZPkuLvkuYnljLvnlJ/nmoTluK7l
+iqnkuIvpgJrov4flpJbkuqTmuKDpgZPlsIbotYTph5Hovaznp7vliLDkvaDnmoTlm73lrrbjgILl
+poLmnpzkvaDmnInlhbTotqPvvIzor7fkuI7miJHogZTns7vjgIINCg==
