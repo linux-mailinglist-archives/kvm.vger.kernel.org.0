@@ -2,65 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A69833F9670
-	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 10:49:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 990DE3F967E
+	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 10:54:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244673AbhH0IuP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Aug 2021 04:50:15 -0400
-Received: from mga17.intel.com ([192.55.52.151]:17767 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S244510AbhH0IuO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Aug 2021 04:50:14 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10088"; a="198163521"
-X-IronPort-AV: E=Sophos;i="5.84,356,1620716400"; 
-   d="scan'208";a="198163521"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Aug 2021 01:49:25 -0700
-X-IronPort-AV: E=Sophos;i="5.84,356,1620716400"; 
-   d="scan'208";a="528239385"
-Received: from chenyi-pc.sh.intel.com ([10.239.159.88])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Aug 2021 01:49:23 -0700
-From:   Chenyi Qiang <chenyi.qiang@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Xiaoyao Li <xiaoyao.li@intel.com>
-Cc:     Chenyi Qiang <chenyi.qiang@intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: nVMX: Fix nested bus lock VM exit
-Date:   Fri, 27 Aug 2021 16:51:10 +0800
-Message-Id: <20210827085110.6763-1-chenyi.qiang@intel.com>
-X-Mailer: git-send-email 2.17.1
+        id S244704AbhH0Iyq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Aug 2021 04:54:46 -0400
+Received: from frasgout.his.huawei.com ([185.176.79.56]:3693 "EHLO
+        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231824AbhH0Iyp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Aug 2021 04:54:45 -0400
+Received: from fraeml735-chm.china.huawei.com (unknown [172.18.147.201])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Gwtl94LbQz67LY3;
+        Fri, 27 Aug 2021 16:52:37 +0800 (CST)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ fraeml735-chm.china.huawei.com (10.206.15.216) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.8; Fri, 27 Aug 2021 10:53:54 +0200
+Received: from [10.47.92.37] (10.47.92.37) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.2308.8; Fri, 27 Aug
+ 2021 09:53:53 +0100
+From:   John Garry <john.garry@huawei.com>
+Subject: Re: [PATCH v11 10/12] vduse: Implement an MMU-based software IOTLB
+To:     Xie Yongji <xieyongji@bytedance.com>, <mst@redhat.com>,
+        <jasowang@redhat.com>, <stefanha@redhat.com>,
+        <sgarzare@redhat.com>, <parav@nvidia.com>, <hch@infradead.org>,
+        <christian.brauner@canonical.com>, <rdunlap@infradead.org>,
+        <willy@infradead.org>, <viro@zeniv.linux.org.uk>,
+        <axboe@kernel.dk>, <bcrl@kvack.org>, <corbet@lwn.net>,
+        <mika.penttila@nextfour.com>, <dan.carpenter@oracle.com>,
+        <joro@8bytes.org>, <gregkh@linuxfoundation.org>,
+        <zhe.he@windriver.com>, <xiaodong.liu@intel.com>,
+        <joe@perches.com>, <robin.murphy@arm.com>
+CC:     <kvm@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>,
+        <virtualization@lists.linux-foundation.org>,
+        <iommu@lists.linux-foundation.org>, <songmuchun@bytedance.com>,
+        <linux-fsdevel@vger.kernel.org>
+References: <20210818120642.165-1-xieyongji@bytedance.com>
+ <20210818120642.165-11-xieyongji@bytedance.com>
+Message-ID: <2d807de3-e245-c2fb-ae5d-7cacbe35dfcb@huawei.com>
+Date:   Fri, 27 Aug 2021 09:57:42 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.1
+MIME-Version: 1.0
+In-Reply-To: <20210818120642.165-11-xieyongji@bytedance.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.47.92.37]
+X-ClientProxiedBy: lhreml706-chm.china.huawei.com (10.201.108.55) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Nested bus lock VM exits are not supported yet. If L2 triggers bus lock
-VM exit, it will be directed to L1 VMM, which would cause unexpected
-behavior. Therefore, handle L2's bus lock VM exits in L0 directly.
+On 18/08/2021 13:06, Xie Yongji wrote:
+> +
+> +static dma_addr_t
+> +vduse_domain_alloc_iova(struct iova_domain *iovad,
+> +			unsigned long size, unsigned long limit)
+> +{
+> +	unsigned long shift = iova_shift(iovad);
+> +	unsigned long iova_len = iova_align(iovad, size) >> shift;
+> +	unsigned long iova_pfn;
+> +
+> +	/*
+> +	 * Freeing non-power-of-two-sized allocations back into the IOVA caches
+> +	 * will come back to bite us badly, so we have to waste a bit of space
+> +	 * rounding up anything cacheable to make sure that can't happen. The
+> +	 * order of the unadjusted size will still match upon freeing.
+> +	 */
+> +	if (iova_len < (1 << (IOVA_RANGE_CACHE_MAX_SIZE - 1)))
+> +		iova_len = roundup_pow_of_two(iova_len);
 
-Fixes: fe6b6bc802b4 ("KVM: VMX: Enable bus lock VM exit")
-Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
----
- arch/x86/kvm/vmx/nested.c | 2 ++
- 1 file changed, 2 insertions(+)
+Whether it's proper to use this "fast" API or not here, this seems to be 
+copied verbatim from dma-iommu.c, which tells me that something should 
+be factored out.
 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index bc6327950657..754f53cf0f7a 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -5873,6 +5873,8 @@ static bool nested_vmx_l0_wants_exit(struct kvm_vcpu *vcpu,
- 	case EXIT_REASON_VMFUNC:
- 		/* VM functions are emulated through L2->L0 vmexits. */
- 		return true;
-+	case EXIT_REASON_BUS_LOCK:
-+		return true;
- 	default:
- 		break;
- 	}
--- 
-2.17.1
+Indeed, this rounding up seems a requirement of the rcache, so not sure 
+why this is not done there.
+
+> +	iova_pfn = alloc_iova_fast(iovad, iova_len, limit >> shift, true);
+
 
