@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 185763F96DA
+	by mail.lfdr.de (Postfix) with ESMTP id AC77F3F96DC
 	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 11:27:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244728AbhH0J0U (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Aug 2021 05:26:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:21054 "EHLO
+        id S244739AbhH0J01 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Aug 2021 05:26:27 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47349 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S244724AbhH0J0T (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 27 Aug 2021 05:26:19 -0400
+        by vger.kernel.org with ESMTP id S244723AbhH0J0Y (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 27 Aug 2021 05:26:24 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630056330;
+        s=mimecast20190719; t=1630056333;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=IYFUg3KjJacWl8OLaf6vH1G2cmWUV+wxHB9g+ejqdCs=;
-        b=FA2eQk5xFd1dOfSTQXeODRyWqFFevnIhC5pp1EOj+cPc0H2ytO7p9OOh3TCS0Zays67Fv+
-        5o7hgqwZCQRmeYkaEHY+gv7PxfGoyt3svkXnd1N5EzoRCQw3xBnthC5IB4hL2Ge+lImpc/
-        84XutEGQDGWS2n3/kDDUatdfBSm8wYM=
+        bh=/L+EAQK+m06QlJhA/k12O+BjGgcPNFgtPOHYl0R7XqA=;
+        b=L2/WaYoiE1TrGhUx7EFITvmIiQsoajLL2NP3YsBbbosvC8+vkaQgt0qlzF6soKA9LC5sw3
+        ykz2UWlr5Y2iF3KKCdu0/Qv0up9rD9BLPj8WFS8Ncq8ur6ZVVaP8lEcPGxpW3bNznWbjWq
+        W3TTr5ckLOTbyi68vtTqKyWW0rqpdyU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-344-0XWVxTZFPTS6E_bO6wFr3A-1; Fri, 27 Aug 2021 05:25:29 -0400
-X-MC-Unique: 0XWVxTZFPTS6E_bO6wFr3A-1
+ us-mta-555-BbHVQ9PqOAC_duWp3pnJ1g-1; Fri, 27 Aug 2021 05:25:32 -0400
+X-MC-Unique: BbHVQ9PqOAC_duWp3pnJ1g-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D01C218C8C01;
-        Fri, 27 Aug 2021 09:25:27 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0BB3E100806F;
+        Fri, 27 Aug 2021 09:25:31 +0000 (UTC)
 Received: from vitty.brq.redhat.com (unknown [10.40.193.235])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 33A6C60CC6;
-        Fri, 27 Aug 2021 09:25:25 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2FE8860C5F;
+        Fri, 27 Aug 2021 09:25:28 +0000 (UTC)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
 To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -44,9 +44,9 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         Maxim Levitsky <mlevitsk@redhat.com>,
         Eduardo Habkost <ehabkost@redhat.com>,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v4 1/8] KVM: Clean up benign vcpu->cpu data races when kicking vCPUs
-Date:   Fri, 27 Aug 2021 11:25:09 +0200
-Message-Id: <20210827092516.1027264-2-vkuznets@redhat.com>
+Subject: [PATCH v4 2/8] KVM: KVM: Use cpumask_available() to check for NULL cpumask when kicking vCPUs
+Date:   Fri, 27 Aug 2021 11:25:10 +0200
+Message-Id: <20210827092516.1027264-3-vkuznets@redhat.com>
 In-Reply-To: <20210827092516.1027264-1-vkuznets@redhat.com>
 References: <20210827092516.1027264-1-vkuznets@redhat.com>
 MIME-Version: 1.0
@@ -58,143 +58,66 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Sean Christopherson <seanjc@google.com>
 
-Fix a benign data race reported by syzbot+KCSAN[*] by ensuring vcpu->cpu
-is read exactly once, and by ensuring the vCPU is booted from guest mode
-if kvm_arch_vcpu_should_kick() returns true.  Fix a similar race in
-kvm_make_vcpus_request_mask() by ensuring the vCPU is interrupted if
-kvm_request_needs_ipi() returns true.
+Check for a NULL cpumask_var_t when kicking multiple vCPUs via
+cpumask_available(), which performs a !NULL check if and only if cpumasks
+are configured to be allocated off-stack.  This is a meaningless
+optimization, e.g. avoids a TEST+Jcc and TEST+CMOV on x86, but more
+importantly helps document that the NULL check is necessary even though
+all callers pass in a local variable.
 
-Reading vcpu->cpu before vcpu->mode (via kvm_arch_vcpu_should_kick() or
-kvm_request_needs_ipi()) means the target vCPU could get migrated (change
-vcpu->cpu) and enter !OUTSIDE_GUEST_MODE between reading vcpu->cpud and
-reading vcpu->mode.  If that happens, the kick/IPI will be sent to the
-old pCPU, not the new pCPU that is now running the vCPU or reading SPTEs.
+No functional change intended.
 
-Although failing to kick the vCPU is not exactly ideal, practically
-speaking it cannot cause a functional issue unless there is also a bug in
-the caller, and any such bug would exist regardless of kvm_vcpu_kick()'s
-behavior.
-
-The purpose of sending an IPI is purely to get a vCPU into the host (or
-out of reading SPTEs) so that the vCPU can recognize a change in state,
-e.g. a KVM_REQ_* request.  If vCPU's handling of the state change is
-required for correctness, KVM must ensure either the vCPU sees the change
-before entering the guest, or that the sender sees the vCPU as running in
-guest mode.  All architectures handle this by (a) sending the request
-before calling kvm_vcpu_kick() and (b) checking for requests _after_
-setting vcpu->mode.
-
-x86's READING_SHADOW_PAGE_TABLES has similar requirements; KVM needs to
-ensure it kicks and waits for vCPUs that started reading SPTEs _before_
-MMU changes were finalized, but any vCPU that starts reading after MMU
-changes were finalized will see the new state and can continue on
-uninterrupted.
-
-For uses of kvm_vcpu_kick() that are not paired with a KVM_REQ_*, e.g.
-x86's kvm_arch_sync_dirty_log(), the order of the kick must not be relied
-upon for functional correctness, e.g. in the dirty log case, userspace
-cannot assume it has a 100% complete log if vCPUs are still running.
-
-All that said, eliminate the benign race since the cost of doing so is an
-"extra" atomic cmpxchg() in the case where the target vCPU is loaded by
-the current pCPU or is not loaded at all.  I.e. the kick will be skipped
-due to kvm_vcpu_exiting_guest_mode() seeing a compatible vcpu->mode as
-opposed to the kick being skipped because of the cpu checks.
-
-Keep the "cpu != me" checks even though they appear useless/impossible at
-first glance.  x86 processes guest IPI writes in a fast path that runs in
-IN_GUEST_MODE, i.e. can call kvm_vcpu_kick() from IN_GUEST_MODE.  And
-calling kvm_vm_bugged()->kvm_make_vcpus_request_mask() from IN_GUEST or
-READING_SHADOW_PAGE_TABLES is perfectly reasonable.
-
-Note, a race with the cpu_online() check in kvm_vcpu_kick() likely
-persists, e.g. the vCPU could exit guest mode and get offlined between
-the cpu_online() check and the sending of smp_send_reschedule().  But,
-the online check appears to exist only to avoid a WARN in x86's
-native_smp_send_reschedule() that fires if the target CPU is not online.
-The reschedule WARN exists because CPU offlining takes the CPU out of the
-scheduling pool, i.e. the WARN is intended to detect the case where the
-kernel attempts to schedule a task on an offline CPU.  The actual sending
-of the IPI is a non-issue as at worst it will simpy be dropped on the
-floor.  In other words, KVM's usurping of the reschedule IPI could
-theoretically trigger a WARN if the stars align, but there will be no
-loss of functionality.
-
-[*] https://syzkaller.appspot.com/bug?extid=cd4154e502f43f10808a
-
-Cc: Venkatesh Srinivas <venkateshs@google.com>
-Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
-Fixes: 97222cc83163 ("KVM: Emulate local APIC in kernel")
+Cc: Lai Jiangshan <jiangshanlai@gmail.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 ---
- virt/kvm/kvm_main.c | 36 ++++++++++++++++++++++++++++--------
- 1 file changed, 28 insertions(+), 8 deletions(-)
+ virt/kvm/kvm_main.c | 18 +++++++++++++++---
+ 1 file changed, 15 insertions(+), 3 deletions(-)
 
 diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 3e67c93ca403..786b914db98f 100644
+index 786b914db98f..2082aceffbf6 100644
 --- a/virt/kvm/kvm_main.c
 +++ b/virt/kvm/kvm_main.c
-@@ -273,14 +273,26 @@ bool kvm_make_vcpus_request_mask(struct kvm *kvm, unsigned int req,
- 			continue;
+@@ -245,9 +245,13 @@ static void ack_flush(void *_completed)
+ {
+ }
  
- 		kvm_make_request(req, vcpu);
--		cpu = vcpu->cpu;
+-static inline bool kvm_kick_many_cpus(const struct cpumask *cpus, bool wait)
++static inline bool kvm_kick_many_cpus(cpumask_var_t tmp, bool wait)
+ {
+-	if (unlikely(!cpus))
++	const struct cpumask *cpus;
++
++	if (likely(cpumask_available(tmp)))
++		cpus = tmp;
++	else
+ 		cpus = cpu_online_mask;
  
+ 	if (cpumask_empty(cpus))
+@@ -277,6 +281,14 @@ bool kvm_make_vcpus_request_mask(struct kvm *kvm, unsigned int req,
  		if (!(req & KVM_REQUEST_NO_WAKEUP) && kvm_vcpu_wake_up(vcpu))
  			continue;
  
--		if (tmp != NULL && cpu != -1 && cpu != me &&
--		    kvm_request_needs_ipi(vcpu, req))
--			__cpumask_set_cpu(cpu, tmp);
 +		/*
-+		 * Note, the vCPU could get migrated to a different pCPU at any
-+		 * point after kvm_request_needs_ipi(), which could result in
-+		 * sending an IPI to the previous pCPU.  But, that's ok because
-+		 * the purpose of the IPI is to ensure the vCPU returns to
-+		 * OUTSIDE_GUEST_MODE, which is satisfied if the vCPU migrates.
-+		 * Entering READING_SHADOW_PAGE_TABLES after this point is also
-+		 * ok, as the requirement is only that KVM wait for vCPUs that
-+		 * were reading SPTEs _before_ any changes were finalized.  See
-+		 * kvm_vcpu_kick() for more details on handling requests.
++		 * tmp can be "unavailable" if cpumasks are allocated off stack
++		 * as allocation of the mask is deliberately not fatal and is
++		 * handled by falling back to kicking all online CPUs.
 +		 */
-+		if (tmp != NULL && kvm_request_needs_ipi(vcpu, req)) {
-+			cpu = READ_ONCE(vcpu->cpu);
-+			if (cpu != -1 && cpu != me)
-+				__cpumask_set_cpu(cpu, tmp);
-+		}
- 	}
- 
- 	called = kvm_kick_many_cpus(tmp, !!(req & KVM_REQUEST_WAIT));
-@@ -3309,16 +3321,24 @@ EXPORT_SYMBOL_GPL(kvm_vcpu_wake_up);
-  */
- void kvm_vcpu_kick(struct kvm_vcpu *vcpu)
- {
--	int me;
--	int cpu = vcpu->cpu;
-+	int me, cpu;
- 
- 	if (kvm_vcpu_wake_up(vcpu))
- 		return;
- 
-+	/*
-+	 * Note, the vCPU could get migrated to a different pCPU at any point
-+	 * after kvm_arch_vcpu_should_kick(), which could result in sending an
-+	 * IPI to the previous pCPU.  But, that's ok because the purpose of the
-+	 * IPI is to force the vCPU to leave IN_GUEST_MODE, and migrating the
-+	 * vCPU also requires it to leave IN_GUEST_MODE.
-+	 */
- 	me = get_cpu();
--	if (cpu != me && (unsigned)cpu < nr_cpu_ids && cpu_online(cpu))
--		if (kvm_arch_vcpu_should_kick(vcpu))
-+	if (kvm_arch_vcpu_should_kick(vcpu)) {
-+		cpu = READ_ONCE(vcpu->cpu);
-+		if (cpu != me && (unsigned)cpu < nr_cpu_ids && cpu_online(cpu))
- 			smp_send_reschedule(cpu);
-+	}
- 	put_cpu();
- }
- EXPORT_SYMBOL_GPL(kvm_vcpu_kick);
++		if (!cpumask_available(tmp))
++			continue;
++
+ 		/*
+ 		 * Note, the vCPU could get migrated to a different pCPU at any
+ 		 * point after kvm_request_needs_ipi(), which could result in
+@@ -288,7 +300,7 @@ bool kvm_make_vcpus_request_mask(struct kvm *kvm, unsigned int req,
+ 		 * were reading SPTEs _before_ any changes were finalized.  See
+ 		 * kvm_vcpu_kick() for more details on handling requests.
+ 		 */
+-		if (tmp != NULL && kvm_request_needs_ipi(vcpu, req)) {
++		if (kvm_request_needs_ipi(vcpu, req)) {
+ 			cpu = READ_ONCE(vcpu->cpu);
+ 			if (cpu != -1 && cpu != me)
+ 				__cpumask_set_cpu(cpu, tmp);
 -- 
 2.31.1
 
