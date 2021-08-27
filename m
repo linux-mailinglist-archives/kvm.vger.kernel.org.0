@@ -2,35 +2,35 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A9EB63F9BF6
-	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 17:52:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 880653F9BFB
+	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 17:52:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245454AbhH0PvE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Aug 2021 11:51:04 -0400
-Received: from smtp-fw-9103.amazon.com ([207.171.188.200]:48777 "EHLO
-        smtp-fw-9103.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244479AbhH0PvD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Aug 2021 11:51:03 -0400
+        id S245508AbhH0PvT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Aug 2021 11:51:19 -0400
+Received: from smtp-fw-6001.amazon.com ([52.95.48.154]:39055 "EHLO
+        smtp-fw-6001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S245494AbhH0PvS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Aug 2021 11:51:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1630079414; x=1661615414;
+  t=1630079429; x=1661615429;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=mPhxoTXhBLw9NtzNGEyI0tnWijnTOsSsdrBPC2agbbQ=;
-  b=TBmp+wn/hcX7Ei91O185QSGOz5JKRqgnScFFlT+hJoJ+X8iw+JbHn6I5
-   rNgYNYxHp1ZUNQpXVcg5JVHMy+15PqxFFb9lDiOEG2eJpaw7YLkInXe12
-   VkYru2fwmvxmbEHlJ2kWWWUoLC15zYYDE2oUcqDdVsg6wdx4+7EIi2CxU
-   E=;
+  bh=9FN9iC2MCy+4k3fjj+1pV+V6I0P0vEJsHx0DVQFI8VY=;
+  b=SBgHx4iwwiEB+N7L5AIMtgFTjNF3caOabgxJ00WycO67hFGvlVh9/l50
+   uRJmk2OK7zlJmqnhHnAm0UxyFq4qnunXeb08PP6ffAGOzG+TW8ohTmwWn
+   fm78siT0IKTpMOZBXCj6iqB5xLJCNy02W1qCUV4U2HvQV/4WqBujq8l8G
+   o=;
 X-IronPort-AV: E=Sophos;i="5.84,357,1620691200"; 
-   d="scan'208";a="953571121"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-2b-859fe132.us-west-2.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-9103.sea19.amazon.com with ESMTP; 27 Aug 2021 15:50:11 +0000
-Received: from EX13D16EUB003.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
-        by email-inbound-relay-2b-859fe132.us-west-2.amazon.com (Postfix) with ESMTPS id B09E522010A;
-        Fri, 27 Aug 2021 15:50:09 +0000 (UTC)
+   d="scan'208";a="137254370"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-2c-2225282c.us-west-2.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-6001.iad6.amazon.com with ESMTP; 27 Aug 2021 15:50:21 +0000
+Received: from EX13D16EUB003.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
+        by email-inbound-relay-2c-2225282c.us-west-2.amazon.com (Postfix) with ESMTPS id 3E45BA20BB;
+        Fri, 27 Aug 2021 15:50:20 +0000 (UTC)
 Received: from 38f9d34ed3b1.ant.amazon.com (10.43.162.52) by
  EX13D16EUB003.ant.amazon.com (10.43.166.99) with Microsoft SMTP Server (TLS)
- id 15.0.1497.23; Fri, 27 Aug 2021 15:50:03 +0000
+ id 15.0.1497.23; Fri, 27 Aug 2021 15:50:13 +0000
 From:   Andra Paraschiv <andraprs@amazon.com>
 To:     linux-kernel <linux-kernel@vger.kernel.org>
 CC:     Alexandru Ciobotaru <alcioa@amazon.com>,
@@ -44,15 +44,15 @@ CC:     Alexandru Ciobotaru <alcioa@amazon.com>,
         kvm <kvm@vger.kernel.org>,
         ne-devel-upstream <ne-devel-upstream@amazon.com>,
         Andra Paraschiv <andraprs@amazon.com>
-Subject: [PATCH v3 4/7] nitro_enclaves: Update copyright statement to include 2021
-Date:   Fri, 27 Aug 2021 18:49:27 +0300
-Message-ID: <20210827154930.40608-5-andraprs@amazon.com>
+Subject: [PATCH v3 5/7] nitro_enclaves: Add fixes for checkpatch match open parenthesis reports
+Date:   Fri, 27 Aug 2021 18:49:28 +0300
+Message-ID: <20210827154930.40608-6-andraprs@amazon.com>
 X-Mailer: git-send-email 2.20.1 (Apple Git-117)
 In-Reply-To: <20210827154930.40608-1-andraprs@amazon.com>
 References: <20210827154930.40608-1-andraprs@amazon.com>
 MIME-Version: 1.0
 X-Originating-IP: [10.43.162.52]
-X-ClientProxiedBy: EX13D23UWA004.ant.amazon.com (10.43.160.72) To
+X-ClientProxiedBy: EX13D04UWB004.ant.amazon.com (10.43.161.103) To
  EX13D16EUB003.ant.amazon.com (10.43.166.99)
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
@@ -60,11 +60,8 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Update the copyright statement to include 2021, as a change has been
-made over this year.
-
-Check commit d874742f6a73 ("nitro_enclaves: Set Bus Master for the NE
-PCI device") for the codebase update from this file (ne_pci_dev.c).
+Update the codebase formatting to fix the reports from the checkpatch
+script, to match the open parenthesis.
 
 Signed-off-by: Andra Paraschiv <andraprs@amazon.com>
 ---
@@ -79,13 +76,13 @@ v2 -> v3
 
 * Move changelog after the "---" line.
 ---
- drivers/virt/nitro_enclaves/ne_pci_dev.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/virt/nitro_enclaves/ne_misc_dev.c | 17 +++++++++--------
+ 1 file changed, 9 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/virt/nitro_enclaves/ne_pci_dev.c b/drivers/virt/nitro_enclaves/ne_pci_dev.c
-index 143207e9b9698..40b49ec8e30b1 100644
---- a/drivers/virt/nitro_enclaves/ne_pci_dev.c
-+++ b/drivers/virt/nitro_enclaves/ne_pci_dev.c
+diff --git a/drivers/virt/nitro_enclaves/ne_misc_dev.c b/drivers/virt/nitro_enclaves/ne_misc_dev.c
+index e21e1e86ad15f..8939612ee0e08 100644
+--- a/drivers/virt/nitro_enclaves/ne_misc_dev.c
++++ b/drivers/virt/nitro_enclaves/ne_misc_dev.c
 @@ -1,6 +1,6 @@
  // SPDX-License-Identifier: GPL-2.0
  /*
@@ -94,6 +91,63 @@ index 143207e9b9698..40b49ec8e30b1 100644
   */
  
  /**
+@@ -284,8 +284,8 @@ static int ne_setup_cpu_pool(const char *ne_cpu_list)
+ 	ne_cpu_pool.nr_parent_vm_cores = nr_cpu_ids / ne_cpu_pool.nr_threads_per_core;
+ 
+ 	ne_cpu_pool.avail_threads_per_core = kcalloc(ne_cpu_pool.nr_parent_vm_cores,
+-					     sizeof(*ne_cpu_pool.avail_threads_per_core),
+-					     GFP_KERNEL);
++						     sizeof(*ne_cpu_pool.avail_threads_per_core),
++						     GFP_KERNEL);
+ 	if (!ne_cpu_pool.avail_threads_per_core) {
+ 		rc = -ENOMEM;
+ 
+@@ -735,7 +735,7 @@ static int ne_add_vcpu_ioctl(struct ne_enclave *ne_enclave, u32 vcpu_id)
+  * * Negative return value on failure.
+  */
+ static int ne_sanity_check_user_mem_region(struct ne_enclave *ne_enclave,
+-	struct ne_user_memory_region mem_region)
++					   struct ne_user_memory_region mem_region)
+ {
+ 	struct ne_mem_region *ne_mem_region = NULL;
+ 
+@@ -771,7 +771,7 @@ static int ne_sanity_check_user_mem_region(struct ne_enclave *ne_enclave,
+ 		u64 userspace_addr = ne_mem_region->userspace_addr;
+ 
+ 		if ((userspace_addr <= mem_region.userspace_addr &&
+-		    mem_region.userspace_addr < (userspace_addr + memory_size)) ||
++		     mem_region.userspace_addr < (userspace_addr + memory_size)) ||
+ 		    (mem_region.userspace_addr <= userspace_addr &&
+ 		    (mem_region.userspace_addr + mem_region.memory_size) > userspace_addr)) {
+ 			dev_err_ratelimited(ne_misc_dev.this_device,
+@@ -836,7 +836,7 @@ static int ne_sanity_check_user_mem_region_page(struct ne_enclave *ne_enclave,
+  * * Negative return value on failure.
+  */
+ static int ne_set_user_memory_region_ioctl(struct ne_enclave *ne_enclave,
+-	struct ne_user_memory_region mem_region)
++					   struct ne_user_memory_region mem_region)
+ {
+ 	long gup_rc = 0;
+ 	unsigned long i = 0;
+@@ -1014,7 +1014,7 @@ static int ne_set_user_memory_region_ioctl(struct ne_enclave *ne_enclave,
+  * * Negative return value on failure.
+  */
+ static int ne_start_enclave_ioctl(struct ne_enclave *ne_enclave,
+-	struct ne_enclave_start_info *enclave_start_info)
++				  struct ne_enclave_start_info *enclave_start_info)
+ {
+ 	struct ne_pci_dev_cmd_reply cmd_reply = {};
+ 	unsigned int cpu = 0;
+@@ -1574,7 +1574,8 @@ static int ne_create_vm_ioctl(struct ne_pci_dev *ne_pci_dev, u64 __user *slot_ui
+ 	mutex_unlock(&ne_cpu_pool.mutex);
+ 
+ 	ne_enclave->threads_per_core = kcalloc(ne_enclave->nr_parent_vm_cores,
+-		sizeof(*ne_enclave->threads_per_core), GFP_KERNEL);
++					       sizeof(*ne_enclave->threads_per_core),
++					       GFP_KERNEL);
+ 	if (!ne_enclave->threads_per_core) {
+ 		rc = -ENOMEM;
+ 
 -- 
 2.20.1 (Apple Git-117)
 
