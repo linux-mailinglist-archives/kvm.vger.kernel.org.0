@@ -2,131 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9B9303F9B38
-	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 16:58:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 90B8C3F9B67
+	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 17:05:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245360AbhH0O7a (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Aug 2021 10:59:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55414 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245373AbhH0O73 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Aug 2021 10:59:29 -0400
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2469AC0613D9
-        for <kvm@vger.kernel.org>; Fri, 27 Aug 2021 07:58:40 -0700 (PDT)
-Received: by mail-pl1-x634.google.com with SMTP id x16so2447456pll.2
-        for <kvm@vger.kernel.org>; Fri, 27 Aug 2021 07:58:40 -0700 (PDT)
+        id S245423AbhH0PE1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Aug 2021 11:04:27 -0400
+Received: from smtp-fw-80006.amazon.com ([99.78.197.217]:15929 "EHLO
+        smtp-fw-80006.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S245364AbhH0PEO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Aug 2021 11:04:14 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=uRFFUbAhELNbaSp6/gZa0c8lVubPxa9shGc4LpwPEKA=;
-        b=LaTxPm5alTPx3ec48IA6+ZkyOejP1tGYjt5wY+p50UOfksJNBKAzDXOzoDDiJpQJ7C
-         7ZlQ2CaQrXUZrhEVe/+L/sf91LGMM0vWjp8eP3YRAXU34kmcSmT/loEOx2KY28gVVCsl
-         oNwRHnusQG6CUmxymYZ58t9NT8p9wB0iZAAe71TUcHWHnrhk4i1QLthTClskPP73rEx7
-         8W5oVGVmckueDqbKs0mB5YdxIHBLQgh+JwU0k3CO0TH8YixDpwG1SB6F/loD+NPrNZ2l
-         0CosQb5gLTnLJ9MX51KpbZFvZYLNN8TvF8Ol0HP7oCHqmHClmMDvOIzUAi7IGzMuFHXf
-         oANw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=uRFFUbAhELNbaSp6/gZa0c8lVubPxa9shGc4LpwPEKA=;
-        b=uI/ytlhqrbk7MzvxB8F/PYY3ESVbvuAVZCbyC3XY1aJRIewP/HjHLow3elCjevGAkz
-         3ukgQcOI7Z8ajVcM9jpiWdmFZonv4cOm96meOErohy7hqi+HNHGVUvirHDco7/pSDgdI
-         16ZBPFn3bHC6lLJwqGUNb93tXksSsGj52YRWjOXDRWTi3kubtTR4S2WwoZixwipGhqzb
-         90JFAp306t3Strrsz15y+uvtsV/HGwkcKQ92uWJZ92hlL+hkGirtfz5F5E/LUG07fhDp
-         CTzuftMA94UFE2HTj0s6T7FHhvaYe2Nb3ZaUWCu36imyqiqanloQN8jIzqnN4n6wZxu4
-         tjKQ==
-X-Gm-Message-State: AOAM5307oELyNc0qVbyTKHAZdpOKEHTh8hezYUVIN7Fb9hh9ap0dnSDk
-        TanQRXhkhgvxslbUZNnlUNmO9w==
-X-Google-Smtp-Source: ABdhPJzgh09WISpUzNhO7TIEv2MEhpi/JDC49fmE6awwyfv/L0ffcVcqSZUNcnR7TJ7/0hyFRiQ/2g==
-X-Received: by 2002:a17:902:e20a:b0:134:221f:657d with SMTP id u10-20020a170902e20a00b00134221f657dmr9134631plb.78.1630076319283;
-        Fri, 27 Aug 2021 07:58:39 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id e11sm6590628pfn.49.2021.08.27.07.58.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Aug 2021 07:58:38 -0700 (PDT)
-Date:   Fri, 27 Aug 2021 14:58:35 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Marc Zyngier <maz@kernel.org>, Guo Ren <guoren@kernel.org>,
-        Nick Hu <nickhu@andestech.com>,
-        Greentime Hu <green.hu@gmail.com>,
-        Vincent Chen <deanbo422@gmail.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Borislav Petkov <bp@alien8.de>, x86@kernel.org,
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1630076606; x=1661612606;
+  h=subject:to:cc:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=56ObOdm8sPuO1N68sjiDnNbwkH2z9H6p0M38mab9cRI=;
+  b=TOen4FeEWouEP2HLN3byVZXnE/Gb0lYGO6bq/ijSgzEetYrhrmsxyr2i
+   FUENcP7dIRtPEABh2ichTwu5Ie/DV64oKvemqUr1dG1MuwsEmklgBrfmU
+   qZqLEg0dgqqnW7qxaM5r6bJzj1RI2KO7mGhOKIv/mY6bVFOAjiINF60dR
+   M=;
+X-IronPort-AV: E=Sophos;i="5.84,356,1620691200"; 
+   d="scan'208";a="22471799"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-1e-28209b7b.us-east-1.amazon.com) ([10.25.36.214])
+  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP; 27 Aug 2021 15:03:18 +0000
+Received: from EX13D16EUB003.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
+        by email-inbound-relay-1e-28209b7b.us-east-1.amazon.com (Postfix) with ESMTPS id 88E48C3087;
+        Fri, 27 Aug 2021 15:03:15 +0000 (UTC)
+Received: from 38f9d34ed3b1.ant.amazon.com (10.43.162.164) by
+ EX13D16EUB003.ant.amazon.com (10.43.166.99) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.23; Fri, 27 Aug 2021 15:03:09 +0000
+Subject: Re: [PATCH v2 1/7] nitro_enclaves: Enable Arm64 support
+To:     Greg KH <gregkh@linuxfoundation.org>
+CC:     linux-kernel <linux-kernel@vger.kernel.org>,
+        Alexandru Ciobotaru <alcioa@amazon.com>,
+        Kamal Mostafa <kamal@canonical.com>,
+        Alexandru Vasile <lexnv@amazon.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Juergen Gross <jgross@suse.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@redhat.com>,
-        Namhyung Kim <namhyung@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-csky@vger.kernel.org, linux-riscv@lists.infradead.org,
-        kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
-        Artem Kashkanov <artem.kashkanov@intel.com>,
-        Like Xu <like.xu.linux@gmail.com>,
-        Zhu Lingshan <lingshan.zhu@intel.com>
-Subject: Re: [PATCH 07/15] KVM: Use dedicated flag to track if KVM is
- handling an NMI from guest
-Message-ID: <YSj9mz4F2NDSKaas@google.com>
-References: <20210827005718.585190-1-seanjc@google.com>
- <20210827005718.585190-8-seanjc@google.com>
- <YSiUnDbi/aZ3nunT@hirez.programming.kicks-ass.net>
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        "Vitaly Kuznetsov" <vkuznets@redhat.com>,
+        kvm <kvm@vger.kernel.org>,
+        ne-devel-upstream <ne-devel-upstream@amazon.com>
+References: <20210827133230.29816-1-andraprs@amazon.com>
+ <20210827133230.29816-2-andraprs@amazon.com> <YSj15tWpwQ41BFy3@kroah.com>
+From:   "Paraschiv, Andra-Irina" <andraprs@amazon.com>
+Message-ID: <f5b75895-5ba8-7715-9deb-6c003477e334@amazon.com>
+Date:   Fri, 27 Aug 2021 18:02:57 +0300
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:78.0)
+ Gecko/20100101 Thunderbird/78.13.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YSiUnDbi/aZ3nunT@hirez.programming.kicks-ass.net>
+In-Reply-To: <YSj15tWpwQ41BFy3@kroah.com>
+Content-Language: en-US
+X-Originating-IP: [10.43.162.164]
+X-ClientProxiedBy: EX13D11UWB003.ant.amazon.com (10.43.161.206) To
+ EX13D16EUB003.ant.amazon.com (10.43.166.99)
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 27, 2021, Peter Zijlstra wrote:
-> On Thu, Aug 26, 2021 at 05:57:10PM -0700, Sean Christopherson wrote:
-> > diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-> > index 5cedc0e8a5d5..4c5ba4128b38 100644
-> > --- a/arch/x86/kvm/x86.h
-> > +++ b/arch/x86/kvm/x86.h
-> > @@ -395,9 +395,10 @@ static inline void kvm_unregister_perf_callbacks(void)
-> >  
-> >  DECLARE_PER_CPU(struct kvm_vcpu *, current_vcpu);
-> >  
-> > -static inline void kvm_before_interrupt(struct kvm_vcpu *vcpu)
-> > +static inline void kvm_before_interrupt(struct kvm_vcpu *vcpu, bool is_nmi)
-> >  {
-> >  	__this_cpu_write(current_vcpu, vcpu);
-> > +	WRITE_ONCE(vcpu->arch.handling_nmi_from_guest, is_nmi);
-> >  
-> >  	kvm_register_perf_callbacks();
-> >  }
-> > @@ -406,6 +407,7 @@ static inline void kvm_after_interrupt(struct kvm_vcpu *vcpu)
-> >  {
-> >  	kvm_unregister_perf_callbacks();
-> >  
-> > +	WRITE_ONCE(vcpu->arch.handling_nmi_from_guest, false);
-> >  	__this_cpu_write(current_vcpu, NULL);
-> >  }
-> 
-> Does this rely on kvm_{,un}register_perf_callback() being a function
-> call and thus implying a sequence point to order the stores? 
+CgpPbiAyNy8wOC8yMDIxIDE3OjI1LCBHcmVnIEtIIHdyb3RlOgo+IE9uIEZyaSwgQXVnIDI3LCAy
+MDIxIGF0IDA0OjMyOjI0UE0gKzAzMDAsIEFuZHJhIFBhcmFzY2hpdiB3cm90ZToKPj4gVXBkYXRl
+IHRoZSBrZXJuZWwgY29uZmlnIHRvIGVuYWJsZSB0aGUgTml0cm8gRW5jbGF2ZXMga2VybmVsIGRy
+aXZlciBmb3IKPj4gQXJtNjQgc3VwcG9ydC4KPj4KPj4gQ2hhbmdlbG9nCj4+Cj4+IHYxIC0+IHYy
+Cj4+Cj4+ICogTm8gY2hhbmdlcy4KPj4KPiBjaGFuZ2Vsb2dzIGZvciBkaWZmZXJlbnQgYWxsIGdv
+IGJlbG93IHRoZSAtLS0gbGluZSwgYXMgaXMgZG9jdW1lbnRlZC4KPiBObyBuZWVkIGZvciB0aGVt
+IGhlcmUgaW4gdGhlIGNoYW5nZWxvZyB0ZXh0IGl0c2VsZiwgcmlnaHQ/Cj4KPiBQbGVhc2UgZml4
+IHVwIGFuZCBzZW5kIGEgdjMgc2VyaWVzLgoKQWxyaWdodCwgSSBjYW4gbW9kaWZ5IHRoZSBwYXRj
+aGVzIHNvIHRoYXQgdGhlIGNoYW5nZWxvZyBpcyBhZnRlciB0aGUgbGluZS4KCkkgZm9sbG93ZWQg
+dGhlIHNhbWUgcGF0dGVybiBhcyB0aGUgaW5pdGlhbCB0aW1lLCB3aGVuIEkgcmVjZWl2ZWQgCmZl
+ZWRiYWNrIHRvIGhhdmUgdGhlIGNoYW5nZWxvZ3MgaW4gdGhlIGNvbW1pdCBtZXNzYWdlLCBiZWZv
+cmUgU29CKHMpLgoKQnV0IHRoYXQncyBmaW5lIHdpdGggbWUsIEkgY2FuIHN3aXRjaCB0byB0aGlz
+IHdheSBvZiBkb2luZyBpdCwgYXMgCm1lbnRpb25lZCBhbHNvIGluIHRoZSBkb2NzLgoKVGhhbmtz
+LApBbmRyYQoKCgpBbWF6b24gRGV2ZWxvcG1lbnQgQ2VudGVyIChSb21hbmlhKSBTLlIuTC4gcmVn
+aXN0ZXJlZCBvZmZpY2U6IDI3QSBTZi4gTGF6YXIgU3RyZWV0LCBVQkM1LCBmbG9vciAyLCBJYXNp
+LCBJYXNpIENvdW50eSwgNzAwMDQ1LCBSb21hbmlhLiBSZWdpc3RlcmVkIGluIFJvbWFuaWEuIFJl
+Z2lzdHJhdGlvbiBudW1iZXIgSjIyLzI2MjEvMjAwNS4K
 
-No, I'm just terrible at remembering which macros provide what ordering guarantees,
-i.e. I was thinking WRITE_ONCE provided guarantees against compiler reordering.
