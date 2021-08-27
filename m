@@ -2,35 +2,35 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 880653F9BFB
-	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 17:52:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EAAB83F9BF9
+	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 17:52:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245508AbhH0PvT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Aug 2021 11:51:19 -0400
-Received: from smtp-fw-6001.amazon.com ([52.95.48.154]:39055 "EHLO
-        smtp-fw-6001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245494AbhH0PvS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S245498AbhH0PvS (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Fri, 27 Aug 2021 11:51:18 -0400
+Received: from smtp-fw-6002.amazon.com ([52.95.49.90]:58648 "EHLO
+        smtp-fw-6002.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S244479AbhH0PvQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Aug 2021 11:51:16 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
   t=1630079429; x=1661615429;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=9FN9iC2MCy+4k3fjj+1pV+V6I0P0vEJsHx0DVQFI8VY=;
-  b=SBgHx4iwwiEB+N7L5AIMtgFTjNF3caOabgxJ00WycO67hFGvlVh9/l50
-   uRJmk2OK7zlJmqnhHnAm0UxyFq4qnunXeb08PP6ffAGOzG+TW8ohTmwWn
-   fm78siT0IKTpMOZBXCj6iqB5xLJCNy02W1qCUV4U2HvQV/4WqBujq8l8G
-   o=;
+  bh=xieo1ZKuUc8N7m/sy5itB97U9T9zjjhdkDZEtFWNniE=;
+  b=joOiv2viorMXfKyMRegsAAqhMr8b6EMgotF0r9jq1+1Lr4Ow1HyhMCGI
+   RX3JiHhjKBDnivTaY4JTKH0QLNwuhE+5OeggXdjjA5872rwfQkKIazlqJ
+   9O5JN0w3D7VzxH1aKYpmAsu3fb43kqK+5MR1iCJEzflCUXIEvNVy9Iu5G
+   Y=;
 X-IronPort-AV: E=Sophos;i="5.84,357,1620691200"; 
-   d="scan'208";a="137254370"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-2c-2225282c.us-west-2.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-6001.iad6.amazon.com with ESMTP; 27 Aug 2021 15:50:21 +0000
+   d="scan'208";a="135809784"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-2b-8cc5d68b.us-west-2.amazon.com) ([10.43.8.2])
+  by smtp-border-fw-6002.iad6.amazon.com with ESMTP; 27 Aug 2021 15:50:27 +0000
 Received: from EX13D16EUB003.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
-        by email-inbound-relay-2c-2225282c.us-west-2.amazon.com (Postfix) with ESMTPS id 3E45BA20BB;
-        Fri, 27 Aug 2021 15:50:20 +0000 (UTC)
+        by email-inbound-relay-2b-8cc5d68b.us-west-2.amazon.com (Postfix) with ESMTPS id 05279A2C74;
+        Fri, 27 Aug 2021 15:50:25 +0000 (UTC)
 Received: from 38f9d34ed3b1.ant.amazon.com (10.43.162.52) by
  EX13D16EUB003.ant.amazon.com (10.43.166.99) with Microsoft SMTP Server (TLS)
- id 15.0.1497.23; Fri, 27 Aug 2021 15:50:13 +0000
+ id 15.0.1497.23; Fri, 27 Aug 2021 15:50:18 +0000
 From:   Andra Paraschiv <andraprs@amazon.com>
 To:     linux-kernel <linux-kernel@vger.kernel.org>
 CC:     Alexandru Ciobotaru <alcioa@amazon.com>,
@@ -44,9 +44,9 @@ CC:     Alexandru Ciobotaru <alcioa@amazon.com>,
         kvm <kvm@vger.kernel.org>,
         ne-devel-upstream <ne-devel-upstream@amazon.com>,
         Andra Paraschiv <andraprs@amazon.com>
-Subject: [PATCH v3 5/7] nitro_enclaves: Add fixes for checkpatch match open parenthesis reports
-Date:   Fri, 27 Aug 2021 18:49:28 +0300
-Message-ID: <20210827154930.40608-6-andraprs@amazon.com>
+Subject: [PATCH v3 6/7] nitro_enclaves: Add fixes for checkpatch spell check reports
+Date:   Fri, 27 Aug 2021 18:49:29 +0300
+Message-ID: <20210827154930.40608-7-andraprs@amazon.com>
 X-Mailer: git-send-email 2.20.1 (Apple Git-117)
 In-Reply-To: <20210827154930.40608-1-andraprs@amazon.com>
 References: <20210827154930.40608-1-andraprs@amazon.com>
@@ -60,8 +60,8 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Update the codebase formatting to fix the reports from the checkpatch
-script, to match the open parenthesis.
+Fix the typos in the words spelling as per the checkpatch script
+reports.
 
 Signed-off-by: Andra Paraschiv <andraprs@amazon.com>
 ---
@@ -76,13 +76,62 @@ v2 -> v3
 
 * Move changelog after the "---" line.
 ---
- drivers/virt/nitro_enclaves/ne_misc_dev.c | 17 +++++++++--------
- 1 file changed, 9 insertions(+), 8 deletions(-)
+ include/uapi/linux/nitro_enclaves.h      | 10 +++++-----
+ samples/nitro_enclaves/ne_ioctl_sample.c |  4 ++--
+ 2 files changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/virt/nitro_enclaves/ne_misc_dev.c b/drivers/virt/nitro_enclaves/ne_misc_dev.c
-index e21e1e86ad15f..8939612ee0e08 100644
---- a/drivers/virt/nitro_enclaves/ne_misc_dev.c
-+++ b/drivers/virt/nitro_enclaves/ne_misc_dev.c
+diff --git a/include/uapi/linux/nitro_enclaves.h b/include/uapi/linux/nitro_enclaves.h
+index b945073fe544d..e808f5ba124d4 100644
+--- a/include/uapi/linux/nitro_enclaves.h
++++ b/include/uapi/linux/nitro_enclaves.h
+@@ -1,6 +1,6 @@
+ /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+ /*
+- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
++ * Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+  */
+ 
+ #ifndef _UAPI_LINUX_NITRO_ENCLAVES_H_
+@@ -60,7 +60,7 @@
+  *
+  * Context: Process context.
+  * Return:
+- * * 0					- Logic succesfully completed.
++ * * 0					- Logic successfully completed.
+  * *  -1				- There was a failure in the ioctl logic.
+  * On failure, errno is set to:
+  * * EFAULT				- copy_from_user() / copy_to_user() failure.
+@@ -95,7 +95,7 @@
+  *
+  * Context: Process context.
+  * Return:
+- * * 0				- Logic succesfully completed.
++ * * 0				- Logic successfully completed.
+  * *  -1			- There was a failure in the ioctl logic.
+  * On failure, errno is set to:
+  * * EFAULT			- copy_from_user() / copy_to_user() failure.
+@@ -118,7 +118,7 @@
+  *
+  * Context: Process context.
+  * Return:
+- * * 0					- Logic succesfully completed.
++ * * 0					- Logic successfully completed.
+  * *  -1				- There was a failure in the ioctl logic.
+  * On failure, errno is set to:
+  * * EFAULT				- copy_from_user() failure.
+@@ -161,7 +161,7 @@
+  *
+  * Context: Process context.
+  * Return:
+- * * 0					- Logic succesfully completed.
++ * * 0					- Logic successfully completed.
+  * *  -1				- There was a failure in the ioctl logic.
+  * On failure, errno is set to:
+  * * EFAULT				- copy_from_user() / copy_to_user() failure.
+diff --git a/samples/nitro_enclaves/ne_ioctl_sample.c b/samples/nitro_enclaves/ne_ioctl_sample.c
+index 480b763142b34..6a60990b2e202 100644
+--- a/samples/nitro_enclaves/ne_ioctl_sample.c
++++ b/samples/nitro_enclaves/ne_ioctl_sample.c
 @@ -1,6 +1,6 @@
  // SPDX-License-Identifier: GPL-2.0
  /*
@@ -91,63 +140,15 @@ index e21e1e86ad15f..8939612ee0e08 100644
   */
  
  /**
-@@ -284,8 +284,8 @@ static int ne_setup_cpu_pool(const char *ne_cpu_list)
- 	ne_cpu_pool.nr_parent_vm_cores = nr_cpu_ids / ne_cpu_pool.nr_threads_per_core;
+@@ -638,7 +638,7 @@ static int ne_start_enclave(int enclave_fd,  struct ne_enclave_start_info *encla
+ }
  
- 	ne_cpu_pool.avail_threads_per_core = kcalloc(ne_cpu_pool.nr_parent_vm_cores,
--					     sizeof(*ne_cpu_pool.avail_threads_per_core),
--					     GFP_KERNEL);
-+						     sizeof(*ne_cpu_pool.avail_threads_per_core),
-+						     GFP_KERNEL);
- 	if (!ne_cpu_pool.avail_threads_per_core) {
- 		rc = -ENOMEM;
- 
-@@ -735,7 +735,7 @@ static int ne_add_vcpu_ioctl(struct ne_enclave *ne_enclave, u32 vcpu_id)
-  * * Negative return value on failure.
-  */
- static int ne_sanity_check_user_mem_region(struct ne_enclave *ne_enclave,
--	struct ne_user_memory_region mem_region)
-+					   struct ne_user_memory_region mem_region)
- {
- 	struct ne_mem_region *ne_mem_region = NULL;
- 
-@@ -771,7 +771,7 @@ static int ne_sanity_check_user_mem_region(struct ne_enclave *ne_enclave,
- 		u64 userspace_addr = ne_mem_region->userspace_addr;
- 
- 		if ((userspace_addr <= mem_region.userspace_addr &&
--		    mem_region.userspace_addr < (userspace_addr + memory_size)) ||
-+		     mem_region.userspace_addr < (userspace_addr + memory_size)) ||
- 		    (mem_region.userspace_addr <= userspace_addr &&
- 		    (mem_region.userspace_addr + mem_region.memory_size) > userspace_addr)) {
- 			dev_err_ratelimited(ne_misc_dev.this_device,
-@@ -836,7 +836,7 @@ static int ne_sanity_check_user_mem_region_page(struct ne_enclave *ne_enclave,
-  * * Negative return value on failure.
-  */
- static int ne_set_user_memory_region_ioctl(struct ne_enclave *ne_enclave,
--	struct ne_user_memory_region mem_region)
-+					   struct ne_user_memory_region mem_region)
- {
- 	long gup_rc = 0;
- 	unsigned long i = 0;
-@@ -1014,7 +1014,7 @@ static int ne_set_user_memory_region_ioctl(struct ne_enclave *ne_enclave,
-  * * Negative return value on failure.
-  */
- static int ne_start_enclave_ioctl(struct ne_enclave *ne_enclave,
--	struct ne_enclave_start_info *enclave_start_info)
-+				  struct ne_enclave_start_info *enclave_start_info)
- {
- 	struct ne_pci_dev_cmd_reply cmd_reply = {};
- 	unsigned int cpu = 0;
-@@ -1574,7 +1574,8 @@ static int ne_create_vm_ioctl(struct ne_pci_dev *ne_pci_dev, u64 __user *slot_ui
- 	mutex_unlock(&ne_cpu_pool.mutex);
- 
- 	ne_enclave->threads_per_core = kcalloc(ne_enclave->nr_parent_vm_cores,
--		sizeof(*ne_enclave->threads_per_core), GFP_KERNEL);
-+					       sizeof(*ne_enclave->threads_per_core),
-+					       GFP_KERNEL);
- 	if (!ne_enclave->threads_per_core) {
- 		rc = -ENOMEM;
- 
+ /**
+- * ne_start_enclave_check_booted() - Start the enclave and wait for a hearbeat
++ * ne_start_enclave_check_booted() - Start the enclave and wait for a heartbeat
+  *				     from it, on a newly created vsock channel,
+  *				     to check it has booted.
+  * @enclave_fd :	The file descriptor associated with the enclave.
 -- 
 2.20.1 (Apple Git-117)
 
