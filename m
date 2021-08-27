@@ -2,361 +2,441 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CDBB23F9221
-	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 03:50:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0E4563F922F
+	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 04:03:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243983AbhH0Buv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Aug 2021 21:50:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:28939 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S242698AbhH0Buu (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 26 Aug 2021 21:50:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630029002;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=DBae8PxX7qj8o1pcDXyyfMAR2sUWBm6T7LaML7kuDgM=;
-        b=U5Ws23zEjTFfHMiURoazWcbEbMSR4ZptGuHXdPKAWbLq6mmITwR7dQ1IEtVDKKYqja7POH
-        b7FvbLHb7e7Qh7LHZme0622/g79Iff9w4ltb1HL4v83MobpZRI4bIENX1iXUevlP+y0peF
-        lcxcxtEZgxQIapI87uqDKFS7AbB6nug=
-Received: from mail-oi1-f197.google.com (mail-oi1-f197.google.com
- [209.85.167.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-1-mWEe8yIXNMywhg2_k5CwVA-1; Thu, 26 Aug 2021 21:48:51 -0400
-X-MC-Unique: mWEe8yIXNMywhg2_k5CwVA-1
-Received: by mail-oi1-f197.google.com with SMTP id s9-20020a056808208900b002694a72eed5so2519114oiw.20
-        for <kvm@vger.kernel.org>; Thu, 26 Aug 2021 18:48:51 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=DBae8PxX7qj8o1pcDXyyfMAR2sUWBm6T7LaML7kuDgM=;
-        b=eKkzrfxPUTxi9qsrd4YxUpNHb/5HkIV2f+vSoFLeoxLcgsWLQN8Szh05V4+8ljRezZ
-         eYHTo/MyaaLvZwwYe7Erc0oIzosKWvvm36vZpmZmB4rWWq3PBxbCXIUdaKCX0M75/CCK
-         j2In2rzBtV9vmTP6uKdIon2ateVz+eaBnY0lbLhngwqMbJBuPUV9o68CRsNrYUgIJjrf
-         aGIwrLqkDkQIaJdA1u7LJf7RILNWtiZTxpCGRZP4Sa07FiDeIarr2EzVo00ujESlxrZL
-         ZmAkJh0rUyJhX8RBtYyetOJaWyQTek0ApGDWriu7HH8BmacNanTQ43n2MuHyJ0+x4STJ
-         7jjQ==
-X-Gm-Message-State: AOAM532DMK1BPM2xpy6eCQqZtTXfvycuAWnSHvmrP24MENdjQBTluf9F
-        TX3MnGE79bl98UuESGvFxVXd6iVm7Ii+tYZq5qwat4DZJhBlN9ffliSILs+jbHrxQc5la5hQZ/A
-        ttZZzVOhg+/0o
-X-Received: by 2002:a05:6830:913:: with SMTP id v19mr5976670ott.131.1630028930308;
-        Thu, 26 Aug 2021 18:48:50 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyTbyOGai+vHSZDjK1qei/P2+i+m3VMXyz4SonogcbpZiPQ/1Gxh9rPal+6APBtQqSz7+hpTA==
-X-Received: by 2002:a05:6830:913:: with SMTP id v19mr5976653ott.131.1630028930066;
-        Thu, 26 Aug 2021 18:48:50 -0700 (PDT)
-Received: from redhat.com ([198.99.80.109])
-        by smtp.gmail.com with ESMTPSA id r28sm734247oiw.45.2021.08.26.18.48.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Aug 2021 18:48:49 -0700 (PDT)
-Date:   Thu, 26 Aug 2021 19:48:48 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Colin Xu <colin.xu@intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        zhenyuw@linux.intel.com, hang.yuan@linux.intel.com,
-        swee.yee.fonn@intel.com, fred.gao@intel.com
-Subject: Re: [PATCH] vfio/pci: Add OpRegion 2.0 Extended VBT support.
-Message-ID: <20210826194848.140e7da7.alex.williamson@redhat.com>
-In-Reply-To: <365a1c5b-53fe-cd2c-11a1-9678dde0c5@outlook.office365.com>
-References: <20210813021329.128543-1-colin.xu@intel.com>
-        <20210816163958.04ab019c.alex.williamson@redhat.com>
-        <9dc7eba-2c49-8d40-46b-5f4382a25c1e@outlook.office365.com>
-        <365a1c5b-53fe-cd2c-11a1-9678dde0c5@outlook.office365.com>
-Organization: Red Hat
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        id S244001AbhH0CDD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Aug 2021 22:03:03 -0400
+Received: from mga02.intel.com ([134.134.136.20]:31944 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S243993AbhH0CDC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Aug 2021 22:03:02 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10088"; a="205084855"
+X-IronPort-AV: E=Sophos;i="5.84,355,1620716400"; 
+   d="scan'208";a="205084855"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Aug 2021 19:02:14 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.84,355,1620716400"; 
+   d="scan'208";a="517128875"
+Received: from orsmsx604.amr.corp.intel.com ([10.22.229.17])
+  by fmsmga004.fm.intel.com with ESMTP; 26 Aug 2021 19:02:14 -0700
+Received: from orsmsx606.amr.corp.intel.com (10.22.229.19) by
+ ORSMSX604.amr.corp.intel.com (10.22.229.17) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2242.10; Thu, 26 Aug 2021 19:02:13 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx606.amr.corp.intel.com (10.22.229.19) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2242.10 via Frontend Transport; Thu, 26 Aug 2021 19:02:13 -0700
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (104.47.73.48) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2242.10; Thu, 26 Aug 2021 19:02:13 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=BchsjKdueGDJC79u9aX9lNkm4fz6Mo8zpjPDtlO2VWLqPL3dG/lGxznKl2w5eJh1D8NIfwMUEJkJLAc0ljVNoi5FIjOvT9F57a+2oyKvABfvtkLu+1Bjw/UruPO+qR6DaTE4lvyGCjbgqgMdEOzyO+1bqvsRXMQ7LtiCMn5IOGFxRapBh4crhivbq4GY4d4ZKkkXcYrIX99R455HSri/XgqymU5htrqisfCuJv1um0rws2x7pGhuMyY9KfWGJmn1+HIPn8GTJKXjJ9t3zAsw0tiLYOtKt5VUF6TNRig2XlImBudbe6E9Nhv+swHfIAuTmfoRbKd7slE6mRyDw9hXmw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=8l28BApJlc6CzJzk6ixor2kxkr8s0D6sb+4uHbvo5aA=;
+ b=b+IzSQCt+Vep72sCazaXvsufxeI+kZk2/EGxq10T209GJOgN2/ZS3GFxeL61OgYpSO7e0bGtWs7JW0k+E7whFmKIvxcdxd41NaIEZ4/HJ8ASTxi5ZjQuKvN1+OKpdnE5bWBDLcAZwzfm6pcbV0/JFPPM1mOZGheCuKEQ8Eg/oak9G2cmdnPTc7Uj7b8rGUuwaqmO87qD9QtO9t/vc9szMp2KrOdALEcOrpS2r516FIsX5lxbU41YxfsVr0pzBCTm8JTpMEj4+glttypCHb5Qb7zv5vFkVRExzho6GKei2qm26myiTKHJfrq5h21vi/Dj4GyXv4yMS9KkP4RKtiQ2tQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
+ s=selector2-intel-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=8l28BApJlc6CzJzk6ixor2kxkr8s0D6sb+4uHbvo5aA=;
+ b=v/voP5V5VJ8kb+leA4EwFci3wVzlMr/BlLEVw8Z0Z0VRvg/htAQXiZQx6yEVbmSKYmHxNhvkHN1PFQo1/YcguVID1+bvKviTT0UUm9J3KZeBrv0FFe5Li+D3JEYYt6NbokN+DSCy3M76ovQZLCdChQJmbZENuVEJF8XkSABDkSo=
+Received: from BN9PR11MB5433.namprd11.prod.outlook.com (2603:10b6:408:11e::13)
+ by BN7PR11MB2690.namprd11.prod.outlook.com (2603:10b6:406:ab::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.22; Fri, 27 Aug
+ 2021 02:02:12 +0000
+Received: from BN9PR11MB5433.namprd11.prod.outlook.com
+ ([fe80::ddb7:fa7f:2cc:45df]) by BN9PR11MB5433.namprd11.prod.outlook.com
+ ([fe80::ddb7:fa7f:2cc:45df%7]) with mapi id 15.20.4457.020; Fri, 27 Aug 2021
+ 02:02:12 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Christoph Hellwig <hch@lst.de>,
+        Alex Williamson <alex.williamson@redhat.com>
+CC:     Diana Craciun <diana.craciun@oss.nxp.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Jason Gunthorpe <jgg@nvidia.com>
+Subject: RE: [PATCH 01/14] vfio: Move vfio_iommu_group_get() to
+ vfio_register_group_dev()
+Thread-Topic: [PATCH 01/14] vfio: Move vfio_iommu_group_get() to
+ vfio_register_group_dev()
+Thread-Index: AQHXmn+HWPs93okg0USXL2M2eK6Sm6uGmgAg
+Date:   Fri, 27 Aug 2021 02:02:12 +0000
+Message-ID: <BN9PR11MB5433FD7780C3F482349FBADF8CC89@BN9PR11MB5433.namprd11.prod.outlook.com>
+References: <20210826133424.3362-1-hch@lst.de>
+ <20210826133424.3362-2-hch@lst.de>
+In-Reply-To: <20210826133424.3362-2-hch@lst.de>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-version: 11.5.1.3
+dlp-product: dlpe-windows
+dlp-reaction: no-action
+authentication-results: lst.de; dkim=none (message not signed)
+ header.d=none;lst.de; dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 1d42c315-020e-4e40-0155-08d968feaf6c
+x-ms-traffictypediagnostic: BN7PR11MB2690:
+x-microsoft-antispam-prvs: <BN7PR11MB2690F462D113399D395C0DD38CC89@BN7PR11MB2690.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:7691;
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: zSrkojxSl5et2bhEmv0/VsT1aHaB6n11iyN9ZuXEaJ/WJ+6h2myXF+9OGXBJ2tDeqOrgcMhC+raihFZVhN261jZ+dT2+4pKfliiHiWp34aCGdn5SaxSmQJY41+q68oQvcnacSOfD+wiLCnGKt388GH2NOOBVild8ANrVq34R6lRCvyLRCrCp+8wDNXFY3ZdhyyxiY5g5hvVG0AyAUkELsy0XJvmgc/Iuz3Y75XH7hRXb/bYmREC3dJtEBGpb5qCI9B8rLqDVJnnKw1lkPRsPYCofOUAUOtHpoOSXSORNkhn0+3LLH2TiFYrS1lI6VY9d3JfQq/pQoHSqQnl2Dnqiw1XUUQln7O/ss5NzOo5JcnIyu/kTh6LYq66hzNj6FVKqvmQBoyQA/v6ifn52BmuogpQVp4EzUXj0igEbzuXx/kkluRlNjt6oGZQlEOqciiHaVJ87p8GBpnsESfXP44nKV1Xt+GtQZg5RSByu0YlkT6FXwqRApXceuwGyjHjkNhn4VO49AuRZjEpUHNWPzSHFksV5EzDt8HChQgjOutlfat5OV6o70zb5ffEztFl/gqgzkpAF+ux8UJ56mGRjrrnGlhS5aY7bPu857S5dc3I+DJbtJGxb3eHRIj4FL6IqOIH1h71CPlVKdOzHjm68XipSAnLjAFE535LtQNdSF17Dr+4R0fn+LNxif9EtK3Th/4hXQuuwXhciQDghc0cgM8utWw==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5433.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(136003)(346002)(376002)(396003)(39860400002)(4326008)(54906003)(8676002)(83380400001)(38070700005)(66476007)(122000001)(66946007)(76116006)(66556008)(316002)(5660300002)(110136005)(55016002)(86362001)(38100700002)(8936002)(478600001)(64756008)(71200400001)(186003)(52536014)(6506007)(9686003)(33656002)(7696005)(66446008)(26005)(2906002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?hysRiLm6kKFW4T6U8HAw8l0lTlv8IsNkaI3G6tVX4qXSwMhjwOTESyKwKyOu?=
+ =?us-ascii?Q?OxIvliNO6rIaXPimjvhjRF2yNpS50rYg8VqeTrVVaX1+AxKKlf64AFaVjDbQ?=
+ =?us-ascii?Q?iJMeAVuKG5QBpa+SNjVEO58trqImIv8MfRyEaDqTkqN/EGVkhoxdWGUYO/po?=
+ =?us-ascii?Q?eO3ilwNy1jvogYVycV+Yxpwq0OoBkXhGYPDAtbGjiARcqRXk0/9fw7guZv3L?=
+ =?us-ascii?Q?Ng+0fzdnK2PZg1rcr5inbVtz7o4gjr/MVtCqoEEZX196+bWJGI95Addvd42d?=
+ =?us-ascii?Q?LwSlAbW01UmmIl9htZKW4iiL2fm5XzZk/6AjuDYpSdAT5SxYieUPNLw94gCf?=
+ =?us-ascii?Q?QYYYClsKUTftFx6LsmQK3Zloba9E418LiKm5q769cv8RKnqR5ENCk9roLUg1?=
+ =?us-ascii?Q?AlOrMT54s0gDGm/3aBa8eSLNzKz5VBY3Ku9aklXKKIilAHiINbdc1MQeGjGY?=
+ =?us-ascii?Q?5zxYEtcJ6os6HK9+45r8mVwnmYUu469d5QkT72JRHQ044HTNEKMFKl3xYX7s?=
+ =?us-ascii?Q?UtqfPHGFHG7SLaGbWr0fAnb0jt54R6o3E84Z6qj9g6fEzC2T/3Nu7yZWN2pg?=
+ =?us-ascii?Q?zpebCahlCHn/EqD3MX3/tS5w/JLWePrZbUHaA7mVVA8ffRf/YETuJVGBzde/?=
+ =?us-ascii?Q?hNU5/JcUBTa4B4quL4mgKvx/DmJMomcMCuBflpZ9t26CHcqlR6yStJ49Ihsh?=
+ =?us-ascii?Q?jbLv2rydyfHj6+xjucx9pDKaIDDilmTk7t2XRJ8nrY6dFRHSGLCncyOiuJ9p?=
+ =?us-ascii?Q?oa/y5djIsaC4ai5M6v9nbMnkaYPGLc5bmDYK+X+N0R23C6IWZBkqqXcessBO?=
+ =?us-ascii?Q?G7Ar4MvLsNJlDEZpwoOTw4J0WIey5VsZSLHMHZO2AZieGDLPU7Nj7jBvbFY4?=
+ =?us-ascii?Q?EuveSlARdiXcX5UknXgK7zmj2ZMVWhob38xmPxqBu+HUpE2vqbCGGMaKsUJ6?=
+ =?us-ascii?Q?2ji6yAEXf0y54bBr4XyGplQJ/GvhKHi8fd4DrXl9CMmthEn/hyZSEHU2AvoD?=
+ =?us-ascii?Q?Wbe4FJDZbzyKkxFPPwLVYM4E+c5pLc3ItoMcTaIrzRHGvLZhFYIGZ9MGM2fw?=
+ =?us-ascii?Q?Ul0gJQjrTBLaaLAm4Q6gv6DlPvdYPlfJNc/cuOR/tViyboZaPBFHG2bD+gm1?=
+ =?us-ascii?Q?QD6UpIlAOFf6V2ortG6xSia4a0k5aEv4ALyNZGOHqEBqZHfTkgG+J17AoXJC?=
+ =?us-ascii?Q?oNhIniBHQDEZDsluYVdEw+sxQRT9BkiQroNGH5Bs3QumN5AeMMHzFnoLOot+?=
+ =?us-ascii?Q?vuRP5NzWQ7/sd3ZS1aSOk/7oIxt4zh7Fuka5W4jPN7nf96NgI6L0g6dE8fXj?=
+ =?us-ascii?Q?amglKXvvgebLXLO2493R+pl9?=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5433.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1d42c315-020e-4e40-0155-08d968feaf6c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Aug 2021 02:02:12.2324
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Uc0ri7WLF6be0XgPZHPAi5/uywHKv+PlaL/SzpiYRETVUnW9oBsa6LmyTqH7wgbpSghdcg+5HC1JvfC2IHM3MA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN7PR11MB2690
+X-OriginatorOrg: intel.com
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 27 Aug 2021 09:36:36 +0800 (CST)
-Colin Xu <colin.xu@intel.com> wrote:
+> From: Christoph Hellwig <hch@lst.de>
+> Sent: Thursday, August 26, 2021 9:34 PM
+>=20
+> From: Jason Gunthorpe <jgg@nvidia.com>
+>=20
+> We don't need to hold a reference to the group in the driver as well as
+> obtain a reference to the same group as the first thing
+> vfio_register_group_dev() does.
+>=20
+> Since the drivers never use the group move this all into the core code.
+>=20
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-> Hi Alex,
-> 
-> In addition to the background that devices on market may still need 
-> OpRegion 2.0 support in vfio-pci, do you have other comments to the patch 
-> body?
+Reviewed-by: Kevin Tian <kevin.tian@intel.com>
 
-Yes, there were further comments in my first reply below.  Thanks,
-
-Alex
-
-
-> On Tue, 17 Aug 2021, Colin Xu wrote:
-> 
-> > On Mon, 16 Aug 2021, Alex Williamson wrote:
-> >  
-> >>  On Fri, 13 Aug 2021 10:13:29 +0800
-> >>  Colin Xu <colin.xu@intel.com> wrote:
-> >>  
-> >>>  Due to historical reason, some legacy shipped system doesn't follow
-> >>>  OpRegion 2.1 spec but still stick to OpRegion 2.0, in which the extended
-> >>>  VBT is not contigious after OpRegion in physical address, but any
-> >>>  location pointed by RVDA via absolute address. Thus it's impossible
-> >>>  to map a contigious range to hold both OpRegion and extended VBT as 2.1.
-> >>>
-> >>>  Since the only difference between OpRegion 2.0 and 2.1 is where extended
-> >>>  VBT is stored: For 2.0, RVDA is the absolute address of extended VBT
-> >>>  while for 2.1, RVDA is the relative address of extended VBT to OpRegion
-> >>>  baes, and there is no other difference between OpRegion 2.0 and 2.1,
-> >>>  it's feasible to amend OpRegion support for these legacy system (before
-> >>>  upgrading the system firmware), by kazlloc a range to shadown OpRegion
-> >>>  from the beginning and stitch VBT after closely, patch the shadow
-> >>>  OpRegion version from 2.0 to 2.1, and patch the shadow RVDA to relative
-> >>>  address. So that from the vfio igd OpRegion r/w ops view, only OpRegion
-> >>>  2.1 is exposed regardless the underneath host OpRegion is 2.0 or 2.1
-> >>>  if the extended VBT exists. vfio igd OpRegion r/w ops will return either
-> >>>  shadowed data (OpRegion 2.0) or directly from physical address
-> >>>  (OpRegion 2.1+) based on host OpRegion version and RVDA/RVDS. The shadow
-> >>>  mechanism makes it possible to support legacy systems on the market.  
-> >>
-> >>  Which systems does this enable?  There's a suggestion above that these
-> >>  systems could update firmware to get OpRegion v2.1 support, why
-> >>  shouldn't we ask users to do that instead?  When we added OpRegion v2.1
-> >>  support we were told that v2.0 support was essentially non-existent,
-> >>  why should we add code to support and old spec with few users for such
-> >>  a niche use case?  
-> > Hi Alex, there was some mis-alignment with the BIOS owner that we were told 
-> > the 2.0 system doesn't for retail but only for internal development. However 
-> > in other projects we DO see the retail market has such systems, including NUC 
-> > NUC6CAYB, some APL industrial PC used in RT system, and some customized APL 
-> > motherboard by commercial virtualization solution. We immediately contact the 
-> > BIOS owner to ask for a clarification and they admit it. These system won't 
-> > get updated BIOS for OpRegion update but still under warranty. That's why the 
-> > OpRegion 2.0 support is still needed.
-> >  
-> >>   
-> >>> Cc:  Zhenyu Wang <zhenyuw@linux.intel.com>
-> >>> Cc:  Hang Yuan <hang.yuan@linux.intel.com>
-> >>> Cc:  Swee Yee Fonn <swee.yee.fonn@intel.com>
-> >>> Cc:  Fred Gao <fred.gao@intel.com>
-> >>>  Signed-off-by: Colin Xu <colin.xu@intel.com>
-> >>>  ---
-> >>>   drivers/vfio/pci/vfio_pci_igd.c | 117 ++++++++++++++++++++------------
-> >>>   1 file changed, 75 insertions(+), 42 deletions(-)
-> >>>
-> >>>  diff --git a/drivers/vfio/pci/vfio_pci_igd.c
-> >>>  b/drivers/vfio/pci/vfio_pci_igd.c
-> >>>  index 228df565e9bc..22b9436a3044 100644
-> >>>  --- a/drivers/vfio/pci/vfio_pci_igd.c
-> >>>  +++ b/drivers/vfio/pci/vfio_pci_igd.c
-> >>>  @@ -48,7 +48,10 @@ static size_t vfio_pci_igd_rw(struct vfio_pci_device
-> >>>  *vdev, char __user *buf,
-> >>>   static void vfio_pci_igd_release(struct vfio_pci_device *vdev,
-> >>>   				 struct vfio_pci_region *region)
-> >>>  {
-> >>>  -	memunmap(region->data);
-> >>>  +	if (is_ioremap_addr(region->data))
-> >>>  +		memunmap(region->data);
-> >>>  +	else
-> >>>  +		kfree(region->data);
-> >>>   }
-> >>>
-> >>>  static const struct vfio_pci_regops vfio_pci_igd_regops = {
-> >>>  @@ -59,10 +62,11 @@ static const struct vfio_pci_regops
-> >>>  vfio_pci_igd_regops = {
-> >>>   static int vfio_pci_igd_opregion_init(struct vfio_pci_device *vdev)
-> >>>   {
-> >>>  	__le32 *dwordp = (__le32 *)(vdev->vconfig + OPREGION_PCI_ADDR);
-> >>>  -	u32 addr, size;
-> >>>  -	void *base;
-> >>>  +	u32 addr, size, rvds = 0;
-> >>>  +	void *base, *opregionvbt;
-> >>>    int ret;
-> >>>    u16 version;
-> >>>  +	u64 rvda = 0;
-> >>>
-> >>>    ret = pci_read_config_dword(vdev->pdev, OPREGION_PCI_ADDR, &addr);
-> >>>    if (ret)
-> >>>  @@ -89,66 +93,95 @@ static int vfio_pci_igd_opregion_init(struct
-> >>>  vfio_pci_device *vdev)
-> >>>    size *= 1024; /* In KB */
-> >>>
-> >>>  	/*
-> >>>  -	 * Support opregion v2.1+
-> >>>  -	 * When VBT data exceeds 6KB size and cannot be within mailbox #4,
-> >>>  then
-> >>>  -	 * the Extended VBT region next to opregion is used to hold the VBT
-> >>>  data.
-> >>>  -	 * RVDA (Relative Address of VBT Data from Opregion Base) and RVDS
-> >>>  -	 * (Raw VBT Data Size) from opregion structure member are used to
-> >>>  hold the
-> >>>  -	 * address from region base and size of VBT data. RVDA/RVDS are not
-> >>>  -	 * defined before opregion 2.0.
-> >>>  +	 * OpRegion and VBT:
-> >>>  +	 * When VBT data doesn't exceed 6KB, it's stored in Mailbox #4.
-> >>>  +	 * When VBT data exceeds 6KB size, Mailbox #4 is no longer large
-> >>>  enough
-> >>>  +	 * to hold the VBT data, the Extended VBT region is introduced since
-> >>>  +	 * OpRegion 2.0 to hold the VBT data. Since OpRegion 2.0, RVDA/RVDS
-> >>>  are
-> >>>  +	 * introduced to define the extended VBT data location and size.
-> >>>  +	 * OpRegion 2.0: RVDA defines the absolute physical address of the
-> >>>  +	 *   extended VBT data, RVDS defines the VBT data size.
-> >>>  +	 * OpRegion 2.1 and above: RVDA defines the relative address of the
-> >>>  +	 *   extended VBT data to OpRegion base, RVDS defines the VBT data
-> >>>  size.
-> >>>  	 *
-> >>>  -	 * opregion 2.1+: RVDA is unsigned, relative offset from
-> >>>  -	 * opregion base, and should point to the end of opregion.
-> >>>  -	 * otherwise, exposing to userspace to allow read access to
-> >>>  everything between
-> >>>  -	 * the OpRegion and VBT is not safe.
-> >>>  -	 * RVDS is defined as size in bytes.
-> >>>  -	 *
-> >>>  -	 * opregion 2.0: rvda is the physical VBT address.
-> >>>  -	 * Since rvda is HPA it cannot be directly used in guest.
-> >>>  -	 * And it should not be practically available for end user,so it is
-> >>>  not supported.
-> >>>  +	 * Due to the RVDA difference in OpRegion VBT (also the only diff
-> >>>  between
-> >>>  +	 * 2.0 and 2.1), while for OpRegion 2.1 and above it's possible to
-> >>>  map
-> >>>  +	 * a contigious memory to expose OpRegion and VBT r/w via the vfio
-> >>>  +	 * region, for OpRegion 2.0 shadow and amendment mechanism is used to
-> >>>  +	 * expose OpRegion and VBT r/w properly. So that from r/w ops view,
-> >>>  only
-> >>>  +	 * OpRegion 2.1 is exposed regardless underneath Region is 2.0 or
-> >>>  2.1.
-> >>>    */
-> >>>  	version = le16_to_cpu(*(__le16 *)(base + OPREGION_VERSION));
-> >>>  -	if (version >= 0x0200) {
-> >>>  -		u64 rvda;
-> >>>  -		u32 rvds;
-> >>>
-> >>>  +	if (version >= 0x0200) {
-> >>>     rvda = le64_to_cpu(*(__le64 *)(base + OPREGION_RVDA));
-> >>>     rvds = le32_to_cpu(*(__le32 *)(base + OPREGION_RVDS));
-> >>>  +
-> >>>  +		/* The extended VBT is valid only when RVDA/RVDS are
-> >>>  non-zero. */
-> >>>  		if (rvda && rvds) {
-> >>>  -			/* no support for opregion v2.0 with physical VBT
-> >>>  address */
-> >>>  -			if (version == 0x0200) {
-> >>>  +			size += rvds;
-> >>>  +		}
-> >>>  +
-> >>>  +		/* The extended VBT must follows OpRegion for OpRegion 2.1+
-> >>>  */
-> >>>  +		if (rvda != size && version > 0x0200) {  
-> >>
-> >>  But we already added rvds to size, this is not compatible with the
-> >>  previous code that required rvda == size BEFORE adding rvds.
-> >>  
-> >>>  +			memunmap(base);
-> >>>  +			pci_err(vdev->pdev,
-> >>>  +				"Extended VBT does not follow opregion on
-> >>>  version 0x%04x\n",
-> >>>  +				version);
-> >>>  +			return -EINVAL;
-> >>>  +		}
-> >>>  +	}
-> >>>  +
-> >>>  +	if (size != OPREGION_SIZE) {
-> >>>  +		/* Allocate memory for OpRegion and extended VBT for 2.0 */
-> >>>  +		if (rvda && rvds && version == 0x0200) {
-> >>>  +			void *vbt_base;
-> >>>  +
-> >>>  +			vbt_base = memremap(rvda, rvds, MEMREMAP_WB);
-> >>>  +			if (!vbt_base) {
-> >>>  				memunmap(base);
-> >>>  -				pci_err(vdev->pdev,
-> >>>  -					"IGD assignment does not support
-> >>>  opregion v2.0 with an extended VBT region\n");
-> >>>  -				return -EINVAL;
-> >>>  +				return -ENOMEM;
-> >>>      }
-> >>>
-> >>>  -			if (rvda != size) {
-> >>>  +			opregionvbt = kzalloc(size, GFP_KERNEL);
-> >>>  +			if (!opregionvbt) {
-> >>>  				memunmap(base);
-> >>>  -				pci_err(vdev->pdev,
-> >>>  -					"Extended VBT does not follow
-> >>>  opregion on version 0x%04x\n",
-> >>>  -					version);
-> >>>  -				return -EINVAL;
-> >>>  +				memunmap(vbt_base);
-> >>>  +				return -ENOMEM;
-> >>>      }
-> >>>
-> >>>  -			/* region size for opregion v2.0+: opregion and VBT
-> >>>  size. */
-> >>>  -			size += rvds;
-> >>>  +			/* Stitch VBT after OpRegion noncontigious */
-> >>>  +			memcpy(opregionvbt, base, OPREGION_SIZE);
-> >>>  +			memcpy(opregionvbt + OPREGION_SIZE, vbt_base, rvds);
-> >>>  +
-> >>>  +			/* Patch OpRegion 2.0 to 2.1 */
-> >>>  +			*(__le16 *)(opregionvbt + OPREGION_VERSION) = 0x0201;
-> >>>  +			/* Patch RVDA to relative address after OpRegion */
-> >>>  +			*(__le64 *)(opregionvbt + OPREGION_RVDA) =
-> >>>  OPREGION_SIZE;  
-> >>
-> >>  AIUI, the OpRegion is a two-way channel between the IGD device/system
-> >>  BIOS and the driver, numerous fields are writable by the driver.  Now
-> >>  the driver writes to a shadow copy of the OpRegion table.  What
-> >>  completes the write to the real OpRegion table for consumption by the
-> >>  device/BIOS?  Likewise, what updates the fields that are written by the
-> >>  device/BIOS for consumption by the driver?
-> >>
-> >>  If a shadow copy of the OpRegion detached from the physical table is
-> >>  sufficient here, why wouldn't we always shadow the OpRegion and prevent
-> >>  all userspace writes from touching the real version?  Thanks,
-> >>
-> >>  Alex
-> >>  
-> >>>  +
-> >>>  +			memunmap(vbt_base);
-> >>>  +			memunmap(base);
-> >>>  +
-> >>>  +			/* Register shadow instead of map as vfio_region */
-> >>>  +			base = opregionvbt;
-> >>>  +		/* Remap OpRegion + extended VBT for 2.1+ */
-> >>>  +		} else {
-> >>>  +			memunmap(base);
-> >>>  +			base = memremap(addr, size, MEMREMAP_WB);
-> >>>  +			if (!base)
-> >>>  +				return -ENOMEM;
-> >>>    	}
-> >>>    }
-> >>>
-> >>>  -	if (size != OPREGION_SIZE) {
-> >>>  -		memunmap(base);
-> >>>  -		base = memremap(addr, size, MEMREMAP_WB);
-> >>>  -		if (!base)
-> >>>  -			return -ENOMEM;
-> >>>  -	}
-> >>>  -
-> >>>    ret = vfio_pci_register_dev_region(vdev,
-> >>>     PCI_VENDOR_ID_INTEL | VFIO_REGION_TYPE_PCI_VENDOR_TYPE,
-> >>>     VFIO_REGION_SUBTYPE_INTEL_IGD_OPREGION,
-> >>>     &vfio_pci_igd_regops, size, VFIO_REGION_INFO_FLAG_READ, base);
-> >>>  	if (ret) {
-> >>>  -		memunmap(base);
-> >>>  +		if (is_ioremap_addr(base))
-> >>>  +			memunmap(base);
-> >>>  +		else
-> >>>  +			kfree(base);
-> >>>    	return ret;
-> >>>    }
-> >>>   
-> >> 
-> >>   
-> >
-> > --
-> > Best Regards,
-> > Colin Xu
-> >
-> >  
-> 
+> ---
+>  drivers/vfio/fsl-mc/vfio_fsl_mc.c            | 17 ++-------
+>  drivers/vfio/pci/vfio_pci_core.c             | 13 ++-----
+>  drivers/vfio/platform/vfio_platform_common.c | 13 +------
+>  drivers/vfio/vfio.c                          | 36 ++++++++------------
+>  include/linux/vfio.h                         |  3 --
+>  5 files changed, 19 insertions(+), 63 deletions(-)
+>=20
+> diff --git a/drivers/vfio/fsl-mc/vfio_fsl_mc.c b/drivers/vfio/fsl-
+> mc/vfio_fsl_mc.c
+> index 0ead91bfa83867..9e838fed560339 100644
+> --- a/drivers/vfio/fsl-mc/vfio_fsl_mc.c
+> +++ b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
+> @@ -505,22 +505,13 @@ static void vfio_fsl_uninit_device(struct
+> vfio_fsl_mc_device *vdev)
+>=20
+>  static int vfio_fsl_mc_probe(struct fsl_mc_device *mc_dev)
+>  {
+> -	struct iommu_group *group;
+>  	struct vfio_fsl_mc_device *vdev;
+>  	struct device *dev =3D &mc_dev->dev;
+>  	int ret;
+>=20
+> -	group =3D vfio_iommu_group_get(dev);
+> -	if (!group) {
+> -		dev_err(dev, "VFIO_FSL_MC: No IOMMU group\n");
+> -		return -EINVAL;
+> -	}
+> -
+>  	vdev =3D kzalloc(sizeof(*vdev), GFP_KERNEL);
+> -	if (!vdev) {
+> -		ret =3D -ENOMEM;
+> -		goto out_group_put;
+> -	}
+> +	if (!vdev)
+> +		return -ENOMEM;
+>=20
+>  	vfio_init_group_dev(&vdev->vdev, dev, &vfio_fsl_mc_ops);
+>  	vdev->mc_dev =3D mc_dev;
+> @@ -556,8 +547,6 @@ static int vfio_fsl_mc_probe(struct fsl_mc_device
+> *mc_dev)
+>  out_uninit:
+>  	vfio_uninit_group_dev(&vdev->vdev);
+>  	kfree(vdev);
+> -out_group_put:
+> -	vfio_iommu_group_put(group, dev);
+>  	return ret;
+>  }
+>=20
+> @@ -574,8 +563,6 @@ static int vfio_fsl_mc_remove(struct fsl_mc_device
+> *mc_dev)
+>=20
+>  	vfio_uninit_group_dev(&vdev->vdev);
+>  	kfree(vdev);
+> -	vfio_iommu_group_put(mc_dev->dev.iommu_group, dev);
+> -
+>  	return 0;
+>  }
+>=20
+> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci=
+_core.c
+> index c67751948504af..4134dceab3f73b 100644
+> --- a/drivers/vfio/pci/vfio_pci_core.c
+> +++ b/drivers/vfio/pci/vfio_pci_core.c
+> @@ -1807,7 +1807,6 @@
+> EXPORT_SYMBOL_GPL(vfio_pci_core_uninit_device);
+>  int vfio_pci_core_register_device(struct vfio_pci_core_device *vdev)
+>  {
+>  	struct pci_dev *pdev =3D vdev->pdev;
+> -	struct iommu_group *group;
+>  	int ret;
+>=20
+>  	if (pdev->hdr_type !=3D PCI_HEADER_TYPE_NORMAL)
+> @@ -1826,10 +1825,6 @@ int vfio_pci_core_register_device(struct
+> vfio_pci_core_device *vdev)
+>  		return -EBUSY;
+>  	}
+>=20
+> -	group =3D vfio_iommu_group_get(&pdev->dev);
+> -	if (!group)
+> -		return -EINVAL;
+> -
+>  	if (pci_is_root_bus(pdev->bus)) {
+>  		ret =3D vfio_assign_device_set(&vdev->vdev, vdev);
+>  	} else if (!pci_probe_reset_slot(pdev->slot)) {
+> @@ -1843,10 +1838,10 @@ int vfio_pci_core_register_device(struct
+> vfio_pci_core_device *vdev)
+>  	}
+>=20
+>  	if (ret)
+> -		goto out_group_put;
+> +		return ret;
+>  	ret =3D vfio_pci_vf_init(vdev);
+>  	if (ret)
+> -		goto out_group_put;
+> +		return ret;
+>  	ret =3D vfio_pci_vga_init(vdev);
+>  	if (ret)
+>  		goto out_vf;
+> @@ -1877,8 +1872,6 @@ int vfio_pci_core_register_device(struct
+> vfio_pci_core_device *vdev)
+>  		vfio_pci_set_power_state(vdev, PCI_D0);
+>  out_vf:
+>  	vfio_pci_vf_uninit(vdev);
+> -out_group_put:
+> -	vfio_iommu_group_put(group, &pdev->dev);
+>  	return ret;
+>  }
+>  EXPORT_SYMBOL_GPL(vfio_pci_core_register_device);
+> @@ -1894,8 +1887,6 @@ void vfio_pci_core_unregister_device(struct
+> vfio_pci_core_device *vdev)
+>  	vfio_pci_vf_uninit(vdev);
+>  	vfio_pci_vga_uninit(vdev);
+>=20
+> -	vfio_iommu_group_put(pdev->dev.iommu_group, &pdev->dev);
+> -
+>  	if (!disable_idle_d3)
+>  		vfio_pci_set_power_state(vdev, PCI_D0);
+>  }
+> diff --git a/drivers/vfio/platform/vfio_platform_common.c
+> b/drivers/vfio/platform/vfio_platform_common.c
+> index 6af7ce7d619c25..256f55b84e70a0 100644
+> --- a/drivers/vfio/platform/vfio_platform_common.c
+> +++ b/drivers/vfio/platform/vfio_platform_common.c
+> @@ -642,7 +642,6 @@ static int vfio_platform_of_probe(struct
+> vfio_platform_device *vdev,
+>  int vfio_platform_probe_common(struct vfio_platform_device *vdev,
+>  			       struct device *dev)
+>  {
+> -	struct iommu_group *group;
+>  	int ret;
+>=20
+>  	vfio_init_group_dev(&vdev->vdev, dev, &vfio_platform_ops);
+> @@ -663,24 +662,15 @@ int vfio_platform_probe_common(struct
+> vfio_platform_device *vdev,
+>  		goto out_uninit;
+>  	}
+>=20
+> -	group =3D vfio_iommu_group_get(dev);
+> -	if (!group) {
+> -		dev_err(dev, "No IOMMU group for device %s\n", vdev-
+> >name);
+> -		ret =3D -EINVAL;
+> -		goto put_reset;
+> -	}
+> -
+>  	ret =3D vfio_register_group_dev(&vdev->vdev);
+>  	if (ret)
+> -		goto put_iommu;
+> +		goto put_reset;
+>=20
+>  	mutex_init(&vdev->igate);
+>=20
+>  	pm_runtime_enable(dev);
+>  	return 0;
+>=20
+> -put_iommu:
+> -	vfio_iommu_group_put(group, dev);
+>  put_reset:
+>  	vfio_platform_put_reset(vdev);
+>  out_uninit:
+> @@ -696,7 +686,6 @@ void vfio_platform_remove_common(struct
+> vfio_platform_device *vdev)
+>  	pm_runtime_disable(vdev->device);
+>  	vfio_platform_put_reset(vdev);
+>  	vfio_uninit_group_dev(&vdev->vdev);
+> -	vfio_iommu_group_put(vdev->vdev.dev->iommu_group, vdev-
+> >vdev.dev);
+>  }
+>  EXPORT_SYMBOL_GPL(vfio_platform_remove_common);
+>=20
+> diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
+> index 3c034fe14ccb03..b39da9b90c95bc 100644
+> --- a/drivers/vfio/vfio.c
+> +++ b/drivers/vfio/vfio.c
+> @@ -169,15 +169,7 @@ static void vfio_release_device_set(struct
+> vfio_device *device)
+>  	xa_unlock(&vfio_device_set_xa);
+>  }
+>=20
+> -/*
+> - * vfio_iommu_group_{get,put} are only intended for VFIO bus driver prob=
+e
+> - * and remove functions, any use cases other than acquiring the first
+> - * reference for the purpose of calling vfio_register_group_dev() or
+> removing
+> - * that symmetric reference after vfio_unregister_group_dev() should use
+> the raw
+> - * iommu_group_{get,put} functions.  In particular, vfio_iommu_group_put=
+()
+> - * removes the device from the dummy group and cannot be nested.
+> - */
+> -struct iommu_group *vfio_iommu_group_get(struct device *dev)
+> +static struct iommu_group *vfio_iommu_group_get(struct device *dev)
+>  {
+>  	struct iommu_group *group;
+>  	int __maybe_unused ret;
+> @@ -220,18 +212,6 @@ struct iommu_group *vfio_iommu_group_get(struct
+> device *dev)
+>=20
+>  	return group;
+>  }
+> -EXPORT_SYMBOL_GPL(vfio_iommu_group_get);
+> -
+> -void vfio_iommu_group_put(struct iommu_group *group, struct device
+> *dev)
+> -{
+> -#ifdef CONFIG_VFIO_NOIOMMU
+> -	if (iommu_group_get_iommudata(group) =3D=3D &noiommu)
+> -		iommu_group_remove_device(dev);
+> -#endif
+> -
+> -	iommu_group_put(group);
+> -}
+> -EXPORT_SYMBOL_GPL(vfio_iommu_group_put);
+>=20
+>  #ifdef CONFIG_VFIO_NOIOMMU
+>  static void *vfio_noiommu_open(unsigned long arg)
+> @@ -841,7 +821,7 @@ int vfio_register_group_dev(struct vfio_device
+> *device)
+>  	if (!device->dev_set)
+>  		vfio_assign_device_set(device, device);
+>=20
+> -	iommu_group =3D iommu_group_get(device->dev);
+> +	iommu_group =3D vfio_iommu_group_get(device->dev);
+>  	if (!iommu_group)
+>  		return -EINVAL;
+>=20
+> @@ -849,6 +829,10 @@ int vfio_register_group_dev(struct vfio_device
+> *device)
+>  	if (!group) {
+>  		group =3D vfio_create_group(iommu_group);
+>  		if (IS_ERR(group)) {
+> +#ifdef CONFIG_VFIO_NOIOMMU
+> +			if (iommu_group_get_iommudata(iommu_group) =3D=3D
+> &noiommu)
+> +				iommu_group_remove_device(device->dev);
+> +#endif
+>  			iommu_group_put(iommu_group);
+>  			return PTR_ERR(group);
+>  		}
+> @@ -865,6 +849,10 @@ int vfio_register_group_dev(struct vfio_device
+> *device)
+>  		dev_WARN(device->dev, "Device already exists on
+> group %d\n",
+>  			 iommu_group_id(iommu_group));
+>  		vfio_device_put(existing_device);
+> +#ifdef CONFIG_VFIO_NOIOMMU
+> +		if (iommu_group_get_iommudata(iommu_group) =3D=3D
+> &noiommu)
+> +			iommu_group_remove_device(device->dev);
+> +#endif
+>  		vfio_group_put(group);
+>  		return -EBUSY;
+>  	}
+> @@ -1010,6 +998,10 @@ void vfio_unregister_group_dev(struct vfio_device
+> *device)
+>  	if (list_empty(&group->device_list))
+>  		wait_event(group->container_q, !group->container);
+>=20
+> +#ifdef CONFIG_VFIO_NOIOMMU
+> +	if (iommu_group_get_iommudata(group) =3D=3D &noiommu)
+> +		iommu_group_remove_device(dev);
+> +#endif
+>  	/* Matches the get in vfio_register_group_dev() */
+>  	vfio_group_put(group);
+>  }
+> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+> index b53a9557884ada..f7083c2fd0d099 100644
+> --- a/include/linux/vfio.h
+> +++ b/include/linux/vfio.h
+> @@ -71,9 +71,6 @@ struct vfio_device_ops {
+>  	int	(*match)(struct vfio_device *vdev, char *buf);
+>  };
+>=20
+> -extern struct iommu_group *vfio_iommu_group_get(struct device *dev);
+> -extern void vfio_iommu_group_put(struct iommu_group *group, struct
+> device *dev);
+> -
+>  void vfio_init_group_dev(struct vfio_device *device, struct device *dev,
+>  			 const struct vfio_device_ops *ops);
+>  void vfio_uninit_group_dev(struct vfio_device *device);
 > --
-> Best Regards,
-> Colin Xu
-> 
+> 2.30.2
 
