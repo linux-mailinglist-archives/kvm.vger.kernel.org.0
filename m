@@ -2,35 +2,35 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EAAB83F9BF9
-	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 17:52:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 247583F9BFD
+	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 17:52:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245498AbhH0PvS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Aug 2021 11:51:18 -0400
-Received: from smtp-fw-6002.amazon.com ([52.95.49.90]:58648 "EHLO
-        smtp-fw-6002.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244479AbhH0PvQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Aug 2021 11:51:16 -0400
+        id S245512AbhH0Pv2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Aug 2021 11:51:28 -0400
+Received: from smtp-fw-9102.amazon.com ([207.171.184.29]:46050 "EHLO
+        smtp-fw-9102.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S245509AbhH0Pv1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Aug 2021 11:51:27 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1630079429; x=1661615429;
+  t=1630079438; x=1661615438;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=xieo1ZKuUc8N7m/sy5itB97U9T9zjjhdkDZEtFWNniE=;
-  b=joOiv2viorMXfKyMRegsAAqhMr8b6EMgotF0r9jq1+1Lr4Ow1HyhMCGI
-   RX3JiHhjKBDnivTaY4JTKH0QLNwuhE+5OeggXdjjA5872rwfQkKIazlqJ
-   9O5JN0w3D7VzxH1aKYpmAsu3fb43kqK+5MR1iCJEzflCUXIEvNVy9Iu5G
-   Y=;
+  bh=i0j/X6GVx88IEMduyTxlPnzYI3HNiRgbOvXelXh/NoM=;
+  b=S4B5YNbXuMwkOsmU254+UiKjrdE49emrT47idKYJIvLHgPDUkboPTv3I
+   TgYYIpV4B3E/Yi1VQczYPiWbFZbRWD4MWNcXKj8BmfhRXvxMKKW2GceiC
+   JhxEDkIKA0N9uKI7zJAWpI537TSw0LGdALBEsfgSXtokjWOFae8Oyn24R
+   M=;
 X-IronPort-AV: E=Sophos;i="5.84,357,1620691200"; 
-   d="scan'208";a="135809784"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-2b-8cc5d68b.us-west-2.amazon.com) ([10.43.8.2])
-  by smtp-border-fw-6002.iad6.amazon.com with ESMTP; 27 Aug 2021 15:50:27 +0000
-Received: from EX13D16EUB003.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
-        by email-inbound-relay-2b-8cc5d68b.us-west-2.amazon.com (Postfix) with ESMTPS id 05279A2C74;
-        Fri, 27 Aug 2021 15:50:25 +0000 (UTC)
+   d="scan'208";a="155652121"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-2b-859fe132.us-west-2.amazon.com) ([10.25.36.214])
+  by smtp-border-fw-9102.sea19.amazon.com with ESMTP; 27 Aug 2021 15:50:32 +0000
+Received: from EX13D16EUB003.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
+        by email-inbound-relay-2b-859fe132.us-west-2.amazon.com (Postfix) with ESMTPS id 5161A2202AF;
+        Fri, 27 Aug 2021 15:50:31 +0000 (UTC)
 Received: from 38f9d34ed3b1.ant.amazon.com (10.43.162.52) by
  EX13D16EUB003.ant.amazon.com (10.43.166.99) with Microsoft SMTP Server (TLS)
- id 15.0.1497.23; Fri, 27 Aug 2021 15:50:18 +0000
+ id 15.0.1497.23; Fri, 27 Aug 2021 15:50:24 +0000
 From:   Andra Paraschiv <andraprs@amazon.com>
 To:     linux-kernel <linux-kernel@vger.kernel.org>
 CC:     Alexandru Ciobotaru <alcioa@amazon.com>,
@@ -44,9 +44,9 @@ CC:     Alexandru Ciobotaru <alcioa@amazon.com>,
         kvm <kvm@vger.kernel.org>,
         ne-devel-upstream <ne-devel-upstream@amazon.com>,
         Andra Paraschiv <andraprs@amazon.com>
-Subject: [PATCH v3 6/7] nitro_enclaves: Add fixes for checkpatch spell check reports
-Date:   Fri, 27 Aug 2021 18:49:29 +0300
-Message-ID: <20210827154930.40608-7-andraprs@amazon.com>
+Subject: [PATCH v3 7/7] nitro_enclaves: Add fixes for checkpatch blank line reports
+Date:   Fri, 27 Aug 2021 18:49:30 +0300
+Message-ID: <20210827154930.40608-8-andraprs@amazon.com>
 X-Mailer: git-send-email 2.20.1 (Apple Git-117)
 In-Reply-To: <20210827154930.40608-1-andraprs@amazon.com>
 References: <20210827154930.40608-1-andraprs@amazon.com>
@@ -60,8 +60,9 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Fix the typos in the words spelling as per the checkpatch script
-reports.
+Remove blank lines that are not necessary, fixing the checkpatch script
+reports. While at it, add a blank line after the switch default block,
+similar to the other parts of the codebase.
 
 Signed-off-by: Andra Paraschiv <andraprs@amazon.com>
 ---
@@ -76,79 +77,31 @@ v2 -> v3
 
 * Move changelog after the "---" line.
 ---
- include/uapi/linux/nitro_enclaves.h      | 10 +++++-----
- samples/nitro_enclaves/ne_ioctl_sample.c |  4 ++--
- 2 files changed, 7 insertions(+), 7 deletions(-)
+ samples/nitro_enclaves/ne_ioctl_sample.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/include/uapi/linux/nitro_enclaves.h b/include/uapi/linux/nitro_enclaves.h
-index b945073fe544d..e808f5ba124d4 100644
---- a/include/uapi/linux/nitro_enclaves.h
-+++ b/include/uapi/linux/nitro_enclaves.h
-@@ -1,6 +1,6 @@
- /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
- /*
-- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-+ * Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-  */
- 
- #ifndef _UAPI_LINUX_NITRO_ENCLAVES_H_
-@@ -60,7 +60,7 @@
-  *
-  * Context: Process context.
-  * Return:
-- * * 0					- Logic succesfully completed.
-+ * * 0					- Logic successfully completed.
-  * *  -1				- There was a failure in the ioctl logic.
-  * On failure, errno is set to:
-  * * EFAULT				- copy_from_user() / copy_to_user() failure.
-@@ -95,7 +95,7 @@
-  *
-  * Context: Process context.
-  * Return:
-- * * 0				- Logic succesfully completed.
-+ * * 0				- Logic successfully completed.
-  * *  -1			- There was a failure in the ioctl logic.
-  * On failure, errno is set to:
-  * * EFAULT			- copy_from_user() / copy_to_user() failure.
-@@ -118,7 +118,7 @@
-  *
-  * Context: Process context.
-  * Return:
-- * * 0					- Logic succesfully completed.
-+ * * 0					- Logic successfully completed.
-  * *  -1				- There was a failure in the ioctl logic.
-  * On failure, errno is set to:
-  * * EFAULT				- copy_from_user() failure.
-@@ -161,7 +161,7 @@
-  *
-  * Context: Process context.
-  * Return:
-- * * 0					- Logic succesfully completed.
-+ * * 0					- Logic successfully completed.
-  * *  -1				- There was a failure in the ioctl logic.
-  * On failure, errno is set to:
-  * * EFAULT				- copy_from_user() / copy_to_user() failure.
 diff --git a/samples/nitro_enclaves/ne_ioctl_sample.c b/samples/nitro_enclaves/ne_ioctl_sample.c
-index 480b763142b34..6a60990b2e202 100644
+index 6a60990b2e202..765b131c73190 100644
 --- a/samples/nitro_enclaves/ne_ioctl_sample.c
 +++ b/samples/nitro_enclaves/ne_ioctl_sample.c
-@@ -1,6 +1,6 @@
- // SPDX-License-Identifier: GPL-2.0
- /*
-- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-+ * Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-  */
- 
- /**
-@@ -638,7 +638,7 @@ static int ne_start_enclave(int enclave_fd,  struct ne_enclave_start_info *encla
+@@ -185,7 +185,6 @@ static int ne_create_vm(int ne_dev_fd, unsigned long *slot_uid, int *enclave_fd)
+ 	return 0;
  }
  
+-
  /**
-- * ne_start_enclave_check_booted() - Start the enclave and wait for a hearbeat
-+ * ne_start_enclave_check_booted() - Start the enclave and wait for a heartbeat
-  *				     from it, on a newly created vsock channel,
-  *				     to check it has booted.
-  * @enclave_fd :	The file descriptor associated with the enclave.
+  * ne_poll_enclave_fd() - Thread function for polling the enclave fd.
+  * @data:	Argument provided for the polling function.
+@@ -560,8 +559,8 @@ static int ne_add_vcpu(int enclave_fd, unsigned int *vcpu_id)
+ 
+ 		default:
+ 			printf("Error in add vcpu [%m]\n");
+-
+ 		}
++
+ 		return rc;
+ 	}
+ 
 -- 
 2.20.1 (Apple Git-117)
 
