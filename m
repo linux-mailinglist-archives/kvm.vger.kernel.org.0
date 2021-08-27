@@ -2,348 +2,274 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 725E63F9F06
-	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 20:40:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 80BD43F9FA4
+	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 21:10:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230111AbhH0SlY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Aug 2021 14:41:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50656 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229882AbhH0SlX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Aug 2021 14:41:23 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B09BC061757;
-        Fri, 27 Aug 2021 11:40:34 -0700 (PDT)
-Received: from zn.tnic (p200300ec2f111700cf40790d4c46ba75.dip0.t-ipconnect.de [IPv6:2003:ec:2f11:1700:cf40:790d:4c46:ba75])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 842FF1EC0464;
-        Fri, 27 Aug 2021 20:40:28 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1630089628;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=6NhP3vMH5lATgbr/qa6Fg8YH0/Kap+rPek8c5UwiIt8=;
-        b=ddARyS0cWg2k1gFCk02lIWfxXSvg/bvocKhn2aoj0uhIEKswfLmKtKUr/LrzjXBR9PwvgR
-        xfndRLWSkMJ8Dtk31vwwf0vbFZJ48Xgj7nNoDh8jnfp0gg9WIrGfx23FgS5+cjg5TzYOm+
-        ELRKRVgcYHOyYv6Wzcftep4P2cXSTAI=
-Date:   Fri, 27 Aug 2021 20:41:10 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        id S231127AbhH0TK0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Aug 2021 15:10:26 -0400
+Received: from mail.efficios.com ([167.114.26.124]:53444 "EHLO
+        mail.efficios.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230446AbhH0TKZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Aug 2021 15:10:25 -0400
+Received: from localhost (localhost [127.0.0.1])
+        by mail.efficios.com (Postfix) with ESMTP id 35CF8381D4D;
+        Fri, 27 Aug 2021 15:09:35 -0400 (EDT)
+Received: from mail.efficios.com ([127.0.0.1])
+        by localhost (mail03.efficios.com [127.0.0.1]) (amavisd-new, port 10032)
+        with ESMTP id bdpbmavpTcDf; Fri, 27 Aug 2021 15:09:34 -0400 (EDT)
+Received: from localhost (localhost [127.0.0.1])
+        by mail.efficios.com (Postfix) with ESMTP id 70AB2381CCB;
+        Fri, 27 Aug 2021 15:09:34 -0400 (EDT)
+DKIM-Filter: OpenDKIM Filter v2.10.3 mail.efficios.com 70AB2381CCB
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=efficios.com;
+        s=default; t=1630091374;
+        bh=a+xsJEpOCH31ksEHBk6kwF1tUR+tILdkL5tisWRdxI0=;
+        h=Date:From:To:Message-ID:MIME-Version;
+        b=cZCl7fQ/RTUAu0JMKb52619qhmst5OKPbEtnktbVMX/PIHufPwNIz98Ws9VY3/hy4
+         tL/OEN4pzYr3Qp9c6LsakEcVPL42DmIBvwb0DHeXYpf+36mtzHghXaDhPpzwd132KK
+         hEGDyCXfz7EzVSVP6SPQEDmeEGlUwzPCYdoSc1QaK5k5qgXsewClns9NDZ5b/ANSk9
+         QAIBXoJdR3MOeo9N8iFtFpTi7L41mC/UV6LCTb8bhnUV6jRlXRnwh3eKkShIA/awvz
+         X6y/j+YsW2oArKIqHNlYlgPu+EvmE4w8fkZeC4LXw6VXW0bGAFOxuNvAsFq0SA9oq1
+         ckDQ0iaaY4cpQ==
+X-Virus-Scanned: amavisd-new at efficios.com
+Received: from mail.efficios.com ([127.0.0.1])
+        by localhost (mail03.efficios.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id nRsCb8Qy1cNv; Fri, 27 Aug 2021 15:09:34 -0400 (EDT)
+Received: from mail03.efficios.com (mail03.efficios.com [167.114.26.124])
+        by mail.efficios.com (Postfix) with ESMTP id 3381D381E39;
+        Fri, 27 Aug 2021 15:09:34 -0400 (EDT)
+Date:   Fri, 27 Aug 2021 15:09:34 -0400 (EDT)
+From:   Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     dvhart <dvhart@infradead.org>,
+        "Russell King, ARM Linux" <linux@armlinux.org.uk>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Guo Ren <guoren@kernel.org>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Heiko Carstens <hca@linux.ibm.com>, gor <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        rostedt <rostedt@goodmis.org>, Ingo Molnar <mingo@redhat.com>,
+        Oleg Nesterov <oleg@redhat.com>,
         Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
         Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH Part1 v5 34/38] x86/sev: Add snp_msg_seqno() helper
-Message-ID: <YSkxxkVdupkyxAJi@zn.tnic>
-References: <20210820151933.22401-1-brijesh.singh@amd.com>
- <20210820151933.22401-35-brijesh.singh@amd.com>
+        Andy Lutomirski <luto@kernel.org>,
+        paulmck <paulmck@kernel.org>, Boqun Feng <boqun.feng@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, shuah <shuah@kernel.org>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        linux-csky <linux-csky@vger.kernel.org>,
+        linux-mips <linux-mips@vger.kernel.org>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>,
+        linux-kselftest <linux-kselftest@vger.kernel.org>,
+        Peter Foley <pefoley@google.com>,
+        Shakeel Butt <shakeelb@google.com>,
+        Ben Gardon <bgardon@google.com>
+Message-ID: <339641531.29941.1630091374065.JavaMail.zimbra@efficios.com>
+In-Reply-To: <YSgpy8iXXXUQ+b/k@google.com>
+References: <20210820225002.310652-1-seanjc@google.com> <20210820225002.310652-5-seanjc@google.com> <766990430.21713.1629731934069.JavaMail.zimbra@efficios.com> <282257549.21721.1629732017655.JavaMail.zimbra@efficios.com> <YSblqrrpKcORzilX@google.com> <1700758714.29394.1630003332081.JavaMail.zimbra@efficios.com> <YSgpy8iXXXUQ+b/k@google.com>
+Subject: Re: [PATCH v2 4/5] KVM: selftests: Add a test for KVM_RUN+rseq to
+ detect task migration bugs
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20210820151933.22401-35-brijesh.singh@amd.com>
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [167.114.26.124]
+X-Mailer: Zimbra 8.8.15_GA_4101 (ZimbraWebClient - FF91 (Linux)/8.8.15_GA_4059)
+Thread-Topic: selftests: Add a test for KVM_RUN+rseq to detect task migration bugs
+Thread-Index: Cat4/nZnF/JdYT0CBeoaNK9t7xzyjQ==
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 20, 2021 at 10:19:29AM -0500, Brijesh Singh wrote:
-> The SNP guest request message header contains a message count. The
-> message count is used while building the IV. The PSP firmware increments
-> the message count by 1, and expects that next message will be using the
-> incremented count. The snp_msg_seqno() helper will be used by driver to
-> get the message sequence counter used in the request message header,
-> and it will be automatically incremented after the request is successful.
-> The incremented value is saved in the secrets page so that the kexec'ed
-> kernel knows from where to begin.
+
+
+----- On Aug 26, 2021, at 7:54 PM, Sean Christopherson seanjc@google.com wrote:
+
+> On Thu, Aug 26, 2021, Mathieu Desnoyers wrote:
+>> ----- On Aug 25, 2021, at 8:51 PM, Sean Christopherson seanjc@google.com wrote:
+>> >> >> +		r = sched_setaffinity(0, sizeof(allowed_mask), &allowed_mask);
+>> >> >> +		TEST_ASSERT(!r, "sched_setaffinity failed, errno = %d (%s)",
+>> >> >> +			    errno, strerror(errno));
+>> >> >> +		atomic_inc(&seq_cnt);
+>> >> >> +
+>> >> >> +		CPU_CLR(cpu, &allowed_mask);
+>> >> >> +
+>> >> >> +		/*
+>> >> >> +		 * Let the read-side get back into KVM_RUN to improve the odds
+>> >> >> +		 * of task migration coinciding with KVM's run loop.
+>> >> > 
+>> >> > This comment should be about increasing the odds of letting the seqlock
+>> >> > read-side complete. Otherwise, the delay between the two back-to-back
+>> >> > atomic_inc is so small that the seqlock read-side may never have time to
+>> >> > complete the reading the rseq cpu id and the sched_getcpu() call, and can
+>> >> > retry forever.
+>> > 
+>> > Hmm, but that's not why there's a delay.  I'm not arguing that a livelock isn't
+>> > possible (though that syscall would have to be screaming fast),
+>> 
+>> I don't think we have the same understanding of the livelock scenario. AFAIU the
+>> livelock
+>> would be caused by a too-small delay between the two consecutive atomic_inc()
+>> from one
+>> loop iteration to the next compared to the time it takes to perform a read-side
+>> critical
+>> section of the seqlock. Back-to-back atomic_inc can be performed very quickly,
+>> so I
+>> doubt that the sched_getcpu implementation have good odds to be fast enough to
+>> complete
+>> in that narrow window, leading to lots of read seqlock retry.
 > 
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> ---
->  arch/x86/kernel/sev.c     | 79 +++++++++++++++++++++++++++++++++++++++
->  include/linux/sev-guest.h | 37 ++++++++++++++++++
->  2 files changed, 116 insertions(+)
+> Ooooh, yeah, brain fart on my side.  I was thinking of the two atomic_inc() in
+> the
+> same loop iteration and completely ignoring the next iteration.  Yes, I 100%
+> agree
+> that a delay to ensure forward progress is needed.  An assertion in main() that
+> the
+> reader complete at least some reasonable number of KVM_RUNs is also probably a
+> good
+> idea, e.g. to rule out a false pass due to the reader never making forward
+> progress.
+
+Agreed.
+
 > 
-> diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
-> index 319a40fc57ce..f42cd5a8e7bb 100644
-> --- a/arch/x86/kernel/sev.c
-> +++ b/arch/x86/kernel/sev.c
-> @@ -51,6 +51,8 @@ static struct ghcb boot_ghcb_page __bss_decrypted __aligned(PAGE_SIZE);
->   */
->  static struct ghcb __initdata *boot_ghcb;
->  
+> FWIW, the do-while loop does make forward progress without a delay, but at ~50%
+> throughput, give or take.
 
-Explain what that is in a comment above it.
+I did not expect absolutely no progress, but a significant slow down of
+the read-side.
 
-> +static u64 snp_secrets_phys;
-
-snp_secrets_pa;
-
-is the usual convention when a variable is supposed to contain a
-physical address.
-
-> +
->  /* #VC handler runtime per-CPU data */
->  struct sev_es_runtime_data {
->  	struct ghcb ghcb_page;
-> @@ -2030,6 +2032,80 @@ bool __init handle_vc_boot_ghcb(struct pt_regs *regs)
->  		halt();
->  }
->  
-> +static struct snp_secrets_page_layout *snp_map_secrets_page(void)
-> +{
-> +	u16 __iomem *secrets;
-> +
-> +	if (!snp_secrets_phys || !sev_feature_enabled(SEV_SNP))
-> +		return NULL;
-> +
-> +	secrets = ioremap_encrypted(snp_secrets_phys, PAGE_SIZE);
-> +	if (!secrets)
-> +		return NULL;
-> +
-> +	return (struct snp_secrets_page_layout *)secrets;
-> +}
-
-Or simply:
-
-static struct snp_secrets_page_layout *map_secrets_page(void)
-{
-        if (!snp_secrets_phys || !sev_feature_enabled(SEV_SNP))
-                return NULL;
-                
-        return ioremap_encrypted(snp_secrets_phys, PAGE_SIZE);
-}
-
-?
-
-> +
-> +static inline u64 snp_read_msg_seqno(void)
-
-Drop that "snp_" prefix from all those static function names. This one
-is even inline, which means its name doesn't matter at all.
-
-> +{
-> +	struct snp_secrets_page_layout *layout;
-> +	u64 count;
-> +
-> +	layout = snp_map_secrets_page();
-> +	if (!layout)
-> +		return 0;
-> +
-> +	/* Read the current message sequence counter from secrets pages */
-> +	count = readl(&layout->os_area.msg_seqno_0);
-> +
-> +	iounmap(layout);
-> +
-> +	/* The sequence counter must begin with 1 */
-
-That sounds weird. Why? 0 is special?
-
-> +	if (!count)
-> +		return 1;
-> +
-> +	return count + 1;
-> +}
-> +
-> +u64 snp_msg_seqno(void)
-
-Function name needs a verb. I.e.,
-
-	 snp_get_msg_seqno()
-
-> +{
-> +	u64 count = snp_read_msg_seqno();
-> +
-> +	if (unlikely(!count))
-
-That looks like a left-over from a previous version as it can't happen.
-
-Or are you handling the case where the u64 count will wraparound to 0?
-
-But "The sequence counter must begin with 1" so that read function above
-needs more love.
-
-> +		return 0;
-
-
-> +
-> +	/*
-> +	 * The message sequence counter for the SNP guest request is a
-> +	 * 64-bit value but the version 2 of GHCB specification defines a
-> +	 * 32-bit storage for the it.
-> +	 */
-> +	if (count >= UINT_MAX)
-> +		return 0;
-
-Huh, WTF? So when the internal counter goes over u32, this function will
-return 0 only? More weird.
-
-> +
-> +	return count;
-> +}
-> +EXPORT_SYMBOL_GPL(snp_msg_seqno);
-> +
-> +static void snp_gen_msg_seqno(void)
-
-That's not "gen" - that's "inc" what this function does. IOW,
-
-	snp_inc_msg_seqno
-
-> +{
-> +	struct snp_secrets_page_layout *layout;
-> +	u64 count;
-> +
-> +	layout = snp_map_secrets_page();
-> +	if (!layout)
-> +		return;
-> +
-> +	/*
-> +	 * The counter is also incremented by the PSP, so increment it by 2
-> +	 * and save in secrets page.
-> +	 */
-> +	count = readl(&layout->os_area.msg_seqno_0);
-> +	count += 2;
-> +
-> +	writel(count, &layout->os_area.msg_seqno_0);
-> +	iounmap(layout);
-
-Why does this need to constantly map and unmap the secrets page? Why
-don't you map it once on init and unmap it on exit?
-
-> +}
-> +
->  int snp_issue_guest_request(int type, struct snp_guest_request_data *input, unsigned long *fw_err)
->  {
->  	struct ghcb_state state;
-> @@ -2077,6 +2153,9 @@ int snp_issue_guest_request(int type, struct snp_guest_request_data *input, unsi
->  		ret = -EIO;
->  	}
->  
-> +	/* The command was successful, increment the sequence counter */
-> +	snp_gen_msg_seqno();
-> +
->  e_put:
->  	__sev_put_ghcb(&state);
->  e_restore_irq:
-> diff --git a/include/linux/sev-guest.h b/include/linux/sev-guest.h
-> index 24dd17507789..16b6af24fda7 100644
-> --- a/include/linux/sev-guest.h
-> +++ b/include/linux/sev-guest.h
-> @@ -20,6 +20,41 @@ enum vmgexit_type {
->  	GUEST_REQUEST_MAX
->  };
->  
-> +/*
-> + * The secrets page contains 96-bytes of reserved field that can be used by
-> + * the guest OS. The guest OS uses the area to save the message sequence
-> + * number for each VMPCK.
-> + *
-> + * See the GHCB spec section Secret page layout for the format for this area.
-> + */
-> +struct secrets_os_area {
-> +	u32 msg_seqno_0;
-> +	u32 msg_seqno_1;
-> +	u32 msg_seqno_2;
-> +	u32 msg_seqno_3;
-> +	u64 ap_jump_table_pa;
-> +	u8 rsvd[40];
-> +	u8 guest_usage[32];
-> +} __packed;
-
-So those are differently named there:
-
-struct secrets_page_os_area {
-	uint32 vmpl0_message_seq_num;
-	uint32 vmpl1_message_seq_num;
-	...
-
-and they have "vmpl" in there which makes a lot more sense for that
-they're used than msg_seqno_* does.
-
-> +
-> +#define VMPCK_KEY_LEN		32
-> +
-> +/* See the SNP spec for secrets page format */
-> +struct snp_secrets_page_layout {
-
-Simply
-
-	struct snp_secrets
-
-That name says all you need to know about what that struct represents.
-
-> +	u32 version;
-> +	u32 imien	: 1,
-> +	    rsvd1	: 31;
-> +	u32 fms;
-> +	u32 rsvd2;
-> +	u8 gosvw[16];
-> +	u8 vmpck0[VMPCK_KEY_LEN];
-> +	u8 vmpck1[VMPCK_KEY_LEN];
-> +	u8 vmpck2[VMPCK_KEY_LEN];
-> +	u8 vmpck3[VMPCK_KEY_LEN];
-> +	struct secrets_os_area os_area;
-
-My SNP spec copy has here
-
-0A0h–FFFh	Reserved.
-
-and no os area. I guess
-
-SEV Secure Nested Paging Firmware ABI Specification 56860 Rev. 0.8 August 2020
-
-needs updating...
-
-> +	u8 rsvd3[3840];
-> +} __packed;
-> +
->  /*
->   * The error code when the data_npages is too small. The error code
->   * is defined in the GHCB specification.
-> @@ -36,6 +71,7 @@ struct snp_guest_request_data {
->  #ifdef CONFIG_AMD_MEM_ENCRYPT
->  int snp_issue_guest_request(int vmgexit_type, struct snp_guest_request_data *input,
->  			    unsigned long *fw_err);
-> +u64 snp_msg_seqno(void);
->  #else
->  
->  static inline int snp_issue_guest_request(int type, struct snp_guest_request_data *input,
-> @@ -43,6 +79,7 @@ static inline int snp_issue_guest_request(int type, struct snp_guest_request_dat
->  {
->  	return -ENODEV;
->  }
-> +static inline u64 snp_msg_seqno(void) { return 0; }
->  
->  #endif /* CONFIG_AMD_MEM_ENCRYPT */
->  #endif /* __LINUX_SEV_GUEST_H__ */
-> -- 
-> 2.17.1
 > 
+>> > but the primary motivation is very much to allow the read-side enough time
+>> > to get back into KVM proper.
+>> 
+>> I'm puzzled by your statement. AFAIU, let's say we don't have the delay, then we
+>> have:
+>> 
+>> migration thread                             KVM_RUN/read-side thread
+>> -----------------------------------------------------------------------------------
+>>                                              - ioctl(KVM_RUN)
+>> - atomic_inc_seq_cst(&seqcnt)
+>> - sched_setaffinity
+>> - atomic_inc_seq_cst(&seqcnt)
+>>                                              - a = atomic_load(&seqcnt) & ~1
+>>                                              - smp_rmb()
+>>                                              - b = LOAD_ONCE(__rseq_abi->cpu_id);
+>>                                              - sched_getcpu()
+>>                                              - smp_rmb()
+>>                                              - re-load seqcnt/compare (succeeds)
+>>                                                - Can only succeed if entire read-side happens while the seqcnt
+>>                                                  is in an even numbered state.
+>>                                              - if (a != b) abort()
+>>   /* no delay. Even counter state is very
+>>      short. */
+>> - atomic_inc_seq_cst(&seqcnt)
+>>   /* Let's suppose the lack of delay causes the
+>>      setaffinity to complete too early compared
+>>      with KVM_RUN ioctl */
+>> - sched_setaffinity
+>> - atomic_inc_seq_cst(&seqcnt)
+>> 
+>>   /* no delay. Even counter state is very
+>>      short. */
+>> - atomic_inc_seq_cst(&seqcnt)
+>>   /* Then a setaffinity from a following
+>>      migration thread loop will run
+>>      concurrently with KVM_RUN */
+>>                                              - ioctl(KVM_RUN)
+>> - sched_setaffinity
+>> - atomic_inc_seq_cst(&seqcnt)
+>> 
+>> As pointed out here, if the first setaffinity runs too early compared with
+>> KVM_RUN,
+>> a following setaffinity will run concurrently with it. However, the fact that
+>> the even counter state is very short may very well hurt progress of the read
+>> seqlock.
+> 
+> *sigh*
+> 
+> Several hours later, I think I finally have my head wrapped around everything.
+> 
+> Due to the way the test is written and because of how KVM's run loop works,
+> TIF_NOTIFY_RESUME or TIF_NEED_RESCHED effectively has to be set before KVM
+> actually
+> enters the guest, otherwise KVM will exit to userspace without touching the
+> flag,
+> i.e. it will be handled by the normal exit_to_user_mode_loop().
+> 
+> Where I got lost was trying to figure out why I couldn't make the bug reproduce
+> by
+> causing the guest to exit to KVM, but not userspace, in which case KVM should
+> easily trigger the problematic flow as the window for sched_getcpu() to collide
+> with KVM would be enormous.  The reason I didn't go down this route for the
+> "official" test is that, unless there's something clever I'm overlooking, it
+> requires arch specific guest code, and ialso I don't know that forcing an exit
+> would even be necessary/sufficient on other architectures.
+> 
+> Anyways, I was trying to confirm that the bug was being hit without a delay,
+> while
+> still retaining the sequence retry in the test.  The test doesn't fail because
+> the
+> back-to-back atomic_inc() changes seqcnt too fast.  The read-side makes forward
+> progress, but it never observes failure because the do-while loop only ever
+> completes after another sched_setaffinity(), never after the one that collides
+> with KVM because it takes too long to get out of ioctl(KVM_RUN) and back to the
+> test.  I.e. the atomic_inc() in the next loop iteration (makes seq_cnt odd)
+> always
+> completes before the check, and so the check ends up spinning until another
+> migration, which correctly updates rseq.  This was expected and didn't confuse
+> me.
+> 
+> What confused me is that I was trying to confirm the bug was being hit from
+> within
+> the kernel by confirming KVM observed TIF_NOTIFY_RESUME, but I misunderstood
+> when
+> TIF_NOTIFY_RESUME would get set.  KVM can observe TIF_NOTIFY_RESUME directly,
+> but
+> it's rare, and I suspect happens iff sched_setaffinity() hits the small window
+> where
+> it collides with KVM_RUN before KVM enters the guest.
+> 
+> More commonly, the bug occurs when KVM sees TIF_NEED_RESCHED.  In that case, KVM
+> calls xfer_to_guest_mode_work(), which does schedule() and _that_ sets
+> TIF_NOTIFY_RESUME.  xfer_to_guest_mode_work() then mishandles TIF_NOTIFY_RESUME
+> and the bug is hit, but my confirmation logic in KVM never fired.
+> 
+> So there are effectively three reasons we want a delay:
+> 
+>  1. To allow sched_setaffinity() to coincide with ioctl(KVM_RUN) before KVM can
+>     enter the guest so that the guest doesn't need an arch-specific VM-Exit source.
+> 
+>  2. To let ioctl(KVM_RUN) make its way back to the test before the next round
+>     of migration.
+> 
+>  3. To ensure the read-side can make forward progress, e.g. if sched_getcpu()
+>     involves a syscall.
+> 
+> 
+> After looking at KVM for arm64 and s390, #1 is a bit tenuous because x86 is the
+> only arch that currently uses xfer_to_guest_mode_work(), i.e. the test could be
+> tweaked to be overtly x86-specific.  But since a delay is needed for #2 and #3,
+> I'd prefer to rely on it for #1 as well in the hopes that this test provides
+> coverage for arm64 and/or s390 if they're ever converted to use the common
+> xfer_to_guest_mode_work().
+
+Now that we have this understanding of why we need the delay, it would be good to
+write this down in a comment within the test.
+
+Does it reproduce if we randomize the delay to have it picked randomly from 0us
+to 100us (with 1us step) ? It would remove a lot of the needs for arch-specific
+magic delay value.
+
+Thanks,
+
+Mathieu
 
 -- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Mathieu Desnoyers
+EfficiOS Inc.
+http://www.efficios.com
