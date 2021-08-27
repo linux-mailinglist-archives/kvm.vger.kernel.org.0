@@ -2,101 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5036B3F9E96
-	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 20:12:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 51DFB3F9EBA
+	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 20:25:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229762AbhH0SNg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Aug 2021 14:13:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44276 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229478AbhH0SNf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Aug 2021 14:13:35 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86BB6C061757;
-        Fri, 27 Aug 2021 11:12:46 -0700 (PDT)
-Received: from zn.tnic (p200300ec2f111700cf40790d4c46ba75.dip0.t-ipconnect.de [IPv6:2003:ec:2f11:1700:cf40:790d:4c46:ba75])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 027621EC0464;
-        Fri, 27 Aug 2021 20:12:41 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1630087961;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=Hlz/5VHRXOfPhVFm7WimoCOj8La+rdAhYJDH4ZFMWbQ=;
-        b=NZddcriKO1PUvMjPs2tFF605PavVOcGKBCU1BA3MnkZVTgbB73hIPgsXYXdschIR7S1+Lp
-        kdQm5Rj6pCwGGqj0B7lkK3xZ8+th3EqnXfpKqYdxuO+fi1SoVcKXs4VB9adfV8G52RawXN
-        N51VO5jyxZpg3mFRIWfHvwPWB/6fKwY=
-Date:   Fri, 27 Aug 2021 20:13:17 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
+        id S229972AbhH0SZe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Aug 2021 14:25:34 -0400
+Received: from mail.kernel.org ([198.145.29.99]:37464 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229775AbhH0SZd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Aug 2021 14:25:33 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 847C160EFE;
+        Fri, 27 Aug 2021 18:24:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1630088684;
+        bh=GZgUgAVx/dgRddny0IXLMsCZm2xbh6JcZV5htCnbqUA=;
+        h=In-Reply-To:References:Date:From:To:Cc:Subject:From;
+        b=BuztgwPAQ3nWhde5Jc8SzsWaqUn5ics5X6QzE8+3FOMwS/HqFVkxgnJqiSIqVnVog
+         J0Y9v+wAzEV33jtevrSterz0CgKG2iDPNJu8ZloywV3rRPAY17stVwHzbGi6DwQGvP
+         9UOJeFcYuPLT/0mo83z3B09pebo9hYqLUBigD8WoeIuqeueqHRn3+Km1FqBGkMjOLZ
+         kPCNMqkVgbQPTo709ZT/BzrWmCka6sEFw69wDIfTmw65VpxNc5dYioJlLNXQN57v6A
+         3mTYf0PjByelXEBp7t642K9zdc5lmXYdFWqw6b9kLN+Cw02j8VV2+PbkCbfNKF7F6t
+         Y/+oUMZr8v/rw==
+Received: from compute6.internal (compute6.nyi.internal [10.202.2.46])
+        by mailauth.nyi.internal (Postfix) with ESMTP id 85DF627C005B;
+        Fri, 27 Aug 2021 14:24:41 -0400 (EDT)
+Received: from imap2 ([10.202.2.52])
+  by compute6.internal (MEProxy); Fri, 27 Aug 2021 14:24:41 -0400
+X-ME-Sender: <xms:5C0pYa63Z2rI7RdyYDqhX8lrgSjlOajbK3ACaA1C9VooeLrEAuiP_Q>
+    <xme:5C0pYT6ljf1vWbqJFbtM0GPm7LDRThDWdvdVotT1ulca4XUB_Ol_wAdtq5EPow577
+    pnOw2ynZ6SBrZDqc9o>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvtddruddufedguddvgecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+    enucfjughrpefofgggkfgjfhffhffvufgtsehttdertderreejnecuhfhrohhmpedftehn
+    ugihucfnuhhtohhmihhrshhkihdfuceolhhuthhosehkvghrnhgvlhdrohhrgheqnecugg
+    ftrfgrthhtvghrnhepgeejgffhtdelvdefgeefleevtdfgveekuefgkeffvdevfeefteei
+    heeuteevkeefnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrh
+    homheprghnugihodhmvghsmhhtphgruhhthhhpvghrshhonhgrlhhithihqdduudeiudek
+    heeifedvqddvieefudeiiedtkedqlhhuthhopeepkhgvrhhnvghlrdhorhhgsehlihhnuh
+    igrdhluhhtohdruhhs
+X-ME-Proxy: <xmx:5C0pYZdnTUiOWN-5cqz7CAY15qS-yrhctiSXkLpcatNeGt37E159sw>
+    <xmx:5C0pYXIxHgo0r9HNtT3tVg6FFGlkrQH_uxUVitTeI89Iql-viqgfVQ>
+    <xmx:5C0pYeI9oxyAM994QgsUE6SRbjpvco-Bh2rF54yDNMOe3bNeN0YjyA>
+    <xmx:6S0pYZc6wV4T00P8gQKZqY9P8fNgMJMHz6FuSc4SMYgw3Ap78YPr60PTbYM>
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+        id 60531A038A7; Fri, 27 Aug 2021 14:24:36 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.5.0-alpha0-1125-g685cec594c-fm-20210825.001-g685cec59
+Mime-Version: 1.0
+Message-Id: <73319f3c-6f5e-4f39-a678-7be5fddd55f2@www.fastmail.com>
+In-Reply-To: <cfe75e39-5927-c02a-b8bc-4de026bb7b3b@redhat.com>
+References: <20210824005248.200037-1-seanjc@google.com>
+ <307d385a-a263-276f-28eb-4bc8dd287e32@redhat.com>
+ <40af9d25-c854-8846-fdab-13fe70b3b279@kernel.org>
+ <cfe75e39-5927-c02a-b8bc-4de026bb7b3b@redhat.com>
+Date:   Fri, 27 Aug 2021 11:24:13 -0700
+From:   "Andy Lutomirski" <luto@kernel.org>
+To:     "David Hildenbrand" <david@redhat.com>,
+        "Sean Christopherson" <seanjc@google.com>,
+        "Paolo Bonzini" <pbonzini@redhat.com>
+Cc:     "Vitaly Kuznetsov" <vkuznets@redhat.com>,
+        "Wanpeng Li" <wanpengli@tencent.com>,
+        "Jim Mattson" <jmattson@google.com>,
+        "Joerg Roedel" <joro@8bytes.org>, "kvm list" <kvm@vger.kernel.org>,
+        "Linux Kernel Mailing List" <linux-kernel@vger.kernel.org>,
+        "Borislav Petkov" <bp@alien8.de>,
+        "Andrew Morton" <akpm@linux-foundation.org>,
+        "Joerg Roedel" <jroedel@suse.de>,
+        "Andi Kleen" <ak@linux.intel.com>,
+        "David Rientjes" <rientjes@google.com>,
+        "Vlastimil Babka" <vbabka@suse.cz>,
+        "Tom Lendacky" <thomas.lendacky@amd.com>,
+        "Thomas Gleixner" <tglx@linutronix.de>,
+        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
+        "Ingo Molnar" <mingo@redhat.com>,
+        "Varad Gautam" <varad.gautam@suse.com>,
+        "Dario Faggioli" <dfaggioli@suse.com>,
+        "the arch/x86 maintainers" <x86@kernel.org>, linux-mm@kvack.org,
+        linux-coco@lists.linux.dev,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
         "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH Part1 v5 33/38] x86/sev: Provide support for SNP guest
- request NAEs
-Message-ID: <YSkrPXLqg38txCqp@zn.tnic>
-References: <20210820151933.22401-1-brijesh.singh@amd.com>
- <20210820151933.22401-34-brijesh.singh@amd.com>
- <YSkkaaXrg6+cnb9+@zn.tnic>
- <4acd17bc-bdb0-c4cc-97af-8842f8836c8e@amd.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <4acd17bc-bdb0-c4cc-97af-8842f8836c8e@amd.com>
+        "Sathyanarayanan Kuppuswamy" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        "Dave Hansen" <dave.hansen@intel.com>,
+        "Yu Zhang" <yu.c.zhang@linux.intel.com>
+Subject: =?UTF-8?Q?Re:_[RFC]_KVM:_mm:_fd-based_approach_for_supporting_KVM_guest_?=
+ =?UTF-8?Q?private_memory?=
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 27, 2021 at 01:07:59PM -0500, Brijesh Singh wrote:
-> Okay, works for me. The main reason why I choose the enum was to not
-> expose the GHCB exit code to the driver
 
-Why does that matter?
 
-> but I guess that attestation driver need to know which VMGEXIT need to
-> be called, so, its okay to have it pass the VMGEXIT number instead of
-> enum.
+On Thu, Aug 26, 2021, at 2:26 PM, David Hildenbrand wrote:
+> On 26.08.21 19:05, Andy Lutomirski wrote:
 
-Well, they're in an uapi header - can't be more public than that. :-)
+> > Oof.  That's quite a requirement.  What's the point of the VMA once all
+> > this is done?
+> 
+> You can keep using things like mbind(), madvise(), ... and the GUP code 
+> with a special flag might mostly just do what you want. You won't have 
+> to reinvent too many wheels on the page fault logic side at least.
+> 
 
-> So far most of the changes were in x86 specific files. However, the
-> attestation service is available through a driver to the userspace. The
-> driver needs to use the VMGEXIT routines provides by the x86 core. I
-> created the said header file so that driver does not need to include
-> <asm/sev.h/sev-common.h> etc and will compile for !x86.
+You can keep calling the functions.  The implementations working is a different story: you can't just unmap (pte_numa-style or otherwise) a private guest page to quiesce it, move it with memcpy(), and then fault it back in.
 
-Lemme ask my question again:
-
-Is SNP available on something which is !x86, all of a sudden?
-
-Why would you want to compile that driver on anything but x86?
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+In any event, adding fd-based NUMA APIs would be quite nice.  Look at the numactl command.
