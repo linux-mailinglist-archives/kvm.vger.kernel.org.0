@@ -2,74 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 71F2C3F984D
-	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 12:54:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D27E33F985E
+	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 13:13:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244976AbhH0KzJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Aug 2021 06:55:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:40802 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S244860AbhH0KzJ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 27 Aug 2021 06:55:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630061660;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=8T0BPsTd+VSSupe/LZTj779EWVf1AbhJwg4MUwYljSc=;
-        b=USdtQBaQvN89jzr9poYMTGv+Wo+4WntMJCLKk9Dy1H7l49FGFd3DmZnOZ9aTIw8LNuXWYI
-        B20X5d7VvJxfbxyAiCjklt8+qA+19+SDdNFVnEDyZbxcgmiUdTxwdUkFNzb79tp3m6Qh3v
-        FGAP+oL6ZLRoXT48WrpxIuzb3X72Bg0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-212-UoeT-EPEMeWiuJa4LCIymA-1; Fri, 27 Aug 2021 06:54:16 -0400
-X-MC-Unique: UoeT-EPEMeWiuJa4LCIymA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8A042802922;
-        Fri, 27 Aug 2021 10:54:15 +0000 (UTC)
-Received: from gator.redhat.com (unknown [10.40.194.250])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D624227CA5;
-        Fri, 27 Aug 2021 10:54:08 +0000 (UTC)
-From:   Andrew Jones <drjones@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     pmorel@linux.ibm.com, thuth@redhat.com, frankja@linux.ibm.com,
-        david@redhat.com, cohuck@redhat.com, imbrenda@linux.ibm.com,
-        pbonzini@redhat.com
-Subject: [PATCH kvm-unit-tests v2] Makefile: Don't trust PWD
-Date:   Fri, 27 Aug 2021 12:54:07 +0200
-Message-Id: <20210827105407.313916-1-drjones@redhat.com>
+        id S244986AbhH0LOn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Aug 2021 07:14:43 -0400
+Received: from mga06.intel.com ([134.134.136.31]:45354 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S234172AbhH0LOm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Aug 2021 07:14:42 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10088"; a="278954581"
+X-IronPort-AV: E=Sophos;i="5.84,356,1620716400"; 
+   d="scan'208";a="278954581"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Aug 2021 04:13:53 -0700
+X-IronPort-AV: E=Sophos;i="5.84,356,1620716400"; 
+   d="scan'208";a="538054362"
+Received: from xiaoyaol-mobl.ccr.corp.intel.com (HELO [10.249.172.200]) ([10.249.172.200])
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Aug 2021 04:13:50 -0700
+Subject: Re: [PATCH] KVM: nVMX: Fix nested bus lock VM exit
+To:     Chenyi Qiang <chenyi.qiang@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20210827085110.6763-1-chenyi.qiang@intel.com>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+Message-ID: <ae887305-378f-3ef1-7e74-8ae11e962671@intel.com>
+Date:   Fri, 27 Aug 2021 19:13:48 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Firefox/78.0 Thunderbird/78.13.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <20210827085110.6763-1-chenyi.qiang@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PWD comes from the environment and it's possible that it's already
-set to something which isn't the full path of the current working
-directory. Use the make variable $(CURDIR) instead.
-
-Suggested-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Andrew Jones <drjones@redhat.com>
----
- Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/Makefile b/Makefile
-index f7b9f28c9319..6792b93c4e16 100644
---- a/Makefile
-+++ b/Makefile
-@@ -119,7 +119,7 @@ cscope: cscope_dirs = lib lib/libfdt lib/linux $(TEST_DIR) $(ARCH_LIBDIRS) lib/a
- cscope:
- 	$(RM) ./cscope.*
- 	find -L $(cscope_dirs) -maxdepth 1 \
--		-name '*.[chsS]' -exec realpath --relative-base=$(PWD) {} \; | sort -u > ./cscope.files
-+		-name '*.[chsS]' -exec realpath --relative-base=$(CURDIR) {} \; | sort -u > ./cscope.files
- 	cscope -bk
- 
- .PHONY: tags
--- 
-2.31.1
-
+On 8/27/2021 4:51 PM, Chenyi Qiang wrote:
+> Nested bus lock VM exits are not supported yet. If L2 triggers bus lock
+> VM exit, it will be directed to L1 VMM, which would cause unexpected
+> behavior. Therefore, handle L2's bus lock VM exits in L0 directly.
+> 
+> Fixes: fe6b6bc802b4 ("KVM: VMX: Enable bus lock VM exit")
+> Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
+> ---
+>   arch/x86/kvm/vmx/nested.c | 2 ++
+>   1 file changed, 2 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index bc6327950657..754f53cf0f7a 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -5873,6 +5873,8 @@ static bool nested_vmx_l0_wants_exit(struct kvm_vcpu *vcpu,
+>   	case EXIT_REASON_VMFUNC:
+>   		/* VM functions are emulated through L2->L0 vmexits. */
+>   		return true;
+> +	case EXIT_REASON_BUS_LOCK:
+> +		return true;
+>   	default:
+>   		break;
+>   	}
+> 
+Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
