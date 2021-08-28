@@ -2,57 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9D2513FA25A
-	for <lists+kvm@lfdr.de>; Sat, 28 Aug 2021 02:41:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0006D3FA25E
+	for <lists+kvm@lfdr.de>; Sat, 28 Aug 2021 02:41:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232830AbhH1Ahc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Aug 2021 20:37:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46294 "EHLO
+        id S232956AbhH1Ahh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Aug 2021 20:37:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46318 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232814AbhH1Aha (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Aug 2021 20:37:30 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 500ABC0617A8
-        for <kvm@vger.kernel.org>; Fri, 27 Aug 2021 17:36:40 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id u1-20020a25ab01000000b0059949024617so818434ybi.17
-        for <kvm@vger.kernel.org>; Fri, 27 Aug 2021 17:36:40 -0700 (PDT)
+        with ESMTP id S232953AbhH1Ahc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Aug 2021 20:37:32 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A69CC0612E7
+        for <kvm@vger.kernel.org>; Fri, 27 Aug 2021 17:36:42 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id c63-20020a25e5420000b0290580b26e708aso8289295ybh.12
+        for <kvm@vger.kernel.org>; Fri, 27 Aug 2021 17:36:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=0YXYNwfO2nP0d/8tcUlJOlRfQipYSfj6KR9im5qFSzU=;
-        b=M/Xe0rMtGmxdkWl9mi5EOW9t7UlutI0HqYiemomWjM6+KLBUeVT3ObS3xgkFOcpBHA
-         tjEreWTZww/GaibpuFp3TP6uJw/XXrbB7rgTViYSk8FfdflF+cKbmXPkirpzaUgFSwuF
-         vLlNrQEp4R0vbB3TstwUqA/I7NNS4Ui2hk2YFYsQ9QF7i+W+jF4GnB9pW6MAQRukcU/q
-         md3KD2Uem7PScXCJD2QVRXMKOLsNPxZapGXO+7H3E2dqptEoTOpWEpWO/03jkHSd2XRu
-         P5sFFQ6xUG9CInfC2TWxYV5PcoFZlV4zv4dllrmT/FnIzl+/h7hBbAB8LVIwt89dViD6
-         wzQw==
+        bh=HKJZFfDLXh82oPfU5c20Gn43VIGGnboNJpddzA+BkHg=;
+        b=rxzaCm/AN4VZGThWPRoQD+RNM2EHTsKr0Ts1TI5RsbpW5tPvu4XmXZqedCw9N2UdfD
+         4BaICFECH3j4loy5TpRObFTxBfrUdbBWvTHBjr6GJLVbonFbfguEMCgYX3LAy00BMX8W
+         u4zq+GNNnFkS61eZe7VYyzsuyilBvIa/AmriXFxKDtOyV9SB/RH39B3Z4ZRtQLKCn0LG
+         75GCLxiyV2Wjkp5NjbGKf221E276nnqTHN+nKLi3sBSe656AbgGBtm5gJBcoRQ+b28Fh
+         EFWEQESVDIOvAnq6i3fM/hFe7419BHD3Hwa7ggBFCXbKuNGTahW2VLC+3ni2ePvL+UNy
+         zQvg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=0YXYNwfO2nP0d/8tcUlJOlRfQipYSfj6KR9im5qFSzU=;
-        b=MsRxK8Sk8QSueiUxBHmx7x6iG7JwezZACNwH4o8+RNjIIzxkw3wgvYcS0ICDQgUzfB
-         ork00hHsMkRXJeGtsHCNHwUifHWIBupDpMfQYLPAG7IZKYMKDhQ8zE5+NJ8oQ9QhOHQG
-         VO3ktpdYQx5agVWLjm6SwZz97nR4lgvD0e2IIwxsqVjGdw3km3QjzFQo9kn5LYQIAIcs
-         0HESvab/SZX9QmB2n1d3NBptG0UfLdVFkwpNZXXsbaTVAw5Ap0x1lUoRHug2wWDINhVK
-         IJ2OCLo8KXL2pb6cE5sqPyXBTvG4D+jZXrNGIW2ADuNHlJZS5OZ4yflFpoHufhhVg0tm
-         OP7w==
-X-Gm-Message-State: AOAM5306dGmIUSdR2J1oNKu9xoUpsoHfIR4QmjQ5kqjoaJwOozEWetxO
-        gto40gjPBT9aTmvD06R8zi9b0pC+JkQ=
-X-Google-Smtp-Source: ABdhPJx7+h99mRUNQ5W6YGQDjwrL7hApQN1LKnrNBAh3ncOOeOsVF2BhDlqAamjvA/RKoXSaOf42ZGz737c=
+        bh=HKJZFfDLXh82oPfU5c20Gn43VIGGnboNJpddzA+BkHg=;
+        b=Tr3TaHix9A+Sq1lr9vXbmQLp1M4/q+kKx7c7kD/tWYOVQs6gifROr2mDWu5ZNLYDMJ
+         B9YLCzqrUrek9diL1r4YrjGAkLp641z2LLvFm4JHDYXCYPokU3OIzForgD17KVf0/iPn
+         cad62QcF+8X+J71Rv3zpCE+caSc4ehNlf0JChVTVl3ozh3nFh7spq1m4ORNlyyk3BNqp
+         dp+4cHlDN6lCC6IJyfbHPQ6lbee0lS8yk2+wEFmUnAbzRj0F7vbA0HoDLuwn4pqtK/bq
+         bqL9Hc2PqS8CPGPM72Aapc3OgiwWPzlR3VA5W2nauun+5LnVdnc/FKmXMjmIR2ha5ZRO
+         ErfA==
+X-Gm-Message-State: AOAM533apCkusQxLY+cnucUXUA4gccyJnEgSYC+OUJRPDDi5ZvzUWk3H
+        NM0QekCm+svzORLVAd/0aR9azRnoR6M=
+X-Google-Smtp-Source: ABdhPJyKixaYStMukhYbHbK555CGQM6iYXLxxdSAEvoAp4FLIZA18987uVI34E4+zGb67g6x4Ia3ty7kWs8=
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:90:200:f66c:b851:7e79:7ed4])
- (user=seanjc job=sendgmr) by 2002:a25:6545:: with SMTP id z66mr9189208ybb.149.1630110999440;
- Fri, 27 Aug 2021 17:36:39 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a25:9ac6:: with SMTP id t6mr8860851ybo.190.1630111001657;
+ Fri, 27 Aug 2021 17:36:41 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 27 Aug 2021 17:35:51 -0700
+Date:   Fri, 27 Aug 2021 17:35:52 -0700
 In-Reply-To: <20210828003558.713983-1-seanjc@google.com>
-Message-Id: <20210828003558.713983-7-seanjc@google.com>
+Message-Id: <20210828003558.713983-8-seanjc@google.com>
 Mime-Version: 1.0
 References: <20210828003558.713983-1-seanjc@google.com>
 X-Mailer: git-send-email 2.33.0.259.gc128427fd7-goog
-Subject: [PATCH v2 06/13] perf/core: Rework guest callbacks to prepare for
- static_call support
+Subject: [PATCH v2 07/13] perf/core: Use static_call to optimize perf_guest_info_callbacks
 From:   Sean Christopherson <seanjc@google.com>
 To:     Peter Zijlstra <peterz@infradead.org>,
         Ingo Molnar <mingo@redhat.com>,
@@ -99,396 +98,254 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Like Xu <like.xu@linux.intel.com>
 
-To prepare for using static_calls to optimize perf's guest callbacks,
-replace ->is_in_guest and ->is_user_mode with a new multiplexed hook
-->state, tweak ->handle_intel_pt_intr to play nice with being called when
-there is no active guest, and drop "guest" from ->is_in_guest.
+Use static_call to optimize perf's guest callbacks on arm64 and x86,
+which are now the only architectures that define the callbacks.  Use
+DEFINE_STATIC_CALL_RET0 as the default/NULL for all guest callbacks, as
+the callback semantics are that a return value '0' means "not in guest".
 
-Return '0' from ->state and ->handle_intel_pt_intr to indicate "not in
-guest" so that DEFINE_STATIC_CALL_RET0 can be used to define the static
-calls, i.e. no callback == !guest.
+static_call obviously avoids the overhead of CONFIG_RETPOLINE=y, but is
+also advantageous versus other solutions, e.g. per-cpu callbacks, in that
+a per-cpu memory load is not needed to detect the !guest case.
 
 Suggested-by: Peter Zijlstra (Intel) <peterz@infradead.org>
 Originally-by: Peter Zijlstra (Intel) <peterz@infradead.org>
 Signed-off-by: Like Xu <like.xu@linux.intel.com>
 Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
-[sean: extracted from static_call patch, fixed get_ip() bug, wrote changelog]
+[sean: split out patch, drop __weak, tweak updaters, rewrite changelog]
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/arm64/kernel/perf_callchain.c | 13 +++++-----
- arch/arm64/kvm/perf.c              | 35 +++++++++++---------------
- arch/x86/events/core.c             | 13 +++++-----
- arch/x86/events/intel/core.c       |  5 +---
- arch/x86/include/asm/kvm_host.h    |  2 +-
- arch/x86/kvm/pmu.c                 |  2 +-
- arch/x86/kvm/x86.c                 | 40 ++++++++++++++++--------------
- arch/x86/xen/pmu.c                 | 32 ++++++++++--------------
- include/linux/perf_event.h         | 10 +++++---
- kernel/events/core.c               |  1 +
- 10 files changed, 74 insertions(+), 79 deletions(-)
+ arch/arm64/kernel/perf_callchain.c | 31 +++++++++++++++---------
+ arch/x86/events/core.c             | 38 ++++++++++++++++++++++--------
+ arch/x86/events/intel/core.c       |  7 +++---
+ include/linux/perf_event.h         |  9 +------
+ kernel/events/core.c               |  2 ++
+ 5 files changed, 54 insertions(+), 33 deletions(-)
 
 diff --git a/arch/arm64/kernel/perf_callchain.c b/arch/arm64/kernel/perf_callchain.c
-index 86d9f2013172..274dc3e11b6d 100644
+index 274dc3e11b6d..18cf6e608778 100644
 --- a/arch/arm64/kernel/perf_callchain.c
 +++ b/arch/arm64/kernel/perf_callchain.c
-@@ -104,7 +104,7 @@ void perf_callchain_user(struct perf_callchain_entry_ctx *entry,
- {
- 	struct perf_guest_info_callbacks *guest_cbs = perf_get_guest_cbs();
+@@ -5,6 +5,7 @@
+  * Copyright (C) 2015 ARM Limited
+  */
+ #include <linux/perf_event.h>
++#include <linux/static_call.h>
+ #include <linux/uaccess.h>
  
--	if (guest_cbs && guest_cbs->is_in_guest()) {
-+	if (guest_cbs && guest_cbs->state()) {
+ #include <asm/pointer_auth.h>
+@@ -99,12 +100,24 @@ compat_user_backtrace(struct compat_frame_tail __user *tail,
+ }
+ #endif /* CONFIG_COMPAT */
+ 
++DEFINE_STATIC_CALL_RET0(arm64_guest_state, *(perf_guest_cbs->state));
++DEFINE_STATIC_CALL_RET0(arm64_guest_get_ip, *(perf_guest_cbs->get_ip));
++
++void arch_perf_update_guest_cbs(struct perf_guest_info_callbacks *guest_cbs)
++{
++	if (guest_cbs) {
++		static_call_update(arm64_guest_state, guest_cbs->state);
++		static_call_update(arm64_guest_get_ip, guest_cbs->get_ip);
++	} else {
++		static_call_update(arm64_guest_state, (void *)&__static_call_return0);
++		static_call_update(arm64_guest_get_ip, (void *)&__static_call_return0);
++	}
++}
++
+ void perf_callchain_user(struct perf_callchain_entry_ctx *entry,
+ 			 struct pt_regs *regs)
+ {
+-	struct perf_guest_info_callbacks *guest_cbs = perf_get_guest_cbs();
+-
+-	if (guest_cbs && guest_cbs->state()) {
++	if (static_call(arm64_guest_state)()) {
  		/* We don't support guest os callchain now */
  		return;
  	}
-@@ -152,7 +152,7 @@ void perf_callchain_kernel(struct perf_callchain_entry_ctx *entry,
- 	struct perf_guest_info_callbacks *guest_cbs = perf_get_guest_cbs();
+@@ -149,10 +162,9 @@ static bool callchain_trace(void *data, unsigned long pc)
+ void perf_callchain_kernel(struct perf_callchain_entry_ctx *entry,
+ 			   struct pt_regs *regs)
+ {
+-	struct perf_guest_info_callbacks *guest_cbs = perf_get_guest_cbs();
  	struct stackframe frame;
  
--	if (guest_cbs && guest_cbs->is_in_guest()) {
-+	if (guest_cbs && guest_cbs->state()) {
+-	if (guest_cbs && guest_cbs->state()) {
++	if (static_call(arm64_guest_state)()) {
  		/* We don't support guest os callchain now */
  		return;
  	}
-@@ -165,8 +165,8 @@ unsigned long perf_instruction_pointer(struct pt_regs *regs)
- {
- 	struct perf_guest_info_callbacks *guest_cbs = perf_get_guest_cbs();
+@@ -163,18 +175,15 @@ void perf_callchain_kernel(struct perf_callchain_entry_ctx *entry,
  
--	if (guest_cbs && guest_cbs->is_in_guest())
--		return guest_cbs->get_guest_ip();
-+	if (guest_cbs && guest_cbs->state())
-+		return guest_cbs->get_ip();
+ unsigned long perf_instruction_pointer(struct pt_regs *regs)
+ {
+-	struct perf_guest_info_callbacks *guest_cbs = perf_get_guest_cbs();
+-
+-	if (guest_cbs && guest_cbs->state())
+-		return guest_cbs->get_ip();
++	if (static_call(arm64_guest_state)())
++		return static_call(arm64_guest_get_ip)();
  
  	return instruction_pointer(regs);
  }
-@@ -174,10 +174,11 @@ unsigned long perf_instruction_pointer(struct pt_regs *regs)
+ 
  unsigned long perf_misc_flags(struct pt_regs *regs)
  {
- 	struct perf_guest_info_callbacks *guest_cbs = perf_get_guest_cbs();
-+	unsigned int guest_state = guest_cbs ? guest_cbs->state() : 0;
+-	struct perf_guest_info_callbacks *guest_cbs = perf_get_guest_cbs();
+-	unsigned int guest_state = guest_cbs ? guest_cbs->state() : 0;
++	unsigned int guest_state = static_call(arm64_guest_state)();
  	int misc = 0;
  
--	if (guest_cbs && guest_cbs->is_in_guest()) {
--		if (guest_cbs->is_user_mode())
-+	if (guest_state) {
-+		if (guest_state & PERF_GUEST_USER)
- 			misc |= PERF_RECORD_MISC_GUEST_USER;
- 		else
- 			misc |= PERF_RECORD_MISC_GUEST_KERNEL;
-diff --git a/arch/arm64/kvm/perf.c b/arch/arm64/kvm/perf.c
-index 039fe59399a2..893de1a51fea 100644
---- a/arch/arm64/kvm/perf.c
-+++ b/arch/arm64/kvm/perf.c
-@@ -13,39 +13,34 @@
- 
- DEFINE_STATIC_KEY_FALSE(kvm_arm_pmu_available);
- 
--static int kvm_is_in_guest(void)
-+static unsigned int kvm_guest_state(void)
- {
--        return kvm_get_running_vcpu() != NULL;
--}
-+	struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
-+	unsigned int state;
- 
--static int kvm_is_user_mode(void)
--{
--	struct kvm_vcpu *vcpu;
--
--	vcpu = kvm_get_running_vcpu();
-+	if (!vcpu)
-+		return 0;
- 
--	if (vcpu)
--		return !vcpu_mode_priv(vcpu);
-+	state = PERF_GUEST_ACTIVE;
-+	if (!vcpu_mode_priv(vcpu))
-+		state |= PERF_GUEST_USER;
- 
--	return 0;
-+	return state;
- }
- 
- static unsigned long kvm_get_guest_ip(void)
- {
--	struct kvm_vcpu *vcpu;
-+	struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
- 
--	vcpu = kvm_get_running_vcpu();
-+	if (WARN_ON_ONCE(!vcpu))
-+		return 0;
- 
--	if (vcpu)
--		return *vcpu_pc(vcpu);
--
--	return 0;
-+	return *vcpu_pc(vcpu);
- }
- 
- static struct perf_guest_info_callbacks kvm_guest_cbs = {
--	.is_in_guest	= kvm_is_in_guest,
--	.is_user_mode	= kvm_is_user_mode,
--	.get_guest_ip	= kvm_get_guest_ip,
-+	.state		= kvm_guest_state,
-+	.get_ip		= kvm_get_guest_ip,
- };
- 
- void kvm_perf_init(void)
+ 	if (guest_state) {
 diff --git a/arch/x86/events/core.c b/arch/x86/events/core.c
-index ffb3e6c0d367..3a7630fdd340 100644
+index 3a7630fdd340..508a677edd8c 100644
 --- a/arch/x86/events/core.c
 +++ b/arch/x86/events/core.c
-@@ -2765,7 +2765,7 @@ perf_callchain_kernel(struct perf_callchain_entry_ctx *entry, struct pt_regs *re
+@@ -90,6 +90,29 @@ DEFINE_STATIC_CALL_NULL(x86_pmu_pebs_aliases, *x86_pmu.pebs_aliases);
+  */
+ DEFINE_STATIC_CALL_RET0(x86_pmu_guest_get_msrs, *x86_pmu.guest_get_msrs);
+ 
++DEFINE_STATIC_CALL_RET0(x86_guest_state, *(perf_guest_cbs->state));
++DEFINE_STATIC_CALL_RET0(x86_guest_get_ip, *(perf_guest_cbs->get_ip));
++DEFINE_STATIC_CALL_RET0(x86_guest_handle_intel_pt_intr, *(perf_guest_cbs->handle_intel_pt_intr));
++
++void arch_perf_update_guest_cbs(struct perf_guest_info_callbacks *guest_cbs)
++{
++	if (guest_cbs) {
++		static_call_update(x86_guest_state, guest_cbs->state);
++		static_call_update(x86_guest_get_ip, guest_cbs->get_ip);
++	} else {
++		static_call_update(x86_guest_state, (void *)&__static_call_return0);
++		static_call_update(x86_guest_get_ip, (void *)&__static_call_return0);
++	}
++
++	/* Implementing ->handle_intel_pt_intr is optional. */
++	if (guest_cbs && guest_cbs->handle_intel_pt_intr)
++		static_call_update(x86_guest_handle_intel_pt_intr,
++				   guest_cbs->handle_intel_pt_intr);
++	else
++		static_call_update(x86_guest_handle_intel_pt_intr,
++				   (void *)&__static_call_return0);
++}
++
+ u64 __read_mostly hw_cache_event_ids
+ 				[PERF_COUNT_HW_CACHE_MAX]
+ 				[PERF_COUNT_HW_CACHE_OP_MAX]
+@@ -2761,11 +2784,10 @@ static bool perf_hw_regs(struct pt_regs *regs)
+ void
+ perf_callchain_kernel(struct perf_callchain_entry_ctx *entry, struct pt_regs *regs)
+ {
+-	struct perf_guest_info_callbacks *guest_cbs = perf_get_guest_cbs();
  	struct unwind_state state;
  	unsigned long addr;
  
--	if (guest_cbs && guest_cbs->is_in_guest()) {
-+	if (guest_cbs && guest_cbs->state()) {
+-	if (guest_cbs && guest_cbs->state()) {
++	if (static_call(x86_guest_state)()) {
  		/* TODO: We don't support guest os callchain now */
  		return;
  	}
-@@ -2869,7 +2869,7 @@ perf_callchain_user(struct perf_callchain_entry_ctx *entry, struct pt_regs *regs
+@@ -2865,11 +2887,10 @@ perf_callchain_user32(struct pt_regs *regs, struct perf_callchain_entry_ctx *ent
+ void
+ perf_callchain_user(struct perf_callchain_entry_ctx *entry, struct pt_regs *regs)
+ {
+-	struct perf_guest_info_callbacks *guest_cbs = perf_get_guest_cbs();
  	struct stack_frame frame;
  	const struct stack_frame __user *fp;
  
--	if (guest_cbs && guest_cbs->is_in_guest()) {
-+	if (guest_cbs && guest_cbs->state()) {
+-	if (guest_cbs && guest_cbs->state()) {
++	if (static_call(x86_guest_state)()) {
  		/* TODO: We don't support guest os callchain now */
  		return;
  	}
-@@ -2948,8 +2948,8 @@ unsigned long perf_instruction_pointer(struct pt_regs *regs)
- {
- 	struct perf_guest_info_callbacks *guest_cbs = perf_get_guest_cbs();
+@@ -2946,18 +2967,15 @@ static unsigned long code_segment_base(struct pt_regs *regs)
  
--	if (guest_cbs && guest_cbs->is_in_guest())
--		return guest_cbs->get_guest_ip();
-+	if (guest_cbs && guest_cbs->state())
-+		return guest_cbs->get_ip();
+ unsigned long perf_instruction_pointer(struct pt_regs *regs)
+ {
+-	struct perf_guest_info_callbacks *guest_cbs = perf_get_guest_cbs();
+-
+-	if (guest_cbs && guest_cbs->state())
+-		return guest_cbs->get_ip();
++	if (static_call(x86_guest_state)())
++		return static_call(x86_guest_get_ip)();
  
  	return regs->ip + code_segment_base(regs);
  }
-@@ -2957,10 +2957,11 @@ unsigned long perf_instruction_pointer(struct pt_regs *regs)
+ 
  unsigned long perf_misc_flags(struct pt_regs *regs)
  {
- 	struct perf_guest_info_callbacks *guest_cbs = perf_get_guest_cbs();
-+	unsigned int guest_state = guest_cbs ? guest_cbs->state() : 0;
+-	struct perf_guest_info_callbacks *guest_cbs = perf_get_guest_cbs();
+-	unsigned int guest_state = guest_cbs ? guest_cbs->state() : 0;
++	unsigned int guest_state = static_call(x86_guest_state)();
  	int misc = 0;
  
--	if (guest_cbs && guest_cbs->is_in_guest()) {
--		if (guest_cbs->is_user_mode())
-+	if (guest_state) {
-+		if (guest_state & PERF_GUEST_USER)
- 			misc |= PERF_RECORD_MISC_GUEST_USER;
- 		else
- 			misc |= PERF_RECORD_MISC_GUEST_KERNEL;
+ 	if (guest_state) {
 diff --git a/arch/x86/events/intel/core.c b/arch/x86/events/intel/core.c
-index 9baa46185d94..524ad1f747bd 100644
+index 524ad1f747bd..fb1bd7a0e1a6 100644
 --- a/arch/x86/events/intel/core.c
 +++ b/arch/x86/events/intel/core.c
-@@ -2855,10 +2855,7 @@ static int handle_pmi_common(struct pt_regs *regs, u64 status)
- 		handled++;
+@@ -2782,11 +2782,12 @@ static void intel_pmu_reset(void)
+ 	local_irq_restore(flags);
+ }
  
- 		guest_cbs = perf_get_guest_cbs();
--		if (unlikely(guest_cbs && guest_cbs->is_in_guest() &&
--			     guest_cbs->handle_intel_pt_intr))
--			guest_cbs->handle_intel_pt_intr();
--		else
-+		if (likely(!guest_cbs || !guest_cbs->handle_intel_pt_intr()))
++DECLARE_STATIC_CALL(x86_guest_handle_intel_pt_intr, *(perf_guest_cbs->handle_intel_pt_intr));
++
+ static int handle_pmi_common(struct pt_regs *regs, u64 status)
+ {
+ 	struct perf_sample_data data;
+ 	struct cpu_hw_events *cpuc = this_cpu_ptr(&cpu_hw_events);
+-	struct perf_guest_info_callbacks *guest_cbs;
+ 	int bit;
+ 	int handled = 0;
+ 	u64 intel_ctrl = hybrid(cpuc->pmu, intel_ctrl);
+@@ -2853,9 +2854,7 @@ static int handle_pmi_common(struct pt_regs *regs, u64 status)
+ 	 */
+ 	if (__test_and_clear_bit(GLOBAL_STATUS_TRACE_TOPAPMI_BIT, (unsigned long *)&status)) {
+ 		handled++;
+-
+-		guest_cbs = perf_get_guest_cbs();
+-		if (likely(!guest_cbs || !guest_cbs->handle_intel_pt_intr()))
++		if (!static_call(x86_guest_handle_intel_pt_intr)())
  			intel_pt_interrupt();
  	}
  
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 1ea4943a73d7..1080166fc0cf 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1874,7 +1874,7 @@ int kvm_skip_emulated_instruction(struct kvm_vcpu *vcpu);
- int kvm_complete_insn_gp(struct kvm_vcpu *vcpu, int err);
- void __kvm_request_immediate_exit(struct kvm_vcpu *vcpu);
- 
--int kvm_is_in_guest(void);
-+unsigned int kvm_guest_state(void);
- 
- void __user *__x86_set_memory_region(struct kvm *kvm, int id, gpa_t gpa,
- 				     u32 size);
-diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-index 0772bad9165c..5b68d4188de0 100644
---- a/arch/x86/kvm/pmu.c
-+++ b/arch/x86/kvm/pmu.c
-@@ -87,7 +87,7 @@ static void kvm_perf_overflow_intr(struct perf_event *perf_event,
- 		 * woken up. So we should wake it, but this is impossible from
- 		 * NMI context. Do it from irq work instead.
- 		 */
--		if (!kvm_is_in_guest())
-+		if (!kvm_guest_state())
- 			irq_work_queue(&pmc_to_pmu(pmc)->irq_work);
- 		else
- 			kvm_make_request(KVM_REQ_PMI, pmc->vcpu);
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index bae951344e28..b2a4d085aa4f 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -8267,44 +8267,48 @@ static void kvm_timer_init(void)
- DEFINE_PER_CPU(struct kvm_vcpu *, current_vcpu);
- EXPORT_PER_CPU_SYMBOL_GPL(current_vcpu);
- 
--int kvm_is_in_guest(void)
-+unsigned int kvm_guest_state(void)
- {
--	return __this_cpu_read(current_vcpu) != NULL;
--}
-+	struct kvm_vcpu *vcpu = __this_cpu_read(current_vcpu);
-+	unsigned int state;
- 
--static int kvm_is_user_mode(void)
--{
--	int user_mode = 3;
-+	if (!vcpu)
-+		return 0;
- 
--	if (__this_cpu_read(current_vcpu))
--		user_mode = static_call(kvm_x86_get_cpl)(__this_cpu_read(current_vcpu));
-+	state = PERF_GUEST_ACTIVE;
-+	if (static_call(kvm_x86_get_cpl)(vcpu))
-+		state |= PERF_GUEST_USER;
- 
--	return user_mode != 0;
-+	return state;
- }
- 
--static unsigned long kvm_get_guest_ip(void)
-+static unsigned long kvm_guest_get_ip(void)
- {
--	unsigned long ip = 0;
-+	struct kvm_vcpu *vcpu = __this_cpu_read(current_vcpu);
- 
--	if (__this_cpu_read(current_vcpu))
--		ip = kvm_rip_read(__this_cpu_read(current_vcpu));
-+	if (WARN_ON_ONCE(!vcpu))
-+		return 0;
- 
--	return ip;
-+	return kvm_rip_read(vcpu);
- }
- 
--static void kvm_handle_intel_pt_intr(void)
-+static unsigned int kvm_handle_intel_pt_intr(void)
- {
- 	struct kvm_vcpu *vcpu = __this_cpu_read(current_vcpu);
- 
-+	/* '0' on failure so that the !PT case can use a RET0 static call. */
-+	if (!vcpu)
-+		return 0;
-+
- 	kvm_make_request(KVM_REQ_PMI, vcpu);
- 	__set_bit(MSR_CORE_PERF_GLOBAL_OVF_CTRL_TRACE_TOPA_PMI_BIT,
- 			(unsigned long *)&vcpu->arch.pmu.global_status);
-+	return 1;
- }
- 
- static struct perf_guest_info_callbacks kvm_guest_cbs = {
--	.is_in_guest		= kvm_is_in_guest,
--	.is_user_mode		= kvm_is_user_mode,
--	.get_guest_ip		= kvm_get_guest_ip,
-+	.state			= kvm_guest_state,
-+	.get_ip			= kvm_guest_get_ip,
- 	.handle_intel_pt_intr	= NULL,
- };
- 
-diff --git a/arch/x86/xen/pmu.c b/arch/x86/xen/pmu.c
-index e13b0b49fcdf..89dd6b1708b0 100644
---- a/arch/x86/xen/pmu.c
-+++ b/arch/x86/xen/pmu.c
-@@ -413,34 +413,29 @@ int pmu_apic_update(uint32_t val)
- }
- 
- /* perf callbacks */
--static int xen_is_in_guest(void)
-+static unsigned int xen_guest_state(void)
- {
- 	const struct xen_pmu_data *xenpmu_data = get_xenpmu_data();
-+	unsigned int state = 0;
- 
- 	if (!xenpmu_data) {
- 		pr_warn_once("%s: pmudata not initialized\n", __func__);
--		return 0;
-+		return state;
- 	}
- 
- 	if (!xen_initial_domain() || (xenpmu_data->domain_id >= DOMID_SELF))
--		return 0;
-+		return state;
- 
--	return 1;
--}
-+	state |= PERF_GUEST_ACTIVE;
- 
--static int xen_is_user_mode(void)
--{
--	const struct xen_pmu_data *xenpmu_data = get_xenpmu_data();
--
--	if (!xenpmu_data) {
--		pr_warn_once("%s: pmudata not initialized\n", __func__);
--		return 0;
-+	if (xenpmu_data->pmu.pmu_flags & PMU_SAMPLE_PV) {
-+		if (xenpmu_data->pmu.pmu_flags & PMU_SAMPLE_USER)
-+			state |= PERF_GUEST_USER;
-+	} else if (xenpmu_data->pmu.r.regs.cpl & 3) {
-+		state |= PERF_GUEST_USER;
- 	}
- 
--	if (xenpmu_data->pmu.pmu_flags & PMU_SAMPLE_PV)
--		return (xenpmu_data->pmu.pmu_flags & PMU_SAMPLE_USER);
--	else
--		return !!(xenpmu_data->pmu.r.regs.cpl & 3);
-+	return state;
- }
- 
- static unsigned long xen_get_guest_ip(void)
-@@ -456,9 +451,8 @@ static unsigned long xen_get_guest_ip(void)
- }
- 
- static struct perf_guest_info_callbacks xen_guest_cbs = {
--	.is_in_guest            = xen_is_in_guest,
--	.is_user_mode           = xen_is_user_mode,
--	.get_guest_ip           = xen_get_guest_ip,
-+	.state                  = xen_guest_state,
-+	.get_ip			= xen_get_guest_ip,
- };
- 
- /* Convert registers from Xen's format to Linux' */
 diff --git a/include/linux/perf_event.h b/include/linux/perf_event.h
-index e75971f85cc8..a5d5893b80b0 100644
+index a5d5893b80b0..3fa1014218f4 100644
 --- a/include/linux/perf_event.h
 +++ b/include/linux/perf_event.h
-@@ -26,11 +26,13 @@
- # include <asm/local64.h>
- #endif
- 
-+#define PERF_GUEST_ACTIVE	0x01
-+#define PERF_GUEST_USER	0x02
-+
- struct perf_guest_info_callbacks {
--	int				(*is_in_guest)(void);
--	int				(*is_user_mode)(void);
--	unsigned long			(*get_guest_ip)(void);
--	void				(*handle_intel_pt_intr)(void);
-+	unsigned int			(*state)(void);
-+	unsigned long			(*get_ip)(void);
-+	unsigned int			(*handle_intel_pt_intr)(void);
- };
- 
- #ifdef CONFIG_HAVE_HW_BREAKPOINT
-diff --git a/kernel/events/core.c b/kernel/events/core.c
-index d7f606e06446..ec36e7aded89 100644
---- a/kernel/events/core.c
-+++ b/kernel/events/core.c
-@@ -6484,6 +6484,7 @@ static void perf_pending_event(struct irq_work *entry)
+@@ -1240,14 +1240,7 @@ extern void perf_event_bpf_event(struct bpf_prog *prog,
  
  #ifdef CONFIG_HAVE_GUEST_PERF_EVENTS
- struct perf_guest_info_callbacks *perf_guest_cbs;
-+
- void perf_register_guest_info_callbacks(struct perf_guest_info_callbacks *cbs)
+ extern struct perf_guest_info_callbacks *perf_guest_cbs;
+-static inline struct perf_guest_info_callbacks *perf_get_guest_cbs(void)
+-{
+-	/* Reg/unreg perf_guest_cbs waits for readers via synchronize_rcu(). */
+-	lockdep_assert_preemption_disabled();
+-
+-	/* Prevent reloading between a !NULL check and dereferences. */
+-	return READ_ONCE(perf_guest_cbs);
+-}
++extern void arch_perf_update_guest_cbs(struct perf_guest_info_callbacks *guest_cbs);
+ extern void perf_register_guest_info_callbacks(struct perf_guest_info_callbacks *callbacks);
+ extern void perf_unregister_guest_info_callbacks(void);
+ #endif /* CONFIG_HAVE_GUEST_PERF_EVENTS */
+diff --git a/kernel/events/core.c b/kernel/events/core.c
+index ec36e7aded89..fb0fd670ab23 100644
+--- a/kernel/events/core.c
++++ b/kernel/events/core.c
+@@ -6491,6 +6491,7 @@ void perf_register_guest_info_callbacks(struct perf_guest_info_callbacks *cbs)
+ 		return;
+ 
+ 	WRITE_ONCE(perf_guest_cbs, cbs);
++	arch_perf_update_guest_cbs(cbs);
+ 	synchronize_rcu();
+ }
+ EXPORT_SYMBOL_GPL(perf_register_guest_info_callbacks);
+@@ -6498,6 +6499,7 @@ EXPORT_SYMBOL_GPL(perf_register_guest_info_callbacks);
+ void perf_unregister_guest_info_callbacks(void)
  {
- 	if (WARN_ON_ONCE(perf_guest_cbs))
+ 	WRITE_ONCE(perf_guest_cbs, NULL);
++	arch_perf_update_guest_cbs(NULL);
+ 	synchronize_rcu();
+ }
+ EXPORT_SYMBOL_GPL(perf_unregister_guest_info_callbacks);
 -- 
 2.33.0.259.gc128427fd7-goog
 
