@@ -2,75 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B87B83FA666
-	for <lists+kvm@lfdr.de>; Sat, 28 Aug 2021 17:13:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 148383FA767
+	for <lists+kvm@lfdr.de>; Sat, 28 Aug 2021 21:45:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231703AbhH1POW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 28 Aug 2021 11:14:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41114 "EHLO
+        id S232499AbhH1TqT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 28 Aug 2021 15:46:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44100 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230034AbhH1POV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 28 Aug 2021 11:14:21 -0400
-Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2933C061756
-        for <kvm@vger.kernel.org>; Sat, 28 Aug 2021 08:13:30 -0700 (PDT)
-Received: by mail-lf1-x135.google.com with SMTP id p38so21174989lfa.0
-        for <kvm@vger.kernel.org>; Sat, 28 Aug 2021 08:13:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:reply-to:from:date:message-id:subject:to;
-        bh=OS0wbKqas7a539x+n8toazOUnYtdbNigT84K+DI5p+M=;
-        b=UDwVu3gSdHsuUJ8RJsnNg2fZB5mOKl7mf4SmThuPn/EDUd6LNnnAvTaJ9FY6ax83tf
-         /HBWeu80BYNsB3UWmmMB8mfTV7q5r4P8heAhETIl5oVu1aSsmzCTUdrtguuLgejuiZoV
-         MBKfwPz/PAUq4qfa6ePGuGfoBUAux2yWKxII8fys41coM3JZFzJ5lsmBli7XxZ9K/vBM
-         U4uzU6iWZVLJFEns4N04iwsnCwdIIoXuaTs69h6ON2reNUd0yaA07IzdKmlux/vQ4GsG
-         OSZu7gwmsLW7TtYjzLJ8HANOVdl0OwNxPn+M3kxtaR+jCHWA8JZHdFxS6LiqRZifz0rs
-         szRg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to;
-        bh=OS0wbKqas7a539x+n8toazOUnYtdbNigT84K+DI5p+M=;
-        b=qjgmMup32cGJk8I7tHj1W25L+5l9T0UXJSZ6FUbqKedml0e+R9cYsCacnVJYVImHfF
-         4h4cFM/5aQ+XuO4FMYe6qarMbUEOYDBD5CMHoCkl4+XcM23uTWfFpDFDkUc8n7UB/BGr
-         L/p5Oyjbzfc6x7VP1le+RmK5gub+vf84uibmKtQVfuyhaOGlosawU8fbinxbf/t9M93a
-         iomLay66e/LeWrFvIMoC375DCo6JIayiAME/7rzi2LxTbVUUgOFIeqtYCZGvmx0j3cw6
-         pHaxbWm8nCK/0cl+TiaWmQ925b8EYIlbAjLWEcPYCf35Z0JOwErd15CQC85vcaMsttY5
-         bRrQ==
-X-Gm-Message-State: AOAM530uGH7nBq/z0WmzxouyoOEaTtqFQkiJYifiCY7nrlYHAxhV9Kjo
-        Givlj0j3fwCgWjfo2AUvRsOBNncaBFSSs1Rppcw=
-X-Google-Smtp-Source: ABdhPJzJMzXsfDz9vqHddXVGiT0bec+EsFkOj50PsWeNqcbkLXLn+jIj77x2xCtjNdbFAzjhOYWvmcyNzPoOThjMsV0=
-X-Received: by 2002:a19:6b02:: with SMTP id d2mr11242526lfa.522.1630163609173;
- Sat, 28 Aug 2021 08:13:29 -0700 (PDT)
+        with ESMTP id S230253AbhH1TqT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 28 Aug 2021 15:46:19 -0400
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 389A5C061756;
+        Sat, 28 Aug 2021 12:45:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=XaDJo/Xp/thzakG+AyFw4gfOeYqXSd+OvToP2IAZADw=; b=iaSYaDXqR2I0RfntlzqVugj0Nj
+        rXYt5kYTwyGKSPywFnw4fyUzTY9LAxxbRjtQkmlvftPwsUj5uPz2F5YspCjIPUg0EU+uNCyGQ3m1z
+        lWBYQwuSheYbXudKlCIc8TNjxaN9C6VQgIvcLqNM4nad3zEOcmW0XTeahuIU8N5XEWm3P7Ut9+abN
+        Q8fQ7zTfRTZ3R7RoF/QygqFwsUOnFQLkR+lOFf7wq4T+6b6moR3EFv7YMAVF9pd5Ox3uQjzGFISAV
+        ivzAchA/SXjNJ8WNIC5WtqGO0JdesSU+G3xE61VeRun7z2ArlsfJGMdbJCaLwzEcpgePCOVpe7U2B
+        vRqaWBQQ==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=worktop.programming.kicks-ass.net)
+        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mK4Fb-00Dvei-M3; Sat, 28 Aug 2021 19:44:23 +0000
+Received: by worktop.programming.kicks-ass.net (Postfix, from userid 1000)
+        id A026C98679D; Sat, 28 Aug 2021 21:44:21 +0200 (CEST)
+Date:   Sat, 28 Aug 2021 21:44:21 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Ingo Molnar <mingo@redhat.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Will Deacon <will@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Marc Zyngier <maz@kernel.org>, Guo Ren <guoren@kernel.org>,
+        Nick Hu <nickhu@andestech.com>,
+        Greentime Hu <green.hu@gmail.com>,
+        Vincent Chen <deanbo422@gmail.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Borislav Petkov <bp@alien8.de>, x86@kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Juergen Gross <jgross@suse.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Jiri Olsa <jolsa@redhat.com>,
+        Namhyung Kim <namhyung@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-csky@vger.kernel.org, linux-riscv@lists.infradead.org,
+        kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
+        Artem Kashkanov <artem.kashkanov@intel.com>,
+        Like Xu <like.xu.linux@gmail.com>,
+        Zhu Lingshan <lingshan.zhu@intel.com>
+Subject: Re: [PATCH v2 01/13] perf: Ensure perf_guest_cbs aren't reloaded
+ between !NULL check and deref
+Message-ID: <20210828194421.GB4353@worktop.programming.kicks-ass.net>
+References: <20210828003558.713983-1-seanjc@google.com>
+ <20210828003558.713983-2-seanjc@google.com>
 MIME-Version: 1.0
-Received: by 2002:a9a:7f53:0:b0:138:daa1:52eb with HTTP; Sat, 28 Aug 2021
- 08:13:28 -0700 (PDT)
-Reply-To: mrmichelduku@outlook.com
-From:   mr michel <mrmichel2233@gmail.com>
-Date:   Sat, 28 Aug 2021 15:13:28 +0000
-Message-ID: <CALSo2NagTG5_r=G3PeG=XeeBfVWHcPRiNeBgFF8Z8ObLd_42pw@mail.gmail.com>
-Subject: Please respond urgently
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210828003558.713983-2-seanjc@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello,
+On Fri, Aug 27, 2021 at 05:35:46PM -0700, Sean Christopherson wrote:
 
-I know that this mail will come to you as a surprise as we have never
-met before, but never mind i have decided to make this contact with
-you as I believe that you can be of great assistance to me. I need
-your assistance in transferring the sum of $11.3million to your
-private account Where this money can be shared between us.
+> diff --git a/include/linux/perf_event.h b/include/linux/perf_event.h
+> index 2d510ad750ed..6b0405e578c1 100644
+> --- a/include/linux/perf_event.h
+> +++ b/include/linux/perf_event.h
+> @@ -1237,6 +1237,14 @@ extern void perf_event_bpf_event(struct bpf_prog *prog,
+>  				 u16 flags);
+>  
+>  extern struct perf_guest_info_callbacks *perf_guest_cbs;
+> +static inline struct perf_guest_info_callbacks *perf_get_guest_cbs(void)
+> +{
+> +	/* Reg/unreg perf_guest_cbs waits for readers via synchronize_rcu(). */
+> +	lockdep_assert_preemption_disabled();
+> +
+> +	/* Prevent reloading between a !NULL check and dereferences. */
+> +	return READ_ONCE(perf_guest_cbs);
+> +}
 
-The money has been here in our Bank lying dormant for years now
-without anybody coming for the claim. I want to release the money to
-you as the relative to our deceased customer (the account owner) who
-died in a plane crash with his family since October 2005.
+Nice..
 
-By indicating your interest I will send you the full details on how
-the business will be executed.
+>  extern int perf_register_guest_info_callbacks(struct perf_guest_info_callbacks *callbacks);
+>  extern int perf_unregister_guest_info_callbacks(struct perf_guest_info_callbacks *callbacks);
+>  
+> diff --git a/kernel/events/core.c b/kernel/events/core.c
+> index 464917096e73..2126f6327321 100644
+> --- a/kernel/events/core.c
+> +++ b/kernel/events/core.c
+> @@ -6491,14 +6491,19 @@ struct perf_guest_info_callbacks *perf_guest_cbs;
+>  
+>  int perf_register_guest_info_callbacks(struct perf_guest_info_callbacks *cbs)
+>  {
+> -	perf_guest_cbs = cbs;
+> +	if (WARN_ON_ONCE(perf_guest_cbs))
+> +		return -EBUSY;
+> +
+> +	WRITE_ONCE(perf_guest_cbs, cbs);
+> +	synchronize_rcu();
 
-Best Regards,
-Mr.Michel Duku.
+You're waiting for all NULL users to go away? :-) IOW, we can do without
+this synchronize_rcu() call.
+
+>  	return 0;
+>  }
+>  EXPORT_SYMBOL_GPL(perf_register_guest_info_callbacks);
+>  
+>  int perf_unregister_guest_info_callbacks(struct perf_guest_info_callbacks *cbs)
+>  {
+> -	perf_guest_cbs = NULL;
+
+	if (WARN_ON_ONCE(perf_guest_cbs != cbs))
+		return -EBUSY;
+
+?
+
+> +	WRITE_ONCE(perf_guest_cbs, NULL);
+> +	synchronize_rcu();
+>  	return 0;
+>  }
+>  EXPORT_SYMBOL_GPL(perf_unregister_guest_info_callbacks);
+
+Yes, this ought to work fine.
