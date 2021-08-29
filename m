@@ -2,97 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6CAFD3FACEC
-	for <lists+kvm@lfdr.de>; Sun, 29 Aug 2021 17:58:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E429A3FADA6
+	for <lists+kvm@lfdr.de>; Sun, 29 Aug 2021 20:11:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235771AbhH2Pyo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 29 Aug 2021 11:54:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33832 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235548AbhH2Pyn (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 29 Aug 2021 11:54:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630252431;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-        bh=/jaF7jZC8q/DpP5yyhldi4uUkfv/Q/aJYUDR7M+5EQ4=;
-        b=KQ5pApz2n835EnrAHbjDNq7xPjwus8ZD101vYJNGvXRMLvulWiaf8mVeuPZMHq6+AQO5ch
-        c9xoLFKy3bVcxgSodg644ttoFoCrDgdoJ1fNwMfRW9zJeJEJAiVxPv4Z6lcIcyxbfl1iwH
-        mSghjA0MFslE7+6mWMMF7+gOQopzx6A=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-291-JJ1OLpaZPzCnwUYT7b7Gcg-1; Sun, 29 Aug 2021 11:53:49 -0400
-X-MC-Unique: JJ1OLpaZPzCnwUYT7b7Gcg-1
-Received: by mail-ed1-f69.google.com with SMTP id e6-20020a056402088600b003c73100e376so5341373edy.17
-        for <kvm@vger.kernel.org>; Sun, 29 Aug 2021 08:53:49 -0700 (PDT)
+        id S235690AbhH2SM3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 29 Aug 2021 14:12:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56752 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230330AbhH2SM2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 29 Aug 2021 14:12:28 -0400
+Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D6C0C06175F
+        for <kvm@vger.kernel.org>; Sun, 29 Aug 2021 11:11:36 -0700 (PDT)
+Received: by mail-lf1-x133.google.com with SMTP id y34so26421919lfa.8
+        for <kvm@vger.kernel.org>; Sun, 29 Aug 2021 11:11:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=nOEXbomGVxdTg2YIKOufPA0FWw0BA6Ntj3OHAW88ff4=;
+        b=G9weGkeHN8FlJqJ0GQMGRkvYxT9+fXAmH0dB17bI65t7LV9Q70hlMMFtwZr4o4zSms
+         C3ZBm+mpNRjS+UkmvFIj8dKgUWkyzIyP3SJa7hZUeOvoF9uuwyCa0eKl5/wXl5LDkYvt
+         g1hC/0+a5me3A0DEW79RnUqRw17xLL0C1Ysgk=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition;
-        bh=/jaF7jZC8q/DpP5yyhldi4uUkfv/Q/aJYUDR7M+5EQ4=;
-        b=pTj0HGdIuqGOUCi8RFctCV5l4IS7hDLSEwmZN7Svrl3S6GGh8caZNW35nvlht3UVgr
-         1FQIT57tnR6PwKvCVBfWvcwsSdj/Y8q8TnD/ITI7bQnzFOkMaqEHrfPAGDAWiTIPS67x
-         JHPEd91aB6eDpVLxqCgC8KeeT//HsmmOwwp0b0w6q19cZIeRJOrE9JUysZs4DIlDKADa
-         JxrsHOLnD/jy9RiRN0/X+mmJPLhmsns3Dj7l8FHTzv0GCS0n9geHSg8lIGqu9k5/MYx6
-         Gjr9p6CIdzBYgESulLFdEaxEDp/dnVEzigWgTf9ZKKIPVzhiytrh5+Pt6ANiMGMpRQjx
-         AcRA==
-X-Gm-Message-State: AOAM5328Uu6W86KidGPzfxgecYsDDwUUJ8GJjgdzCXdkOaTKfR1Vqe2A
-        YpRiZiAJVF5SeXiJBAxvg8bF5wvYK83NuWhJ6JtsC/dBn9i3+q6bObEKUzrpk5ifPee3MTG8ne1
-        JzNWVDfREDQQx
-X-Received: by 2002:a17:907:212e:: with SMTP id qo14mr19145564ejb.501.1630252427534;
-        Sun, 29 Aug 2021 08:53:47 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzobXz3Ef1GROPF3oUnWQrRnebrjXnwnoH6TBBe6U6SyFAGgXQrD00rBwtykUugZTIDZOQ8Lw==
-X-Received: by 2002:a17:907:212e:: with SMTP id qo14mr19145554ejb.501.1630252427363;
-        Sun, 29 Aug 2021 08:53:47 -0700 (PDT)
-Received: from redhat.com ([2.55.137.4])
-        by smtp.gmail.com with ESMTPSA id s3sm5652608ejm.49.2021.08.29.08.53.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 29 Aug 2021 08:53:46 -0700 (PDT)
-Date:   Sun, 29 Aug 2021 11:53:43 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        akpm@linux-foundation.org, dan.carpenter@oracle.com,
-        david@redhat.com, jasowang@redhat.com, mst@redhat.com,
-        torvalds@linux-foundation.org
-Subject: [GIT PULL] virtio: a last minute fix
-Message-ID: <20210829115343-mutt-send-email-mst@kernel.org>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=nOEXbomGVxdTg2YIKOufPA0FWw0BA6Ntj3OHAW88ff4=;
+        b=hD9aB/WGBvJw/JcTtN6TZey2P4UPdOeir0ohOCOGndAFCS5tPCpeQsLYvZrjILAEJ9
+         twrl4f97D1FdTS4Gb9dbE+3cYlKn4WEc4VgK4boPtToyK/QJavW93IfTjwa2eoHkhOqv
+         dgtQpUWzjflyH03OmcOGhayILlsj4I0sn+mWq7v+thC36ZSw5Y7zvryNvAI1Dg8NGI9X
+         YrKfnCkhYYzkSWIBuS6iq8+3Ua83t2CaTJ9zzNU4cGUBtpzXpmPl9VviY5xUmqtiWZBU
+         eH+gIIeykQFi76cgBUjXlZGuG1c+TI0gzHYwzAqBRjUdrq7S2EtZS1TYQpp349QycgNO
+         MHgg==
+X-Gm-Message-State: AOAM530Yt2Pyxim8r6dE7lNQrCRy/U6XM4B80kUqoQQBmvkeXbOzhE39
+        Kx4IXVdrFDB/2DO/WzcbJgsvDg1Aq9jOPBNQ
+X-Google-Smtp-Source: ABdhPJzMc0e+MTIit7m+yVqng8APWh43e2IvzSzdEQUdt/1sozzbpXoqmNkYJ1j1QkzLo9hH2wo5tg==
+X-Received: by 2002:a05:6512:301:: with SMTP id t1mr4546437lfp.626.1630260693044;
+        Sun, 29 Aug 2021 11:11:33 -0700 (PDT)
+Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com. [209.85.208.182])
+        by smtp.gmail.com with ESMTPSA id 131sm1523176ljj.52.2021.08.29.11.11.31
+        for <kvm@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 29 Aug 2021 11:11:31 -0700 (PDT)
+Received: by mail-lj1-f182.google.com with SMTP id d16so21766291ljq.4
+        for <kvm@vger.kernel.org>; Sun, 29 Aug 2021 11:11:31 -0700 (PDT)
+X-Received: by 2002:a2e:7d0e:: with SMTP id y14mr17065408ljc.251.1630260691346;
+ Sun, 29 Aug 2021 11:11:31 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mutt-Fcc: =sent
+References: <20210829115343-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20210829115343-mutt-send-email-mst@kernel.org>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Sun, 29 Aug 2021 11:11:15 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wjYkPWoQWZEHXzd3azugRO4MCCEx9dBYKkVJLrk+1gsMg@mail.gmail.com>
+Message-ID: <CAHk-=wjYkPWoQWZEHXzd3azugRO4MCCEx9dBYKkVJLrk+1gsMg@mail.gmail.com>
+Subject: Re: [GIT PULL] virtio: a last minute fix
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     KVM list <kvm@vger.kernel.org>,
+        virtualization@lists.linux-foundation.org,
+        Netdev <netdev@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        David Hildenbrand <david@redhat.com>,
+        "Cc: stable@vger.kernel.org, david@redhat.com, dverkamp@chromium.org,
+        hch@lst.de, jasowang@redhat.com, liang.z.li@intel.com, mst@redhat.com,
+        tiny.windzz@gmail.com," <jasowang@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Donnu if it's too late - was on vacation and this only arrived
-Wednesday. Seems to be necessary to avoid introducing a regression
-in virtio-mem.
+On Sun, Aug 29, 2021 at 8:53 AM Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> Donnu if it's too late - was on vacation and this only arrived
+> Wednesday. Seems to be necessary to avoid introducing a regression
+> in virtio-mem.
 
-The following changes since commit e22ce8eb631bdc47a4a4ea7ecf4e4ba499db4f93:
+Heh. Not too late for 5.14, but too late in the sense that I had
+picked this one up manually already as commit 425bec0032f5
+("virtio-mem: fix sleeping in RCU read side section in
+virtio_mem_online_page_cb()").
 
-  Linux 5.14-rc7 (2021-08-22 14:24:56 -0700)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
-
-for you to fetch changes up to 816ff7595135948efde558221c8551bdd1869243:
-
-  virtio-mem: fix sleeping in RCU read side section in virtio_mem_online_page_cb() (2021-08-29 11:50:04 -0400)
-
-----------------------------------------------------------------
-virtio: a last minute fix
-
-Fix a regression in virtio-mem.
-
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-
-----------------------------------------------------------------
-David Hildenbrand (1):
-      virtio-mem: fix sleeping in RCU read side section in virtio_mem_online_page_cb()
-
- drivers/virtio/virtio_mem.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
-
+                Linus
