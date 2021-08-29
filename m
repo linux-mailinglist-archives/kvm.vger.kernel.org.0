@@ -2,111 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C553C3FA83E
-	for <lists+kvm@lfdr.de>; Sun, 29 Aug 2021 04:35:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 306E43FA968
+	for <lists+kvm@lfdr.de>; Sun, 29 Aug 2021 08:01:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233635AbhH2Cg2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 28 Aug 2021 22:36:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48248 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230334AbhH2Cg1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 28 Aug 2021 22:36:27 -0400
-Received: from mail-il1-x12d.google.com (mail-il1-x12d.google.com [IPv6:2607:f8b0:4864:20::12d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 313C4C061756
-        for <kvm@vger.kernel.org>; Sat, 28 Aug 2021 19:35:36 -0700 (PDT)
-Received: by mail-il1-x12d.google.com with SMTP id s16so11781726ilo.9
-        for <kvm@vger.kernel.org>; Sat, 28 Aug 2021 19:35:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=RudsPPL2jXFkdPRzt+igCskpzL+QGPjfc2x3ccwPC9w=;
-        b=J9dShv8oT22vhmmqH2pkP0XLxIOEJ7tW9eSIEdnG1fyr3GwcpVNpmGYZWHtUTPwbdc
-         lKZST7xRrEZtCCb+YWt8Xhzpj6P/kSiXR0smrgRiSTf5HtapPENUniwt6x6XneYgBx0f
-         MhIbbwvej2DS9j87DesFkvJyYr27DVk+uIr34OeQabcGSnyM56UwM+VJQyZowkGY0Neh
-         OsWFl9GKalS1FqlEsxb3bHlOl0fYVMlSmFGYXE7WCyXLDSvB9bwTTYN1vCxZ84vvyh5r
-         lSjypE12DhI1TxK1lGSxbhqQx8NkclxW++kh+LZbm+cV6BzzD9CA8RVPG7HK+8BEXDGe
-         18qQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=RudsPPL2jXFkdPRzt+igCskpzL+QGPjfc2x3ccwPC9w=;
-        b=Z2fgwVSEubtoi3ZwLNwKjmT7/ikjSFge4VLPUZPVkIrm9dgikWt4Tw1ps8kSfRv4Py
-         026gUYg2dHZwzjathRA/AACWf6cC+R03xhESkzZ3ffzhuol8X+dfiS9hx9vY6rcytiDW
-         YTUFp9rVa9OxyaycnSQXo0c3LEh8a93iKfevGgSlbFZGefeS2rWaCP69gS1jfmQE5Bsf
-         ardviGdr1kMXY/XEUEPZ3XhBH/QVZexsybTapTrZDsJRgHRHqDSitLCIM2HYdt4UY2S0
-         hSUkuZwfV0RglWIUySpB1+j1KD43oU1zZx6qt7TtVKMT2NlddSTNS5Mjm4DCr0Lz8y8G
-         QqoA==
-X-Gm-Message-State: AOAM533nzPGebWHaeDkehilpeeDiJLTRp5y35wOvKtKFU29WGH3eo7od
-        /BqPmWadvseTdbvSu52KhL6PVI5JYbNgssIB
-X-Google-Smtp-Source: ABdhPJwqUHMTxEkDQA8hFpGHHEo0tu8/O2NMjK/5E7lfYuh/Mo0XzToNBlb9dDEkFv0S5CWvSmaOLA==
-X-Received: by 2002:a92:cda4:: with SMTP id g4mr11981754ild.236.1630204534995;
-        Sat, 28 Aug 2021 19:35:34 -0700 (PDT)
-Received: from google.com (194.225.68.34.bc.googleusercontent.com. [34.68.225.194])
-        by smtp.gmail.com with ESMTPSA id h11sm1851451ilc.7.2021.08.28.19.35.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 28 Aug 2021 19:35:34 -0700 (PDT)
-Date:   Sun, 29 Aug 2021 02:35:30 +0000
-From:   Oliver Upton <oupton@google.com>
-To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-arm-kernel@lists.infradead.org,
-        Andrew Jones <drjones@redhat.com>,
-        Will Deacon <will@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v7 3/7] KVM: arm64: Allow userspace to configure a vCPU's
- virtual offset
-Message-ID: <YSryci4dSuRAEg+g@google.com>
-References: <20210816001217.3063400-1-oupton@google.com>
- <20210816001217.3063400-4-oupton@google.com>
+        id S233899AbhH2GCV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 29 Aug 2021 02:02:21 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50792 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229634AbhH2GCU (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 29 Aug 2021 02:02:20 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 17T5uDh5107480;
+        Sun, 29 Aug 2021 02:01:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : content-transfer-encoding : mime-version; s=pp1;
+ bh=qRUSnzH8Q5ZUGV0OXgkbCsOibmAMVxcMR4LqWn/knhk=;
+ b=bakdzzjMOIuhLBVm9IjoIqZp9otlR97fE8spiCKwGKbE8c4K+e4aLBZdfjmljSghpyAc
+ eEAXf2wIVal0a0OkJCpebeluVenBI64Rlwb8fnaqeYdWxnG3/f3heNWDJ5x8pzT+3XTT
+ +zpCGvJ3CIDQwzPUtsPgzbCQjmtuDXeUiEuWWx6FuTUwrtaL9qaovei5TDh+498E21t9
+ ef3l5+Nx3rmUn+H8nTvz9aXMxpkP3BCb0j11HIpXTbGFlwgqgTJjEIyXV5zVE+KPxH3F
+ YL3KiD8MXtLGzRJBIurYntd3mbb8crJ6YvUur1VuE/ufkWc+X7kDLhTfDl6cJq5WpSU8 Dw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3ar4hcg2qp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sun, 29 Aug 2021 02:01:28 -0400
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 17T5uED3107584;
+        Sun, 29 Aug 2021 02:01:28 -0400
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3ar4hcg2q4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sun, 29 Aug 2021 02:01:28 -0400
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 17T5tEg8012400;
+        Sun, 29 Aug 2021 06:01:26 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma04fra.de.ibm.com with ESMTP id 3aqcs896dq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sun, 29 Aug 2021 06:01:25 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 17T61M5J29819352
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sun, 29 Aug 2021 06:01:22 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4E3B652051;
+        Sun, 29 Aug 2021 06:01:22 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTPS id 39DB052065;
+        Sun, 29 Aug 2021 06:01:22 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 25651)
+        id DC72FE07E8; Sun, 29 Aug 2021 08:01:21 +0200 (CEST)
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     KVM <kvm@vger.kernel.org>, Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+Subject: [GIT PULL 0/2] KVM: s390: Fix and feature for 5.15
+Date:   Sun, 29 Aug 2021 08:01:19 +0200
+Message-Id: <20210829060121.16702-1-borntraeger@de.ibm.com>
+X-Mailer: git-send-email 2.31.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: ftngaYicVHpVnMw8eX-iQbvwxyGNFkTr
+X-Proofpoint-GUID: bMb_SbGmhRlyAgiqHkc0dXUQs5HkP77R
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210816001217.3063400-4-oupton@google.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-08-29_01:2021-08-27,2021-08-29 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 adultscore=0
+ clxscore=1015 impostorscore=0 suspectscore=0 phishscore=0 mlxlogscore=999
+ lowpriorityscore=0 bulkscore=0 priorityscore=1501 mlxscore=0 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2107140000
+ definitions=main-2108290031
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 16, 2021 at 12:12:13AM +0000, Oliver Upton wrote:
-> Allow userspace to access the guest's virtual counter-timer offset
-> through the ONE_REG interface. The value read or written is defined to
-> be an offset from the guest's physical counter-timer. Add some
-> documentation to clarify how a VMM should use this and the existing
-> CNTVCT_EL0.
-> 
-> Signed-off-by: Oliver Upton <oupton@google.com>
-> Reviewed-by: Andrew Jones <drjones@redhat.com>
+Paolo,
 
-Hrm...
+sorry for being so late. One feature (enable hardware interpretion of
+specification exceptions) and one fix targeted for stable. Given the
+short runway to 5.14 I decided to let this go via next and not try to
+sneak it into 5.14.
 
-I was mulling on this patch a bit more and had a thought. As previously
-discussed, the patch implements virtual offsets by broadcasting the same
-offset to all vCPUs in a guest. I wonder if this may tolerate bad
-practices from userspace that will break when KVM supports NV.
+The following changes since commit 1f703d2cf20464338c3d5279dddfb65ac79b8782:
 
-Consider that a nested guest may set CNTVOFF_EL2 to whatever value it
-wants. Presumably, we will need to patch the handling of CNTVOFF_EL2 to
-*not* broadcast to all vCPUs to save/restore NV properly. If a maligned
-VMM only wrote to a single vCPU, banking on this broadcasting
-implementation, it will fall flat on its face when handling an NV guest.
+  KVM: s390: allow facility 192 (vector-packed-decimal-enhancement facility 2) (2021-06-23 09:35:20 +0200)
 
-So, should we preemptively move to the new way of the world, wherein
-userspace accesses to CNTVOFF_EL2 are vCPU-local rather than VM-wide?
+are available in the Git repository at:
 
-No strong opinions in either direction, but figured I'd address it since
-I'll need to respin this series anyway to fix ECV+nVHE.
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git  tags/kvm-s390-next-5.15-1
 
---
-Thanks,
-Oliver
+for you to fetch changes up to a3e03bc1368c1bc16e19b001fc96dc7430573cc8:
+
+  KVM: s390: index kvm->arch.idle_mask by vcpu_idx (2021-08-27 18:35:41 +0200)
+
+----------------------------------------------------------------
+KVM: s390: Fix and feature for 5.15
+
+- enable interpretion of specification exceptions
+- fix a vcpu_idx vs vcpu_id mixup
+
+----------------------------------------------------------------
+Halil Pasic (1):
+      KVM: s390: index kvm->arch.idle_mask by vcpu_idx
+
+Janis Schoetterl-Glausch (1):
+      KVM: s390: Enable specification exception interpretation
+
+ arch/s390/include/asm/kvm_host.h |  2 ++
+ arch/s390/kvm/interrupt.c        | 12 ++++++------
+ arch/s390/kvm/kvm-s390.c         |  4 +++-
+ arch/s390/kvm/kvm-s390.h         |  2 +-
+ arch/s390/kvm/vsie.c             |  2 ++
+ 5 files changed, 14 insertions(+), 8 deletions(-)
