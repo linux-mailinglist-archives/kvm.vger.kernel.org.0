@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 411B13FB600
-	for <lists+kvm@lfdr.de>; Mon, 30 Aug 2021 14:31:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 765F93FB653
+	for <lists+kvm@lfdr.de>; Mon, 30 Aug 2021 14:46:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231963AbhH3M2I (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Aug 2021 08:28:08 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:31919 "EHLO
+        id S236733AbhH3Mqi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Aug 2021 08:46:38 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:47100 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231765AbhH3M2H (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 30 Aug 2021 08:28:07 -0400
+        by vger.kernel.org with ESMTP id S229957AbhH3Mqh (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 30 Aug 2021 08:46:37 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630326433;
+        s=mimecast20190719; t=1630327543;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=JULOJ3D1oEHDnIvJ24fJzaZfSU8J0Xhje3NMw5KwOms=;
-        b=VHZ8YbRSnmgwT3iapezS/XYVYeKmn498+srOH4LnyUjSJ4vp3uoY2hBxHCOiuubNTimUdp
-        yi1NrNGVYRlxfANUo4kQuUTM/maMGnyAEydlhDzdh2ZdnZL3XW1aqdNVE1097hjFKewgqP
-        XmpKe12i3b4WFXqYtbkyJnvfYUqWrtI=
+        bh=D+jzq5oZx1Has3OWiVMtuBB4fFZoD4UvCMmeyzOU7Ws=;
+        b=A6btUu0bODBaSYNZBxX+F0jM+Qcxj4ndaQ2qrjy5hIZwG0dvTLDtLvwRHWL1wOG0yEI366
+        5f7r/Vx919dt20lmseIQhI4e4N7OlACBRtAw9rEiLW/gNKTk4HrWy8EVnkjlTkKkekXnFj
+        nU0MDB/oA2BQ/Hdz+UCicp7jFsiYRSE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-286-fPIcY7stOCKGYrQnRllVCA-1; Mon, 30 Aug 2021 08:27:10 -0400
-X-MC-Unique: fPIcY7stOCKGYrQnRllVCA-1
+ us-mta-132-OLKGGL4RNie0RTmU3GXqpw-1; Mon, 30 Aug 2021 08:45:40 -0400
+X-MC-Unique: OLKGGL4RNie0RTmU3GXqpw-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 333DF1008064;
-        Mon, 30 Aug 2021 12:27:08 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 57F10100CA8F;
+        Mon, 30 Aug 2021 12:45:38 +0000 (UTC)
 Received: from starship (unknown [10.35.206.50])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BD79460939;
-        Mon, 30 Aug 2021 12:27:03 +0000 (UTC)
-Message-ID: <36d7884ddc472c8cf6f30e642985e2f3a4066651.camel@redhat.com>
-Subject: Re: [PATCH 1/2] KVM: VMX: avoid running vmx_handle_exit_irqoff in
- case of emulation
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 325FF60854;
+        Mon, 30 Aug 2021 12:45:34 +0000 (UTC)
+Message-ID: <0a8368d9f27e3c072865a415fd1ca90190d99d25.camel@redhat.com>
+Subject: Re: [PATCH 2/2] VMX: nSVM: enter protected mode prior to returning
+ to nested guest from SMM
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     kvm@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
@@ -50,11 +50,11 @@ Cc:     kvm@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
         Borislav Petkov <bp@alien8.de>,
         "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
         <linux-kernel@vger.kernel.org>
-Date:   Mon, 30 Aug 2021 15:27:02 +0300
-In-Reply-To: <YSe6wphK9b8KSkXW@google.com>
+Date:   Mon, 30 Aug 2021 15:45:33 +0300
+In-Reply-To: <YSfAAYN/Ng/L1IMa@google.com>
 References: <20210826095750.1650467-1-mlevitsk@redhat.com>
-         <20210826095750.1650467-2-mlevitsk@redhat.com>
-         <YSe6wphK9b8KSkXW@google.com>
+         <20210826095750.1650467-3-mlevitsk@redhat.com>
+         <YSfAAYN/Ng/L1IMa@google.com>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
@@ -64,115 +64,197 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2021-08-26 at 16:01 +0000, Sean Christopherson wrote:
+On Thu, 2021-08-26 at 16:23 +0000, Sean Christopherson wrote:
 > On Thu, Aug 26, 2021, Maxim Levitsky wrote:
-> > If we are emulating an invalid guest state, we don't have a correct
-> > exit reason, and thus we shouldn't do anything in this function.
+> > SMM return code switches CPU to real mode, and
+> > then the nested_vmx_enter_non_root_mode first switches to vmcs02,
+> > and then restores CR0 in the KVM register cache.
+> > 
+> > Unfortunately when it restores the CR0, this enables the protection mode
+> > which leads us to "restore" the segment registers from
+> > "real mode segment cache", which is not up to date vs L2 and trips
+> > 'vmx_guest_state_valid check' later, when the
+> > unrestricted guest mode is not enabled.
+> 
+> I suspect this is slightly inaccurate.  When loading vmcs02, vmx_switch_vmcs()
+> will do vmx_register_cache_reset(), which also causes the segment cache to be
+> reset.  enter_pmode() will still load stale values, but they'll come from vmcs02,
+> not KVM's segment register cache.
+> 
+> > This happens to work otherwise, because after we enter the nested guest,
+> > we restore its register state again from SMRAM with correct values
+> > and that includes the segment values.
+> > 
+> > As a workaround to this if we enter protected mode first,
+> > then setting CR0 won't cause this damage.
 > > 
 > > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> 
-> This should have Cc: stable.  I believe userspace could fairly easily trick KVM
-> into "handling" a spurious IRQ, e.g. trigger SIGALRM and stuff invalid state.
-> For all those evil folks running CPUs that are almost old enough to drive :-)
-> 
 > > ---
-> >  arch/x86/kvm/vmx/vmx.c | 3 +++
-> >  1 file changed, 3 insertions(+)
+> >  arch/x86/kvm/vmx/vmx.c | 7 +++++++
+> >  1 file changed, 7 insertions(+)
 > > 
 > > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > index fada1055f325..0c2c0d5ae873 100644
+> > index 0c2c0d5ae873..805c415494cf 100644
 > > --- a/arch/x86/kvm/vmx/vmx.c
 > > +++ b/arch/x86/kvm/vmx/vmx.c
-> > @@ -6382,6 +6382,9 @@ static void vmx_handle_exit_irqoff(struct kvm_vcpu *vcpu)
-> >  {
-> >  	struct vcpu_vmx *vmx = to_vmx(vcpu);
+> > @@ -7507,6 +7507,13 @@ static int vmx_leave_smm(struct kvm_vcpu *vcpu, const char *smstate)
+> >  	}
 > >  
-> > +	if (vmx->emulation_required)
-> > +		return;
+> >  	if (vmx->nested.smm.guest_mode) {
+> > +
+> > +		/*
+> > +		 * Enter protected mode to avoid clobbering L2's segment
+> > +		 * registers during nested guest entry
+> > +		 */
+> > +		vmx_set_cr0(vcpu, vcpu->arch.cr0 | X86_CR0_PE);
 > 
-> Rather than play whack-a-mole with flows consuming stale state, I'd much prefer
-> to synthesize a VM-Exit(INVALID_GUEST_STATE).  Alternatively, just skip ->run()
-> entirely by adding hooks in vcpu_enter_guest(), but that's a much larger change
-> and probably not worth the risk at this juncture.
+> I'd really, really, reaaaally like to avoid stuffing state.  All of the instances
+> I've come across where KVM has stuffed state for something like this were just
+> papering over one symptom of an underlying bug.
+
+I can't agree more with you on this. I even called this patch a hack in the cover letter,
+because I didn't like it either.
+
+
 > 
-> ---
->  arch/x86/kvm/vmx/vmx.c | 17 ++++++++++++++---
->  1 file changed, 14 insertions(+), 3 deletions(-)
+> For example, won't this now cause the same bad behavior if L2 is in Real Mode?
 > 
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 32e3a8b35b13..12fe63800889 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -6618,10 +6618,21 @@ static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
->  		     vmx->loaded_vmcs->soft_vnmi_blocked))
->  		vmx->loaded_vmcs->entry_time = ktime_get();
->  
-> -	/* Don't enter VMX if guest state is invalid, let the exit handler
-> -	   start emulation until we arrive back to a valid state */
-> -	if (vmx->emulation_required)
-> +	/*
-> +	 * Don't enter VMX if guest state is invalid, let the exit handler
-> +	 * start emulation until we arrive back to a valid state.  Synthesize a
-> +	 * consistency check VM-Exit due to invalid guest state and bail.
-> +	 */
-> +	if (unlikely(vmx->emulation_required)) {
-> +		vmx->fail = 0;
-> +		vmx->exit_reason.full = EXIT_REASON_INVALID_STATE;
-> +		vmx->exit_reason.failed_vmentry = 1;
-> +		kvm_register_mark_available(vcpu, VCPU_EXREG_EXIT_INFO_1);
-> +		vmx->exit_qualification = ENTRY_FAIL_DEFAULT;
-> +		kvm_register_mark_available(vcpu, VCPU_EXREG_EXIT_INFO_2);
-> +		vmx->exit_intr_info = 0;
->  		return EXIT_FASTPATH_NONE;
-> +	}
+> Is the problem purely that emulation_required is stale?  If so, how is it stale?
+> Every segment write as part of RSM emulation should reevaluate emulation_required
+> via vmx_set_segment().
 
-I was thinking exactly about this when I wrote the patch, and in fact first
-version of it did roughly what you suggest.
+So this is what is happening:
 
-But I was afraid that this will also introduce a whack-a-mole as now
-it "appears" as if VM entry failed and we should thus kill the guest.
+1. rsm emulation switches the vCPU from the 64 bit protected mode (since BIOS SMM handler
+   of course switches to it) to real mode via CR0 write.
 
-But I'll try that.
+   Here 'enter_rmode' is called which saves current segment register values in 'real mode segemnt cache',
+   and then fixes the values in VMCS to 'work' in vm86 mode. The saved architectural values in that 'cache'
+   are then used, when trying to read them (e.g via vmx_get_segment)
 
-Thanks a lot for the review!
+2. vmx_leave_smm is called which calls nested_vmx_enter_non_root_mode
+   this is unusually done in real mode, while otherwise VMX non root mode entry is
+   only possible from protected mode (all vmx instructions #UD in real mode).
 
+3. nested_vmx_enter_non_root_mode first thing switches to vmcb02 by vmx_switch_vmcs
+   which 'loads' the L2 segments, because it zeros the segment cache via vmx_register_cache_reset),
+   so any attempt to read them will read them from vmcs02.
+
+   That means that at this point all good segment values are loaded.
+
+4. Now prepare_vmcs02 is called which eventually sets KVM's CR0 using 'vmx_set_cr0'
+
+   At that point that function notices that we are entering protected mode and thus 
+   enter_pmode is called, which first reads the segment values from the real mode segment
+   cache (which reflect sadly change to CS that rsm emulation did), updates their base & selectors
+   but not segment types, and writes back these segments, corrupting the L2 state.
+
+   The code is:
+
+   vmx_get_segment(vcpu, &vmx->rmode.segs[VCPU_SREG_CS], VCPU_SREG_CS); // reads segment cache since vmx->rmode.vm86_active = 1;
+   ...
+   vmx->rmode.vm86_active = 0;
+   ...
+   fix_pmode_seg(vcpu, VCPU_SREG_CS, &vmx->rmode.segs[VCPU_SREG_CS]):
+	__vmx_set_segment(vcpu, save, seg);
+
+
+My hack was to avoid all this by setting protected mode first and then doing the nested
+entry, which is more natural as I said above.
+
+
+> 
+> Oooooh, or are you talking about the explicit vmx_guest_state_valid() in prepare_vmcs02()?
+> If that's the case, then we likely should skip that check entirely.  The only part
+> I'm not 100% clear on is whether or not it can/should be skipped for vmx_set_nested_state().
+
+Yes. Initially in the first version (which I didn't post) of the patches I indeed just removed this check and it 
+works sans another fix which is correct to have anyway,
+(see note below).
+
+The L2 will briefly have invalid state and it will be fixed by loading registers from SMRAM.
+ 
+ 
+For vmx_set_nested_state I suspect something similiar can happen at least in theory:
+We load the nested state, and then restore the registers, and only then the state becomes valid.
+
+So it makes sense to remove this check for all but from_entry==true case.
+ 
+However we do need to extend the check in vmx_vcpu_run that if the guest state is not valid and we
+are nested, then fail instead of emulating.
+I'll do this.
+ 
+
+NOTE: There is another fix that has to be done if I remove the
+check for validity of the nested state in nested_vmx_enter_non_root_mode, instead of stuffing
+the protected mode state hack:
+
+This is what is happening:
+ 
+1. rsm emulation switches vCPU (that is vmcs01) to real mode, this state is left in vmcs01
+This means that now L1 state is not valid as well!
+(but with my hack that switches vCPU to protected mode, this doesn't happen accidentaly!)
+ 
+
+2. We switch to vmcb02, L2 state temporary invalid as it has protected mode segments and real mode. 
+
+3. rsm emulation loads L2 registers from SMBASE, and makes the L2 state valid again.
+ 
+4. we (optionally) enter L2
+ 
+5. we exit to L1. L1 guest state is real mode, and invalid now.
+
+We overwrite L1's guest state with vmcb12 host state which is *valid*, however the way the
+'load_vmcs12_host_state' works, is that it uses __vmx_set_segment which doesn't update
+'emulation_required', and thus the L1 state doesn't become valid, 
+we try to emulate it and crash eventually as the emulator can't really emulate everything.
+
+I am now posting a new version of my SMM fixes with title '[PATCH v2 0/6] KVM: few more SMM fixes' 
+(I merged the SVM and VMX fixes in single patch series), and I include all of the above there.
+
+Thanks again for the review!
+  
 Best regards,
 	Maxim Levitsky
 
 
->  
->  	trace_kvm_entry(vcpu);
->  
-> --
 > 
-> or the beginnings of an aggressive refactor...
-
-
-
-
-
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index cf8fb6eb676a..a4fe0f78898a 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -9509,6 +9509,9 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
->                 goto cancel_injection;
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index bc6327950657..20bd84554c1f 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -2547,7 +2547,7 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
+>          * which means L1 attempted VMEntry to L2 with invalid state.
+>          * Fail the VMEntry.
+>          */
+> -       if (CC(!vmx_guest_state_valid(vcpu))) {
+> +       if (from_vmentry && CC(!vmx_guest_state_valid(vcpu))) {
+>                 *entry_failure_code = ENTRY_FAIL_DEFAULT;
+>                 return -EINVAL;
 >         }
 > 
-> +       if (unlikely(static_call(kvm_x86_emulation_required)(vcpu)))
-> +               return static_call(kvm_x86_emulate_invalid_guest_state)(vcpu);
-> +
->         preempt_disable();
 > 
->         static_call(kvm_x86_prepare_guest_switch)(vcpu);
+> If we want to retain the check for the common vmx_set_nested_state() path, i.e.
+> when the vCPU is truly being restored to guest mode, then we can simply exempt
+> the smm.guest_mode case (which also exempts that case when its set via
+> vmx_set_nested_state()).  The argument would be that RSM is going to restore L2
+> state, so whatever happens to be in vmcs12/vmcs02 is stale.
 > 
-> > +
-> >  	if (vmx->exit_reason.basic == EXIT_REASON_EXTERNAL_INTERRUPT)
-> >  		handle_external_interrupt_irqoff(vcpu);
-> >  	else if (vmx->exit_reason.basic == EXIT_REASON_EXCEPTION_NMI)
-> > -- 
-> > 2.26.3
-> > 
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index bc6327950657..ac30ba6a8592 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -2547,7 +2547,7 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
+>          * which means L1 attempted VMEntry to L2 with invalid state.
+>          * Fail the VMEntry.
+>          */
+> -       if (CC(!vmx_guest_state_valid(vcpu))) {
+> +       if (!vmx->nested.smm.guest_mode && CC(!vmx_guest_state_valid(vcpu))) {
+>                 *entry_failure_code = ENTRY_FAIL_DEFAULT;
+>                 return -EINVAL;
+>         }
+> 
+
+
 
 
