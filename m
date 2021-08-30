@@ -2,256 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0B2A73FB07E
-	for <lists+kvm@lfdr.de>; Mon, 30 Aug 2021 06:48:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E65483FB0CD
+	for <lists+kvm@lfdr.de>; Mon, 30 Aug 2021 07:27:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231261AbhH3Epc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Aug 2021 00:45:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55622 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231166AbhH3Epb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 Aug 2021 00:45:31 -0400
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 472F5C061760
-        for <kvm@vger.kernel.org>; Sun, 29 Aug 2021 21:44:38 -0700 (PDT)
-Received: by mail-pj1-x1049.google.com with SMTP id mm23-20020a17090b359700b00185945eae0eso2101658pjb.3
-        for <kvm@vger.kernel.org>; Sun, 29 Aug 2021 21:44:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=reply-to:date:in-reply-to:message-id:mime-version:references
-         :subject:from:to:cc;
-        bh=RoJ0LsLVs40o7Nox03dwwTrjHnUzwdc///UAgXfF3Tc=;
-        b=RF03EgJj3F24vcUGNvoG4Fh+n2kFhF1dlYTNKTong/NWfugW8QcnHaQAOodmweyrWW
-         OTWcGLn9VgFpufi8YlTXPZbXlRL0dcy9D9QiTdykURXnHQm6+vqtoo9/PmvlswCGkMI/
-         zH8OVGd2ywSruiGboumDNnm/Cn9ohVcsN2KjhTgc4pWYrNZBmquOxhLqVrCDnMvlWPoV
-         NWdJ3N4D/IAv3HG4euiZ/5SjNryM2sx2UWkgWDOLByPGWUdk6O7LhzUt14/CCfsznvON
-         Wi0YkrjRBZH23RYwBizZxVKAIp/UCyFBualBtzPaSCY2XExEVBL0SAesidMSdz2aiqaI
-         DVrQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:reply-to:date:in-reply-to:message-id
-         :mime-version:references:subject:from:to:cc;
-        bh=RoJ0LsLVs40o7Nox03dwwTrjHnUzwdc///UAgXfF3Tc=;
-        b=I3V+EhzAalLCIOCjub0x4f4efwjS1qdHf94STG6T6r+xFqOkjXswE+v0VNXCXXdxRQ
-         MNBvBpIav3cUuQ8JVyhhJJKvWF6YyJAcwv+Dk+llC58Cu0at9PBA81sfagml15/dFtJ9
-         hP4Wncah7xjDZXlT46KcVInh3gjVDLjruWSMKMAsLhzE6j6w4dDf0sfd5LZRAUYgCHNj
-         8mZ74+4QvNHOyPP6rFkjCGk2M8cG3Eb9MjqGAl1fTGgtGrlFON6nCRzQEbaNk3XYj0Ot
-         /N9a+pHTFF1eJJYT8fFmWqN5ZOAvlSj2GS9EEJ7T5ohojJb5nK3XYqU3gAr7518YBU9d
-         ZFAA==
-X-Gm-Message-State: AOAM533ehF4H7jIL1TQgdulEejNFD4urs1SQWYFa5Wsk8gbGUDIdHEKy
-        G88/neb0y39Z4N+6sLq5BxmBCZVSHLOe
-X-Google-Smtp-Source: ABdhPJzmW1FSmqK8xT6hF9uY4CuQPY0a/lTVmlyKfrQpQsAljqAmAfv0zV7Qa3Wq7VNMB5YJP+18LZqbNNPh
-X-Received: from mizhang-super.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1071])
- (user=mizhang job=sendgmr) by 2002:a17:903:32cd:b0:138:9904:ef79 with SMTP id
- i13-20020a17090332cd00b001389904ef79mr14594852plr.27.1630298677755; Sun, 29
- Aug 2021 21:44:37 -0700 (PDT)
-Reply-To: Mingwei Zhang <mizhang@google.com>
-Date:   Mon, 30 Aug 2021 04:44:25 +0000
-In-Reply-To: <20210830044425.2686755-1-mizhang@google.com>
-Message-Id: <20210830044425.2686755-3-mizhang@google.com>
-Mime-Version: 1.0
-References: <20210830044425.2686755-1-mizhang@google.com>
-X-Mailer: git-send-email 2.33.0.259.gc128427fd7-goog
-Subject: [PATCH v3 2/2] selftests: KVM: use dirty logging to check if page
- stats work correctly
-From:   Mingwei Zhang <mizhang@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Sean Christopherson <seanjc@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Peter Xu <peterx@redhat.com>, Ben Gardon <bgardon@google.com>,
-        Mingwei Zhang <mizhang@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S231727AbhH3F1K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Aug 2021 01:27:10 -0400
+Received: from mx13.kaspersky-labs.com ([91.103.66.164]:20409 "EHLO
+        mx13.kaspersky-labs.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229936AbhH3F1J (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 Aug 2021 01:27:09 -0400
+Received: from relay13.kaspersky-labs.com (unknown [127.0.0.10])
+        by relay13.kaspersky-labs.com (Postfix) with ESMTP id E7D1D520CAF;
+        Mon, 30 Aug 2021 08:26:13 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kaspersky.com;
+        s=mail202102; t=1630301174;
+        bh=G/A08wErR8GWnTnK1CdgiTF5nygATzwelmcu0b9y9ro=;
+        h=Subject:From:To:Message-ID:Date:MIME-Version:Content-Type;
+        b=4AVjG71Lb7lM2JlsSOE98NhJsd2f6r2OEpN3SxSc+Q5yNTiXqcDUfFcevbXbuHB4r
+         3moNwB4A3FJuQz1Bm32+9TkOFE9lUZwH4/ElRRNxp6A5N+MGWzFXVEbRKdrhqLp2JL
+         9yzLN0G93YADJ9Wbi2sZLJmSCVVEL2Aob+7x8PXWG0tkrgfBKN3nuhQQso4GbchXOV
+         Sy6fmc6dCOLIkka0snugW2XtEpkVKMRlqcR+Kc47YaYy8N1M3owJJdoV/CcuOa0PE4
+         NsDTPsmJfOgQ8dF/exfeJigCrm91nQpj3FjPZDojEkdzPiMnr+WYtideZJftA0R/54
+         yoOkv+B2wu/fQ==
+Received: from mail-hq2.kaspersky.com (unknown [91.103.66.206])
+        (using TLSv1.2 with cipher AES256-GCM-SHA384 (256/256 bits))
+        (Client CN "mail-hq2.kaspersky.com", Issuer "Kaspersky MailRelays CA G3" (verified OK))
+        by mailhub13.kaspersky-labs.com (Postfix) with ESMTPS id 046075214EE;
+        Mon, 30 Aug 2021 08:26:13 +0300 (MSK)
+Received: from [10.16.171.77] (10.64.64.121) by hqmailmbx3.avp.ru
+ (10.64.67.243) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2308.14; Mon, 30
+ Aug 2021 08:26:12 +0300
+Subject: Re: [RFC PATCH v3 0/6] virtio/vsock: introduce MSG_EOR flag for
+ SEQPACKET
+From:   Arseny Krasnov <arseny.krasnov@kaspersky.com>
+To:     Stefano Garzarella <sgarzare@redhat.com>
+CC:     Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Norbert Slusarek <nslusarek@gmx.net>,
+        Andra Paraschiv <andraprs@amazon.com>,
+        Colin Ian King <colin.king@canonical.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "stsp2@yandex.ru" <stsp2@yandex.ru>,
+        "oxffffaa@gmail.com" <oxffffaa@gmail.com>
+References: <20210816085036.4173627-1-arseny.krasnov@kaspersky.com>
+ <3f3fc268-10fc-1917-32c2-dc0e7737dc48@kaspersky.com>
+ <20210824100523.yn5hgiycz2ysdnvm@steredhat>
+ <d28ff03e-c8ab-f7c6-68a2-90c9a400d029@kaspersky.com>
+ <20210824103137.v3fny2yc5ww46p33@steredhat>
+ <0c0a7b61-524e-ab44-7d7e-b35bd094c7ca@kaspersky.com>
+Message-ID: <f251d84e-558e-9618-403c-253a1c2a1ea3@kaspersky.com>
+Date:   Mon, 30 Aug 2021 08:26:12 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+MIME-Version: 1.0
+In-Reply-To: <0c0a7b61-524e-ab44-7d7e-b35bd094c7ca@kaspersky.com>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Originating-IP: [10.64.64.121]
+X-ClientProxiedBy: hqmailmbx3.avp.ru (10.64.67.243) To hqmailmbx3.avp.ru
+ (10.64.67.243)
+X-KSE-ServerInfo: hqmailmbx3.avp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 5.9.20, Database issued on: 08/30/2021 05:09:14
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 0
+X-KSE-AntiSpam-Info: Lua profiles 165837 [Aug 30 2021]
+X-KSE-AntiSpam-Info: Version: 5.9.20.0
+X-KSE-AntiSpam-Info: Envelope from: arseny.krasnov@kaspersky.com
+X-KSE-AntiSpam-Info: LuaCore: 457 457 f9912fc467375383fbac52a53ade5bbe1c769e2a
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: kaspersky.com:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2
+X-KSE-AntiSpam-Info: Rate: 0
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Deterministic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 08/30/2021 05:12:00
+X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
+ rules found
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 30.08.2021 3:54:00
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
+ rules found
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+X-KLMS-Rule-ID: 52
+X-KLMS-Message-Action: clean
+X-KLMS-AntiSpam-Status: not scanned, disabled by settings
+X-KLMS-AntiSpam-Interceptor-Info: not scanned
+X-KLMS-AntiPhishing: Clean, bases: 2021/08/30 03:39:00
+X-KLMS-AntiVirus: Kaspersky Security for Linux Mail Server, version 8.0.3.30, bases: 2021/08/30 03:40:00 #17126216
+X-KLMS-AntiVirus-Status: Clean, skipped
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When dirty logging is enabled, KVM splits the hugepage mapping in NPT/EPT
-into the smallest 4K size after guest VM writes to it. This property could
-be used to check if the page stats metrics work properly in KVM x86/mmu. At
-the same time, this logic might be used the other way around: using page
-stats to verify if dirty logging really splits all huge pages after guest
-VM writes to all memory.
 
-So add page stats checking in dirty logging performance selftest. In
-particular, add checks in three locations:
- - just after vm is created;
- - after populating memory into vm without turning on dirty logging;
- - after guest vm writing to all memory again with dirty logging turned on.
+On 24.08.2021 14:35, Arseny Krasnov wrote:
+> On 24.08.2021 13:31, Stefano Garzarella wrote:
+>> Caution: This is an external email. Be cautious while opening links or attachments.
+>>
+>>
+>>
+>> On Tue, Aug 24, 2021 at 01:18:06PM +0300, Arseny Krasnov wrote:
+>>> On 24.08.2021 13:05, Stefano Garzarella wrote:
+>>>> Caution: This is an external email. Be cautious while opening links or attachments.
+>>>>
+>>>>
+>>>>
+>>>> Hi Arseny,
+>>>>
+>>>> On Mon, Aug 23, 2021 at 09:41:16PM +0300, Arseny Krasnov wrote:
+>>>>> Hello, please ping :)
+>>>>>
+>>>> Sorry, I was off last week.
+>>>> I left some minor comments in the patches.
+>>>>
+>>>> Let's wait a bit for other comments before next version, also on the
+>>>> spec, then I think you can send the next version without RFC tag.
+>>>> The target should be the net-next tree, since this is a new feature.
+>>> Hello,
+>>>
+>>> E.g. next version will be [net-next] instead of [RFC] for both
+>>> kernel and spec patches?
+>> Nope, net-next tag is useful only for kernel patches (net tree -
+>> Documentation/networking/netdev-FAQ.rst).
+> Ack
 
-Tested using commands:
- - ./dirty_log_perf_test -s anonymous_hugetlb_1gb
- - ./dirty_log_perf_test -s anonymous_hugetlb_2mb
- - ./dirty_log_perf_test -s anonymous_thp
+Hello,
 
-Cc: Sean Christopherson <seanjc@google.com>
-Cc: David Matlack <dmatlack@google.com>
-Cc: Jing Zhang <jingzhangos@google.com>
-Cc: Peter Xu <peterx@redhat.com>
+as there are no new comments on this week, i can send
 
-Suggested-by: Ben Gardon <bgardon@google.com>
-Signed-off-by: Mingwei Zhang <mizhang@google.com>
----
- .../selftests/kvm/dirty_log_perf_test.c       | 44 +++++++++++++++++++
- .../testing/selftests/kvm/include/test_util.h |  1 +
- .../selftests/kvm/include/x86_64/processor.h  |  7 +++
- tools/testing/selftests/kvm/lib/test_util.c   | 29 ++++++++++++
- 4 files changed, 81 insertions(+)
+new patchsets for both kernel and spec today. Kernel patches
 
-diff --git a/tools/testing/selftests/kvm/dirty_log_perf_test.c b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-index 3c30d0045d8d..bc598e07b295 100644
---- a/tools/testing/selftests/kvm/dirty_log_perf_test.c
-+++ b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-@@ -19,6 +19,10 @@
- #include "perf_test_util.h"
- #include "guest_modes.h"
- 
-+#ifdef __x86_64__
-+#include "processor.h"
-+#endif
-+
- /* How many host loops to run by default (one KVM_GET_DIRTY_LOG for each loop)*/
- #define TEST_HOST_LOOP_N		2UL
- 
-@@ -166,6 +170,18 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 	vm = perf_test_create_vm(mode, nr_vcpus, guest_percpu_mem_size,
- 				 p->slots, p->backing_src);
- 
-+#ifdef __x86_64__
-+	/*
-+	 * No vCPUs have been started yet, so KVM should not have created any
-+	 * mapping at this moment.
-+	 */
-+	TEST_ASSERT(get_page_stats(X86_PAGE_SIZE_4K) == 0,
-+		    "4K page is non zero");
-+	TEST_ASSERT(get_page_stats(X86_PAGE_SIZE_2M) == 0,
-+		    "2M page is non zero");
-+	TEST_ASSERT(get_page_stats(X86_PAGE_SIZE_1G) == 0,
-+		    "1G page is non zero");
-+#endif
- 	perf_test_args.wr_fract = p->wr_fract;
- 
- 	guest_num_pages = (nr_vcpus * guest_percpu_mem_size) >> vm_get_page_shift(vm);
-@@ -211,6 +227,22 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 	pr_info("Populate memory time: %ld.%.9lds\n",
- 		ts_diff.tv_sec, ts_diff.tv_nsec);
- 
-+#ifdef __x86_64__
-+	TEST_ASSERT(get_page_stats(X86_PAGE_SIZE_4K) != 0,
-+		    "4K page is zero");
-+	/* Ensure THP page stats is non-zero to minimize the flakiness. */
-+	if (p->backing_src == VM_MEM_SRC_ANONYMOUS_THP)
-+		TEST_ASSERT(get_page_stats(X86_PAGE_SIZE_2M) > 0,
-+			"2M page number is zero");
-+	else if (p->backing_src == VM_MEM_SRC_ANONYMOUS_HUGETLB_2MB)
-+		TEST_ASSERT(get_page_stats(X86_PAGE_SIZE_2M) ==
-+			(guest_percpu_mem_size * nr_vcpus) >> X86_PAGE_2M_SHIFT,
-+			"2M page number does not match");
-+	else if (p->backing_src == VM_MEM_SRC_ANONYMOUS_HUGETLB_1GB)
-+		TEST_ASSERT(get_page_stats(X86_PAGE_SIZE_1G) ==
-+			(guest_percpu_mem_size * nr_vcpus) >> X86_PAGE_1G_SHIFT,
-+			"1G page number does not match");
-+#endif
- 	/* Enable dirty logging */
- 	clock_gettime(CLOCK_MONOTONIC, &start);
- 	enable_dirty_logging(vm, p->slots);
-@@ -256,6 +288,18 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 				iteration, ts_diff.tv_sec, ts_diff.tv_nsec);
- 		}
- 	}
-+#ifdef __x86_64__
-+	/*
-+	 * When vCPUs writes to all memory again with dirty logging enabled, we
-+	 * should see only 4K page mappings exist in KVM mmu.
-+	 */
-+	TEST_ASSERT(get_page_stats(X86_PAGE_SIZE_4K) != 0,
-+		    "4K page is zero after dirtying memory");
-+	TEST_ASSERT(get_page_stats(X86_PAGE_SIZE_2M) == 0,
-+		    "2M page is non-zero after dirtying memory");
-+	TEST_ASSERT(get_page_stats(X86_PAGE_SIZE_1G) == 0,
-+		    "1G page is non-zero  after dirtying memory");
-+#endif
- 
- 	/* Disable dirty logging */
- 	clock_gettime(CLOCK_MONOTONIC, &start);
-diff --git a/tools/testing/selftests/kvm/include/test_util.h b/tools/testing/selftests/kvm/include/test_util.h
-index d79be15dd3d2..dca5fcf7aa87 100644
---- a/tools/testing/selftests/kvm/include/test_util.h
-+++ b/tools/testing/selftests/kvm/include/test_util.h
-@@ -102,6 +102,7 @@ const struct vm_mem_backing_src_alias *vm_mem_backing_src_alias(uint32_t i);
- size_t get_backing_src_pagesz(uint32_t i);
- void backing_src_help(void);
- enum vm_mem_backing_src_type parse_backing_src_type(const char *type_name);
-+size_t get_page_stats(uint32_t page_level);
- 
- /*
-  * Whether or not the given source type is shared memory (as opposed to
-diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
-index 242ae8e09a65..9749319821a3 100644
---- a/tools/testing/selftests/kvm/include/x86_64/processor.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-@@ -39,6 +39,13 @@
- #define X86_CR4_SMAP		(1ul << 21)
- #define X86_CR4_PKE		(1ul << 22)
- 
-+#define X86_PAGE_4K_SHIFT	12
-+#define X86_PAGE_4K		(1ul << X86_PAGE_4K_SHIFT)
-+#define X86_PAGE_2M_SHIFT	21
-+#define X86_PAGE_2M		(1ul << X86_PAGE_2M_SHIFT)
-+#define X86_PAGE_1G_SHIFT	30
-+#define X86_PAGE_1G		(1ul << X86_PAGE_1G_SHIFT)
-+
- /* CPUID.1.ECX */
- #define CPUID_VMX		(1ul << 5)
- #define CPUID_SMX		(1ul << 6)
-diff --git a/tools/testing/selftests/kvm/lib/test_util.c b/tools/testing/selftests/kvm/lib/test_util.c
-index af1031fed97f..07eb6b5c125e 100644
---- a/tools/testing/selftests/kvm/lib/test_util.c
-+++ b/tools/testing/selftests/kvm/lib/test_util.c
-@@ -15,6 +15,13 @@
- #include "linux/kernel.h"
- 
- #include "test_util.h"
-+#include "processor.h"
-+
-+static const char * const pagestat_filepaths[] = {
-+	"/sys/kernel/debug/kvm/pages_4k",
-+	"/sys/kernel/debug/kvm/pages_2m",
-+	"/sys/kernel/debug/kvm/pages_1g",
-+};
- 
- /*
-  * Parses "[0-9]+[kmgt]?".
-@@ -141,6 +148,28 @@ size_t get_trans_hugepagesz(void)
- 	return size;
- }
- 
-+#ifdef __x86_64__
-+size_t get_stats_from_file(const char *path)
-+{
-+	size_t value;
-+	FILE *f;
-+
-+	f = fopen(path, "r");
-+	TEST_ASSERT(f != NULL, "Error in opening file: %s\n", path);
-+
-+	fscanf(f, "%ld", &value);
-+	fclose(f);
-+
-+	return value;
-+}
-+
-+size_t get_page_stats(uint32_t page_level)
-+{
-+	TEST_ASSERT(page_level <= X86_PAGE_SIZE_1G, "page type error.");
-+	return get_stats_from_file(pagestat_filepaths[page_level]);
-+}
-+#endif
-+
- size_t get_def_hugetlb_pagesz(void)
- {
- 	char buf[64];
--- 
-2.33.0.259.gc128427fd7-goog
+will be with 'net-next' tag instead of RFC, spec patches will be
 
+without RFC tag.
+
+
+Thank You
+
+>> Thanks,
+>> Stefano
+>>
+>>
