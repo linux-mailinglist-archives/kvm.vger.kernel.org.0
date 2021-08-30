@@ -2,104 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D70CB3FBC72
-	for <lists+kvm@lfdr.de>; Mon, 30 Aug 2021 20:30:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3D7093FBD24
+	for <lists+kvm@lfdr.de>; Mon, 30 Aug 2021 21:47:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238823AbhH3SbZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Aug 2021 14:31:25 -0400
-Received: from smtp-fw-80007.amazon.com ([99.78.197.218]:51066 "EHLO
-        smtp-fw-80007.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238785AbhH3SbX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 Aug 2021 14:31:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1630348230; x=1661884230;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=yoVrCnckET1evT2qypahB9g3i1DhhfMeA2tu5O0/urQ=;
-  b=I1hhG5GfIeEL5xG8dcZKFZbdCJZFsbrJRQAZjYg2xROWrYQJFcnpL8us
-   +iE5to6HAUzLzlJ8vQWchfd2SMpgJcGwQpgrLzX8IEBT+WKaUr3jeMUcn
-   FPorztRWvE9Nag+LjqdPuFftsaGKVsckPU4oOxOO5SMnpsi182z6JJZ3Z
-   g=;
-X-IronPort-AV: E=Sophos;i="5.84,364,1620691200"; 
-   d="scan'208";a="22971413"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-1e-c7f73527.us-east-1.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP; 30 Aug 2021 18:30:23 +0000
-Received: from EX13D16EUB003.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
-        by email-inbound-relay-1e-c7f73527.us-east-1.amazon.com (Postfix) with ESMTPS id DD1E7BDAB0;
-        Mon, 30 Aug 2021 18:30:21 +0000 (UTC)
-Received: from 38f9d34ed3b1.ant.amazon.com (10.43.162.186) by
- EX13D16EUB003.ant.amazon.com (10.43.166.99) with Microsoft SMTP Server (TLS)
- id 15.0.1497.23; Mon, 30 Aug 2021 18:30:16 +0000
-Subject: Re: [PATCH v3 1/7] nitro_enclaves: Enable Arm64 support
-To:     George-Aurelian Popescu <popegeo@amazon.com>,
-        Greg KH <gregkh@linuxfoundation.org>
-CC:     linux-kernel <linux-kernel@vger.kernel.org>,
-        Alexandru Ciobotaru <alcioa@amazon.com>,
-        Kamal Mostafa <kamal@canonical.com>,
-        Alexandru Vasile <lexnv@amazon.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        "Vitaly Kuznetsov" <vkuznets@redhat.com>,
-        kvm <kvm@vger.kernel.org>,
-        ne-devel-upstream <ne-devel-upstream@amazon.com>
-References: <20210827154930.40608-1-andraprs@amazon.com>
- <20210827154930.40608-2-andraprs@amazon.com>
- <20210830155907.GG10224@u90cef543d0ab5a.ant.amazon.com>
-From:   "Paraschiv, Andra-Irina" <andraprs@amazon.com>
-Message-ID: <f57fd0eb-271c-b8d7-ee9b-276c0f0c62ba@amazon.com>
-Date:   Mon, 30 Aug 2021 21:30:04 +0300
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:78.0)
- Gecko/20100101 Thunderbird/78.13.0
+        id S234564AbhH3TsV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Aug 2021 15:48:21 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54996 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233673AbhH3TsU (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 30 Aug 2021 15:48:20 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1630352846;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=7p/HFySufX7Ec/ARNQSZMmnEjbwiFtc+l8ArIs16Qfo=;
+        b=SngN1sL0nidh1Tprgw5hqvzJZjZbHYLO7fYYInpfRFgGwu2sK/v+5LwOy0hMUM5r6zPJ8c
+        3grLxcwegtItbVi/rcIyB4bi6TL9qyPgAMI9kbWXe6sbQexzlygE2XQzD2rX3WxZMXKrxR
+        aueuRo9mhRLHOzyihU6PYuxp5AV+R5M=
+Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
+ [209.85.167.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-153-GsxXuInlOoW5rJKTA-d87w-1; Mon, 30 Aug 2021 15:47:24 -0400
+X-MC-Unique: GsxXuInlOoW5rJKTA-d87w-1
+Received: by mail-lf1-f71.google.com with SMTP id q5-20020ac25fc5000000b003d9227d9edcso2490764lfg.2
+        for <kvm@vger.kernel.org>; Mon, 30 Aug 2021 12:47:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=7p/HFySufX7Ec/ARNQSZMmnEjbwiFtc+l8ArIs16Qfo=;
+        b=jriTSa+QrqxEcserwB6sgub4EHaQ/5/smFTDl+ivw6kHQgA3RC32EDNav9DDuIVSPu
+         /LMdTrXFweHKCcGGfb58st/gx/9/rEsuFobo4J5uc1T6eEVX05Ng2dogmRzYpyTHsCHz
+         aNi7Z0C6D/kqWtLrqlGMm83/GyOfrxhagRfyHvBbl7FT/cu7J0Fd7F/uE5obZcSZc/Z+
+         Q73HYfqP1drUq76dMvm8SscEkD2c03l32RzIgfxo30h0OIFQ1SiqJTyoAAsf9/Wv6VMw
+         +S4tkPmuQuiVVuSeo81jAvLQdb/rJfooQCjT1djZb/q5GpDMgZoGgiFihsPZE8EgxC2m
+         YMSA==
+X-Gm-Message-State: AOAM532u/TeJ3bO+svoGzXVseommq98vK9fvF+OC/TYcFHWDDACtdntq
+        4BhNivBoG0Q+XluE6V3ZeNdDb9tyCsUK+gpkECcwoWyOhKrzfJTo8L1LrbbKlBHvIowg4O/78mJ
+        j5pSoGqftGJBwl2mQm6mL+NM5YEmt
+X-Received: by 2002:a2e:90cf:: with SMTP id o15mr22292320ljg.14.1630352843040;
+        Mon, 30 Aug 2021 12:47:23 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJznUIXAUwxaYc1pT3l5/1NatkQ/kD+6GtozwDSBVoxs81xARSWQiNaDWMLcZ+Vo/mr5xhfBG0iSCSHFvF5EYbQ=
+X-Received: by 2002:a2e:90cf:: with SMTP id o15mr22292305ljg.14.1630352842833;
+ Mon, 30 Aug 2021 12:47:22 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20210830155907.GG10224@u90cef543d0ab5a.ant.amazon.com>
-Content-Language: en-US
-X-Originating-IP: [10.43.162.186]
-X-ClientProxiedBy: EX13D07UWA003.ant.amazon.com (10.43.160.35) To
- EX13D16EUB003.ant.amazon.com (10.43.166.99)
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: base64
+References: <20210823143028.649818-1-vkuznets@redhat.com> <20210823143028.649818-5-vkuznets@redhat.com>
+ <20210823185841.ov7ejn2thwebcwqk@habkost.net> <87mtp7jowv.fsf@vitty.brq.redhat.com>
+ <CAOpTY_ot8teH5x5vVS2HvuMx5LSKLPtyen_ZUM1p7ncci4LFbA@mail.gmail.com>
+ <87k0kakip9.fsf@vitty.brq.redhat.com> <2df0b6d18115fb7f2701587b7937d8ddae38e36a.camel@redhat.com>
+In-Reply-To: <2df0b6d18115fb7f2701587b7937d8ddae38e36a.camel@redhat.com>
+From:   Nitesh Lal <nilal@redhat.com>
+Date:   Mon, 30 Aug 2021 15:47:10 -0400
+Message-ID: <CAFki+L=1UUbNVn21rh34FMk3sajb=6rUpsqSdrK82FyD+UKcTQ@mail.gmail.com>
+Subject: Re: [PATCH v2 4/4] KVM: x86: Fix stack-out-of-bounds memory access
+ from ioapic_write_indirect()
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Nitesh Narayan Lal <nitesh@redhat.com>,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-CgpPbiAzMC8wOC8yMDIxIDE4OjU5LCBHZW9yZ2UtQXVyZWxpYW4gUG9wZXNjdSB3cm90ZToKPiBP
-biBGcmksIEF1ZyAyNywgMjAyMSBhdCAwNjo0OToyNFBNICswMzAwLCBBbmRyYSBQYXJhc2NoaXYg
-d3JvdGU6Cj4+IFVwZGF0ZSB0aGUga2VybmVsIGNvbmZpZyB0byBlbmFibGUgdGhlIE5pdHJvIEVu
-Y2xhdmVzIGtlcm5lbCBkcml2ZXIgZm9yCj4+IEFybTY0IHN1cHBvcnQuCj4+Cj4+IFNpZ25lZC1v
-ZmYtYnk6IEFuZHJhIFBhcmFzY2hpdiA8YW5kcmFwcnNAYW1hem9uLmNvbT4KPj4gQWNrZWQtYnk6
-IFN0ZWZhbm8gR2FyemFyZWxsYSA8c2dhcnphcmVAcmVkaGF0LmNvbT4KPj4gLS0tCj4+IENoYW5n
-ZWxvZwo+Pgo+PiB2MSAtPiB2Mgo+Pgo+PiAqIE5vIGNoYW5nZXMuCj4+Cj4+IHYyIC0+IHYzCj4+
-Cj4+ICogTW92ZSBjaGFuZ2Vsb2cgYWZ0ZXIgdGhlICItLS0iIGxpbmUuCj4+IC0tLQo+PiAgIGRy
-aXZlcnMvdmlydC9uaXRyb19lbmNsYXZlcy9LY29uZmlnIHwgOCArKy0tLS0tLQo+PiAgIDEgZmls
-ZSBjaGFuZ2VkLCAyIGluc2VydGlvbnMoKyksIDYgZGVsZXRpb25zKC0pCj4+Cj4+IGRpZmYgLS1n
-aXQgYS9kcml2ZXJzL3ZpcnQvbml0cm9fZW5jbGF2ZXMvS2NvbmZpZyBiL2RyaXZlcnMvdmlydC9u
-aXRyb19lbmNsYXZlcy9LY29uZmlnCj4+IGluZGV4IDhjOTM4N2EyMzJkZjguLmY1Mzc0MGI5NDFj
-MGYgMTAwNjQ0Cj4+IC0tLSBhL2RyaXZlcnMvdmlydC9uaXRyb19lbmNsYXZlcy9LY29uZmlnCj4+
-ICsrKyBiL2RyaXZlcnMvdmlydC9uaXRyb19lbmNsYXZlcy9LY29uZmlnCj4+IEBAIC0xLDE3ICsx
-LDEzIEBACj4+ICAgIyBTUERYLUxpY2Vuc2UtSWRlbnRpZmllcjogR1BMLTIuMAo+PiAgICMKPj4g
-LSMgQ29weXJpZ2h0IDIwMjAgQW1hem9uLmNvbSwgSW5jLiBvciBpdHMgYWZmaWxpYXRlcy4gQWxs
-IFJpZ2h0cyBSZXNlcnZlZC4KPj4gKyMgQ29weXJpZ2h0IDIwMjAtMjAyMSBBbWF6b24uY29tLCBJ
-bmMuIG9yIGl0cyBhZmZpbGlhdGVzLiBBbGwgUmlnaHRzIFJlc2VydmVkLgo+PiAgIAo+PiAgICMg
-QW1hem9uIE5pdHJvIEVuY2xhdmVzIChORSkgc3VwcG9ydC4KPj4gICAjIE5pdHJvIGlzIGEgaHlw
-ZXJ2aXNvciB0aGF0IGhhcyBiZWVuIGRldmVsb3BlZCBieSBBbWF6b24uCj4+ICAgCj4+IC0jIFRP
-RE86IEFkZCBkZXBlbmRlbmN5IGZvciBBUk02NCBvbmNlIE5FIGlzIHN1cHBvcnRlZCBvbiBBcm0g
-cGxhdGZvcm1zLiBGb3Igbm93LAo+PiAtIyB0aGUgTkUga2VybmVsIGRyaXZlciBjYW4gYmUgYnVp
-bHQgZm9yIGFhcmNoNjQgYXJjaC4KPj4gLSMgZGVwZW5kcyBvbiAoQVJNNjQgfHwgWDg2KSAmJiBI
-T1RQTFVHX0NQVSAmJiBQQ0kgJiYgU01QCj4+IC0KPj4gICBjb25maWcgTklUUk9fRU5DTEFWRVMK
-Pj4gICAJdHJpc3RhdGUgIk5pdHJvIEVuY2xhdmVzIFN1cHBvcnQiCj4+IC0JZGVwZW5kcyBvbiBY
-ODYgJiYgSE9UUExVR19DUFUgJiYgUENJICYmIFNNUAo+PiArCWRlcGVuZHMgb24gKEFSTTY0IHx8
-IFg4NikgJiYgSE9UUExVR19DUFUgJiYgUENJICYmIFNNUAo+PiAgIAloZWxwCj4+ICAgCSAgVGhp
-cyBkcml2ZXIgY29uc2lzdHMgb2Ygc3VwcG9ydCBmb3IgZW5jbGF2ZSBsaWZldGltZSBtYW5hZ2Vt
-ZW50Cj4+ICAgCSAgZm9yIE5pdHJvIEVuY2xhdmVzIChORSkuCj4+IC0tIAo+PiAyLjIwLjEgKEFw
-cGxlIEdpdC0xMTcpCj4+Cj4gUmV2aWV3ZWQtYnk6IEdlb3JnZS1BdXJlbGlhbiBQb3Blc2N1IDxw
-b3BlZ2VvQGFtYXpvbi5jb20+Cj4KClRoYW5rcywgR2VvcmdlLCBmb3IgcmV2aWV3LgoKR3JlZywg
-bGV0IG1lIGtub3cgaWYgb3RoZXIgdXBkYXRlcyBhcmUgbmVlZGVkIGZvciB0aGUgcGF0Y2ggc2Vy
-aWVzLiAKT3RoZXJ3aXNlLCBwbGVhc2UgaW5jbHVkZSB0aGUgcGF0Y2hlcyBpbiB0aGUgY2hhci1t
-aXNjIHRyZWUgYW5kIHdlIGNhbiAKdGFyZ2V0IHRoZSBjdXJyZW50IG1lcmdlIHdpbmRvdywgZm9y
-IHY1LjE1LiBUaGFuayB5b3UuCgpBbmRyYQoKCgpBbWF6b24gRGV2ZWxvcG1lbnQgQ2VudGVyIChS
-b21hbmlhKSBTLlIuTC4gcmVnaXN0ZXJlZCBvZmZpY2U6IDI3QSBTZi4gTGF6YXIgU3RyZWV0LCBV
-QkM1LCBmbG9vciAyLCBJYXNpLCBJYXNpIENvdW50eSwgNzAwMDQ1LCBSb21hbmlhLiBSZWdpc3Rl
-cmVkIGluIFJvbWFuaWEuIFJlZ2lzdHJhdGlvbiBudW1iZXIgSjIyLzI2MjEvMjAwNS4K
+On Tue, Aug 24, 2021 at 12:08 PM Maxim Levitsky <mlevitsk@redhat.com> wrote:
+>
+> On Tue, 2021-08-24 at 16:42 +0200, Vitaly Kuznetsov wrote:
+> > Eduardo Habkost <ehabkost@redhat.com> writes:
+> >
+> > > On Tue, Aug 24, 2021 at 3:13 AM Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
+> > > > Eduardo Habkost <ehabkost@redhat.com> writes:
+> > > >
+> > > > > On Mon, Aug 23, 2021 at 04:30:28PM +0200, Vitaly Kuznetsov wrote:
+> > > > > > KASAN reports the following issue:
+> > > > > >
+> > > > > >  BUG: KASAN: stack-out-of-bounds in kvm_make_vcpus_request_mask+0x174/0x440 [kvm]
+> > > > > >  Read of size 8 at addr ffffc9001364f638 by task qemu-kvm/4798
+> > > > > >
+> > > > > >  CPU: 0 PID: 4798 Comm: qemu-kvm Tainted: G               X --------- ---
+> > > > > >  Hardware name: AMD Corporation DAYTONA_X/DAYTONA_X, BIOS RYM0081C 07/13/2020
+> > > > > >  Call Trace:
+> > > > > >   dump_stack+0xa5/0xe6
+> > > > > >   print_address_description.constprop.0+0x18/0x130
+> > > > > >   ? kvm_make_vcpus_request_mask+0x174/0x440 [kvm]
+> > > > > >   __kasan_report.cold+0x7f/0x114
+> > > > > >   ? kvm_make_vcpus_request_mask+0x174/0x440 [kvm]
+> > > > > >   kasan_report+0x38/0x50
+> > > > > >   kasan_check_range+0xf5/0x1d0
+> > > > > >   kvm_make_vcpus_request_mask+0x174/0x440 [kvm]
+> > > > > >   kvm_make_scan_ioapic_request_mask+0x84/0xc0 [kvm]
+> > > > > >   ? kvm_arch_exit+0x110/0x110 [kvm]
+> > > > > >   ? sched_clock+0x5/0x10
+> > > > > >   ioapic_write_indirect+0x59f/0x9e0 [kvm]
+> > > > > >   ? static_obj+0xc0/0xc0
+> > > > > >   ? __lock_acquired+0x1d2/0x8c0
+> > > > > >   ? kvm_ioapic_eoi_inject_work+0x120/0x120 [kvm]
+> > > > > >
+
+[...]
+
+>
+>
+> I also don't like that ioapic_write_indirect calls the kvm_bitmap_or_dest_vcpus twice,
+> and second time with 'old_dest_id'
+>
+> I am not 100%  sure why old_dest_id/old_dest_mode are needed as I don't see anything in the
+> function changing them.
+> I think only the guest can change them, so maybe the code deals with the guest changing them
+> while the code is running from a different vcpu?
+>
+> The commit that introduced this code is 7ee30bc132c683d06a6d9e360e39e483e3990708
+> Nitesh Narayan Lal, maybe you remember something about it?
+>
+
+Apologies for the delay in responding, I just got back from my PTO and
+still clearing my inbox. Since you have reviewed this patch the only open
+question is the above so I will try to answer that. Please let me know
+in case I missed anything.
+
+IIRC IOAPIC can be reconfigured while the previous interrupt is pending or
+still processing. In this situation, ioapic_handeld_vectors may go out of
+sync as it only records the recently passed configuration. Since with this
+commit, we stopped generating requests for all vCPUs we need this chunk of
+code to keep ioapic_handled_vectors in sync.
+
+Having said that perhaps there could be a better way of handling this (?).
+
+-- 
+Thanks
+Nitesh
 
