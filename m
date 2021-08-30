@@ -2,275 +2,249 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F2A7B3FBDF4
-	for <lists+kvm@lfdr.de>; Mon, 30 Aug 2021 23:10:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9C0BE3FBE50
+	for <lists+kvm@lfdr.de>; Mon, 30 Aug 2021 23:29:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237075AbhH3VLM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Aug 2021 17:11:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57666 "EHLO
+        id S238210AbhH3Va3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Aug 2021 17:30:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33970 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235412AbhH3VLL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 Aug 2021 17:11:11 -0400
-Received: from mail-il1-x134.google.com (mail-il1-x134.google.com [IPv6:2607:f8b0:4864:20::134])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5163CC06175F
-        for <kvm@vger.kernel.org>; Mon, 30 Aug 2021 14:10:17 -0700 (PDT)
-Received: by mail-il1-x134.google.com with SMTP id j15so17777195ila.1
-        for <kvm@vger.kernel.org>; Mon, 30 Aug 2021 14:10:17 -0700 (PDT)
+        with ESMTP id S238448AbhH3Va1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 Aug 2021 17:30:27 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EEB6C06175F
+        for <kvm@vger.kernel.org>; Mon, 30 Aug 2021 14:29:32 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id w8-20020a259188000000b0059bf0bed21fso6336961ybl.18
+        for <kvm@vger.kernel.org>; Mon, 30 Aug 2021 14:29:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=mshXpQmgJqaKCCPtHDuq2mytpmp0ymqRBmmUPpIBMnM=;
-        b=iPoqcoDZrM3zUVajQE1RAnOBnq5O494juPqB3MEnBNJHNCeqs5UZzq9X4mxaGuCEZA
-         S2RccgEzJle0jyTEHB1iglKT3J7cFdWGUTjeIE/zweiERExFTRRYWdFKRrOXZ6fsSuXd
-         nGNU85oV9s2ast3U6WeXeCbD/LLBGy/nxvIyOgOlIHbp8/dMpjwUp1QWWnEI5v0ZkyeS
-         hQFKtIyIt+OiUtk/tzH8A+ChquxQz/lufrHQVSvsaJUjWbTiVZ7MJmSpMUpELzq9excS
-         lbAzY9lFqACmiuVG+tdCiJ7TSyzJagqXJ6Dyr24EIvrMBgRKy9sDjGNGb5Rj/+kf1nPT
-         nDPw==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=eseI6U2kIEOPcPM9gI60D1kTKt4tS6rDtvNewr+avNc=;
+        b=ZtiiV9dThXWzS2SCR/2P/g4bV+3D1oXrC1Y4ceEyKTtixkPvU7pjUOytCDItuhzkDC
+         3NCzupEVHGQe9OpAOWQg2t0QsaKpjhmCaDtzVv94kBihBHAzDqp4oUd8gR7BVBiuKv43
+         KyKdkQL5IJ4OZrxSm1gl3tWnvrBMqRiX6OAdnK2j/K1m2cLAuHBrYKqGlSGoEK37fMo3
+         yyLrX0IIhoMjiJqCxr0rWToyCHO/cczfwdTDp6Kt87qRbPlNh/QToLBf4AconQRjCnTK
+         FxAy5ubjoCvWalIjjEdKlobXbOFBBQ5W4H7vc3amWbgOMlqdtDNqDOzIogTyTwJyX6PZ
+         TqtQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=mshXpQmgJqaKCCPtHDuq2mytpmp0ymqRBmmUPpIBMnM=;
-        b=REYhtLGwgnTbMCimvxcKlq71jxgKwXN5jjkyBIm6Z06Ai8Dj17IjTx39suD19BLEAX
-         ZH5ZqP0nyc/apNq19CTdpmXbQNMbIRSqGjgHAiXN+5hDZs6+7wXhsxT5wldKpqWbBh/0
-         zYaZ81fzhgTc9jhFXvu0GzoQG34M0SvX+dLRDVZA9l/u2S8TYdu+9ZhKnWvClq6g0c8E
-         0u7ueSucwgZHJuuxFQc0yXyTjuM6/wSJ5eOywCKVp8gNQpZ4+p21HT3E4FF2jUpR5NNn
-         A2xZ4j/lIoO/8pNBgw6FV3pQfF5cr4BHNLwfplrEkIFCKEkOXV7W+a7MMAXuNLAxi0Lg
-         XcQA==
-X-Gm-Message-State: AOAM533q1R6vrlpOIo4w4pIhIPeNRcbGx17IvcnSNyyGt4AmBrmvs/Uz
-        8/zMSagHZxh3jSdKxHOlOKa2RzW1+n2w6PZlnrDHPw==
-X-Google-Smtp-Source: ABdhPJwQNvIPMfGNWsL3SqGcwMhma+WRFEs2goX7S2bzgtxrYSsGflpUwtiDZdJQfZR9T0errwnsgU1Bk9FhSSkWYh8=
-X-Received: by 2002:a05:6e02:524:: with SMTP id h4mr17765149ils.203.1630357816519;
- Mon, 30 Aug 2021 14:10:16 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210830044425.2686755-1-mizhang@google.com> <20210830044425.2686755-3-mizhang@google.com>
-In-Reply-To: <20210830044425.2686755-3-mizhang@google.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Mon, 30 Aug 2021 14:10:05 -0700
-Message-ID: <CANgfPd_46=V24r5Qu8cDuOCwVRSEF9RFHuD-1sPpKrBCjWOA2w@mail.gmail.com>
-Subject: Re: [PATCH v3 2/2] selftests: KVM: use dirty logging to check if page
- stats work correctly
-To:     Mingwei Zhang <mizhang@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=eseI6U2kIEOPcPM9gI60D1kTKt4tS6rDtvNewr+avNc=;
+        b=l/kuKiby94/aBmOjhAmqg8jN+C9z5KKWEI86CIzEIs8DRxjuGbRFLIHKnnQCSgLo2m
+         WF1UbId/WmjMbbNPZfaP7a1uzZKzvSHSsDBY3WIFiL6tVPY4d/NSLMtl42fywbgj4oib
+         hpIPYnPiIN8XpA3PbE0a08PtQaAGnLL8UXt1Z0z2g/pWlQxSI6RMlcv+UocwyKgLa8dn
+         QywkPfoCZ8h9eJOIQMRCNSrgW4HChIxW99bL3aUURMHCItL0JLTWoqaLLmXHgAHZp1bu
+         iwLcuQErpeZFaYVeYiEE5N+uuu4f4+zHqzUrUtChq41XkTHSpovrU4dudLkExhNKRMsh
+         EPKg==
+X-Gm-Message-State: AOAM532soSwTlkkQv92Uo2Zd8bVsJcia8D4W9gjFSgB40O8QlVXi49Gw
+        g/N9gELrGa4vtrFP0k+NXOl3zPxNtmqEH18Hlp3JRDqC/Au8IkTUXTBwmMqk2pRx8hGbi1C+SZa
+        MEb35vZa/jIAwYPPrfl61LC9UFidWz5MwoJONOAeY0j1Okxzr5ftKYWdxag==
+X-Google-Smtp-Source: ABdhPJzVjPSgM4mAhNdv+l0chONGunURNhFdW/RVHmYi4gNo666UZgH7s+/emcHsSqCDajMC/hNmxbZ1sb4=
+X-Received: from pgonda1.kir.corp.google.com ([2620:15c:29:204:e552:6d5e:b69d:968c])
+ (user=pgonda job=sendgmr) by 2002:a25:74ca:: with SMTP id p193mr26235340ybc.28.1630358971761;
+ Mon, 30 Aug 2021 14:29:31 -0700 (PDT)
+Date:   Mon, 30 Aug 2021 14:29:27 -0700
+Message-Id: <20210830212927.3540045-1-pgonda@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.0.259.gc128427fd7-goog
+Subject: [PATCH 3/3 V6] selftest: KVM: Add intra host migration
+From:   Peter Gonda <pgonda@google.com>
+To:     kvm@vger.kernel.org
+Cc:     Peter Gonda <pgonda@google.com>,
         Sean Christopherson <seanjc@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Peter Xu <peterx@redhat.com>
+        Marc Orr <marcorr@google.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Aug 29, 2021 at 9:44 PM Mingwei Zhang <mizhang@google.com> wrote:
->
-> When dirty logging is enabled, KVM splits the hugepage mapping in NPT/EPT
-> into the smallest 4K size after guest VM writes to it. This property could
-> be used to check if the page stats metrics work properly in KVM x86/mmu. At
-> the same time, this logic might be used the other way around: using page
-> stats to verify if dirty logging really splits all huge pages after guest
-> VM writes to all memory.
->
-> So add page stats checking in dirty logging performance selftest. In
-> particular, add checks in three locations:
->  - just after vm is created;
->  - after populating memory into vm without turning on dirty logging;
->  - after guest vm writing to all memory again with dirty logging turned on.
->
-> Tested using commands:
->  - ./dirty_log_perf_test -s anonymous_hugetlb_1gb
->  - ./dirty_log_perf_test -s anonymous_hugetlb_2mb
->  - ./dirty_log_perf_test -s anonymous_thp
->
-> Cc: Sean Christopherson <seanjc@google.com>
-> Cc: David Matlack <dmatlack@google.com>
-> Cc: Jing Zhang <jingzhangos@google.com>
-> Cc: Peter Xu <peterx@redhat.com>
->
-> Suggested-by: Ben Gardon <bgardon@google.com>
-> Signed-off-by: Mingwei Zhang <mizhang@google.com>
-> ---
->  .../selftests/kvm/dirty_log_perf_test.c       | 44 +++++++++++++++++++
->  .../testing/selftests/kvm/include/test_util.h |  1 +
->  .../selftests/kvm/include/x86_64/processor.h  |  7 +++
->  tools/testing/selftests/kvm/lib/test_util.c   | 29 ++++++++++++
->  4 files changed, 81 insertions(+)
->
-> diff --git a/tools/testing/selftests/kvm/dirty_log_perf_test.c b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-> index 3c30d0045d8d..bc598e07b295 100644
-> --- a/tools/testing/selftests/kvm/dirty_log_perf_test.c
-> +++ b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-> @@ -19,6 +19,10 @@
->  #include "perf_test_util.h"
->  #include "guest_modes.h"
->
-> +#ifdef __x86_64__
-> +#include "processor.h"
-> +#endif
-> +
+Adds testcases for intra host migration for SEV and SEV-ES. Also adds
+locking test to confirm no deadlock exists.
 
-I know this is only needed for x86_64, but I don't think it needs to
-be ifdef in order for everything to work.
+---
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/x86_64/sev_vm_tests.c       | 152 ++++++++++++++++++
+ 2 files changed, 153 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/sev_vm_tests.c
 
->  /* How many host loops to run by default (one KVM_GET_DIRTY_LOG for each loop)*/
->  #define TEST_HOST_LOOP_N               2UL
->
-> @@ -166,6 +170,18 @@ static void run_test(enum vm_guest_mode mode, void *arg)
->         vm = perf_test_create_vm(mode, nr_vcpus, guest_percpu_mem_size,
->                                  p->slots, p->backing_src);
->
-> +#ifdef __x86_64__
-> +       /*
-> +        * No vCPUs have been started yet, so KVM should not have created any
-> +        * mapping at this moment.
-> +        */
-> +       TEST_ASSERT(get_page_stats(X86_PAGE_SIZE_4K) == 0,
-> +                   "4K page is non zero");
-> +       TEST_ASSERT(get_page_stats(X86_PAGE_SIZE_2M) == 0,
-> +                   "2M page is non zero");
-> +       TEST_ASSERT(get_page_stats(X86_PAGE_SIZE_1G) == 0,
-> +                   "1G page is non zero");
-> +#endif
->         perf_test_args.wr_fract = p->wr_fract;
->
->         guest_num_pages = (nr_vcpus * guest_percpu_mem_size) >> vm_get_page_shift(vm);
-> @@ -211,6 +227,22 @@ static void run_test(enum vm_guest_mode mode, void *arg)
->         pr_info("Populate memory time: %ld.%.9lds\n",
->                 ts_diff.tv_sec, ts_diff.tv_nsec);
->
-> +#ifdef __x86_64__
-> +       TEST_ASSERT(get_page_stats(X86_PAGE_SIZE_4K) != 0,
-> +                   "4K page is zero");
-> +       /* Ensure THP page stats is non-zero to minimize the flakiness. */
-> +       if (p->backing_src == VM_MEM_SRC_ANONYMOUS_THP)
-> +               TEST_ASSERT(get_page_stats(X86_PAGE_SIZE_2M) > 0,
-> +                       "2M page number is zero");
+Signed-off-by: Peter Gonda <pgonda@google.com>
+Suggested-by: Sean Christopherson <seanjc@google.com>
+Cc: Marc Orr <marcorr@google.com>
+Cc: Sean Christopherson <seanjc@google.com>
+Cc: Brijesh Singh <brijesh.singh@amd.com>
+Cc: kvm@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
 
-Nice. Thanks for handling this case. It's very frustrating when THP
-makes test assertions flaky.
+diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+index 5832f510a16c..de6e64d5c9c4 100644
+--- a/tools/testing/selftests/kvm/Makefile
++++ b/tools/testing/selftests/kvm/Makefile
+@@ -71,6 +71,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/tsc_msrs_test
+ TEST_GEN_PROGS_x86_64 += x86_64/vmx_pmu_msrs_test
+ TEST_GEN_PROGS_x86_64 += x86_64/xen_shinfo_test
+ TEST_GEN_PROGS_x86_64 += x86_64/xen_vmcall_test
++TEST_GEN_PROGS_x86_64 += x86_64/sev_vm_tests
+ TEST_GEN_PROGS_x86_64 += access_tracking_perf_test
+ TEST_GEN_PROGS_x86_64 += demand_paging_test
+ TEST_GEN_PROGS_x86_64 += dirty_log_test
+diff --git a/tools/testing/selftests/kvm/x86_64/sev_vm_tests.c b/tools/testing/selftests/kvm/x86_64/sev_vm_tests.c
+new file mode 100644
+index 000000000000..50a770316628
+--- /dev/null
++++ b/tools/testing/selftests/kvm/x86_64/sev_vm_tests.c
+@@ -0,0 +1,150 @@
++// SPDX-License-Identifier: GPL-2.0-only
++#include <linux/kvm.h>
++#include <linux/psp-sev.h>
++#include <stdio.h>
++#include <sys/ioctl.h>
++#include <stdlib.h>
++#include <errno.h>
++#include <pthread.h>
++
++#include "test_util.h"
++#include "kvm_util.h"
++#include "processor.h"
++#include "svm_util.h"
++#include "kvm_util.h"
++#include "kselftest.h"
++#include "../lib/kvm_util_internal.h"
++
++#define SEV_DEV_PATH "/dev/sev"
++
++/*
++ * Open SEV_DEV_PATH if available, otherwise exit the entire program.
++ *
++ * Input Args:
++ *   flags - The flags to pass when opening SEV_DEV_PATH.
++ *
++ * Return:
++ *   The opened file descriptor of /dev/sev.
++ */
++static int open_sev_dev_path_or_exit(int flags)
++{
++	static int fd;
++
++	if (fd != 0)
++		return fd;
++
++	fd = open(SEV_DEV_PATH, flags);
++	if (fd < 0) {
++		print_skip("%s not available, is SEV not enabled? (errno: %d)",
++			   SEV_DEV_PATH, errno);
++		exit(KSFT_SKIP);
++	}
++
++	return fd;
++}
++
++static void sev_ioctl(int fd, int cmd_id, void *data)
++{
++	struct kvm_sev_cmd cmd = { 0 };
++	int ret;
++
++	TEST_ASSERT(cmd_id < KVM_SEV_NR_MAX, "Unknown SEV CMD : %d\n", cmd_id);
++
++	cmd.id = cmd_id;
++	cmd.sev_fd = open_sev_dev_path_or_exit(0);
++	cmd.data = (uint64_t)data;
++	ret = ioctl(fd, KVM_MEMORY_ENCRYPT_OP, &cmd);
++	TEST_ASSERT((ret == 0 || cmd.error == SEV_RET_SUCCESS),
++		    "%d failed: return code: %d, errno: %d, fw error: %d",
++		    cmd_id, ret, errno, cmd.error);
++}
++
++static struct kvm_vm *sev_vm_create(bool es)
++{
++	struct kvm_vm *vm;
++	struct kvm_sev_launch_start start = { 0 };
++	int i;
++
++	vm = vm_create(VM_MODE_DEFAULT, 0, O_RDWR);
++	sev_ioctl(vm->fd, es ? KVM_SEV_ES_INIT : KVM_SEV_INIT, NULL);
++	for (i = 0; i < 3; ++i)
++		vm_vcpu_add(vm, i);
++	start.policy |= (es) << 2;
++	sev_ioctl(vm->fd, KVM_SEV_LAUNCH_START, &start);
++	if (es)
++		sev_ioctl(vm->fd, KVM_SEV_LAUNCH_UPDATE_VMSA, NULL);
++	return vm;
++}
++
++static void test_sev_migrate_from(bool es)
++{
++	struct kvm_vm *vms[3];
++	struct kvm_enable_cap cap = { 0 };
++	int i;
++
++	for (i = 0; i < sizeof(vms) / sizeof(struct kvm_vm *); ++i)
++		vms[i] = sev_vm_create(es);
++
++	cap.cap = KVM_CAP_VM_MIGRATE_ENC_CONTEXT_FROM;
++	for (i = 0; i < sizeof(vms) / sizeof(struct kvm_vm *) - 1; ++i) {
++		cap.args[0] = vms[i]->fd;
++		vm_enable_cap(vms[i + 1], &cap);
++	}
++}
++
++#define LOCK_TESTING_THREADS 3
++
++struct locking_thread_input {
++	struct kvm_vm *vm;
++	int source_fds[LOCK_TESTING_THREADS];
++};
++
++static void *locking_test_thread(void *arg)
++{
++	struct kvm_enable_cap cap = { 0 };
++	int i, j;
++	struct locking_thread_input *input = (struct locking_test_thread *)arg;
++
++	cap.cap = KVM_CAP_VM_MIGRATE_ENC_CONTEXT_FROM;
++
++	for (i = 0; i < 1000; ++i) {
++		j = input->source_fds[i % LOCK_TESTING_THREADS];
++		cap.args[0] = input->source_fds[j];
++		/*
++		 * Call IOCTL directly without checking return code. We are
++		 * simply trying to confirm there is no deadlock from userspace
++		 * not check correctness of migration here.
++		 */
++		ioctl(input->vm->fd, KVM_ENABLE_CAP, &cap);
++	}
++}
++
++static void test_sev_migrate_locking(void)
++{
++	struct locking_thread_input input[LOCK_TESTING_THREADS];
++	pthread_t pt[LOCK_TESTING_THREADS];
++	int i;
++
++	for (i = 0; i < LOCK_TESTING_THREADS; ++i) {
++		input[i].vm = sev_vm_create(/* es= */ false);
++		input[0].source_fds[i] = input[i].vm->fd;
++	}
++	memcpy(input[1].source_fds, input[0].source_fds,
++	       sizeof(input[1].source_fds));
++	memcpy(input[2].source_fds, input[0].source_fds,
++	       sizeof(input[2].source_fds));
++
++	for (i = 0; i < LOCK_TESTING_THREADS; ++i)
++		pthread_create(&pt[i], NULL, locking_test_thread, &input[i]);
++
++	for (i = 0; i < LOCK_TESTING_THREADS; ++i)
++		pthread_join(pt[i], NULL);
++}
++
++int main(int argc, char *argv[])
++{
++	test_sev_migrate_from(/* es= */ false);
++	test_sev_migrate_from(/* es= */ true);
++	test_sev_migrate_locking();
++	return 0;
++}
+-- 
+2.33.0.259.gc128427fd7-goog
 
-> +       else if (p->backing_src == VM_MEM_SRC_ANONYMOUS_HUGETLB_2MB)
-> +               TEST_ASSERT(get_page_stats(X86_PAGE_SIZE_2M) ==
-> +                       (guest_percpu_mem_size * nr_vcpus) >> X86_PAGE_2M_SHIFT,
-> +                       "2M page number does not match");
-> +       else if (p->backing_src == VM_MEM_SRC_ANONYMOUS_HUGETLB_1GB)
-> +               TEST_ASSERT(get_page_stats(X86_PAGE_SIZE_1G) ==
-> +                       (guest_percpu_mem_size * nr_vcpus) >> X86_PAGE_1G_SHIFT,
-> +                       "1G page number does not match");
-> +#endif
->         /* Enable dirty logging */
->         clock_gettime(CLOCK_MONOTONIC, &start);
->         enable_dirty_logging(vm, p->slots);
-> @@ -256,6 +288,18 @@ static void run_test(enum vm_guest_mode mode, void *arg)
->                                 iteration, ts_diff.tv_sec, ts_diff.tv_nsec);
->                 }
->         }
-> +#ifdef __x86_64__
-> +       /*
-> +        * When vCPUs writes to all memory again with dirty logging enabled, we
-> +        * should see only 4K page mappings exist in KVM mmu.
-> +        */
-> +       TEST_ASSERT(get_page_stats(X86_PAGE_SIZE_4K) != 0,
-> +                   "4K page is zero after dirtying memory");
-> +       TEST_ASSERT(get_page_stats(X86_PAGE_SIZE_2M) == 0,
-> +                   "2M page is non-zero after dirtying memory");
-> +       TEST_ASSERT(get_page_stats(X86_PAGE_SIZE_1G) == 0,
-> +                   "1G page is non-zero  after dirtying memory");
-> +#endif
->
->         /* Disable dirty logging */
->         clock_gettime(CLOCK_MONOTONIC, &start);
-> diff --git a/tools/testing/selftests/kvm/include/test_util.h b/tools/testing/selftests/kvm/include/test_util.h
-> index d79be15dd3d2..dca5fcf7aa87 100644
-> --- a/tools/testing/selftests/kvm/include/test_util.h
-> +++ b/tools/testing/selftests/kvm/include/test_util.h
-> @@ -102,6 +102,7 @@ const struct vm_mem_backing_src_alias *vm_mem_backing_src_alias(uint32_t i);
->  size_t get_backing_src_pagesz(uint32_t i);
->  void backing_src_help(void);
->  enum vm_mem_backing_src_type parse_backing_src_type(const char *type_name);
-> +size_t get_page_stats(uint32_t page_level);
->
->  /*
->   * Whether or not the given source type is shared memory (as opposed to
-> diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
-> index 242ae8e09a65..9749319821a3 100644
-> --- a/tools/testing/selftests/kvm/include/x86_64/processor.h
-> +++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-> @@ -39,6 +39,13 @@
->  #define X86_CR4_SMAP           (1ul << 21)
->  #define X86_CR4_PKE            (1ul << 22)
->
-> +#define X86_PAGE_4K_SHIFT      12
-> +#define X86_PAGE_4K            (1ul << X86_PAGE_4K_SHIFT)
-> +#define X86_PAGE_2M_SHIFT      21
-> +#define X86_PAGE_2M            (1ul << X86_PAGE_2M_SHIFT)
-> +#define X86_PAGE_1G_SHIFT      30
-> +#define X86_PAGE_1G            (1ul << X86_PAGE_1G_SHIFT)
-> +
-
-It would be a nice follow up to use these to clean up the magic
-numbers in __virt_pg_map:
-
-const uint64_t pg_size = 1ull << ((page_size * 9) + 12);
-
-:(
-
->  /* CPUID.1.ECX */
->  #define CPUID_VMX              (1ul << 5)
->  #define CPUID_SMX              (1ul << 6)
-> diff --git a/tools/testing/selftests/kvm/lib/test_util.c b/tools/testing/selftests/kvm/lib/test_util.c
-> index af1031fed97f..07eb6b5c125e 100644
-> --- a/tools/testing/selftests/kvm/lib/test_util.c
-> +++ b/tools/testing/selftests/kvm/lib/test_util.c
-> @@ -15,6 +15,13 @@
->  #include "linux/kernel.h"
->
->  #include "test_util.h"
-> +#include "processor.h"
-> +
-> +static const char * const pagestat_filepaths[] = {
-> +       "/sys/kernel/debug/kvm/pages_4k",
-> +       "/sys/kernel/debug/kvm/pages_2m",
-> +       "/sys/kernel/debug/kvm/pages_1g",
-> +};
-
-I think these should only be defined for x86_64 too. Is this the right
-file for these definitions or is there an arch specific file they
-should go in?
-
->
->  /*
->   * Parses "[0-9]+[kmgt]?".
-> @@ -141,6 +148,28 @@ size_t get_trans_hugepagesz(void)
->         return size;
->  }
->
-> +#ifdef __x86_64__
-> +size_t get_stats_from_file(const char *path)
-> +{
-> +       size_t value;
-> +       FILE *f;
-> +
-> +       f = fopen(path, "r");
-> +       TEST_ASSERT(f != NULL, "Error in opening file: %s\n", path);
-> +
-> +       fscanf(f, "%ld", &value);
-> +       fclose(f);
-> +
-> +       return value;
-> +}
-> +
-> +size_t get_page_stats(uint32_t page_level)
-> +{
-> +       TEST_ASSERT(page_level <= X86_PAGE_SIZE_1G, "page type error.");
-> +       return get_stats_from_file(pagestat_filepaths[page_level]);
-> +}
-> +#endif
-> +
->  size_t get_def_hugetlb_pagesz(void)
->  {
->         char buf[64];
-> --
-> 2.33.0.259.gc128427fd7-goog
->
