@@ -2,290 +2,303 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CA84C3FB976
-	for <lists+kvm@lfdr.de>; Mon, 30 Aug 2021 17:59:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D171B3FB7EF
+	for <lists+kvm@lfdr.de>; Mon, 30 Aug 2021 16:27:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237797AbhH3P5Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Aug 2021 11:57:16 -0400
-Received: from mail-bn8nam08on2060.outbound.protection.outlook.com ([40.107.100.60]:53152
-        "EHLO NAM04-BN8-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S237646AbhH3P5K (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 Aug 2021 11:57:10 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=oCscNhcE9ZEBrjUJ3wllsmSIlWtQk3dUu0gAR5wjDiDY0eBEH2XcObMxeffwmWsiooTmA0tBf6KnQt+xQUDXUsc2ouPnETNYb1JrU9m/z7566HJQ6o6LpkU3sGQqPf+faSXLnATzDqmXUBGJ1MustdHzfNNP51KPE6rDN+nVKzZ0DlAA0wvQ8/JIJ+2EMbEGK3FoAbM1YAYMlDDlEoZmrSOipT83vPhgM77RHpT+Zqj01r2oQ28pUVdkPo1wO8SYsCifxKqN+SgOe2hS8ZgQXjNz9RF9ZHkU7krkQQ8wUUrpy+zPwLqaVAA66l2I26MfOZVDHoWTZjjE7uVoYnyqvQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kJKsr19x22LI+8rezBeREocX0uDPMG2SwjIqi1QLieE=;
- b=bOluLh4jqCXy/ngWILxRfKxVxd5ZJVfQO9jYINhOmjGAPa78+O82R0MCyRvMN5ZnIrcCFI5nyhsN7Vsc4wt27LuKvCoF0nRyCIapzo+N4fuQM1tZkEv+vNqkzU2p3kVUAKGXA3uP0NI8ZG4DMV5KCkzbg1/TeWakCo1kZymzFRXVY8YaNKCkuqxyKG0h50QnK3onvplv2xQc4WesNzNJWzG+zIvOuaNf0L8uTyJlez2jZ6xGgfBB8l0AqR7oAQfNs3mbFbU9+NBW35IZAVzp3lvnTCyaPNI0XA0VN7OYxeZL6uoAPAmATeHYb3SqTJ8t7TTnBh/W0RYqGQ2eFuzNhQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kJKsr19x22LI+8rezBeREocX0uDPMG2SwjIqi1QLieE=;
- b=mJocYqPJ78N5WveetTpH+CIjygVm19mX8wKewba0M9SWJPIBB4XBU7G/vkxHiQr10MTL7ILZVCgKGtLlvGXqR/ZPNpCgAhoBBS7p8+Wc4cS2Ks0XLpqbJqL7Tnaj1IzgZi8Rpi0hxFbffbwYby/KLsa4hL97htpgxOapllqRgbo=
-Authentication-Results: alien8.de; dkim=none (message not signed)
- header.d=none;alien8.de; dmarc=none action=none header.from=amd.com;
-Received: from CH2PR12MB4133.namprd12.prod.outlook.com (2603:10b6:610:7a::13)
- by CH2PR12MB4246.namprd12.prod.outlook.com (2603:10b6:610:a9::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4457.24; Mon, 30 Aug
- 2021 15:56:13 +0000
-Received: from CH2PR12MB4133.namprd12.prod.outlook.com
- ([fe80::d19e:b657:5259:24d0]) by CH2PR12MB4133.namprd12.prod.outlook.com
- ([fe80::d19e:b657:5259:24d0%8]) with mapi id 15.20.4436.019; Mon, 30 Aug 2021
- 15:56:13 +0000
-Date:   Fri, 27 Aug 2021 14:09:55 -0500
-From:   Michael Roth <michael.roth@amd.com>
-To:     Borislav Petkov <bp@alien8.de>
-Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH Part1 v5 30/38] x86/compressed/64: store Confidential
- Computing blob address in bootparams
-Message-ID: <20210827190955.fc5eyvk2mmtuawwz@amd.com>
-References: <20210820151933.22401-1-brijesh.singh@amd.com>
- <20210820151933.22401-31-brijesh.singh@amd.com>
- <YSjzcgQDubOY1pGI@zn.tnic>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YSjzcgQDubOY1pGI@zn.tnic>
-X-ClientProxiedBy: SN6PR08CA0014.namprd08.prod.outlook.com
- (2603:10b6:805:66::27) To CH2PR12MB4133.namprd12.prod.outlook.com
- (2603:10b6:610:7a::13)
+        id S237165AbhH3OWu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Aug 2021 10:22:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46756 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237029AbhH3OWs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 Aug 2021 10:22:48 -0400
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25938C061760
+        for <kvm@vger.kernel.org>; Mon, 30 Aug 2021 07:21:55 -0700 (PDT)
+Received: by mail-pj1-x1035.google.com with SMTP id d5so3809478pjx.2
+        for <kvm@vger.kernel.org>; Mon, 30 Aug 2021 07:21:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=uulWibS5sEN2Ovi0hofOj7Yx0ifoVSC01yoyPcRCq0g=;
+        b=ioejUBlqoCVQj6smYYW8ZF+lEB4w9kHPPKbab2Tmt8y4q75rlVQY31Ml0K7Q9uKjrI
+         isHT8SjfSlCdE4l5VXDZVt4ALfhVLzvFnir4DmboJdUmJCC6UmZdGaXNqOx/lhMw9Ju+
+         npzlMNDhu8XYLJTYxDjr1lN7Uz7tDSFvKHkp0zEm46QXg8tSlDOgEBbIJ6Mo6tyh7Rde
+         Bum8JTmRq6EcyZ8QTstLdUv5A27S4iq07Q0BSHkPodfvb6AYhxN/ljKX4JYVM7BJWT6R
+         W/0whMFU3pThq5vAnhxxSEfAl2WKZxXROGPi2/nXW+p4ygQHNIQe4dOhRFfldy2OlXwE
+         7ERQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=uulWibS5sEN2Ovi0hofOj7Yx0ifoVSC01yoyPcRCq0g=;
+        b=lr/T6gQRhISnf7MMH9238pRLY68qP2PYP3UaX9HEhIoLBrtRjhVO2BWvqW8Lhm0zQ9
+         zmnrEn8Kh0EcqBlFCiQawD4b7XCs5LfiRZXsYUSQ+JAUVSwnYPrtFXZ0pn2ExfgU0V+k
+         x+Ut5slDxWU8k/m3zIkh/3+RYrquI02kNJS0l3x727+LWXgJrE6VVOspqEK4XiKXKmzF
+         +XjDRGZjY240QE8I/4SpiabvDeP4GzSswRtBgTtVi1jMuXBW5+9oge75X/7uFyRT1zqM
+         /WIuyTExi2VbUhrxRFfoRFj2FzHu+Nxh6pWpvkiaofygDrt22zNBd1xKinSs3fAvlYfk
+         9HHg==
+X-Gm-Message-State: AOAM532VsU+ZMf7Y66WN9hHjRDixu7/hwCz7EnmkXX4M2M3S/5qkJ8/a
+        a+ZQtauXM479gczKOAKNhUMC
+X-Google-Smtp-Source: ABdhPJxQElBeYt1rYeRcI81eOCWd0UIqF8xBniodVyNdcOqgbq70WS+YPceedu/yIyGELKKy1pBW0w==
+X-Received: by 2002:a17:902:e543:b0:134:1c02:285e with SMTP id n3-20020a170902e54300b001341c02285emr21601812plf.43.1630333314406;
+        Mon, 30 Aug 2021 07:21:54 -0700 (PDT)
+Received: from localhost ([139.177.225.237])
+        by smtp.gmail.com with ESMTPSA id w16sm15587032pff.130.2021.08.30.07.21.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Aug 2021 07:21:53 -0700 (PDT)
+From:   Xie Yongji <xieyongji@bytedance.com>
+To:     mst@redhat.com, jasowang@redhat.com, stefanha@redhat.com,
+        sgarzare@redhat.com, parav@nvidia.com, hch@infradead.org,
+        christian.brauner@canonical.com, rdunlap@infradead.org,
+        willy@infradead.org, viro@zeniv.linux.org.uk, axboe@kernel.dk,
+        bcrl@kvack.org, corbet@lwn.net, mika.penttila@nextfour.com,
+        dan.carpenter@oracle.com, joro@8bytes.org,
+        gregkh@linuxfoundation.org, zhe.he@windriver.com,
+        xiaodong.liu@intel.com, joe@perches.com, robin.murphy@arm.com,
+        will@kernel.org, john.garry@huawei.com
+Cc:     songmuchun@bytedance.com,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org
+Subject: [PATCH v12 00/13] Introduce VDUSE - vDPA Device in Userspace
+Date:   Mon, 30 Aug 2021 22:17:24 +0800
+Message-Id: <20210830141737.181-1-xieyongji@bytedance.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from localhost (165.204.77.11) by SN6PR08CA0014.namprd08.prod.outlook.com (2603:10b6:805:66::27) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4457.17 via Frontend Transport; Mon, 30 Aug 2021 15:56:12 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 5a530821-f2b7-42d6-6fc5-08d96bceb0ff
-X-MS-TrafficTypeDiagnostic: CH2PR12MB4246:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <CH2PR12MB4246C669EA7922D9B97891C995CB9@CH2PR12MB4246.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:336;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: y1zWxeY/9hRhBXnknPZa2qMAxG2bp2foeWqdS7InmQdfadbcgHedrLn/VwPs5ybNFKiixKXXtRmL5zejZgImCR0ZiYQ/UJsHAVITDQdCm+eIK0Vun/EiSu7cfr+E8isztuEwMbQzT1A5pKvxE2DXCMIm/PsMNXYzVH2W1GSXCKJVFCXv/PtgIbjgWp71r7OnatHoBHcJaj4jx1UsrUo3pp+CF6rRPUdABaev8Ntq3A4wTCc/5IpZaHhq1ClXziXtgSb1hwMVGdNvd7wvhaucODeDReDROFUjTSeh6bFqfXZ7OjWot52eFjz1h+0ADqAFNADsAeMGBSEU2i7bdQEgW+N8otDjPVW43srAcsMAEdm2bY1sKgLrkCoYC/AcR8hlwzwHx7u9aqYzVTX6YawO0VJOJLiSLT5kRYktlSw9Yfey0eR66ZhCSbz80/hYzxewYqXSSybJ81XCZl0inhY/79O+INX3MLxGnlw3yuiy52fMz1ROzIOPBlFeYNuLXJzV6TNBn0XRv4DW3/+H7d9R5OEfcrJxfKIPORnr9/2reYKK4L15/I+3M0AXRI4DkD9xZUyb3opLBjouR6kjTvfw79WrQa2eFoG9WvPXkFysen2mvrrpozFfHaMxatVvNYhWdqqz4o0mHOcKWZH1EDomZ2L1XQBnmY97R920z2XdD1Rn3CAtVdqQTRdlpJgJJpIb+Pm6v6n3gL2Pjd4BxwnXzYjU/yRnyKG3MpyQv++zf8NF7mw565Dl26XknCD9sgZ2nX1FelFgf/fLpdLRMb4I4vb+3tWxgQLimYchMobkWtk=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR12MB4133.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(376002)(136003)(346002)(396003)(366004)(186003)(26005)(6916009)(2906002)(52116002)(956004)(44832011)(6496006)(83380400001)(7406005)(4326008)(38100700002)(38350700002)(45080400002)(2616005)(86362001)(6666004)(5660300002)(6486002)(66476007)(478600001)(8676002)(36756003)(54906003)(66946007)(66556008)(1076003)(316002)(966005)(8936002)(7416002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?ovEEv0I4l8yHoXtihEpDdciNzz8vWKN83YMFKLDQMXZ77nyKDTMfhPOos4kX?=
- =?us-ascii?Q?DIAevG4XPcuPdT7B28IEtbaidBSNLiwHoOlN/TwoqCThbGGlc7nuHrqkIatZ?=
- =?us-ascii?Q?Dii4Za7B3TwAzivQ6DbkdahBxkuuj9NN9/0bsnNSTFHF9JasEYKiQMEiCCkE?=
- =?us-ascii?Q?CZjG0uabg7Og09hjfA0+fr7dKlAK3jXXR0g67KJ3GqMNKthQ3q7K1SQftp+y?=
- =?us-ascii?Q?QLwUjM0iCSkaPVKwcRhBbgAmWaHSuWvWVU/sBgDpMGxoTBcWN3Xrwj06X0x5?=
- =?us-ascii?Q?KYXC+OxIjam/Q2ot9iC8vbTfPWor0Zi1bQpWtRg//+begJcoSKsHVMTQKJ0C?=
- =?us-ascii?Q?hXrdzIMcXZjxEaRKfedRSYF1Tf2ZkAw8IdAjVrxZsrcbaiNi6MKtYS1xShgs?=
- =?us-ascii?Q?97fd8kWMOvs4OtbQgXXGVWNkSOTLfu1U8azQcuRQDjzI83BSDkrXodRX8fJY?=
- =?us-ascii?Q?ZZke/yzDdP5qatRgs1Fogn5LgsJwEphmknRMtFHvzHUWR90oJ8EZAKDL9NRg?=
- =?us-ascii?Q?hq33wiP7mbKYigEEEBLM7364ZR6UCrbAzw96HDprObwz4oHfERqX/x8g49n5?=
- =?us-ascii?Q?YDY0FTeUeCu+uDF/udOPzLSbUXg0ta4pkzTTD9DPMYmdD4DM1vm5AexE0Cw+?=
- =?us-ascii?Q?49bkok7k7GtcgHIAV4lXB2rraFD8Rf7itkr9GPrRlJrMMmpCz5Si896y0yHb?=
- =?us-ascii?Q?+ZqBWcIm4lGaEhJigtm5/N78ygY72WT0VWHO467sClFKssK3/YKONmKCE8qN?=
- =?us-ascii?Q?mdD13TKT8FLdNG6f+614AiP9pO9/xh2lzBKzlAvgBgPncfaPLE2RyzNrbD/d?=
- =?us-ascii?Q?oEffwIuiHJA0HDh1embob8IhTk0hO+7sHNy/rpvdzdNtOuJWokFIBKOjpZJ3?=
- =?us-ascii?Q?triCMUFd2/XuvyaKMUKDxlYvxmWsbRfUBXuhena71RFX3cJ3UNcT/BFeNoo/?=
- =?us-ascii?Q?+laXWyGVcq81ivAH/PLs7VmHZjXXF9fMh3OR1KCDhGtk54OPWwoZCbVdXPgc?=
- =?us-ascii?Q?EuhyMyIhZV/xyhDCXjyuBr/fPY2wnUsklby50qjYTn2H+56lwJ8aK4HVBJsj?=
- =?us-ascii?Q?OMl/lJ4OAquVUDD2leAr5t/nCU6zRH+Y2wdaH8Zim+wVQNeMOLj/scskyPp7?=
- =?us-ascii?Q?vml6ZSbnL/jGESNlGD6JMq8I4W6NPmYl5p0qXZ+WQMOeTo8q648KNAr7EGLq?=
- =?us-ascii?Q?+vjAdaSDny26Oz1bKbv6tbnxIEHKbzDx8QgGZd7AvKsVmT2C2gHlMQB38gDS?=
- =?us-ascii?Q?D9d35bs0a9xDdEYKv7/EIBb1b49UPlJ5b2tpwt2sHl4BE1vqbJzS7SpMYc0E?=
- =?us-ascii?Q?k8GV4THB1S6MbQNW5ChHMUIy?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5a530821-f2b7-42d6-6fc5-08d96bceb0ff
-X-MS-Exchange-CrossTenant-AuthSource: CH2PR12MB4133.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Aug 2021 15:56:12.9727
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Sp7INwti4AJ4mw/lrUQHRegQp2Z2zhWNi3E2wKm/W2jAHF9VfrwlCNoz9+ThItajVxNPSrD5IP6VU04PcoenOA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4246
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 27, 2021 at 04:15:14PM +0200, Borislav Petkov wrote:
-> On Fri, Aug 20, 2021 at 10:19:25AM -0500, Brijesh Singh wrote:
-> > From: Michael Roth <michael.roth@amd.com>
-> > 
-> > When the Confidential Computing blob is located by the boot/compressed
-> > kernel, store a pointer to it in bootparams->cc_blob_address to avoid
-> > the need for the run-time kernel to rescan the EFI config table to find
-> > it again.
-> > 
-> > Since this function is also shared by the run-time kernel, this patch
-> 
-> Here's "this patch" again... but you know what to do.
-> 
-> > also adds the logic to make use of bootparams->cc_blob_address when it
-> > has been initialized.
-> > 
-> > Signed-off-by: Michael Roth <michael.roth@amd.com>
-> > Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> > ---
-> >  arch/x86/kernel/sev-shared.c | 40 ++++++++++++++++++++++++++----------
-> >  1 file changed, 29 insertions(+), 11 deletions(-)
-> > 
-> > diff --git a/arch/x86/kernel/sev-shared.c b/arch/x86/kernel/sev-shared.c
-> > index 651980ddbd65..6f70ba293c5e 100644
-> > --- a/arch/x86/kernel/sev-shared.c
-> > +++ b/arch/x86/kernel/sev-shared.c
-> > @@ -868,7 +868,6 @@ static enum es_result vc_handle_rdtsc(struct ghcb *ghcb,
-> >  	return ES_OK;
-> >  }
-> >  
-> > -#ifdef BOOT_COMPRESSED
-> >  static struct setup_data *get_cc_setup_data(struct boot_params *bp)
-> >  {
-> >  	struct setup_data *hdr = (struct setup_data *)bp->hdr.setup_data;
-> > @@ -888,6 +887,16 @@ static struct setup_data *get_cc_setup_data(struct boot_params *bp)
-> >   *   1) Search for CC blob in the following order/precedence:
-> >   *      - via linux boot protocol / setup_data entry
-> >   *      - via EFI configuration table
-> > + *   2) If found, initialize boot_params->cc_blob_address to point to the
-> > + *      blob so that uncompressed kernel can easily access it during very
-> > + *      early boot without the need to re-parse EFI config table
-> > + *   3) Return a pointer to the CC blob, NULL otherwise.
-> > + *
-> > + * For run-time/uncompressed kernel:
-> > + *
-> > + *   1) Search for CC blob in the following order/precedence:
-> > + *      - via linux boot protocol / setup_data entry
-> 
-> Why would you do this again if the boot/compressed kernel has already
-> searched for it?
+This series introduces a framework that makes it possible to implement
+software-emulated vDPA devices in userspace. And to make the device
+emulation more secure, the emulated vDPA device's control path is handled
+in the kernel and only the data path is implemented in the userspace.
 
-In some cases it's possible to boot directly to kernel proper without
-going through decompression kernel (e.g. CONFIG_PVH), so this is to allow
-a way for boot loaders of this sort to provide a CC blob without relying
-on EFI. It could be relevant for things like fast/virtualized containers.
+Since the emuldated vDPA device's control path is handled in the kernel,
+a message mechnism is introduced to make userspace be aware of the data
+path related changes. Userspace can use read()/write() to receive/reply
+the control messages.
 
-> 
-> > + *      - via boot_params->cc_blob_address
-> 
-> Yes, that is the only thing you need to do in the runtime kernel - see
-> if cc_blob_address is not 0. And all the work has been done by the
-> decompressor kernel already.
-> 
-> >   *   2) Return a pointer to the CC blob, NULL otherwise.
-> >   */
-> >  static struct cc_blob_sev_info *sev_snp_probe_cc_blob(struct boot_params *bp)
-> > @@ -897,9 +906,11 @@ static struct cc_blob_sev_info *sev_snp_probe_cc_blob(struct boot_params *bp)
-> >  		struct setup_data header;
-> >  		u32 cc_blob_address;
-> >  	} *sd;
-> > +#ifdef __BOOT_COMPRESSED
-> >  	unsigned long conf_table_pa;
-> >  	unsigned int conf_table_len;
-> >  	bool efi_64;
-> > +#endif
-> 
-> That function turns into an unreadable mess with that #ifdef
-> __BOOT_COMPRESSED slapped everywhere.
-> 
-> It seems the cleanest thing to do is to do what we do with
-> acpi_rsdp_addr: do all the parsing in boot/compressed/ and pass it on
-> through boot_params. Kernel proper simply reads the pointer.
-> 
-> Which means, you can stick all that cc_blob figuring out functionality
-> in arch/x86/boot/compressed/sev.c instead.
+In the data path, the core is mapping dma buffer into VDUSE daemon's
+address space, which can be implemented in different ways depending on
+the vdpa bus to which the vDPA device is attached.
 
-Most of the #ifdef'ery is due to the EFI scan, so I moved that part out
-to a separate helper, snp_probe_cc_blob_efi(), that lives in
-boot/compressed.sev.c. Still not pretty, but would this be acceptable?
+In virtio-vdpa case, we implements a MMU-based software IOTLB with
+bounce-buffering mechanism to achieve that. And in vhost-vdpa case, the dma
+buffer is reside in a userspace memory region which can be shared to the
+VDUSE userspace processs via transferring the shmfd.
 
-/*
- * For boot/compressed kernel:
- *
- *   1) Search for CC blob in the following order/precedence:
- *      - via linux boot protocol / setup_data entry
- *      - via EFI configuration table
- *   2) If found, initialize boot_params->cc_blob_address to point to the
- *      blob so that uncompressed kernel can easily access it during very
- *      early boot without the need to re-parse EFI config table
- *   3) Return a pointer to the CC blob, NULL otherwise.
- *
- * For run-time/uncompressed kernel:
- *
- *   1) Search for CC blob in the following order/precedence:
- *      - via boot_params->cc_blob_address
- *      - via linux boot protocol / setup_data entry
- *   2) Return a pointer to the CC blob, NULL otherwise.
- */
-static struct cc_blob_sev_info *sev_snp_probe_cc_blob(struct boot_params *bp)
-{
-        struct cc_blob_sev_info *cc_info = NULL;
-        struct cc_setup_data *sd;
+The details and our user case is shown below:
 
-#ifndef __BOOT_COMPRESSED
-        /*
-         * CC blob isn't in setup_data, see if boot kernel passed it via
-         * boot_params.
-         */
-        if (bp->cc_blob_address) {
-                cc_info = (struct cc_blob_sev_info *)(unsigned long)bp->cc_blob_address;
-                goto out_verify;
-        }
-#endif
+------------------------    -------------------------   ----------------------------------------------
+|            Container |    |              QEMU(VM) |   |                               VDUSE daemon |
+|       ---------      |    |  -------------------  |   | ------------------------- ---------------- |
+|       |dev/vdx|      |    |  |/dev/vhost-vdpa-x|  |   | | vDPA device emulation | | block driver | |
+------------+-----------     -----------+------------   -------------+----------------------+---------
+            |                           |                            |                      |
+            |                           |                            |                      |
+------------+---------------------------+----------------------------+----------------------+---------
+|    | block device |           |  vhost device |            | vduse driver |          | TCP/IP |    |
+|    -------+--------           --------+--------            -------+--------          -----+----    |
+|           |                           |                           |                       |        |
+| ----------+----------       ----------+-----------         -------+-------                |        |
+| | virtio-blk driver |       |  vhost-vdpa driver |         | vdpa device |                |        |
+| ----------+----------       ----------+-----------         -------+-------                |        |
+|           |      virtio bus           |                           |                       |        |
+|   --------+----+-----------           |                           |                       |        |
+|                |                      |                           |                       |        |
+|      ----------+----------            |                           |                       |        |
+|      | virtio-blk device |            |                           |                       |        |
+|      ----------+----------            |                           |                       |        |
+|                |                      |                           |                       |        |
+|     -----------+-----------           |                           |                       |        |
+|     |  virtio-vdpa driver |           |                           |                       |        |
+|     -----------+-----------           |                           |                       |        |
+|                |                      |                           |    vdpa bus           |        |
+|     -----------+----------------------+---------------------------+------------           |        |
+|                                                                                        ---+---     |
+-----------------------------------------------------------------------------------------| NIC |------
+                                                                                         ---+---
+                                                                                            |
+                                                                                   ---------+---------
+                                                                                   | Remote Storages |
+                                                                                   -------------------
 
-        /* Try to get CC blob via setup_data */
-        sd = get_cc_setup_data(bp);
-        if (sd) {
-                cc_info = (struct cc_blob_sev_info *)(unsigned long)sd->cc_blob_address;
-                goto out_verify;
-        }
+We make use of it to implement a block device connecting to
+our distributed storage, which can be used both in containers and
+VMs. Thus, we can have an unified technology stack in this two cases.
 
-#ifdef __BOOT_COMPRESSED
-        cc_info = snp_probe_cc_blob_efi(bp);
-#endif
+To test it with null-blk:
 
-out_verify:
-        /* CC blob should be either valid or not present. Fail otherwise. */
-        if (cc_info && cc_info->magic != CC_BLOB_SEV_HDR_MAGIC)
-                sev_es_terminate(1, GHCB_SNP_UNSUPPORTED);
+  $ qemu-storage-daemon \
+      --chardev socket,id=charmonitor,path=/tmp/qmp.sock,server,nowait \
+      --monitor chardev=charmonitor \
+      --blockdev driver=host_device,cache.direct=on,aio=native,filename=/dev/nullb0,node-name=disk0 \
+      --export type=vduse-blk,id=test,node-name=disk0,writable=on,name=vduse-null,num-queues=16,queue-size=128
 
-#ifdef __BOOT_COMPRESSED
-        /*
-         * Pass run-time kernel a pointer to CC info via boot_params for easier
-         * access during early boot.
-         */
-        bp->cc_blob_address = (u32)(unsigned long)cc_info;
-#endif
+The qemu-storage-daemon can be found at https://github.com/bytedance/qemu/tree/vduse
 
-        return cc_info;
-}
+To make the userspace VDUSE processes such as qemu-storage-daemon able
+to be run by an unprivileged user. We limit the supported device type
+to virtio block device currently. The support for other device types
+can be added after the security issue of corresponding device driver
+is clarified or fixed in the future.
 
-> 
-> Thx.
-> 
-> -- 
-> Regards/Gruss,
->     Boris.
-> 
-> https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fpeople.kernel.org%2Ftglx%2Fnotes-about-netiquette&amp;data=04%7C01%7Cmichael.roth%40amd.com%7C1c87c1e207d64d80bae308d9696503b4%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637656704870745741%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C1000&amp;sdata=R3pm8Xf3f5B%2Fm7IDpL%2BiFS0kUdCMmUlhtJFXCROh4YA%3D&amp;reserved=0
+Future work:
+  - Improve performance
+  - Userspace library (find a way to reuse device emulation code in qemu/rust-vmm)
+  - Support more device types
+
+V11 to V12:
+- Rebased to vhost.git
+- Add reset support for all vdpa drivers
+- Remove the dependency on other patches
+- Export eventfd_wake_count
+- Use workqueue for virtqueue kicking in some cases
+
+V10 to V11:
+- Rebased to newest kernel tree
+- Add a device attribute for message timeout
+- Add check for the reserved field of some structures
+- Add a reset callback in vdpa_config_ops and handle it in VDUSE case
+- Remove the patches that handle virtio-vdpa reset failure
+- Document the structures in include/uapi/linux/vduse.h using kernel doc
+- Add the reserved field for struct vduse_vq_config
+
+V9 to V10:
+- Forbid some userspace operations after a timeout
+- Rename VDUSE_DEV_INJECT_IRQ to VDUSE_DEV_INJECT_CONFIG_IRQ
+- Use fixed bounce buffer size
+- Fix more code indentation issues in include/linux/vdpa.h
+- Remove the section describing bounce-buffer mechanism in documentation
+- Fix some commit logs and documentation
+
+V8 to V9:
+- Add VDUSE_SET_STATUS message to replace VDUSE_START/STOP_DATAPLANE messages
+- Support packed virtqueue state
+- Handle the reset failure in both virtio-vdpa and vhost-vdpa cases
+- Add more details in documentation
+- Remove VDUSE_REQ_FLAGS_NO_REPLY flag
+- Add VDUSE_VQ_SETUP ioctl to support per-vq configuration
+- Separate config interrupt injecting out of config update
+- Flush kworker for interrupt inject during resetting
+- Validate the config_size in .get_config()
+
+V7 to V8:
+- Rebased to newest kernel tree
+- Rework VDUSE driver to handle the device's control path in kernel
+- Limit the supported device type to virtio block device
+- Export free_iova_fast()
+- Remove the virtio-blk and virtio-scsi patches (will send them alone)
+- Remove all module parameters
+- Use the same MAJOR for both control device and VDUSE devices
+- Avoid eventfd cleanup in vduse_dev_release()
+
+V6 to V7:
+- Export alloc_iova_fast()
+- Add get_config_size() callback
+- Add some patches to avoid trusting virtio devices
+- Add limited device emulation
+- Add some documents
+- Use workqueue to inject config irq
+- Add parameter on vq irq injecting
+- Rename vduse_domain_get_mapping_page() to vduse_domain_get_coherent_page()
+- Add WARN_ON() to catch message failure
+- Add some padding/reserved fields to uAPI structure
+- Fix some bugs
+- Rebase to vhost.git
+
+V5 to V6:
+- Export receive_fd() instead of __receive_fd()
+- Factor out the unmapping logic of pa and va separatedly
+- Remove the logic of bounce page allocation in page fault handler
+- Use PAGE_SIZE as IOVA allocation granule
+- Add EPOLLOUT support
+- Enable setting API version in userspace
+- Fix some bugs
+
+V4 to V5:
+- Remove the patch for irq binding
+- Use a single IOTLB for all types of mapping
+- Factor out vhost_vdpa_pa_map()
+- Add some sample codes in document
+- Use receice_fd_user() to pass file descriptor
+- Fix some bugs
+
+V3 to V4:
+- Rebase to vhost.git
+- Split some patches
+- Add some documents
+- Use ioctl to inject interrupt rather than eventfd
+- Enable config interrupt support
+- Support binding irq to the specified cpu
+- Add two module parameter to limit bounce/iova size
+- Create char device rather than anon inode per vduse
+- Reuse vhost IOTLB for iova domain
+- Rework the message mechnism in control path
+
+V2 to V3:
+- Rework the MMU-based IOMMU driver
+- Use the iova domain as iova allocator instead of genpool
+- Support transferring vma->vm_file in vhost-vdpa
+- Add SVA support in vhost-vdpa
+- Remove the patches on bounce pages reclaim
+
+V1 to V2:
+- Add vhost-vdpa support
+- Add some documents
+- Based on the vdpa management tool
+- Introduce a workqueue for irq injection
+- Replace interval tree with array map to store the iova_map
+
+Xie Yongji (13):
+  iova: Export alloc_iova_fast() and free_iova_fast()
+  eventfd: Export eventfd_wake_count to modules
+  file: Export receive_fd() to modules
+  vdpa: Fix some coding style issues
+  vdpa: Add reset callback in vdpa_config_ops
+  vhost-vdpa: Handle the failure of vdpa_reset()
+  vhost-iotlb: Add an opaque pointer for vhost IOTLB
+  vdpa: Add an opaque pointer for vdpa_config_ops.dma_map()
+  vdpa: factor out vhost_vdpa_pa_map() and vhost_vdpa_pa_unmap()
+  vdpa: Support transferring virtual addressing during DMA mapping
+  vduse: Implement an MMU-based software IOTLB
+  vduse: Introduce VDUSE - vDPA Device in Userspace
+  Documentation: Add documentation for VDUSE
+
+ Documentation/userspace-api/index.rst              |    1 +
+ Documentation/userspace-api/ioctl/ioctl-number.rst |    1 +
+ Documentation/userspace-api/vduse.rst              |  233 +++
+ drivers/iommu/iova.c                               |    2 +
+ drivers/vdpa/Kconfig                               |   10 +
+ drivers/vdpa/Makefile                              |    1 +
+ drivers/vdpa/ifcvf/ifcvf_main.c                    |   37 +-
+ drivers/vdpa/mlx5/net/mlx5_vnet.c                  |   42 +-
+ drivers/vdpa/vdpa.c                                |    9 +-
+ drivers/vdpa/vdpa_sim/vdpa_sim.c                   |   26 +-
+ drivers/vdpa/vdpa_user/Makefile                    |    5 +
+ drivers/vdpa/vdpa_user/iova_domain.c               |  545 +++++++
+ drivers/vdpa/vdpa_user/iova_domain.h               |   73 +
+ drivers/vdpa/vdpa_user/vduse_dev.c                 | 1641 ++++++++++++++++++++
+ drivers/vdpa/virtio_pci/vp_vdpa.c                  |   17 +-
+ drivers/vhost/iotlb.c                              |   20 +-
+ drivers/vhost/vdpa.c                               |  168 +-
+ fs/eventfd.c                                       |    1 +
+ fs/file.c                                          |    6 +
+ include/linux/file.h                               |    7 +-
+ include/linux/vdpa.h                               |   62 +-
+ include/linux/vhost_iotlb.h                        |    3 +
+ include/uapi/linux/vduse.h                         |  306 ++++
+ 23 files changed, 3112 insertions(+), 104 deletions(-)
+ create mode 100644 Documentation/userspace-api/vduse.rst
+ create mode 100644 drivers/vdpa/vdpa_user/Makefile
+ create mode 100644 drivers/vdpa/vdpa_user/iova_domain.c
+ create mode 100644 drivers/vdpa/vdpa_user/iova_domain.h
+ create mode 100644 drivers/vdpa/vdpa_user/vduse_dev.c
+ create mode 100644 include/uapi/linux/vduse.h
+
+-- 
+2.11.0
+
