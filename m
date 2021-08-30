@@ -2,172 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1F7513FB5C9
-	for <lists+kvm@lfdr.de>; Mon, 30 Aug 2021 14:26:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 411B13FB600
+	for <lists+kvm@lfdr.de>; Mon, 30 Aug 2021 14:31:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236643AbhH3MNr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Aug 2021 08:13:47 -0400
-Received: from smtp-out1.suse.de ([195.135.220.28]:45536 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236605AbhH3MNq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 Aug 2021 08:13:46 -0400
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out1.suse.de (Postfix) with ESMTP id EBE1C220CA;
-        Mon, 30 Aug 2021 12:12:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1630325571; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
+        id S231963AbhH3M2I (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Aug 2021 08:28:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:31919 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231765AbhH3M2H (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 30 Aug 2021 08:28:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1630326433;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=2hWoCd86FOkOw7A98E1hRLN7RLXNnAR31E/MeyrKApg=;
-        b=Y1gMMOSG4Lbl6n6EPJf1XND9hTBA55SaCavADAkaMhKtcCo/fdtC90kY49WhTWrpd2I2Qw
-        ihSEer7fh+GydVOL5lgJ+x54xNtaI/DzPJNEfiUsx3J1/ggxYMTOuH0fO1Tzf0qlIEFEpO
-        Ao6FdqbDH28DfZ6nb62XRrXvVEsIYJg=
-Received: from suse.cz (pathway.suse.cz [10.100.12.24])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        bh=JULOJ3D1oEHDnIvJ24fJzaZfSU8J0Xhje3NMw5KwOms=;
+        b=VHZ8YbRSnmgwT3iapezS/XYVYeKmn498+srOH4LnyUjSJ4vp3uoY2hBxHCOiuubNTimUdp
+        yi1NrNGVYRlxfANUo4kQuUTM/maMGnyAEydlhDzdh2ZdnZL3XW1aqdNVE1097hjFKewgqP
+        XmpKe12i3b4WFXqYtbkyJnvfYUqWrtI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-286-fPIcY7stOCKGYrQnRllVCA-1; Mon, 30 Aug 2021 08:27:10 -0400
+X-MC-Unique: fPIcY7stOCKGYrQnRllVCA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by relay2.suse.de (Postfix) with ESMTPS id C0204A3B8C;
-        Mon, 30 Aug 2021 12:12:49 +0000 (UTC)
-Date:   Mon, 30 Aug 2021 14:12:49 +0200
-From:   Petr Mladek <pmladek@suse.com>
-To:     Yury Norov <yury.norov@gmail.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-mmc@vger.kernel.org, linux-perf-users@vger.kernel.org,
-        kvm@vger.kernel.org,
-        "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-        Alexander Lobakin <alobakin@pm.me>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Alexey Klimov <aklimov@redhat.com>,
-        Andrea Merello <andrea.merello@gmail.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Arnaldo Carvalho de Melo <acme@redhat.com>,
-        Arnd Bergmann <arnd@arndb.de>, Ben Gardon <bgardon@google.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Brian Cain <bcain@codeaurora.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Christoph Lameter <cl@linux.com>,
-        Daniel Bristot de Oliveira <bristot@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Dennis Zhou <dennis@kernel.org>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Ian Rogers <irogers@google.com>,
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 333DF1008064;
+        Mon, 30 Aug 2021 12:27:08 +0000 (UTC)
+Received: from starship (unknown [10.35.206.50])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BD79460939;
+        Mon, 30 Aug 2021 12:27:03 +0000 (UTC)
+Message-ID: <36d7884ddc472c8cf6f30e642985e2f3a4066651.camel@redhat.com>
+Subject: Re: [PATCH 1/2] KVM: VMX: avoid running vmx_handle_exit_irqoff in
+ case of emulation
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Jim Mattson <jmattson@google.com>,
         Ingo Molnar <mingo@redhat.com>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Jakub Kicinski <kuba@kernel.org>, Jiri Olsa <jolsa@redhat.com>,
-        Joe Perches <joe@perches.com>, Jonas Bonn <jonas@southpole.se>,
-        Leo Yan <leo.yan@linaro.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        Rich Felker <dalias@libc.org>,
-        Samuel Mendoza-Jonas <sam@mendozajonas.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Tejun Heo <tj@kernel.org>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Will Deacon <will@kernel.org>,
-        Wolfram Sang <wsa+renesas@sang-engineering.com>,
-        Yoshinori Sato <ysato@users.sourceforge.jp>
-Subject: Re: [PATCH 11/17] find: micro-optimize for_each_{set,clear}_bit()
-Message-ID: <20210830121249.2fgyvf47py2tz5s5@pathway.suse.cz>
-References: <20210814211713.180533-1-yury.norov@gmail.com>
- <20210814211713.180533-12-yury.norov@gmail.com>
- <YSeduU41Ef568xhS@alley>
- <YSgDI9NpC51GhB/2@yury-ThinkPad>
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Borislav Petkov <bp@alien8.de>,
+        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
+        <linux-kernel@vger.kernel.org>
+Date:   Mon, 30 Aug 2021 15:27:02 +0300
+In-Reply-To: <YSe6wphK9b8KSkXW@google.com>
+References: <20210826095750.1650467-1-mlevitsk@redhat.com>
+         <20210826095750.1650467-2-mlevitsk@redhat.com>
+         <YSe6wphK9b8KSkXW@google.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YSgDI9NpC51GhB/2@yury-ThinkPad>
-User-Agent: NeoMutt/20170912 (1.9.0)
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu 2021-08-26 14:09:55, Yury Norov wrote:
-> On Thu, Aug 26, 2021 at 03:57:13PM +0200, Petr Mladek wrote:
-> > On Sat 2021-08-14 14:17:07, Yury Norov wrote:
-> > > The macros iterate thru all set/clear bits in a bitmap. They search a
-> > > first bit using find_first_bit(), and the rest bits using find_next_bit().
-> > > 
-> > > Since find_next_bit() is called shortly after find_first_bit(), we can
-> > > save few lines of I-cache by not using find_first_bit().
+On Thu, 2021-08-26 at 16:01 +0000, Sean Christopherson wrote:
+> On Thu, Aug 26, 2021, Maxim Levitsky wrote:
+> > If we are emulating an invalid guest state, we don't have a correct
+> > exit reason, and thus we shouldn't do anything in this function.
 > > 
-> > Is this only a speculation or does it fix a real performance problem?
+> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> 
+> This should have Cc: stable.  I believe userspace could fairly easily trick KVM
+> into "handling" a spurious IRQ, e.g. trigger SIGALRM and stuff invalid state.
+> For all those evil folks running CPUs that are almost old enough to drive :-)
+> 
+> > ---
+> >  arch/x86/kvm/vmx/vmx.c | 3 +++
+> >  1 file changed, 3 insertions(+)
 > > 
-> > The macro is used like:
-> > 
-> > 	for_each_set_bit(bit, addr, size) {
-> > 		fn(bit);
-> > 	}
-> > 
-> > IMHO, the micro-opimization does not help when fn() is non-trivial.
+> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> > index fada1055f325..0c2c0d5ae873 100644
+> > --- a/arch/x86/kvm/vmx/vmx.c
+> > +++ b/arch/x86/kvm/vmx/vmx.c
+> > @@ -6382,6 +6382,9 @@ static void vmx_handle_exit_irqoff(struct kvm_vcpu *vcpu)
+> >  {
+> >  	struct vcpu_vmx *vmx = to_vmx(vcpu);
+> >  
+> > +	if (vmx->emulation_required)
+> > +		return;
+> 
+> Rather than play whack-a-mole with flows consuming stale state, I'd much prefer
+> to synthesize a VM-Exit(INVALID_GUEST_STATE).  Alternatively, just skip ->run()
+> entirely by adding hooks in vcpu_enter_guest(), but that's a much larger change
+> and probably not worth the risk at this juncture.
+> 
+> ---
+>  arch/x86/kvm/vmx/vmx.c | 17 ++++++++++++++---
+>  1 file changed, 14 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 32e3a8b35b13..12fe63800889 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -6618,10 +6618,21 @@ static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
+>  		     vmx->loaded_vmcs->soft_vnmi_blocked))
+>  		vmx->loaded_vmcs->entry_time = ktime_get();
 >  
-> The effect is measurable:
+> -	/* Don't enter VMX if guest state is invalid, let the exit handler
+> -	   start emulation until we arrive back to a valid state */
+> -	if (vmx->emulation_required)
+> +	/*
+> +	 * Don't enter VMX if guest state is invalid, let the exit handler
+> +	 * start emulation until we arrive back to a valid state.  Synthesize a
+> +	 * consistency check VM-Exit due to invalid guest state and bail.
+> +	 */
+> +	if (unlikely(vmx->emulation_required)) {
+> +		vmx->fail = 0;
+> +		vmx->exit_reason.full = EXIT_REASON_INVALID_STATE;
+> +		vmx->exit_reason.failed_vmentry = 1;
+> +		kvm_register_mark_available(vcpu, VCPU_EXREG_EXIT_INFO_1);
+> +		vmx->exit_qualification = ENTRY_FAIL_DEFAULT;
+> +		kvm_register_mark_available(vcpu, VCPU_EXREG_EXIT_INFO_2);
+> +		vmx->exit_intr_info = 0;
+>  		return EXIT_FASTPATH_NONE;
+> +	}
+
+I was thinking exactly about this when I wrote the patch, and in fact first
+version of it did roughly what you suggest.
+
+But I was afraid that this will also introduce a whack-a-mole as now
+it "appears" as if VM entry failed and we should thus kill the guest.
+
+But I'll try that.
+
+Thanks a lot for the review!
+
+Best regards,
+	Maxim Levitsky
+
+
+>  
+>  	trace_kvm_entry(vcpu);
+>  
+> --
 > 
-> Start testing for_each_bit()
-> for_each_set_bit:                15296 ns,   1000 iterations
-> for_each_set_bit_from:           15225 ns,   1000 iterations
+> or the beginnings of an aggressive refactor...
+
+
+
+
+
 > 
-> Start testing for_each_bit() with cash flushing
-> for_each_set_bit:               547626 ns,   1000 iterations
-> for_each_set_bit_from:          497899 ns,   1000 iterations
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index cf8fb6eb676a..a4fe0f78898a 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -9509,6 +9509,9 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+>                 goto cancel_injection;
+>         }
 > 
-> Refer this:
+> +       if (unlikely(static_call(kvm_x86_emulation_required)(vcpu)))
+> +               return static_call(kvm_x86_emulate_invalid_guest_state)(vcpu);
+> +
+>         preempt_disable();
 > 
-> https://www.mail-archive.com/dri-devel@lists.freedesktop.org/msg356151.html
-
-I see. The results look convincing on the first look.
-
-But I am still not sure. This patch is basically contradicting many
-other patches from this patchset:
-
-  + 5th patch optimizes find_first_and_bit() and proves that it is
-    much faster:
-
-    Before (#define find_first_and_bit(...) find_next_and_bit(..., 0):
-    Start testing find_bit() with random-filled bitmap
-    [  140.291468] find_first_and_bit:           46890919 ns,  32671 iterations
-    Start testing find_bit() with sparse bitmap
-    [  140.295028] find_first_and_bit:               7103 ns,      1 iterations
-
-    After:
-    Start testing find_bit() with random-filled bitmap
-    [  162.574907] find_first_and_bit:           25045813 ns,  32846 iterations
-    Start testing find_bit() with sparse bitmap
-    [  162.578458] find_first_and_bit:               4900 ns,      1 iterations
-
-       => saves 46% in random bitmap
-	  saves 31% in sparse bitmap
+>         static_call(kvm_x86_prepare_guest_switch)(vcpu);
+> 
+> > +
+> >  	if (vmx->exit_reason.basic == EXIT_REASON_EXTERNAL_INTERRUPT)
+> >  		handle_external_interrupt_irqoff(vcpu);
+> >  	else if (vmx->exit_reason.basic == EXIT_REASON_EXCEPTION_NMI)
+> > -- 
+> > 2.26.3
+> > 
 
 
-  + 6th, 7th, and 9th patch makes the code use find_first_bit()
-    because it is faster than find_next_bit(mask, size, 0);
-
-  + Now, 11th (this) patch replaces find_first_bit() with
-    find_next_bit(mask, size, 0) because find_first_bit()
-    makes things slower. It is suspicious at minimum.
-
-
-By other words. The I-cache could safe 10% in one case.
-But find_first_bit() might safe 46% in random case.
-
-Does I-cache cost more than the faster code?
-
-Or was for_each_set_bit() tested only with a bitmap
-where find_first_bit() optimization did not help much?
-
-How would for_each_set_bit() work with random bitmap?
-How does it work with larger bitmaps?
-
-Best Regards,
-Petr
