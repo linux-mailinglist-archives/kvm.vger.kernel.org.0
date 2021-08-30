@@ -2,124 +2,172 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E5CCE3FB5A5
-	for <lists+kvm@lfdr.de>; Mon, 30 Aug 2021 14:09:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1F7513FB5C9
+	for <lists+kvm@lfdr.de>; Mon, 30 Aug 2021 14:26:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236625AbhH3MGp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Aug 2021 08:06:45 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:16882 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237051AbhH3MGJ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 30 Aug 2021 08:06:09 -0400
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 17UC42Lk169121;
-        Mon, 30 Aug 2021 08:05:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=Y5H+fFogofucQYpVp4keglQZDmK0zcRTHtHkdIFs9RU=;
- b=SqKmKmNrLDdqSpzSTjzmyI1UNiZbmUnamNijkOT8kHM8LonnnTGPDBL1LNXQMeKTDs7A
- Jfc4wDBqNDS/jydK7Pyr12cjiOA6VZldhoi0afaa1tRnDNn1LtLBTF72Fns6j321H3CK
- advbLiCR2ba5w/7+MM6CrLsO0ZfAGaOCHJppV71ZvqEm6xXKNV7zC3ZHINvPcEMPEhfj
- 50LWplla3BJaSvG2uTLd5IvEsCT14BmsmKHNNruCUL1K1oXqbBFm86l5Jtbs9ynJqQpA
- JDSnb3q5YfmTSlTe8V877AiiwkO2vL38xtOPf0cjggK8enKLWnYVPHt5xQ4jf+eTCKDK +Q== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3arwpxt3w3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 30 Aug 2021 08:05:10 -0400
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 17UC5AY0178018;
-        Mon, 30 Aug 2021 08:05:10 -0400
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3arwpxt3v0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 30 Aug 2021 08:05:10 -0400
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 17UBucbk014529;
-        Mon, 30 Aug 2021 12:05:08 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma02fra.de.ibm.com with ESMTP id 3aqcs8awgf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 30 Aug 2021 12:05:07 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 17UC53oj18940192
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 30 Aug 2021 12:05:03 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7917C4C075;
-        Mon, 30 Aug 2021 12:05:03 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 00D3F4C06D;
-        Mon, 30 Aug 2021 12:05:03 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.33.184])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 30 Aug 2021 12:05:02 +0000 (GMT)
-Subject: Re: [PATCH 0/2] s390x: ccw: A simple test device for virtio CCW
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        kvm@vger.kernel.org, Michael S Tsirkin <mst@redhat.com>
-Cc:     thuth@redhat.com, frankja@linux.ibm.com, david@redhat.com,
-        cohuck@redhat.com, richard.henderson@linaro.org,
-        drjones@redhat.com, qemu-devel@nongnu.org, pasic@linux.ibm.com,
-        qemu-s390x@nongnu.org, imbrenda@linux.ibm.com
-References: <1630061450-18744-1-git-send-email-pmorel@linux.ibm.com>
- <fe2c0cbd-24a6-0785-6a64-22c6b6c01e6d@de.ibm.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Message-ID: <cd2df86d-793e-48ca-7f67-9db8e9439b2b@linux.ibm.com>
-Date:   Mon, 30 Aug 2021 14:05:02 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+        id S236643AbhH3MNr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Aug 2021 08:13:47 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:45536 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236605AbhH3MNq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 Aug 2021 08:13:46 -0400
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out1.suse.de (Postfix) with ESMTP id EBE1C220CA;
+        Mon, 30 Aug 2021 12:12:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1630325571; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=2hWoCd86FOkOw7A98E1hRLN7RLXNnAR31E/MeyrKApg=;
+        b=Y1gMMOSG4Lbl6n6EPJf1XND9hTBA55SaCavADAkaMhKtcCo/fdtC90kY49WhTWrpd2I2Qw
+        ihSEer7fh+GydVOL5lgJ+x54xNtaI/DzPJNEfiUsx3J1/ggxYMTOuH0fO1Tzf0qlIEFEpO
+        Ao6FdqbDH28DfZ6nb62XRrXvVEsIYJg=
+Received: from suse.cz (pathway.suse.cz [10.100.12.24])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by relay2.suse.de (Postfix) with ESMTPS id C0204A3B8C;
+        Mon, 30 Aug 2021 12:12:49 +0000 (UTC)
+Date:   Mon, 30 Aug 2021 14:12:49 +0200
+From:   Petr Mladek <pmladek@suse.com>
+To:     Yury Norov <yury.norov@gmail.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-mmc@vger.kernel.org, linux-perf-users@vger.kernel.org,
+        kvm@vger.kernel.org,
+        "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+        Alexander Lobakin <alobakin@pm.me>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Alexey Klimov <aklimov@redhat.com>,
+        Andrea Merello <andrea.merello@gmail.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Arnaldo Carvalho de Melo <acme@redhat.com>,
+        Arnd Bergmann <arnd@arndb.de>, Ben Gardon <bgardon@google.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Brian Cain <bcain@codeaurora.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Christoph Lameter <cl@linux.com>,
+        Daniel Bristot de Oliveira <bristot@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Dennis Zhou <dennis@kernel.org>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Ian Rogers <irogers@google.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Jakub Kicinski <kuba@kernel.org>, Jiri Olsa <jolsa@redhat.com>,
+        Joe Perches <joe@perches.com>, Jonas Bonn <jonas@southpole.se>,
+        Leo Yan <leo.yan@linaro.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Xu <peterx@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Rich Felker <dalias@libc.org>,
+        Samuel Mendoza-Jonas <sam@mendozajonas.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Tejun Heo <tj@kernel.org>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Will Deacon <will@kernel.org>,
+        Wolfram Sang <wsa+renesas@sang-engineering.com>,
+        Yoshinori Sato <ysato@users.sourceforge.jp>
+Subject: Re: [PATCH 11/17] find: micro-optimize for_each_{set,clear}_bit()
+Message-ID: <20210830121249.2fgyvf47py2tz5s5@pathway.suse.cz>
+References: <20210814211713.180533-1-yury.norov@gmail.com>
+ <20210814211713.180533-12-yury.norov@gmail.com>
+ <YSeduU41Ef568xhS@alley>
+ <YSgDI9NpC51GhB/2@yury-ThinkPad>
 MIME-Version: 1.0
-In-Reply-To: <fe2c0cbd-24a6-0785-6a64-22c6b6c01e6d@de.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: AAKs2K-QVxX9SLHWyDJcCPziSYtvbHDx
-X-Proofpoint-ORIG-GUID: 1mjDDIWDRh7Z02hEXHklvlEDxkAgBMIn
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-08-30_04:2021-08-30,2021-08-30 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0
- priorityscore=1501 impostorscore=0 bulkscore=0 lowpriorityscore=0
- spamscore=0 clxscore=1015 mlxscore=0 suspectscore=0 malwarescore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2107140000 definitions=main-2108300087
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YSgDI9NpC51GhB/2@yury-ThinkPad>
+User-Agent: NeoMutt/20170912 (1.9.0)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 8/30/21 11:51 AM, Christian Borntraeger wrote:
+On Thu 2021-08-26 14:09:55, Yury Norov wrote:
+> On Thu, Aug 26, 2021 at 03:57:13PM +0200, Petr Mladek wrote:
+> > On Sat 2021-08-14 14:17:07, Yury Norov wrote:
+> > > The macros iterate thru all set/clear bits in a bitmap. They search a
+> > > first bit using find_first_bit(), and the rest bits using find_next_bit().
+> > > 
+> > > Since find_next_bit() is called shortly after find_first_bit(), we can
+> > > save few lines of I-cache by not using find_first_bit().
+> > 
+> > Is this only a speculation or does it fix a real performance problem?
+> > 
+> > The macro is used like:
+> > 
+> > 	for_each_set_bit(bit, addr, size) {
+> > 		fn(bit);
+> > 	}
+> > 
+> > IMHO, the micro-opimization does not help when fn() is non-trivial.
+>  
+> The effect is measurable:
 > 
+> Start testing for_each_bit()
+> for_each_set_bit:                15296 ns,   1000 iterations
+> for_each_set_bit_from:           15225 ns,   1000 iterations
 > 
-> On 27.08.21 12:50, Pierre Morel wrote:
->> Hello All,
->>
->>
->> This series presents a VIRTIO test device which receives data on its
->> input channel and sends back a simple checksum for the data it received
->> on its output channel.
->> The goal is to allow a simple VIRTIO device driver to check the VIRTIO
->> initialization and various data transfer.
->>
->> For this I introduced a new device ID for the device and having no
->> Linux driver but a kvm-unit-test driver, I have the following
->> questions:
+> Start testing for_each_bit() with cash flushing
+> for_each_set_bit:               547626 ns,   1000 iterations
+> for_each_set_bit_from:          497899 ns,   1000 iterations
 > 
-> I think we should reserve an ID in the official virtio spec then for 
-> such a device?
+> Refer this:
+> 
+> https://www.mail-archive.com/dri-devel@lists.freedesktop.org/msg356151.html
 
-Yes, you are right, I think we should.
+I see. The results look convincing on the first look.
 
-> Maybe also add mst for such things.
+But I am still not sure. This patch is basically contradicting many
+other patches from this patchset:
 
-Yes, I did.
+  + 5th patch optimizes find_first_and_bit() and proves that it is
+    much faster:
 
-Thanks,
-Pierre
+    Before (#define find_first_and_bit(...) find_next_and_bit(..., 0):
+    Start testing find_bit() with random-filled bitmap
+    [  140.291468] find_first_and_bit:           46890919 ns,  32671 iterations
+    Start testing find_bit() with sparse bitmap
+    [  140.295028] find_first_and_bit:               7103 ns,      1 iterations
+
+    After:
+    Start testing find_bit() with random-filled bitmap
+    [  162.574907] find_first_and_bit:           25045813 ns,  32846 iterations
+    Start testing find_bit() with sparse bitmap
+    [  162.578458] find_first_and_bit:               4900 ns,      1 iterations
+
+       => saves 46% in random bitmap
+	  saves 31% in sparse bitmap
 
 
+  + 6th, 7th, and 9th patch makes the code use find_first_bit()
+    because it is faster than find_next_bit(mask, size, 0);
 
--- 
-Pierre Morel
-IBM Lab Boeblingen
+  + Now, 11th (this) patch replaces find_first_bit() with
+    find_next_bit(mask, size, 0) because find_first_bit()
+    makes things slower. It is suspicious at minimum.
+
+
+By other words. The I-cache could safe 10% in one case.
+But find_first_bit() might safe 46% in random case.
+
+Does I-cache cost more than the faster code?
+
+Or was for_each_set_bit() tested only with a bitmap
+where find_first_bit() optimization did not help much?
+
+How would for_each_set_bit() work with random bitmap?
+How does it work with larger bitmaps?
+
+Best Regards,
+Petr
