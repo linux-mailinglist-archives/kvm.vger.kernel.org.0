@@ -2,205 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EDB1A3FCB0F
-	for <lists+kvm@lfdr.de>; Tue, 31 Aug 2021 17:54:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3291E3FCB2E
+	for <lists+kvm@lfdr.de>; Tue, 31 Aug 2021 18:03:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239136AbhHaPy6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Aug 2021 11:54:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56938 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232421AbhHaPy5 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 31 Aug 2021 11:54:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630425241;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Cqcv7q3sxv359Hw+wbovVKAY99uifNtZJRnqtsftjkQ=;
-        b=YKwMdUI8cbibJ51MM2h4YWBhild5JjCm2Z6eI23QO1tuHWwqKtOHW8UwbbC74Wztv7NYG0
-        nSGpIndy8+vs3uL1OQMbUK/LdMvKfOST2rCPcxiyNu29lRJFFI9U/ZQnXhJJg+QgcKoml2
-        QElmnsf7yv3pIlB6bnIU9ffGpvXcDts=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-461-4LmRuSeONXGsmMPc7yjOCg-1; Tue, 31 Aug 2021 11:54:00 -0400
-X-MC-Unique: 4LmRuSeONXGsmMPc7yjOCg-1
-Received: by mail-wm1-f72.google.com with SMTP id r4-20020a1c4404000000b002e728beb9fbso1433937wma.9
-        for <kvm@vger.kernel.org>; Tue, 31 Aug 2021 08:54:00 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=Cqcv7q3sxv359Hw+wbovVKAY99uifNtZJRnqtsftjkQ=;
-        b=UJMU+3GpQywGNJv2XFgrP5buxtWaTQmFy/ed2nIfrtCtXkRFmPzDsih5Yj/l6bZvD1
-         2+rwuCoufW56by7o3bon4qmsV51TC432D2gUBdHlUfC5HthspbVY6d5+RbvF5T6l8y3v
-         KuYc/CqWe7bX5Vomudr/b9n9fSxp/jaKNxHpsfo9I9DoZhoiZ/xLWMGprbPI/FvDt+lI
-         2A4CPV25jNk40sZaZNNPrAUR8RUxqZ6i4TAZa/SVJjRzAcwjBpMBT1mBrSbX655Frkwk
-         5ZSHWmA5tBe/vk6x456c8h+iNXbuTbfCMOJz4llzr9/DiVf522xqFI3HySz3+NRLhdW/
-         truA==
-X-Gm-Message-State: AOAM5304BU6pjQz4lmshaW1Y8Ghg49Yx046CACbgMgthc9yDNwwF629j
-        N20Fibem9YlGTekllAx7l5dkZ4NAs1/zKxh0sB4UgV0BuBQ96fiFdDdeHPsq/A+0+WchdUnKN4g
-        EvXx8vZqmxYoD
-X-Received: by 2002:a5d:6daa:: with SMTP id u10mr32428380wrs.31.1630425239228;
-        Tue, 31 Aug 2021 08:53:59 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw0EjHISPHLs3TIYt+0W/6JrjIDK3mdnV2vWllkRSIu0u63CB5Ml6SIBkpL6FesrH+HKFbrVg==
-X-Received: by 2002:a5d:6daa:: with SMTP id u10mr32428349wrs.31.1630425238976;
-        Tue, 31 Aug 2021 08:53:58 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id z19sm3139223wma.0.2021.08.31.08.53.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 31 Aug 2021 08:53:58 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     tcs.kernel@gmail.com
-Cc:     Haimin Zhang <tcs_kernel@tencent.com>, pbonzini@redhat.com,
-        seanjc@google.com, wanpengli@tencent.com, jmattson@google.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        jarkko@kernel.org
-Subject: Re: [PATCH] KVM: x86: Add a return code and check kvm_page_track_init
-In-Reply-To: <1630376040-20567-1-git-send-email-tcs_kernel@tencent.com>
-References: <1630376040-20567-1-git-send-email-tcs_kernel@tencent.com>
-Date:   Tue, 31 Aug 2021 17:53:57 +0200
-Message-ID: <87wno1obje.fsf@vitty.brq.redhat.com>
+        id S239746AbhHaQEL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Aug 2021 12:04:11 -0400
+Received: from mail-bn8nam11on2079.outbound.protection.outlook.com ([40.107.236.79]:2033
+        "EHLO NAM11-BN8-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S239594AbhHaQEK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 Aug 2021 12:04:10 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=X2Lt7HydOAHhsiouslwL4LrWuqBu+/+sUZz/nd5du/FdLG/vDhjcBXI/50TpRO3AtQLl/AFjN41I+r1YP2fgAvtw3P8JaOPzRVJS1TBsS28NcMir8n9WPLDAf/L5fTygFCJx4eO143PnHcmNJkRDmDg9hHS5cq1ib9L6RG6szdpCBKvuCjRfv+to/tZY93A5gWE+XBEWs4NAiQDFlfvgrkmLqFWE0H+HZ88MbfOTvO+4zwGpxyPKsEuuW/MQvBXHJM5u/4k+Se4N3IM1pWLXjSLuQzN7D6fuNQF1rop7/aOcmU385wys51H6SwDxJRBktXoNXukVVT4TPiFZtiaPsg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
+ bh=UcRZYxH4LjJv2V3OdRYP0c/Cnl7zssCPUdmTEVJwFG0=;
+ b=oEmKAvGGBa0GoFZljhr65kvB/+XJBwSkQJ+2r7SdjNs7EKt8QR/EV+sE51uLwZ1vVPZP+NbZuMi3/VDNpJkpRhEJQwbnSXdBkJ1AWRCC0bjtav7JTrFb4Zmh52grLoS4Wxj/MQxXiCYHZm3EVoUHN3FIQT5ezIfS5P6mEIf0wfGX1OgCpZBxSe9EyvxsUq5c5lF5BX93ly7OQ0pVGn5VEDW1B34Oi2Jlf9YlrZXCPg+2EJmJ/y6Sv+zkKlPIOQep774jxPvzdG6D042o/6t+Gz2SjGHCT7Mo9ZcDOO4h3NAg6eXt+gz9iLyqeEFTnxyZ8OrNPlWu/Cb9vCHfqO+V+Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=UcRZYxH4LjJv2V3OdRYP0c/Cnl7zssCPUdmTEVJwFG0=;
+ b=S6NDihA3XfJ1T6nXVvS4XoJ/SoecM8qFswwD3oQPOwmW02BFfrsYvN8cKdhUdtzyqG+vHE5LnpsdOPivljGnfGXQQW52buWaepA01nv5ocxJfsnuNGnaChJHg5fatyf4APT6CVULwaGKN1+fGu0AJp5Wvdq+p6oOinpWryx7uk0=
+Authentication-Results: linux.intel.com; dkim=none (message not signed)
+ header.d=none;linux.intel.com; dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
+ by SA0PR12MB4509.namprd12.prod.outlook.com (2603:10b6:806:9e::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4478.17; Tue, 31 Aug
+ 2021 16:03:13 +0000
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::78b7:7336:d363:9be3]) by SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::78b7:7336:d363:9be3%6]) with mapi id 15.20.4457.024; Tue, 31 Aug 2021
+ 16:03:12 +0000
+Cc:     brijesh.singh@amd.com, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH Part1 v5 35/38] x86/sev: Register SNP guest request
+ platform device
+To:     Dov Murik <dovmurik@linux.ibm.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org
+References: <20210820151933.22401-1-brijesh.singh@amd.com>
+ <20210820151933.22401-36-brijesh.singh@amd.com>
+ <56b37edd-6315-953c-271c-f2c4025be3f7@linux.ibm.com>
+From:   Brijesh Singh <brijesh.singh@amd.com>
+Message-ID: <ada086eb-2a27-ff25-6db1-3d629cb31868@amd.com>
+Date:   Tue, 31 Aug 2021 11:03:10 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
+In-Reply-To: <56b37edd-6315-953c-271c-f2c4025be3f7@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SN4PR0701CA0004.namprd07.prod.outlook.com
+ (2603:10b6:803:28::14) To SN6PR12MB2718.namprd12.prod.outlook.com
+ (2603:10b6:805:6f::22)
 MIME-Version: 1.0
-Content-Type: text/plain
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [10.236.31.95] (165.204.77.1) by SN4PR0701CA0004.namprd07.prod.outlook.com (2603:10b6:803:28::14) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4478.17 via Frontend Transport; Tue, 31 Aug 2021 16:03:11 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 89484ea9-2214-4fd8-988f-08d96c98d5b0
+X-MS-TrafficTypeDiagnostic: SA0PR12MB4509:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <SA0PR12MB450934FC3B41C553E9981BCCE5CC9@SA0PR12MB4509.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:3968;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: pUw12PYpTEIzujCO+LpYPp8UJ6IXDn6a37+Fl8ZI8TVp0lhBm31dhL2Ukf5NsMCCd6JE3/xBJ9UiVlCm0txYjHXn5IMprrAgnNtIWNqqQSOnkSL35tQEY09toQFIL5j9ZRAFVReSoIPK+eVcr6Wn/ab4b+3s40nYbTgYuP/R3CB1zwrOr0nGHU10e2GekEo5sMIFaY/0mn1UUhFZmawaWzoa/RCmSUz0iEr+M3P4yo7bUrOTvaYaiu+LD8+vo6w2Y+TanB0mYgxYoZbWrUaD7xj0VycNy821Wz8lgQU7TmoSTRtDTyKdy/Y6WT++4cscr22oDl+XvLXcDHygEv6GLza9EI/IoyVtGzlBrBF3f3wpn89SXU8rWGhF9qAlU2afcqxV159hmZKA4uKS9Q7wj/Kb1m04r5iik28XtCcx2HDv8K3jonGt7js5TGEqjVf8OLqHrJXWBK/8KBN73+1EzUHwjazC+ctBhONY1BD34LMySBFYXVZ4t7Wjgdtncj1Ckldpd6EiGxle9Xwh+y5Pwos/2hSLdYGYaiqPAd2s9JwX9rjtUnumaqpQEp/UdOUh3OK2ML1nu6B38zYjc0/Ug5dF6uhgxqWhkV10EbFEmhx3s7fvYq1PhMiIQnGyy66bhEVdXrlZ+OlcWmmg5Y9z6a4s5YA7lbnf7buQYQ1nmJKBkIua1sfXqO/SzApFaLUn4riLjt7y5fA1Hx+jzK1XEdUQLQMUjtasnuqplJHHUWXAmaPPgY5FF5EWUXD9iMuK2az5SThl2DU6DjBo9/hrtw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(52116002)(956004)(38350700002)(7416002)(8676002)(38100700002)(2616005)(44832011)(53546011)(7406005)(4744005)(6486002)(86362001)(4326008)(2906002)(8936002)(508600001)(31686004)(83380400001)(16576012)(5660300002)(26005)(54906003)(66556008)(66946007)(316002)(66476007)(186003)(36756003)(31696002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?YU1EcHZnalpqa0xsVFc1cnFHd2pEa2IxYnNKMlhFV0d5Y0NWOE5BZy9YNi9D?=
+ =?utf-8?B?dytZWHNHSHR5Y0xrSy9SR091TFJRZUI2VGhVSkp6cUYrRWtZYXljRlFva0dh?=
+ =?utf-8?B?Nmo3Q2xuR1ZwQ1UyejBhUWhJNXV5bVdPdDNrMktQNFFWajVSUFNqSmZYQVlr?=
+ =?utf-8?B?UmZIa2RlaGNnWnBTQUErcHUzbHcvNGQrVUk0QU9Kc29SVDV2UWdlZ0l5L0l1?=
+ =?utf-8?B?RnhOSVJTOG90U0VrZlJHbmhDNmE1dVlESGxnSTBXdUozd3JNOE90bmoyVTNE?=
+ =?utf-8?B?K1lXRzVPZVE4S0hRY0QvSHhST1VFL1hBMXIrV1RxMC9FWStnTldjY2xvRGow?=
+ =?utf-8?B?blptK0N4MkpFNDRrNVZWM1J2NFB3cUNGVU15WElYSUY2QkhDSUNLaitOcHk1?=
+ =?utf-8?B?TENNRHdIdzdPVkhQaUNuUHYrNzg4WmhoSzRPUGNQNDZYNTAzNlN4Y2ZPandv?=
+ =?utf-8?B?WGJ3eTliVnVCWSs4cTBWWWY4UFJGRjlpcWZWYlk1VXc1dno1aGUwMWlhNG5W?=
+ =?utf-8?B?NWVaTTZaTmhTblNkTHdJc3BqdWQrd1c0NVFsVUpJTjY3UUxFL2M5RkNoWGJK?=
+ =?utf-8?B?bmh2aVVuOTg4Nmh4T1hYaHNEZVhYU1dNazBkM1FmUWN2eWtFTVBkbVBLUHFh?=
+ =?utf-8?B?cHhzWENGUGYxWUNEbUl3VmJUMlo3eEIvd1A0ZU5UTENoaW00S2VjRjFzbkNk?=
+ =?utf-8?B?TVJZTk9zbHJrREpIdkdpc2VETVRySGc2UDg5cnNGbGlEeUYzamtzTE5PalZq?=
+ =?utf-8?B?QWc4eHRpakJlQks3bHQwYmFvYlBWcXRYNmhIeGxVU3EyWTJrV0ZudzJFVVEr?=
+ =?utf-8?B?S3g1dzlLTWIvaFZEamFrYTg0ZkF1OFFIUkQ5UXBOWCtaVWxiRHpjS0ZQLyti?=
+ =?utf-8?B?em9VRkZMSTBTblEzbk9DOUZFdUs2Rm50M0F1WlFTbGZpRDc3enJ3dXJkNWgy?=
+ =?utf-8?B?S3VZb1JPMjhqMVNZUU4yUklCbUZocUtOdnBuSFpuZDByL1o1NjFqVjhrTyta?=
+ =?utf-8?B?d1IyZnBoZ0FaU2w2ckpoZkpuMWNoNTM2TWxFbDJFVTU4ckhnenl6YjJaSkJo?=
+ =?utf-8?B?alVEc0NTN09scjNsTG9uS0xmcHdMQno0R0tFdW9yYUxJWkwzQkdYajBtaUdN?=
+ =?utf-8?B?V2ZYT0YyTlBNWEpEMnZyUTg4VmdUSW5TYVFzSHcvVkdTQlVsZmJha1VpZVpk?=
+ =?utf-8?B?OXBlcXNUVEJjQmJFaTdiSFFqOU4rOTB4OVFtV3VtakpibXZXRUFPRUNmd2V6?=
+ =?utf-8?B?SFdZOXp2b1l2Q0pVU3ZrU2pjak9RaTl2NnY0UVRPL21vSEZzVVpmNEFockp6?=
+ =?utf-8?B?TU1MQW9xQ1RIRytIdHZBZE80Ung0dWVuMHNPT3FwRVowK3RxRTN5ZFJXRnk3?=
+ =?utf-8?B?ZGlLNEJJUW14eDh2OTFEaGhnWjJidHZ5RCtzb2RyTGlRQWdaZ2RyRDZhN0dJ?=
+ =?utf-8?B?SkhabFhMeG85Y2ZXS1NXM0ZZQlVmcURnb0doVGlTTithNVF3T2t1ZWZhNHQ4?=
+ =?utf-8?B?eTV1QmVTbCtTVURvdHdvS0RIczdWQ08yU2p6Q2d6YURML1dpQjVmTVFPcTJv?=
+ =?utf-8?B?cUZ1bE53NFZHU3JRQVlrbVdkMHBXNG0wVGlCbmFCakIyMGszaHBmS1FyeU5o?=
+ =?utf-8?B?TjdxdFFnekhSRy93cDMzUFdyNTFsUFBjL2RoMmJqT2J4RkNPNkY4d0hDdTN1?=
+ =?utf-8?B?V1NJM0Y0VzE1dGRnSWl6cm8vQ0M0NTVQOXFiYXk0Q0VPQVFBb1pJcTY2NWVm?=
+ =?utf-8?Q?jD9A1OtMEyLS4LFXSeUdS3W5/4+jFOr7rbtGCJ9?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 89484ea9-2214-4fd8-988f-08d96c98d5b0
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Aug 2021 16:03:12.9332
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: +LnUMIGqHS/GdLSHaiERKenK5EnOdA5iW1VzzaWO5AHzM4QBDcQrRoHzDVVBd9seI17qEOSjFbE/fYpmZda6TQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4509
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-tcs.kernel@gmail.com writes:
+Hi Dov,
 
-> From: Haimin Zhang <tcs_kernel@tencent.com>
->
-> We found a null pointer deref by our modified syzkaller.
->  KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
->  CPU: 1 PID: 13993 Comm: syz-executor.0 Kdump: loaded Tainted: 
->  Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), 
->  BIOS rel-1.12.0-59-gc9ba5276e321-prebuilt.qemu.org 04/01/2014
->  RIP: 0010:rcu_segcblist_enqueue+0xf5/0x1d0 
->  RSP: 0018:ffffc90001e1fc10 EFLAGS: 00010046
->  RAX: dffffc0000000000 RBX: ffff888135c00080 RCX: ffffffff815ba8a1
->  RDX: 0000000000000000 RSI: ffffc90001e1fd00 RDI: ffff888135c00080
->  RBP: ffff888135c000a0 R08: 0000000000000004 R09: fffff520003c3f75
->  R10: 0000000000000003 R11: fffff520003c3f75 R12: 0000000000000000
->  R13: ffff888135c00080 R14: ffff888135c00040 R15: 0000000000000000
->  FS:  00007fecc99f1700(0000) GS:ffff888135c00000(0000) knlGS:0000000000
->  CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->  CR2: 0000001b2f225000 CR3: 0000000093d08000 CR4: 0000000000750ee0
->  DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
->  DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
->  PKRU: 55555554
->  Call Trace:
->  srcu_gp_start_if_needed+0x158/0xc60 build/../kernel/rcu/srcutree.c:823
->  __synchronize_srcu+0x1dc/0x250 build/../kernel/rcu/srcutree.c:929
->  kvm_mmu_uninit_vm+0x18/0x30 build/../arch/x86/kvm/mmu/mmu.c:5585
->  kvm_arch_destroy_vm+0x43f/0x5c0 build/../arch/x86/kvm/x86.c:11277
->  kvm_create_vm build/../arch/x86/kvm/../../../virt/kvm/kvm_main.c:1060 
->  kvm_dev_ioctl_create_vm build/../arch/x86/kvm/../../../virt/kvm/kvm_main
->  kvm_dev_ioctl+0xdfb/0x1860 build/../arch/x86/kvm/../../../virt/kvm/kvm_main
->  vfs_ioctl build/../fs/ioctl.c:51 [inline]
->  __do_sys_ioctl build/../fs/ioctl.c:1069 [inline]
->  __se_sys_ioctl build/../fs/ioctl.c:1055 [inline]
->  __x64_sys_ioctl+0x183/0x210 build/../fs/ioctl.c:1055
->  do_syscall_x64 build/../arch/x86/entry/common.c:50 [inline]
->  do_syscall_64+0x34/0xb0 build/../arch/x86/entry/common.c:80
->  entry_SYSCALL_64_after_hwframe+0x44/0xae
-> This is because when init_srcu_struct() calls alloc_percpu(struct
-> srcu_data) failed, kvm_page_track_init() didn't check init_srcu_struct
-> return code. 
->
-> Signed-off-by: Haimin Zhang <tcs_kernel@tencent.com>
-> Reported-by: TCS Robot <tcs_robot@tencent.com>
-> ---
->  arch/x86/include/asm/kvm_page_track.h | 2 +-
->  arch/x86/kvm/mmu/page_track.c         | 8 ++++++--
->  arch/x86/kvm/x86.c                    | 7 +++++--
->  3 files changed, 12 insertions(+), 5 deletions(-)
->
-> diff --git a/arch/x86/include/asm/kvm_page_track.h b/arch/x86/include/asm/kvm_page_track.h
-> index 87bd6025d91d..6a5f3acf2b33 100644
-> --- a/arch/x86/include/asm/kvm_page_track.h
-> +++ b/arch/x86/include/asm/kvm_page_track.h
-> @@ -46,7 +46,7 @@ struct kvm_page_track_notifier_node {
->  			    struct kvm_page_track_notifier_node *node);
->  };
->  
-> -void kvm_page_track_init(struct kvm *kvm);
-> +int kvm_page_track_init(struct kvm *kvm);
->  void kvm_page_track_cleanup(struct kvm *kvm);
->  
->  void kvm_page_track_free_memslot(struct kvm_memory_slot *slot);
-> diff --git a/arch/x86/kvm/mmu/page_track.c b/arch/x86/kvm/mmu/page_track.c
-> index 91a9f7e0fd91..44a67a50f6d2 100644
-> --- a/arch/x86/kvm/mmu/page_track.c
-> +++ b/arch/x86/kvm/mmu/page_track.c
-> @@ -163,13 +163,17 @@ void kvm_page_track_cleanup(struct kvm *kvm)
->  	cleanup_srcu_struct(&head->track_srcu);
->  }
->  
-> -void kvm_page_track_init(struct kvm *kvm)
-> +int kvm_page_track_init(struct kvm *kvm)
->  {
-> +	int r = -ENOMEM;
 
-Nitpick: pointless initializer, the value is always overwritten by
-init_srcu_struct()'s return value.
+On 8/31/21 6:37 AM, Dov Murik wrote:
+>> +
+>> +	if (!platform_device_register(&guest_req_device))
+>> +		dev_info(&guest_req_device.dev, "secret phys 0x%llx\n", snp_secrets_phys);
+> 
+> Should you return the error code from platform_device_register() in case
+> it fails (returns something other than zero)?
+> 
 
->  	struct kvm_page_track_notifier_head *head;
->  
->  	head = &kvm->arch.track_notifier_head;
-> -	init_srcu_struct(&head->track_srcu);
-> +	r = init_srcu_struct(&head->track_srcu);
-> +	if (r)
-> +		return r;
->  	INIT_HLIST_HEAD(&head->track_notifier_list);
-> +	return r;
->  }
->  
->  /*
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index e5d5c5ed7dd4..5da76f989207 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -11086,8 +11086,9 @@ void kvm_arch_free_vm(struct kvm *kvm)
->  
->  int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
->  {
-> +	int r = -EINVAL;
+Yes, I will fix it in next rev. Will return a non-zero on failure to 
+register the device.
 
-Blank line missing here.
-
->  	if (type)
-> -		return -EINVAL;
-> +		return r;
-
-I'd keep this code as-is and dropped then-pointless initializer to
--EINVAL, it's OK to return directly:
-
-	int ret;
-
-	if (type)
-		return -EINVAL;
-
-        ...
-
-        ret = kvm_page_track_init(kvm);
-	if (ret)
-		return ret;
-
->  
->  	INIT_HLIST_HEAD(&kvm->arch.mask_notifier_list);
->  	INIT_LIST_HEAD(&kvm->arch.active_mmu_pages);
-> @@ -11121,7 +11122,9 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
->  
->  	kvm_apicv_init(kvm);
->  	kvm_hv_init_vm(kvm);
-> -	kvm_page_track_init(kvm);
-> +	r = kvm_page_track_init(kvm);
-> +	if (r)
-> +		return r;
->  	kvm_mmu_init_vm(kvm);
->  
->  	return static_call(kvm_x86_vm_init)(kvm);
-
--- 
-Vitaly
-
+thanks
