@@ -2,279 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3E4ED3FCC20
-	for <lists+kvm@lfdr.de>; Tue, 31 Aug 2021 19:15:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F252A3FCC49
+	for <lists+kvm@lfdr.de>; Tue, 31 Aug 2021 19:27:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234342AbhHaRQU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Aug 2021 13:16:20 -0400
-Received: from foss.arm.com ([217.140.110.172]:56834 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229602AbhHaRQU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 Aug 2021 13:16:20 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1E2C16D;
-        Tue, 31 Aug 2021 10:15:24 -0700 (PDT)
-Received: from slackpad.fritz.box (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C005A3F766;
-        Tue, 31 Aug 2021 10:15:22 -0700 (PDT)
-Date:   Tue, 31 Aug 2021 18:14:58 +0100
-From:   Andre Przywara <andre.przywara@arm.com>
-To:     Vivek Gautam <vivek.gautam@arm.com>
-Cc:     will@kernel.org, julien.thierry.kdev@gmail.com,
-        kvm@vger.kernel.org, alexandru.elisei@arm.com,
-        lorenzo.pieralisi@arm.com, jean-philippe@linaro.org,
-        eric.auger@redhat.com
-Subject: Re: [PATCH] vfio/pci: Add support for PCIe extended capabilities
-Message-ID: <20210831181458.48d2f35f@slackpad.fritz.box>
-In-Reply-To: <20210810062514.18980-1-vivek.gautam@arm.com>
-References: <20210810062514.18980-1-vivek.gautam@arm.com>
-Organization: Arm Ltd.
-X-Mailer: Claws Mail 3.17.1 (GTK+ 2.24.31; x86_64-slackware-linux-gnu)
+        id S234077AbhHaR2X (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Aug 2021 13:28:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50834 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233345AbhHaR2W (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 Aug 2021 13:28:22 -0400
+Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9695C061575
+        for <kvm@vger.kernel.org>; Tue, 31 Aug 2021 10:27:26 -0700 (PDT)
+Received: by mail-lf1-x12f.google.com with SMTP id z2so427666lft.1
+        for <kvm@vger.kernel.org>; Tue, 31 Aug 2021 10:27:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=x/2kwviYgFXJZ+ysPYsfXQdOl9RzKKDy4aBFBjxfgE4=;
+        b=VwkhjaRpWjGfc35sCBBfJ2nBFysfht4GWKFPN970ClNyEfpQRCYLhXyECxlDNFAZKd
+         +jCOueubsQHWs3m2wyAnx0QqQSNXyEH8fPYM1wdYlfp29CuG6Hb+zhYPLZFNARolqmds
+         9obvQjGkjPgmpaw46ueU3XfmG9lTI08sr0xnf61J7In8ePIBV0XaOy+1FB1CZOx7acna
+         8iVMLL+YguPMKL8sAapEI3T5itvqsXf1i6BmSTBfeJ/7xx6oivzfKHNXjrHgy0SRvYOU
+         nNw4r2Na3mjUnWfVT6WockkD25+c0VVWkL5MO6gMTVHQM50+IbpaZrqVhdYTAxweT6Xb
+         a1Rg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=x/2kwviYgFXJZ+ysPYsfXQdOl9RzKKDy4aBFBjxfgE4=;
+        b=lzsr3PqdGFnqA8/gBOSuVY3DgMhx0mOr/vcYWFaezrIs24nEefdOKj/AfcSI/Q4rCt
+         iwOqika0JKWZR9Wk+teHKbW0OS3pgKZAbglMaeOBH+5/CANsuSM3j/h2O11YpAjzmlJN
+         yBdX6GLbAov5pJ9mTsXCtb+ucNaz/4278ia3nlKpBwd+mJmO4cS6d8jPaDmLaT19F6hC
+         Th+7ApbGT9oL7eYu6zjlp85qHEb/SehzONLhAjoUX0Utyf9qZaRRhFAHaqAVVeUQ6SDa
+         gODxtfL0Zq12fR74++rfDAe1U6Yk6+dM5Go3XzzY9+vU0gzf+1lleOeE368eaCsQlcWg
+         ZTCw==
+X-Gm-Message-State: AOAM5302GHRARGuVD6XbHzplXy9ZS3ttoCSPZLs7DtWOYpIAblXfgLvb
+        2garXvcYtLz9s8XAjPnXTTbSVTydwPU3RX9woOZJxQ==
+X-Google-Smtp-Source: ABdhPJzway3c96U+c8VS3MU3jnmFfiUx0To4De35gi9UpU3+sxLJgD9+gPnggGJPC1RTOLC6F14Sotz5rRp+IlQtd5k=
+X-Received: by 2002:ac2:4e90:: with SMTP id o16mr7839919lfr.473.1630430844961;
+ Tue, 31 Aug 2021 10:27:24 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20210827174110.3723076-1-jingzhangos@google.com>
+ <20210827174110.3723076-2-jingzhangos@google.com> <YSlHK+ZZFuokMa4S@google.com>
+In-Reply-To: <YSlHK+ZZFuokMa4S@google.com>
+From:   Jing Zhang <jingzhangos@google.com>
+Date:   Tue, 31 Aug 2021 10:27:13 -0700
+Message-ID: <CAAdAUtghEvtT_v2wm_JV8M=pUXvuDuJ5JAtSP0zni18PtfhPAQ@mail.gmail.com>
+Subject: Re: [PATCH 2/2] KVM: stats: Add counters for SVM exit reasons
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     KVM <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        David Matlack <dmatlack@google.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Peter Feiner <pfeiner@google.com>,
+        Jim Mattson <jmattson@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 10 Aug 2021 11:55:14 +0530
-Vivek Gautam <vivek.gautam@arm.com> wrote:
+Hi Sean,
 
-Hi Vivek,
+On Fri, Aug 27, 2021 at 1:12 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Fri, Aug 27, 2021, Jing Zhang wrote:
+> > Three different exit code ranges are named as low, high and vmgexit,
+> > which start from 0x0, 0x400 and 0x80000000.
+> >
+> > Original-by: Jim Mattson <jmattson@google.com>
+> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> > ---
+> >  arch/x86/include/asm/kvm_host.h |  7 +++++++
+> >  arch/x86/include/uapi/asm/svm.h |  7 +++++++
+> >  arch/x86/kvm/svm/svm.c          | 21 +++++++++++++++++++++
+> >  arch/x86/kvm/x86.c              |  9 +++++++++
+> >  4 files changed, 44 insertions(+)
+> >
+> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> > index dd2380c9ea96..6e3c11a29afe 100644
+> > --- a/arch/x86/include/asm/kvm_host.h
+> > +++ b/arch/x86/include/asm/kvm_host.h
+> > @@ -35,6 +35,7 @@
+> >  #include <asm/kvm_vcpu_regs.h>
+> >  #include <asm/hyperv-tlfs.h>
+> >  #include <asm/vmx.h>
+> > +#include <asm/svm.h>
+> >
+> >  #define __KVM_HAVE_ARCH_VCPU_DEBUGFS
+> >
+> > @@ -1261,6 +1262,12 @@ struct kvm_vcpu_stat {
+> >       u64 vmx_all_exits[EXIT_REASON_NUM];
+> >       u64 vmx_l2_exits[EXIT_REASON_NUM];
+> >       u64 vmx_nested_exits[EXIT_REASON_NUM];
+> > +     u64 svm_exits_low[SVM_EXIT_LOW_END - SVM_EXIT_LOW_START];
+> > +     u64 svm_exits_high[SVM_EXIT_HIGH_END - SVM_EXIT_HIGH_START];
+> > +     u64 svm_vmgexits[SVM_VMGEXIT_END - SVM_VMGEXIT_START];
+>
+> This is, for lack of a better word, a very lazy approach.  With a bit more (ok,
+> probably a lot more) effort and abstraction, we can have parity between VMX and
+> SVM, and eliminate a bunch of dead weight.  Having rough parity would likely be
+> quite helpful for the end user, e.g. reduces/eliminates vendor specific userspace
+> code.
+>
+> E.g. this more or less doubles the memory footprint due to tracking VMX and SVM
+> separately, SVM has finer granularity than VMX (often too fine),  VMX tracks nested
+> exits but SVM does not, etc...
+>
+> If we use KVM-defined exit reasons, then we can omit the exits that should never
+> happen (SVM has quite a few), and consolidate the ones no one should ever care
+> about, e.g. DR0..DR4 and DR6 can be collapsed (if I'm remembering my DR aliases
+> correctly).  And on the VMX side we can provide better granularity than the raw
+> exit reason, e.g. VMX's bundling of NMIs and exceptions is downright gross.
+>
+>         #define KVM_GUEST_EXIT_READ_CR0
+>         #define KVM_GUEST_EXIT_READ_CR3
+>         #define KVM_GUEST_EXIT_READ_CR4
+>         #define KVM_GUEST_EXIT_READ_CR8
+>         #define KVM_GUEST_EXIT_DR_READ
+>         #define KVM_GUEST_EXIT_DR_WRITE
+>         #define KVM_GUEST_EXIT_DB_EXCEPTION
+>         #define KVM_GUEST_EXIT_BP_EXCEPTION
+>         #define KVM_GUEST_EXIT_UD_EXCEPTION
+>
+>         ...
+>         #define KVM_NR_GUEST_EXIT_REASONS
+>
+>         u64 l1_exits[KVM_NR_GUEST_EXIT_REASONS];
+>         u64 l2_exits[KVM_NR_GUEST_EXIT_REASONS];
+>         u64 nested_exits[KVM_NR_GUEST_EXIT_REASONS];
+>
+>
+> The downside is that it will require KVM-defined exit reasons and will have a
+> slightly higher maintenance cost because of it, but I think overall it would be
+> a net positive.  Paolo can probably even concoct some clever arithmetic to avoid
+> conditionals when massaging SVM exits reasons.  VMX will require a bit more
+> manual effort, especially to play nice with nested, but in the end I think we'll
+> be happier.
+>
+Thanks for the suggestions. Will try to generalize the exit reasons
+and see how it is going.
 
-> Add support to parse extended configuration space for vfio based
-> assigned PCIe devices and add extended capabilities for the device
-> in the guest. This allows the guest to see and work on extended
-> capabilities, for example to toggle PRI extended cap to enable and
-> disable Shared virtual addressing (SVA) support.
-> PCIe extended capability header that is the first DWORD of all
-> extended caps is shown below -
-> 
->    31               20  19   16  15                 0
->    ____________________|_______|_____________________
->   |    Next cap off    |  1h   |     Cap ID          |
->   |____________________|_______|_____________________|
-> 
-> Out of the two upper bytes of extended cap header, the
-> lower nibble is actually cap version - 0x1.
-> 'next cap offset' if present at bits [31:20], should be
-> right shifted by 4 bits to calculate the position of next
-> capability.
-> This change supports parsing and adding ATS, PRI and PASID caps.
-> 
-> Signed-off-by: Vivek Gautam <vivek.gautam@arm.com>
-> ---
->  include/kvm/pci.h |   6 +++
->  vfio/pci.c        | 104 ++++++++++++++++++++++++++++++++++++++++++----
->  2 files changed, 103 insertions(+), 7 deletions(-)
-> 
-> diff --git a/include/kvm/pci.h b/include/kvm/pci.h
-> index 0f2d5bb..a365337 100644
-> --- a/include/kvm/pci.h
-> +++ b/include/kvm/pci.h
-> @@ -165,6 +165,12 @@ struct pci_exp_cap {
->  	u32 root_status;
->  };
->  
-> +struct pci_ext_cap_hdr {
-> +	u16	type;
-> +	/* bit 19:16 = 0x1: Cap version */
-> +	u16	next;
-> +};
-> +
->  struct pci_device_header;
->  
->  typedef int (*bar_activate_fn_t)(struct kvm *kvm,
-> diff --git a/vfio/pci.c b/vfio/pci.c
-> index ea33fd6..d045e0d 100644
-> --- a/vfio/pci.c
-> +++ b/vfio/pci.c
-> @@ -665,19 +665,105 @@ static int vfio_pci_add_cap(struct vfio_device *vdev, u8 *virt_hdr,
->  	return 0;
->  }
->  
-> +static ssize_t vfio_pci_ext_cap_size(struct pci_ext_cap_hdr *cap_hdr)
-> +{
-> +	switch (cap_hdr->type) {
-> +	case PCI_EXT_CAP_ID_ATS:
-> +		return PCI_EXT_CAP_ATS_SIZEOF;
-> +	case PCI_EXT_CAP_ID_PRI:
-> +		return PCI_EXT_CAP_PRI_SIZEOF;
-> +	case PCI_EXT_CAP_ID_PASID:
-> +		return PCI_EXT_CAP_PASID_SIZEOF;
-> +	default:
-> +		pr_err("unknown extended PCI capability 0x%x", cap_hdr->type);
-> +		return 0;
-
-It looks somewhat weird to report an error, but then silently carry on
-anyways. Since the return value is signed, you could return something
-negative and check for that error in the caller.
-I see that is copied from the "normal" capabilities, but maybe this
-should be cleaned up there as well? It looks like ending here should be
-an internal error, when this list is not up-to-date with the switch/case
-below (which can be solved as well on the way).
-
-> +	}
-> +}
-> +
-> +static int vfio_pci_add_ext_cap(struct vfio_device *vdev, u8 *virt_hdr,
-> +			    struct pci_ext_cap_hdr *cap, off_t pos)
-> +{
-> +	struct pci_ext_cap_hdr *last;
-> +
-> +	cap->next = 0;
-> +	last = PCI_CAP(virt_hdr, 0x100);
-> +
-> +	while (last->next)
-> +		last = PCI_CAP(virt_hdr, last->next);
-> +
-> +	last->next = pos;
-
-This should be folded into the next statement, but ...
-
-> +	/*
-> +	 * Out of the two upper bytes of extended cap header, the
-> +	 * nibble [19:16] is actually cap version that should be 0x1,
-> +	 * so shift back the actual 'next' value by 4 bits.
-> +	 */
-> +	last->next = (last->next << 4) | 0x1;
-> +	memcpy(virt_hdr + pos, cap, vfio_pci_ext_cap_size(cap));
-
-So here you silently ignore the error when we see an unsupported
-capability. Granted, copying 0 bytes doesn't do anything, but at the
-same time we already updated the next pointer. So I guess you should
-query for the size first, and bail out if this is unsupported. Not sure
-what to do then, but I think we just ignore/filter that capability then?
-
-> +
-> +	return 0;
-> +
-> +}
-> +
-> +static int vfio_pci_parse_ext_caps(struct vfio_device *vdev, u8 *virt_hdr)
-> +{
-> +	int ret;
-> +	u16 pos, next;
-> +	struct pci_ext_cap_hdr *ext_cap;
-> +	struct vfio_pci_device *pdev = &vdev->pci;
-> +
-> +	/* Extended cap only for PCIe devices */
-> +	if (!arch_has_pci_exp())
-> +		return 0;
-> +
-> +	/* Extended caps start from 0x100 offset. */
-> +	pos = 0x100;
-
-Please move that into the for-loop statement.
-
-> +
-> +	for (; pos; pos = next) {
-> +		ext_cap = PCI_CAP(&pdev->hdr, pos);
-
-Don't we need to check if there are extended capabilities at offset
-0x100 first?
-"Absence of any Extended Capabilities is required to be indicated by an
-Extended Capability header with a Capability ID of 0000h, a Capability
-Version of 0h, and a Next Capability Offset of 000h."
-
-> +		/*
-> +		 * Out of the two upper bytes of extended cap header, the
-> +		 * lowest nibble is actually cap version.
-> +		 * 'next cap offset' if present at bits [31:20], while
-> +		 * bits [19:16] are set to 1 to indicate cap version.
-> +		 * So to get position of next cap right shift by 4 bits.
-> +		 */
-> +		next = (ext_cap->next >> 4);
-> +
-> +		switch (ext_cap->type) {
-> +		case PCI_EXT_CAP_ID_ATS:
-> +			ret = vfio_pci_add_ext_cap(vdev, virt_hdr, ext_cap, pos);
-> +			if (ret)
-
-That function seems to be always returning 0, but this would be fixed
-anyway, I guess. And then you could save the switch/case (which
-is somewhat redundant with the one in vfio_pci_ext_cap_size()), and just
-pass every capability to vfio_pci_add_ext_cap().
-
-> +				return ret;
-> +			break;
-> +		case PCI_EXT_CAP_ID_PRI:
-> +			ret = vfio_pci_add_ext_cap(vdev, virt_hdr, ext_cap, pos);
-> +			if (ret)
-> +				return ret;
-> +			break;
-> +		case PCI_EXT_CAP_ID_PASID:
-> +			ret = vfio_pci_add_ext_cap(vdev, virt_hdr, ext_cap, pos);
-> +			if (ret)
-> +				return ret;
-> +			break;
-> +		}
-> +	}
-> +
-> +	return 0;
-> +}
-> +
->  static int vfio_pci_parse_caps(struct vfio_device *vdev)
->  {
->  	int ret;
->  	size_t size;
->  	u16 pos, next;
->  	struct pci_cap_hdr *cap;
-> -	u8 virt_hdr[PCI_DEV_CFG_SIZE_LEGACY];
-> +	u8 virt_hdr[PCI_DEV_CFG_SIZE];
->  	struct vfio_pci_device *pdev = &vdev->pci;
->  
->  	if (!(pdev->hdr.status & PCI_STATUS_CAP_LIST))
->  		return 0;
->  
-> -	memset(virt_hdr, 0, PCI_DEV_CFG_SIZE_LEGACY);
-> +	memset(virt_hdr, 0, PCI_DEV_CFG_SIZE);
->  
->  	pos = pdev->hdr.capabilities & ~3;
->  
-> @@ -715,9 +801,13 @@ static int vfio_pci_parse_caps(struct vfio_device *vdev)
->  		}
->  	}
->  
-> +	ret = vfio_pci_parse_ext_caps(vdev, virt_hdr);
-> +	if (ret)
-> +		return ret;
-> +
->  	/* Wipe remaining capabilities */
->  	pos = PCI_STD_HEADER_SIZEOF;
-> -	size = PCI_DEV_CFG_SIZE_LEGACY - PCI_STD_HEADER_SIZEOF;
-> +	size = PCI_DEV_CFG_SIZE - PCI_STD_HEADER_SIZEOF;
->  	memcpy((void *)&pdev->hdr + pos, virt_hdr + pos, size);
->  
->  	return 0;
-> @@ -725,7 +815,7 @@ static int vfio_pci_parse_caps(struct vfio_device *vdev)
->  
->  static int vfio_pci_parse_cfg_space(struct vfio_device *vdev)
->  {
-> -	ssize_t sz = PCI_DEV_CFG_SIZE_LEGACY;
-> +	ssize_t sz = PCI_DEV_CFG_SIZE;
->  	struct vfio_region_info *info;
->  	struct vfio_pci_device *pdev = &vdev->pci;
->  
-> @@ -831,10 +921,10 @@ static int vfio_pci_fixup_cfg_space(struct vfio_device *vdev)
->  	/* Install our fake Configuration Space */
->  	info = &vdev->regions[VFIO_PCI_CONFIG_REGION_INDEX].info;
->  	/*
-> -	 * We don't touch the extended configuration space, let's be cautious
-> -	 * and not overwrite it all with zeros, or bad things might happen.
-
-It would be good to hear from Alex what those bad things are, and if
-passing on those extended caps now fixes those.
-
-Cheers,
-Andre
-
-> +	 * Update the extended configuration space as well since we
-> +	 * are now populating the extended capabilities.
->  	 */
-> -	hdr_sz = PCI_DEV_CFG_SIZE_LEGACY;
-> +	hdr_sz = PCI_DEV_CFG_SIZE;
->  	if (pwrite(vdev->fd, &pdev->hdr, hdr_sz, info->offset) != hdr_sz) {
->  		vfio_dev_err(vdev, "failed to write %zd bytes to Config Space",
->  			     hdr_sz);
-
+Jing
+> > +     u64 svm_vmgexit_unsupported_event;
+> > +     u64 svm_exit_sw;
+> > +     u64 svm_exit_err;
+> >  };
