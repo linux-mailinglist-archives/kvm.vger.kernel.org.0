@@ -2,186 +2,313 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9E16A3FCA72
-	for <lists+kvm@lfdr.de>; Tue, 31 Aug 2021 17:00:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 05E3A3FCA7C
+	for <lists+kvm@lfdr.de>; Tue, 31 Aug 2021 17:04:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233369AbhHaPBd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Aug 2021 11:01:33 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:8758 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230237AbhHaPBa (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 31 Aug 2021 11:01:30 -0400
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 17VEXgOX052678;
-        Tue, 31 Aug 2021 11:00:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=RSQq3d/OCX6e+KwInguQOP3701NVqw2TYZjRipujqNM=;
- b=MOFC321WsYTJuNjzi3AZ2idVnvkbn4ThydG7hEdV3q4QSEDGEq40O50yZrCUu+VDLIzu
- p8WGFR/3yrUVlQ/yzkXN79BO+1Xw0ucBc+I7AofY86KsGRjRhdFyIK0biBu33OFdAmpY
- pECXRqb4o5f1/hOvwF4XT+3mvQm4EcFLRM7N2B1mDOq5t5U1joPnJU9RMRB1GgdhSCif
- oEZEXZvDNyvKyjLnPKLbqwGJwjqlaOQK14qv2zatoBpegZ+cyFUFgAi4GgLxtTztJ/IR
- a6PUMY08pfQnc+BYhWJ5uZ4VarRHwrXg99CCYAeteYMkaXz/Nezrcu4+5k9llSj2Kcv7 4A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3asnbrk3fr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 31 Aug 2021 11:00:32 -0400
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 17VEYKZ6058163;
-        Tue, 31 Aug 2021 11:00:32 -0400
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3asnbrk3dk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 31 Aug 2021 11:00:32 -0400
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 17VEhch5001300;
-        Tue, 31 Aug 2021 15:00:29 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma01fra.de.ibm.com with ESMTP id 3aqcs93k2d-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 31 Aug 2021 15:00:29 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 17VEuOAQ56033660
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 31 Aug 2021 14:56:24 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4A0D7A405F;
-        Tue, 31 Aug 2021 15:00:24 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B4E6FA4073;
-        Tue, 31 Aug 2021 15:00:23 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.145.2.243])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 31 Aug 2021 15:00:23 +0000 (GMT)
-Date:   Tue, 31 Aug 2021 17:00:20 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Christian Borntraeger <borntraeger@de.ibm.com>
-Cc:     kvm@vger.kernel.org, cohuck@redhat.com, frankja@linux.ibm.com,
-        thuth@redhat.com, pasic@linux.ibm.com, david@redhat.com,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Ulrich.Weigand@de.ibm.com
-Subject: Re: [PATCH v4 04/14] KVM: s390: pv: avoid stalls when making pages
- secure
-Message-ID: <20210831170020.7aa4a1ba@p-imbrenda>
-In-Reply-To: <731aeb25-3883-5941-9400-7cd8c43fc31c@de.ibm.com>
-References: <20210818132620.46770-1-imbrenda@linux.ibm.com>
-        <20210818132620.46770-5-imbrenda@linux.ibm.com>
-        <731aeb25-3883-5941-9400-7cd8c43fc31c@de.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        id S234728AbhHaPE6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Aug 2021 11:04:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46038 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232438AbhHaPE4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 Aug 2021 11:04:56 -0400
+Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B2FEC061760
+        for <kvm@vger.kernel.org>; Tue, 31 Aug 2021 08:04:01 -0700 (PDT)
+Received: by mail-lj1-x22c.google.com with SMTP id j12so32324917ljg.10
+        for <kvm@vger.kernel.org>; Tue, 31 Aug 2021 08:04:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=4Fn4UZmVWhb7Bzvp1FoQQ7qfnZgNzUwT5A3uCCmGDj0=;
+        b=cdfjp6SVsuxqd4fltHdv9vJ1ZOrV00nXaLXFRWNyrWwlDEpcVCsVSzniXR+eEBRSAI
+         8xN0+xrgRv/xoPOhyhee4AiLqAjeQdvE6wBT3AM+GaO/FDPI/Z8ibTlR4oj/gi+EKhfH
+         WheZuSGPwB9l2Zfj9sosh1GhJfSZRX6Fe2T5pyo8QT9+L0kZAuSPTacOMAzk97pzAvQf
+         PHFDYeiLmvDGRUFsSayJ2jg5J7VTpNIwGLOJdIXvRYj/Rqr3bZ7bpDGyCcKnQRfEN+lA
+         eyRxBew4PNzkdzOpuh9Dxqv4y+itg5Pj3L8j8Tl2ea8PnK9ASRdGreKC25SEWsDj8Wjk
+         Dy5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=4Fn4UZmVWhb7Bzvp1FoQQ7qfnZgNzUwT5A3uCCmGDj0=;
+        b=hcL2eBEUNqifqDarvJlnjd5WAutwT4wDMeK8JjtdbNHzGxhMuTJsTSMPSWPPfz2ijy
+         Ra5Sazdr/kpT3Ii8s0nT69NQfhM0A3R/8BEvkEKuAFHqA3VuvzfzpVIX30Swy3IWU8VB
+         +iKDdtt07vQDqFwlyRz5OQwnZ9+87mgUWgxEvP27E+IGFso//XpZJmcbZGCWgr5kByaE
+         Yg+qPvIdy38jppMhrarijtQU2VuuTUEMAm9Vsee97Q4bCfgYsOtgh9hJt2OVJNvw2nTo
+         5tnpv7k6SkenzBDvZVX0QZ03TcG82Tz23FzlQK+S18GGuS/XJ43piFpXtH/uU8g1LfC5
+         tD0g==
+X-Gm-Message-State: AOAM532PLIZJH/oJ+WlMw3YuoOA0kU5+/8xBlD3OKTng9sUw+NZJiENd
+        lQqhubnX3zKWo8UMIbIaMIcjkt9jaz0jdACfpXSptw==
+X-Google-Smtp-Source: ABdhPJz7R8yS4tFq5OIt5U9b9AwBlSVoxf+LlWKsuk9kKOCQLPYDxpxb4go5g5kLf6mFhZ12nLnYq9g/o1AU0vuqcm0=
+X-Received: by 2002:a2e:a7d0:: with SMTP id x16mr25654175ljp.494.1630422239046;
+ Tue, 31 Aug 2021 08:03:59 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: kIMrMhuxujv6YR_10kdu8yLvoMoQr5jn
-X-Proofpoint-ORIG-GUID: 3ALZJTao_-UlUM7k9ExpeqYzb3M1phxN
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-08-31_07:2021-08-31,2021-08-31 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 phishscore=0
- spamscore=0 suspectscore=0 adultscore=0 mlxlogscore=999 malwarescore=0
- impostorscore=0 mlxscore=0 priorityscore=1501 bulkscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2107140000 definitions=main-2108310079
+References: <20210830212951.3541589-1-pgonda@google.com> <CAA03e5Fd2aes=euzXv51d6b3E0S3tK45hkqQhONsmWA5dE33dw@mail.gmail.com>
+ <CAA03e5G9TEsmzbQw_m_Zh+Evdief0hgiuMmBGF40xctMAwjY2w@mail.gmail.com>
+In-Reply-To: <CAA03e5G9TEsmzbQw_m_Zh+Evdief0hgiuMmBGF40xctMAwjY2w@mail.gmail.com>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Tue, 31 Aug 2021 09:03:47 -0600
+Message-ID: <CAMkAt6r8X5XbhRSbfX5vfHn+F40Mp_Ou+qmtUqeDBCtTF1oTxg@mail.gmail.com>
+Subject: Re: [PATCH 3/3 V6] selftest: KVM: Add intra host migration
+To:     Marc Orr <marcorr@google.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 31 Aug 2021 16:32:24 +0200
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+On Tue, Aug 31, 2021 at 7:26 AM Marc Orr <marcorr@google.com> wrote:
+>
+> On Tue, Aug 31, 2021 at 6:24 AM Marc Orr <marcorr@google.com> wrote:
+> >
+> > On Mon, Aug 30, 2021 at 2:29 PM Peter Gonda <pgonda@google.com> wrote:
+> > >
+> > > Adds testcases for intra host migration for SEV and SEV-ES. Also adds
+> > > locking test to confirm no deadlock exists.
+> > >
+> > > ---
+> > >  tools/testing/selftests/kvm/Makefile          |   1 +
+> > >  .../selftests/kvm/x86_64/sev_vm_tests.c       | 152 ++++++++++++++++++
+> > >  2 files changed, 153 insertions(+)
+> > >  create mode 100644 tools/testing/selftests/kvm/x86_64/sev_vm_tests.c
+> > >
+> > > Signed-off-by: Peter Gonda <pgonda@google.com>
+> > > Suggested-by: Sean Christopherson <seanjc@google.com>
+> > > Cc: Marc Orr <marcorr@google.com>
+> > > Cc: Sean Christopherson <seanjc@google.com>
+> > > Cc: Brijesh Singh <brijesh.singh@amd.com>
+> > > Cc: kvm@vger.kernel.org
+> > > Cc: linux-kernel@vger.kernel.org
+> > >
+> > > diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+> > > index 5832f510a16c..de6e64d5c9c4 100644
+> > > --- a/tools/testing/selftests/kvm/Makefile
+> > > +++ b/tools/testing/selftests/kvm/Makefile
+> > > @@ -71,6 +71,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/tsc_msrs_test
+> > >  TEST_GEN_PROGS_x86_64 += x86_64/vmx_pmu_msrs_test
+> > >  TEST_GEN_PROGS_x86_64 += x86_64/xen_shinfo_test
+> > >  TEST_GEN_PROGS_x86_64 += x86_64/xen_vmcall_test
+> > > +TEST_GEN_PROGS_x86_64 += x86_64/sev_vm_tests
+> > >  TEST_GEN_PROGS_x86_64 += access_tracking_perf_test
+> > >  TEST_GEN_PROGS_x86_64 += demand_paging_test
+> > >  TEST_GEN_PROGS_x86_64 += dirty_log_test
+> > > diff --git a/tools/testing/selftests/kvm/x86_64/sev_vm_tests.c b/tools/testing/selftests/kvm/x86_64/sev_vm_tests.c
+> > > new file mode 100644
+> > > index 000000000000..50a770316628
+> > > --- /dev/null
+> > > +++ b/tools/testing/selftests/kvm/x86_64/sev_vm_tests.c
+> > > @@ -0,0 +1,150 @@
+> > > +// SPDX-License-Identifier: GPL-2.0-only
+> > > +#include <linux/kvm.h>
+> > > +#include <linux/psp-sev.h>
+> > > +#include <stdio.h>
+> > > +#include <sys/ioctl.h>
+> > > +#include <stdlib.h>
+> > > +#include <errno.h>
+> > > +#include <pthread.h>
+> > > +
+> > > +#include "test_util.h"
+> > > +#include "kvm_util.h"
+> > > +#include "processor.h"
+> > > +#include "svm_util.h"
+> > > +#include "kvm_util.h"
+> > > +#include "kselftest.h"
+> > > +#include "../lib/kvm_util_internal.h"
+> > > +
+> > > +#define SEV_DEV_PATH "/dev/sev"
+> > > +
+> > > +/*
+> > > + * Open SEV_DEV_PATH if available, otherwise exit the entire program.
+> > > + *
+> > > + * Input Args:
+> > > + *   flags - The flags to pass when opening SEV_DEV_PATH.
+> > > + *
+> > > + * Return:
+> > > + *   The opened file descriptor of /dev/sev.
+> > > + */
+> > > +static int open_sev_dev_path_or_exit(int flags)
+> > > +{
+> > > +       static int fd;
+> > > +
+> > > +       if (fd != 0)
+> > > +               return fd;
+> > > +
+> > > +       fd = open(SEV_DEV_PATH, flags);
+> > > +       if (fd < 0) {
+> > > +               print_skip("%s not available, is SEV not enabled? (errno: %d)",
+> > > +                          SEV_DEV_PATH, errno);
+> > > +               exit(KSFT_SKIP);
+> > > +       }
+> > > +
+> > > +       return fd;
+> > > +}
+> > > +
+> > > +static void sev_ioctl(int fd, int cmd_id, void *data)
+> > > +{
+> > > +       struct kvm_sev_cmd cmd = { 0 };
+> > > +       int ret;
+> > > +
+> > > +       TEST_ASSERT(cmd_id < KVM_SEV_NR_MAX, "Unknown SEV CMD : %d\n", cmd_id);
+> > > +
+> > > +       cmd.id = cmd_id;
+> > > +       cmd.sev_fd = open_sev_dev_path_or_exit(0);
+> > > +       cmd.data = (uint64_t)data;
+> > > +       ret = ioctl(fd, KVM_MEMORY_ENCRYPT_OP, &cmd);
+> > > +       TEST_ASSERT((ret == 0 || cmd.error == SEV_RET_SUCCESS),
+> > > +                   "%d failed: return code: %d, errno: %d, fw error: %d",
+> > > +                   cmd_id, ret, errno, cmd.error);
+> > > +}
+> >
+> > nit: Since this function has two file descriptors, `fd` and
+> > `cmd.sev_fd`, can we rename `fd` to `vm_fd`?
+> >
+> > > +
+> > > +static struct kvm_vm *sev_vm_create(bool es)
+> > > +{
+> > > +       struct kvm_vm *vm;
+> > > +       struct kvm_sev_launch_start start = { 0 };
+> > > +       int i;
+> > > +
+> > > +       vm = vm_create(VM_MODE_DEFAULT, 0, O_RDWR);
+> > > +       sev_ioctl(vm->fd, es ? KVM_SEV_ES_INIT : KVM_SEV_INIT, NULL);
+> > > +       for (i = 0; i < 3; ++i)
+> >
+> > nit: Consider moving `3` to a macro, like `MAX_VCPU_IDX` or maybe
+> > better defining something like `NUM_VCPUS` to be 4.
+> >
+> > > +               vm_vcpu_add(vm, i);
+> > > +       start.policy |= (es) << 2;
+> > > +       sev_ioctl(vm->fd, KVM_SEV_LAUNCH_START, &start);
+> > > +       if (es)
+> > > +               sev_ioctl(vm->fd, KVM_SEV_LAUNCH_UPDATE_VMSA, NULL);
+> > > +       return vm;
+> > > +}
+> > > +
+> > > +static void test_sev_migrate_from(bool es)
+> > > +{
+> > > +       struct kvm_vm *vms[3];
+> >
+> > If we create a `NUM_VCPUS` macro, then we can use it here.
+> >
+> > > +       struct kvm_enable_cap cap = { 0 };
+> > > +       int i;
+> > > +
+> > > +       for (i = 0; i < sizeof(vms) / sizeof(struct kvm_vm *); ++i)
+> > > +               vms[i] = sev_vm_create(es);
+> > > +
+> > > +       cap.cap = KVM_CAP_VM_MIGRATE_ENC_CONTEXT_FROM;
+> > > +       for (i = 0; i < sizeof(vms) / sizeof(struct kvm_vm *) - 1; ++i) {
+> > > +               cap.args[0] = vms[i]->fd;
+> > > +               vm_enable_cap(vms[i + 1], &cap);
+> > > +       }
+> >
+> > nit/optional: To me, the code would be more clear if we combined this
+> > loop with the one above and guarded calling `vm_enable_cap()` with `if
+> > (i > 0)`. Also, maybe we can initialize `cap` when it's declared.
+> >
+> >      struct kvm_enable_cap cap = { .cap = KVM_CAP_VM_MIGRATE_ENC_CONTEXT_FROM };
+> >      int i;
+> >
+> >      for (i = 0; i < sizeof(vms) / sizeof(struct kvm_vm *); ++i) {
+> >           vms[i] = sev_vm_create(es);
+> >           if (i > 0)
+> >                vm_enable_cap(vms[i], &cap);
+> >      }
+> >
+> > > +}
+> > > +
+> > > +#define LOCK_TESTING_THREADS 3
+> >
+> > nit: Consider moving this macro to the top of the file.
+> >
+> > > +
+> > > +struct locking_thread_input {
+> > > +       struct kvm_vm *vm;
+> > > +       int source_fds[LOCK_TESTING_THREADS];
+> > > +};
+> > > +
+> > > +static void *locking_test_thread(void *arg)
+> > > +{
+> > > +       struct kvm_enable_cap cap = { 0 };
+> >
+> > Maybe:
+> > struct kvm_enable_cap cap = { .cap = KVM_CAP_VM_MIGRATE_ENC_CONTEXT_FROM };
+> >
+> > > +       int i, j;
+> > > +       struct locking_thread_input *input = (struct locking_test_thread *)arg;
+> > > +
+> > > +       cap.cap = KVM_CAP_VM_MIGRATE_ENC_CONTEXT_FROM;
+> >
+> > If we initialize the cap field during the declaration, then this line goes away.
+> >
+> > > +
+> > > +       for (i = 0; i < 1000; ++i) {
+> > > +               j = input->source_fds[i % LOCK_TESTING_THREADS];
+> > > +               cap.args[0] = input->source_fds[j];
+> > > +               /*
+> > > +                * Call IOCTL directly without checking return code. We are
+> > > +                * simply trying to confirm there is no deadlock from userspace
+> > > +                * not check correctness of migration here.
+> > > +                */
+> > > +               ioctl(input->vm->fd, KVM_ENABLE_CAP, &cap);
+> >
+> > Should we use `vm_enable_cap()` here?
+> >
 
-> On 18.08.21 15:26, Claudio Imbrenda wrote:
-> > Improve make_secure_pte to avoid stalls when the system is heavily
-> > overcommitted. This was especially problematic in kvm_s390_pv_unpack,
-> > because of the loop over all pages that needed unpacking.
-> > 
-> > Due to the locks being held, it was not possible to simply replace
-> > uv_call with uv_call_sched. A more complex approach was
-> > needed, in which uv_call is replaced with __uv_call, which does not
-> > loop. When the UVC needs to be executed again, -EAGAIN is returned, and
-> > the caller (or its caller) will try again.
-> > 
-> > When -EAGAIN is returned, the path is the same as when the page is in
-> > writeback (and the writeback check is also performed, which is
-> > harmless).  
-> 
-> To me it looks like
-> handle_pv_uvc does not handle EAGAIN but also calls into this code. Is this code
-> path ok or do we need to change something here?
+I took all other suggestions but this one I just updated the comment.
+vm_enable_cap TEST_ASSERT()s if the ioctl fails. Since we are just
+randomly iterating through a bunch of ioclts we fail often so this
+would kill the test.
 
-EAGAIN will be propagated all the way to userspace, which will retry.
-
-if the UVC fails, the page does not get unpinned, and the next attempt
-to run the UVC in the guest will trigger this same path.
-
-if you don't like it, I can change handle_pv_uvc like this
-
-	if (rc == -EINVAL || rc == -EAGAIN)
-
-which will save a trip to userspace
-
-> 
-> > 
-> > Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> > Fixes: 214d9bbcd3a672 ("s390/mm: provide memory management functions for protected KVM guests")
-> > ---
-> >   arch/s390/kernel/uv.c | 29 +++++++++++++++++++++++------
-> >   1 file changed, 23 insertions(+), 6 deletions(-)
-> > 
-> > diff --git a/arch/s390/kernel/uv.c b/arch/s390/kernel/uv.c
-> > index aeb0a15bcbb7..68a8fbafcb9c 100644
-> > --- a/arch/s390/kernel/uv.c
-> > +++ b/arch/s390/kernel/uv.c
-> > @@ -180,7 +180,7 @@ static int make_secure_pte(pte_t *ptep, unsigned long addr,
-> >   {
-> >   	pte_t entry = READ_ONCE(*ptep);
-> >   	struct page *page;
-> > -	int expected, rc = 0;
-> > +	int expected, cc = 0;
-> >   
-> >   	if (!pte_present(entry))
-> >   		return -ENXIO;
-> > @@ -196,12 +196,25 @@ static int make_secure_pte(pte_t *ptep, unsigned long addr,
-> >   	if (!page_ref_freeze(page, expected))
-> >   		return -EBUSY;
-> >   	set_bit(PG_arch_1, &page->flags);
-> > -	rc = uv_call(0, (u64)uvcb);
-> > +	/*
-> > +	 * If the UVC does not succeed or fail immediately, we don't want to
-> > +	 * loop for long, or we might get stall notifications.
-> > +	 * On the other hand, this is a complex scenario and we are holding a lot of
-> > +	 * locks, so we can't easily sleep and reschedule. We try only once,
-> > +	 * and if the UVC returned busy or partial completion, we return
-> > +	 * -EAGAIN and we let the callers deal with it.
-> > +	 */
-> > +	cc = __uv_call(0, (u64)uvcb);
-> >   	page_ref_unfreeze(page, expected);
-> > -	/* Return -ENXIO if the page was not mapped, -EINVAL otherwise */
-> > -	if (rc)
-> > -		rc = uvcb->rc == 0x10a ? -ENXIO : -EINVAL;
-> > -	return rc;
-> > +	/*
-> > +	 * Return -ENXIO if the page was not mapped, -EINVAL for other errors.
-> > +	 * If busy or partially completed, return -EAGAIN.
-> > +	 */
-> > +	if (cc == UVC_CC_OK)
-> > +		return 0;
-> > +	else if (cc == UVC_CC_BUSY || cc == UVC_CC_PARTIAL)
-> > +		return -EAGAIN;
-> > +	return uvcb->rc == 0x10a ? -ENXIO : -EINVAL;
-> >   }
-> >   
-> >   /*
-> > @@ -254,6 +267,10 @@ int gmap_make_secure(struct gmap *gmap, unsigned long gaddr, void *uvcb)
-> >   	mmap_read_unlock(gmap->mm);
-> >   
-> >   	if (rc == -EAGAIN) {
-> > +		/*
-> > +		 * If we are here because the UVC returned busy or partial
-> > +		 * completion, this is just a useless check, but it is safe.
-> > +		 */
-> >   		wait_on_page_writeback(page);
-> >   	} else if (rc == -EBUSY) {
-> >   		/*
-> >   
-
+> > > +       }
+> > > +}
+> > > +
+> > > +static void test_sev_migrate_locking(void)
+> > > +{
+> > > +       struct locking_thread_input input[LOCK_TESTING_THREADS];
+> > > +       pthread_t pt[LOCK_TESTING_THREADS];
+> > > +       int i;
+> > > +
+> > > +       for (i = 0; i < LOCK_TESTING_THREADS; ++i) {
+> > > +               input[i].vm = sev_vm_create(/* es= */ false);
+> > > +               input[0].source_fds[i] = input[i].vm->fd;
+> > > +       }
+> > > +       memcpy(input[1].source_fds, input[0].source_fds,
+> > > +              sizeof(input[1].source_fds));
+> > > +       memcpy(input[2].source_fds, input[0].source_fds,
+> > > +              sizeof(input[2].source_fds));
+> > > +
+> > > +       for (i = 0; i < LOCK_TESTING_THREADS; ++i)
+> > > +               pthread_create(&pt[i], NULL, locking_test_thread, &input[i]);
+> > > +
+> > > +       for (i = 0; i < LOCK_TESTING_THREADS; ++i)
+> > > +               pthread_join(pt[i], NULL);
+> > > +}
+> >
+> > I think this function/test case deserves a comment to capture some of
+> > the conversation we had on the list that led to Sean suggesting this
+> > test case. Speaking of which, should this test case have a
+> > Suggested-by tag for Sean, since he suggested this test?
+>
+> Gah. I forgot to check the tags before sending my feedback. Of course,
+> the suggested-by tag is already there. Second time I made this gaffe
+> in the last couple of weeks. Sorry for the noise.
+>
+> >
+> > > +
+> > > +int main(int argc, char *argv[])
+> > > +{
+> > > +       test_sev_migrate_from(/* es= */ false);
+> > > +       test_sev_migrate_from(/* es= */ true);
+> > > +       test_sev_migrate_locking();
+> > > +       return 0;
+> > > +}
+> > > --
+> > > 2.33.0.259.gc128427fd7-goog
+> > >
+> >
+> > Nice test!
