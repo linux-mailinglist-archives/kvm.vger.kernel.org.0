@@ -2,138 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5BE063FC8EB
-	for <lists+kvm@lfdr.de>; Tue, 31 Aug 2021 15:55:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 169823FC933
+	for <lists+kvm@lfdr.de>; Tue, 31 Aug 2021 15:59:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239811AbhHaN4N (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Aug 2021 09:56:13 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37516 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S239787AbhHaN4M (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 31 Aug 2021 09:56:12 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 17VDnZmJ123807;
-        Tue, 31 Aug 2021 09:55:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=GNld3ZAakhTzCAjLeVyROgSf6RN4dScPLaqttdrbqtc=;
- b=tBHHndK+doas9DbdixV+v06plbyjkKxJC/fz6ytP8jlFtMAS47ivp7EL5ab4u+EIw8ZW
- HlPzIf92JNloFsEzchUgTyNEUu0TF8QsvtyZRbVuFcKO3rplipubh4KDuwysi+v90aft
- RrfX9nEo7npS0ATIiw1prox/VXBBwhdFrj/PIOXVjBA+o3K6b0OrfnUZifspNay5O0oe
- sHTWKXWNT3exdqgQM00hIH7vtT8u9CtdSErb1Szq4lTwfq9hsiyMs8oJTzCq5aXBNr4p
- bbtBeJ4VpfXI9HYhlqGoBzvJK6LmJROYyQFtd3FWugqiN/gxAZ7syOYm6Yg4C6E2lQSi /g== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3asndwrpyv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 31 Aug 2021 09:55:16 -0400
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 17VDowSx131715;
-        Tue, 31 Aug 2021 09:55:16 -0400
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3asndwrpxn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 31 Aug 2021 09:55:16 -0400
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 17VDVdEQ019546;
-        Tue, 31 Aug 2021 13:55:13 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma01fra.de.ibm.com with ESMTP id 3aqcs92kss-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 31 Aug 2021 13:55:13 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 17VDp9Kc14811598
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 31 Aug 2021 13:51:09 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BA71DAE055;
-        Tue, 31 Aug 2021 13:55:08 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 52B90AE068;
-        Tue, 31 Aug 2021 13:55:08 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.145.164.122])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 31 Aug 2021 13:55:08 +0000 (GMT)
-Subject: Re: [PATCH v4 02/14] KVM: s390: pv: avoid double free of sida page
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     cohuck@redhat.com, frankja@linux.ibm.com, thuth@redhat.com,
-        pasic@linux.ibm.com, david@redhat.com, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ulrich.Weigand@de.ibm.com
-References: <20210818132620.46770-1-imbrenda@linux.ibm.com>
- <20210818132620.46770-3-imbrenda@linux.ibm.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Message-ID: <ad1a386e-3ae9-13d7-430b-c24ed0cc4c85@de.ibm.com>
-Date:   Tue, 31 Aug 2021 15:55:07 +0200
+        id S231436AbhHaOAW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Aug 2021 10:00:22 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45132 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234541AbhHaOAG (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 31 Aug 2021 10:00:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1630418349;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=eoZoakAfFIrOybBxZsdFJvMhw582s3B1lhkKRH8aPPI=;
+        b=XTr+EZhYhOwVoz1jX2CAispBt3qJHnaSv4eyYRuAeq0aROViVqhIOXvl9NZAalCCB5ODC/
+        enh9KpGVyhwnt/K6QhJxudWUSGyYHH+H0UGw5nXMB7FflzQKspMY83qAm30SYBW6HERHzM
+        m0LAHq5EtaEjSY3bWJRIBR7OK9D9AYQ=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-413-mI8DhDyAOIK4WcaszSzlqA-1; Tue, 31 Aug 2021 09:59:07 -0400
+X-MC-Unique: mI8DhDyAOIK4WcaszSzlqA-1
+Received: by mail-wr1-f70.google.com with SMTP id k8-20020a5d5248000000b00157b9110fb5so1269649wrc.11
+        for <kvm@vger.kernel.org>; Tue, 31 Aug 2021 06:59:07 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:cc:references:from:organization:subject
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=eoZoakAfFIrOybBxZsdFJvMhw582s3B1lhkKRH8aPPI=;
+        b=Y8qtBGM3Eqesqo1gaEFQnK9FVLglXKV2Q3+9ek/SVTSeeT8I8RqPUthN6S4HCEv4WO
+         ub4p3LE+lYVpDTMrvWR9HZa13+XLdFfWvtc0XA78seYc/MPMjT5+7Rk3DLBjZ1nq/SvK
+         +3EvFhIT5Jg7ph9BPLQe36utLYyLDyl05pN2FTs17/9h7EL2o/izwEbNBEdh9z8l+KDT
+         weDVM9zAHyEX86sdSWLrGYWxlidHOszmafZKcflrrT5Wjjw/6oen5jIVw2gZSn/PP1Rf
+         Qo99Xrt2QQwt32uRHxNSGmPsQ0dZOg9Zk4j/b7wCr93kVOHN52yxneqEf9z83HSlqHbD
+         kMCA==
+X-Gm-Message-State: AOAM531ABGpz7fIwkKMP6SGDnPq1udebY4nZtqsIF2SP876rI2GOU5kF
+        f8l2KmYpr6gRuP9JhqsxEYv/z3yvuDY4yTqOyNmeIaWGLyVNVOFR3oIv4U7w2d5X2NTCpSqgNyS
+        hCFAjIcR37imJ
+X-Received: by 2002:adf:f991:: with SMTP id f17mr31434988wrr.56.1630418346621;
+        Tue, 31 Aug 2021 06:59:06 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwLrNmZ87nLAPswJDNvaJ17N+XDx8mVOLrGb7eKjqGs7O6Nzg1GUEeNfP9JTf/IP+cFIBtOLA==
+X-Received: by 2002:adf:f991:: with SMTP id f17mr31434964wrr.56.1630418346347;
+        Tue, 31 Aug 2021 06:59:06 -0700 (PDT)
+Received: from [192.168.3.132] (p4ff23bf5.dip0.t-ipconnect.de. [79.242.59.245])
+        by smtp.gmail.com with ESMTPSA id s12sm18748921wru.41.2021.08.31.06.59.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 31 Aug 2021 06:59:05 -0700 (PDT)
+To:     Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        borntraeger@de.ibm.com, frankja@linux.ibm.com, cohuck@redhat.com,
+        thuth@redhat.com, imbrenda@linux.ibm.com, hca@linux.ibm.com,
+        gor@linux.ibm.com
+References: <1627979206-32663-1-git-send-email-pmorel@linux.ibm.com>
+ <1627979206-32663-2-git-send-email-pmorel@linux.ibm.com>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat
+Subject: Re: [PATCH v3 1/3] s390x: KVM: accept STSI for CPU topology
+ information
+Message-ID: <b5ee1953-b19d-50ec-b2e2-47a05babcee4@redhat.com>
+Date:   Tue, 31 Aug 2021 15:59:04 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <20210818132620.46770-3-imbrenda@linux.ibm.com>
+In-Reply-To: <1627979206-32663-2-git-send-email-pmorel@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 8DqG5T1CPtRRsY3bQcdBaUv5P-6bqo4p
-X-Proofpoint-GUID: na_nhoeSdqaXKSyqHp9qb6ZoatWJ67Zv
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-08-31_05:2021-08-31,2021-08-31 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 bulkscore=0
- mlxscore=0 clxscore=1015 spamscore=0 lowpriorityscore=0 impostorscore=0
- priorityscore=1501 malwarescore=0 mlxlogscore=768 adultscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2107140000 definitions=main-2108310077
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 18.08.21 15:26, Claudio Imbrenda wrote:
-> If kvm_s390_pv_destroy_cpu is called more than once, we risk calling
-> free_page on a random page, since the sidad field is aliased with the
-> gbea, which is not guaranteed to be zero.
+On 03.08.21 10:26, Pierre Morel wrote:
+> STSI(15.1.x) gives information on the CPU configuration topology.
+> Let's accept the interception of STSI with the function code 15 and
+> let the userland part of the hypervisor handle it when userland
+> support the CPU Topology facility.
 > 
-> The solution is to simply return successfully immediately if the vCPU
-> was already non secure.
-> 
-> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> Fixes: 19e1227768863a1469797c13ef8fea1af7beac2c ("KVM: S390: protvirt: Introduce instruction data area bounce buffer")
-
-Patch looks good. Do we have any potential case where we call this twice? In other words,
-do we need the Fixes tag with the code as of today or not?
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
 > ---
->   arch/s390/kvm/pv.c | 19 +++++++++----------
->   1 file changed, 9 insertions(+), 10 deletions(-)
+>   arch/s390/kvm/priv.c | 7 ++++++-
+>   1 file changed, 6 insertions(+), 1 deletion(-)
 > 
-> diff --git a/arch/s390/kvm/pv.c b/arch/s390/kvm/pv.c
-> index c8841f476e91..0a854115100b 100644
-> --- a/arch/s390/kvm/pv.c
-> +++ b/arch/s390/kvm/pv.c
-> @@ -16,18 +16,17 @@
+> diff --git a/arch/s390/kvm/priv.c b/arch/s390/kvm/priv.c
+> index 9928f785c677..8581b6881212 100644
+> --- a/arch/s390/kvm/priv.c
+> +++ b/arch/s390/kvm/priv.c
+> @@ -856,7 +856,8 @@ static int handle_stsi(struct kvm_vcpu *vcpu)
+>   	if (vcpu->arch.sie_block->gpsw.mask & PSW_MASK_PSTATE)
+>   		return kvm_s390_inject_program_int(vcpu, PGM_PRIVILEGED_OP);
 >   
->   int kvm_s390_pv_destroy_cpu(struct kvm_vcpu *vcpu, u16 *rc, u16 *rrc)
->   {
-> -	int cc = 0;
-> +	int cc;
->   
-> -	if (kvm_s390_pv_cpu_get_handle(vcpu)) {
-> -		cc = uv_cmd_nodata(kvm_s390_pv_cpu_get_handle(vcpu),
-> -				   UVC_CMD_DESTROY_SEC_CPU, rc, rrc);
-> +	if (!kvm_s390_pv_cpu_get_handle(vcpu))
-> +		return 0;
-> +
-> +	cc = uv_cmd_nodata(kvm_s390_pv_cpu_get_handle(vcpu), UVC_CMD_DESTROY_SEC_CPU, rc, rrc);
-> +
-> +	KVM_UV_EVENT(vcpu->kvm, 3, "PROTVIRT DESTROY VCPU %d: rc %x rrc %x",
-> +		     vcpu->vcpu_id, *rc, *rrc);
-> +	WARN_ONCE(cc, "protvirt destroy cpu failed rc %x rrc %x", *rc, *rrc);
->   
-> -		KVM_UV_EVENT(vcpu->kvm, 3,
-> -			     "PROTVIRT DESTROY VCPU %d: rc %x rrc %x",
-> -			     vcpu->vcpu_id, *rc, *rrc);
-> -		WARN_ONCE(cc, "protvirt destroy cpu failed rc %x rrc %x",
-> -			  *rc, *rrc);
-> -	}
->   	/* Intended memory leak for something that should never happen. */
->   	if (!cc)
->   		free_pages(vcpu->arch.pv.stor_base,
+> -	if (fc > 3) {
+> +	if ((fc > 3 && fc != 15) ||
+> +	    (fc == 15 && !test_kvm_facility(vcpu->kvm, 11))) {
+>   		kvm_s390_set_psw_cc(vcpu, 3);
+>   		return 0;
+>   	}
+> @@ -893,6 +894,10 @@ static int handle_stsi(struct kvm_vcpu *vcpu)
+>   			goto out_no_data;
+>   		handle_stsi_3_2_2(vcpu, (void *) mem);
+>   		break;
+> +	case 15:
+> +		trace_kvm_s390_handle_stsi(vcpu, fc, sel1, sel2, operand2);
+> +		insert_stsi_usr_data(vcpu, operand2, ar, fc, sel1, sel2);
+> +		return -EREMOTE;
+>   	}
+>   	if (kvm_s390_pv_cpu_is_protected(vcpu)) {
+>   		memcpy((void *)sida_origin(vcpu->arch.sie_block), (void *)mem,
 > 
+
+Sorry, I'm a bit rusty on s390x kvm facility handling.
+
+
+For test_kvm_facility() to succeed, the facility has to be in both:
+
+a) fac_mask: actually available on the HW and supported by KVM 
+(kvm_s390_fac_base via FACILITIES_KVM, kvm_s390_fac_ext via 
+FACILITIES_KVM_CPUMODEL)
+
+b) fac_list: enabled for a VM
+
+AFAIU, facility 11 is neither in FACILITIES_KVM nor 
+FACILITIES_KVM_CPUMODEL, and I remember it's a hypervisor-managed bit.
+
+So unless we unlock facility 11 in FACILITIES_KVM_CPUMODEL, will 
+test_kvm_facility(vcpu->kvm, 11) ever successfully trigger here?
+
+
+I'm pretty sure I am messing something up :)
+
+-- 
+Thanks,
+
+David / dhildenb
+
