@@ -2,196 +2,205 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C83E23FCAC4
-	for <lists+kvm@lfdr.de>; Tue, 31 Aug 2021 17:26:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EDB1A3FCB0F
+	for <lists+kvm@lfdr.de>; Tue, 31 Aug 2021 17:54:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239067AbhHaP1l (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Aug 2021 11:27:41 -0400
-Received: from mga01.intel.com ([192.55.52.88]:44900 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234356AbhHaP1h (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 Aug 2021 11:27:37 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10093"; a="240753008"
-X-IronPort-AV: E=Sophos;i="5.84,366,1620716400"; 
-   d="scan'208";a="240753008"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Aug 2021 08:26:42 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.84,366,1620716400"; 
-   d="scan'208";a="687772144"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by fmsmga006.fm.intel.com with ESMTP; 31 Aug 2021 08:26:42 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2242.12; Tue, 31 Aug 2021 08:26:42 -0700
-Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2242.10; Tue, 31 Aug 2021 08:26:41 -0700
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2242.12 via Frontend Transport; Tue, 31 Aug 2021 08:26:41 -0700
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (104.47.51.42) by
- edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2242.10; Tue, 31 Aug 2021 08:26:40 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=f52DbUB3eVNfmg71s7jthQ0xZ86hMLv0dWdsSywgeUgkmssnMLJiBfJQZGn7mD4WCj/vGIJIslAu58g+Hs+n8j1zaBaoJHCzkJIcVpX3uSbhonlEvQz3LbO8KWhInrXI96AzM4n/Ix153I3D7NfI0pYqP52IJUk5vfEQBU3WpyxVfdu5zol4d9c3CYNe9pa3u2emZQ5qRiG6E31CxAqojYP071vhvjFJNHwu1y3jJt/KJVbkip7e0MetDO8kW7KdPh037tNt/WdxQIhoXHfcOVqgeSay89mHwZKsJbTSZZCX7x9SBwPJmpLyxClr3P0gn/vt8WC7OXfFrxM4BfBziA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
- bh=rnEyex/wUpfi+wwwD0uIie7JpkscFSCJZg0JjNflRgM=;
- b=Qw9BSgkjQ+Gi+8ChV8mxKQ0g8Slu/5B5qMrbCRCuHE0PEdFlZU+v4wU8TJye9GtRm/5ucod+LTEIWMaXJxVsy5HHNG3Ckufv+CnHh9mtFRuq1snAoLovJvjuIPQD8A0GOU5OXXCFploy0pfsJlpAeQ72J+SRPmIV1DyG42No1HUOlonh28bk++y+SOlkOGn4gPNc8zHOwnT2doFJKdjkuuJDA3U2fxt7ZVkaBTaqgDKE2yqL1eFmNwvkOe//d17ELC8M8Yq7EkcK8ejA2og7jYDrsbsPS72tXT+GG/YWsC0q/tma4W2ryfMi03fQT5+U9oAs3nhmpPkQyxFmlH53Ww==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
- s=selector2-intel-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rnEyex/wUpfi+wwwD0uIie7JpkscFSCJZg0JjNflRgM=;
- b=qV7g60lE42+5US9spIe8fT5uMoENV8Cabdb/Z9skDwzmgeodlqocCBOpd8a3QY2fkiz9OO95yCfb7DRCYkWUVVUC641JXRjCUACxTpOngEKLaQ0+T8UKyf/65pWE0/Vy/4nT4ABvmdfHTdnGq0TdxAQf8FfE0u58PVF0nu1YWTg=
-Received: from DM6PR11MB3177.namprd11.prod.outlook.com (2603:10b6:5:c::28) by
- DM6PR11MB4691.namprd11.prod.outlook.com (2603:10b6:5:2a6::21) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.4478.19; Tue, 31 Aug 2021 15:26:39 +0000
-Received: from DM6PR11MB3177.namprd11.prod.outlook.com
- ([fe80::1801:b765:5ffd:d121]) by DM6PR11MB3177.namprd11.prod.outlook.com
- ([fe80::1801:b765:5ffd:d121%3]) with mapi id 15.20.4457.024; Tue, 31 Aug 2021
- 15:26:39 +0000
-From:   "Xu, Terrence" <terrence.xu@intel.com>
-To:     Christoph Hellwig <hch@lst.de>,
-        Alex Williamson <alex.williamson@redhat.com>
-CC:     Diana Craciun <diana.craciun@oss.nxp.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Tian, Kevin" <kevin.tian@intel.com>
-Subject: RE: cleanup vfio iommu_group creation v4
-Thread-Topic: cleanup vfio iommu_group creation v4
-Thread-Index: AQHXmn9moZsDdebiT02j6t/c9iMEO6uNwvVg
-Date:   Tue, 31 Aug 2021 15:26:39 +0000
-Message-ID: <DM6PR11MB317712989F22416D54C9641BF0CC9@DM6PR11MB3177.namprd11.prod.outlook.com>
-References: <20210826133424.3362-1-hch@lst.de>
-In-Reply-To: <20210826133424.3362-1-hch@lst.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-reaction: no-action
-dlp-version: 11.5.1.3
-authentication-results: lst.de; dkim=none (message not signed)
- header.d=none;lst.de; dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 3c540eec-0c02-487f-14aa-08d96c93babf
-x-ms-traffictypediagnostic: DM6PR11MB4691:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <DM6PR11MB46919E80612CD23A5565CAF9F0CC9@DM6PR11MB4691.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: ws1xkh+8eMM++uMtd5XWACpyCQBYMkRfB+srpp1aaLXknmmh/LxKXqeDgN49DhYbFeW7LksxzHLRfsZVOpC9k/i/NUClht6AlhObcl7TA5u14FKlY1OG9qg+v2OIzYAL7oBrY8MKjqeTb/2nIfBxkT3MVvJLl++lfzqhJek1Za68klrNb0+fUVo7ewPZ9ZNkACxngThmxXZVbd7alSFHNlEAc9Nd0ZC5CDC5OsBtB0sfQPpfZE6ynK0YjFDiiGcsAy+6lnXt/IDv+BQWUnVHce2hZ1sS8go31pc8CLl+/pLNUY3wDTBwuaaqoLBpKlLDMlowNlpaXZDDgI4keVv/XTS9+bKl3x3ImlIc8UueD8BE/V3l2NYzDq4ksdDC8nXqCje+coOuwAZFlk/I9SMm0qU9FzVtRgD6ifvXYHX3wnOBkSlJXIbbNOqO/Yo9piJv2twlJ2ZziKV1E30gFOLmJEGRf8I6zHbn1M4WZhoY5sGQN7sH8iXcFyKkZ3KZkgaaTnZIYLz3ruyfpI0qi7iS8GaV/NKd/pX96hxeuvPukih/1QyYkGKFDMg+0XhFSk3aT9J7+Li1neLnxXa2u0wdVyJrM118nXkCEE+uB1HdGhNYyB8x++xyje9wzBV/01pqGmkwjUye/bXXuOEIJLjDxrrwMf9W8dfooxcr5C0yZ/VLaISooDKNfoKYPv3DztDqsl/71wcy2Nrh/V/wddGS3w==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB3177.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(346002)(39860400002)(366004)(396003)(376002)(107886003)(8676002)(7696005)(186003)(66556008)(66476007)(4326008)(26005)(76116006)(64756008)(8936002)(38100700002)(6506007)(33656002)(122000001)(38070700005)(66946007)(2906002)(478600001)(66446008)(5660300002)(71200400001)(83380400001)(86362001)(54906003)(55016002)(9686003)(110136005)(52536014)(316002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?My3mzmNzgiZA3Oh1UE6L320+Ff9ifaGrarg7GY0ocI0IwgYFgs82kuTChxD5?=
- =?us-ascii?Q?wMK0dfPjbU82vY18lzu4hWg6xVFwxylkF7dP92rgq3v2/AZGJm3vZzGL8GsU?=
- =?us-ascii?Q?P7k8szaObwCRuW6fMii1EZEqG6SHEQz2QlWHUxXkqBrjwXF06KonyPUIQ4gE?=
- =?us-ascii?Q?Y8bUKwLVK0WwQSAXgj3uX15pljaN5y7SRQV41bCzkBzdNuDBeoV84E13+kzq?=
- =?us-ascii?Q?41eVTwfnR6N3LMsAyprtLsluCG03NsSR8xsn2URlTQEPMyhLd8Y66iz9y/Rm?=
- =?us-ascii?Q?UITLfadqtGb9UYXZue2rjScISrfgTRyqAiTbA99e8QLrxYdTBgBbbNcoQxio?=
- =?us-ascii?Q?+qD2jROCDPhnH796NJKuTdQuIPrxUUlP+DX9Hu2k6Mq6EbogALjR+61X9cI/?=
- =?us-ascii?Q?ThjgGJaCiFqRHc0r8KwTSOUxjM2VBmisarnJVFD/R/1XwiDJgu/1OGdpGD9T?=
- =?us-ascii?Q?iImXbhX+N7czwdrURaRyr3k68lFGNybU+xBCTzZ9M7pEAIRk6rSV3zwYWM6H?=
- =?us-ascii?Q?ib6Xfi3nipacVJl3aSiPOyhfCE6eV1zDajI3Vs0F9V9w8oUV6hNIqriAUxHJ?=
- =?us-ascii?Q?1GntveO+Hbr3AkHlBNf38KGoE067MJH30m/Ipo7l9s0OymiiTIQcm1mSEVxJ?=
- =?us-ascii?Q?LtwnLm7yC8HQloQdEHM+I30hMZUl4mo3wyzUoW5sGvXR64Sm9L9RxisQw537?=
- =?us-ascii?Q?tZjMnax5hCVM83cOOxA6jgmGS3tyJrZrIJo73YMaoJmaiaPIIDTFZMgTkOLl?=
- =?us-ascii?Q?aR0eqHUXCqvf+m+kuvNwiTzof3d6WabbXne7L02SoUpdZ6YwOxTfs4TMwNYQ?=
- =?us-ascii?Q?xRWt2Mwv2pBaspx8R9sUbL/EDh0MvUE31apewR6ouTSVsRMKbyarFateEdF2?=
- =?us-ascii?Q?psOZBvvsiN3ywW2uvEimKTDn0CcoLTxmLUgTYu8suQDbUZVpFhTmbSJXCFfJ?=
- =?us-ascii?Q?J37HYMiV+HpPYD4wL4lUoqApgdWOu2vwcNQ8d5GOqHv4xQAcPsDS0cEzRgIO?=
- =?us-ascii?Q?pR0XZi3LM8VWwDMus7MeQ6yoFC2nQHcAoZHuB6SrKjc1OWYP2d1LLSSrdjfZ?=
- =?us-ascii?Q?s3sNzdM40qS1oD/0bMcWCIIYWqT0T5CaBVGUvdQPozkkCgB206Si8RgIRZnp?=
- =?us-ascii?Q?Nfh90KqIUxlOZzcX7GOZ19aeZ7lm6lOcZqpUnqA51rMq3tTwqp75GEuD850Z?=
- =?us-ascii?Q?1wbxaTAMsBRpQ7ioZvcHxTBETiJSOdTUio6T/0qRIEyic5KtbDzL5EXZsfNC?=
- =?us-ascii?Q?BnWwQJ6a4YSBUK+uMChoD1mQOdYOqYf4F6k3HS9tFGQR5Qv3uySRlMT+qKm3?=
- =?us-ascii?Q?9tUAEkRcnUETfpa4m7mGGgYG?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S239136AbhHaPy6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Aug 2021 11:54:58 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56938 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232421AbhHaPy5 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 31 Aug 2021 11:54:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1630425241;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Cqcv7q3sxv359Hw+wbovVKAY99uifNtZJRnqtsftjkQ=;
+        b=YKwMdUI8cbibJ51MM2h4YWBhild5JjCm2Z6eI23QO1tuHWwqKtOHW8UwbbC74Wztv7NYG0
+        nSGpIndy8+vs3uL1OQMbUK/LdMvKfOST2rCPcxiyNu29lRJFFI9U/ZQnXhJJg+QgcKoml2
+        QElmnsf7yv3pIlB6bnIU9ffGpvXcDts=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-461-4LmRuSeONXGsmMPc7yjOCg-1; Tue, 31 Aug 2021 11:54:00 -0400
+X-MC-Unique: 4LmRuSeONXGsmMPc7yjOCg-1
+Received: by mail-wm1-f72.google.com with SMTP id r4-20020a1c4404000000b002e728beb9fbso1433937wma.9
+        for <kvm@vger.kernel.org>; Tue, 31 Aug 2021 08:54:00 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=Cqcv7q3sxv359Hw+wbovVKAY99uifNtZJRnqtsftjkQ=;
+        b=UJMU+3GpQywGNJv2XFgrP5buxtWaTQmFy/ed2nIfrtCtXkRFmPzDsih5Yj/l6bZvD1
+         2+rwuCoufW56by7o3bon4qmsV51TC432D2gUBdHlUfC5HthspbVY6d5+RbvF5T6l8y3v
+         KuYc/CqWe7bX5Vomudr/b9n9fSxp/jaKNxHpsfo9I9DoZhoiZ/xLWMGprbPI/FvDt+lI
+         2A4CPV25jNk40sZaZNNPrAUR8RUxqZ6i4TAZa/SVJjRzAcwjBpMBT1mBrSbX655Frkwk
+         5ZSHWmA5tBe/vk6x456c8h+iNXbuTbfCMOJz4llzr9/DiVf522xqFI3HySz3+NRLhdW/
+         truA==
+X-Gm-Message-State: AOAM5304BU6pjQz4lmshaW1Y8Ghg49Yx046CACbgMgthc9yDNwwF629j
+        N20Fibem9YlGTekllAx7l5dkZ4NAs1/zKxh0sB4UgV0BuBQ96fiFdDdeHPsq/A+0+WchdUnKN4g
+        EvXx8vZqmxYoD
+X-Received: by 2002:a5d:6daa:: with SMTP id u10mr32428380wrs.31.1630425239228;
+        Tue, 31 Aug 2021 08:53:59 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw0EjHISPHLs3TIYt+0W/6JrjIDK3mdnV2vWllkRSIu0u63CB5Ml6SIBkpL6FesrH+HKFbrVg==
+X-Received: by 2002:a5d:6daa:: with SMTP id u10mr32428349wrs.31.1630425238976;
+        Tue, 31 Aug 2021 08:53:58 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id z19sm3139223wma.0.2021.08.31.08.53.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 31 Aug 2021 08:53:58 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     tcs.kernel@gmail.com
+Cc:     Haimin Zhang <tcs_kernel@tencent.com>, pbonzini@redhat.com,
+        seanjc@google.com, wanpengli@tencent.com, jmattson@google.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        jarkko@kernel.org
+Subject: Re: [PATCH] KVM: x86: Add a return code and check kvm_page_track_init
+In-Reply-To: <1630376040-20567-1-git-send-email-tcs_kernel@tencent.com>
+References: <1630376040-20567-1-git-send-email-tcs_kernel@tencent.com>
+Date:   Tue, 31 Aug 2021 17:53:57 +0200
+Message-ID: <87wno1obje.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB3177.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3c540eec-0c02-487f-14aa-08d96c93babf
-X-MS-Exchange-CrossTenant-originalarrivaltime: 31 Aug 2021 15:26:39.7853
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: w4fbRdt4N8xb5XK/V0IXOD2YwU5NRcHdL5uc4oV/UeRZvmBHeVJv2X0WrhJP46kSacped5CKOSfYJZ7JbCRaCA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR11MB4691
-X-OriginatorOrg: intel.com
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> -----Original Message-----
-> From: Christoph Hellwig <hch@lst.de>
-> Sent: Thursday, August 26, 2021 9:34 PM
->=20
-> Hi Alex,
->=20
-> this series cleans up how iommu group are created in VFIO as well as vari=
-ous
-> other lose ends around that.  It sits on top of the
->=20
->     "Introduce vfio_pci_core subsystem"
->=20
-> series from Yishai
->=20
-> Changes since v3:
->  - restore the attribution to Jason for patch 1, which git-rebase lost
->  - fix a vfio vs iommu group counting issue that I added over Jasons
->    original patch
->  - add comments describing the VFIO_EMULATED_IOMMU and
-> VFIO_NO_IOMMU
->    flags
->  - use the emulated iommu naming consistently in comments
->  - a spelling fix
->=20
-> Changes since v2:
->  - cosmetic changes to the code flow in vfio_group_find_or_alloc
->  - replace "mediated" with "emulated iommu"
->  - add a comment describing vfio_register_emulated_iommu_dev
->  - rebased on top of the "Introduce vfio_pci_core subsystem" series
->=20
-> Changes since v1:
->  - only taint if a noiommu group was successfully created
->=20
-> Diffstat:
->  drivers/vfio/fsl-mc/vfio_fsl_mc.c            |   17 -
->  drivers/vfio/mdev/mdev_driver.c              |   46 ----
->  drivers/vfio/mdev/vfio_mdev.c                |    2
->  drivers/vfio/pci/vfio_pci_core.c             |   13 -
->  drivers/vfio/platform/vfio_platform_common.c |   13 -
->  drivers/vfio/vfio.c                          |  306 ++++++++++++--------=
--------
->  drivers/vfio/vfio.h                          |   63 +++++
->  drivers/vfio/vfio_iommu_spapr_tce.c          |    6
->  drivers/vfio/vfio_iommu_type1.c              |  255 ++++++--------------=
---
->  include/linux/mdev.h                         |   20 -
->  include/linux/vfio.h                         |   53 ----
->  samples/vfio-mdev/mbochs.c                   |    2
->  samples/vfio-mdev/mdpy.c                     |    2
->  samples/vfio-mdev/mtty.c                     |    2
->  14 files changed, 292 insertions(+), 508 deletions(-)
-We verified the Intel KVMGT feature, no regression be introduced by these p=
-atch series.
-Tested-by: Terrence Xu <terrence.xu@intel.com>
+tcs.kernel@gmail.com writes:
 
-Thanks
-Terrence
+> From: Haimin Zhang <tcs_kernel@tencent.com>
+>
+> We found a null pointer deref by our modified syzkaller.
+>  KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
+>  CPU: 1 PID: 13993 Comm: syz-executor.0 Kdump: loaded Tainted: 
+>  Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), 
+>  BIOS rel-1.12.0-59-gc9ba5276e321-prebuilt.qemu.org 04/01/2014
+>  RIP: 0010:rcu_segcblist_enqueue+0xf5/0x1d0 
+>  RSP: 0018:ffffc90001e1fc10 EFLAGS: 00010046
+>  RAX: dffffc0000000000 RBX: ffff888135c00080 RCX: ffffffff815ba8a1
+>  RDX: 0000000000000000 RSI: ffffc90001e1fd00 RDI: ffff888135c00080
+>  RBP: ffff888135c000a0 R08: 0000000000000004 R09: fffff520003c3f75
+>  R10: 0000000000000003 R11: fffff520003c3f75 R12: 0000000000000000
+>  R13: ffff888135c00080 R14: ffff888135c00040 R15: 0000000000000000
+>  FS:  00007fecc99f1700(0000) GS:ffff888135c00000(0000) knlGS:0000000000
+>  CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>  CR2: 0000001b2f225000 CR3: 0000000093d08000 CR4: 0000000000750ee0
+>  DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+>  DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+>  PKRU: 55555554
+>  Call Trace:
+>  srcu_gp_start_if_needed+0x158/0xc60 build/../kernel/rcu/srcutree.c:823
+>  __synchronize_srcu+0x1dc/0x250 build/../kernel/rcu/srcutree.c:929
+>  kvm_mmu_uninit_vm+0x18/0x30 build/../arch/x86/kvm/mmu/mmu.c:5585
+>  kvm_arch_destroy_vm+0x43f/0x5c0 build/../arch/x86/kvm/x86.c:11277
+>  kvm_create_vm build/../arch/x86/kvm/../../../virt/kvm/kvm_main.c:1060 
+>  kvm_dev_ioctl_create_vm build/../arch/x86/kvm/../../../virt/kvm/kvm_main
+>  kvm_dev_ioctl+0xdfb/0x1860 build/../arch/x86/kvm/../../../virt/kvm/kvm_main
+>  vfs_ioctl build/../fs/ioctl.c:51 [inline]
+>  __do_sys_ioctl build/../fs/ioctl.c:1069 [inline]
+>  __se_sys_ioctl build/../fs/ioctl.c:1055 [inline]
+>  __x64_sys_ioctl+0x183/0x210 build/../fs/ioctl.c:1055
+>  do_syscall_x64 build/../arch/x86/entry/common.c:50 [inline]
+>  do_syscall_64+0x34/0xb0 build/../arch/x86/entry/common.c:80
+>  entry_SYSCALL_64_after_hwframe+0x44/0xae
+> This is because when init_srcu_struct() calls alloc_percpu(struct
+> srcu_data) failed, kvm_page_track_init() didn't check init_srcu_struct
+> return code. 
+>
+> Signed-off-by: Haimin Zhang <tcs_kernel@tencent.com>
+> Reported-by: TCS Robot <tcs_robot@tencent.com>
+> ---
+>  arch/x86/include/asm/kvm_page_track.h | 2 +-
+>  arch/x86/kvm/mmu/page_track.c         | 8 ++++++--
+>  arch/x86/kvm/x86.c                    | 7 +++++--
+>  3 files changed, 12 insertions(+), 5 deletions(-)
+>
+> diff --git a/arch/x86/include/asm/kvm_page_track.h b/arch/x86/include/asm/kvm_page_track.h
+> index 87bd6025d91d..6a5f3acf2b33 100644
+> --- a/arch/x86/include/asm/kvm_page_track.h
+> +++ b/arch/x86/include/asm/kvm_page_track.h
+> @@ -46,7 +46,7 @@ struct kvm_page_track_notifier_node {
+>  			    struct kvm_page_track_notifier_node *node);
+>  };
+>  
+> -void kvm_page_track_init(struct kvm *kvm);
+> +int kvm_page_track_init(struct kvm *kvm);
+>  void kvm_page_track_cleanup(struct kvm *kvm);
+>  
+>  void kvm_page_track_free_memslot(struct kvm_memory_slot *slot);
+> diff --git a/arch/x86/kvm/mmu/page_track.c b/arch/x86/kvm/mmu/page_track.c
+> index 91a9f7e0fd91..44a67a50f6d2 100644
+> --- a/arch/x86/kvm/mmu/page_track.c
+> +++ b/arch/x86/kvm/mmu/page_track.c
+> @@ -163,13 +163,17 @@ void kvm_page_track_cleanup(struct kvm *kvm)
+>  	cleanup_srcu_struct(&head->track_srcu);
+>  }
+>  
+> -void kvm_page_track_init(struct kvm *kvm)
+> +int kvm_page_track_init(struct kvm *kvm)
+>  {
+> +	int r = -ENOMEM;
+
+Nitpick: pointless initializer, the value is always overwritten by
+init_srcu_struct()'s return value.
+
+>  	struct kvm_page_track_notifier_head *head;
+>  
+>  	head = &kvm->arch.track_notifier_head;
+> -	init_srcu_struct(&head->track_srcu);
+> +	r = init_srcu_struct(&head->track_srcu);
+> +	if (r)
+> +		return r;
+>  	INIT_HLIST_HEAD(&head->track_notifier_list);
+> +	return r;
+>  }
+>  
+>  /*
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index e5d5c5ed7dd4..5da76f989207 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -11086,8 +11086,9 @@ void kvm_arch_free_vm(struct kvm *kvm)
+>  
+>  int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+>  {
+> +	int r = -EINVAL;
+
+Blank line missing here.
+
+>  	if (type)
+> -		return -EINVAL;
+> +		return r;
+
+I'd keep this code as-is and dropped then-pointless initializer to
+-EINVAL, it's OK to return directly:
+
+	int ret;
+
+	if (type)
+		return -EINVAL;
+
+        ...
+
+        ret = kvm_page_track_init(kvm);
+	if (ret)
+		return ret;
+
+>  
+>  	INIT_HLIST_HEAD(&kvm->arch.mask_notifier_list);
+>  	INIT_LIST_HEAD(&kvm->arch.active_mmu_pages);
+> @@ -11121,7 +11122,9 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+>  
+>  	kvm_apicv_init(kvm);
+>  	kvm_hv_init_vm(kvm);
+> -	kvm_page_track_init(kvm);
+> +	r = kvm_page_track_init(kvm);
+> +	if (r)
+> +		return r;
+>  	kvm_mmu_init_vm(kvm);
+>  
+>  	return static_call(kvm_x86_vm_init)(kvm);
+
+-- 
+Vitaly
+
