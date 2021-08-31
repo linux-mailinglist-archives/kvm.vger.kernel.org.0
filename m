@@ -2,195 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 10CD13FC858
-	for <lists+kvm@lfdr.de>; Tue, 31 Aug 2021 15:37:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B89BC3FC88D
+	for <lists+kvm@lfdr.de>; Tue, 31 Aug 2021 15:44:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237198AbhHaNiA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Aug 2021 09:38:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53056 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232909AbhHaNh7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 Aug 2021 09:37:59 -0400
-Received: from mail-ot1-x329.google.com (mail-ot1-x329.google.com [IPv6:2607:f8b0:4864:20::329])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFD9DC061760
-        for <kvm@vger.kernel.org>; Tue, 31 Aug 2021 06:37:03 -0700 (PDT)
-Received: by mail-ot1-x329.google.com with SMTP id x10-20020a056830408a00b004f26cead745so22761145ott.10
-        for <kvm@vger.kernel.org>; Tue, 31 Aug 2021 06:37:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=S0ivpO+/wBB1QVyedUdLAO/h8IikuLBE6+1HWRVEtJg=;
-        b=hTbafWMaGRLRJ9tKhAqzBgzS/YZt6LXaz0EPdsC7KAJwvEuG024HTopG2ksSIKkBK7
-         OBrxyHGlj0TIdRYtsHhbjtHmrEPK1ABDBs39Bf2ECzzrBCqmg0RVBubDr8UkH9EAjHQ+
-         rr06jzMABpceWSErqfzPoZEdJ2C9hhGmREPOVYL01usmJojIemPT+rjpxXZRbP6Y7ojJ
-         92ehojO4YQf9dsfB4Y5xDPf7+OQdQJs8yCazJC1CIhxqEbMpmP/DpdsI7acoaa6JfDSe
-         vb+henU4Ifd6KaCGrOz31NFAuIEmdeD67upgLFeEOEDncQR6ztoIi/YydBxFaoeziEWN
-         0Rqg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=S0ivpO+/wBB1QVyedUdLAO/h8IikuLBE6+1HWRVEtJg=;
-        b=J0ec3t3gqFfmeyJU/gS0YYP4rrrT7p4Mu/yLZmOVsC2cVcfyfvXqj6Ly8JBXwc3k6z
-         yUvwm56JVXm+i1NqoNT5+YUCRx6QXU6mKYiqJNFWQIiRy72iD2I5YPeB4bV/RaMnFk2r
-         vajAvN4+2F38WB6hL334j1xdQPU5S29VOG/h0fX1/JViqJr+vVCouo5Os7BNtJNErWLi
-         OQy9kMnvfZChbgsP8uQywPVnjrwa9ok8rMgadBKEcyYBRVRaAzVfOd0oXgRJy6IF1Jfy
-         7jH57WurdAuy4QP78IRlxM8p3wXkeXf15btxfsQNU+l/pHn2Ktr7G2axg0X/BCdOFrQC
-         HHJw==
-X-Gm-Message-State: AOAM531YuA47pZOsbPFQi3GelKBqheDKBZT18oWgrPU6I3KwAif91DFF
-        +4EmxVXNxTbm9c+k8niljF7ZTTDdi59R3TUpDoTEgqe1gxw=
-X-Google-Smtp-Source: ABdhPJzVFM5xVxXl6RHQsEzsIQNEfzCFs/8mFrBGneTSOyHXnj3FE3qiwldQHAmRi6/mm+eQ3PZiKx1Tp9zqvJ7SQKE=
-X-Received: by 2002:a05:6830:2b2c:: with SMTP id l44mr23760369otv.238.1630417022988;
- Tue, 31 Aug 2021 06:37:02 -0700 (PDT)
+        id S239305AbhHaNpC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Aug 2021 09:45:02 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:21438 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233928AbhHaNpB (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 31 Aug 2021 09:45:01 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 17VDd4Bm119233;
+        Tue, 31 Aug 2021 09:44:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=1Fi0yUgtz9RHoLjSAVwdI/Llm2RRAhJp9ZZ/2bN7jYk=;
+ b=Tzp8Ban95yOdGklYf8RiyCNVQLw9ymy6cVpKOkipLNQhIH9aKruMZ4nCYu0qzrYZeBZu
+ I9hekjPBaSY17LoVcmoWHozBHnyC+7AHQij3dHmaB+PUiPEHM2SFAE2pQczTN/z4UDkE
+ NxbkMuU0ybcj2CYZiHo6YCubN4Niv6MfJ9RnZ09eWx5+Rrs/sP2mqfXpb/HWIuzlSGWu
+ sb/eLRLMT5CqkykmikjnJajtzIUkvGoajsYNgBWdn9clkJmKDX170xiFmOwaJH9mzY77
+ ZZka/UyaO96OXPra5XAPxHay5BXQXQK7c908xy4ILcJwuatyw0UtJAGQ18ieHB79cs1w 9A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3asjbw6277-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 31 Aug 2021 09:44:05 -0400
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 17VDfbkv133237;
+        Tue, 31 Aug 2021 09:44:05 -0400
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3asjbw6260-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 31 Aug 2021 09:44:04 -0400
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 17VDXcF6004026;
+        Tue, 31 Aug 2021 13:44:02 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma03fra.de.ibm.com with ESMTP id 3aqcs9adrg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 31 Aug 2021 13:44:02 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 17VDhwOc33947922
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 31 Aug 2021 13:43:58 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 06C61AE06C;
+        Tue, 31 Aug 2021 13:43:58 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8BA8BAE05D;
+        Tue, 31 Aug 2021 13:43:57 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.145.164.122])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 31 Aug 2021 13:43:57 +0000 (GMT)
+Subject: Re: [PATCH v4 01/14] KVM: s390: pv: add macros for UVC CC values
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     cohuck@redhat.com, frankja@linux.ibm.com, thuth@redhat.com,
+        pasic@linux.ibm.com, david@redhat.com, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Ulrich.Weigand@de.ibm.com
+References: <20210818132620.46770-1-imbrenda@linux.ibm.com>
+ <20210818132620.46770-2-imbrenda@linux.ibm.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Message-ID: <6fe29ca4-61b2-6c43-f2c7-ae83c3d7a846@de.ibm.com>
+Date:   Tue, 31 Aug 2021 15:43:57 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-References: <20210830205717.3530483-1-pgonda@google.com> <20210830205717.3530483-3-pgonda@google.com>
-In-Reply-To: <20210830205717.3530483-3-pgonda@google.com>
-From:   Marc Orr <marcorr@google.com>
-Date:   Tue, 31 Aug 2021 06:36:51 -0700
-Message-ID: <CAA03e5E+BOjrepbaiMQROAsNyuaPYYmc2eLzbUwzb8G=B+SZvw@mail.gmail.com>
-Subject: Re: [PATCH 2/3 V6] KVM, SEV: Add support for SEV-ES intra host migration
-To:     Peter Gonda <pgonda@google.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        David Rientjes <rientjes@google.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20210818132620.46770-2-imbrenda@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: GYX15mX5flKO9mJ5PTYE1U64Pyr0cv6i
+X-Proofpoint-GUID: bdciEbMFyNiZUjFcSn5d-tD1vXGPu2oL
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-08-31_05:2021-08-31,2021-08-31 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 mlxlogscore=999
+ priorityscore=1501 phishscore=0 spamscore=0 impostorscore=0 malwarescore=0
+ clxscore=1015 adultscore=0 bulkscore=0 lowpriorityscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2107140000
+ definitions=main-2108310077
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 30, 2021 at 1:57 PM Peter Gonda <pgonda@google.com> wrote:
->
-> For SEV-ES to work with intra host migration the VMSAs, GHCB metadata,
-> and other SEV-ES info needs to be preserved along with the guest's
-> memory.
->
-> Signed-off-by: Peter Gonda <pgonda@google.com>
-> Cc: Marc Orr <marcorr@google.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Sean Christopherson <seanjc@google.com>
-> Cc: David Rientjes <rientjes@google.com>
-> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Cc: Brijesh Singh <brijesh.singh@amd.com>
-> Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
-> Cc: Wanpeng Li <wanpengli@tencent.com>
-> Cc: Jim Mattson <jmattson@google.com>
-> Cc: Joerg Roedel <joro@8bytes.org>
-> Cc: Thomas Gleixner <tglx@linutronix.de>
-> Cc: Ingo Molnar <mingo@redhat.com>
-> Cc: Borislav Petkov <bp@alien8.de>
-> Cc: "H. Peter Anvin" <hpa@zytor.com>
-> Cc: kvm@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> ---
->  arch/x86/kvm/svm/sev.c | 62 ++++++++++++++++++++++++++++++++++++++++--
->  1 file changed, 60 insertions(+), 2 deletions(-)
->
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 063cf26528bc..3324eed1a39e 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -1545,6 +1545,59 @@ static void migrate_info_from(struct kvm_sev_info *dst,
->         list_replace_init(&src->regions_list, &dst->regions_list);
->  }
->
-> +static int migrate_vmsa_from(struct kvm *dst, struct kvm *src)
-> +{
-> +       int i, num_vcpus;
-> +       struct kvm_vcpu *dst_vcpu, *src_vcpu;
-> +       struct vcpu_svm *dst_svm, *src_svm;
-> +
-> +       num_vcpus = atomic_read(&dst->online_vcpus);
-> +       if (num_vcpus != atomic_read(&src->online_vcpus)) {
-> +               pr_warn_ratelimited(
-> +                       "Source and target VMs must have same number of vCPUs.\n");
-> +               return -EINVAL;
-> +       }
-> +
-> +       for (i = 0; i < num_vcpus; ++i) {
-> +               src_vcpu = src->vcpus[i];
-> +               if (!src_vcpu->arch.guest_state_protected) {
-> +                       pr_warn_ratelimited(
-> +                               "Source ES VM vCPUs must have protected state.\n");
-> +                       return -EINVAL;
-> +               }
-> +       }
-> +
-> +       for (i = 0; i < num_vcpus; ++i) {
-> +               src_vcpu = src->vcpus[i];
-> +               src_svm = to_svm(src_vcpu);
-> +               dst_vcpu = dst->vcpus[i];
-> +               dst_svm = to_svm(dst_vcpu);
-> +
-> +               /*
-> +                * Copy VMSA and GHCB fields from the source to the destination.
-> +                * Clear them on the source to prevent the VM running and
-> +                * changing the state of the VMSA/GHCB unexpectedly.
-> +                */
-> +               dst_vcpu->vcpu_id = src_vcpu->vcpu_id;
-> +               dst_svm->vmsa = src_svm->vmsa;
-> +               src_svm->vmsa = NULL;
-> +               dst_svm->ghcb = src_svm->ghcb;
-> +               src_svm->ghcb = NULL;
-> +               dst_svm->vmcb->control.ghcb_gpa =
-> +                               src_svm->vmcb->control.ghcb_gpa;
-> +               src_svm->vmcb->control.ghcb_gpa = 0;
-> +               dst_svm->ghcb_sa = src_svm->ghcb_sa;
-> +               src_svm->ghcb_sa = NULL;
-> +               dst_svm->ghcb_sa_len = src_svm->ghcb_sa_len;
-> +               src_svm->ghcb_sa_len = 0;
-> +               dst_svm->ghcb_sa_sync = src_svm->ghcb_sa_sync;
-> +               src_svm->ghcb_sa_sync = false;
-> +               dst_svm->ghcb_sa_free = src_svm->ghcb_sa_free;
-> +               src_svm->ghcb_sa_free = false;
-> +       }
-> +       return 0;
-> +}
-> +
->  int svm_vm_migrate_from(struct kvm *kvm, unsigned int source_fd)
->  {
->         struct kvm_sev_info *dst_sev = &to_kvm_svm(kvm)->sev_info;
-> @@ -1556,7 +1609,7 @@ int svm_vm_migrate_from(struct kvm *kvm, unsigned int source_fd)
->         if (ret)
->                 return ret;
->
-> -       if (!sev_guest(kvm) || sev_es_guest(kvm)) {
-> +       if (!sev_guest(kvm)) {
->                 ret = -EINVAL;
->                 pr_warn_ratelimited("VM must be SEV enabled to migrate to.\n");
->                 goto out_unlock;
-> @@ -1580,13 +1633,18 @@ int svm_vm_migrate_from(struct kvm *kvm, unsigned int source_fd)
->         if (ret)
->                 goto out_fput;
->
-> -       if (!sev_guest(source_kvm) || sev_es_guest(source_kvm)) {
-> +       if (!sev_guest(source_kvm)) {
->                 ret = -EINVAL;
->                 pr_warn_ratelimited(
->                         "Source VM must be SEV enabled to migrate from.\n");
->                 goto out_source;
->         }
->
-> +       if (sev_es_guest(kvm)) {
-> +               ret = migrate_vmsa_from(kvm, source_kvm);
-> +               if (ret)
-> +                       goto out_source;
-> +       }
->         migrate_info_from(dst_sev, &to_kvm_svm(source_kvm)->sev_info);
->         ret = 0;
->
-> --
-> 2.33.0.259.gc128427fd7-goog
->
+On 18.08.21 15:26, Claudio Imbrenda wrote:
+> Add macros to describe the 4 possible CC values returned by the UVC
+> instruction.
 
-Reviewed-by: Marc Orr <marcorr@google.com>
+Matches the architecture. I kind of like the numerical value of the condition code, but I am already too long in this area. So I guess it will improve readability for others.
+
+Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> 
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> ---
+>   arch/s390/include/asm/uv.h | 5 +++++
+>   1 file changed, 5 insertions(+)
+> 
+> diff --git a/arch/s390/include/asm/uv.h b/arch/s390/include/asm/uv.h
+> index 12c5f006c136..b35add51b967 100644
+> --- a/arch/s390/include/asm/uv.h
+> +++ b/arch/s390/include/asm/uv.h
+> @@ -18,6 +18,11 @@
+>   #include <asm/page.h>
+>   #include <asm/gmap.h>
+>   
+> +#define UVC_CC_OK	0
+> +#define UVC_CC_ERROR	1
+> +#define UVC_CC_BUSY	2
+> +#define UVC_CC_PARTIAL	3
+> +
+>   #define UVC_RC_EXECUTED		0x0001
+>   #define UVC_RC_INV_CMD		0x0002
+>   #define UVC_RC_INV_STATE	0x0003
+> 
