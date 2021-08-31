@@ -2,80 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A11D3FC39E
-	for <lists+kvm@lfdr.de>; Tue, 31 Aug 2021 10:22:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B5A7B3FC3EB
+	for <lists+kvm@lfdr.de>; Tue, 31 Aug 2021 10:22:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239780AbhHaHX5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Aug 2021 03:23:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53230 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239538AbhHaHX4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 Aug 2021 03:23:56 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5752C061575;
-        Tue, 31 Aug 2021 00:23:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=YP6sLmbHZ4duSfp82g4uPYGB5Sa9IzFIjpbC3uLKhbA=; b=gXi1Ta1sRiqw9f0pfzVKNSvRTc
-        ++Ja+GLsArYf7mZElfpA2Eu1ZME4zRyTaqRWDmEdBfH0bd/FqBv0xIeR2V97jUJENX95O/H8TFSRQ
-        pmxF8uZ4FJaEozNlZ8WBQa5HEc+HLbW+ZY68A1mQTbMe1pWn/WkQxerBMpWv/Sdt9tSCqCfv63hWl
-        O+qP7R0AK4u0g6ws5JOGjdNxO3XdL+vWW1DxXeSxnSsoJPxT7kNBTh1L8tDv1Q81qYMxskMFk6j/j
-        QtoCMFxRMFcwGts3cNAN21GeNaxofh9ci/TGQPhzuRGJXKvGQAiPxzXvTmiffZTyJdgLq6Ys3nAHv
-        OiqmRTFg==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mKy52-000x7F-7R; Tue, 31 Aug 2021 07:21:25 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id CFDB63001F6;
-        Tue, 31 Aug 2021 09:21:11 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id B60542CFB41A3; Tue, 31 Aug 2021 09:21:11 +0200 (CEST)
-Date:   Tue, 31 Aug 2021 09:21:11 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Tianqiang Xu <skyele@sjtu.edu.cn>
-Cc:     x86@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, kvm@vger.kernel.org, hpa@zytor.com,
-        jarkko@kernel.org, dave.hansen@linux.intel.com,
-        linux-kernel@vger.kernel.org, linux-sgx@vger.kernel.org
-Subject: Re: [PATCH 4/4] KVM guest implementation
-Message-ID: <YS3YZ+0pJjNL4ouE@hirez.programming.kicks-ass.net>
-References: <20210831015919.13006-1-skyele@sjtu.edu.cn>
- <20210831015919.13006-4-skyele@sjtu.edu.cn>
+        id S239974AbhHaHop (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Aug 2021 03:44:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:25456 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S239924AbhHaHon (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 31 Aug 2021 03:44:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1630395828;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=15PBX2yOi5tPLhGBJ3hiEPEVIZyqqoOP2n8un1ckZwc=;
+        b=NTxeDboHtUyA5zz9rNEldp0N0mFM4clGLlRilp7JFegTKP8BJw8DcupZ3xqWQtOTXgLWau
+        gBA2Ag/Pse/2WPbLKVmE4IYd0fxiOMBAlhjqKzWHdzR3DJwAJhX2qTFvnrc6CfkMNfYoXT
+        evLm7rWSW15nkgvIFNF2sHb5DukhlqU=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-562-GheH4XZpPOmkJfK-gQEhgg-1; Tue, 31 Aug 2021 03:43:45 -0400
+X-MC-Unique: GheH4XZpPOmkJfK-gQEhgg-1
+Received: by mail-ed1-f72.google.com with SMTP id y10-20020a056402270a00b003c8adc4d40cso5672873edd.15
+        for <kvm@vger.kernel.org>; Tue, 31 Aug 2021 00:43:45 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=15PBX2yOi5tPLhGBJ3hiEPEVIZyqqoOP2n8un1ckZwc=;
+        b=oCmxHfQgNEUc05B0eQgAfTsiFEs/JJ8aFrXRuhdy/gTMYoAouWY6pr83aX14TkXWvL
+         9LiNbJkPvD/3xjtVrPBPpx2QIwWWDare72REyNGDlXA2DMwC1YT4JRX5PC6s9OKBeu9n
+         ny0W8rMxGTr2bQHYW9ye1eVAbu6DPvHnKJpcT+7cYzQkX0p0f/1/bqMrALdlFGSkavUA
+         bBYBiNG+b254BbQkuMIHg1y6cg9w81dkoYCeMCASKQean0wDf6zlrfmJch52q5MiPUIX
+         gFweDEvElrInP5HJxYFAnmiucKsFDUIsjqtb//r72ACz4qih84dwYIupDaX7MlY0vBZF
+         jGSg==
+X-Gm-Message-State: AOAM5323WH671ztjkssPf2uYijSHXOjlouFfjTtRCVZc3J0vhErHtbiQ
+        EfrnLj3j31z4nEchadb1N8nBQKZeuwIZPlzCGqzA/lkvmvxxSputc/kdfU/qySAT+CGVbkurGIJ
+        sQDemFWcfPk+O
+X-Received: by 2002:a17:906:a01:: with SMTP id w1mr29482763ejf.117.1630395824701;
+        Tue, 31 Aug 2021 00:43:44 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJx7MtdjI8o1VZXCbnzLBNcGiS8PwS9GtflTAom1HaHa12cMI48iDS7D5rGq8eKSV0deHgXKoQ==
+X-Received: by 2002:a17:906:a01:: with SMTP id w1mr29482749ejf.117.1630395824465;
+        Tue, 31 Aug 2021 00:43:44 -0700 (PDT)
+Received: from steredhat (host-79-51-186-21.retail.telecomitalia.it. [79.51.186.21])
+        by smtp.gmail.com with ESMTPSA id u4sm3176037ejc.19.2021.08.31.00.43.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 31 Aug 2021 00:43:44 -0700 (PDT)
+Date:   Tue, 31 Aug 2021 09:43:41 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Andra Paraschiv <andraprs@amazon.com>
+Cc:     linux-kernel <linux-kernel@vger.kernel.org>,
+        Alexandru Ciobotaru <alcioa@amazon.com>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Kamal Mostafa <kamal@canonical.com>,
+        Alexandru Vasile <lexnv@amazon.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        kvm <kvm@vger.kernel.org>,
+        ne-devel-upstream <ne-devel-upstream@amazon.com>
+Subject: Re: [PATCH v3 2/7] nitro_enclaves: Update documentation for Arm64
+ support
+Message-ID: <20210831074341.e74quljmvp36gy5a@steredhat>
+References: <20210827154930.40608-1-andraprs@amazon.com>
+ <20210827154930.40608-3-andraprs@amazon.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20210831015919.13006-4-skyele@sjtu.edu.cn>
+In-Reply-To: <20210827154930.40608-3-andraprs@amazon.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 31, 2021 at 09:59:19AM +0800, Tianqiang Xu wrote:
-> Guest OS uses 'is_idle' field of kvm_steal_time to know if a pCPU
-> is idle and decides whether to schedule a task to a preempted vCPU
-> or not. If the pCPU is idle, scheduling a task to this pCPU will
-> improve cpu utilization. If not, avoiding scheduling a task to this
-> preempted vCPU can avoid host/guest switch, hence improving performance.
-> 
-> Guest OS invokes available_idle_cpu_sched() to get the value of
-> 'is_idle' field of kvm_steal_time.
-> 
-> Other modules in kernel except kernel/sched/fair.c which invokes
-> available_idle_cpu() is left unchanged, because other modules in
-> kernel need the semantic provided by 'preempted' field of kvm_steal_time.
+On Fri, Aug 27, 2021 at 06:49:25PM +0300, Andra Paraschiv wrote:
+>Add references for hugepages and booting steps for Arm64.
+>
+>Include info about the current supported architectures for the
+>NE kernel driver.
+>
+>Signed-off-by: Andra Paraschiv <andraprs@amazon.com>
+>---
+>Changelog
+>
+>v1 -> v2
+>
+>* Add information about supported architectures for the NE kernel
+>driver.
+>
+>v2 -> v3
+>
+>* Move changelog after the "---" line.
+>---
+> Documentation/virt/ne_overview.rst | 21 +++++++++++++--------
+> 1 file changed, 13 insertions(+), 8 deletions(-)
 
-> ---
->  kernel/sched/fair.c | 24 ++++++++++++------------
->  1 file changed, 12 insertions(+), 12 deletions(-)
+Acked-by: Stefano Garzarella <sgarzare@redhat.com>
 
-Goes and replaces every single available_idle_cpu() in fair with the new
-function that doesn't consider vCPU preemption.
-
-So what do you reckon now happens in the oversubscribed virt scenario
-where each CPU has multiple vCPUs?
