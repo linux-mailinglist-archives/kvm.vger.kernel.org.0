@@ -2,110 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A5CD03FC417
-	for <lists+kvm@lfdr.de>; Tue, 31 Aug 2021 10:22:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 081B83FC421
+	for <lists+kvm@lfdr.de>; Tue, 31 Aug 2021 10:22:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240181AbhHaIDi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Aug 2021 04:03:38 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:33872 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S240134AbhHaIDg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 Aug 2021 04:03:36 -0400
-Received: from zn.tnic (p200300ec2f0f2f00e5150ccccff88358.dip0.t-ipconnect.de [IPv6:2003:ec:2f0f:2f00:e515:ccc:cff8:8358])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id ADB021EC050D;
-        Tue, 31 Aug 2021 10:02:35 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1630396955;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=+Hzu0yamQhg+NF0YFQ2l8T9eIMH/KofAiCkpDBBtktU=;
-        b=VeIJeDe1YeYq7fFcAdVoI5uWnR5kZeO3gHSjdm7P0w2zseJrdTyLkmnLIxDVAPlI2AsiSY
-        A+LccssbTECpYseBuznoG4ooAs7HrnywRA7Kz+fsPvyHpK3v02E9EVPNp3Epjm4MuGNrOk
-        apXrBYO+XWahTfw18+1NXcVGqOgDrYI=
-Date:   Tue, 31 Aug 2021 10:03:12 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH Part1 v5 23/38] x86/head/64: set up a startup %gs for
- stack protector
-Message-ID: <YS3iCqSY2vEmmkQ+@zn.tnic>
-References: <20210820151933.22401-1-brijesh.singh@amd.com>
- <20210820151933.22401-24-brijesh.singh@amd.com>
- <YSZTubkROktMMSba@zn.tnic>
- <20210825151835.wzgabnl7rbrge3a2@amd.com>
- <YSZv632kJKPzpayk@zn.tnic>
- <20210827133831.xfdw7z55q6ixpgjg@amd.com>
+        id S240176AbhHaIKf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Aug 2021 04:10:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35120 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S240072AbhHaIKd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 Aug 2021 04:10:33 -0400
+Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5ECFC061575
+        for <kvm@vger.kernel.org>; Tue, 31 Aug 2021 01:09:38 -0700 (PDT)
+Received: by mail-ej1-x631.google.com with SMTP id u3so36650851ejz.1
+        for <kvm@vger.kernel.org>; Tue, 31 Aug 2021 01:09:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:reply-to:from:date:message-id:subject:to;
+        bh=pc6JyOcjVRQca0OWFNDzP7P/fgENAxEB6LfMCdWNY2U=;
+        b=jO3UwoqlW0F6AOIV8pqe8lkhfvZZ0fvwiZepFaqa6nJwNg5harEK0qPfzIi8OX6POz
+         7DsOv6Rbj+0ZPK8mgyQMfnpFQ0BlXh5Uds3enFJNi/9x9jTV7Mesm19kWXgJdEbP/EDA
+         qqQTE++7y1C5zPoUUEgMBMGP/q8gCV9S9OwxXeZWNHWkzddnyXYq8FrsVpatQnpaVgbA
+         NKFIKrgAJGuDLxSag2HOdmf5oIVnIjHQWpmm8NWn1XyG04Ybv3gxc/5QyJXrc55cA0Fx
+         V2/xX7RZcvHrtNoy5wHKMSAIh+AeXcIvyXb2iMlwJbzCcVLhTaYxok6RPF1qCea1+dsb
+         24tg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
+         :subject:to;
+        bh=pc6JyOcjVRQca0OWFNDzP7P/fgENAxEB6LfMCdWNY2U=;
+        b=LpbAsrkl8qR1yLXiehNSrFq+QYG6Fs2W2YKi2kC4YJZ9nhWq00C92cjVVzEGAeYn/l
+         MoRybJLa7rXJwNDmbMLEa1JtvpRPalZe0jFM70SjE7o3Dw5Uo3MQsdPIFazxjQkt3FLp
+         pYoHXJGKyYAa3jPqwCLCVeGA4ZcGoPA/cylwjD3dDOgojJZq6PPAbYYNDnQFzMmutYyI
+         QRwc+uoS7YMr+XUIwq1msdxz/EgE57rPnuvWp3wu/+NIv6cWfaqCxMLmJ5cBDDruTRSt
+         DmPLrR2FmPRTtOUwtPFItkzBXoXKZaPerCe5lnIEHZHkaGXFYc+HgHnzEvteRZCo+5zd
+         ka3Q==
+X-Gm-Message-State: AOAM532PDVOiSFM4o938Bb4kL+znYHId8rVOo6rTQ49Sf4vs6XgfnbR4
+        ip7XXkbJYu22a1fQWfEEUdhfPTY3VJKilSsZPRM=
+X-Google-Smtp-Source: ABdhPJzSmKwZ+f+bz4wGaXvVCfROofJNxegGQhYo5Bbf/hhjkGrUed3DKu5QiT4JyG+X3P8iToRR9O0D/EnSEpnvb1E=
+X-Received: by 2002:a17:906:38c8:: with SMTP id r8mr29619644ejd.172.1630397377466;
+ Tue, 31 Aug 2021 01:09:37 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20210827133831.xfdw7z55q6ixpgjg@amd.com>
+Received: by 2002:a17:906:1811:0:0:0:0 with HTTP; Tue, 31 Aug 2021 01:09:37
+ -0700 (PDT)
+Reply-To: dabereaminata@gmail.com
+From:   Aminata Debare <chioudaragou@gmail.com>
+Date:   Tue, 31 Aug 2021 10:09:37 +0200
+Message-ID: <CA+QGEbe-z_x8YyJDEitm0CuiEMpSBpfwERdpZAf6B9HxdpTfnA@mail.gmail.com>
+Subject: Urgent Reply
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 27, 2021 at 08:38:31AM -0500, Michael Roth wrote:
-> I've been periodically revising/rewording my comments since I saw you're
-> original comments to Brijesh a few versions back, but it's how I normally
-> talk when discussing code with people so it keeps managing to sneak back in.
-
-Oh sure, happens to me too and I know it is hard to keep out but when
-you start doing git archeology and start going through old commit
-messages, wondering why stuff was done the way it is sitting there,
-you'd be very grateful if someone actually took the time to write up the
-"why" properly. Why was it done this way, what the constraints were,
-yadda yadda.
-
-And when you see a "we" there, you sometimes wonder, who's "we"? Was it
-the party who submitted the code, was it the person who's submitting the
-code but talking with the generic voice of a programmer who means "we"
-the community writing the kernel, etc.
-
-So yes, it is ambiguous and it probably wasn't a big deal at all when
-the people writing the kernel all knew each other back then but that
-long ain't the case anymore. So we (see, snuck in on me too :)) ... so
-maintainers need to pay attention to those things now too.
-
-Oh look, the last "we" above meant "maintainers".
-
-I believe that should explain with a greater detail what I mean.
-
-:-)
-
-> I've added a git hook to check for this and found other instances that need
-> fixing as well, so hopefully with the help of technology I can get them all
-> sorted for the next spin.
-
-Thanks, very much appreciated!
-
 -- 
-Regards/Gruss,
-    Boris.
+Hello,
+I am a relatives of a politically exposed person (PEP) that is in
+financial regulation. Due to my present health condition, I'd decided
+to write through this email for the security reason. Therefore, kindly
+treat this as top secret for the security reason. I'd after fasting
+and prayer choose to write not you particularly but I believing in
+probability of you being a confidant chosen by chance; luck to help
+and share in this noble cause. I need your assistant to conduct secret
+transfers of family's funds worth $18.5 millions Dollar. It was
+deposited in bank clandestinely.
 
-https://people.kernel.org/tglx/notes-about-netiquette
+I am in grave condition and i expect death anytime because of  the
+political situation my families are into since, so i seek your help in
+transferring the fund for our mutual benefit and i want to donate of
+some  the fund to less privilege and you will be rewarded with
+reasonable percentage of the fund, if you can assist .Thanking you in
+advance.
+
+Yours truly,
+Aminata Dabere
