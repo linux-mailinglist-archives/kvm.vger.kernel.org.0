@@ -2,152 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 74D3F3FCD9C
-	for <lists+kvm@lfdr.de>; Tue, 31 Aug 2021 21:21:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E4AAA3FCDF3
+	for <lists+kvm@lfdr.de>; Tue, 31 Aug 2021 22:02:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240426AbhHaTNq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Aug 2021 15:13:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:43727 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S238332AbhHaTNp (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 31 Aug 2021 15:13:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630437169;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=B3R8+9xCMOWLuSi664S67yIHwiGeNUaH36y7wRqkQk8=;
-        b=Qp8QsZwJN2uTiyEF7iZ3DWp/W/mTd4N5FzHf2OsX7Z0Be7A2zkeMOzBXKT6YKaJiiSrQEr
-        ElQRsGpBZpyfqNs6KUmvW1waphRLp7oq50WfwPfm+NH9cTn3wZTzxwl6MM9ne4hMIFLtc/
-        gZ5Lx6kolruThwJROZTKSIFlRrtXFRo=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-296-_XoyE_t1NfiWuqlVo-EtiQ-1; Tue, 31 Aug 2021 15:12:47 -0400
-X-MC-Unique: _XoyE_t1NfiWuqlVo-EtiQ-1
-Received: by mail-wr1-f69.google.com with SMTP id p10-20020a5d68ca000000b001552bf8b9daso136511wrw.22
-        for <kvm@vger.kernel.org>; Tue, 31 Aug 2021 12:12:47 -0700 (PDT)
+        id S240826AbhHaTi2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Aug 2021 15:38:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52982 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239210AbhHaTi1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 Aug 2021 15:38:27 -0400
+Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DB49C061575
+        for <kvm@vger.kernel.org>; Tue, 31 Aug 2021 12:37:31 -0700 (PDT)
+Received: by mail-ed1-x534.google.com with SMTP id g22so121661edy.12
+        for <kvm@vger.kernel.org>; Tue, 31 Aug 2021 12:37:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=FH3ZSlU/Z8INGao+rLxahfTcyU/GCSs62/WclADOsck=;
+        b=h511RekG+mtG6gnhDDBvcE0Tf6T9i3qFFBMD4PxXGNAH/dj4WOPL94T+m1W4oeWv9Q
+         UcoyPUzDOibyNxEi/eDHjdaX1/4bJc7NFxWzRRY/APeQgG1BADIE6jKOOFoBdmQWFp8Z
+         OPW2hzsjRkDG1BoYFgagMZZCs4Oa0chhCx+wEY+T40M8eZu1/J11Vlls5leiKk0KFsxF
+         1WrN8JZcKSx0n/PyBb2H4XdD/2hBMn+dEPmznhZvAoN2MDBcU8lOaanX40toxQChvfT6
+         fYIuq8Xbf2dCGMuIKF8Gqh5/CLMiw+wrL7Z/JxFG3C1ezzgEfy/qfTwmR+qix4UkUJFT
+         LiJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:organization
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=B3R8+9xCMOWLuSi664S67yIHwiGeNUaH36y7wRqkQk8=;
-        b=C8t1pR0ojj2Wu4i2lB4AsR5rMbu5miyvazh7lD1Z86ano0i2JoU4ys6NltHP+DvTbA
-         49jhaVM2UqArRMeZyWKX7agJzG/7h05mjORWD5tGDxPDP0gQKa+I5m4uDKJKPpWUOS0K
-         wGTnD0vU//kxN1Vw8joClXtz8oEtN0Jty+CCQGDt2IPwcQAJ4rlRsDgZzR0ZhvVRsDpK
-         7g8E52kqcKrXjEmesFRS++zAu2mm5T74W6QJeBKHF2F5xVJd3cVJY7rLTDZa09yv3gAz
-         czB1QtGP+jAqNqj55J5qjTQQADHBPAWo3fYiFLatb9ZsAG/eYLxWNoxB5Wgs5KWoiRte
-         idfg==
-X-Gm-Message-State: AOAM530A7daoaO/2OO68UWnS2RlaG528FQxZv7TFXnZEnBoHclryLmlJ
-        V7h58KrFEbGtBfjDa8vYvt2ahg5ISQ0Zk2IRESF5cr+56SgTB/Ikm49AJtcRrQcpXRliQVbBT3P
-        3CeZp7CFFUQKv
-X-Received: by 2002:a1c:f315:: with SMTP id q21mr5819458wmq.76.1630437166300;
-        Tue, 31 Aug 2021 12:12:46 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxiLNTwKQMvs3colTkzHCAECIzU7cGUrdshsPwDbRyk3ubr6ahQwvcGeQbVyq70Sw5+SV5+fA==
-X-Received: by 2002:a1c:f315:: with SMTP id q21mr5819425wmq.76.1630437166118;
-        Tue, 31 Aug 2021 12:12:46 -0700 (PDT)
-Received: from [192.168.3.132] (p4ff23bf5.dip0.t-ipconnect.de. [79.242.59.245])
-        by smtp.gmail.com with ESMTPSA id f5sm3231993wmb.47.2021.08.31.12.12.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 31 Aug 2021 12:12:45 -0700 (PDT)
-Subject: Re: [RFC] KVM: mm: fd-based approach for supporting KVM guest private
- memory
-To:     Sean Christopherson <seanjc@google.com>,
-        Andy Lutomirski <luto@kernel.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Borislav Petkov <bp@alien8.de>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Joerg Roedel <jroedel@suse.de>,
-        Andi Kleen <ak@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Varad Gautam <varad.gautam@suse.com>,
-        Dario Faggioli <dfaggioli@suse.com>,
-        the arch/x86 maintainers <x86@kernel.org>,
-        linux-mm@kvack.org, linux-coco@lists.linux.dev,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Sathyanarayanan Kuppuswamy 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>
-References: <20210824005248.200037-1-seanjc@google.com>
- <307d385a-a263-276f-28eb-4bc8dd287e32@redhat.com>
- <40af9d25-c854-8846-fdab-13fe70b3b279@kernel.org>
- <cfe75e39-5927-c02a-b8bc-4de026bb7b3b@redhat.com>
- <73319f3c-6f5e-4f39-a678-7be5fddd55f2@www.fastmail.com>
- <YSlnJpWh8fdpddTA@google.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-Message-ID: <949e6d95-266d-0234-3b86-6bd3c5267333@redhat.com>
-Date:   Tue, 31 Aug 2021 21:12:44 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=FH3ZSlU/Z8INGao+rLxahfTcyU/GCSs62/WclADOsck=;
+        b=ntFuhx8eUB6u/DdFBN//I+r5CBO0Hd8ZSfnKUkrezQdxhBfXPEyktCoIIC1d9r566x
+         p59FKDVR66RO3p5X1h7eUSGG4pXChBJrwB8hKFTVOowYitmXExR+vMWIS2KcBXBCUjjT
+         GCM+Kni3SXbOmeNHab8P4Izx56YyHILxkQFYhWj+fW2tOOiWk06Ap8X/C6Cfar62PVLp
+         nDMiDILJiMMmDICe29t2fcQdhq8p6h8AepLlHUPD7WskqYINk+GyKm363Z1Q2fGAVta7
+         08qOsvfXBlccHs8CmCsQEFr4SIoBVcuDV3pi7PYedXe8lN0Qa5ynL00ERYFxu554p+ff
+         otEg==
+X-Gm-Message-State: AOAM532YHeNDD+bSZ/VHitq5s23TP7TkvOvPGuXqPQPG2+rRbRfPM9un
+        JJCZIgHH06l7ozf9jDyCgo4W+IX3NJIQY7/yGLN+mg==
+X-Google-Smtp-Source: ABdhPJztlU5ubKWYvgGEcZRN5s+a0YhzDIb34/VL84Go/WnjGbh30VCwdOD0+0QMVjorN+PJUBqbw0nHLCP5Aa1pG+w=
+X-Received: by 2002:a50:9b52:: with SMTP id a18mr30980489edj.165.1630438650059;
+ Tue, 31 Aug 2021 12:37:30 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <YSlnJpWh8fdpddTA@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20210827031222.2778522-1-zixuanwang@google.com>
+ <20210827031222.2778522-12-zixuanwang@google.com> <22303b79-1074-91ea-6af4-e3d5f4c5bcbb@amd.com>
+In-Reply-To: <22303b79-1074-91ea-6af4-e3d5f4c5bcbb@amd.com>
+From:   Zixuan Wang <zixuanwang@google.com>
+Date:   Tue, 31 Aug 2021 12:36:54 -0700
+Message-ID: <CAFVYft2GXA-NSj3t2AChfvogvJfR6SD4RMHehXyw+9bGOcKRxw@mail.gmail.com>
+Subject: Re: [kvm-unit-tests PATCH v2 11/17] x86 AMD SEV: Initial support
+To:     Tom Lendacky <Thomas.Lendacky@amd.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, drjones@redhat.com,
+        marcorr@google.com, baekhw@google.com, tmroeder@google.com,
+        erdemaktas@google.com, rientjes@google.com, seanjc@google.com,
+        brijesh.singh@amd.com, varad.gautam@suse.com, jroedel@suse.de,
+        bp@suse.de
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 28.08.21 00:28, Sean Christopherson wrote:
-> On Fri, Aug 27, 2021, Andy Lutomirski wrote:
->>
->> On Thu, Aug 26, 2021, at 2:26 PM, David Hildenbrand wrote:
->>> On 26.08.21 19:05, Andy Lutomirski wrote:
->>
->>>> Oof.  That's quite a requirement.  What's the point of the VMA once all
->>>> this is done?
->>>
->>> You can keep using things like mbind(), madvise(), ... and the GUP code
->>> with a special flag might mostly just do what you want. You won't have
->>> to reinvent too many wheels on the page fault logic side at least.
-> 
-> Ya, Kirill's RFC more or less proved a special GUP flag would indeed Just Work.
-> However, the KVM page fault side of things would require only a handful of small
-> changes to send private memslots down a different path.  Compared to the rest of
-> the enabling, it's quite minor.
-> 
-> The counter to that is other KVM architectures would need to learn how to use the
-> new APIs, though I suspect that there will be a fair bit of arch enabling regardless
-> of what route we take.
-> 
->> You can keep calling the functions.  The implementations working is a
->> different story: you can't just unmap (pte_numa-style or otherwise) a private
->> guest page to quiesce it, move it with memcpy(), and then fault it back in.
-> 
-> Ya, I brought this up in my earlier reply.  Even the initial implementation (without
-> real NUMA support) would likely be painful, e.g. the KVM TDX RFC/PoC adds dedicated
-> logic in KVM to handle the case where NUMA balancing zaps a _pinned_ page and then
-> KVM fault in the same pfn.  It's not thaaat ugly, but it's arguably more invasive
-> to KVM's page fault flows than a new fd-based private memslot scheme.
+On Fri, Aug 27, 2021 at 7:51 AM Tom Lendacky <thomas.lendacky@amd.com> wrote:
+>
+> On 8/26/21 10:12 PM, Zixuan Wang wrote:
+> > +++ b/lib/x86/amd_sev.c
+> > @@ -0,0 +1,77 @@
+> > +/*
+> > + * AMD SEV support in KVM-Unit-Tests
+> > + *
+> > + * Copyright (c) 2021, Google Inc
+> > + *
+> > + * Authors:
+> > + *   Zixuan Wang <zixuanwang@google.com>
+> > + *
+> > + * SPDX-License-Identifier: LGPL-2.0-or-later
+> > + */
+> > +
+> > +#include "amd_sev.h"
+> > +#include "x86/processor.h"
+> > +
+> > +static unsigned long long amd_sev_c_bit_pos;
+>
+> This can be a unsigned short since this is just the bit position, not the
+> mask.
+>
 
-I might have a different mindset, but less code churn doesn't 
-necessarily translate to "better approach".
+I agree. I will update it in the next version.
 
-I'm certainly not pushing for what I proposed (it's a rough, broken 
-sketch). I'm much rather trying to come up with alternatives that try 
-solving the same issue, handling the identified requirements.
+> > +
+> > +bool amd_sev_enabled(void)
+> > +{
+> > +     struct cpuid cpuid_out;
+> > +     static bool sev_enabled;
+> > +     static bool initialized = false;
+> > +
+> > +     /* Check CPUID and MSR for SEV status and store it for future function calls. */
+> > +     if (!initialized) {
+> > +             sev_enabled = false;
+> > +             initialized = true;
+> > +
+> > +             /* Test if we can query SEV features */
+> > +             cpuid_out = cpuid(CPUID_FN_LARGEST_EXT_FUNC_NUM);
+> > +             if (cpuid_out.a < CPUID_FN_ENCRYPT_MEM_CAPAB) {
+> > +                     return sev_enabled;
+> > +             }
+> > +
+> > +             /* Test if SEV is supported */
+> > +             cpuid_out = cpuid(CPUID_FN_ENCRYPT_MEM_CAPAB);
+> > +             if (!(cpuid_out.a & SEV_SUPPORT_MASK)) {
+> > +                     return sev_enabled;
+> > +             }
+> > +
+> > +             /* Test if SEV is enabled */
+> > +             if (!(rdmsr(MSR_SEV_STATUS) & SEV_ENABLED_MASK)) {
+> > +                     return sev_enabled;
+> > +             }
+> > +
+> > +             sev_enabled = true;
+>
+> Maybe just make this a bit easier to read by doing:
+>
+>                 if (rdmsr(MSR_SEV_STATUS & SEV_ENABLED_MASK)
+>                         sev_enabled = true;
+>
+> No need to return early since you are at the end of the if statement. Just
+> my opinion, though, not a big deal.
+>
+> Thanks,
+> Tom
+>
 
-I have a gut feeling that the list of requirements might not be complete 
-yet. For example, I wonder if we have to protect against user space 
-replacing private pages by shared pages or punishing random holes into 
-the encrypted memory fd.
+I agree, I will update it in the next version. Thank you for the comments!
 
--- 
-Thanks,
-
-David / dhildenb
-
+Best regards,
+Zixuan
