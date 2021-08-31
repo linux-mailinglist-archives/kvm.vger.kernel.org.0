@@ -2,115 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 525973FC3F2
-	for <lists+kvm@lfdr.de>; Tue, 31 Aug 2021 10:22:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A5CD03FC417
+	for <lists+kvm@lfdr.de>; Tue, 31 Aug 2021 10:22:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240022AbhHaHwi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Aug 2021 03:52:38 -0400
-Received: from smtp-fw-9102.amazon.com ([207.171.184.29]:31394 "EHLO
-        smtp-fw-9102.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239790AbhHaHwh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 Aug 2021 03:52:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1630396303; x=1661932303;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=/npeHnSmtMQ6KY59GUKY2CTtRRzd744hv+lFFf40l5o=;
-  b=VsTRctcIXSVumFb1GK5753P13dwvtqqqkY4sPoeE9xNEow9b8HcH0nit
-   cVOwNDKzPuUpUT5ol6pIbSQEQncmH/d9vnXUKs/jfsfu1+iWe9pU2rM6a
-   2+n/nG4NjvFIZutRVtuU00WBUtqOUujPzvSi5EnN5HxQsVrsPLxz3sn3I
-   o=;
-X-IronPort-AV: E=Sophos;i="5.84,365,1620691200"; 
-   d="scan'208";a="156263196"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-1a-7d76a15f.us-east-1.amazon.com) ([10.25.36.214])
-  by smtp-border-fw-9102.sea19.amazon.com with ESMTP; 31 Aug 2021 07:51:35 +0000
-Received: from EX13D16EUB003.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
-        by email-inbound-relay-1a-7d76a15f.us-east-1.amazon.com (Postfix) with ESMTPS id 4C5DFA2273;
-        Tue, 31 Aug 2021 07:51:32 +0000 (UTC)
-Received: from 38f9d34ed3b1.ant.amazon.com (10.43.161.176) by
- EX13D16EUB003.ant.amazon.com (10.43.166.99) with Microsoft SMTP Server (TLS)
- id 15.0.1497.23; Tue, 31 Aug 2021 07:51:25 +0000
-Subject: Re: [PATCH v3 1/7] nitro_enclaves: Enable Arm64 support
-To:     Greg KH <gregkh@linuxfoundation.org>
-CC:     George-Aurelian Popescu <popegeo@amazon.com>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Alexandru Ciobotaru <alcioa@amazon.com>,
-        Kamal Mostafa <kamal@canonical.com>,
-        Alexandru Vasile <lexnv@amazon.com>,
+        id S240181AbhHaIDi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Aug 2021 04:03:38 -0400
+Received: from mail.skyhub.de ([5.9.137.197]:33872 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S240134AbhHaIDg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 Aug 2021 04:03:36 -0400
+Received: from zn.tnic (p200300ec2f0f2f00e5150ccccff88358.dip0.t-ipconnect.de [IPv6:2003:ec:2f0f:2f00:e515:ccc:cff8:8358])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id ADB021EC050D;
+        Tue, 31 Aug 2021 10:02:35 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1630396955;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=+Hzu0yamQhg+NF0YFQ2l8T9eIMH/KofAiCkpDBBtktU=;
+        b=VeIJeDe1YeYq7fFcAdVoI5uWnR5kZeO3gHSjdm7P0w2zseJrdTyLkmnLIxDVAPlI2AsiSY
+        A+LccssbTECpYseBuznoG4ooAs7HrnywRA7Kz+fsPvyHpK3v02E9EVPNp3Epjm4MuGNrOk
+        apXrBYO+XWahTfw18+1NXcVGqOgDrYI=
+Date:   Tue, 31 Aug 2021 10:03:12 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Michael Roth <michael.roth@amd.com>
+Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        "Vitaly Kuznetsov" <vkuznets@redhat.com>,
-        kvm <kvm@vger.kernel.org>,
-        ne-devel-upstream <ne-devel-upstream@amazon.com>
-References: <20210827154930.40608-1-andraprs@amazon.com>
- <20210827154930.40608-2-andraprs@amazon.com>
- <20210830155907.GG10224@u90cef543d0ab5a.ant.amazon.com>
- <f57fd0eb-271c-b8d7-ee9b-276c0f0c62ba@amazon.com>
- <YS3Peu/ax4gAVb6P@kroah.com>
-From:   "Paraschiv, Andra-Irina" <andraprs@amazon.com>
-Message-ID: <2320e152-e2bf-14dd-e427-d26b936b6a83@amazon.com>
-Date:   Tue, 31 Aug 2021 10:51:14 +0300
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:78.0)
- Gecko/20100101 Thunderbird/78.13.0
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH Part1 v5 23/38] x86/head/64: set up a startup %gs for
+ stack protector
+Message-ID: <YS3iCqSY2vEmmkQ+@zn.tnic>
+References: <20210820151933.22401-1-brijesh.singh@amd.com>
+ <20210820151933.22401-24-brijesh.singh@amd.com>
+ <YSZTubkROktMMSba@zn.tnic>
+ <20210825151835.wzgabnl7rbrge3a2@amd.com>
+ <YSZv632kJKPzpayk@zn.tnic>
+ <20210827133831.xfdw7z55q6ixpgjg@amd.com>
 MIME-Version: 1.0
-In-Reply-To: <YS3Peu/ax4gAVb6P@kroah.com>
-Content-Language: en-US
-X-Originating-IP: [10.43.161.176]
-X-ClientProxiedBy: EX13D40UWC004.ant.amazon.com (10.43.162.175) To
- EX13D16EUB003.ant.amazon.com (10.43.166.99)
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20210827133831.xfdw7z55q6ixpgjg@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-CgpPbiAzMS8wOC8yMDIxIDA5OjQzLCBHcmVnIEtIIHdyb3RlOgo+IE9uIE1vbiwgQXVnIDMwLCAy
-MDIxIGF0IDA5OjMwOjA0UE0gKzAzMDAsIFBhcmFzY2hpdiwgQW5kcmEtSXJpbmEgd3JvdGU6Cj4+
-Cj4+IE9uIDMwLzA4LzIwMjEgMTg6NTksIEdlb3JnZS1BdXJlbGlhbiBQb3Blc2N1IHdyb3RlOgo+
-Pj4gT24gRnJpLCBBdWcgMjcsIDIwMjEgYXQgMDY6NDk6MjRQTSArMDMwMCwgQW5kcmEgUGFyYXNj
-aGl2IHdyb3RlOgo+Pj4+IFVwZGF0ZSB0aGUga2VybmVsIGNvbmZpZyB0byBlbmFibGUgdGhlIE5p
-dHJvIEVuY2xhdmVzIGtlcm5lbCBkcml2ZXIgZm9yCj4+Pj4gQXJtNjQgc3VwcG9ydC4KPj4+Pgo+
-Pj4+IFNpZ25lZC1vZmYtYnk6IEFuZHJhIFBhcmFzY2hpdiA8YW5kcmFwcnNAYW1hem9uLmNvbT4K
-Pj4+PiBBY2tlZC1ieTogU3RlZmFubyBHYXJ6YXJlbGxhIDxzZ2FyemFyZUByZWRoYXQuY29tPgo+
-Pj4+IC0tLQo+Pj4+IENoYW5nZWxvZwo+Pj4+Cj4+Pj4gdjEgLT4gdjIKPj4+Pgo+Pj4+ICogTm8g
-Y2hhbmdlcy4KPj4+Pgo+Pj4+IHYyIC0+IHYzCj4+Pj4KPj4+PiAqIE1vdmUgY2hhbmdlbG9nIGFm
-dGVyIHRoZSAiLS0tIiBsaW5lLgo+Pj4+IC0tLQo+Pj4+ICAgIGRyaXZlcnMvdmlydC9uaXRyb19l
-bmNsYXZlcy9LY29uZmlnIHwgOCArKy0tLS0tLQo+Pj4+ICAgIDEgZmlsZSBjaGFuZ2VkLCAyIGlu
-c2VydGlvbnMoKyksIDYgZGVsZXRpb25zKC0pCj4+Pj4KPj4+PiBkaWZmIC0tZ2l0IGEvZHJpdmVy
-cy92aXJ0L25pdHJvX2VuY2xhdmVzL0tjb25maWcgYi9kcml2ZXJzL3ZpcnQvbml0cm9fZW5jbGF2
-ZXMvS2NvbmZpZwo+Pj4+IGluZGV4IDhjOTM4N2EyMzJkZjguLmY1Mzc0MGI5NDFjMGYgMTAwNjQ0
-Cj4+Pj4gLS0tIGEvZHJpdmVycy92aXJ0L25pdHJvX2VuY2xhdmVzL0tjb25maWcKPj4+PiArKysg
-Yi9kcml2ZXJzL3ZpcnQvbml0cm9fZW5jbGF2ZXMvS2NvbmZpZwo+Pj4+IEBAIC0xLDE3ICsxLDEz
-IEBACj4+Pj4gICAgIyBTUERYLUxpY2Vuc2UtSWRlbnRpZmllcjogR1BMLTIuMAo+Pj4+ICAgICMK
-Pj4+PiAtIyBDb3B5cmlnaHQgMjAyMCBBbWF6b24uY29tLCBJbmMuIG9yIGl0cyBhZmZpbGlhdGVz
-LiBBbGwgUmlnaHRzIFJlc2VydmVkLgo+Pj4+ICsjIENvcHlyaWdodCAyMDIwLTIwMjEgQW1hem9u
-LmNvbSwgSW5jLiBvciBpdHMgYWZmaWxpYXRlcy4gQWxsIFJpZ2h0cyBSZXNlcnZlZC4KPj4+PiAg
-ICAjIEFtYXpvbiBOaXRybyBFbmNsYXZlcyAoTkUpIHN1cHBvcnQuCj4+Pj4gICAgIyBOaXRybyBp
-cyBhIGh5cGVydmlzb3IgdGhhdCBoYXMgYmVlbiBkZXZlbG9wZWQgYnkgQW1hem9uLgo+Pj4+IC0j
-IFRPRE86IEFkZCBkZXBlbmRlbmN5IGZvciBBUk02NCBvbmNlIE5FIGlzIHN1cHBvcnRlZCBvbiBB
-cm0gcGxhdGZvcm1zLiBGb3Igbm93LAo+Pj4+IC0jIHRoZSBORSBrZXJuZWwgZHJpdmVyIGNhbiBi
-ZSBidWlsdCBmb3IgYWFyY2g2NCBhcmNoLgo+Pj4+IC0jIGRlcGVuZHMgb24gKEFSTTY0IHx8IFg4
-NikgJiYgSE9UUExVR19DUFUgJiYgUENJICYmIFNNUAo+Pj4+IC0KPj4+PiAgICBjb25maWcgTklU
-Uk9fRU5DTEFWRVMKPj4+PiAgICAgICAgICAgIHRyaXN0YXRlICJOaXRybyBFbmNsYXZlcyBTdXBw
-b3J0Igo+Pj4+IC0gZGVwZW5kcyBvbiBYODYgJiYgSE9UUExVR19DUFUgJiYgUENJICYmIFNNUAo+
-Pj4+ICsgZGVwZW5kcyBvbiAoQVJNNjQgfHwgWDg2KSAmJiBIT1RQTFVHX0NQVSAmJiBQQ0kgJiYg
-U01QCj4+Pj4gICAgICAgICAgICBoZWxwCj4+Pj4gICAgICAgICAgICAgIFRoaXMgZHJpdmVyIGNv
-bnNpc3RzIG9mIHN1cHBvcnQgZm9yIGVuY2xhdmUgbGlmZXRpbWUgbWFuYWdlbWVudAo+Pj4+ICAg
-ICAgICAgICAgICBmb3IgTml0cm8gRW5jbGF2ZXMgKE5FKS4KPj4+PiAtLQo+Pj4+IDIuMjAuMSAo
-QXBwbGUgR2l0LTExNykKPj4+Pgo+Pj4gUmV2aWV3ZWQtYnk6IEdlb3JnZS1BdXJlbGlhbiBQb3Bl
-c2N1IDxwb3BlZ2VvQGFtYXpvbi5jb20+Cj4+Pgo+PiBUaGFua3MsIEdlb3JnZSwgZm9yIHJldmll
-dy4KPj4KPj4gR3JlZywgbGV0IG1lIGtub3cgaWYgb3RoZXIgdXBkYXRlcyBhcmUgbmVlZGVkIGZv
-ciB0aGUgcGF0Y2ggc2VyaWVzLgo+PiBPdGhlcndpc2UsIHBsZWFzZSBpbmNsdWRlIHRoZSBwYXRj
-aGVzIGluIHRoZSBjaGFyLW1pc2MgdHJlZSBhbmQgd2UgY2FuCj4+IHRhcmdldCB0aGUgY3VycmVu
-dCBtZXJnZSB3aW5kb3csIGZvciB2NS4xNS4gVGhhbmsgeW91Lgo+IEl0J3MgdG9vIGxhdGUgZm9y
-IDUuMTUtcmMxLCBJIHdpbGwgcXVldWUgdGhlbSB1cCBhZnRlciA1LjE1LXJjMSBpcyBvdXQsCj4g
-dGhhbmtzLgoKQWNrLCB0aGFua3MgZm9yIGluZm8uIFRoZW4gd291bGQgYmUgdGhlIG5leHQgcmMs
-IG5vIGZ1bmN0aW9uYWwgY29kZWJhc2UgCmNoYW5nZXMgYmVpbmcgaW5jbHVkZWQuIE9yIGp1c3Qg
-bGV0IG1lIGtub3cgaWYgb3RoZXIgcmVsZWFzZSBwaGFzZSB3b3VsZCAKYmUgdGFyZ2V0ZWQuCgpU
-aGFua3MsCkFuZHJhCgoKCkFtYXpvbiBEZXZlbG9wbWVudCBDZW50ZXIgKFJvbWFuaWEpIFMuUi5M
-LiByZWdpc3RlcmVkIG9mZmljZTogMjdBIFNmLiBMYXphciBTdHJlZXQsIFVCQzUsIGZsb29yIDIs
-IElhc2ksIElhc2kgQ291bnR5LCA3MDAwNDUsIFJvbWFuaWEuIFJlZ2lzdGVyZWQgaW4gUm9tYW5p
-YS4gUmVnaXN0cmF0aW9uIG51bWJlciBKMjIvMjYyMS8yMDA1Lgo=
+On Fri, Aug 27, 2021 at 08:38:31AM -0500, Michael Roth wrote:
+> I've been periodically revising/rewording my comments since I saw you're
+> original comments to Brijesh a few versions back, but it's how I normally
+> talk when discussing code with people so it keeps managing to sneak back in.
 
+Oh sure, happens to me too and I know it is hard to keep out but when
+you start doing git archeology and start going through old commit
+messages, wondering why stuff was done the way it is sitting there,
+you'd be very grateful if someone actually took the time to write up the
+"why" properly. Why was it done this way, what the constraints were,
+yadda yadda.
+
+And when you see a "we" there, you sometimes wonder, who's "we"? Was it
+the party who submitted the code, was it the person who's submitting the
+code but talking with the generic voice of a programmer who means "we"
+the community writing the kernel, etc.
+
+So yes, it is ambiguous and it probably wasn't a big deal at all when
+the people writing the kernel all knew each other back then but that
+long ain't the case anymore. So we (see, snuck in on me too :)) ... so
+maintainers need to pay attention to those things now too.
+
+Oh look, the last "we" above meant "maintainers".
+
+I believe that should explain with a greater detail what I mean.
+
+:-)
+
+> I've added a git hook to check for this and found other instances that need
+> fixing as well, so hopefully with the help of technology I can get them all
+> sorted for the next spin.
+
+Thanks, very much appreciated!
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
