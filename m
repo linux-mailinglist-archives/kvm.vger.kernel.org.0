@@ -2,90 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5989F3FCB70
-	for <lists+kvm@lfdr.de>; Tue, 31 Aug 2021 18:22:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8EF0B3FCBAC
+	for <lists+kvm@lfdr.de>; Tue, 31 Aug 2021 18:42:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239960AbhHaQXL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Aug 2021 12:23:11 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:50868 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S239733AbhHaQXK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 Aug 2021 12:23:10 -0400
-Received: from zn.tnic (p200300ec2f0f2f00fdddcaa5e3f9e694.dip0.t-ipconnect.de [IPv6:2003:ec:2f0f:2f00:fddd:caa5:e3f9:e694])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 53D851EC01B5;
-        Tue, 31 Aug 2021 18:22:09 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1630426929;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=pJLc4Nr2FSbY+5utp8zq0cqJuoQnIBsw2l3U+d3olSs=;
-        b=OG2MmH57Xx0+9u8ejAjkuvOP+tpM08VxofHGL0MJDMGrKoMdpsPtFuWCKWBH3KhkdjY5dR
-        q04iSVWqzy2Mb06ywIkrzyJ5B5weBNc36UQmvjpJ6W6e412ErBjN16s9Q7SaeuWeoRm2Jc
-        puWQRQUhEU3pSfl/bw2Jv4OLgnedFsQ=
-Date:   Tue, 31 Aug 2021 18:22:44 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
+        id S240648AbhHaQne (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Aug 2021 12:43:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40426 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S240532AbhHaQnY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 Aug 2021 12:43:24 -0400
+Received: from mail-qt1-x84a.google.com (mail-qt1-x84a.google.com [IPv6:2607:f8b0:4864:20::84a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D20B8C0613D9
+        for <kvm@vger.kernel.org>; Tue, 31 Aug 2021 09:42:28 -0700 (PDT)
+Received: by mail-qt1-x84a.google.com with SMTP id l24-20020ac84a98000000b00298c09593afso2505999qtq.22
+        for <kvm@vger.kernel.org>; Tue, 31 Aug 2021 09:42:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=f12jBhwq9+r/36NoKImUDEFN+8rcbqX1M1KRePLwVzM=;
+        b=k7XX6L8E3h8OOOUPT5I1QXsY0ja9hOXH9xib1TsSyFkgiC+zEr9+9+fJcwJn5CDk7F
+         HthqKNLD9bHN6bCcdiHKjb11Jx1eqJPO6A+xvWVKgxiQuTTSbXIfIdU6HWYlcYUgRuGR
+         4Ah3lNbn94Dzu4xQ5c/i4AN661IvE3pleqlXYNqCmIKsdlMjC+zQQA2KHD724zf7kYYi
+         rgKEnOBl2uz65Nf5pM2wwn/Je1Vu6vOdJDhigMYbPBSHFai61qb79Grv6FN6KiMejmXa
+         lHI+1IbylAtPhrNdhK+ef5x6Xquw/XP/r1sC9VBXHBsxpONjJoR8KyzInszFzFWXmRU6
+         Y61g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=f12jBhwq9+r/36NoKImUDEFN+8rcbqX1M1KRePLwVzM=;
+        b=rEDPO5KRtKkEztin5KUL7TXYwjlcjG/p2R5OCmUAW2pUx2kKC/Tmo9rdyljVsnKey6
+         cB+GqM102AsN0oBtBNTYirjGMMD3EeIWxnLkDkokfQfDREYTgYQBhf1TukvTl7Ep0FcX
+         5bCIzWuaT9Beulbglf1p7n+gxpGLdPNNQrl0cDSERQ9YXHhtZU6IOWMWGwRBkCozDq2/
+         Jktsx9wsRgc2HSogvhcK5K9GbP7yAjUptgkJCSaHqoMcglJU+UG7pUXtQs/KUWEiOBPs
+         HpwITk/HXUuajzcjHX3GnBtcCp6kbQgDJa2RlQpt1Gn2sE4lwKRKSQISl7Hw52spInCf
+         JnQA==
+X-Gm-Message-State: AOAM5332Mql/BRjmNJkVOAQTXfG35VWidaX0plVk4Ln27fEOtbbTQp6W
+        CFTPBUb9FX5cXrsegdoWMVINRCGgssM=
+X-Google-Smtp-Source: ABdhPJwJpm65TcqXyqkx3P+gbjLiQnm24vEdkncuu85mx+K1P0HAooOTK+aguQjwBYqG1E1oUUgR7+Ii9ac=
+X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:90:200:ddbd:588d:571:702a])
+ (user=seanjc job=sendgmr) by 2002:a05:6214:2609:: with SMTP id
+ gu9mr29117556qvb.35.1630428148017; Tue, 31 Aug 2021 09:42:28 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Tue, 31 Aug 2021 09:42:21 -0700
+Message-Id: <20210831164224.1119728-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.0.259.gc128427fd7-goog
+Subject: [PATCH 0/3] KVM: x86: guest.MAXPHYADDR fix and related cleanup
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH Part1 v5 32/38] x86/sev: enable SEV-SNP-validated CPUID
- in #VC handlers
-Message-ID: <YS5XVBNrASp7Zrig@zn.tnic>
-References: <20210820151933.22401-1-brijesh.singh@amd.com>
- <20210820151933.22401-33-brijesh.singh@amd.com>
- <YSkCWVTd0ZEvphlx@zn.tnic>
- <20210827183240.f7zvo3ujkeohmlrt@amd.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20210827183240.f7zvo3ujkeohmlrt@amd.com>
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        syzbot+200c08e88ae818f849ce@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 27, 2021 at 01:32:40PM -0500, Michael Roth wrote:
-> If the memory is allocated in boot/compressed/mem_encrypt.S, wouldn't
-> kernel proper still need to create a static buffer for its copy?
+Fix a bug exposed by syzkaller where running with guest.MAXPHYADDR < 32
+leads KVM injecting a garbage exception due to mishandling an illegal GPA
+check when "translating" a non-nested GPA.
 
-Just like the other variables like sme_me_mask etc that file allocates
-at the bottom. Or do you have a better idea?
+Clean up tangentially related code in load_pdptrs() to discourage reading
+guest memory using a potentially-nested GPA.
 
-> Would that be a reasonable approach for v6?
+Sean Christopherson (3):
+  Revert "KVM: x86: mmu: Add guest physical address check in
+    translate_gpa()"
+  KVM: x86: Subsume nested GPA read helper into load_pdptrs()
+  KVM: x86: Simplify retrieving the page offset when loading PDTPRs
 
-I don't like the ifdeffery one bit, TBH. I guess you should split it
-and have a boot/compressed page and a kernel proper one and keep 'em
-separate. That should make everything nice and clean at the cost of 2*4K
-which is nothing nowadays.
-
-Thx.
+ arch/x86/include/asm/kvm_host.h |  3 --
+ arch/x86/kvm/mmu/mmu.c          |  6 ----
+ arch/x86/kvm/x86.c              | 56 +++++++++++----------------------
+ 3 files changed, 18 insertions(+), 47 deletions(-)
 
 -- 
-Regards/Gruss,
-    Boris.
+2.33.0.259.gc128427fd7-goog
 
-https://people.kernel.org/tglx/notes-about-netiquette
