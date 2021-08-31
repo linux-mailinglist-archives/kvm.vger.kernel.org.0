@@ -2,175 +2,297 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6222C3FC6B9
-	for <lists+kvm@lfdr.de>; Tue, 31 Aug 2021 14:06:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 491293FC82A
+	for <lists+kvm@lfdr.de>; Tue, 31 Aug 2021 15:24:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241548AbhHaLlK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Aug 2021 07:41:10 -0400
-Received: from foss.arm.com ([217.140.110.172]:53342 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231849AbhHaLlJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 Aug 2021 07:41:09 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2B3131FB;
-        Tue, 31 Aug 2021 04:40:13 -0700 (PDT)
-Received: from slackpad.fritz.box (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 35E873F694;
-        Tue, 31 Aug 2021 04:40:12 -0700 (PDT)
-Date:   Tue, 31 Aug 2021 12:39:57 +0100
-From:   Andre Przywara <andre.przywara@arm.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Will Deacon <will@kernel.org>
-Subject: Re: [PATCH][kvmtool] virtio/pci: Size the MSI-X bar according to
- the number of MSI-X
-Message-ID: <20210831123957.32b5a8f8@slackpad.fritz.box>
-In-Reply-To: <87wno1ontv.wl-maz@kernel.org>
-References: <20210827115405.1981529-1-maz@kernel.org>
-        <20210831121035.6b5c993b@slackpad.fritz.box>
-        <87wno1ontv.wl-maz@kernel.org>
-Organization: Arm Ltd.
-X-Mailer: Claws Mail 3.17.1 (GTK+ 2.24.31; x86_64-slackware-linux-gnu)
+        id S234263AbhHaNZx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Aug 2021 09:25:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50054 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233115AbhHaNZw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 Aug 2021 09:25:52 -0400
+Received: from mail-oi1-x235.google.com (mail-oi1-x235.google.com [IPv6:2607:f8b0:4864:20::235])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2638C061575
+        for <kvm@vger.kernel.org>; Tue, 31 Aug 2021 06:24:56 -0700 (PDT)
+Received: by mail-oi1-x235.google.com with SMTP id c79so24280763oib.11
+        for <kvm@vger.kernel.org>; Tue, 31 Aug 2021 06:24:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Omzea6UqoRijX4TuWX2NCo8oU2xTBnAaNiy5Plggtes=;
+        b=lbSk3Oj/6sD2R9qg37gwgreNNuclNdOoWY3PA9VNDuu+mG+UhqibWaYENbxYE4VF+k
+         KKKtNrH+HYcZZLlCR9lYAj3aC30yLGjjk2j6hhku29/GonghDgsmdv/Bnkfk7vyy+VXW
+         R7MQHO3C3iQfdC/0oD+tCluModxlrsA88dGiSgn5UlTjXqXayeejdBlzaZFQrkSGxh37
+         CbcRGtvRgVOcfsSj89VbtUHyksAOVKsy1ZfLrzXrJuJpL19wOt30V05GIv0cVbV+L0q6
+         GDEJaCz+3Gfjj7aqfttuC1mSKlUfrusWddlTz7xt37KRCjJNm4JW7/midfmNGczCI4tY
+         fXog==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Omzea6UqoRijX4TuWX2NCo8oU2xTBnAaNiy5Plggtes=;
+        b=oh8oJuIJgyUtvSrbH+NVuPaE1j7h32UaYdUm9Uvwb2iXhvqCZkxRlnfxBrajOoSWJQ
+         AN0ajWWV1l5+Pj37aRI0C4efgii5AOT4JmS1k2TgAnV/klDzuL7Irb7AWNj7oRTLdekC
+         oJ8rnohOD3Th6z21b3jx10STieWtrYjFobB0/13l5PI6QFrnvdW9NcgaYqYGAUfyx1Dp
+         6/QrFyvY4KltgfU1U91Dzbov53caDWUFkq18iJl/rTeYKv0BEkHOIiFh1OAUVr9yCV5E
+         C+Tm3wZZr+xzkM6ddnfqCGTEVJYUj5DCqp3k4lTMPwDTkP68cbQ/x6NeCEHmJclwBH/U
+         Yyig==
+X-Gm-Message-State: AOAM532qhQKZr2qEhiC4g3+0QE+vE+oQztXP4/LdxIi2qHNm4/3Jc8SP
+        SWRhR/dUS1zGZaaI3QSoesc1bpGivwYDjO7SSz1mjQ==
+X-Google-Smtp-Source: ABdhPJxn/+5G++cHgnGlVKzR/mRlZfkqiXyQyg8XJ5BoT8TmjwKADEvS89Vel54GDKrf9jmuDbzR5kEQJCi1p+cI3FM=
+X-Received: by 2002:a05:6808:909:: with SMTP id w9mr3097704oih.164.1630416296095;
+ Tue, 31 Aug 2021 06:24:56 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20210830212951.3541589-1-pgonda@google.com>
+In-Reply-To: <20210830212951.3541589-1-pgonda@google.com>
+From:   Marc Orr <marcorr@google.com>
+Date:   Tue, 31 Aug 2021 06:24:44 -0700
+Message-ID: <CAA03e5Fd2aes=euzXv51d6b3E0S3tK45hkqQhONsmWA5dE33dw@mail.gmail.com>
+Subject: Re: [PATCH 3/3 V6] selftest: KVM: Add intra host migration
+To:     Peter Gonda <pgonda@google.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 31 Aug 2021 12:28:28 +0100
-Marc Zyngier <maz@kernel.org> wrote:
+On Mon, Aug 30, 2021 at 2:29 PM Peter Gonda <pgonda@google.com> wrote:
+>
+> Adds testcases for intra host migration for SEV and SEV-ES. Also adds
+> locking test to confirm no deadlock exists.
+>
+> ---
+>  tools/testing/selftests/kvm/Makefile          |   1 +
+>  .../selftests/kvm/x86_64/sev_vm_tests.c       | 152 ++++++++++++++++++
+>  2 files changed, 153 insertions(+)
+>  create mode 100644 tools/testing/selftests/kvm/x86_64/sev_vm_tests.c
+>
+> Signed-off-by: Peter Gonda <pgonda@google.com>
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Cc: Marc Orr <marcorr@google.com>
+> Cc: Sean Christopherson <seanjc@google.com>
+> Cc: Brijesh Singh <brijesh.singh@amd.com>
+> Cc: kvm@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+>
+> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+> index 5832f510a16c..de6e64d5c9c4 100644
+> --- a/tools/testing/selftests/kvm/Makefile
+> +++ b/tools/testing/selftests/kvm/Makefile
+> @@ -71,6 +71,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/tsc_msrs_test
+>  TEST_GEN_PROGS_x86_64 += x86_64/vmx_pmu_msrs_test
+>  TEST_GEN_PROGS_x86_64 += x86_64/xen_shinfo_test
+>  TEST_GEN_PROGS_x86_64 += x86_64/xen_vmcall_test
+> +TEST_GEN_PROGS_x86_64 += x86_64/sev_vm_tests
+>  TEST_GEN_PROGS_x86_64 += access_tracking_perf_test
+>  TEST_GEN_PROGS_x86_64 += demand_paging_test
+>  TEST_GEN_PROGS_x86_64 += dirty_log_test
+> diff --git a/tools/testing/selftests/kvm/x86_64/sev_vm_tests.c b/tools/testing/selftests/kvm/x86_64/sev_vm_tests.c
+> new file mode 100644
+> index 000000000000..50a770316628
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/x86_64/sev_vm_tests.c
+> @@ -0,0 +1,150 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +#include <linux/kvm.h>
+> +#include <linux/psp-sev.h>
+> +#include <stdio.h>
+> +#include <sys/ioctl.h>
+> +#include <stdlib.h>
+> +#include <errno.h>
+> +#include <pthread.h>
+> +
+> +#include "test_util.h"
+> +#include "kvm_util.h"
+> +#include "processor.h"
+> +#include "svm_util.h"
+> +#include "kvm_util.h"
+> +#include "kselftest.h"
+> +#include "../lib/kvm_util_internal.h"
+> +
+> +#define SEV_DEV_PATH "/dev/sev"
+> +
+> +/*
+> + * Open SEV_DEV_PATH if available, otherwise exit the entire program.
+> + *
+> + * Input Args:
+> + *   flags - The flags to pass when opening SEV_DEV_PATH.
+> + *
+> + * Return:
+> + *   The opened file descriptor of /dev/sev.
+> + */
+> +static int open_sev_dev_path_or_exit(int flags)
+> +{
+> +       static int fd;
+> +
+> +       if (fd != 0)
+> +               return fd;
+> +
+> +       fd = open(SEV_DEV_PATH, flags);
+> +       if (fd < 0) {
+> +               print_skip("%s not available, is SEV not enabled? (errno: %d)",
+> +                          SEV_DEV_PATH, errno);
+> +               exit(KSFT_SKIP);
+> +       }
+> +
+> +       return fd;
+> +}
+> +
+> +static void sev_ioctl(int fd, int cmd_id, void *data)
+> +{
+> +       struct kvm_sev_cmd cmd = { 0 };
+> +       int ret;
+> +
+> +       TEST_ASSERT(cmd_id < KVM_SEV_NR_MAX, "Unknown SEV CMD : %d\n", cmd_id);
+> +
+> +       cmd.id = cmd_id;
+> +       cmd.sev_fd = open_sev_dev_path_or_exit(0);
+> +       cmd.data = (uint64_t)data;
+> +       ret = ioctl(fd, KVM_MEMORY_ENCRYPT_OP, &cmd);
+> +       TEST_ASSERT((ret == 0 || cmd.error == SEV_RET_SUCCESS),
+> +                   "%d failed: return code: %d, errno: %d, fw error: %d",
+> +                   cmd_id, ret, errno, cmd.error);
+> +}
 
-> Hi Andre,
-> 
-> On Tue, 31 Aug 2021 12:10:35 +0100,
-> Andre Przywara <andre.przywara@arm.com> wrote:
-> > 
-> > On Fri, 27 Aug 2021 12:54:05 +0100
-> > Marc Zyngier <maz@kernel.org> wrote:
-> > 
-> > Hi Marc,
-> >   
-> > > Since 45d3b59e8c45 ("kvm tools: Increase amount of possible interrupts
-> > > per PCI device"), the number of MSI-S has gone from 4 to 33.
-> > > 
-> > > However, the corresponding storage hasn't been upgraded, and writing
-> > > to the MSI-X table is a pretty risky business. Now that the Linux
-> > > kernel writes to *all* MSI-X entries before doing anything else
-> > > with the device, kvmtool dies a horrible death.
-> > > 
-> > > Fix it by properly defining the size of the MSI-X bar, and make
-> > > Linux great again.
-> > > 
-> > > This includes some fixes the PBA region decoding, as well as minor
-> > > cleanups to make this code a bit more maintainable.
-> > > 
-> > > Signed-off-by: Marc Zyngier <maz@kernel.org>  
-> > 
-> > Many thanks for fixing this, it looks good to me now. Just some
-> > questions below:
+nit: Since this function has two file descriptors, `fd` and
+`cmd.sev_fd`, can we rename `fd` to `vm_fd`?
 
-Thanks for the explanation, and keeping (void *) as there are more
-instances sounds fair enough. So:
+> +
+> +static struct kvm_vm *sev_vm_create(bool es)
+> +{
+> +       struct kvm_vm *vm;
+> +       struct kvm_sev_launch_start start = { 0 };
+> +       int i;
+> +
+> +       vm = vm_create(VM_MODE_DEFAULT, 0, O_RDWR);
+> +       sev_ioctl(vm->fd, es ? KVM_SEV_ES_INIT : KVM_SEV_INIT, NULL);
+> +       for (i = 0; i < 3; ++i)
 
-Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+nit: Consider moving `3` to a macro, like `MAX_VCPU_IDX` or maybe
+better defining something like `NUM_VCPUS` to be 4.
 
-Cheers,
-Andre
+> +               vm_vcpu_add(vm, i);
+> +       start.policy |= (es) << 2;
+> +       sev_ioctl(vm->fd, KVM_SEV_LAUNCH_START, &start);
+> +       if (es)
+> +               sev_ioctl(vm->fd, KVM_SEV_LAUNCH_UPDATE_VMSA, NULL);
+> +       return vm;
+> +}
+> +
+> +static void test_sev_migrate_from(bool es)
+> +{
+> +       struct kvm_vm *vms[3];
 
+If we create a `NUM_VCPUS` macro, then we can use it here.
 
-> >   
-> > > ---
-> > >  virtio/pci.c | 42 ++++++++++++++++++++++++++++++------------
-> > >  1 file changed, 30 insertions(+), 12 deletions(-)
-> > > 
-> > > diff --git a/virtio/pci.c b/virtio/pci.c
-> > > index eb91f512..41085291 100644
-> > > --- a/virtio/pci.c
-> > > +++ b/virtio/pci.c
-> > > @@ -7,6 +7,7 @@
-> > >  #include "kvm/irq.h"
-> > >  #include "kvm/virtio.h"
-> > >  #include "kvm/ioeventfd.h"
-> > > +#include "kvm/util.h"
-> > >  
-> > >  #include <sys/ioctl.h>
-> > >  #include <linux/virtio_pci.h>
-> > > @@ -14,6 +15,13 @@
-> > >  #include <assert.h>
-> > >  #include <string.h>
-> > >  
-> > > +#define ALIGN_UP(x, s)		ALIGN((x) + (s) - 1, (s))
-> > > +#define VIRTIO_NR_MSIX		(VIRTIO_PCI_MAX_VQ + VIRTIO_PCI_MAX_CONFIG)
-> > > +#define VIRTIO_MSIX_TABLE_SIZE	(VIRTIO_NR_MSIX * 16)
-> > > +#define VIRTIO_MSIX_PBA_SIZE	(ALIGN_UP(VIRTIO_MSIX_TABLE_SIZE, 64) / 8)
-> > > +#define VIRTIO_MSIX_BAR_SIZE	(1UL << fls_long(VIRTIO_MSIX_TABLE_SIZE + \
-> > > +						 VIRTIO_MSIX_PBA_SIZE))
-> > > +
-> > >  static u16 virtio_pci__port_addr(struct virtio_pci *vpci)
-> > >  {
-> > >  	return pci__bar_address(&vpci->pci_hdr, 0);
-> > > @@ -333,18 +341,27 @@ static void virtio_pci__msix_mmio_callback(struct kvm_cpu *vcpu,
-> > >  	struct virtio_pci *vpci = vdev->virtio;
-> > >  	struct msix_table *table;
-> > >  	u32 msix_io_addr = virtio_pci__msix_io_addr(vpci);
-> > > +	u32 pba_offset;
-> > >  	int vecnum;
-> > >  	size_t offset;
-> > >  
-> > > -	if (addr > msix_io_addr + PCI_IO_SIZE) {  
-> > 
-> > Ouch, the missing "=" looks like another long standing bug you fixed, I
-> > wonder how this ever worked before? Looking deeper it looks like the
-> > whole PBA code was quite broken (allowing writes, for instance, and
-> > mixing with the code for the MSIX table)?  
-> 
-> I don't think it ever worked. And to be fair, no known guest ever
-> reads from it either. It just that as I was reworking it, some of the
-> pitfalls became obvious.
-> 
-> >   
-> > > +	BUILD_BUG_ON(VIRTIO_NR_MSIX > (sizeof(vpci->msix_pba) * 8));
-> > > +
-> > > +	pba_offset = vpci->pci_hdr.msix.pba_offset & ~PCI_MSIX_TABLE_BIR;  
-> > 
-> > Any particular reason you read back the offset from the MSIX capability
-> > instead of just using VIRTIO_MSIX_TABLE_SIZE here? Is that to avoid
-> > accidentally diverging in the future, by having just one place of
-> > definition?  
-> 
-> Exactly. My first version of this patch actually failed to update the
-> offset advertised to the guest, so I decided to just have a single
-> location for this. At least, we won't have to touch this code again if
-> we change the number of MSI-X.
-> 
-> >   
-> > > +	if (addr >= msix_io_addr + pba_offset) {
-> > > +		/* Read access to PBA */
-> > >  		if (is_write)
-> > >  			return;
-> > > -		table  = (struct msix_table *)&vpci->msix_pba;
-> > > -		offset = addr - (msix_io_addr + PCI_IO_SIZE);
-> > > -	} else {
-> > > -		table  = vpci->msix_table;
-> > > -		offset = addr - msix_io_addr;
-> > > +		offset = addr - (msix_io_addr + pba_offset);
-> > > +		if ((offset + len) > sizeof (vpci->msix_pba))
-> > > +			return;
-> > > +		memcpy(data, (void *)&vpci->msix_pba + offset, len);  
-> > 
-> > Should this be a char* cast, since pointer arithmetic on void* is
-> > somewhat frowned upon (aka "forbidden in the C standard, but allowed as
-> > a GCC extension")?  
-> 
-> I am trying to be consistent. A quick grep shows at least 19
-> occurrences of pointer arithmetic with '(void *)', and none with
-> '(char *)'. Happy for someone to go and repaint this, but I don't
-> think this should be the purpose of this patch.
-> 
-> Thanks,
-> 
-> 	M.
-> 
+> +       struct kvm_enable_cap cap = { 0 };
+> +       int i;
+> +
+> +       for (i = 0; i < sizeof(vms) / sizeof(struct kvm_vm *); ++i)
+> +               vms[i] = sev_vm_create(es);
+> +
+> +       cap.cap = KVM_CAP_VM_MIGRATE_ENC_CONTEXT_FROM;
+> +       for (i = 0; i < sizeof(vms) / sizeof(struct kvm_vm *) - 1; ++i) {
+> +               cap.args[0] = vms[i]->fd;
+> +               vm_enable_cap(vms[i + 1], &cap);
+> +       }
 
+nit/optional: To me, the code would be more clear if we combined this
+loop with the one above and guarded calling `vm_enable_cap()` with `if
+(i > 0)`. Also, maybe we can initialize `cap` when it's declared.
+
+     struct kvm_enable_cap cap = { .cap = KVM_CAP_VM_MIGRATE_ENC_CONTEXT_FROM };
+     int i;
+
+     for (i = 0; i < sizeof(vms) / sizeof(struct kvm_vm *); ++i) {
+          vms[i] = sev_vm_create(es);
+          if (i > 0)
+               vm_enable_cap(vms[i], &cap);
+     }
+
+> +}
+> +
+> +#define LOCK_TESTING_THREADS 3
+
+nit: Consider moving this macro to the top of the file.
+
+> +
+> +struct locking_thread_input {
+> +       struct kvm_vm *vm;
+> +       int source_fds[LOCK_TESTING_THREADS];
+> +};
+> +
+> +static void *locking_test_thread(void *arg)
+> +{
+> +       struct kvm_enable_cap cap = { 0 };
+
+Maybe:
+struct kvm_enable_cap cap = { .cap = KVM_CAP_VM_MIGRATE_ENC_CONTEXT_FROM };
+
+> +       int i, j;
+> +       struct locking_thread_input *input = (struct locking_test_thread *)arg;
+> +
+> +       cap.cap = KVM_CAP_VM_MIGRATE_ENC_CONTEXT_FROM;
+
+If we initialize the cap field during the declaration, then this line goes away.
+
+> +
+> +       for (i = 0; i < 1000; ++i) {
+> +               j = input->source_fds[i % LOCK_TESTING_THREADS];
+> +               cap.args[0] = input->source_fds[j];
+> +               /*
+> +                * Call IOCTL directly without checking return code. We are
+> +                * simply trying to confirm there is no deadlock from userspace
+> +                * not check correctness of migration here.
+> +                */
+> +               ioctl(input->vm->fd, KVM_ENABLE_CAP, &cap);
+
+Should we use `vm_enable_cap()` here?
+
+> +       }
+> +}
+> +
+> +static void test_sev_migrate_locking(void)
+> +{
+> +       struct locking_thread_input input[LOCK_TESTING_THREADS];
+> +       pthread_t pt[LOCK_TESTING_THREADS];
+> +       int i;
+> +
+> +       for (i = 0; i < LOCK_TESTING_THREADS; ++i) {
+> +               input[i].vm = sev_vm_create(/* es= */ false);
+> +               input[0].source_fds[i] = input[i].vm->fd;
+> +       }
+> +       memcpy(input[1].source_fds, input[0].source_fds,
+> +              sizeof(input[1].source_fds));
+> +       memcpy(input[2].source_fds, input[0].source_fds,
+> +              sizeof(input[2].source_fds));
+> +
+> +       for (i = 0; i < LOCK_TESTING_THREADS; ++i)
+> +               pthread_create(&pt[i], NULL, locking_test_thread, &input[i]);
+> +
+> +       for (i = 0; i < LOCK_TESTING_THREADS; ++i)
+> +               pthread_join(pt[i], NULL);
+> +}
+
+I think this function/test case deserves a comment to capture some of
+the conversation we had on the list that led to Sean suggesting this
+test case. Speaking of which, should this test case have a
+Suggested-by tag for Sean, since he suggested this test?
+
+> +
+> +int main(int argc, char *argv[])
+> +{
+> +       test_sev_migrate_from(/* es= */ false);
+> +       test_sev_migrate_from(/* es= */ true);
+> +       test_sev_migrate_locking();
+> +       return 0;
+> +}
+> --
+> 2.33.0.259.gc128427fd7-goog
+>
+
+Nice test!
