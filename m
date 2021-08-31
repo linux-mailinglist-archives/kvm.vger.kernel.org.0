@@ -2,173 +2,180 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 198D53FC0B9
-	for <lists+kvm@lfdr.de>; Tue, 31 Aug 2021 04:14:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D6B253FC15C
+	for <lists+kvm@lfdr.de>; Tue, 31 Aug 2021 05:08:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239353AbhHaCPH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Aug 2021 22:15:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41444 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239339AbhHaCPG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 Aug 2021 22:15:06 -0400
-Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5FDBC061575;
-        Mon, 30 Aug 2021 19:14:11 -0700 (PDT)
-Received: by mail-pg1-x52d.google.com with SMTP id w7so14132705pgk.13;
-        Mon, 30 Aug 2021 19:14:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=g5V5j8DWby/8xr1tG0O71qMLwIMbKtLkCRL8/HbV/wA=;
-        b=NjZ2YbxxI6zuI69xWceGKEiKIl6JkeVB9FzEeObQVcyIkPRcIl11eh4dSjSfFNPJb+
-         22j2QikdJ30BVWh77FV6EKCNnr8v5NM0N4tHZGq7foJTOik6I8phb0oJMAHKS3ItNBDu
-         PXnW8JnieMjHjpU0Rszpb/pwyNBsTQKHRS27uwOWwU8KnkYLW/PRjoVTFvYKpdpByFOO
-         /Ez3EVHhH/96FXig6SxZ9tAowHpUEwc8S8pRQZrdSkvxVUnqhNie7tz3DL2mNVWE5GGy
-         YSrKZz42hngxMD8GZngpzcmGOSfecUyW8/H2dT645Udaw5ROnU/BBdXtf96WoytePu7S
-         2V7w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=g5V5j8DWby/8xr1tG0O71qMLwIMbKtLkCRL8/HbV/wA=;
-        b=sxwGwvkDgZPY0LZXPbLmr++8By8h//oRCh8BeejDntEmqW+kBLj1LzpW4OyNrlzepJ
-         irVvpPii45SlcWkhFFjeQ1LbzO0gjkRWQ4Bs8UK7nldVKHXR6Z82rFKStpI2Az1EroG0
-         oTKgYpFbIRSoug9PcR4H44To9QNn4lyYhXKZmDPJgo0EuvFsWfcp+Xee8THPUJzGLU8r
-         yPYIiJU+6xBpmxm8Qm4Mfli6KE0wSUtZrghOaFsFw3tKnBc9J0m34Glfmgls/0zAvpvE
-         9hp8jUY8o7OhTyLx78+8/QGFLSGum7VPzdwVm+Q0itvz9nCvECoP19FsI3xc9V+ifdzR
-         7I0A==
-X-Gm-Message-State: AOAM533sYYamOnV27DOvPI62fuOhjkz/hWspNNnhLONgfgdboITP6P4p
-        ma0EbhtNKUz45cMTw0xWO7zWy4WA/NVGPkf/
-X-Google-Smtp-Source: ABdhPJyxQGZCTfnzaD+fn7tUZTdd/O+ty2sKoJAaOYPfOm4DfP54hYA7bbqZZtVUOqUcvmXpu47FkA==
-X-Received: by 2002:a63:4b4c:: with SMTP id k12mr16328770pgl.172.1630376051256;
-        Mon, 30 Aug 2021 19:14:11 -0700 (PDT)
-Received: from localhost.localdomain ([162.14.21.36])
-        by smtp.gmail.com with ESMTPSA id l19sm729876pjq.10.2021.08.30.19.14.09
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 30 Aug 2021 19:14:10 -0700 (PDT)
-From:   tcs.kernel@gmail.com
-X-Google-Original-From: tcs_kernel@tencent.com
-To:     pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, jarkko@kernel.org
-Cc:     Haimin Zhang <tcs_kernel@tencent.com>
-Subject: [PATCH] KVM: x86: Add a return code and check kvm_page_track_init
-Date:   Tue, 31 Aug 2021 10:14:00 +0800
-Message-Id: <1630376040-20567-1-git-send-email-tcs_kernel@tencent.com>
-X-Mailer: git-send-email 1.8.3.1
+        id S231944AbhHaDIf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Aug 2021 23:08:35 -0400
+Received: from mail-mw2nam08on2064.outbound.protection.outlook.com ([40.107.101.64]:24352
+        "EHLO NAM04-MW2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S231776AbhHaDI2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 Aug 2021 23:08:28 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=G1SjzE4Zrs8muX78i8PXxIO1VFXoLg/XE58HYibrEyjJVJHjBeup8Ku22jU3RZ2+nSIH1DEqVoqtppBY7mjs5/6SzqMdR5C3CM7gSkNX7hfK2UF25e0ty7jIw1bIl7YdA/pxypZndIsK2mqYr4301jxaDrvbfDrWg6OC76S5OX5DHKNdFh/zDjls3Y7uzfl67F/oUkX8y9hi6+MQDchlbLukkRgsHGt3Oelcca3xd0S/coqC6Zs+82WnaVSXeO5/LE+dOPpvjO6YNHvtXxUOow/sNx8AS3mzoXUf1nHWTak1gBeMEHcir8G4bKtupX+JxD6g2sDqWAP0aODiOidpfQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=MmpWG5lU3Z/z1jgRSunAGrsVONnzzFHu56V3lh7ZSlE=;
+ b=fgvCABcRg84/7qsz0USt1blgXUopA2U2wpbtzpJo2iTV65x/V6TLIMnvyQfYWFmaFGmpNZghvST12190pSj61yrK28PUziY91U40HHiIjarbcv7OPBKz+0I9JZpx1HKVzW/v5K6s4ZT29VbwIm0nektX95jGdHqouP8X9qCBTFwc9A2hMCRV6WVixsuE41Rvwonncc1FbDgKpmPu0AfSOSqEQvwqDYPykq9Cai5mGKOl7T5hc+Z1SzezsGAVtoNw73mF9ml7vYKJ1ldJWa5dBrVpatZX/QMSBw/AO6Yb2oIflCQApnIYDQm8H9ShFHDox9dqWNQ3Jc8jBn+MShZcbQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.112.32) smtp.rcpttodomain=huawei.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=quarantine sp=none pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=MmpWG5lU3Z/z1jgRSunAGrsVONnzzFHu56V3lh7ZSlE=;
+ b=Hys5A8YNK8+emWSDDXiOsgnWZsF6wu2/I3kdCdV+YyI5mETE8oJ4sWhRh8DQguBGKZj2Uy17zNymStsw8dwI7YubTZQbrxgRexsdeZ0uTCBP75nColYxR5QeffIG468gdOakRCzBS5rsicjApAnXE7I+c2Uc3x3JZox+p3EnY2L3xvVecPyJ8igZACIOoydMVhQeYnshAazUeKkJxBSmOzDTA2l8Lv69R4g83erCmEoDj7RYDveQHdQPaaKFVC/mElZIQJXWv6OTlQ9grsZ8IWyPKTRWZrCY3Di1K+YtNdCMj0YbFLJHtgxh5bRuGL+zy8X0re/T0JXmeAXDaP9JQw==
+Received: from BN6PR16CA0033.namprd16.prod.outlook.com (2603:10b6:405:14::19)
+ by BL0PR12MB5537.namprd12.prod.outlook.com (2603:10b6:208:1cc::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4457.20; Tue, 31 Aug
+ 2021 03:07:31 +0000
+Received: from BN8NAM11FT026.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:405:14:cafe::14) by BN6PR16CA0033.outlook.office365.com
+ (2603:10b6:405:14::19) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4457.19 via Frontend
+ Transport; Tue, 31 Aug 2021 03:07:31 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.32)
+ smtp.mailfrom=nvidia.com; huawei.com; dkim=none (message not signed)
+ header.d=none;huawei.com; dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.112.32 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.112.32; helo=mail.nvidia.com;
+Received: from mail.nvidia.com (216.228.112.32) by
+ BN8NAM11FT026.mail.protection.outlook.com (10.13.177.51) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.4457.17 via Frontend Transport; Tue, 31 Aug 2021 03:07:30 +0000
+Received: from HQMAIL101.nvidia.com (172.20.187.10) by HQMAIL109.nvidia.com
+ (172.20.187.15) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Mon, 30 Aug
+ 2021 20:07:29 -0700
+Received: from Asurada-Nvidia.nvidia.com (172.20.187.5) by mail.nvidia.com
+ (172.20.187.10) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
+ Transport; Tue, 31 Aug 2021 03:07:29 +0000
+From:   Nicolin Chen <nicolinc@nvidia.com>
+To:     <will@kernel.org>, <robin.murphy@arm.com>, <joro@8bytes.org>,
+        <alex.williamson@redhat.com>, <cohuck@redhat.com>, <corbet@lwn.net>
+CC:     <nicoleotsuka@gmail.com>, <vdumpa@nvidia.com>,
+        <thierry.reding@gmail.com>, <linux-tegra@vger.kernel.org>,
+        <nwatterson@nvidia.com>, <Jonathan.Cameron@huawei.com>,
+        <jean-philippe@linaro.org>, <song.bao.hua@hisilicon.com>,
+        <eric.auger@redhat.com>, <thunder.leizhen@huawei.com>,
+        <yuzenghui@huawei.com>, <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <iommu@lists.linux-foundation.org>, <kvm@vger.kernel.org>,
+        <linux-doc@vger.kernel.org>
+Subject: [RFC][PATCH v2 00/13] iommu/arm-smmu-v3: Add NVIDIA implementation
+Date:   Mon, 30 Aug 2021 19:59:10 -0700
+Message-ID: <20210831025923.15812-1-nicolinc@nvidia.com>
+X-Mailer: git-send-email 2.17.1
+MIME-Version: 1.0
+Content-Type: text/plain
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 8c9a6db2-7cb6-499c-410a-08d96c2c78a2
+X-MS-TrafficTypeDiagnostic: BL0PR12MB5537:
+X-Microsoft-Antispam-PRVS: <BL0PR12MB5537144866A2857CD282CCE5ABCC9@BL0PR12MB5537.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: uF4cJC4HyIDZ9di4TBzk+OTY5iBsxQaY6OnepMZ8TQ2aA5oeyAWDn1VeFV2nXkvpgnncvhSX2m2yF7QwIApMc6RCblYAaShEeDTlZ4jTnKsmVEKZPiQufgBt0tnW0gR3j1TDVnGotkn72VAv33T9AGw0blTFdh0gt0VtFutI7+rBdLUlCRIgVFXYVeur793f8S7f1MRf7AxBCqeDz9gQwKU9uA2RIT1avX1UWUd6sp5aJR3iO2o158vmm+mgTuumaXR7EAJNJqHmWQCy+sBTpT4KCbLNRTGEsD9vqqhneiBE5wUamzHtbHh6u8OWbS6T+UHdn9B6QqCPl79yr0zo+F+9ypHeOLrfCjF/EVk/RpKThl5zGWXXhvTzZFwG+HwcUGqu9g2qnUVerCO8BORNqFEqHkLFc2wiiZ0yDEJKZ66DH3JNWqaraKDWSRRTJq2KJ9H+GYmk8odRO1nHCZfrLBrDh8R5FQXbd3pZ2J5F94P3VpRDP5Mnj3sH0A5Ws7ooH3YcvkE+NOVi5ODQogY8tmrfX7w07GDpoeL0HtLXH9S1eeAMREOiL5FUz10C+nWKEsr9ucEZi1hxhrQgNLUVFXCQMiaBwQ6jd2uCaUN6T3RIkUk/rsUyIyuKlnV0qiNsbBT1U7NAfI0hm7PyG3eulG/R0RNknetRoRIcOKL+ci+l8UBhVI3/5bGtWywKMrGElSus8K3yZLdc6SVB2uwx+iugQwj0s2q+Hls8a+JpwxytdSfctvacd8ETWi0dyDoGC3MkrbyQAkPFWDP3FOH7reypBvA8gHVp0fx0sZTEpQIa8nl4Khu/DNFLJp7KLWZF
+X-Forefront-Antispam-Report: CIP:216.228.112.32;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid01.nvidia.com;CAT:NONE;SFS:(4636009)(36840700001)(46966006)(110136005)(966005)(36860700001)(508600001)(26005)(82310400003)(83380400001)(4326008)(70206006)(356005)(8676002)(5660300002)(6666004)(2616005)(86362001)(54906003)(316002)(186003)(1076003)(36756003)(336012)(70586007)(7636003)(2906002)(7416002)(426003)(8936002)(47076005)(7696005)(2101003);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Aug 2021 03:07:30.6257
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8c9a6db2-7cb6-499c-410a-08d96c2c78a2
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.32];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT026.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR12MB5537
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Haimin Zhang <tcs_kernel@tencent.com>
+The SMMUv3 devices implemented in the Grace SoC support NVIDIA's custom
+CMDQ-Virtualization (CMDQV) hardware. Like the new ECMDQ feature first
+introduced in the ARM SMMUv3.3 specification, CMDQV adds multiple VCMDQ
+interfaces to supplement the single architected SMMU_CMDQ in an effort
+to reduce contention.
 
-We found a null pointer deref by our modified syzkaller.
- KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
- CPU: 1 PID: 13993 Comm: syz-executor.0 Kdump: loaded Tainted: 
- Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), 
- BIOS rel-1.12.0-59-gc9ba5276e321-prebuilt.qemu.org 04/01/2014
- RIP: 0010:rcu_segcblist_enqueue+0xf5/0x1d0 
- RSP: 0018:ffffc90001e1fc10 EFLAGS: 00010046
- RAX: dffffc0000000000 RBX: ffff888135c00080 RCX: ffffffff815ba8a1
- RDX: 0000000000000000 RSI: ffffc90001e1fd00 RDI: ffff888135c00080
- RBP: ffff888135c000a0 R08: 0000000000000004 R09: fffff520003c3f75
- R10: 0000000000000003 R11: fffff520003c3f75 R12: 0000000000000000
- R13: ffff888135c00080 R14: ffff888135c00040 R15: 0000000000000000
- FS:  00007fecc99f1700(0000) GS:ffff888135c00000(0000) knlGS:0000000000
- CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
- CR2: 0000001b2f225000 CR3: 0000000093d08000 CR4: 0000000000750ee0
- DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
- DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
- PKRU: 55555554
- Call Trace:
- srcu_gp_start_if_needed+0x158/0xc60 build/../kernel/rcu/srcutree.c:823
- __synchronize_srcu+0x1dc/0x250 build/../kernel/rcu/srcutree.c:929
- kvm_mmu_uninit_vm+0x18/0x30 build/../arch/x86/kvm/mmu/mmu.c:5585
- kvm_arch_destroy_vm+0x43f/0x5c0 build/../arch/x86/kvm/x86.c:11277
- kvm_create_vm build/../arch/x86/kvm/../../../virt/kvm/kvm_main.c:1060 
- kvm_dev_ioctl_create_vm build/../arch/x86/kvm/../../../virt/kvm/kvm_main
- kvm_dev_ioctl+0xdfb/0x1860 build/../arch/x86/kvm/../../../virt/kvm/kvm_main
- vfs_ioctl build/../fs/ioctl.c:51 [inline]
- __do_sys_ioctl build/../fs/ioctl.c:1069 [inline]
- __se_sys_ioctl build/../fs/ioctl.c:1055 [inline]
- __x64_sys_ioctl+0x183/0x210 build/../fs/ioctl.c:1055
- do_syscall_x64 build/../arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x34/0xb0 build/../arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-This is because when init_srcu_struct() calls alloc_percpu(struct
-srcu_data) failed, kvm_page_track_init() didn't check init_srcu_struct
-return code. 
+This series of patches add CMDQV support with its preparational changes:
 
-Signed-off-by: Haimin Zhang <tcs_kernel@tencent.com>
-Reported-by: TCS Robot <tcs_robot@tencent.com>
----
- arch/x86/include/asm/kvm_page_track.h | 2 +-
- arch/x86/kvm/mmu/page_track.c         | 8 ++++++--
- arch/x86/kvm/x86.c                    | 7 +++++--
- 3 files changed, 12 insertions(+), 5 deletions(-)
+* PATCH-1 to PATCH-8 are related to shared VMID feature: they are used
+  first to improve TLB utilization, second to bind a shared VMID with a
+  VCMDQ interface for hardware configuring requirement.
 
-diff --git a/arch/x86/include/asm/kvm_page_track.h b/arch/x86/include/asm/kvm_page_track.h
-index 87bd6025d91d..6a5f3acf2b33 100644
---- a/arch/x86/include/asm/kvm_page_track.h
-+++ b/arch/x86/include/asm/kvm_page_track.h
-@@ -46,7 +46,7 @@ struct kvm_page_track_notifier_node {
- 			    struct kvm_page_track_notifier_node *node);
- };
- 
--void kvm_page_track_init(struct kvm *kvm);
-+int kvm_page_track_init(struct kvm *kvm);
- void kvm_page_track_cleanup(struct kvm *kvm);
- 
- void kvm_page_track_free_memslot(struct kvm_memory_slot *slot);
-diff --git a/arch/x86/kvm/mmu/page_track.c b/arch/x86/kvm/mmu/page_track.c
-index 91a9f7e0fd91..44a67a50f6d2 100644
---- a/arch/x86/kvm/mmu/page_track.c
-+++ b/arch/x86/kvm/mmu/page_track.c
-@@ -163,13 +163,17 @@ void kvm_page_track_cleanup(struct kvm *kvm)
- 	cleanup_srcu_struct(&head->track_srcu);
- }
- 
--void kvm_page_track_init(struct kvm *kvm)
-+int kvm_page_track_init(struct kvm *kvm)
- {
-+	int r = -ENOMEM;
- 	struct kvm_page_track_notifier_head *head;
- 
- 	head = &kvm->arch.track_notifier_head;
--	init_srcu_struct(&head->track_srcu);
-+	r = init_srcu_struct(&head->track_srcu);
-+	if (r)
-+		return r;
- 	INIT_HLIST_HEAD(&head->track_notifier_list);
-+	return r;
- }
- 
- /*
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index e5d5c5ed7dd4..5da76f989207 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -11086,8 +11086,9 @@ void kvm_arch_free_vm(struct kvm *kvm)
- 
- int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
- {
-+	int r = -EINVAL;
- 	if (type)
--		return -EINVAL;
-+		return r;
- 
- 	INIT_HLIST_HEAD(&kvm->arch.mask_notifier_list);
- 	INIT_LIST_HEAD(&kvm->arch.active_mmu_pages);
-@@ -11121,7 +11122,9 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
- 
- 	kvm_apicv_init(kvm);
- 	kvm_hv_init_vm(kvm);
--	kvm_page_track_init(kvm);
-+	r = kvm_page_track_init(kvm);
-+	if (r)
-+		return r;
- 	kvm_mmu_init_vm(kvm);
- 
- 	return static_call(kvm_x86_vm_init)(kvm);
+* PATCH-9 and PATCH-10 are to accommodate the NVIDIA implementation with
+  the existing arm-smmu-v3 driver.
+
+* PATCH-11 borrows the "implementation infrastructure" from the arm-smmu
+  driver so later change can build upon it.
+
+* PATCH-12 adds an initial NVIDIA implementation related to host feature,
+  and also adds implementation specific ->device_reset() and ->get_cmdq()
+  callback functions.
+
+* PATCH-13 adds virtualization features using VFIO mdev interface, which
+  allows user space hypervisor to map and get access to one of the VCMDQ
+  interfaces of CMDQV module.
+
+( Thinking that reviewers can get a better view of this implementation,
+  I am attaching QEMU changes here for reference purpose:
+      https://github.com/nicolinc/qemu/commits/dev/cmdqv_v6.0.0-rc2
+  The branch has all preparational changes, while I'm still integrating
+  device model and ARM-VIRT changes, and will push them these two days,
+  although they might not be in a good shape of being sent to review yet )
+
+Above all, I marked RFC for this series, as I feel that we may come up
+some better solution. So please kindly share your reviews and insights.
+
+Thank you!
+
+Changelog
+v1->v2:
+ * Added mdev interface support for hypervisor and VMs.
+ * Added preparational changes for mdev interface implementation.
+ * PATCH-12 Changed ->issue_cmdlist() to ->get_cmdq() for a better
+   integration with recently merged ECMDQ-related changes.
+
+Nate Watterson (3):
+  iommu/arm-smmu-v3: Add implementation infrastructure
+  iommu/arm-smmu-v3: Add support for NVIDIA CMDQ-Virtualization hw
+  iommu/nvidia-smmu-v3: Add mdev interface support
+
+Nicolin Chen (10):
+  iommu: Add set_nesting_vmid/get_nesting_vmid functions
+  vfio: add VFIO_IOMMU_GET_VMID and VFIO_IOMMU_SET_VMID
+  vfio: Document VMID control for IOMMU Virtualization
+  vfio: add set_vmid and get_vmid for vfio_iommu_type1
+  vfio/type1: Implement set_vmid and get_vmid
+  vfio/type1: Set/get VMID to/from iommu driver
+  iommu/arm-smmu-v3: Add shared VMID support for NESTING
+  iommu/arm-smmu-v3: Add VMID alloc/free helpers
+  iommu/arm-smmu-v3: Pass dev pointer to arm_smmu_detach_dev
+  iommu/arm-smmu-v3: Pass cmdq pointer in arm_smmu_cmdq_issue_cmdlist()
+
+ Documentation/driver-api/vfio.rst             |   34 +
+ MAINTAINERS                                   |    2 +
+ drivers/iommu/arm/arm-smmu-v3/Makefile        |    2 +-
+ .../iommu/arm/arm-smmu-v3/arm-smmu-v3-impl.c  |   15 +
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c   |  121 +-
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h   |   18 +
+ .../iommu/arm/arm-smmu-v3/nvidia-smmu-v3.c    | 1249 +++++++++++++++++
+ drivers/iommu/iommu.c                         |   20 +
+ drivers/vfio/vfio.c                           |   25 +
+ drivers/vfio/vfio_iommu_type1.c               |   37 +
+ include/linux/iommu.h                         |    5 +
+ include/linux/vfio.h                          |    2 +
+ include/uapi/linux/vfio.h                     |   26 +
+ 13 files changed, 1537 insertions(+), 19 deletions(-)
+ create mode 100644 drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-impl.c
+ create mode 100644 drivers/iommu/arm/arm-smmu-v3/nvidia-smmu-v3.c
+
 -- 
-2.27.0
+2.17.1
 
