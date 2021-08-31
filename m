@@ -2,120 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0891F3FCE3B
-	for <lists+kvm@lfdr.de>; Tue, 31 Aug 2021 22:15:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A65333FCE88
+	for <lists+kvm@lfdr.de>; Tue, 31 Aug 2021 22:23:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240809AbhHaUQl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Aug 2021 16:16:41 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:37544 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230085AbhHaUQk (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 31 Aug 2021 16:16:40 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630440944;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=g+3bK63F6vZV9gF02enJmq1IwAzxVldbfTOh+NENPz4=;
-        b=XAIS078aFLvwDF9G6Pq+DoRdW806EK+1YyqapSPR4RbRQ4m5M4eHx8Doq6/Dpvjp96kZZd
-        rwbCWoxbypHEe3ztVIAe9A1k+F0rW+bEHbr3ytQuLl6MBvcvCAIeoZ9I2QH0Tapog+B8lI
-        1Xr3PYyIkvZ8WczI8fEMdqpwp1DJrD4=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-165-daabn36qM3uFebKbRKsS1g-1; Tue, 31 Aug 2021 16:15:43 -0400
-X-MC-Unique: daabn36qM3uFebKbRKsS1g-1
-Received: by mail-wm1-f69.google.com with SMTP id 5-20020a1c00050000b02902e67111d9f0so94075wma.4
-        for <kvm@vger.kernel.org>; Tue, 31 Aug 2021 13:15:43 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:organization
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=g+3bK63F6vZV9gF02enJmq1IwAzxVldbfTOh+NENPz4=;
-        b=j9Ee6tjkpHs5dCbi4A+lkmzw2nuPv5XnCikk4nD9cdoD0zPsoM7Mhf+vlBnFUC+Yc6
-         G7xmhgFbh188jDJehKudKWvr8PqPemA7vBFnSDZq8G7F6QXkOg3J7Jk9ivwOWsYYJJOZ
-         yJvvCrD0viWk0TAEMXqvu4jVEpbTw4eUGZ2Uj/OPjEdE6S1F4WpsVbJtQ1LJje1Ol76L
-         Ja4ZsMcqp+MBncnTfyOevZOTvFpwjhQr/sdftMLQLDalotZanmHoet9OUUaOXZGoMi8q
-         Deth0KVimJfNW8hKY+jBp3KfTx+PCsOWjgWSXUYL9gnykACs2BOap2wkfS71WtbeT4gh
-         bV6g==
-X-Gm-Message-State: AOAM533cchaPXcGBgBhMYByz24nl3/qkX+MKrasPyLnnFQlC43LTL4/V
-        U68noDB8tttz6saY6yBaRiid2GGtfqtk+PM9//83qk5yk7Anq6zFIhHraiBWulJQ3FG+P0s3nia
-        x+BB0pjYiOBuy
-X-Received: by 2002:a1c:7c0e:: with SMTP id x14mr6178312wmc.30.1630440942384;
-        Tue, 31 Aug 2021 13:15:42 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyB2RQAmO5BS/DvOxJgqehQUn6XNwZTVP2aL40tssuajSfi8Q5/tHrZmF44xOFZj1btCjBABg==
-X-Received: by 2002:a1c:7c0e:: with SMTP id x14mr6178303wmc.30.1630440942231;
-        Tue, 31 Aug 2021 13:15:42 -0700 (PDT)
-Received: from [192.168.3.132] (p4ff23bf5.dip0.t-ipconnect.de. [79.242.59.245])
-        by smtp.gmail.com with ESMTPSA id p11sm3438168wma.16.2021.08.31.13.15.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 31 Aug 2021 13:15:41 -0700 (PDT)
-Subject: Re: [RFC] KVM: mm: fd-based approach for supporting KVM guest private
- memory
-To:     Andi Kleen <ak@linux.intel.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
+        id S241066AbhHaUYK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Aug 2021 16:24:10 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:18750 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S241090AbhHaUYI (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 31 Aug 2021 16:24:08 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 17VK907i151394;
+        Tue, 31 Aug 2021 16:22:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=ig7sVt9wfp6quoeY/muCeGzaKqcqMWXcgd0PrsiZb6w=;
+ b=g0TARFiOrBmoQWj4hE7viys/Fyum/TPyqHzRu66rKnZJu7I8Jeya76WRiO9ceL8Fa2HT
+ Zkqo0jArYFZP0KN9ny9S1H2FOsedDQaKFjAVDr6jhqAK2YTimtlxmB4F5macr9A90L30
+ /7LKu/n2zRoYye7a6jgx4ZywlaPvfn9eRoDwL/rrjYYhXpSqbYn79pF4jLaSVDYdtWnw
+ 12tiQpDtPGguh5EjC3f70UY7iBwskPC4wvhocjFptsoMiqy5IMKRn873zrN9Sy9RdpdE
+ 0xWq3FXlMh2UY9/PFlDb2Ogd17pOHTq7fhjNFTFWmzXkRyK9z1nM9wW4WEl8u4bxU3pz Fw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3astk5s1xm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 31 Aug 2021 16:22:28 -0400
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 17VK9XUU154067;
+        Tue, 31 Aug 2021 16:22:27 -0400
+Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3astk5s1xa-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 31 Aug 2021 16:22:27 -0400
+Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
+        by ppma02dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 17VKCfZi016728;
+        Tue, 31 Aug 2021 20:22:25 GMT
+Received: from b03cxnp08025.gho.boulder.ibm.com (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
+        by ppma02dal.us.ibm.com with ESMTP id 3aqcsdd8e7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 31 Aug 2021 20:22:25 +0000
+Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
+        by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 17VKMOXt51904814
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 31 Aug 2021 20:22:24 GMT
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4198E78063;
+        Tue, 31 Aug 2021 20:22:24 +0000 (GMT)
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BE01A780D8;
+        Tue, 31 Aug 2021 20:22:15 +0000 (GMT)
+Received: from [9.65.248.250] (unknown [9.65.248.250])
+        by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Tue, 31 Aug 2021 20:22:15 +0000 (GMT)
+Subject: Re: [PATCH Part1 v5 38/38] virt: sevguest: Add support to get
+ extended report
+To:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Borislav Petkov <bp@alien8.de>,
         Andy Lutomirski <luto@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Joerg Roedel <jroedel@suse.de>,
-        David Rientjes <rientjes@google.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
         Peter Zijlstra <peterz@infradead.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Varad Gautam <varad.gautam@suse.com>,
-        Dario Faggioli <dfaggioli@suse.com>, x86@kernel.org,
-        linux-mm@kvack.org, linux-coco@lists.linux.dev,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
         "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Kuppuswamy Sathyanarayanan 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        Dave Hansen <dave.hansen@intel.com>
-References: <20210824005248.200037-1-seanjc@google.com>
- <307d385a-a263-276f-28eb-4bc8dd287e32@redhat.com>
- <20210827023150.jotwvom7mlsawjh4@linux.intel.com>
- <243bc6a3-b43b-cd18-9cbb-1f42a5de802f@redhat.com>
- <765e9bbe-2df5-3dcc-9329-347770dc091d@linux.intel.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-Message-ID: <4677f310-5987-0c13-5caf-fd3b625b4344@redhat.com>
-Date:   Tue, 31 Aug 2021 22:15:40 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
+        Dov Murik <dovmurik@linux.ibm.com>
+References: <20210820151933.22401-1-brijesh.singh@amd.com>
+ <20210820151933.22401-39-brijesh.singh@amd.com>
+From:   Dov Murik <dovmurik@linux.ibm.com>
+Message-ID: <bd5b2d47-2f66-87d9-ce1e-dfe717741d22@linux.ibm.com>
+Date:   Tue, 31 Aug 2021 23:22:04 +0300
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-In-Reply-To: <765e9bbe-2df5-3dcc-9329-347770dc091d@linux.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20210820151933.22401-39-brijesh.singh@amd.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: ULfOSV9PEPRbITNqCq9zYascDlVLWA6b
+X-Proofpoint-ORIG-GUID: 11cFRGpYi2ZoT8RJDYNnY7ITk344_uEz
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-08-31_09:2021-08-31,2021-08-31 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 malwarescore=0
+ lowpriorityscore=0 spamscore=0 suspectscore=0 mlxscore=0 mlxlogscore=999
+ phishscore=0 clxscore=1015 impostorscore=0 priorityscore=1501 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2107140000
+ definitions=main-2108310109
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 31.08.21 22:01, Andi Kleen wrote:
+Hi Brijesh,
+
+On 20/08/2021 18:19, Brijesh Singh wrote:
+> Version 2 of GHCB specification defines NAE to get the extended guest
+> request. It is similar to the SNP_GET_REPORT ioctl. The main difference
+> is related to the additional data that be returned. The additional
+> data returned is a certificate blob that can be used by the SNP guest
+> user. 
+
+It seems like the SNP_GET_EXT_REPORT ioctl does everything that the
+SNP_GET_REPORT ioctl does, and more.  Why expose SNP_GET_REPORT to
+userspace at all?
+
+
+-Dov
+
+
+> The certificate blob layout is defined in the GHCB specification.
+> The driver simply treats the blob as a opaque data and copies it to
+> userspace.
 > 
->>> Thanks a lot for this summary. A question about the requirement: do
->>> we or
->>> do we not have plan to support assigned device to the protected VM?
->>
->> Good question, I assume that is stuff for the far far future.
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+>  Documentation/virt/coco/sevguest.rst  |  22 +++++
+>  drivers/virt/coco/sevguest/sevguest.c | 126 ++++++++++++++++++++++++++
+>  include/uapi/linux/sev-guest.h        |  13 +++
+>  3 files changed, 161 insertions(+)
 > 
-> It is in principle possible with the current TDX, but not secure. But
-> someone might decide to do it. So it would be good to have basic support
-> at least.
 
-Can you elaborate the "not secure" part? Do you mean, making the device 
-only access "shared" memory, not secure/encrypted/whatsoever?
-
--- 
-Thanks,
-
-David / dhildenb
-
+[...]
