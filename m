@@ -2,111 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2F8543FC2EE
-	for <lists+kvm@lfdr.de>; Tue, 31 Aug 2021 08:55:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DD4A33FC342
+	for <lists+kvm@lfdr.de>; Tue, 31 Aug 2021 09:22:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237397AbhHaGoD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Aug 2021 02:44:03 -0400
-Received: from mail.kernel.org ([198.145.29.99]:49158 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235644AbhHaGoC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 Aug 2021 02:44:02 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 6A32160724;
-        Tue, 31 Aug 2021 06:43:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1630392187;
-        bh=ADxNS/MsmWdCPv3pB98riSkxnOCLkLaCV4LN7vxCy94=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=pd5wisrNSONH8C8Oh/yXbcmZd8xjfgng7etw1X3Crk/emROqd23gHGm7SLW4hYYnP
-         NfT/+/E2XbLiFiXDCxK39sSg+0R886W/J6LuiGjIjgPdNvvmAV3lGQR+HsMScPriLY
-         UvQUJ2KAc/GkyrKsAWFdO+PKKpVRNye1swff3XUo=
-Date:   Tue, 31 Aug 2021 08:43:06 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     "Paraschiv, Andra-Irina" <andraprs@amazon.com>
-Cc:     George-Aurelian Popescu <popegeo@amazon.com>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Alexandru Ciobotaru <alcioa@amazon.com>,
-        Kamal Mostafa <kamal@canonical.com>,
-        Alexandru Vasile <lexnv@amazon.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        kvm <kvm@vger.kernel.org>,
-        ne-devel-upstream <ne-devel-upstream@amazon.com>
-Subject: Re: [PATCH v3 1/7] nitro_enclaves: Enable Arm64 support
-Message-ID: <YS3Peu/ax4gAVb6P@kroah.com>
-References: <20210827154930.40608-1-andraprs@amazon.com>
- <20210827154930.40608-2-andraprs@amazon.com>
- <20210830155907.GG10224@u90cef543d0ab5a.ant.amazon.com>
- <f57fd0eb-271c-b8d7-ee9b-276c0f0c62ba@amazon.com>
+        id S239398AbhHaHQK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Aug 2021 03:16:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51532 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239265AbhHaHQJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 Aug 2021 03:16:09 -0400
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06E25C061575;
+        Tue, 31 Aug 2021 00:15:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=YY9pvWpNs1TzAImK8Qk46A5Z5evWyYN+iUQ9FkXNB2c=; b=gZVCxgwskqclakQkAXx+Eg+7Bl
+        l/BVBBomSXREZJyKAHP5/AUuxejcIaW95mP3JfuN25GssEJNYKjdO6Ud4u8HfgQ0cNSUk/PRERtsY
+        hP/i6wVee6DIbIJPKXcY0nLdh9NNszNSK94qfHwz8VJMicVkUQmjB+Rk7Eb2PJzMc7MiqUXta/1O5
+        xxYHMNCpBTCzXzexwKysuA4wAvsZsTrmkHLyyHK6XNKt047bIec6ihWXGJ8XZw1f0ZFCYrNaKwvU/
+        eQVYRRaP1jAnA7umHS+h6y3brAhQ7KmMT4jieqDMs6dtybgjFdVWRKTTVbYb7La4nzKcgzw5H5Sbo
+        d79TYnZw==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mKxyJ-00EdO7-8r; Tue, 31 Aug 2021 07:14:15 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 6DAD23001F6;
+        Tue, 31 Aug 2021 09:14:13 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 22AAB2CFB419C; Tue, 31 Aug 2021 09:14:13 +0200 (CEST)
+Date:   Tue, 31 Aug 2021 09:14:13 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Tianqiang Xu <skyele@sjtu.edu.cn>
+Cc:     x86@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, kvm@vger.kernel.org, hpa@zytor.com,
+        jarkko@kernel.org, dave.hansen@linux.intel.com,
+        linux-kernel@vger.kernel.org, linux-sgx@vger.kernel.org
+Subject: Re: [PATCH 2/4] Scheduler changes
+Message-ID: <YS3WxQe6bJLx6qpR@hirez.programming.kicks-ass.net>
+References: <20210831015919.13006-1-skyele@sjtu.edu.cn>
+ <20210831015919.13006-2-skyele@sjtu.edu.cn>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <f57fd0eb-271c-b8d7-ee9b-276c0f0c62ba@amazon.com>
+In-Reply-To: <20210831015919.13006-2-skyele@sjtu.edu.cn>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 30, 2021 at 09:30:04PM +0300, Paraschiv, Andra-Irina wrote:
+On Tue, Aug 31, 2021 at 09:59:17AM +0800, Tianqiang Xu wrote:
+> Authors: Tianqiang Xu, Dingji Li, Zeyu Mi
+> 	 Shanghai Jiao Tong University
 > 
-> 
-> On 30/08/2021 18:59, George-Aurelian Popescu wrote:
-> > On Fri, Aug 27, 2021 at 06:49:24PM +0300, Andra Paraschiv wrote:
-> > > Update the kernel config to enable the Nitro Enclaves kernel driver for
-> > > Arm64 support.
-> > > 
-> > > Signed-off-by: Andra Paraschiv <andraprs@amazon.com>
-> > > Acked-by: Stefano Garzarella <sgarzare@redhat.com>
-> > > ---
-> > > Changelog
-> > > 
-> > > v1 -> v2
-> > > 
-> > > * No changes.
-> > > 
-> > > v2 -> v3
-> > > 
-> > > * Move changelog after the "---" line.
-> > > ---
-> > >   drivers/virt/nitro_enclaves/Kconfig | 8 ++------
-> > >   1 file changed, 2 insertions(+), 6 deletions(-)
-> > > 
-> > > diff --git a/drivers/virt/nitro_enclaves/Kconfig b/drivers/virt/nitro_enclaves/Kconfig
-> > > index 8c9387a232df8..f53740b941c0f 100644
-> > > --- a/drivers/virt/nitro_enclaves/Kconfig
-> > > +++ b/drivers/virt/nitro_enclaves/Kconfig
-> > > @@ -1,17 +1,13 @@
-> > >   # SPDX-License-Identifier: GPL-2.0
-> > >   #
-> > > -# Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-> > > +# Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-> > >   # Amazon Nitro Enclaves (NE) support.
-> > >   # Nitro is a hypervisor that has been developed by Amazon.
-> > > -# TODO: Add dependency for ARM64 once NE is supported on Arm platforms. For now,
-> > > -# the NE kernel driver can be built for aarch64 arch.
-> > > -# depends on (ARM64 || X86) && HOTPLUG_CPU && PCI && SMP
-> > > -
-> > >   config NITRO_ENCLAVES
-> > >   	tristate "Nitro Enclaves Support"
-> > > -	depends on X86 && HOTPLUG_CPU && PCI && SMP
-> > > +	depends on (ARM64 || X86) && HOTPLUG_CPU && PCI && SMP
-> > >   	help
-> > >   	  This driver consists of support for enclave lifetime management
-> > >   	  for Nitro Enclaves (NE).
-> > > -- 
-> > > 2.20.1 (Apple Git-117)
-> > > 
-> > Reviewed-by: George-Aurelian Popescu <popegeo@amazon.com>
-> > 
-> 
-> Thanks, George, for review.
-> 
-> Greg, let me know if other updates are needed for the patch series.
-> Otherwise, please include the patches in the char-misc tree and we can
-> target the current merge window, for v5.15. Thank you.
+> Signed-off-by: Tianqiang Xu <skyele@sjtu.edu.cn>
 
-It's too late for 5.15-rc1, I will queue them up after 5.15-rc1 is out,
-thanks.
+Authors is not a valid tag, please see our Documentation on submitting
+patches.
 
-greg k-h
+> @@ -10504,3 +10515,9 @@ void call_trace_sched_update_nr_running(struct rq *rq, int count)
+>  {
+>          trace_sched_update_nr_running_tp(rq, count);
+>  }
+> +
+> +int get_cpu_nr_running(int cpu)
+> +{
+> +	return cpu_rq(cpu)->nr_running;
+> +}
+> +EXPORT_SYMBOL_GPL(get_cpu_nr_running);
+
+Yeah, not going to happen.
