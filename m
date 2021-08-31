@@ -2,196 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 84D653FCF5D
-	for <lists+kvm@lfdr.de>; Tue, 31 Aug 2021 23:54:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F15533FD08D
+	for <lists+kvm@lfdr.de>; Wed,  1 Sep 2021 03:03:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239421AbhHaVzp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Aug 2021 17:55:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56206 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237918AbhHaVzn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 Aug 2021 17:55:43 -0400
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C6EBC061760
-        for <kvm@vger.kernel.org>; Tue, 31 Aug 2021 14:54:48 -0700 (PDT)
-Received: by mail-pf1-x42b.google.com with SMTP id 2so426857pfo.8
-        for <kvm@vger.kernel.org>; Tue, 31 Aug 2021 14:54:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=LIxRXgEk8FNbTmaJMmt8rW9Sj/BRMxAhjO20Z8xJZ2Q=;
-        b=cvf+6KfK0r5oQ5VIfV+N1hqu/BL1A0P159QHFVFCzhP/Whc2l7X/x2W5ZKh/jNSZTl
-         odIUJSXKTEDs83be7mqQWNr6xG+hVGpg0r7KTqxGa2EXXh1kxPO5Oh065tyHvtI88Ivz
-         lm2JyKQTP0pnWtq1JhuD8rZSHvVcigBdEoH1ab6lajCt9UyOi60zfhmuPD5bBrTAjRsx
-         j5FeewIS19M3+EQT27Tokvc+CM8eSw67m13I+K8pFd/dlNlMo5A/kUtX/Prady1zJCkx
-         v5NfzZ9EO5pmmsdiPdAp+qqpAniR8n4L4QkEgbMXeg+GyntpZAwtiJmCiFSDpaw0ovRz
-         1Btg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=LIxRXgEk8FNbTmaJMmt8rW9Sj/BRMxAhjO20Z8xJZ2Q=;
-        b=kSnW9CLwyBBextvJvb//DqN5aRc89WrzuICORsxkjMyT8BfJebxZCAPx1BDxX++OWU
-         bc1KLiUyqkmbBDCuZo66Juk37bvYegXVIy2blgx5tsEJ//ENok3fCBX5gM3oLUrrkzTq
-         ucyYbAR7p2ZCx8sRD24bL/G3sRGzV659qG5IsNwR9lA61U0Y3cusWKrrO4xR9HCP75mt
-         RzlrONDOqnRXVWSyt4V72k0yAn5aoJuZXaxOYYsGmT6Gzoa8HZedGI5zf7TuhfqNXDbI
-         Doy6gWfJ9q3fWjgCrgX9s1Nt2+7E/34H8WA5rsh964lZlhHU/MWBTbJx3kPl2dkGzOEW
-         A+5A==
-X-Gm-Message-State: AOAM530TjQ6xm8yEmq5kEjNdIzWSLis+GD0U8AQtpn+S8FYjZ70eXOlh
-        TPzt7Xla51w/Y+Y8hfIc2h/bUA==
-X-Google-Smtp-Source: ABdhPJx3rLis08O1l9dSpQL+UFQG8hxZXFpWkLCsNEa5eWHW1V+ryVw+G1jS50fHj2Eq268+2LrI6g==
-X-Received: by 2002:a05:6a00:22d2:b0:3eb:b41:583 with SMTP id f18-20020a056a0022d200b003eb0b410583mr30779487pfj.73.1630446887341;
-        Tue, 31 Aug 2021 14:54:47 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id c68sm3154996pfc.150.2021.08.31.14.54.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 31 Aug 2021 14:54:46 -0700 (PDT)
-Date:   Tue, 31 Aug 2021 21:54:42 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     David Hildenbrand <david@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        id S241528AbhIABEj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Aug 2021 21:04:39 -0400
+Received: from mail-dm6nam11on2051.outbound.protection.outlook.com ([40.107.223.51]:56257
+        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S234036AbhIABEh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 Aug 2021 21:04:37 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ihmWJl9+BCCyGitoSdNxFxo+h9poNrdKKltuBgbgt4HJdRa7DNMB3CRxLwTN8yNk1Yr8ejcgLGPJ5T8Ve5IZpSSmFzzzsc6hsw/faCWrVuYFWAYwA2XhyADATTa6/RJRcK/d2xB7r4JJ6nTlz95O7s7NQ0maVPutOvJRyCQyTp2/Z++/YPWX9fu78/biu0lOfujlf3BIeFn8iUuAOpSO3NmFzTQvQk6YZOZ5DXvU6We4XYFTy62EURv4R+KQd6mAsZ/ee2U6URrSJqDUnsQYo97xPUnTLmG8TfyRsxfRr+SSObu/oYAB3SOzOuvZ0PGA5UOx+Xt28vdM80tgxbzj1g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=HiQOQ6+MQDPiblA4upx6r2xhJiLv53K8dFchklvnFHA=;
+ b=Jx1njChgYow5lvanSkAvVNAmVK3ipiE8ooYwuO9DbaMZ+NmPnXKlXNbePWTTItMDUVuxGxVvb0h/dnIZeq1Y81RSlZM966Xi1P1HiFVDhp+SeKWoT+uBM2XR4LeUZP8XQ0Mz1vuG8r1JkrW//iX+4NgZxSu42XR2D4/yGqQU5oMHTAcw3DniQ1KNUkN/Z1aUsE8TQHw1tpFt16p8FBJd/5K0elg83GlxBXrRLV8X+2evq+9QJtrY7LIfmHSisfsuUMPWcyI9H3oWGTSzxbOV8qp1Fy85K0csvZ7fFadfmScDF6g/nLbFeHldH8yokrS3T4WOZN6+JuH2NK5A03TXEQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=HiQOQ6+MQDPiblA4upx6r2xhJiLv53K8dFchklvnFHA=;
+ b=Uu7cWHhsSdXZCw0WnkyDgyOgMOuC1niejAEBRDorKeCc9+AJNqQx649EJnYxjRYswioyBRLh4TIQBThC9vgzyjvcTo/g9iEeNDHiaV28wsypC8O0ZyrHUKTlRFb0xS0a6KNtWnJR36QZ9fxpF1C7WdTjRJsbfsiRKJlUmAIIUW8=
+Authentication-Results: alien8.de; dkim=none (message not signed)
+ header.d=none;alien8.de; dmarc=none action=none header.from=amd.com;
+Received: from CH2PR12MB4133.namprd12.prod.outlook.com (2603:10b6:610:7a::13)
+ by CH2PR12MB4134.namprd12.prod.outlook.com (2603:10b6:610:a7::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4457.24; Wed, 1 Sep
+ 2021 01:03:39 +0000
+Received: from CH2PR12MB4133.namprd12.prod.outlook.com
+ ([fe80::f5af:373a:5a75:c353]) by CH2PR12MB4133.namprd12.prod.outlook.com
+ ([fe80::f5af:373a:5a75:c353%6]) with mapi id 15.20.4457.024; Wed, 1 Sep 2021
+ 01:03:39 +0000
+Date:   Tue, 31 Aug 2021 18:30:35 -0500
+From:   Michael Roth <michael.roth@amd.com>
+To:     Borislav Petkov <bp@alien8.de>
+Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Borislav Petkov <bp@alien8.de>,
         Andy Lutomirski <luto@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Joerg Roedel <jroedel@suse.de>,
-        Andi Kleen <ak@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
         Peter Zijlstra <peterz@infradead.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Varad Gautam <varad.gautam@suse.com>,
-        Dario Faggioli <dfaggioli@suse.com>, x86@kernel.org,
-        linux-mm@kvack.org, linux-coco@lists.linux.dev,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
         "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Kuppuswamy Sathyanarayanan 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>
-Subject: Re: [RFC] KVM: mm: fd-based approach for supporting KVM guest
- private memory
-Message-ID: <YS6lIg6kjNPI1EgF@google.com>
-References: <20210824005248.200037-1-seanjc@google.com>
- <307d385a-a263-276f-28eb-4bc8dd287e32@redhat.com>
- <YSlkzLblHfiiPyVM@google.com>
- <61ea53ce-2ba7-70cc-950d-ca128bcb29c5@redhat.com>
-MIME-Version: 1.0
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH Part1 v5 23/38] x86/head/64: set up a startup %gs for
+ stack protector
+Message-ID: <20210831233035.fwvlc5au4ip5odsp@amd.com>
+References: <20210820151933.22401-1-brijesh.singh@amd.com>
+ <20210820151933.22401-24-brijesh.singh@amd.com>
+ <YSZTubkROktMMSba@zn.tnic>
+ <20210825151835.wzgabnl7rbrge3a2@amd.com>
+ <YSZv632kJKPzpayk@zn.tnic>
+ <20210827133831.xfdw7z55q6ixpgjg@amd.com>
+ <YS3iCqSY2vEmmkQ+@zn.tnic>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <61ea53ce-2ba7-70cc-950d-ca128bcb29c5@redhat.com>
+In-Reply-To: <YS3iCqSY2vEmmkQ+@zn.tnic>
+X-ClientProxiedBy: SA9PR13CA0051.namprd13.prod.outlook.com
+ (2603:10b6:806:22::26) To CH2PR12MB4133.namprd12.prod.outlook.com
+ (2603:10b6:610:7a::13)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from localhost (165.204.77.1) by SA9PR13CA0051.namprd13.prod.outlook.com (2603:10b6:806:22::26) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4478.14 via Frontend Transport; Wed, 1 Sep 2021 01:03:38 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 11bcdc02-28a9-4cbb-474f-08d96ce4556c
+X-MS-TrafficTypeDiagnostic: CH2PR12MB4134:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <CH2PR12MB41343AD7DD22DCE5C7B05D2B95CD9@CH2PR12MB4134.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:3826;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Nt3NbTeVN6pTn9X45Jzqw9fCIxQCPrS+z/aQHPYjEunzzfhQCwLjh/yO4OKAZMDCP2M1l8ssqI2HnULmgSTFaj7KTBNcPOUFX2q7O0hbkf0EJ9ELKxdtz3bO5Xmb4SDPV0FzaA90um4ZBy42dXANdpMVFLjwu5O9/FeB11YNuG6JcmWQerxHgm0dIUb26MR9kzr2CCLxtCbWzg8WdUYSf2BM7WpwviJmBCXHuW6Uic1BHgh8wTwMrCuzU7ya88pP7oJErGhyoNXA6Jj9T2UD/+bioRsstmgiqFXnUDfzVb2tqUqHmKE0KfSZW00rtX5bNk0TpfS5ooJ/JdWhnrAFiTN/mi8rz6YvWUmEYTCzt/7eJouLR+0rEpIbGh0q/TUWO60QsKyJOVkKSUuxUVVf/jlQicli2QXePW9ipTzN8qmgDr/okfOvvvUUedefAb9U+RJm35a7vDAfEHI6UlyAA0lQsbtE9UjwLsYNAJb50qMPrmoT0YUjcKdSIBPA6uoVPGObB2mi+7viiH5BGzx1L0nyr8HT7OUY+pzcfp95LP4BhTbaQqucrKUpd8u8vEMzie3Um2hT9v2v+yQygOLiJ2MgbJX6d/+SbiRvnJwOrxV4ZdTP+AxSgFGWkHmS4GIc/BR+sWxEneLjNWixsIbcQi/5/w6LhtKW7+tF3uYs06MVMczUzvKkWSck35baIfAa7Zmx4heg5NDPXBC7PJsqNw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR12MB4133.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(136003)(39850400004)(346002)(366004)(396003)(38100700002)(38350700002)(7416002)(1076003)(4326008)(7406005)(956004)(83380400001)(478600001)(6666004)(2906002)(26005)(86362001)(5660300002)(6486002)(2616005)(66946007)(52116002)(186003)(36756003)(54906003)(66476007)(66556008)(8936002)(6496006)(8676002)(316002)(6916009)(44832011);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?N4XfEmUFSrVpKrcjvj/5KIBNIWZeVYmmebnwiVb0/POrvEHHxa4GIZgH/qzP?=
+ =?us-ascii?Q?4qC9DYvXWte6FpICbafMNlk8+PuOdSga87Ulrt2EXkTHSRkJm70bHIVHVhuW?=
+ =?us-ascii?Q?kYuSMS8Dx55+P8f7Rvx5qhMFD5bURWokz/IuJdqzSBdh1C/VsDFKLOgRUo8s?=
+ =?us-ascii?Q?uV+iclMvuli6qUY3d554xU4IKfJSFBgZV7i99ARzbUI247RGLKbhR+KFrI93?=
+ =?us-ascii?Q?Kh250P8FWtpDmtOSblAGPO24Tnec8LVETbkljzL1/1gDzY30IidDcp+8cybT?=
+ =?us-ascii?Q?MKSXb/BFoBl2b+jEzZZUEBinGCwHtFx0afeyQ6wniLMi1ogWG6midAX4BcMX?=
+ =?us-ascii?Q?+h4bAPNUlDNezVImHHkNZ1AHTAb64rW0meLDGYKxcOO5/qwxNwbu8Lx+pk2T?=
+ =?us-ascii?Q?QBVziYk+PjlJWlE7cABtge4ztRDIg0PmATYUFJ0GUoOPpQepS9UfMSJ7P4rG?=
+ =?us-ascii?Q?F0thoGBBbDMZehNyh+wP/PO4gOiuR1NGLmypgQwBal/aVPW9+J2D6cyCJflo?=
+ =?us-ascii?Q?QtX0IpCMdicStxLpzRY8s0E4vDT3jDO3/Osgx1ydi9M/K0B1WpTLrD7N6kxK?=
+ =?us-ascii?Q?U0b/6K6jIr2T0vxZLb7YlmuWSWqOerESapBoZoh86moYEUzUy3hPBaOlizsE?=
+ =?us-ascii?Q?EOFUxP4/zZu2qoQNLNgiMTaIVUgQYixRgP8cHtPE7ybkekkzWEV8FCw+GX85?=
+ =?us-ascii?Q?VMsxaqiG5L6iHa9jGXKTzEsJ7RJFI34EpmkaO4HRYGV8lO0uEKHkhHkJYJ0P?=
+ =?us-ascii?Q?kEIE6P0UTqwFAiUcKvwh1sQD1Ev1OCqrqE9CEQaFLSQcl0kRbRsufl0Md8pq?=
+ =?us-ascii?Q?cZ/C21gUEbbBty794lZSAvuWe9b9mmdq7NU9oXKvnK7KFASY6zJHNcpEFRXw?=
+ =?us-ascii?Q?sSYkF03/WWQXsL/HCWFCht0CnQeKKxjiAOAdYiD8ahWfH5MHRAsjzsI+Hdd3?=
+ =?us-ascii?Q?5sf6ZVzhU6LkAjH24o19dxCQ3BR9r/B+DcPLw70tnwGfRrsVgYc1eXb903lo?=
+ =?us-ascii?Q?uQ44S5hPru6hKQldcvtFIvPOPou9eVwNsSsRRERFJvrepOjrJ5dQVrQqy9vr?=
+ =?us-ascii?Q?lG7mE9ZSl4ie5NZU7Jy4B1jwRfvqEv88GwBP7jAFu0XX3H4dy4b3E6d50teu?=
+ =?us-ascii?Q?8oRX4jiDyXIkTsHZrkDwdagXrYOe/VkZj+k2F5i2Y0fC+gP+8KEbrYA15hfT?=
+ =?us-ascii?Q?itwSmbJFN2Wd7dJ1L2pW0iKOYjFKLhtovtnYxrh6pG3QuyqW8joEDMWAkduC?=
+ =?us-ascii?Q?gvVno8zi8Deod15GW/f0Rs7mHri05Q232E3L5wpRmD9dyRvFZ/lPPp1FZtYU?=
+ =?us-ascii?Q?9PF7D9u/cdul0X3pfCb82cCG?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 11bcdc02-28a9-4cbb-474f-08d96ce4556c
+X-MS-Exchange-CrossTenant-AuthSource: CH2PR12MB4133.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Sep 2021 01:03:39.3597
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: K8vG/KKzpPjwaUYetp8sk4TDe9owBXmsEVvDpQLu2iTYhTe7Mp9QrhOvJSfuT++VzEPIKaQ24lg5NJLYwY4JMg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4134
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 31, 2021, David Hildenbrand wrote:
-> On 28.08.21 00:18, Sean Christopherson wrote:
-> > On Thu, Aug 26, 2021, David Hildenbrand wrote:
-> > > You'll end up with a VMA that corresponds to the whole file in a single
-> > > process only, and that cannot vanish, not even in parts.
-> > 
-> > How would userspace tell the kernel to free parts of memory that it doesn't want
-> > assigned to the guest, e.g. to free memory that the guest has converted to
-> > not-private?
+On Tue, Aug 31, 2021 at 10:03:12AM +0200, Borislav Petkov wrote:
+> On Fri, Aug 27, 2021 at 08:38:31AM -0500, Michael Roth wrote:
+> > I've been periodically revising/rewording my comments since I saw you're
+> > original comments to Brijesh a few versions back, but it's how I normally
+> > talk when discussing code with people so it keeps managing to sneak back in.
 > 
-> I'd guess one possibility could be fallocate(FALLOC_FL_PUNCH_HOLE).
+> Oh sure, happens to me too and I know it is hard to keep out but when
+> you start doing git archeology and start going through old commit
+> messages, wondering why stuff was done the way it is sitting there,
+> you'd be very grateful if someone actually took the time to write up the
+> "why" properly. Why was it done this way, what the constraints were,
+> yadda yadda.
 > 
-> Questions are: when would it actually be allowed to perform such a
-> destructive operation?
-
-From the kernel's perspective, userspace is allowed to perform destructive
-operations at will.  It is ultimately the userspace VMM's responsibility to not
-DoS the guest.
-
-> Do we have to protect from that? How would KVM protect from user space
-> replacing private pages by shared pages in any of the models we discuss?
-
-The overarching rule is that KVM needs to guarantee a given pfn is never mapped[*]
-as both private and shared, where "shared" also incorporates any mapping from the
-host.  Essentially it boils down to the kernel ensuring that a pfn is unmapped
-before it's converted to/from private, and KVM ensuring that it honors any
-unmap notifications from the kernel, e.g. via mmu_notifier or via a direct callback
-as proposed in this RFC.
-
-As it pertains to PUNCH_HOLE, the responsibilities are no different than when the
-backing-store is destroyed; the backing-store needs to notify downstream MMUs
-(a.k.a. KVM) to unmap the pfn(s) before freeing the associated memory.
-
-[*] Whether or not the kernel's direct mapping needs to be removed is debatable,
-    but my argument is that that behavior is not visible to userspace and thus
-    out of scope for this discussion, e.g. zapping/restoring the direct map can
-    be added/removed without impacting the userspace ABI.
-
-> > > Define "ordinary" user memory slots as overlay on top of "encrypted" memory
-> > > slots.  Inside KVM, bail out if you encounter such a VMA inside a normal
-> > > user memory slot. When creating a "encryped" user memory slot, require that
-> > > the whole VMA is covered at creation time. You know the VMA can't change
-> > > later.
-> > 
-> > This can work for the basic use cases, but even then I'd strongly prefer not to
-> > tie memslot correctness to the VMAs.  KVM doesn't truly care what lies behind
-> > the virtual address of a memslot, and when it does care, it tends to do poorly,
-> > e.g. see the whole PFNMAP snafu.  KVM cares about the pfn<->gfn mappings, and
-> > that's reflected in the infrastructure.  E.g. KVM relies on the mmu_notifiers
-> > to handle mprotect()/munmap()/etc...
+> And when you see a "we" there, you sometimes wonder, who's "we"? Was it
+> the party who submitted the code, was it the person who's submitting the
+> code but talking with the generic voice of a programmer who means "we"
+> the community writing the kernel, etc.
 > 
-> Right, and for the existing use cases this worked. But encrypted memory
-> breaks many assumptions we once made ...
+> So yes, it is ambiguous and it probably wasn't a big deal at all when
+> the people writing the kernel all knew each other back then but that
+> long ain't the case anymore. So we (see, snuck in on me too :)) ... so
+> maintainers need to pay attention to those things now too.
 > 
-> I have somewhat mixed feelings about pages that are mapped into $WHATEVER
-> page tables but not actually mapped into user space page tables. There is no
-> way to reach these via the rmap.
+> Oh look, the last "we" above meant "maintainers".
 > 
-> We have something like that already via vfio. And that is fundamentally
-> broken when it comes to mmu notifiers, page pinning, page migration, ...
-
-I'm not super familiar with VFIO internals, but the idea with the fd-based
-approach is that the backing-store would be in direct communication with KVM and
-would handle those operations through that direct channel.
-
-> > As is, I don't think KVM would get any kind of notification if userpaces unmaps
-> > the VMA for a private memslot that does not have any entries in the host page
-> > tables.   I'm sure it's a solvable problem, e.g. by ensuring at least one page
-> > is touched by the backing store, but I don't think the end result would be any
-> > prettier than a dedicated API for KVM to consume.
-> > 
-> > Relying on VMAs, and thus the mmu_notifiers, also doesn't provide line of sight
-> > to page migration or swap.  For those types of operations, KVM currently just
-> > reacts to invalidation notifications by zapping guest PTEs, and then gets the
-> > new pfn when the guest re-faults on the page.  That sequence doesn't work for
-> > TDX or SEV-SNP because the trusteday agent needs to do the memcpy() of the page
-> > contents, i.e. the host needs to call into KVM for the actual migration.
+> I believe that should explain with a greater detail what I mean.
 > 
-> Right, but I still think this is a kernel internal. You can do such
-> handshake later in the kernel IMHO.
+> :-)
 
-It is kernel internal, but AFAICT it will be ugly because KVM "needs" to do the
-migration and that would invert the mmu_notifer API, e.g. instead of "telling"
-secondary MMUs to invalidate/change a mappings, the mm would be "asking"
-secondary MMus "can you move this?".  More below.
-
-> But I also already thought: is it really KVM that is to perform the
-> migration or is it the fd-provider that performs the migration? Who says
-> memfd_encrypted() doesn't default to a TDX "backend" on Intel CPUs that just
-> knows how to migrate such a page?
-> 
-> I'd love to have some details on how that's supposed to work, and which
-> information we'd need to migrate/swap/... in addition to the EPFN and a new
-> SPFN.
-
-KVM "needs" to do the migration.  On TDX, the migration will be a SEAMCALL,
-a post-VMXON instruction that transfers control to the TDX-Module, that at
-minimum needs a per-VM identifier, the gfn, and the page table level.  The call
-into the TDX-Module would also need to take a KVM lock (probably KVM's mmu_lock)
-to satisfy TDX's concurrency requirement, e.g. to avoid "spurious" errors due to
-the backing-store attempting to migrate memory that KVM is unmapping due to a
-memslot change.
-
-The per-VM identifier may not apply to SEV-SNP, but I believe everything else
-holds true.
+Thanks for the explanation, makes perfect sense. Just need to get my brain
+on the same page. :)
