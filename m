@@ -2,179 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8A7CF3FCB51
-	for <lists+kvm@lfdr.de>; Tue, 31 Aug 2021 18:15:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5989F3FCB70
+	for <lists+kvm@lfdr.de>; Tue, 31 Aug 2021 18:22:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239852AbhHaQQu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Aug 2021 12:16:50 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:48457 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S239720AbhHaQQt (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 31 Aug 2021 12:16:49 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630426554;
+        id S239960AbhHaQXL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Aug 2021 12:23:11 -0400
+Received: from mail.skyhub.de ([5.9.137.197]:50868 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S239733AbhHaQXK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 Aug 2021 12:23:10 -0400
+Received: from zn.tnic (p200300ec2f0f2f00fdddcaa5e3f9e694.dip0.t-ipconnect.de [IPv6:2003:ec:2f0f:2f00:fddd:caa5:e3f9:e694])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 53D851EC01B5;
+        Tue, 31 Aug 2021 18:22:09 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1630426929;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=iC/vqrnC8agefEfcK8F2l8XU9S2U0FJkOrhS5FcGFpE=;
-        b=C2U3gFFXnWKCpPsxZEuvCgkzD2JjfmADTfOk1D1dKN3bDJtHeSIvz/dj6dyYvCNwQpzd3n
-        O9WNgJYT9hTG87SKEIJhFzehGeIQ1+Cyoj2PPMRbnIvI7RPYHH1KKm8R8g8HnGizhSUCXc
-        5ABluoVUp8NATVIoQcEi8JHvDTAtvfA=
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
- [209.85.166.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-136-9dtsnW7XMA2Mrd76BNMcrw-1; Tue, 31 Aug 2021 12:15:52 -0400
-X-MC-Unique: 9dtsnW7XMA2Mrd76BNMcrw-1
-Received: by mail-io1-f72.google.com with SMTP id g14-20020a6be60e000000b005b62a0c2a41so11150715ioh.2
-        for <kvm@vger.kernel.org>; Tue, 31 Aug 2021 09:15:52 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=iC/vqrnC8agefEfcK8F2l8XU9S2U0FJkOrhS5FcGFpE=;
-        b=gBzK2CKPkRzijB6JvWRsXHNRFHFBYtHIxYV0h8opbiyrgyh4oMxKhWZoOupfX+1xxJ
-         OIQJULySKxY9AGxEmJ94uGpVEWMnURk0abjHZVAEgqgEJasfvo9rnkM4n5Tyx7PrpU/I
-         EICC65LQeomxeXJCKNZs0RW6bulT+OFWR3DTaFCNWwLshQFCZoiukQiPPwqrAbNiqqfe
-         HY8gMQ557dDBdxn4pKGygLy9OAQv80KlLRoHbwCvcFRlrhNJiq4d1h6/a1vfT6jYDy72
-         y70bwrbrR3hS/DJ8XwLkYEW4rwAe1AR6IBVvenmDc6y3HCUohPdlL265CqWOcC+R2PlA
-         RrYw==
-X-Gm-Message-State: AOAM532wBLWinG/4ZWGfiY/jqI6vb4R4elNlHMQ4bPHX1K2hqNQkzDP4
-        dBiSIyrgjVaEl/NUlbnjTGyDkeGq9AapVSvyZo/GUSr6Sf84fJZsQqpgWYHktFPGSyL9N/c2FMH
-        CeHkfEJ4kRUOl
-X-Received: by 2002:a92:1306:: with SMTP id 6mr10977690ilt.183.1630426552024;
-        Tue, 31 Aug 2021 09:15:52 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyU8Gm8fnWRjCaSBCl5W6DLLHCeLpBofrbxoK/jTZqCPsDHAV1I8o6zW03fTiw16wfuaHsuSQ==
-X-Received: by 2002:a92:1306:: with SMTP id 6mr10977660ilt.183.1630426551786;
-        Tue, 31 Aug 2021 09:15:51 -0700 (PDT)
-Received: from redhat.com ([198.99.80.109])
-        by smtp.gmail.com with ESMTPSA id u13sm9685406iot.29.2021.08.31.09.15.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 31 Aug 2021 09:15:51 -0700 (PDT)
-Date:   Tue, 31 Aug 2021 10:15:49 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Nicolin Chen <nicolinc@nvidia.com>
-Cc:     <will@kernel.org>, <robin.murphy@arm.com>, <joro@8bytes.org>,
-        <cohuck@redhat.com>, <corbet@lwn.net>, <nicoleotsuka@gmail.com>,
-        <vdumpa@nvidia.com>, <thierry.reding@gmail.com>,
-        <linux-tegra@vger.kernel.org>, <nwatterson@nvidia.com>,
-        <Jonathan.Cameron@huawei.com>, <jean-philippe@linaro.org>,
-        <song.bao.hua@hisilicon.com>, <eric.auger@redhat.com>,
-        <thunder.leizhen@huawei.com>, <yuzenghui@huawei.com>,
-        <linux-kernel@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <iommu@lists.linux-foundation.org>, <kvm@vger.kernel.org>,
-        <linux-doc@vger.kernel.org>, "Tian, Kevin" <kevin.tian@intel.com>,
-        Jason Gunthorpe <jgg@nvidia.com>
-Subject: Re: [RFC][PATCH v2 00/13] iommu/arm-smmu-v3: Add NVIDIA
- implementation
-Message-ID: <20210831101549.237151fa.alex.williamson@redhat.com>
-In-Reply-To: <20210831025923.15812-1-nicolinc@nvidia.com>
-References: <20210831025923.15812-1-nicolinc@nvidia.com>
-Organization: Red Hat
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=pJLc4Nr2FSbY+5utp8zq0cqJuoQnIBsw2l3U+d3olSs=;
+        b=OG2MmH57Xx0+9u8ejAjkuvOP+tpM08VxofHGL0MJDMGrKoMdpsPtFuWCKWBH3KhkdjY5dR
+        q04iSVWqzy2Mb06ywIkrzyJ5B5weBNc36UQmvjpJ6W6e412ErBjN16s9Q7SaeuWeoRm2Jc
+        puWQRQUhEU3pSfl/bw2Jv4OLgnedFsQ=
+Date:   Tue, 31 Aug 2021 18:22:44 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Michael Roth <michael.roth@amd.com>
+Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH Part1 v5 32/38] x86/sev: enable SEV-SNP-validated CPUID
+ in #VC handlers
+Message-ID: <YS5XVBNrASp7Zrig@zn.tnic>
+References: <20210820151933.22401-1-brijesh.singh@amd.com>
+ <20210820151933.22401-33-brijesh.singh@amd.com>
+ <YSkCWVTd0ZEvphlx@zn.tnic>
+ <20210827183240.f7zvo3ujkeohmlrt@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20210827183240.f7zvo3ujkeohmlrt@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 30 Aug 2021 19:59:10 -0700
-Nicolin Chen <nicolinc@nvidia.com> wrote:
+On Fri, Aug 27, 2021 at 01:32:40PM -0500, Michael Roth wrote:
+> If the memory is allocated in boot/compressed/mem_encrypt.S, wouldn't
+> kernel proper still need to create a static buffer for its copy?
 
-> The SMMUv3 devices implemented in the Grace SoC support NVIDIA's custom
-> CMDQ-Virtualization (CMDQV) hardware. Like the new ECMDQ feature first
-> introduced in the ARM SMMUv3.3 specification, CMDQV adds multiple VCMDQ
-> interfaces to supplement the single architected SMMU_CMDQ in an effort
-> to reduce contention.
-> 
-> This series of patches add CMDQV support with its preparational changes:
-> 
-> * PATCH-1 to PATCH-8 are related to shared VMID feature: they are used
->   first to improve TLB utilization, second to bind a shared VMID with a
->   VCMDQ interface for hardware configuring requirement.
+Just like the other variables like sme_me_mask etc that file allocates
+at the bottom. Or do you have a better idea?
 
-The vfio changes would need to be implemented in alignment with the
-/dev/iommu proposals[1].  AIUI, the VMID is essentially binding
-multiple containers together for TLB invalidation, which I expect in
-the proposal below is largely already taken care of in that a single
-iommu-fd can support multiple I/O address spaces and it's largely
-expected that a hypervisor would use a single iommu-fd so this explicit
-connection by userspace across containers wouldn't be necessary.
+> Would that be a reasonable approach for v6?
 
-We're expecting to talk more about the /dev/iommu approach at Plumbers
-in few weeks.  Thanks,
+I don't like the ifdeffery one bit, TBH. I guess you should split it
+and have a boot/compressed page and a kernel proper one and keep 'em
+separate. That should make everything nice and clean at the cost of 2*4K
+which is nothing nowadays.
 
-Alex
+Thx.
 
-[1]https://lore.kernel.org/kvm/BN9PR11MB5433B1E4AE5B0480369F97178C189@BN9PR11MB5433.namprd11.prod.outlook.com/
+-- 
+Regards/Gruss,
+    Boris.
 
- 
-> * PATCH-9 and PATCH-10 are to accommodate the NVIDIA implementation with
->   the existing arm-smmu-v3 driver.
-> 
-> * PATCH-11 borrows the "implementation infrastructure" from the arm-smmu
->   driver so later change can build upon it.
-> 
-> * PATCH-12 adds an initial NVIDIA implementation related to host feature,
->   and also adds implementation specific ->device_reset() and ->get_cmdq()
->   callback functions.
-> 
-> * PATCH-13 adds virtualization features using VFIO mdev interface, which
->   allows user space hypervisor to map and get access to one of the VCMDQ
->   interfaces of CMDQV module.
-> 
-> ( Thinking that reviewers can get a better view of this implementation,
->   I am attaching QEMU changes here for reference purpose:
->       https://github.com/nicolinc/qemu/commits/dev/cmdqv_v6.0.0-rc2
->   The branch has all preparational changes, while I'm still integrating
->   device model and ARM-VIRT changes, and will push them these two days,
->   although they might not be in a good shape of being sent to review yet )
-> 
-> Above all, I marked RFC for this series, as I feel that we may come up
-> some better solution. So please kindly share your reviews and insights.
-> 
-> Thank you!
-> 
-> Changelog
-> v1->v2:
->  * Added mdev interface support for hypervisor and VMs.
->  * Added preparational changes for mdev interface implementation.
->  * PATCH-12 Changed ->issue_cmdlist() to ->get_cmdq() for a better
->    integration with recently merged ECMDQ-related changes.
-> 
-> Nate Watterson (3):
->   iommu/arm-smmu-v3: Add implementation infrastructure
->   iommu/arm-smmu-v3: Add support for NVIDIA CMDQ-Virtualization hw
->   iommu/nvidia-smmu-v3: Add mdev interface support
-> 
-> Nicolin Chen (10):
->   iommu: Add set_nesting_vmid/get_nesting_vmid functions
->   vfio: add VFIO_IOMMU_GET_VMID and VFIO_IOMMU_SET_VMID
->   vfio: Document VMID control for IOMMU Virtualization
->   vfio: add set_vmid and get_vmid for vfio_iommu_type1
->   vfio/type1: Implement set_vmid and get_vmid
->   vfio/type1: Set/get VMID to/from iommu driver
->   iommu/arm-smmu-v3: Add shared VMID support for NESTING
->   iommu/arm-smmu-v3: Add VMID alloc/free helpers
->   iommu/arm-smmu-v3: Pass dev pointer to arm_smmu_detach_dev
->   iommu/arm-smmu-v3: Pass cmdq pointer in arm_smmu_cmdq_issue_cmdlist()
-> 
->  Documentation/driver-api/vfio.rst             |   34 +
->  MAINTAINERS                                   |    2 +
->  drivers/iommu/arm/arm-smmu-v3/Makefile        |    2 +-
->  .../iommu/arm/arm-smmu-v3/arm-smmu-v3-impl.c  |   15 +
->  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c   |  121 +-
->  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h   |   18 +
->  .../iommu/arm/arm-smmu-v3/nvidia-smmu-v3.c    | 1249 +++++++++++++++++
->  drivers/iommu/iommu.c                         |   20 +
->  drivers/vfio/vfio.c                           |   25 +
->  drivers/vfio/vfio_iommu_type1.c               |   37 +
->  include/linux/iommu.h                         |    5 +
->  include/linux/vfio.h                          |    2 +
->  include/uapi/linux/vfio.h                     |   26 +
->  13 files changed, 1537 insertions(+), 19 deletions(-)
->  create mode 100644 drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-impl.c
->  create mode 100644 drivers/iommu/arm/arm-smmu-v3/nvidia-smmu-v3.c
-> 
-
+https://people.kernel.org/tglx/notes-about-netiquette
