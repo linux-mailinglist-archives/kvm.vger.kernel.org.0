@@ -2,161 +2,244 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 701353FD76D
-	for <lists+kvm@lfdr.de>; Wed,  1 Sep 2021 12:14:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 664543FD78B
+	for <lists+kvm@lfdr.de>; Wed,  1 Sep 2021 12:19:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232819AbhIAKO5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Sep 2021 06:14:57 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:52822 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232258AbhIAKO4 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 1 Sep 2021 06:14:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630491239;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=6Xhqwxajqw0bB7EMsnxFVtWq78wNvOTmsrxkbIXy3c4=;
-        b=b6kitShZD8zhjaBSHeATZzxKhJcb+nHe3juAK64n2VFHVWqc4zo2/V6cogcCYSb/W46XIm
-        zSjhjQH9BAdPTZ/38d9zrZf4S8TphPC7m/PIICZCiLMCV+c/BO8L5p4gDTzXM5bKk9tQYw
-        XhhQHy7pqANr9+QT/OlLJOtXYCq1RMw=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-165-Q9sb9MG1N0KLrufjW-g8hQ-1; Wed, 01 Sep 2021 06:13:58 -0400
-X-MC-Unique: Q9sb9MG1N0KLrufjW-g8hQ-1
-Received: by mail-wr1-f72.google.com with SMTP id h14-20020a056000000e00b001575b00eb08so611835wrx.13
-        for <kvm@vger.kernel.org>; Wed, 01 Sep 2021 03:13:58 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=6Xhqwxajqw0bB7EMsnxFVtWq78wNvOTmsrxkbIXy3c4=;
-        b=eUkGmD7VkinPcAECtAGZ80NoOSMypZkRN5OIjPMpDlMqm4Aq7EG8Gl3AbNvRCwggC7
-         vxBu8AyBdG1pRrrwFCCvoSutodNb0PK15IrNYrVMqbStwEvpAZFm3MCwXwnL9fsijkRH
-         G5sPDGZ1eg+Sjxi4bMTBBSkGLsj77uExCYm3qie3+mycSVBUTb7zDmJlfu3CshVFyJd5
-         E8TO/XIE3TbN3aR/kW+0EawHjTqekVjDRRKgSDjVR3ToAAUttw97qioUjFzQW3sV5qWz
-         3BWrhBer/RoZgLAKBLyY2GTAfOOud908jwbHy4GZNEVHsH4ZMM566hCmz0B1p7kly+iL
-         Q97Q==
-X-Gm-Message-State: AOAM5309h/GR26ASnTaZmB4QHAlKYYItu/eqh0Hnzf6m23Lsm8T8io7X
-        87XEfLh6fVMKmSyE1cFTR4eDlZKEOUy1caT5V6DiAN/Y5UPKZLjACW0i3rXJxt7qX1wWGspG1Hs
-        90WYDlU+xpMFO
-X-Received: by 2002:a05:600c:230c:: with SMTP id 12mr8905967wmo.41.1630491237322;
-        Wed, 01 Sep 2021 03:13:57 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwq5cIMX75slmoFWnEm9AA+yLh1uSyJ7JThTl4wi3kQ9KjhcBMBzMwNRwVvaOcfMq6C15ZGqA==
-X-Received: by 2002:a05:600c:230c:: with SMTP id 12mr8905950wmo.41.1630491237110;
-        Wed, 01 Sep 2021 03:13:57 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id o23sm9347859wro.76.2021.09.01.03.13.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Sep 2021 03:13:56 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Igor Mammedov <imammedo@redhat.com>
-Cc:     Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Subject: Re: [PATCH] kvm: x86: Increase MAX_VCPUS to 710
-In-Reply-To: <20210901111326.2efecf6e@redhat.com>
-References: <20210831204535.1594297-1-ehabkost@redhat.com>
- <87sfyooh9x.fsf@vitty.brq.redhat.com> <20210901111326.2efecf6e@redhat.com>
-Date:   Wed, 01 Sep 2021 12:13:55 +0200
-Message-ID: <87ilzkob6k.fsf@vitty.brq.redhat.com>
+        id S234579AbhIAKU1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Sep 2021 06:20:27 -0400
+Received: from mail-dm6nam11on2075.outbound.protection.outlook.com ([40.107.223.75]:1280
+        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S233214AbhIAKU0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Sep 2021 06:20:26 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=RNSCCcJOn6q52QM+621CwVWabFt50Ex+72LGzaNgJvCJcckdq/PrBGu90BX1m9hdhfEZD3wuE34x+xpPCMGo6J2QjWDvsB7RUYMGGPUvSHWayBHivxqz9ThXiKkJt1NlIWY1ogNMBQyhjafaFPnCg6XuyfV+FcJowZ78OCNSh74U9B3qAJIolkDtCYEdJVN1efld85PZklJeD9nCSYjbCIUXhoEuY4NM4BpaFbSADAWJI9USrFm9MC0cgSzJdD4bPX1SS4wkvZJ4rAr9nUOiK5GoYNhyT3KkuOn5OHHVXZcn5/uOneZ7m3YyqBZKCI3NvZqU1zgP99K+dGXRvZAwXA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=oPQaiFO/ZfNP9yVUQLcQyezxQBXgP8bWBHbAweMc8Ng=;
+ b=lD08Cda7cP+sLHZaIVp912Iqzl0jWHMrcVS6muWjRf+NwXeXbuGzRGRAfHAAwKtmhGrGYf6nLeKcot7jq8wSHilX0VBzeE3CHIRUWc1uthXJFSBZRHPo1DBVTn5jLhxnJfkUG2EBLfMM7CSElazizgwqjpBgTHaroc/s9lPY3B1CzLdiiHF1L8YWmlkH5N42mKEq/mQsvDyBYHinUi+Mimi0SWNqHyWMnXERZ5n5gVEzjrsdzIRE50orXntiMBRSBL0itrPUODbA6dia11fxuvnX0OBvku97+3z0YXPR3HNntl9f6eiicbClKVzCFZoBqsebg2U5omkBHqbLOw6lvw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.112.32) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=quarantine sp=none pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=oPQaiFO/ZfNP9yVUQLcQyezxQBXgP8bWBHbAweMc8Ng=;
+ b=fNqXvgdJ/61YiDWAVkv3pLp/am8IE6AXGwO0U+Si0HoojYgMNRMKpu2DIJ+8s9fQKHaHfJtkUAP1uuRPVbxbfF3yC0EUuMYQUSB2uizKAOELT/iLnUTUdtTI9T4gKkzPU2JvL175P6DaWOp1kKL2DnSVQBpazunnDhq8snoYrc9oz94Qn2WuHGmoqIAysaL8YAgTJGrC14HZ2VeQxhC+8RT9CqJeVf4NqHI72Q5AVt3cUfUAPJAmCqatRJtH81E5ZOT/K4dlC+ZSfjmw3bqkH9EdEj6dLkYsx5lQkarAGkjTqoGC4BCCN7nsrvLylE7iEVBWd572+8nkSW5AlyY4dg==
+Received: from BN6PR22CA0032.namprd22.prod.outlook.com (2603:10b6:404:37::18)
+ by MWHPR1201MB0016.namprd12.prod.outlook.com (2603:10b6:300:e4::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4457.23; Wed, 1 Sep
+ 2021 10:19:28 +0000
+Received: from BN8NAM11FT057.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:404:37:cafe::79) by BN6PR22CA0032.outlook.office365.com
+ (2603:10b6:404:37::18) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4478.17 via Frontend
+ Transport; Wed, 1 Sep 2021 10:19:28 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.32)
+ smtp.mailfrom=nvidia.com; redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.112.32 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.112.32; helo=mail.nvidia.com;
+Received: from mail.nvidia.com (216.228.112.32) by
+ BN8NAM11FT057.mail.protection.outlook.com (10.13.177.49) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.4478.19 via Frontend Transport; Wed, 1 Sep 2021 10:19:27 +0000
+Received: from DRHQMAIL107.nvidia.com (10.27.9.16) by HQMAIL109.nvidia.com
+ (172.20.187.15) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Wed, 1 Sep
+ 2021 03:19:26 -0700
+Received: from [172.27.12.69] (172.20.187.6) by DRHQMAIL107.nvidia.com
+ (10.27.9.16) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Wed, 1 Sep 2021
+ 10:19:23 +0000
+Subject: Re: [PATCH 1/1] virtio-blk: avoid preallocating big SGL for data
+To:     Feng Li <lifeng1519@gmail.com>
+CC:     <hch@infradead.org>, <mst@redhat.com>,
+        <virtualization@lists.linux-foundation.org>, <kvm@vger.kernel.org>,
+        <stefanha@redhat.com>, <israelr@nvidia.com>, <nitzanc@nvidia.com>,
+        <oren@nvidia.com>, linux-block <linux-block@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>
+References: <20210830233500.51395-1-mgurtovoy@nvidia.com>
+ <CAEK8JBBU3zNAWpC36-Lq0UBM1Dp+jYQG105psE38Fy8KRy=M-g@mail.gmail.com>
+From:   Max Gurtovoy <mgurtovoy@nvidia.com>
+Message-ID: <165359fc-8f97-ede3-8ab5-35329ca61dbd@nvidia.com>
+Date:   Wed, 1 Sep 2021 13:19:09 +0300
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <CAEK8JBBU3zNAWpC36-Lq0UBM1Dp+jYQG105psE38Fy8KRy=M-g@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Originating-IP: [172.20.187.6]
+X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
+ DRHQMAIL107.nvidia.com (10.27.9.16)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 489a32a6-609b-49a9-83d4-08d96d31fae5
+X-MS-TrafficTypeDiagnostic: MWHPR1201MB0016:
+X-Microsoft-Antispam-PRVS: <MWHPR1201MB001669BB715297AD939B343FDECD9@MWHPR1201MB0016.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:565;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: b8X9mrEuzISIHJVC57983QVTvXZdft+T8+q8gQb7bBUkrIhLaq3VDzCehD8nw+fnGBzDTdg1Q3GJwtWjM9cHOoRJ9KItSpdwEXjGtco8wmvxXIWoYwszzvJQYM8R+Mk3yRrkRJ3aGZXPqWPusPEqaH1iRGX+sCKZvQVQVcwqvUvJ06nM6iAxpIbY+I1U4yI19YcBnn5vvDY9sF31mnOxPJ2siCpoooEoyBqbnIFjgjrBBY3RTorS5nWOcoRVKuNuZ52T3QIiFh7RGclO754+3HxcrIMdox8bUqNzhluxwe2v/vTnS43SCs1Nrsf0L3bNxousQYdgz1C98NdknZvDZU6gnq3TnT31aKT4IITykY4BDLaQecWr9ws/g1nYJP7YBMca2CUKsdgqRfXfAfGNmh9DT9JF2XEl1NHUI+ldEw3/Tw8BdbnVT3jpcWBFbTqIkw77ZH9z9sKGb18Wb+l1t7C6DYXg6eYGieoQr2M3el/ooRstNMO8WHC0wVSti5m9LxHnDebKGkC4+P5U1KGryAMQUkXAW534AKm/Xt7Xwx2+WIb2FWdAEBCK/FwCqk8zeuMihLh5G3ABlPb2yd70UGnfvuccp0IUO6ZlEse61VZse+a9KNYCJzCFYE2SYPNk3H1M4Szk2umaxOnYa3Nt/+B96dHusM6VBa8vBnckHi+MGkGJcscdDGnorEO9o/FAFbDZjq/tHY47ziOW6zyIPRYLShsjPznQdjyZK5MkaqQ=
+X-Forefront-Antispam-Report: CIP:216.228.112.32;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid01.nvidia.com;CAT:NONE;SFS:(4636009)(346002)(396003)(376002)(39860400002)(136003)(46966006)(36840700001)(5660300002)(356005)(8936002)(4326008)(36860700001)(7636003)(31696002)(36756003)(47076005)(86362001)(16576012)(6916009)(53546011)(478600001)(31686004)(186003)(82310400003)(6666004)(82740400003)(8676002)(83380400001)(54906003)(426003)(16526019)(336012)(70206006)(316002)(70586007)(26005)(2906002)(2616005)(43740500002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Sep 2021 10:19:27.8137
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 489a32a6-609b-49a9-83d4-08d96d31fae5
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.32];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT057.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR1201MB0016
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Igor Mammedov <imammedo@redhat.com> writes:
 
-> On Wed, 01 Sep 2021 10:02:18 +0200
-> Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
+On 9/1/2021 6:38 AM, Feng Li wrote:
+> Does this hurt the performance of virtio-blk?
+> I think a fio result is needed here.
+
+No, we use this mechanism in NVMe/NVMf for few years already and didn't 
+see any performance issues.
+
+Also with the fio tests I run with our NVIDIA's Virtio-blk SNAP devices 
+showed same perf numbers.
+
+I can add it to v2.
+
 >
->> Eduardo Habkost <ehabkost@redhat.com> writes:
->> 
->> > Support for 710 VCPUs has been tested by Red Hat since RHEL-8.4.
->> > Increase KVM_MAX_VCPUS and KVM_SOFT_MAX_VCPUS to 710.
->> >
->> > For reference, visible effects of changing KVM_MAX_VCPUS are:
->> > - KVM_CAP_MAX_VCPUS and KVM_CAP_NR_VCPUS will now return 710 (of course)
->> > - Default value for CPUID[HYPERV_CPUID_IMPLEMENT_LIMITS (00x40000005)].EAX
->> >   will now be 710
->> > - Bitmap stack variables that will grow:
->> >   - At kvm_hv_flush_tlb()  kvm_hv_send_ipi():
->> >     - Sparse VCPU bitmap (vp_bitmap) will be 96 bytes long
->> >     - vcpu_bitmap will be 92 bytes long
->> >   - vcpu_bitmap at bioapic_write_indirect() will be 92 bytes long
->> >     once patch "KVM: x86: Fix stack-out-of-bounds memory access
->> >     from ioapic_write_indirect()" is applied
->> >
->> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
->> > ---
->> >  arch/x86/include/asm/kvm_host.h | 4 ++--
->> >  1 file changed, 2 insertions(+), 2 deletions(-)
->> >
->> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
->> > index af6ce8d4c86a..f76fae42bf45 100644
->> > --- a/arch/x86/include/asm/kvm_host.h
->> > +++ b/arch/x86/include/asm/kvm_host.h
->> > @@ -37,8 +37,8 @@
->> >  
->> >  #define __KVM_HAVE_ARCH_VCPU_DEBUGFS
->> >  
->> > -#define KVM_MAX_VCPUS 288
->> > -#define KVM_SOFT_MAX_VCPUS 240
->> > +#define KVM_MAX_VCPUS 710  
->> 
->> Out of pure curiosity, where did 710 came from? Is this some particular
->> hardware which was used for testing (weird number btw). Should we maybe
->> go to e.g. 1024 for the sake of the beauty of powers of two? :-)
->> 
->> > +#define KVM_SOFT_MAX_VCPUS 710  
->> 
->> Do we really need KVM_SOFT_MAX_VCPUS which is equal to KVM_MAX_VCPUS?
->> 
->> Reading 
->> 
->> commit 8c3ba334f8588e1d5099f8602cf01897720e0eca
->> Author: Sasha Levin <levinsasha928@gmail.com>
->> Date:   Mon Jul 18 17:17:15 2011 +0300
->> 
->>     KVM: x86: Raise the hard VCPU count limit
->> 
->> the idea behind KVM_SOFT_MAX_VCPUS was to allow developers to test high
->> vCPU numbers without claiming such configurations as supported.
->> 
->> I have two alternative suggestions:
->> 1) Drop KVM_SOFT_MAX_VCPUS completely.
->> 2) Raise it to a higher number (e.g. 2048)
->> 
->> >  #define KVM_MAX_VCPU_ID 1023  
->> 
->> 1023 may not be enough now. I rememeber there was a suggestion to make
->> max_vcpus configurable via module parameter and this question was
->> raised:
->> 
->> https://lore.kernel.org/lkml/878s292k75.fsf@vitty.brq.redhat.com/
->> 
->> TL;DR: to support EPYC-like topologies we need to keep
->>  KVM_MAX_VCPU_ID = 4 * KVM_MAX_VCPUS
->
-> VCPU_ID (sequential 0-n range) is not APIC ID (sparse distribution),
-> so topology encoded in the later should be orthogonal to VCPU_ID.
-
-Why do we even have KVM_MAX_VCPU_ID which is != KVM[_SOFT]_MAX_VCPUS
-then?
-
-KVM_MAX_VCPU_ID is only checked in kvm_vm_ioctl_create_vcpu() which
-passes 'id' down to kvm_vcpu_init() which, in its turn, sets
-'vcpu->vcpu_id'. This is, for example, returned by kvm_x2apic_id():
-
-static inline u32 kvm_x2apic_id(struct kvm_lapic *apic)
-{
-        return apic->vcpu->vcpu_id;
-}
-
-So I'm pretty certain this is actually APIC id and it has topology in
-it.
-
--- 
-Vitaly
-
+> On Tue, Aug 31, 2021 at 7:36 AM Max Gurtovoy <mgurtovoy@nvidia.com> wrote:
+>> No need to pre-allocate a big buffer for the IO SGL anymore. If a device
+>> has lots of deep queues, preallocation for the sg list can consume
+>> substantial amounts of memory. For HW virtio-blk device, nr_hw_queues
+>> can be 64 or 128 and each queue's depth might be 128. This means the
+>> resulting preallocation for the data SGLs is big.
+>>
+>> Switch to runtime allocation for SGL for lists longer than 2 entries.
+>> This is the approach used by NVMe drivers so it should be reasonable for
+>> virtio block as well. Runtime SGL allocation has always been the case
+>> for the legacy I/O path so this is nothing new.
+>>
+>> The preallocated small SGL depends on SG_CHAIN so if the ARCH doesn't
+>> support SG_CHAIN, use only runtime allocation for the SGL.
+>>
+>> Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
+>> Reviewed-by: Israel Rukshin <israelr@nvidia.com>
+>> ---
+>>   drivers/block/virtio_blk.c | 37 ++++++++++++++++++++++---------------
+>>   1 file changed, 22 insertions(+), 15 deletions(-)
+>>
+>> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+>> index 77e8468e8593..9a4c5d428b58 100644
+>> --- a/drivers/block/virtio_blk.c
+>> +++ b/drivers/block/virtio_blk.c
+>> @@ -24,6 +24,12 @@
+>>   /* The maximum number of sg elements that fit into a virtqueue */
+>>   #define VIRTIO_BLK_MAX_SG_ELEMS 32768
+>>
+>> +#ifdef CONFIG_ARCH_NO_SG_CHAIN
+>> +#define VIRTIO_BLK_INLINE_SG_CNT       0
+>> +#else
+>> +#define VIRTIO_BLK_INLINE_SG_CNT       2
+>> +#endif
+>> +
+>>   static int virtblk_queue_count_set(const char *val,
+>>                  const struct kernel_param *kp)
+>>   {
+>> @@ -99,7 +105,7 @@ struct virtio_blk {
+>>   struct virtblk_req {
+>>          struct virtio_blk_outhdr out_hdr;
+>>          u8 status;
+>> -       struct scatterlist sg[];
+>> +       struct sg_table sg_table;
+>>   };
+>>
+>>   static inline blk_status_t virtblk_result(struct virtblk_req *vbr)
+>> @@ -188,6 +194,8 @@ static inline void virtblk_request_done(struct request *req)
+>>   {
+>>          struct virtblk_req *vbr = blk_mq_rq_to_pdu(req);
+>>
+>> +       sg_free_table_chained(&vbr->sg_table, VIRTIO_BLK_INLINE_SG_CNT);
+>> +
+>>          if (req->rq_flags & RQF_SPECIAL_PAYLOAD) {
+>>                  kfree(page_address(req->special_vec.bv_page) +
+>>                        req->special_vec.bv_offset);
+>> @@ -291,7 +299,15 @@ static blk_status_t virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
+>>                          return BLK_STS_RESOURCE;
+>>          }
+>>
+>> -       num = blk_rq_map_sg(hctx->queue, req, vbr->sg);
+>> +       vbr->sg_table.sgl = (struct scatterlist *)(vbr + 1);
+>> +       err = sg_alloc_table_chained(&vbr->sg_table,
+>> +                                    blk_rq_nr_phys_segments(req),
+>> +                                    vbr->sg_table.sgl,
+>> +                                    VIRTIO_BLK_INLINE_SG_CNT);
+>> +       if (err)
+>> +               return BLK_STS_RESOURCE;
+>> +
+>> +       num = blk_rq_map_sg(hctx->queue, req, vbr->sg_table.sgl);
+>>          if (num) {
+>>                  if (rq_data_dir(req) == WRITE)
+>>                          vbr->out_hdr.type |= cpu_to_virtio32(vblk->vdev, VIRTIO_BLK_T_OUT);
+>> @@ -300,7 +316,7 @@ static blk_status_t virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
+>>          }
+>>
+>>          spin_lock_irqsave(&vblk->vqs[qid].lock, flags);
+>> -       err = virtblk_add_req(vblk->vqs[qid].vq, vbr, vbr->sg, num);
+>> +       err = virtblk_add_req(vblk->vqs[qid].vq, vbr, vbr->sg_table.sgl, num);
+>>          if (err) {
+>>                  virtqueue_kick(vblk->vqs[qid].vq);
+>>                  /* Don't stop the queue if -ENOMEM: we may have failed to
+>> @@ -309,6 +325,8 @@ static blk_status_t virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
+>>                  if (err == -ENOSPC)
+>>                          blk_mq_stop_hw_queue(hctx);
+>>                  spin_unlock_irqrestore(&vblk->vqs[qid].lock, flags);
+>> +               sg_free_table_chained(&vbr->sg_table,
+>> +                                     VIRTIO_BLK_INLINE_SG_CNT);
+>>                  switch (err) {
+>>                  case -ENOSPC:
+>>                          return BLK_STS_DEV_RESOURCE;
+>> @@ -687,16 +705,6 @@ static const struct attribute_group *virtblk_attr_groups[] = {
+>>          NULL,
+>>   };
+>>
+>> -static int virtblk_init_request(struct blk_mq_tag_set *set, struct request *rq,
+>> -               unsigned int hctx_idx, unsigned int numa_node)
+>> -{
+>> -       struct virtio_blk *vblk = set->driver_data;
+>> -       struct virtblk_req *vbr = blk_mq_rq_to_pdu(rq);
+>> -
+>> -       sg_init_table(vbr->sg, vblk->sg_elems);
+>> -       return 0;
+>> -}
+>> -
+>>   static int virtblk_map_queues(struct blk_mq_tag_set *set)
+>>   {
+>>          struct virtio_blk *vblk = set->driver_data;
+>> @@ -709,7 +717,6 @@ static const struct blk_mq_ops virtio_mq_ops = {
+>>          .queue_rq       = virtio_queue_rq,
+>>          .commit_rqs     = virtio_commit_rqs,
+>>          .complete       = virtblk_request_done,
+>> -       .init_request   = virtblk_init_request,
+>>          .map_queues     = virtblk_map_queues,
+>>   };
+>>
+>> @@ -805,7 +812,7 @@ static int virtblk_probe(struct virtio_device *vdev)
+>>          vblk->tag_set.flags = BLK_MQ_F_SHOULD_MERGE;
+>>          vblk->tag_set.cmd_size =
+>>                  sizeof(struct virtblk_req) +
+>> -               sizeof(struct scatterlist) * sg_elems;
+>> +               sizeof(struct scatterlist) * VIRTIO_BLK_INLINE_SG_CNT;
+>>          vblk->tag_set.driver_data = vblk;
+>>          vblk->tag_set.nr_hw_queues = vblk->num_vqs;
+>>
+>> --
+>> 2.18.1
+>>
