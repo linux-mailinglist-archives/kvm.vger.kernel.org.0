@@ -2,208 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 609893FDE9B
-	for <lists+kvm@lfdr.de>; Wed,  1 Sep 2021 17:25:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 026D43FDEA1
+	for <lists+kvm@lfdr.de>; Wed,  1 Sep 2021 17:27:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343746AbhIAP02 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Sep 2021 11:26:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22006 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1343727AbhIAP0Z (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 1 Sep 2021 11:26:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630509928;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=aPK/WRSDF8QrZ8XSCsCWCd7jM/z+l8eT9+5P3Qag9/8=;
-        b=Zu27jAa/t5NuAH6IBiZXlmFjO6ipGoh1tKBWzeDA0uZG3FaeWW1W0xxdKI25iqsxeCn+PZ
-        FZXy2/0W5BiiMdIDY6d9E3cPPdYS3rsVpuoZmFcz0GR5IXkOFdQTfLX+s7fF8SeATmUs1u
-        GK5EH0sNPreRlv1b9855x0ifP0Gpy2I=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-65-VcxYa_cGOyyUtktu9xjr2g-1; Wed, 01 Sep 2021 11:25:26 -0400
-X-MC-Unique: VcxYa_cGOyyUtktu9xjr2g-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E303018460E4;
-        Wed,  1 Sep 2021 15:25:25 +0000 (UTC)
-Received: from localhost (unknown [10.22.8.94])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id AAAFC19C79;
-        Wed,  1 Sep 2021 15:25:25 +0000 (UTC)
-Date:   Wed, 1 Sep 2021 11:25:25 -0400
-From:   Eduardo Habkost <ehabkost@redhat.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Igor Mammedov <imammedo@redhat.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Subject: Re: [PATCH] kvm: x86: Increase MAX_VCPUS to 710
-Message-ID: <20210901152525.g5fnf5ketta3fjhl@habkost.net>
-References: <20210831204535.1594297-1-ehabkost@redhat.com>
- <87sfyooh9x.fsf@vitty.brq.redhat.com>
- <20210901111326.2efecf6e@redhat.com>
- <87ilzkob6k.fsf@vitty.brq.redhat.com>
- <20210901153615.296486b5@redhat.com>
- <875yvknyrj.fsf@vitty.brq.redhat.com>
+        id S1343623AbhIAP2A (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Sep 2021 11:28:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42726 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1343525AbhIAP17 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Sep 2021 11:27:59 -0400
+Received: from mail-il1-x131.google.com (mail-il1-x131.google.com [IPv6:2607:f8b0:4864:20::131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BF17C061575
+        for <kvm@vger.kernel.org>; Wed,  1 Sep 2021 08:27:02 -0700 (PDT)
+Received: by mail-il1-x131.google.com with SMTP id h29so3725666ila.2
+        for <kvm@vger.kernel.org>; Wed, 01 Sep 2021 08:27:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=P4hWmiVCsoalS+MUxb6yp9qen+G/lJg4S4KtX6kUkIg=;
+        b=bAVSIYQ+ja4RwQISg4uNNKJLNh45xtISDhVk9AR2uD9C8rzMnOwI7smTNyDDsjvVhp
+         5lv/E6d/3OL3YUt7CYKIdA9UQOJTPCcGJC0rIsN3eAu9DGf2SzQkphQ9T5JuIkySfLPX
+         8cOOZ3V4znimIUsO1BfrNI4Ctub7u3AviThY62yo8rYSfzQk3MYasYAdXaWcBS9Uu2W/
+         fiTsLtF+iv8UIKeRRfZKzT4XaDuWDlrIQbs7dE+RI0oRYQoAPqdRmzarG9xvclxdYpCZ
+         1YfnL+2c2MGnyUgjN33eQkWFnfrMgbyKqLp5piKS0lFyRs3ODqVW2i8bVKSCB0052vbM
+         JB0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=P4hWmiVCsoalS+MUxb6yp9qen+G/lJg4S4KtX6kUkIg=;
+        b=PNYOtRR2q3s+IRL+NjzXAqi+Hae/ndMAnERqwOoTZyXiDxu2O2BVNmKK7gS+Hl0Lws
+         HnFoy94MJMg+XbU4P0BtjioQz+9oLC9cAYGESqMRR4dGBJLCLbEMcZMIBS93b7j6E0Lu
+         hEDDpadW2fv6atWQk+hEsTx2RkTxxD4D2sAceBYp9oArxBYDcbRQVkjGxtqvwn2Opzg/
+         EtJawuifjDohv781qBKbM+JSom5gCWeI1DXc3Dx1gcpyGdJoVKch71AGUQJ+O+zRa20A
+         Olc4tge2tBVkIbTzq0qkRZ8qyP68MslvZrqWZBxm2NgdsUxmf7pnK6oRtxPHth4Ac8RZ
+         IzPA==
+X-Gm-Message-State: AOAM533oKMnGYcseCEKJ7TE0+4N3fv/RpMchZxqUtkVLo5rpyNTO/bdu
+        US4ZwVnPtonETsASly6SzR2iZg==
+X-Google-Smtp-Source: ABdhPJzu7OecURDkdeuTRcdqGYhldWEarwW4nuDTPdc7m9jAK9+iiAPcpIvGYEtV9JmBvvSla+EqVA==
+X-Received: by 2002:a92:c5cf:: with SMTP id s15mr80745ilt.62.1630510021791;
+        Wed, 01 Sep 2021 08:27:01 -0700 (PDT)
+Received: from [192.168.1.30] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id c5sm175541ilr.54.2021.09.01.08.27.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 01 Sep 2021 08:27:01 -0700 (PDT)
+Subject: Re: [PATCH v3 1/1] virtio-blk: avoid preallocating big SGL for data
+To:     Max Gurtovoy <mgurtovoy@nvidia.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     hch@infradead.org, virtualization@lists.linux-foundation.org,
+        kvm@vger.kernel.org, stefanha@redhat.com, israelr@nvidia.com,
+        nitzanc@nvidia.com, oren@nvidia.com, linux-block@vger.kernel.org
+References: <20210901131434.31158-1-mgurtovoy@nvidia.com>
+ <20210901102623-mutt-send-email-mst@kernel.org>
+ <89d6dc30-a876-b1b0-4ff4-605415113611@nvidia.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <6a648daf-dd93-0c16-58d6-e4a59334bf0b@kernel.dk>
+Date:   Wed, 1 Sep 2021 09:27:00 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
+In-Reply-To: <89d6dc30-a876-b1b0-4ff4-605415113611@nvidia.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <875yvknyrj.fsf@vitty.brq.redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 01, 2021 at 04:42:08PM +0200, Vitaly Kuznetsov wrote:
-> Igor Mammedov <imammedo@redhat.com> writes:
+On 9/1/21 8:58 AM, Max Gurtovoy wrote:
 > 
-> > On Wed, 01 Sep 2021 12:13:55 +0200
-> > Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
-> >
-> >> Igor Mammedov <imammedo@redhat.com> writes:
-> >> 
-> >> > On Wed, 01 Sep 2021 10:02:18 +0200
-> >> > Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
-> >> >  
-> >> >> Eduardo Habkost <ehabkost@redhat.com> writes:
-> >> >>   
-> >> >> > Support for 710 VCPUs has been tested by Red Hat since RHEL-8.4.
-> >> >> > Increase KVM_MAX_VCPUS and KVM_SOFT_MAX_VCPUS to 710.
-> >> >> >
-> >> >> > For reference, visible effects of changing KVM_MAX_VCPUS are:
-> >> >> > - KVM_CAP_MAX_VCPUS and KVM_CAP_NR_VCPUS will now return 710 (of course)
-> >> >> > - Default value for CPUID[HYPERV_CPUID_IMPLEMENT_LIMITS (00x40000005)].EAX
-> >> >> >   will now be 710
-> >> >> > - Bitmap stack variables that will grow:
-> >> >> >   - At kvm_hv_flush_tlb()  kvm_hv_send_ipi():
-> >> >> >     - Sparse VCPU bitmap (vp_bitmap) will be 96 bytes long
-> >> >> >     - vcpu_bitmap will be 92 bytes long
-> >> >> >   - vcpu_bitmap at bioapic_write_indirect() will be 92 bytes long
-> >> >> >     once patch "KVM: x86: Fix stack-out-of-bounds memory access
-> >> >> >     from ioapic_write_indirect()" is applied
-> >> >> >
-> >> >> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> >> >> > ---
-> >> >> >  arch/x86/include/asm/kvm_host.h | 4 ++--
-> >> >> >  1 file changed, 2 insertions(+), 2 deletions(-)
-> >> >> >
-> >> >> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> >> >> > index af6ce8d4c86a..f76fae42bf45 100644
-> >> >> > --- a/arch/x86/include/asm/kvm_host.h
-> >> >> > +++ b/arch/x86/include/asm/kvm_host.h
-> >> >> > @@ -37,8 +37,8 @@
-> >> >> >  
-> >> >> >  #define __KVM_HAVE_ARCH_VCPU_DEBUGFS
-> >> >> >  
-> >> >> > -#define KVM_MAX_VCPUS 288
-> >> >> > -#define KVM_SOFT_MAX_VCPUS 240
-> >> >> > +#define KVM_MAX_VCPUS 710    
-> >> >> 
-> >> >> Out of pure curiosity, where did 710 came from? Is this some particular
-> >> >> hardware which was used for testing (weird number btw). Should we maybe
-> >> >> go to e.g. 1024 for the sake of the beauty of powers of two? :-)
-
-710 wasn't tested with real VMs yet due to userspace limitations
-that still need to be addressed (specifically, due to SMBIOS 2.1
-table size limits).
-
-I would be more than happy to set it to 1024 or 2048 if the KVM
-maintainers agree.  :)
-
-For reference, RHEL-8.4 is compiled with KVM_MAX_VCPUS=2048, but
-userspace enforces a 710 VCPU limit.
-
-> >> >>   
-> >> >> > +#define KVM_SOFT_MAX_VCPUS 710    
-> >> >> 
-> >> >> Do we really need KVM_SOFT_MAX_VCPUS which is equal to KVM_MAX_VCPUS?
-> >> >> 
-> >> >> Reading 
-> >> >> 
-> >> >> commit 8c3ba334f8588e1d5099f8602cf01897720e0eca
-> >> >> Author: Sasha Levin <levinsasha928@gmail.com>
-> >> >> Date:   Mon Jul 18 17:17:15 2011 +0300
-> >> >> 
-> >> >>     KVM: x86: Raise the hard VCPU count limit
-> >> >> 
-> >> >> the idea behind KVM_SOFT_MAX_VCPUS was to allow developers to test high
-> >> >> vCPU numbers without claiming such configurations as supported.
-> >> >> 
-> >> >> I have two alternative suggestions:
-> >> >> 1) Drop KVM_SOFT_MAX_VCPUS completely.
-> >> >> 2) Raise it to a higher number (e.g. 2048)
-
-I will send a RFC later proposing we make KVM_MAX_VCPUS
-configurable by Kconfig, and dropping KVM_SOFT_MAX_VCPUS.
-
-> >> >>   
-> >> >> >  #define KVM_MAX_VCPU_ID 1023    
-> >> >> 
-> >> >> 1023 may not be enough now. I rememeber there was a suggestion to make
-> >> >> max_vcpus configurable via module parameter and this question was
-> >> >> raised:
-> >> >> 
-> >> >> https://lore.kernel.org/lkml/878s292k75.fsf@vitty.brq.redhat.com/
-> >> >> 
-> >> >> TL;DR: to support EPYC-like topologies we need to keep
-> >> >>  KVM_MAX_VCPU_ID = 4 * KVM_MAX_VCPUS  
-
-1024 seems to be enough on all the CPU topologies I have seen,
-but I can happily implement the 4x rule below, just to be sure.
-
-> >> >
-> >> > VCPU_ID (sequential 0-n range) is not APIC ID (sparse distribution),
-> >> > so topology encoded in the later should be orthogonal to VCPU_ID.  
-> >> 
-> >> Why do we even have KVM_MAX_VCPU_ID which is != KVM[_SOFT]_MAX_VCPUS
-> >> then?
-> > I'd say for compat reasons (8c3ba334f85 KVM: x86: Raise the hard VCPU count limit)
-> >
-> > qemu warns users that they are out of recommended (tested) limit when
-> > it sees requested maxcpus over soft limit.
-> > See soft_vcpus_limit in qemu.
-> >
+> On 9/1/2021 5:50 PM, Michael S. Tsirkin wrote:
+>> On Wed, Sep 01, 2021 at 04:14:34PM +0300, Max Gurtovoy wrote:
+>>> No need to pre-allocate a big buffer for the IO SGL anymore. If a device
+>>> has lots of deep queues, preallocation for the sg list can consume
+>>> substantial amounts of memory. For HW virtio-blk device, nr_hw_queues
+>>> can be 64 or 128 and each queue's depth might be 128. This means the
+>>> resulting preallocation for the data SGLs is big.
+>>>
+>>> Switch to runtime allocation for SGL for lists longer than 2 entries.
+>>> This is the approach used by NVMe drivers so it should be reasonable for
+>>> virtio block as well. Runtime SGL allocation has always been the case
+>>> for the legacy I/O path so this is nothing new.
+>>>
+>>> The preallocated small SGL depends on SG_CHAIN so if the ARCH doesn't
+>>> support SG_CHAIN, use only runtime allocation for the SGL.
+>>>
+>>> Re-organize the setup of the IO request to fit the new sg chain
+>>> mechanism.
+>>>
+>>> No performance degradation was seen (fio libaio engine with 16 jobs and
+>>> 128 iodepth):
+>>>
+>>> IO size      IOPs Rand Read (before/after)         IOPs Rand Write (before/after)
+>>> --------     ---------------------------------    ----------------------------------
+>>> 512B          318K/316K                                    329K/325K
+>>>
+>>> 4KB           323K/321K                                    353K/349K
+>>>
+>>> 16KB          199K/208K                                    250K/275K
+>>>
+>>> 128KB         36K/36.1K                                    39.2K/41.7K
+>>>
+>>> Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
+>>> Reviewed-by: Israel Rukshin <israelr@nvidia.com>
+>> Could you use something to give confidence intervals maybe?
+>> As it is it looks like a 1-2% regression for 512B and 4KB.
 > 
-> That's the reason why we have KVM_SOFT_MAX_VCPUS in addition to
-> KVM_MAX_VCPUS, not why we have KVM_MAX_VCPU_ID :-)
+> 1%-2% is not a regression. It's a device/env/test variance.
 > 
-> >
-> >> KVM_MAX_VCPU_ID is only checked in kvm_vm_ioctl_create_vcpu() which
-> >> passes 'id' down to kvm_vcpu_init() which, in its turn, sets
-> >> 'vcpu->vcpu_id'. This is, for example, returned by kvm_x2apic_id():
-> >> 
-> >> static inline u32 kvm_x2apic_id(struct kvm_lapic *apic)
-> >> {
-> >>         return apic->vcpu->vcpu_id;
-> >> }
-> >> 
-> >> So I'm pretty certain this is actually APIC id and it has topology in
-> >> it.
-> > Yep, I mixed it up with cpu_index on QEMU side,
-> > for x86 it fetches actual apic id and feeds that to kvm when creating vCPU.
-> >
-> > It looks like KVM_MAX_VCPU_ID (KVM_SOFT_MAX_VCPUS) is essentially
-> > MAX_[SOFT_]APIC_ID which in some places is treated as max number of vCPUs,
-> > so actual max count of vCPUs could be less than that (in case of sparse APIC
-> > IDs /non power of 2 thread|core|whatever count/).
+> This is just one test results. I run it many times and got difference by 
+> +/- 2%-3% in each run for each sides.
 > 
-> Yes. To avoid the confusion, I'd suggest we re-define KVM_MAX_VCPU_ID as
-> something like:
+> Even if I run same driver without changes I get 2%-3% difference between 
+> runs.
 > 
-> #define KVM_MAX_VCPU_ID_TO_MAX_VCPUS_RATIO 4
-> #define KVM_MAX_VCPU_ID (KVM_MAX_VCPUS * KVM_MAX_VCPU_ID_TO_MAX_VCPUS_RATIO)
-> 
-> and add a comment about sparse APIC IDs/topology.
+> If you have a perf test suite for virtio-blk it will be great if you can 
+> run it, or maybe Feng Li has.
 
-I will submit a new version of this patch with a rule like the
-above.
+You're adding an allocation to the hot path, and a free to the
+completion hot path. It's not unreasonable to expect that there could be
+performance implications associated with that. Which would be
+particularly evident with 1 segment requests, as the results would seem
+to indicate as well.
 
-A 4x ratio is very generous, but the only impact of a large
-KVM_MAX_VCPU_ID is a larger struct kvm_ioapic.  Changing
-KVM_MAX_VCPU_ID from 1024 to 4096 will make struct kvm_ioapic
-grow from 1628 bytes to 5084 bytes, which I assume is OK.
+Probably needs better testing. A profile of a peak run before and after
+and a diff of the two might also be interesting.
+
+The common idiom for situations like this is to have an inline part that
+holds 1-2 segments, and then only punt to alloc if you need more than
+that. As the number of segments grows, the cost per request matters
+less.
 
 -- 
-Eduardo
+Jens Axboe
 
