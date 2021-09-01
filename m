@@ -2,177 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 205093FD4C5
-	for <lists+kvm@lfdr.de>; Wed,  1 Sep 2021 09:52:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0758C3FD4D9
+	for <lists+kvm@lfdr.de>; Wed,  1 Sep 2021 10:02:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242850AbhIAHwT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Sep 2021 03:52:19 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33199 "EHLO
+        id S242892AbhIAIDh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Sep 2021 04:03:37 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43062 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S242622AbhIAHwR (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 1 Sep 2021 03:52:17 -0400
+        by vger.kernel.org with ESMTP id S242777AbhIAIDZ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 1 Sep 2021 04:03:25 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630482681;
+        s=mimecast20190719; t=1630483342;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=5/n4oX+wgvboyZg/iFTnmBK58XCroGgLcRn2/A07gOQ=;
-        b=Oc4EzyZOaFGKcO9FtwKX35hqRDwqlVH2Sk9gQ3CCvgMpo1K4VTWrxBvXvT/aP0dp6Jmfih
-        tXAttoPieJQLgsHlIZmef4513r8x0g6fvxRi/yG0p+PjXBADIR5spZMpjUiKTrYRPw+Yfy
-        NyrBWIAr2FdVtXtfgYFCsNH5dHdZU4c=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-433-Il0HX6rRMx2FW_wG5lK49w-1; Wed, 01 Sep 2021 03:51:20 -0400
-X-MC-Unique: Il0HX6rRMx2FW_wG5lK49w-1
-Received: by mail-wr1-f70.google.com with SMTP id h6-20020a5d4fc6000000b00157503046afso502710wrw.3
-        for <kvm@vger.kernel.org>; Wed, 01 Sep 2021 00:51:19 -0700 (PDT)
+        bh=t+nKp+2THLvSwMHH3W4CrKkRm3I1qSRf6x+wufAoR9s=;
+        b=Oz5jeKCAnuus8kYw08v42x2F5qTT6zd5pfQo+8tbCSk/BYOmxphW6lpWgjYynmeZDwaOoV
+        mXy8RbVyfpKlHRcFCPgOOGPLDmHRJBjRITNfBtsk7oeicl51xpT/E8rdwBpleOMYdtCPKX
+        WV+jke7yPgpHAJeiEzj0uN/jUOcwKLk=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-289-6uorYyM-PkaC9-6yoRp6Zw-1; Wed, 01 Sep 2021 04:02:21 -0400
+X-MC-Unique: 6uorYyM-PkaC9-6yoRp6Zw-1
+Received: by mail-wr1-f72.google.com with SMTP id t15-20020a5d42cf000000b001565f9c9ee8so519603wrr.2
+        for <kvm@vger.kernel.org>; Wed, 01 Sep 2021 01:02:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:organization
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=5/n4oX+wgvboyZg/iFTnmBK58XCroGgLcRn2/A07gOQ=;
-        b=j5OziSLQ0wN+Er5WOKYKsg5DMEqZHwu1lO2lVZ2qLjE56EBHp6KHAKgshPcjkj+5Iy
-         OSOzbGHlp0M0sxKabrd1YU23g2EukhwwGmnnEsGYJPXp93jNPThXUtinDMj2ST/yjPQD
-         b/MwyA0GVr+ohs5NqFR1y4Q8NLNauBd9RB4wYDr8lGs3pHS94YSrlCAamz8X77xVWFcx
-         Vbl1bCWhdivgLMKhAzXF9+29h8IUY39KCTnuPbTRbn3OMMh6vtoe1+wvh4PjiPqzW6/s
-         c3XlKH3F/RT/97HnI82TzzdxGUmXzklSDYTDC9mP2IHLkspzQFXAfdOni4GrdjgQO3VA
-         l4/g==
-X-Gm-Message-State: AOAM530yaTO7r/HdDxyObXgAabPQ7LRhKwlqPs9WyFkchekE46eIWJ2w
-        GjbpX49nncfJOm38gZG4AqbsaTS8I806/0CWmOILc9b93HpBu40TP+/oXTHLb7WGT76x7SrGrPu
-        GBnzarWGqL4Ny
-X-Received: by 2002:a5d:6909:: with SMTP id t9mr34318579wru.44.1630482678969;
-        Wed, 01 Sep 2021 00:51:18 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxMTvey89SA3DoF/1V8U6PpKmCzoHc/KiiggH+ZLjefcj776vc8ndYgcBGPfQkb8V+1P+tq7Q==
-X-Received: by 2002:a5d:6909:: with SMTP id t9mr34318566wru.44.1630482678787;
-        Wed, 01 Sep 2021 00:51:18 -0700 (PDT)
-Received: from [192.168.3.132] (p4ff23f71.dip0.t-ipconnect.de. [79.242.63.113])
-        by smtp.gmail.com with ESMTPSA id v13sm21108768wrf.55.2021.09.01.00.51.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 01 Sep 2021 00:51:18 -0700 (PDT)
-Subject: Re: [RFC] KVM: mm: fd-based approach for supporting KVM guest private
- memory
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Andy Lutomirski <luto@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Borislav Petkov <bp@alien8.de>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Joerg Roedel <jroedel@suse.de>,
-        Andi Kleen <ak@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Varad Gautam <varad.gautam@suse.com>,
-        Dario Faggioli <dfaggioli@suse.com>,
-        the arch/x86 maintainers <x86@kernel.org>,
-        linux-mm@kvack.org, linux-coco@lists.linux.dev,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Sathyanarayanan Kuppuswamy 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>
-References: <20210824005248.200037-1-seanjc@google.com>
- <307d385a-a263-276f-28eb-4bc8dd287e32@redhat.com>
- <40af9d25-c854-8846-fdab-13fe70b3b279@kernel.org>
- <cfe75e39-5927-c02a-b8bc-4de026bb7b3b@redhat.com>
- <73319f3c-6f5e-4f39-a678-7be5fddd55f2@www.fastmail.com>
- <YSlnJpWh8fdpddTA@google.com>
- <949e6d95-266d-0234-3b86-6bd3c5267333@redhat.com>
- <YS6U1u/p+nOXVEfS@google.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-Message-ID: <a21fc9cf-0775-2c70-0ad6-61bb1363e2d0@redhat.com>
-Date:   Wed, 1 Sep 2021 09:51:17 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=t+nKp+2THLvSwMHH3W4CrKkRm3I1qSRf6x+wufAoR9s=;
+        b=c6HY2x3av9PJSkiXq3/QbZsJGxIE0G8+c2Oc2CpLLM+OFSuWgtEBAE/8Y2iDQx7dJ5
+         gACSMjInE7lEeIYtRmqyh3mwV7NaJvuzrEzCG6HLD0+o/Nlf8bsojURYDmrntTZOXslJ
+         plsXJC9l7AV4Fydc1OimaGUCJogeoUFvtnF8yQlMp9Xn5N5haZWGhptHC08qROXYHmB6
+         nStNXA+9945ECP0FQ5sIU92Num2oEQGWFcbAylXvKfo4vPD42E9YbgSO1bTu8Jj5AHrP
+         VHwuZFTLHBko8aU1SHOjukebdVdi7ahTJaXfyOufAlEaqjOVYfM2Y4JYk+VxFzkWm+7t
+         X5Eg==
+X-Gm-Message-State: AOAM531pwPyucHScPL5Lm5mmH5nL3ol9fUHxDtl2BVOaiZTpdOuOE+Ok
+        JHVncSjt2lSBKVIgJ3cE6tNSgWoi8xlAH0mZdAuJV2GBU5ShMBqZJVMW1GWU7PQqcK7FVADTADY
+        avTNjd5HAFXnp
+X-Received: by 2002:a5d:6ac7:: with SMTP id u7mr36837467wrw.390.1630483339921;
+        Wed, 01 Sep 2021 01:02:19 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwzkgBHBDv1S3YvagSZoXp5l3fedPXVzobffJCjW2/eH1e6fx5TjBzQv0qkLZ40yg5JaZq4iw==
+X-Received: by 2002:a5d:6ac7:: with SMTP id u7mr36837446wrw.390.1630483339679;
+        Wed, 01 Sep 2021 01:02:19 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id h16sm20676700wre.52.2021.09.01.01.02.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 01 Sep 2021 01:02:19 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Eduardo Habkost <ehabkost@redhat.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Subject: Re: [PATCH] kvm: x86: Increase MAX_VCPUS to 710
+In-Reply-To: <20210831204535.1594297-1-ehabkost@redhat.com>
+References: <20210831204535.1594297-1-ehabkost@redhat.com>
+Date:   Wed, 01 Sep 2021 10:02:18 +0200
+Message-ID: <87sfyooh9x.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <YS6U1u/p+nOXVEfS@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 31.08.21 22:45, Sean Christopherson wrote:
-> On Tue, Aug 31, 2021, David Hildenbrand wrote:
->> On 28.08.21 00:28, Sean Christopherson wrote:
->>> On Fri, Aug 27, 2021, Andy Lutomirski wrote:
->>>>
->>>> On Thu, Aug 26, 2021, at 2:26 PM, David Hildenbrand wrote:
->>>>> On 26.08.21 19:05, Andy Lutomirski wrote:
->>>>
->>>>>> Oof.  That's quite a requirement.  What's the point of the VMA once all
->>>>>> this is done?
->>>>>
->>>>> You can keep using things like mbind(), madvise(), ... and the GUP code
->>>>> with a special flag might mostly just do what you want. You won't have
->>>>> to reinvent too many wheels on the page fault logic side at least.
->>>
->>> Ya, Kirill's RFC more or less proved a special GUP flag would indeed Just Work.
->>> However, the KVM page fault side of things would require only a handful of small
->>> changes to send private memslots down a different path.  Compared to the rest of
->>> the enabling, it's quite minor.
->>>
->>> The counter to that is other KVM architectures would need to learn how to use the
->>> new APIs, though I suspect that there will be a fair bit of arch enabling regardless
->>> of what route we take.
->>>
->>>> You can keep calling the functions.  The implementations working is a
->>>> different story: you can't just unmap (pte_numa-style or otherwise) a private
->>>> guest page to quiesce it, move it with memcpy(), and then fault it back in.
->>>
->>> Ya, I brought this up in my earlier reply.  Even the initial implementation (without
->>> real NUMA support) would likely be painful, e.g. the KVM TDX RFC/PoC adds dedicated
->>> logic in KVM to handle the case where NUMA balancing zaps a _pinned_ page and then
->>> KVM fault in the same pfn.  It's not thaaat ugly, but it's arguably more invasive
->>> to KVM's page fault flows than a new fd-based private memslot scheme.
->>
->> I might have a different mindset, but less code churn doesn't necessarily
->> translate to "better approach".
-> 
-> I wasn't referring to code churn.  By "invasive" I mean number of touchpoints in
-> KVM as well as the nature of the touchpoints.  E.g. poking into how KVM uses
-> available bits in its shadow PTEs and adding multiple checks through KVM's page
-> fault handler, versus two callbacks to get the PFN and page size.
-> 
->> I'm certainly not pushing for what I proposed (it's a rough, broken sketch).
->> I'm much rather trying to come up with alternatives that try solving the
->> same issue, handling the identified requirements.
->>
->> I have a gut feeling that the list of requirements might not be complete
->> yet. For example, I wonder if we have to protect against user space
->> replacing private pages by shared pages or punishing random holes into the
->> encrypted memory fd.
-> 
-> Replacing a private page with a shared page for a given GFN is very much a
-> requirement as it's expected behavior for all VMM+guests when converting guest
-> memory between shared and private.
-> 
-> Punching holes is a sort of optional requirement.  It's a "requirement" in that
-> it's allowed if the backing store supports such a behavior, optional in that
-> support wouldn't be strictly necessary and/or could come with constraints.  The
-> expected use case is that host userspace would punch a hole to free unreachable
-> private memory, e.g. after the corresponding GFN(s) is converted to shared, so
-> that it doesn't consume 2x memory for the guest.
-> 
+Eduardo Habkost <ehabkost@redhat.com> writes:
 
-Okay, that matches my understanding then. I was rather thinking about 
-"what happens if we punch a hole where private memory was not converted 
-to shared yet". AFAIU, we will simply crash the guest then.
+> Support for 710 VCPUs has been tested by Red Hat since RHEL-8.4.
+> Increase KVM_MAX_VCPUS and KVM_SOFT_MAX_VCPUS to 710.
+>
+> For reference, visible effects of changing KVM_MAX_VCPUS are:
+> - KVM_CAP_MAX_VCPUS and KVM_CAP_NR_VCPUS will now return 710 (of course)
+> - Default value for CPUID[HYPERV_CPUID_IMPLEMENT_LIMITS (00x40000005)].EAX
+>   will now be 710
+> - Bitmap stack variables that will grow:
+>   - At kvm_hv_flush_tlb()  kvm_hv_send_ipi():
+>     - Sparse VCPU bitmap (vp_bitmap) will be 96 bytes long
+>     - vcpu_bitmap will be 92 bytes long
+>   - vcpu_bitmap at bioapic_write_indirect() will be 92 bytes long
+>     once patch "KVM: x86: Fix stack-out-of-bounds memory access
+>     from ioapic_write_indirect()" is applied
+>
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> ---
+>  arch/x86/include/asm/kvm_host.h | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index af6ce8d4c86a..f76fae42bf45 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -37,8 +37,8 @@
+>  
+>  #define __KVM_HAVE_ARCH_VCPU_DEBUGFS
+>  
+> -#define KVM_MAX_VCPUS 288
+> -#define KVM_SOFT_MAX_VCPUS 240
+> +#define KVM_MAX_VCPUS 710
+
+Out of pure curiosity, where did 710 came from? Is this some particular
+hardware which was used for testing (weird number btw). Should we maybe
+go to e.g. 1024 for the sake of the beauty of powers of two? :-)
+
+> +#define KVM_SOFT_MAX_VCPUS 710
+
+Do we really need KVM_SOFT_MAX_VCPUS which is equal to KVM_MAX_VCPUS?
+
+Reading 
+
+commit 8c3ba334f8588e1d5099f8602cf01897720e0eca
+Author: Sasha Levin <levinsasha928@gmail.com>
+Date:   Mon Jul 18 17:17:15 2011 +0300
+
+    KVM: x86: Raise the hard VCPU count limit
+
+the idea behind KVM_SOFT_MAX_VCPUS was to allow developers to test high
+vCPU numbers without claiming such configurations as supported.
+
+I have two alternative suggestions:
+1) Drop KVM_SOFT_MAX_VCPUS completely.
+2) Raise it to a higher number (e.g. 2048)
+
+>  #define KVM_MAX_VCPU_ID 1023
+
+1023 may not be enough now. I rememeber there was a suggestion to make
+max_vcpus configurable via module parameter and this question was
+raised:
+
+https://lore.kernel.org/lkml/878s292k75.fsf@vitty.brq.redhat.com/
+
+TL;DR: to support EPYC-like topologies we need to keep
+ KVM_MAX_VCPU_ID = 4 * KVM_MAX_VCPUS
+
+>  /* memory slots that are not exposed to userspace */
+>  #define KVM_PRIVATE_MEM_SLOTS 3
 
 -- 
-Thanks,
-
-David / dhildenb
+Vitaly
 
