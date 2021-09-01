@@ -2,94 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D8F593FE5FA
-	for <lists+kvm@lfdr.de>; Thu,  2 Sep 2021 02:33:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 49F043FE604
+	for <lists+kvm@lfdr.de>; Thu,  2 Sep 2021 02:33:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230258AbhIAXKH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Sep 2021 19:10:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23446 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229948AbhIAXKG (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 1 Sep 2021 19:10:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630537748;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=O15h3cnMt3r90lGmwHlcMNuy4JQHK1FoGivTCAbP3QU=;
-        b=WI23YuJpoCYjnQuvMp/Fjx/+hbsnzhyI/hroXacgVrZG8CpsWezHIld/gKe9fvIWMLswwx
-        fktf5cG7UwU8FYqYHCoh6WAXuqkcL0v30tq/HHikp6kH/Kq9XDk94ulvD8it46Ti2cuB/I
-        EXNKECZiOBn5Mt05JSXNVLsCbSVzbSc=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-53-JEnNAUGUP2CDTCw0vjfphQ-1; Wed, 01 Sep 2021 19:09:07 -0400
-X-MC-Unique: JEnNAUGUP2CDTCw0vjfphQ-1
-Received: by mail-qk1-f197.google.com with SMTP id e22-20020a05620a209600b003d5ff97bff7so80831qka.1
-        for <kvm@vger.kernel.org>; Wed, 01 Sep 2021 16:09:07 -0700 (PDT)
+        id S242620AbhIAXQm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Sep 2021 19:16:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39462 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229948AbhIAXQl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Sep 2021 19:16:41 -0400
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FC72C061575
+        for <kvm@vger.kernel.org>; Wed,  1 Sep 2021 16:15:44 -0700 (PDT)
+Received: by mail-pl1-x629.google.com with SMTP id k17so56912pls.0
+        for <kvm@vger.kernel.org>; Wed, 01 Sep 2021 16:15:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=uLkRX3S7HGOH3GdjbZJv+B4Lvvu9s6EgNeW/1aZYJLQ=;
+        b=RN3BnZBwO96riciijRXqXoQFBTBrohC3wUD7MTVF1WCmDe3w4DQravBqkmmdjFODBP
+         s74FrqxTc7Zq5rmhv64juzrZcIWCB75JkO78J1my/hCcXt3A9XbXdgL0GQXOT7jRd57M
+         MIB8CTKEQBSNl7ej2ckj28Kaf0cFmsy9eOK7qgYS87ccMLERmzf95AI5kI+YfgtblSaK
+         Uspzks0jpCtsy4MVf51MU3hHPe2jcKkVMwCpny4qKYdXQM97iHzSOqFOnaA8Ir9IGNML
+         URO4db0po9HRciSzH0Yn15NC+0ugIVKxjUE9YnkQsMgHq/DJwDa5q5U1FubuMQtnfhJS
+         y5+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=O15h3cnMt3r90lGmwHlcMNuy4JQHK1FoGivTCAbP3QU=;
-        b=p2pe18kXAyypTO8zltP4QhRi+06mxTOl3Za/hrMPMcZMLYmPTkfagRvdm6xYHA4ItE
-         r6R9WlsU2LVVXPrph0LIiYmOsTvdrWirOPvflUrZ7JeTJCEyJ1Qg4ueq8/NoQ2v8/tar
-         TUx81p0JShNTHUMnju72vE8HdTLL8iyngsLjnH3wdKgq437DSJWMfz02z4Zb6CztN0QR
-         29YFMf0eRiO2+l7OUTyyy682vvSytTF63RbKAPSaaLwYppIkqmgYSaN8qme4aAsnMq22
-         Lya/IouZDyrB+/tHasVWD+49cKrRQs4muz/Zi4zdFytkINvmKU4Gu5jrMmkb1TTBZNbT
-         hUSQ==
-X-Gm-Message-State: AOAM533sbqYSJ9Q2gNaKh50hp1gQRwQGtMpUpwMG/vNAfrJNZeFjtkPD
-        Woglkjoqz9tUbGVKtHQNz5fUK4Wl0brxji62Nh0xG6sKSof483oPALxl7tscOVih1E87F5LX/z9
-        IMaOd2ZPedPY5
-X-Received: by 2002:a37:9606:: with SMTP id y6mr365137qkd.13.1630537746823;
-        Wed, 01 Sep 2021 16:09:06 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw9XwSNTYstZ57acJcE/IHaVbtArR01acSqrUKGp0QC9HqkkUTWtg/HBX5PlhcO88Dujmz14A==
-X-Received: by 2002:a37:9606:: with SMTP id y6mr365114qkd.13.1630537746633;
-        Wed, 01 Sep 2021 16:09:06 -0700 (PDT)
-Received: from t490s.redhat.com ([2607:fea8:56a3:500::ad7f])
-        by smtp.gmail.com with ESMTPSA id j23sm87559qkl.65.2021.09.01.16.09.05
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=uLkRX3S7HGOH3GdjbZJv+B4Lvvu9s6EgNeW/1aZYJLQ=;
+        b=iq9YTCZ/OpCdECOIezoAaAPilSYSJlPg/MVEmDMuHzrRjs3GCAGqf+OObK/5KG9gh6
+         NdCIkDqG5OejnOa9u8/X2M1d3ONZyWfv5xRj7nAxGzx3Yy0E4Vn4yo7ibRigpjARYPKA
+         b4XmU5ud6m69qcSIMAzPU0CrLtBAx9sUa4VkUnU9avBqC5Kf9f8+ufsJDX1i/X8QpnJc
+         xTw57Xm8U57a9KgYUV+nTjxgRyMqu08XRsohbwNxlXmm08Rm2S6KoMmgaMLX5rNP0P4B
+         vQsXmlrr9bG8XzeBi7ahvAA/el6pNwinFtpWQ1oJveA3glfuIE1rUDo2QUudAlM4DydZ
+         LQYA==
+X-Gm-Message-State: AOAM530i0h2+j4Y+ODd2SUsjc6TJtFKBC3IJUYA9Ba83ciUa6f/JKchi
+        02JaI4FEOa19qY2+phj8Wc0Uug==
+X-Google-Smtp-Source: ABdhPJwqLGVyEByKojljzYoFCXPfkkHvZPBB5tyavPSMOTWdQ8nggbgYu+Blphdrk3MKgt0ElJwjfg==
+X-Received: by 2002:a17:90a:49:: with SMTP id 9mr276332pjb.80.1630538143364;
+        Wed, 01 Sep 2021 16:15:43 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id i7sm35421pjm.55.2021.09.01.16.15.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Sep 2021 16:09:06 -0700 (PDT)
-From:   Peter Xu <peterx@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     peterx@redhat.com, Paolo Bonzini <pbonzini@redhat.com>,
-        kernel test robot <lkp@intel.com>
-Subject: [PATCH v2] KVM: Drop unused kvm_dirty_gfn_invalid()
-Date:   Wed,  1 Sep 2021 19:09:04 -0400
-Message-Id: <20210901230904.15164-1-peterx@redhat.com>
-X-Mailer: git-send-email 2.31.1
+        Wed, 01 Sep 2021 16:15:42 -0700 (PDT)
+Date:   Wed, 1 Sep 2021 23:15:39 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        isaku.yamahata@intel.com, David Matlack <dmatlack@google.com>,
+        peterx@redhat.com
+Subject: Re: [PATCH 08/16] KVM: MMU: change handle_abnormal_pfn() arguments
+ to kvm_page_fault
+Message-ID: <YTAJm7c1a37N4adR@google.com>
+References: <20210807134936.3083984-1-pbonzini@redhat.com>
+ <20210807134936.3083984-9-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210807134936.3083984-9-pbonzini@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Drop the unused function as reported by test bot.
+On Sat, Aug 07, 2021, Paolo Bonzini wrote:
+> Pass struct kvm_page_fault to handle_abnormal_pfn() instead of
+> extracting the arguments from the struct.
+> 
+> Suggested-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  arch/x86/kvm/mmu/mmu.c         | 17 ++++++++---------
+>  arch/x86/kvm/mmu/paging_tmpl.h |  2 +-
+>  2 files changed, 9 insertions(+), 10 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index a6366f1c4197..cec59ac2e1cd 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -3024,18 +3024,18 @@ static int kvm_handle_bad_page(struct kvm_vcpu *vcpu, gfn_t gfn, kvm_pfn_t pfn)
+>  	return -EFAULT;
+>  }
+>  
+> -static bool handle_abnormal_pfn(struct kvm_vcpu *vcpu, gva_t gva, gfn_t gfn,
+> -				kvm_pfn_t pfn, unsigned int access,
+> -				int *ret_val)
+> +static bool handle_abnormal_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
+> +				unsigned int access, int *ret_val)
+>  {
+>  	/* The pfn is invalid, report the error! */
+> -	if (unlikely(is_error_pfn(pfn))) {
+> -		*ret_val = kvm_handle_bad_page(vcpu, gfn, pfn);
+> +	if (unlikely(is_error_pfn(fault->pfn))) {
+> +		*ret_val = kvm_handle_bad_page(vcpu, fault->gfn, fault->pfn);
+>  		return true;
+>  	}
+>  
+> -	if (unlikely(is_noslot_pfn(pfn))) {
+> -		vcpu_cache_mmio_info(vcpu, gva, gfn,
+> +	if (unlikely(is_noslot_pfn(fault->pfn))) {
+> +		gva_t gva = fault->is_tdp ? 0 : fault->addr;
 
-Reported-by: kernel test robot <lkp@intel.com>
-Signed-off-by: Peter Xu <peterx@redhat.com>
---
-v2:
-- Fix the subject that points to the right function; the copy-paste failed.
----
- virt/kvm/dirty_ring.c | 5 -----
- 1 file changed, 5 deletions(-)
+Checkpatch wants a newline.  I'm also surprised you didn't abuse bitwise math:
 
-diff --git a/virt/kvm/dirty_ring.c b/virt/kvm/dirty_ring.c
-index 7aafefc50aa7..88f4683198ea 100644
---- a/virt/kvm/dirty_ring.c
-+++ b/virt/kvm/dirty_ring.c
-@@ -91,11 +91,6 @@ static inline void kvm_dirty_gfn_set_dirtied(struct kvm_dirty_gfn *gfn)
- 	gfn->flags = KVM_DIRTY_GFN_F_DIRTY;
- }
- 
--static inline bool kvm_dirty_gfn_invalid(struct kvm_dirty_gfn *gfn)
--{
--	return gfn->flags == 0;
--}
--
- static inline bool kvm_dirty_gfn_harvested(struct kvm_dirty_gfn *gfn)
- {
- 	return gfn->flags & KVM_DIRTY_GFN_F_RESET;
--- 
-2.31.1
+		gva_t gva = fault->addr & ((u64)fault->is_tdp - 1);
 
+I am _not_ suggesting you actually do that ;-)
+
+> +		vcpu_cache_mmio_info(vcpu, gva, fault->gfn,
+>  				     access & shadow_mmio_access_mask);
+>  		/*
+>  		 * If MMIO caching is disabled, emulate immediately without
