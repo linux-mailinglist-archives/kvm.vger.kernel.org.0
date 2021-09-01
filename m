@@ -2,235 +2,228 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 55ADF3FD4E9
-	for <lists+kvm@lfdr.de>; Wed,  1 Sep 2021 10:09:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 179163FD554
+	for <lists+kvm@lfdr.de>; Wed,  1 Sep 2021 10:27:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242944AbhIAIKL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Sep 2021 04:10:11 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41468 "EHLO
+        id S243072AbhIAI2S (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Sep 2021 04:28:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:33243 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S242913AbhIAIKI (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 1 Sep 2021 04:10:08 -0400
+        by vger.kernel.org with ESMTP id S242922AbhIAI2S (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 1 Sep 2021 04:28:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630483751;
+        s=mimecast20190719; t=1630484839;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=xehwNc5m+0VkuxXN2ywY3KTZndfyL4hPEsZFfPwosyo=;
-        b=Gqfb2DC+SIKh/b+m6HsvIL3HWsTUEAqJJSW2rK3DlHaTqe96lAqoF3Rq3eIYDM3KTx4fwW
-        E87coeCpedqZBVkRDI8yScIb8dwADF5OukhyJGyRtjVJ5eoE0fdITGv2uGDTVVYSA6K5xU
-        ML6wStMWTLjrZzsij1G2yqu12QwdPoc=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-547-2qpMDCE6M5i5Pv9KNoSXsg-1; Wed, 01 Sep 2021 04:09:10 -0400
-X-MC-Unique: 2qpMDCE6M5i5Pv9KNoSXsg-1
-Received: by mail-wr1-f71.google.com with SMTP id u2-20020adfdd42000000b001579f5d6779so515736wrm.8
-        for <kvm@vger.kernel.org>; Wed, 01 Sep 2021 01:09:10 -0700 (PDT)
+        bh=ovcjyG7IDaOy6ifWW+v+m6prcD2wZaK5/tKOHaPCRA8=;
+        b=HgJJqzg2OBdcKqXX7FOkcNExTFCpactQB3NctE7Wl+wLtLEfheEPW8+F6urTaYiV4ffOKv
+        c+nJtKZAJfExOBtoef+q+Uice04n1LKd0rmSfMwEp4yNc83UKpYA0xEQZXwwisIA21EmuD
+        7nfPi7nP/gpvAxmTwmZYQ65VCiYBzEQ=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-408-sG-KxLjBN9u5rsaG3jj5JQ-1; Wed, 01 Sep 2021 04:27:18 -0400
+X-MC-Unique: sG-KxLjBN9u5rsaG3jj5JQ-1
+Received: by mail-wm1-f72.google.com with SMTP id u14-20020a7bcb0e0000b0290248831d46e4so740390wmj.6
+        for <kvm@vger.kernel.org>; Wed, 01 Sep 2021 01:27:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:organization:subject
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=xehwNc5m+0VkuxXN2ywY3KTZndfyL4hPEsZFfPwosyo=;
-        b=PT9I8L/A7Z5UB1Lh30kcfUVlYLKrllh12Q3tCwtSCQLuoxOzHxVgoZIn9E+MjTG5Pg
-         g+dXVX18V8++2lfeP86EH1kPu4hVdXaYZtCqBBaiZ0YfOosyT81Qw6RZDelaCkcOBRZZ
-         EZ5mexQYYdKm+J5/+ZbDbh3jCJOX2l6+TOhJneql+BImpYb87n/+uFkaUpiDqQsoem+W
-         3MvkyHq98eGewGNXNH31xf4RKzagel4BlJ7790na88DPIvIMCXlfYNGIm33sVLeeDm+L
-         i3ljRB4GlrGHdxTndIf/D4CHZ/8ATRmTJA4JSPexuBRdFEnikpc5Y2uzSONauzu+7GBj
-         culw==
-X-Gm-Message-State: AOAM531lDJ2KSPWqAeqzUh5JG04mIYO+fxsfuaghT0cIoff+xWjo/+kI
-        xOl2cuQY3+u5aImcOQldu2O+m7tTZJ9tPXng4/L4qObpysN8+CViWTOu0n/5o+6Qj6134c1EoC8
-        5FXMPn1m3o1iy
-X-Received: by 2002:a1c:2684:: with SMTP id m126mr8402739wmm.65.1630483749528;
-        Wed, 01 Sep 2021 01:09:09 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxVg9SDEJVZUq3nbvsMK7CWfSbicB1cKUcx7fhtGFdGrRsx3YALb8TPN4qumsd3be+NY8b/Lw==
-X-Received: by 2002:a1c:2684:: with SMTP id m126mr8402689wmm.65.1630483749203;
-        Wed, 01 Sep 2021 01:09:09 -0700 (PDT)
-Received: from [192.168.3.132] (p4ff23f71.dip0.t-ipconnect.de. [79.242.63.113])
-        by smtp.gmail.com with ESMTPSA id o7sm4481973wmc.46.2021.09.01.01.09.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 01 Sep 2021 01:09:08 -0700 (PDT)
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=ovcjyG7IDaOy6ifWW+v+m6prcD2wZaK5/tKOHaPCRA8=;
+        b=SIthQ8G9++Yx6Wf6w5JC+X78v+SLkv9tJyZ0ThbJ6v4KLSUZYJpKspMawxGRO/4Dr7
+         xg8jpziAJmLGSGHTBzOJsQ26EdnnyC/L9LxOCzLZWySXI/0MqnxALqr8jHytrhVmV6MU
+         tpM1WGhhXEADAXJ2e4IsS7Ts0lcf0tRiCkMfdw1XOP7qCQXnrDq+yCp+WphmM+Dv0hwC
+         G9sWWsxRt1P/X5wjf482XArip8AKYw5AdIvyCMpJQPAz2DYPLvVkM995Ljt0vgOSqUM1
+         1UTjV2CC4CaPSvANEPrkEB0dcf0CtACNtdiofZaSfRYIsAdb5wj5QhnotH2je5Zfqsck
+         aNjQ==
+X-Gm-Message-State: AOAM530jO1BzO8A/KRmmP9PT1WWmPIE0b2jGRqdtWpN2AhhNFxr4q2EO
+        Vz+wY1EO68VOa9RPsLuZo6M0iI3GxpRctK2WTFkHzPEu4VgrP3wTAO491XMSADnozZuOCTg9mMu
+        VqR6K5ASoTtUa
+X-Received: by 2002:a7b:c4cb:: with SMTP id g11mr8411412wmk.80.1630484836985;
+        Wed, 01 Sep 2021 01:27:16 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwVHVGo8/2yaFqDLnkSXohfmFINaCXjLS/UevTrlJwzmeSr3ztn2rVI0RS4UIxlE57pxWngTg==
+X-Received: by 2002:a7b:c4cb:: with SMTP id g11mr8411397wmk.80.1630484836753;
+        Wed, 01 Sep 2021 01:27:16 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id u5sm20249739wrr.94.2021.09.01.01.27.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 01 Sep 2021 01:27:16 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Borislav Petkov <bp@alien8.de>,
-        Andy Lutomirski <luto@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Joerg Roedel <jroedel@suse.de>,
-        Andi Kleen <ak@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Varad Gautam <varad.gautam@suse.com>,
-        Dario Faggioli <dfaggioli@suse.com>, x86@kernel.org,
-        linux-mm@kvack.org, linux-coco@lists.linux.dev,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Kuppuswamy Sathyanarayanan 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>
-References: <20210824005248.200037-1-seanjc@google.com>
- <307d385a-a263-276f-28eb-4bc8dd287e32@redhat.com>
- <YSlkzLblHfiiPyVM@google.com>
- <61ea53ce-2ba7-70cc-950d-ca128bcb29c5@redhat.com>
- <YS6lIg6kjNPI1EgF@google.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-Subject: Re: [RFC] KVM: mm: fd-based approach for supporting KVM guest private
- memory
-Message-ID: <f413cc20-66fc-cf1e-47ab-b8f099c89583@redhat.com>
-Date:   Wed, 1 Sep 2021 10:09:07 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        linux-kernel@vger.kernel.org,
+        syzbot+200c08e88ae818f849ce@syzkaller.appspotmail.com
+Subject: Re: [PATCH 1/3] Revert "KVM: x86: mmu: Add guest physical address
+ check in translate_gpa()"
+In-Reply-To: <20210831164224.1119728-2-seanjc@google.com>
+References: <20210831164224.1119728-1-seanjc@google.com>
+ <20210831164224.1119728-2-seanjc@google.com>
+Date:   Wed, 01 Sep 2021 10:27:15 +0200
+Message-ID: <87pmtsog4c.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <YS6lIg6kjNPI1EgF@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
->> Do we have to protect from that? How would KVM protect from user space
->> replacing private pages by shared pages in any of the models we discuss?
-> 
-> The overarching rule is that KVM needs to guarantee a given pfn is never mapped[*]
-> as both private and shared, where "shared" also incorporates any mapping from the
-> host.  Essentially it boils down to the kernel ensuring that a pfn is unmapped
-> before it's converted to/from private, and KVM ensuring that it honors any
-> unmap notifications from the kernel, e.g. via mmu_notifier or via a direct callback
-> as proposed in this RFC.
+Sean Christopherson <seanjc@google.com> writes:
 
-Okay, so the fallocate(PUNCHHOLE) from user space could trigger the 
-respective unmapping and freeing of backing storage.
+> Revert a misguided illegal GPA check when "translating" a non-nested GPA.
+> The check is woefully incomplete as it does not fill in @exception as
+> expected by all callers, which leads to KVM attempting to inject a bogus
+> exception, potentially exposing kernel stack information in the process.
+>
+>  WARNING: CPU: 0 PID: 8469 at arch/x86/kvm/x86.c:525 exception_type+0x98/0xb0 arch/x86/kvm/x86.c:525
+>  CPU: 1 PID: 8469 Comm: syz-executor531 Not tainted 5.14.0-rc7-syzkaller #0
+>  RIP: 0010:exception_type+0x98/0xb0 arch/x86/kvm/x86.c:525
+>  Call Trace:
+>   x86_emulate_instruction+0xef6/0x1460 arch/x86/kvm/x86.c:7853
+>   kvm_mmu_page_fault+0x2f0/0x1810 arch/x86/kvm/mmu/mmu.c:5199
+>   handle_ept_misconfig+0xdf/0x3e0 arch/x86/kvm/vmx/vmx.c:5336
+>   __vmx_handle_exit arch/x86/kvm/vmx/vmx.c:6021 [inline]
+>   vmx_handle_exit+0x336/0x1800 arch/x86/kvm/vmx/vmx.c:6038
+>   vcpu_enter_guest+0x2a1c/0x4430 arch/x86/kvm/x86.c:9712
+>   vcpu_run arch/x86/kvm/x86.c:9779 [inline]
+>   kvm_arch_vcpu_ioctl_run+0x47d/0x1b20 arch/x86/kvm/x86.c:10010
+>   kvm_vcpu_ioctl+0x49e/0xe50 arch/x86/kvm/../../../virt/kvm/kvm_main.c:3652
+>
+> The bug has escaped notice because practically speaking the GPA check is
+> useless.  The GPA check in question only comes into play when KVM is
+> walking guest page tables (or "translating" CR3), and KVM already handles
+> illegal GPA checks by setting reserved bits in rsvd_bits_mask for each
+> PxE, or in the case of CR3 for loading PTDPTRs, manually checks for an
+> illegal CR3.  This particular failure doesn't hit the existing reserved
+> bits checks because syzbot sets guest.MAXPHYADDR=1, and IA32 architecture
+> simply doesn't allow for such an absurd MAXPHADDR, e.g. 32-bit paging
 
-> 
-> As it pertains to PUNCH_HOLE, the responsibilities are no different than when the
-> backing-store is destroyed; the backing-store needs to notify downstream MMUs
-> (a.k.a. KVM) to unmap the pfn(s) before freeing the associated memory.
+"MAXPHYADDR"
 
-Right.
+> doesn't define any reserved PA bits checks, which KVM emulates by only
+> incorporating the reserved PA bits into the "high" bits, i.e. bits 63:32.
+>
+> Simply remove the bogus check.  There is zero meaningful value and no
+> architectural justification for supporting guest.MAXPHYADDR < 32, and
+> properly filling the exception would introduce non-trivial complexity.
+>
+> This reverts commit ec7771ab471ba6a945350353617e2e3385d0e013.
+>
+> Fixes: ec7771ab471b ("KVM: x86: mmu: Add guest physical address check in translate_gpa()")
+> Cc: stable@vger.kernel.org
+> Reported-by: syzbot+200c08e88ae818f849ce@syzkaller.appspotmail.com
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/kvm/mmu/mmu.c | 6 ------
+>  1 file changed, 6 deletions(-)
+>
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 4853c033e6ce..4b7908187d05 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -334,12 +334,6 @@ static bool check_mmio_spte(struct kvm_vcpu *vcpu, u64 spte)
+>  static gpa_t translate_gpa(struct kvm_vcpu *vcpu, gpa_t gpa, u32 access,
+>                                    struct x86_exception *exception)
+>  {
+> -	/* Check if guest physical address doesn't exceed guest maximum */
+> -	if (kvm_vcpu_is_illegal_gpa(vcpu, gpa)) {
+> -		exception->error_code |= PFERR_RSVD_MASK;
+> -		return UNMAPPED_GVA;
+> -	}
+> -
+>          return gpa;
+>  }
 
-> 
-> [*] Whether or not the kernel's direct mapping needs to be removed is debatable,
->      but my argument is that that behavior is not visible to userspace and thus
->      out of scope for this discussion, e.g. zapping/restoring the direct map can
->      be added/removed without impacting the userspace ABI.
+Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 
-Right. Removing it shouldn't also be requited IMHO. There are other ways 
-to teach the kernel to not read/write some online pages (filter 
-/proc/kcore, disable hibernation, strict access checks for /dev/mem ...).
+I'm, however, wondering if it would also make sense to forbid setting
+nonsensical MAXPHYADDR, something like (compile-only tested):
 
-> 
->>>> Define "ordinary" user memory slots as overlay on top of "encrypted" memory
->>>> slots.  Inside KVM, bail out if you encounter such a VMA inside a normal
->>>> user memory slot. When creating a "encryped" user memory slot, require that
->>>> the whole VMA is covered at creation time. You know the VMA can't change
->>>> later.
->>>
->>> This can work for the basic use cases, but even then I'd strongly prefer not to
->>> tie memslot correctness to the VMAs.  KVM doesn't truly care what lies behind
->>> the virtual address of a memslot, and when it does care, it tends to do poorly,
->>> e.g. see the whole PFNMAP snafu.  KVM cares about the pfn<->gfn mappings, and
->>> that's reflected in the infrastructure.  E.g. KVM relies on the mmu_notifiers
->>> to handle mprotect()/munmap()/etc...
->>
->> Right, and for the existing use cases this worked. But encrypted memory
->> breaks many assumptions we once made ...
->>
->> I have somewhat mixed feelings about pages that are mapped into $WHATEVER
->> page tables but not actually mapped into user space page tables. There is no
->> way to reach these via the rmap.
->>
->> We have something like that already via vfio. And that is fundamentally
->> broken when it comes to mmu notifiers, page pinning, page migration, ...
-> 
-> I'm not super familiar with VFIO internals, but the idea with the fd-based
-> approach is that the backing-store would be in direct communication with KVM and
-> would handle those operations through that direct channel.
-
-Right. The problem I am seeing is that e.g., try_to_unmap() might not be 
-able to actually fully unmap a page, because some non-synchronized KVM 
-MMU still maps a page. It would be great to evaluate how the fd 
-callbacks would fit into the whole picture, including the current rmap.
-
-I guess I'm missing the bigger picture how it all fits together on the 
-!KVM side.
-
-> 
->>> As is, I don't think KVM would get any kind of notification if userpaces unmaps
->>> the VMA for a private memslot that does not have any entries in the host page
->>> tables.   I'm sure it's a solvable problem, e.g. by ensuring at least one page
->>> is touched by the backing store, but I don't think the end result would be any
->>> prettier than a dedicated API for KVM to consume.
->>>
->>> Relying on VMAs, and thus the mmu_notifiers, also doesn't provide line of sight
->>> to page migration or swap.  For those types of operations, KVM currently just
->>> reacts to invalidation notifications by zapping guest PTEs, and then gets the
->>> new pfn when the guest re-faults on the page.  That sequence doesn't work for
->>> TDX or SEV-SNP because the trusteday agent needs to do the memcpy() of the page
->>> contents, i.e. the host needs to call into KVM for the actual migration.
->>
->> Right, but I still think this is a kernel internal. You can do such
->> handshake later in the kernel IMHO.
-> 
-> It is kernel internal, but AFAICT it will be ugly because KVM "needs" to do the
-> migration and that would invert the mmu_notifer API, e.g. instead of "telling"
-> secondary MMUs to invalidate/change a mappings, the mm would be "asking"
-> secondary MMus "can you move this?".  More below.
-
-In my thinking, the the rmap via mmu notifiers would do the unmapping 
-just as we know it (from primary MMU -> secondary MMU). Once 
-try_to_unmap() succeeded, the fd provider could kick-off the migration 
-via whatever callback.
-
-> 
->> But I also already thought: is it really KVM that is to perform the
->> migration or is it the fd-provider that performs the migration? Who says
->> memfd_encrypted() doesn't default to a TDX "backend" on Intel CPUs that just
->> knows how to migrate such a page?
->>
->> I'd love to have some details on how that's supposed to work, and which
->> information we'd need to migrate/swap/... in addition to the EPFN and a new
->> SPFN.
-> 
-> KVM "needs" to do the migration.  On TDX, the migration will be a SEAMCALL,
-> a post-VMXON instruction that transfers control to the TDX-Module, that at
-> minimum needs a per-VM identifier, the gfn, and the page table level.  The call
-
-The per-VM identifier and the GFN would be easy to grab. Page table 
-level, not so sure -- do you mean the general page table depth? Or if 
-it's mapped as 4k vs. 2M ... ? The latter could be answered by the fd 
-provider already I assume.
-
-Does the page still have to be mapped into the secondary MMU when 
-performing the migration via TDX? I assume not, which would simplify 
-things a lot.
-
-> into the TDX-Module would also need to take a KVM lock (probably KVM's mmu_lock)
-> to satisfy TDX's concurrency requirement, e.g. to avoid "spurious" errors due to
-> the backing-store attempting to migrate memory that KVM is unmapping due to a
-> memslot change.
-
-Something like that might be handled by fixing private memory slots 
-similar to in my draft, right?
-
-> 
-> The per-VM identifier may not apply to SEV-SNP, but I believe everything else
-> holds true.
-
-Thanks!
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index fe03bd978761..42e71ac8ff31 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -73,25 +73,6 @@ static inline struct kvm_cpuid_entry2 *cpuid_entry2_find(
+ 	return NULL;
+ }
+ 
+-static int kvm_check_cpuid(struct kvm_cpuid_entry2 *entries, int nent)
+-{
+-	struct kvm_cpuid_entry2 *best;
+-
+-	/*
+-	 * The existing code assumes virtual address is 48-bit or 57-bit in the
+-	 * canonical address checks; exit if it is ever changed.
+-	 */
+-	best = cpuid_entry2_find(entries, nent, 0x80000008, 0);
+-	if (best) {
+-		int vaddr_bits = (best->eax & 0xff00) >> 8;
+-
+-		if (vaddr_bits != 48 && vaddr_bits != 57 && vaddr_bits != 0)
+-			return -EINVAL;
+-	}
+-
+-	return 0;
+-}
+-
+ void kvm_update_pv_runtime(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm_cpuid_entry2 *best;
+@@ -208,20 +189,48 @@ static void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+ 	kvm_mmu_after_set_cpuid(vcpu);
+ }
+ 
+-int cpuid_query_maxphyaddr(struct kvm_vcpu *vcpu)
++static int __cpuid_query_maxphyaddr(struct kvm_cpuid_entry2 *entries, int nent)
+ {
+ 	struct kvm_cpuid_entry2 *best;
+ 
+-	best = kvm_find_cpuid_entry(vcpu, 0x80000000, 0);
++	best = cpuid_entry2_find(entries, nent, 0x80000000, 0);
+ 	if (!best || best->eax < 0x80000008)
+ 		goto not_found;
+-	best = kvm_find_cpuid_entry(vcpu, 0x80000008, 0);
++	best = cpuid_entry2_find(entries, nent, 0x80000008, 0);
+ 	if (best)
+ 		return best->eax & 0xff;
+ not_found:
+ 	return 36;
+ }
+ 
++int cpuid_query_maxphyaddr(struct kvm_vcpu *vcpu)
++{
++	return __cpuid_query_maxphyaddr(vcpu->arch.cpuid_entries, vcpu->arch.cpuid_nent);
++}
++
++static int kvm_check_cpuid(struct kvm_cpuid_entry2 *entries, int nent)
++{
++	struct kvm_cpuid_entry2 *best;
++
++	/* guest.MAXPHYADDR < 32 is completely nonsensical */
++	if (__cpuid_query_maxphyaddr(entries, nent) < 32)
++		return -EINVAL;
++
++	/*
++	 * The existing code assumes virtual address is 48-bit or 57-bit in the
++	 * canonical address checks; exit if it is ever changed.
++	 */
++	best = cpuid_entry2_find(entries, nent, 0x80000008, 0);
++	if (best) {
++		int vaddr_bits = (best->eax & 0xff00) >> 8;
++
++		if (vaddr_bits != 48 && vaddr_bits != 57 && vaddr_bits != 0)
++			return -EINVAL;
++	}
++
++	return 0;
++}
++
+ /*
+  * This "raw" version returns the reserved GPA bits without any adjustments for
+  * encryption technologies that usurp bits.  The raw mask should be used if and
 
 -- 
-Thanks,
-
-David / dhildenb
+Vitaly
 
