@@ -2,114 +2,203 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6B9F33FDF69
-	for <lists+kvm@lfdr.de>; Wed,  1 Sep 2021 18:09:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DB7ED3FDF97
+	for <lists+kvm@lfdr.de>; Wed,  1 Sep 2021 18:17:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245080AbhIAQKW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Sep 2021 12:10:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52706 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245060AbhIAQKL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Sep 2021 12:10:11 -0400
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37B5FC061764
-        for <kvm@vger.kernel.org>; Wed,  1 Sep 2021 09:09:14 -0700 (PDT)
-Received: by mail-pf1-x42e.google.com with SMTP id 7so170931pfl.10
-        for <kvm@vger.kernel.org>; Wed, 01 Sep 2021 09:09:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=FB3R6LeGmuXIo5hb7U8C3iodva/c8R+NqVfhGgpP4U0=;
-        b=s6xT8b9Z5MvXugh9aE3DH7QviFfmTsm+/948fGHfnT/mxvPoY35pWzy8+Nntmc8vGo
-         j4mblX+ULT64l4hiDNIOv++Vip0QN/JubwFNtkFgY/Px0wrggu7hLqttAQJmAbYcS+xd
-         SFlvZdaw/VW/WKp60BgUJ0pUIMD7cUwaxFYfwicMx3B67b2sQXKqdVCfA3Khi1+Galcn
-         nfGsJkjlTvv/b+jcENcBfs+qUOgdgJcTVf2N2jHJ2h2MtI33N8e3teUaTqp863Yshi9U
-         n+bKbyi/1HJH+hxR4rvibLjMsprRp9QNvrLhIMXEDsolU7Sll3aow9Xd1nf0tVSMZaH2
-         f7Yg==
+        id S234245AbhIAQR7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Sep 2021 12:17:59 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:41901 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S245165AbhIAQR6 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 1 Sep 2021 12:17:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1630513021;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=2/XAbNnPYbzrcRQvqGw+pEXzeCPLNq2oeqtLtsfAKPg=;
+        b=NybpK+7+xULzUDlAuxFx+CkXtixjaUqBC0KRmszjt6qLBBrvPEXlzH7cxBIz9UZBoeJpRC
+        Qg6NXXaJCIEvEE3PJ5j7fxIRE6rBIOgIxfmUG2pbGwFyf7yh+QnSGKa9h84us3aHYDURlz
+        vqi2aVOwUAK3zQXvn44YejVk6WtEBdI=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-140-HlS6I0MKM8eZ2EYFjbVHvQ-1; Wed, 01 Sep 2021 12:17:00 -0400
+X-MC-Unique: HlS6I0MKM8eZ2EYFjbVHvQ-1
+Received: by mail-wm1-f69.google.com with SMTP id r4-20020a1c4404000000b002e728beb9fbso16957wma.9
+        for <kvm@vger.kernel.org>; Wed, 01 Sep 2021 09:16:59 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=FB3R6LeGmuXIo5hb7U8C3iodva/c8R+NqVfhGgpP4U0=;
-        b=nAlXrmwXNvvWAh7KNPlAkG4BJiAmfmrFhrzqFGf9yeRw8w3Irey5CAAPLGngY5EXjT
-         8Kx8mcdvliA5WU8v9VizXxC6lGT246vji9JTt0Omy0mdRE5Hn6cRuyecdO7uasKZZGP3
-         SoAr/L1cXrczk0ChDtGV0YPMIwVfRTcxFQfUW/GadJKqk1gulLSavbIrQyH+P9m6Lek6
-         KcBLhIHHer66UKLFRsP8HxgqheSTqTCO0Oz4YPJIU6QrsLs2MCY/NAjj2+7bR1HMOBf4
-         wWbvi0plBrcYh3cjPvKnqdLJxjaa+P/b1Cgzo9OxrYFRHSp8D7TZlXJAQdqX3/6KRk1v
-         3/6g==
-X-Gm-Message-State: AOAM531nLQ+43nyDV1XVFk+k90Cli0K2AN4DQxvsAG4e/zawPn2oR0JY
-        suMcK83azUqBOYvcPlaC7JVxaw==
-X-Google-Smtp-Source: ABdhPJxmvrUQTF6cUfVAdaaPU2mA6Fq+mBMHqFjB1d+G1mMoFmXqzvvBPt3F0qi34nZxQ/5t0yJd8Q==
-X-Received: by 2002:a63:784d:: with SMTP id t74mr218780pgc.112.1630512553446;
-        Wed, 01 Sep 2021 09:09:13 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id a10sm1021pfg.20.2021.09.01.09.09.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Sep 2021 09:09:12 -0700 (PDT)
-Date:   Wed, 1 Sep 2021 16:09:09 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+        h=x-gm-message-state:subject:to:cc:references:from:organization
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=2/XAbNnPYbzrcRQvqGw+pEXzeCPLNq2oeqtLtsfAKPg=;
+        b=k7UFVGKpeS3aMZpUQxT7vYHmpV52VyBEbfdJOCxzgW+tL1HNbVihM3QJdmqAP/AjDi
+         VO+EsSXqfKoaZeucDU0qLnRqFaltMraAOz41PdjaTU0c00t6S8i/zwZi03crUWT+v/jK
+         Cv5gVwBdk8VxWDQNB7jNPDCZmKPyT6aS1v4qBNMkOsH7QVZd3TTbhRjrUnEap9nr2FWG
+         SuR1s0eGlmHU9wQdsRJj/QdbMZblf9yjhjYu+5arxrXkVZFn/e/SksWcfnpFdWJfnOWf
+         eP+vtuIPbIyob81py/TAZhwmSF8bJXeTefcjtPPo2v0F1idmnDokw98BzEeTCwRVd4Nv
+         tXwg==
+X-Gm-Message-State: AOAM532ke4gFmhChI9E1AGfibVLdqQQcz0fnU/3WGbVWsO3yrs4cudxE
+        vfnuxtmieYB08X7yP4kiXLAdp0PddEqgmTDPuGEdJYlPN7AYjt2WmpwsBfUceG6W4VyNblbbA5l
+        04PJD9taHbFnd
+X-Received: by 2002:a7b:c447:: with SMTP id l7mr200559wmi.15.1630513018790;
+        Wed, 01 Sep 2021 09:16:58 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzYF6rA5+Zro3A6/Y9cMEw/zmLGA0hRdVvAS0OCw0bzhechI4gs19V7p58fUfMs6FTavtZ2ig==
+X-Received: by 2002:a7b:c447:: with SMTP id l7mr200513wmi.15.1630513018514;
+        Wed, 01 Sep 2021 09:16:58 -0700 (PDT)
+Received: from [192.168.3.132] (p4ff23f71.dip0.t-ipconnect.de. [79.242.63.113])
+        by smtp.gmail.com with ESMTPSA id u16sm3034wmc.41.2021.09.01.09.16.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 01 Sep 2021 09:16:57 -0700 (PDT)
+Subject: Re: [RFC] KVM: mm: fd-based approach for supporting KVM guest private
+ memory
+To:     Andy Lutomirski <luto@kernel.org>,
+        Sean Christopherson <seanjc@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        syzbot+200c08e88ae818f849ce@syzkaller.appspotmail.com
-Subject: Re: [PATCH 1/3] Revert "KVM: x86: mmu: Add guest physical address
- check in translate_gpa()"
-Message-ID: <YS+lpeqHHgoA6W8A@google.com>
-References: <20210831164224.1119728-1-seanjc@google.com>
- <20210831164224.1119728-2-seanjc@google.com>
- <87pmtsog4c.fsf@vitty.brq.redhat.com>
+        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Borislav Petkov <bp@alien8.de>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Joerg Roedel <jroedel@suse.de>,
+        Andi Kleen <ak@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Varad Gautam <varad.gautam@suse.com>,
+        Dario Faggioli <dfaggioli@suse.com>,
+        the arch/x86 maintainers <x86@kernel.org>,
+        linux-mm@kvack.org, linux-coco@lists.linux.dev,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Sathyanarayanan Kuppuswamy 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>
+References: <20210824005248.200037-1-seanjc@google.com>
+ <307d385a-a263-276f-28eb-4bc8dd287e32@redhat.com>
+ <YSlkzLblHfiiPyVM@google.com>
+ <61ea53ce-2ba7-70cc-950d-ca128bcb29c5@redhat.com>
+ <YS6lIg6kjNPI1EgF@google.com>
+ <f413cc20-66fc-cf1e-47ab-b8f099c89583@redhat.com>
+ <9ec3636a-6434-4c98-9d8d-addc82858c41@www.fastmail.com>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat
+Message-ID: <37d70069-b59f-04c7-f9af-a08af18d0339@redhat.com>
+Date:   Wed, 1 Sep 2021 18:16:56 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87pmtsog4c.fsf@vitty.brq.redhat.com>
+In-Reply-To: <9ec3636a-6434-4c98-9d8d-addc82858c41@www.fastmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 01, 2021, Vitaly Kuznetsov wrote:
-> Sean Christopherson <seanjc@google.com> writes:
+On 01.09.21 17:54, Andy Lutomirski wrote:
+> On Wed, Sep 1, 2021, at 1:09 AM, David Hildenbrand wrote:
+>>>> Do we have to protect from that? How would KVM protect from user space
+>>>> replacing private pages by shared pages in any of the models we discuss?
+>>>
+>>> The overarching rule is that KVM needs to guarantee a given pfn is never mapped[*]
+>>> as both private and shared, where "shared" also incorporates any mapping from the
+>>> host.  Essentially it boils down to the kernel ensuring that a pfn is unmapped
+>>> before it's converted to/from private, and KVM ensuring that it honors any
+>>> unmap notifications from the kernel, e.g. via mmu_notifier or via a direct callback
+>>> as proposed in this RFC.
+>>
+>> Okay, so the fallocate(PUNCHHOLE) from user space could trigger the
+>> respective unmapping and freeing of backing storage.
+>>
+>>>
+>>> As it pertains to PUNCH_HOLE, the responsibilities are no different than when the
+>>> backing-store is destroyed; the backing-store needs to notify downstream MMUs
+>>> (a.k.a. KVM) to unmap the pfn(s) before freeing the associated memory.
+>>
+>> Right.
+>>
+>>>
+>>> [*] Whether or not the kernel's direct mapping needs to be removed is debatable,
+>>>       but my argument is that that behavior is not visible to userspace and thus
+>>>       out of scope for this discussion, e.g. zapping/restoring the direct map can
+>>>       be added/removed without impacting the userspace ABI.
+>>
+>> Right. Removing it shouldn't also be requited IMHO. There are other ways
+>> to teach the kernel to not read/write some online pages (filter
+>> /proc/kcore, disable hibernation, strict access checks for /dev/mem ...).
+>>
+>>>
+>>>>>> Define "ordinary" user memory slots as overlay on top of "encrypted" memory
+>>>>>> slots.  Inside KVM, bail out if you encounter such a VMA inside a normal
+>>>>>> user memory slot. When creating a "encryped" user memory slot, require that
+>>>>>> the whole VMA is covered at creation time. You know the VMA can't change
+>>>>>> later.
+>>>>>
+>>>>> This can work for the basic use cases, but even then I'd strongly prefer not to
+>>>>> tie memslot correctness to the VMAs.  KVM doesn't truly care what lies behind
+>>>>> the virtual address of a memslot, and when it does care, it tends to do poorly,
+>>>>> e.g. see the whole PFNMAP snafu.  KVM cares about the pfn<->gfn mappings, and
+>>>>> that's reflected in the infrastructure.  E.g. KVM relies on the mmu_notifiers
+>>>>> to handle mprotect()/munmap()/etc...
+>>>>
+>>>> Right, and for the existing use cases this worked. But encrypted memory
+>>>> breaks many assumptions we once made ...
+>>>>
+>>>> I have somewhat mixed feelings about pages that are mapped into $WHATEVER
+>>>> page tables but not actually mapped into user space page tables. There is no
+>>>> way to reach these via the rmap.
+>>>>
+>>>> We have something like that already via vfio. And that is fundamentally
+>>>> broken when it comes to mmu notifiers, page pinning, page migration, ...
+>>>
+>>> I'm not super familiar with VFIO internals, but the idea with the fd-based
+>>> approach is that the backing-store would be in direct communication with KVM and
+>>> would handle those operations through that direct channel.
+>>
+>> Right. The problem I am seeing is that e.g., try_to_unmap() might not be
+>> able to actually fully unmap a page, because some non-synchronized KVM
+>> MMU still maps a page. It would be great to evaluate how the fd
+>> callbacks would fit into the whole picture, including the current rmap.
+>>
+>> I guess I'm missing the bigger picture how it all fits together on the
+>> !KVM side.
 > 
-> > Revert a misguided illegal GPA check when "translating" a non-nested GPA.
-> > The check is woefully incomplete as it does not fill in @exception as
-> > expected by all callers, which leads to KVM attempting to inject a bogus
-> > exception, potentially exposing kernel stack information in the process.
-> >
-> >  WARNING: CPU: 0 PID: 8469 at arch/x86/kvm/x86.c:525 exception_type+0x98/0xb0 arch/x86/kvm/x86.c:525
-> >  CPU: 1 PID: 8469 Comm: syz-executor531 Not tainted 5.14.0-rc7-syzkaller #0
-> >  RIP: 0010:exception_type+0x98/0xb0 arch/x86/kvm/x86.c:525
-> >  Call Trace:
-> >   x86_emulate_instruction+0xef6/0x1460 arch/x86/kvm/x86.c:7853
-> >   kvm_mmu_page_fault+0x2f0/0x1810 arch/x86/kvm/mmu/mmu.c:5199
-> >   handle_ept_misconfig+0xdf/0x3e0 arch/x86/kvm/vmx/vmx.c:5336
-> >   __vmx_handle_exit arch/x86/kvm/vmx/vmx.c:6021 [inline]
-> >   vmx_handle_exit+0x336/0x1800 arch/x86/kvm/vmx/vmx.c:6038
-> >   vcpu_enter_guest+0x2a1c/0x4430 arch/x86/kvm/x86.c:9712
-> >   vcpu_run arch/x86/kvm/x86.c:9779 [inline]
-> >   kvm_arch_vcpu_ioctl_run+0x47d/0x1b20 arch/x86/kvm/x86.c:10010
-> >   kvm_vcpu_ioctl+0x49e/0xe50 arch/x86/kvm/../../../virt/kvm/kvm_main.c:3652
-> >
-> > The bug has escaped notice because practically speaking the GPA check is
-> > useless.  The GPA check in question only comes into play when KVM is
-> > walking guest page tables (or "translating" CR3), and KVM already handles
-> > illegal GPA checks by setting reserved bits in rsvd_bits_mask for each
-> > PxE, or in the case of CR3 for loading PTDPTRs, manually checks for an
-> > illegal CR3.  This particular failure doesn't hit the existing reserved
-> > bits checks because syzbot sets guest.MAXPHYADDR=1, and IA32 architecture
-> > simply doesn't allow for such an absurd MAXPHADDR, e.g. 32-bit paging
+> The big picture is fundamentally a bit nasty.  Logically (ignoring the implementation details of rmap, mmu_notifier, etc), you can call try_to_unmap and end up with a page that is Just A Bunch Of Bytes (tm).  Then you can write it to disk, memcpy to another node, compress it, etc. When it gets faulted back in, you make sure the same bytes end up somewhere and put the PTEs back.
 > 
-> "MAXPHYADDR"
+> With guest-private memory, this doesn't work.  Forget about the implementation: you simply can't take a page of private memory, quiesce it so the guest can't access it without faulting, and turn it into Just A Bunch Of Bytes.  TDX does not have that capability.  (Any system with integrity-protected memory won't without having >PAGE_SIZE bytes or otherwise storing metadata, but TDX can't do this at all.)  SEV-ES *can* (I think -- I asked the lead architect), but that's not the same thing as saying it's a good idea.
+> 
+> So if you want to migrate a TDX page from one NUMA node to another, you need to do something different (I don't know all the details), you will have to ask Intel to explain how this might work in the future (it wasn't in the public docs last time I looked), but I'm fairly confident that it does not resemble try_to_unmap().
+> 
+> Even on SEV, where a page *can* be transformed into a Just A Bunch Of Bytes, the operation doesn't really look like try_to_unmap().  As I understand it, it's more of:
+> 
+> look up the one-and-only guest and GPA at which this page is mapped.
+> tear down the NPT PTE.  (SEV, unlike TDX, uses paging structures in normal memory.)
+> Ask the magic SEV mechanism to turn the page into swappable data
+> Go to town.
+> 
+> This doesn't really resemble the current rmap + mmu_notifier code, and shoehorning this into mmu_notifier seems like it may be uglier and more code than implementing it more directly in the backing store.
+> 
+> If you actually just try_to_unmap() a SEV-ES page (and it worked, which it currently won't), you will have data corruption or cache incoherency.
+> 
+> If you want to swap a page on TDX, you can't.  Sorry, go directly to jail, do not collect $200.
+> 
+> So I think there are literally zero code paths that currently call try_to_unmap() that will actually work like that on TDX.  If we run out of memory on a TDX host, we can kill the guest completely and reclaim all of its memory (which probably also involves killing QEMU or whatever other user program is in charge), but that's really our only option.
 
-Gah, I'm pretty sure I mistype that 50% of the time.
+try_to_unmap() would actually do the right thing I think. It's the users 
+that access page content (migration, swapping) that need additional care 
+to special-case these pages. Completely agree that these would be broken.
 
-> I'm, however, wondering if it would also make sense to forbid setting
-> nonsensical MAXPHYADDR, something like (compile-only tested):
 
-That crossed my mind as well, but I actually think letting userspace provide
-garbage is a good thing in this case.  From a kernel-safety perspective, KVM
-does not and _should_ not make any assumptions about guest.MAXPHYADDR.  IMO, the
-added test coverage gaind by allowing truly outrageous values outweighs the
-potential danger, e.g. this bogus code would likely have gone unnoticed forever.
+-- 
+Thanks,
+
+David / dhildenb
+
