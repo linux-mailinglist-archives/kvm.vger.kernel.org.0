@@ -2,182 +2,163 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0B86E3FDD54
-	for <lists+kvm@lfdr.de>; Wed,  1 Sep 2021 15:50:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0B6703FDD92
+	for <lists+kvm@lfdr.de>; Wed,  1 Sep 2021 16:00:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244250AbhIANhS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Sep 2021 09:37:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34056 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S244220AbhIANhR (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 1 Sep 2021 09:37:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630503380;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=9GJaak9/fukjOpM3yRsW6fGYLPWlO2ujAk6t2MGMTZ0=;
-        b=hRpc52h/JwhGFSQbIJv8UZHOXhaSHKrZLQd+8iJPeZJCKD5yhONOiYbO1GZ/hgk+61oONi
-        4n6UF46VrqEhZ6cZcmBIK+Fx9voA8V1wutdHW5LIrbCEJRvuP4TYcuJrkHqQVPxxLVxmxd
-        Ip7Y4dBqzimhzar8jUHwzue2dksi2dQ=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-481-hT-nol8_PPu5LI3qlRmxZw-1; Wed, 01 Sep 2021 09:36:19 -0400
-X-MC-Unique: hT-nol8_PPu5LI3qlRmxZw-1
-Received: by mail-wm1-f70.google.com with SMTP id a201-20020a1c7fd2000000b002e748bf0544so2847831wmd.2
-        for <kvm@vger.kernel.org>; Wed, 01 Sep 2021 06:36:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=9GJaak9/fukjOpM3yRsW6fGYLPWlO2ujAk6t2MGMTZ0=;
-        b=I9ksJiMRqeROSeopoSlMavnLaPcIscbTCrL8qalMars2VOOc5xW+HgUde5D1WCnx2o
-         lXutD47S6w0BX/hFqJYgdTYXKIG+zhcZ31BTQXVPRK3eifWKOqC9lnaHBGT38vuDMdPM
-         oDtaJlrE3CYCppm9F8i+q9Qv9WqD7fr7HA8XmGIszqzc5dCooV4nnCyy0ozehTQwmaWG
-         PjbzzgW8yS0z8Y3tUNLXcGXhSDw54D5lXH553Igfamb5NvsYMoSHppJQyoaM7EL3q0AP
-         gbNZvoukKCE/n7t64G0wqSpAKitcZmBH2ca//2RFrMtqYUkPNjUlUsotiDlsC4J7nX/0
-         4Xsg==
-X-Gm-Message-State: AOAM531bdXywIIb6ck3fjP0IyiAJXfWXztfdb3U1ffHxwG3p2NzWsAyU
-        iaT3GP+DoGo3EhSiYsuQM35JwEMtVNbEWuFAEU1AzZV3DQ9teAOjv11wdx/Hmv8VkmaF42x5pCX
-        Hv7Z421BmjHg/
-X-Received: by 2002:a1c:7e4e:: with SMTP id z75mr9920133wmc.152.1630503377756;
-        Wed, 01 Sep 2021 06:36:17 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy2PrBs83QLdQi2i0EsAHORE+4iG6+VIDnZzcPrknaDnG/lVnaLhQmJdaJ69STVkPWx7ZwjRA==
-X-Received: by 2002:a1c:7e4e:: with SMTP id z75mr9920096wmc.152.1630503377420;
-        Wed, 01 Sep 2021 06:36:17 -0700 (PDT)
-Received: from localhost (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id s1sm15576413wrs.53.2021.09.01.06.36.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Sep 2021 06:36:16 -0700 (PDT)
-Date:   Wed, 1 Sep 2021 15:36:15 +0200
-From:   Igor Mammedov <imammedo@redhat.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Subject: Re: [PATCH] kvm: x86: Increase MAX_VCPUS to 710
-Message-ID: <20210901153615.296486b5@redhat.com>
-In-Reply-To: <87ilzkob6k.fsf@vitty.brq.redhat.com>
-References: <20210831204535.1594297-1-ehabkost@redhat.com>
-        <87sfyooh9x.fsf@vitty.brq.redhat.com>
-        <20210901111326.2efecf6e@redhat.com>
-        <87ilzkob6k.fsf@vitty.brq.redhat.com>
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+        id S244221AbhIAOBi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Sep 2021 10:01:38 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:15768 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S242535AbhIAOBh (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 1 Sep 2021 10:01:37 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 181DXw6w061707;
+        Wed, 1 Sep 2021 09:59:26 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=AyGCXqTlDxFDakHInkc1TJcPaYtvreQxI3c3MyOovZ0=;
+ b=mxRP+lhXY+6m6BKpBUmt9xD9Wq6OvxF3K1iTovTBaMA0UTqgSyoKhL1jVmlILZ2+Ia5X
+ PGbOS0iuHQZqvh0bBKnvRRf7BsRjQPK6aHq8fktRmrw/PINFRMM5YnqcrGasr8VgBvpy
+ /qaD8sa3kzBhd7nTmXW1Am8T/c0CkUaJ/tgCGJEeX6GR00ZSV31P+WDyezvuH++hf+2O
+ V2u68y9NopPBQpbiTUFKJqPJt35PyybLhI92SXI0h0fDgIKWxCfla+wtKeiSh+i0W6xw
+ DgOOtZyEZHMnnWeVCPtGFikrHicaMOJq+WuIWa5jepawp8yIr1jLVr+A1qsIycAuR0l+ Tw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3at7ctx9ew-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 01 Sep 2021 09:59:26 -0400
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 181DYaNT064566;
+        Wed, 1 Sep 2021 09:59:26 -0400
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3at7ctx9e4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 01 Sep 2021 09:59:26 -0400
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 181DmojZ004850;
+        Wed, 1 Sep 2021 13:59:24 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma02fra.de.ibm.com with ESMTP id 3aqcs9a9s0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 01 Sep 2021 13:59:24 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 181DxKoD47383008
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 1 Sep 2021 13:59:20 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 92CF4AE058;
+        Wed,  1 Sep 2021 13:59:20 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 201B0AE053;
+        Wed,  1 Sep 2021 13:59:20 +0000 (GMT)
+Received: from oc3016276355.ibm.com (unknown [9.145.181.78])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed,  1 Sep 2021 13:59:20 +0000 (GMT)
+Subject: Re: [PATCH 0/2] s390x: ccw: A simple test device for virtio CCW
+To:     Halil Pasic <pasic@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     kvm@vger.kernel.org, Michael S Tsirkin <mst@redhat.com>,
+        frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, imbrenda@linux.ibm.com, drjones@redhat.com,
+        qemu-s390x@nongnu.org, richard.henderson@linaro.org,
+        qemu-devel@nongnu.org
+References: <1630061450-18744-1-git-send-email-pmorel@linux.ibm.com>
+ <fe2c0cbd-24a6-0785-6a64-22c6b6c01e6d@de.ibm.com>
+ <20210830224204.49a7965a.pasic@linux.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+Message-ID: <9bcd5bc3-06b9-f5f5-d6c5-949e70a71ffa@linux.ibm.com>
+Date:   Wed, 1 Sep 2021 15:59:19 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
+In-Reply-To: <20210830224204.49a7965a.pasic@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: bufpzJ1ZC30HoPccisE-0GDhcUUc92lJ
+X-Proofpoint-GUID: jCiJ1AmJD9ieuTxsrzlFjyGXPnPSS9-8
 Content-Transfer-Encoding: 7bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+MIME-Version: 1.0
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-09-01_04:2021-09-01,2021-09-01 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 spamscore=0
+ bulkscore=0 phishscore=0 malwarescore=0 mlxlogscore=999 clxscore=1015
+ priorityscore=1501 adultscore=0 lowpriorityscore=0 suspectscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2107140000 definitions=main-2109010081
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 01 Sep 2021 12:13:55 +0200
-Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
 
-> Igor Mammedov <imammedo@redhat.com> writes:
+
+On 8/30/21 10:42 PM, Halil Pasic wrote:
+> On Mon, 30 Aug 2021 11:51:51 +0200
+> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 > 
-> > On Wed, 01 Sep 2021 10:02:18 +0200
-> > Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
-> >  
-> >> Eduardo Habkost <ehabkost@redhat.com> writes:
-> >>   
-> >> > Support for 710 VCPUs has been tested by Red Hat since RHEL-8.4.
-> >> > Increase KVM_MAX_VCPUS and KVM_SOFT_MAX_VCPUS to 710.
-> >> >
-> >> > For reference, visible effects of changing KVM_MAX_VCPUS are:
-> >> > - KVM_CAP_MAX_VCPUS and KVM_CAP_NR_VCPUS will now return 710 (of course)
-> >> > - Default value for CPUID[HYPERV_CPUID_IMPLEMENT_LIMITS (00x40000005)].EAX
-> >> >   will now be 710
-> >> > - Bitmap stack variables that will grow:
-> >> >   - At kvm_hv_flush_tlb()  kvm_hv_send_ipi():
-> >> >     - Sparse VCPU bitmap (vp_bitmap) will be 96 bytes long
-> >> >     - vcpu_bitmap will be 92 bytes long
-> >> >   - vcpu_bitmap at bioapic_write_indirect() will be 92 bytes long
-> >> >     once patch "KVM: x86: Fix stack-out-of-bounds memory access
-> >> >     from ioapic_write_indirect()" is applied
-> >> >
-> >> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> >> > ---
-> >> >  arch/x86/include/asm/kvm_host.h | 4 ++--
-> >> >  1 file changed, 2 insertions(+), 2 deletions(-)
-> >> >
-> >> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> >> > index af6ce8d4c86a..f76fae42bf45 100644
-> >> > --- a/arch/x86/include/asm/kvm_host.h
-> >> > +++ b/arch/x86/include/asm/kvm_host.h
-> >> > @@ -37,8 +37,8 @@
-> >> >  
-> >> >  #define __KVM_HAVE_ARCH_VCPU_DEBUGFS
-> >> >  
-> >> > -#define KVM_MAX_VCPUS 288
-> >> > -#define KVM_SOFT_MAX_VCPUS 240
-> >> > +#define KVM_MAX_VCPUS 710    
-> >> 
-> >> Out of pure curiosity, where did 710 came from? Is this some particular
-> >> hardware which was used for testing (weird number btw). Should we maybe
-> >> go to e.g. 1024 for the sake of the beauty of powers of two? :-)
-> >>   
-> >> > +#define KVM_SOFT_MAX_VCPUS 710    
-> >> 
-> >> Do we really need KVM_SOFT_MAX_VCPUS which is equal to KVM_MAX_VCPUS?
-> >> 
-> >> Reading 
-> >> 
-> >> commit 8c3ba334f8588e1d5099f8602cf01897720e0eca
-> >> Author: Sasha Levin <levinsasha928@gmail.com>
-> >> Date:   Mon Jul 18 17:17:15 2011 +0300
-> >> 
-> >>     KVM: x86: Raise the hard VCPU count limit
-> >> 
-> >> the idea behind KVM_SOFT_MAX_VCPUS was to allow developers to test high
-> >> vCPU numbers without claiming such configurations as supported.
-> >> 
-> >> I have two alternative suggestions:
-> >> 1) Drop KVM_SOFT_MAX_VCPUS completely.
-> >> 2) Raise it to a higher number (e.g. 2048)
-> >>   
-> >> >  #define KVM_MAX_VCPU_ID 1023    
-> >> 
-> >> 1023 may not be enough now. I rememeber there was a suggestion to make
-> >> max_vcpus configurable via module parameter and this question was
-> >> raised:
-> >> 
-> >> https://lore.kernel.org/lkml/878s292k75.fsf@vitty.brq.redhat.com/
-> >> 
-> >> TL;DR: to support EPYC-like topologies we need to keep
-> >>  KVM_MAX_VCPU_ID = 4 * KVM_MAX_VCPUS  
-> >
-> > VCPU_ID (sequential 0-n range) is not APIC ID (sparse distribution),
-> > so topology encoded in the later should be orthogonal to VCPU_ID.  
+>> On 27.08.21 12:50, Pierre Morel wrote:
+>>> Hello All,
+>>>
+>>>
+>>> This series presents a VIRTIO test device which receives data on its
+>>> input channel and sends back a simple checksum for the data it received
+>>> on its output channel.
+>>>    
+>>> The goal is to allow a simple VIRTIO device driver to check the VIRTIO
+>>> initialization and various data transfer.
 > 
-> Why do we even have KVM_MAX_VCPU_ID which is != KVM[_SOFT]_MAX_VCPUS
-> then?
-I'd say for compat reasons (8c3ba334f85 KVM: x86: Raise the hard VCPU count limit)
+> Can you please elaborate a little on the objectives.
 
-qemu warns users that they are out of recommended (tested) limit when
-it sees requested maxcpus over soft limit.
-See soft_vcpus_limit in qemu.
+Yes I will, but I must think a lot more about it, I think doing the 
+specifications you speak about later in this response is the right way 
+to do it.
 
 
-> KVM_MAX_VCPU_ID is only checked in kvm_vm_ioctl_create_vcpu() which
-> passes 'id' down to kvm_vcpu_init() which, in its turn, sets
-> 'vcpu->vcpu_id'. This is, for example, returned by kvm_x2apic_id():
 > 
-> static inline u32 kvm_x2apic_id(struct kvm_lapic *apic)
-> {
->         return apic->vcpu->vcpu_id;
-> }
+>>>
+>>> For this I introduced a new device ID for the device and having no
+>>> Linux driver but a kvm-unit-test driver, I have the following
+>>> questions:
+>>
+>> I think we should reserve an ID in the official virtio spec then for such a device?
+>> Maybe also add mst for such things.
 > 
-> So I'm pretty certain this is actually APIC id and it has topology in
-> it.
-Yep, I mixed it up with cpu_index on QEMU side,
-for x86 it fetches actual apic id and feeds that to kvm when creating vCPU.
+> I agree having ID reserved is a good idea. But then if we are going to
+> introduce an official test device, I believe we should write a
+> specification for it as well. Yes having the guarantee that test devices
+> and real devices won't mix is a value in itself, but if we had a
+> standardized test device, whoever does work with it would not have to
+> ask themselves is this test device compatible with this test device
+> driver.
 
-It looks like KVM_MAX_VCPU_ID (KVM_SOFT_MAX_VCPUS) is essentially
-MAX_[SOFT_]APIC_ID which in some places is treated as max number of vCPUs,
-so actual max count of vCPUs could be less than that (in case of sparse APIC
-IDs /non power of 2 thread|core|whatever count/).
+Yes right.
+
+> 
+>>    
+>>
+>>> Is there another way to advertise new VIRTIO IDs but Linux?
+>>> If this QEMU test meet interest, should I write a Linux test program?
+>>>
+> 
+> You may not simply claim and advertise a VIRTIO ID. The virtio ids
+> are allocated by the virtio standardisation body, and the list of the
+> IDs reserved in the v1.1-cs01 incarnation of the spec can be found here:
+> https://docs.oasis-open.org/virtio/virtio/v1.1/cs01/virtio-v1.1-cs01.html#x1-1930005
+> 
+> For how to contribute to the virtio specification please take look at
+> this:
+> https://github.com/oasis-tcs/virtio-admin/blob/master/README.md
+
+Thanks, I will go this way.
+
+
+Thanks for these constructive answers,
+
+Regards,
+Pierre
 
 
 
-
+-- 
+Pierre Morel
+IBM Lab Boeblingen
