@@ -2,87 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0E5F33FE377
-	for <lists+kvm@lfdr.de>; Wed,  1 Sep 2021 21:57:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D4B813FE3FE
+	for <lists+kvm@lfdr.de>; Wed,  1 Sep 2021 22:30:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238488AbhIAT62 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Sep 2021 15:58:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50088 "EHLO
+        id S231373AbhIAUbg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Sep 2021 16:31:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57626 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230231AbhIAT61 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Sep 2021 15:58:27 -0400
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79E7DC061575
-        for <kvm@vger.kernel.org>; Wed,  1 Sep 2021 12:57:30 -0700 (PDT)
-Received: by mail-pj1-x1036.google.com with SMTP id 28-20020a17090a031cb0290178dcd8a4d1so411338pje.0
-        for <kvm@vger.kernel.org>; Wed, 01 Sep 2021 12:57:30 -0700 (PDT)
+        with ESMTP id S230231AbhIAUbc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Sep 2021 16:31:32 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F517C061760
+        for <kvm@vger.kernel.org>; Wed,  1 Sep 2021 13:30:35 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id j9-20020a2581490000b02905897d81c63fso698336ybm.8
+        for <kvm@vger.kernel.org>; Wed, 01 Sep 2021 13:30:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=tMTG80t3wz+BbsYt7/vMbgUKt2cALKcGrfxmvyDVycI=;
-        b=GDxzDHx6y4t2OpIpS+RJgk1VtJMeiB8knpDgvYQPSsFfHb9myS2i8Y8zKivTuXuXjD
-         80WQ7dy0hlk1NsTkOvIPxXdqWLOvHI003J78+jnvMmt2AHjFlmWer9qGm5PPsff+b2qd
-         aOvfuEe5agrtLAxrPIEsh+gBgAiw95ASoDg+uPHtcGd0X5xUl+uFpwYV5yGFPfy3nYSe
-         X7GTPNiKRIHN5GQzk78FQkxMTyXT4uS5O8MwskFj3Q3faG/t/NUqScAQalxcqTeIbxdC
-         r6CJv4p/DQwb/7mJW/KCjNyL/lqHQmBPjT5leuOBgEo6MdmgGRm0IRJ3pJtpXO6I5Yni
-         WUCw==
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=W1dxeMSnjrWamgGdUCD0sYJfSJN9IbPKQnQHF6ba9Zk=;
+        b=IQ3nzeVkBaQ3+GaVFpdDRiwa1F5iA/5Zp/cm/bF8X3UWxA4Toc92TTI+eIn+naxoj4
+         ET+Zt+Rvu2Fr2/xquoH0yyIu1XZMcmT6cboCyI5rR64pNT2lIrUM9xsZrqNNRFzptE9I
+         wsjHcW+VBGjjK0s1f/t7DFUqU3PrzpUZIO7H21qkNMgtq3NBIoSIXL8a6Wi2vk1qkqG1
+         BaUOcKIMQ08Iy5Y7BqvrFMwn+huvKoc2AWIhhSBz+VoHhzJ2fNfVJZIWBlgZKOH4ctt1
+         0w2Bp1svSX94Jl0zODWdtTreSksXnGqUiHiy/S7N6hf8RY5t4uNFQqLBoR2dt7fhnNYr
+         B6yg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=tMTG80t3wz+BbsYt7/vMbgUKt2cALKcGrfxmvyDVycI=;
-        b=SzB1nvPUhjpkE5AzgQWnGg30HwJo00x9ncODp5qBAKcFZr3fCLSOra6tdADwjhXCyR
-         iuWSoYapfe36yNzTHIxhvajntcnmAOtPNKvwpSded0t7VDnZmq03226Xsa+jETNJxEKz
-         AxZTrJo6cPYyVnwdmU+t4CkudszAlSz3rjbcdQho+ZqzWMrHFOxpU+bJr8DqgGb1s+vX
-         04nrYQ7tlmg2AAxHXjDfhevL0ZHMRr5myikLFJ7F8I++LRMsmLCtK2RaABD73EHsktxx
-         aMs27iLFg8d9yDpUm2xsGdom3zo1hyiNwCsvxY30y3v2ve5t8Svqr0WeodtAXqaMsq+Y
-         zR5g==
-X-Gm-Message-State: AOAM531DngEImk9//+xk9CBKq7n0Qhy2uQpgNUAUMwyiBy+Eeo+bO0zf
-        YlXQRdMMmhzftzR1ZjzAtA9lmg==
-X-Google-Smtp-Source: ABdhPJyjE7jv9C7nQQ332L+GGCxxc0l51kKj4TvBYL6j4Mk0NOTmNP6mrLfjZrAOXlarJRfAETU5Gg==
-X-Received: by 2002:a17:90b:88e:: with SMTP id bj14mr1067223pjb.115.1630526249849;
-        Wed, 01 Sep 2021 12:57:29 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id z7sm306742pjr.42.2021.09.01.12.57.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Sep 2021 12:57:29 -0700 (PDT)
-Date:   Wed, 1 Sep 2021 19:57:25 +0000
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=W1dxeMSnjrWamgGdUCD0sYJfSJN9IbPKQnQHF6ba9Zk=;
+        b=BSrkctWSs+TFd+21PyMfM38N7Sc4TYo85pWSCauC1Thp7eMkRuaVQ19nVgy0FXGWma
+         PL7E8fRK7tjFSbDBSQ+08iUZgIt1wsU+Z2gofLhky6xq3DpuLjQOJKg4dAYM+oyceo9y
+         K/CxH0c0bkUINEoF531LZIBoX2EG52XMtk8vUF0snM28yi1clBvT15U/gIp40u9Gzms0
+         7rhWFv7GHD6rhXN5PQnvBvX7UN8/5Fm+JhCHaO6ISdrZmL3aWTxhKxykAFkkbsdOH+iU
+         deu3OGOHxP2P/XCpMF7babhxlYPNiQUp1xSTFFdZySZP43hC90dU+eRgWqu40RnjX9B1
+         VXdw==
+X-Gm-Message-State: AOAM533fpAgheQk4GO+pogYMwPJ/oC3AGGPH1FhqmIMWzZ6rrsuMWl/q
+        wwRqr41ECzGgS3C8iwwIGSExuAm/Vmg=
+X-Google-Smtp-Source: ABdhPJztMghe8pf2r0RN3BmnZkigpSEdqe6AO5tWh0SkJaCpcvF1MtRyRWIuMac/iI8RQmjvTQ8oDXGaxcw=
+X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:90:200:9935:5a5e:c7b6:e649])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:513:: with SMTP id
+ x19mr1875181ybs.90.1630528234743; Wed, 01 Sep 2021 13:30:34 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Wed,  1 Sep 2021 13:30:25 -0700
+Message-Id: <20210901203030.1292304-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.0.153.gba50c8fa24-goog
+Subject: [PATCH v3 0/5] KVM: rseq: Fix and a test for a KVM+rseq bug
 From:   Sean Christopherson <seanjc@google.com>
-To:     Jia He <justin.he@arm.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
+To:     Russell King <linux@armlinux.org.uk>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Guo Ren <guoren@kernel.org>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Oleg Nesterov <oleg@redhat.com>,
         Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: x86/mmu: Remove unused field mmio_cached in struct
- kvm_mmu_page
-Message-ID: <YS/bJbzgG+pasIxu@google.com>
-References: <20210830145336.27183-1-justin.he@arm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210830145336.27183-1-justin.he@arm.com>
+        Peter Zijlstra <peterz@infradead.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+        "Paul E. McKenney" <paulmck@kernel.org>,
+        Boqun Feng <boqun.feng@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Shuah Khan <shuah@kernel.org>
+Cc:     Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-csky@vger.kernel.org, linux-mips@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, Peter Foley <pefoley@google.com>,
+        Shakeel Butt <shakeelb@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Ben Gardon <bgardon@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 30, 2021, Jia He wrote:
-> After reverting and restoring the fast tlb invalidation patch series,
-> the mmio_cached is not removed. Hence a unused field is left in
-> kvm_mmu_page.
-> 
-> Cc: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Jia He <justin.he@arm.com>
+Patch 1 fixes a KVM+rseq bug where KVM's handling of TIF_NOTIFY_RESUME,
+e.g. for task migration, clears the flag without informing rseq and leads
+to stale data in userspace's rseq struct.
 
-Reviewed-by: Sean Christopherson <seanjc@google.com> 
+Patch 2 is a cleanup to try and make future bugs less likely.  It's also
+a baby step towards moving and renaming tracehook_notify_resume() since
+it has nothing to do with tracing.
 
-There's also additional cleanup we can do to take advantage of the free byte.
-I'll include this patch in a follow-up mini-series to hopefully make life a bit
-easier for Paolo.
+Patch 3 is a fix/cleanup to stop overriding x86's unistd_{32,64}.h when
+the include path (intentionally) omits tools' uapi headers.  KVM's
+selftests do exactly that so that they can pick up the uapi headers from
+the installed kernel headers, and still use various tools/ headers that
+mirror kernel code, e.g. linux/types.h.  This allows the new test in
+patch 4 to reference __NR_rseq without having to manually define it.
 
-Thanks!
+Patch 4 is a regression test for the KVM+rseq bug.
+
+Patch 5 is a cleanup made possible by patch 3.
+
+Based on commit 835d31d319d9 ("Merge tag 'media/v5.15-1' of ...").
+
+v3:
+  - Collect Ack/Review. [Mathieu, Ben]
+  - Add explicit smp_wmb() instead of relying on atomic_inc() to do a full
+    barrier. [Mathieu]
+  - Add lots and lots of comments in the selftest, especially around why
+    the migration thread needs a udelay(). [Mathieu]
+  - Delay between 1us and 10us to reduce the odds of having a hard
+    dependency on arch/kernel behavior.  [Mathieu]
+  - Dropped an s390 change in patch 2 after a rebase to upstream master.
+
+v2:
+  - https://lkml.kernel.org/r/20210820225002.310652-1-seanjc@google.com
+  - Don't touch rseq_cs when handling KVM case so that rseq_syscall() will
+    still detect a naughty userspace. [Mathieu]
+  - Use a sequence counter + retry in the test to ensure the process isn't
+    migrated between sched_getcpu() and reading rseq.cpu_id, i.e. to
+    avoid a flaky test. [Mathieu]
+  - Add Mathieu's ack for patch 2.
+  - Add more comments in the test.
+
+v1: https://lkml.kernel.org/r/20210818001210.4073390-1-seanjc@google.com
+
+Sean Christopherson (5):
+  KVM: rseq: Update rseq when processing NOTIFY_RESUME on xfer to KVM
+    guest
+  entry: rseq: Call rseq_handle_notify_resume() in
+    tracehook_notify_resume()
+  tools: Move x86 syscall number fallbacks to .../uapi/
+  KVM: selftests: Add a test for KVM_RUN+rseq to detect task migration
+    bugs
+  KVM: selftests: Remove __NR_userfaultfd syscall fallback
+
+ arch/arm/kernel/signal.c                      |   1 -
+ arch/arm64/kernel/signal.c                    |   1 -
+ arch/csky/kernel/signal.c                     |   4 +-
+ arch/mips/kernel/signal.c                     |   4 +-
+ arch/powerpc/kernel/signal.c                  |   4 +-
+ include/linux/tracehook.h                     |   2 +
+ kernel/entry/common.c                         |   4 +-
+ kernel/rseq.c                                 |  14 +-
+ .../x86/include/{ => uapi}/asm/unistd_32.h    |   0
+ .../x86/include/{ => uapi}/asm/unistd_64.h    |   3 -
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   3 +
+ tools/testing/selftests/kvm/rseq_test.c       | 236 ++++++++++++++++++
+ 13 files changed, 257 insertions(+), 20 deletions(-)
+ rename tools/arch/x86/include/{ => uapi}/asm/unistd_32.h (100%)
+ rename tools/arch/x86/include/{ => uapi}/asm/unistd_64.h (83%)
+ create mode 100644 tools/testing/selftests/kvm/rseq_test.c
+
+-- 
+2.33.0.153.gba50c8fa24-goog
+
