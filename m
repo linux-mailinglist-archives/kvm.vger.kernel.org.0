@@ -2,108 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 373D53FE548
-	for <lists+kvm@lfdr.de>; Thu,  2 Sep 2021 00:10:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D8E743FE54B
+	for <lists+kvm@lfdr.de>; Thu,  2 Sep 2021 00:11:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245614AbhIAWLQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Sep 2021 18:11:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52752 "EHLO
+        id S1343942AbhIAWLZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Sep 2021 18:11:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52800 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244373AbhIAWLP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Sep 2021 18:11:15 -0400
-Received: from mail-io1-xd30.google.com (mail-io1-xd30.google.com [IPv6:2607:f8b0:4864:20::d30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7D6EC061575
-        for <kvm@vger.kernel.org>; Wed,  1 Sep 2021 15:10:17 -0700 (PDT)
-Received: by mail-io1-xd30.google.com with SMTP id a15so1148457iot.2
-        for <kvm@vger.kernel.org>; Wed, 01 Sep 2021 15:10:17 -0700 (PDT)
+        with ESMTP id S1343674AbhIAWLY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Sep 2021 18:11:24 -0400
+Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B3A7C061757
+        for <kvm@vger.kernel.org>; Wed,  1 Sep 2021 15:10:27 -0700 (PDT)
+Received: by mail-qv1-xf49.google.com with SMTP id e14-20020a056214162e00b00375ec21dd99so1058982qvw.23
+        for <kvm@vger.kernel.org>; Wed, 01 Sep 2021 15:10:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=KGjRFCzfFxSnSrNaojtITxfWpjAOQrO+uEsac7dWTTA=;
-        b=OOv/w+/psizy/DhiK4zgTzBa+yQSn/axNYDdGlR698y7GMR6zMuAi8a9i4OuVbJLj3
-         fxD9JF82Ws31zhzEUgBPX8DyK2uc5kiIr+iDVadf9MWECxBs6evXSoq5kcnSaN46O5bp
-         B5VZpg7XIgwW5ytafFIlN9wteWQn88jXrRqcyEjFL0L1h6vjf0ZFDqOolmNB+QJ7q/ak
-         3LdJxADcRoOE1RnP3pEbq+pX9f9mXOV4yNFMF89myZ/5WsWQWA4JzdA7i61pov79exlC
-         45VVE8GosGLs1VbO1TF3PymyAC3q/7uspmPnOapVMh9PmqySmvvqo1DaS2J8kSn+Q4iu
-         z7Kg==
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=ALl97lKhsbxJ/NiiAvNW+lyq6xZyCyUk+3VnN2UOJAA=;
+        b=PhyJtRw/19bMj/3oy9PlGHHbFe4J7RbPe7eyKEJfjET0e0J4UVbE72Cv/sGgJZxSkZ
+         EXPXMgPnNR6/TKiaON5k3jlvp+8xCctCPbpzzugG5Q2izHFPWUH8OKxnjP25nkwiArVF
+         5FQI6GS63tNLwkgEW78e6oYmCK47cOVMBWMdFvxtQT0IFOzWkRc46zYiG32ABKP7rc/z
+         ZOK7YER3+j/29k7iHEMYZ5hAYWlY/Q4MJL3aFA76H+iJ7FECKKi8/2M0D2r3yBWq9s2D
+         O9qiGkQVibiVP54M6JeSd75bJ02Robd4iOE73+HZkrzdjGgaj2BMibNqbj/yTHQOTPHV
+         J+rQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=KGjRFCzfFxSnSrNaojtITxfWpjAOQrO+uEsac7dWTTA=;
-        b=jLbj/pZKxwaoEzDvMBKPN0GXpEftMVZ3mr+DF+ADIxZaQxXnOtk7ROI+urCGFb9VNH
-         TFdQdVaEBZRTZxmDTwvoJNheCrdBBor2QAce5ossLlUN/GMOMv77ohAKXYvXvx4crEnq
-         cb/pypCaAZGZWKTKaztYTL6prhT7se+FbmViE1pMoxAs325A04yfsKTKdAxHwGw6pNHO
-         XvXrU1BsN4mwWCvlClYj/KcaDUj3dt8sDALbdDH2dgOYd2Mex7c4nAr4rHlXiLFjOmMl
-         jrCLFIUhBMjMdk0azOnSpOoZkbx7nv0te9sL1ix9wstDJb8oKut0hEb4LGblTUgOLEej
-         ESWA==
-X-Gm-Message-State: AOAM5324jQ4voqUrhmAWduzdkgonOhSazcr5R8YTscsWvGqoKYogV4WV
-        vdt7ih2DB99L6/BenvE0bv54Hg==
-X-Google-Smtp-Source: ABdhPJySzt8yvEcNMvACBvDBo4zdwifpTI+hcV+s3GieMcGv75P4h3hv4hnkMh9HLpsRhVbkfBXl9Q==
-X-Received: by 2002:a05:6602:2c07:: with SMTP id w7mr50345iov.122.1630534217200;
-        Wed, 01 Sep 2021 15:10:17 -0700 (PDT)
-Received: from google.com (194.225.68.34.bc.googleusercontent.com. [34.68.225.194])
-        by smtp.gmail.com with ESMTPSA id a17sm489028ios.36.2021.09.01.15.10.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Sep 2021 15:10:16 -0700 (PDT)
-Date:   Wed, 1 Sep 2021 22:10:13 +0000
-From:   Oliver Upton <oupton@google.com>
-To:     Raghavendra Rao Ananta <rananta@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH v3 03/12] KVM: arm64: selftests: Add support for cpu_relax
-Message-ID: <YS/6RZG7Elr9fPQP@google.com>
-References: <20210901211412.4171835-1-rananta@google.com>
- <20210901211412.4171835-4-rananta@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210901211412.4171835-4-rananta@google.com>
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=ALl97lKhsbxJ/NiiAvNW+lyq6xZyCyUk+3VnN2UOJAA=;
+        b=SghydbWyrXk5SBBBGuQs8GGqt1cR5lcf4Xwvvmxy7A8+IQhOUvuvjOhVQOqYtpu9uO
+         Gf6FkZpYk6i+kclrvozEBCqYSnghO/kJPXriHGu53O8j8Pk91UHZgnFBPsaqS4I6dbOt
+         2yZH1+uizTE+JLsvL5PGyMFT7pYz4jTIUg6njKNsdvqglmLlqcPA9oygcsXmXI+IFJ9L
+         R/3PNQrPvEYe++MnT1oLSeWlAhExUsARNoVTyLuwE4UPOtNYagfb5oFf2/NGbV0B5N/p
+         D4U6lPIgXlsn5V4hVTuBERlBFq69EnCMrbcMxOOJNM3GkCk9HZXPZl3N3MCa2Zq5+ZR8
+         mdwg==
+X-Gm-Message-State: AOAM533/jbydZkOELWhvM1OlTJnD+7/obG5g5xtQtBGU3dpr92EOjlHh
+        eW+HY3KYaSVXUSEdfwj8wSdenrs7ZH8=
+X-Google-Smtp-Source: ABdhPJy2XduhtgCTgV3BaVLkTfU4bAudbwfcIULDKv3cwvK7W9UX0UY+9kA9Gimfys/Z1VWA8xfmQqI24Ao=
+X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:90:200:9935:5a5e:c7b6:e649])
+ (user=seanjc job=sendgmr) by 2002:a05:6214:c87:: with SMTP id
+ r7mr2088190qvr.2.1630534226644; Wed, 01 Sep 2021 15:10:26 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Wed,  1 Sep 2021 15:10:20 -0700
+Message-Id: <20210901221023.1303578-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.0.153.gba50c8fa24-goog
+Subject: [PATCH 0/3] KVM: x86/mmu: kvm_mmu_page cleanups
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Jia He <justin.he@arm.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 01, 2021 at 09:14:03PM +0000, Raghavendra Rao Ananta wrote:
-> Implement the guest helper routine, cpu_relax(), to yield
-> the processor to other tasks.
-> 
-> The function was derived from
-> arch/arm64/include/asm/vdso/processor.h.
-> 
-> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+Patch 1 is from Jia He to remove a defunct boolean from kvm_mmu_page
+(link[*] below if you want to take it directly).
 
-Reviewed-by: Oliver Upton <oupton@google.com>
+Patch 2 builds on that patch to micro-optimize the TDP MMU flag.
 
-> ---
->  tools/testing/selftests/kvm/include/aarch64/processor.h | 5 +++++
->  1 file changed, 5 insertions(+)
-> 
-> diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
-> index 082cc97ad8d3..78df059dc974 100644
-> --- a/tools/testing/selftests/kvm/include/aarch64/processor.h
-> +++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
-> @@ -191,6 +191,11 @@ asm(
->  	val;								  \
->  })
->  
-> +static inline void cpu_relax(void)
-> +{
-> +	asm volatile("yield" ::: "memory");
-> +}
-> +
->  #define isb()		asm volatile("isb" : : : "memory")
->  #define dsb(opt)	asm volatile("dsb " #opt : : : "memory")
->  #define dmb(opt)	asm volatile("dmb " #opt : : : "memory")
-> -- 
-> 2.33.0.153.gba50c8fa24-goog
-> 
+Patch 3 is another micro-optimization that probably doesn't buy much
+performance (I didn't check), feel free to ignore it.
+
+[*] https://lkml.kernel.org/r/20210830145336.27183-1-justin.he@arm.com
+
+Jia He (1):
+  KVM: x86/mmu: Remove unused field mmio_cached in struct kvm_mmu_page
+
+Sean Christopherson (2):
+  KVM: x86/mmu: Relocate kvm_mmu_page.tdp_mmu_page for better cache
+    locality
+  KVM: x86/mmu: Move lpage_disallowed_link further "down" in
+    kvm_mmu_page
+
+ arch/x86/kvm/mmu/mmu_internal.h | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+-- 
+2.33.0.153.gba50c8fa24-goog
+
