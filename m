@@ -2,128 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6758B3FD188
-	for <lists+kvm@lfdr.de>; Wed,  1 Sep 2021 04:52:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 773363FD1D9
+	for <lists+kvm@lfdr.de>; Wed,  1 Sep 2021 05:35:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241770AbhIACxB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Aug 2021 22:53:01 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41350 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S241648AbhIACxA (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 31 Aug 2021 22:53:00 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630464723;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=22daRUQV9U4yr6Wt0e3afK9IF5RqMvZ3yQMarWKzKaw=;
-        b=JxkWfQ7EGfdRby2Hd9j56rPsXil9S4cm2C3FAZXX5OO7cUDSxFTYinqBbb3iSpD6TdXSJT
-        6PrikPnEDTcBMAOb1V26OPOx1bsNDR+/Rg4qYR1bHBBiYO3xsUrVrBd9lpGTuUWxbipX6o
-        bPgZ3hpHWHlyTA3A+VvZuKPecQT/dm4=
-Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com
- [209.85.215.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-561-v7A3T5YcOWSK4UgGillQ3w-1; Tue, 31 Aug 2021 22:52:02 -0400
-X-MC-Unique: v7A3T5YcOWSK4UgGillQ3w-1
-Received: by mail-pg1-f197.google.com with SMTP id d1-20020a630e010000b029023afa459291so812526pgl.11
-        for <kvm@vger.kernel.org>; Tue, 31 Aug 2021 19:52:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=22daRUQV9U4yr6Wt0e3afK9IF5RqMvZ3yQMarWKzKaw=;
-        b=nTFMpDQhEqPHWAaz2gvoajuE8HICREfKnYXYqBQLWj8Hf9D2d0HrKqNyJS3SR459i3
-         11P+qkCxzgnumJugT33H8e5v1VJGaAjRoW0WEHkJKJtYRK5e467C78ROR4f0HfdOaROt
-         l6vq6DQFYfU0d7ptlHXh9Ke2kDBEc7Smu4+cgs4PjXm4DrF7ZbjM0qLGe317HSOKspA3
-         smA5ENxf4zBewLNOLAw8d8ZgErQ8HxXeBeNJMiyPZDa0ww+3YLG16mpWym5fG3sIXCky
-         P6GUZjmpU9Pa/eVGLwwHpFi4VUkhb1r7qKciZAxqNlxbLF50jn+EbCLpKsgm3PdshUIJ
-         J5lQ==
-X-Gm-Message-State: AOAM532BiNReU+j1XAU1f081OgccZ4knKc7pyFsUmiVFC6rl95nFhrNe
-        AHmfoQ7PaTkh1376OjrL9vriHEnrdiYXhNylS+SNvwoH8AlBi7vVpndsPmxstGvDW+aNaTLzoG6
-        cmajZVyMoTlkW
-X-Received: by 2002:a17:902:ea89:b0:134:7eb7:b4d7 with SMTP id x9-20020a170902ea8900b001347eb7b4d7mr7633966plb.43.1630464721016;
-        Tue, 31 Aug 2021 19:52:01 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwTWS6gU6vtbRqrdbv/Yqpra3725hn41k3JbwUi9Z5AqTrEe2L3d1WI2eNmIrtm6tnQdkeYWQ==
-X-Received: by 2002:a17:902:ea89:b0:134:7eb7:b4d7 with SMTP id x9-20020a170902ea8900b001347eb7b4d7mr7633932plb.43.1630464720692;
-        Tue, 31 Aug 2021 19:52:00 -0700 (PDT)
-Received: from wangxiaodeMacBook-Air.local ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id b7sm19703920pgs.64.2021.08.31.19.51.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 31 Aug 2021 19:51:59 -0700 (PDT)
-Subject: Re: [PATCH v13 02/13] eventfd: Export eventfd_wake_count to modules
-To:     Xie Yongji <xieyongji@bytedance.com>, mst@redhat.com,
-        stefanha@redhat.com, sgarzare@redhat.com, parav@nvidia.com,
-        hch@infradead.org, christian.brauner@canonical.com,
-        rdunlap@infradead.org, willy@infradead.org,
-        viro@zeniv.linux.org.uk, axboe@kernel.dk, bcrl@kvack.org,
-        corbet@lwn.net, mika.penttila@nextfour.com,
-        dan.carpenter@oracle.com, joro@8bytes.org,
-        gregkh@linuxfoundation.org, zhe.he@windriver.com,
-        xiaodong.liu@intel.com, joe@perches.com, robin.murphy@arm.com,
-        will@kernel.org, john.garry@huawei.com
-Cc:     songmuchun@bytedance.com,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org
-References: <20210831103634.33-1-xieyongji@bytedance.com>
- <20210831103634.33-3-xieyongji@bytedance.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <0e486c0a-0055-e698-ffd2-31c4b75dae5d@redhat.com>
-Date:   Wed, 1 Sep 2021 10:50:40 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.13.0
+        id S241797AbhIADfj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Aug 2021 23:35:39 -0400
+Received: from mga02.intel.com ([134.134.136.20]:25251 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S241452AbhIADfi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 Aug 2021 23:35:38 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10093"; a="205836477"
+X-IronPort-AV: E=Sophos;i="5.84,368,1620716400"; 
+   d="scan'208";a="205836477"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Aug 2021 20:34:41 -0700
+X-IronPort-AV: E=Sophos;i="5.84,368,1620716400"; 
+   d="scan'208";a="531657052"
+Received: from zhibosun-mobl2.ccr.corp.intel.com (HELO localhost) ([10.255.31.93])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Aug 2021 20:34:32 -0700
+Date:   Wed, 1 Sep 2021 11:34:29 +0800
+From:   Yu Zhang <yu.c.zhang@linux.intel.com>
+To:     Andi Kleen <ak@linux.intel.com>
+Cc:     David Hildenbrand <david@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Borislav Petkov <bp@alien8.de>,
+        Andy Lutomirski <luto@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Joerg Roedel <jroedel@suse.de>,
+        David Rientjes <rientjes@google.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Varad Gautam <varad.gautam@suse.com>,
+        Dario Faggioli <dfaggioli@suse.com>, x86@kernel.org,
+        linux-mm@kvack.org, linux-coco@lists.linux.dev,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Kuppuswamy Sathyanarayanan 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        Dave Hansen <dave.hansen@intel.com>
+Subject: Re: [RFC] KVM: mm: fd-based approach for supporting KVM guest
+ private memory
+Message-ID: <20210901033429.4c2dh5cwlppjvz2h@linux.intel.com>
+References: <20210824005248.200037-1-seanjc@google.com>
+ <307d385a-a263-276f-28eb-4bc8dd287e32@redhat.com>
+ <20210827023150.jotwvom7mlsawjh4@linux.intel.com>
+ <243bc6a3-b43b-cd18-9cbb-1f42a5de802f@redhat.com>
+ <765e9bbe-2df5-3dcc-9329-347770dc091d@linux.intel.com>
+ <4677f310-5987-0c13-5caf-fd3b625b4344@redhat.com>
+ <cf24c39e-2e87-f596-4375-9368ed8ef813@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20210831103634.33-3-xieyongji@bytedance.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cf24c39e-2e87-f596-4375-9368ed8ef813@linux.intel.com>
+User-Agent: NeoMutt/20171215
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, Aug 31, 2021 at 01:39:31PM -0700, Andi Kleen wrote:
+> 
+> On 8/31/2021 1:15 PM, David Hildenbrand wrote:
+> > On 31.08.21 22:01, Andi Kleen wrote:
+> > > 
+> > > > > Thanks a lot for this summary. A question about the requirement: do
+> > > > > we or
+> > > > > do we not have plan to support assigned device to the protected VM?
+> > > > 
+> > > > Good question, I assume that is stuff for the far far future.
+> > > 
+> > > It is in principle possible with the current TDX, but not secure. But
+> > > someone might decide to do it. So it would be good to have basic support
+> > > at least.
+> > 
+> > Can you elaborate the "not secure" part? Do you mean, making the device
+> > only access "shared" memory, not secure/encrypted/whatsoever?
+> 
+> 
+> Yes that's right. It can only access shared areas.
 
-在 2021/8/31 下午6:36, Xie Yongji 写道:
-> Export eventfd_wake_count so that some modules can use
-> the eventfd_signal_count() to check whether the
-> eventfd_signal() call should be deferred to a safe context.
->
-> Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
+Thanks, Andy & David.
 
+Actually, enabling of device assinment needs quite some effort, e.g.,
+to guarantee only shared pages are mapped in IOMMU page table (using
+shared GFNs). And the buffer copying inside TD is still unavoidable,
+thus not much performance benefit.
 
-And this matches the comment inside eventfd_signal():
+Maybe we should just *disable* VFIO device in TDX first. 
 
-         /*
-          * Deadlock or stack overflow issues can happen if we recurse here
-          * through waitqueue wakeup handlers. If the caller users 
-potentially
-          * nested waitqueues with custom wakeup handlers, then it should
-          * check eventfd_signal_count() before calling this function. If
-          * it returns true, the eventfd_signal() call should be 
-deferred to a
-          * safe context.
-          */
+As to the fd-based private memory, enventually we will have to tolerate
+its impact on any place where GUP is needed in virtualization. :)
 
-
-So:
-
-Acked-by: Jason Wang <jasowang@redhat.com>
-
-
-> ---
->   fs/eventfd.c | 1 +
->   1 file changed, 1 insertion(+)
->
-> diff --git a/fs/eventfd.c b/fs/eventfd.c
-> index e265b6dd4f34..1b3130b8d6c1 100644
-> --- a/fs/eventfd.c
-> +++ b/fs/eventfd.c
-> @@ -26,6 +26,7 @@
->   #include <linux/uio.h>
->   
->   DEFINE_PER_CPU(int, eventfd_wake_count);
-> +EXPORT_PER_CPU_SYMBOL_GPL(eventfd_wake_count);
->   
->   static DEFINE_IDA(eventfd_ida);
->   
-
+B.R.
+Yu
