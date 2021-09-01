@@ -2,148 +2,184 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3A7D63FD644
-	for <lists+kvm@lfdr.de>; Wed,  1 Sep 2021 11:13:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 32E553FD710
+	for <lists+kvm@lfdr.de>; Wed,  1 Sep 2021 11:43:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243449AbhIAJO1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Sep 2021 05:14:27 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59927 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S243285AbhIAJO1 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 1 Sep 2021 05:14:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630487610;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=JFfsdp0moBSobvmRxa50MBuZjWDZuZXxaOD7vKTHwFw=;
-        b=PutGUoidLyGC2rP/rjVI+7BOyJyvpSSrQ0AWJ6kPQ5Twh0Yxt3jHavcrsYxpo+lN5gtZf5
-        Dfy0s3W0Ig3pzpAjhtY0/C8vJNnmmuRzjZUSSn6dWDLzyoz7XqThq9yvMNDuORqD9T1Ocd
-        ivNwulLs9THTjdRvAHz+G6UXjWuP0gI=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-383-c54jstO0P8e78aZkKiRY3A-1; Wed, 01 Sep 2021 05:13:29 -0400
-X-MC-Unique: c54jstO0P8e78aZkKiRY3A-1
-Received: by mail-wm1-f69.google.com with SMTP id s197-20020a1ca9ce000000b002e72ba822dcso2531671wme.6
-        for <kvm@vger.kernel.org>; Wed, 01 Sep 2021 02:13:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=JFfsdp0moBSobvmRxa50MBuZjWDZuZXxaOD7vKTHwFw=;
-        b=WhIT0BynKguLFiZ83rBTULHRAMDdO0Sx1KZbwZQ9SwEZzSlN22G+NTY1Pud+/xRlvl
-         xI4k5uj3Nj5vrLQliSkCW4XaJjPsT9bw6eQtrnlTSRicwjQ+5fNql+DNZBh/eD7TAwJZ
-         XDPkJ82dE3zmWUkWP2+cFNFDH0pzf8RJGvxsVtJSXVoum4RaKryZ4/8OC2cTE/G/jxKi
-         Up7SwsTLBcoSuLg/HUxVGJQe9peCPaeBhnqOH9G5GmSaizMDjS9qke9nEoDeYwTNdJLi
-         WpqjBhSgOiATLfq50PywtpJ7Iw8590UiKVbpcfcvqoRw+hJW0DhWLyEhVrMT4yl7rQe5
-         sJQg==
-X-Gm-Message-State: AOAM5303nziCm2e4sdOqnAxsZaifiKSBofsRhgwwqSULhO5ANCAW9wPG
-        dBYM0+bBHvYf/m15sK+BcpOurMAjdzjAlSEkayMA9ci9NPbjL/tDald+saz5BMumf2dP2jXSI7A
-        F8W1RWBzRBiyD
-X-Received: by 2002:a7b:cc85:: with SMTP id p5mr8752542wma.42.1630487608012;
-        Wed, 01 Sep 2021 02:13:28 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzN5uhosl/g8BsU95QIeOxgUPXZLSUnfsagYqzdilII9el1VFGZtDLe5ZLLY0YEM5zDbmbtuQ==
-X-Received: by 2002:a7b:cc85:: with SMTP id p5mr8752525wma.42.1630487607833;
-        Wed, 01 Sep 2021 02:13:27 -0700 (PDT)
-Received: from localhost (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id z137sm5388181wmc.14.2021.09.01.02.13.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Sep 2021 02:13:27 -0700 (PDT)
-Date:   Wed, 1 Sep 2021 11:13:26 +0200
-From:   Igor Mammedov <imammedo@redhat.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Subject: Re: [PATCH] kvm: x86: Increase MAX_VCPUS to 710
-Message-ID: <20210901111326.2efecf6e@redhat.com>
-In-Reply-To: <87sfyooh9x.fsf@vitty.brq.redhat.com>
-References: <20210831204535.1594297-1-ehabkost@redhat.com>
-        <87sfyooh9x.fsf@vitty.brq.redhat.com>
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        id S243543AbhIAJoK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Sep 2021 05:44:10 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:14332 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S243522AbhIAJoJ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 1 Sep 2021 05:44:09 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 1819YBxe135343;
+        Wed, 1 Sep 2021 05:43:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=Q3IQOAntduAE1izOUzufatGk9AX0B/EI1q9Q9dnuYZs=;
+ b=n1I+uToRuOHWkKCzicPjsFmUM2xSQVy4Jxndn5RdedXICS9+6Cc0QXgdDXFyg/e9Q33p
+ 7sFeqJnay1Oc0Eq2X/NPvriOrI3AFR2VCCbHMOwQsop0De0YvMIR9fmnSt2vbt9dkwyt
+ 2FfmRa4tWo01bhy57DLhMyXDAs/426WAI3EKDTf5003j7xUqnS+ZwCzDDmNDfiWroOpt
+ xH7Pwf7SJN/HcUVb8kuRugDqkYrB3T5a54aTAAmQ/4ZL4yn/iZcwBzT/+G65VtHSa/vP
+ eQe8OPDEq/g2JK3wlXK9buet8tYXymvSe8yarfjdG36EFrsjZdXVUwwfGrz+h1p0nNA6 rw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3at6g2s7uy-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 01 Sep 2021 05:43:12 -0400
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1819ZSu0143087;
+        Wed, 1 Sep 2021 05:43:12 -0400
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3at6g2s7ub-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 01 Sep 2021 05:43:12 -0400
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1819bgn5024935;
+        Wed, 1 Sep 2021 09:43:10 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma03fra.de.ibm.com with ESMTP id 3aqcs9ptpq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 01 Sep 2021 09:43:09 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1819h1kc18547098
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 1 Sep 2021 09:43:01 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4B74EAE079;
+        Wed,  1 Sep 2021 09:43:01 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E389CAE08F;
+        Wed,  1 Sep 2021 09:43:00 +0000 (GMT)
+Received: from oc3016276355.ibm.com (unknown [9.145.181.78])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed,  1 Sep 2021 09:43:00 +0000 (GMT)
+Subject: Re: [PATCH v3 1/3] s390x: KVM: accept STSI for CPU topology
+ information
+To:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        borntraeger@de.ibm.com, frankja@linux.ibm.com, cohuck@redhat.com,
+        thuth@redhat.com, imbrenda@linux.ibm.com, hca@linux.ibm.com,
+        gor@linux.ibm.com
+References: <1627979206-32663-1-git-send-email-pmorel@linux.ibm.com>
+ <1627979206-32663-2-git-send-email-pmorel@linux.ibm.com>
+ <b5ee1953-b19d-50ec-b2e2-47a05babcee4@redhat.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+Message-ID: <f8d8bf00-3965-d4a1-c464-59ffcf20bfa3@linux.ibm.com>
+Date:   Wed, 1 Sep 2021 11:43:00 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <b5ee1953-b19d-50ec-b2e2-47a05babcee4@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: fswuS0m00twXKBiHPvovRo4h9hOk-M50
+X-Proofpoint-ORIG-GUID: -DYeszWcPdXR0QSo36MNC8OmjiSl-v02
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-09-01_03:2021-08-31,2021-09-01 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 spamscore=0
+ mlxscore=0 adultscore=0 bulkscore=0 phishscore=0 suspectscore=0
+ impostorscore=0 priorityscore=1501 malwarescore=0 lowpriorityscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2107140000 definitions=main-2109010054
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 01 Sep 2021 10:02:18 +0200
-Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
 
-> Eduardo Habkost <ehabkost@redhat.com> writes:
-> 
-> > Support for 710 VCPUs has been tested by Red Hat since RHEL-8.4.
-> > Increase KVM_MAX_VCPUS and KVM_SOFT_MAX_VCPUS to 710.
-> >
-> > For reference, visible effects of changing KVM_MAX_VCPUS are:
-> > - KVM_CAP_MAX_VCPUS and KVM_CAP_NR_VCPUS will now return 710 (of course)
-> > - Default value for CPUID[HYPERV_CPUID_IMPLEMENT_LIMITS (00x40000005)].EAX
-> >   will now be 710
-> > - Bitmap stack variables that will grow:
-> >   - At kvm_hv_flush_tlb()  kvm_hv_send_ipi():
-> >     - Sparse VCPU bitmap (vp_bitmap) will be 96 bytes long
-> >     - vcpu_bitmap will be 92 bytes long
-> >   - vcpu_bitmap at bioapic_write_indirect() will be 92 bytes long
-> >     once patch "KVM: x86: Fix stack-out-of-bounds memory access
-> >     from ioapic_write_indirect()" is applied
-> >
-> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> > ---
-> >  arch/x86/include/asm/kvm_host.h | 4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> > index af6ce8d4c86a..f76fae42bf45 100644
-> > --- a/arch/x86/include/asm/kvm_host.h
-> > +++ b/arch/x86/include/asm/kvm_host.h
-> > @@ -37,8 +37,8 @@
-> >  
-> >  #define __KVM_HAVE_ARCH_VCPU_DEBUGFS
-> >  
-> > -#define KVM_MAX_VCPUS 288
-> > -#define KVM_SOFT_MAX_VCPUS 240
-> > +#define KVM_MAX_VCPUS 710  
-> 
-> Out of pure curiosity, where did 710 came from? Is this some particular
-> hardware which was used for testing (weird number btw). Should we maybe
-> go to e.g. 1024 for the sake of the beauty of powers of two? :-)
-> 
-> > +#define KVM_SOFT_MAX_VCPUS 710  
-> 
-> Do we really need KVM_SOFT_MAX_VCPUS which is equal to KVM_MAX_VCPUS?
-> 
-> Reading 
-> 
-> commit 8c3ba334f8588e1d5099f8602cf01897720e0eca
-> Author: Sasha Levin <levinsasha928@gmail.com>
-> Date:   Mon Jul 18 17:17:15 2011 +0300
-> 
->     KVM: x86: Raise the hard VCPU count limit
-> 
-> the idea behind KVM_SOFT_MAX_VCPUS was to allow developers to test high
-> vCPU numbers without claiming such configurations as supported.
-> 
-> I have two alternative suggestions:
-> 1) Drop KVM_SOFT_MAX_VCPUS completely.
-> 2) Raise it to a higher number (e.g. 2048)
-> 
-> >  #define KVM_MAX_VCPU_ID 1023  
-> 
-> 1023 may not be enough now. I rememeber there was a suggestion to make
-> max_vcpus configurable via module parameter and this question was
-> raised:
-> 
-> https://lore.kernel.org/lkml/878s292k75.fsf@vitty.brq.redhat.com/
-> 
-> TL;DR: to support EPYC-like topologies we need to keep
->  KVM_MAX_VCPU_ID = 4 * KVM_MAX_VCPUS
 
-VCPU_ID (sequential 0-n range) is not APIC ID (sparse distribution),
-so topology encoded in the later should be orthogonal to VCPU_ID.
-
-> >  /* memory slots that are not exposed to userspace */
-> >  #define KVM_PRIVATE_MEM_SLOTS 3  
+On 8/31/21 3:59 PM, David Hildenbrand wrote:
+> On 03.08.21 10:26, Pierre Morel wrote:
+>> STSI(15.1.x) gives information on the CPU configuration topology.
+>> Let's accept the interception of STSI with the function code 15 and
+>> let the userland part of the hypervisor handle it when userland
+>> support the CPU Topology facility.
+>>
+>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>> ---
+>>   arch/s390/kvm/priv.c | 7 ++++++-
+>>   1 file changed, 6 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/arch/s390/kvm/priv.c b/arch/s390/kvm/priv.c
+>> index 9928f785c677..8581b6881212 100644
+>> --- a/arch/s390/kvm/priv.c
+>> +++ b/arch/s390/kvm/priv.c
+>> @@ -856,7 +856,8 @@ static int handle_stsi(struct kvm_vcpu *vcpu)
+>>       if (vcpu->arch.sie_block->gpsw.mask & PSW_MASK_PSTATE)
+>>           return kvm_s390_inject_program_int(vcpu, PGM_PRIVILEGED_OP);
+>> -    if (fc > 3) {
+>> +    if ((fc > 3 && fc != 15) ||
+>> +        (fc == 15 && !test_kvm_facility(vcpu->kvm, 11))) {
+>>           kvm_s390_set_psw_cc(vcpu, 3);
+>>           return 0;
+>>       }
+>> @@ -893,6 +894,10 @@ static int handle_stsi(struct kvm_vcpu *vcpu)
+>>               goto out_no_data;
+>>           handle_stsi_3_2_2(vcpu, (void *) mem);
+>>           break;
+>> +    case 15:
+>> +        trace_kvm_s390_handle_stsi(vcpu, fc, sel1, sel2, operand2);
+>> +        insert_stsi_usr_data(vcpu, operand2, ar, fc, sel1, sel2);
+>> +        return -EREMOTE;
+>>       }
+>>       if (kvm_s390_pv_cpu_is_protected(vcpu)) {
+>>           memcpy((void *)sida_origin(vcpu->arch.sie_block), (void *)mem,
+>>
+> 
+> Sorry, I'm a bit rusty on s390x kvm facility handling.
+> 
+> 
+> For test_kvm_facility() to succeed, the facility has to be in both:
+> 
+> a) fac_mask: actually available on the HW and supported by KVM 
+> (kvm_s390_fac_base via FACILITIES_KVM, kvm_s390_fac_ext via 
+> FACILITIES_KVM_CPUMODEL)
+> 
+> b) fac_list: enabled for a VM
+> 
+> AFAIU, facility 11 is neither in FACILITIES_KVM nor 
+> FACILITIES_KVM_CPUMODEL, and I remember it's a hypervisor-managed bit.
+> 
+> So unless we unlock facility 11 in FACILITIES_KVM_CPUMODEL, will 
+> test_kvm_facility(vcpu->kvm, 11) ever successfully trigger here?
+> 
+> 
+> I'm pretty sure I am messing something up :)
 > 
 
+I think it is the same remark that Christian did as wanted me to use the 
+arch/s390/tools/gen_facilities.c to activate the facility.
+
+The point is that CONFIGURATION_TOPOLOGY, STFL, 11, is already defined 
+inside QEMU since full_GEN10_GA1, so the test_kvm_facility() will 
+succeed with the next patch setting the facility 11 in the mask when 
+getting the KVM_CAP_S390_CPU_TOPOLOGY from userland.
+
+But if we activate it in KVM via any of the FACILITIES_KVM_xxx in the 
+gen_facilities.c we will activate it for the guest what ever userland 
+hypervizor we have, including old QEMU which will generate an exception.
+
+
+In this circumstances we have the choice between:
+
+- use FACILITY_KVM and handle everything in kernel
+- use FACILITY_KVM and use an extra CAPABILITY to handle part in kernel 
+to avoid guest crash and part in userland
+- use only the extra CAPABILITY and handle almost everything in userland
+
+I want to avoid kernel code when not really necessary so I eliminated 
+the first option.
+
+The last two are not very different but I found a better integration 
+using the last one, allowing to use standard test_[kvm_]facility()
+
+Thanks for reviewing.
+
+Regards,
+Pierre
+
+-- 
+Pierre Morel
+IBM Lab Boeblingen
