@@ -2,228 +2,165 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 179163FD554
-	for <lists+kvm@lfdr.de>; Wed,  1 Sep 2021 10:27:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 62AE43FD5A9
+	for <lists+kvm@lfdr.de>; Wed,  1 Sep 2021 10:34:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243072AbhIAI2S (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Sep 2021 04:28:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:33243 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S242922AbhIAI2S (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 1 Sep 2021 04:28:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630484839;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ovcjyG7IDaOy6ifWW+v+m6prcD2wZaK5/tKOHaPCRA8=;
-        b=HgJJqzg2OBdcKqXX7FOkcNExTFCpactQB3NctE7Wl+wLtLEfheEPW8+F6urTaYiV4ffOKv
-        c+nJtKZAJfExOBtoef+q+Uice04n1LKd0rmSfMwEp4yNc83UKpYA0xEQZXwwisIA21EmuD
-        7nfPi7nP/gpvAxmTwmZYQ65VCiYBzEQ=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-408-sG-KxLjBN9u5rsaG3jj5JQ-1; Wed, 01 Sep 2021 04:27:18 -0400
-X-MC-Unique: sG-KxLjBN9u5rsaG3jj5JQ-1
-Received: by mail-wm1-f72.google.com with SMTP id u14-20020a7bcb0e0000b0290248831d46e4so740390wmj.6
-        for <kvm@vger.kernel.org>; Wed, 01 Sep 2021 01:27:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=ovcjyG7IDaOy6ifWW+v+m6prcD2wZaK5/tKOHaPCRA8=;
-        b=SIthQ8G9++Yx6Wf6w5JC+X78v+SLkv9tJyZ0ThbJ6v4KLSUZYJpKspMawxGRO/4Dr7
-         xg8jpziAJmLGSGHTBzOJsQ26EdnnyC/L9LxOCzLZWySXI/0MqnxALqr8jHytrhVmV6MU
-         tpM1WGhhXEADAXJ2e4IsS7Ts0lcf0tRiCkMfdw1XOP7qCQXnrDq+yCp+WphmM+Dv0hwC
-         G9sWWsxRt1P/X5wjf482XArip8AKYw5AdIvyCMpJQPAz2DYPLvVkM995Ljt0vgOSqUM1
-         1UTjV2CC4CaPSvANEPrkEB0dcf0CtACNtdiofZaSfRYIsAdb5wj5QhnotH2je5Zfqsck
-         aNjQ==
-X-Gm-Message-State: AOAM530jO1BzO8A/KRmmP9PT1WWmPIE0b2jGRqdtWpN2AhhNFxr4q2EO
-        Vz+wY1EO68VOa9RPsLuZo6M0iI3GxpRctK2WTFkHzPEu4VgrP3wTAO491XMSADnozZuOCTg9mMu
-        VqR6K5ASoTtUa
-X-Received: by 2002:a7b:c4cb:: with SMTP id g11mr8411412wmk.80.1630484836985;
-        Wed, 01 Sep 2021 01:27:16 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwVHVGo8/2yaFqDLnkSXohfmFINaCXjLS/UevTrlJwzmeSr3ztn2rVI0RS4UIxlE57pxWngTg==
-X-Received: by 2002:a7b:c4cb:: with SMTP id g11mr8411397wmk.80.1630484836753;
-        Wed, 01 Sep 2021 01:27:16 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id u5sm20249739wrr.94.2021.09.01.01.27.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Sep 2021 01:27:16 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
+        id S243549AbhIAIeV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Sep 2021 04:34:21 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:31796 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S243562AbhIAIeO (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 1 Sep 2021 04:34:14 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 18184TuB074153;
+        Wed, 1 Sep 2021 04:32:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=wTyTfHd7TSM/j7teZCQHStIyAgYflYh980W3yUujmzg=;
+ b=SVINeSCnKJpQrAlY+H4xBh8erXH2sN7GVXnodgx9IzfdrpxNYhlGq6fghQ4ZTj5LHsRr
+ Ik7lAq5lLx/HL5BOtshhXth9mmxANfSm3dEwofBrp6BQngzAIXPwUuwTRtThk7u0j2US
+ ba+9lJzgZFKqP83zI1zZfoQ63KDMvsQCVLG7CGlXFZMpeEKUSGKBjOnGOrUBHf6rUX1E
+ fdWijevJljsT6qOT4vdnPGFzXqqFkvm9wjcqez7jVG0Cjc6WpsYVmnoTSCJ4x+dxKlJT
+ NEQUtFjJj/ytvh4MiggMAhRT5E3yy7nBMgf+qnQ3DZ9Q7ZGocoiI1IaqqBz3Rns6x7zm mg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3at3gdux57-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 01 Sep 2021 04:32:19 -0400
+Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 18184U8F074175;
+        Wed, 1 Sep 2021 04:32:18 -0400
+Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com [169.47.144.26])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3at3gdux4k-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 01 Sep 2021 04:32:18 -0400
+Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
+        by ppma04wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1818GlCb002939;
+        Wed, 1 Sep 2021 08:32:17 GMT
+Received: from b03cxnp07027.gho.boulder.ibm.com (b03cxnp07027.gho.boulder.ibm.com [9.17.130.14])
+        by ppma04wdc.us.ibm.com with ESMTP id 3aqcsca136-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 01 Sep 2021 08:32:17 +0000
+Received: from b03ledav006.gho.boulder.ibm.com (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
+        by b03cxnp07027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1818WGew21102968
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 1 Sep 2021 08:32:16 GMT
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 82B55C6057;
+        Wed,  1 Sep 2021 08:32:16 +0000 (GMT)
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 525B0C6061;
+        Wed,  1 Sep 2021 08:32:10 +0000 (GMT)
+Received: from [9.148.12.157] (unknown [9.148.12.157])
+        by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Wed,  1 Sep 2021 08:32:10 +0000 (GMT)
+Subject: Re: [PATCH Part1 v5 38/38] virt: sevguest: Add support to get
+ extended report
+To:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        syzbot+200c08e88ae818f849ce@syzkaller.appspotmail.com
-Subject: Re: [PATCH 1/3] Revert "KVM: x86: mmu: Add guest physical address
- check in translate_gpa()"
-In-Reply-To: <20210831164224.1119728-2-seanjc@google.com>
-References: <20210831164224.1119728-1-seanjc@google.com>
- <20210831164224.1119728-2-seanjc@google.com>
-Date:   Wed, 01 Sep 2021 10:27:15 +0200
-Message-ID: <87pmtsog4c.fsf@vitty.brq.redhat.com>
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
+        Dov Murik <dovmurik@linux.ibm.com>
+References: <20210820151933.22401-1-brijesh.singh@amd.com>
+ <20210820151933.22401-39-brijesh.singh@amd.com>
+ <bd5b2d47-2f66-87d9-ce1e-dfe717741d22@linux.ibm.com>
+ <e7e35408-9336-2b89-6028-c201b406f5f3@amd.com>
+From:   Dov Murik <dovmurik@linux.ibm.com>
+Message-ID: <a49bafa9-e00c-7dec-ec07-08f4dfd6400f@linux.ibm.com>
+Date:   Wed, 1 Sep 2021 11:32:08 +0300
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <e7e35408-9336-2b89-6028-c201b406f5f3@amd.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 5JSPlWLptOL7Dhu_Di7WHkrO4hX69CiQ
+X-Proofpoint-GUID: 7QaYGXi0QrcH-JVSb44dmDj7gh7m4Utd
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-09-01_02:2021-08-31,2021-09-01 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 adultscore=0
+ mlxscore=0 suspectscore=0 malwarescore=0 lowpriorityscore=0
+ impostorscore=0 clxscore=1015 spamscore=0 priorityscore=1501
+ mlxlogscore=986 bulkscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2107140000 definitions=main-2109010045
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <seanjc@google.com> writes:
 
-> Revert a misguided illegal GPA check when "translating" a non-nested GPA.
-> The check is woefully incomplete as it does not fill in @exception as
-> expected by all callers, which leads to KVM attempting to inject a bogus
-> exception, potentially exposing kernel stack information in the process.
->
->  WARNING: CPU: 0 PID: 8469 at arch/x86/kvm/x86.c:525 exception_type+0x98/0xb0 arch/x86/kvm/x86.c:525
->  CPU: 1 PID: 8469 Comm: syz-executor531 Not tainted 5.14.0-rc7-syzkaller #0
->  RIP: 0010:exception_type+0x98/0xb0 arch/x86/kvm/x86.c:525
->  Call Trace:
->   x86_emulate_instruction+0xef6/0x1460 arch/x86/kvm/x86.c:7853
->   kvm_mmu_page_fault+0x2f0/0x1810 arch/x86/kvm/mmu/mmu.c:5199
->   handle_ept_misconfig+0xdf/0x3e0 arch/x86/kvm/vmx/vmx.c:5336
->   __vmx_handle_exit arch/x86/kvm/vmx/vmx.c:6021 [inline]
->   vmx_handle_exit+0x336/0x1800 arch/x86/kvm/vmx/vmx.c:6038
->   vcpu_enter_guest+0x2a1c/0x4430 arch/x86/kvm/x86.c:9712
->   vcpu_run arch/x86/kvm/x86.c:9779 [inline]
->   kvm_arch_vcpu_ioctl_run+0x47d/0x1b20 arch/x86/kvm/x86.c:10010
->   kvm_vcpu_ioctl+0x49e/0xe50 arch/x86/kvm/../../../virt/kvm/kvm_main.c:3652
->
-> The bug has escaped notice because practically speaking the GPA check is
-> useless.  The GPA check in question only comes into play when KVM is
-> walking guest page tables (or "translating" CR3), and KVM already handles
-> illegal GPA checks by setting reserved bits in rsvd_bits_mask for each
-> PxE, or in the case of CR3 for loading PTDPTRs, manually checks for an
-> illegal CR3.  This particular failure doesn't hit the existing reserved
-> bits checks because syzbot sets guest.MAXPHYADDR=1, and IA32 architecture
-> simply doesn't allow for such an absurd MAXPHADDR, e.g. 32-bit paging
 
-"MAXPHYADDR"
+On 01/09/2021 0:11, Brijesh Singh wrote:
+> 
+> 
+> On 8/31/21 3:22 PM, Dov Murik wrote:
+>> Hi Brijesh,
+>>
+>> On 20/08/2021 18:19, Brijesh Singh wrote:
+>>> Version 2 of GHCB specification defines NAE to get the extended guest
+>>> request. It is similar to the SNP_GET_REPORT ioctl. The main difference
+>>> is related to the additional data that be returned. The additional
+>>> data returned is a certificate blob that can be used by the SNP guest
+>>> user.
+>>
+>> It seems like the SNP_GET_EXT_REPORT ioctl does everything that the
+>> SNP_GET_REPORT ioctl does, and more.  Why expose SNP_GET_REPORT to
+>> userspace at all?
+>>
+>>
+> 
+> Since both of these options are provided by the GHCB protocol so I
+> exposed it. Its possible that some applications may not care about the
+> extended certificate blob. And in those case, if the hypervisor is
+> programmed with the extended certificate blob and caller does not supply
+> the enough number of pages to copy the blob then command should fail.
+> This will enforce a new requirement on that guest application to
+> allocate an extra memory. e.g:
+> 
+> 1. Hypervisor is programmed with a system wide certificate blob using
+> the SNP_SET_EXT_CONFIG ioctl().
+> 
+> 2. Guest wants to get the report but does not care about the certificate
+> blob.
+> 
+> 3. Guest issues a extended guest report with the npages = 0. The command
+> will fail with invalid length and number of pages will be returned in
+> the response.
+> 
+> 4. Guest will not need to allocate memory to hold the certificate and
+> reissue the command.
+> 
+> The #4 is unnecessary for a guest which does not want to get. In this
+> case, a guest can simply call the attestation report without asking for
+> certificate blob. Please see the GHCB spec for more details.
+> 
 
-> doesn't define any reserved PA bits checks, which KVM emulates by only
-> incorporating the reserved PA bits into the "high" bits, i.e. bits 63:32.
->
-> Simply remove the bogus check.  There is zero meaningful value and no
-> architectural justification for supporting guest.MAXPHYADDR < 32, and
-> properly filling the exception would introduce non-trivial complexity.
->
-> This reverts commit ec7771ab471ba6a945350353617e2e3385d0e013.
->
-> Fixes: ec7771ab471b ("KVM: x86: mmu: Add guest physical address check in translate_gpa()")
-> Cc: stable@vger.kernel.org
-> Reported-by: syzbot+200c08e88ae818f849ce@syzkaller.appspotmail.com
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/kvm/mmu/mmu.c | 6 ------
->  1 file changed, 6 deletions(-)
->
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 4853c033e6ce..4b7908187d05 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -334,12 +334,6 @@ static bool check_mmio_spte(struct kvm_vcpu *vcpu, u64 spte)
->  static gpa_t translate_gpa(struct kvm_vcpu *vcpu, gpa_t gpa, u32 access,
->                                    struct x86_exception *exception)
->  {
-> -	/* Check if guest physical address doesn't exceed guest maximum */
-> -	if (kvm_vcpu_is_illegal_gpa(vcpu, gpa)) {
-> -		exception->error_code |= PFERR_RSVD_MASK;
-> -		return UNMAPPED_GVA;
-> -	}
-> -
->          return gpa;
->  }
+OK.  Originally I thought that by passing certs_address=NULL and
+certs_len=0 the user program can say "I don't want this extra data"; but
+now I understand that this will return an error (invalid length) with
+number of pages needed.
 
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-
-I'm, however, wondering if it would also make sense to forbid setting
-nonsensical MAXPHYADDR, something like (compile-only tested):
-
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index fe03bd978761..42e71ac8ff31 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -73,25 +73,6 @@ static inline struct kvm_cpuid_entry2 *cpuid_entry2_find(
- 	return NULL;
- }
- 
--static int kvm_check_cpuid(struct kvm_cpuid_entry2 *entries, int nent)
--{
--	struct kvm_cpuid_entry2 *best;
--
--	/*
--	 * The existing code assumes virtual address is 48-bit or 57-bit in the
--	 * canonical address checks; exit if it is ever changed.
--	 */
--	best = cpuid_entry2_find(entries, nent, 0x80000008, 0);
--	if (best) {
--		int vaddr_bits = (best->eax & 0xff00) >> 8;
--
--		if (vaddr_bits != 48 && vaddr_bits != 57 && vaddr_bits != 0)
--			return -EINVAL;
--	}
--
--	return 0;
--}
--
- void kvm_update_pv_runtime(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_cpuid_entry2 *best;
-@@ -208,20 +189,48 @@ static void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
- 	kvm_mmu_after_set_cpuid(vcpu);
- }
- 
--int cpuid_query_maxphyaddr(struct kvm_vcpu *vcpu)
-+static int __cpuid_query_maxphyaddr(struct kvm_cpuid_entry2 *entries, int nent)
- {
- 	struct kvm_cpuid_entry2 *best;
- 
--	best = kvm_find_cpuid_entry(vcpu, 0x80000000, 0);
-+	best = cpuid_entry2_find(entries, nent, 0x80000000, 0);
- 	if (!best || best->eax < 0x80000008)
- 		goto not_found;
--	best = kvm_find_cpuid_entry(vcpu, 0x80000008, 0);
-+	best = cpuid_entry2_find(entries, nent, 0x80000008, 0);
- 	if (best)
- 		return best->eax & 0xff;
- not_found:
- 	return 36;
- }
- 
-+int cpuid_query_maxphyaddr(struct kvm_vcpu *vcpu)
-+{
-+	return __cpuid_query_maxphyaddr(vcpu->arch.cpuid_entries, vcpu->arch.cpuid_nent);
-+}
-+
-+static int kvm_check_cpuid(struct kvm_cpuid_entry2 *entries, int nent)
-+{
-+	struct kvm_cpuid_entry2 *best;
-+
-+	/* guest.MAXPHYADDR < 32 is completely nonsensical */
-+	if (__cpuid_query_maxphyaddr(entries, nent) < 32)
-+		return -EINVAL;
-+
-+	/*
-+	 * The existing code assumes virtual address is 48-bit or 57-bit in the
-+	 * canonical address checks; exit if it is ever changed.
-+	 */
-+	best = cpuid_entry2_find(entries, nent, 0x80000008, 0);
-+	if (best) {
-+		int vaddr_bits = (best->eax & 0xff00) >> 8;
-+
-+		if (vaddr_bits != 48 && vaddr_bits != 57 && vaddr_bits != 0)
-+			return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
- /*
-  * This "raw" version returns the reserved GPA bits without any adjustments for
-  * encryption technologies that usurp bits.  The raw mask should be used if and
-
--- 
-Vitaly
-
+-Dov
