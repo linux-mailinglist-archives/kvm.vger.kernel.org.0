@@ -2,58 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DC40D3FDD0A
-	for <lists+kvm@lfdr.de>; Wed,  1 Sep 2021 15:20:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C0C293FDD19
+	for <lists+kvm@lfdr.de>; Wed,  1 Sep 2021 15:20:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343876AbhIANDo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Sep 2021 09:03:44 -0400
-Received: from mail-co1nam11on2041.outbound.protection.outlook.com ([40.107.220.41]:30272
-        "EHLO NAM11-CO1-obe.outbound.protection.outlook.com"
+        id S242525AbhIANPj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Sep 2021 09:15:39 -0400
+Received: from mail-bn8nam12on2051.outbound.protection.outlook.com ([40.107.237.51]:5219
+        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1343816AbhIANDV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Sep 2021 09:03:21 -0400
+        id S238562AbhIANPh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Sep 2021 09:15:37 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=L2qQgwvUUswWSgSjL3uPDICjDnXZCrJTYmlXLk0l/eXPgu4N/s9NEvQ14BdfXSx0tarF6QGSeHDfZIwE6uRG6L107mMPXpmr3S9jGVieQwHLScU0lmiWRc/bzROnYuyaFyu/Lsn5hzZPPbTB6PxkWlPoQk+3L5VM6LiR9yS2gUlFBdTSh0rVVOTSM1tdL1nwldVC1Vemd8tAKlQnh86cYEvvNhJq6ABmeSYt485pAtuo+ZmN8s/YdaAdARKZsDRB/2In9AUlVfDMQ7qG4CKZyLu8qmtrKuIwr136Fc2VC39BxjwKfQyKZn5hGdDujYI+GtuoKw9XMjwfpxQyQEViaQ==
+ b=VpDr4hEVK6vr8uS07OlI9FCgmbl+9vMOmZA5cpLjEhsC+6uZThsBPOKmMKx3ZIbUIXyNVos3CmtMGdy5geoSbHBfkL1ALd0DB8YI2ZZTn1Flr1uX719NiBbpDE2cJ62OziPowiWI5ezEj2O/7ppgibQ6WZ6uF0TX+0MYwen5KM+XSJu7gUaOu9ZvbvBapwBkBs+TZcWXQy1wf+EClqIWsJ5Wx39GeL98G69KI+BrUIpC25FKu75l/RhQaHauQhL/tqhYO7DNZCLZhIOCR+7EXvcopcFKPVR6UsikFUZiVgQPu4LInuZsjbuaQR85Y6JiGt6mC4hk0N3WQ7JRxTIrPg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jKljKRwlm7DxoAJhpc9j+/9uP0XIUJhaEPPJXPZqiq0=;
- b=AQHqHgu1mjEiEuW/FD4/9Hsxc+ambkr3K7mO8gv2scEzdGyreQl4lhuk427jnBtlOGvM8fxD9EBdn1waroiwg60VvBDjJoK9xRD6IwiHfdursOh3ehs8meZoQvSYH4YQY7gTNk5jrsievJZo63cpyX5D86G76Kg/nDokuwWLaCiRD2n1jmi1Ffg26Ph6Eku3NIM3fNMt9hdn29OstQg1AzUiPlbLm7emf4s0yTVpckSz+CPQ0ZHC7MXnICjOG6eD3rzE6ujXQd9OtahMQiPWJAMr721TdQnUP3s2QtZAsjigjr6wFSOmO7tW99MwdnTtEZGPTwg4aGwTVbhv4tN9RA==
+ bh=RZ21bjCDdqZQrEmj/vL21RVCFmHICYnXJeXFI3ryQUQ=;
+ b=KoFiakmDqEmcurvHSkIQc2vouyW8TtBDIgOlTMa0qhAIljcq8Iwxx/KqSvcSapuDloCDWdSOowBlpxMENAz+cw4r0DYS9ctPYbYIMsiCNRPi6sK0vDNjWSCqXkct0rphkwXrp3ZAAg096R+iJlVoLieG0ZUXvHf0Xd1my9skkvIkuPRckh24Tvh/swquMMZxN2xMNB3tOQgysnv/ci9YYW1zmJlppbzILMeqwxbBRD8XueLU2x90yXUmNMfQODVwjrUzXzXQrvKUu83CgjfRMuTULil+ipJpkJQOc30z5kpz6bmBgyHYKzejr8WbfZhbEyrtZ9Ylf2hON64O38kcWA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.112.34) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=quarantine sp=none pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
+ 216.228.112.35) smtp.rcpttodomain=lists.linux-foundation.org
+ smtp.mailfrom=nvidia.com; dmarc=pass (p=quarantine sp=none pct=100)
+ action=none header.from=nvidia.com; dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jKljKRwlm7DxoAJhpc9j+/9uP0XIUJhaEPPJXPZqiq0=;
- b=srthAGmwG7o2yrYug3y2QKK8nWYBrW/p6wb/FwaVarj9wb+wmyeGqAHwoXJkLdAhjkPxsiizEEKwTRd6DMUR6li8EfXz5h5fPbtztcjmHqFvaGqECFEMMzwCzfVxAjfVWieJSu34x4t5MrvCGFAi0AC2nwpNDKBfgaZP7nbwzexrqRSWqh6dKbNp2XuU7hsNdqp6hMROh7AkH2hOaQipR2xHIWBW/E2HMf/w33J+aIPYVP/c9hn+mWSI0/c6i4oJz+HggIQFgndLhQJbTPYDtCZ1lg/TlgJIn1jbtWXlzhbSUT8vxc5tLTMyBCaftJr1Qi840ftoI9DI0tHkfyVc4Q==
-Received: from MW4PR04CA0277.namprd04.prod.outlook.com (2603:10b6:303:89::12)
- by BYAPR12MB2646.namprd12.prod.outlook.com (2603:10b6:a03:65::31) with
+ bh=RZ21bjCDdqZQrEmj/vL21RVCFmHICYnXJeXFI3ryQUQ=;
+ b=hFVsi94K3kDXZLxnE3YgyiDk30ukubhTIXCMZFXfonzFctowmPwd21F6ccnKR9t9C0wVDvUHD94/581oQr1K7zK2SFEG5LM0Aa21XdhT4YnCz/L7KxwoQ7ajDqZxOotQZfDDAOhS1kzRUnj7S/r9HRJuPl5/zvDLL/G1xy3zE+4+8+0x0u0Dl/l8D0L0W2LKvZNQXGBZRugYHdN4qLFgN4YoIyv/woEbYCZgfKbPJpHEB6It869USAC/mnCzrQbQLOG6ooA97iS2KaxyggyJkG27081l4xoBvmWuxE4daymRC6EBw8UK1b+eRdP6h5500CUXunoiTxJ8EMItqD+ZDA==
+Received: from BN6PR18CA0021.namprd18.prod.outlook.com (2603:10b6:404:121::31)
+ by BN9PR12MB5067.namprd12.prod.outlook.com (2603:10b6:408:134::16) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4457.20; Wed, 1 Sep
- 2021 13:02:23 +0000
-Received: from CO1NAM11FT065.eop-nam11.prod.protection.outlook.com
- (2603:10b6:303:89:cafe::71) by MW4PR04CA0277.outlook.office365.com
- (2603:10b6:303:89::12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4457.23; Wed, 1 Sep
+ 2021 13:14:39 +0000
+Received: from BN8NAM11FT004.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:404:121:cafe::e7) by BN6PR18CA0021.outlook.office365.com
+ (2603:10b6:404:121::31) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4478.19 via Frontend
- Transport; Wed, 1 Sep 2021 13:02:23 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.34)
- smtp.mailfrom=nvidia.com; redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=pass action=none header.from=nvidia.com;
+ Transport; Wed, 1 Sep 2021 13:14:39 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.35)
+ smtp.mailfrom=nvidia.com; lists.linux-foundation.org; dkim=none (message not
+ signed) header.d=none;lists.linux-foundation.org; dmarc=pass action=none
+ header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.112.34 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.112.34; helo=mail.nvidia.com;
-Received: from mail.nvidia.com (216.228.112.34) by
- CO1NAM11FT065.mail.protection.outlook.com (10.13.174.62) with Microsoft SMTP
+ 216.228.112.35 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.112.35; helo=mail.nvidia.com;
+Received: from mail.nvidia.com (216.228.112.35) by
+ BN8NAM11FT004.mail.protection.outlook.com (10.13.176.164) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.4478.19 via Frontend Transport; Wed, 1 Sep 2021 13:02:23 +0000
-Received: from HQMAIL105.nvidia.com (172.20.187.12) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Wed, 1 Sep
- 2021 13:02:22 +0000
+ 15.20.4478.19 via Frontend Transport; Wed, 1 Sep 2021 13:14:39 +0000
+Received: from HQMAIL105.nvidia.com (172.20.187.12) by HQMAIL111.nvidia.com
+ (172.20.187.18) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Wed, 1 Sep
+ 2021 13:14:38 +0000
+Received: from HQMAIL105.nvidia.com (172.20.187.12) by HQMAIL105.nvidia.com
+ (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Wed, 1 Sep
+ 2021 13:14:38 +0000
 Received: from r-arch-stor02.mtr.labs.mlnx (172.20.187.6) by mail.nvidia.com
  (172.20.187.12) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
- Transport; Wed, 1 Sep 2021 13:02:20 +0000
+ Transport; Wed, 1 Sep 2021 13:14:35 +0000
 From:   Max Gurtovoy <mgurtovoy@nvidia.com>
 To:     <hch@infradead.org>, <mst@redhat.com>,
         <virtualization@lists.linux-foundation.org>, <kvm@vger.kernel.org>,
@@ -61,33 +65,33 @@ To:     <hch@infradead.org>, <mst@redhat.com>,
 CC:     <israelr@nvidia.com>, <nitzanc@nvidia.com>, <oren@nvidia.com>,
         <linux-block@vger.kernel.org>, <axboe@kernel.dk>,
         Max Gurtovoy <mgurtovoy@nvidia.com>
-Subject: [PATCH v2 1/1] virtio-blk: avoid preallocating big SGL for data
-Date:   Wed, 1 Sep 2021 16:02:19 +0300
-Message-ID: <20210901130219.27643-1-mgurtovoy@nvidia.com>
+Subject: [PATCH v3 1/1] virtio-blk: avoid preallocating big SGL for data
+Date:   Wed, 1 Sep 2021 16:14:34 +0300
+Message-ID: <20210901131434.31158-1-mgurtovoy@nvidia.com>
 X-Mailer: git-send-email 2.18.1
 MIME-Version: 1.0
 Content-Type: text/plain
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: efdccc4a-2d92-432c-02b5-08d96d48bd84
-X-MS-TrafficTypeDiagnostic: BYAPR12MB2646:
-X-Microsoft-Antispam-PRVS: <BYAPR12MB2646742AF957B58BCF2835FCDECD9@BYAPR12MB2646.namprd12.prod.outlook.com>
+X-MS-Office365-Filtering-Correlation-Id: 2a93793a-08b5-4088-1dfb-08d96d4a7438
+X-MS-TrafficTypeDiagnostic: BN9PR12MB5067:
+X-Microsoft-Antispam-PRVS: <BN9PR12MB50679F3B7880515F62043F6DDECD9@BN9PR12MB5067.namprd12.prod.outlook.com>
 X-MS-Oob-TLC-OOBClassifiers: OLM:1201;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 84KRlpcXcZaT1BZgMujkBIe6xOpDS9rp+PpSUujD+bys7TPirH1f6oasHV6SLw2xxhJlqv7W4BUHARb+u8HIADyjTjlFGhkkqiKP/3LCAKW5v32CMIPdbe65m+EXCXhzi+45ozlC1FbhZZ2i7bOMyxNpsIuQZzXs6qkASugbkrxLNENMqp2nnHKNmjUaIxDPdkRre/NzfMZIM2H26o5TS5xCZcbpqo24Hn8A/kEBuB41t7/zDNfsv9dqZFYuWRmhxK+GoYlPDqoT5iCsvY61B27U+27TqVQdsGY7oMtf5/WvaDdR/G15i9lPWw0Xi92yHgtM3RkRHXAiQhzlA9wlKtkpVkFJ1eqXXfHeLp4z1n+lBk/8y40xdX30+mgEl/1QPeQUWXexLJ2qJo/dmFKcey4ulP4r/iFpIfxumR2Z6QmZG/WvQVzA8ZDboOV1gHdMbu7Ycsyit4Ct/fK0Hdc2ki1VkOI1pPhHHTAtygPJD1E3P2spSK4jh3aC3wk5kHZX1BUNp2BY8lTNIdTIVowTOU1H69KgyRkNRMgIiPurFub9hjBiXuDIibhEoyOVaxGaF2DWZbimpD5qZewqRYU3S9h5V1NqW555Tza2SDRb2VI23IZPEn4/AKAgSwde7LTk61zwa7UqCc7FqY4OYto9OV68ZBdE3Ov+oMJbc9FYqYB+yc3aHbGWn8OMeY/emRKF7NwJMXENFw77pMQ/PEThRA==
-X-Forefront-Antispam-Report: CIP:216.228.112.34;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid03.nvidia.com;CAT:NONE;SFS:(4636009)(46966006)(36840700001)(8936002)(2616005)(1076003)(47076005)(83380400001)(82310400003)(36860700001)(86362001)(5660300002)(70206006)(508600001)(336012)(110136005)(26005)(70586007)(8676002)(356005)(36756003)(107886003)(4326008)(7636003)(186003)(54906003)(316002)(426003)(2906002)(36906005);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: kosEXupq0Iwdaecef7gxd8yhdR0nqZJi4JIy9B7QaJamPK8usodp5zpRx5L6LHlc87A0cQ/XbG9nODqf+8s66W2a8nNYjqSAC/UsI3eEwdaD6HlJa4zdx7X2GUz+WikdCF6gDhU8leIiDyKerXTu3ZuvpETWmokASMAOJyKIrPEmivSijTPThCDyy7u2So3LHOKp+cgZYPgaXW9dbH8Tf+nppwK0nYK+z+t/nvV9Ak+r6nTcbk8U9MVFeoxioEg+Oj6xVdzD18hnqElu9JyBW3bOJYzC6/4YeOjBJq3Nd9vJDukMtYy6ylmF0pYO4liHm1+FLILB8Z53ekMgAL6a3M/y/qoHLO4Jdg6TyoQYu8O+QSuWZfP+LELSo2iOeeL7J5dp60K0+7fPSZ6/Vs4I7YnJ7F2ZB+BkeZ247pr97xKvDX6Md6VJe7Tz67z93tM5Ap/SceNuYHDT8WilIQfyfNVoZyDKmpU6KwYy88hCNt9mTTIO0QBGgVqgl4zf8Yn0YIVRweHxQa+M8ir8GtLQZMV7b+Ani8PH6irvpE4fnh+WRSywGuzw9yJP0/8obUGfppsu2r+yX6zNpWf4Njd+ertL0g+7DqEou/dxistrnAUQTiqNF+XsXgffrKnA1zk5aO/gQjYQ0ABqGhFEI2KqEM9uiaXiGZlJ/zXv9VauNuLiO8PPjcqRR8pbvKnR6MwUqvKZC00Htwnh0qFHv0sEDA==
+X-Forefront-Antispam-Report: CIP:216.228.112.35;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid04.nvidia.com;CAT:NONE;SFS:(4636009)(46966006)(36840700001)(336012)(356005)(2616005)(4326008)(86362001)(54906003)(36756003)(110136005)(1076003)(8936002)(70586007)(82310400003)(5660300002)(47076005)(7636003)(426003)(70206006)(26005)(2906002)(508600001)(36860700001)(8676002)(316002)(186003)(36906005)(107886003)(83380400001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Sep 2021 13:02:23.3214
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Sep 2021 13:14:39.2059
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: efdccc4a-2d92-432c-02b5-08d96d48bd84
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2a93793a-08b5-4088-1dfb-08d96d4a7438
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.34];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT065.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.35];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT004.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR12MB2646
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR12MB5067
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
@@ -126,6 +130,9 @@ Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
 Reviewed-by: Israel Rukshin <israelr@nvidia.com>
 ---
 
+changes from V2:
+ - initialize vbr->out_hdr.sector during virtblk_setup_cmd
+
 changes from V1:
  - Kconfig update (from Christoph)
  - Re-order cmd setup (from Christoph)
@@ -134,8 +141,8 @@ changes from V1:
 
 ---
  drivers/block/Kconfig      |   1 +
- drivers/block/virtio_blk.c | 153 +++++++++++++++++++++++--------------
- 2 files changed, 98 insertions(+), 56 deletions(-)
+ drivers/block/virtio_blk.c | 155 +++++++++++++++++++++++--------------
+ 2 files changed, 100 insertions(+), 56 deletions(-)
 
 diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
 index 63056cfd4b62..ca25a122b8ee 100644
@@ -150,7 +157,7 @@ index 63056cfd4b62..ca25a122b8ee 100644
  	  This is the virtual block driver for virtio.  It can be used with
            QEMU based VMMs (like KVM or Xen).  Say Y or M.
 diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index 9332fc4e9b31..7a1efa2a619e 100644
+index 9332fc4e9b31..bdd6d415bd20 100644
 --- a/drivers/block/virtio_blk.c
 +++ b/drivers/block/virtio_blk.c
 @@ -24,6 +24,12 @@
@@ -174,7 +181,7 @@ index 9332fc4e9b31..7a1efa2a619e 100644
  	struct scatterlist sg[];
  };
  
-@@ -178,15 +185,92 @@ static int virtblk_setup_discard_write_zeroes(struct request *req, bool unmap)
+@@ -178,15 +185,94 @@ static int virtblk_setup_discard_write_zeroes(struct request *req, bool unmap)
  	return 0;
  }
  
@@ -220,6 +227,8 @@ index 9332fc4e9b31..7a1efa2a619e 100644
 +	bool unmap = false;
 +	u32 type;
 +
++	vbr->out_hdr.sector = 0;
++
 +	switch (req_op(req)) {
 +	case REQ_OP_READ:
 +		type = VIRTIO_BLK_T_IN;
@@ -248,7 +257,7 @@ index 9332fc4e9b31..7a1efa2a619e 100644
 +		WARN_ON_ONCE(1);
 +		return BLK_STS_IOERR;
 +	}
-+
+ 
 +	vbr->out_hdr.type = cpu_to_virtio32(vdev, type);
 +	vbr->out_hdr.ioprio = cpu_to_virtio32(vdev, req_get_ioprio(req));
 +
@@ -259,7 +268,7 @@ index 9332fc4e9b31..7a1efa2a619e 100644
 +
 +	return 0;
 +}
- 
++
 +static inline void virtblk_request_done(struct request *req)
 +{
 +	struct virtblk_req *vbr = blk_mq_rq_to_pdu(req);
@@ -269,7 +278,7 @@ index 9332fc4e9b31..7a1efa2a619e 100644
  	blk_mq_end_request(req, virtblk_result(vbr));
  }
  
-@@ -244,57 +328,23 @@ static blk_status_t virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
+@@ -244,57 +330,23 @@ static blk_status_t virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
  	int qid = hctx->queue_num;
  	int err;
  	bool notify = false;
@@ -335,7 +344,7 @@ index 9332fc4e9b31..7a1efa2a619e 100644
  	if (err) {
  		virtqueue_kick(vblk->vqs[qid].vq);
  		/* Don't stop the queue if -ENOMEM: we may have failed to
-@@ -303,6 +353,8 @@ static blk_status_t virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
+@@ -303,6 +355,8 @@ static blk_status_t virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
  		if (err == -ENOSPC)
  			blk_mq_stop_hw_queue(hctx);
  		spin_unlock_irqrestore(&vblk->vqs[qid].lock, flags);
@@ -344,7 +353,7 @@ index 9332fc4e9b31..7a1efa2a619e 100644
  		switch (err) {
  		case -ENOSPC:
  			return BLK_STS_DEV_RESOURCE;
-@@ -681,16 +733,6 @@ static const struct attribute_group *virtblk_attr_groups[] = {
+@@ -681,16 +735,6 @@ static const struct attribute_group *virtblk_attr_groups[] = {
  	NULL,
  };
  
@@ -361,7 +370,7 @@ index 9332fc4e9b31..7a1efa2a619e 100644
  static int virtblk_map_queues(struct blk_mq_tag_set *set)
  {
  	struct virtio_blk *vblk = set->driver_data;
-@@ -703,7 +745,6 @@ static const struct blk_mq_ops virtio_mq_ops = {
+@@ -703,7 +747,6 @@ static const struct blk_mq_ops virtio_mq_ops = {
  	.queue_rq	= virtio_queue_rq,
  	.commit_rqs	= virtio_commit_rqs,
  	.complete	= virtblk_request_done,
@@ -369,7 +378,7 @@ index 9332fc4e9b31..7a1efa2a619e 100644
  	.map_queues	= virtblk_map_queues,
  };
  
-@@ -783,7 +824,7 @@ static int virtblk_probe(struct virtio_device *vdev)
+@@ -783,7 +826,7 @@ static int virtblk_probe(struct virtio_device *vdev)
  	vblk->tag_set.flags = BLK_MQ_F_SHOULD_MERGE;
  	vblk->tag_set.cmd_size =
  		sizeof(struct virtblk_req) +
