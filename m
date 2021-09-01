@@ -2,61 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 889083FDFDE
-	for <lists+kvm@lfdr.de>; Wed,  1 Sep 2021 18:27:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4DBC23FDFF7
+	for <lists+kvm@lfdr.de>; Wed,  1 Sep 2021 18:33:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245403AbhIAQ20 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Sep 2021 12:28:26 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24849 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S245242AbhIAQ2W (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 1 Sep 2021 12:28:22 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630513645;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=TCAH52YqS9JZQzJKa7DRR1Gpuc8EPZCmTZ5AQVbYtWA=;
-        b=CQSXfa1RsLb8cees6QT9Hv5mRreNLsW5HcBvOcAgXOXFdtnlUYIv8ZrxLTbUPb59GwkJUa
-        dQqvHNVvBvcGGvV7ZyRB9xOaw0ibOKu0yptS5I8P0cI5Pfvo0NXoPZ9BtKiknc2U695N7r
-        gFOSR/rywuYjLZE23EjnzDN9ifKSQEw=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-57--yw-hXnXMN21o3akplrH7Q-1; Wed, 01 Sep 2021 12:27:23 -0400
-X-MC-Unique: -yw-hXnXMN21o3akplrH7Q-1
-Received: by mail-wm1-f70.google.com with SMTP id b126-20020a1c8084000000b002f152a868a2so29406wmd.1
-        for <kvm@vger.kernel.org>; Wed, 01 Sep 2021 09:27:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:organization
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=TCAH52YqS9JZQzJKa7DRR1Gpuc8EPZCmTZ5AQVbYtWA=;
-        b=JWyL6flK3T80I1DvWi/VWmzJd+gp73pRl+OhFL45inE/agltvRghTUvDUOfVXmAAvP
-         KmogIPut4Gaa4ZM9gx7W7+EiXZd8UzrtvshNKjR7wkrKmxdM9yFW1ogllftSRN2bNg1B
-         cs+eDBQgZ/grK7+OZ3srfYCVo5foVno/p1/Y6R0JppOFvPri/eAuQa1MxkNo/g2nrp03
-         dWWLTMGKDPc6aCgc6/KzIq36ScByvbh8ByPyGmxHwtPiaGxHTalEiCHarBH1/SkZHHf7
-         SoZKTtKUWH+tEmG+EkxjtEURN6EQlBsw3q24BgHe0vCOIOttmAwzI0Clhl5zfeFLBcKm
-         FHFg==
-X-Gm-Message-State: AOAM531ODA7Dju1yJwAwsI5Ow+bOz72M5KA3OlCttyCniGU23/19trY0
-        wztSNCiPvHkJXsvHc3Iuct/4O3dONOPFGBGLuU7GlEakcVvsgheITflolkilKKP48fRVH0rEjeR
-        OeuLxVRTcJvpX
-X-Received: by 2002:adf:f9cb:: with SMTP id w11mr259282wrr.382.1630513642553;
-        Wed, 01 Sep 2021 09:27:22 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzGHmzuvAvqEcnBZI7Y23pSv8aObIhsarRJKP+kEp6VN4fOLNmhGpMU3DYltGLE2gcg2FV3PQ==
-X-Received: by 2002:adf:f9cb:: with SMTP id w11mr259251wrr.382.1630513642352;
-        Wed, 01 Sep 2021 09:27:22 -0700 (PDT)
-Received: from [192.168.3.132] (p4ff23f71.dip0.t-ipconnect.de. [79.242.63.113])
-        by smtp.gmail.com with ESMTPSA id k17sm225645wmj.0.2021.09.01.09.27.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 01 Sep 2021 09:27:21 -0700 (PDT)
-Subject: Re: [RFC] KVM: mm: fd-based approach for supporting KVM guest private
- memory
-To:     Andy Lutomirski <luto@kernel.org>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+        id S245394AbhIAQeB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Sep 2021 12:34:01 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:1412 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232876AbhIAQeA (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 1 Sep 2021 12:34:00 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 181G2lEV135862;
+        Wed, 1 Sep 2021 12:31:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : reply-to : to : cc : date : in-reply-to : references : content-type
+ : content-transfer-encoding : mime-version; s=pp1;
+ bh=OK+UoipCQDRdmNhN8LKNcQBV5QECX7QgiiXDE1CWxU4=;
+ b=T1/wsVCAR6dwC7SzPZYMOAO5GTEbQSnxFhT81B6soLD+eKCBveIYN31YbsCdcLgSeJM7
+ IiNa/gjwakk9gXurnmUrrKxhpBqGHrmmzmyAFW9y3IgP7AR6FTe/ey7gj9gupIjx9yfZ
+ VPdnjvrQcSWDQmY3faT/ZQ0+1O4kl5nkwRnBP8kX9tBkCfiKeLmK7UJIi186w+ekSpbm
+ 6pYuT/Ds8yZvveCZqDh5Uua+H3yCi5WrG56Hd5pSDOrBBQSdoYo4hkGwnwBdwlE1Btrc
+ dkG/0VhKFsZkyzU0a5mcK3u4gcoIHLptaJTR4WzGPp4hOixR9kdvdyLHip5Iizmod0Nc mA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3atafaddbw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 01 Sep 2021 12:31:55 -0400
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 181G3ViV146149;
+        Wed, 1 Sep 2021 12:31:54 -0400
+Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3atafaddbf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 01 Sep 2021 12:31:54 -0400
+Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
+        by ppma01wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 181GE1RM001502;
+        Wed, 1 Sep 2021 16:31:53 GMT
+Received: from b03cxnp07028.gho.boulder.ibm.com (b03cxnp07028.gho.boulder.ibm.com [9.17.130.15])
+        by ppma01wdc.us.ibm.com with ESMTP id 3aqcsdd4vd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 01 Sep 2021 16:31:53 +0000
+Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
+        by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 181GVqAW42074462
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 1 Sep 2021 16:31:53 GMT
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D56857806B;
+        Wed,  1 Sep 2021 16:31:52 +0000 (GMT)
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3F6C17805E;
+        Wed,  1 Sep 2021 16:31:50 +0000 (GMT)
+Received: from jarvis.int.hansenpartnership.com (unknown [9.211.89.117])
+        by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Wed,  1 Sep 2021 16:31:50 +0000 (GMT)
+Message-ID: <0d6b2a7e22f5e27e03abc21795124ccd66655966.camel@linux.ibm.com>
+Subject: Re: [RFC] KVM: mm: fd-based approach for supporting KVM guest
+ private memory
+From:   James Bottomley <jejb@linux.ibm.com>
+Reply-To: jejb@linux.ibm.com
+To:     David Hildenbrand <david@redhat.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
@@ -80,106 +86,90 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         "Kirill A . Shutemov" <kirill@shutemov.name>,
         Sathyanarayanan Kuppuswamy 
         <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        Dave Hansen <dave.hansen@intel.com>
+        Dave Hansen <dave.hansen@intel.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>
+Date:   Wed, 01 Sep 2021 09:31:49 -0700
+In-Reply-To: <a259e10d-39c9-c4a5-0ab4-f42a1b9bfaee@redhat.com>
 References: <20210824005248.200037-1-seanjc@google.com>
- <307d385a-a263-276f-28eb-4bc8dd287e32@redhat.com>
- <20210827023150.jotwvom7mlsawjh4@linux.intel.com>
- <8f3630ff-bd6d-4d57-8c67-6637ea2c9560@www.fastmail.com>
- <20210901102437.g5wrgezmrjqn3mvy@linux.intel.com>
- <f37a61ba-b7ef-c789-5763-f7f237ae41cc@kernel.org>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-Message-ID: <2b2740ec-fa89-e4c3-d175-824e439874a6@redhat.com>
-Date:   Wed, 1 Sep 2021 18:27:20 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
-MIME-Version: 1.0
-In-Reply-To: <f37a61ba-b7ef-c789-5763-f7f237ae41cc@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+         <307d385a-a263-276f-28eb-4bc8dd287e32@redhat.com>
+         <YSlkzLblHfiiPyVM@google.com>
+         <61ea53ce-2ba7-70cc-950d-ca128bcb29c5@redhat.com>
+         <YS6lIg6kjNPI1EgF@google.com>
+         <f413cc20-66fc-cf1e-47ab-b8f099c89583@redhat.com>
+         <9ec3636a-6434-4c98-9d8d-addc82858c41@www.fastmail.com>
+         <bd22ef54224d15ee89130728c408f70da0516eaa.camel@linux.ibm.com>
+         <a259e10d-39c9-c4a5-0ab4-f42a1b9bfaee@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.34.4 
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 740NiI5iGR3hYxkUmw29dddhY5YGUAGA
+X-Proofpoint-GUID: u2xUgjuS-M1puQAP-rLX-ZO2m8UUaaDN
 Content-Transfer-Encoding: 7bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+MIME-Version: 1.0
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-09-01_05:2021-09-01,2021-09-01 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
+ priorityscore=1501 bulkscore=0 adultscore=0 impostorscore=0 spamscore=0
+ suspectscore=0 lowpriorityscore=0 mlxlogscore=999 mlxscore=0 phishscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2107140000 definitions=main-2109010094
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 01.09.21 18:07, Andy Lutomirski wrote:
-> On 9/1/21 3:24 AM, Yu Zhang wrote:
->> On Tue, Aug 31, 2021 at 09:53:27PM -0700, Andy Lutomirski wrote:
->>>
->>>
->>> On Thu, Aug 26, 2021, at 7:31 PM, Yu Zhang wrote:
->>>> On Thu, Aug 26, 2021 at 12:15:48PM +0200, David Hildenbrand wrote:
->>>
->>>> Thanks a lot for this summary. A question about the requirement: do we or
->>>> do we not have plan to support assigned device to the protected VM?
->>>>
->>>> If yes. The fd based solution may need change the VFIO interface as well(
->>>> though the fake swap entry solution need mess with VFIO too). Because:
->>>>
->>>> 1> KVM uses VFIO when assigning devices into a VM.
->>>>
->>>> 2> Not knowing which GPA ranges may be used by the VM as DMA buffer, all
->>>> guest pages will have to be mapped in host IOMMU page table to host pages,
->>>> which are pinned during the whole life cycle fo the VM.
->>>>
->>>> 3> IOMMU mapping is done during VM creation time by VFIO and IOMMU driver,
->>>> in vfio_dma_do_map().
->>>>
->>>> 4> However, vfio_dma_do_map() needs the HVA to perform a GUP to get the HPA
->>>> and pin the page.
->>>>
->>>> But if we are using fd based solution, not every GPA can have a HVA, thus
->>>> the current VFIO interface to map and pin the GPA(IOVA) wont work. And I
->>>> doubt if VFIO can be modified to support this easily.
->>>>
->>>>
->>>
->>> Do you mean assigning a normal device to a protected VM or a hypothetical protected-MMIO device?
->>>
->>> If the former, it should work more or less like with a non-protected VM. mmap the VFIO device, set up a memslot, and use it.  I'm not sure whether anyone will actually do this, but it should be possible, at least in principle.  Maybe someone will want to assign a NIC to a TDX guest.  An NVMe device with the understanding that the guest can't trust it wouldn't be entirely crazy ether.
->>>
->>> If the latter, AFAIK there is no spec for how it would work even in principle. Presumably it wouldn't work quite like VFIO -- instead, the kernel could have a protection-virtual-io-fd mechanism, and that fd could be bound to a memslot in whatever way we settle on for binding secure memory to a memslot.
->>>
->>
->> Thanks Andy. I was asking the first scenario.
->>
->> Well, I agree it is doable if someone really want some assigned
->> device in TD guest. As Kevin mentioned in his reply, HPA can be
->> generated, by extending VFIO with a new mapping protocol which
->> uses fd+offset, instead of HVA.
+On Wed, 2021-09-01 at 18:22 +0200, David Hildenbrand wrote:
+> On 01.09.21 18:18, James Bottomley wrote:
+> > On Wed, 2021-09-01 at 08:54 -0700, Andy Lutomirski wrote:
+> > [...]
+> > > If you want to swap a page on TDX, you can't.  Sorry, go directly
+> > > to jail, do not collect $200.
+> > 
+> > Actually, even on SEV-ES you can't either.  You can read the
+> > encrypted page and write it out if you want, but unless you swap it
+> > back to the exact same physical memory location, the encryption key
+> > won't work.  Since we don't guarantee this for swap, I think swap
+> > won't actually work for any confidential computing environment.
+> > 
+> > > So I think there are literally zero code paths that currently
+> > > call try_to_unmap() that will actually work like that on TDX.  If
+> > > we run out of memory on a TDX host, we can kill the guest
+> > > completely and reclaim all of its memory (which probably also
+> > > involves killing QEMU or whatever other user program is in
+> > > charge), but that's really our only option.
+> > 
+> > I think our only option for swap is guest co-operation.  We're
+> > going to have to inflate a balloon or something in the guest and
+> > have the guest driver do some type of bounce of the page, where it
+> > becomes an unencrypted page in the guest (so the host can read it
+> > without the physical address keying of the encryption getting in
+> > the way) but actually encrypted with a swap transfer key known only
+> > to the guest.  I assume we can use the page acceptance
+> > infrastructure currently being discussed elsewhere to do swap back
+> > in as well ... the host provides the guest with the encrypted swap
+> > page and the guest has to decrypt it and place it in encrypted
+> > guest memory.
 > 
-> I'm confused.  I don't see why any new code is needed for this at all.
-> Every proposal I've seen for handling TDX memory continues to handle TDX
-> *shared* memory exactly like regular guest memory today.  The only
-> differences are that more hole punching will be needed, which will
-> require lightweight memslots (to have many of them), memslots with
-> holes, or mappings backing memslots with holes (which can be done with
-> munmap() on current kernels).
-> 
-> So you can literally just mmap a VFIO device and expect it to work,
-> exactly like it does right now.  Whether the guest will be willing to
-> use the device will depend on the guest security policy (all kinds of
-> patches about that are flying around), but if the guest tries to use it,
-> it really should just work.
+> Ballooning is indeed *the* mechanism to avoid swapping in the
+> hypervisor  and much rather let the guest swap. Shame it requires
+> trusting a guest, which we, in general, can't. Not to mention other
+> issues we already do have with ballooning (latency, broken auto-
+> ballooning, over-inflating, ...).
 
-... but if you end up mapping private memory into IOMMU of the device 
-and the device ends up accessing that memory, we're in the same position 
-that the host might get capped, just like access from user space, no?
 
-Sure, you can map only the complete duplicate shared-memory region into 
-the IOMMU of the device, that would work. Shame vfio mostly always pins 
-all guest memory and you essentially cannot punch holes into the shared 
-memory anymore -- resulting in the worst case in a duplicate memory 
-consumption for your VM.
+Well not necessarily, but it depends how clever we want to get.  If you
+look over on the OVMF/edk2 list, there's a proposal to do guest
+migration via a mirror VM that invokes a co-routine embedded in the
+OVMF binary:
 
-So you'd actually want to map only the *currently* shared pieces into 
-the IOMMU and update the mappings on demand. Having worked on something 
-related, I can only say that 64k individual mappings, and not being able 
-to modify existing mappings except completely deleting them to replace 
-with something new (!atomic), can be quite an issue for bigger VMs.
+https://patchew.org/EDK2/20210818212048.162626-1-tobin@linux.ibm.com/
 
--- 
-Thanks,
+This gives us a page encryption mechanism that's provided by the host
+but accepted via the guest using attestation, meaning we have a
+mutually trusted piece of code that can use to extract encrypted pages.
+It does seem it could be enhanced to do swapping for us as well if
+that's a road we want to go down?
 
-David / dhildenb
+James
+
 
