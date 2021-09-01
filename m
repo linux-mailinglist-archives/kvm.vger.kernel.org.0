@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 350F03FE535
-	for <lists+kvm@lfdr.de>; Thu,  2 Sep 2021 00:05:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6DE833FE542
+	for <lists+kvm@lfdr.de>; Thu,  2 Sep 2021 00:08:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243571AbhIAWGJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Sep 2021 18:06:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51548 "EHLO
+        id S244939AbhIAWJf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Sep 2021 18:09:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52342 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243091AbhIAWGI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Sep 2021 18:06:08 -0400
-Received: from mail-il1-x134.google.com (mail-il1-x134.google.com [IPv6:2607:f8b0:4864:20::134])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75E7BC061575
-        for <kvm@vger.kernel.org>; Wed,  1 Sep 2021 15:05:11 -0700 (PDT)
-Received: by mail-il1-x134.google.com with SMTP id u7so813164ilk.7
-        for <kvm@vger.kernel.org>; Wed, 01 Sep 2021 15:05:11 -0700 (PDT)
+        with ESMTP id S243133AbhIAWJa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Sep 2021 18:09:30 -0400
+Received: from mail-il1-x133.google.com (mail-il1-x133.google.com [IPv6:2607:f8b0:4864:20::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE638C061757
+        for <kvm@vger.kernel.org>; Wed,  1 Sep 2021 15:08:32 -0700 (PDT)
+Received: by mail-il1-x133.google.com with SMTP id a1so31490ilj.6
+        for <kvm@vger.kernel.org>; Wed, 01 Sep 2021 15:08:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=+DuLck7trE3/jeuLJyQqFOD4gSDy3mwIoW3d+ThIoWc=;
-        b=ue60hZ708cIr7G42kkYJi/pAO26l3GQIlDpRhHkRx9vrX7fkrGwcxv381hWQHI/80W
-         u697z+xufWYfztWIL9kzUPbDj+ybhEp3ZG4QiSDxRsFBVYWZhhiadTaAty6AcHC1yd9s
-         +RtPFgqGxGPHaBXwIGpGCa/G0bn8zAC5+mwkup6bTH+Ybsz7vXo5hFvzG7kxwf5kJnQX
-         mCOcBpbHGFnARtedqKBlXB95AWHySM3o4dW9WeC4PFn7tLnsDhQQFB0XSPli72Glti9S
-         5PNsiN0EZfP0B1y9voI1vv+Wx7UuCoYBBbTI5YMtJ9ZqNUut17oqsZ4+Y1pvn+g+sG9N
-         NP2w==
+        bh=tPUheJaZHBcw4vca9HyUxGYJolSn/dkPnRtCmems3Kk=;
+        b=XBRkHtg5GUG48wrLz+RUhRTD7Q7TWZFMtYe69RP+BmyRwImiVD2LD83lEVcJTo+HE0
+         XMDBWHB3Il+/uvFYFRnBOOgEb6KO9VTDo0rKZrTe7FxM87LjoQDRcjyqYNkIwOHOHD/X
+         fYaWNizVlQ+kn5Pdxs0gShGtRFvReUizq5VH+bWHy5E4rowruiih+MC8iU/NbUriSMMh
+         C2fpPAwih/gSvxg8n/52V7XpcyPrrm8yu6hDs7WSD1jJ0Q2eZCZJGUMl5yafDxyIjfSd
+         FoZzcMXOAtCRsUfvWIF6gohZFSLO1o8TVvFiKnL/HBNmiZWmiiFjjvMgaaS+gubMIlf+
+         LUbg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=+DuLck7trE3/jeuLJyQqFOD4gSDy3mwIoW3d+ThIoWc=;
-        b=nKV56jlt9aO6VIot5kwSg/W6GnErZ5O11tKVHR7vEfqHOuyMtNPra8fN8RdRP6/Rcr
-         5J5Y7d9yaow5TCJUA5Pj7hNAQ6IMwBiX7x4LKGiZtNYbI1PxGLeA679EXBgz2WzQkxfV
-         cklxvJXaJzYoH1LMPo+DwjiOANYsCL5en6u0MVWHsc3lJIEpyYRTGE2tQGAE6kb6Fm8O
-         I5sgjibANFiqm2tOT4UIBMc2xUQRpNw4nsEwnNbNijlqVrcESCMqXYwJ4Septkli8ezu
-         rh7WWknBYjSmcIBH4yxFs1N7J1xpJL4mdn2p7vAo0qH9r7gufGOsYtdf5wkUHzYTuqK+
-         QWYA==
-X-Gm-Message-State: AOAM530kYfYL2URXhcMbB+XcEOWScevbf0avlWu/D2wMtMp2UVJVmQCP
-        WTs7ZozUKYQbFsY1yyZt7D8oNg==
-X-Google-Smtp-Source: ABdhPJyz03AQjKq617pC8w9b66FNA0eCW4EBtDeYY+hkxM2sCWzfoOh7yUadawftcIzUoT8TCwMRug==
-X-Received: by 2002:a92:c609:: with SMTP id p9mr1138171ilm.135.1630533910160;
-        Wed, 01 Sep 2021 15:05:10 -0700 (PDT)
+        bh=tPUheJaZHBcw4vca9HyUxGYJolSn/dkPnRtCmems3Kk=;
+        b=FxRiAHbtORsQ+e+VS2dM0VTRzZ0Rg/9gnIrj8SQzYV8lFqTNRNWVzcX+mBewP9h/UL
+         bmm83tOEV6obAEVQeQpshLYhiSoxmVp8ejdoW/qcKCn6Btsyvnew6jBxZvB7Od8XIdCn
+         RoUD8o+skbDSuR68D6OAXbIWN/UNbva3fsWBlXfA38clMfwCGg1t9WBXPeZR5506EA7a
+         pt64gBShf58k7A/OyoeKnaZc3NAwiNhmNPqFGnk22h+P1/Zt0o3aVYmR+ji+F8plu4Nd
+         Ea9NxvSB41AaQa88l5BBRUo6zd4Bo4ibIAxGdbceqElLS/+l0o2eUSjKqin3zOPHJ5wh
+         85fw==
+X-Gm-Message-State: AOAM533+oJ+etvzYimqX8ubk0FBmy8W2IAGjbT4S5Ts59hBRa1mrzygL
+        8xP4XMYyVp5ecMme48UeEIZ3fg==
+X-Google-Smtp-Source: ABdhPJy7j9n5AI8PSx1LUhSYg41KM1gcaY+NB3v8gxt4nUeuUOMHYoY6GxgdiPT9WZl4I3pv1HmPuQ==
+X-Received: by 2002:a92:870b:: with SMTP id m11mr1143869ild.132.1630534112153;
+        Wed, 01 Sep 2021 15:08:32 -0700 (PDT)
 Received: from google.com (194.225.68.34.bc.googleusercontent.com. [34.68.225.194])
-        by smtp.gmail.com with ESMTPSA id h9sm518789ioz.30.2021.09.01.15.05.09
+        by smtp.gmail.com with ESMTPSA id p15sm490025ilc.12.2021.09.01.15.08.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Sep 2021 15:05:09 -0700 (PDT)
-Date:   Wed, 1 Sep 2021 22:05:06 +0000
+        Wed, 01 Sep 2021 15:08:31 -0700 (PDT)
+Date:   Wed, 1 Sep 2021 22:08:28 +0000
 From:   Oliver Upton <oupton@google.com>
 To:     Raghavendra Rao Ananta <rananta@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
@@ -60,117 +60,120 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
         Reiji Watanabe <reijiw@google.com>,
         Jing Zhang <jingzhangos@google.com>,
         linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        drjones@redhat.com
-Subject: Re: [PATCH v3 00/12] KVM: arm64: selftests: Introduce arch_timer
- selftest
-Message-ID: <YS/5EjjPSWjWb6BI@google.com>
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v3 02/12] KVM: arm64: selftests: Add write_sysreg_s and
+ read_sysreg_s
+Message-ID: <YS/53N7LdJOgdzNu@google.com>
 References: <20210901211412.4171835-1-rananta@google.com>
+ <20210901211412.4171835-3-rananta@google.com>
+ <YS/wfBTnCJWn05Kn@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210901211412.4171835-1-rananta@google.com>
+In-Reply-To: <YS/wfBTnCJWn05Kn@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-+cc Andrew Jones
+On Wed, Sep 01, 2021 at 09:28:28PM +0000, Oliver Upton wrote:
+> On Wed, Sep 01, 2021 at 09:14:02PM +0000, Raghavendra Rao Ananta wrote:
+> > For register names that are unsupported by the assembler or the ones
+> > without architectural names, add the macros write_sysreg_s and
+> > read_sysreg_s to support them.
+> > 
+> > The functionality is derived from kvm-unit-tests and kernel's
+> > arch/arm64/include/asm/sysreg.h.
+> > 
+> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> 
+> Would it be possible to just include <asm/sysreg.h>? See
+> tools/arch/arm64/include/asm/sysreg.h
 
-On Wed, Sep 01, 2021 at 09:14:00PM +0000, Raghavendra Rao Ananta wrote:
-> Hello,
-> 
-> The patch series adds a KVM selftest to validate the behavior of
-> ARM's generic timer (patch-11). The test programs the timer IRQs
-> periodically, and for each interrupt, it validates the behaviour
-> against the architecture specifications. The test further provides
-> a command-line interface to configure the number of vCPUs, the
-> period of the timer, and the number of iterations that the test
-> has to run for.
-> 
-> Patch-12 adds an option to randomly migrate the vCPUs to different
-> physical CPUs across the system. The bug for the fix provided by
-> Marc with commit 3134cc8beb69d0d ("KVM: arm64: vgic: Resample HW
-> pending state on deactivation") was discovered using arch_timer
-> test with vCPU migrations.
-> 
-> Since the test heavily depends on interrupts, patch-10 adds a host
-> library to setup ARM Generic Interrupt Controller v3 (GICv3). This
-> includes creating a vGIC device, setting up distributor and
-> redistributor attributes, and mapping the guest physical addresses.
-> Symmetrical to this, patch-9 adds a guest library to talk to the vGIC,
-> which includes initializing the controller, enabling/disabling the
-> interrupts, and so on.
-> 
-> Furthermore, additional processor utilities such as accessing the MMIO
-> (via readl/writel), read/write to assembler unsupported registers,
-> basic delay generation, enable/disable local IRQs, and so on, are also
-> introduced that the test/GICv3 takes advantage of (patches 1 through 8).
-> 
-> The patch series, specifically the library support, is derived from the
-> kvm-unit-tests and the kernel itself.
-> 
-> Regards,
-> Raghavendra
-> 
-> v2 -> v3:
-> 
-> - Addressed the comments from Ricardo regarding moving the vGIC host
->   support for selftests to its own library.
-> - Added an option (-m) to migrate the guest vCPUs to physical CPUs
->   in the system.
-> 
-> v1 -> v2:
-> 
-> Addressed comments from Zenghui in include/aarch64/arch_timer.h:
-> - Correct the header description
-> - Remove unnecessary inclusion of linux/sizes.h
-> - Re-arrange CTL_ defines in ascending order
-> - Remove inappropriate 'return' from timer_set_* functions, which
->   returns 'void'.
-> 
-> Raghavendra Rao Ananta (12):
->   KVM: arm64: selftests: Add MMIO readl/writel support
->   KVM: arm64: selftests: Add write_sysreg_s and read_sysreg_s
->   KVM: arm64: selftests: Add support for cpu_relax
->   KVM: arm64: selftests: Add basic support for arch_timers
->   KVM: arm64: selftests: Add basic support to generate delays
->   KVM: arm64: selftests: Add support to disable and enable local IRQs
->   KVM: arm64: selftests: Add support to get the vcpuid from MPIDR_EL1
->   KVM: arm64: selftests: Add light-weight spinlock support
->   KVM: arm64: selftests: Add basic GICv3 support
->   KVM: arm64: selftests: Add host support for vGIC
->   KVM: arm64: selftests: Add arch_timer test
->   KVM: arm64: selftests: arch_timer: Support vCPU migration
-> 
->  tools/testing/selftests/kvm/.gitignore        |   1 +
->  tools/testing/selftests/kvm/Makefile          |   3 +-
->  .../selftests/kvm/aarch64/arch_timer.c        | 457 ++++++++++++++++++
->  .../kvm/include/aarch64/arch_timer.h          | 142 ++++++
->  .../selftests/kvm/include/aarch64/delay.h     |  25 +
->  .../selftests/kvm/include/aarch64/gic.h       |  21 +
->  .../selftests/kvm/include/aarch64/processor.h | 140 +++++-
->  .../selftests/kvm/include/aarch64/spinlock.h  |  13 +
->  .../selftests/kvm/include/aarch64/vgic.h      |  14 +
->  tools/testing/selftests/kvm/lib/aarch64/gic.c |  93 ++++
->  .../selftests/kvm/lib/aarch64/gic_private.h   |  21 +
->  .../selftests/kvm/lib/aarch64/gic_v3.c        | 240 +++++++++
->  .../selftests/kvm/lib/aarch64/gic_v3.h        |  70 +++
->  .../selftests/kvm/lib/aarch64/spinlock.c      |  27 ++
->  .../testing/selftests/kvm/lib/aarch64/vgic.c  |  67 +++
->  15 files changed, 1332 insertions(+), 2 deletions(-)
->  create mode 100644 tools/testing/selftests/kvm/aarch64/arch_timer.c
->  create mode 100644 tools/testing/selftests/kvm/include/aarch64/arch_timer.h
->  create mode 100644 tools/testing/selftests/kvm/include/aarch64/delay.h
->  create mode 100644 tools/testing/selftests/kvm/include/aarch64/gic.h
->  create mode 100644 tools/testing/selftests/kvm/include/aarch64/spinlock.h
->  create mode 100644 tools/testing/selftests/kvm/include/aarch64/vgic.h
->  create mode 100644 tools/testing/selftests/kvm/lib/aarch64/gic.c
->  create mode 100644 tools/testing/selftests/kvm/lib/aarch64/gic_private.h
->  create mode 100644 tools/testing/selftests/kvm/lib/aarch64/gic_v3.c
->  create mode 100644 tools/testing/selftests/kvm/lib/aarch64/gic_v3.h
->  create mode 100644 tools/testing/selftests/kvm/lib/aarch64/spinlock.c
->  create mode 100644 tools/testing/selftests/kvm/lib/aarch64/vgic.c
-> 
-> -- 
-> 2.33.0.153.gba50c8fa24-goog
-> 
+Geez, sorry for the noise. I mistakenly searched from the root of my
+repository, not the tools/ directory.
+
+In any case, you could perhaps just drop the kernel header there just to
+use the exact same source for kernel and selftest.
+
+Thanks,
+Oliver
+
+> > ---
+> >  .../selftests/kvm/include/aarch64/processor.h | 61 +++++++++++++++++++
+> >  1 file changed, 61 insertions(+)
+> > 
+> > diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
+> > index 3cbaf5c1e26b..082cc97ad8d3 100644
+> > --- a/tools/testing/selftests/kvm/include/aarch64/processor.h
+> > +++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
+> > @@ -118,6 +118,67 @@ void vm_install_exception_handler(struct kvm_vm *vm,
+> >  void vm_install_sync_handler(struct kvm_vm *vm,
+> >  		int vector, int ec, handler_fn handler);
+> >  
+> > +/*
+> > + * ARMv8 ARM reserves the following encoding for system registers:
+> > + * (Ref: ARMv8 ARM, Section: "System instruction class encoding overview",
+> > + *  C5.2, version:ARM DDI 0487A.f)
+> > + *	[20-19] : Op0
+> > + *	[18-16] : Op1
+> > + *	[15-12] : CRn
+> > + *	[11-8]  : CRm
+> > + *	[7-5]   : Op2
+> > + */
+> > +#define Op0_shift	19
+> > +#define Op0_mask	0x3
+> > +#define Op1_shift	16
+> > +#define Op1_mask	0x7
+> > +#define CRn_shift	12
+> > +#define CRn_mask	0xf
+> > +#define CRm_shift	8
+> > +#define CRm_mask	0xf
+> > +#define Op2_shift	5
+> > +#define Op2_mask	0x7
+> > +
+> > +/*
+> > + * When accessed from guests, the ARM64_SYS_REG() doesn't work since it
+> > + * generates a different encoding for additional KVM processing, and is
+> > + * only suitable for userspace to access the register via ioctls.
+> > + * Hence, define a 'pure' sys_reg() here to generate the encodings as per spec.
+> > + */
+> > +#define sys_reg(op0, op1, crn, crm, op2) \
+> > +	(((op0) << Op0_shift) | ((op1) << Op1_shift) | \
+> > +	 ((crn) << CRn_shift) | ((crm) << CRm_shift) | \
+> > +	 ((op2) << Op2_shift))
+> > +
+> > +asm(
+> > +"	.irp	num,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30\n"
+> > +"	.equ	.L__reg_num_x\\num, \\num\n"
+> > +"	.endr\n"
+> > +"	.equ	.L__reg_num_xzr, 31\n"
+> > +"\n"
+> > +"	.macro	mrs_s, rt, sreg\n"
+> > +"	.inst	0xd5200000|(\\sreg)|(.L__reg_num_\\rt)\n"
+> > +"	.endm\n"
+> > +"\n"
+> > +"	.macro	msr_s, sreg, rt\n"
+> > +"	.inst	0xd5000000|(\\sreg)|(.L__reg_num_\\rt)\n"
+> > +"	.endm\n"
+> > +);
+> > +
+> > +/*
+> > + * read_sysreg_s() and write_sysreg_s()'s 'reg' has to be encoded via sys_reg()
+> > + */
+> > +#define read_sysreg_s(reg) ({						\
+> > +	u64 __val;							\
+> > +	asm volatile("mrs_s %0, "__stringify(reg) : "=r" (__val));	\
+> > +	__val;								\
+> > +})
+> > +
+> > +#define write_sysreg_s(reg, val) do {					\
+> > +	u64 __val = (u64)val;						\
+> > +	asm volatile("msr_s "__stringify(reg) ", %x0" : : "rZ" (__val));\
+> > +} while (0)
+> > +
+> >  #define write_sysreg(reg, val)						  \
+> >  ({									  \
+> >  	u64 __val = (u64)(val);						  \
+> > -- 
+> > 2.33.0.153.gba50c8fa24-goog
+> > 
