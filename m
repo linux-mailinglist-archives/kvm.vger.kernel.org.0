@@ -2,130 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0F0003FE2FC
-	for <lists+kvm@lfdr.de>; Wed,  1 Sep 2021 21:26:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0E5F33FE377
+	for <lists+kvm@lfdr.de>; Wed,  1 Sep 2021 21:57:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243789AbhIAT1J (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Sep 2021 15:27:09 -0400
-Received: from mga02.intel.com ([134.134.136.20]:2527 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236087AbhIAT1H (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Sep 2021 15:27:07 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10094"; a="206069613"
-X-IronPort-AV: E=Sophos;i="5.84,370,1620716400"; 
-   d="scan'208";a="206069613"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Sep 2021 12:26:09 -0700
-X-IronPort-AV: E=Sophos;i="5.84,370,1620716400"; 
-   d="scan'208";a="690853274"
-Received: from davidj-mobl1.amr.corp.intel.com (HELO [10.212.161.93]) ([10.212.161.93])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Sep 2021 12:26:07 -0700
-Subject: Re: [RFC] KVM: mm: fd-based approach for supporting KVM guest private
- memory
-To:     jejb@linux.ibm.com, Andy Lutomirski <luto@kernel.org>,
-        David Hildenbrand <david@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
+        id S238488AbhIAT62 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Sep 2021 15:58:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50088 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230231AbhIAT61 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Sep 2021 15:58:27 -0400
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79E7DC061575
+        for <kvm@vger.kernel.org>; Wed,  1 Sep 2021 12:57:30 -0700 (PDT)
+Received: by mail-pj1-x1036.google.com with SMTP id 28-20020a17090a031cb0290178dcd8a4d1so411338pje.0
+        for <kvm@vger.kernel.org>; Wed, 01 Sep 2021 12:57:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=tMTG80t3wz+BbsYt7/vMbgUKt2cALKcGrfxmvyDVycI=;
+        b=GDxzDHx6y4t2OpIpS+RJgk1VtJMeiB8knpDgvYQPSsFfHb9myS2i8Y8zKivTuXuXjD
+         80WQ7dy0hlk1NsTkOvIPxXdqWLOvHI003J78+jnvMmt2AHjFlmWer9qGm5PPsff+b2qd
+         aOvfuEe5agrtLAxrPIEsh+gBgAiw95ASoDg+uPHtcGd0X5xUl+uFpwYV5yGFPfy3nYSe
+         X7GTPNiKRIHN5GQzk78FQkxMTyXT4uS5O8MwskFj3Q3faG/t/NUqScAQalxcqTeIbxdC
+         r6CJv4p/DQwb/7mJW/KCjNyL/lqHQmBPjT5leuOBgEo6MdmgGRm0IRJ3pJtpXO6I5Yni
+         WUCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=tMTG80t3wz+BbsYt7/vMbgUKt2cALKcGrfxmvyDVycI=;
+        b=SzB1nvPUhjpkE5AzgQWnGg30HwJo00x9ncODp5qBAKcFZr3fCLSOra6tdADwjhXCyR
+         iuWSoYapfe36yNzTHIxhvajntcnmAOtPNKvwpSded0t7VDnZmq03226Xsa+jETNJxEKz
+         AxZTrJo6cPYyVnwdmU+t4CkudszAlSz3rjbcdQho+ZqzWMrHFOxpU+bJr8DqgGb1s+vX
+         04nrYQ7tlmg2AAxHXjDfhevL0ZHMRr5myikLFJ7F8I++LRMsmLCtK2RaABD73EHsktxx
+         aMs27iLFg8d9yDpUm2xsGdom3zo1hyiNwCsvxY30y3v2ve5t8Svqr0WeodtAXqaMsq+Y
+         zR5g==
+X-Gm-Message-State: AOAM531DngEImk9//+xk9CBKq7n0Qhy2uQpgNUAUMwyiBy+Eeo+bO0zf
+        YlXQRdMMmhzftzR1ZjzAtA9lmg==
+X-Google-Smtp-Source: ABdhPJyjE7jv9C7nQQ332L+GGCxxc0l51kKj4TvBYL6j4Mk0NOTmNP6mrLfjZrAOXlarJRfAETU5Gg==
+X-Received: by 2002:a17:90b:88e:: with SMTP id bj14mr1067223pjb.115.1630526249849;
+        Wed, 01 Sep 2021 12:57:29 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id z7sm306742pjr.42.2021.09.01.12.57.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 01 Sep 2021 12:57:29 -0700 (PDT)
+Date:   Wed, 1 Sep 2021 19:57:25 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Jia He <justin.he@arm.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Borislav Petkov <bp@alien8.de>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Joerg Roedel <jroedel@suse.de>,
-        Andi Kleen <ak@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
+        Joerg Roedel <joro@8bytes.org>,
         Thomas Gleixner <tglx@linutronix.de>,
-        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Varad Gautam <varad.gautam@suse.com>,
-        Dario Faggioli <dfaggioli@suse.com>,
-        the arch/x86 maintainers <x86@kernel.org>,
-        linux-mm@kvack.org, linux-coco@lists.linux.dev,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Sathyanarayanan Kuppuswamy 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>
-References: <20210824005248.200037-1-seanjc@google.com>
- <307d385a-a263-276f-28eb-4bc8dd287e32@redhat.com>
- <YSlkzLblHfiiPyVM@google.com>
- <61ea53ce-2ba7-70cc-950d-ca128bcb29c5@redhat.com>
- <YS6lIg6kjNPI1EgF@google.com>
- <f413cc20-66fc-cf1e-47ab-b8f099c89583@redhat.com>
- <9ec3636a-6434-4c98-9d8d-addc82858c41@www.fastmail.com>
- <bd22ef54224d15ee89130728c408f70da0516eaa.camel@linux.ibm.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
- z5cecg==
-Message-ID: <cb3b2281-8651-672a-53e0-d0c7a9407643@intel.com>
-Date:   Wed, 1 Sep 2021 12:26:07 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: x86/mmu: Remove unused field mmio_cached in struct
+ kvm_mmu_page
+Message-ID: <YS/bJbzgG+pasIxu@google.com>
+References: <20210830145336.27183-1-justin.he@arm.com>
 MIME-Version: 1.0
-In-Reply-To: <bd22ef54224d15ee89130728c408f70da0516eaa.camel@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210830145336.27183-1-justin.he@arm.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/1/21 9:18 AM, James Bottomley wrote:
->> So I think there are literally zero code paths that currently call
->> try_to_unmap() that will actually work like that on TDX.  If we run
->> out of memory on a TDX host, we can kill the guest completely and
->> reclaim all of its memory (which probably also involves killing QEMU
->> or whatever other user program is in charge), but that's really our
->> only option.
-> I think our only option for swap is guest co-operation.
+On Mon, Aug 30, 2021, Jia He wrote:
+> After reverting and restoring the fast tlb invalidation patch series,
+> the mmio_cached is not removed. Hence a unused field is left in
+> kvm_mmu_page.
+> 
+> Cc: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Jia He <justin.he@arm.com>
 
-Yes, today that's the only choice.  Both TDX and SEV-SNP can
-*theoretically* extend their architectures to enable swap with
-uncooperative guests.  But, frankly, nobody has been asking for it.
+Reviewed-by: Sean Christopherson <seanjc@google.com> 
 
-If you care, please ask Intel and AMD to fix this gap.
+There's also additional cleanup we can do to take advantage of the free byte.
+I'll include this patch in a follow-up mini-series to hopefully make life a bit
+easier for Paolo.
+
+Thanks!
