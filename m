@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5DBF33FF101
+	by mail.lfdr.de (Postfix) with ESMTP id D4ED73FF103
 	for <lists+kvm@lfdr.de>; Thu,  2 Sep 2021 18:16:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346275AbhIBQRU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Sep 2021 12:17:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44820 "EHLO
+        id S1346223AbhIBQRW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Sep 2021 12:17:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44794 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346305AbhIBQRM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Sep 2021 12:17:12 -0400
-Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A690C0613A4
-        for <kvm@vger.kernel.org>; Thu,  2 Sep 2021 09:16:12 -0700 (PDT)
-Received: by mail-wr1-x433.google.com with SMTP id x6so3800987wrv.13
-        for <kvm@vger.kernel.org>; Thu, 02 Sep 2021 09:16:12 -0700 (PDT)
+        with ESMTP id S1346248AbhIBQRR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Sep 2021 12:17:17 -0400
+Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CDD6C061764
+        for <kvm@vger.kernel.org>; Thu,  2 Sep 2021 09:16:18 -0700 (PDT)
+Received: by mail-wm1-x32a.google.com with SMTP id x2-20020a1c7c02000000b002e6f1f69a1eso1857570wmc.5
+        for <kvm@vger.kernel.org>; Thu, 02 Sep 2021 09:16:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=P0fp1qqpF59XMbIIHxComfWKKQIg8VIlTwHVvhBN59A=;
-        b=G8+gv7/l02p+3pIOfkKqyIa3SJNJqqucn0S8o/siAkKaxmFM5RO224iTEbB1+wTzyT
-         yH9VCpxFWBr0t0GXhQxQRUuO0CaUa3ZzEf3celJhLqjAbDckl1E6mqaq2dCEttikPZRW
-         NTgh0ED5VO3rDtoACT4pDd4RK9nfKb9VvyIT09l58j9YQUutJPWiW1YUvmfRQD6MaciO
-         hgQld4iTpFhaM+A7V2MEdU+/ZRnuTgXC5fBFAjpnxBcFkFzPQ9ZRGDj/1+tmyCyow8jw
-         rBfrG9A0yoltXZKggfPRhQMqdG2T5CPTN8x3VdAjvEoK7uauTkkWkCFDPZbLzkrywDXE
-         DO1A==
+        bh=RYRVLsfl9Ob+8zW8ulpQWg/n0bsy9p4rFkeC3sRFgzg=;
+        b=cWSYDAq5Jp0McvzKfoJCBhOUKIrlk33QHDkz+m47acNIlb9JOx3tfp5kB+KXf5dDO/
+         w4+OyKHGR2RiqPyFa7V7bzZyYSy6kLYW49zVrZ6Hy8QBCbCerYOKfrGjd0qNffHf9SpP
+         r/Kq+8mSo19dNZRUfW1WN64ERD6JetVYvf41b1e1tWlJwcOL4P63Z/Mm9sSwkJyaYePZ
+         Jroc0woaa+Fir71b0dp9xMglTvA3smVf5tzo/uq315Y7Ji+qHpf638YaJjs7F9y6JQ5A
+         whXUesQqAhIyuS/27l3cznkFQWzDOa9H8TavWnRll7U6TXlgZEUv2l8XPpV83TA8h9zC
+         OFCw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
          :in-reply-to:references:mime-version:content-transfer-encoding;
-        bh=P0fp1qqpF59XMbIIHxComfWKKQIg8VIlTwHVvhBN59A=;
-        b=k0DEcHz/7WqO6jlmUG3qCr2mKaRPyW9xyrivrIfxT0Zd6oX/6uL4dx9ub0e/TzkH40
-         +d4BdKz1KQqybPMMNfMABsHFQq+3OQ8Bf8eGHtl2qN5U2XWz6a0T6SBK66nx8rq/OFHw
-         EUQ89HXoIza9y7GDB37Uavk8gaArAW0xivL3MVEJlyx0NRzxonJIgXMATDCRjCq4Beys
-         DnivEG8bcU/h1BMlvoAIs7TrzDd/eJB7VMx4a5Do0UkQT4aAV/s2D/tQKxcpJ3vZbTMU
-         fWzhscVNmdwvXnoCIjXTI5chN6PYebU2n8jRpul6cXr4GhTbyBojYUaaNV01EGadv1Ds
-         Iomg==
-X-Gm-Message-State: AOAM531dNKWbzGb40Ep1472U04n/LVEr4lvBylda5WQweo+/bqwddMCE
-        oAata86DtVfiWObzI5VlZkc=
-X-Google-Smtp-Source: ABdhPJxqYVZz8Vtdq+1rVuHAugWlbrJscT37rU3tWfkU/lcfKzRuzJ6gBh5u/Yi5SNrMElUTWFem6A==
-X-Received: by 2002:adf:d191:: with SMTP id v17mr4847443wrc.345.1630599370860;
-        Thu, 02 Sep 2021 09:16:10 -0700 (PDT)
+        bh=RYRVLsfl9Ob+8zW8ulpQWg/n0bsy9p4rFkeC3sRFgzg=;
+        b=b2rLs3IDpCuQuaDyZno0PtTmhfhlnIT1E/xXebnZiXotpxY8ejryWLeINjC3x8T5cT
+         Kt4f8SmWbDSaA5BCe1FLvj1h16kdmGlWwzRSYVB77gLnQXD0gBPV7zLymd25pkKziqt9
+         QjWz10h86gsXpWqkHexQCELrwtKZeK7R/sCsjxdHYF2pQLu+vDkAeyvaPIw5p3H7dusX
+         Ly6b6Q6UCkaX9rFGPoV4LBAvxlEvn+I9usqLH+Db31bLbVtlYz8jEflMrEx6d2Hk3hmf
+         87a2TPl6DQT1jLWBX+Nt7iVj1yWYzD+0ERWcAx+xLR4akchtNRsUim6NQzTV25PG8YEA
+         KZwA==
+X-Gm-Message-State: AOAM531y+7UMOHPyvDxdsj97nFjfVltyAHFB+UvkCJBWqbcR0hOOfPdU
+        n1cWAtAGfwQ/GXJDlnCaF7U=
+X-Google-Smtp-Source: ABdhPJwPjYjbwvv/6b7qFrtZZvNxWFscX+KmwH8SpAbQsTLfx+OHgnzX3KJXi3XGsfieLbi9LeXPtA==
+X-Received: by 2002:a7b:c0c6:: with SMTP id s6mr3953111wmh.161.1630599376931;
+        Thu, 02 Sep 2021 09:16:16 -0700 (PDT)
 Received: from x1w.. (163.red-83-52-55.dynamicip.rima-tde.net. [83.52.55.163])
-        by smtp.gmail.com with ESMTPSA id l1sm2293844wrb.15.2021.09.02.09.16.08
+        by smtp.gmail.com with ESMTPSA id n3sm2097857wmi.0.2021.09.02.09.16.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Sep 2021 09:16:10 -0700 (PDT)
+        Thu, 02 Sep 2021 09:16:16 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= 
         <philippe.mathieu.daude@gmail.com>
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
@@ -92,9 +92,9 @@ Cc:     Bin Meng <bin.meng@windriver.com>,
         Palmer Dabbelt <palmer@dabbelt.com>,
         Stafford Horne <shorne@gmail.com>,
         Reinoud Zandijk <reinoud@netbsd.org>, kvm@vger.kernel.org
-Subject: [PATCH v3 04/30] sysemu: Introduce AccelOpsClass::has_work()
-Date:   Thu,  2 Sep 2021 18:15:17 +0200
-Message-Id: <20210902161543.417092-5-f4bug@amsat.org>
+Subject: [PATCH v3 05/30] accel/kvm: Implement AccelOpsClass::has_work()
+Date:   Thu,  2 Sep 2021 18:15:18 +0200
+Message-Id: <20210902161543.417092-6-f4bug@amsat.org>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20210902161543.417092-1-f4bug@amsat.org>
 References: <20210902161543.417092-1-f4bug@amsat.org>
@@ -105,45 +105,53 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Introduce an accelerator-specific has_work() handler.
-Eventually call it from cpu_has_work().
+Implement KVM has_work() handler in AccelOpsClass and
+remove it from cpu_thread_is_idle() since cpu_has_work()
+is already called.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- include/sysemu/accel-ops.h | 5 +++++
- softmmu/cpus.c             | 3 +++
- 2 files changed, 8 insertions(+)
+ accel/kvm/kvm-accel-ops.c | 6 ++++++
+ softmmu/cpus.c            | 2 +-
+ 2 files changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/include/sysemu/accel-ops.h b/include/sysemu/accel-ops.h
-index 032f6979d76..de83f095f20 100644
---- a/include/sysemu/accel-ops.h
-+++ b/include/sysemu/accel-ops.h
-@@ -31,6 +31,11 @@ struct AccelOpsClass {
-     void (*create_vcpu_thread)(CPUState *cpu); /* MANDATORY NON-NULL */
-     void (*kick_vcpu_thread)(CPUState *cpu);
+diff --git a/accel/kvm/kvm-accel-ops.c b/accel/kvm/kvm-accel-ops.c
+index 7516c67a3f5..6f4d5df3a0d 100644
+--- a/accel/kvm/kvm-accel-ops.c
++++ b/accel/kvm/kvm-accel-ops.c
+@@ -74,6 +74,11 @@ static void kvm_start_vcpu_thread(CPUState *cpu)
+                        cpu, QEMU_THREAD_JOINABLE);
+ }
  
-+    /**
-+     * @has_work: Callback for checking if there is work to do.
-+     */
-+    bool (*has_work)(CPUState *cpu);
++static bool kvm_cpu_has_work(CPUState *cpu)
++{
++    return kvm_halt_in_kernel();
++}
 +
-     void (*synchronize_post_reset)(CPUState *cpu);
-     void (*synchronize_post_init)(CPUState *cpu);
-     void (*synchronize_state)(CPUState *cpu);
+ static void kvm_accel_ops_class_init(ObjectClass *oc, void *data)
+ {
+     AccelOpsClass *ops = ACCEL_OPS_CLASS(oc);
+@@ -83,6 +88,7 @@ static void kvm_accel_ops_class_init(ObjectClass *oc, void *data)
+     ops->synchronize_post_init = kvm_cpu_synchronize_post_init;
+     ops->synchronize_state = kvm_cpu_synchronize_state;
+     ops->synchronize_pre_loadvm = kvm_cpu_synchronize_pre_loadvm;
++    ops->has_work = kvm_cpu_has_work;
+ }
+ 
+ static const TypeInfo kvm_accel_ops_type = {
 diff --git a/softmmu/cpus.c b/softmmu/cpus.c
-index 7e2cb2c571b..2a61dfd6287 100644
+index 2a61dfd6287..3db7bd4eb4d 100644
 --- a/softmmu/cpus.c
 +++ b/softmmu/cpus.c
-@@ -255,6 +255,9 @@ bool cpu_has_work(CPUState *cpu)
- {
-     CPUClass *cc = CPU_GET_CLASS(cpu);
- 
-+    if (cpus_accel->has_work) {
-+        return cpus_accel->has_work(cpu);
-+    }
-     g_assert(cc->has_work);
-     return cc->has_work(cpu);
- }
+@@ -90,7 +90,7 @@ bool cpu_thread_is_idle(CPUState *cpu)
+         return true;
+     }
+     if (!cpu->halted || cpu_has_work(cpu) ||
+-        kvm_halt_in_kernel() || whpx_apic_in_platform()) {
++        whpx_apic_in_platform()) {
+         return false;
+     }
+     return true;
 -- 
 2.31.1
 
