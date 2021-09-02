@@ -2,177 +2,265 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 793243FEB36
-	for <lists+kvm@lfdr.de>; Thu,  2 Sep 2021 11:30:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A8A303FEBBC
+	for <lists+kvm@lfdr.de>; Thu,  2 Sep 2021 11:58:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245595AbhIBJ3V (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Sep 2021 05:29:21 -0400
-Received: from mga14.intel.com ([192.55.52.115]:38994 "EHLO mga14.intel.com"
+        id S232600AbhIBJ7J (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Sep 2021 05:59:09 -0400
+Received: from foss.arm.com ([217.140.110.172]:46424 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1343539AbhIBJ3P (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Sep 2021 05:29:15 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10094"; a="218756250"
-X-IronPort-AV: E=Sophos;i="5.84,371,1620716400"; 
-   d="scan'208";a="218756250"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2021 02:28:15 -0700
-X-IronPort-AV: E=Sophos;i="5.84,371,1620716400"; 
-   d="scan'208";a="532961015"
-Received: from cqiang-mobl.ccr.corp.intel.com (HELO [10.238.0.162]) ([10.238.0.162])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2021 02:28:12 -0700
-Subject: Re: [PATCH v2] KVM: VMX: Enable Notify VM exit
-To:     Xiaoyao Li <xiaoyao.li@intel.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Tao Xu <tao3.xu@intel.com>, pbonzini@redhat.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, hpa@zytor.com, x86@kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20210525051204.1480610-1-tao3.xu@intel.com>
- <YQRkBI9RFf6lbifZ@google.com>
- <b0c90258-3f68-57a2-664a-e20a6d251e45@intel.com>
- <YQgTPakbT+kCwMLP@google.com>
- <080602dc-f998-ec13-ddf9-42902aa477de@intel.com>
-From:   Chenyi Qiang <chenyi.qiang@intel.com>
-Message-ID: <4079f0c9-e34c-c034-853a-b26908a58182@intel.com>
-Date:   Thu, 2 Sep 2021 17:28:10 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Firefox/78.0 Thunderbird/78.13.0
+        id S231544AbhIBJ7J (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Sep 2021 05:59:09 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B39441063;
+        Thu,  2 Sep 2021 02:58:10 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6124B3F766;
+        Thu,  2 Sep 2021 02:58:09 -0700 (PDT)
+Subject: Re: [PATCH] vfio/pci: Add support for PCIe extended capabilities
+To:     Vivek Gautam <vivek.gautam@arm.com>, will@kernel.org,
+        julien.thierry.kdev@gmail.com, kvm@vger.kernel.org
+Cc:     andre.przywara@arm.com, lorenzo.pieralisi@arm.com,
+        jean-philippe@linaro.org, eric.auger@redhat.com
+References: <20210810062514.18980-1-vivek.gautam@arm.com>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <af1ae6fe-176b-8016-3815-faa9651b0aba@arm.com>
+Date:   Thu, 2 Sep 2021 10:59:27 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-In-Reply-To: <080602dc-f998-ec13-ddf9-42902aa477de@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20210810062514.18980-1-vivek.gautam@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Vivek,
 
+On 8/10/21 7:25 AM, Vivek Gautam wrote:
+> Add support to parse extended configuration space for vfio based
+> assigned PCIe devices and add extended capabilities for the device
+> in the guest. This allows the guest to see and work on extended
+> capabilities, for example to toggle PRI extended cap to enable and
+> disable Shared virtual addressing (SVA) support.
+> PCIe extended capability header that is the first DWORD of all
+> extended caps is shown below -
+>
+>    31               20  19   16  15                 0
+>    ____________________|_______|_____________________
+>   |    Next cap off    |  1h   |     Cap ID          |
+>   |____________________|_______|_____________________|
+>
+> Out of the two upper bytes of extended cap header, the
+> lower nibble is actually cap version - 0x1.
+> 'next cap offset' if present at bits [31:20], should be
+> right shifted by 4 bits to calculate the position of next
+> capability.
+> This change supports parsing and adding ATS, PRI and PASID caps.
+>
+> Signed-off-by: Vivek Gautam <vivek.gautam@arm.com>
+> ---
+>  include/kvm/pci.h |   6 +++
+>  vfio/pci.c        | 104 ++++++++++++++++++++++++++++++++++++++++++----
+>  2 files changed, 103 insertions(+), 7 deletions(-)
+>
+> diff --git a/include/kvm/pci.h b/include/kvm/pci.h
+> index 0f2d5bb..a365337 100644
+> --- a/include/kvm/pci.h
+> +++ b/include/kvm/pci.h
+> @@ -165,6 +165,12 @@ struct pci_exp_cap {
+>  	u32 root_status;
+>  };
+>  
+> +struct pci_ext_cap_hdr {
+> +	u16	type;
+> +	/* bit 19:16 = 0x1: Cap version */
 
-On 8/3/2021 8:38 AM, Xiaoyao Li wrote:
-> On 8/2/2021 11:46 PM, Sean Christopherson wrote:
->> On Mon, Aug 02, 2021, Xiaoyao Li wrote:
->>> On 7/31/2021 4:41 AM, Sean Christopherson wrote:
->>>> On Tue, May 25, 2021, Tao Xu wrote:
->>>>>    #endif /* __KVM_X86_VMX_CAPS_H */
->>>>> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
->>>>> index 4bceb5ca3a89..c0ad01c88dac 100644
->>>>> --- a/arch/x86/kvm/vmx/vmx.c
->>>>> +++ b/arch/x86/kvm/vmx/vmx.c
->>>>> @@ -205,6 +205,10 @@ module_param(ple_window_max, uint, 0444);
->>>>>    int __read_mostly pt_mode = PT_MODE_SYSTEM;
->>>>>    module_param(pt_mode, int, S_IRUGO);
->>>>> +/* Default is 0, less than 0 (for example, -1) disables notify 
->>>>> window. */
->>>>> +static int __read_mostly notify_window;
->>>>
->>>> I'm not sure I like the idea of trusting ucode to select an 
->>>> appropriate internal
->>>> threshold.  Unless the internal threshold is architecturally defined 
->>>> to be at
->>>> least N nanoseconds or whatever, I think KVM should provide its own 
->>>> sane default.
->>>> E.g. it's not hard to imagine a scenario where a ucode patch gets 
->>>> rolled out that
->>>> adjusts the threshold and starts silently degrading guest performance.
->>>
->>> You mean when internal threshold gets smaller somehow, and cases
->>> false-positive that leads unexpected VM exit on normal instruction? 
->>> In this
->>> case, we set increase the vmcs.notify_window in KVM.
->>
->> Not while VMs are running though.
->>
->>> I think there is no better to avoid this case if ucode changes internal
->>> threshold. Unless KVM's default notify_window is bigger enough.
->>>
->>>> Even if the internal threshold isn't architecturally constrained, it 
->>>> would be very,
->>>> very helpful if Intel could publish the per-uarch/stepping 
->>>> thresholds, e.g. to give
->>>> us a ballpark idea of how agressive KVM can be before it risks false 
->>>> positives.
->>>
->>> Even Intel publishes the internal threshold, we still need to provide a
->>> final best_value (internal + vmcs.notify_window). Then what's that 
->>> value?
->>
->> The ideal value would be high enough to guarantee there are zero false 
->> positives,
->> yet low enough to prevent a malicious guest from causing instability 
->> in the host
->> by blocking events for an extended duration.  The problem is that 
->> there's no
->> magic answer for the threshold at which a blocked event would lead to 
->> system
->> instability, and without at least a general idea of the internal value 
->> there's no
->> answer at all.
->>
->> IIRC, SGX instructions have a hard upper bound of 25k cycles before 
->> they have to
->> check for pending interrupts, e.g. it's why EINIT is interruptible.  
->> The 25k cycle
->> limit is likely a good starting point for the combined minimum.  
->> That's why I want
->> to know the internal minimum; if the internal minimum is _guaranteed_ 
->> to be >25k,
->> then KVM can be more aggressive with its default value.
-> 
-> OK. I will go internally to see if we can publish the internal threshold.
-> 
+I believe bits 19:16 are the cap version if you look at the header as a 32bit
+value (next:type). If you actually want to set those bits, you need to set bits
+3:0 of the next field. I believe the comment should reflect that because it's
+slightly confusing (no field is larger than 16 bits, for example). Or you can move
+the comment at the top of the struct and keep it as it is.
 
-Hi Sean,
+> +	u16	next;
+> +};
+> +
+>  struct pci_device_header;
+>  
+>  typedef int (*bar_activate_fn_t)(struct kvm *kvm,
+> diff --git a/vfio/pci.c b/vfio/pci.c
+> index ea33fd6..d045e0d 100644
+> --- a/vfio/pci.c
+> +++ b/vfio/pci.c
+> @@ -665,19 +665,105 @@ static int vfio_pci_add_cap(struct vfio_device *vdev, u8 *virt_hdr,
+>  	return 0;
+>  }
+>  
+> +static ssize_t vfio_pci_ext_cap_size(struct pci_ext_cap_hdr *cap_hdr)
+> +{
+> +	switch (cap_hdr->type) {
+> +	case PCI_EXT_CAP_ID_ATS:
+> +		return PCI_EXT_CAP_ATS_SIZEOF;
+> +	case PCI_EXT_CAP_ID_PRI:
+> +		return PCI_EXT_CAP_PRI_SIZEOF;
+> +	case PCI_EXT_CAP_ID_PASID:
+> +		return PCI_EXT_CAP_PASID_SIZEOF;
+> +	default:
+> +		pr_err("unknown extended PCI capability 0x%x", cap_hdr->type);
+> +		return 0;
+> +	}
+> +}
+> +
+> +static int vfio_pci_add_ext_cap(struct vfio_device *vdev, u8 *virt_hdr,
+> +			    struct pci_ext_cap_hdr *cap, off_t pos)
+> +{
+> +	struct pci_ext_cap_hdr *last;
+> +
+> +	cap->next = 0;
+> +	last = PCI_CAP(virt_hdr, 0x100);
+> +
+> +	while (last->next)
+> +		last = PCI_CAP(virt_hdr, last->next);
+> +
+> +	last->next = pos;
+> +	/*
+> +	 * Out of the two upper bytes of extended cap header, the
+> +	 * nibble [19:16] is actually cap version that should be 0x1,
+> +	 * so shift back the actual 'next' value by 4 bits.
+> +	 */
+> +	last->next = (last->next << 4) | 0x1;
+> +	memcpy(virt_hdr + pos, cap, vfio_pci_ext_cap_size(cap));
+> +
+> +	return 0;
+> +
+> +}
+> +
+> +static int vfio_pci_parse_ext_caps(struct vfio_device *vdev, u8 *virt_hdr)
+> +{
+> +	int ret;
+> +	u16 pos, next;
+> +	struct pci_ext_cap_hdr *ext_cap;
+> +	struct vfio_pci_device *pdev = &vdev->pci;
+> +
+> +	/* Extended cap only for PCIe devices */
 
-After syncing internally, we know that the internal threshold is not 
-architectural but a model-specific value. It will be published in some 
-place in future.
+Devices are PCI Express if they have the PCI Express Capability (this is also how
+Linux tells them apart). The arch_has_pci_exp() is meant to check that the
+architecture kvmtool has been compiled for can emulate a PCI Express bus (as
+apposed to a legacy PCI bus). For example, when you compile kvmtool for x86, you
+will get a legacy PCI bus.
 
-On Sapphire Rapids platform, the threshold is 128k. With this in mind, 
-is it appropriate to set 0 as the default value of notify_window?
+I'm not saying the check is bad, because it definitely should be done, but if what
+you're trying to do is to check that the device is a PCI Express capable device,
+then you also need to have a look at the PCI Express Capability like Andre suggested.
 
->>> If we have an option for final best_value, then I think it's OK to 
->>> just let
->>> vmcs.notify_window = best_value. Then the true final value is 
->>> best_value +
->>> internal.
->>>   - if it's a normal instruction, it should finish within best_value or
->>> best_value + internal. So it makes no difference.
->>>   - if it's an instruction in malicious case, it won't go to next 
->>> instruction
->>> whether wait for best_value or best_value + internal.
->>
->> ...
->>
->>>>> +
->>>>>        vmcs_write32(PAGE_FAULT_ERROR_CODE_MASK, 0);
->>>>>        vmcs_write32(PAGE_FAULT_ERROR_CODE_MATCH, 0);
->>>>>        vmcs_write32(CR3_TARGET_COUNT, 0);           /* 22.2.1 */
->>>>> @@ -5642,6 +5653,31 @@ static int handle_bus_lock_vmexit(struct 
->>>>> kvm_vcpu *vcpu)
->>>>>        return 0;
->>>>>    }
->>>>> +static int handle_notify(struct kvm_vcpu *vcpu)
->>>>> +{
->>>>> +    unsigned long exit_qual = vmx_get_exit_qual(vcpu);
->>>>> +
->>>>> +    if (!(exit_qual & NOTIFY_VM_CONTEXT_INVALID)) {
->>>>
->>>> What does CONTEXT_INVALID mean?  The ISE doesn't provide any 
->>>> information whatsoever.
->>>
->>> It means whether the VM context is corrupted and not valid in the VMCS.
->>
->> Well that's a bit terrifying.  Under what conditions can the VM 
->> context become
->> corrupted?  E.g. if the context can be corrupted by an inopportune 
->> NOTIFY exit,
->> then KVM needs to be ultra conservative as a false positive could be 
->> fatal to a
->> guest.
->>
-> 
-> Short answer is no case will set the VM_CONTEXT_INVALID bit.
-> 
-> VM_CONTEXT_INVALID is so fatal and IMHO it won't be set for any 
-> inopportune NOTIFY exit.
+> +	if (!arch_has_pci_exp())
+> +		return 0;
+> +
+> +	/* Extended caps start from 0x100 offset. */
+> +	pos = 0x100;
+> +
+> +	for (; pos; pos = next) {
+> +		ext_cap = PCI_CAP(&pdev->hdr, pos);
+> +		/*
+> +		 * Out of the two upper bytes of extended cap header, the
+> +		 * lowest nibble is actually cap version.
+> +		 * 'next cap offset' if present at bits [31:20], while
+> +		 * bits [19:16] are set to 1 to indicate cap version.
+> +		 * So to get position of next cap right shift by 4 bits.
+> +		 */
+> +		next = (ext_cap->next >> 4);
+> +
+> +		switch (ext_cap->type) {
+> +		case PCI_EXT_CAP_ID_ATS:
+> +			ret = vfio_pci_add_ext_cap(vdev, virt_hdr, ext_cap, pos);
+> +			if (ret)
+> +				return ret;
+> +			break;
+> +		case PCI_EXT_CAP_ID_PRI:
+> +			ret = vfio_pci_add_ext_cap(vdev, virt_hdr, ext_cap, pos);
+> +			if (ret)
+> +				return ret;
+> +			break;
+> +		case PCI_EXT_CAP_ID_PASID:
+> +			ret = vfio_pci_add_ext_cap(vdev, virt_hdr, ext_cap, pos);
+> +			if (ret)
+> +				return ret;
+> +			break;
+> +		}
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+>  static int vfio_pci_parse_caps(struct vfio_device *vdev)
+>  {
+>  	int ret;
+>  	size_t size;
+>  	u16 pos, next;
+>  	struct pci_cap_hdr *cap;
+> -	u8 virt_hdr[PCI_DEV_CFG_SIZE_LEGACY];
+> +	u8 virt_hdr[PCI_DEV_CFG_SIZE];
+>  	struct vfio_pci_device *pdev = &vdev->pci;
+>  
+>  	if (!(pdev->hdr.status & PCI_STATUS_CAP_LIST))
+>  		return 0;
+>  
+> -	memset(virt_hdr, 0, PCI_DEV_CFG_SIZE_LEGACY);
+> +	memset(virt_hdr, 0, PCI_DEV_CFG_SIZE);
+>  
+>  	pos = pdev->hdr.capabilities & ~3;
+>  
+> @@ -715,9 +801,13 @@ static int vfio_pci_parse_caps(struct vfio_device *vdev)
+>  		}
+>  	}
+>  
+> +	ret = vfio_pci_parse_ext_caps(vdev, virt_hdr);
+> +	if (ret)
+> +		return ret;
+> +
+>  	/* Wipe remaining capabilities */
+>  	pos = PCI_STD_HEADER_SIZEOF;
+> -	size = PCI_DEV_CFG_SIZE_LEGACY - PCI_STD_HEADER_SIZEOF;
+> +	size = PCI_DEV_CFG_SIZE - PCI_STD_HEADER_SIZEOF;
+>  	memcpy((void *)&pdev->hdr + pos, virt_hdr + pos, size);
+>  
+>  	return 0;
+> @@ -725,7 +815,7 @@ static int vfio_pci_parse_caps(struct vfio_device *vdev)
+>  
+>  static int vfio_pci_parse_cfg_space(struct vfio_device *vdev)
+>  {
+> -	ssize_t sz = PCI_DEV_CFG_SIZE_LEGACY;
+> +	ssize_t sz = PCI_DEV_CFG_SIZE;
+>  	struct vfio_region_info *info;
+>  	struct vfio_pci_device *pdev = &vdev->pci;
+>  
+> @@ -831,10 +921,10 @@ static int vfio_pci_fixup_cfg_space(struct vfio_device *vdev)
+>  	/* Install our fake Configuration Space */
+>  	info = &vdev->regions[VFIO_PCI_CONFIG_REGION_INDEX].info;
+>  	/*
+> -	 * We don't touch the extended configuration space, let's be cautious
+> -	 * and not overwrite it all with zeros, or bad things might happen.
+> +	 * Update the extended configuration space as well since we
+> +	 * are now populating the extended capabilities.
+>  	 */
+> -	hdr_sz = PCI_DEV_CFG_SIZE_LEGACY;
+> +	hdr_sz = PCI_DEV_CFG_SIZE;
+
+In one of the earlier versions of the PCI Express patches I was doing the same
+thing here - overwriting the entire PCI Express configuration space for a device.
+However, that made one of the devices I was using for testing stop working when
+assigned to a VM.
+
+I'll go through my testing notes and test it again, the cause of the failure might
+have been something else entirely which was fixed since then.
+
+Thanks,
+
+Alex
+
+>  	if (pwrite(vdev->fd, &pdev->hdr, hdr_sz, info->offset) != hdr_sz) {
+>  		vfio_dev_err(vdev, "failed to write %zd bytes to Config Space",
+>  			     hdr_sz);
