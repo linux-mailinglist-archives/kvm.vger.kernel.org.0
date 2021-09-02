@@ -2,155 +2,163 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 84EA23FEDDC
-	for <lists+kvm@lfdr.de>; Thu,  2 Sep 2021 14:37:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 49C633FEDE8
+	for <lists+kvm@lfdr.de>; Thu,  2 Sep 2021 14:41:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344533AbhIBMiA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Sep 2021 08:38:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56735 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1344309AbhIBMh7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 2 Sep 2021 08:37:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630586220;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=XjZNhaTHu2G7qvKup1PDbiF+IV6d0VDmwJ2nyMbiAo4=;
-        b=a4sCMnJT3kvQ0k87hgj5Ybb+TOXwrdRw5ST0EMylVLd2XolK2OJdlhrDJYVuY6TLtldHMm
-        xoWwpXHR6o4X8TVBByqJ98bJwv/zFDeVkuNoT667FPKr21GFNleOzFp+6NTTQWpFH4cdaY
-        KyGoRcUu7CmEMgwOmy6zlRL4B06BGlA=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-121-ujFw3oYzOjmyshLE9UQHnQ-1; Thu, 02 Sep 2021 08:36:59 -0400
-X-MC-Unique: ujFw3oYzOjmyshLE9UQHnQ-1
-Received: by mail-wr1-f69.google.com with SMTP id p10-20020a5d68ca000000b001552bf8b9daso480570wrw.22
-        for <kvm@vger.kernel.org>; Thu, 02 Sep 2021 05:36:59 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=XjZNhaTHu2G7qvKup1PDbiF+IV6d0VDmwJ2nyMbiAo4=;
-        b=SBfl4T65JWx/Fb7JNpNsldxbYBfhYxqHlkh9jlAOm0F7LZFKc0YNK12nRpbpHkyVnU
-         Jp4NygXWl6UWFPKlHW0ZRR8TfVpComuq+LqTlXXou6WY3HAXFCGGaVmZ7jlB7mG4S8D9
-         eGx8137aFZmuMj31+AeaZlfdfSJbcbXvnNj4nmnztcV1B+lh18IxmLFjRTd2vhyX1J4X
-         Yhb3lkg1oQV2Xp6M9rucXK9o8ipc9wOntAvIJBqDas2B5dP8GmyDIL4cynYqIMiYMIlu
-         nd+l44BzHp2s1nMUspBqzfYZSmlXJl+RumZTpmd2WmI66xadI7VYy7j5/Fz8tOMRZ/qo
-         o9iw==
-X-Gm-Message-State: AOAM533VDnzK2fqBafZD7UlcGfGNPNwS/7csZnKFreqrTb0zV9hWIPxO
-        PhM0DmxT/kGgRMkphozSbrInDKv0xf5M8K6xAez0vCVca7QtoBsChJW84sEs4USUAZr6+mCjAKr
-        3C4FnxR9ybUzT
-X-Received: by 2002:adf:dfc5:: with SMTP id q5mr3490262wrn.5.1630586218651;
-        Thu, 02 Sep 2021 05:36:58 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyda7YkzbAIwptDdwUxeFFJ3yXbh0EqmH9ayktJ/+cOAYBlktEFMuEzHFWPK2Zg6EPNQDNukw==
-X-Received: by 2002:adf:dfc5:: with SMTP id q5mr3490239wrn.5.1630586218485;
-        Thu, 02 Sep 2021 05:36:58 -0700 (PDT)
-Received: from gator (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id k16sm1774372wrx.87.2021.09.02.05.36.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Sep 2021 05:36:58 -0700 (PDT)
-Date:   Thu, 2 Sep 2021 14:36:56 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Oliver Upton <oupton@google.com>
-Cc:     Raghavendra Rao Ananta <rananta@google.com>, kvm@vger.kernel.org,
-        Will Deacon <will@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Peter Shier <pshier@google.com>, linux-kernel@vger.kernel.org,
-        Marc Zyngier <maz@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v3 07/12] KVM: arm64: selftests: Add support to get the
- vcpuid from MPIDR_EL1
-Message-ID: <20210902123656.lfzwqrlw5kbvckah@gator>
-References: <20210901211412.4171835-1-rananta@google.com>
- <20210901211412.4171835-8-rananta@google.com>
- <YTARPBhMHXjgcPlg@google.com>
+        id S1344663AbhIBMmK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Sep 2021 08:42:10 -0400
+Received: from mail-dm3nam07on2061.outbound.protection.outlook.com ([40.107.95.61]:57988
+        "EHLO NAM02-DM3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S234098AbhIBMmK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Sep 2021 08:42:10 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=TU0/Fg1W5YeTfz03Jc1nUnrWPD0e7q5/VMGtuC6dhuGuwKjGQuqcA4U9hoLfEAEqJW5u/Pr8Xldwx6iZG6MxnLQxEbYMu3gsvwKqQE2F5kKa7uAj282e+qatgO+sN0FHWCIxg9Px7WKJMaanAhmEgvXLTII7FC0LFUPgkOarhR5K2Hs4Ca9qHHIBnJkTTgciRfPfm2R9ztYnwPkKGZ+YdjdbwLzxcPo+91KA9OAhboCIDjmeFcNJ49iUoxh+BSte1ZEVryoGgGo7e6gqtLysm08FG1Tf9R8kPqhbLw9nQsC0MKpea/cygPA7b/P68/IvV0KWErwfE6v+DOaqDCeYvg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
+ bh=SARnDv7ZMhH2eqwgqjUe+EEnuThwlm2xat6htonBLAE=;
+ b=IxDNf429XMzAA0Q/aOpGP8OiOobo1FOWx8tppD4IMPHQOUFtShexTdDcvcT32ZswMdSOalc3eNOXGA6UnXl9vnYEMF0L9vZjyyZpJIpdW88U5xQ+HYY/iAPqnUQm8jreLtY9xpS70/wLH0P3Hym7TEZjTZXJMWc/iBAm4uvrXHVNosfPzUh8qeo7QavZZwDuxSDyemh8dayFsYXzsIhBoj2G0WOFHhOEq6ZUAw+xPO5X6E9ExXsChP5glTnDrPpzeJPcoeAjwtTzueklj8KERTsHf1qMbkJMN5UYor09jdVonljQDAq3BGw5h55WPSjXXqnCZY8Gl9B8HssL54ALzg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.112.36) smtp.rcpttodomain=infradead.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=quarantine sp=none pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=SARnDv7ZMhH2eqwgqjUe+EEnuThwlm2xat6htonBLAE=;
+ b=sddEB2jf42XYL714SyqYEuFWukSjlMNw18mmFMsKhhCVdHK2WEfCMgHJpv1rAhXLtAYATq+ZQImc0lw/tdJk6gLALsqBrhHQWdkmyi5nIv8tLxzFUa9hYARRVzDEcorOCoAIVXtzt2gjUMAeollDG2RSTt/qcOSpb8hUmn/p0mRSEyfSPLwaFTsC80w9zZWJcc95CbI/ASRSCowK0CifIES1rxwgL+Q1+4vvGp5UJaasBSJxA2Qw1MJa1M2m4W+rF8PKOvc9DYbn4fqlAi+bxv/dEw+n9zJYYoy4euD+QIbf8NFXf7K5iaIVtyfIep6s1FP4dSNS1O45V4dxKxw/JQ==
+Received: from DM6PR02CA0080.namprd02.prod.outlook.com (2603:10b6:5:1f4::21)
+ by BL0PR12MB2370.namprd12.prod.outlook.com (2603:10b6:207:47::27) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4478.19; Thu, 2 Sep
+ 2021 12:41:10 +0000
+Received: from DM6NAM11FT004.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:5:1f4:cafe::90) by DM6PR02CA0080.outlook.office365.com
+ (2603:10b6:5:1f4::21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4478.19 via Frontend
+ Transport; Thu, 2 Sep 2021 12:41:10 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.36)
+ smtp.mailfrom=nvidia.com; infradead.org; dkim=none (message not signed)
+ header.d=none;infradead.org; dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.112.36 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.112.36; helo=mail.nvidia.com;
+Received: from mail.nvidia.com (216.228.112.36) by
+ DM6NAM11FT004.mail.protection.outlook.com (10.13.172.217) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.4478.19 via Frontend Transport; Thu, 2 Sep 2021 12:41:09 +0000
+Received: from DRHQMAIL107.nvidia.com (10.27.9.16) by HQMAIL101.nvidia.com
+ (172.20.187.10) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Thu, 2 Sep
+ 2021 12:41:08 +0000
+Received: from [172.27.1.153] (172.20.187.6) by DRHQMAIL107.nvidia.com
+ (10.27.9.16) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Thu, 2 Sep 2021
+ 12:41:05 +0000
+Subject: Re: [PATCH v3 1/1] virtio-blk: avoid preallocating big SGL for data
+To:     Stefan Hajnoczi <stefanha@redhat.com>
+CC:     <hch@infradead.org>, <mst@redhat.com>,
+        <virtualization@lists.linux-foundation.org>, <kvm@vger.kernel.org>,
+        <israelr@nvidia.com>, <nitzanc@nvidia.com>, <oren@nvidia.com>,
+        <linux-block@vger.kernel.org>, <axboe@kernel.dk>
+References: <20210901131434.31158-1-mgurtovoy@nvidia.com>
+ <YTDBx/E/UJZWTFlG@stefanha-x1.localdomain>
+From:   Max Gurtovoy <mgurtovoy@nvidia.com>
+Message-ID: <c8107800-63fa-2ab5-235f-6f365e22abe1@nvidia.com>
+Date:   Thu, 2 Sep 2021 15:41:02 +0300
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YTARPBhMHXjgcPlg@google.com>
+In-Reply-To: <YTDBx/E/UJZWTFlG@stefanha-x1.localdomain>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Originating-IP: [172.20.187.6]
+X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
+ DRHQMAIL107.nvidia.com (10.27.9.16)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: e9b295f6-062a-4b39-79e8-08d96e0ef0b1
+X-MS-TrafficTypeDiagnostic: BL0PR12MB2370:
+X-Microsoft-Antispam-PRVS: <BL0PR12MB2370B9C0056BE946ADCECEA0DECE9@BL0PR12MB2370.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:2803;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: yUMaIYeNHq1ikoZLNQH/M32uq4g+ahsT5qGN1c3zwLxzmyoUZ6QQQtOSjQ6GTLsus41sc+frl4K2asVRUO5/MDlK3jpj/zkwbbuSdifoisbKGofTNF8E3VNiEDpkC1N+bbKpuuAnSsvq53rF6zqNYG5sQm3IO4krKIK0Nz6BJCV9xT9YoUf5y3FM2UafsS7vsOzHIGlp3NTz1HXpoYNp3MLeWRHETjq40I0UYuUHfg3RAtWLFDj6P8/fjSlOPRR+KT+5LO26Q5TShoqTflFkjKQKWZ2zNOZziqMPlXZrFfFbCab9Mw51d1X3XZP+bOp78ML46squIjfGH96+CwW62wlXXwHJDibxyrtyteXuNkrn6PYYnXhfGvchFTQ/a2QbXJ0fSaI2l/KLpuMFrxWI0qshn5TNgsNXA6gjgyLDrNP+5Nk8vxWmkrsy21mr4fYW9SXL/VknI2fW52HMpyeNPT71PNIo/wQjwOo3ViOidjxzLRJE9OzlvjFZnCnOx/9MI7W18yPQSfR2TGVQR1/wMBfU0GB7CiVmgAWx0KxH/8wgRLjYqEQd15rq9Ee0gf8x2cqc8wY3ijd3VVr/eX1cDWjjx2NN0pwwhRN7vJ34/uYA8hSpe/F+FU3vIOcRlcBOy7rir5r99YqzzZWIquqhkN9PAc20B9taLzYGdZ2ckJ1BjLLb4c/MfmHCu1T7NmxewPFsjAX89aLDzQh0yenhtGaencFf7LKFUrLG+8KagaE=
+X-Forefront-Antispam-Report: CIP:216.228.112.36;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid05.nvidia.com;CAT:NONE;SFS:(4636009)(36840700001)(46966006)(16576012)(316002)(36906005)(54906003)(83380400001)(6916009)(2906002)(26005)(508600001)(36756003)(5660300002)(8936002)(4326008)(6666004)(7636003)(8676002)(336012)(186003)(16526019)(426003)(2616005)(356005)(47076005)(53546011)(70586007)(31696002)(70206006)(82310400003)(36860700001)(31686004)(86362001)(43740500002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Sep 2021 12:41:09.5306
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: e9b295f6-062a-4b39-79e8-08d96e0ef0b1
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.36];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT004.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR12MB2370
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 01, 2021 at 11:48:12PM +0000, Oliver Upton wrote:
-> On Wed, Sep 01, 2021 at 09:14:07PM +0000, Raghavendra Rao Ananta wrote:
-> > At times, such as when in the interrupt handler, the guest wants to
-> > get the vCPU-id that it's running on. As a result, introduce
-> > get_vcpuid() that parses the MPIDR_EL1 and returns the vcpuid to the
-> > requested caller.
-> > 
-> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> > ---
-> >  .../selftests/kvm/include/aarch64/processor.h | 19 +++++++++++++++++++
-> >  1 file changed, 19 insertions(+)
-> > 
-> > diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
-> > index c35bb7b8e870..8b372cd427da 100644
-> > --- a/tools/testing/selftests/kvm/include/aarch64/processor.h
-> > +++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
-> > @@ -251,4 +251,23 @@ static inline void local_irq_disable(void)
-> >  	asm volatile("msr daifset, #3" : : : "memory");
-> >  }
-> >  
-> > +#define MPIDR_LEVEL_BITS 8
-> > +#define MPIDR_LEVEL_SHIFT(level) (MPIDR_LEVEL_BITS * level)
-> > +#define MPIDR_LEVEL_MASK ((1 << MPIDR_LEVEL_BITS) - 1)
-> > +#define MPIDR_AFFINITY_LEVEL(mpidr, level) \
-> > +	((mpidr >> MPIDR_LEVEL_SHIFT(level)) & MPIDR_LEVEL_MASK)
-> > +
-> > +static inline uint32_t get_vcpuid(void)
-> > +{
-> > +	uint32_t vcpuid = 0;
-> > +	uint64_t mpidr = read_sysreg(mpidr_el1);
-> > +
-> > +	/* KVM limits only 16 vCPUs at level 0 */
-> > +	vcpuid = mpidr & 0x0f;
-> > +	vcpuid |= MPIDR_AFFINITY_LEVEL(mpidr, 1) << 4;
-> > +	vcpuid |= MPIDR_AFFINITY_LEVEL(mpidr, 2) << 12;
-> > +
-> > +	return vcpuid;
-> > +}
-> 
-> Are we guaranteed that KVM will always compose vCPU IDs the same way? I
-> do not believe this is guaranteed ABI.
 
-I don't believe we are. At least in QEMU we take pains to avoid that
-assumption.
+On 9/2/2021 3:21 PM, Stefan Hajnoczi wrote:
+> On Wed, Sep 01, 2021 at 04:14:34PM +0300, Max Gurtovoy wrote:
+>> No need to pre-allocate a big buffer for the IO SGL anymore. If a device
+>> has lots of deep queues, preallocation for the sg list can consume
+>> substantial amounts of memory. For HW virtio-blk device, nr_hw_queues
+>> can be 64 or 128 and each queue's depth might be 128. This means the
+>> resulting preallocation for the data SGLs is big.
+>>
+>> Switch to runtime allocation for SGL for lists longer than 2 entries.
+>> This is the approach used by NVMe drivers so it should be reasonable for
+>> virtio block as well. Runtime SGL allocation has always been the case
+>> for the legacy I/O path so this is nothing new.
+>>
+>> The preallocated small SGL depends on SG_CHAIN so if the ARCH doesn't
+>> support SG_CHAIN, use only runtime allocation for the SGL.
+>>
+>> Re-organize the setup of the IO request to fit the new sg chain
+>> mechanism.
+>>
+>> No performance degradation was seen (fio libaio engine with 16 jobs and
+>> 128 iodepth):
+>>
+>> IO size      IOPs Rand Read (before/after)         IOPs Rand Write (before/after)
+>> --------     ---------------------------------    ----------------------------------
+>> 512B          318K/316K                                    329K/325K
+>>
+>> 4KB           323K/321K                                    353K/349K
+>>
+>> 16KB          199K/208K                                    250K/275K
+>>
+>> 128KB         36K/36.1K                                    39.2K/41.7K
+>>
+>> Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
+>> Reviewed-by: Israel Rukshin <israelr@nvidia.com>
+>> ---
+>>
+>> changes from V2:
+>>   - initialize vbr->out_hdr.sector during virtblk_setup_cmd
+>>
+>> changes from V1:
+>>   - Kconfig update (from Christoph)
+>>   - Re-order cmd setup (from Christoph)
+>>   - use flexible sg pointer in the cmd (from Christoph)
+>>   - added perf numbers to commit msg (from Feng Li)
+>>
+>> ---
+>>   drivers/block/Kconfig      |   1 +
+>>   drivers/block/virtio_blk.c | 155 +++++++++++++++++++++++--------------
+>>   2 files changed, 100 insertions(+), 56 deletions(-)
+> Hi Max,
+> I can run benchmark to give everyone more confidence about this change.
+> Should I test this version or are you still planning to make code
+> changes?
 
-> 
-> For the base case, you could pass the vCPU ID as an arg to the guest
-> function.
-> 
-> I do agree that finding the vCPU ID is a bit more challenging in an
-> interrupt context. Maybe use a ucall to ask userspace? But of course,
-> every test implements its own run loop, so its yet another case that
-> tests need to handle.
-> 
-> Or, you could allocate an array at runtime of length KVM_CAP_MAX_VCPUS
-> (use the KVM_CHECK_EXTENSION ioctl to get the value). Once all vCPUs are
-> instantiated, iterate over them from userspace to populate the {MPIDR,
-> VCPU_ID} map. You'd need to guarantee that callers initialize the vGIC
-> *after* adding vCPUs to the guest.
-
-I agree with this approach. It may even make sense to create a common
-function that returns a {cpu_id,vcpu_index} map for other tests to use.
+Yes you can test v3.
 
 Thanks,
-drew
 
-> 
-> --
-> Thanks,
-> Oliver
-> 
-> >  #endif /* SELFTEST_KVM_PROCESSOR_H */
-> > -- 
-> > 2.33.0.153.gba50c8fa24-goog
-> > 
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-> 
+Max.
 
+>
+> Stefan
