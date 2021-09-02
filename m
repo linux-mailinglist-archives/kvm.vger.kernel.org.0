@@ -2,56 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A2BE13FF2D8
-	for <lists+kvm@lfdr.de>; Thu,  2 Sep 2021 19:52:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4DF663FF2E1
+	for <lists+kvm@lfdr.de>; Thu,  2 Sep 2021 19:55:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346689AbhIBRxP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Sep 2021 13:53:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39522 "EHLO
+        id S1346635AbhIBR4X (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Sep 2021 13:56:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40220 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229574AbhIBRxP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Sep 2021 13:53:15 -0400
-Received: from mail-yb1-xb2e.google.com (mail-yb1-xb2e.google.com [IPv6:2607:f8b0:4864:20::b2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 990E2C061757
-        for <kvm@vger.kernel.org>; Thu,  2 Sep 2021 10:52:16 -0700 (PDT)
-Received: by mail-yb1-xb2e.google.com with SMTP id a93so5484112ybi.1
-        for <kvm@vger.kernel.org>; Thu, 02 Sep 2021 10:52:16 -0700 (PDT)
+        with ESMTP id S234652AbhIBR4S (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Sep 2021 13:56:18 -0400
+Received: from mail-yb1-xb31.google.com (mail-yb1-xb31.google.com [IPv6:2607:f8b0:4864:20::b31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D73C9C061757
+        for <kvm@vger.kernel.org>; Thu,  2 Sep 2021 10:55:19 -0700 (PDT)
+Received: by mail-yb1-xb31.google.com with SMTP id v26so5441736ybd.9
+        for <kvm@vger.kernel.org>; Thu, 02 Sep 2021 10:55:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=xAUZw7IrrctnJdeQBEtbAhv9xiy70VOpKzIZyk6KqAA=;
-        b=iyKqthjIRwPONyCS4/FKOde7Qj8MPxzxsMuN8Ti/E5d4o95dMRFhXGD0ZN2pu7RPVp
-         JwWUX/2NUc7y4oxHWdsjIHW4i99GjxckLQGR8lyOsGYMBoUAf4tdI8Tc2b2WN05V78s1
-         1ci/XTZoMbCx+VULa5z5tq7lKuPFjEOFL2ewyVdnHWMbRBr8zMXxtFQ47bECS/S778Vd
-         uWYSbkDI5Q7wCUKjWhT936QxX63P6W5fUF+RE1aax17r7lqa+ihcXphy+D1BQzgYmBOh
-         74HWpCi3vjxnYhTz4SIltFZH+bMTbuiVxuEulZmZgyDq40oAz76TRf9JSIgTAEM3wNC2
-         3lXA==
+        bh=gqxRE7kir7W0L8sbl3qxABrwWx/ImNi+hvYh+LGW41A=;
+        b=cv9zdd1oi04eIr1gf7nRpzyMmnd2MFSg9K1LzVavTuRHOmcg94Y/OCdNFhlu8mz9xI
+         oKwwTN71H2su8FeDC+5CjPNWW2dx1NeBB9PbWwtccN50LjfaiAYpRGr0Ktf0ocOj7pEc
+         affqCVcuKVaXYBJZjI3dCdsWOzLl3UrUXHbrsmA3LZZ3W/ofMk0Fr8JJhlUL9286/lnE
+         XGyK3RURH0w0A4PQaU5s8EqiyDQ9sOy9CTYyYXy5LIIaa5qXylR2Df1Ac854OuYRjUvh
+         PoyzOpVUq7CiEfefE0vfqTjSVfZBzMW6vJinsJ9Og1Nw/ERoRneAoNly1w5levpfnQOu
+         J1bg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=xAUZw7IrrctnJdeQBEtbAhv9xiy70VOpKzIZyk6KqAA=;
-        b=JtJiYkl9VmC3vREucevMxC8uOqP3SfAUuJFH0HKyygOteGA70wzJWhOQik7qFHs6h9
-         /vi1FM2Q0Ikio/ZgRnLcf5/ycD9ii8Ta32dfnPHsRlQldx41ynsg4Losi4I7nvcNFi2j
-         /XlygwQQQ7L7l0JUZYoj+Eh4nKE0YMyDQfmuO9VJ21yEojoCZxy/mehQtyL7WCHLY8G+
-         J9pDfurBKUnKY321ztvxGy5qGmhYzb0RgJIE8AuVJWFflScguLK22OXjAtRnsFB7I8ci
-         WdF7AxYC+IqWswiiL7U4trsRnaW2R0u1lzjuiCYniAF9fcjMr+Qc3+91RVB+YR31VIh9
-         +9dw==
-X-Gm-Message-State: AOAM531ANknzkO/5kA5MetLRlBCmg/6lFXuXqR5inaj/fnGTxw7RXr6s
-        LvcKHbPryjMozGY1d2+47l2gO+KtK00NpXfR3BD4eQ==
-X-Google-Smtp-Source: ABdhPJwQXtJzqbxl4gNeMNvhKYFqgI/uCi3/Up5vD6artyFiw1jvBI/+9aQ5dnuQX2F2LGGKUfF/T1/Eh5NonYuxIbU=
-X-Received: by 2002:a25:4f87:: with SMTP id d129mr5967977ybb.359.1630605135660;
- Thu, 02 Sep 2021 10:52:15 -0700 (PDT)
+        bh=gqxRE7kir7W0L8sbl3qxABrwWx/ImNi+hvYh+LGW41A=;
+        b=HUl1obAbZXXifsr/LF8bqV7xy5XxBWAbarLorT/ByfoXflYboQiw5Dnr4DZl6ad0iB
+         Ca7pjglVMzl1BmaHVmfgIM4P+oG6O8QC12xLJUtq3ABEwgC1kuK3BXxj6dXWXoDmFGSb
+         W8fXE7W1XZM6pUVyMcY6f4t1sJhUYa+skPw4Hct6JA+J9S7n+etL/4lngIHQIWTJSGCU
+         qeKOO70nIY300qS2i+yTosL4NvMcmaZxtF+t09dtpzau+FLetYXNo5vLiiSFpO5PvN1g
+         kmdwOCgXTxXph8fsj00lFBMEpS/mDcGtq1qnitSAMBgjISdN+lYBgDV8X3Rf1EJRLujb
+         n6hg==
+X-Gm-Message-State: AOAM532Rs4yJNsWNJjvl5au997Ej4LMX8A12CZPWdhA+THxe5tebojCo
+        0pE76m3zahudN61x9eXlGJEjdfumzYUxzlEespMrHQ==
+X-Google-Smtp-Source: ABdhPJwUZwqrwOekpIYyTz0pzYA+LEPg2QXTbJ63dba3PQAQ8pp85mpwvFE+9uO8Y0Cnfe82N+/p5oaHg8isCinoM0E=
+X-Received: by 2002:a05:6902:513:: with SMTP id x19mr5997339ybs.90.1630605318839;
+ Thu, 02 Sep 2021 10:55:18 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210901211412.4171835-1-rananta@google.com> <20210901211412.4171835-8-rananta@google.com>
- <YTARPBhMHXjgcPlg@google.com> <20210902123656.lfzwqrlw5kbvckah@gator>
-In-Reply-To: <20210902123656.lfzwqrlw5kbvckah@gator>
+References: <20210901211412.4171835-1-rananta@google.com> <20210901211412.4171835-3-rananta@google.com>
+ <YS/wfBTnCJWn05Kn@google.com> <YS/53N7LdJOgdzNu@google.com>
+ <CAJHc60xU3XvmkBHoB8ihyjy6k4RJ9dhqt31ytHDGjd5xsaJjFA@mail.gmail.com>
+ <YTAHYrQslkY12715@google.com> <20210902123110.royrzw4dsykkrcjx@gator>
+In-Reply-To: <20210902123110.royrzw4dsykkrcjx@gator>
 From:   Raghavendra Rao Ananta <rananta@google.com>
-Date:   Thu, 2 Sep 2021 10:52:05 -0700
-Message-ID: <CAJHc60xQYiOsQcZ64SVsVRarnb2b+fefRYq+xQ8FeqGxH0fY2w@mail.gmail.com>
-Subject: Re: [PATCH v3 07/12] KVM: arm64: selftests: Add support to get the
- vcpuid from MPIDR_EL1
+Date:   Thu, 2 Sep 2021 10:55:08 -0700
+Message-ID: <CAJHc60xLj77n3pvqQNn_+LoLL=UZtQV+hz3r4VmPpqpZ7SBPVg@mail.gmail.com>
+Subject: Re: [PATCH v3 02/12] KVM: arm64: selftests: Add write_sysreg_s and read_sysreg_s
 To:     Andrew Jones <drjones@redhat.com>
 Cc:     Oliver Upton <oupton@google.com>, kvm@vger.kernel.org,
         Will Deacon <will@kernel.org>,
@@ -65,91 +66,65 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 2, 2021 at 5:37 AM Andrew Jones <drjones@redhat.com> wrote:
+On Thu, Sep 2, 2021 at 5:31 AM Andrew Jones <drjones@redhat.com> wrote:
 >
-> On Wed, Sep 01, 2021 at 11:48:12PM +0000, Oliver Upton wrote:
-> > On Wed, Sep 01, 2021 at 09:14:07PM +0000, Raghavendra Rao Ananta wrote:
-> > > At times, such as when in the interrupt handler, the guest wants to
-> > > get the vCPU-id that it's running on. As a result, introduce
-> > > get_vcpuid() that parses the MPIDR_EL1 and returns the vcpuid to the
-> > > requested caller.
+> On Wed, Sep 01, 2021 at 11:06:10PM +0000, Oliver Upton wrote:
+> > On Wed, Sep 01, 2021 at 03:48:40PM -0700, Raghavendra Rao Ananta wrote:
+> > > On Wed, Sep 1, 2021 at 3:08 PM Oliver Upton <oupton@google.com> wrote:
+> > > >
+> > > > On Wed, Sep 01, 2021 at 09:28:28PM +0000, Oliver Upton wrote:
+> > > > > On Wed, Sep 01, 2021 at 09:14:02PM +0000, Raghavendra Rao Ananta wrote:
+> > > > > > For register names that are unsupported by the assembler or the ones
+> > > > > > without architectural names, add the macros write_sysreg_s and
+> > > > > > read_sysreg_s to support them.
+> > > > > >
+> > > > > > The functionality is derived from kvm-unit-tests and kernel's
+> > > > > > arch/arm64/include/asm/sysreg.h.
+> > > > > >
+> > > > > > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> > > > >
+> > > > > Would it be possible to just include <asm/sysreg.h>? See
+> > > > > tools/arch/arm64/include/asm/sysreg.h
+> > > >
+> > > > Geez, sorry for the noise. I mistakenly searched from the root of my
+> > > > repository, not the tools/ directory.
+> > > >
+> > > No worries :)
 > > >
-> > > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> > > ---
-> > >  .../selftests/kvm/include/aarch64/processor.h | 19 +++++++++++++++++++
-> > >  1 file changed, 19 insertions(+)
-> > >
-> > > diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
-> > > index c35bb7b8e870..8b372cd427da 100644
-> > > --- a/tools/testing/selftests/kvm/include/aarch64/processor.h
-> > > +++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
-> > > @@ -251,4 +251,23 @@ static inline void local_irq_disable(void)
-> > >     asm volatile("msr daifset, #3" : : : "memory");
-> > >  }
-> > >
-> > > +#define MPIDR_LEVEL_BITS 8
-> > > +#define MPIDR_LEVEL_SHIFT(level) (MPIDR_LEVEL_BITS * level)
-> > > +#define MPIDR_LEVEL_MASK ((1 << MPIDR_LEVEL_BITS) - 1)
-> > > +#define MPIDR_AFFINITY_LEVEL(mpidr, level) \
-> > > +   ((mpidr >> MPIDR_LEVEL_SHIFT(level)) & MPIDR_LEVEL_MASK)
-> > > +
-> > > +static inline uint32_t get_vcpuid(void)
-> > > +{
-> > > +   uint32_t vcpuid = 0;
-> > > +   uint64_t mpidr = read_sysreg(mpidr_el1);
-> > > +
-> > > +   /* KVM limits only 16 vCPUs at level 0 */
-> > > +   vcpuid = mpidr & 0x0f;
-> > > +   vcpuid |= MPIDR_AFFINITY_LEVEL(mpidr, 1) << 4;
-> > > +   vcpuid |= MPIDR_AFFINITY_LEVEL(mpidr, 2) << 12;
-> > > +
-> > > +   return vcpuid;
-> > > +}
+> > > > In any case, you could perhaps just drop the kernel header there just to
+> > > > use the exact same source for kernel and selftest.
+> > > >
+> > > You mean just copy/paste the entire header? There's a lot of stuff in
+> > > there which we
+> > > don't need it (yet).
 > >
-> > Are we guaranteed that KVM will always compose vCPU IDs the same way? I
-> > do not believe this is guaranteed ABI.
->
-> I don't believe we are. At least in QEMU we take pains to avoid that
-> assumption.
->
+> > Right. It's mostly register definitions, which I don't think is too high
+> > of an overhead. Don't know where others stand, but I would prefer a
+> > header that is equivalent between kernel & selftests over a concise
+> > header.
 > >
-> > For the base case, you could pass the vCPU ID as an arg to the guest
-> > function.
-> >
-> > I do agree that finding the vCPU ID is a bit more challenging in an
-> > interrupt context. Maybe use a ucall to ask userspace? But of course,
-> > every test implements its own run loop, so its yet another case that
-> > tests need to handle.
-> >
-> > Or, you could allocate an array at runtime of length KVM_CAP_MAX_VCPUS
-> > (use the KVM_CHECK_EXTENSION ioctl to get the value). Once all vCPUs are
-> > instantiated, iterate over them from userspace to populate the {MPIDR,
-> > VCPU_ID} map. You'd need to guarantee that callers initialize the vGIC
-> > *after* adding vCPUs to the guest.
 >
-> I agree with this approach. It may even make sense to create a common
-> function that returns a {cpu_id,vcpu_index} map for other tests to use.
+> Until now we haven't needed the sys_reg(...) type of definitions for
+> sysregs in selftests. In case we did, we defined the registers we
+> needed for get/set_one_reg by their parts, e.g.
 >
-Interesting idea. I'll look into this.
+>  #define ID_AA64DFR0_EL1 3, 0,  0, 5, 0
+>
+> allowing us to choose how we use them, ARM64_SYS_REG(...) vs.
+> sys_reg(...).
+>
+> Bringing over sysreg.h is probably a good idea though. If we do, then
+> I'd suggest we define a new macro that allows us to convert a SYS_*
+> register definition from sysreg.h into an ARM64_SYS_REG definition
+> for get/set_one_reg in order to avoid redundant definitions.
+>
+
+I agree. Will look into it, and plan to pull the original sysreg.h
+into selftests.
 
 Regards,
 Raghavendra
 
 > Thanks,
 > drew
->
-> >
-> > --
-> > Thanks,
-> > Oliver
-> >
-> > >  #endif /* SELFTEST_KVM_PROCESSOR_H */
-> > > --
-> > > 2.33.0.153.gba50c8fa24-goog
-> > >
-> > _______________________________________________
-> > kvmarm mailing list
-> > kvmarm@lists.cs.columbia.edu
-> > https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-> >
 >
