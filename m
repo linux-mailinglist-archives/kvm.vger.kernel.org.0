@@ -2,68 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CAD923FF529
-	for <lists+kvm@lfdr.de>; Thu,  2 Sep 2021 22:55:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2BBD63FF536
+	for <lists+kvm@lfdr.de>; Thu,  2 Sep 2021 22:57:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238413AbhIBU43 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Sep 2021 16:56:29 -0400
-Received: from mail.kernel.org ([198.145.29.99]:35284 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231186AbhIBU42 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Sep 2021 16:56:28 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPS id 9E98260FC0;
-        Thu,  2 Sep 2021 20:55:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1630616129;
-        bh=ctEN46C7hU0k3XCjFxpy+myKCJa2ov5i1NnH7bGbI7g=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=cYO/DK+HbUGZeBhyA3YWRqzV2mQZdMFwg9bffRqroTJ5uQkbEikxuwSpK4bcMB7rW
-         CGdIM/aoNrdAd9+B1Bi33xlxx8XVzVOEJWzi0AmzMuFhzguONi9orFoO4PAqOa5KAj
-         knVir3uUvJsO6DCoPY8dgVKpYDrVrB8Hyr8PxIVlodgnzIGHZFhwRrws1cKUem3Vj5
-         fVBRKsO0ogI65ZrvpL4CWdtjLW+dXvEipXCFm6u+EdlD6o+CgK7g+g7EBVZZontaPl
-         xUv9fmqHnYpkUrpMbDrOI6ScYnrUU+PArrCV9sl7PNhBmTeq4nxb929gBQi0Ns/u8D
-         oryHoB9yBww2w==
-Received: from pdx-korg-docbuild-2.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by pdx-korg-docbuild-2.ci.codeaurora.org (Postfix) with ESMTP id 8D90760A0C;
-        Thu,  2 Sep 2021 20:55:29 +0000 (UTC)
-Subject: Re: [GIT PULL] VFIO update for v5.15-rc1
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <20210901130821.6c81da7e.alex.williamson@redhat.com>
-References: <20210901130821.6c81da7e.alex.williamson@redhat.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20210901130821.6c81da7e.alex.williamson@redhat.com>
-X-PR-Tracked-Remote: git://github.com/awilliam/linux-vfio.git tags/vfio-v5.15-rc1
-X-PR-Tracked-Commit-Id: ea870730d83fc13a5fa2bd0e175176d7ac8a400a
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 89b6b8cd92c068cd1bdf877ec7fb1392568ef35d
-Message-Id: <163061612952.4397.4445309581412678319.pr-tracker-bot@kernel.org>
-Date:   Thu, 02 Sep 2021 20:55:29 +0000
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Anthony Yznaga <anthony.yznaga@oracle.com>,
-        Cai Huoqing <caihuoqing@baidu.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Dave Airlie <airlied@linux.ie>,
-        Stephen Rothwell <sfr@canb.auug.org.au>
+        id S1347277AbhIBU6P (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Sep 2021 16:58:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54320 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1347179AbhIBU6N (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Sep 2021 16:58:13 -0400
+Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8A1FC061575
+        for <kvm@vger.kernel.org>; Thu,  2 Sep 2021 13:57:14 -0700 (PDT)
+Received: by mail-pg1-x531.google.com with SMTP id c17so3338443pgc.0
+        for <kvm@vger.kernel.org>; Thu, 02 Sep 2021 13:57:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=AKvoBglyKyX6FOVMBLB/URNeY80PWCKE3Lo+SAFXI3k=;
+        b=I0126LUhSD04CPCw4NfU0xi6Grfk2wjNYQRqWhZ2iOjuKglbP3AD/1E2rxglR4eqNc
+         DdX3w8JzqQQH3hNWFfvTPXXjh2+dFfbeO4FA6jCRnlTCTjMeF2NpPBumA3HEr0NrUdxf
+         S0DkZDKDTD3ejQMUECTQNJO8OHQhjM3R33UV68hmzRwCApTNPwt+XBesICvcgmKy+uO2
+         I3PyHC2gE0qNX6iNXg0+5XhUPuJSKAIiG5L700Ho3x/W/1j1mr0SY++iz+nLz2vYjnZ3
+         ytFh15AkqwWicUz1FlSAPt6vWCeIrjsSHPFXb6RYhApDX/a93eOR2oNaSdqJ9P+BFRHW
+         5TYw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=AKvoBglyKyX6FOVMBLB/URNeY80PWCKE3Lo+SAFXI3k=;
+        b=hYe2PyUaCJt0p2hHTqOgnV1+IvzkJvLC2nKaAJD6nb676eYPdMcam5XcPftkoIzylX
+         6ERR+8+5T/vG8Bv8XsteuiNiAahZP5e9iR8GI9/wpZoqsxVwbkncyF+Tvs1+C6dgN6Fx
+         o9YFxVUVMBM1D08Th1QEkJ9+nQSLX3DVl8ssM/EclVSmBg5hhc8Zj4DPctFCjMd7/mEn
+         D/to8B4Y5qTGi/VUbbJ+M+Ab0LZ6WP4I+jHrkBWsWxoKH/z0hgOa6cSyErYGPxFCtAB+
+         dBL5SVDrqhL9G4gLrn/TvzKBKCf5B9PyrrfGKfu/HI3Ai/dfB+4voTgPT3AT1E5uRnJg
+         nPdg==
+X-Gm-Message-State: AOAM531PstjYy2gbsdzKWm5ky0uSYAP0EIabO1bQFWrubWsxTehjcgK+
+        HufQ1qL1sQKdxm12reqMseYUhQ==
+X-Google-Smtp-Source: ABdhPJxzTD7xp5K/i9sHGH587GJ8tZkJXnLGOqiJwoNVv8Rls8D2cm5udFmcc86bB3yp/lT+Rd2yLA==
+X-Received: by 2002:a63:4917:: with SMTP id w23mr271248pga.344.1630616234252;
+        Thu, 02 Sep 2021 13:57:14 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id x16sm3647924pgc.49.2021.09.02.13.57.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Sep 2021 13:57:13 -0700 (PDT)
+Date:   Thu, 2 Sep 2021 20:57:10 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Nitesh Narayan Lal <nitesh@redhat.com>,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 3/8] KVM: x86: hyper-v: Avoid calling
+ kvm_make_vcpus_request_mask() with vcpu_mask==NULL
+Message-ID: <YTE6pk22mslvIDr6@google.com>
+References: <20210827092516.1027264-1-vkuznets@redhat.com>
+ <20210827092516.1027264-4-vkuznets@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210827092516.1027264-4-vkuznets@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The pull request you sent on Wed, 1 Sep 2021 13:08:21 -0600:
+On Fri, Aug 27, 2021, Vitaly Kuznetsov wrote:
+> In preparation to making kvm_make_vcpus_request_mask() use for_each_set_bit()
+> switch kvm_hv_flush_tlb() to calling kvm_make_all_cpus_request() for 'all cpus'
+> case.
+> 
+> Note: kvm_make_all_cpus_request() (unlike kvm_make_vcpus_request_mask())
+> currently dynamically allocates cpumask on each call and this is suboptimal.
+> Both kvm_make_all_cpus_request() and kvm_make_vcpus_request_mask() are
+> going to be switched to using pre-allocated per-cpu masks.
+> 
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> ---
 
-> git://github.com/awilliam/linux-vfio.git tags/vfio-v5.15-rc1
-
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/89b6b8cd92c068cd1bdf877ec7fb1392568ef35d
-
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Reviewed-by: Sean Christopherson <seanjc@google.com>
