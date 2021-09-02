@@ -2,161 +2,181 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C561F3FF554
-	for <lists+kvm@lfdr.de>; Thu,  2 Sep 2021 23:07:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D80783FF55C
+	for <lists+kvm@lfdr.de>; Thu,  2 Sep 2021 23:08:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346577AbhIBVIN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Sep 2021 17:08:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56710 "EHLO
+        id S1347027AbhIBVJP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Sep 2021 17:09:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56968 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230315AbhIBVIM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Sep 2021 17:08:12 -0400
-Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F96CC061575
-        for <kvm@vger.kernel.org>; Thu,  2 Sep 2021 14:07:13 -0700 (PDT)
-Received: by mail-lf1-x129.google.com with SMTP id z2so7255398lft.1
-        for <kvm@vger.kernel.org>; Thu, 02 Sep 2021 14:07:13 -0700 (PDT)
+        with ESMTP id S1347017AbhIBVJO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Sep 2021 17:09:14 -0400
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6680C061575
+        for <kvm@vger.kernel.org>; Thu,  2 Sep 2021 14:08:15 -0700 (PDT)
+Received: by mail-pj1-x1029.google.com with SMTP id fz10so2282600pjb.0
+        for <kvm@vger.kernel.org>; Thu, 02 Sep 2021 14:08:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=XguslLdPIXxVxFmZIelMYc4XAgNZi0tFqmUYgQxOp5M=;
-        b=GRl6nsj+q44z1Ha5UTrEb/YbOYWdRlaK0fubHiqDSnXS8sWWJcwTGWoDIW2UCbn6Zr
-         Cin4HyfAIjK1TVjdigRZ9ja7ecjITroQf2sZC4PC79Xaz+k+vtV6XvjQXxLLGFS3Tgvd
-         rZxyeNE+Shn/fy1exk3CDfTmR+G77EyuLt2WAGw8j5ATWWbDt8eRpAfxm4LgmHc7p2us
-         SdVcNLtNJiQPkMgU50e+CmDwIvKnHFdoc0jTOcrwRN3F83mIHv0PA+s/3GaM1tNx243Z
-         gMITCnX0rWgJVXu10k47y/pC6aRMKRjTFKL60xjdzuDoDoXohJ5vAGs0C1TJ9uxuED5z
-         b2tA==
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=Jsw+0RVz7kftEoRLavLgOo4GczdDf7aQJBZW/qWLrRg=;
+        b=ka0Oj+PjP0myE0BToQV3XzncczscdjeGITakU0uoU2xiaHRnNeILJeuczOtmgz8P3d
+         yELQU2R4mfWM6643HaIjUfniTIpSJxo/F9D5mn3sdXlFCPSzXAreDXb8K6ISu2KZa+qG
+         WDcLvcG886JSY82qWMOSgbV7LrkN4stezqeSrPQdwsT0SOvAM0ui0At1yu1ppDDVIPct
+         Gks8lW3uWkq2Fo/CmTq3VYOXdsKtfsdN4uWP/UDdBNk7XJhQzSlZnNBUtMIcxNNCb8u6
+         CAY0wu82mF3SVke9rBAdhzNcDXGln2trGkSCi6UU5tZb0sH1VG9I7P4jbl2JXowUoVlk
+         MFVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=XguslLdPIXxVxFmZIelMYc4XAgNZi0tFqmUYgQxOp5M=;
-        b=OpMNQi713CL+gu019KER0vmwxGX2pUjgfokOarqlJ065VJt+RrRcjjN0d4h4mm8hns
-         VeJ1cSyNaJ0uwO/pdPyiyA0hapq1Yql0/zIRueQ0jMmNxDeO3dTf+W/AntryBRzhTiZw
-         QamJn4bCKsHJLcJsd7ch3jqEg6OiL1N1MKfjLklM/hHByxzgeuWOIBjpmWuWLbf2z4TC
-         sj9UGAS/jhkCWNCBGQrOMVvEo1eDPd/LN311WsYn/J/rDCAN9GDTReJ2Qe7ENn9uqb8G
-         k5R654MmCsxcGoLyw1KVczpWg9b87TuRdfdM1l5ZlILrJ9Wfw3y3gSYw6WP5M1TER5C5
-         /TeA==
-X-Gm-Message-State: AOAM530qRFG7xLc/lMRE7aQK9x/OLkWZs+LmypPK6lEZvOrOcMlj+XbR
-        SNV7d0ZzO0Gs35nkKEyLy29G6d4mKLGPw/25Xapu4A==
-X-Google-Smtp-Source: ABdhPJy8xnwpcjzdbh31Silho7ZsIAfWPr+R+NuwJ6UvcoeGh2m0fcJ/FCsJ2/qFTEX7zkqJV51h+rVv6z0QgWfOt/4=
-X-Received: by 2002:a05:6512:6c3:: with SMTP id u3mr80050lff.411.1630616831502;
- Thu, 02 Sep 2021 14:07:11 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Jsw+0RVz7kftEoRLavLgOo4GczdDf7aQJBZW/qWLrRg=;
+        b=jHyV/k3R5lGDWQPl5hXgq5BQgzFddL7maOHxbmM1IEEWUFN9FE5GWAazBc2tkAP+IX
+         Gsh8AiNbuj2NiXIr88LgxjGXwOtPSvHAse0f+g5t6ZIPkYbtb8xLOfFLRs6TGDXBEmQV
+         Sl9akyQRV3Lo+nPTlWrr4yzZYKd6mjoIxG+rO74Xvflclu4a2gpzw7KiSunVnLRAmWG0
+         rmaUBQPrpzukGjkyhWJu+OH+5ClU6E8J9rxXhvc8SEC5fbItURQ6Yz5zeEPRe0LtnMoe
+         jZrtxbxXHkpLkLXnDGYgTtGcboY0KG9//D817nA8ArYWSoWndhWt4dHje8Q/mqBoa5A0
+         1IDg==
+X-Gm-Message-State: AOAM530YJKdhToZFKvn8dZpJTJu67IsVAUnB+i7C+4uPdQ5q05Qa0wEJ
+        1XM+cqIpbWWgG/RVqOgoiPD8gw==
+X-Google-Smtp-Source: ABdhPJyGGdSHjvZNith8nn/rlOSbpsGt4FmNaUkcIVgELS/5Et4dd93zq81nzbWh9rJTTJ/rSiYyaA==
+X-Received: by 2002:a17:90a:f18d:: with SMTP id bv13mr6178724pjb.70.1630616895004;
+        Thu, 02 Sep 2021 14:08:15 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id gm5sm3087181pjb.32.2021.09.02.14.08.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Sep 2021 14:08:14 -0700 (PDT)
+Date:   Thu, 2 Sep 2021 21:08:10 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Nitesh Narayan Lal <nitesh@redhat.com>,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 7/8] KVM: Pre-allocate cpumasks for
+ kvm_make_all_cpus_request_except()
+Message-ID: <YTE9OsXABLzUitUd@google.com>
+References: <20210827092516.1027264-1-vkuznets@redhat.com>
+ <20210827092516.1027264-8-vkuznets@redhat.com>
 MIME-Version: 1.0
-References: <20210901211412.4171835-1-rananta@google.com> <20210901211412.4171835-9-rananta@google.com>
-In-Reply-To: <20210901211412.4171835-9-rananta@google.com>
-From:   Oliver Upton <oupton@google.com>
-Date:   Thu, 2 Sep 2021 14:06:58 -0700
-Message-ID: <CAOQ_QsiYHkyDVUuUjFb5Zc=o4=yrmVEERNqt1aAY=4uy91mbgQ@mail.gmail.com>
-Subject: Re: [PATCH v3 08/12] KVM: arm64: selftests: Add light-weight spinlock support
-To:     Raghavendra Rao Ananta <rananta@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <Alexandru.Elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210827092516.1027264-8-vkuznets@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 1, 2021 at 2:14 PM Raghavendra Rao Ananta
-<rananta@google.com> wrote:
->
-> Add a simpler version of spinlock support for ARM64 for
-> the guests to use.
->
-> The implementation is loosely based on the spinlock
-> implementation in kvm-unit-tests.
->
-> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+On Fri, Aug 27, 2021, Vitaly Kuznetsov wrote:
+> Allocating cpumask dynamically in zalloc_cpumask_var() is not ideal.
+> Allocation is somewhat slow and can (in theory and when CPUMASK_OFFSTACK)
+> fail. kvm_make_all_cpus_request_except() already disables preemption so
+> we can use pre-allocated per-cpu cpumasks instead.
+> 
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 > ---
->  tools/testing/selftests/kvm/Makefile          |  2 +-
->  .../selftests/kvm/include/aarch64/spinlock.h  | 13 +++++++++
->  .../selftests/kvm/lib/aarch64/spinlock.c      | 27 +++++++++++++++++++
->  3 files changed, 41 insertions(+), 1 deletion(-)
->  create mode 100644 tools/testing/selftests/kvm/include/aarch64/spinlock.h
->  create mode 100644 tools/testing/selftests/kvm/lib/aarch64/spinlock.c
->
-> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> index 5d05801ab816..61f0d376af99 100644
-> --- a/tools/testing/selftests/kvm/Makefile
-> +++ b/tools/testing/selftests/kvm/Makefile
-> @@ -35,7 +35,7 @@ endif
->
->  LIBKVM = lib/assert.c lib/elf.c lib/io.c lib/kvm_util.c lib/rbtree.c lib/sparsebit.c lib/test_util.c lib/guest_modes.c lib/perf_test_util.c
->  LIBKVM_x86_64 = lib/x86_64/apic.c lib/x86_64/processor.c lib/x86_64/vmx.c lib/x86_64/svm.c lib/x86_64/ucall.c lib/x86_64/handlers.S
-> -LIBKVM_aarch64 = lib/aarch64/processor.c lib/aarch64/ucall.c lib/aarch64/handlers.S
-> +LIBKVM_aarch64 = lib/aarch64/processor.c lib/aarch64/ucall.c lib/aarch64/handlers.S lib/aarch64/spinlock.c
->  LIBKVM_s390x = lib/s390x/processor.c lib/s390x/ucall.c lib/s390x/diag318_test_handler.c
->
->  TEST_GEN_PROGS_x86_64 = x86_64/cr4_cpuid_sync_test
-> diff --git a/tools/testing/selftests/kvm/include/aarch64/spinlock.h b/tools/testing/selftests/kvm/include/aarch64/spinlock.h
-> new file mode 100644
-> index 000000000000..cf0984106d14
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/include/aarch64/spinlock.h
-> @@ -0,0 +1,13 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
+>  virt/kvm/kvm_main.c | 29 +++++++++++++++++++++++------
+>  1 file changed, 23 insertions(+), 6 deletions(-)
+> 
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 2e9927c4eb32..2f5fe4f54a51 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -155,6 +155,8 @@ static void kvm_uevent_notify_change(unsigned int type, struct kvm *kvm);
+>  static unsigned long long kvm_createvm_count;
+>  static unsigned long long kvm_active_vms;
+>  
+> +static DEFINE_PER_CPU(cpumask_var_t, cpu_kick_mask);
 > +
-> +#ifndef SELFTEST_KVM_ARM64_SPINLOCK_H
-> +#define SELFTEST_KVM_ARM64_SPINLOCK_H
+>  __weak void kvm_arch_mmu_notifier_invalidate_range(struct kvm *kvm,
+>  						   unsigned long start, unsigned long end)
+>  {
+> @@ -323,14 +325,15 @@ bool kvm_make_all_cpus_request_except(struct kvm *kvm, unsigned int req,
+>  				      struct kvm_vcpu *except)
+>  {
+>  	struct kvm_vcpu *vcpu;
+> -	cpumask_var_t cpus;
+> +	struct cpumask *cpus;
+>  	bool called;
+>  	int i, me;
+>  
+> -	zalloc_cpumask_var(&cpus, GFP_ATOMIC);
+> -
+>  	me = get_cpu();
+>  
+> +	cpus = this_cpu_cpumask_var_ptr(cpu_kick_mask);
+> +	cpumask_clear(cpus);
 > +
-> +struct spinlock {
-> +       int v;
-> +};
-> +
-> +extern void spin_lock(struct spinlock *lock);
-> +extern void spin_unlock(struct spinlock *lock);
-> +
-> +#endif /* SELFTEST_KVM_ARM64_SPINLOCK_H */
-> diff --git a/tools/testing/selftests/kvm/lib/aarch64/spinlock.c b/tools/testing/selftests/kvm/lib/aarch64/spinlock.c
-> new file mode 100644
-> index 000000000000..6d66a3dac237
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/lib/aarch64/spinlock.c
-> @@ -0,0 +1,27 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * ARM64 Spinlock support
-> + */
-> +#include <stdint.h>
-> +
-> +#include "spinlock.h"
-> +
-> +void spin_lock(struct spinlock *lock)
-> +{
-> +       uint32_t val, res;
+>  	kvm_for_each_vcpu(i, vcpu, kvm) {
+>  		if (vcpu == except)
+>  			continue;
+> @@ -340,7 +343,6 @@ bool kvm_make_all_cpus_request_except(struct kvm *kvm, unsigned int req,
+>  	called = kvm_kick_many_cpus(cpus, !!(req & KVM_REQUEST_WAIT));
+>  	put_cpu();
+>  
+> -	free_cpumask_var(cpus);
+>  	return called;
+>  }
+>  
+> @@ -5581,9 +5583,15 @@ int kvm_init(void *opaque, unsigned vcpu_size, unsigned vcpu_align,
+>  		goto out_free_3;
+>  	}
+>  
+> +	for_each_possible_cpu(cpu) {
+> +		if (!alloc_cpumask_var_node(&per_cpu(cpu_kick_mask, cpu),
+> +					    GFP_KERNEL, cpu_to_node(cpu)))
+> +			goto out_free_4;
 
-nit: use 'int' to match the lock value type.
+'r' needs to be explicitly set to -EFAULT, e.g. in the current code it's
+guaranteed to be 0 here.
 
+> +	}
 > +
-> +       asm volatile(
-> +       "1:     ldaxr   %w0, [%2]\n"
-> +       "       cbnz    %w0, 1b\n"
-> +       "       mov     %w0, #1\n"
-> +       "       stxr    %w1, %w0, [%2]\n"
-> +       "       cbnz    %w1, 1b\n"
-> +       : "=&r" (val), "=&r" (res)
-> +       : "r" (&lock->v)
-> +       : "memory");
-> +}
+>  	r = kvm_async_pf_init();
+>  	if (r)
+> -		goto out_free;
+> +		goto out_free_5;
+>  
+>  	kvm_chardev_ops.owner = module;
+>  	kvm_vm_fops.owner = module;
+> @@ -5609,7 +5617,11 @@ int kvm_init(void *opaque, unsigned vcpu_size, unsigned vcpu_align,
+>  
+>  out_unreg:
+>  	kvm_async_pf_deinit();
+> -out_free:
+> +out_free_5:
+> +	for_each_possible_cpu(cpu) {
+
+Unnecessary braces.
+
+> +		free_cpumask_var(per_cpu(cpu_kick_mask, cpu));
+> +	}
+> +out_free_4:
+>  	kmem_cache_destroy(kvm_vcpu_cache);
+>  out_free_3:
+>  	unregister_reboot_notifier(&kvm_reboot_notifier);
+> @@ -5629,8 +5641,13 @@ EXPORT_SYMBOL_GPL(kvm_init);
+>  
+>  void kvm_exit(void)
+>  {
+> +	int cpu;
 > +
-> +void spin_unlock(struct spinlock *lock)
-> +{
-> +       asm volatile("stlr wzr, [%0]\n" : : "r" (&lock->v) : "memory");
-> +}
-> --
-> 2.33.0.153.gba50c8fa24-goog
->
+>  	debugfs_remove_recursive(kvm_debugfs_dir);
+>  	misc_deregister(&kvm_dev);
+> +	for_each_possible_cpu(cpu) {
 
-Otherwise, LGTM.
+Same here.
 
-Reviewed-by: Oliver Upton <oupton@google.com>
+> +		free_cpumask_var(per_cpu(cpu_kick_mask, cpu));
+> +	}
+>  	kmem_cache_destroy(kvm_vcpu_cache);
+>  	kvm_async_pf_deinit();
+>  	unregister_syscore_ops(&kvm_syscore_ops);
+> -- 
+> 2.31.1
+> 
