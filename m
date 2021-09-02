@@ -2,69 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D2D133FF59A
-	for <lists+kvm@lfdr.de>; Thu,  2 Sep 2021 23:26:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A00963FF5B3
+	for <lists+kvm@lfdr.de>; Thu,  2 Sep 2021 23:38:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347017AbhIBV1i (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Sep 2021 17:27:38 -0400
-Received: from smtp-relay-canonical-0.canonical.com ([185.125.188.120]:59366
-        "EHLO smtp-relay-canonical-0.canonical.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S245379AbhIBV1i (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 2 Sep 2021 17:27:38 -0400
-Received: from localhost (1.general.cking.uk.vpn [10.172.193.212])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by smtp-relay-canonical-0.canonical.com (Postfix) with ESMTPSA id 4927D3F112;
-        Thu,  2 Sep 2021 21:26:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-        s=20210705; t=1630617992;
-        bh=E0+rjETp1q3bF8ZXs+1AdT+BHFcfxbmgeeVYX//s5wE=;
-        h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type;
-        b=MkRRkl08bMgIfGvpGCeikhiC1LBLteA04+O8lK+1IjhGyLbwS8lBHyX1iuvHyl8QE
-         65XKOtGSGaQpipZBucZKrwcYgPkigcJwq6T79FyBRa0SYjl6IQOf5CZvova+nvYJKS
-         gREk0bWrL9Q6KrdQjxMSq1FqZK588z7iOhqaKSIP6t1Z+v77sSBNAqvsB2CMDFzCVb
-         AdEwg+1cBk6kAFxqy2z7kDm78JzmuvtNvOJ5OxA6NNEiN1LCmgvY/TleHuEkw5Hqq8
-         JJcA6nkXeu4hEVJDTB4hnkbLkDL84ih2cnsXGusn8w63JZPwCc1EcXrcB6iPRW9IFU
-         lsuDC6SAWKOSA==
-From:   Colin King <colin.king@canonical.com>
-To:     Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>, kvm@vger.kernel.org
-Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH][next] vfio/pci: add missing identifier name in argument of function prototype
-Date:   Thu,  2 Sep 2021 22:26:31 +0100
-Message-Id: <20210902212631.54260-1-colin.king@canonical.com>
-X-Mailer: git-send-email 2.32.0
+        id S1347105AbhIBVjB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Sep 2021 17:39:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35804 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1346956AbhIBVjA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Sep 2021 17:39:00 -0400
+Received: from mail-yb1-xb42.google.com (mail-yb1-xb42.google.com [IPv6:2607:f8b0:4864:20::b42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D737FC061575
+        for <kvm@vger.kernel.org>; Thu,  2 Sep 2021 14:38:01 -0700 (PDT)
+Received: by mail-yb1-xb42.google.com with SMTP id z5so6551757ybj.2
+        for <kvm@vger.kernel.org>; Thu, 02 Sep 2021 14:38:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:reply-to:sender:from:date:message-id:subject:to
+         :content-transfer-encoding;
+        bh=BxKAPKE9vhK0W3TsOFbojb5f34O8/iLgDXh7tR6Qexs=;
+        b=mhfBuGzKrImKYLhZFuNIPbcFA/suJH/Qpj8Ep4oH6qBjjwYKkeGmYCbYqqTipmM88p
+         dIUqCIYj2NnJSWXttVSD7KpjyJPO9xevDKh/vwvMT6jM8Bql3X5P+PaqboPPCo4HyOdK
+         oGFfCKjAQgJtEq7vjkaHUMjIO7T2kLrf9bv9kuSHHGEG0Gn9CiesPPM2ckadD5YYUZmu
+         Ijdlg6DIGWvHPfZhTijGttMjwh28NnSvruGLsvl4JXlZKali8GfCPgINaIiCHPwGrgVb
+         /aePdS5zrPINQPEyxVIoN+SuF41mw8tcQIrirvjoRQysAZ/+/o0PfUpadG1hk8wwoced
+         4q4g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:reply-to:sender:from:date
+         :message-id:subject:to:content-transfer-encoding;
+        bh=BxKAPKE9vhK0W3TsOFbojb5f34O8/iLgDXh7tR6Qexs=;
+        b=GmHWjPs47XrqZK1R0Od60HPi7gd48W4GONIWbf4dHsLLhI8rJCaep2G6sy9D2OdB85
+         keA/8zNtQ30bVl9Sn6fhFiqxuwlxiGnPUy6ZWT6cvGMnWEpyn3pWUSqrQHxa7bYukuVV
+         nG0plzHAHo9TIAcZPZ2UbcJtRSbRxe/M1/mhrJ0Kb8zrma5KwVcjHzBmVZY4G2N3eDbh
+         UhrNJG94AwXSQVrdmIeV6vVfpp5YV0KeKU0sG997ePHDkHz9eK0Tepo/8cKnKrla0unx
+         M4RaJhrGb3HEWd1DlLzc3ictYwd0fppUsgN7FgacH9omQpLWV+aVLEiRsm1gnM6weJB3
+         kipA==
+X-Gm-Message-State: AOAM5308Z/HkERgBKxKVH629AWcy3cOJxnhTvNM2xB0WHpfo35WNNYtI
+        LJPubjSZbrUQO+ieB9g0W3RW1gJsb/dIf3pYsp4=
+X-Google-Smtp-Source: ABdhPJxyGYmJoVOZIH23YEZwJUzCidk1vYeXma+wYJtEQTnMk0JUvPIryhexIN3fEgswT+W2rbdw2IAPaRjbQPU/rRU=
+X-Received: by 2002:a25:e782:: with SMTP id e124mr616678ybh.6.1630618680980;
+ Thu, 02 Sep 2021 14:38:00 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Reply-To: salifnaba85@gmail.com
+Sender: zjaochim@gmail.com
+Received: by 2002:a05:7010:11c9:b0:11a:1966:c5c0 with HTTP; Thu, 2 Sep 2021
+ 14:38:00 -0700 (PDT)
+From:   "Mr.Salif Naba" <mrsalifnaba5@gmail.com>
+Date:   Thu, 2 Sep 2021 14:38:00 -0700
+X-Google-Sender-Auth: 3OIm9UEX6u7-qCSVFqCFiVmW2GQ
+Message-ID: <CAAyfKfmB2pt0vt45ri8c0wVL2657TEBK7=jsabh09GqnBV2cTw@mail.gmail.com>
+Subject: WITH DUE RESPECT
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Colin Ian King <colin.king@canonical.com>
+Compliment of the day,
 
-The function prototype is missing an identifier name. Add one.
+I am Mr. Salif Naba I Have a Business Proposal of $15.5)million For
+You. I am aware of the unsafe nature of the internet, and was
+compelled to use this medium due to the nature of this project.
 
-Signed-off-by: Colin Ian King <colin.king@canonical.com>
----
- drivers/vfio/pci/vfio_pci_core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I have access to very vital information that can be used to transfer
+this huge amount of money, which may culminate into the investment of
+the said funds into your company or any lucrative venture in your
+country.
 
-diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-index 68198e0f2a63..a03b5a99c2da 100644
---- a/drivers/vfio/pci/vfio_pci_core.c
-+++ b/drivers/vfio/pci/vfio_pci_core.c
-@@ -565,7 +565,7 @@ static bool vfio_pci_dev_below_slot(struct pci_dev *pdev, struct pci_slot *slot)
- }
- 
- struct vfio_pci_walk_info {
--	int (*fn)(struct pci_dev *, void *data);
-+	int (*fn)(struct pci_dev *pdev, void *data);
- 	void *data;
- 	struct pci_dev *pdev;
- 	bool slot;
--- 
-2.32.0
+If you will like to assist me as a partner then indicate your
+interest, after which we shall both discuss the modalities and the
+sharing percentage.
 
+Upon receipt of your reply on your expression of Interest I will give
+you full details,
+on how the business will be executed I am open for negotiation. You
+should forward your reply to this private email id
+(salifnaba85@gmail.com) Thanks for your anticipated cooperation.
+
+Note you might receive this message in your inbox or spam or junk
+folder, depends on your web host or server network.
+
+Thanks=E2=80=99
+Best Regards
+Mr., Salif Naba
