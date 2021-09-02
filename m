@@ -2,54 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BFE7C3FF416
-	for <lists+kvm@lfdr.de>; Thu,  2 Sep 2021 21:23:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7761C3FF44A
+	for <lists+kvm@lfdr.de>; Thu,  2 Sep 2021 21:41:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347370AbhIBTYq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Sep 2021 15:24:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60904 "EHLO
+        id S231211AbhIBTms (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Sep 2021 15:42:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36806 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347245AbhIBTYl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Sep 2021 15:24:41 -0400
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC543C061757
-        for <kvm@vger.kernel.org>; Thu,  2 Sep 2021 12:23:42 -0700 (PDT)
-Received: by mail-pf1-x432.google.com with SMTP id 18so2436289pfh.9
-        for <kvm@vger.kernel.org>; Thu, 02 Sep 2021 12:23:42 -0700 (PDT)
+        with ESMTP id S230462AbhIBTmr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Sep 2021 15:42:47 -0400
+Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BD44C061575
+        for <kvm@vger.kernel.org>; Thu,  2 Sep 2021 12:41:48 -0700 (PDT)
+Received: by mail-lj1-x236.google.com with SMTP id g14so5660700ljk.5
+        for <kvm@vger.kernel.org>; Thu, 02 Sep 2021 12:41:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=bdRaYL9hM7jiSCUixVQ5zx2AOjhox/HWm2JZjrik6sU=;
-        b=P6U3y4+NDgkwLnM7k8tfRmmQNz3FbNimiCjNiDzg2c4/b7cnIMnSgSLYgren5AfpBQ
-         FZjBRxEBn/G+JsgTKmLNhBdQ3PtvRchAl+Cd29xQTm+I7A1i4NZ7Izvqp8JwhPR2pQRZ
-         Pe8En2Gn2SzcvcfwBCnUDGnLJRsYhSfO3EESmVQl+nTrENWKUYTOG/2PuU/7vl0YaJ09
-         V4pmW7LbA0lUJAXT8HrSCOSTkZfuLfCqwmGZE4pVqzcVE1cI6tu3Njp2a0dTpa1LrXfm
-         G2uSzRx/JfYiBUtlBJISj6kjnMu9P3OqSnzIN8uEKwvwm9ZnWSwh+yto/yk3zDWuYh+j
-         SxBA==
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=ADrMhTmPrgZbNnM++pu1uoBNav1T6vaZhzMfabX6fg8=;
+        b=hO5FKzGplclg/n5vIngJvh6FKIQEXfVeBPrT6JowB2p5Ecz0xWFtPqVmDg/wE1QXjt
+         xo+GELyqZ0PZgrgCgSvNKjVyo63+tYKZOotWClNQYtoMAOjByiKzcCSMDiYy8w6Yct05
+         2C4nGmqs8SM0fk5maL5+R4jbU/DLMCY0c4hI1nYTCjOUnlNfbts5uZtQ3nGzDfBiqRwp
+         mkQrSouEqQhavMgpc37b4Z+iBlJWbpRd/oE3b9gbw4T/iK0UWO6W07ErDgbMJA5n5XxW
+         9gADtevCBdTeQImZ6PPBxw2lW2sZ3V4xtJHKHuwh28zQ2jlkXwwqjOezg/4UkLnCOy8Q
+         DyCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=bdRaYL9hM7jiSCUixVQ5zx2AOjhox/HWm2JZjrik6sU=;
-        b=rPAio4OMc5LxrKd1kcdZk/VAOOvmCoofM3owHcJsUHv2H4R1HF+SXdDJwoZx0tvFNV
-         2N5MCav7WySNINWe043N6sMGt+0WouhZUNob+LJkEPyldEH25pmEuuBcG2euLCwFO0GE
-         DcNtfzWyRFdNLpO9di0ANtpjVmKqHr9mWS/bJI1dI4K4VBO0IMpcBv2ROZVoXmaTZd+f
-         zk8Yu30Hmtrt+QZstRz3xHSoJOG+zXcP2zNq0FeDoPGMcv9/gVW2Qfb1fCuFrTBHb/e0
-         20uzsT9gb3RGBPQxeufMRHMLd0ysnkhC6DsTTBcxWxjUE+WSSSnAB1bjm/BPV4d3ABB+
-         qFtA==
-X-Gm-Message-State: AOAM531NQCkDLqSyNw/V/VoXplbweVneLWhVmniYLtBNuJ74vhk7fLS7
-        SnfGRpvZjHN1P9jTZxncsBuwpg==
-X-Google-Smtp-Source: ABdhPJzBzFjoSYZppoJqGPeszZnPa1tw+Regznd0m+yvwVLEvAxR/W5mnHB1AAD6LnodpA7epZnM1g==
-X-Received: by 2002:a63:1a64:: with SMTP id a36mr4666097pgm.225.1630610622242;
-        Thu, 02 Sep 2021 12:23:42 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id s83sm3183628pfc.204.2021.09.02.12.23.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Sep 2021 12:23:41 -0700 (PDT)
-Date:   Thu, 2 Sep 2021 19:23:37 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Oliver Upton <oupton@google.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=ADrMhTmPrgZbNnM++pu1uoBNav1T6vaZhzMfabX6fg8=;
+        b=g0zth7DnbIy1Pr22X8TglKbT6j2EW/M0jTQgTFa6ZbIhNwai4ouelexwUhD4MJn7AF
+         dVsdGCno/GlfhmzjBnnEBnIxvUIbRC7JPQUlorVA5yVO6zXvYDjpjyqUb0eKLg/WrbwZ
+         PJEM7Ptjk+H/QBhgtD3Nr8aCJdMld1EacYmq6KBUNs2kDI+rkSwW6DXsamBdAhSq2Xfb
+         npTAc0nUinSwPImfzmRxw2dvJiXMLhksQNwEd5VIGrxJO+m6vaeC5HYdEK5Y5wnReHkS
+         hasLAk1RhmNJxGg59ADUrgxT0ae5x1IP0CGG/lFLkLb3PFitXCtyUUEYB7CIS1NYvSzg
+         TXgg==
+X-Gm-Message-State: AOAM531DvBouSjgHAQQJmQEX4o4uoKcouW0EHQzXJziHVDMXH99TyE9E
+        iL0NnopidnM+6dRVP/8KKp//dC1cmV7+4G2KZ4a/lg==
+X-Google-Smtp-Source: ABdhPJyPSRz4pY8zwxiiI7e+q4TcAiErfRzU01m5EtpNay3AZ3717xZk6GJsBJZFBVgzI+rrjERJLrroUnk4yHnGBJo=
+X-Received: by 2002:a2e:9615:: with SMTP id v21mr3776932ljh.22.1630611705984;
+ Thu, 02 Sep 2021 12:41:45 -0700 (PDT)
+MIME-Version: 1.0
+References: <20210816001130.3059564-1-oupton@google.com> <20210816001130.3059564-6-oupton@google.com>
+ <YTEkRfTFyoh+HQyT@google.com>
+In-Reply-To: <YTEkRfTFyoh+HQyT@google.com>
+From:   Oliver Upton <oupton@google.com>
+Date:   Thu, 2 Sep 2021 12:41:33 -0700
+Message-ID: <CAOQ_QsjP65fq5+Mc0xP-wejpjugYNxCFOhEecwFhKaDdxDGUJw@mail.gmail.com>
+Subject: Re: [PATCH v7 5/6] KVM: x86: Refactor tsc synchronization code
+To:     Sean Christopherson <seanjc@google.com>
 Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
         Paolo Bonzini <pbonzini@redhat.com>,
         Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
@@ -59,56 +61,93 @@ Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
         Jing Zhang <jingzhangos@google.com>,
         Raghavendra Rao Anata <rananta@google.com>,
         James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Alexandru Elisei <Alexandru.Elisei@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         linux-arm-kernel@lists.infradead.org,
         Andrew Jones <drjones@redhat.com>,
         Will Deacon <will@kernel.org>,
         Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v7 0/6] KVM: x86: Add idempotent controls for migrating
- system counter state
-Message-ID: <YTEkuXQ1cNhPoqP1@google.com>
-References: <20210816001130.3059564-1-oupton@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210816001130.3059564-1-oupton@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 16, 2021, Oliver Upton wrote:
-> Applies cleanly to kvm/queue.
-> 
-> Parent commit: a3e0b8bd99ab ("KVM: MMU: change tracepoints arguments to kvm_page_fault")
+On Thu, Sep 2, 2021 at 12:21 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Mon, Aug 16, 2021, Oliver Upton wrote:
+> > Refactor kvm_synchronize_tsc to make a new function that allows callers
+> > to specify TSC parameters (offset, value, nanoseconds, etc.) explicitly
+> > for the sake of participating in TSC synchronization.
+> >
+> > Signed-off-by: Oliver Upton <oupton@google.com>
+> > ---
+> > +     struct kvm *kvm = vcpu->kvm;
+> > +     bool already_matched;
+> > +
+> > +     lockdep_assert_held(&kvm->arch.tsc_write_lock);
+> > +
+> > +     already_matched =
+> > +            (vcpu->arch.this_tsc_generation == kvm->arch.cur_tsc_generation);
+> > +
+>
+> ...
+>
+> > +     if (!matched) {
+> > +             /*
+> > +              * We split periods of matched TSC writes into generations.
+> > +              * For each generation, we track the original measured
+> > +              * nanosecond time, offset, and write, so if TSCs are in
+> > +              * sync, we can match exact offset, and if not, we can match
+> > +              * exact software computation in compute_guest_tsc()
+> > +              *
+> > +              * These values are tracked in kvm->arch.cur_xxx variables.
+> > +              */
+> > +             kvm->arch.cur_tsc_generation++;
+> > +             kvm->arch.cur_tsc_nsec = ns;
+> > +             kvm->arch.cur_tsc_write = tsc;
+> > +             kvm->arch.cur_tsc_offset = offset;
+> > +
+> > +             spin_lock(&kvm->arch.pvclock_gtod_sync_lock);
+> > +             kvm->arch.nr_vcpus_matched_tsc = 0;
+> > +     } else if (!already_matched) {
+> > +             spin_lock(&kvm->arch.pvclock_gtod_sync_lock);
+> > +             kvm->arch.nr_vcpus_matched_tsc++;
+> > +     }
+> > +
+> > +     kvm_track_tsc_matching(vcpu);
+> > +     spin_unlock(&kvm->arch.pvclock_gtod_sync_lock);
+>
+> This unlock is imbalanced if matched and already_matched are both true.  It's not
+> immediately obvious that that _can't_ happen, and if it truly can't happen then
+> conditionally locking is pointless (because it's not actually conditional).
+>
+> The previous code took the lock unconditionally, I don't see a strong argument
+> to change that, e.g. holding it for a few extra cycles while kvm->arch.cur_tsc_*
+> are updated is unlikely to be noticable.
 
-This needs a rebase, patch 2 and presumably patch 3 conflict with commit
-77fcbe823f00 ("KVM: x86: Prevent 'hv_clock->system_time' from going negative in
-kvm_guest_time_update()").
+We may have gone full circle here :-) You had said it was confusing to
+hold the lock when updating kvm->arch.cur_tsc_* a while back. I do
+still agree with that sentiment, but the conditional locking is odd.
 
-> v6: https://lore.kernel.org/r/20210804085819.846610-1-oupton@google.com
-> 
-> v6 -> v7:
->  - Separated x86, arm64, and selftests into different series
->  - Rebased on top of kvm/queue
-> 
-> Oliver Upton (6):
->   KVM: x86: Fix potential race in KVM_GET_CLOCK
->   KVM: x86: Create helper methods for KVM_{GET,SET}_CLOCK ioctls
->   KVM: x86: Report host tsc and realtime values in KVM_GET_CLOCK
->   KVM: x86: Take the pvclock sync lock behind the tsc_write_lock
->   KVM: x86: Refactor tsc synchronization code
->   KVM: x86: Expose TSC offset controls to userspace
-> 
->  Documentation/virt/kvm/api.rst          |  42 ++-
->  Documentation/virt/kvm/devices/vcpu.rst |  57 ++++
->  Documentation/virt/kvm/locking.rst      |  11 +
->  arch/x86/include/asm/kvm_host.h         |   4 +
->  arch/x86/include/uapi/asm/kvm.h         |   4 +
->  arch/x86/kvm/x86.c                      | 362 +++++++++++++++++-------
->  include/uapi/linux/kvm.h                |   7 +-
->  7 files changed, 378 insertions(+), 109 deletions(-)
-> 
-> -- 
-> 2.33.0.rc1.237.g0d66db33f3-goog
-> 
+> If you really want to delay taking the locking, you could do
+>
+>         if (!matched) {
+>                 kvm->arch.cur_tsc_generation++;
+>                 kvm->arch.cur_tsc_nsec = ns;
+>                 kvm->arch.cur_tsc_write = data;
+>                 kvm->arch.cur_tsc_offset = offset;
+>         }
+>
+>         spin_lock(&kvm->arch.pvclock_gtod_sync_lock);
+>         if (!matched)
+>                 kvm->arch.nr_vcpus_matched_tsc = 0;
+>         else if (!already_matched)
+>                 kvm->arch.nr_vcpus_matched_tsc++;
+>         spin_unlock(&kvm->arch.pvclock_gtod_sync_lock);
+
+This seems the most readable, making it clear what is guarded and what
+is not. I'll probably go this route.
+
+--
+Thanks,
+Oliver
