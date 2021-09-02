@@ -2,265 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A8A303FEBBC
-	for <lists+kvm@lfdr.de>; Thu,  2 Sep 2021 11:58:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 23B9E3FEC02
+	for <lists+kvm@lfdr.de>; Thu,  2 Sep 2021 12:18:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232600AbhIBJ7J (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Sep 2021 05:59:09 -0400
-Received: from foss.arm.com ([217.140.110.172]:46424 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231544AbhIBJ7J (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Sep 2021 05:59:09 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B39441063;
-        Thu,  2 Sep 2021 02:58:10 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6124B3F766;
-        Thu,  2 Sep 2021 02:58:09 -0700 (PDT)
-Subject: Re: [PATCH] vfio/pci: Add support for PCIe extended capabilities
-To:     Vivek Gautam <vivek.gautam@arm.com>, will@kernel.org,
-        julien.thierry.kdev@gmail.com, kvm@vger.kernel.org
-Cc:     andre.przywara@arm.com, lorenzo.pieralisi@arm.com,
-        jean-philippe@linaro.org, eric.auger@redhat.com
-References: <20210810062514.18980-1-vivek.gautam@arm.com>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <af1ae6fe-176b-8016-3815-faa9651b0aba@arm.com>
-Date:   Thu, 2 Sep 2021 10:59:27 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+        id S242667AbhIBKTU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Sep 2021 06:19:20 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:58830 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S243368AbhIBKTJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Sep 2021 06:19:09 -0400
+Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id A1A4B225D4;
+        Thu,  2 Sep 2021 10:18:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1630577889; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=o5wTXqNvuSJEwCeDL192rJBmN+9+D3ngDikxglpjpZ4=;
+        b=WlWETb8uX6gQQE+aJZkft+x4OWzC7Ka2YDRDnhqW9avPQ6g1UABlehUmtDua4fYkAouMgi
+        Yh6mS4ot3MbWgknmvRTYf5IC7xPzm5OKMCb8wK7YHiZs+vJsWt3GYjqnFqqViUTMuxtngS
+        xUxnj1Zur5aW02GMtQvqR6WQVhT5sWo=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1630577889;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=o5wTXqNvuSJEwCeDL192rJBmN+9+D3ngDikxglpjpZ4=;
+        b=u9LCFdZjeyVY6ogWowGjOZf3Ps3MMJioDzIwEtNZGnu4ahoXy52InCdqyFfKJaO9lR0bNZ
+        8KBNjTgbzGwhnkBA==
+Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap1.suse-dmz.suse.de (Postfix) with ESMTPS id A5CB413424;
+        Thu,  2 Sep 2021 10:18:08 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap1.suse-dmz.suse.de with ESMTPSA
+        id XWkQJuCkMGF2ZAAAGKfGzw
+        (envelope-from <jroedel@suse.de>); Thu, 02 Sep 2021 10:18:08 +0000
+Date:   Thu, 2 Sep 2021 12:18:06 +0200
+From:   Joerg Roedel <jroedel@suse.de>
+To:     Andy Lutomirski <luto@kernel.org>
+Cc:     James Bottomley <jejb@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Borislav Petkov <bp@alien8.de>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Andi Kleen <ak@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Varad Gautam <varad.gautam@suse.com>,
+        Dario Faggioli <dfaggioli@suse.com>,
+        the arch/x86 maintainers <x86@kernel.org>,
+        linux-mm@kvack.org, linux-coco@lists.linux.dev,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Sathyanarayanan Kuppuswamy 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>
+Subject: Re: [RFC] KVM: mm: fd-based approach for supporting KVM guest
+ private memory
+Message-ID: <YTCk3hME4QyOPOD4@suse.de>
+References: <20210824005248.200037-1-seanjc@google.com>
+ <307d385a-a263-276f-28eb-4bc8dd287e32@redhat.com>
+ <YSlkzLblHfiiPyVM@google.com>
+ <61ea53ce-2ba7-70cc-950d-ca128bcb29c5@redhat.com>
+ <YS6lIg6kjNPI1EgF@google.com>
+ <f413cc20-66fc-cf1e-47ab-b8f099c89583@redhat.com>
+ <9ec3636a-6434-4c98-9d8d-addc82858c41@www.fastmail.com>
+ <bd22ef54224d15ee89130728c408f70da0516eaa.camel@linux.ibm.com>
+ <85b1dabf-f7be-490a-a856-28227a85ab3a@www.fastmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20210810062514.18980-1-vivek.gautam@arm.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <85b1dabf-f7be-490a-a856-28227a85ab3a@www.fastmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Vivek,
+On Wed, Sep 01, 2021 at 10:08:33AM -0700, Andy Lutomirski wrote:
+> I asked David, and he said the PSP offers a swapping mechanism for
+> SEV-ES.  I haven’t read the details, but they should all be public.
 
-On 8/10/21 7:25 AM, Vivek Gautam wrote:
-> Add support to parse extended configuration space for vfio based
-> assigned PCIe devices and add extended capabilities for the device
-> in the guest. This allows the guest to see and work on extended
-> capabilities, for example to toggle PRI extended cap to enable and
-> disable Shared virtual addressing (SVA) support.
-> PCIe extended capability header that is the first DWORD of all
-> extended caps is shown below -
->
->    31               20  19   16  15                 0
->    ____________________|_______|_____________________
->   |    Next cap off    |  1h   |     Cap ID          |
->   |____________________|_______|_____________________|
->
-> Out of the two upper bytes of extended cap header, the
-> lower nibble is actually cap version - 0x1.
-> 'next cap offset' if present at bits [31:20], should be
-> right shifted by 4 bits to calculate the position of next
-> capability.
-> This change supports parsing and adding ATS, PRI and PASID caps.
->
-> Signed-off-by: Vivek Gautam <vivek.gautam@arm.com>
-> ---
->  include/kvm/pci.h |   6 +++
->  vfio/pci.c        | 104 ++++++++++++++++++++++++++++++++++++++++++----
->  2 files changed, 103 insertions(+), 7 deletions(-)
->
-> diff --git a/include/kvm/pci.h b/include/kvm/pci.h
-> index 0f2d5bb..a365337 100644
-> --- a/include/kvm/pci.h
-> +++ b/include/kvm/pci.h
-> @@ -165,6 +165,12 @@ struct pci_exp_cap {
->  	u32 root_status;
->  };
->  
-> +struct pci_ext_cap_hdr {
-> +	u16	type;
-> +	/* bit 19:16 = 0x1: Cap version */
+Right, the details are here:
 
-I believe bits 19:16 are the cap version if you look at the header as a 32bit
-value (next:type). If you actually want to set those bits, you need to set bits
-3:0 of the next field. I believe the comment should reflect that because it's
-slightly confusing (no field is larger than 16 bits, for example). Or you can move
-the comment at the top of the struct and keep it as it is.
+	https://www.amd.com/system/files/TechDocs/55766_SEV-KM_API_Specification.pdf
 
-> +	u16	next;
-> +};
-> +
->  struct pci_device_header;
->  
->  typedef int (*bar_activate_fn_t)(struct kvm *kvm,
-> diff --git a/vfio/pci.c b/vfio/pci.c
-> index ea33fd6..d045e0d 100644
-> --- a/vfio/pci.c
-> +++ b/vfio/pci.c
-> @@ -665,19 +665,105 @@ static int vfio_pci_add_cap(struct vfio_device *vdev, u8 *virt_hdr,
->  	return 0;
->  }
->  
-> +static ssize_t vfio_pci_ext_cap_size(struct pci_ext_cap_hdr *cap_hdr)
-> +{
-> +	switch (cap_hdr->type) {
-> +	case PCI_EXT_CAP_ID_ATS:
-> +		return PCI_EXT_CAP_ATS_SIZEOF;
-> +	case PCI_EXT_CAP_ID_PRI:
-> +		return PCI_EXT_CAP_PRI_SIZEOF;
-> +	case PCI_EXT_CAP_ID_PASID:
-> +		return PCI_EXT_CAP_PASID_SIZEOF;
-> +	default:
-> +		pr_err("unknown extended PCI capability 0x%x", cap_hdr->type);
-> +		return 0;
-> +	}
-> +}
-> +
-> +static int vfio_pci_add_ext_cap(struct vfio_device *vdev, u8 *virt_hdr,
-> +			    struct pci_ext_cap_hdr *cap, off_t pos)
-> +{
-> +	struct pci_ext_cap_hdr *last;
-> +
-> +	cap->next = 0;
-> +	last = PCI_CAP(virt_hdr, 0x100);
-> +
-> +	while (last->next)
-> +		last = PCI_CAP(virt_hdr, last->next);
-> +
-> +	last->next = pos;
-> +	/*
-> +	 * Out of the two upper bytes of extended cap header, the
-> +	 * nibble [19:16] is actually cap version that should be 0x1,
-> +	 * so shift back the actual 'next' value by 4 bits.
-> +	 */
-> +	last->next = (last->next << 4) | 0x1;
-> +	memcpy(virt_hdr + pos, cap, vfio_pci_ext_cap_size(cap));
-> +
-> +	return 0;
-> +
-> +}
-> +
-> +static int vfio_pci_parse_ext_caps(struct vfio_device *vdev, u8 *virt_hdr)
-> +{
-> +	int ret;
-> +	u16 pos, next;
-> +	struct pci_ext_cap_hdr *ext_cap;
-> +	struct vfio_pci_device *pdev = &vdev->pci;
-> +
-> +	/* Extended cap only for PCIe devices */
+Namely section 6.25 and 6.26 which describe the SWAP_OUT and SWAP_IN
+commands.
 
-Devices are PCI Express if they have the PCI Express Capability (this is also how
-Linux tells them apart). The arch_has_pci_exp() is meant to check that the
-architecture kvmtool has been compiled for can emulate a PCI Express bus (as
-apposed to a legacy PCI bus). For example, when you compile kvmtool for x86, you
-will get a legacy PCI bus.
+Regards,
 
-I'm not saying the check is bad, because it definitely should be done, but if what
-you're trying to do is to check that the device is a PCI Express capable device,
-then you also need to have a look at the PCI Express Capability like Andre suggested.
-
-> +	if (!arch_has_pci_exp())
-> +		return 0;
-> +
-> +	/* Extended caps start from 0x100 offset. */
-> +	pos = 0x100;
-> +
-> +	for (; pos; pos = next) {
-> +		ext_cap = PCI_CAP(&pdev->hdr, pos);
-> +		/*
-> +		 * Out of the two upper bytes of extended cap header, the
-> +		 * lowest nibble is actually cap version.
-> +		 * 'next cap offset' if present at bits [31:20], while
-> +		 * bits [19:16] are set to 1 to indicate cap version.
-> +		 * So to get position of next cap right shift by 4 bits.
-> +		 */
-> +		next = (ext_cap->next >> 4);
-> +
-> +		switch (ext_cap->type) {
-> +		case PCI_EXT_CAP_ID_ATS:
-> +			ret = vfio_pci_add_ext_cap(vdev, virt_hdr, ext_cap, pos);
-> +			if (ret)
-> +				return ret;
-> +			break;
-> +		case PCI_EXT_CAP_ID_PRI:
-> +			ret = vfio_pci_add_ext_cap(vdev, virt_hdr, ext_cap, pos);
-> +			if (ret)
-> +				return ret;
-> +			break;
-> +		case PCI_EXT_CAP_ID_PASID:
-> +			ret = vfio_pci_add_ext_cap(vdev, virt_hdr, ext_cap, pos);
-> +			if (ret)
-> +				return ret;
-> +			break;
-> +		}
-> +	}
-> +
-> +	return 0;
-> +}
-> +
->  static int vfio_pci_parse_caps(struct vfio_device *vdev)
->  {
->  	int ret;
->  	size_t size;
->  	u16 pos, next;
->  	struct pci_cap_hdr *cap;
-> -	u8 virt_hdr[PCI_DEV_CFG_SIZE_LEGACY];
-> +	u8 virt_hdr[PCI_DEV_CFG_SIZE];
->  	struct vfio_pci_device *pdev = &vdev->pci;
->  
->  	if (!(pdev->hdr.status & PCI_STATUS_CAP_LIST))
->  		return 0;
->  
-> -	memset(virt_hdr, 0, PCI_DEV_CFG_SIZE_LEGACY);
-> +	memset(virt_hdr, 0, PCI_DEV_CFG_SIZE);
->  
->  	pos = pdev->hdr.capabilities & ~3;
->  
-> @@ -715,9 +801,13 @@ static int vfio_pci_parse_caps(struct vfio_device *vdev)
->  		}
->  	}
->  
-> +	ret = vfio_pci_parse_ext_caps(vdev, virt_hdr);
-> +	if (ret)
-> +		return ret;
-> +
->  	/* Wipe remaining capabilities */
->  	pos = PCI_STD_HEADER_SIZEOF;
-> -	size = PCI_DEV_CFG_SIZE_LEGACY - PCI_STD_HEADER_SIZEOF;
-> +	size = PCI_DEV_CFG_SIZE - PCI_STD_HEADER_SIZEOF;
->  	memcpy((void *)&pdev->hdr + pos, virt_hdr + pos, size);
->  
->  	return 0;
-> @@ -725,7 +815,7 @@ static int vfio_pci_parse_caps(struct vfio_device *vdev)
->  
->  static int vfio_pci_parse_cfg_space(struct vfio_device *vdev)
->  {
-> -	ssize_t sz = PCI_DEV_CFG_SIZE_LEGACY;
-> +	ssize_t sz = PCI_DEV_CFG_SIZE;
->  	struct vfio_region_info *info;
->  	struct vfio_pci_device *pdev = &vdev->pci;
->  
-> @@ -831,10 +921,10 @@ static int vfio_pci_fixup_cfg_space(struct vfio_device *vdev)
->  	/* Install our fake Configuration Space */
->  	info = &vdev->regions[VFIO_PCI_CONFIG_REGION_INDEX].info;
->  	/*
-> -	 * We don't touch the extended configuration space, let's be cautious
-> -	 * and not overwrite it all with zeros, or bad things might happen.
-> +	 * Update the extended configuration space as well since we
-> +	 * are now populating the extended capabilities.
->  	 */
-> -	hdr_sz = PCI_DEV_CFG_SIZE_LEGACY;
-> +	hdr_sz = PCI_DEV_CFG_SIZE;
-
-In one of the earlier versions of the PCI Express patches I was doing the same
-thing here - overwriting the entire PCI Express configuration space for a device.
-However, that made one of the devices I was using for testing stop working when
-assigned to a VM.
-
-I'll go through my testing notes and test it again, the cause of the failure might
-have been something else entirely which was fixed since then.
-
-Thanks,
-
-Alex
-
->  	if (pwrite(vdev->fd, &pdev->hdr, hdr_sz, info->offset) != hdr_sz) {
->  		vfio_dev_err(vdev, "failed to write %zd bytes to Config Space",
->  			     hdr_sz);
+	Joerg
