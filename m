@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B71133FF119
-	for <lists+kvm@lfdr.de>; Thu,  2 Sep 2021 18:18:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1698A3FF11A
+	for <lists+kvm@lfdr.de>; Thu,  2 Sep 2021 18:18:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346248AbhIBQSu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Sep 2021 12:18:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45274 "EHLO
+        id S1346286AbhIBQSz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Sep 2021 12:18:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45312 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346150AbhIBQSs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Sep 2021 12:18:48 -0400
-Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B982BC061575
-        for <kvm@vger.kernel.org>; Thu,  2 Sep 2021 09:17:49 -0700 (PDT)
-Received: by mail-wr1-x429.google.com with SMTP id v10so3839948wrd.4
-        for <kvm@vger.kernel.org>; Thu, 02 Sep 2021 09:17:49 -0700 (PDT)
+        with ESMTP id S1346150AbhIBQSy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Sep 2021 12:18:54 -0400
+Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAC52C061575
+        for <kvm@vger.kernel.org>; Thu,  2 Sep 2021 09:17:55 -0700 (PDT)
+Received: by mail-wm1-x32c.google.com with SMTP id u15-20020a05600c19cf00b002f6445b8f55so1771318wmq.0
+        for <kvm@vger.kernel.org>; Thu, 02 Sep 2021 09:17:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=wiJyFwIKRQWjRkbu8SvGMr1PDMKMIYamMV7C3BB8oe8=;
-        b=qAtoFIb8zeHmLJ+DXBMGpAdnbrphpEAfuI7XHEPw8NBmRW9/+WQnP+AZelTqnIhAyE
-         XWWklQ0ZgUaW+TjGyBKgrmT5Awe/DhMqWt5iYbHcpZayB/1OpJXxLIVgIBvvvx9tbfbe
-         MhBhX16/hQ/XQpM8/t7IWpZx8Wn0h5lsCbsMip4ljj1E3unFy90cJy4UzhkEFnhbknkU
-         T8DR04fw7m7nWgaHWphfTdeObgKvp0ylXJqEGEN6mGrqmeM1GzS3/abyks0gzOofcGN7
-         UjU06l66Hvh9mNoLvBN0ewV7GlShfdvdFlG07p47BqES4xriMHGxYVH/Zf/4POrSSA9s
-         8XQA==
+        bh=KB6w4zAa3ScKbWvcSeRs6nml5mmvjgABbPo/s2Hl9mE=;
+        b=KudZd4akeMvkEQWUbX6szQOXRBHrwcFxsejJsDwXAwrTkhmJGlULM7aiBntpU6DlLD
+         x1G792oH76CFsyLlbuYcUF0GY8rXRo+VR9Hu/GBgHJyiVzTP3OvIC53DxbyFxm7deDsy
+         jywij08/HNg0mFST30fvOpvMZOkJgu6uZtVjcnTVWcKz4cejoxRKoHPRUUanT/GYimTW
+         BuEEvjzL5rlc0uwntqWn8CT2tidHHSSa+1LvLL/36Uq3AShOfMPK6XKiF4/niGHWKMJq
+         4jkolFQjzFn6TC5LBuIhdKNpLtstdk7EfVBatQiEEjt66rdtDDU/Oqn47gGLe726oHXk
+         a0tw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
          :in-reply-to:references:mime-version:content-transfer-encoding;
-        bh=wiJyFwIKRQWjRkbu8SvGMr1PDMKMIYamMV7C3BB8oe8=;
-        b=ZTp+4MJDXLBBsfR1fLnFRIJJs3yU1aShB14hf6wkK9nlhWuSl964ESzJt9sZZ7ECoL
-         Sj/FO4m1g2ZAGSHpHUrXRTt2p71fgToZiqVOfBU8CIcHq8Oi7flIy4Oztsbfg3/9XtAC
-         wuTDb+HA0oHfg0YzMcOjfU6LkXb9+jYHzOArn5P1JWQlasE6saLRpu/jMMp1zxS0QHqs
-         aRjNlCSMSBaJ8XBFJEBvU4oOVDp4/UcoTh2Rf8XBAh7R2G25ESxbSX+po+YJ7eggq/IA
-         GgKASANJYSFo5FFvN24507UjXFyHE707319k8ZW79tb5w1c1l3FQkBewIKCWvbVp0oTz
-         o8Rg==
-X-Gm-Message-State: AOAM531AhIviI2INVb9g9yGCd7Krq58SLre+os84978+tJgN9UyfqGDx
-        ETYmP3sDFdJYSyytvHzfbzQ=
-X-Google-Smtp-Source: ABdhPJzK4QdOoxXsApVtGRumuSNyT10qkKd9QeSHbbUEQ3zItVBoCovI95FuxXm2STsnpfXGUzb9Vg==
-X-Received: by 2002:a5d:4ed0:: with SMTP id s16mr4776030wrv.71.1630599468354;
-        Thu, 02 Sep 2021 09:17:48 -0700 (PDT)
+        bh=KB6w4zAa3ScKbWvcSeRs6nml5mmvjgABbPo/s2Hl9mE=;
+        b=q30hDdxguXv/CNQ+rgpkh1loHMvULeJ1HbgLn0/IjXjHhLrwR4i23hfbjoSF6PSs4E
+         6Qzc8FWGUll/T0iqEblozn+Smc/UAcCg63JndfuULkW2Vy2orn97lkrIQqCzcdeweUKq
+         9QsS3fQQLtrSsLigq1T1IzuJ0QGwkV4ReG/qhe3ckaoJMwAPwnyXKmLc/pu8sGOxqdMQ
+         KTcr4wRYYFifekJY2hyupU2e3c19pkLvJExWRIRiqfREYadWPDe48NE65GJCmyWsj/ls
+         zujg1dHjo29tq1vpAj91WxmoDeGrZ8iq4HByxsX1uNmeKCb9IvLov6BBtnuAIFiHLBWp
+         LHsA==
+X-Gm-Message-State: AOAM531loVNSm6SuzWqpEHFiWgrzHPLKA9rKrWfVPK/XPLjM9EZkgtK1
+        b+GKe9qNRYDfoE3iSYZ9t6M=
+X-Google-Smtp-Source: ABdhPJx3cFt1jrbYXnlPCjqrJf+8cwfXAXn4EeP6vsDC0dCbWo+FdkLPkzBtWW3nLTZkBTFw2ib2sw==
+X-Received: by 2002:a1c:ed10:: with SMTP id l16mr3994398wmh.8.1630599474350;
+        Thu, 02 Sep 2021 09:17:54 -0700 (PDT)
 Received: from x1w.. (163.red-83-52-55.dynamicip.rima-tde.net. [83.52.55.163])
-        by smtp.gmail.com with ESMTPSA id s15sm2202811wrb.22.2021.09.02.09.17.45
+        by smtp.gmail.com with ESMTPSA id f7sm2089431wmh.20.2021.09.02.09.17.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Sep 2021 09:17:47 -0700 (PDT)
+        Thu, 02 Sep 2021 09:17:53 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= 
         <philippe.mathieu.daude@gmail.com>
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
@@ -92,9 +92,9 @@ Cc:     Bin Meng <bin.meng@windriver.com>,
         Palmer Dabbelt <palmer@dabbelt.com>,
         Stafford Horne <shorne@gmail.com>,
         Reinoud Zandijk <reinoud@netbsd.org>, kvm@vger.kernel.org
-Subject: [PATCH v3 19/30] target/openrisc: Restrict has_work() handler to sysemu and TCG
-Date:   Thu,  2 Sep 2021 18:15:32 +0200
-Message-Id: <20210902161543.417092-20-f4bug@amsat.org>
+Subject: [PATCH v3 20/30] target/ppc: Restrict has_work() handler to sysemu and TCG
+Date:   Thu,  2 Sep 2021 18:15:33 +0200
+Message-Id: <20210902161543.417092-21-f4bug@amsat.org>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20210902161543.417092-1-f4bug@amsat.org>
 References: <20210902161543.417092-1-f4bug@amsat.org>
@@ -109,43 +109,45 @@ Restrict has_work() to TCG sysemu.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- target/openrisc/cpu.c | 4 +++-
+ target/ppc/cpu_init.c | 4 +++-
  1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/target/openrisc/cpu.c b/target/openrisc/cpu.c
-index 27cb04152f9..6544b549f12 100644
---- a/target/openrisc/cpu.c
-+++ b/target/openrisc/cpu.c
-@@ -30,11 +30,13 @@ static void openrisc_cpu_set_pc(CPUState *cs, vaddr value)
-     cpu->env.dflag = 0;
+diff --git a/target/ppc/cpu_init.c b/target/ppc/cpu_init.c
+index 6aad01d1d3a..e2e721c2b81 100644
+--- a/target/ppc/cpu_init.c
++++ b/target/ppc/cpu_init.c
+@@ -8790,6 +8790,7 @@ static void ppc_cpu_set_pc(CPUState *cs, vaddr value)
+     cpu->env.nip = value;
  }
  
 +#if defined(CONFIG_TCG) && !defined(CONFIG_USER_ONLY)
- static bool openrisc_cpu_has_work(CPUState *cs)
+ static bool ppc_cpu_has_work(CPUState *cs)
  {
-     return cs->interrupt_request & (CPU_INTERRUPT_HARD |
-                                     CPU_INTERRUPT_TIMER);
+     PowerPCCPU *cpu = POWERPC_CPU(cs);
+@@ -8797,6 +8798,7 @@ static bool ppc_cpu_has_work(CPUState *cs)
+ 
+     return msr_ee && (cs->interrupt_request & CPU_INTERRUPT_HARD);
  }
 +#endif /* CONFIG_TCG && !CONFIG_USER_ONLY */
  
- static void openrisc_disas_set_info(CPUState *cpu, disassemble_info *info)
+ static void ppc_cpu_reset(DeviceState *dev)
  {
-@@ -189,6 +191,7 @@ static const struct TCGCPUOps openrisc_tcg_ops = {
-     .tlb_fill = openrisc_cpu_tlb_fill,
+@@ -9017,6 +9019,7 @@ static const struct TCGCPUOps ppc_tcg_ops = {
+   .tlb_fill = ppc_cpu_tlb_fill,
  
  #ifndef CONFIG_USER_ONLY
-+    .has_work = openrisc_cpu_has_work,
-     .cpu_exec_interrupt = openrisc_cpu_exec_interrupt,
-     .do_interrupt = openrisc_cpu_do_interrupt,
- #endif /* !CONFIG_USER_ONLY */
-@@ -205,7 +208,6 @@ static void openrisc_cpu_class_init(ObjectClass *oc, void *data)
-     device_class_set_parent_reset(dc, openrisc_cpu_reset, &occ->parent_reset);
++  .has_work = ppc_cpu_has_work,
+   .cpu_exec_interrupt = ppc_cpu_exec_interrupt,
+   .do_interrupt = ppc_cpu_do_interrupt,
+   .cpu_exec_enter = ppc_cpu_exec_enter,
+@@ -9042,7 +9045,6 @@ static void ppc_cpu_class_init(ObjectClass *oc, void *data)
+     device_class_set_parent_reset(dc, ppc_cpu_reset, &pcc->parent_reset);
  
-     cc->class_by_name = openrisc_cpu_class_by_name;
--    cc->has_work = openrisc_cpu_has_work;
-     cc->dump_state = openrisc_cpu_dump_state;
-     cc->set_pc = openrisc_cpu_set_pc;
-     cc->gdb_read_register = openrisc_cpu_gdb_read_register;
+     cc->class_by_name = ppc_cpu_class_by_name;
+-    cc->has_work = ppc_cpu_has_work;
+     cc->dump_state = ppc_cpu_dump_state;
+     cc->set_pc = ppc_cpu_set_pc;
+     cc->gdb_read_register = ppc_cpu_gdb_read_register;
 -- 
 2.31.1
 
