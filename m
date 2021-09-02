@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6E2BE3FF118
+	by mail.lfdr.de (Postfix) with ESMTP id B71133FF119
 	for <lists+kvm@lfdr.de>; Thu,  2 Sep 2021 18:18:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346283AbhIBQSn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Sep 2021 12:18:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45248 "EHLO
+        id S1346248AbhIBQSu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Sep 2021 12:18:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45274 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346248AbhIBQSn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Sep 2021 12:18:43 -0400
-Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59D00C061757
-        for <kvm@vger.kernel.org>; Thu,  2 Sep 2021 09:17:43 -0700 (PDT)
-Received: by mail-wm1-x32b.google.com with SMTP id g135so1662900wme.5
-        for <kvm@vger.kernel.org>; Thu, 02 Sep 2021 09:17:43 -0700 (PDT)
+        with ESMTP id S1346150AbhIBQSs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Sep 2021 12:18:48 -0400
+Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B982BC061575
+        for <kvm@vger.kernel.org>; Thu,  2 Sep 2021 09:17:49 -0700 (PDT)
+Received: by mail-wr1-x429.google.com with SMTP id v10so3839948wrd.4
+        for <kvm@vger.kernel.org>; Thu, 02 Sep 2021 09:17:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=zZDEgfpsGMQvs/Uf9L14U8iNfhU1RYAtDHEnPo7PYYM=;
-        b=GULtcfLvxCYjpD88B1lNFiQq0+Fx5WhxaqykU8SQ2CHcFSQ46Oe+PaWfXkceFQ4mZo
-         9SVUhNZ9o3T9wPipJYMj4yipSNtMQdK9k6FheUrkcj3bklOdIm+96woKK1z756yLjsg/
-         MhcJnDjB6bDPTEVYbHN4OuhakMfbQHLPwIuQo7fhJI4LnxL+hhUixbbozhsjDk51Ju96
-         gEVW+K7GtzvK1ZSbUGOUZzNQwoBSJHeiBUhu/bkunqvaYTW0krBKCnLFihT41xPY7/te
-         UIojuKoYb6sy0krnR6uivIpg05XXUq83++TFLX9QNOJMrVv7jBEaRQx/6ic9TCOEtLyT
-         HNGQ==
+        bh=wiJyFwIKRQWjRkbu8SvGMr1PDMKMIYamMV7C3BB8oe8=;
+        b=qAtoFIb8zeHmLJ+DXBMGpAdnbrphpEAfuI7XHEPw8NBmRW9/+WQnP+AZelTqnIhAyE
+         XWWklQ0ZgUaW+TjGyBKgrmT5Awe/DhMqWt5iYbHcpZayB/1OpJXxLIVgIBvvvx9tbfbe
+         MhBhX16/hQ/XQpM8/t7IWpZx8Wn0h5lsCbsMip4ljj1E3unFy90cJy4UzhkEFnhbknkU
+         T8DR04fw7m7nWgaHWphfTdeObgKvp0ylXJqEGEN6mGrqmeM1GzS3/abyks0gzOofcGN7
+         UjU06l66Hvh9mNoLvBN0ewV7GlShfdvdFlG07p47BqES4xriMHGxYVH/Zf/4POrSSA9s
+         8XQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
          :in-reply-to:references:mime-version:content-transfer-encoding;
-        bh=zZDEgfpsGMQvs/Uf9L14U8iNfhU1RYAtDHEnPo7PYYM=;
-        b=G6KiRlqIj65Eu6fphpt/KWA6WGebKeDeFy6UdOCk/jznzbk4eCTMpkjZs8lm4iEGdH
-         +uunGj1LA7q7aag+sL5Mx8MpHMhwouoXBliVI5+FH36lmce7phP93TNjhDMjl2sQyyUe
-         JA6DQZy9a+uKOA1Dqqbv0JaAFFRz3SQw4TvV+4qLwm/hV0QHiQdtkpseW/UJfX0n/xeT
-         aofVm/lRxy42qG087Mtxp4NGaT1/BIblL9Kzi7YlizriIHe1bSXVdlQJevqtqtykz0Xh
-         Sv7o0xz6pqMg1sMs6drzwX3XdIDyNFDG5qmsKEscxNj1zwgQ7jkGVBRgY2mvjiqUx4Eo
-         5N/w==
-X-Gm-Message-State: AOAM530LgYjIMBwf7MjHOd8Y417s5LSFnVocaSFU6rFTEfiKCKPN2EkQ
-        HnoR4OmLxPEeNhv/XeL6K98=
-X-Google-Smtp-Source: ABdhPJyVfC2B9mnkyBEM+dhp2QSoSDx2mJAJ4q0c4MKaFScZUxxMUDRDRaRsAykGgf3YQuNS/WTfdA==
-X-Received: by 2002:a05:600c:3641:: with SMTP id y1mr3991806wmq.181.1630599461974;
-        Thu, 02 Sep 2021 09:17:41 -0700 (PDT)
+        bh=wiJyFwIKRQWjRkbu8SvGMr1PDMKMIYamMV7C3BB8oe8=;
+        b=ZTp+4MJDXLBBsfR1fLnFRIJJs3yU1aShB14hf6wkK9nlhWuSl964ESzJt9sZZ7ECoL
+         Sj/FO4m1g2ZAGSHpHUrXRTt2p71fgToZiqVOfBU8CIcHq8Oi7flIy4Oztsbfg3/9XtAC
+         wuTDb+HA0oHfg0YzMcOjfU6LkXb9+jYHzOArn5P1JWQlasE6saLRpu/jMMp1zxS0QHqs
+         aRjNlCSMSBaJ8XBFJEBvU4oOVDp4/UcoTh2Rf8XBAh7R2G25ESxbSX+po+YJ7eggq/IA
+         GgKASANJYSFo5FFvN24507UjXFyHE707319k8ZW79tb5w1c1l3FQkBewIKCWvbVp0oTz
+         o8Rg==
+X-Gm-Message-State: AOAM531AhIviI2INVb9g9yGCd7Krq58SLre+os84978+tJgN9UyfqGDx
+        ETYmP3sDFdJYSyytvHzfbzQ=
+X-Google-Smtp-Source: ABdhPJzK4QdOoxXsApVtGRumuSNyT10qkKd9QeSHbbUEQ3zItVBoCovI95FuxXm2STsnpfXGUzb9Vg==
+X-Received: by 2002:a5d:4ed0:: with SMTP id s16mr4776030wrv.71.1630599468354;
+        Thu, 02 Sep 2021 09:17:48 -0700 (PDT)
 Received: from x1w.. (163.red-83-52-55.dynamicip.rima-tde.net. [83.52.55.163])
-        by smtp.gmail.com with ESMTPSA id b10sm2396452wrt.43.2021.09.02.09.17.39
+        by smtp.gmail.com with ESMTPSA id s15sm2202811wrb.22.2021.09.02.09.17.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Sep 2021 09:17:41 -0700 (PDT)
+        Thu, 02 Sep 2021 09:17:47 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= 
         <philippe.mathieu.daude@gmail.com>
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
@@ -92,9 +92,9 @@ Cc:     Bin Meng <bin.meng@windriver.com>,
         Palmer Dabbelt <palmer@dabbelt.com>,
         Stafford Horne <shorne@gmail.com>,
         Reinoud Zandijk <reinoud@netbsd.org>, kvm@vger.kernel.org
-Subject: [PATCH v3 18/30] target/nios2: Restrict has_work() handler to sysemu and TCG
-Date:   Thu,  2 Sep 2021 18:15:31 +0200
-Message-Id: <20210902161543.417092-19-f4bug@amsat.org>
+Subject: [PATCH v3 19/30] target/openrisc: Restrict has_work() handler to sysemu and TCG
+Date:   Thu,  2 Sep 2021 18:15:32 +0200
+Message-Id: <20210902161543.417092-20-f4bug@amsat.org>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20210902161543.417092-1-f4bug@amsat.org>
 References: <20210902161543.417092-1-f4bug@amsat.org>
@@ -109,42 +109,43 @@ Restrict has_work() to TCG sysemu.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- target/nios2/cpu.c | 4 +++-
+ target/openrisc/cpu.c | 4 +++-
  1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/target/nios2/cpu.c b/target/nios2/cpu.c
-index 947bb09bc1e..f1f976bdad7 100644
---- a/target/nios2/cpu.c
-+++ b/target/nios2/cpu.c
-@@ -34,10 +34,12 @@ static void nios2_cpu_set_pc(CPUState *cs, vaddr value)
-     env->regs[R_PC] = value;
+diff --git a/target/openrisc/cpu.c b/target/openrisc/cpu.c
+index 27cb04152f9..6544b549f12 100644
+--- a/target/openrisc/cpu.c
++++ b/target/openrisc/cpu.c
+@@ -30,11 +30,13 @@ static void openrisc_cpu_set_pc(CPUState *cs, vaddr value)
+     cpu->env.dflag = 0;
  }
  
 +#if defined(CONFIG_TCG) && !defined(CONFIG_USER_ONLY)
- static bool nios2_cpu_has_work(CPUState *cs)
+ static bool openrisc_cpu_has_work(CPUState *cs)
  {
-     return cs->interrupt_request & (CPU_INTERRUPT_HARD | CPU_INTERRUPT_NMI);
+     return cs->interrupt_request & (CPU_INTERRUPT_HARD |
+                                     CPU_INTERRUPT_TIMER);
  }
 +#endif /* CONFIG_TCG && !CONFIG_USER_ONLY */
  
- static void nios2_cpu_reset(DeviceState *dev)
+ static void openrisc_disas_set_info(CPUState *cpu, disassemble_info *info)
  {
-@@ -223,6 +225,7 @@ static const struct TCGCPUOps nios2_tcg_ops = {
-     .tlb_fill = nios2_cpu_tlb_fill,
+@@ -189,6 +191,7 @@ static const struct TCGCPUOps openrisc_tcg_ops = {
+     .tlb_fill = openrisc_cpu_tlb_fill,
  
  #ifndef CONFIG_USER_ONLY
-+    .has_work = nios2_cpu_has_work,
-     .cpu_exec_interrupt = nios2_cpu_exec_interrupt,
-     .do_interrupt = nios2_cpu_do_interrupt,
-     .do_unaligned_access = nios2_cpu_do_unaligned_access,
-@@ -241,7 +244,6 @@ static void nios2_cpu_class_init(ObjectClass *oc, void *data)
-     device_class_set_parent_reset(dc, nios2_cpu_reset, &ncc->parent_reset);
++    .has_work = openrisc_cpu_has_work,
+     .cpu_exec_interrupt = openrisc_cpu_exec_interrupt,
+     .do_interrupt = openrisc_cpu_do_interrupt,
+ #endif /* !CONFIG_USER_ONLY */
+@@ -205,7 +208,6 @@ static void openrisc_cpu_class_init(ObjectClass *oc, void *data)
+     device_class_set_parent_reset(dc, openrisc_cpu_reset, &occ->parent_reset);
  
-     cc->class_by_name = nios2_cpu_class_by_name;
--    cc->has_work = nios2_cpu_has_work;
-     cc->dump_state = nios2_cpu_dump_state;
-     cc->set_pc = nios2_cpu_set_pc;
-     cc->disas_set_info = nios2_cpu_disas_set_info;
+     cc->class_by_name = openrisc_cpu_class_by_name;
+-    cc->has_work = openrisc_cpu_has_work;
+     cc->dump_state = openrisc_cpu_dump_state;
+     cc->set_pc = openrisc_cpu_set_pc;
+     cc->gdb_read_register = openrisc_cpu_gdb_read_register;
 -- 
 2.31.1
 
