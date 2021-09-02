@@ -2,31 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7807A3FEC55
-	for <lists+kvm@lfdr.de>; Thu,  2 Sep 2021 12:42:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DA4BC3FEC5D
+	for <lists+kvm@lfdr.de>; Thu,  2 Sep 2021 12:48:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244893AbhIBKnd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Sep 2021 06:43:33 -0400
-Received: from mail-eopbgr150070.outbound.protection.outlook.com ([40.107.15.70]:17170
-        "EHLO EUR01-DB5-obe.outbound.protection.outlook.com"
+        id S233799AbhIBKtj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Sep 2021 06:49:39 -0400
+Received: from mail-eopbgr70051.outbound.protection.outlook.com ([40.107.7.51]:3042
+        "EHLO EUR04-HE1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S243699AbhIBKnb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Sep 2021 06:43:31 -0400
+        id S245693AbhIBKtg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Sep 2021 06:49:36 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com;
  s=selector2-armh-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Yc5VkKQs8ESbums5A49tUvXHnavn4Kawwtjv4xTxi3o=;
- b=QtkeJcZMkwWtkpGBc4ZhNL9Dqt2rDuYb6kKzeP7FaAPrTqpfH5XG8KWe5t8e70o/lvZwO+Qec3mrmT8sRQsgQcl+ole4+Z2ILybvannNrdDSiZf4StCQSPGYnKuhKF/TLHu6Fvgod3BuUcQmNFYGkT7AtTAesktlUpVvYgU1ddA=
-Received: from AM6P191CA0084.EURP191.PROD.OUTLOOK.COM (2603:10a6:209:8a::25)
- by VI1PR08MB2976.eurprd08.prod.outlook.com (2603:10a6:803:41::14) with
+ bh=dnvi/omBv3GrdeGf5pxi7b2TckLdqg0paRJ5hTboWl0=;
+ b=hEG43A/0luDmRmrpSWrcZk2UpEK6qBwvYdGaNLGQcn/a9QtQc59FNTIVQt08Ly5qHLMFQ0ZbsJFmGhW1a6+CsnnUB9jgrj3ftxI11RUEXQb9qTVdsAF+5dLV2Ad7UCxT6P2XkoB9jcl0EJulU/W1NAZb8gi6myK+KCVEicHydms=
+Received: from AM6PR10CA0030.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:209:89::43)
+ by PR3PR08MB5612.eurprd08.prod.outlook.com (2603:10a6:102:8f::23) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4478.19; Thu, 2 Sep
- 2021 10:42:31 +0000
-Received: from AM5EUR03FT059.eop-EUR03.prod.protection.outlook.com
- (2603:10a6:209:8a:cafe::c6) by AM6P191CA0084.outlook.office365.com
- (2603:10a6:209:8a::25) with Microsoft SMTP Server (version=TLS1_2,
+ 2021 10:48:32 +0000
+Received: from AM5EUR03FT028.eop-EUR03.prod.protection.outlook.com
+ (2603:10a6:209:89:cafe::13) by AM6PR10CA0030.outlook.office365.com
+ (2603:10a6:209:89::43) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4478.17 via Frontend
- Transport; Thu, 2 Sep 2021 10:42:31 +0000
+ Transport; Thu, 2 Sep 2021 10:48:32 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 63.35.35.123)
  smtp.mailfrom=arm.com; vger.kernel.org; dkim=pass (signature was verified)
  header.d=armh.onmicrosoft.com;vger.kernel.org; dmarc=pass action=none
@@ -35,116 +35,109 @@ Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
  63.35.35.123 as permitted sender) receiver=protection.outlook.com;
  client-ip=63.35.35.123; helo=64aa7808-outbound-1.mta.getcheckrecipient.com;
 Received: from 64aa7808-outbound-1.mta.getcheckrecipient.com (63.35.35.123) by
- AM5EUR03FT059.mail.protection.outlook.com (10.152.17.193) with Microsoft SMTP
+ AM5EUR03FT028.mail.protection.outlook.com (10.152.16.118) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.4478.19 via Frontend Transport; Thu, 2 Sep 2021 10:42:30 +0000
-Received: ("Tessian outbound 32695b2df2f8:v103"); Thu, 02 Sep 2021 10:42:30 +0000
+ 15.20.4478.19 via Frontend Transport; Thu, 2 Sep 2021 10:48:32 +0000
+Received: ("Tessian outbound 32695b2df2f8:v103"); Thu, 02 Sep 2021 10:48:32 +0000
 X-CheckRecipientChecked: true
-X-CR-MTA-CID: c7adb5c51080a5ee
+X-CR-MTA-CID: 6a100947d794a74d
 X-CR-MTA-TID: 64aa7808
-Received: from 33840c08f7d0.2
-        by 64aa7808-outbound-1.mta.getcheckrecipient.com id 48035084-038B-4273-B36C-9AA636E0C27D.1;
-        Thu, 02 Sep 2021 10:42:19 +0000
-Received: from EUR04-HE1-obe.outbound.protection.outlook.com
-    by 64aa7808-outbound-1.mta.getcheckrecipient.com with ESMTPS id 33840c08f7d0.2
+Received: from da63de19165b.1
+        by 64aa7808-outbound-1.mta.getcheckrecipient.com id 359CA352-83FB-4184-910E-7991D5E70725.1;
+        Thu, 02 Sep 2021 10:48:22 +0000
+Received: from EUR01-VE1-obe.outbound.protection.outlook.com
+    by 64aa7808-outbound-1.mta.getcheckrecipient.com with ESMTPS id da63de19165b.1
     (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384);
-    Thu, 02 Sep 2021 10:42:19 +0000
+    Thu, 02 Sep 2021 10:48:21 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=kolIDakhEX5nXo1NrkNnpRxjDcs9ReiWmoszcMNEFnNkDJ9ASCRT7JJx8K/T3AxVb7Vm2tBqWxiUIGJCbeyYUJrg0t9zsmn0OHkpzm9LSmbGfHYte4oLQHhZp3jb/hqjkcGdu0HGAAyVxVDvfVeSfDw/yhHtqVYNUfvR9xyzh+rZRiw3NtONAmLFU9cntFVkviSKONo1wXfJkLJx/rLtrOWsUphqdEucNtKXB8aO7TpgNse+wYlp3QwAOyxXK3b4+CkdGYVx0xuKhove6hjsRBVrBdT6D+WCh83T9y86+P1f6khQew/JWYPAUsOUG8RGcE0cRz6RpwgZGc8v96Ym6Q==
+ b=BCj0qxFTmzsDreZQPrMkhyWyHH2kcFubRrKh1fANmC4Wp9vXFk0773OrtEZ+4EnFyV2LiKsFhYYsNp8a1GHOJS8E/QkrUq8B5r9WNCqIX83C6lz1aNqWerSUlbYLHSlUyUs/ZkFMsxtO13q50ohFYze6gKfc03lu7Ohl+dmjAt5pNgbtwxSS7k93A8DiiTIor0xjKt9EdebN32dWXjfuctmWE0PQzBIeKzfisycW0oTYWAmxHeBwZZYBrTjzR8vE49SlZ6SONQm5wUtgOZYNo3xre5wCAYhLKsQIaXeJYQcpX/iq44EiGgbSVg4Xa0T9zpK1SWFJAmLgAqtcKgtyig==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Yc5VkKQs8ESbums5A49tUvXHnavn4Kawwtjv4xTxi3o=;
- b=DPpLCuVCmlhYww++Utc1olVRc5TfoCCQkw8LoyYb9MKSzZfC+QLRtaTlZPHNLDyevK7RO3mY1J5YHa9/t9yb65U8ADYJxsBn21lPlgpBOk+42JXBzG6jvlJQS2DVKBPWDRRUE5izdkTimcuK9UxEfCBtKdf9VrCCPfVx3WP1/NeQB2USKXOUhYSRMTIyT3TbPdeZ+dy3mJWXE/CH1ys331gPdDnRmnmD2lkPRKiIoFJRZPskiSYoGUcqMgaof2hU+FpuUjShHBrTBjqcxAiAWZubEgW9sF8wMUGXpkvOWn5PvOR3egVJ884yqivaNR29Y0SDWMnnzO59IhJ+PLZEUQ==
+ s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
+ bh=dnvi/omBv3GrdeGf5pxi7b2TckLdqg0paRJ5hTboWl0=;
+ b=NvbMTALknOEDhS1Pm9n9dZShgVZ2fMmeN5+eqZGqOleOgvOj8dQHq37wQPwcK4ouPZ0fx/9sRq5u0b4UdTm+IyiazTtqu9WpbZJE1JPSePepjR1cNKxrfBDMvh1ZTvQEp7yjhs13GVeubEBB1HYSkgv+EZexPoKUrZ5KcQJneRRwndt5W+jxQ4NV9V14kG7xx+jSl6kuTd8oalr5g2gKzc1NwggyKpQpyvKCwh2lTRvpykYTw5WWZUowBql41y61P4skOV+ggaY3N9/w/ZXMnBhwq8+fT2X4ToiXz6XGj4W666xXWySnpmqBziVNNyrsE1mDl+YEO4uxAIVJsgqf/w==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
  header.d=arm.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com;
  s=selector2-armh-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Yc5VkKQs8ESbums5A49tUvXHnavn4Kawwtjv4xTxi3o=;
- b=QtkeJcZMkwWtkpGBc4ZhNL9Dqt2rDuYb6kKzeP7FaAPrTqpfH5XG8KWe5t8e70o/lvZwO+Qec3mrmT8sRQsgQcl+ole4+Z2ILybvannNrdDSiZf4StCQSPGYnKuhKF/TLHu6Fvgod3BuUcQmNFYGkT7AtTAesktlUpVvYgU1ddA=
+ bh=dnvi/omBv3GrdeGf5pxi7b2TckLdqg0paRJ5hTboWl0=;
+ b=hEG43A/0luDmRmrpSWrcZk2UpEK6qBwvYdGaNLGQcn/a9QtQc59FNTIVQt08Ly5qHLMFQ0ZbsJFmGhW1a6+CsnnUB9jgrj3ftxI11RUEXQb9qTVdsAF+5dLV2Ad7UCxT6P2XkoB9jcl0EJulU/W1NAZb8gi6myK+KCVEicHydms=
 Authentication-Results-Original: redhat.com; dkim=none (message not signed)
  header.d=none;redhat.com; dmarc=none action=none header.from=arm.com;
 Received: from DB6PR08MB2645.eurprd08.prod.outlook.com (2603:10a6:6:24::25) by
- DBBPR08MB6073.eurprd08.prod.outlook.com (2603:10a6:10:1f7::20) with Microsoft
+ DB9PR08MB6713.eurprd08.prod.outlook.com (2603:10a6:10:2aa::7) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.4457.23; Thu, 2 Sep 2021 10:42:17 +0000
+ 15.20.4478.19; Thu, 2 Sep 2021 10:48:16 +0000
 Received: from DB6PR08MB2645.eurprd08.prod.outlook.com
  ([fe80::5c52:c63f:275d:59b6]) by DB6PR08MB2645.eurprd08.prod.outlook.com
  ([fe80::5c52:c63f:275d:59b6%4]) with mapi id 15.20.4478.019; Thu, 2 Sep 2021
- 10:42:17 +0000
+ 10:48:16 +0000
 Subject: Re: [PATCH] vfio/pci: Add support for PCIe extended capabilities
-To:     Andre Przywara <andre.przywara@arm.com>
-Cc:     will@kernel.org, julien.thierry.kdev@gmail.com,
-        kvm@vger.kernel.org, alexandru.elisei@arm.com,
-        lorenzo.pieralisi@arm.com, jean-philippe@linaro.org,
-        eric.auger@redhat.com
+To:     Alexandru Elisei <alexandru.elisei@arm.com>, will@kernel.org,
+        julien.thierry.kdev@gmail.com, kvm@vger.kernel.org
+Cc:     andre.przywara@arm.com, lorenzo.pieralisi@arm.com,
+        jean-philippe@linaro.org, eric.auger@redhat.com
 References: <20210810062514.18980-1-vivek.gautam@arm.com>
- <20210831181458.48d2f35f@slackpad.fritz.box>
+ <af1ae6fe-176b-8016-3815-faa9651b0aba@arm.com>
 From:   Vivek Kumar Gautam <vivek.gautam@arm.com>
-Message-ID: <65ca872d-94e0-89e9-34d4-5ba7bf6168c8@arm.com>
-Date:   Thu, 2 Sep 2021 16:12:11 +0530
+Message-ID: <51cc78f5-6841-5e83-3b28-bef7fbf68937@arm.com>
+Date:   Thu, 2 Sep 2021 16:18:09 +0530
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
-In-Reply-To: <20210831181458.48d2f35f@slackpad.fritz.box>
+In-Reply-To: <af1ae6fe-176b-8016-3815-faa9651b0aba@arm.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-X-ClientProxiedBy: PN3PR01CA0044.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:c01:98::21) To DB6PR08MB2645.eurprd08.prod.outlook.com
+X-ClientProxiedBy: BM1PR0101CA0057.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:b00:19::19) To DB6PR08MB2645.eurprd08.prod.outlook.com
  (2603:10a6:6:24::25)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [10.162.16.71] (217.140.105.56) by PN3PR01CA0044.INDPRD01.PROD.OUTLOOK.COM (2603:1096:c01:98::21) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4478.20 via Frontend Transport; Thu, 2 Sep 2021 10:42:15 +0000
+Received: from [10.162.16.71] (217.140.105.56) by BM1PR0101CA0057.INDPRD01.PROD.OUTLOOK.COM (2603:1096:b00:19::19) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4478.17 via Frontend Transport; Thu, 2 Sep 2021 10:48:14 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 16586e4f-6570-45c7-364b-08d96dfe5d9b
-X-MS-TrafficTypeDiagnostic: DBBPR08MB6073:|VI1PR08MB2976:
+X-MS-Office365-Filtering-Correlation-Id: 2628decf-a5e8-4131-72a1-08d96dff354a
+X-MS-TrafficTypeDiagnostic: DB9PR08MB6713:|PR3PR08MB5612:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <VI1PR08MB297679070D41F7AA305DBF0E89CE9@VI1PR08MB2976.eurprd08.prod.outlook.com>
+X-Microsoft-Antispam-PRVS: <PR3PR08MB5612FB119E959415A7D8186E89CE9@PR3PR08MB5612.eurprd08.prod.outlook.com>
 x-checkrecipientrouted: true
 NoDisclaimer: true
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;OLM:10000;
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;OLM:9508;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam-Untrusted: BCL:0;
-X-Microsoft-Antispam-Message-Info-Original: 9gqThEP/jdHqc/P73ShlKptBv2qUKv7eK5WavF9sJWPCMKeh+433hxvlF/QA14ZbOzb26VKwJ9apUafZLJ3ByVWaSx7nZjQH97CQWaT184gHB3zxHTAvXlJfa6qi7pPrp7J1SbOnHa8Jvg/Mb4L/lGwHRSm7tAMFJJh7lrG/PqvDb9GEGflgb0CVamdjCz8zbyzLGe08/HO2XhUbaIrFtXxKXFo+RdHciy0x8JumHbY8a0SJKAaSK6La6WHngTjaWVuRrMhi3gY9XeCUBEFyRVJRzEJ2dPm0c1sX6uZzSKzBELrJ+YP36QL/AH2vE7IcV8c0WD+I3t/E2AWVJraEsgYtpNue6vDF1EzaJyXXnu3PqEwB/4hlK1j15Ymbbik5SxxyAjM+EF1OGbN+rz8AUdH/pJn6Wfci5Tv2jC1hsW/8njAQ7XXZeueR9acJUm/QgwVu5AJpG/2frKA1zdcIPKeJCHHeXIgQ44Mike5gLaAzoZNfZIqyy7Fes4PujO217lqXqc7sYKBViuJHG3i4vT7mpF7rkCppdjio/zaXM9uGeeD+V1sQ3k1WKjWVcVgqDXOoBroCnr6MSE7LUKom7NgSHJCHKkRCfM2R5wnol2x/9yCHY56EnY3UdHLWM58AQ2KD7+i5W1y51FzAWGm/u8Ui190dXz6PaH1iiQeZ3WnPKQqYbGpjoul6E3cDDBtm4Pqjltn39xPqbbCA+q+AgrAbLj7Bz6hdz34lT/ZqVF+IVtErZI31ZbaCwSYjxneO0ckFesYLYj7GCvwDPJtGEQ==
-X-Forefront-Antispam-Report-Untrusted: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB6PR08MB2645.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(396003)(366004)(376002)(346002)(39860400002)(31686004)(478600001)(38100700002)(5660300002)(31696002)(36756003)(186003)(4326008)(83380400001)(26005)(86362001)(66556008)(8936002)(6666004)(6862004)(52116002)(66476007)(53546011)(316002)(2616005)(38350700002)(66946007)(16576012)(6486002)(956004)(6636002)(2906002)(37006003)(8676002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBBPR08MB6073
+X-Microsoft-Antispam-Message-Info-Original: cxZwg+YCDw5UxPseXcvMvQoIKwf32OwC4eT99aqM4FF9HNCbCFoH8ajLN9Zw5bTI3VTeng8q/RTd4qEKK/KF7kwFopL3Pm4ouRx8lrCTz6A76k+n9fFnp6OuEcaNMO2ohwrIby+7BAH+2z7GZEqrHaVqI6R+6EDyIJ0J2Stno09KnMhwHao9gc2uLqAFxvHLcvFLoF2acoa+cjUHTgdOAUFU4uq2J6hWYAlTwB/UEJl84BMRuiUPtUkoOEFGvK1cpuUnqwVFRiW4NY5FTm0yHHCpvIMihPbZh6WrrTWdsr1ecPWEuQcXNtNuAKzc8uLjGjq9iICadaGlzcUWBrWjJpmOKXQIAI87kFN6qmtK8KjnXI0oA+x+dMLd+Ndu1w63VB6y+92BEYXHllbCREgzaTMALJc5IzCthbI4p7oWpm4sOCacZpXOeEHbj9zqvffIO4dEmeRNoM9zoO6+90kgPVCuF4oCszR+8tl+Kj1hUTqJ9N2+L5HPHE3CkcWAgRFsQVwLiqeSpLe0uXzwYIbRRzBvikYpJWpoFQLguGAErMtafaJfGgLpaCg8KNTKnJ221FbmjzyqaIZNFrLHcWHILhJ8hfH/S19R9hRVPusN6DluWyTGi9zcwKv41ihebeHgKR6577WB1/UDNk93dx0wYGVzhGqErale1CzdNcQWHS4gIafNK5cLFTGRCRNFhnJ0o/VaWsFWQQzVzdxbcxjET+UrWW2bIjjYtKoChlVLQkQ0Rh+7xkc0RtthSGKwxIRyf+rf2XXI99xOuOR1Fz9uug==
+X-Forefront-Antispam-Report-Untrusted: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB6PR08MB2645.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(39860400002)(396003)(376002)(136003)(346002)(66476007)(52116002)(186003)(4326008)(6486002)(2906002)(5660300002)(8676002)(66946007)(2616005)(956004)(31696002)(86362001)(8936002)(478600001)(66556008)(31686004)(83380400001)(316002)(36756003)(53546011)(38350700002)(26005)(38100700002)(6666004)(16576012)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR08MB6713
 Original-Authentication-Results: redhat.com; dkim=none (message not signed)
  header.d=none;redhat.com; dmarc=none action=none header.from=arm.com;
 X-EOPAttributedMessage: 0
-X-MS-Exchange-Transport-CrossTenantHeadersStripped: AM5EUR03FT059.eop-EUR03.prod.protection.outlook.com
-X-MS-Office365-Filtering-Correlation-Id-Prvs: 22c685f8-d2f7-4c2b-b66e-08d96dfe551f
+X-MS-Exchange-Transport-CrossTenantHeadersStripped: AM5EUR03FT028.eop-EUR03.prod.protection.outlook.com
+X-MS-Office365-Filtering-Correlation-Id-Prvs: 3110dd60-b424-43d3-2c87-08d96dff2b68
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: PCy4ofNTJQV0uXWQ4CCPf4sp9y+MxOAQ0TrLUAB23Y0CPk7NJ2U6h+yXesYQiON7PEsDNaRhxvIseP5z6FpDK2iP7HOoaGv9oqNRTiRNMM5pSuCI7hc6OH/mVkw5erDkYmAt3TzVi0IH23Q2cOIYs01RNDQuHVbtETJRFKMD6VGku/LhNkGOI1RGOWwHpOlheChLiL7Fr5ETr6arqQbzf5IxC+tgmsdnJ+khRQk5CF2GpE/mIPnS5+JO9H//Lq9CSwe0cm4fuFOnL4++mOZfmI404cnINg3YO9LW5+O2Hk5AEjPLI6zLEM4mt4lNhQyT1ugXyvwWLIEJhIWb6aVpIt2MDCBsQs2kg4aYvrrGTaqnnisjnfzlJs6vWp8VaATQnrp0J/0k5YCQj7ghLd2p+s5Dio2ZJOHZ8+HgUmEYLi1AylSh8BxOdKEmQ6ZWyv5NEyWsrbFxUtTNKvxez1Bo8g1sTzX9J7ZLAnC4z5TzWcSGufa9wPw569UdW1Q+sX5KH3goVEmBHpsObtqgVMTfJ4eTyydKSgQqAI0KLE2Q975yDgCOkjvHM2oDLVl05tcGrI8c5n77LG+HnF/5wJAH+VV3z8gGy2r84w5yJfRo0MWRSsW42+1VS09yP5i5ugQYaQFraXUnt8PwUPmGA2KdMZqSCcA/C1eiGg57h0RJrrj5NtyscluiMkdMG42O8BHhJufkoNBbbkVtoZiHTb6VaaDE6ZgIOu0oBuat7VMWM+Q=
-X-Forefront-Antispam-Report: CIP:63.35.35.123;CTRY:IE;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:64aa7808-outbound-1.mta.getcheckrecipient.com;PTR:ec2-63-35-35-123.eu-west-1.compute.amazonaws.com;CAT:NONE;SFS:(4636009)(346002)(39860400002)(376002)(396003)(136003)(46966006)(36840700001)(83380400001)(2906002)(53546011)(2616005)(47076005)(36756003)(37006003)(6666004)(107886003)(6486002)(81166007)(26005)(16576012)(186003)(82740400003)(8676002)(478600001)(356005)(336012)(316002)(36860700001)(70206006)(31686004)(70586007)(4326008)(5660300002)(86362001)(6636002)(82310400003)(6862004)(8936002)(31696002)(956004)(43740500002);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: AWWQdWQXwPorC7bZ+zpLUQ66nK7eLUnTkw+FSzrgSN4NDKi0nqZOKcAbahtCCSRN2D6y/9u+OGXc2nnyaBs16uXCenaADgO+hkvIZleThKN2jrGzuguF01vJ0hbxc9elld3kmP1LaL2x6x9Y4uC6Vccac98esjG0CBM5KRY2w1v9swTVNuPg4JDYx+sVzut44qehscAhLgpkXovsZXbQvsy0XvJSFwNfz56c7oRxQMMbrU++ndyrwZoAU8i9YNn2cjOEBLuVw9lxyDEBYhaeanOCuyrLow+9Zd4MPVKT1bdp52/m5tijldL3ikn45eVL3alxqXBQIX9GqA1t+0rL/rOIPQyEKEdtsI2E4eyGQZOejvPVAhHZENf72HZKZZqyppg5hTPs5eWD0bJKtPSxz44autzA4yIq0yJyyZ/QdImgcpIsb9qe/FE8hGbgOVUb+KrSn3cVQ2K1XBgZA6ZnbEXV8LwL30WLrRqUM98XoOzE4m8aQF+I94aIBa5nZ2XvjPuT7QvWMZ3ymLkEhZSPTg8XTCaaNA/F3htm++eGc2SY9eUESO17AjtYmk/CTPclPURXeAB/q+DrCIvIl8C/Xc3+i4jGjblYrvDTD/xwVaHhPwMLdE7A7Vj94Wqsx0BytfPk07pb9Y4wHLYEfAqrLd3Js2AkUr7nTgTweskh7FfYDD38e1OT2F893w9QmpxY0hIr3pSR1oUsKN5unsqoBJTFLSELMbx5TD4TZbSmveM=
+X-Forefront-Antispam-Report: CIP:63.35.35.123;CTRY:IE;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:64aa7808-outbound-1.mta.getcheckrecipient.com;PTR:ec2-63-35-35-123.eu-west-1.compute.amazonaws.com;CAT:NONE;SFS:(4636009)(346002)(39860400002)(376002)(136003)(396003)(46966006)(36840700001)(83380400001)(2906002)(53546011)(2616005)(47076005)(36756003)(6666004)(107886003)(6486002)(81166007)(26005)(16576012)(186003)(82740400003)(8676002)(478600001)(356005)(316002)(336012)(36860700001)(70206006)(70586007)(4326008)(31686004)(5660300002)(86362001)(82310400003)(8936002)(31696002)(956004)(43740500002);DIR:OUT;SFP:1101;
 X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Sep 2021 10:42:30.8370
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Sep 2021 10:48:32.7026
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 16586e4f-6570-45c7-364b-08d96dfe5d9b
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2628decf-a5e8-4131-72a1-08d96dff354a
 X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[63.35.35.123];Helo=[64aa7808-outbound-1.mta.getcheckrecipient.com]
-X-MS-Exchange-CrossTenant-AuthSource: AM5EUR03FT059.eop-EUR03.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: AM5EUR03FT028.eop-EUR03.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR08MB2976
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PR3PR08MB5612
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Andre,
+Hi Alex,
 
 
-On 8/31/21 10:44 PM, Andre Przywara wrote:
-> On Tue, 10 Aug 2021 11:55:14 +0530
-> Vivek Gautam <vivek.gautam@arm.com> wrote:
->
+On 9/2/21 3:29 PM, Alexandru Elisei wrote:
 > Hi Vivek,
-
-Thanks a lot for the review. Please find my comments inline below.
-
 >
+> On 8/10/21 7:25 AM, Vivek Gautam wrote:
 >> Add support to parse extended configuration space for vfio based
 >> assigned PCIe devices and add extended capabilities for the device
 >> in the guest. This allows the guest to see and work on extended
@@ -182,6 +175,21 @@ Thanks a lot for the review. Please find my comments inline below.
 >> +struct pci_ext_cap_hdr {
 >> +    u16     type;
 >> +    /* bit 19:16 =3D 0x1: Cap version */
+>
+> I believe bits 19:16 are the cap version if you look at the header as a 3=
+2bit
+> value (next:type). If you actually want to set those bits, you need to se=
+t bits
+> 3:0 of the next field. I believe the comment should reflect that because =
+it's
+> slightly confusing (no field is larger than 16 bits, for example). Or you=
+ can move
+> the comment at the top of the struct and keep it as it is.
+
+Right, bit [19:16] for u16 would be a wrong interpretation. I will move
+this comment to top of the structure.
+
+>
 >> +    u16     next;
 >> +};
 >> +
@@ -210,18 +218,6 @@ dev, u8 *virt_hdr,
 >> +            pr_err("unknown extended PCI capability 0x%x", cap_hdr->typ=
 e);
 >> +            return 0;
->
-> It looks somewhat weird to report an error, but then silently carry on
-> anyways. Since the return value is signed, you could return something
-> negative and check for that error in the caller.
-> I see that is copied from the "normal" capabilities, but maybe this
-> should be cleaned up there as well? It looks like ending here should be
-> an internal error, when this list is not up-to-date with the switch/case
-> below (which can be solved as well on the way).
-
-Sure, will take care of the error case and fix.
-
->
 >> +    }
 >> +}
 >> +
@@ -237,9 +233,6 @@ Sure, will take care of the error case and fix.
 >> +            last =3D PCI_CAP(virt_hdr, last->next);
 >> +
 >> +    last->next =3D pos;
->
-> This should be folded into the next statement, but ...
->
 >> +    /*
 >> +     * Out of the two upper bytes of extended cap header, the
 >> +     * nibble [19:16] is actually cap version that should be 0x1,
@@ -247,18 +240,6 @@ Sure, will take care of the error case and fix.
 >> +     */
 >> +    last->next =3D (last->next << 4) | 0x1;
 >> +    memcpy(virt_hdr + pos, cap, vfio_pci_ext_cap_size(cap));
->
-> So here you silently ignore the error when we see an unsupported
-> capability. Granted, copying 0 bytes doesn't do anything, but at the
-> same time we already updated the next pointer. So I guess you should
-> query for the size first, and bail out if this is unsupported. Not sure
-> what to do then, but I think we just ignore/filter that capability then?
-
-Right, I got what you are saying here. As any other cap is not supported
-at this point, it wouldn't be right to update the next pointer. I will
-fix this.
-
->
 >> +
 >> +    return 0;
 >> +
@@ -273,33 +254,37 @@ dr)
 >> +    struct vfio_pci_device *pdev =3D &vdev->pci;
 >> +
 >> +    /* Extended cap only for PCIe devices */
+>
+> Devices are PCI Express if they have the PCI Express Capability (this is =
+also how
+> Linux tells them apart). The arch_has_pci_exp() is meant to check that th=
+e
+> architecture kvmtool has been compiled for can emulate a PCI Express bus =
+(as
+> apposed to a legacy PCI bus). For example, when you compile kvmtool for x=
+86, you
+> will get a legacy PCI bus.
+>
+> I'm not saying the check is bad, because it definitely should be done, bu=
+t if what
+> you're trying to do is to check that the device is a PCI Express capable =
+device,
+> then you also need to have a look at the PCI Express Capability like Andr=
+e suggested.
+
+Yes, better to check the 'presence' of PCI express caps after reading
+the extended configuration space rather than relying on a static check.
+I will add as Andre suggested.
+
+>
 >> +    if (!arch_has_pci_exp())
 >> +            return 0;
 >> +
 >> +    /* Extended caps start from 0x100 offset. */
 >> +    pos =3D 0x100;
->
-> Please move that into the for-loop statement.
-
-Sure.
-
->
 >> +
 >> +    for (; pos; pos =3D next) {
 >> +            ext_cap =3D PCI_CAP(&pdev->hdr, pos);
->
-> Don't we need to check if there are extended capabilities at offset
-> 0x100 first?
-> "Absence of any Extended Capabilities is required to be indicated by an
-> Extended Capability header with a Capability ID of 0000h, a Capability
-> Version of 0h, and a Next Capability Offset of 000h."
-
-Sure, will add a check before going into this loop to check whethere
-extended caps are present or not.
-I might have mistaken the 'presence' of extended cap with the
-arch_has_pci_exp() check.
-
->
 >> +            /*
 >> +             * Out of the two upper bytes of extended cap header, the
 >> +             * lowest nibble is actually cap version.
@@ -314,15 +299,6 @@ arch_has_pci_exp() check.
 >> +                    ret =3D vfio_pci_add_ext_cap(vdev, virt_hdr, ext_ca=
 p, pos);
 >> +                    if (ret)
->
-> That function seems to be always returning 0, but this would be fixed
-> anyway, I guess. And then you could save the switch/case (which
-> is somewhat redundant with the one in vfio_pci_ext_cap_size()), and just
-> pass every capability to vfio_pci_add_ext_cap().
-
-Sure, will fix here too.
-
->
 >> +                            return ret;
 >> +                    break;
 >> +            case PCI_EXT_CAP_ID_PRI:
@@ -395,30 +371,39 @@ vice *vdev)
 >> -     * We don't touch the extended configuration space, let's be cautio=
 us
 >> -     * and not overwrite it all with zeros, or bad things might happen.
->
-> It would be good to hear from Alex what those bad things are, and if
-> passing on those extended caps now fixes those.
-
-On this, I will wait for Alex's testing as he mentioned in the thread.
-
-Best regards
-Vivek
-
->
-> Cheers,
-> Andre
->
 >> +     * Update the extended configuration space as well since we
 >> +     * are now populating the extended capabilities.
 >>       */
 >> -    hdr_sz =3D PCI_DEV_CFG_SIZE_LEGACY;
 >> +    hdr_sz =3D PCI_DEV_CFG_SIZE;
+>
+> In one of the earlier versions of the PCI Express patches I was doing the=
+ same
+> thing here - overwriting the entire PCI Express configuration space for a=
+ device.
+> However, that made one of the devices I was using for testing stop workin=
+g when
+> assigned to a VM.
+>
+> I'll go through my testing notes and test it again, the cause of the fail=
+ure might
+> have been something else entirely which was fixed since then.
+
+Sure. Let me know your findings.
+
+Best regards
+Vivek
+
+>
+> Thanks,
+>
+> Alex
+>
 >>      if (pwrite(vdev->fd, &pdev->hdr, hdr_sz, info->offset) !=3D hdr_sz)=
  {
 >>              vfio_dev_err(vdev, "failed to write %zd bytes to Config Spa=
 ce",
 >>                           hdr_sz);
->
 IMPORTANT NOTICE: The contents of this email and any attachments are confid=
 ential and may also be privileged. If you are not the intended recipient, p=
 lease notify the sender immediately and do not disclose the contents to any=
