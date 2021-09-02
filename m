@@ -2,103 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8E51F3FEB33
-	for <lists+kvm@lfdr.de>; Thu,  2 Sep 2021 11:30:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 793243FEB36
+	for <lists+kvm@lfdr.de>; Thu,  2 Sep 2021 11:30:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245426AbhIBJ2d (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Sep 2021 05:28:33 -0400
-Received: from smtp-out1.suse.de ([195.135.220.28]:50358 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245139AbhIBJ2c (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Sep 2021 05:28:32 -0400
-Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id D91A0225DE;
-        Thu,  2 Sep 2021 09:27:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1630574852; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=bjaQEerT4+CdbjFrLgaMt67gvVqUKw1V0kBH85jwObA=;
-        b=Iyn0nfUSi9DyIsyI1gBQuzUE1Uz2REQy193mUGHVbITVS3Qo6JvXCBHz7sBNiwKScDqSAW
-        SfOfvkNmdDZRikzvvW5NAPY3hFooiKddfQQKC+dYW1pMoSN4yFqRisT/DjTYBLiavrx2gN
-        W3SFXMHwTxK2FMS+LtA8ihgfSWIjtVM=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1630574852;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=bjaQEerT4+CdbjFrLgaMt67gvVqUKw1V0kBH85jwObA=;
-        b=prIjHJhKs6+qfeR9s7/JeP4Iw+aXOzwEYrtkuB1R/a2P+97wxWrsQXysD4IvI7RoLDRSFr
-        kwl/mXUICTSwWxBw==
-Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap1.suse-dmz.suse.de (Postfix) with ESMTPS id D9FE813887;
-        Thu,  2 Sep 2021 09:27:31 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap1.suse-dmz.suse.de with ESMTPSA
-        id xHPQMgOZMGEnWAAAGKfGzw
-        (envelope-from <jroedel@suse.de>); Thu, 02 Sep 2021 09:27:31 +0000
-Date:   Thu, 2 Sep 2021 11:27:30 +0200
-From:   Joerg Roedel <jroedel@suse.de>
-To:     Andy Lutomirski <luto@kernel.org>
-Cc:     Yu Zhang <yu.c.zhang@linux.intel.com>,
-        David Hildenbrand <david@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Borislav Petkov <bp@alien8.de>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Andi Kleen <ak@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Varad Gautam <varad.gautam@suse.com>,
-        Dario Faggioli <dfaggioli@suse.com>,
-        the arch/x86 maintainers <x86@kernel.org>,
-        linux-mm@kvack.org, linux-coco@lists.linux.dev,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Sathyanarayanan Kuppuswamy 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        Dave Hansen <dave.hansen@intel.com>
-Subject: Re: [RFC] KVM: mm: fd-based approach for supporting KVM guest
- private memory
-Message-ID: <YTCZAjdci5yx+n6l@suse.de>
-References: <20210824005248.200037-1-seanjc@google.com>
- <307d385a-a263-276f-28eb-4bc8dd287e32@redhat.com>
- <20210827023150.jotwvom7mlsawjh4@linux.intel.com>
- <8f3630ff-bd6d-4d57-8c67-6637ea2c9560@www.fastmail.com>
- <20210901102437.g5wrgezmrjqn3mvy@linux.intel.com>
- <f37a61ba-b7ef-c789-5763-f7f237ae41cc@kernel.org>
+        id S245595AbhIBJ3V (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Sep 2021 05:29:21 -0400
+Received: from mga14.intel.com ([192.55.52.115]:38994 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1343539AbhIBJ3P (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Sep 2021 05:29:15 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10094"; a="218756250"
+X-IronPort-AV: E=Sophos;i="5.84,371,1620716400"; 
+   d="scan'208";a="218756250"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2021 02:28:15 -0700
+X-IronPort-AV: E=Sophos;i="5.84,371,1620716400"; 
+   d="scan'208";a="532961015"
+Received: from cqiang-mobl.ccr.corp.intel.com (HELO [10.238.0.162]) ([10.238.0.162])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2021 02:28:12 -0700
+Subject: Re: [PATCH v2] KVM: VMX: Enable Notify VM exit
+To:     Xiaoyao Li <xiaoyao.li@intel.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Tao Xu <tao3.xu@intel.com>, pbonzini@redhat.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, hpa@zytor.com, x86@kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20210525051204.1480610-1-tao3.xu@intel.com>
+ <YQRkBI9RFf6lbifZ@google.com>
+ <b0c90258-3f68-57a2-664a-e20a6d251e45@intel.com>
+ <YQgTPakbT+kCwMLP@google.com>
+ <080602dc-f998-ec13-ddf9-42902aa477de@intel.com>
+From:   Chenyi Qiang <chenyi.qiang@intel.com>
+Message-ID: <4079f0c9-e34c-c034-853a-b26908a58182@intel.com>
+Date:   Thu, 2 Sep 2021 17:28:10 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Firefox/78.0 Thunderbird/78.13.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f37a61ba-b7ef-c789-5763-f7f237ae41cc@kernel.org>
+In-Reply-To: <080602dc-f998-ec13-ddf9-42902aa477de@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 01, 2021 at 09:07:59AM -0700, Andy Lutomirski wrote:
-> In principle, you could actually initialize a TDX guest with all of its
-> memory shared and all of it mapped in the host IOMMU.
 
-Not sure how this works in TDX, but in SEV code fetches are always
-treated as encrypted. So this approach would not work with SEV, not to
-speak about attestation, which will not work with this approach either
-:)
 
-Regards,
+On 8/3/2021 8:38 AM, Xiaoyao Li wrote:
+> On 8/2/2021 11:46 PM, Sean Christopherson wrote:
+>> On Mon, Aug 02, 2021, Xiaoyao Li wrote:
+>>> On 7/31/2021 4:41 AM, Sean Christopherson wrote:
+>>>> On Tue, May 25, 2021, Tao Xu wrote:
+>>>>>    #endif /* __KVM_X86_VMX_CAPS_H */
+>>>>> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+>>>>> index 4bceb5ca3a89..c0ad01c88dac 100644
+>>>>> --- a/arch/x86/kvm/vmx/vmx.c
+>>>>> +++ b/arch/x86/kvm/vmx/vmx.c
+>>>>> @@ -205,6 +205,10 @@ module_param(ple_window_max, uint, 0444);
+>>>>>    int __read_mostly pt_mode = PT_MODE_SYSTEM;
+>>>>>    module_param(pt_mode, int, S_IRUGO);
+>>>>> +/* Default is 0, less than 0 (for example, -1) disables notify 
+>>>>> window. */
+>>>>> +static int __read_mostly notify_window;
+>>>>
+>>>> I'm not sure I like the idea of trusting ucode to select an 
+>>>> appropriate internal
+>>>> threshold.  Unless the internal threshold is architecturally defined 
+>>>> to be at
+>>>> least N nanoseconds or whatever, I think KVM should provide its own 
+>>>> sane default.
+>>>> E.g. it's not hard to imagine a scenario where a ucode patch gets 
+>>>> rolled out that
+>>>> adjusts the threshold and starts silently degrading guest performance.
+>>>
+>>> You mean when internal threshold gets smaller somehow, and cases
+>>> false-positive that leads unexpected VM exit on normal instruction? 
+>>> In this
+>>> case, we set increase the vmcs.notify_window in KVM.
+>>
+>> Not while VMs are running though.
+>>
+>>> I think there is no better to avoid this case if ucode changes internal
+>>> threshold. Unless KVM's default notify_window is bigger enough.
+>>>
+>>>> Even if the internal threshold isn't architecturally constrained, it 
+>>>> would be very,
+>>>> very helpful if Intel could publish the per-uarch/stepping 
+>>>> thresholds, e.g. to give
+>>>> us a ballpark idea of how agressive KVM can be before it risks false 
+>>>> positives.
+>>>
+>>> Even Intel publishes the internal threshold, we still need to provide a
+>>> final best_value (internal + vmcs.notify_window). Then what's that 
+>>> value?
+>>
+>> The ideal value would be high enough to guarantee there are zero false 
+>> positives,
+>> yet low enough to prevent a malicious guest from causing instability 
+>> in the host
+>> by blocking events for an extended duration.  The problem is that 
+>> there's no
+>> magic answer for the threshold at which a blocked event would lead to 
+>> system
+>> instability, and without at least a general idea of the internal value 
+>> there's no
+>> answer at all.
+>>
+>> IIRC, SGX instructions have a hard upper bound of 25k cycles before 
+>> they have to
+>> check for pending interrupts, e.g. it's why EINIT is interruptible.  
+>> The 25k cycle
+>> limit is likely a good starting point for the combined minimum.  
+>> That's why I want
+>> to know the internal minimum; if the internal minimum is _guaranteed_ 
+>> to be >25k,
+>> then KVM can be more aggressive with its default value.
+> 
+> OK. I will go internally to see if we can publish the internal threshold.
+> 
 
-	Joerg
+Hi Sean,
+
+After syncing internally, we know that the internal threshold is not 
+architectural but a model-specific value. It will be published in some 
+place in future.
+
+On Sapphire Rapids platform, the threshold is 128k. With this in mind, 
+is it appropriate to set 0 as the default value of notify_window?
+
+>>> If we have an option for final best_value, then I think it's OK to 
+>>> just let
+>>> vmcs.notify_window = best_value. Then the true final value is 
+>>> best_value +
+>>> internal.
+>>>   - if it's a normal instruction, it should finish within best_value or
+>>> best_value + internal. So it makes no difference.
+>>>   - if it's an instruction in malicious case, it won't go to next 
+>>> instruction
+>>> whether wait for best_value or best_value + internal.
+>>
+>> ...
+>>
+>>>>> +
+>>>>>        vmcs_write32(PAGE_FAULT_ERROR_CODE_MASK, 0);
+>>>>>        vmcs_write32(PAGE_FAULT_ERROR_CODE_MATCH, 0);
+>>>>>        vmcs_write32(CR3_TARGET_COUNT, 0);           /* 22.2.1 */
+>>>>> @@ -5642,6 +5653,31 @@ static int handle_bus_lock_vmexit(struct 
+>>>>> kvm_vcpu *vcpu)
+>>>>>        return 0;
+>>>>>    }
+>>>>> +static int handle_notify(struct kvm_vcpu *vcpu)
+>>>>> +{
+>>>>> +    unsigned long exit_qual = vmx_get_exit_qual(vcpu);
+>>>>> +
+>>>>> +    if (!(exit_qual & NOTIFY_VM_CONTEXT_INVALID)) {
+>>>>
+>>>> What does CONTEXT_INVALID mean?  The ISE doesn't provide any 
+>>>> information whatsoever.
+>>>
+>>> It means whether the VM context is corrupted and not valid in the VMCS.
+>>
+>> Well that's a bit terrifying.  Under what conditions can the VM 
+>> context become
+>> corrupted?  E.g. if the context can be corrupted by an inopportune 
+>> NOTIFY exit,
+>> then KVM needs to be ultra conservative as a false positive could be 
+>> fatal to a
+>> guest.
+>>
+> 
+> Short answer is no case will set the VM_CONTEXT_INVALID bit.
+> 
+> VM_CONTEXT_INVALID is so fatal and IMHO it won't be set for any 
+> inopportune NOTIFY exit.
