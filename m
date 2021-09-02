@@ -2,262 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 685693FF351
-	for <lists+kvm@lfdr.de>; Thu,  2 Sep 2021 20:39:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C72D93FF358
+	for <lists+kvm@lfdr.de>; Thu,  2 Sep 2021 20:41:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347041AbhIBSki (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Sep 2021 14:40:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50374 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230434AbhIBSkh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Sep 2021 14:40:37 -0400
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84A88C061757
-        for <kvm@vger.kernel.org>; Thu,  2 Sep 2021 11:39:38 -0700 (PDT)
-Received: by mail-pf1-x42e.google.com with SMTP id r13so2345763pff.7
-        for <kvm@vger.kernel.org>; Thu, 02 Sep 2021 11:39:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=9mAuR07OfJtECJWZylMyQMHOfdpdyw9F5Bfyp/4I0Fs=;
-        b=h51hmAcrxCY+OGzq8Gpj6/9Yl65jFqtCezp7R/OkM30OeH8UEYe/BQVn6LRCg9lP6z
-         CgqINfkgupRKGWlA9a79I+FCECGxz+NSn8xcDjILXnntFUgLXDBNAi8rz/SK5LLgIT6k
-         6DHjGNI/IcKN13c1IMTRLqdTvol5yjDsVSyxJXbOYbTJKauL+r7pf48kaZnZQcBPvfl9
-         2l6+7LZmbDlHMROXLBPJgykKLAMUnJGC+xkqHhTTkHo39LN9XUFsxxd7bheXOTyzulME
-         lOFMjSy6J6CBU1l5icvYXzyonlfveSl9xoTg81HPE6AfgDlJp/7O9fFcb/vHVo9/leHt
-         DnKQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=9mAuR07OfJtECJWZylMyQMHOfdpdyw9F5Bfyp/4I0Fs=;
-        b=ikCRuiprPGcaBUAPQMH5axRqk8mJB/GbckYL26urBqP+IOm1wxJPGrJLGF6W2/kRNg
-         8jOdombQbK4ZEtiqItqrFwR4W7yARRmMhwJCojIuMPrmbY3iKtUriXeErXkrxuU5d4T5
-         5KpV094mxFAXI2b22ShoJ+CyaLvUkAnvN5pNHNiogL3gLEjgtPrlbFaWW0qsqJYaPgbe
-         SSY0D+PUXjT+F0+2GzMkj9xtdkgYLgQBenP8nX8lzMlwmq/jcQRW2EXYTAL7CT3q3faB
-         XV0+87d2TdNfQ42C29NbcZgDCCVB8l3Fh05aGQ7qUAOt1S5Lg8DwHcA5NJu3lMCrCBVs
-         Mylw==
-X-Gm-Message-State: AOAM532w9yWGgOOD7BlOW8wHe6se+ISNxoA/Isy/IbSBip23dh+yacbP
-        ey9qJHkbwuaFmXPokmP7bmsuaQ==
-X-Google-Smtp-Source: ABdhPJxIZp0aOCRkqfN3ew+CA1Ki3cu/Zx38LyC3RZHYa4MM78qK+lyZz0Dsir5Z+8WivY0brF/uGA==
-X-Received: by 2002:a63:4622:: with SMTP id t34mr4614406pga.293.1630607977806;
-        Thu, 02 Sep 2021 11:39:37 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id l12sm3376784pgc.41.2021.09.02.11.39.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Sep 2021 11:39:37 -0700 (PDT)
-Date:   Thu, 2 Sep 2021 18:39:33 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     David Edmondson <david.edmondson@oracle.com>
-Cc:     linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>,
-        Borislav Petkov <bp@alien8.de>,
+        id S1347063AbhIBSmI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Sep 2021 14:42:08 -0400
+Received: from mail.kernel.org ([198.145.29.99]:32934 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1347055AbhIBSmH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Sep 2021 14:42:07 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 18B7561054;
+        Thu,  2 Sep 2021 18:41:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1630608069;
+        bh=Rz27QrMv3CmEHDYgF/fVueCgLU4vpnJjqWFkkAFYWTo=;
+        h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
+        b=aAeGYLAqgzAU48atK8jAIAITEdS1UEjxwuAflbmidzx0ALrOBEwzA2ev56kjz/umQ
+         uZqY+/B5VCOzIeDcO0/SMFwQ2ZrHxn0rHI7R+SiZcZc+bvPu5hA33bnpI2x354TeNw
+         gNoh7kx6MyBDHccHT4gwSqhwqTFQKPoupyUd4BPiSU+6E21EV8dOBm+ed43cUnVrOu
+         wMjhh8vcM98olY5RkwTuRnZhw++6zXDWQZU27zpjTszKctI2/N4PZwaexQ7hFguDoG
+         DQdBdHB5zbJpPmFiCHNChobr1WkwQDIpG7aQ/V2CfxmMvI4oOhOhTHQsER188NlSvP
+         Wju2ZUSj2VOXA==
+Subject: Re: [RFC] KVM: mm: fd-based approach for supporting KVM guest private
+ memory
+To:     Yu Zhang <yu.c.zhang@linux.intel.com>
+Cc:     David Hildenbrand <david@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <joro@8bytes.org>,
-        David Matlack <dmatlack@google.com>, x86@kernel.org,
-        kvm@vger.kernel.org, Joao Martins <joao.m.martins@oracle.com>
-Subject: Re: [PATCH v4 3/4] KVM: x86: On emulation failure, convey the exit
- reason, etc. to userspace
-Message-ID: <YTEaZVjZwhOD0gMi@google.com>
-References: <20210813071211.1635310-1-david.edmondson@oracle.com>
- <20210813071211.1635310-4-david.edmondson@oracle.com>
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Borislav Petkov <bp@alien8.de>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Joerg Roedel <jroedel@suse.de>,
+        Andi Kleen <ak@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Varad Gautam <varad.gautam@suse.com>,
+        Dario Faggioli <dfaggioli@suse.com>,
+        the arch/x86 maintainers <x86@kernel.org>,
+        linux-mm@kvack.org, linux-coco@lists.linux.dev,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Sathyanarayanan Kuppuswamy 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        Dave Hansen <dave.hansen@intel.com>
+References: <20210824005248.200037-1-seanjc@google.com>
+ <307d385a-a263-276f-28eb-4bc8dd287e32@redhat.com>
+ <20210827023150.jotwvom7mlsawjh4@linux.intel.com>
+ <8f3630ff-bd6d-4d57-8c67-6637ea2c9560@www.fastmail.com>
+ <20210901102437.g5wrgezmrjqn3mvy@linux.intel.com>
+ <f37a61ba-b7ef-c789-5763-f7f237ae41cc@kernel.org>
+ <20210902081923.lertnjsgnskegkmn@linux.intel.com>
+From:   Andy Lutomirski <luto@kernel.org>
+Message-ID: <d4f90b99-85de-9007-85d0-46d41892c283@kernel.org>
+Date:   Thu, 2 Sep 2021 11:41:07 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210813071211.1635310-4-david.edmondson@oracle.com>
+In-Reply-To: <20210902081923.lertnjsgnskegkmn@linux.intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 13, 2021, David Edmondson wrote:
-> -static void prepare_emulation_failure_exit(struct kvm_vcpu *vcpu)
-> +static void prepare_emulation_failure_exit(struct kvm_vcpu *vcpu, u64 *data,
-> +					   u8 ndata, u8 *insn_bytes, u8 insn_size)
->  {
-> -	struct x86_emulate_ctxt *ctxt = vcpu->arch.emulate_ctxt;
-> -	u32 insn_size = ctxt->fetch.end - ctxt->fetch.data;
->  	struct kvm_run *run = vcpu->run;
-> +	u8 ndata_start;
-> +	u64 info[5];
-> +
-> +	/*
-> +	 * Zero the whole array used to retrieve the exit info, casting to u32
-> +	 * for select entries will leave some chunks uninitialized.
-> +	 */
-> +	memset(&info, 0, sizeof(info));
-> +
-> +	static_call(kvm_x86_get_exit_info)(vcpu, (u32 *)&info[0], &info[1],
-> +					   &info[2], (u32 *)&info[3],
-> +					   (u32 *)&info[4]);
->  
->  	run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
->  	run->emulation_failure.suberror = KVM_INTERNAL_ERROR_EMULATION;
-> -	run->emulation_failure.ndata = 0;
-> +
-> +	/*
-> +	 * There's currently space for 13 entries, but 5 are used for the exit
-> +	 * reason and info.  Restrict to 4 to reduce the maintenance burden
-> +	 * when expanding kvm_run.emulation_failure in the future.
-> +	 */
-> +	if (WARN_ON_ONCE(ndata > 4))
-> +		ndata = 4;
-> +
-> +	/* Always include the flags as a 'data' entry. */
-> +	ndata_start = 1;
->  	run->emulation_failure.flags = 0;
->  
->  	if (insn_size) {
-> -		run->emulation_failure.ndata = 3;
-> +		ndata_start += (sizeof(run->emulation_failure.insn_size) +
-> +				sizeof(run->emulation_failure.insn_bytes)) /
-> +			sizeof(u64);
-
-Hrm, I like the intent, but the end result ends up being rather convoluted and
-unnecessarily scary, e.g. this would do the wrong thing if the combined size of
-the fields is not a multiple of 8.  That's obviously is not true, but relying on
-insn_size/insn_bytes being carefully selected while simultaneously obscuring that
-dependency is a bit mean.  What about a compile-time assertion with a more reader
-friendly literal for bumping the count?
-
-		BUILD_BUG_ON((sizeof(run->emulation_failure.insn_size) +
-			      sizeof(run->emulation_failure.insn_bytes) != 16));
-		ndata_start += 2;
-
->  		run->emulation_failure.flags |=
->  			KVM_INTERNAL_ERROR_EMULATION_FLAG_INSTRUCTION_BYTES;
->  		run->emulation_failure.insn_size = insn_size;
->  		memset(run->emulation_failure.insn_bytes, 0x90,
->  		       sizeof(run->emulation_failure.insn_bytes));
-> -		memcpy(run->emulation_failure.insn_bytes,
-> -		       ctxt->fetch.data, insn_size);
-> +		memcpy(run->emulation_failure.insn_bytes, insn_bytes, insn_size);
->  	}
-> +
-> +	memcpy(&run->internal.data[ndata_start], info, sizeof(info));
-
-Oof, coming back to this code after some time away, "ndata_start" is confusing.
-I believe past me thought that it would help convey that "info" is lumped into
-the arbitrary data, but for me at least it just ends up making the interaction
-with @data and @ndata more confusing.  Sorry for the bad suggestion :-/
-
-What about info_start?  IMO, that makes the memcpy more readable.  Another option
-would be to have the name describe the number of "ABI enries", but I can't come
-up with a variable name that's remotely readable.
-
-	memcpy(&run->internal.data[info_start], info, sizeof(info));
-	memcpy(&run->internal.data[info_start + ARRAY_SIZE(info)], data,
-	       ndata * sizeof(data[0]));
-
-
-> +	memcpy(&run->internal.data[ndata_start + ARRAY_SIZE(info)], data,
-> +	       ndata * sizeof(u64));
-
-Not that it really matters, but it's probably better to use sizeof(data[0]) or
-sizeof(*data).  E.g. if we do screw up the param in the future, we only botch the
-output formatting, as opposed to dumping kernel stack data to userspace.
-
-> +
-> +	run->emulation_failure.ndata = ndata_start + ARRAY_SIZE(info) + ndata;
->  }
->  
-> +static void prepare_emulation_ctxt_failure_exit(struct kvm_vcpu *vcpu)
-> +{
-> +	struct x86_emulate_ctxt *ctxt = vcpu->arch.emulate_ctxt;
-> +
-> +	prepare_emulation_failure_exit(vcpu, NULL, 0, ctxt->fetch.data,
-> +				       ctxt->fetch.end - ctxt->fetch.data);
-> +}
-> +
-> +void __kvm_prepare_emulation_failure_exit(struct kvm_vcpu *vcpu, u64 *data,
-> +					  u8 ndata)
-> +{
-> +	prepare_emulation_failure_exit(vcpu, data, ndata, NULL, 0);
-> +}
-> +EXPORT_SYMBOL_GPL(__kvm_prepare_emulation_failure_exit);
-> +
-> +void kvm_prepare_emulation_failure_exit(struct kvm_vcpu *vcpu)
-> +{
-> +	__kvm_prepare_emulation_failure_exit(vcpu, NULL, 0);
-> +}
-> +EXPORT_SYMBOL_GPL(kvm_prepare_emulation_failure_exit);
-> +
->  static int handle_emulation_failure(struct kvm_vcpu *vcpu, int emulation_type)
->  {
->  	struct kvm *kvm = vcpu->kvm;
-> @@ -7502,16 +7551,14 @@ static int handle_emulation_failure(struct kvm_vcpu *vcpu, int emulation_type)
->  
->  	if (kvm->arch.exit_on_emulation_error ||
->  	    (emulation_type & EMULTYPE_SKIP)) {
-> -		prepare_emulation_failure_exit(vcpu);
-> +		prepare_emulation_ctxt_failure_exit(vcpu);
->  		return 0;
->  	}
->  
->  	kvm_queue_exception(vcpu, UD_VECTOR);
->  
->  	if (!is_guest_mode(vcpu) && static_call(kvm_x86_get_cpl)(vcpu) == 0) {
-> -		vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
-> -		vcpu->run->internal.suberror = KVM_INTERNAL_ERROR_EMULATION;
-> -		vcpu->run->internal.ndata = 0;
-> +		prepare_emulation_ctxt_failure_exit(vcpu);
->  		return 0;
->  	}
->  
-> @@ -12104,9 +12151,7 @@ int kvm_handle_memory_failure(struct kvm_vcpu *vcpu, int r,
->  	 * doesn't seem to be a real use-case behind such requests, just return
->  	 * KVM_EXIT_INTERNAL_ERROR for now.
->  	 */
-> -	vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
-> -	vcpu->run->internal.suberror = KVM_INTERNAL_ERROR_EMULATION;
-> -	vcpu->run->internal.ndata = 0;
-> +	kvm_prepare_emulation_failure_exit(vcpu);
->  
->  	return 0;
->  }
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 6c79c1ce3703..e86cc2de7b5c 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -397,6 +397,12 @@ struct kvm_run {
->  		 * "ndata" is correct, that new fields are enumerated in "flags",
->  		 * and that each flag enumerates fields that are 64-bit aligned
->  		 * and sized (so that ndata+internal.data[] is valid/accurate).
-> +		 *
-> +		 * Space beyond the defined fields may be used to
-
-Please run these out to 80 chars.  Even 80 is a soft limit, it's ok to run over
-a bit if the end result is (subjectively) prettier. 
-
-> +		 * store arbitrary debug information relating to the
-> +		 * emulation failure. It is accounted for in "ndata"
-> +		 * but otherwise unspecified and is not represented in
-
-Explicitly state the format is unspecified?
-
-> +		 * "flags".
-
-And also explicitly stating the debug info isn't ABI, e.g.
-
-		 * Space beyond the defined fields may be used to store arbitrary
-		 * debug information relating to the emulation failure. It is
-		 * accounted for in "ndata" but the format is unspecified and
-		 * is not represented in "flags".  Any such info is _not_ ABI!
-
->  		 */
->  		struct {
->  			__u32 suberror;
-> @@ -408,6 +414,7 @@ struct kvm_run {
->  					__u8  insn_bytes[15];
->  				};
->  			};
-> +			/* Arbitrary debug data may follow. */
->  		} emulation_failure;
->  		/* KVM_EXIT_OSI */
->  		struct {
-> -- 
-> 2.30.2
+>>
+>> In principle, you could actually initialize a TDX guest with all of its
+>> memory shared and all of it mapped in the host IOMMU.  When a guest
+>> turns some pages private, user code could punch a hole in the memslot,
+>> allocate private memory at that address, but leave the shared backing
+>> store in place and still mapped in the host IOMMU.  The result would be
+>> that guest-initiated DMA to the previously shared address would actually
+>> work but would hit pages that are invisible to the guest.  And a whole
+>> bunch of memory would be waste, but the whole system should stll work.
 > 
+> Do you mean to let VFIO & IOMMU to treat all guest memory as shared first,
+> and then just allocate the private pages in another backing store? I guess
+> that could work, but with the cost of allocating roughly 2x physical pages
+> of the guest RAM size. After all, the shared pages shall be only a small
+> part of guest memory.
+
+Yes.
+
+My point is that I don't think there should be any particular danger in
+leaving the VFIO code alone as part of TDX enablement.  The code ought
+to *work* even if it will be wildly inefficient.  If someone cares to
+make it work better, they're welcome to do so.
+
+--Andy
