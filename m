@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D024D3FEE92
-	for <lists+kvm@lfdr.de>; Thu,  2 Sep 2021 15:21:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4F79A3FEEE5
+	for <lists+kvm@lfdr.de>; Thu,  2 Sep 2021 15:44:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344999AbhIBNWV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Sep 2021 09:22:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:58937 "EHLO
+        id S1345226AbhIBNpP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Sep 2021 09:45:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:55242 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234516AbhIBNWR (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 2 Sep 2021 09:22:17 -0400
+        by vger.kernel.org with ESMTP id S1345156AbhIBNpJ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 2 Sep 2021 09:45:09 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630588878;
+        s=mimecast20190719; t=1630590248;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=6tJf5xIvKDCnRwuvzEhUuuc4fd9eQkxx1PjNi93Vu3s=;
-        b=SnzWriVvL1J/4ZPJ06qeAlQl33FEpWh9jdCEPiw9zTq8pOJ7Y6W2+DQZAr/Uw+0tVj6GPH
-        m+Ll5hv+zguwNMRcQ7NjAK+z6iDs9LuIks9uLmWlcbN366y8VKl5zTZBgR9AgzcUnfGTcf
-        7k62Rd/2GOiRK8t40gG/ZtjYAWL30UM=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-600-soczMSrUOQWqWP0ZAt3L-g-1; Thu, 02 Sep 2021 09:21:17 -0400
-X-MC-Unique: soczMSrUOQWqWP0ZAt3L-g-1
-Received: by mail-qt1-f200.google.com with SMTP id e8-20020a05622a110800b0029ecbdc1b2aso1239677qty.12
-        for <kvm@vger.kernel.org>; Thu, 02 Sep 2021 06:21:17 -0700 (PDT)
+        bh=PRM8lYGUmpsg4gH1Jz3PJxIAnZtJDS7+em5ACTDkhkU=;
+        b=QjPcRUqmyKU0TRfpc1WtY2E0oI9voSL5YQt8sUQXITY+gHNOOCIU625KW5WVTTCfLpqumv
+        5hE+ybfs+t3MLTbiuRRz1zoTOnHTrSV1kQZ7NtB1XBUsj7ey2KO9DATE3xWEgrKhQWNs0a
+        6TVvW8q5M9e0w7s3yItaMekQVezFAiY=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-4-obSgRkcIN46_TwDHPixLBA-1; Thu, 02 Sep 2021 09:44:07 -0400
+X-MC-Unique: obSgRkcIN46_TwDHPixLBA-1
+Received: by mail-qk1-f198.google.com with SMTP id h186-20020a3785c3000000b00425f37f792aso1627300qkd.22
+        for <kvm@vger.kernel.org>; Thu, 02 Sep 2021 06:44:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=6tJf5xIvKDCnRwuvzEhUuuc4fd9eQkxx1PjNi93Vu3s=;
-        b=FBOSj/Eipenwujq2aK2OesNm+p3Up+4hCsD+iHpLmFtBppLIBmhzSQHhlEf/VDw699
-         HgXlcr/wFr2GXHLWmsGIDsNzXmBOk7b3WXIHq8MSh5ku8xVfnefuFjOdbx+5RLXdcD2/
-         WPJUCgApR3bDS0VQcTi3Jzcvs2aM9u/yX2bTXSy6d2rHOQJdKNVYjvLxnq1Rn1O3LusC
-         dXrDgh4hEGL4FXnnbtDf08IkmGc2EAvjorXCGhjseV5ppk/QlLMXPFEVDNJbeferrtA/
-         36SVBb9btUWtolVpxyfcFlHBNGla4ZLqT2UJHoUdpxBTl0zIQPQXLJqBeeXPIGvBrtPU
-         xjgA==
-X-Gm-Message-State: AOAM5337HAB0UDUX4FsvVj7rCU09FI7ZNyngkzFl7vnfzLNviKL64Ov6
-        tKQMd540dlTU+P8y+y+tCpQ8vCR540ChE8txA6hnD/gVSBjsJhSesOoPKClWwY2eyicJU4TctCX
-        jUyxw6LPae562
-X-Received: by 2002:ad4:562c:: with SMTP id cb12mr1587961qvb.6.1630588877097;
-        Thu, 02 Sep 2021 06:21:17 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxG9JfvU8t2EsYROxxRPXPNKTs00M8PoYMUrrQVfghePFKxWKnhmt6JBf3fCTGn9rsZbouzrg==
-X-Received: by 2002:ad4:562c:: with SMTP id cb12mr1587947qvb.6.1630588876898;
-        Thu, 02 Sep 2021 06:21:16 -0700 (PDT)
+        bh=PRM8lYGUmpsg4gH1Jz3PJxIAnZtJDS7+em5ACTDkhkU=;
+        b=t9wKFn8KHPDyy0gTb/TALDjsiKsDKBaYsPr3mSVO3awPMMnVm/QviFkRDjDG3jwtC+
+         tpx6Vuw5vG+yIXHsahgzliq7EQEKSqf6ApnNnvtbfgVwl2kWt0v2VoT7OJiED4k0Shp/
+         ch3b9MRrWQSiHNlwsFi5qKX4WnI5MW/V+cuoTqHqYcobqQrUm0aEtNZ713/1fz7DCgaZ
+         iihgQAfJJ2CRn/S6nSWhz8VETSBqgeuNRVR53I/m++0cRBTF/BeUqkNTlNbjSxAagMeY
+         k3kSYG60IyhqZ19KjkOer304vULkWjxOcphVb85TTY6NLj/p6hHkpuoTsBXQkoFDsV1i
+         Gi3g==
+X-Gm-Message-State: AOAM532qW/VBMU1urQQJMZ9q30U6yFcd3bf7fItMth4Jg0NPE7D/ssRC
+        S9hxTLQEw/9W56CbbNEiC18WQNZk4RjveDhSXttwiWyp0gfKX6bS4kcE/zNHB35udpYJCs/K4qM
+        e0b+pToBLH913
+X-Received: by 2002:ae9:ef48:: with SMTP id d69mr3231871qkg.232.1630590246611;
+        Thu, 02 Sep 2021 06:44:06 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzdTmtzmIqhqv1SiL46ML/7VojNuDfGcPgaJcYW31JCHc0kbak0ynOg7JISUhtrJ42VKof4iA==
+X-Received: by 2002:ae9:ef48:: with SMTP id d69mr3231851qkg.232.1630590246376;
+        Thu, 02 Sep 2021 06:44:06 -0700 (PDT)
 Received: from gator (nat-pool-brq-u.redhat.com. [213.175.37.12])
-        by smtp.gmail.com with ESMTPSA id g8sm1319814qkm.25.2021.09.02.06.21.14
+        by smtp.gmail.com with ESMTPSA id w11sm1412416qkp.49.2021.09.02.06.44.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Sep 2021 06:21:16 -0700 (PDT)
-Date:   Thu, 2 Sep 2021 15:21:12 +0200
+        Thu, 02 Sep 2021 06:44:06 -0700 (PDT)
+Date:   Thu, 2 Sep 2021 15:44:02 +0200
 From:   Andrew Jones <drjones@redhat.com>
 To:     Raghavendra Rao Ananta <rananta@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
@@ -60,105 +60,33 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
         Peter Shier <pshier@google.com>, linux-kernel@vger.kernel.org,
         Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
         linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v3 01/12] KVM: arm64: selftests: Add MMIO readl/writel
- support
-Message-ID: <20210902132112.yyz7iiqims3nlmmi@gator>
+Subject: Re: [PATCH v3 02/12] KVM: arm64: selftests: Add write_sysreg_s and
+ read_sysreg_s
+Message-ID: <20210902134402.zihdyigplaxm432o@gator>
 References: <20210901211412.4171835-1-rananta@google.com>
- <20210901211412.4171835-2-rananta@google.com>
+ <20210901211412.4171835-3-rananta@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210901211412.4171835-2-rananta@google.com>
+In-Reply-To: <20210901211412.4171835-3-rananta@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 01, 2021 at 09:14:01PM +0000, Raghavendra Rao Ananta wrote:
-> Define the readl() and writel() functions for the guests to
-> access (4-byte) the MMIO region.
+On Wed, Sep 01, 2021 at 09:14:02PM +0000, Raghavendra Rao Ananta wrote:
+> For register names that are unsupported by the assembler or the ones
+> without architectural names, add the macros write_sysreg_s and
+> read_sysreg_s to support them.
 > 
-> The routines, and their dependents, are inspired from the kernel's
-> arch/arm64/include/asm/io.h and arch/arm64/include/asm/barrier.h.
+> The functionality is derived from kvm-unit-tests and kernel's
+> arch/arm64/include/asm/sysreg.h.
 > 
 > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
 > ---
->  .../selftests/kvm/include/aarch64/processor.h | 45 ++++++++++++++++++-
->  1 file changed, 44 insertions(+), 1 deletion(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
-> index c0273aefa63d..3cbaf5c1e26b 100644
-> --- a/tools/testing/selftests/kvm/include/aarch64/processor.h
-> +++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
-> @@ -130,6 +130,49 @@ void vm_install_sync_handler(struct kvm_vm *vm,
->  	val;								  \
->  })
->  
-> -#define isb()	asm volatile("isb" : : : "memory")
-> +#define isb()		asm volatile("isb" : : : "memory")
-> +#define dsb(opt)	asm volatile("dsb " #opt : : : "memory")
-> +#define dmb(opt)	asm volatile("dmb " #opt : : : "memory")
-> +
-> +#define dma_wmb()	dmb(oshst)
-> +#define __iowmb()	dma_wmb()
-> +
-> +#define dma_rmb()	dmb(oshld)
-> +
-> +#define __iormb(v)							\
-> +({									\
-> +	unsigned long tmp;						\
-> +									\
-> +	dma_rmb();							\
-> +									\
-> +	/*								\
-> +	 * Courtesy of arch/arm64/include/asm/io.h:			\
-> +	 * Create a dummy control dependency from the IO read to any	\
-> +	 * later instructions. This ensures that a subsequent call	\
-> +	 * to udelay() will be ordered due to the ISB in __delay().	\
+>  .../selftests/kvm/include/aarch64/processor.h | 61 +++++++++++++++++++
+>  1 file changed, 61 insertions(+)
 
-We don't have udelay or __delay yet, but I assume they're coming soon.
-
-> +	 */								\
-> +	asm volatile("eor	%0, %1, %1\n"				\
-> +		     "cbnz	%0, ."					\
-> +		     : "=r" (tmp) : "r" ((unsigned long)(v))		\
-> +		     : "memory");					\
-> +})
-> +
-> +static __always_inline void __raw_writel(u32 val, volatile void *addr)
-> +{
-> +	asm volatile("str %w0, [%1]" : : "rZ" (val), "r" (addr));
-> +}
-> +
-> +static __always_inline u32 __raw_readl(const volatile void *addr)
-> +{
-> +	u32 val;
-> +	asm volatile("ldr %w0, [%1]" : "=r" (val) : "r" (addr));
-> +	return val;
-> +}
-> +
-> +#define writel_relaxed(v,c)	((void)__raw_writel((__force u32)cpu_to_le32(v),(c)))
-> +#define readl_relaxed(c)	({ u32 __r = le32_to_cpu((__force __le32)__raw_readl(c)); __r; })
-
-Might want to explicitly include linux/types.h for these __force symbols.
-
-> +
-> +#define writel(v,c)		({ __iowmb(); writel_relaxed((v),(c));})
-> +#define readl(c)		({ u32 __v = readl_relaxed(c); __iormb(__v); __v; })
->  
->  #endif /* SELFTEST_KVM_PROCESSOR_H */
-> -- 
-> 2.33.0.153.gba50c8fa24-goog
-
+If we don't replace with an import of arch/arm64/include/asm/sysreg.h
 
 Reviewed-by: Andrew Jones <drjones@redhat.com>
-
-Thanks,
-drew
-
-> 
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-> 
 
