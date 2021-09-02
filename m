@@ -2,176 +2,395 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 613A43FF029
-	for <lists+kvm@lfdr.de>; Thu,  2 Sep 2021 17:27:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4ECBF3FF032
+	for <lists+kvm@lfdr.de>; Thu,  2 Sep 2021 17:28:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345791AbhIBP2n (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Sep 2021 11:28:43 -0400
-Received: from mail-dm6nam12on2078.outbound.protection.outlook.com ([40.107.243.78]:52353
-        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1345689AbhIBP2l (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Sep 2021 11:28:41 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=bYjl0F70/bFR3Zrpy7eyYutN3YbLSgS8qebTyMOVPTNbWHcUomhqxRZaJpLmdWW9pcbE22PAzH5jlGl0lHwFGdBwARw9sVUYiTbo6lG4Uhouq8WbZOgO+Hr7ANPoUPY+H5s+VZuF7HO8JhBjFktJBiuv5ST3Vrcdw051ZYw++qZaaujyXAaKzwjTKwsBt270wDnwuhv6nPjV0xbxkL8BsAWP0A+QEdegK/QYKJ1nVqZJlrOq9RFUGAEuQuYUSZTXqFzdQ2yqNKGW2rJh6itnvUuD/GwYLqhPuY6nq25U7xhDjihzHZ118fbZNuNJw1PbOvPmyOOGmq1O687IUr663w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
- bh=MjlRa9KJVbTROiW7pY0odste8AGb+qLpZ2D2029ws30=;
- b=e7bTAIshV6Qavh7Nalpp8gtmSikLh0+fytrIbwoDlc8xRURAa1HFZsaVIOnwXlslQjT8jQXpK1kjGKAex0PAwe2ROM7HFUCkE7zCJUZ/VyxhAeB1blzueQNY0GrxdVIWcZFsJN0y+vk++T4pn5vA8pJrsZ4bDa+zSw/4r6PRctQVJ3b1oSYgMlXOjWdjFCAy3ZYtMIrtFmo53TjjrqnbiC8py8gvSyvB/xrbdBMz6BG01Wo+xue6ZuXjj1aABJ9fDMFmVsBMnpbO6dJriglBmVt2yXcE1vH/sM9xLPJy2GQe9N1Syqmt6HGCcRoqRHe8p7ZUHYMMbPyv93T79mmliw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MjlRa9KJVbTROiW7pY0odste8AGb+qLpZ2D2029ws30=;
- b=NvcDZhpgEPONOBos8LB1h+ICkOb+R2j6pWbX5cg5VeT6GI3DsgapXZ5jjwfCiYeawpbfolLjOs/vXUP46zc8p1pbg08X6iNsFuhsimTqqlpuX5XOX4q58E1rhnhASKefVAmMYlasCm51YnHrr50TR7h+j390FGsQk0WcjZbkE7E=
-Authentication-Results: linux.intel.com; dkim=none (message not signed)
- header.d=none;linux.intel.com; dmarc=none action=none header.from=amd.com;
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
- by SA0PR12MB4525.namprd12.prod.outlook.com (2603:10b6:806:92::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4478.19; Thu, 2 Sep
- 2021 15:27:41 +0000
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::78b7:7336:d363:9be3]) by SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::78b7:7336:d363:9be3%6]) with mapi id 15.20.4478.021; Thu, 2 Sep 2021
- 15:27:41 +0000
-Cc:     brijesh.singh@amd.com, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        id S1345834AbhIBP3h (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Sep 2021 11:29:37 -0400
+Received: from mail.efficios.com ([167.114.26.124]:38750 "EHLO
+        mail.efficios.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1345689AbhIBP3g (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Sep 2021 11:29:36 -0400
+Received: from localhost (localhost [127.0.0.1])
+        by mail.efficios.com (Postfix) with ESMTP id 34F1F374320;
+        Thu,  2 Sep 2021 11:28:37 -0400 (EDT)
+Received: from mail.efficios.com ([127.0.0.1])
+        by localhost (mail03.efficios.com [127.0.0.1]) (amavisd-new, port 10032)
+        with ESMTP id LP_tK4KXAATN; Thu,  2 Sep 2021 11:28:36 -0400 (EDT)
+Received: from localhost (localhost [127.0.0.1])
+        by mail.efficios.com (Postfix) with ESMTP id 4757D37431D;
+        Thu,  2 Sep 2021 11:28:36 -0400 (EDT)
+DKIM-Filter: OpenDKIM Filter v2.10.3 mail.efficios.com 4757D37431D
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=efficios.com;
+        s=default; t=1630596516;
+        bh=lyEy5Tw3HF5zzHal3IxuH63JnLhK6o3BByEcr5vw1rg=;
+        h=Date:From:To:Message-ID:MIME-Version;
+        b=PkYRnHv/ofNva5xCGCWueWu5kG7//pAcru9Vl9Em5Gr3OvbQeSUiRGgWKTmzh2OfI
+         Sjtr9l+kUcUIU9XZlToc+Z4wJQBVyFWbHEHUeSa+2RDCaXhYGy6qHgpoOj5xKQtN1V
+         nNnhbYFS65/K1T/uccIE8G+ADHVcibcfGmbWCoPO3tZKw3cRLH6j//CQvxXLj4F0Xk
+         2daMpjzb9zUYo73hQUpnKiVqJdvVS9W+rw3XPFfCIThSmgxJdsdRNZF0M2JsUcIFNZ
+         O76eGLqYGHd+qIENC46Yt2seVQPY/F6Nz2q4acGRDTmp90tKL4W3jimKfH2bSHiM3a
+         5YgHnoT9xiBDQ==
+X-Virus-Scanned: amavisd-new at efficios.com
+Received: from mail.efficios.com ([127.0.0.1])
+        by localhost (mail03.efficios.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id OXXEWNoZQrO3; Thu,  2 Sep 2021 11:28:36 -0400 (EDT)
+Received: from mail03.efficios.com (mail03.efficios.com [167.114.26.124])
+        by mail.efficios.com (Postfix) with ESMTP id 1CA5F37431C;
+        Thu,  2 Sep 2021 11:28:36 -0400 (EDT)
+Date:   Thu, 2 Sep 2021 11:28:36 -0400 (EDT)
+From:   Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     "Russell King, ARM Linux" <linux@armlinux.org.uk>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Guo Ren <guoren@kernel.org>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        rostedt <rostedt@goodmis.org>, Ingo Molnar <mingo@redhat.com>,
+        Oleg Nesterov <oleg@redhat.com>,
         Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
         Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH Part1 v5 34/38] x86/sev: Add snp_msg_seqno() helper
-To:     Borislav Petkov <bp@alien8.de>
-References: <20210820151933.22401-1-brijesh.singh@amd.com>
- <20210820151933.22401-35-brijesh.singh@amd.com> <YSkxxkVdupkyxAJi@zn.tnic>
- <9e0e734d-7d2f-4703-b9ce-8362f0c740f4@amd.com> <YTC1ANx81eQeGN4o@zn.tnic>
-From:   Brijesh Singh <brijesh.singh@amd.com>
-Message-ID: <01b9c0e8-a808-83a7-214f-ea62136ffa0b@amd.com>
-Date:   Thu, 2 Sep 2021 10:27:38 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
-In-Reply-To: <YTC1ANx81eQeGN4o@zn.tnic>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SA0PR11CA0059.namprd11.prod.outlook.com
- (2603:10b6:806:d0::34) To SN6PR12MB2718.namprd12.prod.outlook.com
- (2603:10b6:805:6f::22)
+        Andy Lutomirski <luto@kernel.org>,
+        paulmck <paulmck@kernel.org>, Boqun Feng <boqun.feng@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, shuah <shuah@kernel.org>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        linux-csky <linux-csky@vger.kernel.org>,
+        linux-mips <linux-mips@vger.kernel.org>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        KVM list <kvm@vger.kernel.org>,
+        linux-kselftest <linux-kselftest@vger.kernel.org>,
+        Peter Foley <pefoley@google.com>,
+        Shakeel Butt <shakeelb@google.com>,
+        Ben Gardon <bgardon@google.com>
+Message-ID: <93105975.4876.1630596516005.JavaMail.zimbra@efficios.com>
+In-Reply-To: <20210901203030.1292304-5-seanjc@google.com>
+References: <20210901203030.1292304-1-seanjc@google.com> <20210901203030.1292304-5-seanjc@google.com>
+Subject: Re: [PATCH v3 4/5] KVM: selftests: Add a test for KVM_RUN+rseq to
+ detect task migration bugs
 MIME-Version: 1.0
-Received: from [10.236.31.95] (165.204.77.1) by SA0PR11CA0059.namprd11.prod.outlook.com (2603:10b6:806:d0::34) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4478.19 via Frontend Transport; Thu, 2 Sep 2021 15:27:40 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 77610795-2842-4a2f-43aa-08d96e2633f7
-X-MS-TrafficTypeDiagnostic: SA0PR12MB4525:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SA0PR12MB4525C522CA751A5EB764ADB2E5CE9@SA0PR12MB4525.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: cMNaJ1bFdJtglbTSWYUHz8usGmD4BXLJY+jFZueYcGiZPU4HfPF/DTj7PB39H6Md5T2bqTNJeq8Y+/dNXx15GF11kw37uGEGVxG/QV31G0vyy0KA8jfFA2sxapStMwkXeDzTVLFmVypei4dEeyIqqd4kGNGsOFK5r5GlzrQdo2mNLmTDx6vWVpaqFQTLMp/946tG3vn4BrqK5L/RldZbmx9NjSWp5uzVElrqrFL3ZmICQ2ktD6AFUqagtPqp5BvEliobcdPp65JeSmuDvYQZHQQOw+FvtIgRWP47Dsjdvt1r8DGF5J9ZFwICi28FUCS5JzVSWhnKIypIJCfuoyWEmz+Rc3MoCyJQtw2bEtnx6FVLQ2RZu1Gu8I/JAMr1rNK07ksDJy9wGZb9zwKuXP8PaHzj/yJTZbAaC8gRQBNAW22wOlVia7lf8rqCuv9FBYQxFAu3f8lvgC5xWg9sMXIIQo28Bozwg68cCI1PBjUPPsy+QZoBZsfavKK+e44AgdwbeQWZi3usGG7xXRYnSm/hx5VbWUt6s4jRgvcZWD6o7d1bB+2gL6PpH3GVYmIaCvSe1wWugS9h8zDXBP4yiqbkWYwn2L0S81JETdi0HRWcDn6s0bVE9hNtf4HK9j4ArkzcKUyWszsiz9kV3WaV5nf/fPZj31/ySHsIV3cKDFH7FIm8O9+rd1wsodDaFmLLeZ3H3LABG/dJxIjXIbmdy4C0HPH9X2kj0teC37V/CCpYKzpZ6aI9jZPxIy9xMK8uurwTKCk6qrhxsX/oYkn5yFtUvw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(39860400002)(376002)(346002)(136003)(366004)(2616005)(86362001)(7406005)(31686004)(7416002)(956004)(36756003)(52116002)(6486002)(4326008)(5660300002)(66946007)(478600001)(316002)(38100700002)(38350700002)(16576012)(54906003)(2906002)(83380400001)(44832011)(6916009)(66556008)(8936002)(186003)(8676002)(31696002)(26005)(66476007)(53546011)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TEZENEdnTkNvaGR2LzlDSTI4dEhuWkRVSmx5bHg1WjZ3N1NyYzlUc3RYcDI4?=
- =?utf-8?B?MkJEMjJnSHc0QmcyUEhsdzY5WVplVkxmMnJ4TzNzVjFCUGM0NE1pd2Nrb0o3?=
- =?utf-8?B?cldkV0dOSklreS8vZjI2dXNIeHlISS9KbFgzOUhqVzB2bVh2QUdNTE9yeGZq?=
- =?utf-8?B?WnZZbUZtUFN0QzRHVGhRS3R1dUpEVmJ2cTQrY1pZdVgrQU5BZjIrYk53UGpJ?=
- =?utf-8?B?QTBKY2dSQjFPL2RmR3VoYmRORWlQa294dkdKbktlV1ZRK3FOZ1BSNzBOWE50?=
- =?utf-8?B?cUV5S05CNDhvQ1VidE9RT3lXbTgzVDZWeU1GVkdDektON3VQMXZHTXNUY3ls?=
- =?utf-8?B?eXd2Z1pSeGdFWHkzeDh0Wi9VZWh2QWdwZm41NTJlTzZxeHRUdjc3SWduaVlJ?=
- =?utf-8?B?YzQvVFVzY1RFVEttZXlqRmtNUWxVVXRnV3JJV2R3R2xNbW1jc1lIR01rcjhl?=
- =?utf-8?B?clE5MXo4VEcrcXFTM21GVkx1ZVNsdEIvaC9mT2ZJZlpneDByNWJXS3hLUjJR?=
- =?utf-8?B?R2xJYmpZa2lBRjJucnd3ckV4Vll4K2hGdXJJZ3dMNEZMMjIrdzcydEtqNzEy?=
- =?utf-8?B?M3p4ampNM1RjUzI1Wk9FcTViaEZLQlorWWFHZTl3dDVEVGFjYjhMMEpqVzRi?=
- =?utf-8?B?Q2pJdDRzRk02bzQvK01IcnhlZU5WbEhqUmtOWU5KeUNhU2VSMVo0V0FaczJl?=
- =?utf-8?B?ekhUM0VyUi9zTzJ6VnZYc05IQks0Y1Blam1aU2RVZVZZcVp5MXhPUS82TFRU?=
- =?utf-8?B?ZzdpREhVT0JFRS91WjB5S09ORmt1RGZyWnJaOThad3JjSHlZb2x5b092MHlI?=
- =?utf-8?B?SjEyTWJleGxzYWFQSUljc0kvNWNGQ2U4TzZhcWdIbHpPcDhZWlVZZmttY1VE?=
- =?utf-8?B?Q3Z6VnRoT2dOZ3hkbkhvWXcrbWhRL290Ym44VkE0ZklQcEh2aUVTcXJrbU00?=
- =?utf-8?B?NU5iZU9QNUk5NE9TQ0ZoaEZJRnRjeHNUeHM4YTVwNlpGZ1NRUE40QjVqMk1P?=
- =?utf-8?B?UjZLMXZXWnNLL1luRWRUdTRtakpibGhMWlp4bnZpSDI0Q05DY28zMWh2MndY?=
- =?utf-8?B?S2xQTVA3OU5SNDFxbkdyZjE0ZHo1UC8wWXhlNEJsWkpieXhEemFScEpOYnZw?=
- =?utf-8?B?WHhlaGMrY2RjUllrMkUreUdhZjI0TUU2NFBQcHVtVDlqOTc0M3NHZXdYTGpi?=
- =?utf-8?B?U0g1YjJwaVBmelRrWWNaWWFsb0hqdndoZWNmSUJpdW5NaklqWVZPbmJ1TGdp?=
- =?utf-8?B?VzREVVRiL1hQZWRwQW85RkI2Y29jYU5FUmQvaVBvZFdOdkJRZHV3V3VpZmtN?=
- =?utf-8?B?TjFRUTgrSCtvZWdyNnRUSjVRcnREdGlsbGVTaVhkK25RbVM5UzlheHI2c1JJ?=
- =?utf-8?B?K0pOcUJLZTVFUklwcU9lcnFHcW01emFva2tKMFJOK1Y5aklDUzBlWGNBRGR6?=
- =?utf-8?B?azNwNWY4LzAyblZhQlRBUjc5NmR0WGF2TE1wQk0zc0dkQ3l3Z3Q3WlJBcExZ?=
- =?utf-8?B?U004QVhSdGNlUld0Q2VadzhPYXQ1YnE1TndEeWpsWnhhOEo0TkxQY01FQjBN?=
- =?utf-8?B?RnRpYXV3U2Y5bUVtL1BEcU44aVZQV1lDczBDcTNNRkRkTFZjZU5uQ0VhdSto?=
- =?utf-8?B?VkNEWlMraW1mQzR0UHlHR09QeSs3ckVOTVRCeWNKSlQ1a1o4R3JDaitCOVhH?=
- =?utf-8?B?ei8rMEthSGJpT2xIcGE0UTJabWNyU3QzZEgrbkZ3U0Y1WkVJM2pWTE9uSXQy?=
- =?utf-8?Q?D1VQ9EVfPkOLAWVpfspmjffr2hHJTFGkiOLh2q1?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 77610795-2842-4a2f-43aa-08d96e2633f7
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Sep 2021 15:27:41.2799
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: i8teaP8OhzOVNdwJ7t3vExFGBwR377BIgzo122K/oL2vyCEfr9S6aHpuEcF4O0jYcQ6E6o0tqhXwGEu7d8/waQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4525
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [167.114.26.124]
+X-Mailer: Zimbra 8.8.15_GA_4125 (ZimbraWebClient - FF91 (Linux)/8.8.15_GA_4059)
+Thread-Topic: selftests: Add a test for KVM_RUN+rseq to detect task migration bugs
+Thread-Index: EyGVp1d/A2F7ckYRHUvub8wzNHGsxA==
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+----- On Sep 1, 2021, at 4:30 PM, Sean Christopherson seanjc@google.com wrote:
 
+> Add a test to verify an rseq's CPU ID is updated correctly if the task is
+> migrated while the kernel is handling KVM_RUN.  This is a regression test
+> for a bug introduced by commit 72c3c0fe54a3 ("x86/kvm: Use generic xfer
+> to guest work function"), where TIF_NOTIFY_RESUME would be cleared by KVM
+> without updating rseq, leading to a stale CPU ID and other badness.
+> 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-On 9/2/21 6:26 AM, Borislav Petkov wrote:
-> On Mon, Aug 30, 2021 at 10:07:39AM -0500, Brijesh Singh wrote:
->> The SNP firmware spec says that counter must begin with the 1.
-> 
-> So put that in the comment and explain what 0 is: magic or invalid or
-> whatnot and why is that so and that it is spec-ed this way, etc.
-> 
-> Just having it there without a reasoning makes one wonder whether that's
-> some arbitrary limitation or so.
+Thanks!
 
-Agreed, I will add a comment explaining it.
+Acked-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
 
+> ---
+> tools/testing/selftests/kvm/.gitignore  |   1 +
+> tools/testing/selftests/kvm/Makefile    |   3 +
+> tools/testing/selftests/kvm/rseq_test.c | 236 ++++++++++++++++++++++++
+> 3 files changed, 240 insertions(+)
+> create mode 100644 tools/testing/selftests/kvm/rseq_test.c
 > 
->> During the GHCB writing the seqno use to be 32-bit value and hence the GHCB
->> spec choose the 32-bit value but recently the SNP firmware changed it from
->> the 32 to 64. So, now we are left with the option of limiting the sequence
->> number to 32-bit. If we go beyond 32-bit then all we can do is fail the
->> call. If we pass the value of zero then FW will fail the call.
+> diff --git a/tools/testing/selftests/kvm/.gitignore
+> b/tools/testing/selftests/kvm/.gitignore
+> index 0709af0144c8..6d031ff6b68e 100644
+> --- a/tools/testing/selftests/kvm/.gitignore
+> +++ b/tools/testing/selftests/kvm/.gitignore
+> @@ -47,6 +47,7 @@
+> /kvm_page_table_test
+> /memslot_modification_stress_test
+> /memslot_perf_test
+> +/rseq_test
+> /set_memory_region_test
+> /steal_time
+> /kvm_binary_stats_test
+> diff --git a/tools/testing/selftests/kvm/Makefile
+> b/tools/testing/selftests/kvm/Makefile
+> index 5832f510a16c..0756e79cb513 100644
+> --- a/tools/testing/selftests/kvm/Makefile
+> +++ b/tools/testing/selftests/kvm/Makefile
+> @@ -80,6 +80,7 @@ TEST_GEN_PROGS_x86_64 += kvm_create_max_vcpus
+> TEST_GEN_PROGS_x86_64 += kvm_page_table_test
+> TEST_GEN_PROGS_x86_64 += memslot_modification_stress_test
+> TEST_GEN_PROGS_x86_64 += memslot_perf_test
+> +TEST_GEN_PROGS_x86_64 += rseq_test
+> TEST_GEN_PROGS_x86_64 += set_memory_region_test
+> TEST_GEN_PROGS_x86_64 += steal_time
+> TEST_GEN_PROGS_x86_64 += kvm_binary_stats_test
+> @@ -92,6 +93,7 @@ TEST_GEN_PROGS_aarch64 += dirty_log_test
+> TEST_GEN_PROGS_aarch64 += dirty_log_perf_test
+> TEST_GEN_PROGS_aarch64 += kvm_create_max_vcpus
+> TEST_GEN_PROGS_aarch64 += kvm_page_table_test
+> +TEST_GEN_PROGS_aarch64 += rseq_test
+> TEST_GEN_PROGS_aarch64 += set_memory_region_test
+> TEST_GEN_PROGS_aarch64 += steal_time
+> TEST_GEN_PROGS_aarch64 += kvm_binary_stats_test
+> @@ -103,6 +105,7 @@ TEST_GEN_PROGS_s390x += demand_paging_test
+> TEST_GEN_PROGS_s390x += dirty_log_test
+> TEST_GEN_PROGS_s390x += kvm_create_max_vcpus
+> TEST_GEN_PROGS_s390x += kvm_page_table_test
+> +TEST_GEN_PROGS_s390x += rseq_test
+> TEST_GEN_PROGS_s390x += set_memory_region_test
+> TEST_GEN_PROGS_s390x += kvm_binary_stats_test
 > 
-> That sounds weird again. So make it 64-bit like the FW and fix the spec.
-> 
->> I just choose the smaller name but I have no issues matching with the spec.
->> Also those keys does not have anything to do with the VMPL level. The
->> secrets page provides 4 different keys and they are referred as vmpck0..3
->> and each of them have a sequence numbers associated with it.
->>
->> In GHCB v3 we probably need to rework the structure name.
-> 
-> You can point to the spec section so that readers can find the struct
-> layout there.
-> 
+> diff --git a/tools/testing/selftests/kvm/rseq_test.c
+> b/tools/testing/selftests/kvm/rseq_test.c
+> new file mode 100644
+> index 000000000000..060538bd405a
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/rseq_test.c
+> @@ -0,0 +1,236 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +#define _GNU_SOURCE /* for program_invocation_short_name */
+> +#include <errno.h>
+> +#include <fcntl.h>
+> +#include <pthread.h>
+> +#include <sched.h>
+> +#include <stdio.h>
+> +#include <stdlib.h>
+> +#include <string.h>
+> +#include <signal.h>
+> +#include <syscall.h>
+> +#include <sys/ioctl.h>
+> +#include <asm/barrier.h>
+> +#include <linux/atomic.h>
+> +#include <linux/rseq.h>
+> +#include <linux/unistd.h>
+> +
+> +#include "kvm_util.h"
+> +#include "processor.h"
+> +#include "test_util.h"
+> +
+> +#define VCPU_ID 0
+> +
+> +static __thread volatile struct rseq __rseq = {
+> +	.cpu_id = RSEQ_CPU_ID_UNINITIALIZED,
+> +};
+> +
+> +/*
+> + * Use an arbitrary, bogus signature for configuring rseq, this test does not
+> + * actually enter an rseq critical section.
+> + */
+> +#define RSEQ_SIG 0xdeadbeef
+> +
+> +/*
+> + * Any bug related to task migration is likely to be timing-dependent; perform
+> + * a large number of migrations to reduce the odds of a false negative.
+> + */
+> +#define NR_TASK_MIGRATIONS 100000
+> +
+> +static pthread_t migration_thread;
+> +static cpu_set_t possible_mask;
+> +static bool done;
+> +
+> +static atomic_t seq_cnt;
+> +
+> +static void guest_code(void)
+> +{
+> +	for (;;)
+> +		GUEST_SYNC(0);
+> +}
+> +
+> +static void sys_rseq(int flags)
+> +{
+> +	int r;
+> +
+> +	r = syscall(__NR_rseq, &__rseq, sizeof(__rseq), flags, RSEQ_SIG);
+> +	TEST_ASSERT(!r, "rseq failed, errno = %d (%s)", errno, strerror(errno));
+> +}
+> +
+> +static void *migration_worker(void *ign)
+> +{
+> +	cpu_set_t allowed_mask;
+> +	int r, i, nr_cpus, cpu;
+> +
+> +	CPU_ZERO(&allowed_mask);
+> +
+> +	nr_cpus = CPU_COUNT(&possible_mask);
+> +
+> +	for (i = 0; i < NR_TASK_MIGRATIONS; i++) {
+> +		cpu = i % nr_cpus;
+> +		if (!CPU_ISSET(cpu, &possible_mask))
+> +			continue;
+> +
+> +		CPU_SET(cpu, &allowed_mask);
+> +
+> +		/*
+> +		 * Bump the sequence count twice to allow the reader to detect
+> +		 * that a migration may have occurred in between rseq and sched
+> +		 * CPU ID reads.  An odd sequence count indicates a migration
+> +		 * is in-progress, while a completely different count indicates
+> +		 * a migration occurred since the count was last read.
+> +		 */
+> +		atomic_inc(&seq_cnt);
+> +
+> +		/*
+> +		 * Ensure the odd count is visible while sched_getcpu() isn't
+> +		 * stable, i.e. while changing affinity is in-progress.
+> +		 */
+> +		smp_wmb();
+> +		r = sched_setaffinity(0, sizeof(allowed_mask), &allowed_mask);
+> +		TEST_ASSERT(!r, "sched_setaffinity failed, errno = %d (%s)",
+> +			    errno, strerror(errno));
+> +		smp_wmb();
+> +		atomic_inc(&seq_cnt);
+> +
+> +		CPU_CLR(cpu, &allowed_mask);
+> +
+> +		/*
+> +		 * Wait 1-10us before proceeding to the next iteration and more
+> +		 * specifically, before bumping seq_cnt again.  A delay is
+> +		 * needed on three fronts:
+> +		 *
+> +		 *  1. To allow sched_setaffinity() to prompt migration before
+> +		 *     ioctl(KVM_RUN) enters the guest so that TIF_NOTIFY_RESUME
+> +		 *     (or TIF_NEED_RESCHED, which indirectly leads to handling
+> +		 *     NOTIFY_RESUME) is handled in KVM context.
+> +		 *
+> +		 *     If NOTIFY_RESUME/NEED_RESCHED is set after KVM enters
+> +		 *     the guest, the guest will trigger a IO/MMIO exit all the
+> +		 *     way to userspace and the TIF flags will be handled by
+> +		 *     the generic "exit to userspace" logic, not by KVM.  The
+> +		 *     exit to userspace is necessary to give the test a chance
+> +		 *     to check the rseq CPU ID (see #2).
+> +		 *
+> +		 *     Alternatively, guest_code() could include an instruction
+> +		 *     to trigger an exit that is handled by KVM, but any such
+> +		 *     exit requires architecture specific code.
+> +		 *
+> +		 *  2. To let ioctl(KVM_RUN) make its way back to the test
+> +		 *     before the next round of migration.  The test's check on
+> +		 *     the rseq CPU ID must wait for migration to complete in
+> +		 *     order to avoid false positive, thus any kernel rseq bug
+> +		 *     will be missed if the next migration starts before the
+> +		 *     check completes.
+> +		 *
+> +		 *  3. To ensure the read-side makes efficient forward progress,
+> +		 *     e.g. if sched_getcpu() involves a syscall.  Stalling the
+> +		 *     read-side means the test will spend more time waiting for
+> +		 *     sched_getcpu() to stabilize and less time trying to hit
+> +		 *     the timing-dependent bug.
+> +		 *
+> +		 * Because any bug in this area is likely to be timing-dependent,
+> +		 * run with a range of delays at 1us intervals from 1us to 10us
+> +		 * as a best effort to avoid tuning the test to the point where
+> +		 * it can hit _only_ the original bug and not detect future
+> +		 * regressions.
+> +		 *
+> +		 * The original bug can reproduce with a delay up to ~500us on
+> +		 * x86-64, but starts to require more iterations to reproduce
+> +		 * as the delay creeps above ~10us, and the average runtime of
+> +		 * each iteration obviously increases as well.  Cap the delay
+> +		 * at 10us to keep test runtime reasonable while minimizing
+> +		 * potential coverage loss.
+> +		 *
+> +		 * The lower bound for reproducing the bug is likely below 1us,
+> +		 * e.g. failures occur on x86-64 with nanosleep(0), but at that
+> +		 * point the overhead of the syscall likely dominates the delay.
+> +		 * Use usleep() for simplicity and to avoid unnecessary kernel
+> +		 * dependencies.
+> +		 */
+> +		usleep((i % 10) + 1);
+> +	}
+> +	done = true;
+> +	return NULL;
+> +}
+> +
+> +int main(int argc, char *argv[])
+> +{
+> +	int r, i, snapshot;
+> +	struct kvm_vm *vm;
+> +	u32 cpu, rseq_cpu;
+> +
+> +	/* Tell stdout not to buffer its content */
+> +	setbuf(stdout, NULL);
+> +
+> +	r = sched_getaffinity(0, sizeof(possible_mask), &possible_mask);
+> +	TEST_ASSERT(!r, "sched_getaffinity failed, errno = %d (%s)", errno,
+> +		    strerror(errno));
+> +
+> +	if (CPU_COUNT(&possible_mask) < 2) {
+> +		print_skip("Only one CPU, task migration not possible\n");
+> +		exit(KSFT_SKIP);
+> +	}
+> +
+> +	sys_rseq(0);
+> +
+> +	/*
+> +	 * Create and run a dummy VM that immediately exits to userspace via
+> +	 * GUEST_SYNC, while concurrently migrating the process by setting its
+> +	 * CPU affinity.
+> +	 */
+> +	vm = vm_create_default(VCPU_ID, 0, guest_code);
+> +
+> +	pthread_create(&migration_thread, NULL, migration_worker, 0);
+> +
+> +	for (i = 0; !done; i++) {
+> +		vcpu_run(vm, VCPU_ID);
+> +		TEST_ASSERT(get_ucall(vm, VCPU_ID, NULL) == UCALL_SYNC,
+> +			    "Guest failed?");
+> +
+> +		/*
+> +		 * Verify rseq's CPU matches sched's CPU.  Ensure migration
+> +		 * doesn't occur between sched_getcpu() and reading the rseq
+> +		 * cpu_id by rereading both if the sequence count changes, or
+> +		 * if the count is odd (migration in-progress).
+> +		 */
+> +		do {
+> +			/*
+> +			 * Drop bit 0 to force a mismatch if the count is odd,
+> +			 * i.e. if a migration is in-progress.
+> +			 */
+> +			snapshot = atomic_read(&seq_cnt) & ~1;
+> +
+> +			/*
+> +			 * Ensure reading sched_getcpu() and rseq.cpu_id
+> +			 * complete in a single "no migration" window, i.e. are
+> +			 * not reordered across the seq_cnt reads.
+> +			 */
+> +			smp_rmb();
+> +			cpu = sched_getcpu();
+> +			rseq_cpu = READ_ONCE(__rseq.cpu_id);
+> +			smp_rmb();
+> +		} while (snapshot != atomic_read(&seq_cnt));
+> +
+> +		TEST_ASSERT(rseq_cpu == cpu,
+> +			    "rseq CPU = %d, sched CPU = %d\n", rseq_cpu, cpu);
+> +	}
+> +
+> +	/*
+> +	 * Sanity check that the test was able to enter the guest a reasonable
+> +	 * number of times, e.g. didn't get stalled too often/long waiting for
+> +	 * sched_getcpu() to stabilize.  A 2:1 migration:KVM_RUN ratio is a
+> +	 * fairly conservative ratio on x86-64, which can do _more_ KVM_RUNs
+> +	 * than migrations given the 1us+ delay in the migration task.
+> +	 */
+> +	TEST_ASSERT(i > (NR_TASK_MIGRATIONS / 2),
+> +		    "Only performed %d KVM_RUNs, task stalled too much?\n", i);
+> +
+> +	pthread_join(migration_thread, NULL);
+> +
+> +	kvm_vm_free(vm);
+> +
+> +	sys_rseq(RSEQ_FLAG_UNREGISTER);
+> +
+> +	return 0;
+> +}
+> --
+> 2.33.0.153.gba50c8fa24-goog
 
-I will add comment that this for spec 0.9+.
-
-thanks
+-- 
+Mathieu Desnoyers
+EfficiOS Inc.
+http://www.efficios.com
