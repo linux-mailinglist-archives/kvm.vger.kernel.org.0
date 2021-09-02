@@ -2,118 +2,211 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EEC5A3FF1E7
-	for <lists+kvm@lfdr.de>; Thu,  2 Sep 2021 18:56:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 01E653FF24A
+	for <lists+kvm@lfdr.de>; Thu,  2 Sep 2021 19:28:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346480AbhIBQ5x (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Sep 2021 12:57:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54778 "EHLO
+        id S1346581AbhIBR31 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Sep 2021 13:29:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33858 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234446AbhIBQ5w (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Sep 2021 12:57:52 -0400
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19AA4C061757
-        for <kvm@vger.kernel.org>; Thu,  2 Sep 2021 09:56:54 -0700 (PDT)
-Received: by mail-pj1-x1031.google.com with SMTP id n13-20020a17090a4e0d00b0017946980d8dso1894336pjh.5
-        for <kvm@vger.kernel.org>; Thu, 02 Sep 2021 09:56:54 -0700 (PDT)
+        with ESMTP id S1346568AbhIBR30 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Sep 2021 13:29:26 -0400
+Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2411C061760
+        for <kvm@vger.kernel.org>; Thu,  2 Sep 2021 10:28:27 -0700 (PDT)
+Received: by mail-pg1-x52e.google.com with SMTP id s11so2694615pgr.11
+        for <kvm@vger.kernel.org>; Thu, 02 Sep 2021 10:28:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=+Qgo5364SnUWK2dNQ5Zfdn6/xMGj0/q4OzZE+MW9D64=;
-        b=Evzzbucq1EgSUqQiruSqadL7VBZWvcldiKDimfrvXEg2S2TIo8Qi7uQJNX4b6v0/10
-         amVv7sNRRqnhTCHLFKdhLz4k2XZdMlH5DoUJtSQuUFXB8cyLL3Gfh1JDVUtpwmRcAW8n
-         erExgzMPh+2aOt1IQneL1CT0RB5brkkoCorwcFsSEtSBRh8J31DpoWmB5zCZbsCkPMYJ
-         PiTP1GUacJKMTHmMt3RgZdaj1U+nm29ZX8mnsDEXSX0v15aqK9zJjo+wWokpp1taEA67
-         6bJ4VywXke3JWSDCw3ZJh9mEixqfMlBrvKB8mNPKm+yJ6beIMIcDjnHqz8jN8Sam+ve8
-         0eJw==
+        bh=tlkTv+QSdLj89BzEW2jIvlFhKPTJ8DlZMmZCRyVz7HU=;
+        b=FdhRZcEWHVic1uoYs4TxzGQx1jBnt1hu2TuteTVmM94eqGRGZmxlpH8weXG9NzPdm8
+         tYqEi+kWRTsI71W8XqcbUIp2yrmpQMlCGd14tG8xzhA6l316CJVtXXu6uT+nu/3DSrAO
+         SJy5ZJ56FflBwtg/FD5juUH50ILwZ0fTONMn2+aC+RyBePbxmsc8ACTBT9JvAzzxgpA2
+         pzO49NwrYqWUcPWHkqgqWAT8HzIaKxJ7MAu3uVGspflY2pkTPuQrxnxlunyiabvyVPiv
+         XPumM07kxeu2lg5IabzOiSzMFS2MKX73GQM1Hiz93FAtHXC3RILOo2Rbrhz6jRRynvc9
+         iavw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=+Qgo5364SnUWK2dNQ5Zfdn6/xMGj0/q4OzZE+MW9D64=;
-        b=A4MAH7Un6ECR0EhCxGnQPPRXGJRfXDfdFXG0TAFDkWSvSZsiu2GYAeBPGNK21c74ON
-         kDYJWrT8FYNPjZjTHJX1PQIlcyBBOXIWRlowYqf9s7Y3GTCRfAGKONjJ/haEc4Wkr5Y8
-         CgDMauDEZNKVHVu5neLvXsfrptpzZCI0L6oYf2BfC2aK4sdpYE91UFFD4Hp9+7m8ygX9
-         kJ+1uQ4msH24QgeoOo/1bpW2dNf5HCYQRGKT8B+/htenDgHf49kyoEVLDvKIqUZNmQqi
-         N8zopUUu+dilrLcPL9fG52jPDvViq/ML5ur+ncC6seOprJKq9BIHFvv2wiBT4howMkT7
-         QAdw==
-X-Gm-Message-State: AOAM530b1Tl63ffbmSY+LVIIyq0L2GO+jsAzbZ7z7ZYBhEscBerZXmkf
-        2S8lHdsT+H/6/M6Tbxw6qc8luQ==
-X-Google-Smtp-Source: ABdhPJz7WaOCKKUUXKC5QJrEjYscQ8+A1ETyUmwukoerUYpRIYH60c0efD2qdHXWwPpJG40jHiDkyQ==
-X-Received: by 2002:a17:90a:588f:: with SMTP id j15mr5059145pji.177.1630601813323;
-        Thu, 02 Sep 2021 09:56:53 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id v190sm2968216pfv.166.2021.09.02.09.56.52
+        bh=tlkTv+QSdLj89BzEW2jIvlFhKPTJ8DlZMmZCRyVz7HU=;
+        b=lhCUT7Gg49+OupuHxZUzMqOIDkonn6cpt0Fs86bxSo5JgPybxH3oa529NXl91uw6lR
+         YY21FdWPxmZnoC3EF2QJrIFJWBYeSAvmSpma/sGSIoWCn/yngpjlYcAOBCdkMqCWlcQI
+         0lUUkJtSiG1u6lIKKRJTCETCTVzuX5mOBg0ofeEN4Zgtg0ULLZVQT4NiRo1DfLeLdr/Q
+         7GhvNh99nCRCevaThugyCfP06p0xOEDV5n5vowlnBc/jO06i6yaUTjHHJlNRHOJM5CYd
+         HsaLDjanbK5J1y+E30UoqQl6RdxlMfz7byWIyfQ6H5z+jynh2n4Drt4o46rccnZ9DQkQ
+         Geog==
+X-Gm-Message-State: AOAM531tT46iyXKWuqapqtJidvY5wt3ZkaYz67vKEvrBpRX6R8De7J1+
+        SezA6eFA5g1MIkGjaT7YgZP3pQ==
+X-Google-Smtp-Source: ABdhPJz8r/7UkdfmCJP3knKikFIB42/rNdTHUUWLp90TllbLBlgVZbxCg0hV5rMB9wjHmZi6tgMQ8w==
+X-Received: by 2002:a63:b47:: with SMTP id a7mr4251871pgl.181.1630603707200;
+        Thu, 02 Sep 2021 10:28:27 -0700 (PDT)
+Received: from google.com (150.12.83.34.bc.googleusercontent.com. [34.83.12.150])
+        by smtp.gmail.com with ESMTPSA id e8sm3736647pgg.31.2021.09.02.10.28.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Sep 2021 09:56:52 -0700 (PDT)
-Date:   Thu, 2 Sep 2021 16:56:49 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     kvm@vger.kernel.org, Kieran Bingham <kbingham@kernel.org>,
-        Jan Kiszka <jan.kiszka@siemens.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Johannes Berg <johannes.berg@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Jessica Yu <jeyu@kernel.org>,
-        Jim Mattson <jmattson@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Yang Weijiang <weijiang.yang@intel.com>,
-        linux-kernel@vger.kernel.org, Borislav Petkov <bp@alien8.de>,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Borislav Petkov <bp@suse.de>
-Subject: Re: [PATCH v3 2/6] KVM: x86: add force_intercept_exceptions_mask
-Message-ID: <YTECUaPa9kySQxRX@google.com>
-References: <20210811122927.900604-1-mlevitsk@redhat.com>
- <20210811122927.900604-3-mlevitsk@redhat.com>
+        Thu, 02 Sep 2021 10:28:26 -0700 (PDT)
+Date:   Thu, 2 Sep 2021 10:28:23 -0700
+From:   Ricardo Koller <ricarkol@google.com>
+To:     Raghavendra Rao Ananta <rananta@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v3 10/12] KVM: arm64: selftests: Add host support for vGIC
+Message-ID: <YTEJt2pC1cIcwvyD@google.com>
+References: <20210901211412.4171835-1-rananta@google.com>
+ <20210901211412.4171835-11-rananta@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210811122927.900604-3-mlevitsk@redhat.com>
+In-Reply-To: <20210901211412.4171835-11-rananta@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Assuming this hasn't been abandoned...
-
-On Wed, Aug 11, 2021, Maxim Levitsky wrote:
-> This parameter will be used by VMX and SVM code to force
-> interception of a set of exceptions, given by a bitmask
-> for guest debug and/or kvm debug.
+On Wed, Sep 01, 2021 at 09:14:10PM +0000, Raghavendra Rao Ananta wrote:
+> Implement a simple library to do perform vGIC-v3
+> setup from a host of view. This includes creating
+> a vGIC device, setting up distributor and redistributor
+> attributes, and mapping the guest physical addresses.
 > 
-> This is based on an idea first shown here:
-> https://patchwork.kernel.org/project/kvm/patch/20160301192822.GD22677@pd.tnic/
+> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
 > 
-> CC: Borislav Petkov <bp@suse.de>
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 > ---
->  arch/x86/kvm/x86.c | 3 +++
->  arch/x86/kvm/x86.h | 2 ++
->  2 files changed, 5 insertions(+)
+>  tools/testing/selftests/kvm/Makefile          |  2 +-
+>  .../selftests/kvm/include/aarch64/vgic.h      | 14 ++++
+>  .../testing/selftests/kvm/lib/aarch64/vgic.c  | 67 +++++++++++++++++++
+>  3 files changed, 82 insertions(+), 1 deletion(-)
+>  create mode 100644 tools/testing/selftests/kvm/include/aarch64/vgic.h
+>  create mode 100644 tools/testing/selftests/kvm/lib/aarch64/vgic.c
 > 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index fdc0c18339fb..092e2fad3c0d 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -184,6 +184,9 @@ module_param(force_emulation_prefix, bool, S_IRUGO);
->  int __read_mostly pi_inject_timer = -1;
->  module_param(pi_inject_timer, bint, S_IRUGO | S_IWUSR);
+> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+> index 5476a8ddef60..8342f65c1d96 100644
+> --- a/tools/testing/selftests/kvm/Makefile
+> +++ b/tools/testing/selftests/kvm/Makefile
+> @@ -35,7 +35,7 @@ endif
 >  
-> +uint force_intercept_exceptions_mask;
-> +module_param(force_intercept_exceptions_mask, uint, S_IRUGO | S_IWUSR);
+>  LIBKVM = lib/assert.c lib/elf.c lib/io.c lib/kvm_util.c lib/rbtree.c lib/sparsebit.c lib/test_util.c lib/guest_modes.c lib/perf_test_util.c
+>  LIBKVM_x86_64 = lib/x86_64/apic.c lib/x86_64/processor.c lib/x86_64/vmx.c lib/x86_64/svm.c lib/x86_64/ucall.c lib/x86_64/handlers.S
+> -LIBKVM_aarch64 = lib/aarch64/processor.c lib/aarch64/ucall.c lib/aarch64/handlers.S lib/aarch64/spinlock.c lib/aarch64/gic.c lib/aarch64/gic_v3.c
+> +LIBKVM_aarch64 = lib/aarch64/processor.c lib/aarch64/ucall.c lib/aarch64/handlers.S lib/aarch64/spinlock.c lib/aarch64/gic.c lib/aarch64/gic_v3.c lib/aarch64/vgic.c
+>  LIBKVM_s390x = lib/s390x/processor.c lib/s390x/ucall.c lib/s390x/diag318_test_handler.c
+>  
+>  TEST_GEN_PROGS_x86_64 = x86_64/cr4_cpuid_sync_test
+> diff --git a/tools/testing/selftests/kvm/include/aarch64/vgic.h b/tools/testing/selftests/kvm/include/aarch64/vgic.h
+> new file mode 100644
+> index 000000000000..45bbf238147a
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/include/aarch64/vgic.h
+> @@ -0,0 +1,14 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * ARM Generic Interrupt Controller (GIC) host specific defines
+> + */
+> +
+> +#ifndef SELFTEST_KVM_VGIC_H
+> +#define SELFTEST_KVM_VGIC_H
+> +
+> +#include <linux/kvm.h>
+> +
+> +int vgic_v3_setup(struct kvm_vm *vm, unsigned int nr_vcpus,
+> +		uint64_t gicd_base_gpa, uint64_t gicr_base_gpa, uint32_t slot);
+> +
+> +#endif /* SELFTEST_KVM_VGIC_H */
+> diff --git a/tools/testing/selftests/kvm/lib/aarch64/vgic.c b/tools/testing/selftests/kvm/lib/aarch64/vgic.c
+> new file mode 100644
+> index 000000000000..a0e4b986d335
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/lib/aarch64/vgic.c
+> @@ -0,0 +1,67 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * ARM Generic Interrupt Controller (GIC) v3 host support
+> + */
+> +
+> +#include <linux/kvm.h>
+> +#include <linux/sizes.h>
+> +
+> +#include "kvm_util.h"
+> +
+> +#define VGIC_V3_GICD_SZ		(SZ_64K)
+> +#define VGIC_V3_GICR_SZ		(2 * SZ_64K)
+> +
+> +#define REDIST_REGION_ATTR_ADDR(count, base, flags, index) \
+> +	(((uint64_t)(count) << 52) | \
+> +	((uint64_t)((base) >> 16) << 16) | \
+> +	((uint64_t)(flags) << 12) | \
+> +	index)
+> +
+> +static void vgic_v3_map(struct kvm_vm *vm, uint64_t addr, unsigned int size)
+> +{
+> +	unsigned int n_pages = DIV_ROUND_UP(size, vm_get_page_size(vm));
+> +
+> +	virt_map(vm, addr, addr, n_pages);
+> +}
+> +
+> +/*
+> + * vGIC-v3 default host setup
+> + *
+> + * Input args:
+> + *	vm - KVM VM
+> + *	nr_vcpus - Number of vCPUs for this VM
+> + *	gicd_base_gpa - Guest Physical Address of the Distributor region
+> + *	gicr_base_gpa - Guest Physical Address of the Redistributor region
+> + *
+> + * Output args: None
+> + *
+> + * Return: GIC file-descriptor or negative error code upon failure
+> + *
+> + * The function creates a vGIC-v3 device and maps the distributor and
+> + * redistributor regions of the guest.
+> + */
+> +int vgic_v3_setup(struct kvm_vm *vm, unsigned int nr_vcpus,
+> +		uint64_t gicd_base_gpa, uint64_t gicr_base_gpa)
+> +{
+> +	uint64_t redist_attr;
+> +	int gic_fd;
+> +
+> +	TEST_ASSERT(nr_vcpus <= KVM_MAX_VCPUS,
+> +			"Invalid number of CPUs: %u\n", nr_vcpus);
+> +
+> +	gic_fd = kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_V3, false);
 
-Use octal permissions.  This also can't be a simple writable param, at least not
-without a well-documented disclaimer, as there's no guarantee a vCPU will update
-its exception bitmap in a timely fashion.  An alternative to a module param would
-be to extend/add a per-VM ioctl(), e.g. maybe KVM_SET_GUEST_DEBUG?  The downside
-of an ioctl() is that it would require userspace enabling :-/
+Nit: you can return early if gic_fd is bad.
+
+> +
+> +	kvm_device_access(gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+> +			KVM_VGIC_V3_ADDR_TYPE_DIST, &gicd_base_gpa, true);
+> +	vgic_v3_map(vm, gicd_base_gpa, VGIC_V3_GICD_SZ);
+
+vgic_v3_map() implies that it's doing something vgic specific, when it's
+just converting bytes to pages. What about something like the following?
+
+	virt_map(vm, addr, addr, VM_BYTES_TO_PAGES(vm, VGIC_V3_GICD_SZ));
+
+and you add a VM_BYTES_TO_PAGES macro to include/kvm_util.h? I think
+this macro can be useful to others.
+
+> +
+> +	redist_attr = REDIST_REGION_ATTR_ADDR(nr_vcpus, gicr_base_gpa, 0, 0);
+> +	kvm_device_access(gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+> +			KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &redist_attr, true);
+> +	vgic_v3_map(vm, gicr_base_gpa, VGIC_V3_GICR_SZ * nr_vcpus);
+> +
+> +	kvm_device_access(gic_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
+> +				KVM_DEV_ARM_VGIC_CTRL_INIT, NULL, true);
+> +
+> +	return gic_fd;
+> +}
+> -- 
+> 2.33.0.153.gba50c8fa24-goog
+> 
