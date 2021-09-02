@@ -2,119 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 95B7A3FF454
-	for <lists+kvm@lfdr.de>; Thu,  2 Sep 2021 21:45:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E88D23FF467
+	for <lists+kvm@lfdr.de>; Thu,  2 Sep 2021 21:56:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231670AbhIBTqR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Sep 2021 15:46:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37586 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230462AbhIBTqQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Sep 2021 15:46:16 -0400
-Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E154C061575
-        for <kvm@vger.kernel.org>; Thu,  2 Sep 2021 12:45:17 -0700 (PDT)
-Received: by mail-lf1-x134.google.com with SMTP id l10so6789338lfg.4
-        for <kvm@vger.kernel.org>; Thu, 02 Sep 2021 12:45:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Hc2gcVksXzTr1IYZOTogrbXgKL8dWeh0/s29AyPzQmQ=;
-        b=nGK4NeA6yxLc1weyQpFYZMrqUi3ivy+2UO+yNScnEseijwiIq21vEMLnYigeNN2xqm
-         Yi6Qc1ylsTv2t0Iuok58JzuIduweJpCeJ1pmjZvwXXCKwnNoUWaG/dkE1v0p+ZLG3Mfp
-         e1baudwOsKlH/fDwgBAxp8lf9bh/JLcEa+uruQgVKVdY99FIiVYvNBH4rqYDZtFR82al
-         JY38xlhEi0kshEEl7eBwj3LgbiqJBijkOpZh9ODqFwQVPDHpDsnX+AeNlaVsFgqUYTap
-         ypGZlUzgHzB52a8WMmkq6tkBQpthITzwz5WNifkBD0MTR7pdWkk4JU+w1ROT5lyTkSgK
-         Yzew==
+        id S1347462AbhIBT4C (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Sep 2021 15:56:02 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:32414 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1347449AbhIBT4C (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 2 Sep 2021 15:56:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1630612502;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=0KZsLb+dQjO46E/gdx6NrK5aykQFxATsK6Vcg3WdPIc=;
+        b=hAloLV/AVG6b48mWgRARQkNafnmYdGnFsl8yggstcoTEb+rgCpHjrlWM6DLYZLZy5BMFp4
+        0egjAW8f6BHCNi8ydnLJQO0LO6a2VA7GlblrRzvgW4gg0fERELo63ELfbBQNnD3Xxc86pM
+        m86KxwZvMQLBIxymZEQekxacrmI5U4A=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-1-C3wKhQQVMvKMPdF2QddXDQ-1; Thu, 02 Sep 2021 15:53:54 -0400
+X-MC-Unique: C3wKhQQVMvKMPdF2QddXDQ-1
+Received: by mail-qk1-f200.google.com with SMTP id o4-20020ae9f504000000b003d39d97b227so3465750qkg.2
+        for <kvm@vger.kernel.org>; Thu, 02 Sep 2021 12:53:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Hc2gcVksXzTr1IYZOTogrbXgKL8dWeh0/s29AyPzQmQ=;
-        b=XXTBYQzuTf0Q8jt3P2zPaTZvP9q32INu1xckIHS6JDixTAvemiGGWMhb6t8k6M9w7C
-         WjEjCNHb4Y2GoFkQDXUY5q4IZdFwBQ0yligPcwp3N0x8GMFYj1BXra0HVOgg+WMb+eLJ
-         OVIVrraAiDvOk7wqP8i+4L9Oe0puU6Tq8HYh+yKju0hCYBKbeZZ+Royv7JIJGchpdxl8
-         aK43uv4J/udDUX1wKflXc2WmD4DEFIh95uW8WFpyTxLQokzNx/niO5/bu/QZkzVvmoo5
-         WThPhjw37YCySCYVkQ480dH6+XWKyCvpz4XrmMaondjH+NpcG7KkCvV/fIqGeJ7mRcpd
-         nL/A==
-X-Gm-Message-State: AOAM533rSLiOaYipRAC7B+0NMDBYfRVtD9vrszm0sEjgAT7fzjkxteiq
-        Y5pnoMunWZMCLhzMrRhWyFHBJowhmYFh92cE2HozkA==
-X-Google-Smtp-Source: ABdhPJxs82rjOaFEEVNEFjggRcMRuAgzhuR+/VhLAeGrIKZ+wPbbkII2xn5iYSx51JVsk55zn+AngBAngaE4OnGx1lU=
-X-Received: by 2002:a05:6512:1107:: with SMTP id l7mr3883353lfg.80.1630611915246;
- Thu, 02 Sep 2021 12:45:15 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210816001130.3059564-1-oupton@google.com> <YTEkuXQ1cNhPoqP1@google.com>
-In-Reply-To: <YTEkuXQ1cNhPoqP1@google.com>
-From:   Oliver Upton <oupton@google.com>
-Date:   Thu, 2 Sep 2021 12:45:02 -0700
-Message-ID: <CAOQ_QshZCNACJy2f-jJL=U8+NROp1DoM3KXcN_3z5kE4h2JY7Q@mail.gmail.com>
-Subject: Re: [PATCH v7 0/6] KVM: x86: Add idempotent controls for migrating
- system counter state
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=0KZsLb+dQjO46E/gdx6NrK5aykQFxATsK6Vcg3WdPIc=;
+        b=Y9ieKjRY/cr32LVGd1kzQ4RbjM/q2qKFotHmLcEgb6N1uZYKF5aXBLD28FPYT6DxnV
+         Oa/AnSmH5zWWrWoxjZpK3uHEtbI0WfKhEClxXqJg6s+iS4S25+izqJv/v89yD89K8yjR
+         ZqlrlN+1jEGvg8j+VJSxhCuOZAfwcxjTSOo+O+WMcDyBtyOt0iOkHEo2NonVFFaYKEqc
+         he5j1gaduRKbOjGbUtHaNH+gxZd6PPFkz1SLYryBfNGlbzOujSx95bcIXSUcT2SEEsc8
+         bHzMyEeHATRvVtDIYmQXX0i1YFrNRWMh1dSZSMi4AsqG0A2cFBYrD4trpcOKObYdZVOT
+         4M1Q==
+X-Gm-Message-State: AOAM533GLq/FDXgx9GP2cqFDt/MkKL6kGmSS+000eYvwMiaV5uiP3X+/
+        BCZUq7fb/p7i4JAcWIWTsXgrqqvJfCgPuU2rYbwh0EjYut25234PhHujkqQP+8mtIS52ogSh5Hc
+        udyPnYXUu1LkY
+X-Received: by 2002:a05:6214:c3:: with SMTP id f3mr35450qvs.1.1630612434425;
+        Thu, 02 Sep 2021 12:53:54 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxfe+gUFrTXtomtVX2xlzkNBTFg7I3mOh//TVRKhgiquDY4WnrhWTNbYNyI7qpkd/xsfAo6rw==
+X-Received: by 2002:a05:6214:c3:: with SMTP id f3mr35435qvs.1.1630612434225;
+        Thu, 02 Sep 2021 12:53:54 -0700 (PDT)
+Received: from t490s ([2607:fea8:56a3:500::ad7f])
+        by smtp.gmail.com with ESMTPSA id l11sm1625458qtv.88.2021.09.02.12.53.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Sep 2021 12:53:53 -0700 (PDT)
+Date:   Thu, 2 Sep 2021 15:53:51 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <Alexandru.Elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-arm-kernel@lists.infradead.org,
-        Andrew Jones <drjones@redhat.com>,
-        Will Deacon <will@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>
-Content-Type: text/plain; charset="UTF-8"
+        kernel test robot <lkp@intel.com>
+Subject: Re: [PATCH] KVM: Drop unused kvm_dirty_gfn_harvested()
+Message-ID: <YTErzxipuwv7X0Qk@t490s>
+References: <20210901230506.13362-1-peterx@redhat.com>
+ <87y28flyxj.fsf@vitty.brq.redhat.com>
+ <YTD+eBj+9+mb9LVg@google.com>
+ <87r1e7lycp.fsf@vitty.brq.redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <87r1e7lycp.fsf@vitty.brq.redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 2, 2021 at 12:23 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Mon, Aug 16, 2021, Oliver Upton wrote:
-> > Applies cleanly to kvm/queue.
+On Thu, Sep 02, 2021 at 06:46:14PM +0200, Vitaly Kuznetsov wrote:
+> Sean Christopherson <seanjc@google.com> writes:
+> 
+> > On Thu, Sep 02, 2021, Vitaly Kuznetsov wrote:
+> >> Peter Xu <peterx@redhat.com> writes:
+> >> 
+> >> > Drop the unused function as reported by test bot.
+> >> 
+> >> Your subject line says "Drop unused kvm_dirty_gfn_harvested()" while in
+> >> reallity you drop "kvm_dirty_gfn_invalid()".
 > >
-> > Parent commit: a3e0b8bd99ab ("KVM: MMU: change tracepoints arguments to kvm_page_fault")
->
-> This needs a rebase, patch 2 and presumably patch 3 conflict with commit
-> 77fcbe823f00 ("KVM: x86: Prevent 'hv_clock->system_time' from going negative in
-> kvm_guest_time_update()").
+> > Heh, Peter already sent v2[*].  Though that's a good reminder that it's helpful
+> > to reviewers to respond to your own patch if there's a fatal mistake and you're
+> > going to immediately post a new version.  For tiny patches it's not a big deal,
+> > but for larger patches it can avoid wasting reviewers' time.
+> >
+> 
+> Indeed. It's also a good reminder for reviewers that inbox is best
+> treated like a stack and not like a queue :-)
 
-Thanks for the heads up! I've been hands-off with this series for a
-bit, as I saw Paolo was playing around with it to fold it with his
-pvclock locking changes (branch kvm/paolo). I'll pick up your
-suggestions and get another series out with Paolo's additions.
+It should really be a queue, to be fair. :)
 
---
-Thanks,
-Oliver
+I normally glance all the emails before looking into the details.  But that's
+not an excuse for sure, I should have NACKed that one.  Sorry about that.
 
-> > v6: https://lore.kernel.org/r/20210804085819.846610-1-oupton@google.com
-> >
-> > v6 -> v7:
-> >  - Separated x86, arm64, and selftests into different series
-> >  - Rebased on top of kvm/queue
-> >
-> > Oliver Upton (6):
-> >   KVM: x86: Fix potential race in KVM_GET_CLOCK
-> >   KVM: x86: Create helper methods for KVM_{GET,SET}_CLOCK ioctls
-> >   KVM: x86: Report host tsc and realtime values in KVM_GET_CLOCK
-> >   KVM: x86: Take the pvclock sync lock behind the tsc_write_lock
-> >   KVM: x86: Refactor tsc synchronization code
-> >   KVM: x86: Expose TSC offset controls to userspace
-> >
-> >  Documentation/virt/kvm/api.rst          |  42 ++-
-> >  Documentation/virt/kvm/devices/vcpu.rst |  57 ++++
-> >  Documentation/virt/kvm/locking.rst      |  11 +
-> >  arch/x86/include/asm/kvm_host.h         |   4 +
-> >  arch/x86/include/uapi/asm/kvm.h         |   4 +
-> >  arch/x86/kvm/x86.c                      | 362 +++++++++++++++++-------
-> >  include/uapi/linux/kvm.h                |   7 +-
-> >  7 files changed, 378 insertions(+), 109 deletions(-)
-> >
-> > --
-> > 2.33.0.rc1.237.g0d66db33f3-goog
-> >
+-- 
+Peter Xu
+
