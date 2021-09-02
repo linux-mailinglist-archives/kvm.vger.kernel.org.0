@@ -2,263 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 327123FF25E
-	for <lists+kvm@lfdr.de>; Thu,  2 Sep 2021 19:35:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A2BE13FF2D8
+	for <lists+kvm@lfdr.de>; Thu,  2 Sep 2021 19:52:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346688AbhIBRf4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Sep 2021 13:35:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35372 "EHLO
+        id S1346689AbhIBRxP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Sep 2021 13:53:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39522 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346676AbhIBRfy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Sep 2021 13:35:54 -0400
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 009D7C061760
-        for <kvm@vger.kernel.org>; Thu,  2 Sep 2021 10:34:56 -0700 (PDT)
-Received: by mail-pj1-x102c.google.com with SMTP id d3-20020a17090ae28300b0019629c96f25so2002222pjz.2
-        for <kvm@vger.kernel.org>; Thu, 02 Sep 2021 10:34:55 -0700 (PDT)
+        with ESMTP id S229574AbhIBRxP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Sep 2021 13:53:15 -0400
+Received: from mail-yb1-xb2e.google.com (mail-yb1-xb2e.google.com [IPv6:2607:f8b0:4864:20::b2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 990E2C061757
+        for <kvm@vger.kernel.org>; Thu,  2 Sep 2021 10:52:16 -0700 (PDT)
+Received: by mail-yb1-xb2e.google.com with SMTP id a93so5484112ybi.1
+        for <kvm@vger.kernel.org>; Thu, 02 Sep 2021 10:52:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=kuxbSrJC7raCjCUG7LcB8YHVpag242X34QlRVBQEJck=;
-        b=Qz1JtxK/pZoFgGuAbj5ok/V6BdH4SNaUT0cKQyYvHFapEjheOiI0V1dmLqkEhLpRjc
-         PgDWnKnhzn0LqSnm65THcoYdBpQ02rtkl9jynSOqt18yD+GXKqlfo7sZzQY6ul/QeocB
-         9SWc/o9T0R70mbqBqOiC0m8ivO+EJlbbDddTJjJhP9iHQeCjhocVeDcg3ob6HPQIu3Yy
-         34/e8WkJ6Vv1KZc2kuJCz1o0zIbWhcMMnK/6dFbNCtCmrBRsIInyQeKKtec1vieRwuL+
-         C8Kjz16NnffK8oQQjWjxwDpT3epVz++uQVOUpkcRcKTXwRiRpX6wwJz21f5oIw+OE1Mj
-         dOSA==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=xAUZw7IrrctnJdeQBEtbAhv9xiy70VOpKzIZyk6KqAA=;
+        b=iyKqthjIRwPONyCS4/FKOde7Qj8MPxzxsMuN8Ti/E5d4o95dMRFhXGD0ZN2pu7RPVp
+         JwWUX/2NUc7y4oxHWdsjIHW4i99GjxckLQGR8lyOsGYMBoUAf4tdI8Tc2b2WN05V78s1
+         1ci/XTZoMbCx+VULa5z5tq7lKuPFjEOFL2ewyVdnHWMbRBr8zMXxtFQ47bECS/S778Vd
+         uWYSbkDI5Q7wCUKjWhT936QxX63P6W5fUF+RE1aax17r7lqa+ihcXphy+D1BQzgYmBOh
+         74HWpCi3vjxnYhTz4SIltFZH+bMTbuiVxuEulZmZgyDq40oAz76TRf9JSIgTAEM3wNC2
+         3lXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=kuxbSrJC7raCjCUG7LcB8YHVpag242X34QlRVBQEJck=;
-        b=Z8/cfsTQ6kSzc+QV70Qd84C1tdEPHDlJhu7WvbHmdkZrhiKx89C/L8wjQFCk3bE9Tc
-         hqiDQLPnadd9gkKsrcjhxbr4luoUjhRqO9tytST87sM9L7auVR65RXCMlZz3wUUpDJVo
-         haDp2Lzl1Qa7eABO2/UY8ViX1820I9dK4Hi/5jAMKPr4Pz/oiBp6X2uuF2/DyLt3R+nV
-         1A8r8j/osfeU8xY1RD0j9tva9Z6wqIzJhgoCY0q9cCCdaY5phgIL7NHGN9m44tbD7zgr
-         AxeuBDOrlLDb6X9aKd2ydoZIV0oIxuIo5JN7KCqG/TNciZ1h0+0eJrG/OuEkBK771blf
-         8cjw==
-X-Gm-Message-State: AOAM531RuMYOfS5VGdJvWs2PUiVX03+ioCxV/m+Cr1P0G8hIw6DCEZP3
-        stTZDLfy4CCUVFzIO/fF6F0Rjg==
-X-Google-Smtp-Source: ABdhPJzikB/whUMv0CGvwxBEkqeGMSm9SVinoKW03uCXHvCgtKkl9lYMXN2IL/CRuNFSIuqIGEGsfA==
-X-Received: by 2002:a17:90a:af88:: with SMTP id w8mr5157122pjq.104.1630604095117;
-        Thu, 02 Sep 2021 10:34:55 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id g4sm3268835pgs.42.2021.09.02.10.34.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Sep 2021 10:34:54 -0700 (PDT)
-Date:   Thu, 2 Sep 2021 17:34:50 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     kvm@vger.kernel.org, Kieran Bingham <kbingham@kernel.org>,
-        Jan Kiszka <jan.kiszka@siemens.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Johannes Berg <johannes.berg@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Jessica Yu <jeyu@kernel.org>,
-        Jim Mattson <jmattson@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Yang Weijiang <weijiang.yang@intel.com>,
-        linux-kernel@vger.kernel.org, Borislav Petkov <bp@alien8.de>,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH v3 3/6] KVM: SVM: implement
- force_intercept_exceptions_mask
-Message-ID: <YTELOvhj5lERBKeC@google.com>
-References: <20210811122927.900604-1-mlevitsk@redhat.com>
- <20210811122927.900604-4-mlevitsk@redhat.com>
- <73f3eff092ca9624ebd55bc02193b39f248c8877.camel@redhat.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=xAUZw7IrrctnJdeQBEtbAhv9xiy70VOpKzIZyk6KqAA=;
+        b=JtJiYkl9VmC3vREucevMxC8uOqP3SfAUuJFH0HKyygOteGA70wzJWhOQik7qFHs6h9
+         /vi1FM2Q0Ikio/ZgRnLcf5/ycD9ii8Ta32dfnPHsRlQldx41ynsg4Losi4I7nvcNFi2j
+         /XlygwQQQ7L7l0JUZYoj+Eh4nKE0YMyDQfmuO9VJ21yEojoCZxy/mehQtyL7WCHLY8G+
+         J9pDfurBKUnKY321ztvxGy5qGmhYzb0RgJIE8AuVJWFflScguLK22OXjAtRnsFB7I8ci
+         WdF7AxYC+IqWswiiL7U4trsRnaW2R0u1lzjuiCYniAF9fcjMr+Qc3+91RVB+YR31VIh9
+         +9dw==
+X-Gm-Message-State: AOAM531ANknzkO/5kA5MetLRlBCmg/6lFXuXqR5inaj/fnGTxw7RXr6s
+        LvcKHbPryjMozGY1d2+47l2gO+KtK00NpXfR3BD4eQ==
+X-Google-Smtp-Source: ABdhPJwQXtJzqbxl4gNeMNvhKYFqgI/uCi3/Up5vD6artyFiw1jvBI/+9aQ5dnuQX2F2LGGKUfF/T1/Eh5NonYuxIbU=
+X-Received: by 2002:a25:4f87:: with SMTP id d129mr5967977ybb.359.1630605135660;
+ Thu, 02 Sep 2021 10:52:15 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <73f3eff092ca9624ebd55bc02193b39f248c8877.camel@redhat.com>
+References: <20210901211412.4171835-1-rananta@google.com> <20210901211412.4171835-8-rananta@google.com>
+ <YTARPBhMHXjgcPlg@google.com> <20210902123656.lfzwqrlw5kbvckah@gator>
+In-Reply-To: <20210902123656.lfzwqrlw5kbvckah@gator>
+From:   Raghavendra Rao Ananta <rananta@google.com>
+Date:   Thu, 2 Sep 2021 10:52:05 -0700
+Message-ID: <CAJHc60xQYiOsQcZ64SVsVRarnb2b+fefRYq+xQ8FeqGxH0fY2w@mail.gmail.com>
+Subject: Re: [PATCH v3 07/12] KVM: arm64: selftests: Add support to get the
+ vcpuid from MPIDR_EL1
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     Oliver Upton <oupton@google.com>, kvm@vger.kernel.org,
+        Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Peter Shier <pshier@google.com>, linux-kernel@vger.kernel.org,
+        Marc Zyngier <maz@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 11, 2021, Maxim Levitsky wrote:
-> On Wed, 2021-08-11 at 15:29 +0300, Maxim Levitsky wrote:
-> > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> > index e45259177009..19f54b07161a 100644
-> > --- a/arch/x86/kvm/svm/svm.c
-> > +++ b/arch/x86/kvm/svm/svm.c
-> > @@ -233,6 +233,8 @@ static const u32 msrpm_ranges[] = {0, 0xc0000000, 0xc0010000};
-> >  #define MSRS_RANGE_SIZE 2048
-> >  #define MSRS_IN_RANGE (MSRS_RANGE_SIZE * 8 / 2)
-> >  
-> > +static int svm_handle_invalid_exit(struct kvm_vcpu *vcpu, u64 exit_code);
-> > +
-> >  u32 svm_msrpm_offset(u32 msr)
-> >  {
-> >  	u32 offset;
-> > @@ -1153,6 +1155,22 @@ static void svm_recalc_instruction_intercepts(struct kvm_vcpu *vcpu,
-> >  	}
-> >  }
-> >  
-> > +static void svm_init_force_exceptions_intercepts(struct vcpu_svm *svm)
-> > +{
-> > +	int exc;
-> > +
-> > +	svm->force_intercept_exceptions_mask = force_intercept_exceptions_mask;
+On Thu, Sep 2, 2021 at 5:37 AM Andrew Jones <drjones@redhat.com> wrote:
+>
+> On Wed, Sep 01, 2021 at 11:48:12PM +0000, Oliver Upton wrote:
+> > On Wed, Sep 01, 2021 at 09:14:07PM +0000, Raghavendra Rao Ananta wrote:
+> > > At times, such as when in the interrupt handler, the guest wants to
+> > > get the vCPU-id that it's running on. As a result, introduce
+> > > get_vcpuid() that parses the MPIDR_EL1 and returns the vcpuid to the
+> > > requested caller.
+> > >
+> > > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> > > ---
+> > >  .../selftests/kvm/include/aarch64/processor.h | 19 +++++++++++++++++++
+> > >  1 file changed, 19 insertions(+)
+> > >
+> > > diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
+> > > index c35bb7b8e870..8b372cd427da 100644
+> > > --- a/tools/testing/selftests/kvm/include/aarch64/processor.h
+> > > +++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
+> > > @@ -251,4 +251,23 @@ static inline void local_irq_disable(void)
+> > >     asm volatile("msr daifset, #3" : : : "memory");
+> > >  }
+> > >
+> > > +#define MPIDR_LEVEL_BITS 8
+> > > +#define MPIDR_LEVEL_SHIFT(level) (MPIDR_LEVEL_BITS * level)
+> > > +#define MPIDR_LEVEL_MASK ((1 << MPIDR_LEVEL_BITS) - 1)
+> > > +#define MPIDR_AFFINITY_LEVEL(mpidr, level) \
+> > > +   ((mpidr >> MPIDR_LEVEL_SHIFT(level)) & MPIDR_LEVEL_MASK)
+> > > +
+> > > +static inline uint32_t get_vcpuid(void)
+> > > +{
+> > > +   uint32_t vcpuid = 0;
+> > > +   uint64_t mpidr = read_sysreg(mpidr_el1);
+> > > +
+> > > +   /* KVM limits only 16 vCPUs at level 0 */
+> > > +   vcpuid = mpidr & 0x0f;
+> > > +   vcpuid |= MPIDR_AFFINITY_LEVEL(mpidr, 1) << 4;
+> > > +   vcpuid |= MPIDR_AFFINITY_LEVEL(mpidr, 2) << 12;
+> > > +
+> > > +   return vcpuid;
+> > > +}
+> >
+> > Are we guaranteed that KVM will always compose vCPU IDs the same way? I
+> > do not believe this is guaranteed ABI.
+>
+> I don't believe we are. At least in QEMU we take pains to avoid that
+> assumption.
+>
+> >
+> > For the base case, you could pass the vCPU ID as an arg to the guest
+> > function.
+> >
+> > I do agree that finding the vCPU ID is a bit more challenging in an
+> > interrupt context. Maybe use a ucall to ask userspace? But of course,
+> > every test implements its own run loop, so its yet another case that
+> > tests need to handle.
+> >
+> > Or, you could allocate an array at runtime of length KVM_CAP_MAX_VCPUS
+> > (use the KVM_CHECK_EXTENSION ioctl to get the value). Once all vCPUs are
+> > instantiated, iterate over them from userspace to populate the {MPIDR,
+> > VCPU_ID} map. You'd need to guarantee that callers initialize the vGIC
+> > *after* adding vCPUs to the guest.
+>
+> I agree with this approach. It may even make sense to create a common
+> function that returns a {cpu_id,vcpu_index} map for other tests to use.
+>
+Interesting idea. I'll look into this.
 
-Ah, the param is being snapshotted on vCPU creation, hence the writable module
-param.  That works, though it'd be better to snapshot it on a per-VM basic, not
-per-vCPU, and do so in common x86 code so that the param doesn't need to be
-exported.
+Regards,
+Raghavendra
 
-> > +	for (exc = 0 ; exc < 32 ; exc++) {
-
-for_each_set_bit()
-
-> > +		if (!(svm->force_intercept_exceptions_mask & (1 << exc)))
-> > +			continue;
-> > +
-> > +		/* Those are defined to have undefined behavior in the SVM spec */
-> > +		if (exc != 2 && exc != 9)
-
-Maybe add a pr_warn_once() to let the user know they done messed up?
-
-And given that there are already intercepts with undefined behavior, it's probably
-best to disallow intercepting anything we aren't 100% postive will be handled
-correctly, e.g. intercepting vector 31 is nonsensical at this time.
-
-> > +			continue;
-> > +		set_exception_intercept(svm, exc);
-
-...
-
-> > +static int gen_exc_interception(struct kvm_vcpu *vcpu)
-> > +{
-> > +	/*
-> > +	 * Generic exception intercept handler which forwards a guest exception
-> > +	 * as-is to the guest.
-> > +	 * For exceptions that don't have a special intercept handler.
-> > +	 *
-> > +	 * Used only for 'force_intercept_exceptions_mask' KVM debug feature.
-> > +	 */
-> > +	struct vcpu_svm *svm = to_svm(vcpu);
-> > +	int exc = svm->vmcb->control.exit_code - SVM_EXIT_EXCP_BASE;
-> > +
-> > +	/* SVM doesn't provide us with an error code for the #DF */
-> > +	u32 err_code = exc == DF_VECTOR ? 0 : svm->vmcb->control.exit_info_1;
-
-Might be better to handle this in the x86_exception_has_error_code() path to
-avoid confusing readers with respect to exceptions that don't have an error code,
-e.g.
-
-	else if (x86_exception_has_error_code(exc)) {
-		/* SVM doesn't provide the error code on #DF :-( */
-		if (exc == DF_VECTOR)
-			kvm_queue_exception_e(vcpu, exc, 0);
-		else
-			kvm_queue_exception_e(vcpu, exc, svm->vmcb->control.exit_info_1);
-	} else {
-		...
-	}
-
-Alternatively, can we zero svm->vmcb->control.exit_info_1 on #DF to make it more
-obvious that SVM leaves stale data in exit_info_1 (assuming that's true)?  E.g.
-
-	...
-
-	if (exc == TS_VECTOR) {
-		...
-	} else if (x86_exception_has_error_code(exc)) {
-		/* SVM doesn't provide the error code on #DF :-( */
-		if (exc == DF_VECTOR)
-			svm->vmcb->control.exit_info_1 = 0;
-
-		kvm_queue_exception_e(vcpu, exc, svm->vmcb->control.exit_info_1);
-	} else {
-		...
-	}
-
-		
-> > +
-> > +	if (!(svm->force_intercept_exceptions_mask & (1 << exc)))
-
-BIT(exc)
-
-> > +		return svm_handle_invalid_exit(vcpu, svm->vmcb->control.exit_code);
-> > +
-> > +	if (exc == TS_VECTOR) {
-> > +		/*
-> > +		 * SVM doesn't provide us with an error code to be able to
-> > +		 * re-inject the #TS exception, so just disable its
-> > +		 * intercept, and let the guest re-execute the instruction.
-> > +		 */
-> > +		vmcb_clr_intercept(&svm->vmcb01.ptr->control,
-> > +				   INTERCEPT_EXCEPTION_OFFSET + TS_VECTOR);
-
-Maybe just disallow intercepting #TS altogether?  Or does this fall into your
-Win98 use case? :-)
-
-> > +		recalc_intercepts(svm);
-> > +	} else if (x86_exception_has_error_code(exc))
-> > +		kvm_queue_exception_e(vcpu, exc, err_code);
-> > +	else
-> > +		kvm_queue_exception(vcpu, exc);
-> > +	return 1;
-> > +}
-> > +
-> >  static bool is_erratum_383(void)
-> >  {
-> >  	int err, i;
-> > @@ -3065,6 +3131,10 @@ static int (*const svm_exit_handlers[])(struct kvm_vcpu *vcpu) = {
-> >  	[SVM_EXIT_WRITE_DR5]			= dr_interception,
-> >  	[SVM_EXIT_WRITE_DR6]			= dr_interception,
-> >  	[SVM_EXIT_WRITE_DR7]			= dr_interception,
-> > +
-> > +	[SVM_EXIT_EXCP_BASE ...
-> > +	SVM_EXIT_EXCP_BASE + 31]		= gen_exc_interception,
-
-This generates a Sparse warning due to the duplicate initializer.  IMO that's a
-very good warning as I have zero idea how the compiler actually handles this
-particular scenario, e.g. do later entries take priority, is it technically
-"undefined" behavior, etc...
-
-arch/x86/kvm/svm/svm.c:3065:10: warning: Initializer entry defined twice
-arch/x86/kvm/svm/svm.c:3067:29:   also defined here
-
-I don't have a clever solution though :-(
-
-> > +
-> >  	[SVM_EXIT_EXCP_BASE + DB_VECTOR]	= db_interception,
-> >  	[SVM_EXIT_EXCP_BASE + BP_VECTOR]	= bp_interception,
-> >  	[SVM_EXIT_EXCP_BASE + UD_VECTOR]	= ud_interception,
-> > diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-> > index 524d943f3efc..187ada7c5b03 100644
-> > --- a/arch/x86/kvm/svm/svm.h
-> > +++ b/arch/x86/kvm/svm/svm.h
-> > @@ -196,6 +196,7 @@ struct vcpu_svm {
-> >  	bool ghcb_sa_free;
-> >  
-> >  	bool guest_state_loaded;
-> > +	u32 force_intercept_exceptions_mask;
-> >  };
-> >  
-> >  struct svm_cpu_data {
-> > @@ -351,8 +352,11 @@ static inline void clr_exception_intercept(struct vcpu_svm *svm, u32 bit)
-> >  	struct vmcb *vmcb = svm->vmcb01.ptr;
-> >  
-> >  	WARN_ON_ONCE(bit >= 32);
-> > -	vmcb_clr_intercept(&vmcb->control, INTERCEPT_EXCEPTION_OFFSET + bit);
-> >  
-> > +	if ((1 << bit) & svm->force_intercept_exceptions_mask)
-
-BIT(bit)
-
-> > +		return;
-> > +
-> > +	vmcb_clr_intercept(&vmcb->control, INTERCEPT_EXCEPTION_OFFSET + bit);
-> >  	recalc_intercepts(svm);
-> >  }
+> Thanks,
+> drew
+>
+> >
+> > --
+> > Thanks,
+> > Oliver
+> >
+> > >  #endif /* SELFTEST_KVM_PROCESSOR_H */
+> > > --
+> > > 2.33.0.153.gba50c8fa24-goog
+> > >
+> > _______________________________________________
+> > kvmarm mailing list
+> > kvmarm@lists.cs.columbia.edu
+> > https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+> >
+>
