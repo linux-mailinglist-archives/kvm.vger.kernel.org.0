@@ -2,100 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 010823FECE6
-	for <lists+kvm@lfdr.de>; Thu,  2 Sep 2021 13:26:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EE87B3FED4B
+	for <lists+kvm@lfdr.de>; Thu,  2 Sep 2021 13:57:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245611AbhIBL1a (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Sep 2021 07:27:30 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:40846 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233850AbhIBL13 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Sep 2021 07:27:29 -0400
-Received: from zn.tnic (p200300ec2f0ed1002d220efd52bc539e.dip0.t-ipconnect.de [IPv6:2003:ec:2f0e:d100:2d22:efd:52bc:539e])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id E179F1EC0528;
-        Thu,  2 Sep 2021 13:26:25 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1630581986;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=nZDBbNwW0kzPiqS/jH6ifLFLt5uI+iZ0TLZo07Wo180=;
-        b=PVqkwqgxwkgB67Wb5b6iXPa5pJWSmTjnI/8EkkTlPxlHEXlvZhiVAYvl6uEAVRmlmYHbg3
-        T4hS6EmZOtkeycXGzbvzamDU6UNpeyViICmVFuIUyYQckxeXgvZ5u9EcMhgOL3iLiEyxcS
-        cHbsR20RNgm2UWY23Pl2ZCMPmOwcMPo=
-Date:   Thu, 2 Sep 2021 13:26:56 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH Part1 v5 34/38] x86/sev: Add snp_msg_seqno() helper
-Message-ID: <YTC1ANx81eQeGN4o@zn.tnic>
-References: <20210820151933.22401-1-brijesh.singh@amd.com>
- <20210820151933.22401-35-brijesh.singh@amd.com>
- <YSkxxkVdupkyxAJi@zn.tnic>
- <9e0e734d-7d2f-4703-b9ce-8362f0c740f4@amd.com>
+        id S1343838AbhIBL55 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Sep 2021 07:57:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41448 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1343615AbhIBL55 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Sep 2021 07:57:57 -0400
+Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7A48C061575
+        for <kvm@vger.kernel.org>; Thu,  2 Sep 2021 04:56:58 -0700 (PDT)
+Received: by mail-pg1-x536.google.com with SMTP id c17so1690136pgc.0
+        for <kvm@vger.kernel.org>; Thu, 02 Sep 2021 04:56:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:reply-to:from:date:message-id:subject:to;
+        bh=wXPEshFYPreebAoTX3ABJCbi6RIUZePUnpogyL8TPAk=;
+        b=LybtSOOj7BjZSUsjA/q6NtZrX1x3qfsJ6WEU3zKSYMq893Fd3EFc67LMp07FdKCfq3
+         H+bu6+PTNCC40k6cOa6aqRndhMVcAoxyytiEASPkorxqSJxopfTxnATwlLM2JkxdHm8/
+         rHYAZStesQvayfi968kPq9blEYkIfNrIuBfN1x8epmUFpdR+qfcQ8lLrzBywfBv3J4Tf
+         4jQfzktj7jVky/9ei2JhBbzioIEJCFYGho/ZQUwlQtshou7AVON4xR82bIaKW7KhFfEk
+         TQQtA/bGU69zbmbjfFtsBU4lf9b6FXJ1og46GYAqhaBVa+ab+N7LZGmL4IZPWiOgzFSm
+         wqSA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
+         :subject:to;
+        bh=wXPEshFYPreebAoTX3ABJCbi6RIUZePUnpogyL8TPAk=;
+        b=lMGgjeGqQ/vVKhkNU+gLFucEQHZTDQ0Tq86suF5zlDCsFV9/cTdur8Hhsqp6Za+nW9
+         5y3F6mtfqAn2dGJCraaH486NAiowJRGrCSGRzbNQ2rrxAOkAzD/5WM25kd2x+R2POFsA
+         oaF6PnO1DWDFzHZ5VTezOSLTiDRyWlHnt5g54diQnAxLaoPLWmMamBgiR0xM/bz6CV/5
+         OrvgCSwZ92nWGzDoLOVUKqFgOxjjOxMAwKCH4OmXifcOtSwa+YN9m34LLNbLSqk9QD6H
+         0HzemVtH/WfysoMZoAgn7pcjgXaVOdlowIf2HhAOuX5LKZ3Cihxalx57av8Uou0Opab7
+         aV9g==
+X-Gm-Message-State: AOAM530E2sRDQBjyuffCS8MwpMELVC6E8Dinp9HS9+4eeh6j2kcSqSpp
+        glyjp4pnAKB0CIFFvFyR5FeGZ9bIhXOoDLVsF9I=
+X-Google-Smtp-Source: ABdhPJx66ZlYqDUcCHPItRgBFZvHjnUYdkipubY/z9tUi09N+E5gXG0FIHmkuVUfL0XZNKdLCnAUD45yJH+LBJbPtiU=
+X-Received: by 2002:a63:20f:: with SMTP id 15mr2814491pgc.319.1630583818098;
+ Thu, 02 Sep 2021 04:56:58 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <9e0e734d-7d2f-4703-b9ce-8362f0c740f4@amd.com>
+Received: by 2002:a17:90b:1b42:0:0:0:0 with HTTP; Thu, 2 Sep 2021 04:56:57
+ -0700 (PDT)
+Reply-To: nnoelie64@gmail.com
+From:   Noelie Nikiema <telexdepartment19@gmail.com>
+Date:   Thu, 2 Sep 2021 04:56:57 -0700
+Message-ID: <CAOVp_5YJvFn0bH=w9cTkD_SMyHehc8S3rievYWjB3K5Zi8+vnw@mail.gmail.com>
+Subject: Dear Beneficiary,
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 30, 2021 at 10:07:39AM -0500, Brijesh Singh wrote:
-> The SNP firmware spec says that counter must begin with the 1.
-
-So put that in the comment and explain what 0 is: magic or invalid or
-whatnot and why is that so and that it is spec-ed this way, etc.
-
-Just having it there without a reasoning makes one wonder whether that's
-some arbitrary limitation or so.
-
-> During the GHCB writing the seqno use to be 32-bit value and hence the GHCB
-> spec choose the 32-bit value but recently the SNP firmware changed it from
-> the 32 to 64. So, now we are left with the option of limiting the sequence
-> number to 32-bit. If we go beyond 32-bit then all we can do is fail the
-> call. If we pass the value of zero then FW will fail the call.
-
-That sounds weird again. So make it 64-bit like the FW and fix the spec.
-
-> I just choose the smaller name but I have no issues matching with the spec.
-> Also those keys does not have anything to do with the VMPL level. The
-> secrets page provides 4 different keys and they are referred as vmpck0..3
-> and each of them have a sequence numbers associated with it.
-> 
-> In GHCB v3 we probably need to rework the structure name.
-
-You can point to the spec section so that readers can find the struct
-layout there.
-
 -- 
-Regards/Gruss,
-    Boris.
+2021 FUND RECOVERY COMPENSATION PAYMENT.
 
-https://people.kernel.org/tglx/notes-about-netiquette
+
+I am a foreign delegate from the United Nations fund recovery
+committee office/ compensation directive office , your name and
+address has been selected lucky ones for the payment of
+US$1,550.000.00 compensations funds.
+
+On this faith full recommendations, I want you to know that during the
+last UN meetings held at Africa ,it was alarmed so much by the rest of
+the world in the meetings on the lost of funds by various foreigners
+to the scams artists operating in syndicates all over the world today,
+in other to retain the good image of the country, the president UN is
+now paying 50 victims of this operators US$1,550.000.00 each, Due to
+the corrupt and inefficient banking systems in Africa, the payments
+are to be wired via direct transfer, online banking transfer or ATM
+visa card,
+Your urgent response is needed for more directives.
+
+Thanks
+Dr. Noelie Nikiema
