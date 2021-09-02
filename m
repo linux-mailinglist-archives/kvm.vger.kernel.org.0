@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C3DF33FF112
-	for <lists+kvm@lfdr.de>; Thu,  2 Sep 2021 18:17:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1C73B3FF113
+	for <lists+kvm@lfdr.de>; Thu,  2 Sep 2021 18:17:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346279AbhIBQSN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Sep 2021 12:18:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45070 "EHLO
+        id S1346235AbhIBQSS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Sep 2021 12:18:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45112 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346281AbhIBQSI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Sep 2021 12:18:08 -0400
-Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28883C061575
-        for <kvm@vger.kernel.org>; Thu,  2 Sep 2021 09:17:07 -0700 (PDT)
-Received: by mail-wr1-x42e.google.com with SMTP id t15so3838468wrg.7
-        for <kvm@vger.kernel.org>; Thu, 02 Sep 2021 09:17:07 -0700 (PDT)
+        with ESMTP id S1346242AbhIBQSP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Sep 2021 12:18:15 -0400
+Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC599C061760
+        for <kvm@vger.kernel.org>; Thu,  2 Sep 2021 09:17:16 -0700 (PDT)
+Received: by mail-wm1-x32f.google.com with SMTP id 79-20020a1c0452000000b002e6cf79e572so1878630wme.1
+        for <kvm@vger.kernel.org>; Thu, 02 Sep 2021 09:17:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=Pk3U565FofhMNBdH085OA9aU3aTnCsU54QbFBxwfMI8=;
-        b=NaB65rpK4UK7+XbBO28oZxFusXeQWuGTndzQkKqs4x497OOBypBPU5uctaWGbkSibX
-         gbzbf0uKBllL7IMK9jeerTaWXdNmmwfHar32fZ/NCC0Cj626RXCkU3d8hlfsPo25otel
-         OL/nvXSML0UuV9hTKCtQARxXaxraFStiKn4xGZp+OALpmFXy+6sqXkWFwBJFR6EcXMpL
-         +gEhWt3eW2TEXJjoPvyiNmFQPJOj0yOdhR7ZZu+zEVqND+25gS72HJlWm9AWHklxn9DD
-         TkIjI2aJpOFpKyf44h+zUsWbE/UTizlwAkVSUgam/bJtjGLksKc8rvZbllkWj5mw988x
-         UXUw==
+        bh=k2G3IfvTSVM9dAo9x5r9x/QXUgni24b97nAmsANOOiA=;
+        b=M+D+zo4/zdtMjYh01av69Zx4I3VwXPivjqKNQQ+G3Cy3iOhT3mTPvnPzXtpAFBC7IC
+         bwDY97okiaHzzYZk/Nr+HJhmQWDbqsmtfcbNHfDxcB+wW5LVOcMLHk2ke6LUzT0b2vAG
+         YqHMZm6pCnZF4sDmb5j0t8leoEPE4luIBbr+2Y/AHejZSaAIPRgw6F1l+RvTfdeQZQ/w
+         KmEHFk+ys6eIeCl+10CsGxJv2WVk1ePshB2QpZEYQ9Rs3vY5QE1eYEOqT+aIoXIw8PR9
+         WNsdSSeclnt9XXMY/k06ObG6uMJqiNqm40/pEaPsmniXZMMe5CRy4fWye4vqLWV5kU8p
+         n7eA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
          :in-reply-to:references:mime-version:content-transfer-encoding;
-        bh=Pk3U565FofhMNBdH085OA9aU3aTnCsU54QbFBxwfMI8=;
-        b=W/DT1wprGLo79uBhTx7V0+hqg0FYdoSEAo9x9BHukcfOE76+6/LwRFSKJ3GEDv/hKG
-         jcuiumMWp5LIJ9fo1jXPvY4Xp1wc6hmK+tYqK+mJ4kDSy1CZWH4SxvwuvuYvpg4CdK2R
-         vGtZwh5YsZO8YMIrsYL0taNhDUW08FZOXJEvDFhFdP+Q+LThdQehyQ9lSFCQ2/lxGQnI
-         YiYCnqIze35Q8IZynp1NZrMv/JrmuxIgprLnIY13Kzl3dfwWIHs/jCGusuk9nSsBkZM4
-         Tued94H3ET5wMGlm/2rkX5WmAAckM161HkTMvKB/BBjMk8Lsw8/wS411h6Z77iX/he7x
-         6MuA==
-X-Gm-Message-State: AOAM5339mKPNYMgXhm3UpnJmX582FvJrKsREGZWhOMsB8Y3QswkGLzP3
-        tdY99BBfdQL2lLE1BF6eh6o=
-X-Google-Smtp-Source: ABdhPJxJ0WzmriUMp5BLtv/IKodEKm5HtzrJCRMHsGjbOs/WMzY0lZa1I+orMo+J9P/Vgaj+G+An4w==
-X-Received: by 2002:adf:f991:: with SMTP id f17mr4751225wrr.56.1630599425756;
-        Thu, 02 Sep 2021 09:17:05 -0700 (PDT)
+        bh=k2G3IfvTSVM9dAo9x5r9x/QXUgni24b97nAmsANOOiA=;
+        b=cL1ISwfy3LoMlqJ+0tAYVtGtlZY2Bd4yICCLcsj9qdr669nJ/Lg6ccEYsev90PnuX6
+         IdSnYWXNnr8GsQQjGo+JfLAdpfc5uC3SX9DTcJysTRayRvkq5UskPOlvhpoveQKdvIUT
+         DCqAm9cIi1c8M8Ssa6qGq8qMnhqhGk7se/xcPuWcFsXs4FPqBCMGLXFLZWSsbniFOV+s
+         bIolgzB2KoP5KMdhejRWY5mc2vwDTedZ23/bR5AsdE7xkR3SvIvvVbXHQ20wXaDoF8rO
+         HO76OExWyVQI0/2a8b+kZwOPSiPuuAUNZ7+/Gc8uf83mdHtyrWhGDEAPs8OQmZDihIZt
+         EOCg==
+X-Gm-Message-State: AOAM533XkK5JBf3gW20LKHm+mHpaJ3CftINHPv8DGt/GT64WZgm/z3oZ
+        Q6axo9p2vutrPLcCehUTgeQ=
+X-Google-Smtp-Source: ABdhPJxFmnMfDsCiejdGeBE1y8KakVIkNHc7YRKHEHHLvGEXylx3fbGc1JSSwIBZyxQGjwxS5CvgPg==
+X-Received: by 2002:a05:600c:1d27:: with SMTP id l39mr3986130wms.146.1630599431932;
+        Thu, 02 Sep 2021 09:17:11 -0700 (PDT)
 Received: from x1w.. (163.red-83-52-55.dynamicip.rima-tde.net. [83.52.55.163])
-        by smtp.gmail.com with ESMTPSA id y4sm2068566wmi.22.2021.09.02.09.17.03
+        by smtp.gmail.com with ESMTPSA id c3sm2410025wrd.34.2021.09.02.09.17.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Sep 2021 09:17:05 -0700 (PDT)
+        Thu, 02 Sep 2021 09:17:11 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= 
         <philippe.mathieu.daude@gmail.com>
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
@@ -92,9 +92,9 @@ Cc:     Bin Meng <bin.meng@windriver.com>,
         Palmer Dabbelt <palmer@dabbelt.com>,
         Stafford Horne <shorne@gmail.com>,
         Reinoud Zandijk <reinoud@netbsd.org>, kvm@vger.kernel.org
-Subject: [PATCH v3 13/30] target/hppa: Restrict has_work() handler to sysemu and TCG
-Date:   Thu,  2 Sep 2021 18:15:26 +0200
-Message-Id: <20210902161543.417092-14-f4bug@amsat.org>
+Subject: [PATCH v3 14/30] target/i386: Restrict has_work() handler to sysemu and TCG
+Date:   Thu,  2 Sep 2021 18:15:27 +0200
+Message-Id: <20210902161543.417092-15-f4bug@amsat.org>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20210902161543.417092-1-f4bug@amsat.org>
 References: <20210902161543.417092-1-f4bug@amsat.org>
@@ -109,42 +109,67 @@ Restrict has_work() to TCG sysemu.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- target/hppa/cpu.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ target/i386/cpu.c         | 6 ------
+ target/i386/tcg/tcg-cpu.c | 8 +++++++-
+ 2 files changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/target/hppa/cpu.c b/target/hppa/cpu.c
-index e8edd189bfc..cf1f656218f 100644
---- a/target/hppa/cpu.c
-+++ b/target/hppa/cpu.c
-@@ -60,10 +60,12 @@ static void hppa_cpu_synchronize_from_tb(CPUState *cs,
-     cpu->env.psw_n = (tb->flags & PSW_N) != 0;
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 04f59043804..b7417d29f44 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -6548,11 +6548,6 @@ int x86_cpu_pending_interrupt(CPUState *cs, int interrupt_request)
+     return 0;
  }
  
-+#if defined(CONFIG_TCG) && !defined(CONFIG_USER_ONLY)
- static bool hppa_cpu_has_work(CPUState *cs)
+-static bool x86_cpu_has_work(CPUState *cs)
+-{
+-    return x86_cpu_pending_interrupt(cs, cs->interrupt_request) != 0;
+-}
+-
+ static void x86_disas_set_info(CPUState *cs, disassemble_info *info)
  {
-     return cs->interrupt_request & CPU_INTERRUPT_HARD;
- }
-+#endif /* CONFIG_TCG && !CONFIG_USER_ONLY */
+     X86CPU *cpu = X86_CPU(cs);
+@@ -6757,7 +6752,6 @@ static void x86_cpu_common_class_init(ObjectClass *oc, void *data)
  
- static void hppa_cpu_disas_set_info(CPUState *cs, disassemble_info *info)
- {
-@@ -147,6 +149,7 @@ static const struct TCGCPUOps hppa_tcg_ops = {
-     .tlb_fill = hppa_cpu_tlb_fill,
+     cc->class_by_name = x86_cpu_class_by_name;
+     cc->parse_features = x86_cpu_parse_featurestr;
+-    cc->has_work = x86_cpu_has_work;
+     cc->dump_state = x86_cpu_dump_state;
+     cc->set_pc = x86_cpu_set_pc;
+     cc->gdb_read_register = x86_cpu_gdb_read_register;
+diff --git a/target/i386/tcg/tcg-cpu.c b/target/i386/tcg/tcg-cpu.c
+index fd86daf93d2..6cde53603ba 100644
+--- a/target/i386/tcg/tcg-cpu.c
++++ b/target/i386/tcg/tcg-cpu.c
+@@ -55,6 +55,11 @@ static void x86_cpu_synchronize_from_tb(CPUState *cs,
+ }
  
  #ifndef CONFIG_USER_ONLY
-+    .has_work = hppa_cpu_has_work,
-     .cpu_exec_interrupt = hppa_cpu_exec_interrupt,
-     .do_interrupt = hppa_cpu_do_interrupt,
-     .do_unaligned_access = hppa_cpu_do_unaligned_access,
-@@ -163,7 +166,6 @@ static void hppa_cpu_class_init(ObjectClass *oc, void *data)
-                                     &acc->parent_realize);
++static bool x86_cpu_has_work(CPUState *cs)
++{
++    return x86_cpu_pending_interrupt(cs, cs->interrupt_request) != 0;
++}
++
+ static bool x86_debug_check_breakpoint(CPUState *cs)
+ {
+     X86CPU *cpu = X86_CPU(cs);
+@@ -63,7 +68,7 @@ static bool x86_debug_check_breakpoint(CPUState *cs)
+     /* RF disables all architectural breakpoints. */
+     return !(env->eflags & RF_MASK);
+ }
+-#endif
++#endif /* CONFIG_USER_ONLY */
  
-     cc->class_by_name = hppa_cpu_class_by_name;
--    cc->has_work = hppa_cpu_has_work;
-     cc->dump_state = hppa_cpu_dump_state;
-     cc->set_pc = hppa_cpu_set_pc;
-     cc->gdb_read_register = hppa_cpu_gdb_read_register;
+ #include "hw/core/tcg-cpu-ops.h"
+ 
+@@ -76,6 +81,7 @@ static const struct TCGCPUOps x86_tcg_ops = {
+ #ifdef CONFIG_USER_ONLY
+     .fake_user_exception = x86_cpu_do_interrupt,
+ #else
++    .has_work = x86_cpu_has_work,
+     .do_interrupt = x86_cpu_do_interrupt,
+     .cpu_exec_interrupt = x86_cpu_exec_interrupt,
+     .debug_excp_handler = breakpoint_handler,
 -- 
 2.31.1
 
