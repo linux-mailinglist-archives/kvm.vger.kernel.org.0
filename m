@@ -2,137 +2,266 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 82DB73FF8E3
-	for <lists+kvm@lfdr.de>; Fri,  3 Sep 2021 04:37:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A958D3FF9FF
+	for <lists+kvm@lfdr.de>; Fri,  3 Sep 2021 07:23:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345804AbhICCiU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Sep 2021 22:38:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46656 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234372AbhICCiT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Sep 2021 22:38:19 -0400
-Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D56D6C061575;
-        Thu,  2 Sep 2021 19:37:20 -0700 (PDT)
-Received: by mail-pg1-x533.google.com with SMTP id q68so4088274pga.9;
-        Thu, 02 Sep 2021 19:37:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id;
-        bh=pvnZY5mm0UezB8MEgdPnD0hyXPavTNaGp7d3rKDossE=;
-        b=XjBHgaPSRhh4Qj4iqSij3ueZOupdr6ICtQz/6Qfvdu3xWkGTFpm1R73SBevbBmWf3P
-         2L/IimBwYBPCSF0MdefLxHUDlCgmb0+PX4WT+ot/iNWlEGaQnN/uCiEPtyUC+eG1xGAU
-         P9WBFrs2DqStp6X6XThYTnbi0OYEl4VJLcbyZkKFLysfb7R+6+mi/crubBUUUA+JwfAo
-         yi8sr/xihXcvun6zq9RLW6LmpEFQx3RjvUMyEdJ+Jjonvp7NYItqn+lF7XO8ADPIuJz3
-         wQ8et50mBL9y/zdw0hlot+u+KQZwfRVmDeS1sp4lmEx6MZyThhRQlcbKHy3VBH3EQm+0
-         DF+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=pvnZY5mm0UezB8MEgdPnD0hyXPavTNaGp7d3rKDossE=;
-        b=Cx7rlOqLhybOJK9kjDri1QSu0y/ZMhDlWYUfjiS8zBWGxuHLgc7ZpB3pEVh46LT30y
-         lu3SY9fExPozmvMVZaWnh7fXLU+rRaUiuuzRSJN1TyekZEfyA9tzTERzEdxrk+1I6yFa
-         iLC7ZnSfpcytIGg/HIAw1JBi7Mbsr3+4wSrlTb+huN19StrdVp3+DMBmjWGcF77vMgAB
-         gWLc3MjRY/ac8Eq7aniwttlVZ+ZE+WZJz35k61mgwJhPz1oSdSnKQ44aZGgi3/ubD48q
-         RSCq4xkhFt4W3xSlyOCALq1Ov/bZt/9wyerNdxbIxUqP1VXHmzdFjtn5/ohWi0+IUf8M
-         yPlg==
-X-Gm-Message-State: AOAM532B53eUrDNmB2IaKiYksvxkMVxiYLyHaCCC4Aj1ABVw2MpivrLK
-        CzqAADv/Y7+eOGQO9w/ib6U=
-X-Google-Smtp-Source: ABdhPJzh7/+jToUiHx+YFZS64mSgUJA4U0bW2LOQWhLlqs5FkH878j5T4xbtD9Vg8NR/DcufUAo1Vw==
-X-Received: by 2002:a62:7d84:0:b029:3b8:49bb:4c3f with SMTP id y126-20020a627d840000b02903b849bb4c3fmr1225262pfc.49.1630636640451;
-        Thu, 02 Sep 2021 19:37:20 -0700 (PDT)
-Received: from localhost.localdomain ([162.14.19.95])
-        by smtp.gmail.com with ESMTPSA id q126sm3452214pfc.156.2021.09.02.19.37.18
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 02 Sep 2021 19:37:19 -0700 (PDT)
-From:   tcs.kernel@gmail.com
-X-Google-Original-From: tcs_kernel@tencent.com
-To:     pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, jarkko@kernel.org
-Cc:     Haimin Zhang <tcs_kernel@tencent.com>
-Subject: [PATCH v2] KVM: x86: Handle SRCU initialization failure during page track init
-Date:   Fri,  3 Sep 2021 10:37:06 +0800
-Message-Id: <1630636626-12262-1-git-send-email-tcs_kernel@tencent.com>
-X-Mailer: git-send-email 1.8.3.1
+        id S233634AbhICFYe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Sep 2021 01:24:34 -0400
+Received: from ozlabs.ru ([107.174.27.60]:44548 "EHLO ozlabs.ru"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232553AbhICFYd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Sep 2021 01:24:33 -0400
+Received: from fstn1-p1.ozlabs.ibm.com. (localhost [IPv6:::1])
+        by ozlabs.ru (Postfix) with ESMTP id 07ECBAE80212;
+        Fri,  3 Sep 2021 01:22:59 -0400 (EDT)
+From:   Alexey Kardashevskiy <aik@ozlabs.ru>
+To:     linuxppc-dev@lists.ozlabs.org
+Cc:     Alexey Kardashevskiy <aik@ozlabs.ru>, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Fabiano Rosas <farosas@linux.ibm.com>
+Subject: [PATCH kernel] KVM: PPC: Book3S: Merge powerpc's debugfs entry content into generic entry
+Date:   Fri,  3 Sep 2021 15:22:57 +1000
+Message-Id: <20210903052257.2348036-1-aik@ozlabs.ru>
+X-Mailer: git-send-email 2.30.2
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Haimin Zhang <tcs_kernel@tencent.com>
+At the moment the generic KVM code creates an "%pid-%fd" entry per a KVM
+instance; and the PPC HV KVM creates its own at "vm%pid".
 
-Check the return of init_srcu_struct(), which can fail due to OOM, when
-initializing the page track mechanism.  Lack of checking leads to a NULL
-pointer deref found by a modified syzkaller.
+The rproblems with the PPC entries are:
+1. they do not allow multiple VMs in the same process (which is extremely
+rare case mostly used by syzkaller fuzzer);
+2. prone to race bugs like the generic KVM code had fixed in
+commit 85cd39af14f4 ("KVM: Do not leak memory for duplicate debugfs
+directories").
 
-Signed-off-by: Haimin Zhang <tcs_kernel@tencent.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-Reported-by: TCS Robot <tcs_robot@tencent.com>
+This defines kvm_arch_create_kvm_debugfs() similar to one for vcpus.
 
+This defines 2 hooks in kvmppc_ops for allowing specific KVM
+implementations to add necessary entries.
+
+This makes use of already existing kvm_arch_create_vcpu_debugfs.
+
+This removes no more used debugfs_dir pointers from PPC kvm_arch structs.
+
+Suggested-by: Fabiano Rosas <farosas@linux.ibm.com>
+Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 ---
- arch/x86/include/asm/kvm_page_track.h | 2 +-
- arch/x86/kvm/mmu/page_track.c         | 4 ++--
- arch/x86/kvm/x86.c                    | 6 +++++-
- 3 files changed, 8 insertions(+), 4 deletions(-)
+ arch/powerpc/include/asm/kvm_host.h    |  6 +++---
+ arch/powerpc/include/asm/kvm_ppc.h     |  2 ++
+ include/linux/kvm_host.h               |  3 +++
+ arch/powerpc/kvm/book3s_64_mmu_hv.c    |  2 +-
+ arch/powerpc/kvm/book3s_64_mmu_radix.c |  2 +-
+ arch/powerpc/kvm/book3s_hv.c           | 30 +++++++++-----------------
+ arch/powerpc/kvm/powerpc.c             | 12 +++++++++++
+ virt/kvm/kvm_main.c                    |  3 +++
+ 8 files changed, 35 insertions(+), 25 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_page_track.h b/arch/x86/include/asm/kvm_page_track.h
-index 8766adb..9cd9230 100644
---- a/arch/x86/include/asm/kvm_page_track.h
-+++ b/arch/x86/include/asm/kvm_page_track.h
-@@ -46,7 +46,7 @@ struct kvm_page_track_notifier_node {
- 			    struct kvm_page_track_notifier_node *node);
+diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
+index 2bcac6da0a4b..e4f2feb67b53 100644
+--- a/arch/powerpc/include/asm/kvm_host.h
++++ b/arch/powerpc/include/asm/kvm_host.h
+@@ -296,7 +296,6 @@ struct kvm_arch {
+ 	bool dawr1_enabled;
+ 	pgd_t *pgtable;
+ 	u64 process_table;
+-	struct dentry *debugfs_dir;
+ 	struct kvm_resize_hpt *resize_hpt; /* protected by kvm->lock */
+ #endif /* CONFIG_KVM_BOOK3S_HV_POSSIBLE */
+ #ifdef CONFIG_KVM_BOOK3S_PR_POSSIBLE
+@@ -828,8 +827,6 @@ struct kvm_vcpu_arch {
+ 	struct kvmhv_tb_accumulator rm_exit;	/* real-mode exit code */
+ 	struct kvmhv_tb_accumulator guest_time;	/* guest execution */
+ 	struct kvmhv_tb_accumulator cede_time;	/* time napping inside guest */
+-
+-	struct dentry *debugfs_dir;
+ #endif /* CONFIG_KVM_BOOK3S_HV_EXIT_TIMING */
  };
  
--void kvm_page_track_init(struct kvm *kvm);
-+int kvm_page_track_init(struct kvm *kvm);
- void kvm_page_track_cleanup(struct kvm *kvm);
+@@ -868,4 +865,7 @@ static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu) {}
+ static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
+ static inline void kvm_arch_vcpu_block_finish(struct kvm_vcpu *vcpu) {}
  
- void kvm_page_track_free_memslot(struct kvm_memory_slot *slot);
-diff --git a/arch/x86/kvm/mmu/page_track.c b/arch/x86/kvm/mmu/page_track.c
-index a9e2e02..859800f 100644
---- a/arch/x86/kvm/mmu/page_track.c
-+++ b/arch/x86/kvm/mmu/page_track.c
-@@ -170,13 +170,13 @@ void kvm_page_track_cleanup(struct kvm *kvm)
- 	cleanup_srcu_struct(&head->track_srcu);
- }
- 
--void kvm_page_track_init(struct kvm *kvm)
-+int kvm_page_track_init(struct kvm *kvm)
- {
- 	struct kvm_page_track_notifier_head *head;
- 
- 	head = &kvm->arch.track_notifier_head;
--	init_srcu_struct(&head->track_srcu);
- 	INIT_HLIST_HEAD(&head->track_notifier_list);
-+	return init_srcu_struct(&head->track_srcu);
- }
- 
- /*
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 86539c1..9a122af 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -11143,6 +11143,8 @@ void kvm_arch_free_vm(struct kvm *kvm)
- 
- int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
- {
-+	int ret;
++#define __KVM_HAVE_ARCH_VCPU_DEBUGFS
++#define __KVM_HAVE_ARCH_KVM_DEBUGFS
 +
- 	if (type)
- 		return -EINVAL;
+ #endif /* __POWERPC_KVM_HOST_H__ */
+diff --git a/arch/powerpc/include/asm/kvm_ppc.h b/arch/powerpc/include/asm/kvm_ppc.h
+index 6355a6980ccf..8b3f7f6e3f12 100644
+--- a/arch/powerpc/include/asm/kvm_ppc.h
++++ b/arch/powerpc/include/asm/kvm_ppc.h
+@@ -316,6 +316,8 @@ struct kvmppc_ops {
+ 	int (*svm_off)(struct kvm *kvm);
+ 	int (*enable_dawr1)(struct kvm *kvm);
+ 	bool (*hash_v3_possible)(void);
++	void (*create_kvm_debugfs)(struct kvm *kvm);
++	void (*create_vcpu_debugfs)(struct kvm_vcpu *vcpu, struct dentry *debugfs_dentry);
+ };
  
-@@ -11178,7 +11180,9 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+ extern struct kvmppc_ops *kvmppc_hv_ops;
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index ae7735b490b4..74d2c1c3df1b 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -1021,6 +1021,9 @@ int kvm_arch_pm_notifier(struct kvm *kvm, unsigned long state);
+ #ifdef __KVM_HAVE_ARCH_VCPU_DEBUGFS
+ void kvm_arch_create_vcpu_debugfs(struct kvm_vcpu *vcpu, struct dentry *debugfs_dentry);
+ #endif
++#ifdef __KVM_HAVE_ARCH_KVM_DEBUGFS
++void kvm_arch_create_kvm_debugfs(struct kvm *kvm);
++#endif
  
- 	kvm_apicv_init(kvm);
- 	kvm_hv_init_vm(kvm);
--	kvm_page_track_init(kvm);
-+	ret = kvm_page_track_init(kvm);
-+	if (ret)
-+		return ret;
- 	kvm_mmu_init_vm(kvm);
- 	kvm_xen_init_vm(kvm);
+ int kvm_arch_hardware_enable(void);
+ void kvm_arch_hardware_disable(void);
+diff --git a/arch/powerpc/kvm/book3s_64_mmu_hv.c b/arch/powerpc/kvm/book3s_64_mmu_hv.c
+index c63e263312a4..33dae253a0ac 100644
+--- a/arch/powerpc/kvm/book3s_64_mmu_hv.c
++++ b/arch/powerpc/kvm/book3s_64_mmu_hv.c
+@@ -2112,7 +2112,7 @@ static const struct file_operations debugfs_htab_fops = {
+ 
+ void kvmppc_mmu_debugfs_init(struct kvm *kvm)
+ {
+-	debugfs_create_file("htab", 0400, kvm->arch.debugfs_dir, kvm,
++	debugfs_create_file("htab", 0400, kvm->debugfs_dentry, kvm,
+ 			    &debugfs_htab_fops);
+ }
+ 
+diff --git a/arch/powerpc/kvm/book3s_64_mmu_radix.c b/arch/powerpc/kvm/book3s_64_mmu_radix.c
+index c5508744e14c..f4e083c20872 100644
+--- a/arch/powerpc/kvm/book3s_64_mmu_radix.c
++++ b/arch/powerpc/kvm/book3s_64_mmu_radix.c
+@@ -1452,7 +1452,7 @@ static const struct file_operations debugfs_radix_fops = {
+ 
+ void kvmhv_radix_debugfs_init(struct kvm *kvm)
+ {
+-	debugfs_create_file("radix", 0400, kvm->arch.debugfs_dir, kvm,
++	debugfs_create_file("radix", 0400, kvm->debugfs_dentry, kvm,
+ 			    &debugfs_radix_fops);
+ }
+ 
+diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+index c8f12b056968..325b388c725a 100644
+--- a/arch/powerpc/kvm/book3s_hv.c
++++ b/arch/powerpc/kvm/book3s_hv.c
+@@ -2771,19 +2771,14 @@ static const struct file_operations debugfs_timings_ops = {
+ };
+ 
+ /* Create a debugfs directory for the vcpu */
+-static void debugfs_vcpu_init(struct kvm_vcpu *vcpu, unsigned int id)
++static void kvmppc_arch_create_vcpu_debugfs_hv(struct kvm_vcpu *vcpu, struct dentry *debugfs_dentry)
+ {
+-	char buf[16];
+-	struct kvm *kvm = vcpu->kvm;
+-
+-	snprintf(buf, sizeof(buf), "vcpu%u", id);
+-	vcpu->arch.debugfs_dir = debugfs_create_dir(buf, kvm->arch.debugfs_dir);
+-	debugfs_create_file("timings", 0444, vcpu->arch.debugfs_dir, vcpu,
++	debugfs_create_file("timings", 0444, debugfs_dentry, vcpu,
+ 			    &debugfs_timings_ops);
+ }
+ 
+ #else /* CONFIG_KVM_BOOK3S_HV_EXIT_TIMING */
+-static void debugfs_vcpu_init(struct kvm_vcpu *vcpu, unsigned int id)
++static void kvmppc_arch_create_vcpu_debugfs_hv(struct kvm_vcpu *vcpu, struct dentry *debugfs_dentry)
+ {
+ }
+ #endif /* CONFIG_KVM_BOOK3S_HV_EXIT_TIMING */
+@@ -2907,8 +2902,6 @@ static int kvmppc_core_vcpu_create_hv(struct kvm_vcpu *vcpu)
+ 	vcpu->arch.cpu_type = KVM_CPU_3S_64;
+ 	kvmppc_sanity_check(vcpu);
+ 
+-	debugfs_vcpu_init(vcpu, id);
+-
+ 	return 0;
+ }
+ 
+@@ -5186,7 +5179,6 @@ void kvmppc_free_host_rm_ops(void)
+ static int kvmppc_core_init_vm_hv(struct kvm *kvm)
+ {
+ 	unsigned long lpcr, lpid;
+-	char buf[32];
+ 	int ret;
+ 
+ 	mutex_init(&kvm->arch.uvmem_lock);
+@@ -5319,16 +5311,14 @@ static int kvmppc_core_init_vm_hv(struct kvm *kvm)
+ 		kvm->arch.smt_mode = 1;
+ 	kvm->arch.emul_smt_mode = 1;
+ 
+-	/*
+-	 * Create a debugfs directory for the VM
+-	 */
+-	snprintf(buf, sizeof(buf), "vm%d", current->pid);
+-	kvm->arch.debugfs_dir = debugfs_create_dir(buf, kvm_debugfs_dir);
++	return 0;
++}
++
++static void kvmppc_arch_create_kvm_debugfs_hv(struct kvm *kvm)
++{
+ 	kvmppc_mmu_debugfs_init(kvm);
+ 	if (radix_enabled())
+ 		kvmhv_radix_debugfs_init(kvm);
+-
+-	return 0;
+ }
+ 
+ static void kvmppc_free_vcores(struct kvm *kvm)
+@@ -5342,8 +5332,6 @@ static void kvmppc_free_vcores(struct kvm *kvm)
+ 
+ static void kvmppc_core_destroy_vm_hv(struct kvm *kvm)
+ {
+-	debugfs_remove_recursive(kvm->arch.debugfs_dir);
+-
+ 	if (!cpu_has_feature(CPU_FTR_ARCH_300))
+ 		kvm_hv_vm_deactivated();
+ 
+@@ -5996,6 +5984,8 @@ static struct kvmppc_ops kvm_ops_hv = {
+ 	.svm_off = kvmhv_svm_off,
+ 	.enable_dawr1 = kvmhv_enable_dawr1,
+ 	.hash_v3_possible = kvmppc_hash_v3_possible,
++	.create_vcpu_debugfs = kvmppc_arch_create_vcpu_debugfs_hv,
++	.create_kvm_debugfs = kvmppc_arch_create_kvm_debugfs_hv,
+ };
+ 
+ static int kvm_init_subcore_bitmap(void)
+diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
+index b4e6f70b97b9..9c18d599171b 100644
+--- a/arch/powerpc/kvm/powerpc.c
++++ b/arch/powerpc/kvm/powerpc.c
+@@ -2505,3 +2505,15 @@ int kvm_arch_init(void *opaque)
+ }
+ 
+ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_ppc_instr);
++
++void kvm_arch_create_vcpu_debugfs(struct kvm_vcpu *vcpu, struct dentry *debugfs_dentry)
++{
++	if (vcpu->kvm->arch.kvm_ops->create_vcpu_debugfs)
++		vcpu->kvm->arch.kvm_ops->create_vcpu_debugfs(vcpu, debugfs_dentry);
++}
++
++void kvm_arch_create_kvm_debugfs(struct kvm *kvm)
++{
++	if (kvm->arch.kvm_ops->create_kvm_debugfs)
++		kvm->arch.kvm_ops->create_kvm_debugfs(kvm);
++}
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index b50dbe269f4b..f9d423535f00 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -954,6 +954,9 @@ static int kvm_create_vm_debugfs(struct kvm *kvm, int fd)
+ 				    kvm->debugfs_dentry, stat_data,
+ 				    &stat_fops_per_vm);
+ 	}
++#ifdef __KVM_HAVE_ARCH_KVM_DEBUGFS
++	kvm_arch_create_kvm_debugfs(kvm);
++#endif
+ 	return 0;
+ }
  
 -- 
-1.8.3.1
+2.30.2
 
