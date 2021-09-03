@@ -2,145 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 250353FFABB
-	for <lists+kvm@lfdr.de>; Fri,  3 Sep 2021 08:55:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 608EA3FFAC7
+	for <lists+kvm@lfdr.de>; Fri,  3 Sep 2021 08:59:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347469AbhICG4p (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Sep 2021 02:56:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42045 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1346599AbhICG4o (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 3 Sep 2021 02:56:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630652144;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=EeO/1ruPx/J3HagGwQQq0jPFzGgymZG7mS2oDGjCub4=;
-        b=AEC5tqOyojbpH3X8GZVtqdsU1HIfKgKTL+SdhIdqmKQQpW8bOc/WVsYi5OOVTFmUXQMifq
-        L4wAJRULZix6bDKBOuNlyLM9v7/xMf6R6xJ7vM0nfZ7RJrVtw5IXr7MdfRqoQ13vFNcatK
-        Rl+W8rixVIZpx6Ve3/WN8PQuCI0o/BA=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-557-UMQnbxp8OvqCLRlz9HWowg-1; Fri, 03 Sep 2021 02:55:43 -0400
-X-MC-Unique: UMQnbxp8OvqCLRlz9HWowg-1
-Received: by mail-ej1-f69.google.com with SMTP id o14-20020a1709062e8e00b005d37183e041so2221599eji.21
-        for <kvm@vger.kernel.org>; Thu, 02 Sep 2021 23:55:43 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=EeO/1ruPx/J3HagGwQQq0jPFzGgymZG7mS2oDGjCub4=;
-        b=TX/jrNjRBExYjv5kwywiNk4f2JNUheI+fim0X+FS88rQZ8KVxUUkSZle3OpYAbPFIB
-         W6tfPylDR1Pudqcuh2rB+3TiywFOe/3Y9RCbjXjvJQjfanMxnVv7fc7p0AN5V3MMUq0z
-         EnrYm9cKq6PYwk8g/C5G8NiVoOVcGRL034N/vmhAxQGpcBxN1aseapOGzJpmEUbRvFHA
-         r58NG3pfb0MH0cDJiWRu+eYpWf9Q94BSnXwasD9FYJqTyU/yo3qW7hNQLUplHuz42pWr
-         i9CWO69WahcWUYwsb9r9meofVY2GStZ6APizOzNLve6JLXLFWGjUqhot/ExKFqJ1NxEq
-         I7QQ==
-X-Gm-Message-State: AOAM533UPkZIYCDCkylxUnEomMtaDdOWDQ0XHqm633ZeOfpJzKhAO0oj
-        mtbRApcrEryaCDfYSaDs3QSCeayK5DdvrlY0mvieM1ICGEgPivqe2muQdLm2hdOw+X4ufHJeUoF
-        1bohaeOSI0Lci
-X-Received: by 2002:a05:6402:2909:: with SMTP id ee9mr2379474edb.377.1630652142359;
-        Thu, 02 Sep 2021 23:55:42 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzqmSk8HBLIJKh7TPV1i1K1+xzAXzo7Ae30A7P6UZPUjSR75Ct+E874fXO8233Bd4c/cP2SjA==
-X-Received: by 2002:a05:6402:2909:: with SMTP id ee9mr2379457edb.377.1630652142126;
-        Thu, 02 Sep 2021 23:55:42 -0700 (PDT)
-Received: from steredhat (host-79-51-2-59.retail.telecomitalia.it. [79.51.2.59])
-        by smtp.gmail.com with ESMTPSA id k12sm2391179edq.59.2021.09.02.23.55.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Sep 2021 23:55:41 -0700 (PDT)
-Date:   Fri, 3 Sep 2021 08:55:39 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Norbert Slusarek <nslusarek@gmx.net>,
-        Colin Ian King <colin.king@canonical.com>,
-        Andra Paraschiv <andraprs@amazon.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, stsp2@yandex.ru, oxffffaa@gmail.com
-Subject: Re: [PATCH net-next v4 3/6] vhost/vsock: support MSG_EOR bit
- processing
-Message-ID: <20210903065539.nb2hk4sszdtlqfmb@steredhat>
-References: <20210903061353.3187150-1-arseny.krasnov@kaspersky.com>
- <20210903061541.3187840-1-arseny.krasnov@kaspersky.com>
+        id S1347491AbhICHAO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Sep 2021 03:00:14 -0400
+Received: from mail.kernel.org ([198.145.29.99]:59504 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1346599AbhICHAO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Sep 2021 03:00:14 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 35FEE60F9C;
+        Fri,  3 Sep 2021 06:59:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1630652354;
+        bh=Q4+XwPN+M1cvWkQuGrtu9reB+WwKcJKnoIF/ojmKBVM=;
+        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+        b=XN2ippLWQO03bK2sMb6hqrkdTyYHIhPz9iZwFpJgB7QBDo8rWvQ4xqnbL5gU9Es2s
+         17jxFHAd/XT1DrU/jkwXtW363y+iTEMpxGiofl69XGp09ZR/v8OB0cLb2gy2y+fvQd
+         jCQap+vXUfakWwWdbRWu31f+HpaqITe3E6TdfwEZaF3YbdSm8e6LXoEqmgO/OkZOmF
+         V2pUpB+c5km+hBzOoSkrPfxcnoD/tqDq+E39QrFolaS4cJRsmRLCcqDeGwAs/BGCWx
+         xZiel+RBUcWpHQ+RN7pS9FO8aydVvafLD0De1OWSP02PbRMMCwOXbqJIH5w4e2VV3j
+         67ghs2Cawuepw==
+Message-ID: <3c0a8a858a805789b9c71b7e54e316403fc41d5e.camel@kernel.org>
+Subject: Re: [PATCH v2] KVM: x86: Handle SRCU initialization failure during
+ page track init
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     tcs.kernel@gmail.com, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Haimin Zhang <tcs_kernel@tencent.com>
+Date:   Fri, 03 Sep 2021 09:59:12 +0300
+In-Reply-To: <1630636626-12262-1-git-send-email-tcs_kernel@tencent.com>
+References: <1630636626-12262-1-git-send-email-tcs_kernel@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20210903061541.3187840-1-arseny.krasnov@kaspersky.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 03, 2021 at 09:15:38AM +0300, Arseny Krasnov wrote:
->'MSG_EOR' handling has similar logic as 'MSG_EOM' - if bit present
->in packet's header, reset it to 0. Then restore it back if packet
->processing wasn't completed. Instead of bool variable for each
->flag, bit mask variable was added: it has logical OR of 'MSG_EOR'
->and 'MSG_EOM' if needed, to restore flags, this variable is ORed
->with flags field of packet.
->
->Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
->---
-> drivers/vhost/vsock.c | 22 +++++++++++++---------
-> 1 file changed, 13 insertions(+), 9 deletions(-)
->
->diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
->index feaf650affbe..93e8d635e18f 100644
->--- a/drivers/vhost/vsock.c
->+++ b/drivers/vhost/vsock.c
->@@ -114,7 +114,7 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
-> 		size_t nbytes;
-> 		size_t iov_len, payload_len;
-> 		int head;
->-		bool restore_flag = false;
->+		u32 flags_to_restore = 0;
->
-> 		spin_lock_bh(&vsock->send_pkt_list_lock);
-> 		if (list_empty(&vsock->send_pkt_list)) {
->@@ -179,15 +179,20 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
-> 			 * created dynamically and are initialized with header
-> 			 * of current packet(except length). But in case of
-> 			 * SOCK_SEQPACKET, we also must clear message delimeter
->-			 * bit(VIRTIO_VSOCK_SEQ_EOM). Otherwise, instead of one
->-			 * packet with delimeter(which marks end of message),
->-			 * there will be sequence of packets with delimeter
->-			 * bit set. After initialized header will be copied to
->-			 * rx buffer, this bit will be restored.
->+			 * bit (VIRTIO_VSOCK_SEQ_EOM) and MSG_EOR bit
->+			 * (VIRTIO_VSOCK_SEQ_EOR) if set. Otherwise,
->+			 * there will be sequence of packets with these
->+			 * bits set. After initialized header will be copied to
->+			 * rx buffer, these required bits will be restored.
-> 			 */
-> 			if (le32_to_cpu(pkt->hdr.flags) & VIRTIO_VSOCK_SEQ_EOM) {
-> 				pkt->hdr.flags &= ~cpu_to_le32(VIRTIO_VSOCK_SEQ_EOM);
->-				restore_flag = true;
->+				flags_to_restore |= VIRTIO_VSOCK_SEQ_EOM;
->+
->+				if (le32_to_cpu(pkt->hdr.flags & VIRTIO_VSOCK_SEQ_EOR)) {
->+					pkt->hdr.flags &= ~cpu_to_le32(VIRTIO_VSOCK_SEQ_EOR);
->+					flags_to_restore |= VIRTIO_VSOCK_SEQ_EOR;
->+				}
-> 			}
-> 		}
->
->@@ -224,8 +229,7 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
-> 		 * to send it with the next available buffer.
-> 		 */
-> 		if (pkt->off < pkt->len) {
->-			if (restore_flag)
->-				pkt->hdr.flags |= cpu_to_le32(VIRTIO_VSOCK_SEQ_EOM);
->+			pkt->hdr.flags |= cpu_to_le32(flags_to_restore);
->
-> 			/* We are queueing the same virtio_vsock_pkt to handle
-> 			 * the remaining bytes, and we want to deliver it
->-- 
->2.25.1
->
+On Fri, 2021-09-03 at 10:37 +0800, tcs.kernel@gmail.com wrote:
+> From: Haimin Zhang <tcs_kernel@tencent.com>
+>=20
+> Check the return of init_srcu_struct(), which can fail due to OOM, when
+> initializing the page track mechanism.  Lack of checking leads to a NULL
+> pointer deref found by a modified syzkaller.
+>=20
+> Signed-off-by: Haimin Zhang <tcs_kernel@tencent.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> Reported-by: TCS Robot <tcs_robot@tencent.com>
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+I'd drop reported-by. It's not a person (I guess) and the desc
+is self-contained already.
+
+Anyway,
+
+Acked-by: Jarkko Sakkinen <jarkko@kernel.org>
+
+/Jarkko
+
 
