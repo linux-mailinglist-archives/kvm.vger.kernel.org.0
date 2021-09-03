@@ -2,158 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 253A53FFF8E
-	for <lists+kvm@lfdr.de>; Fri,  3 Sep 2021 14:08:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 59CB53FFF9E
+	for <lists+kvm@lfdr.de>; Fri,  3 Sep 2021 14:14:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348866AbhICMJP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Sep 2021 08:09:15 -0400
-Received: from mail-dm6nam10on2080.outbound.protection.outlook.com ([40.107.93.80]:8960
-        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1348265AbhICMJN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Sep 2021 08:09:13 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Iqt4MceP1730montdzBkxrZ5GOggPVva7O0Vwe2TLu/0au36Wdn4E3u4RtjbCS9OdUD/drMHfak1lQeX+jW3nujgf7FXqkmxoOBJmflMs5Ataiez5NfH3c035Jh8PMdN2+MvNp1NhCn2s1UvTbY4nvB4iRUEZ/ur3g96Iwp2L2HHYmy2YhfSs+BQNmTpDHCwsAmdSIZ73N8PQ5KurPLKcSzd0HMCzDpWovFV1EG+slL9kldaKppR/GojsG/O8A3YeSuQkullu4N++cZTW0issFR6qaRMuUafT/LPewg6jwhG0RWkuHpz9a+OfcPO1fe7SlDFqvz+d60t8HtyK+FFNg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
- bh=bneLOLThWC+MYdJPDsERPwwBE/lRHAXqxiY8hlJoOOo=;
- b=Y/H2LCcLWNfdr28fPzHeluIs1SwAnW42oov3HXiFwSaoKSOhbbGvlWBxNaLxJGMPZMb/Cz5IG+LfGdhDjJXCFxAh7YXMaDyCJzP2xywB7vfnVIyTiZ8GdVOklHEfQYJKfv14kGaDTDv6q0W30Y8rQIhqSDDncSEO9mxxmAa27ltaiCi7asmKTCna2gcS6WdGNssUg9ha6Gl2XforOY3Uk6iLPirCpYlllaRHqUwM+2hZJlU+/Bv1Sye4TZBSZsw8+wKvwItKizpcMsiRlyqT3f59dSlCn4JqtpsW2kDIdxcV147ag/B4XSOukKP6mJ93mRycguKF/htX/Sj/dwr2Rg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=bneLOLThWC+MYdJPDsERPwwBE/lRHAXqxiY8hlJoOOo=;
- b=5oIHjlVgrTWAz57FWeOCXqBxKRljjvIvc1WUKqGvi5lAInki/fqy4WhkSjyEqFxQOz+Trjf+d/qnMBk4T/cX6TAoigWDZOIZXFRY04FkP6rk+05LGXrgw4vwPyKroKlsPT/64gTvFMS491huu8fkjBcw0qgNqZf8BG4PvYVsZCk=
-Authentication-Results: linux.intel.com; dkim=none (message not signed)
- header.d=none;linux.intel.com; dmarc=none action=none header.from=amd.com;
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
- by SA0PR12MB4446.namprd12.prod.outlook.com (2603:10b6:806:71::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4478.19; Fri, 3 Sep
- 2021 12:08:09 +0000
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::78b7:7336:d363:9be3]) by SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::78b7:7336:d363:9be3%6]) with mapi id 15.20.4478.021; Fri, 3 Sep 2021
- 12:08:09 +0000
-Subject: Re: [PATCH Part1 v5 35/38] x86/sev: Register SNP guest request
- platform device
-To:     Dov Murik <dovmurik@linux.ibm.com>, Borislav Petkov <bp@alien8.de>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
-References: <20210820151933.22401-1-brijesh.singh@amd.com>
- <20210820151933.22401-36-brijesh.singh@amd.com> <YTD+go747TIU6k9g@zn.tnic>
- <5428d654-a24d-7d8b-489c-b666d72043c1@amd.com>
- <287db163-aaac-4cc1-522f-380f97197b3d@linux.ibm.com>
-From:   Brijesh Singh <brijesh.singh@amd.com>
-Message-ID: <a42c782c-1de4-6c9f-4e97-cc4e1e48b358@amd.com>
-Date:   Fri, 3 Sep 2021 07:08:06 -0500
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.13.0
-In-Reply-To: <287db163-aaac-4cc1-522f-380f97197b3d@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-ClientProxiedBy: SN4PR0201CA0014.namprd02.prod.outlook.com
- (2603:10b6:803:2b::24) To SN6PR12MB2718.namprd12.prod.outlook.com
- (2603:10b6:805:6f::22)
+        id S235288AbhICMPK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Sep 2021 08:15:10 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:45863 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235119AbhICMPJ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 3 Sep 2021 08:15:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1630671249;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=jKhxEryxOvV3BCEV05H9WKrbxCCVH7ys4JOnEtcYv0o=;
+        b=Y/UqbhFAomHE1i62TT3wb9Jt0IW4itTzDLvLExiz6EX7FnlJxvlt/vBEAG3Y+qcOj5cxCB
+        V2gAbH3WABNKJCI1Es//s9Y173fR1rkSjaxQFnyL/QDCrvwYCZmB3wXzIEIXegBXNCeo6T
+        uWA2zw4PCqWNY69GsqX3dLRcK3CxjJ0=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-286-kKJsDknzPxSNSOE3U6GagA-1; Fri, 03 Sep 2021 08:14:07 -0400
+X-MC-Unique: kKJsDknzPxSNSOE3U6GagA-1
+Received: by mail-ed1-f70.google.com with SMTP id v13-20020a056402174d00b003c25d6b2f13so2659158edx.4
+        for <kvm@vger.kernel.org>; Fri, 03 Sep 2021 05:14:07 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=jKhxEryxOvV3BCEV05H9WKrbxCCVH7ys4JOnEtcYv0o=;
+        b=Xodrt1wzaqYG8z7BlDKTlfOOIrBE1jNWLytp974zzVOB4Ca/WL0bFrcw3Ogl8NWllj
+         E+IKi8utYp5k1YSuVM53+dga0YgLiCCWTvEQK88jOccU86Oc4y3G/zMALrcJ0lAbXKsc
+         B81Ox5XXk3KjCPov5Lgcbzklp8q5aWovmV1tGBq/eFWpmVqIUduRiiGktZkjbc1qkgLo
+         mIOP4vyzJ9P1FIl/Q5sh1u1OoZ+dB8vZEKOTvWNirTOJBlEXcJOJaRc8oSiGPtvLpOxC
+         WXkRC0IxFMnKFvE1M8YRh9U9pVOIsxEi1xw9jPpuKHbIGRYbhvJhH6cWbBiozUPXtTSY
+         5LCw==
+X-Gm-Message-State: AOAM531mkC+ciEmHMAxkopMdr1KKUwkQi/ER+EB2E66+W8XxqY92Ctfh
+        N2HXrLSj6chdGOPGykhE+VP2e48568+yq35x45Ilj94XIl3Zywxv7KXrKsQ8bO8fCPkNv5BD4Ny
+        RxNydSfbVhL38
+X-Received: by 2002:a17:907:7601:: with SMTP id jx1mr3852017ejc.69.1630671246105;
+        Fri, 03 Sep 2021 05:14:06 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwrZ9hQ5skCpK7Qi697152xoz1AkM543cXdpgGsazHd3sse474FPdYSbyN9lc3iS+HY2SJFkQ==
+X-Received: by 2002:a17:907:7601:: with SMTP id jx1mr3852004ejc.69.1630671245896;
+        Fri, 03 Sep 2021 05:14:05 -0700 (PDT)
+Received: from steredhat (host-79-51-2-59.retail.telecomitalia.it. [79.51.2.59])
+        by smtp.gmail.com with ESMTPSA id g19sm2607768eje.121.2021.09.03.05.14.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 03 Sep 2021 05:14:05 -0700 (PDT)
+Date:   Fri, 3 Sep 2021 14:14:02 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Norbert Slusarek <nslusarek@gmx.net>,
+        Colin Ian King <colin.king@canonical.com>,
+        Andra Paraschiv <andraprs@amazon.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, stsp2@yandex.ru, oxffffaa@gmail.com
+Subject: Re: [PATCH net-next v4 3/6] vhost/vsock: support MSG_EOR bit
+ processing
+Message-ID: <20210903121402.vfdaxznxwepezacf@steredhat>
+References: <20210903061353.3187150-1-arseny.krasnov@kaspersky.com>
+ <20210903061541.3187840-1-arseny.krasnov@kaspersky.com>
+ <20210903065539.nb2hk4sszdtlqfmb@steredhat>
 MIME-Version: 1.0
-Received: from Brijeshs-MacBook-Pro.local (70.112.153.56) by SN4PR0201CA0014.namprd02.prod.outlook.com (2603:10b6:803:2b::24) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4478.19 via Frontend Transport; Fri, 3 Sep 2021 12:08:08 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 6588ae69-cfdf-4bb0-88c5-08d96ed37ecf
-X-MS-TrafficTypeDiagnostic: SA0PR12MB4446:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SA0PR12MB4446BFF596381FC4AD925C4EE5CF9@SA0PR12MB4446.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:5516;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: IgRFo+R00yXFS88/J1lN9ciaw+1ulmuk59vFsc6gqEoMcQK+V97OM/sZrACm069uOKM6EzhFq7su3TWHhDD1ShACwMl/hJ24S2Lm4D9KSqG00VjO7xYtGT9bGN1+wYrlHBEtXUEZ1A9dF5ly3iIc7YpHGB/weXG0NQF+xpw09PGPM8hR8g8WTJWe4mdXsD0wT7PO9BsGmy9qB2OJHOJs0aoAi/vSC3JF7eZdoVLUIb3yXvBu3jgiiZ/FvI2s3d3gV9ib4FzyUCpW619Q7QrTC0dwD7Go29NIUUiAKcZiyQfcwUidK0yUJslecRzHRdpSlgZ5N9ut7TNfIURDe2IcRZBaoO0wmgGr1d9pLx6yYEDgdB0LNlLcdaBBucDj/T+IqQPmeoYdn68Thuk2ipGbE92QkiQggiQHtf5ZGSVP+oeD73z01AYEq9qUzaSk+eg2AbXMXl3TDk2bJxs9XHePABo/p7SG6QYBCpO/rSM9O0M7n4Y4k5C7gQhzTdNxx1EkVPaDO/6Hnh3R/Ieqm5Eb1qvCmwt4RLtlBbSOYs5JLSwsYCWZLQiB/tLewT0qKWVA6lTSeTRXW01v0dVWEqNvrBQACV0+plxzFOow4D2wmK6mV2WoWVOcgqm0xXkL3OvrQHWR3kzCcBxHmTqC3iigcS6w3+g5wO9uXfBggeFj/Tb5qRvk55cgUFU/xEEEcCyVEpFtvymqnjWR5NmDhbMycI2LjNu0NMwseC0yLFu3BJLoSskDMDBI7PbIzlDDGXPvRcgorAtrYshUgfFCR55yhQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(39860400002)(396003)(346002)(366004)(136003)(53546011)(44832011)(26005)(2906002)(5660300002)(52116002)(86362001)(956004)(7406005)(83380400001)(2616005)(6506007)(6486002)(8936002)(7416002)(66946007)(4744005)(4326008)(6512007)(54906003)(110136005)(186003)(8676002)(31696002)(316002)(66476007)(478600001)(31686004)(38350700002)(66556008)(36756003)(38100700002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VElEM3p5ZDJZaGswMnUzWGJxajBtd0p3UTYvbGFJbXBlSHlPQVpaN0lhREx0?=
- =?utf-8?B?eFBLMERPQkhhZGFqRjliQnIrd05MWUh6V2VzQWVzYnJGSFJFZzRhcHFVWWM1?=
- =?utf-8?B?Y3dZZitMelNiQnNBMnZGYkxic1IyNDF4VDlrQnFvbzFESlZacUgxVG5OMHlQ?=
- =?utf-8?B?RG1QeStFanBPVWhNYllqVjFTbnZGQ2xkUWgvRVpJN2pBbUxJb0F1dUh5YzBr?=
- =?utf-8?B?SzJzaHZrNjZDeUdxSG4wb2N1ZG9tSDNJbWx5SFgxMm8wYUthdGZTeXhXRC9m?=
- =?utf-8?B?Z1RmWWdnUy9XRzRxMmVPaUhLeDdtMGhzZThyTVJIU0JJdDUxUUFaUFhVd21h?=
- =?utf-8?B?cnNoU0taMnhhQ3ZyQ3U2Q1Ntb3pxMEh4d3QwTTkzMUhaZDZ4WFdIb2dURkRx?=
- =?utf-8?B?SldJbXBKWElQYjlWR00zbmhhVXQ3TDB4djZyUkl6MVRKbWNyN3U4bVhMWUZK?=
- =?utf-8?B?aTBaS3R6MHFheDVBcTJGVHRrdS9rMXRrTy9UTE16QU00RlBBNUR3bjhHUGJX?=
- =?utf-8?B?ajZqUythMXFlbWpUZkZRQlpSdTJMOE1kb3haWnp1Ulk5bWRNT2VWbWJLUDZP?=
- =?utf-8?B?R0pHVzRmTW5aMytKWklEemZjSVRTR0J5L0JhQUlRak1FVFJoeGRKZlRyTlRv?=
- =?utf-8?B?YzdGcTBJQ1hYTmd6U1o4bUYvSVRPUVVEdGZWMHdUNVh5cnN2MHluc3k0bmlF?=
- =?utf-8?B?L0xLYUJqWDlvSGdNQzUxRERSQjBjQnhTZjlScVlPR295aE15K2hCeWF0UmZI?=
- =?utf-8?B?S2tlV1lOdFdyQmlzbjlhd0RCamZQYit5a3hmNkdzVnlHUmlCQzhLVlZ4cExL?=
- =?utf-8?B?czllY1hCNXFKZklUVVBsemd5YjFsT0xNTm92bkRWWE1obGVNb0FqRW0xSXZG?=
- =?utf-8?B?Q1hQNElkVHFwMHZ0b2Z1U2ZsT2szZE5wL2lwVmFZbmlFSGsvRmdvZS92RXJN?=
- =?utf-8?B?YzFIRklZU2gxWm13VFVhWmdLY2FPKzFoemZWaVR3REY4MnRDYXk4ZU9qblFu?=
- =?utf-8?B?Mk9ySFd1YWZ4N2JUdER3aHZ0TWE2M0t3cXJNcTh5M1M5dDEwYStYcEM2OFNP?=
- =?utf-8?B?UHhiaUFiRlRmN1ZFOGVSdlo2VnhTRzYxeWE2NnhZT2l0bmxBdkd1Z1BXWTdr?=
- =?utf-8?B?bGM5ZVp4K1RGRjhFTlV6WVhsMFRBTFJBOXhudjdCaUFpUW8xN3pMK0hraHh6?=
- =?utf-8?B?SU9zbFhnTmpHMUVzRlZiNGhKSUlHcmJrSFVkMFdDZEhoeVEzWjAxY0c0eEx3?=
- =?utf-8?B?dXlabXhHWjRTNGN0UXAzZmtobVM4bUpqelY3RG5TT2RZQTBVYll1NjdDUWo1?=
- =?utf-8?B?ZHlDV3E0U21hK1FxNlVhWUJjUjZ3UCtTSW1wQm1HUk9rVHJKRXB0TUEvaXlk?=
- =?utf-8?B?V2poSSt3bm9nTS9QdUxBY2UrNFA4N1R6VUNzRjd2Z1NiM1VRa2VibllPT25v?=
- =?utf-8?B?UEtuNko4dzVCWXZ3T0dFNFVERWNDWSttYVNOU005aU82Vjl5QlhObWwwTTMx?=
- =?utf-8?B?UU0yT2Q5SFp1Q0tZdytmOEJJNkJRMWJ4RXNrYStuL0VBaklwYy9iM1BBbDAz?=
- =?utf-8?B?VWY3WkdKM0l4bllHa1hPbXE2N3c2RGhUaGYvMVNWaVJ0Z21DemRxNkhzWFRL?=
- =?utf-8?B?QmJQWkE5YUFlOEJ1c2R6ZlBFbXR2eFI4L290aDdiUWdCbStWMC8wamVPU2Nk?=
- =?utf-8?B?VEozWTFsclRHcUxhWTgxUTgzc3d1Wml4bHlkTURXVFA2NU5EQWJEQngrMng2?=
- =?utf-8?Q?fL3h1wbwkk7LO6I8NT9qrR/zvkxeLIqwXB7rTFM?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6588ae69-cfdf-4bb0-88c5-08d96ed37ecf
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Sep 2021 12:08:09.6799
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: HsLLWfIuhX7BAoaozSkURIPI5H0rZPPpq4LTyCkldvKI8r3w47ONPFeBMLFO+g1wqGQSl99CTTESgNvu2hqOUQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4446
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20210903065539.nb2hk4sszdtlqfmb@steredhat>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Fri, Sep 03, 2021 at 08:55:39AM +0200, Stefano Garzarella wrote:
+>On Fri, Sep 03, 2021 at 09:15:38AM +0300, Arseny Krasnov wrote:
+>>'MSG_EOR' handling has similar logic as 'MSG_EOM' - if bit present
+>>in packet's header, reset it to 0. Then restore it back if packet
+>>processing wasn't completed. Instead of bool variable for each
+>>flag, bit mask variable was added: it has logical OR of 'MSG_EOR'
+>>and 'MSG_EOM' if needed, to restore flags, this variable is ORed
+>>with flags field of packet.
+>>
+>>Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
+>>---
+>>drivers/vhost/vsock.c | 22 +++++++++++++---------
+>>1 file changed, 13 insertions(+), 9 deletions(-)
+>>
+>>diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+>>index feaf650affbe..93e8d635e18f 100644
+>>--- a/drivers/vhost/vsock.c
+>>+++ b/drivers/vhost/vsock.c
+>>@@ -114,7 +114,7 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
+>>		size_t nbytes;
+>>		size_t iov_len, payload_len;
+>>		int head;
+>>-		bool restore_flag = false;
+>>+		u32 flags_to_restore = 0;
+>>
+>>		spin_lock_bh(&vsock->send_pkt_list_lock);
+>>		if (list_empty(&vsock->send_pkt_list)) {
+>>@@ -179,15 +179,20 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
+>>			 * created dynamically and are initialized with header
+>>			 * of current packet(except length). But in case of
+>>			 * SOCK_SEQPACKET, we also must clear message delimeter
+>>-			 * bit(VIRTIO_VSOCK_SEQ_EOM). Otherwise, instead of one
+>>-			 * packet with delimeter(which marks end of message),
+>>-			 * there will be sequence of packets with delimeter
+>>-			 * bit set. After initialized header will be copied to
+>>-			 * rx buffer, this bit will be restored.
+>>+			 * bit (VIRTIO_VSOCK_SEQ_EOM) and MSG_EOR bit
+>>+			 * (VIRTIO_VSOCK_SEQ_EOR) if set. Otherwise,
+>>+			 * there will be sequence of packets with these
+>>+			 * bits set. After initialized header will be copied to
+>>+			 * rx buffer, these required bits will be restored.
+>>			 */
+>>			if (le32_to_cpu(pkt->hdr.flags) & VIRTIO_VSOCK_SEQ_EOM) {
+>>				pkt->hdr.flags &= ~cpu_to_le32(VIRTIO_VSOCK_SEQ_EOM);
+>>-				restore_flag = true;
+>>+				flags_to_restore |= VIRTIO_VSOCK_SEQ_EOM;
+>>+
+>>+				if (le32_to_cpu(pkt->hdr.flags & VIRTIO_VSOCK_SEQ_EOR)) {
+                                                               ^
+Ooops, le32_to_cpu() should close before bitwise and operator.
+I missed this, but kernel test robot discovered :-)
 
-On 9/3/21 3:15 AM, Dov Murik wrote:
->> Unfortunately, the secrets page does not contain a magic header or uuid
->> which a guest can read to verify that the page is actually populated by
->> the PSP. 
-> In the SNP FW ABI document section 8.14.2.5 there's a Table 61 titled
-> Secrets Page Format, which states that the first field in that page is a
-> u32 VERSION field which should equal 2h.
+>>+					pkt->hdr.flags &= ~cpu_to_le32(VIRTIO_VSOCK_SEQ_EOR);
+>>+					flags_to_restore |= VIRTIO_VSOCK_SEQ_EOR;
+>>+				}
+>>			}
+>>		}
+>>
+>>@@ -224,8 +229,7 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
+>>		 * to send it with the next available buffer.
+>>		 */
+>>		if (pkt->off < pkt->len) {
+>>-			if (restore_flag)
+>>-				pkt->hdr.flags |= cpu_to_le32(VIRTIO_VSOCK_SEQ_EOM);
+>>+			pkt->hdr.flags |= cpu_to_le32(flags_to_restore);
+>>
+>>			/* We are queueing the same virtio_vsock_pkt to handle
+>>			 * the remaining bytes, and we want to deliver it
+>>-- 2.25.1
+>>
 >
-> While not as strict as GUID header, this can help detect early that the
-> content of the SNP secrets page is invalid.
+>Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
-The description indicates that the field is a version number of the
-secrets page format; it will get bumped every time the spec steals the
-reserved bytes for something new. IMHO, we should not depend on the
-version number.
+NACK
 
-thanks
+Please resend fixing the issue.
+
+Stefano
 
