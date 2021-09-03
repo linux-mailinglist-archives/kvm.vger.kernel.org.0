@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 44D733FFE67
-	for <lists+kvm@lfdr.de>; Fri,  3 Sep 2021 12:52:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4060A3FFEA4
+	for <lists+kvm@lfdr.de>; Fri,  3 Sep 2021 13:06:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349149AbhICKxB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Sep 2021 06:53:01 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:33703 "EHLO
+        id S1348610AbhICLGV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Sep 2021 07:06:21 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53359 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1348304AbhICKw7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 3 Sep 2021 06:52:59 -0400
+        by vger.kernel.org with ESMTP id S1348589AbhICLGU (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 3 Sep 2021 07:06:20 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630666319;
+        s=mimecast20190719; t=1630667119;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=oHeIw9YVmcEgwNcQqJwIRj/uFxtFE2HXVzkecjvqdww=;
-        b=KAluWqWQS9ZeqaHTzID0jIGN3HqFu+gZUY998ZYOQuD8/sSBCEEs09f7ZaVOyCuwdVL9gi
-        iMnrQmvZTkz69qf+H4pqVvjxOx3pSh1SS/aku1vFIU8/BVqmkcIEqAfNBujTGjZ+2j6/KO
-        39nnC8BwhnNm6HpIANjfFS/vGJCwtj4=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-60-s6uRjDbZM_SIwCokolENMw-1; Fri, 03 Sep 2021 06:51:58 -0400
-X-MC-Unique: s6uRjDbZM_SIwCokolENMw-1
-Received: by mail-ed1-f71.google.com with SMTP id j13-20020aa7ca4d000000b003c44c679d73so2576567edt.8
-        for <kvm@vger.kernel.org>; Fri, 03 Sep 2021 03:51:58 -0700 (PDT)
+        bh=HKIY6ikHaYXPyQ8mc3z2vSwsDwCqgabZwLfvmGN6b8E=;
+        b=It1RMP5Oo96Cd88eLIHwgChvUqx6IK+aJoHA6SHx6qLz0kIgHObxQNjMoU7TxOWN8ENJuQ
+        n5qFcGdcU0LYKyqoxGkngtt0aAjj6w0baqWch0tduhjVE9IdfgYmiNzeDvczUicv2GYDxS
+        evpocg3VeXbslZjy2CD0LnJS5ISLPEo=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-277-SgEEqcOnPE2AnpOFN3AkhA-1; Fri, 03 Sep 2021 07:05:18 -0400
+X-MC-Unique: SgEEqcOnPE2AnpOFN3AkhA-1
+Received: by mail-ej1-f71.google.com with SMTP id bo11-20020a170906d04b00b005d477e1e41fso2539806ejb.11
+        for <kvm@vger.kernel.org>; Fri, 03 Sep 2021 04:05:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=oHeIw9YVmcEgwNcQqJwIRj/uFxtFE2HXVzkecjvqdww=;
-        b=j7C/d2AC8ISI1GDTuHjjlyP8QvzH9x8aFwAteRxrTdBbeo0xFDVN82A0v4tjZfc7JP
-         uN7U87YgFOjohKd3KSIwfiNpFc6Ifzn3IiqXONXjeeguyDINJ32sGn8oOvNEQbbVf8Yr
-         uTLEamhQcKNO+gPCpDcL+y0kdjYXQHxM4lm9xY85D0xhsPsX0kEkU5Ka31dwI7F5neG3
-         5hA+S3PGGn9d2CkQrZ/7kZZUmPtVV0hmPL59dU0kXkv4hflFGrZSnipUizP3GF6464oV
-         LL0HuTZ4bfIHiHqISa/EGObx2nr3reEDFhRhq0QgFHsDcJI3EIhW7yHhOFQUs0o51F7Q
-         p3RA==
-X-Gm-Message-State: AOAM5337uppv0Cc2cPpQuHEp8aNoHaF96tVQjPyqlI/uVJA9R4Sb6NFl
-        6+V7rppBKB8sy9QdjkhA8G0vCYhooylr5mBZ0D1wAVuKKxuaZPaJlkEeOY/mbXeJ4jTx3aeDyEH
-        oLXPfEWF9ajYJ
-X-Received: by 2002:a50:954c:: with SMTP id v12mr3312810eda.313.1630666317336;
-        Fri, 03 Sep 2021 03:51:57 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxyAFfqVO/C7ouLWgxFNht3qcnYfHlmXAIA9oHUIyykzFXWNqs4vtSc2/TiLy4hFCGFZQX0Nw==
-X-Received: by 2002:a50:954c:: with SMTP id v12mr3312796eda.313.1630666317122;
-        Fri, 03 Sep 2021 03:51:57 -0700 (PDT)
+        bh=HKIY6ikHaYXPyQ8mc3z2vSwsDwCqgabZwLfvmGN6b8E=;
+        b=IdD7aYy0EMNrhwEBWCB8FW0qXbQ0X1nFVKB1ymm7HC3givPn4cSA9Qn4mIwILQZRhn
+         p4M302LjeZIAZ8FCbZdtK9n53ET/8YH+QYy98mRcYRnqvZ/6mhGOMw/JyR3NDTBiAg9C
+         m2bB4liFSCBLiX0/MuiZ57iEGQJPNDKvNv/elUbNYl9NgeTkldyUIH58kxJC6ghwEC+V
+         pPRkmAXZqP6HfTuKHaWuq3B1tdnHzY7paNkODMU0ipVUKJbvfKbNbLtmHC/JkGIc9NTf
+         zPb4sOn2ygXEspsZFBEbp5HnXFW2H/6HBhl/8QVwqueCv2iFUTpdXeyomPwdopQ5GPNP
+         rX8Q==
+X-Gm-Message-State: AOAM5316tbXJi9WyBiVjl7zom7RekKEJ/R9EAStVwFURs8xc9hsFRK9R
+        jRXOWl6lzXdGWf4477+eCIqrfen6XDLL0Bz6SkzoHwyXRJ7wNVG2watS3ERV4KVa7mx650zx18C
+        PZzqhmG07Us4E
+X-Received: by 2002:aa7:c649:: with SMTP id z9mr3434778edr.304.1630667117285;
+        Fri, 03 Sep 2021 04:05:17 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz3MQKea1R8lQ0vwpT0Bk599an+E9Z7X4uNcjB0uA7SB1DzNkJn4bAYb6lg/3Nhge6byxQIRA==
+X-Received: by 2002:aa7:c649:: with SMTP id z9mr3434757edr.304.1630667117046;
+        Fri, 03 Sep 2021 04:05:17 -0700 (PDT)
 Received: from gator.home (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
-        by smtp.gmail.com with ESMTPSA id d3sm2560762ejw.18.2021.09.03.03.51.56
+        by smtp.gmail.com with ESMTPSA id n2sm2842024edi.32.2021.09.03.04.05.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Sep 2021 03:51:56 -0700 (PDT)
-Date:   Fri, 3 Sep 2021 12:51:55 +0200
+        Fri, 03 Sep 2021 04:05:16 -0700 (PDT)
+Date:   Fri, 3 Sep 2021 13:05:14 +0200
 From:   Andrew Jones <drjones@redhat.com>
 To:     Raghavendra Rao Ananta <rananta@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
@@ -60,157 +60,253 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
         Peter Shier <pshier@google.com>, linux-kernel@vger.kernel.org,
         Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
         linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v3 10/12] KVM: arm64: selftests: Add host support for vGIC
-Message-ID: <20210903105155.dgu2bi765ngp3pgi@gator.home>
+Subject: Re: [PATCH v3 12/12] KVM: arm64: selftests: arch_timer: Support vCPU
+ migration
+Message-ID: <20210903110514.22x3txynin5hg46z@gator.home>
 References: <20210901211412.4171835-1-rananta@google.com>
- <20210901211412.4171835-11-rananta@google.com>
+ <20210901211412.4171835-13-rananta@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210901211412.4171835-11-rananta@google.com>
+In-Reply-To: <20210901211412.4171835-13-rananta@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 01, 2021 at 09:14:10PM +0000, Raghavendra Rao Ananta wrote:
-> Implement a simple library to do perform vGIC-v3
-> setup from a host of view. This includes creating
-> a vGIC device, setting up distributor and redistributor
-> attributes, and mapping the guest physical addresses.
+On Wed, Sep 01, 2021 at 09:14:12PM +0000, Raghavendra Rao Ananta wrote:
+> Since the timer stack (hardware and KVM) is per-CPU, there
+> are potential chances for races to occur when the scheduler
+> decides to migrate a vCPU thread to a different physical CPU.
+> Hence, include an option to stress-test this part as well by
+> forcing the vCPUs to migrate across physical CPUs in the
+> system at a particular rate.
+> 
+> Originally, the bug for the fix with commit 3134cc8beb69d0d
+> ("KVM: arm64: vgic: Resample HW pending state on deactivation")
+> was discovered using arch_timer test with vCPU migrations and
+> can be easily reproduced.
 > 
 > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> 
 > ---
->  tools/testing/selftests/kvm/Makefile          |  2 +-
->  .../selftests/kvm/include/aarch64/vgic.h      | 14 ++++
->  .../testing/selftests/kvm/lib/aarch64/vgic.c  | 67 +++++++++++++++++++
->  3 files changed, 82 insertions(+), 1 deletion(-)
->  create mode 100644 tools/testing/selftests/kvm/include/aarch64/vgic.h
->  create mode 100644 tools/testing/selftests/kvm/lib/aarch64/vgic.c
+>  .../selftests/kvm/aarch64/arch_timer.c        | 108 +++++++++++++++++-
+>  1 file changed, 107 insertions(+), 1 deletion(-)
 > 
-> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> index 5476a8ddef60..8342f65c1d96 100644
-> --- a/tools/testing/selftests/kvm/Makefile
-> +++ b/tools/testing/selftests/kvm/Makefile
-> @@ -35,7 +35,7 @@ endif
+> diff --git a/tools/testing/selftests/kvm/aarch64/arch_timer.c b/tools/testing/selftests/kvm/aarch64/arch_timer.c
+> index 1383f33850e9..de246c7afab2 100644
+> --- a/tools/testing/selftests/kvm/aarch64/arch_timer.c
+> +++ b/tools/testing/selftests/kvm/aarch64/arch_timer.c
+> @@ -14,6 +14,8 @@
+>   *
+>   * The test provides command-line options to configure the timer's
+>   * period (-p), number of vCPUs (-n), and iterations per stage (-i).
+> + * To stress-test the timer stack even more, an option to migrate the
+> + * vCPUs across pCPUs (-m), at a particular rate, is also provided.
+>   *
+>   * Copyright (c) 2021, Google LLC.
+>   */
+> @@ -24,6 +26,8 @@
+>  #include <pthread.h>
+>  #include <linux/kvm.h>
+>  #include <linux/sizes.h>
+> +#include <linux/bitmap.h>
+> +#include <sys/sysinfo.h>
 >  
->  LIBKVM = lib/assert.c lib/elf.c lib/io.c lib/kvm_util.c lib/rbtree.c lib/sparsebit.c lib/test_util.c lib/guest_modes.c lib/perf_test_util.c
->  LIBKVM_x86_64 = lib/x86_64/apic.c lib/x86_64/processor.c lib/x86_64/vmx.c lib/x86_64/svm.c lib/x86_64/ucall.c lib/x86_64/handlers.S
-> -LIBKVM_aarch64 = lib/aarch64/processor.c lib/aarch64/ucall.c lib/aarch64/handlers.S lib/aarch64/spinlock.c lib/aarch64/gic.c lib/aarch64/gic_v3.c
-> +LIBKVM_aarch64 = lib/aarch64/processor.c lib/aarch64/ucall.c lib/aarch64/handlers.S lib/aarch64/spinlock.c lib/aarch64/gic.c lib/aarch64/gic_v3.c lib/aarch64/vgic.c
->  LIBKVM_s390x = lib/s390x/processor.c lib/s390x/ucall.c lib/s390x/diag318_test_handler.c
+>  #include "kvm_util.h"
+>  #include "processor.h"
+> @@ -41,12 +45,14 @@ struct test_args {
+>  	int nr_vcpus;
+>  	int nr_iter;
+>  	int timer_period_ms;
+> +	int migration_freq_ms;
+>  };
 >  
->  TEST_GEN_PROGS_x86_64 = x86_64/cr4_cpuid_sync_test
-> diff --git a/tools/testing/selftests/kvm/include/aarch64/vgic.h b/tools/testing/selftests/kvm/include/aarch64/vgic.h
-> new file mode 100644
-> index 000000000000..45bbf238147a
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/include/aarch64/vgic.h
-> @@ -0,0 +1,14 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/*
-> + * ARM Generic Interrupt Controller (GIC) host specific defines
-> + */
-> +
-> +#ifndef SELFTEST_KVM_VGIC_H
-> +#define SELFTEST_KVM_VGIC_H
-> +
-> +#include <linux/kvm.h>
-> +
-> +int vgic_v3_setup(struct kvm_vm *vm, unsigned int nr_vcpus,
-> +		uint64_t gicd_base_gpa, uint64_t gicr_base_gpa, uint32_t slot);
+>  static struct test_args test_args = {
+>  	.nr_vcpus = NR_VCPUS_DEF,
+>  	.nr_iter = NR_TEST_ITERS_DEF,
+>  	.timer_period_ms = TIMER_TEST_PERIOD_MS_DEF,
+> +	.migration_freq_ms = 0,		/* Turn off migrations by default */
 
-Having seen 5 arguments used in the vgic_v3_setup call in the next patch I
-came back here to refresh my memory on that parameter. 'slot' is the one I
-forgot, but...
+I'd rather we enable good tests like these by default.
 
+>  };
+>  
+>  #define msecs_to_usecs(msec)		((msec) * 1000LL)
+> @@ -81,6 +87,9 @@ struct test_vcpu {
+>  static struct test_vcpu test_vcpu[KVM_MAX_VCPUS];
+>  static struct test_vcpu_shared_data vcpu_shared_data[KVM_MAX_VCPUS];
+>  
+> +static unsigned long *vcpu_done_map;
+> +static pthread_mutex_t vcpu_done_map_lock;
 > +
-> +#endif /* SELFTEST_KVM_VGIC_H */
-> diff --git a/tools/testing/selftests/kvm/lib/aarch64/vgic.c b/tools/testing/selftests/kvm/lib/aarch64/vgic.c
-> new file mode 100644
-> index 000000000000..a0e4b986d335
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/lib/aarch64/vgic.c
-> @@ -0,0 +1,67 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * ARM Generic Interrupt Controller (GIC) v3 host support
-> + */
+>  static void
+>  guest_configure_timer_action(struct test_vcpu_shared_data *shared_data)
+>  {
+> @@ -216,6 +225,11 @@ static void *test_vcpu_run(void *arg)
+>  
+>  	vcpu_run(vm, vcpuid);
+>  
+> +	/* Currently, any exit from guest is an indication of completion */
+> +	pthread_mutex_lock(&vcpu_done_map_lock);
+> +	set_bit(vcpuid, vcpu_done_map);
+> +	pthread_mutex_unlock(&vcpu_done_map_lock);
 > +
-> +#include <linux/kvm.h>
-> +#include <linux/sizes.h>
-> +
-> +#include "kvm_util.h"
-> +
-> +#define VGIC_V3_GICD_SZ		(SZ_64K)
-> +#define VGIC_V3_GICR_SZ		(2 * SZ_64K)
-> +
-> +#define REDIST_REGION_ATTR_ADDR(count, base, flags, index) \
-> +	(((uint64_t)(count) << 52) | \
-> +	((uint64_t)((base) >> 16) << 16) | \
-> +	((uint64_t)(flags) << 12) | \
-> +	index)
-> +
-> +static void vgic_v3_map(struct kvm_vm *vm, uint64_t addr, unsigned int size)
+>  	switch (get_ucall(vm, vcpuid, &uc)) {
+>  	case UCALL_SYNC:
+>  	case UCALL_DONE:
+> @@ -235,9 +249,73 @@ static void *test_vcpu_run(void *arg)
+>  	return NULL;
+>  }
+>  
+> +static uint32_t test_get_pcpu(void)
 > +{
-> +	unsigned int n_pages = DIV_ROUND_UP(size, vm_get_page_size(vm));
+> +	uint32_t pcpu;
+> +	unsigned int nproc_conf;
+> +	cpu_set_t online_cpuset;
 > +
-> +	virt_map(vm, addr, addr, n_pages);
+> +	nproc_conf = get_nprocs_conf();
+> +	sched_getaffinity(0, sizeof(cpu_set_t), &online_cpuset);
+> +
+> +	/* Randomly find an available pCPU to place a vCPU on */
+> +	do {
+> +		pcpu = rand() % nproc_conf;
+> +	} while (!CPU_ISSET(pcpu, &online_cpuset));
+> +
+> +	return pcpu;
+> +}
+> +static int test_migrate_vcpu(struct test_vcpu *vcpu)
+> +{
+> +	int ret;
+> +	cpu_set_t cpuset;
+> +	uint32_t new_pcpu = test_get_pcpu();
+> +
+> +	CPU_ZERO(&cpuset);
+> +	CPU_SET(new_pcpu, &cpuset);
+> +	ret = pthread_setaffinity_np(vcpu->pt_vcpu_run,
+> +					sizeof(cpuset), &cpuset);
+> +
+> +	/* Allow the error where the vCPU thread is already finished */
+> +	TEST_ASSERT(ret == 0 || ret == ESRCH,
+> +			"Failed to migrate the vCPU:%u to pCPU: %u; ret: %d\n",
+> +			vcpu->vcpuid, new_pcpu, ret);
+
+It'd be good to collect stats for the two cases so we know how many
+vcpus we actually migrated with a successful setaffinity and how many
+just completed too early. If our stats don't look good, then we can
+adjust our timeouts and frequencies.
+
+> +
+> +	return ret;
+> +}
+> +static void *test_vcpu_migration(void *arg)
+> +{
+> +	unsigned int i, n_done;
+> +	bool vcpu_done;
+> +
+> +	do {
+> +		usleep(msecs_to_usecs(test_args.migration_freq_ms));
+> +
+> +		for (n_done = 0, i = 0; i < test_args.nr_vcpus; i++) {
+> +			pthread_mutex_lock(&vcpu_done_map_lock);
+> +			vcpu_done = test_bit(i, vcpu_done_map);
+> +			pthread_mutex_unlock(&vcpu_done_map_lock);
+> +
+> +			if (vcpu_done) {
+> +				n_done++;
+> +				continue;
+> +			}
+> +
+> +			test_migrate_vcpu(&test_vcpu[i]);
+> +		}
+> +	} while (test_args.nr_vcpus != n_done);
+> +
+> +	return NULL;
 > +}
 > +
-> +/*
-> + * vGIC-v3 default host setup
-> + *
-> + * Input args:
-> + *	vm - KVM VM
-> + *	nr_vcpus - Number of vCPUs for this VM
-> + *	gicd_base_gpa - Guest Physical Address of the Distributor region
-> + *	gicr_base_gpa - Guest Physical Address of the Redistributor region
-> + *
-> + * Output args: None
-> + *
-> + * Return: GIC file-descriptor or negative error code upon failure
-> + *
-> + * The function creates a vGIC-v3 device and maps the distributor and
-> + * redistributor regions of the guest.
-> + */
-> +int vgic_v3_setup(struct kvm_vm *vm, unsigned int nr_vcpus,
-> +		uint64_t gicd_base_gpa, uint64_t gicr_base_gpa)
+>  static void test_run(struct kvm_vm *vm)
+>  {
+>  	int i, ret;
+> +	pthread_t pt_vcpu_migration;
+> +
+> +	pthread_mutex_init(&vcpu_done_map_lock, NULL);
+> +	vcpu_done_map = bitmap_alloc(test_args.nr_vcpus);
+> +	TEST_ASSERT(vcpu_done_map, "Failed to allocate vcpu done bitmap\n");
+>  
+>  	for (i = 0; i < test_args.nr_vcpus; i++) {
+>  		ret = pthread_create(&test_vcpu[i].pt_vcpu_run, NULL,
+> @@ -245,8 +323,23 @@ static void test_run(struct kvm_vm *vm)
+>  		TEST_ASSERT(!ret, "Failed to create vCPU-%d pthread\n", i);
+>  	}
+>  
+> +	/* Spawn a thread to control the vCPU migrations */
+> +	if (test_args.migration_freq_ms) {
+> +		srand(time(NULL));
+> +
+> +		ret = pthread_create(&pt_vcpu_migration, NULL,
+> +					test_vcpu_migration, NULL);
+> +		TEST_ASSERT(!ret, "Failed to create the migration pthread\n");
+> +	}
+> +
+> +
+>  	for (i = 0; i < test_args.nr_vcpus; i++)
+>  		pthread_join(test_vcpu[i].pt_vcpu_run, NULL);
+> +
+> +	if (test_args.migration_freq_ms)
+> +		pthread_join(pt_vcpu_migration, NULL);
+> +
+> +	bitmap_free(vcpu_done_map);
+>  }
+>  
+>  static struct kvm_vm *test_vm_create(void)
+> @@ -286,6 +379,7 @@ static void test_print_help(char *name)
+>  		NR_TEST_ITERS_DEF);
+>  	pr_info("\t-p: Periodicity (in ms) of the guest timer (default: %u)\n",
+>  		TIMER_TEST_PERIOD_MS_DEF);
+> +	pr_info("\t-m: Frequency (in ms) of vCPUs to migrate to different pCPU. 0 to turn off (default: 0)\n");
+>  	pr_info("\t-h: print this help screen\n");
+>  }
+>  
+> @@ -293,7 +387,7 @@ static bool parse_args(int argc, char *argv[])
+>  {
+>  	int opt;
+>  
+> -	while ((opt = getopt(argc, argv, "hn:i:p:")) != -1) {
+> +	while ((opt = getopt(argc, argv, "hn:i:p:m:")) != -1) {
+>  		switch (opt) {
+>  		case 'n':
+>  			test_args.nr_vcpus = atoi(optarg);
+> @@ -320,6 +414,13 @@ static bool parse_args(int argc, char *argv[])
+>  				goto err;
+>  			}
+>  			break;
+> +		case 'm':
+> +			test_args.migration_freq_ms = atoi(optarg);
+> +			if (test_args.migration_freq_ms < 0) {
+> +				pr_info("0 or positive value needed for -m\n");
+> +				goto err;
+> +			}
+> +			break;
+>  		case 'h':
+>  		default:
+>  			goto err;
+> @@ -343,6 +444,11 @@ int main(int argc, char *argv[])
+>  	if (!parse_args(argc, argv))
+>  		exit(KSFT_SKIP);
+>  
+> +	if (get_nprocs() < 2) {
 
-...looks like it was forgotten here too.
+if (test_args.migration_freq_ms && get_nprocs() < 2)
 
-Thanks,
-drew
-
-> +{
-> +	uint64_t redist_attr;
-> +	int gic_fd;
+> +		print_skip("At least two physical CPUs needed for vCPU migration");
+> +		exit(KSFT_SKIP);
+> +	}
 > +
-> +	TEST_ASSERT(nr_vcpus <= KVM_MAX_VCPUS,
-> +			"Invalid number of CPUs: %u\n", nr_vcpus);
-> +
-> +	gic_fd = kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_V3, false);
-> +
-> +	kvm_device_access(gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
-> +			KVM_VGIC_V3_ADDR_TYPE_DIST, &gicd_base_gpa, true);
-> +	vgic_v3_map(vm, gicd_base_gpa, VGIC_V3_GICD_SZ);
-> +
-> +	redist_attr = REDIST_REGION_ATTR_ADDR(nr_vcpus, gicr_base_gpa, 0, 0);
-> +	kvm_device_access(gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
-> +			KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &redist_attr, true);
-> +	vgic_v3_map(vm, gicr_base_gpa, VGIC_V3_GICR_SZ * nr_vcpus);
-> +
-> +	kvm_device_access(gic_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
-> +				KVM_DEV_ARM_VGIC_CTRL_INIT, NULL, true);
-> +
-> +	return gic_fd;
-> +}
+>  	vm = test_vm_create();
+>  	test_run(vm);
+>  	kvm_vm_free(vm);
 > -- 
 > 2.33.0.153.gba50c8fa24-goog
-> 
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-> 
+>
+
+Thanks,
+drew 
 
