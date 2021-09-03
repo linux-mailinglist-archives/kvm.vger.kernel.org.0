@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A14D3FFB51
-	for <lists+kvm@lfdr.de>; Fri,  3 Sep 2021 09:53:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8D93A3FFB57
+	for <lists+kvm@lfdr.de>; Fri,  3 Sep 2021 09:53:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348050AbhICHxc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Sep 2021 03:53:32 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:30118 "EHLO
+        id S1348093AbhICHxh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Sep 2021 03:53:37 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:23687 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1347992AbhICHxY (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 3 Sep 2021 03:53:24 -0400
+        by vger.kernel.org with ESMTP id S1348025AbhICHxZ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 3 Sep 2021 03:53:25 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630655544;
+        s=mimecast20190719; t=1630655545;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=uO5cZkBAb4EzZ2fBpKycqtuV0oNrYilh+cmyB9NoXVM=;
-        b=VOF8YoYQomE2CYG1n/eyxLE/2pFJwIlFZaUuPkTTKbXQ9VOE1IlAnPh1xo+TJzv4l/yRRj
-        RFMSUJOGvI6jq8kvXAnFhAQ/w0dnok/RnBVXg4LHol2iBvLihaNHy55kzKwtW4+KloJnXh
-        3xH/lwMOjMDCGuNVlW8mIhm/HKtsYsY=
+        bh=CAww2Pu9T9uLrDa7tGvh1V9RqD8zqzV1FJuxb6/DyjY=;
+        b=fx7QY0HPCqxhogj8o8CwPUykW9Oymll34QLO9EgAyJwu/hrp114t3fyH3iZvp9c2Z0/yG9
+        lCq2uwvimHVyGtucrnmsR5s9YtE1sXvtD6LNVBYI7KZyhJHNSORl/cyBgP/5Wp2sFm5BKA
+        Vvqztn2AGveB7H0HZv+KeEBYlxFcJFo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-408-Kh4SmpzNN8WdbcjFtDfykA-1; Fri, 03 Sep 2021 03:52:21 -0400
-X-MC-Unique: Kh4SmpzNN8WdbcjFtDfykA-1
+ us-mta-598-nYRdqdyUPXqPZxa8QeBqGg-1; Fri, 03 Sep 2021 03:52:24 -0400
+X-MC-Unique: nYRdqdyUPXqPZxa8QeBqGg-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3B51B195D560;
-        Fri,  3 Sep 2021 07:51:59 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 53914501EC;
+        Fri,  3 Sep 2021 07:52:02 +0000 (UTC)
 Received: from vitty.brq.redhat.com (unknown [10.40.194.111])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5F1ED10016F5;
-        Fri,  3 Sep 2021 07:51:56 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id AB2AA10016F5;
+        Fri,  3 Sep 2021 07:51:59 +0000 (UTC)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
 To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -44,151 +44,93 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         Maxim Levitsky <mlevitsk@redhat.com>,
         Eduardo Habkost <ehabkost@redhat.com>,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v5 4/8] KVM: Optimize kvm_make_vcpus_request_mask() a bit
-Date:   Fri,  3 Sep 2021 09:51:37 +0200
-Message-Id: <20210903075141.403071-5-vkuznets@redhat.com>
+Subject: [PATCH v5 5/8] KVM: Drop 'except' parameter from kvm_make_vcpus_request_mask()
+Date:   Fri,  3 Sep 2021 09:51:38 +0200
+Message-Id: <20210903075141.403071-6-vkuznets@redhat.com>
 In-Reply-To: <20210903075141.403071-1-vkuznets@redhat.com>
 References: <20210903075141.403071-1-vkuznets@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Iterating over set bits in 'vcpu_bitmap' should be faster than going
-through all vCPUs, especially when just a few bits are set.
+Both remaining callers of kvm_make_vcpus_request_mask() pass 'NULL' for
+'except' parameter so it can just be dropped.
 
-Drop kvm_make_vcpus_request_mask() call from kvm_make_all_cpus_request_except()
-to avoid handling the special case when 'vcpu_bitmap' is NULL, move the
-code to kvm_make_all_cpus_request_except() itself.
+No functional change intended ©.
 
+Suggested-by: Sean Christopherson <seanjc@google.com>
+Reviewed-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 ---
- virt/kvm/kvm_main.c | 88 +++++++++++++++++++++++++++------------------
- 1 file changed, 53 insertions(+), 35 deletions(-)
+ arch/x86/kvm/hyperv.c    | 2 +-
+ arch/x86/kvm/x86.c       | 2 +-
+ include/linux/kvm_host.h | 1 -
+ virt/kvm/kvm_main.c      | 3 +--
+ 4 files changed, 3 insertions(+), 5 deletions(-)
 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 2082aceffbf6..e649b939dda7 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -261,50 +261,57 @@ static inline bool kvm_kick_many_cpus(cpumask_var_t tmp, bool wait)
- 	return true;
- }
+diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+index 783a7f2441bd..5704bfe53ee0 100644
+--- a/arch/x86/kvm/hyperv.c
++++ b/arch/x86/kvm/hyperv.c
+@@ -1850,7 +1850,7 @@ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc, bool
+ 						    vp_bitmap, vcpu_bitmap);
  
-+static void kvm_make_vcpu_request(struct kvm *kvm, struct kvm_vcpu *vcpu,
-+				  unsigned int req, cpumask_var_t tmp,
-+				  int current_cpu)
-+{
-+	int cpu;
-+
-+	kvm_make_request(req, vcpu);
-+
-+	if (!(req & KVM_REQUEST_NO_WAKEUP) && kvm_vcpu_wake_up(vcpu))
-+		return;
-+
-+	/*
-+	 * tmp can be "unavailable" if cpumasks are allocated off stack as
-+	 * allocation of the mask is deliberately not fatal and is handled by
-+	 * falling back to kicking all online CPUs.
-+	 */
-+	if (!cpumask_available(tmp))
-+		return;
-+
-+	/*
-+	 * Note, the vCPU could get migrated to a different pCPU at any point
-+	 * after kvm_request_needs_ipi(), which could result in sending an IPI
-+	 * to the previous pCPU.  But, that's OK because the purpose of the IPI
-+	 * is to ensure the vCPU returns to OUTSIDE_GUEST_MODE, which is
-+	 * satisfied if the vCPU migrates. Entering READING_SHADOW_PAGE_TABLES
-+	 * after this point is also OK, as the requirement is only that KVM wait
-+	 * for vCPUs that were reading SPTEs _before_ any changes were
-+	 * finalized. See kvm_vcpu_kick() for more details on handling requests.
-+	 */
-+	if (kvm_request_needs_ipi(vcpu, req)) {
-+		cpu = READ_ONCE(vcpu->cpu);
-+		if (cpu != -1 && cpu != current_cpu)
-+			__cpumask_set_cpu(cpu, tmp);
-+	}
-+}
-+
- bool kvm_make_vcpus_request_mask(struct kvm *kvm, unsigned int req,
- 				 struct kvm_vcpu *except,
- 				 unsigned long *vcpu_bitmap, cpumask_var_t tmp)
- {
--	int i, cpu, me;
- 	struct kvm_vcpu *vcpu;
-+	int i, me;
- 	bool called;
- 
- 	me = get_cpu();
- 
--	kvm_for_each_vcpu(i, vcpu, kvm) {
--		if ((vcpu_bitmap && !test_bit(i, vcpu_bitmap)) ||
--		    vcpu == except)
-+	for_each_set_bit(i, vcpu_bitmap, KVM_MAX_VCPUS) {
-+		vcpu = kvm_get_vcpu(kvm, i);
-+		if (!vcpu || vcpu == except)
- 			continue;
--
--		kvm_make_request(req, vcpu);
--
--		if (!(req & KVM_REQUEST_NO_WAKEUP) && kvm_vcpu_wake_up(vcpu))
--			continue;
--
--		/*
--		 * tmp can be "unavailable" if cpumasks are allocated off stack
--		 * as allocation of the mask is deliberately not fatal and is
--		 * handled by falling back to kicking all online CPUs.
--		 */
--		if (!cpumask_available(tmp))
--			continue;
--
--		/*
--		 * Note, the vCPU could get migrated to a different pCPU at any
--		 * point after kvm_request_needs_ipi(), which could result in
--		 * sending an IPI to the previous pCPU.  But, that's ok because
--		 * the purpose of the IPI is to ensure the vCPU returns to
--		 * OUTSIDE_GUEST_MODE, which is satisfied if the vCPU migrates.
--		 * Entering READING_SHADOW_PAGE_TABLES after this point is also
--		 * ok, as the requirement is only that KVM wait for vCPUs that
--		 * were reading SPTEs _before_ any changes were finalized.  See
--		 * kvm_vcpu_kick() for more details on handling requests.
--		 */
--		if (kvm_request_needs_ipi(vcpu, req)) {
--			cpu = READ_ONCE(vcpu->cpu);
--			if (cpu != -1 && cpu != me)
--				__cpumask_set_cpu(cpu, tmp);
--		}
-+		kvm_make_vcpu_request(kvm, vcpu, req, tmp, me);
+ 		kvm_make_vcpus_request_mask(kvm, KVM_REQ_TLB_FLUSH_GUEST,
+-					    NULL, vcpu_mask, &hv_vcpu->tlb_flush);
++					    vcpu_mask, &hv_vcpu->tlb_flush);
  	}
  
- 	called = kvm_kick_many_cpus(tmp, !!(req & KVM_REQUEST_WAIT));
-@@ -316,12 +323,23 @@ bool kvm_make_vcpus_request_mask(struct kvm *kvm, unsigned int req,
- bool kvm_make_all_cpus_request_except(struct kvm *kvm, unsigned int req,
- 				      struct kvm_vcpu *except)
- {
-+	struct kvm_vcpu *vcpu;
- 	cpumask_var_t cpus;
- 	bool called;
-+	int i, me;
- 
+ ret_success:
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 86539c1686fa..a4752dcc2a75 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -9229,7 +9229,7 @@ void kvm_make_scan_ioapic_request_mask(struct kvm *kvm,
  	zalloc_cpumask_var(&cpus, GFP_ATOMIC);
  
--	called = kvm_make_vcpus_request_mask(kvm, req, except, NULL, cpus);
-+	me = get_cpu();
-+
-+	kvm_for_each_vcpu(i, vcpu, kvm) {
-+		if (vcpu == except)
-+			continue;
-+		kvm_make_vcpu_request(kvm, vcpu, req, cpus, me);
-+	}
-+
-+	called = kvm_kick_many_cpus(cpus, !!(req & KVM_REQUEST_WAIT));
-+	put_cpu();
+ 	kvm_make_vcpus_request_mask(kvm, KVM_REQ_SCAN_IOAPIC,
+-				    NULL, vcpu_bitmap, cpus);
++				    vcpu_bitmap, cpus);
  
  	free_cpumask_var(cpus);
- 	return called;
+ }
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index e4d712e9f760..2f149ed140f7 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -160,7 +160,6 @@ static inline bool is_error_page(struct page *page)
+ #define KVM_ARCH_REQ(nr)           KVM_ARCH_REQ_FLAGS(nr, 0)
+ 
+ bool kvm_make_vcpus_request_mask(struct kvm *kvm, unsigned int req,
+-				 struct kvm_vcpu *except,
+ 				 unsigned long *vcpu_bitmap, cpumask_var_t tmp);
+ bool kvm_make_all_cpus_request(struct kvm *kvm, unsigned int req);
+ bool kvm_make_all_cpus_request_except(struct kvm *kvm, unsigned int req,
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index e649b939dda7..1238976ef614 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -298,7 +298,6 @@ static void kvm_make_vcpu_request(struct kvm *kvm, struct kvm_vcpu *vcpu,
+ }
+ 
+ bool kvm_make_vcpus_request_mask(struct kvm *kvm, unsigned int req,
+-				 struct kvm_vcpu *except,
+ 				 unsigned long *vcpu_bitmap, cpumask_var_t tmp)
+ {
+ 	struct kvm_vcpu *vcpu;
+@@ -309,7 +308,7 @@ bool kvm_make_vcpus_request_mask(struct kvm *kvm, unsigned int req,
+ 
+ 	for_each_set_bit(i, vcpu_bitmap, KVM_MAX_VCPUS) {
+ 		vcpu = kvm_get_vcpu(kvm, i);
+-		if (!vcpu || vcpu == except)
++		if (!vcpu)
+ 			continue;
+ 		kvm_make_vcpu_request(kvm, vcpu, req, tmp, me);
+ 	}
 -- 
 2.31.1
 
