@@ -2,137 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 03811400251
-	for <lists+kvm@lfdr.de>; Fri,  3 Sep 2021 17:30:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EF35140025E
+	for <lists+kvm@lfdr.de>; Fri,  3 Sep 2021 17:31:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349658AbhICPbD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Sep 2021 11:31:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52500 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349599AbhICPbC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Sep 2021 11:31:02 -0400
-Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0767C061575
-        for <kvm@vger.kernel.org>; Fri,  3 Sep 2021 08:30:02 -0700 (PDT)
-Received: by mail-pg1-x52c.google.com with SMTP id 17so5877122pgp.4
-        for <kvm@vger.kernel.org>; Fri, 03 Sep 2021 08:30:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=LHKYiZn1enaTL529IiH4EK/EtyfMkn7nwZWISrjiVhY=;
-        b=M1hmIwSk2NFKnJOJ4Vgu+iHShzORT6dJIsRIp8JdNkhiOnx2AJdQ1bkLFvHmd8erXR
-         KkANKbXwH/nLCgfjJR+XdN4Jcz7MNqpUzimseDcRtOhZ1dRfny7IUbMDN5inYeqVeSIf
-         SFZ+Bn9jZYos1uBn7NfjX+9IVYRANzhTkx/CkkBbPMZ/PBTYfC6m7LCrUXZLfytVM1ZE
-         bLYhwqg93Sn4s3Dv4Qu8R6gz96gztgR9EaYlTl1E4ZXcpjy73MQtMev4u0mXTg0cqNAp
-         cehbFesspteHPSp9wOB8WwJZ+ucJqg3z7PQbmAIbsBMxBb49ku5JDs226YWY7WOPbaVs
-         Q4hA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=LHKYiZn1enaTL529IiH4EK/EtyfMkn7nwZWISrjiVhY=;
-        b=J+CLgWZMnepjwwBARrQnxo0wkyKkZdJJxQw/8jSgdyOYYf29aeNqia8e81/7FW0pyI
-         FeUGAROYmFdytDkTsOJQyRxAaFtlps8wsrv1pyqd1AMAslHNhGM520DgE4gwqsHoiC9s
-         2JmE4SnelQ/oDeYitwvJidQq8CVCCIo7T+CnCLsdO+QO50Y/Xbrjq45s9l3HaTmzB4eU
-         nLj2fB9MNMBLt+i6m6/2PLh0HQBSRlHFuxpe+rvbtM0/6a3C1LxNIC/5n+byRsrKDGO4
-         eRuXQ8aOXGi9Wb2PTw5KexEmMFerKc0P0mav4e1aVNktAywbVTbLxrgZ6twlH6tBF/rd
-         /b0Q==
-X-Gm-Message-State: AOAM533f5xJKj+e4TkB4vK1N1VlfcFpAoNzi+jyR7viypLdunlj7qwoe
-        MFGb+ZeOzdMn416+5vUEdZt3IQ==
-X-Google-Smtp-Source: ABdhPJwMBaYVLR8cXvB6Z+9aj4+MXUcCaIeCuQlghLG74c5rWCjeRc3NgQRo85XQweiL3iOtRfcUEg==
-X-Received: by 2002:a65:6a46:: with SMTP id o6mr4043496pgu.139.1630683002030;
-        Fri, 03 Sep 2021 08:30:02 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id h7sm619948pfe.125.2021.09.03.08.30.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Sep 2021 08:30:01 -0700 (PDT)
-Date:   Fri, 3 Sep 2021 15:29:57 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Jarkko Sakkinen <jarkko@kernel.org>
-Cc:     Dave Hansen <dave.hansen@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        id S1349711AbhICPcE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Sep 2021 11:32:04 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:34736 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1349680AbhICPcE (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 3 Sep 2021 11:32:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1630683063;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:in-reply-to:in-reply-to:  references:references;
+        bh=CzPb8MlbLx41oQqysfJ8QyV0MvR1gCZguZRQ8mTaaK4=;
+        b=DNgksK0re68B9R4HvVKec8qIYNj6Fi6d9BilBx0sd6ArJ+M6lFxXuxVKT0oZrhO4wlSkw7
+        8oiqN/c7y3OmNaRrV0q9BlDYes8GSotjn1i+ENJlO6bfpxDVUf9sQXIvFmFf9o6JQIxSJA
+        MAViJvuh8+YNxvgwdjJLL+C2rwkqikQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-588-uJrZ-_7SOISk6KCCwMLCZQ-1; Fri, 03 Sep 2021 11:31:02 -0400
+X-MC-Unique: uJrZ-_7SOISk6KCCwMLCZQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2DC9384A5E1;
+        Fri,  3 Sep 2021 15:31:01 +0000 (UTC)
+Received: from redhat.com (unknown [10.39.193.241])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id A27195D9D3;
+        Fri,  3 Sep 2021 15:30:50 +0000 (UTC)
+Date:   Fri, 3 Sep 2021 16:30:48 +0100
+From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To:     Michael Roth <michael.roth@amd.com>
+Cc:     Markus Armbruster <armbru@redhat.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Connor Kuehl <ckuehl@redhat.com>,
+        Eric Blake <eblake@redhat.com>,
+        James Bottomley <jejb@linux.ibm.com>, qemu-devel@nongnu.org,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Tony Luck <tony.luck@intel.com>, linux-sgx@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH] x86/sgx: Declare sgx_set_attribute() for !CONFIG_X86_SGX
-Message-ID: <YTI/dTORBZEmGgux@google.com>
-References: <20210903064156.387979-1-jarkko@kernel.org>
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+        David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: [RFC PATCH v2 12/12] i386/sev: update query-sev QAPI format to
+ handle SEV-SNP
+Message-ID: <YTI/qB4uk477/lQP@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20210826222627.3556-1-michael.roth@amd.com>
+ <20210826222627.3556-13-michael.roth@amd.com>
+ <87tuj4qt71.fsf@dusky.pond.sub.org>
+ <20210903151316.zveiegbo42o2gttq@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20210903064156.387979-1-jarkko@kernel.org>
+In-Reply-To: <20210903151316.zveiegbo42o2gttq@amd.com>
+User-Agent: Mutt/2.0.7 (2021-05-04)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 03, 2021, Jarkko Sakkinen wrote:
-> Simplify sgx_set_attribute() usage by declaring a fallback
-> implementation for it rather than requiring to have compilation
-> flag checks in the call site. The fallback unconditionally returns
-> -EINVAL.
+On Fri, Sep 03, 2021 at 10:13:16AM -0500, Michael Roth wrote:
+> On Wed, Sep 01, 2021 at 04:14:10PM +0200, Markus Armbruster wrote:
+> > Michael Roth <michael.roth@amd.com> writes:
+> > 
+> > > Most of the current 'query-sev' command is relevant to both legacy
+> > > SEV/SEV-ES guests and SEV-SNP guests, with 2 exceptions:
+> > >
+> > >   - 'policy' is a 64-bit field for SEV-SNP, not 32-bit, and
+> > >     the meaning of the bit positions has changed
+> > >   - 'handle' is not relevant to SEV-SNP
+> > >
+> > > To address this, this patch adds a new 'sev-type' field that can be
+> > > used as a discriminator to select between SEV and SEV-SNP-specific
+> > > fields/formats without breaking compatibility for existing management
+> > > tools (so long as management tools that add support for launching
+> > > SEV-SNP guest update their handling of query-sev appropriately).
+> > 
+> > Technically a compatibility break: query-sev can now return an object
+> > that whose member @policy has different meaning, and also lacks @handle.
+> > 
+> > Matrix:
+> > 
+> >                             Old mgmt app    New mgmt app
+> >     Old QEMU, SEV/SEV-ES       good            good(1)
+> >     New QEMU, SEV/SEV-ES       good(2)         good
+> >     New QEMU, SEV-SNP           bad(3)         good
+> > 
+> > Notes:
+> > 
+> > (1) As long as the management application can cope with absent member
+> > @sev-type.
+> > 
+> > (2) As long as the management application ignores unknown member
+> > @sev-type.
+> > 
+> > (3) Management application may choke on missing member @handle, or
+> > worse, misinterpret member @policy.  Can only happen when something
+> > other than the management application created the SEV-SNP guest (or the
+> > user somehow made the management application create one even though it
+> > doesn't know how, say with CLI option passthrough, but that's always
+> > fragile, and I wouldn't worry about it here).
+> > 
+> > I think (1) and (2) are reasonable.  (3) is an issue for management
+> > applications that support attaching to existing guests.  Thoughts?
 > 
-> Refactor the call site in kvm_vm_ioctl_enable_cap() accordingly.
-> The net result is the same: KVM_CAP_SGX_ATTRIBUTE causes -EINVAL
-> when kernel is compiled without CONFIG_X86_SGX_KVM.
+> Hmm... yah I hadn't considering 'old mgmt' trying to interact with a SNP
+> guest started through some other means.
+> 
+> Don't really see an alternative other than introducing a new
+> 'query-sev-snp', but that would still leave 'old mgmt' broken, since
+> it might still call do weird stuff like try to interpret the SNP policy
+> as an SEV/SEV-ES and end up with some very unexpected results. So if I
+> did go this route, I would need to have QMP begin returning an error if
+> query-sev is run against an SNP guest. But currently for non-SEV guests
+> it already does:
+> 
+>   error_setg(errp, "SEV feature is not available")
+> 
+> so 'old mgmt' should be able to handle the error just fine.
+> 
+> Would that approach be reasonable?
 
-Eh, it doesn't really simplify the usage.  If anything it makes it more convoluted
-because the capability check in kvm_vm_ioctl_check_extension() still needs an
-#ifdef, e.g. readers will wonder why the check is conditional but the usage is not.
+This ties into the question I've just sent in my other mail.
 
-> Cc: Tony Luck <tony.luck@intel.com>
-> Signed-off-by: Jarkko Sakkinen <jarkko@kernel.org>
-> ---
->  arch/x86/include/asm/sgx.h | 8 ++++++++
->  arch/x86/kvm/x86.c         | 2 --
->  2 files changed, 8 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/sgx.h b/arch/x86/include/asm/sgx.h
-> index 05f3e21f01a7..31ee106c0f4b 100644
-> --- a/arch/x86/include/asm/sgx.h
-> +++ b/arch/x86/include/asm/sgx.h
-> @@ -372,7 +372,15 @@ int sgx_virt_einit(void __user *sigstruct, void __user *token,
->  		   void __user *secs, u64 *lepubkeyhash, int *trapnr);
->  #endif
->  
-> +#ifdef CONFIG_X86_SGX
->  int sgx_set_attribute(unsigned long *allowed_attributes,
->  		      unsigned int attribute_fd);
-> +#else
-> +static inline int sgx_set_attribute(unsigned long *allowed_attributes,
-> +				    unsigned int attribute_fd)
-> +{
-> +	return -EINVAL;
-> +}
-> +#endif
->  
->  #endif /* _ASM_X86_SGX_H */
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index e5d5c5ed7dd4..a6a27a8f41eb 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -5633,7 +5633,6 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
->  			kvm->arch.bus_lock_detection_enabled = true;
->  		r = 0;
->  		break;
-> -#ifdef CONFIG_X86_SGX_KVM
->  	case KVM_CAP_SGX_ATTRIBUTE: {
->  		unsigned long allowed_attributes = 0;
->  
-> @@ -5649,7 +5648,6 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
->  			r = -EINVAL;
->  		break;
->  	}
-> -#endif
->  	case KVM_CAP_VM_COPY_ENC_CONTEXT_FROM:
->  		r = -EINVAL;
->  		if (kvm_x86_ops.vm_copy_enc_context_from)
-> -- 
-> 2.25.1
-> 
+If the hardware strictly requires that guest are created in SEV-SNP
+mode only, and will not support SEV/SEV-ES mode, then we need to
+ensure "query-sev" reports the feature as not-available, so that
+existing mgmt apps don't try to use SEV/SEV-ES.
+
+If the SEV-SNP hardware is functionally back-compatible with a gues
+configured in SEV/SEV-ES mode, then we souldn't need a new command,
+just augment th eexisting command with additional field(s), to
+indicate existance of SEV-SNP features.
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+
