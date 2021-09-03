@@ -2,177 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 062BE40015D
-	for <lists+kvm@lfdr.de>; Fri,  3 Sep 2021 16:41:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5415E400192
+	for <lists+kvm@lfdr.de>; Fri,  3 Sep 2021 16:54:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349442AbhICOms (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Sep 2021 10:42:48 -0400
-Received: from mail.kernel.org ([198.145.29.99]:35842 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230332AbhICOmr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Sep 2021 10:42:47 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 6319D610CF;
-        Fri,  3 Sep 2021 14:41:47 +0000 (UTC)
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <maz@kernel.org>)
-        id 1mMAO1-008rk1-Cn; Fri, 03 Sep 2021 15:41:45 +0100
-Date:   Fri, 03 Sep 2021 15:41:44 +0100
-Message-ID: <871r65wwk7.wl-maz@kernel.org>
-From:   Marc Zyngier <maz@kernel.org>
-To:     Juergen Gross <jgross@suse.com>
-Cc:     kvm@vger.kernel.org, x86@kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        ehabkost@redhat.com, James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        id S1349558AbhICOzx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Sep 2021 10:55:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44118 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235068AbhICOzw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Sep 2021 10:55:52 -0400
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BA6DC061757
+        for <kvm@vger.kernel.org>; Fri,  3 Sep 2021 07:54:53 -0700 (PDT)
+Received: by mail-pl1-x62d.google.com with SMTP id n4so3442007plh.9
+        for <kvm@vger.kernel.org>; Fri, 03 Sep 2021 07:54:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=zcZ/sXt90893FBSCWdUgATs3aWLIfrYQ34PJYV2dZJc=;
+        b=hauAnT3zndI3mOqhhNntv1SZlGJfUoSGiJXr48EJkTsGxuROAGNeKRBN7Vb2V7eEer
+         /UN2xeYuXQDDHxZQ0JUUT4ZHQRe4aqyBFanYTS2BuVy6a8UzHLPryCKChqXxs2L6weoj
+         owtgkAJM/d7SSjG1+IJeAEqR/mpfuh9qPtbb73WtNmOJr4JZyXLf1LUy6tvMzhv6XmFR
+         61Mypj7E5M1yZ81tqTQtvHU+EzDhUeh13Z0Y1j/KbcTH6peXG2xnwFOEDyOfyiValpBQ
+         iCrpCsxc6JG8nUJUdpu+hG6qgGdh3/oG85ClCoXnqd0DRR9kGwGF98xpgGHxapMbqmKo
+         NEyw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=zcZ/sXt90893FBSCWdUgATs3aWLIfrYQ34PJYV2dZJc=;
+        b=dbC6x8h8a22DwicfcfVvlE1k23+D03h62lN9VjiBieq4pbvwPS4ek/KV8P0Hc9hLrO
+         0NMOYZ280oY3hggehWrd5Bi1vJqE7swpnW92BUS1+UDo3hqXhpR3+NQO9PLg+WH3AaoW
+         HM0pTtXgan+peQaoZKtzBMKvXlEUJr6iSXwmJiRFtjqx0aX39zzik5kD8JzsEAGkAU9O
+         sgu+IMQDghekgQ5yb+1WFEw4oGX0502O8J7UKf/5GCylsnvMpKgSgs283BXFD0qCbvyz
+         PGTSGYk2SzLsypGexV8D3Fhfu3J0UNWTFOu4+EWZYBTAOLQLyu9qrtKpCa2th92wKuxq
+         STrQ==
+X-Gm-Message-State: AOAM531cLsOL/YiYw7EUBUdI9703EXLkiV117NCzGFCVhlhaDsGnH9qv
+        ZLvwQEIlQTPqAN9KK2pns29mrQ==
+X-Google-Smtp-Source: ABdhPJx6rBI/0INfExIO/0BvrWyU/n69Lb9NJdoHIhgBLJM4G9ggQFlFrp4zJdJ9j4y9AcG56IKTaQ==
+X-Received: by 2002:a17:902:9889:b0:12c:fd88:530b with SMTP id s9-20020a170902988900b0012cfd88530bmr3571237plp.33.1630680892323;
+        Fri, 03 Sep 2021 07:54:52 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id n10sm5553799pjp.3.2021.09.03.07.54.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 03 Sep 2021 07:54:51 -0700 (PDT)
+Date:   Fri, 3 Sep 2021 14:54:48 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, kvmarm@lists.cs.columbia.edu
-Subject: Re: [PATCH v2 5/6] kvm: allocate vcpu pointer array separately
-In-Reply-To: <20210903130808.30142-6-jgross@suse.com>
-References: <20210903130808.30142-1-jgross@suse.com>
-        <20210903130808.30142-6-jgross@suse.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: jgross@suse.com, kvm@vger.kernel.org, x86@kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, ehabkost@redhat.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org, pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com, kvmarm@lists.cs.columbia.edu
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Nitesh Narayan Lal <nitesh@redhat.com>,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 7/8] KVM: Pre-allocate cpumasks for
+ kvm_make_all_cpus_request_except()
+Message-ID: <YTI3OL9scNnhFpWA@google.com>
+References: <20210827092516.1027264-1-vkuznets@redhat.com>
+ <20210827092516.1027264-8-vkuznets@redhat.com>
+ <YTE9OsXABLzUitUd@google.com>
+ <87o89am8fn.fsf@vitty.brq.redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87o89am8fn.fsf@vitty.brq.redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 03 Sep 2021 14:08:06 +0100,
-Juergen Gross <jgross@suse.com> wrote:
+On Fri, Sep 03, 2021, Vitaly Kuznetsov wrote:
+> Sean Christopherson <seanjc@google.com> writes:
+> >> @@ -5581,9 +5583,15 @@ int kvm_init(void *opaque, unsigned vcpu_size, unsigned vcpu_align,
+> >>  		goto out_free_3;
+> >>  	}
+> >>  
+> >> +	for_each_possible_cpu(cpu) {
+> >> +		if (!alloc_cpumask_var_node(&per_cpu(cpu_kick_mask, cpu),
+> >> +					    GFP_KERNEL, cpu_to_node(cpu)))
+> >> +			goto out_free_4;
+> >
+> > 'r' needs to be explicitly set to -EFAULT, e.g. in the current code it's
+> > guaranteed to be 0 here.
 > 
-> Prepare support of very large vcpu numbers per guest by moving the
-> vcpu pointer array out of struct kvm.
-> 
-> Signed-off-by: Juergen Gross <jgross@suse.com>
-> ---
-> V2:
-> - rebase to new kvm_arch_free_vm() implementation
-> ---
->  arch/arm64/kvm/arm.c            | 21 +++++++++++++++++++--
->  arch/x86/include/asm/kvm_host.h |  5 +----
->  arch/x86/kvm/x86.c              | 18 ++++++++++++++++++
->  include/linux/kvm_host.h        | 17 +++++++++++++++--
->  4 files changed, 53 insertions(+), 8 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 38fff5963d9f..8bb5caeba007 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -293,10 +293,27 @@ long kvm_arch_dev_ioctl(struct file *filp,
->  
->  struct kvm *kvm_arch_alloc_vm(void)
->  {
-> +	struct kvm *kvm;
-> +
-> +	if (!has_vhe())
-> +		kvm = kzalloc(sizeof(struct kvm), GFP_KERNEL);
-> +	else
-> +		kvm = vzalloc(sizeof(struct kvm));
-> +
-> +	if (!kvm)
-> +		return NULL;
-> +
->  	if (!has_vhe())
-> -		return kzalloc(sizeof(struct kvm), GFP_KERNEL);
-> +		kvm->vcpus = kcalloc(KVM_MAX_VCPUS, sizeof(void *), GFP_KERNEL);
-> +	else
-> +		kvm->vcpus = vzalloc(KVM_MAX_VCPUS * sizeof(void *));
-> +
-> +	if (!kvm->vcpus) {
-> +		kvm_arch_free_vm(kvm);
-> +		kvm = NULL;
-> +	}
->  
-> -	return vzalloc(sizeof(struct kvm));
-> +	return kvm;
->  }
->  
->  int kvm_arch_vcpu_precreate(struct kvm *kvm, unsigned int id)
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index f16fadfc030a..6c28d0800208 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1517,10 +1517,7 @@ static inline void kvm_ops_static_call_update(void)
->  }
->  
->  #define __KVM_HAVE_ARCH_VM_ALLOC
-> -static inline struct kvm *kvm_arch_alloc_vm(void)
-> -{
-> -	return __vmalloc(kvm_x86_ops.vm_size, GFP_KERNEL_ACCOUNT | __GFP_ZERO);
-> -}
-> +struct kvm *kvm_arch_alloc_vm(void);
->  
->  #define __KVM_HAVE_ARCH_VM_FREE
->  void kvm_arch_free_vm(struct kvm *kvm);
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index cc552763f0e4..ff142b6dd00c 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -11126,6 +11126,24 @@ void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu)
->  	static_call(kvm_x86_sched_in)(vcpu, cpu);
->  }
->  
-> +struct kvm *kvm_arch_alloc_vm(void)
-> +{
-> +	struct kvm *kvm;
-> +
-> +	kvm = __vmalloc(kvm_x86_ops.vm_size, GFP_KERNEL_ACCOUNT | __GFP_ZERO);
-> +	if (!kvm)
-> +		return NULL;
-> +
-> +	kvm->vcpus = __vmalloc(KVM_MAX_VCPUS * sizeof(void *),
-> +			       GFP_KERNEL_ACCOUNT | __GFP_ZERO);
-> +	if (!kvm->vcpus) {
-> +		vfree(kvm);
-> +		kvm = NULL;
-> +	}
-> +
-> +	return kvm;
-> +}
-> +
->  void kvm_arch_free_vm(struct kvm *kvm)
->  {
->  	kfree(to_kvm_hv(kvm)->hv_pa_pg);
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index d75e9c2a00b1..9e2a5f1c6f54 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -536,7 +536,7 @@ struct kvm {
->  	struct mutex slots_arch_lock;
->  	struct mm_struct *mm; /* userspace tied to this vm */
->  	struct kvm_memslots __rcu *memslots[KVM_ADDRESS_SPACE_NUM];
-> -	struct kvm_vcpu *vcpus[KVM_MAX_VCPUS];
-> +	struct kvm_vcpu **vcpus;
+> Oops, yes. Any particular reason to avoid -ENOMEM? (hope not, will use
+> this in v5)
 
-At this stage, I really wonder why we are not using an xarray instead.
-
-I wrote this [1] a while ago, and nothing caught fire. It was also a
-net deletion of code...
-
-	M.
-
-[1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/vcpu-xarray
-
--- 
-Without deviation from the norm, progress is not possible.
+Huh.  Yes, -ENOMEM.  I have no idea why I typed -EFAULT.
