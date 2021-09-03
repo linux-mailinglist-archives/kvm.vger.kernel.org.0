@@ -2,156 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 59CB53FFF9E
-	for <lists+kvm@lfdr.de>; Fri,  3 Sep 2021 14:14:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 871163FFFB2
+	for <lists+kvm@lfdr.de>; Fri,  3 Sep 2021 14:24:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235288AbhICMPK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Sep 2021 08:15:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:45863 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235119AbhICMPJ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 3 Sep 2021 08:15:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630671249;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=jKhxEryxOvV3BCEV05H9WKrbxCCVH7ys4JOnEtcYv0o=;
-        b=Y/UqbhFAomHE1i62TT3wb9Jt0IW4itTzDLvLExiz6EX7FnlJxvlt/vBEAG3Y+qcOj5cxCB
-        V2gAbH3WABNKJCI1Es//s9Y173fR1rkSjaxQFnyL/QDCrvwYCZmB3wXzIEIXegBXNCeo6T
-        uWA2zw4PCqWNY69GsqX3dLRcK3CxjJ0=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-286-kKJsDknzPxSNSOE3U6GagA-1; Fri, 03 Sep 2021 08:14:07 -0400
-X-MC-Unique: kKJsDknzPxSNSOE3U6GagA-1
-Received: by mail-ed1-f70.google.com with SMTP id v13-20020a056402174d00b003c25d6b2f13so2659158edx.4
-        for <kvm@vger.kernel.org>; Fri, 03 Sep 2021 05:14:07 -0700 (PDT)
+        id S1349210AbhICMZV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Sep 2021 08:25:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38158 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1347765AbhICMZV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Sep 2021 08:25:21 -0400
+Received: from mail-qv1-xf2e.google.com (mail-qv1-xf2e.google.com [IPv6:2607:f8b0:4864:20::f2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C0F7C061757
+        for <kvm@vger.kernel.org>; Fri,  3 Sep 2021 05:24:21 -0700 (PDT)
+Received: by mail-qv1-xf2e.google.com with SMTP id bn14so2994040qvb.12
+        for <kvm@vger.kernel.org>; Fri, 03 Sep 2021 05:24:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=AjVVv2ndb2u5Bt4uUF9TlcBGvkr2yBKHs0BYvFEiwhM=;
+        b=gGIslmjuvjmkuQE+MEw2D09EW4vDOuMlNxsSM/ktZ1WBAGN0rCOgOC0WBF8Pk+FMaE
+         7i1joaB5gBAmJUqpqz9IMmHXWUaSQ+HttFLCkX4i/TTtxUI1WCJ+bIIbMTZoKG1P1PVP
+         rRp5XhWoUPlhKABNFH+Z1T5wARWdSGlN0tqqXO84rUiWuaMeUFfgB8WQxzx0Lng+HFEw
+         +hy0WhoOTknyTagvlH2TBDMgG5qEz2hTr3ob4IxVCA951tzGMvUJjg+muXTKr/02rEIS
+         1Ydj6mmRRXAbe5t23lTGLiPPIzkKfPXKKTl94e4F7ZES4BTQdhObBaI+dHC5c2Vz/ysO
+         15LA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=jKhxEryxOvV3BCEV05H9WKrbxCCVH7ys4JOnEtcYv0o=;
-        b=Xodrt1wzaqYG8z7BlDKTlfOOIrBE1jNWLytp974zzVOB4Ca/WL0bFrcw3Ogl8NWllj
-         E+IKi8utYp5k1YSuVM53+dga0YgLiCCWTvEQK88jOccU86Oc4y3G/zMALrcJ0lAbXKsc
-         B81Ox5XXk3KjCPov5Lgcbzklp8q5aWovmV1tGBq/eFWpmVqIUduRiiGktZkjbc1qkgLo
-         mIOP4vyzJ9P1FIl/Q5sh1u1OoZ+dB8vZEKOTvWNirTOJBlEXcJOJaRc8oSiGPtvLpOxC
-         WXkRC0IxFMnKFvE1M8YRh9U9pVOIsxEi1xw9jPpuKHbIGRYbhvJhH6cWbBiozUPXtTSY
-         5LCw==
-X-Gm-Message-State: AOAM531mkC+ciEmHMAxkopMdr1KKUwkQi/ER+EB2E66+W8XxqY92Ctfh
-        N2HXrLSj6chdGOPGykhE+VP2e48568+yq35x45Ilj94XIl3Zywxv7KXrKsQ8bO8fCPkNv5BD4Ny
-        RxNydSfbVhL38
-X-Received: by 2002:a17:907:7601:: with SMTP id jx1mr3852017ejc.69.1630671246105;
-        Fri, 03 Sep 2021 05:14:06 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwrZ9hQ5skCpK7Qi697152xoz1AkM543cXdpgGsazHd3sse474FPdYSbyN9lc3iS+HY2SJFkQ==
-X-Received: by 2002:a17:907:7601:: with SMTP id jx1mr3852004ejc.69.1630671245896;
-        Fri, 03 Sep 2021 05:14:05 -0700 (PDT)
-Received: from steredhat (host-79-51-2-59.retail.telecomitalia.it. [79.51.2.59])
-        by smtp.gmail.com with ESMTPSA id g19sm2607768eje.121.2021.09.03.05.14.04
+        bh=AjVVv2ndb2u5Bt4uUF9TlcBGvkr2yBKHs0BYvFEiwhM=;
+        b=FJHYVRTCZ0Is8lcqQaGR2v+UCV5yun7MXrJkaqKcUsZxr60oYB56V5ByATVw9nlhCO
+         mg12zql77WEQb+H1nc8K9PTLmX1La2w3IenyLCrB8UOjYcEqsX1dBTJ+Aoyx9m0dav+O
+         r+7gOOZcSZthpjvvEqCvRu3DF2kM1bB2gyBzDY2y/3r+BBmbRnFiUGI14TwpkjY5Wg2j
+         se8ABefreGRI87AgH2NlzmNDvIzaxej+rhTuEm6tC8ry/gYsp+X7IlAe8xRYMmhP2+k/
+         HHP5v6HfQNsS83XOvS8KzjyW3q/6+/RdU4zl8ukzzXvD73O2WJmr0wsw3ZOTzcPtKGY7
+         QFug==
+X-Gm-Message-State: AOAM5332H31OPHLcNwOpskbOwHRk2gHKqbUU5il/oWdWmPSMUR9xU5sm
+        sm8HbUaGWheFSr6hhkcXuXcQqw==
+X-Google-Smtp-Source: ABdhPJx0ZRB4N7U15Yq2f7MIxv4JxXW05wcJNeaYCXXvbjwj/xN2sCap7XlcXbOyT6yjd1yWliCKqA==
+X-Received: by 2002:a05:6214:21cc:: with SMTP id d12mr3132616qvh.22.1630671860349;
+        Fri, 03 Sep 2021 05:24:20 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-162-113-129.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.129])
+        by smtp.gmail.com with ESMTPSA id c15sm3703514qka.46.2021.09.03.05.24.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Sep 2021 05:14:05 -0700 (PDT)
-Date:   Fri, 3 Sep 2021 14:14:02 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Norbert Slusarek <nslusarek@gmx.net>,
-        Colin Ian King <colin.king@canonical.com>,
-        Andra Paraschiv <andraprs@amazon.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, stsp2@yandex.ru, oxffffaa@gmail.com
-Subject: Re: [PATCH net-next v4 3/6] vhost/vsock: support MSG_EOR bit
- processing
-Message-ID: <20210903121402.vfdaxznxwepezacf@steredhat>
-References: <20210903061353.3187150-1-arseny.krasnov@kaspersky.com>
- <20210903061541.3187840-1-arseny.krasnov@kaspersky.com>
- <20210903065539.nb2hk4sszdtlqfmb@steredhat>
+        Fri, 03 Sep 2021 05:24:19 -0700 (PDT)
+Received: from jgg by mlx with local (Exim 4.94)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1mM8F0-00Agea-T2; Fri, 03 Sep 2021 09:24:18 -0300
+Date:   Fri, 3 Sep 2021 09:24:18 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Colin King <colin.king@canonical.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
+        kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH][next] vfio/pci: add missing identifier name in argument
+ of function prototype
+Message-ID: <20210903122418.GU1200268@ziepe.ca>
+References: <20210902212631.54260-1-colin.king@canonical.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210903065539.nb2hk4sszdtlqfmb@steredhat>
+In-Reply-To: <20210902212631.54260-1-colin.king@canonical.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 03, 2021 at 08:55:39AM +0200, Stefano Garzarella wrote:
->On Fri, Sep 03, 2021 at 09:15:38AM +0300, Arseny Krasnov wrote:
->>'MSG_EOR' handling has similar logic as 'MSG_EOM' - if bit present
->>in packet's header, reset it to 0. Then restore it back if packet
->>processing wasn't completed. Instead of bool variable for each
->>flag, bit mask variable was added: it has logical OR of 'MSG_EOR'
->>and 'MSG_EOM' if needed, to restore flags, this variable is ORed
->>with flags field of packet.
->>
->>Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
->>---
->>drivers/vhost/vsock.c | 22 +++++++++++++---------
->>1 file changed, 13 insertions(+), 9 deletions(-)
->>
->>diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
->>index feaf650affbe..93e8d635e18f 100644
->>--- a/drivers/vhost/vsock.c
->>+++ b/drivers/vhost/vsock.c
->>@@ -114,7 +114,7 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
->>		size_t nbytes;
->>		size_t iov_len, payload_len;
->>		int head;
->>-		bool restore_flag = false;
->>+		u32 flags_to_restore = 0;
->>
->>		spin_lock_bh(&vsock->send_pkt_list_lock);
->>		if (list_empty(&vsock->send_pkt_list)) {
->>@@ -179,15 +179,20 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
->>			 * created dynamically and are initialized with header
->>			 * of current packet(except length). But in case of
->>			 * SOCK_SEQPACKET, we also must clear message delimeter
->>-			 * bit(VIRTIO_VSOCK_SEQ_EOM). Otherwise, instead of one
->>-			 * packet with delimeter(which marks end of message),
->>-			 * there will be sequence of packets with delimeter
->>-			 * bit set. After initialized header will be copied to
->>-			 * rx buffer, this bit will be restored.
->>+			 * bit (VIRTIO_VSOCK_SEQ_EOM) and MSG_EOR bit
->>+			 * (VIRTIO_VSOCK_SEQ_EOR) if set. Otherwise,
->>+			 * there will be sequence of packets with these
->>+			 * bits set. After initialized header will be copied to
->>+			 * rx buffer, these required bits will be restored.
->>			 */
->>			if (le32_to_cpu(pkt->hdr.flags) & VIRTIO_VSOCK_SEQ_EOM) {
->>				pkt->hdr.flags &= ~cpu_to_le32(VIRTIO_VSOCK_SEQ_EOM);
->>-				restore_flag = true;
->>+				flags_to_restore |= VIRTIO_VSOCK_SEQ_EOM;
->>+
->>+				if (le32_to_cpu(pkt->hdr.flags & VIRTIO_VSOCK_SEQ_EOR)) {
-                                                               ^
-Ooops, le32_to_cpu() should close before bitwise and operator.
-I missed this, but kernel test robot discovered :-)
+On Thu, Sep 02, 2021 at 10:26:31PM +0100, Colin King wrote:
+> From: Colin Ian King <colin.king@canonical.com>
+> 
+> The function prototype is missing an identifier name. Add one.
+> 
+> Signed-off-by: Colin Ian King <colin.king@canonical.com>
+> ---
+>  drivers/vfio/pci/vfio_pci_core.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
->>+					pkt->hdr.flags &= ~cpu_to_le32(VIRTIO_VSOCK_SEQ_EOR);
->>+					flags_to_restore |= VIRTIO_VSOCK_SEQ_EOR;
->>+				}
->>			}
->>		}
->>
->>@@ -224,8 +229,7 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
->>		 * to send it with the next available buffer.
->>		 */
->>		if (pkt->off < pkt->len) {
->>-			if (restore_flag)
->>-				pkt->hdr.flags |= cpu_to_le32(VIRTIO_VSOCK_SEQ_EOM);
->>+			pkt->hdr.flags |= cpu_to_le32(flags_to_restore);
->>
->>			/* We are queueing the same virtio_vsock_pkt to handle
->>			 * the remaining bytes, and we want to deliver it
->>-- 2.25.1
->>
->
->Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+It seems fine, but is there a reason to just pick this one case and
+not clean the whole subsystem?
 
-NACK
+Eg i see a couple more cases in the headers
 
-Please resend fixing the issue.
+Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 
-Stefano
-
+Jason
