@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1A356400677
-	for <lists+kvm@lfdr.de>; Fri,  3 Sep 2021 22:20:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DB22240067A
+	for <lists+kvm@lfdr.de>; Fri,  3 Sep 2021 22:21:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350231AbhICUVR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Sep 2021 16:21:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35310 "EHLO
+        id S1350305AbhICUW0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Sep 2021 16:22:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35578 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234379AbhICUVP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Sep 2021 16:21:15 -0400
-Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1550C061575
-        for <kvm@vger.kernel.org>; Fri,  3 Sep 2021 13:20:13 -0700 (PDT)
-Received: by mail-wr1-x435.google.com with SMTP id b6so309956wrh.10
-        for <kvm@vger.kernel.org>; Fri, 03 Sep 2021 13:20:13 -0700 (PDT)
+        with ESMTP id S1350293AbhICUWZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Sep 2021 16:22:25 -0400
+Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5658AC061575
+        for <kvm@vger.kernel.org>; Fri,  3 Sep 2021 13:21:25 -0700 (PDT)
+Received: by mail-wr1-x42a.google.com with SMTP id i6so344700wrv.2
+        for <kvm@vger.kernel.org>; Fri, 03 Sep 2021 13:21:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=xsif4pme6nhSpsi7vEWmXFg/Hnrb7mhQtjIRT3kxFkM=;
-        b=muTFofn/yHs0EYKIsGha4ps6z/nsFLgk7o50hQ1bBL3mlCLJN3dqh2EbQA90EnwZiK
-         NECjyG+jXGItzTA4QlZoqJEuj4/2GopLUtjAu+ncqdo/FFyEUWUPbBu236/GFMudcuCK
-         D9DyjDbkUkta9IAKG6+3m2r8+8jv4lYsuurqFUi0rWz/gxe73U7hLmg/mrm5hqKdTbiF
-         Opmfkr9N/UDCqcJTgk0JtowcRFkQ/LeFaRp+RBrZIUFfJTbIekWq6l07SbB0VGTU8eH+
-         /SKP943AfE5+gEB6opgLoUtMGZRq5vBaEZuA49fASyXmNkP+xk+3PmUF6tFbonUn2CoS
-         6yWA==
+        bh=q+SSfq4073OmWN5SjfGpr2ImvdVTltAm2Ap93b1Y88E=;
+        b=PZ2KiViiXR0yMgtsi9ubJd49eXX8m7kgtJ7JWAf0xocPcQ4Oxw4avSPsHVo9QZcW0N
+         BByueunHxBruDfx2gZo+Ix58peWhu5wGIHIMCSjfvS8XdfqDnHodPv7hZLnIQBhld9/a
+         y0lWLp8aIQKnuXGpPmhHwQpf/DGQHqb2SPZDygfQELNsjREPaTcvh71MJU4d2M9P2WuC
+         AZHX/t3lV1bfa8h49PxfG8kq4e5hCt+9BPtVsMQjLzebnh3VaBZTuTGJBK+rNkK7BCfW
+         EvnOQKajlmpMw2NfupoVnEo8oI6UDgZtiqq4mNRFKiSDClkKz+9ZYBjtDFyqInTaIFO/
+         szhw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=xsif4pme6nhSpsi7vEWmXFg/Hnrb7mhQtjIRT3kxFkM=;
-        b=j5YPzZTZKjIgDJal829K0HOYxITzegsP1PEE88u9NYo0R24oa73s9JQXy2ViuE1uVL
-         J459dE0k4iR9PBUhs24S5cVagO2FydljguzC5daCN0rAG5MVVtN1NXLU9i5fkUYCuCNO
-         OZWdBip+lnCcN8Ex5OHLuNabg2k7pb0dhRP7wNWZHl0raKAU40BQee3Gw7aYJZZxae0G
-         NEMojiOPKZlwaUgpjDRVjAfZXoxVMYiaLxcIU1rSgNjp8gVaZFac+Cr8GqceR9gvXmWj
-         IScbcSfRbsPNVWoDEt3vxGYKkqIk6leVb0Jj2iSi99xAniha9qqvAVbLkRAcPuyuuBh1
-         yWJw==
-X-Gm-Message-State: AOAM530CbC629fv1629taWbODHjLqzz5sMZ0/+0raWpT8C3N6EeHaQbo
-        M+y74Z/QXdzIiR4XXNQwCJ8xBHNfrTIoostAt8M=
-X-Google-Smtp-Source: ABdhPJxCxEUNKk9CrXrBQLK7GjqB1EVrT8+iyYBGoXf53+iVgrOG7SDx81iHjmDeuA92Igp3EWy9+w==
-X-Received: by 2002:adf:dd4f:: with SMTP id u15mr825520wrm.237.1630700412182;
-        Fri, 03 Sep 2021 13:20:12 -0700 (PDT)
+        bh=q+SSfq4073OmWN5SjfGpr2ImvdVTltAm2Ap93b1Y88E=;
+        b=N2QKQh8aaF0gRUvpco2/8SdfdUgbw29HFaRp3RNeEnI/aVKCS4aYrYcve/skBYUwXo
+         OYXg1a4UCIPKsv3W+S16N/aq3AZpzjDbv89t3wtRlyuDtrzgg74nJZwprdqRN8CqMPhb
+         6UqtU1n5JPOZq1iAFnaO6H0SMcbYpf7WJdheZum+Ooi+8lV1o0VqU3K7RO25q49L+Yja
+         +IXoqhJ/7BhzOFIM3Ukvxlc/Pgmh75i2/rF0CYkBrmzGTtkZxVWBzDC7Nnc1yEKGKHsR
+         lJD4GkjpvKxhvZ+maajdAJ2n1RnZoGmI7+a/CQ9H8Sq4NWGMNG0Wb7G+FOk+eWQJbDZZ
+         BGxw==
+X-Gm-Message-State: AOAM533H2O7Veif7W9xyAva0e8ebSAwv0v9ZPXXHpAPqwPdRVBmzZWwh
+        MslAnnXHkYONuwHEJVIvn4oSB4S0qnVN2ALOcBU=
+X-Google-Smtp-Source: ABdhPJyd1De7PuFzuLP4i8MhbWXrBu0OhprhhfEXRkHThwdYNyCL8/AmxbAlET5sIL14xwjI9QRBeg==
+X-Received: by 2002:adf:c149:: with SMTP id w9mr804955wre.127.1630700483905;
+        Fri, 03 Sep 2021 13:21:23 -0700 (PDT)
 Received: from [192.168.8.107] (190.red-2-142-216.dynamicip.rima-tde.net. [2.142.216.190])
-        by smtp.gmail.com with ESMTPSA id o8sm266012wmp.42.2021.09.03.13.20.06
+        by smtp.gmail.com with ESMTPSA id s15sm232969wrb.22.2021.09.03.13.21.19
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 03 Sep 2021 13:20:11 -0700 (PDT)
-Subject: Re: [PATCH v3 10/30] target/avr: Restrict has_work() handler to
+        Fri, 03 Sep 2021 13:21:23 -0700 (PDT)
+Subject: Re: [PATCH v3 11/30] target/cris: Restrict has_work() handler to
  sysemu and TCG
 To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
         qemu-devel@nongnu.org
@@ -92,14 +92,14 @@ Cc:     Bin Meng <bin.meng@windriver.com>,
         Stafford Horne <shorne@gmail.com>,
         Reinoud Zandijk <reinoud@netbsd.org>, kvm@vger.kernel.org
 References: <20210902161543.417092-1-f4bug@amsat.org>
- <20210902161543.417092-11-f4bug@amsat.org>
+ <20210902161543.417092-12-f4bug@amsat.org>
 From:   Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <1833210b-e250-33f5-be38-9d543539b4aa@linaro.org>
-Date:   Fri, 3 Sep 2021 22:20:03 +0200
+Message-ID: <51e42a3f-6064-be49-26b2-20eafd1106a2@linaro.org>
+Date:   Fri, 3 Sep 2021 22:21:16 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.13.0
 MIME-Version: 1.0
-In-Reply-To: <20210902161543.417092-11-f4bug@amsat.org>
+In-Reply-To: <20210902161543.417092-12-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -108,27 +108,11 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 9/2/21 6:15 PM, Philippe Mathieu-Daudé wrote:
-> Restrict has_work() to TCG sysemu.
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> ---
->   target/avr/cpu.c | 4 +++-
->   1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/target/avr/cpu.c b/target/avr/cpu.c
-> index e9fa54c9777..6267cc6d530 100644
-> --- a/target/avr/cpu.c
-> +++ b/target/avr/cpu.c
-> @@ -32,6 +32,7 @@ static void avr_cpu_set_pc(CPUState *cs, vaddr value)
->       cpu->env.pc_w = value / 2; /* internally PC points to words */
->   }
->   
 > +#if defined(CONFIG_TCG) && !defined(CONFIG_USER_ONLY)
->   static bool avr_cpu_has_work(CPUState *cs)
+>   static bool cris_cpu_has_work(CPUState *cs)
 
-No CONFIG_TCG or CONFIG_USER_ONLY test for avr.
+No CONFIG_TCG for cris.  Otherwise,
 
-Otherwise,
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
