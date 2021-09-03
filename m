@@ -2,82 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B2A8B4002C2
-	for <lists+kvm@lfdr.de>; Fri,  3 Sep 2021 17:58:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8F78D4002D1
+	for <lists+kvm@lfdr.de>; Fri,  3 Sep 2021 18:01:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349826AbhICP76 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Sep 2021 11:59:58 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47206 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235851AbhICP75 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Sep 2021 11:59:57 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 14B516054E;
-        Fri,  3 Sep 2021 15:58:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1630684737;
-        bh=Km412k9TxdN2OI2AHmk0Z+VNMot6URwk5SBYdwiMiPM=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=RTLMu/63cCk7wD5IBS+q01tUNz85Lil8FNk/E8kJq+kezRqUSIZ/nrYjOFrkYkhgP
-         3jpb7dji4lBW//qveGawND5PUruVOruiEwKGVJq10L2mGWP5x0rHBopQjoohuIfmRd
-         yZcq0nxcHKWJkxXrmirPx2PaKcqN4BNbWKLkdo7/nVcUmmWlPRUB/mJT29g2GhsXis
-         1vOJSevR/Qt4sr+yyeKU7rg8A3PA5df6UMmRlM9Aw9eA2QM3XJC4zudnrU+OsZBIXt
-         F/3fSNTPDFQU+Cc6CVwLAwbnEjIghCTa/oRcjedMPLM5sDM+GPPfm0/T8D5wSfjgwh
-         jw8q9ZK3oYH+w==
-Message-ID: <f7e6b2f444f34064e34d7bd680d2c863b9ce6a41.camel@kernel.org>
-Subject: Re: [PATCH] x86/sgx: Declare sgx_set_attribute() for !CONFIG_X86_SGX
-From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Dave Hansen <dave.hansen@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        id S235851AbhICQCi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Sep 2021 12:02:38 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:33242 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1349865AbhICQCf (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 3 Sep 2021 12:02:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1630684894;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:in-reply-to:in-reply-to:  references:references;
+        bh=ybHw7U4g3iVRZxIp5kFJ8XRmPMWIYv/Oqv8Fl2TUX8o=;
+        b=NYZzEOjlU3Fwxl/z0vi6mpys/wLJ51NjIg8yZzE1/n6egZvdFxF4pnqpOOS9mtvb8qeJA3
+        Ib4Z2E6GBwokvWo1zR6wIueq+oH7E0/GryK9W3qz9nijIfsg9CZ1KiaRjeubGchnh9I0fS
+        mxsrJINgWC4m1PM9fiL/hahgfiPfa2Q=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-320-gofoRV0fOo-HWvDl8q6ZYg-1; Fri, 03 Sep 2021 12:01:30 -0400
+X-MC-Unique: gofoRV0fOo-HWvDl8q6ZYg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A7D01DF8A5;
+        Fri,  3 Sep 2021 16:01:28 +0000 (UTC)
+Received: from redhat.com (unknown [10.39.193.241])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 52B7D19C59;
+        Fri,  3 Sep 2021 16:01:21 +0000 (UTC)
+Date:   Fri, 3 Sep 2021 17:01:18 +0100
+From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To:     Markus Armbruster <armbru@redhat.com>
+Cc:     Michael Roth <michael.roth@amd.com>, qemu-devel@nongnu.org,
+        Connor Kuehl <ckuehl@redhat.com>,
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        James Bottomley <jejb@linux.ibm.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Tony Luck <tony.luck@intel.com>, linux-sgx@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Date:   Fri, 03 Sep 2021 18:58:55 +0300
-In-Reply-To: <YTI/dTORBZEmGgux@google.com>
-References: <20210903064156.387979-1-jarkko@kernel.org>
-         <YTI/dTORBZEmGgux@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.36.5-0ubuntu1 
+        Dov Murik <dovmurik@linux.ibm.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        kvm@vger.kernel.org, Eduardo Habkost <ehabkost@redhat.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Eric Blake <eblake@redhat.com>
+Subject: Re: [RFC PATCH v2 12/12] i386/sev: update query-sev QAPI format to
+ handle SEV-SNP
+Message-ID: <YTJGzrnqO9vzUqNq@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20210826222627.3556-1-michael.roth@amd.com>
+ <20210826222627.3556-13-michael.roth@amd.com>
+ <87tuj4qt71.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <87tuj4qt71.fsf@dusky.pond.sub.org>
+User-Agent: Mutt/2.0.7 (2021-05-04)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2021-09-03 at 15:29 +0000, Sean Christopherson wrote:
-> On Fri, Sep 03, 2021, Jarkko Sakkinen wrote:
-> > Simplify sgx_set_attribute() usage by declaring a fallback
-> > implementation for it rather than requiring to have compilation
-> > flag checks in the call site. The fallback unconditionally returns
-> > -EINVAL.
-> >=20
-> > Refactor the call site in kvm_vm_ioctl_enable_cap() accordingly.
-> > The net result is the same: KVM_CAP_SGX_ATTRIBUTE causes -EINVAL
-> > when kernel is compiled without CONFIG_X86_SGX_KVM.
->=20
-> Eh, it doesn't really simplify the usage.  If anything it makes it more c=
-onvoluted
-> because the capability check in kvm_vm_ioctl_check_extension() still need=
-s an
-> #ifdef, e.g. readers will wonder why the check is conditional but the usa=
-ge is not.
+On Wed, Sep 01, 2021 at 04:14:10PM +0200, Markus Armbruster wrote:
+> Michael Roth <michael.roth@amd.com> writes:
+> 
+> > Most of the current 'query-sev' command is relevant to both legacy
+> > SEV/SEV-ES guests and SEV-SNP guests, with 2 exceptions:
+> >
+> >   - 'policy' is a 64-bit field for SEV-SNP, not 32-bit, and
+> >     the meaning of the bit positions has changed
+> >   - 'handle' is not relevant to SEV-SNP
+> >
+> > To address this, this patch adds a new 'sev-type' field that can be
+> > used as a discriminator to select between SEV and SEV-SNP-specific
+> > fields/formats without breaking compatibility for existing management
+> > tools (so long as management tools that add support for launching
+> > SEV-SNP guest update their handling of query-sev appropriately).
+> 
+> Technically a compatibility break: query-sev can now return an object
+> that whose member @policy has different meaning, and also lacks @handle.
+> 
+> Matrix:
+> 
+>                             Old mgmt app    New mgmt app
+>     Old QEMU, SEV/SEV-ES       good            good(1)
+>     New QEMU, SEV/SEV-ES       good(2)         good
+>     New QEMU, SEV-SNP           bad(3)         good
+> 
+> Notes:
+> 
+> (1) As long as the management application can cope with absent member
+> @sev-type.
+> 
+> (2) As long as the management application ignores unknown member
+> @sev-type.
+> 
+> (3) Management application may choke on missing member @handle, or
+> worse, misinterpret member @policy.  Can only happen when something
+> other than the management application created the SEV-SNP guest (or the
+> user somehow made the management application create one even though it
+> doesn't know how, say with CLI option passthrough, but that's always
+> fragile, and I wouldn't worry about it here).
+> 
+> I think (1) and (2) are reasonable.  (3) is an issue for management
+> applications that support attaching to existing guests.  Thoughts?
 
-It does objectively a bit, since it's one ifdef less.
+IIUC you can only reach scenario (3) if you have created a guest
+using '-object sev-snp-guest', which is a new feature introduced
+in patch 2.
 
-This is fairly standard practice to do in kernel APIs, used in countless
-places, for instance in Tony's patch set to add MCE recovery for SGX. And
-it would be nice to share common pattern here how we define API now and
-futre.
+IOW, scenario (3)  old mgmt app + new QEMU + sev-snp guest does
+not exist as a combination. Thus the (bad) field is actually (n/a)
 
-I also remarked that declaration of "sgx_provisioning_allowed" is not flagg=
-ed,
-which is IMHO even more convolved because without SGX it is spare data.
+So I believe this proposed change is acceptable in all scenarios
+with existing deployed usage, as well as all newly introduced
+scenarios.
 
-/Jarkko
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
