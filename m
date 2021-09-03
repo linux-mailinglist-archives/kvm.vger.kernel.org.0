@@ -2,325 +2,219 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E2F513FF883
-	for <lists+kvm@lfdr.de>; Fri,  3 Sep 2021 02:56:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 98F793FF873
+	for <lists+kvm@lfdr.de>; Fri,  3 Sep 2021 02:52:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241891AbhICA5m (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Sep 2021 20:57:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52760 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239772AbhICA5l (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Sep 2021 20:57:41 -0400
-Received: from ozlabs.org (ozlabs.org [IPv6:2401:3900:2:1::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55462C061575
-        for <kvm@vger.kernel.org>; Thu,  2 Sep 2021 17:56:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gibson.dropbear.id.au; s=201602; t=1630630598;
-        bh=dYFvOAbI0hzwi7bgHPuL2nISN21A/HVkTWCIarLAldc=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=DMCqqC7Itikgm2VTUEE5MykJBeTtYQkUaBtP+KuJF/Y5jTcUC2LQWs1ef3S2IMUl3
-         RysX7Pwh5G3C+1QXEaTzQ5loyPMlyIRqnn+VJrtw1FLSH+R0ynhlUXGg+rbaiWSc1f
-         53PPEtkqp6WkbUnSX5FiujxAAdGniXO0crpUxZ60=
-Received: by ozlabs.org (Postfix, from userid 1007)
-        id 4H0zrk2nScz9sX3; Fri,  3 Sep 2021 10:56:38 +1000 (AEST)
-Date:   Fri, 3 Sep 2021 10:50:45 +1000
-From:   David Gibson <david@gibson.dropbear.id.au>
-To:     Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc:     qemu-devel@nongnu.org, Bin Meng <bin.meng@windriver.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Greg Kurz <groug@kaod.org>, haxm-team@intel.com,
-        Kamil Rytarowski <kamil@netbsd.org>, qemu-ppc@nongnu.org,
-        Anthony Perard <anthony.perard@citrix.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Michael Rolnik <mrolnik@gmail.com>, qemu-riscv@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jiaxun Yang <jiaxun.yang@flygoat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Chris Wulff <crwulff@gmail.com>,
-        Laurent Vivier <lvivier@redhat.com>,
-        Cameron Esfahani <dirty@apple.com>,
-        Sunil Muthuswamy <sunilmut@microsoft.com>,
-        Max Filippov <jcmvbkbc@gmail.com>,
-        Taylor Simpson <tsimpson@quicinc.com>, qemu-s390x@nongnu.org,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
-        Yoshinori Sato <ysato@users.sourceforge.jp>,
-        Artyom Tarasenko <atar4qemu@gmail.com>,
-        Aurelien Jarno <aurelien@aurel32.net>,
-        Paul Durrant <paul@xen.org>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        Alistair Francis <alistair.francis@wdc.com>,
-        "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
-        Roman Bolshakov <r.bolshakov@yadro.com>,
-        Laurent Vivier <laurent@vivier.eu>,
-        Cornelia Huck <cohuck@redhat.com>, qemu-arm@nongnu.org,
-        Wenchao Wang <wenchao.wang@intel.com>,
-        xen-devel@lists.xenproject.org, Marek Vasut <marex@denx.de>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
-        Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
-        Colin Xu <colin.xu@intel.com>,
-        Claudio Fontana <cfontana@suse.de>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Stafford Horne <shorne@gmail.com>,
-        Reinoud Zandijk <reinoud@netbsd.org>, kvm@vger.kernel.org
-Subject: Re: [PATCH v3 21/30] target/ppc: Introduce
- PowerPCCPUClass::has_work()
-Message-ID: <YTFxZb1Vg5pWVW9p@yekko>
-References: <20210902161543.417092-1-f4bug@amsat.org>
- <20210902161543.417092-22-f4bug@amsat.org>
+        id S1346291AbhICAw7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Sep 2021 20:52:59 -0400
+Received: from out30-133.freemail.mail.aliyun.com ([115.124.30.133]:46358 "EHLO
+        out30-133.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1345668AbhICAw6 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 2 Sep 2021 20:52:58 -0400
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R171e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04420;MF=laijs@linux.alibaba.com;NM=1;PH=DS;RN=16;SR=0;TI=SMTPD_---0Un2SUqC_1630630316;
+Received: from C02XQCBJJG5H.local(mailfrom:laijs@linux.alibaba.com fp:SMTPD_---0Un2SUqC_1630630316)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Fri, 03 Sep 2021 08:51:57 +0800
+Subject: Re: [PATCH 2/7] KVM: X86: Synchronize the shadow pagetable before
+ link it
+To:     Sean Christopherson <seanjc@google.com>,
+        Lai Jiangshan <jiangshanlai@gmail.com>
+Cc:     linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Avi Kivity <avi@redhat.com>, kvm@vger.kernel.org
+References: <20210824075524.3354-1-jiangshanlai@gmail.com>
+ <20210824075524.3354-3-jiangshanlai@gmail.com> <YTFhCt87vzo4xDrc@google.com>
+From:   Lai Jiangshan <laijs@linux.alibaba.com>
+Message-ID: <e7e9201f-76cc-08de-29a7-6d75abccf968@linux.alibaba.com>
+Date:   Fri, 3 Sep 2021 08:51:56 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.13.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="iHh9kZyoW/xDyYBn"
-Content-Disposition: inline
-In-Reply-To: <20210902161543.417092-22-f4bug@amsat.org>
+In-Reply-To: <YTFhCt87vzo4xDrc@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---iHh9kZyoW/xDyYBn
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Sep 02, 2021 at 06:15:34PM +0200, Philippe Mathieu-Daud=E9 wrote:
-> Each POWER cpu has its own has_work() implementation. Instead of
-> overloading CPUClass on each PowerPCCPUClass init, register the
-> generic ppc_cpu_has_work() handler, and have it call the POWER
-> specific has_work().
+On 2021/9/3 07:40, Sean Christopherson wrote:
+> On Tue, Aug 24, 2021, Lai Jiangshan wrote:
+>> From: Lai Jiangshan <laijs@linux.alibaba.com>
+>>
+>> If gpte is changed from non-present to present, the guest doesn't need
+>> to flush tlb per SDM.  So the host must synchronze sp before
+>> link it.  Otherwise the guest might use a wrong mapping.
+>>
+>> For example: the guest first changes a level-1 pagetable, and then
+>> links its parent to a new place where the original gpte is non-present.
+>> Finally the guest can access the remapped area without flushing
+>> the tlb.  The guest's behavior should be allowed per SDM, but the host
+>> kvm mmu makes it wrong.
+> 
+> Ah, are you saying, given:
+> 
+> VA_x = PML4_A -> PDP_B -> PD_C -> PT_D
+> 
+> the guest can modify PT_D, then link it with
+> 
+> VA_y = PML4_A -> PDP_B -> PD_E -> PT_D
+> 
+> and access it via VA_y without flushing, and so KVM must sync PT_D.  Is that
+> correct?
 
-I don't quite see the rationale for introducing a second layer of
-indirection here.  What's wrong with switching the base has_work for
-each cpu variant?
+Yes. and another vcpu accesses it via VA_y without flushing.
 
->=20
-> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+> 
+>> Fixes: 4731d4c7a077 ("KVM: MMU: out of sync shadow core")
+>> Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
+>> ---
+> 
+> ...
+> 
+>> diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+>> index 50ade6450ace..48c7fe1b2d50 100644
+>> --- a/arch/x86/kvm/mmu/paging_tmpl.h
+>> +++ b/arch/x86/kvm/mmu/paging_tmpl.h
+>> @@ -664,7 +664,7 @@ static void FNAME(pte_prefetch)(struct kvm_vcpu *vcpu, struct guest_walker *gw,
+>>    * emulate this operation, return 1 to indicate this case.
+>>    */
+>>   static int FNAME(fetch)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
+>> -			 struct guest_walker *gw)
+>> +			 struct guest_walker *gw, unsigned long mmu_seq)
+>>   {
+>>   	struct kvm_mmu_page *sp = NULL;
+>>   	struct kvm_shadow_walk_iterator it;
+>> @@ -678,6 +678,8 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
+>>   	top_level = vcpu->arch.mmu->root_level;
+>>   	if (top_level == PT32E_ROOT_LEVEL)
+>>   		top_level = PT32_ROOT_LEVEL;
+>> +
+>> +again:
+>>   	/*
+>>   	 * Verify that the top-level gpte is still there.  Since the page
+>>   	 * is a root page, it is either write protected (and cannot be
+>> @@ -713,8 +715,28 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
+>>   		if (FNAME(gpte_changed)(vcpu, gw, it.level - 1))
+>>   			goto out_gpte_changed;
+>>   
+>> -		if (sp)
+>> +		if (sp) {
+>> +			/*
+>> +			 * We must synchronize the pagetable before link it
+>> +			 * because the guest doens't need to flush tlb when
+>> +			 * gpte is changed from non-present to present.
+>> +			 * Otherwise, the guest may use the wrong mapping.
+>> +			 *
+>> +			 * For PG_LEVEL_4K, kvm_mmu_get_page() has already
+>> +			 * synchronized it transiently via kvm_sync_page().
+>> +			 *
+>> +			 * For higher level pagetable, we synchronize it
+>> +			 * via slower mmu_sync_children().  If it once
+>> +			 * released the mmu_lock, we need to restart from
+>> +			 * the root since we don't have reference to @sp.
+>> +			 */
+>> +			if (sp->unsync_children && !mmu_sync_children(vcpu, sp, false)) {
+> 
+> I don't like dropping mmu_lock in the page fault path.  I agree that it's not
+> all that different than grabbing various things in kvm_mmu_do_page_fault() long
+> before acquiring mmu_lock, but I'm not 100% convinced we don't have a latent
+> bug hiding somehwere in there :-), and (b) there's a possibility, however small,
+> that something in FNAME(fetch) that we're missing.  Case in point, this technically
+> needs to do make_mmu_pages_available().
+> 
+> And I believe kvm_mmu_get_page() already tries to handle this case by requesting
+> KVM_REQ_MMU_SYNC if it uses a sp with unsync_children, it just doesn't handle SMP
+> interaction, e.g. can link a sp that's immediately available to other vCPUs before
+> the sync.
+> 
+> Rather than force the sync here, what about kicking all vCPUs and retrying the
+> page fault?  The only gross part is that kvm_mmu_get_page() can now fail :-(
+> 
 > ---
->  target/ppc/cpu-qom.h  |  3 +++
->  target/ppc/cpu_init.c | 26 ++++++++++++++++++--------
->  2 files changed, 21 insertions(+), 8 deletions(-)
->=20
-> diff --git a/target/ppc/cpu-qom.h b/target/ppc/cpu-qom.h
-> index 5800fa324e8..ff2bafcde6f 100644
-> --- a/target/ppc/cpu-qom.h
-> +++ b/target/ppc/cpu-qom.h
-> @@ -189,6 +189,9 @@ struct PowerPCCPUClass {
->      int bfd_mach;
->      uint32_t l1_dcache_size, l1_icache_size;
->  #ifndef CONFIG_USER_ONLY
-> +#ifdef CONFIG_TCG
-> +    bool (*has_work)(CPUState *cpu);
-> +#endif /* CONFIG_TCG */
->      unsigned int gdb_num_sprs;
->      const char *gdb_spr_xml;
->  #endif
-> diff --git a/target/ppc/cpu_init.c b/target/ppc/cpu_init.c
-> index e2e721c2b81..bbad16cc1ec 100644
-> --- a/target/ppc/cpu_init.c
-> +++ b/target/ppc/cpu_init.c
-> @@ -7583,6 +7583,7 @@ static bool ppc_pvr_match_power7(PowerPCCPUClass *p=
-cc, uint32_t pvr)
->      return false;
->  }
-> =20
-> +#if defined(CONFIG_TCG) && !defined(CONFIG_USER_ONLY)
->  static bool cpu_has_work_POWER7(CPUState *cs)
->  {
->      PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-> @@ -7616,12 +7617,12 @@ static bool cpu_has_work_POWER7(CPUState *cs)
->          return msr_ee && (cs->interrupt_request & CPU_INTERRUPT_HARD);
->      }
->  }
-> +#endif /* CONFIG_TCG && !CONFIG_USER_ONLY */
-> =20
->  POWERPC_FAMILY(POWER7)(ObjectClass *oc, void *data)
->  {
->      DeviceClass *dc =3D DEVICE_CLASS(oc);
->      PowerPCCPUClass *pcc =3D POWERPC_CPU_CLASS(oc);
-> -    CPUClass *cc =3D CPU_CLASS(oc);
-> =20
->      dc->fw_name =3D "PowerPC,POWER7";
->      dc->desc =3D "POWER7";
-> @@ -7630,7 +7631,6 @@ POWERPC_FAMILY(POWER7)(ObjectClass *oc, void *data)
->      pcc->pcr_supported =3D PCR_COMPAT_2_06 | PCR_COMPAT_2_05;
->      pcc->init_proc =3D init_proc_POWER7;
->      pcc->check_pow =3D check_pow_nocheck;
-> -    cc->has_work =3D cpu_has_work_POWER7;
->      pcc->insns_flags =3D PPC_INSNS_BASE | PPC_ISEL | PPC_STRING | PPC_MF=
-TB |
->                         PPC_FLOAT | PPC_FLOAT_FSEL | PPC_FLOAT_FRES |
->                         PPC_FLOAT_FSQRT | PPC_FLOAT_FRSQRTE |
-> @@ -7673,6 +7673,7 @@ POWERPC_FAMILY(POWER7)(ObjectClass *oc, void *data)
->      pcc->lpcr_pm =3D LPCR_P7_PECE0 | LPCR_P7_PECE1 | LPCR_P7_PECE2;
->      pcc->mmu_model =3D POWERPC_MMU_2_06;
->  #if defined(CONFIG_SOFTMMU)
-> +    pcc->has_work =3D cpu_has_work_POWER7;
->      pcc->hash64_opts =3D &ppc_hash64_opts_POWER7;
->      pcc->lrg_decr_bits =3D 32;
->  #endif
-> @@ -7743,6 +7744,7 @@ static bool ppc_pvr_match_power8(PowerPCCPUClass *p=
-cc, uint32_t pvr)
->      return false;
->  }
-> =20
-> +#if defined(CONFIG_TCG) && !defined(CONFIG_USER_ONLY)
->  static bool cpu_has_work_POWER8(CPUState *cs)
->  {
->      PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-> @@ -7784,12 +7786,12 @@ static bool cpu_has_work_POWER8(CPUState *cs)
->          return msr_ee && (cs->interrupt_request & CPU_INTERRUPT_HARD);
->      }
->  }
-> +#endif /* CONFIG_TCG && !CONFIG_USER_ONLY */
-> =20
->  POWERPC_FAMILY(POWER8)(ObjectClass *oc, void *data)
->  {
->      DeviceClass *dc =3D DEVICE_CLASS(oc);
->      PowerPCCPUClass *pcc =3D POWERPC_CPU_CLASS(oc);
-> -    CPUClass *cc =3D CPU_CLASS(oc);
-> =20
->      dc->fw_name =3D "PowerPC,POWER8";
->      dc->desc =3D "POWER8";
-> @@ -7798,7 +7800,6 @@ POWERPC_FAMILY(POWER8)(ObjectClass *oc, void *data)
->      pcc->pcr_supported =3D PCR_COMPAT_2_07 | PCR_COMPAT_2_06 | PCR_COMPA=
-T_2_05;
->      pcc->init_proc =3D init_proc_POWER8;
->      pcc->check_pow =3D check_pow_nocheck;
-> -    cc->has_work =3D cpu_has_work_POWER8;
->      pcc->insns_flags =3D PPC_INSNS_BASE | PPC_ISEL | PPC_STRING | PPC_MF=
-TB |
->                         PPC_FLOAT | PPC_FLOAT_FSEL | PPC_FLOAT_FRES |
->                         PPC_FLOAT_FSQRT | PPC_FLOAT_FRSQRTE |
-> @@ -7848,6 +7849,7 @@ POWERPC_FAMILY(POWER8)(ObjectClass *oc, void *data)
->                     LPCR_P8_PECE3 | LPCR_P8_PECE4;
->      pcc->mmu_model =3D POWERPC_MMU_2_07;
->  #if defined(CONFIG_SOFTMMU)
-> +    pcc->has_work =3D cpu_has_work_POWER8;
->      pcc->hash64_opts =3D &ppc_hash64_opts_POWER7;
->      pcc->lrg_decr_bits =3D 32;
->      pcc->n_host_threads =3D 8;
-> @@ -7941,6 +7943,7 @@ static bool ppc_pvr_match_power9(PowerPCCPUClass *p=
-cc, uint32_t pvr)
->      return false;
->  }
-> =20
-> +#if defined(CONFIG_TCG) && !defined(CONFIG_USER_ONLY)
->  static bool cpu_has_work_POWER9(CPUState *cs)
->  {
->      PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-> @@ -7998,12 +8001,12 @@ static bool cpu_has_work_POWER9(CPUState *cs)
->          return msr_ee && (cs->interrupt_request & CPU_INTERRUPT_HARD);
->      }
->  }
-> +#endif /* CONFIG_TCG && !CONFIG_USER_ONLY */
-> =20
->  POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *data)
->  {
->      DeviceClass *dc =3D DEVICE_CLASS(oc);
->      PowerPCCPUClass *pcc =3D POWERPC_CPU_CLASS(oc);
-> -    CPUClass *cc =3D CPU_CLASS(oc);
-> =20
->      dc->fw_name =3D "PowerPC,POWER9";
->      dc->desc =3D "POWER9";
-> @@ -8013,7 +8016,6 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *data)
->                           PCR_COMPAT_2_05;
->      pcc->init_proc =3D init_proc_POWER9;
->      pcc->check_pow =3D check_pow_nocheck;
-> -    cc->has_work =3D cpu_has_work_POWER9;
->      pcc->insns_flags =3D PPC_INSNS_BASE | PPC_ISEL | PPC_STRING | PPC_MF=
-TB |
->                         PPC_FLOAT | PPC_FLOAT_FSEL | PPC_FLOAT_FRES |
->                         PPC_FLOAT_FSQRT | PPC_FLOAT_FRSQRTE |
-> @@ -8062,6 +8064,7 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *data)
->      pcc->lpcr_pm =3D LPCR_PDEE | LPCR_HDEE | LPCR_EEE | LPCR_DEE | LPCR_=
-OEE;
->      pcc->mmu_model =3D POWERPC_MMU_3_00;
->  #if defined(CONFIG_SOFTMMU)
-> +    pcc->has_work =3D cpu_has_work_POWER9;
->      /* segment page size remain the same */
->      pcc->hash64_opts =3D &ppc_hash64_opts_POWER7;
->      pcc->radix_page_info =3D &POWER9_radix_page_info;
-> @@ -8150,6 +8153,7 @@ static bool ppc_pvr_match_power10(PowerPCCPUClass *=
-pcc, uint32_t pvr)
->      return false;
->  }
-> =20
-> +#if defined(CONFIG_TCG) && !defined(CONFIG_USER_ONLY)
->  static bool cpu_has_work_POWER10(CPUState *cs)
->  {
->      PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-> @@ -8207,12 +8211,12 @@ static bool cpu_has_work_POWER10(CPUState *cs)
->          return msr_ee && (cs->interrupt_request & CPU_INTERRUPT_HARD);
->      }
->  }
-> +#endif /* CONFIG_TCG && !CONFIG_USER_ONLY */
-> =20
->  POWERPC_FAMILY(POWER10)(ObjectClass *oc, void *data)
->  {
->      DeviceClass *dc =3D DEVICE_CLASS(oc);
->      PowerPCCPUClass *pcc =3D POWERPC_CPU_CLASS(oc);
-> -    CPUClass *cc =3D CPU_CLASS(oc);
-> =20
->      dc->fw_name =3D "PowerPC,POWER10";
->      dc->desc =3D "POWER10";
-> @@ -8223,7 +8227,6 @@ POWERPC_FAMILY(POWER10)(ObjectClass *oc, void *data)
->                           PCR_COMPAT_2_06 | PCR_COMPAT_2_05;
->      pcc->init_proc =3D init_proc_POWER10;
->      pcc->check_pow =3D check_pow_nocheck;
-> -    cc->has_work =3D cpu_has_work_POWER10;
->      pcc->insns_flags =3D PPC_INSNS_BASE | PPC_ISEL | PPC_STRING | PPC_MF=
-TB |
->                         PPC_FLOAT | PPC_FLOAT_FSEL | PPC_FLOAT_FRES |
->                         PPC_FLOAT_FSQRT | PPC_FLOAT_FRSQRTE |
-> @@ -8275,6 +8278,7 @@ POWERPC_FAMILY(POWER10)(ObjectClass *oc, void *data)
->      pcc->lpcr_pm =3D LPCR_PDEE | LPCR_HDEE | LPCR_EEE | LPCR_DEE | LPCR_=
-OEE;
->      pcc->mmu_model =3D POWERPC_MMU_3_00;
->  #if defined(CONFIG_SOFTMMU)
-> +    pcc->has_work =3D cpu_has_work_POWER10;
->      /* segment page size remain the same */
->      pcc->hash64_opts =3D &ppc_hash64_opts_POWER7;
->      pcc->radix_page_info =3D &POWER10_radix_page_info;
-> @@ -8796,6 +8800,12 @@ static bool ppc_cpu_has_work(CPUState *cs)
->      PowerPCCPU *cpu =3D POWERPC_CPU(cs);
->      CPUPPCState *env =3D &cpu->env;
-> =20
-> +    if (cs->halted) {
-> +        PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cpu);
+>   arch/x86/include/asm/kvm_host.h | 3 ++-
+>   arch/x86/kvm/mmu/mmu.c          | 9 +++++++--
+>   arch/x86/kvm/mmu/paging_tmpl.h  | 4 ++++
+>   3 files changed, 13 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 09b256db394a..332b9fb3454c 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -57,7 +57,8 @@
+>   #define KVM_REQ_MIGRATE_TIMER		KVM_ARCH_REQ(0)
+>   #define KVM_REQ_REPORT_TPR_ACCESS	KVM_ARCH_REQ(1)
+>   #define KVM_REQ_TRIPLE_FAULT		KVM_ARCH_REQ(2)
+> -#define KVM_REQ_MMU_SYNC		KVM_ARCH_REQ(3)
+> +#define KVM_REQ_MMU_SYNC \
+> +	KVM_ARCH_REQ_FLAGS(3, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+>   #define KVM_REQ_CLOCK_UPDATE		KVM_ARCH_REQ(4)
+>   #define KVM_REQ_LOAD_MMU_PGD		KVM_ARCH_REQ(5)
+>   #define KVM_REQ_EVENT			KVM_ARCH_REQ(6)
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 4853c033e6ce..03293cd3c7ae 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -2143,8 +2143,10 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
+>   			kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
+>   		}
+> 
+> -		if (sp->unsync_children)
+> -			kvm_make_request(KVM_REQ_MMU_SYNC, vcpu);
+> +		if (sp->unsync_children) {
+> +			kvm_make_all_cpus_request(KVM_REQ_MMU_SYNC, vcpu);
+> +			return NULL;
+> +		}
+> 
+>   		__clear_sp_write_flooding_count(sp);
+> 
+> @@ -2999,6 +3001,7 @@ static int __direct_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+> 
+>   		sp = kvm_mmu_get_page(vcpu, base_gfn, it.addr,
+>   				      it.level - 1, true, ACC_ALL);
+> +		BUG_ON(!sp);
+> 
+>   		link_shadow_page(vcpu, it.sptep, sp);
+>   		if (fault->is_tdp && fault->huge_page_disallowed &&
+> @@ -3383,6 +3386,8 @@ static hpa_t mmu_alloc_root(struct kvm_vcpu *vcpu, gfn_t gfn, gva_t gva,
+>   	struct kvm_mmu_page *sp;
+> 
+>   	sp = kvm_mmu_get_page(vcpu, gfn, gva, level, direct, ACC_ALL);
+> +	BUG_ON(!sp);
 > +
-> +        return pcc->has_work(cs);
-> +    }
+>   	++sp->root_count;
+> 
+>   	return __pa(sp->spt);
+> diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+> index 50ade6450ace..f573d45e2c6f 100644
+> --- a/arch/x86/kvm/mmu/paging_tmpl.h
+> +++ b/arch/x86/kvm/mmu/paging_tmpl.h
+> @@ -704,6 +704,8 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
+>   			access = gw->pt_access[it.level - 2];
+>   			sp = kvm_mmu_get_page(vcpu, table_gfn, fault->addr,
+>   					      it.level-1, false, access);
+> +			if (!sp)
+> +				return RET_PF_RETRY;
+>   		}
+> 
+>   		/*
+> @@ -742,6 +744,8 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
+>   		if (!is_shadow_present_pte(*it.sptep)) {
+>   			sp = kvm_mmu_get_page(vcpu, base_gfn, fault->addr,
+>   					      it.level - 1, true, direct_access);
+> +			BUG_ON(!sp);
 > +
->      return msr_ee && (cs->interrupt_request & CPU_INTERRUPT_HARD);
->  }
->  #endif /* CONFIG_TCG && !CONFIG_USER_ONLY */
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---iHh9kZyoW/xDyYBn
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAmExcWUACgkQbDjKyiDZ
-s5Kd6Q/9ExvXgL0E8gsCJTsKVim2JIFxJm6lfW3Ljf0A7E4onyKybV1Gu4uLlUjF
-j5ELZ1+AgWr3vOUIhcBT5V1pGKvYXc37CpiQ15Q92DTTfHCcku03DesecGmle2lS
-SiUQFgxVA88pMj1bzbYdQhrwgNebNJzVUdmeGythMdPbN+U4NwFJ5BYs+hkj3v+U
-maeTd4I/tJOySTZhNbNsRi+zahzOxt/idmrjbJ/XoT8z9EUCF54IE/Xf9xKvgcbQ
-YMK+c4PePo2xQXuDozfJNurhJ++J94hysnxH1nihopOegCgBhy8ZyU2LjsXa6hdA
-GkUnVb7tG//kw3uEYkm2z+0a80ZLmXKuR2M0gkkkGQFEftHLF2ZLNo9ou8HuWEzd
-1BeejEEKrUKGb7IoNwAZ3XgXZ2dErbwrvzKEIMNo6e0w7nnLSPpEgkEYQe0c6JEE
-ZUl0IAd541qcGbI8Ckerg652ymOvv4I3PhG7Rg3GhQhR4+7uByfOkGVAZwf+TPYM
-/EBZjio3zJrj3j5tl6xuC6y1GBefg601jAXvJUQzTOuQyxsgcujgKtvexCDztUoG
-fJIX+Pn1j5q54OAE7CRHS1YEiJXlzj58FDBMJ2p/sdqETP2iJ1KhfJQ8Vw9ObJ54
-1qMEYGBJIChIYtsBLc2OkVECXoXqJr3yjVJ6wp5a+DW7vgtQtNs=
-=ay8o
------END PGP SIGNATURE-----
-
---iHh9kZyoW/xDyYBn--
+>   			link_shadow_page(vcpu, it.sptep, sp);
+>   			if (fault->huge_page_disallowed &&
+>   			    fault->req_level >= it.level)
+> --
+> 
