@@ -2,146 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4167F400003
-	for <lists+kvm@lfdr.de>; Fri,  3 Sep 2021 14:51:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BD0F140002B
+	for <lists+kvm@lfdr.de>; Fri,  3 Sep 2021 15:08:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349366AbhICMwi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Sep 2021 08:52:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59258 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1349070AbhICMwh (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 3 Sep 2021 08:52:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630673497;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=DF2I+24AkIxRwqkEhT0lnpePfg+abdYQYWaKlAVyD/A=;
-        b=QgLUPC/qEjsZMGrXp4dQhMaZ4IRVNmOMvNPzmhZUj254MnhpCCma7IU8CdWSvqSK5LEkTN
-        oZxJHHTGA15Q+OOywX94YVX9a61Bj2zpJZ3PB9UNA0mBOnypmE8C7cSEGJYDvHkZ2BrV4+
-        mIiv8CjacapbKgmVwV7bN/VH31qrLRU=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-269-KHTcx_6wNcu0mhLX5fDdQw-1; Fri, 03 Sep 2021 08:51:36 -0400
-X-MC-Unique: KHTcx_6wNcu0mhLX5fDdQw-1
-Received: by mail-ed1-f72.google.com with SMTP id x4-20020a50d9c4000000b003bed5199871so2687959edj.14
-        for <kvm@vger.kernel.org>; Fri, 03 Sep 2021 05:51:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=DF2I+24AkIxRwqkEhT0lnpePfg+abdYQYWaKlAVyD/A=;
-        b=ZWQ5GytWOmy6doTXM2EUFXhCgoUW7JTIhPNydv4BX4Pl4yDdCzzTITeXdMd8HF42X8
-         4ruxUCRkkiuwhzZvex0JZyNw8WoVsXqGmx+609IzAcV5z+ulLyOwAB3CCz4Bqc4Gj7ki
-         VSYFxAJWMO2aswJDHzPp1RfUvpUPwcFzDed4xq7b4b+sAjc7dLRzZohgzorxhiecPLvv
-         Hu/yxxtMiLlGg2dLhtXepgmwhb3cFlEsnds7ZzMpGuNk5WtbVPz05nj1ZF9wQQqrc+Ig
-         gNzrr+N8aD2pMrrshFdkeaWPMF+KeXD+/bhuVh+FxAtdy9eCL6kz2fJHtNgfiHys5z/e
-         lctw==
-X-Gm-Message-State: AOAM531sqe5g/WeQR9g7n50UMtCXRptcjlxJc1Zl96Mo4RtnTr9/rYeg
-        GB4tknFQZEh6r5YfejsHwrS2K7EYTRVDOrYTZwoCSWNUL1GagXE5ZgklJJSnxahhB2Po+nKKDxr
-        rKkM7lwPSstbl
-X-Received: by 2002:a05:6402:18ec:: with SMTP id x44mr3799681edy.331.1630673495260;
-        Fri, 03 Sep 2021 05:51:35 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx8/zNYsvWxJttqosppBPW56JQy0Hy96063NjGYssxoHP8Kz56/+VNYFokXhgAQGoC1tL6Bkw==
-X-Received: by 2002:a05:6402:18ec:: with SMTP id x44mr3799651edy.331.1630673494961;
-        Fri, 03 Sep 2021 05:51:34 -0700 (PDT)
-Received: from steredhat (host-79-51-2-59.retail.telecomitalia.it. [79.51.2.59])
-        by smtp.gmail.com with ESMTPSA id b2sm2876144edt.74.2021.09.03.05.51.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Sep 2021 05:51:34 -0700 (PDT)
-Date:   Fri, 3 Sep 2021 14:51:32 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Colin Ian King <colin.king@canonical.com>,
-        Norbert Slusarek <nslusarek@gmx.net>,
-        Andra Paraschiv <andraprs@amazon.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, stsp2@yandex.ru, oxffffaa@gmail.com
-Subject: Re: [PATCH net-next v5 3/6] vhost/vsock: support MSG_EOR bit
- processing
-Message-ID: <20210903125132.fpuwfij6ggsg4wuf@steredhat>
-References: <20210903123016.3272800-1-arseny.krasnov@kaspersky.com>
- <20210903123238.3273526-1-arseny.krasnov@kaspersky.com>
+        id S1349412AbhICNJ2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Sep 2021 09:09:28 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:36486 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229645AbhICNJ1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Sep 2021 09:09:27 -0400
+Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 7E4AD226F0;
+        Fri,  3 Sep 2021 13:08:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1630674506; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=NN5HIyhd2hnMW2pPqHYMruB3Bj3fGyUnsWK7Hj00imw=;
+        b=T6lLGd6FQmb5ouXURJN/wpryYuxVyDYwFIXSM5ovqZU54Zy7M5ma6Mo9+sCnCBUy9rnA2y
+        B1RFvgVp76vfG6u/8j7GCV8SVom0jO5vLkNpBSOJYRirwRZwHOpSqDORiG15hcaHLLMD+9
+        aaEe5Z5h7+o8DLK+z5EBLnk6ybOdLxE=
+Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap1.suse-dmz.suse.de (Postfix) with ESMTPS id BDFEF137D4;
+        Fri,  3 Sep 2021 13:08:25 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap1.suse-dmz.suse.de with ESMTPSA
+        id MJjBLEkeMmHYOAAAGKfGzw
+        (envelope-from <jgross@suse.com>); Fri, 03 Sep 2021 13:08:25 +0000
+From:   Juergen Gross <jgross@suse.com>
+To:     kvm@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc:     maz@kernel.org, ehabkost@redhat.com,
+        Juergen Gross <jgross@suse.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, Jonathan Corbet <corbet@lwn.net>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu
+Subject: [PATCH v2 0/6] x86/kvm: add boot parameters for max vcpu configs
+Date:   Fri,  3 Sep 2021 15:08:01 +0200
+Message-Id: <20210903130808.30142-1-jgross@suse.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20210903123238.3273526-1-arseny.krasnov@kaspersky.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 03, 2021 at 03:32:35PM +0300, Arseny Krasnov wrote:
->'MSG_EOR' handling has similar logic as 'MSG_EOM' - if bit present
->in packet's header, reset it to 0. Then restore it back if packet
->processing wasn't completed. Instead of bool variable for each
->flag, bit mask variable was added: it has logical OR of 'MSG_EOR'
->and 'MSG_EOM' if needed, to restore flags, this variable is ORed
->with flags field of packet.
->
->Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
->---
-> drivers/vhost/vsock.c | 22 +++++++++++++---------
-> 1 file changed, 13 insertions(+), 9 deletions(-)
->
->diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
->index feaf650affbe..938aefbc75ec 100644
->--- a/drivers/vhost/vsock.c
->+++ b/drivers/vhost/vsock.c
->@@ -114,7 +114,7 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
-> 		size_t nbytes;
-> 		size_t iov_len, payload_len;
-> 		int head;
->-		bool restore_flag = false;
->+		u32 flags_to_restore = 0;
->
-> 		spin_lock_bh(&vsock->send_pkt_list_lock);
-> 		if (list_empty(&vsock->send_pkt_list)) {
->@@ -179,15 +179,20 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
-> 			 * created dynamically and are initialized with header
-> 			 * of current packet(except length). But in case of
-> 			 * SOCK_SEQPACKET, we also must clear message delimeter
->-			 * bit(VIRTIO_VSOCK_SEQ_EOM). Otherwise, instead of one
->-			 * packet with delimeter(which marks end of message),
->-			 * there will be sequence of packets with delimeter
->-			 * bit set. After initialized header will be copied to
->-			 * rx buffer, this bit will be restored.
->+			 * bit (VIRTIO_VSOCK_SEQ_EOM) and MSG_EOR bit
->+			 * (VIRTIO_VSOCK_SEQ_EOR) if set. Otherwise,
->+			 * there will be sequence of packets with these
->+			 * bits set. After initialized header will be copied to
->+			 * rx buffer, these required bits will be restored.
-> 			 */
-> 			if (le32_to_cpu(pkt->hdr.flags) & VIRTIO_VSOCK_SEQ_EOM) {
-> 				pkt->hdr.flags &= ~cpu_to_le32(VIRTIO_VSOCK_SEQ_EOM);
->-				restore_flag = true;
->+				flags_to_restore |= VIRTIO_VSOCK_SEQ_EOM;
->+
->+				if (le32_to_cpu(pkt->hdr.flags) & VIRTIO_VSOCK_SEQ_EOR) {
->+					pkt->hdr.flags &= ~cpu_to_le32(VIRTIO_VSOCK_SEQ_EOR);
->+					flags_to_restore |= VIRTIO_VSOCK_SEQ_EOR;
->+				}
-> 			}
-> 		}
->
->@@ -224,8 +229,7 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
-> 		 * to send it with the next available buffer.
-> 		 */
-> 		if (pkt->off < pkt->len) {
->-			if (restore_flag)
->-				pkt->hdr.flags |= cpu_to_le32(VIRTIO_VSOCK_SEQ_EOM);
->+			pkt->hdr.flags |= cpu_to_le32(flags_to_restore);
->
-> 			/* We are queueing the same virtio_vsock_pkt to 
-> 			handle
-> 			 * the remaining bytes, and we want to deliver it
->-- 
->2.25.1
->
+In order to be able to have a single kernel for supporting even huge
+numbers of vcpus per guest some arrays should be sized dynamically.
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+The easiest way to do that is to add boot parameters for the maximum
+number of vcpus and to calculate the maximum vcpu-id from that using
+either the host topology or a topology hint via another boot parameter.
+
+This patch series is doing that for x86. The same scheme can be easily
+adapted to other architectures, but I don't want to do that in the
+first iteration.
+
+In the long term I'd suggest to have a per-guest setting of the two
+parameters allowing to spare some memory for smaller guests. OTOH this
+would require new ioctl()s and respective qemu modifications, so I let
+those away for now.
+
+I've tested the series not to break normal guest operation and the new
+parameters to be effective on x86. For Arm64 I did a compile test only.
+
+Changes in V2:
+- removed old patch 1, as already applied
+- patch 1 (old patch 2) only for reference, as the patch is already in
+  the kvm tree
+- switch patch 2 (old patch 3) to calculate vcpu-id
+- added patch 4
+
+Juergen Gross (6):
+  x86/kvm: remove non-x86 stuff from arch/x86/kvm/ioapic.h
+  x86/kvm: add boot parameter for adding vcpu-id bits
+  x86/kvm: introduce per cpu vcpu masks
+  kvm: use kvfree() in kvm_arch_free_vm()
+  kvm: allocate vcpu pointer array separately
+  x86/kvm: add boot parameter for setting max number of vcpus per guest
+
+ .../admin-guide/kernel-parameters.txt         | 25 ++++++
+ arch/arm64/include/asm/kvm_host.h             |  1 -
+ arch/arm64/kvm/arm.c                          | 23 ++++--
+ arch/x86/include/asm/kvm_host.h               | 26 +++++--
+ arch/x86/kvm/hyperv.c                         | 25 ++++--
+ arch/x86/kvm/ioapic.c                         | 12 ++-
+ arch/x86/kvm/ioapic.h                         |  8 +-
+ arch/x86/kvm/irq_comm.c                       |  9 ++-
+ arch/x86/kvm/x86.c                            | 78 ++++++++++++++++++-
+ include/linux/kvm_host.h                      | 26 ++++++-
+ 10 files changed, 198 insertions(+), 35 deletions(-)
+
+-- 
+2.26.2
 
