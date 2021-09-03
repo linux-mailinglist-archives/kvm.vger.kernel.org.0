@@ -2,87 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CC8523FF870
-	for <lists+kvm@lfdr.de>; Fri,  3 Sep 2021 02:45:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6B9283FF882
+	for <lists+kvm@lfdr.de>; Fri,  3 Sep 2021 02:56:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346366AbhICApz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Sep 2021 20:45:55 -0400
-Received: from out30-131.freemail.mail.aliyun.com ([115.124.30.131]:33446 "EHLO
-        out30-131.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1345668AbhICApz (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 2 Sep 2021 20:45:55 -0400
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=alimailimapcm10staff010182156082;MF=laijs@linux.alibaba.com;NM=1;PH=DS;RN=16;SR=0;TI=SMTPD_---0Un301am_1630629893;
-Received: from C02XQCBJJG5H.local(mailfrom:laijs@linux.alibaba.com fp:SMTPD_---0Un301am_1630629893)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Fri, 03 Sep 2021 08:44:54 +0800
-Subject: Re: [PATCH 2/7] KVM: X86: Synchronize the shadow pagetable before
- link it
-To:     Sean Christopherson <seanjc@google.com>,
-        Lai Jiangshan <jiangshanlai@gmail.com>
-Cc:     linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Avi Kivity <avi@redhat.com>, kvm@vger.kernel.org
-References: <20210824075524.3354-1-jiangshanlai@gmail.com>
- <20210824075524.3354-3-jiangshanlai@gmail.com> <YTFhCt87vzo4xDrc@google.com>
- <YTFkMvdGug3uS2e4@google.com>
-From:   Lai Jiangshan <laijs@linux.alibaba.com>
-Message-ID: <c8cd9508-7516-0891-f507-4b869d7e4322@linux.alibaba.com>
-Date:   Fri, 3 Sep 2021 08:44:53 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.13.0
+        id S239561AbhICA5j (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Sep 2021 20:57:39 -0400
+Received: from ozlabs.org ([203.11.71.1]:51527 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231161AbhICA5i (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Sep 2021 20:57:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gibson.dropbear.id.au; s=201602; t=1630630598;
+        bh=XXRA9E9bkfiMuArjbNTfx+r3Un7G6QIyGWXT2AEimqw=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=S/oOJX4wVez+0NVv34NrPleBWRl5YwYrRYxkIYCYr2DBSXFoQW3ujaLS8VYNkCkdh
+         k+y3JMpbgn9tPsrOUDPXq+7t9kf9MvRy3873T3nWL9uuJ/xjlikC8YswJYUk9vfu76
+         vduXzNxO6Vij/+kbOiSMh1QGiktvH/h6gdwa0iwg=
+Received: by ozlabs.org (Postfix, from userid 1007)
+        id 4H0zrk2QpHz9sCD; Fri,  3 Sep 2021 10:56:38 +1000 (AEST)
+Date:   Fri, 3 Sep 2021 10:49:20 +1000
+From:   David Gibson <david@gibson.dropbear.id.au>
+To:     Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc:     qemu-devel@nongnu.org, Bin Meng <bin.meng@windriver.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Greg Kurz <groug@kaod.org>, haxm-team@intel.com,
+        Kamil Rytarowski <kamil@netbsd.org>, qemu-ppc@nongnu.org,
+        Anthony Perard <anthony.perard@citrix.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Michael Rolnik <mrolnik@gmail.com>, qemu-riscv@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jiaxun Yang <jiaxun.yang@flygoat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Chris Wulff <crwulff@gmail.com>,
+        Laurent Vivier <lvivier@redhat.com>,
+        Cameron Esfahani <dirty@apple.com>,
+        Sunil Muthuswamy <sunilmut@microsoft.com>,
+        Max Filippov <jcmvbkbc@gmail.com>,
+        Taylor Simpson <tsimpson@quicinc.com>, qemu-s390x@nongnu.org,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+        Yoshinori Sato <ysato@users.sourceforge.jp>,
+        Artyom Tarasenko <atar4qemu@gmail.com>,
+        Aurelien Jarno <aurelien@aurel32.net>,
+        Paul Durrant <paul@xen.org>,
+        Peter Maydell <peter.maydell@linaro.org>,
+        Alistair Francis <alistair.francis@wdc.com>,
+        "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+        Roman Bolshakov <r.bolshakov@yadro.com>,
+        Laurent Vivier <laurent@vivier.eu>,
+        Cornelia Huck <cohuck@redhat.com>, qemu-arm@nongnu.org,
+        Wenchao Wang <wenchao.wang@intel.com>,
+        xen-devel@lists.xenproject.org, Marek Vasut <marex@denx.de>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+        Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+        Colin Xu <colin.xu@intel.com>,
+        Claudio Fontana <cfontana@suse.de>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Stafford Horne <shorne@gmail.com>,
+        Reinoud Zandijk <reinoud@netbsd.org>, kvm@vger.kernel.org
+Subject: Re: [PATCH v3 20/30] target/ppc: Restrict has_work() handler to
+ sysemu and TCG
+Message-ID: <YTFxEPkY6Eq1+Xe/@yekko>
+References: <20210902161543.417092-1-f4bug@amsat.org>
+ <20210902161543.417092-21-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <YTFkMvdGug3uS2e4@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="6Kw+8nBbrWcu5Nha"
+Content-Disposition: inline
+In-Reply-To: <20210902161543.417092-21-f4bug@amsat.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
+--6Kw+8nBbrWcu5Nha
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 2021/9/3 07:54, Sean Christopherson wrote:
-> 
->   trace_get_page:
-> diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-> index 50ade6450ace..5b13918a55c2 100644
-> --- a/arch/x86/kvm/mmu/paging_tmpl.h
-> +++ b/arch/x86/kvm/mmu/paging_tmpl.h
-> @@ -704,6 +704,10 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
->   			access = gw->pt_access[it.level - 2];
->   			sp = kvm_mmu_get_page(vcpu, table_gfn, fault->addr,
->   					      it.level-1, false, access);
-> +			if (sp->unsync_children) {
-> +				kvm_make_all_cpus_request(KVM_REQ_MMU_SYNC, vcpu);
-> +				return RET_PF_RETRY;
+On Thu, Sep 02, 2021 at 06:15:33PM +0200, Philippe Mathieu-Daud=E9 wrote:
+> Restrict has_work() to TCG sysemu.
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
 
-Making KVM_REQ_MMU_SYNC be able remotely is good idea.
-But if the sp is not linked, the @sp might not be synced even we
-tried many times. So we should continue to link it.
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
 
-But if we continue to link it, KVM_REQ_MMU_SYNC should be extended to
-sync all roots (current root and prev_roots).  And maybe add a
-KVM_REQ_MMU_SYNC_CURRENT for current root syncing.
+> ---
+>  target/ppc/cpu_init.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/target/ppc/cpu_init.c b/target/ppc/cpu_init.c
+> index 6aad01d1d3a..e2e721c2b81 100644
+> --- a/target/ppc/cpu_init.c
+> +++ b/target/ppc/cpu_init.c
+> @@ -8790,6 +8790,7 @@ static void ppc_cpu_set_pc(CPUState *cs, vaddr valu=
+e)
+>      cpu->env.nip =3D value;
+>  }
+> =20
+> +#if defined(CONFIG_TCG) && !defined(CONFIG_USER_ONLY)
+>  static bool ppc_cpu_has_work(CPUState *cs)
+>  {
+>      PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+> @@ -8797,6 +8798,7 @@ static bool ppc_cpu_has_work(CPUState *cs)
+> =20
+>      return msr_ee && (cs->interrupt_request & CPU_INTERRUPT_HARD);
+>  }
+> +#endif /* CONFIG_TCG && !CONFIG_USER_ONLY */
+> =20
+>  static void ppc_cpu_reset(DeviceState *dev)
+>  {
+> @@ -9017,6 +9019,7 @@ static const struct TCGCPUOps ppc_tcg_ops =3D {
+>    .tlb_fill =3D ppc_cpu_tlb_fill,
+> =20
+>  #ifndef CONFIG_USER_ONLY
+> +  .has_work =3D ppc_cpu_has_work,
+>    .cpu_exec_interrupt =3D ppc_cpu_exec_interrupt,
+>    .do_interrupt =3D ppc_cpu_do_interrupt,
+>    .cpu_exec_enter =3D ppc_cpu_exec_enter,
+> @@ -9042,7 +9045,6 @@ static void ppc_cpu_class_init(ObjectClass *oc, voi=
+d *data)
+>      device_class_set_parent_reset(dc, ppc_cpu_reset, &pcc->parent_reset);
+> =20
+>      cc->class_by_name =3D ppc_cpu_class_by_name;
+> -    cc->has_work =3D ppc_cpu_has_work;
+>      cc->dump_state =3D ppc_cpu_dump_state;
+>      cc->set_pc =3D ppc_cpu_set_pc;
+>      cc->gdb_read_register =3D ppc_cpu_gdb_read_register;
 
-It is not going to be a simple.  I have a new way to sync pages
-and also fix the problem,  but that include several non-fix patches.
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-We need to fix this problem in the simplest way.  In my patch
-mmu_sync_children() has a @root argument.  I think we can disallow
-releasing the lock when @root is false. Is it OK?
+--6Kw+8nBbrWcu5Nha
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
 
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAmExcRAACgkQbDjKyiDZ
+s5IeEBAAv3cpcInuLFJXsDvzVly7wSr5p5Tp9oNaBy8UvvGyoBX2eesw8Om/A3+P
+S/tu8jqAI/GRfxWwBaE+wNg+Fmpdl3CK+ThR/6t9NA5BhoBwy5rwsM4V32BYkawN
+NS5jP+L14XMC5MMa9o1IbnrNIPcpSA7kLTxq6sZxP1UaSvLecauVW2a14q630sUN
+0mQEVEq0V/dO9bB01U775VN8Nzwxc6khrC8oufvhvSL22oYCjQTvOTslr7LEN5Ro
+Bb/6zxAXhGR1A8aBLekm7RSlqY767gZjEtIdn1zjx6g/owGyARjDez0rzwhiBL8C
+WqVsrRndk6jLRe1SJSRpZvgCx0EybrQyITVbeyMM4A/lXZYmDD2HKvOuXpUtnNZg
+frxhAADG1KW6Y1Ufvklqyz9YGnFpztZL6XevPw1xfXXFvC3jyZpBNYP5XrilV44G
+Sl7xomR8sRiJqzvJ2fWj475h07KiQ5NjXVvX5NvWy4okv9IphyXh8JoxyQsrA2b5
+zIuqvUOy4GNPsunnxcNha90XiMsN6i5ds/ibiTyMwKbllU/hgUI3GEKVICncvbGt
+LmIo3UFw/vTG7+lqCUxRZUtGBBgDZlsyxpkAGXfiBf+aISLrhsCHQeXxbD18AGBO
+tECHtorVH7MbCNLHks/1Ey6DsZyaJnMdBoNjA+d4GpSUzASXzxI=
+=o8a9
+-----END PGP SIGNATURE-----
 
-> +			}
->   		}
-> 
->   		/*
-> --
-> 
+--6Kw+8nBbrWcu5Nha--
