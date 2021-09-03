@@ -2,230 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 443EB3FFB56
-	for <lists+kvm@lfdr.de>; Fri,  3 Sep 2021 09:53:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0861F3FFB7D
+	for <lists+kvm@lfdr.de>; Fri,  3 Sep 2021 10:04:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348087AbhICHxg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Sep 2021 03:53:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:48388 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1348035AbhICHx1 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 3 Sep 2021 03:53:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630655547;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=9j3oKiG5IgXoavVwKdsM4PDzRm77ulmaFH8VPcXYkD8=;
-        b=D2XgqLdwYpOUM66SgQ0FHk5aKtNFskTYygjECfoWDTP+dRVft6R+LFIoNS8IWpaJ8qkdKT
-        JCHXsngauuJZSH69x9O8TkmbXtT1nQMvpRP+9/MjoYknTunxcrtBQXCLmcEl4vHITsLQNf
-        HXHWOfPjiVGoOluOBjRjMNOQKGAB/hU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-520-XiHgvJyNOUu6ebZAARo0dA-1; Fri, 03 Sep 2021 03:52:26 -0400
-X-MC-Unique: XiHgvJyNOUu6ebZAARo0dA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D3F3A6D254;
-        Fri,  3 Sep 2021 07:52:11 +0000 (UTC)
-Received: from vitty.brq.redhat.com (unknown [10.40.194.111])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 36A0C10016F5;
-        Fri,  3 Sep 2021 07:52:09 +0000 (UTC)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Nitesh Narayan Lal <nitesh@redhat.com>,
-        Lai Jiangshan <jiangshanlai@gmail.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v5 8/8] KVM: Make kvm_make_vcpus_request_mask() use pre-allocated cpu_kick_mask
-Date:   Fri,  3 Sep 2021 09:51:41 +0200
-Message-Id: <20210903075141.403071-9-vkuznets@redhat.com>
-In-Reply-To: <20210903075141.403071-1-vkuznets@redhat.com>
-References: <20210903075141.403071-1-vkuznets@redhat.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+        id S1348177AbhICIFD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Sep 2021 04:05:03 -0400
+Received: from smtp21.cstnet.cn ([159.226.251.21]:55502 "EHLO cstnet.cn"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1347900AbhICIEI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Sep 2021 04:04:08 -0400
+X-Greylist: delayed 438 seconds by postgrey-1.27 at vger.kernel.org; Fri, 03 Sep 2021 04:04:04 EDT
+Received: from localhost.localdomain (unknown [124.16.138.128])
+        by APP-01 (Coremail) with SMTP id qwCowABXazDW1DFh9IwiAA--.56360S2;
+        Fri, 03 Sep 2021 15:55:02 +0800 (CST)
+From:   Jiang Jiasheng <jiasheng@iscas.ac.cn>
+To:     pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
+        hpa@zytor.com, jarkko@kernel.org, dave.hansen@linux.intel.com
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-sgx@vger.kernel.org, Jiang Jiasheng <jiasheng@iscas.ac.cn>
+Subject: [PATCH 4/4] KVM: X86: Potential 'index out of range' bug
+Date:   Fri,  3 Sep 2021 07:55:00 +0000
+Message-Id: <1630655700-798374-1-git-send-email-jiasheng@iscas.ac.cn>
+X-Mailer: git-send-email 2.7.4
+X-CM-TRANSID: qwCowABXazDW1DFh9IwiAA--.56360S2
+X-Coremail-Antispam: 1UD129KBjvdXoWrur48uw4fJr47CFy3uw4kWFg_yoWDJFb_CF
+        1fZan8Gr9Yvr9avws7A3ySyanY9w40qFW5Gw1rC343J34vyF4UAw4vq3W7Ar12gw40vFW2
+        9ry5Gr47Aw4j9jkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUbVAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+        A2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr0_
+        Cr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv6xkF7I0E14v26F4UJV
+        W0owAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+        I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+        4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
+        n2kIc2xKxwCY02Avz4vE14v_GF4l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr
+        0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY
+        17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcV
+        C0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF
+        0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxh
+        VjvjDU0xZFpf9x0JUvQ6LUUUUU=
+X-Originating-IP: [124.16.138.128]
+X-CM-SenderInfo: pmld2xxhqjqxpvfd2hldfou0/
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-kvm_make_vcpus_request_mask() already disables preemption so just like
-kvm_make_all_cpus_request_except() it can be switched to using
-pre-allocated per-cpu cpumasks. This allows for improvements for both
-users of the function: in Hyper-V emulation code 'tlb_flush' can now be
-dropped from 'struct kvm_vcpu_hv' and kvm_make_scan_ioapic_request_mask()
-gets rid of dynamic allocation.
+The kvm_get_vcpu() will call for the array_index_nospec()
+with the value of atomic_read(&(v->kvm)->online_vcpus) as size,
+and the value of constant '0' as index.
+If the size is also '0', it will be unreasonabe
+that the index is no less than the size.
 
-cpumask_available() checks in kvm_make_vcpu_request() and
-kvm_kick_many_cpus() can now be dropped as they checks for an impossible
-condition: kvm_init() makes sure per-cpu masks are allocated.
-
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+Signed-off-by: Jiang Jiasheng <jiasheng@iscas.ac.cn>
 ---
- arch/x86/include/asm/kvm_host.h |  1 -
- arch/x86/kvm/hyperv.c           |  5 +----
- arch/x86/kvm/x86.c              |  8 +-------
- include/linux/kvm_host.h        |  2 +-
- virt/kvm/kvm_main.c             | 29 +++++++++--------------------
- 5 files changed, 12 insertions(+), 33 deletions(-)
+ arch/x86/kvm/x86.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 09b256db394a..846552fa2012 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -569,7 +569,6 @@ struct kvm_vcpu_hv {
- 	struct kvm_hyperv_exit exit;
- 	struct kvm_vcpu_hv_stimer stimer[HV_SYNIC_STIMER_COUNT];
- 	DECLARE_BITMAP(stimer_pending_bitmap, HV_SYNIC_STIMER_COUNT);
--	cpumask_t tlb_flush;
- 	bool enforce_cpuid;
- 	struct {
- 		u32 features_eax; /* HYPERV_CPUID_FEATURES.EAX */
-diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-index 5704bfe53ee0..f76e7228f687 100644
---- a/arch/x86/kvm/hyperv.c
-+++ b/arch/x86/kvm/hyperv.c
-@@ -1755,7 +1755,6 @@ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc, bool
- 	int i;
- 	gpa_t gpa;
- 	struct kvm *kvm = vcpu->kvm;
--	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
- 	struct hv_tlb_flush_ex flush_ex;
- 	struct hv_tlb_flush flush;
- 	u64 vp_bitmap[KVM_HV_MAX_SPARSE_VCPU_SET_BITS];
-@@ -1837,8 +1836,6 @@ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc, bool
- 		}
- 	}
- 
--	cpumask_clear(&hv_vcpu->tlb_flush);
--
- 	/*
- 	 * vcpu->arch.cr3 may not be up-to-date for running vCPUs so we can't
- 	 * analyze it here, flush TLB regardless of the specified address space.
-@@ -1850,7 +1847,7 @@ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc, bool
- 						    vp_bitmap, vcpu_bitmap);
- 
- 		kvm_make_vcpus_request_mask(kvm, KVM_REQ_TLB_FLUSH_GUEST,
--					    vcpu_mask, &hv_vcpu->tlb_flush);
-+					    vcpu_mask);
- 	}
- 
- ret_success:
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index a4752dcc2a75..91c1e6c98b0f 100644
+index e0f4a46..c59013c 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -9224,14 +9224,8 @@ static void process_smi(struct kvm_vcpu *vcpu)
- void kvm_make_scan_ioapic_request_mask(struct kvm *kvm,
- 				       unsigned long *vcpu_bitmap)
- {
--	cpumask_var_t cpus;
--
--	zalloc_cpumask_var(&cpus, GFP_ATOMIC);
--
- 	kvm_make_vcpus_request_mask(kvm, KVM_REQ_SCAN_IOAPIC,
--				    vcpu_bitmap, cpus);
--
--	free_cpumask_var(cpus);
-+				    vcpu_bitmap);
+@@ -2871,7 +2871,7 @@ static int kvm_guest_time_update(struct kvm_vcpu *v)
+ 				       offsetof(struct compat_vcpu_info, time));
+ 	if (vcpu->xen.vcpu_time_info_set)
+ 		kvm_setup_pvclock_page(v, &vcpu->xen.vcpu_time_info_cache, 0);
+-	if (v == kvm_get_vcpu(v->kvm, 0))
++	if (atomic_read(&(v->kvm)->online_vcpus) > 0 && v == kvm_get_vcpu(v->kvm, 0))
+ 		kvm_hv_setup_tsc_page(v->kvm, &vcpu->hv_clock);
+ 	return 0;
  }
- 
- void kvm_make_scan_ioapic_request(struct kvm *kvm)
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 2f149ed140f7..1ee85de0bf74 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -160,7 +160,7 @@ static inline bool is_error_page(struct page *page)
- #define KVM_ARCH_REQ(nr)           KVM_ARCH_REQ_FLAGS(nr, 0)
- 
- bool kvm_make_vcpus_request_mask(struct kvm *kvm, unsigned int req,
--				 unsigned long *vcpu_bitmap, cpumask_var_t tmp);
-+				 unsigned long *vcpu_bitmap);
- bool kvm_make_all_cpus_request(struct kvm *kvm, unsigned int req);
- bool kvm_make_all_cpus_request_except(struct kvm *kvm, unsigned int req,
- 				      struct kvm_vcpu *except);
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index ddd091f05c18..12dbf3f062da 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -247,15 +247,8 @@ static void ack_flush(void *_completed)
- {
- }
- 
--static inline bool kvm_kick_many_cpus(cpumask_var_t tmp, bool wait)
-+static inline bool kvm_kick_many_cpus(struct cpumask *cpus, bool wait)
- {
--	const struct cpumask *cpus;
--
--	if (likely(cpumask_available(tmp)))
--		cpus = tmp;
--	else
--		cpus = cpu_online_mask;
--
- 	if (cpumask_empty(cpus))
- 		return false;
- 
-@@ -264,7 +257,7 @@ static inline bool kvm_kick_many_cpus(cpumask_var_t tmp, bool wait)
- }
- 
- static void kvm_make_vcpu_request(struct kvm *kvm, struct kvm_vcpu *vcpu,
--				  unsigned int req, cpumask_var_t tmp,
-+				  unsigned int req, struct cpumask *tmp,
- 				  int current_cpu)
- {
- 	int cpu;
-@@ -274,14 +267,6 @@ static void kvm_make_vcpu_request(struct kvm *kvm, struct kvm_vcpu *vcpu,
- 	if (!(req & KVM_REQUEST_NO_WAKEUP) && kvm_vcpu_wake_up(vcpu))
- 		return;
- 
--	/*
--	 * tmp can be "unavailable" if cpumasks are allocated off stack as
--	 * allocation of the mask is deliberately not fatal and is handled by
--	 * falling back to kicking all online CPUs.
--	 */
--	if (!cpumask_available(tmp))
--		return;
--
- 	/*
- 	 * Note, the vCPU could get migrated to a different pCPU at any point
- 	 * after kvm_request_needs_ipi(), which could result in sending an IPI
-@@ -300,22 +285,26 @@ static void kvm_make_vcpu_request(struct kvm *kvm, struct kvm_vcpu *vcpu,
- }
- 
- bool kvm_make_vcpus_request_mask(struct kvm *kvm, unsigned int req,
--				 unsigned long *vcpu_bitmap, cpumask_var_t tmp)
-+				 unsigned long *vcpu_bitmap)
- {
- 	struct kvm_vcpu *vcpu;
-+	struct cpumask *cpus;
- 	int i, me;
- 	bool called;
- 
- 	me = get_cpu();
- 
-+	cpus = this_cpu_cpumask_var_ptr(cpu_kick_mask);
-+	cpumask_clear(cpus);
-+
- 	for_each_set_bit(i, vcpu_bitmap, KVM_MAX_VCPUS) {
- 		vcpu = kvm_get_vcpu(kvm, i);
- 		if (!vcpu)
- 			continue;
--		kvm_make_vcpu_request(kvm, vcpu, req, tmp, me);
-+		kvm_make_vcpu_request(kvm, vcpu, req, cpus, me);
- 	}
- 
--	called = kvm_kick_many_cpus(tmp, !!(req & KVM_REQUEST_WAIT));
-+	called = kvm_kick_many_cpus(cpus, !!(req & KVM_REQUEST_WAIT));
- 	put_cpu();
- 
- 	return called;
 -- 
-2.31.1
+2.7.4
 
