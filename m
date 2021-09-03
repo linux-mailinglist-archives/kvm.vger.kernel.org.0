@@ -2,127 +2,167 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7C4EB3FFA1E
-	for <lists+kvm@lfdr.de>; Fri,  3 Sep 2021 08:07:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 221383FFA2A
+	for <lists+kvm@lfdr.de>; Fri,  3 Sep 2021 08:14:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236241AbhICGII (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Sep 2021 02:08:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36234 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236332AbhICGIH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Sep 2021 02:08:07 -0400
-Received: from mail-il1-x12a.google.com (mail-il1-x12a.google.com [IPv6:2607:f8b0:4864:20::12a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3ABBC061575;
-        Thu,  2 Sep 2021 23:07:07 -0700 (PDT)
-Received: by mail-il1-x12a.google.com with SMTP id u7so4194656ilk.7;
-        Thu, 02 Sep 2021 23:07:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=g0tm4GeYA/JaE1+KeZPU+sovvSIMGM2e/oeyivqXSxQ=;
-        b=E+uZm9nLOn4PWLG8KOzSMxZJZQ/rMpsJS87CO2+bYbxXHkw/yzhkT8WUeWdxNCpH+D
-         pa04b52QOs2WJjeAATcLNLVr1kkYT4ewaX/6N3Ng2YOD/amCspYsLXlKkJqEHctvfob+
-         RFTOkXGDmoa35WOz/i0mM5BVR1ITG1Rd9PHvj8lZjgrtTE20naxuXljRUUBwB93c4Sq4
-         2yoxiYUPlG3iPVXicFlRVtbO0BQAa1T8VzUVVjlKSQxjKeSBxzCKO7+0xmWaIRxy3tHR
-         gzD1UUNvqsBc9QgrZvz7Yy7V87nq7Ps96rLmYcdvGD54dV+x+GN8V/Fo5eiTdWggBwPj
-         I51A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=g0tm4GeYA/JaE1+KeZPU+sovvSIMGM2e/oeyivqXSxQ=;
-        b=GkDb3leY+UCmdis/Pe5F2DlM9bUAlOc4K0sZDnfaXI53km2/jiKgVYeO/H4MpPQ4DL
-         xyMfBjSjlo7MaUyaNtrcHEE6quNWQoGaZ/1SXfgwat9kZTJ+P9Pr8pNS4hSeuiGvIbJW
-         1dqbFstKUVVoOjG49t3buY5Ji6ux6TAa9YY/MvAmfbRjGKsKugOr8uTrV8s/9ehpq74j
-         UxXVkvXSQLpA0Z1hQBjIohhohb18JXWauh6lVu39JyRogDk4CP+FFX57vF2vssIJEXMD
-         O8vQ8ZyH9JsIsP6q81fzjxsXVr8hyUEzznFNi5zsqb/1jorp3+ehLSzzACVjpa6sbnzV
-         9Q8A==
-X-Gm-Message-State: AOAM530cW+FmruVBd4BVyGWanxE1Z/Kndm3PuqsT1Mxf+Xou4adBf9E1
-        TU4SF0WIhnxmYXh2HGFqcFS52NM9971p3rnFVCQ=
-X-Google-Smtp-Source: ABdhPJwPs5QxPZOJoXaUhH8grjGdFAJjoHrBeR2WGgRBQMFdhIgs0J42J6OdPrwyr1L+17L5FS9y9c6fCbiW1CjWQuM=
-X-Received: by 2002:a92:de4b:: with SMTP id e11mr1413991ilr.22.1630649226872;
- Thu, 02 Sep 2021 23:07:06 -0700 (PDT)
+        id S1344368AbhICGPG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Sep 2021 02:15:06 -0400
+Received: from mx13.kaspersky-labs.com ([91.103.66.164]:25017 "EHLO
+        mx13.kaspersky-labs.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234109AbhICGPF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Sep 2021 02:15:05 -0400
+Received: from relay13.kaspersky-labs.com (unknown [127.0.0.10])
+        by relay13.kaspersky-labs.com (Postfix) with ESMTP id 791DF5210F3;
+        Fri,  3 Sep 2021 09:14:04 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kaspersky.com;
+        s=mail202102; t=1630649644;
+        bh=eaFyXAtHgvusgE2gF7Bwy2o/KgRvSmEZUxGeY5Dp9+k=;
+        h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type;
+        b=oYJp8WEIbdPnb/4bchkdZ8JaMtO6P9CgvbcVvrpfACIA73nT4UAW7kLtWfPB45q7o
+         mD6z2/hqH9pZywn1+UxdvAkCh7YX2FTzMBn9jqyHsOiJJYF/tvUKbH79QCdK2THEv3
+         ePyEzgGfrJYLK7RmOJiDDVGCDn5im6MCjVZ05nmRwf8ihBnOMesg094n0csrtkgw/k
+         nu2lajr+IvOyCJztxIHe656z7FE+s4M/usLkAp8bPA40fxglRnAr+HbEQcUEXPMtx5
+         rcaVc3ag2CGPdvWIEBErWO+MAWX5eTkDZ7OovpLz7xerjCe0bMDbz5JHtCRQlnJjHJ
+         HyyWt5g4VBY0g==
+Received: from mail-hq2.kaspersky.com (unknown [91.103.66.206])
+        (using TLSv1.2 with cipher AES256-GCM-SHA384 (256/256 bits))
+        (Client CN "mail-hq2.kaspersky.com", Issuer "Kaspersky MailRelays CA G3" (verified OK))
+        by mailhub13.kaspersky-labs.com (Postfix) with ESMTPS id A05C9520FD1;
+        Fri,  3 Sep 2021 09:14:03 +0300 (MSK)
+Received: from arseniy-pc.avp.ru (10.64.68.129) by hqmailmbx3.avp.ru
+ (10.64.67.243) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2308.14; Fri, 3
+ Sep 2021 09:14:02 +0300
+From:   Arseny Krasnov <arseny.krasnov@kaspersky.com>
+To:     Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Arseny Krasnov <arseny.krasnov@kaspersky.com>,
+        Norbert Slusarek <nslusarek@gmx.net>,
+        Andra Paraschiv <andraprs@amazon.com>,
+        Colin Ian King <colin.king@canonical.com>
+CC:     <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <stsp2@yandex.ru>, <oxffffaa@gmail.com>
+Subject: [PATCH net-next v4 0/6] virtio/vsock: introduce MSG_EOR flag for SEQPACKET
+Date:   Fri, 3 Sep 2021 09:13:49 +0300
+Message-ID: <20210903061353.3187150-1-arseny.krasnov@kaspersky.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-References: <20210902204622.54354-1-mgurtovoy@nvidia.com>
-In-Reply-To: <20210902204622.54354-1-mgurtovoy@nvidia.com>
-From:   Pankaj Gupta <pankaj.gupta.linux@gmail.com>
-Date:   Fri, 3 Sep 2021 08:06:55 +0200
-Message-ID: <CAM9Jb+gX9nRpXWjyxusEsmJKOVdY7zdhtWkDpu2raQXkN5Af_Q@mail.gmail.com>
-Subject: Re: [PATCH v3 1/1] virtio-blk: add num_request_queues module parameter
-To:     Max Gurtovoy <mgurtovoy@nvidia.com>
-Cc:     hch@infradead.org, "Michael S . Tsirkin" <mst@redhat.com>,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        Stefan Hajnoczi <stefanha@redhat.com>, israelr@nvidia.com,
-        nitzanc@nvidia.com, oren@nvidia.com, linux-block@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.64.68.129]
+X-ClientProxiedBy: hqmailmbx1.avp.ru (10.64.67.241) To hqmailmbx3.avp.ru
+ (10.64.67.243)
+X-KSE-ServerInfo: hqmailmbx3.avp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 5.9.20, Database issued on: 09/03/2021 05:49:39
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 0
+X-KSE-AntiSpam-Info: Lua profiles 165946 [Sep 03 2021]
+X-KSE-AntiSpam-Info: Version: 5.9.20.0
+X-KSE-AntiSpam-Info: Envelope from: arseny.krasnov@kaspersky.com
+X-KSE-AntiSpam-Info: LuaCore: 461 461 c95454ca24f64484bdf56c7842a96dd24416624e
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: arseniy-pc.avp.ru:7.1.1;127.0.0.199:7.1.2;kaspersky.com:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
+X-KSE-AntiSpam-Info: Rate: 0
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Deterministic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 09/03/2021 05:52:00
+X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
+ rules found
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 03.09.2021 4:06:00
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
+ rules found
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+X-KLMS-Rule-ID: 52
+X-KLMS-Message-Action: clean
+X-KLMS-AntiSpam-Status: not scanned, disabled by settings
+X-KLMS-AntiSpam-Interceptor-Info: not scanned
+X-KLMS-AntiPhishing: Clean, bases: 2021/09/03 04:45:00
+X-KLMS-AntiVirus: Kaspersky Security for Linux Mail Server, version 8.0.3.30, bases: 2021/09/03 02:56:00 #17151492
+X-KLMS-AntiVirus-Status: Clean, skipped
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> Sometimes a user would like to control the amount of request queues to
-> be created for a block device. For example, for limiting the memory
-> footprint of virtio-blk devices.
->
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-> Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
-> ---
->
-> changes from v2:
->  - renamed num_io_queues to num_request_queues (from Stefan)
->  - added Reviewed-by signatures (from Stefan and Christoph)
->
-> changes from v1:
->  - use param_set_uint_minmax (from Christoph)
->  - added "Should > 0" to module description
->
-> Note: This commit apply on top of Jens's branch for-5.15/drivers
->
-> ---
->  drivers/block/virtio_blk.c | 21 ++++++++++++++++++++-
->  1 file changed, 20 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> index 4b49df2dfd23..aaa2833a4734 100644
-> --- a/drivers/block/virtio_blk.c
-> +++ b/drivers/block/virtio_blk.c
-> @@ -24,6 +24,23 @@
->  /* The maximum number of sg elements that fit into a virtqueue */
->  #define VIRTIO_BLK_MAX_SG_ELEMS 32768
->
-> +static int virtblk_queue_count_set(const char *val,
-> +               const struct kernel_param *kp)
-> +{
-> +       return param_set_uint_minmax(val, kp, 1, nr_cpu_ids);
-> +}
-> +
-> +static const struct kernel_param_ops queue_count_ops = {
-> +       .set = virtblk_queue_count_set,
-> +       .get = param_get_uint,
-> +};
-> +
-> +static unsigned int num_request_queues;
-> +module_param_cb(num_request_queues, &queue_count_ops, &num_request_queues,
-> +               0644);
-> +MODULE_PARM_DESC(num_request_queues,
-> +                "Number of request queues to use for blk device. Should > 0");
-> +
->  static int major;
->  static DEFINE_IDA(vd_index_ida);
->
-> @@ -501,7 +518,9 @@ static int init_vq(struct virtio_blk *vblk)
->         if (err)
->                 num_vqs = 1;
->
-> -       num_vqs = min_t(unsigned int, nr_cpu_ids, num_vqs);
-> +       num_vqs = min_t(unsigned int,
-> +                       min_not_zero(num_request_queues, nr_cpu_ids),
-> +                       num_vqs);
->
->         vblk->vqs = kmalloc_array(num_vqs, sizeof(*vblk->vqs), GFP_KERNEL);
->         if (!vblk->vqs)
-> --
+	This patchset implements support of MSG_EOR bit for SEQPACKET
+AF_VSOCK sockets over virtio transport.
+	First we need to define 'messages' and 'records' like this:
+Message is result of sending calls: 'write()', 'send()', 'sendmsg()'
+etc. It has fixed maximum length, and it bounds are visible using
+return from receive calls: 'read()', 'recv()', 'recvmsg()' etc.
+Current implementation based on message definition above.
+	Record has unlimited length, it consists of multiple message,
+and bounds of record are visible via MSG_EOR flag returned from
+'recvmsg()' call. Sender passes MSG_EOR to sending system call and
+receiver will see MSG_EOR when corresponding message will be processed.
+	Idea of patchset comes from POSIX: it says that SEQPACKET
+supports record boundaries which are visible for receiver using
+MSG_EOR bit. So, it looks like MSG_EOR is enough thing for SEQPACKET
+and we don't need to maintain boundaries of corresponding send -
+receive system calls. But, for 'sendXXX()' and 'recXXX()' POSIX says,
+that all these calls operates with messages, e.g. 'sendXXX()' sends
+message, while 'recXXX()' reads messages and for SEQPACKET, 'recXXX()'
+must read one entire message from socket, dropping all out of size
+bytes. Thus, both message boundaries and MSG_EOR bit must be supported
+to follow POSIX rules.
+	To support MSG_EOR new bit was added along with existing
+'VIRTIO_VSOCK_SEQ_EOR': 'VIRTIO_VSOCK_SEQ_EOM'(end-of-message) - now it
+works in the same way as 'VIRTIO_VSOCK_SEQ_EOR'. But 'VIRTIO_VSOCK_SEQ_EOR'
+is used to mark 'MSG_EOR' bit passed from userspace.
+	This patchset includes simple test for MSG_EOR.
 
-Reviewed-by: Pankaj Gupta <pankaj.gupta@ionos.com>
+ Arseny Krasnov(6):
+  virtio/vsock: rename 'EOR' to 'EOM' bit.
+  virtio/vsock: add 'VIRTIO_VSOCK_SEQ_EOR' bit.
+  vhost/vsock: support MSG_EOR bit processing
+  virtio/vsock: support MSG_EOR bit processing
+  af_vsock: rename variables in receive loop
+  vsock_test: update message bounds test for MSG_EOR
+
+ drivers/vhost/vsock.c                   | 28 +++++++++++++----------
+ include/uapi/linux/virtio_vsock.h       |  3 ++-
+ net/vmw_vsock/af_vsock.c                | 10 ++++----
+ net/vmw_vsock/virtio_transport_common.c | 23 ++++++++++++-------
+ tools/testing/vsock/vsock_test.c        |  8 ++++++-
+ 5 files changed, 45 insertions(+), 27 deletions(-)
+
+ v3 -> v4:
+ - 'sendXXX()' renamed to 'send*()' in 0002- commit msg.
+ - Comment about bit restore updated in 0003-.
+ - 'same' renamed to 'similar' in 0003- commit msg.
+ - u32 used instead of uint32_t in 0003-.
+
+ v2 -> v3:
+ - 'virtio/vsock: rename 'EOR' to 'EOM' bit.' - commit message updated.
+ - 'VIRTIO_VSOCK_SEQ_EOR' bit add moved to separate patch.
+ - 'vhost/vsock: support MSG_EOR bit processing' - commit message
+   updated.
+ - 'vhost/vsock: support MSG_EOR bit processing' - removed unneeded
+   'le32_to_cpu()', because input argument was already in CPU
+   endianness.
+
+ v1 -> v2:
+ - 'VIRTIO_VSOCK_SEQ_EOR' is renamed to 'VIRTIO_VSOCK_SEQ_EOM', to
+   support backward compatibility.
+ - use bitmask of flags to restore in vhost.c, instead of separated
+   bool variable for each flag.
+ - test for EAGAIN removed, as logically it is not part of this
+   patchset(will be sent separately).
+ - cover letter updated(added part with POSIX description).
+
+Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
+
+-- 
+2.25.1
+
