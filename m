@@ -2,306 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3711B40024B
-	for <lists+kvm@lfdr.de>; Fri,  3 Sep 2021 17:28:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A20AC40024D
+	for <lists+kvm@lfdr.de>; Fri,  3 Sep 2021 17:28:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349669AbhICP3P (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Sep 2021 11:29:15 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48865 "EHLO
+        id S1349691AbhICP3c (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Sep 2021 11:29:32 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:41976 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1349745AbhICP3G (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 3 Sep 2021 11:29:06 -0400
+        by vger.kernel.org with ESMTP id S235536AbhICP3a (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 3 Sep 2021 11:29:30 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630682885;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:in-reply-to:in-reply-to:  references:references;
-        bh=3LR7REeezVsIp3SNM2nZhl+ZtoLMOZo4uM0Zo8Y4Lwo=;
-        b=EwvGx8ViMRezWnX2ce0l2vAZeblkoRnZuXM3Oy6yiEpWggVOPWKie3v4y8OU62hR3g3weM
-        9p9hDHG6E7f5fgdK0XJQAO/tNz0tbSmXS9Dgf/6z/Q58IjwbAq2cFMunRHDjVjhBmkZPvf
-        skVun5TqpshADmRNc0jmqo3oiQX02GM=
+        s=mimecast20190719; t=1630682910;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=pZkDhvwFytLIQ3GqCYeXEIXo1n/CTQnLIJFcfLYdv6Y=;
+        b=SLJs9RyXI/uNhVcMoFI72ce2KQpGDHFyLz6KWDCjyx/sffJBDtjjV9MCjhpDQ/Tpm/TSjU
+        705vpGwVMeAPaqhcnE6L0MGp6ftkoCsE3GP7mfxUrmAwMYdfiDstDoI78H+QBj3Yub+Fl1
+        quOqUTNqu0QT2cnY/B4765T7g+Y/V7A=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-359-lwRSrDa-PteO7D9H_m_qzw-1; Fri, 03 Sep 2021 11:28:04 -0400
-X-MC-Unique: lwRSrDa-PteO7D9H_m_qzw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+ us-mta-438-m7YFGk6JNdeaXCKC--F62w-1; Fri, 03 Sep 2021 11:28:29 -0400
+X-MC-Unique: m7YFGk6JNdeaXCKC--F62w-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1015784A5E1;
-        Fri,  3 Sep 2021 15:28:03 +0000 (UTC)
-Received: from redhat.com (unknown [10.39.193.241])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3BAD65D9D3;
-        Fri,  3 Sep 2021 15:27:59 +0000 (UTC)
-Date:   Fri, 3 Sep 2021 16:27:56 +0100
-From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     qemu-devel@nongnu.org, Connor Kuehl <ckuehl@redhat.com>,
-        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        James Bottomley <jejb@linux.ibm.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D9C28C7442;
+        Fri,  3 Sep 2021 15:28:27 +0000 (UTC)
+Received: from localhost (unknown [10.22.8.230])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 999E360861;
+        Fri,  3 Sep 2021 15:28:27 +0000 (UTC)
+Date:   Fri, 3 Sep 2021 11:28:26 -0400
+From:   Eduardo Habkost <ehabkost@redhat.com>
+To:     Juergen Gross <jgross@suse.com>
+Cc:     linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        kvm@vger.kernel.org, Eduardo Habkost <ehabkost@redhat.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Markus Armbruster <armbru@redhat.com>,
-        Eric Blake <eblake@redhat.com>
-Subject: Re: [RFC PATCH v2 12/12] i386/sev: update query-sev QAPI format to
- handle SEV-SNP
-Message-ID: <YTI+/A/ejS/tlYMf@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20210826222627.3556-1-michael.roth@amd.com>
- <20210826222627.3556-13-michael.roth@amd.com>
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>
+Subject: Re: [PATCH 1/6] x86/kvm: fix vcpu-id indexed array sizes
+Message-ID: <20210903152826.75rbaedvlud3potn@habkost.net>
+References: <20210701154105.23215-1-jgross@suse.com>
+ <20210701154105.23215-2-jgross@suse.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20210826222627.3556-13-michael.roth@amd.com>
-User-Agent: Mutt/2.0.7 (2021-05-04)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <20210701154105.23215-2-jgross@suse.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 26, 2021 at 05:26:27PM -0500, Michael Roth wrote:
-> Most of the current 'query-sev' command is relevant to both legacy
-> SEV/SEV-ES guests and SEV-SNP guests, with 2 exceptions:
-> 
->   - 'policy' is a 64-bit field for SEV-SNP, not 32-bit, and
->     the meaning of the bit positions has changed
->   - 'handle' is not relevant to SEV-SNP
+On Thu, Jul 01, 2021 at 05:41:00PM +0200, Juergen Gross wrote:
+> KVM_MAX_VCPU_ID is the maximum vcpu-id of a guest, and not the number
+> of vcpu-ids. Fix array indexed by vcpu-id to have KVM_MAX_VCPU_ID+1
+> elements.
 
-If the host supports SEV-SNP guests, is it still possible for mgmt
-app to create guests using the  "legacy" SEV/SEV-ES approach ? ie
-is the hardware backwards compatible, or is it strictly required
-to always create SEV-SNP guests when the hardware is capable ?
+I don't think that's true.  kvm_vm_ioctl_create_vcpu() refuses to
+create a VCPU with id==KVM_MAX_VCPU_ID.
+Documentation/virt/kvm/api.rst also states that
+"The vcpu id is an integer in the range [0, max_vcpu_id)."
 
-The code here seems to imply a non-backwards compatible approach,
-mandating use of SEV-SNP guests on such capable kernel/hardware.
-
-> To address this, this patch adds a new 'sev-type' field that can be
-> used as a discriminator to select between SEV and SEV-SNP-specific
-> fields/formats without breaking compatibility for existing management
-> tools (so long as management tools that add support for launching
-> SEV-SNP guest update their handling of query-sev appropriately).
 > 
-> The corresponding HMP command has also been fixed up similarly.
+> Note that this is currently no real problem, as KVM_MAX_VCPU_ID is
+> an odd number, resulting in always enough padding being available at
+> the end of those arrays.
 > 
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
+> Nevertheless this should be fixed in order to avoid rare problems in
+> case someone is using an even number for KVM_MAX_VCPU_ID.
+> 
+> Signed-off-by: Juergen Gross <jgross@suse.com>
 > ---
->  qapi/misc-target.json  | 71 +++++++++++++++++++++++++++++++++---------
->  target/i386/monitor.c  | 29 +++++++++++++----
->  target/i386/sev.c      | 22 +++++++------
->  target/i386/sev_i386.h |  3 ++
->  4 files changed, 95 insertions(+), 30 deletions(-)
+>  arch/x86/kvm/ioapic.c | 2 +-
+>  arch/x86/kvm/ioapic.h | 4 ++--
+>  2 files changed, 3 insertions(+), 3 deletions(-)
 > 
-> diff --git a/qapi/misc-target.json b/qapi/misc-target.json
-> index 3b05ad3dbf..80f994ff9b 100644
-> --- a/qapi/misc-target.json
-> +++ b/qapi/misc-target.json
-> @@ -81,6 +81,49 @@
->             'send-update', 'receive-update' ],
->    'if': 'TARGET_I386' }
->  
-> +##
-> +# @SevGuestType:
-> +#
-> +# An enumeration indicating the type of SEV guest being run.
-> +#
-> +# @sev:     The guest is a legacy SEV or SEV-ES guest.
-> +# @sev-snp: The guest is an SEV-SNP guest.
-> +#
-> +# Since: 6.2
-> +##
-> +{ 'enum': 'SevGuestType',
-> +  'data': [ 'sev', 'sev-snp' ],
-> +  'if': 'TARGET_I386' }
-> +
-> +##
-> +# @SevGuestInfo:
-> +#
-> +# Information specific to legacy SEV/SEV-ES guests.
-> +#
-> +# @policy: SEV policy value
-> +#
-> +# @handle: SEV firmware handle
-> +#
-> +# Since: 2.12
-> +##
-> +{ 'struct': 'SevGuestInfo',
-> +  'data': { 'policy': 'uint32',
-> +            'handle': 'uint32' },
-> +  'if': 'TARGET_I386' }
-> +
-> +##
-> +# @SevSnpGuestInfo:
-> +#
-> +# Information specific to SEV-SNP guests.
-> +#
-> +# @policy: SEV-SNP policy value
-> +#
-> +# Since: 6.2
-> +##
-> +{ 'struct': 'SevSnpGuestInfo',
-> +  'data': { 'policy': 'uint64' },
-> +  'if': 'TARGET_I386' }
-> +
->  ##
->  # @SevInfo:
->  #
-> @@ -94,25 +137,25 @@
->  #
->  # @build-id: SEV FW build id
->  #
-> -# @policy: SEV policy value
-> -#
->  # @state: SEV guest state
->  #
-> -# @handle: SEV firmware handle
-> +# @sev-type: Type of SEV guest being run
->  #
->  # Since: 2.12
->  ##
-> -{ 'struct': 'SevInfo',
-> -    'data': { 'enabled': 'bool',
-> -              'api-major': 'uint8',
-> -              'api-minor' : 'uint8',
-> -              'build-id' : 'uint8',
-> -              'policy' : 'uint32',
-> -              'state' : 'SevState',
-> -              'handle' : 'uint32'
-> -            },
-> -  'if': 'TARGET_I386'
-> -}
-> +{ 'union': 'SevInfo',
-> +  'base': { 'enabled': 'bool',
-> +            'api-major': 'uint8',
-> +            'api-minor' : 'uint8',
-> +            'build-id' : 'uint8',
-> +            'state' : 'SevState',
-> +            'sev-type' : 'SevGuestType' },
-> +  'discriminator': 'sev-type',
-> +  'data': {
-> +      'sev': 'SevGuestInfo',
-> +      'sev-snp': 'SevSnpGuestInfo' },
-> +  'if': 'TARGET_I386' }
-> +
->  
->  ##
->  # @query-sev:
-> diff --git a/target/i386/monitor.c b/target/i386/monitor.c
-> index 119211f0b0..85a8bc2bef 100644
-> --- a/target/i386/monitor.c
-> +++ b/target/i386/monitor.c
-> @@ -692,20 +692,37 @@ void hmp_info_sev(Monitor *mon, const QDict *qdict)
+> diff --git a/arch/x86/kvm/ioapic.c b/arch/x86/kvm/ioapic.c
+> index 698969e18fe3..ff005fe738a4 100644
+> --- a/arch/x86/kvm/ioapic.c
+> +++ b/arch/x86/kvm/ioapic.c
+> @@ -96,7 +96,7 @@ static unsigned long ioapic_read_indirect(struct kvm_ioapic *ioapic,
+>  static void rtc_irq_eoi_tracking_reset(struct kvm_ioapic *ioapic)
 >  {
->      SevInfo *info = sev_get_info();
->  
-> -    if (info && info->enabled) {
-> -        monitor_printf(mon, "handle: %d\n", info->handle);
-> +    if (!info || !info->enabled) {
-> +        monitor_printf(mon, "SEV is not enabled\n");
-> +        goto out;
-> +    }
-> +
-> +    if (sev_snp_enabled()) {
->          monitor_printf(mon, "state: %s\n", SevState_str(info->state));
->          monitor_printf(mon, "build: %d\n", info->build_id);
->          monitor_printf(mon, "api version: %d.%d\n",
->                         info->api_major, info->api_minor);
->          monitor_printf(mon, "debug: %s\n",
-> -                       info->policy & SEV_POLICY_NODBG ? "off" : "on");
-> -        monitor_printf(mon, "key-sharing: %s\n",
-> -                       info->policy & SEV_POLICY_NOKS ? "off" : "on");
-> +                       info->u.sev_snp.policy & SEV_SNP_POLICY_DBG ? "on"
-> +                                                                   : "off");
-> +        monitor_printf(mon, "SMT allowed: %s\n",
-> +                       info->u.sev_snp.policy & SEV_SNP_POLICY_SMT ? "on"
-> +                                                                   : "off");
-> +        monitor_printf(mon, "SEV type: %s\n", SevGuestType_str(info->sev_type));
->      } else {
-> -        monitor_printf(mon, "SEV is not enabled\n");
-> +        monitor_printf(mon, "handle: %d\n", info->u.sev.handle);
-> +        monitor_printf(mon, "state: %s\n", SevState_str(info->state));
-> +        monitor_printf(mon, "build: %d\n", info->build_id);
-> +        monitor_printf(mon, "api version: %d.%d\n",
-> +                       info->api_major, info->api_minor);
-> +        monitor_printf(mon, "debug: %s\n",
-> +                       info->u.sev.policy & SEV_POLICY_NODBG ? "off" : "on");
-> +        monitor_printf(mon, "key-sharing: %s\n",
-> +                       info->u.sev.policy & SEV_POLICY_NOKS ? "off" : "on");
-> +        monitor_printf(mon, "SEV type: %s\n", SevGuestType_str(info->sev_type));
->      }
->  
-> +out:
->      qapi_free_SevInfo(info);
+>  	ioapic->rtc_status.pending_eoi = 0;
+> -	bitmap_zero(ioapic->rtc_status.dest_map.map, KVM_MAX_VCPU_ID);
+> +	bitmap_zero(ioapic->rtc_status.dest_map.map, KVM_MAX_VCPU_ID + 1);
 >  }
 >  
-> diff --git a/target/i386/sev.c b/target/i386/sev.c
-> index 72a6146295..fac2755e68 100644
-> --- a/target/i386/sev.c
-> +++ b/target/i386/sev.c
-> @@ -704,25 +704,27 @@ sev_get_info(void)
->  {
->      SevInfo *info;
->      SevCommonState *sev_common = SEV_COMMON(MACHINE(qdev_get_machine())->cgs);
-> -    SevGuestState *sev_guest =
-> -        (SevGuestState *)object_dynamic_cast(OBJECT(sev_common),
-> -                                             TYPE_SEV_GUEST);
+>  static void kvm_rtc_eoi_tracking_restore_all(struct kvm_ioapic *ioapic);
+> diff --git a/arch/x86/kvm/ioapic.h b/arch/x86/kvm/ioapic.h
+> index 660401700075..11e4065e1617 100644
+> --- a/arch/x86/kvm/ioapic.h
+> +++ b/arch/x86/kvm/ioapic.h
+> @@ -43,13 +43,13 @@ struct kvm_vcpu;
 >  
->      info = g_new0(SevInfo, 1);
->      info->enabled = sev_enabled();
+>  struct dest_map {
+>  	/* vcpu bitmap where IRQ has been sent */
+> -	DECLARE_BITMAP(map, KVM_MAX_VCPU_ID);
+> +	DECLARE_BITMAP(map, KVM_MAX_VCPU_ID + 1);
 >  
->      if (info->enabled) {
-> -        if (sev_guest) {
-> -            info->handle = sev_guest->handle;
-> -        }
->          info->api_major = sev_common->api_major;
->          info->api_minor = sev_common->api_minor;
->          info->build_id = sev_common->build_id;
->          info->state = sev_common->state;
-> -        /* we only report the lower 32-bits of policy for SNP, ok for now... */
-> -        info->policy =
-> -            (uint32_t)object_property_get_uint(OBJECT(sev_common),
-> -                                               "policy", NULL);
-> +
-> +        if (sev_snp_enabled()) {
-> +            info->sev_type = SEV_GUEST_TYPE_SEV_SNP;
-> +            info->u.sev_snp.policy =
-> +                object_property_get_uint(OBJECT(sev_common), "policy", NULL);
-> +        } else {
-> +            info->sev_type = SEV_GUEST_TYPE_SEV;
-> +            info->u.sev.handle = SEV_GUEST(sev_common)->handle;
-> +            info->u.sev.policy =
-> +                (uint32_t)object_property_get_uint(OBJECT(sev_common),
-> +                                                   "policy", NULL);
-> +        }
->      }
+>  	/*
+>  	 * Vector sent to a given vcpu, only valid when
+>  	 * the vcpu's bit in map is set
+>  	 */
+> -	u8 vectors[KVM_MAX_VCPU_ID];
+> +	u8 vectors[KVM_MAX_VCPU_ID + 1];
+>  };
 >  
->      return info;
-> diff --git a/target/i386/sev_i386.h b/target/i386/sev_i386.h
-> index e0e1a599be..948d8f1079 100644
-> --- a/target/i386/sev_i386.h
-> +++ b/target/i386/sev_i386.h
-> @@ -28,6 +28,9 @@
->  #define SEV_POLICY_DOMAIN       0x10
->  #define SEV_POLICY_SEV          0x20
 >  
-> +#define SEV_SNP_POLICY_SMT      0x10000
-> +#define SEV_SNP_POLICY_DBG      0x80000
-> +
->  extern bool sev_es_enabled(void);
->  extern bool sev_snp_enabled(void);
->  extern uint64_t sev_get_me_mask(void);
 > -- 
-> 2.25.1
+> 2.26.2
 > 
 
-Regards,
-Daniel
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Eduardo
 
