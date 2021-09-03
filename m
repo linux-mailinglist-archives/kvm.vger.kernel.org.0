@@ -2,206 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 092844005F0
-	for <lists+kvm@lfdr.de>; Fri,  3 Sep 2021 21:38:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C75AD400613
+	for <lists+kvm@lfdr.de>; Fri,  3 Sep 2021 21:48:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349960AbhICTjt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Sep 2021 15:39:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54102 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349900AbhICTjs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Sep 2021 15:39:48 -0400
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7EACC0613CF
-        for <kvm@vger.kernel.org>; Fri,  3 Sep 2021 12:38:47 -0700 (PDT)
-Received: by mail-pj1-x102c.google.com with SMTP id g13-20020a17090a3c8d00b00196286963b9so236443pjc.3
-        for <kvm@vger.kernel.org>; Fri, 03 Sep 2021 12:38:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=qzhaz9XxDSm1ugGQAic1jSV4h3dO1CWRqJG/Wa1eKqo=;
-        b=Q4g8O/XPm2u0b/cy1Hw89zcNMj9oiX+bRd+8mJDYqYQ8LqTxTaTrNWdtwP4bLcnUkU
-         eMWjtXHzk5yzQKvQBZz1g+zzocaHQ9MQmA8qY4buy+vaNmp5diQC16nhwre2uxT+p8vV
-         JaPlc6nRsTMCMhGj/qmDvfSk+tKUB6VvKpq9Gv4jj25FmVwK/Bdzgw/LlzdZO6aAJQv5
-         f1EqIV23Wb6apk3n3WO4d0Tzr00atX0sfTt+1Q6zmCti6z/NPft5/mzAJJpR+1wmv7ml
-         Q385PdhiwJginqPZ/Re4d9EE91NU4GLKOycCnmXK4odaYvOj4A5XwF2/tqj8Hh6UoDX4
-         Ku8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=qzhaz9XxDSm1ugGQAic1jSV4h3dO1CWRqJG/Wa1eKqo=;
-        b=AXomkKKZ7JeTK09cD3/obM0V/2QxV8LaVIL170hpdfX4oQI21gNg4aB5WvFaMrLoKU
-         v1ReeYPu0BqmoqVc2u8WayXIaDdu5V3Eyk4jcdg6vXlvjcx6zlBySejjVhj8CpTdMd2f
-         arSP6FtV2bEVriDFlKyv9/B0DAc3L47fvGj4jVPlVjBwGXvU8ZzAdsguC9dyyGgApr7z
-         d3p3h6srNCc5HFrxoK3oP4hJmk6vzIlZ1G0l9JeuYrNNihN2b6P5VWaBxW7Ltv0+D1fT
-         v/vfGLBTuroTsYlkzL10gPHDgQkmc79H5wuFOuT4fFDzWM6T8LXFis4A4yWmw/KlSi00
-         nUzg==
-X-Gm-Message-State: AOAM5336CzLHSm9H140biFjISsOuly1YxUbYKCGObJiJi5U/HjfBxzxT
-        C1N8SFihkUZOPs5pNZXp2vl9kA==
-X-Google-Smtp-Source: ABdhPJxAbMzCuFmt0f4TsCM6x099HH8zwapkycmIw+PDBp1H5EAVUuuq+cobTGIsNH17Vprk8NCwxQ==
-X-Received: by 2002:a17:90b:4b4f:: with SMTP id mi15mr497532pjb.120.1630697926927;
-        Fri, 03 Sep 2021 12:38:46 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id q20sm180458pgu.31.2021.09.03.12.38.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Sep 2021 12:38:46 -0700 (PDT)
-Date:   Fri, 3 Sep 2021 19:38:42 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Mingwei Zhang <mizhang@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        John Allen <john.allen@amd.com>,
+        id S235916AbhICTta (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Sep 2021 15:49:30 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49974 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233514AbhICTt3 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 3 Sep 2021 15:49:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1630698508;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=DW68GxV6Lb0qE4ekh0Ivx+87OsRzETRMBE0QJs6OocI=;
+        b=L060QxMNPEFMY3hqmNeLmRxpF1/0AJoikeGUi99ofOSc0voDXT1gLSajhuVNi1b1NUosPG
+        +RQyXaJJCTgRNcf8DksijuPT2Sk24vkxk2qdTsvx0S9udYuyqkbajNpjm8wMqRqtf9Ji57
+        IFuTYU/3nDgIoMDPJRoaAvdBXFP0+fM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-417-2HDgqUOzOZWN2NPx5sx4EA-1; Fri, 03 Sep 2021 15:48:27 -0400
+X-MC-Unique: 2HDgqUOzOZWN2NPx5sx4EA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4E2058042D6;
+        Fri,  3 Sep 2021 19:48:25 +0000 (UTC)
+Received: from localhost (unknown [10.22.8.230])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A27675C1C5;
+        Fri,  3 Sep 2021 19:48:24 +0000 (UTC)
+Date:   Fri, 3 Sep 2021 15:48:24 -0400
+From:   Eduardo Habkost <ehabkost@redhat.com>
+To:     Juergen Gross <jgross@suse.com>
+Cc:     kvm@vger.kernel.org, x86@kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, maz@kernel.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Alper Gun <alpergun@google.com>,
-        Borislav Petkov <bp@alien8.de>,
-        David Rienjes <rientjes@google.com>,
-        Marc Orr <marcorr@google.com>, Peter Gonda <pgonda@google.com>,
-        Vipin Sharma <vipinsh@google.com>
-Subject: Re: [PATCH v2 3/4] KVM: SVM: move sev_bind_asid to psp
-Message-ID: <YTJ5wjNShaHlDVAp@google.com>
-References: <20210818053908.1907051-1-mizhang@google.com>
- <20210818053908.1907051-4-mizhang@google.com>
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>
+Subject: Re: [PATCH v2 2/6] x86/kvm: add boot parameter for adding vcpu-id
+ bits
+Message-ID: <20210903194824.lfjzeaab6ct72pxn@habkost.net>
+References: <20210903130808.30142-1-jgross@suse.com>
+ <20210903130808.30142-3-jgross@suse.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20210818053908.1907051-4-mizhang@google.com>
+In-Reply-To: <20210903130808.30142-3-jgross@suse.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 18, 2021, Mingwei Zhang wrote:
-> @@ -336,11 +322,9 @@ static int sev_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
->  		goto e_free_session;
->  
->  	/* Bind ASID to this guest */
-> -	ret = sev_bind_asid(kvm, start.handle, error);
-> -	if (ret) {
-> -		sev_guest_decommission(start.handle, NULL);
-> +	ret = sev_guest_bind_asid(sev_get_asid(kvm), start.handle, error);
-> +	if (ret)
->  		goto e_free_session;
-> -	}
->  
->  	/* return handle to userspace */
->  	params.handle = start.handle;
+On Fri, Sep 03, 2021 at 03:08:03PM +0200, Juergen Gross wrote:
+> Today the maximum vcpu-id of a kvm guest's vcpu on x86 systems is set
+> via a #define in a header file.
+> 
+> In order to support higher vcpu-ids without generally increasing the
+> memory consumption of guests on the host (some guest structures contain
+> arrays sized by KVM_MAX_VCPU_ID) add a boot parameter for adding some
+> bits to the vcpu-id. Additional bits are needed as the vcpu-id is
+> constructed via bit-wise concatenation of socket-id, core-id, etc.
+> As those ids maximum values are not always a power of 2, the vcpu-ids
+> are sparse.
+> 
+> The additional number of bits needed is basically the number of
+> topology levels with a non-power-of-2 maximum value, excluding the top
+> most level.
+> 
+> The default value of the new parameter will be to take the correct
+> setting from the host's topology.
 
-...
+Having the default depend on the host topology makes the host
+behaviour unpredictable (which might be a problem when migrating
+VMs from another host with a different topology).  Can't we just
+default to 2?
 
-> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-> index e2d49bedc0ef..325e79360d9e 100644
-> --- a/drivers/crypto/ccp/sev-dev.c
-> +++ b/drivers/crypto/ccp/sev-dev.c
-> @@ -903,6 +903,21 @@ int sev_guest_activate(struct sev_data_activate *data, int *error)
->  }
->  EXPORT_SYMBOL_GPL(sev_guest_activate);
->  
-> +int sev_guest_bind_asid(int asid, unsigned int handle, int *error)
+> 
+> Calculating the maximum vcpu-id dynamically requires to allocate the
+> arrays using KVM_MAX_VCPU_ID as the size dynamically.
+> 
+> Signed-of-by: Juergen Gross <jgross@suse.com>
+> ---
+> V2:
+> - switch to specifying additional bits (based on comment by Vitaly
+>   Kuznetsov)
+> 
+> Signed-off-by: Juergen Gross <jgross@suse.com>
+> ---
+[...]
+>  #define KVM_MAX_VCPUS 288
+>  #define KVM_SOFT_MAX_VCPUS 240
+> -#define KVM_MAX_VCPU_ID 1023
+> +#define KVM_MAX_VCPU_ID kvm_max_vcpu_id()
+[...]
+> +unsigned int kvm_max_vcpu_id(void)
 > +{
-> +	struct sev_data_activate activate;
-> +	int ret;
+> +	int n_bits = fls(KVM_MAX_VCPUS - 1);
 > +
-> +	/* activate ASID on the given handle */
-> +	activate.handle = handle;
-> +	activate.asid   = asid;
-> +	ret = sev_guest_activate(&activate, error);
-> +	if (ret)
-> +		sev_guest_decommission(handle, NULL);
+> +	if (vcpu_id_add_bits < -1 || vcpu_id_add_bits > (32 - n_bits)) {
+> +		pr_err("Invalid value of vcpu_id_add_bits=%d parameter!\n",
+> +		       vcpu_id_add_bits);
+> +		vcpu_id_add_bits = -1;
+> +	}
+> +
+> +	if (vcpu_id_add_bits >= 0) {
+> +		n_bits += vcpu_id_add_bits;
+> +	} else {
+> +		n_bits++;		/* One additional bit for core level. */
+> +		if (topology_max_die_per_package() > 1)
+> +			n_bits++;	/* One additional bit for die level. */
+> +	}
+> +
+> +	if (!n_bits)
+> +		n_bits = 1;
+> +
+> +	return (1U << n_bits) - 1;
 
-Hrm, undoing state like this is a bad API.  It assumes the caller is well-behaved,
-e.g. has already done something that requires decommissioning, and it surprises
-the caller, e.g. the KVM side (above) looks like it's missing error handling.
-Something like this would be cleaner overall:
+The largest possible VCPU ID is not KVM_MAX_VCPU_ID,
+it's (KVM_MAX_VCPU_ID - 1).  This is enforced by
+kvm_vm_ioctl_create_vcpu().
 
-	/* create memory encryption context */
-	ret = __sev_issue_cmd(argp->sev_fd, SEV_CMD_RECEIVE_START, &start,
-				error);
-	if (ret)
-		goto e_free_session;
-
-	/* Bind ASID to this guest */
-	ret = sev_guest_activate(sev_get_asid(kvm), start.handle, error);
-	if (ret)
-		goto e_decommision;
-
-	params.handle = start.handle;
-	if (copy_to_user((void __user *)(uintptr_t)argp->data,
-			 &params, sizeof(struct kvm_sev_receive_start))) {
-		ret = -EFAULT;
-		goto e_deactivate;
-	}
-
-    	sev->handle = start.handle;
-	sev->fd = argp->sev_fd;
-
-e_deactivate:
-	sev_guest_deactivate(sev_get_asid(kvm), start.handle, error);
-e_decommision:
-	sev_guest_decommission(start.handle, error);
-e_free_session:
-	kfree(session_data);
-e_free_pdh:
-	kfree(pdh_data);
+That would mean KVM_MAX_VCPU_ID should be (1 << n_bits) instead
+of ((1 << n_bits) - 1), wouldn't it?
 
 
-However, I don't know that that's a good level of abstraction, e.g. the struct
-details are abstracted from KVM but the exact sequencing is not, which is odd
-to say the least.
+> +}
+> +EXPORT_SYMBOL_GPL(kvm_max_vcpu_id);
+> +
+>  /*
+>   * Restoring the host value for MSRs that are only consumed when running in
+>   * usermode, e.g. SYSCALL MSRs and TSC_AUX, can be deferred until the CPU
+> -- 
+> 2.26.2
+> 
 
-Which is a good segue into my overarching complaint about the PSP API and what
-made me suggest this change in the first place.  IMO, the API exposed to KVM (and
-others) is too low level, e.g. KVM is practically making direct calls to the PSP
-via sev_issue_cmd_external_user().  Even the partially-abstracted helpers that
-take a "struct sev_data_*" are too low level, KVM really shouldn't need to know
-the hardware-defined structures for an off-CPU device.
+-- 
+Eduardo
 
-My intent with the suggestion was to start driving toward a mostly-abstracted API
-across the board, with an end goal of eliminating sev_issue_cmd_external_user()
-and moving all of the sev_data* structs out of psp-sev.h and into a private
-header.  However, I think we should all explicitly agree on the desired level of
-abstraction before shuffling code around.
-
-My personal preference is obviously to work towards an abstracted API.  And if
-we decide to go that route, I think we should be much more aggressive with respect
-to what is abstracted.   Many of the functions will be rather gross due to the
-sheer number of params, but I think the end result will be a net positive in terms
-of readability and separation of concerns.
-
-E.g. get KVM looking like this
-
-static int sev_receive_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
-{
-	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-	struct kvm_sev_receive_start params;
-	int ret;
-
-	if (!sev_guest(kvm))
-		return -ENOTTY;
-
-	/* Get parameter from the userspace */
-	if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data,
-			sizeof(struct kvm_sev_receive_start)))
-		return -EFAULT;
-
-	ret = sev_guest_receive_start(argp->sev_fd, &arpg->error, sev->asid,
-				      &params.handle, params.policy,
-				      params.pdh_uaddr, params.pdh_len,
-				      params.session_uaddr, params.session_len);
-	if (ret)
-		return ret;
-
-	/* Copy params back to user even on failure, e.g. for error info. */
-	if (copy_to_user((void __user *)(uintptr_t)argp->data,
-			 &params, sizeof(struct kvm_sev_receive_start)))
-		return -EFAULT;
-
-    	sev->handle = params.handle;
-	sev->fd = argp->sev_fd;
-	return 0;
-}
