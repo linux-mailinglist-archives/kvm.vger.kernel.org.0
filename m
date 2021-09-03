@@ -2,99 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6B46C400759
-	for <lists+kvm@lfdr.de>; Fri,  3 Sep 2021 23:16:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 09DC740075B
+	for <lists+kvm@lfdr.de>; Fri,  3 Sep 2021 23:16:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236039AbhICVRH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Sep 2021 17:17:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:33893 "EHLO
+        id S236091AbhICVRI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Sep 2021 17:17:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55144 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232927AbhICVRG (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 3 Sep 2021 17:17:06 -0400
+        by vger.kernel.org with ESMTP id S234472AbhICVRH (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 3 Sep 2021 17:17:07 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630703764;
+        s=mimecast20190719; t=1630703765;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=SSIVNkVvm0gWqkOOU9lE9NsfPjtIigmPaRNK/vB50kw=;
-        b=cxbsvNI87+u1Ot7ovcBiPq5GN29sR72njnOsOAxi/cxTCFYyItP7h48oroIzg5AtCHCWje
-        JXHe8DeegbrFYb6ljIgdGGg2FA9Fqm5QtL03w9DvEZ4ZJTXmDCUSZ7uoIzvNWxC1HvK4Nt
-        u7+2fS3AzF1tnLZ3K3RN6e9moTS3CCE=
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=r6t3h2Mlp3rk1TasU2ZEG8OzaCEsOtdQv3ykEEHWrfc=;
+        b=ARnAk0IKYBBpsnX5CZPQ4OkZhvdJWX7OOTRh//+1S4pUQ5L/Ey3SvE+RqHSucHwNfiPnWu
+        FdYnLqT6f3at7aTvvXWy8xO7CXMZ3xJTK66/bifPL4QGIbUGy2z9Rfd4H71FUDnOhRbBbP
+        7wp8bWGD5c9lw5d3etBkZlPAPpUOl1w=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-596-YMVRquaMO7izfGfEc77zmA-1; Fri, 03 Sep 2021 17:16:02 -0400
-X-MC-Unique: YMVRquaMO7izfGfEc77zmA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+ us-mta-107-aa8o_a-gNPCbzyoETfJJuA-1; Fri, 03 Sep 2021 17:16:03 -0400
+X-MC-Unique: aa8o_a-gNPCbzyoETfJJuA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CC63784A5E0;
-        Fri,  3 Sep 2021 21:16:01 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B5EE010054F6;
+        Fri,  3 Sep 2021 21:16:02 +0000 (UTC)
 Received: from localhost (unknown [10.22.8.230])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8A2985C3DF;
-        Fri,  3 Sep 2021 21:16:01 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7E47260861;
+        Fri,  3 Sep 2021 21:16:02 +0000 (UTC)
 From:   Eduardo Habkost <ehabkost@redhat.com>
 To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
         Juergen Gross <jgross@suse.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>
-Subject: [PATCH v2 0/3] kvm: x86: Set KVM_MAX_VCPUS=1024, KVM_SOFT_MAX_VCPUS=710
-Date:   Fri,  3 Sep 2021 17:15:57 -0400
-Message-Id: <20210903211600.2002377-1-ehabkost@redhat.com>
-Content-Type: text/plain; charset="utf-8"
+Subject: [PATCH v2 1/3] kvm: x86: Set KVM_MAX_VCPU_ID to 4*KVM_MAX_VCPUS
+Date:   Fri,  3 Sep 2021 17:15:58 -0400
+Message-Id: <20210903211600.2002377-2-ehabkost@redhat.com>
+In-Reply-To: <20210903211600.2002377-1-ehabkost@redhat.com>
+References: <20210903211600.2002377-1-ehabkost@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This:
-- Increases KVM_MAX_VCPUS 288 to 1024.
-- Increases KVM_MAX_VCPU_ID from 1023 to 4096.
-- Increases KVM_SOFT_MAX_VCPUS from 240 to 710.
+Instead of requiring KVM_MAX_VCPU_ID to be manually increased
+every time we increase KVM_MAX_VCPUS, set it to 4*KVM_MAX_VCPUS.
+This should be enough for CPU topologies where Cores-per-Package
+and Packages-per-Socket are not powers of 2.
 
-Note that this conflicts with:
-  https://lore.kernel.org/lkml/20210903130808.30142-1-jgross@suse.com
-  Date: Fri,  3 Sep 2021 15:08:01 +0200
+In practice, this increases KVM_MAX_VCPU_ID from 1023 to 1152.
+The only side effect of this change is making some fields in
+struct kvm_ioapic larger, increasing the struct size from 1628 to
+1780 bytes (in x86_64).
+
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+Note: this conflicts with:
+  https://lore.kernel.org/lkml/20210903130808.30142-3-jgross@suse.com
+  Date: Fri,  3 Sep 2021 15:08:03 +0200
   From: Juergen Gross <jgross@suse.com>
-  Subject: [PATCH v2 0/6] x86/kvm: add boot parameters for max vcpu configs
-  Message-Id: <20210903130808.30142-1-jgross@suse.com>
+  Subject: [PATCH v2 2/6] x86/kvm: add boot parameter for adding vcpu-id bits
+  Message-Id: <20210903130808.30142-3-jgross@suse.com>
 
-I don't intend to block Juergen's work.  I will be happy to
-rebase and resubmit in case Juergen's series is merged first.
-However, I do propose that we set the values above as the default
-even if Juergen's series is merged.
+I would be happy to drop this patch and resubmit the series if
+Juergen's series gets merged first.  This is part of this series
+only because I'm not sure how the final version of Juergen's
+changes will look like and how long they will take to be merged.
+---
+ arch/x86/include/asm/kvm_host.h | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
 
-The additional overhead (on x86_64) of the new defaults will be:
-- struct kvm_ioapic will grow from 1628 to 5084 bytes.
-- struct kvm will grow from 19328 to 22272 bytes.
-- Bitmap stack variables that will grow:
-- At kvm_hv_flush_tlb() & kvm_hv_send_ipi(),
-  vp_bitmap[] and vcpu_bitmap[] will now be 128 bytes long
-- vcpu_bitmap at bioapic_write_indirect() will be 128 bytes long
-  once patch "KVM: x86: Fix stack-out-of-bounds memory access
-  from ioapic_write_indirect()" is applied
-
-Changes v1 -> v2:
-* KVM_MAX_VCPUS is now 1024 (v1 set it to 710)
-* KVM_MAX_VCPU_ID is now 4096 (v1 left it unchanged, at 1023)
-
-v1 of this series was:
-
-  https://lore.kernel.org/lkml/20210831204535.1594297-1-ehabkost@redhat.com
-  Date: Tue, 31 Aug 2021 16:45:35 -0400
-  From: Eduardo Habkost <ehabkost@redhat.com>
-  Subject: [PATCH] kvm: x86: Increase MAX_VCPUS to 710
-  Message-Id: <20210831204535.1594297-1-ehabkost@redhat.com>
-
-Eduardo Habkost (3):
-  kvm: x86: Set KVM_MAX_VCPU_ID to 4*KVM_MAX_VCPUS
-  kvm: x86: Increase MAX_VCPUS to 1024
-  kvm: x86: Increase KVM_SOFT_MAX_VCPUS to 710
-
- arch/x86/include/asm/kvm_host.h | 18 +++++++++++++++---
- 1 file changed, 15 insertions(+), 3 deletions(-)
-
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index af6ce8d4c86a..f4cbc08b8d4d 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -39,7 +39,19 @@
+ 
+ #define KVM_MAX_VCPUS 288
+ #define KVM_SOFT_MAX_VCPUS 240
+-#define KVM_MAX_VCPU_ID 1023
++
++/*
++ * In x86, the VCPU ID corresponds to the APIC ID, and APIC IDs
++ * might be larger than the actual number of VCPUs because the
++ * APIC ID encodes CPU topology information.
++ *
++ * In the worst case, we'll need less than one extra bit for the
++ * Core ID, and less than one extra bit for the Package (Die) ID,
++ * so ratio of 4 should be enough.
++ */
++#define KVM_VCPU_ID_RATIO 4
++#define KVM_MAX_VCPU_ID (KVM_MAX_VCPUS * KVM_VCPU_ID_RATIO)
++
+ /* memory slots that are not exposed to userspace */
+ #define KVM_PRIVATE_MEM_SLOTS 3
+ 
 -- 
 2.31.1
 
