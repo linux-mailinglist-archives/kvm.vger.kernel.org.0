@@ -2,134 +2,174 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4071F3FFCDE
-	for <lists+kvm@lfdr.de>; Fri,  3 Sep 2021 11:17:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D33333FFD30
+	for <lists+kvm@lfdr.de>; Fri,  3 Sep 2021 11:33:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348680AbhICJSP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Sep 2021 05:18:15 -0400
-Received: from mail.kernel.org ([198.145.29.99]:53264 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1348638AbhICJSG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Sep 2021 05:18:06 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 6C2C26101A;
-        Fri,  3 Sep 2021 09:17:06 +0000 (UTC)
-Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <maz@kernel.org>)
-        id 1mM5Jo-008oRm-FB; Fri, 03 Sep 2021 10:17:04 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu
-Cc:     ascull@google.com, dbrazdil@google.com,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        kernel-team@android.com
-Subject: [PATCH] KVM: arm64: Allow KVM to be disabled from the command line
-Date:   Fri,  3 Sep 2021 10:16:52 +0100
-Message-Id: <20210903091652.985836-1-maz@kernel.org>
-X-Mailer: git-send-email 2.30.2
+        id S1348822AbhICJea (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Sep 2021 05:34:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55692 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S244272AbhICJe3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Sep 2021 05:34:29 -0400
+Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EDB8C061575
+        for <kvm@vger.kernel.org>; Fri,  3 Sep 2021 02:33:30 -0700 (PDT)
+Received: by mail-lf1-x12e.google.com with SMTP id t12so10431509lfg.9
+        for <kvm@vger.kernel.org>; Fri, 03 Sep 2021 02:33:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:mime-version:content-disposition
+         :content-transfer-encoding:in-reply-to:user-agent;
+        bh=KjJsqN08kHUU9hALt64x49WnpC13zTqRn/N/C5PoLnI=;
+        b=He+DQLj1WT4ORQvv8S8uq3EujtuxuAoiAyYvQc2ErhJjuczXlaIpOjYjhIVCMJATEz
+         80xdA8ILn36S+tN8GvvvJPkhIOdmeFZRSsvpDwoWyLVQ1nnx6A7yzxrk8wu9pJ2l5Mvy
+         rvzqVbcxFDJlCzlm4/re12fXzraSap97kpHA9QFoBK3JFctamfb6SXFSWybcO9HWnqIB
+         mwNyO5WFnyIk+bAkYn19W24fOzfNEjs84BZR0ZO1yg8EjhYW2FiCWXMVXzyc2CdMXGqn
+         CrhY+rDqCpKsDiac/AF1EHBVxLLsDmOfynzOYta5aRjiab/Obf1dDdcEsesypl//6QQA
+         TIVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to
+         :user-agent;
+        bh=KjJsqN08kHUU9hALt64x49WnpC13zTqRn/N/C5PoLnI=;
+        b=N5oeTpx7yK8ytpzl3PzmcYOVC+GYqKslFoTkkyhOyUzVOBsEkRS/aaFNISwBFWMVoB
+         RmV05I6Oh4p+uV78XWFEy8/eEwG+wti1jReOmxbXvmlpfR/2JuInelkiZTy0Zfcad/Ot
+         wkpQGGODFspSIydqFg5GmZljipx5ldqMNT8EDQOyGCm5HFdhmAatugMXUBy4KgrXY1Tz
+         7JG5r/WU+zgu8zJeBsccOe27BMuLHcKFpMxWeyo0cAPDDRXiBjh8i+yW0D4WOoggr2Cz
+         8lkrTAMC2Qyw2N39rNNxdW+x6whbo1uQYK8BgNqZBUE8c6L4gHFBHAmiwYDCz09Mep/E
+         o+Nw==
+X-Gm-Message-State: AOAM532I6i03frviSa4HefHolvuW4e6vonwR5b84aGaw8k+Jc6Mn8i9k
+        p2ItuuLoZ4Li/i5Fb/PmrHqxvr8UsgWEZHk/lm4=
+X-Google-Smtp-Source: ABdhPJxifj1S2SHPbc+Df6lhpY7062s4mIlcoloXqCBFD+lRLnj9An5kt3UKL3ju1PFjr0wwJknX0A==
+X-Received: by 2002:a19:c350:: with SMTP id t77mr2032018lff.33.1630661608232;
+        Fri, 03 Sep 2021 02:33:28 -0700 (PDT)
+Received: from zombie ([176.106.247.78])
+        by smtp.gmail.com with ESMTPSA id z11sm524805ljn.114.2021.09.03.02.33.27
+        (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
+        Fri, 03 Sep 2021 02:33:27 -0700 (PDT)
+Date:   Fri, 3 Sep 2021 12:33:25 +0300
+From:   Valeriy Vdovin <valery.vdovin.s@gmail.com>
+To:     Markus Armbruster <armbru@redhat.com>
+Cc:     "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        Thomas Huth <thuth@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Eric Blake <eblake@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Laurent Vivier <lvivier@redhat.com>, kvm@vger.kernel.org,
+        Denis Lunev <den@openvz.org>,
+        Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+        Valeriy Vdovin <valery.vdovin.s@gmail.com>
+Subject: Re: [PATCH v12] qapi: introduce 'query-x86-cpuid' QMP command.
+Message-ID: <20210903093325.GA26525@zombie>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, ascull@google.com, dbrazdil@google.com, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+In-Reply-To: <8735qzpccg.fsf@dusky.pond.sub.org>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Although KVM can be compiled out of the kernel, it cannot be disabled
-at runtime. Allow this possibility by introducing a new mode that
-will prevent KVM from initialising.
+On Tue, 24 Aug 2021 08:48:31 +0200 Marcus Armbruster <armbru@redhat.com> wrote:
 
-This is useful in the (limited) circumstances where you don't want
-KVM to be available (what is wrong with you?), or when you want
-to install another hypervisor instead (good luck with that).
+>Eduardo Habkost <ehabkost@redhat.com> writes:
+>
+>> On Mon, Aug 23, 2021 at 9:35 AM Markus Armbruster <armbru@redhat.com> wrote:
+>>>
+>>> Eduardo Habkost <ehabkost@redhat.com> writes:
+>>>
+>>> > On Wed, Aug 11, 2021 at 9:44 AM Thomas Huth <thuth@redhat.com> wrote:
+>>> >>
+>>> >> On 11/08/2021 15.40, Eduardo Habkost wrote:
+>>> >> > On Wed, Aug 11, 2021 at 2:10 AM Thomas Huth <thuth@redhat.com> wrote:
+>>> >> >>
+>>> >> >> On 10/08/2021 20.56, Eduardo Habkost wrote:
+>>> >> >>> On Sat, Aug 07, 2021 at 04:22:42PM +0200, Markus Armbruster wrote:
+>>> >> >>>> Is this intended to be a stable interface?  Interfaces intended just
+>>> >> >>>> for
+>>> >> >>>> debugging usually aren't.
+>>> >> >>>
+>>> >> >>> I don't think we need to make it a stable interface, but I won't
+>>> >> >>> mind if we declare it stable.
+>>> >> >>
+>>> >> >> If we don't feel 100% certain yet, it's maybe better to introduce this
+>>> >> >> with
+>>> >> >> a "x-" prefix first, isn't it? I.e. "x-query-x86-cpuid" ... then it's
+>>> >> >> clear
+>>> >> >> that this is only experimental/debugging/not-stable yet. Just my 0.02
+>>> >> >> €.
+>>> >> >
+>>> >> > That would be my expectation. Is this a documented policy?
+>>> >> >
+>>> >>
+>>> >> According to docs/interop/qmp-spec.txt :
+>>> >>
+>>> >>   Any command or member name beginning with "x-" is deemed
+>>> >>   experimental, and may be withdrawn or changed in an incompatible
+>>> >>   manner in a future release.
+>>> >
+>>> > Thanks! I had looked at other QMP docs, but not qmp-spec.txt.
+>>> >
+>>> > In my reply above, please read "make it a stable interface" as
+>>> > "declare it as supported by not using the 'x-' prefix".
+>>> >
+>>> > I don't think we have to make it stable, but I won't argue against it
+>>> > if the current proposal is deemed acceptable by other maintainers.
+>>> >
+>>> > Personally, I'm still frustrated by the complexity of the current
+>>> > proposal, but I don't want to block it just because of my frustration.
+>>>
+>>> Is this a case of "there must be a simpler way", or did you actually
+>>> propose a simpler way?  I don't remember...
+>>>
+>>
+>> I did propose a simpler way at
+>> 20210810195053.6vsjadglrexf6jwy@habkost.net/">https://lore.kernel.org/qemu-devel/20210810195053.6vsjadglrexf6jwy@habkost.net/
+>
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- Documentation/admin-guide/kernel-parameters.txt |  3 +++
- arch/arm64/include/asm/kvm_host.h               |  1 +
- arch/arm64/kernel/idreg-override.c              |  1 +
- arch/arm64/kvm/arm.c                            | 14 +++++++++++++-
- 4 files changed, 18 insertions(+), 1 deletion(-)
+Hi. Sorry for the late response to that.
 
-diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-index 91ba391f9b32..cc5f68846434 100644
---- a/Documentation/admin-guide/kernel-parameters.txt
-+++ b/Documentation/admin-guide/kernel-parameters.txt
-@@ -2365,6 +2365,9 @@
- 	kvm-arm.mode=
- 			[KVM,ARM] Select one of KVM/arm64's modes of operation.
- 
-+			none: Forcefully disable KVM and run in nVHE mode,
-+			      preventing KVM from ever initialising.
-+
- 			nvhe: Standard nVHE-based mode, without support for
- 			      protected guests.
- 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index f8be56d5342b..019490c67976 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -58,6 +58,7 @@
- enum kvm_mode {
- 	KVM_MODE_DEFAULT,
- 	KVM_MODE_PROTECTED,
-+	KVM_MODE_NONE,
- };
- enum kvm_mode kvm_get_mode(void);
- 
-diff --git a/arch/arm64/kernel/idreg-override.c b/arch/arm64/kernel/idreg-override.c
-index d8e606fe3c21..57013c1b6552 100644
---- a/arch/arm64/kernel/idreg-override.c
-+++ b/arch/arm64/kernel/idreg-override.c
-@@ -95,6 +95,7 @@ static const struct {
- 	char	alias[FTR_ALIAS_NAME_LEN];
- 	char	feature[FTR_ALIAS_OPTION_LEN];
- } aliases[] __initconst = {
-+	{ "kvm-arm.mode=none",		"id_aa64mmfr1.vh=0" },
- 	{ "kvm-arm.mode=nvhe",		"id_aa64mmfr1.vh=0" },
- 	{ "kvm-arm.mode=protected",	"id_aa64mmfr1.vh=0" },
- 	{ "arm64.nobti",		"id_aa64pfr1.bt=0" },
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index fe102cd2e518..cdc70e238316 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -2064,6 +2064,11 @@ int kvm_arch_init(void *opaque)
- 		return -ENODEV;
- 	}
- 
-+	if (kvm_get_mode() == KVM_MODE_NONE) {
-+		kvm_info("KVM disabled from command line\n");
-+		return -ENODEV;
-+	}
-+
- 	in_hyp_mode = is_kernel_in_hyp_mode();
- 
- 	if (cpus_have_final_cap(ARM64_WORKAROUND_DEVICE_LOAD_ACQUIRE) ||
-@@ -2137,8 +2142,15 @@ static int __init early_kvm_mode_cfg(char *arg)
- 		return 0;
- 	}
- 
--	if (strcmp(arg, "nvhe") == 0 && !WARN_ON(is_kernel_in_hyp_mode()))
-+	if (strcmp(arg, "nvhe") == 0 && !WARN_ON(is_kernel_in_hyp_mode())) {
-+		kvm_mode = KVM_MODE_DEFAULT;
- 		return 0;
-+	}
-+
-+	if (strcmp(arg, "none") == 0 && !WARN_ON(is_kernel_in_hyp_mode())) {
-+		kvm_mode = KVM_MODE_NONE;
-+		return 0;
-+	}
- 
- 	return -EINVAL;
- }
--- 
-2.30.2
+Also sorry for possible technical email header errors in my reply mail, as I was switching the e-mail accounts that I use to
+communicate with this maillist, so hope technically all went well.
 
+>Valeriy, would the simpler way still work for you?
+>
+>If no, please explain why.  If you already did, just provide a pointer.
+>
+Yes, I remember your proposal of using just 5 lines of code. To be exact here are
+those proposed lines:
+
+>>    for start in (0, 0x40000000, 0x80000000, 0xC0000000):
+>>        leaf = query_cpuid(qom_path, start)
+>>        for eax in range(start, leaf.max_eax + 1):
+>>            for ecx in range(0, leaf.get('max_ecx', 0) + 1):
+>>                all_leaves.append(query_cpuid(qom_path, eax, ecx))
+
+
+It looks cool and short, but this is only a pseudocode with not only variable declarations omitted, but
+with some logic omitted as well. It does not become obvious until you start typing the code and then review it.
+In fact the patch, to which you have done this suggestion back then already had the same concept at it's basis, but
+it has grown quickly to somewhat more complex code than it's conceptual pseudo-brother above.
+
+I'm sure that this current patch (which is the most recent in v15 email) is the most simple and shortest of possible.
+This is iteration 3 patch, with first iteration being the one to which you've made that suggestion, but then we also tried one
+more version by trying to do this via KVM ioctls, but it did not work quite smooth. So this last iteration at which we are currently
+looking at is really the product of thought and is the simplest.
+
+I suggest that we stick to it and start converging towards it's submission instead of going to another round of coding and discussion.
+v15 - is the result of fine-tunes and rebases, that has already covered a lot of comments. Please let's review it to the end and give it a go.
+
+
+>If yes, we need to choose between the complex solution we have and the
+>simpler solution we still need to code up.  The latter is extra work,
+>but having to carry more complex code is going to be extra work, too.
+
+I agree to the idea that we MUST minimize support effort in priority to the commiting effort, but here I do not see direct dependency
+between the two. This is already the simplest solution. All the code we have here is mostly
+to service the QMP machinery, which has to be in any version of the patch. The payload code is minimal.
+
+Thanks.
