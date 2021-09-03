@@ -2,148 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C75AD400613
-	for <lists+kvm@lfdr.de>; Fri,  3 Sep 2021 21:48:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 23A91400659
+	for <lists+kvm@lfdr.de>; Fri,  3 Sep 2021 22:11:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235916AbhICTta (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Sep 2021 15:49:30 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49974 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233514AbhICTt3 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 3 Sep 2021 15:49:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630698508;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=DW68GxV6Lb0qE4ekh0Ivx+87OsRzETRMBE0QJs6OocI=;
-        b=L060QxMNPEFMY3hqmNeLmRxpF1/0AJoikeGUi99ofOSc0voDXT1gLSajhuVNi1b1NUosPG
-        +RQyXaJJCTgRNcf8DksijuPT2Sk24vkxk2qdTsvx0S9udYuyqkbajNpjm8wMqRqtf9Ji57
-        IFuTYU/3nDgIoMDPJRoaAvdBXFP0+fM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-417-2HDgqUOzOZWN2NPx5sx4EA-1; Fri, 03 Sep 2021 15:48:27 -0400
-X-MC-Unique: 2HDgqUOzOZWN2NPx5sx4EA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4E2058042D6;
-        Fri,  3 Sep 2021 19:48:25 +0000 (UTC)
-Received: from localhost (unknown [10.22.8.230])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A27675C1C5;
-        Fri,  3 Sep 2021 19:48:24 +0000 (UTC)
-Date:   Fri, 3 Sep 2021 15:48:24 -0400
-From:   Eduardo Habkost <ehabkost@redhat.com>
-To:     Juergen Gross <jgross@suse.com>
-Cc:     kvm@vger.kernel.org, x86@kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, maz@kernel.org,
-        Jonathan Corbet <corbet@lwn.net>,
+        id S1350130AbhICUMa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Sep 2021 16:12:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33262 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234379AbhICUM3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Sep 2021 16:12:29 -0400
+Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52827C061575
+        for <kvm@vger.kernel.org>; Fri,  3 Sep 2021 13:11:29 -0700 (PDT)
+Received: by mail-wr1-x429.google.com with SMTP id b10so351299wru.0
+        for <kvm@vger.kernel.org>; Fri, 03 Sep 2021 13:11:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=EaCWOOldFpTJW/62GNcO8hnd0wqc8elIcEfaX69jVvw=;
+        b=YyrzMqwR7pTY4UVwmQkF/b6/6vs1u7pbVcrnFbJ2IcW6P4fipRJVT8PmaEsbbFpg5m
+         Ymv96X1royzInIGobPF2j09Z1yc16HGEdliJIXhC7BdkL4CkDrSv4ViHU6bzRWnn7dZV
+         qZBXE7dHM+4+DbAAXk77dXGymyVlTIpYSq7C1i3JEZlTfiNoWgj2wqws++sPnSgcptat
+         mA18BowRdXGHFl+/0fRO7ZQ0GtRH00yJ/XcRK/OYqcLDp/RR8ktqw1Cg+Aoha/XNDyBg
+         8cWnsyWPtksyXCOTBNPJZ0SnF8sr/Z1rLMwoCoGs5MDwwc19FX55U9jh0cE3apvw4e/O
+         +6oQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=EaCWOOldFpTJW/62GNcO8hnd0wqc8elIcEfaX69jVvw=;
+        b=bQdCZU32oR2oJ1+57bRRj3ut1/nO5tmmUv6iHjKNGizfyzy6gJrrjPrI/4Vk2rIfFG
+         P51n99+KqoqG7MQwVQkJL54ozq9sFLBoQttmjgv8nIjy/9y7xc1uk8vVBTFTe+atpnVK
+         HuT27OxsHQI74cElIkGQJiYK5+dedDMxpkzxHdaMC5p36c6ItQoX2QUSI9udKJbqIYzp
+         FrM8LG+4sIxwk5RzDcY6e9uzD7haXKKBIJtkx9G7wXn8eMwj9b5UICpHl9b5i/Ha/rws
+         9DqWNIkNNH8omvXUJeUWlFQVEEDNx0ZO+lBt9zZh8qzmbfDXbTiF59Y6ppHKGItZAI2/
+         Lz0Q==
+X-Gm-Message-State: AOAM533ee56yG0PugEFB0BDU6ouYM1ZwlYGWLLrJ1yQYPxT3oTXm8JCa
+        OliWbJ31/HYV8yC4fKu5ajzzHsiApwIt4XDw1dE=
+X-Google-Smtp-Source: ABdhPJwhD7ZLlhNK9IfRlsfSxTpaQWDz0Xn28SyMeYUyzG5cv49AdD3Ojc4LM0ShmrKJ0X1u+d3JqQ==
+X-Received: by 2002:a5d:5712:: with SMTP id a18mr758059wrv.367.1630699887867;
+        Fri, 03 Sep 2021 13:11:27 -0700 (PDT)
+Received: from [192.168.8.107] (190.red-2-142-216.dynamicip.rima-tde.net. [2.142.216.190])
+        by smtp.gmail.com with ESMTPSA id o26sm331500wmc.17.2021.09.03.13.11.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 03 Sep 2021 13:11:27 -0700 (PDT)
+Subject: Re: [PATCH v3 02/30] hw/core: Restrict cpu_has_work() to sysemu
+To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+        qemu-devel@nongnu.org
+Cc:     Bin Meng <bin.meng@windriver.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Greg Kurz <groug@kaod.org>, haxm-team@intel.com,
+        Kamil Rytarowski <kamil@netbsd.org>, qemu-ppc@nongnu.org,
+        Anthony Perard <anthony.perard@citrix.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Michael Rolnik <mrolnik@gmail.com>, qemu-riscv@nongnu.org,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>
-Subject: Re: [PATCH v2 2/6] x86/kvm: add boot parameter for adding vcpu-id
- bits
-Message-ID: <20210903194824.lfjzeaab6ct72pxn@habkost.net>
-References: <20210903130808.30142-1-jgross@suse.com>
- <20210903130808.30142-3-jgross@suse.com>
+        Jiaxun Yang <jiaxun.yang@flygoat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Chris Wulff <crwulff@gmail.com>,
+        Laurent Vivier <lvivier@redhat.com>,
+        Cameron Esfahani <dirty@apple.com>,
+        Sunil Muthuswamy <sunilmut@microsoft.com>,
+        Max Filippov <jcmvbkbc@gmail.com>,
+        Taylor Simpson <tsimpson@quicinc.com>, qemu-s390x@nongnu.org,
+        Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+        Yoshinori Sato <ysato@users.sourceforge.jp>,
+        Artyom Tarasenko <atar4qemu@gmail.com>,
+        Aurelien Jarno <aurelien@aurel32.net>,
+        Paul Durrant <paul@xen.org>,
+        Peter Maydell <peter.maydell@linaro.org>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Alistair Francis <alistair.francis@wdc.com>,
+        "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+        Roman Bolshakov <r.bolshakov@yadro.com>,
+        Laurent Vivier <laurent@vivier.eu>,
+        Cornelia Huck <cohuck@redhat.com>, qemu-arm@nongnu.org,
+        Wenchao Wang <wenchao.wang@intel.com>,
+        xen-devel@lists.xenproject.org, Marek Vasut <marex@denx.de>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+        Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+        Colin Xu <colin.xu@intel.com>,
+        Claudio Fontana <cfontana@suse.de>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Stafford Horne <shorne@gmail.com>,
+        Reinoud Zandijk <reinoud@netbsd.org>, kvm@vger.kernel.org
+References: <20210902161543.417092-1-f4bug@amsat.org>
+ <20210902161543.417092-3-f4bug@amsat.org>
+From:   Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <ee2f2d27-cc3d-c398-74a0-c0ca439d84ef@linaro.org>
+Date:   Fri, 3 Sep 2021 22:11:21 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20210903130808.30142-3-jgross@suse.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <20210902161543.417092-3-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 03, 2021 at 03:08:03PM +0200, Juergen Gross wrote:
-> Today the maximum vcpu-id of a kvm guest's vcpu on x86 systems is set
-> via a #define in a header file.
+On 9/2/21 6:15 PM, Philippe Mathieu-Daudé wrote:
+> cpu_has_work() is only called from system emulation code.
 > 
-> In order to support higher vcpu-ids without generally increasing the
-> memory consumption of guests on the host (some guest structures contain
-> arrays sized by KVM_MAX_VCPU_ID) add a boot parameter for adding some
-> bits to the vcpu-id. Additional bits are needed as the vcpu-id is
-> constructed via bit-wise concatenation of socket-id, core-id, etc.
-> As those ids maximum values are not always a power of 2, the vcpu-ids
-> are sparse.
-> 
-> The additional number of bits needed is basically the number of
-> topology levels with a non-power-of-2 maximum value, excluding the top
-> most level.
-> 
-> The default value of the new parameter will be to take the correct
-> setting from the host's topology.
-
-Having the default depend on the host topology makes the host
-behaviour unpredictable (which might be a problem when migrating
-VMs from another host with a different topology).  Can't we just
-default to 2?
-
-> 
-> Calculating the maximum vcpu-id dynamically requires to allocate the
-> arrays using KVM_MAX_VCPU_ID as the size dynamically.
-> 
-> Signed-of-by: Juergen Gross <jgross@suse.com>
+> Signed-off-by: Philippe Mathieu-Daudé<f4bug@amsat.org>
 > ---
-> V2:
-> - switch to specifying additional bits (based on comment by Vitaly
->   Kuznetsov)
-> 
-> Signed-off-by: Juergen Gross <jgross@suse.com>
-> ---
-[...]
->  #define KVM_MAX_VCPUS 288
->  #define KVM_SOFT_MAX_VCPUS 240
-> -#define KVM_MAX_VCPU_ID 1023
-> +#define KVM_MAX_VCPU_ID kvm_max_vcpu_id()
-[...]
-> +unsigned int kvm_max_vcpu_id(void)
-> +{
-> +	int n_bits = fls(KVM_MAX_VCPUS - 1);
-> +
-> +	if (vcpu_id_add_bits < -1 || vcpu_id_add_bits > (32 - n_bits)) {
-> +		pr_err("Invalid value of vcpu_id_add_bits=%d parameter!\n",
-> +		       vcpu_id_add_bits);
-> +		vcpu_id_add_bits = -1;
-> +	}
-> +
-> +	if (vcpu_id_add_bits >= 0) {
-> +		n_bits += vcpu_id_add_bits;
-> +	} else {
-> +		n_bits++;		/* One additional bit for core level. */
-> +		if (topology_max_die_per_package() > 1)
-> +			n_bits++;	/* One additional bit for die level. */
-> +	}
-> +
-> +	if (!n_bits)
-> +		n_bits = 1;
-> +
-> +	return (1U << n_bits) - 1;
+>   include/hw/core/cpu.h | 32 ++++++++++++++++----------------
+>   1 file changed, 16 insertions(+), 16 deletions(-)
 
-The largest possible VCPU ID is not KVM_MAX_VCPU_ID,
-it's (KVM_MAX_VCPU_ID - 1).  This is enforced by
-kvm_vm_ioctl_create_vcpu().
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-That would mean KVM_MAX_VCPU_ID should be (1 << n_bits) instead
-of ((1 << n_bits) - 1), wouldn't it?
-
-
-> +}
-> +EXPORT_SYMBOL_GPL(kvm_max_vcpu_id);
-> +
->  /*
->   * Restoring the host value for MSRs that are only consumed when running in
->   * usermode, e.g. SYSCALL MSRs and TSC_AUX, can be deferred until the CPU
-> -- 
-> 2.26.2
-> 
-
--- 
-Eduardo
-
+r~
