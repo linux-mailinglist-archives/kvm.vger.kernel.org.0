@@ -2,107 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EA5F73FFA83
-	for <lists+kvm@lfdr.de>; Fri,  3 Sep 2021 08:42:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 250353FFABB
+	for <lists+kvm@lfdr.de>; Fri,  3 Sep 2021 08:55:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344995AbhICGnH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Sep 2021 02:43:07 -0400
-Received: from mail.kernel.org ([198.145.29.99]:56030 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232218AbhICGnG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Sep 2021 02:43:06 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 7E66060F91;
-        Fri,  3 Sep 2021 06:42:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1630651327;
-        bh=hKmqa7Vs9APJQ/9FaigC6kerO3ACZOY+NOsi/tv20Xg=;
-        h=From:To:Cc:Subject:Date:From;
-        b=IzC1DstgmX4ke/oK/LJ/XxA41KkndggA/GhJRSuAKhDNb48g+HODyGVl4rP26pnLe
-         uC65ieYl+KiGMn1KhPlfCNE7CsJkRm+jMZAqgzP5/2cepbfCpd8i52yeiwjrKuF4vM
-         QoXfF5DPQwqLsSMGi41sfLMXEeFaVUszmxIgNRY2ur4btARtcrAeDJ/DCUI3NurHyj
-         qze6F/cbR1HbLoECKcETLdeXZ+OgNrKxiQ9Pj760h6TV3WrQHQkdfzj9ZL/okSokh3
-         uPvzDYw4YH8W6b4qOWBfM70nBejDXRdg0MIkIMTqIagU+YW18+ebT1CBkUT4S6Y3Zz
-         LUR4Qm93fGXZA==
-From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     Jarkko Sakkinen <jarkko@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Cc:     Tony Luck <tony.luck@intel.com>, linux-sgx@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: [PATCH] x86/sgx: Declare sgx_set_attribute() for !CONFIG_X86_SGX
-Date:   Fri,  3 Sep 2021 09:41:56 +0300
-Message-Id: <20210903064156.387979-1-jarkko@kernel.org>
-X-Mailer: git-send-email 2.25.1
+        id S1347469AbhICG4p (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Sep 2021 02:56:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42045 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1346599AbhICG4o (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 3 Sep 2021 02:56:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1630652144;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=EeO/1ruPx/J3HagGwQQq0jPFzGgymZG7mS2oDGjCub4=;
+        b=AEC5tqOyojbpH3X8GZVtqdsU1HIfKgKTL+SdhIdqmKQQpW8bOc/WVsYi5OOVTFmUXQMifq
+        L4wAJRULZix6bDKBOuNlyLM9v7/xMf6R6xJ7vM0nfZ7RJrVtw5IXr7MdfRqoQ13vFNcatK
+        Rl+W8rixVIZpx6Ve3/WN8PQuCI0o/BA=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-557-UMQnbxp8OvqCLRlz9HWowg-1; Fri, 03 Sep 2021 02:55:43 -0400
+X-MC-Unique: UMQnbxp8OvqCLRlz9HWowg-1
+Received: by mail-ej1-f69.google.com with SMTP id o14-20020a1709062e8e00b005d37183e041so2221599eji.21
+        for <kvm@vger.kernel.org>; Thu, 02 Sep 2021 23:55:43 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=EeO/1ruPx/J3HagGwQQq0jPFzGgymZG7mS2oDGjCub4=;
+        b=TX/jrNjRBExYjv5kwywiNk4f2JNUheI+fim0X+FS88rQZ8KVxUUkSZle3OpYAbPFIB
+         W6tfPylDR1Pudqcuh2rB+3TiywFOe/3Y9RCbjXjvJQjfanMxnVv7fc7p0AN5V3MMUq0z
+         EnrYm9cKq6PYwk8g/C5G8NiVoOVcGRL034N/vmhAxQGpcBxN1aseapOGzJpmEUbRvFHA
+         r58NG3pfb0MH0cDJiWRu+eYpWf9Q94BSnXwasD9FYJqTyU/yo3qW7hNQLUplHuz42pWr
+         i9CWO69WahcWUYwsb9r9meofVY2GStZ6APizOzNLve6JLXLFWGjUqhot/ExKFqJ1NxEq
+         I7QQ==
+X-Gm-Message-State: AOAM533UPkZIYCDCkylxUnEomMtaDdOWDQ0XHqm633ZeOfpJzKhAO0oj
+        mtbRApcrEryaCDfYSaDs3QSCeayK5DdvrlY0mvieM1ICGEgPivqe2muQdLm2hdOw+X4ufHJeUoF
+        1bohaeOSI0Lci
+X-Received: by 2002:a05:6402:2909:: with SMTP id ee9mr2379474edb.377.1630652142359;
+        Thu, 02 Sep 2021 23:55:42 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzqmSk8HBLIJKh7TPV1i1K1+xzAXzo7Ae30A7P6UZPUjSR75Ct+E874fXO8233Bd4c/cP2SjA==
+X-Received: by 2002:a05:6402:2909:: with SMTP id ee9mr2379457edb.377.1630652142126;
+        Thu, 02 Sep 2021 23:55:42 -0700 (PDT)
+Received: from steredhat (host-79-51-2-59.retail.telecomitalia.it. [79.51.2.59])
+        by smtp.gmail.com with ESMTPSA id k12sm2391179edq.59.2021.09.02.23.55.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Sep 2021 23:55:41 -0700 (PDT)
+Date:   Fri, 3 Sep 2021 08:55:39 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Norbert Slusarek <nslusarek@gmx.net>,
+        Colin Ian King <colin.king@canonical.com>,
+        Andra Paraschiv <andraprs@amazon.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, stsp2@yandex.ru, oxffffaa@gmail.com
+Subject: Re: [PATCH net-next v4 3/6] vhost/vsock: support MSG_EOR bit
+ processing
+Message-ID: <20210903065539.nb2hk4sszdtlqfmb@steredhat>
+References: <20210903061353.3187150-1-arseny.krasnov@kaspersky.com>
+ <20210903061541.3187840-1-arseny.krasnov@kaspersky.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20210903061541.3187840-1-arseny.krasnov@kaspersky.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Simplify sgx_set_attribute() usage by declaring a fallback
-implementation for it rather than requiring to have compilation
-flag checks in the call site. The fallback unconditionally returns
--EINVAL.
+On Fri, Sep 03, 2021 at 09:15:38AM +0300, Arseny Krasnov wrote:
+>'MSG_EOR' handling has similar logic as 'MSG_EOM' - if bit present
+>in packet's header, reset it to 0. Then restore it back if packet
+>processing wasn't completed. Instead of bool variable for each
+>flag, bit mask variable was added: it has logical OR of 'MSG_EOR'
+>and 'MSG_EOM' if needed, to restore flags, this variable is ORed
+>with flags field of packet.
+>
+>Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
+>---
+> drivers/vhost/vsock.c | 22 +++++++++++++---------
+> 1 file changed, 13 insertions(+), 9 deletions(-)
+>
+>diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+>index feaf650affbe..93e8d635e18f 100644
+>--- a/drivers/vhost/vsock.c
+>+++ b/drivers/vhost/vsock.c
+>@@ -114,7 +114,7 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
+> 		size_t nbytes;
+> 		size_t iov_len, payload_len;
+> 		int head;
+>-		bool restore_flag = false;
+>+		u32 flags_to_restore = 0;
+>
+> 		spin_lock_bh(&vsock->send_pkt_list_lock);
+> 		if (list_empty(&vsock->send_pkt_list)) {
+>@@ -179,15 +179,20 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
+> 			 * created dynamically and are initialized with header
+> 			 * of current packet(except length). But in case of
+> 			 * SOCK_SEQPACKET, we also must clear message delimeter
+>-			 * bit(VIRTIO_VSOCK_SEQ_EOM). Otherwise, instead of one
+>-			 * packet with delimeter(which marks end of message),
+>-			 * there will be sequence of packets with delimeter
+>-			 * bit set. After initialized header will be copied to
+>-			 * rx buffer, this bit will be restored.
+>+			 * bit (VIRTIO_VSOCK_SEQ_EOM) and MSG_EOR bit
+>+			 * (VIRTIO_VSOCK_SEQ_EOR) if set. Otherwise,
+>+			 * there will be sequence of packets with these
+>+			 * bits set. After initialized header will be copied to
+>+			 * rx buffer, these required bits will be restored.
+> 			 */
+> 			if (le32_to_cpu(pkt->hdr.flags) & VIRTIO_VSOCK_SEQ_EOM) {
+> 				pkt->hdr.flags &= ~cpu_to_le32(VIRTIO_VSOCK_SEQ_EOM);
+>-				restore_flag = true;
+>+				flags_to_restore |= VIRTIO_VSOCK_SEQ_EOM;
+>+
+>+				if (le32_to_cpu(pkt->hdr.flags & VIRTIO_VSOCK_SEQ_EOR)) {
+>+					pkt->hdr.flags &= ~cpu_to_le32(VIRTIO_VSOCK_SEQ_EOR);
+>+					flags_to_restore |= VIRTIO_VSOCK_SEQ_EOR;
+>+				}
+> 			}
+> 		}
+>
+>@@ -224,8 +229,7 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
+> 		 * to send it with the next available buffer.
+> 		 */
+> 		if (pkt->off < pkt->len) {
+>-			if (restore_flag)
+>-				pkt->hdr.flags |= cpu_to_le32(VIRTIO_VSOCK_SEQ_EOM);
+>+			pkt->hdr.flags |= cpu_to_le32(flags_to_restore);
+>
+> 			/* We are queueing the same virtio_vsock_pkt to handle
+> 			 * the remaining bytes, and we want to deliver it
+>-- 
+>2.25.1
+>
 
-Refactor the call site in kvm_vm_ioctl_enable_cap() accordingly.
-The net result is the same: KVM_CAP_SGX_ATTRIBUTE causes -EINVAL
-when kernel is compiled without CONFIG_X86_SGX_KVM.
-
-Cc: Tony Luck <tony.luck@intel.com>
-Signed-off-by: Jarkko Sakkinen <jarkko@kernel.org>
----
- arch/x86/include/asm/sgx.h | 8 ++++++++
- arch/x86/kvm/x86.c         | 2 --
- 2 files changed, 8 insertions(+), 2 deletions(-)
-
-diff --git a/arch/x86/include/asm/sgx.h b/arch/x86/include/asm/sgx.h
-index 05f3e21f01a7..31ee106c0f4b 100644
---- a/arch/x86/include/asm/sgx.h
-+++ b/arch/x86/include/asm/sgx.h
-@@ -372,7 +372,15 @@ int sgx_virt_einit(void __user *sigstruct, void __user *token,
- 		   void __user *secs, u64 *lepubkeyhash, int *trapnr);
- #endif
- 
-+#ifdef CONFIG_X86_SGX
- int sgx_set_attribute(unsigned long *allowed_attributes,
- 		      unsigned int attribute_fd);
-+#else
-+static inline int sgx_set_attribute(unsigned long *allowed_attributes,
-+				    unsigned int attribute_fd)
-+{
-+	return -EINVAL;
-+}
-+#endif
- 
- #endif /* _ASM_X86_SGX_H */
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index e5d5c5ed7dd4..a6a27a8f41eb 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -5633,7 +5633,6 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
- 			kvm->arch.bus_lock_detection_enabled = true;
- 		r = 0;
- 		break;
--#ifdef CONFIG_X86_SGX_KVM
- 	case KVM_CAP_SGX_ATTRIBUTE: {
- 		unsigned long allowed_attributes = 0;
- 
-@@ -5649,7 +5648,6 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
- 			r = -EINVAL;
- 		break;
- 	}
--#endif
- 	case KVM_CAP_VM_COPY_ENC_CONTEXT_FROM:
- 		r = -EINVAL;
- 		if (kvm_x86_ops.vm_copy_enc_context_from)
--- 
-2.25.1
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
