@@ -2,183 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 58D29401179
-	for <lists+kvm@lfdr.de>; Sun,  5 Sep 2021 22:20:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E47C8401180
+	for <lists+kvm@lfdr.de>; Sun,  5 Sep 2021 22:22:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234715AbhIEUUE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 5 Sep 2021 16:20:04 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:31173 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232840AbhIEUUD (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 5 Sep 2021 16:20:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630873140;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=fQWW6TpVY//HFZs2vSUfOxyHJTX08YzLd3xkHk5EtPE=;
-        b=BABlO+H6H5f2MD0thZ93TaKj/yWO7T/R28cRkrldgkjmN9M4GtN2Qhq7OAl3NVCFFwc/+9
-        xzpclb0ReuWmp8fR2vZD3IPWUkWL767Csr0krdrC7/u3g9vaFNV18gK2HrhkFS4r7KAQG3
-        VLsBo4KlgbDktlN0svnJdBnHJEFE1Pg=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-518-vo_KkQmeNM-Cak22OGUlZA-1; Sun, 05 Sep 2021 16:18:58 -0400
-X-MC-Unique: vo_KkQmeNM-Cak22OGUlZA-1
-Received: by mail-ej1-f69.google.com with SMTP id n18-20020a170906089200b005dc91303dfeso1343141eje.15
-        for <kvm@vger.kernel.org>; Sun, 05 Sep 2021 13:18:58 -0700 (PDT)
+        id S238014AbhIEUX3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 5 Sep 2021 16:23:29 -0400
+Received: from mail-il1-f200.google.com ([209.85.166.200]:42829 "EHLO
+        mail-il1-f200.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236049AbhIEUX2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 5 Sep 2021 16:23:28 -0400
+Received: by mail-il1-f200.google.com with SMTP id z14-20020a92d18e0000b029022418b34bc9so2789725ilz.9
+        for <kvm@vger.kernel.org>; Sun, 05 Sep 2021 13:22:24 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=fQWW6TpVY//HFZs2vSUfOxyHJTX08YzLd3xkHk5EtPE=;
-        b=OcVascTiy1ZmQkzt3Enwy4S/OVAZSd+YLT95QC4bMy4QULQ5G0JywoJuWgemex/Kgq
-         0wSHrUyxkfF6vs7rtCtrPvkm6S8WZoGOW+9XFWz4PGTgUm+SJYSrB4drPQ3CfmuhtE0r
-         nNIGaysli5EFYtK5hF8lkTxdran+mv0T+K79r1LRyNojPTxwKavgW+txeL8h7YDbnorW
-         yzZJgaP4Yq7ZmjFmePHHp+TAWdY65lHzsNmbSNBodtHkKF9o6f/S7OoP3j28h7wlt3AN
-         27M317HqNBqAbhCXDzMF64SrV8+oDSi6FTgYrwyqe2cyqUuUo9QjxuM2fGBVba69+5Ag
-         pJ2Q==
-X-Gm-Message-State: AOAM533Ln8SjH3WP/xIKcpQXMYeuA963D0lJ8d3gFtRmRqg8LkcJHx9P
-        JDkcvk27BpIyooHZRZoYp1Z8pDJXujcjC5TFWETUIqRb4MUrN03v0o2f64ZMzopYiXGLWnvMx2g
-        i9n7KWDtdFwgq
-X-Received: by 2002:a50:c31e:: with SMTP id a30mr9935801edb.123.1630873137568;
-        Sun, 05 Sep 2021 13:18:57 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzZyj5klHOKXtKHJVij4O41tF6RVru9NpoUc9SoZ7Oi7i9goRlBONg0sRdXLSdPiSXG6ezXvw==
-X-Received: by 2002:a50:c31e:: with SMTP id a30mr9935790edb.123.1630873137307;
-        Sun, 05 Sep 2021 13:18:57 -0700 (PDT)
-Received: from redhat.com ([2.55.131.183])
-        by smtp.gmail.com with ESMTPSA id k6sm3292620edv.77.2021.09.05.13.18.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 05 Sep 2021 13:18:56 -0700 (PDT)
-Date:   Sun, 5 Sep 2021 16:18:52 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Colin Ian King <colin.king@canonical.com>,
-        Norbert Slusarek <nslusarek@gmx.net>,
-        Andra Paraschiv <andraprs@amazon.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "stsp2@yandex.ru" <stsp2@yandex.ru>,
-        "oxffffaa@gmail.com" <oxffffaa@gmail.com>
-Subject: Re: [PATCH net-next v5 0/6] virtio/vsock: introduce MSG_EOR flag for
- SEQPACKET
-Message-ID: <20210905161809-mutt-send-email-mst@kernel.org>
-References: <20210903123016.3272800-1-arseny.krasnov@kaspersky.com>
- <20210905115139-mutt-send-email-mst@kernel.org>
- <4558e96b-6330-667f-955b-b689986f884f@kaspersky.com>
- <20210905121932-mutt-send-email-mst@kernel.org>
- <5b20410a-fb8f-2e38-59d9-74dc6b8a9d4f@kaspersky.com>
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=+rPDgNSzrLHkZMxn4POnNNUzX99qgQeVfqX1qOJ/i+Y=;
+        b=oT9xChzq6vp96h4sFffef+11U+9l4YfN4uV5sox5aA+tny05xvVc2M2eWftiPxNM9n
+         iXo+S6mEyWg40hDWjIgUKAv8zYY8KeyapKeRFuMIBEzSzlTGiMvozpTqAvPGf2lbEQN1
+         upMhyktX4WhHYFRoc6y9T1EQiP1tLdGeGTW+Q54OOykiiVpUk78Qb/ESadYmNETQPK/G
+         UmO19r2dh+TDULFb17lQro2iycP+uNONpC1GXVFEi7hm+wx2wHLjbDQ1nDBzY/2O2U/q
+         L4WnKLVlokRvaBlSIn2Banq1Vf7Gcnezc4jF0Zt2LJSp4RdP2C8cnQTdeSTSQRyJgfqG
+         ECjg==
+X-Gm-Message-State: AOAM531llUZ2RlFY/m17QbbZNGxFbw+Qx+dJ3iwJSUDDnN2OLBnVOb7c
+        sSlaVCJEJdNS9TWtiEaoQUuqadIZnKRQ7yWXqd/vucuOg2Ms
+X-Google-Smtp-Source: ABdhPJyCiLjtVk7bcmv5SV1YROdQgrWx5SlnNRnIvCzXPcYQfZnvsh4mWSBPjmQnqAVqRELawgeTZtjwlG+o49ITr8nYinh8+HbG
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5b20410a-fb8f-2e38-59d9-74dc6b8a9d4f@kaspersky.com>
+X-Received: by 2002:a92:4453:: with SMTP id a19mr6024050ilm.221.1630873344577;
+ Sun, 05 Sep 2021 13:22:24 -0700 (PDT)
+Date:   Sun, 05 Sep 2021 13:22:24 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000006096fa05cb454a9c@google.com>
+Subject: [syzbot] WARNING: kmalloc bug in memslot_rmap_alloc
+From:   syzbot <syzbot+e0de2333cbf95ea473e8@syzkaller.appspotmail.com>
+To:     bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
+        jarkko@kernel.org, jmattson@google.com, joro@8bytes.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-sgx@vger.kernel.org, mingo@redhat.com, pbonzini@redhat.com,
+        seanjc@google.com, syzkaller-bugs@googlegroups.com,
+        tglx@linutronix.de, vkuznets@redhat.com, wanpengli@tencent.com,
+        x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Sep 05, 2021 at 07:21:10PM +0300, Arseny Krasnov wrote:
-> 
-> On 05.09.2021 19:19, Michael S. Tsirkin wrote:
-> > On Sun, Sep 05, 2021 at 07:02:44PM +0300, Arseny Krasnov wrote:
-> >> On 05.09.2021 18:55, Michael S. Tsirkin wrote:
-> >>> On Fri, Sep 03, 2021 at 03:30:13PM +0300, Arseny Krasnov wrote:
-> >>>> 	This patchset implements support of MSG_EOR bit for SEQPACKET
-> >>>> AF_VSOCK sockets over virtio transport.
-> >>>> 	First we need to define 'messages' and 'records' like this:
-> >>>> Message is result of sending calls: 'write()', 'send()', 'sendmsg()'
-> >>>> etc. It has fixed maximum length, and it bounds are visible using
-> >>>> return from receive calls: 'read()', 'recv()', 'recvmsg()' etc.
-> >>>> Current implementation based on message definition above.
-> >>>> 	Record has unlimited length, it consists of multiple message,
-> >>>> and bounds of record are visible via MSG_EOR flag returned from
-> >>>> 'recvmsg()' call. Sender passes MSG_EOR to sending system call and
-> >>>> receiver will see MSG_EOR when corresponding message will be processed.
-> >>>> 	Idea of patchset comes from POSIX: it says that SEQPACKET
-> >>>> supports record boundaries which are visible for receiver using
-> >>>> MSG_EOR bit. So, it looks like MSG_EOR is enough thing for SEQPACKET
-> >>>> and we don't need to maintain boundaries of corresponding send -
-> >>>> receive system calls. But, for 'sendXXX()' and 'recXXX()' POSIX says,
-> >>>> that all these calls operates with messages, e.g. 'sendXXX()' sends
-> >>>> message, while 'recXXX()' reads messages and for SEQPACKET, 'recXXX()'
-> >>>> must read one entire message from socket, dropping all out of size
-> >>>> bytes. Thus, both message boundaries and MSG_EOR bit must be supported
-> >>>> to follow POSIX rules.
-> >>>> 	To support MSG_EOR new bit was added along with existing
-> >>>> 'VIRTIO_VSOCK_SEQ_EOR': 'VIRTIO_VSOCK_SEQ_EOM'(end-of-message) - now it
-> >>>> works in the same way as 'VIRTIO_VSOCK_SEQ_EOR'. But 'VIRTIO_VSOCK_SEQ_EOR'
-> >>>> is used to mark 'MSG_EOR' bit passed from userspace.
-> >>>> 	This patchset includes simple test for MSG_EOR.
-> >>> I'm prepared to merge this for this window,
-> >>> but I'm not sure who's supposed to ack the net/vmw_vsock/af_vsock.c
-> >>> bits. It's a harmless variable renaming so maybe it does not matter.
-> >>>
-> >>> The rest is virtio stuff so I guess my tree is ok.
-> >>>
-> >>> Objections, anyone?
-> >> https://lkml.org/lkml/2021/9/3/76 this is v4. It is same as v5 in af_vsock.c changes.
-> >>
-> >> It has Reviewed by from Stefano Garzarella.
-> > Is Stefano the maintainer for af_vsock then?
-> > I wasn't sure.
-> Ack, let's wait for maintainer's comment
+Hello,
+
+syzbot found the following issue on:
+
+HEAD commit:    f1583cb1be35 Merge tag 'linux-kselftest-next-5.15-rc1' of ..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=11dd6315300000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=9c582b69de20dde2
+dashboard link: https://syzkaller.appspot.com/bug?extid=e0de2333cbf95ea473e8
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.1
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15db7e5d300000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=170e66cd300000
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+e0de2333cbf95ea473e8@syzkaller.appspotmail.com
+
+L1TF CPU bug present and SMT on, data leak possible. See CVE-2018-3646 and https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/l1tf.html for details.
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 8419 at mm/util.c:597 kvmalloc_node+0x111/0x120 mm/util.c:597
+Modules linked in:
+CPU: 0 PID: 8419 Comm: syz-executor520 Not tainted 5.14.0-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+RIP: 0010:kvmalloc_node+0x111/0x120 mm/util.c:597
+Code: 01 00 00 00 4c 89 e7 e8 ed 17 0d 00 49 89 c5 e9 69 ff ff ff e8 90 0a d1 ff 41 89 ed 41 81 cd 00 20 01 00 eb 95 e8 7f 0a d1 ff <0f> 0b e9 4c ff ff ff 0f 1f 84 00 00 00 00 00 55 48 89 fd 53 e8 66
+RSP: 0018:ffffc90001a7f828 EFLAGS: 00010293
+RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000000
+RDX: ffff888027ee5580 RSI: ffffffff81a51341 RDI: 0000000000000003
+RBP: 0000000000400dc0 R08: 000000007fffffff R09: 00000000ffffffff
+R10: ffffffff81a512fe R11: 0000000000000000 R12: 0000000380000000
+R13: 0000000000000000 R14: 00000000ffffffff R15: dffffc0000000000
+FS:  0000000000707300(0000) GS:ffff8880b9c00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007faeea03f6c0 CR3: 0000000074a57000 CR4: 00000000001526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ kvmalloc include/linux/mm.h:806 [inline]
+ kvmalloc_array include/linux/mm.h:824 [inline]
+ kvcalloc include/linux/mm.h:829 [inline]
+ memslot_rmap_alloc+0xf6/0x310 arch/x86/kvm/x86.c:11320
+ kvm_alloc_memslot_metadata arch/x86/kvm/x86.c:11388 [inline]
+ kvm_arch_prepare_memory_region+0x48d/0x610 arch/x86/kvm/x86.c:11462
+ kvm_set_memslot+0xfe/0x1700 arch/x86/kvm/../../../virt/kvm/kvm_main.c:1505
+ __kvm_set_memory_region+0x761/0x10e0 arch/x86/kvm/../../../virt/kvm/kvm_main.c:1668
+ kvm_set_memory_region arch/x86/kvm/../../../virt/kvm/kvm_main.c:1689 [inline]
+ kvm_vm_ioctl_set_memory_region arch/x86/kvm/../../../virt/kvm/kvm_main.c:1701 [inline]
+ kvm_vm_ioctl+0x4c6/0x2330 arch/x86/kvm/../../../virt/kvm/kvm_main.c:4236
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:874 [inline]
+ __se_sys_ioctl fs/ioctl.c:860 [inline]
+ __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:860
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x43ee99
+Code: 28 c3 e8 2a 14 00 00 66 2e 0f 1f 84 00 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 c0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffc276d5138 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 0000000000400488 RCX: 000000000043ee99
+RDX: 00000000200005c0 RSI: 000000004020ae46 RDI: 0000000000000004
+RBP: 0000000000402e80 R08: 0000000000400488 R09: 0000000000400488
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000402f10
+R13: 0000000000000000 R14: 00000000004ac018 R15: 0000000000400488
 
 
-The specific patch is a trivial variable renaming so
-I parked this in my tree for now, will merge unless I
-hear any objections in the next couple of days.
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-> >>>
-> >>>>  Arseny Krasnov(6):
-> >>>>   virtio/vsock: rename 'EOR' to 'EOM' bit.
-> >>>>   virtio/vsock: add 'VIRTIO_VSOCK_SEQ_EOR' bit.
-> >>>>   vhost/vsock: support MSG_EOR bit processing
-> >>>>   virtio/vsock: support MSG_EOR bit processing
-> >>>>   af_vsock: rename variables in receive loop
-> >>>>   vsock_test: update message bounds test for MSG_EOR
-> >>>>
-> >>>>  drivers/vhost/vsock.c                   | 28 +++++++++++++----------
-> >>>>  include/uapi/linux/virtio_vsock.h       |  3 ++-
-> >>>>  net/vmw_vsock/af_vsock.c                | 10 ++++----
-> >>>>  net/vmw_vsock/virtio_transport_common.c | 23 ++++++++++++-------
-> >>>>  tools/testing/vsock/vsock_test.c        |  8 ++++++-
-> >>>>  5 files changed, 45 insertions(+), 27 deletions(-)
-> >>>>
-> >>>>  v4 -> v5:
-> >>>>  - Move bitwise and out of le32_to_cpu() in 0003.
-> >>>>
-> >>>>  v3 -> v4:
-> >>>>  - 'sendXXX()' renamed to 'send*()' in 0002- commit msg.
-> >>>>  - Comment about bit restore updated in 0003-.
-> >>>>  - 'same' renamed to 'similar' in 0003- commit msg.
-> >>>>  - u32 used instead of uint32_t in 0003-.
-> >>>>
-> >>>>  v2 -> v3:
-> >>>>  - 'virtio/vsock: rename 'EOR' to 'EOM' bit.' - commit message updated.
-> >>>>  - 'VIRTIO_VSOCK_SEQ_EOR' bit add moved to separate patch.
-> >>>>  - 'vhost/vsock: support MSG_EOR bit processing' - commit message
-> >>>>    updated.
-> >>>>  - 'vhost/vsock: support MSG_EOR bit processing' - removed unneeded
-> >>>>    'le32_to_cpu()', because input argument was already in CPU
-> >>>>    endianness.
-> >>>>
-> >>>>  v1 -> v2:
-> >>>>  - 'VIRTIO_VSOCK_SEQ_EOR' is renamed to 'VIRTIO_VSOCK_SEQ_EOM', to
-> >>>>    support backward compatibility.
-> >>>>  - use bitmask of flags to restore in vhost.c, instead of separated
-> >>>>    bool variable for each flag.
-> >>>>  - test for EAGAIN removed, as logically it is not part of this
-> >>>>    patchset(will be sent separately).
-> >>>>  - cover letter updated(added part with POSIX description).
-> >>>>
-> >>>> Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
-> >>>> -- 
-> >>>> 2.25.1
-> >
-
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+syzbot can test patches for this issue, for details see:
+https://goo.gl/tpsmEJ#testing-patches
