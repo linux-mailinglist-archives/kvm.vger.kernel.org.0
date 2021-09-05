@@ -2,163 +2,183 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7A8AF4010FC
-	for <lists+kvm@lfdr.de>; Sun,  5 Sep 2021 19:11:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 58D29401179
+	for <lists+kvm@lfdr.de>; Sun,  5 Sep 2021 22:20:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234143AbhIERKt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 5 Sep 2021 13:10:49 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:27826 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230471AbhIERKt (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 5 Sep 2021 13:10:49 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 185H3XZ8078653;
-        Sun, 5 Sep 2021 13:09:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=7+n/rZHRyH7CtyhKb6AyYY/skow/1Nd/K7rY6sENMOM=;
- b=EqtdiRnyTNyoO+p3MdZRmCrQ62JV0SWqJCr9j0mVjJKaxfWqdkg5WbJMEfoz2ul3WQtz
- ubD4EoyZ+zZwLhCIY1fFk60yZwtSkmTJMKOi0KLqoKOvUTwNT6aGuIGLHSs7UJ4U1CkW
- gxt2Jwhxend4T3e+AvXx68JF9ZpJ2P2EhLzkh/IcUAUvtyoRzLr38BUp2Vlpm1xTHeo8
- 2ICZ6KhaI5swIuccdD2luF0iKNwnzfKjf5nsfXNMQ6iQkNRXAwqU7Sa1S0Gbn2gwBWLD
- g2cEv8wA3TyMXwNlrwQtZZOuVzpu273iN6sF/WkdUQZhueUc6yIEUj8StIKoQPw/6Y7L 6g== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3avt02x2x2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sun, 05 Sep 2021 13:09:36 -0400
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 185H4DE1082752;
-        Sun, 5 Sep 2021 13:09:35 -0400
-Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3avt02x2wv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sun, 05 Sep 2021 13:09:35 -0400
-Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
-        by ppma05wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 185H4540030039;
-        Sun, 5 Sep 2021 17:09:35 GMT
-Received: from b03cxnp07028.gho.boulder.ibm.com (b03cxnp07028.gho.boulder.ibm.com [9.17.130.15])
-        by ppma05wdc.us.ibm.com with ESMTP id 3av0e9a9c2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sun, 05 Sep 2021 17:09:35 +0000
-Received: from b03ledav006.gho.boulder.ibm.com (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
-        by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 185H9XTU37814764
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sun, 5 Sep 2021 17:09:33 GMT
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BB13CC6063;
-        Sun,  5 Sep 2021 17:09:33 +0000 (GMT)
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 15157C6059;
-        Sun,  5 Sep 2021 17:09:28 +0000 (GMT)
-Received: from [9.65.84.185] (unknown [9.65.84.185])
-        by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Sun,  5 Sep 2021 17:09:28 +0000 (GMT)
-Subject: Re: [RFC PATCH v2 04/12] i386/sev: initialize SNP context
-To:     Brijesh Singh <brijesh.singh@amd.com>,
-        Michael Roth <michael.roth@amd.com>, qemu-devel@nongnu.org
-Cc:     Connor Kuehl <ckuehl@redhat.com>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        James Bottomley <jejb@linux.ibm.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
-        kvm@vger.kernel.org, Eduardo Habkost <ehabkost@redhat.com>,
-        Markus Armbruster <armbru@redhat.com>,
-        Eric Blake <eblake@redhat.com>,
-        Dov Murik <dovmurik@linux.ibm.com>
-References: <20210826222627.3556-1-michael.roth@amd.com>
- <20210826222627.3556-5-michael.roth@amd.com>
- <48bcd5d9-c5da-1ae3-4943-4c3bd9a91c7b@linux.ibm.com>
- <c930872e-8c13-55af-f431-1c99dd277f12@amd.com>
-From:   Dov Murik <dovmurik@linux.ibm.com>
-Message-ID: <43a0d7d5-442b-84fe-2a62-574fb96d6ea3@linux.ibm.com>
-Date:   Sun, 5 Sep 2021 20:09:26 +0300
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+        id S234715AbhIEUUE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 5 Sep 2021 16:20:04 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:31173 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232840AbhIEUUD (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 5 Sep 2021 16:20:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1630873140;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=fQWW6TpVY//HFZs2vSUfOxyHJTX08YzLd3xkHk5EtPE=;
+        b=BABlO+H6H5f2MD0thZ93TaKj/yWO7T/R28cRkrldgkjmN9M4GtN2Qhq7OAl3NVCFFwc/+9
+        xzpclb0ReuWmp8fR2vZD3IPWUkWL767Csr0krdrC7/u3g9vaFNV18gK2HrhkFS4r7KAQG3
+        VLsBo4KlgbDktlN0svnJdBnHJEFE1Pg=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-518-vo_KkQmeNM-Cak22OGUlZA-1; Sun, 05 Sep 2021 16:18:58 -0400
+X-MC-Unique: vo_KkQmeNM-Cak22OGUlZA-1
+Received: by mail-ej1-f69.google.com with SMTP id n18-20020a170906089200b005dc91303dfeso1343141eje.15
+        for <kvm@vger.kernel.org>; Sun, 05 Sep 2021 13:18:58 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=fQWW6TpVY//HFZs2vSUfOxyHJTX08YzLd3xkHk5EtPE=;
+        b=OcVascTiy1ZmQkzt3Enwy4S/OVAZSd+YLT95QC4bMy4QULQ5G0JywoJuWgemex/Kgq
+         0wSHrUyxkfF6vs7rtCtrPvkm6S8WZoGOW+9XFWz4PGTgUm+SJYSrB4drPQ3CfmuhtE0r
+         nNIGaysli5EFYtK5hF8lkTxdran+mv0T+K79r1LRyNojPTxwKavgW+txeL8h7YDbnorW
+         yzZJgaP4Yq7ZmjFmePHHp+TAWdY65lHzsNmbSNBodtHkKF9o6f/S7OoP3j28h7wlt3AN
+         27M317HqNBqAbhCXDzMF64SrV8+oDSi6FTgYrwyqe2cyqUuUo9QjxuM2fGBVba69+5Ag
+         pJ2Q==
+X-Gm-Message-State: AOAM533Ln8SjH3WP/xIKcpQXMYeuA963D0lJ8d3gFtRmRqg8LkcJHx9P
+        JDkcvk27BpIyooHZRZoYp1Z8pDJXujcjC5TFWETUIqRb4MUrN03v0o2f64ZMzopYiXGLWnvMx2g
+        i9n7KWDtdFwgq
+X-Received: by 2002:a50:c31e:: with SMTP id a30mr9935801edb.123.1630873137568;
+        Sun, 05 Sep 2021 13:18:57 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzZyj5klHOKXtKHJVij4O41tF6RVru9NpoUc9SoZ7Oi7i9goRlBONg0sRdXLSdPiSXG6ezXvw==
+X-Received: by 2002:a50:c31e:: with SMTP id a30mr9935790edb.123.1630873137307;
+        Sun, 05 Sep 2021 13:18:57 -0700 (PDT)
+Received: from redhat.com ([2.55.131.183])
+        by smtp.gmail.com with ESMTPSA id k6sm3292620edv.77.2021.09.05.13.18.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 05 Sep 2021 13:18:56 -0700 (PDT)
+Date:   Sun, 5 Sep 2021 16:18:52 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Colin Ian King <colin.king@canonical.com>,
+        Norbert Slusarek <nslusarek@gmx.net>,
+        Andra Paraschiv <andraprs@amazon.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "stsp2@yandex.ru" <stsp2@yandex.ru>,
+        "oxffffaa@gmail.com" <oxffffaa@gmail.com>
+Subject: Re: [PATCH net-next v5 0/6] virtio/vsock: introduce MSG_EOR flag for
+ SEQPACKET
+Message-ID: <20210905161809-mutt-send-email-mst@kernel.org>
+References: <20210903123016.3272800-1-arseny.krasnov@kaspersky.com>
+ <20210905115139-mutt-send-email-mst@kernel.org>
+ <4558e96b-6330-667f-955b-b689986f884f@kaspersky.com>
+ <20210905121932-mutt-send-email-mst@kernel.org>
+ <5b20410a-fb8f-2e38-59d9-74dc6b8a9d4f@kaspersky.com>
 MIME-Version: 1.0
-In-Reply-To: <c930872e-8c13-55af-f431-1c99dd277f12@amd.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: iKpeSljVrPBvx0nb-3vw1Hs7BRryk6hM
-X-Proofpoint-GUID: M9tw5ux46rpruvkoRUn6N3vg-pvz079w
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-09-05_01:2021-09-03,2021-09-05 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- mlxlogscore=999 impostorscore=0 bulkscore=0 suspectscore=0 adultscore=0
- lowpriorityscore=0 clxscore=1015 priorityscore=1501 mlxscore=0 spamscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2108310000 definitions=main-2109050121
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5b20410a-fb8f-2e38-59d9-74dc6b8a9d4f@kaspersky.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Sun, Sep 05, 2021 at 07:21:10PM +0300, Arseny Krasnov wrote:
+> 
+> On 05.09.2021 19:19, Michael S. Tsirkin wrote:
+> > On Sun, Sep 05, 2021 at 07:02:44PM +0300, Arseny Krasnov wrote:
+> >> On 05.09.2021 18:55, Michael S. Tsirkin wrote:
+> >>> On Fri, Sep 03, 2021 at 03:30:13PM +0300, Arseny Krasnov wrote:
+> >>>> 	This patchset implements support of MSG_EOR bit for SEQPACKET
+> >>>> AF_VSOCK sockets over virtio transport.
+> >>>> 	First we need to define 'messages' and 'records' like this:
+> >>>> Message is result of sending calls: 'write()', 'send()', 'sendmsg()'
+> >>>> etc. It has fixed maximum length, and it bounds are visible using
+> >>>> return from receive calls: 'read()', 'recv()', 'recvmsg()' etc.
+> >>>> Current implementation based on message definition above.
+> >>>> 	Record has unlimited length, it consists of multiple message,
+> >>>> and bounds of record are visible via MSG_EOR flag returned from
+> >>>> 'recvmsg()' call. Sender passes MSG_EOR to sending system call and
+> >>>> receiver will see MSG_EOR when corresponding message will be processed.
+> >>>> 	Idea of patchset comes from POSIX: it says that SEQPACKET
+> >>>> supports record boundaries which are visible for receiver using
+> >>>> MSG_EOR bit. So, it looks like MSG_EOR is enough thing for SEQPACKET
+> >>>> and we don't need to maintain boundaries of corresponding send -
+> >>>> receive system calls. But, for 'sendXXX()' and 'recXXX()' POSIX says,
+> >>>> that all these calls operates with messages, e.g. 'sendXXX()' sends
+> >>>> message, while 'recXXX()' reads messages and for SEQPACKET, 'recXXX()'
+> >>>> must read one entire message from socket, dropping all out of size
+> >>>> bytes. Thus, both message boundaries and MSG_EOR bit must be supported
+> >>>> to follow POSIX rules.
+> >>>> 	To support MSG_EOR new bit was added along with existing
+> >>>> 'VIRTIO_VSOCK_SEQ_EOR': 'VIRTIO_VSOCK_SEQ_EOM'(end-of-message) - now it
+> >>>> works in the same way as 'VIRTIO_VSOCK_SEQ_EOR'. But 'VIRTIO_VSOCK_SEQ_EOR'
+> >>>> is used to mark 'MSG_EOR' bit passed from userspace.
+> >>>> 	This patchset includes simple test for MSG_EOR.
+> >>> I'm prepared to merge this for this window,
+> >>> but I'm not sure who's supposed to ack the net/vmw_vsock/af_vsock.c
+> >>> bits. It's a harmless variable renaming so maybe it does not matter.
+> >>>
+> >>> The rest is virtio stuff so I guess my tree is ok.
+> >>>
+> >>> Objections, anyone?
+> >> https://lkml.org/lkml/2021/9/3/76 this is v4. It is same as v5 in af_vsock.c changes.
+> >>
+> >> It has Reviewed by from Stefano Garzarella.
+> > Is Stefano the maintainer for af_vsock then?
+> > I wasn't sure.
+> Ack, let's wait for maintainer's comment
 
 
-On 05/09/2021 16:58, Brijesh Singh wrote:
-> Hi Dov,
-> 
-> On 9/5/21 2:07 AM, Dov Murik wrote:
-> ...
->>
->>>  
->>>  uint64_t
->>> @@ -1074,6 +1083,7 @@ int sev_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
->>>      uint32_t ebx;
->>>      uint32_t host_cbitpos;
->>>      struct sev_user_data_status status = {};
->>> +    void *init_args = NULL;
->>>  
->>>      if (!sev_common) {
->>>          return 0;
->>> @@ -1126,7 +1136,18 @@ int sev_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
->>>      sev_common->api_major = status.api_major;
->>>      sev_common->api_minor = status.api_minor;
->> Not visible here in the context: the code here is using the
->> SEV_PLATFORM_STATUS command to get the build_id, api_major, and api_minor.
->>
->> I see that SNP has a new command SNP_PLATFORM_STATUS, which fills a
->> struct sev_data_snp_platform_status (hmmm, I can't find the struct's
->> definition; I assume it should look like Table 38 in 8.3.2 in SNP FW ABI
->> document).
-> 
-> The API version can be queries either through the SNP_PLATFORM_STATUS or
-> SEV_PLATFORM_STATUS and they both report the same info. As the
-> definition of the sev_data_platform_status is concerned it should be
-> defined in the kernel include/linux/psp-sev.h.
-> 
-> 
->> My questions are:
->>
->> 1. Is it OK to call the "legacy" SEV_PLATFORM_STATUS when about to init
->> an SNP guest?
-> 
-> Yes, the legacy platform status command can be called on the SNP
-> initialized host.
-> 
-> I choose not to new command because we only care about the verison
-> string and that is available through either of these commands (SNP or
-> SEV platform status).
-> 
->> 2. Do we want to save some info like installed TCB version and reported
->> TCB version, and maybe other fields from SNP platform status?
-> 
-> If we decide to add a new QMP (query-sev-snp) then it makes sense to
-> export those fields so that a hypervisor console can give additional
-> information; But note that for the guest, all these are available in the
-> attestation report.
-> 
+The specific patch is a trivial variable renaming so
+I parked this in my tree for now, will merge unless I
+hear any objections in the next couple of days.
 
-We have new QMP response for SNP guests (SevSnpGuestProperties, patch 3
-in this series).  I think it would make sense to add the
-installed+reported TCB versions there (read-only properties), for
-debugging/observability purposes.
-
-
--Dov
+> >>>
+> >>>>  Arseny Krasnov(6):
+> >>>>   virtio/vsock: rename 'EOR' to 'EOM' bit.
+> >>>>   virtio/vsock: add 'VIRTIO_VSOCK_SEQ_EOR' bit.
+> >>>>   vhost/vsock: support MSG_EOR bit processing
+> >>>>   virtio/vsock: support MSG_EOR bit processing
+> >>>>   af_vsock: rename variables in receive loop
+> >>>>   vsock_test: update message bounds test for MSG_EOR
+> >>>>
+> >>>>  drivers/vhost/vsock.c                   | 28 +++++++++++++----------
+> >>>>  include/uapi/linux/virtio_vsock.h       |  3 ++-
+> >>>>  net/vmw_vsock/af_vsock.c                | 10 ++++----
+> >>>>  net/vmw_vsock/virtio_transport_common.c | 23 ++++++++++++-------
+> >>>>  tools/testing/vsock/vsock_test.c        |  8 ++++++-
+> >>>>  5 files changed, 45 insertions(+), 27 deletions(-)
+> >>>>
+> >>>>  v4 -> v5:
+> >>>>  - Move bitwise and out of le32_to_cpu() in 0003.
+> >>>>
+> >>>>  v3 -> v4:
+> >>>>  - 'sendXXX()' renamed to 'send*()' in 0002- commit msg.
+> >>>>  - Comment about bit restore updated in 0003-.
+> >>>>  - 'same' renamed to 'similar' in 0003- commit msg.
+> >>>>  - u32 used instead of uint32_t in 0003-.
+> >>>>
+> >>>>  v2 -> v3:
+> >>>>  - 'virtio/vsock: rename 'EOR' to 'EOM' bit.' - commit message updated.
+> >>>>  - 'VIRTIO_VSOCK_SEQ_EOR' bit add moved to separate patch.
+> >>>>  - 'vhost/vsock: support MSG_EOR bit processing' - commit message
+> >>>>    updated.
+> >>>>  - 'vhost/vsock: support MSG_EOR bit processing' - removed unneeded
+> >>>>    'le32_to_cpu()', because input argument was already in CPU
+> >>>>    endianness.
+> >>>>
+> >>>>  v1 -> v2:
+> >>>>  - 'VIRTIO_VSOCK_SEQ_EOR' is renamed to 'VIRTIO_VSOCK_SEQ_EOM', to
+> >>>>    support backward compatibility.
+> >>>>  - use bitmask of flags to restore in vhost.c, instead of separated
+> >>>>    bool variable for each flag.
+> >>>>  - test for EAGAIN removed, as logically it is not part of this
+> >>>>    patchset(will be sent separately).
+> >>>>  - cover letter updated(added part with POSIX description).
+> >>>>
+> >>>> Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
+> >>>> -- 
+> >>>> 2.25.1
+> >
 
