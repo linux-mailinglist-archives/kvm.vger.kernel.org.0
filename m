@@ -2,96 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D86D6400E87
-	for <lists+kvm@lfdr.de>; Sun,  5 Sep 2021 09:13:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 84B00400E9A
+	for <lists+kvm@lfdr.de>; Sun,  5 Sep 2021 09:46:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233733AbhIEHOO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 5 Sep 2021 03:14:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45380 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230076AbhIEHOF (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 5 Sep 2021 03:14:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630825981;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=5NXjMtIKegV5Bnld7xmlh2BI3wqQcMyh0+qVZHk8Jl4=;
-        b=UZDL9P88jBxJk6wKxJMXA4Hka08XMHLttYFETQx97eUI4lBNyH2r4hZ/Z4XcGwMzCpvT6W
-        etrt1eua4VQWETqU3vO3FHx5lsboy0vE93AyBCRZWORdDcMv7wFHp86ZoMS836TFdaQF85
-        fYWurh2guBd9LgDKCaXOZ+cgHNjiLSI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-217-erxbHYjoOxuNhJcYFlDhCA-1; Sun, 05 Sep 2021 03:13:00 -0400
-X-MC-Unique: erxbHYjoOxuNhJcYFlDhCA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B6322180FD8C;
-        Sun,  5 Sep 2021 07:12:59 +0000 (UTC)
-Received: from starship (unknown [10.35.206.50])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7955669CAD;
-        Sun,  5 Sep 2021 07:12:58 +0000 (UTC)
-Message-ID: <f539e833bd7da4800612f8ae4bdffcb1db2f8684.camel@redhat.com>
-Subject: Re: [PATCH] KVM: Remove unnecessary export of
- kvm_{inc,dec}_notifier_count()
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Sun, 05 Sep 2021 10:12:57 +0300
-In-Reply-To: <20210902175951.1387989-1-seanjc@google.com>
-References: <20210902175951.1387989-1-seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        id S235061AbhIEHrj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 5 Sep 2021 03:47:39 -0400
+Received: from mail.kernel.org ([198.145.29.99]:53184 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229599AbhIEHrj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 5 Sep 2021 03:47:39 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id C849360555;
+        Sun,  5 Sep 2021 07:46:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1630827996;
+        bh=O/ZxP3FhOz37k0frdZmwLZpa5oBRB8mmxRGdut1wTDs=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=l/n5ExtJ0lN140PPLg37CRQXuH3DT+TA3Oki8D+6E8+aoYkaeS3r68Rucy5CGcKbI
+         mpp9ne8wEbkSqnLUxI2hGXfIdxTvYXYkEmfEUzPMGn3FYHzNmjmCkMLagls1eJqpRh
+         wWVoCqII96pbG56Tt6e9mjtgw9QcVdTbs3hU5lGdOBJEibeq9n/uNR3xnormFYb1f9
+         9c2tNLosDtsYTePJ6Y/c+SXGfD/3uJd+SGXSS4LXw8O74bNXXqWleV9E7f79nzkw0C
+         WCTE+4WdfdKFbLhkQFWG9TChM2kWIJXtPjkuCvV0gopzPjDXiG8Uqj5ItTWHdAr+Af
+         THLmYI/iz//nA==
+Date:   Sun, 5 Sep 2021 10:46:32 +0300
+From:   Leon Romanovsky <leon@kernel.org>
+To:     Max Gurtovoy <mgurtovoy@nvidia.com>
+Cc:     hch@infradead.org, mst@redhat.com,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        stefanha@redhat.com, israelr@nvidia.com, nitzanc@nvidia.com,
+        oren@nvidia.com, linux-block@vger.kernel.org, axboe@kernel.dk
+Subject: Re: [PATCH v3 1/1] virtio-blk: add num_request_queues module
+ parameter
+Message-ID: <YTR12AHOGs1nhfz1@unreal>
+References: <20210902204622.54354-1-mgurtovoy@nvidia.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210902204622.54354-1-mgurtovoy@nvidia.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2021-09-02 at 10:59 -0700, Sean Christopherson wrote:
-> Don't export KVM's MMU notifier count helpers, under no circumstance
-> should any downstream module, including x86's vendor code, have a
-> legitimate reason to piggyback KVM's MMU notifier logic.  E.g in the x86
-> case, only KVM's MMU should be elevating the notifier count, and that
-> code is always built into the core kvm.ko module.
+On Thu, Sep 02, 2021 at 11:46:22PM +0300, Max Gurtovoy wrote:
+> Sometimes a user would like to control the amount of request queues to
+> be created for a block device. For example, for limiting the memory
+> footprint of virtio-blk devices.
 > 
-> Fixes: edb298c663fc ("KVM: x86/mmu: bump mmu notifier count in kvm_zap_gfn_range")
-> Cc: Maxim Levitsky <mlevitsk@redhat.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
 > ---
->  virt/kvm/kvm_main.c | 3 ---
->  1 file changed, 3 deletions(-)
 > 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 3e67c93ca403..140c7d311021 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -638,7 +638,6 @@ void kvm_inc_notifier_count(struct kvm *kvm, unsigned long start,
->  			max(kvm->mmu_notifier_range_end, end);
->  	}
->  }
-> -EXPORT_SYMBOL_GPL(kvm_inc_notifier_count);
+> changes from v2:
+>  - renamed num_io_queues to num_request_queues (from Stefan)
+>  - added Reviewed-by signatures (from Stefan and Christoph)
+> 
+> changes from v1:
+>  - use param_set_uint_minmax (from Christoph)
+>  - added "Should > 0" to module description
+> 
+> Note: This commit apply on top of Jens's branch for-5.15/drivers
+> 
+> ---
+>  drivers/block/virtio_blk.c | 21 ++++++++++++++++++++-
+>  1 file changed, 20 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> index 4b49df2dfd23..aaa2833a4734 100644
+> --- a/drivers/block/virtio_blk.c
+> +++ b/drivers/block/virtio_blk.c
+> @@ -24,6 +24,23 @@
+>  /* The maximum number of sg elements that fit into a virtqueue */
+>  #define VIRTIO_BLK_MAX_SG_ELEMS 32768
 >  
->  static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
->  					const struct mmu_notifier_range *range)
-> @@ -690,8 +689,6 @@ void kvm_dec_notifier_count(struct kvm *kvm, unsigned long start,
->  	 */
->  	kvm->mmu_notifier_count--;
->  }
-> -EXPORT_SYMBOL_GPL(kvm_dec_notifier_count);
-> -
->  
->  static void kvm_mmu_notifier_invalidate_range_end(struct mmu_notifier *mn,
->  					const struct mmu_notifier_range *range)
+> +static int virtblk_queue_count_set(const char *val,
+> +		const struct kernel_param *kp)
+> +{
+> +	return param_set_uint_minmax(val, kp, 1, nr_cpu_ids);
+> +}
+> +
+> +static const struct kernel_param_ops queue_count_ops = {
+> +	.set = virtblk_queue_count_set,
+> +	.get = param_get_uint,
+> +};
+> +
+> +static unsigned int num_request_queues;
+> +module_param_cb(num_request_queues, &queue_count_ops, &num_request_queues,
+> +		0644);
+> +MODULE_PARM_DESC(num_request_queues,
+> +		 "Number of request queues to use for blk device. Should > 0");
+> +
 
-Ah, I somehow thought when I wrote this that those two will be used by kvm_amd.
+Won't it limit all virtio block devices to the same limit?
 
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+It is very common to see multiple virtio-blk devices on the same system
+and they probably need different limits.
 
-Best regards,
-	Maxim Levitsky
-
+Thanks
