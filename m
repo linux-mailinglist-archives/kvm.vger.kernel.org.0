@@ -2,196 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9A4CF4010BA
-	for <lists+kvm@lfdr.de>; Sun,  5 Sep 2021 18:03:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 223294010D0
+	for <lists+kvm@lfdr.de>; Sun,  5 Sep 2021 18:18:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237736AbhIEQDw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 5 Sep 2021 12:03:52 -0400
-Received: from mx13.kaspersky-labs.com ([91.103.66.164]:26786 "EHLO
-        mx13.kaspersky-labs.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229566AbhIEQDv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 5 Sep 2021 12:03:51 -0400
-Received: from relay13.kaspersky-labs.com (unknown [127.0.0.10])
-        by relay13.kaspersky-labs.com (Postfix) with ESMTP id 576625213A4;
-        Sun,  5 Sep 2021 19:02:46 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kaspersky.com;
-        s=mail202102; t=1630857766;
-        bh=1o/rOf/o+3ebi3NRCGD99GWw+T4YfEahf28tbFoGe5I=;
-        h=Subject:To:From:Message-ID:Date:MIME-Version:Content-Type;
-        b=PE8ltYTTOAVmFAkr9cTfJESLAmhSNpXMS9c+41aCh9YAis6qDxU3417U+ebNY43yG
-         lyqKox0gf2OO0BWgj8rFIWKWGNmJgg1KIVLwvFc4BmleYPf7aUSNe2senkhFe9EHH4
-         N2KQ/UOEMR7yRaALMI6ZkfVJJHe0+2Lq7r1VHA8qiv2IAn4vh642onrWsSG0bUWyw+
-         plvHBkkor6vhVpPI8uFF78H6gAk+S1R/FGWVhlam1DbAkEX5mPuq+cZx/VsQOE2E56
-         KjDdCaL51lBo9j0ICmkHzLvK0SBasqo/Mwn67VJoP1mzSNoGKZRDZvPdyXADRVRdkF
-         +k0e2hGJR2Ccg==
-Received: from mail-hq2.kaspersky.com (unknown [91.103.66.206])
-        (using TLSv1.2 with cipher AES256-GCM-SHA384 (256/256 bits))
-        (Client CN "mail-hq2.kaspersky.com", Issuer "Kaspersky MailRelays CA G3" (verified OK))
-        by mailhub13.kaspersky-labs.com (Postfix) with ESMTPS id 387735213F9;
-        Sun,  5 Sep 2021 19:02:45 +0300 (MSK)
-Received: from [10.16.171.77] (10.64.64.121) by hqmailmbx3.avp.ru
- (10.64.67.243) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2308.14; Sun, 5
- Sep 2021 19:02:44 +0300
-Subject: Re: [PATCH net-next v5 0/6] virtio/vsock: introduce MSG_EOR flag for
- SEQPACKET
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-CC:     Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Colin Ian King <colin.king@canonical.com>,
-        Norbert Slusarek <nslusarek@gmx.net>,
-        Andra Paraschiv <andraprs@amazon.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "stsp2@yandex.ru" <stsp2@yandex.ru>,
-        "oxffffaa@gmail.com" <oxffffaa@gmail.com>
-References: <20210903123016.3272800-1-arseny.krasnov@kaspersky.com>
- <20210905115139-mutt-send-email-mst@kernel.org>
-From:   Arseny Krasnov <arseny.krasnov@kaspersky.com>
-Message-ID: <4558e96b-6330-667f-955b-b689986f884f@kaspersky.com>
-Date:   Sun, 5 Sep 2021 19:02:44 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S238029AbhIEQTN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 5 Sep 2021 12:19:13 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:58870 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S238025AbhIEQTJ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 5 Sep 2021 12:19:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1630858685;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=hW1sN5QGx3Kx2EPNmaIE4CRt6Il/ANBqcp567eWWlqk=;
+        b=QCQP0CXmWVdasf14M9I1QRQsUQh56E/iAil1iQQuIdKAfsAEWsdburYQdejHm4k6NadJTA
+        nxVA7WtRijPw30X7fGKTlQbOKnh946EhJSUFHJkDj4refxq/a+YKHZPj3kxd/w3MhYeloN
+        EVTPfXUTrOFLgy/RkEVff7MPJI5iBxQ=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-390-UEdiEuQeO86waMllZnzSPw-1; Sun, 05 Sep 2021 12:18:01 -0400
+X-MC-Unique: UEdiEuQeO86waMllZnzSPw-1
+Received: by mail-wm1-f72.google.com with SMTP id y188-20020a1c7dc5000000b002e80e0b2f87so2747942wmc.1
+        for <kvm@vger.kernel.org>; Sun, 05 Sep 2021 09:18:01 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=hW1sN5QGx3Kx2EPNmaIE4CRt6Il/ANBqcp567eWWlqk=;
+        b=Kh5R8LNmPGPs9FTuIdeE+zSvZt0A6XdtHKgjU9uGTCawXV2V6lZ6lxpsX0j0/LHGRU
+         6Zxqu00vLxwrY0NUb9dXZIBrWxZ8K0/9S7p4nRsHapTfGCAHTil3U0Cd9S4HZGoodiGB
+         Ui0NnkdH/7nbe/DbfWCI9vb1Y/DNPsXKJ6NpJh8HNM+gr0MhXEvgNnqha/mqdkZ5iHqa
+         XtS7jzQ+Innf24okUvaTlyegEYINxF3MwTRsX3j1EN1xZz/4rGIadJitapF2u/hPVLtm
+         mTGnSyhMHerlwGMyj/zHyme9qiG+/lljZs9ML6fZWRIHtPE4OySQyIzFYiV6YpF8Xo6W
+         0I7A==
+X-Gm-Message-State: AOAM530DjfhA+7mzCyVvt+xNznZZG2TQmXeOYO2X7L/GBzozSpyjpO88
+        ZVJEjbYblvKwAtj+ovJQAS7cQ4woCMoIRo+SdlSfH7mVSh/1bWHobXsjwyudcxsgdYRL6FZtXhs
+        j6ijFFTQBbrNb
+X-Received: by 2002:adf:e6c5:: with SMTP id y5mr9020247wrm.198.1630858680219;
+        Sun, 05 Sep 2021 09:18:00 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxCY+j+7T+nDz0P50mK89ZiTPM8ct/jZZ3HWCX3r0RyVKusgkTEzB0PV/xPQQ6NTWshHSYVWg==
+X-Received: by 2002:adf:e6c5:: with SMTP id y5mr9020227wrm.198.1630858679962;
+        Sun, 05 Sep 2021 09:17:59 -0700 (PDT)
+Received: from redhat.com ([2.55.131.183])
+        by smtp.gmail.com with ESMTPSA id n18sm4795503wmc.22.2021.09.05.09.17.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 05 Sep 2021 09:17:58 -0700 (PDT)
+Date:   Sun, 5 Sep 2021 12:17:55 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Xiyu Yang <xiyuyang19@fudan.edu.cn>
+Cc:     Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yuanxzhang@fudan.edu.cn,
+        Xin Tan <tanxin.ctf@gmail.com>
+Subject: Re: [PATCH] vhost_net: Convert from atomic_t to refcount_t on
+ vhost_net_ubuf_ref->refcount
+Message-ID: <20210905121737-mutt-send-email-mst@kernel.org>
+References: <1626517230-42920-1-git-send-email-xiyuyang19@fudan.edu.cn>
 MIME-Version: 1.0
-In-Reply-To: <20210905115139-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Originating-IP: [10.64.64.121]
-X-ClientProxiedBy: hqmailmbx1.avp.ru (10.64.67.241) To hqmailmbx3.avp.ru
- (10.64.67.243)
-X-KSE-ServerInfo: hqmailmbx3.avp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 5.9.20, Database issued on: 09/05/2021 15:49:49
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 0
-X-KSE-AntiSpam-Info: Lua profiles 165972 [Sep 05 2021]
-X-KSE-AntiSpam-Info: Version: 5.9.20.0
-X-KSE-AntiSpam-Info: Envelope from: arseny.krasnov@kaspersky.com
-X-KSE-AntiSpam-Info: LuaCore: 461 461 c95454ca24f64484bdf56c7842a96dd24416624e
-X-KSE-AntiSpam-Info: {Tracking_uf_ne_domains}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: kaspersky.com:7.1.1;lkml.org:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2
-X-KSE-AntiSpam-Info: Rate: 0
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Deterministic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 09/05/2021 15:52:00
-X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
- rules found
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 05.09.2021 14:20:00
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
-X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
- rules found
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
-X-KLMS-Rule-ID: 52
-X-KLMS-Message-Action: clean
-X-KLMS-AntiSpam-Status: not scanned, disabled by settings
-X-KLMS-AntiSpam-Interceptor-Info: not scanned
-X-KLMS-AntiPhishing: Clean, bases: 2021/09/05 15:01:00
-X-KLMS-AntiVirus: Kaspersky Security for Linux Mail Server, version 8.0.3.30, bases: 2021/09/05 13:26:00 #17165381
-X-KLMS-AntiVirus-Status: Clean, skipped
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1626517230-42920-1-git-send-email-xiyuyang19@fudan.edu.cn>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Sat, Jul 17, 2021 at 06:20:30PM +0800, Xiyu Yang wrote:
+> refcount_t type and corresponding API can protect refcounters from
+> accidental underflow and overflow and further use-after-free situations.
+> 
+> Signed-off-by: Xiyu Yang <xiyuyang19@fudan.edu.cn>
+> Signed-off-by: Xin Tan <tanxin.ctf@gmail.com>
 
-On 05.09.2021 18:55, Michael S. Tsirkin wrote:
-> On Fri, Sep 03, 2021 at 03:30:13PM +0300, Arseny Krasnov wrote:
->> 	This patchset implements support of MSG_EOR bit for SEQPACKET
->> AF_VSOCK sockets over virtio transport.
->> 	First we need to define 'messages' and 'records' like this:
->> Message is result of sending calls: 'write()', 'send()', 'sendmsg()'
->> etc. It has fixed maximum length, and it bounds are visible using
->> return from receive calls: 'read()', 'recv()', 'recvmsg()' etc.
->> Current implementation based on message definition above.
->> 	Record has unlimited length, it consists of multiple message,
->> and bounds of record are visible via MSG_EOR flag returned from
->> 'recvmsg()' call. Sender passes MSG_EOR to sending system call and
->> receiver will see MSG_EOR when corresponding message will be processed.
->> 	Idea of patchset comes from POSIX: it says that SEQPACKET
->> supports record boundaries which are visible for receiver using
->> MSG_EOR bit. So, it looks like MSG_EOR is enough thing for SEQPACKET
->> and we don't need to maintain boundaries of corresponding send -
->> receive system calls. But, for 'sendXXX()' and 'recXXX()' POSIX says,
->> that all these calls operates with messages, e.g. 'sendXXX()' sends
->> message, while 'recXXX()' reads messages and for SEQPACKET, 'recXXX()'
->> must read one entire message from socket, dropping all out of size
->> bytes. Thus, both message boundaries and MSG_EOR bit must be supported
->> to follow POSIX rules.
->> 	To support MSG_EOR new bit was added along with existing
->> 'VIRTIO_VSOCK_SEQ_EOR': 'VIRTIO_VSOCK_SEQ_EOM'(end-of-message) - now it
->> works in the same way as 'VIRTIO_VSOCK_SEQ_EOR'. But 'VIRTIO_VSOCK_SEQ_EOR'
->> is used to mark 'MSG_EOR' bit passed from userspace.
->> 	This patchset includes simple test for MSG_EOR.
->
-> I'm prepared to merge this for this window,
-> but I'm not sure who's supposed to ack the net/vmw_vsock/af_vsock.c
-> bits. It's a harmless variable renaming so maybe it does not matter.
->
-> The rest is virtio stuff so I guess my tree is ok.
->
-> Objections, anyone?
+Pls resubmit after addressing the build bot comments.
+Thanks!
 
-https://lkml.org/lkml/2021/9/3/76 this is v4. It is same as v5 in af_vsock.c changes.
+> ---
+>  drivers/vhost/net.c | 14 ++++++++------
+>  1 file changed, 8 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+> index 6414bd5741b8..e23150ca7d4c 100644
+> --- a/drivers/vhost/net.c
+> +++ b/drivers/vhost/net.c
+> @@ -5,6 +5,7 @@
+>   * virtio-net server in host kernel.
+>   */
+>  
+> +#include <linux/refcount.h>
+>  #include <linux/compat.h>
+>  #include <linux/eventfd.h>
+>  #include <linux/vhost.h>
+> @@ -92,7 +93,7 @@ struct vhost_net_ubuf_ref {
+>  	 *  1: no outstanding ubufs
+>  	 * >1: outstanding ubufs
+>  	 */
+> -	atomic_t refcount;
+> +	refcount_t refcount;
+>  	wait_queue_head_t wait;
+>  	struct vhost_virtqueue *vq;
+>  };
+> @@ -240,7 +241,7 @@ vhost_net_ubuf_alloc(struct vhost_virtqueue *vq, bool zcopy)
+>  	ubufs = kmalloc(sizeof(*ubufs), GFP_KERNEL);
+>  	if (!ubufs)
+>  		return ERR_PTR(-ENOMEM);
+> -	atomic_set(&ubufs->refcount, 1);
+> +	refcount_set(&ubufs->refcount, 1);
+>  	init_waitqueue_head(&ubufs->wait);
+>  	ubufs->vq = vq;
+>  	return ubufs;
+> @@ -248,7 +249,8 @@ vhost_net_ubuf_alloc(struct vhost_virtqueue *vq, bool zcopy)
+>  
+>  static int vhost_net_ubuf_put(struct vhost_net_ubuf_ref *ubufs)
+>  {
+> -	int r = atomic_sub_return(1, &ubufs->refcount);
+> +	refcount_dec(&ubufs->refcount);
+> +	int r = refcount_read(&ubufs->refcount);
+>  	if (unlikely(!r))
+>  		wake_up(&ubufs->wait);
+>  	return r;
+> @@ -257,7 +259,7 @@ static int vhost_net_ubuf_put(struct vhost_net_ubuf_ref *ubufs)
+>  static void vhost_net_ubuf_put_and_wait(struct vhost_net_ubuf_ref *ubufs)
+>  {
+>  	vhost_net_ubuf_put(ubufs);
+> -	wait_event(ubufs->wait, !atomic_read(&ubufs->refcount));
+> +	wait_event(ubufs->wait, !refcount_read(&ubufs->refcount));
+>  }
+>  
+>  static void vhost_net_ubuf_put_wait_and_free(struct vhost_net_ubuf_ref *ubufs)
+> @@ -909,7 +911,7 @@ static void handle_tx_zerocopy(struct vhost_net *net, struct socket *sock)
+>  			ctl.ptr = ubuf;
+>  			msg.msg_controllen = sizeof(ctl);
+>  			ubufs = nvq->ubufs;
+> -			atomic_inc(&ubufs->refcount);
+> +			refcount_inc(&ubufs->refcount);
+>  			nvq->upend_idx = (nvq->upend_idx + 1) % UIO_MAXIOV;
+>  		} else {
+>  			msg.msg_control = NULL;
+> @@ -1384,7 +1386,7 @@ static void vhost_net_flush(struct vhost_net *n)
+>  		vhost_net_ubuf_put_and_wait(n->vqs[VHOST_NET_VQ_TX].ubufs);
+>  		mutex_lock(&n->vqs[VHOST_NET_VQ_TX].vq.mutex);
+>  		n->tx_flush = false;
+> -		atomic_set(&n->vqs[VHOST_NET_VQ_TX].ubufs->refcount, 1);
+> +		refcount_set(&n->vqs[VHOST_NET_VQ_TX].ubufs->refcount, 1);
+>  		mutex_unlock(&n->vqs[VHOST_NET_VQ_TX].vq.mutex);
+>  	}
+>  }
+> -- 
+> 2.7.4
 
-It has Reviewed by from Stefano Garzarella.
-
->
->
->>  Arseny Krasnov(6):
->>   virtio/vsock: rename 'EOR' to 'EOM' bit.
->>   virtio/vsock: add 'VIRTIO_VSOCK_SEQ_EOR' bit.
->>   vhost/vsock: support MSG_EOR bit processing
->>   virtio/vsock: support MSG_EOR bit processing
->>   af_vsock: rename variables in receive loop
->>   vsock_test: update message bounds test for MSG_EOR
->>
->>  drivers/vhost/vsock.c                   | 28 +++++++++++++----------
->>  include/uapi/linux/virtio_vsock.h       |  3 ++-
->>  net/vmw_vsock/af_vsock.c                | 10 ++++----
->>  net/vmw_vsock/virtio_transport_common.c | 23 ++++++++++++-------
->>  tools/testing/vsock/vsock_test.c        |  8 ++++++-
->>  5 files changed, 45 insertions(+), 27 deletions(-)
->>
->>  v4 -> v5:
->>  - Move bitwise and out of le32_to_cpu() in 0003.
->>
->>  v3 -> v4:
->>  - 'sendXXX()' renamed to 'send*()' in 0002- commit msg.
->>  - Comment about bit restore updated in 0003-.
->>  - 'same' renamed to 'similar' in 0003- commit msg.
->>  - u32 used instead of uint32_t in 0003-.
->>
->>  v2 -> v3:
->>  - 'virtio/vsock: rename 'EOR' to 'EOM' bit.' - commit message updated.
->>  - 'VIRTIO_VSOCK_SEQ_EOR' bit add moved to separate patch.
->>  - 'vhost/vsock: support MSG_EOR bit processing' - commit message
->>    updated.
->>  - 'vhost/vsock: support MSG_EOR bit processing' - removed unneeded
->>    'le32_to_cpu()', because input argument was already in CPU
->>    endianness.
->>
->>  v1 -> v2:
->>  - 'VIRTIO_VSOCK_SEQ_EOR' is renamed to 'VIRTIO_VSOCK_SEQ_EOM', to
->>    support backward compatibility.
->>  - use bitmask of flags to restore in vhost.c, instead of separated
->>    bool variable for each flag.
->>  - test for EAGAIN removed, as logically it is not part of this
->>    patchset(will be sent separately).
->>  - cover letter updated(added part with POSIX description).
->>
->> Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
->> -- 
->> 2.25.1
->
