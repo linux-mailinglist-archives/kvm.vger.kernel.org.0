@@ -2,57 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8CB444010A3
-	for <lists+kvm@lfdr.de>; Sun,  5 Sep 2021 17:50:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 170D44010A8
+	for <lists+kvm@lfdr.de>; Sun,  5 Sep 2021 17:53:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237418AbhIEPvX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 5 Sep 2021 11:51:23 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:29989 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234447AbhIEPvW (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 5 Sep 2021 11:51:22 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630857018;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=dt3+lUrr17xrCqRRoNhFo4SoQOQwGb+2P4GqnUIMZG4=;
-        b=IijXAQqeJQVkWJv5BjwkNQiwwNw32alX9PdHKY7ogztPUvGZ8kK2pa80DD59021DtwF3wk
-        vnn7p4vVJ0j2aaI4Rd9gVdGlARJYOQywh0r5Iwq9fkaIfOVuCZnxj1xiVXx42y/eoJa7jT
-        T4y+PRw0xkcVhezVPUx2Aw4QIXme58g=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-248-j6q35e5NMTywUKAoQa8kFA-1; Sun, 05 Sep 2021 11:50:17 -0400
-X-MC-Unique: j6q35e5NMTywUKAoQa8kFA-1
-Received: by mail-ed1-f72.google.com with SMTP id b8-20020a056402350800b003c5e3d4e2a7so2452066edd.2
-        for <kvm@vger.kernel.org>; Sun, 05 Sep 2021 08:50:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=dt3+lUrr17xrCqRRoNhFo4SoQOQwGb+2P4GqnUIMZG4=;
-        b=DGponOGR9HoTDW3Bchi3IvqPQiy4wf8QhpDDi69Jgy6B5fjpm4tB7UlL3ZDyEdDJdy
-         n8cAueR5wGW82aRhJPFhhZcrCmOuF7CUrfbaL0fUHLW8fueYbyt1dZ3uMi3HBjfWfU1n
-         BtT6t01q97pLL7k351T+yelVqFvk5Mw/hG7Epp9Qh2MQ1DFTgx+HkKCWk+A1webB/E56
-         NavdmyYX4q1MvCrOvHPVNEVXqHRL4RP/PfUSdpWPttHXotahNoZsfZiHj3AC0/XgVRSB
-         BVirCCbTUG2e5MJxgH+q2oZ+GvGfh+uLNLzd1frXfDpWpxnmNOU8J/kHKyAD+A/THqFq
-         raJQ==
-X-Gm-Message-State: AOAM532yDZwDuYDefTWxCeUYlsD5p1F1m8fMlQhOWuANLb9Mmp24rKMv
-        rmDN4cOYx4BlJJyVwBQJ075PDtFAYR/srhS6537gFBfXYGixdAe029L3y7PGvUsSL+9lVudQ0nw
-        iWE2ZppGmcanj
-X-Received: by 2002:aa7:c514:: with SMTP id o20mr9209155edq.318.1630857016058;
-        Sun, 05 Sep 2021 08:50:16 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw/Vr1hTVx3/Sty6LNqcZMAJAOmpd1FUx3LtNW8reY+9FMDFhx51QrJugo5epYEB0BNnX/rsw==
-X-Received: by 2002:aa7:c514:: with SMTP id o20mr9209144edq.318.1630857015928;
-        Sun, 05 Sep 2021 08:50:15 -0700 (PDT)
-Received: from redhat.com ([2.55.131.183])
-        by smtp.gmail.com with ESMTPSA id g18sm2495519ejr.99.2021.09.05.08.50.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 05 Sep 2021 08:50:15 -0700 (PDT)
-Date:   Sun, 5 Sep 2021 11:50:11 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        id S237863AbhIEPxT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 5 Sep 2021 11:53:19 -0400
+Received: from mx12.kaspersky-labs.com ([91.103.66.155]:57428 "EHLO
+        mx12.kaspersky-labs.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230387AbhIEPxP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 5 Sep 2021 11:53:15 -0400
+Received: from relay12.kaspersky-labs.com (unknown [127.0.0.10])
+        by relay12.kaspersky-labs.com (Postfix) with ESMTP id CBFB676121;
+        Sun,  5 Sep 2021 18:52:10 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kaspersky.com;
+        s=mail202102; t=1630857130;
+        bh=eldlQrYSQIiQ25t4xUDWL1mvwS06bjtE6FUDNQ2h9X4=;
+        h=Subject:To:From:Message-ID:Date:MIME-Version:Content-Type;
+        b=3i9ywYIlX8eaxSkCAFr6Pdgs3ID4tVstxnUtmk45boK2FswRfV2MDXrssQa0cWZ5h
+         MpHmyk/UU6ICgpxmnkt2iyhBh6TEV/AiPLC1IGn2h38PwoTArJRmT3niruXFnQJveR
+         oBJfjLUqC89duNXjmKeFe3eNTC9iApU7Cjp5I230SI3XASX4YE8vFu7XSTa2WBvI+e
+         cBUvvLfPrD9NnUiBVTZ91eFS1fsYyWH9MuJisQhOVKxXavjLdiyAmgozz3VU5oXbwC
+         HjDTiHP2OX1Dz6EZMOeUWcnDjI2zLqvAF0RM1F5njbXWOsBRs53iWyRrJHr6pkZLdb
+         2cd4U882jDtig==
+Received: from mail-hq2.kaspersky.com (unknown [91.103.66.206])
+        (using TLSv1.2 with cipher AES256-GCM-SHA384 (256/256 bits))
+        (Client CN "mail-hq2.kaspersky.com", Issuer "Kaspersky MailRelays CA G3" (verified OK))
+        by mailhub12.kaspersky-labs.com (Postfix) with ESMTPS id E2517760D1;
+        Sun,  5 Sep 2021 18:52:09 +0300 (MSK)
+Received: from [10.16.171.77] (10.64.68.128) by hqmailmbx3.avp.ru
+ (10.64.67.243) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2308.14; Sun, 5
+ Sep 2021 18:52:09 +0300
+Subject: Re: [PATCH net-next v4 2/6] virtio/vsock: add 'VIRTIO_VSOCK_SEQ_EOR'
+ bit.
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+CC:     Stefan Hajnoczi <stefanha@redhat.com>,
         Stefano Garzarella <sgarzare@redhat.com>,
         Jason Wang <jasowang@redhat.com>,
         "David S. Miller" <davem@davemloft.net>,
@@ -60,49 +44,101 @@ Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
         Norbert Slusarek <nslusarek@gmx.net>,
         Andra Paraschiv <andraprs@amazon.com>,
         Colin Ian King <colin.king@canonical.com>,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        stsp2@yandex.ru, oxffffaa@gmail.com
-Subject: Re: [PATCH net-next v4 2/6] virtio/vsock: add 'VIRTIO_VSOCK_SEQ_EOR'
- bit.
-Message-ID: <20210905115002-mutt-send-email-mst@kernel.org>
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "stsp2@yandex.ru" <stsp2@yandex.ru>,
+        "oxffffaa@gmail.com" <oxffffaa@gmail.com>
 References: <20210903061353.3187150-1-arseny.krasnov@kaspersky.com>
  <20210903061523.3187714-1-arseny.krasnov@kaspersky.com>
+ <20210905115002-mutt-send-email-mst@kernel.org>
+From:   Arseny Krasnov <arseny.krasnov@kaspersky.com>
+Message-ID: <14e42fc4-3b78-6865-80bf-e19adfa4c506@kaspersky.com>
+Date:   Sun, 5 Sep 2021 18:52:09 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210903061523.3187714-1-arseny.krasnov@kaspersky.com>
+In-Reply-To: <20210905115002-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Originating-IP: [10.64.68.128]
+X-ClientProxiedBy: hqmailmbx3.avp.ru (10.64.67.243) To hqmailmbx3.avp.ru
+ (10.64.67.243)
+X-KSE-ServerInfo: hqmailmbx3.avp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 5.9.20, Database issued on: 09/05/2021 15:39:47
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 0
+X-KSE-AntiSpam-Info: Lua profiles 165972 [Sep 05 2021]
+X-KSE-AntiSpam-Info: Version: 5.9.20.0
+X-KSE-AntiSpam-Info: Envelope from: arseny.krasnov@kaspersky.com
+X-KSE-AntiSpam-Info: LuaCore: 461 461 c95454ca24f64484bdf56c7842a96dd24416624e
+X-KSE-AntiSpam-Info: {Tracking_uf_ne_domains}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: lists.oasis-open.org:7.1.1;127.0.0.199:7.1.2;kaspersky.com:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
+X-KSE-AntiSpam-Info: Rate: 0
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Deterministic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 09/05/2021 15:42:00
+X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
+ rules found
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 05.09.2021 14:20:00
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
+ rules found
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+X-KLMS-Rule-ID: 52
+X-KLMS-Message-Action: clean
+X-KLMS-AntiSpam-Status: not scanned, disabled by settings
+X-KLMS-AntiSpam-Interceptor-Info: not scanned
+X-KLMS-AntiPhishing: Clean, bases: 2021/09/05 15:01:00
+X-KLMS-AntiVirus: Kaspersky Security for Linux Mail Server, version 8.0.3.30, bases: 2021/09/05 13:26:00 #17165381
+X-KLMS-AntiVirus-Status: Clean, skipped
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 03, 2021 at 09:15:20AM +0300, Arseny Krasnov wrote:
-> This bit is used to handle POSIX MSG_EOR flag passed from
-> userspace in 'send*()' system calls. It marks end of each
-> record and is visible to receiver using 'recvmsg()' system
-> call.
-> 
-> Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
-> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
-Spec patch for this?
+On 05.09.2021 18:50, Michael S. Tsirkin wrote:
+> On Fri, Sep 03, 2021 at 09:15:20AM +0300, Arseny Krasnov wrote:
+>> This bit is used to handle POSIX MSG_EOR flag passed from
+>> userspace in 'send*()' system calls. It marks end of each
+>> record and is visible to receiver using 'recvmsg()' system
+>> call.
+>>
+>> Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
+>> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+> Spec patch for this?
 
-> ---
->  include/uapi/linux/virtio_vsock.h | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/include/uapi/linux/virtio_vsock.h b/include/uapi/linux/virtio_vsock.h
-> index 8485b004a5f8..64738838bee5 100644
-> --- a/include/uapi/linux/virtio_vsock.h
-> +++ b/include/uapi/linux/virtio_vsock.h
-> @@ -98,6 +98,7 @@ enum virtio_vsock_shutdown {
->  /* VIRTIO_VSOCK_OP_RW flags values */
->  enum virtio_vsock_rw {
->  	VIRTIO_VSOCK_SEQ_EOM = 1,
-> +	VIRTIO_VSOCK_SEQ_EOR = 2,
->  };
->  
->  #endif /* _UAPI_LINUX_VIRTIO_VSOCK_H */
-> -- 
-> 2.25.1
+Hello, here it is
 
+https://lists.oasis-open.org/archives/virtio-comment/202109/msg00008.html
+
+>
+>> ---
+>>  include/uapi/linux/virtio_vsock.h | 1 +
+>>  1 file changed, 1 insertion(+)
+>>
+>> diff --git a/include/uapi/linux/virtio_vsock.h b/include/uapi/linux/virtio_vsock.h
+>> index 8485b004a5f8..64738838bee5 100644
+>> --- a/include/uapi/linux/virtio_vsock.h
+>> +++ b/include/uapi/linux/virtio_vsock.h
+>> @@ -98,6 +98,7 @@ enum virtio_vsock_shutdown {
+>>  /* VIRTIO_VSOCK_OP_RW flags values */
+>>  enum virtio_vsock_rw {
+>>  	VIRTIO_VSOCK_SEQ_EOM = 1,
+>> +	VIRTIO_VSOCK_SEQ_EOR = 2,
+>>  };
+>>  
+>>  #endif /* _UAPI_LINUX_VIRTIO_VSOCK_H */
+>> -- 
+>> 2.25.1
+>
