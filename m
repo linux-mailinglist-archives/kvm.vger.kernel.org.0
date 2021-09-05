@@ -2,118 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AF0A1400F82
-	for <lists+kvm@lfdr.de>; Sun,  5 Sep 2021 14:10:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C209E400FCE
+	for <lists+kvm@lfdr.de>; Sun,  5 Sep 2021 15:10:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237909AbhIEMKU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 5 Sep 2021 08:10:20 -0400
-Received: from mail-mw2nam10on2040.outbound.protection.outlook.com ([40.107.94.40]:39296
-        "EHLO NAM10-MW2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S234382AbhIEMKT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 5 Sep 2021 08:10:19 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=bxEbHRA1ARS+UFoHt+Hg/VsnpvY9J+o/LXWOZAgNuGsNw+fBZxoTOkwhoJDXXyop25MZdgFuqOmvikOnw6uZStvqxd/WQWwCtv1+onbWycwDTeOWAGPUxFBIcQGTuMa3vVIOHSXo7A9vbeK9JZT+nK10ghGLyq7dsjNFhPgarGaHwEfbKRzXDzgn9Futbm2Pya9LG2rB+NsXiSDori84oCCMaSaguUItahKq6ip78ejfaU47OL+LllM3wAltY5aDcRnglvel5piYjIj7UlbU6E/uW2SpXCeYqv3I+16gSVXCrfU+0OXa85gxpKIWSu2y1QfSl6yD59nzduCiI37zCA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
- bh=Mb2WmlZMNgMbeujM6Bci8Q0uyaVKPhAjLXC48m9pUmM=;
- b=LFcXAEFE2ivt6PZhSBjw5f6x+10ZKMhr1SQZ5O9eiVxlpQ30rUyDvs2KxQ/d+9I5O7jVVLHxxpy3jB0bqSHUTdWy3WT7x0EzTzDBHrxmJyAFRe7lHSaKmDtosn+Cynt9sg94odATcH5S5cCzhtzNYeQw43+yiLYc/uNLmT4bucengVZpQJNfC/9MbAyqoi3O6jsUdwjUTFeGqWeietHjMf0XxOZMvsQ0dR9Vdccsp5lD5qrfYq91gJs2uud+UbSUOunWaOFUjH/otyQBZxBcciN0ECAXiyiZ1WsDblvJp519XYXimS+OeSLQEvB/H4skAD71DVrOP9VSaZpOXPZb/g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.112.34) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=quarantine sp=none pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Mb2WmlZMNgMbeujM6Bci8Q0uyaVKPhAjLXC48m9pUmM=;
- b=s3sxVXXhAt/5mA39SpBqsJu4Lc0RDfv8Yyo8XJzFP9gnxPtDHJqkRImrFWq0zg2HshHPHuR3OGz2gSrESfn67N+nFcijm5oVDqnwWf1ZOB57wqg4lvzhfbOdELYhBOAnuUbiJYnX1gqcmixe9eRNZee7Kb6b4CZOuTfLmcHkF2VieKj8c/gBwQ2oh+5mpmm/93mNjDSnBMBfqBDOc+jqZnn3Z6dng9nedUT2yYi9x8lbC70sAgAixOR94uuzivOu44Os97lEso/7GreDTT/FkiDwL1gtL9thT+V+Gw/2nQVNQcvZD6Os/zf4SXmSdVahrBjBLhyaiT191ru4s4DoOQ==
-Received: from BN0PR04CA0048.namprd04.prod.outlook.com (2603:10b6:408:e8::23)
- by BYAPR12MB3144.namprd12.prod.outlook.com (2603:10b6:a03:d6::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4478.22; Sun, 5 Sep
- 2021 12:09:15 +0000
-Received: from BN8NAM11FT046.eop-nam11.prod.protection.outlook.com
- (2603:10b6:408:e8:cafe::51) by BN0PR04CA0048.outlook.office365.com
- (2603:10b6:408:e8::23) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4478.17 via Frontend
- Transport; Sun, 5 Sep 2021 12:09:14 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.34)
- smtp.mailfrom=nvidia.com; vger.kernel.org; dkim=none (message not signed)
- header.d=none;vger.kernel.org; dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.112.34 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.112.34; helo=mail.nvidia.com;
-Received: from mail.nvidia.com (216.228.112.34) by
- BN8NAM11FT046.mail.protection.outlook.com (10.13.177.127) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.4478.19 via Frontend Transport; Sun, 5 Sep 2021 12:09:14 +0000
-Received: from HQMAIL109.nvidia.com (172.20.187.15) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.18; Sun, 5 Sep
- 2021 12:09:13 +0000
-Received: from r-arch-stor02.mtr.labs.mlnx (172.20.187.6) by mail.nvidia.com
- (172.20.187.15) with Microsoft SMTP Server id 15.0.1497.18 via Frontend
- Transport; Sun, 5 Sep 2021 05:09:12 -0700
-From:   Max Gurtovoy <mgurtovoy@nvidia.com>
-To:     <mst@redhat.com>, <virtualization@lists.linux-foundation.org>,
-        <kvm@vger.kernel.org>, <stefanha@redhat.com>
-CC:     <oren@nvidia.com>, <nitzanc@nvidia.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>
-Subject: [PATCH 1/1] virtio: add VIRTIO_F_IN_ORDER to header file
-Date:   Sun, 5 Sep 2021 15:09:11 +0300
-Message-ID: <20210905120911.8239-1-mgurtovoy@nvidia.com>
-X-Mailer: git-send-email 2.18.1
+        id S233744AbhIENLM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 5 Sep 2021 09:11:12 -0400
+Received: from mail.kernel.org ([198.145.29.99]:35840 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231917AbhIENLL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 5 Sep 2021 09:11:11 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 8855D60F45;
+        Sun,  5 Sep 2021 13:10:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1630847408;
+        bh=6R0PUe/Nldfy234Rj0kTE5wnvjhWU3jlHe4lOOg9EM0=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=fkUXo6sTgIvPZs1UAlTNxvcnjEU0QjYSwNW69nUy1GiDXPH3Vvh1rG8182NhIlmjm
+         e6K3OtPTSaeZU0LV/LLXg+B/wCASRMB0PRjs93MOPUeLz9on0DfrG/u9YjXhXPBaUJ
+         KRW7Ya1Pc5HyARZ20x1gEkJ6xD6Mlm4Z2hXg6CqbzhsStZdJ/UvOJiSD0TyZ4Cquyi
+         7dC21adnc9KavFQ4eGKInvggKgY/5HiMleug0twNsTxX3LbrzJazWl57JQOJg1DQsA
+         5Ez63Honh6Ek04gBY797cZlrFNAYGt/On7zH7k5VbZYbzSdnj2cxhohRimkQz0gRCy
+         Mb57SlRwpfcAg==
+Date:   Sun, 5 Sep 2021 16:10:04 +0300
+From:   Leon Romanovsky <leon@kernel.org>
+To:     Max Gurtovoy <mgurtovoy@nvidia.com>
+Cc:     Chaitanya Kulkarni <ckulkarnilinux@gmail.com>, hch@infradead.org,
+        mst@redhat.com, virtualization@lists.linux-foundation.org,
+        kvm@vger.kernel.org, stefanha@redhat.com, israelr@nvidia.com,
+        nitzanc@nvidia.com, oren@nvidia.com, linux-block@vger.kernel.org,
+        axboe@kernel.dk
+Subject: Re: [PATCH v3 1/1] virtio-blk: add num_request_queues module
+ parameter
+Message-ID: <YTTBrD/0bHcyfNGm@unreal>
+References: <20210902204622.54354-1-mgurtovoy@nvidia.com>
+ <YTR12AHOGs1nhfz1@unreal>
+ <b2e60035-2e63-3162-6222-d8c862526a28@gmail.com>
+ <e4455133-ac9f-44d0-a07d-be55b336ebcc@nvidia.com>
+ <YTSZpm1GZGT4BUDR@unreal>
+ <5aada544-356f-5363-c6e4-6885e9812f82@nvidia.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: f1e8a740-cdf1-4898-4ce1-08d97065faaf
-X-MS-TrafficTypeDiagnostic: BYAPR12MB3144:
-X-Microsoft-Antispam-PRVS: <BYAPR12MB31440D150FF663542E23CBD0DED19@BYAPR12MB3144.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:5797;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ORrc25WaGZYvXbolAPKwf0EG/mTvW4qh2TFY6wP9qeFV7/MLUs1C9q6PQwb3QPOmKZ02nCP33aRTBSFb/rF7VSNRJTMhG27LR96PsVk3eE4VU2/ZVKixHrOSL2V3wSxSNE4VvpYEijrAHiULH+zhp5M9YbspoenC7sD7RCLtwgpdlpO17U3Lhn4DZPjPtSF2qEDs4CS9oNEW11w1h2cPSaNyR2NSTRCFqtA9Q6LBCX65ltLQAGwkMLTjOSie/JAAjiZSdR+yBAMSUvVgWGQVFOTfimeVdQFzidVlmv9vjVF5vRDu6F53SFZf3BlNKpN83o+fFm4cwb18FM6gU5HmGG7i6mo9TGb92z6OEdSFJ/ExawfiETl14FS+X7NqmVENWKo4dHAYSnzA1DNOTf/0CuYSoaDNlfslviR3mHhY8MHZkiNCPel6s716oFBqNo+egAnhMYXVdsNEUg6Vnfn90e38C8IjQAzRa5KKLTfZv7qw5pjE/uoy3G95c5w3BcCC9E+loNfUl9odsoAv6MnGk1+e7/y0GswJQTiYyOmOfgOUrm0Rs3ZqYRnVaSE8B4pbSGLZ3rkFs9EsnJ6h/OW5KvWnpZvcA4JDv/JrYIIJkssPH9nk1ilX33WZdgAV9D6mHN9ouK81960Jj7Gr1BjsS3varddWuvtYmXXPiavWlbOPsoifAOepk1sEtZnGHv7eTOG4dGm5M3ybHPD1sxItHg==
-X-Forefront-Antispam-Report: CIP:216.228.112.34;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid03.nvidia.com;CAT:NONE;SFS:(4636009)(46966006)(36840700001)(86362001)(83380400001)(426003)(336012)(316002)(356005)(5660300002)(47076005)(82310400003)(2906002)(36860700001)(8936002)(4326008)(1076003)(36756003)(7636003)(70586007)(70206006)(107886003)(2616005)(26005)(508600001)(36906005)(4744005)(186003)(8676002)(54906003)(110136005);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Sep 2021 12:09:14.7657
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: f1e8a740-cdf1-4898-4ce1-08d97065faaf
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.34];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT046.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR12MB3144
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <5aada544-356f-5363-c6e4-6885e9812f82@nvidia.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-For now only add this definition from the spec. In the future, The
-drivers should negotiate this feature to optimize the performance.
+On Sun, Sep 05, 2021 at 02:16:58PM +0300, Max Gurtovoy wrote:
+> 
+> On 9/5/2021 1:19 PM, Leon Romanovsky wrote:
+> > On Sun, Sep 05, 2021 at 12:19:09PM +0300, Max Gurtovoy wrote:
+> > > On 9/5/2021 11:49 AM, Chaitanya Kulkarni wrote:
+> > > > On 9/5/2021 12:46 AM, Leon Romanovsky wrote:
+> > > > > > +static unsigned int num_request_queues;
+> > > > > > +module_param_cb(num_request_queues, &queue_count_ops,
+> > > > > > &num_request_queues,
+> > > > > > +        0644);
+> > > > > > +MODULE_PARM_DESC(num_request_queues,
+> > > > > > +         "Number of request queues to use for blk device.
+> > > > > > Should > 0");
+> > > > > > +
+> > > > > Won't it limit all virtio block devices to the same limit?
+> > > > > 
+> > > > > It is very common to see multiple virtio-blk devices on the same system
+> > > > > and they probably need different limits.
+> > > > > 
+> > > > > Thanks
+> > > > 
+> > > > Without looking into the code, that can be done adding a configfs
+> > > > 
+> > > > interface and overriding a global value (module param) when it is set
+> > > > from
+> > > > 
+> > > > configfs.
+> > > > 
+> > > > 
+> > > You have many ways to overcome this issue.
+> > > 
+> > > For example:
+> > > 
+> > > # ls -l /sys/block/vda/mq/
+> > > drwxr-xr-x 18 root root 0 Sep  5 12:14 0
+> > > drwxr-xr-x 18 root root 0 Sep  5 12:14 1
+> > > drwxr-xr-x 18 root root 0 Sep  5 12:14 2
+> > > drwxr-xr-x 18 root root 0 Sep  5 12:14 3
+> > > 
+> > > # echo virtio0 > /sys/bus/virtio/drivers/virtio_blk/unbind
+> > > 
+> > > # echo 8 > /sys/module/virtio_blk/parameters/num_request_queues
+> > This is global to all virtio-blk devices.
+> 
+> You define a global module param but you bind/unbind a specific device.
+> 
+> Do you have a better way to control it ?
 
-Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
----
- include/uapi/linux/virtio_config.h | 6 ++++++
- 1 file changed, 6 insertions(+)
+One of the possible solutions will be to extend virtio bus to allow
+setting of such pre-probe parameters. However I don't know if it is
+really worth doing it,
 
-diff --git a/include/uapi/linux/virtio_config.h b/include/uapi/linux/virtio_config.h
-index b5eda06f0d57..3fcdc4ab6f19 100644
---- a/include/uapi/linux/virtio_config.h
-+++ b/include/uapi/linux/virtio_config.h
-@@ -82,6 +82,12 @@
- /* This feature indicates support for the packed virtqueue layout. */
- #define VIRTIO_F_RING_PACKED		34
- 
-+/*
-+ * This feature indicates that all buffers are used by the device in the same
-+ * order in which they have been made available.
-+ */
-+#define VIRTIO_F_IN_ORDER              35
-+
- /*
-  * This feature indicates that memory accesses by the driver and the
-  * device are ordered in a way described by the platform.
--- 
-2.18.1
-
+> 
+> if the device is already probed, it's too late to change the queue_num.
+> 
+> 
+> > 
+> > > # echo virtio0 > /sys/bus/virtio/drivers/virtio_blk/bind
+> > > 
+> > > # ls -l /sys/block/vda/mq/
+> > > drwxr-xr-x 10 root root 0 Sep  5 12:17 0
+> > > drwxr-xr-x 10 root root 0 Sep  5 12:17 1
+> > > drwxr-xr-x 10 root root 0 Sep  5 12:17 2
+> > > drwxr-xr-x 10 root root 0 Sep  5 12:17 3
+> > > drwxr-xr-x 10 root root 0 Sep  5 12:17 4
+> > > drwxr-xr-x 10 root root 0 Sep  5 12:17 5
+> > > drwxr-xr-x 10 root root 0 Sep  5 12:17 6
+> > > drwxr-xr-x 10 root root 0 Sep  5 12:17 7
+> > > 
+> > > -Max.
+> > > 
+> > > 
