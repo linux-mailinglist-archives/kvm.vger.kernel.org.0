@@ -2,113 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C52A7401080
-	for <lists+kvm@lfdr.de>; Sun,  5 Sep 2021 17:15:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8CB444010A3
+	for <lists+kvm@lfdr.de>; Sun,  5 Sep 2021 17:50:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235924AbhIEPQ3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 5 Sep 2021 11:16:29 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22574 "EHLO
+        id S237418AbhIEPvX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 5 Sep 2021 11:51:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:29989 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229566AbhIEPQ2 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 5 Sep 2021 11:16:28 -0400
+        by vger.kernel.org with ESMTP id S234447AbhIEPvW (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 5 Sep 2021 11:51:22 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630854924;
+        s=mimecast20190719; t=1630857018;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=5ZzmZ3cm/kvau4n2g5RTLrehaLVkdjZ73wl5vRun3Qc=;
-        b=jSK9066dndq/16yyZBjVD5G0DhGL841NBQX95/08sI4ETdDbUXTWGI8788lkGLXBurmWa3
-        eic/dwJ7/bEGq9U6YkgPzMlp+mwLEhKpXO2rDPnAPevhFIrHvcAbJrIw6SUHOfZDNZw2Hu
-        Id2QV8oeQD0UGizoVFqZbUWG6vS3P6Q=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-49-h8Dv_jffOk-RnHNIB-nekQ-1; Sun, 05 Sep 2021 11:15:23 -0400
-X-MC-Unique: h8Dv_jffOk-RnHNIB-nekQ-1
-Received: by mail-ed1-f71.google.com with SMTP id h4-20020aa7c604000000b003c423efb7efso2407937edq.12
-        for <kvm@vger.kernel.org>; Sun, 05 Sep 2021 08:15:23 -0700 (PDT)
+        bh=dt3+lUrr17xrCqRRoNhFo4SoQOQwGb+2P4GqnUIMZG4=;
+        b=IijXAQqeJQVkWJv5BjwkNQiwwNw32alX9PdHKY7ogztPUvGZ8kK2pa80DD59021DtwF3wk
+        vnn7p4vVJ0j2aaI4Rd9gVdGlARJYOQywh0r5Iwq9fkaIfOVuCZnxj1xiVXx42y/eoJa7jT
+        T4y+PRw0xkcVhezVPUx2Aw4QIXme58g=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-248-j6q35e5NMTywUKAoQa8kFA-1; Sun, 05 Sep 2021 11:50:17 -0400
+X-MC-Unique: j6q35e5NMTywUKAoQa8kFA-1
+Received: by mail-ed1-f72.google.com with SMTP id b8-20020a056402350800b003c5e3d4e2a7so2452066edd.2
+        for <kvm@vger.kernel.org>; Sun, 05 Sep 2021 08:50:17 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=5ZzmZ3cm/kvau4n2g5RTLrehaLVkdjZ73wl5vRun3Qc=;
-        b=OxoHhRU6/Co8kfqnQBHrqgXdjJnL3WjSpOOsiC8gO1GVZOMs3lmz4vyuifBDPFwxl6
-         XkXgt26r214Qo4MA4fwPUwtf7pOROEwnvYIV+kpITfY97jMHOHsOIJp84SwL8+Zw8+J6
-         kBulvaDx9UkEbKp1JS918txYtUUb4oLifG5MRQYm7AzhOPPIyCJz7yjF/N8Tya/Jikm3
-         oOobS/chrSZn+CXX6Ejks76AfZ8ZNRQrNH9+3T8J8HH7Q2zTlXsnKDSUKvslhSMd9phT
-         5Ni5TU//W8TzcsGGgMlnKWOF1EYEvaPkaYMyP/GGDniDF+HS+9VENj8EdIKq4eBJceyM
-         2qvA==
-X-Gm-Message-State: AOAM530t1dGO7vpuMcQhHMpCQUo74A2yJ+YazBUjmuhzBHBdH6CF3Hl3
-        pv6QeLFgQ5VTNLOoRar70hqOCKVsv9VED0wrWoLLJDknulMBqapF7XScNfFsaykCxbEwibdlJZU
-        vAYUUSQyj8lff
-X-Received: by 2002:a17:906:1f54:: with SMTP id d20mr9200341ejk.48.1630854922110;
-        Sun, 05 Sep 2021 08:15:22 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzWbCojxNISr+mKnf+beM5xR3SEos+shGuS9gvYwwtR/FWexU0zALsrFPLXDAs6YgRpFnkV0Q==
-X-Received: by 2002:a17:906:1f54:: with SMTP id d20mr9200330ejk.48.1630854921973;
-        Sun, 05 Sep 2021 08:15:21 -0700 (PDT)
+        bh=dt3+lUrr17xrCqRRoNhFo4SoQOQwGb+2P4GqnUIMZG4=;
+        b=DGponOGR9HoTDW3Bchi3IvqPQiy4wf8QhpDDi69Jgy6B5fjpm4tB7UlL3ZDyEdDJdy
+         n8cAueR5wGW82aRhJPFhhZcrCmOuF7CUrfbaL0fUHLW8fueYbyt1dZ3uMi3HBjfWfU1n
+         BtT6t01q97pLL7k351T+yelVqFvk5Mw/hG7Epp9Qh2MQ1DFTgx+HkKCWk+A1webB/E56
+         NavdmyYX4q1MvCrOvHPVNEVXqHRL4RP/PfUSdpWPttHXotahNoZsfZiHj3AC0/XgVRSB
+         BVirCCbTUG2e5MJxgH+q2oZ+GvGfh+uLNLzd1frXfDpWpxnmNOU8J/kHKyAD+A/THqFq
+         raJQ==
+X-Gm-Message-State: AOAM532yDZwDuYDefTWxCeUYlsD5p1F1m8fMlQhOWuANLb9Mmp24rKMv
+        rmDN4cOYx4BlJJyVwBQJ075PDtFAYR/srhS6537gFBfXYGixdAe029L3y7PGvUsSL+9lVudQ0nw
+        iWE2ZppGmcanj
+X-Received: by 2002:aa7:c514:: with SMTP id o20mr9209155edq.318.1630857016058;
+        Sun, 05 Sep 2021 08:50:16 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw/Vr1hTVx3/Sty6LNqcZMAJAOmpd1FUx3LtNW8reY+9FMDFhx51QrJugo5epYEB0BNnX/rsw==
+X-Received: by 2002:aa7:c514:: with SMTP id o20mr9209144edq.318.1630857015928;
+        Sun, 05 Sep 2021 08:50:15 -0700 (PDT)
 Received: from redhat.com ([2.55.131.183])
-        by smtp.gmail.com with ESMTPSA id cf11sm2997982edb.65.2021.09.05.08.15.18
+        by smtp.gmail.com with ESMTPSA id g18sm2495519ejr.99.2021.09.05.08.50.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 05 Sep 2021 08:15:20 -0700 (PDT)
-Date:   Sun, 5 Sep 2021 11:15:16 -0400
+        Sun, 05 Sep 2021 08:50:15 -0700 (PDT)
+Date:   Sun, 5 Sep 2021 11:50:11 -0400
 From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Leon Romanovsky <leon@kernel.org>
-Cc:     Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>, hch@infradead.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        stefanha@redhat.com, israelr@nvidia.com, nitzanc@nvidia.com,
-        oren@nvidia.com, linux-block@vger.kernel.org, axboe@kernel.dk
-Subject: Re: [PATCH v3 1/1] virtio-blk: add num_request_queues module
- parameter
-Message-ID: <20210905111415-mutt-send-email-mst@kernel.org>
-References: <20210902204622.54354-1-mgurtovoy@nvidia.com>
- <YTR12AHOGs1nhfz1@unreal>
- <b2e60035-2e63-3162-6222-d8c862526a28@gmail.com>
- <YTSZ6CYM6BCsbVmk@unreal>
+To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Norbert Slusarek <nslusarek@gmx.net>,
+        Andra Paraschiv <andraprs@amazon.com>,
+        Colin Ian King <colin.king@canonical.com>,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        stsp2@yandex.ru, oxffffaa@gmail.com
+Subject: Re: [PATCH net-next v4 2/6] virtio/vsock: add 'VIRTIO_VSOCK_SEQ_EOR'
+ bit.
+Message-ID: <20210905115002-mutt-send-email-mst@kernel.org>
+References: <20210903061353.3187150-1-arseny.krasnov@kaspersky.com>
+ <20210903061523.3187714-1-arseny.krasnov@kaspersky.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YTSZ6CYM6BCsbVmk@unreal>
+In-Reply-To: <20210903061523.3187714-1-arseny.krasnov@kaspersky.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Sep 05, 2021 at 01:20:24PM +0300, Leon Romanovsky wrote:
-> On Sun, Sep 05, 2021 at 01:49:46AM -0700, Chaitanya Kulkarni wrote:
-> > 
-> > On 9/5/2021 12:46 AM, Leon Romanovsky wrote:
-> > > > +static unsigned int num_request_queues;
-> > > > +module_param_cb(num_request_queues, &queue_count_ops, &num_request_queues,
-> > > > +		0644);
-> > > > +MODULE_PARM_DESC(num_request_queues,
-> > > > +		 "Number of request queues to use for blk device. Should > 0");
-> > > > +
-> > > Won't it limit all virtio block devices to the same limit?
-> > > 
-> > > It is very common to see multiple virtio-blk devices on the same system
-> > > and they probably need different limits.
-> > > 
-> > > Thanks
-> > 
-> > 
-> > Without looking into the code, that can be done adding a configfs
-> > 
-> > interface and overriding a global value (module param) when it is set from
-> > 
-> > configfs.
+On Fri, Sep 03, 2021 at 09:15:20AM +0300, Arseny Krasnov wrote:
+> This bit is used to handle POSIX MSG_EOR flag passed from
+> userspace in 'send*()' system calls. It marks end of each
+> record and is visible to receiver using 'recvmsg()' system
+> call.
 > 
-> So why should we do double work instead of providing one working
-> interface from the beginning?
-> 
-> Thanks
-> 
-> > 
-> > 
+> Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
+> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
-The main way to do it is really from the hypervisor. This one
-is a pretty blunt instrument, Max here says it's useful to reduce
-memory usage of the driver. If that's the usecase then a global limit
-seems sufficient.
+Spec patch for this?
 
--- 
-MST
+> ---
+>  include/uapi/linux/virtio_vsock.h | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/include/uapi/linux/virtio_vsock.h b/include/uapi/linux/virtio_vsock.h
+> index 8485b004a5f8..64738838bee5 100644
+> --- a/include/uapi/linux/virtio_vsock.h
+> +++ b/include/uapi/linux/virtio_vsock.h
+> @@ -98,6 +98,7 @@ enum virtio_vsock_shutdown {
+>  /* VIRTIO_VSOCK_OP_RW flags values */
+>  enum virtio_vsock_rw {
+>  	VIRTIO_VSOCK_SEQ_EOM = 1,
+> +	VIRTIO_VSOCK_SEQ_EOR = 2,
+>  };
+>  
+>  #endif /* _UAPI_LINUX_VIRTIO_VSOCK_H */
+> -- 
+> 2.25.1
 
