@@ -2,105 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4F74D401B22
-	for <lists+kvm@lfdr.de>; Mon,  6 Sep 2021 14:24:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BA9F5401B24
+	for <lists+kvm@lfdr.de>; Mon,  6 Sep 2021 14:25:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242208AbhIFMZY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Sep 2021 08:25:24 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:52935 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S241829AbhIFMZV (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 6 Sep 2021 08:25:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630931057;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=5T3jMeGN4kX5wlrRjGBWKj+SsZVCRR2xQTk1YdLtOs4=;
-        b=S2Ll9jT0xlWSYhgif9UJid51o7iLciOZyd26tkxVmAc1imc4t799S/cqSjzSix0kncmY85
-        p4z0EibleGJP348VvQHFz8I8K3+OvzP4J24ZVeMw4Q0g1Gs28e6jcqZK++0o5j4TMAS06z
-        q9YR7BQXvW0n8SSLegmd2fFyBAmFOzk=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-554-XpBp1sueP6aZIrhmBtQ4pA-1; Mon, 06 Sep 2021 08:24:16 -0400
-X-MC-Unique: XpBp1sueP6aZIrhmBtQ4pA-1
-Received: by mail-ej1-f70.google.com with SMTP id bx10-20020a170906a1ca00b005c341820edeso2261952ejb.10
-        for <kvm@vger.kernel.org>; Mon, 06 Sep 2021 05:24:15 -0700 (PDT)
+        id S241975AbhIFM0n (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Sep 2021 08:26:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33116 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237245AbhIFM0m (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Sep 2021 08:26:42 -0400
+Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53F7BC061575;
+        Mon,  6 Sep 2021 05:25:38 -0700 (PDT)
+Received: by mail-pf1-x435.google.com with SMTP id j16so5531410pfc.2;
+        Mon, 06 Sep 2021 05:25:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=UmBZm6nsLJ37H9eh10vOWK3FkWVJCo2NauoZ+XB4cd0=;
+        b=gWLNTCcRISfyVGlu17uPjXxYADtSl8OE5nVWpruGPxrrJ/BVt6g4rq/EtLQcEF+yij
+         XnuzPXgQLVfbYWH0sP99ff552bnFy3DDA9T4w4oFdCo+9IKhmuHjrlcHiLeYbTakOkl3
+         DKhQdsU2QtuK/2QNQWQZJTG4ULIrBom0wUh1mbfBhLBr7JCj/0De90yIr9t8twQvnoBH
+         uD0MwNg9Dyoh+QuqXMUgnYO6RuraC3mGHL3KT8NTDLVjCNvnD364P3I0ecH6DjgryiaX
+         ug5q0159eMvb0Fy9aK1Vw5qH3x8GiQUdOlVKzM+iJmN/xvCsmXD3kVrDrOHGUm774/0q
+         0sYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=5T3jMeGN4kX5wlrRjGBWKj+SsZVCRR2xQTk1YdLtOs4=;
-        b=c0R26WVRcrwJ09W/OHawWCd0nCdq4m1hNROfLkj68DIWHfIbszq5aZBStvXCO9vVde
-         UpG07onp+Ixw8sG6XBu55LObLsZoEPQhBAu8vEJvza3AFVsnI/yJR/KppbE73aY5WCwm
-         5PtUg0zIU4UW2J81vZuwf0kEC6v53UwgnYlme6ANr76vXCS+POolsFokEgpbo22xkZZd
-         CcKrUIFiQFNlbOxet316kHZ7QesRfpfm1qQo4r2iB+9B6Ohm6O9T3Y6AkizTQzFYnZmk
-         8DfWm/NPCpuV3gV/750wQdSXDb+G5Oj04OyRkX8xj37NWL4QPKicHTzlKzX5WKu+TNpA
-         v96w==
-X-Gm-Message-State: AOAM530QPBq2c3uw7J/mF8J228cisceuc1soq2ij3EhU9m9Cp3pCqQei
-        8f+TofD/eO00/Nn/qfjOVXX3sScMAP+XR+kRgWkvEov/bSAniGXbWdj0fG26tPAslk6SUfLSAF9
-        56hf/eVML90At
-X-Received: by 2002:a05:6402:b7c:: with SMTP id cb28mr12962444edb.152.1630931054922;
-        Mon, 06 Sep 2021 05:24:14 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzpxMI6NExBPU/SlkCnU4bFtlsTovlMfLu3JG5Ts6X/yfcGcvonJPvRojtNx12kOY5m7Vxgdw==
-X-Received: by 2002:a05:6402:b7c:: with SMTP id cb28mr12962417edb.152.1630931054670;
-        Mon, 06 Sep 2021 05:24:14 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id q9sm3864150ejf.70.2021.09.06.05.24.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 06 Sep 2021 05:24:14 -0700 (PDT)
-Subject: Re: [PATCH v2] KVM: Drop unused kvm_dirty_gfn_invalid()
-To:     Peter Xu <peterx@redhat.com>, linux-kernel@vger.kernel.org,
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=UmBZm6nsLJ37H9eh10vOWK3FkWVJCo2NauoZ+XB4cd0=;
+        b=e9bQmGCEiLc0NoT6emlscFgVqpjYl8OqQkIWPO9YgeoUTITSMIaqOvVzVNcBldQkgQ
+         Jb4Ox3Y5lQTboP+6tvDoe816VZNKPQeFHAXGaFTY+gMKxndWo1szLailhEpi6kxXU7n/
+         hllkB7y1wnPEmC6ftPrZ5dvwK32xmGeMkn060wmSoCY5xnaEpRoOjtCTmtpJz0HBm9V3
+         e8TeDsB6PpJIowkZUwhciFVSvPGKccmhTxjo3uB7ic/tgGrDTz6mg+XirSRFsNYv6Z81
+         6F6/eo9Ppt0Jdu5g4vER2yAcalwtYmxTD2OwTiAQ0d01GAAq4efauNPukLKENUEyuaId
+         F35g==
+X-Gm-Message-State: AOAM532aYUUkZrpHvzdYGnCngDa+uyS/cmwsAencEJJo6oCTEJLHItVg
+        s1oK9OykUs24SHQHn67NntNJRFXxv4o=
+X-Google-Smtp-Source: ABdhPJwTb86ZckUvhutjrCJCv6YO6apn5oh4IL7MbeHd6BfMWZGI80bPyThgf2Nd9wen/D+mPCb7Hg==
+X-Received: by 2002:a63:4303:: with SMTP id q3mr12030866pga.375.1630931137543;
+        Mon, 06 Sep 2021 05:25:37 -0700 (PDT)
+Received: from localhost ([47.251.3.230])
+        by smtp.gmail.com with ESMTPSA id e19sm7370242pfi.139.2021.09.06.05.25.36
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 06 Sep 2021 05:25:37 -0700 (PDT)
+From:   Lai Jiangshan <jiangshanlai@gmail.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Lai Jiangshan <laijs@linux.alibaba.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
         kvm@vger.kernel.org
-Cc:     kernel test robot <lkp@intel.com>
-References: <20210901230904.15164-1-peterx@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <786bbcc9-50dd-51c9-61e1-fe04204ca3f6@redhat.com>
-Date:   Mon, 6 Sep 2021 14:24:13 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+Subject: [PATCH V3 1/2] KVM: x86/mmu: Verify shadow walk doesn't terminate early in  page faults
+Date:   Mon,  6 Sep 2021 20:25:46 +0800
+Message-Id: <20210906122547.263316-1-jiangshanlai@gmail.com>
+X-Mailer: git-send-email 2.19.1.6.gb485710b
+In-Reply-To: <YTE3bRcZv2BiVxzH@google.com>
+References: <YTE3bRcZv2BiVxzH@google.com>
 MIME-Version: 1.0
-In-Reply-To: <20210901230904.15164-1-peterx@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 02/09/21 01:09, Peter Xu wrote:
-> Drop the unused function as reported by test bot.
-> 
-> Reported-by: kernel test robot <lkp@intel.com>
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> --
-> v2:
-> - Fix the subject that points to the right function; the copy-paste failed.
-> ---
->   virt/kvm/dirty_ring.c | 5 -----
->   1 file changed, 5 deletions(-)
-> 
-> diff --git a/virt/kvm/dirty_ring.c b/virt/kvm/dirty_ring.c
-> index 7aafefc50aa7..88f4683198ea 100644
-> --- a/virt/kvm/dirty_ring.c
-> +++ b/virt/kvm/dirty_ring.c
-> @@ -91,11 +91,6 @@ static inline void kvm_dirty_gfn_set_dirtied(struct kvm_dirty_gfn *gfn)
->   	gfn->flags = KVM_DIRTY_GFN_F_DIRTY;
->   }
->   
-> -static inline bool kvm_dirty_gfn_invalid(struct kvm_dirty_gfn *gfn)
-> -{
-> -	return gfn->flags == 0;
-> -}
-> -
->   static inline bool kvm_dirty_gfn_harvested(struct kvm_dirty_gfn *gfn)
->   {
->   	return gfn->flags & KVM_DIRTY_GFN_F_RESET;
-> 
+From: Sean Christopherson <seanjc@google.com>
 
-Queued, thanks.
+WARN and bail if the shadow walk for faulting in a SPTE terminates early,
+i.e. doesn't reach the expected level because the walk encountered a
+terminal SPTE.  The shadow walks for page faults are subtle in that they
+install non-leaf SPTEs (zapping leaf SPTEs if necessary!) in the loop
+body, and consume the newly created non-leaf SPTE in the loop control,
+e.g. __shadow_walk_next().  In other words, the walks guarantee that the
+walk will stop if and only if the target level is reached by installing
+non-leaf SPTEs to guarantee the walk remains valid.
 
-Paolo
+Opportunistically use fault->goal-level instead of it.level in
+FNAME(fetch) to further clarify that KVM always installs the leaf SPTE at
+the target level.
+
+Reviewed-by: Lai Jiangshan <jiangshanlai@gmail.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
+---
+ arch/x86/kvm/mmu/mmu.c         | 3 +++
+ arch/x86/kvm/mmu/paging_tmpl.h | 7 +++++--
+ 2 files changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 4853c033e6ce..538be037549d 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -3006,6 +3006,9 @@ static int __direct_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+ 			account_huge_nx_page(vcpu->kvm, sp);
+ 	}
+ 
++	if (WARN_ON_ONCE(it.level != fault->goal_level))
++		return -EFAULT;
++
+ 	ret = mmu_set_spte(vcpu, it.sptep, ACC_ALL,
+ 			   fault->write, fault->goal_level, base_gfn, fault->pfn,
+ 			   fault->prefault, fault->map_writable);
+diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+index 50ade6450ace..4d559d2d4d66 100644
+--- a/arch/x86/kvm/mmu/paging_tmpl.h
++++ b/arch/x86/kvm/mmu/paging_tmpl.h
+@@ -749,9 +749,12 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
+ 		}
+ 	}
+ 
++	if (WARN_ON_ONCE(it.level != fault->goal_level))
++		return -EFAULT;
++
+ 	ret = mmu_set_spte(vcpu, it.sptep, gw->pte_access, fault->write,
+-			   it.level, base_gfn, fault->pfn, fault->prefault,
+-			   fault->map_writable);
++			   fault->goal_level, base_gfn, fault->pfn,
++			   fault->prefault, fault->map_writable);
+ 	if (ret == RET_PF_SPURIOUS)
+ 		return ret;
+ 
+-- 
+2.19.1.6.gb485710b
 
