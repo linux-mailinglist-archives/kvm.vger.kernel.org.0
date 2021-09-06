@@ -2,43 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 020A84015B9
-	for <lists+kvm@lfdr.de>; Mon,  6 Sep 2021 06:36:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1090B4015C5
+	for <lists+kvm@lfdr.de>; Mon,  6 Sep 2021 06:46:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236292AbhIFEgF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Sep 2021 00:36:05 -0400
-Received: from smtp-out1.suse.de ([195.135.220.28]:55936 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233686AbhIFEgD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Sep 2021 00:36:03 -0400
+        id S238613AbhIFEre (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Sep 2021 00:47:34 -0400
+Received: from smtp-out2.suse.de ([195.135.220.29]:36086 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236292AbhIFErc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Sep 2021 00:47:32 -0400
 Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 48CED2204B;
-        Mon,  6 Sep 2021 04:34:58 +0000 (UTC)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 608F21FEC0;
+        Mon,  6 Sep 2021 04:46:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1630902898; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1630903586; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=CAITozoLdTvuiSpCA4FBc48ZQJ3G8U/K57SXrbH1fCI=;
-        b=m2bxMkJfbHmtGpka4JIRbqW2o1s0oEVbebBh8OJX4Dt9wW1RIFbr+MTfIJt+rAMZoIwb6+
-        BWzzjRvs5dzATRFl9bj5/uLe2qu0LCnJE+8f6rOzEkUro+0JDO5HuceRqaTI4r2ldt7Rnb
-        XzslWmR8PRhpo4YCok2w35Mrcavq5yY=
+        bh=5WXZWDjsL6VCDzFfKsy+fr5w2Ib5Q48se+K6nAixw7A=;
+        b=skiUEYbZPkGoKoSnNKDcWM2FTl6pRFomATdSKpYlwHm+RVUcnGhls0q3bU138VCdwYyHAn
+        Rkh/CE3wMrsCbW8E6Q274XJ+Imtmo22cZt7aKVwITgcELWNkbAgZlhhDVBdi7D79TrR29m
+        WcqcE3xs8V6NIepJ9N/RHBbbPcpCw8M=
 Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap1.suse-dmz.suse.de (Postfix) with ESMTPS id C50FD1332A;
-        Mon,  6 Sep 2021 04:34:57 +0000 (UTC)
+        by imap1.suse-dmz.suse.de (Postfix) with ESMTPS id CB30A1332A;
+        Mon,  6 Sep 2021 04:46:25 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap1.suse-dmz.suse.de with ESMTPSA
-        id 2hJVLnGaNWHsQQAAGKfGzw
-        (envelope-from <jgross@suse.com>); Mon, 06 Sep 2021 04:34:57 +0000
-Subject: Re: [PATCH v2 3/6] x86/kvm: introduce per cpu vcpu masks
+        id qWCDLyGdNWFDQwAAGKfGzw
+        (envelope-from <jgross@suse.com>); Mon, 06 Sep 2021 04:46:25 +0000
 To:     Eduardo Habkost <ehabkost@redhat.com>
-Cc:     kvm@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
-        maz@kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+Cc:     kvm@vger.kernel.org, x86@kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, maz@kernel.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
@@ -48,79 +49,144 @@ Cc:     kvm@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         "H. Peter Anvin" <hpa@zytor.com>
 References: <20210903130808.30142-1-jgross@suse.com>
- <20210903130808.30142-4-jgross@suse.com>
- <20210903160503.htkifa5g5wobte5b@habkost.net>
+ <20210903130808.30142-3-jgross@suse.com>
+ <20210903194824.lfjzeaab6ct72pxn@habkost.net>
 From:   Juergen Gross <jgross@suse.com>
-Message-ID: <b73693a6-d43c-ec58-91d0-c07ef5ea71ee@suse.com>
-Date:   Mon, 6 Sep 2021 06:34:57 +0200
+Subject: Re: [PATCH v2 2/6] x86/kvm: add boot parameter for adding vcpu-id
+ bits
+Message-ID: <2f7d511e-e846-e6a4-f180-987511518f42@suse.com>
+Date:   Mon, 6 Sep 2021 06:46:25 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.12.0
 MIME-Version: 1.0
-In-Reply-To: <20210903160503.htkifa5g5wobte5b@habkost.net>
+In-Reply-To: <20210903194824.lfjzeaab6ct72pxn@habkost.net>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="d2J1dfCgefD1bn8ucNo28kAFebLZ7CdPn"
+ boundary="qJYM4kX82J82dgMD9nuy8n4hbZ6zojjbg"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---d2J1dfCgefD1bn8ucNo28kAFebLZ7CdPn
-Content-Type: multipart/mixed; boundary="cbFkSkIok7N03pcvI3gx1gEWuKKGU7SlM";
+--qJYM4kX82J82dgMD9nuy8n4hbZ6zojjbg
+Content-Type: multipart/mixed; boundary="qU4uyZzhiMzt6qlPfC6tu7Ah3DhhJy0mE";
  protected-headers="v1"
 From: Juergen Gross <jgross@suse.com>
 To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: kvm@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
- maz@kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+Cc: kvm@vger.kernel.org, x86@kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, maz@kernel.org,
+ Jonathan Corbet <corbet@lwn.net>, Paolo Bonzini <pbonzini@redhat.com>,
  Sean Christopherson <seanjc@google.com>,
  Vitaly Kuznetsov <vkuznets@redhat.com>, Wanpeng Li <wanpengli@tencent.com>,
  Jim Mattson <jmattson@google.com>, Joerg Roedel <joro@8bytes.org>,
  Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
  Borislav Petkov <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>
-Message-ID: <b73693a6-d43c-ec58-91d0-c07ef5ea71ee@suse.com>
-Subject: Re: [PATCH v2 3/6] x86/kvm: introduce per cpu vcpu masks
+Message-ID: <2f7d511e-e846-e6a4-f180-987511518f42@suse.com>
+Subject: Re: [PATCH v2 2/6] x86/kvm: add boot parameter for adding vcpu-id
+ bits
 References: <20210903130808.30142-1-jgross@suse.com>
- <20210903130808.30142-4-jgross@suse.com>
- <20210903160503.htkifa5g5wobte5b@habkost.net>
-In-Reply-To: <20210903160503.htkifa5g5wobte5b@habkost.net>
+ <20210903130808.30142-3-jgross@suse.com>
+ <20210903194824.lfjzeaab6ct72pxn@habkost.net>
+In-Reply-To: <20210903194824.lfjzeaab6ct72pxn@habkost.net>
 
---cbFkSkIok7N03pcvI3gx1gEWuKKGU7SlM
+--qU4uyZzhiMzt6qlPfC6tu7Ah3DhhJy0mE
 Content-Type: multipart/mixed;
- boundary="------------E87B25597F9CB4AEB2114D8A"
+ boundary="------------0F5B31BAE14E271D71F849BD"
 Content-Language: en-US
 
 This is a multi-part message in MIME format.
---------------E87B25597F9CB4AEB2114D8A
+--------------0F5B31BAE14E271D71F849BD
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 
-On 03.09.21 18:05, Eduardo Habkost wrote:
-> On Fri, Sep 03, 2021 at 03:08:04PM +0200, Juergen Gross wrote:
->> In order to support high vcpu numbers per guest don't use on stack
->> vcpu bitmasks. As all those currently used bitmasks are not used in
->> functions subject to recursion it is fairly easy to replace them with
->> percpu bitmasks.
+On 03.09.21 21:48, Eduardo Habkost wrote:
+> On Fri, Sep 03, 2021 at 03:08:03PM +0200, Juergen Gross wrote:
+>> Today the maximum vcpu-id of a kvm guest's vcpu on x86 systems is set
+>> via a #define in a header file.
 >>
->> Disable preemption while such a bitmask is being used in order to
->> avoid double usage in case we'd switch cpus.
+>> In order to support higher vcpu-ids without generally increasing the
+>> memory consumption of guests on the host (some guest structures contai=
+n
+>> arrays sized by KVM_MAX_VCPU_ID) add a boot parameter for adding some
+>> bits to the vcpu-id. Additional bits are needed as the vcpu-id is
+>> constructed via bit-wise concatenation of socket-id, core-id, etc.
+>> As those ids maximum values are not always a power of 2, the vcpu-ids
+>> are sparse.
+>>
+>> The additional number of bits needed is basically the number of
+>> topology levels with a non-power-of-2 maximum value, excluding the top=
+
+>> most level.
+>>
+>> The default value of the new parameter will be to take the correct
+>> setting from the host's topology.
+>=20
+> Having the default depend on the host topology makes the host
+> behaviour unpredictable (which might be a problem when migrating
+> VMs from another host with a different topology).  Can't we just
+> default to 2?
+
+Okay, fine with me.
+
+>=20
+>>
+>> Calculating the maximum vcpu-id dynamically requires to allocate the
+>> arrays using KVM_MAX_VCPU_ID as the size dynamically.
+>>
+>> Signed-of-by: Juergen Gross <jgross@suse.com>
+>> ---
+>> V2:
+>> - switch to specifying additional bits (based on comment by Vitaly
+>>    Kuznetsov)
 >>
 >> Signed-off-by: Juergen Gross <jgross@suse.com>
+>> ---
+> [...]
+>>   #define KVM_MAX_VCPUS 288
+>>   #define KVM_SOFT_MAX_VCPUS 240
+>> -#define KVM_MAX_VCPU_ID 1023
+>> +#define KVM_MAX_VCPU_ID kvm_max_vcpu_id()
+> [...]
+>> +unsigned int kvm_max_vcpu_id(void)
+>> +{
+>> +	int n_bits =3D fls(KVM_MAX_VCPUS - 1);
+>> +
+>> +	if (vcpu_id_add_bits < -1 || vcpu_id_add_bits > (32 - n_bits)) {
+>> +		pr_err("Invalid value of vcpu_id_add_bits=3D%d parameter!\n",
+>> +		       vcpu_id_add_bits);
+>> +		vcpu_id_add_bits =3D -1;
+>> +	}
+>> +
+>> +	if (vcpu_id_add_bits >=3D 0) {
+>> +		n_bits +=3D vcpu_id_add_bits;
+>> +	} else {
+>> +		n_bits++;		/* One additional bit for core level. */
+>> +		if (topology_max_die_per_package() > 1)
+>> +			n_bits++;	/* One additional bit for die level. */
+>> +	}
+>> +
+>> +	if (!n_bits)
+>> +		n_bits =3D 1;
+>> +
+>> +	return (1U << n_bits) - 1;
 >=20
-> Note that there's another patch that will introduce another
-> KVM_MAX_VCPUS bitmap variable on the stack:
-> https://lore.kernel.org/lkml/20210827092516.1027264-7-vkuznets@redhat.c=
-om/
+> The largest possible VCPU ID is not KVM_MAX_VCPU_ID,
+> it's (KVM_MAX_VCPU_ID - 1).  This is enforced by
+> kvm_vm_ioctl_create_vcpu().
 >=20
-> Considering that the patch is a bug fix, should this series be
-> rebased on top of that?
->=20
+> That would mean KVM_MAX_VCPU_ID should be (1 << n_bits) instead
+> of ((1 << n_bits) - 1), wouldn't it?
 
-Yes, I can do that.
+Oh, indeed. I have been fooled by the IMO bad naming of this macro.
+
+The current value 1023 suggests it is not only me having been fooled.
+
+Shouldn't it be named "KVM_MAX_VCPU_IDS" instead?
 
 
 Juergen
 
---------------E87B25597F9CB4AEB2114D8A
+--------------0F5B31BAE14E271D71F849BD
 Content-Type: application/pgp-keys;
  name="OpenPGP_0xB0DE9DD628BF132F.asc"
 Content-Transfer-Encoding: quoted-printable
@@ -212,24 +278,24 @@ ZDn8R38=3D
 =3D2wuH
 -----END PGP PUBLIC KEY BLOCK-----
 
---------------E87B25597F9CB4AEB2114D8A--
+--------------0F5B31BAE14E271D71F849BD--
 
---cbFkSkIok7N03pcvI3gx1gEWuKKGU7SlM--
+--qU4uyZzhiMzt6qlPfC6tu7Ah3DhhJy0mE--
 
---d2J1dfCgefD1bn8ucNo28kAFebLZ7CdPn
+--qJYM4kX82J82dgMD9nuy8n4hbZ6zojjbg
 Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="OpenPGP_signature"
 
 -----BEGIN PGP SIGNATURE-----
 
-wsB5BAABCAAjFiEEhRJncuj2BJSl0Jf3sN6d1ii/Ey8FAmE1mnEFAwAAAAAACgkQsN6d1ii/Ey9C
-1Af+NQilka48ADqHdvZvSEs50TYI7wYRDbyxL4UI4Nou4aR4f0CrgQJ48MsCLW4AjAInf+5uT8PD
-kT0I65jULSx//zL5/Bq6A15ozhMyomt4eQXnQIi2HjRr358bqJ2NkXmuTNBixzSKhBrjTqM5fopp
-b+PjCo59LpDHEGtMcDwpVqWkyU8tmNEZRGWAzP8NAvJGr3YM4nggBpomuknVo11Vi2LvoLAcIoKt
-sjw4hSMOgV0lZaPazeDSXUa3pI9BDcirEQAxUnhuhHG3DNvomMS8FfL7j8NBeWUJjBB7cP1Qqo7V
-jpAJaEXKce/9raKleUg5aA2beDALa1xKEfJekH7LxQ==
-=Nz9v
+wsB5BAABCAAjFiEEhRJncuj2BJSl0Jf3sN6d1ii/Ey8FAmE1nSEFAwAAAAAACgkQsN6d1ii/Ey/F
+iwf+JakrFmIMZA1TmRtmVd91vNMvvhViqIM50lB0PwvHQil927rdUMhZt3zkycnFGG8cKZt9pr4s
+3slKFOOABizkHQPY+PxcZvkTqb08IhIoUN7aXcg4nPkTzqV7PCU7fpO8szHWNA8pcPIwWLF5KStK
+dNRVlhZcplKOXKdO6U2zK/cUrM0IkzcW4RSOmOI58VNgoO1RDC2h6ATx9llKqbw1nv0/s/31vbQ/
+2bhMMYd55xv+2tN8fqZXJ/1lalwOokXn5WlVmoet5nx779ZFSrl+Zi0H5DgmSJNO1iImbuf+KYCx
+sezN3deb7YtLXlhRe0WirXZv+6pzScmzbOHryDVQUA==
+=u0+B
 -----END PGP SIGNATURE-----
 
---d2J1dfCgefD1bn8ucNo28kAFebLZ7CdPn--
+--qJYM4kX82J82dgMD9nuy8n4hbZ6zojjbg--
