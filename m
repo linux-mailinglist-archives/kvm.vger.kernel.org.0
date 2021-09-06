@@ -2,69 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1F02B4019B3
-	for <lists+kvm@lfdr.de>; Mon,  6 Sep 2021 12:22:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AE72D4019CC
+	for <lists+kvm@lfdr.de>; Mon,  6 Sep 2021 12:29:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241931AbhIFKWv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Sep 2021 06:22:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:45803 "EHLO
+        id S241951AbhIFKaF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Sep 2021 06:30:05 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42942 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S241852AbhIFKWv (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 6 Sep 2021 06:22:51 -0400
+        by vger.kernel.org with ESMTP id S242023AbhIFK3W (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 6 Sep 2021 06:29:22 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630923706;
+        s=mimecast20190719; t=1630924097;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=6I/+jwkS4G/jaKLYt0NFvHjgSx5PJZJIsHfHPHUbyAg=;
-        b=B9ztA6Ig9/qQ3wUZoU7FFFqL8fGKtW7fMy3eeNOhOfOa/A4r0O1dWN0EWZxYfB9BZuKRTf
-        ch1/9q3y5Ph6KJzSmwRbFAe8+jL0dtNZxiEO17s3kCTAHlyuJbpivNlXEPUjLZt/pu82/6
-        itDZwOwjSuNw6E6lWhj+YywzLHuErgU=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-88-BScmMlU5NsurnJilUCeQbA-1; Mon, 06 Sep 2021 06:21:45 -0400
-X-MC-Unique: BScmMlU5NsurnJilUCeQbA-1
-Received: by mail-ej1-f70.google.com with SMTP id bi9-20020a170906a24900b005c74b30ff24so2138719ejb.5
-        for <kvm@vger.kernel.org>; Mon, 06 Sep 2021 03:21:44 -0700 (PDT)
+        bh=REmJl8s2nvMdTdbKRVVIcDfYVEbx2wjp9XTagCASYqs=;
+        b=M0Tzz4taVNiDQ7O9U0tpdW1QbeRJ9elAmkEpqslUOUXBdmGj3whd/+ybivfoD9GN1i2m4T
+        R5N7BcHNHfal9jq4A2i7oeL8XfzZ00iCopkW9hVuCjpWkVrzUftHACZQmahxOWuQhHKD1K
+        F5TqTn1xqMSPQBbP3rrsS+tIOWbMg7s=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-409-ZgRlki4fMT6G2BYxvyeeYg-1; Mon, 06 Sep 2021 06:28:16 -0400
+X-MC-Unique: ZgRlki4fMT6G2BYxvyeeYg-1
+Received: by mail-ed1-f71.google.com with SMTP id e6-20020a056402088600b003c73100e376so3330132edy.17
+        for <kvm@vger.kernel.org>; Mon, 06 Sep 2021 03:28:16 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=6I/+jwkS4G/jaKLYt0NFvHjgSx5PJZJIsHfHPHUbyAg=;
-        b=bGnhKCwn63e17TIrU8MlIzn/IKWnVvWd7bUeyCw2NzPcBCXVRQfDi9Ubcqc9MopJJ4
-         K5gFc4FOjJa47FJzE7dqYoAztrj+gOBSgeeMipdzcXwkyFgGoLs1Naq56Erh5Hx095Rn
-         BBAcBP/bTb3mLKlBgscGXuEcaEN4/QUfWhNDL2YD3X5Qk7l+hN6/kZW1kL6gKNpYGLuT
-         UZNw9sTDQfDpCxP588SVXHR+CNlvw9WIlh4J7X3UgX/pxow6PndhzG7VV9aVYKopxTX+
-         cfMYJVlhWSZdSzAZLeEhc5aAvXl7McNvWgMaOs68ogep/yfxT5HL7WQx75JPfKwilMHE
-         meng==
-X-Gm-Message-State: AOAM530fcMUcjTB+icBHvPcVsHV1R9+iZ+ls1qFhQLiEsexG8wfCjmHk
-        YB5hQVF+kHE+HCP8j9j2K1jal72D5ntau8AH8OhWUIvwm6CjjbWlxgYP6B8zUnG8Q+IadXDoYpK
-        BEINXSPE3GMR2
-X-Received: by 2002:a17:907:7601:: with SMTP id jx1mr12682604ejc.69.1630923703989;
-        Mon, 06 Sep 2021 03:21:43 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxIfg38qh5MAYI2aL/o0JVdU/uV5GNkIIo8KH69KQ+gmjTcd3VL5L5ABWRZT4YQzrSiru1xPw==
-X-Received: by 2002:a17:907:7601:: with SMTP id jx1mr12682591ejc.69.1630923703795;
-        Mon, 06 Sep 2021 03:21:43 -0700 (PDT)
+        bh=REmJl8s2nvMdTdbKRVVIcDfYVEbx2wjp9XTagCASYqs=;
+        b=LwIlqYkEQnbdP+CprAW0mMoExwWhN8ipGGgLFwzMJgOUAeL+dKlMN2kuw/uo0FUr6N
+         jFLen2k/lbIm/mCFHcYpIbF0PbOmHypCWiPjuOg5er/DzbFtzaZSXBzEbl9XSe9S+ZIJ
+         vYv5voeHsznhBnW2m72DwUavNfIut8W6S/DjG0j2mMZnjKikWK9CvAksJHOFAwOXc/8o
+         igQF+xAek5nzoYJkBlMNafyvw9BNLtFscu1oc74YSnHuwMOr/9VrddLPyFgHl8Enu9tQ
+         w/kwKtONsxMoWUlmVBm6jObd5eijC+TH7i0Dy3F9QST141MKhCFznjLUMZ+zQe0TCpzI
+         oCsQ==
+X-Gm-Message-State: AOAM533bR7ImEL6H/y2qaAE6LsK5H494aGCERdlAjZ2ZevJcYbhq8RuR
+        JYaZDvBMXtBeTGV89xxzMz5sGQB/fWKVz3kkfDYBieWvamjJVqI49Vj6l0GGOCclJSmevO4tPGN
+        chAgCPbgjLCbb
+X-Received: by 2002:a17:906:1d19:: with SMTP id n25mr13007269ejh.11.1630924095432;
+        Mon, 06 Sep 2021 03:28:15 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz7T8yPC7CUEnqP8Q5KGyfYQsTy7fdIFm0w0WX7OHu/0lN1pf6u81fhziGWQVchhgc+jbFRRA==
+X-Received: by 2002:a17:906:1d19:: with SMTP id n25mr13007231ejh.11.1630924095200;
+        Mon, 06 Sep 2021 03:28:15 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id s23sm4327693eds.12.2021.09.06.03.21.42
+        by smtp.gmail.com with ESMTPSA id h7sm4431526edr.4.2021.09.06.03.28.13
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 06 Sep 2021 03:21:43 -0700 (PDT)
-Subject: Re: [PATCH] KVM: Remove unnecessary export of
- kvm_{inc,dec}_notifier_count()
-To:     Maxim Levitsky <mlevitsk@redhat.com>,
+        Mon, 06 Sep 2021 03:28:14 -0700 (PDT)
+Subject: Re: [PATCH 1/5] KVM: rseq: Update rseq when processing NOTIFY_RESUME
+ on xfer to KVM guest
+To:     Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
         Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20210902175951.1387989-1-seanjc@google.com>
- <f539e833bd7da4800612f8ae4bdffcb1db2f8684.camel@redhat.com>
+Cc:     "Russell King, ARM Linux" <linux@armlinux.org.uk>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Guo Ren <guoren@kernel.org>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Heiko Carstens <hca@linux.ibm.com>, gor <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Oleg Nesterov <oleg@redhat.com>, rostedt <rostedt@goodmis.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        paulmck <paulmck@kernel.org>, Boqun Feng <boqun.feng@gmail.com>,
+        shuah <shuah@kernel.org>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        linux-csky <linux-csky@vger.kernel.org>,
+        linux-mips <linux-mips@vger.kernel.org>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>,
+        linux-kselftest <linux-kselftest@vger.kernel.org>,
+        Peter Foley <pefoley@google.com>,
+        Shakeel Butt <shakeelb@google.com>,
+        Ben Gardon <bgardon@google.com>
+References: <20210818001210.4073390-1-seanjc@google.com>
+ <20210818001210.4073390-2-seanjc@google.com>
+ <1673583543.19718.1629409152244.JavaMail.zimbra@efficios.com>
+ <YR7tzZ98XC6OV2vu@google.com>
+ <1872633041.20290.1629485463253.JavaMail.zimbra@efficios.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <79dcce75-802d-5193-6200-c52f3b1ff90d@redhat.com>
-Date:   Mon, 6 Sep 2021 12:21:41 +0200
+Message-ID: <425456d3-4772-2a1b-9cf3-a5b750b95c2e@redhat.com>
+Date:   Mon, 6 Sep 2021 12:28:12 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <f539e833bd7da4800612f8ae4bdffcb1db2f8684.camel@redhat.com>
+In-Reply-To: <1872633041.20290.1629485463253.JavaMail.zimbra@efficios.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -72,52 +101,22 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05/09/21 09:12, Maxim Levitsky wrote:
-> On Thu, 2021-09-02 at 10:59 -0700, Sean Christopherson wrote:
->> Don't export KVM's MMU notifier count helpers, under no circumstance
->> should any downstream module, including x86's vendor code, have a
->> legitimate reason to piggyback KVM's MMU notifier logic.  E.g in the x86
->> case, only KVM's MMU should be elevating the notifier count, and that
->> code is always built into the core kvm.ko module.
->>
->> Fixes: edb298c663fc ("KVM: x86/mmu: bump mmu notifier count in kvm_zap_gfn_range")
->> Cc: Maxim Levitsky <mlevitsk@redhat.com>
->> Signed-off-by: Sean Christopherson <seanjc@google.com>
->> ---
->>   virt/kvm/kvm_main.c | 3 ---
->>   1 file changed, 3 deletions(-)
->>
->> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
->> index 3e67c93ca403..140c7d311021 100644
->> --- a/virt/kvm/kvm_main.c
->> +++ b/virt/kvm/kvm_main.c
->> @@ -638,7 +638,6 @@ void kvm_inc_notifier_count(struct kvm *kvm, unsigned long start,
->>   			max(kvm->mmu_notifier_range_end, end);
->>   	}
->>   }
->> -EXPORT_SYMBOL_GPL(kvm_inc_notifier_count);
->>   
->>   static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
->>   					const struct mmu_notifier_range *range)
->> @@ -690,8 +689,6 @@ void kvm_dec_notifier_count(struct kvm *kvm, unsigned long start,
->>   	 */
->>   	kvm->mmu_notifier_count--;
->>   }
->> -EXPORT_SYMBOL_GPL(kvm_dec_notifier_count);
->> -
->>   
->>   static void kvm_mmu_notifier_invalidate_range_end(struct mmu_notifier *mn,
->>   					const struct mmu_notifier_range *range)
+On 20/08/21 20:51, Mathieu Desnoyers wrote:
+>> Ah, or is it the case that rseq_cs is non-NULL if and only if userspace is in an
+>> rseq critical section, and because syscalls in critical sections are illegal, by
+>> definition clearing rseq_cs is a nop unless userspace is misbehaving.
+> Not quite, as I described above. But we want it to stay set so the CONFIG_DEBUG_RSEQ
+> code executed when returning from ioctl to userspace will be able to validate that
+> it is not nested within a rseq critical section.
 > 
-> Ah, I somehow thought when I wrote this that those two will be used by kvm_amd.
-> 
-> Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-> 
-> Best regards,
-> 	Maxim Levitsky
-> 
+>> If that's true, what about explicitly checking that at NOTIFY_RESUME?  Or is it
+>> not worth the extra code to detect an error that will likely be caught anyways?
+> The error will indeed already be caught on return from ioctl to userspace, so I
+> don't see any added value in duplicating this check.
 
-Queued, thanks.
+Sean, can you send a v2 (even for this patch only would be okay)?
+
+Thanks,
 
 Paolo
 
