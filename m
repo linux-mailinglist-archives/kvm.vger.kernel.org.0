@@ -2,271 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C4C6C401A12
-	for <lists+kvm@lfdr.de>; Mon,  6 Sep 2021 12:44:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 800D4401A3A
+	for <lists+kvm@lfdr.de>; Mon,  6 Sep 2021 12:58:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234905AbhIFKog (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Sep 2021 06:44:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42406 "EHLO
+        id S236042AbhIFK5x (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Sep 2021 06:57:53 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:37248 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229913AbhIFKod (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 6 Sep 2021 06:44:33 -0400
+        by vger.kernel.org with ESMTP id S231173AbhIFK5w (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 6 Sep 2021 06:57:52 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630925006;
+        s=mimecast20190719; t=1630925807;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Ul4qFH3gT696MqPqcmDxIOKc6JmUkzaJFABQhow9EWg=;
-        b=jS/4G4hsSU7TeVPlCE0Ti6JQdICkGYroM73RM/9qW4a7z76rpZ0wkyDL8KuKuQ3qair+4f
-        IlfyXpqlRCz0RxQQZtQGlxk1uVTIR5oun8JNUSsIF59ovWac6PsA9sdrFYvLaBtmVtvxDY
-        68nyTjuDh/EPGZY7cWwzhcO6nvqSTZ4=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-57-sc_tzhbnOfybySDW1WAzqQ-1; Mon, 06 Sep 2021 06:43:25 -0400
-X-MC-Unique: sc_tzhbnOfybySDW1WAzqQ-1
-Received: by mail-wm1-f72.google.com with SMTP id x125-20020a1c3183000000b002e73f079eefso3770197wmx.0
-        for <kvm@vger.kernel.org>; Mon, 06 Sep 2021 03:43:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Ul4qFH3gT696MqPqcmDxIOKc6JmUkzaJFABQhow9EWg=;
-        b=kn6vJIyygx4+zjwTtSHfPcjye/bLdNF/Y4P8OTymehq+CbC28QT5Z0IIwLMlOQBRaS
-         ytt5wfJdSZjpJfgkkUpb4Ey2pIH1u7pz32symKkAjpoiXdKnUY/ab4r/eS989Rx//OlK
-         4N71QJFbib2zrrScT86SsWxGreBbgw4+Dv/3467ntiLeNawIiJw7Ki+7kn5u+PzfvvLn
-         epaYZ4hm7+usebda67HCvZJoxijGMPTrFV1cVWV5L8RNPqFsWqFzx+jFiVe8Aa2iuHxK
-         7HrEX2pcd9t6yJpcCwGDl4tDN3WedA8N7gHDkrdUwHtLZOpNlLs+mQh9PdEMps7ng1zX
-         fh+Q==
-X-Gm-Message-State: AOAM533uAPAAbD3HVVScjbnFd7pLWv2fmw6eJplBckQRFL1sXUJPNLMJ
-        z/raLBugbO51Dn6akxxgpSvY0BeZHsUokQ+F+k2O8K6+OGoR8CB4r4Etu3lj11iD2dR9jBLKtE9
-        iPYZUW4Imt8S2
-X-Received: by 2002:a05:600c:3543:: with SMTP id i3mr10798046wmq.2.1630925004176;
-        Mon, 06 Sep 2021 03:43:24 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzq0y7NDDKEVc4QMn/xSXfsLrateDW5EX086OFKHb0Me/zK5A7xaZmIg1gdA2WViHz/LIzfeQ==
-X-Received: by 2002:a05:600c:3543:: with SMTP id i3mr10798024wmq.2.1630925003942;
-        Mon, 06 Sep 2021 03:43:23 -0700 (PDT)
-Received: from redhat.com ([2.55.131.183])
-        by smtp.gmail.com with ESMTPSA id g5sm7424960wrq.80.2021.09.06.03.43.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Sep 2021 03:43:22 -0700 (PDT)
-Date:   Mon, 6 Sep 2021 06:43:15 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Yongji Xie <xieyongji@bytedance.com>
-Cc:     Jason Wang <jasowang@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Parav Pandit <parav@nvidia.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Christian Brauner <christian.brauner@canonical.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        Mika =?iso-8859-1?Q?Penttil=E4?= <mika.penttila@nextfour.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>, joro@8bytes.org,
-        Greg KH <gregkh@linuxfoundation.org>,
-        He Zhe <zhe.he@windriver.com>,
-        Liu Xiaodong <xiaodong.liu@intel.com>,
-        Joe Perches <joe@perches.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Will Deacon <will@kernel.org>,
-        John Garry <john.garry@huawei.com>, songmuchun@bytedance.com,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        netdev@vger.kernel.org, kvm <kvm@vger.kernel.org>,
-        linux-fsdevel@vger.kernel.org, iommu@lists.linux-foundation.org,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v13 05/13] vdpa: Add reset callback in vdpa_config_ops
-Message-ID: <20210906053210-mutt-send-email-mst@kernel.org>
-References: <20210831103634.33-1-xieyongji@bytedance.com>
- <20210831103634.33-6-xieyongji@bytedance.com>
- <20210906015524-mutt-send-email-mst@kernel.org>
- <CACycT3v4ZVnh7DGe_RtAOx4Vvau0km=HWyCM=KzKhD+ahYKafQ@mail.gmail.com>
- <20210906023131-mutt-send-email-mst@kernel.org>
- <CACycT3ssC1bhNzY9Pk=LPvKjMrFFavTfCKTJtR2XEiVYqDxT1Q@mail.gmail.com>
- <20210906035338-mutt-send-email-mst@kernel.org>
- <CACycT3vQHRsJ_j5f4T9RoB4MQzBoYO5ts3egVe9K6TcCVfLOFQ@mail.gmail.com>
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=RK2Ni9Cbo/+wilrr5SKGs0bqB6QPRnMOhzJVRr0kJ8Y=;
+        b=e4DWBZs+wjfDbLjsZfCzBdB0XpLjrRk4/nRSksZZSaTnsb+qOPbExRgLLFsoYXa4gFNO3E
+        AsObtLW7sVJwGxZIh/h3Xn72NFXTZDquA3YJzg7nM6P7jfxOaNxhAmfGyLmWHu65zmbq2u
+        LelzM8Wf3Az6gRebn9mT6/kIj43u3Ic=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-472-uZJrnWC_Prqlk6lZB4ZTgA-1; Mon, 06 Sep 2021 06:56:46 -0400
+X-MC-Unique: uZJrnWC_Prqlk6lZB4ZTgA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 92BB2107ACE8;
+        Mon,  6 Sep 2021 10:56:45 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0ADBD18649;
+        Mon,  6 Sep 2021 10:56:44 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     seanjc@google.com, kernel test robot <lkp@intel.com>
+Subject: [PATCH] KVM: MMU: mark role_regs and role accessors as maybe unused
+Date:   Mon,  6 Sep 2021 06:56:44 -0400
+Message-Id: <20210906105644.3686909-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CACycT3vQHRsJ_j5f4T9RoB4MQzBoYO5ts3egVe9K6TcCVfLOFQ@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 06, 2021 at 04:45:55PM +0800, Yongji Xie wrote:
-> On Mon, Sep 6, 2021 at 4:01 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> >
-> > On Mon, Sep 06, 2021 at 03:06:44PM +0800, Yongji Xie wrote:
-> > > On Mon, Sep 6, 2021 at 2:37 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> > > >
-> > > > On Mon, Sep 06, 2021 at 02:09:25PM +0800, Yongji Xie wrote:
-> > > > > On Mon, Sep 6, 2021 at 1:56 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> > > > > >
-> > > > > > On Tue, Aug 31, 2021 at 06:36:26PM +0800, Xie Yongji wrote:
-> > > > > > > This adds a new callback to support device specific reset
-> > > > > > > behavior. The vdpa bus driver will call the reset function
-> > > > > > > instead of setting status to zero during resetting.
-> > > > > > >
-> > > > > > > Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
-> > > > > >
-> > > > > >
-> > > > > > This does gloss over a significant change though:
-> > > > > >
-> > > > > >
-> > > > > > > ---
-> > > > > > > @@ -348,12 +352,12 @@ static inline struct device *vdpa_get_dma_dev(struct vdpa_device *vdev)
-> > > > > > >       return vdev->dma_dev;
-> > > > > > >  }
-> > > > > > >
-> > > > > > > -static inline void vdpa_reset(struct vdpa_device *vdev)
-> > > > > > > +static inline int vdpa_reset(struct vdpa_device *vdev)
-> > > > > > >  {
-> > > > > > >       const struct vdpa_config_ops *ops = vdev->config;
-> > > > > > >
-> > > > > > >       vdev->features_valid = false;
-> > > > > > > -     ops->set_status(vdev, 0);
-> > > > > > > +     return ops->reset(vdev);
-> > > > > > >  }
-> > > > > > >
-> > > > > > >  static inline int vdpa_set_features(struct vdpa_device *vdev, u64 features)
-> > > > > >
-> > > > > >
-> > > > > > Unfortunately this breaks virtio_vdpa:
-> > > > > >
-> > > > > >
-> > > > > > static void virtio_vdpa_reset(struct virtio_device *vdev)
-> > > > > > {
-> > > > > >         struct vdpa_device *vdpa = vd_get_vdpa(vdev);
-> > > > > >
-> > > > > >         vdpa_reset(vdpa);
-> > > > > > }
-> > > > > >
-> > > > > >
-> > > > > > and there's no easy way to fix this, kernel can't recover
-> > > > > > from a reset failure e.g. during driver unbind.
-> > > > > >
-> > > > >
-> > > > > Yes, but it should be safe with the protection of software IOTLB even
-> > > > > if the reset() fails during driver unbind.
-> > > > >
-> > > > > Thanks,
-> > > > > Yongji
-> > > >
-> > > > Hmm. I don't see it.
-> > > > What exactly will happen? What prevents device from poking at
-> > > > memory after reset? Note that dma unmap in e.g. del_vqs happens
-> > > > too late.
-> > >
-> > > But I didn't see any problems with touching the memory for virtqueues.
-> >
-> > Drivers make the assumption that after reset returns no new
-> > buffers will be consumed. For example a bunch of drivers
-> > call virtqueue_detach_unused_buf.
-> 
-> I'm not sure if I get your point. But it looks like
-> virtqueue_detach_unused_buf() will check the driver's metadata first
-> rather than read the memory from virtqueue.
-> 
-> > I can't say whether block makes this assumption anywhere.
-> > Needs careful auditing.
-> >
-> > > The memory should not be freed after dma unmap?
-> >
-> > But unmap does not happen until after the reset.
-> >
-> 
-> I mean the memory is totally allocated and controlled by the VDUSE
-> driver. The VDUSE driver will not return them to the buddy system
-> unless userspace unmap it.
+It is reasonable for these functions to be used only in some configurations,
+for example only if the host is 64-bits (and therefore supports 64-bit
+guests).  It is also reasonable to keep the role_regs and role accessors
+in sync even though some of the accessors may be used only for one of the
+two sets (as is the case currently for CR4.LA57)..
 
-Right. But what stops VDUSE from poking at memory after
-reset failed?
+Because clang reports warnings for unused inlines declared in a .c file,
+mark both sets of accessors as __maybe_unused.
 
+Reported-by: kernel test robot <lkp@intel.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/x86/kvm/mmu/mmu.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-
-> >
-> > > And the memory for the bounce buffer should also be safe to be
-> > > accessed by userspace in this case.
-> > >
-> > > > And what about e.g. interrupts?
-> > > > E.g. we have this:
-> > > >
-> > > >         /* Virtqueues are stopped, nothing can use vblk->vdev anymore. */
-> > > >         vblk->vdev = NULL;
-> > > >
-> > > > and this is no longer true at this point.
-> > > >
-> > >
-> > > You're right. But I didn't see where the interrupt handler will use
-> > > the vblk->vdev.
-> >
-> > static void virtblk_done(struct virtqueue *vq)
-> > {
-> >         struct virtio_blk *vblk = vq->vdev->priv;
-> >
-> > vq->vdev is the same as vblk->vdev.
-> >
-> 
-> We will test the vq->ready (will be set to false in del_vqs()) before
-> injecting an interrupt in the VDUSE driver. So it should be OK?
-
-Maybe not ...  It's not designed for such asynchronous access, so e.g.
-there's no locking or memory ordering around accesses.
-
-
-> >
-> > > So it seems to be not too late to fix it:
-> > >
-> > > diff --git a/drivers/vdpa/vdpa_user/vduse_dev.c
-> > > b/drivers/vdpa/vdpa_user/vduse_dev.c
-> > > index 5c25ff6483ad..ea41a7389a26 100644
-> > > --- a/drivers/vdpa/vdpa_user/vduse_dev.c
-> > > +++ b/drivers/vdpa/vdpa_user/vduse_dev.c
-> > > @@ -665,13 +665,13 @@ static void vduse_vdpa_set_config(struct
-> > > vdpa_device *vdpa, unsigned int offset,
-> > >  static int vduse_vdpa_reset(struct vdpa_device *vdpa)
-> > >  {
-> > >         struct vduse_dev *dev = vdpa_to_vduse(vdpa);
-> > > +       int ret;
-> > >
-> > > -       if (vduse_dev_set_status(dev, 0))
-> > > -               return -EIO;
-> > > +       ret = vduse_dev_set_status(dev, 0);
-> > >
-> > >         vduse_dev_reset(dev);
-> > >
-> > > -       return 0;
-> > > +       return ret;
-> > >  }
-> > >
-> > >  static u32 vduse_vdpa_get_generation(struct vdpa_device *vdpa)
-> > >
-> > > Thanks,
-> > > Yongji
-> >
-> > Needs some comments to explain why it's done like this.
-> >
-> 
-> This is used to make sure the userspace can't not inject the interrupt
-> any more after reset. The vduse_dev_reset() will clear the interrupt
-> callback and flush the irq kworker.
-> 
-> > BTW device is generally wedged at this point right?
-> > E.g. if reset during initialization fails, userspace
-> > will still get the reset at some later point and be
-> > confused ...
-> >
-> 
-> Sorry, I don't get why userspace will get the reset at some later point?
-> 
-> Thanks,
-> Yongji
-
-I am generally a bit confused about how does reset work with vduse.
-We clearly want device to get back to its original state.
-How is that supposed to be achieved?
-
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 9b0cdec8b62d..2d7e61122af8 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -204,7 +204,7 @@ struct kvm_mmu_role_regs {
+  * the single source of truth for the MMU's state.
+  */
+ #define BUILD_MMU_ROLE_REGS_ACCESSOR(reg, name, flag)			\
+-static inline bool ____is_##reg##_##name(struct kvm_mmu_role_regs *regs)\
++static inline bool __maybe_unused ____is_##reg##_##name(struct kvm_mmu_role_regs *regs)\
+ {									\
+ 	return !!(regs->reg & flag);					\
+ }
+@@ -226,7 +226,7 @@ BUILD_MMU_ROLE_REGS_ACCESSOR(efer, lma, EFER_LMA);
+  * and the vCPU may be incorrect/irrelevant.
+  */
+ #define BUILD_MMU_ROLE_ACCESSOR(base_or_ext, reg, name)		\
+-static inline bool is_##reg##_##name(struct kvm_mmu *mmu)	\
++static inline bool __maybe_unused is_##reg##_##name(struct kvm_mmu *mmu)	\
+ {								\
+ 	return !!(mmu->mmu_role. base_or_ext . reg##_##name);	\
+ }
 -- 
-MST
+2.27.0
 
