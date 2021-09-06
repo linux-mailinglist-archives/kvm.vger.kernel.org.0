@@ -2,103 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 71295401603
-	for <lists+kvm@lfdr.de>; Mon,  6 Sep 2021 07:52:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2119E401615
+	for <lists+kvm@lfdr.de>; Mon,  6 Sep 2021 07:56:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238866AbhIFFhH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Sep 2021 01:37:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52640 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236124AbhIFFhG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Sep 2021 01:37:06 -0400
-Received: from mail-io1-xd31.google.com (mail-io1-xd31.google.com [IPv6:2607:f8b0:4864:20::d31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D5FFC061575;
-        Sun,  5 Sep 2021 22:36:02 -0700 (PDT)
-Received: by mail-io1-xd31.google.com with SMTP id a13so7238725iol.5;
-        Sun, 05 Sep 2021 22:36:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=SueHKYkxrfnV7M4ec6sVbN4VWy4YIBLTLnDQ1kZYr3w=;
-        b=BLhDr5XMVFBQtj2pSsEY10kwQUjdmVv63WfkUbfpCb9PoPRwe6fUD7VTa8g7XDwXj7
-         KTmYQkpYobuIaf8BxeHLO0cUTQspfB0m0TisdZRugGrq4n006f8SIW2u8heo2C9YwP7o
-         FNLWCvcAe2+Qyvi/kFuMArdetwAUuw3UT8YdeIRQUWgXiTdGG2QY2CHJiE+N9KX+33h5
-         ptaeF1wVb6m3zYPWbQre2QDlJsvgbT+i4PyrOb0IxVZA/HqVwAJiAK4idy+hgMlfzXwp
-         bsr+sd0PcsJm8Gznc8XxpBhBzIKA9wXkFft8w+O4443BPitt9xTu5JQQBvWgvafz801y
-         uAag==
+        id S238796AbhIFF4C (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Sep 2021 01:56:02 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:27920 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229475AbhIFF4B (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 6 Sep 2021 01:56:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1630907696;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=uXUj74/nW7Dop13kd56Tk5oKTffqICUe0M10X4WaPl4=;
+        b=GUdZ1eZQlzCOGh1NwV8LtGH2T8rzYVbjGWgYpiIJXoRpQ92bQe12hhNowOqoFXtPMxzW5u
+        aP3PYHxyAmwSjUySiwvrIceX1TPdj2cz/H7djZxQi1eHPdnARmD4QnZmPJUGR8BF2LTKWC
+        5MAZc/xWES7JWGitNVqcR86RsKXi2zg=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-46-IUWy8nRbMVOWvM3WB9cROg-1; Mon, 06 Sep 2021 01:54:55 -0400
+X-MC-Unique: IUWy8nRbMVOWvM3WB9cROg-1
+Received: by mail-wr1-f71.google.com with SMTP id n18-20020adfe792000000b00156ae576abdso848780wrm.9
+        for <kvm@vger.kernel.org>; Sun, 05 Sep 2021 22:54:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=SueHKYkxrfnV7M4ec6sVbN4VWy4YIBLTLnDQ1kZYr3w=;
-        b=SwY5ulvHN/ygWnPaxLDdj3jJ/QD10QfZt+DfCv1p+zpHkzayDyByj5xgAM9x/+ecvs
-         ZByJjvRqSEG9xYG1LqPpEk1NoalBCZNCon9R/+jzRzCYSTGTBaYKDFV72dVulpVD7VSZ
-         MJMK4/GHbF1ZzCfampvDa73AMbG1KfD/K12JXnE7qtS0CcM4Zzqh40fhA06RzkjJw7gJ
-         6uvH+z/98JMFtqtYNb/4Q7JATH3cqizj1x/3jEMGSit75i4gPK1vzV5h3DNjXj9J1GSM
-         zJOPpJLzdsZdFpGmUA0GXVLmS1rjxJOjF9528h+RXzA5q9u/cIzJIc8vFCFH8083/vzo
-         X4Ow==
-X-Gm-Message-State: AOAM5332jpvr6cVoE2IHP9PWxmgZipzZCQN9PYg8ODE3utDnfa+IW8e4
-        hlBMZCampEVybUJB+5zTGmm1OJ9hiqc8j+8u0h+UDWRu3OA=
-X-Google-Smtp-Source: ABdhPJwWGsa8Mbr0GhlJTm89mecRNOpmMG9dT703P5euTuQR4V+0TUGa0YzJae1MbtSD8MzrnZtn4SDkgo+gCf2UuYg=
-X-Received: by 2002:a6b:3f02:: with SMTP id m2mr7734264ioa.136.1630906561896;
- Sun, 05 Sep 2021 22:36:01 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=uXUj74/nW7Dop13kd56Tk5oKTffqICUe0M10X4WaPl4=;
+        b=o3HeEbekB31k916jChlt3rHLBb1TEmM8cB+oYbB4zZKpIzSwdA19yJozC3db5ORtpr
+         3fusX8utQTnpX+IuFb6P9+Yf7hjsLfHgmsmY5EAfn4I2Dztb7GrguA2KZXYpXsXuvmlX
+         FZc23H9JVbzjxPja/l7Y6pomUx2yNXVFiZ9y8bogK6NVvXfRXPLuJeieS7awCedSFO23
+         7dNO+ptQOrXbWRNrqUxUY9U0GF8p+YBE/QlQlSqAmEFKqQv16U0i1G+W+qZpiLgxLeNG
+         2B8iRkqYjyy0DBkXhwSlLp+uzkQVJ84OdwQx3jra448X9lt4aPa5Qibf0Q8qrZszavNm
+         RNkQ==
+X-Gm-Message-State: AOAM531HP5QchBuKUBoGdfHFhUIx6icuVu0NuEJFKwmhV+fkRanQMUnh
+        7oN2d82R8SdYk6bhM5sC/BkRF42nljrmcGKicL+RJ2/vKaEvq05etRbSE03VZQzAItWkRSC9DR+
+        Jq5rcBpwWrr1W
+X-Received: by 2002:adf:c14c:: with SMTP id w12mr11478519wre.115.1630907694586;
+        Sun, 05 Sep 2021 22:54:54 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzR1O2bgM/VI9yvbWaSh3BRtvaI+DJ+X6rHFaklEn67szHR3xlYEE2NCPwCA7NsX4rJPFqdkg==
+X-Received: by 2002:adf:c14c:: with SMTP id w12mr11478480wre.115.1630907694360;
+        Sun, 05 Sep 2021 22:54:54 -0700 (PDT)
+Received: from redhat.com ([2.55.131.183])
+        by smtp.gmail.com with ESMTPSA id h8sm6166143wmb.35.2021.09.05.22.54.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 05 Sep 2021 22:54:53 -0700 (PDT)
+Date:   Mon, 6 Sep 2021 01:54:46 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Xie Yongji <xieyongji@bytedance.com>
+Cc:     jasowang@redhat.com, stefanha@redhat.com, sgarzare@redhat.com,
+        parav@nvidia.com, hch@infradead.org,
+        christian.brauner@canonical.com, rdunlap@infradead.org,
+        willy@infradead.org, viro@zeniv.linux.org.uk, axboe@kernel.dk,
+        bcrl@kvack.org, corbet@lwn.net, mika.penttila@nextfour.com,
+        dan.carpenter@oracle.com, joro@8bytes.org,
+        gregkh@linuxfoundation.org, zhe.he@windriver.com,
+        xiaodong.liu@intel.com, joe@perches.com, robin.murphy@arm.com,
+        will@kernel.org, john.garry@huawei.com, songmuchun@bytedance.com,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v12 05/13] vdpa: Add reset callback in vdpa_config_ops
+Message-ID: <20210906015243-mutt-send-email-mst@kernel.org>
+References: <20210830141737.181-1-xieyongji@bytedance.com>
+ <20210830141737.181-6-xieyongji@bytedance.com>
 MIME-Version: 1.0
-References: <20210905085717.7427-1-mgurtovoy@nvidia.com>
-In-Reply-To: <20210905085717.7427-1-mgurtovoy@nvidia.com>
-From:   Pankaj Gupta <pankaj.gupta.linux@gmail.com>
-Date:   Mon, 6 Sep 2021 07:35:51 +0200
-Message-ID: <CAM9Jb+ii_YthttHt7Jbs337zzJ-0FRU6LtjXwOUmPzfXGDDKgQ@mail.gmail.com>
-Subject: Re: [PATCH v2 1/1] virtio-blk: remove unneeded "likely" statements
-To:     Max Gurtovoy <mgurtovoy@nvidia.com>
-Cc:     "Michael S . Tsirkin" <mst@redhat.com>,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210830141737.181-6-xieyongji@bytedance.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> Usually we use "likely/unlikely" to optimize the fast path. Remove
-> redundant "likely/unlikely" statements in the control path to simplify
-> the code and make it easier to read.
->
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-> Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
-> ---
->
-> changes from v1:
->  - added "Reviewed-by" (Stefan)
->  - commit description update (Stefan)
->
-> ---
->  drivers/block/virtio_blk.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> index afb37aac09e8..e574fbf5e6df 100644
-> --- a/drivers/block/virtio_blk.c
-> +++ b/drivers/block/virtio_blk.c
-> @@ -765,7 +765,7 @@ static int virtblk_probe(struct virtio_device *vdev)
->                 goto out_free_vblk;
->
->         /* Default queue sizing is to fill the ring. */
-> -       if (likely(!virtblk_queue_depth)) {
-> +       if (!virtblk_queue_depth) {
->                 queue_depth = vblk->vqs[0].vq->num_free;
->                 /* ... but without indirect descs, we use 2 descs per req */
->                 if (!virtio_has_feature(vdev, VIRTIO_RING_F_INDIRECT_DESC))
-> @@ -839,7 +839,7 @@ static int virtblk_probe(struct virtio_device *vdev)
->         else
->                 blk_size = queue_logical_block_size(q);
->
-> -       if (unlikely(blk_size < SECTOR_SIZE || blk_size > PAGE_SIZE)) {
-> +       if (blk_size < SECTOR_SIZE || blk_size > PAGE_SIZE) {
->                 dev_err(&vdev->dev,
->                         "block size is changed unexpectedly, now is %u\n",
->                         blk_size);
-> --
+On Mon, Aug 30, 2021 at 10:17:29PM +0800, Xie Yongji wrote:
+> This adds a new callback to support device specific reset
+> behavior. The vdpa bus driver will call the reset function
+> instead of setting status to zero during resetting.
+> 
+> Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
+
+This does gloss over a significant change though:
+
+> @@ -348,12 +352,12 @@ static inline struct device *vdpa_get_dma_dev(struct vdpa_device *vdev)
+>  	return vdev->dma_dev;
+>  }
+>  
+> -static inline void vdpa_reset(struct vdpa_device *vdev)
+> +static inline int vdpa_reset(struct vdpa_device *vdev)
+>  {
+>  	const struct vdpa_config_ops *ops = vdev->config;
+>  
+>  	vdev->features_valid = false;
+> -	ops->set_status(vdev, 0);
+> +	return ops->reset(vdev);
+>  }
+>  
+>  static inline int vdpa_set_features(struct vdpa_device *vdev, u64 features)
+
+Unfortunately this breaks virtio_vdpa:
 
 
-Reviewed-by: Pankaj Gupta <pankaj.gupta@ionos.com>
+static void virtio_vdpa_reset(struct virtio_device *vdev)
+{
+        struct vdpa_device *vdpa = vd_get_vdpa(vdev);
+
+        vdpa_reset(vdpa);
+}
+
+
+and there's no easy way to fix this, kernel can't recover
+from a reset failure e.g. during driver unbind.
+
+Find a way to disable virtio_vdpa for now?
+
+> -- 
+> 2.11.0
+
