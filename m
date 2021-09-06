@@ -2,103 +2,182 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 713704020A0
-	for <lists+kvm@lfdr.de>; Mon,  6 Sep 2021 22:10:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 96D614020FE
+	for <lists+kvm@lfdr.de>; Mon,  6 Sep 2021 23:03:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236274AbhIFUGj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Sep 2021 16:06:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52306 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229717AbhIFUGi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Sep 2021 16:06:38 -0400
-Received: from mail-yb1-xb2a.google.com (mail-yb1-xb2a.google.com [IPv6:2607:f8b0:4864:20::b2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F473C061575
-        for <kvm@vger.kernel.org>; Mon,  6 Sep 2021 13:05:33 -0700 (PDT)
-Received: by mail-yb1-xb2a.google.com with SMTP id q70so15412854ybg.11
-        for <kvm@vger.kernel.org>; Mon, 06 Sep 2021 13:05:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Lm4jdiDuWbqAv4O7YJ6wZ0vVIEpUpOQJ86d4UA/6SjA=;
-        b=I5fTuvgnT9HxQ8xV0WPigXQzCZJUNgH1XdAnBxrfTTXtABBsN58Equ7pN+lofptQr5
-         v8AJZEUyQ5CEVJ1PuLnXmMsIggU6WfCOxXtAskYJS3GsrojX31Qqk/lQu3VEDJXYq6Gi
-         F3LhosFyS3VlcpzONHNaDcLIchdgiL5v4NA35UZSDxOFigjbi3/k2ZSVwDtxBAdMLeEh
-         PiApND73vDcx4gkZyX2ovCBhM57vfLg6OLSOS0lritofSJz4hrdw/sM8mUdEhTGvv1aw
-         U7mhhYqzmX6t+hCI8DkX+hR+3KQpqsrlj3AtMfivn9VVLvlapxzhUfpCVoN9HAmKa7Ej
-         E3Bg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Lm4jdiDuWbqAv4O7YJ6wZ0vVIEpUpOQJ86d4UA/6SjA=;
-        b=Jeu2nOjtV13uC7K3n/Gc6l9vUzrmOPM7+kn18X5H279bZjZSfT/t187qIVYfR26o49
-         SokvSRavpcN1PNuZhLem5ifbqAIDtLAvV88PHisr3EktXfRYio1OYF8Ij1dJU2y3TzHP
-         PlD3Y5kzcNu9UQRtuQ/VcSruBjn4h22q57M13+GkOtiKVZFzwNcLYrGHeTM92xfTy4iX
-         kDHgAVhmponHoTyddn6ya/pihzHjc7r8h4fBr777AaQ5HoKHJBSeeFN7LYLmWsNWxRGg
-         bSD71adKclor1xRqed7XL9xXBFhThUMHRefHq7sQJ1yAjUZmhZDvSbEn7qaU4Nm79GZg
-         TIpg==
-X-Gm-Message-State: AOAM530MB9qj7gI38FJKqWJxshuxpIUfPTrmPvej2mKj4925UItvIDq9
-        kaeIW1MezatQKpDKpb+nlM1Dp4lKwIVn7N1WfDoXHQ==
-X-Google-Smtp-Source: ABdhPJxRjqK/FZ4AoWTnkr8ASqTSmfC1tsb9qFvW2zNIHqFPVPi5jMbxh0tyslfhYDzSJFTj5fVm7boyJH+vPTsyD1I=
-X-Received: by 2002:a25:3046:: with SMTP id w67mr18083671ybw.134.1630958732615;
- Mon, 06 Sep 2021 13:05:32 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210830044425.2686755-1-mizhang@google.com> <20210830044425.2686755-3-mizhang@google.com>
- <CANgfPd_46=V24r5Qu8cDuOCwVRSEF9RFHuD-1sPpKrBCjWOA2w@mail.gmail.com> <YS5fxJtX/nYb43ir@google.com>
-In-Reply-To: <YS5fxJtX/nYb43ir@google.com>
-From:   Mingwei Zhang <mizhang@google.com>
-Date:   Mon, 6 Sep 2021 13:05:21 -0700
-Message-ID: <CAL715WJUmRJmt=u4Gi3ydTpbTGy2M5Wi=CbF9Qs8GNRK8g5FAA@mail.gmail.com>
-Subject: Re: [PATCH v3 2/2] selftests: KVM: use dirty logging to check if page
- stats work correctly
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Ben Gardon <bgardon@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        David Matlack <dmatlack@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Peter Xu <peterx@redhat.com>
+        id S231394AbhIFVEf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Sep 2021 17:04:35 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24685 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230510AbhIFVEd (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 6 Sep 2021 17:04:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1630962207;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=6zz5nxlrQtpfoMyc8K53x2jtzybHx8hYr7zwDuDWfXs=;
+        b=hviGSOUK7IkFfErGyBqH+JMRjocysbTgSezPfHh9ajZ1FF1g5cw/BIemUnFv/6fBnQxQHH
+        P4rReYwA0eHBkaU1Ga3KNRaHbM8g/bNjN+ImSj9mhuBQqL7ZL2Ya2C5pRMrAlZqFj0yioG
+        s9VYGWtfNnTduZF0mX3HdLcWUbngj5I=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-479-uZc-LRAoNMyRVS2c3iyUSw-1; Mon, 06 Sep 2021 17:03:26 -0400
+X-MC-Unique: uZc-LRAoNMyRVS2c3iyUSw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 23486107ACCD;
+        Mon,  6 Sep 2021 21:03:22 +0000 (UTC)
+Received: from starship (unknown [10.35.206.50])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 91FD05C1BB;
+        Mon,  6 Sep 2021 21:03:15 +0000 (UTC)
+Message-ID: <37b82ee53a3a84563b65be8e63193d4b823ea139.camel@redhat.com>
+Subject: Re: [PATCH v3 6/6] KVM: selftests: test KVM_GUESTDBG_BLOCKIRQ
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Cc:     Kieran Bingham <kbingham@kernel.org>,
+        Jan Kiszka <jan.kiszka@siemens.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Johannes Berg <johannes.berg@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Jessica Yu <jeyu@kernel.org>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Yang Weijiang <weijiang.yang@intel.com>,
+        linux-kernel@vger.kernel.org, Borislav Petkov <bp@alien8.de>,
+        "open list:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>,
+        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>
+Date:   Tue, 07 Sep 2021 00:03:14 +0300
+In-Reply-To: <137f2dcc-75d2-9d71-e259-dd66d43ad377@redhat.com>
+References: <20210811122927.900604-1-mlevitsk@redhat.com>
+         <20210811122927.900604-7-mlevitsk@redhat.com>
+         <137f2dcc-75d2-9d71-e259-dd66d43ad377@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 31, 2021 at 9:58 AM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Mon, Aug 30, 2021, Ben Gardon wrote:
-> > On Sun, Aug 29, 2021 at 9:44 PM Mingwei Zhang <mizhang@google.com> wrote:
-> > > diff --git a/tools/testing/selftests/kvm/lib/test_util.c b/tools/testing/selftests/kvm/lib/test_util.c
-> > > index af1031fed97f..07eb6b5c125e 100644
-> > > --- a/tools/testing/selftests/kvm/lib/test_util.c
-> > > +++ b/tools/testing/selftests/kvm/lib/test_util.c
-> > > @@ -15,6 +15,13 @@
-> > >  #include "linux/kernel.h"
-> > >
-> > >  #include "test_util.h"
-> > > +#include "processor.h"
-> > > +
-> > > +static const char * const pagestat_filepaths[] = {
-> > > +       "/sys/kernel/debug/kvm/pages_4k",
-> > > +       "/sys/kernel/debug/kvm/pages_2m",
-> > > +       "/sys/kernel/debug/kvm/pages_1g",
-> > > +};
-> >
-> > I think these should only be defined for x86_64 too. Is this the right
-> > file for these definitions or is there an arch specific file they
-> > should go in?
->
-> The stats also need to be pulled from the selftest's VM, not from the overall KVM
-> stats, otherwise the test will fail if there are any other active VMs on the host,
-> e.g. I like to run to selftests and kvm-unit-tests in parallel.
+On Mon, 2021-09-06 at 13:20 +0200, Paolo Bonzini wrote:
+> On 11/08/21 14:29, Maxim Levitsky wrote:
+> > Modify debug_regs test to create a pending interrupt
+> > and see that it is blocked when single stepping is done
+> > with KVM_GUESTDBG_BLOCKIRQ
+> > 
+> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > ---
+> >   .../testing/selftests/kvm/x86_64/debug_regs.c | 24 ++++++++++++++++---
+> >   1 file changed, 21 insertions(+), 3 deletions(-)
+> 
+> I haven't looked very much at this, but the test fails.
 
-That is correct. But since this selftest is not the 'default' selftest
-that people normally run, can we make an assumption on running these
-tests at this moment? I am planning to submit this test and improve it
-in the next series by using Jing's fd based KVM stats interface to
-eliminate the assumption of the existence of a single running VM.
-Right now, this interface still needs some work, so I am taking a
-shortcut that directly uses the whole-system metricfs based interface.
+Works for me :-(
 
-But I can choose to do that and submit the fd-based API together with
-this series. What do you suggest?
+[mlevitsk@starship ~/Kernel/master/src/tools/testing/selftests/kvm]$./x86_64/debug_regs 
+[mlevitsk@starship ~/Kernel/master/src/tools/testing/selftests/kvm]$echo $?
+0
+
+
+Maybe you run the test on kernel that doesn't support KVM_GUESTDBG_BLOCKIRQ?
+
+Best regards,
+	Maxim Levitsky
+
+> 
+> Paolo
+> 
+> > diff --git a/tools/testing/selftests/kvm/x86_64/debug_regs.c b/tools/testing/selftests/kvm/x86_64/debug_regs.c
+> > index 6097a8283377..5f078db1bcba 100644
+> > --- a/tools/testing/selftests/kvm/x86_64/debug_regs.c
+> > +++ b/tools/testing/selftests/kvm/x86_64/debug_regs.c
+> > @@ -8,12 +8,15 @@
+> >   #include <string.h>
+> >   #include "kvm_util.h"
+> >   #include "processor.h"
+> > +#include "apic.h"
+> >   
+> >   #define VCPU_ID 0
+> >   
+> >   #define DR6_BD		(1 << 13)
+> >   #define DR7_GD		(1 << 13)
+> >   
+> > +#define IRQ_VECTOR 0xAA
+> > +
+> >   /* For testing data access debug BP */
+> >   uint32_t guest_value;
+> >   
+> > @@ -21,6 +24,11 @@ extern unsigned char sw_bp, hw_bp, write_data, ss_start, bd_start;
+> >   
+> >   static void guest_code(void)
+> >   {
+> > +	/* Create a pending interrupt on current vCPU */
+> > +	x2apic_enable();
+> > +	x2apic_write_reg(APIC_ICR, APIC_DEST_SELF | APIC_INT_ASSERT |
+> > +			 APIC_DM_FIXED | IRQ_VECTOR);
+> > +
+> >   	/*
+> >   	 * Software BP tests.
+> >   	 *
+> > @@ -38,12 +46,19 @@ static void guest_code(void)
+> >   		     "mov %%rax,%0;\n\t write_data:"
+> >   		     : "=m" (guest_value) : : "rax");
+> >   
+> > -	/* Single step test, covers 2 basic instructions and 2 emulated */
+> > +	/*
+> > +	 * Single step test, covers 2 basic instructions and 2 emulated
+> > +	 *
+> > +	 * Enable interrupts during the single stepping to see that
+> > +	 * pending interrupt we raised is not handled due to KVM_GUESTDBG_BLOCKIRQ
+> > +	 */
+> >   	asm volatile("ss_start: "
+> > +		     "sti\n\t"
+> >   		     "xor %%eax,%%eax\n\t"
+> >   		     "cpuid\n\t"
+> >   		     "movl $0x1a0,%%ecx\n\t"
+> >   		     "rdmsr\n\t"
+> > +		     "cli\n\t"
+> >   		     : : : "eax", "ebx", "ecx", "edx");
+> >   
+> >   	/* DR6.BD test */
+> > @@ -72,11 +87,13 @@ int main(void)
+> >   	uint64_t cmd;
+> >   	int i;
+> >   	/* Instruction lengths starting at ss_start */
+> > -	int ss_size[4] = {
+> > +	int ss_size[6] = {
+> > +		1,		/* sti*/
+> >   		2,		/* xor */
+> >   		2,		/* cpuid */
+> >   		5,		/* mov */
+> >   		2,		/* rdmsr */
+> > +		1,		/* cli */
+> >   	};
+> >   
+> >   	if (!kvm_check_cap(KVM_CAP_SET_GUEST_DEBUG)) {
+> > @@ -154,7 +171,8 @@ int main(void)
+> >   	for (i = 0; i < (sizeof(ss_size) / sizeof(ss_size[0])); i++) {
+> >   		target_rip += ss_size[i];
+> >   		CLEAR_DEBUG();
+> > -		debug.control = KVM_GUESTDBG_ENABLE | KVM_GUESTDBG_SINGLESTEP;
+> > +		debug.control = KVM_GUESTDBG_ENABLE | KVM_GUESTDBG_SINGLESTEP |
+> > +				KVM_GUESTDBG_BLOCKIRQ;
+> >   		debug.arch.debugreg[7] = 0x00000400;
+> >   		APPLY_DEBUG();
+> >   		vcpu_run(vm, VCPU_ID);
+> > 
+
+
