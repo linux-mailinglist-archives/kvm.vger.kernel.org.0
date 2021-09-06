@@ -2,185 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B080A401A7D
-	for <lists+kvm@lfdr.de>; Mon,  6 Sep 2021 13:21:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5B429401A82
+	for <lists+kvm@lfdr.de>; Mon,  6 Sep 2021 13:21:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236106AbhIFLVb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Sep 2021 07:21:31 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55429 "EHLO
+        id S241314AbhIFLWB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Sep 2021 07:22:01 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:32004 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232512AbhIFLV1 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 6 Sep 2021 07:21:27 -0400
+        by vger.kernel.org with ESMTP id S240875AbhIFLWA (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 6 Sep 2021 07:22:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630927222;
+        s=mimecast20190719; t=1630927255;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=j7VH8fL3glvum3Nt0WVFPZDDHGKO9yZkd04H/l3akBA=;
-        b=Qj05cyGYy6ALDy97812fK3Snt+vbujbdmxBGJd7XaaaCA8G6fIOF1SxIIO12/u2OKbLHXt
-        PZLY0pGw+chH+qDO1cyDuIPnNIUouDotKfyRClvQk/8CaWWS1zuSFryL9/9OibLth44nxZ
-        w4u1vMESFELlQ1Lqg2V20AzLOK9LcMs=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-487-VxLZbW_GNZ2na5mUSA6mlg-1; Mon, 06 Sep 2021 07:20:21 -0400
-X-MC-Unique: VxLZbW_GNZ2na5mUSA6mlg-1
-Received: by mail-wm1-f71.google.com with SMTP id a201-20020a1c7fd2000000b002e748bf0544so3792616wmd.2
-        for <kvm@vger.kernel.org>; Mon, 06 Sep 2021 04:20:21 -0700 (PDT)
+        bh=PwCcwobqarvdp7b4ZxKmDRuHy822IrmJf431Zj87HGM=;
+        b=c8VndKIXRd3uk4l/vu4ezfYK7J6KNb0Du+QtllfoiroG7oy8SwZ5+hyF2SrGCYDxLuV/Ql
+        zcHohVvcsFXhk/2YAsJnKZUrSd9gJBp40zD5ZI72ZIIdNmFrboxR9CZxwYuz8qU/BvdLrI
+        4YpWkmsd8VLqyRiDxAjh9InDSaMipyM=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-5-0dkzaYtvN8qyZtRUmaIE9g-1; Mon, 06 Sep 2021 07:20:54 -0400
+X-MC-Unique: 0dkzaYtvN8qyZtRUmaIE9g-1
+Received: by mail-ej1-f71.google.com with SMTP id yz13-20020a170906dc4d00b005c61ad936f0so2195065ejb.12
+        for <kvm@vger.kernel.org>; Mon, 06 Sep 2021 04:20:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=j7VH8fL3glvum3Nt0WVFPZDDHGKO9yZkd04H/l3akBA=;
-        b=oRs3q/tervGml6HJhpD/E8j+33g/3voSGO0XgIBuWd84DjcZ9LE5Qe/3MlCDb0i6CT
-         KNCPhXI6Q92Iw6g/m61b5vj7vknZ/1UNE0jUasfofW07kyQBRlgobjAK8iD6NIn4eO3K
-         zJRVBJ+2wEwQULep+6IVsbpJqEcJkZuHUe17HFLMTSx1AyHQ93ZPLPODCobpegT89VYf
-         uUuiGFUJ03zjRkf91fWXxGNCQRF47LpNsaDfG3YK9TVd5vWfs+Ue+TK7xzbaI0j04Yj7
-         D3SMOu12IAeZuPoLcwkYyCGgMEOP2OVYrLmduwX1jQKk3gJwdD5/epaNLVJZlRByx98D
-         8HrQ==
-X-Gm-Message-State: AOAM533So5k2S1r57HdQI1phhVNrCNABbIGv5o7hFHgPBOk2IG25/NRd
-        IHv7BbJORBqGE8Wunb6kLyywF00lkDutEprg47GbTx8xX7H0NgLJN5NWedUU2bYoPkSDzAqul5M
-        OUvalXAdG3WnH
-X-Received: by 2002:a1c:9a0e:: with SMTP id c14mr11072642wme.119.1630927220110;
-        Mon, 06 Sep 2021 04:20:20 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxnnpEuWDhXm/HsiMYhbswprAY/0U3Qm9lUNt38ZqMW4d4O9iigvGYH5X6vA70t10AlgvDOaw==
-X-Received: by 2002:a1c:9a0e:: with SMTP id c14mr11072600wme.119.1630927219810;
-        Mon, 06 Sep 2021 04:20:19 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id m11sm7585194wrz.28.2021.09.06.04.20.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 06 Sep 2021 04:20:19 -0700 (PDT)
-Subject: Re: [PATCH v3 6/6] KVM: selftests: test KVM_GUESTDBG_BLOCKIRQ
-To:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
-Cc:     Kieran Bingham <kbingham@kernel.org>,
-        Jan Kiszka <jan.kiszka@siemens.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Johannes Berg <johannes.berg@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Jessica Yu <jeyu@kernel.org>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Yang Weijiang <weijiang.yang@intel.com>,
-        linux-kernel@vger.kernel.org, Borislav Petkov <bp@alien8.de>,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>
-References: <20210811122927.900604-1-mlevitsk@redhat.com>
- <20210811122927.900604-7-mlevitsk@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <137f2dcc-75d2-9d71-e259-dd66d43ad377@redhat.com>
-Date:   Mon, 6 Sep 2021 13:20:14 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=PwCcwobqarvdp7b4ZxKmDRuHy822IrmJf431Zj87HGM=;
+        b=fuQbyCngM1uCKI3kUsQgsyvzBm2eV+5G50qiHB8JQ5I7YU+aeXsmDyal8hQH13j7UT
+         NsRJH7AjSyvO4Q+axkzyMQXStlSgj7D1h5Q27s6b2Qnj/uf3hguptmZR8dCyB7Wis/N/
+         6TiRaijwnukufR3vnDzFKaPusC8gJXrVE5zYxNz/nVgc2JDfoQH3NRD3LVojrvQVDuU3
+         YiE4nsXBRbR2WXRG0o3YlpSMC9dxAH3FFFgWVtiCWRT17GuqhmevdAFIcjbWGQ3/Nk1C
+         WUKNwIE00InKAqzW3dRHFFUD53XMKHK7JSldT9pIyjR8zYb7LNPcugo1cymgPg3iti/X
+         aOWg==
+X-Gm-Message-State: AOAM530KLjc9QCD+CMBpW2xiEScllm5tUSDBDWLaG/I3RZtf1RgOBLWe
+        ttoASyOIRd+znB2a8tYE/8j3Xgs+d8AAeuSCCHEpASn+5EFQ6dm5/yYjHQ4HLX5dFnXqh78EQGg
+        9KuAa+ZZosyE0
+X-Received: by 2002:a50:fb08:: with SMTP id d8mr12725037edq.160.1630927253392;
+        Mon, 06 Sep 2021 04:20:53 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwnXiZkAIDU73uVyPn+3O20GkHTxFw7vX6uAGTN6zNHOCvY8p6FyX/5L/Q7XXf2IlUH+ouktQ==
+X-Received: by 2002:a50:fb08:: with SMTP id d8mr12725016edq.160.1630927253147;
+        Mon, 06 Sep 2021 04:20:53 -0700 (PDT)
+Received: from redhat.com ([2.55.131.183])
+        by smtp.gmail.com with ESMTPSA id f1sm4406891edq.89.2021.09.06.04.20.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Sep 2021 04:20:51 -0700 (PDT)
+Date:   Mon, 6 Sep 2021 07:20:47 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Max Gurtovoy <mgurtovoy@nvidia.com>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>, hch@infradead.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        israelr@nvidia.com, nitzanc@nvidia.com, oren@nvidia.com,
+        linux-block@vger.kernel.org, axboe@kernel.dk
+Subject: Re: [PATCH v2 1/1] virtio-blk: add num_io_queues module parameter
+Message-ID: <20210906071957-mutt-send-email-mst@kernel.org>
+References: <20210831135035.6443-1-mgurtovoy@nvidia.com>
+ <YTDVkDIr5WLdlRsK@stefanha-x1.localdomain>
+ <20210905120234-mutt-send-email-mst@kernel.org>
+ <98309fcd-3abe-1f27-fe52-e8fcc58bec13@nvidia.com>
 MIME-Version: 1.0
-In-Reply-To: <20210811122927.900604-7-mlevitsk@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <98309fcd-3abe-1f27-fe52-e8fcc58bec13@nvidia.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/08/21 14:29, Maxim Levitsky wrote:
-> Modify debug_regs test to create a pending interrupt
-> and see that it is blocked when single stepping is done
-> with KVM_GUESTDBG_BLOCKIRQ
+On Mon, Sep 06, 2021 at 01:31:32AM +0300, Max Gurtovoy wrote:
 > 
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> ---
->   .../testing/selftests/kvm/x86_64/debug_regs.c | 24 ++++++++++++++++---
->   1 file changed, 21 insertions(+), 3 deletions(-)
+> On 9/5/2021 7:02 PM, Michael S. Tsirkin wrote:
+> > On Thu, Sep 02, 2021 at 02:45:52PM +0100, Stefan Hajnoczi wrote:
+> > > On Tue, Aug 31, 2021 at 04:50:35PM +0300, Max Gurtovoy wrote:
+> > > > Sometimes a user would like to control the amount of IO queues to be
+> > > > created for a block device. For example, for limiting the memory
+> > > > footprint of virtio-blk devices.
+> > > > 
+> > > > Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
+> > > > ---
+> > > > 
+> > > > changes from v1:
+> > > >   - use param_set_uint_minmax (from Christoph)
+> > > >   - added "Should > 0" to module description
+> > > > 
+> > > > Note: This commit apply on top of Jens's branch for-5.15/drivers
+> > > > ---
+> > > >   drivers/block/virtio_blk.c | 20 +++++++++++++++++++-
+> > > >   1 file changed, 19 insertions(+), 1 deletion(-)
+> > > > 
+> > > > diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> > > > index 4b49df2dfd23..9332fc4e9b31 100644
+> > > > --- a/drivers/block/virtio_blk.c
+> > > > +++ b/drivers/block/virtio_blk.c
+> > > > @@ -24,6 +24,22 @@
+> > > >   /* The maximum number of sg elements that fit into a virtqueue */
+> > > >   #define VIRTIO_BLK_MAX_SG_ELEMS 32768
+> > > > +static int virtblk_queue_count_set(const char *val,
+> > > > +		const struct kernel_param *kp)
+> > > > +{
+> > > > +	return param_set_uint_minmax(val, kp, 1, nr_cpu_ids);
+> > > > +}
 
-I haven't looked very much at this, but the test fails.
 
-Paolo
+Hmm which tree is this for?
 
-> diff --git a/tools/testing/selftests/kvm/x86_64/debug_regs.c b/tools/testing/selftests/kvm/x86_64/debug_regs.c
-> index 6097a8283377..5f078db1bcba 100644
-> --- a/tools/testing/selftests/kvm/x86_64/debug_regs.c
-> +++ b/tools/testing/selftests/kvm/x86_64/debug_regs.c
-> @@ -8,12 +8,15 @@
->   #include <string.h>
->   #include "kvm_util.h"
->   #include "processor.h"
-> +#include "apic.h"
->   
->   #define VCPU_ID 0
->   
->   #define DR6_BD		(1 << 13)
->   #define DR7_GD		(1 << 13)
->   
-> +#define IRQ_VECTOR 0xAA
-> +
->   /* For testing data access debug BP */
->   uint32_t guest_value;
->   
-> @@ -21,6 +24,11 @@ extern unsigned char sw_bp, hw_bp, write_data, ss_start, bd_start;
->   
->   static void guest_code(void)
->   {
-> +	/* Create a pending interrupt on current vCPU */
-> +	x2apic_enable();
-> +	x2apic_write_reg(APIC_ICR, APIC_DEST_SELF | APIC_INT_ASSERT |
-> +			 APIC_DM_FIXED | IRQ_VECTOR);
-> +
->   	/*
->   	 * Software BP tests.
->   	 *
-> @@ -38,12 +46,19 @@ static void guest_code(void)
->   		     "mov %%rax,%0;\n\t write_data:"
->   		     : "=m" (guest_value) : : "rax");
->   
-> -	/* Single step test, covers 2 basic instructions and 2 emulated */
-> +	/*
-> +	 * Single step test, covers 2 basic instructions and 2 emulated
-> +	 *
-> +	 * Enable interrupts during the single stepping to see that
-> +	 * pending interrupt we raised is not handled due to KVM_GUESTDBG_BLOCKIRQ
-> +	 */
->   	asm volatile("ss_start: "
-> +		     "sti\n\t"
->   		     "xor %%eax,%%eax\n\t"
->   		     "cpuid\n\t"
->   		     "movl $0x1a0,%%ecx\n\t"
->   		     "rdmsr\n\t"
-> +		     "cli\n\t"
->   		     : : : "eax", "ebx", "ecx", "edx");
->   
->   	/* DR6.BD test */
-> @@ -72,11 +87,13 @@ int main(void)
->   	uint64_t cmd;
->   	int i;
->   	/* Instruction lengths starting at ss_start */
-> -	int ss_size[4] = {
-> +	int ss_size[6] = {
-> +		1,		/* sti*/
->   		2,		/* xor */
->   		2,		/* cpuid */
->   		5,		/* mov */
->   		2,		/* rdmsr */
-> +		1,		/* cli */
->   	};
->   
->   	if (!kvm_check_cap(KVM_CAP_SET_GUEST_DEBUG)) {
-> @@ -154,7 +171,8 @@ int main(void)
->   	for (i = 0; i < (sizeof(ss_size) / sizeof(ss_size[0])); i++) {
->   		target_rip += ss_size[i];
->   		CLEAR_DEBUG();
-> -		debug.control = KVM_GUESTDBG_ENABLE | KVM_GUESTDBG_SINGLESTEP;
-> +		debug.control = KVM_GUESTDBG_ENABLE | KVM_GUESTDBG_SINGLESTEP |
-> +				KVM_GUESTDBG_BLOCKIRQ;
->   		debug.arch.debugreg[7] = 0x00000400;
->   		APPLY_DEBUG();
->   		vcpu_run(vm, VCPU_ID);
+> > > > +
+> > > > +static const struct kernel_param_ops queue_count_ops = {
+> > > > +	.set = virtblk_queue_count_set,
+> > > > +	.get = param_get_uint,
+> > > > +};
+> > > > +
+> > > > +static unsigned int num_io_queues;
+> > > > +module_param_cb(num_io_queues, &queue_count_ops, &num_io_queues, 0644);
+> > > > +MODULE_PARM_DESC(num_io_queues,
+> > > > +		 "Number of IO virt queues to use for blk device. Should > 0");
+
+
+
+better:
+
++MODULE_PARM_DESC(num_io_request_queues,
++                "Limit number of IO request virt queues to use for each device. 0 for now limit");
+
+
+> > > > +
+> > > >   static int major;
+> > > >   static DEFINE_IDA(vd_index_ida);
+> > > > @@ -501,7 +517,9 @@ static int init_vq(struct virtio_blk *vblk)
+> > > >   	if (err)
+> > > >   		num_vqs = 1;
+> > > > -	num_vqs = min_t(unsigned int, nr_cpu_ids, num_vqs);
+> > > > +	num_vqs = min_t(unsigned int,
+> > > > +			min_not_zero(num_io_queues, nr_cpu_ids),
+> > > > +			num_vqs);
+> > > If you respin, please consider calling them request queues. That's the
+> > > terminology from the VIRTIO spec and it's nice to keep it consistent.
+> > > But the purpose of num_io_queues is clear, so:
+> > > 
+> > > Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > I did this:
+> > +static unsigned int num_io_request_queues;
+> > +module_param_cb(num_io_request_queues, &queue_count_ops, &num_io_request_queues, 0644);
+> > +MODULE_PARM_DESC(num_io_request_queues,
+> > +                "Limit number of IO request virt queues to use for each device. 0 for now limit");
 > 
+> The parameter is writable and can be changed and then new devices might be
+> probed with new value.
+> 
+> It can't be zero in the code. we can change param_set_uint_minmax args and
+> say that 0 says nr_cpus.
+> 
+> I'm ok with the renaming but I prefer to stick to the description we gave in
+> V3 of this patch (and maybe enable value of 0 as mentioned above).
 
