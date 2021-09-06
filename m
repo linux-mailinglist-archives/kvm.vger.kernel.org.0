@@ -2,126 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1512140161C
-	for <lists+kvm@lfdr.de>; Mon,  6 Sep 2021 07:56:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 127F3401634
+	for <lists+kvm@lfdr.de>; Mon,  6 Sep 2021 08:09:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239259AbhIFF5L (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Sep 2021 01:57:11 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:59358 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S239048AbhIFF5J (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 6 Sep 2021 01:57:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630907765;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=vovMbtPf5r3ofbG1k9TCSMxb7U8AijKtdOS/02BCPEA=;
-        b=c/WB3cGs0VdQSYISTv5WAem0B6nQzF2kI1JZw2qhGii5AmF4PG9P199CHVQyZd24cfDaky
-        vx6g2DLPMZccEg8BaEpULyEiOrl5Utx6XS+wmnHi7YOubtX06nxWKZAHpyETd3YRRzIMXk
-        Gg8uNKUTlgfZq1ptk+mkYktRn3pI6YA=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-28-E_wGKxHRN4Oe0JTh9P7gfQ-1; Mon, 06 Sep 2021 01:56:03 -0400
-X-MC-Unique: E_wGKxHRN4Oe0JTh9P7gfQ-1
-Received: by mail-wr1-f71.google.com with SMTP id m16-20020a056000181000b0015964e4ae48so847124wrh.14
-        for <kvm@vger.kernel.org>; Sun, 05 Sep 2021 22:56:03 -0700 (PDT)
+        id S239259AbhIFGKn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Sep 2021 02:10:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60034 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239192AbhIFGKm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Sep 2021 02:10:42 -0400
+Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F312C061575
+        for <kvm@vger.kernel.org>; Sun,  5 Sep 2021 23:09:38 -0700 (PDT)
+Received: by mail-ed1-x532.google.com with SMTP id g22so7926628edy.12
+        for <kvm@vger.kernel.org>; Sun, 05 Sep 2021 23:09:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=iLQZhgxKgfIDFt5lvdc2MzHzo2TIxIc31ByxAdyguDw=;
+        b=odHfcBGsXMMsYB2K8Do9ItkBkMTq6LWsGfzwSwjDSZ150IpQF83y0vfBln5L7YVgiw
+         3MpZwyeS+QD8McxuPPxYxbm0B8uAK5/6bNVzGCQ3vsq1gUyf9m37Tv+e5qVdZqDNjAev
+         Xaqo2CLPu9Y3meToLpI9B7J78zGlu+7JUYZ4izYbDZgP2XtyOGajNL0pzHncLqlgsEVm
+         4bIszAuRtDUfeh0uGsQB/wMMzlHe4FXMtOXP7CcKYI3X3EKfrVxan8x6W96Lfrgxnfnf
+         VkoHn8zk2d48PQu1VwJZG2YCEYOwA1Adig/icsv06Ld2WfJcAwY0GQAelyk08s8IO8Ul
+         YFcQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=vovMbtPf5r3ofbG1k9TCSMxb7U8AijKtdOS/02BCPEA=;
-        b=Y75bnkmmZQ+nKv4eMzWWg/yPe/qvMSTbVbmObGiMQmCzNajh9Pui+o6ZFaQAnzmdOA
-         fjDV+Z0ldCkMQsVJ+eAuiH258D7F1CnzvoUdhVwQfVdIXqB/9QcTdPa9R2daINq/T7Nt
-         7WSCM1/UpG4efO8gaQ4QE6x+IcjAeUg6cfqgt0zsiV7GSojrUho8dWNHWS1lujcEospl
-         /l7nsnsWsh+cAjnpKuUQygkSEwo0JkBTlbgPtxCl6D+hFXmTtiPeoqwTxL30jqLSNliW
-         2bJWoyVLhD24jPcHAtaRQTFR+fvIgT9gzUQxlx9HrO/n6SKVCbgS5xGfC2fAyQJSVXQ0
-         e79A==
-X-Gm-Message-State: AOAM531h+3zQDjZGxB4ix9rBLMOU1TTu0Tk4GvXKBxKfiVpv366/UlA3
-        +yputtZTt4tdsxvr/KKReoMtwVEfHO2rhAZMszTfNKPvT7kck9vQOGgcgkacGFbziiE6T3J6fw8
-        d/JWb2HqCUMhX
-X-Received: by 2002:a1c:a50c:: with SMTP id o12mr9495400wme.4.1630907762420;
-        Sun, 05 Sep 2021 22:56:02 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzSohV4waNTUQh5Sb39O42c9OGim/c0J+8EbtpG04qEdzlJ16UAGsVC7V6aTmAbRvcBXz/LFQ==
-X-Received: by 2002:a1c:a50c:: with SMTP id o12mr9495363wme.4.1630907762186;
-        Sun, 05 Sep 2021 22:56:02 -0700 (PDT)
-Received: from redhat.com ([2.55.131.183])
-        by smtp.gmail.com with ESMTPSA id a133sm6174326wme.5.2021.09.05.22.55.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 05 Sep 2021 22:56:01 -0700 (PDT)
-Date:   Mon, 6 Sep 2021 01:55:56 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Xie Yongji <xieyongji@bytedance.com>
-Cc:     jasowang@redhat.com, stefanha@redhat.com, sgarzare@redhat.com,
-        parav@nvidia.com, hch@infradead.org,
-        christian.brauner@canonical.com, rdunlap@infradead.org,
-        willy@infradead.org, viro@zeniv.linux.org.uk, axboe@kernel.dk,
-        bcrl@kvack.org, corbet@lwn.net, mika.penttila@nextfour.com,
-        dan.carpenter@oracle.com, joro@8bytes.org,
-        gregkh@linuxfoundation.org, zhe.he@windriver.com,
-        xiaodong.liu@intel.com, joe@perches.com, robin.murphy@arm.com,
-        will@kernel.org, john.garry@huawei.com, songmuchun@bytedance.com,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v13 05/13] vdpa: Add reset callback in vdpa_config_ops
-Message-ID: <20210906015524-mutt-send-email-mst@kernel.org>
-References: <20210831103634.33-1-xieyongji@bytedance.com>
- <20210831103634.33-6-xieyongji@bytedance.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=iLQZhgxKgfIDFt5lvdc2MzHzo2TIxIc31ByxAdyguDw=;
+        b=kTWdK8gWuRkkXLK41qUVfsqxfj4x0QeIWzHZc52Svvbzt1vaa8QOAaoVZbX5x8uWzI
+         rKhb+LociiE4AI2WdyyzjY8mdTX+9A7I0980R771dnRNj2CoiFDVySNj3frXE9FVhcx6
+         VyFe4rM1JjLBwWI1q69KutI5K50njhM3PnDlt299bnt6JazyervZBiGtXnTqjcx5i4nk
+         vKwley7LbJdwx24N6BM/Jc4xLL76ErSt/D2owG86bQoMPFW/zdQRdZCUgAakICdcRIrt
+         4D1L38AmiLkcKrNSDE1v2W0TOZX3IeZXTp+oz/IXH4wPWGoBcrvNQvE+KZYf3IjcniK/
+         OsOQ==
+X-Gm-Message-State: AOAM530J3H9X9t0oZ9Hco2CF4P1XKt1w3EdMPTtK1VQPtGUnKJdot/RG
+        EYcw3LBGhEhOIXAuPZAYW7Nmj6wyEr5y0OnGj+tu
+X-Google-Smtp-Source: ABdhPJwAFlEIMtTqX/FnP+Pe+DBoVGCsW7XaaIAidi/YyhHjkzk2b+1T+9ejMprIIKa+g3AudWKBbxIRe912O1wmSz0=
+X-Received: by 2002:a05:6402:4247:: with SMTP id g7mr11700392edb.287.1630908576144;
+ Sun, 05 Sep 2021 23:09:36 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210831103634.33-6-xieyongji@bytedance.com>
+References: <20210831103634.33-1-xieyongji@bytedance.com> <20210831103634.33-6-xieyongji@bytedance.com>
+ <20210906015524-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20210906015524-mutt-send-email-mst@kernel.org>
+From:   Yongji Xie <xieyongji@bytedance.com>
+Date:   Mon, 6 Sep 2021 14:09:25 +0800
+Message-ID: <CACycT3v4ZVnh7DGe_RtAOx4Vvau0km=HWyCM=KzKhD+ahYKafQ@mail.gmail.com>
+Subject: Re: [PATCH v13 05/13] vdpa: Add reset callback in vdpa_config_ops
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Jason Wang <jasowang@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Parav Pandit <parav@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Christian Brauner <christian.brauner@canonical.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?Q?Mika_Penttil=C3=A4?= <mika.penttila@nextfour.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>, joro@8bytes.org,
+        Greg KH <gregkh@linuxfoundation.org>,
+        He Zhe <zhe.he@windriver.com>,
+        Liu Xiaodong <xiaodong.liu@intel.com>,
+        Joe Perches <joe@perches.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Will Deacon <will@kernel.org>,
+        John Garry <john.garry@huawei.com>, songmuchun@bytedance.com,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        netdev@vger.kernel.org, kvm <kvm@vger.kernel.org>,
+        linux-fsdevel@vger.kernel.org, iommu@lists.linux-foundation.org,
+        linux-kernel <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 31, 2021 at 06:36:26PM +0800, Xie Yongji wrote:
-> This adds a new callback to support device specific reset
-> behavior. The vdpa bus driver will call the reset function
-> instead of setting status to zero during resetting.
-> 
-> Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
+On Mon, Sep 6, 2021 at 1:56 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> On Tue, Aug 31, 2021 at 06:36:26PM +0800, Xie Yongji wrote:
+> > This adds a new callback to support device specific reset
+> > behavior. The vdpa bus driver will call the reset function
+> > instead of setting status to zero during resetting.
+> >
+> > Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
+>
+>
+> This does gloss over a significant change though:
+>
+>
+> > ---
+> > @@ -348,12 +352,12 @@ static inline struct device *vdpa_get_dma_dev(struct vdpa_device *vdev)
+> >       return vdev->dma_dev;
+> >  }
+> >
+> > -static inline void vdpa_reset(struct vdpa_device *vdev)
+> > +static inline int vdpa_reset(struct vdpa_device *vdev)
+> >  {
+> >       const struct vdpa_config_ops *ops = vdev->config;
+> >
+> >       vdev->features_valid = false;
+> > -     ops->set_status(vdev, 0);
+> > +     return ops->reset(vdev);
+> >  }
+> >
+> >  static inline int vdpa_set_features(struct vdpa_device *vdev, u64 features)
+>
+>
+> Unfortunately this breaks virtio_vdpa:
+>
+>
+> static void virtio_vdpa_reset(struct virtio_device *vdev)
+> {
+>         struct vdpa_device *vdpa = vd_get_vdpa(vdev);
+>
+>         vdpa_reset(vdpa);
+> }
+>
+>
+> and there's no easy way to fix this, kernel can't recover
+> from a reset failure e.g. during driver unbind.
+>
 
+Yes, but it should be safe with the protection of software IOTLB even
+if the reset() fails during driver unbind.
 
-This does gloss over a significant change though:
-
-
-> ---
-> @@ -348,12 +352,12 @@ static inline struct device *vdpa_get_dma_dev(struct vdpa_device *vdev)
->  	return vdev->dma_dev;
->  }
->  
-> -static inline void vdpa_reset(struct vdpa_device *vdev)
-> +static inline int vdpa_reset(struct vdpa_device *vdev)
->  {
->  	const struct vdpa_config_ops *ops = vdev->config;
->  
->  	vdev->features_valid = false;
-> -	ops->set_status(vdev, 0);
-> +	return ops->reset(vdev);
->  }
->  
->  static inline int vdpa_set_features(struct vdpa_device *vdev, u64 features)
-
-
-Unfortunately this breaks virtio_vdpa:
-
-
-static void virtio_vdpa_reset(struct virtio_device *vdev)
-{
-        struct vdpa_device *vdpa = vd_get_vdpa(vdev);
-
-        vdpa_reset(vdpa);
-}
-
-
-and there's no easy way to fix this, kernel can't recover
-from a reset failure e.g. during driver unbind.
-
-Find a way to disable virtio_vdpa for now?
-
-
-> -- 
-> 2.11.0
-
+Thanks,
+Yongji
