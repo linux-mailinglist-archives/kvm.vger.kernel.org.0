@@ -2,242 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F10F6401838
-	for <lists+kvm@lfdr.de>; Mon,  6 Sep 2021 10:47:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EAA3040188D
+	for <lists+kvm@lfdr.de>; Mon,  6 Sep 2021 11:03:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241362AbhIFIsF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Sep 2021 04:48:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39458 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241496AbhIFIrN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Sep 2021 04:47:13 -0400
-Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C0BCC061575
-        for <kvm@vger.kernel.org>; Mon,  6 Sep 2021 01:46:08 -0700 (PDT)
-Received: by mail-ej1-x62d.google.com with SMTP id mf2so11987436ejb.9
-        for <kvm@vger.kernel.org>; Mon, 06 Sep 2021 01:46:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=8LAmaSyJa7xIkRyWmQFQLPdtTpPfl6cF8N/0UDdi5JQ=;
-        b=ftFDUtejRaca7/VzbCnbdEqwMSB1qRj0J5JYAYxPmAajPt03iJ9JCXESud9TiTSFw/
-         I7SEgZbb5lKtt2/bzhJSqptGgf4gIGPXHdpEN+PqnzoJCwe5G6zw1nZV5r1mHhS2Uj6u
-         Ma3WF0jXLDn+f7ZSOT3zf1nrVt/O+3Hz8nT/Xs9Zrojfwv8wZrnspilhtE7WoyICjPFF
-         /BMAycSuJw9hbx4I4PL//aQpMrxhcaD/FCjz3yn0AM8kK11PIo9D4z2JpAZFfyn00OAF
-         XAOQbuFOpM72i24Kdf2NjGDkRC54nedjfG1Hhy3fsWsggeuCs9rfuR4xMpV0zJe/P+Dq
-         iNcg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=8LAmaSyJa7xIkRyWmQFQLPdtTpPfl6cF8N/0UDdi5JQ=;
-        b=r2jXa2AMdQIZGihoIwATTxvO0h5F2TxC+sa+JQ8LfaNLf4BHf8H9+g921WTBa8/qiQ
-         mjdDVrHns+S59mCGQZay3fkMi2/ND9vvn5j0t3AnWCClteqvo3lQ/2l82cTrQmqoYjZw
-         Ntyxfz2GnZlcAG1uPvCowruaTQKaTUh49Rb5d++PRhq4RMe5fo9b331V/gxIIF4mFHCH
-         /NdhN6KUqxJL8QZt+mKO2ELb25zTHEtngT8dPYDr0i1ocobaE22u9UHeWARSPX/elqQV
-         dYQ/ux9TfvdUtdls7Dj4SWMeFPGfEM9V2loYQBu9bT7ZEMwtTRkwpuko/+nOLE61qB59
-         fPnQ==
-X-Gm-Message-State: AOAM532A3JyRxq1vGwG8lv59arNIMQL0Vjp8tGwxBbJI9vVPP7mrt8Qh
-        whGRsneqz9gbf17n0XQ4HfE4YYjbpDNa2GSsQK+S
-X-Google-Smtp-Source: ABdhPJxRcevb7Cx9lFr/uLNuGUc45WhioHM0KmVHs1F8bqTkXfZVuaNxvzm/8iuqiAHlOvgz0eipWdPdNONQLdXkGV8=
-X-Received: by 2002:a17:907:1c01:: with SMTP id nc1mr12529737ejc.504.1630917966948;
- Mon, 06 Sep 2021 01:46:06 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210831103634.33-1-xieyongji@bytedance.com> <20210831103634.33-6-xieyongji@bytedance.com>
- <20210906015524-mutt-send-email-mst@kernel.org> <CACycT3v4ZVnh7DGe_RtAOx4Vvau0km=HWyCM=KzKhD+ahYKafQ@mail.gmail.com>
- <20210906023131-mutt-send-email-mst@kernel.org> <CACycT3ssC1bhNzY9Pk=LPvKjMrFFavTfCKTJtR2XEiVYqDxT1Q@mail.gmail.com>
- <20210906035338-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20210906035338-mutt-send-email-mst@kernel.org>
-From:   Yongji Xie <xieyongji@bytedance.com>
-Date:   Mon, 6 Sep 2021 16:45:55 +0800
-Message-ID: <CACycT3vQHRsJ_j5f4T9RoB4MQzBoYO5ts3egVe9K6TcCVfLOFQ@mail.gmail.com>
-Subject: Re: [PATCH v13 05/13] vdpa: Add reset callback in vdpa_config_ops
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Jason Wang <jasowang@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Parav Pandit <parav@nvidia.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Christian Brauner <christian.brauner@canonical.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?Q?Mika_Penttil=C3=A4?= <mika.penttila@nextfour.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>, joro@8bytes.org,
-        Greg KH <gregkh@linuxfoundation.org>,
-        He Zhe <zhe.he@windriver.com>,
-        Liu Xiaodong <xiaodong.liu@intel.com>,
-        Joe Perches <joe@perches.com>,
-        Robin Murphy <robin.murphy@arm.com>,
+        id S240727AbhIFJDR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Sep 2021 05:03:17 -0400
+Received: from mail.kernel.org ([198.145.29.99]:51260 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S240365AbhIFJDP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Sep 2021 05:03:15 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 24AF660F3A;
+        Mon,  6 Sep 2021 09:02:11 +0000 (UTC)
+Received: from 82-132-228-124.dab.02.net ([82.132.228.124] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1mNAW1-009Dbo-1g; Mon, 06 Sep 2021 10:02:09 +0100
+Date:   Mon, 06 Sep 2021 10:02:09 +0100
+Message-ID: <87k0jucc1a.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Oliver Upton <oupton@google.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Peter Shier <pshier@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-arm-kernel@lists.infradead.org,
+        Andrew Jones <drjones@redhat.com>,
         Will Deacon <will@kernel.org>,
-        John Garry <john.garry@huawei.com>, songmuchun@bytedance.com,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        netdev@vger.kernel.org, kvm <kvm@vger.kernel.org>,
-        linux-fsdevel@vger.kernel.org, iommu@lists.linux-foundation.org,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH v7 3/7] KVM: arm64: Allow userspace to configure a vCPU's virtual offset
+In-Reply-To: <YSryci4dSuRAEg+g@google.com>
+References: <20210816001217.3063400-1-oupton@google.com>
+        <20210816001217.3063400-4-oupton@google.com>
+        <YSryci4dSuRAEg+g@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 82.132.228.124
+X-SA-Exim-Rcpt-To: oupton@google.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, seanjc@google.com, pshier@google.com, jmattson@google.com, dmatlack@google.com, ricarkol@google.com, jingzhangos@google.com, rananta@google.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, linux-arm-kernel@lists.infradead.org, drjones@redhat.com, will@kernel.org, catalin.marinas@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 6, 2021 at 4:01 PM Michael S. Tsirkin <mst@redhat.com> wrote:
->
-> On Mon, Sep 06, 2021 at 03:06:44PM +0800, Yongji Xie wrote:
-> > On Mon, Sep 6, 2021 at 2:37 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> > >
-> > > On Mon, Sep 06, 2021 at 02:09:25PM +0800, Yongji Xie wrote:
-> > > > On Mon, Sep 6, 2021 at 1:56 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> > > > >
-> > > > > On Tue, Aug 31, 2021 at 06:36:26PM +0800, Xie Yongji wrote:
-> > > > > > This adds a new callback to support device specific reset
-> > > > > > behavior. The vdpa bus driver will call the reset function
-> > > > > > instead of setting status to zero during resetting.
-> > > > > >
-> > > > > > Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
-> > > > >
-> > > > >
-> > > > > This does gloss over a significant change though:
-> > > > >
-> > > > >
-> > > > > > ---
-> > > > > > @@ -348,12 +352,12 @@ static inline struct device *vdpa_get_dma_dev(struct vdpa_device *vdev)
-> > > > > >       return vdev->dma_dev;
-> > > > > >  }
-> > > > > >
-> > > > > > -static inline void vdpa_reset(struct vdpa_device *vdev)
-> > > > > > +static inline int vdpa_reset(struct vdpa_device *vdev)
-> > > > > >  {
-> > > > > >       const struct vdpa_config_ops *ops = vdev->config;
-> > > > > >
-> > > > > >       vdev->features_valid = false;
-> > > > > > -     ops->set_status(vdev, 0);
-> > > > > > +     return ops->reset(vdev);
-> > > > > >  }
-> > > > > >
-> > > > > >  static inline int vdpa_set_features(struct vdpa_device *vdev, u64 features)
-> > > > >
-> > > > >
-> > > > > Unfortunately this breaks virtio_vdpa:
-> > > > >
-> > > > >
-> > > > > static void virtio_vdpa_reset(struct virtio_device *vdev)
-> > > > > {
-> > > > >         struct vdpa_device *vdpa = vd_get_vdpa(vdev);
-> > > > >
-> > > > >         vdpa_reset(vdpa);
-> > > > > }
-> > > > >
-> > > > >
-> > > > > and there's no easy way to fix this, kernel can't recover
-> > > > > from a reset failure e.g. during driver unbind.
-> > > > >
-> > > >
-> > > > Yes, but it should be safe with the protection of software IOTLB even
-> > > > if the reset() fails during driver unbind.
-> > > >
-> > > > Thanks,
-> > > > Yongji
-> > >
-> > > Hmm. I don't see it.
-> > > What exactly will happen? What prevents device from poking at
-> > > memory after reset? Note that dma unmap in e.g. del_vqs happens
-> > > too late.
-> >
-> > But I didn't see any problems with touching the memory for virtqueues.
->
-> Drivers make the assumption that after reset returns no new
-> buffers will be consumed. For example a bunch of drivers
-> call virtqueue_detach_unused_buf.
+On Sun, 29 Aug 2021 03:35:30 +0100,
+Oliver Upton <oupton@google.com> wrote:
+> 
+> On Mon, Aug 16, 2021 at 12:12:13AM +0000, Oliver Upton wrote:
+> > Allow userspace to access the guest's virtual counter-timer offset
+> > through the ONE_REG interface. The value read or written is defined to
+> > be an offset from the guest's physical counter-timer. Add some
+> > documentation to clarify how a VMM should use this and the existing
+> > CNTVCT_EL0.
+> > 
+> > Signed-off-by: Oliver Upton <oupton@google.com>
+> > Reviewed-by: Andrew Jones <drjones@redhat.com>
+> 
+> Hrm...
+> 
+> I was mulling on this patch a bit more and had a thought. As previously
+> discussed, the patch implements virtual offsets by broadcasting the same
+> offset to all vCPUs in a guest. I wonder if this may tolerate bad
+> practices from userspace that will break when KVM supports NV.
+> 
+> Consider that a nested guest may set CNTVOFF_EL2 to whatever value it
+> wants. Presumably, we will need to patch the handling of CNTVOFF_EL2 to
+> *not* broadcast to all vCPUs to save/restore NV properly. If a maligned
+> VMM only wrote to a single vCPU, banking on this broadcasting
+> implementation, it will fall flat on its face when handling an NV guest.
+> 
+> So, should we preemptively move to the new way of the world, wherein
+> userspace accesses to CNTVOFF_EL2 are vCPU-local rather than VM-wide?
+> 
+> No strong opinions in either direction, but figured I'd address it since
+> I'll need to respin this series anyway to fix ECV+nVHE.
 
-I'm not sure if I get your point. But it looks like
-virtqueue_detach_unused_buf() will check the driver's metadata first
-rather than read the memory from virtqueue.
+Thought about this a bit more whilst being away from a computer...
 
-> I can't say whether block makes this assumption anywhere.
-> Needs careful auditing.
->
-> > The memory should not be freed after dma unmap?
->
-> But unmap does not happen until after the reset.
->
+It all boils down to what we expose as an abstraction of a machine. If
+there is no EL2 in the VM, then there shouldn't be any way for the
+guest to observe different values for the counters as seen from
+different vcpus. That's what the architecture guarantees for a
+physical system, and we shouldn't deviate from that. Opening the door
+for userspace to do anything differently is a recipe for disaster.
 
-I mean the memory is totally allocated and controlled by the VDUSE
-driver. The VDUSE driver will not return them to the buddy system
-unless userspace unmap it.
+It actually is an argument in favour of setting the various offsets to
+a value that keep the two physical and virtual counters in sync,
+instead of the current behaviour that allows different values to be
+observed.
 
->
-> > And the memory for the bounce buffer should also be safe to be
-> > accessed by userspace in this case.
-> >
-> > > And what about e.g. interrupts?
-> > > E.g. we have this:
-> > >
-> > >         /* Virtqueues are stopped, nothing can use vblk->vdev anymore. */
-> > >         vblk->vdev = NULL;
-> > >
-> > > and this is no longer true at this point.
-> > >
-> >
-> > You're right. But I didn't see where the interrupt handler will use
-> > the vblk->vdev.
->
-> static void virtblk_done(struct virtqueue *vq)
-> {
->         struct virtio_blk *vblk = vq->vdev->priv;
->
-> vq->vdev is the same as vblk->vdev.
->
+The above is in contrast with what the architecture allows when EL2 is
+present. The hypervisor can naturally deal with the offsets as it sees
+fit, and no offset should have any bearing on it (this later point is
+of course to be moderated by CNTPOFF on the host).
 
-We will test the vq->ready (will be set to false in del_vqs()) before
-injecting an interrupt in the VDUSE driver. So it should be OK?
+To sum it up, I'd rather keep the CNTVOFF behaviour what it is today
+for guest that have their highest exception level at EL1. For EL2
+guests, the setting will obviously have to become per-CPU.
 
->
-> > So it seems to be not too late to fix it:
-> >
-> > diff --git a/drivers/vdpa/vdpa_user/vduse_dev.c
-> > b/drivers/vdpa/vdpa_user/vduse_dev.c
-> > index 5c25ff6483ad..ea41a7389a26 100644
-> > --- a/drivers/vdpa/vdpa_user/vduse_dev.c
-> > +++ b/drivers/vdpa/vdpa_user/vduse_dev.c
-> > @@ -665,13 +665,13 @@ static void vduse_vdpa_set_config(struct
-> > vdpa_device *vdpa, unsigned int offset,
-> >  static int vduse_vdpa_reset(struct vdpa_device *vdpa)
-> >  {
-> >         struct vduse_dev *dev = vdpa_to_vduse(vdpa);
-> > +       int ret;
-> >
-> > -       if (vduse_dev_set_status(dev, 0))
-> > -               return -EIO;
-> > +       ret = vduse_dev_set_status(dev, 0);
-> >
-> >         vduse_dev_reset(dev);
-> >
-> > -       return 0;
-> > +       return ret;
-> >  }
-> >
-> >  static u32 vduse_vdpa_get_generation(struct vdpa_device *vdpa)
-> >
-> > Thanks,
-> > Yongji
->
-> Needs some comments to explain why it's done like this.
->
+	M.
 
-This is used to make sure the userspace can't not inject the interrupt
-any more after reset. The vduse_dev_reset() will clear the interrupt
-callback and flush the irq kworker.
-
-> BTW device is generally wedged at this point right?
-> E.g. if reset during initialization fails, userspace
-> will still get the reset at some later point and be
-> confused ...
->
-
-Sorry, I don't get why userspace will get the reset at some later point?
-
-Thanks,
-Yongji
+-- 
+Without deviation from the norm, progress is not possible.
