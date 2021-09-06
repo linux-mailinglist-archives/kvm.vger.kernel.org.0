@@ -2,105 +2,242 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9AF98401817
-	for <lists+kvm@lfdr.de>; Mon,  6 Sep 2021 10:36:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F10F6401838
+	for <lists+kvm@lfdr.de>; Mon,  6 Sep 2021 10:47:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240941AbhIFIgl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Sep 2021 04:36:41 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48271 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S240888AbhIFIgk (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 6 Sep 2021 04:36:40 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630917335;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=IjuoIMMg9iawWeddQRM19hiJ7Lu1md2D4kuSs3r3SI4=;
-        b=AHETR3nQ+OW6171ulBx1xqUPZ/dE8jjA79Mm4CG+RSyo6LHVu0pVP+arsgVusnvL3gRd+6
-        NdxQYD26NlBw/ehSNCUnJ8km512k7v5oa8ZAsvgFWGQs/u1fViQeaIeaXOe6PxGuTBqR1y
-        vqY6/HEhM3wX/2LhMx3gLU1PS7tCn+4=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-301-USSTAK9-MmG7X3l7F82Org-1; Mon, 06 Sep 2021 04:35:34 -0400
-X-MC-Unique: USSTAK9-MmG7X3l7F82Org-1
-Received: by mail-wm1-f71.google.com with SMTP id a201-20020a1c7fd2000000b002e748bf0544so3628561wmd.2
-        for <kvm@vger.kernel.org>; Mon, 06 Sep 2021 01:35:34 -0700 (PDT)
+        id S241362AbhIFIsF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Sep 2021 04:48:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39458 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S241496AbhIFIrN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Sep 2021 04:47:13 -0400
+Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C0BCC061575
+        for <kvm@vger.kernel.org>; Mon,  6 Sep 2021 01:46:08 -0700 (PDT)
+Received: by mail-ej1-x62d.google.com with SMTP id mf2so11987436ejb.9
+        for <kvm@vger.kernel.org>; Mon, 06 Sep 2021 01:46:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=8LAmaSyJa7xIkRyWmQFQLPdtTpPfl6cF8N/0UDdi5JQ=;
+        b=ftFDUtejRaca7/VzbCnbdEqwMSB1qRj0J5JYAYxPmAajPt03iJ9JCXESud9TiTSFw/
+         I7SEgZbb5lKtt2/bzhJSqptGgf4gIGPXHdpEN+PqnzoJCwe5G6zw1nZV5r1mHhS2Uj6u
+         Ma3WF0jXLDn+f7ZSOT3zf1nrVt/O+3Hz8nT/Xs9Zrojfwv8wZrnspilhtE7WoyICjPFF
+         /BMAycSuJw9hbx4I4PL//aQpMrxhcaD/FCjz3yn0AM8kK11PIo9D4z2JpAZFfyn00OAF
+         XAOQbuFOpM72i24Kdf2NjGDkRC54nedjfG1Hhy3fsWsggeuCs9rfuR4xMpV0zJe/P+Dq
+         iNcg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=IjuoIMMg9iawWeddQRM19hiJ7Lu1md2D4kuSs3r3SI4=;
-        b=EVmiUlGHBspN23tj/A+ub24nOnYJy5BHedvqbhCT/p5neDnLKY4niaMt6Rx7bExmy5
-         ilYFYm1uzverDQ33P9x6AEfSPWeVE0mu2tVHfdX2G9hF5STqB/31Ox5pipDJzPP35PEF
-         CZe5dv/AtxK5Yuvc5/l0IvOT4582ZW4U7BMMFSMyUwCvwMN90N1smJSJYAPpViXlu5Rb
-         r7PPoXxcAc1w/n9q/PFFZBGAYy472VjubXLnoIb+PqH8vKbcn5LTQutGERl+QBmgFVed
-         2AN+OFgBPKG86rl0++vOTUpKz1fKO6EKl1VEA31Po04PDkDgUnhEpoX7XMIVWpw4aIol
-         6uQw==
-X-Gm-Message-State: AOAM533ip6aUDZODdnPvnYDWSSD08kKIzRt2euB9XbF4aKBCzoVTxr8V
-        EPNH99B5VzGm5i14mfAtk20bQvVsNYit/6SCBk+53QoIUpb5O8q1bFWX0pc0va7gYo8bYqmtjvF
-        jJhdm7alxwzY4QqzAKFHZNNq0iUZPdgU/otcuU5cT3Dxx1XMQFZxJk5cC0hh01cTG
-X-Received: by 2002:a1c:98d5:: with SMTP id a204mr10542460wme.52.1630917333346;
-        Mon, 06 Sep 2021 01:35:33 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzPMM1T99WUU70Segpdi5Aem47QBjEgyCa24XVyUiY9UeaE4vEGWOypPCBZ8+vWngLZIZgt+w==
-X-Received: by 2002:a1c:98d5:: with SMTP id a204mr10542427wme.52.1630917333122;
-        Mon, 06 Sep 2021 01:35:33 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id y15sm7998147wmi.18.2021.09.06.01.35.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 06 Sep 2021 01:35:32 -0700 (PDT)
-Subject: Re: [PATCH] x86/sgx: Declare sgx_set_attribute() for !CONFIG_X86_SGX
-To:     Jarkko Sakkinen <jarkko@kernel.org>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Dave Hansen <dave.hansen@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Tony Luck <tony.luck@intel.com>, linux-sgx@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <20210903064156.387979-1-jarkko@kernel.org>
- <YTI/dTORBZEmGgux@google.com>
- <f7e6b2f444f34064e34d7bd680d2c863b9ce6a41.camel@kernel.org>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a43d34d5-623f-20f3-c29a-56985d5614ba@redhat.com>
-Date:   Mon, 6 Sep 2021 10:35:31 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=8LAmaSyJa7xIkRyWmQFQLPdtTpPfl6cF8N/0UDdi5JQ=;
+        b=r2jXa2AMdQIZGihoIwATTxvO0h5F2TxC+sa+JQ8LfaNLf4BHf8H9+g921WTBa8/qiQ
+         mjdDVrHns+S59mCGQZay3fkMi2/ND9vvn5j0t3AnWCClteqvo3lQ/2l82cTrQmqoYjZw
+         Ntyxfz2GnZlcAG1uPvCowruaTQKaTUh49Rb5d++PRhq4RMe5fo9b331V/gxIIF4mFHCH
+         /NdhN6KUqxJL8QZt+mKO2ELb25zTHEtngT8dPYDr0i1ocobaE22u9UHeWARSPX/elqQV
+         dYQ/ux9TfvdUtdls7Dj4SWMeFPGfEM9V2loYQBu9bT7ZEMwtTRkwpuko/+nOLE61qB59
+         fPnQ==
+X-Gm-Message-State: AOAM532A3JyRxq1vGwG8lv59arNIMQL0Vjp8tGwxBbJI9vVPP7mrt8Qh
+        whGRsneqz9gbf17n0XQ4HfE4YYjbpDNa2GSsQK+S
+X-Google-Smtp-Source: ABdhPJxRcevb7Cx9lFr/uLNuGUc45WhioHM0KmVHs1F8bqTkXfZVuaNxvzm/8iuqiAHlOvgz0eipWdPdNONQLdXkGV8=
+X-Received: by 2002:a17:907:1c01:: with SMTP id nc1mr12529737ejc.504.1630917966948;
+ Mon, 06 Sep 2021 01:46:06 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <f7e6b2f444f34064e34d7bd680d2c863b9ce6a41.camel@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20210831103634.33-1-xieyongji@bytedance.com> <20210831103634.33-6-xieyongji@bytedance.com>
+ <20210906015524-mutt-send-email-mst@kernel.org> <CACycT3v4ZVnh7DGe_RtAOx4Vvau0km=HWyCM=KzKhD+ahYKafQ@mail.gmail.com>
+ <20210906023131-mutt-send-email-mst@kernel.org> <CACycT3ssC1bhNzY9Pk=LPvKjMrFFavTfCKTJtR2XEiVYqDxT1Q@mail.gmail.com>
+ <20210906035338-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20210906035338-mutt-send-email-mst@kernel.org>
+From:   Yongji Xie <xieyongji@bytedance.com>
+Date:   Mon, 6 Sep 2021 16:45:55 +0800
+Message-ID: <CACycT3vQHRsJ_j5f4T9RoB4MQzBoYO5ts3egVe9K6TcCVfLOFQ@mail.gmail.com>
+Subject: Re: [PATCH v13 05/13] vdpa: Add reset callback in vdpa_config_ops
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Jason Wang <jasowang@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Parav Pandit <parav@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Christian Brauner <christian.brauner@canonical.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?Q?Mika_Penttil=C3=A4?= <mika.penttila@nextfour.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>, joro@8bytes.org,
+        Greg KH <gregkh@linuxfoundation.org>,
+        He Zhe <zhe.he@windriver.com>,
+        Liu Xiaodong <xiaodong.liu@intel.com>,
+        Joe Perches <joe@perches.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Will Deacon <will@kernel.org>,
+        John Garry <john.garry@huawei.com>, songmuchun@bytedance.com,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        netdev@vger.kernel.org, kvm <kvm@vger.kernel.org>,
+        linux-fsdevel@vger.kernel.org, iommu@lists.linux-foundation.org,
+        linux-kernel <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 03/09/21 17:58, Jarkko Sakkinen wrote:
->> Eh, it doesn't really simplify the usage.  If anything it makes it more convoluted
->> because the capability check in kvm_vm_ioctl_check_extension() still needs an
->> #ifdef, e.g. readers will wonder why the check is conditional but the usage is not.
-> It does objectively a bit, since it's one ifdef less.
+On Mon, Sep 6, 2021 at 4:01 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> On Mon, Sep 06, 2021 at 03:06:44PM +0800, Yongji Xie wrote:
+> > On Mon, Sep 6, 2021 at 2:37 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> > >
+> > > On Mon, Sep 06, 2021 at 02:09:25PM +0800, Yongji Xie wrote:
+> > > > On Mon, Sep 6, 2021 at 1:56 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> > > > >
+> > > > > On Tue, Aug 31, 2021 at 06:36:26PM +0800, Xie Yongji wrote:
+> > > > > > This adds a new callback to support device specific reset
+> > > > > > behavior. The vdpa bus driver will call the reset function
+> > > > > > instead of setting status to zero during resetting.
+> > > > > >
+> > > > > > Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
+> > > > >
+> > > > >
+> > > > > This does gloss over a significant change though:
+> > > > >
+> > > > >
+> > > > > > ---
+> > > > > > @@ -348,12 +352,12 @@ static inline struct device *vdpa_get_dma_dev(struct vdpa_device *vdev)
+> > > > > >       return vdev->dma_dev;
+> > > > > >  }
+> > > > > >
+> > > > > > -static inline void vdpa_reset(struct vdpa_device *vdev)
+> > > > > > +static inline int vdpa_reset(struct vdpa_device *vdev)
+> > > > > >  {
+> > > > > >       const struct vdpa_config_ops *ops = vdev->config;
+> > > > > >
+> > > > > >       vdev->features_valid = false;
+> > > > > > -     ops->set_status(vdev, 0);
+> > > > > > +     return ops->reset(vdev);
+> > > > > >  }
+> > > > > >
+> > > > > >  static inline int vdpa_set_features(struct vdpa_device *vdev, u64 features)
+> > > > >
+> > > > >
+> > > > > Unfortunately this breaks virtio_vdpa:
+> > > > >
+> > > > >
+> > > > > static void virtio_vdpa_reset(struct virtio_device *vdev)
+> > > > > {
+> > > > >         struct vdpa_device *vdpa = vd_get_vdpa(vdev);
+> > > > >
+> > > > >         vdpa_reset(vdpa);
+> > > > > }
+> > > > >
+> > > > >
+> > > > > and there's no easy way to fix this, kernel can't recover
+> > > > > from a reset failure e.g. during driver unbind.
+> > > > >
+> > > >
+> > > > Yes, but it should be safe with the protection of software IOTLB even
+> > > > if the reset() fails during driver unbind.
+> > > >
+> > > > Thanks,
+> > > > Yongji
+> > >
+> > > Hmm. I don't see it.
+> > > What exactly will happen? What prevents device from poking at
+> > > memory after reset? Note that dma unmap in e.g. del_vqs happens
+> > > too late.
+> >
+> > But I didn't see any problems with touching the memory for virtqueues.
+>
+> Drivers make the assumption that after reset returns no new
+> buffers will be consumed. For example a bunch of drivers
+> call virtqueue_detach_unused_buf.
 
-But you're effectively replacing #ifdef CONFIG_X86_SGX_KVM with #ifdef 
-CONFIG_X86_SGX; so the patch is not a no-op as far as KVM is concerned.
+I'm not sure if I get your point. But it looks like
+virtqueue_detach_unused_buf() will check the driver's metadata first
+rather than read the memory from virtqueue.
 
-So NACK for the KVM parts (yeah I know it's RFC but just to be clearer), 
-but I agree that adding a stub inline version of the function is 
-standard practice and we do it a lot in KVM too.
+> I can't say whether block makes this assumption anywhere.
+> Needs careful auditing.
+>
+> > The memory should not be freed after dma unmap?
+>
+> But unmap does not happen until after the reset.
+>
 
-Paolo
+I mean the memory is totally allocated and controlled by the VDUSE
+driver. The VDUSE driver will not return them to the buddy system
+unless userspace unmap it.
 
-> This is fairly standard practice to do in kernel APIs, used in countless
-> places, for instance in Tony's patch set to add MCE recovery for SGX. And
-> it would be nice to share common pattern here how we define API now and
-> futre.
-> 
-> I also remarked that declaration of "sgx_provisioning_allowed" is not flagged,
-> which is IMHO even more convolved because without SGX it is spare data.
+>
+> > And the memory for the bounce buffer should also be safe to be
+> > accessed by userspace in this case.
+> >
+> > > And what about e.g. interrupts?
+> > > E.g. we have this:
+> > >
+> > >         /* Virtqueues are stopped, nothing can use vblk->vdev anymore. */
+> > >         vblk->vdev = NULL;
+> > >
+> > > and this is no longer true at this point.
+> > >
+> >
+> > You're right. But I didn't see where the interrupt handler will use
+> > the vblk->vdev.
+>
+> static void virtblk_done(struct virtqueue *vq)
+> {
+>         struct virtio_blk *vblk = vq->vdev->priv;
+>
+> vq->vdev is the same as vblk->vdev.
+>
 
+We will test the vq->ready (will be set to false in del_vqs()) before
+injecting an interrupt in the VDUSE driver. So it should be OK?
+
+>
+> > So it seems to be not too late to fix it:
+> >
+> > diff --git a/drivers/vdpa/vdpa_user/vduse_dev.c
+> > b/drivers/vdpa/vdpa_user/vduse_dev.c
+> > index 5c25ff6483ad..ea41a7389a26 100644
+> > --- a/drivers/vdpa/vdpa_user/vduse_dev.c
+> > +++ b/drivers/vdpa/vdpa_user/vduse_dev.c
+> > @@ -665,13 +665,13 @@ static void vduse_vdpa_set_config(struct
+> > vdpa_device *vdpa, unsigned int offset,
+> >  static int vduse_vdpa_reset(struct vdpa_device *vdpa)
+> >  {
+> >         struct vduse_dev *dev = vdpa_to_vduse(vdpa);
+> > +       int ret;
+> >
+> > -       if (vduse_dev_set_status(dev, 0))
+> > -               return -EIO;
+> > +       ret = vduse_dev_set_status(dev, 0);
+> >
+> >         vduse_dev_reset(dev);
+> >
+> > -       return 0;
+> > +       return ret;
+> >  }
+> >
+> >  static u32 vduse_vdpa_get_generation(struct vdpa_device *vdpa)
+> >
+> > Thanks,
+> > Yongji
+>
+> Needs some comments to explain why it's done like this.
+>
+
+This is used to make sure the userspace can't not inject the interrupt
+any more after reset. The vduse_dev_reset() will clear the interrupt
+callback and flush the irq kworker.
+
+> BTW device is generally wedged at this point right?
+> E.g. if reset during initialization fails, userspace
+> will still get the reset at some later point and be
+> confused ...
+>
+
+Sorry, I don't get why userspace will get the reset at some later point?
+
+Thanks,
+Yongji
