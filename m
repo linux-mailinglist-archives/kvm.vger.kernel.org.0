@@ -2,129 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 791DA4016EF
-	for <lists+kvm@lfdr.de>; Mon,  6 Sep 2021 09:24:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BDBEB4016FC
+	for <lists+kvm@lfdr.de>; Mon,  6 Sep 2021 09:33:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239960AbhIFHZD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Sep 2021 03:25:03 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25867 "EHLO
+        id S239974AbhIFHeZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Sep 2021 03:34:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:57819 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233040AbhIFHZD (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 6 Sep 2021 03:25:03 -0400
+        by vger.kernel.org with ESMTP id S239505AbhIFHeZ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 6 Sep 2021 03:34:25 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630913038;
+        s=mimecast20190719; t=1630913600;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=wf8KRCDP99l0Ftn5x2zHgfYJe6BFFbdxma/jTrXRbLU=;
-        b=XUm45s8VTWlQQQygnbnwiKo67NqbUbRLKCU9gZcGPTibBuVun+Q/FcH+mPV3jwb5PBmEyC
-        DA77fQaLUBsfrfd7HopChqp7Vt0/E85gKv5i8ydxCub3ysrEZ7hjT2/yRyGdDtK364PtRr
-        CKaLawFiXnO5PR/Pcb+f8mpvagV40SA=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-225-Y0Xe5-tCPpmaQabVio5eRw-1; Mon, 06 Sep 2021 03:23:55 -0400
-X-MC-Unique: Y0Xe5-tCPpmaQabVio5eRw-1
-Received: by mail-wr1-f71.google.com with SMTP id j1-20020adff541000000b001593715d384so918145wrp.1
-        for <kvm@vger.kernel.org>; Mon, 06 Sep 2021 00:23:55 -0700 (PDT)
+        bh=RSrx4XOVTKDR+lRM3utIJIs7HCPXyZCtAZOFr15Y8Bw=;
+        b=X7DT8HoDz8ZPSQAjJcAahyqM4Mi0w3eMABkPs2OEiDrDk20exV38TUUI/K/gZqOu1IAs0p
+        lFwCwaIAeWkogUzMg4AcoyER+xsxhwAbt0fdDThFR5sPQ8gg9j9McxtF3/uCuwFQ7P364Z
+        LPrUP/SZCGmamLqpA3wNBDHZrDDHrSU=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-294-WYY1x9t3N6uwjVj-lVe4RQ-1; Mon, 06 Sep 2021 03:33:19 -0400
+X-MC-Unique: WYY1x9t3N6uwjVj-lVe4RQ-1
+Received: by mail-ej1-f72.google.com with SMTP id c25-20020a170906529900b005c56c92caa2so1915720ejm.19
+        for <kvm@vger.kernel.org>; Mon, 06 Sep 2021 00:33:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=wf8KRCDP99l0Ftn5x2zHgfYJe6BFFbdxma/jTrXRbLU=;
-        b=pOPyufW2OWl/HSNUm0ooE1JtuUWCVBV//yClDaoj0GabTkFnjzEPVptV6ReuEUvHjS
-         PuPraaZXHk/kYrmDnZLAHuh4moac5+ITpeIkiiYxESp1f5OXOTY5HSsnmf6qsmCYi+Cy
-         UnjIrT216hqpc8KeDYMf5yuZOWo8UOR4n429Gv0u86ra6ObB1d2WVa5n01GSId2/U3oE
-         XaGJHCxyVGhdjTJG2DX27dTqd+zRI7Buq1FfRWa83LPp+rd9hwe1nQ4N9jV+BcfLxV4O
-         vSVOYyiVB9027z13NwJK7EJiwTu3VwnPKbNF/6GPOae0LjUdyIJHf3RY5XXmk4qzxBJz
-         j1ww==
-X-Gm-Message-State: AOAM530DEP7yx9EL9Rv2ik9fA7oKiJbj3rBMkbKVjIbx6nwDYr9WEuSt
-        uWJslgew3f6Rs8a7VGmf2uaayfEoL5TEWwx8iVgOEunLheiMxsaeRepAbEoMlqYoZ2j45d1vXpS
-        UxGCpGH1ZAzYs
-X-Received: by 2002:adf:fb91:: with SMTP id a17mr11227365wrr.376.1630913034536;
-        Mon, 06 Sep 2021 00:23:54 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxdaR3Mh8cLUnR+nwZrbR2K1Bv76qt2OHscdhtOpNYxiADNGF0/XvoztVGTSICRDJ/6aJonwg==
-X-Received: by 2002:adf:fb91:: with SMTP id a17mr11227346wrr.376.1630913034375;
-        Mon, 06 Sep 2021 00:23:54 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id o12sm6471190wmr.2.2021.09.06.00.23.53
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=RSrx4XOVTKDR+lRM3utIJIs7HCPXyZCtAZOFr15Y8Bw=;
+        b=atQeZiabDJ7RVZaruC0kruxcTjdyjLYpK0MwJM2WpZyT5/o4j3qp6m1qjbPy2jJsPg
+         GA1gZox4Jtr338aQRP4FqxfOM5TMTCvpFuk05qDR5Kaa8sz8RjCj5CGC+NnhZjB2H33K
+         hYXbfqt6c2qqjpR3hOQMkiJ1z81T76mgP61Y7hUwxNptXeGime7pHgCzBi8XovHyrCfe
+         AAkqBhfr3FY6rHY2xlj5yvHrWR05U4E0Wy5sHs+qbT/40WE5aW48HKxWIiSSwGLj277d
+         V9w/ShBAGt/lSyqMIZibbNY7HTlF3+st2BODrx3p4m7yzRXq7bTtfUljIjFOKW9UoV8M
+         M/Ng==
+X-Gm-Message-State: AOAM533AnZgxfMjYKU1WqKCz4GczQS0fKKJ2cuDQRl8XPFJm9sNNL8SL
+        cH0pUpuTXpqnxwOm4toGgp6SQy44KpI4ChsHeTVm71DWuXXAVgafLu7lK8NoQu16YDQY+Q3KE+f
+        rfeSoe9mk6nmk
+X-Received: by 2002:a05:6402:524f:: with SMTP id t15mr12090719edd.121.1630913598479;
+        Mon, 06 Sep 2021 00:33:18 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJztuWeCXr3yeqKVL82y9FHLYnMqEF7PCrl5+Qj+0fsCR1hZx3SVNS75Zj5Zq0HWAuYyDMs9jw==
+X-Received: by 2002:a05:6402:524f:: with SMTP id t15mr12090699edd.121.1630913598298;
+        Mon, 06 Sep 2021 00:33:18 -0700 (PDT)
+Received: from steredhat (host-79-51-2-59.retail.telecomitalia.it. [79.51.2.59])
+        by smtp.gmail.com with ESMTPSA id y32sm4119673ede.22.2021.09.06.00.33.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Sep 2021 00:23:53 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Nitesh Narayan Lal <nitesh@redhat.com>,
-        Lai Jiangshan <jiangshanlai@gmail.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5 8/8] KVM: Make kvm_make_vcpus_request_mask() use
- pre-allocated cpu_kick_mask
-In-Reply-To: <YTJMvI1GE5Ux7eVE@google.com>
-References: <20210903075141.403071-1-vkuznets@redhat.com>
- <20210903075141.403071-9-vkuznets@redhat.com>
- <YTJMvI1GE5Ux7eVE@google.com>
-Date:   Mon, 06 Sep 2021 09:23:52 +0200
-Message-ID: <87wnnu416f.fsf@vitty.brq.redhat.com>
+        Mon, 06 Sep 2021 00:33:17 -0700 (PDT)
+Date:   Mon, 6 Sep 2021 09:33:15 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Arseny Krasnov <arseny.krasnov@kaspersky.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Colin Ian King <colin.king@canonical.com>,
+        Norbert Slusarek <nslusarek@gmx.net>,
+        Andra Paraschiv <andraprs@amazon.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "stsp2@yandex.ru" <stsp2@yandex.ru>,
+        "oxffffaa@gmail.com" <oxffffaa@gmail.com>
+Subject: Re: [PATCH net-next v5 0/6] virtio/vsock: introduce MSG_EOR flag for
+ SEQPACKET
+Message-ID: <20210906073315.n7qgsv3gm7dasgzu@steredhat>
+References: <20210903123016.3272800-1-arseny.krasnov@kaspersky.com>
+ <20210905115139-mutt-send-email-mst@kernel.org>
+ <4558e96b-6330-667f-955b-b689986f884f@kaspersky.com>
+ <20210905121932-mutt-send-email-mst@kernel.org>
+ <5b20410a-fb8f-2e38-59d9-74dc6b8a9d4f@kaspersky.com>
+ <20210905161809-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20210905161809-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <seanjc@google.com> writes:
+On Sun, Sep 05, 2021 at 04:18:52PM -0400, Michael S. Tsirkin wrote:
+>On Sun, Sep 05, 2021 at 07:21:10PM +0300, Arseny Krasnov wrote:
+>>
+>> On 05.09.2021 19:19, Michael S. Tsirkin wrote:
+>> > On Sun, Sep 05, 2021 at 07:02:44PM +0300, Arseny Krasnov wrote:
+>> >> On 05.09.2021 18:55, Michael S. Tsirkin wrote:
+>> >>> On Fri, Sep 03, 2021 at 03:30:13PM +0300, Arseny Krasnov wrote:
+>> >>>> 	This patchset implements support of MSG_EOR bit for SEQPACKET
+>> >>>> AF_VSOCK sockets over virtio transport.
+>> >>>> 	First we need to define 'messages' and 'records' like this:
+>> >>>> Message is result of sending calls: 'write()', 'send()', 'sendmsg()'
+>> >>>> etc. It has fixed maximum length, and it bounds are visible using
+>> >>>> return from receive calls: 'read()', 'recv()', 'recvmsg()' etc.
+>> >>>> Current implementation based on message definition above.
+>> >>>> 	Record has unlimited length, it consists of multiple message,
+>> >>>> and bounds of record are visible via MSG_EOR flag returned from
+>> >>>> 'recvmsg()' call. Sender passes MSG_EOR to sending system call and
+>> >>>> receiver will see MSG_EOR when corresponding message will be processed.
+>> >>>> 	Idea of patchset comes from POSIX: it says that SEQPACKET
+>> >>>> supports record boundaries which are visible for receiver using
+>> >>>> MSG_EOR bit. So, it looks like MSG_EOR is enough thing for SEQPACKET
+>> >>>> and we don't need to maintain boundaries of corresponding send -
+>> >>>> receive system calls. But, for 'sendXXX()' and 'recXXX()' POSIX says,
+>> >>>> that all these calls operates with messages, e.g. 'sendXXX()' sends
+>> >>>> message, while 'recXXX()' reads messages and for SEQPACKET, 'recXXX()'
+>> >>>> must read one entire message from socket, dropping all out of size
+>> >>>> bytes. Thus, both message boundaries and MSG_EOR bit must be supported
+>> >>>> to follow POSIX rules.
+>> >>>> 	To support MSG_EOR new bit was added along with existing
+>> >>>> 'VIRTIO_VSOCK_SEQ_EOR': 'VIRTIO_VSOCK_SEQ_EOM'(end-of-message) - now it
+>> >>>> works in the same way as 'VIRTIO_VSOCK_SEQ_EOR'. But 'VIRTIO_VSOCK_SEQ_EOR'
+>> >>>> is used to mark 'MSG_EOR' bit passed from userspace.
+>> >>>> 	This patchset includes simple test for MSG_EOR.
+>> >>> I'm prepared to merge this for this window,
+>> >>> but I'm not sure who's supposed to ack the net/vmw_vsock/af_vsock.c
+>> >>> bits. It's a harmless variable renaming so maybe it does not matter.
+>> >>>
+>> >>> The rest is virtio stuff so I guess my tree is ok.
+>> >>>
+>> >>> Objections, anyone?
+>> >> https://lkml.org/lkml/2021/9/3/76 this is v4. It is same as v5 in af_vsock.c changes.
+>> >>
+>> >> It has Reviewed by from Stefano Garzarella.
+>> > Is Stefano the maintainer for af_vsock then?
+>> > I wasn't sure.
 
-> On Fri, Sep 03, 2021, Vitaly Kuznetsov wrote:
->> kvm_make_vcpus_request_mask() already disables preemption so just like
->> kvm_make_all_cpus_request_except() it can be switched to using
->> pre-allocated per-cpu cpumasks. This allows for improvements for both
->> users of the function: in Hyper-V emulation code 'tlb_flush' can now be
->> dropped from 'struct kvm_vcpu_hv' and kvm_make_scan_ioapic_request_mask()
->> gets rid of dynamic allocation.
->> 
->> cpumask_available() checks in kvm_make_vcpu_request() and
->> kvm_kick_many_cpus() can now be dropped as they checks for an impossible
->> condition: kvm_init() makes sure per-cpu masks are allocated.
->> 
->> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
->> ---
+I'm maintaining virtio-vsock stuff, but I'm reviewing most of the 
+af_vsock patches. We don't have an entry for it in MAINTAINERS, maybe we 
+should.
+
+>> Ack, let's wait for maintainer's comment
 >
-> Reviewed-by: Sean Christopherson <seanjc@google.com>
 >
+>The specific patch is a trivial variable renaming so
+>I parked this in my tree for now, will merge unless I
+>hear any objections in the next couple of days.
 
-Thanks!
+I agree, I think your tree is fine, since this series is mostly about 
+virtio-vsock.
 
->> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->> index a4752dcc2a75..91c1e6c98b0f 100644
->> --- a/arch/x86/kvm/x86.c
->> +++ b/arch/x86/kvm/x86.c
->> @@ -9224,14 +9224,8 @@ static void process_smi(struct kvm_vcpu *vcpu)
->>  void kvm_make_scan_ioapic_request_mask(struct kvm *kvm,
->>  				       unsigned long *vcpu_bitmap)
->>  {
->> -	cpumask_var_t cpus;
->> -
->> -	zalloc_cpumask_var(&cpus, GFP_ATOMIC);
->> -
->>  	kvm_make_vcpus_request_mask(kvm, KVM_REQ_SCAN_IOAPIC,
->> -				    vcpu_bitmap, cpus);
->> -
->> -	free_cpumask_var(cpus);
->> +				    vcpu_bitmap);
->
-> Nit, this can all go on a single line.
->
-
-Sorry, you've mentioned this on v4 but I forgot. Hope this can be fixed
-upon commit...
-
->>  }
->>  
->>  void kvm_make_scan_ioapic_request(struct kvm *kvm)
->
-
--- 
-Vitaly
+Thanks,
+Stefano
 
