@@ -2,228 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EF44E401772
-	for <lists+kvm@lfdr.de>; Mon,  6 Sep 2021 10:02:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 24613401778
+	for <lists+kvm@lfdr.de>; Mon,  6 Sep 2021 10:05:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240206AbhIFICO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Sep 2021 04:02:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:21304 "EHLO
+        id S240539AbhIFIE4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Sep 2021 04:04:56 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34633 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S240427AbhIFICL (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 6 Sep 2021 04:02:11 -0400
+        by vger.kernel.org with ESMTP id S240544AbhIFIEx (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 6 Sep 2021 04:04:53 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630915266;
+        s=mimecast20190719; t=1630915426;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=NO6GFqxRcZJwYtn+Qe2gbxSZz+UC4dbKjNIIRf72XCk=;
-        b=UuFqQ00Tm2KbrhirSrxPgY++m/Ew4rhyq7U+cUI5JrKAVmU31D6uQJEFQzGcB+mUK99jKB
-        SaN/5T8yRSXswwKIsJmT/pRx6nS6tsAA32EYse4fgTjn7yV/B1T9YgamrBw+X0KoUi/YE9
-        88lNIa2nP4yayQC08JhGnaTt1pg8RBc=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-568-IlZw0440MJ6oT_f8Hl6Z3Q-1; Mon, 06 Sep 2021 04:01:03 -0400
-X-MC-Unique: IlZw0440MJ6oT_f8Hl6Z3Q-1
-Received: by mail-wm1-f72.google.com with SMTP id r4-20020a1c4404000000b002e728beb9fbso3574107wma.9
-        for <kvm@vger.kernel.org>; Mon, 06 Sep 2021 01:01:03 -0700 (PDT)
+        bh=W2g1b9NX3P4QOnCtZSdNu+sJkQfvHZK6OJZ7BDJqDLg=;
+        b=ZaputEcm/bYOJY/hTTB9gC/tjdWq5WQ1tWLKLj6Fbfv75sH+YpyM5GM10STYXGnViCX1Kr
+        61Wt7eklQVQOpM8rDngzK+Lk9H4ztr1z20NF3VS3Lmk8b2MZDCDopuBvuICzdSf2Q2ST+v
+        QUeuO723eJpApjtmax69nvNHX2sQaLY=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-91-EZTOas_CMTKIXPk8iO5SJg-1; Mon, 06 Sep 2021 04:03:45 -0400
+X-MC-Unique: EZTOas_CMTKIXPk8iO5SJg-1
+Received: by mail-ed1-f69.google.com with SMTP id ch11-20020a0564021bcb00b003c8021b61c4so3148298edb.23
+        for <kvm@vger.kernel.org>; Mon, 06 Sep 2021 01:03:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=NO6GFqxRcZJwYtn+Qe2gbxSZz+UC4dbKjNIIRf72XCk=;
-        b=IPp5w+xC0Aq53EzJzNiF77wFKhDUI7HXJnOlIzi1uSrzAQu+pAOC4z0/mRAACPEb7y
-         VeYRp5v8AKc37sDMuD/UiESUjj3Sv5l194JWqI2VNgeoyizG3mfh2XM6pxaUyhku8e3r
-         cqHAn0OmhNF5iBs7KPP8Awpr3GGfy48iD9l+LkzJjvRabIOimU282x4+WORkQT/5cdqE
-         AAJHYp3LMXBq2Ovp0tz0C6/bOB7HpoIU11wqwEFNbQX9gvJ7Tdes2b72XDsfbxbKnMMD
-         OAcNoL1mXUnzr4KAdvsLoGyyTVOKofcclQBMvxdbtj9jJsoSf8qvAJ68NBcWdks8Qeus
-         sAwg==
-X-Gm-Message-State: AOAM532k6+2jlQag66JntJQxIiH4wtdEq2eQi4qNkx3bLKoFV1RGs/AU
-        udKfjOIAOkrcbffosjmthx2Ur1DLjkulsWNck3JYIeBMKVntybfcWbw9IOzc/BRNq6okYKlP/C/
-        QPHNws/ZXZoph
-X-Received: by 2002:a1c:4d10:: with SMTP id o16mr10145336wmh.60.1630915262581;
-        Mon, 06 Sep 2021 01:01:02 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyD0Y0QTVxlVRT+q0YtcHDYNCzcA75tKV0/AOdp2DwxYwSQKzP8ML7fq7xzKLKNz0GctS8Quw==
-X-Received: by 2002:a1c:4d10:: with SMTP id o16mr10145288wmh.60.1630915262309;
-        Mon, 06 Sep 2021 01:01:02 -0700 (PDT)
+        bh=W2g1b9NX3P4QOnCtZSdNu+sJkQfvHZK6OJZ7BDJqDLg=;
+        b=YqBwQLQY2WGHYee23sCLL0LdEqXoloBXRBMcPGGdgBLAGkQh0wwODhEGfzoa9NAgnH
+         vOm1gAyZzCN6XI1V3jeAD1ZreJM/EIb/MAdYJyP55zp3Q3/kSU/6nmzgws/qlzHsDS/w
+         x4BaA0iY1i2NYjjKnRkGCR+PM8+oii2K+2tStIwTs3D8NY71Up/RDYQp571UFZqnv+dk
+         8LaC/6MAHvwZM8AIh8ETGNb/RRJihZkMSQNfi+AXFQb3IcQ6hw5jN7QWcK0se9+llLhz
+         5sIPh0qA4zwu2HlNHp735dT52hbDzuHipp1/Z1vlZEBvOM1mEuFohLnE1tMAEtQOXFRn
+         LgAA==
+X-Gm-Message-State: AOAM532gaeBYkRcnd5tgHX4qw1Edu2uOnWGRsMwujJ4XkhUjGP3/bkaR
+        wenSdX3nIjdiLhlw/SzUALIFY7Sr9wMgXC7RVsOg1uFcamUBGnqi5BvVHijT5LTOuNd+m04H/Jt
+        FlUTVdBilA9pW
+X-Received: by 2002:a05:6402:148:: with SMTP id s8mr12049798edu.298.1630915424072;
+        Mon, 06 Sep 2021 01:03:44 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxRJf9kq4wjR1PeMax4DOv0vHAJxFFvRjMlnKsmrmMvqdiz5jcTh29LDuagCJ7xkcWidZAWDA==
+X-Received: by 2002:a05:6402:148:: with SMTP id s8mr12049783edu.298.1630915423910;
+        Mon, 06 Sep 2021 01:03:43 -0700 (PDT)
 Received: from redhat.com ([2.55.131.183])
-        by smtp.gmail.com with ESMTPSA id e3sm6259897wrc.11.2021.09.06.01.00.57
+        by smtp.gmail.com with ESMTPSA id c25sm3423749ejm.9.2021.09.06.01.03.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Sep 2021 01:01:01 -0700 (PDT)
-Date:   Mon, 6 Sep 2021 04:00:55 -0400
+        Mon, 06 Sep 2021 01:03:43 -0700 (PDT)
+Date:   Mon, 6 Sep 2021 04:03:38 -0400
 From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Yongji Xie <xieyongji@bytedance.com>
-Cc:     Jason Wang <jasowang@redhat.com>,
+To:     Stefano Garzarella <sgarzare@redhat.com>
+Cc:     Arseny Krasnov <arseny.krasnov@kaspersky.com>,
         Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Parav Pandit <parav@nvidia.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Christian Brauner <christian.brauner@canonical.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        Mika =?iso-8859-1?Q?Penttil=E4?= <mika.penttila@nextfour.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>, joro@8bytes.org,
-        Greg KH <gregkh@linuxfoundation.org>,
-        He Zhe <zhe.he@windriver.com>,
-        Liu Xiaodong <xiaodong.liu@intel.com>,
-        Joe Perches <joe@perches.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Will Deacon <will@kernel.org>,
-        John Garry <john.garry@huawei.com>, songmuchun@bytedance.com,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        netdev@vger.kernel.org, kvm <kvm@vger.kernel.org>,
-        linux-fsdevel@vger.kernel.org, iommu@lists.linux-foundation.org,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v13 05/13] vdpa: Add reset callback in vdpa_config_ops
-Message-ID: <20210906035338-mutt-send-email-mst@kernel.org>
-References: <20210831103634.33-1-xieyongji@bytedance.com>
- <20210831103634.33-6-xieyongji@bytedance.com>
- <20210906015524-mutt-send-email-mst@kernel.org>
- <CACycT3v4ZVnh7DGe_RtAOx4Vvau0km=HWyCM=KzKhD+ahYKafQ@mail.gmail.com>
- <20210906023131-mutt-send-email-mst@kernel.org>
- <CACycT3ssC1bhNzY9Pk=LPvKjMrFFavTfCKTJtR2XEiVYqDxT1Q@mail.gmail.com>
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Colin Ian King <colin.king@canonical.com>,
+        Norbert Slusarek <nslusarek@gmx.net>,
+        Andra Paraschiv <andraprs@amazon.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "stsp2@yandex.ru" <stsp2@yandex.ru>,
+        "oxffffaa@gmail.com" <oxffffaa@gmail.com>
+Subject: Re: [PATCH net-next v5 0/6] virtio/vsock: introduce MSG_EOR flag for
+ SEQPACKET
+Message-ID: <20210906040148-mutt-send-email-mst@kernel.org>
+References: <20210903123016.3272800-1-arseny.krasnov@kaspersky.com>
+ <20210905115139-mutt-send-email-mst@kernel.org>
+ <4558e96b-6330-667f-955b-b689986f884f@kaspersky.com>
+ <20210905121932-mutt-send-email-mst@kernel.org>
+ <5b20410a-fb8f-2e38-59d9-74dc6b8a9d4f@kaspersky.com>
+ <20210905161809-mutt-send-email-mst@kernel.org>
+ <20210906073315.n7qgsv3gm7dasgzu@steredhat>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CACycT3ssC1bhNzY9Pk=LPvKjMrFFavTfCKTJtR2XEiVYqDxT1Q@mail.gmail.com>
+In-Reply-To: <20210906073315.n7qgsv3gm7dasgzu@steredhat>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 06, 2021 at 03:06:44PM +0800, Yongji Xie wrote:
-> On Mon, Sep 6, 2021 at 2:37 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> >
-> > On Mon, Sep 06, 2021 at 02:09:25PM +0800, Yongji Xie wrote:
-> > > On Mon, Sep 6, 2021 at 1:56 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> > > >
-> > > > On Tue, Aug 31, 2021 at 06:36:26PM +0800, Xie Yongji wrote:
-> > > > > This adds a new callback to support device specific reset
-> > > > > behavior. The vdpa bus driver will call the reset function
-> > > > > instead of setting status to zero during resetting.
-> > > > >
-> > > > > Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
-> > > >
-> > > >
-> > > > This does gloss over a significant change though:
-> > > >
-> > > >
-> > > > > ---
-> > > > > @@ -348,12 +352,12 @@ static inline struct device *vdpa_get_dma_dev(struct vdpa_device *vdev)
-> > > > >       return vdev->dma_dev;
-> > > > >  }
-> > > > >
-> > > > > -static inline void vdpa_reset(struct vdpa_device *vdev)
-> > > > > +static inline int vdpa_reset(struct vdpa_device *vdev)
-> > > > >  {
-> > > > >       const struct vdpa_config_ops *ops = vdev->config;
-> > > > >
-> > > > >       vdev->features_valid = false;
-> > > > > -     ops->set_status(vdev, 0);
-> > > > > +     return ops->reset(vdev);
-> > > > >  }
-> > > > >
-> > > > >  static inline int vdpa_set_features(struct vdpa_device *vdev, u64 features)
-> > > >
-> > > >
-> > > > Unfortunately this breaks virtio_vdpa:
-> > > >
-> > > >
-> > > > static void virtio_vdpa_reset(struct virtio_device *vdev)
-> > > > {
-> > > >         struct vdpa_device *vdpa = vd_get_vdpa(vdev);
-> > > >
-> > > >         vdpa_reset(vdpa);
-> > > > }
-> > > >
-> > > >
-> > > > and there's no easy way to fix this, kernel can't recover
-> > > > from a reset failure e.g. during driver unbind.
-> > > >
-> > >
-> > > Yes, but it should be safe with the protection of software IOTLB even
-> > > if the reset() fails during driver unbind.
-> > >
-> > > Thanks,
-> > > Yongji
-> >
-> > Hmm. I don't see it.
-> > What exactly will happen? What prevents device from poking at
-> > memory after reset? Note that dma unmap in e.g. del_vqs happens
-> > too late.
+On Mon, Sep 06, 2021 at 09:33:15AM +0200, Stefano Garzarella wrote:
+> On Sun, Sep 05, 2021 at 04:18:52PM -0400, Michael S. Tsirkin wrote:
+> > On Sun, Sep 05, 2021 at 07:21:10PM +0300, Arseny Krasnov wrote:
+> > > 
+> > > On 05.09.2021 19:19, Michael S. Tsirkin wrote:
+> > > > On Sun, Sep 05, 2021 at 07:02:44PM +0300, Arseny Krasnov wrote:
+> > > >> On 05.09.2021 18:55, Michael S. Tsirkin wrote:
+> > > >>> On Fri, Sep 03, 2021 at 03:30:13PM +0300, Arseny Krasnov wrote:
+> > > >>>> 	This patchset implements support of MSG_EOR bit for SEQPACKET
+> > > >>>> AF_VSOCK sockets over virtio transport.
+> > > >>>> 	First we need to define 'messages' and 'records' like this:
+> > > >>>> Message is result of sending calls: 'write()', 'send()', 'sendmsg()'
+> > > >>>> etc. It has fixed maximum length, and it bounds are visible using
+> > > >>>> return from receive calls: 'read()', 'recv()', 'recvmsg()' etc.
+> > > >>>> Current implementation based on message definition above.
+> > > >>>> 	Record has unlimited length, it consists of multiple message,
+> > > >>>> and bounds of record are visible via MSG_EOR flag returned from
+> > > >>>> 'recvmsg()' call. Sender passes MSG_EOR to sending system call and
+> > > >>>> receiver will see MSG_EOR when corresponding message will be processed.
+> > > >>>> 	Idea of patchset comes from POSIX: it says that SEQPACKET
+> > > >>>> supports record boundaries which are visible for receiver using
+> > > >>>> MSG_EOR bit. So, it looks like MSG_EOR is enough thing for SEQPACKET
+> > > >>>> and we don't need to maintain boundaries of corresponding send -
+> > > >>>> receive system calls. But, for 'sendXXX()' and 'recXXX()' POSIX says,
+> > > >>>> that all these calls operates with messages, e.g. 'sendXXX()' sends
+> > > >>>> message, while 'recXXX()' reads messages and for SEQPACKET, 'recXXX()'
+> > > >>>> must read one entire message from socket, dropping all out of size
+> > > >>>> bytes. Thus, both message boundaries and MSG_EOR bit must be supported
+> > > >>>> to follow POSIX rules.
+> > > >>>> 	To support MSG_EOR new bit was added along with existing
+> > > >>>> 'VIRTIO_VSOCK_SEQ_EOR': 'VIRTIO_VSOCK_SEQ_EOM'(end-of-message) - now it
+> > > >>>> works in the same way as 'VIRTIO_VSOCK_SEQ_EOR'. But 'VIRTIO_VSOCK_SEQ_EOR'
+> > > >>>> is used to mark 'MSG_EOR' bit passed from userspace.
+> > > >>>> 	This patchset includes simple test for MSG_EOR.
+> > > >>> I'm prepared to merge this for this window,
+> > > >>> but I'm not sure who's supposed to ack the net/vmw_vsock/af_vsock.c
+> > > >>> bits. It's a harmless variable renaming so maybe it does not matter.
+> > > >>>
+> > > >>> The rest is virtio stuff so I guess my tree is ok.
+> > > >>>
+> > > >>> Objections, anyone?
+> > > >> https://lkml.org/lkml/2021/9/3/76 this is v4. It is same as v5 in af_vsock.c changes.
+> > > >>
+> > > >> It has Reviewed by from Stefano Garzarella.
+> > > > Is Stefano the maintainer for af_vsock then?
+> > > > I wasn't sure.
 > 
-> But I didn't see any problems with touching the memory for virtqueues.
+> I'm maintaining virtio-vsock stuff, but I'm reviewing most of the af_vsock
+> patches. We don't have an entry for it in MAINTAINERS, maybe we should.
 
-Drivers make the assumption that after reset returns no new
-buffers will be consumed. For example a bunch of drivers
-call virtqueue_detach_unused_buf.
-I can't say whether block makes this assumption anywhere.
-Needs careful auditing.
+Yea, please add that. And the test I guess?
+It's now Dave and while he's great as we all know,
+reducing the load on him is a good thing to do.
 
-> The memory should not be freed after dma unmap?
-
-But unmap does not happen until after the reset.
-
-
-> And the memory for the bounce buffer should also be safe to be
-> accessed by userspace in this case.
+> > > Ack, let's wait for maintainer's comment
+> > 
+> > 
+> > The specific patch is a trivial variable renaming so
+> > I parked this in my tree for now, will merge unless I
+> > hear any objections in the next couple of days.
 > 
-> > And what about e.g. interrupts?
-> > E.g. we have this:
-> >
-> >         /* Virtqueues are stopped, nothing can use vblk->vdev anymore. */
-> >         vblk->vdev = NULL;
-> >
-> > and this is no longer true at this point.
-> >
-> 
-> You're right. But I didn't see where the interrupt handler will use
-> the vblk->vdev.
-
-static void virtblk_done(struct virtqueue *vq)
-{
-        struct virtio_blk *vblk = vq->vdev->priv;
-
-vq->vdev is the same as vblk->vdev.
-
-
-> So it seems to be not too late to fix it:
-> 
-> diff --git a/drivers/vdpa/vdpa_user/vduse_dev.c
-> b/drivers/vdpa/vdpa_user/vduse_dev.c
-> index 5c25ff6483ad..ea41a7389a26 100644
-> --- a/drivers/vdpa/vdpa_user/vduse_dev.c
-> +++ b/drivers/vdpa/vdpa_user/vduse_dev.c
-> @@ -665,13 +665,13 @@ static void vduse_vdpa_set_config(struct
-> vdpa_device *vdpa, unsigned int offset,
->  static int vduse_vdpa_reset(struct vdpa_device *vdpa)
->  {
->         struct vduse_dev *dev = vdpa_to_vduse(vdpa);
-> +       int ret;
-> 
-> -       if (vduse_dev_set_status(dev, 0))
-> -               return -EIO;
-> +       ret = vduse_dev_set_status(dev, 0);
-> 
->         vduse_dev_reset(dev);
-> 
-> -       return 0;
-> +       return ret;
->  }
-> 
->  static u32 vduse_vdpa_get_generation(struct vdpa_device *vdpa)
+> I agree, I think your tree is fine, since this series is mostly about
+> virtio-vsock.
 > 
 > Thanks,
-> Yongji
-
-Needs some comments to explain why it's done like this.
-
-BTW device is generally wedged at this point right?
-E.g. if reset during initialization fails, userspace
-will still get the reset at some later point and be
-confused ...
-
--- 
-MST
+> Stefano
 
