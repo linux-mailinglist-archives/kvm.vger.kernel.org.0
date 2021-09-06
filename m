@@ -2,314 +2,174 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2838A401F3C
-	for <lists+kvm@lfdr.de>; Mon,  6 Sep 2021 19:38:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 13581401F68
+	for <lists+kvm@lfdr.de>; Mon,  6 Sep 2021 20:04:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244120AbhIFRjZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Sep 2021 13:39:25 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:37542 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S237281AbhIFRjY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Sep 2021 13:39:24 -0400
-Received: from zn.tnic (p200300ec2f0c240054be6003e2b88cf4.dip0.t-ipconnect.de [IPv6:2003:ec:2f0c:2400:54be:6003:e2b8:8cf4])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 36C451EC04DF;
-        Mon,  6 Sep 2021 19:38:17 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1630949897;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=Ic9idha1eNRSeBbKjXxejnqYa8Nsdxsy/xZxuh1y44E=;
-        b=PPM9iAzRTqGs9JPf6ALMDL2Vgz1dUv1TO1PLsi8TBnLEGNydqiBXeH71rVHga/8DD9iDnS
-        wRmuA8ywktfe9FKU9LtxfmbGBqTZ8c/6KxLqToTiI6fRf3s9ig5kXgJmpDyBMtn0CyzenZ
-        +/XaZvLq7O0pvAJ06c5tURTgK4zgBoE=
-Date:   Mon, 6 Sep 2021 19:38:08 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH Part1 v5 36/38] virt: Add SEV-SNP guest driver
-Message-ID: <YTZSAB5H9EC2uk8z@zn.tnic>
-References: <20210820151933.22401-1-brijesh.singh@amd.com>
- <20210820151933.22401-37-brijesh.singh@amd.com>
+        id S230219AbhIFSE5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Sep 2021 14:04:57 -0400
+Received: from mx0a-00069f02.pphosted.com ([205.220.165.32]:47062 "EHLO
+        mx0a-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S244369AbhIFSE4 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 6 Sep 2021 14:04:56 -0400
+Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 186GSuvH028664;
+        Mon, 6 Sep 2021 18:03:46 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : subject : to :
+ cc : references : message-id : date : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=corp-2021-07-09;
+ bh=DihQvp1oh2lgTsz6RpAw7UOhzyalUdKTFKuwVtJY9nc=;
+ b=yd06W7gfgZuOU9t5YNn7PQQNVbRHUkjP+1laO8xyQyB+VcrJpJ9ttlmYm3wNv4MGwGGj
+ UN4RcdlmYNmvkPTDxxMQ/3LVzlT6v/u5PJiWdPT2Ud9dMXRyCRwU+/J22yNX0Ic5X18t
+ 4np968yHAsFmGlZec39rrSz2zV2A99mfcNPBILNrABY50JrXxPVbWpr0+aUgqtNLcBp2
+ 62Wi/QRTw1bR0t9yC6Osff5r3+5FXfNJOlQdYl4MVubLnHJLlbifXX99brUEu9pdbAb0
+ wnIyTb/fETQ5D0l6jD2Tl76Oj/kualsXBsi9fMgKFtRIH83+cqxH3D1U6c0gnPEyJ0o6 YA== 
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : subject : to :
+ cc : references : message-id : date : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=corp-2020-01-29;
+ bh=DihQvp1oh2lgTsz6RpAw7UOhzyalUdKTFKuwVtJY9nc=;
+ b=ubXiEHIWHaJc8n8PW1WMNrTWZYr3fzP/ptTZxnSt/egYNP+BILlvlYfba4tFqzhJh14L
+ m1/wmdqd7B1y/ZWY6FOYSTu8nQCm1GK1yCgEZob9if+V3bGnqcsNQ4MLEzLajcZt+iup
+ UREKz89jUrwIDkH+IgoWYjAI9fUo7oh+iJ4IQ8U3nPrMG1fsUgCnH7773oQ89BnjwUU0
+ zGe/d08SQdoB9R22VyxGXn53lQBJm5Lnny3icnlHyoXEQ6z9aOEsKyLqyv8SQSAGSzcm
+ bNtNNQPJPSwcj2JTOiPkFTsURYnqSdopG86q7RrE8bpxRsSjSovS8sLPQM4oyV6mzwqr ng== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by mx0b-00069f02.pphosted.com with ESMTP id 3avy77jn71-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 06 Sep 2021 18:03:46 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 186I0AJS005532;
+        Mon, 6 Sep 2021 18:03:44 GMT
+Received: from nam12-dm6-obe.outbound.protection.outlook.com (mail-dm6nam12lp2168.outbound.protection.outlook.com [104.47.59.168])
+        by userp3020.oracle.com with ESMTP id 3avqtcnp3v-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 06 Sep 2021 18:03:44 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=GOBbhjdFYgmjKYrL9EIaV+JKO07HDeiN896NsYK5ntAyGlHajMgtXVcD9BeBEE+k6In7WugWGQqr33TiqiwdLGg9DoJseSd0hqucorZ5Js+RaZ1E1mvd/IfUbgmOh63RM2MGP45ikVz5hlA6oWM3HU/5PuvL0UAgpXvxFJp0YVv863rnCTTukeH+l/nUtWNk9RG7yzlma5Zqu3wJ9fxQBntAcpX75ttOyBxEmt9+/2ByCK0eN8VgdYtzjyWAv6/e0FL1EkdbsZtVgJjtEv+BZP6J7wHajvezIx+F3RnW7CUr1S64/E4eQGJfTbnsY4eefJIvNuyvIyNpFOUXw6cdLg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
+ bh=DihQvp1oh2lgTsz6RpAw7UOhzyalUdKTFKuwVtJY9nc=;
+ b=mH726d7vczEsihhfF95Z1KV2P6cUtRYVbTFlRxhKT416ABBn2BMMfpBoWjKr06iSuTrfT6mtRHA351JDuH8ACNKOG5AwJlwNcGgMf5inX/oqz9rqMPGk3vDIZ6NMAE2N0dxI/vAogVQWb6DZeUr2tQ6pCbGnc7EIVHrAwyVTgWJHZmnotC+Dc/QIGFiV98WJF1wTtG40qFuY/zlKeakWRll3HbuW7oqIxWBk61WQigdFdHKgzLMrpYNbdx4CIVjVGmbnA36zZnoTowD8rc6BLAB47KeHKhx+seAwWNKpz8xHE+sL4ZaUJNrJKr6VS3OSWaivkmBkR/CW3SNSeZyJ/A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=DihQvp1oh2lgTsz6RpAw7UOhzyalUdKTFKuwVtJY9nc=;
+ b=GGc+a6FOd+wBkEQ8BInSlvOrH3XlwwYxQ5r9mV+xWrrT2uYl304pBRe7iLBH2lVrzGQ2cnVGzyHpirdySMoOZZa0M+AsneBMgp+uj7kLGZ8EqkHZgrAO7IYuU2+vmMYW+8MO7fDaamZNqKcMfW5ikNG7vQmQpG1nC6M0jvT6tm4=
+Authentication-Results: lists.cs.columbia.edu; dkim=none (message not signed)
+ header.d=none;lists.cs.columbia.edu; dmarc=none action=none
+ header.from=oracle.com;
+Received: from CH2PR10MB4008.namprd10.prod.outlook.com (2603:10b6:610:c::22)
+ by CH0PR10MB5243.namprd10.prod.outlook.com (2603:10b6:610:dc::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4478.24; Mon, 6 Sep
+ 2021 18:03:42 +0000
+Received: from CH2PR10MB4008.namprd10.prod.outlook.com
+ ([fe80::18f4:28d6:63f1:58e8]) by CH2PR10MB4008.namprd10.prod.outlook.com
+ ([fe80::18f4:28d6:63f1:58e8%5]) with mapi id 15.20.4478.025; Mon, 6 Sep 2021
+ 18:03:42 +0000
+From:   "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
+Subject: Re: [PATCH 1/2] KVM: selftests: make memslot_perf_test arch
+ independent
+To:     Ricardo Koller <ricarkol@google.com>
+Cc:     drjones@redhat.com, Paolo Bonzini <pbonzini@redhat.com>,
+        maz@kernel.org, oupton@google.com, jingzhangos@google.com,
+        pshier@google.com, rananta@google.com, reijiw@google.com,
+        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+References: <20210903231154.25091-1-ricarkol@google.com>
+ <20210903231154.25091-2-ricarkol@google.com>
+Message-ID: <6082c051-03f1-653d-6188-b09974c62512@oracle.com>
+Date:   Mon, 6 Sep 2021 20:03:35 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
+In-Reply-To: <20210903231154.25091-2-ricarkol@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: AM3PR03CA0075.eurprd03.prod.outlook.com
+ (2603:10a6:207:5::33) To CH2PR10MB4008.namprd10.prod.outlook.com
+ (2603:10b6:610:c::22)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20210820151933.22401-37-brijesh.singh@amd.com>
+Received: from [172.20.10.2] (37.248.175.250) by AM3PR03CA0075.eurprd03.prod.outlook.com (2603:10a6:207:5::33) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4478.19 via Frontend Transport; Mon, 6 Sep 2021 18:03:40 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 30f9db95-36aa-4d79-bc6c-08d97160a97b
+X-MS-TrafficTypeDiagnostic: CH0PR10MB5243:
+X-Microsoft-Antispam-PRVS: <CH0PR10MB524365D9FCBE27BDE8F02D25FFD29@CH0PR10MB5243.namprd10.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: HN5rf425KQd4FQJtI9OTipkJiT1DNTWFn0xYZ5YTUZYG0Osbrt4QEsKcjEm/dwWh++BeJZTGdcwqjHfgnNmtu7sQzk/u66oMkzKUP3gIJiKpXDurgFsNH1M9fSe6zpzyap7um1aypH5Y8pH6dPv4SNZekfMVEkZl1b3BnyRUFn1sZVcxA3zk40k7HOCDhxPMhpfpZ119Z8bzTcg2aoSXQlj0PguCfkkn9pfGF330zCV3Evd1ldqYVR3UrWgngFCLOXy9UEwbKV+B9RuLn8WzS/CVVhfZUJ27YCsUbObXbZRxK+dcPPfkVRx7svEQBudxPpmijgYNuOuklSmWZDLQUdiWjLmTxVkvNPoIvbEuVjCcaWBHwg9u2vvGmnVaE6In9SHo2j5iqIMQICoxYL0FFWfgrUfPmJi17d/STyGJeeEuDHqccfX4G16GoR57iXx7czAg/NFFcAF8Rr5RvcNR6IPmJUTVt3RzCbuVIQPDXAvDWvFeVaww3RLoU2g4r78axy0cw6PohNuckLEomS1D7t9gxMw9s0d6IfZiTph+oitcrHS65NExsCeKCW9NcB8olnvHo7AqJb2D8I7wT0iFHdoMGYNzncU2LJ5u14iNhwFsxuB+FkEnUNNeF/uqoymiS+1hWLLa5/X9GkR+sdCQ/0bUyUmhG6U6TTRn49RSH6o3AvOssnuQo+3PifjnhPzaPDdhDvfQwKDnocnWGMHE+xW75GTYj1a/V4/7B9QXwjA=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR10MB4008.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(136003)(376002)(39860400002)(346002)(396003)(53546011)(2616005)(8936002)(7416002)(4326008)(31686004)(38100700002)(86362001)(5660300002)(31696002)(6916009)(36756003)(6666004)(316002)(4744005)(8676002)(66946007)(186003)(6486002)(66476007)(66556008)(956004)(26005)(478600001)(16576012)(2906002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Sm1uSGdmQWI3dVlOMGNVcGcwWUtuVDlHdit5NXd6SW9nOVhGcUxlNVhjbzQ3?=
+ =?utf-8?B?NHA4Q0d2bTBMRDF1TUF0SHY3UjRNeUhvMENjTkpvVW5icHN5S05UdXNBR05n?=
+ =?utf-8?B?T3pDRUxnSXhVL3liLzZRMERtWFFZcUZDZXFMdEZYNVVmOEtLTGQvaTdSNG9O?=
+ =?utf-8?B?ZUxNbkNZRG9UajRxSWlBS0x6aFI2QlRaeHg5MVpQTVB2TEV1LzhwTUJ4Y2NH?=
+ =?utf-8?B?MktVTUhzYkx6RTNUV1JpZ0NUbWJBNUVmSmNUV2hzK1FEUzUwV2swQThDU2ZV?=
+ =?utf-8?B?NjJ0UWpMM1psSWtzaExpUk5JVENkYldWamF6RGRndzFqNDVqNkNYbjhGM0pF?=
+ =?utf-8?B?M0prSVNHeXMvTS9zaEF5QmUybEhJTWVZNmk4TVNIeWxDM2hNTnJBc0s1UWNJ?=
+ =?utf-8?B?cGRUd2gwV3JKWTlaMGxYRDc3MjlMcHdMbXg1Vi9MbTBzRXlnN0NoWFJBbVRD?=
+ =?utf-8?B?Wno1RmlqakxnWW52Vkxvd2NiMlZzSXhOQWVFNE9DakRhbTJSSng4Rm12ek1N?=
+ =?utf-8?B?RVg1ano0azh2NTBzY1FkZmgrc1p5WUZxUUhQTWhsWHZvWnpuVzgwUThWWmFO?=
+ =?utf-8?B?VWhaaXFMOTBZTmh4UlJRS2tpM3cvdHh1WFhIL1YxeGhjKzhzWmU4RkZ5TXNw?=
+ =?utf-8?B?Rm00MDU2STJBNy83ZmFmdm5BUlZFNVNUcS80aFpVWTMwL1VEWVF1TG5LOTdu?=
+ =?utf-8?B?cDcxK1dPOVE1YlFPc3VGeGR3WCtwcDhIakFTTXlFNzJ2MWlhT3NoODFpbUND?=
+ =?utf-8?B?N0Iyck9zekhTamFlSzFseUk0Uk5wVEpOanBMbXdwaFRpcjJqS3BiVWpBdnFD?=
+ =?utf-8?B?NWVIaml1RDNOc0dTc1dVRzZLZjBMejVVQU5uVy9ILzdYRkI0ZE00OGhFZVpB?=
+ =?utf-8?B?R1Q2OXQ2T2tKN3ZFYkJOTmE4b21ucVROS0pwMGJ4Z0EvdHUxV1BVc1BBT3Bo?=
+ =?utf-8?B?bjI2MmFGdUR2RFo4MWcwcHdmZno0a1kxTy8xeWRaYkZRYVArdzVIR05WUG9n?=
+ =?utf-8?B?VmtwQjF0ankvck5yZkI1SDBJTnN5bzFPalMwSUZmcmlMZFNCRXBEOHozbHJ1?=
+ =?utf-8?B?TjNlTHV1QTJQVmFrSnJrTFVIVnhZK09KMDFvV3pJY2g5aVk1REtMcGFCZ1B5?=
+ =?utf-8?B?V01aL0dnY0ZkWWNrYzNRYkREd2RMTXF4TnEyNHdRV0ZNT1B6RzY0Z0lNWUh3?=
+ =?utf-8?B?YzY1dGpvOWsxZHYvWk9yTzFHd1dKU0tlUm1TRXNEa0w3SW9waWdnQ1NSUXlK?=
+ =?utf-8?B?UTNwYzhQYmJOYVJNUVQwelV2SnhOYVRwUDdEck16NTM1ZlZjK3I2ZnoyUjk5?=
+ =?utf-8?B?QjZQQW5OWmVMaVBWRVI3cmVHa2tDWGhYSGc4dVV6NGFISTJnMlBKQXNubktl?=
+ =?utf-8?B?aG1FckNZQUlua1VGZzlsMnIvU0ExZiszajhBZjlxUFB2L3hMSTVHWDFTcEV2?=
+ =?utf-8?B?Z0tlOE9aanZZRjN0RlFObTc1Q2xRa2JoVzF1a0FRenlrZ3N3dkFIZE5TV0x6?=
+ =?utf-8?B?Mi93TlBmTVRyNlpUODFsRDc0QXM4d3htRnJycWZIOFE2Y0ZyY0hKK0xacTRt?=
+ =?utf-8?B?UmZpZTVuRW9XaG5kOUg2eEpoK1VjL3hyZ25KNkYyRTI2NC92NkVHUFl4dkNO?=
+ =?utf-8?B?Z3o4WUltY1FLTzc2L201NTNHM1g4U0g1ZnVQMmllSGlSNzRndkM1cXpEZ3l4?=
+ =?utf-8?B?cWUrUEpVZWJXTExkVFA2K01HZ1dkck1oOHdWcVovTE11OWk5eVlGRk5BdHR1?=
+ =?utf-8?Q?rn48ajG7ykmJJjKHXoEzM+Mdmm/bY9FszHYQssH?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 30f9db95-36aa-4d79-bc6c-08d97160a97b
+X-MS-Exchange-CrossTenant-AuthSource: CH2PR10MB4008.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Sep 2021 18:03:42.6312
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: m5OjfSgTqAPKYW6t/mJRsu1175sAYWBoYJxsnVdtxQKyG7l/OKIwcYG+lTAfjF3jG4P8Jpd512WR2dWgwZSHEQEVmG9LW6lBWr0WhRArxZs=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR10MB5243
+X-Proofpoint-Virus-Version: vendor=nai engine=6300 definitions=10099 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 adultscore=0
+ bulkscore=0 suspectscore=0 spamscore=0 malwarescore=0 mlxscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2108310000 definitions=main-2109060115
+X-Proofpoint-ORIG-GUID: jfn79EwcB4W31k_b_dXNf1uxzkX5qD4t
+X-Proofpoint-GUID: jfn79EwcB4W31k_b_dXNf1uxzkX5qD4t
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 20, 2021 at 10:19:31AM -0500, Brijesh Singh wrote:
-> +===================================================================
-> +The Definitive SEV Guest API Documentation
-> +===================================================================
-> +
-> +1. General description
-> +======================
-> +
-> +The SEV API is a set of ioctls that are issued to by the guest or
+On 04.09.2021 01:11, Ricardo Koller wrote:
+> memslot_perf_test uses ucalls for synchronization between guest and
+> host. Ucalls API is architecture independent: tests do not need know
+> what kind of exit they generate on a specific arch.  More specifically,
+> there is no need to check whether an exit is KVM_EXIT_IO in x86 for the
+> host to know that the exit is ucall related, as get_ucall() already
+> makes that check.
+> 
+> Change memslot_perf_test to not require specifying what exit does a
+> ucall generate. Also add a missing ucall_init.
+> 
+> Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> ---
 
-issued to by?
+Reviewed-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
 
-Issued by the guest or hypervisor, you mean..
-
-> +hypervisor to get or set certain aspect of the SEV virtual machine.
-> +The ioctls belong to the following classes:
-> +
-> + - Hypervisor ioctls: These query and set global attributes which affect the
-> +   whole SEV firmware.  These ioctl is used by platform provision tools.
-
-"These ioctls are used ... "
-
-> +
-> + - Guest ioctls: These query and set attribute of the SEV virtual machine.
-
-"... attributes... "
-
-> +
-> +2. API description
-> +==================
-> +
-> +This section describes ioctls that can be used to query or set SEV guests.
-> +For each ioctl, the following information is provided along with a
-> +description:
-> +
-> +  Technology:
-> +      which SEV techology provides this ioctl. sev, sev-es, sev-snp or all.
-> +
-> +  Type:
-> +      hypervisor or guest. The ioctl can be used inside the guest or the
-> +      hypervisor.
-> +
-> +  Parameters:
-> +      what parameters are accepted by the ioctl.
-> +
-> +  Returns:
-> +      the return value.  General error numbers (ENOMEM, EINVAL)
-> +      are not detailed, but errors with specific meanings are.
-> +
-> +The guest ioctl should be called to /dev/sev-guest device. The ioctl accepts
-
-s/called to/issued on a file descriptor of the/
-
-> +struct snp_user_guest_request. The input and output structure is specified
-> +through the req_data and resp_data field respectively. If the ioctl fails
-> +to execute due to the firmware error, then fw_err code will be set.
-
-"... due to a ... "
-
-> +
-> +::
-> +        struct snp_user_guest_request {
-
-So you said earlier:
-
-> I followed the naming convension you recommended during the initial SEV driver
-> developement. IIRC, the main reason for us having to add "user" in it because
-> we wanted to distinguious that this structure is not exactly same as the what
-> is defined in the SEV-SNP firmware spec.
-
-but looking at the current variant in the code, the structure in the SNP spec is
-
-Table 91. Layout of the CMDBUF_SNP_GUEST_REQUEST Structure
-
-which corresponds to struct snp_guest_request_data so you can call this one:
-
-	struct snp_guest_request_ioctl
-
-and then it is perfectly clear what is what.
-
-> +                /* Request and response structure address */
-> +                __u64 req_data;
-> +                __u64 resp_data;
-> +
-> +                /* firmware error code on failure (see psp-sev.h) */
-> +                __u64 fw_err;
-> +        };
-> +
-> +2.1 SNP_GET_REPORT
-> +------------------
-> +
-> +:Technology: sev-snp
-> +:Type: guest ioctl
-> +:Parameters (in): struct snp_report_req
-> +:Returns (out): struct snp_report_resp on success, -negative on error
-> +
-> +The SNP_GET_REPORT ioctl can be used to query the attestation report from the
-> +SEV-SNP firmware. The ioctl uses the SNP_GUEST_REQUEST (MSG_REPORT_REQ) command
-> +provided by the SEV-SNP firmware to query the attestation report.
-> +
-> +On success, the snp_report_resp.data will contains the report. The report
-
-"... will contain... "
-
-> +format is described in the SEV-SNP specification. See the SEV-SNP specification
-> +for further details.
-
-"... which can be found at https://developer.amd.com/sev/."
-
-assuming that URL will keep its validity in the foreseeable future.
-
-> +static long snp_guest_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
-> +{
-> +	struct snp_guest_dev *snp_dev = to_snp_dev(file);
-> +	void __user *argp = (void __user *)arg;
-> +	struct snp_user_guest_request input;
-> +	int ret = -ENOTTY;
-> +
-> +	if (copy_from_user(&input, argp, sizeof(input)))
-> +		return -EFAULT;
-> +
-> +	mutex_lock(&snp_cmd_mutex);
-> +
-> +	switch (ioctl) {
-> +	case SNP_GET_REPORT: {
-> +		ret = get_report(snp_dev, &input);
-> +		break;
-> +	}
-
-No need for those {} brackets around the case.
-
-> +	default:
-> +		break;
-> +	}
-> +
-> +	mutex_unlock(&snp_cmd_mutex);
-> +
-> +	if (copy_to_user(argp, &input, sizeof(input)))
-> +		return -EFAULT;
-> +
-> +	return ret;
-> +}
-> +
-> +static void free_shared_pages(void *buf, size_t sz)
-> +{
-> +	unsigned int npages = PAGE_ALIGN(sz) >> PAGE_SHIFT;
-> +
-> +	/* If fail to restore the encryption mask then leak it. */
-> +	if (set_memory_encrypted((unsigned long)buf, npages))
-
-Hmm, this sounds like an abnormal condition about which we should at
-least warn...
-
-> +		return;
-> +
-> +	__free_pages(virt_to_page(buf), get_order(sz));
-> +}
-> +
-> +static void *alloc_shared_pages(size_t sz)
-> +{
-> +	unsigned int npages = PAGE_ALIGN(sz) >> PAGE_SHIFT;
-> +	struct page *page;
-> +	int ret;
-> +
-> +	page = alloc_pages(GFP_KERNEL_ACCOUNT, get_order(sz));
-> +	if (IS_ERR(page))
-> +		return NULL;
-> +
-> +	ret = set_memory_decrypted((unsigned long)page_address(page), npages);
-> +	if (ret) {
-> +		__free_pages(page, get_order(sz));
-> +		return NULL;
-> +	}
-> +
-> +	return page_address(page);
-> +}
-> +
-> +static const struct file_operations snp_guest_fops = {
-> +	.owner	= THIS_MODULE,
-> +	.unlocked_ioctl = snp_guest_ioctl,
-> +};
-> +
-> +static int __init snp_guest_probe(struct platform_device *pdev)
-> +{
-> +	struct snp_guest_platform_data *data;
-> +	struct device *dev = &pdev->dev;
-> +	struct snp_guest_dev *snp_dev;
-> +	struct miscdevice *misc;
-> +	int ret;
-> +
-> +	if (!dev->platform_data)
-> +		return -ENODEV;
-> +
-> +	data = (struct snp_guest_platform_data *)dev->platform_data;
-> +	vmpck_id = data->vmpck_id;
-> +
-> +	snp_dev = devm_kzalloc(&pdev->dev, sizeof(struct snp_guest_dev), GFP_KERNEL);
-> +	if (!snp_dev)
-> +		return -ENOMEM;
-> +
-> +	platform_set_drvdata(pdev, snp_dev);
-> +	snp_dev->dev = dev;
-> +
-> +	snp_dev->crypto = init_crypto(snp_dev, data->vmpck, sizeof(data->vmpck));
-> +	if (!snp_dev->crypto)
-> +		return -EIO;
-
-I guess you should put the crypto init...
-
-> +
-> +	/* Allocate the shared page used for the request and response message. */
-> +	snp_dev->request = alloc_shared_pages(sizeof(struct snp_guest_msg));
-> +	if (IS_ERR(snp_dev->request)) {
-> +		ret = PTR_ERR(snp_dev->request);
-> +		goto e_free_crypto;
-> +	}
-> +
-> +	snp_dev->response = alloc_shared_pages(sizeof(struct snp_guest_msg));
-> +	if (IS_ERR(snp_dev->response)) {
-> +		ret = PTR_ERR(snp_dev->response);
-> +		goto e_free_req;
-> +	}
-
-... here, after the page allocation to save yourself all the setup work
-if the shared pages allocation fails.
-
-> +
-> +	misc = &snp_dev->misc;
-> +	misc->minor = MISC_DYNAMIC_MINOR;
-> +	misc->name = DEVICE_NAME;
-> +	misc->fops = &snp_guest_fops;
-> +
-> +	return misc_register(misc);
-> +
-> +e_free_req:
-> +	free_shared_pages(snp_dev->request, sizeof(struct snp_guest_msg));
-> +
-> +e_free_crypto:
-> +	deinit_crypto(snp_dev->crypto);
-> +
-> +	return ret;
-> +}
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Thanks,
+Maciej
