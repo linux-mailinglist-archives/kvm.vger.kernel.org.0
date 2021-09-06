@@ -2,153 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 24613401778
-	for <lists+kvm@lfdr.de>; Mon,  6 Sep 2021 10:05:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9AF98401817
+	for <lists+kvm@lfdr.de>; Mon,  6 Sep 2021 10:36:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240539AbhIFIE4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Sep 2021 04:04:56 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34633 "EHLO
+        id S240941AbhIFIgl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Sep 2021 04:36:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48271 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S240544AbhIFIEx (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 6 Sep 2021 04:04:53 -0400
+        by vger.kernel.org with ESMTP id S240888AbhIFIgk (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 6 Sep 2021 04:36:40 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630915426;
+        s=mimecast20190719; t=1630917335;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=W2g1b9NX3P4QOnCtZSdNu+sJkQfvHZK6OJZ7BDJqDLg=;
-        b=ZaputEcm/bYOJY/hTTB9gC/tjdWq5WQ1tWLKLj6Fbfv75sH+YpyM5GM10STYXGnViCX1Kr
-        61Wt7eklQVQOpM8rDngzK+Lk9H4ztr1z20NF3VS3Lmk8b2MZDCDopuBvuICzdSf2Q2ST+v
-        QUeuO723eJpApjtmax69nvNHX2sQaLY=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-91-EZTOas_CMTKIXPk8iO5SJg-1; Mon, 06 Sep 2021 04:03:45 -0400
-X-MC-Unique: EZTOas_CMTKIXPk8iO5SJg-1
-Received: by mail-ed1-f69.google.com with SMTP id ch11-20020a0564021bcb00b003c8021b61c4so3148298edb.23
-        for <kvm@vger.kernel.org>; Mon, 06 Sep 2021 01:03:45 -0700 (PDT)
+        bh=IjuoIMMg9iawWeddQRM19hiJ7Lu1md2D4kuSs3r3SI4=;
+        b=AHETR3nQ+OW6171ulBx1xqUPZ/dE8jjA79Mm4CG+RSyo6LHVu0pVP+arsgVusnvL3gRd+6
+        NdxQYD26NlBw/ehSNCUnJ8km512k7v5oa8ZAsvgFWGQs/u1fViQeaIeaXOe6PxGuTBqR1y
+        vqY6/HEhM3wX/2LhMx3gLU1PS7tCn+4=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-301-USSTAK9-MmG7X3l7F82Org-1; Mon, 06 Sep 2021 04:35:34 -0400
+X-MC-Unique: USSTAK9-MmG7X3l7F82Org-1
+Received: by mail-wm1-f71.google.com with SMTP id a201-20020a1c7fd2000000b002e748bf0544so3628561wmd.2
+        for <kvm@vger.kernel.org>; Mon, 06 Sep 2021 01:35:34 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=W2g1b9NX3P4QOnCtZSdNu+sJkQfvHZK6OJZ7BDJqDLg=;
-        b=YqBwQLQY2WGHYee23sCLL0LdEqXoloBXRBMcPGGdgBLAGkQh0wwODhEGfzoa9NAgnH
-         vOm1gAyZzCN6XI1V3jeAD1ZreJM/EIb/MAdYJyP55zp3Q3/kSU/6nmzgws/qlzHsDS/w
-         x4BaA0iY1i2NYjjKnRkGCR+PM8+oii2K+2tStIwTs3D8NY71Up/RDYQp571UFZqnv+dk
-         8LaC/6MAHvwZM8AIh8ETGNb/RRJihZkMSQNfi+AXFQb3IcQ6hw5jN7QWcK0se9+llLhz
-         5sIPh0qA4zwu2HlNHp735dT52hbDzuHipp1/Z1vlZEBvOM1mEuFohLnE1tMAEtQOXFRn
-         LgAA==
-X-Gm-Message-State: AOAM532gaeBYkRcnd5tgHX4qw1Edu2uOnWGRsMwujJ4XkhUjGP3/bkaR
-        wenSdX3nIjdiLhlw/SzUALIFY7Sr9wMgXC7RVsOg1uFcamUBGnqi5BvVHijT5LTOuNd+m04H/Jt
-        FlUTVdBilA9pW
-X-Received: by 2002:a05:6402:148:: with SMTP id s8mr12049798edu.298.1630915424072;
-        Mon, 06 Sep 2021 01:03:44 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxRJf9kq4wjR1PeMax4DOv0vHAJxFFvRjMlnKsmrmMvqdiz5jcTh29LDuagCJ7xkcWidZAWDA==
-X-Received: by 2002:a05:6402:148:: with SMTP id s8mr12049783edu.298.1630915423910;
-        Mon, 06 Sep 2021 01:03:43 -0700 (PDT)
-Received: from redhat.com ([2.55.131.183])
-        by smtp.gmail.com with ESMTPSA id c25sm3423749ejm.9.2021.09.06.01.03.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Sep 2021 01:03:43 -0700 (PDT)
-Date:   Mon, 6 Sep 2021 04:03:38 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Stefano Garzarella <sgarzare@redhat.com>
-Cc:     Arseny Krasnov <arseny.krasnov@kaspersky.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Colin Ian King <colin.king@canonical.com>,
-        Norbert Slusarek <nslusarek@gmx.net>,
-        Andra Paraschiv <andraprs@amazon.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "stsp2@yandex.ru" <stsp2@yandex.ru>,
-        "oxffffaa@gmail.com" <oxffffaa@gmail.com>
-Subject: Re: [PATCH net-next v5 0/6] virtio/vsock: introduce MSG_EOR flag for
- SEQPACKET
-Message-ID: <20210906040148-mutt-send-email-mst@kernel.org>
-References: <20210903123016.3272800-1-arseny.krasnov@kaspersky.com>
- <20210905115139-mutt-send-email-mst@kernel.org>
- <4558e96b-6330-667f-955b-b689986f884f@kaspersky.com>
- <20210905121932-mutt-send-email-mst@kernel.org>
- <5b20410a-fb8f-2e38-59d9-74dc6b8a9d4f@kaspersky.com>
- <20210905161809-mutt-send-email-mst@kernel.org>
- <20210906073315.n7qgsv3gm7dasgzu@steredhat>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=IjuoIMMg9iawWeddQRM19hiJ7Lu1md2D4kuSs3r3SI4=;
+        b=EVmiUlGHBspN23tj/A+ub24nOnYJy5BHedvqbhCT/p5neDnLKY4niaMt6Rx7bExmy5
+         ilYFYm1uzverDQ33P9x6AEfSPWeVE0mu2tVHfdX2G9hF5STqB/31Ox5pipDJzPP35PEF
+         CZe5dv/AtxK5Yuvc5/l0IvOT4582ZW4U7BMMFSMyUwCvwMN90N1smJSJYAPpViXlu5Rb
+         r7PPoXxcAc1w/n9q/PFFZBGAYy472VjubXLnoIb+PqH8vKbcn5LTQutGERl+QBmgFVed
+         2AN+OFgBPKG86rl0++vOTUpKz1fKO6EKl1VEA31Po04PDkDgUnhEpoX7XMIVWpw4aIol
+         6uQw==
+X-Gm-Message-State: AOAM533ip6aUDZODdnPvnYDWSSD08kKIzRt2euB9XbF4aKBCzoVTxr8V
+        EPNH99B5VzGm5i14mfAtk20bQvVsNYit/6SCBk+53QoIUpb5O8q1bFWX0pc0va7gYo8bYqmtjvF
+        jJhdm7alxwzY4QqzAKFHZNNq0iUZPdgU/otcuU5cT3Dxx1XMQFZxJk5cC0hh01cTG
+X-Received: by 2002:a1c:98d5:: with SMTP id a204mr10542460wme.52.1630917333346;
+        Mon, 06 Sep 2021 01:35:33 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzPMM1T99WUU70Segpdi5Aem47QBjEgyCa24XVyUiY9UeaE4vEGWOypPCBZ8+vWngLZIZgt+w==
+X-Received: by 2002:a1c:98d5:: with SMTP id a204mr10542427wme.52.1630917333122;
+        Mon, 06 Sep 2021 01:35:33 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id y15sm7998147wmi.18.2021.09.06.01.35.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 06 Sep 2021 01:35:32 -0700 (PDT)
+Subject: Re: [PATCH] x86/sgx: Declare sgx_set_attribute() for !CONFIG_X86_SGX
+To:     Jarkko Sakkinen <jarkko@kernel.org>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Dave Hansen <dave.hansen@linux.intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Tony Luck <tony.luck@intel.com>, linux-sgx@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <20210903064156.387979-1-jarkko@kernel.org>
+ <YTI/dTORBZEmGgux@google.com>
+ <f7e6b2f444f34064e34d7bd680d2c863b9ce6a41.camel@kernel.org>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <a43d34d5-623f-20f3-c29a-56985d5614ba@redhat.com>
+Date:   Mon, 6 Sep 2021 10:35:31 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210906073315.n7qgsv3gm7dasgzu@steredhat>
+In-Reply-To: <f7e6b2f444f34064e34d7bd680d2c863b9ce6a41.camel@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 06, 2021 at 09:33:15AM +0200, Stefano Garzarella wrote:
-> On Sun, Sep 05, 2021 at 04:18:52PM -0400, Michael S. Tsirkin wrote:
-> > On Sun, Sep 05, 2021 at 07:21:10PM +0300, Arseny Krasnov wrote:
-> > > 
-> > > On 05.09.2021 19:19, Michael S. Tsirkin wrote:
-> > > > On Sun, Sep 05, 2021 at 07:02:44PM +0300, Arseny Krasnov wrote:
-> > > >> On 05.09.2021 18:55, Michael S. Tsirkin wrote:
-> > > >>> On Fri, Sep 03, 2021 at 03:30:13PM +0300, Arseny Krasnov wrote:
-> > > >>>> 	This patchset implements support of MSG_EOR bit for SEQPACKET
-> > > >>>> AF_VSOCK sockets over virtio transport.
-> > > >>>> 	First we need to define 'messages' and 'records' like this:
-> > > >>>> Message is result of sending calls: 'write()', 'send()', 'sendmsg()'
-> > > >>>> etc. It has fixed maximum length, and it bounds are visible using
-> > > >>>> return from receive calls: 'read()', 'recv()', 'recvmsg()' etc.
-> > > >>>> Current implementation based on message definition above.
-> > > >>>> 	Record has unlimited length, it consists of multiple message,
-> > > >>>> and bounds of record are visible via MSG_EOR flag returned from
-> > > >>>> 'recvmsg()' call. Sender passes MSG_EOR to sending system call and
-> > > >>>> receiver will see MSG_EOR when corresponding message will be processed.
-> > > >>>> 	Idea of patchset comes from POSIX: it says that SEQPACKET
-> > > >>>> supports record boundaries which are visible for receiver using
-> > > >>>> MSG_EOR bit. So, it looks like MSG_EOR is enough thing for SEQPACKET
-> > > >>>> and we don't need to maintain boundaries of corresponding send -
-> > > >>>> receive system calls. But, for 'sendXXX()' and 'recXXX()' POSIX says,
-> > > >>>> that all these calls operates with messages, e.g. 'sendXXX()' sends
-> > > >>>> message, while 'recXXX()' reads messages and for SEQPACKET, 'recXXX()'
-> > > >>>> must read one entire message from socket, dropping all out of size
-> > > >>>> bytes. Thus, both message boundaries and MSG_EOR bit must be supported
-> > > >>>> to follow POSIX rules.
-> > > >>>> 	To support MSG_EOR new bit was added along with existing
-> > > >>>> 'VIRTIO_VSOCK_SEQ_EOR': 'VIRTIO_VSOCK_SEQ_EOM'(end-of-message) - now it
-> > > >>>> works in the same way as 'VIRTIO_VSOCK_SEQ_EOR'. But 'VIRTIO_VSOCK_SEQ_EOR'
-> > > >>>> is used to mark 'MSG_EOR' bit passed from userspace.
-> > > >>>> 	This patchset includes simple test for MSG_EOR.
-> > > >>> I'm prepared to merge this for this window,
-> > > >>> but I'm not sure who's supposed to ack the net/vmw_vsock/af_vsock.c
-> > > >>> bits. It's a harmless variable renaming so maybe it does not matter.
-> > > >>>
-> > > >>> The rest is virtio stuff so I guess my tree is ok.
-> > > >>>
-> > > >>> Objections, anyone?
-> > > >> https://lkml.org/lkml/2021/9/3/76 this is v4. It is same as v5 in af_vsock.c changes.
-> > > >>
-> > > >> It has Reviewed by from Stefano Garzarella.
-> > > > Is Stefano the maintainer for af_vsock then?
-> > > > I wasn't sure.
-> 
-> I'm maintaining virtio-vsock stuff, but I'm reviewing most of the af_vsock
-> patches. We don't have an entry for it in MAINTAINERS, maybe we should.
+On 03/09/21 17:58, Jarkko Sakkinen wrote:
+>> Eh, it doesn't really simplify the usage.  If anything it makes it more convoluted
+>> because the capability check in kvm_vm_ioctl_check_extension() still needs an
+>> #ifdef, e.g. readers will wonder why the check is conditional but the usage is not.
+> It does objectively a bit, since it's one ifdef less.
 
-Yea, please add that. And the test I guess?
-It's now Dave and while he's great as we all know,
-reducing the load on him is a good thing to do.
+But you're effectively replacing #ifdef CONFIG_X86_SGX_KVM with #ifdef 
+CONFIG_X86_SGX; so the patch is not a no-op as far as KVM is concerned.
 
-> > > Ack, let's wait for maintainer's comment
-> > 
-> > 
-> > The specific patch is a trivial variable renaming so
-> > I parked this in my tree for now, will merge unless I
-> > hear any objections in the next couple of days.
+So NACK for the KVM parts (yeah I know it's RFC but just to be clearer), 
+but I agree that adding a stub inline version of the function is 
+standard practice and we do it a lot in KVM too.
+
+Paolo
+
+> This is fairly standard practice to do in kernel APIs, used in countless
+> places, for instance in Tony's patch set to add MCE recovery for SGX. And
+> it would be nice to share common pattern here how we define API now and
+> futre.
 > 
-> I agree, I think your tree is fine, since this series is mostly about
-> virtio-vsock.
-> 
-> Thanks,
-> Stefano
+> I also remarked that declaration of "sgx_provisioning_allowed" is not flagged,
+> which is IMHO even more convolved because without SGX it is spare data.
 
