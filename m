@@ -2,192 +2,174 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9B79E401AD6
-	for <lists+kvm@lfdr.de>; Mon,  6 Sep 2021 14:00:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 160C9401ADC
+	for <lists+kvm@lfdr.de>; Mon,  6 Sep 2021 14:02:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241352AbhIFMAz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Sep 2021 08:00:55 -0400
-Received: from mail-mw2nam12on2068.outbound.protection.outlook.com ([40.107.244.68]:8065
-        "EHLO NAM12-MW2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S239993AbhIFMAy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Sep 2021 08:00:54 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=EOZYaJg+GS/a4al2paDpgOmWgwl3gMGmzpCstWWdqBmifbf0GR9be+zdHYWb9HP6UuXE+tUv9Ln1ne1qIuyxKIyS4Jkfn8j1tERWyDvG3hcdvpr3i9mnIkJ5Rpr8nkUNbiOGW8JJJP9mKR9MvCjBQoHvKML8D+N40wptbiBSkX0haN9uptwSAt6tAL7opUIay+7bh7AmW/qZPy2r5kaGXkVbkY8zQffIRdDiQP7P2/3svCRVrevHcPNuWrlJIuQhINNgoGByGg+mbOT+pUMnoH3Z+CkR4sjl3/A4NujDhLt18S1BsbHp4rNN4mU+S4/T251pxf7G6SAJXJlnR5Y9QA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
- bh=6Md+c5I5CGlHGgPXOEzuEpVghQBokq552hSjC3YM4Is=;
- b=NKtXz2FUjAHc77tbo8QRpw6bBpC2/lw1sXdNMIlIQUq6PKtqifFOs833rdgAHwqOwBjaiayJk+oVbUFee+bmLTHI5rbUOtTFtQcwa9p6FMUNmjmuSxppzSWZ6CMwt82ZWCdfi5eapjDcuGuyPyKq8hivqNRp0xinEksLgBWbr+3eSbQ/OgOGBtk51RRb9i9UjfXVMTDwGyaRdlwiZuNwdvMUiVM1KZihg9tp4XcOjLgDsZunKwKhulMPytIAapdJpK/+2axAQ1WQADxOT6bIUWl/CYMNhETuJbMP3ohMLuI++UFK53Eu2NmnAjUiSwE9An4xwT0cOmq6cFYu09Lv+A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.112.34) smtp.rcpttodomain=infradead.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=quarantine sp=none pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6Md+c5I5CGlHGgPXOEzuEpVghQBokq552hSjC3YM4Is=;
- b=VEI2V18s9AZhYP76eUVy5A59bHNrhd//JsGjraMQILwI6SRqXQ8QZt+99VBW8lbdstjTijMInYfJ36+N+ciEl8bF0t4dbtbLg0/lbJF5FbWUfYGOeinOtPsjGlQiq1tfVGH9hhMmnDHz4TG13qi2Z9SauL3Wd5yX5AX2G9etrg5MmM+J9ltHAh0iANSiDCPYa1BXYGCFbyDhF0Rp0+Ei7hUccmLvvJboYdvn1sjt36jvZU1roZD8Ux3iPLZvJr+YbQggVgBYOCjEaEvsot7gbqUZmmEdmmI2R95QJTrmJXcjf/yypQm6rWfSx8GPSJpyHEJ2oB72jv1BuKxD+BePzg==
-Received: from DM6PR02CA0113.namprd02.prod.outlook.com (2603:10b6:5:1b4::15)
- by DM6PR12MB3404.namprd12.prod.outlook.com (2603:10b6:5:3a::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4478.22; Mon, 6 Sep
- 2021 11:59:48 +0000
-Received: from DM6NAM11FT025.eop-nam11.prod.protection.outlook.com
- (2603:10b6:5:1b4:cafe::54) by DM6PR02CA0113.outlook.office365.com
- (2603:10b6:5:1b4::15) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4478.19 via Frontend
- Transport; Mon, 6 Sep 2021 11:59:48 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.34)
- smtp.mailfrom=nvidia.com; infradead.org; dkim=none (message not signed)
- header.d=none;infradead.org; dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.112.34 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.112.34; helo=mail.nvidia.com;
-Received: from mail.nvidia.com (216.228.112.34) by
- DM6NAM11FT025.mail.protection.outlook.com (10.13.172.197) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.4478.19 via Frontend Transport; Mon, 6 Sep 2021 11:59:47 +0000
-Received: from [172.27.1.210] (172.20.187.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.18; Mon, 6 Sep
- 2021 11:59:44 +0000
-Subject: Re: [PATCH v2 1/1] virtio-blk: add num_io_queues module parameter
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-CC:     Stefan Hajnoczi <stefanha@redhat.com>, <hch@infradead.org>,
-        <virtualization@lists.linux-foundation.org>, <kvm@vger.kernel.org>,
-        <israelr@nvidia.com>, <nitzanc@nvidia.com>, <oren@nvidia.com>,
-        <linux-block@vger.kernel.org>, <axboe@kernel.dk>
-References: <20210831135035.6443-1-mgurtovoy@nvidia.com>
- <YTDVkDIr5WLdlRsK@stefanha-x1.localdomain>
- <20210905120234-mutt-send-email-mst@kernel.org>
- <98309fcd-3abe-1f27-fe52-e8fcc58bec13@nvidia.com>
- <20210906071957-mutt-send-email-mst@kernel.org>
-From:   Max Gurtovoy <mgurtovoy@nvidia.com>
-Message-ID: <1cbbe6e2-1473-8696-565c-518fc1016a1a@nvidia.com>
-Date:   Mon, 6 Sep 2021 14:59:40 +0300
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+        id S237454AbhIFMDn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Sep 2021 08:03:43 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:8080 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229648AbhIFMDn (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 6 Sep 2021 08:03:43 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 186BumjL092208;
+        Mon, 6 Sep 2021 08:02:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=Bjuk2NDJE+6fXhkJSAQxTPZRvmPVUvFZ+XXivWwaByY=;
+ b=rDIbK6nRtxrctvyX12DQirogMcS8cdnGD8ztT5JBryAqx99avkOmVTc7+lv82K0DQ8qq
+ 3Ry82olsgzCKwHj6qI5bzZTRcy4ovVCralJ5HZOEgfwBw/bDp618ll+y5klJoaHNEups
+ E3tkjdLTKTJu9gVhDGImRMr/3Yp5/5BUF2IwAtJ4SIYgM5Za5ATtZzmGUASGQbq4UnwO
+ 8OGhtfK4EIolpRBOjLMQ+/FiNwChprF8IE9Zd4ktAWcLxzj4F7uuWQoIdznzhQmnhKy0
+ P3pxx1Q7DhpyowiBH8XExICcTPIXJ+nbk5OZkuII0HHqKyi13x6yJ0SZ2WYC7H4+2JFN vw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3awjje83n1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 06 Sep 2021 08:02:37 -0400
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 186BvW0Z096218;
+        Mon, 6 Sep 2021 08:02:37 -0400
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3awjje83m3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 06 Sep 2021 08:02:36 -0400
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 186BvOqD029141;
+        Mon, 6 Sep 2021 12:02:34 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma04ams.nl.ibm.com with ESMTP id 3av0e93h10-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 06 Sep 2021 12:02:34 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 186C2S2a57606462
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 6 Sep 2021 12:02:28 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B8A1F420BC;
+        Mon,  6 Sep 2021 12:02:28 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 611764209E;
+        Mon,  6 Sep 2021 12:02:28 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.145.8.215])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon,  6 Sep 2021 12:02:28 +0000 (GMT)
+Date:   Mon, 6 Sep 2021 14:02:25 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     David Hildenbrand <david@redhat.com>
+Cc:     kvm@vger.kernel.org, Thomas Huth <thuth@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>, linux-s390@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH v1] s390x/skey: Test for ADDRESSING
+ exceptions
+Message-ID: <20210906140225.4edfdd9a@p-imbrenda>
+In-Reply-To: <20210903162537.57178-1-david@redhat.com>
+References: <20210903162537.57178-1-david@redhat.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20210906071957-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Originating-IP: [172.20.187.5]
-X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
- HQMAIL107.nvidia.com (172.20.187.13)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 1d4c848f-d0d1-4a85-32a4-08d9712dd313
-X-MS-TrafficTypeDiagnostic: DM6PR12MB3404:
-X-Microsoft-Antispam-PRVS: <DM6PR12MB340430A23117B8FA746B46DCDED29@DM6PR12MB3404.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: gmnv6e2qlywnwmtUBSU/Dl1a8aqi33wkBoIbm7FbX3QS1DrkLFRBGBs4V2NbXDbC8ZqgBCPh9hbm0HVHtfGcU9GfafvLx43Nl6qdnSdhvk+bYBglgb2+wlU0/xB9rTOzMT42AOjEFhHwnK1x5zMJ64uJbEYxsOx+Y1gaUT5uqx7XhRRXk5/gLDoE9xL+GrtZvtrznFeg1jez9+xTla/2ZDtNEVfx2FtD8EcXT5sLDJdda2AP8Pm2Ds2beLaoQfW+RMHz6Mx6l1UEju5qFq0d695Q84cOV6jzHlmDCv3P/hIuUo6YL5lq7xukyTFI3sftQw5q5NxPJDoqJZ47Ff+4cY/KSouEBpGAIWWP1xVJyr7K9W8IVL4e5o4BzacwWKL7T9yLUJ+mvTvBVLzPJt115mQ5DgfIFyD6lOvpsPwvMVVxg1KtAviV6ZVAizDMlf6vqxi6OuRUgcRj0X2Q5o8t0N20qgcgB5WAiqx4FORR5Xp/TIlh8R7lmaPaY6Lb80euiH41CT9o5SKYe5WYzyF6/00bzfNCHmfQGJTjqzi4mZfNsnV8Ks+Sb9zAuS5W+jjnUCIRKpCpw97gMe9wT31jk/DUS1tDOK4Irm1+ibjYGIMC9q/3KFyzZu0La7DE9vD6cCvXsItPN++WjwdcZBLcjlC6vg2AqlYbMdgjoCVmSFkpGqlXepi9XfU0qAPFT0n87FVazLTIhxwI9g6gSybJHMmCBMyEfhVb7BwMydARUSI=
-X-Forefront-Antispam-Report: CIP:216.228.112.34;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid03.nvidia.com;CAT:NONE;SFS:(4636009)(376002)(39860400002)(346002)(396003)(136003)(46966006)(36840700001)(36906005)(47076005)(316002)(86362001)(336012)(82740400003)(82310400003)(8676002)(36860700001)(36756003)(70586007)(186003)(5660300002)(16576012)(16526019)(31696002)(426003)(356005)(70206006)(31686004)(2906002)(83380400001)(26005)(4326008)(7636003)(8936002)(478600001)(6666004)(6916009)(2616005)(54906003)(53546011)(43740500002);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Sep 2021 11:59:47.7314
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1d4c848f-d0d1-4a85-32a4-08d9712dd313
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.34];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT025.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3404
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: Dj6Obc5eBoX8Jlq7l5ugYr8WD89ImTxW
+X-Proofpoint-GUID: aKqjbbrKe0Yc-EwxTKacf4yaWw1Dbksc
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-09-06_05:2021-09-03,2021-09-06 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ malwarescore=0 spamscore=0 clxscore=1015 mlxscore=0 adultscore=0
+ suspectscore=0 bulkscore=0 mlxlogscore=999 priorityscore=1501 phishscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2108310000 definitions=main-2109060073
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Fri,  3 Sep 2021 18:25:37 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-On 9/6/2021 2:20 PM, Michael S. Tsirkin wrote:
-> On Mon, Sep 06, 2021 at 01:31:32AM +0300, Max Gurtovoy wrote:
->> On 9/5/2021 7:02 PM, Michael S. Tsirkin wrote:
->>> On Thu, Sep 02, 2021 at 02:45:52PM +0100, Stefan Hajnoczi wrote:
->>>> On Tue, Aug 31, 2021 at 04:50:35PM +0300, Max Gurtovoy wrote:
->>>>> Sometimes a user would like to control the amount of IO queues to be
->>>>> created for a block device. For example, for limiting the memory
->>>>> footprint of virtio-blk devices.
->>>>>
->>>>> Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
->>>>> ---
->>>>>
->>>>> changes from v1:
->>>>>    - use param_set_uint_minmax (from Christoph)
->>>>>    - added "Should > 0" to module description
->>>>>
->>>>> Note: This commit apply on top of Jens's branch for-5.15/drivers
->>>>> ---
->>>>>    drivers/block/virtio_blk.c | 20 +++++++++++++++++++-
->>>>>    1 file changed, 19 insertions(+), 1 deletion(-)
->>>>>
->>>>> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
->>>>> index 4b49df2dfd23..9332fc4e9b31 100644
->>>>> --- a/drivers/block/virtio_blk.c
->>>>> +++ b/drivers/block/virtio_blk.c
->>>>> @@ -24,6 +24,22 @@
->>>>>    /* The maximum number of sg elements that fit into a virtqueue */
->>>>>    #define VIRTIO_BLK_MAX_SG_ELEMS 32768
->>>>> +static int virtblk_queue_count_set(const char *val,
->>>>> +		const struct kernel_param *kp)
->>>>> +{
->>>>> +	return param_set_uint_minmax(val, kp, 1, nr_cpu_ids);
->>>>> +}
->
-> Hmm which tree is this for?
+> ... used to be broken in TCG, so let's add a very simple test for SSKE
+> and ISKE. In order to test RRBE as well, introduce a helper to call the
+> machine instruction.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 
-I've mentioned in the note that it apply on branch for-5.15/drivers. But 
-now you can apply it on linus/master as well.
+Maybe consider testing rrbm too, but anyway:
 
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 
->
->>>>> +
->>>>> +static const struct kernel_param_ops queue_count_ops = {
->>>>> +	.set = virtblk_queue_count_set,
->>>>> +	.get = param_get_uint,
->>>>> +};
->>>>> +
->>>>> +static unsigned int num_io_queues;
->>>>> +module_param_cb(num_io_queues, &queue_count_ops, &num_io_queues, 0644);
->>>>> +MODULE_PARM_DESC(num_io_queues,
->>>>> +		 "Number of IO virt queues to use for blk device. Should > 0");
->
->
-> better:
->
-> +MODULE_PARM_DESC(num_io_request_queues,
-> +                "Limit number of IO request virt queues to use for each device. 0 for now limit");
+> ---
+>  lib/s390x/asm/mem.h | 12 ++++++++++++
+>  s390x/skey.c        | 28 ++++++++++++++++++++++++++++
+>  2 files changed, 40 insertions(+)
+> 
+> diff --git a/lib/s390x/asm/mem.h b/lib/s390x/asm/mem.h
+> index 40b22b6..845c00c 100644
+> --- a/lib/s390x/asm/mem.h
+> +++ b/lib/s390x/asm/mem.h
+> @@ -50,6 +50,18 @@ static inline unsigned char get_storage_key(void *addr)
+>  	return skey;
+>  }
+>  
+> +static inline unsigned char reset_reference_bit(void *addr)
+> +{
+> +	int cc;
+> +
+> +	asm volatile(
+> +		"rrbe	0,%1\n"
+> +		"ipm	%0\n"
+> +		"srl	%0,28\n"
+> +		: "=d" (cc) : "a" (addr) : "cc");
+> +	return cc;
+> +}
+> +
+>  #define PFMF_FSC_4K 0
+>  #define PFMF_FSC_1M 1
+>  #define PFMF_FSC_2G 2
+> diff --git a/s390x/skey.c b/s390x/skey.c
+> index 2539944..58a5543 100644
+> --- a/s390x/skey.c
+> +++ b/s390x/skey.c
+> @@ -120,6 +120,33 @@ static void test_priv(void)
+>  	report_prefix_pop();
+>  }
+>  
+> +static void test_invalid_address(void)
+> +{
+> +	void *inv_addr = (void *)-1ull;
+> +
+> +	report_prefix_push("invalid address");
+> +
+> +	report_prefix_push("sske");
+> +	expect_pgm_int();
+> +	set_storage_key(inv_addr, 0, 0);
+> +	check_pgm_int_code(PGM_INT_CODE_ADDRESSING);
+> +	report_prefix_pop();
+> +
+> +	report_prefix_push("iske");
+> +	expect_pgm_int();
+> +	get_storage_key(inv_addr);
+> +	check_pgm_int_code(PGM_INT_CODE_ADDRESSING);
+> +	report_prefix_pop();
+> +
+> +	report_prefix_push("rrbe");
+> +	expect_pgm_int();
+> +	reset_reference_bit(inv_addr);
+> +	check_pgm_int_code(PGM_INT_CODE_ADDRESSING);
+> +	report_prefix_pop();
+> +
+> +	report_prefix_pop();
+> +}
+> +
+>  int main(void)
+>  {
+>  	report_prefix_push("skey");
+> @@ -128,6 +155,7 @@ int main(void)
+>  		goto done;
+>  	}
+>  	test_priv();
+> +	test_invalid_address();
+>  	test_set();
+>  	test_set_mb();
+>  	test_chg();
 
-You proposed it and I replied on it bellow.
-
-
->
->
->>>>> +
->>>>>    static int major;
->>>>>    static DEFINE_IDA(vd_index_ida);
->>>>> @@ -501,7 +517,9 @@ static int init_vq(struct virtio_blk *vblk)
->>>>>    	if (err)
->>>>>    		num_vqs = 1;
->>>>> -	num_vqs = min_t(unsigned int, nr_cpu_ids, num_vqs);
->>>>> +	num_vqs = min_t(unsigned int,
->>>>> +			min_not_zero(num_io_queues, nr_cpu_ids),
->>>>> +			num_vqs);
->>>> If you respin, please consider calling them request queues. That's the
->>>> terminology from the VIRTIO spec and it's nice to keep it consistent.
->>>> But the purpose of num_io_queues is clear, so:
->>>>
->>>> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
->>> I did this:
->>> +static unsigned int num_io_request_queues;
->>> +module_param_cb(num_io_request_queues, &queue_count_ops, &num_io_request_queues, 0644);
->>> +MODULE_PARM_DESC(num_io_request_queues,
->>> +                "Limit number of IO request virt queues to use for each device. 0 for now limit");
->> The parameter is writable and can be changed and then new devices might be
->> probed with new value.
->>
->> It can't be zero in the code. we can change param_set_uint_minmax args and
->> say that 0 says nr_cpus.
->>
->> I'm ok with the renaming but I prefer to stick to the description we gave in
->> V3 of this patch (and maybe enable value of 0 as mentioned above).
