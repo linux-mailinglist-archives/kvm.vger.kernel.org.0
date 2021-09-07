@@ -2,76 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 60FDC4029D3
-	for <lists+kvm@lfdr.de>; Tue,  7 Sep 2021 15:37:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C8A3402A09
+	for <lists+kvm@lfdr.de>; Tue,  7 Sep 2021 15:45:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344706AbhIGNiz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Sep 2021 09:38:55 -0400
-Received: from mail.kernel.org ([198.145.29.99]:42404 "EHLO mail.kernel.org"
+        id S1344833AbhIGNqZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Sep 2021 09:46:25 -0400
+Received: from mga18.intel.com ([134.134.136.126]:61159 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1344664AbhIGNiz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Sep 2021 09:38:55 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 59FDA60EB7;
-        Tue,  7 Sep 2021 13:37:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1631021868;
-        bh=aGK2dcSou8XexWMUytCSYbgfygwqSAPDqtXuf+UXqOw=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=RYDLqIr/p1PCNyZkxKeuh2ErR9cdhCMuDUHa27a1QxV9AdMjhtFwwfakIeuyuUrnz
-         Q7f7ZWbsLbPRFTUoPKP7FdnsSbCW0pMz9IZvvWlbGvrB5oktkU4TW7QeW+h4z3pbA+
-         4WxlkcFrHPAGI4sHvokUHFg0zeU4SDEv9Njei0CaY9vftkbRluhjkLybtXX0DLHrpo
-         SE3qh3LgLPkBbruQ6WO4Lra7HaWRIUwsRiqDu8VSRrcHsPu3cn8C8Jt4y7alXWM497
-         KvDb6jLLjw+eE/B27OhBj1IcEi7iJcKIJ4qipYpb0DED5zNk7ZRVi5K3YtqmbFOvcx
-         176R8xkVm8pOg==
-Message-ID: <80cb912c6ef946a0b0c82bfdccaa92c82fe41d47.camel@kernel.org>
-Subject: Re: [PATCH] x86/sgx: Declare sgx_set_attribute() for !CONFIG_X86_SGX
-From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Dave Hansen <dave.hansen@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Tony Luck <tony.luck@intel.com>, linux-sgx@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Date:   Tue, 07 Sep 2021 16:37:46 +0300
-In-Reply-To: <a43d34d5-623f-20f3-c29a-56985d5614ba@redhat.com>
-References: <20210903064156.387979-1-jarkko@kernel.org>
-         <YTI/dTORBZEmGgux@google.com>
-         <f7e6b2f444f34064e34d7bd680d2c863b9ce6a41.camel@kernel.org>
-         <a43d34d5-623f-20f3-c29a-56985d5614ba@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.36.5-0ubuntu1 
+        id S1344817AbhIGNqY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Sep 2021 09:46:24 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10099"; a="207318430"
+X-IronPort-AV: E=Sophos;i="5.85,274,1624345200"; 
+   d="scan'208";a="207318430"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Sep 2021 06:45:18 -0700
+X-IronPort-AV: E=Sophos;i="5.85,274,1624345200"; 
+   d="scan'208";a="537981051"
+Received: from xiaoyaol-mobl.ccr.corp.intel.com (HELO [10.249.169.12]) ([10.249.169.12])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Sep 2021 06:45:14 -0700
+Subject: Re: [PATCH v2] KVM: VMX: Enable Notify VM exit
+To:     Sean Christopherson <seanjc@google.com>,
+        Chenyi Qiang <chenyi.qiang@intel.com>
+Cc:     pbonzini@redhat.com, vkuznets@redhat.com, wanpengli@tencent.com,
+        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, hpa@zytor.com, x86@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20210525051204.1480610-1-tao3.xu@intel.com>
+ <YQRkBI9RFf6lbifZ@google.com>
+ <b0c90258-3f68-57a2-664a-e20a6d251e45@intel.com>
+ <YQgTPakbT+kCwMLP@google.com>
+ <080602dc-f998-ec13-ddf9-42902aa477de@intel.com>
+ <YTD4l7L0CKMCQwd5@google.com> <YTD9kIIzAz34Ieeu@google.com>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+Message-ID: <118cd1b9-1b50-3173-05b8-4293412ca78c@intel.com>
+Date:   Tue, 7 Sep 2021 21:45:12 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Firefox/78.0 Thunderbird/78.13.0
 MIME-Version: 1.0
+In-Reply-To: <YTD9kIIzAz34Ieeu@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 2021-09-06 at 10:35 +0200, Paolo Bonzini wrote:
-> On 03/09/21 17:58, Jarkko Sakkinen wrote:
-> > > Eh, it doesn't really simplify the usage.  If anything it makes it mo=
-re convoluted
-> > > because the capability check in kvm_vm_ioctl_check_extension() still =
-needs an
-> > > #ifdef, e.g. readers will wonder why the check is conditional but the=
- usage is not.
-> > It does objectively a bit, since it's one ifdef less.
->=20
-> But you're effectively replacing #ifdef CONFIG_X86_SGX_KVM with #ifdef=
-=20
-> CONFIG_X86_SGX; so the patch is not a no-op as far as KVM is concerned.
->=20
-> So NACK for the KVM parts (yeah I know it's RFC but just to be clearer),=
-=20
-> but I agree that adding a stub inline version of the function is=20
-> standard practice and we do it a lot in KVM too.
+On 9/3/2021 12:36 AM, Sean Christopherson wrote:
+> On Thu, Sep 02, 2021, Sean Christopherson wrote:
+>> On Tue, Aug 03, 2021, Xiaoyao Li wrote:
+>>> On 8/2/2021 11:46 PM, Sean Christopherson wrote:
+>>>>>>> @@ -5642,6 +5653,31 @@ static int handle_bus_lock_vmexit(struct kvm_vcpu *vcpu)
+>>>>>>>     	return 0;
+>>>>>>>     }
+>>>>>>> +static int handle_notify(struct kvm_vcpu *vcpu)
+>>>>>>> +{
+>>>>>>> +	unsigned long exit_qual = vmx_get_exit_qual(vcpu);
+>>>>>>> +
+>>>>>>> +	if (!(exit_qual & NOTIFY_VM_CONTEXT_INVALID)) {
+>>>>>>
+>>>>>> What does CONTEXT_INVALID mean?  The ISE doesn't provide any information whatsoever.
+>>>>>
+>>>>> It means whether the VM context is corrupted and not valid in the VMCS.
+>>>>
+>>>> Well that's a bit terrifying.  Under what conditions can the VM context become
+>>>> corrupted?  E.g. if the context can be corrupted by an inopportune NOTIFY exit,
+>>>> then KVM needs to be ultra conservative as a false positive could be fatal to a
+>>>> guest.
+>>>>
+>>>
+>>> Short answer is no case will set the VM_CONTEXT_INVALID bit.
+>>
+>> But something must set it, otherwise it wouldn't exist.  
 
-OK, this is perfectly fine for me (I care most that we can do this in
-SGX side).
+For existing Intel silicon, no case will set it. Maybe in the future new 
+case will set it.
 
-/Jarkko
+> The condition(s) under
+>> which it can be set matters because it affects how KVM should respond.  E.g. if
+>> the guest can trigger VM_CONTEXT_INVALID at will, then we should probably treat
+>> it as a shutdown and reset the VMCS.
+> 
+> Oh, and "shutdown" would be relative to the VMCS, i.e. if L2 triggers a NOTIFY
+> exit with VM_CONTEXT_INVALID then KVM shouldn't kill the entire VM.  The least
+> awful option would probably be to synthesize a shutdown VM-Exit to L1.  That
+> won't communicate to L1 that vmcs12 state is stale/bogus, but I don't see any way
+> to handle that via an existing VM-Exit reason :-/
+> 
+>> But if VM_CONTEXT_INVALID can occur if and only if there's a hardware/ucode
+>> issue, then we can do:
+>>
+>> 	if (KVM_BUG_ON(exit_qual & NOTIFY_VM_CONTEXT_INVALID, vcpu->kvm))
+>> 		return -EIO;
+>>
+>> Either way, to enable this by default we need some form of documentation that
+>> describes what conditions lead to VM_CONTEXT_INVALID.
+
+I still don't know why the conditions lead to it matters. I think the 
+consensus is that once VM_CONTEXT_INVALID happens, the vcpu can no 
+longer run. Either KVM_BUG_ON() or a specific EXIT to userspace should 
+be OK?
