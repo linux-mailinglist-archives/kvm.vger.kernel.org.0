@@ -2,202 +2,174 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9ADA8402735
-	for <lists+kvm@lfdr.de>; Tue,  7 Sep 2021 12:29:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4ACD1402763
+	for <lists+kvm@lfdr.de>; Tue,  7 Sep 2021 12:51:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343493AbhIGK3k (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Sep 2021 06:29:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44150 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343523AbhIGK3i (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Sep 2021 06:29:38 -0400
-Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4989DC0613C1;
-        Tue,  7 Sep 2021 03:28:32 -0700 (PDT)
-Received: by mail-pf1-x42d.google.com with SMTP id v123so7786275pfb.11;
-        Tue, 07 Sep 2021 03:28:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=vRBbwPHbmtfpgIVtQU9f4UNTrL9hQeaBXAYOYIggBaU=;
-        b=k2dVwFQ3drLgLgSu0OvFPqRt3etXzw8YD4eNAHUHeY54P5exrUAR3PjCPmoo/WgK95
-         aRRD4yUIy2xmbejYnXGoayfJK4NJrW/RUJT3SA77kUiAsxAJwydZUEGDMeXrbuYpw/8n
-         XsHrhz325gOKTjv/+ha357Wt7VAP4JiQT2SexDk4HBEkzHhZzFeke7E3Ez+hWoucJ8xJ
-         M59zED5nzmcZM7fqcICJRwCIXaflMNiizuJEFiaABVMYsGkXPTQMVunadsHOSK0VKPPk
-         so/0yqfuTbqdUFmeteQ+JjqmRtBpbPhxliZOWdbMUzmI8bs9OphWB+jc1hDca/naRDpd
-         zbTw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=vRBbwPHbmtfpgIVtQU9f4UNTrL9hQeaBXAYOYIggBaU=;
-        b=D+xAHpnaQMbSx9FRfJGbi1VlrywEl5Jja+CkDDHPinSYLUQoLSpYTZ8VNaBSAdyiP/
-         sxeGOn+6MPKO0MbyQXzQskRCV8vvDjutQVYOIQpsmRXl3XJ18xyKACyV+KxaICfuS7bY
-         EPqdouvN2GadXOsdoXyIKN/+F2Jd/fe4a+COtv69/EzrhaonPX4Ml6bLOj3DgbkhxLi/
-         Q5Knu050Gk6N8+0WfXMwpVFxpSd4JhSmENe4gWyYwGFHrLQTBJKsMlvcBf2UZAsVZ3m7
-         DJ6my0h2P8c9i61HMlsGCQBOp6eqpfQeil1FucJgPjHV7OSP4QC29ydl68zBbJoAdHUY
-         L2hw==
-X-Gm-Message-State: AOAM533dF8BodXsz6OhfAU5C/gJ1hwQbNZtnr9FqfEm7Fubn3gQZvQlB
-        kEN0YtfZYJKTEqOq0dvb59DmAGzltd/4LcY0zYUXmH52VYz4
-X-Google-Smtp-Source: ABdhPJyLASDHolzt4Yl0XnyYzXn0EdY8Iv19HG2XLCRKHzd5N4uP4CN7+KxzCO9OFUOQf5a/cKJRBg0cE1flxjRp2ZY=
-X-Received: by 2002:a63:b60a:: with SMTP id j10mr16374299pgf.83.1631010511411;
- Tue, 07 Sep 2021 03:28:31 -0700 (PDT)
+        id S244744AbhIGKwW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Sep 2021 06:52:22 -0400
+Received: from mail-co1nam11on2068.outbound.protection.outlook.com ([40.107.220.68]:29096
+        "EHLO NAM11-CO1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S233669AbhIGKwT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Sep 2021 06:52:19 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Amd3Ws0WVF5vlA6D1ukC13EdvDfEkKC/RpPyldKv4Pj9utitet86EPacxb9PUTTD1ygSpTtyVuuYHhvRI/7Hj1esiM1dGB5MdwwNLoLRfaFeWjQipbDCnw9WL1LIcrPahqSkioAJFILKQY5oUNhk1KcLvmcJ9ibXYiNZI1gv09XMQd+cQek10fFWqI6F5PbVB72e7BiXlQuLlc9tF2N0J1onzD3/QxhuJpxCjFQQdpRKUsSILM98v4OCRhtgN0Rr8i5sn06iC9OV9rBtvTkY0taqSJSNmGvfB3Timx4QVYVatVzR0NzawU6f1YzUBxrCIE0tTnfKfBn0sh9FXpAr/g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
+ bh=Tn5AGGrH4UW8Vo4nmKMZSlVY5ldP6FMXoCV9OGM+i5M=;
+ b=Kuj9FYYxZ5XvJpbl1CM7YHkEP+2sYf+IiqEDpjD+70JveniTIWbh44yQgnBmNVTPX+tamxl+17VwCnPb3SchH6b7llN2BTmHo1JVCDXXK+t8H6PSGTN4JJV/lqjT9Kd2GnH40h7KEY4ConBNVX9/pgNbW9QBtPWThQUMEYoHqgXwwl0Yugu+yNG3dKovK4cSzqul9T4NgptvmCyJbJXDuef/azbyEbEGSR6Sb42y7mlNnksbKUO348aiBiBFsxi+YZGw1brQqkbkvVEU4k4EneNhtVb/l9ofLf+5RlVKsSZTdwFLe6PBSeG+91ca+YaMajR6RCrgA/7taRC9bZTKEQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Tn5AGGrH4UW8Vo4nmKMZSlVY5ldP6FMXoCV9OGM+i5M=;
+ b=IhaxTLVG2OOrAFGLVAw8B/tvMlmP/vgaSfJw876P7QeSvYujDGZ16qrmLENav8b8Z0AboTUaYEhc2zD/KbO5XFpSnTMtSLzJciJlYXwbr/Lr4b99v6dmB6GsfWRKy+OzXCISjQIwfFdc+Lym8z6UtasPSwbv7Nh3TuCmUIi+bqg=
+Authentication-Results: intel.com; dkim=none (message not signed)
+ header.d=none;intel.com; dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
+ by SN6PR12MB2685.namprd12.prod.outlook.com (2603:10b6:805:67::33) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4478.24; Tue, 7 Sep
+ 2021 10:51:11 +0000
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::491e:2642:bae2:8b73]) by SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::491e:2642:bae2:8b73%7]) with mapi id 15.20.4478.025; Tue, 7 Sep 2021
+ 10:51:11 +0000
+Date:   Tue, 7 Sep 2021 10:51:04 +0000
+From:   Ashish Kalra <ashish.kalra@amd.com>
+To:     "Yao, Yuan" <yuan.yao@intel.com>
+Cc:     "yuan.yao@linux.intel.com" <yuan.yao@linux.intel.com>,
+        "Thomas.Lendacky@amd.com" <Thomas.Lendacky@amd.com>,
+        "armbru@redhat.com" <armbru@redhat.com>,
+        "brijesh.singh@amd.com" <brijesh.singh@amd.com>,
+        "dgilbert@redhat.com" <dgilbert@redhat.com>,
+        "ehabkost@redhat.com" <ehabkost@redhat.com>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mst@redhat.com" <mst@redhat.com>,
+        "mtosatti@redhat.com" <mtosatti@redhat.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Subject: Re: [RFC][PATCH v1 00/10] Enable encrypted guest memory access in
+ QEMU
+Message-ID: <20210907105104.GA17821@ashkalra_ubuntu_server>
+References: <20210506014037.11982-1-yuan.yao@linux.intel.com>
+ <20210902140433.12994-1-Ashish.Kalra@amd.com>
+ <BYAPR11MB37179FAB0D067E0177498E2795CE9@BYAPR11MB3717.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BYAPR11MB37179FAB0D067E0177498E2795CE9@BYAPR11MB3717.namprd11.prod.outlook.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-ClientProxiedBy: SN6PR2101CA0019.namprd21.prod.outlook.com
+ (2603:10b6:805:106::29) To SN6PR12MB2767.namprd12.prod.outlook.com
+ (2603:10b6:805:75::23)
 MIME-Version: 1.0
-From:   Hao Sun <sunhao.th@gmail.com>
-Date:   Tue, 7 Sep 2021 18:28:20 +0800
-Message-ID: <CACkBjsZ55MKvOBGYJyQxwHBCQOTP=Lz=yfYwJtdOzNiT59E38g@mail.gmail.com>
-Subject: BUG: spinlock bad magic in synchronize_srcu
-To:     linux-kernel@vger.kernel.org
-Cc:     bp@alien8.de, hpa@zytor.com, jmattson@google.com, joro@8bytes.org,
-        kvm@vger.kernel.org, mingo@redhat.com, pbonzini@redhat.com,
-        seanjc@google.com, tglx@linutronix.de, vkuznets@redhat.com,
-        wanpengli@tencent.com, x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Received: from ashkalra_ubuntu_server (165.204.77.1) by SN6PR2101CA0019.namprd21.prod.outlook.com (2603:10b6:805:106::29) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4523.3 via Frontend Transport; Tue, 7 Sep 2021 10:51:10 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 515eec02-d1ec-41b9-e3c3-08d971ed6789
+X-MS-TrafficTypeDiagnostic: SN6PR12MB2685:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <SN6PR12MB26856816FC10CA0202358AA18ED39@SN6PR12MB2685.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 6PcCpBMdeEaOnI/jIyBsNuSm5MXM9FcS6qW9OTrNj61CR780hj4F7AvCEE++jlt4ME71ZhbAkv/J/HDOqw3IG75qiCnS4DAP9W2V0yHnkP/OJuJBWbs3mQ3Pf6uuhP4bK7Z6rn+blfTAfWEpSFan8aPaL7Fs6oVsSY00sz6Mu/GWGuld6zvYnFtbBnHt0yKXA/cJG8oqWj/lfRL8pVynwJHuxwFEsqZiJlCDqbwrlGWJJH+aoI0ay2BRLgy7T+qRslIGHV5J18Zn98XliKocNQUEYFPhROOKfcDhb3H8IRH8akYCAvMvXdzi0o6LnM1h+WkBnqiOUsQJTKpQAmUtfMkQEPjkZlKsK8pCc7xfMSszTwzZZyF4BcAB5zcDb2bBPuEDtGojSdMFfKQ/Ui/+QVkD0kukUMJV6tSLIFE/B1YU0iTSBgQrgSKrly66618dUvMktiGV4oUNKmF0ZpwQbuox0LQonaDgl8UgKbE2h/7+pt3tpJp4BbMd6JhdaHl+ZQKWmEJuNVkRnUx1/TttN1MIR/vEgTex8sTin8glIHrWsX6DH5SIHqNpV+MIkYANKXCbDkcsajqndMRdDvAzntyswn2+G/9bS4zeQCqKR389b+qzDX4sSbY+PIpxtsRsDt2ozCt2ycq6mwfiBxaOaQAD16+poaeUGaHxtNY933xj0VCUrZVqTBE2EupW/Prn/LrxSB7uwNatkTTODJucRQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(366004)(136003)(396003)(376002)(346002)(66556008)(83380400001)(66476007)(2906002)(33656002)(66946007)(7416002)(38100700002)(956004)(86362001)(8936002)(38350700002)(33716001)(8676002)(316002)(1076003)(6496006)(54906003)(6666004)(478600001)(5660300002)(186003)(55016002)(9686003)(26005)(44832011)(52116002)(4326008)(6916009);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?FbX8yN4aWVYAe3eYSjgixS7zCDJX72PmvogBNI8t8UakrcKTH52CCZBKmSeK?=
+ =?us-ascii?Q?A4KFcSNJnn2DymbCqQrxpA1FkqN3IAHTvVO3dj692fRi8hh+1Vtd2dH/rDhZ?=
+ =?us-ascii?Q?kMihN45bsD708FGfgDVEaSSQQ3VlE4//J8CqEJsuVGCc+xmGjYKdQjNlOhlg?=
+ =?us-ascii?Q?/dj8nIST9LqA6RnxCATaq+e10ncHV+WNZrp7+8szw264vWSH7QFafGKIWkzE?=
+ =?us-ascii?Q?IY8vonA4g50/ZyRmAYPVKpkjJBc0/letkbpEqKBTsX0tJNPIrgFywcALY2bt?=
+ =?us-ascii?Q?XUr4wSpEFVJ4KCwbDzJrNxYWRvFach649luUMo2NVvJVig1tyIRku3vg+FSK?=
+ =?us-ascii?Q?csuO2Jl5aJRLKwWay9HDiExaVPzeHbvfCI9+kbCt/qW0roD0Sa+ZOappEhxj?=
+ =?us-ascii?Q?kJrBN3hSEmrwvqJ9DUyhJfbbUI/J1CTVdD7+uW4K1n1RIDVy6leJgnQuveWc?=
+ =?us-ascii?Q?K8s6rVPUyt/dhV1HJLT9lVticH50uSbe7UtbdDEe0dNiZ+RFLnipaKSoeVPS?=
+ =?us-ascii?Q?CbjxTTZhat8bsLURO0TUjl1nhDo/wuy6oFH2VocRjrfGSQsH1PMuzezx1cCj?=
+ =?us-ascii?Q?66rmKgD3F0zIPi4zjikRHKR0xL8RaxcFo1QgNJ8tJLovti1W1DnJb+XYDB71?=
+ =?us-ascii?Q?6kAKqGQi3SLM9kpbWP/hg3LEYLb5oZ8Xap4urNj6UReQFh9oiQ25Vj00ja7O?=
+ =?us-ascii?Q?m0rq+pRzGiGnIia/1mJUimOAaaoiosawm/dshqvXYALaFTQ8NPiCMTtSPUBl?=
+ =?us-ascii?Q?g6QD98Ndp6+6ASEodftixHI9r6yRnhg/900Gr3tscbZcKS0D9U2Syr1ONQEH?=
+ =?us-ascii?Q?eIbi7ADmec4lfPSDqcxFuMNmxhkMgCpOfCkUC+W2TFHq232HKqxvuHEF8Isz?=
+ =?us-ascii?Q?e1Ts65CStEhb/cZoWlTfNBptP66KUhCjiFbhak2qBuT5FUg3Qa/mIeIWWZSa?=
+ =?us-ascii?Q?YN0orZRfGdVNDPkQZ5XStXLiuRblhkc4OmLSmlLNG4uOTucEvhvSnFXNgyGN?=
+ =?us-ascii?Q?huPVTcmPNl9gxn6BAAWz04jRAi9bgOe6uT+e5GF2JpScfJd0+XGEZK6nP6DZ?=
+ =?us-ascii?Q?+zXqKVSzP9PaFzz6HmCxa88NpbEmVvnmtnXpybKsJWI2u0qLTI0NCxQ3AKdv?=
+ =?us-ascii?Q?35ut+5hsnbLI6iv/c4g+m97kh+7M77PRDmT3tDw2VPXOa+QmJ/0C6YqAEArE?=
+ =?us-ascii?Q?jZfbR/tl7dZxNl3zxQ/y1p44BhMOjykNef4dWVPRIzHp1X+dLVIsV6u2et9I?=
+ =?us-ascii?Q?W834fYX64E+fJbDfMSTQofDCOv4LIj0iDw4hqI3uowtk5DATCeLcIASJR4bJ?=
+ =?us-ascii?Q?ISSorfBmBlKa2cn4bAfToryg?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 515eec02-d1ec-41b9-e3c3-08d971ed6789
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Sep 2021 10:51:11.0981
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: TkqHLVpK7me1zfTy5aHis+6pPLo4U0M83HzYiPEk7i2hRT+yIKIc3E+S34NzjL7EuvJgas27r+fNf5qbMKdsqw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR12MB2685
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello,
+Hello Yuan,
 
-When using Healer to fuzz the latest Linux kernel, the following crash
-was triggered.
+On Thu, Sep 02, 2021 at 11:23:50PM +0000, Yao, Yuan wrote:
+> >-----Original Message-----
+> >From: Ashish Kalra <Ashish.Kalra@amd.com>
+> >Sent: Thursday, September 02, 2021 22:05
+> >To: yuan.yao@linux.intel.com
+> >Cc: Thomas.Lendacky@amd.com; armbru@redhat.com; ashish.kalra@amd.com; brijesh.singh@amd.com;
+> >dgilbert@redhat.com; ehabkost@redhat.com; Yamahata, Isaku <isaku.yamahata@intel.com>; kvm@vger.kernel.org;
+> >mst@redhat.com; mtosatti@redhat.com; pbonzini@redhat.com; qemu-devel@nongnu.org; Yao, Yuan
+> ><yuan.yao@intel.com>
+> >Subject: [RFC][PATCH v1 00/10] Enable encrypted guest memory access in QEMU
+> >
+> >> - We introduce another new vm level ioctl focus on the encrypted
+> >>     guest memory accessing:
+> >>
+> >>     KVM_MEMORY_ENCRYPT_{READ,WRITE}_MEMORY
+> >>
+> >>     struct kvm_rw_memory rw;
+> >>     rw.addr = gpa_OR_hva;
+> >>     rw.buf = (__u64)src;
+> >>     rw.len = len;
+> >>     kvm_vm_ioctl(kvm_state,
+> >>                  KVM_MEMORY_ENCRYPT_{READ,WRITE}_MEMORY,
+> >>                  &rw);
+> >>
+> >>     This new ioctl has more neutral and general name for its
+> >>     purpose, the debugging support of AMD SEV and INTEL TDX
+> >>     can be covered by a unify QEMU implementation on x86 with this
+> >>     ioctl. Although only INTEL TD guest is supported in this series,
+> >>     AMD SEV could be also supported with implementation of this
+> >>     ioctl in KVM, plus small modifications in QEMU to enable the
+> >>     unify part.
+> >
+> >A general comment, we have sev_ioctl() interface for SEV guests and
+> >probably this new vm level ioctl will not work for us.
+> >
+> >It probably makes more sense to do this TDX/SEV level abstraction
+> >using the Memory Region's ram_debug_ops, which can point these to
+> >TDX specific vm level ioctl and SEV specific ioctl at the lowest
+> >level of this interface.
+> >
+> Hi Ashish,
+> 
+> Yes, this new ioctl is now working as the low-level interface for 
+> Memory Region's ram_debug_ops. SEV can use 
+> kvm_setup_set_memory_region_debug_ops() to install a new
+> callback to KVM for installing SEV only low-level implementation,
+> then call kvm_set_memory_region_debug_ops() to do Memory
+> Region's ram_debug_ops installation later.
+> 
+> 
 
-HEAD commit: 27151f177827 Merge tag 'perf-tools-for-v5.15-2021-09-04'
-git tree: upstream
-console output:
-https://drive.google.com/file/d/1AauK3Op9WjrF8tZOM0r76XOGMrvgK65e/view?usp=sharing
-kernel config: https://drive.google.com/file/d/1ZMVJ2vNe0EiIEeWNVyrGb7hBdOG5Uj3e/view?usp=sharing
-Similar bug report:
-https://groups.google.com/g/syzkaller-bugs/c/JMQALBa9wVE/m/_Wp1KGYzBwAJ
+Ok. Yes i think that should work. 
 
-Sorry, I don't have a reproducer for this crash, hope the symbolized
-report can help.
-If you fix this issue, please add the following tag to the commit:
-Reported-by: Hao Sun <sunhao.th@gmail.com>
-
-BUG: spinlock bad magic on CPU#3, syz-executor/11945
- lock: 0xffff88813dd00040, .magic: 00000000, .owner: <none>/-1, .owner_cpu: 0
-CPU: 3 PID: 11945 Comm: syz-executor Not tainted 5.14.0+ #13
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
-rel-1.12.0-59-gc9ba5276e321-prebuilt.qemu.org 04/01/2014
-Call Trace:
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0x8d/0xcf lib/dump_stack.c:105
- spin_bug kernel/locking/spinlock_debug.c:77 [inline]
- debug_spin_lock_before kernel/locking/spinlock_debug.c:85 [inline]
- do_raw_spin_lock+0x6c/0xc0 kernel/locking/spinlock_debug.c:114
- __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:117 [inline]
- _raw_spin_lock_irqsave+0x40/0x50 kernel/locking/spinlock.c:162
- srcu_might_be_idle kernel/rcu/srcutree.c:767 [inline]
- synchronize_srcu+0x33/0xf0 kernel/rcu/srcutree.c:1008
- kvm_mmu_uninit_vm+0x18/0x30 arch/x86/kvm/mmu/mmu.c:5585
- kvm_arch_destroy_vm+0x225/0x2d0 arch/x86/kvm/x86.c:11277
- kvm_create_vm arch/x86/kvm/../../../virt/kvm/kvm_main.c:1060 [inline]
- kvm_dev_ioctl_create_vm arch/x86/kvm/../../../virt/kvm/kvm_main.c:4486 [inline]
- kvm_dev_ioctl+0x7c7/0xc00 arch/x86/kvm/../../../virt/kvm/kvm_main.c:4541
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:874 [inline]
- __se_sys_ioctl fs/ioctl.c:860 [inline]
- __x64_sys_ioctl+0xb6/0x100 fs/ioctl.c:860
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x34/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x46a9a9
-Code: f7 d8 64 89 02 b8 ff ff ff ff c3 66 0f 1f 44 00 00 48 89 f8 48
-89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d
-01 f0 ff ff 73 01 c3 48 c7 c1 bc ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f7df63cfc58 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 000000000078c0a0 RCX: 000000000046a9a9
-RDX: 0000000000000000 RSI: 000000000000ae01 RDI: 0000000000000003
-RBP: 00000000004e4042 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 000000000078c0a0
-R13: 0000000000000000 R14: 000000000078c0a0 R15: 00007fff67e58cd0
-BUG: kernel NULL pointer dereference, address: 0000000000000000
-#PF: supervisor write access in kernel mode
-#PF: error_code(0x0002) - not-present page
-PGD 104cb6067 P4D 104cb6067 PUD 10574c067 PMD 0
-Oops: 0002 [#1] PREEMPT SMP
-CPU: 3 PID: 11945 Comm: syz-executor Not tainted 5.14.0+ #13
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
-rel-1.12.0-59-gc9ba5276e321-prebuilt.qemu.org 04/01/2014
-RIP: 0010:rcu_segcblist_enqueue+0x2f/0x40 kernel/rcu/rcu_segcblist.c:348
-Code: 00 48 8b 47 48 48 83 c0 01 48 89 47 48 f0 83 44 24 fc 00 48 8b
-47 68 48 83 c0 01 48 89 47 68 48 c7 06 00 00 00 00 48 8b 47 20 <48> 89
-30 48 89 77 20 c3 66 0f 1f 84 00 00 00 00 00 48 8b 57 48 48
-RSP: 0018:ffffc90000a0bd48 EFLAGS: 00010002
-RAX: 0000000000000000 RBX: ffffc90000a0bdb0 RCX: ffffc90000a5d000
-RDX: 0000000000000001 RSI: ffffc90000a0bdb0 RDI: ffff88813dd00080
-RBP: ffffc90000a0bda0 R08: 0000000000000001 R09: 0000000000000000
-R10: ffffc90000a0bd80 R11: 3030303030302052 R12: ffffc90001681d10
-R13: 0000000000000000 R14: 0000000000000000 R15: ffff88813dd00080
-FS:  00007f7df63d0700(0000) GS:ffff88813dd00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000000 CR3: 0000000100f94000 CR4: 0000000000750ee0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-PKRU: 55555554
-Call Trace:
- srcu_gp_start_if_needed+0xb4/0x480 kernel/rcu/srcutree.c:823
- __synchronize_srcu+0x13a/0x1a0 kernel/rcu/srcutree.c:929
- kvm_mmu_uninit_vm+0x18/0x30 arch/x86/kvm/mmu/mmu.c:5585
- kvm_arch_destroy_vm+0x225/0x2d0 arch/x86/kvm/x86.c:11277
- kvm_create_vm arch/x86/kvm/../../../virt/kvm/kvm_main.c:1060 [inline]
- kvm_dev_ioctl_create_vm arch/x86/kvm/../../../virt/kvm/kvm_main.c:4486 [inline]
- kvm_dev_ioctl+0x7c7/0xc00 arch/x86/kvm/../../../virt/kvm/kvm_main.c:4541
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:874 [inline]
- __se_sys_ioctl fs/ioctl.c:860 [inline]
- __x64_sys_ioctl+0xb6/0x100 fs/ioctl.c:860
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x34/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x46a9a9
-Code: f7 d8 64 89 02 b8 ff ff ff ff c3 66 0f 1f 44 00 00 48 89 f8 48
-89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d
-01 f0 ff ff 73 01 c3 48 c7 c1 bc ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f7df63cfc58 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 000000000078c0a0 RCX: 000000000046a9a9
-RDX: 0000000000000000 RSI: 000000000000ae01 RDI: 0000000000000003
-RBP: 00000000004e4042 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 000000000078c0a0
-R13: 0000000000000000 R14: 000000000078c0a0 R15: 00007fff67e58cd0
-Modules linked in:
-Dumping ftrace buffer:
-   (ftrace buffer empty)
-CR2: 0000000000000000
----[ end trace a7c9cbcbae2d6a4b ]---
-RIP: 0010:rcu_segcblist_enqueue+0x2f/0x40 kernel/rcu/rcu_segcblist.c:348
-Code: 00 48 8b 47 48 48 83 c0 01 48 89 47 48 f0 83 44 24 fc 00 48 8b
-47 68 48 83 c0 01 48 89 47 68 48 c7 06 00 00 00 00 48 8b 47 20 <48> 89
-30 48 89 77 20 c3 66 0f 1f 84 00 00 00 00 00 48 8b 57 48 48
-RSP: 0018:ffffc90000a0bd48 EFLAGS: 00010002
-RAX: 0000000000000000 RBX: ffffc90000a0bdb0 RCX: ffffc90000a5d000
-RDX: 0000000000000001 RSI: ffffc90000a0bdb0 RDI: ffff88813dd00080
-RBP: ffffc90000a0bda0 R08: 0000000000000001 R09: 0000000000000000
-R10: ffffc90000a0bd80 R11: 3030303030302052 R12: ffffc90001681d10
-R13: 0000000000000000 R14: 0000000000000000 R15: ffff88813dd00080
-FS:  00007f7df63d0700(0000) GS:ffff88813dd00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000000 CR3: 0000000100f94000 CR4: 0000000000750ee0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-PKRU: 55555554
-----------------
-Code disassembly (best guess):
-   0: 00 48 8b              add    %cl,-0x75(%rax)
-   3: 47                    rex.RXB
-   4: 48                    rex.W
-   5: 48 83 c0 01          add    $0x1,%rax
-   9: 48 89 47 48          mov    %rax,0x48(%rdi)
-   d: f0 83 44 24 fc 00    lock addl $0x0,-0x4(%rsp)
-  13: 48 8b 47 68          mov    0x68(%rdi),%rax
-  17: 48 83 c0 01          add    $0x1,%rax
-  1b: 48 89 47 68          mov    %rax,0x68(%rdi)
-  1f: 48 c7 06 00 00 00 00 movq   $0x0,(%rsi)
-  26: 48 8b 47 20          mov    0x20(%rdi),%rax
-* 2a: 48 89 30              mov    %rsi,(%rax) <-- trapping instruction
-  2d: 48 89 77 20          mov    %rsi,0x20(%rdi)
-  31: c3                    retq
-  32: 66 0f 1f 84 00 00 00 nopw   0x0(%rax,%rax,1)
-  39: 00 00
-  3b: 48 8b 57 48          mov    0x48(%rdi),%rdx
-  3f: 48                    rex.W%
+Thanks,
+Ashish
