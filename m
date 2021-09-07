@@ -2,59 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 14D6E403031
-	for <lists+kvm@lfdr.de>; Tue,  7 Sep 2021 23:22:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E9D1B40315C
+	for <lists+kvm@lfdr.de>; Wed,  8 Sep 2021 01:04:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347166AbhIGVXh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Sep 2021 17:23:37 -0400
-Received: from mail.kernel.org ([198.145.29.99]:34962 "EHLO mail.kernel.org"
+        id S1346385AbhIGXFn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Sep 2021 19:05:43 -0400
+Received: from mail.kernel.org ([198.145.29.99]:48822 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1347128AbhIGVXe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Sep 2021 17:23:34 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPS id BAF6C610C9;
-        Tue,  7 Sep 2021 21:22:27 +0000 (UTC)
+        id S240690AbhIGXFk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Sep 2021 19:05:40 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 365DD61102;
+        Tue,  7 Sep 2021 23:04:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1631049747;
-        bh=T40cB3S44WxRTkIeUq7YZ9g3ktTtPPiNAjJ+/MV2VPs=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=rTJ+93Dsx/+MDR4VGiwZ6JfZyocrf6FWuC9uFZhGzX7cZFzLRp88VOPXlM+eab80/
-         OVmTfweZ/VM2MaOq1tDXway5ACMlEs1x0sHV4xPjPf4a6h0PSToI9Wo5501lpSjSPh
-         aR2ZG0xn8rrrEedCps5k5Wk8TEwK/Ju+jxxn07dvniG6Sv5FUYsIoB4eSrjF8pHkrA
-         Q3nuyrGVNmt1c+BdmNoGgCzgQcS2iweonVTKG8yS6R/YtXnfI1KOQ45peJTT0mgIhk
-         qArR5ciKVO6Ds/n7b/hhS2tXacAhCxNb3bIg/lHkzmqp3Xx2L964ZENq3UpyJRfOXE
-         yUsnRddwlneAg==
-Received: from pdx-korg-docbuild-2.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by pdx-korg-docbuild-2.ci.codeaurora.org (Postfix) with ESMTP id B511D609F5;
-        Tue,  7 Sep 2021 21:22:27 +0000 (UTC)
-Subject: Re: [GIT PULL] KVM changes for Linux 5.15
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <20210907171639.574037-1-pbonzini@redhat.com>
-References: <20210907171639.574037-1-pbonzini@redhat.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20210907171639.574037-1-pbonzini@redhat.com>
-X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
-X-PR-Tracked-Commit-Id: 109bbba5066b42431399b40e947243f049d8dc8d
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 192ad3c27a4895ee4b2fa31c5b54a932f5bb08c1
-Message-Id: <163104974773.25074.8564070895508947960.pr-tracker-bot@kernel.org>
-Date:   Tue, 07 Sep 2021 21:22:27 +0000
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     torvalds@linux-foundation.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
+        s=k20201202; t=1631055873;
+        bh=U4r90XGeMFMBTYQzJqJqJ72n/aEzus0q4Z98AOX2grc=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=sKXNN3dc3jccHx69/sKD47gbQLIRPr5FvdMGBsnJ/eUfbMNTLqUqNfWSvns+I69ck
+         U25GKT7tGRJbAWVj0zvnCcxOB6w4HzBT1Fe6R/PlLWnsRJcpQuvxrlr71Ab0Gl0r/g
+         yCUbkzUr9DQXvBlG7STLjsnFeql70rUCYRhVNXo5P9Gd5NRMXopOXF68LZg0JtLbDj
+         NWDsTld22BYYdo8O+Vk07IJEW02ZwlwcdChvtN2kzeHNXcIDL0mt9ZFToQ/iPeAFMS
+         FGhfCRqW9/t3Jn7umP3x8hpJMQ+gNd+0TD6+cH0YIKQMIROMhf40SlprUdwNv8QkXz
+         HpLc51HwA2u3Q==
+Date:   Wed, 8 Sep 2021 02:04:30 +0300
+From:   Leon Romanovsky <leon@kernel.org>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>, hch@infradead.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        stefanha@redhat.com, israelr@nvidia.com, nitzanc@nvidia.com,
+        oren@nvidia.com, linux-block@vger.kernel.org, axboe@kernel.dk
+Subject: Re: [PATCH v3 1/1] virtio-blk: add num_request_queues module
+ parameter
+Message-ID: <YTfv/s8v0MsCya5r@unreal>
+References: <20210902204622.54354-1-mgurtovoy@nvidia.com>
+ <YTR12AHOGs1nhfz1@unreal>
+ <b2e60035-2e63-3162-6222-d8c862526a28@gmail.com>
+ <YTSZ6CYM6BCsbVmk@unreal>
+ <20210905111415-mutt-send-email-mst@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210905111415-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The pull request you sent on Tue,  7 Sep 2021 13:16:39 -0400:
+On Sun, Sep 05, 2021 at 11:15:16AM -0400, Michael S. Tsirkin wrote:
+> On Sun, Sep 05, 2021 at 01:20:24PM +0300, Leon Romanovsky wrote:
+> > On Sun, Sep 05, 2021 at 01:49:46AM -0700, Chaitanya Kulkarni wrote:
+> > > 
+> > > On 9/5/2021 12:46 AM, Leon Romanovsky wrote:
+> > > > > +static unsigned int num_request_queues;
+> > > > > +module_param_cb(num_request_queues, &queue_count_ops, &num_request_queues,
+> > > > > +		0644);
+> > > > > +MODULE_PARM_DESC(num_request_queues,
+> > > > > +		 "Number of request queues to use for blk device. Should > 0");
+> > > > > +
+> > > > Won't it limit all virtio block devices to the same limit?
+> > > > 
+> > > > It is very common to see multiple virtio-blk devices on the same system
+> > > > and they probably need different limits.
+> > > > 
+> > > > Thanks
+> > > 
+> > > 
+> > > Without looking into the code, that can be done adding a configfs
+> > > 
+> > > interface and overriding a global value (module param) when it is set from
+> > > 
+> > > configfs.
+> > 
+> > So why should we do double work instead of providing one working
+> > interface from the beginning?
+> > 
+> > Thanks
+> > 
+> > > 
+> > > 
+> 
+> The main way to do it is really from the hypervisor. This one
+> is a pretty blunt instrument, Max here says it's useful to reduce
+> memory usage of the driver. If that's the usecase then a global limit
+> seems sufficient.
 
-> https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+How memory will you reduce? It is worth to write it in the commit message.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/192ad3c27a4895ee4b2fa31c5b54a932f5bb08c1
+Thanks
 
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+> 
+> -- 
+> MST
+> 
