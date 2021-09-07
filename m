@@ -2,98 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6BABE402E4A
-	for <lists+kvm@lfdr.de>; Tue,  7 Sep 2021 20:18:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 46323402E53
+	for <lists+kvm@lfdr.de>; Tue,  7 Sep 2021 20:26:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345796AbhIGSTq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Sep 2021 14:19:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:57668 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1345714AbhIGSTp (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 7 Sep 2021 14:19:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1631038718;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=LUu7mpwr2jWyNZjk6B2vNYIBEH3XQErYN13Ykm4FJUs=;
-        b=Zlv2XlJuz6/fCPCbkjkdKdtC2znDykQM3UFbYGmy4kBiBC8s+jcM0RFkq9uFdyc5rbbqG3
-        Wr+LT7/zpa0qNOfQ2Fz4ZcN9mj29PQGO5aJrSZBgJGAV31aYToreF5RajXMQATXtem+MNX
-        9svEyhKifRefQcLShB2HvLCt1vOqCqI=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-364-Q85vsq-eN0Cb3nOjpovM8w-1; Tue, 07 Sep 2021 14:18:37 -0400
-X-MC-Unique: Q85vsq-eN0Cb3nOjpovM8w-1
-Received: by mail-ed1-f70.google.com with SMTP id bf22-20020a0564021a5600b003c86b59e291so5619608edb.18
-        for <kvm@vger.kernel.org>; Tue, 07 Sep 2021 11:18:37 -0700 (PDT)
+        id S1345839AbhIGS1W (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Sep 2021 14:27:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41642 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236461AbhIGS1U (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Sep 2021 14:27:20 -0400
+Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42BCAC061575
+        for <kvm@vger.kernel.org>; Tue,  7 Sep 2021 11:26:14 -0700 (PDT)
+Received: by mail-wm1-x336.google.com with SMTP id j17-20020a05600c1c1100b002e754875260so7608wms.4
+        for <kvm@vger.kernel.org>; Tue, 07 Sep 2021 11:26:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=FhXgO4soHUfxUZvgfxgTnbg0Q339mdYzMA/DtCHulwM=;
+        b=XujAKCsnSv1SoIEqIFBQX0tSV/UFdURbpRl6b/A2AzaV6EgVVpRy4fvqRJVNkfktOX
+         XgjoLQtKKvIP1kxEyMRpoFzl4pPsgCNTm6Maus1bw1cg4j7VovCDgC3FeuTGZa6Q8P6Z
+         7rnnb6gVceVdPykWLjsC8x4JFbHsqMK9HqkgsmK1F1AuHUxmTZuOYPrn1iKWo37teFlf
+         XyNBkiSk1IDWaMvYWR6D2aoS9EWu25NKX0eSuR1FAqWNn3zM+4SMFeOLiaWQSQcOVheA
+         oOlcrn9LQGeM+m4Y2PQ8vztisubnmJ3/mvJFjxngs4HaqH69lQlE3bXs7fb5qn4z7xoq
+         7WzA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=LUu7mpwr2jWyNZjk6B2vNYIBEH3XQErYN13Ykm4FJUs=;
-        b=A8Xf05QCEbH5gGwgYTMeaMHLUqDIPu1kJml9l2WkGiRROF2NFDnn0/ykjXNWrk7roY
-         XdrXz3cnEP2v7wC/Ky5CBngA6k/oX/X/mofxhUP48r51ateK+NwASVPTzfoKyRuwLudG
-         pGAzI2nHTG7Tr4fJQ2Wt9RZV1uIUyXBQzXr/GHINe3Jpg7syhuUnK8WOFf9Akd4d5efG
-         PcbSFuxLD0m6oG3yAo7TEqbzaiUaMNH8vwj0bxhhhlOcCvWY7uHkw6UFaFnmOxnX36Uw
-         y51Hualn+E++IZG34mDeajapVoj/R+93uESSeF62HyK/3IM+glbzUaePS9tCu9XhR7D/
-         FK/Q==
-X-Gm-Message-State: AOAM5322T6WZn952Dq8gFsnBxLjJyuqJ7kreeLhTf7PnCnwl3pODdNGu
-        4ukmtIJFCIs7r97eD09wCz/GX9uniAHaMBSHDZkAhaWXLRCMQ75C24GC8X/HbVZ5C24QLl9f9Dz
-        AQ42ZSuB/QqF3
-X-Received: by 2002:a17:906:6dcb:: with SMTP id j11mr19706639ejt.202.1631038716450;
-        Tue, 07 Sep 2021 11:18:36 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzJ16MXBVuMZi4LPFWDJ41bJqO5hzeQF793u0WWbWMrnfuEmtTm1ev6ELecKdk1XtNTMtystg==
-X-Received: by 2002:a17:906:6dcb:: with SMTP id j11mr19706624ejt.202.1631038716320;
-        Tue, 07 Sep 2021 11:18:36 -0700 (PDT)
-Received: from gator.home (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
-        by smtp.gmail.com with ESMTPSA id p16sm6895261eds.63.2021.09.07.11.18.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Sep 2021 11:18:36 -0700 (PDT)
-Date:   Tue, 7 Sep 2021 20:18:34 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Ricardo Koller <ricarkol@google.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        maciej.szmigiero@oracle.com, maz@kernel.org, oupton@google.com,
-        jingzhangos@google.com, pshier@google.com, rananta@google.com,
-        reijiw@google.com
-Subject: Re: [PATCH v2 2/2] KVM: selftests: build the memslot tests for arm64
-Message-ID: <20210907181834.uqecqygvvlvmetbl@gator.home>
-References: <20210907180957.609966-1-ricarkol@google.com>
- <20210907180957.609966-3-ricarkol@google.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=FhXgO4soHUfxUZvgfxgTnbg0Q339mdYzMA/DtCHulwM=;
+        b=apTPqY7Ti90qrzJXM6BDkksMmUCIGznDQrCrCysLm2BUlvnNUscnl3d587lex0pQSN
+         7ZWd6MPj2+d+4hSdBy3c2MFNg8JdoniomgWIdC5NUugHmQb/7rrRuAyucZtOYjXVX/X5
+         0Dn7dpwy5XDdMp7nn1+gqTQ4/+XFn6ickbWvBaCvTguYS8KtZPfVSwSyvn5V9DRg6+7R
+         mLDnbPbPJYU2AbWie09xds+WvRcjtap+EabF+ZpE9IVXRzK5ps4QZczYUFCeLZYACVOV
+         OWCvhxFFYZg+THuX1ICj8LrlpP6KpLq9xql9CEi1TwbLYLzI5M226eNa9pIfNSamAZi4
+         mksQ==
+X-Gm-Message-State: AOAM533u5mU6mzRXpljHrlCPA+RvtLA7sawxdjAUuM6lwORRveolKLs9
+        hGuz21z41OZ51c0TSKPB27A/xFvydb20+tPnYvdM0baSk2Y=
+X-Google-Smtp-Source: ABdhPJwMBtgoNU1DNZ3wjpbNoTr8qYBDuvceJ9eIxrnJpE3hgXpGIxe2N2Hyd1ZrAxjAa2aJTCxvA5d0Q8jsAy15RLE=
+X-Received: by 2002:a05:600c:19d0:: with SMTP id u16mr5288352wmq.21.1631039172877;
+ Tue, 07 Sep 2021 11:26:12 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210907180957.609966-3-ricarkol@google.com>
+References: <20210822144441.1290891-1-maz@kernel.org> <20210822144441.1290891-4-maz@kernel.org>
+ <CAFEAcA_J5W6kaaZ-oYtcRcQ5=z5nFv6bOVVu5n_ad0N8-NGzpg@mail.gmail.com> <87bl54cnx5.wl-maz@kernel.org>
+In-Reply-To: <87bl54cnx5.wl-maz@kernel.org>
+From:   Peter Maydell <peter.maydell@linaro.org>
+Date:   Tue, 7 Sep 2021 19:25:23 +0100
+Message-ID: <CAFEAcA_MRyd2AcgAhvEwJY8LGbHoyz_JgTdMGAEtGegvZB0d7A@mail.gmail.com>
+Subject: Re: [PATCH 3/3] docs/system/arm/virt: Fix documentation for the
+ 'highmem' option
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     QEMU Developers <qemu-devel@nongnu.org>,
+        Andrew Jones <drjones@redhat.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        kvmarm <kvmarm@lists.cs.columbia.edu>,
+        kvm-devel <kvm@vger.kernel.org>,
+        Android Kernel Team <kernel-team@android.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 07, 2021 at 11:09:57AM -0700, Ricardo Koller wrote:
-> Add memslot_perf_test and memslot_modification_stress_test to the list
-> of aarch64 selftests.
-> 
-> Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> ---
->  tools/testing/selftests/kvm/Makefile | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> index 5832f510a16c..5ed203b9314c 100644
-> --- a/tools/testing/selftests/kvm/Makefile
-> +++ b/tools/testing/selftests/kvm/Makefile
-> @@ -92,6 +92,8 @@ TEST_GEN_PROGS_aarch64 += dirty_log_test
->  TEST_GEN_PROGS_aarch64 += dirty_log_perf_test
->  TEST_GEN_PROGS_aarch64 += kvm_create_max_vcpus
->  TEST_GEN_PROGS_aarch64 += kvm_page_table_test
-> +TEST_GEN_PROGS_aarch64 += memslot_modification_stress_test
-> +TEST_GEN_PROGS_aarch64 += memslot_perf_test
->  TEST_GEN_PROGS_aarch64 += set_memory_region_test
->  TEST_GEN_PROGS_aarch64 += steal_time
->  TEST_GEN_PROGS_aarch64 += kvm_binary_stats_test
-> -- 
-> 2.33.0.153.gba50c8fa24-goog
+On Tue, 7 Sept 2021 at 18:10, Marc Zyngier <maz@kernel.org> wrote:
 >
+> Hi Peter,
+>
+> On Tue, 07 Sep 2021 13:51:13 +0100,
+> Peter Maydell <peter.maydell@linaro.org> wrote:
+> >
+> > On Sun, 22 Aug 2021 at 15:45, Marc Zyngier <maz@kernel.org> wrote:
+> > >
+> > > The documentation for the 'highmem' option indicates that it controls
+> > > the placement of both devices and RAM. The actual behaviour of QEMU
+> > > seems to be that RAM is allowed to go beyond the 4GiB limit, and
+> > > that only devices are constraint by this option.
+> > >
+> > > Align the documentation with the actual behaviour.
+> >
+> > I think it would be better to align the behaviour with the documentation.
+> >
+> > The intent of 'highmem' is to allow a configuration for use with guests
+> > that can't address more than 32 bits (originally, 32-bit guests without
+> > LPAE support compiled in). It seems like a bug that we allow the user
+> > to specify more RAM than will fit into that 32-bit range. We should
+> > instead make QEMU exit with an error if the user tries to specify
+> > both highmem=off and a memory size that's too big to fit.
+>
+> I'm happy to address this if you are OK with the change in user
+> visible behaviour.
+>
+> However, I am still struggling with my original goal, which is to
+> allow QEMU to create a usable KVM_based VM on systems with a small IPA
+> space (36 bits on the system I have). What would an acceptable way to
+> convey this to the code that deals with the virt memory map so that it
+> falls back to something that actually works?
 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+Hmm, so at the moment we can either do "fits in 32 bits" or
+"assumes at least 40 bits" but not 36 ?
 
+thanks
+-- PMM
