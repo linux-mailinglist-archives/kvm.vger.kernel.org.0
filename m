@@ -2,163 +2,202 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9BD1840271E
-	for <lists+kvm@lfdr.de>; Tue,  7 Sep 2021 12:26:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9ADA8402735
+	for <lists+kvm@lfdr.de>; Tue,  7 Sep 2021 12:29:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233477AbhIGK0r (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Sep 2021 06:26:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:59191 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232704AbhIGK0r (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 7 Sep 2021 06:26:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1631010340;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=YkR6zwo7S5sLkEP3Hl3y8Gt+KIK6HBJlddNqv1cks4k=;
-        b=cfwsFXwEPTJ6sEweVQxvKrjHf84Somzk53aAWWZtPeEuL+0ZicFJta/XDrUTOFZ2oLoiMF
-        gg9wzVF5eQl9zV2yo5EoeFZ610krN50Ti03B1rRcQHR/x2CVVerNy4541CnRiEGS8JiUZI
-        +JQCpw+bkbOMHImcDDS/YfhlRG08RSU=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-478-4CTBFcn4NGasrMNDrAGobg-1; Tue, 07 Sep 2021 06:25:39 -0400
-X-MC-Unique: 4CTBFcn4NGasrMNDrAGobg-1
-Received: by mail-wm1-f71.google.com with SMTP id k5-20020a7bc3050000b02901e081f69d80so3219597wmj.8
-        for <kvm@vger.kernel.org>; Tue, 07 Sep 2021 03:25:39 -0700 (PDT)
+        id S1343493AbhIGK3k (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Sep 2021 06:29:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44150 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1343523AbhIGK3i (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Sep 2021 06:29:38 -0400
+Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4989DC0613C1;
+        Tue,  7 Sep 2021 03:28:32 -0700 (PDT)
+Received: by mail-pf1-x42d.google.com with SMTP id v123so7786275pfb.11;
+        Tue, 07 Sep 2021 03:28:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=vRBbwPHbmtfpgIVtQU9f4UNTrL9hQeaBXAYOYIggBaU=;
+        b=k2dVwFQ3drLgLgSu0OvFPqRt3etXzw8YD4eNAHUHeY54P5exrUAR3PjCPmoo/WgK95
+         aRRD4yUIy2xmbejYnXGoayfJK4NJrW/RUJT3SA77kUiAsxAJwydZUEGDMeXrbuYpw/8n
+         XsHrhz325gOKTjv/+ha357Wt7VAP4JiQT2SexDk4HBEkzHhZzFeke7E3Ez+hWoucJ8xJ
+         M59zED5nzmcZM7fqcICJRwCIXaflMNiizuJEFiaABVMYsGkXPTQMVunadsHOSK0VKPPk
+         so/0yqfuTbqdUFmeteQ+JjqmRtBpbPhxliZOWdbMUzmI8bs9OphWB+jc1hDca/naRDpd
+         zbTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=YkR6zwo7S5sLkEP3Hl3y8Gt+KIK6HBJlddNqv1cks4k=;
-        b=HXLCI+Xr1I32Ofol3/sWU1PEJ13u+qBJQie4Ow4Ec9mFEmJjtnJu+8+gd+n3d/MzZ+
-         Y3F1EMQnQ0yhcAYOP8Q6mIM5Xq2Qmu/NWuvfbKyKaCjMfZy624jVOFD+FRlouPKHya3u
-         9xIpmkjpnRVm8U+ngHMArnoFRw6ivlcje7E4IEISxVEaodqgBbJAz5VVV5J06yGCfXNr
-         cVXM1vrecM/RESSDBr/7xYbHeE0et08FNA8ajVHvjUx87+m4mPrpreCVqJ6iY6WZ1kPx
-         D1yqaMcbs3QsA53R0pi2828PjE3Y97DUxSwY9ZNZuOMq/TPbdI1eDEzfIHDXiCL24Dcc
-         pnbA==
-X-Gm-Message-State: AOAM53385+KEcyL6h4TSCIAt6fxNjkNnZ75mFh+uZytNhFoGKgjkSn3u
-        3Lr0WDXPYHgjHogjIKQ4LkvrEq+eJ7NOr05KLmySMWOMKNIDD39ufgtZrdgziWmS7+JF0KMrHaH
-        B6uIaeIz1OFxu
-X-Received: by 2002:a5d:6486:: with SMTP id o6mr17366341wri.193.1631010338760;
-        Tue, 07 Sep 2021 03:25:38 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzSuexDTec5nPjCkxud+p5tgz5pAvum9LG2zR+d+af/JuudrOVT+AYs0JNtNTuoPUbk+lGqwQ==
-X-Received: by 2002:a5d:6486:: with SMTP id o6mr17366315wri.193.1631010338595;
-        Tue, 07 Sep 2021 03:25:38 -0700 (PDT)
-Received: from gator (nat-pool-brq-u.redhat.com. [213.175.37.12])
-        by smtp.gmail.com with ESMTPSA id t11sm2252710wmi.23.2021.09.07.03.25.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Sep 2021 03:25:38 -0700 (PDT)
-Date:   Tue, 7 Sep 2021 12:25:36 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     thuth@redhat.com, pbonzini@redhat.com, lvivier@redhat.com,
-        kvm-ppc@vger.kernel.org, david@redhat.com, frankja@linux.ibm.com,
-        cohuck@redhat.com, imbrenda@linux.ibm.com,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, andre.przywara@arm.com,
-        maz@kernel.org, vivek.gautam@arm.com
-Subject: Re: [kvm-unit-tests RFC PATCH 5/5] configure: Ignore --erratatxt
- when --target=kvmtool
-Message-ID: <20210907102536.jhycvnazlmj7qyto@gator>
-References: <20210702163122.96110-1-alexandru.elisei@arm.com>
- <20210702163122.96110-6-alexandru.elisei@arm.com>
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=vRBbwPHbmtfpgIVtQU9f4UNTrL9hQeaBXAYOYIggBaU=;
+        b=D+xAHpnaQMbSx9FRfJGbi1VlrywEl5Jja+CkDDHPinSYLUQoLSpYTZ8VNaBSAdyiP/
+         sxeGOn+6MPKO0MbyQXzQskRCV8vvDjutQVYOIQpsmRXl3XJ18xyKACyV+KxaICfuS7bY
+         EPqdouvN2GadXOsdoXyIKN/+F2Jd/fe4a+COtv69/EzrhaonPX4Ml6bLOj3DgbkhxLi/
+         Q5Knu050Gk6N8+0WfXMwpVFxpSd4JhSmENe4gWyYwGFHrLQTBJKsMlvcBf2UZAsVZ3m7
+         DJ6my0h2P8c9i61HMlsGCQBOp6eqpfQeil1FucJgPjHV7OSP4QC29ydl68zBbJoAdHUY
+         L2hw==
+X-Gm-Message-State: AOAM533dF8BodXsz6OhfAU5C/gJ1hwQbNZtnr9FqfEm7Fubn3gQZvQlB
+        kEN0YtfZYJKTEqOq0dvb59DmAGzltd/4LcY0zYUXmH52VYz4
+X-Google-Smtp-Source: ABdhPJyLASDHolzt4Yl0XnyYzXn0EdY8Iv19HG2XLCRKHzd5N4uP4CN7+KxzCO9OFUOQf5a/cKJRBg0cE1flxjRp2ZY=
+X-Received: by 2002:a63:b60a:: with SMTP id j10mr16374299pgf.83.1631010511411;
+ Tue, 07 Sep 2021 03:28:31 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210702163122.96110-6-alexandru.elisei@arm.com>
+From:   Hao Sun <sunhao.th@gmail.com>
+Date:   Tue, 7 Sep 2021 18:28:20 +0800
+Message-ID: <CACkBjsZ55MKvOBGYJyQxwHBCQOTP=Lz=yfYwJtdOzNiT59E38g@mail.gmail.com>
+Subject: BUG: spinlock bad magic in synchronize_srcu
+To:     linux-kernel@vger.kernel.org
+Cc:     bp@alien8.de, hpa@zytor.com, jmattson@google.com, joro@8bytes.org,
+        kvm@vger.kernel.org, mingo@redhat.com, pbonzini@redhat.com,
+        seanjc@google.com, tglx@linutronix.de, vkuznets@redhat.com,
+        wanpengli@tencent.com, x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 02, 2021 at 05:31:22PM +0100, Alexandru Elisei wrote:
-> kvmtool runs a test using the -f/--firmware argument, which doesn't load an
-> initrd, making specifying an errata file useless. Instead, configure forces
-> all erratas to be enabled via the CONFIG_ERRATA_FORCE define in
-> lib/config.h.
-> 
-> Forbid the --erratatxt option when kvm-unit-tests is configured for kvmtool
-> and let the user know that all erratas are enabled by default.
-> 
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> ---
-> I'm not sure if printing an error is too strong here and a simple warning would
-> suffice. Suggestions welcome!
-> 
->  configure | 26 +++++++++++++++++++-------
->  1 file changed, 19 insertions(+), 7 deletions(-)
-> 
-> diff --git a/configure b/configure
-> index 395c809c9c02..acd288239f80 100755
-> --- a/configure
-> +++ b/configure
-> @@ -24,7 +24,8 @@ u32_long=
->  wa_divide=
->  target=
->  errata_force=0
-> -erratatxt="$srcdir/errata.txt"
-> +erratatxt_default="$srcdir/errata.txt"
-> +erratatxt="_NO_FILE_4Uhere_"
->  host_key_document=
->  page_size=
->  earlycon=
-> @@ -50,7 +51,8 @@ usage() {
->  	                           enable or disable the generation of a default environ when
->  	                           no environ is provided by the user (enabled by default)
->  	    --erratatxt=FILE       specify a file to use instead of errata.txt. Use
-> -	                           '--erratatxt=' to ensure no file is used.
-> +	                           '--erratatxt=' to ensure no file is used. This option is
-> +	                           invalid for arm/arm64 when target=kvmtool.
+Hello,
 
-Do we need to always specifiy arm/arm64 when talking about target=kvmtool?
-How much more effort would an x86 kvmtool target be to add?
+When using Healer to fuzz the latest Linux kernel, the following crash
+was triggered.
 
->  	    --host-key-document=HOST_KEY_DOCUMENT
->  	                           Specify the machine-specific host-key document for creating
->  	                           a PVM image with 'genprotimg' (s390x only)
-> @@ -147,11 +149,6 @@ if [ -n "$host_key_document" ] && [ ! -f "$host_key_document" ]; then
->      exit 1
->  fi
->  
-> -if [ "$erratatxt" ] && [ ! -f "$erratatxt" ]; then
-> -    echo "erratatxt: $erratatxt does not exist or is not a regular file"
-> -    exit 1
-> -fi
-> -
->  arch_name=$arch
->  [ "$arch" = "aarch64" ] && arch="arm64"
->  [ "$arch_name" = "arm64" ] && arch_name="aarch64"
-> @@ -184,6 +181,21 @@ else
->      fi
->  fi
->  
-> +if [ "$target" = "kvmtool" ]; then
-> +    if [ "$erratatxt" ] && [ "$erratatxt" != "_NO_FILE_4Uhere_" ]; then
-> +        echo "--erratatxt is not supported for target=kvmtool (all erratas enabled by default)"
-> +        usage
-> +    fi
-> +else
-> +    if [ "$erratatxt" = "_NO_FILE_4Uhere_" ]; then
-> +        erratatxt=$erratatxt_default
-> +    fi
-> +    if [ "$erratatxt" ] && [ ! -f "$erratatxt" ]; then
-> +        echo "erratatxt: $erratatxt does not exist or is not a regular file"
-> +        exit 1
-> +    fi
-> +fi
+HEAD commit: 27151f177827 Merge tag 'perf-tools-for-v5.15-2021-09-04'
+git tree: upstream
+console output:
+https://drive.google.com/file/d/1AauK3Op9WjrF8tZOM0r76XOGMrvgK65e/view?usp=sharing
+kernel config: https://drive.google.com/file/d/1ZMVJ2vNe0EiIEeWNVyrGb7hBdOG5Uj3e/view?usp=sharing
+Similar bug report:
+https://groups.google.com/g/syzkaller-bugs/c/JMQALBa9wVE/m/_Wp1KGYzBwAJ
 
-switch
+Sorry, I don't have a reproducer for this crash, hope the symbolized
+report can help.
+If you fix this issue, please add the following tag to the commit:
+Reported-by: Hao Sun <sunhao.th@gmail.com>
 
-> +
->  [ -z "$processor" ] && processor="$arch"
->  
->  if [ "$processor" = "arm64" ]; then
-> -- 
-> 2.32.0
->
-
-Otherwise looks good to me.
-
-Thanks,
-drew 
-
+BUG: spinlock bad magic on CPU#3, syz-executor/11945
+ lock: 0xffff88813dd00040, .magic: 00000000, .owner: <none>/-1, .owner_cpu: 0
+CPU: 3 PID: 11945 Comm: syz-executor Not tainted 5.14.0+ #13
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
+rel-1.12.0-59-gc9ba5276e321-prebuilt.qemu.org 04/01/2014
+Call Trace:
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x8d/0xcf lib/dump_stack.c:105
+ spin_bug kernel/locking/spinlock_debug.c:77 [inline]
+ debug_spin_lock_before kernel/locking/spinlock_debug.c:85 [inline]
+ do_raw_spin_lock+0x6c/0xc0 kernel/locking/spinlock_debug.c:114
+ __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:117 [inline]
+ _raw_spin_lock_irqsave+0x40/0x50 kernel/locking/spinlock.c:162
+ srcu_might_be_idle kernel/rcu/srcutree.c:767 [inline]
+ synchronize_srcu+0x33/0xf0 kernel/rcu/srcutree.c:1008
+ kvm_mmu_uninit_vm+0x18/0x30 arch/x86/kvm/mmu/mmu.c:5585
+ kvm_arch_destroy_vm+0x225/0x2d0 arch/x86/kvm/x86.c:11277
+ kvm_create_vm arch/x86/kvm/../../../virt/kvm/kvm_main.c:1060 [inline]
+ kvm_dev_ioctl_create_vm arch/x86/kvm/../../../virt/kvm/kvm_main.c:4486 [inline]
+ kvm_dev_ioctl+0x7c7/0xc00 arch/x86/kvm/../../../virt/kvm/kvm_main.c:4541
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:874 [inline]
+ __se_sys_ioctl fs/ioctl.c:860 [inline]
+ __x64_sys_ioctl+0xb6/0x100 fs/ioctl.c:860
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x34/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x46a9a9
+Code: f7 d8 64 89 02 b8 ff ff ff ff c3 66 0f 1f 44 00 00 48 89 f8 48
+89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d
+01 f0 ff ff 73 01 c3 48 c7 c1 bc ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f7df63cfc58 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 000000000078c0a0 RCX: 000000000046a9a9
+RDX: 0000000000000000 RSI: 000000000000ae01 RDI: 0000000000000003
+RBP: 00000000004e4042 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 000000000078c0a0
+R13: 0000000000000000 R14: 000000000078c0a0 R15: 00007fff67e58cd0
+BUG: kernel NULL pointer dereference, address: 0000000000000000
+#PF: supervisor write access in kernel mode
+#PF: error_code(0x0002) - not-present page
+PGD 104cb6067 P4D 104cb6067 PUD 10574c067 PMD 0
+Oops: 0002 [#1] PREEMPT SMP
+CPU: 3 PID: 11945 Comm: syz-executor Not tainted 5.14.0+ #13
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
+rel-1.12.0-59-gc9ba5276e321-prebuilt.qemu.org 04/01/2014
+RIP: 0010:rcu_segcblist_enqueue+0x2f/0x40 kernel/rcu/rcu_segcblist.c:348
+Code: 00 48 8b 47 48 48 83 c0 01 48 89 47 48 f0 83 44 24 fc 00 48 8b
+47 68 48 83 c0 01 48 89 47 68 48 c7 06 00 00 00 00 48 8b 47 20 <48> 89
+30 48 89 77 20 c3 66 0f 1f 84 00 00 00 00 00 48 8b 57 48 48
+RSP: 0018:ffffc90000a0bd48 EFLAGS: 00010002
+RAX: 0000000000000000 RBX: ffffc90000a0bdb0 RCX: ffffc90000a5d000
+RDX: 0000000000000001 RSI: ffffc90000a0bdb0 RDI: ffff88813dd00080
+RBP: ffffc90000a0bda0 R08: 0000000000000001 R09: 0000000000000000
+R10: ffffc90000a0bd80 R11: 3030303030302052 R12: ffffc90001681d10
+R13: 0000000000000000 R14: 0000000000000000 R15: ffff88813dd00080
+FS:  00007f7df63d0700(0000) GS:ffff88813dd00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000000000000 CR3: 0000000100f94000 CR4: 0000000000750ee0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+PKRU: 55555554
+Call Trace:
+ srcu_gp_start_if_needed+0xb4/0x480 kernel/rcu/srcutree.c:823
+ __synchronize_srcu+0x13a/0x1a0 kernel/rcu/srcutree.c:929
+ kvm_mmu_uninit_vm+0x18/0x30 arch/x86/kvm/mmu/mmu.c:5585
+ kvm_arch_destroy_vm+0x225/0x2d0 arch/x86/kvm/x86.c:11277
+ kvm_create_vm arch/x86/kvm/../../../virt/kvm/kvm_main.c:1060 [inline]
+ kvm_dev_ioctl_create_vm arch/x86/kvm/../../../virt/kvm/kvm_main.c:4486 [inline]
+ kvm_dev_ioctl+0x7c7/0xc00 arch/x86/kvm/../../../virt/kvm/kvm_main.c:4541
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:874 [inline]
+ __se_sys_ioctl fs/ioctl.c:860 [inline]
+ __x64_sys_ioctl+0xb6/0x100 fs/ioctl.c:860
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x34/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x46a9a9
+Code: f7 d8 64 89 02 b8 ff ff ff ff c3 66 0f 1f 44 00 00 48 89 f8 48
+89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d
+01 f0 ff ff 73 01 c3 48 c7 c1 bc ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f7df63cfc58 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 000000000078c0a0 RCX: 000000000046a9a9
+RDX: 0000000000000000 RSI: 000000000000ae01 RDI: 0000000000000003
+RBP: 00000000004e4042 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 000000000078c0a0
+R13: 0000000000000000 R14: 000000000078c0a0 R15: 00007fff67e58cd0
+Modules linked in:
+Dumping ftrace buffer:
+   (ftrace buffer empty)
+CR2: 0000000000000000
+---[ end trace a7c9cbcbae2d6a4b ]---
+RIP: 0010:rcu_segcblist_enqueue+0x2f/0x40 kernel/rcu/rcu_segcblist.c:348
+Code: 00 48 8b 47 48 48 83 c0 01 48 89 47 48 f0 83 44 24 fc 00 48 8b
+47 68 48 83 c0 01 48 89 47 68 48 c7 06 00 00 00 00 48 8b 47 20 <48> 89
+30 48 89 77 20 c3 66 0f 1f 84 00 00 00 00 00 48 8b 57 48 48
+RSP: 0018:ffffc90000a0bd48 EFLAGS: 00010002
+RAX: 0000000000000000 RBX: ffffc90000a0bdb0 RCX: ffffc90000a5d000
+RDX: 0000000000000001 RSI: ffffc90000a0bdb0 RDI: ffff88813dd00080
+RBP: ffffc90000a0bda0 R08: 0000000000000001 R09: 0000000000000000
+R10: ffffc90000a0bd80 R11: 3030303030302052 R12: ffffc90001681d10
+R13: 0000000000000000 R14: 0000000000000000 R15: ffff88813dd00080
+FS:  00007f7df63d0700(0000) GS:ffff88813dd00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000000000000 CR3: 0000000100f94000 CR4: 0000000000750ee0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+PKRU: 55555554
+----------------
+Code disassembly (best guess):
+   0: 00 48 8b              add    %cl,-0x75(%rax)
+   3: 47                    rex.RXB
+   4: 48                    rex.W
+   5: 48 83 c0 01          add    $0x1,%rax
+   9: 48 89 47 48          mov    %rax,0x48(%rdi)
+   d: f0 83 44 24 fc 00    lock addl $0x0,-0x4(%rsp)
+  13: 48 8b 47 68          mov    0x68(%rdi),%rax
+  17: 48 83 c0 01          add    $0x1,%rax
+  1b: 48 89 47 68          mov    %rax,0x68(%rdi)
+  1f: 48 c7 06 00 00 00 00 movq   $0x0,(%rsi)
+  26: 48 8b 47 20          mov    0x20(%rdi),%rax
+* 2a: 48 89 30              mov    %rsi,(%rax) <-- trapping instruction
+  2d: 48 89 77 20          mov    %rsi,0x20(%rdi)
+  31: c3                    retq
+  32: 66 0f 1f 84 00 00 00 nopw   0x0(%rax,%rax,1)
+  39: 00 00
+  3b: 48 8b 57 48          mov    0x48(%rdi),%rdx
+  3f: 48                    rex.W%
