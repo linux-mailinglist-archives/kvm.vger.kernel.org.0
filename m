@@ -2,93 +2,188 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 443E2402DD0
-	for <lists+kvm@lfdr.de>; Tue,  7 Sep 2021 19:42:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3E279402DD6
+	for <lists+kvm@lfdr.de>; Tue,  7 Sep 2021 19:43:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233362AbhIGRnQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Sep 2021 13:43:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59706 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229493AbhIGRnM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Sep 2021 13:43:12 -0400
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47727C061575
-        for <kvm@vger.kernel.org>; Tue,  7 Sep 2021 10:42:06 -0700 (PDT)
-Received: by mail-pj1-x102f.google.com with SMTP id j10-20020a17090a94ca00b00181f17b7ef7so2015458pjw.2
-        for <kvm@vger.kernel.org>; Tue, 07 Sep 2021 10:42:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=40HbNUxcF+T20RK2OUdw+aYb/8oENTKJgMKoFCUo07c=;
-        b=s6OYBqLpD3/j1aEyb93Oh8WoZXc+VKDanEf2q6xWzGDc28ZW0Em6Bdij9R1Fg+Li2y
-         MkdcevWyPzSOePZVZitqkjOcjZXy+mKNnVl+L21B3xAsNBcfYIAmjZWyvtzqb7OPSRgx
-         6ZalvZ6QBpLxwizuU23OJrYaLb9W4bV670XhpQ4kJGSeOX1J3YH5v2sLwCuRXjHfm40u
-         vzyijciJrEDSITEwzb9clo5E9cVu4p5LqVQzYRx0aQ71DjEtdfF4yvfyhE5lGnO8sAxo
-         ekzpK6FoTWsKTfrLJ2vY+8GxM1ePtqe6gcRUFb81EiGCvVh+OyXA58Bz/YzBfZxlBxDH
-         01Vw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=40HbNUxcF+T20RK2OUdw+aYb/8oENTKJgMKoFCUo07c=;
-        b=h25HgVNb81foapG3Pk1U2zSmDB3bHbu2zbSpIcjTEuq5qgEx46B7WqkCF5YpvbSerk
-         1dTsUiYUmfvEstr0Ms3YUeh/pDxcCSFvoJikbSppi3UT9b7XE5ys45QmWqvLTE/kjgvp
-         fvXLxvJQuo7F0CODWmh4XwNJxTprFRsZ8BfmS7UJUXl/mnOcr0w5d2hl3ihoXVFosnnM
-         t0an7cJSoexE4a0WUnsaLPUKK4p/0g5ZOh2JRrxyoPJaNtpbl+qqpbq1exh2b1CUK3Pb
-         pT9GtFki7OUbrKRrx8dFST5Ae9lSdDfQQPb4i3LDN+cNAAYwqiWcRp3zEhJCx5cih6Aq
-         AnYg==
-X-Gm-Message-State: AOAM531vblOXkE/hn7IaHsmgev15boTiEF/G+2Ryqxo/6EFYuAIpaZR2
-        A+qUbVbfh2O7XeQCF9ClWPsrbg==
-X-Google-Smtp-Source: ABdhPJz3Z+k1SXGfmZnqwU2YMASZrpPO/JbNt4ygiAWP7MBg8vyQqvf59hmDoq/FcStuiIFOcTTabw==
-X-Received: by 2002:a17:90b:1d83:: with SMTP id pf3mr5363746pjb.158.1631036525474;
-        Tue, 07 Sep 2021 10:42:05 -0700 (PDT)
-Received: from google.com (150.12.83.34.bc.googleusercontent.com. [34.83.12.150])
-        by smtp.gmail.com with ESMTPSA id q18sm11606686pfj.46.2021.09.07.10.42.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Sep 2021 10:42:04 -0700 (PDT)
-Date:   Tue, 7 Sep 2021 10:42:01 -0700
-From:   Ricardo Koller <ricarkol@google.com>
+        id S236545AbhIGRoz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Sep 2021 13:44:55 -0400
+Received: from mail.kernel.org ([198.145.29.99]:33422 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1343727AbhIGRow (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Sep 2021 13:44:52 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 258E9606A5;
+        Tue,  7 Sep 2021 17:43:46 +0000 (UTC)
+Received: from 82-132-222-194.dab.02.net ([82.132.222.194] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1mNf8K-009Rkd-0o; Tue, 07 Sep 2021 18:43:44 +0100
+Date:   Tue, 07 Sep 2021 18:43:42 +0100
+Message-ID: <87a6kocmcx.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
 To:     Oliver Upton <oupton@google.com>
 Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        drjones@redhat.com, Paolo Bonzini <pbonzini@redhat.com>,
-        maciej.szmigiero@oracle.com, maz@kernel.org,
-        jingzhangos@google.com, pshier@google.com, rananta@google.com,
-        reijiw@google.com
-Subject: Re: [PATCH 2/2] KVM: selftests: build the memslot tests for arm64
-Message-ID: <YTekaQOHMzNxV8Bl@google.com>
-References: <20210903231154.25091-1-ricarkol@google.com>
- <20210903231154.25091-3-ricarkol@google.com>
- <CAOQ_QshLu-EiLdPDY-d1dS3qvNjJBiN=B=a-W7_70Fdt=GbOcw@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAOQ_QshLu-EiLdPDY-d1dS3qvNjJBiN=B=a-W7_70Fdt=GbOcw@mail.gmail.com>
+        Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <Alexandru.Elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH 0/6] KVM: arm64: Implement PSCI SYSTEM_SUSPEND support
+In-Reply-To: <CAOQ_QsgOtufyB6_qGAs4fQf6kd81FSMSj44uiVRgoFQWOf3nRA@mail.gmail.com>
+References: <20210819223640.3564975-1-oupton@google.com>
+        <87ilzecbkj.wl-maz@kernel.org>
+        <CAOQ_QsgOtufyB6_qGAs4fQf6kd81FSMSj44uiVRgoFQWOf3nRA@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 82.132.222.194
+X-SA-Exim-Rcpt-To: oupton@google.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, pshier@google.com, ricarkol@google.com, jingzhangos@google.com, rananta@google.com, james.morse@arm.com, Alexandru.Elisei@arm.com, suzuki.poulose@arm.com, drjones@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 07, 2021 at 09:39:12AM -0500, Oliver Upton wrote:
-> Ricardo,
+On Tue, 07 Sep 2021 17:30:33 +0100,
+Oliver Upton <oupton@google.com> wrote:
 > 
-> On Fri, Sep 3, 2021 at 6:12 PM Ricardo Koller <ricarkol@google.com> wrote:
+> On Mon, Sep 6, 2021 at 4:12 AM Marc Zyngier <maz@kernel.org> wrote:
 > >
-> > Add memslot_perf_test and memslot_modification_stress_test to the list
-> > of aarch64 selftests.
+> > Hi Oliver,
 > >
-> > Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> > On Thu, 19 Aug 2021 23:36:34 +0100,
+> > Oliver Upton <oupton@google.com> wrote:
+> > >
+> > > Certain VMMs/operators may wish to give their guests the ability to
+> > > initiate a system suspend that could result in the VM being saved to
+> > > persistent storage to be resumed at a later time. The PSCI v1.0
+> > > specification describes an SMC, SYSTEM_SUSPEND, that allows a kernel to
+> > > request a system suspend. This call is optional for v1.0, and KVM
+> > > elected to not support the call in its v1.0 implementation.
+> > >
+> > > This series adds support for the SYSTEM_SUSPEND PSCI call to KVM/arm64.
+> > > Since this is a system-scoped event, KVM cannot quiesce the VM on its
+> > > own. We add a new system exit type in this series to clue in userspace
+> > > that a suspend was requested. Per the KVM_EXIT_SYSTEM_EVENT ABI, a VMM
+> > > that doesn't care about this event can simply resume the guest without
+> > > issue (we set up the calling vCPU to come out of reset correctly on next
+> > > KVM_RUN).
+> >
+> > More idle thoughts on this:
+> >
+> > Although the definition of SYSTEM_SUSPEND is very simple from a PSCI
+> > perspective, I don't think it is that simple at the system level,
+> > because PSCI is only concerned with the CPU.
+> >
+> > For example, what is a wake-up event? My first approach would be to
+> > consider interrupts to be such events. However, this approach suffers
+> > from at least two issues:
+> >
+> > - How do you define which interrupts are actual wake-up events?
+> >   Nothing in the GIC architecture defines what a wake-up is (let alone
+> >   a wake-up event).
 > 
-> There isn't anything that prevents these tests from being used for
-> s390x too right? Of course, we haven't anything to test on but just a
-> thought.
+> Good point.
+> 
+> One possible implementation of suspend could just be a `WFI` in a
+> higher EL. In this case, KVM could emulate WFI wake up events
+> according to D1.16.2 in DDI 0487G.a. But I agree, it isn't entirely
+> clear what constitutes a wakeup from powered down state.
 
-Tbh I'm not sure. Will ask if somebody can try it in the cover letter
-for v2.
+It isn't, and it is actually IMPDEF (there isn't much in the ARM ARM
+in terms of what constitutes a low power state). And even if you
+wanted to emulate a WFI in userspace, the problem of interrupts that
+have their source in the kernel remains. How to you tell userspace
+that such an event has occurred if the vcpu thread isn't in the
+kernel?
+
+> 
+> > - Assuming you have a way to express the above, how do you handle
+> >   wake-ups from interrupts that have their source in the kernel (such
+> >   as timers, irqfd sources)?
+> 
+> I think this could be handled, so long as we allow userspace to
+> indicate it has woken a vCPU. Depending on this, in the next KVM_RUN
+> we'd say:
+> 
+> - Some IMP DEF event occurred; I'm waking this CPU now
+
+I'm seeing the problem from the other side. The vcpu has exited to
+userspace on a SUSPEND event. How is the kernel supposed to tell
+userspace that there is a pending interrupt? To do that, you'd have to
+keep the vcpu in the kernel on SUSPEND. Which is *exactly* WFI.
+
+> - I've either chosen to ignore the guest or will defer to KVM's
+> suspend implementation
+> 
+> > How do you cope with directly injected interrupts?
+> 
+> No expert on this, I'll need to do a bit more reading to give a good
+> answer here.
+> 
+> > It looks to me that your implementation can only work with userspace
+> > provided events, which is pretty limited.
+> 
+> Right. I implemented this from the mindset that userspace may do
+> something heavyweight when a guest suspends, like save it to a
+> persistent store to resume later on. No matter what we do in KVM, I
+> think it's probably best to give userspace the right of first refusal
+> to handle the suspension.
+
+Maybe. But if you want to handle wake-up from interrupts to actually
+work, you must return to the kernel for the wake-up to occurs.
+
+The problem is that you piggyback on an existing feature (suspend) to
+implement something else (opportunistic save/restore?). Oddly enough
+the stars don't exactly align! ;-)
+
+I have the feeling that a solution to this problem would be to exit to
+userspace with something indicating an *intent* to suspend. At this
+stage, userspace can do two things:
+
+- resume the guest: the guest may have been moved to some other
+  machine, cold storage, whatever... The important thing is that the
+  guest is directly runnable without any extra event
+
+- confirm the suspension by returning to the kernel, which will
+  execute a blocking WFI on behalf of the guest
+
+With this, you end-up with something that is works from an interrupt
+perspective (even for directly injected interrupts), and you can save
+your guest on suspend.
+
+>
+> > Other items worth considering: ongoing DMA, state of the caches at
+> > suspend time, device state in general All of this really needs to be
+> > defined before we can move forward with this feature.
+> 
+> I believe it is largely up to the caller to get devices in a quiesced
+> state appropriate for a system suspend, but PSCI is delightfully vague
+> on this topic.
+
+Indeed, it only deals with the CPU. Oh look, another opportunity to
+write a new spec! :)
+
+> On the contrary, it is up to KVM's implementation to
+> guarantee caches are clean when servicing the guest request.
+
+This last point is pretty unclear to me. If the guest doesn't clean to
+the PoC (or even to one of the PoPs) when it calls into suspend,
+that's a clear indication that it doesn't care about its data. Why
+should KVM be more conservative here? It shouldn't be in the business
+of working around guest bugs.
 
 Thanks,
-Ricardo
 
-> 
-> Besides Drew's comments:
-> 
-> Reviewed-by: Oliver Upton <oupton@google.com>
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
