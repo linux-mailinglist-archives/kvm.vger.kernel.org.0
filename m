@@ -2,53 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 136FF404067
-	for <lists+kvm@lfdr.de>; Wed,  8 Sep 2021 23:03:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5B88D404065
+	for <lists+kvm@lfdr.de>; Wed,  8 Sep 2021 23:03:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352417AbhIHVEh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S1352352AbhIHVEh (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Wed, 8 Sep 2021 17:04:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36790 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36792 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235437AbhIHVEf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1350641AbhIHVEf (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 8 Sep 2021 17:04:35 -0400
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 648EFC061575
-        for <kvm@vger.kernel.org>; Wed,  8 Sep 2021 14:03:24 -0700 (PDT)
-Received: by mail-pf1-x449.google.com with SMTP id f23-20020aa782d7000000b003eb2baced8bso2162384pfn.3
-        for <kvm@vger.kernel.org>; Wed, 08 Sep 2021 14:03:24 -0700 (PDT)
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6ACF1C061757
+        for <kvm@vger.kernel.org>; Wed,  8 Sep 2021 14:03:25 -0700 (PDT)
+Received: by mail-pf1-x44a.google.com with SMTP id 202-20020a6219d3000000b0040b60510fd8so2164499pfz.5
+        for <kvm@vger.kernel.org>; Wed, 08 Sep 2021 14:03:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=JC16aUwWh6VH1dHIMo/8cnVTyU7yQibp113aKDOygMY=;
-        b=OXtBrVZQuDsj1Xd11yEKs6/hnslMSZ5qwPiSLFnQtXEJzAEZDxdwJ0oylLEAJYnpAY
-         N/uIjCw9BAaW9hztD862iMgGgd2iUeKJm0Io91e8UK+7beow+rrfR7qBsanX5C4OYBkB
-         oxyblXxt0sc1T5zq775Psfnb4LGYHas68I0MtlJwO/tXadr+oh0mmJV5uJVzqpVCC1wg
-         6vtkOxb0K71cdgMcQ7CEjZzB7i77/VeUued+2jJ5yLu+5jwm1nOq4Xmy3QX8Kgaj3Kkk
-         Ib6Jrsz/EkXMWQPxU0zFo3452qgS0gBFH1G8cG7+oNkg4JSxllrFBy1EHWljpHeD/2Bj
-         dQRg==
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=2d4nfleHWQk6Q9Qf0G0fpUlHYSowf2WbKKEPepaq7rY=;
+        b=KO8+nZdJPGaZn8QnoYwVIdO6MCYkmTZJPROR2cBbazw7mJE6hHqqcxlqlX8x9nMenR
+         1JnAjdtTMrvnwytbbDZGN96cia+5bwznuBBTpvRNfUvFfxXkklisBDog+L6QKk26Mdbj
+         Ngyd6TF4iRVnj5SxMEdxyZb51mCZAUEI+f6hFIH4WHkd2usMHpnZLm/Zv/tBDdPj4VPq
+         cRdMMaYlGTf122Cbg0BVD8wlsk871xqLrF1acNbFtDPlvpqku80pwdArsR9I0KvQOPn+
+         w16PtXopOwPEvTYencl/xsWmv750SZsVi9OYo4tvaujFP8xWEPScXr5GHU32Jz6xKfjN
+         NfXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=JC16aUwWh6VH1dHIMo/8cnVTyU7yQibp113aKDOygMY=;
-        b=PZJNg8yT2/bEeWN0qUUQvzyHgDOFo+bBqNHPSDL+Lqqm0lcjk8NTi+KkZmHNS/SXXe
-         VjlT7ch+Cf/L+r9Y1GXk2cGlOTJXs+T2DzarJPs3B4wKQPyh1+aiPeO/XhLBzroq0pg5
-         ANuIt9tASXueBYVrq2/3v/pT7coaGsbJVMLjIwlWvUUtq5rmUJIwOlDrbLtDM7/HLMPP
-         jYWRUkN5FJb9WP3OzTRNgFkbciNT7ZIIHz4IP5qICtGeQnb+QQWN8zRbhoACkSeOYYY/
-         3VbiCAdPB1w/xsmU+q7Dhl07tLHJRQ+zlrvb5KstY0OfnDDUeR6o0AknlN1dTm6pAMy/
-         rdMw==
-X-Gm-Message-State: AOAM53247KTAP1h3PK7975uOj5a5NtP7rwKGvoHjPEfc3wndkBcehFw7
-        efKYiihSJaGpFsuh+VhvzNIkHxNQw+56vrRyvckSgt4X7eoo2XRKjO3Awd3RGKElZdaQU94cBmI
-        lIhXtNlVmjEGWsLxxKSGMv5NGze3C5C8MfbpvUialq2vPElTxLHpT8FSL4FP9v5E=
-X-Google-Smtp-Source: ABdhPJzla16tMBCgG9E0q1xwBqSq8LzrlZo3pCb2r/5jjfDudDDoT/FtwgmHXvdHMdSKQAJYM1AtIxoy9XZR+w==
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=2d4nfleHWQk6Q9Qf0G0fpUlHYSowf2WbKKEPepaq7rY=;
+        b=nuo3tjIpHnAK+o8WX/zb4hWx/dv8upk0sBtwaVMKE9GZgDvhxSuOx118iupvKkin5N
+         qcr9FXN2QJ9T74+7otLxAZ7TjqjaFigiWe+tFR2iOznVMOZodBTvkqp5Q8Tw1rHBGYQR
+         /hQkwT1ucHtB1o0ItLMrhc+pE7QGhXwOy+w7RW0tXBPh0BFEWBqLJqK5Kn+zP3Zd2cQ3
+         gXDh1YmF/hbtjMGkADbTQaqhgUk703zlrbd3Q7A7eVHEZjadS1s362dVzGWLQ+MaSKHc
+         sRFwlpSQMqZsFTyR82f0Qwz3BkuJfa/8m39oMEt0+M8eMxzupG0GZ8nMSi5Mb8s1VMTN
+         TPQw==
+X-Gm-Message-State: AOAM530FMefvtG5IY26Rb5KX09Mz9dsKlXRCyiwj0ku3TcfpA/hC2h7o
+        L9agkGwH5Kgxw2qudbWdyS2F/zGoq8XnDIUwLLlmpF1Rv4Y7ITegL2Uz2GqyA/31NQIXaGbg4pW
+        Va9GExr1HTj0KvTmw7bKp+fjAR9Yyv8gimcWuzrpmk1pTblwQxKa4LPuL7/fH82o=
+X-Google-Smtp-Source: ABdhPJwIVSsg5yuM194jxyxXA4Dmfrn64eyhBy1C61zVrAz4sOc5g0bQEJ0nBw/uh8TR18zcER/UzQnsrIK3MA==
 X-Received: from ricarkol2.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:62fe])
- (user=ricarkol job=sendgmr) by 2002:a17:90b:1e02:: with SMTP id
- pg2mr6190361pjb.35.1631135002966; Wed, 08 Sep 2021 14:03:22 -0700 (PDT)
-Date:   Wed,  8 Sep 2021 14:03:18 -0700
-Message-Id: <20210908210320.1182303-1-ricarkol@google.com>
+ (user=ricarkol job=sendgmr) by 2002:a17:90a:dc15:: with SMTP id
+ i21mr168843pjv.64.1631135004439; Wed, 08 Sep 2021 14:03:24 -0700 (PDT)
+Date:   Wed,  8 Sep 2021 14:03:19 -0700
+In-Reply-To: <20210908210320.1182303-1-ricarkol@google.com>
+Message-Id: <20210908210320.1182303-2-ricarkol@google.com>
 Mime-Version: 1.0
+References: <20210908210320.1182303-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.33.0.153.gba50c8fa24-goog
-Subject: [PATCH 0/2] KVM: arm64: vgic-v3: Missing check for redist region
- above the VM IPA size
+Subject: [PATCH 1/2] KVM: arm64: vgic: check redist region is not above the VM
+ IPA size
 From:   Ricardo Koller <ricarkol@google.com>
 To:     kvm@vger.kernel.org, maz@kernel.org, kvmarm@lists.cs.columbia.edu,
         drjones@redhat.com, eric.auger@redhat.com, alexandru.elisei@arm.com
@@ -61,23 +65,36 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM doesn't check for redist regions that extend partially above the
-VM-specified IPA (phys_size).  This can happen when using the
-KVM_VGIC_V3_ADDR_TYPE_REDIST attribute to set a new region that extends
-partially above phys_size (with the base below phys_size).  The issue is that
-vcpus can potentially run into a situation where some redistributors are
-addressable and others are not.
+Extend vgic_v3_check_base() to verify that the redistributor regions
+don't go above the VM-specified IPA size (phys_size). This can happen
+when using the legacy KVM_VGIC_V3_ADDR_TYPE_REDIST attribute with:
 
-Patch 1 adds the missing check, and patch 2 adds a test into aarch64/vgic_init.
+  base + size > phys_size AND base < phys_size
 
-Ricardo Koller (2):
-  KVM: arm64: vgic: check redist region is not above the VM IPA size
-  KVM: arm64: selftests: test for vgic redist above the VM IPA size
+vgic_v3_check_base() is used to check the redist regions bases when
+setting them (with the vcpus added so far) and when attempting the first
+vcpu-run.
 
- arch/arm64/kvm/vgic/vgic-v3.c                 |  4 ++
- .../testing/selftests/kvm/aarch64/vgic_init.c | 44 +++++++++++++++++++
- 2 files changed, 48 insertions(+)
+Signed-off-by: Ricardo Koller <ricarkol@google.com>
+---
+ arch/arm64/kvm/vgic/vgic-v3.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
+diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
+index 66004f61cd83..5afd9f6f68f6 100644
+--- a/arch/arm64/kvm/vgic/vgic-v3.c
++++ b/arch/arm64/kvm/vgic/vgic-v3.c
+@@ -512,6 +512,10 @@ bool vgic_v3_check_base(struct kvm *kvm)
+ 		if (rdreg->base + vgic_v3_rd_region_size(kvm, rdreg) <
+ 			rdreg->base)
+ 			return false;
++
++		if (rdreg->base + vgic_v3_rd_region_size(kvm, rdreg) >
++			kvm_phys_size(kvm))
++			return false;
+ 	}
+ 
+ 	if (IS_VGIC_ADDR_UNDEF(d->vgic_dist_base))
 -- 
 2.33.0.153.gba50c8fa24-goog
 
