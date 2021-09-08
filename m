@@ -2,110 +2,190 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 86917403A08
-	for <lists+kvm@lfdr.de>; Wed,  8 Sep 2021 14:39:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 812F9403A22
+	for <lists+kvm@lfdr.de>; Wed,  8 Sep 2021 14:52:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351747AbhIHMkM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Sep 2021 08:40:12 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:58033 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1351735AbhIHMkL (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 8 Sep 2021 08:40:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1631104742;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=qJk9DPikcEEEFmKWzBbvekDGUKQO1oc5fhwtnVuechI=;
-        b=fgWFlSwgFVb5A24gLr1gyzfzUgF0RRZNPh4MXDuYMIl+Guj+FvQ84Tgl+wks2vp4/6nLYd
-        9ZBL5MA95bEiBrrMoPp8i7dYUeDHWHay7+9rAArbBbu7LguUd3Fl8CSubqCQgFcvmHz+k+
-        DLrECC4qvuYOydf2OoS0vJFpJtowLYg=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-12-kuSR9GajOVqX2UTZ36UPeg-1; Wed, 08 Sep 2021 08:39:01 -0400
-X-MC-Unique: kuSR9GajOVqX2UTZ36UPeg-1
-Received: by mail-ed1-f70.google.com with SMTP id s15-20020a056402520f00b003cad788f1f6so988205edd.22
-        for <kvm@vger.kernel.org>; Wed, 08 Sep 2021 05:39:01 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=qJk9DPikcEEEFmKWzBbvekDGUKQO1oc5fhwtnVuechI=;
-        b=dsQjli4ly/lEScUGpYJTfFg2Sr/nC5NwtjmbEo2dgXkAGfE9Z5DNzLeuf2FJKuHPqI
-         yq+ajvawO6jLH9/11CqOfWtZ0eukia31WA9zCjXcvkYqQIoHI5cu1M29yKi7YjvgwYTL
-         XXgc3XVMkRhz3bZzn115CNQfyQ9RyLYQdS3eo9tsyKETVtZrDzvJwbVPv/u2mXwzbgri
-         AOS5NpJ5SqyitltP0fQDdlTklvQS8aAMXaPB7+UAtG6tDcUznwXGDcpJ4VMR33I9xKRB
-         xK2bZMgFQxpLQllBn/pGJ5I/WoluoJfARGCGa8VQeWHyQtQw3d/kioerTgTbQtRMGhyQ
-         RQvQ==
-X-Gm-Message-State: AOAM532KiktwAB3/E47vRXHtogqORPvzn9tBNLlht1vOEvWT9Bvfu/q8
-        cIXIhChv1Es2lvGTnlC1E7LmgchM/9sEjrT+oaAB+GX9XPaLDCpQvf+g/GIgfClKUvp41OTZYAP
-        rjPlX8niTdgIf
-X-Received: by 2002:aa7:cfd2:: with SMTP id r18mr3792146edy.82.1631104740791;
-        Wed, 08 Sep 2021 05:39:00 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwjid3++di+F5iCU9+5CzYDTvq+wLZRd9DcKg7WpI/zFqCadUN/JE18oA3HheHdzPjP0LYM/w==
-X-Received: by 2002:aa7:cfd2:: with SMTP id r18mr3792124edy.82.1631104740608;
-        Wed, 08 Sep 2021 05:39:00 -0700 (PDT)
-Received: from gator (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
-        by smtp.gmail.com with ESMTPSA id bm14sm1157297edb.71.2021.09.08.05.38.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Sep 2021 05:39:00 -0700 (PDT)
-Date:   Wed, 8 Sep 2021 14:38:58 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Fuad Tabba <tabba@google.com>
-Cc:     kvmarm@lists.cs.columbia.edu, maz@kernel.org, will@kernel.org,
-        james.morse@arm.com, alexandru.elisei@arm.com,
-        suzuki.poulose@arm.com, mark.rutland@arm.com,
-        christoffer.dall@arm.com, pbonzini@redhat.com, oupton@google.com,
-        qperret@google.com, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kernel-team@android.com
-Subject: Re: [PATCH v5 3/8] KVM: arm64: Simplify masking out MTE in feature
- id reg
-Message-ID: <20210908123858.fqoltrkp3aodj4ly@gator>
-References: <20210827101609.2808181-1-tabba@google.com>
- <20210827101609.2808181-4-tabba@google.com>
+        id S1351727AbhIHMxT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Sep 2021 08:53:19 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:62912 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1346153AbhIHMxT (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 8 Sep 2021 08:53:19 -0400
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 188CXKWc168550;
+        Wed, 8 Sep 2021 08:52:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=S18rahtjgCFUjUFwVEitjwK8LiYm/yk+g1sXfgfi+do=;
+ b=sxDByZxeUuV9lMC47wTOZGoHAO8xWdpDYCPmJBuZkmKOzpJMPMDArTW8XstAh8LG6O7m
+ 29PoDUzzSzMuvP6uvWGp4UjPBmTglLcpDPLl0qdQvOTkohro832Y7y2+YhwbmLZCiWwc
+ E7wdj6/96sZ+rAyOVs13WJAiVRCNdWdgD2BFnAr+X7r/j3U35vc1COyLSaLkpC0bQhXm
+ IDM4++IbyW+5SwigUbTt0cubyFHLSz2yZRdWw6/DAUTAagAP/yy9l7/JNVfh3JqSXFgj
+ I+h8v2AbSG8SmOV1zvU9jJzeub0XbxibtZ6s1oh5XemOG5QXOieGp/QZJ80rj3yHmviA 2Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3axrd4gbjk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 08 Sep 2021 08:52:10 -0400
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 188CY5DY172108;
+        Wed, 8 Sep 2021 08:52:10 -0400
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3axrd4gbj2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 08 Sep 2021 08:52:10 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 188ClMas010831;
+        Wed, 8 Sep 2021 12:52:08 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma03ams.nl.ibm.com with ESMTP id 3axcnp8vam-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 08 Sep 2021 12:52:08 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 188ClkI951970530
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 8 Sep 2021 12:47:46 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B7D4EA405C;
+        Wed,  8 Sep 2021 12:52:04 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5B2B1A4066;
+        Wed,  8 Sep 2021 12:52:04 +0000 (GMT)
+Received: from oc3016276355.ibm.com (unknown [9.145.52.8])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed,  8 Sep 2021 12:52:04 +0000 (GMT)
+Subject: Re: [PATCH v3 2/3] s390x: KVM: Implementation of Multiprocessor
+ Topology-Change-Report
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        frankja@linux.ibm.com, cohuck@redhat.com, thuth@redhat.com,
+        imbrenda@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com
+References: <1627979206-32663-1-git-send-email-pmorel@linux.ibm.com>
+ <1627979206-32663-3-git-send-email-pmorel@linux.ibm.com>
+ <d85a6998-0f86-44d9-4eae-3051b65c2b4e@redhat.com>
+ <59ff09e8-6975-20c2-78de-282585e2953d@linux.ibm.com>
+ <66754109-4b35-f6e5-3db7-654d8b67392e@de.ibm.com>
+ <d76697e5-d7fb-4210-234a-7b3482e7babc@linux.ibm.com>
+ <461c895b-d25a-7dba-4c06-235235e18f1b@de.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+Message-ID: <316097be-81f6-4667-0245-a32d62b19a25@linux.ibm.com>
+Date:   Wed, 8 Sep 2021 14:52:04 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210827101609.2808181-4-tabba@google.com>
+In-Reply-To: <461c895b-d25a-7dba-4c06-235235e18f1b@de.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 7-h6HByKwyzx1FcdA5_buRt5u8g2kC8O
+X-Proofpoint-ORIG-GUID: f6ybdRWYhytpRKzz-NmKsqXNel4GlzHh
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-09-08_06:2021-09-07,2021-09-08 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 adultscore=0
+ phishscore=0 malwarescore=0 lowpriorityscore=0 spamscore=0 mlxlogscore=999
+ clxscore=1011 priorityscore=1501 bulkscore=0 suspectscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2109030001 definitions=main-2109080080
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 27, 2021 at 11:16:04AM +0100, Fuad Tabba wrote:
-> Simplify code for hiding MTE support in feature id register when
-> MTE is not enabled/supported by KVM.
-> 
-> No functional change intended.
-> 
-> Signed-off-by: Fuad Tabba <tabba@google.com>
-> ---
->  arch/arm64/kvm/sys_regs.c | 10 ++--------
->  1 file changed, 2 insertions(+), 8 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 1d46e185f31e..447acce9ca84 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1077,14 +1077,8 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
->  		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_CSV3), (u64)vcpu->kvm->arch.pfr0_csv3);
->  		break;
->  	case SYS_ID_AA64PFR1_EL1:
-> -		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_MTE);
-> -		if (kvm_has_mte(vcpu->kvm)) {
-> -			u64 pfr, mte;
-> -
-> -			pfr = read_sanitised_ftr_reg(SYS_ID_AA64PFR1_EL1);
-> -			mte = cpuid_feature_extract_unsigned_field(pfr, ID_AA64PFR1_MTE_SHIFT);
-> -			val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR1_MTE), mte);
-> -		}
-> +		if (!kvm_has_mte(vcpu->kvm))
-> +			val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_MTE);
->  		break;
->  	case SYS_ID_AA64ISAR1_EL1:
->  		if (!vcpu_has_ptrauth(vcpu))
-> -- 
-> 2.33.0.259.gc128427fd7-goog
->
 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
 
+On 9/8/21 2:01 PM, Christian Borntraeger wrote:
+> 
+> 
+> On 08.09.21 14:00, Pierre Morel wrote:
+>>
+>>
+>> On 9/8/21 9:04 AM, Christian Borntraeger wrote:
+>>>
+>>>
+>>> On 07.09.21 12:24, Pierre Morel wrote:
+>>>>
+>>>>
+>>>> On 9/6/21 8:37 PM, David Hildenbrand wrote:
+>>>>> On 03.08.21 10:26, Pierre Morel wrote:
+>>>>>> We let the userland hypervisor know if the machine support the CPU
+>>>>>> topology facility using a new KVM capability: 
+>>>>>> KVM_CAP_S390_CPU_TOPOLOGY.
+>>>>>>
+>>>>>> The PTF instruction will report a topology change if there is any 
+>>>>>> change
+>>>>>> with a previous STSI_15_2 SYSIB.
+>>>>>> Changes inside a STSI_15_2 SYSIB occur if CPU bits are set or clear
+>>>>>> inside the CPU Topology List Entry CPU mask field, which happens with
+>>>>>> changes in CPU polarization, dedication, CPU types and adding or
+>>>>>> removing CPUs in a socket.
+>>>>>>
+>>>>>> The reporting to the guest is done using the Multiprocessor
+>>>>>> Topology-Change-Report (MTCR) bit of the utility entry of the guest's
+>>>>>> SCA which will be cleared during the interpretation of PTF.
+>>>>>>
+>>>>>> To check if the topology has been modified we use a new field of the
+>>>>>> arch vCPU to save the previous real CPU ID at the end of a schedule
+>>>>>> and verify on next schedule that the CPU used is in the same socket.
+>>>>>>
+>>>>>> We deliberatly ignore:
+>>>>>> - polarization: only horizontal polarization is currently used in 
+>>>>>> linux.
+>>>>>> - CPU Type: only IFL Type are supported in Linux
+>>>>>> - Dedication: we consider that only a complete dedicated CPU stack 
+>>>>>> can
+>>>>>>    take benefit of the CPU Topology.
+>>>>>>
+>>>>>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>>>>>
+>>>>>
+>>>>>> @@ -228,7 +232,7 @@ struct kvm_s390_sie_block {
+>>>>>>       __u8    icptcode;        /* 0x0050 */
+>>>>>>       __u8    icptstatus;        /* 0x0051 */
+>>>>>>       __u16    ihcpu;            /* 0x0052 */
+>>>>>> -    __u8    reserved54;        /* 0x0054 */
+>>>>>> +    __u8    mtcr;            /* 0x0054 */
+>>>>>>   #define IICTL_CODE_NONE         0x00
+>>>>>>   #define IICTL_CODE_MCHK         0x01
+>>>>>>   #define IICTL_CODE_EXT         0x02
+>>>>>> @@ -246,6 +250,7 @@ struct kvm_s390_sie_block {
+>>>>>>   #define ECB_TE        0x10
+>>>>>>   #define ECB_SRSI    0x04
+>>>>>>   #define ECB_HOSTPROTINT    0x02
+>>>>>> +#define ECB_PTF        0x01
+>>>>>
+>>>>>  From below I understand, that ECB_PTF can be used with stfl(11) in 
+>>>>> the hypervisor.
+>>>>>
+>>>>> What is to happen if the hypervisor doesn't support stfl(11) and we 
+>>>>> consequently cannot use ECB_PTF? Will QEMU be able to emulate PTF 
+>>>>> fully?
+>>>>
+>>>> Yes.
+>>>
+>>> Do we want that? I do not think so. Other OSes (like zOS) do use PTF 
+>>> in there low level interrupt handler, so PTF must be really fast.
+>>> I think I would prefer that in that case the guest will simply not 
+>>> see stfle(11).
+>>> So the user can still specify the topology but the guest will have no 
+>>> interface to query it.
+>>
+>> I do not understand.
+>> If the host support stfle(11) we interpret PTF.
+>>
+>> The proposition was to emulate only in the case it is not supported, 
+>> what you propose is to not advertise stfl(11) if the host does not 
+>> support it, and consequently to never emulate is it right?
+> 
+> Yes, exactly. My idea is to provide it to guests if we can do it fast, 
+> but do not provide it if it would add a performance issue.
+
+OK, understood, I will update this and the QEMU part too as we do not 
+need emulation there anymore.
+
+Thanks,
+Pierre
+
+-- 
+Pierre Morel
+IBM Lab Boeblingen
