@@ -2,190 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 812F9403A22
-	for <lists+kvm@lfdr.de>; Wed,  8 Sep 2021 14:52:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0D08E403A30
+	for <lists+kvm@lfdr.de>; Wed,  8 Sep 2021 15:01:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351727AbhIHMxT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Sep 2021 08:53:19 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:62912 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1346153AbhIHMxT (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 8 Sep 2021 08:53:19 -0400
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 188CXKWc168550;
-        Wed, 8 Sep 2021 08:52:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=S18rahtjgCFUjUFwVEitjwK8LiYm/yk+g1sXfgfi+do=;
- b=sxDByZxeUuV9lMC47wTOZGoHAO8xWdpDYCPmJBuZkmKOzpJMPMDArTW8XstAh8LG6O7m
- 29PoDUzzSzMuvP6uvWGp4UjPBmTglLcpDPLl0qdQvOTkohro832Y7y2+YhwbmLZCiWwc
- E7wdj6/96sZ+rAyOVs13WJAiVRCNdWdgD2BFnAr+X7r/j3U35vc1COyLSaLkpC0bQhXm
- IDM4++IbyW+5SwigUbTt0cubyFHLSz2yZRdWw6/DAUTAagAP/yy9l7/JNVfh3JqSXFgj
- I+h8v2AbSG8SmOV1zvU9jJzeub0XbxibtZ6s1oh5XemOG5QXOieGp/QZJ80rj3yHmviA 2Q== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3axrd4gbjk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 08 Sep 2021 08:52:10 -0400
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 188CY5DY172108;
-        Wed, 8 Sep 2021 08:52:10 -0400
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3axrd4gbj2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 08 Sep 2021 08:52:10 -0400
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 188ClMas010831;
-        Wed, 8 Sep 2021 12:52:08 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma03ams.nl.ibm.com with ESMTP id 3axcnp8vam-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 08 Sep 2021 12:52:08 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 188ClkI951970530
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 8 Sep 2021 12:47:46 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B7D4EA405C;
-        Wed,  8 Sep 2021 12:52:04 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5B2B1A4066;
-        Wed,  8 Sep 2021 12:52:04 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.52.8])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed,  8 Sep 2021 12:52:04 +0000 (GMT)
-Subject: Re: [PATCH v3 2/3] s390x: KVM: Implementation of Multiprocessor
- Topology-Change-Report
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        frankja@linux.ibm.com, cohuck@redhat.com, thuth@redhat.com,
-        imbrenda@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com
-References: <1627979206-32663-1-git-send-email-pmorel@linux.ibm.com>
- <1627979206-32663-3-git-send-email-pmorel@linux.ibm.com>
- <d85a6998-0f86-44d9-4eae-3051b65c2b4e@redhat.com>
- <59ff09e8-6975-20c2-78de-282585e2953d@linux.ibm.com>
- <66754109-4b35-f6e5-3db7-654d8b67392e@de.ibm.com>
- <d76697e5-d7fb-4210-234a-7b3482e7babc@linux.ibm.com>
- <461c895b-d25a-7dba-4c06-235235e18f1b@de.ibm.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Message-ID: <316097be-81f6-4667-0245-a32d62b19a25@linux.ibm.com>
-Date:   Wed, 8 Sep 2021 14:52:04 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+        id S1348808AbhIHNDA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Sep 2021 09:03:00 -0400
+Received: from mga18.intel.com ([134.134.136.126]:27500 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232097AbhIHNC7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Sep 2021 09:02:59 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10100"; a="207588630"
+X-IronPort-AV: E=Sophos;i="5.85,278,1624345200"; 
+   d="scan'208";a="207588630"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Sep 2021 06:01:51 -0700
+X-IronPort-AV: E=Sophos;i="5.85,278,1624345200"; 
+   d="scan'208";a="538726756"
+Received: from rhe-mobl.ccr.corp.intel.com (HELO localhost) ([10.249.169.176])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Sep 2021 06:01:48 -0700
+Date:   Wed, 8 Sep 2021 21:01:45 +0800
+From:   Yu Zhang <yu.c.zhang@linux.intel.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, wanpengli@tencent.com,
+        jmattson@google.com, joro@8bytes.org
+Subject: Re: [PATCH] KVM: nVMX: fix comments of handle_vmon()
+Message-ID: <20210908130145.3uwmywgjaahyb6iw@linux.intel.com>
+References: <20210908171731.18885-1-yu.c.zhang@linux.intel.com>
+ <87lf474ci8.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <461c895b-d25a-7dba-4c06-235235e18f1b@de.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 7-h6HByKwyzx1FcdA5_buRt5u8g2kC8O
-X-Proofpoint-ORIG-GUID: f6ybdRWYhytpRKzz-NmKsqXNel4GlzHh
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-09-08_06:2021-09-07,2021-09-08 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 adultscore=0
- phishscore=0 malwarescore=0 lowpriorityscore=0 spamscore=0 mlxlogscore=999
- clxscore=1011 priorityscore=1501 bulkscore=0 suspectscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2109030001 definitions=main-2109080080
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87lf474ci8.fsf@vitty.brq.redhat.com>
+User-Agent: NeoMutt/20171215
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 9/8/21 2:01 PM, Christian Borntraeger wrote:
+On Wed, Sep 08, 2021 at 11:55:59AM +0200, Vitaly Kuznetsov wrote:
+> Indeed,
 > 
+> Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 > 
-> On 08.09.21 14:00, Pierre Morel wrote:
->>
->>
->> On 9/8/21 9:04 AM, Christian Borntraeger wrote:
->>>
->>>
->>> On 07.09.21 12:24, Pierre Morel wrote:
->>>>
->>>>
->>>> On 9/6/21 8:37 PM, David Hildenbrand wrote:
->>>>> On 03.08.21 10:26, Pierre Morel wrote:
->>>>>> We let the userland hypervisor know if the machine support the CPU
->>>>>> topology facility using a new KVM capability: 
->>>>>> KVM_CAP_S390_CPU_TOPOLOGY.
->>>>>>
->>>>>> The PTF instruction will report a topology change if there is any 
->>>>>> change
->>>>>> with a previous STSI_15_2 SYSIB.
->>>>>> Changes inside a STSI_15_2 SYSIB occur if CPU bits are set or clear
->>>>>> inside the CPU Topology List Entry CPU mask field, which happens with
->>>>>> changes in CPU polarization, dedication, CPU types and adding or
->>>>>> removing CPUs in a socket.
->>>>>>
->>>>>> The reporting to the guest is done using the Multiprocessor
->>>>>> Topology-Change-Report (MTCR) bit of the utility entry of the guest's
->>>>>> SCA which will be cleared during the interpretation of PTF.
->>>>>>
->>>>>> To check if the topology has been modified we use a new field of the
->>>>>> arch vCPU to save the previous real CPU ID at the end of a schedule
->>>>>> and verify on next schedule that the CPU used is in the same socket.
->>>>>>
->>>>>> We deliberatly ignore:
->>>>>> - polarization: only horizontal polarization is currently used in 
->>>>>> linux.
->>>>>> - CPU Type: only IFL Type are supported in Linux
->>>>>> - Dedication: we consider that only a complete dedicated CPU stack 
->>>>>> can
->>>>>>    take benefit of the CPU Topology.
->>>>>>
->>>>>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->>>>>
->>>>>
->>>>>> @@ -228,7 +232,7 @@ struct kvm_s390_sie_block {
->>>>>>       __u8    icptcode;        /* 0x0050 */
->>>>>>       __u8    icptstatus;        /* 0x0051 */
->>>>>>       __u16    ihcpu;            /* 0x0052 */
->>>>>> -    __u8    reserved54;        /* 0x0054 */
->>>>>> +    __u8    mtcr;            /* 0x0054 */
->>>>>>   #define IICTL_CODE_NONE         0x00
->>>>>>   #define IICTL_CODE_MCHK         0x01
->>>>>>   #define IICTL_CODE_EXT         0x02
->>>>>> @@ -246,6 +250,7 @@ struct kvm_s390_sie_block {
->>>>>>   #define ECB_TE        0x10
->>>>>>   #define ECB_SRSI    0x04
->>>>>>   #define ECB_HOSTPROTINT    0x02
->>>>>> +#define ECB_PTF        0x01
->>>>>
->>>>>  From below I understand, that ECB_PTF can be used with stfl(11) in 
->>>>> the hypervisor.
->>>>>
->>>>> What is to happen if the hypervisor doesn't support stfl(11) and we 
->>>>> consequently cannot use ECB_PTF? Will QEMU be able to emulate PTF 
->>>>> fully?
->>>>
->>>> Yes.
->>>
->>> Do we want that? I do not think so. Other OSes (like zOS) do use PTF 
->>> in there low level interrupt handler, so PTF must be really fast.
->>> I think I would prefer that in that case the guest will simply not 
->>> see stfle(11).
->>> So the user can still specify the topology but the guest will have no 
->>> interface to query it.
->>
->> I do not understand.
->> If the host support stfle(11) we interpret PTF.
->>
->> The proposition was to emulate only in the case it is not supported, 
->> what you propose is to not advertise stfl(11) if the host does not 
->> support it, and consequently to never emulate is it right?
+> On a slightly related note: we don't seem to reset
+> 'vmx->nested.vmxon_ptr' upon VMXOFF emulation; this is not a problem per
+> se as we never access it when !vmx->nested.vmxon but I'd still suggest
+> we do something like
 > 
-> Yes, exactly. My idea is to provide it to guests if we can do it fast, 
-> but do not provide it if it would add a performance issue.
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index bc6327950657..8beb41d02d21 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -290,6 +290,7 @@ static void free_nested(struct kvm_vcpu *vcpu)
+>  
+>         vmx->nested.vmxon = false;
+>         vmx->nested.smm.vmxon = false;
+> +       vmx->nested.vmxon_ptr = -1ull;
+>         free_vpid(vmx->nested.vpid02);
+>         vmx->nested.posted_intr_nv = -1;
+>         vmx->nested.current_vmptr = -1ull;
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index d7c5257eb5c0..2214e6bd4713 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -6884,6 +6884,7 @@ static int vmx_create_vcpu(struct kvm_vcpu *vcpu)
+>  
+>         vcpu_setup_sgx_lepubkeyhash(vcpu);
+>  
+> +       vmx->nested.vmxon_ptr = -1ull;
+>         vmx->nested.posted_intr_nv = -1;
+>         vmx->nested.current_vmptr = -1ull;
+>         vmx->nested.hv_evmcs_vmptr = EVMPTR_INVALID;
+> 
+> to avoid issues in the future.
+> 
+Thanks, Vitaly. And above suggestion sounds reasonable to me. :)
 
-OK, understood, I will update this and the QEMU part too as we do not 
-need emulation there anymore.
+I can add this in V2 later, if no one objects. 
 
-Thanks,
-Pierre
-
--- 
-Pierre Morel
-IBM Lab Boeblingen
+B.R.
+Yu
