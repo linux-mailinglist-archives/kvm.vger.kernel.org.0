@@ -2,125 +2,168 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 03C814040D0
-	for <lists+kvm@lfdr.de>; Thu,  9 Sep 2021 00:00:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A11BA4040D9
+	for <lists+kvm@lfdr.de>; Thu,  9 Sep 2021 00:04:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235893AbhIHWCB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Sep 2021 18:02:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49558 "EHLO
+        id S236400AbhIHWFR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Sep 2021 18:05:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50314 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234144AbhIHWCB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Sep 2021 18:02:01 -0400
-Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91684C061575
-        for <kvm@vger.kernel.org>; Wed,  8 Sep 2021 15:00:52 -0700 (PDT)
-Received: by mail-lj1-x233.google.com with SMTP id r3so3855832ljc.4
-        for <kvm@vger.kernel.org>; Wed, 08 Sep 2021 15:00:52 -0700 (PDT)
+        with ESMTP id S235603AbhIHWFO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Sep 2021 18:05:14 -0400
+Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C1B7C061575
+        for <kvm@vger.kernel.org>; Wed,  8 Sep 2021 15:04:06 -0700 (PDT)
+Received: by mail-pg1-x52f.google.com with SMTP id r2so4049259pgl.10
+        for <kvm@vger.kernel.org>; Wed, 08 Sep 2021 15:04:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=GDe9/Ly5F2n1g5YILCIvzMoK8BHDpL9Shfxx8ob78n4=;
-        b=ejEiHkTbeEbIe67154apcT6mUJBjbEHtHjSH6KVMwCN8+RT2TpS8G0QlBpEgX0pUJX
-         LzgWU3tVcaSU7vKRiDKGv9cm6pBYL0hv+hs5sIy/jbtxngC97nN7EwipCaUbadrIGRsq
-         Sl1aUxqaKsteQoj9w7oiv1ZeuxRPJNvIjuqVGNiI2sZ1+xU9p0CspL8j+F2+n+x6oR3z
-         Hb0ULJLmgmce9LYYuL9thl9cimbDBD6CNRrwdbShlRAIWAJ2/1MCGN/WvNdxDPeu0Ca3
-         /N9f3PB9u2TD92YzD7weC0FRLI4n0pkw1azmceDiMcdd654fsUrQhAbRji62whb2iPVg
-         v59w==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=18AnhRW3dAr1PCrBHBFLJrZqcArBzwF29cM5sws1nbM=;
+        b=pcYTw/bILO7ZwMau96S/hoLCEOgSW2MGGBOcOeyVd40FR08UqFRdJW9hcPqffjtZL4
+         lECLA8XzdSVQqmMHDRVHcEnCeGiI1vQggyDOyxdcqIx5UX/2LvhC1J17X/SOpjJ1g9Ar
+         TnwbfCqMx796Z5AiOmpNhVAUr7G5FgnTqlsMSDbQOn84ZGmvoydek+oZyy9wI1QRj9x7
+         5Hlk1hbBtQaFszXJ7nhIKFCdwfSsrqipaVREpLulejXBW/iOjbP4aJyc02xyDftHVCDA
+         zR4SXOl2OSMk8DZ8M7FDAoAwYRptBzlbo8eEzBl6qOkwsZRKAU9EAfSDehVVzHnaViyu
+         4H6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=GDe9/Ly5F2n1g5YILCIvzMoK8BHDpL9Shfxx8ob78n4=;
-        b=IORyIR+eENN8RTpshljeG0sascPvUQnR/FpSOhvYsBYqUZRlyln/n4sYpTrrMvyqwA
-         mmFFLt2GEs7U/5JJQMnS4KDyzzw0KWUdiTTVZ5xAbM/4BITYtC+iPy9Ssq0fUDdv9M1Y
-         3dpytrZoCujbormLZbnKEs6yN57QK9uKSuQmEW1Tm62uWwoh2YH8RTjp3/1cot3pXUfL
-         ZmdCa4gGahzO5YuvnuOw8qJb9FFOq15Gjplp5kGoBo1vfNXn93Ypm54zTaNgvQ8SPSQ2
-         XPBTRHfpvhH3CcFaaceBcCPnxpBhWrWB1cOvqkOT9WEhEKlGaPAm67+RtPeuQvJnsId1
-         o1Cg==
-X-Gm-Message-State: AOAM531O8zQ3BFZEPwkVaVfWLF2JnVYQBVgmSfyW4gLIlx7OmjUKeLzE
-        OgkOTYme/2rLFZcrejLw8yIIVwpupJdzU1KNJxLLdQ==
-X-Google-Smtp-Source: ABdhPJxPzpIxpaq3ZMzFadWNqfu8YiOXjvgiyHMV9g8NIse80i9fIoc1m0TkP2py7fGZEiT8oipYK0+5WfGzQIekGMc=
-X-Received: by 2002:a2e:5c9:: with SMTP id 192mr359998ljf.337.1631138450633;
- Wed, 08 Sep 2021 15:00:50 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=18AnhRW3dAr1PCrBHBFLJrZqcArBzwF29cM5sws1nbM=;
+        b=l6SyNf9sN1LBjZeQhpwfkLBVvxtYpk4TnPljj5Xqg1TTYABzePo7fmZq6u9+xqm/nD
+         kgkeqeqYiU1YZWyKry+uxRF+YVeQTpm+EBQZTTKICoKALHFHCwtBOlO4Qd/xeClGWqcR
+         3IcrZP+VhIR5AKFxBakX+03UtnGLhiSxs/cN2skgdX5B7vGimdhfFQjT9w7oFcWRsDLQ
+         MEDA/KsKBgU9B60U/ByZe5dYpseGahslznZcpoFKz4LJR1vZpcJOmaczVfiDPsJz3DBt
+         xAWwdMOeEOHs8fwMcB/nkUtJfNZtP4PaUaKuo+RvnQzbU9ED3wjsWpidkveZaCiNRlke
+         epOg==
+X-Gm-Message-State: AOAM531RLFQLkHfvWYVmZnJkAbADWONuu8FdWNgoxTXnhXK1iYVb2Ub9
+        VPsqWM81wFptY7sYGyh8vEl4Fg==
+X-Google-Smtp-Source: ABdhPJx5fIPRC67AmFdbbYTgLi2/+o0m5jcTglZATET/J7A2JBEcgkqwPdocELkWasdEEjPBnb82hQ==
+X-Received: by 2002:aa7:8088:0:b029:3c1:1672:2f25 with SMTP id v8-20020aa780880000b02903c116722f25mr309095pff.22.1631138645508;
+        Wed, 08 Sep 2021 15:04:05 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id m13sm3112247pjv.20.2021.09.08.15.04.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Sep 2021 15:04:04 -0700 (PDT)
+Date:   Wed, 8 Sep 2021 22:04:01 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     kvm@vger.kernel.org, Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Jim Mattson <jmattson@google.com>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
+        <linux-kernel@vger.kernel.org>, Wanpeng Li <wanpengli@tencent.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Subject: Re: [PATCH v2 1/3] KVM: nSVM: restore the L1 host state prior to
+ resuming a nested guest on SMM exit
+Message-ID: <YTkzUaFD664+9WB+@google.com>
+References: <20210823114618.1184209-1-mlevitsk@redhat.com>
+ <20210823114618.1184209-2-mlevitsk@redhat.com>
 MIME-Version: 1.0
-References: <20210908210320.1182303-1-ricarkol@google.com> <20210908210320.1182303-2-ricarkol@google.com>
- <YTkr1c7S0wPRv6hH@google.com> <YTkwGHdBcy7v/mSA@google.com>
-In-Reply-To: <YTkwGHdBcy7v/mSA@google.com>
-From:   Oliver Upton <oupton@google.com>
-Date:   Wed, 8 Sep 2021 18:00:39 -0400
-Message-ID: <CAOQ_QsjZMSXYz_BES8JBQncSN5ubdPhs5GrF3OU8KkLf=TiSfw@mail.gmail.com>
-Subject: Re: [PATCH 1/2] KVM: arm64: vgic: check redist region is not above
- the VM IPA size
-To:     Ricardo Koller <ricarkol@google.com>
-Cc:     kvm@vger.kernel.org, maz@kernel.org, kvmarm@lists.cs.columbia.edu,
-        drjones@redhat.com, eric.auger@redhat.com,
-        Alexandru.Elisei@arm.com, Paolo Bonzini <pbonzini@redhat.com>,
-        james.morse@arm.com, suzuki.poulose@arm.com, shuah@kernel.org,
-        jingzhangos@google.com, pshier@google.com, rananta@google.com,
-        reijiw@google.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210823114618.1184209-2-mlevitsk@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 8, 2021 at 5:50 PM Ricardo Koller <ricarkol@google.com> wrote:
->
-> On Wed, Sep 08, 2021 at 09:32:05PM +0000, Oliver Upton wrote:
-> > Hi Ricardo,
-> >
-> > On Wed, Sep 08, 2021 at 02:03:19PM -0700, Ricardo Koller wrote:
-> > > Extend vgic_v3_check_base() to verify that the redistributor regions
-> > > don't go above the VM-specified IPA size (phys_size). This can happen
-> > > when using the legacy KVM_VGIC_V3_ADDR_TYPE_REDIST attribute with:
-> > >
-> > >   base + size > phys_size AND base < phys_size
-> > >
-> > > vgic_v3_check_base() is used to check the redist regions bases when
-> > > setting them (with the vcpus added so far) and when attempting the first
-> > > vcpu-run.
-> > >
-> > > Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> > > ---
-> > >  arch/arm64/kvm/vgic/vgic-v3.c | 4 ++++
-> > >  1 file changed, 4 insertions(+)
-> > >
-> > > diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
-> > > index 66004f61cd83..5afd9f6f68f6 100644
-> > > --- a/arch/arm64/kvm/vgic/vgic-v3.c
-> > > +++ b/arch/arm64/kvm/vgic/vgic-v3.c
-> > > @@ -512,6 +512,10 @@ bool vgic_v3_check_base(struct kvm *kvm)
-> > >             if (rdreg->base + vgic_v3_rd_region_size(kvm, rdreg) <
-> > >                     rdreg->base)
-> > >                     return false;
-> >
-> > Can we drop this check in favor of explicitly comparing rdreg->base with
-> > kvm_phys_size()? I believe that would be more readable.
-> >
->
-> You mean the integer overflow check above? in that case, I would prefer
-> to leave it, if you don't mind. It seems that this type of check is used
-> in some other places in KVM (like kvm_assign_ioeventfd and
-> vgic_v3_alloc_redist_region).
+On Mon, Aug 23, 2021, Maxim Levitsky wrote:
+> If the guest is entered prior to restoring the host save area,
+> the guest entry code might see incorrect L1 state (e.g paging state).
+> 
+> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> ---
+>  arch/x86/kvm/svm/svm.c | 23 +++++++++++++----------
+>  1 file changed, 13 insertions(+), 10 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 1a70e11f0487..ea7a4dacd42f 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -4347,27 +4347,30 @@ static int svm_leave_smm(struct kvm_vcpu *vcpu, const char *smstate)
+>  					 gpa_to_gfn(vmcb12_gpa), &map) == -EINVAL)
+>  				return 1;
+>  
+> -			if (svm_allocate_nested(svm))
+> +			if (kvm_vcpu_map(vcpu, gpa_to_gfn(svm->nested.hsave_msr),
+> +					 &map_save) == -EINVAL)
+>  				return 1;
 
-I would expect rdreg->base to exceed kvm_phys_size() before wrapping,
-but we do derive rdreg->count from what userspace gives us. In that
-case, your addition in combination with this makes sense, so no real
-objections here.
+Returning here will neglect to unmap "map".
 
-> > > +
-> > > +           if (rdreg->base + vgic_v3_rd_region_size(kvm, rdreg) >
-> > > +                   kvm_phys_size(kvm))
-> > > +                   return false;
-> > >     }
-> > >
-> > >     if (IS_VGIC_ADDR_UNDEF(d->vgic_dist_base))
-> > > --
-> > > 2.33.0.153.gba50c8fa24-goog
-> > >
-> >
-> > --
-> > Thanks,
-> > Oliver
+>  
+> -			vmcb12 = map.hva;
+> -
+> -			nested_load_control_from_vmcb12(svm, &vmcb12->control);
+> -
+> -			ret = enter_svm_guest_mode(vcpu, vmcb12_gpa, vmcb12);
+> -			kvm_vcpu_unmap(vcpu, &map, true);
+> +			if (svm_allocate_nested(svm))
+> +				return 1;
 
-Reviewed-by: Oliver Upton <oupton@google.com>
+Ditto here for both "map" and "map_save", though it looks like there's a
+pre-existing bug if svm_allocate_nested() fails.  If you add a prep cleanup patch
+to remove the statement nesting (between the bug fix and this patch), it will make
+handling this a lot easier, e.g.
+
+static int svm_leave_smm(struct kvm_vcpu *vcpu, const char *smstate)
+{
+	struct vcpu_svm *svm = to_svm(vcpu);
+	struct kvm_host_map map, map_save;
+	u64 saved_efer, vmcb12_gpa;
+	struct vmcb *vmcb12;
+	int ret;
+
+	if (!guest_cpuid_has(vcpu, X86_FEATURE_LM))
+		return 0;
+
+	/* Non-zero if SMI arrived while vCPU was in guest mode. */
+	if (!GET_SMSTATE(u64, smstate, 0x7ed8))
+		return 0;
+
+	if (!guest_cpuid_has(vcpu, X86_FEATURE_SVM))
+		return 1;
+
+	saved_efer = GET_SMSTATE(u64, smstate, 0x7ed0);
+	if (!(saved_efer & EFER_SVME))
+		return 1;
+
+	vmcb12_gpa = GET_SMSTATE(u64, smstate, 0x7ee0);
+	if (kvm_vcpu_map(vcpu, gpa_to_gfn(vmcb12_gpa), &map) == -EINVAL)
+		return 1;
+
+	ret = 1;
+	if (kvm_vcpu_map(vcpu, gpa_to_gfn(svm->nested.hsave_msr), &map_save) == -EINVAL)
+		goto unmap_map;
+
+	if (svm_allocate_nested(svm))
+		goto unmap_save;
+
+	/*
+	 * Restore L1 host state from L1 HSAVE area as VMCB01 was
+	 * used during SMM (see svm_enter_smm())
+	 */
+
+	svm_copy_vmrun_state(&svm->vmcb01.ptr->save,
+				map_save.hva + 0x400);
+
+	/*
+	 * Restore L2 state
+	 */
+
+	vmcb12 = map.hva;
+	nested_load_control_from_vmcb12(svm, &vmcb12->control);
+	ret = enter_svm_guest_mode(vcpu, vmcb12_gpa, vmcb12);
+
+unmap_save;
+	kvm_vcpu_unmap(vcpu, &map_save, true);
+unmap_map:
+	kvm_vcpu_unmap(vcpu, &map, true);
+	return 1;
+}
