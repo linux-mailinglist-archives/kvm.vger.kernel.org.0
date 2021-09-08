@@ -2,102 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 08DF0403ED7
-	for <lists+kvm@lfdr.de>; Wed,  8 Sep 2021 20:03:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A5163403F2D
+	for <lists+kvm@lfdr.de>; Wed,  8 Sep 2021 20:42:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349554AbhIHSEZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Sep 2021 14:04:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52546 "EHLO
+        id S1350161AbhIHSnh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Sep 2021 14:43:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33210 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349030AbhIHSEO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Sep 2021 14:04:14 -0400
-Received: from mail-io1-xd36.google.com (mail-io1-xd36.google.com [IPv6:2607:f8b0:4864:20::d36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F6D0C061575
-        for <kvm@vger.kernel.org>; Wed,  8 Sep 2021 11:03:06 -0700 (PDT)
-Received: by mail-io1-xd36.google.com with SMTP id m11so4436065ioo.6
-        for <kvm@vger.kernel.org>; Wed, 08 Sep 2021 11:03:06 -0700 (PDT)
+        with ESMTP id S1350029AbhIHSnf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Sep 2021 14:43:35 -0400
+Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21437C061757
+        for <kvm@vger.kernel.org>; Wed,  8 Sep 2021 11:42:27 -0700 (PDT)
+Received: by mail-pl1-x633.google.com with SMTP id n4so1855813plh.9
+        for <kvm@vger.kernel.org>; Wed, 08 Sep 2021 11:42:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:reply-to:from:date:message-id:subject:to
-         :content-transfer-encoding;
-        bh=zg9SIKBAn9y4QkDFQZM1xH/JoxGqKi4pT4YDjZN4Piw=;
-        b=E7+y7F774jijiwan6yhtOG75jkl5Za0vMoQXmiyC3L4yZrGTJUXSsSFVQcK0xhMX6Z
-         NU2ulZIsHPvlmHXauL2XF7TM2u0dd+JB8Oe+g0wgsWehpsblEd5ujCiyTPDvB2+PJOO9
-         Xac5GnsaiuNOtFrxVtbzaCvyHg26KqLEroiP51RXwd0s5np3p7bNOgckz0ZbBc6RpZUk
-         JlCJEzK8Am9Nj35+GlNGCwlfAKNj05A/8462QRwevcXHeE0TEkZOQ7zzpkwTv5xdi8ZD
-         B6MtiXNVuOlEM/E/l4fGxAMXNFR92l+i1O+kLZAQCLUOskVEHELeTArac0mvBeTHnGSU
-         YdSg==
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=ABvGIs5eX2JcG2RKOXdfPuOSsqXlbFksA1bqMpiHrKg=;
+        b=gggg8QY83kYOHmlQFwrqwpTrxRQ37OKExGKYl+YcDgMR4e8uWIDSoRYCkqZwj+ddht
+         zO23SG38AW+h3fnG5RPY72UcoFxK8l9NEIPJIfKiRfR3MlK7YJSeNR3br+isPCUUcmF9
+         NvUUh8Y6VgCFCFuNiWn2L2OtxHjmecXPgNcqWVTwt8vNbTqo9iN7Oyw4uoOEKXVo8wsY
+         C24bb9xHQJ9d2f1psLLQxW8qq/bcwWnjXjrnsqhRPbMeVP2VOjlzShjL5fDK4rprKmIR
+         BlM6H+e3TxMX7aykAeiOxIPcrU5MTW4PB6oJSYCzVAe6mp8245j2H0vElw0rO1pqB+Yf
+         K+IQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to:content-transfer-encoding;
-        bh=zg9SIKBAn9y4QkDFQZM1xH/JoxGqKi4pT4YDjZN4Piw=;
-        b=GW7qEE1yWA1rPN8jWhJwx8Z0Pkw7u7QpWfLEploVQx2QLeiWB6CiauzsNmvzZUC/+y
-         18dvZxF0saW0kVbhY1NrgLzx175kmgMJm4ExhDQL6bjSbHFKZOFHTsUfiobEc/g5fos+
-         ULgXiRXCzjJmUXELa9awgM5T7q/oHemUUssx0+kOdpK4S0sjURRDzKY7pTvwNMj4w7b1
-         B0tGJyvI9fus7gD0fyxthIlI1OWTpjAz8xf6KQRmcnH7ZFcDK5aGqkb+k2PAn2GS5BQc
-         G9wJCOVx07When2Q/y1/F8IAw8FSPJZXzr3HunHeJdRtKzh19J3Ixlly4zjTF/sGMyWl
-         4B9Q==
-X-Gm-Message-State: AOAM533/CVEVDp1vNDQadEvt1WaJY0Pnm+s1ONHyNpO4PrlZtBfOnA5+
-        590Izk0qugoPeTQahH5xSyu/k9nzzhsBNNWY/DY=
-X-Google-Smtp-Source: ABdhPJxvWxS5fpHvbbTwtE5pYnr43kchRmZqyBPqBAdxC32ZUzqVWHRLVfbItNRuu3FFNf59nAYyIojy9Ad5xZm4oVk=
-X-Received: by 2002:a6b:7106:: with SMTP id q6mr994363iog.174.1631124185877;
- Wed, 08 Sep 2021 11:03:05 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=ABvGIs5eX2JcG2RKOXdfPuOSsqXlbFksA1bqMpiHrKg=;
+        b=DgIuwpgk+1WKYTTq2Sp0GSV82VgagpdLj+Z1BXL2wf5Ey5c21ak83hcR04SbivG6kk
+         yx/KOQ5/vhKbfwyJMpNYwvG4ElEC6Qqs2g5Hc6I7DBHWmlooEcGxqdYb8eUpVL/m4GHH
+         qfoHgzzkjdbbo4eLNivNUtGdWtbU7fo42a2XXaE3Ial2A6lok0KKmrIHDj3lToO6mnyr
+         ikUN4hgpBkLXgVLqu60/ImkhMDrjT+uXzvQwi5TffLl8Vg4YA5rMZRZCVYo2mD9O5U6C
+         P0G9HmMl97i6mTnVp8d6XGrS/e6eoTXWo79ezMSwstAupmPh2P3qyQK4yRjwUUbGRtkM
+         rV/g==
+X-Gm-Message-State: AOAM532FduPS1bcE6Pk4t2oS+oM25PiwzyCqZ0u6Y8Stkpopj/80aipo
+        g/OWSGekNGL0h5DBbrhyNIokNg==
+X-Google-Smtp-Source: ABdhPJy4e/vI56FcplVnGf0mW1f0p2XiKwuKf2Umtrz+2M+vgo8laMp7d1jaXTbTS/HdfYOrprWQZw==
+X-Received: by 2002:a17:90b:1102:: with SMTP id gi2mr5638781pjb.43.1631126546438;
+        Wed, 08 Sep 2021 11:42:26 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id j4sm2924229pjc.46.2021.09.08.11.42.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Sep 2021 11:42:25 -0700 (PDT)
+Date:   Wed, 8 Sep 2021 18:42:22 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     Jiang Jiasheng <jiasheng@iscas.ac.cn>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-sgx@vger.kernel.org,
+        pbonzini@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, x86@kernel.org, hpa@zytor.com, jarkko@kernel.org,
+        dave.hansen@linux.intel.com
+Subject: Re: [PATCH 4/4] KVM: X86: Potential 'index out of range' bug
+Message-ID: <YTkEDoe8R5JJ77+B@google.com>
+References: <1630655700-798374-1-git-send-email-jiasheng@iscas.ac.cn>
+ <87czppnasv.fsf@vitty.brq.redhat.com>
+ <YTI5SYVTJHiMdm+W@google.com>
+ <87tuiy3qtc.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Received: by 2002:a5e:a60f:0:0:0:0:0 with HTTP; Wed, 8 Sep 2021 11:03:05 -0700 (PDT)
-Reply-To: robertandersonhappy1@gmail.com
-From:   robert <andersonrobertpass11@gmail.com>
-Date:   Wed, 8 Sep 2021 11:03:05 -0700
-Message-ID: <CAOga3cejo35bnm1qzkRgxwx57naOT-HDYFnc1UNGabOODN3nKg@mail.gmail.com>
-Subject: 
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87tuiy3qtc.fsf@vitty.brq.redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-0JLQvdC40LzQsNC90LjQtSwg0L/QvtC20LDQu9GD0LnRgdGC0LAsDQoNCtCvINCR0LDRgC4gdWNo
-ZW5uYSBpbG9iaSwg0LrQsNC6INC00LXQu9CwLCDQvdCw0LTQtdGO0YHRjCDRgyDRgtC10LHRjyDQ
-stGB0LUg0YXQvtGA0L7RiNC+INC4INC30LTQvtGA0L7QstCwPw0K0KHQvtC+0LHRidCw0LXQvCDQ
-stCw0LwsINGH0YLQviDRjyDRg9GB0L/QtdGI0L3QviDQt9Cw0LLQtdGA0YjQuNC7INGC0YDQsNC9
-0LfQsNC60YbQuNGOINGBINC/0L7QvNC+0YnRjNGOINC90L7QstC+0LPQvg0K0L/QsNGA0YLQvdC1
-0YDQsCDQuNC3INCS0LXQvdC10YHRg9GN0LvRiywg0Lgg0YLQtdC/0LXRgNGMINGB0YDQtdC00YHR
-gtCy0LAg0LHRi9C70Lgg0L/QtdGA0LXQstC10LTQtdC90Ysg0LIg0JLQtdC90LXRgdGD0Y3Qu9GD
-DQrQvdCwINCx0LDQvdC60L7QstGB0LrQuNC5INGB0YfQtdGCINC90L7QstC+0LPQviDQv9Cw0YDR
-gtC90LXRgNCwLg0KDQrQotC10Lwg0LLRgNC10LzQtdC90LXQvCDRjyDRgNC10YjQuNC7INC60L7Q
-vNC/0LXQvdGB0LjRgNC+0LLQsNGC0Ywg0LLQsNC8INGB0YPQvNC80YMg0LIgMzUwIDAwMCDQtNC+
-0LvQu9Cw0YDQvtCyINCh0KjQkA0KKNGC0YDQuCDRgdC+0YLQvdC4INC/0Y/RgtGM0LTQtdGB0Y/R
-giDRgtGL0YHRj9GHINC00L7Qu9C70LDRgNC+0LIg0KHQqNCQKSDQuNC3LdC30LAg0LLQsNGI0LjR
-hSDQv9GA0L7RiNC70YvRhSDRg9GB0LjQu9C40LksDQrRhdC+0YLRjyDQstGLINC80LXQvdGPINGA
-0LDQt9C+0YfQsNGA0L7QstCw0LvQuC4g0J3Qviwg0YLQtdC8INC90LUg0LzQtdC90LXQtSwg0Y8g
-0L7Rh9C10L3RjCDRgNCw0LQg0YPRgdC/0LXRiNC90L7QvNGDDQrQt9Cw0LLQtdGA0YjQtdC90LjR
-jiDRgtGA0LDQvdC30LDQutGG0LjQuCDQsdC10Lcg0LrQsNC60LjRhS3Qu9C40LHQviDQv9GA0L7Q
-sdC70LXQvCwg0Lgg0L/QvtGN0YLQvtC80YMg0Y8g0YDQtdGI0LjQuw0K0LrQvtC80L/QtdC90YHQ
-uNGA0L7QstCw0YLRjCDQstCw0Lwg0YHRg9C80LzRgyDQsiDRgNCw0LfQvNC10YDQtSAzNTAgMDAw
-LDAwINC00L7Qu9C70LDRgNC+0LIg0KHQqNCQLCDRh9GC0L7QsdGLINCy0YsNCtGA0LDQt9C00LXQ
-u9C40LvQuCDRgdC+INC80L3QvtC5INGA0LDQtNC+0YHRgtGMLg0KDQrQryDRgdC+0LLQtdGC0YPR
-jiDQstCw0Lwg0L7QsdGA0LDRgtC40YLRjNGB0Y8g0Log0LzQvtC10LzRgyDRgdC10LrRgNC10YLQ
-sNGA0Y4g0LfQsCDQsdCw0L3QutC+0LzQsNGC0L3QvtC5INC60LDRgNGC0L7QuSDQvdCwDQozNTAg
-MDAwINC00L7Qu9C70LDRgNC+0LIg0KHQqNCQLCDQutC+0YLQvtGA0YPRjiDRjyDQvtGB0YLQsNCy
-0LjQuyDQtNC70Y8g0LLQsNGBLiDQodCy0Y/QttC40YLQtdGB0Ywg0YEg0L3QuNC8DQrRgdC10LnR
-h9Cw0YEg0LHQtdC3INC/0YDQvtC80LXQtNC70LXQvdC40Y8uDQoNCtCd0LDQt9Cy0LDQvdC40LU6
-INCx0YDQtdC90LTQuCDRgdC+0LvQvtC80L7QvQ0KDQrQn9C+0YfRgtCwOiBzb2xvbW9uYnJhbmR5
-Zml2ZW9uZUBnbWFpbC5jb20NCg0K0KPQsdC10LTQuNGC0LXQu9GM0L3QviDQv9C+0LTRgtCy0LXR
-gNC00LjRgtC1INC10LzRgyDRgdC70LXQtNGD0Y7RidGD0Y4g0LjQvdGE0L7RgNC80LDRhtC40Y46
-DQoNCtCS0LDRiNC1INC/0L7Qu9C90L7QtSDQuNC80Y9fX19fX19fX19fX19fX19fX19fX19fX19f
-DQrQktCw0Ygg0LDQtNGA0LXRgdGBX19fX19fX19fX19fX19fX19fX19fX19fX18NCtCi0LLQvtGP
-INGB0YLRgNCw0L3QsF9fX19fX19fX19fX19fX19fX19fX19fX19fXw0K0KLQstC+0Lkg0LLQvtC3
-0YDQsNGB0YJfX19fX19fX19fX19fX19fX19fX19fX19fX19fX18NCtCS0LDRiCDRgNC+0LQg0LfQ
-sNC90Y/RgtC40LlfX19fX19fX19fX19fX19fX19fX19fX18NCtCS0LDRiCDQvdC+0LzQtdGAINC8
-0L7QsdC40LvRjNC90L7Qs9C+INGC0LXQu9C10YTQvtC90LAgX19fX19fX19fX19fX19fX19fX19f
-Xw0KDQrQntCx0YDQsNGC0LjRgtC1INCy0L3QuNC80LDQvdC40LU6INC10YHQu9C4INCy0Ysg0L3Q
-tSDQvtGC0L/RgNCw0LLQuNC70Lgg0LXQvNGDINC/0L7Qu9C90YPRjiDQuNC90YTQvtGA0LzQsNGG
-0LjRjiwg0L7QvSDQvdC1DQrQstGL0LTQsNGB0YIg0LLQsNC8INC60LDRgNGC0YMg0LHQsNC90LrQ
-vtC80LDRgtCwLCDQv9C+0YLQvtC80YMg0YfRgtC+INC+0L0g0LTQvtC70LbQtdC9INCx0YvRgtGM
-INGD0LLQtdGA0LXQvSwg0YfRgtC+INGN0YLQvg0K0LLRiy4g0J/QvtC/0YDQvtGB0LjRgtC1INC1
-0LPQviDQstGL0YHQu9Cw0YLRjCDQstCw0Lwg0LrQsNGA0YLRgyDQsdCw0L3QutC+0LzQsNGC0LAg
-0L3QsCDQvtCx0YnRg9GOINGB0YPQvNC80YMgKDM1MCAwMDANCtC00L7Qu9C70LDRgNC+0LIg0KHQ
-qNCQKSwg0LrQvtGC0L7RgNGD0Y4g0Y8g0L7RgdGC0LDQstC40Lsg0LTQu9GPINCy0LDRgS4NCg0K
-0KEg0L3QsNC40LvRg9GH0YjQuNC80Lgg0L/QvtC20LXQu9Cw0L3QuNGP0LzQuCwNCg0K0JMt0L0g
-0YPRh9C10L3QvdCwINC40LvQvtCx0LgNCg==
+On Mon, Sep 06, 2021, Vitaly Kuznetsov wrote:
+> Sean Christopherson <seanjc@google.com> writes:
+> 
+> > On Fri, Sep 03, 2021, Vitaly Kuznetsov wrote:
+> >> Jiang Jiasheng <jiasheng@iscas.ac.cn> writes:
+> >> 
+> >> > The kvm_get_vcpu() will call for the array_index_nospec()
+> >> > with the value of atomic_read(&(v->kvm)->online_vcpus) as size,
+> >> > and the value of constant '0' as index.
+> >> > If the size is also '0', it will be unreasonabe
+> >> > that the index is no less than the size.
+> >> >
+> >> 
+> >> Can this really happen?
+> >> 
+> >> 'online_vcpus' is never decreased, it is increased with every
+> >> kvm_vm_ioctl_create_vcpu() call when a new vCPU is created and is set to
+> >> 0 when all vCPUs are destroyed (kvm_free_vcpus()).
+> >> 
+> >> kvm_guest_time_update() takes a vcpu as a parameter, this means that at
+> >> least 1 vCPU is currently present so 'online_vcpus' just can't be zero.
+> >
+> > Agreed, but doing kvm_get_vcpu() is ugly and overkill.
+> >
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index 86539c1686fa..cc1cb9a401cd 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -2969,7 +2969,7 @@ static int kvm_guest_time_update(struct kvm_vcpu *v)
+> >                                        offsetof(struct compat_vcpu_info, time));
+> >         if (vcpu->xen.vcpu_time_info_set)
+> >                 kvm_setup_pvclock_page(v, &vcpu->xen.vcpu_time_info_cache, 0);
+> > -       if (v == kvm_get_vcpu(v->kvm, 0))
+> > +       if (!kvm_vcpu_get_idx(v))
+> 
+> Do we really need to keep kvm_vcpu_get_idx() around though? It has only
+> 3 users, all in arch/x86/kvm/hyperv.[ch], and the inline simpy returns
+> 'vcpu->vcpu_idx'.
+
+Nope, looks like it's a holdover from before the introduction of vcpu_idx.  I'll
+send a small series to jettison the wrapper and make the above change.
+
+Thanks!
