@@ -2,114 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 21E4E40408C
-	for <lists+kvm@lfdr.de>; Wed,  8 Sep 2021 23:32:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4E23540409C
+	for <lists+kvm@lfdr.de>; Wed,  8 Sep 2021 23:42:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234878AbhIHVdT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Sep 2021 17:33:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43090 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233709AbhIHVdS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Sep 2021 17:33:18 -0400
-Received: from mail-il1-x131.google.com (mail-il1-x131.google.com [IPv6:2607:f8b0:4864:20::131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60F1FC061575
-        for <kvm@vger.kernel.org>; Wed,  8 Sep 2021 14:32:10 -0700 (PDT)
-Received: by mail-il1-x131.google.com with SMTP id s16so3852677ilo.9
-        for <kvm@vger.kernel.org>; Wed, 08 Sep 2021 14:32:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=uZbNrjLOwzJp4fFJM+cNQcKd8IqlQMB7ACTwfLqh720=;
-        b=Ett/Xnj4B+RYOCHKQFGaJnIjhhXun6RIb3DCCgH1bOAdsvr1XprrI60dfFjcYLkjIp
-         WDuayRb97yZhJ+qlb+s6kOSERJhp22DoEXbQrsXurJxcraxBKnTRu5o0SLLnlnoMoThC
-         CNFW39GKXId+Xaa4y5B3i6sFIHm1vYXe00gc4VLRu3d7ixbnmZef4+VkRytJFizRYF3g
-         r7dRh/qjXx3YrF0WrOYKOG8ipIrYjmOdkK9Lx3/4XJmw9g657fmFuWik1+invwtWyxFJ
-         4nXC5Uq6b96hPvLEq5sl7I1C7Way6nZrGMbhwOv3v1FKKcXTaqxybkkw4Qk/07oFwv50
-         vPhw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=uZbNrjLOwzJp4fFJM+cNQcKd8IqlQMB7ACTwfLqh720=;
-        b=ERwDFCeG5HkzBBymRgRLQuQtxkG7hKQ3CJFLx7dyNjfE32AF7cHObCbojI+CpiRFSh
-         +XaqKaVGlnsVF84gHpC9Sah5taZkj6SJi9f6mvIwXi4DiqywGhw5gG4dbGduSD1jXOrp
-         R3GiH0gH/1BbbTQ0pQZ1C4O5Wq8yDyPQfqy54EhBSUw3wHLKQFzW1p+gazqiztM3KZ3N
-         Vs+p3zcJsPdQ8/Oq+cDAV4e164dfjQND5PquD345S5w36TJ2aB5Ph1xlWaIqZEriIqBE
-         bAPtUbXAHY921ga2jMZ8D8C5NtUcrxGuV+sLtoJMFycS6rNKR7lTVFq/8qLzVbwIop7Z
-         vdnQ==
-X-Gm-Message-State: AOAM533J8w9eaBBR8EiPDrTwBiG1sdiEcauZPBeks5378pwCH/F6LTsg
-        R6Zcm1p1XT24+9GGydBww4GTGkyhlqO3yhNA
-X-Google-Smtp-Source: ABdhPJwciF/VAdAEbUH3mpVJJwTsflA3hfhOWENiEDiyry80B9MoAQJ2HWB2Fc1zl0RfhUmXiBz2sg==
-X-Received: by 2002:a05:6e02:2145:: with SMTP id d5mr257650ilv.214.1631136729375;
-        Wed, 08 Sep 2021 14:32:09 -0700 (PDT)
-Received: from google.com (194.225.68.34.bc.googleusercontent.com. [34.68.225.194])
-        by smtp.gmail.com with ESMTPSA id b76sm184005iof.17.2021.09.08.14.32.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Sep 2021 14:32:08 -0700 (PDT)
-Date:   Wed, 8 Sep 2021 21:32:05 +0000
-From:   Oliver Upton <oupton@google.com>
-To:     Ricardo Koller <ricarkol@google.com>
-Cc:     kvm@vger.kernel.org, maz@kernel.org, kvmarm@lists.cs.columbia.edu,
-        drjones@redhat.com, eric.auger@redhat.com,
-        alexandru.elisei@arm.com, Paolo Bonzini <pbonzini@redhat.com>,
-        james.morse@arm.com, suzuki.poulose@arm.com, shuah@kernel.org,
-        jingzhangos@google.com, pshier@google.com, rananta@google.com,
-        reijiw@google.com
-Subject: Re: [PATCH 1/2] KVM: arm64: vgic: check redist region is not above
- the VM IPA size
-Message-ID: <YTkr1c7S0wPRv6hH@google.com>
-References: <20210908210320.1182303-1-ricarkol@google.com>
- <20210908210320.1182303-2-ricarkol@google.com>
+        id S235105AbhIHVnh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Sep 2021 17:43:37 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32159 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234808AbhIHVng (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 8 Sep 2021 17:43:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1631137347;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=rAVZAu3hpXwiNvy/AA87U7fY8TlEUUMh0/TY5+LCdNo=;
+        b=TZ9pPsRxzhEPFv9LCkB007HFaHrlpMiA+QNlqUsgcoBb4PMGOt9mperb1rf4wccvo+r6uE
+        cfBoWsxgahX8vOkxdjQPO7he/Msik3mom+4cfFeJnmw1TquI3UkpT9kStoRJ8qpi4rrP1f
+        oBcpZMFsxhBIhMneAQbUWpjaxBrdYOE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-533-35Qalk8nP7iUZpSm9wT7rg-1; Wed, 08 Sep 2021 17:42:26 -0400
+X-MC-Unique: 35Qalk8nP7iUZpSm9wT7rg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6FBCD835DE1
+        for <kvm@vger.kernel.org>; Wed,  8 Sep 2021 21:42:25 +0000 (UTC)
+Received: from wainer-laptop.localdomain.com (ovpn-116-108.gru2.redhat.com [10.97.116.108])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id EB82619C79;
+        Wed,  8 Sep 2021 21:42:22 +0000 (UTC)
+From:   Wainer dos Santos Moschetta <wainersm@redhat.com>
+To:     pbonzini@redhat.com, kvm@vger.kernel.org
+Subject: [PATCH] KVM: Documentation: Fix missing backtick
+Date:   Wed,  8 Sep 2021 18:42:17 -0300
+Message-Id: <20210908214217.1423119-1-wainersm@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210908210320.1182303-2-ricarkol@google.com>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Ricardo,
+Added the missing backtick around ENOTTY in amd-memory-encryption.rst.
 
-On Wed, Sep 08, 2021 at 02:03:19PM -0700, Ricardo Koller wrote:
-> Extend vgic_v3_check_base() to verify that the redistributor regions
-> don't go above the VM-specified IPA size (phys_size). This can happen
-> when using the legacy KVM_VGIC_V3_ADDR_TYPE_REDIST attribute with:
-> 
->   base + size > phys_size AND base < phys_size
-> 
-> vgic_v3_check_base() is used to check the redist regions bases when
-> setting them (with the vcpus added so far) and when attempting the first
-> vcpu-run.
-> 
-> Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> ---
->  arch/arm64/kvm/vgic/vgic-v3.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
-> index 66004f61cd83..5afd9f6f68f6 100644
-> --- a/arch/arm64/kvm/vgic/vgic-v3.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v3.c
-> @@ -512,6 +512,10 @@ bool vgic_v3_check_base(struct kvm *kvm)
->  		if (rdreg->base + vgic_v3_rd_region_size(kvm, rdreg) <
->  			rdreg->base)
->  			return false;
+Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+---
+ Documentation/virt/kvm/amd-memory-encryption.rst | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Can we drop this check in favor of explicitly comparing rdreg->base with
-kvm_phys_size()? I believe that would be more readable.
+diff --git a/Documentation/virt/kvm/amd-memory-encryption.rst b/Documentation/virt/kvm/amd-memory-encryption.rst
+index 5c081c8c7164..1d1810731f95 100644
+--- a/Documentation/virt/kvm/amd-memory-encryption.rst
++++ b/Documentation/virt/kvm/amd-memory-encryption.rst
+@@ -55,7 +55,7 @@ information, see the SEV Key Management spec [api-spec]_
+ 
+ The main ioctl to access SEV is KVM_MEMORY_ENCRYPT_OP.  If the argument
+ to KVM_MEMORY_ENCRYPT_OP is NULL, the ioctl returns 0 if SEV is enabled
+-and ``ENOTTY` if it is disabled (on some older versions of Linux,
++and ``ENOTTY`` if it is disabled (on some older versions of Linux,
+ the ioctl runs normally even with a NULL argument, and therefore will
+ likely return ``EFAULT``).  If non-NULL, the argument to KVM_MEMORY_ENCRYPT_OP
+ must be a struct kvm_sev_cmd::
+-- 
+2.31.1
 
-> +
-> +		if (rdreg->base + vgic_v3_rd_region_size(kvm, rdreg) >
-> +			kvm_phys_size(kvm))
-> +			return false;
->  	}
->  
->  	if (IS_VGIC_ADDR_UNDEF(d->vgic_dist_base))
-> -- 
-> 2.33.0.153.gba50c8fa24-goog
-> 
-
---
-Thanks,
-Oliver
