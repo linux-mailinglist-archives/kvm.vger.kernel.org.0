@@ -2,118 +2,197 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 55DC0403D4C
-	for <lists+kvm@lfdr.de>; Wed,  8 Sep 2021 18:07:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5265E403D56
+	for <lists+kvm@lfdr.de>; Wed,  8 Sep 2021 18:07:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346386AbhIHQIc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Sep 2021 12:08:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54346 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344503AbhIHQI3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Sep 2021 12:08:29 -0400
-Received: from mail-yb1-xb30.google.com (mail-yb1-xb30.google.com [IPv6:2607:f8b0:4864:20::b30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6686CC061575
-        for <kvm@vger.kernel.org>; Wed,  8 Sep 2021 09:07:21 -0700 (PDT)
-Received: by mail-yb1-xb30.google.com with SMTP id c6so5266365ybm.10
-        for <kvm@vger.kernel.org>; Wed, 08 Sep 2021 09:07:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=OlLwloMM1UNziGhSZ73I5whfEToHkI4ZvWhuIcM5G8s=;
-        b=j5bGc2IirxaeHkq6J05nylDjOjhI8/WNnNCH218C+ljUcd3BGM6/pCCcKr7PlgQ9rX
-         mqW/bc2JL6DSp2FiVstvuKUqj+sxSdPA6D3jxap2gRz/Av8srgQrIVRHdc/QBVyOAMzT
-         gnjJFbXHDV1N79Vn4zAP+N9TEfUfDMpKdghWSrb3hKHoDqu8urjueLFJAX/2B0xLei0H
-         kKvHUpnCdwec4gbQbL2VsN9H/6tmlUj7M6kQfhy4Cf2xb7nJqKGB0kLL59QoxiBmxHTO
-         OsVNa+PcYwqBB1wJS9AUKqqv4GEtDXYhPdINQVZ6iU3jI863GfKQsA/GQcKcEoCtxCwm
-         AcSg==
+        id S1347220AbhIHQI6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Sep 2021 12:08:58 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:33876 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1346618AbhIHQI5 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 8 Sep 2021 12:08:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1631117268;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=bgAixjfqxK+KySv0KLIPFQXXlPfwGRV/dBCLSa1qrTs=;
+        b=aUw0wiLpDa+JObqaDmcQp0On/HCXQwVbL0k6oHuq2QmocCj8vkp8PyiqSLAUVe23XIOTiV
+        qDeaFa8HOG3C6PS1+VjJc1fncajvRi9cNW5/bPpHy754PZ44RdoNiB+4EGOmShsGfIlNMf
+        8tE+s70nkui5YvL6OZ/ZFi839o55Ygo=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-222-zjp__QDON-SXdZwjRSHmDw-1; Wed, 08 Sep 2021 12:07:47 -0400
+X-MC-Unique: zjp__QDON-SXdZwjRSHmDw-1
+Received: by mail-ej1-f69.google.com with SMTP id bi9-20020a170906a24900b005c74b30ff24so1248259ejb.5
+        for <kvm@vger.kernel.org>; Wed, 08 Sep 2021 09:07:46 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=OlLwloMM1UNziGhSZ73I5whfEToHkI4ZvWhuIcM5G8s=;
-        b=XL9T3J6+H8bohGBEGSeo5frgiPPvBm3enGp+2gmG3Qq4s1TuaP1+h89MTFS4cSE8XQ
-         qG84B44PSZoWvLv+ZfmkwRLU6HOu/cF7B2VUNMIF3o8rDfz5TzZM03q7dyCSdi4ML/9v
-         azLbc/bEY4kQRQCvsRW+Y6XaWZBM9BXGSdLyAp65vUx8lblw3QAtD4rkXHix9xYCXu6F
-         o2W+jA84t0G+mAymXMIvXNW9azWhlfmbfU1WpM/F6OE/edk8V1Ip7gXE7vZNnMRFzRPL
-         gbx6mkHM0Ort8LgSv6wsgwziI5GTFbiMFaQJ3y25JL7ufeXle5wfLHY5yCbFkIieL0UG
-         udvg==
-X-Gm-Message-State: AOAM532PxFcP7VoFt+lL6Y8w6RjYhP0iAyel3c1LE12A8WJ2WHPa9Ki4
-        7iC+nSHcMYiIHI9Tf3Yg6rsIDMz7n4BWZp/QEVePlw==
-X-Google-Smtp-Source: ABdhPJw4+DDt30fQHD5oYPdoChAnKFa73Ue9B3s9aptNmiCY1/fZWxEuLXm7T7yt4bdUe3JR8cBNfjANw4oHXZpOlhA=
-X-Received: by 2002:a25:abeb:: with SMTP id v98mr4667226ybi.30.1631117240489;
- Wed, 08 Sep 2021 09:07:20 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=bgAixjfqxK+KySv0KLIPFQXXlPfwGRV/dBCLSa1qrTs=;
+        b=pwmGDosy26MKVcLk+qr7YOo33Pn3PU+pMA889ISdeqGi02io9oEXOsJWsmCQT/TWVP
+         aGIbgGWjC2PrXr8o8lKIkYN4qwmJeZjxehsaEuYfVXakWbFApK9s+sAWWrFKE913hUdm
+         o6iRvNL8CnR8ZY73Y2TpsCf7cRB7Gfh5Dyvwa8BKnhktHgiSMr+CWqum9Z4QksEvo+lv
+         GgqJa1sKmHAfWdp+4CVIB9QcVbInDaaItrdjdXkpzosKY3LpJMfq2zI5pSbEr8KsW7lC
+         JOgOOXTyl1ClTZiTIl8ayHffvkqpx2rL9hFkPNjs3fJ1eGdxRQ+o0nkYJY/jePRdvJSG
+         iLiQ==
+X-Gm-Message-State: AOAM533waBQSnKLjYBkiIkuMjVMM4MGWYCCG2Nx+CnMu1eJhXvvdoK36
+        a/vHZHKUIHRcy06YKjGBt0U7dx8xfwj/BJbyEnRnEsHI+rjKuzhbw0zz71+d5qxmr2mVV7kap+X
+        NCi84t7rDqe/B
+X-Received: by 2002:aa7:c04e:: with SMTP id k14mr4597891edo.101.1631117265773;
+        Wed, 08 Sep 2021 09:07:45 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJx/Z+CwRUwOjBWCCIIw4LzHo1BJr62ATb5mUiTSp/JNWar8qE3J6IMmTqOXtmUN6Dl6kWTUDw==
+X-Received: by 2002:aa7:c04e:: with SMTP id k14mr4597875edo.101.1631117265580;
+        Wed, 08 Sep 2021 09:07:45 -0700 (PDT)
+Received: from gator (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
+        by smtp.gmail.com with ESMTPSA id l8sm1080254ejn.103.2021.09.08.09.07.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Sep 2021 09:07:45 -0700 (PDT)
+Date:   Wed, 8 Sep 2021 18:07:43 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     thuth@redhat.com, pbonzini@redhat.com, lvivier@redhat.com,
+        kvm-ppc@vger.kernel.org, david@redhat.com, frankja@linux.ibm.com,
+        cohuck@redhat.com, imbrenda@linux.ibm.com,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, andre.przywara@arm.com,
+        maz@kernel.org, vivek.gautam@arm.com
+Subject: Re: [kvm-unit-tests RFC PATCH 4/5] scripts: Generate kvmtool
+ standalone tests
+Message-ID: <20210908160743.l4hrl4de7wkxwuda@gator>
+References: <20210702163122.96110-1-alexandru.elisei@arm.com>
+ <20210702163122.96110-5-alexandru.elisei@arm.com>
+ <20210907102135.i2w3r7j4zyj736b5@gator>
+ <ee11a10a-c3e6-b9ce-81e1-147025a9b5bd@arm.com>
 MIME-Version: 1.0
-References: <20210830044425.2686755-1-mizhang@google.com> <20210830044425.2686755-3-mizhang@google.com>
- <CANgfPd_46=V24r5Qu8cDuOCwVRSEF9RFHuD-1sPpKrBCjWOA2w@mail.gmail.com>
- <YS5fxJtX/nYb43ir@google.com> <CAL715WJUmRJmt=u4Gi3ydTpbTGy2M5Wi=CbF9Qs8GNRK8g5FAA@mail.gmail.com>
-In-Reply-To: <CAL715WJUmRJmt=u4Gi3ydTpbTGy2M5Wi=CbF9Qs8GNRK8g5FAA@mail.gmail.com>
-From:   Mingwei Zhang <mizhang@google.com>
-Date:   Wed, 8 Sep 2021 09:07:09 -0700
-Message-ID: <CAL715WJYqusqiztS=fYE46jXmHUi9uni_kswt=ALyUx_hxKBFg@mail.gmail.com>
-Subject: Re: [PATCH v3 2/2] selftests: KVM: use dirty logging to check if page
- stats work correctly
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Ben Gardon <bgardon@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        David Matlack <dmatlack@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Peter Xu <peterx@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ee11a10a-c3e6-b9ce-81e1-147025a9b5bd@arm.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 6, 2021 at 1:05 PM Mingwei Zhang <mizhang@google.com> wrote:
->
-> On Tue, Aug 31, 2021 at 9:58 AM Sean Christopherson <seanjc@google.com> wrote:
+On Wed, Sep 08, 2021 at 04:37:39PM +0100, Alexandru Elisei wrote:
+> Hi Drew,
+> 
+> On 9/7/21 11:21 AM, Andrew Jones wrote:
+> > On Fri, Jul 02, 2021 at 05:31:21PM +0100, Alexandru Elisei wrote:
+> >> Add support for the standalone target when running kvm-unit-tests under
+> >> kvmtool.
+> >>
+> >> Example command line invocation:
+> >>
+> >> $ ./configure --target=kvmtool
+> >> $ make clean && make standalone
+> >>
+> >> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> >> ---
+> >>  scripts/mkstandalone.sh | 14 +++++++-------
+> >>  1 file changed, 7 insertions(+), 7 deletions(-)
+> >>
+> >> diff --git a/scripts/mkstandalone.sh b/scripts/mkstandalone.sh
+> >> index 16f461c06842..d84bdb7e278c 100755
+> >> --- a/scripts/mkstandalone.sh
+> >> +++ b/scripts/mkstandalone.sh
+> >> @@ -44,6 +44,10 @@ generate_test ()
+> >>  	config_export ARCH_NAME
+> >>  	config_export PROCESSOR
+> >>  
+> >> +	if [ "$ARCH" = "arm64" ] || [ "$ARCH" = "arm" ]; then
+> >> +		config_export TARGET
+> >> +	fi
+> > Should export unconditionally, since we'll want TARGET set
+> > unconditionally.
+> 
+> Yes, will do.
+> 
 > >
-> > On Mon, Aug 30, 2021, Ben Gardon wrote:
-> > > On Sun, Aug 29, 2021 at 9:44 PM Mingwei Zhang <mizhang@google.com> wrote:
-> > > > diff --git a/tools/testing/selftests/kvm/lib/test_util.c b/tools/testing/selftests/kvm/lib/test_util.c
-> > > > index af1031fed97f..07eb6b5c125e 100644
-> > > > --- a/tools/testing/selftests/kvm/lib/test_util.c
-> > > > +++ b/tools/testing/selftests/kvm/lib/test_util.c
-> > > > @@ -15,6 +15,13 @@
-> > > >  #include "linux/kernel.h"
-> > > >
-> > > >  #include "test_util.h"
-> > > > +#include "processor.h"
-> > > > +
-> > > > +static const char * const pagestat_filepaths[] = {
-> > > > +       "/sys/kernel/debug/kvm/pages_4k",
-> > > > +       "/sys/kernel/debug/kvm/pages_2m",
-> > > > +       "/sys/kernel/debug/kvm/pages_1g",
-> > > > +};
-> > >
-> > > I think these should only be defined for x86_64 too. Is this the right
-> > > file for these definitions or is there an arch specific file they
-> > > should go in?
+> >> +
+> >>  	echo "echo BUILD_HEAD=$(cat build-head)"
+> >>  
+> >>  	if [ ! -f $kernel ]; then
+> >> @@ -59,7 +63,7 @@ generate_test ()
+> >>  		echo 'export FIRMWARE'
+> >>  	fi
+> >>  
+> >> -	if [ "$ENVIRON_DEFAULT" = "yes" ] && [ "$ERRATATXT" ]; then
+> >> +	if [ "$TARGET" != "kvmtool" ] && [ "$ENVIRON_DEFAULT" = "yes" ] && [ "$ERRATATXT" ]; then
+> > I think it would be better to ensure that ENVIRON_DEFAULT is "no" for
+> > TARGET=kvmtool in configure.
+> 
+> From looking at the code, it is my understanding that with ENVIRON_DEFAULT=yes, an
+> initrd file is generated with the contents of erratatxt and other information, in
+> a key=value pair format. This initrd is then passed on to the test (please correct
+> me if I'm wrong). With ENVIRON_DEFAULT=no (set via ./configure
+> --disable-default-environ), this initrd is not generated.
+> 
+> kvmtool doesn't have support for passing an initrd when loading firmware, so yes,
+> I believe the default should be no.
+> 
+> However, I have two questions:
+> 
+> 1. What happens when the user specifically enables the default environ via
+> ./configure --enable-default-environ --target=kvmtool? In my opinion, that should
+> be an error because the user wants something that is not possible with kvmtool
+> (loading an image with --firmware in kvmtool means that the initrd image it not
+> loaded into the guest memory and no node is generated for it in the dtb), but I
+> would like to hear your thoughts about it.
+
+As part of the forcing ENVIRON_DEFAULT to "no" for kvmtool in configure an
+error should be generated if a user tries to explicitly enable it.
+
+> 
+> 2. If the default environment is disabled, is it still possible for an user to
+> pass an initrd via other means? I couldn't find where that is implemented, so I'm
+> guessing it's not possible.
+
+Yes, a user could have a KVM_UNIT_TESTS_ENV environment variable set when
+they launch the tests. If that variable points to a file then it will get
+passed as an initrd. I guess you should also report a warning in arm/run
+if KVM_UNIT_TESTS_ENV is set which states that the environment file will
+be ignored when running with kvmtool.
+
+There aren't currently any other ways to invoke the addition of the
+-initrd command line option, because so far we only support passing a
+single file to test (the environment "file"). If we ever want to pass
+more files, then we'd need to create a simple file system on the initrd
+and make it possible to add -initrd even when no environment is desired.
+But, that may never happen.
+
+Thanks,
+drew
+
+> 
+> Thanks,
+> 
+> Alex
+> 
 > >
-> > The stats also need to be pulled from the selftest's VM, not from the overall KVM
-> > stats, otherwise the test will fail if there are any other active VMs on the host,
-> > e.g. I like to run to selftests and kvm-unit-tests in parallel.
->
-> That is correct. But since this selftest is not the 'default' selftest
-> that people normally run, can we make an assumption on running these
-> tests at this moment? I am planning to submit this test and improve it
-> in the next series by using Jing's fd based KVM stats interface to
-> eliminate the assumption of the existence of a single running VM.
-> Right now, this interface still needs some work, so I am taking a
-> shortcut that directly uses the whole-system metricfs based interface.
->
-> But I can choose to do that and submit the fd-based API together with
-> this series. What do you suggest?
+> >
+> >>  		temp_file ERRATATXT "$ERRATATXT"
+> >>  		echo 'export ERRATATXT'
+> >>  	fi
+> >> @@ -95,12 +99,8 @@ function mkstandalone()
+> >>  	echo Written $standalone.
+> >>  }
+> >>  
+> >> -if [ "$TARGET" = "kvmtool" ]; then
+> >> -	echo "Standalone tests not supported with kvmtool"
+> >> -	exit 2
+> >> -fi
+> >> -
+> >> -if [ "$ENVIRON_DEFAULT" = "yes" ] && [ "$ERRATATXT" ] && [ ! -f "$ERRATATXT" ]; then
+> >> +if [ "$TARGET" != "kvmtool" ] && [ "$ENVIRON_DEFAULT" = "yes" ] && \
+> >> +		[ "$ERRATATXT" ] && [ ! -f "$ERRATATXT" ]; then
+> >>  	echo "$ERRATATXT not found. (ERRATATXT=$ERRATATXT)" >&2
+> >>  	exit 2
+> >>  fi
+> >> -- 
+> >> 2.32.0
+> >>
+> > Thanks,
+> > drew 
+> >
+> 
 
-
-I will take my point back, since some of the "TEST_ASSERT" in this
-selftest does assume that there is no other VM running even on
-'default' case (ie., run ./dirty_logging_perf_test without arguments).
-Therefore, this patch will make the test flaky.
-
-I will go back to implement the fd based API and submit the code along
-with this selftest.
-
-Thanks.
--Mingwei
