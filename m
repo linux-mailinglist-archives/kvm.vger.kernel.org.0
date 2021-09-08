@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B49E9404044
-	for <lists+kvm@lfdr.de>; Wed,  8 Sep 2021 22:45:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 18BE2404045
+	for <lists+kvm@lfdr.de>; Wed,  8 Sep 2021 22:45:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350595AbhIHUrE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Sep 2021 16:47:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32800 "EHLO
+        id S1350608AbhIHUrF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Sep 2021 16:47:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32808 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350572AbhIHUrD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Sep 2021 16:47:03 -0400
-Received: from mail-qt1-x84a.google.com (mail-qt1-x84a.google.com [IPv6:2607:f8b0:4864:20::84a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E48C1C061575
-        for <kvm@vger.kernel.org>; Wed,  8 Sep 2021 13:45:54 -0700 (PDT)
-Received: by mail-qt1-x84a.google.com with SMTP id c22-20020ac80096000000b0029f6809300eso5662979qtg.6
-        for <kvm@vger.kernel.org>; Wed, 08 Sep 2021 13:45:54 -0700 (PDT)
+        with ESMTP id S1350572AbhIHUrF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Sep 2021 16:47:05 -0400
+Received: from mail-qk1-x74a.google.com (mail-qk1-x74a.google.com [IPv6:2607:f8b0:4864:20::74a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24085C061575
+        for <kvm@vger.kernel.org>; Wed,  8 Sep 2021 13:45:57 -0700 (PDT)
+Received: by mail-qk1-x74a.google.com with SMTP id x19-20020a05620a099300b003f64d79cbbaso5633180qkx.7
+        for <kvm@vger.kernel.org>; Wed, 08 Sep 2021 13:45:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=F9GYQd7GnFGl03eeAiMHP1LfsWzd2DbdzCfDnk6lJ9g=;
-        b=Kulwlklj5NjUxZuN+cZwpyFysa7xy7hOm1brOciy1YxETDPAyXQAZ9h25pOHMErwED
-         /TtDwlR/7GP/UWfpySkpmHzgj/NRooD0+x4Bme6+pqaa6GQCJCpmkGgCUB1Ya4mtUIEj
-         MfJMXOWf+3uCBh7MTgGJmfYBMmYe21V3qi4W4IAiob0rX1FXzjoAPZ9KEA6dAWy1ONC2
-         3uOg1mJ6W8uGHrtnnzquePp1S3VdX6x42JDtiPhdYfYP0hDBnB4iWRmHJNIA6ylDMY/o
-         LzthFUDAhsp66ko2gXYPfhU2vEmhX51it00pK/SBjafsPtPoKRQNKAn30zbz77cQYmPi
-         2Ifg==
+        bh=ymeUDxCOSpBc//Fnk+ZR8CYIjCEY9GvLaXymBc8UYEI=;
+        b=f5fpr/1key+gRM+45MYAxnvIPkPkx9nJmmCdTswHPqARi7qqJbxrycIgAJgDYfARE6
+         21MnZL39AUDwllfwn6bQ3PBPxUYIw1gToogFTvwPw9QTLMct3tj/G0eTVCT2F0Y4yDyg
+         QMgJMII4Eir/PxoF1YJWOxDpmIqGbQvtm62G5360K50VBwCwu4QcN/7+iQn39Nbeuurh
+         i02aWioNTDBRnr6ZtrgQRaEDW+cXbQSQeD1y5MDzTrWsy/PypUNgGRJ9ZVY5u2zCBKgk
+         bt9PfgVE1ZT7UCW0FsabwBnWdGlpawGFWQ+ZljVbAryqIFwfEqTdk3LJUlFydfC+TOzy
+         wUSw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=F9GYQd7GnFGl03eeAiMHP1LfsWzd2DbdzCfDnk6lJ9g=;
-        b=jocoVM2VUqh9ea0COFsqNN5zrLSccghPyamUAj50Rk6WjjVeQHYpoKwznh6aBSbFLn
-         JD6RoO8K4Dfpevp8OiAiqPjTDXrneAObxA1ViCtROQzIm/B4NwJyegRJaevT8gM7IhNY
-         mrlMQ/pAzL2kkc4o5J99f4VuyKkGGDY5y3oV0qKtpYkLnuXkD7NrGu4ITxN3GHzy0Tw0
-         Mde6FMD7BKmE2ChdnJ8SWpvV1XIypbuG6ayUyYVeOvErV/FGjFOg5+mcMXJ1XhE1h5xI
-         A8ZnKSfIhb2JJep08E9gQeUG9VORgtqyLBgKjyScUUbaSlHqTluFIzUm4ZLCuynNP3J6
-         fX6A==
-X-Gm-Message-State: AOAM5338qqJUQSiG+zfsW8rOhfU4PCAm1rzYBA+Zqygv+HM2htGWoQ5q
-        egNdBpMlIK/fU01POWacDsCQiOWxiyjFFxubXf9oo093Osva6+XtmktB92VH86emMckAzCLV3ll
-        +7zcgAalGP3rKE8OjBp0cuInYwcEGiE85V4a6BIROabgxc8uobWc8Ag==
-X-Google-Smtp-Source: ABdhPJw8RC7dDMcblawJtQJfyUNOttHaUhjPdtfIUO2NSDUA7jtC+4gdmgjiju6TP/4fGNhn9brwyh0bRQ==
+        bh=ymeUDxCOSpBc//Fnk+ZR8CYIjCEY9GvLaXymBc8UYEI=;
+        b=n/OyQJImerD0SGqMCJfYAhlQ/zWs7DOr3afsP78P69Nz3TIidQ61GGZ6gk1GmNV4Vw
+         5zr3hF6BXcFDOOLrW1xl5iKY/4crUvE4XQerhXbnl2Z6De7AO6A36dJBl1DpHQaMzsSq
+         IVgrOcIQ1w7LByDKRMDpMBAI0UpICIKZ5mz4aAvc+Wo3QAn8nf1NaBpe6/gXwnW94KKA
+         LGMklDD6U0Q6ZpE+fBv8oVJRMwZjNqTFefb3wGXPKoWpLIxQ5xPec7M8yTE7+i+Gw0Yt
+         uDqF1NtIWmbOY83Ym0EuBaFv+RG8t9DoLGTD/jHjpJSq+bAcq0bhwm5JD82WZ7QZ7uaG
+         faCQ==
+X-Gm-Message-State: AOAM532po6IF2D9X1gDaFZeqMfVa6IyGlZZb0VK08Elx+qTbkcH4AlsU
+        iKLsFD8Tj131Nx1O2TyjLZzGIVDG/bCIO8oWcxQsM53tdKhCcnuCk1ZtMrs2JIsuG997EYcCw76
+        xRGpKSeE70nWLa4g1fjyFX8dcftkpamn7sUhaGwN/Mf4ge2614Aqi1g==
+X-Google-Smtp-Source: ABdhPJwv5u0S0ZsBlci1nYX1H4m7hHqJ+R5AOoEJT4eqDICQH3PjgbrLIBFPGLXHq39Pd9I5n2Jnx6d3xA==
 X-Received: from fawn.svl.corp.google.com ([2620:15c:2cd:202:2d44:9018:fc46:57b])
- (user=morbo job=sendgmr) by 2002:ad4:5506:: with SMTP id az6mr219966qvb.8.1631133953998;
- Wed, 08 Sep 2021 13:45:53 -0700 (PDT)
-Date:   Wed,  8 Sep 2021 13:45:36 -0700
-In-Reply-To: <20210825222604.2659360-1-morbo@google.com>
-Message-Id: <20210908204541.3632269-1-morbo@google.com>
+ (user=morbo job=sendgmr) by 2002:a0c:8503:: with SMTP id n3mr195545qva.48.1631133956300;
+ Wed, 08 Sep 2021 13:45:56 -0700 (PDT)
+Date:   Wed,  8 Sep 2021 13:45:37 -0700
+In-Reply-To: <20210908204541.3632269-1-morbo@google.com>
+Message-Id: <20210908204541.3632269-2-morbo@google.com>
 Mime-Version: 1.0
-References: <20210825222604.2659360-1-morbo@google.com>
+References: <20210825222604.2659360-1-morbo@google.com> <20210908204541.3632269-1-morbo@google.com>
 X-Mailer: git-send-email 2.33.0.309.g3052b89438-goog
-Subject: [kvm-unit-tests PATCH v2 0/5] Prevent inlining for asm blocks with labels
+Subject: [kvm-unit-tests PATCH v2 1/5] libcflag: define the "noinline" macro
 From:   Bill Wendling <morbo@google.com>
 To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
         Roman Bolshakov <r.bolshakov@yadro.com>,
@@ -64,27 +64,50 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Clang may decide to inline some functions that have inline asm with labels.
-Doing this duplicates the labels, causing the assembler to be complain. These
-patches add the "noinline" attribute to the functions to prevent this.
+Define "noline" macro to reduce the amount of typing for functions using
+the "noinline" attribute.
 
-v2: Combine "libcflat.h" change and use the new "noinline" macro.
-
-Bill Wendling (5):
-  libcflag: define the "noinline" macro
-  x86: realmode: mark exec_in_big_real_mode as noinline
-  x86: svm: mark test_run as noinline
-  x86: umip: mark do_ring3 as noinline
-  x86: vmx: mark some test_* functions as noinline
-
+Signed-off-by: Bill Wendling <morbo@google.com>
+---
+v2: Combine separate change with this series.
+---
  lib/libcflat.h | 1 +
  x86/pmu_lbr.c  | 4 ++--
- x86/realmode.c | 2 +-
- x86/svm.c      | 2 +-
- x86/umip.c     | 2 +-
- x86/vmx.c      | 6 +++---
- 6 files changed, 9 insertions(+), 8 deletions(-)
+ 2 files changed, 3 insertions(+), 2 deletions(-)
 
+diff --git a/lib/libcflat.h b/lib/libcflat.h
+index 97db9e3..a652c76 100644
+--- a/lib/libcflat.h
++++ b/lib/libcflat.h
+@@ -29,6 +29,7 @@
+ #include <stdbool.h>
+ 
+ #define __unused __attribute__((__unused__))
++#define noinline __attribute__((noinline))
+ 
+ #define xstr(s...) xxstr(s)
+ #define xxstr(s...) #s
+diff --git a/x86/pmu_lbr.c b/x86/pmu_lbr.c
+index 3bd9e9f..5ff805a 100644
+--- a/x86/pmu_lbr.c
++++ b/x86/pmu_lbr.c
+@@ -16,14 +16,14 @@
+ 
+ volatile int count;
+ 
+-static __attribute__((noinline)) int compute_flag(int i)
++static noinline int compute_flag(int i)
+ {
+ 	if (i % 10 < 4)
+ 		return i + 1;
+ 	return 0;
+ }
+ 
+-static __attribute__((noinline)) int lbr_test(void)
++static noinline int lbr_test(void)
+ {
+ 	int i;
+ 	int flag;
 -- 
 2.33.0.309.g3052b89438-goog
 
