@@ -2,169 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A788040494F
-	for <lists+kvm@lfdr.de>; Thu,  9 Sep 2021 13:31:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4B5E8404962
+	for <lists+kvm@lfdr.de>; Thu,  9 Sep 2021 13:38:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235446AbhIILc4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Sep 2021 07:32:56 -0400
-Received: from foss.arm.com ([217.140.110.172]:58934 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234507AbhIILc4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Sep 2021 07:32:56 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 53DD831B;
-        Thu,  9 Sep 2021 04:31:46 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 995063F73D;
-        Thu,  9 Sep 2021 04:31:43 -0700 (PDT)
-Subject: Re: [kvm-unit-tests RFC PATCH 3/5] run_tests.sh: Add kvmtool support
-To:     Andrew Jones <drjones@redhat.com>
-Cc:     thuth@redhat.com, pbonzini@redhat.com, lvivier@redhat.com,
-        kvm-ppc@vger.kernel.org, david@redhat.com, frankja@linux.ibm.com,
-        cohuck@redhat.com, imbrenda@linux.ibm.com,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, andre.przywara@arm.com,
-        maz@kernel.org, vivek.gautam@arm.com
-References: <20210702163122.96110-1-alexandru.elisei@arm.com>
- <20210702163122.96110-4-alexandru.elisei@arm.com>
- <20210907101730.trnsig2j4jmhinyu@gator>
- <587a5f8c-cf04-59ec-7e35-4ca6adf87862@arm.com>
- <20210908150912.3d57akqkfux4fahj@gator>
- <56289c06-04ec-1772-6e15-98d02780876d@arm.com>
- <20210908154943.z7d6bhww3pnbaftd@gator>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <58d25f89-ff19-2dbc-81bc-3224b8baa9fb@arm.com>
-Date:   Thu, 9 Sep 2021 12:33:11 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+        id S235655AbhIILjI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Sep 2021 07:39:08 -0400
+Received: from out30-56.freemail.mail.aliyun.com ([115.124.30.56]:47541 "EHLO
+        out30-56.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234507AbhIILjH (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 9 Sep 2021 07:39:07 -0400
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R201e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04400;MF=houwenlong93@linux.alibaba.com;NM=1;PH=DS;RN=1;SR=0;TI=SMTPD_---0Unnk522_1631187476;
+Received: from localhost(mailfrom:houwenlong93@linux.alibaba.com fp:SMTPD_---0Unnk522_1631187476)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Thu, 09 Sep 2021 19:37:56 +0800
+From:   Hou Wenlong <houwenlong93@linux.alibaba.com>
+To:     kvm@vger.kernel.org
+Subject: [PATCH 0/3] some fixes of hypercall emulation
+Date:   Thu,  9 Sep 2021 19:37:53 +0800
+Message-Id: <cover.1631186996.git.houwenlong93@linux.alibaba.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-In-Reply-To: <20210908154943.z7d6bhww3pnbaftd@gator>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Drew,
+Currently, use hypercall instruction in guest cpl3 would just skip
+the instruction, however, that behaviour could trigger a exception
+in Linux host. It is reasonable for hypervisor to inject a exception,
+especially in nested guest, L1 guest could behaviour like host.
 
-On 9/8/21 4:49 PM, Andrew Jones wrote:
-> On Wed, Sep 08, 2021 at 04:46:19PM +0100, Alexandru Elisei wrote:
->> Hi Drew,
->>
->> On 9/8/21 4:09 PM, Andrew Jones wrote:
->>> On Wed, Sep 08, 2021 at 03:33:19PM +0100, Alexandru Elisei wrote:
->>> ...
->>>>>> +fixup_kvmtool_opts()
->>>>>> +{
->>>>>> +    local opts=$1
->>>>>> +    local groups=$2
->>>>>> +    local gic
->>>>>> +    local gic_version
->>>>>> +
->>>>>> +    if find_word "pmu" $groups; then
->>>>>> +        opts+=" --pmu"
->>>>>> +    fi
->>>>>> +
->>>>>> +    if find_word "its" $groups; then
->>>>>> +        gic_version=3
->>>>>> +        gic="gicv3-its"
->>>>>> +    elif [[ "$opts" =~ -machine\ *gic-version=(2|3) ]]; then
->>>>>> +        gic_version="${BASH_REMATCH[1]}"
->>>>>> +        gic="gicv$gic_version"
->>>>>> +    fi
->>>>>> +
->>>>>> +    if [ -n "$gic" ]; then
->>>>>> +        opts=${opts/-machine gic-version=$gic_version/}
->>>>>> +        opts+=" --irqchip=$gic"
->>>>>> +    fi
->>>>>> +
->>>>>> +    opts=${opts/-append/--params}
->>>>>> +
->>>>>> +    echo "$opts"
->>>>>> +}
->>>>> Hmm, I don't think we want to write a QEMU parameter translator for
->>>>> all other VMMs, and all other VMM architectures, that we want to
->>>>> support. I think we should add new "extra_params" variables to the
->>>>> unittest configuration instead, e.g. "kvmtool_params", where the
->>>>> extra parameters can be listed correctly and explicitly. While at
->>>>> it, I would create an alias for "extra_params", which would be
->>>>> "qemu_params" allowing unittests that support more than one VMM
->>>>> to clearly show what's what.
->>>> I agree, this is a much better idea than a parameter translator. Using a dedicated
->>>> variable in unittests.cfg will make it easier for new tests to get support for all
->>>> VMMs (for example, writing a list of parameters in unittests.cfg should be easier
->>>> than digging through the scripts to figure exactly how and where to add a
->>>> translation for a new parameter), and it allow us to express parameters for other
->>>> VMMs which don't have a direct correspondent in qemu.
->>>>
->>>> By creating an alias, do you mean replacing extra_params with qemu_params in
->>>> arm/unittests.cfg? Or something else?
->>> Probably something like this
->>>
->>> diff --git a/scripts/common.bash b/scripts/common.bash
->>> index 7b983f7d6dd6..e5119ff216e5 100644
->>> --- a/scripts/common.bash
->>> +++ b/scripts/common.bash
->>> @@ -37,7 +37,12 @@ function for_each_unittest()
->>>                 elif [[ $line =~ ^smp\ *=\ *(.*)$ ]]; then
->>>                         smp=${BASH_REMATCH[1]}
->>>                 elif [[ $line =~ ^extra_params\ *=\ *(.*)$ ]]; then
->>> -                       opts=${BASH_REMATCH[1]}
->>> +               elif [[ $line =~ ^extra_params\ *=\ *(.*)$ ]]; then
->>> +                       qemu_opts=${BASH_REMATCH[1]}
->>> +               elif [[ $line =~ ^qemu_params\ *=\ *(.*)$ ]]; then
->>> +                       qemu_opts=${BASH_REMATCH[1]}
->>> +               elif [[ $line =~ ^kvmtool_params\ *=\ *(.*)$ ]]; then
->>> +                       kvmtool_opts=${BASH_REMATCH[1]}
->>>                 elif [[ $line =~ ^groups\ *=\ *(.*)$ ]]; then
->>>                         groups=${BASH_REMATCH[1]}
->>>                 elif [[ $line =~ ^arch\ *=\ *(.*)$ ]]; then
->>>
->>> and all other changes needed to support the s/opts/qemu_opts/ change
->>> should work. Also, an addition to the unittests.cfg documentation.
->> Got it, replace extra_opts with qemu_opts in the scripts.
->>
->> Yes, the documentation for unittests.cfg (at the top of the file) should
->> definitely be updated to document the new configuration option, kvmtool_params.
->>
->>> The above diff doesn't consider that a unittests.cfg file could have
->>> both an 'extra_params' and a 'qemu_params' field, but I'm not sure
->>> we care about that. Users should read the documentation and we
->>> should review changes to the committed unittests.cfg files to avoid
->>> that.
->> What do you feel about renaming extra_params -> qemu_params in unittests.cfg?
-> Yes, that's what I would expect the patch to do.
->
->> I'm
->> thinking it would make the usage clearer, improve consistency (we would have
->> qemu_params and kvmtool_params, instead of extra_params and kvmtool_params), and
->> remove any confusions regarding when they are used (I can see someone thinking
->> that extra_params are used all the time, and are appended to kvmtool_params when
->> --target=kvmtool). On the other hand, this could be problematic for people using
->> out-of-tree scripts that parse the unittest.cfg file for whatever reason (are
->> there people that do that?).
-> I'm not as worried about that as about people using out-of-tree
-> unittests.cfg files that will break when the 'extra_params' field
-> disappears. That's why I suggested to make 'extra_params' an alias.
+As for hypercall instruction emulation, hypervisor would replace
+the wrong instruction with the right instruction instead of the real
+instruction emulation. It's guest's responsibility to use the right
+instruction, hypervisor could emulate it but shouldn't modify it
+without guest's request. At present, Linux guest could use alternative
+to choose right instruction, and hyperv guest could use hypercall to
+modify instruction. So just do the real instruction emualtion job
+for em_hypercall().
 
-I'm sorry, but I'm still having trouble parsing what alias means in this context.
-Do you mean keep extra_params for current tests, encourage qemu_params for new
-tests, document that they mean the same thing and going forward qemu_params should
-be used?
+Hou Wenlong (3):
+  kvm: x86: Introduce hypercall x86 ops for handling hypercall not in
+    cpl0
+  kvm: x86: Refactor kvm_emulate_hypercall() to no skip instruction
+  kvm: x86: Emulate hypercall instead of fixing hypercall instruction
 
-Thanks,
+ arch/x86/include/asm/kvm-x86-ops.h |  1 +
+ arch/x86/include/asm/kvm_host.h    |  1 +
+ arch/x86/kvm/emulate.c             | 20 +++++------
+ arch/x86/kvm/kvm_emulate.h         |  2 +-
+ arch/x86/kvm/svm/svm.c             |  5 +++
+ arch/x86/kvm/vmx/vmx.c             |  9 +++++
+ arch/x86/kvm/x86.c                 | 55 +++++++++++++++++-------------
+ 7 files changed, 58 insertions(+), 35 deletions(-)
 
-Alex
+--
+2.31.1
 
->
-> Thanks,
-> drew
->
->> Thanks,
->>
->> Alex
->>
->>> Thanks,
->>> drew
->>>
