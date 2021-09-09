@@ -2,184 +2,346 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4E8FA405A47
-	for <lists+kvm@lfdr.de>; Thu,  9 Sep 2021 17:40:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 95A37405A56
+	for <lists+kvm@lfdr.de>; Thu,  9 Sep 2021 17:44:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233795AbhIIPmD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Sep 2021 11:42:03 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:23382 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231274AbhIIPmC (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 9 Sep 2021 11:42:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1631202053;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=WBYiYhsVVzfTpEKTlWDA25Qp/Q4qm4nDo+fBNglD38I=;
-        b=IqGsoPAsEq8DNaw/wMLktEVbjlZR+XdVR1srMIGPvPcqhOqG4VH6wrb9bM7wemVEEXyj+g
-        m6VrKQu4VEb/8sf1fGpH8ZOP4bmRnplysvInHZEQkdNwTiwLazEpEuF5I5nRT1OIHYcoSn
-        lGOtYa3KtHsJt/+uX0Op6W4ordjmYlc=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-546-8DPINETqMQGfItsIBPdJGQ-1; Thu, 09 Sep 2021 11:40:51 -0400
-X-MC-Unique: 8DPINETqMQGfItsIBPdJGQ-1
-Received: by mail-wm1-f69.google.com with SMTP id g9-20020a1c2009000000b002fd21541799so422201wmg.0
-        for <kvm@vger.kernel.org>; Thu, 09 Sep 2021 08:40:51 -0700 (PDT)
+        id S232029AbhIIPpK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Sep 2021 11:45:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33596 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231928AbhIIPpJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Sep 2021 11:45:09 -0400
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C33C3C061575
+        for <kvm@vger.kernel.org>; Thu,  9 Sep 2021 08:43:59 -0700 (PDT)
+Received: by mail-pj1-x1031.google.com with SMTP id w19-20020a17090aaf9300b00191e6d10a19so1753383pjq.1
+        for <kvm@vger.kernel.org>; Thu, 09 Sep 2021 08:43:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=VXel4jDIwMqHOMKd1NHF2UcMfLOxiHSOIdq0jgRvr2Y=;
+        b=cPcC3iY+uaJRaPxbpPGok8cDOXaduQZ/rq4ZH3wJg8KoSv45VtzzaRA1qzWPk5zFYj
+         Cw++oCY3SgQ93Mg9T9Srnhz9Lp4uYSaEcMgZpLr9oK8HB//q/wSjjBBzSg7z6SrN2dGD
+         XLgR7KIQVHl/6Pl6hQl+aNRCkcHmLJl1NghOzCjw3+4G8HmwH1+Zw2gKdUCclmartZ8h
+         muF8ZjX9zXn1odzKzNqZUCIs8n9tmZwp0XCm92aa+NYKAEMHigNiipIRFbt4vtlQZ6N9
+         XmGCrAuFjxycILLEiB6OOro/qS9kTY2uyLmsKlAytbsd2jvuMOfAmX3bp43VWzNaAIZ0
+         ZY9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=WBYiYhsVVzfTpEKTlWDA25Qp/Q4qm4nDo+fBNglD38I=;
-        b=cnbPcvjVQJ9vMm0eSshzsPig/p8FsPRrhzPdD/mN5MPKWGe1e7yLpddcFA8axK564c
-         PLk+Y4A0IMpqKfaGAfqhQNJpftyKdntNgbasooOruXEkqO1nS9Oa4wY8RPPFDEfDkQzY
-         3yuuqIi20IyMggi/bOtmBdRqMC5rN8dLGnV1v18i0KFeD4lvfjYOynDKYsjrMDJcmBRt
-         yRbjyMTkaLhx3UhoiTSJdAFyOS/d/yP2H/kdHipG+BiFOYXLaCtLeCd+zkXqdj32vJ9r
-         E57K6ylWCTAs7vMPXWiyIhI2aLLiegiwIgzUAyeXyHvwtUZfoO9CRe6wk+KYrZ5+fEJb
-         l2oQ==
-X-Gm-Message-State: AOAM530Smy0LKSvBCdld6GW4L0H14zuWAKdTHrq0AJ5+OBTYHOQl1KxR
-        IGpQ3vbalQRCvHeRW1VFWRFnlqlSZom6S6LW04Mxv7DNjpUC2VjLGovalIw2zp03Qg16A+7hbw6
-        CNOFjdcgZ3Ar3
-X-Received: by 2002:adf:e384:: with SMTP id e4mr4349332wrm.163.1631202050611;
-        Thu, 09 Sep 2021 08:40:50 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz5Am4d/lKBmohH9Lzy/1jzcAVTjXLDkspGZBDFHm4AcucevN0az97m19jUsDd6QfUM7rXXsg==
-X-Received: by 2002:adf:e384:: with SMTP id e4mr4349308wrm.163.1631202050439;
-        Thu, 09 Sep 2021 08:40:50 -0700 (PDT)
-Received: from redhat.com ([2.55.145.189])
-        by smtp.gmail.com with ESMTPSA id 129sm1885672wmz.26.2021.09.09.08.40.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Sep 2021 08:40:49 -0700 (PDT)
-Date:   Thu, 9 Sep 2021 11:40:46 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Max Gurtovoy <mgurtovoy@nvidia.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>, hch@infradead.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        israelr@nvidia.com, nitzanc@nvidia.com, oren@nvidia.com,
-        linux-block@vger.kernel.org, axboe@kernel.dk
-Subject: Re: [PATCH v2 1/1] virtio-blk: add num_io_queues module parameter
-Message-ID: <20210909114029-mutt-send-email-mst@kernel.org>
-References: <20210831135035.6443-1-mgurtovoy@nvidia.com>
- <YTDVkDIr5WLdlRsK@stefanha-x1.localdomain>
- <20210905120234-mutt-send-email-mst@kernel.org>
- <98309fcd-3abe-1f27-fe52-e8fcc58bec13@nvidia.com>
- <20210906071957-mutt-send-email-mst@kernel.org>
- <1cbbe6e2-1473-8696-565c-518fc1016a1a@nvidia.com>
- <20210909094001-mutt-send-email-mst@kernel.org>
- <456e1704-67e9-aac9-a82a-44fed65dd153@nvidia.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=VXel4jDIwMqHOMKd1NHF2UcMfLOxiHSOIdq0jgRvr2Y=;
+        b=7jBWxk8ziuay+uAbRINYWxrafgd0gjM20W7lSB/sLAm1q8hZh59MW+fDf7U/Oq84m0
+         lZaQPmCEbo3D7VwB1ID4Jw4KcXhy3Bj+Ad0/Z/mUCcPigSPKmy9bTc1WlkW3Jlicj7M7
+         BXzifp/SpiqpyGAJE1jr+kHONCt37sfwQSqF8abSKZBSAswU183Elir2YVFXotFBCQKE
+         5lZznbHIxuxCNa61FDQtAL4mzW0p6IozY1pf4/rh9MZKzAvWpDUT3W4oM4iAGJRbmlAT
+         BNlEFDMcVzHaBNhr7gDrqTRxs2BmntrLZDmiCOGT5ZoA3/xjHmFUNj6Xw4focZHbVKhO
+         fGnw==
+X-Gm-Message-State: AOAM531tOYDb12C4fIhxNP6BPJ3BIgynCqsclUn+8yUD4fW96BIU9v3/
+        nqd620FBOO1kfMtvPLFZqGnkYTu6hHL9qlJT/NHmCA==
+X-Google-Smtp-Source: ABdhPJxghBekE2X9P8QBoxcZ1RFjL27mZtL6kHa2HZWY1xPAQ8KMdm0bIHKczqXMkkwFcgfcXuvl7A/d/oh7BJnv5+4=
+X-Received: by 2002:a17:902:e550:b0:138:ed48:2e9a with SMTP id
+ n16-20020a170902e55000b00138ed482e9amr3307277plf.46.1631202238783; Thu, 09
+ Sep 2021 08:43:58 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <456e1704-67e9-aac9-a82a-44fed65dd153@nvidia.com>
+References: <20210820151933.22401-1-brijesh.singh@amd.com> <20210820151933.22401-35-brijesh.singh@amd.com>
+ <CAMkAt6qQOgZVEMQdMXqvs2s8pELnAFV-Msgc2_MC5WOYf8oAiQ@mail.gmail.com> <4742dbfe-4e02-a7e3-6464-905ccc602e6c@amd.com>
+In-Reply-To: <4742dbfe-4e02-a7e3-6464-905ccc602e6c@amd.com>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Thu, 9 Sep 2021 09:43:46 -0600
+Message-ID: <CAMkAt6pT4vkgLxTN1Lj54ufaStyCHHitNaHAdZvEgDV8Nyrx-Q@mail.gmail.com>
+Subject: Re: [PATCH Part1 v5 34/38] x86/sev: Add snp_msg_seqno() helper
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org,
+        kvm list <kvm@vger.kernel.org>, linux-efi@vger.kernel.org,
+        platform-driver-x86@vger.kernel.org, linux-coco@lists.linux.dev,
+        linux-mm@kvack.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        Marc Orr <marcorr@google.com>,
+        sathyanarayanan.kuppuswamy@linux.intel.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 09, 2021 at 06:37:37PM +0300, Max Gurtovoy wrote:
-> 
-> On 9/9/2021 4:42 PM, Michael S. Tsirkin wrote:
-> > On Mon, Sep 06, 2021 at 02:59:40PM +0300, Max Gurtovoy wrote:
-> > > On 9/6/2021 2:20 PM, Michael S. Tsirkin wrote:
-> > > > On Mon, Sep 06, 2021 at 01:31:32AM +0300, Max Gurtovoy wrote:
-> > > > > On 9/5/2021 7:02 PM, Michael S. Tsirkin wrote:
-> > > > > > On Thu, Sep 02, 2021 at 02:45:52PM +0100, Stefan Hajnoczi wrote:
-> > > > > > > On Tue, Aug 31, 2021 at 04:50:35PM +0300, Max Gurtovoy wrote:
-> > > > > > > > Sometimes a user would like to control the amount of IO queues to be
-> > > > > > > > created for a block device. For example, for limiting the memory
-> > > > > > > > footprint of virtio-blk devices.
-> > > > > > > > 
-> > > > > > > > Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
-> > > > > > > > ---
-> > > > > > > > 
-> > > > > > > > changes from v1:
-> > > > > > > >     - use param_set_uint_minmax (from Christoph)
-> > > > > > > >     - added "Should > 0" to module description
-> > > > > > > > 
-> > > > > > > > Note: This commit apply on top of Jens's branch for-5.15/drivers
-> > > > > > > > ---
-> > > > > > > >     drivers/block/virtio_blk.c | 20 +++++++++++++++++++-
-> > > > > > > >     1 file changed, 19 insertions(+), 1 deletion(-)
-> > > > > > > > 
-> > > > > > > > diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> > > > > > > > index 4b49df2dfd23..9332fc4e9b31 100644
-> > > > > > > > --- a/drivers/block/virtio_blk.c
-> > > > > > > > +++ b/drivers/block/virtio_blk.c
-> > > > > > > > @@ -24,6 +24,22 @@
-> > > > > > > >     /* The maximum number of sg elements that fit into a virtqueue */
-> > > > > > > >     #define VIRTIO_BLK_MAX_SG_ELEMS 32768
-> > > > > > > > +static int virtblk_queue_count_set(const char *val,
-> > > > > > > > +		const struct kernel_param *kp)
-> > > > > > > > +{
-> > > > > > > > +	return param_set_uint_minmax(val, kp, 1, nr_cpu_ids);
-> > > > > > > > +}
-> > > > Hmm which tree is this for?
-> > > I've mentioned in the note that it apply on branch for-5.15/drivers. But now
-> > > you can apply it on linus/master as well.
-> > > 
-> > > 
-> > > > > > > > +
-> > > > > > > > +static const struct kernel_param_ops queue_count_ops = {
-> > > > > > > > +	.set = virtblk_queue_count_set,
-> > > > > > > > +	.get = param_get_uint,
-> > > > > > > > +};
-> > > > > > > > +
-> > > > > > > > +static unsigned int num_io_queues;
-> > > > > > > > +module_param_cb(num_io_queues, &queue_count_ops, &num_io_queues, 0644);
-> > > > > > > > +MODULE_PARM_DESC(num_io_queues,
-> > > > > > > > +		 "Number of IO virt queues to use for blk device. Should > 0");
-> > > > 
-> > > > better:
-> > > > 
-> > > > +MODULE_PARM_DESC(num_io_request_queues,
-> > > > +                "Limit number of IO request virt queues to use for each device. 0 for now limit");
-> > > You proposed it and I replied on it bellow.
-> > 
-> > Can't say I understand 100% what you are saying. Want to send
-> > a description that does make sense to you but
-> > also reflects reality? 0 is the default so
-> > "should > 0" besides being ungrammatical does not seem t"
-> > reflect what it does ...
-> 
-> if you "modprobe virtio_blk" the previous behavior will happen.
-> 
-> You can't "modprobe virtio_blk num_io_request_queues=0" since the minimal
-> value is 1.
-> 
-> So your description is not reflecting the code.
-> 
-> We can do:
-> 
-> MODULE_PARM_DESC(num_io_request_queues, "Number of request virt queues to use for blk device. Minimum value is 1 queue");
+)()
 
-What's the default value? We should document that.
+On Thu, Sep 9, 2021 at 9:26 AM Brijesh Singh <brijesh.singh@amd.com> wrote:
+>
+>
+>
+> On 9/9/21 9:54 AM, Peter Gonda wrote:
+> > On Fri, Aug 20, 2021 at 9:22 AM Brijesh Singh <brijesh.singh@amd.com> wrote:
+> >>
+> >> The SNP guest request message header contains a message count. The
+> >> message count is used while building the IV. The PSP firmware increments
+> >> the message count by 1, and expects that next message will be using the
+> >> incremented count. The snp_msg_seqno() helper will be used by driver to
+> >> get the message sequence counter used in the request message header,
+> >> and it will be automatically incremented after the request is successful.
+> >> The incremented value is saved in the secrets page so that the kexec'ed
+> >> kernel knows from where to begin.
+> >>
+> >> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> >> ---
+> >>   arch/x86/kernel/sev.c     | 79 +++++++++++++++++++++++++++++++++++++++
+> >>   include/linux/sev-guest.h | 37 ++++++++++++++++++
+> >>   2 files changed, 116 insertions(+)
+> >>
+> >> diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
+> >> index 319a40fc57ce..f42cd5a8e7bb 100644
+> >> --- a/arch/x86/kernel/sev.c
+> >> +++ b/arch/x86/kernel/sev.c
+> >> @@ -51,6 +51,8 @@ static struct ghcb boot_ghcb_page __bss_decrypted __aligned(PAGE_SIZE);
+> >>    */
+> >>   static struct ghcb __initdata *boot_ghcb;
+> >>
+> >> +static u64 snp_secrets_phys;
+> >> +
+> >>   /* #VC handler runtime per-CPU data */
+> >>   struct sev_es_runtime_data {
+> >>          struct ghcb ghcb_page;
+> >> @@ -2030,6 +2032,80 @@ bool __init handle_vc_boot_ghcb(struct pt_regs *regs)
+> >>                  halt();
+> >>   }
+> >>
+> >> +static struct snp_secrets_page_layout *snp_map_secrets_page(void)
+> >> +{
+> >> +       u16 __iomem *secrets;
+> >> +
+> >> +       if (!snp_secrets_phys || !sev_feature_enabled(SEV_SNP))
+> >> +               return NULL;
+> >> +
+> >> +       secrets = ioremap_encrypted(snp_secrets_phys, PAGE_SIZE);
+> >> +       if (!secrets)
+> >> +               return NULL;
+> >> +
+> >> +       return (struct snp_secrets_page_layout *)secrets;
+> >> +}
+> >> +
+> >> +static inline u64 snp_read_msg_seqno(void)
+> >> +{
+> >> +       struct snp_secrets_page_layout *layout;
+> >> +       u64 count;
+> >> +
+> >> +       layout = snp_map_secrets_page();
+> >> +       if (!layout)
+> >> +               return 0;
+> >> +
+> >> +       /* Read the current message sequence counter from secrets pages */
+> >> +       count = readl(&layout->os_area.msg_seqno_0);
+> >> +
+> >> +       iounmap(layout);
+> >> +
+> >> +       /* The sequence counter must begin with 1 */
+> >> +       if (!count)
+> >> +               return 1;
+> >> +
+> >> +       return count + 1;
+> >> +}
+> >> +
+> >> +u64 snp_msg_seqno(void)
+> >> +{
+> >> +       u64 count = snp_read_msg_seqno();
+> >> +
+> >> +       if (unlikely(!count))
+> >> +               return 0;
+> >> +
+> >> +       /*
+> >> +        * The message sequence counter for the SNP guest request is a
+> >> +        * 64-bit value but the version 2 of GHCB specification defines a
+> >> +        * 32-bit storage for the it.
+> >> +        */
+> >> +       if (count >= UINT_MAX)
+> >> +               return 0;
+> >> +
+> >> +       return count;
+> >> +}
+> >> +EXPORT_SYMBOL_GPL(snp_msg_seqno);
+> >
+> > Do we need some sort of get sequence number, then ack that sequence
+> > number was used API? Taking your host changes in Part2 V5 as an
+> > example. If 'snp_setup_guest_buf' fails the given sequence number is
+> > never actually used by a message to the PSP. So the guest will have
+> > the wrong current sequence number, an off by 1 error, right?
+> >
+>
+> The sequence number should be incremented only after the command is
+> successful. In this particular case the next caller should not get the
+> updated sequence number.
+>
+> Having said so, there is a bug in current code that will cause us to
+> increment the sequence number on failure. I notice it last week and have
+> it fixed in v6 wip branch.
+>
+> int snp_issue_guest_request(....)
+> {
+>
+>         .....
+>         .....
+>
+>         ret = sev_es_ghcb_hv_call(ghcb, NULL, id, input->req_gpa, input->resp_gpa);
+>         if (ret)
+>                 goto e_put;
+>
+>         if (ghcb->save.sw_exit_info_2) {
+>                 ...
+>                 ...
+>
+>                 ret = -EIO;
+>                 goto e_put;   /** THIS WAS MISSING */
+>         }
+>
+>         /* The command was successful, increment the sequence counter. */
+>         snp_gen_msg_seqno();
+> e_put:
+>         ....
+> }
+>
+> Does this address your concern?
 
-> > 
-> > > > 
-> > > > > > > > +
-> > > > > > > >     static int major;
-> > > > > > > >     static DEFINE_IDA(vd_index_ida);
-> > > > > > > > @@ -501,7 +517,9 @@ static int init_vq(struct virtio_blk *vblk)
-> > > > > > > >     	if (err)
-> > > > > > > >     		num_vqs = 1;
-> > > > > > > > -	num_vqs = min_t(unsigned int, nr_cpu_ids, num_vqs);
-> > > > > > > > +	num_vqs = min_t(unsigned int,
-> > > > > > > > +			min_not_zero(num_io_queues, nr_cpu_ids),
-> > > > > > > > +			num_vqs);
-> > > > > > > If you respin, please consider calling them request queues. That's the
-> > > > > > > terminology from the VIRTIO spec and it's nice to keep it consistent.
-> > > > > > > But the purpose of num_io_queues is clear, so:
-> > > > > > > 
-> > > > > > > Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-> > > > > > I did this:
-> > > > > > +static unsigned int num_io_request_queues;
-> > > > > > +module_param_cb(num_io_request_queues, &queue_count_ops, &num_io_request_queues, 0644);
-> > > > > > +MODULE_PARM_DESC(num_io_request_queues,
-> > > > > > +                "Limit number of IO request virt queues to use for each device. 0 for now limit");
-> > > > > The parameter is writable and can be changed and then new devices might be
-> > > > > probed with new value.
-> > > > > 
-> > > > > It can't be zero in the code. we can change param_set_uint_minmax args and
-> > > > > say that 0 says nr_cpus.
-> > > > > 
-> > > > > I'm ok with the renaming but I prefer to stick to the description we gave in
-> > > > > V3 of this patch (and maybe enable value of 0 as mentioned above).
+So the 'snp_msg_seqno()' call in 'enc_payload' will not increment the
+counter, its only incremented on 'snp_gen_msg_seqno()'? If thats
+correct, that addresses my first concern.
 
+>
+>
+> > Also it seems like there is a concurrency error waiting to happen
+> > here. If 2 callers call snp_msg_seqno() before either actually places
+> > a call to the PSP, if the first caller's request doesn't reach the PSP
+> > before the second caller's request both calls will fail. And again I
+> > think the sequence numbers in the guest will be incorrect and
+> > unrecoverable.
+> >
+>
+> So far, the only user for the snp_msg_seqno() is the attestation driver.
+> And the driver is designed to serialize the vmgexit request and thus we
+> should not run into concurrence issue.
+
+That seems a little dangerous as any module new code or out-of-tree
+module could use this function thus revealing this race condition
+right? Could we at least have a comment on these functions
+(snp_msg_seqno and snp_gen_msg_seqno) noting this?
+
+>
+> >> +
+> >> +static void snp_gen_msg_seqno(void)
+> >> +{
+> >> +       struct snp_secrets_page_layout *layout;
+> >> +       u64 count;
+> >> +
+> >> +       layout = snp_map_secrets_page();
+> >> +       if (!layout)
+> >> +               return;
+> >> +
+> >> +       /*
+> >> +        * The counter is also incremented by the PSP, so increment it by 2
+> >> +        * and save in secrets page.
+> >> +        */
+> >> +       count = readl(&layout->os_area.msg_seqno_0);
+> >> +       count += 2;
+> >> +
+> >> +       writel(count, &layout->os_area.msg_seqno_0);
+> >> +       iounmap(layout);
+> >> +}
+> >> +
+> >>   int snp_issue_guest_request(int type, struct snp_guest_request_data *input, unsigned long *fw_err)
+> >>   {
+> >>          struct ghcb_state state;
+> >> @@ -2077,6 +2153,9 @@ int snp_issue_guest_request(int type, struct snp_guest_request_data *input, unsi
+> >>                  ret = -EIO;
+> >>          }
+> >>
+> >> +       /* The command was successful, increment the sequence counter */
+> >> +       snp_gen_msg_seqno();
+> >> +
+> >>   e_put:
+> >>          __sev_put_ghcb(&state);
+> >>   e_restore_irq:
+> >> diff --git a/include/linux/sev-guest.h b/include/linux/sev-guest.h
+> >> index 24dd17507789..16b6af24fda7 100644
+> >> --- a/include/linux/sev-guest.h
+> >> +++ b/include/linux/sev-guest.h
+> >> @@ -20,6 +20,41 @@ enum vmgexit_type {
+> >>          GUEST_REQUEST_MAX
+> >>   };
+> >>
+> >> +/*
+> >> + * The secrets page contains 96-bytes of reserved field that can be used by
+> >> + * the guest OS. The guest OS uses the area to save the message sequence
+> >> + * number for each VMPCK.
+> >> + *
+> >> + * See the GHCB spec section Secret page layout for the format for this area.
+> >> + */
+> >> +struct secrets_os_area {
+> >> +       u32 msg_seqno_0;
+> >> +       u32 msg_seqno_1;
+> >> +       u32 msg_seqno_2;
+> >> +       u32 msg_seqno_3;
+> >> +       u64 ap_jump_table_pa;
+> >> +       u8 rsvd[40];
+> >> +       u8 guest_usage[32];
+> >> +} __packed;
+> >> +
+> >> +#define VMPCK_KEY_LEN          32
+> >> +
+> >> +/* See the SNP spec for secrets page format */
+> >> +struct snp_secrets_page_layout {
+> >> +       u32 version;
+> >> +       u32 imien       : 1,
+> >> +           rsvd1       : 31;
+> >> +       u32 fms;
+> >> +       u32 rsvd2;
+> >> +       u8 gosvw[16];
+> >> +       u8 vmpck0[VMPCK_KEY_LEN];
+> >> +       u8 vmpck1[VMPCK_KEY_LEN];
+> >> +       u8 vmpck2[VMPCK_KEY_LEN];
+> >> +       u8 vmpck3[VMPCK_KEY_LEN];
+> >> +       struct secrets_os_area os_area;
+> >> +       u8 rsvd3[3840];
+> >> +} __packed;
+> >> +
+> >>   /*
+> >>    * The error code when the data_npages is too small. The error code
+> >>    * is defined in the GHCB specification.
+> >> @@ -36,6 +71,7 @@ struct snp_guest_request_data {
+> >>   #ifdef CONFIG_AMD_MEM_ENCRYPT
+> >>   int snp_issue_guest_request(int vmgexit_type, struct snp_guest_request_data *input,
+> >>                              unsigned long *fw_err);
+> >> +u64 snp_msg_seqno(void);
+> >>   #else
+> >>
+> >>   static inline int snp_issue_guest_request(int type, struct snp_guest_request_data *input,
+> >> @@ -43,6 +79,7 @@ static inline int snp_issue_guest_request(int type, struct snp_guest_request_dat
+> >>   {
+> >>          return -ENODEV;
+> >>   }
+> >> +static inline u64 snp_msg_seqno(void) { return 0; }
+> >>
+> >>   #endif /* CONFIG_AMD_MEM_ENCRYPT */
+> >>   #endif /* __LINUX_SEV_GUEST_H__ */
+> >> --
+> >> 2.17.1
+> >>
+> >>
