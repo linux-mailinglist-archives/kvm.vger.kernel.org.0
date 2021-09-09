@@ -2,213 +2,291 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 27C2E4054B4
-	for <lists+kvm@lfdr.de>; Thu,  9 Sep 2021 15:31:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A6E47405611
+	for <lists+kvm@lfdr.de>; Thu,  9 Sep 2021 15:36:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351171AbhIINB3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Sep 2021 09:01:29 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:24849 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1344530AbhIIMuk (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 9 Sep 2021 08:50:40 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1631191769;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=/WIIV9R0O9293cVKltmhNKEdIknXhvoAmfpR0+Emkrc=;
-        b=QA2TDyvUImPRNeJYKF1PAZE5Qs8XQ5L3etWkHSowvvXidV1sRO/Xhpklgq/fUnxl/y79O6
-        c/RwCGwsKXiZavjFO+jNALE5qKiKfsCEeyHXIlu8UbcoxKti84dygC+BuAA3XnN1wNERAK
-        7XG6lwMEpxG0s3dkKdL61dtLhP3G3Tc=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-476-RXK86191OiuCKwwD61hYYQ-1; Thu, 09 Sep 2021 08:49:28 -0400
-X-MC-Unique: RXK86191OiuCKwwD61hYYQ-1
-Received: by mail-wm1-f71.google.com with SMTP id n30-20020a05600c3b9e00b002fbbaada5d7so710248wms.7
-        for <kvm@vger.kernel.org>; Thu, 09 Sep 2021 05:49:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=/WIIV9R0O9293cVKltmhNKEdIknXhvoAmfpR0+Emkrc=;
-        b=M/TMg2M5kYUAx9EbSl1WvktxcTdYmplnSk/dC1POccbVyID3JBtV2wrJmu4U5R1dsN
-         LA4NCUkCRi5u/+4RZakDY+NHsH+oDIp1v8V2QGSiEI1EcLi8ZVGK+mqwuv16RxvlZMLW
-         xM5FAgFk7tbr/5JF/dh42Ee/FaI1P/ggXFXkSm1x9TRIDQzrXCI/GGTVCAiPMnGB9Wsu
-         vulBQqbtTlKs2CSYjWFA+9b6C5QbeCB74HE/2ueNhAzftaOP4KKOdyTH/uRXjqJlUMQR
-         c2xX9Z5RqItw8wxZfp1gAFWUuaSZvUCMkVbjrACXt3S0C/6R0a0j3VyYTZ+pbm/s7v4K
-         vU4A==
-X-Gm-Message-State: AOAM531CiMcjwMjjTb7pLUAtsvhBy8D1LICMWKH94EgfStuhvMg4MWqM
-        XoqkNI5u32qZnzkvYAh3IHgqo/z0ZUdcDMLnE0Xgr5wR+FapxbCU53q8Bs6zwObFDcX8omJxFwL
-        BTaQ5ttKvtEwA
-X-Received: by 2002:a1c:f315:: with SMTP id q21mr2914788wmq.76.1631191767073;
-        Thu, 09 Sep 2021 05:49:27 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyhRToFiGZDeV90P9U2++KGI827ZasghlkgDnXG6Np7ns/pBENdzsEK0QomGtIIK6/dnfSjDQ==
-X-Received: by 2002:a1c:f315:: with SMTP id q21mr2914753wmq.76.1631191766841;
-        Thu, 09 Sep 2021 05:49:26 -0700 (PDT)
-Received: from gator (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
-        by smtp.gmail.com with ESMTPSA id t17sm1658091wra.95.2021.09.09.05.49.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Sep 2021 05:49:26 -0700 (PDT)
-Date:   Thu, 9 Sep 2021 14:49:24 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     thuth@redhat.com, pbonzini@redhat.com, lvivier@redhat.com,
-        kvm-ppc@vger.kernel.org, david@redhat.com, frankja@linux.ibm.com,
-        cohuck@redhat.com, imbrenda@linux.ibm.com,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, andre.przywara@arm.com,
-        maz@kernel.org, vivek.gautam@arm.com
-Subject: Re: [kvm-unit-tests RFC PATCH 3/5] run_tests.sh: Add kvmtool support
-Message-ID: <20210909124924.xcuehgluucvs7gb2@gator>
-References: <20210702163122.96110-1-alexandru.elisei@arm.com>
- <20210702163122.96110-4-alexandru.elisei@arm.com>
- <20210907101730.trnsig2j4jmhinyu@gator>
- <587a5f8c-cf04-59ec-7e35-4ca6adf87862@arm.com>
- <20210908150912.3d57akqkfux4fahj@gator>
- <56289c06-04ec-1772-6e15-98d02780876d@arm.com>
- <20210908154943.z7d6bhww3pnbaftd@gator>
- <58d25f89-ff19-2dbc-81bc-3224b8baa9fb@arm.com>
+        id S1354900AbhIINRu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Sep 2021 09:17:50 -0400
+Received: from mail-dm3nam07on2063.outbound.protection.outlook.com ([40.107.95.63]:16033
+        "EHLO NAM02-DM3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1357681AbhIINDP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Sep 2021 09:03:15 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=WH17hFuqA/pi1Nimz1Ntx6N00PEtOii7EZs+Zv5MP8R5NLJGSvQQ2t3DRJnARQ8JOcg77SB0Iia4qNEA0OpGdZ0WYSqAPYqivQczh+ZtbqvIsEa0DEW/Qkwf/vzgaX4YsCFt0/uXQsC0XKGzIrpZ5VVXbszd+TCIZXV0CVyp3/Un7Jzfb1moxIb9LNbcSt8iXc1xqhKQR2SxGbk/oxTChfSushlj8k6k+7Z9yB8N26QIkalgQnllmoMYScOtBrRgdvs2ErZSDyQEFjlS54JQefRNQadiX4YS7D9i8QkEmlf3UTGFW1iP/Aqi0YaGw/g6uBUzuTypL34S8J8Td8PLqw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
+ bh=rpX1a5tQN2dEESee31DyPmnXlFmmvSJK9zaC52ovp4g=;
+ b=f9S9paFC6lSOURgkLUZPpjSxJrH1OhzpNWJnu65tGJrOHptLOpHRyRof6MD5mO7aI2FyQPfUMlBeXyqb+rQoA5XaAYYigb9fUdlsEs4YrOpihQeS3401IsqV52qfU8joY/pYEpvzQUwlyy5QP3HlGUMb5YFP0JPQW3tyPCbdYN7PbGtEqUaU1QeK6EEhc0mZ30zN7Q7YCRnWfzLrM52lIowOwEzRyc6M0ctx8feDSfgO5eUoVwVOS2rE74TNmxAJfEuW2091Blbn18PNQyPUbIZ/5Vpke4lPQv1S1zcAvf3tChTjS9/Wc/7ao24EYFg5xnc3GadKU+NzfqQ7yqOa/w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=rpX1a5tQN2dEESee31DyPmnXlFmmvSJK9zaC52ovp4g=;
+ b=h9uGzwAc3cTh9S3704Q30Tf+Ioad9/+0fooTbx8TGO6YP/enaEu4Xv5DTFgIIkT3TnwSejHm70nuR7U+G2E55eQh0wME4Il5a7jOQeaLk07JpMpqP8U5K9tJT4bIxgEFCJgLysGkeLz5QYkYQzRX1NVVwLuc3QDMQappXJPRkjY=
+Authentication-Results: kernel.org; dkim=none (message not signed)
+ header.d=none;kernel.org; dmarc=none action=none header.from=amd.com;
+Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
+ by DM4PR12MB5279.namprd12.prod.outlook.com (2603:10b6:5:39f::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4500.16; Thu, 9 Sep
+ 2021 13:01:54 +0000
+Received: from DM4PR12MB5229.namprd12.prod.outlook.com
+ ([fe80::d560:d21:cd59:9418]) by DM4PR12MB5229.namprd12.prod.outlook.com
+ ([fe80::d560:d21:cd59:9418%6]) with mapi id 15.20.4500.017; Thu, 9 Sep 2021
+ 13:01:54 +0000
+Subject: Re: [PATCH v3 0/8] Implement generic cc_platform_has() helper
+ function
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        linux-kernel@vger.kernel.org, x86@kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
+        iommu@lists.linux-foundation.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-graphics-maintainer@vmware.com,
+        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        kexec@lists.infradead.org, linux-fsdevel@vger.kernel.org
+Cc:     Borislav Petkov <bp@alien8.de>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Andi Kleen <ak@linux.intel.com>,
+        Sathyanarayanan Kuppuswamy 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        Tianyu Lan <Tianyu.Lan@microsoft.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        Ard Biesheuvel <ardb@kernel.org>, Baoquan He <bhe@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Dave Young <dyoung@redhat.com>,
+        David Airlie <airlied@linux.ie>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+        Maxime Ripard <mripard@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Paul Mackerras <paulus@samba.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Thomas Zimmermann <tzimmermann@suse.de>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Will Deacon <will@kernel.org>
+References: <cover.1631141919.git.thomas.lendacky@amd.com>
+ <bde05ba8-c1b7-5df7-4147-44c38f4f3acf@de.ibm.com>
+From:   Tom Lendacky <thomas.lendacky@amd.com>
+Message-ID: <9b343e40-d892-b556-c5e6-fa46fae61079@amd.com>
+Date:   Thu, 9 Sep 2021 08:01:49 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
+In-Reply-To: <bde05ba8-c1b7-5df7-4147-44c38f4f3acf@de.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SN6PR2101CA0004.namprd21.prod.outlook.com
+ (2603:10b6:805:106::14) To DM4PR12MB5229.namprd12.prod.outlook.com
+ (2603:10b6:5:398::12)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <58d25f89-ff19-2dbc-81bc-3224b8baa9fb@arm.com>
+Received: from [10.236.30.241] (165.204.77.1) by SN6PR2101CA0004.namprd21.prod.outlook.com (2603:10b6:805:106::14) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4523.3 via Frontend Transport; Thu, 9 Sep 2021 13:01:51 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: fbe46845-74d6-47a5-a65c-08d97391ff27
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5279:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <DM4PR12MB5279A7D3B874B087A509A87FECD59@DM4PR12MB5279.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:1850;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 8azszEYDBgIcFSiw1oNOvgD7E1IhXES5E6w2h5NgETx64gpCnDg9zvbnQB9qkb4yQd19JI14VVRqKEWfjnYsHpKemszYNEDyq/9cQ4X9py2ZoMa5iuDLYA3Os+QHnOp9T8hK2a+UdOIMyWH6S4ARpJxa7RR8edpOCCDaglO+UcKLOJsHoDrw/6sKsnoDpDLWF2uHtUPEQzXrJNXlICAJfG6mGNQi8vQcXdd4kjegt0nKOsLZVrS5KZqF4SSCmJYiOugNe6YZLG4c7Y9F+dvyltd7gt2agYFH7Y9hObsDhtki1SSoG+TK0ckBmZfZ34UIQ+rP6gb3TuwOydJrSbSYlzAJQ17DGg16NS+9oQocedMY9wHwR4DaVZfrED2IOaTaV9ueHCUkEnPiUcU9PP5DyvGXmSofkJn9pcBrMES9/Bxm3pRgZyGchK/Ncy3cR1crCLICHnfECzwXM6Jio1DSYdDSW1BwYINArbeKe0ok54Ny3Pe69K77UbgvYcQeFQkjghksiYpP2+TGiyqfmiHfjjwzIE4EEkOEaDvPag+JFxeZASGherqFGZStf42rr2/RWI9xFv0FSI9Gomcgg9JQi3P5tLw7MejxAi0xlCCM0MINvwmKuR8rzF/xD5IQS8e5y+4EpKqJmoTVS3cZxzAq9kvMdAZ+dvbhpZjhdgoXGAFr7und1HYPk9AOk1HDn6xkN57pgEfGxwfVOSjO1YlOmQH1pEp5Jrca+puHMOh8HZP3JL1gHPjvMPSOoezRv09Z92FGPa5gMtvI2XrO0yAXFUtHYttFZY4gYifuQPRffBkt2AcFqQ0WoKrQNbhTzcaJgQjZe9KmAYLSJktWn/EVEQFit2seosGRO5S5LOk6ppQrP9w+DXnuOeu6CZaYyy6Lno7thwqlcagGienEwrB2wA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(39860400002)(346002)(136003)(366004)(376002)(31696002)(31686004)(86362001)(66556008)(66476007)(66946007)(8936002)(921005)(38100700002)(54906003)(83380400001)(36756003)(316002)(53546011)(2906002)(16576012)(956004)(2616005)(26005)(186003)(5660300002)(45080400002)(8676002)(966005)(4326008)(7416002)(7406005)(478600001)(6486002)(41533002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?a1NCenA2RzlrWm14QW9qN0dENUJsZmFuQ1ZqN3NtT1dEcHh0eEhRUURtVUpx?=
+ =?utf-8?B?Q2JHZ0wyS05wN3JOZmlUUXdqNkJ4cWlZU3hGSENBbnR6L01SbWNpMXNlS1Vw?=
+ =?utf-8?B?RHg2YldiWDduV2RpdmlZaTZHU2x6WGowM2FELzlNK0V0TjVCcTlmamZCMUo3?=
+ =?utf-8?B?ZWI1dXBGd09LQjBpTU9JTHZrSSsxaGxobkFnZ0pxM0NZRGthSVpyZGhWZzNI?=
+ =?utf-8?B?NGpPTnY1V0pGTzdJanIycThsMTNWaS9XYnZWWk8vU0ZldkIxVW5nMEl5NkNL?=
+ =?utf-8?B?SWw3L3hIZXJLTFo5NUN3ZWFYMnFYbXhONUd1WDNaMnZjSUh5bWtYcUJ3WlpR?=
+ =?utf-8?B?QnYxelNtQlU1UkxIQjJGYUh0Y0h0YWR6QU9nWHpYN3hXTmJ1dThKNFEwOVRK?=
+ =?utf-8?B?dm1YN3dOMVRpOFkxWG9vN3pZb2JkOXFwL09ia1M1Q0JacWVDK082bWVvSnVq?=
+ =?utf-8?B?MGxjbzRXTWFVak1OWk5pbVRZL0ZCUWRmR2dkNmhwRW12VUFTeUtCU3gvNUlN?=
+ =?utf-8?B?ZXl2YnFkRGNteWFmMWdRNHlVa1N2akxXQ1EyQXY2alRLOW1FeFFCbTZsYjJl?=
+ =?utf-8?B?bzZ3alNPYXVPVEhMTXFPb3kzVmV6aTJGSGw2NE5sZ1RxbFUxNnArWVpDWmJt?=
+ =?utf-8?B?UWhoOVBESldRSjdGZEZTRjZvYno4V2JyWFVNNXh1UjNzOXZ0TzZvTjFqQk9E?=
+ =?utf-8?B?b1d1MnAvU3lwTGVQZlIvalpkMmxrdUJvdXBvR05UMDd5RXBRNVJxQnI4VFA3?=
+ =?utf-8?B?OUh2L2NmOE03TnU3V2cweCthQUhYN2tyY3BqNXArU0EzbjVkQUozb3o5K3Jr?=
+ =?utf-8?B?WGZrQUkzVEpqcy9lUHl4ejB6dk9CODNJdUwzVUpvTHpEMFF1VlpZTlBuU3lh?=
+ =?utf-8?B?cWUvc1pLR25vcXoxbEowVmNUNTRkSWNQWWVIbWVSbll0N2lBcHIzS2UrcVE3?=
+ =?utf-8?B?NWJQRVg0MnA1SFczUzEyTkVoZWNrNmhnb29BRWx6OVkrUUNUcUZCd1RaaTF4?=
+ =?utf-8?B?MFdIbFZxb3VKV1dmdUpmaldPYjNON1UwcGx5OWdKSWFwdGdWdU4xTWJzT2t0?=
+ =?utf-8?B?QzdkenltODY3MjhUVVNrZzZxRGkwdW5CYWdDdUhiTDRnVFJyMFVlZFBMVXVI?=
+ =?utf-8?B?d095R2xENm5oM0NYbnI4SEUxOFVjOFN2TzZmcEN0Q2wyQnBvSmNFMk9iWVdX?=
+ =?utf-8?B?Nk14TTl0TFJiM1NmOElmOXVMVXhIbXhldGdydDNaNTRNMTloU0crQ0RrYjRx?=
+ =?utf-8?B?QjJJdEhpTjZ2SWgrK2xYUFplTlJQUHliUFkwRUhZK0EyVUFnYjJMY1FLcCs0?=
+ =?utf-8?B?OWdLam8xWjcxbXZ2NWVoT0UyZE93aUZ3aTkwU3pyaFlmWHJRMyt1UmVSQ3lT?=
+ =?utf-8?B?aXhHWjlOckhTRng5R1BTNGFUNysxd3ZzZ0JBbHNUUUllYVFLcmU3OXU0QkdQ?=
+ =?utf-8?B?TGxCR0VMMnRGdXp4bkhrV0YzK3VZK0RCWDlUdlRVNS95UnIzRC9tSmd6N0hO?=
+ =?utf-8?B?ekRQQXlpckJVZlo4ZUxTRmpBRDErcmh2bDFOWFcvVytxL3Z2WnZXR2Y5OXJv?=
+ =?utf-8?B?a1djcERWSGpFQ3hZTkU3d1dhcmVRN25nZmY5a3VnSGlaeU9jRENxeEVsSjd4?=
+ =?utf-8?B?dlBIL3RqNVNKeHhoNnJOclRKVHF1NWwweGNqamxpOUhIN3o2YXErbVhRSkZC?=
+ =?utf-8?B?L1FaQVl4bTJ1N0pENko0RXZCWXp4S0FOWEtBWXE4YTRVMHRJMnpHdXg0d1dC?=
+ =?utf-8?Q?A2M+sJAvQGlm+uPvsG27j3t3H/XfZPzqwDPzML/?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fbe46845-74d6-47a5-a65c-08d97391ff27
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Sep 2021 13:01:54.0365
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ANZ57FOLue2D/RaeIjmO2WoLtLG51gGpPVQrrA3t7YDPLPRVgfHokrCbZywnjveuP8+/ExrGdyKOWUbE4yoOag==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5279
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 09, 2021 at 12:33:11PM +0100, Alexandru Elisei wrote:
-> Hi Drew,
+On 9/9/21 2:32 AM, Christian Borntraeger wrote:
 > 
-> On 9/8/21 4:49 PM, Andrew Jones wrote:
-> > On Wed, Sep 08, 2021 at 04:46:19PM +0100, Alexandru Elisei wrote:
-> >> Hi Drew,
-> >>
-> >> On 9/8/21 4:09 PM, Andrew Jones wrote:
-> >>> On Wed, Sep 08, 2021 at 03:33:19PM +0100, Alexandru Elisei wrote:
-> >>> ...
-> >>>>>> +fixup_kvmtool_opts()
-> >>>>>> +{
-> >>>>>> +    local opts=$1
-> >>>>>> +    local groups=$2
-> >>>>>> +    local gic
-> >>>>>> +    local gic_version
-> >>>>>> +
-> >>>>>> +    if find_word "pmu" $groups; then
-> >>>>>> +        opts+=" --pmu"
-> >>>>>> +    fi
-> >>>>>> +
-> >>>>>> +    if find_word "its" $groups; then
-> >>>>>> +        gic_version=3
-> >>>>>> +        gic="gicv3-its"
-> >>>>>> +    elif [[ "$opts" =~ -machine\ *gic-version=(2|3) ]]; then
-> >>>>>> +        gic_version="${BASH_REMATCH[1]}"
-> >>>>>> +        gic="gicv$gic_version"
-> >>>>>> +    fi
-> >>>>>> +
-> >>>>>> +    if [ -n "$gic" ]; then
-> >>>>>> +        opts=${opts/-machine gic-version=$gic_version/}
-> >>>>>> +        opts+=" --irqchip=$gic"
-> >>>>>> +    fi
-> >>>>>> +
-> >>>>>> +    opts=${opts/-append/--params}
-> >>>>>> +
-> >>>>>> +    echo "$opts"
-> >>>>>> +}
-> >>>>> Hmm, I don't think we want to write a QEMU parameter translator for
-> >>>>> all other VMMs, and all other VMM architectures, that we want to
-> >>>>> support. I think we should add new "extra_params" variables to the
-> >>>>> unittest configuration instead, e.g. "kvmtool_params", where the
-> >>>>> extra parameters can be listed correctly and explicitly. While at
-> >>>>> it, I would create an alias for "extra_params", which would be
-> >>>>> "qemu_params" allowing unittests that support more than one VMM
-> >>>>> to clearly show what's what.
-> >>>> I agree, this is a much better idea than a parameter translator. Using a dedicated
-> >>>> variable in unittests.cfg will make it easier for new tests to get support for all
-> >>>> VMMs (for example, writing a list of parameters in unittests.cfg should be easier
-> >>>> than digging through the scripts to figure exactly how and where to add a
-> >>>> translation for a new parameter), and it allow us to express parameters for other
-> >>>> VMMs which don't have a direct correspondent in qemu.
-> >>>>
-> >>>> By creating an alias, do you mean replacing extra_params with qemu_params in
-> >>>> arm/unittests.cfg? Or something else?
-> >>> Probably something like this
-> >>>
-> >>> diff --git a/scripts/common.bash b/scripts/common.bash
-> >>> index 7b983f7d6dd6..e5119ff216e5 100644
-> >>> --- a/scripts/common.bash
-> >>> +++ b/scripts/common.bash
-> >>> @@ -37,7 +37,12 @@ function for_each_unittest()
-> >>>                 elif [[ $line =~ ^smp\ *=\ *(.*)$ ]]; then
-> >>>                         smp=${BASH_REMATCH[1]}
-> >>>                 elif [[ $line =~ ^extra_params\ *=\ *(.*)$ ]]; then
-> >>> -                       opts=${BASH_REMATCH[1]}
-> >>> +               elif [[ $line =~ ^extra_params\ *=\ *(.*)$ ]]; then
-> >>> +                       qemu_opts=${BASH_REMATCH[1]}
-> >>> +               elif [[ $line =~ ^qemu_params\ *=\ *(.*)$ ]]; then
-> >>> +                       qemu_opts=${BASH_REMATCH[1]}
-> >>> +               elif [[ $line =~ ^kvmtool_params\ *=\ *(.*)$ ]]; then
-> >>> +                       kvmtool_opts=${BASH_REMATCH[1]}
-> >>>                 elif [[ $line =~ ^groups\ *=\ *(.*)$ ]]; then
-> >>>                         groups=${BASH_REMATCH[1]}
-> >>>                 elif [[ $line =~ ^arch\ *=\ *(.*)$ ]]; then
-> >>>
-> >>> and all other changes needed to support the s/opts/qemu_opts/ change
-> >>> should work. Also, an addition to the unittests.cfg documentation.
-> >> Got it, replace extra_opts with qemu_opts in the scripts.
-> >>
-> >> Yes, the documentation for unittests.cfg (at the top of the file) should
-> >> definitely be updated to document the new configuration option, kvmtool_params.
-> >>
-> >>> The above diff doesn't consider that a unittests.cfg file could have
-> >>> both an 'extra_params' and a 'qemu_params' field, but I'm not sure
-> >>> we care about that. Users should read the documentation and we
-> >>> should review changes to the committed unittests.cfg files to avoid
-> >>> that.
-> >> What do you feel about renaming extra_params -> qemu_params in unittests.cfg?
-> > Yes, that's what I would expect the patch to do.
-> >
-> >> I'm
-> >> thinking it would make the usage clearer, improve consistency (we would have
-> >> qemu_params and kvmtool_params, instead of extra_params and kvmtool_params), and
-> >> remove any confusions regarding when they are used (I can see someone thinking
-> >> that extra_params are used all the time, and are appended to kvmtool_params when
-> >> --target=kvmtool). On the other hand, this could be problematic for people using
-> >> out-of-tree scripts that parse the unittest.cfg file for whatever reason (are
-> >> there people that do that?).
-> > I'm not as worried about that as about people using out-of-tree
-> > unittests.cfg files that will break when the 'extra_params' field
-> > disappears. That's why I suggested to make 'extra_params' an alias.
 > 
-> I'm sorry, but I'm still having trouble parsing what alias means in this context.
-> Do you mean keep extra_params for current tests, encourage qemu_params for new
-> tests, document that they mean the same thing and going forward qemu_params should
-> be used?
+> On 09.09.21 00:58, Tom Lendacky wrote:
+>> This patch series provides a generic helper function, cc_platform_has(),
+>> to replace the sme_active(), sev_active(), sev_es_active() and
+>> mem_encrypt_active() functions.
+>>
+>> It is expected that as new confidential computing technologies are
+>> added to the kernel, they can all be covered by a single function call
+>> instead of a collection of specific function calls all called from the
+>> same locations.
+>>
+>> The powerpc and s390 patches have been compile tested only. Can the
+>> folks copied on this series verify that nothing breaks for them.
+> 
+> Is there a tree somewhere?
 
-Exactly, which just amounts to keeping the parsing line
+I pushed it up to github:
 
-           elif [[ $line =~ ^extra_params\ *=\ *(.*)$ ]]; then
-                 qemu_opts=${BASH_REMATCH[1]}
-
-and some documentation changes.
+https://github.com/AMDESE/linux/tree/prot-guest-has-v3
 
 Thanks,
-drew
+Tom
 
 > 
-> Thanks,
-> 
-> Alex
-> 
-> >
-> > Thanks,
-> > drew
-> >
-> >> Thanks,
-> >>
-> >> Alex
-> >>
-> >>> Thanks,
-> >>> drew
-> >>>
-> 
-
+>   Also,
+>> a new file, arch/powerpc/platforms/pseries/cc_platform.c, has been
+>> created for powerpc to hold the out of line function.
+>>
+>> Cc: Andi Kleen <ak@linux.intel.com>
+>> Cc: Andy Lutomirski <luto@kernel.org>
+>> Cc: Ard Biesheuvel <ardb@kernel.org>
+>> Cc: Baoquan He <bhe@redhat.com>
+>> Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+>> Cc: Borislav Petkov <bp@alien8.de>
+>> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+>> Cc: Daniel Vetter <daniel@ffwll.ch>
+>> Cc: Dave Hansen <dave.hansen@linux.intel.com>
+>> Cc: Dave Young <dyoung@redhat.com>
+>> Cc: David Airlie <airlied@linux.ie>
+>> Cc: Heiko Carstens <hca@linux.ibm.com>
+>> Cc: Ingo Molnar <mingo@redhat.com>
+>> Cc: Joerg Roedel <joro@8bytes.org>
+>> Cc: Maarten Lankhorst <maarten.lankhorst@linux.intel.com>
+>> Cc: Maxime Ripard <mripard@kernel.org>
+>> Cc: Michael Ellerman <mpe@ellerman.id.au>
+>> Cc: Paul Mackerras <paulus@samba.org>
+>> Cc: Peter Zijlstra <peterz@infradead.org>
+>> Cc: Thomas Gleixner <tglx@linutronix.de>
+>> Cc: Thomas Zimmermann <tzimmermann@suse.de>
+>> Cc: Vasily Gorbik <gor@linux.ibm.com>
+>> Cc: VMware Graphics <linux-graphics-maintainer@vmware.com>
+>> Cc: Will Deacon <will@kernel.org>
+>> Cc: Christoph Hellwig <hch@infradead.org>
+>>
+>> ---
+>>
+>> Patches based on:
+>>    
+>> https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fgit.kernel.org%2Fpub%2Fscm%2Flinux%2Fkernel%2Fgit%2Ftorvalds%2Flinux.git&amp;data=04%7C01%7Cthomas.lendacky%40amd.com%7C5cd71ef2c2ce4b90060708d973640358%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637667695657121432%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C1000&amp;sdata=FVngrPSxCCRKutAaIMtU2Nk8WArFQB1dEE2wN7v8RgA%3D&amp;reserved=0 
+>> master
+>>    4b93c544e90e ("thunderbolt: test: split up test cases in 
+>> tb_test_credit_alloc_all")
+>>
+>> Changes since v2:
+>> - Changed the name from prot_guest_has() to cc_platform_has()
+>> - Took the cc_platform_has() function out of line. Created two new files,
+>>    cc_platform.c, in both x86 and ppc to implment the function. As a
+>>    result, also changed the attribute defines into enums.
+>> - Removed any received Reviewed-by's and Acked-by's given changes in this
+>>    version.
+>> - Added removal of new instances of mem_encrypt_active() usage in powerpc
+>>    arch.
+>> - Based on latest Linux tree to pick up powerpc changes related to the
+>>    mem_encrypt_active() function.
+>>
+>> Changes since v1:
+>> - Moved some arch ioremap functions within #ifdef CONFIG_AMD_MEM_ENCRYPT
+>>    in prep for use of prot_guest_has() by TDX.
+>> - Added type includes to the the protected_guest.h header file to prevent
+>>    build errors outside of x86.
+>> - Made amd_prot_guest_has() EXPORT_SYMBOL_GPL
+>> - Used amd_prot_guest_has() in place of checking sme_me_mask in the
+>>    arch/x86/mm/mem_encrypt.c file.
+>>
+>> Tom Lendacky (8):
+>>    x86/ioremap: Selectively build arch override encryption functions
+>>    mm: Introduce a function to check for confidential computing features
+>>    x86/sev: Add an x86 version of cc_platform_has()
+>>    powerpc/pseries/svm: Add a powerpc version of cc_platform_has()
+>>    x86/sme: Replace occurrences of sme_active() with cc_platform_has()
+>>    x86/sev: Replace occurrences of sev_active() with cc_platform_has()
+>>    x86/sev: Replace occurrences of sev_es_active() with cc_platform_has()
+>>    treewide: Replace the use of mem_encrypt_active() with
+>>      cc_platform_has()
+>>
+>>   arch/Kconfig                                 |  3 +
+>>   arch/powerpc/include/asm/mem_encrypt.h       |  5 --
+>>   arch/powerpc/platforms/pseries/Kconfig       |  1 +
+>>   arch/powerpc/platforms/pseries/Makefile      |  2 +
+>>   arch/powerpc/platforms/pseries/cc_platform.c | 26 ++++++
+>>   arch/powerpc/platforms/pseries/svm.c         |  5 +-
+>>   arch/s390/include/asm/mem_encrypt.h          |  2 -
+>>   arch/x86/Kconfig                             |  1 +
+>>   arch/x86/include/asm/io.h                    |  8 ++
+>>   arch/x86/include/asm/kexec.h                 |  2 +-
+>>   arch/x86/include/asm/mem_encrypt.h           | 14 +---
+>>   arch/x86/kernel/Makefile                     |  3 +
+>>   arch/x86/kernel/cc_platform.c                | 21 +++++
+>>   arch/x86/kernel/crash_dump_64.c              |  4 +-
+>>   arch/x86/kernel/head64.c                     |  4 +-
+>>   arch/x86/kernel/kvm.c                        |  3 +-
+>>   arch/x86/kernel/kvmclock.c                   |  4 +-
+>>   arch/x86/kernel/machine_kexec_64.c           | 19 +++--
+>>   arch/x86/kernel/pci-swiotlb.c                |  9 +-
+>>   arch/x86/kernel/relocate_kernel_64.S         |  2 +-
+>>   arch/x86/kernel/sev.c                        |  6 +-
+>>   arch/x86/kvm/svm/svm.c                       |  3 +-
+>>   arch/x86/mm/ioremap.c                        | 18 ++--
+>>   arch/x86/mm/mem_encrypt.c                    | 57 +++++++------
+>>   arch/x86/mm/mem_encrypt_identity.c           |  3 +-
+>>   arch/x86/mm/pat/set_memory.c                 |  3 +-
+>>   arch/x86/platform/efi/efi_64.c               |  9 +-
+>>   arch/x86/realmode/init.c                     |  8 +-
+>>   drivers/gpu/drm/amd/amdgpu/amdgpu_drv.c      |  4 +-
+>>   drivers/gpu/drm/drm_cache.c                  |  4 +-
+>>   drivers/gpu/drm/vmwgfx/vmwgfx_drv.c          |  4 +-
+>>   drivers/gpu/drm/vmwgfx/vmwgfx_msg.c          |  6 +-
+>>   drivers/iommu/amd/init.c                     |  7 +-
+>>   drivers/iommu/amd/iommu.c                    |  3 +-
+>>   drivers/iommu/amd/iommu_v2.c                 |  3 +-
+>>   drivers/iommu/iommu.c                        |  3 +-
+>>   fs/proc/vmcore.c                             |  6 +-
+>>   include/linux/cc_platform.h                  | 88 ++++++++++++++++++++
+>>   include/linux/mem_encrypt.h                  |  4 -
+>>   kernel/dma/swiotlb.c                         |  4 +-
+>>   40 files changed, 267 insertions(+), 114 deletions(-)
+>>   create mode 100644 arch/powerpc/platforms/pseries/cc_platform.c
+>>   create mode 100644 arch/x86/kernel/cc_platform.c
+>>   create mode 100644 include/linux/cc_platform.h
+>>
+>>
+>> base-commit: 4b93c544e90e2b28326182d31ee008eb80e02074
+>>
