@@ -2,85 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 37A0A4043B7
-	for <lists+kvm@lfdr.de>; Thu,  9 Sep 2021 04:47:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 726094043C1
+	for <lists+kvm@lfdr.de>; Thu,  9 Sep 2021 04:53:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236170AbhIICsy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Sep 2021 22:48:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56972 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235700AbhIICsx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Sep 2021 22:48:53 -0400
-Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2533C061575
-        for <kvm@vger.kernel.org>; Wed,  8 Sep 2021 19:47:44 -0700 (PDT)
-Received: by mail-lf1-x132.google.com with SMTP id x27so684667lfu.5
-        for <kvm@vger.kernel.org>; Wed, 08 Sep 2021 19:47:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=JZuJyqgIQ3oQtgMoTdVtSIrlc/hlmnNYpLQyvIq2xfg=;
-        b=VZXmr2CtnEu1xnlQB4sj2Toq9NyQnwr3mAwinwc9e8osCTTaXFE+U4Fud4LA4LQwHL
-         tKIq+ogy26qQ/8sq5IHh1IZf4M4UAzkPAVyKYHJor1xFMGUQVY8Gu3C67tp1bAAGmALc
-         1vk19c5020uz/heFydrcvHLZ7iJAhJqPZCCH9/lxWmAtmgqVSUAsGQzpDbEXNU/rp8Eo
-         ftURTDAMe4WoRh6lSolAyHoT2Uz9IwQvq4w1ttJUdRzg234sqSsL8cps/95yAkAPqClc
-         M/+o+mVAN9ae1EQE0dH6Jjidt6164K1TboKNNsnUWx9A4aZu6ESEx2imAPJDnA6rVaUp
-         QZoA==
+        id S1347880AbhIICyX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Sep 2021 22:54:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:20692 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230075AbhIICyW (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 8 Sep 2021 22:54:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1631155992;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=4Dd9/A9sFeDep6pwypkyHRy6LbqeJ+nHZSlHUWD9puM=;
+        b=LwwwRfEb7kSUSqx9BJpdwrHPpPVXHy7UaQmVJGxgm5Ey6DM+ucc8DTOM7UJOKgkd3p4OKe
+        0ODdoXV1Edg/HRfx+4AjS/4HzIN7CygC621zy4sU8y+hQlTJNaoeZAA15SPVz3h2t1imw7
+        PYknWeW+4DsMiomc8MT98G2KbvNRCG4=
+Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
+ [209.85.167.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-454-vksWiNxhMNuJ8284K_6jqw-1; Wed, 08 Sep 2021 22:53:11 -0400
+X-MC-Unique: vksWiNxhMNuJ8284K_6jqw-1
+Received: by mail-lf1-f71.google.com with SMTP id g4-20020a19ac04000000b003eb3973e4e2so131151lfc.17
+        for <kvm@vger.kernel.org>; Wed, 08 Sep 2021 19:53:11 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=JZuJyqgIQ3oQtgMoTdVtSIrlc/hlmnNYpLQyvIq2xfg=;
-        b=OG84sUxZ68LmydQy6tR4VaNt1qSJQ83rf9RvNjlGYT5PD6QetLQM/Kh04M008dTE4k
-         kpDGA6P4f6ElEjlluAAHcrY9EHd9ygZqHUM76fjVbySti8xPqzs/IwokL+tvxozOiixk
-         xvOy2KEPOrPLKpFWZlwD/iXDI4gAlMMg6hT5HovWAN1GVUkg29lRXCNK64yHJoWi0HyY
-         Da3S3MLr3wkxR8iw8STgiryPxKxBZhMiF0fXgTUAknymmN5zAAIUib/bjwtLuJJmdM/V
-         HphuaBoFhlhNlMIowfdA+vRn5ig/ABfiGyTeCpR909IPYVnKlvYFqv9njn/9iEtdm3ab
-         3L8w==
-X-Gm-Message-State: AOAM531xoAFF6XrSP7IjivlR9gfIUNnbmigtltwaA7WCj1P8gusT3Rkg
-        bZhOYqPgb0aqFx338LOBTjtU1xRCswK5BAgArKD0dQ==
-X-Google-Smtp-Source: ABdhPJwf+kTCeI6PWF0qQnERCUUUEE8rZRrAMp2Rah12EYfVEJ+5BQho5Hay73HyIRWt9EKzJwn1d+yIQ9o2ln5e0jc=
-X-Received: by 2002:a05:6512:114c:: with SMTP id m12mr626886lfg.150.1631155662626;
- Wed, 08 Sep 2021 19:47:42 -0700 (PDT)
+        bh=4Dd9/A9sFeDep6pwypkyHRy6LbqeJ+nHZSlHUWD9puM=;
+        b=nMjtVw22lB5tBxbyCux5ZOMSEp9ZRs2YdSAa444iLS/jJCcVrJrHSgNcgaJhBdf3Fh
+         kfFTFrUs0kUzglPe5VatrCU72z8xQuB1goIenmSJO6db+h7UGFZ/7BzJc2Zrdml9K+st
+         cNEhq54E+FilQtIT0Hxkq3Nc9HdaA3UKagHpz8qoIC+OfuzJcylOxjmi9/BTnBSmx+33
+         mNU5pFIN7KGoDRMo0AGXShCPCuiOe8QR35JVIUCaEopqm/J57sTT65s8UClEGBEXzM8T
+         CRzZWCLunubK6TpuEPlmgTaB7ZHTpQKFBIqjbXdbSsgaw7sswFUSMK6B/4sTzOrMKYJ4
+         h+Cw==
+X-Gm-Message-State: AOAM531u2d9CCyhEGfXZ1cP2R6XMnz7XaFoTTwn4geENyQ7C9u/8hV6z
+        jIJY8plb5oqvOb8W69rkEGxljjqgJdgB4neG8eqx9L+B9zBqo45qW8RlUOhY7TeD5WkflMjHvK3
+        KwGTGdNN/j5bZHozv8rja+50T9u0j
+X-Received: by 2002:a2e:99d9:: with SMTP id l25mr425108ljj.217.1631155990093;
+        Wed, 08 Sep 2021 19:53:10 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxo1QiSnPNV+uG69sTm5YphTzwX2AqVXNZlrZDd69Dbr+lA7ndwSZ8/FU/at8ix62m9YeVPMnUYQ2Rz6NMek4E=
+X-Received: by 2002:a2e:99d9:: with SMTP id l25mr425099ljj.217.1631155989914;
+ Wed, 08 Sep 2021 19:53:09 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210909013818.1191270-1-rananta@google.com> <20210909013818.1191270-3-rananta@google.com>
-In-Reply-To: <20210909013818.1191270-3-rananta@google.com>
-From:   Oliver Upton <oupton@google.com>
-Date:   Wed, 8 Sep 2021 22:47:31 -0400
-Message-ID: <CAOQ_Qsh=F-tTre_ojiLXUfAriH-coTF_gXCcLyRb3kKM+LLhQA@mail.gmail.com>
-Subject: Re: [PATCH v4 02/18] KVM: arm64: selftests: Add sysreg.h
-To:     Raghavendra Rao Ananta <rananta@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Andrew Jones <drjones@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <Alexandru.Elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <463c1b02ca6f65fc1183431d8d85ec8154a2c28e.1631090797.git.pabeni@redhat.com>
+In-Reply-To: <463c1b02ca6f65fc1183431d8d85ec8154a2c28e.1631090797.git.pabeni@redhat.com>
+From:   Jason Wang <jasowang@redhat.com>
+Date:   Thu, 9 Sep 2021 10:52:59 +0800
+Message-ID: <CACGkMEvTBt3WSJnxvGN0-gsZNXE1eRqx4ZV7X+d9gar1VfwArA@mail.gmail.com>
+Subject: Re: [PATCH] vhost_net: fix OoB on sendmsg() failure.
+To:     Paolo Abeni <pabeni@redhat.com>
+Cc:     netdev <netdev@vger.kernel.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>, kvm <kvm@vger.kernel.org>,
+        virtualization <virtualization@lists.linux-foundation.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Raghu,
-
-On Wed, Sep 8, 2021 at 9:38 PM Raghavendra Rao Ananta
-<rananta@google.com> wrote:
+On Wed, Sep 8, 2021 at 7:42 PM Paolo Abeni <pabeni@redhat.com> wrote:
 >
-> Bring-in the kernel's arch/arm64/include/asm/sysreg.h
-> into selftests to make use of all the standard
-> register definitions in consistence with the kernel.
+> If the sendmsg() call in vhost_tx_batch() fails, both the 'batched_xdp'
+> and 'done_idx' indexes are left unchanged. If such failure happens
+> when batched_xdp == VHOST_NET_BATCH, the next call to
+> vhost_net_build_xdp() will access and write memory outside the xdp
+> buffers area.
 >
-> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> Since sendmsg() can only error with EBADFD, this change addresses the
+> issue explicitly freeing the XDP buffers batch on error.
+>
+> Fixes: 0a0be13b8fe2 ("vhost_net: batch submitting XDP buffers to underlayer sockets")
+> Suggested-by: Jason Wang <jasowang@redhat.com>
+> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 > ---
->  .../selftests/kvm/include/aarch64/sysreg.h    | 1278 +++++++++++++++++
->  1 file changed, 1278 insertions(+)
->  create mode 100644 tools/testing/selftests/kvm/include/aarch64/sysreg.h
+> Note: my understanding is that this should go through MST's tree, please
+> educate me otherwise, thanks!
+> ---
 
-This belongs in tools/arch/arm64/include/asm/sysreg.h, I believe.
+Acked-by: Jason Wang <jasowang@redhat.com>
+
+Thanks!
+
+>  drivers/vhost/net.c | 11 ++++++++++-
+>  1 file changed, 10 insertions(+), 1 deletion(-)
+>
+> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+> index 3a249ee7e144..28ef323882fb 100644
+> --- a/drivers/vhost/net.c
+> +++ b/drivers/vhost/net.c
+> @@ -467,7 +467,7 @@ static void vhost_tx_batch(struct vhost_net *net,
+>                 .num = nvq->batched_xdp,
+>                 .ptr = nvq->xdp,
+>         };
+> -       int err;
+> +       int i, err;
+>
+>         if (nvq->batched_xdp == 0)
+>                 goto signal_used;
+> @@ -476,6 +476,15 @@ static void vhost_tx_batch(struct vhost_net *net,
+>         err = sock->ops->sendmsg(sock, msghdr, 0);
+>         if (unlikely(err < 0)) {
+>                 vq_err(&nvq->vq, "Fail to batch sending packets\n");
+> +
+> +               /* free pages owned by XDP; since this is an unlikely error path,
+> +                * keep it simple and avoid more complex bulk update for the
+> +                * used pages
+> +                */
+> +               for (i = 0; i < nvq->batched_xdp; ++i)
+> +                       put_page(virt_to_head_page(nvq->xdp[i].data));
+> +               nvq->batched_xdp = 0;
+> +               nvq->done_idx = 0;
+>                 return;
+>         }
+>
+> --
+> 2.26.3
+>
+
