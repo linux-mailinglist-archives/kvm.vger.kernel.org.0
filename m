@@ -2,136 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4D43C405EAF
-	for <lists+kvm@lfdr.de>; Thu,  9 Sep 2021 23:18:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A1372405F07
+	for <lists+kvm@lfdr.de>; Thu,  9 Sep 2021 23:42:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345085AbhIIVTv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Sep 2021 17:19:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54018 "EHLO
+        id S1347166AbhIIVnP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Sep 2021 17:43:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59304 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232891AbhIIVTu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Sep 2021 17:19:50 -0400
-Received: from mail-vs1-xe29.google.com (mail-vs1-xe29.google.com [IPv6:2607:f8b0:4864:20::e29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DC6DC061756
-        for <kvm@vger.kernel.org>; Thu,  9 Sep 2021 14:18:40 -0700 (PDT)
-Received: by mail-vs1-xe29.google.com with SMTP id f6so2877473vsr.3
-        for <kvm@vger.kernel.org>; Thu, 09 Sep 2021 14:18:40 -0700 (PDT)
+        with ESMTP id S1344885AbhIIVnH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Sep 2021 17:43:07 -0400
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B483BC061574
+        for <kvm@vger.kernel.org>; Thu,  9 Sep 2021 14:41:57 -0700 (PDT)
+Received: by mail-pl1-x635.google.com with SMTP id e7so1972022plh.8
+        for <kvm@vger.kernel.org>; Thu, 09 Sep 2021 14:41:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=/E/8smJUHTBplUsRlZBuIUX4K9eK50NLheqbrKIzOMA=;
-        b=bssITox5qc/lCDCeF8R7HDzSPA21Bum0LW1yVbEsMTcqDR5xerO1F49EIZTt5i4hAO
-         uLes0QE6PfOR+C+h/i4Bn72vhh5sjNSBrdPKMVPjb2zn4zUazwal8QWYZgLf/biiQIPR
-         aJwsJSz8t+K1Y9eezczxAZQtWmc4C+tTVQLUgquqVVDYWc+zQ7DUgAdn2VQXBgEx49bT
-         l6ihG0i+WZlEtE9Uk22h23hhITZHehdjoqhg3SkhOEiFlz5fNNXid+r/jk9c/RaRuaNf
-         kU1s9nhTJi2jgPUMt0J8UjV9svIFbnh3iCKCZEJXT3wrdlCyvtM+v3vvCBUbZhH/qHFp
-         1lTg==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=Cmi7xVMJh51AjVg5ujaQ3w2M+HVnZy5yn09Ds7yQTCI=;
+        b=B1+ODwqLAvPfFWRXxuisetotF1uVlKSYT8OV6/JEXj/8fdsNjKuq4Rh8YuiI350OUo
+         xaQFo9bJROXJbhRHoeZZsuSPQ/U8fwHuD9gvnI8noMzMHxThDNdfuR9k4et+O4/IlzuB
+         Tfpbzoox009CzUY5nHcN1oxXigDn0Lo6I3jd3KhXq6jBvdaZaszU+GGDwXuVL0eFXRvX
+         q7Csh+I48IRHA5wGb88eV86ftte6HT4VW9K0hp8AmpD7qtNDpoYyc3RBgC1D9Hy04zbG
+         i67LLtFJqlJxgpz8JkGrK/zK0G/T8bL219wBjVVidvJ53KG+3dRbwi4vYXBBRI/yxgir
+         AR8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=/E/8smJUHTBplUsRlZBuIUX4K9eK50NLheqbrKIzOMA=;
-        b=3TuHiDVkGdAAhxOaxSBCo8VgfSEyJzV3L9sFAc1a2gG32JeFxeYBHBsJulJ/vVCD/G
-         dr8dSkyHbl2kpMgkjIfWu3FNKG5Zy6xz0996kRr4mGJgLNhSxZRPJydzG4bqB0KaIwix
-         KQXEfjM54hvQcUqdiEuo3vmjt0VcBDR+9IRSqFy/pqbSBJU3ae9bHiReVAGEE0scgI+/
-         N8awNLaLsBsnf6u4M9R8l9FihiRKrki2rBih+D7fd3lkWp61aiXOljr0xd6HZt01Ti6+
-         l6umOAgty6tApzQbIA5A5UsfmrMnaa5Ks45SHNpx+EzapvAGZrhD7rWv2XpQAJM6+zxg
-         jGvQ==
-X-Gm-Message-State: AOAM530zFTwFf7HuukBOfO6O5d7tP/BQz6Hk9qBQ4ibXr2qexRHNgLiH
-        TfSNTLo6aKx4jtkdPaJUYuW0oSATNpZdWnXDSkg/YA==
-X-Google-Smtp-Source: ABdhPJwaw3fj4RW2mYYYaHq8r3mCngNKf5j/vOsNg0pxRS2SMxe8BP1fJ+TSXjOXVdkXzYXeUr7Uk5/cjhgtMqgCWtg=
-X-Received: by 2002:a67:fdd1:: with SMTP id l17mr3617799vsq.47.1631222319252;
- Thu, 09 Sep 2021 14:18:39 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210818053908.1907051-1-mizhang@google.com> <20210818053908.1907051-4-mizhang@google.com>
- <YTJ5wjNShaHlDVAp@google.com> <fcb83a85-8150-9617-01e6-c6bcc249c485@amd.com>
- <YTf3udAv1TZzW+xA@google.com> <8421f104-34e8-cc68-1066-be95254af625@amd.com> <YTpOsUAqHjQ9DDLd@google.com>
-In-Reply-To: <YTpOsUAqHjQ9DDLd@google.com>
-From:   Mingwei Zhang <mizhang@google.com>
-Date:   Thu, 9 Sep 2021 14:18:28 -0700
-Message-ID: <CAL715W+u6mt5grwoT6DBhUtzN6xx=OjWPu6M0=p0sxLZ4JTvDg@mail.gmail.com>
-Subject: Re: [PATCH v2 3/4] KVM: SVM: move sev_bind_asid to psp
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Brijesh Singh <brijesh.singh@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        John Allen <john.allen@amd.com>,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Cmi7xVMJh51AjVg5ujaQ3w2M+HVnZy5yn09Ds7yQTCI=;
+        b=vgKwqunOhWJ7zE2XdLim3tqF4m7ldpGGcgm9vujOWErxdKitDQASifTq5qGmIIrhoZ
+         KTnmoCVDjlWRYJS9k8A4hhuXtKGl5QjjIoYBwcEdPJ+UJIdUDDTcZk2C31+0gZC8SK9J
+         fRkOXmbMwEb0SJHxLpuBDuPS5xtFhOZX8kk4UseyW8BhkT2OqO4fAgU5Q6Vzl/kQIIEy
+         JcozPYd4ZGFRvFyDQ3+Se/nUaPR33cBD+xEaXnBNKn4Cp3TjYIn4O8jOc8R/de+trPBM
+         tBXLv8PFQOPVgyKhlhiTG2pOzP00TpPScYupXpyVZDD57X/o+tjmsDknHInEW7nOWrgM
+         245Q==
+X-Gm-Message-State: AOAM533+PIH9LWjXlKvizAy7idyCmdnY0MNdPicrVluUehaKrto1/lDJ
+        K24S6IZkN/rDSKJZlinwzsOWWw==
+X-Google-Smtp-Source: ABdhPJyNNEmvNXWXbLbpiwJCEkwrZPMI6ZxJQjILhKo2FNAMx+uP5cq72TUb0Q1WjyeGDsoEW94ZKQ==
+X-Received: by 2002:a17:90a:d789:: with SMTP id z9mr5962122pju.32.1631223717031;
+        Thu, 09 Sep 2021 14:41:57 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id n9sm2973973pfu.152.2021.09.09.14.41.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Sep 2021 14:41:56 -0700 (PDT)
+Date:   Thu, 9 Sep 2021 21:41:52 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>,
-        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-        Alper Gun <alpergun@google.com>,
-        Borislav Petkov <bp@alien8.de>,
-        David Rienjes <rientjes@google.com>,
-        Marc Orr <marcorr@google.com>, Peter Gonda <pgonda@google.com>,
-        Vipin Sharma <vipinsh@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 6/7] KVM: VMX: Check Intel PT related CPUID leaves
+Message-ID: <YTp/oGmiin19q4sQ@google.com>
+References: <20210827070249.924633-1-xiaoyao.li@intel.com>
+ <20210827070249.924633-7-xiaoyao.li@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210827070249.924633-7-xiaoyao.li@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> > Most of the address field in the "struct sev_data_*" are physical
-> > addressess. The userspace will not be able to populate those fields.
->
-> Yeah, that's my biggest hesitation to using struct sev_data_* in the API, it's
-> both confusing and gross.  But it's also why I think these helpers belong in the
-> PSP driver, KVM should not need to know the "on-the-wire" format for communicating
-> with the PSP.
->
+On Fri, Aug 27, 2021, Xiaoyao Li wrote:
+> CPUID 0xD leaves reports the capabilities of Intel PT, e.g. it decides
+> which bits are valid to be set in MSR_IA32_RTIT_CTL, and reports the
+> number of PT ADDR ranges.
+> 
+> KVM needs to check that guest CPUID values set by userspace doesn't
+> enable any bit which is not supported by bare metal. Otherwise,
+> 1. it will trigger vm-entry failure if hardware unsupported bit is
+>    exposed to guest and set by guest.
+> 2. it triggers #GP when context switch PT MSRs if exposing more
+>    RTIT_ADDR* MSRs than hardware capacity.
+> 
+> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> ---
+> There is bit 31 of CPUID(0xD, 0).ECX that doesn't restrict any bit in
+> MSR_IA32_RTIT_CTL. If guest has different value than host, it won't
+> cause any vm-entry failure, but guest will parse the PT packet with
+> wrong format.
+> 
+> I also check it to be same as host to ensure the virtualization correctness.
+> 
+> Changes in v2:
+> - Call out that if configuring more PT ADDR MSRs than hardware, it can
+>   cause #GP when context switch.
+> ---
+>  arch/x86/kvm/cpuid.c | 25 +++++++++++++++++++++++++
+>  1 file changed, 25 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index 739be5da3bca..0c8e06a24156 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -76,6 +76,7 @@ static inline struct kvm_cpuid_entry2 *cpuid_entry2_find(
+>  static int kvm_check_cpuid(struct kvm_cpuid_entry2 *entries, int nent)
+>  {
+>  	struct kvm_cpuid_entry2 *best;
+> +	u32 eax, ebx, ecx, edx;
+>  
+>  	/*
+>  	 * The existing code assumes virtual address is 48-bit or 57-bit in the
+> @@ -89,6 +90,30 @@ static int kvm_check_cpuid(struct kvm_cpuid_entry2 *entries, int nent)
+>  			return -EINVAL;
+>  	}
+>  
+> +	/*
+> +	 * CPUID 0xD leaves tell Intel PT capabilities, which decides
 
-Did a simple checking for all struct sev_data_* fields defined in psp-sev.h:
+CPUID.0xD is XSAVE state, CPUID.0x14 is Intel PT.  This series needs tests...
 
-The average argument is roughly 4 (103/27), detailed data appended at
-last. In addition, I believe the most used commands would be the
-following?
+> +	 * pt_desc.ctl_bitmask in later update_intel_pt_cfg().
+> +	 *
+> +	 * pt_desc.ctl_bitmask decides the legal value for guest
+> +	 * MSR_IA32_RTIT_CTL. KVM cannot support PT capabilities beyond native,
+> +	 * otherwise it will trigger vm-entry failure if guest sets native
+> +	 * unsupported bits in MSR_IA32_RTIT_CTL.
+> +	 */
+> +	best = cpuid_entry2_find(entries, nent, 0xD, 0);
+> +	if (best) {
+> +		cpuid_count(0xD, 0, &eax, &ebx, &ecx, &edx);
+> +		if (best->ebx & ~ebx || best->ecx & ~ecx)
+> +			return -EINVAL;
+> +	}
+> +	best = cpuid_entry2_find(entries, nent, 0xD, 1);
+> +	if (best) {
+> +		cpuid_count(0xD, 0, &eax, &ebx, &ecx, &edx);
+> +		if (((best->eax & 0x7) > (eax & 0x7)) ||
 
-#data structure name: number of meaningful fields
-sev_data_launch_start: 6
-sev_data_activate: 2
-sev_data_decommission: 1
-sev_data_receive_update_data: 7
-sev_data_send_update_vmsa: 7
-sev_data_launch_measure: 3
-sev_data_launch_finish: 1
-sev_data_deactivate: 1
+Ugh, looking at the rest of the code, even this isn't sufficient because
+pt_desc.guest.addr_{a,b} are hardcoded at 4 entries, i.e. running KVM on hardware
+with >4 entries will lead to buffer overflows.
 
-For the above frequently-used command set, the average argument length
-is also around 3-4 (28/8) on average, 2.5 as the median.
+One option would be to bump that to the theoretical max of 15, which doesn't seem
+too horrible, especially if pt_desc as a whole is allocated on-demand, which it
+probably should be since it isn't exactly tiny (nor ubiquitous)
 
-So, from that perspective, I think we should just remove those
-sev_data data structures in KVM, since it is more clear to read each
-argument.
+A different option would be to let userspace define whatever it wants for guest
+CPUID, and instead cap nr_addr_ranges at min(host.cpuid, guest.cpuid, RTIT_ADDR_RANGE).
 
-In addition, having to construct each sev_data_* structure in KVM code
-is also a pain and  consumes a lot of irrelevant lines as well.
+Letting userspace generate a bad MSR_IA32_RTIT_CTL is not problematic, there are
+plenty of ways userspace can deliberately trigger VM-Entry failure due to invalid
+guest state (even if this is a VM-Fail condition, it's not a danger to KVM).
 
-#data structure name: number of meaningful fields
-sev_data_deactivate: 1
-sev_data_decommission: 1
-sev_data_launch_finish: 1
-sev_data_receive_finish: 1
-sev_data_send_cancel: 1
-sev_data_send_finish: 1
-sev_data_activate: 2
-sev_data_download_firmware: 2
-sev_data_get_id: 2
-sev_data_pek_csr: 2
-sev_data_init: 3
-sev_data_launch_measure: 3
-sev_data_launch_update_data: 3
-sev_data_launch_update_vmsa: 3
-sev_data_attestation_report: 4
-sev_data_dbg: 4
-sev_data_guest_status: 4
-sev_data_pdh_cert_export: 4
-sev_data_pek_cert_import: 4
-sev_data_launch_start: 6
-sev_data_receive_start: 6
-sev_data_launch_secret: 7
-sev_data_receive_update_data: 7
-sev_data_receive_update_vmsa: 7
-sev_data_send_update_data: 7
-sev_data_send_update_vmsa: 7
-sev_data_send_start: 10
+> +		    ((best->eax & ~eax) >> 16) ||
+> +		    (best->ebx & ~ebx))
+> +			return -EINVAL;
+> +	}
+> +
+>  	return 0;
+>  }
+>  
+> -- 
+> 2.27.0
+> 
