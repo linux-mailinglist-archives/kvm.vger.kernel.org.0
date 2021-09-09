@@ -2,97 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 33E43405DDE
-	for <lists+kvm@lfdr.de>; Thu,  9 Sep 2021 22:06:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 33502405E01
+	for <lists+kvm@lfdr.de>; Thu,  9 Sep 2021 22:28:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344117AbhIIUH4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Sep 2021 16:07:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37938 "EHLO
+        id S1345323AbhIIU3Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Sep 2021 16:29:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42650 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245508AbhIIUHz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Sep 2021 16:07:55 -0400
-Received: from mail-yb1-xb33.google.com (mail-yb1-xb33.google.com [IPv6:2607:f8b0:4864:20::b33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74CA0C061574
-        for <kvm@vger.kernel.org>; Thu,  9 Sep 2021 13:06:45 -0700 (PDT)
-Received: by mail-yb1-xb33.google.com with SMTP id a93so6356305ybi.1
-        for <kvm@vger.kernel.org>; Thu, 09 Sep 2021 13:06:45 -0700 (PDT)
+        with ESMTP id S1345192AbhIIU3Y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Sep 2021 16:29:24 -0400
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F091C061574
+        for <kvm@vger.kernel.org>; Thu,  9 Sep 2021 13:28:15 -0700 (PDT)
+Received: by mail-pl1-x62c.google.com with SMTP id w6so1860951pll.3
+        for <kvm@vger.kernel.org>; Thu, 09 Sep 2021 13:28:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=tO7FQvr77frYJi3nZmu6+pwHGzzGpRLOFUZlxjTtI1U=;
-        b=Oy8ce1O5/wmCpWya7nBN8qiLzyBclFRFa2r5eAlAZU84jaC9rRJqZj+6BkGTdfIpgW
-         Xo43sUbTTRgBrpwz5atoMw8WujebQDagPIFYaWoWcjBinCeRRovpaAoErPviwwGktYxP
-         2IzfCacZM2oMqC39Ot+/X5X/Dm9DDMIjRuU6S0+QBgx2AmPIUXBsbIFrNplp1T8lCRh8
-         yi+d82k1py9m7Zw1jRBRnzaBMTHpxNDk1JlsO3SBLSBfCH36zQGB1BjjhcxRxp10WXKe
-         5KDRIbkrpMER8mwxPbVPhljAg1QG2K6yLR41eqOBWjdb0KAOLc1agFTWxfHGFr2zJmrQ
-         svJA==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=KkIQUN6UVWVDGVs7gQUvenivKjOnMibWM6lN26FSefU=;
+        b=FVbJMuxsPdMboW3fGRpeknq9uQRgiNFYMkfTDCp+yIJU/r8SnfixFRLOMHCuS02TXV
+         RwGohEECz7j1XeRtYg7gQzlcG+vLV6rsHNncc7O4uYVacKrMziWXHeyXi3ToHSI5Krci
+         dAtD/keu37A2un94zex2UJJKhbPBH+ZA+1B3gpOkZmfN9W4RivrlV4R9/tQ/9cnZUrgu
+         RzQYH2dMHu7mQiJ40p9ZTab+fVOUV0+TFBglNS4NUUQKTHkf9HLIB/mCNlTcORWAPzSS
+         K/4cGRMB01MOZSLT6KTLNPsQp2b002EpBhgBufLFsJW1FvkHgofIBfja7U+61OoYFw47
+         vXng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=tO7FQvr77frYJi3nZmu6+pwHGzzGpRLOFUZlxjTtI1U=;
-        b=gdRc+NIcCQRkx9zZq1KN6eCAPpF8Mh3BdI8Y0tQbHN3lW+JQ6HJPs6mjCCk9QsG9YH
-         fqoycx82gWwRhQTJlk9aG8OnB3Qvwfrp3zEfz1VBQXI2GuBGWdwe0npXBUzKBks42Arq
-         X4fPSqocqj1Z8zKnIwi8cNcg3uIo+b4VI9EeIaeYH9gyKJ8wai202xsKME/HErpgXj/a
-         vuYeoe/lQG5cs2IUo6qQy1xqLsFMdOJ2zJAhhitJnophDjNCTUFtLrVfjgYJCfTj3PQu
-         kPRwxiEID23Q+eu+RvJe9/Y+5eEY4zA9i51f4xr6WLYwqvSXUm4G+Zyj1WDOEuTYVZ66
-         OTmw==
-X-Gm-Message-State: AOAM533S69BWotlVnR3UJOCK/or587iBh3bVXkjeaOQXCKTa+DIS4HjR
-        9ttLupuut/jwOtnucatbXblF1sxiBTX1vb/Uh07ToQ==
-X-Google-Smtp-Source: ABdhPJy5AGrEZidGvl3dQRB0sKLB1qGhBQdOWzBR63cYYp97lf+k7MCv+e5P0N+q7y2PLgyyxkEQheVKlXRUYFUqZyY=
-X-Received: by 2002:a25:8093:: with SMTP id n19mr6441809ybk.414.1631218003111;
- Thu, 09 Sep 2021 13:06:43 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210909013818.1191270-1-rananta@google.com> <20210909013818.1191270-3-rananta@google.com>
- <20210909171755.GF5176@sirena.org.uk>
-In-Reply-To: <20210909171755.GF5176@sirena.org.uk>
-From:   Raghavendra Rao Ananta <rananta@google.com>
-Date:   Thu, 9 Sep 2021 13:06:31 -0700
-Message-ID: <CAJHc60yJ6621=TezncgsMR+DdYxzXY1oF-QLeARwq8HowH6sVQ@mail.gmail.com>
-Subject: Re: [PATCH v4 02/18] KVM: arm64: selftests: Add sysreg.h
-To:     Mark Brown <broonie@kernel.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Andrew Jones <drjones@redhat.com>,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=KkIQUN6UVWVDGVs7gQUvenivKjOnMibWM6lN26FSefU=;
+        b=NVnOQV4LMco+7oYP5d9e6lNFZzr6POb8/Ab+jKg1im30+UGaRynxqcViU72hfSaB0o
+         cD9y7O0nxwmJDMEE7iIZYTaZnjWmqtGPjHa8XoeQloJyfqrQR/X24M57zh8QSGDqGdbs
+         G0Wf+I7Bv0efunTCfDvoQuB/Nj9as1JfBw82ofZ2YBMgHSAv+eC5ReD17X30XDbLAiiG
+         7cXtUnKZnk9Hc/eqonbMUJXw7pRo+dIoZvCeZgHbbXaHXaC8Z7Wp116S6/TJOIMhxBMQ
+         CgWefCfN+Grad/9wJ5LTKiEBWbmUXAlUkrhCGnu7sOkANqJhQj8uiEt0txkroNg1OBqc
+         qqTg==
+X-Gm-Message-State: AOAM530zGyOlD7svXodmo7zCV9SdzcHEgU3xTlIpmfDWds8itjRlt/1b
+        Qbji3v8XYN+omXyExCe36yh6uQ==
+X-Google-Smtp-Source: ABdhPJyAc4CRr9tF0y4feLojYbdHTKlOemQgA2iiZMpEO+mvtfr+51OjqPfvtnvGWSxrmgXGK89LBw==
+X-Received: by 2002:a17:90a:428e:: with SMTP id p14mr5632154pjg.92.1631219294432;
+        Thu, 09 Sep 2021 13:28:14 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id b4sm3124696pga.69.2021.09.09.13.28.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Sep 2021 13:28:14 -0700 (PDT)
+Date:   Thu, 9 Sep 2021 20:28:10 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Juergen Gross <jgross@suse.com>, kvm@vger.kernel.org,
+        x86@kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org, ehabkost@redhat.com,
         James Morse <james.morse@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        Will Deacon <will@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, kvmarm@lists.cs.columbia.edu
+Subject: Re: [PATCH v2 5/6] kvm: allocate vcpu pointer array separately
+Message-ID: <YTpuWl3Uhu4qpC1U@google.com>
+References: <20210903130808.30142-1-jgross@suse.com>
+ <20210903130808.30142-6-jgross@suse.com>
+ <871r65wwk7.wl-maz@kernel.org>
+ <37699e98-9a47-732d-8522-daa90f35c52f@suse.com>
+ <87eea2c9zu.wl-maz@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87eea2c9zu.wl-maz@kernel.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 9, 2021 at 10:18 AM Mark Brown <broonie@kernel.org> wrote:
->
-> On Thu, Sep 09, 2021 at 01:38:02AM +0000, Raghavendra Rao Ananta wrote:
-> > Bring-in the kernel's arch/arm64/include/asm/sysreg.h
-> > into selftests to make use of all the standard
-> > register definitions in consistence with the kernel.
->
-> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> > ---
-> >  .../selftests/kvm/include/aarch64/sysreg.h    | 1278 +++++++++++++++++
-> >  1 file changed, 1278 insertions(+)
-> >  create mode 100644 tools/testing/selftests/kvm/include/aarch64/sysreg.h
->
-> Can we arrange to copy this at build time rather than having a duplicate
-> copy we need to keep in sync?  We have some stuff to do this for uapi
-> headers already.
+On Mon, Sep 06, 2021, Marc Zyngier wrote:
+> On Mon, 06 Sep 2021 05:33:35 +0100,
+> Juergen Gross <jgross@suse.com> wrote:
+> > 
+> > On 03.09.21 16:41, Marc Zyngier wrote:
+> >
+> > > At this stage, I really wonder why we are not using an xarray instead.
+> > > 
+> > > I wrote this [1] a while ago, and nothing caught fire. It was also a
+> > > net deletion of code...
+> > 
+> > Indeed, I'd prefer that solution!
+> > 
+> > Are you fine with me swapping my patch with yours in the series?
+> 
+> Of course, feel free to grab the whole series. You'll probably need
+> the initial patches to set the scene for this. On their own, they are
+> a nice cleanup, and I trust you can write a decent commit message for
+> the three patches affecting mips/s390/x86.
 
-That's a great idea actually (I wasn't aware of it). But, probably
-should've mentioned it earlier, I had a hard time compiling the header
-as is so I modified it a little bit and made the definitions of
-[write|read]_sysreg_s() similar to the ones in kvm-unit-tests.
-I'll try my best to get the original format working and try to
-implement your idea if it works.
-
-Regards,
-Raghavendra
+It would also be a good idea to convert kvm_for_each_vcpu() to use xa_for_each(),
+I assume that's more performant than 2x atomic_read() + xa_load().  Unless I'm
+misreading the code, xa_for_each() is guaranteed to iterate in ascending index
+order, i.e. preserves the current vcpu0..vcpuN iteration order.
