@@ -2,105 +2,224 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E809F405BC3
-	for <lists+kvm@lfdr.de>; Thu,  9 Sep 2021 19:09:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E7867405BCF
+	for <lists+kvm@lfdr.de>; Thu,  9 Sep 2021 19:11:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240791AbhIIRK0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Sep 2021 13:10:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53388 "EHLO
+        id S241273AbhIIRM2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Sep 2021 13:12:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53852 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238914AbhIIRKZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Sep 2021 13:10:25 -0400
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 151C9C061575
-        for <kvm@vger.kernel.org>; Thu,  9 Sep 2021 10:09:16 -0700 (PDT)
-Received: by mail-pj1-x102a.google.com with SMTP id w19-20020a17090aaf9300b00191e6d10a19so1942345pjq.1
-        for <kvm@vger.kernel.org>; Thu, 09 Sep 2021 10:09:16 -0700 (PDT)
+        with ESMTP id S240958AbhIIRMT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Sep 2021 13:12:19 -0400
+Received: from mail-yb1-xb32.google.com (mail-yb1-xb32.google.com [IPv6:2607:f8b0:4864:20::b32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82592C061575
+        for <kvm@vger.kernel.org>; Thu,  9 Sep 2021 10:11:09 -0700 (PDT)
+Received: by mail-yb1-xb32.google.com with SMTP id v17so5288770ybs.9
+        for <kvm@vger.kernel.org>; Thu, 09 Sep 2021 10:11:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=aBtM+Vc7Pdk2KbXitmQqbb8Smj1Sm+602q1syMUfkco=;
-        b=k43+wP4XjElxHdhGoIl3EArpqrrKP9efEUsSpzl8yfxIKXgG2r01TrRNEloYN/070s
-         psSDinINGrXnE/sGefyEmidxLuIXLQWbvcuMJTleE/BiRdRurVyA7poDYPnpPuhy/FtY
-         loa/sRj7PbmXt9ODqmyRANNK+nidaLFfsOQ0jKtfL4y1dDst2DP5nOZv6y19oDZskDEI
-         UjqU0mnTOU3cEdpxzR+p3dpujVrpYIlpaQGOFiM6LwyTtlF+8BvL8Rqzo4CKcE6adPwg
-         TYkjbrDih81xcxJNySwqxIcs4foWtqeNzUrEqcwPZDN9/h/evLRd6AccdLMQIwN2JahQ
-         JSzw==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Gt9YsGEHPd9blquFdpY+rNn/Ktkd0FJBPDXVSwWfzVA=;
+        b=mBPX6UaRDah3B9oEWW40eU8dcRn8RO27Gpz202oHuPyfN6E2FVjsIyHQoLooajZXzz
+         WKvlB4pyuqZBiH941evKKdmhjzotDrTrIRW9b+f/vYXimmZkfY6Pw5n/D8soGbl93xhg
+         6nVfZ8UUE5zyPdNVLOU4y4m7Lgi9SEHC2RqUhV/PzfFnjly+5Q33ymAQTsfyG1DjjyJs
+         qfW+e20g4OTXBCKsm7HSZ0jOHZHeavkx+lNQd6d463MFJZOUwDO9DaXCzYCYcrQoiupo
+         vm8+36L8qF8U0YQ4dc4r38X0yCdYMJT5QcfnRv563cdHCRSyVu1FKpPWoKabCSgssWOu
+         i0IA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=aBtM+Vc7Pdk2KbXitmQqbb8Smj1Sm+602q1syMUfkco=;
-        b=Dm1IJogKHQCshMjyeqaPH5bUDX5y2KRNu9du22Hva/JtNoXAT1/nHWX77mX5i/WcJK
-         s3gR/XJQMwqhL68XJr5BuOPPRMsmYrPQmoFrs0nsfCQX9d+UqF7lNPnqYtYqfjUmrqJl
-         U3udulP8Os0GKHnwAKX9JDSExhrpf+KipFQ3DyHUjcd3MWO7p+ViI4p/+pIJwojdJgJ1
-         OBnsba0IIEHCR/plYtIbZnWRNfe2HifKvdxW8klodRFONnmbHB18hDgvr12gzXtSxRi4
-         LQeZNhNKKZu6nZc6lOja3lbcL/5J7zEbdzSMo+OBSAoREK3ORgn/Lpmwef/kCQyGQBnF
-         3zbA==
-X-Gm-Message-State: AOAM533ZpCSbqSRPmYqpTtSAK3H9VgFchtXsTTdqyk0FR/cKZuBe6/yP
-        vXnrHFWzGSIiDbkqlFnrgN0gTw==
-X-Google-Smtp-Source: ABdhPJycifsJuq88nNWwvxJDYYjyqLf3VbV19NHMcl078B1/FDTeUil2OXWc0PyTR1WOy8TLeCmApQ==
-X-Received: by 2002:a17:902:bf07:b0:138:e32d:9f2e with SMTP id bi7-20020a170902bf0700b00138e32d9f2emr3524138plb.59.1631207355415;
-        Thu, 09 Sep 2021 10:09:15 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id o10sm2854670pjo.47.2021.09.09.10.09.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Sep 2021 10:09:14 -0700 (PDT)
-Date:   Thu, 9 Sep 2021 17:09:11 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Yu Zhang <yu.c.zhang@linux.intel.com>
-Cc:     Hou Wenlong <houwenlong93@linux.alibaba.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Jan Kiszka <jan.kiszka@siemens.com>,
-        Avi Kivity <avi@redhat.com>,
-        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
-        <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2 1/3] kvm: x86: Introduce hypercall x86 ops for
- handling hypercall not in cpl0
-Message-ID: <YTo/t4G1iI28oDmk@google.com>
-References: <cover.1631188011.git.houwenlong93@linux.alibaba.com>
- <04a337801ad5aaa54144dc57df8ee2fc32bc9c4e.1631188011.git.houwenlong93@linux.alibaba.com>
- <20210909163901.2vvozmkuxjcgabs5@linux.intel.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Gt9YsGEHPd9blquFdpY+rNn/Ktkd0FJBPDXVSwWfzVA=;
+        b=0xQcc8xnr0ENMl4z+pENEt75FiS4nwvbn1xJEGS8tf472dYDE5MPQ3B8pWge38Rx1k
+         OYgej9BkL6IvMQSdKZnNTfI1DIVg4cJqabQ3x/fO9AGfpgw8fYbHAn9P4VgaHu3yh7kv
+         V6LCSTc/EJ/mcCWj7KFH8NExJFGGLHWcIM1u8WFwrVkf0ibShxHjx6oavII/9+TP2+Yl
+         BENdmXYnLTS10SJTxCYKjxDvHsXg5i5LHcENkgE79zu2AJVsX2wUln3q8zfWqzn+Ca/D
+         m+Y5AboAf2T/XgWwxNrIqeW0yUsCE04WpaZrAMeU+rooiXwj9pdWtyfZ7t1x3PVOcIii
+         zrpA==
+X-Gm-Message-State: AOAM532OyV/sulukp5kVOx60UqaWLLLmtRAtD1lOit1f/scXInEUFQUc
+        7+TLwR9J/dvLo0pEMWzU/AS67QCEf/E+Tl9LECyxcw==
+X-Google-Smtp-Source: ABdhPJyjeZVZ5OBHHfB/gVgbY4kEHNdlHJNCyRZ8a5HkSMk3+pNJRkf1F8zHY9JBbnAAyeMDADYnnps15uTm9MTGWF8=
+X-Received: by 2002:a25:1c09:: with SMTP id c9mr5447528ybc.350.1631207468411;
+ Thu, 09 Sep 2021 10:11:08 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210909163901.2vvozmkuxjcgabs5@linux.intel.com>
+References: <20210909013818.1191270-1-rananta@google.com> <20210909013818.1191270-10-rananta@google.com>
+ <20210909075643.fhngqu6tqrpe33gl@gator>
+In-Reply-To: <20210909075643.fhngqu6tqrpe33gl@gator>
+From:   Raghavendra Rao Ananta <rananta@google.com>
+Date:   Thu, 9 Sep 2021 10:10:56 -0700
+Message-ID: <CAJHc60wRkUyKEdY0ok0uC7r=P0FME+Lb7oapz+AKbjaNDhFHyA@mail.gmail.com>
+Subject: Re: [PATCH v4 09/18] KVM: arm64: selftests: Add guest support to get
+ the vcpuid
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 10, 2021, Yu Zhang wrote:
-> On Thu, Sep 09, 2021 at 07:55:23PM +0800, Hou Wenlong wrote:
-> > Per Intel's SDM, use vmcall instruction in non VMX operation for cpl3
-> > it should trigger a #UD. And in VMX root operation, it should
-> 
-> Are you sure? IIRC, vmcall will always cause VM exit as long as CPU
-> is in non-root mode(regardless the CPL).
+On Thu, Sep 9, 2021 at 12:56 AM Andrew Jones <drjones@redhat.com> wrote:
+>
+> On Thu, Sep 09, 2021 at 01:38:09AM +0000, Raghavendra Rao Ananta wrote:
+> > At times, such as when in the interrupt handler, the guest wants
+> > to get the vcpuid that it's running on. As a result, introduce
+> > get_vcpuid() that returns the vcpuid of the calling vcpu. At its
+> > backend, the VMM prepares a map of vcpuid and mpidr during VM
+> > initialization and exports the map to the guest for it to read.
+> >
+> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> > ---
+> >  .../selftests/kvm/include/aarch64/processor.h |  3 ++
+> >  .../selftests/kvm/lib/aarch64/processor.c     | 46 +++++++++++++++++++
+> >  2 files changed, 49 insertions(+)
+> >
+> > diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
+> > index b6088c3c67a3..150f63101f4c 100644
+> > --- a/tools/testing/selftests/kvm/include/aarch64/processor.h
+> > +++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
+> > @@ -133,6 +133,7 @@ void vm_install_exception_handler(struct kvm_vm *vm,
+> >               int vector, handler_fn handler);
+> >  void vm_install_sync_handler(struct kvm_vm *vm,
+> >               int vector, int ec, handler_fn handler);
+> > +void vm_vcpuid_map_init(struct kvm_vm *vm);
+> >
+> >  static inline void cpu_relax(void)
+> >  {
+> > @@ -194,4 +195,6 @@ static inline void local_irq_disable(void)
+> >       asm volatile("msr daifset, #3" : : : "memory");
+> >  }
+> >
+> > +int get_vcpuid(void);
+> > +
+> >  #endif /* SELFTEST_KVM_PROCESSOR_H */
+> > diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+> > index 632b74d6b3ca..9844b62227b1 100644
+> > --- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
+> > +++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+> > @@ -13,9 +13,17 @@
+> >  #include "processor.h"
+> >
+> >  #define DEFAULT_ARM64_GUEST_STACK_VADDR_MIN  0xac0000
+> > +#define VM_VCPUID_MAP_INVAL                  -1
+> >
+> >  static vm_vaddr_t exception_handlers;
+> >
+> > +struct vm_vcpuid_map {
+> > +     uint64_t mpidr;
+> > +     int vcpuid;
+> > +};
+>
+> I'd prefer we create an arch neutral map structure that has arch specific
+> vm_vcpuid_map_add() functions to populate them. So, instead of calling the
+> 'mpidr' member mpidr, we should call it 'cpuid'. On x86, for example,
+> cpuid would be the APIC ID.
+>
+Great idea. Let me think about it..
 
-Correct, VMCALL unconditionally causes VM-Exit in non-root mode, but Hou is
-referring to the first fault condition of "non VMX operation".  The intent of the
-patch is to emulate hardware behavior for CPL>0: if L1 is not in VMX operation,
-a.k.a. not post-VMXON, then #UD, else #GP (because VMCALL #GPs at CPL>0 in VMX
-root).
+> > +
+> > +static struct vm_vcpuid_map vcpuid_map[KVM_MAX_VCPUS];
+> > +
+> >  static uint64_t page_align(struct kvm_vm *vm, uint64_t v)
+> >  {
+> >       return (v + vm->page_size) & ~(vm->page_size - 1);
+> > @@ -426,3 +434,41 @@ void vm_install_exception_handler(struct kvm_vm *vm, int vector,
+> >       assert(vector < VECTOR_NUM);
+> >       handlers->exception_handlers[vector][0] = handler;
+> >  }
+> > +
+> > +void vm_vcpuid_map_init(struct kvm_vm *vm)
+> > +{
+> > +     int i = 0;
+> > +     struct vcpu *vcpu;
+> > +     struct vm_vcpuid_map *map;
+> > +
+> > +     list_for_each_entry(vcpu, &vm->vcpus, list) {
+> > +             map = &vcpuid_map[i++];
+> > +             map->vcpuid = vcpu->id;
+> > +             get_reg(vm, vcpu->id,
+> > +                     ARM64_SYS_KVM_REG(SYS_MPIDR_EL1), &map->mpidr);
+> > +             map->mpidr &= MPIDR_HWID_BITMASK;
+> > +     }
+>
+> Here we should assert that i is no longer zero. If it is, then we should
+> complain that vcpus need to be added before this call is made.
+>
+Makes sense, I'll add an ASSERT to be safe.
+> But, rather than providing an init function that inits the whole map
+> after all vcpus are created, I think we should add each vcpu's map entry
+> as we add vcpus to the vm. So we need to call the arch-specific
+> vm_vcpuid_map_add() from vm_vcpu_add(). We can just create stubs
+> for x86 and s390 for now. Also, in vm_vcpu_rm() we should find the
+> corresponding entry in the vcpuid map and set it to VM_VCPUID_MAP_INVAL
+> in order to remove it.
+>
+> > +
+> > +     if (i < KVM_MAX_VCPUS)
+> > +             vcpuid_map[i].vcpuid = VM_VCPUID_MAP_INVAL;
+> > +
+> > +     sync_global_to_guest(vm, vcpuid_map);
+>
+> We can't do this synch part for the test code at vcpu add time since we
+> don't know if the guest page tables are ready. I think it's OK to require
+> the test code to do this when the guest code needs it though. We should
+> document that requirement above the vm_vcpuid_map struct declaration,
+> which will be in kvm_util.h.
+>
+Sure, I'll add a comment.
+> > +}
+> > +
+> > +int get_vcpuid(void)
+> > +{
+> > +     int i, vcpuid;
+> > +     uint64_t mpidr = read_sysreg(mpidr_el1) & MPIDR_HWID_BITMASK;
+> > +
+> > +     for (i = 0; i < KVM_MAX_VCPUS; i++) {
+> > +             vcpuid = vcpuid_map[i].vcpuid;
+> > +             GUEST_ASSERT_1(vcpuid != VM_VCPUID_MAP_INVAL, mpidr);
+>
+> We don't want this assert if it's possible to have sparse maps, which
+> it probably isn't ever going to be, but...
+>
+If you look at the way the array is arranged, the element with
+VM_VCPUID_MAP_INVAL acts as a sentinel for us and all the proper
+elements would lie before this. So, I don't think we'd have a sparse
+array here.
 
-On one hand, I agree with Hou's logic; injecting #UD/#GP is architecturally
-correct if KVM is emulating a bare metal environment for the guest.  On the
-other hand, that contradicts with KVM _not_ injecting #UD for guest CPL0, i.e.
-KVM is clearly not emulating a bare metal environment.
-
-In the end, this would represent an ABI change for guest CPL>0.  While it's highly
-unlikely that such a change would cause problems, maintaining the current behavior
-is the safe option unless there's strong motivation for changing the guest ABI.
-
-And injecting #UD/#GP would also mean KVM would again have to change its ABI if
-there is a future hypercall KVM wants to allow at CPL>0.  Again, that's unlikely,
-but again I don't see sufficient justification.
+Regards,
+Raghavendra
+> > +
+> > +             if (mpidr == vcpuid_map[i].mpidr)
+> > +                     return vcpuid;
+> > +     }
+> > +
+> > +     /* We should not be reaching here */
+> > +     GUEST_ASSERT_1(0, mpidr);
+>
+> ...this assert should be good enough to sanity check the map by itself
+> anyway.
+>
+> Also, the only arch-specific aspect of get_vcpuid() is the looking up
+> the cpuid. So we should make get_vcpuid arch-neutral and call an arch-
+> specific get_cpuid() from it.
+>
+> > +     return -1;
+> > +}
+> > --
+> > 2.33.0.153.gba50c8fa24-goog
+> >
+>
+> Thanks,
+> drew
+>
