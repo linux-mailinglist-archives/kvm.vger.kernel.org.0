@@ -2,291 +2,235 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A6E47405611
-	for <lists+kvm@lfdr.de>; Thu,  9 Sep 2021 15:36:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A6F83405734
+	for <lists+kvm@lfdr.de>; Thu,  9 Sep 2021 15:40:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354900AbhIINRu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Sep 2021 09:17:50 -0400
-Received: from mail-dm3nam07on2063.outbound.protection.outlook.com ([40.107.95.63]:16033
-        "EHLO NAM02-DM3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1357681AbhIINDP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Sep 2021 09:03:15 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WH17hFuqA/pi1Nimz1Ntx6N00PEtOii7EZs+Zv5MP8R5NLJGSvQQ2t3DRJnARQ8JOcg77SB0Iia4qNEA0OpGdZ0WYSqAPYqivQczh+ZtbqvIsEa0DEW/Qkwf/vzgaX4YsCFt0/uXQsC0XKGzIrpZ5VVXbszd+TCIZXV0CVyp3/Un7Jzfb1moxIb9LNbcSt8iXc1xqhKQR2SxGbk/oxTChfSushlj8k6k+7Z9yB8N26QIkalgQnllmoMYScOtBrRgdvs2ErZSDyQEFjlS54JQefRNQadiX4YS7D9i8QkEmlf3UTGFW1iP/Aqi0YaGw/g6uBUzuTypL34S8J8Td8PLqw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
- bh=rpX1a5tQN2dEESee31DyPmnXlFmmvSJK9zaC52ovp4g=;
- b=f9S9paFC6lSOURgkLUZPpjSxJrH1OhzpNWJnu65tGJrOHptLOpHRyRof6MD5mO7aI2FyQPfUMlBeXyqb+rQoA5XaAYYigb9fUdlsEs4YrOpihQeS3401IsqV52qfU8joY/pYEpvzQUwlyy5QP3HlGUMb5YFP0JPQW3tyPCbdYN7PbGtEqUaU1QeK6EEhc0mZ30zN7Q7YCRnWfzLrM52lIowOwEzRyc6M0ctx8feDSfgO5eUoVwVOS2rE74TNmxAJfEuW2091Blbn18PNQyPUbIZ/5Vpke4lPQv1S1zcAvf3tChTjS9/Wc/7ao24EYFg5xnc3GadKU+NzfqQ7yqOa/w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rpX1a5tQN2dEESee31DyPmnXlFmmvSJK9zaC52ovp4g=;
- b=h9uGzwAc3cTh9S3704Q30Tf+Ioad9/+0fooTbx8TGO6YP/enaEu4Xv5DTFgIIkT3TnwSejHm70nuR7U+G2E55eQh0wME4Il5a7jOQeaLk07JpMpqP8U5K9tJT4bIxgEFCJgLysGkeLz5QYkYQzRX1NVVwLuc3QDMQappXJPRkjY=
-Authentication-Results: kernel.org; dkim=none (message not signed)
- header.d=none;kernel.org; dmarc=none action=none header.from=amd.com;
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
- by DM4PR12MB5279.namprd12.prod.outlook.com (2603:10b6:5:39f::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4500.16; Thu, 9 Sep
- 2021 13:01:54 +0000
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::d560:d21:cd59:9418]) by DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::d560:d21:cd59:9418%6]) with mapi id 15.20.4500.017; Thu, 9 Sep 2021
- 13:01:54 +0000
-Subject: Re: [PATCH v3 0/8] Implement generic cc_platform_has() helper
- function
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        linux-kernel@vger.kernel.org, x86@kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
-        iommu@lists.linux-foundation.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-graphics-maintainer@vmware.com,
-        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        kexec@lists.infradead.org, linux-fsdevel@vger.kernel.org
-Cc:     Borislav Petkov <bp@alien8.de>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Andi Kleen <ak@linux.intel.com>,
-        Sathyanarayanan Kuppuswamy 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        Tianyu Lan <Tianyu.Lan@microsoft.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        Ard Biesheuvel <ardb@kernel.org>, Baoquan He <bhe@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Dave Young <dyoung@redhat.com>,
-        David Airlie <airlied@linux.ie>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-        Maxime Ripard <mripard@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Paul Mackerras <paulus@samba.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Thomas Zimmermann <tzimmermann@suse.de>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Will Deacon <will@kernel.org>
-References: <cover.1631141919.git.thomas.lendacky@amd.com>
- <bde05ba8-c1b7-5df7-4147-44c38f4f3acf@de.ibm.com>
-From:   Tom Lendacky <thomas.lendacky@amd.com>
-Message-ID: <9b343e40-d892-b556-c5e6-fa46fae61079@amd.com>
-Date:   Thu, 9 Sep 2021 08:01:49 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
-In-Reply-To: <bde05ba8-c1b7-5df7-4147-44c38f4f3acf@de.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SN6PR2101CA0004.namprd21.prod.outlook.com
- (2603:10b6:805:106::14) To DM4PR12MB5229.namprd12.prod.outlook.com
- (2603:10b6:5:398::12)
+        id S1354390AbhIINcJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Sep 2021 09:32:09 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27088 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1358345AbhIINHK (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 9 Sep 2021 09:07:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1631192758;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=1FVErduCuTQmHI3vb5b1r9KDhDiP+77xZGlhd2lM7ew=;
+        b=M6t3u8sF0wG5ULyhAOghlLfFKBby4BaXvFQG4sxnmZLatoqcXJp6rb8mspMhnOZ7Q5RQiN
+        yErt1c4JTXAlTYEONojviBwHQE51zSlQNTLd0BuPJsvztl+o34EK/sSATqzPiHvuftmWGd
+        AOldZTkOv8tN9pnBMS9GJUEeA/e6eMk=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-351-JEPbRRFzMEO8TZJLEg5Rsg-1; Thu, 09 Sep 2021 09:05:57 -0400
+X-MC-Unique: JEPbRRFzMEO8TZJLEg5Rsg-1
+Received: by mail-wm1-f71.google.com with SMTP id k5-20020a7bc3050000b02901e081f69d80so742833wmj.8
+        for <kvm@vger.kernel.org>; Thu, 09 Sep 2021 06:05:57 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=1FVErduCuTQmHI3vb5b1r9KDhDiP+77xZGlhd2lM7ew=;
+        b=s0GFMZws7wIJ9gLOZQgSBAUxqIRZ6uY7uu/uNn8rNXvoGFJRh9s7gfpvjdrI+IwFxu
+         wVBVFoNjCc/v1NvWyhRa3E/mh60P+ZdCJATqFv1sfRJ4C34DKjqEOt93FPLD3gsFZEhY
+         r8aK7IhKIUMQHc1Yru7LDRc5agXqKZZQJMTe9vfrH7Vt0jNeZ80NeTOfmp/Ci+FZHYz8
+         /bFpLJep+xQ65dXh9JrXFgMx/21dPtmR8RlbAlE30xjTQkfRLby1HzD2JNt6CjQ5wstU
+         DODOBkXUD1MESU/FdviMSHLb4Lu8LYG/UQ6iayMtAfmb7kYd/14LP0LpOK1pR5MWrbOJ
+         USmg==
+X-Gm-Message-State: AOAM532IP64YwI5EoWo66JdWyq96krkDlHhJYZwGW/jsyHWIiGTju+xv
+        AexYHyKEV/XuVl5pUWwRUIwvcAroWvwrp6rIfnaRzFQkqFlJMRjANCct4KJVq9gih/x83YLnObl
+        6opvlllD5o7An
+X-Received: by 2002:a5d:5241:: with SMTP id k1mr3513738wrc.14.1631192756631;
+        Thu, 09 Sep 2021 06:05:56 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxT+tWfcglL0t0S4eC6SA9jHkqZot0Iidmz8QttJrfgTCOxvjPtNiiEnA6df1lyr1npKB9VDA==
+X-Received: by 2002:a5d:5241:: with SMTP id k1mr3513679wrc.14.1631192756264;
+        Thu, 09 Sep 2021 06:05:56 -0700 (PDT)
+Received: from gator (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
+        by smtp.gmail.com with ESMTPSA id s15sm1695653wrb.22.2021.09.09.06.05.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Sep 2021 06:05:55 -0700 (PDT)
+Date:   Thu, 9 Sep 2021 15:05:53 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     thuth@redhat.com, pbonzini@redhat.com, lvivier@redhat.com,
+        kvm-ppc@vger.kernel.org, david@redhat.com, frankja@linux.ibm.com,
+        cohuck@redhat.com, imbrenda@linux.ibm.com,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, andre.przywara@arm.com,
+        maz@kernel.org, vivek.gautam@arm.com
+Subject: Re: [kvm-unit-tests RFC PATCH 4/5] scripts: Generate kvmtool
+ standalone tests
+Message-ID: <20210909130553.gnzce7cs7d5stvjd@gator>
+References: <20210702163122.96110-1-alexandru.elisei@arm.com>
+ <20210702163122.96110-5-alexandru.elisei@arm.com>
+ <20210907102135.i2w3r7j4zyj736b5@gator>
+ <ee11a10a-c3e6-b9ce-81e1-147025a9b5bd@arm.com>
+ <20210908160743.l4hrl4de7wkxwuda@gator>
+ <9d5da497-7070-31ef-282a-a11a86e0102e@arm.com>
 MIME-Version: 1.0
-Received: from [10.236.30.241] (165.204.77.1) by SN6PR2101CA0004.namprd21.prod.outlook.com (2603:10b6:805:106::14) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4523.3 via Frontend Transport; Thu, 9 Sep 2021 13:01:51 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: fbe46845-74d6-47a5-a65c-08d97391ff27
-X-MS-TrafficTypeDiagnostic: DM4PR12MB5279:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM4PR12MB5279A7D3B874B087A509A87FECD59@DM4PR12MB5279.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:1850;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 8azszEYDBgIcFSiw1oNOvgD7E1IhXES5E6w2h5NgETx64gpCnDg9zvbnQB9qkb4yQd19JI14VVRqKEWfjnYsHpKemszYNEDyq/9cQ4X9py2ZoMa5iuDLYA3Os+QHnOp9T8hK2a+UdOIMyWH6S4ARpJxa7RR8edpOCCDaglO+UcKLOJsHoDrw/6sKsnoDpDLWF2uHtUPEQzXrJNXlICAJfG6mGNQi8vQcXdd4kjegt0nKOsLZVrS5KZqF4SSCmJYiOugNe6YZLG4c7Y9F+dvyltd7gt2agYFH7Y9hObsDhtki1SSoG+TK0ckBmZfZ34UIQ+rP6gb3TuwOydJrSbSYlzAJQ17DGg16NS+9oQocedMY9wHwR4DaVZfrED2IOaTaV9ueHCUkEnPiUcU9PP5DyvGXmSofkJn9pcBrMES9/Bxm3pRgZyGchK/Ncy3cR1crCLICHnfECzwXM6Jio1DSYdDSW1BwYINArbeKe0ok54Ny3Pe69K77UbgvYcQeFQkjghksiYpP2+TGiyqfmiHfjjwzIE4EEkOEaDvPag+JFxeZASGherqFGZStf42rr2/RWI9xFv0FSI9Gomcgg9JQi3P5tLw7MejxAi0xlCCM0MINvwmKuR8rzF/xD5IQS8e5y+4EpKqJmoTVS3cZxzAq9kvMdAZ+dvbhpZjhdgoXGAFr7und1HYPk9AOk1HDn6xkN57pgEfGxwfVOSjO1YlOmQH1pEp5Jrca+puHMOh8HZP3JL1gHPjvMPSOoezRv09Z92FGPa5gMtvI2XrO0yAXFUtHYttFZY4gYifuQPRffBkt2AcFqQ0WoKrQNbhTzcaJgQjZe9KmAYLSJktWn/EVEQFit2seosGRO5S5LOk6ppQrP9w+DXnuOeu6CZaYyy6Lno7thwqlcagGienEwrB2wA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(39860400002)(346002)(136003)(366004)(376002)(31696002)(31686004)(86362001)(66556008)(66476007)(66946007)(8936002)(921005)(38100700002)(54906003)(83380400001)(36756003)(316002)(53546011)(2906002)(16576012)(956004)(2616005)(26005)(186003)(5660300002)(45080400002)(8676002)(966005)(4326008)(7416002)(7406005)(478600001)(6486002)(41533002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?a1NCenA2RzlrWm14QW9qN0dENUJsZmFuQ1ZqN3NtT1dEcHh0eEhRUURtVUpx?=
- =?utf-8?B?Q2JHZ0wyS05wN3JOZmlUUXdqNkJ4cWlZU3hGSENBbnR6L01SbWNpMXNlS1Vw?=
- =?utf-8?B?RHg2YldiWDduV2RpdmlZaTZHU2x6WGowM2FELzlNK0V0TjVCcTlmamZCMUo3?=
- =?utf-8?B?ZWI1dXBGd09LQjBpTU9JTHZrSSsxaGxobkFnZ0pxM0NZRGthSVpyZGhWZzNI?=
- =?utf-8?B?NGpPTnY1V0pGTzdJanIycThsMTNWaS9XYnZWWk8vU0ZldkIxVW5nMEl5NkNL?=
- =?utf-8?B?SWw3L3hIZXJLTFo5NUN3ZWFYMnFYbXhONUd1WDNaMnZjSUh5bWtYcUJ3WlpR?=
- =?utf-8?B?QnYxelNtQlU1UkxIQjJGYUh0Y0h0YWR6QU9nWHpYN3hXTmJ1dThKNFEwOVRK?=
- =?utf-8?B?dm1YN3dOMVRpOFkxWG9vN3pZb2JkOXFwL09ia1M1Q0JacWVDK082bWVvSnVq?=
- =?utf-8?B?MGxjbzRXTWFVak1OWk5pbVRZL0ZCUWRmR2dkNmhwRW12VUFTeUtCU3gvNUlN?=
- =?utf-8?B?ZXl2YnFkRGNteWFmMWdRNHlVa1N2akxXQ1EyQXY2alRLOW1FeFFCbTZsYjJl?=
- =?utf-8?B?bzZ3alNPYXVPVEhMTXFPb3kzVmV6aTJGSGw2NE5sZ1RxbFUxNnArWVpDWmJt?=
- =?utf-8?B?UWhoOVBESldRSjdGZEZTRjZvYno4V2JyWFVNNXh1UjNzOXZ0TzZvTjFqQk9E?=
- =?utf-8?B?b1d1MnAvU3lwTGVQZlIvalpkMmxrdUJvdXBvR05UMDd5RXBRNVJxQnI4VFA3?=
- =?utf-8?B?OUh2L2NmOE03TnU3V2cweCthQUhYN2tyY3BqNXArU0EzbjVkQUozb3o5K3Jr?=
- =?utf-8?B?WGZrQUkzVEpqcy9lUHl4ejB6dk9CODNJdUwzVUpvTHpEMFF1VlpZTlBuU3lh?=
- =?utf-8?B?cWUvc1pLR25vcXoxbEowVmNUNTRkSWNQWWVIbWVSbll0N2lBcHIzS2UrcVE3?=
- =?utf-8?B?NWJQRVg0MnA1SFczUzEyTkVoZWNrNmhnb29BRWx6OVkrUUNUcUZCd1RaaTF4?=
- =?utf-8?B?MFdIbFZxb3VKV1dmdUpmaldPYjNON1UwcGx5OWdKSWFwdGdWdU4xTWJzT2t0?=
- =?utf-8?B?QzdkenltODY3MjhUVVNrZzZxRGkwdW5CYWdDdUhiTDRnVFJyMFVlZFBMVXVI?=
- =?utf-8?B?d095R2xENm5oM0NYbnI4SEUxOFVjOFN2TzZmcEN0Q2wyQnBvSmNFMk9iWVdX?=
- =?utf-8?B?Nk14TTl0TFJiM1NmOElmOXVMVXhIbXhldGdydDNaNTRNMTloU0crQ0RrYjRx?=
- =?utf-8?B?QjJJdEhpTjZ2SWgrK2xYUFplTlJQUHliUFkwRUhZK0EyVUFnYjJMY1FLcCs0?=
- =?utf-8?B?OWdLam8xWjcxbXZ2NWVoT0UyZE93aUZ3aTkwU3pyaFlmWHJRMyt1UmVSQ3lT?=
- =?utf-8?B?aXhHWjlOckhTRng5R1BTNGFUNysxd3ZzZ0JBbHNUUUllYVFLcmU3OXU0QkdQ?=
- =?utf-8?B?TGxCR0VMMnRGdXp4bkhrV0YzK3VZK0RCWDlUdlRVNS95UnIzRC9tSmd6N0hO?=
- =?utf-8?B?ekRQQXlpckJVZlo4ZUxTRmpBRDErcmh2bDFOWFcvVytxL3Z2WnZXR2Y5OXJv?=
- =?utf-8?B?a1djcERWSGpFQ3hZTkU3d1dhcmVRN25nZmY5a3VnSGlaeU9jRENxeEVsSjd4?=
- =?utf-8?B?dlBIL3RqNVNKeHhoNnJOclRKVHF1NWwweGNqamxpOUhIN3o2YXErbVhRSkZC?=
- =?utf-8?B?L1FaQVl4bTJ1N0pENko0RXZCWXp4S0FOWEtBWXE4YTRVMHRJMnpHdXg0d1dC?=
- =?utf-8?Q?A2M+sJAvQGlm+uPvsG27j3t3H/XfZPzqwDPzML/?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fbe46845-74d6-47a5-a65c-08d97391ff27
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Sep 2021 13:01:54.0365
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ANZ57FOLue2D/RaeIjmO2WoLtLG51gGpPVQrrA3t7YDPLPRVgfHokrCbZywnjveuP8+/ExrGdyKOWUbE4yoOag==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5279
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9d5da497-7070-31ef-282a-a11a86e0102e@arm.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/9/21 2:32 AM, Christian Borntraeger wrote:
+On Thu, Sep 09, 2021 at 12:11:52PM +0100, Alexandru Elisei wrote:
+> Hi Drew,
 > 
+> On 9/8/21 5:07 PM, Andrew Jones wrote:
+> > On Wed, Sep 08, 2021 at 04:37:39PM +0100, Alexandru Elisei wrote:
+> >> Hi Drew,
+> >>
+> >> On 9/7/21 11:21 AM, Andrew Jones wrote:
+> >>> On Fri, Jul 02, 2021 at 05:31:21PM +0100, Alexandru Elisei wrote:
+> >>>> Add support for the standalone target when running kvm-unit-tests under
+> >>>> kvmtool.
+> >>>>
+> >>>> Example command line invocation:
+> >>>>
+> >>>> $ ./configure --target=kvmtool
+> >>>> $ make clean && make standalone
+> >>>>
+> >>>> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> >>>> ---
+> >>>>  scripts/mkstandalone.sh | 14 +++++++-------
+> >>>>  1 file changed, 7 insertions(+), 7 deletions(-)
+> >>>>
+> >>>> diff --git a/scripts/mkstandalone.sh b/scripts/mkstandalone.sh
+> >>>> index 16f461c06842..d84bdb7e278c 100755
+> >>>> --- a/scripts/mkstandalone.sh
+> >>>> +++ b/scripts/mkstandalone.sh
+> >>>> @@ -44,6 +44,10 @@ generate_test ()
+> >>>>  	config_export ARCH_NAME
+> >>>>  	config_export PROCESSOR
+> >>>>  
+> >>>> +	if [ "$ARCH" = "arm64" ] || [ "$ARCH" = "arm" ]; then
+> >>>> +		config_export TARGET
+> >>>> +	fi
+> >>> Should export unconditionally, since we'll want TARGET set
+> >>> unconditionally.
+> >> Yes, will do.
+> >>
+> >>>> +
+> >>>>  	echo "echo BUILD_HEAD=$(cat build-head)"
+> >>>>  
+> >>>>  	if [ ! -f $kernel ]; then
+> >>>> @@ -59,7 +63,7 @@ generate_test ()
+> >>>>  		echo 'export FIRMWARE'
+> >>>>  	fi
+> >>>>  
+> >>>> -	if [ "$ENVIRON_DEFAULT" = "yes" ] && [ "$ERRATATXT" ]; then
+> >>>> +	if [ "$TARGET" != "kvmtool" ] && [ "$ENVIRON_DEFAULT" = "yes" ] && [ "$ERRATATXT" ]; then
+> >>> I think it would be better to ensure that ENVIRON_DEFAULT is "no" for
+> >>> TARGET=kvmtool in configure.
+> >> From looking at the code, it is my understanding that with ENVIRON_DEFAULT=yes, an
+> >> initrd file is generated with the contents of erratatxt and other information, in
+> >> a key=value pair format. This initrd is then passed on to the test (please correct
+> >> me if I'm wrong). With ENVIRON_DEFAULT=no (set via ./configure
+> >> --disable-default-environ), this initrd is not generated.
+> >>
+> >> kvmtool doesn't have support for passing an initrd when loading firmware, so yes,
+> >> I believe the default should be no.
+> >>
+> >> However, I have two questions:
+> >>
+> >> 1. What happens when the user specifically enables the default environ via
+> >> ./configure --enable-default-environ --target=kvmtool? In my opinion, that should
+> >> be an error because the user wants something that is not possible with kvmtool
+> >> (loading an image with --firmware in kvmtool means that the initrd image it not
+> >> loaded into the guest memory and no node is generated for it in the dtb), but I
+> >> would like to hear your thoughts about it.
+> > As part of the forcing ENVIRON_DEFAULT to "no" for kvmtool in configure an
+> > error should be generated if a user tries to explicitly enable it.
+> >
+> >> 2. If the default environment is disabled, is it still possible for an user to
+> >> pass an initrd via other means? I couldn't find where that is implemented, so I'm
+> >> guessing it's not possible.
+> > Yes, a user could have a KVM_UNIT_TESTS_ENV environment variable set when
+> > they launch the tests. If that variable points to a file then it will get
+> > passed as an initrd. I guess you should also report a warning in arm/run
+> > if KVM_UNIT_TESTS_ENV is set which states that the environment file will
+> > be ignored when running with kvmtool.
 > 
-> On 09.09.21 00:58, Tom Lendacky wrote:
->> This patch series provides a generic helper function, cc_platform_has(),
->> to replace the sme_active(), sev_active(), sev_es_active() and
->> mem_encrypt_active() functions.
->>
->> It is expected that as new confidential computing technologies are
->> added to the kernel, they can all be covered by a single function call
->> instead of a collection of specific function calls all called from the
->> same locations.
->>
->> The powerpc and s390 patches have been compile tested only. Can the
->> folks copied on this series verify that nothing breaks for them.
+> Thank you for explaining it, I had looked at
+> scripts/arch-run.bash::initrd_create(), but it didn't click that setting the
+> KVM_UNIT_TESTS_ENV environment variable is enough to generate and use the initrd.
 > 
-> Is there a tree somewhere?
+> After looking at the code some more, in the logs the -initrd argument is shown as
+> a comment, instead of an actual argument that is passed to qemu:
+> 
+> timeout -k 1s --foreground 90s /usr/bin/qemu-system-aarch64 -nodefaults -machine
+> virt,gic-version=host,accel=kvm -cpu host -device virtio-serial-device -device
+> virtconsole,chardev=ctd -chardev testdev,id=ctd -device pci-testdev -display none
+> -serial stdio -kernel arm/cache.flat -smp 1 # -initrd /tmp/tmp.rUIZ3h9KLJ
+> QEMU_ACCEL = kvm
+> INFO: IDC-DIC: dcache clean to PoU required
+> INFO: IDC-DIC: icache invalidation to PoU required
+> PASS: IDC-DIC: code generation
+> SUMMARY: 1 tests
+> 
+> This is done intentionally in scripts/arch-run.bash::run_qemu(). I don't
+> understand the reason for that. When I first looked at the logs, I was sure that
+> no initrd is passed to the test. I had to go dig through the scripts to figure out
+> that the "#" sign (which marks the beginning of a comment) is not present in the
+> qemu invocation.
 
-I pushed it up to github:
-
-https://github.com/AMDESE/linux/tree/prot-guest-has-v3
+It's commented out because if you want to copy+paste the command line to
+use it again it'll fail to run because the temp file will be gone. Of
+course somebody depending on the environment for their test run will have
+other problems when it's gone, but those people can use the
+KVM_UNIT_TESTS_ENV variable to specify a non-temp file which includes the
+default environment and then configure without the default environment.
+The command line won't get the # in that case.
 
 Thanks,
-Tom
+drew
 
 > 
->   Also,
->> a new file, arch/powerpc/platforms/pseries/cc_platform.c, has been
->> created for powerpc to hold the out of line function.
->>
->> Cc: Andi Kleen <ak@linux.intel.com>
->> Cc: Andy Lutomirski <luto@kernel.org>
->> Cc: Ard Biesheuvel <ardb@kernel.org>
->> Cc: Baoquan He <bhe@redhat.com>
->> Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
->> Cc: Borislav Petkov <bp@alien8.de>
->> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
->> Cc: Daniel Vetter <daniel@ffwll.ch>
->> Cc: Dave Hansen <dave.hansen@linux.intel.com>
->> Cc: Dave Young <dyoung@redhat.com>
->> Cc: David Airlie <airlied@linux.ie>
->> Cc: Heiko Carstens <hca@linux.ibm.com>
->> Cc: Ingo Molnar <mingo@redhat.com>
->> Cc: Joerg Roedel <joro@8bytes.org>
->> Cc: Maarten Lankhorst <maarten.lankhorst@linux.intel.com>
->> Cc: Maxime Ripard <mripard@kernel.org>
->> Cc: Michael Ellerman <mpe@ellerman.id.au>
->> Cc: Paul Mackerras <paulus@samba.org>
->> Cc: Peter Zijlstra <peterz@infradead.org>
->> Cc: Thomas Gleixner <tglx@linutronix.de>
->> Cc: Thomas Zimmermann <tzimmermann@suse.de>
->> Cc: Vasily Gorbik <gor@linux.ibm.com>
->> Cc: VMware Graphics <linux-graphics-maintainer@vmware.com>
->> Cc: Will Deacon <will@kernel.org>
->> Cc: Christoph Hellwig <hch@infradead.org>
->>
->> ---
->>
->> Patches based on:
->>    
->> https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fgit.kernel.org%2Fpub%2Fscm%2Flinux%2Fkernel%2Fgit%2Ftorvalds%2Flinux.git&amp;data=04%7C01%7Cthomas.lendacky%40amd.com%7C5cd71ef2c2ce4b90060708d973640358%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637667695657121432%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C1000&amp;sdata=FVngrPSxCCRKutAaIMtU2Nk8WArFQB1dEE2wN7v8RgA%3D&amp;reserved=0 
->> master
->>    4b93c544e90e ("thunderbolt: test: split up test cases in 
->> tb_test_credit_alloc_all")
->>
->> Changes since v2:
->> - Changed the name from prot_guest_has() to cc_platform_has()
->> - Took the cc_platform_has() function out of line. Created two new files,
->>    cc_platform.c, in both x86 and ppc to implment the function. As a
->>    result, also changed the attribute defines into enums.
->> - Removed any received Reviewed-by's and Acked-by's given changes in this
->>    version.
->> - Added removal of new instances of mem_encrypt_active() usage in powerpc
->>    arch.
->> - Based on latest Linux tree to pick up powerpc changes related to the
->>    mem_encrypt_active() function.
->>
->> Changes since v1:
->> - Moved some arch ioremap functions within #ifdef CONFIG_AMD_MEM_ENCRYPT
->>    in prep for use of prot_guest_has() by TDX.
->> - Added type includes to the the protected_guest.h header file to prevent
->>    build errors outside of x86.
->> - Made amd_prot_guest_has() EXPORT_SYMBOL_GPL
->> - Used amd_prot_guest_has() in place of checking sme_me_mask in the
->>    arch/x86/mm/mem_encrypt.c file.
->>
->> Tom Lendacky (8):
->>    x86/ioremap: Selectively build arch override encryption functions
->>    mm: Introduce a function to check for confidential computing features
->>    x86/sev: Add an x86 version of cc_platform_has()
->>    powerpc/pseries/svm: Add a powerpc version of cc_platform_has()
->>    x86/sme: Replace occurrences of sme_active() with cc_platform_has()
->>    x86/sev: Replace occurrences of sev_active() with cc_platform_has()
->>    x86/sev: Replace occurrences of sev_es_active() with cc_platform_has()
->>    treewide: Replace the use of mem_encrypt_active() with
->>      cc_platform_has()
->>
->>   arch/Kconfig                                 |  3 +
->>   arch/powerpc/include/asm/mem_encrypt.h       |  5 --
->>   arch/powerpc/platforms/pseries/Kconfig       |  1 +
->>   arch/powerpc/platforms/pseries/Makefile      |  2 +
->>   arch/powerpc/platforms/pseries/cc_platform.c | 26 ++++++
->>   arch/powerpc/platforms/pseries/svm.c         |  5 +-
->>   arch/s390/include/asm/mem_encrypt.h          |  2 -
->>   arch/x86/Kconfig                             |  1 +
->>   arch/x86/include/asm/io.h                    |  8 ++
->>   arch/x86/include/asm/kexec.h                 |  2 +-
->>   arch/x86/include/asm/mem_encrypt.h           | 14 +---
->>   arch/x86/kernel/Makefile                     |  3 +
->>   arch/x86/kernel/cc_platform.c                | 21 +++++
->>   arch/x86/kernel/crash_dump_64.c              |  4 +-
->>   arch/x86/kernel/head64.c                     |  4 +-
->>   arch/x86/kernel/kvm.c                        |  3 +-
->>   arch/x86/kernel/kvmclock.c                   |  4 +-
->>   arch/x86/kernel/machine_kexec_64.c           | 19 +++--
->>   arch/x86/kernel/pci-swiotlb.c                |  9 +-
->>   arch/x86/kernel/relocate_kernel_64.S         |  2 +-
->>   arch/x86/kernel/sev.c                        |  6 +-
->>   arch/x86/kvm/svm/svm.c                       |  3 +-
->>   arch/x86/mm/ioremap.c                        | 18 ++--
->>   arch/x86/mm/mem_encrypt.c                    | 57 +++++++------
->>   arch/x86/mm/mem_encrypt_identity.c           |  3 +-
->>   arch/x86/mm/pat/set_memory.c                 |  3 +-
->>   arch/x86/platform/efi/efi_64.c               |  9 +-
->>   arch/x86/realmode/init.c                     |  8 +-
->>   drivers/gpu/drm/amd/amdgpu/amdgpu_drv.c      |  4 +-
->>   drivers/gpu/drm/drm_cache.c                  |  4 +-
->>   drivers/gpu/drm/vmwgfx/vmwgfx_drv.c          |  4 +-
->>   drivers/gpu/drm/vmwgfx/vmwgfx_msg.c          |  6 +-
->>   drivers/iommu/amd/init.c                     |  7 +-
->>   drivers/iommu/amd/iommu.c                    |  3 +-
->>   drivers/iommu/amd/iommu_v2.c                 |  3 +-
->>   drivers/iommu/iommu.c                        |  3 +-
->>   fs/proc/vmcore.c                             |  6 +-
->>   include/linux/cc_platform.h                  | 88 ++++++++++++++++++++
->>   include/linux/mem_encrypt.h                  |  4 -
->>   kernel/dma/swiotlb.c                         |  4 +-
->>   40 files changed, 267 insertions(+), 114 deletions(-)
->>   create mode 100644 arch/powerpc/platforms/pseries/cc_platform.c
->>   create mode 100644 arch/x86/kernel/cc_platform.c
->>   create mode 100644 include/linux/cc_platform.h
->>
->>
->> base-commit: 4b93c544e90e2b28326182d31ee008eb80e02074
->>
+> Thanks,
+> 
+> Alex
+> 
+> >
+> > There aren't currently any other ways to invoke the addition of the
+> > -initrd command line option, because so far we only support passing a
+> > single file to test (the environment "file"). If we ever want to pass
+> > more files, then we'd need to create a simple file system on the initrd
+> > and make it possible to add -initrd even when no environment is desired.
+> > But, that may never happen.
+> >
+> > Thanks,
+> > drew
+> >
+> >> Thanks,
+> >>
+> >> Alex
+> >>
+> >>>
+> >>>>  		temp_file ERRATATXT "$ERRATATXT"
+> >>>>  		echo 'export ERRATATXT'
+> >>>>  	fi
+> >>>> @@ -95,12 +99,8 @@ function mkstandalone()
+> >>>>  	echo Written $standalone.
+> >>>>  }
+> >>>>  
+> >>>> -if [ "$TARGET" = "kvmtool" ]; then
+> >>>> -	echo "Standalone tests not supported with kvmtool"
+> >>>> -	exit 2
+> >>>> -fi
+> >>>> -
+> >>>> -if [ "$ENVIRON_DEFAULT" = "yes" ] && [ "$ERRATATXT" ] && [ ! -f "$ERRATATXT" ]; then
+> >>>> +if [ "$TARGET" != "kvmtool" ] && [ "$ENVIRON_DEFAULT" = "yes" ] && \
+> >>>> +		[ "$ERRATATXT" ] && [ ! -f "$ERRATATXT" ]; then
+> >>>>  	echo "$ERRATATXT not found. (ERRATATXT=$ERRATATXT)" >&2
+> >>>>  	exit 2
+> >>>>  fi
+> >>>> -- 
+> >>>> 2.32.0
+> >>>>
+> >>> Thanks,
+> >>> drew 
+> >>>
+> 
+
