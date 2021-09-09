@@ -2,86 +2,236 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DCCAA405941
-	for <lists+kvm@lfdr.de>; Thu,  9 Sep 2021 16:40:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C8E89405958
+	for <lists+kvm@lfdr.de>; Thu,  9 Sep 2021 16:42:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235181AbhIIOlc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Sep 2021 10:41:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46376 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241257AbhIIOlW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Sep 2021 10:41:22 -0400
-Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8650EC066408
-        for <kvm@vger.kernel.org>; Thu,  9 Sep 2021 07:02:59 -0700 (PDT)
-Received: by mail-lj1-x236.google.com with SMTP id p15so3191338ljn.3
-        for <kvm@vger.kernel.org>; Thu, 09 Sep 2021 07:02:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:reply-to:from:date:message-id:subject:to;
-        bh=7oTEU0E4xx+wFYWqhqzgm4aEcDBxaGZEX1bAEoxzgGo=;
-        b=ak5Ce5ZjqF6nsC1ueXSSRJxmyjYuzgJELKPqJpb3SWrSKLapS3i7TzwNaxVSFqcydm
-         BtcXfIgQgGQ8nOTNON2XJUD+e96ntPHO6+zEKl60y0eFaLgP41tY95V1zh7Bzq7q5GGL
-         bVrz0/c4topxsulQ5fP9AoxySb/l9RzJIwADSHJY/A/WOKGc3BxG1pHzGC1Se6ta5kaG
-         kqgyF54UONhFMFxvKbHtoSVWks0OjDE8Q3ADInn98wUv69tYTZZEv56xrSZtSzRyp0zt
-         6iilRK++FjNmYch2LrduPH8xmR+0pLp2YPv8Jd8/98KuB7I9FT2QDVRak2DouczpLyUs
-         jeeA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to;
-        bh=7oTEU0E4xx+wFYWqhqzgm4aEcDBxaGZEX1bAEoxzgGo=;
-        b=RSKqM2v8BUSqKDO+rveeY8PbeEuPE2aXb33CpFU862RqDfdrk0AYQxaOwrdBFFLTTC
-         7qOB0Das5O7uiW+bqIgtusvuDa9+lo+IsGqe0rLCvhT3qNWlmxEKp51YCYl4CThf+jYE
-         q8zUM7x1Mplbi2/9wVTnVDRH5MrReZkVLFsXA+gP3vwOweRccp4qFL0FPz0hK6OHLMml
-         lOQYv/sQL704tNP/aCDRAjzhxO7X4v7fAcf9nh1cc23kBRsAlktPIyTFblUrWsXpdYb7
-         yR50f7OCVWYB+d77VQ3g/yTsBvmxrK1RgNPHSj/Ehu/pUBHmch851EeQvvzvCYm4YfrJ
-         eEGA==
-X-Gm-Message-State: AOAM531imODl23MxSdw3UQJGUreeeJG6aP7+8tJc+q2NRDGYeNSxNOcl
-        SB/d1BLcXCWeZRJUrgp3Kf1izvPdWQicvi8BluA=
-X-Google-Smtp-Source: ABdhPJyPmgSveotBAK/aBh7pDWkTb0z7OecbQNBnaVy+MOF7mctbaOCTUHLINe34fVL0nX2YOr9z6Ns9+CPd42nAAtc=
-X-Received: by 2002:a2e:8608:: with SMTP id a8mr6501lji.224.1631196177915;
- Thu, 09 Sep 2021 07:02:57 -0700 (PDT)
+        id S243678AbhIIOm5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Sep 2021 10:42:57 -0400
+Received: from foss.arm.com ([217.140.110.172]:36598 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1350908AbhIIOml (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Sep 2021 10:42:41 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CC8DF6D;
+        Thu,  9 Sep 2021 07:41:31 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 78A7F3F59C;
+        Thu,  9 Sep 2021 07:41:29 -0700 (PDT)
+Subject: Re: [kvm-unit-tests RFC PATCH 4/5] scripts: Generate kvmtool
+ standalone tests
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     thuth@redhat.com, pbonzini@redhat.com, lvivier@redhat.com,
+        kvm-ppc@vger.kernel.org, david@redhat.com, frankja@linux.ibm.com,
+        cohuck@redhat.com, imbrenda@linux.ibm.com,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, andre.przywara@arm.com,
+        maz@kernel.org, vivek.gautam@arm.com
+References: <20210702163122.96110-1-alexandru.elisei@arm.com>
+ <20210702163122.96110-5-alexandru.elisei@arm.com>
+ <20210907102135.i2w3r7j4zyj736b5@gator>
+ <ee11a10a-c3e6-b9ce-81e1-147025a9b5bd@arm.com>
+ <20210908160743.l4hrl4de7wkxwuda@gator>
+ <9d5da497-7070-31ef-282a-a11a86e0102e@arm.com>
+ <20210909130553.gnzce7cs7d5stvjd@gator>
+ <7313396e-de46-8a3b-902d-5a59b2089c79@arm.com>
+ <20210909135429.dqreodxr7elpvmfm@gator>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <e8560cdb-532c-0320-420d-c57d14cdae18@arm.com>
+Date:   Thu, 9 Sep 2021 15:42:54 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-Received: by 2002:a2e:150e:0:0:0:0:0 with HTTP; Thu, 9 Sep 2021 07:02:57 -0700 (PDT)
-Reply-To: jennehkandeh@yahoo.com
-From:   Jenneh Kandeh <ayenijohnolatunde@gmail.com>
-Date:   Thu, 9 Sep 2021 07:02:57 -0700
-Message-ID: <CAJ7+8MEvETb85gQpJ9RRbrTpnX9+f7TSexUjLfH2XWs0yPMt9w@mail.gmail.com>
-Subject: Re: Regarding Of My Late Father's Fund $10,500,000
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20210909135429.dqreodxr7elpvmfm@gator>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-dear,
+Hi Drew,
 
-I got your contact through the internet due to serious searching for a
-reliable personality. I am Jenneh Kandeh from FreeTown Capital of
-Sierra Leone. Time of opposed to the government of President Ahmad
-Tejan Kebbah the ex-leader. l have been on exile in the Porto-Novo
-Benin. since 21st November, 2005 But I am current residing in
-Porto-Novo Benin due to war of my country, my mother killed on
-04/01/2002 for Sierra Leone civilian war my father decided to change
-another residence country with me because I am only child for my
-family bad news that my father passed away on 25/11/2018.
+On 9/9/21 2:54 PM, Andrew Jones wrote:
+> On Thu, Sep 09, 2021 at 02:47:57PM +0100, Alexandru Elisei wrote:
+>> Hi Drew,
+>>
+>> On 9/9/21 2:05 PM, Andrew Jones wrote:
+>>> On Thu, Sep 09, 2021 at 12:11:52PM +0100, Alexandru Elisei wrote:
+>>>> Hi Drew,
+>>>>
+>>>> On 9/8/21 5:07 PM, Andrew Jones wrote:
+>>>>> On Wed, Sep 08, 2021 at 04:37:39PM +0100, Alexandru Elisei wrote:
+>>>>>> Hi Drew,
+>>>>>>
+>>>>>> On 9/7/21 11:21 AM, Andrew Jones wrote:
+>>>>>>> On Fri, Jul 02, 2021 at 05:31:21PM +0100, Alexandru Elisei wrote:
+>>>>>>>> Add support for the standalone target when running kvm-unit-tests under
+>>>>>>>> kvmtool.
+>>>>>>>>
+>>>>>>>> Example command line invocation:
+>>>>>>>>
+>>>>>>>> $ ./configure --target=kvmtool
+>>>>>>>> $ make clean && make standalone
+>>>>>>>>
+>>>>>>>> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+>>>>>>>> ---
+>>>>>>>>  scripts/mkstandalone.sh | 14 +++++++-------
+>>>>>>>>  1 file changed, 7 insertions(+), 7 deletions(-)
+>>>>>>>>
+>>>>>>>> diff --git a/scripts/mkstandalone.sh b/scripts/mkstandalone.sh
+>>>>>>>> index 16f461c06842..d84bdb7e278c 100755
+>>>>>>>> --- a/scripts/mkstandalone.sh
+>>>>>>>> +++ b/scripts/mkstandalone.sh
+>>>>>>>> @@ -44,6 +44,10 @@ generate_test ()
+>>>>>>>>  	config_export ARCH_NAME
+>>>>>>>>  	config_export PROCESSOR
+>>>>>>>>  
+>>>>>>>> +	if [ "$ARCH" = "arm64" ] || [ "$ARCH" = "arm" ]; then
+>>>>>>>> +		config_export TARGET
+>>>>>>>> +	fi
+>>>>>>> Should export unconditionally, since we'll want TARGET set
+>>>>>>> unconditionally.
+>>>>>> Yes, will do.
+>>>>>>
+>>>>>>>> +
+>>>>>>>>  	echo "echo BUILD_HEAD=$(cat build-head)"
+>>>>>>>>  
+>>>>>>>>  	if [ ! -f $kernel ]; then
+>>>>>>>> @@ -59,7 +63,7 @@ generate_test ()
+>>>>>>>>  		echo 'export FIRMWARE'
+>>>>>>>>  	fi
+>>>>>>>>  
+>>>>>>>> -	if [ "$ENVIRON_DEFAULT" = "yes" ] && [ "$ERRATATXT" ]; then
+>>>>>>>> +	if [ "$TARGET" != "kvmtool" ] && [ "$ENVIRON_DEFAULT" = "yes" ] && [ "$ERRATATXT" ]; then
+>>>>>>> I think it would be better to ensure that ENVIRON_DEFAULT is "no" for
+>>>>>>> TARGET=kvmtool in configure.
+>>>>>> From looking at the code, it is my understanding that with ENVIRON_DEFAULT=yes, an
+>>>>>> initrd file is generated with the contents of erratatxt and other information, in
+>>>>>> a key=value pair format. This initrd is then passed on to the test (please correct
+>>>>>> me if I'm wrong). With ENVIRON_DEFAULT=no (set via ./configure
+>>>>>> --disable-default-environ), this initrd is not generated.
+>>>>>>
+>>>>>> kvmtool doesn't have support for passing an initrd when loading firmware, so yes,
+>>>>>> I believe the default should be no.
+>>>>>>
+>>>>>> However, I have two questions:
+>>>>>>
+>>>>>> 1. What happens when the user specifically enables the default environ via
+>>>>>> ./configure --enable-default-environ --target=kvmtool? In my opinion, that should
+>>>>>> be an error because the user wants something that is not possible with kvmtool
+>>>>>> (loading an image with --firmware in kvmtool means that the initrd image it not
+>>>>>> loaded into the guest memory and no node is generated for it in the dtb), but I
+>>>>>> would like to hear your thoughts about it.
+>>>>> As part of the forcing ENVIRON_DEFAULT to "no" for kvmtool in configure an
+>>>>> error should be generated if a user tries to explicitly enable it.
+>>>>>
+>>>>>> 2. If the default environment is disabled, is it still possible for an user to
+>>>>>> pass an initrd via other means? I couldn't find where that is implemented, so I'm
+>>>>>> guessing it's not possible.
+>>>>> Yes, a user could have a KVM_UNIT_TESTS_ENV environment variable set when
+>>>>> they launch the tests. If that variable points to a file then it will get
+>>>>> passed as an initrd. I guess you should also report a warning in arm/run
+>>>>> if KVM_UNIT_TESTS_ENV is set which states that the environment file will
+>>>>> be ignored when running with kvmtool.
+>>>> Thank you for explaining it, I had looked at
+>>>> scripts/arch-run.bash::initrd_create(), but it didn't click that setting the
+>>>> KVM_UNIT_TESTS_ENV environment variable is enough to generate and use the initrd.
+>>>>
+>>>> After looking at the code some more, in the logs the -initrd argument is shown as
+>>>> a comment, instead of an actual argument that is passed to qemu:
+>>>>
+>>>> timeout -k 1s --foreground 90s /usr/bin/qemu-system-aarch64 -nodefaults -machine
+>>>> virt,gic-version=host,accel=kvm -cpu host -device virtio-serial-device -device
+>>>> virtconsole,chardev=ctd -chardev testdev,id=ctd -device pci-testdev -display none
+>>>> -serial stdio -kernel arm/cache.flat -smp 1 # -initrd /tmp/tmp.rUIZ3h9KLJ
+>>>> QEMU_ACCEL = kvm
+>>>> INFO: IDC-DIC: dcache clean to PoU required
+>>>> INFO: IDC-DIC: icache invalidation to PoU required
+>>>> PASS: IDC-DIC: code generation
+>>>> SUMMARY: 1 tests
+>>>>
+>>>> This is done intentionally in scripts/arch-run.bash::run_qemu(). I don't
+>>>> understand the reason for that. When I first looked at the logs, I was sure that
+>>>> no initrd is passed to the test. I had to go dig through the scripts to figure out
+>>>> that the "#" sign (which marks the beginning of a comment) is not present in the
+>>>> qemu invocation.
+>>> It's commented out because if you want to copy+paste the command line to
+>>> use it again it'll fail to run because the temp file will be gone. Of
+>>> course somebody depending on the environment for their test run will have
+>>> other problems when it's gone, but those people can use the
+>>> KVM_UNIT_TESTS_ENV variable to specify a non-temp file which includes the
+>>> default environment and then configure without the default environment.
+>>> The command line won't get the # in that case.
+>> Hmm... wouldn't it make more sense then to generate the initrd in the logs
+>> directory, and keep it there? To ensure the test runs can be reproduced manually,
+>> if needed?
+> Well, there's no logs directory for standalone tests, but I do like the
+> idea of capturing the environment when possible. Possibly the best thing
+> to do is to provide an option that, when enabled, says to dump the
+> environment into the log before executing the test. That would be similar
+> to how BUILD_HEAD is output first when running the tests standalone.
+> Anyway, this is a good idea, but probably outside the scope of your
+> kvmtool work unless the initrd thing is blocking you and you need to
+> rework it anyway.
 
-During the war, My father made a lot of money through the illegal
-sales of Diamonds. To the tune of $10,200,000. This money is currently
-and secretly kept in ECOWAS security company here in Benin, but
-because of the political turmoil which still exists here in Africa, I
-can not invest the money by myself, hence am soliciting your help to
-help me take these funds into your custody and also advise me on how
-to invest it.
+I don't need to change anything about how initrd works in kvm-unit-tests for my
+kvmtool series, I was just curious to understand more about it. Thank you for the
+explanations!
 
-And I want to add here that if agreed 35% of the total worth of the
-fund will be yours minus your total expenses incurred during the
-clearing of the fund in
-Porto Novo Benin that 35% is a $3,570,000 (Three Million Five Hundred
-And Seventy Thousand United State Dollars) I would like to invest on
-heavy duty agricultural equipment and earth moving machines to enable
-me go into a full scale mechanized farming. l think that will help me
-to ameliorate hunger in the sub-Saharan Africa.
+Thanks,
 
-While l wait to hear from you soon, my warm regards to you and your family
+Alex
+
+>
+> Thanks,
+> drew
+>
+>> Thanks,
+>>
+>> Alex
+>>
+>>> Thanks,
+>>> drew
+>>>
+>>>> Thanks,
+>>>>
+>>>> Alex
+>>>>
+>>>>> There aren't currently any other ways to invoke the addition of the
+>>>>> -initrd command line option, because so far we only support passing a
+>>>>> single file to test (the environment "file"). If we ever want to pass
+>>>>> more files, then we'd need to create a simple file system on the initrd
+>>>>> and make it possible to add -initrd even when no environment is desired.
+>>>>> But, that may never happen.
+>>>>>
+>>>>> Thanks,
+>>>>> drew
+>>>>>
+>>>>>> Thanks,
+>>>>>>
+>>>>>> Alex
+>>>>>>
+>>>>>>>>  		temp_file ERRATATXT "$ERRATATXT"
+>>>>>>>>  		echo 'export ERRATATXT'
+>>>>>>>>  	fi
+>>>>>>>> @@ -95,12 +99,8 @@ function mkstandalone()
+>>>>>>>>  	echo Written $standalone.
+>>>>>>>>  }
+>>>>>>>>  
+>>>>>>>> -if [ "$TARGET" = "kvmtool" ]; then
+>>>>>>>> -	echo "Standalone tests not supported with kvmtool"
+>>>>>>>> -	exit 2
+>>>>>>>> -fi
+>>>>>>>> -
+>>>>>>>> -if [ "$ENVIRON_DEFAULT" = "yes" ] && [ "$ERRATATXT" ] && [ ! -f "$ERRATATXT" ]; then
+>>>>>>>> +if [ "$TARGET" != "kvmtool" ] && [ "$ENVIRON_DEFAULT" = "yes" ] && \
+>>>>>>>> +		[ "$ERRATATXT" ] && [ ! -f "$ERRATATXT" ]; then
+>>>>>>>>  	echo "$ERRATATXT not found. (ERRATATXT=$ERRATATXT)" >&2
+>>>>>>>>  	exit 2
+>>>>>>>>  fi
+>>>>>>>> -- 
+>>>>>>>> 2.32.0
+>>>>>>>>
+>>>>>>> Thanks,
+>>>>>>> drew 
+>>>>>>>
