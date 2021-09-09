@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DAC8140430C
-	for <lists+kvm@lfdr.de>; Thu,  9 Sep 2021 03:42:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B7B2B40430E
+	for <lists+kvm@lfdr.de>; Thu,  9 Sep 2021 03:42:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350256AbhIIBma (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Sep 2021 21:42:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41762 "EHLO
+        id S1349694AbhIIBm4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Sep 2021 21:42:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41750 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350286AbhIIBl5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Sep 2021 21:41:57 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D159C0619FE
-        for <kvm@vger.kernel.org>; Wed,  8 Sep 2021 18:39:03 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id f83-20020a25cf56000000b005a0445377e8so360490ybg.20
-        for <kvm@vger.kernel.org>; Wed, 08 Sep 2021 18:39:03 -0700 (PDT)
+        with ESMTP id S1350036AbhIIBmO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Sep 2021 21:42:14 -0400
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82411C06114A
+        for <kvm@vger.kernel.org>; Wed,  8 Sep 2021 18:39:05 -0700 (PDT)
+Received: by mail-pj1-x1049.google.com with SMTP id n12-20020a17090a2fcc00b001971a2d91b9so293774pjm.6
+        for <kvm@vger.kernel.org>; Wed, 08 Sep 2021 18:39:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=4OIc2sSKc5PiPc2xTSosx0KfrjbnKTlWe//IPTDuYu4=;
-        b=icCH1PAZUBFK2QTRdnVCwUZk++tC3+Z/TKIBuCVxZtlGzQ97I3F4gyGsHngVphVsI9
-         o4r6WjEUk26x3P3ydmjoLIRILK7iOi1YHJSCE1vbkZnAAceei8hCkoh5A+yKEbwhyRVO
-         demvx+RcQSAcrO5eElDdTV7+nbYP3Ph+UD/gYB/WeKQzh2hK7IRtusYsumIPJ4zRszU9
-         w+Gw37Pzhkibz+KSrFMugXzTaWpDYxIXLaOEYQzuIXpMJMlQkEDNeWOHM8U7IW0j5Hiz
-         tVBy66xElaMw5oKiEHab7SRt4rSnZF4o3T2vZ3aGQ+rOBBUnJ28nPdRS/dl4qz3fuoH4
-         fiYw==
+        bh=fhJBhdTI7Fph8U8UIbebfbsbJEo/+U9ZAKdtVVmT0OQ=;
+        b=rP8SFpJgPxh5O3rCo7DlGcKTQcyeoV5/8Amp4gBI8kJiTtJgE1jEuvY/WmpuCQuFdw
+         Ol5TEtCV7UxcmNrgAiMoi3ZMFJ1fOL13rECQ6SDHrCnAeHftRvScWKwQtdAh/m1WnwBM
+         AwAxJjd4jVZyvg9I3pCCNJufENKS7X9OPjXgh/rNbDIhZ/1NRb7Pb0dZtZL3x0FIoTZw
+         WWe9GS21MN2Co959shkpEpn3GO2WxfKW9VfGk06hr770AF+kqaBAsT4Mag16JXd3a5tB
+         tOxYrzOzi7UY+KbUpcEPORumjkWyN7gqFlEMSY+ox4pDYJlSUGlLD8U5xqmXzHYzI9mR
+         9Khg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=4OIc2sSKc5PiPc2xTSosx0KfrjbnKTlWe//IPTDuYu4=;
-        b=qixSffC8TBAIeWd3X63wJ1oxGD4dtp6BL26QwPimGXojLCGFS2ArG7EWiao+3j+qnV
-         PCMhA1sA7p8q+U7wwnnbJZzfWQ7+u7xquXGXScZ9WQ2OPYUksoLRyU00dug1LsBCLZM6
-         PWBWMt4aHme9HtlNgR0rTlG8CmCOiY8Wj9mRIWSeKrVlxz9mqlqr5sWDIzo5ctlSrYX+
-         KL0tKm61kcVIJew7OTcIaSgLGY9Yi9Sl7x2olbJ7JvwQxNMi69O2hZuu7ryCUQFYtG0q
-         wBwROMySVJ6/J0c6id+WnLKN/zNTzxxDIRWBPJFsXrQGDUNzOi7SP0TpRXfVsiaqwBl/
-         xkcg==
-X-Gm-Message-State: AOAM530lGGAkdOCll0D2egxp76tYmAAp7iipQR0fanG5edr0GbPHZdQp
-        6tVos/z0SA8bWMAZfEy3lTEOmS6XCi9c
-X-Google-Smtp-Source: ABdhPJzV7/nQ7w8OHl4rXBpv1VGAeMX7mcXIRC/vkEWV39vJHcqhs3IbBsVcXu/0kz+YtVcN0eg7d/mHOnYG
+        bh=fhJBhdTI7Fph8U8UIbebfbsbJEo/+U9ZAKdtVVmT0OQ=;
+        b=8QEAixFmJM2+oJpf1BZLvAruggjsZyinIuffp+mScYLelY77z0vn3eiUiQeaE7Jmgk
+         jCEPpNbjBVmEy0l17W5WDmQh5s/Tj9tNk2EZV+n+jflePFtFZ2RHKw7rkBfMstoh+X2o
+         snhRSDxy1gJ+ooqYVexS7Jb0cr71+pmJNEjRN5cxO+oJsKj0CGbEmmmDW1gRMP0OL5O7
+         QJ9g2TMG2zH9XMuwrto/uHosVu128ZqyY8A8XguhuF7Rybumq2nJ5WrUwrVukjxKZ0C4
+         jXFOjPgRiBS7k1OLp+zZ8QlHjlcrECnk96nuMb1foHXP2xEgaUKpqRdUs2QdFi9lX0eN
+         RmFQ==
+X-Gm-Message-State: AOAM531N14keRegCezZ9bbpZl/ecDSymNNCP0R4h5yh45vXcebOYDFTt
+        Aji6bS6/A/Rm+/2R9RFb2JgDOBKr0yOu
+X-Google-Smtp-Source: ABdhPJy1lNBcGsIrqRNLwlUOtJjNJsPjnKdPd3b+kR3weBs5ZRkHHcD0ZUb/rO+VqjVCBrvKm12LfqSuKHJa
 X-Received: from rananta-virt.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1bcc])
- (user=rananta job=sendgmr) by 2002:a25:c6c1:: with SMTP id
- k184mr521559ybf.277.1631151542393; Wed, 08 Sep 2021 18:39:02 -0700 (PDT)
-Date:   Thu,  9 Sep 2021 01:38:16 +0000
+ (user=rananta job=sendgmr) by 2002:a17:90b:fd7:: with SMTP id
+ gd23mr51155pjb.1.1631151544636; Wed, 08 Sep 2021 18:39:04 -0700 (PDT)
+Date:   Thu,  9 Sep 2021 01:38:17 +0000
 In-Reply-To: <20210909013818.1191270-1-rananta@google.com>
-Message-Id: <20210909013818.1191270-17-rananta@google.com>
+Message-Id: <20210909013818.1191270-18-rananta@google.com>
 Mime-Version: 1.0
 References: <20210909013818.1191270-1-rananta@google.com>
 X-Mailer: git-send-email 2.33.0.153.gba50c8fa24-goog
-Subject: [PATCH v4 16/18] KVM: arm64: selftests: arch_timer: Support vCPU migration
+Subject: [PATCH v4 17/18] KVM: arm64: selftests: Replace ARM64_SYS_REG with ARM64_SYS_KVM_REG
 From:   Raghavendra Rao Ananta <rananta@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
         Andrew Jones <drjones@redhat.com>,
@@ -71,233 +71,109 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Since the timer stack (hardware and KVM) is per-CPU, there
-are potential chances for races to occur when the scheduler
-decides to migrate a vCPU thread to a different physical CPU.
-Hence, include an option to stress-test this part as well by
-forcing the vCPUs to migrate across physical CPUs in the
-system at a particular rate.
-
-Originally, the bug for the fix with commit 3134cc8beb69d0d
-("KVM: arm64: vgic: Resample HW pending state on deactivation")
-was discovered using arch_timer test with vCPU migrations and
-can be easily reproduced.
+With the introduction of ARM64_SYS_KVM_REG, that takes the
+system register encodings from sysreg.h directly, replace
+all the users of ARM64_SYS_REG, relyiing on the encodings
+created in processor.h, with ARM64_SYS_KVM_REG.
 
 Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
 ---
- .../selftests/kvm/aarch64/arch_timer.c        | 113 +++++++++++++++++-
- 1 file changed, 112 insertions(+), 1 deletion(-)
+ .../selftests/kvm/aarch64/debug-exceptions.c     |  2 +-
+ .../selftests/kvm/aarch64/psci_cpu_on_test.c     |  3 ++-
+ .../selftests/kvm/include/aarch64/processor.h    | 10 ----------
+ .../selftests/kvm/lib/aarch64/processor.c        | 16 ++++++++--------
+ 4 files changed, 11 insertions(+), 20 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/aarch64/arch_timer.c b/tools/testing/selftests/kvm/aarch64/arch_timer.c
-index 6141c387e6dc..aac7bcea4352 100644
---- a/tools/testing/selftests/kvm/aarch64/arch_timer.c
-+++ b/tools/testing/selftests/kvm/aarch64/arch_timer.c
-@@ -14,6 +14,8 @@
-  *
-  * The test provides command-line options to configure the timer's
-  * period (-p), number of vCPUs (-n), and iterations per stage (-i).
-+ * To stress-test the timer stack even more, an option to migrate the
-+ * vCPUs across pCPUs (-m), at a particular rate, is also provided.
-  *
-  * Copyright (c) 2021, Google LLC.
-  */
-@@ -24,6 +26,8 @@
- #include <pthread.h>
- #include <linux/kvm.h>
- #include <linux/sizes.h>
-+#include <linux/bitmap.h>
-+#include <sys/sysinfo.h>
- 
- #include "kvm_util.h"
- #include "processor.h"
-@@ -36,17 +40,20 @@
- #define NR_TEST_ITERS_DEF		5
- #define TIMER_TEST_PERIOD_MS_DEF	10
- #define TIMER_TEST_ERR_MARGIN_US	100
-+#define TIMER_TEST_MIGRATION_FREQ_MS	2
- 
- struct test_args {
- 	int nr_vcpus;
- 	int nr_iter;
- 	int timer_period_ms;
-+	int migration_freq_ms;
- };
- 
- static struct test_args test_args = {
- 	.nr_vcpus = NR_VCPUS_DEF,
- 	.nr_iter = NR_TEST_ITERS_DEF,
- 	.timer_period_ms = TIMER_TEST_PERIOD_MS_DEF,
-+	.migration_freq_ms = TIMER_TEST_MIGRATION_FREQ_MS,
- };
- 
- #define msecs_to_usecs(msec)		((msec) * 1000LL)
-@@ -81,6 +88,9 @@ struct test_vcpu {
- static struct test_vcpu test_vcpu[KVM_MAX_VCPUS];
- static struct test_vcpu_shared_data vcpu_shared_data[KVM_MAX_VCPUS];
- 
-+static unsigned long *vcpu_done_map;
-+static pthread_mutex_t vcpu_done_map_lock;
-+
- static void
- guest_configure_timer_action(struct test_vcpu_shared_data *shared_data)
+diff --git a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
+index 11fd23e21cb4..b28b311f4dd7 100644
+--- a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
++++ b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
+@@ -190,7 +190,7 @@ static int debug_version(struct kvm_vm *vm)
  {
-@@ -216,6 +226,11 @@ static void *test_vcpu_run(void *arg)
+ 	uint64_t id_aa64dfr0;
  
- 	vcpu_run(vm, vcpuid);
- 
-+	/* Currently, any exit from guest is an indication of completion */
-+	pthread_mutex_lock(&vcpu_done_map_lock);
-+	set_bit(vcpuid, vcpu_done_map);
-+	pthread_mutex_unlock(&vcpu_done_map_lock);
-+
- 	switch (get_ucall(vm, vcpuid, &uc)) {
- 	case UCALL_SYNC:
- 	case UCALL_DONE:
-@@ -234,9 +249,76 @@ static void *test_vcpu_run(void *arg)
- 	return NULL;
+-	get_reg(vm, VCPU_ID, ARM64_SYS_REG(ID_AA64DFR0_EL1), &id_aa64dfr0);
++	get_reg(vm, VCPU_ID, ARM64_SYS_KVM_REG(SYS_ID_AA64DFR0_EL1), &id_aa64dfr0);
+ 	return id_aa64dfr0 & 0xf;
  }
  
-+static uint32_t test_get_pcpu(void)
-+{
-+	uint32_t pcpu;
-+	unsigned int nproc_conf;
-+	cpu_set_t online_cpuset;
-+
-+	nproc_conf = get_nprocs_conf();
-+	sched_getaffinity(0, sizeof(cpu_set_t), &online_cpuset);
-+
-+	/* Randomly find an available pCPU to place a vCPU on */
-+	do {
-+		pcpu = rand() % nproc_conf;
-+	} while (!CPU_ISSET(pcpu, &online_cpuset));
-+
-+	return pcpu;
-+}
-+static int test_migrate_vcpu(struct test_vcpu *vcpu)
-+{
-+	int ret;
-+	cpu_set_t cpuset;
-+	uint32_t new_pcpu = test_get_pcpu();
-+
-+	CPU_ZERO(&cpuset);
-+	CPU_SET(new_pcpu, &cpuset);
-+
-+	pr_debug("Migrating vCPU: %u to pCPU: %u\n", vcpu->vcpuid, new_pcpu);
-+
-+	ret = pthread_setaffinity_np(vcpu->pt_vcpu_run,
-+					sizeof(cpuset), &cpuset);
-+
-+	/* Allow the error where the vCPU thread is already finished */
-+	TEST_ASSERT(ret == 0 || ret == ESRCH,
-+			"Failed to migrate the vCPU:%u to pCPU: %u; ret: %d\n",
-+			vcpu->vcpuid, new_pcpu, ret);
-+
-+	return ret;
-+}
-+static void *test_vcpu_migration(void *arg)
-+{
-+	unsigned int i, n_done;
-+	bool vcpu_done;
-+
-+	do {
-+		usleep(msecs_to_usecs(test_args.migration_freq_ms));
-+
-+		for (n_done = 0, i = 0; i < test_args.nr_vcpus; i++) {
-+			pthread_mutex_lock(&vcpu_done_map_lock);
-+			vcpu_done = test_bit(i, vcpu_done_map);
-+			pthread_mutex_unlock(&vcpu_done_map_lock);
-+
-+			if (vcpu_done) {
-+				n_done++;
-+				continue;
-+			}
-+
-+			test_migrate_vcpu(&test_vcpu[i]);
-+		}
-+	} while (test_args.nr_vcpus != n_done);
-+
-+	return NULL;
-+}
-+
- static void test_run(struct kvm_vm *vm)
- {
- 	int i, ret;
-+	pthread_t pt_vcpu_migration;
-+
-+	pthread_mutex_init(&vcpu_done_map_lock, NULL);
-+	vcpu_done_map = bitmap_alloc(test_args.nr_vcpus);
-+	TEST_ASSERT(vcpu_done_map, "Failed to allocate vcpu done bitmap\n");
+diff --git a/tools/testing/selftests/kvm/aarch64/psci_cpu_on_test.c b/tools/testing/selftests/kvm/aarch64/psci_cpu_on_test.c
+index 018c269990e1..4c8aa7b8a65d 100644
+--- a/tools/testing/selftests/kvm/aarch64/psci_cpu_on_test.c
++++ b/tools/testing/selftests/kvm/aarch64/psci_cpu_on_test.c
+@@ -91,7 +91,8 @@ int main(void)
+ 	init.features[0] |= (1 << KVM_ARM_VCPU_POWER_OFF);
+ 	aarch64_vcpu_add_default(vm, VCPU_ID_TARGET, &init, guest_main);
  
- 	for (i = 0; i < test_args.nr_vcpus; i++) {
- 		ret = pthread_create(&test_vcpu[i].pt_vcpu_run, NULL,
-@@ -244,8 +326,23 @@ static void test_run(struct kvm_vm *vm)
- 		TEST_ASSERT(!ret, "Failed to create vCPU-%d pthread\n", i);
- 	}
+-	get_reg(vm, VCPU_ID_TARGET, ARM64_SYS_REG(MPIDR_EL1), &target_mpidr);
++	get_reg(vm, VCPU_ID_TARGET,
++		ARM64_SYS_KVM_REG(SYS_MPIDR_EL1), &target_mpidr);
+ 	vcpu_args_set(vm, VCPU_ID_SOURCE, 1, target_mpidr & MPIDR_HWID_BITMASK);
+ 	vcpu_run(vm, VCPU_ID_SOURCE);
  
-+	/* Spawn a thread to control the vCPU migrations */
-+	if (test_args.migration_freq_ms) {
-+		srand(time(NULL));
-+
-+		ret = pthread_create(&pt_vcpu_migration, NULL,
-+					test_vcpu_migration, NULL);
-+		TEST_ASSERT(!ret, "Failed to create the migration pthread\n");
-+	}
-+
-+
- 	for (i = 0; i < test_args.nr_vcpus; i++)
- 		pthread_join(test_vcpu[i].pt_vcpu_run, NULL);
-+
-+	if (test_args.migration_freq_ms)
-+		pthread_join(pt_vcpu_migration, NULL);
-+
-+	bitmap_free(vcpu_done_map);
+diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
+index 150f63101f4c..ee81dd3db516 100644
+--- a/tools/testing/selftests/kvm/include/aarch64/processor.h
++++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
+@@ -16,16 +16,6 @@
+ #define ARM64_CORE_REG(x) (KVM_REG_ARM64 | KVM_REG_SIZE_U64 | \
+ 			   KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(x))
+ 
+-#define CPACR_EL1               3, 0,  1, 0, 2
+-#define TCR_EL1                 3, 0,  2, 0, 2
+-#define MAIR_EL1                3, 0, 10, 2, 0
+-#define MPIDR_EL1               3, 0,  0, 0, 5
+-#define TTBR0_EL1               3, 0,  2, 0, 0
+-#define SCTLR_EL1               3, 0,  1, 0, 0
+-#define VBAR_EL1                3, 0, 12, 0, 0
+-
+-#define ID_AA64DFR0_EL1         3, 0,  0, 5, 0
+-
+ /*
+  * ARM64_SYS_KVM_REG(sys_reg_id): Helper macro to convert
+  * SYS_* register definitions in sysreg.h to use in KVM
+diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+index 9844b62227b1..d7b89aa092f5 100644
+--- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
++++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+@@ -240,10 +240,10 @@ void aarch64_vcpu_setup(struct kvm_vm *vm, int vcpuid, struct kvm_vcpu_init *ini
+ 	 * Enable FP/ASIMD to avoid trapping when accessing Q0-Q15
+ 	 * registers, which the variable argument list macros do.
+ 	 */
+-	set_reg(vm, vcpuid, ARM64_SYS_REG(CPACR_EL1), 3 << 20);
++	set_reg(vm, vcpuid, ARM64_SYS_KVM_REG(SYS_CPACR_EL1), 3 << 20);
+ 
+-	get_reg(vm, vcpuid, ARM64_SYS_REG(SCTLR_EL1), &sctlr_el1);
+-	get_reg(vm, vcpuid, ARM64_SYS_REG(TCR_EL1), &tcr_el1);
++	get_reg(vm, vcpuid, ARM64_SYS_KVM_REG(SYS_SCTLR_EL1), &sctlr_el1);
++	get_reg(vm, vcpuid, ARM64_SYS_KVM_REG(SYS_TCR_EL1), &tcr_el1);
+ 
+ 	switch (vm->mode) {
+ 	case VM_MODE_P52V48_4K:
+@@ -281,10 +281,10 @@ void aarch64_vcpu_setup(struct kvm_vm *vm, int vcpuid, struct kvm_vcpu_init *ini
+ 	tcr_el1 |= (1 << 8) | (1 << 10) | (3 << 12);
+ 	tcr_el1 |= (64 - vm->va_bits) /* T0SZ */;
+ 
+-	set_reg(vm, vcpuid, ARM64_SYS_REG(SCTLR_EL1), sctlr_el1);
+-	set_reg(vm, vcpuid, ARM64_SYS_REG(TCR_EL1), tcr_el1);
+-	set_reg(vm, vcpuid, ARM64_SYS_REG(MAIR_EL1), DEFAULT_MAIR_EL1);
+-	set_reg(vm, vcpuid, ARM64_SYS_REG(TTBR0_EL1), vm->pgd);
++	set_reg(vm, vcpuid, ARM64_SYS_KVM_REG(SYS_SCTLR_EL1), sctlr_el1);
++	set_reg(vm, vcpuid, ARM64_SYS_KVM_REG(SYS_TCR_EL1), tcr_el1);
++	set_reg(vm, vcpuid, ARM64_SYS_KVM_REG(SYS_MAIR_EL1), DEFAULT_MAIR_EL1);
++	set_reg(vm, vcpuid, ARM64_SYS_KVM_REG(SYS_TTBR0_EL1), vm->pgd);
  }
  
- static struct kvm_vm *test_vm_create(void)
-@@ -286,6 +383,8 @@ static void test_print_help(char *name)
- 		NR_TEST_ITERS_DEF);
- 	pr_info("\t-p: Periodicity (in ms) of the guest timer (default: %u)\n",
- 		TIMER_TEST_PERIOD_MS_DEF);
-+	pr_info("\t-m: Frequency (in ms) of vCPUs to migrate to different pCPU. 0 to turn off (default: %u)\n",
-+		TIMER_TEST_MIGRATION_FREQ_MS);
- 	pr_info("\t-h: print this help screen\n");
+ void vcpu_dump(FILE *stream, struct kvm_vm *vm, uint32_t vcpuid, uint8_t indent)
+@@ -370,7 +370,7 @@ void vcpu_init_descriptor_tables(struct kvm_vm *vm, uint32_t vcpuid)
+ {
+ 	extern char vectors;
+ 
+-	set_reg(vm, vcpuid, ARM64_SYS_REG(VBAR_EL1), (uint64_t)&vectors);
++	set_reg(vm, vcpuid, ARM64_SYS_KVM_REG(SYS_VBAR_EL1), (uint64_t)&vectors);
  }
  
-@@ -293,7 +392,7 @@ static bool parse_args(int argc, char *argv[])
- {
- 	int opt;
- 
--	while ((opt = getopt(argc, argv, "hn:i:p:")) != -1) {
-+	while ((opt = getopt(argc, argv, "hn:i:p:m:")) != -1) {
- 		switch (opt) {
- 		case 'n':
- 			test_args.nr_vcpus = atoi(optarg);
-@@ -320,6 +419,13 @@ static bool parse_args(int argc, char *argv[])
- 				goto err;
- 			}
- 			break;
-+		case 'm':
-+			test_args.migration_freq_ms = atoi(optarg);
-+			if (test_args.migration_freq_ms < 0) {
-+				pr_info("0 or positive value needed for -m\n");
-+				goto err;
-+			}
-+			break;
- 		case 'h':
- 		default:
- 			goto err;
-@@ -343,6 +449,11 @@ int main(int argc, char *argv[])
- 	if (!parse_args(argc, argv))
- 		exit(KSFT_SKIP);
- 
-+	if (get_nprocs() < 2) {
-+		print_skip("At least two physical CPUs needed for vCPU migration");
-+		exit(KSFT_SKIP);
-+	}
-+
- 	vm = test_vm_create();
- 	test_run(vm);
- 	kvm_vm_free(vm);
+ void route_exception(struct ex_regs *regs, int vector)
 -- 
 2.33.0.153.gba50c8fa24-goog
 
