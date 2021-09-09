@@ -2,134 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 185F54041A3
-	for <lists+kvm@lfdr.de>; Thu,  9 Sep 2021 01:12:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D86C2404270
+	for <lists+kvm@lfdr.de>; Thu,  9 Sep 2021 02:55:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240620AbhIHXN6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Sep 2021 19:13:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26051 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236792AbhIHXN4 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 8 Sep 2021 19:13:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1631142767;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=nOaLPYWvCmKA3+gZFk6HgMiMUXXOGyn19f1P8xgHAEI=;
-        b=i160cRuAoPVRNn1BH+O7x8O1MY0mErXj8LBbUUNntdT56rt3hC0ajIcscofusSMBYMrfcY
-        ZP30Oak3mtCuvEaFgMNd85DTNgGS+TluiyycY1hzsurvxRP0rSaBHTacfk9vbtq4txe8sk
-        UwILLbpyASKG0RWOmnJO4EHBeTnR99M=
-Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com
- [209.85.167.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-193-SJqXzpCKO8OHHRIKyVENPg-1; Wed, 08 Sep 2021 19:12:44 -0400
-X-MC-Unique: SJqXzpCKO8OHHRIKyVENPg-1
-Received: by mail-oi1-f199.google.com with SMTP id v24-20020a056808005800b00268eee6bf2cso30429oic.11
-        for <kvm@vger.kernel.org>; Wed, 08 Sep 2021 16:12:44 -0700 (PDT)
+        id S1348865AbhIIA4h (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Sep 2021 20:56:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60212 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S245152AbhIIA4h (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Sep 2021 20:56:37 -0400
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEB0BC061575
+        for <kvm@vger.kernel.org>; Wed,  8 Sep 2021 17:55:28 -0700 (PDT)
+Received: by mail-pj1-x1035.google.com with SMTP id c13-20020a17090a558d00b00198e6497a4fso187625pji.4
+        for <kvm@vger.kernel.org>; Wed, 08 Sep 2021 17:55:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=EAwI9xKTqeHWChHWhRhYTeBipS4ZF/kZaxQsB1p1X8Q=;
+        b=OibT8iqWnv9BI2GQFDg0FNJCIef2vX5j7r9atqElzLhKKnlOKXCxJHWsLuHsdjQtTn
+         lMKw88jZ5Pzft7mqJ6XUCoKEy+r50qK+nC0xKdA1d5Y6+yb6hjEasvXJ8BMOkpQr9h/H
+         PMWdO+/SEaqoGTwkl5AaOYk5WAOU7nV0/Zw30J/gZvv3qfkRcSBhsp1aShmMiNiIJ75G
+         0wlPgtsGqrxbe2tH+7wywKpkl6vW9sjbtHy4AsYcwLnb9ipxep24Q9XvB4oVB7DV5YtP
+         AgFHB1DtaeKfGG9JsWX7U1iifJ69dFWtGZGisP+Aoqn3bbOUuneXlt3/00zxTJdxRfY6
+         hHgA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=nOaLPYWvCmKA3+gZFk6HgMiMUXXOGyn19f1P8xgHAEI=;
-        b=QLXCME87FZsSwEfkGfQLktt/bWJ2/nFiBPOZI1yAg9KCT3DKuipOvDPHde5g2wIv6P
-         TH8lSIXa9imIkTaEho0BzfYDPzDtftZBf671m6CEi6qDDx/XRnvKf5PDspjRl16HqYYR
-         AkxzLFE/cBkjhY4lG2h0OB2rihQHXI6BDmjbshP0oTcgJ5b4Fpo4EpFAveeWGhTqtSbd
-         7TGo7+URtRXr3dA+vVg0CCh+jsh9nPCoorXLwUPBdlHOFGOQrpRuB8twOovFB2CQDY82
-         8M/2lxJQ4JtI9NrJntmfZmFFbINld9eiByOeUzocJHsZsM+yc3M8BHycGGGkpeRXK7CE
-         oe2w==
-X-Gm-Message-State: AOAM532NNf9dDUwhoPkEE3px3Ws9vBY7e5yNoeh9lob9KQd/dzOiL2hg
-        2yu1HKRaorZWFLkGH08afX0dvj+tSpoicGKPvluynR6v3y6F+ZyGKie03F9RDY7kQkBI2VCzJur
-        YzM8Ps9QG/RIC
-X-Received: by 2002:a9d:63cf:: with SMTP id e15mr498577otl.172.1631142763553;
-        Wed, 08 Sep 2021 16:12:43 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxqJXuGzjBMZyjx4FIV1ALqedQxy0ByHV+FDgb9944WAR2nbxG24k2RxSKOZtXTYszMG+qinQ==
-X-Received: by 2002:a9d:63cf:: with SMTP id e15mr498561otl.172.1631142763201;
-        Wed, 08 Sep 2021 16:12:43 -0700 (PDT)
-Received: from redhat.com ([198.99.80.109])
-        by smtp.gmail.com with ESMTPSA id j10sm11655oiw.32.2021.09.08.16.12.42
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=EAwI9xKTqeHWChHWhRhYTeBipS4ZF/kZaxQsB1p1X8Q=;
+        b=CHrsaVv6npUbOnpjyENVAldKV6Sw5wGtNMJRtylykCr36ntn0FbM4+jDcUIalOr+rP
+         1Yvj1IOwtU9WQtWBauHxgWCWVs9vhD0X6BwT9jJ2lVHs/z+oUICaCy2A4pw0m4xjmLAW
+         ClEjjBGg66MqBUzynv1RO9NoYMyTpo44xlYxYlld1ObvTxI6P4gqH+XZX37OFfkddS1W
+         AY9mYRiOPK+4wPAezkn/3oiKdVxwVfwyqaWOZoVW2noonGK8NnYr8+EvLAw4geQGGHRZ
+         nmoYJQSw/7Ws8gwUhRJ5Q9fCLKVZGquTgIwK7noYRLCzEme5iatkU6eHXBy6eAYyfrWa
+         HnNA==
+X-Gm-Message-State: AOAM5312exgGD9eW3lX4/edReRupowjFHm+J6PrldRphg00/CJkG2nBR
+        cPCv9glRrVXP7l7zvVOmpRvtCg==
+X-Google-Smtp-Source: ABdhPJyPH0BiF68HweszYajAaQyBaXsTRL3oeWVKBFhlxm1Qrf3xmq+mF6xMbTEBWP26wts7TgHVhg==
+X-Received: by 2002:a17:90a:f18d:: with SMTP id bv13mr464518pjb.70.1631148927962;
+        Wed, 08 Sep 2021 17:55:27 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id x189sm93375pfc.52.2021.09.08.17.55.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Sep 2021 16:12:42 -0700 (PDT)
-Date:   Wed, 8 Sep 2021 17:12:41 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Kishon Vijay Abraham I <kishon@ti.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>, <kvm@vger.kernel.org>,
-        Ohad Ben-Cohen <ohad@wizery.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        linux-remoteproc <linux-remoteproc@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Vutla, Lokesh" <lokeshvutla@ti.com>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        "Strashko, Grygorii" <grygorii.strashko@ti.com>
-Subject: Re: [QUERY] Flushing cache from userspace using VFIO
-Message-ID: <20210908171241.63b0b89c.alex.williamson@redhat.com>
-In-Reply-To: <d338414f-ed88-20d4-7da0-6742dedb8579@ti.com>
-References: <d338414f-ed88-20d4-7da0-6742dedb8579@ti.com>
-Organization: Red Hat
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        Wed, 08 Sep 2021 17:55:27 -0700 (PDT)
+Date:   Thu, 9 Sep 2021 00:55:23 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     kvm@vger.kernel.org, Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Jim Mattson <jmattson@google.com>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
+        <linux-kernel@vger.kernel.org>, Wanpeng Li <wanpengli@tencent.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Subject: Re: [PATCH v2 2/3] KVM: x86: force PDPTRs reload on SMM exit
+Message-ID: <YTlbeylHFkr9/8ES@google.com>
+References: <20210823114618.1184209-1-mlevitsk@redhat.com>
+ <20210823114618.1184209-3-mlevitsk@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210823114618.1184209-3-mlevitsk@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Kishon,
-
-On Mon, 6 Sep 2021 21:22:15 +0530
-Kishon Vijay Abraham I <kishon@ti.com> wrote:
-
-> Hi Alex, Cornelia,
+On Mon, Aug 23, 2021, Maxim Levitsky wrote:
+> KVM_REQ_GET_NESTED_STATE_PAGES is also used with VM entries that happen
+> on exit from SMM mode, and in this case PDPTRS must be always reloaded.
 > 
-> I'm trying to see if I can use VFIO (Versatile Framework for userspace I/O
-> [1]) for communication between two cores within the same SoC. I've tried to put
-> down a picture like below which tries to communicate between ARM64 (running
-> Linux) and CORTEX R5 (running firmware). It uses rpmsg/remoteproc for the
-> control messages and the actual data buffers are directly accessed from the
-> userspace. The location of the data buffers can be informed to the userspace via
-> rpmsg_vfio (which has to be built as a rpmsg endpoint).
+> Thanks to Sean Christopherson for pointing this out.
+> 
+> Fixes: 0f85722341b0 ("KVM: nVMX: delay loading of PDPTRs to KVM_REQ_GET_NESTED_STATE_PAGES")
+> 
+> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> ---
+>  arch/x86/kvm/vmx/vmx.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index fada1055f325..4194fbf5e5d6 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -7504,6 +7504,13 @@ static int vmx_leave_smm(struct kvm_vcpu *vcpu, const char *smstate)
+>  	}
+>  
+>  	if (vmx->nested.smm.guest_mode) {
+> +
+> +		/* Exit from the SMM to the non root mode also uses
 
-In the vfio model, the user gets access to a device that's a member of
-an IOMMU isolation group whose IOMMU context is managed by a vfio
-container.  What "device" is the user getting access to here and is an
-IOMMU involved?
+Just "Exit from SMM to non-root mode", i.e. drop the "the".
 
-> My question is after the userspace application in ARM64 writes to a buffer in
-> the SYSTEM MEMORY, can it flush it (through a VFIO IOCTL) before handing the
-> buffer to the CORTEX R5.
+Multi-line comments should look like:
 
-No such vfio ioctl currently exists.  Now you're starting to get into
-KVM space if userspace requires elevated privileges to flush memory.
-See for example the handling of wbinvd (write-back-invalidate) in x86
-KVM based on an assigned device and coherency model supported by the
-IOMMU.  vfio is only facilitating isolated access to the device. 
- 
-> If it's implemented within kernel either we use dma_alloc_coherent() for
-> allocating coherent memory or streaming DMA APIs like
-> dma_map_single()/dma_unmap_single() for flushing/invalidate the cache.
+		/*
+		 * Exit from SMM ...
 
-In vfio, DMA is mapped to userspace buffers.  The user allocates a
-buffer and maps it for device access.  The IOMMU restricts the device to
-only allow access to those buffers.  Accessing device memory in vfio is
-done via regions on the device file descriptor, a device specific
-region could allow a user to mmap that buffer, but the fact that this
-buffer actually lives in host memory per your model and requires DMA
-programming for the cortex core makes that really troubling.
+though oddly checkpatch doesn't complain about that.
 
-For a vfio model to work, I think userspace would need to allocate the
-buffers and the cortex core would need to be represented as a device
-that supports isolation via an IOMMU.  Otherwise I'm not sure what
-benefit you're getting from vfio.
- 
-> Trying to see if that is already supported in VFIO or if not, would it be
-> acceptable to implement it.
+That said, for the comment, it'd be more helpful to explain why the PDPTRs should
+not come from userspace.  Something like:
 
-vfio provides a user with privilege to access an isolated device, what
-you're proposing could possibly be mangled to fit that model, but it
-seems pretty awkward and there are existing solutions such as KVM for
-processor virtualization if userspace needs elevated privileges to
-handle CPU/RAM coherency.  Thanks,
+		/*
+		 * Always reload the guest's version of the PDPTRs when exiting
+		 * from SMM to non-root.  If KVM_SET_SREGS2 stuffs PDPTRs while
+		 * SMM is active, that state is specifically for SMM context.
+		 * On RSM, all guest state is pulled from its architectural
+		 * location, whatever that may be.
+		 */
 
-Alex
+Though typing that makes me wonder if this is fixing the wrong thing.  It seems
+like pdptrs_from_userspace shouldn't be set when SMM is active, though I suppose
+there's a potential ordering issue between KVM_SET_SREGS2 and KVM_SET_VCPU_EVENTS.
+Bummer.
 
+> +		 * the KVM_REQ_GET_NESTED_STATE_PAGES request,
+> +		 * but in this case the pdptrs must be always reloaded
+> +		 */
+> +		vcpu->arch.pdptrs_from_userspace = false;
+> +
+>  		ret = nested_vmx_enter_non_root_mode(vcpu, false);
+>  		if (ret)
+>  			return ret;
+> -- 
+> 2.26.3
+> 
