@@ -2,329 +2,212 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DA93640583A
-	for <lists+kvm@lfdr.de>; Thu,  9 Sep 2021 15:56:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A7E37405840
+	for <lists+kvm@lfdr.de>; Thu,  9 Sep 2021 15:56:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351577AbhIINsl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Sep 2021 09:48:41 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57431 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1358385AbhIINqf (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 9 Sep 2021 09:46:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1631195125;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=xTpohogIA64F7YnEY632XtA1i/qGIAHCwBWGTfs60IE=;
-        b=MnZZgNmFFDXmd4g+SuwJV/tgeJ+whW9f+zuAQcghz7LWRKW+KMEWK4nO0e42szmfodAZwZ
-        Oo145YD+/OmgzU+vjo4svTmD3olNISlqit2u4MdqVFRvJ4qus+oxsNOH/Xagm5l1ZYCeCu
-        pJDPXIclmhh/MZYEaHaT9LF+sFj4HjE=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-317-6hd7nG0xNxmfBAZd4chfjQ-1; Thu, 09 Sep 2021 09:45:24 -0400
-X-MC-Unique: 6hd7nG0xNxmfBAZd4chfjQ-1
-Received: by mail-wm1-f69.google.com with SMTP id g9-20020a1c2009000000b002fd21541799so279058wmg.0
-        for <kvm@vger.kernel.org>; Thu, 09 Sep 2021 06:45:24 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=xTpohogIA64F7YnEY632XtA1i/qGIAHCwBWGTfs60IE=;
-        b=nOeAF9E/8jc5SRbuDWQhheUCugMUWT/PZ12oPVDZUzWfFH9big58+sJU+D1/IjD7nE
-         DAGt5IKvkRJgRZDYzMppFLYngmXs3TdZH6w0ZbnrA48YBRwBFNRbIxkq6iY18GLLGESB
-         VVDduuvJW2juuvTHuCF2BL0xwaC7YESC7NWq1CaQsJNJEDu1bqTtaYa2rCyLROSJYGTn
-         oBfbUhj2z1JlFyY6dt8QpjHmn3N96TnLnljsOf5G0ZA1MFNDmxFbnlhtNVUgEzLfnFoX
-         HWqpGgegPWUIGPyFBkywpJQnBNZNLBltAIXfmxq/gYjvWmMswCX6Y0VzpKclKjWlITpK
-         YD6g==
-X-Gm-Message-State: AOAM531Qklp8eHTo3zyEni9DN1/IQysnqqJZG7HutFUPyTqimsKrnZ/i
-        sYdAZK2hRQDpmxHjnSmgq2TYPmissNu2k69IUelU4DUMg+JtfBeD7X4mZ+YHjFbxIyyAEnuj2EM
-        BpVIPkfksQejS
-X-Received: by 2002:a7b:cbc9:: with SMTP id n9mr3122660wmi.50.1631195123207;
-        Thu, 09 Sep 2021 06:45:23 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx7puNMDXniSPYBQjdcRLIZDpZ0bmtEJYUCUsx+UIrFjPnaJ0zlntbh8UgDW66c97dJo2dZeQ==
-X-Received: by 2002:a7b:cbc9:: with SMTP id n9mr3122635wmi.50.1631195122967;
-        Thu, 09 Sep 2021 06:45:22 -0700 (PDT)
-Received: from gator (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
-        by smtp.gmail.com with ESMTPSA id u16sm1719047wmc.41.2021.09.09.06.45.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Sep 2021 06:45:22 -0700 (PDT)
-Date:   Thu, 9 Sep 2021 15:45:20 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Raghavendra Rao Ananta <rananta@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH v4 16/18] KVM: arm64: selftests: arch_timer: Support vCPU
- migration
-Message-ID: <20210909134520.yxrjestdwsishce2@gator>
-References: <20210909013818.1191270-1-rananta@google.com>
- <20210909013818.1191270-17-rananta@google.com>
+        id S241203AbhIINto (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Sep 2021 09:49:44 -0400
+Received: from foss.arm.com ([217.140.110.172]:35616 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1354458AbhIINrt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Sep 2021 09:47:49 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6CD1D6D;
+        Thu,  9 Sep 2021 06:46:39 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0F7AA3F59C;
+        Thu,  9 Sep 2021 06:46:36 -0700 (PDT)
+Subject: Re: [kvm-unit-tests RFC PATCH 4/5] scripts: Generate kvmtool
+ standalone tests
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     thuth@redhat.com, pbonzini@redhat.com, lvivier@redhat.com,
+        kvm-ppc@vger.kernel.org, david@redhat.com, frankja@linux.ibm.com,
+        cohuck@redhat.com, imbrenda@linux.ibm.com,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, andre.przywara@arm.com,
+        maz@kernel.org, vivek.gautam@arm.com
+References: <20210702163122.96110-1-alexandru.elisei@arm.com>
+ <20210702163122.96110-5-alexandru.elisei@arm.com>
+ <20210907102135.i2w3r7j4zyj736b5@gator>
+ <ee11a10a-c3e6-b9ce-81e1-147025a9b5bd@arm.com>
+ <20210908160743.l4hrl4de7wkxwuda@gator>
+ <9d5da497-7070-31ef-282a-a11a86e0102e@arm.com>
+ <20210909130553.gnzce7cs7d5stvjd@gator>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <7313396e-de46-8a3b-902d-5a59b2089c79@arm.com>
+Date:   Thu, 9 Sep 2021 14:47:57 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210909013818.1191270-17-rananta@google.com>
+In-Reply-To: <20210909130553.gnzce7cs7d5stvjd@gator>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 09, 2021 at 01:38:16AM +0000, Raghavendra Rao Ananta wrote:
-> Since the timer stack (hardware and KVM) is per-CPU, there
-> are potential chances for races to occur when the scheduler
-> decides to migrate a vCPU thread to a different physical CPU.
-> Hence, include an option to stress-test this part as well by
-> forcing the vCPUs to migrate across physical CPUs in the
-> system at a particular rate.
-> 
-> Originally, the bug for the fix with commit 3134cc8beb69d0d
-> ("KVM: arm64: vgic: Resample HW pending state on deactivation")
-> was discovered using arch_timer test with vCPU migrations and
-> can be easily reproduced.
-> 
-> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> ---
->  .../selftests/kvm/aarch64/arch_timer.c        | 113 +++++++++++++++++-
->  1 file changed, 112 insertions(+), 1 deletion(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/aarch64/arch_timer.c b/tools/testing/selftests/kvm/aarch64/arch_timer.c
-> index 6141c387e6dc..aac7bcea4352 100644
-> --- a/tools/testing/selftests/kvm/aarch64/arch_timer.c
-> +++ b/tools/testing/selftests/kvm/aarch64/arch_timer.c
-> @@ -14,6 +14,8 @@
->   *
->   * The test provides command-line options to configure the timer's
->   * period (-p), number of vCPUs (-n), and iterations per stage (-i).
-> + * To stress-test the timer stack even more, an option to migrate the
-> + * vCPUs across pCPUs (-m), at a particular rate, is also provided.
->   *
->   * Copyright (c) 2021, Google LLC.
->   */
-> @@ -24,6 +26,8 @@
->  #include <pthread.h>
->  #include <linux/kvm.h>
->  #include <linux/sizes.h>
-> +#include <linux/bitmap.h>
-> +#include <sys/sysinfo.h>
->  
->  #include "kvm_util.h"
->  #include "processor.h"
-> @@ -36,17 +40,20 @@
->  #define NR_TEST_ITERS_DEF		5
->  #define TIMER_TEST_PERIOD_MS_DEF	10
->  #define TIMER_TEST_ERR_MARGIN_US	100
-> +#define TIMER_TEST_MIGRATION_FREQ_MS	2
->  
->  struct test_args {
->  	int nr_vcpus;
->  	int nr_iter;
->  	int timer_period_ms;
-> +	int migration_freq_ms;
->  };
->  
->  static struct test_args test_args = {
->  	.nr_vcpus = NR_VCPUS_DEF,
->  	.nr_iter = NR_TEST_ITERS_DEF,
->  	.timer_period_ms = TIMER_TEST_PERIOD_MS_DEF,
-> +	.migration_freq_ms = TIMER_TEST_MIGRATION_FREQ_MS,
->  };
->  
->  #define msecs_to_usecs(msec)		((msec) * 1000LL)
-> @@ -81,6 +88,9 @@ struct test_vcpu {
->  static struct test_vcpu test_vcpu[KVM_MAX_VCPUS];
->  static struct test_vcpu_shared_data vcpu_shared_data[KVM_MAX_VCPUS];
->  
-> +static unsigned long *vcpu_done_map;
-> +static pthread_mutex_t vcpu_done_map_lock;
-> +
->  static void
->  guest_configure_timer_action(struct test_vcpu_shared_data *shared_data)
->  {
-> @@ -216,6 +226,11 @@ static void *test_vcpu_run(void *arg)
->  
->  	vcpu_run(vm, vcpuid);
->  
-> +	/* Currently, any exit from guest is an indication of completion */
-> +	pthread_mutex_lock(&vcpu_done_map_lock);
-> +	set_bit(vcpuid, vcpu_done_map);
-> +	pthread_mutex_unlock(&vcpu_done_map_lock);
-> +
->  	switch (get_ucall(vm, vcpuid, &uc)) {
->  	case UCALL_SYNC:
->  	case UCALL_DONE:
-> @@ -234,9 +249,76 @@ static void *test_vcpu_run(void *arg)
->  	return NULL;
->  }
->  
-> +static uint32_t test_get_pcpu(void)
-> +{
-> +	uint32_t pcpu;
-> +	unsigned int nproc_conf;
-> +	cpu_set_t online_cpuset;
-> +
-> +	nproc_conf = get_nprocs_conf();
-> +	sched_getaffinity(0, sizeof(cpu_set_t), &online_cpuset);
-> +
-> +	/* Randomly find an available pCPU to place a vCPU on */
-> +	do {
-> +		pcpu = rand() % nproc_conf;
-> +	} while (!CPU_ISSET(pcpu, &online_cpuset));
-> +
-> +	return pcpu;
-> +}
+Hi Drew,
 
-Missing blank line here.
+On 9/9/21 2:05 PM, Andrew Jones wrote:
+> On Thu, Sep 09, 2021 at 12:11:52PM +0100, Alexandru Elisei wrote:
+>> Hi Drew,
+>>
+>> On 9/8/21 5:07 PM, Andrew Jones wrote:
+>>> On Wed, Sep 08, 2021 at 04:37:39PM +0100, Alexandru Elisei wrote:
+>>>> Hi Drew,
+>>>>
+>>>> On 9/7/21 11:21 AM, Andrew Jones wrote:
+>>>>> On Fri, Jul 02, 2021 at 05:31:21PM +0100, Alexandru Elisei wrote:
+>>>>>> Add support for the standalone target when running kvm-unit-tests under
+>>>>>> kvmtool.
+>>>>>>
+>>>>>> Example command line invocation:
+>>>>>>
+>>>>>> $ ./configure --target=kvmtool
+>>>>>> $ make clean && make standalone
+>>>>>>
+>>>>>> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+>>>>>> ---
+>>>>>>  scripts/mkstandalone.sh | 14 +++++++-------
+>>>>>>  1 file changed, 7 insertions(+), 7 deletions(-)
+>>>>>>
+>>>>>> diff --git a/scripts/mkstandalone.sh b/scripts/mkstandalone.sh
+>>>>>> index 16f461c06842..d84bdb7e278c 100755
+>>>>>> --- a/scripts/mkstandalone.sh
+>>>>>> +++ b/scripts/mkstandalone.sh
+>>>>>> @@ -44,6 +44,10 @@ generate_test ()
+>>>>>>  	config_export ARCH_NAME
+>>>>>>  	config_export PROCESSOR
+>>>>>>  
+>>>>>> +	if [ "$ARCH" = "arm64" ] || [ "$ARCH" = "arm" ]; then
+>>>>>> +		config_export TARGET
+>>>>>> +	fi
+>>>>> Should export unconditionally, since we'll want TARGET set
+>>>>> unconditionally.
+>>>> Yes, will do.
+>>>>
+>>>>>> +
+>>>>>>  	echo "echo BUILD_HEAD=$(cat build-head)"
+>>>>>>  
+>>>>>>  	if [ ! -f $kernel ]; then
+>>>>>> @@ -59,7 +63,7 @@ generate_test ()
+>>>>>>  		echo 'export FIRMWARE'
+>>>>>>  	fi
+>>>>>>  
+>>>>>> -	if [ "$ENVIRON_DEFAULT" = "yes" ] && [ "$ERRATATXT" ]; then
+>>>>>> +	if [ "$TARGET" != "kvmtool" ] && [ "$ENVIRON_DEFAULT" = "yes" ] && [ "$ERRATATXT" ]; then
+>>>>> I think it would be better to ensure that ENVIRON_DEFAULT is "no" for
+>>>>> TARGET=kvmtool in configure.
+>>>> From looking at the code, it is my understanding that with ENVIRON_DEFAULT=yes, an
+>>>> initrd file is generated with the contents of erratatxt and other information, in
+>>>> a key=value pair format. This initrd is then passed on to the test (please correct
+>>>> me if I'm wrong). With ENVIRON_DEFAULT=no (set via ./configure
+>>>> --disable-default-environ), this initrd is not generated.
+>>>>
+>>>> kvmtool doesn't have support for passing an initrd when loading firmware, so yes,
+>>>> I believe the default should be no.
+>>>>
+>>>> However, I have two questions:
+>>>>
+>>>> 1. What happens when the user specifically enables the default environ via
+>>>> ./configure --enable-default-environ --target=kvmtool? In my opinion, that should
+>>>> be an error because the user wants something that is not possible with kvmtool
+>>>> (loading an image with --firmware in kvmtool means that the initrd image it not
+>>>> loaded into the guest memory and no node is generated for it in the dtb), but I
+>>>> would like to hear your thoughts about it.
+>>> As part of the forcing ENVIRON_DEFAULT to "no" for kvmtool in configure an
+>>> error should be generated if a user tries to explicitly enable it.
+>>>
+>>>> 2. If the default environment is disabled, is it still possible for an user to
+>>>> pass an initrd via other means? I couldn't find where that is implemented, so I'm
+>>>> guessing it's not possible.
+>>> Yes, a user could have a KVM_UNIT_TESTS_ENV environment variable set when
+>>> they launch the tests. If that variable points to a file then it will get
+>>> passed as an initrd. I guess you should also report a warning in arm/run
+>>> if KVM_UNIT_TESTS_ENV is set which states that the environment file will
+>>> be ignored when running with kvmtool.
+>> Thank you for explaining it, I had looked at
+>> scripts/arch-run.bash::initrd_create(), but it didn't click that setting the
+>> KVM_UNIT_TESTS_ENV environment variable is enough to generate and use the initrd.
+>>
+>> After looking at the code some more, in the logs the -initrd argument is shown as
+>> a comment, instead of an actual argument that is passed to qemu:
+>>
+>> timeout -k 1s --foreground 90s /usr/bin/qemu-system-aarch64 -nodefaults -machine
+>> virt,gic-version=host,accel=kvm -cpu host -device virtio-serial-device -device
+>> virtconsole,chardev=ctd -chardev testdev,id=ctd -device pci-testdev -display none
+>> -serial stdio -kernel arm/cache.flat -smp 1 # -initrd /tmp/tmp.rUIZ3h9KLJ
+>> QEMU_ACCEL = kvm
+>> INFO: IDC-DIC: dcache clean to PoU required
+>> INFO: IDC-DIC: icache invalidation to PoU required
+>> PASS: IDC-DIC: code generation
+>> SUMMARY: 1 tests
+>>
+>> This is done intentionally in scripts/arch-run.bash::run_qemu(). I don't
+>> understand the reason for that. When I first looked at the logs, I was sure that
+>> no initrd is passed to the test. I had to go dig through the scripts to figure out
+>> that the "#" sign (which marks the beginning of a comment) is not present in the
+>> qemu invocation.
+> It's commented out because if you want to copy+paste the command line to
+> use it again it'll fail to run because the temp file will be gone. Of
+> course somebody depending on the environment for their test run will have
+> other problems when it's gone, but those people can use the
+> KVM_UNIT_TESTS_ENV variable to specify a non-temp file which includes the
+> default environment and then configure without the default environment.
+> The command line won't get the # in that case.
 
-> +static int test_migrate_vcpu(struct test_vcpu *vcpu)
-> +{
-> +	int ret;
-> +	cpu_set_t cpuset;
-> +	uint32_t new_pcpu = test_get_pcpu();
-> +
-> +	CPU_ZERO(&cpuset);
-> +	CPU_SET(new_pcpu, &cpuset);
-> +
-> +	pr_debug("Migrating vCPU: %u to pCPU: %u\n", vcpu->vcpuid, new_pcpu);
-> +
-> +	ret = pthread_setaffinity_np(vcpu->pt_vcpu_run,
-> +					sizeof(cpuset), &cpuset);
-> +
-> +	/* Allow the error where the vCPU thread is already finished */
-> +	TEST_ASSERT(ret == 0 || ret == ESRCH,
-> +			"Failed to migrate the vCPU:%u to pCPU: %u; ret: %d\n",
-> +			vcpu->vcpuid, new_pcpu, ret);
-> +
-> +	return ret;
-> +}
-
-Missing blank line here.
-
-> +static void *test_vcpu_migration(void *arg)
-> +{
-> +	unsigned int i, n_done;
-> +	bool vcpu_done;
-> +
-> +	do {
-> +		usleep(msecs_to_usecs(test_args.migration_freq_ms));
-> +
-> +		for (n_done = 0, i = 0; i < test_args.nr_vcpus; i++) {
-> +			pthread_mutex_lock(&vcpu_done_map_lock);
-> +			vcpu_done = test_bit(i, vcpu_done_map);
-> +			pthread_mutex_unlock(&vcpu_done_map_lock);
-> +
-> +			if (vcpu_done) {
-> +				n_done++;
-> +				continue;
-> +			}
-> +
-> +			test_migrate_vcpu(&test_vcpu[i]);
-> +		}
-> +	} while (test_args.nr_vcpus != n_done);
-> +
-> +	return NULL;
-> +}
-> +
->  static void test_run(struct kvm_vm *vm)
->  {
->  	int i, ret;
-> +	pthread_t pt_vcpu_migration;
-> +
-> +	pthread_mutex_init(&vcpu_done_map_lock, NULL);
-> +	vcpu_done_map = bitmap_alloc(test_args.nr_vcpus);
-> +	TEST_ASSERT(vcpu_done_map, "Failed to allocate vcpu done bitmap\n");
->  
->  	for (i = 0; i < test_args.nr_vcpus; i++) {
->  		ret = pthread_create(&test_vcpu[i].pt_vcpu_run, NULL,
-> @@ -244,8 +326,23 @@ static void test_run(struct kvm_vm *vm)
->  		TEST_ASSERT(!ret, "Failed to create vCPU-%d pthread\n", i);
->  	}
->  
-> +	/* Spawn a thread to control the vCPU migrations */
-> +	if (test_args.migration_freq_ms) {
-> +		srand(time(NULL));
-> +
-> +		ret = pthread_create(&pt_vcpu_migration, NULL,
-> +					test_vcpu_migration, NULL);
-> +		TEST_ASSERT(!ret, "Failed to create the migration pthread\n");
-> +	}
-> +
-> +
->  	for (i = 0; i < test_args.nr_vcpus; i++)
->  		pthread_join(test_vcpu[i].pt_vcpu_run, NULL);
-> +
-> +	if (test_args.migration_freq_ms)
-> +		pthread_join(pt_vcpu_migration, NULL);
-> +
-> +	bitmap_free(vcpu_done_map);
->  }
->  
->  static struct kvm_vm *test_vm_create(void)
-> @@ -286,6 +383,8 @@ static void test_print_help(char *name)
->  		NR_TEST_ITERS_DEF);
->  	pr_info("\t-p: Periodicity (in ms) of the guest timer (default: %u)\n",
->  		TIMER_TEST_PERIOD_MS_DEF);
-> +	pr_info("\t-m: Frequency (in ms) of vCPUs to migrate to different pCPU. 0 to turn off (default: %u)\n",
-> +		TIMER_TEST_MIGRATION_FREQ_MS);
->  	pr_info("\t-h: print this help screen\n");
->  }
->  
-> @@ -293,7 +392,7 @@ static bool parse_args(int argc, char *argv[])
->  {
->  	int opt;
->  
-> -	while ((opt = getopt(argc, argv, "hn:i:p:")) != -1) {
-> +	while ((opt = getopt(argc, argv, "hn:i:p:m:")) != -1) {
->  		switch (opt) {
->  		case 'n':
->  			test_args.nr_vcpus = atoi(optarg);
-> @@ -320,6 +419,13 @@ static bool parse_args(int argc, char *argv[])
->  				goto err;
->  			}
->  			break;
-> +		case 'm':
-> +			test_args.migration_freq_ms = atoi(optarg);
-> +			if (test_args.migration_freq_ms < 0) {
-> +				pr_info("0 or positive value needed for -m\n");
-> +				goto err;
-> +			}
-> +			break;
->  		case 'h':
->  		default:
->  			goto err;
-> @@ -343,6 +449,11 @@ int main(int argc, char *argv[])
->  	if (!parse_args(argc, argv))
->  		exit(KSFT_SKIP);
->  
-> +	if (get_nprocs() < 2) {
-
-Even though the chance of being on a uniprocessor is low and the migration
-test is now on by default, we could still do
-
- if (test_args.migration_freq_ms && get_nprocs() < 2)
-
-since that's why the skip message says it needs two cpus.
-
-> +		print_skip("At least two physical CPUs needed for vCPU migration");
-> +		exit(KSFT_SKIP);
-> +	}
-> +
->  	vm = test_vm_create();
->  	test_run(vm);
->  	kvm_vm_free(vm);
-> -- 
-> 2.33.0.153.gba50c8fa24-goog
-> 
-
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+Hmm... wouldn't it make more sense then to generate the initrd in the logs
+directory, and keep it there? To ensure the test runs can be reproduced manually,
+if needed?
 
 Thanks,
-drew
 
+Alex
+
+>
+> Thanks,
+> drew
+>
+>> Thanks,
+>>
+>> Alex
+>>
+>>> There aren't currently any other ways to invoke the addition of the
+>>> -initrd command line option, because so far we only support passing a
+>>> single file to test (the environment "file"). If we ever want to pass
+>>> more files, then we'd need to create a simple file system on the initrd
+>>> and make it possible to add -initrd even when no environment is desired.
+>>> But, that may never happen.
+>>>
+>>> Thanks,
+>>> drew
+>>>
+>>>> Thanks,
+>>>>
+>>>> Alex
+>>>>
+>>>>>>  		temp_file ERRATATXT "$ERRATATXT"
+>>>>>>  		echo 'export ERRATATXT'
+>>>>>>  	fi
+>>>>>> @@ -95,12 +99,8 @@ function mkstandalone()
+>>>>>>  	echo Written $standalone.
+>>>>>>  }
+>>>>>>  
+>>>>>> -if [ "$TARGET" = "kvmtool" ]; then
+>>>>>> -	echo "Standalone tests not supported with kvmtool"
+>>>>>> -	exit 2
+>>>>>> -fi
+>>>>>> -
+>>>>>> -if [ "$ENVIRON_DEFAULT" = "yes" ] && [ "$ERRATATXT" ] && [ ! -f "$ERRATATXT" ]; then
+>>>>>> +if [ "$TARGET" != "kvmtool" ] && [ "$ENVIRON_DEFAULT" = "yes" ] && \
+>>>>>> +		[ "$ERRATATXT" ] && [ ! -f "$ERRATATXT" ]; then
+>>>>>>  	echo "$ERRATATXT not found. (ERRATATXT=$ERRATATXT)" >&2
+>>>>>>  	exit 2
+>>>>>>  fi
+>>>>>> -- 
+>>>>>> 2.32.0
+>>>>>>
+>>>>> Thanks,
+>>>>> drew 
+>>>>>
