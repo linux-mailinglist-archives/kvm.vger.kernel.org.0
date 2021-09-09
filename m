@@ -2,209 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A3F7540585C
-	for <lists+kvm@lfdr.de>; Thu,  9 Sep 2021 15:57:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DCCAA405941
+	for <lists+kvm@lfdr.de>; Thu,  9 Sep 2021 16:40:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350923AbhIIN6i (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Sep 2021 09:58:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:28772 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1355441AbhIIN5Y (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 9 Sep 2021 09:57:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1631195775;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-        bh=FJ3vx9ItWF84RR27z81TE9j4hUoJb+a4RSamUREx5R8=;
-        b=dn05rc+PBT7TETFotzbxttrddwrDru9isvwU9Ms1pjh5HYouKcFep9EbXwV6rA34jZf7F1
-        mLfhGjLm4cXsWsGsdi850s6GQ/f8U4cjvt2nigXQ0ODQ9JeOZS15zFGjey4g5nGZ38aDNY
-        jUI9X75y+AfbzsCiFMZusy/dTphbH0o=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-240-YBJ1ZLX2NUKH1gPXqt8Ymw-1; Thu, 09 Sep 2021 09:56:14 -0400
-X-MC-Unique: YBJ1ZLX2NUKH1gPXqt8Ymw-1
-Received: by mail-ej1-f69.google.com with SMTP id s11-20020a170906060b00b005be824f15daso870581ejb.2
-        for <kvm@vger.kernel.org>; Thu, 09 Sep 2021 06:56:13 -0700 (PDT)
+        id S235181AbhIIOlc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Sep 2021 10:41:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46376 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S241257AbhIIOlW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Sep 2021 10:41:22 -0400
+Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8650EC066408
+        for <kvm@vger.kernel.org>; Thu,  9 Sep 2021 07:02:59 -0700 (PDT)
+Received: by mail-lj1-x236.google.com with SMTP id p15so3191338ljn.3
+        for <kvm@vger.kernel.org>; Thu, 09 Sep 2021 07:02:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:reply-to:from:date:message-id:subject:to;
+        bh=7oTEU0E4xx+wFYWqhqzgm4aEcDBxaGZEX1bAEoxzgGo=;
+        b=ak5Ce5ZjqF6nsC1ueXSSRJxmyjYuzgJELKPqJpb3SWrSKLapS3i7TzwNaxVSFqcydm
+         BtcXfIgQgGQ8nOTNON2XJUD+e96ntPHO6+zEKl60y0eFaLgP41tY95V1zh7Bzq7q5GGL
+         bVrz0/c4topxsulQ5fP9AoxySb/l9RzJIwADSHJY/A/WOKGc3BxG1pHzGC1Se6ta5kaG
+         kqgyF54UONhFMFxvKbHtoSVWks0OjDE8Q3ADInn98wUv69tYTZZEv56xrSZtSzRyp0zt
+         6iilRK++FjNmYch2LrduPH8xmR+0pLp2YPv8Jd8/98KuB7I9FT2QDVRak2DouczpLyUs
+         jeeA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition;
-        bh=FJ3vx9ItWF84RR27z81TE9j4hUoJb+a4RSamUREx5R8=;
-        b=4hIKEyJKFA9qo0U1h+B3m1xE+kiv7DDPDNbR7QFRrk44waevC7vgXPbENOW4mn3JHd
-         01Mb2F8qO3pzhoDAvUvDhEbuaofkFGC3nR6UOCZfUfsshNKyGgCITP+mlQ/+2p8maj0H
-         6A9jc0y3RLjRgHOf7ED17mCL9QFKOB0zVN2BPkuD0gxbnGSOnamIbAGBdwGBqB6L/vtu
-         itv2G6ANZdHflE3gvupQq4vK2887QU2Qa0Sb3pkLyCkx4KBJvinaGf96v65mknET+xXM
-         tbvuMuQzm6xnvOhfFpJ5deKhAVMU5qhJ2aHqkDwQ6Pl0V5ik8cr7uNB5ObBVjj8L/KXR
-         0L2A==
-X-Gm-Message-State: AOAM5311XFmnE0ZKu1g+6TpILsNmO/HH89eTMChfRDnJFShd9GV226/P
-        KgQdpf4+zziFI7iIiPrlecvpGk9WofsjUXsAFYeWiZJwz4mNM/hD+ef7aIutKE87zh6BsCrGyfU
-        O/KJKgvH+R90z
-X-Received: by 2002:a17:906:12c8:: with SMTP id l8mr3453431ejb.515.1631195772672;
-        Thu, 09 Sep 2021 06:56:12 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw4tBPafNVgPmrZd3KYi1ABh5Zl7/eVhQcwR6Yr2RpP9yEYDIYrmgjs2t9Ub19JNtKWg/PAtg==
-X-Received: by 2002:a17:906:12c8:: with SMTP id l8mr3453415ejb.515.1631195772487;
-        Thu, 09 Sep 2021 06:56:12 -0700 (PDT)
-Received: from redhat.com ([2.55.145.189])
-        by smtp.gmail.com with ESMTPSA id t19sm987072ejb.115.2021.09.09.06.56.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Sep 2021 06:56:11 -0700 (PDT)
-Date:   Thu, 9 Sep 2021 09:56:08 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        arseny.krasnov@kaspersky.com, caihuoqing@baidu.com,
-        elic@nvidia.com, jasowang@redhat.com, lingshan.zhu@intel.com,
-        mgurtovoy@nvidia.com, mst@redhat.com, viresh.kumar@linaro.org,
-        will@kernel.org, wsa@kernel.org, xianting.tian@linux.alibaba.com,
-        xieyongji@bytedance.com
-Subject: [GIT PULL] virtio,vdpa,vhost: features, fixes
-Message-ID: <20210909095608-mutt-send-email-mst@kernel.org>
+        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
+         :subject:to;
+        bh=7oTEU0E4xx+wFYWqhqzgm4aEcDBxaGZEX1bAEoxzgGo=;
+        b=RSKqM2v8BUSqKDO+rveeY8PbeEuPE2aXb33CpFU862RqDfdrk0AYQxaOwrdBFFLTTC
+         7qOB0Das5O7uiW+bqIgtusvuDa9+lo+IsGqe0rLCvhT3qNWlmxEKp51YCYl4CThf+jYE
+         q8zUM7x1Mplbi2/9wVTnVDRH5MrReZkVLFsXA+gP3vwOweRccp4qFL0FPz0hK6OHLMml
+         lOQYv/sQL704tNP/aCDRAjzhxO7X4v7fAcf9nh1cc23kBRsAlktPIyTFblUrWsXpdYb7
+         yR50f7OCVWYB+d77VQ3g/yTsBvmxrK1RgNPHSj/Ehu/pUBHmch851EeQvvzvCYm4YfrJ
+         eEGA==
+X-Gm-Message-State: AOAM531imODl23MxSdw3UQJGUreeeJG6aP7+8tJc+q2NRDGYeNSxNOcl
+        SB/d1BLcXCWeZRJUrgp3Kf1izvPdWQicvi8BluA=
+X-Google-Smtp-Source: ABdhPJyPmgSveotBAK/aBh7pDWkTb0z7OecbQNBnaVy+MOF7mctbaOCTUHLINe34fVL0nX2YOr9z6Ns9+CPd42nAAtc=
+X-Received: by 2002:a2e:8608:: with SMTP id a8mr6501lji.224.1631196177915;
+ Thu, 09 Sep 2021 07:02:57 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mutt-Fcc: =sent
+Received: by 2002:a2e:150e:0:0:0:0:0 with HTTP; Thu, 9 Sep 2021 07:02:57 -0700 (PDT)
+Reply-To: jennehkandeh@yahoo.com
+From:   Jenneh Kandeh <ayenijohnolatunde@gmail.com>
+Date:   Thu, 9 Sep 2021 07:02:57 -0700
+Message-ID: <CAJ7+8MEvETb85gQpJ9RRbrTpnX9+f7TSexUjLfH2XWs0yPMt9w@mail.gmail.com>
+Subject: Re: Regarding Of My Late Father's Fund $10,500,000
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The following changes since commit 7d2a07b769330c34b4deabeed939325c77a7ec2f:
+dear,
 
-  Linux 5.14 (2021-08-29 15:04:50 -0700)
+I got your contact through the internet due to serious searching for a
+reliable personality. I am Jenneh Kandeh from FreeTown Capital of
+Sierra Leone. Time of opposed to the government of President Ahmad
+Tejan Kebbah the ex-leader. l have been on exile in the Porto-Novo
+Benin. since 21st November, 2005 But I am current residing in
+Porto-Novo Benin due to war of my country, my mother killed on
+04/01/2002 for Sierra Leone civilian war my father decided to change
+another residence country with me because I am only child for my
+family bad news that my father passed away on 25/11/2018.
 
-are available in the Git repository at:
+During the war, My father made a lot of money through the illegal
+sales of Diamonds. To the tune of $10,200,000. This money is currently
+and secretly kept in ECOWAS security company here in Benin, but
+because of the political turmoil which still exists here in Africa, I
+can not invest the money by myself, hence am soliciting your help to
+help me take these funds into your custody and also advise me on how
+to invest it.
 
-  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+And I want to add here that if agreed 35% of the total worth of the
+fund will be yours minus your total expenses incurred during the
+clearing of the fund in
+Porto Novo Benin that 35% is a $3,570,000 (Three Million Five Hundred
+And Seventy Thousand United State Dollars) I would like to invest on
+heavy duty agricultural equipment and earth moving machines to enable
+me go into a full scale mechanized farming. l think that will help me
+to ameliorate hunger in the sub-Saharan Africa.
 
-for you to fetch changes up to 7bc7f61897b66bef78bb5952e3d1e9f3aaf9ccca:
-
-  Documentation: Add documentation for VDUSE (2021-09-06 07:20:58 -0400)
-
-----------------------------------------------------------------
-virtio,vdpa,vhost: features, fixes
-
-vduse driver supporting blk
-virtio-vsock support for end of record with SEQPACKET
-vdpa: mac and mq support for ifcvf and mlx5
-vdpa: management netlink for ifcvf
-virtio-i2c, gpio dt bindings
-
-misc fixes, cleanups
-
-NB: when merging this with
-b542e383d8c0 ("eventfd: Make signal recursion protection a task bit")
-from Linus' tree, replace eventfd_signal_count with
-eventfd_signal_allowed, and drop the export of eventfd_wake_count from
-("eventfd: Export eventfd_wake_count to modules").
-
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-
-----------------------------------------------------------------
-Arseny Krasnov (6):
-      virtio/vsock: rename 'EOR' to 'EOM' bit.
-      virtio/vsock: add 'VIRTIO_VSOCK_SEQ_EOR' bit.
-      vhost/vsock: support MSG_EOR bit processing
-      virtio/vsock: support MSG_EOR bit processing
-      af_vsock: rename variables in receive loop
-      vsock_test: update message bounds test for MSG_EOR
-
-Cai Huoqing (2):
-      vhost scsi: Convert to SPDX identifier
-      vdpa: Make use of PFN_PHYS/PFN_UP/PFN_DOWN helper macro
-
-Eli Cohen (6):
-      vdpa/mlx5: Remove redundant header file inclusion
-      vdpa/mlx5: function prototype modifications in preparation to control VQ
-      vdpa/mlx5: Decouple virtqueue callback from struct mlx5_vdpa_virtqueue
-      vdpa/mlx5: Ensure valid indices are provided
-      vdpa/mlx5: Add support for control VQ and MAC setting
-      vdpa/mlx5: Add multiqueue support
-
-Max Gurtovoy (1):
-      virtio-blk: remove unneeded "likely" statements
-
-Viresh Kumar (5):
-      dt-bindings: virtio: Add binding for virtio devices
-      dt-bindings: i2c: Add bindings for i2c-virtio
-      dt-bindings: gpio: Add bindings for gpio-virtio
-      uapi: virtio_ids: Sync ids with specification
-      virtio: Bind virtio device to device-tree node
-
-Xianting Tian (1):
-      virtio-balloon: Use virtio_find_vqs() helper
-
-Xie Yongji (14):
-      vdpa_sim: Use iova_shift() for the size passed to alloc_iova()
-      iova: Export alloc_iova_fast() and free_iova_fast()
-      eventfd: Export eventfd_wake_count to modules
-      file: Export receive_fd() to modules
-      vdpa: Fix some coding style issues
-      vdpa: Add reset callback in vdpa_config_ops
-      vhost-vdpa: Handle the failure of vdpa_reset()
-      vhost-iotlb: Add an opaque pointer for vhost IOTLB
-      vdpa: Add an opaque pointer for vdpa_config_ops.dma_map()
-      vdpa: factor out vhost_vdpa_pa_map() and vhost_vdpa_pa_unmap()
-      vdpa: Support transferring virtual addressing during DMA mapping
-      vduse: Implement an MMU-based software IOTLB
-      vduse: Introduce VDUSE - vDPA Device in Userspace
-      Documentation: Add documentation for VDUSE
-
-Zhu Lingshan (4):
-      vDPA/ifcvf: introduce get_dev_type() which returns virtio dev id
-      vDPA/ifcvf: implement management netlink framework for ifcvf
-      vDPA/ifcvf: detect and use the onboard number of queues directly
-      vDPA/ifcvf: enable multiqueue and control vq
-
- .../devicetree/bindings/gpio/gpio-virtio.yaml      |   59 +
- .../devicetree/bindings/i2c/i2c-virtio.yaml        |   51 +
- Documentation/devicetree/bindings/virtio/mmio.yaml |    3 +-
- .../devicetree/bindings/virtio/virtio-device.yaml  |   41 +
- Documentation/userspace-api/index.rst              |    1 +
- Documentation/userspace-api/ioctl/ioctl-number.rst |    1 +
- Documentation/userspace-api/vduse.rst              |  233 +++
- drivers/block/virtio_blk.c                         |    4 +-
- drivers/iommu/iova.c                               |    2 +
- drivers/vdpa/Kconfig                               |   11 +
- drivers/vdpa/Makefile                              |    1 +
- drivers/vdpa/ifcvf/ifcvf_base.c                    |    8 +-
- drivers/vdpa/ifcvf/ifcvf_base.h                    |   25 +-
- drivers/vdpa/ifcvf/ifcvf_main.c                    |  257 ++-
- drivers/vdpa/mlx5/core/mlx5_vdpa.h                 |   26 +-
- drivers/vdpa/mlx5/core/mr.c                        |   81 +-
- drivers/vdpa/mlx5/core/resources.c                 |   35 +
- drivers/vdpa/mlx5/net/mlx5_vnet.c                  |  555 ++++++-
- drivers/vdpa/vdpa.c                                |    9 +-
- drivers/vdpa/vdpa_sim/vdpa_sim.c                   |   29 +-
- drivers/vdpa/vdpa_user/Makefile                    |    5 +
- drivers/vdpa/vdpa_user/iova_domain.c               |  545 +++++++
- drivers/vdpa/vdpa_user/iova_domain.h               |   73 +
- drivers/vdpa/vdpa_user/vduse_dev.c                 | 1641 ++++++++++++++++++++
- drivers/vdpa/virtio_pci/vp_vdpa.c                  |   17 +-
- drivers/vhost/iotlb.c                              |   20 +-
- drivers/vhost/scsi.c                               |   14 +-
- drivers/vhost/vdpa.c                               |  188 ++-
- drivers/vhost/vsock.c                              |   28 +-
- drivers/virtio/virtio.c                            |   57 +-
- drivers/virtio/virtio_balloon.c                    |    4 +-
- fs/eventfd.c                                       |    1 +
- fs/file.c                                          |    6 +
- include/linux/file.h                               |    7 +-
- include/linux/vdpa.h                               |   62 +-
- include/linux/vhost_iotlb.h                        |    3 +
- include/uapi/linux/vduse.h                         |  306 ++++
- include/uapi/linux/virtio_ids.h                    |   12 +
- include/uapi/linux/virtio_vsock.h                  |    3 +-
- net/vmw_vsock/af_vsock.c                           |   10 +-
- net/vmw_vsock/virtio_transport_common.c            |   23 +-
- tools/testing/vsock/vsock_test.c                   |    8 +-
- 42 files changed, 4136 insertions(+), 329 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/gpio/gpio-virtio.yaml
- create mode 100644 Documentation/devicetree/bindings/i2c/i2c-virtio.yaml
- create mode 100644 Documentation/devicetree/bindings/virtio/virtio-device.yaml
- create mode 100644 Documentation/userspace-api/vduse.rst
- create mode 100644 drivers/vdpa/vdpa_user/Makefile
- create mode 100644 drivers/vdpa/vdpa_user/iova_domain.c
- create mode 100644 drivers/vdpa/vdpa_user/iova_domain.h
- create mode 100644 drivers/vdpa/vdpa_user/vduse_dev.c
- create mode 100644 include/uapi/linux/vduse.h
-
+While l wait to hear from you soon, my warm regards to you and your family
