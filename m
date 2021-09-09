@@ -2,56 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 881414042E7
-	for <lists+kvm@lfdr.de>; Thu,  9 Sep 2021 03:39:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 587034042EA
+	for <lists+kvm@lfdr.de>; Thu,  9 Sep 2021 03:39:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349604AbhIIBjt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Sep 2021 21:39:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41698 "EHLO
+        id S1349503AbhIIBjx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Sep 2021 21:39:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41718 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349514AbhIIBjq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Sep 2021 21:39:46 -0400
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75CDAC061757
-        for <kvm@vger.kernel.org>; Wed,  8 Sep 2021 18:38:37 -0700 (PDT)
-Received: by mail-pf1-x449.google.com with SMTP id i3-20020aa79083000000b003efb4fd360dso295111pfa.8
-        for <kvm@vger.kernel.org>; Wed, 08 Sep 2021 18:38:37 -0700 (PDT)
+        with ESMTP id S1349565AbhIIBjs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Sep 2021 21:39:48 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24384C0613C1
+        for <kvm@vger.kernel.org>; Wed,  8 Sep 2021 18:38:40 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id y134-20020a25dc8c000000b0059f0301df0fso356480ybe.21
+        for <kvm@vger.kernel.org>; Wed, 08 Sep 2021 18:38:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=gnXKJQdV0c3R/PtxS6JEuqPswo+mI03RfMS+GJY9V2c=;
-        b=qovCNdObk9hAYj5TRIstPpudmx6SP1gE3xKWc2RIyrpnrPqHTaRlABxqgUjn2zw7rT
-         vEidP+eM7AUJIEqMeJgU88+wfjlSHF19U/ZiK9c6aesOhSvvkl4oRIUjCOTHPGyEZWay
-         I37gnbfuZr2v8I5I5mxm2EC0V8EZ6yK+qOAnp+jtr324k5m51nzdTq56dzoHMs10+7zn
-         8u22Sqvehn7ThNOUO7HAFN5kRqbI2jP4+7K40fB+qnINSr4lmHmlxbbzeV/WnIy1E+x6
-         R3gWMpaynW+uiMBXTZa/08/31Czfo6HEvQtCL8VmjI/Mf0dUE+Al2Qvm46MSYSaI3WGq
-         IYLg==
+        bh=ulk7lg3SWnBNJFJ99cX5GWqXCF6sjZDZS2dWa8toKKg=;
+        b=jAKHD524wMO49NuE4IB1vnqJEKtcCTjhkAwc3lAUtMyKw7Pk9/nLq9TvVIs7Fu98Xr
+         nSWsoHAe2XeE8Lcln5RyLQ6TtzzvHNH723D9gqRRsYNHzHjZTM0ohw50/OJQx0ba0iq/
+         VDoROgSTz02R5syU054odn28QPH/NVNwsN95Nx67AY1PpnffxyEtUA5d8Pep3hHETDO5
+         lmXuKBHKiUbMLZhSKk5VjWX13w/o3OPOiMxDPMoW10YOWiCqhlhROfxubrdXEO3ubUbD
+         SQ9/N1tDjNrG5uM4OOdqLZagmr6EL8nBnD9Q3pqzjIBrGIx2zWPW6WK5ydoB4L+WpGuV
+         jxdQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=gnXKJQdV0c3R/PtxS6JEuqPswo+mI03RfMS+GJY9V2c=;
-        b=nhmacivJ1wT+bDm1nmlx+T1A2ntjgojMxZXIrB/eBgQqVNwM4ON8CkW7uvWhRMe+xS
-         Y3Yqr1C3r9YNhc05adr1G2U6l5baKyZ3Cj/zApwu9FKIMcw+Mq2RcNVaKJXIJA4urfWO
-         3dEp1IobvWhghHhpQe+z+ztjzAh8s+IureujzOzpgR81Ty6NG8HYRkLyRauePZ44lccu
-         Kqi7eqEAy/+WJOEWax6I0fU+6kHMt1p2dF7iukktmIpyI5thgjZtQKA5ehnZXC1h2ftB
-         90FQqM10S0pDiIuRZGE0ceqIBnJr7ZFngeRnB6iHdn7rGGwYZ5KXXEHFXHY+URLhSDVZ
-         ixEQ==
-X-Gm-Message-State: AOAM532vgrE0yiVf/1UlHQa1Y19Xhk3syZOqHjyAmTnoz+vEUcE9cL7u
-        dJ5+lMrT6egV5N5pd3u2Ax/cjKC6kRmt
-X-Google-Smtp-Source: ABdhPJzYobbwdhjyH3noMxa1HCPANLozf7zYs5UxTopZ642KuVhxcHxiSRq8EQ2ySUHCdPtjJlAquY0U4s3l
+        bh=ulk7lg3SWnBNJFJ99cX5GWqXCF6sjZDZS2dWa8toKKg=;
+        b=firi885480h/k21JKq7CwowmvHlw7b0EK7SJf2OM2u1rS21ptNMHTTu1OVVp1u0wsn
+         GkTRZsDUgC8QjMqNYlAjDe0PTpDVJCdaue7647Ckn/kgiqIKZWXMEay8f9GzVfD1ixDQ
+         +/mDu0dpFXqpO0uK7xUaurJTakqovM35Grwdj/7hp78XtrN8V1CZPrwOJFFQmDusNkx6
+         6YxKcYZDYuQSlk2QaQN6SS9IwgK/A+ufSlrvmnXfQG6vEmsq0NbBYHOno7wdWwBJ+KDl
+         UdEtyxeV96QfdePz/+4I12V0gsqYHqRgfYqbSKeK1lgmoleOehJlf+qTF2B8ZdIyiHQ/
+         FPYQ==
+X-Gm-Message-State: AOAM531fSJjRCT2huDwPfy/xtZzDsnNh7L0YVhrSpU9lCbv1divr8sow
+        +qx03b0P49+GPvVlPlwgJLUbuc9F5q4w
+X-Google-Smtp-Source: ABdhPJyd54TWYs4V5EnAlAUH5QhP/9ocrgnHZwTJO7/wp1dYTGqkAgZiD35uxEgGmkNMyaHA6QEGHxdCjfz4
 X-Received: from rananta-virt.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1bcc])
- (user=rananta job=sendgmr) by 2002:aa7:9693:0:b0:412:448c:89c6 with SMTP id
- f19-20020aa79693000000b00412448c89c6mr616147pfk.82.1631151516895; Wed, 08 Sep
- 2021 18:38:36 -0700 (PDT)
-Date:   Thu,  9 Sep 2021 01:38:05 +0000
+ (user=rananta job=sendgmr) by 2002:a5b:791:: with SMTP id b17mr568206ybq.263.1631151519339;
+ Wed, 08 Sep 2021 18:38:39 -0700 (PDT)
+Date:   Thu,  9 Sep 2021 01:38:06 +0000
 In-Reply-To: <20210909013818.1191270-1-rananta@google.com>
-Message-Id: <20210909013818.1191270-6-rananta@google.com>
+Message-Id: <20210909013818.1191270-7-rananta@google.com>
 Mime-Version: 1.0
 References: <20210909013818.1191270-1-rananta@google.com>
 X-Mailer: git-send-email 2.33.0.153.gba50c8fa24-goog
-Subject: [PATCH v4 05/18] KVM: arm64: selftests: Add support for cpu_relax
+Subject: [PATCH v4 06/18] KVM: arm64: selftests: Add basic support for arch_timers
 From:   Raghavendra Rao Ananta <rananta@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
         Andrew Jones <drjones@redhat.com>,
@@ -72,35 +71,164 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Implement the guest helper routine, cpu_relax(), to yield
-the processor to other tasks.
-
-The function was derived from
-arch/arm64/include/asm/vdso/processor.h.
+Add a minimalistic library support to access the virtual timers,
+that can be used for simple timing functionalities, such as
+introducing delays in the guest.
 
 Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-Reviewed-by: Oliver Upton <oupton@google.com>
-Reviewed-by: Andrew Jones <drjones@redhat.com>
 ---
- tools/testing/selftests/kvm/include/aarch64/processor.h | 5 +++++
- 1 file changed, 5 insertions(+)
+ .../kvm/include/aarch64/arch_timer.h          | 142 ++++++++++++++++++
+ 1 file changed, 142 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/include/aarch64/arch_timer.h
 
-diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
-index ac8b63f8aab7..166d273ad715 100644
---- a/tools/testing/selftests/kvm/include/aarch64/processor.h
-+++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
-@@ -134,6 +134,11 @@ void vm_install_exception_handler(struct kvm_vm *vm,
- void vm_install_sync_handler(struct kvm_vm *vm,
- 		int vector, int ec, handler_fn handler);
- 
-+static inline void cpu_relax(void)
+diff --git a/tools/testing/selftests/kvm/include/aarch64/arch_timer.h b/tools/testing/selftests/kvm/include/aarch64/arch_timer.h
+new file mode 100644
+index 000000000000..cb7c03de3a21
+--- /dev/null
++++ b/tools/testing/selftests/kvm/include/aarch64/arch_timer.h
+@@ -0,0 +1,142 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * ARM Generic Timer specific interface
++ */
++
++#ifndef SELFTEST_KVM_ARCH_TIMER_H
++#define SELFTEST_KVM_ARCH_TIMER_H
++
++#include "processor.h"
++
++enum arch_timer {
++	VIRTUAL,
++	PHYSICAL,
++};
++
++#define CTL_ENABLE	(1 << 0)
++#define CTL_IMASK	(1 << 1)
++#define CTL_ISTATUS	(1 << 2)
++
++#define msec_to_cycles(msec)	\
++	(timer_get_cntfrq() * (uint64_t)(msec) / 1000)
++
++#define usec_to_cycles(usec)	\
++	(timer_get_cntfrq() * (uint64_t)(usec) / 1000000)
++
++#define cycles_to_usec(cycles) \
++	((uint64_t)(cycles) * 1000000 / timer_get_cntfrq())
++
++static inline uint32_t timer_get_cntfrq(void)
 +{
-+	asm volatile("yield" ::: "memory");
++	return read_sysreg(cntfrq_el0);
 +}
 +
- #define isb()		asm volatile("isb" : : : "memory")
- #define dsb(opt)	asm volatile("dsb " #opt : : : "memory")
- #define dmb(opt)	asm volatile("dmb " #opt : : : "memory")
++static inline uint64_t timer_get_cntct(enum arch_timer timer)
++{
++	isb();
++
++	switch (timer) {
++	case VIRTUAL:
++		return read_sysreg(cntvct_el0);
++	case PHYSICAL:
++		return read_sysreg(cntpct_el0);
++	default:
++		GUEST_ASSERT_1(0, timer);
++	}
++
++	/* We should not reach here */
++	return 0;
++}
++
++static inline void timer_set_cval(enum arch_timer timer, uint64_t cval)
++{
++	switch (timer) {
++	case VIRTUAL:
++		write_sysreg(cval, cntv_cval_el0);
++		break;
++	case PHYSICAL:
++		write_sysreg(cval, cntp_cval_el0);
++		break;
++	default:
++		GUEST_ASSERT_1(0, timer);
++	}
++
++	isb();
++}
++
++static inline uint64_t timer_get_cval(enum arch_timer timer)
++{
++	switch (timer) {
++	case VIRTUAL:
++		return read_sysreg(cntv_cval_el0);
++	case PHYSICAL:
++		return read_sysreg(cntp_cval_el0);
++	default:
++		GUEST_ASSERT_1(0, timer);
++	}
++
++	/* We should not reach here */
++	return 0;
++}
++
++static inline void timer_set_tval(enum arch_timer timer, uint32_t tval)
++{
++	switch (timer) {
++	case VIRTUAL:
++		write_sysreg(tval, cntv_tval_el0);
++		break;
++	case PHYSICAL:
++		write_sysreg(tval, cntp_tval_el0);
++		break;
++	default:
++		GUEST_ASSERT_1(0, timer);
++	}
++
++	isb();
++}
++
++static inline void timer_set_ctl(enum arch_timer timer, uint32_t ctl)
++{
++	switch (timer) {
++	case VIRTUAL:
++		write_sysreg(ctl, cntv_ctl_el0);
++		break;
++	case PHYSICAL:
++		write_sysreg(ctl, cntp_ctl_el0);
++		break;
++	default:
++		GUEST_ASSERT_1(0, timer);
++	}
++
++	isb();
++}
++
++static inline uint32_t timer_get_ctl(enum arch_timer timer)
++{
++	switch (timer) {
++	case VIRTUAL:
++		return read_sysreg(cntv_ctl_el0);
++	case PHYSICAL:
++		return read_sysreg(cntp_ctl_el0);
++	default:
++		GUEST_ASSERT_1(0, timer);
++	}
++
++	/* We should not reach here */
++	return 0;
++}
++
++static inline void timer_set_next_cval_ms(enum arch_timer timer, uint32_t msec)
++{
++	uint64_t now_ct = timer_get_cntct(timer);
++	uint64_t next_ct = now_ct + msec_to_cycles(msec);
++
++	timer_set_cval(timer, next_ct);
++}
++
++static inline void timer_set_next_tval_ms(enum arch_timer timer, uint32_t msec)
++{
++	timer_set_tval(timer, msec_to_cycles(msec));
++}
++
++#endif /* SELFTEST_KVM_ARCH_TIMER_H */
 -- 
 2.33.0.153.gba50c8fa24-goog
 
