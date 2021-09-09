@@ -2,175 +2,225 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D9423405BE2
-	for <lists+kvm@lfdr.de>; Thu,  9 Sep 2021 19:19:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 960D7405BE9
+	for <lists+kvm@lfdr.de>; Thu,  9 Sep 2021 19:21:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240530AbhIIRUz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Sep 2021 13:20:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55806 "EHLO
+        id S239381AbhIIRWP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Sep 2021 13:22:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56122 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235813AbhIIRUy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Sep 2021 13:20:54 -0400
-Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD76FC061574
-        for <kvm@vger.kernel.org>; Thu,  9 Sep 2021 10:19:44 -0700 (PDT)
-Received: by mail-ej1-x634.google.com with SMTP id t19so5068567ejr.8
-        for <kvm@vger.kernel.org>; Thu, 09 Sep 2021 10:19:44 -0700 (PDT)
+        with ESMTP id S232940AbhIIRWM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Sep 2021 13:22:12 -0400
+Received: from mail-yb1-xb30.google.com (mail-yb1-xb30.google.com [IPv6:2607:f8b0:4864:20::b30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC7FDC061575
+        for <kvm@vger.kernel.org>; Thu,  9 Sep 2021 10:21:02 -0700 (PDT)
+Received: by mail-yb1-xb30.google.com with SMTP id s16so5453103ybe.0
+        for <kvm@vger.kernel.org>; Thu, 09 Sep 2021 10:21:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=HP6zYcpN9FTCWRSqbs+P2HEdnIvKmMR7Slns5ajotdk=;
-        b=O7ZKQV9R/GtyXSocKl+UyRIcG2TtwdAeFQiTGMjV5gOtkwQNzrmMZGOQYXUfvwrlF6
-         u/KKzGgGaYSYCcOL5vg1NFmVLymU6tSvUqO235qJQIUxZZp0TOOJOn8xTLrZsbiRzOLa
-         SDESGrE4cn99EvFxLhwc9SWqZI9R8IjgJ69i9MuN3q5lFd0dG58kPpdIhqH5OSG3YnP9
-         nX64SkVyT9kLpRf3FJ9GxxQrrTBsnn6rZCVXXEtGqRKS7QZbjuQciN154j2gIhjtU2pU
-         2DUYQ+UF4JLkq7psolkIJKCb8M7tg7WhRK30c3MmsWeplHjD+VL7ieVivpMuirCL5tx2
-         Zy6A==
+        bh=Yk1xRCHa7oe+DYf+9hvXu4dgI0POdHNG4LTk33BEmSw=;
+        b=mALGXMTn96O2epfdF+bedTHCxwZJaAfI7GnQx+Oo9vDJDY9dCMb8NKwL7hNgBwYC7H
+         +wZelSPSgGy28NSgrim0e+CAyEcWnfauA12PfCBgT0VXgHqLwUqNwNb5feQ3d40a1+Dn
+         Mpm4Mh0eomv988vE2Ocb+EjRf574xnBzOfTpkizk3t4n3IM/rPknN69vfoUfPBG2UCt3
+         MPTdqOt9FcvgNnYbizlCnyCYA8tWHNmWDWKNOs+2Yz9erLSQ/9DW8chtDzMNqicEWoeA
+         9WrUolRpiv2YuP2hsxjl3ujY2wwSlRAfsjdFYMkAMGIFIdv1JFnOAjaYJ37ec9QuP4Yx
+         fldg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=HP6zYcpN9FTCWRSqbs+P2HEdnIvKmMR7Slns5ajotdk=;
-        b=NyK2+1qQ6BpgT4D+1sjPTds3xZa/RKofDAI9L3VOQD8O4ZaTzBM3bLa0a5/1F3FmJk
-         IiiP6A9eSikGhwR3S1utQhduRefYEj/BjHKMvub44fevmk1QHiwkxL2ry2FGEU/0/X4Y
-         Qm6NO12AANfYotYEHKKF/UqNo7w2UB7dA8mMPGmS6I7Esah/eAnE6BbHJ5uKKHtC7HFE
-         n9DywTKrwJOP7leS2A0Px7ct5DGpqs6Waxi1OioMREVUFcKumDhVrOFDFn5+Lz1RZJFo
-         TKOnNs0kf/8WkpeP4z5o8sqjREQluQjzANA0BS8JfqcharEkQnu/YIjIR6DrpDYsDlr4
-         sQAg==
-X-Gm-Message-State: AOAM531tV0ndlj3DTeDd3ruKPLU2SPr/Mjf5QbnXm1um26tByAcOnYtM
-        546PjZYbKRH6J08tIMYCQLf0zL+TDmglNF3LkTawnAJWOQ==
-X-Google-Smtp-Source: ABdhPJyCMijf54lukseMqOggIsTy5V2XL7j5b0M3LhpyCRS0zSbLiLtv2yXEZcx6N/EJqcigWSmoQ3aIzEsQKQONGMo=
-X-Received: by 2002:a17:906:2c10:: with SMTP id e16mr4508234ejh.182.1631207982958;
- Thu, 09 Sep 2021 10:19:42 -0700 (PDT)
+        bh=Yk1xRCHa7oe+DYf+9hvXu4dgI0POdHNG4LTk33BEmSw=;
+        b=2l7UgA+R2Pev91z3lht3YnVSRc7Fa+rhfsLeR+LLWFrN0h3zefqeqC/A81O491WN9q
+         KWWDYF5H0PUJqjw7b88wjMUEwQ2Vg0ty8lJ80p60NbzJiweoCf5aCjyhxDajDLso+tnM
+         92xuVg4r2XDt98C9bAFryTVreXftWQRIfeNQJWtUHRCimTUu7/5xPTHEqdBsA4Rrxbi2
+         1mrvvrI47NOnxHLoOhG/Zbno/8/ZP0CV8qUAFnthzMvbYv70NoCI2CDq46cTKa6jox8L
+         /W72I63wWQ7aEike5E/V+Q6CsIFjRQTSnmYZjUn0woGqiu3JkW6F/6MKPzHfWQHl5m4r
+         qf7g==
+X-Gm-Message-State: AOAM532Mv+nJuOV+XU6xjXQ4JxOj7Rwq2bqmCzBLvTQ0wH0S52Rek9fE
+        TR8823Wwsfej7v3XF+73pq2qKyxBi969BuuEQXKfQw==
+X-Google-Smtp-Source: ABdhPJxA+qKZtjUOncYqYLOYKJryq5SW7oK8uVt1u8oOXgMFawG4AMBXZi67DCvZzE4IlyJ+03LuU+yuYgkqdVYnM2s=
+X-Received: by 2002:a25:ab44:: with SMTP id u62mr5186947ybi.335.1631208061767;
+ Thu, 09 Sep 2021 10:21:01 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210825222604.2659360-1-morbo@google.com> <20210908204541.3632269-1-morbo@google.com>
- <20210908204541.3632269-3-morbo@google.com> <YTkv6HXYEGnDe56h@google.com>
- <CAGG=3QX1L1dsFHhQhiEHPRycm8ot2Abw1j=wR60ezVoKgU0KmQ@mail.gmail.com> <YTk+amslyQCsM3+M@google.com>
-In-Reply-To: <YTk+amslyQCsM3+M@google.com>
-From:   Bill Wendling <morbo@google.com>
-Date:   Thu, 9 Sep 2021 10:19:31 -0700
-Message-ID: <CAGG=3QWBiyxC_K96yXZPxCBHoB3gffvzkzwvaTHgTLJHKqJ4Tw@mail.gmail.com>
-Subject: Re: [kvm-unit-tests PATCH v2 2/5] x86: realmode: mark
- exec_in_big_real_mode as noinline
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Roman Bolshakov <r.bolshakov@yadro.com>,
-        David Matlack <dmatlack@google.com>,
-        Jim Mattson <jmattson@google.com>
+References: <20210909013818.1191270-1-rananta@google.com> <20210909013818.1191270-15-rananta@google.com>
+ <YTmce6Xn+ymngA+r@google.com>
+In-Reply-To: <YTmce6Xn+ymngA+r@google.com>
+From:   Raghavendra Rao Ananta <rananta@google.com>
+Date:   Thu, 9 Sep 2021 10:20:50 -0700
+Message-ID: <CAJHc60z-q6vsKNuJ0_xab_1F1qxWcte4PYO-8tmMCo49VVg-nA@mail.gmail.com>
+Subject: Re: [PATCH v4 14/18] KVM: arm64: selftests: Add host support for vGIC
+To:     Oliver Upton <oupton@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Andrew Jones <drjones@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 8, 2021 at 3:51 PM Sean Christopherson <seanjc@google.com> wrote:
+On Wed, Sep 8, 2021 at 10:32 PM Oliver Upton <oupton@google.com> wrote:
 >
-> On Wed, Sep 08, 2021, Bill Wendling wrote:
-> > On Wed, Sep 8, 2021 at 2:49 PM Sean Christopherson <seanjc@google.com> wrote:
-> > >
-> > > On Wed, Sep 08, 2021, Bill Wendling wrote:
-> > > > exec_in_big_real_mode() uses inline asm that has labels. Clang decides
-> > >
-> > > _global_ labels.  Inlining functions with local labels, including asm goto labels,
-> > > is not problematic, the issue is specific to labels that must be unique for a
-> > > given compilation unit.
-> > >
-> > > > that it can inline this function, which causes the assembler to complain
-> > > > about duplicate symbols. Mark the function as "noinline" to prevent
-> > > > this.
-> > > >
-> > > > Signed-off-by: Bill Wendling <morbo@google.com>
-> > > > ---
-> > > >  x86/realmode.c | 2 +-
-> > > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > > >
-> > > > diff --git a/x86/realmode.c b/x86/realmode.c
-> > > > index b4fa603..07a477f 100644
-> > > > --- a/x86/realmode.c
-> > > > +++ b/x86/realmode.c
-> > > > @@ -178,7 +178,7 @@ static inline void init_inregs(struct regs *regs)
-> > > >               inregs.esp = (unsigned long)&tmp_stack.top;
-> > > >  }
-> > > >
-> > > > -static void exec_in_big_real_mode(struct insn_desc *insn)
-> > > > +static __attribute__((noinline)) void exec_in_big_real_mode(struct insn_desc *insn)
-> > >
-> > > Forgot to use the new define in this patch :-)
-> > >
-> > This was intentional. realmode.c doesn't #include any header files,
-> > and adding '#include "libflat.h" causes a lot of warnings and errors.
-> > We could do that, but I feel it's beyond the scope of this series of
-> > patches.
+> Hi Raghu,
 >
-> Ah, right, realmode is compiled for real mode and can't use any of the libcflat
-> stuff.
+> On Thu, Sep 09, 2021 at 01:38:14AM +0000, Raghavendra Rao Ananta wrote:
+> > Implement a simple library to perform vGIC-v3 setup
+> > from a host point of view. This includes creating a
+> > vGIC device, setting up distributor and redistributor
+> > attributes, and mapping the guest physical addresses.
+> >
+> > The definition of REDIST_REGION_ATTR_ADDR is taken
+> > from aarch64/vgic_init test.
+> >
 >
-> A better option would be to put the #define in linux/compiler.h and include that
-> in libcflat.h and directly in realmode.h.  It only requires a small prep patch to
-> avoid a duplicate barrier() definition.
+> Consider dropping the macro from vgic_init.c and have it just include
+> vgic.h
 >
-Sounds good to me. Please go ahead and submit this for inclusion and I
-can revamp my stuff.
+> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> > ---
+> >  tools/testing/selftests/kvm/Makefile          |  2 +-
+> >  .../selftests/kvm/include/aarch64/vgic.h      | 20 +++++++
+> >  .../testing/selftests/kvm/lib/aarch64/vgic.c  | 60 +++++++++++++++++++
+> >  3 files changed, 81 insertions(+), 1 deletion(-)
+> >  create mode 100644 tools/testing/selftests/kvm/include/aarch64/vgic.h
+> >  create mode 100644 tools/testing/selftests/kvm/lib/aarch64/vgic.c
+> >
+> > diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+> > index 5476a8ddef60..8342f65c1d96 100644
+> > --- a/tools/testing/selftests/kvm/Makefile
+> > +++ b/tools/testing/selftests/kvm/Makefile
+> > @@ -35,7 +35,7 @@ endif
+> >
+> >  LIBKVM = lib/assert.c lib/elf.c lib/io.c lib/kvm_util.c lib/rbtree.c lib/sparsebit.c lib/test_util.c lib/guest_modes.c lib/perf_test_util.c
+> >  LIBKVM_x86_64 = lib/x86_64/apic.c lib/x86_64/processor.c lib/x86_64/vmx.c lib/x86_64/svm.c lib/x86_64/ucall.c lib/x86_64/handlers.S
+> > -LIBKVM_aarch64 = lib/aarch64/processor.c lib/aarch64/ucall.c lib/aarch64/handlers.S lib/aarch64/spinlock.c lib/aarch64/gic.c lib/aarch64/gic_v3.c
+> > +LIBKVM_aarch64 = lib/aarch64/processor.c lib/aarch64/ucall.c lib/aarch64/handlers.S lib/aarch64/spinlock.c lib/aarch64/gic.c lib/aarch64/gic_v3.c lib/aarch64/vgic.c
+> >  LIBKVM_s390x = lib/s390x/processor.c lib/s390x/ucall.c lib/s390x/diag318_test_handler.c
+> >
+> >  TEST_GEN_PROGS_x86_64 = x86_64/cr4_cpuid_sync_test
+> > diff --git a/tools/testing/selftests/kvm/include/aarch64/vgic.h b/tools/testing/selftests/kvm/include/aarch64/vgic.h
+> > new file mode 100644
+> > index 000000000000..3a776af958a0
+> > --- /dev/null
+> > +++ b/tools/testing/selftests/kvm/include/aarch64/vgic.h
+> > @@ -0,0 +1,20 @@
+> > +/* SPDX-License-Identifier: GPL-2.0 */
+> > +/*
+> > + * ARM Generic Interrupt Controller (GIC) host specific defines
+> > + */
+> > +
+> > +#ifndef SELFTEST_KVM_VGIC_H
+> > +#define SELFTEST_KVM_VGIC_H
+> > +
+> > +#include <linux/kvm.h>
+> > +
+> > +#define REDIST_REGION_ATTR_ADDR(count, base, flags, index) \
+> > +     (((uint64_t)(count) << 52) | \
+> > +     ((uint64_t)((base) >> 16) << 16) | \
+> > +     ((uint64_t)(flags) << 12) | \
+> > +     index)
+> > +
+> > +int vgic_v3_setup(struct kvm_vm *vm,
+> > +                             uint64_t gicd_base_gpa, uint64_t gicr_base_gpa);
+> > +
+> > +#endif /* SELFTEST_KVM_VGIC_H */
+> > diff --git a/tools/testing/selftests/kvm/lib/aarch64/vgic.c b/tools/testing/selftests/kvm/lib/aarch64/vgic.c
+> > new file mode 100644
+> > index 000000000000..2318912ab134
+> > --- /dev/null
+> > +++ b/tools/testing/selftests/kvm/lib/aarch64/vgic.c
+> > @@ -0,0 +1,60 @@
+> > +// SPDX-License-Identifier: GPL-2.0
+> > +/*
+> > + * ARM Generic Interrupt Controller (GIC) v3 host support
+> > + */
+> > +
+> > +#include <linux/kvm.h>
+> > +#include <linux/sizes.h>
+> > +
+> > +#include "kvm_util.h"
+> > +#include "vgic.h"
+> > +
+> > +#define VGIC_V3_GICD_SZ              (SZ_64K)
+> > +#define VGIC_V3_GICR_SZ              (2 * SZ_64K)
+>
+> These values are UAPI, consider dropping them in favor of the
+> definitions from asm/kvm.h
+>
+> > +
+> > +/*
+> > + * vGIC-v3 default host setup
+> > + *
+> > + * Input args:
+> > + *   vm - KVM VM
+> > + *   gicd_base_gpa - Guest Physical Address of the Distributor region
+> > + *   gicr_base_gpa - Guest Physical Address of the Redistributor region
+> > + *
+> > + * Output args: None
+> > + *
+> > + * Return: GIC file-descriptor or negative error code upon failure
+> > + *
+> > + * The function creates a vGIC-v3 device and maps the distributor and
+> > + * redistributor regions of the guest. Since it depends on the number of
+> > + * vCPUs for the VM, it must be called after all the vCPUs have been created.
+>
+> You could avoid the ordering dependency by explicitly taking nr_vcpus as
+> an arg. It would also avoid the need for 12/18.
+>
+Well I guess I was focusing on Andrew's comment on v3 10/12,
+"TEST_ASSERT(!list_empty(&vm->vcpus), ...) to ensure we've created
+vcpus first. To be really paranoid we could even confirm the number of
+vcpus in the list matches nr_vcpus."
+So, instead of just getting the arg from the caller and doing all the
+fancy checks, I figured let vgic_v3_setup() learn this on its own,
+which made me define vm_get_nr_vcpus().
 
--bw
+Regards,
+Raghavendra
 
-> From 6e6971ef22c335732a9597409a45fee8a3be6fb7 Mon Sep 17 00:00:00 2001
-> From: Sean Christopherson <seanjc@google.com>
-> Date: Wed, 8 Sep 2021 15:41:12 -0700
-> Subject: [PATCH] lib: Drop x86/processor.h's barrier() in favor of compiler.h
->  version
+> Also note the required alignment on the GPA arguments you're taking.
 >
-> Drop x86's duplicate version of barrier() in favor of the generic #define
-> provided by linux/compiler.h.  Include compiler.h in the all-encompassing
-> libcflat.h to pick up barrier() and other future goodies, e.g. new
-> attributes defines.
->
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  lib/libcflat.h      | 1 +
->  lib/x86/processor.h | 5 -----
->  2 files changed, 1 insertion(+), 5 deletions(-)
->
-> diff --git a/lib/libcflat.h b/lib/libcflat.h
-> index 97db9e3..e619de1 100644
-> --- a/lib/libcflat.h
-> +++ b/lib/libcflat.h
-> @@ -22,6 +22,7 @@
->
->  #ifndef __ASSEMBLY__
->
-> +#include <linux/compiler.h>
->  #include <stdarg.h>
->  #include <stddef.h>
->  #include <stdint.h>
-> diff --git a/lib/x86/processor.h b/lib/x86/processor.h
-> index f380321..eaf24d4 100644
-> --- a/lib/x86/processor.h
-> +++ b/lib/x86/processor.h
-> @@ -216,11 +216,6 @@ struct descriptor_table_ptr {
->      ulong base;
->  } __attribute__((packed));
->
-> -static inline void barrier(void)
-> -{
-> -    asm volatile ("" : : : "memory");
-> -}
-> -
->  static inline void clac(void)
->  {
->      asm volatile (".byte 0x0f, 0x01, 0xca" : : : "memory");
-> --
->
-> and then your patch 1 can become:
->
-> diff --git a/lib/linux/compiler.h b/lib/linux/compiler.h
-> index 5d9552a..5937b7b 100644
-> --- a/lib/linux/compiler.h
-> +++ b/lib/linux/compiler.h
-> @@ -46,6 +46,7 @@
->  #define barrier()      asm volatile("" : : : "memory")
->
->  #define __always_inline        inline __attribute__((always_inline))
-> +#define noinline __attribute__((noinline))
->
+> > + */
+> > +int vgic_v3_setup(struct kvm_vm *vm,
+> > +             uint64_t gicd_base_gpa, uint64_t gicr_base_gpa)
+> > +{
+> > +     uint64_t redist_attr;
+> > +     int gic_fd, nr_vcpus;
+> > +     unsigned int nr_gic_pages;
+> > +
+> > +     nr_vcpus = vm_get_nr_vcpus(vm);
+> > +     TEST_ASSERT(nr_vcpus > 0, "Invalid number of CPUs: %u\n", nr_vcpus);
+> > +
+> > +     /* Distributor setup */
+> > +     gic_fd = kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_V3, false);
+> > +     kvm_device_access(gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+> > +                     KVM_VGIC_V3_ADDR_TYPE_DIST, &gicd_base_gpa, true);
+> > +     nr_gic_pages = vm_calc_num_guest_pages(vm_get_mode(vm), VGIC_V3_GICD_SZ);
+> > +     virt_map(vm, gicd_base_gpa, gicd_base_gpa,  nr_gic_pages);
+> > +
+> > +     /* Redistributor setup */
+> > +     redist_attr = REDIST_REGION_ATTR_ADDR(nr_vcpus, gicr_base_gpa, 0, 0);
+> > +     kvm_device_access(gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+> > +                     KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &redist_attr, true);
+> > +     nr_gic_pages = vm_calc_num_guest_pages(vm_get_mode(vm),
+> > +                                             VGIC_V3_GICR_SZ * nr_vcpus);
+> > +     virt_map(vm, gicr_base_gpa, gicr_base_gpa,  nr_gic_pages);
+> > +
+> > +     kvm_device_access(gic_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
+> > +                             KVM_DEV_ARM_VGIC_CTRL_INIT, NULL, true);
+> > +
+> > +     return gic_fd;
+> > +}
+> > --
+> > 2.33.0.153.gba50c8fa24-goog
+> >
