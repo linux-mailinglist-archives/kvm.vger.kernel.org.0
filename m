@@ -2,143 +2,285 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C744F405963
-	for <lists+kvm@lfdr.de>; Thu,  9 Sep 2021 16:43:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F1B324059BF
+	for <lists+kvm@lfdr.de>; Thu,  9 Sep 2021 16:55:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234822AbhIIOoq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Sep 2021 10:44:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:34734 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1348641AbhIIOo0 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 9 Sep 2021 10:44:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1631198596;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=NXI4TwfF9ATuisncE0UeLZfKMl4lBSArTcS01RD5hDM=;
-        b=cCv+VNtiYnDZQkVD2aGi6kpHThmqW2G3UH6t5eMd6Xi8DxHS7rvNwxxy2HfxOln4rdGvNL
-        SmtGe+OfFp0vh9RKXPcq4ZG17V62LcpjbnlwbgOF/LgI9wf1tbVEgYmmUpOnVTucrOoVlA
-        xQSidOFKBZawHnPrmhPHofkFTNvjKSg=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-86-vmi6b5aeO9-S1xjQSZPduA-1; Thu, 09 Sep 2021 10:43:14 -0400
-X-MC-Unique: vmi6b5aeO9-S1xjQSZPduA-1
-Received: by mail-wr1-f69.google.com with SMTP id i16-20020adfded0000000b001572ebd528eso581087wrn.19
-        for <kvm@vger.kernel.org>; Thu, 09 Sep 2021 07:43:14 -0700 (PDT)
+        id S232557AbhIIO4K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Sep 2021 10:56:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50502 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232359AbhIIO4J (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Sep 2021 10:56:09 -0400
+Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C79E9C061575
+        for <kvm@vger.kernel.org>; Thu,  9 Sep 2021 07:54:59 -0700 (PDT)
+Received: by mail-lf1-x135.google.com with SMTP id m28so4271941lfj.6
+        for <kvm@vger.kernel.org>; Thu, 09 Sep 2021 07:54:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=UXDQZf9GzYNTEO852SsaCLl2x7HS0RgCfhZ04IuDC2I=;
+        b=JmUdq4Wh16MijW68342W/rE/D7fXFeyOtoOKzi7u5wegZlDayNEemJqHGu5Pv9EMfv
+         O3yK5jfNQWOv+JhpDuIV1LnSI8PjS94xPdjGuAh6yNEjkIA3yAAuqUzLCjqCyFCcN6Xo
+         daekX6B2mNlFawoQnV15OrMMyQnvV/c8uxXZZHnLaac/lpU7GY10oJNGM/R0/6e+Y/gF
+         QEPBHJHHCWohS5g2kCmcODC7rfSbNA6i9Zm/KIuokcvwlMC0Yv1Py+laDT43vW6WiH4I
+         VHVpfJDllRA41xwd+PYM8PhubIV9K0ym+dGqP0Yv3CvIE0iosrl1Xz/C/NAcPMAeBjK+
+         IsqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:reply-to:subject:to:cc:references:from
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-transfer-encoding:content-language;
-        bh=NXI4TwfF9ATuisncE0UeLZfKMl4lBSArTcS01RD5hDM=;
-        b=R+VE47etRrs5IKCRTytn82idLOpEFk24pyctlt6D/ayRqleuX1JlEH7G4HxhCFr6oh
-         Mrm7P+GS+0OULj1Ng58cKerVLG3SluGyocj7Q1iFYNKzcWqNlq/bSFd6FxHlNgh5yAPy
-         Zdr0Q24/jkvxhLYIgOvZyRLFmMnVstYuR28pDeLh/tpdyOew8i2j/W00pxfo+Y2iOQnZ
-         6SwcrUW+V6LzWUk40CG7xIu6rFK+NceNzStRALOCo4eSh6VHEwMT6PLCa/r02ocQPscm
-         83Ccv+zf0wCxVeH2Hn943ueFpDJCAUbFertdSArfVAklB9o3dcBPmWE89U8VDZU2zKYf
-         TrKg==
-X-Gm-Message-State: AOAM530aZfY/WWyId9eatSZdACy+EcINW0CJ03uAMRQE5iG4Dvurfo5E
-        o+x/5sEUT1Mr11EtTzMkLe8UwvFyOU/4M71/um/xBX3Nfbv2Kx35CBXVv3+n4EewH6GLWT1JA8A
-        42dG0GOAzYYi2
-X-Received: by 2002:adf:ea4d:: with SMTP id j13mr4019750wrn.86.1631198593659;
-        Thu, 09 Sep 2021 07:43:13 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw1LuTiwsjnrgw/0AGWEEOKwqU3QmylhI8y8zAc70bSBImbu5FbUVlcZZAs/ShC2AxuK5Z4Jw==
-X-Received: by 2002:adf:ea4d:: with SMTP id j13mr4019708wrn.86.1631198593387;
-        Thu, 09 Sep 2021 07:43:13 -0700 (PDT)
-Received: from ?IPv6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id a5sm1748509wmm.44.2021.09.09.07.43.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 09 Sep 2021 07:43:12 -0700 (PDT)
-Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH 1/2] KVM: arm64: vgic: check redist region is not above
- the VM IPA size
-To:     Alexandru Elisei <alexandru.elisei@arm.com>,
-        Ricardo Koller <ricarkol@google.com>, kvm@vger.kernel.org,
-        maz@kernel.org, kvmarm@lists.cs.columbia.edu, drjones@redhat.com
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, oupton@google.com,
-        james.morse@arm.com, suzuki.poulose@arm.com, shuah@kernel.org,
-        jingzhangos@google.com, pshier@google.com, rananta@google.com,
-        reijiw@google.com
-References: <20210908210320.1182303-1-ricarkol@google.com>
- <20210908210320.1182303-2-ricarkol@google.com>
- <b368e9cf-ec28-1768-edf9-dfdc7fa108f8@arm.com>
-From:   Eric Auger <eric.auger@redhat.com>
-Message-ID: <bd905ebe-f786-9d5b-d19d-03ff5fa1ba14@redhat.com>
-Date:   Thu, 9 Sep 2021 16:43:11 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=UXDQZf9GzYNTEO852SsaCLl2x7HS0RgCfhZ04IuDC2I=;
+        b=tFFrqfP6XiDkmPU9zXZs4D63e5WVq12h9DrAl8B6v9K2JDNBRZo8NYXIjETk6DvvCJ
+         zfKTARthj6V1ydJBtce65z83Y2MZRxj40kgwCzjNR8BSukz1maUM4GFVoAZPPcJuxBw8
+         jRKdHujFqRFHAhT4t09fyIH+tcZ6W1n4C1QLSIejdzx/lm+bomjEQx/UvJ0vjOhrdOFT
+         grLCoFnOGNyM86JuRObOURN0VVhNwodIZNvnxjfq4AccfFQHncVK8vrxVd7DlwbZjnbQ
+         tN/McFWkC94jbKIxnJbU7tPy32/YevBBnscFTCnldRqVdBA6vB+1B+zbMg/2kG5557hY
+         j5Xw==
+X-Gm-Message-State: AOAM533OQGZizDTct6f0doeqpvLJFzpB00UH+W5NgUN92y+dh3tMx+cO
+        ftrgVjKN5ltzaAvsr0BjKKb3s4LXmOxyuDuMmE9a1g==
+X-Google-Smtp-Source: ABdhPJzVlDJrIFcJ2i81VlE5b1q6SgGaZDssMEI+LEFLRhNJoDi+tgy/aITWYuMKp0ppmEZ9S1Cumb8525ItJFbkX28=
+X-Received: by 2002:a05:6512:1112:: with SMTP id l18mr204163lfg.402.1631199297810;
+ Thu, 09 Sep 2021 07:54:57 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <b368e9cf-ec28-1768-edf9-dfdc7fa108f8@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+References: <20210820151933.22401-1-brijesh.singh@amd.com> <20210820151933.22401-35-brijesh.singh@amd.com>
+In-Reply-To: <20210820151933.22401-35-brijesh.singh@amd.com>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Thu, 9 Sep 2021 08:54:46 -0600
+Message-ID: <CAMkAt6qQOgZVEMQdMXqvs2s8pELnAFV-Msgc2_MC5WOYf8oAiQ@mail.gmail.com>
+Subject: Re: [PATCH Part1 v5 34/38] x86/sev: Add snp_msg_seqno() helper
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org,
+        kvm list <kvm@vger.kernel.org>, linux-efi@vger.kernel.org,
+        platform-driver-x86@vger.kernel.org, linux-coco@lists.linux.dev,
+        linux-mm@kvack.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        Marc Orr <marcorr@google.com>,
+        sathyanarayanan.kuppuswamy@linux.intel.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
-
-On 9/9/21 12:20 PM, Alexandru Elisei wrote:
-> Hi Ricardo,
+On Fri, Aug 20, 2021 at 9:22 AM Brijesh Singh <brijesh.singh@amd.com> wrote:
 >
-> On 9/8/21 10:03 PM, Ricardo Koller wrote:
->> Extend vgic_v3_check_base() to verify that the redistributor regions
->> don't go above the VM-specified IPA size (phys_size). This can happen
->> when using the legacy KVM_VGIC_V3_ADDR_TYPE_REDIST attribute with:
->>
->>   base + size > phys_size AND base < phys_size
->>
->> vgic_v3_check_base() is used to check the redist regions bases when
->> setting them (with the vcpus added so far) and when attempting the first
->> vcpu-run.
->>
->> Signed-off-by: Ricardo Koller <ricarkol@google.com>
->> ---
->>  arch/arm64/kvm/vgic/vgic-v3.c | 4 ++++
->>  1 file changed, 4 insertions(+)
->>
->> diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
->> index 66004f61cd83..5afd9f6f68f6 100644
->> --- a/arch/arm64/kvm/vgic/vgic-v3.c
->> +++ b/arch/arm64/kvm/vgic/vgic-v3.c
->> @@ -512,6 +512,10 @@ bool vgic_v3_check_base(struct kvm *kvm)
->>  		if (rdreg->base + vgic_v3_rd_region_size(kvm, rdreg) <
->>  			rdreg->base)
->>  			return false;
->> +
->> +		if (rdreg->base + vgic_v3_rd_region_size(kvm, rdreg) >
->> +			kvm_phys_size(kvm))
->> +			return false;
-> Looks to me like this same check (and the overflow one before it) is done when
-> adding a new Redistributor region in kvm_vgic_addr() -> vgic_v3_set_redist_base()
-> -> vgic_v3_alloc_redist_region() -> vgic_check_ioaddr(). As far as I can tell,
-> kvm_vgic_addr() handles both ways of setting the Redistributor address.
-To me vgic_check_ioaddr() does check the base addr but not the end addr.
-So looks this fix is needed.
-As I commented on the selftest patch, I think you should double check
-your fix also handles the KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION case.
-
-In vgic_v3_alloc_redist_region(), in this later case, we know the number
-of redistributors in the region (count), so it would be easy to check
-the end addr. But I think this would be a duplicate of your new check as
-vgic_v3_check_base() also gets called in vgic_register_redist_iodev().
-But better to check it ;-)
-
-Thanks
-
-Eric
+> The SNP guest request message header contains a message count. The
+> message count is used while building the IV. The PSP firmware increments
+> the message count by 1, and expects that next message will be using the
+> incremented count. The snp_msg_seqno() helper will be used by driver to
+> get the message sequence counter used in the request message header,
+> and it will be automatically incremented after the request is successful.
+> The incremented value is saved in the secrets page so that the kexec'ed
+> kernel knows from where to begin.
 >
-> Without this patch, did you manage to set a base address such that base + size >
-> kvm_phys_size()?
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+>  arch/x86/kernel/sev.c     | 79 +++++++++++++++++++++++++++++++++++++++
+>  include/linux/sev-guest.h | 37 ++++++++++++++++++
+>  2 files changed, 116 insertions(+)
 >
-> Thanks,
+> diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
+> index 319a40fc57ce..f42cd5a8e7bb 100644
+> --- a/arch/x86/kernel/sev.c
+> +++ b/arch/x86/kernel/sev.c
+> @@ -51,6 +51,8 @@ static struct ghcb boot_ghcb_page __bss_decrypted __aligned(PAGE_SIZE);
+>   */
+>  static struct ghcb __initdata *boot_ghcb;
 >
-> Alex
+> +static u64 snp_secrets_phys;
+> +
+>  /* #VC handler runtime per-CPU data */
+>  struct sev_es_runtime_data {
+>         struct ghcb ghcb_page;
+> @@ -2030,6 +2032,80 @@ bool __init handle_vc_boot_ghcb(struct pt_regs *regs)
+>                 halt();
+>  }
 >
->>  	}
->>  
->>  	if (IS_VGIC_ADDR_UNDEF(d->vgic_dist_base))
+> +static struct snp_secrets_page_layout *snp_map_secrets_page(void)
+> +{
+> +       u16 __iomem *secrets;
+> +
+> +       if (!snp_secrets_phys || !sev_feature_enabled(SEV_SNP))
+> +               return NULL;
+> +
+> +       secrets = ioremap_encrypted(snp_secrets_phys, PAGE_SIZE);
+> +       if (!secrets)
+> +               return NULL;
+> +
+> +       return (struct snp_secrets_page_layout *)secrets;
+> +}
+> +
+> +static inline u64 snp_read_msg_seqno(void)
+> +{
+> +       struct snp_secrets_page_layout *layout;
+> +       u64 count;
+> +
+> +       layout = snp_map_secrets_page();
+> +       if (!layout)
+> +               return 0;
+> +
+> +       /* Read the current message sequence counter from secrets pages */
+> +       count = readl(&layout->os_area.msg_seqno_0);
+> +
+> +       iounmap(layout);
+> +
+> +       /* The sequence counter must begin with 1 */
+> +       if (!count)
+> +               return 1;
+> +
+> +       return count + 1;
+> +}
+> +
+> +u64 snp_msg_seqno(void)
+> +{
+> +       u64 count = snp_read_msg_seqno();
+> +
+> +       if (unlikely(!count))
+> +               return 0;
+> +
+> +       /*
+> +        * The message sequence counter for the SNP guest request is a
+> +        * 64-bit value but the version 2 of GHCB specification defines a
+> +        * 32-bit storage for the it.
+> +        */
+> +       if (count >= UINT_MAX)
+> +               return 0;
+> +
+> +       return count;
+> +}
+> +EXPORT_SYMBOL_GPL(snp_msg_seqno);
 
+Do we need some sort of get sequence number, then ack that sequence
+number was used API? Taking your host changes in Part2 V5 as an
+example. If 'snp_setup_guest_buf' fails the given sequence number is
+never actually used by a message to the PSP. So the guest will have
+the wrong current sequence number, an off by 1 error, right?
+
+Also it seems like there is a concurrency error waiting to happen
+here. If 2 callers call snp_msg_seqno() before either actually places
+a call to the PSP, if the first caller's request doesn't reach the PSP
+before the second caller's request both calls will fail. And again I
+think the sequence numbers in the guest will be incorrect and
+unrecoverable.
+
+> +
+> +static void snp_gen_msg_seqno(void)
+> +{
+> +       struct snp_secrets_page_layout *layout;
+> +       u64 count;
+> +
+> +       layout = snp_map_secrets_page();
+> +       if (!layout)
+> +               return;
+> +
+> +       /*
+> +        * The counter is also incremented by the PSP, so increment it by 2
+> +        * and save in secrets page.
+> +        */
+> +       count = readl(&layout->os_area.msg_seqno_0);
+> +       count += 2;
+> +
+> +       writel(count, &layout->os_area.msg_seqno_0);
+> +       iounmap(layout);
+> +}
+> +
+>  int snp_issue_guest_request(int type, struct snp_guest_request_data *input, unsigned long *fw_err)
+>  {
+>         struct ghcb_state state;
+> @@ -2077,6 +2153,9 @@ int snp_issue_guest_request(int type, struct snp_guest_request_data *input, unsi
+>                 ret = -EIO;
+>         }
+>
+> +       /* The command was successful, increment the sequence counter */
+> +       snp_gen_msg_seqno();
+> +
+>  e_put:
+>         __sev_put_ghcb(&state);
+>  e_restore_irq:
+> diff --git a/include/linux/sev-guest.h b/include/linux/sev-guest.h
+> index 24dd17507789..16b6af24fda7 100644
+> --- a/include/linux/sev-guest.h
+> +++ b/include/linux/sev-guest.h
+> @@ -20,6 +20,41 @@ enum vmgexit_type {
+>         GUEST_REQUEST_MAX
+>  };
+>
+> +/*
+> + * The secrets page contains 96-bytes of reserved field that can be used by
+> + * the guest OS. The guest OS uses the area to save the message sequence
+> + * number for each VMPCK.
+> + *
+> + * See the GHCB spec section Secret page layout for the format for this area.
+> + */
+> +struct secrets_os_area {
+> +       u32 msg_seqno_0;
+> +       u32 msg_seqno_1;
+> +       u32 msg_seqno_2;
+> +       u32 msg_seqno_3;
+> +       u64 ap_jump_table_pa;
+> +       u8 rsvd[40];
+> +       u8 guest_usage[32];
+> +} __packed;
+> +
+> +#define VMPCK_KEY_LEN          32
+> +
+> +/* See the SNP spec for secrets page format */
+> +struct snp_secrets_page_layout {
+> +       u32 version;
+> +       u32 imien       : 1,
+> +           rsvd1       : 31;
+> +       u32 fms;
+> +       u32 rsvd2;
+> +       u8 gosvw[16];
+> +       u8 vmpck0[VMPCK_KEY_LEN];
+> +       u8 vmpck1[VMPCK_KEY_LEN];
+> +       u8 vmpck2[VMPCK_KEY_LEN];
+> +       u8 vmpck3[VMPCK_KEY_LEN];
+> +       struct secrets_os_area os_area;
+> +       u8 rsvd3[3840];
+> +} __packed;
+> +
+>  /*
+>   * The error code when the data_npages is too small. The error code
+>   * is defined in the GHCB specification.
+> @@ -36,6 +71,7 @@ struct snp_guest_request_data {
+>  #ifdef CONFIG_AMD_MEM_ENCRYPT
+>  int snp_issue_guest_request(int vmgexit_type, struct snp_guest_request_data *input,
+>                             unsigned long *fw_err);
+> +u64 snp_msg_seqno(void);
+>  #else
+>
+>  static inline int snp_issue_guest_request(int type, struct snp_guest_request_data *input,
+> @@ -43,6 +79,7 @@ static inline int snp_issue_guest_request(int type, struct snp_guest_request_dat
+>  {
+>         return -ENODEV;
+>  }
+> +static inline u64 snp_msg_seqno(void) { return 0; }
+>
+>  #endif /* CONFIG_AMD_MEM_ENCRYPT */
+>  #endif /* __LINUX_SEV_GUEST_H__ */
+> --
+> 2.17.1
+>
+>
