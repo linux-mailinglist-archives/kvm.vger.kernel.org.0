@@ -2,19 +2,19 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D5E54404CEE
-	for <lists+kvm@lfdr.de>; Thu,  9 Sep 2021 14:01:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 20E16404CE9
+	for <lists+kvm@lfdr.de>; Thu,  9 Sep 2021 14:01:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243881AbhIIL6w (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Sep 2021 07:58:52 -0400
-Received: from out4436.biz.mail.alibaba.com ([47.88.44.36]:19780 "EHLO
-        out4436.biz.mail.alibaba.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S240169AbhIIL4t (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 9 Sep 2021 07:56:49 -0400
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R451e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04420;MF=houwenlong93@linux.alibaba.com;NM=1;PH=DS;RN=15;SR=0;TI=SMTPD_---0UnnCNDA_1631188526;
-Received: from localhost(mailfrom:houwenlong93@linux.alibaba.com fp:SMTPD_---0UnnCNDA_1631188526)
+        id S233058AbhIIL6r (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Sep 2021 07:58:47 -0400
+Received: from out30-45.freemail.mail.aliyun.com ([115.124.30.45]:54818 "EHLO
+        out30-45.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S242401AbhIIL4m (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 9 Sep 2021 07:56:42 -0400
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R701e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04395;MF=houwenlong93@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0UnnCNDU_1631188528;
+Received: from localhost(mailfrom:houwenlong93@linux.alibaba.com fp:SMTPD_---0UnnCNDU_1631188528)
           by smtp.aliyun-inc.com(127.0.0.1);
-          Thu, 09 Sep 2021 19:55:27 +0800
+          Thu, 09 Sep 2021 19:55:29 +0800
 From:   Hou Wenlong <houwenlong93@linux.alibaba.com>
 To:     kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -27,13 +27,11 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         x86@kernel.org (maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)),
         "H. Peter Anvin" <hpa@zytor.com>,
-        Jan Kiszka <jan.kiszka@siemens.com>,
-        Avi Kivity <avi@redhat.com>,
         linux-kernel@vger.kernel.org (open list:X86 ARCHITECTURE (32-BIT AND
         64-BIT))
-Subject: [PATCH v2 1/3] kvm: x86: Introduce hypercall x86 ops for handling hypercall not in cpl0
-Date:   Thu,  9 Sep 2021 19:55:23 +0800
-Message-Id: <04a337801ad5aaa54144dc57df8ee2fc32bc9c4e.1631188011.git.houwenlong93@linux.alibaba.com>
+Subject: [PATCH v2 3/3] kvm: x86: Emulate hypercall instead of fixing hypercall instruction
+Date:   Thu,  9 Sep 2021 19:55:25 +0800
+Message-Id: <7893d13e11648be0326834248fcb943088fb0b76.1631188011.git.houwenlong93@linux.alibaba.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <cover.1631188011.git.houwenlong93@linux.alibaba.com>
 References: <cover.1631188011.git.houwenlong93@linux.alibaba.com>
@@ -43,123 +41,117 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Per Intel's SDM, use vmcall instruction in non VMX operation for cpl3
-it should trigger a #UD. And in VMX root operation, it should
-trigger a #GP for cpl3. So hypervisor could inject such exceptions
-for guest cpl3 to act like host.
+It is guest's resposibility to use right instruction for hypercall,
+hypervisor could emulate wrong instruction instead of modifying
+guest's instruction.
 
-Per AMD's APM, no cpl check for vmmcall instruction. But use it
-in host can trigger a #UD, so hypervisor is suitable to inject a #UD.
-
-Fixes: 07708c4af1346 ("KVM: x86: Disallow hypercalls for guest callers in rings > 0")
 Signed-off-by: Hou Wenlong <houwenlong93@linux.alibaba.com>
 ---
- arch/x86/include/asm/kvm-x86-ops.h | 1 +
- arch/x86/include/asm/kvm_host.h    | 1 +
- arch/x86/kvm/svm/svm.c             | 6 ++++++
- arch/x86/kvm/vmx/vmx.c             | 9 +++++++++
- arch/x86/kvm/x86.c                 | 6 +++---
- 5 files changed, 20 insertions(+), 3 deletions(-)
+ arch/x86/kvm/emulate.c     | 20 +++++++++-----------
+ arch/x86/kvm/kvm_emulate.h |  2 +-
+ arch/x86/kvm/x86.c         | 17 ++++++++---------
+ 3 files changed, 18 insertions(+), 21 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-index cefe1d81e2e8..00a8b8c80cb0 100644
---- a/arch/x86/include/asm/kvm-x86-ops.h
-+++ b/arch/x86/include/asm/kvm-x86-ops.h
-@@ -60,6 +60,7 @@ KVM_X86_OP_NULL(update_emulated_instruction)
- KVM_X86_OP(set_interrupt_shadow)
- KVM_X86_OP(get_interrupt_shadow)
- KVM_X86_OP(patch_hypercall)
-+KVM_X86_OP(handle_hypercall_fail)
- KVM_X86_OP(set_irq)
- KVM_X86_OP(set_nmi)
- KVM_X86_OP(queue_exception)
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index f8f48a7ec577..3548c8047820 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1369,6 +1369,7 @@ struct kvm_x86_ops {
- 	u32 (*get_interrupt_shadow)(struct kvm_vcpu *vcpu);
- 	void (*patch_hypercall)(struct kvm_vcpu *vcpu,
- 				unsigned char *hypercall_addr);
-+	void (*handle_hypercall_fail)(struct kvm_vcpu *vcpu);
- 	void (*set_irq)(struct kvm_vcpu *vcpu);
- 	void (*set_nmi)(struct kvm_vcpu *vcpu);
- 	void (*queue_exception)(struct kvm_vcpu *vcpu);
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 1a70e11f0487..a8048e5b2aff 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -3944,6 +3944,11 @@ svm_patch_hypercall(struct kvm_vcpu *vcpu, unsigned char *hypercall)
- 	hypercall[2] = 0xd9;
- }
+diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+index 2837110e66ed..671008a4ee20 100644
+--- a/arch/x86/kvm/emulate.c
++++ b/arch/x86/kvm/emulate.c
+@@ -3732,13 +3732,11 @@ static int em_clts(struct x86_emulate_ctxt *ctxt)
  
-+static void svm_handle_hypercall_fail(struct kvm_vcpu *vcpu)
-+{
-+	kvm_queue_exception(vcpu, UD_VECTOR);
-+}
-+
- static int __init svm_check_processor_compat(void)
+ static int em_hypercall(struct x86_emulate_ctxt *ctxt)
  {
- 	return 0;
-@@ -4563,6 +4568,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
- 	.set_interrupt_shadow = svm_set_interrupt_shadow,
- 	.get_interrupt_shadow = svm_get_interrupt_shadow,
- 	.patch_hypercall = svm_patch_hypercall,
-+	.handle_hypercall_fail = svm_handle_hypercall_fail,
- 	.set_irq = svm_set_irq,
- 	.set_nmi = svm_inject_nmi,
- 	.queue_exception = svm_queue_exception,
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 0c2c0d5ae873..3bd66eb46309 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -4921,6 +4921,14 @@ vmx_patch_hypercall(struct kvm_vcpu *vcpu, unsigned char *hypercall)
- 	hypercall[2] = 0xc1;
- }
+-	int rc = ctxt->ops->fix_hypercall(ctxt);
++	int rc = ctxt->ops->hypercall(ctxt);
  
-+static void vmx_handle_hypercall_fail(struct kvm_vcpu *vcpu)
-+{
-+	if (to_vmx(vcpu)->nested.vmxon)
-+		kvm_queue_exception_e(vcpu, GP_VECTOR, 0);
-+	else
-+		kvm_queue_exception(vcpu, UD_VECTOR);
-+}
-+
- /* called to set cr0 as appropriate for a mov-to-cr0 exit. */
- static int handle_set_cr0(struct kvm_vcpu *vcpu, unsigned long val)
- {
-@@ -7606,6 +7614,7 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
- 	.set_interrupt_shadow = vmx_set_interrupt_shadow,
- 	.get_interrupt_shadow = vmx_get_interrupt_shadow,
- 	.patch_hypercall = vmx_patch_hypercall,
-+	.handle_hypercall_fail = vmx_handle_hypercall_fail,
- 	.set_irq = vmx_inject_irq,
- 	.set_nmi = vmx_inject_nmi,
- 	.queue_exception = vmx_queue_exception,
+ 	if (rc != X86EMUL_CONTINUE)
+ 		return rc;
+ 
+-	/* Let the processor re-execute the fixed hypercall */
+-	ctxt->_eip = ctxt->eip;
+ 	/* Disable writeback. */
+ 	ctxt->dst.type = OP_NONE;
+ 	return X86EMUL_CONTINUE;
+@@ -4298,14 +4296,14 @@ static const struct opcode group7_rm2[] = {
+ };
+ 
+ static const struct opcode group7_rm3[] = {
+-	DIP(SrcNone | Prot | Priv,		vmrun,		check_svme_pa),
+-	II(SrcNone  | Prot | EmulateOnUD,	em_hypercall,	vmmcall),
+-	DIP(SrcNone | Prot | Priv,		vmload,		check_svme_pa),
+-	DIP(SrcNone | Prot | Priv,		vmsave,		check_svme_pa),
+-	DIP(SrcNone | Prot | Priv,		stgi,		check_svme),
+-	DIP(SrcNone | Prot | Priv,		clgi,		check_svme),
+-	DIP(SrcNone | Prot | Priv,		skinit,		check_svme),
+-	DIP(SrcNone | Prot | Priv,		invlpga,	check_svme),
++	DIP(SrcNone | Prot | Priv,			vmrun,		check_svme_pa),
++	II(SrcNone  | Prot | Priv | EmulateOnUD,	em_hypercall,	vmmcall),
++	DIP(SrcNone | Prot | Priv,			vmload,		check_svme_pa),
++	DIP(SrcNone | Prot | Priv,			vmsave,		check_svme_pa),
++	DIP(SrcNone | Prot | Priv,			stgi,		check_svme),
++	DIP(SrcNone | Prot | Priv,			clgi,		check_svme),
++	DIP(SrcNone | Prot | Priv,			skinit,		check_svme),
++	DIP(SrcNone | Prot | Priv,			invlpga,	check_svme),
+ };
+ 
+ static const struct opcode group7_rm7[] = {
+diff --git a/arch/x86/kvm/kvm_emulate.h b/arch/x86/kvm/kvm_emulate.h
+index 68b420289d7e..b090ec0688a6 100644
+--- a/arch/x86/kvm/kvm_emulate.h
++++ b/arch/x86/kvm/kvm_emulate.h
+@@ -216,7 +216,7 @@ struct x86_emulate_ops {
+ 	int (*read_pmc)(struct x86_emulate_ctxt *ctxt, u32 pmc, u64 *pdata);
+ 	void (*halt)(struct x86_emulate_ctxt *ctxt);
+ 	void (*wbinvd)(struct x86_emulate_ctxt *ctxt);
+-	int (*fix_hypercall)(struct x86_emulate_ctxt *ctxt);
++	int (*hypercall)(struct x86_emulate_ctxt *ctxt);
+ 	int (*intercept)(struct x86_emulate_ctxt *ctxt,
+ 			 struct x86_instruction_info *info,
+ 			 enum x86_intercept_stage stage);
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 28ef14155726..4e2836b94a01 100644
+index b8d799e1c57c..aee3b08a1d85 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -8665,8 +8665,8 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
- 	}
+@@ -329,7 +329,7 @@ static struct kmem_cache *kvm_alloc_emulator_cache(void)
+ 					  size - useroffset, NULL);
+ }
  
- 	if (static_call(kvm_x86_get_cpl)(vcpu) != 0) {
--		ret = -KVM_EPERM;
--		goto out;
-+		static_call(kvm_x86_handle_hypercall_fail)(vcpu);
-+		return 1;
- 	}
+-static int emulator_fix_hypercall(struct x86_emulate_ctxt *ctxt);
++static int emulator_hypercall(struct x86_emulate_ctxt *ctxt);
  
- 	ret = -KVM_ENOSYS;
-@@ -8727,7 +8727,7 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
- 		ret = -KVM_ENOSYS;
- 		break;
- 	}
--out:
-+
- 	if (!op_64_bit)
- 		ret = (u32)ret;
- 	kvm_rax_write(vcpu, ret);
+ static inline void kvm_async_pf_hash_reset(struct kvm_vcpu *vcpu)
+ {
+@@ -7352,7 +7352,7 @@ static const struct x86_emulate_ops emulate_ops = {
+ 	.read_pmc            = emulator_read_pmc,
+ 	.halt                = emulator_halt,
+ 	.wbinvd              = emulator_wbinvd,
+-	.fix_hypercall       = emulator_fix_hypercall,
++	.hypercall           = emulator_hypercall,
+ 	.intercept           = emulator_intercept,
+ 	.get_cpuid           = emulator_get_cpuid,
+ 	.guest_has_long_mode = emulator_guest_has_long_mode,
+@@ -8747,16 +8747,15 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
+ }
+ EXPORT_SYMBOL_GPL(kvm_emulate_hypercall);
+ 
+-static int emulator_fix_hypercall(struct x86_emulate_ctxt *ctxt)
++static int emulator_hypercall(struct x86_emulate_ctxt *ctxt)
+ {
++	int ret;
+ 	struct kvm_vcpu *vcpu = emul_to_vcpu(ctxt);
+-	char instruction[3];
+-	unsigned long rip = kvm_rip_read(vcpu);
+-
+-	static_call(kvm_x86_patch_hypercall)(vcpu, instruction);
+ 
+-	return emulator_write_emulated(ctxt, rip, instruction, 3,
+-		&ctxt->exception);
++	ret = kvm_emulate_hypercall_noskip(vcpu);
++	if (ret)
++		return X86EMUL_CONTINUE;
++	return X86EMUL_IO_NEEDED;
+ }
+ 
+ static int dm_request_for_irq_injection(struct kvm_vcpu *vcpu)
 -- 
 2.31.1
 
