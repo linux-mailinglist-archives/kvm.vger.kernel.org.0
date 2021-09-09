@@ -2,39 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0503B404850
-	for <lists+kvm@lfdr.de>; Thu,  9 Sep 2021 12:18:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B86394048FC
+	for <lists+kvm@lfdr.de>; Thu,  9 Sep 2021 13:10:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232339AbhIIKUD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Sep 2021 06:20:03 -0400
-Received: from foss.arm.com ([217.140.110.172]:58344 "EHLO foss.arm.com"
+        id S234529AbhIILLm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Sep 2021 07:11:42 -0400
+Received: from foss.arm.com ([217.140.110.172]:58736 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229980AbhIIKUC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Sep 2021 06:20:02 -0400
+        id S234349AbhIILLj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Sep 2021 07:11:39 -0400
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9BF7F31B;
-        Thu,  9 Sep 2021 03:18:52 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B19A431B;
+        Thu,  9 Sep 2021 04:10:29 -0700 (PDT)
 Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 476013F73D;
-        Thu,  9 Sep 2021 03:18:50 -0700 (PDT)
-Subject: Re: [PATCH 1/2] KVM: arm64: vgic: check redist region is not above
- the VM IPA size
-To:     Ricardo Koller <ricarkol@google.com>, kvm@vger.kernel.org,
-        maz@kernel.org, kvmarm@lists.cs.columbia.edu, drjones@redhat.com,
-        eric.auger@redhat.com
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, oupton@google.com,
-        james.morse@arm.com, suzuki.poulose@arm.com, shuah@kernel.org,
-        jingzhangos@google.com, pshier@google.com, rananta@google.com,
-        reijiw@google.com
-References: <20210908210320.1182303-1-ricarkol@google.com>
- <20210908210320.1182303-2-ricarkol@google.com>
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4AC433F73D;
+        Thu,  9 Sep 2021 04:10:27 -0700 (PDT)
+Subject: Re: [kvm-unit-tests RFC PATCH 4/5] scripts: Generate kvmtool
+ standalone tests
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     thuth@redhat.com, pbonzini@redhat.com, lvivier@redhat.com,
+        kvm-ppc@vger.kernel.org, david@redhat.com, frankja@linux.ibm.com,
+        cohuck@redhat.com, imbrenda@linux.ibm.com,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, andre.przywara@arm.com,
+        maz@kernel.org, vivek.gautam@arm.com
+References: <20210702163122.96110-1-alexandru.elisei@arm.com>
+ <20210702163122.96110-5-alexandru.elisei@arm.com>
+ <20210907102135.i2w3r7j4zyj736b5@gator>
+ <ee11a10a-c3e6-b9ce-81e1-147025a9b5bd@arm.com>
+ <20210908160743.l4hrl4de7wkxwuda@gator>
 From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <b368e9cf-ec28-1768-edf9-dfdc7fa108f8@arm.com>
-Date:   Thu, 9 Sep 2021 11:20:15 +0100
+Message-ID: <9d5da497-7070-31ef-282a-a11a86e0102e@arm.com>
+Date:   Thu, 9 Sep 2021 12:11:52 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.13.0
 MIME-Version: 1.0
-In-Reply-To: <20210908210320.1182303-2-ricarkol@google.com>
+In-Reply-To: <20210908160743.l4hrl4de7wkxwuda@gator>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
@@ -42,49 +45,147 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Ricardo,
+Hi Drew,
 
-On 9/8/21 10:03 PM, Ricardo Koller wrote:
-> Extend vgic_v3_check_base() to verify that the redistributor regions
-> don't go above the VM-specified IPA size (phys_size). This can happen
-> when using the legacy KVM_VGIC_V3_ADDR_TYPE_REDIST attribute with:
+On 9/8/21 5:07 PM, Andrew Jones wrote:
+> On Wed, Sep 08, 2021 at 04:37:39PM +0100, Alexandru Elisei wrote:
+>> Hi Drew,
+>>
+>> On 9/7/21 11:21 AM, Andrew Jones wrote:
+>>> On Fri, Jul 02, 2021 at 05:31:21PM +0100, Alexandru Elisei wrote:
+>>>> Add support for the standalone target when running kvm-unit-tests under
+>>>> kvmtool.
+>>>>
+>>>> Example command line invocation:
+>>>>
+>>>> $ ./configure --target=kvmtool
+>>>> $ make clean && make standalone
+>>>>
+>>>> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+>>>> ---
+>>>>  scripts/mkstandalone.sh | 14 +++++++-------
+>>>>  1 file changed, 7 insertions(+), 7 deletions(-)
+>>>>
+>>>> diff --git a/scripts/mkstandalone.sh b/scripts/mkstandalone.sh
+>>>> index 16f461c06842..d84bdb7e278c 100755
+>>>> --- a/scripts/mkstandalone.sh
+>>>> +++ b/scripts/mkstandalone.sh
+>>>> @@ -44,6 +44,10 @@ generate_test ()
+>>>>  	config_export ARCH_NAME
+>>>>  	config_export PROCESSOR
+>>>>  
+>>>> +	if [ "$ARCH" = "arm64" ] || [ "$ARCH" = "arm" ]; then
+>>>> +		config_export TARGET
+>>>> +	fi
+>>> Should export unconditionally, since we'll want TARGET set
+>>> unconditionally.
+>> Yes, will do.
+>>
+>>>> +
+>>>>  	echo "echo BUILD_HEAD=$(cat build-head)"
+>>>>  
+>>>>  	if [ ! -f $kernel ]; then
+>>>> @@ -59,7 +63,7 @@ generate_test ()
+>>>>  		echo 'export FIRMWARE'
+>>>>  	fi
+>>>>  
+>>>> -	if [ "$ENVIRON_DEFAULT" = "yes" ] && [ "$ERRATATXT" ]; then
+>>>> +	if [ "$TARGET" != "kvmtool" ] && [ "$ENVIRON_DEFAULT" = "yes" ] && [ "$ERRATATXT" ]; then
+>>> I think it would be better to ensure that ENVIRON_DEFAULT is "no" for
+>>> TARGET=kvmtool in configure.
+>> From looking at the code, it is my understanding that with ENVIRON_DEFAULT=yes, an
+>> initrd file is generated with the contents of erratatxt and other information, in
+>> a key=value pair format. This initrd is then passed on to the test (please correct
+>> me if I'm wrong). With ENVIRON_DEFAULT=no (set via ./configure
+>> --disable-default-environ), this initrd is not generated.
+>>
+>> kvmtool doesn't have support for passing an initrd when loading firmware, so yes,
+>> I believe the default should be no.
+>>
+>> However, I have two questions:
+>>
+>> 1. What happens when the user specifically enables the default environ via
+>> ./configure --enable-default-environ --target=kvmtool? In my opinion, that should
+>> be an error because the user wants something that is not possible with kvmtool
+>> (loading an image with --firmware in kvmtool means that the initrd image it not
+>> loaded into the guest memory and no node is generated for it in the dtb), but I
+>> would like to hear your thoughts about it.
+> As part of the forcing ENVIRON_DEFAULT to "no" for kvmtool in configure an
+> error should be generated if a user tries to explicitly enable it.
 >
->   base + size > phys_size AND base < phys_size
->
-> vgic_v3_check_base() is used to check the redist regions bases when
-> setting them (with the vcpus added so far) and when attempting the first
-> vcpu-run.
->
-> Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> ---
->  arch/arm64/kvm/vgic/vgic-v3.c | 4 ++++
->  1 file changed, 4 insertions(+)
->
-> diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
-> index 66004f61cd83..5afd9f6f68f6 100644
-> --- a/arch/arm64/kvm/vgic/vgic-v3.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v3.c
-> @@ -512,6 +512,10 @@ bool vgic_v3_check_base(struct kvm *kvm)
->  		if (rdreg->base + vgic_v3_rd_region_size(kvm, rdreg) <
->  			rdreg->base)
->  			return false;
-> +
-> +		if (rdreg->base + vgic_v3_rd_region_size(kvm, rdreg) >
-> +			kvm_phys_size(kvm))
-> +			return false;
+>> 2. If the default environment is disabled, is it still possible for an user to
+>> pass an initrd via other means? I couldn't find where that is implemented, so I'm
+>> guessing it's not possible.
+> Yes, a user could have a KVM_UNIT_TESTS_ENV environment variable set when
+> they launch the tests. If that variable points to a file then it will get
+> passed as an initrd. I guess you should also report a warning in arm/run
+> if KVM_UNIT_TESTS_ENV is set which states that the environment file will
+> be ignored when running with kvmtool.
 
-Looks to me like this same check (and the overflow one before it) is done when
-adding a new Redistributor region in kvm_vgic_addr() -> vgic_v3_set_redist_base()
--> vgic_v3_alloc_redist_region() -> vgic_check_ioaddr(). As far as I can tell,
-kvm_vgic_addr() handles both ways of setting the Redistributor address.
+Thank you for explaining it, I had looked at
+scripts/arch-run.bash::initrd_create(), but it didn't click that setting the
+KVM_UNIT_TESTS_ENV environment variable is enough to generate and use the initrd.
 
-Without this patch, did you manage to set a base address such that base + size >
-kvm_phys_size()?
+After looking at the code some more, in the logs the -initrd argument is shown as
+a comment, instead of an actual argument that is passed to qemu:
+
+timeout -k 1s --foreground 90s /usr/bin/qemu-system-aarch64 -nodefaults -machine
+virt,gic-version=host,accel=kvm -cpu host -device virtio-serial-device -device
+virtconsole,chardev=ctd -chardev testdev,id=ctd -device pci-testdev -display none
+-serial stdio -kernel arm/cache.flat -smp 1 # -initrd /tmp/tmp.rUIZ3h9KLJ
+QEMU_ACCEL = kvm
+INFO: IDC-DIC: dcache clean to PoU required
+INFO: IDC-DIC: icache invalidation to PoU required
+PASS: IDC-DIC: code generation
+SUMMARY: 1 tests
+
+This is done intentionally in scripts/arch-run.bash::run_qemu(). I don't
+understand the reason for that. When I first looked at the logs, I was sure that
+no initrd is passed to the test. I had to go dig through the scripts to figure out
+that the "#" sign (which marks the beginning of a comment) is not present in the
+qemu invocation.
 
 Thanks,
 
 Alex
 
->  	}
->  
->  	if (IS_VGIC_ADDR_UNDEF(d->vgic_dist_base))
+>
+> There aren't currently any other ways to invoke the addition of the
+> -initrd command line option, because so far we only support passing a
+> single file to test (the environment "file"). If we ever want to pass
+> more files, then we'd need to create a simple file system on the initrd
+> and make it possible to add -initrd even when no environment is desired.
+> But, that may never happen.
+>
+> Thanks,
+> drew
+>
+>> Thanks,
+>>
+>> Alex
+>>
+>>>
+>>>>  		temp_file ERRATATXT "$ERRATATXT"
+>>>>  		echo 'export ERRATATXT'
+>>>>  	fi
+>>>> @@ -95,12 +99,8 @@ function mkstandalone()
+>>>>  	echo Written $standalone.
+>>>>  }
+>>>>  
+>>>> -if [ "$TARGET" = "kvmtool" ]; then
+>>>> -	echo "Standalone tests not supported with kvmtool"
+>>>> -	exit 2
+>>>> -fi
+>>>> -
+>>>> -if [ "$ENVIRON_DEFAULT" = "yes" ] && [ "$ERRATATXT" ] && [ ! -f "$ERRATATXT" ]; then
+>>>> +if [ "$TARGET" != "kvmtool" ] && [ "$ENVIRON_DEFAULT" = "yes" ] && \
+>>>> +		[ "$ERRATATXT" ] && [ ! -f "$ERRATATXT" ]; then
+>>>>  	echo "$ERRATATXT not found. (ERRATATXT=$ERRATATXT)" >&2
+>>>>  	exit 2
+>>>>  fi
+>>>> -- 
+>>>> 2.32.0
+>>>>
+>>> Thanks,
+>>> drew 
+>>>
