@@ -2,56 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 90CCC405CE4
-	for <lists+kvm@lfdr.de>; Thu,  9 Sep 2021 20:32:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E591F405CE5
+	for <lists+kvm@lfdr.de>; Thu,  9 Sep 2021 20:32:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237363AbhIISd3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Sep 2021 14:33:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44778 "EHLO
+        id S237493AbhIISda (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Sep 2021 14:33:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44786 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237355AbhIISd1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Sep 2021 14:33:27 -0400
-Received: from mail-qk1-x749.google.com (mail-qk1-x749.google.com [IPv6:2607:f8b0:4864:20::749])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCB9AC061575
-        for <kvm@vger.kernel.org>; Thu,  9 Sep 2021 11:32:17 -0700 (PDT)
-Received: by mail-qk1-x749.google.com with SMTP id t18-20020a05620a0b1200b003f8729fdd04so5602648qkg.5
-        for <kvm@vger.kernel.org>; Thu, 09 Sep 2021 11:32:17 -0700 (PDT)
+        with ESMTP id S237355AbhIISd3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Sep 2021 14:33:29 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E56CBC061574
+        for <kvm@vger.kernel.org>; Thu,  9 Sep 2021 11:32:19 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id j9-20020a2581490000b02905897d81c63fso3491722ybm.8
+        for <kvm@vger.kernel.org>; Thu, 09 Sep 2021 11:32:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=F7SA2+l7YnzWg3+wwA5w5eR2P61Jl46+Hled4U2BLZY=;
-        b=as5BF0XFYaht0N8QuPA8BfrWeiS6rYipNqGi4wekckwccB+f+t4tmJjCkXtVvTysDO
-         sKBN8ajNMezipAc6iLwR8Wpj2ZHE6Nt6xvDnemmF7WtDK4pfGmmH7Ub/74SocRZk1TqG
-         0QRWgvrJkES0HV2v0IfFek1UOgYisGkm6Ob1zYHgbO9lG+bo3e1U635/IINDgW+4slfC
-         xKC2SK7mXmpaFVTFNvDuIM4EHNuOWMSPUfQYHVSfLBeSil3A7NSw8jlxgPzbLFq3VqmB
-         hfWUhT1nxOJ2y4LM2dgLWqRY0LHp9YnHORDEHYvAauVrsd/sZ3sicXkx+nI5q6BbdRuN
-         TwpQ==
+        bh=spLnCQZlIbcUrxFiVIendQ1pC9hVNZvWQSDOA+UvjVk=;
+        b=r89daTy9fPBGaiG18IWOgrY8O/RLfpzpsRAl3PYo1wUW+pQB2k0WXbisQH/HPVFbyA
+         3ijOaHq3+fV3wfV8sv0fmOEUczsU8IHZsvTIeuIb/+LDSlRpbBnngnFUxKYAhWanceN7
+         WE7SCImQQdIS5FkHSNlVqu0ch2awg6SekdS/9pP/tcSV9ZSuTcwXe5J0VuvQgARg0m+o
+         q+huQWk+9AjPDHePQekZPVE0C6Te42MsrTlynGUCUaRagTq29qVc2mOoseVzH+C54Lhe
+         reLKJV3Of4fltLBA6Y2c06yxzVUIccEsbhU2Xvlx14VK4T8Ism/2aGW0AP7ZiLRxkBzX
+         CGhA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=F7SA2+l7YnzWg3+wwA5w5eR2P61Jl46+Hled4U2BLZY=;
-        b=5gMxPkCqJGNohHf34Ydpncl74y7TWnwMo+yxtupB5EGqqwHLaAgFd9pWdUNiYdrvJY
-         THRx8WzyarLZALcgYFI6YTXDIdsWLevO5aUmdlOd52WYrQl57ySa9NgQxWCF7yHGDP+y
-         rsMD8n4QsLCvAHPbjB+5AKyf2MbvrTjdFVspAqp6QBK9lBYp2mCREmbjJTKcQKmCnJeS
-         hEkdLdDSq/EruSU5hd6eQ6W9Wg8XQRO+gLWnlhzD/OetNWR2bzl5Qo4jN+l5eX4Hl9qk
-         d5pU+Dh0y25nyzChPc0F/VWr3ZCrnjlGNokNKohkhRQjARUK4h5IBXDq7bq5pZltuGVg
-         RjWQ==
-X-Gm-Message-State: AOAM533BvpVPH3ywMXsulejAhOeQb7bgPmHqQeBcBchKChYsm9Jrv4JL
-        0ns17kU7QzK/KKmFX+/npX1ltQ/j13s=
-X-Google-Smtp-Source: ABdhPJxeuw+oP06jSa9Hn5T5scZUOh5Ds8T2+EHB6OxgjaI6Bg9ifmQc1IbU7N4WI94wcib+Ac515fD0Ugg=
+        bh=spLnCQZlIbcUrxFiVIendQ1pC9hVNZvWQSDOA+UvjVk=;
+        b=YJahCJ0WgNWnceub+FzIZrQQy9Au6F6V28whSt362k/ABnDjgv41oCvS50nAB2nf2f
+         Jb42g4kDCRnV/tJFkgadxqstHgn3eAsC8v1vsEm8cGATeJfwDdL2L4+/uke4zPdU2bRj
+         vv2GbiS00QLUppWNsUKkb4RKN/Jx9kVcWp6mfFobdPPGLqaFZ/dEhgPPF5s3b23L+R3l
+         9ICv15DvbWspCTojKAR1NuaLJ0ZZR4q3eCOOf8nbhtBRL5EEpREcNx1di+5g26RRHJwm
+         m3cW6Q+oMu75rLuhYI/MwTKDTQVg6yqnRHNPknuOtaapbGLoC9QcIDfDLJzLZ4AGCXmR
+         Oa1Q==
+X-Gm-Message-State: AOAM533chQPAzl2DjF0KZBk4rBCzEbW9/BE/baPqQB3ixe2MDOhhOCom
+        Izdd2yhyt2Y7Thhsk1ZqJfRevrLJG1g=
+X-Google-Smtp-Source: ABdhPJxgv1/TcTrDKtQU1S40mOmbQeXj+stLDWFBcNt5Da6kRYRw02tOuz2wVs3L+XOQnHzyUUe/qScNN0I=
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:90:200:295c:3114:eec1:f9f5])
- (user=seanjc job=sendgmr) by 2002:a05:6214:706:: with SMTP id
- b6mr4257787qvz.29.1631212336932; Thu, 09 Sep 2021 11:32:16 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a25:a522:: with SMTP id h31mr6166818ybi.355.1631212339151;
+ Thu, 09 Sep 2021 11:32:19 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Thu,  9 Sep 2021 11:32:03 -0700
+Date:   Thu,  9 Sep 2021 11:32:04 -0700
 In-Reply-To: <20210909183207.2228273-1-seanjc@google.com>
-Message-Id: <20210909183207.2228273-4-seanjc@google.com>
+Message-Id: <20210909183207.2228273-5-seanjc@google.com>
 Mime-Version: 1.0
 References: <20210909183207.2228273-1-seanjc@google.com>
 X-Mailer: git-send-email 2.33.0.309.g3052b89438-goog
-Subject: [kvm-unit-tests PATCH v3 3/7] lib: Move __unused attribute macro to compiler.h
+Subject: [kvm-unit-tests PATCH v3 4/7] x86: realmode: mark exec_in_big_real_mode
+ as noinline
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
@@ -61,42 +62,39 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Move the __unused macro to linux/compiler.h to co-locate it with the
-other macros that provide syntactic sugar around __attribute__.
+From: Bill Wendling <morbo@google.com>
 
-No functional change intended.
+exec_in_big_real_mode() uses inline asm that defines labels that are
+globally. Clang decides that it can inline this function, which causes the
+assembler to complain about duplicate symbols. Mark the function as
+"noinline" to prevent this.
 
+Signed-off-by: Bill Wendling <morbo@google.com>
+[sean: use noinline from compiler.h, call out the globally visible aspect]
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- lib/libcflat.h       | 2 --
- lib/linux/compiler.h | 1 +
- 2 files changed, 1 insertion(+), 2 deletions(-)
+ x86/realmode.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/lib/libcflat.h b/lib/libcflat.h
-index e619de1..39f4552 100644
---- a/lib/libcflat.h
-+++ b/lib/libcflat.h
-@@ -29,8 +29,6 @@
- #include <string.h>
- #include <stdbool.h>
+diff --git a/x86/realmode.c b/x86/realmode.c
+index b4fa603..7a4423e 100644
+--- a/x86/realmode.c
++++ b/x86/realmode.c
+@@ -1,3 +1,5 @@
++#include <linux/compiler.h>
++
+ #ifndef USE_SERIAL
+ #define USE_SERIAL
+ #endif
+@@ -178,7 +180,7 @@ static inline void init_inregs(struct regs *regs)
+ 		inregs.esp = (unsigned long)&tmp_stack.top;
+ }
  
--#define __unused __attribute__((__unused__))
--
- #define xstr(s...) xxstr(s)
- #define xxstr(s...) #s
- 
-diff --git a/lib/linux/compiler.h b/lib/linux/compiler.h
-index 5937b7b..c7fc0cf 100644
---- a/lib/linux/compiler.h
-+++ b/lib/linux/compiler.h
-@@ -47,6 +47,7 @@
- 
- #define __always_inline	inline __attribute__((always_inline))
- #define noinline __attribute__((noinline))
-+#define __unused __attribute__((__unused__))
- 
- static __always_inline void __read_once_size(const volatile void *p, void *res, int size)
+-static void exec_in_big_real_mode(struct insn_desc *insn)
++static noinline void exec_in_big_real_mode(struct insn_desc *insn)
  {
+ 	unsigned long tmp;
+ 	static struct regs save;
 -- 
 2.33.0.309.g3052b89438-goog
 
