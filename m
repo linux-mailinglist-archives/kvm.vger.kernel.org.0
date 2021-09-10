@@ -2,141 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B5FEB40726A
-	for <lists+kvm@lfdr.de>; Fri, 10 Sep 2021 22:21:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 41CB1407278
+	for <lists+kvm@lfdr.de>; Fri, 10 Sep 2021 22:25:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233654AbhIJUWP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Sep 2021 16:22:15 -0400
-Received: from mail-oi1-f179.google.com ([209.85.167.179]:40585 "EHLO
-        mail-oi1-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230513AbhIJUWK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Sep 2021 16:22:10 -0400
-Received: by mail-oi1-f179.google.com with SMTP id h133so4602205oib.7;
-        Fri, 10 Sep 2021 13:20:58 -0700 (PDT)
+        id S233384AbhIJU0r (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Sep 2021 16:26:47 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:46451 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233397AbhIJU0q (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 10 Sep 2021 16:26:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1631305535;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=43k0//Ex2cYDlTEbrRHwYvccCOHqUEbEWZ9s5rg8S24=;
+        b=SdjHtmrpIreBKu4aaZgJcCZSd1ynNGJ8vRVqadDJfMxHtzxM6BC57uVBkftfqvAT4rUIAp
+        yj2So4+bj2Z+4aW+TFQ7aSGaGrW/DZlFRMYmFkTP10AzNHUlRTt44srRaxQ9JXluw6iwu1
+        r8Q9qONu5FijySKfjyXInaQjjekEPc0=
+Received: from mail-oi1-f198.google.com (mail-oi1-f198.google.com
+ [209.85.167.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-492-rCNsDR91O3mGqMKqaNgPbw-1; Fri, 10 Sep 2021 16:25:33 -0400
+X-MC-Unique: rCNsDR91O3mGqMKqaNgPbw-1
+Received: by mail-oi1-f198.google.com with SMTP id 20-20020aca2814000000b002690d9b60aaso2405282oix.0
+        for <kvm@vger.kernel.org>; Fri, 10 Sep 2021 13:25:33 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=4IPxaQoHLBsI4TsWZBSz429Jh2IPs4Tsu9wpBitBgng=;
-        b=RHaoRE+qDgYZPicCywIjXi43sTcHVLztXKuRhBqTKG/BC3AcU3T1OrRbsbchDZDH42
-         qQDkjh6NdFxcOPdOkhKUyztQ7LAqL5c4wAeychuNyh7BIphBf6Uh7sdgOi6vp/32XXGb
-         7XiEUztdTPfVfdZxT6e+BGsuwZ4vLBRUsFXtzKfFjnj/xiJK2WdT3QIJq7NSo/Cfn08l
-         B6R0zrZCw+1G3nZRT9RcFkxXwuEsE2qI7pv8dasNw8D+q0EA+xN7BMiCZvTl+0MkdVF0
-         h63WP8ufp5jj/Vvpq5MhXPhWhx3Jqd598XNIr0ufIKJo6hzZugdYA8IS1BwiF2rrSuyx
-         EVDA==
-X-Gm-Message-State: AOAM530MuR9lBAdZ75GkAgdwnu8Cu+xtRwYXoMF3cJWo/boXmyAt4kel
-        nl+98UZs1SecqQhNZwgqsA==
-X-Google-Smtp-Source: ABdhPJz5SQZueBteIwX5jHufIZZ/JozLZUCT7O2iJGriI7vlauYxJk6NPj/twUv+QLH5Q4gVPTAZyQ==
-X-Received: by 2002:a05:6808:aa8:: with SMTP id r8mr5746125oij.171.1631305258063;
-        Fri, 10 Sep 2021 13:20:58 -0700 (PDT)
-Received: from robh.at.kernel.org (66-90-148-213.dyn.grandenetworks.net. [66.90.148.213])
-        by smtp.gmail.com with ESMTPSA id s24sm1483439otp.37.2021.09.10.13.20.55
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=43k0//Ex2cYDlTEbrRHwYvccCOHqUEbEWZ9s5rg8S24=;
+        b=cOxGiVi5Mn9c6LL6FK90K+Nonod59vfLLw60WEyraIDgT4OMgYR2OFmcj8xC2FrFP+
+         ypY1PhxwlBsbVcTo7M8mQ3eYV9u5P0tV33qrMmKRXgJstmdONEMWLsJvB8AZlER5JHYM
+         TwGA3oYQj6z14Hkb5JUWffTLGy/6ryMOFgXhNY59VPaJFkkGuE0bujfiwe7uW7UkY/Xi
+         GPOYjVdvfdIgF7RHpkhEIYqY8xS95weYk3MkqArkoG06r2gdX4pT/ZkypoO9V+SePbmU
+         Zz0PoADC+OvPj0DsexL3Brl20rFhCALy4u4gEwdyJPNI7W82yQNwuublVZ2HM80v7YpC
+         HFdA==
+X-Gm-Message-State: AOAM532Ygxeww70dNCgc7jzkSy7Lqh1SrohobgJGSKSOuXoHpWw/DsBd
+        M87A/CigW84AFBnrdo9hOKInGYtg4ZA+XbJaLPxY2WWCO0a8wTgN3Xcm9Ca8LVtALATG9ifF4m3
+        Ihe2VewCB+VHq
+X-Received: by 2002:a05:6830:18c7:: with SMTP id v7mr6324382ote.126.1631305533204;
+        Fri, 10 Sep 2021 13:25:33 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwYrFnBjgHbgw4oFL2xGmKazRhOApYuH6K1Sj3HlCQm6wWY57BvwLdhxibj8FSVdeN7/KJt5g==
+X-Received: by 2002:a05:6830:18c7:: with SMTP id v7mr6324353ote.126.1631305532962;
+        Fri, 10 Sep 2021 13:25:32 -0700 (PDT)
+Received: from redhat.com ([198.99.80.109])
+        by smtp.gmail.com with ESMTPSA id 33sm1446635otx.19.2021.09.10.13.25.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Sep 2021 13:20:57 -0700 (PDT)
-Received: (nullmailer pid 3226408 invoked by uid 1000);
-        Fri, 10 Sep 2021 20:20:55 -0000
-Date:   Fri, 10 Sep 2021 15:20:55 -0500
-From:   Rob Herring <robh@kernel.org>
-To:     Keith Packard <keithpac@amazon.com>
-Cc:     linux-kernel@vger.kernel.org, Abbott Liu <liuwenliang@huawei.com>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Andrii Nakryiko <andrii@kernel.org>,
-        Anshuman Khandual <anshuman.khandual@arm.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>, Ben Segall <bsegall@google.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        bpf@vger.kernel.org, Christoph Lameter <cl@linux.com>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Daniel Bristot de Oliveira <bristot@redhat.com>,
-        Dennis Zhou <dennis@kernel.org>, devicetree@vger.kernel.org,
-        Dietmar Eggemann <dietmar.eggemann@arm.com>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        Frank Rowand <frowand.list@gmail.com>,
-        Geert Uytterhoeven <geert+renesas@glider.be>,
-        Ingo Molnar <mingo@redhat.com>,
-        Jason Wang <jasowang@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        Joe Perches <joe@perches.com>,
-        John Fastabend <john.fastabend@gmail.com>,
-        Juri Lelli <juri.lelli@redhat.com>,
-        KP Singh <kpsingh@kernel.org>, kvm@vger.kernel.org,
-        Linus Walleij <linus.walleij@linaro.org>,
-        linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-mm@kvack.org, Manivannan Sadhasivam <mani@kernel.org>,
-        Marc Zyngier <maz@kernel.org>, Martin KaFai Lau <kafai@fb.com>,
-        Mel Gorman <mgorman@suse.de>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Miguel Ojeda <ojeda@kernel.org>,
-        Mike Rapoport <rppt@kernel.org>, netdev@vger.kernel.org,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Nick Desaulniers <ndesaulniers@gooogle.com>,
-        Nicolas Pitre <nico@fluxnic.net>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Russell King <linux@armlinux.org.uk>,
-        Song Liu <songliubraving@fb.com>,
-        Srikar Dronamraju <srikar@linux.vnet.ibm.com>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Tejun Heo <tj@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        =?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= 
-        <u.kleine-koenig@pengutronix.de>,
-        Valentin Schneider <valentin.schneider@arm.com>,
-        Vincent Guittot <vincent.guittot@linaro.org>,
-        virtualization@lists.linux-foundation.org,
-        "Wolfram Sang (Renesas)" <wsa+renesas@sang-engineering.com>,
-        YiFei Zhu <yifeifz2@illinois.edu>, Yonghong Song <yhs@fb.com>
-Subject: Re: [PATCH v4 4/7] Make sure task_struct is available for
- raw_smp_processor_id
-Message-ID: <YTu+JyNyQH7v+1Yx@robh.at.kernel.org>
-References: <id:20210907220038.91021-1-keithpac@amazon.com>
- <20210908190605.419064-1-keithpac@amazon.com>
- <20210908190605.419064-5-keithpac@amazon.com>
+        Fri, 10 Sep 2021 13:25:32 -0700 (PDT)
+Date:   Fri, 10 Sep 2021 14:25:31 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        linux-s390@vger.kernel.org, Halil Pasic <pasic@linux.ibm.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Christoph Hellwig <hch@lst.de>, kvm@vger.kernel.org
+Subject: Re: [PATCH] vfio/ap_ops: Add missed vfio_uninit_group_dev()
+Message-ID: <20210910142531.2e18e73a.alex.williamson@redhat.com>
+In-Reply-To: <0-v1-3a05c6000668+2ce62-ap_uninit_jgg@nvidia.com>
+References: <0-v1-3a05c6000668+2ce62-ap_uninit_jgg@nvidia.com>
+Organization: Red Hat
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210908190605.419064-5-keithpac@amazon.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 08, 2021 at 12:06:02PM -0700, Keith Packard wrote:
-> To allow architectures to use the 'cpu' field in task_struct for cpu
-> identification, the task_struct must be visible whereever the
-> raw_smp_processor_id macro is used. It would be simplest to include
-> linux/sched.h from the relevant asm/smp.h file, but that file is
-> included from linux/sched.h, and the recursive include ends up with
-> several declarations in the wrong order.
+On Thu,  9 Sep 2021 14:24:00 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
+
+> Without this call an xarray entry is leaked when the vfio_ap device is
+> unprobed. It was missed when the below patch was rebased across the
+> dev_set patch.
 > 
-> To avoid this, the PowerPC architecture code has this ugly hack:
-> 
-> 	#define raw_smp_processor_id() \
-> 		(*(unsigned int *)((void *)current + _TASK_CPU))
-> 
-> As an alternative, placing includes of linux/sched.h in a few files
-> that are used along with asm/smp.h means we can use the task_struct
-> field directly.
-> 
-> Signed-off-by: Keith Packard <keithpac@amazon.com>
+> Fixes: eb0feefd4c02 ("vfio/ap_ops: Convert to use vfio_register_group_dev()")
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
 > ---
->  arch/arm/mm/proc-v7-bugs.c     | 1 +
->  drivers/vhost/vhost.c          | 1 +
->  drivers/vhost/vhost.h          | 1 +
->  include/asm-generic/irq_regs.h | 1 +
->  include/linux/of_address.h     | 1 +
+>  drivers/s390/crypto/vfio_ap_ops.c | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
+> index 2347808fa3e427..54bb0c22e8020e 100644
+> --- a/drivers/s390/crypto/vfio_ap_ops.c
+> +++ b/drivers/s390/crypto/vfio_ap_ops.c
+> @@ -360,6 +360,7 @@ static int vfio_ap_mdev_probe(struct mdev_device *mdev)
+>  	mutex_lock(&matrix_dev->lock);
+>  	list_del(&matrix_mdev->node);
+>  	mutex_unlock(&matrix_dev->lock);
+> +	vfio_uninit_group_dev(&matrix_mdev->vdev);
+>  	kfree(matrix_mdev);
+>  err_dec_available:
+>  	atomic_inc(&matrix_dev->available_instances);
+> @@ -375,8 +376,8 @@ static void vfio_ap_mdev_remove(struct mdev_device *mdev)
 
-Where does the DT code use raw_smp_processor_id()? The header itself 
-certainly doesn't and the headers should only include what the headers 
-use directly.
 
-In general this seems pretty terrible pulling in all of sched.h (and 
-then everything else it includes) for just raw_smp_processor_id().
+Not sure if you're editing patches by hand, but your line counts above
+don't match the chunk below, should be ,6..,7 as the previous chunk.
+It's malformed as is.  Thanks,
 
->  include/linux/random.h         | 1 +
->  include/linux/topology.h       | 1 +
->  init/calibrate.c               | 1 +
->  kernel/bpf/bpf_lru_list.h      | 1 +
->  kernel/bpf/percpu_freelist.h   | 1 +
->  kernel/sched/cpuacct.c         | 2 +-
->  lib/irq_regs.c                 | 1 +
->  12 files changed, 12 insertions(+), 1 deletion(-)
+Alex
+
+>  	mutex_lock(&matrix_dev->lock);
+>  	vfio_ap_mdev_reset_queues(matrix_mdev);
+>  	list_del(&matrix_mdev->node);
+> +	vfio_uninit_group_dev(&matrix_mdev->vdev);
+>  	kfree(matrix_mdev);
+>  	atomic_inc(&matrix_dev->available_instances);
+>  	mutex_unlock(&matrix_dev->lock);
+> 
+
