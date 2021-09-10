@@ -2,56 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2E58E4070F1
+	by mail.lfdr.de (Postfix) with ESMTP id F12184070F3
 	for <lists+kvm@lfdr.de>; Fri, 10 Sep 2021 20:32:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232210AbhIJSdi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Sep 2021 14:33:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55808 "EHLO
+        id S232392AbhIJSdp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Sep 2021 14:33:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55824 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232140AbhIJSdh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Sep 2021 14:33:37 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E066C061574
-        for <kvm@vger.kernel.org>; Fri, 10 Sep 2021 11:32:25 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id i189-20020a256dc6000000b005a04d42ebf2so3532470ybc.22
-        for <kvm@vger.kernel.org>; Fri, 10 Sep 2021 11:32:25 -0700 (PDT)
+        with ESMTP id S232140AbhIJSdj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Sep 2021 14:33:39 -0400
+Received: from mail-qv1-xf4a.google.com (mail-qv1-xf4a.google.com [IPv6:2607:f8b0:4864:20::f4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8E9BC06175F
+        for <kvm@vger.kernel.org>; Fri, 10 Sep 2021 11:32:27 -0700 (PDT)
+Received: by mail-qv1-xf4a.google.com with SMTP id p12-20020ad4496c000000b0037a535cb8b2so23652880qvy.15
+        for <kvm@vger.kernel.org>; Fri, 10 Sep 2021 11:32:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=BpS4yRoua78uKf+TYKOiUUv6QuQHXhubiioVBA8nCQo=;
-        b=KJlkpanmfvYJW1Yhgn/za09vfEebPfPxU2SzO/psUbCosl17Img3mIIFLy3J+pdT6h
-         w0tSojRDn38/Eg9HrUmwwRS82TOK9quZYndWZw6S58pRsGhADod72pXbmMAdhPY2Ttb0
-         blInNBtJHWRU5WNNIYjD0SShBbXi3xaiOKeETbGBvu8GpiVppPHNAggX621AesFy6yIG
-         8mR25PdIxiXlyb99lT6iYIje+OGXAwP/s3ybjt11FTJDByQpCCItR37M0ILgE0o1ehyC
-         lEn28wMU8BQ1BE4/24aLVXXb3LJ8K8O+Yhf+e+LtpU5QrHiRz6xBYd+FxC4oy/ohnoiw
-         cAeA==
+        bh=cnbcsUxj0+vz286J/QqU6TqKXNjgZZG8Rpm/4K5hx2w=;
+        b=pIww2R46Arl4Ntwsc4XJCAiwVxNzRhuhtannaePCd7dYBJ5hjOWCVEHQ4bdvTnmhi1
+         i9b2nClpEpBcnp4BW834p6pNhwkT9Lz2YvtDAsioeLYoMsW3AiUF7PAkiZJi5yo5BiMa
+         726gv2m7wrOxIfRTMXbtgLxHvXPi/Mzq+qrfX/44MoH7sVMM2fFmAunU8noY83RXnVGd
+         PQ+TMkVcgGGsUw1Lx8zOADlavLkshhTczGf1lhaG9YUVbxVGQUzTz9fWG3aREs5g1RZb
+         1HNMvrFj008GVGtIRe+vxJIzgBmMM5ExMvlrTSWSi3wVR5Lu4FOBZL9aIcpKI3gcSjHC
+         1ajA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=BpS4yRoua78uKf+TYKOiUUv6QuQHXhubiioVBA8nCQo=;
-        b=p0LS7Fazg3Q6lYgjS9Bn3dS5jkHFoM+bi1SQJtEmrhby/gB+u1Lcv09n6q25puqBZp
-         AHHjNM2gvx3f3vMeB0/WLUnDQDhadiBtnINVf15dz1rAMebVSW5lD69FV/Fm9M+bS4WT
-         2nr/9DlXYdHSU5TseBkCq1WnFaGRc251BaKpFwYG0IhBvB3lxZmvFttbhvlPBa9H8+pj
-         bNVv6i9ZpaNwVtPllCTLLRsue5Bg38eip/oMxLuosHXJcSLYbph3sgbETP22nb2HqU5q
-         TUe2ayOzXdCYAlufnPHj+GC0tMEJ3CfXOrfpcT0yw5/ffWxNcnTjKBtHXiO2AtgdX6ux
-         iQgQ==
-X-Gm-Message-State: AOAM531zrNJ9xVRTKcZs5yZVO6OQ+rEBdjPofF1jBivPymHrs5EjvvMV
-        PQCjCHA4cvln09dXyoqISbO60+NR56U=
-X-Google-Smtp-Source: ABdhPJxm2mcfigiu3P42M+5DYgiEUd1/wdQui/picbFpUwqJCgDKG91fPKZGY3yyRL3nonS5ufiLzZ/F84M=
+        bh=cnbcsUxj0+vz286J/QqU6TqKXNjgZZG8Rpm/4K5hx2w=;
+        b=oEVUaW1aaKC9gdjKPE/c+MxMVzpoRhM8VtArHU+wZueK6Gt5gqJFlSLizQ/Ux0JZyo
+         IE1SCPcp/0YxdwmfAhN4PkkwZdy30GFhyFA+VvQmtZ/bYuAhN79+9nLr/yqmYMaJQwv6
+         4ali23qtfCNnx1UFxMImKVERKJPbn3pkdK8TvXSs86dOjHjAkYSiwt9kdfMWWm6OSxh6
+         SPoGIUDtk2C9Ux18xPZOQcHYczsIO8tWzHgIjma+BrZoJN//62xrzFixicmqqJo4LCWZ
+         edLg9pnERm6VjMiE0I84LtkcMM2ngtl3+eIsGpMMzj0OunpaEfEiBM4QUiC+skRkj9M1
+         8sAA==
+X-Gm-Message-State: AOAM532GIZW0pGXk1voswOrCUhAdlaJ3/eQnC6qNqwlzn/XwdjvVGNwY
+        KtLZFL4t1tLLDqZigaiQlpeQuDnYimE=
+X-Google-Smtp-Source: ABdhPJzXDjWhio+8oqJuBsmbBOKUJMrxubACsQ/soxYMQizwRXsd1DU4no0VULnpnjDACE5EIgVGkHsQAcM=
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:90:200:d1d5:efd6:dd3d:4420])
- (user=seanjc job=sendgmr) by 2002:a25:5246:: with SMTP id g67mr11846626ybb.56.1631298744906;
- Fri, 10 Sep 2021 11:32:24 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a0c:be85:: with SMTP id n5mr9437942qvi.59.1631298746885;
+ Fri, 10 Sep 2021 11:32:26 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 10 Sep 2021 11:32:19 -0700
+Date:   Fri, 10 Sep 2021 11:32:20 -0700
 In-Reply-To: <20210910183220.2397812-1-seanjc@google.com>
-Message-Id: <20210910183220.2397812-2-seanjc@google.com>
+Message-Id: <20210910183220.2397812-3-seanjc@google.com>
 Mime-Version: 1.0
 References: <20210910183220.2397812-1-seanjc@google.com>
 X-Mailer: git-send-email 2.33.0.309.g3052b89438-goog
-Subject: [PATCH 1/2] KVM: x86: Query vcpu->vcpu_idx directly and drop its accessor
+Subject: [PATCH 2/2] KVM: x86: Identify vCPU0 by its vcpu_idx instead of
+ walking vCPUs array
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -65,94 +66,32 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Read vcpu->vcpu_idx directly instead of bouncing through the one-line
-wrapper, kvm_vcpu_get_idx(), and drop the wrapper.  The wrapper is a
-remnant of the original implementation and serves no purpose; remove it
-before it gains more users.
-
-Back when kvm_vcpu_get_idx() was added by commit 497d72d80a78 ("KVM: Add
-kvm_vcpu_get_idx to get vcpu index in kvm->vcpus"), the implementation
-was more than just a simple wrapper as vcpu->vcpu_idx did not exist and
-retrieving the index meant walking over the vCPU array to find the given
+Use vcpu_idx to identify vCPU0 when updating HyperV's TSC page, which is
+shared by all vCPUs and "owned" by vCPU0 (because vCPU0 is the only vCPU
+that's guaranteed to exist).  Using kvm_get_vcpu() to find vCPU works,
+but it's a rather odd and suboptimal method to check the index of a given
 vCPU.
-
-When vcpu_idx was introduced by commit 8750e72a79dd ("KVM: remember
-position in kvm->vcpus array"), the helper was left behind, likely to
-avoid extra thrash (but even then there were only two users, the original
-arm usage having been removed at some point in the past).
 
 No functional change intended.
 
-Suggested-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/hyperv.c    | 7 +++----
- arch/x86/kvm/hyperv.h    | 2 +-
- include/linux/kvm_host.h | 5 -----
- 3 files changed, 4 insertions(+), 10 deletions(-)
+ arch/x86/kvm/x86.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-index fe4a02715266..04dbc001f4fc 100644
---- a/arch/x86/kvm/hyperv.c
-+++ b/arch/x86/kvm/hyperv.c
-@@ -939,7 +939,7 @@ static int kvm_hv_vcpu_init(struct kvm_vcpu *vcpu)
- 	for (i = 0; i < ARRAY_SIZE(hv_vcpu->stimer); i++)
- 		stimer_init(&hv_vcpu->stimer[i], i);
- 
--	hv_vcpu->vp_index = kvm_vcpu_get_idx(vcpu);
-+	hv_vcpu->vp_index = vcpu->vcpu_idx;
- 
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 86539c1686fa..6ab851df08d1 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -2969,7 +2969,7 @@ static int kvm_guest_time_update(struct kvm_vcpu *v)
+ 				       offsetof(struct compat_vcpu_info, time));
+ 	if (vcpu->xen.vcpu_time_info_set)
+ 		kvm_setup_pvclock_page(v, &vcpu->xen.vcpu_time_info_cache, 0);
+-	if (v == kvm_get_vcpu(v->kvm, 0))
++	if (!v->vcpu_idx)
+ 		kvm_hv_setup_tsc_page(v->kvm, &vcpu->hv_clock);
  	return 0;
  }
-@@ -1444,7 +1444,6 @@ static int kvm_hv_set_msr(struct kvm_vcpu *vcpu, u32 msr, u64 data, bool host)
- 	switch (msr) {
- 	case HV_X64_MSR_VP_INDEX: {
- 		struct kvm_hv *hv = to_kvm_hv(vcpu->kvm);
--		int vcpu_idx = kvm_vcpu_get_idx(vcpu);
- 		u32 new_vp_index = (u32)data;
- 
- 		if (!host || new_vp_index >= KVM_MAX_VCPUS)
-@@ -1459,9 +1458,9 @@ static int kvm_hv_set_msr(struct kvm_vcpu *vcpu, u32 msr, u64 data, bool host)
- 		 * VP index is changing, adjust num_mismatched_vp_indexes if
- 		 * it now matches or no longer matches vcpu_idx.
- 		 */
--		if (hv_vcpu->vp_index == vcpu_idx)
-+		if (hv_vcpu->vp_index == vcpu->vcpu_idx)
- 			atomic_inc(&hv->num_mismatched_vp_indexes);
--		else if (new_vp_index == vcpu_idx)
-+		else if (new_vp_index == vcpu->vcpu_idx)
- 			atomic_dec(&hv->num_mismatched_vp_indexes);
- 
- 		hv_vcpu->vp_index = new_vp_index;
-diff --git a/arch/x86/kvm/hyperv.h b/arch/x86/kvm/hyperv.h
-index 730da8537d05..ed1c4e546d04 100644
---- a/arch/x86/kvm/hyperv.h
-+++ b/arch/x86/kvm/hyperv.h
-@@ -83,7 +83,7 @@ static inline u32 kvm_hv_get_vpindex(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
- 
--	return hv_vcpu ? hv_vcpu->vp_index : kvm_vcpu_get_idx(vcpu);
-+	return hv_vcpu ? hv_vcpu->vp_index : vcpu->vcpu_idx;
- }
- 
- int kvm_hv_set_msr_common(struct kvm_vcpu *vcpu, u32 msr, u64 data, bool host);
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index e4d712e9f760..31071ad821e2 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -721,11 +721,6 @@ static inline struct kvm_vcpu *kvm_get_vcpu_by_id(struct kvm *kvm, int id)
- 	return NULL;
- }
- 
--static inline int kvm_vcpu_get_idx(struct kvm_vcpu *vcpu)
--{
--	return vcpu->vcpu_idx;
--}
--
- #define kvm_for_each_memslot(memslot, slots)				\
- 	for (memslot = &slots->memslots[0];				\
- 	     memslot < slots->memslots + slots->used_slots; memslot++)	\
 -- 
 2.33.0.309.g3052b89438-goog
 
