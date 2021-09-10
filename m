@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 27B5B4064FB
-	for <lists+kvm@lfdr.de>; Fri, 10 Sep 2021 03:15:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3E1F1406508
+	for <lists+kvm@lfdr.de>; Fri, 10 Sep 2021 03:21:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237237AbhIJBQi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Sep 2021 21:16:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49212 "EHLO
+        id S234750AbhIJBXD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Sep 2021 21:23:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51246 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235275AbhIJBQX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Sep 2021 21:16:23 -0400
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4009FC094248
-        for <kvm@vger.kernel.org>; Thu,  9 Sep 2021 17:50:47 -0700 (PDT)
-Received: by mail-pf1-x42b.google.com with SMTP id 18so347941pfh.9
-        for <kvm@vger.kernel.org>; Thu, 09 Sep 2021 17:50:47 -0700 (PDT)
+        with ESMTP id S231868AbhIJBW7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Sep 2021 21:22:59 -0400
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C748FC0698D6
+        for <kvm@vger.kernel.org>; Thu,  9 Sep 2021 18:12:40 -0700 (PDT)
+Received: by mail-pj1-x1035.google.com with SMTP id j1so283222pjv.3
+        for <kvm@vger.kernel.org>; Thu, 09 Sep 2021 18:12:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=6EzzDQr8yG5LGu5YaQcJ8I2pgkIJnUB9NbZo6MY9NXc=;
-        b=c5HRKGzhLdFkDdqEaIAkzI2TMXEXey1oW4MYk1KKgGtbVRwNCS50yLwVApx2ET8oZE
-         a08EtNL8Nr9TakKWLixpnMOtjt6TND+WWSSwZtAzso/DATK5EyfEi0bFk3rcAxNtADr/
-         X473cN9R3YlbUVxapedTDrJw17TrwvHZXdi4mu5cXsF2bxWh/fkhDVhm3TvgXaYOjWDl
-         1y2NmOWQrUik0qHnTeQOABPGH75WGlung4k6tvXcTfROJhET3yUQY66nXwdfDxw81SQ5
-         hOvMtNLBJZjhSYGgC6uifXXwVWf2hJKkHq4+Q9Luyf4cyAQCNYvcdTN/qF/6J8y4NNoD
-         Ze4w==
+        bh=uVOCS25mxvjBZ7GClAgZG2jOvpBEyDT5oWpJ4su1Yt0=;
+        b=de/KxNe+EOHGeJ83TPp3H465bkg1HK9EVB2o1dpG4Iweuobaf5S23Z/tmwKRyGCUwF
+         hsDQbLEk9Lq9p1hCSNh1uONQRtnygBLOdlRdb3wRNe07D0X8G6TzVoN01vqeF0IBebdH
+         xPBCopRxx/tA3DCHTKIRULdAS+P+r1E9732rExTvVGNCKAL9eNwfeVZqTvzMuHxe9Ook
+         KJX3WdXIg9rI0WJxmr6cm5KbuXMlvJhlcE8duAKulN3TxS7yC+f/UZO5PyfjXDQSS8ZC
+         shv23XJR+zsX8LpcPWOxJ32MAXvtB16IWSGCIxm1H9yADYaumBKX9zkizDMQKjR9uAHz
+         80sw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=6EzzDQr8yG5LGu5YaQcJ8I2pgkIJnUB9NbZo6MY9NXc=;
-        b=qHNsJyWM3joZv6Gb4GPoZ1Q8HB7rALkyOT6Dao271QJh9pTs+yrnabQmUvPoNR9IL6
-         Z5r4S6XygA2/eH4GE1RzXX8qtpg5imWXtPpGl8K9ve3aaNR1CkNb33zvlMVFYJfgHtBQ
-         BpGcQ9Mqw6pn6mvkJPZvboztvcsm3PdD5pbIGZZtzsCVZ2AsV6W5G73m2dTO/I0/CL9d
-         NcSIbBs1DxrLt5D+KU/zy6nrFQW3azJUihpWcmwcTRKqpWXm8SYVfZ9t74FfrTk4DiXd
-         hvAVivHb8LFeHFVgrEuA6yKlnjEceCOu/uCCxwwZsOijDgySUK8DHaDYfuyeMbwJnUyx
-         gsAg==
-X-Gm-Message-State: AOAM533o9aooYiw33o8AciN5eQrMZ7418xL4eY47RRro23fkA93Eohpz
-        4jIADGLdpDsADm13ngck2fsWaA==
-X-Google-Smtp-Source: ABdhPJwDSECF6phzYbvcSxSRC8ZValgSEZsvTx/p14hy5cqm4bJBZy6SuNYjcaJhTZWtR5jPB+xhxw==
-X-Received: by 2002:a63:1e16:: with SMTP id e22mr5012704pge.153.1631235046553;
-        Thu, 09 Sep 2021 17:50:46 -0700 (PDT)
+        bh=uVOCS25mxvjBZ7GClAgZG2jOvpBEyDT5oWpJ4su1Yt0=;
+        b=rrqAfA8O1fg23zY51p5k9TZojZBQtHPKZy2haqI08hbuP4r2hr4hKTQu8okOOE264F
+         HApKm68fWJWbJpWVr0dleilm8ZAQWPUHMOANfrfjsJchSVH27zlO7KCfzBTU4ykJFrQF
+         VkIxDCd7wOMYVBNI+eGLnfTCPUmGj+2Enb31El/uC+5UCVkwP4NB8nkwYLT9C5wt5XHJ
+         6s7fwuLp5w+q9y+BoLAtkxC1gR6LJ+b8q1wX0R0URY8cl40ND+soLtW+RUyQeM3S/uY7
+         dEcOxx4rxP/2uV6YTSyiaODyJ+rpAvbspkHg7f3Pv+Qxu8MZrTegTM1iEyc/y4jaUFFC
+         zxiQ==
+X-Gm-Message-State: AOAM532lPuuFqxBIxGDw3z+JvJwz8F9MTjCAagXzcOGp/DB697Pv/msx
+        lrgLkBbjaUBcCPhLqDE7PYw79A==
+X-Google-Smtp-Source: ABdhPJyc0QiINKvWbWZq746qOMozDTpBT10Tb6tAjhwfvQj5xHDA5QLN9YlMi2NrjpBfPN1M7S/75Q==
+X-Received: by 2002:a17:902:c389:b0:13a:56c8:6696 with SMTP id g9-20020a170902c38900b0013a56c86696mr5260115plg.70.1631236360033;
+        Thu, 09 Sep 2021 18:12:40 -0700 (PDT)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id a78sm3407284pfa.95.2021.09.09.17.50.45
+        by smtp.gmail.com with ESMTPSA id t28sm3429475pfe.144.2021.09.09.18.12.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Sep 2021 17:50:46 -0700 (PDT)
-Date:   Fri, 10 Sep 2021 00:50:42 +0000
+        Thu, 09 Sep 2021 18:12:39 -0700 (PDT)
+Date:   Fri, 10 Sep 2021 01:12:35 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Peter Gonda <pgonda@google.com>
 Cc:     kvm@vger.kernel.org, Marc Orr <marcorr@google.com>,
@@ -62,118 +62,44 @@ Cc:     kvm@vger.kernel.org, Marc Orr <marcorr@google.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/3 V7] KVM, SEV: Add support for SEV-ES intra host
- migration
-Message-ID: <YTqr4nuXYVFz81kD@google.com>
+Subject: Re: [PATCH 1/3 V7] KVM, SEV: Add support for SEV intra host migration
+Message-ID: <YTqxA23XRryWfCuA@google.com>
 References: <20210902181751.252227-1-pgonda@google.com>
- <20210902181751.252227-3-pgonda@google.com>
+ <20210902181751.252227-2-pgonda@google.com>
+ <YTqirwnu0rOcfDCq@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210902181751.252227-3-pgonda@google.com>
+In-Reply-To: <YTqirwnu0rOcfDCq@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 02, 2021, Peter Gonda wrote:
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 8db666a362d4..fac21a82e4de 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -1545,6 +1545,59 @@ static void migrate_info_from(struct kvm_sev_info *dst,
->  	list_replace_init(&src->regions_list, &dst->regions_list);
->  }
->  
-> +static int migrate_vmsa_from(struct kvm *dst, struct kvm *src)
-> +{
-> +	int i, num_vcpus;
-> +	struct kvm_vcpu *dst_vcpu, *src_vcpu;
-> +	struct vcpu_svm *dst_svm, *src_svm;
-> +
-> +	num_vcpus = atomic_read(&dst->online_vcpus);
-> +	if (num_vcpus != atomic_read(&src->online_vcpus)) {
-> +		pr_warn_ratelimited(
-> +			"Source and target VMs must have same number of vCPUs.\n");
+On Fri, Sep 10, 2021, Sean Christopherson wrote:
+> Ooh, this brings up a potential shortcoming of requiring @dst to be SEV-enabled.
+> If every SEV{-ES} ASID is allocated, then there won't be an available ASID to
+> (temporarily) allocate for the intra-host migration.  But that temporary ASID
+> isn't actually necessary, i.e. there's no reason intra-host migration should fail
+> if all ASIDs are in-use.
 
-Same comments about not logging the why.
+...
 
-> +		return -EINVAL;
-> +	}
-> +
-> +	for (i = 0; i < num_vcpus; ++i) 
-> +		src_vcpu = src->vcpus[i];
+> So I think the only option is to take vcpu->mutex for all vCPUs in both @src and
+> @dst.  Adding that after acquiring kvm->lock in svm_sev_lock_for_migration()
+> should Just Work.  Unless userspace is misbehaving, the lock won't be contended
+> since all vCPUs need to be quiesced, though it's probably worth using the
+> mutex_lock_killable() variant just to be safe.
 
-This can be:
+Circling back to this after looking at the SEV-ES support, I think the vCPUs in
+the source VM need to be reset via kvm_vcpu_reset(vcpu, false).  I doubt there's
+a use case for actually doing anything with the vCPU, but leaving it runnable
+without purging state makes me nervous.
 
-	kvm_for_each_vcpu(i, src_vcpu, src) {
-		if (!src_vcpu->arch.guest_state_protected)
-			return -EINVAL;
+Alternative #1 would be to mark vCPUs as dead in some way so as to prevent doing
+anything useful with the vCPU.
 
-	}
-> +		if (!src_vcpu->arch.guest_state_protected) {
-> +			pr_warn_ratelimited(
-> +				"Source ES VM vCPUs must have protected state.\n");
-> +			return -EINVAL;
-> +		}
-> +	}
-> +
-> +	for (i = 0; i < num_vcpus; ++i) {
+Alternative #2 would be to "kill" the source VM by setting kvm->vm_bugged to
+prevent all ioctls().
 
-And again here,
-
-	kvm_for_each_vcpu(i, src_vcpu, src) {
-		src_svm = to_svm(src_vcpu);
-
-> +		src_vcpu = src->vcpus[i];
-> +		src_svm = to_svm(src_vcpu);
-> +		dst_vcpu = dst->vcpus[i];
-
-Probably a good idea to use kvm_get_vcpu(), even though dst->lock is held.  If
-nothing else, using kvm_get_vcpu() may save some merge pain as there's a proposal
-to switch vcpus to an xarray.
-
-> +		dst_svm = to_svm(dst_vcpu);
-> +
-> +		/*
-> +		 * Copy VMSA and GHCB fields from the source to the destination.
-> +		 * Clear them on the source to prevent the VM running and
-
-As brought up in the prior patch, clearing the fields might ensure future KVM_RUNs
-fail, but it doesn't prevent the VM from running _now_.  And with vcpu->mutext
-held, I think a more appropriate comment would be:
-
-		/*
-		 * Transfer VMSA and GHCB state to the destination.  Nullify and
-		 * clear source fields as appropriate, the state now belongs to
-		 * the destination.
-		 */
-
-> +		 * changing the state of the VMSA/GHCB unexpectedly.
-> +		 */
-> +		dst_vcpu->vcpu_id = src_vcpu->vcpu_id;
-> +		dst_svm->vmsa = src_svm->vmsa;
-> +		src_svm->vmsa = NULL;
-> +		dst_svm->ghcb = src_svm->ghcb;
-> +		src_svm->ghcb = NULL;
-> +		dst_svm->vmcb->control.ghcb_gpa =
-> +				src_svm->vmcb->control.ghcb_gpa;
-
-Let this poke out, an 83 char line isn't the end of the world, and not having
-the interrupt makes the code more readable overall.
-
-> +		src_svm->vmcb->control.ghcb_gpa = 0;
-
-Nit, '0' isn't an invalid GPA.  The reset value would be more appropriate, though
-I would just leave this alone.
-
-> +		dst_svm->ghcb_sa = src_svm->ghcb_sa;
-> +		src_svm->ghcb_sa = NULL;
-> +		dst_svm->ghcb_sa_len = src_svm->ghcb_sa_len;
-> +		src_svm->ghcb_sa_len = 0;
-> +		dst_svm->ghcb_sa_sync = src_svm->ghcb_sa_sync;
-> +		src_svm->ghcb_sa_sync = false;
-> +		dst_svm->ghcb_sa_free = src_svm->ghcb_sa_free;
-> +		src_svm->ghcb_sa_free = false;
-> +	}
-> +	return 0;
-> +}
+The downside to preventing future ioctls() is that this would need to be the
+very last step of migration.  Not sure if that's problematic?
