@@ -2,149 +2,221 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8E29C40657A
-	for <lists+kvm@lfdr.de>; Fri, 10 Sep 2021 03:59:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 864D34065F8
+	for <lists+kvm@lfdr.de>; Fri, 10 Sep 2021 05:18:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229633AbhIJCAi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Sep 2021 22:00:38 -0400
-Received: from mga18.intel.com ([134.134.136.126]:7224 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229524AbhIJCAh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Sep 2021 22:00:37 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10102"; a="208073443"
-X-IronPort-AV: E=Sophos;i="5.85,282,1624345200"; 
-   d="scan'208";a="208073443"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Sep 2021 18:59:27 -0700
-X-IronPort-AV: E=Sophos;i="5.85,282,1624345200"; 
-   d="scan'208";a="540085015"
-Received: from unknown (HELO [10.239.13.122]) ([10.239.13.122])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Sep 2021 18:59:25 -0700
-Subject: Re: [PATCH v2 6/7] KVM: VMX: Check Intel PT related CPUID leaves
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        id S229993AbhIJDTX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Sep 2021 23:19:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49478 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229461AbhIJDTW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Sep 2021 23:19:22 -0400
+Received: from mail-ot1-x331.google.com (mail-ot1-x331.google.com [IPv6:2607:f8b0:4864:20::331])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3313AC061574
+        for <kvm@vger.kernel.org>; Thu,  9 Sep 2021 20:18:12 -0700 (PDT)
+Received: by mail-ot1-x331.google.com with SMTP id c19-20020a9d6153000000b0051829acbfc7so433612otk.9
+        for <kvm@vger.kernel.org>; Thu, 09 Sep 2021 20:18:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=qCAr61hpoK6IKG40PpJaKVqIxCQSvqZ6i3qbQqvhygc=;
+        b=XjDL0OYY74Mq3fMUE3D498DEIpvbWZvfPnUKICeBvPjA69xmSRNlHfBckOLkxZJMwq
+         NPjAT1OcacqQuwHsHeUU7ksBviqq06IGCsnQK/0uiY1weBqIzL9NRvGWjgPKazFjFdLg
+         NiS2ExZJlPA2Y6/tj9EvzDAmNW5u/fu7OcEhvZvtiOe1TtV2dY4lYCrVBIZsrefEiRN2
+         h+jRjJA7x//dnjRmX5Xf2vwKNo7wwAqcXO5R2gLkEeyggnEclaNduCo3n8zLy+3An3HZ
+         ZkGrwHWqoKQt7DpLVZc5jOU3SJa6n07Cmmlw0Ez1N0kU8AvFREm9u372nF2GzPUyRtcC
+         /Yyg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=qCAr61hpoK6IKG40PpJaKVqIxCQSvqZ6i3qbQqvhygc=;
+        b=BxBntUO3GpXNxZ48+/0PQz3tdUqKsJOLI1Kn6R4+EG/3JqP8v+XxNVoZyNTVALSl2I
+         CBW8o4gvIo/x6PKX159dLRxu64gv8vXghkAofLZ9+83EycpVBhI9O9Bwi5ocjtCJMgWe
+         q4bJNQp7ZawYU7pGTDU+IjTUkxqEcVY9SmM/rMT6nJafwmctjdRz3654fPWaS4fRuyhJ
+         0QD7JmDt7wopnt7FgrboTnO6xldMEt6PO+DsNpQrD1apacwdmrwG2PzkWHplj7bM5BfB
+         pXixW8epYvzIWRZ4lfgNEhKlt6K3Z1HPScmXkZBIYARknNJbPeBjE8QNJItM6nyyiFWW
+         WAsw==
+X-Gm-Message-State: AOAM5314FiCuMOhbntvT9WeYOBMl5Djmq3PwCMZfzT20zpNLMwvoH1Ej
+        ngq6vUvYbJv/MSxfliIsyfdoozMxB1cD+2M6qqEdyQ==
+X-Google-Smtp-Source: ABdhPJw96FbxjX9u29XaMK2DOTr9bF2gLcfjjJ3BYuB3Zi4eDiySYJk3VPNwLngCcJjsKH98YgYHoDG9VCw9IhvKbPA=
+X-Received: by 2002:a05:6830:349c:: with SMTP id c28mr2849513otu.35.1631243891225;
+ Thu, 09 Sep 2021 20:18:11 -0700 (PDT)
+MIME-Version: 1.0
+References: <20210820155918.7518-1-brijesh.singh@amd.com> <20210820155918.7518-17-brijesh.singh@amd.com>
+In-Reply-To: <20210820155918.7518-17-brijesh.singh@amd.com>
+From:   Marc Orr <marcorr@google.com>
+Date:   Thu, 9 Sep 2021 20:18:00 -0700
+Message-ID: <CAA03e5EGXiw2dZ-c1-Vugor1d=vZPwrP81K0LmpUxTrLCbc+Xg@mail.gmail.com>
+Subject: Re: [PATCH Part2 v5 16/45] crypto: ccp: Add the SNP_PLATFORM_STATUS command
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86 <x86@kernel.org>, LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>, linux-coco@lists.linux.dev,
+        linux-mm@kvack.org, linux-crypto@vger.kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20210827070249.924633-1-xiaoyao.li@intel.com>
- <20210827070249.924633-7-xiaoyao.li@intel.com> <YTp/oGmiin19q4sQ@google.com>
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-Message-ID: <a7988439-5a4c-3d5a-ea4a-0fad181ad733@intel.com>
-Date:   Fri, 10 Sep 2021 09:59:22 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Firefox/78.0 Thunderbird/78.14.0
-MIME-Version: 1.0
-In-Reply-To: <YTp/oGmiin19q4sQ@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/10/2021 5:41 AM, Sean Christopherson wrote:
-> On Fri, Aug 27, 2021, Xiaoyao Li wrote:
->> CPUID 0xD leaves reports the capabilities of Intel PT, e.g. it decides
->> which bits are valid to be set in MSR_IA32_RTIT_CTL, and reports the
->> number of PT ADDR ranges.
->>
->> KVM needs to check that guest CPUID values set by userspace doesn't
->> enable any bit which is not supported by bare metal. Otherwise,
->> 1. it will trigger vm-entry failure if hardware unsupported bit is
->>     exposed to guest and set by guest.
->> 2. it triggers #GP when context switch PT MSRs if exposing more
->>     RTIT_ADDR* MSRs than hardware capacity.
->>
->> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
->> ---
->> There is bit 31 of CPUID(0xD, 0).ECX that doesn't restrict any bit in
->> MSR_IA32_RTIT_CTL. If guest has different value than host, it won't
->> cause any vm-entry failure, but guest will parse the PT packet with
->> wrong format.
->>
->> I also check it to be same as host to ensure the virtualization correctness.
->>
->> Changes in v2:
->> - Call out that if configuring more PT ADDR MSRs than hardware, it can
->>    cause #GP when context switch.
->> ---
->>   arch/x86/kvm/cpuid.c | 25 +++++++++++++++++++++++++
->>   1 file changed, 25 insertions(+)
->>
->> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
->> index 739be5da3bca..0c8e06a24156 100644
->> --- a/arch/x86/kvm/cpuid.c
->> +++ b/arch/x86/kvm/cpuid.c
->> @@ -76,6 +76,7 @@ static inline struct kvm_cpuid_entry2 *cpuid_entry2_find(
->>   static int kvm_check_cpuid(struct kvm_cpuid_entry2 *entries, int nent)
->>   {
->>   	struct kvm_cpuid_entry2 *best;
->> +	u32 eax, ebx, ecx, edx;
->>   
->>   	/*
->>   	 * The existing code assumes virtual address is 48-bit or 57-bit in the
->> @@ -89,6 +90,30 @@ static int kvm_check_cpuid(struct kvm_cpuid_entry2 *entries, int nent)
->>   			return -EINVAL;
->>   	}
->>   
->> +	/*
->> +	 * CPUID 0xD leaves tell Intel PT capabilities, which decides
-> 
-> CPUID.0xD is XSAVE state, CPUID.0x14 is Intel PT.  This series needs tests...
+On Fri, Aug 20, 2021 at 9:00 AM Brijesh Singh <brijesh.singh@amd.com> wrote:
+>
+> The command can be used by the userspace to query the SNP platform status
+> report. See the SEV-SNP spec for more details.
+>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+>  Documentation/virt/coco/sevguest.rst | 27 +++++++++++++++++
+>  drivers/crypto/ccp/sev-dev.c         | 45 ++++++++++++++++++++++++++++
+>  include/uapi/linux/psp-sev.h         |  1 +
+>  3 files changed, 73 insertions(+)
+>
+> diff --git a/Documentation/virt/coco/sevguest.rst b/Documentation/virt/coco/sevguest.rst
+> index 7acb8696fca4..7c51da010039 100644
+> --- a/Documentation/virt/coco/sevguest.rst
+> +++ b/Documentation/virt/coco/sevguest.rst
+> @@ -52,6 +52,22 @@ to execute due to the firmware error, then fw_err code will be set.
+>                  __u64 fw_err;
+>          };
+>
+> +The host ioctl should be called to /dev/sev device. The ioctl accepts command
+> +id and command input structure.
+> +
+> +::
+> +        struct sev_issue_cmd {
+> +                /* Command ID */
+> +                __u32 cmd;
+> +
+> +                /* Command request structure */
+> +                __u64 data;
+> +
+> +                /* firmware error code on failure (see psp-sev.h) */
+> +                __u32 error;
+> +        };
+> +
+> +
+>  2.1 SNP_GET_REPORT
+>  ------------------
+>
+> @@ -107,3 +123,14 @@ length of the blob is lesser than expected then snp_ext_report_req.certs_len wil
+>  be updated with the expected value.
+>
+>  See GHCB specification for further detail on how to parse the certificate blob.
+> +
+> +2.3 SNP_PLATFORM_STATUS
+> +-----------------------
+> +:Technology: sev-snp
+> +:Type: hypervisor ioctl cmd
+> +:Parameters (in): struct sev_data_snp_platform_status
+> +:Returns (out): 0 on success, -negative on error
+> +
+> +The SNP_PLATFORM_STATUS command is used to query the SNP platform status. The
+> +status includes API major, minor version and more. See the SEV-SNP
+> +specification for further details.
+> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+> index 4cd7d803a624..16c6df5d412c 100644
+> --- a/drivers/crypto/ccp/sev-dev.c
+> +++ b/drivers/crypto/ccp/sev-dev.c
+> @@ -1394,6 +1394,48 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp, bool writable)
+>         return ret;
+>  }
+>
+> +static int sev_ioctl_snp_platform_status(struct sev_issue_cmd *argp)
+> +{
+> +       struct sev_device *sev = psp_master->sev_data;
+> +       struct sev_data_snp_platform_status_buf buf;
+> +       struct page *status_page;
+> +       void *data;
+> +       int ret;
+> +
+> +       if (!sev->snp_inited || !argp->data)
+> +               return -EINVAL;
+> +
+> +       status_page = alloc_page(GFP_KERNEL_ACCOUNT);
+> +       if (!status_page)
+> +               return -ENOMEM;
+> +
+> +       data = page_address(status_page);
+> +       if (snp_set_rmp_state(__pa(data), 1, true, true, false)) {
+> +               __free_pages(status_page, 0);
+> +               return -EFAULT;
+> +       }
+> +
+> +       buf.status_paddr = __psp_pa(data);
+> +       ret = __sev_do_cmd_locked(SEV_CMD_SNP_PLATFORM_STATUS, &buf, &argp->error);
+> +
+> +       /* Change the page state before accessing it */
+> +       if (snp_set_rmp_state(__pa(data), 1, false, true, true)) {
+> +               snp_leak_pages(__pa(data) >> PAGE_SHIFT, 1);
 
-My apologize.
+Calling `snp_leak_pages()` here seems wrong, because
+`snp_set_rmp_state()` calls `snp_leak_pages()` when it returns an
+error.
 
->> +	 * pt_desc.ctl_bitmask in later update_intel_pt_cfg().
->> +	 *
->> +	 * pt_desc.ctl_bitmask decides the legal value for guest
->> +	 * MSR_IA32_RTIT_CTL. KVM cannot support PT capabilities beyond native,
->> +	 * otherwise it will trigger vm-entry failure if guest sets native
->> +	 * unsupported bits in MSR_IA32_RTIT_CTL.
->> +	 */
->> +	best = cpuid_entry2_find(entries, nent, 0xD, 0);
->> +	if (best) {
->> +		cpuid_count(0xD, 0, &eax, &ebx, &ecx, &edx);
->> +		if (best->ebx & ~ebx || best->ecx & ~ecx)
->> +			return -EINVAL;
->> +	}
->> +	best = cpuid_entry2_find(entries, nent, 0xD, 1);
->> +	if (best) {
->> +		cpuid_count(0xD, 0, &eax, &ebx, &ecx, &edx);
->> +		if (((best->eax & 0x7) > (eax & 0x7)) ||
-> 
-> Ugh, looking at the rest of the code, even this isn't sufficient because
-> pt_desc.guest.addr_{a,b} are hardcoded at 4 entries, i.e. running KVM on hardware
-> with >4 entries will lead to buffer overflows.
-
-it's hardcoded to 4 because there is a note of "no processors support 
-more than 4 address ranges" in SDM vol.3 Chapter 31.3.1, table 31-11
-
-> One option would be to bump that to the theoretical max of 15, which doesn't seem
-> too horrible, especially if pt_desc as a whole is allocated on-demand, which it
-> probably should be since it isn't exactly tiny (nor ubiquitous)
-> 
-> A different option would be to let userspace define whatever it wants for guest
-> CPUID, and instead cap nr_addr_ranges at min(host.cpuid, guest.cpuid, RTIT_ADDR_RANGE).
-> 
-> Letting userspace generate a bad MSR_IA32_RTIT_CTL is not problematic, there are
-> plenty of ways userspace can deliberately trigger VM-Entry failure due to invalid
-> guest state (even if this is a VM-Fail condition, it's not a danger to KVM).
-
-I'm fine to only safe guard the nr_addr_range if VM-Entry failure 
-doesn't matter.
-
-> 
->> +		    ((best->eax & ~eax) >> 16) ||
->> +		    (best->ebx & ~ebx))
->> +			return -EINVAL;
->> +	}
->> +
->>   	return 0;
->>   }
->>   
->> -- 
->> 2.27.0
->>
-
+> +               return -EFAULT;
+> +       }
+> +
+> +       if (ret)
+> +               goto cleanup;
+> +
+> +       if (copy_to_user((void __user *)argp->data, data,
+> +                        sizeof(struct sev_user_data_snp_status)))
+> +               ret = -EFAULT;
+> +
+> +cleanup:
+> +       __free_pages(status_page, 0);
+> +       return ret;
+> +}
+> +
+>  static long sev_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
+>  {
+>         void __user *argp = (void __user *)arg;
+> @@ -1445,6 +1487,9 @@ static long sev_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
+>         case SEV_GET_ID2:
+>                 ret = sev_ioctl_do_get_id2(&input);
+>                 break;
+> +       case SNP_PLATFORM_STATUS:
+> +               ret = sev_ioctl_snp_platform_status(&input);
+> +               break;
+>         default:
+>                 ret = -EINVAL;
+>                 goto out;
+> diff --git a/include/uapi/linux/psp-sev.h b/include/uapi/linux/psp-sev.h
+> index bed65a891223..ffd60e8b0a31 100644
+> --- a/include/uapi/linux/psp-sev.h
+> +++ b/include/uapi/linux/psp-sev.h
+> @@ -28,6 +28,7 @@ enum {
+>         SEV_PEK_CERT_IMPORT,
+>         SEV_GET_ID,     /* This command is deprecated, use SEV_GET_ID2 */
+>         SEV_GET_ID2,
+> +       SNP_PLATFORM_STATUS,
+>
+>         SEV_MAX,
+>  };
+> --
+> 2.17.1
+>
+>
