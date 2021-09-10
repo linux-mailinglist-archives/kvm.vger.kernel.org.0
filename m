@@ -2,125 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E7441406EED
-	for <lists+kvm@lfdr.de>; Fri, 10 Sep 2021 18:08:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D9E5406F38
+	for <lists+kvm@lfdr.de>; Fri, 10 Sep 2021 18:11:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233470AbhIJQJT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Sep 2021 12:09:19 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31629 "EHLO
+        id S232305AbhIJQM2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Sep 2021 12:12:28 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44853 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229524AbhIJQIE (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 10 Sep 2021 12:08:04 -0400
+        by vger.kernel.org with ESMTP id S229861AbhIJQLI (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 10 Sep 2021 12:11:08 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1631290012;
+        s=mimecast20190719; t=1631290196;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=nZ9m8GB+SRNPd987F+aUm8xDcHRH1ey6FXHn0bKLQqE=;
-        b=exAl4z7ygeI3S/EUkHFOvvDQIBwxL9bMQK/dFraN9NoywkH77sKoIjAhNmLm40BrdFXRci
-        d7PaWRb4zHcYaPKeJvHRLBtB2lhpG0QOFg3PG5+ZGtYw8AnRrAsB7bdKL1bG7IL9ovluRM
-        oQYNqL1YqSf4rONuU4OnQ6wGFodRmOc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-381-z7KQJQ2hP6S8PJA48x5-ug-1; Fri, 10 Sep 2021 12:06:51 -0400
-X-MC-Unique: z7KQJQ2hP6S8PJA48x5-ug-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7871B1084682;
-        Fri, 10 Sep 2021 16:06:50 +0000 (UTC)
-Received: from vitty.brq.redhat.com (unknown [10.40.192.108])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7D18B5C1A1;
-        Fri, 10 Sep 2021 16:06:48 +0000 (UTC)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org
-Subject: [PATCH 4/4] KVM: nVMX: Implement Enlightened MSR Bitmap feature
-Date:   Fri, 10 Sep 2021 18:06:33 +0200
-Message-Id: <20210910160633.451250-5-vkuznets@redhat.com>
-In-Reply-To: <20210910160633.451250-1-vkuznets@redhat.com>
-References: <20210910160633.451250-1-vkuznets@redhat.com>
+        bh=6/69qBPEq+ZxoLUCx7D3iUMKDE0eou/SmM/DmrEsT78=;
+        b=FN005Z4iU0lqZChXTlZ+78Ze9k/Sqaf9Oc4bzTV28KKla6lMOy1qrkGIAaSotlWG7KeZtN
+        oh14wFh9gU6cZcLbioHR0uYj4zEK2qIri4Zepu4SF9T2X6Jg+KToEgdpb04S3JYVmq224U
+        MPdh0awidgOGAAtHMviaQATtG/mXwN4=
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
+ [209.85.166.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-441-_FCGVFtMPv6EGgagBBZCOw-1; Fri, 10 Sep 2021 12:09:55 -0400
+X-MC-Unique: _FCGVFtMPv6EGgagBBZCOw-1
+Received: by mail-io1-f70.google.com with SMTP id s6-20020a5ec646000000b005b7f88ffdd3so4134974ioo.13
+        for <kvm@vger.kernel.org>; Fri, 10 Sep 2021 09:09:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=6/69qBPEq+ZxoLUCx7D3iUMKDE0eou/SmM/DmrEsT78=;
+        b=fub1KNvva89ONUrfxTilVNrVhxmDKappdktIjRdkZHzsZTWZekBG9LdUagVoiKjl+6
+         Uh+QLQx8XKeCvvjQKj5ujHFtRkyXM+PYYLfi3G8aquWMml8Zvo9wUSmzZ6VHiqBQjoiv
+         rNVx8LRlnDDGsEg7LMex/4mQfNIx/Y7R6mpoLoZ/zHELzsZ/wovPJT3S31RhRwnjYKg8
+         AN2b+itPJgca/kWJk5s4NGiDAuHC2ptv51S32x9ffgd5cgcQcwrrpdtUPvhd7E10k3Nh
+         /v77kKbAoJwZcid8QRehb5kKx0L7qHBD3PHxgsC5aw3sstR9yIDnzPByt3fZtHwIK57I
+         jMHA==
+X-Gm-Message-State: AOAM5331m4DH8AZ39XAED0b2SxVWiaOQQCIItgHl5SXmZUqSWQW1hi2M
+        qeDAGD0DNyn4TetrhVWagoKA4ISawloknRC+XxVSF3Fss8Ec1opa+YPF3HZrGIM9dBcBNvYR9sZ
+        58BcIH+k3Ftu/
+X-Received: by 2002:a05:6e02:8f2:: with SMTP id n18mr6862646ilt.256.1631290194643;
+        Fri, 10 Sep 2021 09:09:54 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxP8Y1TihJai/O/xPIO5JmfEsEgfV81tQvv38D8IJQRDSK+KLhAXgtQ59aQINI+2fQswrVxaA==
+X-Received: by 2002:a05:6e02:8f2:: with SMTP id n18mr6862610ilt.256.1631290194398;
+        Fri, 10 Sep 2021 09:09:54 -0700 (PDT)
+Received: from redhat.com (c-73-14-100-188.hsd1.co.comcast.net. [73.14.100.188])
+        by smtp.gmail.com with ESMTPSA id y10sm2555019ilv.35.2021.09.10.09.09.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 10 Sep 2021 09:09:54 -0700 (PDT)
+Date:   Fri, 10 Sep 2021 10:09:51 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        David Airlie <airlied@linux.ie>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        dri-devel@lists.freedesktop.org,
+        Eric Farman <farman@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
+        linux-s390@vger.kernel.org,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>, Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH v2 5/9] vfio/mdev: Consolidate all the device_api sysfs
+ into the core code
+Message-ID: <20210910100951.4da06602.alex.williamson@redhat.com>
+In-Reply-To: <20210910133850.GT2505917@nvidia.com>
+References: <0-v2-7d3a384024cf+2060-ccw_mdev_jgg@nvidia.com>
+        <5-v2-7d3a384024cf+2060-ccw_mdev_jgg@nvidia.com>
+        <YTtLRmiXq+QtJ+la@infradead.org>
+        <20210910133850.GT2505917@nvidia.com>
+Organization: Red Hat
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Updating MSR bitmap for L2 is not cheap and rearly needed. TLFS for Hyper-V
-offers 'Enlightened MSR Bitmap' feature which allows L1 hypervisor to
-inform L0 when it changes MSR bitmap, this eliminates the need to examine
-L1's MSR bitmap for L2 every time when 'real' MSR bitmap for L2 gets
-constructed.
+On Fri, 10 Sep 2021 10:38:50 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-Use 'vmx->nested.msr_bitmap_changed' flag to implement the feature.
+> On Fri, Sep 10, 2021 at 01:10:46PM +0100, Christoph Hellwig wrote:
+> > On Thu, Sep 09, 2021 at 04:38:45PM -0300, Jason Gunthorpe wrote:  
+> > > Every driver just emits a static string, simply feed it through the ops
+> > > and provide a standard sysfs show function.  
+> > 
+> > Looks sensible.  But can you make the attribute optional and add a
+> > comment marking it deprecated?  Because it really is completely useless.
+> > We don't version userspace APIs, userspae has to discover new features
+> > individually by e.g. finding new sysfs files or just trying new ioctls.  
+> 
+> To be honest I have no idea what side effects that would have..
+> 
+> device code search tells me libvirt reads it and stuffs it into some
+> XML
+> 
+> Something called mdevctl touches it, feeds it into some JSON and
+> other stuff..
+> 
+> qemu has some VFIO_DEVICE_API_* constants but it is all dead code
+> 
+> I agree it shouldn't have been there in the first place
+> 
+> Cornelia? Alex? Any thoughts?
 
-Note, KVM already uses 'Enlightened MSR bitmap' feature when it runs as a
-nested hypervisor on top of Hyper-V. The newly introduced feature is going
-to be used by Hyper-V guests on KVM.
+It's not a version, it's a means for userspace to determine the basic
+API for an mdev device without needing to go through the process of
+creating a container, adding the group, setting an IOMMU type, opening
+the device before being able to call VFIO_DEVICE_GET_INFO to determine
+the API.  For example, it wouldn't make sense for libvirt to attach a
+vfio-ccw device to a PCIe root port in a VM.  It's a means to say this
+mdev device is a vfio-pci or that mdev device is a vfio-ccw.  If it were
+optional, then management tools would have no basic idea how to attach
+the device to a VM without gaining access to the device themselves.
+Thanks,
 
-When the feature is enabled for Win10+WSL2, it shaves off around 700 CPU
-cycles from a nested vmexit cost (tight cpuid loop test).
-
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
- arch/x86/kvm/hyperv.c     |  2 ++
- arch/x86/kvm/vmx/nested.c | 19 +++++++++++++++++--
- 2 files changed, 19 insertions(+), 2 deletions(-)
-
-diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-index 232a86a6faaf..7124dbe79ac2 100644
---- a/arch/x86/kvm/hyperv.c
-+++ b/arch/x86/kvm/hyperv.c
-@@ -2517,6 +2517,8 @@ int kvm_get_hv_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid2 *cpuid,
- 
- 		case HYPERV_CPUID_NESTED_FEATURES:
- 			ent->eax = evmcs_ver;
-+			if (evmcs_ver)
-+				ent->eax |= HV_X64_NESTED_MSR_BITMAP;
- 
- 			break;
- 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 42cd95611892..5ac5ba2f6191 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -607,15 +607,30 @@ static inline bool nested_vmx_prepare_msr_bitmap(struct kvm_vcpu *vcpu,
- 						 struct vmcs12 *vmcs12)
- {
- 	int msr;
-+	struct vcpu_vmx *vmx = to_vmx(vcpu);
- 	unsigned long *msr_bitmap_l1;
--	unsigned long *msr_bitmap_l0 = to_vmx(vcpu)->nested.vmcs02.msr_bitmap;
--	struct kvm_host_map *map = &to_vmx(vcpu)->nested.msr_bitmap_map;
-+	unsigned long *msr_bitmap_l0 = vmx->nested.vmcs02.msr_bitmap;
-+	struct hv_enlightened_vmcs *evmcs = vmx->nested.hv_evmcs;
-+	struct kvm_host_map *map = &vmx->nested.msr_bitmap_map;
- 
- 	/* Nothing to do if the MSR bitmap is not in use.  */
- 	if (!cpu_has_vmx_msr_bitmap() ||
- 	    !nested_cpu_has(vmcs12, CPU_BASED_USE_MSR_BITMAPS))
- 		return false;
- 
-+	/*
-+	 * MSR bitmap update can be skipped when:
-+	 * - MSR bitmap for L1 hasn't changed.
-+	 * - Nested hypervisor (L1) is attempting to launch the same L2 as
-+	 *   before.
-+	 * - Nested hypervisor (L1) has enabled 'Enlightened MSR Bitmap' feature
-+	 *   and tells KVM (L0) there were no changes in MSR bitmap for L2.
-+	 */
-+	if (!vmx->nested.msr_bitmap_changed && evmcs &&
-+	    evmcs->hv_enlightenments_control.msr_bitmap &&
-+	    evmcs->hv_clean_fields & HV_VMX_ENLIGHTENED_CLEAN_FIELD_MSR_BITMAP)
-+		return true;
-+
- 	if (kvm_vcpu_map(vcpu, gpa_to_gfn(vmcs12->msr_bitmap), map))
- 		return false;
- 
--- 
-2.31.1
+Alex
 
