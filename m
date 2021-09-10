@@ -2,214 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4B02E407208
-	for <lists+kvm@lfdr.de>; Fri, 10 Sep 2021 21:32:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B5FEB40726A
+	for <lists+kvm@lfdr.de>; Fri, 10 Sep 2021 22:21:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232739AbhIJTdY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Sep 2021 15:33:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41388 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232790AbhIJTdV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Sep 2021 15:33:21 -0400
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 981C6C061574
-        for <kvm@vger.kernel.org>; Fri, 10 Sep 2021 12:32:10 -0700 (PDT)
-Received: by mail-pj1-x1034.google.com with SMTP id k23-20020a17090a591700b001976d2db364so2160529pji.2
-        for <kvm@vger.kernel.org>; Fri, 10 Sep 2021 12:32:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=gp/EtrgVV0pqgAxNAgUDSeBZ+pTvYj4FQRlJ1GMLFEU=;
-        b=AuY6LIJxJFI0BygWczR7RWIpobT48uhXYq/QvfUlCY2F2I0YalDnxjBhUMIr62Sg8E
-         4IlZDKKjWK7MLYPcreaZ0X1Ilrxo/tGZOrvIE1iOHXhCYxwEyKNddT2U1bQJron5k0Sx
-         ZDrP2tbC8Bf35TrbfoqPaLSbT9sL/Fgv/5uIhDJiuO9wUtFqmLsqEXDIE55iiVi2SjUU
-         qSBbiZFEzmFSwOwlFRTQStZ5ljt1Buo1xGWjG/u/EiIMmxjsKMQl2BiPAdde/Hj95btQ
-         XO0Am4J0baDlBhg260FYw9vdd1rYHzVyl3sexJA3W3i7xgKEs2PAMMC0LxRhaJID/giR
-         UGwQ==
+        id S233654AbhIJUWP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Sep 2021 16:22:15 -0400
+Received: from mail-oi1-f179.google.com ([209.85.167.179]:40585 "EHLO
+        mail-oi1-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230513AbhIJUWK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Sep 2021 16:22:10 -0400
+Received: by mail-oi1-f179.google.com with SMTP id h133so4602205oib.7;
+        Fri, 10 Sep 2021 13:20:58 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=gp/EtrgVV0pqgAxNAgUDSeBZ+pTvYj4FQRlJ1GMLFEU=;
-        b=spcrUs+WEX0BR0K16Yq/AOP/is3FFTKTz/2EZ9HSqbYeUQAxHu9gxvnm2aVaFxvpfm
-         VnO4tId5JsJ05wWt7Awl/Kr9KyiXjttWSRTjlk7ptkaVpuNTMtFC1lWe8uhi7FdCAhJ8
-         cjOxSn4BVvGh7QD/wM7svyXS9Nad5jRLVr7hd/MEDeLwCzwzDJFDtxSlMIw1MbHAYvIn
-         A6icisnNx7NH1Q2iH2Z12+nqDQjaLmBZ8AkKe9DWP21/vsFU76aooDr84N8hDI1Jo8Ml
-         w91yaKXDMu16iDgwnKxGXFh1gRBQmj6gxg0xlI9FQpGv9ccvYGRdobBqH9Dl4DcQmrzy
-         IMeA==
-X-Gm-Message-State: AOAM532eObQ4aewnTGDojS50tL1IL4rB/cdgwRiM7KiHRFaTof5MjMEV
-        XpUxJ/wOtPyC8J3KR4f3sWi2BQ==
-X-Google-Smtp-Source: ABdhPJx7k1Xe3NcxnUviUrljAE+Zul5MGB53kScveWe4Yie9kWrVt15hLLhM0LFtFUt7WR4y2CTMGA==
-X-Received: by 2002:a17:902:db05:b0:139:1b8:10c0 with SMTP id m5-20020a170902db0500b0013901b810c0mr8811814plx.26.1631302329725;
-        Fri, 10 Sep 2021 12:32:09 -0700 (PDT)
-Received: from google.com (150.12.83.34.bc.googleusercontent.com. [34.83.12.150])
-        by smtp.gmail.com with ESMTPSA id a71sm5922769pfd.86.2021.09.10.12.32.08
+         :mime-version:content-disposition:in-reply-to;
+        bh=4IPxaQoHLBsI4TsWZBSz429Jh2IPs4Tsu9wpBitBgng=;
+        b=RHaoRE+qDgYZPicCywIjXi43sTcHVLztXKuRhBqTKG/BC3AcU3T1OrRbsbchDZDH42
+         qQDkjh6NdFxcOPdOkhKUyztQ7LAqL5c4wAeychuNyh7BIphBf6Uh7sdgOi6vp/32XXGb
+         7XiEUztdTPfVfdZxT6e+BGsuwZ4vLBRUsFXtzKfFjnj/xiJK2WdT3QIJq7NSo/Cfn08l
+         B6R0zrZCw+1G3nZRT9RcFkxXwuEsE2qI7pv8dasNw8D+q0EA+xN7BMiCZvTl+0MkdVF0
+         h63WP8ufp5jj/Vvpq5MhXPhWhx3Jqd598XNIr0ufIKJo6hzZugdYA8IS1BwiF2rrSuyx
+         EVDA==
+X-Gm-Message-State: AOAM530MuR9lBAdZ75GkAgdwnu8Cu+xtRwYXoMF3cJWo/boXmyAt4kel
+        nl+98UZs1SecqQhNZwgqsA==
+X-Google-Smtp-Source: ABdhPJz5SQZueBteIwX5jHufIZZ/JozLZUCT7O2iJGriI7vlauYxJk6NPj/twUv+QLH5Q4gVPTAZyQ==
+X-Received: by 2002:a05:6808:aa8:: with SMTP id r8mr5746125oij.171.1631305258063;
+        Fri, 10 Sep 2021 13:20:58 -0700 (PDT)
+Received: from robh.at.kernel.org (66-90-148-213.dyn.grandenetworks.net. [66.90.148.213])
+        by smtp.gmail.com with ESMTPSA id s24sm1483439otp.37.2021.09.10.13.20.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Sep 2021 12:32:09 -0700 (PDT)
-Date:   Fri, 10 Sep 2021 12:32:05 -0700
-From:   Ricardo Koller <ricarkol@google.com>
-To:     Eric Auger <eric.auger@redhat.com>
-Cc:     Alexandru Elisei <alexandru.elisei@arm.com>, kvm@vger.kernel.org,
-        maz@kernel.org, kvmarm@lists.cs.columbia.edu, drjones@redhat.com,
-        Paolo Bonzini <pbonzini@redhat.com>, oupton@google.com,
-        james.morse@arm.com, suzuki.poulose@arm.com, shuah@kernel.org,
-        jingzhangos@google.com, pshier@google.com, rananta@google.com,
-        reijiw@google.com
-Subject: Re: [PATCH 1/2] KVM: arm64: vgic: check redist region is not above
- the VM IPA size
-Message-ID: <YTuytfGTDlaoz0yH@google.com>
-References: <20210908210320.1182303-1-ricarkol@google.com>
- <20210908210320.1182303-2-ricarkol@google.com>
- <b368e9cf-ec28-1768-edf9-dfdc7fa108f8@arm.com>
- <YTo6kX7jGeR3XvPg@google.com>
- <5eb41efd-2ff2-d25b-5801-f4a56457a09f@arm.com>
- <80bdbdb3-1bff-aa99-c49b-76d6bd960aa9@redhat.com>
+        Fri, 10 Sep 2021 13:20:57 -0700 (PDT)
+Received: (nullmailer pid 3226408 invoked by uid 1000);
+        Fri, 10 Sep 2021 20:20:55 -0000
+Date:   Fri, 10 Sep 2021 15:20:55 -0500
+From:   Rob Herring <robh@kernel.org>
+To:     Keith Packard <keithpac@amazon.com>
+Cc:     linux-kernel@vger.kernel.org, Abbott Liu <liuwenliang@huawei.com>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Andrii Nakryiko <andrii@kernel.org>,
+        Anshuman Khandual <anshuman.khandual@arm.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>, Ben Segall <bsegall@google.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        bpf@vger.kernel.org, Christoph Lameter <cl@linux.com>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Daniel Bristot de Oliveira <bristot@redhat.com>,
+        Dennis Zhou <dennis@kernel.org>, devicetree@vger.kernel.org,
+        Dietmar Eggemann <dietmar.eggemann@arm.com>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Frank Rowand <frowand.list@gmail.com>,
+        Geert Uytterhoeven <geert+renesas@glider.be>,
+        Ingo Molnar <mingo@redhat.com>,
+        Jason Wang <jasowang@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        Joe Perches <joe@perches.com>,
+        John Fastabend <john.fastabend@gmail.com>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        KP Singh <kpsingh@kernel.org>, kvm@vger.kernel.org,
+        Linus Walleij <linus.walleij@linaro.org>,
+        linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-mm@kvack.org, Manivannan Sadhasivam <mani@kernel.org>,
+        Marc Zyngier <maz@kernel.org>, Martin KaFai Lau <kafai@fb.com>,
+        Mel Gorman <mgorman@suse.de>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Miguel Ojeda <ojeda@kernel.org>,
+        Mike Rapoport <rppt@kernel.org>, netdev@vger.kernel.org,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Nick Desaulniers <ndesaulniers@gooogle.com>,
+        Nicolas Pitre <nico@fluxnic.net>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Russell King <linux@armlinux.org.uk>,
+        Song Liu <songliubraving@fb.com>,
+        Srikar Dronamraju <srikar@linux.vnet.ibm.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Tejun Heo <tj@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        =?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= 
+        <u.kleine-koenig@pengutronix.de>,
+        Valentin Schneider <valentin.schneider@arm.com>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        virtualization@lists.linux-foundation.org,
+        "Wolfram Sang (Renesas)" <wsa+renesas@sang-engineering.com>,
+        YiFei Zhu <yifeifz2@illinois.edu>, Yonghong Song <yhs@fb.com>
+Subject: Re: [PATCH v4 4/7] Make sure task_struct is available for
+ raw_smp_processor_id
+Message-ID: <YTu+JyNyQH7v+1Yx@robh.at.kernel.org>
+References: <id:20210907220038.91021-1-keithpac@amazon.com>
+ <20210908190605.419064-1-keithpac@amazon.com>
+ <20210908190605.419064-5-keithpac@amazon.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <80bdbdb3-1bff-aa99-c49b-76d6bd960aa9@redhat.com>
+In-Reply-To: <20210908190605.419064-5-keithpac@amazon.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Alexandru and Eric,
-
-On Fri, Sep 10, 2021 at 10:42:23AM +0200, Eric Auger wrote:
-> Hi Alexandru,
+On Wed, Sep 08, 2021 at 12:06:02PM -0700, Keith Packard wrote:
+> To allow architectures to use the 'cpu' field in task_struct for cpu
+> identification, the task_struct must be visible whereever the
+> raw_smp_processor_id macro is used. It would be simplest to include
+> linux/sched.h from the relevant asm/smp.h file, but that file is
+> included from linux/sched.h, and the recursive include ends up with
+> several declarations in the wrong order.
 > 
-> On 9/10/21 10:28 AM, Alexandru Elisei wrote:
-> > Hi Ricardo,
-> >
-> > On 9/9/21 5:47 PM, Ricardo Koller wrote:
-> >> On Thu, Sep 09, 2021 at 11:20:15AM +0100, Alexandru Elisei wrote:
-> >>> Hi Ricardo,
-> >>>
-> >>> On 9/8/21 10:03 PM, Ricardo Koller wrote:
-> >>>> Extend vgic_v3_check_base() to verify that the redistributor regions
-> >>>> don't go above the VM-specified IPA size (phys_size). This can happen
-> >>>> when using the legacy KVM_VGIC_V3_ADDR_TYPE_REDIST attribute with:
-> >>>>
-> >>>>   base + size > phys_size AND base < phys_size
-> >>>>
-> >>>> vgic_v3_check_base() is used to check the redist regions bases when
-> >>>> setting them (with the vcpus added so far) and when attempting the first
-> >>>> vcpu-run.
-> >>>>
-> >>>> Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> >>>> ---
-> >>>>  arch/arm64/kvm/vgic/vgic-v3.c | 4 ++++
-> >>>>  1 file changed, 4 insertions(+)
-> >>>>
-> >>>> diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
-> >>>> index 66004f61cd83..5afd9f6f68f6 100644
-> >>>> --- a/arch/arm64/kvm/vgic/vgic-v3.c
-> >>>> +++ b/arch/arm64/kvm/vgic/vgic-v3.c
-> >>>> @@ -512,6 +512,10 @@ bool vgic_v3_check_base(struct kvm *kvm)
-> >>>>  		if (rdreg->base + vgic_v3_rd_region_size(kvm, rdreg) <
-> >>>>  			rdreg->base)
-> >>>>  			return false;
-> >>>> +
-> >>>> +		if (rdreg->base + vgic_v3_rd_region_size(kvm, rdreg) >
-> >>>> +			kvm_phys_size(kvm))
-> >>>> +			return false;
-> >>> Looks to me like this same check (and the overflow one before it) is done when
-> >>> adding a new Redistributor region in kvm_vgic_addr() -> vgic_v3_set_redist_base()
-> >>> -> vgic_v3_alloc_redist_region() -> vgic_check_ioaddr(). As far as I can tell,
-> >>> kvm_vgic_addr() handles both ways of setting the Redistributor address.
-> >>>
-> >>> Without this patch, did you manage to set a base address such that base + size >
-> >>> kvm_phys_size()?
-> >>>
-> >> Yes, with the KVM_VGIC_V3_ADDR_TYPE_REDIST legacy API. The easiest way
-> >> to get to this situation is with the selftest in patch 2.  I then tried
-> >> an extra experiment: map the first redistributor, run the first vcpu,
-> >> and access the redist from inside the guest. KVM didn't complain in any
-> >> of these steps.
-> > Yes, Eric pointed out that I was mistaken and there is no check being done for
-> > base + size > kvm_phys_size().
-> >
-> > What I was trying to say is that this check is better done when the user creates a
-> > Redistributor region, not when a VCPU is first run. We have everything we need to
-> > make the check when a region is created, why wait until the VCPU is run?
-> >
-> > For example, vgic_v3_insert_redist_region() is called each time the adds a new
-> > Redistributor region (via either of the two APIs), and already has a check for the
-> > upper limit overflowing (identical to the check in vgic_v3_check_base()). I would
-> > add the check against the maximum IPA size there.
-> you seem to refer to an old kernel as vgic_v3_insert_redist_region was
-> renamed into  vgic_v3_alloc_redist_region in
-> e5a35635464b kvm: arm64: vgic-v3: Introduce vgic_v3_free_redist_region()
+> To avoid this, the PowerPC architecture code has this ugly hack:
 > 
-> I think in case you use the old rdist API you do not know yet the size
-> of the redist region at this point (count=0), hence Ricardo's choice to
-> do the check latter.
-
-Just wanted to add one more detail. vgic_v3_check_base() is also called
-when creating the redistributor region (via vgic_v3_set_redist_base ->
-vgic_register_redist_iodev). This patch reuses that check for the old
-redist API to also check for "base + size > kvm_phys_size()" with a size
-calculated using the vcpus added so far.
-
-> >
-> > Also, because vgic_v3_insert_redist_region() already checks for overflow, I
-> > believe the overflow check in vgic_v3_check_base() is redundant.
-> >
-
-It's redundant for the new redist API, but still needed for the old
-redist API.
-
-> > As far as I can tell, vgic_v3_check_base() is there to make sure that the
-> > Distributor doesn't overlap with any of the Redistributors, and because the
-> > Redistributors and the Distributor can be created in any order, we defer the check
-> > until the first VCPU is run. I might be wrong about this, someone please correct
-> > me if I'm wrong.
-> >
-> > Also, did you verify that KVM is also doing this check for GICv2? KVM does
-> > something similar and calls vgic_v2_check_base() when mapping the GIC resources,
-> > and I don't see a check for the maximum IPA size in that function either.
+> 	#define raw_smp_processor_id() \
+> 		(*(unsigned int *)((void *)current + _TASK_CPU))
 > 
-> I think vgic_check_ioaddr() called in kvm_vgic_addr() does the job (it
-> checks the base @)
->
-
-It seems that GICv2 suffers from the same problem. The cpu interface
-base is checked but the end can extend above IPA size. Note that the cpu
-interface is 8KBs and vgic_check_ioaddr() is only checking that its base
-is 4KB aligned and below IPA size. The distributor region is 4KB so
-vgic_check_ioaddr() is enough in that case.
-
-What about the following?
-
-I can work on the next version of this patch (v2 has the GICv2 issue)
-which adds vgic_check_range(), which is like vgic_check_ioaddr() but
-with a size arg.  kvm_vgic_addr() can then call vgic_check_range() and
-do all the checks for GICv2 and GICv3. Note that for GICv2, there's no
-need to wait until first vcpu run to do the check. Also note that I will
-have to keep the change in vgic_v3_check_base() to check for the old v3
-redist API at first vcpu run.
-
-Thanks,
-Ricardo
-
-> Thanks
+> As an alternative, placing includes of linux/sched.h in a few files
+> that are used along with asm/smp.h means we can use the task_struct
+> field directly.
 > 
-> Eric
-> >
-> > Thanks,
-> >
-> > Alex
-> >
-> >> Thanks,
-> >> Ricardo
-> >>
-> >>> Thanks,
-> >>>
-> >>> Alex
-> >>>
-> >>>>  	}
-> >>>>  
-> >>>>  	if (IS_VGIC_ADDR_UNDEF(d->vgic_dist_base))
-> 
+> Signed-off-by: Keith Packard <keithpac@amazon.com>
+> ---
+>  arch/arm/mm/proc-v7-bugs.c     | 1 +
+>  drivers/vhost/vhost.c          | 1 +
+>  drivers/vhost/vhost.h          | 1 +
+>  include/asm-generic/irq_regs.h | 1 +
+>  include/linux/of_address.h     | 1 +
+
+Where does the DT code use raw_smp_processor_id()? The header itself 
+certainly doesn't and the headers should only include what the headers 
+use directly.
+
+In general this seems pretty terrible pulling in all of sched.h (and 
+then everything else it includes) for just raw_smp_processor_id().
+
+>  include/linux/random.h         | 1 +
+>  include/linux/topology.h       | 1 +
+>  init/calibrate.c               | 1 +
+>  kernel/bpf/bpf_lru_list.h      | 1 +
+>  kernel/bpf/percpu_freelist.h   | 1 +
+>  kernel/sched/cpuacct.c         | 2 +-
+>  lib/irq_regs.c                 | 1 +
+>  12 files changed, 12 insertions(+), 1 deletion(-)
