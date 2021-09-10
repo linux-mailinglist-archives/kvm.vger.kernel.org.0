@@ -2,54 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 29AEA4064F8
-	for <lists+kvm@lfdr.de>; Fri, 10 Sep 2021 03:14:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 017FA4064F9
+	for <lists+kvm@lfdr.de>; Fri, 10 Sep 2021 03:14:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235016AbhIJBP6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Sep 2021 21:15:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49210 "EHLO
+        id S235085AbhIJBQC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Sep 2021 21:16:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49012 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234003AbhIJBPw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Sep 2021 21:15:52 -0400
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D16E7C08ED3E
-        for <kvm@vger.kernel.org>; Thu,  9 Sep 2021 17:49:22 -0700 (PDT)
-Received: by mail-pf1-x449.google.com with SMTP id v65-20020a627a44000000b003f286b054cbso198946pfc.11
-        for <kvm@vger.kernel.org>; Thu, 09 Sep 2021 17:49:22 -0700 (PDT)
+        with ESMTP id S234402AbhIJBPy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Sep 2021 21:15:54 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75AB2C08ED4B
+        for <kvm@vger.kernel.org>; Thu,  9 Sep 2021 17:49:24 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id j4-20020a258b84000000b005a203c5e066so173028ybl.19
+        for <kvm@vger.kernel.org>; Thu, 09 Sep 2021 17:49:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=dEdxgR+gW3CA1xQLb38rytPzrES1DL67Ux6A5LMF1hE=;
-        b=M5VNWAyB8m19PEM6kIY9iuTeb1Xx80xAZbeYJcIhWPCTh6WRfOB109DGID2/XjRrq0
-         lNfXAfaWumtKxg6frGyZOUE3Ti/1bXxS63hAFzKK3vzMWMXFvvXcHswdVCnbSQ4FSVmz
-         7xPxcBXufl3zRO6rH2JwBa430gIC4+I9fL2KOkI8azT/p5yLhmvAm3II8j3f6Tzmbdgv
-         ib3W1twjR+vmqRt7Td9uaD40H/e+f23ce8Gg21a4knrCwVns02a/SucIaCvZxVe+O4vN
-         3pdnKub0f6wG/k3OzlM9KLPGT395AUcP2XHyK8eMmqoYhDZGqps0W5TK2ZPR6miwYUeD
-         dK8A==
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=PnmYaOqrQjNWrJEqxLGOl8MYEOt5oEWk1M6ZydsFVAE=;
+        b=TQM4yg1FQfOHBQ3ZAvGNocrqsOwJKAxncc4mbKyCgHs5sxi89dK2qKe5iyJqq1tvRR
+         An/tkJry/YQJFz5NFvLeQWjiGWZV0FNQxX6QlpwEu0YEYlcLf/SL1VEosgZip9wKDt1o
+         Qheb62L3ihr6th3Wp84yvD/P8BtLuGFAkktnoXOnaBiIIMQaGKUV/XNawWcPtC3IO1Zm
+         0PKmKFlrBx8a1DpltbAaAi8pbfBr3joPqTjnBeN5wsA5zCOQ9NbF8ymQAuzxwkHJE4gc
+         R4LfXayln5UN0nhCcF3OFkoL9yv7E/nF1z8EpdhuBipWE0CNvsIFi3c4iq0iRIHRk7ye
+         J2BQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=dEdxgR+gW3CA1xQLb38rytPzrES1DL67Ux6A5LMF1hE=;
-        b=qVHJT2AZ16GAbAvKcaGqQK+YA4H5lkSkbn29pxE7mW6+jQ1sZWHyqolWraC5POF8nK
-         xyITZip2HrHbUUqqZN48ASHYrQCom1kmEsf38uzN6TXc0tWzljcAKr7slnDH+Q18jWn/
-         dHcG+blz3umbCidqj5rMdLThpjWmT1gUgOxN0PgHNb6fIZPyFBs4rLw5eHhYmkmGASip
-         zU9E2oeeQkI82/xbMWEL2tNtCO2+rCFzxeY3sGnz9UG5KOa053jQ48JgzKkpsJvYJwYL
-         N1/WMSjlfim5jl/b2Zedz/iecgUVDnpnOAgMOWDNzQgMy8wRMnvTsiIppTNl5k4SV/wQ
-         3V0A==
-X-Gm-Message-State: AOAM533hnn3g3lu3A5NLybh8GzAfKAGLsCUuZFsm4KS3f34zX+TNSPhI
-        UGC/uKXvYlo+1imq/bu6WYOWe4AccGW+S1IkEbgdymg7lMENZ5ClZM2QOvaoIpu5WgUt6d3jyGt
-        Es0AzUxM02z7WQU3z6ZSs9OZS7htgxyi3UAaY5eZHuctluAIVoMarr/Ij7wzXSDo=
-X-Google-Smtp-Source: ABdhPJx2dtSeD1rpEMeeTCoYm9lmfTiEVNC3xqi2+/nX82mrsrKK906Uu6TqTvZRHtZHYiRDV8rjHO8nHGBf+w==
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=PnmYaOqrQjNWrJEqxLGOl8MYEOt5oEWk1M6ZydsFVAE=;
+        b=oaSWA3DOn0RathJHVPb/Vuk7mefs1QXLoF1nghOU0gQo9ii3AYfJQ4FXOrnRxdL20W
+         6Ti8/SPztFD9eTGbTZtdOYbrysCKbprt1MMXDAAMlv7rsnXZWSkgUreFWXB3FCBliL/A
+         A+xZxHgDnf1Ibtv2UKWiLlS1lrLn75PACq5IpGUEzF8YfiWmh7FtjgNd3DS6C6oBL3yG
+         jKBf1A7ScJCOegOqFzS5EHlPPJVnkZcNBLmX/qkfbXSVwIQnFVH3CJGPMGaf/OfjDOB8
+         ZLvt392hyboV13Ymynf4VAsPp422xHRUTnyjsxxXo8dJTVd1DLQXIAzvX+9PFs1b9M55
+         9qqQ==
+X-Gm-Message-State: AOAM5302+F5sqAHD0RAeaGVPBLrSIJn7Upwl2jhOOA/fwmhHnTV1xZ9n
+        vT9uOXQxjGgYUBEOF5CKzj8c5Ngr+MnP+7LWu2IFZtxxhr2NfF06LX71ZRa6Kyl5rLNXI8ChPOC
+        13VD6E2FSGHgKJ1DwfILvB9T7tw436VhcGhtmw8/n0jjBq20eT89V/hQflS2VCJQ=
+X-Google-Smtp-Source: ABdhPJwltqINxS2/XMXrxLmWX9yF6gQpclVmbDxaDjAl+YaM/CMRTWEuXw0zyveFYzixo9Vkn5FgkDdOFdD6Tg==
 X-Received: from ricarkol2.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:62fe])
- (user=ricarkol job=sendgmr) by 2002:aa7:83c6:0:b029:3e0:1f64:6f75 with SMTP
- id j6-20020aa783c60000b02903e01f646f75mr5657228pfn.69.1631234961995; Thu, 09
- Sep 2021 17:49:21 -0700 (PDT)
-Date:   Thu,  9 Sep 2021 17:49:17 -0700
-Message-Id: <20210910004919.1610709-1-ricarkol@google.com>
+ (user=ricarkol job=sendgmr) by 2002:a25:7409:: with SMTP id
+ p9mr7587625ybc.462.1631234963645; Thu, 09 Sep 2021 17:49:23 -0700 (PDT)
+Date:   Thu,  9 Sep 2021 17:49:18 -0700
+In-Reply-To: <20210910004919.1610709-1-ricarkol@google.com>
+Message-Id: <20210910004919.1610709-2-ricarkol@google.com>
 Mime-Version: 1.0
+References: <20210910004919.1610709-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.33.0.309.g3052b89438-goog
-Subject: [PATCH v2 0/2] KVM: arm64: vgic-v3: Missing check for redist region
- above the VM IPA size
+Subject: [PATCH v2 1/2] KVM: arm64: vgic: check redist region is not above the
+ VM IPA size
 From:   Ricardo Koller <ricarkol@google.com>
 To:     kvm@vger.kernel.org, maz@kernel.org, kvmarm@lists.cs.columbia.edu,
         drjones@redhat.com, eric.auger@redhat.com, alexandru.elisei@arm.com
@@ -62,29 +65,67 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM doesn't check for redist regions that extend partially above the
-VM-specified IPA (phys_size).  This can happen when using the
-KVM_VGIC_V3_ADDR_TYPE_REDIST or KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION attribute
-to set a new region that extends partially above phys_size (with the base below
-phys_size).  The issue is that vcpus can potentially run into a situation where
-some redistributors are addressable and others are not.
+Verify that the redistributor regions do not extend beyond the
+VM-specified IPA size (phys_size). This can happen when using
+KVM_VGIC_V3_ADDR_TYPE_REDIST or KVM_VGIC_V3_ADDR_TYPE_REDIST_REGIONS
+with:
 
-Patch 1 adds the missing checks, and patch 2 adds a test into aarch64/vgic_init.
+  base + size > phys_size AND base < phys_size
 
-Changes:
-v2: adding a test for KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, and returning E2BIG
-    instead of EINVAL (thanks Alexandru and Eric).
+Add the missing check into vgic_v3_alloc_redist_region() which is called
+when setting the regions, and into vgic_v3_check_base() which is called
+when attempting the first vcpu-run. The vcpu-run check does not apply to
+KVM_VGIC_V3_ADDR_TYPE_REDIST_REGIONS because the regions size is known
+before the first vcpu-run. Finally, this patch also enables some extra
+tests in vgic_v3_alloc_redist_region() by calculating "size" early for
+the legacy redist api.
 
-Ricardo Koller (2):
-  KVM: arm64: vgic: check redist region is not above the VM IPA size
-  KVM: arm64: selftests: tests for vgic redist regions above the VM IPA
-    size
+Signed-off-by: Ricardo Koller <ricarkol@google.com>
+---
+ arch/arm64/kvm/vgic/vgic-mmio-v3.c | 7 ++++++-
+ arch/arm64/kvm/vgic/vgic-v3.c      | 4 ++++
+ 2 files changed, 10 insertions(+), 1 deletion(-)
 
- arch/arm64/kvm/vgic/vgic-mmio-v3.c            |  7 ++-
- arch/arm64/kvm/vgic/vgic-v3.c                 |  4 ++
- .../testing/selftests/kvm/aarch64/vgic_init.c | 52 +++++++++++++++++++
- 3 files changed, 62 insertions(+), 1 deletion(-)
-
+diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+index a09cdc0b953c..055671bede85 100644
+--- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
++++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+@@ -796,7 +796,9 @@ static int vgic_v3_alloc_redist_region(struct kvm *kvm, uint32_t index,
+ 	struct vgic_dist *d = &kvm->arch.vgic;
+ 	struct vgic_redist_region *rdreg;
+ 	struct list_head *rd_regions = &d->rd_regions;
+-	size_t size = count * KVM_VGIC_V3_REDIST_SIZE;
++	int nr_vcpus = atomic_read(&kvm->online_vcpus);
++	size_t size = count ? count * KVM_VGIC_V3_REDIST_SIZE :
++			nr_vcpus * KVM_VGIC_V3_REDIST_SIZE;
+ 	int ret;
+ 
+ 	/* cross the end of memory ? */
+@@ -834,6 +836,9 @@ static int vgic_v3_alloc_redist_region(struct kvm *kvm, uint32_t index,
+ 	if (vgic_v3_rdist_overlap(kvm, base, size))
+ 		return -EINVAL;
+ 
++	if (base + size > kvm_phys_size(kvm))
++		return -E2BIG;
++
+ 	rdreg = kzalloc(sizeof(*rdreg), GFP_KERNEL);
+ 	if (!rdreg)
+ 		return -ENOMEM;
+diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
+index 66004f61cd83..5afd9f6f68f6 100644
+--- a/arch/arm64/kvm/vgic/vgic-v3.c
++++ b/arch/arm64/kvm/vgic/vgic-v3.c
+@@ -512,6 +512,10 @@ bool vgic_v3_check_base(struct kvm *kvm)
+ 		if (rdreg->base + vgic_v3_rd_region_size(kvm, rdreg) <
+ 			rdreg->base)
+ 			return false;
++
++		if (rdreg->base + vgic_v3_rd_region_size(kvm, rdreg) >
++			kvm_phys_size(kvm))
++			return false;
+ 	}
+ 
+ 	if (IS_VGIC_ADDR_UNDEF(d->vgic_dist_base))
 -- 
 2.33.0.309.g3052b89438-goog
 
