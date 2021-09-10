@@ -2,379 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2F596407342
-	for <lists+kvm@lfdr.de>; Sat, 11 Sep 2021 00:14:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 45E19407355
+	for <lists+kvm@lfdr.de>; Sat, 11 Sep 2021 00:26:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232896AbhIJWPo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Sep 2021 18:15:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49550 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234711AbhIJWPn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Sep 2021 18:15:43 -0400
-Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B72AC061574
-        for <kvm@vger.kernel.org>; Fri, 10 Sep 2021 15:14:31 -0700 (PDT)
-Received: by mail-lf1-x130.google.com with SMTP id n2so7023780lfk.0
-        for <kvm@vger.kernel.org>; Fri, 10 Sep 2021 15:14:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=TA6suC0Bve+igd/7LKYeC0ZIyexn7MlL+eU3pyKRHoI=;
-        b=bYZoX19xoaM5s7DcJBrMQFUgxfbCPxVbpJXouHY7eGkfkYHaXSHmOam3/yOxf8Di3z
-         isWJWgBMNObSH87mJFjKHazi7UoX9fB/0wz/RNz18giS9XnnNKKNQlaHYZsFENmSaCiO
-         uv/fRzutb1OapEDZ72m2siua19bXYtagwkyzMzR0a03y7dbcbkfITPExc0wU4M7X9mKl
-         N103bEmYF9XpJZP6W6b1oOP8/+jEVfAy2A0aPtldn9kO3IQnugzv5t8tU+QebUblVAIY
-         N6UGJhk8FsXOAsgAfCpBFrt/YjBYjMgRuYeJeW9sXaiUpVMqlRzrq/VrQuDrrSQZ8dXo
-         a/Jg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=TA6suC0Bve+igd/7LKYeC0ZIyexn7MlL+eU3pyKRHoI=;
-        b=Pp273Ner2Ydu6ij9luiNY/bORNEuDsvwJjdUrzbEVlOkpwbtDnWBCdxh3NbyJkuS7W
-         0xr9X4Rc8y/y8yIn8Fx1cmLZokLyAqoIy+sRnGg0Mv0rHXDmYRUVuW/5biWJ2oE6vBxN
-         dK6qZ0mHdjSl/D4xOnEM54zm7SRGfNeMzdxmzOrkQxBLxP1MNxskZZvcQDrajgeyAml+
-         /EWtvpf7oYfj/53joiZnRoWq6GQ9SWTkt35Mpja1sf7sUHkbe+IsOml62YVsuAiMA5El
-         232sa/X2t2MQClyebXBVAPWRep3rckhIZKZy3YDf/U7zeDwsL5OpxmQY0j/LCetXd04e
-         QV+Q==
-X-Gm-Message-State: AOAM5336kZuA5jIiqJjNpigH/YuIPMSakVKK8zRvAp/X0VZ2RRDCG6Hh
-        rNYXsDP4mMA8POGYdzL2i/gSdMcj5h/5YPKe7z6sXw==
-X-Google-Smtp-Source: ABdhPJxvfovj3ZwasyBWO+STHHSS9r49tm28A55PXd3hIkMnx3ED8JWjaI0m2XZEBdZbk6+gnDMBTnyFeEDmpJBozsw=
-X-Received: by 2002:a19:c313:: with SMTP id t19mr5368510lff.644.1631312069409;
- Fri, 10 Sep 2021 15:14:29 -0700 (PDT)
+        id S230018AbhIJW13 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Sep 2021 18:27:29 -0400
+Received: from mail-bn8nam08on2053.outbound.protection.outlook.com ([40.107.100.53]:11617
+        "EHLO NAM04-BN8-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S229474AbhIJW12 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Sep 2021 18:27:28 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ZLjx8eZezaCKXGaV+09ZVoo4kBoxvcptFwUDCk6xfFN8VmpuCfl24stcV6c8riZ5hR3bR2YYTySVEYl3LZavl9jcsPPZUK9FVxhkWm7gHKYjuTTaZ0fF4IG1DfsZLKkk0lK1hzQRt8gs7IoRFtMIVqfw27oDb47DCVkcv71GvlF/xPi+yA1x5PztbglirhxAVKiT4tbIeu4X4gAlYonjvbY9d9PeSHDWPLUa6Io2L/+CdwLe8DwDQhxAeftjE6CxDHjMygJ4rST1iJr7P0E2NEquTlVGGxvy3tNMjJGVswcGQbrn3HTfrc4Ucr/DcLAYIBgZLoEwEVmLi7zw3Dljfg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
+ bh=npimqYWbevy/eUHfWf3Ti49kTeL2kV6d+BBqrJQJ8cU=;
+ b=cwUIiyhftypH+e0vXlzEMHuFdoiIRzJedO810Xbk+8lqaoGRHwkyq8Zlje3fNqKpgQS8IVYTPiDV/Lml+jjBqirnJeG3WEgzq+18wMpDwNJpLUFjqVKYX+bH61tKylvsu1SPpVlxnIXwAqAo2/kLP4pFw+tLFvlMLwzeyb8MAEIGm3MpymXP7CHnFdTpEWkr/sT83jvAOdHyWRnXpN+L0ITQp7nWHArAoo+DfPQmok4Omkqj5Y9gzBoF0VVQsDw5a8JFKlsJJYLzd0lRYX+gDqzeTLBuwqQkvHMbg4fUylQbzgj6jzvNqdY2HCuPO1LVHZwBBVGPpdgZTL7LBDzLXA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=npimqYWbevy/eUHfWf3Ti49kTeL2kV6d+BBqrJQJ8cU=;
+ b=nNP3AEewukPRg7LkPzD8MMr9v58035pPnTxE2W3wt3oblEVEs9eQ+n1bUn7Zm25lxcLwQBxLVTzu+lAGy3fMN8ZXvuCMxlX8BovX6JU9wf3+LswgsTC7f1Wr9M53h+FV8lCJRahZuB9oJIc1t0FDd0zuw+JhIEazqp6SMhvh/B1JkAZLKauJqGWuZZX5E2aBWod6COLOLTNxhGMl8IKbMOODk3Ps5NLGdD+oNeCYXUFIS4Out9rcuPjYurOCY46UCekixCRbExLn/Kt6XFuwv8lk47kY7Q2BEhqri6PsiYGh+D6F4If59kV2VOjMfcEt7nZ2+Go2Sp3vkdcbbw+WXA==
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=nvidia.com;
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
+ by BL1PR12MB5191.namprd12.prod.outlook.com (2603:10b6:208:318::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4500.16; Fri, 10 Sep
+ 2021 22:26:16 +0000
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::e8af:232:915e:2f95]) by BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::e8af:232:915e:2f95%8]) with mapi id 15.20.4500.014; Fri, 10 Sep 2021
+ 22:26:16 +0000
+Date:   Fri, 10 Sep 2021 19:26:14 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        linux-s390@vger.kernel.org, Halil Pasic <pasic@linux.ibm.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Christoph Hellwig <hch@lst.de>, kvm@vger.kernel.org
+Subject: Re: [PATCH] vfio/ap_ops: Add missed vfio_uninit_group_dev()
+Message-ID: <20210910222614.GV2505917@nvidia.com>
+References: <0-v1-3a05c6000668+2ce62-ap_uninit_jgg@nvidia.com>
+ <20210910142531.2e18e73a.alex.williamson@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210910142531.2e18e73a.alex.williamson@redhat.com>
+X-ClientProxiedBy: MN2PR22CA0009.namprd22.prod.outlook.com
+ (2603:10b6:208:238::14) To BL0PR12MB5506.namprd12.prod.outlook.com
+ (2603:10b6:208:1cb::22)
 MIME-Version: 1.0
-References: <20210902181751.252227-1-pgonda@google.com> <20210902181751.252227-4-pgonda@google.com>
- <YTuS3iHN7GgK4oQr@google.com>
-In-Reply-To: <YTuS3iHN7GgK4oQr@google.com>
-From:   Peter Gonda <pgonda@google.com>
-Date:   Fri, 10 Sep 2021 16:14:17 -0600
-Message-ID: <CAMkAt6rDYdKOQniszX=zq6F92TDCfKQC+0PGFabAXtYWgCmC1A@mail.gmail.com>
-Subject: Re: [PATCH 3/3 V7] selftest: KVM: Add intra host migration tests
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm list <kvm@vger.kernel.org>, Marc Orr <marcorr@google.com>,
-        David Rientjes <rientjes@google.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Received: from mlx.ziepe.ca (142.162.113.129) by MN2PR22CA0009.namprd22.prod.outlook.com (2603:10b6:208:238::14) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4500.14 via Frontend Transport; Fri, 10 Sep 2021 22:26:15 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1mOoyM-00FgFE-IP; Fri, 10 Sep 2021 19:26:14 -0300
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 4c44059a-5e72-4e4a-47bb-08d974aa00e1
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5191:
+X-Microsoft-Antispam-PRVS: <BL1PR12MB5191C00C2DEE07A032F471DEC2D69@BL1PR12MB5191.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:178;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: bup3HnYnhez/UnL9SRRwlmxxtwkjWxebN8Mi7kjGxVCN+Glsc4h2rNnErXdrg5XKhjb1ifDg7o4EsEbozjeSdheqFrpQaRoJjQFNjfC79GOYiiFhRwiYfKSTlQ4XdMvvRUMJneZbF9R2AS+2zDGSp9VO1LZkPU8K29Pqv8LZq7eqWQ+PuAs45F93VHLZHaxpFKyzPgbaq8b3OBmzcbMbFjElbtrIJ+kXDh9crO/4gcthnwEbKpk/SrEnuFtwf2MbTDS+ob19sD81udXWm2D7iGJhgby5LHef3pYz3Ta3RICCezJJvaT738nR1gny2caGNVWikwmsVH02o7OkfKK2pZCEzbjG24qlUFkvA87qFgPXX4OSj8oyBOMgiTT+1IYMNx/Rhbnqrc1THWliQDos1CtD5VpXo3nFrHBpZB+XnvyzROnWanZVIl1OPJpRexEBgWCOHjiw+Kp/KmC+EV+ESk3SafmXRqDKvZlRvIsdUv4NGB9V2cVcNayfOtk7aGTkUrBauKPBYArZsFe7dr6sNcN3kA4ldOoLlo5hcg/8TST6rXCNK6Gvf6vR7RY5wYCQ/wc//zJIjspXCIRNydVULEqapSzBQ32HkX1vOmWOni1WKKpLKqEt0dE9RmJ5VHHiCgPM3PbuN6ao7/labn7/yQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(376002)(396003)(136003)(366004)(346002)(83380400001)(2616005)(66946007)(38100700002)(26005)(54906003)(1076003)(33656002)(4326008)(36756003)(478600001)(9786002)(9746002)(7416002)(8936002)(2906002)(8676002)(6916009)(316002)(66476007)(66556008)(5660300002)(186003)(86362001)(426003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Ox/e+NZSGahMtKCbSLYpdj4lXduXYTVSACipY/19RvM94C3ZQUEg06la47/G?=
+ =?us-ascii?Q?mg9w7o/GXTq4C1eb1huhTj/rfrcZYiyiTToezQBqr/jqv9px71Fx0li0P1iH?=
+ =?us-ascii?Q?YYNx5dDWdCbzT8zepSAn+IIEcwVPaoPO+srQcFYw8wU+qTHdQHRwwDm+hFn5?=
+ =?us-ascii?Q?7JyoojRYldwDJ7eln/3ST1eTq8ID4aPa3cMrX9O87EurBIYZ2hB2SgXrBAuu?=
+ =?us-ascii?Q?rCTo/timccuaXUw8SpncofcAygSOC2zW+9S1dQYfEO3JilAx5VVIDkj+DEYV?=
+ =?us-ascii?Q?bPAMJmDAY8QlaXwL0OtmcKZR3/S+eA4ibqN8gb1uCjzzbIHJh5UTjiNO4nJg?=
+ =?us-ascii?Q?cAnRotMsOZramD9Z73WBShD+jSYDxKQTscVNBnIUTvb1h9pIBKPbWsUWsgBp?=
+ =?us-ascii?Q?5KvHoY1niN0E71Vvh95MdaPJBqsWHVTtc0Lcg0L+3RENt45NfErWiIgyqcvJ?=
+ =?us-ascii?Q?F5AQlC7fAWNz2JDvyVJJjv2Kt2GgP7ilrqWmzCU/CRQV3eYVJNnBBqa1w4O0?=
+ =?us-ascii?Q?pILX9ixGtpN7V0fQSqg35dfx3rk1C1xILQMZa8AMFb+az38AGDSbp7VwAFBW?=
+ =?us-ascii?Q?2HWC5OTG14aBSuVUuYQPfmG+XNGFqHJgyP30IE6WQgJekDQBgt+HyPhMcNru?=
+ =?us-ascii?Q?pU5EnmfSTjPsXfljUv3XJMtTk66EEHEpQk7B7ERpXN1KBh9Th2qrYCPG3Ss3?=
+ =?us-ascii?Q?4WyLEvZSjkB9Lzwnyd3oNsnmZlh2ETpRCb00z1zPeFKQtgWD/EJia5cfGxk8?=
+ =?us-ascii?Q?TBR3/AhOdrtsy4P68TX6/rmVP8MfkDXkhnt3u1x83AQsxDAIoJubEAHYmBOm?=
+ =?us-ascii?Q?GzqoFo+QXqVeSFrvuw+zzYbYA86fVMunkQ3wNgEi100zr41jes5+GHeiIQOz?=
+ =?us-ascii?Q?zkXyNnCYWAnU3cvOziMZ3yQXrW5uKO5AanEB92cUkI2UWKd19y2x4v1wl8Xe?=
+ =?us-ascii?Q?0NIbMRgu5X31EpQYP8GKZy9EhQHwnHqi3tYfbAfm4Vf7+qcj13OxvIZ7HuuE?=
+ =?us-ascii?Q?ExAFzt5zX/6XLIESp5O2qTDyRKvYcLgySkdzhcKvGAqfw5VP4VDU21SIwdvQ?=
+ =?us-ascii?Q?DbvvCnGvIppV0Pw912wq5qX4wdl/OCCJspeA3GpbdxS4Ii8empfWqoOWKJVG?=
+ =?us-ascii?Q?ceLCr1iE1QrbA5es1dfH5Cyp25QKbiLpKCokKT8fObxwlwEsyaebVpcICEr4?=
+ =?us-ascii?Q?Mt0CEkNaK49VFdPB/lCqkbgYcgUm+VlvIlKnzUMfyLvVvHdSyjXae0bLVq7x?=
+ =?us-ascii?Q?9h+6IeeWWYqu622R6RTfVInY84fCi6D+9UcGbBUGAwYMjkXfOnS7pY0r4twt?=
+ =?us-ascii?Q?pTsnPjW3LHGHst2t19WaJHw/?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4c44059a-5e72-4e4a-47bb-08d974aa00e1
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Sep 2021 22:26:15.9802
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: c9DxdtHw1ymNcrNv2/gI6Qu7V1KLtlNZHLo5qX2STE5NGCf3vKGEf971R57BZx2Q
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5191
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 10, 2021 at 11:16 AM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Thu, Sep 02, 2021, Peter Gonda wrote:
-> > +/*
-> > + * Open SEV_DEV_PATH if available, otherwise exit the entire program.
-> > + *
-> > + * Input Args:
-> > + *   flags - The flags to pass when opening SEV_DEV_PATH.
-> > + *
-> > + * Return:
-> > + *   The opened file descriptor of /dev/sev.
-> > + */
-> > +static int open_sev_dev_path_or_exit(int flags)
-> > +{
-> > +     static int fd;
-> > +
-> > +     if (fd != 0)
-> > +             return fd;
->
-> Caching the file here is unnecessary, it's used in exactly one function.
->
-> > +     fd = open(SEV_DEV_PATH, flags);
-> > +     if (fd < 0) {
-> > +             print_skip("%s not available, is SEV not enabled? (errno: %d)",
-> > +                        SEV_DEV_PATH, errno);
-> > +             exit(KSFT_SKIP);
-> > +     }
-> > +
-> > +     return fd;
-> > +}
->
-> Rather than copy-paste _open_kvm_dev_path_or_exit(), it's probably worth factoring
-> out a helper in a separate patch, e.g.
+On Fri, Sep 10, 2021 at 02:25:31PM -0600, Alex Williamson wrote:
+> On Thu,  9 Sep 2021 14:24:00 -0300
+> Jason Gunthorpe <jgg@nvidia.com> wrote:
+> 
+> > Without this call an xarray entry is leaked when the vfio_ap device is
+> > unprobed. It was missed when the below patch was rebased across the
+> > dev_set patch.
+> > 
+> > Fixes: eb0feefd4c02 ("vfio/ap_ops: Convert to use vfio_register_group_dev()")
+> > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> >  drivers/s390/crypto/vfio_ap_ops.c | 2 ++
+> >  1 file changed, 2 insertions(+)
+> > 
+> > diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
+> > index 2347808fa3e427..54bb0c22e8020e 100644
+> > +++ b/drivers/s390/crypto/vfio_ap_ops.c
+> > @@ -360,6 +360,7 @@ static int vfio_ap_mdev_probe(struct mdev_device *mdev)
+> >  	mutex_lock(&matrix_dev->lock);
+> >  	list_del(&matrix_mdev->node);
+> >  	mutex_unlock(&matrix_dev->lock);
+> > +	vfio_uninit_group_dev(&matrix_mdev->vdev);
+> >  	kfree(matrix_mdev);
+> >  err_dec_available:
+> >  	atomic_inc(&matrix_dev->available_instances);
+> > @@ -375,8 +376,8 @@ static void vfio_ap_mdev_remove(struct mdev_device *mdev)
+> 
+> 
+> Not sure if you're editing patches by hand, but your line counts above
+> don't match the chunk below, should be ,6..,7 as the previous chunk.
 
-So the suggestion would be to move open_sev_dev_path_or_exit into
-tools/testing/selftests/kvm/include/x86_64/svm_util.h
+No, never... 
 
-If so, wouldn't it make sense to keep the caching of the FD?
+It took awhile to figure out but it turns out emacs did it?!
 
->
-> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> index 10a8ed691c66..06a6c04010fb 100644
-> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> @@ -31,6 +31,19 @@ static void *align(void *x, size_t size)
->         return (void *) (((size_t) x + mask) & ~mask);
->  }
->
-> +int open_path_or_exit(const char *path, int flags)
-> +{
-> +       int fd;
-> +
-> +       fd = open(path, flags);
-> +       if (fd < 0) {
-> +               print_skip("%s not available (errno: %d)", path, errno);
-> +               exit(KSFT_SKIP);
-> +       }
-> +
-> +       return fd;
-> +}
-> +
->  /*
->   * Open KVM_DEV_PATH if available, otherwise exit the entire program.
->   *
-> @@ -42,16 +55,7 @@ static void *align(void *x, size_t size)
->   */
->  static int _open_kvm_dev_path_or_exit(int flags)
->  {
-> -       int fd;
-> -
-> -       fd = open(KVM_DEV_PATH, flags);
-> -       if (fd < 0) {
-> -               print_skip("%s not available, is KVM loaded? (errno: %d)",
-> -                          KVM_DEV_PATH, errno);
-> -               exit(KSFT_SKIP);
-> -       }
-> -
-> -       return fd;
-> +       return open_path_or_exit(KVM_DEV_PATH, flags);
->  }
->
->  int open_kvm_dev_path_or_exit(void)
->
->
-> > +
-> > +static void sev_ioctl(int vm_fd, int cmd_id, void *data)
-> > +{
-> > +     struct kvm_sev_cmd cmd = {
-> > +             .id = cmd_id,
-> > +             .data = (uint64_t)data,
-> > +             .sev_fd = open_sev_dev_path_or_exit(0),
-> > +     };
-> > +     int ret;
-> > +
-> > +     TEST_ASSERT(cmd_id < KVM_SEV_NR_MAX && cmd_id >= 0,
-> > +                 "Unknown SEV CMD : %d\n", cmd_id);
->
-> LOL, I like sanity checks, but asserting that the test itself isn't horrendously
-> broken is a bit much.  And someone manages to screw up that badly, the ioctl()
-> below will fail.
+I've been trying out the 'base-commit' trailer feature and removed it
+by hand from this patch before sending because it was just some bogus
+local merge. When I did this emacs diff mode wrongly thought the diff
+was being edited and corrupted the @@ line.
 
-Ack. I'll remove this.
+Wow, I had no idea it could edit patches :\
 
->
-> > +     ret = ioctl(vm_fd, KVM_MEMORY_ENCRYPT_OP, &cmd);
-> > +     TEST_ASSERT((ret == 0 || cmd.error == SEV_RET_SUCCESS),
-> > +                 "%d failed: return code: %d, errno: %d, fw error: %d",
-> > +                 cmd_id, ret, errno, cmd.error);
-> > +}
-> > +
-> > +static struct kvm_vm *sev_vm_create(bool es)
-> > +{
-> > +     struct kvm_vm *vm;
-> > +     struct kvm_sev_launch_start start = { 0 };
-> > +     int i;
->
-> Rather than cache /dev/sev in a helper, you can do:
->
->         int sev_fd = open_path_or_exit(SEV_DEV_PATH, 0);
->
->         sev_ioctl(vm, sev_fd, ...);
->
-> > +     vm = vm_create(VM_MODE_DEFAULT, 0, O_RDWR);
-> > +     sev_ioctl(vm->fd, es ? KVM_SEV_ES_INIT : KVM_SEV_INIT, NULL);
-> > +     for (i = 0; i < MIGRATE_TEST_NUM_VCPUS; ++i)
-> > +             vm_vcpu_add(vm, i);
-> > +     start.policy |= (es) << 2;
->
-> I had to go spelunking to confirm this is the "ES" policy, please do:
->
->         if (es)
->                 start.policy |= SEV_POLICY_ES;
->
-> > +     sev_ioctl(vm->fd, KVM_SEV_LAUNCH_START, &start);
-> > +     if (es)
-> > +             sev_ioctl(vm->fd, KVM_SEV_LAUNCH_UPDATE_VMSA, NULL);
->
->
-> And with sev_fd scoped to this function:
->
->         close(sev_fd);
->
-> which I think is legal?
->
-> > +     return vm;
-> > +}
-> > +
-> > +static void test_sev_migrate_from(bool es)
-> > +{
-> > +     struct kvm_vm *vms[MIGRATE_TEST_VMS];
->
-> Prefix this and LOCK_TESTING_THREAD with NR_ so that it's clear these are arbitrary
-> numbers of things.  And I guess s/MIGRATE_TEST_NUM_VCPUS/NR_MIGRATE_TEST_VCPUS to
-> be consistent.
->
-> > +     struct kvm_enable_cap cap = {
-> > +             .cap = KVM_CAP_VM_MIGRATE_ENC_CONTEXT_FROM
-> > +     };
-> > +     int i;
-> > +
-> > +     for (i = 0; i < MIGRATE_TEST_VMS; ++i) {
-> > +             vms[i] = sev_vm_create(es);
->
-> It doesn't really matter, but closing these fds tests that KVM doesn't explode
-> when VMs are destroyed without the process exiting.
->
-
-Can do, I spot checked a couple other tests and didn't see any close
-calls so didn't clutter the test here.
-
-> > +             if (i > 0) {
-> > +                     cap.args[0] = vms[i - 1]->fd;
-> > +                     vm_enable_cap(vms[i], &cap);
-> > +             }
-> > +     }
->
-> For giggles, we can also test migrating back (with some feedback from below
-> mixed in):
->
->         /* Initial migration from the src to the first dst. */
->         sev_migrate_from(dst_vms[0]->fd, src_vm->fd);
->
->         for (i = 1; i < NR_MIGRATE_TEST_VMS; i++)
->                 sev_migrate_from(vms[i]->fd, vms[i - 1]->fd);
->
->         /* Migrate the guest back to the original VM. */
->         sev_migrate_from(src_vm->fd, dst_vms[NR_MIGRATE_TEST_VMS - 1]->fd);
->
-> > +}
-> > +
-> > +struct locking_thread_input {
-> > +     struct kvm_vm *vm;
-> > +     int source_fds[LOCK_TESTING_THREADS];
-> > +};
-> > +
-> > +static void *locking_test_thread(void *arg)
-> > +{
-> > +     /*
-> > +      * This test case runs a number of threads all trying to use the intra
-> > +      * host migration ioctls. This tries to detect if a deadlock exists.
-> > +      */
-> > +     struct kvm_enable_cap cap = {
-> > +             .cap = KVM_CAP_VM_MIGRATE_ENC_CONTEXT_FROM
-> > +     };
-> > +     int i, j;
-> > +     struct locking_thread_input *input = (struct locking_test_thread *)arg;
-> > +
-> > +     for (i = 0; i < LOCK_TESTING_ITERATIONS; ++i) {
-> > +             j = input->source_fds[i % LOCK_TESTING_THREADS];
-> > +             cap.args[0] = input->source_fds[j];
->
-> This looks wrong, it's indexing source_fds with a value from source_fds.  Did
-> you intend?
->
->                 j = i % LOCK_TESTING_THREADS;
->                 cap.args[0] = input->source_fds[j];
->
-
-Yup that's wrong I'll update.
-
-> > +             /*
-> > +              * Call IOCTL directly without checking return code or
-> > +              * asserting. We are * simply trying to confirm there is no
-> > +              * deadlock from userspace * not check correctness of
-> > +              * migration here.
-> > +              */
-> > +             ioctl(input->vm->fd, KVM_ENABLE_CAP, &cap);
->
-> For readability and future extensibility, I'd say create a single helper and use
-> it even in the happy case, e.g.
->
-> static int __sev_migrate_from(int dst_fd, int src_fd)
-> {
->         struct kvm_enable_cap cap = {
->                 .cap = KVM_CAP_VM_MIGRATE_ENC_CONTEXT_FROM,
->                 .args = { src_fd } // No idea if this is correct syntax
->         };
->
->         return ioctl(dst_fd, KVM_ENABLE_CAP, &cap);
-> }
->
->
-> static void sev_migrate_from(...)
-> {
->         ret = __sev_migrate_from(...);
->         TEST_ASSERT(!ret, "Migration failed, blah blah blah");
-> }
->
-> > +     }
-> > +}
-> > +
-> > +static void test_sev_migrate_locking(void)
-> > +{
-> > +     struct locking_thread_input input[LOCK_TESTING_THREADS];
-> > +     pthread_t pt[LOCK_TESTING_THREADS];
-> > +     int i;
-> > +
-> > +     for (i = 0; i < LOCK_TESTING_THREADS; ++i) {
->
-> With a bit of refactoring, the same VMs from the happy case can be reused for
-> the locking test, and we can also get concurrent SEV+SEV-ES migration (see below).
->
-> > +             input[i].vm = sev_vm_create(/* es= */ false);
-> > +             input[0].source_fds[i] = input[i].vm->fd;
-> > +     }
-> > +     for (i = 1; i < LOCK_TESTING_THREADS; ++i)
-> > +             memcpy(input[i].source_fds, input[0].source_fds,
-> > +                    sizeof(input[i].source_fds));
-> > +
-> > +     for (i = 0; i < LOCK_TESTING_THREADS; ++i)
-> > +             pthread_create(&pt[i], NULL, locking_test_thread, &input[i]);
-> > +
-> > +     for (i = 0; i < LOCK_TESTING_THREADS; ++i)
-> > +             pthread_join(pt[i], NULL);
-> > +}
-> > +
-> > +int main(int argc, char *argv[])
-> > +{
-> > +     test_sev_migrate_from(/* es= */ false);
-> > +     test_sev_migrate_from(/* es= */ true);
-> > +     test_sev_migrate_locking();
->
->
-> With a little refactoring, this can add other tests, e.g. illegal dst.  Assuming
-> KVM requires the dst to be !SEV, SEV and SEV-ES can use the same set of destination
-> VMs.  And the locking test can take 'em all.  E.g. something like:
->
->         struct kvm_vm *sev_vm, *sev_es_vm;
->
->         sev_vm = sev_vm_create(false);
->         sev_es_vm = sev_vm_create(true);
->
->         for (i = 0; i < NR_MIGRATE_TEST_VMS; i++)
->                 dst_vms[i] = sev_dst_vm_create();
->
->         test_sev_migrate_from(sev_vms, dst_vms);
->         test_sev_migrate_from(sev_es_vms, dst_vms);
->
->         ret = __sev_migrate_from(sev_es_vms[0], sev_vms[0]);
->         TEST_ASSERT(ret == -EINVAL, ...);
->
->         ret = __sev_migrate_from(sev_vms[0], sev_es_vms[0]);
->         TEST_ASSERT(ret == -EINVAL, ...);
->
->         ret = __sev_migrate_from(dst_vms[0], dst_vms[1]);
->         TEST_ASSERT(ret == -EINVAL, ....);
->
->         test_sev_migrate_locking(sev_vm, sev_es_vm, dst_vms);
->
-
-Ack. I'll add these parameter validation tests.
-
-> > +     return 0;
-> > +}
-> > --
-> > 2.33.0.153.gba50c8fa24-goog
-> >
+Jason
