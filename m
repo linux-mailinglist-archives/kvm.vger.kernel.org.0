@@ -2,119 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 41CB1407278
-	for <lists+kvm@lfdr.de>; Fri, 10 Sep 2021 22:25:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CD8014072E6
+	for <lists+kvm@lfdr.de>; Fri, 10 Sep 2021 23:25:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233384AbhIJU0r (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Sep 2021 16:26:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:46451 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233397AbhIJU0q (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 10 Sep 2021 16:26:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1631305535;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=43k0//Ex2cYDlTEbrRHwYvccCOHqUEbEWZ9s5rg8S24=;
-        b=SdjHtmrpIreBKu4aaZgJcCZSd1ynNGJ8vRVqadDJfMxHtzxM6BC57uVBkftfqvAT4rUIAp
-        yj2So4+bj2Z+4aW+TFQ7aSGaGrW/DZlFRMYmFkTP10AzNHUlRTt44srRaxQ9JXluw6iwu1
-        r8Q9qONu5FijySKfjyXInaQjjekEPc0=
-Received: from mail-oi1-f198.google.com (mail-oi1-f198.google.com
- [209.85.167.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-492-rCNsDR91O3mGqMKqaNgPbw-1; Fri, 10 Sep 2021 16:25:33 -0400
-X-MC-Unique: rCNsDR91O3mGqMKqaNgPbw-1
-Received: by mail-oi1-f198.google.com with SMTP id 20-20020aca2814000000b002690d9b60aaso2405282oix.0
-        for <kvm@vger.kernel.org>; Fri, 10 Sep 2021 13:25:33 -0700 (PDT)
+        id S234558AbhIJV0T (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Sep 2021 17:26:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38564 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234306AbhIJV0S (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Sep 2021 17:26:18 -0400
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 667C6C061574
+        for <kvm@vger.kernel.org>; Fri, 10 Sep 2021 14:25:06 -0700 (PDT)
+Received: by mail-pl1-x631.google.com with SMTP id e7so1966629plh.8
+        for <kvm@vger.kernel.org>; Fri, 10 Sep 2021 14:25:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=hNXoetdf0vSmo87Dxq7RWSc3TBCJiQr558RgCaM5xeo=;
+        b=OhiiW7eOOxRvvFYs4RGNSH5g7H82RSOE5Y8VKniFEOTJoT4q33rcxrcsM3AIyZ5FLQ
+         5tIeySGF5xaFy00wd6Dz9IBj+VgJqzVOuTZCxbizFwXCOgR4B0+XPvnUCZ4GOgY2B50q
+         7gsWWujJLSs3mPJKasIFqyQGeIihUGTR8WKVaGT7ckKLpxE0csiWOkgEMqfVl/88SXbX
+         i9ado6TIoRVNgQ36HVArzD4Nod+6jFXHyiarKA32em5j1lBZ+438d0C7of9CWJAiqNXB
+         vzEbs6F3qMUpvgU6tz4kt1iCZ3X6lvRRAsU/O6NUGlPUxWmRU7CYrK0Zy1tvKWaWSgyp
+         X/HQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=43k0//Ex2cYDlTEbrRHwYvccCOHqUEbEWZ9s5rg8S24=;
-        b=cOxGiVi5Mn9c6LL6FK90K+Nonod59vfLLw60WEyraIDgT4OMgYR2OFmcj8xC2FrFP+
-         ypY1PhxwlBsbVcTo7M8mQ3eYV9u5P0tV33qrMmKRXgJstmdONEMWLsJvB8AZlER5JHYM
-         TwGA3oYQj6z14Hkb5JUWffTLGy/6ryMOFgXhNY59VPaJFkkGuE0bujfiwe7uW7UkY/Xi
-         GPOYjVdvfdIgF7RHpkhEIYqY8xS95weYk3MkqArkoG06r2gdX4pT/ZkypoO9V+SePbmU
-         Zz0PoADC+OvPj0DsexL3Brl20rFhCALy4u4gEwdyJPNI7W82yQNwuublVZ2HM80v7YpC
-         HFdA==
-X-Gm-Message-State: AOAM532Ygxeww70dNCgc7jzkSy7Lqh1SrohobgJGSKSOuXoHpWw/DsBd
-        M87A/CigW84AFBnrdo9hOKInGYtg4ZA+XbJaLPxY2WWCO0a8wTgN3Xcm9Ca8LVtALATG9ifF4m3
-        Ihe2VewCB+VHq
-X-Received: by 2002:a05:6830:18c7:: with SMTP id v7mr6324382ote.126.1631305533204;
-        Fri, 10 Sep 2021 13:25:33 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwYrFnBjgHbgw4oFL2xGmKazRhOApYuH6K1Sj3HlCQm6wWY57BvwLdhxibj8FSVdeN7/KJt5g==
-X-Received: by 2002:a05:6830:18c7:: with SMTP id v7mr6324353ote.126.1631305532962;
-        Fri, 10 Sep 2021 13:25:32 -0700 (PDT)
-Received: from redhat.com ([198.99.80.109])
-        by smtp.gmail.com with ESMTPSA id 33sm1446635otx.19.2021.09.10.13.25.32
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=hNXoetdf0vSmo87Dxq7RWSc3TBCJiQr558RgCaM5xeo=;
+        b=Dz5MGYqFsOTYTR5JExaT1srnEeXtBnPLPgZQw/P0RYR3YpMZIqGP7Hs9fP2cBk2ZGk
+         PVFp1xccYZuG98Y98nSqe8xqSN5gDMj2c/Zmfd1vrmAuhVjfllP3pJYH+5KizjUa403h
+         ykle/mrCYrsPPDwGq/aRaDtO9H8cMD5ruw8mwHZvQo2VBhF7iXTsp6pNpX3JInSOWhJ7
+         VZsk6ExEQsavB+OH75NNQzZKphQT7SbbsFChybY9jXMJ3frAAWOOqu2auFS8ssKhZcO5
+         PEpcsSE5BeiosXUYnqXmwXQEtMS4s0bKfLCa+SB9kK1K0uLnD89JUOoloo5LYEFwC4Uo
+         CO+Q==
+X-Gm-Message-State: AOAM530+af0oN2obKF8HIAZorYLFtJ7uapwxL10eW5OJdZ//2ftFZ3cf
+        gl5ioY5NYy7Di1Jn8JR7DUI0/1I65+rVpA==
+X-Google-Smtp-Source: ABdhPJzoWSETaKcosebsuIAvqdf7dSkGLP1mSVHX+fy+vPVXXTmCMngfOSJtCsMHJOq7JdoJgLzr9A==
+X-Received: by 2002:a17:902:c944:b0:138:7cd2:dd with SMTP id i4-20020a170902c94400b001387cd200ddmr9403386pla.72.1631309105666;
+        Fri, 10 Sep 2021 14:25:05 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id x22sm5721767pfm.102.2021.09.10.14.25.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Sep 2021 13:25:32 -0700 (PDT)
-Date:   Fri, 10 Sep 2021 14:25:31 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        linux-s390@vger.kernel.org, Halil Pasic <pasic@linux.ibm.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Christoph Hellwig <hch@lst.de>, kvm@vger.kernel.org
-Subject: Re: [PATCH] vfio/ap_ops: Add missed vfio_uninit_group_dev()
-Message-ID: <20210910142531.2e18e73a.alex.williamson@redhat.com>
-In-Reply-To: <0-v1-3a05c6000668+2ce62-ap_uninit_jgg@nvidia.com>
-References: <0-v1-3a05c6000668+2ce62-ap_uninit_jgg@nvidia.com>
-Organization: Red Hat
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        Fri, 10 Sep 2021 14:25:05 -0700 (PDT)
+Date:   Fri, 10 Sep 2021 21:25:01 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Zeng Guang <guang.zeng@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Kim Phillips <kim.phillips@amd.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Jethro Beekman <jethro@fortanix.com>,
+        Kai Huang <kai.huang@intel.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, Robert Hu <robert.hu@intel.com>,
+        Gao Chao <chao.gao@intel.com>,
+        Robert Hoo <robert.hu@linux.intel.com>
+Subject: Re: [PATCH v4 1/6] x86/feat_ctl: Add new VMX feature, Tertiary
+ VM-Execution control
+Message-ID: <YTvNLd0PwX+PijH7@google.com>
+References: <20210809032925.3548-1-guang.zeng@intel.com>
+ <20210809032925.3548-2-guang.zeng@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210809032925.3548-2-guang.zeng@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu,  9 Sep 2021 14:24:00 -0300
-Jason Gunthorpe <jgg@nvidia.com> wrote:
+x86/cpu: is probaby more appropriate, this touches more than just feat_ctl.
 
-> Without this call an xarray entry is leaked when the vfio_ap device is
-> unprobed. It was missed when the below patch was rebased across the
-> dev_set patch.
+On Mon, Aug 09, 2021, Zeng Guang wrote:
+> From: Robert Hoo <robert.hu@linux.intel.com>
 > 
-> Fixes: eb0feefd4c02 ("vfio/ap_ops: Convert to use vfio_register_group_dev()")
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> New VMX capability MSR IA32_VMX_PROCBASED_CTLS3 conresponse to this new
+> VM-Execution control field. And it is 64bit allow-1 semantics, not like
+> previous capability MSRs 32bit allow-0 and 32bit allow-1. So with Tertiary
+> VM-Execution control field introduced, 2 vmx_feature leaves are introduced,
+> TERTIARY_CTLS_LOW and TERTIARY_CTLS_HIGH.
+> 
+> Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
+> Signed-off-by: Zeng Guang <guang.zeng@intel.com>
 > ---
->  drivers/s390/crypto/vfio_ap_ops.c | 2 ++
->  1 file changed, 2 insertions(+)
+
+Nits aside,
+
+Reviewed-by: Sean Christopherson <seanjc@google.com>
+
+> @@ -22,7 +24,7 @@ enum vmx_feature_leafs {
+>  
+>  static void init_vmx_capabilities(struct cpuinfo_x86 *c)
+>  {
+> -	u32 supported, funcs, ept, vpid, ign;
+> +	u32 supported, funcs, ept, vpid, ign, low, high;
+>  
+>  	BUILD_BUG_ON(NVMXINTS != NR_VMX_FEATURE_WORDS);
+>  
+> @@ -42,6 +44,13 @@ static void init_vmx_capabilities(struct cpuinfo_x86 *c)
+>  	rdmsr_safe(MSR_IA32_VMX_PROCBASED_CTLS2, &ign, &supported);
+>  	c->vmx_capability[SECONDARY_CTLS] = supported;
+>  
+> +	/*
+> +	 * For tertiary execution controls MSR, it's actually a 64bit allowed-1.
+> +	 */
+
+Maybe something like this to better fit on one line?
+
+	/* All 64 bits of tertiary controls MSR are allowed-1 settings. */
+
+> +	rdmsr_safe(MSR_IA32_VMX_PROCBASED_CTLS3, &low, &high);
+> +	c->vmx_capability[TERTIARY_CTLS_LOW] = low;
+> +	c->vmx_capability[TERTIARY_CTLS_HIGH] = high;
+> +
+>  	rdmsr(MSR_IA32_VMX_PINBASED_CTLS, ign, supported);
+>  	rdmsr_safe(MSR_IA32_VMX_VMFUNC, &ign, &funcs);
+>  
+> -- 
+> 2.25.1
 > 
-> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
-> index 2347808fa3e427..54bb0c22e8020e 100644
-> --- a/drivers/s390/crypto/vfio_ap_ops.c
-> +++ b/drivers/s390/crypto/vfio_ap_ops.c
-> @@ -360,6 +360,7 @@ static int vfio_ap_mdev_probe(struct mdev_device *mdev)
->  	mutex_lock(&matrix_dev->lock);
->  	list_del(&matrix_mdev->node);
->  	mutex_unlock(&matrix_dev->lock);
-> +	vfio_uninit_group_dev(&matrix_mdev->vdev);
->  	kfree(matrix_mdev);
->  err_dec_available:
->  	atomic_inc(&matrix_dev->available_instances);
-> @@ -375,8 +376,8 @@ static void vfio_ap_mdev_remove(struct mdev_device *mdev)
-
-
-Not sure if you're editing patches by hand, but your line counts above
-don't match the chunk below, should be ,6..,7 as the previous chunk.
-It's malformed as is.  Thanks,
-
-Alex
-
->  	mutex_lock(&matrix_dev->lock);
->  	vfio_ap_mdev_reset_queues(matrix_mdev);
->  	list_del(&matrix_mdev->node);
-> +	vfio_uninit_group_dev(&matrix_mdev->vdev);
->  	kfree(matrix_mdev);
->  	atomic_inc(&matrix_dev->available_instances);
->  	mutex_unlock(&matrix_dev->lock);
-> 
-
