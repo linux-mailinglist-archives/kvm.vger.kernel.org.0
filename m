@@ -2,39 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 137964062F4
-	for <lists+kvm@lfdr.de>; Fri, 10 Sep 2021 02:45:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2603A4062F9
+	for <lists+kvm@lfdr.de>; Fri, 10 Sep 2021 02:45:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242250AbhIJAqh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Sep 2021 20:46:37 -0400
-Received: from mail.kernel.org ([198.145.29.99]:44042 "EHLO mail.kernel.org"
+        id S230502AbhIJAqn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Sep 2021 20:46:43 -0400
+Received: from mail.kernel.org ([198.145.29.99]:46906 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232374AbhIJASz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Sep 2021 20:18:55 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id C44CA6120F;
-        Fri, 10 Sep 2021 00:17:27 +0000 (UTC)
+        id S230495AbhIJAUw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Sep 2021 20:20:52 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 26765610A3;
+        Fri, 10 Sep 2021 00:19:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1631233048;
-        bh=S0fKkRoX8OM+lseDySOUOxA9WY08+Gq3ZQnlBa7LJTk=;
+        s=k20201202; t=1631233182;
+        bh=3EJEYSbrALYB7LpHafXO2ujVXrI1FWjSHMvrjjUfelw=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=DqPEZPYZoOmKw+Val1MlwV/VKAGw2r/YgUIcJ+lVoILuNBOwsPVI/dp9CRuOHf91B
-         D0g85j/rlJ+/Wl5D1c8fQnRIEiyVbRUvGW2K4XZ7yujtdwVno2yef+Q6iH3Agy/RdH
-         oa98XUsSCpxmoHdgMnkzurxyaxMh2WKvySbIDgrURpuXR/gsw4rPCE7c9aizsWMVNO
-         bvCkMPv49yK335MXgTzyREJHnKBk0FFHK5rm4HiCqDp4Wgqk15dAsWzOr+U+mXIkHz
-         KSFuKA7shVo/XM16tJ1cBtb8RJGmpkMT5PBlgX6vxwDu/T4EAPiGsOMcgxq1sDECMc
-         4jh0jgxhjANoQ==
+        b=q52Paj8SEB3NhmWA/rfmwC2LVuleH7Poc03lc44itmOzBEV/eHrobm9NSJyNaeUd5
+         CXjSI1a9wt7DesoDZVRray8E7wDHBhRQAczZVVsdZmriT2vfN9+UsEPut5r5uQ1Ntf
+         UQNJ/R5KSAiUs75BhfJmPozJNnVVsQCvZ0wNcacv1YvXeJD2W+7/iYUMQuEN4gzki1
+         14+Jvlx/ilk79fTXYrF1/JrP6jxjqvO2W2AFog+eAYPnLYIhXlOSyivENfRCl8bado
+         EVyLE97Xt1mwTgdUzjO6lmIjhPB4fC4XDGaLCPBaF78Sxo1bT/FusXDo4xR/Vz0k2V
+         hk5j3QNEQHsdw==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Anthony Yznaga <anthony.yznaga@oracle.com>,
         Steve Sistare <steven.sistare@oracle.com>,
         Alex Williamson <alex.williamson@redhat.com>,
         Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.14 65/99] vfio/type1: Fix vfio_find_dma_valid return
-Date:   Thu,  9 Sep 2021 20:15:24 -0400
-Message-Id: <20210910001558.173296-65-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.13 58/88] vfio/type1: Fix vfio_find_dma_valid return
+Date:   Thu,  9 Sep 2021 20:17:50 -0400
+Message-Id: <20210910001820.174272-58-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210910001558.173296-1-sashal@kernel.org>
-References: <20210910001558.173296-1-sashal@kernel.org>
+In-Reply-To: <20210910001820.174272-1-sashal@kernel.org>
+References: <20210910001820.174272-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -61,10 +61,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index 0b4f7c174c7a..0e9217687f5c 100644
+index a3e925a41b0d..98dd65bf8fe7 100644
 --- a/drivers/vfio/vfio_iommu_type1.c
 +++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -612,17 +612,17 @@ static int vfio_wait(struct vfio_iommu *iommu)
+@@ -611,17 +611,17 @@ static int vfio_wait(struct vfio_iommu *iommu)
  static int vfio_find_dma_valid(struct vfio_iommu *iommu, dma_addr_t start,
  			       size_t size, struct vfio_dma **dma_p)
  {
