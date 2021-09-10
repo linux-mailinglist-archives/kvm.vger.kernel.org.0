@@ -2,121 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 884AB406633
-	for <lists+kvm@lfdr.de>; Fri, 10 Sep 2021 05:41:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 61D3240673B
+	for <lists+kvm@lfdr.de>; Fri, 10 Sep 2021 08:32:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230060AbhIJDmj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Sep 2021 23:42:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54684 "EHLO
+        id S230526AbhIJGeD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Sep 2021 02:34:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35480 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229972AbhIJDmi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Sep 2021 23:42:38 -0400
-Received: from mail-oi1-x22d.google.com (mail-oi1-x22d.google.com [IPv6:2607:f8b0:4864:20::22d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81CF0C061575
-        for <kvm@vger.kernel.org>; Thu,  9 Sep 2021 20:41:28 -0700 (PDT)
-Received: by mail-oi1-x22d.google.com with SMTP id bi4so1095389oib.9
-        for <kvm@vger.kernel.org>; Thu, 09 Sep 2021 20:41:28 -0700 (PDT)
+        with ESMTP id S230417AbhIJGeC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Sep 2021 02:34:02 -0400
+Received: from mail-qk1-x736.google.com (mail-qk1-x736.google.com [IPv6:2607:f8b0:4864:20::736])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD360C061574;
+        Thu,  9 Sep 2021 23:32:51 -0700 (PDT)
+Received: by mail-qk1-x736.google.com with SMTP id t190so925730qke.7;
+        Thu, 09 Sep 2021 23:32:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
+        d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=AcDaWUAinO2fEsf4ZPvLFB5Mx25ltgwZ7j4hlM6IIoM=;
-        b=G59xvSv/rp+s9VhZYcfvC7HQvDS0+1Y/31lt72rGg4SuU/3q7Bur6+CZT0oX9BCHHd
-         pf25q9r0pJpU7IZYtD45LxPTuZ7lt/+7kub6CoSg9zklHVO14+S7uSpfFltQBvw4eLda
-         8lFybnYaePz40XR9CFc+EAGr7DMGGnekQ+7B4JJVAbtpRqVdHwwqHHxKTtPtxEa7nmOJ
-         gn6q36V9etefm6vpc8MR1hhLSUSfIVf4sVgvI8kVOp4VDzhqKL0p9tvVBUxdM9Hm8oWq
-         W/ZyP2CYNdmexJXmP/Mtd7hliSmyQGlSFekxvfGhpoC0l2TuD4H/jNfkIlj/yZgCQLQf
-         5eOw==
+        bh=wsf5hPUH3MYL5lrAiO50lKX+4L4mH3UTRgfpXirFAAc=;
+        b=MqCiBW484db2PJ93autlPemRbVAD+dtdje6igzgdnXOevdZ8+oS7fRLZzImz5JgvHR
+         WD7R9YxkJoiLVnXiSBRmBPSPqOISMirRnS9bohHAKYAC+Y0vOcJ8I7Ci0QIMU60chC4f
+         Vpm2kTh3nhiStHP3XzBBTP87H4Yk6Tdwo28RGpX2/EIm+mPuRSQZ9B6Rhk2fwoSBuuX8
+         9MaIyUDddS1m5RumUkcU9yyGBSNQbe+b2UR+t7Yl8h2EgcZeRtppHDKsdlO2yov9EU5d
+         lDa6gFwMIv7hnxsMlX4OP4Zw4cKqUSdVuSpUfWzgFQq9PP/AQIfOGSVoryGeAKmcDveY
+         /Teg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=AcDaWUAinO2fEsf4ZPvLFB5Mx25ltgwZ7j4hlM6IIoM=;
-        b=NOrY+adbpK8DvOtakEJRyWU2nYJcYVYpTDp9gNTw9R96Sj8mm/+XeagHAYN9aiaCRx
-         0Df4cid2OGLJOR0jEb3VCUmTkUpJFy+PmTRlbiMQSGwT1uLMRhkOdYsI8HEI41K6IZ1U
-         qEW3ArbxZDTis3lmL8UZKDy66uR8o5QDchgoEih9B7R/NgDXsvQuhPmB8qn41PWsfDKp
-         Dh3TezoE9FnxETi8J2a7kc+wfaiMXbU6OtJgNR2vzYl4TK0P1iADQR+xhOQyKsHzc8IA
-         WjdVH83dSZD43a84AjaEUHSSSsa5jCyLqQAwPOn/FTYgqtIj4JVym3i12WHgb1n6yBrC
-         eFJg==
-X-Gm-Message-State: AOAM5306Imfi9TEx5CM8bcNQGW8KcC6EwH9rKjKI3+jf+AtofIb9OJp8
-        Jv9oiu+MoTq3J2FfXjOFznCWt3AHsvtX55F9MQ4QBQ==
-X-Google-Smtp-Source: ABdhPJxvqKgvT0iHOJw9pusSa94n3g4TIFRcc5YNy3WemyPlpTzR+73ed/PuZ8xeXXe2eHPgkUHuLRU2VwFFv/+rplk=
-X-Received: by 2002:a05:6808:2026:: with SMTP id q38mr2590770oiw.15.1631245287533;
- Thu, 09 Sep 2021 20:41:27 -0700 (PDT)
+        bh=wsf5hPUH3MYL5lrAiO50lKX+4L4mH3UTRgfpXirFAAc=;
+        b=Q06812RBkEmESMRnIULtmG0n4DuKhNYyQqMgE61ByUyBIaKFQF77V5kwbpMbe0MNTA
+         vHUMarXaD54W71BaDZDBfjWX6rgBUvrmDt4UcKIMRKl93g/+Kd/zwCmci9CEt6UPUaWw
+         oWfYh8BbnQYpAP64oHV0itvcdLzzzsQeHVvOmdxlCSWDncRVSB22UqL4SicrTpMJcqOw
+         xcZ9CIS1MsJ9YhmrBt+7lKrbYJ3J9mwzdrP8wO13XCET9JwbtxZq+3raL3da4FarTNMX
+         8sQ+GnQvsbHOfnhZOSnLBMS+EtLXY73/1J0JGRKBxiDeIRpfy+URSvPyl5Ct+CEQazD9
+         nUNw==
+X-Gm-Message-State: AOAM530b5hQU7mZI1DKz2EazWomltXupJPKsrBz31stn+4FvfaOyuBxy
+        h1KeMt8CubOpC0b/OEgQwucbQHOwmIGXOOxt0aY=
+X-Google-Smtp-Source: ABdhPJxqdfwJQrz4egs3WTw1rREh6nLLPa50d7pE/eI+qOfEwebXuNf0LVXhG896eTPiHPbk9X1g/3EqxxDE7UZ795c=
+X-Received: by 2002:a05:620a:4042:: with SMTP id i2mr6511644qko.336.1631255570807;
+ Thu, 09 Sep 2021 23:32:50 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210902181751.252227-1-pgonda@google.com> <20210902181751.252227-2-pgonda@google.com>
- <YTqirwnu0rOcfDCq@google.com> <CAA03e5Ek=puWCXc+cTi-XNe02RXJLY7Y6=cq1g-AyxEan_RG2A@mail.gmail.com>
- <YTq3cRq5tYbopgSd@google.com>
-In-Reply-To: <YTq3cRq5tYbopgSd@google.com>
-From:   Marc Orr <marcorr@google.com>
-Date:   Thu, 9 Sep 2021 20:41:16 -0700
-Message-ID: <CAA03e5EeBf254ENNnky41W3J2f0v2Laiq4QyeF6pOdGPOCn5Xw@mail.gmail.com>
-Subject: Re: [PATCH 1/3 V7] KVM, SEV: Add support for SEV intra host migration
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Peter Gonda <pgonda@google.com>, kvm list <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        David Rientjes <rientjes@google.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        LKML <linux-kernel@vger.kernel.org>
+References: <20210901131434.31158-1-mgurtovoy@nvidia.com> <YTYvOetMHvocg9UZ@stefanha-x1.localdomain>
+In-Reply-To: <YTYvOetMHvocg9UZ@stefanha-x1.localdomain>
+From:   Feng Li <lifeng1519@gmail.com>
+Date:   Fri, 10 Sep 2021 14:32:24 +0800
+Message-ID: <CAEK8JBAz8Y6b1a2v+_EhXowdSEQgpv0CxmYX1kMP+wN8W1qOdA@mail.gmail.com>
+Subject: Re: [PATCH v3 1/1] virtio-blk: avoid preallocating big SGL for data
+To:     Stefan Hajnoczi <stefanha@redhat.com>
+Cc:     Max Gurtovoy <mgurtovoy@nvidia.com>, hch@infradead.org,
+        mst@redhat.com, virtualization@lists.linux-foundation.org,
+        kvm@vger.kernel.org, israelr@nvidia.com, nitzanc@nvidia.com,
+        oren@nvidia.com, linux-block <linux-block@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 9, 2021 at 6:40 PM Sean Christopherson <seanjc@google.com> wrote:
+On Mon, Sep 6, 2021 at 11:39 PM Stefan Hajnoczi <stefanha@redhat.com> wrote:
 >
-> On Thu, Sep 09, 2021, Marc Orr wrote:
-> > > > +int svm_vm_migrate_from(struct kvm *kvm, unsigned int source_fd)
-> > > > +{
-> > > > +     struct kvm_sev_info *dst_sev = &to_kvm_svm(kvm)->sev_info;
-> > > > +     struct file *source_kvm_file;
-> > > > +     struct kvm *source_kvm;
-> > > > +     int ret;
-> > > > +
-> > > > +     ret = svm_sev_lock_for_migration(kvm);
-> > > > +     if (ret)
-> > > > +             return ret;
-> > > > +
-> > > > +     if (!sev_guest(kvm) || sev_es_guest(kvm)) {
-> > > > +             ret = -EINVAL;
-> > > > +             pr_warn_ratelimited("VM must be SEV enabled to migrate to.\n");
-> > >
-> > > Linux generally doesn't log user errors to dmesg.  They can be helpful during
-> > > development, but aren't actionable and thus are of limited use in production.
+> On Wed, Sep 01, 2021 at 04:14:34PM +0300, Max Gurtovoy wrote:
+> > No need to pre-allocate a big buffer for the IO SGL anymore. If a device
+> > has lots of deep queues, preallocation for the sg list can consume
+> > substantial amounts of memory. For HW virtio-blk device, nr_hw_queues
+> > can be 64 or 128 and each queue's depth might be 128. This means the
+> > resulting preallocation for the data SGLs is big.
 > >
-> > Ha. I had suggested adding the logs when I reviewed these patches
-> > (maybe before Peter posted them publicly). My rationale is that if I'm
-> > looking at a crash in production, and all I have is a stack trace and
-> > the error code, then I can narrow the failure down to this function,
-> > but once the function starts returning the same error code in multiple
-> > places now it's non-trivial for me to deduce exactly which condition
-> > caused the crash. Having these logs makes it trivial. However, if this
-> > is not the preferred Linux style then so be it.
+> > Switch to runtime allocation for SGL for lists longer than 2 entries.
+> > This is the approach used by NVMe drivers so it should be reasonable for
+> > virtio block as well. Runtime SGL allocation has always been the case
+> > for the legacy I/O path so this is nothing new.
+> >
+> > The preallocated small SGL depends on SG_CHAIN so if the ARCH doesn't
+> > support SG_CHAIN, use only runtime allocation for the SGL.
+> >
+> > Re-organize the setup of the IO request to fit the new sg chain
+> > mechanism.
+> >
+> > No performance degradation was seen (fio libaio engine with 16 jobs and
+> > 128 iodepth):
+> >
+> > IO size      IOPs Rand Read (before/after)         IOPs Rand Write (before/after)
+> > --------     ---------------------------------    ----------------------------------
+> > 512B          318K/316K                                    329K/325K
+> >
+> > 4KB           323K/321K                                    353K/349K
+> >
+> > 16KB          199K/208K                                    250K/275K
+> >
+> > 128KB         36K/36.1K                                    39.2K/41.7K
 >
-> I don't necessarily disagree, but none of these errors conditions should so much
-> as sniff production.  E.g. if userspace invokes this on a !KVM fd or on a non-SEV
-> source, or before guest_state_protected=true, then userspace has bigger problems.
-> Ditto if the dest isn't actual KVM VM or doesn't meet whatever SEV-enabled/disabled
-> criteria we end up with.
+> I ran fio randread benchmarks with 4k, 16k, 64k, and 128k at iodepth 1,
+> 8, and 64 on two vCPUs. The results look fine, there is no significant
+> regression.
 >
-> The mismatch in online_vcpus is the only one where I could reasonablly see a bug
-> escaping to production, e.g. due to an orchestration layer mixup.
+> iodepth=1 and iodepth=64 are very consistent. For some reason the
+> iodepth=8 has significant variance but I don't think it's the fault of
+> this patch.
 >
-> For all of these conditions, userspace _must_ be aware of the conditions for success,
-> and except for guest_state_protected=true, userspace has access to what state it
-> sent into KVM, e.g. it shouldn't be difficult for userspace dump the relevant bits
-> from the src and dst without any help from the kernel.
+> Fio results and the Jupyter notebook export are available here (check
+> out benchmark.html to see the graphs):
 >
-> If userspace really needs kernel help to differentiate what's up, I'd rather use
-> more unique errors for online_cpus and guest_state_protected, e.g. -E2BIG isn't
-> too big of a strecth for the online_cpus mismatch.
+> https://gitlab.com/stefanha/virt-playbooks/-/tree/virtio-blk-sgl-allocation-benchmark/notebook
+>
+> Guest:
+> - Fedora 34
+> - Linux v5.14
+> - 2 vCPUs (pinned), 4 GB RAM (single host NUMA node)
+> - 1 IOThread (pinned)
+> - virtio-blk aio=native,cache=none,format=raw
+> - QEMU 6.1.0
+>
+> Host:
+> - RHEL 8.3
+> - Linux 4.18.0-240.22.1.el8_3.x86_64
+> - Intel(R) Xeon(R) Silver 4214 CPU @ 2.20GHz
+> - Intel Optane DC P4800X
+>
+> Stefan
 
-SGTM, thanks.
+Reviewed-by: Feng Li <lifeng1519@gmail.com>
