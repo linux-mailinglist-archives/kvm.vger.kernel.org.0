@@ -2,125 +2,207 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5A1BD4070AF
-	for <lists+kvm@lfdr.de>; Fri, 10 Sep 2021 19:55:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 67A614070C2
+	for <lists+kvm@lfdr.de>; Fri, 10 Sep 2021 20:04:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231971AbhIJR4k (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Sep 2021 13:56:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47618 "EHLO
+        id S229664AbhIJSFY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Sep 2021 14:05:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49566 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231922AbhIJR4i (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Sep 2021 13:56:38 -0400
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1928C061756
-        for <kvm@vger.kernel.org>; Fri, 10 Sep 2021 10:55:27 -0700 (PDT)
-Received: by mail-pl1-x632.google.com with SMTP id bg1so1619387plb.13
-        for <kvm@vger.kernel.org>; Fri, 10 Sep 2021 10:55:27 -0700 (PDT)
+        with ESMTP id S229476AbhIJSFX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Sep 2021 14:05:23 -0400
+Received: from mail-yb1-xb31.google.com (mail-yb1-xb31.google.com [IPv6:2607:f8b0:4864:20::b31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9492CC061574
+        for <kvm@vger.kernel.org>; Fri, 10 Sep 2021 11:04:12 -0700 (PDT)
+Received: by mail-yb1-xb31.google.com with SMTP id r4so5567748ybp.4
+        for <kvm@vger.kernel.org>; Fri, 10 Sep 2021 11:04:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=74br1N0NBz3VAESrVPeVqbSv4KpvlUpZC5wb7BVH5bM=;
-        b=PoMBT5PzZXpKtCxjsX/Fld3niyqTFQTJjrnbjxl22WWNvHGWfD3bdB0IiukTT5/T2m
-         U5lyc00oHBvpOWjq2DGox4Cctkd4i6lRb2SoWvoH5pcIQEfkorPNdRgbzBmfmntSWKXV
-         7iX1e/se+bux8EjhtPtfZ79ou55zlTOSM8B4FbWY1tDIwbmFhmY5xq05r0kfOOBllEQ6
-         PLrpL4zQM89JZ8dNbS/NiOFb7fXms/Tp39FzOijmzTOmvd09isUJ8+S6rEOt17UD+xsL
-         XtrUs17yUp+CTl+sP2ZrsAb8C1wzaPBcc84g1KC0c8pL6nz+BZ+P4/VOTsSSlJzhwrwH
-         8/Bw==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=FdiZIU18HRQNVcUBqI1gOpJDuHw72fPqFgD0vfSbxiM=;
+        b=OftdWZEwD9jdXht+HSnlAwhydSymZg+fXMuExwKIPpWPSdPet2l673kSg8FcGtw/6d
+         q/A8Jammz5TZedHA0AghaMGGChHtT4/kVWecAClUWj5q1tcoBkPQ91R8uZfezyXn1maC
+         dYBLtWCRik7kgp43oQveNCvzkjyyNnCZtQRG8fAd0m1JyDBsgXnolXRZtTMW7Nd24Dm9
+         /R+toReJ9Jkosf8Ny7n9oy64MKoI6hxdAt9vg8RHkQ6J5ZouUO23IUvUJGlNZsriSIUT
+         y/mncKScphEyMFh6hYP3TjUIv7at+65xBbQO8YlIAu7cB6/3mLMu/squbAehr5XeI1qJ
+         osVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=74br1N0NBz3VAESrVPeVqbSv4KpvlUpZC5wb7BVH5bM=;
-        b=2EC5GeqquwCWA3ZyuV5wHwhnzu2UPX9wmYoXkvM9fPon0iO3jPsVXO9wpYSnOtE4mT
-         70QKysIjM4L4eruHAGTW+nboXIBiTjdffnR+43GOVOooVLzR9P6U/g1f2pD1yLkXetU/
-         KG6UcmcIG6Zj0QC8oVWcx3T8+w+bUSQW9VpbIqpnPxITSB63PJ6+bWBN5Q+TJkzs32IL
-         nOEiXu7UVZw2rQfXO9LVrUjguS79kEQqAU7xLKaWgGDoQVbeVgaVy75Z2IYTxodKnLzQ
-         fXq5NDIZCw9vKbAAvkALQ33bDaHANJ0HypH7dBtV4IVd+lXFgn1gddHg1MEGACVwcMRS
-         gOPw==
-X-Gm-Message-State: AOAM533L2UTBnyCJ1H20MvZ1+OB4AdDYHQ7xVqsfp/F2xwPGHhzUpHA/
-        9mCte9RGKCoT9Nn0dg/InhM5Pg==
-X-Google-Smtp-Source: ABdhPJx+wMohUP/daiNsbnsj/P33eYsOJ6z7uBSLf55XZZ3IuD7jQEyqiAzTKGYWyEzS0McFfWHsVA==
-X-Received: by 2002:a17:902:ea11:b0:13a:db38:cfcf with SMTP id s17-20020a170902ea1100b0013adb38cfcfmr4790469plg.3.1631296527096;
-        Fri, 10 Sep 2021 10:55:27 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id b17sm5635774pfo.98.2021.09.10.10.55.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Sep 2021 10:55:26 -0700 (PDT)
-Date:   Fri, 10 Sep 2021 17:55:22 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Xiaoyao Li <xiaoyao.li@intel.com>
-Cc:     Chenyi Qiang <chenyi.qiang@intel.com>, Tao Xu <tao3.xu@intel.com>,
-        pbonzini@redhat.com, vkuznets@redhat.com, wanpengli@tencent.com,
-        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, hpa@zytor.com, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] KVM: VMX: Enable Notify VM exit
-Message-ID: <YTucCk8cVVvES2mx@google.com>
-References: <20210525051204.1480610-1-tao3.xu@intel.com>
- <YQRkBI9RFf6lbifZ@google.com>
- <b0c90258-3f68-57a2-664a-e20a6d251e45@intel.com>
- <YQgTPakbT+kCwMLP@google.com>
- <080602dc-f998-ec13-ddf9-42902aa477de@intel.com>
- <4079f0c9-e34c-c034-853a-b26908a58182@intel.com>
- <YTD7+v2t0dSZqVHF@google.com>
- <c7ff247a-0046-e461-09bf-bcf8b5d0f426@intel.com>
- <YTpW3M8Iyh8kLpyx@google.com>
- <ce2dfc44-d1cf-8d09-6a38-9befb6f65885@intel.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=FdiZIU18HRQNVcUBqI1gOpJDuHw72fPqFgD0vfSbxiM=;
+        b=p41jP2rsoYPG1R/ShtCX2cWr9f64ybDzmYsghu8sQtw+kwKE1YvxVnuZ6zMEKTzeHN
+         GP4GdfA0VZSavW5E0/rs+uOUkfbOlDy527SbRznwetJ0h4ulMcbjJf48ipcY4lHQU5uD
+         U2u/mjAV6tC+05slEqztqhrKe+lMwkmofhlR80U17CUkTVSg6FuQxILMC24WHJr/qf07
+         g2qz3LAaKSpn85GJRH7CAlHGadmEiau++DfBb3W0LuSfELenmuYcIX1DdCoVTOis+MZG
+         LnJff0J12qf5P8IkLrPB9Rc6RdadqqNryccgydt1MaGvY2MIqmgXiC33dZLBvYy30h4l
+         AElQ==
+X-Gm-Message-State: AOAM5339BwcInnv/vAeUkxWMxunVuQDgbD1s9Xoi3r8Tpow+OXbHj+DY
+        itW2VhWrUhDfLteZVnUFJQKuy8zZ0DU0c1iORjM7MA==
+X-Google-Smtp-Source: ABdhPJzWgdNOv8FFFa8yER05OfPRQry5w0Mk8yQAnalMrVdKBP5XCEEVprWbGAlMxK82fvaBzfD7oAiOSSVboVdVasw=
+X-Received: by 2002:a25:8093:: with SMTP id n19mr12994954ybk.414.1631297049652;
+ Fri, 10 Sep 2021 11:04:09 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ce2dfc44-d1cf-8d09-6a38-9befb6f65885@intel.com>
+References: <20210909013818.1191270-1-rananta@google.com> <20210909013818.1191270-10-rananta@google.com>
+ <20210909075643.fhngqu6tqrpe33gl@gator> <CAJHc60wRkUyKEdY0ok0uC7r=P0FME+Lb7oapz+AKbjaNDhFHyA@mail.gmail.com>
+ <20210910081001.4gljsvmcovvoylwt@gator>
+In-Reply-To: <20210910081001.4gljsvmcovvoylwt@gator>
+From:   Raghavendra Rao Ananta <rananta@google.com>
+Date:   Fri, 10 Sep 2021 11:03:58 -0700
+Message-ID: <CAJHc60yhg7oYiJpHJK27M7=qo0CMOX+Qj9+q-ZHgTVhWr_76aA@mail.gmail.com>
+Subject: Re: [PATCH v4 09/18] KVM: arm64: selftests: Add guest support to get
+ the vcpuid
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 10, 2021, Xiaoyao Li wrote:
-> On 9/10/2021 2:47 AM, Sean Christopherson wrote:
-> > On Tue, Sep 07, 2021, Xiaoyao Li wrote:
-> > > On 9/3/2021 12:29 AM, Sean Christopherson wrote:
-> > > > > After syncing internally, we know that the internal threshold is not
-> > > > > architectural but a model-specific value. It will be published in some place
-> > > > > in future.
-> > > > 
-> > > > Any chance it will also be discoverable, e.g. via an MSR?
-> > > 
-> > > I also hope we can expose it via MSR. If not, we can maintain a table per
-> > > FMS in KVM to get the internal threshold. However, per FMS info is not
-> > > friendly to be virtualized (when we are going to enable the nested support).
-> > 
-> > Yeah, FMS is awful.  If the built-in buffer isn't discoverable, my vote is to
-> > assume the worst, i.e. a built-in buffer of '0', and have the notify_window
-> > param default to a safe value, e.g. 25k or maybe even 150k (to go above what the
-> > hardware folks apparently deemed safe for SPR).  It's obviously not idea, but
-> > it's better than playing FMS guessing games.
-> > 
-> > > I'll try to persuade internal to expose it via MSR, but I guarantee nothing.
-> > 
-> > ...
-> > 
-> > > > On a related topic, this needs tests.  One thought would be to stop unconditionally
-> > > > intercepting #AC if NOTIFY_WINDOW is enabled, and then have the test set up the
-> > > > infinite #AC vectoring scenario.
-> > > > 
-> > > 
-> > > yes, we have already tested with this case with notify_window set to 0. No
-> > > false positive.
-> > 
-> > Can you send a selftest or kvm-unit-test?
-> > 
-> 
-> Actually we implement the attacking case of CVE-2015-5307 with
-> kvm-unit-test, while manually disabling the intercept of #AC.
-> 
-> First, it requires modification of KVM that only posting the kvm-unit-test
-> doesn't help.
+On Fri, Sep 10, 2021 at 1:10 AM Andrew Jones <drjones@redhat.com> wrote:
+>
+> On Thu, Sep 09, 2021 at 10:10:56AM -0700, Raghavendra Rao Ananta wrote:
+> > On Thu, Sep 9, 2021 at 12:56 AM Andrew Jones <drjones@redhat.com> wrote:
+> > >
+> > > On Thu, Sep 09, 2021 at 01:38:09AM +0000, Raghavendra Rao Ananta wrote:
+> ...
+> > > > +     for (i = 0; i < KVM_MAX_VCPUS; i++) {
+> > > > +             vcpuid = vcpuid_map[i].vcpuid;
+> > > > +             GUEST_ASSERT_1(vcpuid != VM_VCPUID_MAP_INVAL, mpidr);
+> > >
+> > > We don't want this assert if it's possible to have sparse maps, which
+> > > it probably isn't ever going to be, but...
+> > >
+> > If you look at the way the array is arranged, the element with
+> > VM_VCPUID_MAP_INVAL acts as a sentinel for us and all the proper
+> > elements would lie before this. So, I don't think we'd have a sparse
+> > array here.
+>
+> If we switch to my suggestion of adding map entries at vcpu-add time and
+> removing them at vcpu-rm time, then the array may become sparse depending
+> on the order of removals.
+>
+Oh, I get it now. But like you mentioned, we add entries to the map
+while the vCPUs are getting added and then sync_global_to_guest()
+later. This seems like a lot of maintainance, unless I'm interpreting
+it wrong or not seeing an advantage.
+I like your idea of coming up an arch-independent interface, however.
+So I modified it similar to the familiar ucall interface that we have
+and does everything in one shot to avoid any confusion:
 
-It helps in that hacking KVM to disable #AC interception is a lot easier than
-re-writing a test from scratch.
+diff --git a/tools/testing/selftests/kvm/include/kvm_util.h
+b/tools/testing/selftests/kvm/include/kvm_util.h
+index 010b59b13917..0e87cb0c980b 100644
+--- a/tools/testing/selftests/kvm/include/kvm_util.h
++++ b/tools/testing/selftests/kvm/include/kvm_util.h
+@@ -400,4 +400,24 @@ uint64_t get_ucall(struct kvm_vm *vm, uint32_t
+vcpu_id, struct ucall *uc);
+ int vm_get_stats_fd(struct kvm_vm *vm);
+ int vcpu_get_stats_fd(struct kvm_vm *vm, uint32_t vcpuid);
 
-> Second, release the attacking case is not the correct action.
++#define VM_CPUID_MAP_INVAL -1
++
++struct vm_cpuid_map {
++       uint64_t hw_cpuid;
++       int vcpuid;
++};
++
++/*
++ * Create a vcpuid:hw_cpuid map and export it to the guest
++ *
++ * Input Args:
++ *   vm - KVM VM.
++ *
++ * Output Args: None
++ *
++ * Must be called after all the vCPUs are added to the VM
++ */
++void vm_cpuid_map_init(struct kvm_vm *vm);
++int guest_get_vcpuid(void);
++
+ #endif /* SELFTEST_KVM_UTIL_H */
+diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c
+b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+index db64ee206064..e796bb3984a6 100644
+--- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
++++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+@@ -16,6 +16,8 @@
 
-As in it's irresponsible to provide code that can be used to DoS a hypervisor?
-The CVE is six years old, IMO security-through-obscurity is unnecessary at this
-point.
+ static vm_vaddr_t exception_handlers;
+
++static struct vm_cpuid_map cpuid_map[KVM_MAX_VCPUS];
++
+ static uint64_t page_align(struct kvm_vm *vm, uint64_t v)
+ {
+        return (v + vm->page_size) & ~(vm->page_size - 1);
+@@ -426,3 +428,42 @@ void vm_install_exception_handler(struct kvm_vm
+*vm, int vector,
+        assert(vector < VECTOR_NUM);
+        handlers->exception_handlers[vector][0] = handler;
+ }
++
++void vm_cpuid_map_init(struct kvm_vm *vm)
++{
++       int i = 0;
++       struct vcpu *vcpu;
++       struct vm_cpuid_map *map;
++
++       TEST_ASSERT(!list_empty(&vm->vcpus), "vCPUs must have been created\n");
++
++       list_for_each_entry(vcpu, &vm->vcpus, list) {
++               map = &cpuid_map[i++];
++               map->vcpuid = vcpu->id;
++               get_reg(vm, vcpu->id,
+KVM_ARM64_SYS_REG(SYS_MPIDR_EL1), &map->hw_cpuid);
++               map->hw_cpuid &= MPIDR_HWID_BITMASK;
++       }
++
++       if (i < KVM_MAX_VCPUS)
++               cpuid_map[i].vcpuid = VM_CPUID_MAP_INVAL;
++
++       sync_global_to_guest(vm, cpuid_map);
++}
++
++int guest_get_vcpuid(void)
++{
++       int i, vcpuid;
++       uint64_t mpidr = read_sysreg(mpidr_el1) & MPIDR_HWID_BITMASK;
++
++       for (i = 0; i < KVM_MAX_VCPUS; i++) {
++               vcpuid = cpuid_map[i].vcpuid;
++
++               /* Was this vCPU added to the VM after the map was
+initialized? */
++               GUEST_ASSERT_1(vcpuid != VM_CPUID_MAP_INVAL, mpidr);
++
++               if (mpidr == cpuid_map[i].hw_cpuid)
++                       return vcpuid;
++       }
++
++       /* We should not be reaching here */
++       GUEST_ASSERT_1(0, mpidr);
++       return -1;
++}
+
+This would ensure that we don't have a sparse array and can use the
+last non-vCPU element as a sentinal node.
+If you still feel preparing the map as and when the vCPUs are created
+makes more sense, I can go for it.
+
+Regards,
+Raghavendra
+> Thanks,
+> drew
+>
