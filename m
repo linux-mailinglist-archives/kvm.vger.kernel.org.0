@@ -2,125 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B8B144072FF
-	for <lists+kvm@lfdr.de>; Fri, 10 Sep 2021 23:36:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1AF5E407311
+	for <lists+kvm@lfdr.de>; Fri, 10 Sep 2021 23:46:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234564AbhIJVhP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Sep 2021 17:37:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40992 "EHLO
+        id S234659AbhIJVrh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Sep 2021 17:47:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43286 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229543AbhIJVhL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Sep 2021 17:37:11 -0400
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64DF0C061574
-        for <kvm@vger.kernel.org>; Fri, 10 Sep 2021 14:36:00 -0700 (PDT)
-Received: by mail-pf1-x434.google.com with SMTP id v123so3021701pfb.11
-        for <kvm@vger.kernel.org>; Fri, 10 Sep 2021 14:36:00 -0700 (PDT)
+        with ESMTP id S234602AbhIJVrh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Sep 2021 17:47:37 -0400
+Received: from mail-ot1-x336.google.com (mail-ot1-x336.google.com [IPv6:2607:f8b0:4864:20::336])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 942B2C061756
+        for <kvm@vger.kernel.org>; Fri, 10 Sep 2021 14:46:24 -0700 (PDT)
+Received: by mail-ot1-x336.google.com with SMTP id a20-20020a0568300b9400b0051b8ca82dfcso4170789otv.3
+        for <kvm@vger.kernel.org>; Fri, 10 Sep 2021 14:46:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=osMYYNGSd/Wjj+GEQ9AnjZzDNQa5kCk+UK3hUXrWsLk=;
-        b=IXUbRyP+p3BXmkawxfs/aq7YDdpzZnyWexYE0UEPyjiWqxO3uGv9NI9++wqMbnMmdH
-         3URAQ0FTb3EoySjHEvif6yG26N0NTBuDCOa0+xUMSoL1kD8TWU+Cvqyf8ztuC8N+f2TB
-         EGHCxLcoAtBYIBEsTVA6wx+OPCFIWJzjQgsQEeIAqAXb0WPjXJVNzmcFkrBbEqAQguNF
-         VRrrFmw43kb02a+KMCmooXTiiOhguXeBswP4JApCFDBI1lH40MlwzKc+OGWsuMJgK+or
-         jUGOgbz+BaUESiviGAL6LjfDuVwnplOX94CrlNPxus1lFxQudezL9FmIk0zlXa/v58sV
-         q1OA==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=++QHrqgiKekFVysXZMhd2rrKBQpZDTBgQWBiMBTyRX4=;
+        b=jKmbyI3OsVkjKnLxNtHb5YDUvhK+qmwz3B+k3Bt4ABaqQRJXU394z4mRHUDPdhgfKX
+         V5qR6n3xkjts2ZQ+SBlwg6JWuKzWHseHwhsUbbVrxEgCdZpU3a1gM5HRkwdiOiKF850l
+         7ssOKJyRkCCTQZp809Hfjjk/UcvACIBD/aFW9NQXALrvXwsnLD/U53RLTlL4UaknPG5q
+         zLc0U8CoU/hKWcJEX9NfgFZDs4M0bNZhz3irslcUy5gW1ti4XdwVDKnue2DkYMx8wgbs
+         hSOp0nHLNkByJX6Si+S5/UMooHqRHyebui6t/tVd65uizdduDT/mh/CcRPg+d3o0z5Iy
+         LG9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=osMYYNGSd/Wjj+GEQ9AnjZzDNQa5kCk+UK3hUXrWsLk=;
-        b=Yykp82yORSpYfEW/IWlWG14PKfClOlORzbpmRgFGMm+fTwvltaZA92bOJqMS+EDXul
-         cEcUeiD3vG6qqzsJrPUvb042G3H4rcdF003I5x+BPdjYmwa62G1hN4hzkqYLHK66hKIB
-         F+AxsG1oxhCb90ugLh4rI99pMY5hmcHOJgFQNFBE+OTzXBkunzaAsqIoVluIJprgksFa
-         wgnP1povA+RBCYc7Nx3E4EG/YgTdRHwqcQpSkvA8QvbCRQyLocv4B5aaxW8/LSq85NJW
-         XWkaOK00YImJA6IeCcm5bf3JCjEYFJxoF5QsTjvuJ+7Py0CJ1xM6hUkzduO4Mx/G8HcM
-         2x+Q==
-X-Gm-Message-State: AOAM530s/w8sIbHbQl6v1udvU3xiOFLDR6znUtlT57RyfcscDaTW87Ji
-        UWsFh7+ImiMXQA27mOQSHpZ5ZQ==
-X-Google-Smtp-Source: ABdhPJyFM/PKYPzNQH2Lo5rKS4cW/OJY1IuedAKl7NpJWa9TgpNuFMv10CRgNkyrPf1xFt2BAAReVQ==
-X-Received: by 2002:a05:6a00:814:b0:40d:563a:a7ce with SMTP id m20-20020a056a00081400b0040d563aa7cemr10118324pfk.60.1631309759677;
-        Fri, 10 Sep 2021 14:35:59 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id h16sm5826014pfn.215.2021.09.10.14.35.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Sep 2021 14:35:59 -0700 (PDT)
-Date:   Fri, 10 Sep 2021 21:35:55 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Zeng Guang <guang.zeng@intel.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=++QHrqgiKekFVysXZMhd2rrKBQpZDTBgQWBiMBTyRX4=;
+        b=Ie9VrEzBKzpSmwXfTSQVfyvgEsyepGAYBNa/QH4M/tzCF2lSsiWZM5Uk00j4sT6nUX
+         mi49xqloTbKN0LQWfw4sk1xbqEgL3Os2oQFY5iHYtcs0s9yBtnTXNlJSNY4K/nQspAsL
+         hJp1M2ChYc93cOi9fzppHrK52hBnT+wYuwf7ArMXqqoGU+XKwQrEFJ0sVhTdKOMFkcqd
+         rCiqwKtiuraCPFwUOrOFnAEmbdRADYOZwTdBJK+DWafuHiSE9jxibJa44uTgE/lwssbY
+         OlNNb7adfiNRF4e7Jwqqs6rj0SQxSJOfRnxaBoOVeA+gutsYK/IxAC4Dm+3PS9mjggk+
+         LWjg==
+X-Gm-Message-State: AOAM533P6YWTPTLum+P705yBku0W2AasWsV3Zs9YMQJzLwBgYq9I5V06
+        5dt1UiC1Z+8ZsXLYknCjov9KtesjxvxUOzwGHYpQPw==
+X-Google-Smtp-Source: ABdhPJwjV66Z2n5sSFAkbvXAaXHm+ruJI4hvVih91Zj1FFxpt4TZGjeQfAlq28ovXILknWUiyC1+F7YTGIG2abe/afE=
+X-Received: by 2002:a9d:5a89:: with SMTP id w9mr6336406oth.91.1631310383564;
+ Fri, 10 Sep 2021 14:46:23 -0700 (PDT)
+MIME-Version: 1.0
+References: <20210910183220.2397812-1-seanjc@google.com> <20210910183220.2397812-3-seanjc@google.com>
+In-Reply-To: <20210910183220.2397812-3-seanjc@google.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Fri, 10 Sep 2021 14:46:12 -0700
+Message-ID: <CALMp9eSYfXQScdHa84xMaXoReZZow1dCzWw5i7T4URHGpq3KFQ@mail.gmail.com>
+Subject: Re: [PATCH 2/2] KVM: x86: Identify vCPU0 by its vcpu_idx instead of
+ walking vCPUs array
+To:     Sean Christopherson <seanjc@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Kim Phillips <kim.phillips@amd.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Jethro Beekman <jethro@fortanix.com>,
-        Kai Huang <kai.huang@intel.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, Robert Hu <robert.hu@intel.com>,
-        Gao Chao <chao.gao@intel.com>,
-        Robert Hoo <robert.hu@linux.intel.com>
-Subject: Re: [PATCH v4 3/6] KVM: VMX: Detect Tertiary VM-Execution control
- when setup VMCS config
-Message-ID: <YTvPu0REr+Wg3/s3@google.com>
-References: <20210809032925.3548-1-guang.zeng@intel.com>
- <20210809032925.3548-4-guang.zeng@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210809032925.3548-4-guang.zeng@intel.com>
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 09, 2021, Zeng Guang wrote:
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 927a552393b9..ee8c5664dc95 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -2391,6 +2391,23 @@ static __init int adjust_vmx_controls(u32 ctl_min, u32 ctl_opt,
->  	return 0;
->  }
->  
-> +static __init int adjust_vmx_controls_64(u64 ctl_min, u64 ctl_opt,
-> +					 u32 msr, u64 *result)
-> +{
-> +	u64 vmx_msr;
-> +	u64 ctl = ctl_min | ctl_opt;
-> +
-> +	rdmsrl(msr, vmx_msr);
-> +	ctl &= vmx_msr; /* bit == 1 means it can be set */
-> +
-> +	/* Ensure minimum (required) set of control bits are supported. */
-> +	if (ctl_min & ~ctl)
-> +		return -EIO;
-> +
-> +	*result = ctl;
-> +	return 0;
-> +}
-
-More succinctly, since we don't need to force-set bits in the final value:
-
-	u64 allowed1;
-
-	rdmsrl(msr, allowed1);
-
-	/* Ensure minimum (required) set of control bits are supported. */
-	if (ctl_min & ~allowed1)
-		return -EIO;
-
-	*result = (ctl_min | ctl_opt) & allowed1;
-	return 0;
-
->  static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
->  				    struct vmx_capability *vmx_cap)
->  {
-
+On Fri, Sep 10, 2021 at 11:32 AM Sean Christopherson <seanjc@google.com> wrote:
+>
+> Use vcpu_idx to identify vCPU0 when updating HyperV's TSC page, which is
+> shared by all vCPUs and "owned" by vCPU0 (because vCPU0 is the only vCPU
+> that's guaranteed to exist).  Using kvm_get_vcpu() to find vCPU works,
+> but it's a rather odd and suboptimal method to check the index of a given
+> vCPU.
+>
+> No functional change intended.
+>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+Reviewed-by: Jim Mattson <jmattson@google.com>
