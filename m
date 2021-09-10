@@ -2,92 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BD0E64067D4
-	for <lists+kvm@lfdr.de>; Fri, 10 Sep 2021 09:39:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E3D8F4067E7
+	for <lists+kvm@lfdr.de>; Fri, 10 Sep 2021 09:43:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231537AbhIJHk0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Sep 2021 03:40:26 -0400
-Received: from mga14.intel.com ([192.55.52.115]:22333 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231290AbhIJHkZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Sep 2021 03:40:25 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10102"; a="220691649"
-X-IronPort-AV: E=Sophos;i="5.85,282,1624345200"; 
-   d="scan'208";a="220691649"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Sep 2021 00:39:11 -0700
-X-IronPort-AV: E=Sophos;i="5.85,282,1624345200"; 
-   d="scan'208";a="549158582"
-Received: from unknown (HELO [10.239.13.122]) ([10.239.13.122])
-  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Sep 2021 00:39:07 -0700
-Subject: Re: [PATCH v2] KVM: VMX: Enable Notify VM exit
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Chenyi Qiang <chenyi.qiang@intel.com>, Tao Xu <tao3.xu@intel.com>,
-        pbonzini@redhat.com, vkuznets@redhat.com, wanpengli@tencent.com,
-        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, hpa@zytor.com, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20210525051204.1480610-1-tao3.xu@intel.com>
- <YQRkBI9RFf6lbifZ@google.com>
- <b0c90258-3f68-57a2-664a-e20a6d251e45@intel.com>
- <YQgTPakbT+kCwMLP@google.com>
- <080602dc-f998-ec13-ddf9-42902aa477de@intel.com>
- <4079f0c9-e34c-c034-853a-b26908a58182@intel.com>
- <YTD7+v2t0dSZqVHF@google.com>
- <c7ff247a-0046-e461-09bf-bcf8b5d0f426@intel.com>
- <YTpW3M8Iyh8kLpyx@google.com>
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-Message-ID: <ce2dfc44-d1cf-8d09-6a38-9befb6f65885@intel.com>
-Date:   Fri, 10 Sep 2021 15:39:03 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Firefox/78.0 Thunderbird/78.14.0
+        id S231580AbhIJHoh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Sep 2021 03:44:37 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:19023 "EHLO
+        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231384AbhIJHog (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Sep 2021 03:44:36 -0400
+Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.57])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4H5SSB2XJGzbmRf;
+        Fri, 10 Sep 2021 15:39:22 +0800 (CST)
+Received: from dggpeml100016.china.huawei.com (7.185.36.216) by
+ dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.8; Fri, 10 Sep 2021 15:43:24 +0800
+Received: from [10.174.148.223] (10.174.148.223) by
+ dggpeml100016.china.huawei.com (7.185.36.216) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.8; Fri, 10 Sep 2021 15:43:23 +0800
+Subject: Re: [PATCH] kvm: irqfd: avoid update unmodified entries of the
+ routing
+To:     <pbonzini@redhat.com>
+CC:     <seanjc@google.com>, <vkuznets@redhat.com>,
+        <wanpengli@tencent.com>, <jmattson@google.com>, <joro@8bytes.org>,
+        <tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
+        <hpa@zytor.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <arei.gonglei@huawei.com>
+References: <20210827080003.2689-1-longpeng2@huawei.com>
+From:   "Longpeng (Mike, Cloud Infrastructure Service Product Dept.)" 
+        <longpeng2@huawei.com>
+Message-ID: <8bae4a6d-9b89-2543-fbed-7deb1d75fc41@huawei.com>
+Date:   Fri, 10 Sep 2021 15:43:22 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <YTpW3M8Iyh8kLpyx@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20210827080003.2689-1-longpeng2@huawei.com>
+Content-Type: text/plain; charset="gbk"
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.148.223]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ dggpeml100016.china.huawei.com (7.185.36.216)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/10/2021 2:47 AM, Sean Christopherson wrote:
-> On Tue, Sep 07, 2021, Xiaoyao Li wrote:
->> On 9/3/2021 12:29 AM, Sean Christopherson wrote:
->>>> After syncing internally, we know that the internal threshold is not
->>>> architectural but a model-specific value. It will be published in some place
->>>> in future.
->>>
->>> Any chance it will also be discoverable, e.g. via an MSR?
->>
->> I also hope we can expose it via MSR. If not, we can maintain a table per
->> FMS in KVM to get the internal threshold. However, per FMS info is not
->> friendly to be virtualized (when we are going to enable the nested support).
-> 
-> Yeah, FMS is awful.  If the built-in buffer isn't discoverable, my vote is to
-> assume the worst, i.e. a built-in buffer of '0', and have the notify_window
-> param default to a safe value, e.g. 25k or maybe even 150k (to go above what the
-> hardware folks apparently deemed safe for SPR).  It's obviously not idea, but
-> it's better than playing FMS guessing games.
-> 
->> I'll try to persuade internal to expose it via MSR, but I guarantee nothing.
-> 
-> ...
-> 
->>> On a related topic, this needs tests.  One thought would be to stop unconditionally
->>> intercepting #AC if NOTIFY_WINDOW is enabled, and then have the test set up the
->>> infinite #AC vectoring scenario.
->>>
->>
->> yes, we have already tested with this case with notify_window set to 0. No
->> false positive.
-> 
-> Can you send a selftest or kvm-unit-test?
-> 
+Hi guys,
 
-Actually we implement the attacking case of CVE-2015-5307 with 
-kvm-unit-test, while manually disabling the intercept of #AC.
+Do you have any suggestions ? Thanks.
 
-First, it requires modification of KVM that only posting the 
-kvm-unit-test doesn't help.
-
-Second, release the attacking case is not the correct action.
+ÔÚ 2021/8/27 16:00, Longpeng(Mike) Ð´µÀ:
+> All of the irqfds would to be updated when update the irq
+> routing, it's too expensive if there're too many irqfds.
+> 
+> However we can reduce the cost by avoid some unnecessary
+> updates. For irqs of MSI type on X86, the update can be
+> saved if the msi values are not change.
+> 
+> The vfio migration could receives benefit from this optimi-
+> zaiton. The test VM has 128 vcpus and 8 VF (with 65 vectors
+> enabled), so the VM has more than 520 irqfds. We mesure the
+> cost of the vfio_msix_enable (in QEMU, it would set routing
+> for each irqfd) for each VF, and we can see the total cost
+> can be significantly reduced.
+> 
+>                 Origin         Apply this Patch
+> 1st             8              4
+> 2nd             15             5
+> 3rd             22             6
+> 4th             24             6
+> 5th             36             7
+> 6th             44             7
+> 7th             51             8
+> 8th             58             8
+> Total           258ms          51ms
+> 
+> We're also tring to optimize the QEMU part [1], but it's still
+> worth to optimize the KVM to gain more benefits.
+> 
+> [1] https://lists.gnu.org/archive/html/qemu-devel/2021-08/msg04215.html
+> 
+> Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
+> ---
+>  arch/x86/kvm/x86.c       |  9 +++++++++
+>  include/linux/kvm_host.h |  2 ++
+>  virt/kvm/eventfd.c       | 15 ++++++++++++++-
+>  3 files changed, 25 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index e5d5c5e..22cf20e 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -12023,6 +12023,15 @@ int kvm_arch_update_irqfd_routing(struct kvm *kvm, unsigned int host_irq,
+>  	return static_call(kvm_x86_update_pi_irte)(kvm, host_irq, guest_irq, set);
+>  }
+>  
+> +bool kvm_arch_irqfd_route_changed(struct kvm_kernel_irq_routing_entry *old,
+> +				  struct kvm_kernel_irq_routing_entry *new)
+> +{
+> +	if (new->type != KVM_IRQ_ROUTING_MSI)
+> +		return true;
+> +
+> +	return !!memcmp(&old->msi, &new->msi, sizeof(new->msi));
+> +}
+> +
+>  bool kvm_vector_hashing_enabled(void)
+>  {
+>  	return vector_hashing;
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index ae7735b..c0954ae 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -1621,6 +1621,8 @@ void kvm_arch_irq_bypass_del_producer(struct irq_bypass_consumer *,
+>  void kvm_arch_irq_bypass_start(struct irq_bypass_consumer *);
+>  int kvm_arch_update_irqfd_routing(struct kvm *kvm, unsigned int host_irq,
+>  				  uint32_t guest_irq, bool set);
+> +bool kvm_arch_irqfd_route_changed(struct kvm_kernel_irq_routing_entry *,
+> +				  struct kvm_kernel_irq_routing_entry *);
+>  #endif /* CONFIG_HAVE_KVM_IRQ_BYPASS */
+>  
+>  #ifdef CONFIG_HAVE_KVM_INVALID_WAKEUPS
+> diff --git a/virt/kvm/eventfd.c b/virt/kvm/eventfd.c
+> index e996989..2ad013b 100644
+> --- a/virt/kvm/eventfd.c
+> +++ b/virt/kvm/eventfd.c
+> @@ -281,6 +281,13 @@ int  __attribute__((weak)) kvm_arch_update_irqfd_routing(
+>  {
+>  	return 0;
+>  }
+> +
+> +bool __attribute__((weak)) kvm_arch_irqfd_route_changed(
+> +				struct kvm_kernel_irq_routing_entry *old,
+> +				struct kvm_kernel_irq_routing_entry *new)
+> +{
+> +	return true;
+> +}
+>  #endif
+>  
+>  static int
+> @@ -615,10 +622,16 @@ void kvm_irq_routing_update(struct kvm *kvm)
+>  	spin_lock_irq(&kvm->irqfds.lock);
+>  
+>  	list_for_each_entry(irqfd, &kvm->irqfds.items, list) {
+> +#ifdef CONFIG_HAVE_KVM_IRQ_BYPASS
+> +		/* Under irqfds.lock, so can read irq_entry safely */
+> +		struct kvm_kernel_irq_routing_entry old = irqfd->irq_entry;
+> +#endif
+> +
+>  		irqfd_update(kvm, irqfd);
+>  
+>  #ifdef CONFIG_HAVE_KVM_IRQ_BYPASS
+> -		if (irqfd->producer) {
+> +		if (irqfd->producer &&
+> +		    kvm_arch_irqfd_route_changed(&old, &irqfd->irq_entry)) {
+>  			int ret = kvm_arch_update_irqfd_routing(
+>  					irqfd->kvm, irqfd->producer->irq,
+>  					irqfd->gsi, 1);
+> 
