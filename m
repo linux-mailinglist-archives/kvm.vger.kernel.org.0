@@ -2,111 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9C1BB40650C
-	for <lists+kvm@lfdr.de>; Fri, 10 Sep 2021 03:22:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 30B05406512
+	for <lists+kvm@lfdr.de>; Fri, 10 Sep 2021 03:22:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238909AbhIJBXX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Sep 2021 21:23:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51366 "EHLO
+        id S239005AbhIJBXr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Sep 2021 21:23:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51264 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235793AbhIJBXS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Sep 2021 21:23:18 -0400
-Received: from mail-ot1-x334.google.com (mail-ot1-x334.google.com [IPv6:2607:f8b0:4864:20::334])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCBE1C0612AC
-        for <kvm@vger.kernel.org>; Thu,  9 Sep 2021 18:16:08 -0700 (PDT)
-Received: by mail-ot1-x334.google.com with SMTP id m7-20020a9d4c87000000b0051875f56b95so131520otf.6
-        for <kvm@vger.kernel.org>; Thu, 09 Sep 2021 18:16:08 -0700 (PDT)
+        with ESMTP id S238975AbhIJBXi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Sep 2021 21:23:38 -0400
+Received: from mail-vk1-xa2f.google.com (mail-vk1-xa2f.google.com [IPv6:2607:f8b0:4864:20::a2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85C97C061146
+        for <kvm@vger.kernel.org>; Thu,  9 Sep 2021 18:18:13 -0700 (PDT)
+Received: by mail-vk1-xa2f.google.com with SMTP id g34so73495vkd.11
+        for <kvm@vger.kernel.org>; Thu, 09 Sep 2021 18:18:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=cGAyUL8bp8BmihGQbVBB5Ud51RVhdqCDb2c9LcQm9Qk=;
-        b=EzrrGCy8DmzpGQL1ZpWiLsC+VVQlDGA9wIY9fvS3uHzBRrbihpPVv0mLc8LrobN/MV
-         S31Bg81HQmiNst71q25BlZIRh+1aeDmX2FhCgAX1ZKTRp9H/6nIl5k1UvDI5cnhtiNB+
-         AEu+hMCWuB8s2IGeWIC3smZcljMRJOb22RzlwxpxRsrxIHPt2OyGVMjoNgtneyc+sz48
-         A2abUpyeigP9ggBUTNYzzuMrMZrDW8cAOTIYZE24tgd7RdpdBZEG9LfQRRhb+4lw8PrW
-         F8t9Y0PE/fR4rbuQ+XgvQyzUieVQ0gb64uMPXYTk14IAbwB4xyKS0geofNVPhDJ33OOj
-         GuuQ==
+        bh=HbI2yiRU/jgiPI9Y0Qhq4XSNxGMyHQg/AsGVWpKiMPQ=;
+        b=N/bV7DdzgzJX9tuD0gJ1oHWXMKjVIilDlTsd8CQdy9OcY+PYpLT/7StxhscRnc0n+X
+         aHKf+SFbMiacCnfIm4gERFIDgquBJKQCAzX6eqvcwJObzw/lXlvYIzwbpd8nBNmjzE2f
+         bBmO0P0lchrN8m8Zvi7E90n7aXB89xt1IPhFmL+Vza+M8LeKFpfNXbV1ZGdFCdyw+2EK
+         sK1gkFyI3ofYwnp0dBfNxdkuFzesuyeGuSXXLAl+gxgK5M0EQYd9TMvh0N9dvtFgDcPy
+         HiexPcqDYeAQiYrKzHOnxlvAp/LB2348/Mbc7USim1Kyfcsd45prwMumK1l3i8fOEPxv
+         B8iQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=cGAyUL8bp8BmihGQbVBB5Ud51RVhdqCDb2c9LcQm9Qk=;
-        b=lUjWOF1cFvXGjZ+iIdGDIzurTCTe6cYnTCslGi+hccVSC7Hk9F5cR8A7F02rcglbAA
-         Tv8FqMR8j5nMepuXz0fYn9Ivf0SLUC3cnWEeH0dWk2aolIW2C21XUhORtCjQc6mT37aW
-         OZFxJvZbbndIrXK+iHSyTWaR45s82LVh5YY3eY0cIVMBhnedGd9cHRRgBDD/Mm7cMSpr
-         aUghVWS3QCY9TQEHKlUWt5AzGu0HOxWiM+B6i7t4RmMrWlbBl2ANWD6kRry2Jcwa1jDL
-         cvYuhCRJD/x6KVmZq7QGwu65KN6oZkZzW+RgcTXOdKzhIN1iUDsw1cHKAjdHSg5UsfKO
-         9Zww==
-X-Gm-Message-State: AOAM530ogOhVuq/8MqODgLPl4rJTIf4ayKjp4BSy7uy65zrDtz8arO8w
-        I7j94Pk8l1gZjJ/OOQqOZaZ0tPT1vqUTPIqDy19tvw==
-X-Google-Smtp-Source: ABdhPJyyEMT6Ic/FnBQyMKpWAY/Lq+ISrhC02XxfIvxVP7Cv6NywynWeAOwJXTle3byAGTkGxZ5QMj8QsaauFMK6IhE=
-X-Received: by 2002:a05:6830:2b24:: with SMTP id l36mr2545318otv.25.1631236568003;
- Thu, 09 Sep 2021 18:16:08 -0700 (PDT)
+        bh=HbI2yiRU/jgiPI9Y0Qhq4XSNxGMyHQg/AsGVWpKiMPQ=;
+        b=SNDzwz74+o/DysbYDdne4mEkuw9ITfuFRy9pbyNm81NdcgqwYPruVBysJRkJDUzHgP
+         8qXqca1UeEelYUAimTXcOlh/scbgCeyZDPytaj8GIm8YmkKFQLtSYdg/niDLWbzuwNM3
+         tqqGIuFpxmm31gDwTyjG5kgaunEmQclgHsMa2VkSe0RUDthlNhTizL4PPezyE9KV2o2O
+         EqN1HfqsArSV3vrKiZdJ76X+rf/jMa0VSPhG/dADJ6Pw7vv1VWX5EEN4nXGXacsnyvJ0
+         9x6Qn+2QAoOT6b06SOKLhCq3kOTpbAE2vHZZXQUPCgkFDCRdKooor8x3Vqs0tVowlQ2F
+         gzOA==
+X-Gm-Message-State: AOAM532xTKq9SOJuFEXHfGGlrYLBOaRLtbvg5OzPw6xn+5FZvUZSOopk
+        BXNN/srcu4A+z67X2bAUpqFgDQIyYFIEGIX9MFSK5A==
+X-Google-Smtp-Source: ABdhPJxVSmdutczIf+UKMJ5gDc9dI7OkFsH5fiUg1yZl4BNkB4w32KXzudQ2/8MTi7GZaj+yfhm0JyI1KEkD6NBtVz8=
+X-Received: by 2002:a1f:43:: with SMTP id 64mr4038849vka.6.1631236692396; Thu,
+ 09 Sep 2021 18:18:12 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210902181751.252227-1-pgonda@google.com> <20210902181751.252227-2-pgonda@google.com>
- <YTqirwnu0rOcfDCq@google.com>
-In-Reply-To: <YTqirwnu0rOcfDCq@google.com>
-From:   Marc Orr <marcorr@google.com>
-Date:   Thu, 9 Sep 2021 18:15:56 -0700
-Message-ID: <CAA03e5Ek=puWCXc+cTi-XNe02RXJLY7Y6=cq1g-AyxEan_RG2A@mail.gmail.com>
-Subject: Re: [PATCH 1/3 V7] KVM, SEV: Add support for SEV intra host migration
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Peter Gonda <pgonda@google.com>, kvm list <kvm@vger.kernel.org>,
+References: <20210818053908.1907051-1-mizhang@google.com> <20210818053908.1907051-4-mizhang@google.com>
+ <YTJ5wjNShaHlDVAp@google.com> <fcb83a85-8150-9617-01e6-c6bcc249c485@amd.com>
+ <YTf3udAv1TZzW+xA@google.com> <8421f104-34e8-cc68-1066-be95254af625@amd.com>
+ <YTpOsUAqHjQ9DDLd@google.com> <CAL715W+u6mt5grwoT6DBhUtzN6xx=OjWPu6M0=p0sxLZ4JTvDg@mail.gmail.com>
+ <48af420f-20e3-719a-cf5c-e651a176e7c2@amd.com>
+In-Reply-To: <48af420f-20e3-719a-cf5c-e651a176e7c2@amd.com>
+From:   Mingwei Zhang <mizhang@google.com>
+Date:   Thu, 9 Sep 2021 18:18:00 -0700
+Message-ID: <CAL715WL6g3P6QKv1w-zSDvY3jjLVdbfxaqyr2XV_NicnuP2+EQ@mail.gmail.com>
+Subject: Re: [PATCH v2 3/4] KVM: SVM: move sev_bind_asid to psp
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        David Rientjes <rientjes@google.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        John Allen <john.allen@amd.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
+        Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>,
+        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+        Alper Gun <alpergun@google.com>,
+        Borislav Petkov <bp@alien8.de>,
+        David Rienjes <rientjes@google.com>,
+        Marc Orr <marcorr@google.com>, Peter Gonda <pgonda@google.com>,
+        Vipin Sharma <vipinsh@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> > +     dst->asid = src->asid;
-> > +     dst->misc_cg = src->misc_cg;
-> > +     dst->handle = src->handle;
-> > +     dst->pages_locked = src->pages_locked;
-> > +
-> > +     src->asid = 0;
-> > +     src->active = false;
-> > +     src->handle = 0;
-> > +     src->pages_locked = 0;
-> > +     src->misc_cg = NULL;
-> > +
-> > +     INIT_LIST_HEAD(&dst->regions_list);
-> > +     list_replace_init(&src->regions_list, &dst->regions_list);
-> > +}
-> > +
-> > +int svm_vm_migrate_from(struct kvm *kvm, unsigned int source_fd)
-> > +{
-> > +     struct kvm_sev_info *dst_sev = &to_kvm_svm(kvm)->sev_info;
-> > +     struct file *source_kvm_file;
-> > +     struct kvm *source_kvm;
-> > +     int ret;
-> > +
-> > +     ret = svm_sev_lock_for_migration(kvm);
-> > +     if (ret)
-> > +             return ret;
-> > +
-> > +     if (!sev_guest(kvm) || sev_es_guest(kvm)) {
-> > +             ret = -EINVAL;
-> > +             pr_warn_ratelimited("VM must be SEV enabled to migrate to.\n");
+> I believe once we are done with it, will have 5 functions that will need
+>  >=8 arguments. I don't know if its acceptable.
 >
-> Linux generally doesn't log user errors to dmesg.  They can be helpful during
-> development, but aren't actionable and thus are of limited use in production.
+> > In addition, having to construct each sev_data_* structure in KVM code
+> > is also a pain and  consumes a lot of irrelevant lines as well.
+> >
+>
+> Maybe I am missing something, aren't those lines will be moved from KVM
+> to PSP driver?
+>
+> I am in full support for restructuring, but lets look at full set of PSP
+> APIs before making the final decision.
+>
+> thanks
+>
 
-Ha. I had suggested adding the logs when I reviewed these patches
-(maybe before Peter posted them publicly). My rationale is that if I'm
-looking at a crash in production, and all I have is a stack trace and
-the error code, then I can narrow the failure down to this function,
-but once the function starts returning the same error code in multiple
-places now it's non-trivial for me to deduce exactly which condition
-caused the crash. Having these logs makes it trivial. However, if this
-is not the preferred Linux style then so be it.
+Oh, sorry for the confusion. I think the current feedback I got is
+that my restructuring patchset was blocked due to the fact that it is
+a partial one. So, if this patchset got checked in, then the psp-sev.h
+will have two types of APIs: ones that use sev_data_* structure and
+ones that do not. So one of the worries is that this would make the
+situation even worse.
+
+So that's why I am thinking that maybe it is fine to just avoid using
+sev_data_* for all PSP functions exposed to KVM? I use the number of
+arguments as the justification. But that might not be a good one.
+
+In anycase, I will not rush into any code change before we reach a consensus.
+
+Thanks.
+-Mingwei
