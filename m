@@ -2,242 +2,256 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 35F494076A0
-	for <lists+kvm@lfdr.de>; Sat, 11 Sep 2021 14:56:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D737E40790A
+	for <lists+kvm@lfdr.de>; Sat, 11 Sep 2021 17:26:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235788AbhIKM6H (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 11 Sep 2021 08:58:07 -0400
-Received: from mail-dm6nam08on2074.outbound.protection.outlook.com ([40.107.102.74]:38892
-        "EHLO NAM04-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S230249AbhIKM6G (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 11 Sep 2021 08:58:06 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=OTcFDNjVhQtUqJFGYNO8SzllJpHjFxzz+PuPRLzmYz9qkcP5ejHllJBFOT/6FHqn3ZLvlfhmMeNuYHQ+e+4FIH0UFxXUp6rOJHJgY6RTX2/dbqEIefTkyjR5nDzCfZ+J8Fx2ZVcNTa739tJt1rVRR5ir4yLY/A/vocJPZ8N4tMmieoJ6EVr1XpE8Av6/Xgo3yQ9fMLF3qUu0iul0ODksFnTqcWesEKAozSt/e86+nd3GeGQhdQNoJBIFhvLWV1bdFWUxPYHkB+/nMfqa3X1/AWYyH5ARZQQmAz5U3TZDyroPUDWyJYx4nB2Vog65zg9rSqMjWgwAQ0mx46EP1Xw2Ow==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
- bh=97u9hwembo0GmVcymejpRtb/9J1Sq5DPaFJWvHZC80Y=;
- b=aBSY3Ed81U1z5D2glE6LTE9oM5ynJoCcL+OdBjMR/hpI+CmvP1JUN0fnRSDOS3kLmRayQKHR4+fvVUmJKzs6eh7k0Vn6d7ZXyRlvgfCO+6Zz+m9R8ixdQOeF7w/4/kfbP+kWCdT8uHLMcS4FzvIzWtXgfAno+VarxBQ6xwUtlXt7xOPZw+vKWEWLfkZmzStylko1QIS9W4+mLEyQMogvYJh4M1WrRBOn3zEzILnv+HeumCFcPF4u/e+FzLdgFGgnkly4xEAr4LOXrUr5NbEPwjxoplTJ8bR1O3mj22NqHLPLvvt+ukQhwxzXNZ3+E9x0K3ABuLnYgh3NaC7/z6FhkQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.112.35) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=quarantine sp=none pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=97u9hwembo0GmVcymejpRtb/9J1Sq5DPaFJWvHZC80Y=;
- b=RjOvSq2sLKAUYgHUbElK0p10MRVe3dFrp2BoZVE4CG9ZLdqhE0klD/AUVSlTVnxFH2/soF1RAQ73zb81JAy5COR2b7JE9iTts5ZhZtdsiKG7pZ7G4VXKNXNKmqo3kxodCvem71uY9OcdFGiUcCyeFOnOK/m0NbHYNcQlWs08DeDAeH5odpQhOu+LuUw+N392oKCc7ip1q2XfyeQgWbrN48XciQ1yBYkqn+lrQ/ZYaBEgtJ6aMGTxK2gLQol80fiPZpKjjtFLnAPTtMjmeBsOYfdJ9iT4m2VyQrOmst5cVnBJC0POf6h04LEk+WuHwmpXYmu00zLuBcRk7C8NjRQa7Q==
-Received: from BN9PR03CA0478.namprd03.prod.outlook.com (2603:10b6:408:139::33)
- by MN2PR12MB3631.namprd12.prod.outlook.com (2603:10b6:208:c2::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4500.17; Sat, 11 Sep
- 2021 12:56:51 +0000
-Received: from BN8NAM11FT009.eop-nam11.prod.protection.outlook.com
- (2603:10b6:408:139:cafe::6a) by BN9PR03CA0478.outlook.office365.com
- (2603:10b6:408:139::33) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4500.17 via Frontend
- Transport; Sat, 11 Sep 2021 12:56:51 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.35)
- smtp.mailfrom=nvidia.com; redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.112.35 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.112.35; helo=mail.nvidia.com;
-Received: from mail.nvidia.com (216.228.112.35) by
- BN8NAM11FT009.mail.protection.outlook.com (10.13.176.65) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.4500.14 via Frontend Transport; Sat, 11 Sep 2021 12:56:51 +0000
-Received: from DRHQMAIL107.nvidia.com (10.27.9.16) by HQMAIL111.nvidia.com
- (172.20.187.18) with Microsoft SMTP Server (TLS) id 15.0.1497.18; Sat, 11 Sep
- 2021 12:56:51 +0000
-Received: from [172.27.0.120] (172.20.187.5) by DRHQMAIL107.nvidia.com
- (10.27.9.16) with Microsoft SMTP Server (TLS) id 15.0.1497.18; Sat, 11 Sep
- 2021 12:56:47 +0000
-Subject: Re: [PATCH v2 1/1] virtio-blk: add num_io_queues module parameter
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-CC:     Stefan Hajnoczi <stefanha@redhat.com>, <hch@infradead.org>,
-        <virtualization@lists.linux-foundation.org>, <kvm@vger.kernel.org>,
-        <israelr@nvidia.com>, <nitzanc@nvidia.com>, <oren@nvidia.com>,
-        <linux-block@vger.kernel.org>, <axboe@kernel.dk>
-References: <20210905120234-mutt-send-email-mst@kernel.org>
- <98309fcd-3abe-1f27-fe52-e8fcc58bec13@nvidia.com>
- <20210906071957-mutt-send-email-mst@kernel.org>
- <1cbbe6e2-1473-8696-565c-518fc1016a1a@nvidia.com>
- <20210909094001-mutt-send-email-mst@kernel.org>
- <456e1704-67e9-aac9-a82a-44fed65dd153@nvidia.com>
- <20210909114029-mutt-send-email-mst@kernel.org>
- <da61fec0-e90f-0020-c836-c2e58d32be27@nvidia.com>
- <20210909123035-mutt-send-email-mst@kernel.org>
- <0cd4ab50-1bb2-3baf-fc00-b2045e8f8eb1@nvidia.com>
- <20210909185525-mutt-send-email-mst@kernel.org>
-From:   Max Gurtovoy <mgurtovoy@nvidia.com>
-Message-ID: <9de9a43a-2d3a-493b-516e-4601778b9237@nvidia.com>
-Date:   Sat, 11 Sep 2021 15:56:45 +0300
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+        id S232209AbhIKP1g (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 11 Sep 2021 11:27:36 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:34829 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230472AbhIKP1g (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 11 Sep 2021 11:27:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1631373982;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Xl+oqwnwvaxEHmP4vvNsBIhqBf7vlnAMAg0d7V640wo=;
+        b=bBcqpuZ1NouwCUaxRZWlnqBr2lrRJjiw/L5sVXhRvk1TFqplNZeQTTaphwh5CRaMUq6UBV
+        ow1Vp1z+R9UnRa5H1EYmmKPB1N3Zvdc10WPvxJdTqsZeHEwH4FRktGyNSAovbQXXFZFr7l
+        auX45SsZ0jTZbNobtkyDzXxV7S0qR7I=
+Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
+ [209.85.208.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-264-F7gUoVoTOz2iqmJfvNcKzQ-1; Sat, 11 Sep 2021 11:26:19 -0400
+X-MC-Unique: F7gUoVoTOz2iqmJfvNcKzQ-1
+Received: by mail-lj1-f200.google.com with SMTP id p11-20020a2ea40b000000b001d68cffb055so1799345ljn.6
+        for <kvm@vger.kernel.org>; Sat, 11 Sep 2021 08:26:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=Xl+oqwnwvaxEHmP4vvNsBIhqBf7vlnAMAg0d7V640wo=;
+        b=33ymdF8T1Vl32zveW++zWHSOzFWPL/bV5OuVbXeuQSQCa4uRWFx0cxfnv2Ltb9bbQ9
+         Lbss5MGgBev7RRjC3Rfgn5lqXeGHf3AIO3JOb88Co0YYQeO8lyBCvXpbgUk5HduZ3YyM
+         TbM7nIPNXT0hhfGFnYuvMsW4CtPl5l8k3m8zebsYZHbKaHgVhKW1EsMadsmrS1mPGQQy
+         y41mnqDwrqRXxgrzo66dwjWYjCYfw4dz6HzqPpaQJ3UmjMoWqrKDsX/Wj+fK36eJypwL
+         2DLc0iiLULFn5WtCxX8jy8a1j6K2DkTGsWlpQ3qhzyLhA9le0Mlre2wbL1zW578iwT8a
+         rQpQ==
+X-Gm-Message-State: AOAM532l4UY1uAh82SQ65Q1RRsbkSQ0u+Y9vtMBMCbD/s8QL6/P4yUoA
+        PX6538KEa+fkQuv2rD4QUBymHZlUZ89W62h6AnRHZiEzyOQy/cpGD682KimTVGU0gVGAgH1frBK
+        x8O1W680BqsOsWEYLWx+VR4P7i7jq
+X-Received: by 2002:ac2:4d57:: with SMTP id 23mr2359165lfp.493.1631373977465;
+        Sat, 11 Sep 2021 08:26:17 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw0FsdHGxiCkwOlRM7elTNZJQzMhOhalIj40meqAu34NJPBi0bEAORuK2tgt+z51M2CRS1qILAoO1Qq7TQbwDc=
+X-Received: by 2002:ac2:4d57:: with SMTP id 23mr2359143lfp.493.1631373977147;
+ Sat, 11 Sep 2021 08:26:17 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20210909185525-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Originating-IP: [172.20.187.5]
-X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
- DRHQMAIL107.nvidia.com (10.27.9.16)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: cdcb6d30-4292-49a4-2817-08d975239fe2
-X-MS-TrafficTypeDiagnostic: MN2PR12MB3631:
-X-Microsoft-Antispam-PRVS: <MN2PR12MB36318242A3BE520564D2BE3FDED79@MN2PR12MB3631.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: d5Z1ZiRIly+x+WFfRLr2dFVzVm0YBe/roDRseXaZjcsVWJb1ocdac2oMPRJeJpqarJWXHe4kJpGic7zGJctHBzbpmFMvhLyAj6VbNSFd/b/Wxo3+XtOeudQ259SCWI1Vn5t/gjbdgivJv951heA9lnak/iMbraywOBZQeMoZ1/mvOddpW1YfrBbljV9PBNQ6d5qKuPzLie1iiEaCBP6hi6/avoesV/gACdzCDUF4vRzgWYHYCtKD1/lGIh6dwrIYwA2Lq5zPhbTanPwy11uMCr1S3HFXvFcQSUA7QPvOiHlrt/hURuDhYGNzNSgAkZZlm7s4l+z2wnxFY6VEx2tKv+XpYEPx3L5lAWLGRz/AEBCBvp4PznaZkf6X8IAVXKk6HJx8NEbHJauqr8WXR7tCZf5dev059WGmEHG43V1Dtr5Ct2/ec6nxYANAtiSxgjZrUHKTf15VU82lpZMzTY8usxl7HWZ0gw6RDBkH8njYUJvvoKWpJXizWVBOLGCw3JbXb2IBAEzbgKqDGUbNLHwqn02HyW1fxyoElhTJocdBimZ6VLNl5F/PsEottEW9fs6RMsr5ZOthHH5/4FEGnb1K0tdMJLXlJFW1hvsO6vgwqvDmKtm3gPy8GJzCGGPcW6zHTwzTkcq5L51QuhnRxMRhVBpV+OsOSnBydHB3NuOAkIMrlSIWWP22AUWGdpB0g1IN4AxhbxqcN5MitvhRwJjcJ0JUe+GWrH96WkiKKv8grjI=
-X-Forefront-Antispam-Report: CIP:216.228.112.35;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid04.nvidia.com;CAT:NONE;SFS:(4636009)(396003)(346002)(376002)(39860400002)(136003)(46966006)(36840700001)(2616005)(36756003)(356005)(36860700001)(31696002)(36906005)(186003)(31686004)(8676002)(426003)(82310400003)(7636003)(6916009)(70206006)(16526019)(4326008)(26005)(478600001)(70586007)(8936002)(53546011)(2906002)(82740400003)(54906003)(47076005)(83380400001)(5660300002)(16576012)(86362001)(336012)(316002)(43740500002);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Sep 2021 12:56:51.4580
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: cdcb6d30-4292-49a4-2817-08d975239fe2
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.35];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT009.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB3631
+References: <20210903211600.2002377-1-ehabkost@redhat.com> <1111efc8-b32f-bd50-2c0f-4c6f506b544b@redhat.com>
+ <YTv4rgPol5vILWay@google.com>
+In-Reply-To: <YTv4rgPol5vILWay@google.com>
+From:   Eduardo Habkost <ehabkost@redhat.com>
+Date:   Sat, 11 Sep 2021 11:26:01 -0400
+Message-ID: <CAOpTY_ony8uDquFQR3=hRvzpGHic6O_0qhocbHCz7-swyNc-QQ@mail.gmail.com>
+Subject: Re: [PATCH v2 0/3] kvm: x86: Set KVM_MAX_VCPUS=1024, KVM_SOFT_MAX_VCPUS=710
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Juergen Gross <jgross@suse.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Fri, Sep 10, 2021 at 8:30 PM Sean Christopherson <seanjc@google.com> wro=
+te:
+>
+> On Mon, Sep 06, 2021, Paolo Bonzini wrote:
+> > On 03/09/21 23:15, Eduardo Habkost wrote:
+> > > - Increases KVM_MAX_VCPU_ID from 1023 to 4096.
+>
+> ...
+>
+> > > Eduardo Habkost (3):
+> > >    kvm: x86: Set KVM_MAX_VCPU_ID to 4*KVM_MAX_VCPUS
+>
+> ...
+>
+> > >    kvm: x86: Increase MAX_VCPUS to 1024
+> > >    kvm: x86: Increase KVM_SOFT_MAX_VCPUS to 710
+> > >
+> > >   arch/x86/include/asm/kvm_host.h | 18 +++++++++++++++---
+> > >   1 file changed, 15 insertions(+), 3 deletions(-)
+> > >
+> >
+> > Queued, thanks.
+>
+> Before we commit to this, can we sort out the off-by-one mess that is KVM=
+_MAX_VCPU_ID?
+> As Eduardo pointed out[*], Juergen's commit 76b4f357d0e7 ("x86/kvm: fix v=
+cpu-id
+> indexed array sizes") _shouldn't_ be necessary because kvm_vm_ioctl_creat=
+e_vcpu()
+> rejects attempts to create id=3D=3DKVM_MAX_VCPU_ID
+>
+>         if (id >=3D KVM_MAX_VCPU_ID)
+>                 return -EINVAL;
+>
+> which aligns with the docs for KVM_CREATE_VCPU:
+>
+>         The vcpu id is an integer in the range [0, max_vcpu_id)
+>
+> but the fix is "needed" because rtc_irq_eoi_tracking_reset() does
+>
+>         bitmap_zero(ioapic->rtc_status.dest_map.map, KVM_MAX_VCPU_ID + 1)=
+;
+>
+> and now we have this
+>
+>         DECLARE_BITMAP(map, KVM_MAX_VCPU_ID + 1);
+>         u8 vectors[KVM_MAX_VCPU_ID + 1];
+>
+> which is wrong as well.  The "right" fix would have been to change
+> rtc_irq_eoi_tracking_reset(), but that looks all kinds of wrong on the su=
+rface.
+>
+> Non-x86 really mucks it up because generic code does:
+>
+>         #ifndef KVM_MAX_VCPU_ID
+>         #define KVM_MAX_VCPU_ID KVM_MAX_VCPUS
+>         #endif
+>
+> which means pretty much everything else can create more vCPUs than vCPU I=
+Ds.
+>
+> Maybe fix KVM's internal KVM_MAX_VCPU_ID so that it's incluse, and handle=
+ the
+> backwards compability mess in KVM_CAP_MAX_VCPU_ID?  Then have the max ID =
+for x86
+> be (4*KVM_MAX_VCPUS - 1).  E.g. something like:
 
-On 9/10/2021 1:57 AM, Michael S. Tsirkin wrote:
-> On Thu, Sep 09, 2021 at 07:45:42PM +0300, Max Gurtovoy wrote:
->> On 9/9/2021 7:31 PM, Michael S. Tsirkin wrote:
->>> On Thu, Sep 09, 2021 at 06:51:56PM +0300, Max Gurtovoy wrote:
->>>> On 9/9/2021 6:40 PM, Michael S. Tsirkin wrote:
->>>>> On Thu, Sep 09, 2021 at 06:37:37PM +0300, Max Gurtovoy wrote:
->>>>>> On 9/9/2021 4:42 PM, Michael S. Tsirkin wrote:
->>>>>>> On Mon, Sep 06, 2021 at 02:59:40PM +0300, Max Gurtovoy wrote:
->>>>>>>> On 9/6/2021 2:20 PM, Michael S. Tsirkin wrote:
->>>>>>>>> On Mon, Sep 06, 2021 at 01:31:32AM +0300, Max Gurtovoy wrote:
->>>>>>>>>> On 9/5/2021 7:02 PM, Michael S. Tsirkin wrote:
->>>>>>>>>>> On Thu, Sep 02, 2021 at 02:45:52PM +0100, Stefan Hajnoczi wrote:
->>>>>>>>>>>> On Tue, Aug 31, 2021 at 04:50:35PM +0300, Max Gurtovoy wrote:
->>>>>>>>>>>>> Sometimes a user would like to control the amount of IO queues to be
->>>>>>>>>>>>> created for a block device. For example, for limiting the memory
->>>>>>>>>>>>> footprint of virtio-blk devices.
->>>>>>>>>>>>>
->>>>>>>>>>>>> Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
->>>>>>>>>>>>> ---
->>>>>>>>>>>>>
->>>>>>>>>>>>> changes from v1:
->>>>>>>>>>>>>        - use param_set_uint_minmax (from Christoph)
->>>>>>>>>>>>>        - added "Should > 0" to module description
->>>>>>>>>>>>>
->>>>>>>>>>>>> Note: This commit apply on top of Jens's branch for-5.15/drivers
->>>>>>>>>>>>> ---
->>>>>>>>>>>>>        drivers/block/virtio_blk.c | 20 +++++++++++++++++++-
->>>>>>>>>>>>>        1 file changed, 19 insertions(+), 1 deletion(-)
->>>>>>>>>>>>>
->>>>>>>>>>>>> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
->>>>>>>>>>>>> index 4b49df2dfd23..9332fc4e9b31 100644
->>>>>>>>>>>>> --- a/drivers/block/virtio_blk.c
->>>>>>>>>>>>> +++ b/drivers/block/virtio_blk.c
->>>>>>>>>>>>> @@ -24,6 +24,22 @@
->>>>>>>>>>>>>        /* The maximum number of sg elements that fit into a virtqueue */
->>>>>>>>>>>>>        #define VIRTIO_BLK_MAX_SG_ELEMS 32768
->>>>>>>>>>>>> +static int virtblk_queue_count_set(const char *val,
->>>>>>>>>>>>> +		const struct kernel_param *kp)
->>>>>>>>>>>>> +{
->>>>>>>>>>>>> +	return param_set_uint_minmax(val, kp, 1, nr_cpu_ids);
->>>>>>>>>>>>> +}
->>>>>>>>> Hmm which tree is this for?
->>>>>>>> I've mentioned in the note that it apply on branch for-5.15/drivers. But now
->>>>>>>> you can apply it on linus/master as well.
->>>>>>>>
->>>>>>>>
->>>>>>>>>>>>> +
->>>>>>>>>>>>> +static const struct kernel_param_ops queue_count_ops = {
->>>>>>>>>>>>> +	.set = virtblk_queue_count_set,
->>>>>>>>>>>>> +	.get = param_get_uint,
->>>>>>>>>>>>> +};
->>>>>>>>>>>>> +
->>>>>>>>>>>>> +static unsigned int num_io_queues;
->>>>>>>>>>>>> +module_param_cb(num_io_queues, &queue_count_ops, &num_io_queues, 0644);
->>>>>>>>>>>>> +MODULE_PARM_DESC(num_io_queues,
->>>>>>>>>>>>> +		 "Number of IO virt queues to use for blk device. Should > 0");
->>>>>>>>> better:
->>>>>>>>>
->>>>>>>>> +MODULE_PARM_DESC(num_io_request_queues,
->>>>>>>>> +                "Limit number of IO request virt queues to use for each device. 0 for now limit");
->>>>>>>> You proposed it and I replied on it bellow.
->>>>>>> Can't say I understand 100% what you are saying. Want to send
->>>>>>> a description that does make sense to you but
->>>>>>> also reflects reality? 0 is the default so
->>>>>>> "should > 0" besides being ungrammatical does not seem t"
->>>>>>> reflect what it does ...
->>>>>> if you "modprobe virtio_blk" the previous behavior will happen.
->>>>>>
->>>>>> You can't "modprobe virtio_blk num_io_request_queues=0" since the minimal
->>>>>> value is 1.
->>>>>>
->>>>>> So your description is not reflecting the code.
->>>>>>
->>>>>> We can do:
->>>>>>
->>>>>> MODULE_PARM_DESC(num_io_request_queues, "Number of request virt queues to use for blk device. Minimum value is 1 queue");
->>>>> What's the default value? We should document that.
->>>> default value for static global variables is 0.
->>>>
->>>> MODULE_PARM_DESC(num_io_request_queues, "Number of request virt queues to
->>>> use for blk device. Minimum value is 1 queue. Default and Maximum value is
->>>> equal to the total number of CPUs");
->>> So it says it's the # of cpus but yoiu inspect it with
->>> sysfs and it's actually 0. Let's say that's confusing
->>> at the least. why not just let users set it to 0
->>> and document that?
->>>
->> Setting it by the user to 0 makes no sense.
->>
->> We can say "if not set, the value equals to the total number of CPUs".
-> the value is 0. it seems to mean "no limit". the actual # of queues is
-> then te smaller between # of cpus and # of hardware queues.
-> I see no reason not to allow user to set that especially if
-> it was originally the value then user changed it
-> and is trying to change it back.
 
-I fine with that.
+Wouldn't it be simpler to just revert 76b4f357d0e7 and rename
+KVM_MAX_VCPU_ID to KVM_MAX_VCPU_IDS?
 
-MODULE_PARM_DESC(num_io_request_queues, "Number of request virt queues to use for blk device. 0 value means no limitation");
-
+As far as I can see, every single line of code in KVM (except the 3
+lines touched by 76b4f357d0e7) treats both KVM_MAX_VCPU_ID and
+KVM_CAP_MAX_VCPU_ID as exclusive. Including the API documentation.
 
 >
->> The actual value of the created queues can be seen in /sys/block/vda/mq/ as
->> done today.
->>>>>>>>>>>>> +
->>>>>>>>>>>>>        static int major;
->>>>>>>>>>>>>        static DEFINE_IDA(vd_index_ida);
->>>>>>>>>>>>> @@ -501,7 +517,9 @@ static int init_vq(struct virtio_blk *vblk)
->>>>>>>>>>>>>        	if (err)
->>>>>>>>>>>>>        		num_vqs = 1;
->>>>>>>>>>>>> -	num_vqs = min_t(unsigned int, nr_cpu_ids, num_vqs);
->>>>>>>>>>>>> +	num_vqs = min_t(unsigned int,
->>>>>>>>>>>>> +			min_not_zero(num_io_queues, nr_cpu_ids),
->>>>>>>>>>>>> +			num_vqs);
->>>>>>>>>>>> If you respin, please consider calling them request queues. That's the
->>>>>>>>>>>> terminology from the VIRTIO spec and it's nice to keep it consistent.
->>>>>>>>>>>> But the purpose of num_io_queues is clear, so:
->>>>>>>>>>>>
->>>>>>>>>>>> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
->>>>>>>>>>> I did this:
->>>>>>>>>>> +static unsigned int num_io_request_queues;
->>>>>>>>>>> +module_param_cb(num_io_request_queues, &queue_count_ops, &num_io_request_queues, 0644);
->>>>>>>>>>> +MODULE_PARM_DESC(num_io_request_queues,
->>>>>>>>>>> +                "Limit number of IO request virt queues to use for each device. 0 for now limit");
->>>>>>>>>> The parameter is writable and can be changed and then new devices might be
->>>>>>>>>> probed with new value.
->>>>>>>>>>
->>>>>>>>>> It can't be zero in the code. we can change param_set_uint_minmax args and
->>>>>>>>>> say that 0 says nr_cpus.
->>>>>>>>>>
->>>>>>>>>> I'm ok with the renaming but I prefer to stick to the description we gave in
->>>>>>>>>> V3 of this patch (and maybe enable value of 0 as mentioned above).
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index e5d5c5ed7dd4..2e5c8081f72b 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -4061,7 +4061,8 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, l=
+ong ext)
+>                 r =3D KVM_MAX_VCPUS;
+>                 break;
+>         case KVM_CAP_MAX_VCPU_ID:
+> -               r =3D KVM_MAX_VCPU_ID;
+> +               /* KVM's ABI is stupid. */
+> +               r =3D KVM_MAX_VCPU_ID - 1;
+>                 break;
+>         case KVM_CAP_PV_MMU:    /* obsolete */
+>                 r =3D 0;
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index b50dbe269f4b..ba46c42a4a6f 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -3460,7 +3460,7 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm=
+, u32 id)
+>         struct kvm_vcpu *vcpu;
+>         struct page *page;
+>
+> -       if (id >=3D KVM_MAX_VCPU_ID)
+> +       if (id > KVM_MAX_VCPU_ID)
+>                 return -EINVAL;
+>
+>         mutex_lock(&kvm->lock);
+> 17:23:40 =E2=9C=94 ~/go/src/kernel.org/host $ gdd
+> diff --git a/arch/powerpc/include/asm/kvm_book3s.h b/arch/powerpc/include=
+/asm/kvm_book3s.h
+> index caaa0f592d8e..0292d8a5ce5e 100644
+> --- a/arch/powerpc/include/asm/kvm_book3s.h
+> +++ b/arch/powerpc/include/asm/kvm_book3s.h
+> @@ -434,7 +434,7 @@ extern int kvmppc_h_logical_ci_store(struct kvm_vcpu =
+*vcpu);
+>  #define SPLIT_HACK_OFFS                        0xfb000000
+>
+>  /*
+> - * This packs a VCPU ID from the [0..KVM_MAX_VCPU_ID) space down to the
+> + * This packs a VCPU ID from the [0..KVM_MAX_VCPU_ID] space down to the
+>   * [0..KVM_MAX_VCPUS) space, using knowledge of the guest's core stride
+>   * (but not its actual threading mode, which is not available) to avoid
+>   * collisions.
+> diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/a=
+sm/kvm_host.h
+> index 9f52f282b1aa..beeebace8d1c 100644
+> --- a/arch/powerpc/include/asm/kvm_host.h
+> +++ b/arch/powerpc/include/asm/kvm_host.h
+> @@ -33,11 +33,11 @@
+>
+>  #ifdef CONFIG_KVM_BOOK3S_HV_POSSIBLE
+>  #include <asm/kvm_book3s_asm.h>                /* for MAX_SMT_THREADS */
+> -#define KVM_MAX_VCPU_ID                (MAX_SMT_THREADS * KVM_MAX_VCORES=
+)
+> +#define KVM_MAX_VCPU_ID                (MAX_SMT_THREADS * KVM_MAX_VCORES=
+) - 1
+>  #define KVM_MAX_NESTED_GUESTS  KVMPPC_NR_LPIDS
+>
+>  #else
+> -#define KVM_MAX_VCPU_ID                KVM_MAX_VCPUS
+> +#define KVM_MAX_VCPU_ID                KVM_MAX_VCPUS - 1
+>  #endif /* CONFIG_KVM_BOOK3S_HV_POSSIBLE */
+>
+>  #define __KVM_HAVE_ARCH_INTC_INITIALIZED
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index e5d5c5ed7dd4..5c20c0bd4db6 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -4061,7 +4061,8 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, l=
+ong ext)
+>                 r =3D KVM_MAX_VCPUS;
+>                 break;
+>         case KVM_CAP_MAX_VCPU_ID:
+> -               r =3D KVM_MAX_VCPU_ID;
+> +               /* KVM's ABI is stupid. */
+> +               r =3D KVM_MAX_VCPU_ID + 1;
+>                 break;
+>         case KVM_CAP_PV_MMU:    /* obsolete */
+>                 r =3D 0;
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index ae7735b490b4..37ef972caf4b 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -40,7 +40,7 @@
+>  #include <linux/kvm_dirty_ring.h>
+>
+>  #ifndef KVM_MAX_VCPU_ID
+> -#define KVM_MAX_VCPU_ID KVM_MAX_VCPUS
+> +#define KVM_MAX_VCPU_ID KVM_MAX_VCPUS - 1
+>  #endif
+>
+>  /*
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index b50dbe269f4b..ba46c42a4a6f 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -3460,7 +3460,7 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm=
+, u32 id)
+>         struct kvm_vcpu *vcpu;
+>         struct page *page;
+>
+> -       if (id >=3D KVM_MAX_VCPU_ID)
+> +       if (id > KVM_MAX_VCPU_ID)
+>                 return -EINVAL;
+>
+>         mutex_lock(&kvm->lock);
+>
+>
+
+
+--=20
+Eduardo
+
