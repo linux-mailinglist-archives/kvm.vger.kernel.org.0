@@ -2,154 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C6596407D45
-	for <lists+kvm@lfdr.de>; Sun, 12 Sep 2021 14:31:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BC6EF407E32
+	for <lists+kvm@lfdr.de>; Sun, 12 Sep 2021 17:58:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235050AbhILMcy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 12 Sep 2021 08:32:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38640 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229635AbhILMcy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 12 Sep 2021 08:32:54 -0400
-Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0D21C061574
-        for <kvm@vger.kernel.org>; Sun, 12 Sep 2021 05:31:39 -0700 (PDT)
-Received: by mail-pf1-x433.google.com with SMTP id g14so6264581pfm.1
-        for <kvm@vger.kernel.org>; Sun, 12 Sep 2021 05:31:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=l2bSjNJqTwhQZphEwMAU513EeIhPI7Thg1lJpA7i8fs=;
-        b=R66inDcAWt9GQlblcZebPLMwPlHlAnt0L3kyGlH8r3X6FsDI/N/vYwneGzy6f53yoC
-         aJSbeJ2HVLZ5IETneJLglbqjOoAzPmPkvYhRyqU7w9yu4eGlZVUBvR4cBjWxsVNMWyQs
-         qiLol3oXEuJFHpxM5XDG2HifDgtIlXc6Y+gNn2EVYS2UFBYwOF9tNaPzUqjb6c9xEMKD
-         EpbKtmy5jQyQ9JwjSHSZdDyKcuXW75ONjIPM4WmszEr/HJrFRo+qRBybdHwe5FUddKSp
-         VhyKUscbCxv1rziWUD7Bm32+mC15T8UjtL/0R3OkiO3/Lb77FRexMdrsOVYoCJhihCLc
-         vdAQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=l2bSjNJqTwhQZphEwMAU513EeIhPI7Thg1lJpA7i8fs=;
-        b=nGq70sNAB4ZA8avnxemsQH+GPgEWqgcfF0aTBMbyw2kwgm6iNMcyjNVRKaVnaULSPU
-         TS0jMhySXCB4neWN3/k7QMW2ONj8ZCQ0sQhx8sYwlFtcmMZbA76qGed6qhc8y/ks/GCY
-         8HGFanJWoLq30vxhM9Y7bA41q4+sCvRSqaY6PvzwxjIMTz7xa+uKp/9O+vYQzjgkFdJn
-         FKOgKK4W1IrMS/0EkupEydA8DT0GTy85BJGI44M/4fJnKWmFH5EPBrQV/08vxDolaJkt
-         SNoj+VjXy2/93A12W6VslSx0W2uiMSeHyyIIZe9UKwsrEjthJEcI0HAolu913y742m/o
-         PTPQ==
-X-Gm-Message-State: AOAM532Xo6GBg9ZgFREVLvhIf2+cGQT5r1m/DSEmj0ezDzcTc/MmieSK
-        VHK9HwjpuDGUCmp50TNz4mEixw==
-X-Google-Smtp-Source: ABdhPJxYx4l/5Z0anqBV+G7Bghe5EKN+RrvdQIUDU4YrpZdFpP+VKFzDEwt6BtZ6HBag6jIPDdKEog==
-X-Received: by 2002:a63:5413:: with SMTP id i19mr6469698pgb.297.1631449898733;
-        Sun, 12 Sep 2021 05:31:38 -0700 (PDT)
-Received: from [192.168.1.11] ([71.212.134.125])
-        by smtp.gmail.com with ESMTPSA id z9sm3970376pfn.22.2021.09.12.05.31.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 12 Sep 2021 05:31:38 -0700 (PDT)
-Subject: Re: [PATCH v3 21/30] target/ppc: Introduce
- PowerPCCPUClass::has_work()
-To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
-        Greg Kurz <groug@kaod.org>
-Cc:     Peter Maydell <peter.maydell@linaro.org>,
-        Chris Wulff <crwulff@gmail.com>, kvm@vger.kernel.org,
-        David Hildenbrand <david@redhat.com>,
-        Bin Meng <bin.meng@windriver.com>,
-        Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
-        qemu-devel@nongnu.org, Jiaxun Yang <jiaxun.yang@flygoat.com>,
-        Max Filippov <jcmvbkbc@gmail.com>,
-        Taylor Simpson <tsimpson@quicinc.com>, haxm-team@intel.com,
-        Colin Xu <colin.xu@intel.com>,
-        Sunil Muthuswamy <sunilmut@microsoft.com>,
-        Marek Vasut <marex@denx.de>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Yoshinori Sato <ysato@users.sourceforge.jp>,
-        Paul Durrant <paul@xen.org>,
-        Kamil Rytarowski <kamil@netbsd.org>,
-        Reinoud Zandijk <reinoud@netbsd.org>,
-        Claudio Fontana <cfontana@suse.de>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Anthony Perard <anthony.perard@citrix.com>,
-        xen-devel@lists.xenproject.org,
-        Artyom Tarasenko <atar4qemu@gmail.com>,
-        Laurent Vivier <lvivier@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Cameron Esfahani <dirty@apple.com>, qemu-s390x@nongnu.org,
-        qemu-arm@nongnu.org, Michael Rolnik <mrolnik@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, qemu-ppc@nongnu.org,
-        Stafford Horne <shorne@gmail.com>, qemu-riscv@nongnu.org,
-        Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Roman Bolshakov <r.bolshakov@yadro.com>,
-        Laurent Vivier <laurent@vivier.eu>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Wenchao Wang <wenchao.wang@intel.com>,
-        Alistair Francis <alistair.francis@wdc.com>,
-        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
-        Aurelien Jarno <aurelien@aurel32.net>
-References: <20210902161543.417092-1-f4bug@amsat.org>
- <20210902161543.417092-22-f4bug@amsat.org> <YTFxZb1Vg5pWVW9p@yekko>
- <fd383a02-fb9f-8641-937f-ebe1d8bb065f@linaro.org>
- <fc98e293-f2ba-8ca0-99c8-f07758b79d73@amsat.org>
- <a49e0100-74d1-2974-990f-a05f9f796cc5@amsat.org>
-From:   Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <82c9e627-016a-e834-6ed0-4c5d49b554e6@linaro.org>
-Date:   Sun, 12 Sep 2021 05:31:33 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+        id S232021AbhILP7n (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 12 Sep 2021 11:59:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:59815 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229726AbhILP7n (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 12 Sep 2021 11:59:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1631462308;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=OfkCLhQjkEJmJ1j4mWHgvbULQtNu9xPhouoVxezHb10=;
+        b=RxRmJwVjx8no58lmhL4J9ebQCCbZmwv+qlyd0c3/Q7Ppc0y9c/AcS1WRONxQX2egG5tgCx
+        NjqsqCxceGzOWEOqM46Bl0JJjqoQIX3xUKwEhvhG3UAkbaHBjERfumiLrZqz2Ay649V1bm
+        GZguV/Dd64mhZ3/Ht3Jh05gzKJvtX88=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-582-KJy9WGiHPBaMSXQvcAgnsw-1; Sun, 12 Sep 2021 11:58:27 -0400
+X-MC-Unique: KJy9WGiHPBaMSXQvcAgnsw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E1E74824FA6;
+        Sun, 12 Sep 2021 15:58:25 +0000 (UTC)
+Received: from starship (unknown [10.35.206.50])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CE0135D6CF;
+        Sun, 12 Sep 2021 15:58:22 +0000 (UTC)
+Message-ID: <6424b309216b276e46a66573320b3eed8209a0ed.camel@redhat.com>
+Subject: Re: [PATCH 1/4] KVM: nVMX: Don't use Enlightened MSR Bitmap for L3
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org
+Date:   Sun, 12 Sep 2021 18:58:21 +0300
+In-Reply-To: <20210910160633.451250-2-vkuznets@redhat.com>
+References: <20210910160633.451250-1-vkuznets@redhat.com>
+         <20210910160633.451250-2-vkuznets@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-In-Reply-To: <a49e0100-74d1-2974-990f-a05f9f796cc5@amsat.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/11/21 3:31 PM, Philippe Mathieu-Daudé wrote:
-> On 9/3/21 11:11 PM, Philippe Mathieu-Daudé wrote:
->> On 9/3/21 10:42 PM, Richard Henderson wrote:
->>> On 9/3/21 2:50 AM, David Gibson wrote:
->>>> On Thu, Sep 02, 2021 at 06:15:34PM +0200, Philippe Mathieu-Daudé wrote:
->>>>> Each POWER cpu has its own has_work() implementation. Instead of
->>>>> overloading CPUClass on each PowerPCCPUClass init, register the
->>>>> generic ppc_cpu_has_work() handler, and have it call the POWER
->>>>> specific has_work().
->>>>
->>>> I don't quite see the rationale for introducing a second layer of
->>>> indirection here.  What's wrong with switching the base has_work for
->>>> each cpu variant?
->>>
->>> We're moving the hook from CPUState to TCGCPUOps.
->>> Phil was trying to avoid creating N versions of
->>>
->>> static const struct TCGCPUOps ppc_tcg_ops = {
->>>      ...
->>> };
->>
->> Ah yes this is the reason! Too many context switching so
->> I forgot about it.
->>
->>> A plausible alternative is to remove the const from this struct and
->>> modify it, just as we do for CPUState, on the assumption that we cannot
->>> mix and match ppc cpu types in any one machine.
->>
->> I thought about this case and remembered how it works on the ARM arch,
->> i.e. ZynqMP machine uses both Cortex-R5F and Cortex-A53. Even if no
->> similar PPC machine exists, IMHO we should try to generally allow to
->> possibility to experiment machine with different CPUs. Restricting it
->> on PPC goes the other way around. Thoughts?
+On Fri, 2021-09-10 at 18:06 +0200, Vitaly Kuznetsov wrote:
+> When KVM runs as a nested hypervisor on top of Hyper-V it uses Enlightened
+> VMCS and enables Enlightened MSR Bitmap feature for its L1s and L2s (which
+> are actually L2s and L3s from Hyper-V's perspective). When MSR bitmap is
+> updated, KVM has to reset HV_VMX_ENLIGHTENED_CLEAN_FIELD_MSR_BITMAP from
+> clean fields to make Hyper-V aware of the change. For KVM's L1s, this is
+> done in vmx_disable_intercept_for_msr()/vmx_enable_intercept_for_msr().
+> MSR bitmap for L2 is build in nested_vmx_prepare_msr_bitmap() by blending
+> MSR bitmap for L1 and L1's idea of MSR bitmap for L2. KVM, however, doesn't
+> check if the resulting bitmap is different and never cleans
+> HV_VMX_ENLIGHTENED_CLEAN_FIELD_MSR_BITMAP in eVMCS02. This is incorrect and
+> may result in Hyper-V missing the update.
 > 
-> I'm running out of ideas to do avoid the indirection and multiple
-> copies of TCGCPUOps. I'm not giving up, I suppose I'm simply not
-> seeing it... David, any suggestions?
+> The issue could've been solved by calling evmcs_touch_msr_bitmap() for
+> eVMCS02 from nested_vmx_prepare_msr_bitmap() unconditionally but doing so
+> would not give any performance benefits (compared to not using Enlightened
+> MSR Bitmap at all). 3-level nesting is also not a very common setup
+> nowadays.
+> 
+> Don't enable 'Enlightened MSR Bitmap' feature for KVM's L2s (real L3s) for
+> now.
+> 
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> ---
+>  arch/x86/kvm/vmx/vmx.c | 22 +++++++++++++---------
+>  1 file changed, 13 insertions(+), 9 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 0c2c0d5ae873..ae470afcb699 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -2654,15 +2654,6 @@ int alloc_loaded_vmcs(struct loaded_vmcs *loaded_vmcs)
+>  		if (!loaded_vmcs->msr_bitmap)
+>  			goto out_vmcs;
+>  		memset(loaded_vmcs->msr_bitmap, 0xff, PAGE_SIZE);
+> -
+> -		if (IS_ENABLED(CONFIG_HYPERV) &&
+> -		    static_branch_unlikely(&enable_evmcs) &&
+> -		    (ms_hyperv.nested_features & HV_X64_NESTED_MSR_BITMAP)) {
+> -			struct hv_enlightened_vmcs *evmcs =
+> -				(struct hv_enlightened_vmcs *)loaded_vmcs->vmcs;
+> -
+> -			evmcs->hv_enlightenments_control.msr_bitmap = 1;
+> -		}
+>  	}
+>  
+>  	memset(&loaded_vmcs->host_state, 0, sizeof(struct vmcs_host_state));
+> @@ -6861,6 +6852,19 @@ static int vmx_create_vcpu(struct kvm_vcpu *vcpu)
+>  	}
+>  
+>  	vmx->loaded_vmcs = &vmx->vmcs01;
+> +
+> +	/*
+> +	 * Use Hyper-V 'Enlightened MSR Bitmap' feature when KVM runs as a
+> +	 * nested (L1) hypervisor and Hyper-V in L0 supports it.
+> +	 */
+> +	if (IS_ENABLED(CONFIG_HYPERV) && static_branch_unlikely(&enable_evmcs)
+> +	    && (ms_hyperv.nested_features & HV_X64_NESTED_MSR_BITMAP)) {
+> +		struct hv_enlightened_vmcs *evmcs =
+> +			(struct hv_enlightened_vmcs *)vmx->loaded_vmcs->vmcs;
+> +
+> +		evmcs->hv_enlightenments_control.msr_bitmap = 1;
+> +	}
+> +
+>  	cpu = get_cpu();
+>  	vmx_vcpu_load(vcpu, cpu);
+>  	vcpu->cpu = cpu;
 
-I think multiple copies of TCGCPUOps is the solution.  Macro-ized, perhaps, so that the 
-amount of typing is minimal across the versions.
+Makes sense.
+
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 
 
-r~
+However, just a note that it is very very confusing that KVM can use eVMCS in both ways.
+ 
+ 
+'Client': It can both run under HyperV, and thus take advantage of eVMCS when it runs its guests (with
+help of
+HyperV)
+ 
+'Server' KVM can emulate some HyperV features, and one of these is eVMCS, thus a windows guest running
+under KVM, can use KVM's eVMCS implementation to run nested guests.
+ 
+This patch fails under
+'Client', while the other patches in the series fall under the 'Server' category,
+and even more confusing, the patch 2 moves 'Client' code around, but it is intended for following patches
+3,4 which are
+for Server.
+ 
+
+Thus this patch probably should be a separate patch, just to avoid confusion.
+
+However, since this patch series is already posted, and I figured that out, and hopefully explained it here,
+no need to do anything though!
+
+
+Best regards,
+	Maxim Levitsky
+
+
+
