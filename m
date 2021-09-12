@@ -2,223 +2,165 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0A9A8407CC2
-	for <lists+kvm@lfdr.de>; Sun, 12 Sep 2021 11:51:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 49F4C407CD9
+	for <lists+kvm@lfdr.de>; Sun, 12 Sep 2021 12:33:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233958AbhILJwO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 12 Sep 2021 05:52:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25517 "EHLO
+        id S233719AbhILKeg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 12 Sep 2021 06:34:36 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50595 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233454AbhILJwO (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 12 Sep 2021 05:52:14 -0400
+        by vger.kernel.org with ESMTP id S229568AbhILKed (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 12 Sep 2021 06:34:33 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1631440259;
+        s=mimecast20190719; t=1631442798;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=DO0lP6RjLZGuAwzVarCFdM0VM58MS0sPAfAXE13fr4c=;
-        b=I+Om7A05TTUu8UwnL88wsFXVaz7NUw2wN8Tndm3SYinSC6f9zF7I+0rlBEh5mEr57ycn1V
-        TCMMM79gPI+itIaHz90nv6uaCl1nhNv5hSJsI1EI6bntogB7Et5EfEGA147ZcMct87MRHb
-        2ggftAK+bfwQ5+citbQ6rnjrOJsLTNA=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-381-HQ8t2aC7Pae5nkk_mwIT-w-1; Sun, 12 Sep 2021 05:50:58 -0400
-X-MC-Unique: HQ8t2aC7Pae5nkk_mwIT-w-1
-Received: by mail-ed1-f72.google.com with SMTP id n5-20020a05640206c500b003cf53f7cef2so3291858edy.12
-        for <kvm@vger.kernel.org>; Sun, 12 Sep 2021 02:50:58 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=DO0lP6RjLZGuAwzVarCFdM0VM58MS0sPAfAXE13fr4c=;
-        b=ffsj3ZAbLoxqg6GmHqNGxaJTFYlbFwczsOAsO7TrAgdWkD+JhmsOpAJnaVoucPNamd
-         W/DdX6at3GwxDSusoY3MQSSzxbY0lEVXNNRKnr9azcwGftIV3mGbqxlEvoei9l7PGlhW
-         dGBH4VY4nZjlV1xeoysiRtYANY8q08H6JrRQg/fdGs1Sj3UD7F9ADj58pFM6R8DW1giy
-         JybZDVDqmVUoqfjOu4yu6+QDsrsTMDoqlPnAvfx+s1zi+dczYjvHvmcyPstc5wv0RXhn
-         828l9rZjnV1HQMBMYiJK/uRpxFZVx17W6Y70SlcvsMFCB+Gi6YpyZpydkWPy8X8IQ9Au
-         PCPA==
-X-Gm-Message-State: AOAM532y7phQViuA4fpBpcBrP9LaK4VxeEqL4m5ZgvnDOJTjRKsPIA9G
-        JK3XFBq1iUtLbwbiWOr8uOhwLmVIhnEo1YWrhxKI39xngmf3wqBLdGZ4os6EhcY9u3TgjqYmv9L
-        IJ1F1nMzF8aC/
-X-Received: by 2002:a17:906:b08e:: with SMTP id x14mr6858877ejy.40.1631440257286;
-        Sun, 12 Sep 2021 02:50:57 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxfzYlW00EflVZRuhrUrZmzBRewk6zsNxfHiJAIwWbYcmxK42e9TZoQ8zJXVI/1VvQk7LkshA==
-X-Received: by 2002:a17:906:b08e:: with SMTP id x14mr6858859ejy.40.1631440257074;
-        Sun, 12 Sep 2021 02:50:57 -0700 (PDT)
-Received: from redhat.com ([2.55.27.174])
-        by smtp.gmail.com with ESMTPSA id t5sm2048235edd.66.2021.09.12.02.50.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 12 Sep 2021 02:50:55 -0700 (PDT)
-Date:   Sun, 12 Sep 2021 05:50:51 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Max Gurtovoy <mgurtovoy@nvidia.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>, hch@infradead.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        israelr@nvidia.com, nitzanc@nvidia.com, oren@nvidia.com,
-        linux-block@vger.kernel.org, axboe@kernel.dk
-Subject: Re: [PATCH v2 1/1] virtio-blk: add num_io_queues module parameter
-Message-ID: <20210912054959-mutt-send-email-mst@kernel.org>
-References: <20210909094001-mutt-send-email-mst@kernel.org>
- <456e1704-67e9-aac9-a82a-44fed65dd153@nvidia.com>
- <20210909114029-mutt-send-email-mst@kernel.org>
- <da61fec0-e90f-0020-c836-c2e58d32be27@nvidia.com>
- <20210909123035-mutt-send-email-mst@kernel.org>
- <0cd4ab50-1bb2-3baf-fc00-b2045e8f8eb1@nvidia.com>
- <20210909185525-mutt-send-email-mst@kernel.org>
- <9de9a43a-2d3a-493b-516e-4601778b9237@nvidia.com>
- <20210912050531-mutt-send-email-mst@kernel.org>
- <f58f955e-ef27-fba1-7417-8d37a175e872@nvidia.com>
+        bh=INc5cECNI9sJ05Bk6PZMOwiVAdVb2WxqVCqnhvKwEZM=;
+        b=e76xlHdzSLJPK8pzk6d2z88tg20bt1PLlNKKfJ4MFPmgm92d432mpoTAQeC28Lpx07A8Gt
+        oGLBxaezR/picHgrsDNCCiByi5psD0TkYIhq6izw9ZXHzBsfLZwW3WAk0+uGnMvNVP+csC
+        Tqtum0vlbcLmPMB+/bl2IpXZli4UtBI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-485-XVqpWGwjP16_HM1c4VWdow-1; Sun, 12 Sep 2021 06:33:17 -0400
+X-MC-Unique: XVqpWGwjP16_HM1c4VWdow-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F2DE6801B3D;
+        Sun, 12 Sep 2021 10:33:14 +0000 (UTC)
+Received: from starship (unknown [10.35.206.50])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id EDE0A5D9DD;
+        Sun, 12 Sep 2021 10:33:10 +0000 (UTC)
+Message-ID: <ba96d0334762fc41f20ed997c859d4b01c38b6d8.camel@redhat.com>
+Subject: Re: [PATCH v2 1/3] KVM: nSVM: restore the L1 host state prior to
+ resuming a nested guest on SMM exit
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Jim Mattson <jmattson@google.com>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
+        <linux-kernel@vger.kernel.org>, Wanpeng Li <wanpengli@tencent.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Date:   Sun, 12 Sep 2021 13:33:09 +0300
+In-Reply-To: <YTkzUaFD664+9WB+@google.com>
+References: <20210823114618.1184209-1-mlevitsk@redhat.com>
+         <20210823114618.1184209-2-mlevitsk@redhat.com>
+         <YTkzUaFD664+9WB+@google.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f58f955e-ef27-fba1-7417-8d37a175e872@nvidia.com>
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Sep 12, 2021 at 12:37:26PM +0300, Max Gurtovoy wrote:
+On Wed, 2021-09-08 at 22:04 +0000, Sean Christopherson wrote:
+> On Mon, Aug 23, 2021, Maxim Levitsky wrote:
+> > If the guest is entered prior to restoring the host save area,
+> > the guest entry code might see incorrect L1 state (e.g paging state).
+> > 
+> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > ---
+> >  arch/x86/kvm/svm/svm.c | 23 +++++++++++++----------
+> >  1 file changed, 13 insertions(+), 10 deletions(-)
+> > 
+> > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> > index 1a70e11f0487..ea7a4dacd42f 100644
+> > --- a/arch/x86/kvm/svm/svm.c
+> > +++ b/arch/x86/kvm/svm/svm.c
+> > @@ -4347,27 +4347,30 @@ static int svm_leave_smm(struct kvm_vcpu *vcpu, const char *smstate)
+> >  					 gpa_to_gfn(vmcb12_gpa), &map) == -EINVAL)
+> >  				return 1;
+> >  
+> > -			if (svm_allocate_nested(svm))
+> > +			if (kvm_vcpu_map(vcpu, gpa_to_gfn(svm->nested.hsave_msr),
+> > +					 &map_save) == -EINVAL)
+> >  				return 1;
 > 
-> On 9/12/2021 12:07 PM, Michael S. Tsirkin wrote:
-> > On Sat, Sep 11, 2021 at 03:56:45PM +0300, Max Gurtovoy wrote:
-> > > On 9/10/2021 1:57 AM, Michael S. Tsirkin wrote:
-> > > > On Thu, Sep 09, 2021 at 07:45:42PM +0300, Max Gurtovoy wrote:
-> > > > > On 9/9/2021 7:31 PM, Michael S. Tsirkin wrote:
-> > > > > > On Thu, Sep 09, 2021 at 06:51:56PM +0300, Max Gurtovoy wrote:
-> > > > > > > On 9/9/2021 6:40 PM, Michael S. Tsirkin wrote:
-> > > > > > > > On Thu, Sep 09, 2021 at 06:37:37PM +0300, Max Gurtovoy wrote:
-> > > > > > > > > On 9/9/2021 4:42 PM, Michael S. Tsirkin wrote:
-> > > > > > > > > > On Mon, Sep 06, 2021 at 02:59:40PM +0300, Max Gurtovoy wrote:
-> > > > > > > > > > > On 9/6/2021 2:20 PM, Michael S. Tsirkin wrote:
-> > > > > > > > > > > > On Mon, Sep 06, 2021 at 01:31:32AM +0300, Max Gurtovoy wrote:
-> > > > > > > > > > > > > On 9/5/2021 7:02 PM, Michael S. Tsirkin wrote:
-> > > > > > > > > > > > > > On Thu, Sep 02, 2021 at 02:45:52PM +0100, Stefan Hajnoczi wrote:
-> > > > > > > > > > > > > > > On Tue, Aug 31, 2021 at 04:50:35PM +0300, Max Gurtovoy wrote:
-> > > > > > > > > > > > > > > > Sometimes a user would like to control the amount of IO queues to be
-> > > > > > > > > > > > > > > > created for a block device. For example, for limiting the memory
-> > > > > > > > > > > > > > > > footprint of virtio-blk devices.
-> > > > > > > > > > > > > > > > 
-> > > > > > > > > > > > > > > > Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
-> > > > > > > > > > > > > > > > ---
-> > > > > > > > > > > > > > > > 
-> > > > > > > > > > > > > > > > changes from v1:
-> > > > > > > > > > > > > > > >         - use param_set_uint_minmax (from Christoph)
-> > > > > > > > > > > > > > > >         - added "Should > 0" to module description
-> > > > > > > > > > > > > > > > 
-> > > > > > > > > > > > > > > > Note: This commit apply on top of Jens's branch for-5.15/drivers
-> > > > > > > > > > > > > > > > ---
-> > > > > > > > > > > > > > > >         drivers/block/virtio_blk.c | 20 +++++++++++++++++++-
-> > > > > > > > > > > > > > > >         1 file changed, 19 insertions(+), 1 deletion(-)
-> > > > > > > > > > > > > > > > 
-> > > > > > > > > > > > > > > > diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> > > > > > > > > > > > > > > > index 4b49df2dfd23..9332fc4e9b31 100644
-> > > > > > > > > > > > > > > > --- a/drivers/block/virtio_blk.c
-> > > > > > > > > > > > > > > > +++ b/drivers/block/virtio_blk.c
-> > > > > > > > > > > > > > > > @@ -24,6 +24,22 @@
-> > > > > > > > > > > > > > > >         /* The maximum number of sg elements that fit into a virtqueue */
-> > > > > > > > > > > > > > > >         #define VIRTIO_BLK_MAX_SG_ELEMS 32768
-> > > > > > > > > > > > > > > > +static int virtblk_queue_count_set(const char *val,
-> > > > > > > > > > > > > > > > +		const struct kernel_param *kp)
-> > > > > > > > > > > > > > > > +{
-> > > > > > > > > > > > > > > > +	return param_set_uint_minmax(val, kp, 1, nr_cpu_ids);
-> > > > > > > > > > > > > > > > +}
-> > > > > > > > > > > > Hmm which tree is this for?
-> > > > > > > > > > > I've mentioned in the note that it apply on branch for-5.15/drivers. But now
-> > > > > > > > > > > you can apply it on linus/master as well.
-> > > > > > > > > > > 
-> > > > > > > > > > > 
-> > > > > > > > > > > > > > > > +
-> > > > > > > > > > > > > > > > +static const struct kernel_param_ops queue_count_ops = {
-> > > > > > > > > > > > > > > > +	.set = virtblk_queue_count_set,
-> > > > > > > > > > > > > > > > +	.get = param_get_uint,
-> > > > > > > > > > > > > > > > +};
-> > > > > > > > > > > > > > > > +
-> > > > > > > > > > > > > > > > +static unsigned int num_io_queues;
-> > > > > > > > > > > > > > > > +module_param_cb(num_io_queues, &queue_count_ops, &num_io_queues, 0644);
-> > > > > > > > > > > > > > > > +MODULE_PARM_DESC(num_io_queues,
-> > > > > > > > > > > > > > > > +		 "Number of IO virt queues to use for blk device. Should > 0");
-> > > > > > > > > > > > better:
-> > > > > > > > > > > > 
-> > > > > > > > > > > > +MODULE_PARM_DESC(num_io_request_queues,
-> > > > > > > > > > > > +                "Limit number of IO request virt queues to use for each device. 0 for now limit");
-> > > > > > > > > > > You proposed it and I replied on it bellow.
-> > > > > > > > > > Can't say I understand 100% what you are saying. Want to send
-> > > > > > > > > > a description that does make sense to you but
-> > > > > > > > > > also reflects reality? 0 is the default so
-> > > > > > > > > > "should > 0" besides being ungrammatical does not seem t"
-> > > > > > > > > > reflect what it does ...
-> > > > > > > > > if you "modprobe virtio_blk" the previous behavior will happen.
-> > > > > > > > > 
-> > > > > > > > > You can't "modprobe virtio_blk num_io_request_queues=0" since the minimal
-> > > > > > > > > value is 1.
-> > > > > > > > > 
-> > > > > > > > > So your description is not reflecting the code.
-> > > > > > > > > 
-> > > > > > > > > We can do:
-> > > > > > > > > 
-> > > > > > > > > MODULE_PARM_DESC(num_io_request_queues, "Number of request virt queues to use for blk device. Minimum value is 1 queue");
-> > > > > > > > What's the default value? We should document that.
-> > > > > > > default value for static global variables is 0.
-> > > > > > > 
-> > > > > > > MODULE_PARM_DESC(num_io_request_queues, "Number of request virt queues to
-> > > > > > > use for blk device. Minimum value is 1 queue. Default and Maximum value is
-> > > > > > > equal to the total number of CPUs");
-> > > > > > So it says it's the # of cpus but yoiu inspect it with
-> > > > > > sysfs and it's actually 0. Let's say that's confusing
-> > > > > > at the least. why not just let users set it to 0
-> > > > > > and document that?
-> > > > > > 
-> > > > > Setting it by the user to 0 makes no sense.
-> > > > > 
-> > > > > We can say "if not set, the value equals to the total number of CPUs".
-> > > > the value is 0. it seems to mean "no limit". the actual # of queues is
-> > > > then te smaller between # of cpus and # of hardware queues.
-> > > > I see no reason not to allow user to set that especially if
-> > > > it was originally the value then user changed it
-> > > > and is trying to change it back.
-> > > I fine with that.
-> > > 
-> > > MODULE_PARM_DESC(num_io_request_queues, "Number of request virt queues to use for blk device. 0 value means no limitation");
-> > > 
-> > OK and the second distinction is that it's a limit on the
-> > number, not the actual number. It's never more than what's provided
-> > by the hypervisor.
+> Returning here will neglect to unmap "map".
 > 
-> MODULE_PARM_DESC(num_io_request_queues, "Maximal number of request virt queues to use for blk device. 0 value means no limitation");
+> >  
+> > -			vmcb12 = map.hva;
+> > -
+> > -			nested_load_control_from_vmcb12(svm, &vmcb12->control);
+> > -
+> > -			ret = enter_svm_guest_mode(vcpu, vmcb12_gpa, vmcb12);
+> > -			kvm_vcpu_unmap(vcpu, &map, true);
+> > +			if (svm_allocate_nested(svm))
+> > +				return 1;
 > 
-> is that ok ?
+> Ditto here for both "map" and "map_save", though it looks like there's a
+> pre-existing bug if svm_allocate_nested() fails.  If you add a prep cleanup patch
+> to remove the statement nesting (between the bug fix and this patch), it will make
+> handling this a lot easier, e.g.
+> 
+> static int svm_leave_smm(struct kvm_vcpu *vcpu, const char *smstate)
+> {
+> 	struct vcpu_svm *svm = to_svm(vcpu);
+> 	struct kvm_host_map map, map_save;
+> 	u64 saved_efer, vmcb12_gpa;
+> 	struct vmcb *vmcb12;
+> 	int ret;
+> 
+> 	if (!guest_cpuid_has(vcpu, X86_FEATURE_LM))
+> 		return 0;
+> 
+> 	/* Non-zero if SMI arrived while vCPU was in guest mode. */
+> 	if (!GET_SMSTATE(u64, smstate, 0x7ed8))
+> 		return 0;
+> 
+> 	if (!guest_cpuid_has(vcpu, X86_FEATURE_SVM))
+> 		return 1;
+> 
+> 	saved_efer = GET_SMSTATE(u64, smstate, 0x7ed0);
+> 	if (!(saved_efer & EFER_SVME))
+> 		return 1;
+> 
+> 	vmcb12_gpa = GET_SMSTATE(u64, smstate, 0x7ee0);
+> 	if (kvm_vcpu_map(vcpu, gpa_to_gfn(vmcb12_gpa), &map) == -EINVAL)
+> 		return 1;
+> 
+> 	ret = 1;
+> 	if (kvm_vcpu_map(vcpu, gpa_to_gfn(svm->nested.hsave_msr), &map_save) == -EINVAL)
+> 		goto unmap_map;
+> 
+> 	if (svm_allocate_nested(svm))
+> 		goto unmap_save;
+> 
+> 	/*
+> 	 * Restore L1 host state from L1 HSAVE area as VMCB01 was
+> 	 * used during SMM (see svm_enter_smm())
+> 	 */
+> 
+> 	svm_copy_vmrun_state(&svm->vmcb01.ptr->save,
+> 				map_save.hva + 0x400);
+> 
+> 	/*
+> 	 * Restore L2 state
+> 	 */
+> 
+> 	vmcb12 = map.hva;
+> 	nested_load_control_from_vmcb12(svm, &vmcb12->control);
+> 	ret = enter_svm_guest_mode(vcpu, vmcb12_gpa, vmcb12);
+> 
+> unmap_save;
+> 	kvm_vcpu_unmap(vcpu, &map_save, true);
+> unmap_map:
+> 	kvm_vcpu_unmap(vcpu, &map, true);
+> 	return 1;
+> }
+> 
+Will do. I haven't given the error path enough attention.
 
-
-Looks ok. And then do we need to limit this to nr_cpu_ids?
-Setting a value that's too high seems harmless ...
-
-> > > > > The actual value of the created queues can be seen in /sys/block/vda/mq/ as
-> > > > > done today.
-> > > > > > > > > > > > > > > > +
-> > > > > > > > > > > > > > > >         static int major;
-> > > > > > > > > > > > > > > >         static DEFINE_IDA(vd_index_ida);
-> > > > > > > > > > > > > > > > @@ -501,7 +517,9 @@ static int init_vq(struct virtio_blk *vblk)
-> > > > > > > > > > > > > > > >         	if (err)
-> > > > > > > > > > > > > > > >         		num_vqs = 1;
-> > > > > > > > > > > > > > > > -	num_vqs = min_t(unsigned int, nr_cpu_ids, num_vqs);
-> > > > > > > > > > > > > > > > +	num_vqs = min_t(unsigned int,
-> > > > > > > > > > > > > > > > +			min_not_zero(num_io_queues, nr_cpu_ids),
-> > > > > > > > > > > > > > > > +			num_vqs);
-> > > > > > > > > > > > > > > If you respin, please consider calling them request queues. That's the
-> > > > > > > > > > > > > > > terminology from the VIRTIO spec and it's nice to keep it consistent.
-> > > > > > > > > > > > > > > But the purpose of num_io_queues is clear, so:
-> > > > > > > > > > > > > > > 
-> > > > > > > > > > > > > > > Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-> > > > > > > > > > > > > > I did this:
-> > > > > > > > > > > > > > +static unsigned int num_io_request_queues;
-> > > > > > > > > > > > > > +module_param_cb(num_io_request_queues, &queue_count_ops, &num_io_request_queues, 0644);
-> > > > > > > > > > > > > > +MODULE_PARM_DESC(num_io_request_queues,
-> > > > > > > > > > > > > > +                "Limit number of IO request virt queues to use for each device. 0 for now limit");
-> > > > > > > > > > > > > The parameter is writable and can be changed and then new devices might be
-> > > > > > > > > > > > > probed with new value.
-> > > > > > > > > > > > > 
-> > > > > > > > > > > > > It can't be zero in the code. we can change param_set_uint_minmax args and
-> > > > > > > > > > > > > say that 0 says nr_cpus.
-> > > > > > > > > > > > > 
-> > > > > > > > > > > > > I'm ok with the renaming but I prefer to stick to the description we gave in
-> > > > > > > > > > > > > V3 of this patch (and maybe enable value of 0 as mentioned above).
+Thanks!
+Best regards,
+	Maxim Levitsky
 
