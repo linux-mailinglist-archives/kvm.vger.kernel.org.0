@@ -2,135 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 972F1407E3E
-	for <lists+kvm@lfdr.de>; Sun, 12 Sep 2021 17:59:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 58082407F39
+	for <lists+kvm@lfdr.de>; Sun, 12 Sep 2021 20:18:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235937AbhILQAx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 12 Sep 2021 12:00:53 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60990 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235926AbhILQAw (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 12 Sep 2021 12:00:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1631462377;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=+U8F5dy04482OlUMBaJgRXH5mkn96++3NSktyO41b2U=;
-        b=Y9LGXhiNoQipb4mq6+M02bDjaf497UG0fIb3W14oVoctegFkzwXmMwL1DFG1gwejK7CTzP
-        OYX993FlNaQUMR5gAZtA53Ba11GkcFXRAH662zw8F6AQYeh/DNFHh7RR9k8HpKUazivT0p
-        R966X8yzfoIfFHWcD73LXM8yI+q7Cio=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-253-8ZSsAaAhPB-VJqCAEnewJg-1; Sun, 12 Sep 2021 11:59:36 -0400
-X-MC-Unique: 8ZSsAaAhPB-VJqCAEnewJg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 08AE41084681;
-        Sun, 12 Sep 2021 15:59:35 +0000 (UTC)
-Received: from starship (unknown [10.35.206.50])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 25C405C25A;
-        Sun, 12 Sep 2021 15:59:32 +0000 (UTC)
-Message-ID: <453d7e70b63124ead6b1c1dc7aaa3ae456d839a0.camel@redhat.com>
-Subject: Re: [PATCH 4/4] KVM: nVMX: Implement Enlightened MSR Bitmap feature
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>
+        id S233568AbhILSTi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 12 Sep 2021 14:19:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57608 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229653AbhILSTh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 12 Sep 2021 14:19:37 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D9DBC061574
+        for <kvm@vger.kernel.org>; Sun, 12 Sep 2021 11:18:23 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id o202-20020a25d7d3000000b005a704560db0so8321355ybg.17
+        for <kvm@vger.kernel.org>; Sun, 12 Sep 2021 11:18:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=A5jzcEo3N8osg10m96UXC0mRrSn6XuuhJObZXmt9E+Q=;
+        b=Amted87+W6/WP0Kg6XI/m7V6R5ychIhbfTusMpYEViZUdigBJUgvOWbExI3j08g3R8
+         GDscaVh51TSLhnPo8DQcsH1oL4T1iqru9P2HtlcAzWsaumpHtNnySz1lToJp23D+Myuf
+         4BJEiKVCREKgTxQdNt+TPqshjUEXhb7wyT9tY8kRfP18l8XoxMRdgsWe5kqQCfxTHHQT
+         5+zCjsgphNpA4KN1LEYG/Scf1Ud9tWnxE+6Juk1+usX8Lap5U2ePMB8HXMHPG490RHTT
+         8Z7JMGzuKKsW1KYtuMCmepRy1y7087X4RgwV6GVL0ndSzDdZEBgO8KtK6GGpMTy8uGBs
+         8SWQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=A5jzcEo3N8osg10m96UXC0mRrSn6XuuhJObZXmt9E+Q=;
+        b=1cAnrl7DhTF5PtZX0krRR/qS8pql5a9zeIf8WdQ859U01r5EOkiKZQcYHc0lP2hBEk
+         3qmA+/xr3FwfGki0Rnhqyal3/idyB/9WAZASVQ6SqsAdzyspRZ+LkLGR/YZOrpwIvYtu
+         GUkPnHlZz/npb8mcLzOQ6s3V9gCvOGzvGoA5OuaBerGLfRbe+rvMNFEIj+SwoCoTm+sG
+         PAVwOQtpdYwcBAuSV6zmB+luoRsQekMJm+h9GnKy6rgz80xLC4+RHvEgAG0Q7X2TW0+y
+         F2492q1tIUsrk1RH1JR6EkuQd0SRio7U9WvWCnOUpePBMTg3EXfzi5+Gk++261tMWVek
+         4f1Q==
+X-Gm-Message-State: AOAM533qFq4R9JORj7cN+UnhOl0KBSK1s8I6O2bcMhBwc8VB8KdChXqI
+        wXG5s5+L9hdkNw6QrcxGbs2xCFcZsCfq
+X-Google-Smtp-Source: ABdhPJw+pcn8ymn8D7AhPPxq0UqlxK1KLvhUzH+nhooa4tfQoogcmF8mTgUYD4EhR9wOjrEkXzRPHqc/thu5
+X-Received: from mizhang-super.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1071])
+ (user=mizhang job=sendgmr) by 2002:a25:c441:: with SMTP id
+ u62mr10565061ybf.12.1631470702545; Sun, 12 Sep 2021 11:18:22 -0700 (PDT)
+Reply-To: Mingwei Zhang <mizhang@google.com>
+Date:   Sun, 12 Sep 2021 18:18:15 +0000
+Message-Id: <20210912181815.3899316-1-mizhang@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.0.309.g3052b89438-goog
+Subject: [PATCH] KVM: SVM: fix missing sev_decommission in sev_receive_start
+From:   Mingwei Zhang <mizhang@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org
-Date:   Sun, 12 Sep 2021 18:59:31 +0300
-In-Reply-To: <20210910160633.451250-5-vkuznets@redhat.com>
-References: <20210910160633.451250-1-vkuznets@redhat.com>
-         <20210910160633.451250-5-vkuznets@redhat.com>
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Alper Gun <alpergun@google.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        David Rienjes <rientjes@google.com>,
+        Marc Orr <marcorr@google.com>, John Allen <john.allen@amd.com>,
+        Peter Gonda <pgonda@google.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Vipin Sharma <vipinsh@google.com>,
+        Mingwei Zhang <mizhang@google.com>
 Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2021-09-10 at 18:06 +0200, Vitaly Kuznetsov wrote:
-> Updating MSR bitmap for L2 is not cheap and rearly needed. TLFS for Hyper-V
-> offers 'Enlightened MSR Bitmap' feature which allows L1 hypervisor to
-> inform L0 when it changes MSR bitmap, this eliminates the need to examine
-> L1's MSR bitmap for L2 every time when 'real' MSR bitmap for L2 gets
-> constructed.
-> 
-> Use 'vmx->nested.msr_bitmap_changed' flag to implement the feature.
-> 
-> Note, KVM already uses 'Enlightened MSR bitmap' feature when it runs as a
-> nested hypervisor on top of Hyper-V. The newly introduced feature is going
-> to be used by Hyper-V guests on KVM.
-> 
-> When the feature is enabled for Win10+WSL2, it shaves off around 700 CPU
-> cycles from a nested vmexit cost (tight cpuid loop test).
-> 
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> ---
->  arch/x86/kvm/hyperv.c     |  2 ++
->  arch/x86/kvm/vmx/nested.c | 19 +++++++++++++++++--
->  2 files changed, 19 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-> index 232a86a6faaf..7124dbe79ac2 100644
-> --- a/arch/x86/kvm/hyperv.c
-> +++ b/arch/x86/kvm/hyperv.c
-> @@ -2517,6 +2517,8 @@ int kvm_get_hv_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid2 *cpuid,
->  
->  		case HYPERV_CPUID_NESTED_FEATURES:
->  			ent->eax = evmcs_ver;
-> +			if (evmcs_ver)
-> +				ent->eax |= HV_X64_NESTED_MSR_BITMAP;
->  
->  			break;
->  
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index 42cd95611892..5ac5ba2f6191 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -607,15 +607,30 @@ static inline bool nested_vmx_prepare_msr_bitmap(struct kvm_vcpu *vcpu,
->  						 struct vmcs12 *vmcs12)
->  {
->  	int msr;
-> +	struct vcpu_vmx *vmx = to_vmx(vcpu);
->  	unsigned long *msr_bitmap_l1;
-> -	unsigned long *msr_bitmap_l0 = to_vmx(vcpu)->nested.vmcs02.msr_bitmap;
-> -	struct kvm_host_map *map = &to_vmx(vcpu)->nested.msr_bitmap_map;
-> +	unsigned long *msr_bitmap_l0 = vmx->nested.vmcs02.msr_bitmap;
-> +	struct hv_enlightened_vmcs *evmcs = vmx->nested.hv_evmcs;
-> +	struct kvm_host_map *map = &vmx->nested.msr_bitmap_map;
->  
->  	/* Nothing to do if the MSR bitmap is not in use.  */
->  	if (!cpu_has_vmx_msr_bitmap() ||
->  	    !nested_cpu_has(vmcs12, CPU_BASED_USE_MSR_BITMAPS))
->  		return false;
->  
-> +	/*
-> +	 * MSR bitmap update can be skipped when:
-> +	 * - MSR bitmap for L1 hasn't changed.
-> +	 * - Nested hypervisor (L1) is attempting to launch the same L2 as
-> +	 *   before.
-> +	 * - Nested hypervisor (L1) has enabled 'Enlightened MSR Bitmap' feature
-> +	 *   and tells KVM (L0) there were no changes in MSR bitmap for L2.
-> +	 */
-> +	if (!vmx->nested.msr_bitmap_changed && evmcs &&
-> +	    evmcs->hv_enlightenments_control.msr_bitmap &&
-> +	    evmcs->hv_clean_fields & HV_VMX_ENLIGHTENED_CLEAN_FIELD_MSR_BITMAP)
-> +		return true;
-> +
->  	if (kvm_vcpu_map(vcpu, gpa_to_gfn(vmcs12->msr_bitmap), map))
->  		return false;
->  
+sev_decommission is needed in the error path of sev_bind_asid. The purpose
+of this function is to clear the firmware context. Missing this step may
+cause subsequent SEV launch failures.
 
-I am not an expert on HyperV, but it looks OK to me.
+Although missing sev_decommission issue has previously been found and was
+fixed in sev_launch_start function. It is supposed to be fixed on all
+scenarios where a firmware context needs to be freed. According to the AMD
+SEV API v0.24 Section 1.3.3:
 
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+"The RECEIVE_START command is the only command other than the LAUNCH_START
+command that generates a new guest context and guest handle."
 
-Best regards,
-	Maxim Levitsky
+The above indicates that RECEIVE_START command also requires calling
+sev_decommission if ASID binding fails after RECEIVE_START succeeds.
+
+So add the sev_decommission function in sev_receive_start.
+
+Cc: Alper Gun <alpergun@google.com>
+Cc: Borislav Petkov <bp@alien8.de>
+Cc: Brijesh Singh <brijesh.singh@amd.com>
+Cc: David Rienjes <rientjes@google.com>
+Cc: Marc Orr <marcorr@google.com>
+Cc: John Allen <john.allen@amd.com>
+Cc: Peter Gonda <pgonda@google.com>
+Cc: Sean Christopherson <seanjc@google.com>
+Cc: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: Vipin Sharma <vipinsh@google.com>
+
+Reviewed-by: Marc Orr <marcorr@google.com>
+Acked-by: Brijesh Singh <brijesh.singh@amd.com>
+Fixes: af43cbbf954b ("KVM: SVM: Add support for KVM_SEV_RECEIVE_START command")
+Signed-off-by: Mingwei Zhang <mizhang@google.com>
+---
+ arch/x86/kvm/svm/sev.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 75e0b21ad07c..55d8b9c933c3 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -1397,8 +1397,10 @@ static int sev_receive_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ 
+ 	/* Bind ASID to this guest */
+ 	ret = sev_bind_asid(kvm, start.handle, error);
+-	if (ret)
++	if (ret) {
++		sev_decommission(start.handle);
+ 		goto e_free_session;
++	}
+ 
+ 	params.handle = start.handle;
+ 	if (copy_to_user((void __user *)(uintptr_t)argp->data,
+-- 
+2.33.0.309.g3052b89438-goog
 
