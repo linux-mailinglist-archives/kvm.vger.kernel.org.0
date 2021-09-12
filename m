@@ -2,39 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 05C2D407CDD
-	for <lists+kvm@lfdr.de>; Sun, 12 Sep 2021 12:34:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C8983407CDF
+	for <lists+kvm@lfdr.de>; Sun, 12 Sep 2021 12:36:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234867AbhILKfH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 12 Sep 2021 06:35:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48551 "EHLO
+        id S233624AbhILKhT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 12 Sep 2021 06:37:19 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24010 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232555AbhILKfF (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 12 Sep 2021 06:35:05 -0400
+        by vger.kernel.org with ESMTP id S229597AbhILKhS (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 12 Sep 2021 06:37:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1631442831;
+        s=mimecast20190719; t=1631442964;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=vvMzth+IF5FLsBCqQ5vuYZZ9lz8yM7mDVyzxWe/Vzhg=;
-        b=UQRVcR2jFwkShBqIE61vEkmW+kxGSdhQM4EwqUn4El/j/Wgw+okuMyAy6K+ITg/Q5J4dg4
-        Ed+gpCH7sBkSBGFdhmAUdEd1wG+ZNXXMCWzzmUefyV8qboinrHSTry0Wyle2I6e9MsCR8+
-        7yvpA0frHWAcAm2x/I9d6rXNKgcOBWg=
+        bh=SJrlF3qoDx/aav2O69lvlRtO6fUeYfbdtCxqNNdYeAU=;
+        b=TBUJE16fnbDz0tff0kVF+ZPDEZ728gGMwpw8Xm7HS3dZcbCRWlAbshMPPUqZBLgRbNRUx0
+        pyC0z3QzGQUU6C8JNnSNBa8qWCmqs5q9ETvNmxTHtyy4rvHCtEbrKByjM2sfUOM03Ilwu0
+        /xv7IqlkSAkwh+tUoyIVDjIC4fyql8o=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-527-JC6lQXnvOCWa28R-2FyZkQ-1; Sun, 12 Sep 2021 06:33:50 -0400
-X-MC-Unique: JC6lQXnvOCWa28R-2FyZkQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+ us-mta-247-EGGFgw44MBKK-GYQVldqYw-1; Sun, 12 Sep 2021 06:36:00 -0400
+X-MC-Unique: EGGFgw44MBKK-GYQVldqYw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D93E980196C;
-        Sun, 12 Sep 2021 10:33:48 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 34F7E1808300;
+        Sun, 12 Sep 2021 10:35:59 +0000 (UTC)
 Received: from starship (unknown [10.35.206.50])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A70406A8FC;
-        Sun, 12 Sep 2021 10:33:44 +0000 (UTC)
-Message-ID: <b8b28cec40a4d5b314a1af645f2eb3fa0be7b394.camel@redhat.com>
-Subject: Re: [PATCH v2 2/3] KVM: x86: force PDPTRs reload on SMM exit
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A338A60C04;
+        Sun, 12 Sep 2021 10:35:54 +0000 (UTC)
+Message-ID: <5fb5397289ba9ad44c9c959a5ecc4a1cfce72f00.camel@redhat.com>
+Subject: Re: [PATCH v2 3/3] KVM: nSVM: call KVM_REQ_GET_NESTED_STATE_PAGES
+ on exit from SMM mode
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     kvm@vger.kernel.org, Joerg Roedel <joro@8bytes.org>,
@@ -47,85 +48,146 @@ Cc:     kvm@vger.kernel.org, Joerg Roedel <joro@8bytes.org>,
         Borislav Petkov <bp@alien8.de>,
         "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>
-Date:   Sun, 12 Sep 2021 13:33:43 +0300
-In-Reply-To: <YTlbeylHFkr9/8ES@google.com>
+Date:   Sun, 12 Sep 2021 13:35:53 +0300
+In-Reply-To: <YTlcgQHLmkjtvVks@google.com>
 References: <20210823114618.1184209-1-mlevitsk@redhat.com>
-         <20210823114618.1184209-3-mlevitsk@redhat.com>
-         <YTlbeylHFkr9/8ES@google.com>
+         <20210823114618.1184209-4-mlevitsk@redhat.com>
+         <YTlcgQHLmkjtvVks@google.com>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2021-09-09 at 00:55 +0000, Sean Christopherson wrote:
+On Thu, 2021-09-09 at 00:59 +0000, Sean Christopherson wrote:
 > On Mon, Aug 23, 2021, Maxim Levitsky wrote:
-> > KVM_REQ_GET_NESTED_STATE_PAGES is also used with VM entries that happen
-> > on exit from SMM mode, and in this case PDPTRS must be always reloaded.
-> > 
-> > Thanks to Sean Christopherson for pointing this out.
-> > 
-> > Fixes: 0f85722341b0 ("KVM: nVMX: delay loading of PDPTRs to KVM_REQ_GET_NESTED_STATE_PAGES")
+> > This allows nested SVM code to be more similar to nested VMX code.
 > > 
 > > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 > > ---
-> >  arch/x86/kvm/vmx/vmx.c | 7 +++++++
-> >  1 file changed, 7 insertions(+)
+> >  arch/x86/kvm/svm/nested.c | 9 ++++++---
+> >  arch/x86/kvm/svm/svm.c    | 8 +++++++-
+> >  arch/x86/kvm/svm/svm.h    | 3 ++-
+> >  3 files changed, 15 insertions(+), 5 deletions(-)
 > > 
-> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > index fada1055f325..4194fbf5e5d6 100644
-> > --- a/arch/x86/kvm/vmx/vmx.c
-> > +++ b/arch/x86/kvm/vmx/vmx.c
-> > @@ -7504,6 +7504,13 @@ static int vmx_leave_smm(struct kvm_vcpu *vcpu, const char *smstate)
-> >  	}
+> > diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+> > index 5e13357da21e..678fd21f6077 100644
+> > --- a/arch/x86/kvm/svm/nested.c
+> > +++ b/arch/x86/kvm/svm/nested.c
+> > @@ -572,7 +572,7 @@ static void nested_svm_copy_common_state(struct vmcb *from_vmcb, struct vmcb *to
+> >  }
 > >  
-> >  	if (vmx->nested.smm.guest_mode) {
+> >  int enter_svm_guest_mode(struct kvm_vcpu *vcpu, u64 vmcb12_gpa,
+> > -			 struct vmcb *vmcb12)
+> > +			 struct vmcb *vmcb12, bool from_entry)
+> 
+> from_vmrun would be a better name.  VMX uses the slightly absstract from_vmentry
+> because of the VMLAUNCH vs. VMRESUME silliness.  If we want to explicitly follow
+> VMX then from_vmentry would be more appropriate, but I don't see any reason not
+> to be more precise.
+OK.
+
+> 
+> >  {
+> >  	struct vcpu_svm *svm = to_svm(vcpu);
+> >  	int ret;
+> > @@ -602,13 +602,16 @@ int enter_svm_guest_mode(struct kvm_vcpu *vcpu, u64 vmcb12_gpa,
+> >  	nested_vmcb02_prepare_save(svm, vmcb12);
+> >  
+> >  	ret = nested_svm_load_cr3(&svm->vcpu, vmcb12->save.cr3,
+> > -				  nested_npt_enabled(svm), true);
+> > +				  nested_npt_enabled(svm), from_entry);
+> >  	if (ret)
+> >  		return ret;
+> >  
+> >  	if (!npt_enabled)
+> >  		vcpu->arch.mmu->inject_page_fault = svm_inject_page_fault_nested;
+> >  
+> > +	if (!from_entry)
+> > +		kvm_make_request(KVM_REQ_GET_NESTED_STATE_PAGES, vcpu);
 > > +
-> > +		/* Exit from the SMM to the non root mode also uses
+> >  	svm_set_gif(svm, true);
+> >  
+> >  	return 0;
+> > @@ -674,7 +677,7 @@ int nested_svm_vmrun(struct kvm_vcpu *vcpu)
+> >  
+> >  	svm->nested.nested_run_pending = 1;
+> >  
+> > -	if (enter_svm_guest_mode(vcpu, vmcb12_gpa, vmcb12))
+> > +	if (enter_svm_guest_mode(vcpu, vmcb12_gpa, vmcb12, true))
+> >  		goto out_exit_err;
+> >  
+> >  	if (nested_svm_vmrun_msrpm(svm))
+> > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> > index ea7a4dacd42f..76ee15af8c48 100644
+> > --- a/arch/x86/kvm/svm/svm.c
+> > +++ b/arch/x86/kvm/svm/svm.c
+> > @@ -4354,6 +4354,12 @@ static int svm_leave_smm(struct kvm_vcpu *vcpu, const char *smstate)
+> >  			if (svm_allocate_nested(svm))
+> >  				return 1;
+> >  
+> > +			/* Exit from the SMM to the non root mode also uses
+> > +			 * the KVM_REQ_GET_NESTED_STATE_PAGES request,
+> > +			 * but in this case the pdptrs must be always reloaded
+> > +			 */
+> > +			vcpu->arch.pdptrs_from_userspace = false;
 > 
-> Just "Exit from SMM to non-root mode", i.e. drop the "the".
+> Hmm, I think this belongs in the previous patch.  And I would probably go so far
+> as to say it belongs in emulator_leave_smm(), i.e. pdptrs_from_userspace should
+> be cleared on RSM regardless of what mode is being resumed.
+
+I actually don't think that this belongs to a previous patch, since this issue didn't exist on SVM,
+since it didn't call the KVM_REQ_GET_NESTED_STATE_PAGES.
+
+However I do agree with you that it makes sense to move this hack to the common x86 code.
+I had put it to kvm_smm_changed, and will soon send a new version.
+
 > 
-> Multi-line comments should look like:
-> 
-> 		/*
-> 		 * Exit from SMM ...
-> 
-> though oddly checkpatch doesn't complain about that.
-> 
-> That said, for the comment, it'd be more helpful to explain why the PDPTRs should
-> not come from userspace.  Something like:
-> 
-> 		/*
-> 		 * Always reload the guest's version of the PDPTRs when exiting
-> 		 * from SMM to non-root.  If KVM_SET_SREGS2 stuffs PDPTRs while
-> 		 * SMM is active, that state is specifically for SMM context.
-> 		 * On RSM, all guest state is pulled from its architectural
-> 		 * location, whatever that may be.
-> 		 */
-> 
-> Though typing that makes me wonder if this is fixing the wrong thing.  It seems
-> like pdptrs_from_userspace shouldn't be set when SMM is active, though I suppose
-> there's a potential ordering issue between KVM_SET_SREGS2 and KVM_SET_VCPU_EVENTS.
-> Bummer.
-> 
-> > +		 * the KVM_REQ_GET_NESTED_STATE_PAGES request,
-> > +		 * but in this case the pdptrs must be always reloaded
-> > +		 */
-> > +		vcpu->arch.pdptrs_from_userspace = false;
 > > +
-> >  		ret = nested_vmx_enter_non_root_mode(vcpu, false);
-> >  		if (ret)
-> >  			return ret;
+> >  			/*
+> >  			 * Restore L1 host state from L1 HSAVE area as VMCB01 was
+> >  			 * used during SMM (see svm_enter_smm())
+> > @@ -4368,7 +4374,7 @@ static int svm_leave_smm(struct kvm_vcpu *vcpu, const char *smstate)
+> >  
+> >  			vmcb12 = map.hva;
+> >  			nested_load_control_from_vmcb12(svm, &vmcb12->control);
+> > -			ret = enter_svm_guest_mode(vcpu, vmcb12_gpa, vmcb12);
+> > +			ret = enter_svm_guest_mode(vcpu, vmcb12_gpa, vmcb12, false);
+> >  
+> >  			kvm_vcpu_unmap(vcpu, &map, true);
+> >  			kvm_vcpu_unmap(vcpu, &map_save, true);
+> > diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+> > index 524d943f3efc..51ffa46ab257 100644
+> > --- a/arch/x86/kvm/svm/svm.h
+> > +++ b/arch/x86/kvm/svm/svm.h
+> > @@ -459,7 +459,8 @@ static inline bool nested_exit_on_nmi(struct vcpu_svm *svm)
+> >  	return vmcb_is_intercept(&svm->nested.ctl, INTERCEPT_NMI);
+> >  }
+> >  
+> > -int enter_svm_guest_mode(struct kvm_vcpu *vcpu, u64 vmcb_gpa, struct vmcb *vmcb12);
+> > +int enter_svm_guest_mode(struct kvm_vcpu *vcpu,
+> > +		u64 vmcb_gpa, struct vmcb *vmcb12, bool from_entry);
+> 
+> Alignment is funky, it can/should match the definition, e.g.
+Oops, forgot to check the prototype - these things you write once and forget about them,
+as long as it compiles :-)
+
+> 
+> int enter_svm_guest_mode(struct kvm_vcpu *vcpu, u64 vmcb12_gpa,
+> 			 struct vmcb *vmcb12, bool from_entry);
+> 
+> >  void svm_leave_nested(struct vcpu_svm *svm);
+> >  void svm_free_nested(struct vcpu_svm *svm);
+> >  int svm_allocate_nested(struct vcpu_svm *svm);
 > > -- 
 > > 2.26.3
 > > 
 
-I went with your suggestion in the patch 3, and dropped this patch.
+Thanks for the review!
 
-Thanks!
 Best regards,
 	Maxim Levitsky
 
