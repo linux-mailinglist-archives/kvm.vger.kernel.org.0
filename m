@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D055C40A162
-	for <lists+kvm@lfdr.de>; Tue, 14 Sep 2021 01:11:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 37ECD40A166
+	for <lists+kvm@lfdr.de>; Tue, 14 Sep 2021 01:11:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349984AbhIMXMn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Sep 2021 19:12:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53138 "EHLO
+        id S1350403AbhIMXMs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Sep 2021 19:12:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53244 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349570AbhIMXL5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Sep 2021 19:11:57 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB7EFC061787
-        for <kvm@vger.kernel.org>; Mon, 13 Sep 2021 16:10:28 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id i189-20020a256dc6000000b005a04d42ebf2so14970147ybc.22
-        for <kvm@vger.kernel.org>; Mon, 13 Sep 2021 16:10:28 -0700 (PDT)
+        with ESMTP id S1349606AbhIMXL6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Sep 2021 19:11:58 -0400
+Received: from mail-qt1-x84a.google.com (mail-qt1-x84a.google.com [IPv6:2607:f8b0:4864:20::84a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FF12C06178A
+        for <kvm@vger.kernel.org>; Mon, 13 Sep 2021 16:10:31 -0700 (PDT)
+Received: by mail-qt1-x84a.google.com with SMTP id e8-20020a05622a110800b0029ecbdc1b2aso57838655qty.12
+        for <kvm@vger.kernel.org>; Mon, 13 Sep 2021 16:10:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=yjNJw+kETl+pWfUO4z+jiP/+35v5UjRhLA3RPJihcmY=;
-        b=QOUYZH0pT7uJt0ynJwTshFqpJ1W6Uqk9Wr1hPtYS6ewr/fJUPcW5PD9iIpl0caLSOp
-         E+BotTU+GBVy8AKcZgG8eIPIJbhr7ZSuDo2fNbAzsd5SGNcaKdW5txuGdi3Xyz0XWfTv
-         IqNIUSlCOJBxal0FM6o8ERMw3dqIL9qUIPanLBNTE+QKE2P8lbjwkYj6qUloHoH19Wg8
-         D6l2wp5GlHAvnLfascQXUHNOIbpAAI3CYvs23q521t6ox0EpWgO7u+W8YoP9V91cG0w+
-         D0/Hn3u8rIlGxFa52n3S/vVPsLr9cwxJexAENTYne+BfGVgv1pIOxnrgkEJGDieVMoKX
-         AXvw==
+        bh=olkgI25ot6cwVXWHcDB1hHw/7osEl0hBr1FZd0b3M84=;
+        b=L+PL2fv8O4JoLscRmipccGUam2IAo8P0w3OolVdtMksN4nKxPqgbSTrRv5Okehg/6G
+         PFWy/KVFU0l3Yapow/zqFNrymumWtIpI+uQhMguwyjj1qcdErn6oE1Ahr2f7KUoU5y9t
+         DCP6GH6QObfXw94Kt1IK1myNxdXiUtW08g5xCmmwT2JnqI8dC08X9mJdNHh5jkULaSJa
+         EdqxUbU4nRkdziVwXF5EHw40V0aI/zdoGhJHhtFx41gd5LTVmZvsaSF+gviRvdsYXffL
+         m6NXF+sXRxyItdn99MINw/SqnfBeSm7oxKQBauZqJu9/Cm5El8yt0XrApnWbo5ZdgzWi
+         eMEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=yjNJw+kETl+pWfUO4z+jiP/+35v5UjRhLA3RPJihcmY=;
-        b=v/d2FPkFyNOlwc15k/vcDHiEYiLgPzdG6QVnb93XdobX7JLwHCcjz+UL5YxTiyqaU3
-         aRWOBFaaCdevTnR06r7QtFRHtB1ZpwAkqFgwrHtSytoFwXYBue7YwY8YngkC2N+5XUMU
-         YgYhdKByuUK7er2W8qgU9cA3qs4rfNRiWuM6VD5BC0X6OxErxtCtA8oif+6oPZnCBKFE
-         O6tcsu9NJNmc/r/CfILIFURqwXheiK+vDWjFU4gjyODTde0rE/vcJ+AhWd1+a+TYy8ot
-         89EVGLW8F/Jj9tION6Iczc5mUFg+bzQzWrfLei+0lHIbByWXFXKrotFC/QTYCQkapMq/
-         qwbQ==
-X-Gm-Message-State: AOAM531WS2LAXYAObqbO0aLnORtcdNJp6HC3FBMppS/Ift/TXVURmV+Q
-        o7/XHuVH6EzouszcdBd+qKqluc1Y/VTK
-X-Google-Smtp-Source: ABdhPJxt7SEH3831oZpRn4gjgV7fi9h+MIi+/yEF1g0fZTI5nbME9eC3Cv6FblC7+5vdkV0jp0Facktg67EJ
+        bh=olkgI25ot6cwVXWHcDB1hHw/7osEl0hBr1FZd0b3M84=;
+        b=IIX8qB4Wq1mlg5SiR5CHhLLA1zy2nfxki+Lcb0msAmlKgVHYkF3x06gvQZTw2gYM8A
+         zCAfGuFQANVAUacLXE0Kt2LKaCWWzEyFCRGs3tFpFozOzFZ2Mcktj1a6uk/4hYdKMHJe
+         aYvwYAdSQVZ9/DKDUgOk83jBVJUU3BN5YJnkHKLGaC8nIYsPhq5g+wTZG1yiFjWiDNLN
+         Urg13A8MPmfdByCt9mnA9/RqOO5nume1mXwiW6CEVVhF2FKA3nG7l8FHZjoUrRSuoL2T
+         yV5H/akkPcl0K3SCFqubdhxtS7+YpvrUtbQNuyLl/jYmpZZHeXuS8Y/BZG+yMLzRYfxz
+         Lx3Q==
+X-Gm-Message-State: AOAM530HwPM6qEZ+6KnNERoWmrpso5HzwkJWxaNhGxnFpZgPkjPfftis
+        awzb2MdvXXLHx9A9eQ4yhC3C4y//ko8T
+X-Google-Smtp-Source: ABdhPJyDsDY3H+v3Yl6gyQYdKNLyKptv8ox/ZB66nvimNeFPUZTmFFPwvNUUBQdzymKSOoY/TEblaQIiF0mZ
 X-Received: from rananta-virt.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1bcc])
- (user=rananta job=sendgmr) by 2002:a25:1d05:: with SMTP id
- d5mr19657578ybd.270.1631574628203; Mon, 13 Sep 2021 16:10:28 -0700 (PDT)
-Date:   Mon, 13 Sep 2021 23:09:53 +0000
+ (user=rananta job=sendgmr) by 2002:a05:6214:1271:: with SMTP id
+ r17mr2124823qvv.48.1631574630387; Mon, 13 Sep 2021 16:10:30 -0700 (PDT)
+Date:   Mon, 13 Sep 2021 23:09:54 +0000
 In-Reply-To: <20210913230955.156323-1-rananta@google.com>
-Message-Id: <20210913230955.156323-13-rananta@google.com>
+Message-Id: <20210913230955.156323-14-rananta@google.com>
 Mime-Version: 1.0
 References: <20210913230955.156323-1-rananta@google.com>
 X-Mailer: git-send-email 2.33.0.309.g3052b89438-goog
-Subject: [PATCH v6 12/14] KVM: arm64: selftests: Add host support for vGIC
+Subject: [PATCH v6 13/14] KVM: arm64: selftests: Add arch_timer test
 From:   Raghavendra Rao Ananta <rananta@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
         Andrew Jones <drjones@redhat.com>,
@@ -71,157 +71,415 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Implement a simple library to perform vGIC-v3 setup
-from a host point of view. This includes creating a
-vGIC device, setting up distributor and redistributor
-attributes, and mapping the guest physical addresses.
+Add a KVM selftest to validate the arch_timer functionality.
+Primarily, the test sets up periodic timer interrupts and
+validates the basic architectural expectations upon its receipt.
 
-The definition of REDIST_REGION_ATTR_ADDR is taken from
-aarch64/vgic_init test. Hence, replace the definition
-by including vgic.h in the test file.
+The test provides command-line options to configure the period
+of the timer, number of iterations, and number of vCPUs.
 
 Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-Reviewed-by: Ricardo Koller <ricarkol@google.com>
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 ---
- tools/testing/selftests/kvm/Makefile          |  2 +-
- .../testing/selftests/kvm/aarch64/vgic_init.c |  3 +-
- .../selftests/kvm/include/aarch64/vgic.h      | 20 ++++++
- .../testing/selftests/kvm/lib/aarch64/vgic.c  | 70 +++++++++++++++++++
- 4 files changed, 92 insertions(+), 3 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/include/aarch64/vgic.h
- create mode 100644 tools/testing/selftests/kvm/lib/aarch64/vgic.c
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/aarch64/arch_timer.c        | 366 ++++++++++++++++++
+ 3 files changed, 368 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/aarch64/arch_timer.c
 
+diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
+index 98053d3afbda..c6058df0cd18 100644
+--- a/tools/testing/selftests/kvm/.gitignore
++++ b/tools/testing/selftests/kvm/.gitignore
+@@ -1,4 +1,5 @@
+ # SPDX-License-Identifier: GPL-2.0-only
++/aarch64/arch_timer
+ /aarch64/debug-exceptions
+ /aarch64/get-reg-list
+ /aarch64/psci_cpu_on_test
 diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 5476a8ddef60..8342f65c1d96 100644
+index 8342f65c1d96..46d43e706b20 100644
 --- a/tools/testing/selftests/kvm/Makefile
 +++ b/tools/testing/selftests/kvm/Makefile
-@@ -35,7 +35,7 @@ endif
+@@ -84,6 +84,7 @@ TEST_GEN_PROGS_x86_64 += set_memory_region_test
+ TEST_GEN_PROGS_x86_64 += steal_time
+ TEST_GEN_PROGS_x86_64 += kvm_binary_stats_test
  
- LIBKVM = lib/assert.c lib/elf.c lib/io.c lib/kvm_util.c lib/rbtree.c lib/sparsebit.c lib/test_util.c lib/guest_modes.c lib/perf_test_util.c
- LIBKVM_x86_64 = lib/x86_64/apic.c lib/x86_64/processor.c lib/x86_64/vmx.c lib/x86_64/svm.c lib/x86_64/ucall.c lib/x86_64/handlers.S
--LIBKVM_aarch64 = lib/aarch64/processor.c lib/aarch64/ucall.c lib/aarch64/handlers.S lib/aarch64/spinlock.c lib/aarch64/gic.c lib/aarch64/gic_v3.c
-+LIBKVM_aarch64 = lib/aarch64/processor.c lib/aarch64/ucall.c lib/aarch64/handlers.S lib/aarch64/spinlock.c lib/aarch64/gic.c lib/aarch64/gic_v3.c lib/aarch64/vgic.c
- LIBKVM_s390x = lib/s390x/processor.c lib/s390x/ucall.c lib/s390x/diag318_test_handler.c
- 
- TEST_GEN_PROGS_x86_64 = x86_64/cr4_cpuid_sync_test
-diff --git a/tools/testing/selftests/kvm/aarch64/vgic_init.c b/tools/testing/selftests/kvm/aarch64/vgic_init.c
-index 623f31a14326..157fc24f39c5 100644
---- a/tools/testing/selftests/kvm/aarch64/vgic_init.c
-+++ b/tools/testing/selftests/kvm/aarch64/vgic_init.c
-@@ -13,11 +13,10 @@
- #include "test_util.h"
- #include "kvm_util.h"
- #include "processor.h"
-+#include "vgic.h"
- 
- #define NR_VCPUS		4
- 
--#define REDIST_REGION_ATTR_ADDR(count, base, flags, index) (((uint64_t)(count) << 52) | \
--	((uint64_t)((base) >> 16) << 16) | ((uint64_t)(flags) << 12) | index)
- #define REG_OFFSET(vcpu, offset) (((uint64_t)vcpu << 32) | offset)
- 
- #define GICR_TYPER 0x8
-diff --git a/tools/testing/selftests/kvm/include/aarch64/vgic.h b/tools/testing/selftests/kvm/include/aarch64/vgic.h
++TEST_GEN_PROGS_aarch64 += aarch64/arch_timer
+ TEST_GEN_PROGS_aarch64 += aarch64/debug-exceptions
+ TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list
+ TEST_GEN_PROGS_aarch64 += aarch64/psci_cpu_on_test
+diff --git a/tools/testing/selftests/kvm/aarch64/arch_timer.c b/tools/testing/selftests/kvm/aarch64/arch_timer.c
 new file mode 100644
-index 000000000000..0ecfb253893c
+index 000000000000..3b6ea6a462f4
 --- /dev/null
-+++ b/tools/testing/selftests/kvm/include/aarch64/vgic.h
-@@ -0,0 +1,20 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
++++ b/tools/testing/selftests/kvm/aarch64/arch_timer.c
+@@ -0,0 +1,366 @@
++// SPDX-License-Identifier: GPL-2.0-only
 +/*
-+ * ARM Generic Interrupt Controller (GIC) host specific defines
++ * arch_timer.c - Tests the aarch64 timer IRQ functionality
++ *
++ * The test validates both the virtual and physical timer IRQs using
++ * CVAL and TVAL registers. This consitutes the four stages in the test.
++ * The guest's main thread configures the timer interrupt for a stage
++ * and waits for it to fire, with a timeout equal to the timer period.
++ * It asserts that the timeout doesn't exceed the timer period.
++ *
++ * On the other hand, upon receipt of an interrupt, the guest's interrupt
++ * handler validates the interrupt by checking if the architectural state
++ * is in compliance with the specifications.
++ *
++ * The test provides command-line options to configure the timer's
++ * period (-p), number of vCPUs (-n), and iterations per stage (-i).
++ *
++ * Copyright (c) 2021, Google LLC.
 + */
 +
-+#ifndef SELFTEST_KVM_VGIC_H
-+#define SELFTEST_KVM_VGIC_H
++#define _GNU_SOURCE
 +
-+#include <linux/kvm.h>
-+
-+#define REDIST_REGION_ATTR_ADDR(count, base, flags, index) \
-+	(((uint64_t)(count) << 52) | \
-+	((uint64_t)((base) >> 16) << 16) | \
-+	((uint64_t)(flags) << 12) | \
-+	index)
-+
-+int vgic_v3_setup(struct kvm_vm *vm, unsigned int nr_vcpus,
-+		uint64_t gicd_base_gpa, uint64_t gicr_base_gpa);
-+
-+#endif /* SELFTEST_KVM_VGIC_H */
-diff --git a/tools/testing/selftests/kvm/lib/aarch64/vgic.c b/tools/testing/selftests/kvm/lib/aarch64/vgic.c
-new file mode 100644
-index 000000000000..9880caa8c7db
---- /dev/null
-+++ b/tools/testing/selftests/kvm/lib/aarch64/vgic.c
-@@ -0,0 +1,70 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * ARM Generic Interrupt Controller (GIC) v3 host support
-+ */
-+
++#include <stdlib.h>
++#include <pthread.h>
 +#include <linux/kvm.h>
 +#include <linux/sizes.h>
-+#include <asm/kvm.h>
 +
 +#include "kvm_util.h"
-+#include "../kvm_util_internal.h"
++#include "processor.h"
++#include "delay.h"
++#include "arch_timer.h"
++#include "gic.h"
 +#include "vgic.h"
 +
-+/*
-+ * vGIC-v3 default host setup
-+ *
-+ * Input args:
-+ *	vm - KVM VM
-+ *	nr_vcpus - Number of vCPUs supported by this VM
-+ *	gicd_base_gpa - Guest Physical Address of the Distributor region
-+ *	gicr_base_gpa - Guest Physical Address of the Redistributor region
-+ *
-+ * Output args: None
-+ *
-+ * Return: GIC file-descriptor or negative error code upon failure
-+ *
-+ * The function creates a vGIC-v3 device and maps the distributor and
-+ * redistributor regions of the guest. Since it depends on the number of
-+ * vCPUs for the VM, it must be called after all the vCPUs have been created.
-+ */
-+int vgic_v3_setup(struct kvm_vm *vm, unsigned int nr_vcpus,
-+		uint64_t gicd_base_gpa, uint64_t gicr_base_gpa)
++#define NR_VCPUS_DEF			4
++#define NR_TEST_ITERS_DEF		5
++#define TIMER_TEST_PERIOD_MS_DEF	10
++#define TIMER_TEST_ERR_MARGIN_US	100
++
++struct test_args {
++	int nr_vcpus;
++	int nr_iter;
++	int timer_period_ms;
++};
++
++static struct test_args test_args = {
++	.nr_vcpus = NR_VCPUS_DEF,
++	.nr_iter = NR_TEST_ITERS_DEF,
++	.timer_period_ms = TIMER_TEST_PERIOD_MS_DEF,
++};
++
++#define msecs_to_usecs(msec)		((msec) * 1000LL)
++
++#define GICD_BASE_GPA			0x8000000ULL
++#define GICR_BASE_GPA			0x80A0000ULL
++
++enum guest_stage {
++	GUEST_STAGE_VTIMER_CVAL = 1,
++	GUEST_STAGE_VTIMER_TVAL,
++	GUEST_STAGE_PTIMER_CVAL,
++	GUEST_STAGE_PTIMER_TVAL,
++	GUEST_STAGE_MAX,
++};
++
++/* Shared variables between host and guest */
++struct test_vcpu_shared_data {
++	int nr_iter;
++	enum guest_stage guest_stage;
++	uint64_t xcnt;
++};
++
++struct test_vcpu {
++	uint32_t vcpuid;
++	pthread_t pt_vcpu_run;
++	struct kvm_vm *vm;
++};
++
++static struct test_vcpu test_vcpu[KVM_MAX_VCPUS];
++static struct test_vcpu_shared_data vcpu_shared_data[KVM_MAX_VCPUS];
++
++static int vtimer_irq, ptimer_irq;
++
++static void
++guest_configure_timer_action(struct test_vcpu_shared_data *shared_data)
 +{
-+	int gic_fd;
-+	uint64_t redist_attr;
-+	struct list_head *iter;
-+	unsigned int nr_gic_pages, nr_vcpus_created = 0;
++	switch (shared_data->guest_stage) {
++	case GUEST_STAGE_VTIMER_CVAL:
++		timer_set_next_cval_ms(VIRTUAL, test_args.timer_period_ms);
++		shared_data->xcnt = timer_get_cntct(VIRTUAL);
++		timer_set_ctl(VIRTUAL, CTL_ENABLE);
++		break;
++	case GUEST_STAGE_VTIMER_TVAL:
++		timer_set_next_tval_ms(VIRTUAL, test_args.timer_period_ms);
++		shared_data->xcnt = timer_get_cntct(VIRTUAL);
++		timer_set_ctl(VIRTUAL, CTL_ENABLE);
++		break;
++	case GUEST_STAGE_PTIMER_CVAL:
++		timer_set_next_cval_ms(PHYSICAL, test_args.timer_period_ms);
++		shared_data->xcnt = timer_get_cntct(PHYSICAL);
++		timer_set_ctl(PHYSICAL, CTL_ENABLE);
++		break;
++	case GUEST_STAGE_PTIMER_TVAL:
++		timer_set_next_tval_ms(PHYSICAL, test_args.timer_period_ms);
++		shared_data->xcnt = timer_get_cntct(PHYSICAL);
++		timer_set_ctl(PHYSICAL, CTL_ENABLE);
++		break;
++	default:
++		GUEST_ASSERT(0);
++	}
++}
 +
-+	TEST_ASSERT(nr_vcpus, "Num of vCPUs cannot be empty\n");
++static void guest_validate_irq(unsigned int intid,
++				struct test_vcpu_shared_data *shared_data)
++{
++	enum guest_stage stage = shared_data->guest_stage;
++	uint64_t xcnt = 0, xcnt_diff_us, cval = 0;
++	unsigned long xctl = 0;
++	unsigned int timer_irq = 0;
 +
-+	/*
-+	 * Make sure that the caller is infact calling this
-+	 * function after all the vCPUs are added.
-+	 */
-+	list_for_each(iter, &vm->vcpus)
-+		nr_vcpus_created++;
-+	TEST_ASSERT(nr_vcpus == nr_vcpus_created,
-+			"No. of vCPUs requested (%u) doesn't match with the ones created for the VM (%u)\n",
-+			nr_vcpus, nr_vcpus_created);
++	if (stage == GUEST_STAGE_VTIMER_CVAL ||
++		stage == GUEST_STAGE_VTIMER_TVAL) {
++		xctl = timer_get_ctl(VIRTUAL);
++		timer_set_ctl(VIRTUAL, CTL_IMASK);
++		xcnt = timer_get_cntct(VIRTUAL);
++		cval = timer_get_cval(VIRTUAL);
++		timer_irq = vtimer_irq;
++	} else if (stage == GUEST_STAGE_PTIMER_CVAL ||
++		stage == GUEST_STAGE_PTIMER_TVAL) {
++		xctl = timer_get_ctl(PHYSICAL);
++		timer_set_ctl(PHYSICAL, CTL_IMASK);
++		xcnt = timer_get_cntct(PHYSICAL);
++		cval = timer_get_cval(PHYSICAL);
++		timer_irq = ptimer_irq;
++	} else {
++		GUEST_ASSERT(0);
++	}
 +
-+	/* Distributor setup */
-+	gic_fd = kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_V3, false);
-+	kvm_device_access(gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
-+			KVM_VGIC_V3_ADDR_TYPE_DIST, &gicd_base_gpa, true);
-+	nr_gic_pages = vm_calc_num_guest_pages(vm->mode, KVM_VGIC_V3_DIST_SIZE);
-+	virt_map(vm, gicd_base_gpa, gicd_base_gpa,  nr_gic_pages);
++	xcnt_diff_us = cycles_to_usec(xcnt - shared_data->xcnt);
 +
-+	/* Redistributor setup */
-+	redist_attr = REDIST_REGION_ATTR_ADDR(nr_vcpus, gicr_base_gpa, 0, 0);
-+	kvm_device_access(gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
-+			KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &redist_attr, true);
-+	nr_gic_pages = vm_calc_num_guest_pages(vm->mode,
-+						KVM_VGIC_V3_REDIST_SIZE * nr_vcpus);
-+	virt_map(vm, gicr_base_gpa, gicr_base_gpa,  nr_gic_pages);
++	/* Make sure we are dealing with the correct timer IRQ */
++	GUEST_ASSERT_2(intid == timer_irq, intid, timer_irq);
 +
-+	kvm_device_access(gic_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
-+				KVM_DEV_ARM_VGIC_CTRL_INIT, NULL, true);
++	/* Basic 'timer condition met' check */
++	GUEST_ASSERT_3(xcnt >= cval, xcnt, cval, xcnt_diff_us);
++	GUEST_ASSERT_1(xctl & CTL_ISTATUS, xctl);
++}
 +
-+	return gic_fd;
++static void guest_irq_handler(struct ex_regs *regs)
++{
++	unsigned int intid = gic_get_and_ack_irq();
++	uint32_t cpu = guest_get_vcpuid();
++	struct test_vcpu_shared_data *shared_data = &vcpu_shared_data[cpu];
++
++	guest_validate_irq(intid, shared_data);
++
++	WRITE_ONCE(shared_data->nr_iter, shared_data->nr_iter + 1);
++
++	gic_set_eoi(intid);
++}
++
++static void guest_run_stage(struct test_vcpu_shared_data *shared_data,
++				enum guest_stage stage)
++{
++	uint32_t irq_iter, config_iter;
++
++	shared_data->guest_stage = stage;
++	shared_data->nr_iter = 0;
++
++	for (config_iter = 0; config_iter < test_args.nr_iter; config_iter++) {
++		/* Setup the next interrupt */
++		guest_configure_timer_action(shared_data);
++
++		/* Setup a timeout for the interrupt to arrive */
++		udelay(msecs_to_usecs(test_args.timer_period_ms) +
++			TIMER_TEST_ERR_MARGIN_US);
++
++		irq_iter = READ_ONCE(shared_data->nr_iter);
++		GUEST_ASSERT_2(config_iter + 1 == irq_iter,
++				config_iter + 1, irq_iter);
++	}
++}
++
++static void guest_code(void)
++{
++	uint32_t cpu = guest_get_vcpuid();
++	struct test_vcpu_shared_data *shared_data = &vcpu_shared_data[cpu];
++
++	local_irq_disable();
++
++	gic_init(GIC_V3, test_args.nr_vcpus,
++		(void *)GICD_BASE_GPA, (void *)GICR_BASE_GPA);
++
++	timer_set_ctl(VIRTUAL, CTL_IMASK);
++	timer_set_ctl(PHYSICAL, CTL_IMASK);
++
++	gic_irq_enable(vtimer_irq);
++	gic_irq_enable(ptimer_irq);
++	local_irq_enable();
++
++	guest_run_stage(shared_data, GUEST_STAGE_VTIMER_CVAL);
++	guest_run_stage(shared_data, GUEST_STAGE_VTIMER_TVAL);
++	guest_run_stage(shared_data, GUEST_STAGE_PTIMER_CVAL);
++	guest_run_stage(shared_data, GUEST_STAGE_PTIMER_TVAL);
++
++	GUEST_DONE();
++}
++
++static void *test_vcpu_run(void *arg)
++{
++	struct ucall uc;
++	struct test_vcpu *vcpu = arg;
++	struct kvm_vm *vm = vcpu->vm;
++	uint32_t vcpuid = vcpu->vcpuid;
++	struct test_vcpu_shared_data *shared_data = &vcpu_shared_data[vcpuid];
++
++	vcpu_run(vm, vcpuid);
++
++	switch (get_ucall(vm, vcpuid, &uc)) {
++	case UCALL_SYNC:
++	case UCALL_DONE:
++		break;
++	case UCALL_ABORT:
++		sync_global_from_guest(vm, *shared_data);
++		TEST_FAIL("%s at %s:%ld\n\tvalues: %lu, %lu; %lu, vcpu: %u; stage: %u; iter: %u",
++			(const char *)uc.args[0], __FILE__, uc.args[1],
++			uc.args[2], uc.args[3], uc.args[4], vcpuid,
++			shared_data->guest_stage, shared_data->nr_iter);
++		break;
++	default:
++		TEST_FAIL("Unexpected guest exit\n");
++	}
++
++	return NULL;
++}
++
++static void test_run(struct kvm_vm *vm)
++{
++	int i, ret;
++
++	for (i = 0; i < test_args.nr_vcpus; i++) {
++		ret = pthread_create(&test_vcpu[i].pt_vcpu_run, NULL,
++				test_vcpu_run, &test_vcpu[i]);
++		TEST_ASSERT(!ret, "Failed to create vCPU-%d pthread\n", i);
++	}
++
++	for (i = 0; i < test_args.nr_vcpus; i++)
++		pthread_join(test_vcpu[i].pt_vcpu_run, NULL);
++}
++
++static void test_init_timer_irq(struct kvm_vm *vm)
++{
++	/* Timer initid should be same for all the vCPUs, so query only vCPU-0 */
++	int vcpu0_fd = vcpu_get_fd(vm, 0);
++
++	kvm_device_access(vcpu0_fd, KVM_ARM_VCPU_TIMER_CTRL,
++			KVM_ARM_VCPU_TIMER_IRQ_PTIMER, &ptimer_irq, false);
++	kvm_device_access(vcpu0_fd, KVM_ARM_VCPU_TIMER_CTRL,
++			KVM_ARM_VCPU_TIMER_IRQ_VTIMER, &vtimer_irq, false);
++
++	sync_global_to_guest(vm, ptimer_irq);
++	sync_global_to_guest(vm, vtimer_irq);
++
++	pr_debug("ptimer_irq: %d; vtimer_irq: %d\n", ptimer_irq, vtimer_irq);
++}
++
++static struct kvm_vm *test_vm_create(void)
++{
++	struct kvm_vm *vm;
++	unsigned int i;
++	int nr_vcpus = test_args.nr_vcpus;
++
++	vm = vm_create_default_with_vcpus(nr_vcpus, 0, 0, guest_code, NULL);
++
++	vm_init_descriptor_tables(vm);
++	vm_install_exception_handler(vm, VECTOR_IRQ_CURRENT, guest_irq_handler);
++
++	for (i = 0; i < nr_vcpus; i++) {
++		vcpu_init_descriptor_tables(vm, i);
++
++		test_vcpu[i].vcpuid = i;
++		test_vcpu[i].vm = vm;
++	}
++
++	ucall_init(vm, NULL);
++	test_init_timer_irq(vm);
++	vgic_v3_setup(vm, nr_vcpus, GICD_BASE_GPA, GICR_BASE_GPA);
++
++	/* Make all the test's cmdline args visible to the guest */
++	sync_global_to_guest(vm, test_args);
++
++	return vm;
++}
++
++static void test_print_help(char *name)
++{
++	pr_info("Usage: %s [-h] [-n nr_vcpus] [-i iterations] [-p timer_period_ms]\n",
++		name);
++	pr_info("\t-n: Number of vCPUs to configure (default: %u; max: %u)\n",
++		NR_VCPUS_DEF, KVM_MAX_VCPUS);
++	pr_info("\t-i: Number of iterations per stage (default: %u)\n",
++		NR_TEST_ITERS_DEF);
++	pr_info("\t-p: Periodicity (in ms) of the guest timer (default: %u)\n",
++		TIMER_TEST_PERIOD_MS_DEF);
++	pr_info("\t-h: print this help screen\n");
++}
++
++static bool parse_args(int argc, char *argv[])
++{
++	int opt;
++
++	while ((opt = getopt(argc, argv, "hn:i:p:")) != -1) {
++		switch (opt) {
++		case 'n':
++			test_args.nr_vcpus = atoi(optarg);
++			if (test_args.nr_vcpus <= 0) {
++				pr_info("Positive value needed for -n\n");
++				goto err;
++			} else if (test_args.nr_vcpus > KVM_MAX_VCPUS) {
++				pr_info("Max allowed vCPUs: %u\n",
++					KVM_MAX_VCPUS);
++				goto err;
++			}
++			break;
++		case 'i':
++			test_args.nr_iter = atoi(optarg);
++			if (test_args.nr_iter <= 0) {
++				pr_info("Positive value needed for -i\n");
++				goto err;
++			}
++			break;
++		case 'p':
++			test_args.timer_period_ms = atoi(optarg);
++			if (test_args.timer_period_ms <= 0) {
++				pr_info("Positive value needed for -p\n");
++				goto err;
++			}
++			break;
++		case 'h':
++		default:
++			goto err;
++		}
++	}
++
++	return true;
++
++err:
++	test_print_help(argv[0]);
++	return false;
++}
++
++int main(int argc, char *argv[])
++{
++	struct kvm_vm *vm;
++
++	/* Tell stdout not to buffer its content */
++	setbuf(stdout, NULL);
++
++	if (!parse_args(argc, argv))
++		exit(KSFT_SKIP);
++
++	vm = test_vm_create();
++	test_run(vm);
++	kvm_vm_free(vm);
++
++	return 0;
 +}
 -- 
 2.33.0.309.g3052b89438-goog
