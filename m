@@ -2,231 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6AC72409B1C
-	for <lists+kvm@lfdr.de>; Mon, 13 Sep 2021 19:41:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 59E18409C06
+	for <lists+kvm@lfdr.de>; Mon, 13 Sep 2021 20:21:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345921AbhIMRmg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Sep 2021 13:42:36 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60496 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1345948AbhIMRm1 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 13 Sep 2021 13:42:27 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.0.43) with SMTP id 18DGRBUv018538;
-        Mon, 13 Sep 2021 13:41:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=/NN3jaUxPuN1Z0XMRm7SAz5tZplp4p3QlUjz9/vCUbc=;
- b=gO39d4TnwFjmc7xxvNJGf0GVcXd02hsuUO1bvxu2ZDiXoKFn2lyr3Ga3IW6qdqZISaoA
- Yzoca+q97jMS2R9VoXLd00SvHsYvqwXbultrFG2N3xEcaVAttzCGwcpb+cQkwr5gDb7W
- ABjjTVYR/z0/F0T1Vd/9CDuHbFL2ryENB/Lfs+9ddrArVMJJ/rg3yCn0Y4xrtZm0tHyi
- zERGOsLVdO76nPD7zFC/GFafhtor/nYWdPr/CVO9EY7Tg6K4llpeViKhOwEFhsVAFQhr
- Jk5UsCkpqrKYCLRDPgt9m0jufcPfVREB+9CHfITC7euvKIWljd90An0qkF4rVVlz/Ffx 4w== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3b247749d6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 13 Sep 2021 13:41:02 -0400
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 18DHYb4u002637;
-        Mon, 13 Sep 2021 13:41:01 -0400
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3b247749ch-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 13 Sep 2021 13:41:01 -0400
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
-        by ppma03dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 18DHNkKQ030419;
-        Mon, 13 Sep 2021 17:41:00 GMT
-Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com [9.57.198.25])
-        by ppma03dal.us.ibm.com with ESMTP id 3b0m3a7j57-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 13 Sep 2021 17:41:00 +0000
-Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com [9.57.199.107])
-        by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 18DHehJp41025848
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 13 Sep 2021 17:40:43 GMT
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BD939124066;
-        Mon, 13 Sep 2021 17:40:43 +0000 (GMT)
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 50577124076;
-        Mon, 13 Sep 2021 17:40:36 +0000 (GMT)
-Received: from farman-thinkpad-t470p (unknown [9.211.116.76])
-        by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
-        Mon, 13 Sep 2021 17:40:36 +0000 (GMT)
-Message-ID: <1e431e58465b86430d02d429c86c427f7088bf1f.camel@linux.ibm.com>
-Subject: Re: [PATCH v2 0/9] Move vfio_ccw to the new mdev API
-From:   Eric Farman <farman@linux.ibm.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>, David Airlie <airlied@linux.ie>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        dri-devel@lists.freedesktop.org,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        intel-gfx@lists.freedesktop.org,
-        intel-gvt-dev@lists.freedesktop.org,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
-        linux-s390@vger.kernel.org,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>
-Cc:     Christoph Hellwig <hch@lst.de>
-Date:   Mon, 13 Sep 2021 13:40:34 -0400
-In-Reply-To: <0-v2-7d3a384024cf+2060-ccw_mdev_jgg@nvidia.com>
-References: <0-v2-7d3a384024cf+2060-ccw_mdev_jgg@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-16.el8) 
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: -Y_Guw0LHcHmxLUcn1T9ujGqJJ8_C5Jd
-X-Proofpoint-ORIG-GUID: z1fn5zdhFz8KxePmVCxN-fxKjMKHYvcA
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        id S243976AbhIMSWr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Sep 2021 14:22:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43644 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S242760AbhIMSWq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Sep 2021 14:22:46 -0400
+Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A3E8C061764
+        for <kvm@vger.kernel.org>; Mon, 13 Sep 2021 11:21:30 -0700 (PDT)
+Received: by mail-pg1-x52e.google.com with SMTP id q68so10224609pga.9
+        for <kvm@vger.kernel.org>; Mon, 13 Sep 2021 11:21:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=6++MUHqyHKCB5FgpZ/mPI8mWFFcZJMAIOAPJiYxj2J8=;
+        b=I8oAss5KvNOxSzhenZXmIesL1MTLaeyUnk6Q8EYJv5KLYqd1LxYtn/ptQxgv3SD+T9
+         PsQ3lmeYGUOmkmNBEchDt3vbOWf9cDZ90nOdyyxe+PJxS6IItldgrzQgOojUBQJ9bxR0
+         MyBt75NYyvzrKbm2331lHF5jPUnLM/Z4/K+PyuyXMBjivWPXQ5CUE0HDc1dRbLaZYOKY
+         BxXw50eAQgSRSTQ7ePnQPyXCKvYAlFcNZ3SQ6pgwqdpfVP7+nhLYaOvgheq0lrdxWlWB
+         3bBhDAN6CcQfyLsrTyRTzGqroPXLKVttcyRR7ITwmfGoVYHHNY4Xpa/Dj/oY2lcBFm/W
+         hDMw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=6++MUHqyHKCB5FgpZ/mPI8mWFFcZJMAIOAPJiYxj2J8=;
+        b=Bq0CPKK9lkTT19UQD+gG8iBDI83RxrOS4nEvcRsgVtDj5u0hi/XDDXGh6UcWxycWEm
+         gV5pX/7HDv5VUqkM/ODqWvxzNL0Qbo9Vs7jAcTbfCOu8MM5RLjE1uRH0Tq0XfS2rEeTr
+         9FR74vIfvg6vsx9s4fqZFBVYI7oaTq4Vb4bF5Zzn6Qt4H8GVqfeYCMjtK8wtLK+GqtrI
+         3TvPLw95+qClj9DPaKaN+Sgo/+attgvcPSHsDu704D5SYQ5l0hihFFyrSiKFa2BDJS9e
+         QXdmUOFF48SiWzDYf5WPpyuxDNjn+OA3+0WbjXPT+VC1gSinV/XWbNoP8GbHYH0XtEfp
+         C3nw==
+X-Gm-Message-State: AOAM5316NjZe4TxY/lL80eY7QuQHx4CRw6FwJTBvT1wQubs6lwFgU7VL
+        PYpJ5Ey3N+OJX08/rIvXqnl/4A==
+X-Google-Smtp-Source: ABdhPJzgg07OWjq2bQtnbrD/FW+0dCRqz+/2tJpzVzU6KzTpUZG3HRY1sfxYtkNoWAuSpFfjZ/hUlw==
+X-Received: by 2002:a05:6a00:1a10:b0:412:448c:89ca with SMTP id g16-20020a056a001a1000b00412448c89camr811832pfv.86.1631557289837;
+        Mon, 13 Sep 2021 11:21:29 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id x13sm4547221pfp.133.2021.09.13.11.21.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Sep 2021 11:21:29 -0700 (PDT)
+Date:   Mon, 13 Sep 2021 18:21:25 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Eduardo Habkost <ehabkost@redhat.com>
+Cc:     Juergen Gross <jgross@suse.com>, kvm@vger.kernel.org,
+        x86@kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mips@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-kselftest@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, Shuah Khan <shuah@kernel.org>,
+        Shuah Khan <skhan@linuxfoundation.org>
+Subject: Re: [PATCH 2/2] kvm: rename KVM_MAX_VCPU_ID to KVM_MAX_VCPU_IDS
+Message-ID: <YT+WpdnGodZE9krY@google.com>
+References: <20210913135745.13944-1-jgross@suse.com>
+ <20210913135745.13944-3-jgross@suse.com>
+ <YT97K7yXyCrphyCt@google.com>
+ <CAOpTY_pyeOo2Kh-r1cEFk2XL4g8A1mxQpP1y62thWk2mh6XUUg@mail.gmail.com>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.182.1,Aquarius:18.0.687,Hydra:6.0.235,FMLib:17.0.607.475
- definitions=2020-10-13_15,2020-10-13_02,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011
- lowpriorityscore=0 malwarescore=0 mlxlogscore=999 suspectscore=0
- adultscore=0 mlxscore=0 priorityscore=1501 spamscore=0 impostorscore=0
- bulkscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2109030001 definitions=main-2109130063
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAOpTY_pyeOo2Kh-r1cEFk2XL4g8A1mxQpP1y62thWk2mh6XUUg@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2021-09-09 at 16:38 -0300, Jason Gunthorpe wrote:
-> This addresses Cornelia's remark on the earlier patch that ccw has a
-> confusing lifecycle. While it doesn't seem like the original attempt
-> was
-> functionally wrong, the result can be made better with a lot of
-> further
-> work.
+On Mon, Sep 13, 2021, Eduardo Habkost wrote:
+> On Mon, Sep 13, 2021 at 12:24 PM Sean Christopherson <seanjc@google.com> wrote:
+> >
+> > On Mon, Sep 13, 2021, Juergen Gross wrote:
+> > > KVM_MAX_VCPU_ID is not specifying the highest allowed vcpu-id, but the
+> > > number of allowed vcpu-ids. This has already led to confusion, so
+> > > rename KVM_MAX_VCPU_ID to KVM_MAX_VCPU_IDS to make its semantics more
+> > > clear
+> >
+> > My hesitation with this rename is that the max _number_ of IDs is not the same
+> > thing as the max allowed ID.  E.g. on x86, given a capability that enumerates the
+> > max number of IDs, I would expect to be able to create vCPUs with arbitrary 32-bit
+> > x2APIC IDs so long as the total number of IDs is below the max.
+> >
+> 
+> What name would you suggest instead? KVM_VCPU_ID_LIMIT, maybe?
+> 
+> I'm assuming we are not going to redefine KVM_MAX_VCPU_ID to be an
+> inclusive limit.
 
-I thought I'd take a stab at seeing how this works with the hardware
-before looking at the code much. git couldn't apply patches 1, 6, or 9
-to 5.15-rc1, but I was able to hand-fit them into place. Shutting down
-the guest and de-configuring a device ends up bringing my whole system
-down. I haven't looked at this any further; hopefully something jumps
-to mind for you:
-
-[   64.585347] vfio_ccw 0.0.08fe: MDEV: Unregistering
-[   64.585357] illegal operation: 0001 ilc:1 [#1] SMP 
-[   64.585362] Modules linked in: vhost_vsock
-vmw_vsock_virtio_transport_common vsock vhost
-[   64.585364] vfio_ccw_mdev b50bbd4b-eab8-4f8c-9f0c-3cf636f936b9:
-Relaying device request to user (#0)
-[   64.585364]  vhost_iotlb lcs ctcm fsm kvm xt_MASQUERADE xt_conntrack
-ipt_REJECT nf_reject_ipv4 xt_tcpudp iptable_mangle iptable_nat nf_nat
-nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 iptable_filter bridge stp
-llc dm_multipath dm_mod s390_trng eadm_sch zcrypt_cex4 qeth_l2 vfio_ccw
-mdev vfio_iommu_type1 vfio configfs zram zsmalloc ip_tables x_tables
-mlx5_core ghash_s390 prng aes_s390 des_s390 libdes sha3_512_s390
-sha3_256_s390 sha512_s390 sha256_s390 sha1_s390 sha_common pkey zcrypt
-rng_core autofs4
-[   64.585392] CPU: 14 PID: 4487 Comm: qemu-system-s39 Kdump: loaded
-Not tainted 5.15.0-rc1 #1
-[   64.585395] Hardware name: IBM 3906 M05 780 (LPAR)
-[   64.585396] Krnl PSW : 0704c00180000000 0000000000000002 (0x2)
-[   64.585404]            R:0 T:1 IO:1 EX:1 Key:0 M:1 W:0 P:0 AS:3 CC:0
-PM:0 RI:0 EA:3
-[   64.585407] Krnl GPRS: 0000000000000001 0000000000000000
-00000000005f4800 0000000000000004
-[   64.585410]            0000000000000000 0000000000000002
-0000000000000000 000002aa3e65085e
-[   64.585412]            000000008de09100 0000000000003b6f
-000003ff8017fa08 00000000005f4800
-[   64.585413]            0000000081450000 000003ff7c032310
-000003ff80179db0 000003800bf53da0
-[   64.585418] Krnl Code:#0000000000000000:
-0000                illegal 
-          >0000000000000002: 0000               illegal 
-           0000000000000004: 0000               illegal 
-           0000000000000006: 0000               illegal 
-           0000000000000008: 0000               illegal 
-           000000000000000a: 0000               illegal 
-           000000000000000c: 0000               illegal 
-           000000000000000e: 0000               illegal 
-[   64.585462] Call Trace:
-[   64.585464]  [<0000000000000002>] 0x2 
-[   64.585467] ([<000003ff80179d74>] vfio_ccw_mdev_ioctl+0x84/0x318
-[vfio_ccw])
-[   64.585476]  [<00000000bb7adda6>] __s390x_sys_ioctl+0xbe/0x100 
-[   64.585481]  [<00000000bbfbf5e4>] __do_syscall+0x1bc/0x1e8 
-[   64.585488]  [<00000000bbfcc8d8>] system_call+0x78/0xa0 
-
-Eric
-
-> 
-> Reorganize the driver so that the mdev owns the private memory and
-> controls the lifecycle, not the css_driver. The memory associated
-> with the
-> css_driver lifecycle is only the mdev_parent/mdev_type registration.
-> 
-> Along the way we change when the sch is quiescent or not to be linked
-> to
-> the open/close_device lifetime of the vfio_device, which is sort of
-> what
-> it was tring to do already, just not completely.
-> 
-> The troublesome racey lifecycle of the css_driver callbacks is made
-> clear
-> with simple vfio_device refcounting so a callback is only delivered
-> into a
-> registered vfio_device and has obvious correctness.
-> 
-> Move the only per-css_driver state, the "available instance" counter,
-> into
-> the core code and share that logic with many of the other drivers.
-> The
-> value is kept in the mdev_type memory.
-> 
-> v2:
->  - Clean up the lifecycle in ccw with 7 new patches
->  - Rebase
-> v1: 
-> https://lore.kernel.org/all/7-v2-7667f42c9bad+935-vfio3_jgg@nvidia.com
-> 
-> Jason Gunthorpe (9):
->   vfio/ccw: Use functions for alloc/free of the vfio_ccw_private
->   vfio/ccw: Pass vfio_ccw_private not mdev_device to various
-> functions
->   vfio/ccw: Convert to use vfio_register_group_dev()
->   vfio/ccw: Make the FSM complete and synchronize it to the mdev
->   vfio/mdev: Consolidate all the device_api sysfs into the core code
->   vfio/mdev: Add mdev available instance checking to the core
->   vfio/ccw: Remove private->mdev
->   vfio: Export vfio_device_try_get()
->   vfio/ccw: Move the lifecycle of the struct vfio_ccw_private to the
->     mdev
-> 
->  drivers/gpu/drm/i915/gvt/kvmgt.c      |   9 +-
->  drivers/s390/cio/vfio_ccw_drv.c       | 282 +++++++++++-------------
-> --
->  drivers/s390/cio/vfio_ccw_fsm.c       | 152 ++++++++++----
->  drivers/s390/cio/vfio_ccw_ops.c       | 240 ++++++++++------------
->  drivers/s390/cio/vfio_ccw_private.h   |  42 +++-
->  drivers/s390/crypto/vfio_ap_ops.c     |  41 +---
->  drivers/s390/crypto/vfio_ap_private.h |   2 -
->  drivers/vfio/mdev/mdev_core.c         |  13 +-
->  drivers/vfio/mdev/mdev_private.h      |   2 +
->  drivers/vfio/mdev/mdev_sysfs.c        |  64 +++++-
->  drivers/vfio/vfio.c                   |   3 +-
->  include/linux/mdev.h                  |  13 +-
->  include/linux/vfio.h                  |   1 +
->  samples/vfio-mdev/mbochs.c            |   9 +-
->  samples/vfio-mdev/mdpy.c              |  31 +--
->  samples/vfio-mdev/mtty.c              |  10 +-
->  16 files changed, 470 insertions(+), 444 deletions(-)
-> 
-
+Heh, I haven't been able to come up with one, which is why I suggested the route
+of making it an inclusive value internally within KVM.
