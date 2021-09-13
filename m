@@ -2,20 +2,20 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 09CF6409821
-	for <lists+kvm@lfdr.de>; Mon, 13 Sep 2021 17:57:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 88A3B40981E
+	for <lists+kvm@lfdr.de>; Mon, 13 Sep 2021 17:57:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345577AbhIMP61 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Sep 2021 11:58:27 -0400
-Received: from 8bytes.org ([81.169.241.247]:56874 "EHLO theia.8bytes.org"
+        id S1345516AbhIMP6Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Sep 2021 11:58:25 -0400
+Received: from 8bytes.org ([81.169.241.247]:56962 "EHLO theia.8bytes.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S244891AbhIMP5i (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Sep 2021 11:57:38 -0400
+        id S245366AbhIMP5j (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Sep 2021 11:57:39 -0400
 Received: from cap.home.8bytes.org (p549ad441.dip0.t-ipconnect.de [84.154.212.65])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
         (No client certificate requested)
-        by theia.8bytes.org (Postfix) with ESMTPSA id 8B1EA1043;
-        Mon, 13 Sep 2021 17:56:19 +0200 (CEST)
+        by theia.8bytes.org (Postfix) with ESMTPSA id 555131074;
+        Mon, 13 Sep 2021 17:56:20 +0200 (CEST)
 From:   Joerg Roedel <joro@8bytes.org>
 To:     x86@kernel.org
 Cc:     Eric Biederman <ebiederm@xmission.com>, kexec@lists.infradead.org,
@@ -39,9 +39,9 @@ Cc:     Eric Biederman <ebiederm@xmission.com>, kexec@lists.infradead.org,
         Joerg Roedel <joro@8bytes.org>, linux-coco@lists.linux.dev,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org
-Subject: [PATCH v2 05/12] x86/sev: Use GHCB protocol version 2 if supported
-Date:   Mon, 13 Sep 2021 17:55:56 +0200
-Message-Id: <20210913155603.28383-6-joro@8bytes.org>
+Subject: [PATCH v2 06/12] x86/sev: Cache AP Jump Table Address
+Date:   Mon, 13 Sep 2021 17:55:57 +0200
+Message-Id: <20210913155603.28383-7-joro@8bytes.org>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20210913155603.28383-1-joro@8bytes.org>
 References: <20210913155603.28383-1-joro@8bytes.org>
@@ -53,100 +53,92 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Joerg Roedel <jroedel@suse.de>
 
-Check whether the hypervisor supports GHCB version 2 and use it if
-available.
+Store the physical address of the AP Jump Table in kernel memory so
+that it does not need to be fetched from the Hypervisor again.
 
 Signed-off-by: Joerg Roedel <jroedel@suse.de>
 ---
- arch/x86/boot/compressed/sev.c | 10 ++++++++--
- arch/x86/include/asm/sev.h     |  4 ++--
- arch/x86/kernel/sev-shared.c   | 17 ++++++++++++++---
- 3 files changed, 24 insertions(+), 7 deletions(-)
+ arch/x86/kernel/sev.c | 26 ++++++++++++++------------
+ 1 file changed, 14 insertions(+), 12 deletions(-)
 
-diff --git a/arch/x86/boot/compressed/sev.c b/arch/x86/boot/compressed/sev.c
-index 101e08c67296..7f8416f76be7 100644
---- a/arch/x86/boot/compressed/sev.c
-+++ b/arch/x86/boot/compressed/sev.c
-@@ -119,16 +119,22 @@ static enum es_result vc_read_mem(struct es_em_ctxt *ctxt,
- /* Include code for early handlers */
- #include "../../kernel/sev-shared.c"
+diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
+index 5d3422e8b25e..eedba56b6bac 100644
+--- a/arch/x86/kernel/sev.c
++++ b/arch/x86/kernel/sev.c
+@@ -42,6 +42,9 @@ static struct ghcb boot_ghcb_page __bss_decrypted __aligned(PAGE_SIZE);
+  */
+ static struct ghcb __initdata *boot_ghcb;
  
-+static unsigned int ghcb_protocol;
++/* Cached AP Jump Table Address */
++static phys_addr_t sev_es_jump_table_pa;
 +
- static u64 sev_get_ghcb_proto_ver(void)
- {
--	return GHCB_PROTOCOL_MAX;
-+	return ghcb_protocol;
+ /* #VC handler runtime per-CPU data */
+ struct sev_es_runtime_data {
+ 	struct ghcb ghcb_page;
+@@ -546,12 +549,14 @@ void noinstr __sev_es_nmi_complete(void)
+ 	__sev_put_ghcb(&state);
  }
  
- static bool early_setup_sev_es(void)
+-static u64 get_jump_table_addr(void)
++static phys_addr_t get_jump_table_addr(void)
  {
--	if (!sev_es_negotiate_protocol(NULL))
-+	struct sev_ghcb_protocol_info info;
+ 	struct ghcb_state state;
+ 	unsigned long flags;
+ 	struct ghcb *ghcb;
+-	u64 ret = 0;
 +
-+	if (!sev_es_negotiate_protocol(&info))
- 		sev_es_terminate(GHCB_SEV_ES_REASON_PROTOCOL_UNSUPPORTED);
++	if (sev_es_jump_table_pa)
++		return sev_es_jump_table_pa;
  
-+	ghcb_protocol = info.vm_proto;
-+
- 	if (set_page_decrypted((unsigned long)&boot_ghcb_page))
- 		return false;
+ 	local_irq_save(flags);
  
-diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
-index fa5cd05d3b5b..134a7c9d91b6 100644
---- a/arch/x86/include/asm/sev.h
-+++ b/arch/x86/include/asm/sev.h
-@@ -12,8 +12,8 @@
- #include <asm/insn.h>
- #include <asm/sev-common.h>
+@@ -567,39 +572,36 @@ static u64 get_jump_table_addr(void)
  
--#define GHCB_PROTO_OUR		0x0001UL
--#define GHCB_PROTOCOL_MAX	1ULL
-+#define GHCB_PROTOCOL_MIN	1ULL
-+#define GHCB_PROTOCOL_MAX	2ULL
- #define GHCB_DEFAULT_USAGE	0ULL
+ 	if (ghcb_sw_exit_info_1_is_valid(ghcb) &&
+ 	    ghcb_sw_exit_info_2_is_valid(ghcb))
+-		ret = ghcb->save.sw_exit_info_2;
++		sev_es_jump_table_pa = (phys_addr_t)ghcb->save.sw_exit_info_2;
  
- #define	VMGEXIT()			{ asm volatile("rep; vmmcall\n\r"); }
-diff --git a/arch/x86/kernel/sev-shared.c b/arch/x86/kernel/sev-shared.c
-index 36eaac2773ed..40a1ca81bdb8 100644
---- a/arch/x86/kernel/sev-shared.c
-+++ b/arch/x86/kernel/sev-shared.c
-@@ -61,6 +61,7 @@ static void __noreturn sev_es_terminate(unsigned int reason)
+ 	__sev_put_ghcb(&state);
  
- static bool sev_es_negotiate_protocol(struct sev_ghcb_protocol_info *info)
+ 	local_irq_restore(flags);
+ 
+-	return ret;
++	return sev_es_jump_table_pa;
+ }
+ 
+ int sev_es_setup_ap_jump_table(struct real_mode_header *rmh)
  {
-+	unsigned int protocol;
- 	u64 val;
+ 	u16 startup_cs, startup_ip;
+-	phys_addr_t jump_table_pa;
+-	u64 jump_table_addr;
+ 	u16 __iomem *jump_table;
++	phys_addr_t pa;
  
- 	/* Do the GHCB protocol version negotiation */
-@@ -71,14 +72,24 @@ static bool sev_es_negotiate_protocol(struct sev_ghcb_protocol_info *info)
- 	if (GHCB_MSR_INFO(val) != GHCB_MSR_SEV_INFO_RESP)
- 		return false;
+-	jump_table_addr = get_jump_table_addr();
++	pa = get_jump_table_addr();
  
--	if (GHCB_MSR_PROTO_MAX(val) < GHCB_PROTO_OUR ||
--	    GHCB_MSR_PROTO_MIN(val) > GHCB_PROTO_OUR)
-+	/* Sanity check untrusted input */
-+	if (GHCB_MSR_PROTO_MIN(val) > GHCB_MSR_PROTO_MAX(val))
-+		return false;
-+
-+	/* Use maximum supported protocol version */
-+	protocol = min_t(unsigned int, GHCB_MSR_PROTO_MAX(val), GHCB_PROTOCOL_MAX);
-+
-+	/*
-+	 * Hypervisor does not support any protocol version required for this
-+	 * kernel.
-+	 */
-+	if (protocol < GHCB_MSR_PROTO_MIN(val))
- 		return false;
+ 	/* On UP guests there is no jump table so this is not a failure */
+-	if (!jump_table_addr)
++	if (!pa)
+ 		return 0;
  
- 	if (info) {
- 		info->hv_proto_min = GHCB_MSR_PROTO_MIN(val);
- 		info->hv_proto_max = GHCB_MSR_PROTO_MAX(val);
--		info->vm_proto	   = GHCB_PROTO_OUR;
-+		info->vm_proto	   = protocol;
- 	}
+ 	/* Check if AP Jump Table is page-aligned */
+-	if (jump_table_addr & ~PAGE_MASK)
++	if (pa & ~PAGE_MASK)
+ 		return -EINVAL;
  
- 	return true;
+-	jump_table_pa = jump_table_addr & PAGE_MASK;
+-
+ 	startup_cs = (u16)(rmh->trampoline_start >> 4);
+ 	startup_ip = (u16)(rmh->sev_es_trampoline_start -
+ 			   rmh->trampoline_start);
+ 
+-	jump_table = ioremap_encrypted(jump_table_pa, PAGE_SIZE);
++	jump_table = ioremap_encrypted(pa, PAGE_SIZE);
+ 	if (!jump_table)
+ 		return -EIO;
+ 
 -- 
 2.33.0
 
