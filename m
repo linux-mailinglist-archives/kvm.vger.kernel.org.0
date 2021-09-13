@@ -2,101 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3F40040987F
-	for <lists+kvm@lfdr.de>; Mon, 13 Sep 2021 18:14:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 29D724098D6
+	for <lists+kvm@lfdr.de>; Mon, 13 Sep 2021 18:21:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345736AbhIMQPe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Sep 2021 12:15:34 -0400
-Received: from smtp-out2.suse.de ([195.135.220.29]:52940 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232274AbhIMQPd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Sep 2021 12:15:33 -0400
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 85FAC1FD99;
-        Mon, 13 Sep 2021 16:14:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1631549656; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=am3WMc1q9XARynRDUM7E3FUGoxi9LsITJzf3oeQ+Lww=;
-        b=P/4IFY9RCf3aKGlNrhp4PnGQUQUBpMMsHj0KqsHTSXt5OdpCfML/CO9aOsYMSrM2X9fQuN
-        +uG8yEn3iOcJ4wLeht3ztrh5E3yCcwpzPJm7JFM92jmUw918wl5ZBG27ouscyAT4J34f1T
-        N3cV0Ud03Kmk8mK9YOC4/ANyQFbWLa0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1631549656;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=am3WMc1q9XARynRDUM7E3FUGoxi9LsITJzf3oeQ+Lww=;
-        b=Q7q10t86FU0aIasjf0FzLIFUI+diQ5WAToTZOr1nw6kx/bpWHfTpn4UjvYcHbt8+s2poj8
-        UAtG7spSEyhbPVAQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id A329613AAB;
-        Mon, 13 Sep 2021 16:14:15 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id 62cXJtd4P2F6IQAAMHmgww
-        (envelope-from <jroedel@suse.de>); Mon, 13 Sep 2021 16:14:15 +0000
-Date:   Mon, 13 Sep 2021 18:14:14 +0200
-From:   Joerg Roedel <jroedel@suse.de>
-To:     Dave Hansen <dave.hansen@intel.com>
-Cc:     Joerg Roedel <joro@8bytes.org>, x86@kernel.org,
-        Eric Biederman <ebiederm@xmission.com>,
-        kexec@lists.infradead.org, hpa@zytor.com,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
-        David Rientjes <rientjes@google.com>,
-        Cfir Cohen <cfir@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Mike Stunes <mstunes@vmware.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Martin Radev <martin.b.radev@gmail.com>,
-        Arvind Sankar <nivedita@alum.mit.edu>,
-        linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH v2 00/12] x86/sev: KEXEC/KDUMP support for SEV-ES guests
-Message-ID: <YT941raolZvGTVR/@suse.de>
-References: <20210913155603.28383-1-joro@8bytes.org>
- <4e033293-b81d-1e21-6fd6-f507b6821d3c@intel.com>
+        id S235826AbhIMQW5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Sep 2021 12:22:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42898 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235824AbhIMQWu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Sep 2021 12:22:50 -0400
+Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9E8BC061762
+        for <kvm@vger.kernel.org>; Mon, 13 Sep 2021 09:21:34 -0700 (PDT)
+Received: by mail-lf1-x12a.google.com with SMTP id s10so22249156lfr.11
+        for <kvm@vger.kernel.org>; Mon, 13 Sep 2021 09:21:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=JDprip5fY3voX1Qv8j7L/aqC8hZUhXwNwQ9qHoD5Biw=;
+        b=m7SWvcjcOuSUFq4JiGRDT+E6uGirxXLi6uDeqkBo91KEbXZzA+WYa4CF2bPvuTUEpE
+         WEp8JcZyUfh7a3ahWwxFDPli0KHOjStveLQAMPW+aOJIwNndaoqzLNcIbJcpeVkmTVVz
+         s0zH+Yq2hytNDOXR/pp+RmBY14I8yllyrlv0LSZiCN5qNF6BrQVLkMDr34lMfB+6ydJN
+         tV1dFoWevq+aPi3V71JO81+LAjFKaXpn5BMAAoi/zwElKqDV9alPSmtKGZ+XXJk1Bf2P
+         St6OxQzkBV2TebshxkYVnAuwv/rG9rrQjnWZRFDMBnhTYGJobrfsQBXOKJTIKpN5t5Me
+         2WGQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=JDprip5fY3voX1Qv8j7L/aqC8hZUhXwNwQ9qHoD5Biw=;
+        b=5imp2cJPk3rHqyQ+WJOoma1H1hoEnWuxSq3MLV9K0FIuiywv1l5AhPoHtEBJEnoQ+t
+         J2u61/ntzQTYikEp+fi0Ff6tJ6j0RCKeGWQyNK5w648t+GwULT3lkJXN2nbq94i0EU4D
+         fZ4XBFOW1kR97+VnOgW7gXaCeDa+Mf7p6AjhADycGNinUhKwXrrY+UIRKmMSzXgkOE7g
+         VPr5wLvYTF2E4xpLXxPJvOXl4D3CGO6uPOdy5AF/VYT+mIGHgEts1wLYRuE5jOGWUFVs
+         Nf0cQh+s9YcgaRcPRxVmbwsiemcYJDiMvw8UJLyuoWtznOLXHTlltWSBxynnUgdMto52
+         N6Cg==
+X-Gm-Message-State: AOAM532tTHvoay06wFs7vcWwTKMtBlew4ImmufRBnaFaZbe9CsPnM31s
+        hg90ft6ivkuWt2SB81G5HBFHiReoSzbHNZ8so1M7Aw==
+X-Google-Smtp-Source: ABdhPJzHWaFiLOpsPyJcfBHoAy1z8ekjl8TtNbzufPp+6KFlQhI2O5fF7FzpSSK4yxQDFIa9+tWQnAW+uWUSVEBh8JQ=
+X-Received: by 2002:a05:6512:c15:: with SMTP id z21mr9760718lfu.193.1631550092955;
+ Mon, 13 Sep 2021 09:21:32 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4e033293-b81d-1e21-6fd6-f507b6821d3c@intel.com>
+References: <20210902181751.252227-1-pgonda@google.com> <20210902181751.252227-2-pgonda@google.com>
+ <YTqirwnu0rOcfDCq@google.com> <YTqxA23XRryWfCuA@google.com>
+In-Reply-To: <YTqxA23XRryWfCuA@google.com>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Mon, 13 Sep 2021 10:21:21 -0600
+Message-ID: <CAMkAt6q3as414YMZco6UyCycY+jKbaYS5BUdC+U+8iWmBft3+A@mail.gmail.com>
+Subject: Re: [PATCH 1/3 V7] KVM, SEV: Add support for SEV intra host migration
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm list <kvm@vger.kernel.org>, Marc Orr <marcorr@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        David Rientjes <rientjes@google.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 13, 2021 at 09:02:38AM -0700, Dave Hansen wrote:
-> On 9/13/21 8:55 AM, Joerg Roedel wrote:
-> > This does not work under SEV-ES, because the hypervisor has no access
-> > to the vCPU registers and can't make modifications to them. So an
-> > SEV-ES guest needs to reset the vCPU itself and park it using the
-> > AP-reset-hold protocol. Upon wakeup the guest needs to jump to
-> > real-mode and to the reset-vector configured in the AP-Jump-Table.
-> 
-> How does this end up looking to an end user that tries to kexec() from a
-> an SEV-ES kernel?  Does it just hang?
+On Thu, Sep 9, 2021 at 7:12 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Fri, Sep 10, 2021, Sean Christopherson wrote:
+> > Ooh, this brings up a potential shortcoming of requiring @dst to be SEV-enabled.
+> > If every SEV{-ES} ASID is allocated, then there won't be an available ASID to
+> > (temporarily) allocate for the intra-host migration.  But that temporary ASID
+> > isn't actually necessary, i.e. there's no reason intra-host migration should fail
+> > if all ASIDs are in-use.
 
-Yes, the kexec will just hang. This patch-set contains code to disable
-the kexec syscalls in situations where it would not work for that
-reason.
+Ack forcing dst to be SEV disabled will mitigate this problem.
 
-Actually with the changes to the decompressor in this patch-set the
-kexec'ed kernel could boot, but would fail to bring up all the APs.
+>
+> ...
+>
+> > So I think the only option is to take vcpu->mutex for all vCPUs in both @src and
+> > @dst.  Adding that after acquiring kvm->lock in svm_sev_lock_for_migration()
+> > should Just Work.  Unless userspace is misbehaving, the lock won't be contended
+> > since all vCPUs need to be quiesced, though it's probably worth using the
+> > mutex_lock_killable() variant just to be safe.
+>
+> Circling back to this after looking at the SEV-ES support, I think the vCPUs in
+> the source VM need to be reset via kvm_vcpu_reset(vcpu, false).  I doubt there's
+> a use case for actually doing anything with the vCPU, but leaving it runnable
+> without purging state makes me nervous.
+>
+> Alternative #1 would be to mark vCPUs as dead in some way so as to prevent doing
+> anything useful with the vCPU.
+>
+> Alternative #2 would be to "kill" the source VM by setting kvm->vm_bugged to
+> prevent all ioctls().
+>
+> The downside to preventing future ioctls() is that this would need to be the
+> very last step of migration.  Not sure if that's problematic?
 
-Regards,
-
-	Joerg
+I'll add calls to kvm_vcpu_reset. Alternative #2 using vm_bugged won't
+work for us because we need to keep using the source VM even after the
+state is transfered.
