@@ -2,177 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 346F8409CE6
-	for <lists+kvm@lfdr.de>; Mon, 13 Sep 2021 21:24:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 96935409CEB
+	for <lists+kvm@lfdr.de>; Mon, 13 Sep 2021 21:25:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242116AbhIMTZ3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Sep 2021 15:25:29 -0400
-Received: from mail-mw2nam08on2068.outbound.protection.outlook.com ([40.107.101.68]:34977
-        "EHLO NAM04-MW2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S240264AbhIMTZ2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Sep 2021 15:25:28 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=QpnDoOIXkru/jRLspVz3bPnlu53WbIWuRDGALLyqtGBXJoZdy4gurjYQuG2TblMEm+tOgcJ1rsSCLw0gZZj6xRWDlO57io3OQ6ZGUkm6X3zyKpFv0a6QW9t3v8eGYTd7vgm6aTqtYQw5/nSVJbqIrz4SBjR32rk/upVb40njRBG2y72Pkx59cY72oJFTONGJZzjzowjAuxw5m+9UTlE56C1tahUq9uNZ3/hox49EYrL6GnhzB70AViErvGqGzUxj+MVHqXhi+L6cZmH6GBg5S9krigUOJJx2ZAWrG1CCMUMpSgPJaPS05cjHtuUDhpDlGiIEYWa/1fafwWxQGBR8KQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
- bh=NxQdwY3KBK2uvQ6zOhOYy+6E6Eam8AdjRwpt2W9lfrw=;
- b=h7KhCuSpwGcW4holqmLGDIGpRA45fVq0ybMxWSRXK+xYqzzgw/AN4xmhTVZ2rZWWgUYApK8kHmBbDgKR5eCP9clwGUy5vWmcqBkXH1/rvaSSvBCZDiwxlD+/WG51J3tCX/RrWyseOmWoAbEveaccNqAu4ymsCure65qSWk2NiGpjm85n4Om34OfLRXoMjSYTh9UkG1GI8fQXX9B1BM7fE0sfQlOVrzuxWavvYlhB9aMY4Z65j5RF4B6Lg3mQzBtGscDvmf1LCqvNxNWSiSEcmIubL3ru0lxf5lQTV1a3RfFoavY3J67pNeNzm7YFerLmcNLP17CMngV0lsmx5s5i6A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NxQdwY3KBK2uvQ6zOhOYy+6E6Eam8AdjRwpt2W9lfrw=;
- b=UEVurqOGPEPYaq63mmoJkS7wwxCayMK/+ayY2R9PRLbZFU8k6ojkVwk01KLkLkkiMAgzU+/qCOaTachs5C3fOri0R+dVaYy+NBraGEIhk5D9oXn2+Rb1SRHBW6URMti0/anXAQKTCQk5LFuZbpBN8zHlfL8RElavCrjxAGhUzaL7hZwMhr/l2nG5r9XDv66SHQxAYpyZuXlpzTCfYU7n2HnAnRFLMx9COcmzREs7ljgq4qGfzJrwQ+FKHAJeVHPqi0nc4KPBZnuiWrp3jpk/EB1aRm+uSeTCNlpQ4qisv1HbnmgEFYRa1c8stlMwDvAkESTnJWQKvSX+H2uYtoQsaw==
-Authentication-Results: linux.ibm.com; dkim=none (message not signed)
- header.d=none;linux.ibm.com; dmarc=none action=none header.from=nvidia.com;
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
- by BL1PR12MB5032.namprd12.prod.outlook.com (2603:10b6:208:30a::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4500.16; Mon, 13 Sep
- 2021 19:24:09 +0000
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::e8af:232:915e:2f95]) by BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::e8af:232:915e:2f95%8]) with mapi id 15.20.4500.019; Mon, 13 Sep 2021
- 19:24:09 +0000
-Date:   Mon, 13 Sep 2021 16:24:07 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Eric Farman <farman@linux.ibm.com>
-Cc:     David Airlie <airlied@linux.ie>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        dri-devel@lists.freedesktop.org,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        intel-gfx@lists.freedesktop.org,
-        intel-gvt-dev@lists.freedesktop.org,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
-        linux-s390@vger.kernel.org,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>, Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH v2 0/9] Move vfio_ccw to the new mdev API
-Message-ID: <20210913192407.GZ2505917@nvidia.com>
-References: <0-v2-7d3a384024cf+2060-ccw_mdev_jgg@nvidia.com>
- <1e431e58465b86430d02d429c86c427f7088bf1f.camel@linux.ibm.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1e431e58465b86430d02d429c86c427f7088bf1f.camel@linux.ibm.com>
-X-ClientProxiedBy: BL0PR0102CA0044.prod.exchangelabs.com
- (2603:10b6:208:25::21) To BL0PR12MB5506.namprd12.prod.outlook.com
- (2603:10b6:208:1cb::22)
+        id S241848AbhIMT07 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Sep 2021 15:26:59 -0400
+Received: from mga05.intel.com ([192.55.52.43]:35927 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S240725AbhIMT0w (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Sep 2021 15:26:52 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10106"; a="307329127"
+X-IronPort-AV: E=Sophos;i="5.85,290,1624345200"; 
+   d="scan'208";a="307329127"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2021 12:25:36 -0700
+X-IronPort-AV: E=Sophos;i="5.85,290,1624345200"; 
+   d="scan'208";a="609185389"
+Received: from holdensm-mobl.amr.corp.intel.com (HELO [10.212.147.16]) ([10.212.147.16])
+  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2021 12:25:35 -0700
+Subject: Re: [PATCH 1/2] x86: sgx_vepc: extract sgx_vepc_remove_page
+To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     x86@kernel.org, linux-sgx@vger.kernel.org, jarkko@kernel.org,
+        dave.hansen@linux.intel.com, yang.zhong@intel.com
+References: <20210913131153.1202354-1-pbonzini@redhat.com>
+ <20210913131153.1202354-2-pbonzini@redhat.com>
+ <dc628588-3030-6c05-0ba4-d8fc6629c0d2@intel.com>
+ <8105a379-195e-8c9b-5e06-f981f254707f@redhat.com>
+ <06db5a41-3485-9141-10b5-56ca57ed1792@intel.com>
+ <34632ea9-42d3-fdfa-ae47-e208751ab090@redhat.com>
+ <480cf917-7301-4227-e1c4-728b52537f46@intel.com>
+ <2b595588-eb98-6d30-dc50-794fc396bf7e@redhat.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+ z5cecg==
+Message-ID: <fa8e8573-d907-11b0-60e1-f31e050beb64@intel.com>
+Date:   Mon, 13 Sep 2021 12:25:33 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Received: from mlx.ziepe.ca (142.162.113.129) by BL0PR0102CA0044.prod.exchangelabs.com (2603:10b6:208:25::21) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4500.14 via Frontend Transport; Mon, 13 Sep 2021 19:24:08 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1mPrYl-00HEBt-S6; Mon, 13 Sep 2021 16:24:07 -0300
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 403ba96e-8df1-40b2-6e82-08d976ec0f29
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5032:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <BL1PR12MB5032C1477F1EF2ED95A821ACC2D99@BL1PR12MB5032.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: D4ysEwtpik3fx36hBT73ZZrPK7rcdSVkKcTjKcksH3MKnoAshBBgMonzacxvwRCFVwIx4FOR9nCcJYDld3Fdi4uM56zLQjC2qNfO1Nm78dQQpfoBrVy1WwCHo9APzEiEsafOeo0zJEmwhwwj9DxYzbuAb3eoA46IgOapu5byst57Ffem2TBN2SknlbUxNGrI2gbk8431jmlQQcs2+zjqG0Dh8q7Hvkp9dfSeynfMk+YPQlTtKRSbdigaDqIR/vKx2+gHByAyowe3FDSiUgzb0/SW1GPDJf9TFYpF7XG3FEzLWlMYLo7SxvsGmfq80KeXsD2FjrRrhfZmLWxRMaVpl1E0VlYzfJ1xulc6zUsvinnqLsk3Zcjw+4htXQtaEJVqblJjPCgpFzTQh0kOsm9gL1DDtHeBZHtNuqNZxS9wBAbL+PXc5r20hXYXCraqyCPWsYdMC0OsEoC1dHA1FMifcx9FCwyZutnoz1KQwy9bS7SfZEMSSRMt5Ajh/ZUz5fI60Nnxiuxvhs1kAQRH0TAJaiR2UJgt/8+DRO5awcGXowc9JHtLYNz+Gm9mj7NU6Ml8E6lUd319OoyQpaUcImxqXLrLvcMEJ3RBv+lm1nO/N7aezwmHDGa+78UZWVMaaTcvrfFF2LwXd26Q0e7dVSxhFuEEP0RD4q/qPKiY4Z4/UVnJGfY2/26EINe5thaUNtVgyrMa2I1VNFdDxw7N8PDeGp0y0Em1U1Gp+D4p6jUnulE=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(136003)(39860400002)(396003)(366004)(346002)(66946007)(36756003)(478600001)(6916009)(26005)(7416002)(316002)(66476007)(66556008)(426003)(8676002)(54906003)(86362001)(2906002)(5660300002)(33656002)(186003)(2616005)(38100700002)(1076003)(83380400001)(966005)(9746002)(4326008)(8936002)(9786002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?GTdBOX5KR+NMVQf7QUdWwzbqfGLVaDZntJnZRZ4FO0SJJGQ9CjmoTwtT+GO3?=
- =?us-ascii?Q?QhQf3vzA5uIP/JFM7HafS6PGPdSx8GBBhKu5Ma5wcpFxY6+l8U8fMKosnglO?=
- =?us-ascii?Q?zFtSH/FM2eUS+JM3txD41fYqlgXaH77I6M6gQX8H+WwH1hK0YLANduu3XyQ+?=
- =?us-ascii?Q?xoM0wusRs3XuThQ/MVfyuF9xkQCi0Jeh1JDDGIHauVZChPrnzhbJrhiBwmZ/?=
- =?us-ascii?Q?tYZregpX1tSwWRwt0lYYBQT50yGh35OOoRzqQLO9Je0CWw/62I6sN4Xd2pI1?=
- =?us-ascii?Q?a+6qmL5QmjzcNFCfQgQVn/4oPZBxV+TY7DCKP2XDA8VRKjpFBTEm0xJrahuv?=
- =?us-ascii?Q?Mho+BO3Pr30/EV4bbDRH9nJop5IssKwUSSAH7t7T6WDmB3T1iwGIRDNYWWok?=
- =?us-ascii?Q?y3a92t8SengijNr5pRm7SE6rVPKtGdA7EuiEr6uHiMlg9R4RriltCgb0oOfF?=
- =?us-ascii?Q?Sve3wworOBG+uDLnQZBibkqnHFAX6EL/0feoYIEeurx1g+DQWAHhZWM3gl26?=
- =?us-ascii?Q?6nRBzJnta6/o4v7OPFg1FRJKyv6ySzCNKK06uPDjRlsof2Pxk6+zMCGtS7xO?=
- =?us-ascii?Q?dkTIldtNVSBPpte/uxyC+pB2V5XXDU18UAD28MRSxQ3Xv5Ous8YGR6VbXjXC?=
- =?us-ascii?Q?szEdYvLxN80WaH6LfYgtTzFF41zikTQL0Q69f4Oo45G9ktbBC6Q9+QiFhKCG?=
- =?us-ascii?Q?bxUe9R2be+7D5q5K/N7tMlYuQ+91qARvSJxg/hB4U8AnGul+ThqWG1yGnIxg?=
- =?us-ascii?Q?iR35amffN5N2d95eET77nr0IlV6Xd2egrbI/FHGYrDL4KFpn5q7x6wPpv5Jn?=
- =?us-ascii?Q?+6eLnNBGG5XbehGGHMbn9VM3q8AsewChXW/yxZhSLLmtpl2hMd09tS8flZQj?=
- =?us-ascii?Q?vIVBdcyKRo8Guic1bMeetykcoRSx1dIrUCJPDP8+j78fJaemK0Eb9HqnqAA9?=
- =?us-ascii?Q?Ss7mOsziFelQK8CdzM9fqWyFGGZa2jw/heJhYHxzpUogxbM4nRE5EPynID8r?=
- =?us-ascii?Q?aE97JBA3vytv1k1nZebB9ykbx0gKLvWOMc3ybRRm/bzsXJE7Ztc/7LySCO52?=
- =?us-ascii?Q?HBRugT9xxCSdcnJyIvX4R3EXwhfZveKn0ZOWiQYR8w32rZSgaQVu/rG4LTix?=
- =?us-ascii?Q?EQWXBjr1KCtxdmDJdnNN88byhbOw80nR3jS4jx0wr9mFtn2S/meAzc2N1xOG?=
- =?us-ascii?Q?1UWTr9Azw9OmUYgoWoqV58gvRAQe1dkYq05tIcU1QETKjVXEOPoR00G/kRN1?=
- =?us-ascii?Q?jlwAYmYxNJ3NLnJalQo61AFULKKl3HaarYqKGAvPLXqezoJ5RhNKet930d0T?=
- =?us-ascii?Q?2OEJksh981BnHqo7fGB85/i3?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 403ba96e-8df1-40b2-6e82-08d976ec0f29
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Sep 2021 19:24:09.0967
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: HKV6trJX1GT9FIFQFzgKOrc+tsouYFCYKDK/SaVKXorb45hrtGxkM8yN3ijD1kzY
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5032
+In-Reply-To: <2b595588-eb98-6d30-dc50-794fc396bf7e@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 13, 2021 at 01:40:34PM -0400, Eric Farman wrote:
-> On Thu, 2021-09-09 at 16:38 -0300, Jason Gunthorpe wrote:
-> > This addresses Cornelia's remark on the earlier patch that ccw has a
-> > confusing lifecycle. While it doesn't seem like the original attempt
-> > was
-> > functionally wrong, the result can be made better with a lot of
-> > further
-> > work.
+On 9/13/21 11:35 AM, Paolo Bonzini wrote:
+>>> Apart from reclaiming, /dev/sgx_vepc might disappear between the first
+>>> open() and subsequent ones.
+>>
+>> Aside from it being rm'd, I don't think that's possible.
+>>
 > 
-> I thought I'd take a stab at seeing how this works with the hardware
-> before looking at the code much. git couldn't apply patches 1, 6, or 9
-> to 5.15-rc1, but I was able to hand-fit them into place. 
+> Being rm'd would be a possibility in principle, and it would be ugly for
+> it to cause issues on running VMs.  Also I'd like for it to be able to
+> pass /dev/sgx_vepc in via a file descriptor, and run QEMU in a chroot or
+> a mount namespace.  Alternatively, with seccomp it may be possible to
+> sandbox a running QEMU process in such a way that open() is forbidden at
+> runtime (all hotplug is done via file descriptor passing); it is not yet
+> possible, but it is a goal.
 
-Oh? Thats odd, I had no remarks from git when rebasing onto
-v5.15-rc1..
+OK, so maybe another way of saying this:
 
-Maybe this is a situation where you need "b4 am --prep-3way" ...
+For bare-metal SGX on real hardware, the hardware provides guarantees
+SGX state at reboot.  For instance, all pages start out uninitialized.
+The vepc driver provides a similar guarantee today for freshly-opened
+vepc instances.
 
-> [   64.585462] Call Trace:
-> [   64.585464]  [<0000000000000002>] 0x2 
-> [   64.585467] ([<000003ff80179d74>] vfio_ccw_mdev_ioctl+0x84/0x318
-> [vfio_ccw])
-> [   64.585476]  [<00000000bb7adda6>] __s390x_sys_ioctl+0xbe/0x100 
-> [   64.585481]  [<00000000bbfbf5e4>] __do_syscall+0x1bc/0x1e8 
-> [   64.585488]  [<00000000bbfcc8d8>] system_call+0x78/0xa0 
+But, vepc users have a problem: they might want to run an OS that
+expects to be booted with clean, fully uninitialized SGX state, just as
+it would be on bare-metal.  Right now, the only way to get that is to
+create a new vepc instance.  That might not be possible in all
+configurations, like if the permission to open(/dev/sgx_vepc) has been
+lost since the VM was first booted.
 
-I think it is this:
+Windows has these expectations about booting with fully uninitialized
+state.  There are also a number of environments where QEMU is sandboxed
+or drops permissions in a way that prevent free and open access to
+/dev/sgx_vepc.
 
-diff --git a/drivers/s390/cio/vfio_ccw_fsm.c b/drivers/s390/cio/vfio_ccw_fsm.c
-index df1490943b20ec..5ea392959c0711 100644
---- a/drivers/s390/cio/vfio_ccw_fsm.c
-+++ b/drivers/s390/cio/vfio_ccw_fsm.c
-@@ -441,6 +441,7 @@ fsm_func_t *vfio_ccw_jumptable[NR_VFIO_CCW_STATES][NR_VFIO_CCW_EVENTS] = {
- 		[VFIO_CCW_EVENT_IO_REQ]		= fsm_io_error,
- 		[VFIO_CCW_EVENT_ASYNC_REQ]	= fsm_async_error,
- 		[VFIO_CCW_EVENT_INTERRUPT]	= fsm_disabled_irq,
-+		[VFIO_CCW_EVENT_OPEN]		= fsm_nop,
- 		[VFIO_CCW_EVENT_CLOSE]		= fsm_nop,
- 	},
- 	[VFIO_CCW_STATE_CLOSED] = {
+So good so far?
 
-I rebased it and fixed it up here:
-
-https://github.com/jgunthorpe/linux/tree/vfio_ccw
-
-Can you try again?
-
-Thanks,
-Jason
