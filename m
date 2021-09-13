@@ -2,37 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 96935409CEB
-	for <lists+kvm@lfdr.de>; Mon, 13 Sep 2021 21:25:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 51E2D409D24
+	for <lists+kvm@lfdr.de>; Mon, 13 Sep 2021 21:33:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241848AbhIMT07 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Sep 2021 15:26:59 -0400
-Received: from mga05.intel.com ([192.55.52.43]:35927 "EHLO mga05.intel.com"
+        id S241188AbhIMTeo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Sep 2021 15:34:44 -0400
+Received: from mga18.intel.com ([134.134.136.126]:61836 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S240725AbhIMT0w (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Sep 2021 15:26:52 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10106"; a="307329127"
+        id S235290AbhIMTen (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Sep 2021 15:34:43 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10106"; a="208874723"
 X-IronPort-AV: E=Sophos;i="5.85,290,1624345200"; 
-   d="scan'208";a="307329127"
+   d="scan'208";a="208874723"
 Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2021 12:25:36 -0700
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2021 12:33:27 -0700
 X-IronPort-AV: E=Sophos;i="5.85,290,1624345200"; 
-   d="scan'208";a="609185389"
+   d="scan'208";a="609187491"
 Received: from holdensm-mobl.amr.corp.intel.com (HELO [10.212.147.16]) ([10.212.147.16])
-  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2021 12:25:35 -0700
-Subject: Re: [PATCH 1/2] x86: sgx_vepc: extract sgx_vepc_remove_page
+  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2021 12:33:26 -0700
+Subject: Re: [PATCH 2/2] x86: sgx_vepc: implement SGX_IOC_VEPC_REMOVE ioctl
 To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org
 Cc:     x86@kernel.org, linux-sgx@vger.kernel.org, jarkko@kernel.org,
         dave.hansen@linux.intel.com, yang.zhong@intel.com
 References: <20210913131153.1202354-1-pbonzini@redhat.com>
- <20210913131153.1202354-2-pbonzini@redhat.com>
- <dc628588-3030-6c05-0ba4-d8fc6629c0d2@intel.com>
- <8105a379-195e-8c9b-5e06-f981f254707f@redhat.com>
- <06db5a41-3485-9141-10b5-56ca57ed1792@intel.com>
- <34632ea9-42d3-fdfa-ae47-e208751ab090@redhat.com>
- <480cf917-7301-4227-e1c4-728b52537f46@intel.com>
- <2b595588-eb98-6d30-dc50-794fc396bf7e@redhat.com>
+ <20210913131153.1202354-3-pbonzini@redhat.com>
 From:   Dave Hansen <dave.hansen@intel.com>
 Autocrypt: addr=dave.hansen@intel.com; keydata=
  xsFNBE6HMP0BEADIMA3XYkQfF3dwHlj58Yjsc4E5y5G67cfbt8dvaUq2fx1lR0K9h1bOI6fC
@@ -77,12 +71,12 @@ Autocrypt: addr=dave.hansen@intel.com; keydata=
  OPsw5tV/LmQ5GXH0JQ/TZXWygyRFyyI2FqNTx4WHqUn3yFj8rwTAU1tluRUYyeLy0ayUlKBH
  ybj0N71vWO936MqP6haFERzuPAIpxj2ezwu0xb1GjTk4ynna6h5GjnKgdfOWoRtoWndMZxbA
  z5cecg==
-Message-ID: <fa8e8573-d907-11b0-60e1-f31e050beb64@intel.com>
-Date:   Mon, 13 Sep 2021 12:25:33 -0700
+Message-ID: <50287173-0afb-36f4-058e-0960fb4017a7@intel.com>
+Date:   Mon, 13 Sep 2021 12:33:24 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <2b595588-eb98-6d30-dc50-794fc396bf7e@redhat.com>
+In-Reply-To: <20210913131153.1202354-3-pbonzini@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -90,39 +84,43 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/13/21 11:35 AM, Paolo Bonzini wrote:
->>> Apart from reclaiming, /dev/sgx_vepc might disappear between the first
->>> open() and subsequent ones.
->>
->> Aside from it being rm'd, I don't think that's possible.
->>
-> 
-> Being rm'd would be a possibility in principle, and it would be ugly for
-> it to cause issues on running VMs.  Also I'd like for it to be able to
-> pass /dev/sgx_vepc in via a file descriptor, and run QEMU in a chroot or
-> a mount namespace.  Alternatively, with seccomp it may be possible to
-> sandbox a running QEMU process in such a way that open() is forbidden at
-> runtime (all hotplug is done via file descriptor passing); it is not yet
-> possible, but it is a goal.
+On 9/13/21 6:11 AM, Paolo Bonzini wrote:
+> +static long sgx_vepc_remove_all(struct sgx_vepc *vepc)
+> +{
+> +	struct sgx_epc_page *entry;
+> +	unsigned long index;
+> +	long failures = 0;
+> +
+> +	xa_for_each(&vepc->page_array, index, entry)
+> +		if (sgx_vepc_remove_page(entry))
+> +			failures++;
+> +
+> +	/*
+> +	 * Return the number of pages that failed to be removed, so
+> +	 * userspace knows that there are still SECS pages lying
+> +	 * around.
+> +	 */
+> +	return failures;
+> +}
 
-OK, so maybe another way of saying this:
+I'm not sure the retry logic should be in userspace.  Also, is this
+strictly limited to SECS pages?  It could also happen if there were
+enclaves running that used the page.  Granted, userspace can probably
+stop all the vcpus, but the *interface* doesn't prevent it being called
+like that.
 
-For bare-metal SGX on real hardware, the hardware provides guarantees
-SGX state at reboot.  For instance, all pages start out uninitialized.
-The vepc driver provides a similar guarantee today for freshly-opened
-vepc instances.
+What else can userspace do but:
 
-But, vepc users have a problem: they might want to run an OS that
-expects to be booted with clean, fully uninitialized SGX state, just as
-it would be on bare-metal.  Right now, the only way to get that is to
-create a new vepc instance.  That might not be possible in all
-configurations, like if the permission to open(/dev/sgx_vepc) has been
-lost since the VM was first booted.
+	ret = ioctl(fd, SGX_IOC_VEPC_REMOVE);
+	if (ret)
+		ret = ioctl(fd, SGX_IOC_VEPC_REMOVE);
+	if (ret)
+		printf("uh oh\n");
 
-Windows has these expectations about booting with fully uninitialized
-state.  There are also a number of environments where QEMU is sandboxed
-or drops permissions in a way that prevent free and open access to
-/dev/sgx_vepc.
+We already have existing code to gather up the pages that couldn't be
+EREMOVE'd and selectively EREMOVE them again.  Why not reuse that code
+here?  If there is 100GB of EPC, it's gotta be painful to run through
+the ->page_array twice when once plus a small list iteration will do.
 
-So good so far?
-
+Which reminds me...  Do we need a cond_resched() in there or anything?
+That loop could theoretically get really, really long.
