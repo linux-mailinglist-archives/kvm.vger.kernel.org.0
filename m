@@ -2,524 +2,249 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B0C37408B27
-	for <lists+kvm@lfdr.de>; Mon, 13 Sep 2021 14:39:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 76BAF408B38
+	for <lists+kvm@lfdr.de>; Mon, 13 Sep 2021 14:42:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236325AbhIMMlH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Sep 2021 08:41:07 -0400
-Received: from mga02.intel.com ([134.134.136.20]:6544 "EHLO mga02.intel.com"
+        id S239037AbhIMMnW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Sep 2021 08:43:22 -0400
+Received: from mga12.intel.com ([192.55.52.136]:45539 "EHLO mga12.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236160AbhIMMlD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Sep 2021 08:41:03 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10105"; a="208893240"
+        id S236180AbhIMMnV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Sep 2021 08:43:21 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10105"; a="201170535"
 X-IronPort-AV: E=Sophos;i="5.85,288,1624345200"; 
-   d="scan'208";a="208893240"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2021 05:39:46 -0700
+   d="scan'208";a="201170535"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2021 05:42:02 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.85,288,1624345200"; 
-   d="scan'208";a="507275946"
-Received: from unknown (HELO coxu-arch-shz) ([10.239.160.21])
-  by fmsmga008.fm.intel.com with ESMTP; 13 Sep 2021 05:39:43 -0700
-Date:   Mon, 13 Sep 2021 20:39:42 +0800 (CST)
+   d="scan'208";a="698724483"
+Received: from unknown (HELO coxu-arch-shz.sh.intel.com) ([10.239.160.21])
+  by fmsmga005.fm.intel.com with ESMTP; 13 Sep 2021 05:42:00 -0700
 From:   Colin Xu <colin.xu@intel.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-cc:     Colin Xu <colin.xu@intel.com>, kvm@vger.kernel.org,
-        zhenyuw@linux.intel.com, hang.yuan@linux.intel.com,
-        swee.yee.fonn@intel.com, fred.gao@intel.com
-Subject: Re: [PATCH v3] vfio/pci: Add OpRegion 2.0+ Extended VBT support.
-In-Reply-To: <20210909160052.10d29f54.alex.williamson@redhat.com>
-Message-ID: <8a444890-63ba-e96a-63ab-7e6993ea1b4b@outlook.office365.com>
-References: <8d18c045-7c50-e1c-99-536357f0b8ec@outlook.office365.com> <20210909050934.296027-1-colin.xu@intel.com> <20210909160052.10d29f54.alex.williamson@redhat.com>
+To:     alex.williamson@redhat.com
+Cc:     kvm@vger.kernel.org, colin.xu@intel.com, zhenyuw@linux.intel.com,
+        hang.yuan@linux.intel.com, swee.yee.fonn@intel.com,
+        fred.gao@intel.com
+Subject: [PATCH v4] vfio/pci: Add OpRegion 2.0+ Extended VBT support.
+Date:   Mon, 13 Sep 2021 20:41:58 +0800
+Message-Id: <20210913124158.68775-1-colin.xu@intel.com>
+X-Mailer: git-send-email 2.33.0
+In-Reply-To: <8a444890-63ba-e96a-63ab-7e6993ea1b4b@outlook.office365.com>
+References: <8a444890-63ba-e96a-63ab-7e6993ea1b4b@outlook.office365.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
+Content-Transfer-Encoding: base64
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-yyyyyyyyyyOn Thu, 9 Sep 2021, Alex Williamson wrote:
-
-> On Thu,  9 Sep 2021 13:09:34 +0800
-> Colin Xu <colin.xu@intel.com> wrote:
->
->> Due to historical reason, some legacy shipped system doesn't follow
->> OpRegion 2.1 spec but still stick to OpRegion 2.0, in which the extended
->> VBT is not contiguous after OpRegion in physical address, but any
->> location pointed by RVDA via absolute address. Also although current
->> OpRegion 2.1+ systems appears that the extended VBT follows OpRegion,
->> RVDA is the relative address to OpRegion head, the extended VBT location
->> may change to non-contiguous to OpRegion. In both cases, it's impossible
->> to map a contiguous range to hold both OpRegion and the extended VBT and
->> expose via one vfio region.
->>
->> The only difference between OpRegion 2.0 and 2.1 is where extended
->> VBT is stored: For 2.0, RVDA is the absolute address of extended VBT
->> while for 2.1, RVDA is the relative address of extended VBT to OpRegion
->> baes, and there is no other difference between OpRegion 2.0 and 2.1.
->> To support the non-contiguous region case as described, the updated read
->> op will patch OpRegion version and RVDA on-the-fly accordingly. So that
->> from vfio igd OpRegion view, only 2.1+ with contiguous extended VBT
->> after OpRegion is exposed, regardless the underneath host OpRegion is
->> 2.0 or 2.1+. The mechanism makes it possible to support legacy OpRegion
->> 2.0 extended VBT systems with on the market, and support OpRegion 2.1+
->> where the extended VBT isn't contiguous after OpRegion.
->> Also split the write op with read ops to leave flexibility for OpRegion
->> write op support in future.
->>
->> V2:
->> Validate RVDA for 2.1+ before increasing total size. (Alex)
->>
->> V3: (Alex)
->> Split read and write ops.
->> On-the-fly modify OpRegion version and RVDA.
->> Fix sparse error on assign value to casted pointer.
->>
->> Cc: Zhenyu Wang <zhenyuw@linux.intel.com>
->> Cc: Hang Yuan <hang.yuan@linux.intel.com>
->> Cc: Swee Yee Fonn <swee.yee.fonn@intel.com>
->> Cc: Fred Gao <fred.gao@intel.com>
->> Signed-off-by: Colin Xu <colin.xu@intel.com>
->> ---
->>  drivers/vfio/pci/vfio_pci_igd.c | 229 +++++++++++++++++++++++---------
->>  1 file changed, 169 insertions(+), 60 deletions(-)
->
->
-> BTW, this does not apply on current mainline.
-Let me rebase to latest kvm mainline.
->
->
->> diff --git a/drivers/vfio/pci/vfio_pci_igd.c b/drivers/vfio/pci/vfio_pci_igd.c
->> index 228df565e9bc..fd6ad80f0c5f 100644
->> --- a/drivers/vfio/pci/vfio_pci_igd.c
->> +++ b/drivers/vfio/pci/vfio_pci_igd.c
->> @@ -25,30 +25,131 @@
->>  #define OPREGION_RVDS		0x3c2
->>  #define OPREGION_VERSION	0x16
->>
->> -static size_t vfio_pci_igd_rw(struct vfio_pci_device *vdev, char __user *buf,
->> -			      size_t count, loff_t *ppos, bool iswrite)
->> +struct igd_opregion_vbt {
->> +	void *opregion;
->> +	void *vbt_ex;
->
-> 	__le16 version; // see below
->
-Updated. Also add rvda here which is similarly handled.
->> +};
->> +
->> +static size_t vfio_pci_igd_read(struct igd_opregion_vbt *opregionvbt,
->> +				char __user *buf, size_t count, loff_t *ppos)
->>  {
->> -	unsigned int i = VFIO_PCI_OFFSET_TO_INDEX(*ppos) - VFIO_PCI_NUM_REGIONS;
->> -	void *base = vdev->region[i].data;
->> +	u16 version = le16_to_cpu(*(__le16 *)(opregionvbt->opregion + OPREGION_VERSION));
->
-> 80 column throughout please (I know we already have some violations in
-> this file).
-Done.
->
->>  	loff_t pos = *ppos & VFIO_PCI_OFFSET_MASK;
->> +	void *base, *shadow = NULL;
->>
->> -	if (pos >= vdev->region[i].size || iswrite)
->> -		return -EINVAL;
->> +	/* Shift into the range for reading the extended VBT only */
->> +	if (pos >= OPREGION_SIZE) {
->> +		base = opregionvbt->vbt_ex + pos - OPREGION_SIZE;
->> +		goto done;
->> +	}
->>
->> -	count = min(count, (size_t)(vdev->region[i].size - pos));
->> +	/* Simply read from OpRegion if the extended VBT doesn't exist */
->> +	if (!opregionvbt->vbt_ex) {
->> +		base = opregionvbt->opregion + pos;
->> +		goto done;
->> +	} else {
->> +		shadow = kzalloc(count, GFP_KERNEL);
->> +
->
-> I don't really see any value in this shadow buffer, I don't think we
-> have any requirement to fulfill the read in a single copy_to_user().
-> Therefore we could do something like:
->
-Thanks. Update the logic based on below thought.
-
-> 	size_t remaining = count;
-> 	loff_t off = 0;
->
-> 	if (remaining && pos < OPREGION_VERSION) {
-> 		size_t bytes = min(remaining, OPREGION_VERSION - pos);
->
-> 		if (copy_to_user(buf + off, opregionvbt->opregion + pos, bytes))
-> 			return -EFAULT;
->
-> 		pos += bytes;
-> 		off += bytes;
-> 		remaining -= bytes;
-> 	}
->
-> 	if (remaining && pos < OPREGION_VERSION + sizeof(__le16)) {
-> 		size_t bytes = min(remaining, OPREGION_VERSION + sizeof(__le16) - pos);
->
-> 		/* reported version cached in struct igd_opregion_vbt.version */
-> 		if (copy_to_user(buf + off, &opregionvbt->version + pos, bytes))
-> 			return -EFAULT;
->
-> 		pos += bytes;
-> 		off += bytes;
-> 		remaining -= bytes;
-> 	}
->
-> 	if (remaining && pos < OPREGION_RVDA) {
-> 		size_t bytes = min(remaining, OPREGION_RVDA - pos);
->
-> 		if (copy_to_user(buf + off, opregionvbt->opregion + pos, bytes))
-> 			return -EFAULT;
->
-> 		pos += bytes;
-> 		off += bytes;
-> 		remaining -= bytes;
-> 	}
->
-> 	if (remaining && pos < OPREGION_RVDA + sizeof(__le64)) {
-> 		size_t bytes = min(remaining, OPREGION_RVDA + sizeof(__le64) - pos);
-> 		__le64 rvda = cpu_to_le64(opregionvbt->vbt_ex ? OPREGION_SIZE : 0);
->
-> 		if (copy_to_user(buf + off, &rvda + pos, bytes))
-> 			return -EFAULT;
->
-> 		pos += bytes;
-> 		off += bytes;
-> 		remaining -= bytes;
-> 	}
->
-> 	if (remaining && pos < OPREGION_SIZE) {
-> 		size_t bytes = min(remaining, OPREGION_SIZE - pos);
->
-> 		if (copy_to_user(buf + off, opregionvbt->opregion + pos, bytes))
-> 			return -EFAULT;
->
-> 		pos += bytes;
-> 		off += bytes;
-> 		remaining -= bytes;
-> 	}
->
-> 	if (remaining) {
-> 		if (copy_to_user(buf + off, opregionvbt->vbt_ex + pos, remaining))
-> 			return -EFAULT;
-> 	}
->
-> 	*ppos += count;
->
-> 	return count;
->
-> It's tedious, but extensible and simple (and avoids the partial read
-> problem below).  Maybe there's a macro or helper function that'd make
-> it less tedious.
-Add a copy'n'shift helper to simplify above logic.
->
->
->> +		if (!shadow)
->> +			return -ENOMEM;
->> +	}
->>
->> -	if (copy_to_user(buf, base + pos, count))
->> +	/*
->> +	 * If the extended VBT exist, need shift for non-contiguous reading and
->> +	 * may need patch OpRegion version (for 2.0) and RVDA (for 2.0 and above)
->> +	 * Use a temporary buffer to simplify the stitch and patch
->> +	 */
->> +
->> +	/* Either crossing OpRegion and VBT or in OpRegion range only */
->> +	if (pos < OPREGION_SIZE && (pos + count) > OPREGION_SIZE) {
->> +		memcpy(shadow, opregionvbt->opregion + pos, OPREGION_SIZE - pos);
->> +		memcpy(shadow + OPREGION_SIZE - pos, opregionvbt->vbt_ex,
->> +		       pos + count - OPREGION_SIZE);
->> +	} else {
->> +		memcpy(shadow, opregionvbt->opregion + pos, count);
->> +	}
->> +
->> +	/*
->> +	 * Patch OpRegion 2.0 to 2.1 if extended VBT exist and reading the version
->> +	 */
->> +	if (opregionvbt->vbt_ex && version == 0x0200 &&
->> +	    pos <= OPREGION_VERSION && pos + count > OPREGION_VERSION) {
->> +		/* May only read 1 byte minor version */
->> +		if (pos + count == OPREGION_VERSION + 1)
->> +			*(u8 *)(shadow + OPREGION_VERSION - pos) = (u8)0x01;
->> +		else
->> +			*(__le16 *)(shadow + OPREGION_VERSION - pos) = cpu_to_le16(0x0201);
->> +	}
->> +
->> +	/*
->> +	 * Patch RVDA for OpRegion 2.0 and above to make the region contiguous.
->> +	 * For 2.0, the requestor always see 2.1 with RVDA as relative.
->> +	 * For 2.1+, RVDA is already relative, but possibly non-contiguous
->> +	 *   after OpRegion.
->> +	 * In both cases, patch RVDA to OpRegion size to make the extended
->> +	 * VBT follows OpRegion and show the requestor a contiguous region.
->> +	 * Always fail partial RVDA reading to prevent malicious reading to offset
->> +	 *   of OpRegion by construct arbitrary offset.
->> +	 */
->> +	if (opregionvbt->vbt_ex) {
->> +		/* Full RVDA reading */
->> +		if (pos <= OPREGION_RVDA && pos + count >= OPREGION_RVDA + 8) {
->> +			*(__le64 *)(shadow + OPREGION_RVDA - pos) = cpu_to_le64(OPREGION_SIZE);
->> +		/* Fail partial reading to avoid construct arbitrary RVDA */
->> +		} else {
->> +			kfree(shadow);
->> +			pr_err("%s: partial RVDA reading!\n", __func__);
->> +			return -EFAULT;
->> +		}
->> +	}
->> +
->> +	base = shadow;
->> +
->> +done:
->> +	if (copy_to_user(buf, base, count))
->>  		return -EFAULT;
->>
->> +	kfree(shadow);
->> +
->>  	*ppos += count;
->>
->>  	return count;
->>  }
->>
->> +static size_t vfio_pci_igd_write(struct igd_opregion_vbt *opregionvbt,
->> +				 char __user *buf, size_t count, loff_t *ppos)
->> +{
->> +	// Not supported yet.
->> +	return -EINVAL;
->> +}
->> +
->> +static size_t vfio_pci_igd_rw(struct vfio_pci_device *vdev, char __user *buf,
->> +			      size_t count, loff_t *ppos, bool iswrite)
->> +{
->> +	unsigned int i = VFIO_PCI_OFFSET_TO_INDEX(*ppos) - VFIO_PCI_NUM_REGIONS;
->> +	struct igd_opregion_vbt *opregionvbt = vdev->region[i].data;
->> +	loff_t pos = *ppos & VFIO_PCI_OFFSET_MASK;
->> +
->> +	if (pos >= vdev->region[i].size)
->> +		return -EINVAL;
->> +
->> +	count = min(count, (size_t)(vdev->region[i].size - pos));
->> +
->> +	return (iswrite ?
->> +		vfio_pci_igd_write(opregionvbt, buf, count, ppos) :
->> +		vfio_pci_igd_read(opregionvbt, buf, count, ppos));
->> +}
->
-> I don't think we need to go this far towards enabling write support,
-> I'd roll the range and iswrite check into your _read function (rename
-> back to _rw()) and call it good.
-Remove the write op, and re-implement _rw() as above.
->
->> +
->>  static void vfio_pci_igd_release(struct vfio_pci_device *vdev,
->>  				 struct vfio_pci_region *region)
->>  {
->> -	memunmap(region->data);
->> +	struct igd_opregion_vbt *opregionvbt = region->data;
->> +
->> +	if (opregionvbt->vbt_ex)
->> +		memunmap(opregionvbt->vbt_ex);
->> +
->> +	memunmap(opregionvbt->opregion);
->> +	kfree(opregionvbt);
->>  }
->>
->>  static const struct vfio_pci_regops vfio_pci_igd_regops = {
->> @@ -60,7 +161,7 @@ static int vfio_pci_igd_opregion_init(struct vfio_pci_device *vdev)
->>  {
->>  	__le32 *dwordp = (__le32 *)(vdev->vconfig + OPREGION_PCI_ADDR);
->>  	u32 addr, size;
->> -	void *base;
->> +	struct igd_opregion_vbt *base;
->
->
-> @base doesn't seem like an appropriate name for this, it was called
-> opregionvbt in the function above.
-opregionvbt is a little longer to keep within 80 column so re-use base.
-Now rename to opregionvbt to make it meaningful and avoid confusion.
->
->
->>  	int ret;
->>  	u16 version;
->>
->> @@ -71,84 +172,92 @@ static int vfio_pci_igd_opregion_init(struct vfio_pci_device *vdev)
->>  	if (!addr || !(~addr))
->>  		return -ENODEV;
->>
->> -	base = memremap(addr, OPREGION_SIZE, MEMREMAP_WB);
->> +	base = kzalloc(sizeof(*base), GFP_KERNEL);
->>  	if (!base)
->>  		return -ENOMEM;
->>
->> -	if (memcmp(base, OPREGION_SIGNATURE, 16)) {
->> -		memunmap(base);
->> +	base->opregion = memremap(addr, OPREGION_SIZE, MEMREMAP_WB);
->> +	if (!base->opregion) {
->> +		kfree(base);
->> +		return -ENOMEM;
->> +	}
->> +
->> +	if (memcmp(base->opregion, OPREGION_SIGNATURE, 16)) {
->> +		memunmap(base->opregion);
->> +		kfree(base);
->>  		return -EINVAL;
->>  	}
->>
->> -	size = le32_to_cpu(*(__le32 *)(base + 16));
->> +	size = le32_to_cpu(*(__le32 *)(base->opregion + 16));
->>  	if (!size) {
->> -		memunmap(base);
->> +		memunmap(base->opregion);
->> +		kfree(base);
->>  		return -EINVAL;
->>  	}
->>
->>  	size *= 1024; /* In KB */
->>
->>  	/*
->> -	 * Support opregion v2.1+
->> -	 * When VBT data exceeds 6KB size and cannot be within mailbox #4, then
->> -	 * the Extended VBT region next to opregion is used to hold the VBT data.
->> -	 * RVDA (Relative Address of VBT Data from Opregion Base) and RVDS
->> -	 * (Raw VBT Data Size) from opregion structure member are used to hold the
->> -	 * address from region base and size of VBT data. RVDA/RVDS are not
->> -	 * defined before opregion 2.0.
->> -	 *
->> -	 * opregion 2.1+: RVDA is unsigned, relative offset from
->> -	 * opregion base, and should point to the end of opregion.
->> -	 * otherwise, exposing to userspace to allow read access to everything between
->> -	 * the OpRegion and VBT is not safe.
->> -	 * RVDS is defined as size in bytes.
->> +	 * OpRegion and VBT:
->> +	 * When VBT data doesn't exceed 6KB, it's stored in Mailbox #4.
->> +	 * When VBT data exceeds 6KB size, Mailbox #4 is no longer large enough
->> +	 * to hold the VBT data, the Extended VBT region is introduced since
->> +	 * OpRegion 2.0 to hold the VBT data. Since OpRegion 2.0, RVDA/RVDS are
->> +	 * introduced to define the extended VBT data location and size.
->> +	 * OpRegion 2.0: RVDA defines the absolute physical address of the
->> +	 *   extended VBT data, RVDS defines the VBT data size.
->> +	 * OpRegion 2.1 and above: RVDA defines the relative address of the
->> +	 *   extended VBT data to OpRegion base, RVDS defines the VBT data size.
->>  	 *
->> -	 * opregion 2.0: rvda is the physical VBT address.
->> -	 * Since rvda is HPA it cannot be directly used in guest.
->> -	 * And it should not be practically available for end user,so it is not supported.
->> +	 * Due to the RVDA difference in OpRegion VBT (also the only diff between
->> +	 * 2.0 and 2.1), expose OpRegion and VBT as a contiguous range for
->> +	 * OpRegion 2.0 and above makes it possible to support the non-contiguous
->> +	 * VBT via a single vfio region. From r/w ops view, only contiguous VBT
->> +	 * after OpRegion with version 2.1+ is exposed regardless the underneath
->> +	 * host is 2.0 or non-contiguous 2.1+. The r/w ops will on-the-fly shift
->> +	 * the actural offset into VBT so that data at correct position can be
->> +	 * returned to the requester.
->>  	 */
->> -	version = le16_to_cpu(*(__le16 *)(base + OPREGION_VERSION));
->> +	version = le16_to_cpu(*(__le16 *)(base->opregion + OPREGION_VERSION));
->> +
->
-> 	opregionvbt->version = *(__le16 *)(base + OPREGION_VERSION)
-> 	version = le16_to_cpu(opregionvbt->version);
->
->
->>  	if (version >= 0x0200) {
->> -		u64 rvda;
->> -		u32 rvds;
->> +		u64 rvda = le64_to_cpu(*(__le64 *)(base->opregion + OPREGION_RVDA));
->> +		u32 rvds = le32_to_cpu(*(__le32 *)(base->opregion + OPREGION_RVDS));
->>
->> -		rvda = le64_to_cpu(*(__le64 *)(base + OPREGION_RVDA));
->> -		rvds = le32_to_cpu(*(__le32 *)(base + OPREGION_RVDS));
->> +		/* The extended VBT is valid only when RVDA/RVDS are non-zero. */
->>  		if (rvda && rvds) {
->> -			/* no support for opregion v2.0 with physical VBT address */
->> -			if (version == 0x0200) {
->> -				memunmap(base);
->> -				pci_err(vdev->pdev,
->> -					"IGD assignment does not support opregion v2.0 with an extended VBT region\n");
->> -				return -EINVAL;
->> -			}
->> +			size += rvds;
->>
->> -			if (rvda != size) {
->> -				memunmap(base);
->> -				pci_err(vdev->pdev,
->> -					"Extended VBT does not follow opregion on version 0x%04x\n",
->> -					version);
->> -				return -EINVAL;
->> +			if (version == 0x0200) {
->> +				/* Absolute physical address for 2.0 */
->
->
-> 			if (version == 0x0200) {
-> 				opregionvbt->version = cpu_to_le16(0x0201);
-> 				addr = rvda;
-> 			} else {
-> 				addr += rvda;
-> 			}
->
-> 			... single memremap and error path
-I add rvda here, either 0 or OPREGION_SIZE, so that the copy helper can 
-directly copy from.
-
-The updated version will be sent via v4 patch.
-
-Thanks!
-Colin
->
-> Thanks,
->
-> Alex
->
->> +				base->vbt_ex = memremap(rvda, rvds, MEMREMAP_WB);
->> +				if (!base->vbt_ex) {
->> +					memunmap(base->opregion);
->> +					kfree(base);
->> +					return -ENOMEM;
->> +				}
->> +			} else {
->> +				/* Relative address to OpRegion header for 2.1+ */
->> +				base->vbt_ex = memremap(addr + rvda, rvds, MEMREMAP_WB);
->> +				if (!base->vbt_ex) {
->> +					memunmap(base->opregion);
->> +					kfree(base);
->> +					return -ENOMEM;
->> +				}
->>  			}
->> -
->> -			/* region size for opregion v2.0+: opregion and VBT size. */
->> -			size += rvds;
->>  		}
->>  	}
->>
->> -	if (size != OPREGION_SIZE) {
->> -		memunmap(base);
->> -		base = memremap(addr, size, MEMREMAP_WB);
->> -		if (!base)
->> -			return -ENOMEM;
->> -	}
->> -
->>  	ret = vfio_pci_register_dev_region(vdev,
->>  		PCI_VENDOR_ID_INTEL | VFIO_REGION_TYPE_PCI_VENDOR_TYPE,
->>  		VFIO_REGION_SUBTYPE_INTEL_IGD_OPREGION,
->>  		&vfio_pci_igd_regops, size, VFIO_REGION_INFO_FLAG_READ, base);
->>  	if (ret) {
->> -		memunmap(base);
->> +		if (base->vbt_ex)
->> +			memunmap(base->vbt_ex);
->> +
->> +		memunmap(base->opregion);
->> +		kfree(base);
->>  		return ret;
->>  	}
->>
->
->
-
---
-Best Regards,
-Colin Xu
+RHVlIHRvIGhpc3RvcmljYWwgcmVhc29uLCBzb21lIGxlZ2FjeSBzaGlwcGVkIHN5c3RlbSBkb2Vz
+bid0IGZvbGxvdwpPcFJlZ2lvbiAyLjEgc3BlYyBidXQgc3RpbGwgc3RpY2sgdG8gT3BSZWdpb24g
+Mi4wLCBpbiB3aGljaCB0aGUgZXh0ZW5kZWQKVkJUIGlzIG5vdCBjb250aWd1b3VzIGFmdGVyIE9w
+UmVnaW9uIGluIHBoeXNpY2FsIGFkZHJlc3MsIGJ1dCBhbnkKbG9jYXRpb24gcG9pbnRlZCBieSBS
+VkRBIHZpYSBhYnNvbHV0ZSBhZGRyZXNzLiBBbHNvIGFsdGhvdWdoIGN1cnJlbnQKT3BSZWdpb24g
+Mi4xKyBzeXN0ZW1zIGFwcGVhcnMgdGhhdCB0aGUgZXh0ZW5kZWQgVkJUIGZvbGxvd3MgT3BSZWdp
+b24sClJWREEgaXMgdGhlIHJlbGF0aXZlIGFkZHJlc3MgdG8gT3BSZWdpb24gaGVhZCwgdGhlIGV4
+dGVuZGVkIFZCVCBsb2NhdGlvbgptYXkgY2hhbmdlIHRvIG5vbi1jb250aWd1b3VzIHRvIE9wUmVn
+aW9uLiBJbiBib3RoIGNhc2VzLCBpdCdzIGltcG9zc2libGUKdG8gbWFwIGEgY29udGlndW91cyBy
+YW5nZSB0byBob2xkIGJvdGggT3BSZWdpb24gYW5kIHRoZSBleHRlbmRlZCBWQlQgYW5kCmV4cG9z
+ZSB2aWEgb25lIHZmaW8gcmVnaW9uLgoKVGhlIG9ubHkgZGlmZmVyZW5jZSBiZXR3ZWVuIE9wUmVn
+aW9uIDIuMCBhbmQgMi4xIGlzIHdoZXJlIGV4dGVuZGVkClZCVCBpcyBzdG9yZWQ6IEZvciAyLjAs
+IFJWREEgaXMgdGhlIGFic29sdXRlIGFkZHJlc3Mgb2YgZXh0ZW5kZWQgVkJUCndoaWxlIGZvciAy
+LjEsIFJWREEgaXMgdGhlIHJlbGF0aXZlIGFkZHJlc3Mgb2YgZXh0ZW5kZWQgVkJUIHRvIE9wUmVn
+aW9uCmJhZXMsIGFuZCB0aGVyZSBpcyBubyBvdGhlciBkaWZmZXJlbmNlIGJldHdlZW4gT3BSZWdp
+b24gMi4wIGFuZCAyLjEuClRvIHN1cHBvcnQgdGhlIG5vbi1jb250aWd1b3VzIHJlZ2lvbiBjYXNl
+IGFzIGRlc2NyaWJlZCwgdGhlIHVwZGF0ZWQgcmVhZApvcCB3aWxsIHBhdGNoIE9wUmVnaW9uIHZl
+cnNpb24gYW5kIFJWREEgb24tdGhlLWZseSBhY2NvcmRpbmdseS4gU28gdGhhdApmcm9tIHZmaW8g
+aWdkIE9wUmVnaW9uIHZpZXcsIG9ubHkgMi4xKyB3aXRoIGNvbnRpZ3VvdXMgZXh0ZW5kZWQgVkJU
+CmFmdGVyIE9wUmVnaW9uIGlzIGV4cG9zZWQsIHJlZ2FyZGxlc3MgdGhlIHVuZGVybmVhdGggaG9z
+dCBPcFJlZ2lvbiBpcwoyLjAgb3IgMi4xKy4gVGhlIG1lY2hhbmlzbSBtYWtlcyBpdCBwb3NzaWJs
+ZSB0byBzdXBwb3J0IGxlZ2FjeSBPcFJlZ2lvbgoyLjAgZXh0ZW5kZWQgVkJUIHN5c3RlbXMgd2l0
+aCBvbiB0aGUgbWFya2V0LCBhbmQgc3VwcG9ydCBPcFJlZ2lvbiAyLjErCndoZXJlIHRoZSBleHRl
+bmRlZCBWQlQgaXNuJ3QgY29udGlndW91cyBhZnRlciBPcFJlZ2lvbi4KQWxzbyBzcGxpdCB0aGUg
+d3JpdGUgb3Agd2l0aCByZWFkIG9wcyB0byBsZWF2ZSBmbGV4aWJpbGl0eSBmb3IgT3BSZWdpb24K
+d3JpdGUgb3Agc3VwcG9ydCBpbiBmdXR1cmUuCgpWMjoKVmFsaWRhdGUgUlZEQSBmb3IgMi4xKyBi
+ZWZvcmUgaW5jcmVhc2luZyB0b3RhbCBzaXplLiAoQWxleCkKClYzOiAoQWxleCkKU3BsaXQgcmVh
+ZCBhbmQgd3JpdGUgb3BzLgpPbi10aGUtZmx5IG1vZGlmeSBPcFJlZ2lvbiB2ZXJzaW9uIGFuZCBS
+VkRBLgpGaXggc3BhcnNlIGVycm9yIG9uIGFzc2lnbiB2YWx1ZSB0byBjYXN0ZWQgcG9pbnRlci4K
+ClY0OiAoQWxleCkKTm8gbmVlZCBzdXBwb3J0IHdyaXRlIG9wLgpEaXJlY3QgY29weSB0byB1c2Vy
+IGJ1ZmZlciB3aXRoIHNldmVyYWwgc2hpZnQgaW5zdGVhZCBvZiBzaGFkb3cuCkNvcHkgaGVscGVy
+IHRvIGNvcHkgdG8gdXNlciBidWZmZXIgYW5kIHNoaWZ0IG9mZnNldC4KCkNjOiBaaGVueXUgV2Fu
+ZyA8emhlbnl1d0BsaW51eC5pbnRlbC5jb20+CkNjOiBIYW5nIFl1YW4gPGhhbmcueXVhbkBsaW51
+eC5pbnRlbC5jb20+CkNjOiBTd2VlIFllZSBGb25uIDxzd2VlLnllZS5mb25uQGludGVsLmNvbT4K
+Q2M6IEZyZWQgR2FvIDxmcmVkLmdhb0BpbnRlbC5jb20+ClNpZ25lZC1vZmYtYnk6IENvbGluIFh1
+IDxjb2xpbi54dUBpbnRlbC5jb20+Ci0tLQogZHJpdmVycy92ZmlvL3BjaS92ZmlvX3BjaV9pZ2Qu
+YyB8IDIyOSArKysrKysrKysrKysrKysrKysrKysrKystLS0tLS0tLQogMSBmaWxlIGNoYW5nZWQs
+IDE3NCBpbnNlcnRpb25zKCspLCA1NSBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9kcml2ZXJz
+L3ZmaW8vcGNpL3ZmaW9fcGNpX2lnZC5jIGIvZHJpdmVycy92ZmlvL3BjaS92ZmlvX3BjaV9pZ2Qu
+YwppbmRleCAyMjhkZjU2NWU5YmMuLjE0ZTk1ODg5M2JlNiAxMDA2NDQKLS0tIGEvZHJpdmVycy92
+ZmlvL3BjaS92ZmlvX3BjaV9pZ2QuYworKysgYi9kcml2ZXJzL3ZmaW8vcGNpL3ZmaW9fcGNpX2ln
+ZC5jCkBAIC0yNSwyMCArMjUsMTE5IEBACiAjZGVmaW5lIE9QUkVHSU9OX1JWRFMJCTB4M2MyCiAj
+ZGVmaW5lIE9QUkVHSU9OX1ZFUlNJT04JMHgxNgogCitzdHJ1Y3QgaWdkX29wcmVnaW9uX3ZidCB7
+CisJdm9pZCAqb3ByZWdpb247CisJdm9pZCAqdmJ0X2V4OworCV9fbGUxNiB2ZXJzaW9uOworCV9f
+bGU2NCBydmRhOworfTsKKworLyoqCisgKiBpZ2Rfb3ByZWdpb25fc2hpZnRfY29weSgpIC0gQ29w
+eSBPcFJlZ2lvbiB0byB1c2VyIGJ1ZmZlciBhbmQgc2hpZnQgcG9zaXRpb24uCisgKiBAZHN0OiBV
+c2VyIGJ1ZmZlciBwdHIgdG8gY29weSB0by4KKyAqIEBvZmY6IE9mZnNldCB0byB1c2VyIGJ1ZmZl
+ciBwdHIuIEluY3JlYXNlZCBieSBieXRlc19hZHYgb24gcmV0dXJuLgorICogQHNyYzogU291cmNl
+IGJ1ZmZlciB0byBjb3B5IGZyb20uCisgKiBAcG9zOiBJbmNyZWFzZWQgYnkgYnl0ZXNfYWR2IG9u
+IHJldHVybi4KKyAqIEByZW1haW5pbmc6IERlY3JlYXNlZCBieSBieXRlc19hZHYgb24gcmV0dXJu
+LgorICogQGJ5dGVzX2NwOiBCeXRlcyB0byBjb3B5LgorICogQGJ5dGVzX2FkdjogQnl0ZXMgdG8g
+YWRqdXN0IG9mZiwgcG9zIGFuZCByZW1haW5pbmcuCisgKgorICogQ29weSBPcFJlZ2lvbiB0byBv
+ZmZzZXQgZnJvbSBzcGVjaWZpYyBzb3VyY2UgcHRyIGFuZCBzaGlmdCB0aGUgb2Zmc2V0LgorICoK
+KyAqIFJldHVybjogMCBvbiBzdWNjZXNzLCAtRUZBVUxUIG90aGVyd2lzZS4KKyAqCisgKi8KK3N0
+YXRpYyBpbmxpbmUgdW5zaWduZWQgbG9uZyBpZ2Rfb3ByZWdpb25fc2hpZnRfY29weShjaGFyIF9f
+dXNlciAqZHN0LAorCQkJCQkJICAgIGxvZmZfdCAqb2ZmLAorCQkJCQkJICAgIHZvaWQgKnNyYywK
+KwkJCQkJCSAgICBsb2ZmX3QgKnBvcywKKwkJCQkJCSAgICBsb2ZmX3QgKnJlbWFpbmluZywKKwkJ
+CQkJCSAgICBsb2ZmX3QgYnl0ZXNfY3AsCisJCQkJCQkgICAgbG9mZl90IGJ5dGVzX2FkdikKK3sK
+KwlpZiAoY29weV90b191c2VyKGRzdCArICgqb2ZmKSwgc3JjLCBieXRlc19jcCkpCisJCXJldHVy
+biAtRUZBVUxUOworCisJKm9mZiArPSBieXRlc19hZHY7CisJKnBvcyArPSBieXRlc19hZHY7CisJ
+KnJlbWFpbmluZyAtPSBieXRlc19hZHY7CisKKwlyZXR1cm4gMDsKK30KKwogc3RhdGljIHNpemVf
+dCB2ZmlvX3BjaV9pZ2Rfcncoc3RydWN0IHZmaW9fcGNpX2RldmljZSAqdmRldiwgY2hhciBfX3Vz
+ZXIgKmJ1ZiwKIAkJCSAgICAgIHNpemVfdCBjb3VudCwgbG9mZl90ICpwcG9zLCBib29sIGlzd3Jp
+dGUpCiB7CiAJdW5zaWduZWQgaW50IGkgPSBWRklPX1BDSV9PRkZTRVRfVE9fSU5ERVgoKnBwb3Mp
+IC0gVkZJT19QQ0lfTlVNX1JFR0lPTlM7Ci0Jdm9pZCAqYmFzZSA9IHZkZXYtPnJlZ2lvbltpXS5k
+YXRhOworCXN0cnVjdCBpZ2Rfb3ByZWdpb25fdmJ0ICpvcHJlZ2lvbnZidCA9IHZkZXYtPnJlZ2lv
+bltpXS5kYXRhOwogCWxvZmZfdCBwb3MgPSAqcHBvcyAmIFZGSU9fUENJX09GRlNFVF9NQVNLOwor
+CWxvZmZfdCByZW1haW5pbmcgPSBjb3VudDsKKwlsb2ZmX3Qgb2ZmID0gMDsKIAogCWlmIChwb3Mg
+Pj0gdmRldi0+cmVnaW9uW2ldLnNpemUgfHwgaXN3cml0ZSkKIAkJcmV0dXJuIC1FSU5WQUw7CiAK
+IAljb3VudCA9IG1pbihjb3VudCwgKHNpemVfdCkodmRldi0+cmVnaW9uW2ldLnNpemUgLSBwb3Mp
+KTsKIAotCWlmIChjb3B5X3RvX3VzZXIoYnVmLCBiYXNlICsgcG9zLCBjb3VudCkpCi0JCXJldHVy
+biAtRUZBVUxUOworCS8qIENvcHkgdW50aWwgT3BSZWdpb24gdmVyc2lvbiAqLworCWlmIChyZW1h
+aW5pbmcgJiYgcG9zIDwgT1BSRUdJT05fVkVSU0lPTikgeworCQlsb2ZmX3QgYnl0ZXMgPSBtaW4o
+cmVtYWluaW5nLCBPUFJFR0lPTl9WRVJTSU9OIC0gcG9zKTsKKworCQlpZiAoaWdkX29wcmVnaW9u
+X3NoaWZ0X2NvcHkoYnVmLCAmb2ZmLAorCQkJCQkgICAgb3ByZWdpb252YnQtPm9wcmVnaW9uICsg
+cG9zLCAmcG9zLAorCQkJCQkgICAgJnJlbWFpbmluZywgYnl0ZXMsIGJ5dGVzKSkKKwkJCXJldHVy
+biAtRUZBVUxUOworCX0KKworCS8qIENvcHkgcGF0Y2hlZCAoaWYgbmVjZXNzYXJ5KSBPcFJlZ2lv
+biB2ZXJzaW9uICovCisJaWYgKHJlbWFpbmluZyAmJiBwb3MgPCBPUFJFR0lPTl9WRVJTSU9OICsg
+c2l6ZW9mKF9fbGUxNikpIHsKKwkJbG9mZl90IGJ5dGVzID0gbWluKHJlbWFpbmluZywKKwkJCQkg
+ICBPUFJFR0lPTl9WRVJTSU9OICsgKGxvZmZfdClzaXplb2YoX19sZTE2KSAtIHBvcyk7CisKKwkJ
+aWYgKGlnZF9vcHJlZ2lvbl9zaGlmdF9jb3B5KGJ1ZiwgJm9mZiwKKwkJCQkJICAgICZvcHJlZ2lv
+bnZidC0+dmVyc2lvbiwgJnBvcywKKwkJCQkJICAgICZyZW1haW5pbmcsIGJ5dGVzLCBieXRlcykp
+CisJCQlyZXR1cm4gLUVGQVVMVDsKKwl9CisKKwkvKiBDb3B5IHVudGlsIFJWREEgKi8KKwlpZiAo
+cmVtYWluaW5nICYmIHBvcyA8IE9QUkVHSU9OX1JWREEpIHsKKwkJbG9mZl90IGJ5dGVzID0gbWlu
+KChsb2ZmX3QpcmVtYWluaW5nLCBPUFJFR0lPTl9SVkRBIC0gcG9zKTsKKworCQlpZiAoaWdkX29w
+cmVnaW9uX3NoaWZ0X2NvcHkoYnVmLCAmb2ZmLAorCQkJCQkgICAgb3ByZWdpb252YnQtPm9wcmVn
+aW9uICsgcG9zLCAmcG9zLAorCQkJCQkgICAgJnJlbWFpbmluZywgYnl0ZXMsIGJ5dGVzKSkKKwkJ
+CXJldHVybiAtRUZBVUxUOworCX0KKworCS8qIENvcHkgbW9kaWZpZWQgKGlmIG5lY2Vzc2FyeSkg
+UlZEQSAqLworCWlmIChyZW1haW5pbmcgJiYgcG9zIDwgT1BSRUdJT05fUlZEQSArIHNpemVvZihf
+X2xlNjQpKSB7CisJCWxvZmZfdCBieXRlcyA9IG1pbihyZW1haW5pbmcsIE9QUkVHSU9OX1JWREEg
+KworCQkJCQkgICAgICAobG9mZl90KXNpemVvZihfX2xlNjQpIC0gcG9zKTsKKworCQlpZiAoaWdk
+X29wcmVnaW9uX3NoaWZ0X2NvcHkoYnVmLCAmb2ZmLAorCQkJCQkgICAgJm9wcmVnaW9udmJ0LT5y
+dmRhLCAmcG9zLAorCQkJCQkgICAgJnJlbWFpbmluZywgYnl0ZXMsIGJ5dGVzKSkKKwkJCXJldHVy
+biAtRUZBVUxUOworCX0KKworCS8qIENvcHkgdGhlIHJlc3Qgb2YgT3BSZWdpb24gKi8KKwlpZiAo
+cmVtYWluaW5nICYmIHBvcyA8IE9QUkVHSU9OX1NJWkUpIHsKKwkJbG9mZl90IGJ5dGVzID0gbWlu
+KHJlbWFpbmluZywgT1BSRUdJT05fU0laRSAtIHBvcyk7CisKKwkJaWYgKGlnZF9vcHJlZ2lvbl9z
+aGlmdF9jb3B5KGJ1ZiwgJm9mZiwKKwkJCQkJICAgIG9wcmVnaW9udmJ0LT5vcHJlZ2lvbiArIHBv
+cywgJnBvcywKKwkJCQkJICAgICZyZW1haW5pbmcsIGJ5dGVzLCBieXRlcykpCisJCQlyZXR1cm4g
+LUVGQVVMVDsKKwl9CisKKwkvKiBDb3B5IGV4dGVuZGVkIFZCVCBpZiBleGlzdHMgKi8KKwlpZiAo
+cmVtYWluaW5nKSB7CisJCWlmIChpZ2Rfb3ByZWdpb25fc2hpZnRfY29weShidWYsICZvZmYsCisJ
+CQkJCSAgICBvcHJlZ2lvbnZidC0+dmJ0X2V4LCAmcG9zLAorCQkJCQkgICAgJnJlbWFpbmluZywg
+cmVtYWluaW5nLCAwKSkKKwkJCXJldHVybiAtRUZBVUxUOworCX0KIAogCSpwcG9zICs9IGNvdW50
+OwogCkBAIC00OCw3ICsxNDcsMTMgQEAgc3RhdGljIHNpemVfdCB2ZmlvX3BjaV9pZ2Rfcncoc3Ry
+dWN0IHZmaW9fcGNpX2RldmljZSAqdmRldiwgY2hhciBfX3VzZXIgKmJ1ZiwKIHN0YXRpYyB2b2lk
+IHZmaW9fcGNpX2lnZF9yZWxlYXNlKHN0cnVjdCB2ZmlvX3BjaV9kZXZpY2UgKnZkZXYsCiAJCQkJ
+IHN0cnVjdCB2ZmlvX3BjaV9yZWdpb24gKnJlZ2lvbikKIHsKLQltZW11bm1hcChyZWdpb24tPmRh
+dGEpOworCXN0cnVjdCBpZ2Rfb3ByZWdpb25fdmJ0ICpvcHJlZ2lvbnZidCA9IHJlZ2lvbi0+ZGF0
+YTsKKworCWlmIChvcHJlZ2lvbnZidC0+dmJ0X2V4KQorCQltZW11bm1hcChvcHJlZ2lvbnZidC0+
+dmJ0X2V4KTsKKworCW1lbXVubWFwKG9wcmVnaW9udmJ0LT5vcHJlZ2lvbik7CisJa2ZyZWUob3By
+ZWdpb252YnQpOwogfQogCiBzdGF0aWMgY29uc3Qgc3RydWN0IHZmaW9fcGNpX3JlZ29wcyB2Zmlv
+X3BjaV9pZ2RfcmVnb3BzID0gewpAQCAtNjAsNyArMTY1LDcgQEAgc3RhdGljIGludCB2ZmlvX3Bj
+aV9pZ2Rfb3ByZWdpb25faW5pdChzdHJ1Y3QgdmZpb19wY2lfZGV2aWNlICp2ZGV2KQogewogCV9f
+bGUzMiAqZHdvcmRwID0gKF9fbGUzMiAqKSh2ZGV2LT52Y29uZmlnICsgT1BSRUdJT05fUENJX0FE
+RFIpOwogCXUzMiBhZGRyLCBzaXplOwotCXZvaWQgKmJhc2U7CisJc3RydWN0IGlnZF9vcHJlZ2lv
+bl92YnQgKm9wcmVnaW9udmJ0OwogCWludCByZXQ7CiAJdTE2IHZlcnNpb247CiAKQEAgLTcxLDg0
+ICsxNzYsOTggQEAgc3RhdGljIGludCB2ZmlvX3BjaV9pZ2Rfb3ByZWdpb25faW5pdChzdHJ1Y3Qg
+dmZpb19wY2lfZGV2aWNlICp2ZGV2KQogCWlmICghYWRkciB8fCAhKH5hZGRyKSkKIAkJcmV0dXJu
+IC1FTk9ERVY7CiAKLQliYXNlID0gbWVtcmVtYXAoYWRkciwgT1BSRUdJT05fU0laRSwgTUVNUkVN
+QVBfV0IpOwotCWlmICghYmFzZSkKKwlvcHJlZ2lvbnZidCA9IGt6YWxsb2Moc2l6ZW9mKCpvcHJl
+Z2lvbnZidCksIEdGUF9LRVJORUwpOworCWlmICghb3ByZWdpb252YnQpCisJCXJldHVybiAtRU5P
+TUVNOworCisJb3ByZWdpb252YnQtPm9wcmVnaW9uID0gbWVtcmVtYXAoYWRkciwgT1BSRUdJT05f
+U0laRSwgTUVNUkVNQVBfV0IpOworCWlmICghb3ByZWdpb252YnQtPm9wcmVnaW9uKSB7CisJCWtm
+cmVlKG9wcmVnaW9udmJ0KTsKIAkJcmV0dXJuIC1FTk9NRU07CisJfQogCi0JaWYgKG1lbWNtcChi
+YXNlLCBPUFJFR0lPTl9TSUdOQVRVUkUsIDE2KSkgewotCQltZW11bm1hcChiYXNlKTsKKwlpZiAo
+bWVtY21wKG9wcmVnaW9udmJ0LT5vcHJlZ2lvbiwgT1BSRUdJT05fU0lHTkFUVVJFLCAxNikpIHsK
+KwkJbWVtdW5tYXAob3ByZWdpb252YnQtPm9wcmVnaW9uKTsKKwkJa2ZyZWUob3ByZWdpb252YnQp
+OwogCQlyZXR1cm4gLUVJTlZBTDsKIAl9CiAKLQlzaXplID0gbGUzMl90b19jcHUoKihfX2xlMzIg
+KikoYmFzZSArIDE2KSk7CisJc2l6ZSA9IGxlMzJfdG9fY3B1KCooX19sZTMyICopKG9wcmVnaW9u
+dmJ0LT5vcHJlZ2lvbiArIDE2KSk7CiAJaWYgKCFzaXplKSB7Ci0JCW1lbXVubWFwKGJhc2UpOwor
+CQltZW11bm1hcChvcHJlZ2lvbnZidC0+b3ByZWdpb24pOworCQlrZnJlZShvcHJlZ2lvbnZidCk7
+CiAJCXJldHVybiAtRUlOVkFMOwogCX0KIAogCXNpemUgKj0gMTAyNDsgLyogSW4gS0IgKi8KIAog
+CS8qCi0JICogU3VwcG9ydCBvcHJlZ2lvbiB2Mi4xKwotCSAqIFdoZW4gVkJUIGRhdGEgZXhjZWVk
+cyA2S0Igc2l6ZSBhbmQgY2Fubm90IGJlIHdpdGhpbiBtYWlsYm94ICM0LCB0aGVuCi0JICogdGhl
+IEV4dGVuZGVkIFZCVCByZWdpb24gbmV4dCB0byBvcHJlZ2lvbiBpcyB1c2VkIHRvIGhvbGQgdGhl
+IFZCVCBkYXRhLgotCSAqIFJWREEgKFJlbGF0aXZlIEFkZHJlc3Mgb2YgVkJUIERhdGEgZnJvbSBP
+cHJlZ2lvbiBCYXNlKSBhbmQgUlZEUwotCSAqIChSYXcgVkJUIERhdGEgU2l6ZSkgZnJvbSBvcHJl
+Z2lvbiBzdHJ1Y3R1cmUgbWVtYmVyIGFyZSB1c2VkIHRvIGhvbGQgdGhlCi0JICogYWRkcmVzcyBm
+cm9tIHJlZ2lvbiBiYXNlIGFuZCBzaXplIG9mIFZCVCBkYXRhLiBSVkRBL1JWRFMgYXJlIG5vdAot
+CSAqIGRlZmluZWQgYmVmb3JlIG9wcmVnaW9uIDIuMC4KLQkgKgotCSAqIG9wcmVnaW9uIDIuMSs6
+IFJWREEgaXMgdW5zaWduZWQsIHJlbGF0aXZlIG9mZnNldCBmcm9tCi0JICogb3ByZWdpb24gYmFz
+ZSwgYW5kIHNob3VsZCBwb2ludCB0byB0aGUgZW5kIG9mIG9wcmVnaW9uLgotCSAqIG90aGVyd2lz
+ZSwgZXhwb3NpbmcgdG8gdXNlcnNwYWNlIHRvIGFsbG93IHJlYWQgYWNjZXNzIHRvIGV2ZXJ5dGhp
+bmcgYmV0d2VlbgotCSAqIHRoZSBPcFJlZ2lvbiBhbmQgVkJUIGlzIG5vdCBzYWZlLgotCSAqIFJW
+RFMgaXMgZGVmaW5lZCBhcyBzaXplIGluIGJ5dGVzLgorCSAqIE9wUmVnaW9uIGFuZCBWQlQ6CisJ
+ICogV2hlbiBWQlQgZGF0YSBkb2Vzbid0IGV4Y2VlZCA2S0IsIGl0J3Mgc3RvcmVkIGluIE1haWxi
+b3ggIzQuCisJICogV2hlbiBWQlQgZGF0YSBleGNlZWRzIDZLQiBzaXplLCBNYWlsYm94ICM0IGlz
+IG5vIGxvbmdlciBsYXJnZSBlbm91Z2gKKwkgKiB0byBob2xkIHRoZSBWQlQgZGF0YSwgdGhlIEV4
+dGVuZGVkIFZCVCByZWdpb24gaXMgaW50cm9kdWNlZCBzaW5jZQorCSAqIE9wUmVnaW9uIDIuMCB0
+byBob2xkIHRoZSBWQlQgZGF0YS4gU2luY2UgT3BSZWdpb24gMi4wLCBSVkRBL1JWRFMgYXJlCisJ
+ICogaW50cm9kdWNlZCB0byBkZWZpbmUgdGhlIGV4dGVuZGVkIFZCVCBkYXRhIGxvY2F0aW9uIGFu
+ZCBzaXplLgorCSAqIE9wUmVnaW9uIDIuMDogUlZEQSBkZWZpbmVzIHRoZSBhYnNvbHV0ZSBwaHlz
+aWNhbCBhZGRyZXNzIG9mIHRoZQorCSAqICAgZXh0ZW5kZWQgVkJUIGRhdGEsIFJWRFMgZGVmaW5l
+cyB0aGUgVkJUIGRhdGEgc2l6ZS4KKwkgKiBPcFJlZ2lvbiAyLjEgYW5kIGFib3ZlOiBSVkRBIGRl
+ZmluZXMgdGhlIHJlbGF0aXZlIGFkZHJlc3Mgb2YgdGhlCisJICogICBleHRlbmRlZCBWQlQgZGF0
+YSB0byBPcFJlZ2lvbiBiYXNlLCBSVkRTIGRlZmluZXMgdGhlIFZCVCBkYXRhIHNpemUuCiAJICoK
+LQkgKiBvcHJlZ2lvbiAyLjA6IHJ2ZGEgaXMgdGhlIHBoeXNpY2FsIFZCVCBhZGRyZXNzLgotCSAq
+IFNpbmNlIHJ2ZGEgaXMgSFBBIGl0IGNhbm5vdCBiZSBkaXJlY3RseSB1c2VkIGluIGd1ZXN0Lgot
+CSAqIEFuZCBpdCBzaG91bGQgbm90IGJlIHByYWN0aWNhbGx5IGF2YWlsYWJsZSBmb3IgZW5kIHVz
+ZXIsc28gaXQgaXMgbm90IHN1cHBvcnRlZC4KKwkgKiBEdWUgdG8gdGhlIFJWREEgZGlmZmVyZW5j
+ZSBpbiBPcFJlZ2lvbiBWQlQgKGFsc28gdGhlIG9ubHkgZGlmZiBiZXR3ZWVuCisJICogMi4wIGFu
+ZCAyLjEpLCBleHBvc2UgT3BSZWdpb24gYW5kIFZCVCBhcyBhIGNvbnRpZ3VvdXMgcmFuZ2UgZm9y
+CisJICogT3BSZWdpb24gMi4wIGFuZCBhYm92ZSBtYWtlcyBpdCBwb3NzaWJsZSB0byBzdXBwb3J0
+IHRoZSBub24tY29udGlndW91cworCSAqIFZCVCB2aWEgYSBzaW5nbGUgdmZpbyByZWdpb24uIEZy
+b20gci93IG9wcyB2aWV3LCBvbmx5IGNvbnRpZ3VvdXMgVkJUCisJICogYWZ0ZXIgT3BSZWdpb24g
+d2l0aCB2ZXJzaW9uIDIuMSsgaXMgZXhwb3NlZCByZWdhcmRsZXNzIHRoZSB1bmRlcm5lYXRoCisJ
+ICogaG9zdCBpcyAyLjAgb3Igbm9uLWNvbnRpZ3VvdXMgMi4xKy4gVGhlIHIvdyBvcHMgd2lsbCBv
+bi10aGUtZmx5IHNoaWZ0CisJICogdGhlIGFjdHVyYWwgb2Zmc2V0IGludG8gVkJUIHNvIHRoYXQg
+ZGF0YSBhdCBjb3JyZWN0IHBvc2l0aW9uIGNhbiBiZQorCSAqIHJldHVybmVkIHRvIHRoZSByZXF1
+ZXN0ZXIuCiAJICovCi0JdmVyc2lvbiA9IGxlMTZfdG9fY3B1KCooX19sZTE2ICopKGJhc2UgKyBP
+UFJFR0lPTl9WRVJTSU9OKSk7CisJb3ByZWdpb252YnQtPnZlcnNpb24gPSAqKF9fbGUxNiAqKShv
+cHJlZ2lvbnZidC0+b3ByZWdpb24gKworCQkJCQkgICBPUFJFR0lPTl9WRVJTSU9OKTsKKwl2ZXJz
+aW9uID0gbGUxNl90b19jcHUob3ByZWdpb252YnQtPnZlcnNpb24pOworCiAJaWYgKHZlcnNpb24g
+Pj0gMHgwMjAwKSB7Ci0JCXU2NCBydmRhOwotCQl1MzIgcnZkczsKKwkJdTY0IHJ2ZGEgPSBsZTY0
+X3RvX2NwdSgqKF9fbGU2NCAqKShvcHJlZ2lvbnZidC0+b3ByZWdpb24gKworCQkJCQkJICAgT1BS
+RUdJT05fUlZEQSkpOworCQl1MzIgcnZkcyA9IGxlMzJfdG9fY3B1KCooX19sZTMyICopKG9wcmVn
+aW9udmJ0LT5vcHJlZ2lvbiArCisJCQkJCQkgICBPUFJFR0lPTl9SVkRTKSk7CiAKLQkJcnZkYSA9
+IGxlNjRfdG9fY3B1KCooX19sZTY0ICopKGJhc2UgKyBPUFJFR0lPTl9SVkRBKSk7Ci0JCXJ2ZHMg
+PSBsZTMyX3RvX2NwdSgqKF9fbGUzMiAqKShiYXNlICsgT1BSRUdJT05fUlZEUykpOworCQkvKiBU
+aGUgZXh0ZW5kZWQgVkJUIGlzIHZhbGlkIG9ubHkgd2hlbiBSVkRBL1JWRFMgYXJlIG5vbi16ZXJv
+ICovCiAJCWlmIChydmRhICYmIHJ2ZHMpIHsKLQkJCS8qIG5vIHN1cHBvcnQgZm9yIG9wcmVnaW9u
+IHYyLjAgd2l0aCBwaHlzaWNhbCBWQlQgYWRkcmVzcyAqLworCQkJc2l6ZSArPSBydmRzOworCiAJ
+CQlpZiAodmVyc2lvbiA9PSAweDAyMDApIHsKLQkJCQltZW11bm1hcChiYXNlKTsKLQkJCQlwY2lf
+ZXJyKHZkZXYtPnBkZXYsCi0JCQkJCSJJR0QgYXNzaWdubWVudCBkb2VzIG5vdCBzdXBwb3J0IG9w
+cmVnaW9uIHYyLjAgd2l0aCBhbiBleHRlbmRlZCBWQlQgcmVnaW9uXG4iKTsKLQkJCQlyZXR1cm4g
+LUVJTlZBTDsKKwkJCQkvKiBQYXRjaCB0byB2ZXJzaW9uIDIuMCBpbiByZWFkIG9wcyAqLworCQkJ
+CW9wcmVnaW9udmJ0LT52ZXJzaW9uID0gY3B1X3RvX2xlMTYoMHgwMjAxKTsKKwkJCQkvKiBBYnNv
+bHV0ZSBwaHlzaWNhbCBhZGRyIGZvciAyLjAgKi8KKwkJCQlhZGRyID0gcnZkYTsKKwkJCX0gZWxz
+ZSB7CisJCQkJLyogUmVsYXRpdmUgYWRkciB0byBPcFJlZ2lvbiBoZWFkZXIgZm9yIDIuMSsgKi8K
+KwkJCQlhZGRyICs9IHJ2ZGE7CiAJCQl9CiAKLQkJCWlmIChydmRhICE9IHNpemUpIHsKLQkJCQlt
+ZW11bm1hcChiYXNlKTsKLQkJCQlwY2lfZXJyKHZkZXYtPnBkZXYsCi0JCQkJCSJFeHRlbmRlZCBW
+QlQgZG9lcyBub3QgZm9sbG93IG9wcmVnaW9uIG9uIHZlcnNpb24gMHglMDR4XG4iLAotCQkJCQl2
+ZXJzaW9uKTsKLQkJCQlyZXR1cm4gLUVJTlZBTDsKKwkJCW9wcmVnaW9udmJ0LT52YnRfZXggPSBt
+ZW1yZW1hcChhZGRyLCBydmRzLCBNRU1SRU1BUF9XQik7CisJCQlpZiAoIW9wcmVnaW9udmJ0LT52
+YnRfZXgpIHsKKwkJCQltZW11bm1hcChvcHJlZ2lvbnZidC0+b3ByZWdpb24pOworCQkJCWtmcmVl
+KG9wcmVnaW9udmJ0KTsKKwkJCQlyZXR1cm4gLUVOT01FTTsKIAkJCX0KIAotCQkJLyogcmVnaW9u
+IHNpemUgZm9yIG9wcmVnaW9uIHYyLjArOiBvcHJlZ2lvbiBhbmQgVkJUIHNpemUuICovCi0JCQlz
+aXplICs9IHJ2ZHM7CisJCQkvKiBBbHdheXMgc2V0IFJWREEgdG8gbWFrZSBleFZCVCBmb2xsb3dz
+IE9wUmVnaW9uICovCisJCQlvcHJlZ2lvbnZidC0+cnZkYSA9IGNwdV90b19sZTY0KE9QUkVHSU9O
+X1NJWkUpOwogCQl9CiAJfQogCi0JaWYgKHNpemUgIT0gT1BSRUdJT05fU0laRSkgewotCQltZW11
+bm1hcChiYXNlKTsKLQkJYmFzZSA9IG1lbXJlbWFwKGFkZHIsIHNpemUsIE1FTVJFTUFQX1dCKTsK
+LQkJaWYgKCFiYXNlKQotCQkJcmV0dXJuIC1FTk9NRU07Ci0JfQotCiAJcmV0ID0gdmZpb19wY2lf
+cmVnaXN0ZXJfZGV2X3JlZ2lvbih2ZGV2LAogCQlQQ0lfVkVORE9SX0lEX0lOVEVMIHwgVkZJT19S
+RUdJT05fVFlQRV9QQ0lfVkVORE9SX1RZUEUsCi0JCVZGSU9fUkVHSU9OX1NVQlRZUEVfSU5URUxf
+SUdEX09QUkVHSU9OLAotCQkmdmZpb19wY2lfaWdkX3JlZ29wcywgc2l6ZSwgVkZJT19SRUdJT05f
+SU5GT19GTEFHX1JFQUQsIGJhc2UpOworCQlWRklPX1JFR0lPTl9TVUJUWVBFX0lOVEVMX0lHRF9P
+UFJFR0lPTiwgJnZmaW9fcGNpX2lnZF9yZWdvcHMsCisJCXNpemUsIFZGSU9fUkVHSU9OX0lORk9f
+RkxBR19SRUFELCBvcHJlZ2lvbnZidCk7CiAJaWYgKHJldCkgewotCQltZW11bm1hcChiYXNlKTsK
+KwkJaWYgKG9wcmVnaW9udmJ0LT52YnRfZXgpCisJCQltZW11bm1hcChvcHJlZ2lvbnZidC0+dmJ0
+X2V4KTsKKworCQltZW11bm1hcChvcHJlZ2lvbnZidC0+b3ByZWdpb24pOworCQlrZnJlZShvcHJl
+Z2lvbnZidCk7CiAJCXJldHVybiByZXQ7CiAJfQogCi0tIAoyLjMzLjAKCg==
