@@ -2,19 +2,22 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4E6174097FB
-	for <lists+kvm@lfdr.de>; Mon, 13 Sep 2021 17:56:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B25FF409803
+	for <lists+kvm@lfdr.de>; Mon, 13 Sep 2021 17:56:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245530AbhIMP5j (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S1344151AbhIMP5n (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Sep 2021 11:57:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36502 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S245581AbhIMP5j (ORCPT <rfc822;kvm@vger.kernel.org>);
         Mon, 13 Sep 2021 11:57:39 -0400
-Received: from 8bytes.org ([81.169.241.247]:56874 "EHLO theia.8bytes.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S238348AbhIMP5g (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Sep 2021 11:57:36 -0400
+Received: from theia.8bytes.org (8bytes.org [IPv6:2a01:238:4383:600:38bc:a715:4b6d:a889])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A55FBC061574;
+        Mon, 13 Sep 2021 08:56:23 -0700 (PDT)
 Received: from cap.home.8bytes.org (p549ad441.dip0.t-ipconnect.de [84.154.212.65])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
         (No client certificate requested)
-        by theia.8bytes.org (Postfix) with ESMTPSA id 270C0E7C;
+        by theia.8bytes.org (Postfix) with ESMTPSA id CC69CFCF;
         Mon, 13 Sep 2021 17:56:18 +0200 (CEST)
 From:   Joerg Roedel <joro@8bytes.org>
 To:     x86@kernel.org
@@ -39,9 +42,9 @@ Cc:     Eric Biederman <ebiederm@xmission.com>, kexec@lists.infradead.org,
         Joerg Roedel <joro@8bytes.org>, linux-coco@lists.linux.dev,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org
-Subject: [PATCH v2 03/12] x86/sev: Save and print negotiated GHCB protocol version
-Date:   Mon, 13 Sep 2021 17:55:54 +0200
-Message-Id: <20210913155603.28383-4-joro@8bytes.org>
+Subject: [PATCH v2 04/12] x86/sev: Do not hardcode GHCB protocol version
+Date:   Mon, 13 Sep 2021 17:55:55 +0200
+Message-Id: <20210913155603.28383-5-joro@8bytes.org>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20210913155603.28383-1-joro@8bytes.org>
 References: <20210913155603.28383-1-joro@8bytes.org>
@@ -53,115 +56,71 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Joerg Roedel <jroedel@suse.de>
 
-Save the results of the GHCB protocol negotiation into a data structure
-and print information about versions supported and used to the kernel
-log.
+Introduce the sev_get_ghcb_proto_ver() which will return the negotiated
+GHCB protocol version and use it to set the version field in the GHCB.
 
 Signed-off-by: Joerg Roedel <jroedel@suse.de>
 ---
- arch/x86/boot/compressed/sev.c |  2 +-
- arch/x86/kernel/sev-shared.c   | 22 +++++++++++++++++++++-
- arch/x86/kernel/sev.c          | 13 ++++++++++++-
- 3 files changed, 34 insertions(+), 3 deletions(-)
+ arch/x86/boot/compressed/sev.c | 5 +++++
+ arch/x86/kernel/sev-shared.c   | 5 ++++-
+ arch/x86/kernel/sev.c          | 5 +++++
+ 3 files changed, 14 insertions(+), 1 deletion(-)
 
 diff --git a/arch/x86/boot/compressed/sev.c b/arch/x86/boot/compressed/sev.c
-index 670e998fe930..1a2e49730f8b 100644
+index 1a2e49730f8b..101e08c67296 100644
 --- a/arch/x86/boot/compressed/sev.c
 +++ b/arch/x86/boot/compressed/sev.c
-@@ -121,7 +121,7 @@ static enum es_result vc_read_mem(struct es_em_ctxt *ctxt,
+@@ -119,6 +119,11 @@ static enum es_result vc_read_mem(struct es_em_ctxt *ctxt,
+ /* Include code for early handlers */
+ #include "../../kernel/sev-shared.c"
  
++static u64 sev_get_ghcb_proto_ver(void)
++{
++	return GHCB_PROTOCOL_MAX;
++}
++
  static bool early_setup_sev_es(void)
  {
--	if (!sev_es_negotiate_protocol())
-+	if (!sev_es_negotiate_protocol(NULL))
- 		sev_es_terminate(GHCB_SEV_ES_REASON_PROTOCOL_UNSUPPORTED);
- 
- 	if (set_page_decrypted((unsigned long)&boot_ghcb_page))
+ 	if (!sev_es_negotiate_protocol(NULL))
 diff --git a/arch/x86/kernel/sev-shared.c b/arch/x86/kernel/sev-shared.c
-index 9f90f460a28c..73eeb5897d16 100644
+index 73eeb5897d16..36eaac2773ed 100644
 --- a/arch/x86/kernel/sev-shared.c
 +++ b/arch/x86/kernel/sev-shared.c
-@@ -14,6 +14,20 @@
- #define has_cpuflag(f)	boot_cpu_has(f)
- #endif
+@@ -28,6 +28,9 @@ struct sev_ghcb_protocol_info {
+ 	unsigned int vm_proto;
+ };
  
-+/*
-+ * struct sev_ghcb_protocol_info - Used to return GHCB protocol
-+ *				   negotiation details.
-+ *
-+ * @hv_proto_min:	Minimum GHCB protocol version supported by Hypervisor
-+ * @hv_proto_max:	Maximum GHCB protocol version supported by Hypervisor
-+ * @vm_proto:		Protocol version the VM (this kernel) will use
-+ */
-+struct sev_ghcb_protocol_info {
-+	unsigned int hv_proto_min;
-+	unsigned int hv_proto_max;
-+	unsigned int vm_proto;
-+};
++/* Returns the negotiated GHCB Protocol version */
++static u64 sev_get_ghcb_proto_ver(void);
 +
  static bool __init sev_es_check_cpu_features(void)
  {
  	if (!has_cpuflag(X86_FEATURE_RDRAND)) {
-@@ -42,7 +56,7 @@ static void __noreturn sev_es_terminate(unsigned int reason)
- 		asm volatile("hlt\n" : : : "memory");
- }
+@@ -122,7 +125,7 @@ static enum es_result sev_es_ghcb_hv_call(struct ghcb *ghcb,
+ 	enum es_result ret;
  
--static bool sev_es_negotiate_protocol(void)
-+static bool sev_es_negotiate_protocol(struct sev_ghcb_protocol_info *info)
- {
- 	u64 val;
+ 	/* Fill in protocol and format specifiers */
+-	ghcb->protocol_version = GHCB_PROTOCOL_MAX;
++	ghcb->protocol_version = sev_get_ghcb_proto_ver();
+ 	ghcb->ghcb_usage       = GHCB_DEFAULT_USAGE;
  
-@@ -58,6 +72,12 @@ static bool sev_es_negotiate_protocol(void)
- 	    GHCB_MSR_PROTO_MIN(val) > GHCB_PROTO_OUR)
- 		return false;
- 
-+	if (info) {
-+		info->hv_proto_min = GHCB_MSR_PROTO_MIN(val);
-+		info->hv_proto_max = GHCB_MSR_PROTO_MAX(val);
-+		info->vm_proto	   = GHCB_PROTO_OUR;
-+	}
-+
- 	return true;
- }
- 
+ 	ghcb_set_sw_exit_code(ghcb, exit_code);
 diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
-index a6895e440bc3..8084bfd7cce1 100644
+index 8084bfd7cce1..5d3422e8b25e 100644
 --- a/arch/x86/kernel/sev.c
 +++ b/arch/x86/kernel/sev.c
-@@ -495,6 +495,9 @@ static enum es_result vc_slow_virt_to_phys(struct ghcb *ghcb, struct es_em_ctxt
- /* Include code shared with pre-decompression boot stage */
- #include "sev-shared.c"
+@@ -498,6 +498,11 @@ static enum es_result vc_slow_virt_to_phys(struct ghcb *ghcb, struct es_em_ctxt
+ /* Negotiated GHCB protocol version */
+ static struct sev_ghcb_protocol_info ghcb_protocol_info __ro_after_init;
  
-+/* Negotiated GHCB protocol version */
-+static struct sev_ghcb_protocol_info ghcb_protocol_info __ro_after_init;
++static u64 sev_get_ghcb_proto_ver(void)
++{
++	return ghcb_protocol_info.vm_proto;
++}
 +
  static noinstr void __sev_put_ghcb(struct ghcb_state *state)
  {
  	struct sev_es_runtime_data *data;
-@@ -665,7 +668,7 @@ static enum es_result vc_handle_msr(struct ghcb *ghcb, struct es_em_ctxt *ctxt)
- static bool __init sev_es_setup_ghcb(void)
- {
- 	/* First make sure the hypervisor talks a supported protocol. */
--	if (!sev_es_negotiate_protocol())
-+	if (!sev_es_negotiate_protocol(&ghcb_protocol_info))
- 		return false;
- 
- 	/*
-@@ -794,6 +797,14 @@ void __init sev_es_init_vc_handling(void)
- 
- 	/* Secondary CPUs use the runtime #VC handler */
- 	initial_vc_handler = (unsigned long)kernel_exc_vmm_communication;
-+
-+	/*
-+	 * Print information about supported and negotiated GHCB protocol
-+	 * versions.
-+	 */
-+	pr_info("Hypervisor GHCB protocol version support: min=%u max=%u\n",
-+		ghcb_protocol_info.hv_proto_min, ghcb_protocol_info.hv_proto_max);
-+	pr_info("Using GHCB protocol version %u\n", ghcb_protocol_info.vm_proto);
- }
- 
- static void __init vc_early_forward_exception(struct es_em_ctxt *ctxt)
 -- 
 2.33.0
 
