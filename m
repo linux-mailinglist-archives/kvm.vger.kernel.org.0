@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A161A4092EA
-	for <lists+kvm@lfdr.de>; Mon, 13 Sep 2021 16:17:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 25F924092AC
+	for <lists+kvm@lfdr.de>; Mon, 13 Sep 2021 16:14:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344390AbhIMOQa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Sep 2021 10:16:30 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:32277 "EHLO
+        id S1343964AbhIMONh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Sep 2021 10:13:37 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59183 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1344133AbhIMOL3 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 13 Sep 2021 10:11:29 -0400
+        by vger.kernel.org with ESMTP id S1344186AbhIMOLd (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 13 Sep 2021 10:11:33 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1631542213;
+        s=mimecast20190719; t=1631542217;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=HAk+4Ryawj4Ec+KIX3poPsHgTj+9jieC8UMzgx7uXjw=;
-        b=Mm8IxDsewHkMKv2zrcbIYf3zDCiyw/dMwBI1DRRw6wGY2f9r3us2QFy6aQTYuIjgQxZxD+
-        PCVO+ZwiCEwAx8JjwJaJQUOvY/HK74n5Q48Xq1luz63CIhR4Y37doyNodqhT4yjMBCKF3a
-        DSYZ4cdxTqe9TmNls3Eei3rx1ydr1tE=
+        bh=rOIleuW7ntxBl5bDlUbNb+ctoG6rTIoi5sLSfP0Cy3w=;
+        b=CwpWHBTUOOvOdnhGnDmEzDUg1sJjZFrYUc09MNlCzaHCUUSYOD3K/UV6X5sjCNs/IUmblR
+        oBd9s6X48M95N4Fbye72huarSI4n/x3edw5Upq2m3CknhLxaDkjk/xI/EA4+2piFgWBxYk
+        YB2B8qiJSBGAtreH7WlZBJ9qPBthIX8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-90-4Qrtf2jiMEW5I7DLZYFJCg-1; Mon, 13 Sep 2021 10:10:09 -0400
-X-MC-Unique: 4Qrtf2jiMEW5I7DLZYFJCg-1
+ us-mta-587-Unp0dlGhPw-Ra3D_YOxMKQ-1; Mon, 13 Sep 2021 10:10:16 -0400
+X-MC-Unique: Unp0dlGhPw-Ra3D_YOxMKQ-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A22C21006AA4;
-        Mon, 13 Sep 2021 14:10:07 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5E508835DE2;
+        Mon, 13 Sep 2021 14:10:14 +0000 (UTC)
 Received: from localhost.localdomain (unknown [10.35.206.50])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4A7B319724;
-        Mon, 13 Sep 2021 14:10:04 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0853B19724;
+        Mon, 13 Sep 2021 14:10:07 +0000 (UTC)
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
@@ -47,9 +47,9 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
         Ingo Molnar <mingo@redhat.com>,
         x86@kernel.org (maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)),
         Joerg Roedel <joro@8bytes.org>
-Subject: [PATCH v3 2/7] KVM: x86: nSVM: restore the L1 host state prior to resuming nested guest on SMM exit
-Date:   Mon, 13 Sep 2021 17:09:49 +0300
-Message-Id: <20210913140954.165665-3-mlevitsk@redhat.com>
+Subject: [PATCH v3 3/7] KVM: x86: reset pdptrs_from_userspace when exiting smm
+Date:   Mon, 13 Sep 2021 17:09:50 +0300
+Message-Id: <20210913140954.165665-4-mlevitsk@redhat.com>
 In-Reply-To: <20210913140954.165665-1-mlevitsk@redhat.com>
 References: <20210913140954.165665-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
@@ -59,45 +59,35 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Otherwise guest entry code might see incorrect L1 state (e.g paging state).
+When exiting SMM, pdpts are loaded again from the guest memory.
 
-Fixes: 37be407b2ce8 ("KVM: nSVM: Fix L1 state corruption upon return from SMM")
+This fixes a theoretical bug, when exit from SMM triggers entry to the
+nested guest which re-uses some of the migration
+code which uses this flag as a workaround for a legacy userspace.
 
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- arch/x86/kvm/svm/svm.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+ arch/x86/kvm/x86.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index a75dafbfa4a6..e3b092a3a2e1 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -4358,10 +4358,6 @@ static int svm_leave_smm(struct kvm_vcpu *vcpu, const char *smstate)
- 	if (svm_allocate_nested(svm))
- 		goto unmap_save;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 86539c1686fa..3a61f19455cb 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -7654,6 +7654,13 @@ static void kvm_smm_changed(struct kvm_vcpu *vcpu, bool entering_smm)
  
--	vmcb12 = map.hva;
--	nested_load_control_from_vmcb12(svm, &vmcb12->control);
--	ret = enter_svm_guest_mode(vcpu, vmcb12_gpa, vmcb12);
--
- 	/*
- 	 * Restore L1 host state from L1 HSAVE area as VMCB01 was
- 	 * used during SMM (see svm_enter_smm())
-@@ -4369,6 +4365,14 @@ static int svm_leave_smm(struct kvm_vcpu *vcpu, const char *smstate)
- 
- 	svm_copy_vmrun_state(&svm->vmcb01.ptr->save, map_save.hva + 0x400);
- 
-+	/*
-+	 * Enter the nested guest now
-+	 */
+ 		/* Process a latched INIT or SMI, if any.  */
+ 		kvm_make_request(KVM_REQ_EVENT, vcpu);
 +
-+	vmcb12 = map.hva;
-+	nested_load_control_from_vmcb12(svm, &vmcb12->control);
-+	ret = enter_svm_guest_mode(vcpu, vmcb12_gpa, vmcb12);
-+
- unmap_save:
- 	kvm_vcpu_unmap(vcpu, &map_save, true);
- unmap_map:
++		/*
++		 * Even if KVM_SET_SREGS2 loaded PDPTRs out of band,
++		 * on SMM exit we still need to reload them from
++		 * guest memory
++		 */
++		vcpu->arch.pdptrs_from_userspace = false;
+ 	}
+ 
+ 	kvm_mmu_reset_context(vcpu);
 -- 
 2.26.3
 
