@@ -2,104 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 13944409A00
-	for <lists+kvm@lfdr.de>; Mon, 13 Sep 2021 18:51:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 10A5E409A27
+	for <lists+kvm@lfdr.de>; Mon, 13 Sep 2021 18:57:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240395AbhIMQxE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Sep 2021 12:53:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50738 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239698AbhIMQxD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Sep 2021 12:53:03 -0400
-Received: from mail-yb1-xb29.google.com (mail-yb1-xb29.google.com [IPv6:2607:f8b0:4864:20::b29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA97FC061574
-        for <kvm@vger.kernel.org>; Mon, 13 Sep 2021 09:51:47 -0700 (PDT)
-Received: by mail-yb1-xb29.google.com with SMTP id i12so21570267ybq.9
-        for <kvm@vger.kernel.org>; Mon, 13 Sep 2021 09:51:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=3/SIYclYJBA8R/7MLXxAd/hpBEuATYrK81iK2vA0aLI=;
-        b=UaGSj5rF9TV4TbKEczi4abu9Nvmk3QFlrNsZ94RkSIZo5XRGdw1+Yp8wU1bW9ZIKU7
-         qVYpBNuU+BqPWj1VV0lFT/GWawzyPNcOXttDDmhFRg+yEyIx+9mPVAx48lK+heY3iA3U
-         HfCW9WvnXI6sbmUfIeRc2nkS12QocvHXtxiMMfataHdNLwYk/dbbfasez2yumAPudGYC
-         n/k5QceOvkIZ5XWqkUBFnHcWLXjV0SJXVTJO0j+H5/1iEevGYv+hiF5UfvY0YT6vNala
-         zKfQdTpdroaT4Tu5XUNzVCE60Q3x49dFineIsNw6rXKH899hYBUZPrQ4vrEEBC5tbuni
-         gB4A==
+        id S241049AbhIMQ6Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Sep 2021 12:58:16 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33970 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S241084AbhIMQ6Q (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 13 Sep 2021 12:58:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1631552219;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=g+3cqH6ifdVqKTPD8DSIcY8WRiPrRg0IjI4GufOGc8I=;
+        b=Msp7aB1MnnFIoQcVFpmEF8x6z7ic0wfUmr4qs4z0RFBIj4yhykhXu/RdwJr08dsBy0TpQX
+        2DykgNtMzUX6tJGZ2HXMiQKF4DuhWKmkS04urQ0Bye4G+/v3cyjdXMjfHHtzvtP0nM/xQA
+        wXwok8/1aYJ17rjf2Brg7ktQZGMwWDE=
+Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
+ [209.85.208.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-227-IBxGM45mPv6pYVBpeLn-fg-1; Mon, 13 Sep 2021 12:56:58 -0400
+X-MC-Unique: IBxGM45mPv6pYVBpeLn-fg-1
+Received: by mail-lj1-f198.google.com with SMTP id m9-20020a2e5809000000b001dccccc2bf6so4486547ljb.7
+        for <kvm@vger.kernel.org>; Mon, 13 Sep 2021 09:56:58 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=3/SIYclYJBA8R/7MLXxAd/hpBEuATYrK81iK2vA0aLI=;
-        b=q8G7w6kHes4BwUBpjnXMNWkLr9CmR6A+CYIQSRMU3ZJkx/HVKHGGvk1JBApF4aAoiI
-         U1tX0Dw4AWmtvuqkU3jlXoXDja1FhiiimdvYCJT+RiY6UtqjU6i9t/j2p58MgnMHo1YO
-         7WBBjO63DfxQ8W89mO/g1QUKmwtzS+e5Oy8QcQFqGKqDQTzEVvMTyLAfqhU1+i7Hx66V
-         G6iZSfzq+ZDSq1PQNuZdryxUXn9r9FRvi6kPPH/YMToz/JSiqbTi95U2/VovhxDKRp6g
-         yYzcGdP3eJERpdEWdbSb0tMOa2HHe36r4WXShgUfvW0oXk0QKykDaafmI0lWjdhaoQ9k
-         0gyg==
-X-Gm-Message-State: AOAM532tlaUiAMNLchc5sDQSyCw/ahhvlURGBAk0u3aGrdv6XcGt74ZR
-        5ZSRsZQ1zuc7B75YUwNZ0F7DlgHXYol2pBTXWjpMTw==
-X-Google-Smtp-Source: ABdhPJxF0MJAT41gnQOnRX7DjWFM0GLtwxdoVZIW+Gw+fILuc0cKnD6bHktwWwOauF6yqJrWs2OzSb/bX+FogXn7Y8c=
-X-Received: by 2002:a25:50c7:: with SMTP id e190mr17068088ybb.439.1631551907001;
- Mon, 13 Sep 2021 09:51:47 -0700 (PDT)
+        bh=g+3cqH6ifdVqKTPD8DSIcY8WRiPrRg0IjI4GufOGc8I=;
+        b=7LgF1wAIM2KfbMqcPqQfbhMNEsalErQi0GhYnFs6XFDcF/rHABQwq/Y15vmDaGiTLv
+         0UXCd2++cmIgS+k+DbCoRSk+q/gNAQI7ga70PwIX0X1iZt1jCKHX+nhvQj0axzdcSMbw
+         6LFSUzy6ZBPBZgrEmnBNGTMJKFt7vBvNpxy96mETbsIm08DbAu223OVha5FGti6IB3z2
+         aq75I/RNKqi157b9Qiybmn6IWeru2tlESxcS3a57aKJxt2lYpxDGT5r6tAHCiQ7mADSo
+         V7NbPhs2Ukrek2IXY4FnqbAEa2vmiPaKOZDIAwys3u51OrAtSs7RnfVZzBEP1KeDwA6A
+         IUFg==
+X-Gm-Message-State: AOAM530osjBcCJKWWL5kC4UJr9u5q4ZCB+RebWWNdgkodPvfS2FJd9rG
+        AUGnVhU4kqut8cwqmwLlT3Mm52qEyqt1PDPpfNQLFwF/3yQaF/XAPd6s+bWLIcCi8JHRENAUN9I
+        E9fVA5Geoakt4dNtewC+9zFK9DQDE
+X-Received: by 2002:a2e:7304:: with SMTP id o4mr11659550ljc.51.1631552216996;
+        Mon, 13 Sep 2021 09:56:56 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwEsueuL9hseX4+IMXePvu65lhG7CpxBDTW6sDERh7JVYGERNaG5Xeiw6ppL+jq20MLxOXsjghqm8q8r+/BSJY=
+X-Received: by 2002:a2e:7304:: with SMTP id o4mr11659504ljc.51.1631552216735;
+ Mon, 13 Sep 2021 09:56:56 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210909013818.1191270-1-rananta@google.com> <20210909013818.1191270-10-rananta@google.com>
- <CAAeT=Fw0Z1USVpdi2iRMRq0ktTP4+VFzfy31FWV36VPOCTq6_w@mail.gmail.com> <20210913073512.x774i5hi3s4wmopx@gator.home>
-In-Reply-To: <20210913073512.x774i5hi3s4wmopx@gator.home>
-From:   Raghavendra Rao Ananta <rananta@google.com>
-Date:   Mon, 13 Sep 2021 09:51:35 -0700
-Message-ID: <CAJHc60wVJP4=s3r16nLWXA8o=k71OagvLFrWVWwJJnLycHMQyw@mail.gmail.com>
-Subject: Re: [PATCH v4 09/18] KVM: arm64: selftests: Add guest support to get
- the vcpuid
-To:     Andrew Jones <drjones@redhat.com>
-Cc:     Reiji Watanabe <reijiw@google.com>,
+References: <20210913135745.13944-1-jgross@suse.com> <20210913135745.13944-3-jgross@suse.com>
+ <YT97K7yXyCrphyCt@google.com>
+In-Reply-To: <YT97K7yXyCrphyCt@google.com>
+From:   Eduardo Habkost <ehabkost@redhat.com>
+Date:   Mon, 13 Sep 2021 12:56:41 -0400
+Message-ID: <CAOpTY_pyeOo2Kh-r1cEFk2XL4g8A1mxQpP1y62thWk2mh6XUUg@mail.gmail.com>
+Subject: Re: [PATCH 2/2] kvm: rename KVM_MAX_VCPU_ID to KVM_MAX_VCPU_IDS
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Juergen Gross <jgross@suse.com>, kvm@vger.kernel.org,
+        x86@kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mips@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-kselftest@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+        Jonathan Corbet <corbet@lwn.net>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, Shuah Khan <shuah@kernel.org>,
+        Shuah Khan <skhan@linuxfoundation.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 13, 2021 at 12:35 AM Andrew Jones <drjones@redhat.com> wrote:
+On Mon, Sep 13, 2021 at 12:24 PM Sean Christopherson <seanjc@google.com> wrote:
 >
-> On Sun, Sep 12, 2021 at 12:05:22AM -0700, Reiji Watanabe wrote:
-> > Hi Raghu and all,
-> >
-> > On Wed, Sep 8, 2021 at 6:38 PM Raghavendra Rao Ananta
-> > <rananta@google.com> wrote:
-> > >
-> > > At times, such as when in the interrupt handler, the guest wants
-> > > to get the vcpuid that it's running on. As a result, introduce
-> > > get_vcpuid() that returns the vcpuid of the calling vcpu. At its
-> > > backend, the VMM prepares a map of vcpuid and mpidr during VM
-> > > initialization and exports the map to the guest for it to read.
-> >
-> > How about using TPIDR_EL1 to hold the vcpuid ?
-> > i.e. have aarch64_vcpu_setup() set the register to vcpuid and
-> > guest_get_vcpuid() simply return a value of the register.
-> > This would be a simpler solution to implement.
+> On Mon, Sep 13, 2021, Juergen Gross wrote:
+> > KVM_MAX_VCPU_ID is not specifying the highest allowed vcpu-id, but the
+> > number of allowed vcpu-ids. This has already led to confusion, so
+> > rename KVM_MAX_VCPU_ID to KVM_MAX_VCPU_IDS to make its semantics more
+> > clear
 >
-> That is a great suggestion. It's arch-specific, but maybe the
-> other architectures can mimic it with their own capabilities.
-> And, in the unlikely event a unit test wants that register for
-> itself, then it can build its own mpidr-vcpuid map if necessary.
-> Ship it :-)
+> My hesitation with this rename is that the max _number_ of IDs is not the same
+> thing as the max allowed ID.  E.g. on x86, given a capability that enumerates the
+> max number of IDs, I would expect to be able to create vCPUs with arbitrary 32-bit
+> x2APIC IDs so long as the total number of IDs is below the max.
 >
-Thanks for the suggestion, Reiji. I'll send out a patch soon for this.
 
-Regards,
-Raghavendra
-> Thanks,
-> drew
->
+What name would you suggest instead? KVM_VCPU_ID_LIMIT, maybe?
+
+I'm assuming we are not going to redefine KVM_MAX_VCPU_ID to be an
+inclusive limit.
+
+--
+Eduardo
+
