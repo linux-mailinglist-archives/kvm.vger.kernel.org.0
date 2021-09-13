@@ -2,43 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9E2C8409165
-	for <lists+kvm@lfdr.de>; Mon, 13 Sep 2021 16:00:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EC87C409162
+	for <lists+kvm@lfdr.de>; Mon, 13 Sep 2021 16:00:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244323AbhIMOBN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Sep 2021 10:01:13 -0400
-Received: from smtp-out2.suse.de ([195.135.220.29]:58060 "EHLO
+        id S1343704AbhIMOBK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Sep 2021 10:01:10 -0400
+Received: from smtp-out2.suse.de ([195.135.220.29]:58110 "EHLO
         smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245106AbhIMN7I (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Sep 2021 09:59:08 -0400
+        with ESMTP id S245108AbhIMN7H (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Sep 2021 09:59:07 -0400
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id EC9A61FD84;
-        Mon, 13 Sep 2021 13:57:48 +0000 (UTC)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 6FFA01FFE4;
+        Mon, 13 Sep 2021 13:57:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1631541468; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=hH7Iy2pE2qXXycVl+pdgp/YjaWw0chbvKCaG1nR6wMw=;
-        b=rskVLjWzWO+SQgKM7whOVKZMJUU4eAWiaaJMkUHgZ4o7XtDWNqJkR0Wr4hdo3PNSaEbKzB
-        Exa6amYfD+QDBiQhuM+DEZysqjzQngjO3Q3MK8s9iFamZnSgC1AeJZJ+unDND6ZpNFUZSC
-        o24T08ZH8M+lcBm0flqCa3TxOm58Cks=
+        t=1631541469; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=kMNxl3ROgcUS4F7pKtP67mA1glR29ldcpqto1Jdyazk=;
+        b=rPaWfAfMYVL+BM/X+k2P3bUmJh1U9tCsNR63GI8x2DEc94HCtgtlZIzIL16fc2ArDHG7Lp
+        lz75VBmInPm+LUyhQU6y+oZhBejKreTzXoDcy0AGUQR8McRw8s91+CF6xlpRc0RfjFdzMK
+        7lnHwloRG7TlYQUGdIq05dMfbYB9D8U=
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 0B52D13AB2;
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id F3B3413F16;
         Mon, 13 Sep 2021 13:57:48 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id ucX7ANxYP2FMUwAAMHmgww
+        id WEHrOdxYP2FMUwAAMHmgww
         (envelope-from <jgross@suse.com>); Mon, 13 Sep 2021 13:57:48 +0000
 From:   Juergen Gross <jgross@suse.com>
-To:     kvm@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-mips@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-kselftest@vger.kernel.org
+To:     kvm@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org
 Cc:     Juergen Gross <jgross@suse.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
@@ -48,50 +47,66 @@ Cc:     Juergen Gross <jgross@suse.com>,
         Joerg Roedel <joro@8bytes.org>,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, Jonathan Corbet <corbet@lwn.net>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Shuah Khan <skhan@linuxfoundation.org>
-Subject: [PATCH 0/2] kvm: fix KVM_MAX_VCPU_ID handling
-Date:   Mon, 13 Sep 2021 15:57:42 +0200
-Message-Id: <20210913135745.13944-1-jgross@suse.com>
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Eduardo Habkost <ehabkost@redhat.com>
+Subject: [PATCH 1/2] x86/kvm: revert commit 76b4f357d0e7d8f6f00
+Date:   Mon, 13 Sep 2021 15:57:43 +0200
+Message-Id: <20210913135745.13944-2-jgross@suse.com>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20210913135745.13944-1-jgross@suse.com>
+References: <20210913135745.13944-1-jgross@suse.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Revert commit 76b4f357d0e7d8f6f00 which was based on wrong reasoning
-and rename KVM_MAX_VCPU_ID to KVM_MAX_VCPU_IDS in order to avoid the
-same issue in future.
+Commit 76b4f357d0e7d8f6f00 ("x86/kvm: fix vcpu-id indexed array sizes")
+has wrong reasoning, as KVM_MAX_VCPU_ID is not defining the maximum
+allowed vcpu-id as its name suggests, but the number of vcpu-ids.
 
-Juergen Gross (2):
-  x86/kvm: revert commit 76b4f357d0e7d8f6f00
-  kvm: rename KVM_MAX_VCPU_ID to KVM_MAX_VCPU_IDS
+So revert this patch again.
 
- Documentation/virt/kvm/devices/xics.rst            | 2 +-
- Documentation/virt/kvm/devices/xive.rst            | 2 +-
- arch/mips/kvm/mips.c                               | 2 +-
- arch/powerpc/include/asm/kvm_book3s.h              | 2 +-
- arch/powerpc/include/asm/kvm_host.h                | 4 ++--
- arch/powerpc/kvm/book3s_xive.c                     | 2 +-
- arch/powerpc/kvm/powerpc.c                         | 2 +-
- arch/x86/include/asm/kvm_host.h                    | 2 +-
- arch/x86/kvm/ioapic.c                              | 2 +-
- arch/x86/kvm/ioapic.h                              | 4 ++--
- arch/x86/kvm/x86.c                                 | 2 +-
- include/linux/kvm_host.h                           | 4 ++--
- tools/testing/selftests/kvm/kvm_create_max_vcpus.c | 2 +-
- virt/kvm/kvm_main.c                                | 2 +-
- 14 files changed, 17 insertions(+), 17 deletions(-)
+Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
+Signed-off-by: Juergen Gross <jgross@suse.com>
+---
+ arch/x86/kvm/ioapic.c | 2 +-
+ arch/x86/kvm/ioapic.h | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
+diff --git a/arch/x86/kvm/ioapic.c b/arch/x86/kvm/ioapic.c
+index ff005fe738a4..698969e18fe3 100644
+--- a/arch/x86/kvm/ioapic.c
++++ b/arch/x86/kvm/ioapic.c
+@@ -96,7 +96,7 @@ static unsigned long ioapic_read_indirect(struct kvm_ioapic *ioapic,
+ static void rtc_irq_eoi_tracking_reset(struct kvm_ioapic *ioapic)
+ {
+ 	ioapic->rtc_status.pending_eoi = 0;
+-	bitmap_zero(ioapic->rtc_status.dest_map.map, KVM_MAX_VCPU_ID + 1);
++	bitmap_zero(ioapic->rtc_status.dest_map.map, KVM_MAX_VCPU_ID);
+ }
+ 
+ static void kvm_rtc_eoi_tracking_restore_all(struct kvm_ioapic *ioapic);
+diff --git a/arch/x86/kvm/ioapic.h b/arch/x86/kvm/ioapic.h
+index bbd4a5d18b5d..27e61ff3ac3e 100644
+--- a/arch/x86/kvm/ioapic.h
++++ b/arch/x86/kvm/ioapic.h
+@@ -39,13 +39,13 @@ struct kvm_vcpu;
+ 
+ struct dest_map {
+ 	/* vcpu bitmap where IRQ has been sent */
+-	DECLARE_BITMAP(map, KVM_MAX_VCPU_ID + 1);
++	DECLARE_BITMAP(map, KVM_MAX_VCPU_ID);
+ 
+ 	/*
+ 	 * Vector sent to a given vcpu, only valid when
+ 	 * the vcpu's bit in map is set
+ 	 */
+-	u8 vectors[KVM_MAX_VCPU_ID + 1];
++	u8 vectors[KVM_MAX_VCPU_ID];
+ };
+ 
+ 
 -- 
 2.26.2
 
