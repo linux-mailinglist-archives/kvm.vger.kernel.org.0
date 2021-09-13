@@ -2,125 +2,180 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 51E2D409D24
-	for <lists+kvm@lfdr.de>; Mon, 13 Sep 2021 21:33:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A3A08409E2D
+	for <lists+kvm@lfdr.de>; Mon, 13 Sep 2021 22:32:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241188AbhIMTeo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Sep 2021 15:34:44 -0400
-Received: from mga18.intel.com ([134.134.136.126]:61836 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235290AbhIMTen (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Sep 2021 15:34:43 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10106"; a="208874723"
-X-IronPort-AV: E=Sophos;i="5.85,290,1624345200"; 
-   d="scan'208";a="208874723"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2021 12:33:27 -0700
-X-IronPort-AV: E=Sophos;i="5.85,290,1624345200"; 
-   d="scan'208";a="609187491"
-Received: from holdensm-mobl.amr.corp.intel.com (HELO [10.212.147.16]) ([10.212.147.16])
-  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2021 12:33:26 -0700
-Subject: Re: [PATCH 2/2] x86: sgx_vepc: implement SGX_IOC_VEPC_REMOVE ioctl
-To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     x86@kernel.org, linux-sgx@vger.kernel.org, jarkko@kernel.org,
-        dave.hansen@linux.intel.com, yang.zhong@intel.com
-References: <20210913131153.1202354-1-pbonzini@redhat.com>
- <20210913131153.1202354-3-pbonzini@redhat.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
- z5cecg==
-Message-ID: <50287173-0afb-36f4-058e-0960fb4017a7@intel.com>
-Date:   Mon, 13 Sep 2021 12:33:24 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S243884AbhIMUde (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Sep 2021 16:33:34 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:22440 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S239327AbhIMUdc (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 13 Sep 2021 16:33:32 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.0.43) with SMTP id 18DIxULk018537;
+        Mon, 13 Sep 2021 16:32:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=yBRQSXYa6E0Da+LOl4wVPZbAFonIeAlEysP3yqC0kzY=;
+ b=iyRyMymH7QfKN3srOByUI7wHO00B6QMgqGhD3OT/yH2ZdLiVFkZuDXvI7Pd+rcXSldW1
+ PJbbcCsrGoliN+CVb/3xICZwMwxMIfx1agtSUZMylE/A7xAjsVqC513ZKefVaxA+aMqc
+ q2QD5lLwtuSf/cZZ1fEm9e0OO6tHoTby2LcihbT07yVhfLVz/lBWGdeu3sD2/UdKaIFi
+ g+QQYblvKFm4t0VM6fv+9iGAvxwCLtgYNLEd/kPKqedxkWJhH8cgWZXzC+XErQw4V8ea
+ rRK9mNHhnNyFnPjqu+okcZQAuSDIjqwynBwF0ZCP5bOow07lMkpk/wQDtvbqqS5wDzU9 8w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3b24777ndw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 13 Sep 2021 16:32:05 -0400
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 18DIospt026987;
+        Mon, 13 Sep 2021 16:32:04 -0400
+Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3b24777ndh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 13 Sep 2021 16:32:04 -0400
+Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
+        by ppma05wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 18DKDMSq030005;
+        Mon, 13 Sep 2021 20:32:03 GMT
+Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com [9.57.198.29])
+        by ppma05wdc.us.ibm.com with ESMTP id 3b0m3a9b8n-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 13 Sep 2021 20:32:03 +0000
+Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com [9.57.199.106])
+        by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 18DKW2Bn44237072
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 13 Sep 2021 20:32:02 GMT
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 42C442805C;
+        Mon, 13 Sep 2021 20:32:02 +0000 (GMT)
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5E31B2805A;
+        Mon, 13 Sep 2021 20:31:55 +0000 (GMT)
+Received: from farman-thinkpad-t470p (unknown [9.211.116.76])
+        by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
+        Mon, 13 Sep 2021 20:31:55 +0000 (GMT)
+Message-ID: <6f55044373dea4515b831957981bbf333e03de59.camel@linux.ibm.com>
+Subject: Re: [PATCH v2 0/9] Move vfio_ccw to the new mdev API
+From:   Eric Farman <farman@linux.ibm.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     David Airlie <airlied@linux.ie>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        dri-devel@lists.freedesktop.org,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
+        linux-s390@vger.kernel.org,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>, Christoph Hellwig <hch@lst.de>
+Date:   Mon, 13 Sep 2021 16:31:54 -0400
+In-Reply-To: <20210913192407.GZ2505917@nvidia.com>
+References: <0-v2-7d3a384024cf+2060-ccw_mdev_jgg@nvidia.com>
+         <1e431e58465b86430d02d429c86c427f7088bf1f.camel@linux.ibm.com>
+         <20210913192407.GZ2505917@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-16.el8) 
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: J2Mq2xTpaK-3MSFbfYoVTtsLoCLgmINY
+X-Proofpoint-ORIG-GUID: r492AUbxpbkj-DNzhYj7IEyrQ8grPz3w
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-In-Reply-To: <20210913131153.1202354-3-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.182.1,Aquarius:18.0.687,Hydra:6.0.235,FMLib:17.0.607.475
+ definitions=2020-10-13_15,2020-10-13_02,2020-04-07_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
+ lowpriorityscore=0 malwarescore=0 mlxlogscore=999 suspectscore=0
+ adultscore=0 mlxscore=0 priorityscore=1501 spamscore=0 impostorscore=0
+ bulkscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2109030001 definitions=main-2109130063
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/13/21 6:11 AM, Paolo Bonzini wrote:
-> +static long sgx_vepc_remove_all(struct sgx_vepc *vepc)
-> +{
-> +	struct sgx_epc_page *entry;
-> +	unsigned long index;
-> +	long failures = 0;
-> +
-> +	xa_for_each(&vepc->page_array, index, entry)
-> +		if (sgx_vepc_remove_page(entry))
-> +			failures++;
-> +
-> +	/*
-> +	 * Return the number of pages that failed to be removed, so
-> +	 * userspace knows that there are still SECS pages lying
-> +	 * around.
-> +	 */
-> +	return failures;
-> +}
+On Mon, 2021-09-13 at 16:24 -0300, Jason Gunthorpe wrote:
+> On Mon, Sep 13, 2021 at 01:40:34PM -0400, Eric Farman wrote:
+> > On Thu, 2021-09-09 at 16:38 -0300, Jason Gunthorpe wrote:
+> > > This addresses Cornelia's remark on the earlier patch that ccw
+> > > has a
+> > > confusing lifecycle. While it doesn't seem like the original
+> > > attempt
+> > > was
+> > > functionally wrong, the result can be made better with a lot of
+> > > further
+> > > work.
+> > 
+> > I thought I'd take a stab at seeing how this works with the
+> > hardware
+> > before looking at the code much. git couldn't apply patches 1, 6,
+> > or 9
+> > to 5.15-rc1, but I was able to hand-fit them into place. 
+> 
+> Oh? Thats odd, I had no remarks from git when rebasing onto
+> v5.15-rc1..
+> 
+> Maybe this is a situation where you need "b4 am --prep-3way" ...
 
-I'm not sure the retry logic should be in userspace.  Also, is this
-strictly limited to SECS pages?  It could also happen if there were
-enclaves running that used the page.  Granted, userspace can probably
-stop all the vcpus, but the *interface* doesn't prevent it being called
-like that.
+Ah, that does indeed help, thanks. Still missing the vfio-ap patch
+that's elsewhere on the list, but I'm not caring about that at the
+moment.
 
-What else can userspace do but:
+> 
+> > [   64.585462] Call Trace:
+> > [   64.585464]  [<0000000000000002>] 0x2 
+> > [   64.585467] ([<000003ff80179d74>] vfio_ccw_mdev_ioctl+0x84/0x318
+> > [vfio_ccw])
+> > [   64.585476]  [<00000000bb7adda6>] __s390x_sys_ioctl+0xbe/0x100 
+> > [   64.585481]  [<00000000bbfbf5e4>] __do_syscall+0x1bc/0x1e8 
+> > [   64.585488]  [<00000000bbfcc8d8>] system_call+0x78/0xa0 
+> 
+> I think it is this:
+> 
+> diff --git a/drivers/s390/cio/vfio_ccw_fsm.c
+> b/drivers/s390/cio/vfio_ccw_fsm.c
+> index df1490943b20ec..5ea392959c0711 100644
+> --- a/drivers/s390/cio/vfio_ccw_fsm.c
+> +++ b/drivers/s390/cio/vfio_ccw_fsm.c
+> @@ -441,6 +441,7 @@ fsm_func_t
+> *vfio_ccw_jumptable[NR_VFIO_CCW_STATES][NR_VFIO_CCW_EVENTS] = {
+>  		[VFIO_CCW_EVENT_IO_REQ]		= fsm_io_error,
+>  		[VFIO_CCW_EVENT_ASYNC_REQ]	= fsm_async_error,
+>  		[VFIO_CCW_EVENT_INTERRUPT]	= fsm_disabled_irq,
+> +		[VFIO_CCW_EVENT_OPEN]		= fsm_nop,
+>  		[VFIO_CCW_EVENT_CLOSE]		= fsm_nop,
+>  	},
+>  	[VFIO_CCW_STATE_CLOSED] = {
+> 
+> I rebased it and fixed it up here:
+> 
+> https://github.com/jgunthorpe/linux/tree/vfio_ccw
+> 
+> Can you try again?
 
-	ret = ioctl(fd, SGX_IOC_VEPC_REMOVE);
-	if (ret)
-		ret = ioctl(fd, SGX_IOC_VEPC_REMOVE);
-	if (ret)
-		printf("uh oh\n");
+That does address the crash, but then why is it processing a BROKEN
+event? Seems problematic. All the configuration works fine, but the
+devices get ripped away once a guest is started that wants to open/use
+them.
 
-We already have existing code to gather up the pages that couldn't be
-EREMOVE'd and selectively EREMOVE them again.  Why not reuse that code
-here?  If there is 100GB of EPC, it's gotta be painful to run through
-the ->page_array twice when once plus a small list iteration will do.
+So, there's more problems to figure out.
 
-Which reminds me...  Do we need a cond_resched() in there or anything?
-That loop could theoretically get really, really long.
+Eric
+
+> 
+> Thanks,
+> Jason
+
