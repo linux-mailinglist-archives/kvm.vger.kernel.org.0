@@ -2,216 +2,194 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D4E0E4083B5
-	for <lists+kvm@lfdr.de>; Mon, 13 Sep 2021 07:09:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 65B0D4084FD
+	for <lists+kvm@lfdr.de>; Mon, 13 Sep 2021 08:53:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235190AbhIMFKj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Sep 2021 01:10:39 -0400
-Received: from smtp-out1.suse.de ([195.135.220.28]:58122 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229563AbhIMFKh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Sep 2021 01:10:37 -0400
-Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 884F521EF6;
-        Mon, 13 Sep 2021 05:09:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1631509761; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
+        id S237481AbhIMGyw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Sep 2021 02:54:52 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:32191 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S237470AbhIMGyu (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 13 Sep 2021 02:54:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1631516014;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=VFh9JrU2YT/OIFYZJvpIhWcET0LisUkKb7tvpWYg/Ok=;
-        b=YVFx3WJg8wOXHiIqn7C4mjTRmisMw4MmPJgKeDn+TM4juiQV4zvutbEgVUGo2vkdRYtrfp
-        ER38cmVLumNp7QQ+U1FKtC4XYv4zhgUPEVFbArgoyPiH0dPMiAWNeZDg8EkkgikknbQruA
-        1Wy+uedg9SItKTkFG0OpD4CwRmgLl8o=
-Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap1.suse-dmz.suse.de (Postfix) with ESMTPS id 5593F131F5;
-        Mon, 13 Sep 2021 05:09:21 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap1.suse-dmz.suse.de with ESMTPSA
-        id MS/iEgHdPmGiZAAAGKfGzw
-        (envelope-from <jgross@suse.com>); Mon, 13 Sep 2021 05:09:21 +0000
-Subject: Re: [PATCH v2 0/3] kvm: x86: Set KVM_MAX_VCPUS=1024,
- KVM_SOFT_MAX_VCPUS=710
-To:     Eduardo Habkost <ehabkost@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-References: <20210903211600.2002377-1-ehabkost@redhat.com>
- <1111efc8-b32f-bd50-2c0f-4c6f506b544b@redhat.com>
- <YTv4rgPol5vILWay@google.com>
- <CAOpTY_ony8uDquFQR3=hRvzpGHic6O_0qhocbHCz7-swyNc-QQ@mail.gmail.com>
-From:   Juergen Gross <jgross@suse.com>
-Message-ID: <6a914c3e-7abe-1daa-67fc-fde8d20597aa@suse.com>
-Date:   Mon, 13 Sep 2021 07:09:20 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.12.0
+        bh=FeM9VbeOZW6Q8YpmpSes2OU2n8QPVYH3Vzvp3bUiPm4=;
+        b=U99SUxXSMyZJDX54jD9mo5zGDCZD2M9Q2ZPVhuFJj3IRT/hG8GBURHy7cZuadUhaH5S+Tm
+        QP+aSFH7xMD0flKN+LrOTr88I2pc5T3FrzczgjJy9hD5p9k7q06kKJfeGC3GqxZxN5lHiW
+        sWMdYA18cW6pdnIi+4WAcLs3V/Nir8I=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-574-i0aEninbNxOWq00q6Ase3A-1; Mon, 13 Sep 2021 02:53:33 -0400
+X-MC-Unique: i0aEninbNxOWq00q6Ase3A-1
+Received: by mail-ej1-f71.google.com with SMTP id ar17-20020a170907265100b005eff65b9184so1055737ejc.21
+        for <kvm@vger.kernel.org>; Sun, 12 Sep 2021 23:53:33 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=FeM9VbeOZW6Q8YpmpSes2OU2n8QPVYH3Vzvp3bUiPm4=;
+        b=gOrG/JxIjAgUNztna1x7nsTOmp5EjdNIxqSgRx2GYytUif4zjEot2WLQBlLoD38Nxn
+         HrZIyrKC8uylpZZb27u/1Qsca4rXF/ZveAOvy1Tm0c/0qx+c/uW2M1d5iHZXyflBLg3s
+         blvU/zO97PDjwOxHhU7p/dNf/TxBNPtzoSuAO7tJccNiwG4AsgLkmMF+xyux+pvMYbF/
+         NkcwRt7FsD5fEVFC3eKNQ97KJEF6kjvar7bO5r0RplTk/2CeFwOHMOeOZQ7HdDHcWmU3
+         SvftFsKkrhwcKQYJCDBZhOG1vLR/CZfrD9qBPGHx4UVEPrJy3r0WMCSNR9lSS6M/thq4
+         HYIA==
+X-Gm-Message-State: AOAM5335SXl5dyNDuDfOE53BN7Uen4/ASFMhQN2imegrODIr9b+1u23c
+        vJPOFEsJ1BLwumN9xb0trcoXZ828HxuB5Bi/mOjOH9wnsEGFjsI0JgisTvIb++2E7jcwpdv5++C
+        mEkdmmZWpHycj
+X-Received: by 2002:aa7:c3cb:: with SMTP id l11mr11609227edr.310.1631516012329;
+        Sun, 12 Sep 2021 23:53:32 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxUGigNc+sq3gVdCwC4TFvas+vjbm9v+f5pAbfSRWMoSLIan1K0j0zN3DtoLbuM+ZVuamppSw==
+X-Received: by 2002:aa7:c3cb:: with SMTP id l11mr11609214edr.310.1631516012101;
+        Sun, 12 Sep 2021 23:53:32 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id eg14sm3418082edb.64.2021.09.12.23.53.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 12 Sep 2021 23:53:31 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/4] KVM: nVMX: Don't use Enlightened MSR Bitmap for L3
+In-Reply-To: <6424b309216b276e46a66573320b3eed8209a0ed.camel@redhat.com>
+References: <20210910160633.451250-1-vkuznets@redhat.com>
+ <20210910160633.451250-2-vkuznets@redhat.com>
+ <6424b309216b276e46a66573320b3eed8209a0ed.camel@redhat.com>
+Date:   Mon, 13 Sep 2021 08:53:33 +0200
+Message-ID: <87lf412cgi.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAOpTY_ony8uDquFQR3=hRvzpGHic6O_0qhocbHCz7-swyNc-QQ@mail.gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="bU1dcWg4lkCgzNHSovWlqHEnK31xFUKQ0"
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---bU1dcWg4lkCgzNHSovWlqHEnK31xFUKQ0
-Content-Type: multipart/mixed; boundary="Ns9zvV6zrXb4oIs31bK9MFzwPdPidvlyU";
- protected-headers="v1"
-From: Juergen Gross <jgross@suse.com>
-To: Eduardo Habkost <ehabkost@redhat.com>,
- Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
- Vitaly Kuznetsov <vkuznets@redhat.com>
-Message-ID: <6a914c3e-7abe-1daa-67fc-fde8d20597aa@suse.com>
-Subject: Re: [PATCH v2 0/3] kvm: x86: Set KVM_MAX_VCPUS=1024,
- KVM_SOFT_MAX_VCPUS=710
-References: <20210903211600.2002377-1-ehabkost@redhat.com>
- <1111efc8-b32f-bd50-2c0f-4c6f506b544b@redhat.com>
- <YTv4rgPol5vILWay@google.com>
- <CAOpTY_ony8uDquFQR3=hRvzpGHic6O_0qhocbHCz7-swyNc-QQ@mail.gmail.com>
-In-Reply-To: <CAOpTY_ony8uDquFQR3=hRvzpGHic6O_0qhocbHCz7-swyNc-QQ@mail.gmail.com>
+Maxim Levitsky <mlevitsk@redhat.com> writes:
 
---Ns9zvV6zrXb4oIs31bK9MFzwPdPidvlyU
-Content-Type: multipart/mixed;
- boundary="------------2B11A60E786804181885A533"
-Content-Language: en-US
+> On Fri, 2021-09-10 at 18:06 +0200, Vitaly Kuznetsov wrote:
+>> When KVM runs as a nested hypervisor on top of Hyper-V it uses Enlightened
+>> VMCS and enables Enlightened MSR Bitmap feature for its L1s and L2s (which
+>> are actually L2s and L3s from Hyper-V's perspective). When MSR bitmap is
+>> updated, KVM has to reset HV_VMX_ENLIGHTENED_CLEAN_FIELD_MSR_BITMAP from
+>> clean fields to make Hyper-V aware of the change. For KVM's L1s, this is
+>> done in vmx_disable_intercept_for_msr()/vmx_enable_intercept_for_msr().
+>> MSR bitmap for L2 is build in nested_vmx_prepare_msr_bitmap() by blending
+>> MSR bitmap for L1 and L1's idea of MSR bitmap for L2. KVM, however, doesn't
+>> check if the resulting bitmap is different and never cleans
+>> HV_VMX_ENLIGHTENED_CLEAN_FIELD_MSR_BITMAP in eVMCS02. This is incorrect and
+>> may result in Hyper-V missing the update.
+>> 
+>> The issue could've been solved by calling evmcs_touch_msr_bitmap() for
+>> eVMCS02 from nested_vmx_prepare_msr_bitmap() unconditionally but doing so
+>> would not give any performance benefits (compared to not using Enlightened
+>> MSR Bitmap at all). 3-level nesting is also not a very common setup
+>> nowadays.
+>> 
+>> Don't enable 'Enlightened MSR Bitmap' feature for KVM's L2s (real L3s) for
+>> now.
+>> 
+>> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+>> ---
+>>  arch/x86/kvm/vmx/vmx.c | 22 +++++++++++++---------
+>>  1 file changed, 13 insertions(+), 9 deletions(-)
+>> 
+>> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+>> index 0c2c0d5ae873..ae470afcb699 100644
+>> --- a/arch/x86/kvm/vmx/vmx.c
+>> +++ b/arch/x86/kvm/vmx/vmx.c
+>> @@ -2654,15 +2654,6 @@ int alloc_loaded_vmcs(struct loaded_vmcs *loaded_vmcs)
+>>  		if (!loaded_vmcs->msr_bitmap)
+>>  			goto out_vmcs;
+>>  		memset(loaded_vmcs->msr_bitmap, 0xff, PAGE_SIZE);
+>> -
+>> -		if (IS_ENABLED(CONFIG_HYPERV) &&
+>> -		    static_branch_unlikely(&enable_evmcs) &&
+>> -		    (ms_hyperv.nested_features & HV_X64_NESTED_MSR_BITMAP)) {
+>> -			struct hv_enlightened_vmcs *evmcs =
+>> -				(struct hv_enlightened_vmcs *)loaded_vmcs->vmcs;
+>> -
+>> -			evmcs->hv_enlightenments_control.msr_bitmap = 1;
+>> -		}
+>>  	}
+>>  
+>>  	memset(&loaded_vmcs->host_state, 0, sizeof(struct vmcs_host_state));
+>> @@ -6861,6 +6852,19 @@ static int vmx_create_vcpu(struct kvm_vcpu *vcpu)
+>>  	}
+>>  
+>>  	vmx->loaded_vmcs = &vmx->vmcs01;
+>> +
+>> +	/*
+>> +	 * Use Hyper-V 'Enlightened MSR Bitmap' feature when KVM runs as a
+>> +	 * nested (L1) hypervisor and Hyper-V in L0 supports it.
+>> +	 */
+>> +	if (IS_ENABLED(CONFIG_HYPERV) && static_branch_unlikely(&enable_evmcs)
+>> +	    && (ms_hyperv.nested_features & HV_X64_NESTED_MSR_BITMAP)) {
+>> +		struct hv_enlightened_vmcs *evmcs =
+>> +			(struct hv_enlightened_vmcs *)vmx->loaded_vmcs->vmcs;
+>> +
+>> +		evmcs->hv_enlightenments_control.msr_bitmap = 1;
+>> +	}
+>> +
+>>  	cpu = get_cpu();
+>>  	vmx_vcpu_load(vcpu, cpu);
+>>  	vcpu->cpu = cpu;
+>
+> Makes sense.
+>
+> Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+>
+>
+> However, just a note that it is very very confusing that KVM can use eVMCS in both ways.
+>  
+>  
+> 'Client': It can both run under HyperV, and thus take advantage of eVMCS when it runs its guests (with
+> help of
+> HyperV)
+>  
+> 'Server' KVM can emulate some HyperV features, and one of these is eVMCS, thus a windows guest running
+> under KVM, can use KVM's eVMCS implementation to run nested guests.
+>  
+> This patch fails under
+> 'Client', while the other patches in the series fall under the 'Server' category,
+> and even more confusing, the patch 2 moves 'Client' code around, but it is intended for following patches
+> 3,4 which are
+> for Server.
+>  
 
-This is a multi-part message in MIME format.
---------------2B11A60E786804181885A533
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+All this is confusing indeed, KVM-on-Hyper-V and Hyper-V-on-KVM are two
+different beasts but it's not always clear from patch subject. I was
+thinking about adding this to patch prexes:
 
-On 11.09.21 17:26, Eduardo Habkost wrote:
-> Wouldn't it be simpler to just revert 76b4f357d0e7 and rename
-> KVM_MAX_VCPU_ID to KVM_MAX_VCPU_IDS?
->=20
-> As far as I can see, every single line of code in KVM (except the 3
-> lines touched by 76b4f357d0e7) treats both KVM_MAX_VCPU_ID and
-> KVM_CAP_MAX_VCPU_ID as exclusive. Including the API documentation.
+"KVM: VMX: KVM-on-Hyper-V: ... " 
+"KVM: nVMX: Hyper-V-on-KVM ..."
 
-I agree.
+or something similar.
 
-Will send patches.
+>
+> Thus this patch probably should be a separate patch, just to avoid confusion.
+>
+
+This patch is a weird one. We actually fix
+
+Hyper-V-on-KVM-on-Hyper-V case.
+
+Don't get confused! :-)
 
 
-Juergen
+> However, since this patch series is already posted, and I figured that out, and hopefully explained it here,
+> no need to do anything though!
+>
+>
+> Best regards,
+> 	Maxim Levitsky
+>
+>
+>
 
---------------2B11A60E786804181885A533
-Content-Type: application/pgp-keys;
- name="OpenPGP_0xB0DE9DD628BF132F.asc"
-Content-Transfer-Encoding: quoted-printable
-Content-Description: OpenPGP public key
-Content-Disposition: attachment;
- filename="OpenPGP_0xB0DE9DD628BF132F.asc"
+-- 
+Vitaly
 
------BEGIN PGP PUBLIC KEY BLOCK-----
-
-xsBNBFOMcBYBCACgGjqjoGvbEouQZw/ToiBg9W98AlM2QHV+iNHsEs7kxWhKMjrioyspZKOBy=
-cWx
-w3ie3j9uvg9EOB3aN4xiTv4qbnGiTr3oJhkB1gsb6ToJQZ8uxGq2kaV2KL9650I1SJvedYm8O=
-f8Z
-d621lSmoKOwlNClALZNew72NjJLEzTalU1OdT7/i1TXkH09XSSI8mEQ/ouNcMvIJNwQpd369y=
-9bf
-IhWUiVXEK7MlRgUG6MvIj6Y3Am/BBLUVbDa4+gmzDC9ezlZkTZG2t14zWPvxXP3FAp2pkW0xq=
-G7/
-377qptDmrk42GlSKN4z76ELnLxussxc7I2hx18NUcbP8+uty4bMxABEBAAHNHEp1ZXJnZW4gR=
-3Jv
-c3MgPGpnQHBmdXBmLm5ldD7CwHkEEwECACMFAlOMcBYCGwMHCwkIBwMCAQYVCAIJCgsEFgIDA=
-QIe
-AQIXgAAKCRCw3p3WKL8TL0KdB/93FcIZ3GCNwFU0u3EjNbNjmXBKDY4FUGNQH2lvWAUy+dnyT=
-hpw
-dtF/jQ6j9RwE8VP0+NXcYpGJDWlNb9/JmYqLiX2Q3TyevpB0CA3dbBQp0OW0fgCetToGIQrg0=
-MbD
-1C/sEOv8Mr4NAfbauXjZlvTj30H2jO0u+6WGM6nHwbh2l5O8ZiHkH32iaSTfN7Eu5RnNVUJbv=
-oPH
-Z8SlM4KWm8rG+lIkGurqqu5gu8q8ZMKdsdGC4bBxdQKDKHEFExLJK/nRPFmAuGlId1E3fe10v=
-5QL
-+qHI3EIPtyfE7i9Hz6rVwi7lWKgh7pe0ZvatAudZ+JNIlBKptb64FaiIOAWDCx1SzR9KdWVyZ=
-2Vu
-IEdyb3NzIDxqZ3Jvc3NAc3VzZS5jb20+wsB5BBMBAgAjBQJTjHCvAhsDBwsJCAcDAgEGFQgCC=
-QoL
-BBYCAwECHgECF4AACgkQsN6d1ii/Ey/HmQf/RtI7kv5A2PS4RF7HoZhPVPogNVbC4YA6lW7Dr=
-Wf0
-teC0RR3MzXfy6pJ+7KLgkqMlrAbN/8Dvjoz78X+5vhH/rDLa9BuZQlhFmvcGtCF8eR0T1v0nC=
-/nu
-AFVGy+67q2DH8As3KPu0344TBDpAvr2uYM4tSqxK4DURx5INz4ZZ0WNFHcqsfvlGJALDeE0Lh=
-ITT
-d9jLzdDad1pQSToCnLl6SBJZjDOX9QQcyUigZFtCXFst4dlsvddrxyqT1f17+2cFSdu7+ynLm=
-XBK
-7abQ3rwJY8SbRO2iRulogc5vr/RLMMlscDAiDkaFQWLoqHHOdfO9rURssHNN8WkMnQfvUewRz=
-80h
-SnVlcmdlbiBHcm9zcyA8amdyb3NzQG5vdmVsbC5jb20+wsB5BBMBAgAjBQJTjHDXAhsDBwsJC=
-AcD
-AgEGFQgCCQoLBBYCAwECHgECF4AACgkQsN6d1ii/Ey8PUQf/ehmgCI9jB9hlgexLvgOtf7PJn=
-FOX
-gMLdBQgBlVPO3/D9R8LtF9DBAFPNhlrsfIG/SqICoRCqUcJ96Pn3P7UUinFG/I0ECGF4EvTE1=
-jnD
-kfJZr6jrbjgyoZHiw/4BNwSTL9rWASyLgqlA8u1mf+c2yUwcGhgkRAd1gOwungxcwzwqgljf0=
-N51
-N5JfVRHRtyfwq/ge+YEkDGcTU6Y0sPOuj4Dyfm8fJzdfHNQsWq3PnczLVELStJNdapwPOoE+l=
-otu
-fe3AM2vAEYJ9rTz3Cki4JFUsgLkHFqGZarrPGi1eyQcXeluldO3m91NK/1xMI3/+8jbO0tsn1=
-tqS
-EUGIJi7ox80eSnVlcmdlbiBHcm9zcyA8amdyb3NzQHN1c2UuZGU+wsB5BBMBAgAjBQJTjHDrA=
-hsD
-BwsJCAcDAgEGFQgCCQoLBBYCAwECHgECF4AACgkQsN6d1ii/Ey+LhQf9GL45eU5vOowA2u5N3=
-g3O
-ZUEBmDHVVbqMtzwlmNC4k9Kx39r5s2vcFl4tXqW7g9/ViXYuiDXb0RfUpZiIUW89siKrkzmQ5=
-dM7
-wRqzgJpJwK8Bn2MIxAKArekWpiCKvBOB/Cc+3EXE78XdlxLyOi/NrmSGRIov0karw2RzMNOu5=
-D+j
-LRZQd1Sv27AR+IP3I8U4aqnhLpwhK7MEy9oCILlgZ1QZe49kpcumcZKORmzBTNh30FVKK1Evm=
-V2x
-AKDoaEOgQB4iFQLhJCdP1I5aSgM5IVFdn7v5YgEYuJYx37IoN1EblHI//x/e2AaIHpzK5h88N=
-Eaw
-QsaNRpNSrcfbFmAg987ATQRTjHAWAQgAyzH6AOODMBjgfWE9VeCgsrwH3exNAU32gLq2xvjpW=
-nHI
-s98ndPUDpnoxWQugJ6MpMncr0xSwFmHEgnSEjK/PAjppgmyc57BwKII3sV4on+gDVFJR6Y8ZR=
-wgn
-BC5mVM6JjQ5xDk8WRXljExRfUX9pNhdE5eBOZJrDRoLUmmjDtKzWaDhIg/+1Hzz93X4fCQkNV=
-bVF
-LELU9bMaLPBG/x5q4iYZ2k2ex6d47YE1ZFdMm6YBYMOljGkZKwYde5ldM9mo45mmwe0icXKLk=
-pEd
-IXKTZeKDO+Hdv1aqFuAcccTg9RXDQjmwhC3yEmrmcfl0+rPghO0Iv3OOImwTEe4co3c1mwARA=
-QAB
-wsBfBBgBAgAJBQJTjHAWAhsMAAoJELDendYovxMvQ/gH/1ha96vm4P/L+bQpJwrZ/dneZcmEw=
-Tbe
-8YFsw2V/Buv6Z4Mysln3nQK5ZadD534CF7TDVft7fC4tU4PONxF5D+/tvgkPfDAfF77zy2AH1=
-vJz
-Q1fOU8lYFpZXTXIHb+559UqvIB8AdgR3SAJGHHt4RKA0F7f5ipYBBrC6cyXJyyoprT10EMvU8=
-VGi
-wXvTyJz3fjoYsdFzpWPlJEBRMedCot60g5dmbdrZ5DWClAr0yau47zpWj3enf1tLWaqcsuylW=
-svi
-uGjKGw7KHQd3bxALOknAp4dN3QwBYCKuZ7AddY9yjynVaD5X7nF9nO5BjR/i1DG86lem3iBDX=
-zXs
-ZDn8R38=3D
-=3D2wuH
------END PGP PUBLIC KEY BLOCK-----
-
---------------2B11A60E786804181885A533--
-
---Ns9zvV6zrXb4oIs31bK9MFzwPdPidvlyU--
-
---bU1dcWg4lkCgzNHSovWlqHEnK31xFUKQ0
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature"
-
------BEGIN PGP SIGNATURE-----
-
-wsB5BAABCAAjFiEEhRJncuj2BJSl0Jf3sN6d1ii/Ey8FAmE+3QAFAwAAAAAACgkQsN6d1ii/Ey/r
-dgf+M39aXqEdr4Dd9dhtbxlaJN0bQnsdR04vn8bmgWHqm6p0NYsmAjmH7hpY/KSzoLiLqPNkE3A/
-JdV6VWFQBoEmTEUL/Y0S6p5wAt+FFNbP09DjPO8tEGXayJmNGQWMCddHWky2n3dvrvM9+O5wWYwa
-fdHf6n4cpacrWMXIdzzIaZgth4Ga30+bamIuLhq8aniyltyWEs/SFiPRGhOlMelAiH/sGAyf7Qm+
-RjfY0ubC05o766eMyAc+Tm5ZFT97NUplplJUNhmI5IY2Z2rDJtX03fKUm23Y8IwDnvgipvMPZ0Xk
-T21nQr7wzVDXmUfNueTWdgilZqz6858+yTYih+4n0g==
-=2TKb
------END PGP SIGNATURE-----
-
---bU1dcWg4lkCgzNHSovWlqHEnK31xFUKQ0--
