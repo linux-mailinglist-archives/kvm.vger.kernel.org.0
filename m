@@ -2,196 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 419C6408506
-	for <lists+kvm@lfdr.de>; Mon, 13 Sep 2021 08:57:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A478A408512
+	for <lists+kvm@lfdr.de>; Mon, 13 Sep 2021 09:02:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237520AbhIMG7K (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Sep 2021 02:59:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46568 "EHLO
+        id S237531AbhIMHEH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Sep 2021 03:04:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:35074 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237429AbhIMG7J (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 13 Sep 2021 02:59:09 -0400
+        by vger.kernel.org with ESMTP id S237454AbhIMHEG (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 13 Sep 2021 03:04:06 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1631516274;
+        s=mimecast20190719; t=1631516571;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=0jCqRhc3bcZaCNkwZY/q58ovcD1/WO6KrpN3X1X+eYI=;
-        b=QAHEzakJ90IJ1CQn/lZBpZgMtE9ri0GOrvQlaZvMVZVFYg0G9mTpgleNWltt6byaxZLomv
-        MM9sus3QfHSWUayqe1kj2sCyxVKHzTdCZYhXSgMkrvBS1GqLVpy4XbkCIgBy4jxAi/tIcj
-        sH//vTpeE5Kn1RycmytQMMJN4cOUcqQ=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-331-3lxLb6RcPJ-ZvZvmYCDsFw-1; Mon, 13 Sep 2021 02:57:52 -0400
-X-MC-Unique: 3lxLb6RcPJ-ZvZvmYCDsFw-1
-Received: by mail-ej1-f69.google.com with SMTP id f10-20020a170906390a00b005eeb8ca19f7so1652955eje.7
-        for <kvm@vger.kernel.org>; Sun, 12 Sep 2021 23:57:52 -0700 (PDT)
+        bh=DmQmip+5IO9siRqxDMXPdeE7VXRN9aesxsgPai5q4c8=;
+        b=W6grbrjjYh9dZOLq3zIayCsTElr+1A7c1XXct0oZ8Otim92HUWyYiXAGx62siAquskQXVx
+        9wlxntrgbLNLfZKNR+VZfztTDrxWeYQxvUdnobefDLTA2NH5Pdau1y0Dy7C/k3EW57hMJ1
+        J3CKOVcLckgGRny0JDMhjQx8OQ5QWX0=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-106-Yuhbcm65NA29F5hIuoYIZA-1; Mon, 13 Sep 2021 03:02:49 -0400
+X-MC-Unique: Yuhbcm65NA29F5hIuoYIZA-1
+Received: by mail-wr1-f70.google.com with SMTP id r7-20020a5d6947000000b0015e0f68a63bso104745wrw.22
+        for <kvm@vger.kernel.org>; Mon, 13 Sep 2021 00:02:49 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
          :message-id:mime-version;
-        bh=0jCqRhc3bcZaCNkwZY/q58ovcD1/WO6KrpN3X1X+eYI=;
-        b=jW1RZSdOSJmESKDKLiAA6WN0WGIzYAv80cHgHK1nla2YHzw87+DA+e7ejlIdMjz9XM
-         yU9xy/KxL2pkdWGqI1A2c563lWwIvzFJMTwjrtbhqKYiUwnsAuTzsyg/7Hc2GswclVgs
-         y+x1LERYA4DnwDsVqgF3ocFnYCBc5XgMb6EJro+Nn/22MsvOYIhjsrtVnsHK9a0wEvyM
-         Ektdd9sxTR5aHxnra8SEVY7ZqPd3pjOGXk1FjOpflxOiAiFqt+kG89kZwqXidku5pTNF
-         hIFM3V6TxY+r+FS5VYkZiWdLD8avGdu4P0yDkDbhrRx3YYG+3B4V5iypn7Ds7t23cTma
-         PFlA==
-X-Gm-Message-State: AOAM533T304ShLixXxo7YLAe8vDUKQmxK6QjU/S+v8o6dbjKuaY9kJxw
-        LlKkFjNDouAbr99wlAL95hoStZeZuRkj0EUkewLYQg5Gr4Cy8BbO6x8Z2WffXxpYE+mEy8AsGZl
-        CWQRKoI4UBJ1G
-X-Received: by 2002:a17:906:2bdb:: with SMTP id n27mr11227384ejg.86.1631516271584;
-        Sun, 12 Sep 2021 23:57:51 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy5mdrAjiCCyG+UIsMaHgbGCKDsyGBnp8g9M9bsnrDoBc947WLZ+oMsZuxXFEZKzCu3CpSr9Q==
-X-Received: by 2002:a17:906:2bdb:: with SMTP id n27mr11227366ejg.86.1631516271318;
-        Sun, 12 Sep 2021 23:57:51 -0700 (PDT)
+        bh=DmQmip+5IO9siRqxDMXPdeE7VXRN9aesxsgPai5q4c8=;
+        b=ApbBqaEb+Dt+ZhD80h3hAPuMGg7K94a6N8rcZ0l38bugnsR5/KldJoeN8McyaboRIl
+         ys2QeiHpMYTui+09cOY/jNIY1HHK2NULSrAA5to0oY5vPbZucG0t5wnr6mSwTzWZlqvV
+         4+43Ra6pHTS1nw7GxwZMjx/GgYakmU8uJVp58ofujfdturko02HJWEKUCyN3V+JZfjsq
+         O2yg/Xebt7ESHcoHUpXn9ZbsQ/Bu/ufR4tfJzy9NeXCsn4GbzI7chxP+QJLFxAOkKemZ
+         ApkY/DjE2MZFqv6tuh5rZWy2CZYkjlWtBKHmB65BzR9G/nW6eeidA9zivvIpcGq/+ZFe
+         nlDQ==
+X-Gm-Message-State: AOAM532itI9xqSyaPLsoVDGwWHvQR+tQ7Zs9qtYCa3DCjiMixWUS3F6A
+        WiQLYQbIR6+uwZcSx1VgtwQXBDlZeDsnrpOC9QBq+05pseABfN2H4YrEUwxUxCWW3DuKSmHRfh/
+        4MxFodCdD0iv9
+X-Received: by 2002:a1c:ac07:: with SMTP id v7mr9398193wme.160.1631516568492;
+        Mon, 13 Sep 2021 00:02:48 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyytOfLrNJ/fWUKhedt0MGFoZXpWHC40WzlmnUyObEMReSAOJa9m8EX9faxmiXT98S3Xpy/Ug==
+X-Received: by 2002:a1c:ac07:: with SMTP id v7mr9398166wme.160.1631516568237;
+        Mon, 13 Sep 2021 00:02:48 -0700 (PDT)
 Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id z6sm2897536ejj.13.2021.09.12.23.57.50
+        by smtp.gmail.com with ESMTPSA id p13sm6402656wro.8.2021.09.13.00.02.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 12 Sep 2021 23:57:50 -0700 (PDT)
+        Mon, 13 Sep 2021 00:02:47 -0700 (PDT)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
+To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 3/4] KVM: nVMX: Track whether changes in L0 require MSR
- bitmap for L2 to be rebuilt
-In-Reply-To: <37efb41fda41317bf04c0cb805792af261894a1a.camel@redhat.com>
-References: <20210910160633.451250-1-vkuznets@redhat.com>
- <20210910160633.451250-4-vkuznets@redhat.com>
- <37efb41fda41317bf04c0cb805792af261894a1a.camel@redhat.com>
-Date:   Mon, 13 Sep 2021 08:57:49 +0200
-Message-ID: <87ilz52c9e.fsf@vitty.brq.redhat.com>
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] KVM: x86: Query vcpu->vcpu_idx directly and drop
+ its accessor
+In-Reply-To: <20210910183220.2397812-2-seanjc@google.com>
+References: <20210910183220.2397812-1-seanjc@google.com>
+ <20210910183220.2397812-2-seanjc@google.com>
+Date:   Mon, 13 Sep 2021 09:02:46 +0200
+Message-ID: <87fsu92c15.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Maxim Levitsky <mlevitsk@redhat.com> writes:
+Sean Christopherson <seanjc@google.com> writes:
 
-> On Fri, 2021-09-10 at 18:06 +0200, Vitaly Kuznetsov wrote:
->> Introduce a flag to keep track of whether MSR bitmap for L2 needs to be
->> rebuilt due to changes in MSR bitmap for L1 or switching to a different
->> L2. This information will be used for Enlightened MSR Bitmap feature for
->> Hyper-V guests.
->> 
->> Note, setting msr_bitmap_changed to 'true' from set_current_vmptr() is
->> not really needed for Enlightened MSR Bitmap as the feature can only
->> be used in conjunction with Enlightened VMCS but let's keep tracking
->> information complete, it's cheap and in the future similar PV feature can
->> easily be implemented for KVM on KVM too.
->> 
->> No functional change intended.
->> 
->> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
->> ---
->>  arch/x86/kvm/vmx/nested.c | 9 ++++++++-
->>  arch/x86/kvm/vmx/vmx.c    | 2 ++
->>  arch/x86/kvm/vmx/vmx.h    | 6 ++++++
->>  3 files changed, 16 insertions(+), 1 deletion(-)
->> 
->> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
->> index ccb03d69546c..42cd95611892 100644
->> --- a/arch/x86/kvm/vmx/nested.c
->> +++ b/arch/x86/kvm/vmx/nested.c
->> @@ -2053,10 +2053,13 @@ static enum nested_evmptrld_status nested_vmx_handle_enlightened_vmptrld(
->>  	 * Clean fields data can't be used on VMLAUNCH and when we switch
->>  	 * between different L2 guests as KVM keeps a single VMCS12 per L1.
->>  	 */
->> -	if (from_launch || evmcs_gpa_changed)
->> +	if (from_launch || evmcs_gpa_changed) {
->>  		vmx->nested.hv_evmcs->hv_clean_fields &=
->>  			~HV_VMX_ENLIGHTENED_CLEAN_FIELD_ALL;
->>  
->> +		vmx->nested.msr_bitmap_changed = true;
->> +	}
->> +
->>  	return EVMPTRLD_SUCCEEDED;
->>  }
->>  
->> @@ -3240,6 +3243,8 @@ static bool nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
->>  	else
->>  		exec_controls_clearbit(vmx, CPU_BASED_USE_MSR_BITMAPS);
->>  
->> +	vmx->nested.msr_bitmap_changed = false;
+> Read vcpu->vcpu_idx directly instead of bouncing through the one-line
+> wrapper, kvm_vcpu_get_idx(), and drop the wrapper.  The wrapper is a
+> remnant of the original implementation and serves no purpose; remove it
+> before it gains more users.
 >
-> Very minor nitpick: Maybe I would put this into nested_vmx_prepare_msr_bitmap,
-> a bit closer to the action, but this is fine like this as well.
+> Back when kvm_vcpu_get_idx() was added by commit 497d72d80a78 ("KVM: Add
+> kvm_vcpu_get_idx to get vcpu index in kvm->vcpus"), the implementation
+> was more than just a simple wrapper as vcpu->vcpu_idx did not exist and
+> retrieving the index meant walking over the vCPU array to find the given
+> vCPU.
 >
-
-I don't have a strong preference here, can move it to nested_vmx_prepare_msr_bitmap().
-
->> +
->>  	return true;
->>  }
->>  
->> @@ -5273,6 +5278,7 @@ static void set_current_vmptr(struct vcpu_vmx *vmx, gpa_t vmptr)
->>  		vmx->nested.need_vmcs12_to_shadow_sync = true;
->>  	}
->>  	vmx->nested.dirty_vmcs12 = true;
->> +	vmx->nested.msr_bitmap_changed = true;
->>  }
->>  
->>  /* Emulate the VMPTRLD instruction */
->> @@ -6393,6 +6399,7 @@ static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
->>  		goto error_guest_mode;
->>  
->>  	vmx->nested.dirty_vmcs12 = true;
->> +	vmx->nested.msr_bitmap_changed = true;
+> When vcpu_idx was introduced by commit 8750e72a79dd ("KVM: remember
+> position in kvm->vcpus array"), the helper was left behind, likely to
+> avoid extra thrash (but even then there were only two users, the original
+> arm usage having been removed at some point in the past).
 >
-> Is this needed? Setting the nested state should eventually trigger call to
-> nested_vmx_handle_enlightened_vmptrld.
+> No functional change intended.
 >
+> Suggested-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/kvm/hyperv.c    | 7 +++----
+>  arch/x86/kvm/hyperv.h    | 2 +-
+>  include/linux/kvm_host.h | 5 -----
+>  3 files changed, 4 insertions(+), 10 deletions(-)
+>
+> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+> index fe4a02715266..04dbc001f4fc 100644
+> --- a/arch/x86/kvm/hyperv.c
+> +++ b/arch/x86/kvm/hyperv.c
+> @@ -939,7 +939,7 @@ static int kvm_hv_vcpu_init(struct kvm_vcpu *vcpu)
+>  	for (i = 0; i < ARRAY_SIZE(hv_vcpu->stimer); i++)
+>  		stimer_init(&hv_vcpu->stimer[i], i);
 >  
+> -	hv_vcpu->vp_index = kvm_vcpu_get_idx(vcpu);
+> +	hv_vcpu->vp_index = vcpu->vcpu_idx;
+>  
+>  	return 0;
+>  }
+> @@ -1444,7 +1444,6 @@ static int kvm_hv_set_msr(struct kvm_vcpu *vcpu, u32 msr, u64 data, bool host)
+>  	switch (msr) {
+>  	case HV_X64_MSR_VP_INDEX: {
+>  		struct kvm_hv *hv = to_kvm_hv(vcpu->kvm);
+> -		int vcpu_idx = kvm_vcpu_get_idx(vcpu);
+>  		u32 new_vp_index = (u32)data;
+>  
+>  		if (!host || new_vp_index >= KVM_MAX_VCPUS)
+> @@ -1459,9 +1458,9 @@ static int kvm_hv_set_msr(struct kvm_vcpu *vcpu, u32 msr, u64 data, bool host)
+>  		 * VP index is changing, adjust num_mismatched_vp_indexes if
+>  		 * it now matches or no longer matches vcpu_idx.
+>  		 */
+> -		if (hv_vcpu->vp_index == vcpu_idx)
+> +		if (hv_vcpu->vp_index == vcpu->vcpu_idx)
+>  			atomic_inc(&hv->num_mismatched_vp_indexes);
+> -		else if (new_vp_index == vcpu_idx)
+> +		else if (new_vp_index == vcpu->vcpu_idx)
+>  			atomic_dec(&hv->num_mismatched_vp_indexes);
+>  
+>  		hv_vcpu->vp_index = new_vp_index;
+> diff --git a/arch/x86/kvm/hyperv.h b/arch/x86/kvm/hyperv.h
+> index 730da8537d05..ed1c4e546d04 100644
+> --- a/arch/x86/kvm/hyperv.h
+> +++ b/arch/x86/kvm/hyperv.h
+> @@ -83,7 +83,7 @@ static inline u32 kvm_hv_get_vpindex(struct kvm_vcpu *vcpu)
+>  {
+>  	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
+>  
+> -	return hv_vcpu ? hv_vcpu->vp_index : kvm_vcpu_get_idx(vcpu);
+> +	return hv_vcpu ? hv_vcpu->vp_index : vcpu->vcpu_idx;
+>  }
+>  
+>  int kvm_hv_set_msr_common(struct kvm_vcpu *vcpu, u32 msr, u64 data, bool host);
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index e4d712e9f760..31071ad821e2 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -721,11 +721,6 @@ static inline struct kvm_vcpu *kvm_get_vcpu_by_id(struct kvm *kvm, int id)
+>  	return NULL;
+>  }
+>  
+> -static inline int kvm_vcpu_get_idx(struct kvm_vcpu *vcpu)
+> -{
+> -	return vcpu->vcpu_idx;
+> -}
+> -
+>  #define kvm_for_each_memslot(memslot, slots)				\
+>  	for (memslot = &slots->memslots[0];				\
+>  	     memslot < slots->memslots + slots->used_slots; memslot++)	\
 
-Strictly speaking - no (meaning that nothing is going to change if we
-just drop this hunk). My intention was to keep tracking information
-complete: after vmx_set_nested_state() we certainly need to re-build MSR
-Bitmap 02 and that's what 'msr_bitmap_changed' tracks. We can replace
-this with a comment if needed (but I'd slightly prefer to keep it -
-unless there's a reason not to).
-
->
->>  	ret = nested_vmx_enter_non_root_mode(vcpu, false);
->>  	if (ret)
->>  		goto error_guest_mode;
->> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
->> index ad33032e8588..2dbfb5d838db 100644
->> --- a/arch/x86/kvm/vmx/vmx.c
->> +++ b/arch/x86/kvm/vmx/vmx.c
->> @@ -3734,6 +3734,8 @@ static void vmx_msr_bitmap_l01_changed(struct vcpu_vmx *vmx)
->>  	 */
->>  	if (static_branch_unlikely(&enable_evmcs))
->>  		evmcs_touch_msr_bitmap();
->> +
->> +	vmx->nested.msr_bitmap_changed = true;
->>  }
->>  
->>  void vmx_disable_intercept_for_msr(struct kvm_vcpu *vcpu, u32 msr, int type)
->> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
->> index 4858c5fd95f2..b6596fc2943a 100644
->> --- a/arch/x86/kvm/vmx/vmx.h
->> +++ b/arch/x86/kvm/vmx/vmx.h
->> @@ -148,6 +148,12 @@ struct nested_vmx {
->>  	bool need_vmcs12_to_shadow_sync;
->>  	bool dirty_vmcs12;
->>  
->> +	/*
->> +	 * Indicates whether MSR bitmap for L2 needs to be rebuilt due to
->> +	 * changes in MSR bitmap for L1 or switching to a different L2.
->> +	 */
->> +	bool msr_bitmap_changed;
->> +
->>  	/*
->>  	 * Indicates lazily loaded guest state has not yet been decached from
->>  	 * vmcs02.
->
->
-> Best regards,
-> 	Maxim Levitsky
->
+Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 
 -- 
 Vitaly
