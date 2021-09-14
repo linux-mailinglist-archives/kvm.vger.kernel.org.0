@@ -2,99 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AC3C440AB89
-	for <lists+kvm@lfdr.de>; Tue, 14 Sep 2021 12:19:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E7E2940ABD7
+	for <lists+kvm@lfdr.de>; Tue, 14 Sep 2021 12:39:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231484AbhINKU4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Sep 2021 06:20:56 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:23089 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229969AbhINKUx (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 14 Sep 2021 06:20:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1631614775;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=DRAlggCC+PYlUePAB0cF2Y6j/OP0F7mIhm9zbgJqV5g=;
-        b=Bt0kNv/q4NZMamPIMD/8Fe4X3wcGWv1zk85EnYXvhHCi4PiuDtdlc4AOu7YiiQ/2ApMaLX
-        /JaxtflW5d69M0kuqRuh3110nNoFyzCAJjp5OiUfIhY0qcMfz4dov0PcJGwWw6vL8lZxX7
-        Pdhn+KNyKrquRMUTt6Am5o2gE7Tg394=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-266-Frjee4D3MdGQyBbR8vik6A-1; Tue, 14 Sep 2021 06:19:34 -0400
-X-MC-Unique: Frjee4D3MdGQyBbR8vik6A-1
-Received: by mail-ed1-f71.google.com with SMTP id b8-20020a056402350800b003c5e3d4e2a7so6528644edd.2
-        for <kvm@vger.kernel.org>; Tue, 14 Sep 2021 03:19:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=DRAlggCC+PYlUePAB0cF2Y6j/OP0F7mIhm9zbgJqV5g=;
-        b=B6xcGoSvvr3x63kWxFYTmYVjgUJfYK2IUJ8TvYiKWyHNcmx8l8tVVmrQg6vEkw8QgU
-         K7uI9GlJ1NojuPgAlZVwAkcCRK3oUyNhF9dymRAS71h6Od4JPx0R7rblQdsSR8ML6X3p
-         fRqIwMk79+RHEQAFXdhVA9Zj5W7esudM+j6YZ827Y/uM5KXqZtKMqodZ8ImSrVNZSuro
-         hdLrS/uyIEXvI46QgQySaDMReHaDtTofr+wZ8unO2PgMCNmgA0d1MxqcGXW8tUoqI5qv
-         S3TyIfoKP+G+YVvx0vhLwHNuuRr2IEMzyacxafslkfS44kRtFybfRkQk4b+qms1xG9/i
-         mh1A==
-X-Gm-Message-State: AOAM531DbNtkW7A0Cb9eBjSCMx909a+NNHlY2ouM+EXKAOicvWuIuyys
-        XCkTNI5q2X/7lx6oJ7pyhX8/aom+A8WgEyUfsx43BQRpGTUtkrY2yp78xAxNzPPk9jaK8U0plFE
-        xpZfEZznbRuEs
-X-Received: by 2002:a17:907:76e7:: with SMTP id kg7mr16778431ejc.344.1631614773414;
-        Tue, 14 Sep 2021 03:19:33 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxbCELqwjjt8QQVuD+3BuPAl2MJy/czcHXmaprwjH6qzNCYuRmte+5SasZsQL6iipLwMo7OSg==
-X-Received: by 2002:a17:907:76e7:: with SMTP id kg7mr16778412ejc.344.1631614773211;
-        Tue, 14 Sep 2021 03:19:33 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id dg18sm2398050edb.44.2021.09.14.03.19.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 14 Sep 2021 03:19:32 -0700 (PDT)
-Subject: Re: [RFC/RFT PATCH 0/2] x86: sgx_vepc: implement ioctl to EREMOVE all
- pages
-To:     Yang Zhong <yang.zhong@intel.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
-        linux-sgx@vger.kernel.org, jarkko@kernel.org,
-        dave.hansen@linux.intel.com
-References: <20210913131153.1202354-1-pbonzini@redhat.com>
- <20210914071030.GA28797@yangzhon-Virtual>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8e1c6b6d-6a73-827e-f496-b17b3c0f8c89@redhat.com>
-Date:   Tue, 14 Sep 2021 12:19:31 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        id S231844AbhINKk7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Sep 2021 06:40:59 -0400
+Received: from mail.kernel.org ([198.145.29.99]:56594 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231774AbhINKk5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Sep 2021 06:40:57 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 91A826112D;
+        Tue, 14 Sep 2021 10:39:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1631615980;
+        bh=X/xWVryAoLR7F4gV0F2zY4/xYU1ChD2peTUfv0rUZc8=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=VMQ3Uy3nchC/bZwF0x8e+1q47nyPm+/I0t6LMEt3rojKp8ZMlO6cDZd58Ez/nsLGy
+         2W283wCjSURRX5KHRrB57FdM1zweXDeu2ZpTXBKn2mjfUoeRqILe2drBy9HfF473Qu
+         p4EGedimD4SrGl9ve13ObSIQD3uuVNldUU7VOcoLrwsvpgjNlDIM3YmTjvTSz35lII
+         XondBEOe0/Vkvj6I3xQ/jcc+zdMCOQUAW2s1lj/KfASpqZ6j0mRspEuwkV8lkBzgOn
+         VaF9l7MHrDaCGQK0NL3HK8j54cKDwork356wqYoMsfjNSh8QDQTmMITvMfQH30C9kB
+         wbSqDa5qRu2kA==
+Date:   Tue, 14 Sep 2021 11:39:00 +0100
+From:   Mark Brown <broonie@kernel.org>
+To:     Raghavendra Rao Ananta <rananta@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Andrew Jones <drjones@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v4 02/18] KVM: arm64: selftests: Add sysreg.h
+Message-ID: <20210914103900.GC4434@sirena.org.uk>
+References: <20210909013818.1191270-1-rananta@google.com>
+ <20210909013818.1191270-3-rananta@google.com>
+ <20210909171755.GF5176@sirena.org.uk>
+ <CAJHc60yJ6621=TezncgsMR+DdYxzXY1oF-QLeARwq8HowH6sVQ@mail.gmail.com>
+ <20210910083011.GA4474@sirena.org.uk>
+ <CAJHc60z0kLzrA3FfQeD0RFZE-PscnDsxxqkVwzcNFcCkf_FRPw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20210914071030.GA28797@yangzhon-Virtual>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="0vzXIDBeUiKkjNJl"
+Content-Disposition: inline
+In-Reply-To: <CAJHc60z0kLzrA3FfQeD0RFZE-PscnDsxxqkVwzcNFcCkf_FRPw@mail.gmail.com>
+X-Cookie: This space intentionally left blank.
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 14/09/21 09:10, Yang Zhong wrote:
-> On Mon, Sep 13, 2021 at 09:11:51AM -0400, Paolo Bonzini wrote:
->> Based on discussions from the previous week(end), this series implements
->> a ioctl that performs EREMOVE on all pages mapped by a /dev/sgx_vepc
->> file descriptor.  Other possibilities, such as closing and reopening
->> the device, are racy.
->>
->> The patches are untested, but I am posting them because they are simple
->> and so that Yang Zhong can try using them in QEMU.
->>
-> 
->    Paolo, i re-implemented one reset patch in the Qemu side to call this ioctl(),
->    and did some tests on Windows and Linux guest, the Windows/Linux guest reboot
->    work well.
-> 
->    So, it is time for me to send this reset patch to Qemu community? or wait for
->    this kernel patchset merged? thanks!
 
-Let's wait for this patch to be accepted first.  I'll wait a little more 
-for Jarkko and Dave to comment on this, and include your "Tested-by".
+--0vzXIDBeUiKkjNJl
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-I will also add cond_resched() on the final submission.
+On Mon, Sep 13, 2021 at 04:38:29PM -0700, Raghavendra Rao Ananta wrote:
 
-Paolo
+> I was looking into this though and could only find some utilities such
+> as tools/iio/, tools/spi/, and so on, which seem to create a symbolic
+> link to the header present in the kernel (rather than copying). Is
+> this what you were referring to?
 
+TBH I'm not exactly aware of how it works, just that it does work - the
+main case I was thinking of was the uapi headers, mainly when used in
+kselftest.  Those look like they're actual copies rather than symlinks
+so I guess it's a different mechanism to what's used by the other tools
+you found.
+
+--0vzXIDBeUiKkjNJl
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmFAe8MACgkQJNaLcl1U
+h9B44Af/SfJ+AN5Ix/ZXr/siuBNgcCpe3/mrChxg41mKS/t+k7AWSAqfnOD/iUcf
+oZC0i22AAWeRNATEsToyHoax/Bqdr/HWpOSzajwbgP9Dn9rhvpJscPAxy4kq1Y78
+hwa+3eHPhRfPx98ZiT5HFFVPtx2eg1wDiO4YkHGyDfEO8ChLMpylYJPI4IwIzU36
+ZpT0Ked+cJvArWiX5JslxeGzHn+jJazjkO//PdltUMw6JnhNfHV3uXYfvMsmBOsd
+yRAtlgPEah/p33l4ZmkTH7y0quM4XaWFmNOOH4yuMDn2dAr2+9cg2TRbL0jQzAVL
+pqf78AH3B6XfTRQDQRSvHCkerk8o8w==
+=R/0t
+-----END PGP SIGNATURE-----
+
+--0vzXIDBeUiKkjNJl--
