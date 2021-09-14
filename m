@@ -2,93 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9185A40B3B6
-	for <lists+kvm@lfdr.de>; Tue, 14 Sep 2021 17:51:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BB15540B3BF
+	for <lists+kvm@lfdr.de>; Tue, 14 Sep 2021 17:52:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235632AbhINPwW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Sep 2021 11:52:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49667 "EHLO
+        id S234648AbhINPxp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Sep 2021 11:53:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48443 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234993AbhINPvy (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 14 Sep 2021 11:51:54 -0400
+        by vger.kernel.org with ESMTP id S231928AbhINPxh (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 14 Sep 2021 11:53:37 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1631634636;
+        s=mimecast20190719; t=1631634740;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=jJZEdwvFQ3ljWbLKCYoI62KGMcI1gt7/agR2sAPSxa0=;
-        b=XRtPb7vWBFqmWqr0JaSO+N7EC7b524wqv47V4WczEDyw9EePkg1o/a/Bqu4CSBHXRcRybc
-        jVIQZYWg/RzCBJaosvKdSz8Q6c/XI8xRnezXEg8cSwTH9QZzx6SzcxuTeAHwBp1/Cuk3PQ
-        lpUnfJIu4jd/TiuxheWVXwJcaB0dsn4=
+         content-transfer-encoding:content-transfer-encoding;
+        bh=rsc7F78hfpb2cAPyQAe2qVvV2kE4WtG8AgRwBpIg1Ek=;
+        b=gN3+S48OYs2B9Q64FHWV5HU+BEOagPrJP60go8TaCcNYAMcNoVL0rl8icO21WVXCUBaivi
+        /pLaMnosooKXEto8+fXP73cOt1GVLnci2jzlZegzSHgdxd+/VMY29NV9I6kwaUTjXGw6Tl
+        /7BS7VWQWo5zPgvAHUfHvOHpJmTZFV8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-161-GmG0s0aDNHqI4HgOwagdZQ-1; Tue, 14 Sep 2021 11:50:35 -0400
-X-MC-Unique: GmG0s0aDNHqI4HgOwagdZQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+ us-mta-123-HMinhiJtNM6AW3I-2Hl-Pw-1; Tue, 14 Sep 2021 11:52:19 -0400
+X-MC-Unique: HMinhiJtNM6AW3I-2Hl-Pw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EB3DFCC623;
-        Tue, 14 Sep 2021 15:50:31 +0000 (UTC)
-Received: from localhost (unknown [10.39.193.211])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 28282100AE35;
-        Tue, 14 Sep 2021 15:50:27 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Christoph Hellwig <hch@infradead.org>,
-        Jason Gunthorpe <jgg@nvidia.com>
-Cc:     David Airlie <airlied@linux.ie>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        dri-devel@lists.freedesktop.org,
-        Eric Farman <farman@linux.ibm.com>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        intel-gfx@lists.freedesktop.org,
-        intel-gvt-dev@lists.freedesktop.org,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
-        linux-s390@vger.kernel.org,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>, Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH v2 1/9] vfio/ccw: Use functions for alloc/free of the
- vfio_ccw_private
-In-Reply-To: <YTtBDbVsRveVE3i9@infradead.org>
-Organization: Red Hat GmbH
-References: <0-v2-7d3a384024cf+2060-ccw_mdev_jgg@nvidia.com>
- <1-v2-7d3a384024cf+2060-ccw_mdev_jgg@nvidia.com>
- <YTtBDbVsRveVE3i9@infradead.org>
-User-Agent: Notmuch/0.32.1 (https://notmuchmail.org)
-Date:   Tue, 14 Sep 2021 17:50:25 +0200
-Message-ID: <87sfy7gnr2.fsf@redhat.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EC6A1835DEA;
+        Tue, 14 Sep 2021 15:52:17 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.35.206.50])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 141875D9D3;
+        Tue, 14 Sep 2021 15:52:15 +0000 (UTC)
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     qemu-devel@nongnu.org
+Cc:     Marcelo Tosatti <mtosatti@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+        kvm@vger.kernel.org,
+        =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+        Maxim Levitsky <mlevitsk@redhat.com>
+Subject: [PATCH 0/3] KVM: qemu patches for few KVM features I developed
+Date:   Tue, 14 Sep 2021 18:52:11 +0300
+Message-Id: <20210914155214.105415-1-mlevitsk@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 10 2021, Christoph Hellwig <hch@infradead.org> wrote:
-
-> On Thu, Sep 09, 2021 at 04:38:41PM -0300, Jason Gunthorpe wrote:
->> +
->> +	private = kzalloc(sizeof(*private), GFP_KERNEL | GFP_DMA);
->> +	if (!private)
->> +		return ERR_PTR(-ENOMEM);
->
-> Nit: there is no need to add GFP_KERNEL when using GFP_DMA.
->
-> Also a question to the s390 maintainers: why do we need 31-bit
-> addressability for the main private data structure?
-
-I don't think we need it anymore since c98e16b2fa12 ("s390/cio: Convert
-ccw_io_region to pointer") and probably should just drop the GFP_DMA.
+These patches implement the qemu side logic to support=0D
+the KVM features I developed recently.=0D
+=0D
+First two patches are for features that are already accepted=0D
+upstream, and I already posted them on the qemu mailing list once.=0D
+=0D
+And the 3rd patch is for nested TSC scaling on SVM=0D
+which isn't yet accepted in KVM but can already be added to qemu since=0D
+it is conditional on KVM supporting it, and ABI wise it only relies=0D
+on SVM spec.=0D
+=0D
+Best regards,=0D
+    Maxim Levitsky=0D
+=0D
+Maxim Levitsky (3):=0D
+  KVM: use KVM_{GET|SET}_SREGS2 when supported.=0D
+  gdbstub: implement NOIRQ support for single step on KVM=0D
+  KVM: SVM: add migration support for nested TSC scaling=0D
+=0D
+ accel/kvm/kvm-all.c   |  30 +++++++++++=0D
+ gdbstub.c             |  60 +++++++++++++++++----=0D
+ include/sysemu/kvm.h  |  17 ++++++=0D
+ target/i386/cpu.c     |   5 ++=0D
+ target/i386/cpu.h     |   7 +++=0D
+ target/i386/kvm/kvm.c | 122 +++++++++++++++++++++++++++++++++++++++++-=0D
+ target/i386/machine.c |  53 ++++++++++++++++++=0D
+ 7 files changed, 282 insertions(+), 12 deletions(-)=0D
+=0D
+-- =0D
+2.26.3=0D
+=0D
 
