@@ -2,127 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9E4FC40B6CD
-	for <lists+kvm@lfdr.de>; Tue, 14 Sep 2021 20:25:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BB38840B713
+	for <lists+kvm@lfdr.de>; Tue, 14 Sep 2021 20:41:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231335AbhINS0Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Sep 2021 14:26:24 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:58876 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229477AbhINS0W (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Sep 2021 14:26:22 -0400
-Received: from zn.tnic (p200300ec2f1048008d634cac5b0c7131.dip0.t-ipconnect.de [IPv6:2003:ec:2f10:4800:8d63:4cac:5b0c:7131])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 763B31EC04D1;
-        Tue, 14 Sep 2021 20:24:59 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1631643899;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=ZiKIvLzxdvLHB/We39H7CYYWYKE3V9X7egkB0ENPsyE=;
-        b=GN7S7yA8avxg1KGLWQ5Wx4mPloiFO1PBUg1PdvgNlg1k2E8fi0qdXRRIE9kwM20ienZRVh
-        o8LBR3WQL8vRxBEN8UtVxzVQ4SPu4d1Dm2tyq3MgOH0kvt8jlqMPz4StWyaaodjjc84DcD
-        Q2fGTwl3VhF1WGvU/wGjdbzSHrnpkrw=
-Date:   Tue, 14 Sep 2021 20:24:52 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Tom Lendacky <thomas.lendacky@amd.com>
-Cc:     linux-kernel@vger.kernel.org, x86@kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
-        iommu@lists.linux-foundation.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-graphics-maintainer@vmware.com,
-        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        kexec@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+        id S231863AbhINSmj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Sep 2021 14:42:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41986 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231401AbhINSmi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Sep 2021 14:42:38 -0400
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1479EC061762
+        for <kvm@vger.kernel.org>; Tue, 14 Sep 2021 11:41:21 -0700 (PDT)
+Received: by mail-pj1-x1033.google.com with SMTP id k23so309722pji.0
+        for <kvm@vger.kernel.org>; Tue, 14 Sep 2021 11:41:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=CZGAmbkitZy1k/EbPG4VZaALR8mUJkwDAJ+dhwnEfWA=;
+        b=g0XsY+ZsxAS62v5OORPhKedEFaUPok0532gCaf35nYaW3Xo3uVIUpkYTkh/m8MKQX2
+         JHSZRACscofgKlXYLwjExoXqvFEnzJNwUIWqwcOpMXquEUg8MTGk/vSM+81+7UgkGEu0
+         Uky5wXvnhZFp+7zM0zZavFzxVBblL0+3EYUF1DYEd4bYo4BChp9xJj1Nn6fd2LP7AX+g
+         2xFSKik3Fudqeki7Latt8irjFQXjYitD10ov4ymGe/ZENZ+Q/ffw/fu/rgq2DFSj72rx
+         EVfrofp0tBcb6+a+Ok77h9Cf3ebzU3GILYloXI5gAZLvT6cidT4VOOOyKHZArylBqZWV
+         LiaA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=CZGAmbkitZy1k/EbPG4VZaALR8mUJkwDAJ+dhwnEfWA=;
+        b=AhISlXRv44BeqUaMnFgDT+GkfreO/4/bGvXUWElWv888ehr+iT08z8v63q/1COx/SN
+         WX7MbDhfeqcJS0UdJZCqzbUQyWG/SqpQv3t76aC2h1v6eSPKnPq/YaxKRoJ1rSRC6kxI
+         xnDeVAkq8PVCkTqDjcU0LKG7UMJrzZ2HfY8PgF9+WoT2lFUv+ow4ZReI4IssFOFYOGn/
+         veoWq6/0H4YI48LdJKY+obLrwqtHnD7uibDzuUrwrFHiZESb1JxTcEl4Ic+Blt9yhU/S
+         O/moPu604eJGy4HZeHgMldCa4MS0W3rXXn0c0n7CHWpP3UXvxsk0M2vJ1HdXl8Zzv36B
+         fLAQ==
+X-Gm-Message-State: AOAM533XrpogKsZhKOK6inWD3vDlwTKrOOF7CR6ykQ+bdaCHVeBzTDKl
+        Y0dP0Y/16dF8+RZkvdkgmBxabuR3yLhaaQ==
+X-Google-Smtp-Source: ABdhPJxutQ1GMW+J5gbp3HNJ6JRYL68/SsneQ7S3VEv4paQ8J4o2b7kmJu3ktKmvsaWglWEAw6Kbkg==
+X-Received: by 2002:a17:902:c948:b0:13a:345c:917c with SMTP id i8-20020a170902c94800b0013a345c917cmr16428275pla.61.1631644880303;
+        Tue, 14 Sep 2021 11:41:20 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id 23sm12220414pgk.89.2021.09.14.11.41.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Sep 2021 11:41:19 -0700 (PDT)
+Date:   Tue, 14 Sep 2021 18:41:15 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Peter Gonda <pgonda@google.com>
+Cc:     kvm list <kvm@vger.kernel.org>, Marc Orr <marcorr@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Nathan Tempelman <natet@google.com>,
         Brijesh Singh <brijesh.singh@amd.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Andi Kleen <ak@linux.intel.com>,
-        Sathyanarayanan Kuppuswamy 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        Tianyu Lan <Tianyu.Lan@microsoft.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v3 5/8] x86/sme: Replace occurrences of sme_active() with
- cc_platform_has()
-Message-ID: <YUDo9CWyLVa1PeUF@zn.tnic>
-References: <cover.1631141919.git.thomas.lendacky@amd.com>
- <367624d43d35d61d5c97a8b289d9ddae223636e9.1631141919.git.thomas.lendacky@amd.com>
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: SEV: Disable KVM_CAP_VM_COPY_ENC_CONTEXT_FROM for
+ SEV-ES
+Message-ID: <YUDsy4W0/FeIEJDr@google.com>
+References: <20210914171551.3223715-1-pgonda@google.com>
+ <YUDcvRB3/QOXSi8H@google.com>
+ <CAMkAt6opZoFfW_DiyJUREBAtd8503C6j+ZbjS9YL3z+bhqHR8Q@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <367624d43d35d61d5c97a8b289d9ddae223636e9.1631141919.git.thomas.lendacky@amd.com>
+In-Reply-To: <CAMkAt6opZoFfW_DiyJUREBAtd8503C6j+ZbjS9YL3z+bhqHR8Q@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 08, 2021 at 05:58:36PM -0500, Tom Lendacky wrote:
-> diff --git a/arch/x86/mm/mem_encrypt.c b/arch/x86/mm/mem_encrypt.c
-> index 18fe19916bc3..4b54a2377821 100644
-> --- a/arch/x86/mm/mem_encrypt.c
-> +++ b/arch/x86/mm/mem_encrypt.c
-> @@ -144,7 +144,7 @@ void __init sme_unmap_bootdata(char *real_mode_data)
->  	struct boot_params *boot_data;
->  	unsigned long cmdline_paddr;
->  
-> -	if (!sme_active())
-> +	if (!cc_platform_has(CC_ATTR_HOST_MEM_ENCRYPT))
->  		return;
->  
->  	/* Get the command line address before unmapping the real_mode_data */
-> @@ -164,7 +164,7 @@ void __init sme_map_bootdata(char *real_mode_data)
->  	struct boot_params *boot_data;
->  	unsigned long cmdline_paddr;
->  
-> -	if (!sme_active())
-> +	if (!cc_platform_has(CC_ATTR_HOST_MEM_ENCRYPT))
->  		return;
->  
->  	__sme_early_map_unmap_mem(real_mode_data, sizeof(boot_params), true);
-> @@ -377,11 +377,6 @@ bool sev_active(void)
->  {
->  	return sev_status & MSR_AMD64_SEV_ENABLED;
->  }
-> -
-> -bool sme_active(void)
-> -{
-> -	return sme_me_mask && !sev_active();
-> -}
->  EXPORT_SYMBOL_GPL(sev_active);
->  
->  /* Needs to be called from non-instrumentable code */
+-stable, for giggles
 
-You forgot this hunk:
+On Tue, Sep 14, 2021, Peter Gonda wrote:
+> On Tue, Sep 14, 2021 at 11:32 AM Sean Christopherson <seanjc@google.com> wrote:
+> >
+> > On Tue, Sep 14, 2021, Peter Gonda wrote:
+> > > Copying an ASID into new vCPUs will not work for SEV-ES since the vCPUs
+> > > VMSAs need to be setup and measured before SEV_LAUNCH_FINISH. Return an
+> > > error if a users tries to KVM_CAP_VM_COPY_ENC_CONTEXT_FROM from an
+> > > SEV-ES guest.
+> >
+> > What happens if userspace does KVM_CAP_VM_COPY_ENC_CONTEXT_FROM before the source
+> > has created vCPUs, i.e. before it has done SEV_LAUNCH_FINISH?
+> 
+> That's not enough. If you wanted to be able to mirror SEV-ES you'd
+> also need to call LAUNCH_UPDATE_VMSA on the mirror's vCPUs before
+> SEV_LAUNCH_FINISH. That is do-able but I was writing a small change to
+> fix this bug. If mirroring of SEV-ES is wanted it's a much bigger
+> change.
 
-diff --git a/arch/x86/mm/mem_encrypt.c b/arch/x86/mm/mem_encrypt.c
-index 5635ca9a1fbe..a3a2396362a5 100644
---- a/arch/x86/mm/mem_encrypt.c
-+++ b/arch/x86/mm/mem_encrypt.c
-@@ -364,8 +364,9 @@ int __init early_set_memory_encrypted(unsigned long vaddr, unsigned long size)
- /*
-  * SME and SEV are very similar but they are not the same, so there are
-  * times that the kernel will need to distinguish between SME and SEV. The
-- * sme_active() and sev_active() functions are used for this.  When a
-- * distinction isn't needed, the mem_encrypt_active() function can be used.
-+ * PATTR_HOST_MEM_ENCRYPT and PATTR_GUEST_MEM_ENCRYPT flags to
-+ * amd_prot_guest_has() are used for this. When a distinction isn't needed,
-+ * the mem_encrypt_active() function can be used.
-  *
-  * The trampoline code is a good example for this requirement.  Before
-  * paging is activated, SME will access all memory as decrypted, but SEV
+Is it doable without KVM updates?  If so, then outright rejection may not be the
+correct behavior.
 
-because there's still a sme_active() mentioned there:
+> > Might be worth noting that the destination cannot be an SEV guest, and therefore
+> > can't be an SEV-ES guest either.
+> 
+> sev_guest() implies sev_es_guest() so I think this case is covered.
 
-$ git grep sme_active
-arch/x86/mm/mem_encrypt.c:367: * sme_active() and sev_active() functions are used for this.  When a
+Yes, I was suggesting calling that out in the changelog so that readers/reviewers
+don't worry about that case.
 
--- 
-Regards/Gruss,
-    Boris.
+> > Cc: stable@vger.kernel.org
 
-https://people.kernel.org/tglx/notes-about-netiquette
+> Oops. I'll update in the V2 if needed. Added to this thread for now.
+
+FWIW, you don't actually need to Cc stable, just including it in the changelog is
+sufficient as the script automagic will pick it up when it hits Linus' tree.
