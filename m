@@ -2,114 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D34D240AA5F
-	for <lists+kvm@lfdr.de>; Tue, 14 Sep 2021 11:12:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 56F4B40AA64
+	for <lists+kvm@lfdr.de>; Tue, 14 Sep 2021 11:13:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231426AbhINJNr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Sep 2021 05:13:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55361 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229727AbhINJNi (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 14 Sep 2021 05:13:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1631610741;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Uz2MwQ8O6PWUdtwcLKLou2o1zImRqX/46y2OPHfGWF8=;
-        b=QN7wYyfksuZMIjHnto0CXjZf+4c70oBzh5erGpCsKD6q4cWsh1/ImvaKAOf2Fx5Bx6WOBs
-        2pACxIqVX1rVCrrg7achIO6rCMJb2A5WUYE7cg3D5AVRtwnFquv+AT9LIkCTJdFCp9sKn6
-        Xj/f69TJwlmGQ8MjKzfFPc83JFKkTjI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-385-kelXotrXPJm2v0OGzXzb4g-1; Tue, 14 Sep 2021 05:12:19 -0400
-X-MC-Unique: kelXotrXPJm2v0OGzXzb4g-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 02C5E1800D41;
-        Tue, 14 Sep 2021 09:12:18 +0000 (UTC)
-Received: from starship (unknown [10.35.206.50])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9986477F3C;
-        Tue, 14 Sep 2021 09:12:12 +0000 (UTC)
-Message-ID: <2b1e17416cef1e37f42e9bc8b2283b03d2651cb2.camel@redhat.com>
-Subject: Re: [RFC PATCH 3/3] nSVM: use svm->nested.save to load vmcb12
- registers and avoid TOC/TOU races
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        linux-kernel@vger.kernel.org
-Date:   Tue, 14 Sep 2021 12:12:11 +0300
-In-Reply-To: <9585f1387b2581d30b74cd163a9aac2adbd37a93.camel@redhat.com>
-References: <20210903102039.55422-1-eesposit@redhat.com>
-         <20210903102039.55422-4-eesposit@redhat.com>
-         <21d2bf8c4e3eb3fc5d297fd13300557ec686b625.camel@redhat.com>
-         <73b5a5bb-48f2-3a08-c76b-a82b5b69c406@redhat.com>
-         <9585f1387b2581d30b74cd163a9aac2adbd37a93.camel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        id S231586AbhINJNz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Sep 2021 05:13:55 -0400
+Received: from foss.arm.com ([217.140.110.172]:41700 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231633AbhINJNv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Sep 2021 05:13:51 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4DA301FB;
+        Tue, 14 Sep 2021 02:12:34 -0700 (PDT)
+Received: from monolith.cable.virginm.net (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 45C723F719;
+        Tue, 14 Sep 2021 02:12:33 -0700 (PDT)
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     will@kernel.org, julien.thierry.kdev@gmail.com, kvm@vger.kernel.org
+Cc:     andre.przywara@arm.com, jean-philippe@linaro.org
+Subject: [RESEND PATCH v1 kvmtool 4/8] vfio/pci: Rename PBA offset in device descriptor to fd_offset
+Date:   Tue, 14 Sep 2021 10:13:53 +0100
+Message-Id: <20210914091353.10599-1-alexandru.elisei@arm.com>
+X-Mailer: git-send-email 2.33.0
+In-Reply-To: <20210913154413.14322-4-alexandru.elisei@arm.com>
+References: <20210913154413.14322-4-alexandru.elisei@arm.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2021-09-14 at 12:02 +0300, Maxim Levitsky wrote:
-> On Tue, 2021-09-14 at 10:20 +0200, Emanuele Giuseppe Esposito wrote:
-> > On 12/09/2021 12:42, Maxim Levitsky wrote:
-> > > >   
-> > > > -	if (!nested_vmcb_valid_sregs(vcpu, &vmcb12->save) ||
-> > > > +	if (!nested_vmcb_valid_sregs(vcpu, &svm->nested.save) ||
-> > > >   	    !nested_vmcb_check_controls(vcpu, &svm->nested.ctl)) {
-> > > If you use a different struct for the copied fields, then it makes
-> > > sense IMHO to drop the 'control' parameter from nested_vmcb_check_controls,
-> > > and just use the svm->nested.save there directly.
-> > > 
-> > 
-> > Ok, what you say in patch 2 makes sense to me. I can create a new struct 
-> > vmcb_save_area_cached, but I need to keep nested.ctl because 1) it is 
-> > used also elsewhere, and different fields from the one checked here are 
-> > read/set and 2) using another structure (or the same 
-> 
-> Yes, keep nested.ctl, since vast majority of the fields are copied I think.
+The MSI-X capability defines a PBA offset, which is the offset of the PBA
+array in the BAR that holds the array.
 
-But actually that you mention it, I'll say why not to create vmcb_control_area_cached
-as well indeed and change the type of svm->nested.save to it. (in a separate patch)
+kvmtool uses the field "pba_offset" in struct msix_cap (which represents
+the MSIX capability) to refer to the [PBA offset:BAR] field of the
+capability; and the field "offset" in the struct vfio_pci_msix_pba to refer
+to offset of the PBA array in the device descriptor created by the VFIO
+driver.
 
-I see what you mean that we modify it a bit (but we shoudn't to be honest) and such, but
-all of this can be fixed.
+As we're getting ready to add yet another field that represents an offset
+to struct vfio_pci_msix_pba, try to avoid ambiguities by renaming the
+struct's "offset" field to "fd_offset".
 
-The advantage of having vmcb_control_area_cached is that it becomes impossible to use
-by mistake a non copied field from the guest.
+No functional change intended.
 
-It would also emphasize that this stuff came from the guest and should be treated as
-a toxic waste.
+Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+---
+This is a resend of the original patch which kvm@vger.kernel.org rejected:
 
-Note again that this should be done if we agree as a separate patch.
+<kvm@vger.kernel.org>: host vger.kernel.org[23.128.96.18] said: 550 5.7.1
+    Content-Policy reject msg: The message contains HTML, therefore we consider
+    it SPAM.  Send pure TEXT/PLAIN if you are not a spammer. BF:<S 1>;
+    S1343576AbhIMPoN (in reply to end of DATA command)
 
-> 
-> Best regards,
-> 	Maxim Levitsky
-> 
-> 
-> > vmcb_save_area_cached) in its place would just duplicate the same fields 
-> > of nested.ctl, creating even more confusion and possible inconsistency.
-> > 
-> > Let me know if you disagree.
-> > 
-> > Thank you,
-> > Emanuele
-> > 
+ include/kvm/vfio.h | 2 +-
+ vfio/pci.c         | 6 +++---
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
+diff --git a/include/kvm/vfio.h b/include/kvm/vfio.h
+index 28223cf2f036..8cdf04fcc265 100644
+--- a/include/kvm/vfio.h
++++ b/include/kvm/vfio.h
+@@ -48,7 +48,7 @@ struct vfio_pci_msix_table {
+ 
+ struct vfio_pci_msix_pba {
+ 	size_t				size;
+-	off_t				offset; /* in VFIO device fd */
++	off_t				fd_offset; /* in VFIO device fd */
+ 	unsigned int			bar;
+ 	u32				guest_phys_addr;
+ };
+diff --git a/vfio/pci.c b/vfio/pci.c
+index 10ff99e70226..cc183118c7e3 100644
+--- a/vfio/pci.c
++++ b/vfio/pci.c
+@@ -256,7 +256,7 @@ static void vfio_pci_msix_pba_access(struct kvm_cpu *vcpu, u64 addr, u8 *data,
+ 	 * TODO: emulate PBA. Hardware MSI-X is never masked, so reading the PBA
+ 	 * is completely useless here. Note that Linux doesn't use PBA.
+ 	 */
+-	if (pread(vdev->fd, data, len, pba->offset + offset) != (ssize_t)len)
++	if (pread(vdev->fd, data, len, pba->fd_offset + offset) != (ssize_t)len)
+ 		vfio_dev_err(vdev, "cannot access MSIX PBA\n");
+ }
+ 
+@@ -815,8 +815,8 @@ static int vfio_pci_fixup_cfg_space(struct vfio_device *vdev)
+ 	if (msix) {
+ 		/* Add a shortcut to the PBA region for the MMIO handler */
+ 		int pba_index = VFIO_PCI_BAR0_REGION_INDEX + pdev->msix_pba.bar;
+-		pdev->msix_pba.offset = vdev->regions[pba_index].info.offset +
+-					(msix->pba_offset & PCI_MSIX_PBA_OFFSET);
++		pdev->msix_pba.fd_offset = vdev->regions[pba_index].info.offset +
++					   (msix->pba_offset & PCI_MSIX_PBA_OFFSET);
+ 
+ 		/* Tidy up the capability */
+ 		msix->table_offset &= PCI_MSIX_TABLE_BIR;
+-- 
+2.33.0
 
