@@ -2,51 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 44CEE40BB7B
-	for <lists+kvm@lfdr.de>; Wed, 15 Sep 2021 00:31:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D95F40BB82
+	for <lists+kvm@lfdr.de>; Wed, 15 Sep 2021 00:31:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235639AbhINWco (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Sep 2021 18:32:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39466 "EHLO
+        id S235721AbhINWcs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Sep 2021 18:32:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39482 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235137AbhINWck (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Sep 2021 18:32:40 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48C48C061762
-        for <kvm@vger.kernel.org>; Tue, 14 Sep 2021 15:31:22 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 63-20020a250d42000000b0059dc43162c9so847808ybn.23
-        for <kvm@vger.kernel.org>; Tue, 14 Sep 2021 15:31:22 -0700 (PDT)
+        with ESMTP id S235637AbhINWcn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Sep 2021 18:32:43 -0400
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93216C061762
+        for <kvm@vger.kernel.org>; Tue, 14 Sep 2021 15:31:25 -0700 (PDT)
+Received: by mail-pg1-x54a.google.com with SMTP id g15-20020a63564f000000b00261998c1b70so376306pgm.5
+        for <kvm@vger.kernel.org>; Tue, 14 Sep 2021 15:31:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=EE9zcrGALS0AmzIOcz/rem1alKDBMQ7pd13ZNxH1nSA=;
-        b=pZ7eBZ80BpvrufxvDCQPciTIRfG8+svNCHDEO/tUDxJz0YhNMtHuG7GHSKrfuuQ+5V
-         5+d/F+i84q6Q4e0tIkNEXBCPnmBhjkkPoLyWarXVKAcSHcwuS4pNbYPnVbnW52+/xx1e
-         kY0AJDiVSTda523hlM8M214BgHZaKjtrvAHY6UohR21Iez5gOAd8bq+ORny1eD9SIqQH
-         S61MrKr1RNE+BdduEb/bnmvX+LYqFEE5tbZIplMIr8UW8Zh2zaH4l8RuqB5DOcR8OOwl
-         OsqqfgQAeFExrhjMvktynlwazX4S8QxPL/RidfBeF+9M1leYh2c3jh4oGpo57spmzhmq
-         EAHw==
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=S2j8r1BCKqhVhJ+8bR7t/dA2J/PIIE/Rns3zAg7zZww=;
+        b=SF+8jytE6tsk7OdA1EjKqcwdx9BTnDEREQgH6nl2uYaQV6EsWg9JbEN1WShtL0KrTK
+         nIJrAF8y6vYLIizVYUdOeQM3tqJNxxCw25p/g7bhvEHMt0ttYN5R5m4oqvgDEttZJYNp
+         jGhndv6Q7RT3FSoSJyS2jvzSCkY3lH5Vb+skzup8e1pD3ppCKZhFcxdVKtRVhOp1H40U
+         Ehg1qIXzFtqoy3sgq12X2c1wb0cLIVod97evqV5ZXRyTDhW001I2Uo5WcNl35wkl/TG4
+         DF42qFBq26VDenW/Kz1W7jxnPPAD53T19C1mYz8TTNRznLL5dZ+UsN77LxSTxVTbMBMQ
+         IeXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=EE9zcrGALS0AmzIOcz/rem1alKDBMQ7pd13ZNxH1nSA=;
-        b=OeOEAuMQQ46MjtDvmKV6199ofxvaWrDRTw5BnMqeHpMuZDDazkOVMvBkjbZAxgtj4H
-         gvs5wgxhvyimsKn79aQcTdrvk++bi1vBmf8UGD5Rz2msz+sk8/rhyj9S7EfgWDsK0wEL
-         bTPHEfKFDDyQ1psXmgCrond5Ky2Q+Y0MD3OuOBDhCPjNwuaksTFS0kEAFZdMuRvFY8RW
-         ylcmmkj4qFsgB+yv3nnaMK3bYCASecR8PSe/lsYFDacaMJWRM2H/bIRoVkYY4fcJqyIj
-         SVAC0LefZozagYnblPWHxx4bLePZgk6DFoB5/vNtrPdo1es9BsWddkoptckztwOaP/w+
-         6nyw==
-X-Gm-Message-State: AOAM533kQPjBDXwsLo/YKCu3hYcTYiSqlWTOi0MFWNlalDeKadufQcJB
-        nZ/YS+6pz4IjyoxAGBOfYCpp2kk1WORH
-X-Google-Smtp-Source: ABdhPJyL0hd2dTusZRy8zhikD+3TvkMkTMn5/JhFbTQwfFhCzWUTIsX5NDiI3yX4HUYgRmVtoykyXKpqPtAe
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=S2j8r1BCKqhVhJ+8bR7t/dA2J/PIIE/Rns3zAg7zZww=;
+        b=jSvHuce3yjkwNB3LXpKe9cRKP6A9m01sHMSrTr02O9DY0mnq3dmf0ZyOURujUJt4r1
+         ybvjkVqVpqHpo52xo6dknNzn93GDToLXOWeH7gCrDrP9SXtjxwr/AzaMlk1WMUWDTgMm
+         3M4V9Fm8KIm8rMfz3OF4uHjul/qUnw1KF5mVEabaSOqWEPZJBM/W2mS0+uA6xpKiAhnq
+         FfGO6nfHAwcHYjlO2AkxD8IR4J4G5gNR6OOjDjMUZGtYuUxVqzbezy/YgGCFtXXlcUVy
+         XzoEOxoCWSwFzk3iuYgmVIiTHQkLbsDh5WTMNJ3BJ/SkJSnR1LwDir+4kLVeymVPn8Qq
+         mesw==
+X-Gm-Message-State: AOAM530VSXGG+i4XvqVcKEPZz0iufQKRzeV7P5TE/w3fgoQePvfGA7gT
+        gDHgRxSqDPH792ep8feWzN6piGGedY7g
+X-Google-Smtp-Source: ABdhPJznyX0vOJEHN8tDK0ykFp8Ok1BU6n72Ike+NrTzqOrtDgUxbHGRXF1d5AyiWweWcLPS52UxS5UGLckH
 X-Received: from rananta-virt.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1bcc])
- (user=rananta job=sendgmr) by 2002:a5b:7c4:: with SMTP id t4mr2016493ybq.509.1631658681501;
- Tue, 14 Sep 2021 15:31:21 -0700 (PDT)
-Date:   Tue, 14 Sep 2021 22:30:59 +0000
-Message-Id: <20210914223114.435273-1-rananta@google.com>
+ (user=rananta job=sendgmr) by 2002:a17:90b:fd7:: with SMTP id
+ gd23mr57225pjb.1.1631658684598; Tue, 14 Sep 2021 15:31:24 -0700 (PDT)
+Date:   Tue, 14 Sep 2021 22:31:00 +0000
+In-Reply-To: <20210914223114.435273-1-rananta@google.com>
+Message-Id: <20210914223114.435273-2-rananta@google.com>
 Mime-Version: 1.0
+References: <20210914223114.435273-1-rananta@google.com>
 X-Mailer: git-send-email 2.33.0.309.g3052b89438-goog
-Subject: [PATCH v7 00/15] KVM: arm64: selftests: Introduce arch_timer selftest
+Subject: [PATCH v7 01/15] KVM: arm64: selftests: Add MMIO readl/writel support
 From:   Raghavendra Rao Ananta <rananta@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
         Andrew Jones <drjones@redhat.com>,
@@ -67,215 +71,82 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello,
+Define the readl() and writel() functions for the guests to
+access (4-byte) the MMIO region.
 
-The patch series adds a KVM selftest to validate the behavior of
-ARM's generic timer (patch-14). The test programs the timer IRQs
-periodically, and for each interrupt, it validates the behaviour
-against the architecture specifications. The test further provides
-a command-line interface to configure the number of vCPUs, the
-period of the timer, and the number of iterations that the test
-has to run for.
+The routines, and their dependents, are inspired from the kernel's
+arch/arm64/include/asm/io.h and arch/arm64/include/asm/barrier.h.
 
-Patch-15 adds an option to randomly migrate the vCPUs to different
-physical CPUs across the system. The bug for the fix provided by
-Marc with commit 3134cc8beb69d0d ("KVM: arm64: vgic: Resample HW
-pending state on deactivation") was discovered using arch_timer
-test with vCPU migrations.
+Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+Reviewed-by: Oliver Upton <oupton@google.com>
+Reviewed-by: Andrew Jones <drjones@redhat.com>
+---
+ .../selftests/kvm/include/aarch64/processor.h | 46 ++++++++++++++++++-
+ 1 file changed, 45 insertions(+), 1 deletion(-)
 
-Since the test heavily depends on interrupts, patch-13 adds a host
-library to setup ARM Generic Interrupt Controller v3 (GICv3). This
-includes creating a vGIC device, setting up distributor and
-redistributor attributes, and mapping the guest physical addresses.
-Symmetrical to this, patch-12 adds a guest library to talk to the vGIC,
-which includes initializing the controller, enabling/disabling the
-interrupts, and so on.
-
-The following patches are utility patches that the above ones make use
-of:
-Patch-1 adds readl/writel support for guests to access MMIO space.
-
-Patch-2 imports arch/arm64/include/asm/sysreg.h into
-tools/arch/arm64/include/asm/ to make use of the register encodings
-and read/write definitions.
-
-Patch-3 is not directly related to the test, but makes
-aarch64/debug-exceptions.c use the read/write definitions from the
-imported sysreg.h and remove the existing definitions of read_sysreg()
-and write_sysreg().
-
-Patch-4 introduces ARM64_SYS_KVM_REG, that helps convert the SYS_*
-register encodings in sysreg.h to be acceptable by get_reg() and set_reg().
-It further replaces the users of ARM64_SYS_REG to use the new macro.
-
-Patch-5 adds the support for cpu_relax().
-
-Patch-6 adds basic arch_timer framework.
-
-Patch-7 adds udelay() support for the guests to utilize.
-
-Patch-8 adds local_irq_enable() and local_irq_disable() for the guests
-to enable/disable interrupts.
-
-Patch-9 is also unrelated to the test. It modifies the prototype of
-aarch64_vcpu_setup() to accept vcpuid as uint32_t, to keep it consistent
-with the other parts of code.
-
-Patch-10 adds the support to get the vcpuid for the guests. This allows
-them to access any cpu-centric private data in the upcoming patches.
-
-Patch-11 adds a light-weight support for spinlocks for the guests to
-use.
-
-The patch series, specifically the library support, is derived from the
-kvm-unit-tests and the kernel itself.
-
-Regards,
-Raghavendra
-
-v6 -> v7:
-
-Addressed comments by Andrew:
-
-- Changed the prototype of aarch64_vcpu_setup() to accept vcpuid as
-  uint32_t.
-- Modified the prototype of guest_get_vcpuid() to return uint32_t.
-- Renamed assert messages in lib/aarch64/vgic.c to use "Number".
-
-v5 -> v6:
-
-- Corrected the syntax for write_sysreg_s in gic_v3.c (11/14) so that
-  the file can be compiled with the unmodified
-  arch/arm64/include/asm/sysreg.h that's imported into tools/.
-
-v4 -> v5:
-
-Addressed the comments by Andrew, Oliver, and Reiji (Thanks, again):
-- Squashed patches 17/18 and 18/18 into 3/18 and 14/18, respectively.
-- Dropped patches to keep track kvm_utils of nr_vcpus (12/18) and
-  vm_get_mode() (13/18) as they were no longer needed.
-- Instead of creating the a map, exporting the vcpuid to the guest
-  is done by using the TPIDR_EL1 register.
-- Just to be on the safer side, gic.c's gic_dist_init() explicitly
-  checks if gic_ops is NULL.
-- Move sysreg.h from within selftests to tool/arch/arm64/include/asm/.
-- Rename ARM64_SYS_KVM_REG to KVM_ARM64_SYS_REG to improve readability.
-- Use the GIC regions' sizes from asm/kvm.h instead of re-defining it
-  in the vgic host support.
-- Get the timer IRQ numbers via timer's device attributes
-  (KVM_ARM_VCPU_TIMER_IRQ_PTIMER, KVM_ARM_VCPU_TIMER_IRQ_VTIMER) instead
-  of depending on default numbers to be safe.
-- Add check to see if the vCPU migrations are in fact enabled, before
-  looking for at least two online physical CPUs for the test.
-- Add missing blank lines in the arch_timer test.
-
-v3 -> v4:
-
-Addressed the comments by Andrew, Oliver, and Ricardo (Thank you):
-- Reimplemented get_vcpuid() by exporting a map of vcpuid:mpidr to the
-  guest.
-- Import sysreg.h from arch/arm64/include/asm/sysreg.h to get the system
-  register encodings and its read/write support. As a result, delete the
-  existing definitions in processor.h.
-- Introduce ARM64_SYS_KVM_REG that converts SYS_* register definitions
-  from sysreg.h into the encodings accepted by get_reg() and set_reg().
-- Hence, remove the existing encodings of system registers (CPACR_EL1,
-  TCR_EL1, and friends) and replace all the its consumers throughout
-  the selftests with ARM64_SYS_KVM_REG.
-- Keep track of number of vCPUs in 'struct kvm_vm'.
-- Add a helper method to get the KVM VM's mode.
-- Modify the vGIC host function vgic_v3_setup to make use of the above
-  two helper methods, which prevents it from accepting nr_vcpus as
-  an argument.
-- Move the definition of REDIST_REGION_ATTR_ADDR from lib/aarch64/vgic.c
-  to include/aarch64/vgic.h.
-- Make the selftest, vgic_init.c, use the definition of REDIST_REGION_ATTR_ADDR
-  from include/aarch64/vgic.h.
-- Turn ON vCPU migration by default (-m 2).
-- Add pr_debug() to log vCPU migrations. Helpful for diagnosis.
-- Change TEST_ASSERT(false,...) to TEST_FAIL() in the base arch_timer
-  test.
-- Include linux/types.h for __force definitions.
-- Change the type of 'val' to 'int' in spin_lock() to match the lock
-  value type.
-- Fix typos in code files and comments.
-
-v2 -> v3:
-
-- Addressed the comments from Ricardo regarding moving the vGIC host
-  support for selftests to its own library.
-- Added an option (-m) to migrate the guest vCPUs to physical CPUs
-  in the system.
-
-v1 -> v2:
-
-Addressed comments from Zenghui in include/aarch64/arch_timer.h:
-- Correct the header description
-- Remove unnecessary inclusion of linux/sizes.h
-- Re-arrange CTL_ defines in ascending order
-- Remove inappropriate 'return' from timer_set_* functions, which
-  returns 'void'.
-
-v1: https://lore.kernel.org/kvmarm/20210813211211.2983293-1-rananta@google.com/
-v2: https://lore.kernel.org/kvmarm/20210818184311.517295-1-rananta@google.com/
-v3: https://lore.kernel.org/kvmarm/20210901211412.4171835-1-rananta@google.com/
-v4: https://lore.kernel.org/kvmarm/20210909013818.1191270-1-rananta@google.com/
-v5: https://lore.kernel.org/kvmarm/20210913204930.130715-1-rananta@google.com/
-v6: https://lore.kernel.org/kvmarm/20210913230955.156323-1-rananta@google.com/
-
-Raghavendra Rao Ananta (15):
-  KVM: arm64: selftests: Add MMIO readl/writel support
-  tools: arm64: Import sysreg.h
-  KVM: arm64: selftests: Use read/write definitions from sysreg.h
-  KVM: arm64: selftests: Introduce ARM64_SYS_KVM_REG
-  KVM: arm64: selftests: Add support for cpu_relax
-  KVM: arm64: selftests: Add basic support for arch_timers
-  KVM: arm64: selftests: Add basic support to generate delays
-  KVM: arm64: selftests: Add support to disable and enable local IRQs
-  KVM: arm64: selftests: Maintain consistency for vcpuid type
-  KVM: arm64: selftests: Add guest support to get the vcpuid
-  KVM: arm64: selftests: Add light-weight spinlock support
-  KVM: arm64: selftests: Add basic GICv3 support
-  KVM: arm64: selftests: Add host support for vGIC
-  KVM: arm64: selftests: Add arch_timer test
-  KVM: arm64: selftests: arch_timer: Support vCPU migration
-
- tools/arch/arm64/include/asm/sysreg.h         | 1296 +++++++++++++++++
- tools/testing/selftests/kvm/.gitignore        |    1 +
- tools/testing/selftests/kvm/Makefile          |    3 +-
- .../selftests/kvm/aarch64/arch_timer.c        |  479 ++++++
- .../selftests/kvm/aarch64/debug-exceptions.c  |   30 +-
- .../selftests/kvm/aarch64/psci_cpu_on_test.c  |    2 +-
- .../testing/selftests/kvm/aarch64/vgic_init.c |    3 +-
- .../kvm/include/aarch64/arch_timer.h          |  142 ++
- .../selftests/kvm/include/aarch64/delay.h     |   25 +
- .../selftests/kvm/include/aarch64/gic.h       |   21 +
- .../selftests/kvm/include/aarch64/processor.h |   90 +-
- .../selftests/kvm/include/aarch64/spinlock.h  |   13 +
- .../selftests/kvm/include/aarch64/vgic.h      |   20 +
- .../testing/selftests/kvm/include/kvm_util.h  |    2 +
- tools/testing/selftests/kvm/lib/aarch64/gic.c |   95 ++
- .../selftests/kvm/lib/aarch64/gic_private.h   |   21 +
- .../selftests/kvm/lib/aarch64/gic_v3.c        |  240 +++
- .../selftests/kvm/lib/aarch64/gic_v3.h        |   70 +
- .../selftests/kvm/lib/aarch64/processor.c     |   24 +-
- .../selftests/kvm/lib/aarch64/spinlock.c      |   27 +
- .../testing/selftests/kvm/lib/aarch64/vgic.c  |   70 +
- 21 files changed, 2626 insertions(+), 48 deletions(-)
- create mode 100644 tools/arch/arm64/include/asm/sysreg.h
- create mode 100644 tools/testing/selftests/kvm/aarch64/arch_timer.c
- create mode 100644 tools/testing/selftests/kvm/include/aarch64/arch_timer.h
- create mode 100644 tools/testing/selftests/kvm/include/aarch64/delay.h
- create mode 100644 tools/testing/selftests/kvm/include/aarch64/gic.h
- create mode 100644 tools/testing/selftests/kvm/include/aarch64/spinlock.h
- create mode 100644 tools/testing/selftests/kvm/include/aarch64/vgic.h
- create mode 100644 tools/testing/selftests/kvm/lib/aarch64/gic.c
- create mode 100644 tools/testing/selftests/kvm/lib/aarch64/gic_private.h
- create mode 100644 tools/testing/selftests/kvm/lib/aarch64/gic_v3.c
- create mode 100644 tools/testing/selftests/kvm/lib/aarch64/gic_v3.h
- create mode 100644 tools/testing/selftests/kvm/lib/aarch64/spinlock.c
- create mode 100644 tools/testing/selftests/kvm/lib/aarch64/vgic.c
-
+diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
+index c0273aefa63d..96578bd46a85 100644
+--- a/tools/testing/selftests/kvm/include/aarch64/processor.h
++++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
+@@ -9,6 +9,7 @@
+ 
+ #include "kvm_util.h"
+ #include <linux/stringify.h>
++#include <linux/types.h>
+ 
+ 
+ #define ARM64_CORE_REG(x) (KVM_REG_ARM64 | KVM_REG_SIZE_U64 | \
+@@ -130,6 +131,49 @@ void vm_install_sync_handler(struct kvm_vm *vm,
+ 	val;								  \
+ })
+ 
+-#define isb()	asm volatile("isb" : : : "memory")
++#define isb()		asm volatile("isb" : : : "memory")
++#define dsb(opt)	asm volatile("dsb " #opt : : : "memory")
++#define dmb(opt)	asm volatile("dmb " #opt : : : "memory")
++
++#define dma_wmb()	dmb(oshst)
++#define __iowmb()	dma_wmb()
++
++#define dma_rmb()	dmb(oshld)
++
++#define __iormb(v)							\
++({									\
++	unsigned long tmp;						\
++									\
++	dma_rmb();							\
++									\
++	/*								\
++	 * Courtesy of arch/arm64/include/asm/io.h:			\
++	 * Create a dummy control dependency from the IO read to any	\
++	 * later instructions. This ensures that a subsequent call	\
++	 * to udelay() will be ordered due to the ISB in __delay().	\
++	 */								\
++	asm volatile("eor	%0, %1, %1\n"				\
++		     "cbnz	%0, ."					\
++		     : "=r" (tmp) : "r" ((unsigned long)(v))		\
++		     : "memory");					\
++})
++
++static __always_inline void __raw_writel(u32 val, volatile void *addr)
++{
++	asm volatile("str %w0, [%1]" : : "rZ" (val), "r" (addr));
++}
++
++static __always_inline u32 __raw_readl(const volatile void *addr)
++{
++	u32 val;
++	asm volatile("ldr %w0, [%1]" : "=r" (val) : "r" (addr));
++	return val;
++}
++
++#define writel_relaxed(v,c)	((void)__raw_writel((__force u32)cpu_to_le32(v),(c)))
++#define readl_relaxed(c)	({ u32 __r = le32_to_cpu((__force __le32)__raw_readl(c)); __r; })
++
++#define writel(v,c)		({ __iowmb(); writel_relaxed((v),(c));})
++#define readl(c)		({ u32 __v = readl_relaxed(c); __iormb(__v); __v; })
+ 
+ #endif /* SELFTEST_KVM_PROCESSOR_H */
 -- 
 2.33.0.309.g3052b89438-goog
 
