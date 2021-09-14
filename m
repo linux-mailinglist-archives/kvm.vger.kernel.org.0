@@ -2,119 +2,258 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 827D040A40B
-	for <lists+kvm@lfdr.de>; Tue, 14 Sep 2021 04:58:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C22B040A44B
+	for <lists+kvm@lfdr.de>; Tue, 14 Sep 2021 05:21:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238438AbhINDAG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Sep 2021 23:00:06 -0400
-Received: from mail.kernel.org ([198.145.29.99]:59202 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S238162AbhINDAA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Sep 2021 23:00:00 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 9ADEA61108;
-        Tue, 14 Sep 2021 02:58:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1631588323;
-        bh=WwLKONhLQD5yu3qOg6mO99EvFPpF5pg1KAphIgvFPOY=;
-        h=Date:From:To:Subject:From;
-        b=jf740rma9NXfbo6JQs1uGl05VxesMb8BECRSsq+wrW2GXkmJf6qvIbv/QyhbtRCup
-         +/QN4frnt+BegLmND2vEZB0ONoOJxmBisc6jo7G/eWdEhgiDwuRr2droA9MsCa5WA9
-         nPT86BHq1OOHKt9/gbnaXjq8JFwdhxieuIzBQFX7uBJKrK3YZMVlTFI98tRLO9VIu3
-         xS9+eIFhZT4veKRI8pV8lOEdVMNvL+UKqSv+6CQGSDFQ84+pprOYXAK3BXFd0Fg85Z
-         FxGDNkyzlDXjhLm8ItI4sbMV/dMRMryPVaPV4V+zAz3vSs8TL22/qb3P4NzOr5VW0H
-         sloum5tdsZT3A==
-Date:   Mon, 13 Sep 2021 19:58:43 -0700
-From:   "Darrick J. Wong" <djwong@kernel.org>
-To:     linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-fsdevel <linux-fsdevel@vger.kernel.org>
-Subject: kvm crash in 5.14.1?
-Message-ID: <20210914025843.GA638460@magnolia>
+        id S238785AbhINDWV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Sep 2021 23:22:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52916 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238594AbhINDWT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Sep 2021 23:22:19 -0400
+Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1CA9C061766
+        for <kvm@vger.kernel.org>; Mon, 13 Sep 2021 20:20:49 -0700 (PDT)
+Received: by mail-pg1-x533.google.com with SMTP id w7so11354200pgk.13
+        for <kvm@vger.kernel.org>; Mon, 13 Sep 2021 20:20:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=pUjEFPKNx1O9WzlN4Kw5jO3Lwl0ZxDuARimA6uJp1m0=;
+        b=g2CNxhF0mDFL+5WB2rhy2fUthXDWMK4oFBPJ/CTC7ECkycYskSddAsVq8J5eVMhXIz
+         alsmIoruq3w5FQ9gvwE8cR8cItAo4gWvXnSjmHRsLG1DrBGx2Qku8jBYHYwhs5mRKJts
+         KFiNTmZhTOXgWQ0btiR6v8P8GGz5Dj1G6q8AUAqSzp9AON90DG8hjDD+MaKskJKwDm/8
+         QZBEMRDKwroS/VD87J3Tk8VTKjek22vdtmMO2C3hqpoa0xqczKiw4o2K8H/uX0BnTm6o
+         O30mAvnGcN5FnrNM8IaVCWcUjcyGtnh4Ljr1R5vNkC/h5NsDRyKpy/MGY8E+0awerJap
+         b1og==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=pUjEFPKNx1O9WzlN4Kw5jO3Lwl0ZxDuARimA6uJp1m0=;
+        b=aFi0Yx+tIuffMiqMvpPFJlEINfOphTxss1TZV6337elNCPRaiE5stPQH4hpWigZ22o
+         DhYzbe6VwnSIrKnQm42JHhTnO1N2SckMAl01S5zBCCHnOEduuRrgztarlWjmO1tvIE5K
+         k+rrhpLZR6fSR/XelV9YAThs53jjMLIuu3CPg8Wm9umNKgKlO54r7M/Adu0Q4Oz/mEyQ
+         O5K5t+cOI+LFRdv5N4RcId5KgUe3beMTzdnar3VCsrRg2tIvwozrquPfxDR8BKuhHkPv
+         JQdEollfG4CTB4Edjch+p58kC5ijlfgpuCEpyd/UlFhk9OYYkiMIbLWjYYBRRqR7ik+A
+         I7hg==
+X-Gm-Message-State: AOAM532dztaNRc89V+jacxdmJ7pzsFpwk3sfWQ52zVno0PHzbc3zSdno
+        fWhIZ2vt4j9SSzFa0XaM+TbBgg==
+X-Google-Smtp-Source: ABdhPJwiJ3D2WvPMeBUyHqVRvyWDRMXgUJoPNHGaY5arhbRTW9Ek+/U6cSANzpykRzS4BHwBP3/8bw==
+X-Received: by 2002:a63:1717:: with SMTP id x23mr13795189pgl.182.1631589649074;
+        Mon, 13 Sep 2021 20:20:49 -0700 (PDT)
+Received: from google.com (150.12.83.34.bc.googleusercontent.com. [34.83.12.150])
+        by smtp.gmail.com with ESMTPSA id z14sm5799380pfr.154.2021.09.13.20.20.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Sep 2021 20:20:48 -0700 (PDT)
+Date:   Mon, 13 Sep 2021 20:20:45 -0700
+From:   Ricardo Koller <ricarkol@google.com>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     Eric Auger <eric.auger@redhat.com>, kvm@vger.kernel.org,
+        maz@kernel.org, kvmarm@lists.cs.columbia.edu, drjones@redhat.com,
+        Paolo Bonzini <pbonzini@redhat.com>, oupton@google.com,
+        james.morse@arm.com, suzuki.poulose@arm.com, shuah@kernel.org,
+        jingzhangos@google.com, pshier@google.com, rananta@google.com,
+        reijiw@google.com
+Subject: Re: [PATCH 1/2] KVM: arm64: vgic: check redist region is not above
+ the VM IPA size
+Message-ID: <YUAVDfuSbG35WEOR@google.com>
+References: <20210908210320.1182303-1-ricarkol@google.com>
+ <20210908210320.1182303-2-ricarkol@google.com>
+ <b368e9cf-ec28-1768-edf9-dfdc7fa108f8@arm.com>
+ <YTo6kX7jGeR3XvPg@google.com>
+ <5eb41efd-2ff2-d25b-5801-f4a56457a09f@arm.com>
+ <80bdbdb3-1bff-aa99-c49b-76d6bd960aa9@redhat.com>
+ <YTuytfGTDlaoz0yH@google.com>
+ <cc916884-9b76-9784-c3ce-3469cb7682ab@arm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <cc916884-9b76-9784-c3ce-3469cb7682ab@arm.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi everyone,
+Hi Alexandru, Eric,
 
-While running the XFS fuzz test suite (which launches ~50 VMs, which is
-enough to eat nearly all the DRAM on the system) on a VM host that I'd
-recently upgrade to 5.14.1, I noticed the following crash in dmesg on
-the host:
+On Mon, Sep 13, 2021 at 11:15:33AM +0100, Alexandru Elisei wrote:
+> Hi Eric, Ricardo,
+> 
+> On 9/10/21 20:32, Ricardo Koller wrote:
+> > Hi Alexandru and Eric,
+> >
+> > On Fri, Sep 10, 2021 at 10:42:23AM +0200, Eric Auger wrote:
+> >> Hi Alexandru,
+> >>
+> >> On 9/10/21 10:28 AM, Alexandru Elisei wrote:
+> >>> Hi Ricardo,
+> >>>
+> >>> On 9/9/21 5:47 PM, Ricardo Koller wrote:
+> >>>> On Thu, Sep 09, 2021 at 11:20:15AM +0100, Alexandru Elisei wrote:
+> >>>>> Hi Ricardo,
+> >>>>>
+> >>>>> On 9/8/21 10:03 PM, Ricardo Koller wrote:
+> >>>>>> Extend vgic_v3_check_base() to verify that the redistributor regions
+> >>>>>> don't go above the VM-specified IPA size (phys_size). This can happen
+> >>>>>> when using the legacy KVM_VGIC_V3_ADDR_TYPE_REDIST attribute with:
+> >>>>>>
+> >>>>>>   base + size > phys_size AND base < phys_size
+> >>>>>>
+> >>>>>> vgic_v3_check_base() is used to check the redist regions bases when
+> >>>>>> setting them (with the vcpus added so far) and when attempting the first
+> >>>>>> vcpu-run.
+> >>>>>>
+> >>>>>> Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> >>>>>> ---
+> >>>>>>  arch/arm64/kvm/vgic/vgic-v3.c | 4 ++++
+> >>>>>>  1 file changed, 4 insertions(+)
+> >>>>>>
+> >>>>>> diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
+> >>>>>> index 66004f61cd83..5afd9f6f68f6 100644
+> >>>>>> --- a/arch/arm64/kvm/vgic/vgic-v3.c
+> >>>>>> +++ b/arch/arm64/kvm/vgic/vgic-v3.c
+> >>>>>> @@ -512,6 +512,10 @@ bool vgic_v3_check_base(struct kvm *kvm)
+> >>>>>>  		if (rdreg->base + vgic_v3_rd_region_size(kvm, rdreg) <
+> >>>>>>  			rdreg->base)
+> >>>>>>  			return false;
+> >>>>>> +
+> >>>>>> +		if (rdreg->base + vgic_v3_rd_region_size(kvm, rdreg) >
+> >>>>>> +			kvm_phys_size(kvm))
+> >>>>>> +			return false;
+> >>>>> Looks to me like this same check (and the overflow one before it) is done when
+> >>>>> adding a new Redistributor region in kvm_vgic_addr() -> vgic_v3_set_redist_base()
+> >>>>> -> vgic_v3_alloc_redist_region() -> vgic_check_ioaddr(). As far as I can tell,
+> >>>>> kvm_vgic_addr() handles both ways of setting the Redistributor address.
+> >>>>>
+> >>>>> Without this patch, did you manage to set a base address such that base + size >
+> >>>>> kvm_phys_size()?
+> >>>>>
+> >>>> Yes, with the KVM_VGIC_V3_ADDR_TYPE_REDIST legacy API. The easiest way
+> >>>> to get to this situation is with the selftest in patch 2.  I then tried
+> >>>> an extra experiment: map the first redistributor, run the first vcpu,
+> >>>> and access the redist from inside the guest. KVM didn't complain in any
+> >>>> of these steps.
+> >>> Yes, Eric pointed out that I was mistaken and there is no check being done for
+> >>> base + size > kvm_phys_size().
+> >>>
+> >>> What I was trying to say is that this check is better done when the user creates a
+> >>> Redistributor region, not when a VCPU is first run. We have everything we need to
+> >>> make the check when a region is created, why wait until the VCPU is run?
+> >>>
+> >>> For example, vgic_v3_insert_redist_region() is called each time the adds a new
+> >>> Redistributor region (via either of the two APIs), and already has a check for the
+> >>> upper limit overflowing (identical to the check in vgic_v3_check_base()). I would
+> >>> add the check against the maximum IPA size there.
+> >> you seem to refer to an old kernel as vgic_v3_insert_redist_region was
+> >> renamed into� vgic_v3_alloc_redist_region in
+> >> e5a35635464b kvm: arm64: vgic-v3: Introduce vgic_v3_free_redist_region()
+> >>
+> >> I think in case you use the old rdist API you do not know yet the size
+> >> of the redist region at this point (count=0), hence Ricardo's choice to
+> >> do the check latter.
+> > Just wanted to add one more detail. vgic_v3_check_base() is also called
+> > when creating the redistributor region (via vgic_v3_set_redist_base ->
+> > vgic_register_redist_iodev). This patch reuses that check for the old
+> > redist API to also check for "base + size > kvm_phys_size()" with a size
+> > calculated using the vcpus added so far.
+> 
+> @Eric: Indeed I was looking at an older kernel by mistake, thank you for pointing
+> that out!
+> 
+> Thank you both for the explanations, the piece I was missing was the fact that
+> KVM_VGIC_V3_ADDR_TYPE_REDIST specifies only the base address and the limit for the
+> region is the number of VCPUs * (KVM_VGIC_V3_REDIST_SIZE = 128K), which makes it
+> necessary to have the check when each VCPU is first run (as far as I can tell,
+> VCPUs can be created at any time).
+> 
+> >
+> >>> Also, because vgic_v3_insert_redist_region() already checks for overflow, I
+> >>> believe the overflow check in vgic_v3_check_base() is redundant.
+> >>>
+> > It's redundant for the new redist API, but still needed for the old
+> > redist API.
+> 
+> Indeed.
+> 
+> >
+> >>> As far as I can tell, vgic_v3_check_base() is there to make sure that the
+> >>> Distributor doesn't overlap with any of the Redistributors, and because the
+> >>> Redistributors and the Distributor can be created in any order, we defer the check
+> >>> until the first VCPU is run. I might be wrong about this, someone please correct
+> >>> me if I'm wrong.
+> >>>
+> >>> Also, did you verify that KVM is also doing this check for GICv2? KVM does
+> >>> something similar and calls vgic_v2_check_base() when mapping the GIC resources,
+> >>> and I don't see a check for the maximum IPA size in that function either.
+> >> I think vgic_check_ioaddr() called in kvm_vgic_addr() does the job (it
+> >> checks the base @)
+> >>
+> > It seems that GICv2 suffers from the same problem. The cpu interface
+> > base is checked but the end can extend above IPA size. Note that the cpu
+> > interface is 8KBs and vgic_check_ioaddr() is only checking that its base
+> 
+> ... except that the doc for KVM_VGIC_V2_ADDR_TYPE_CPU says that the CPU interface
+> region is 4K, while the check in vgic_v2_check_base() is done against
+> KVM_VGIC_V2_CPU_SIZE, which is 8K.
 
-BUG: kernel NULL pointer dereference, address: 0000000000000068
-#PF: supervisor read access in kernel mode
-#PF: error_code(0x0000) - not-present page
-PGD 0 P4D 0 
-Oops: 0000 [#1] PREEMPT SMP NOPTI
-CPU: 6 PID: 4173897 Comm: CPU 3/KVM Tainted: G        W         5.14.1-67-server #67.3
-RIP: 0010:internal_get_user_pages_fast+0x621/0x9d0
-Code: f7 c2 00 00 01 00 0f 85 94 fb ff ff 48 8b 4c 24 18 48 8d bc 24 8c 00 00 00 8b b4 24 8c 00 00 00 e8 b4 cd ff ff e9 76 fb ff ff <48> 81 7a 68 80 08 04 bc 0f 85 21 ff ff 
-8 89 c7 be
-RSP: 0018:ffffaa90087679b0 EFLAGS: 00010046
-RAX: ffffe3f37905b900 RBX: 00007f2dd561e000 RCX: ffffe3f37905b934
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffffe3f37905b900
-RBP: 00007f2dd561f000 R08: ffffe3f37905b900 R09: 000000049b4b6000
-R10: ffffaa9008767b17 R11: 0000000000000000 R12: 8000000e416e4067
-R13: ffff9dc39b4b60f0 R14: 000000ffffffffff R15: ffffe3f37905b900
-FS:  00007f2e07fff700(0000) GS:ffff9dcf3f980000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000068 CR3: 00000004c5898003 CR4: 00000000001726e0
-Call Trace:
- get_user_pages_fast_only+0x13/0x20
- hva_to_pfn+0xa9/0x3e0
- ? check_preempt_wakeup+0xec/0x230
- try_async_pf+0xa1/0x270
- ? try_to_wake_up+0x1f0/0x580
- ? generic_exec_single+0x50/0xa0
- direct_page_fault+0x113/0xad0
- kvm_mmu_page_fault+0x69/0x680
- ? __schedule+0x301/0x13f0
- ? enqueue_hrtimer+0x2f/0x80
- ? vmx_sync_pir_to_irr+0x73/0x100
- ? vmx_set_hv_timer+0x31/0x100
- vmx_handle_exit+0xe1/0x5d0
- kvm_arch_vcpu_ioctl_run+0xd81/0x1c70
- ? kvm_vcpu_ioctl+0xe8/0x670
- kvm_vcpu_ioctl+0x267/0x670
- ? kvm_on_user_return+0x7e/0x80
- ? fire_user_return_notifiers+0x38/0x50
- __x64_sys_ioctl+0x83/0xa0
- do_syscall_64+0x56/0x80
- ? do_syscall_64+0x63/0x80
- ? syscall_exit_to_user_mode+0x1d/0x40
- ? do_syscall_64+0x63/0x80
- ? do_syscall_64+0x63/0x80
- ? asm_exc_page_fault+0x5/0x20
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x7f2e2018c50b
-Code: 0f 1e fa 48 8b 05 85 39 0d 00 64 c7 00 26 00 00 00 48 c7 c0 ff ff ff ff c3 66 0f 1f 44 00 00 f3 0f 1e fa b8 10 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 55 39 0d 00 f7 d8 64 89 01 48
-RSP: 002b:00007f2e07ffe5b8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 000000000000ae80 RCX: 00007f2e2018c50b
-RDX: 0000000000000000 RSI: 000000000000ae80 RDI: 000000000000001e
-RBP: 0000556cd92161e0 R08: 0000556cd823b1d0 R09: 00000000000000ff
-R10: 0000000000000001 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000556cd88a8080 R14: 0000000000000001 R15: 0000000000000000
-Modules linked in: vhost_net vhost vhost_iotlb tap nfsv4 nfs xt_REDIRECT md5 xt_CHECKSUM xt_MASQUERADE ip6table_mangle ip6table_nat iptable_mangle ebtable_filter ebtables tun iptable_nat nf_nat joydev af_packet bonding bridge stp llc ip_set_hash_ip ip_set_hash_net xt_set tcp_diag udp_diag raw_diag inet_diag ip_set_hash_mac ip_set nfnetlink binfmt_misc nls_iso8859_1 nls_cp437 vfat fat bfq ipmi_ssif intel_rapl_msr at24 regmap_i2c intel_rapl_common iosf_mbi wmi ipmi_si ipmi_devintf ipmi_msghandler sch_fq_codel ip6t_REJECT nf_reject_ipv6 xt_hl ip6t_rt ipt_REJECT nfsd nf_reject_ipv4 xt_comment xt_limit xt_addrtype xt_tcpudp auth_rpcgss xt_conntrack nf_conntrack nfs_acl lockd nf_defrag_ipv6 nf_defrag_ipv4 grace ip6table_filter ip6_tables sunrpc iptable_filter ip_tables x_tables uas usb_storage megaraid_sas
-CR2: 0000000000000068
----[ end trace 09ba7735db5e61a6 ]---
-RIP: 0010:internal_get_user_pages_fast+0x621/0x9d0
-Code: f7 c2 00 00 01 00 0f 85 94 fb ff ff 48 8b 4c 24 18 48 8d bc 24 8c 00 00 00 8b b4 24 8c 00 00 00 e8 b4 cd ff ff e9 76 fb ff ff <48> 81 7a 68 80 08 04 bc 0f 85 21 ff ff ff 8b 54 24 68 48 89 c7 be
-RSP: 0018:ffffaa90087679b0 EFLAGS: 00010046
-RAX: ffffe3f37905b900 RBX: 00007f2dd561e000 RCX: ffffe3f37905b934
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffffe3f37905b900
-RBP: 00007f2dd561f000 R08: ffffe3f37905b900 R09: 000000049b4b6000
-R10: ffffaa9008767b17 R11: 0000000000000000 R12: 8000000e416e4067
-R13: ffff9dc39b4b60f0 R14: 000000ffffffffff R15: ffffe3f37905b900
-FS:  00007f2e07fff700(0000) GS:ffff9dcf3f980000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000068 CR3: 00000004c5898003 CR4: 00000000001726e0
+The "GIC virtual CPU interface" alone is slightly more than 4K: GICV_DIR
+is at 0x1000. The documentation might need to be updated.
 
-I also noticed that a number of the VMs seemed to be totally livelocked
-on "memset_erms" and the only thing I could do was terminate them all.
+> I suppose that the CPU interface region is 8K
+> because ARM IHI 0048B.b strongly recommends that the virtual CPU interface control
+> registers are in a separate 4KB region, and KVM wants to emulate a GICv2 as close
+> to the real thing as possible?
 
-I'll dig into this more tomorrow, but on the off chance this rings a
-bell for anyone, is this a known error?
+Are the "virtual CPU interface control" registers the ones starting with
+GICH_? If yes, then I'm a bit confused, as those are not exposed to the
+guest (to my knowledge).
 
---Darrick
+> 
+> > is 4KB aligned and below IPA size. The distributor region is 4KB so
+> > vgic_check_ioaddr() is enough in that case.
+> >
+> > What about the following?
+> >
+> > I can work on the next version of this patch (v2 has the GICv2 issue)
+> > which adds vgic_check_range(), which is like vgic_check_ioaddr() but
+> > with a size arg.  kvm_vgic_addr() can then call vgic_check_range() and
+> > do all the checks for GICv2 and GICv3. Note that for GICv2, there's no
+> > need to wait until first vcpu run to do the check. Also note that I will
+> > have to keep the change in vgic_v3_check_base() to check for the old v3
+> > redist API at first vcpu run.
+> 
+> Sounds good.
+> 
+> Thanks,
+> 
+> Alex
+> 
+> >
+> > Thanks,
+> > Ricardo
+> >
+> >> Thanks
+> >>
+> >> Eric
+
+Will do, thank you both.
+
+Ricardo
+
+> >>> Thanks,
+> >>>
+> >>> Alex
+> >>>
+> >>>> Thanks,
+> >>>> Ricardo
+> >>>>
+> >>>>> Thanks,
+> >>>>>
+> >>>>> Alex
+> >>>>>
+> >>>>>>  	}
+> >>>>>>  
+> >>>>>>  	if (IS_VGIC_ADDR_UNDEF(d->vgic_dist_base))
