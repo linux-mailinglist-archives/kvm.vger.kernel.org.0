@@ -2,91 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ADDE640B598
-	for <lists+kvm@lfdr.de>; Tue, 14 Sep 2021 19:07:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7283740B5C0
+	for <lists+kvm@lfdr.de>; Tue, 14 Sep 2021 19:15:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230111AbhINRIv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Sep 2021 13:08:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:46155 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229937AbhINRIj (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 14 Sep 2021 13:08:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1631639241;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=VSPaTs/Ana3c5AjdJic+DfXIvcN63Hc2gA/Tf0kL54c=;
-        b=ZWqo/os4SAeBKR+8y/K5PgsRUAUNf78dE3KSdMeUAAH1jo2WRn971l2D8uMkmCAyj1pAEu
-        /CnyC+v2dJqKkwboVUzqvHxCdrWC2pQhVI3xYxxMtghp3js4aGtGndz9uC92mYgbR+MjKq
-        EJaGsL8A7ze8ssq+c3MW71qEWKJMzoI=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-234-LU7Y3bcGMIWYXMkfpVSc8w-1; Tue, 14 Sep 2021 13:07:20 -0400
-X-MC-Unique: LU7Y3bcGMIWYXMkfpVSc8w-1
-Received: by mail-ed1-f71.google.com with SMTP id m20-20020aa7c2d4000000b003d1add00b8aso4001231edp.0
-        for <kvm@vger.kernel.org>; Tue, 14 Sep 2021 10:07:20 -0700 (PDT)
+        id S231171AbhINRRN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Sep 2021 13:17:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50162 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229844AbhINRRM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Sep 2021 13:17:12 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49688C061762
+        for <kvm@vger.kernel.org>; Tue, 14 Sep 2021 10:15:55 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id v16-20020a256110000000b005b23a793d77so106988ybb.15
+        for <kvm@vger.kernel.org>; Tue, 14 Sep 2021 10:15:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=arTh63mKKz2UjJUT7owYdS6q6AzPlBHxrK8LnvU/pPg=;
+        b=c8+R69jscaR3LSiuenW4TuKCq+Ntj3ps02aD68vYYywqoXpGq1bt4CEQdSGzH7GFFD
+         YA9gvZqm1/wq5XkZsp7V6rmfKP07o9SQSnku9nkDA0ToG2q0nImHP9MHtcvm/SdUSmsa
+         kTvmC/b2bjRGVTdPB0v6/hhrQRz6JORTNipxEqdTsdoa4uhvHbZ51txngI1gjm77cyhw
+         f4hvw+JzVJSLJYHKSdWWQduiir57mpvGUUDIymzlf0W5i0PK5R5+r8kQ8lqUGZb94Pw7
+         D8HkVDLku5SEcigXvdzKfeSmC0EzDKPhQ2fO8vq1lJ5SX4gK4o7eO6MAjXLEUFQV3Jnb
+         k7pA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=VSPaTs/Ana3c5AjdJic+DfXIvcN63Hc2gA/Tf0kL54c=;
-        b=vSby3dLaS5/Cggg8mXBbxUoNSxiwUnrakWNbYsg1xWi8Um/C8llc7bSdmjOeszkrXd
-         f8XzsT0viPfAevM2KuvSKSnLdWKF1MGCDQXrlJQE5SHJyDnPa2yyDUgc1qAnVWgDw4yf
-         W7Api6wKK/IYfQE7AsRcPqar67c4iXK7M15mzlxWL1cMOnx9IdoeFyh+uwYu5t+OokD8
-         EXr85MBzajtXJAXS4nUggbWsMhoY2DogxhtUgE3V4MIiPa6hrjYOsVnb6Yd1cn3NqXyQ
-         caUzv2YEmHP0zLruB8Ls0HKDzlIzuBcCFDBYQasPMvmuS/83GZmcrnRmmZhaASO6LFKs
-         +QRQ==
-X-Gm-Message-State: AOAM532Ed823h7rqTJX51u/Ycb0WKWvrTtookuOTwnisSE2gdHFH7g5w
-        H2erl0gYRgZKbK2851/V3StuIgIimsPlDR6FOgjrsjPn9wQh4klpCOib/pdIomNe5nEcj9+rZrV
-        FxMz34axIAyw+
-X-Received: by 2002:a17:906:6148:: with SMTP id p8mr19508109ejl.17.1631639239597;
-        Tue, 14 Sep 2021 10:07:19 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyz+fGJykczhq+9IbbmATrEW/jUyWNpQF9sYky1OwNDGdYkM+u3sKi6b2acRNQYiL90BljSkw==
-X-Received: by 2002:a17:906:6148:: with SMTP id p8mr19508091ejl.17.1631639239377;
-        Tue, 14 Sep 2021 10:07:19 -0700 (PDT)
-Received: from ?IPv6:2001:b07:add:ec09:c399:bc87:7b6c:fb2a? ([2001:b07:add:ec09:c399:bc87:7b6c:fb2a])
-        by smtp.gmail.com with ESMTPSA id h2sm5905306edd.43.2021.09.14.10.07.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 14 Sep 2021 10:07:18 -0700 (PDT)
-Subject: Re: [RFC/RFT PATCH 0/2] x86: sgx_vepc: implement ioctl to EREMOVE all
- pages
-To:     Jarkko Sakkinen <jarkko@kernel.org>,
-        Yang Zhong <yang.zhong@intel.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
-        linux-sgx@vger.kernel.org, dave.hansen@linux.intel.com
-References: <20210913131153.1202354-1-pbonzini@redhat.com>
- <20210914071030.GA28797@yangzhon-Virtual>
- <8e1c6b6d-6a73-827e-f496-b17b3c0f8c89@redhat.com>
- <fb04eae72ca0b24fdb533585775f2f20de9f5beb.camel@kernel.org>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <1afa3ed3-d77b-163d-e35e-30bf4f5d3a9e@redhat.com>
-Date:   Tue, 14 Sep 2021 19:07:10 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
-MIME-Version: 1.0
-In-Reply-To: <fb04eae72ca0b24fdb533585775f2f20de9f5beb.camel@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=arTh63mKKz2UjJUT7owYdS6q6AzPlBHxrK8LnvU/pPg=;
+        b=09XKEdFhb0m1SbvIx4Q2N2I5Fw0yafQmXFi8FUaW/kzSR8xYq/V40marPlwzoYq2XV
+         xUjnzQ1tIkSTAjkWFGQQaZCB0dQGeZbkOTgP6PmgMqoh79Qx+4c6iaMsU/KaAoa05plR
+         +KzdIMHUV+Y0HRvg6t56UmAwypeqASIjAXIjpnWQcfOxOKpF+Qrwt9RN7EBHAm5xEB+A
+         1o/FRS/C6HqgMfDW9K6xNb/0BuVDqfqtOr+hQT2z+hnNIUjdMkK1YR+93JL1CrSraRG4
+         hXG9lJQg7ILT+SbNOoTBHJygTd1VWltAS8k/HSgMJp35mFLoGBhZX0EkOWbxwHbeLTO/
+         hUIQ==
+X-Gm-Message-State: AOAM531UEApMvwqUvhNQhB1ylQ/SuzzZ+Lzc4PfpSxTnzuvUGkEx72ou
+        7raHSjO7R4gqvgnWksfd8yM2V5KEBmnqxwmUAZ3HTUGdlbpeF5CGXmXtQbb9DAJX0CZsqLVdim0
+        TXoWZO2W5cYJJ7bjwGWUHgRl+G6xIuy5kZTybrS6BWp+jgo4gHdrhm3W1/A==
+X-Google-Smtp-Source: ABdhPJwVNgP5CvMV+cdVnb5Bnrr1y0ECrwdNlymG78pUyGAiKl1jx17bS7ntg1rn0KjWkBG+R2Q4/I7/7ro=
+X-Received: from pgonda1.kir.corp.google.com ([2620:15c:29:204:b358:1f40:79d5:ab23])
+ (user=pgonda job=sendgmr) by 2002:a25:d804:: with SMTP id p4mr272746ybg.87.1631639754332;
+ Tue, 14 Sep 2021 10:15:54 -0700 (PDT)
+Date:   Tue, 14 Sep 2021 10:15:51 -0700
+Message-Id: <20210914171551.3223715-1-pgonda@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.0.309.g3052b89438-goog
+Subject: [PATCH] KVM: SEV: Disable KVM_CAP_VM_COPY_ENC_CONTEXT_FROM for SEV-ES
+From:   Peter Gonda <pgonda@google.com>
+To:     kvm@vger.kernel.org
+Cc:     Peter Gonda <pgonda@google.com>, Marc Orr <marcorr@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Nathan Tempelman <natet@google.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 14/09/21 18:42, Jarkko Sakkinen wrote:
->> Let's wait for this patch to be accepted first.  I'll wait a little more
->> for Jarkko and Dave to comment on this, and include your "Tested-by".
->>
->> I will also add cond_resched() on the final submission.
-> Why these would be conflicting tasks? I.e. why could not QEMU use
-> what is available now and move forward using better mechanism, when
-> they are available?
+Copying an ASID into new vCPUs will not work for SEV-ES since the vCPUs
+VMSAs need to be setup and measured before SEV_LAUNCH_FINISH. Return an
+error if a users tries to KVM_CAP_VM_COPY_ENC_CONTEXT_FROM from an
+SEV-ES guest.
 
-The implementation using close/open is quite ugly (destroying and 
-recreating the memory block breaks a few levels of abstractions), so 
-it's not really something I'd like to commit.
+Fixes: 54526d1fd593 ("KVM: x86: Support KVM VMs sharing SEV context")
 
-Paolo
+Signed-off-by: Peter Gonda <pgonda@google.com>
+Cc: Marc Orr <marcorr@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Sean Christopherson <seanjc@google.com>
+Cc: Nathan Tempelman <natet@google.com>
+Cc: Brijesh Singh <brijesh.singh@amd.com>
+Cc: kvm@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+---
+ arch/x86/kvm/svm/sev.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 75e0b21ad07c..8a279027425f 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -1728,7 +1728,7 @@ int svm_vm_copy_asid_from(struct kvm *kvm, unsigned int source_fd)
+ 	source_kvm = source_kvm_file->private_data;
+ 	mutex_lock(&source_kvm->lock);
+ 
+-	if (!sev_guest(source_kvm)) {
++	if (!sev_guest(source_kvm) || sev_es_guest(source_kvm)) {
+ 		ret = -EINVAL;
+ 		goto e_source_unlock;
+ 	}
+-- 
+2.33.0.309.g3052b89438-goog
 
