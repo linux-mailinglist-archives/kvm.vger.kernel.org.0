@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2F2A940B3C3
-	for <lists+kvm@lfdr.de>; Tue, 14 Sep 2021 17:52:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 917A540B3C1
+	for <lists+kvm@lfdr.de>; Tue, 14 Sep 2021 17:52:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234879AbhINPxr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Sep 2021 11:53:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47995 "EHLO
+        id S234762AbhINPxq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Sep 2021 11:53:46 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:47567 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231966AbhINPxk (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 14 Sep 2021 11:53:40 -0400
+        by vger.kernel.org with ESMTP id S234534AbhINPxm (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 14 Sep 2021 11:53:42 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1631634742;
+        s=mimecast20190719; t=1631634744;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ZMnmF36NpJLencIN47ewkXJeydFagF9FlbQ/WeXOPb4=;
-        b=QAcjf9AbirT4CmtTEFgzrgMTUzv+SO3hSCnop+lHUJ32a+bfIKmP0rv/WdlT25YQZ4dmCz
-        wvAxahDbgY7johDgCl1RJNq9TtZ5irj4n77+h2dh8NfueWT0mepssmpFzEcTtAL0j2nXXx
-        GikLTOU5IBWOLJlW24BdFhevG+rD2IA=
+        bh=EVzGgOi462BggNsvkxUFt1krENMLCAYntkyOmgKfes4=;
+        b=Gj4v8cic77eTsGgUKYS6fNY0kaO0G3JFDlT3BAUzouxL/bFQ4HSNj79Bk4SYY5kNuqHw/5
+        cahXJVPOti6/lwi/GSkMPalqqfauBeCLUaKn3pFN8S5pipo7xDgvJJo6Q40WuS14Wtqdvq
+        9TztcR+zb7EJceb7Mc1OpA3GsVGPDnA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-503-8L-mLjYTNSC_eRnVO5Q7LA-1; Tue, 14 Sep 2021 11:52:21 -0400
-X-MC-Unique: 8L-mLjYTNSC_eRnVO5Q7LA-1
+ us-mta-15-FrOzdBsKOb-NLFZLDBpqXA-1; Tue, 14 Sep 2021 11:52:23 -0400
+X-MC-Unique: FrOzdBsKOb-NLFZLDBpqXA-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7CB861006AA1;
-        Tue, 14 Sep 2021 15:52:20 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BE4F719253C0;
+        Tue, 14 Sep 2021 15:52:22 +0000 (UTC)
 Received: from localhost.localdomain (unknown [10.35.206.50])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 58CAB5D9D3;
-        Tue, 14 Sep 2021 15:52:18 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DE4F05D9D3;
+        Tue, 14 Sep 2021 15:52:20 +0000 (UTC)
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     qemu-devel@nongnu.org
 Cc:     Marcelo Tosatti <mtosatti@redhat.com>,
@@ -41,9 +41,9 @@ Cc:     Marcelo Tosatti <mtosatti@redhat.com>,
         kvm@vger.kernel.org,
         =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
         Maxim Levitsky <mlevitsk@redhat.com>
-Subject: [PATCH 1/3] KVM: use KVM_{GET|SET}_SREGS2 when supported.
-Date:   Tue, 14 Sep 2021 18:52:12 +0300
-Message-Id: <20210914155214.105415-2-mlevitsk@redhat.com>
+Subject: [PATCH 2/3] gdbstub: implement NOIRQ support for single step on KVM
+Date:   Tue, 14 Sep 2021 18:52:13 +0300
+Message-Id: <20210914155214.105415-3-mlevitsk@redhat.com>
 In-Reply-To: <20210914155214.105415-1-mlevitsk@redhat.com>
 References: <20210914155214.105415-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
@@ -53,265 +53,212 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This allows to make PDPTRs part of the migration
-stream and thus not reload them after migration which
-is against X86 spec.
-
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- accel/kvm/kvm-all.c   |   5 ++
- include/sysemu/kvm.h  |   4 ++
- target/i386/cpu.h     |   3 ++
- target/i386/kvm/kvm.c | 107 +++++++++++++++++++++++++++++++++++++++++-
- target/i386/machine.c |  30 ++++++++++++
- 5 files changed, 147 insertions(+), 2 deletions(-)
+ accel/kvm/kvm-all.c  | 25 ++++++++++++++++++
+ gdbstub.c            | 60 ++++++++++++++++++++++++++++++++++++--------
+ include/sysemu/kvm.h | 13 ++++++++++
+ 3 files changed, 88 insertions(+), 10 deletions(-)
 
 diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index 0125c17edb..6b187e9c96 100644
+index 6b187e9c96..e141260796 100644
 --- a/accel/kvm/kvm-all.c
 +++ b/accel/kvm/kvm-all.c
-@@ -163,6 +163,7 @@ bool kvm_msi_via_irqfd_allowed;
- bool kvm_gsi_routing_allowed;
- bool kvm_gsi_direct_mapping;
- bool kvm_allowed;
-+bool kvm_sregs2;
- bool kvm_readonly_mem_allowed;
- bool kvm_vm_attributes_allowed;
+@@ -169,6 +169,8 @@ bool kvm_vm_attributes_allowed;
  bool kvm_direct_msi_allowed;
-@@ -2554,6 +2555,10 @@ static int kvm_init(MachineState *ms)
-     kvm_ioeventfd_any_length_allowed =
-         (kvm_check_extension(s, KVM_CAP_IOEVENTFD_ANY_LENGTH) > 0);
+ bool kvm_ioeventfd_any_length_allowed;
+ bool kvm_msi_use_devid;
++bool kvm_has_guest_debug;
++int kvm_sstep_flags;
+ static bool kvm_immediate_exit;
+ static hwaddr kvm_max_slot_size = ~0;
  
+@@ -2559,6 +2561,25 @@ static int kvm_init(MachineState *ms)
+     kvm_sregs2 =
+         (kvm_check_extension(s, KVM_CAP_SREGS2) > 0);
+ 
++    kvm_has_guest_debug =
++        (kvm_check_extension(s, KVM_CAP_SET_GUEST_DEBUG) > 0);
 +
-+    kvm_sregs2 =
-+        (kvm_check_extension(s, KVM_CAP_SREGS2) > 0);
++    kvm_sstep_flags = 0;
++
++    if (kvm_has_guest_debug) {
++        /* Assume that single stepping is supported */
++        kvm_sstep_flags = SSTEP_ENABLE;
++
++        int guest_debug_flags =
++            kvm_check_extension(s, KVM_CAP_SET_GUEST_DEBUG2);
++
++        if (guest_debug_flags > 0) {
++            if (guest_debug_flags & KVM_GUESTDBG_BLOCKIRQ) {
++                kvm_sstep_flags |= SSTEP_NOIRQ;
++            }
++        }
++    }
 +
      kvm_state = s;
  
      ret = kvm_arch_init(ms, s);
+@@ -3188,6 +3209,10 @@ int kvm_update_guest_debug(CPUState *cpu, unsigned long reinject_trap)
+ 
+     if (cpu->singlestep_enabled) {
+         data.dbg.control |= KVM_GUESTDBG_ENABLE | KVM_GUESTDBG_SINGLESTEP;
++
++        if (cpu->singlestep_enabled & SSTEP_NOIRQ) {
++            data.dbg.control |= KVM_GUESTDBG_BLOCKIRQ;
++        }
+     }
+     kvm_arch_update_guest_debug(cpu, &data.dbg);
+ 
+diff --git a/gdbstub.c b/gdbstub.c
+index 5d8e6ae3cd..48bb803bae 100644
+--- a/gdbstub.c
++++ b/gdbstub.c
+@@ -368,12 +368,11 @@ typedef struct GDBState {
+     gdb_syscall_complete_cb current_syscall_cb;
+     GString *str_buf;
+     GByteArray *mem_buf;
++    int sstep_flags;
++    int supported_sstep_flags;
+ } GDBState;
+ 
+-/* By default use no IRQs and no timers while single stepping so as to
+- * make single stepping like an ICE HW step.
+- */
+-static int sstep_flags = SSTEP_ENABLE|SSTEP_NOIRQ|SSTEP_NOTIMER;
++static GDBState gdbserver_state;
+ 
+ /* Retrieves flags for single step mode. */
+ static int get_sstep_flags(void)
+@@ -385,11 +384,10 @@ static int get_sstep_flags(void)
+     if (replay_mode != REPLAY_MODE_NONE) {
+         return SSTEP_ENABLE;
+     } else {
+-        return sstep_flags;
++        return gdbserver_state.sstep_flags;
+     }
+ }
+ 
+-static GDBState gdbserver_state;
+ 
+ static void init_gdbserver_state(void)
+ {
+@@ -399,6 +397,23 @@ static void init_gdbserver_state(void)
+     gdbserver_state.str_buf = g_string_new(NULL);
+     gdbserver_state.mem_buf = g_byte_array_sized_new(MAX_PACKET_LENGTH);
+     gdbserver_state.last_packet = g_byte_array_sized_new(MAX_PACKET_LENGTH + 4);
++
++
++    if (kvm_enabled()) {
++        gdbserver_state.supported_sstep_flags = kvm_get_supported_sstep_flags();
++    } else {
++        gdbserver_state.supported_sstep_flags =
++            SSTEP_ENABLE | SSTEP_NOIRQ | SSTEP_NOTIMER;
++    }
++
++    /*
++     * By default use no IRQs and no timers while single stepping so as to
++     * make single stepping like an ICE HW step.
++     */
++
++    gdbserver_state.sstep_flags = SSTEP_ENABLE | SSTEP_NOIRQ | SSTEP_NOTIMER;
++    gdbserver_state.sstep_flags &= gdbserver_state.supported_sstep_flags;
++
+ }
+ 
+ #ifndef CONFIG_USER_ONLY
+@@ -2017,24 +2032,44 @@ static void handle_v_commands(GArray *params, void *user_ctx)
+ 
+ static void handle_query_qemu_sstepbits(GArray *params, void *user_ctx)
+ {
+-    g_string_printf(gdbserver_state.str_buf, "ENABLE=%x,NOIRQ=%x,NOTIMER=%x",
+-                    SSTEP_ENABLE, SSTEP_NOIRQ, SSTEP_NOTIMER);
++    g_string_printf(gdbserver_state.str_buf, "ENABLE=%x", SSTEP_ENABLE);
++
++    if (gdbserver_state.supported_sstep_flags & SSTEP_NOIRQ) {
++        g_string_append_printf(gdbserver_state.str_buf, ",NOIRQ=%x",
++                               SSTEP_NOIRQ);
++    }
++
++    if (gdbserver_state.supported_sstep_flags & SSTEP_NOTIMER) {
++        g_string_append_printf(gdbserver_state.str_buf, ",NOTIMER=%x",
++                               SSTEP_NOTIMER);
++    }
++
+     put_strbuf();
+ }
+ 
+ static void handle_set_qemu_sstep(GArray *params, void *user_ctx)
+ {
++    int new_sstep_flags;
++
+     if (!params->len) {
+         return;
+     }
+ 
+-    sstep_flags = get_param(params, 0)->val_ul;
++    new_sstep_flags = get_param(params, 0)->val_ul;
++
++    if (new_sstep_flags  & ~gdbserver_state.supported_sstep_flags) {
++        put_packet("E22");
++        return;
++    }
++
++    gdbserver_state.sstep_flags = new_sstep_flags;
+     put_packet("OK");
+ }
+ 
+ static void handle_query_qemu_sstep(GArray *params, void *user_ctx)
+ {
+-    g_string_printf(gdbserver_state.str_buf, "0x%x", sstep_flags);
++    g_string_printf(gdbserver_state.str_buf, "0x%x",
++                    gdbserver_state.sstep_flags);
+     put_strbuf();
+ }
+ 
+@@ -3493,6 +3528,11 @@ int gdbserver_start(const char *device)
+         return -1;
+     }
+ 
++    if (kvm_enabled() && !kvm_supports_guest_debug()) {
++        error_report("gdbstub: KVM doesn't support guest debugging");
++        return -1;
++    }
++
+     if (!device)
+         return -1;
+     if (strcmp(device, "none") != 0) {
 diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-index a1ab1ee12d..b3d4538c55 100644
+index b3d4538c55..9c0665363d 100644
 --- a/include/sysemu/kvm.h
 +++ b/include/sysemu/kvm.h
-@@ -32,6 +32,7 @@
- #ifdef CONFIG_KVM_IS_POSSIBLE
+@@ -47,6 +47,8 @@ extern bool kvm_readonly_mem_allowed;
+ extern bool kvm_direct_msi_allowed;
+ extern bool kvm_ioeventfd_any_length_allowed;
+ extern bool kvm_msi_use_devid;
++extern bool kvm_has_guest_debug;
++extern int kvm_sstep_flags;
  
- extern bool kvm_allowed;
-+extern bool kvm_sregs2;
- extern bool kvm_kernel_irqchip;
- extern bool kvm_split_irqchip;
- extern bool kvm_async_interrupts_allowed;
-@@ -139,6 +140,9 @@ extern bool kvm_msi_use_devid;
-  */
- #define kvm_gsi_direct_mapping() (kvm_gsi_direct_mapping)
- 
-+
-+#define kvm_supports_sregs2() (kvm_sregs2)
-+
+ #define kvm_enabled()           (kvm_allowed)
  /**
-  * kvm_readonly_mem_enabled:
-  *
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 71ae3141c3..9adae12426 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1436,6 +1436,9 @@ typedef struct CPUX86State {
-     SegmentCache idt; /* only base and limit are used */
+@@ -171,6 +173,17 @@ extern bool kvm_msi_use_devid;
+  */
+ #define kvm_msi_devid_required() (kvm_msi_use_devid)
  
-     target_ulong cr[5]; /* NOTE: cr1 is unused */
++/*
++ * Does KVM support guest debugging
++ */
++#define kvm_supports_guest_debug() (kvm_has_guest_debug)
 +
-+    bool pdptrs_valid;
-+    uint64_t pdptrs[4];
-     int32_t a20_mask;
++/*
++ * kvm_supported_sstep_flags
++ * Returns: SSTEP_* flags that KVM supports for guest debug
++ */
++#define kvm_get_supported_sstep_flags() (kvm_sstep_flags)
++
+ #else
  
-     BNDReg bnd_regs[4];
-diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-index 500d2e0e68..841b3b98f7 100644
---- a/target/i386/kvm/kvm.c
-+++ b/target/i386/kvm/kvm.c
-@@ -2587,6 +2587,61 @@ static int kvm_put_sregs(X86CPU *cpu)
-     return kvm_vcpu_ioctl(CPU(cpu), KVM_SET_SREGS, &sregs);
- }
- 
-+static int kvm_put_sregs2(X86CPU *cpu)
-+{
-+    CPUX86State *env = &cpu->env;
-+    struct kvm_sregs2 sregs;
-+    int i;
-+
-+    sregs.flags = 0;
-+
-+    if ((env->eflags & VM_MASK)) {
-+        set_v8086_seg(&sregs.cs, &env->segs[R_CS]);
-+        set_v8086_seg(&sregs.ds, &env->segs[R_DS]);
-+        set_v8086_seg(&sregs.es, &env->segs[R_ES]);
-+        set_v8086_seg(&sregs.fs, &env->segs[R_FS]);
-+        set_v8086_seg(&sregs.gs, &env->segs[R_GS]);
-+        set_v8086_seg(&sregs.ss, &env->segs[R_SS]);
-+    } else {
-+        set_seg(&sregs.cs, &env->segs[R_CS]);
-+        set_seg(&sregs.ds, &env->segs[R_DS]);
-+        set_seg(&sregs.es, &env->segs[R_ES]);
-+        set_seg(&sregs.fs, &env->segs[R_FS]);
-+        set_seg(&sregs.gs, &env->segs[R_GS]);
-+        set_seg(&sregs.ss, &env->segs[R_SS]);
-+    }
-+
-+    set_seg(&sregs.tr, &env->tr);
-+    set_seg(&sregs.ldt, &env->ldt);
-+
-+    sregs.idt.limit = env->idt.limit;
-+    sregs.idt.base = env->idt.base;
-+    memset(sregs.idt.padding, 0, sizeof sregs.idt.padding);
-+    sregs.gdt.limit = env->gdt.limit;
-+    sregs.gdt.base = env->gdt.base;
-+    memset(sregs.gdt.padding, 0, sizeof sregs.gdt.padding);
-+
-+    sregs.cr0 = env->cr[0];
-+    sregs.cr2 = env->cr[2];
-+    sregs.cr3 = env->cr[3];
-+    sregs.cr4 = env->cr[4];
-+
-+    sregs.cr8 = cpu_get_apic_tpr(cpu->apic_state);
-+    sregs.apic_base = cpu_get_apic_base(cpu->apic_state);
-+
-+    sregs.efer = env->efer;
-+
-+    if (env->pdptrs_valid) {
-+        for (i = 0; i < 4; i++) {
-+            sregs.pdptrs[i] = env->pdptrs[i];
-+        }
-+        sregs.flags |= KVM_SREGS2_FLAGS_PDPTRS_VALID;
-+    }
-+
-+    return kvm_vcpu_ioctl(CPU(cpu), KVM_SET_SREGS2, &sregs);
-+}
-+
-+
- static void kvm_msr_buf_reset(X86CPU *cpu)
- {
-     memset(cpu->kvm_msr_buf, 0, MSR_BUF_SIZE);
-@@ -3252,6 +3307,53 @@ static int kvm_get_sregs(X86CPU *cpu)
-     return 0;
- }
- 
-+static int kvm_get_sregs2(X86CPU *cpu)
-+{
-+    CPUX86State *env = &cpu->env;
-+    struct kvm_sregs2 sregs;
-+    int i, ret;
-+
-+    ret = kvm_vcpu_ioctl(CPU(cpu), KVM_GET_SREGS2, &sregs);
-+    if (ret < 0) {
-+        return ret;
-+    }
-+
-+    get_seg(&env->segs[R_CS], &sregs.cs);
-+    get_seg(&env->segs[R_DS], &sregs.ds);
-+    get_seg(&env->segs[R_ES], &sregs.es);
-+    get_seg(&env->segs[R_FS], &sregs.fs);
-+    get_seg(&env->segs[R_GS], &sregs.gs);
-+    get_seg(&env->segs[R_SS], &sregs.ss);
-+
-+    get_seg(&env->tr, &sregs.tr);
-+    get_seg(&env->ldt, &sregs.ldt);
-+
-+    env->idt.limit = sregs.idt.limit;
-+    env->idt.base = sregs.idt.base;
-+    env->gdt.limit = sregs.gdt.limit;
-+    env->gdt.base = sregs.gdt.base;
-+
-+    env->cr[0] = sregs.cr0;
-+    env->cr[2] = sregs.cr2;
-+    env->cr[3] = sregs.cr3;
-+    env->cr[4] = sregs.cr4;
-+
-+    env->efer = sregs.efer;
-+
-+    env->pdptrs_valid = sregs.flags & KVM_SREGS2_FLAGS_PDPTRS_VALID;
-+
-+    if (env->pdptrs_valid) {
-+        for (i = 0; i < 4; i++) {
-+            env->pdptrs[i] = sregs.pdptrs[i];
-+        }
-+    }
-+
-+    /* changes to apic base and cr8/tpr are read back via kvm_arch_post_run */
-+    x86_update_hflags(env);
-+
-+    return 0;
-+}
-+
- static int kvm_get_msrs(X86CPU *cpu)
- {
-     CPUX86State *env = &cpu->env;
-@@ -4077,7 +4179,8 @@ int kvm_arch_put_registers(CPUState *cpu, int level)
-     assert(cpu_is_stopped(cpu) || qemu_cpu_is_self(cpu));
- 
-     /* must be before kvm_put_nested_state so that EFER.SVME is set */
--    ret = kvm_put_sregs(x86_cpu);
-+    ret = kvm_supports_sregs2() ? kvm_put_sregs2(x86_cpu) :
-+                                  kvm_put_sregs(x86_cpu);
-     if (ret < 0) {
-         return ret;
-     }
-@@ -4182,7 +4285,7 @@ int kvm_arch_get_registers(CPUState *cs)
-     if (ret < 0) {
-         goto out;
-     }
--    ret = kvm_get_sregs(cpu);
-+    ret = kvm_supports_sregs2() ? kvm_get_sregs2(cpu) : kvm_get_sregs(cpu);
-     if (ret < 0) {
-         goto out;
-     }
-diff --git a/target/i386/machine.c b/target/i386/machine.c
-index b0943118d1..154666e7c0 100644
---- a/target/i386/machine.c
-+++ b/target/i386/machine.c
-@@ -1415,6 +1415,35 @@ static const VMStateDescription vmstate_msr_tsx_ctrl = {
-     }
- };
- 
-+static bool pdptrs_needed(void *opaque)
-+{
-+    X86CPU *cpu = opaque;
-+    CPUX86State *env = &cpu->env;
-+    return env->pdptrs_valid;
-+}
-+
-+static int pdptrs_post_load(void *opaque, int version_id)
-+{
-+    X86CPU *cpu = opaque;
-+    CPUX86State *env = &cpu->env;
-+    env->pdptrs_valid = true;
-+    return 0;
-+}
-+
-+
-+static const VMStateDescription vmstate_pdptrs = {
-+    .name = "cpu/pdptrs",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = pdptrs_needed,
-+    .post_load = pdptrs_post_load,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT64_ARRAY(env.pdptrs, X86CPU, 4),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+
- const VMStateDescription vmstate_x86_cpu = {
-     .name = "cpu",
-     .version_id = 12,
-@@ -1551,6 +1580,7 @@ const VMStateDescription vmstate_x86_cpu = {
-         &vmstate_nested_state,
- #endif
-         &vmstate_msr_tsx_ctrl,
-+        &vmstate_pdptrs,
-         NULL
-     }
- };
+ #define kvm_enabled()           (0)
 -- 
 2.26.3
 
