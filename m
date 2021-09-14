@@ -2,244 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B5E3840A8A0
-	for <lists+kvm@lfdr.de>; Tue, 14 Sep 2021 09:50:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EAF5E40A910
+	for <lists+kvm@lfdr.de>; Tue, 14 Sep 2021 10:20:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232842AbhINHva (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Sep 2021 03:51:30 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:40019 "EHLO
+        id S230460AbhINIV7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Sep 2021 04:21:59 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:49141 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231915AbhINHvQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 14 Sep 2021 03:51:16 -0400
+        by vger.kernel.org with ESMTP id S230303AbhINIV4 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 14 Sep 2021 04:21:56 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1631605799;
+        s=mimecast20190719; t=1631607639;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=R6Z78UAv1kninDvhZD/qhelNjlru3f9bIEDAEEJ+aas=;
-        b=civYtNuqbQXIAvfT52tsD1J3Ww44wDSkPMYFSePm5Bwgul1qmANCIolgjwP76LGepo1Q+2
-        JeF+Xx6JsKPXbvgFY77iCpVscZdkaZXzbaQb+MKOl9Tr9/YCCr7/t87OzWb4zfpvnKIiHr
-        sD0W5ibmJ3Rfdw6KKnhnjGURhCSAJew=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-23-lc2ZcRV6OcqBkF-DXAvFsQ-1; Tue, 14 Sep 2021 03:49:57 -0400
-X-MC-Unique: lc2ZcRV6OcqBkF-DXAvFsQ-1
-Received: by mail-ed1-f69.google.com with SMTP id y19-20020a056402441300b003cd8ce2b987so6315453eda.6
-        for <kvm@vger.kernel.org>; Tue, 14 Sep 2021 00:49:57 -0700 (PDT)
+        bh=OZrYl96UcrzJ4U/1lcwjzdKR3IPWpMITPCEIEQf+OBw=;
+        b=PJB4Jz7mhpk1qsVH7H8TgEzm/TXIphRIQX3Z86h8SxjYSKiZVK905lteIWiHrXwWGWrHr7
+        kWWvR0Q0+hIQaZzMT0AEUliVSik5wRNeW10gODnrnWmCRAE3D/YyZHa0brjwFEFYUSXbHj
+        6ACWv3XOc9ytQuepzE82lLcKt+VJjM8=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-524-FSqoMLYfP8y89Fyiqyk6gA-1; Tue, 14 Sep 2021 04:20:37 -0400
+X-MC-Unique: FSqoMLYfP8y89Fyiqyk6gA-1
+Received: by mail-ed1-f71.google.com with SMTP id h15-20020aa7de0f000000b003d02f9592d6so5980902edv.17
+        for <kvm@vger.kernel.org>; Tue, 14 Sep 2021 01:20:36 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=R6Z78UAv1kninDvhZD/qhelNjlru3f9bIEDAEEJ+aas=;
-        b=vcf5rFyhg9bKbLDoHR3VRjou4yYGmKXkcG8iXc7erjcNFkt5bFpC3aAi14ytwuzBIQ
-         W8aFQ2ybip5TqM7W8SJ3TZ1SjYNgJxJ1SS14cTkSn5sq96a9L/nn8AyboPBElQ+ckaOQ
-         RHFpK4dW1lmLvf6g8UhRHvwqE2giqI4Pz5ybPROIt9crsnniUjKmxfCg0tMkvxzIVDOz
-         NAiPiTWorl0CFt+El3qAK4Mz+iUdmSmLLxpQzHHTylVupglrr/qZ1REd1Pa9IJi9VZOn
-         aUscsbmn9P/hLfwNE6pLUZLuucXu4ank403HXrSIB1CCfWeXubE9l5p99irpb0X24riO
-         8s0Q==
-X-Gm-Message-State: AOAM532oekIrh4qePR3GbzEPxY6BAb0gHrChFvmmYw/ASk/T0vPeptgZ
-        Fz4bc9VqAZWY2TQDgeMmZHo5o19D3hVZqrlisaP8GZjT1rCctVKDyM4KIm6zS/CsK18YIwyjiQ0
-        5UHPV5/46Z8NA
-X-Received: by 2002:a17:906:50d:: with SMTP id j13mr10991466eja.58.1631605796665;
-        Tue, 14 Sep 2021 00:49:56 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxJTsoIi5L3KoB/sC54f49zilK1+Lotlu4FXZaBZwCghtwsY0aj86bOujiop9u3X1CIuwd6VQ==
-X-Received: by 2002:a17:906:50d:: with SMTP id j13mr10991428eja.58.1631605796384;
-        Tue, 14 Sep 2021 00:49:56 -0700 (PDT)
-Received: from gator.home (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
-        by smtp.gmail.com with ESMTPSA id dj8sm3925587edb.53.2021.09.14.00.49.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Sep 2021 00:49:55 -0700 (PDT)
-Date:   Tue, 14 Sep 2021 09:49:53 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Raghavendra Rao Ananta <rananta@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH v6 12/14] KVM: arm64: selftests: Add host support for vGIC
-Message-ID: <20210914074953.lijtspubonocwz4u@gator.home>
-References: <20210913230955.156323-1-rananta@google.com>
- <20210913230955.156323-13-rananta@google.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=OZrYl96UcrzJ4U/1lcwjzdKR3IPWpMITPCEIEQf+OBw=;
+        b=Xu7MwmjX3pd9hXj7zup8vrqPHrWDQORIFoWkeQlzIMun7tbfdmm/IKGppAUiEO+G7j
+         /WwQaqySF3fEnUfosb5VN+znq1LzUkeYrjr8XiXJgbxRp9iTxfLAlQk9oco/w42GzWVV
+         O5upLVct0dUsWRYg06l2cUEQH6S8K3huuS2YHJFATwJUZAa3w0C7lDvikXd2ag46Ry6q
+         8bkmRVtQzY/aUtlhHyxXaF077tGOwR6DaFLyjSaboCEoCAgTPPhsZpxzodrxg0knoSUN
+         oKPQiizOWBe6pKnhLCJ6ZzanoV0YFKQzzOgA8IQG9wUYE2IwHiHN6ZNELY8CD58fkkQP
+         DRyA==
+X-Gm-Message-State: AOAM531G2ZDSV9wFzUQtmxXcQk3mkZOWz2YDc95QfcylYhmdIirG5nxq
+        sqcboPCZYHvsO2uf1e/xQrZ4DagQ5QNBF/dhSFVEyTzGMLXx9wrGUeTYne6zuOX6nPP8AP1tb21
+        nYSVaHtAy79sp
+X-Received: by 2002:a17:906:3693:: with SMTP id a19mr17824384ejc.237.1631607635929;
+        Tue, 14 Sep 2021 01:20:35 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz5i665AMySfybFMK4WWmW9FuL6POLqqgnKYXsAFXFztRVO+7qVj5BAth9qVjtGIXqSoMuBqA==
+X-Received: by 2002:a17:906:3693:: with SMTP id a19mr17824378ejc.237.1631607635793;
+        Tue, 14 Sep 2021 01:20:35 -0700 (PDT)
+Received: from localhost.localdomain ([2a04:ee41:4:31cb:e591:1e1e:abde:a8f1])
+        by smtp.gmail.com with ESMTPSA id h10sm4540598ede.28.2021.09.14.01.20.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 14 Sep 2021 01:20:33 -0700 (PDT)
+Subject: Re: [RFC PATCH 3/3] nSVM: use svm->nested.save to load vmcb12
+ registers and avoid TOC/TOU races
+To:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        linux-kernel@vger.kernel.org
+References: <20210903102039.55422-1-eesposit@redhat.com>
+ <20210903102039.55422-4-eesposit@redhat.com>
+ <21d2bf8c4e3eb3fc5d297fd13300557ec686b625.camel@redhat.com>
+From:   Emanuele Giuseppe Esposito <eesposit@redhat.com>
+Message-ID: <73b5a5bb-48f2-3a08-c76b-a82b5b69c406@redhat.com>
+Date:   Tue, 14 Sep 2021 10:20:32 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210913230955.156323-13-rananta@google.com>
+In-Reply-To: <21d2bf8c4e3eb3fc5d297fd13300557ec686b625.camel@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 13, 2021 at 11:09:53PM +0000, Raghavendra Rao Ananta wrote:
-> Implement a simple library to perform vGIC-v3 setup
-> from a host point of view. This includes creating a
-> vGIC device, setting up distributor and redistributor
-> attributes, and mapping the guest physical addresses.
+
+
+On 12/09/2021 12:42, Maxim Levitsky wrote:
+>>   
+>> -	if (!nested_vmcb_valid_sregs(vcpu, &vmcb12->save) ||
+>> +	if (!nested_vmcb_valid_sregs(vcpu, &svm->nested.save) ||
+>>   	    !nested_vmcb_check_controls(vcpu, &svm->nested.ctl)) {
+
+> If you use a different struct for the copied fields, then it makes
+> sense IMHO to drop the 'control' parameter from nested_vmcb_check_controls,
+> and just use the svm->nested.save there directly.
 > 
-> The definition of REDIST_REGION_ATTR_ADDR is taken from
-> aarch64/vgic_init test. Hence, replace the definition
-> by including vgic.h in the test file.
-> 
-> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> Reviewed-by: Ricardo Koller <ricarkol@google.com>
-> ---
->  tools/testing/selftests/kvm/Makefile          |  2 +-
->  .../testing/selftests/kvm/aarch64/vgic_init.c |  3 +-
->  .../selftests/kvm/include/aarch64/vgic.h      | 20 ++++++
->  .../testing/selftests/kvm/lib/aarch64/vgic.c  | 70 +++++++++++++++++++
->  4 files changed, 92 insertions(+), 3 deletions(-)
->  create mode 100644 tools/testing/selftests/kvm/include/aarch64/vgic.h
->  create mode 100644 tools/testing/selftests/kvm/lib/aarch64/vgic.c
-> 
-> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> index 5476a8ddef60..8342f65c1d96 100644
-> --- a/tools/testing/selftests/kvm/Makefile
-> +++ b/tools/testing/selftests/kvm/Makefile
-> @@ -35,7 +35,7 @@ endif
->  
->  LIBKVM = lib/assert.c lib/elf.c lib/io.c lib/kvm_util.c lib/rbtree.c lib/sparsebit.c lib/test_util.c lib/guest_modes.c lib/perf_test_util.c
->  LIBKVM_x86_64 = lib/x86_64/apic.c lib/x86_64/processor.c lib/x86_64/vmx.c lib/x86_64/svm.c lib/x86_64/ucall.c lib/x86_64/handlers.S
-> -LIBKVM_aarch64 = lib/aarch64/processor.c lib/aarch64/ucall.c lib/aarch64/handlers.S lib/aarch64/spinlock.c lib/aarch64/gic.c lib/aarch64/gic_v3.c
-> +LIBKVM_aarch64 = lib/aarch64/processor.c lib/aarch64/ucall.c lib/aarch64/handlers.S lib/aarch64/spinlock.c lib/aarch64/gic.c lib/aarch64/gic_v3.c lib/aarch64/vgic.c
->  LIBKVM_s390x = lib/s390x/processor.c lib/s390x/ucall.c lib/s390x/diag318_test_handler.c
->  
->  TEST_GEN_PROGS_x86_64 = x86_64/cr4_cpuid_sync_test
-> diff --git a/tools/testing/selftests/kvm/aarch64/vgic_init.c b/tools/testing/selftests/kvm/aarch64/vgic_init.c
-> index 623f31a14326..157fc24f39c5 100644
-> --- a/tools/testing/selftests/kvm/aarch64/vgic_init.c
-> +++ b/tools/testing/selftests/kvm/aarch64/vgic_init.c
-> @@ -13,11 +13,10 @@
->  #include "test_util.h"
->  #include "kvm_util.h"
->  #include "processor.h"
-> +#include "vgic.h"
->  
->  #define NR_VCPUS		4
->  
-> -#define REDIST_REGION_ATTR_ADDR(count, base, flags, index) (((uint64_t)(count) << 52) | \
-> -	((uint64_t)((base) >> 16) << 16) | ((uint64_t)(flags) << 12) | index)
->  #define REG_OFFSET(vcpu, offset) (((uint64_t)vcpu << 32) | offset)
->  
->  #define GICR_TYPER 0x8
-> diff --git a/tools/testing/selftests/kvm/include/aarch64/vgic.h b/tools/testing/selftests/kvm/include/aarch64/vgic.h
-> new file mode 100644
-> index 000000000000..0ecfb253893c
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/include/aarch64/vgic.h
-> @@ -0,0 +1,20 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/*
-> + * ARM Generic Interrupt Controller (GIC) host specific defines
-> + */
-> +
-> +#ifndef SELFTEST_KVM_VGIC_H
-> +#define SELFTEST_KVM_VGIC_H
-> +
-> +#include <linux/kvm.h>
-> +
-> +#define REDIST_REGION_ATTR_ADDR(count, base, flags, index) \
-> +	(((uint64_t)(count) << 52) | \
-> +	((uint64_t)((base) >> 16) << 16) | \
-> +	((uint64_t)(flags) << 12) | \
-> +	index)
-> +
-> +int vgic_v3_setup(struct kvm_vm *vm, unsigned int nr_vcpus,
-> +		uint64_t gicd_base_gpa, uint64_t gicr_base_gpa);
-> +
-> +#endif /* SELFTEST_KVM_VGIC_H */
-> diff --git a/tools/testing/selftests/kvm/lib/aarch64/vgic.c b/tools/testing/selftests/kvm/lib/aarch64/vgic.c
-> new file mode 100644
-> index 000000000000..9880caa8c7db
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/lib/aarch64/vgic.c
-> @@ -0,0 +1,70 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * ARM Generic Interrupt Controller (GIC) v3 host support
-> + */
-> +
-> +#include <linux/kvm.h>
-> +#include <linux/sizes.h>
-> +#include <asm/kvm.h>
-> +
-> +#include "kvm_util.h"
-> +#include "../kvm_util_internal.h"
-> +#include "vgic.h"
-> +
-> +/*
-> + * vGIC-v3 default host setup
-> + *
-> + * Input args:
-> + *	vm - KVM VM
-> + *	nr_vcpus - Number of vCPUs supported by this VM
-> + *	gicd_base_gpa - Guest Physical Address of the Distributor region
-> + *	gicr_base_gpa - Guest Physical Address of the Redistributor region
-> + *
-> + * Output args: None
-> + *
-> + * Return: GIC file-descriptor or negative error code upon failure
-> + *
-> + * The function creates a vGIC-v3 device and maps the distributor and
-> + * redistributor regions of the guest. Since it depends on the number of
-> + * vCPUs for the VM, it must be called after all the vCPUs have been created.
-> + */
-> +int vgic_v3_setup(struct kvm_vm *vm, unsigned int nr_vcpus,
-> +		uint64_t gicd_base_gpa, uint64_t gicr_base_gpa)
-> +{
-> +	int gic_fd;
-> +	uint64_t redist_attr;
-> +	struct list_head *iter;
-> +	unsigned int nr_gic_pages, nr_vcpus_created = 0;
-> +
-> +	TEST_ASSERT(nr_vcpus, "Num of vCPUs cannot be empty\n");
 
-nit: I'd rather spell out 'Number'
+Ok, what you say in patch 2 makes sense to me. I can create a new struct 
+vmcb_save_area_cached, but I need to keep nested.ctl because 1) it is 
+used also elsewhere, and different fields from the one checked here are 
+read/set and 2) using another structure (or the same 
+vmcb_save_area_cached) in its place would just duplicate the same fields 
+of nested.ctl, creating even more confusion and possible inconsistency.
 
-> +
-> +	/*
-> +	 * Make sure that the caller is infact calling this
-> +	 * function after all the vCPUs are added.
-> +	 */
-> +	list_for_each(iter, &vm->vcpus)
-> +		nr_vcpus_created++;
-> +	TEST_ASSERT(nr_vcpus == nr_vcpus_created,
-> +			"No. of vCPUs requested (%u) doesn't match with the ones created for the VM (%u)\n",
+Let me know if you disagree.
 
-nit: Same nit here, s/No./Number/
-
-> +			nr_vcpus, nr_vcpus_created);
-> +
-> +	/* Distributor setup */
-> +	gic_fd = kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_V3, false);
-> +	kvm_device_access(gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
-> +			KVM_VGIC_V3_ADDR_TYPE_DIST, &gicd_base_gpa, true);
-> +	nr_gic_pages = vm_calc_num_guest_pages(vm->mode, KVM_VGIC_V3_DIST_SIZE);
-> +	virt_map(vm, gicd_base_gpa, gicd_base_gpa,  nr_gic_pages);
-> +
-> +	/* Redistributor setup */
-> +	redist_attr = REDIST_REGION_ATTR_ADDR(nr_vcpus, gicr_base_gpa, 0, 0);
-> +	kvm_device_access(gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
-> +			KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &redist_attr, true);
-> +	nr_gic_pages = vm_calc_num_guest_pages(vm->mode,
-> +						KVM_VGIC_V3_REDIST_SIZE * nr_vcpus);
-> +	virt_map(vm, gicr_base_gpa, gicr_base_gpa,  nr_gic_pages);
-> +
-> +	kvm_device_access(gic_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
-> +				KVM_DEV_ARM_VGIC_CTRL_INIT, NULL, true);
-> +
-> +	return gic_fd;
-> +}
-> -- 
-> 2.33.0.309.g3052b89438-goog
->
-
-Otherwise,
-
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+Thank you,
+Emanuele
 
