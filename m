@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 832D140BB99
-	for <lists+kvm@lfdr.de>; Wed, 15 Sep 2021 00:32:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 51C6D40BB9E
+	for <lists+kvm@lfdr.de>; Wed, 15 Sep 2021 00:33:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235895AbhINWdd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Sep 2021 18:33:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39632 "EHLO
+        id S235766AbhINWeF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Sep 2021 18:34:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39624 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235770AbhINWdG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Sep 2021 18:33:06 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F259C0613E1
-        for <kvm@vger.kernel.org>; Tue, 14 Sep 2021 15:31:45 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id f64-20020a2538430000b0290593bfc4b046so926333yba.9
-        for <kvm@vger.kernel.org>; Tue, 14 Sep 2021 15:31:45 -0700 (PDT)
+        with ESMTP id S236069AbhINWdV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Sep 2021 18:33:21 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9298EC0613EE
+        for <kvm@vger.kernel.org>; Tue, 14 Sep 2021 15:31:47 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id b9-20020a5b07890000b0290558245b7eabso922280ybq.10
+        for <kvm@vger.kernel.org>; Tue, 14 Sep 2021 15:31:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=BW7fBGcKsdrR8mke56V7bzU7gD9WyqlXvKOO1bey3dM=;
-        b=KKrMidevVqRU8tnCf4HU4OhnmV4gTubXrbIfa7ytYE6gg6NnqwIA73O/SeJOdKPaFS
-         +aF6f8SR1NWh9ctn4JkR57SOSgLADPbjUTJXnTPMlWXteaQen7oI9433NcrMbrU9+6Vx
-         IfOmq44ELPlXjNG5vZ8UGDbY8XrQNygpDmddOehD8XpaTdhS5CBvPXhFs97WUdE3mdlx
-         +rlcewue0YSfqo1HwOKvI4mzWUA4vf5jcotMRA3l3ydvvLj8mozJhget75ThKDippFOI
-         QQYqdf3SRHPJwf8tlda7NBau1BdAqms2EsS0QX+etXuBOJJaFOw6OK7Ykj4paUtyEafI
-         le9w==
+        bh=ap1ftYDLPyFEEpyKZVnsUXcIKPkxVpyeCr5WbufecSE=;
+        b=CjFqjry3wo3EQPMz5M99dDU9C/SJybGkzsqWG/YDHqzkvfrMClsP6/tYCnkQ6mabGN
+         ciRWxPdsotKE2bFCar/MqFTkNSNrjzafeoEsbrVqtUP1YHsQ5oA7EzkCrWaS3DUV8edz
+         /wQ2KKAXSnINeEpXioFtHmJs2fA6eGzFjENcKZjm8/kYZUTvinu8Zf5CYFKRn1bW+iwW
+         /yuPsTBbs6j43kZgKAReV/AbVhWd/mZC09YjNPzfAi5zRCsUYVQmqdi7wyvLj5Hm+sEO
+         1+iFZ9J9NQurs9j2BCPUcxJdDOC/ao0/6qc1mJBn4hWI5TvP5xxL2glsMvmkZuY8U+uJ
+         fKYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=BW7fBGcKsdrR8mke56V7bzU7gD9WyqlXvKOO1bey3dM=;
-        b=cCscVswNUDxRZaVZg/beVYOxheKRetpeV17NqgFJab4jFdo/xiBgG9Zxgcg6npY/W8
-         52Ij1g8GSW9ebCNjA2s9fd6MZqCbE341bLZx0lrT2fin/dMCzl1l6CvXk80Q0R7t08hn
-         Rys9l8mjBbsj7CZMJI0arI7mzykwVVZhgZBTlWppKadHm4nc283b67kXQJOG2clWHyi1
-         hO8/6jBCbkT3x+U3dfT/qDFiBbxzjUvQb4R4/UClry0IaclEXzLcZE4/MmkF+FY42KX7
-         8HESHVx0UFdq6mg6G2+hWjn/1wvV80xUwnLqYNMWLjlxwCIU4GaQ7kED5d8xKRWZG/0d
-         DFbg==
-X-Gm-Message-State: AOAM530/sn7cRIp39k0gvBJqTRtJUNRt9MXulKkEk8waLBhklcz6x/iP
-        83GOAeqBvddo0159Ssszm6mB0y4Cc2kp
-X-Google-Smtp-Source: ABdhPJzPcqUzTM5tBKbzTFIOabctvphrNK79S1QDbS3uHmuEww5wKnVoFnhwbSzNggFM60aX3Wsu6DKNYmnL
+        bh=ap1ftYDLPyFEEpyKZVnsUXcIKPkxVpyeCr5WbufecSE=;
+        b=WV0bmBqaKYiYYs3kyX7ElOidkgUXn4Ryoi/yN3HmyXL8QVmt7R0wy66GzRUb5zVkMp
+         PhI7pynrACCaa+yQ6BxmHuIod/6Dh+0v7UZY8pSU+yCke+wX+KcevunVQ6wenGTyKqSp
+         tvC9LXXWqQYSniW+QAfpNFhgP8GSxVlIpGqShPDQyehlUlCE+T/vRwuX4UBNkde0/oKT
+         AhXSHfVgv/lxpe2lTMDy86lSurjPzi1zgnjylpNE/VxnGmXkjvaiqe2QzTlIfHkF5BEH
+         1rXhGWeVOiFuOYQ7SH2q5sIdpLg2KTPE03QmxdDL7b3ifNgP3SeaBvWNFAHsbVzsKBAk
+         rAUQ==
+X-Gm-Message-State: AOAM5315BE8gPj1nDnz62pO1gV3Wp4AjlhkcCa/LYVZ4Zx56D6JVNP9U
+        jLEk+eiGQzV/6TjWEr+LHcBhnHqfCTp0
+X-Google-Smtp-Source: ABdhPJxBaFLFKMu3q6qk1EwMRDGG2Dza3QEyOnAPZV3kJ7MvX3zS4aMl29r5sI9FcTr45XcEBNh5JCxPXY7Z
 X-Received: from rananta-virt.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1bcc])
- (user=rananta job=sendgmr) by 2002:a25:5607:: with SMTP id
- k7mr2077562ybb.378.1631658704625; Tue, 14 Sep 2021 15:31:44 -0700 (PDT)
-Date:   Tue, 14 Sep 2021 22:31:09 +0000
+ (user=rananta job=sendgmr) by 2002:a25:16c6:: with SMTP id
+ 189mr1901322ybw.27.1631658706802; Tue, 14 Sep 2021 15:31:46 -0700 (PDT)
+Date:   Tue, 14 Sep 2021 22:31:10 +0000
 In-Reply-To: <20210914223114.435273-1-rananta@google.com>
-Message-Id: <20210914223114.435273-11-rananta@google.com>
+Message-Id: <20210914223114.435273-12-rananta@google.com>
 Mime-Version: 1.0
 References: <20210914223114.435273-1-rananta@google.com>
 X-Mailer: git-send-email 2.33.0.309.g3052b89438-goog
-Subject: [PATCH v7 10/15] KVM: arm64: selftests: Add guest support to get the vcpuid
+Subject: [PATCH v7 11/15] KVM: arm64: selftests: Add light-weight spinlock support
 From:   Raghavendra Rao Ananta <rananta@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
         Andrew Jones <drjones@redhat.com>,
@@ -71,52 +71,87 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-At times, such as when in the interrupt handler, the guest wants
-to get the vcpuid that it's running on to pull the per-cpu private
-data. As a result, introduce guest_get_vcpuid() that returns the
-vcpuid of the calling vcpu. The interface is architecture
-independent, but defined only for arm64 as of now.
+Add a simpler version of spinlock support for ARM64 for
+the guests to use.
 
-Suggested-by: Reiji Watanabe <reijiw@google.com>
+The implementation is loosely based on the spinlock
+implementation in kvm-unit-tests.
+
 Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-Reviewed-by: Ricardo Koller <ricarkol@google.com>
-Reviewed-by: Reiji Watanabe <reijiw@google.com>
+Reviewed-by: Oliver Upton <oupton@google.com>
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 ---
- tools/testing/selftests/kvm/include/kvm_util.h      | 2 ++
- tools/testing/selftests/kvm/lib/aarch64/processor.c | 6 ++++++
- 2 files changed, 8 insertions(+)
+ tools/testing/selftests/kvm/Makefile          |  2 +-
+ .../selftests/kvm/include/aarch64/spinlock.h  | 13 +++++++++
+ .../selftests/kvm/lib/aarch64/spinlock.c      | 27 +++++++++++++++++++
+ 3 files changed, 41 insertions(+), 1 deletion(-)
+ create mode 100644 tools/testing/selftests/kvm/include/aarch64/spinlock.h
+ create mode 100644 tools/testing/selftests/kvm/lib/aarch64/spinlock.c
 
-diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-index 010b59b13917..bcf05f5381ed 100644
---- a/tools/testing/selftests/kvm/include/kvm_util.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util.h
-@@ -400,4 +400,6 @@ uint64_t get_ucall(struct kvm_vm *vm, uint32_t vcpu_id, struct ucall *uc);
- int vm_get_stats_fd(struct kvm_vm *vm);
- int vcpu_get_stats_fd(struct kvm_vm *vm, uint32_t vcpuid);
+diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+index 5d05801ab816..61f0d376af99 100644
+--- a/tools/testing/selftests/kvm/Makefile
++++ b/tools/testing/selftests/kvm/Makefile
+@@ -35,7 +35,7 @@ endif
  
-+uint32_t guest_get_vcpuid(void);
-+
- #endif /* SELFTEST_KVM_UTIL_H */
-diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-index 34f6bd47661f..b4eeeafd2a70 100644
---- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-@@ -277,6 +277,7 @@ void aarch64_vcpu_setup(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_vcpu_init
- 	set_reg(vm, vcpuid, KVM_ARM64_SYS_REG(SYS_TCR_EL1), tcr_el1);
- 	set_reg(vm, vcpuid, KVM_ARM64_SYS_REG(SYS_MAIR_EL1), DEFAULT_MAIR_EL1);
- 	set_reg(vm, vcpuid, KVM_ARM64_SYS_REG(SYS_TTBR0_EL1), vm->pgd);
-+	set_reg(vm, vcpuid, KVM_ARM64_SYS_REG(SYS_TPIDR_EL1), vcpuid);
- }
+ LIBKVM = lib/assert.c lib/elf.c lib/io.c lib/kvm_util.c lib/rbtree.c lib/sparsebit.c lib/test_util.c lib/guest_modes.c lib/perf_test_util.c
+ LIBKVM_x86_64 = lib/x86_64/apic.c lib/x86_64/processor.c lib/x86_64/vmx.c lib/x86_64/svm.c lib/x86_64/ucall.c lib/x86_64/handlers.S
+-LIBKVM_aarch64 = lib/aarch64/processor.c lib/aarch64/ucall.c lib/aarch64/handlers.S
++LIBKVM_aarch64 = lib/aarch64/processor.c lib/aarch64/ucall.c lib/aarch64/handlers.S lib/aarch64/spinlock.c
+ LIBKVM_s390x = lib/s390x/processor.c lib/s390x/ucall.c lib/s390x/diag318_test_handler.c
  
- void vcpu_dump(FILE *stream, struct kvm_vm *vm, uint32_t vcpuid, uint8_t indent)
-@@ -426,3 +427,8 @@ void vm_install_exception_handler(struct kvm_vm *vm, int vector,
- 	assert(vector < VECTOR_NUM);
- 	handlers->exception_handlers[vector][0] = handler;
- }
+ TEST_GEN_PROGS_x86_64 = x86_64/cr4_cpuid_sync_test
+diff --git a/tools/testing/selftests/kvm/include/aarch64/spinlock.h b/tools/testing/selftests/kvm/include/aarch64/spinlock.h
+new file mode 100644
+index 000000000000..cf0984106d14
+--- /dev/null
++++ b/tools/testing/selftests/kvm/include/aarch64/spinlock.h
+@@ -0,0 +1,13 @@
++/* SPDX-License-Identifier: GPL-2.0 */
 +
-+uint32_t guest_get_vcpuid(void)
++#ifndef SELFTEST_KVM_ARM64_SPINLOCK_H
++#define SELFTEST_KVM_ARM64_SPINLOCK_H
++
++struct spinlock {
++	int v;
++};
++
++extern void spin_lock(struct spinlock *lock);
++extern void spin_unlock(struct spinlock *lock);
++
++#endif /* SELFTEST_KVM_ARM64_SPINLOCK_H */
+diff --git a/tools/testing/selftests/kvm/lib/aarch64/spinlock.c b/tools/testing/selftests/kvm/lib/aarch64/spinlock.c
+new file mode 100644
+index 000000000000..a076e780be5d
+--- /dev/null
++++ b/tools/testing/selftests/kvm/lib/aarch64/spinlock.c
+@@ -0,0 +1,27 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * ARM64 Spinlock support
++ */
++#include <stdint.h>
++
++#include "spinlock.h"
++
++void spin_lock(struct spinlock *lock)
 +{
-+	return read_sysreg(tpidr_el1);
++	int val, res;
++
++	asm volatile(
++	"1:	ldaxr	%w0, [%2]\n"
++	"	cbnz	%w0, 1b\n"
++	"	mov	%w0, #1\n"
++	"	stxr	%w1, %w0, [%2]\n"
++	"	cbnz	%w1, 1b\n"
++	: "=&r" (val), "=&r" (res)
++	: "r" (&lock->v)
++	: "memory");
++}
++
++void spin_unlock(struct spinlock *lock)
++{
++	asm volatile("stlr wzr, [%0]\n"	: : "r" (&lock->v) : "memory");
 +}
 -- 
 2.33.0.309.g3052b89438-goog
