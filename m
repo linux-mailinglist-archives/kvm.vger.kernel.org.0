@@ -2,198 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D097240BA4B
-	for <lists+kvm@lfdr.de>; Tue, 14 Sep 2021 23:34:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8A0FD40BAEA
+	for <lists+kvm@lfdr.de>; Wed, 15 Sep 2021 00:04:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234833AbhINVfQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Sep 2021 17:35:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54002 "EHLO
+        id S235180AbhINWF1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Sep 2021 18:05:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32932 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234656AbhINVfP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Sep 2021 17:35:15 -0400
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1DA8C061764
-        for <kvm@vger.kernel.org>; Tue, 14 Sep 2021 14:33:57 -0700 (PDT)
-Received: by mail-pf1-x42a.google.com with SMTP id m26so698349pff.3
-        for <kvm@vger.kernel.org>; Tue, 14 Sep 2021 14:33:57 -0700 (PDT)
+        with ESMTP id S235112AbhINWF0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Sep 2021 18:05:26 -0400
+Received: from mail-lj1-x234.google.com (mail-lj1-x234.google.com [IPv6:2a00:1450:4864:20::234])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30BBAC061574
+        for <kvm@vger.kernel.org>; Tue, 14 Sep 2021 15:04:08 -0700 (PDT)
+Received: by mail-lj1-x234.google.com with SMTP id p15so1449574ljn.3
+        for <kvm@vger.kernel.org>; Tue, 14 Sep 2021 15:04:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=ZyjM2wXU6lcczfYiDbbE+nr5M72sF/mBbv9m3C0jSUo=;
-        b=BBPcaDizm+ebmiak6LRh4102fNSBmRNhl4+y56Xy2ZoG6QzA2eKAqLu1xvxohYClem
-         UYDOdK/PS8+E8SGCISj7wMV0BW0SMNj/qd3gqwq4xV4LyCIfDhIofxM7O3ZCbrj9bTM6
-         AiBSpm5AnkHD7DK55QKyv67HyOeMAtBMryUEJCdRYXTXUeiiiGawQPSEU+YEOmzfc4OG
-         +cVLqYnv2f2/EV2Nx2RcyJGERu6F/4Lp8o8bVAROm9jRVliNOGKGT9tXaO6ZwrY7F62Q
-         I1OmwG/NvCeKXN5z93eojG4S2GjBmgVmTDZ2IyeN4Stdd+GGPp7tmKrb3fei2UwID+o8
-         mBuA==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=4r/QuEek1IJxOTV0kb5k4wwB4qARh5+mDnfq9y231lI=;
+        b=JkTwfbecRPqhMK7XoQ8d92T7iOKua5f+IVTLSDSDJB9qWyiIkM0SaCWyK06t6HTfzz
+         0i3FD4mp/tlKdDdsrBvEqcHZOynglvHdU/AL1a1ZT9cikXbKyCr702n3S+K1FmC/MORo
+         UsU0+uneGV8wluKv+9naoH8tUlhNqaaE+lUcuMzc3Bj68pKI7UL3So27UkZRr7ASSPyz
+         MkcB63hMgusMPBIXy0v6/ke/SIcj9e/1nhA1gLB/jI2/DGVx3OtlNc3vSkYLgZZX3Uo3
+         hBXV6LMnLsIxD2hLgTG0MrAWWizIDYq7aGRuvLWeQlBHWFdOZFqXI0uoKT8+JISo/g2V
+         JKnQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=ZyjM2wXU6lcczfYiDbbE+nr5M72sF/mBbv9m3C0jSUo=;
-        b=S6kqq1OFH+VgPzwd+J1ies9S+kYcvR+0e4gI5op7LemK9CS2zX1rSKCLq7bD2vJFgF
-         1C8JLXvsMUQKsACm1G4uuPOw+8MfzQIunsy/tWUnX0V0XPEj11E6BG8PVeNcPA97S7Zr
-         8xSl+y9gPGAP9t+VUNaAHiDHDoprPhYr9oEItOyktvwQfCfCllSfd4P/zYEsEQX6WWeg
-         bEirtkLD40hTnhD49u93UJ/s9IlwCidK6/JiSAo/7DUWHVrHkUpuj12VYKekGnouKqjx
-         m/UqC+sf6P3ci9bT7FJ17j/gmMXug7nrRSVnFvHj45VulD+O10hJJzh5Ly+fdlPxYmEA
-         mpcA==
-X-Gm-Message-State: AOAM533bdRAgmOYO/Q/Xvrra0csCEUU9sSMQRvB22yubW/0sMYO43djq
-        V6q8Sni2GejS43lDE8D9w/5YmQ==
-X-Google-Smtp-Source: ABdhPJybCI6QSBt4aaOFLxKB+NKlA+WI2FDLU3adUXCAU9W7cHSWjtPA3oc5IWHv9q84jY3U/uhClA==
-X-Received: by 2002:aa7:9d02:0:b0:43d:ea96:5882 with SMTP id k2-20020aa79d02000000b0043dea965882mr6882103pfp.23.1631655237051;
-        Tue, 14 Sep 2021 14:33:57 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id m125sm3448904pfd.174.2021.09.14.14.33.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Sep 2021 14:33:56 -0700 (PDT)
-Date:   Tue, 14 Sep 2021 21:33:52 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Peter Gonda <pgonda@google.com>
-Cc:     kvm@vger.kernel.org, Marc Orr <marcorr@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Brijesh Singh <brijesh.singh@amd.com>, stable@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: SEV: Acquire vcpu mutex when updating VMSA
-Message-ID: <YUEVQDEvLbdJF+sj@google.com>
-References: <20210914200639.3305617-1-pgonda@google.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=4r/QuEek1IJxOTV0kb5k4wwB4qARh5+mDnfq9y231lI=;
+        b=U2z4UcjmXJfHdAhOCb7gCSJusN1TBtA55vK1kCikf8QnjfXFBaJZL0QXeHBE7Kb9Lz
+         sanN+BAwLUalQ5mqbixhp/4g/sJnhXPqV/HfO5MX4/bRDPIDqjcWZXpFiOBG+UoZvVx2
+         sY58gl7g5RnGYRAnj3vOr9LyyGoDOpCLM5WHSemMVdTjEVXCZ9rDiIhAmgWgjEa6/bl8
+         xQqou+rg4E+krA2ikQweZuX2TQmyB2UwCfJ1hgL+dkaAQp4Cs0+vQOYdel19MjZ8Kb45
+         yRegdeu48+VJhZaqbyU60eMUMH6AuRlYCKZ+PwdW1By52RJdvrMfDwgs8O2eqrwBOrn5
+         mQ/A==
+X-Gm-Message-State: AOAM532L5ye81Zru3qE3unUZLDfntjPX9zlCavo/QxRvdMlLr5qnggSv
+        t18zBRt+GRkJNNKgI9tasD6gnJK7LS0azQoqyfFb8A==
+X-Google-Smtp-Source: ABdhPJyRlHmWOTMX6JO0I0LrUpZjPoiigiqAXnBic0Wf6wKgYPtz+W4ySCH25h/SuTM2qi/MjIA2o7jci+EHEpqI5VI=
+X-Received: by 2002:a2e:86d5:: with SMTP id n21mr16992991ljj.278.1631657046349;
+ Tue, 14 Sep 2021 15:04:06 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210914200639.3305617-1-pgonda@google.com>
+References: <20210914210951.2994260-1-seanjc@google.com> <20210914210951.2994260-2-seanjc@google.com>
+In-Reply-To: <20210914210951.2994260-2-seanjc@google.com>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Tue, 14 Sep 2021 16:03:54 -0600
+Message-ID: <CAMkAt6rnUUS9t1Z73dqZ0_3iUmyRxz5hJmZ+A3vQ34t3N=JAFQ@mail.gmail.com>
+Subject: Re: [PATCH 1/2] KVM: SEV: Pin guest memory for write for RECEIVE_UPDATE_DATA
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
+        linux-kernel@vger.kernel.org, Marc Orr <marcorr@google.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Masahiro Kozuka <masa.koz@kozuka.jp>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 14, 2021, Peter Gonda wrote:
-> Adds mutex guard to the VMSA updating code. Also adds a check to skip a
-> vCPU if it has already been LAUNCH_UPDATE_VMSA'd which should allow
-> userspace to retry this ioctl until all the vCPUs can be successfully
-> LAUNCH_UPDATE_VMSA'd. Because this operation cannot be undone we cannot
-> unwind if one vCPU fails.
-> 
-> Fixes: ad73109ae7ec ("KVM: SVM: Provide support to launch and run an SEV-ES guest")
-> 
-> Signed-off-by: Peter Gonda <pgonda@google.com>
-> Cc: Marc Orr <marcorr@google.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Sean Christopherson <seanjc@google.com>
-> Cc: Brijesh Singh <brijesh.singh@amd.com>
-> Cc: kvm@vger.kernel.org
+On Tue, Sep 14, 2021 at 3:09 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> Require the target guest page to be writable when pinning memory for
+> RECEIVE_UPDATE_DATA.  Per the SEV API, the PSP writes to guest memory:
+>
+>   The result is then encrypted with GCTX.VEK and written to the memory
+>   pointed to by GUEST_PADDR field.
+>
+> Fixes: 15fb7de1a7f5 ("KVM: SVM: Add KVM_SEV_RECEIVE_UPDATE_DATA command")
 > Cc: stable@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
+> Cc: Peter Gonda <pgonda@google.com>
+> Cc: Marc Orr <marcorr@google.com>
+> Cc: Tom Lendacky <thomas.lendacky@amd.com>
+> Cc: Brijesh Singh <brijesh.singh@amd.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+
+Reviewed-by: Peter Gonda <pgonda@google.com>
+
 > ---
->  arch/x86/kvm/svm/sev.c | 24 +++++++++++++++++++-----
->  1 file changed, 19 insertions(+), 5 deletions(-)
-> 
+>  arch/x86/kvm/svm/sev.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
 > diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 75e0b21ad07c..9a2ebd0328ca 100644
+> index 75e0b21ad07c..95228ba3cd8f 100644
 > --- a/arch/x86/kvm/svm/sev.c
 > +++ b/arch/x86/kvm/svm/sev.c
-> @@ -598,22 +598,29 @@ static int sev_es_sync_vmsa(struct vcpu_svm *svm)
->  static int sev_launch_update_vmsa(struct kvm *kvm, struct kvm_sev_cmd *argp)
->  {
->  	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-> -	struct sev_data_launch_update_vmsa vmsa;
-> +	struct sev_data_launch_update_vmsa vmsa = {0};
->  	struct kvm_vcpu *vcpu;
->  	int i, ret;
->  
->  	if (!sev_es_guest(kvm))
->  		return -ENOTTY;
->  
-> -	vmsa.reserved = 0;
-> -
+> @@ -1464,7 +1464,7 @@ static int sev_receive_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>
+>         /* Pin guest memory */
+>         guest_page = sev_pin_memory(kvm, params.guest_uaddr & PAGE_MASK,
+> -                                   PAGE_SIZE, &n, 0);
+> +                                   PAGE_SIZE, &n, 1);
+>         if (IS_ERR(guest_page)) {
+>                 ret = PTR_ERR(guest_page);
+>                 goto e_free_trans;
 
-Zeroing all of 'vmsa' is an unrelated chagne and belongs in a separate patch.  I
-would even go so far as to say it's unnecessary, even field of the struct is
-explicitly written before it's consumed.
+Not sure how common this is but adding a comment like this could help
+with readability:
++                                   PAGE_SIZE, &n, /* write= */ 1);
 
->  	kvm_for_each_vcpu(i, vcpu, kvm) {
->  		struct vcpu_svm *svm = to_svm(vcpu);
->  
-> +		ret = mutex_lock_killable(&vcpu->mutex);
-> +		if (ret)
-> +			goto out_unlock;
 
-Rather than multiple unlock labels, move the guts of the loop to a wrapper.
-As discussed off list, this really should be a vCPU-scoped ioctl, but that ship
-has sadly sailed :-(  We can at least imitate that by making the VM-scoped ioctl
-nothing but a wrapper.
-
-> +
-> +		/* Skip to the next vCPU if this one has already be updated. */
-
-s/be/been
-
-Uber nit, there may not be a next vCPU.  It'd be more slightly more accurate to
-say something like "Do nothing if this vCPU has already been updated".
-
-> +		ret = sev_es_sync_vmsa(svm);
-> +		if (svm->vcpu.arch.guest_state_protected)
-> +			goto unlock;
-
-This belongs in a separate patch, too.  It also introduces a bug (arguably two)
-in that it adds a duplicate call to sev_es_sync_vmsa().  The second bug is that
-if sev_es_sync_vmsa() fails _and_ the vCPU is already protected, this will cause
-that failure to be squashed.
-
-In the end, I think the least gross implementation will look something like this,
-implemented over two patches (one for the lock, one for the protected check).
-
-static int __sev_launch_update_vmsa(struct kvm *kvm, struct kvm_vcpu *vcpu,
-				    int *error)
-{
-	struct sev_data_launch_update_vmsa vmsa;
-	struct vcpu_svm *svm = to_svm(vcpu);
-	int ret;
-
-	/*
-	 * Do nothing if this vCPU has already been updated.  This is allowed
-	 * to let userspace retry LAUNCH_UPDATE_VMSA if the command fails on a
-	 * later vCPU.
-	 */
-	if (svm->vcpu.arch.guest_state_protected)
-		return 0;
-
-	/* Perform some pre-encryption checks against the VMSA */
-	ret = sev_es_sync_vmsa(svm);
-	if (ret)
-		return ret;
-
-	/*
-	 * The LAUNCH_UPDATE_VMSA command will perform in-place
-	 * encryption of the VMSA memory content (i.e it will write
-	 * the same memory region with the guest's key), so invalidate
-	 * it first.
-	 */
-	clflush_cache_range(svm->vmsa, PAGE_SIZE);
-
-	vmsa.reserved = 0;
-	vmsa.handle = to_kvm_svm(kvm)->sev_info.handle;
-	vmsa.address = __sme_pa(svm->vmsa);
-	vmsa.len = PAGE_SIZE;
-	return sev_issue_cmd(kvm, SEV_CMD_LAUNCH_UPDATE_VMSA, &vmsa, error);
-}
-
-static int sev_launch_update_vmsa(struct kvm *kvm, struct kvm_sev_cmd *argp)
-{
-	struct kvm_vcpu *vcpu;
-	int i, ret;
-
-	if (!sev_es_guest(kvm))
-		return -ENOTTY;
-
-	kvm_for_each_vcpu(i, vcpu, kvm) {
-		ret = mutex_lock_killable(&vcpu->mutex);
-		if (ret)
-			return ret;
-
-		ret = __sev_launch_update_vmsa(kvm, vcpu, &argp->error);
-
-		mutex_unlock(&vcpu->mutex);
-		if (ret)
-			return ret;
-	}
-	return 0;
-}
+> --
+> 2.33.0.309.g3052b89438-goog
+>
