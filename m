@@ -2,53 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B583440BC07
-	for <lists+kvm@lfdr.de>; Wed, 15 Sep 2021 01:09:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3987D40BC08
+	for <lists+kvm@lfdr.de>; Wed, 15 Sep 2021 01:09:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235838AbhINXKi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Sep 2021 19:10:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47872 "EHLO
+        id S236206AbhINXKj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Sep 2021 19:10:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47954 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235930AbhINXKb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Sep 2021 19:10:31 -0400
+        with ESMTP id S236036AbhINXKd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Sep 2021 19:10:33 -0400
 Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA2EAC061793
-        for <kvm@vger.kernel.org>; Tue, 14 Sep 2021 16:08:44 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id s204-20020a252cd5000000b005a16e62ee63so1018182ybs.12
-        for <kvm@vger.kernel.org>; Tue, 14 Sep 2021 16:08:44 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 200BAC0613BC
+        for <kvm@vger.kernel.org>; Tue, 14 Sep 2021 16:08:47 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id a23-20020a25ae17000000b005ad73346312so984305ybj.18
+        for <kvm@vger.kernel.org>; Tue, 14 Sep 2021 16:08:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
-        bh=PztszF2YIAOMGYHBfcW7r+pjCpLpLa/8v1KHPoNSnec=;
-        b=Rlj3ZqyeNHZQujdEOAGUoCv/3iATsQKhJ0LnYDd7vpZR9odQDtf1XopNhrZLpRhumi
-         mq99GaN6rKBbnLYfUd8Qlv3gu1woKcvxny1zJrHpZCuyuujaOkeraT/nPQWBsktZjwf9
-         gmPznr2Ecj+nufK54yE9vFiAVVokApw+k55j8nnwqsae5uvARCZaqbwavCbOx2MRZX7e
-         zaQB2W7vE+XFm+xFyU9fT3bFkrA5rthtsO75X9ACkBe/w2PD4mg1DNROicKXJaH5efYQ
-         kYAJAoFjcOFBeUMafTQeebaFmJf6POsZETwvWQJPPz7Dvu4oVx07OUqOqlgaDMbENn40
-         +yOg==
+        h=reply-to:date:in-reply-to:message-id:mime-version:references
+         :subject:from:to:cc;
+        bh=Kb4RIrU35lN+tPmwsgBaQo7Uv7rFiX3GXXf8rcFZQTw=;
+        b=ENSKM5WbOnYjx/ds/KccT7z4pBTRJTWdCgEbYzGw5T8KtwsZwrC29Xmv2SXMhRoaPf
+         l4iBm0/agX03hp6Xd+TdfwSZcaXreaLMBNy0GzeMIeWD+iyFdMBpX03FJx//1K0Z0DfX
+         Bq0MsI6ZQrUsHJFfKvADUnbh5LCVGsiCA7HNLNx3wO5hvmRNK9qn8kovJVp+Y27XQrS3
+         jwWekIWJ7b8YjFKx/VJTLlNZ1iaUHcC0rotSRBWuagcVxKClOsw3GBtt6DcLDP3Epg2+
+         WzSaLthJP2u02Eq+QAws0TPf+isx3ihQ2ZDmXHg/9bZ9oG3UvnRGgnVOoF4EP+20uyct
+         PneA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
-         :from:to:cc;
-        bh=PztszF2YIAOMGYHBfcW7r+pjCpLpLa/8v1KHPoNSnec=;
-        b=WwRzHJu+mv4PqK4EKx1tS2rVsaRiK9kIijdelE8Pf7bUfeRUsu07sJEO2YlZDZFUcP
-         WYiSZQyGSy1v3KUmIp/TvhUblLS2tvButT1N8csn1acDDRnRQplIYoHkiA/hiR0uow7Q
-         o6V71GmhEGmgq28t6UtYcqLA6gtZM7ioE72BkURv7faH4M13Apr92p0Sf6s1MnVkcGAY
-         rw1DGdXvTy9whazKp8QYnaPdTQ07iJMUNEZtlc8X8KtAM1XVSSP0otWyw1nsYOA08pik
-         nDLZg2xZ6wZK9r2h9tbqY5EXLleq2SfS1z2Y5IrXtPoYIGCb6yCIG5zFXRRbJyw0LKFQ
-         5Olg==
-X-Gm-Message-State: AOAM533qn2kvls5nxSiPnI9flcqFqT9Tx2T0yZpaQlZHpOXNXnRBxd4c
-        1lo2oIoENmqfwQ6yhYmv6mr7I2GNcTg=
-X-Google-Smtp-Source: ABdhPJz/GPJsTRdRxM5UC2FowOQDmjcbLosM07pV/dhbRy68NKLqwo2+pG3RTdgSs8PlDrzd89hI5K2lRbs=
+        h=x-gm-message-state:reply-to:date:in-reply-to:message-id
+         :mime-version:references:subject:from:to:cc;
+        bh=Kb4RIrU35lN+tPmwsgBaQo7Uv7rFiX3GXXf8rcFZQTw=;
+        b=sf7riYt5uIs/5+9hPub570QeYAHwm3I8J1cMF6ovjZOYJB4MqS6lqg7Kwo9seRlDLV
+         6SOtEtFiSw/d4ZOUkKZw/v9+Z2dhb2Se4kiqRtsTxq6HzNy0ngCDrJxFg9RcL+Ro6+5t
+         TB3PTQgjGIHOXVlP54vHvKo2Bk/IHGAUiGhpTn395pErzqJFcc1wb5QYhYfCrgUy6y+r
+         oNm/FZgi2YXZAnvwHcSdGv6BtePk2zqr+j+lWXzSLwfPIrH9gDdzY/bv++LKX2A8b4eK
+         whEE7hmu6+wnZxhk9WXE+K26q+bMsKYtwSJLUSRwt3NDLlsC+RYat1Y9+MrisXwDDIrz
+         YBMQ==
+X-Gm-Message-State: AOAM532uU5LnK75v6VAs1u/aW6LGL05dvB7G3kzvu/xMhoxTD4eh7eB3
+        Y+pGcg2pGedwuHcA7DwXzi315YP1ffw=
+X-Google-Smtp-Source: ABdhPJwPxxyO6jpT2L9j4gJKZpd98VUb4RcOHs7Auq/lkyVAkKhP514ZWGtkjcd0OXhZuXlYWREzVmHknbE=
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:90:200:d59f:9874:e5e5:256b])
- (user=seanjc job=sendgmr) by 2002:a05:6902:72d:: with SMTP id
- l13mr2314014ybt.168.1631660924206; Tue, 14 Sep 2021 16:08:44 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1005:: with SMTP id
+ w5mr2151354ybt.330.1631660926348; Tue, 14 Sep 2021 16:08:46 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Tue, 14 Sep 2021 16:08:37 -0700
-Message-Id: <20210914230840.3030620-1-seanjc@google.com>
+Date:   Tue, 14 Sep 2021 16:08:38 -0700
+In-Reply-To: <20210914230840.3030620-1-seanjc@google.com>
+Message-Id: <20210914230840.3030620-2-seanjc@google.com>
 Mime-Version: 1.0
+References: <20210914230840.3030620-1-seanjc@google.com>
 X-Mailer: git-send-email 2.33.0.309.g3052b89438-goog
-Subject: [PATCH 0/3] KVM: x86: Clean up RESET "emulation"
+Subject: [PATCH 1/3] KVM: VMX: Drop explicit zeroing of MSR guest values at
+ vCPU creation
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -62,31 +66,48 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add dedicated helpers to emulate RESET instead of having the relevant code
-scattered through vcpu_create() and vcpu_reset().  Paolo, I think this is
-what you meant by "have init_vmcb/svm_vcpu_reset look more like the VMX
-code"[*].
+Don't zero out user return and nested MSRs during vCPU creation, and
+instead rely on vcpu_vmx being zero-allocated.  Explicitly zeroing MSRs
+is not wrong, and is in fact necessary if KVM ever emulates vCPU RESET
+outside of vCPU creation, but zeroing only a subset of MSRs is confusing.
 
-Patch 01 is a bit odd; it's essentially an explicit acknowledgement that
-KVM's emulation is far from complete.  It caught my eye when auditing the
-"create" flows to ensure they didn't touch guest state, which should be
-handled by "reset".  I waffled between deleting it outright and moving it
-to the new __vmx_vcpu_reset(), and opted to delete outright to discourage
-ad hoc clearing of MSRs during RESET, which isn't a maintainable approach.
+Poking directly into KVM's backing is also undesirable in that it doesn't
+scale and is error prone.  Ideally KVM would have a common RESET path for
+all MSRs, e.g. by expanding kvm_set_msr(), which would obviate the need
+for this out-of-bad code (to support standalone RESET).
 
-[*] https://lore.kernel.org/all/c3563870-62c3-897d-3148-e48bb755310c@redhat.com/
+No functional change intended.
 
-Sean Christopherson (3):
-  KVM: VMX: Drop explicit zeroing of MSR guest values at vCPU creation
-  KVM: VMX: Move RESET emulation to vmx_vcpu_reset()
-  KVM: SVM: Move RESET emulation to svm_vcpu_reset()
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/vmx/vmx.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
 
- arch/x86/kvm/svm/sev.c |  6 ++--
- arch/x86/kvm/svm/svm.c | 29 ++++++++++--------
- arch/x86/kvm/svm/svm.h |  2 +-
- arch/x86/kvm/vmx/vmx.c | 67 ++++++++++++++++++++----------------------
- 4 files changed, 53 insertions(+), 51 deletions(-)
-
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index fada1055f325..dc274b4c9912 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -6818,10 +6818,8 @@ static int vmx_create_vcpu(struct kvm_vcpu *vcpu)
+ 			goto free_vpid;
+ 	}
+ 
+-	for (i = 0; i < kvm_nr_uret_msrs; ++i) {
+-		vmx->guest_uret_msrs[i].data = 0;
++	for (i = 0; i < kvm_nr_uret_msrs; ++i)
+ 		vmx->guest_uret_msrs[i].mask = -1ull;
+-	}
+ 	if (boot_cpu_has(X86_FEATURE_RTM)) {
+ 		/*
+ 		 * TSX_CTRL_CPUID_CLEAR is handled in the CPUID interception.
+@@ -6878,8 +6876,6 @@ static int vmx_create_vcpu(struct kvm_vcpu *vcpu)
+ 
+ 	if (nested)
+ 		memcpy(&vmx->nested.msrs, &vmcs_config.nested, sizeof(vmx->nested.msrs));
+-	else
+-		memset(&vmx->nested.msrs, 0, sizeof(vmx->nested.msrs));
+ 
+ 	vcpu_setup_sgx_lepubkeyhash(vcpu);
+ 
 -- 
 2.33.0.309.g3052b89438-goog
 
