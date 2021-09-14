@@ -2,136 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DF4E940B54D
-	for <lists+kvm@lfdr.de>; Tue, 14 Sep 2021 18:52:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A72E740B553
+	for <lists+kvm@lfdr.de>; Tue, 14 Sep 2021 18:52:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230111AbhINQxV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Sep 2021 12:53:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44368 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229706AbhINQxV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Sep 2021 12:53:21 -0400
-Received: from mail-yb1-xb2f.google.com (mail-yb1-xb2f.google.com [IPv6:2607:f8b0:4864:20::b2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BFFDC061762
-        for <kvm@vger.kernel.org>; Tue, 14 Sep 2021 09:52:03 -0700 (PDT)
-Received: by mail-yb1-xb2f.google.com with SMTP id a93so29767134ybi.1
-        for <kvm@vger.kernel.org>; Tue, 14 Sep 2021 09:52:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=InOpix2phRGLMorlyZqQ+GGTXRocd0DMzXMfTrOXIA8=;
-        b=nrOaF0RH6u956TyUyQH1NkkOgIGnw+zvNCqN8QZ36kWB6qePAQWi8cn0yFbga60Vsu
-         sRW+HWafhWk6f++eXZLpGzpEgPlh8G16aEC4HJhIW9/bmFt2i2mPuDRgpeTXONJ5TNNM
-         Tp2bqLDrUE6phdkOMo322ofUMoJzCug9X0E7PUrBuejl5bMGPgJXZ0QYo7QRPWlwPqm2
-         1ytrqMHpyiu6LPDfx8WqE6DamhFtgWcHijiAN1erSs62NG6Ru8eIoBFtitSm+IMqO/XJ
-         j/ruyaeHzBEQzMGY72FSdzuTDPm+jfe0D+k522tSC8bj2xcXpPynGhWztD9b5l9SrpxM
-         REtg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=InOpix2phRGLMorlyZqQ+GGTXRocd0DMzXMfTrOXIA8=;
-        b=XvlCnJjYPzOVsSa0ga+rAXLcRWJc4Id/ILyBkaDE1keSCA5yEN+QQWi+TtwTIaJgMw
-         2hMNuZlJ/F+lTFhT8JMjhsA9DUEVXyncD1BD43Kxlv2arMv5pQJg59wFEHQRHPWMlx0g
-         frJ4DFMTgqb2xbQjUwmlnOVSZRnkWd7Hb5AcPldS2Kj2Qz9F4rlEcFM/tT7Uqhubvktv
-         u3Se15y0Ltit1+iagTHEESbeE77UMdvWwzxvWgszvdkdWL21nWgm1Q3itX7XkdSAIqAY
-         nIF9z/F61fQx1h3m6dD0mMm4i8KoJSpxfU5bBYHeOhOxj8x1vWG8GBIQwXdsODAC3Tn+
-         rIug==
-X-Gm-Message-State: AOAM533PQa607wovOEAcg44np5iToKxFegGYKHRdnzJt3OZl4As37BEY
-        jK8KlZpHAJudp8TuHnghxZ2y8odjEYG4R9NNt+kZ3Q==
-X-Google-Smtp-Source: ABdhPJyHV28ZJhx5INkGz4FS57frMA9C4W90KU6v9rPb7f8DnJDT7BHYoLFwTtirGvLKJE69HQJQgZDW4qFMUfPs300=
-X-Received: by 2002:a25:2d4c:: with SMTP id s12mr163395ybe.350.1631638322326;
- Tue, 14 Sep 2021 09:52:02 -0700 (PDT)
+        id S230238AbhINQyD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Sep 2021 12:54:03 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:12074 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229507AbhINQyC (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 14 Sep 2021 12:54:02 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.0.43) with SMTP id 18EF0KiW022418;
+        Tue, 14 Sep 2021 12:52:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=4ESj+6KO+3A52gu6PVxC6TdHhPGQbw6bZ5a83zR1ryo=;
+ b=lsY60wx+OPDiz7z8/9hDwBiQ8wCliOYP6Vpu1Tf42dZftvthcfAan+0O/CJ/oIDCfuJf
+ CZQ5xTk+fv5QAqQcU6NoN9RVa+VPfBXJcXpZYVWmF8xo+5VZHYgDpsOdBIU1yaUD3GDz
+ e0Rsy0dFGR+TqfD5MpwsJLQn4oKHiAqg+/pLlCbfKnrXAfnSumqhEBChjjLFIjMxjdaP
+ itAKQmFHTzPWNOoK96+yMnOWDiZlYkQ5HQ+oXqPsAcS2DOInn/tRMRjrNSbZ/LQ1CAhT
+ NS7T0YBxcOVEHdgb/0Mt2wIje0UFsHRzJUraDRhWzSpkJsmjOOyMrG+LijJJ9w9fScxM Lg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3b2x0gjty3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 14 Sep 2021 12:52:43 -0400
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 18EF1RL8026129;
+        Tue, 14 Sep 2021 12:52:43 -0400
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3b2x0gjtxc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 14 Sep 2021 12:52:43 -0400
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 18EGTSnT030129;
+        Tue, 14 Sep 2021 16:52:40 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma04ams.nl.ibm.com with ESMTP id 3b0m39xb5g-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 14 Sep 2021 16:52:40 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 18EGqa0b45678902
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 14 Sep 2021 16:52:36 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8822642042;
+        Tue, 14 Sep 2021 16:52:36 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 04F0642049;
+        Tue, 14 Sep 2021 16:52:36 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.145.8.12])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 14 Sep 2021 16:52:35 +0000 (GMT)
+Date:   Tue, 14 Sep 2021 18:52:32 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     David Hildenbrand <david@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, linux-mm@kvack.org,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Niklas Schnelle <schnelle@linux.ibm.com>,
+        Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>
+Subject: Re: [PATCH resend RFC 2/9] s390/gmap: don't unconditionally call
+ pte_unmap_unlock() in __gmap_zap()
+Message-ID: <20210914185232.3b86c7d3@p-imbrenda>
+In-Reply-To: <20210909162248.14969-3-david@redhat.com>
+References: <20210909162248.14969-1-david@redhat.com>
+ <20210909162248.14969-3-david@redhat.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <20210913230955.156323-1-rananta@google.com> <20210913230955.156323-10-rananta@google.com>
- <20210914070340.u6fp5zo7pjpxdlga@gator.home>
-In-Reply-To: <20210914070340.u6fp5zo7pjpxdlga@gator.home>
-From:   Raghavendra Rao Ananta <rananta@google.com>
-Date:   Tue, 14 Sep 2021 09:51:51 -0700
-Message-ID: <CAJHc60w_p5d0=0_BthStcutUywNJaJjamMdJrhD6HbFt_BVFHw@mail.gmail.com>
-Subject: Re: [PATCH v6 09/14] KVM: arm64: selftests: Add guest support to get
- the vcpuid
-To:     Andrew Jones <drjones@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: gh8oP10Yy3CcRrDUk05R5AEHlr7A2r90
+X-Proofpoint-ORIG-GUID: nzLA_OHx0ymGw3_JXA9_iI_qv_jk5Cry
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.182.1,Aquarius:18.0.687,Hydra:6.0.235,FMLib:17.0.607.475
+ definitions=2020-10-13_15,2020-10-13_02,2020-04-07_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ impostorscore=0 phishscore=0 clxscore=1015 priorityscore=1501 bulkscore=0
+ spamscore=0 mlxlogscore=999 suspectscore=0 adultscore=0 malwarescore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2109030001 definitions=main-2109140081
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 14, 2021 at 12:03 AM Andrew Jones <drjones@redhat.com> wrote:
->
-> On Mon, Sep 13, 2021 at 11:09:50PM +0000, Raghavendra Rao Ananta wrote:
-> > At times, such as when in the interrupt handler, the guest wants
-> > to get the vcpuid that it's running on to pull the per-cpu private
-> > data. As a result, introduce guest_get_vcpuid() that returns the
-> > vcpuid of the calling vcpu. The interface is architecture
-> > independent, but defined only for arm64 as of now.
-> >
-> > Suggested-by: Reiji Watanabe <reijiw@google.com>
-> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> > Reviewed-by: Ricardo Koller <ricarkol@google.com>
-> > ---
-> >  tools/testing/selftests/kvm/include/kvm_util.h      | 2 ++
-> >  tools/testing/selftests/kvm/lib/aarch64/processor.c | 6 ++++++
-> >  2 files changed, 8 insertions(+)
-> >
-> > diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-> > index 010b59b13917..5770751a5735 100644
-> > --- a/tools/testing/selftests/kvm/include/kvm_util.h
-> > +++ b/tools/testing/selftests/kvm/include/kvm_util.h
-> > @@ -400,4 +400,6 @@ uint64_t get_ucall(struct kvm_vm *vm, uint32_t vcpu_id, struct ucall *uc);
-> >  int vm_get_stats_fd(struct kvm_vm *vm);
-> >  int vcpu_get_stats_fd(struct kvm_vm *vm, uint32_t vcpuid);
-> >
-> > +int guest_get_vcpuid(void);
-> > +
-> >  #endif /* SELFTEST_KVM_UTIL_H */
-> > diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-> > index db64ee206064..f1255f44dad0 100644
-> > --- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
-> > +++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-> > @@ -277,6 +277,7 @@ void aarch64_vcpu_setup(struct kvm_vm *vm, int vcpuid, struct kvm_vcpu_init *ini
->
-> x86's vcpu_setup strangely uses 'int' for vcpuid even though everywhere
-> else we use uint32_t. Unfortunately that strangeness got inherited by
-> aarch64 (my fault). We should change it to uint32_t here (as a separate
-> patch) and...
->
-I can send one out as a part of this series.
+On Thu,  9 Sep 2021 18:22:41 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-Regards,
-Raghavendra
-> >       set_reg(vm, vcpuid, KVM_ARM64_SYS_REG(SYS_TCR_EL1), tcr_el1);
-> >       set_reg(vm, vcpuid, KVM_ARM64_SYS_REG(SYS_MAIR_EL1), DEFAULT_MAIR_EL1);
-> >       set_reg(vm, vcpuid, KVM_ARM64_SYS_REG(SYS_TTBR0_EL1), vm->pgd);
-> > +     set_reg(vm, vcpuid, KVM_ARM64_SYS_REG(SYS_TPIDR_EL1), vcpuid);
-> >  }
-> >
-> >  void vcpu_dump(FILE *stream, struct kvm_vm *vm, uint32_t vcpuid, uint8_t indent)
-> > @@ -426,3 +427,8 @@ void vm_install_exception_handler(struct kvm_vm *vm, int vector,
-> >       assert(vector < VECTOR_NUM);
-> >       handlers->exception_handlers[vector][0] = handler;
-> >  }
-> > +
-> > +int guest_get_vcpuid(void)
-> > +{
-> > +     return read_sysreg(tpidr_el1);
-> > +}
->
-> ...return uint32_t here.
->
-> Thanks,
-> drew
->
+> ... otherwise we will try unlocking a spinlock that was never locked via a
+> garbage pointer.
+> 
+> At the time we reach this code path, we usually successfully looked up
+> a PGSTE already; however, evil user space could have manipulated the VMA
+> layout in the meantime and triggered removal of the page table.
+> 
+> Fixes: 1e133ab296f3 ("s390/mm: split arch/s390/mm/pgtable.c")
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+
+> ---
+>  arch/s390/mm/gmap.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/s390/mm/gmap.c b/arch/s390/mm/gmap.c
+> index b6b56cd4ca64..9023bf3ced89 100644
+> --- a/arch/s390/mm/gmap.c
+> +++ b/arch/s390/mm/gmap.c
+> @@ -690,9 +690,10 @@ void __gmap_zap(struct gmap *gmap, unsigned long gaddr)
+>  
+>  		/* Get pointer to the page table entry */
+>  		ptep = get_locked_pte(gmap->mm, vmaddr, &ptl);
+> -		if (likely(ptep))
+> +		if (likely(ptep)) {
+>  			ptep_zap_unused(gmap->mm, vmaddr, ptep, 0);
+> -		pte_unmap_unlock(ptep, ptl);
+> +			pte_unmap_unlock(ptep, ptl);
+> +		}
+>  	}
+>  }
+>  EXPORT_SYMBOL_GPL(__gmap_zap);
+
