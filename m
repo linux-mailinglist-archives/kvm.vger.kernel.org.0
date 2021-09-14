@@ -2,121 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A99FB40ACA0
-	for <lists+kvm@lfdr.de>; Tue, 14 Sep 2021 13:39:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BA5C540ACE6
+	for <lists+kvm@lfdr.de>; Tue, 14 Sep 2021 13:58:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232456AbhINLk6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Sep 2021 07:40:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:47604 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232420AbhINLkx (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 14 Sep 2021 07:40:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1631619575;
+        id S232429AbhINL7f (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Sep 2021 07:59:35 -0400
+Received: from mail.skyhub.de ([5.9.137.197]:57542 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232287AbhINL7d (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Sep 2021 07:59:33 -0400
+Received: from zn.tnic (p200300ec2f1048001e15ef619509992f.dip0.t-ipconnect.de [IPv6:2003:ec:2f10:4800:1e15:ef61:9509:992f])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 8B7241EC04EC;
+        Tue, 14 Sep 2021 13:58:10 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1631620690;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=VXsGLVph1NbqQ2nkvDoWH9B2JiDcc6lqU3jEfo1REJk=;
-        b=SWLmyt/kaSxpj4MLSWPnV9hKO8tEBoiocDkndHhrqdufWdoI+3xW0YmSR242T8d3e0O9Rh
-        2Xbr/h2kBNAuWN6dABimbyur9/WxHRyblAu2Q6s2tS47K7v3OeUxwtVKGrw3GLZrmJyH9h
-        B2aVJ+HLAbhTIJ6imDM18qouvZRQWU0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-456-WrrSKas9MgCaVgh6GAv1lQ-1; Tue, 14 Sep 2021 07:39:32 -0400
-X-MC-Unique: WrrSKas9MgCaVgh6GAv1lQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 498B71811EC1;
-        Tue, 14 Sep 2021 11:39:30 +0000 (UTC)
-Received: from starship (unknown [10.35.206.50])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 16CA81002388;
-        Tue, 14 Sep 2021 11:39:24 +0000 (UTC)
-Message-ID: <5fec07dfcfd53421293c3814796f1aa4add4a126.camel@redhat.com>
-Subject: Re: [RFC PATCH 3/3] nSVM: use svm->nested.save to load vmcb12
- registers and avoid TOC/TOU races
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=b/N09IsvqYn24JfFZ47aDfAefXmwmXR82Pt3awNAfbs=;
+        b=bxwwIzIyK+Rg4oIy01BbpgT86ORE1XKclCEYAaQ9uu2p2YFJBhtO9vvO21Z67RPc0ptMoP
+        47+Ry7kCX0P48iid+/PmdkrtsbH5uZdiuAmR5uxqjBKZy74znSrvhF2nYkipmdb9VWoPx/
+        PSVn04awQpG91qOKWcYNAHUkxFtjb44=
+Date:   Tue, 14 Sep 2021 13:58:04 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Michael Ellerman <mpe@ellerman.id.au>
+Cc:     Tom Lendacky <thomas.lendacky@amd.com>,
+        linux-kernel@vger.kernel.org, x86@kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
+        iommu@lists.linux-foundation.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-graphics-maintainer@vmware.com,
+        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        kexec@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+        Brijesh Singh <brijesh.singh@amd.com>,
         Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        linux-kernel@vger.kernel.org
-Date:   Tue, 14 Sep 2021 14:39:23 +0300
-In-Reply-To: <a1ab92dd-6e76-fb30-d570-582cd3ebecd3@redhat.com>
-References: <20210903102039.55422-1-eesposit@redhat.com>
-         <20210903102039.55422-4-eesposit@redhat.com>
-         <21d2bf8c4e3eb3fc5d297fd13300557ec686b625.camel@redhat.com>
-         <73b5a5bb-48f2-3a08-c76b-a82b5b69c406@redhat.com>
-         <9585f1387b2581d30b74cd163a9aac2adbd37a93.camel@redhat.com>
-         <2b1e17416cef1e37f42e9bc8b2283b03d2651cb2.camel@redhat.com>
-         <ee207b0c-eab3-13ba-44be-999f849008d2@redhat.com>
-         <fb828c752fac255c6a1d997ff27dfc5264a5c658.camel@redhat.com>
-         <a1ab92dd-6e76-fb30-d570-582cd3ebecd3@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        Andi Kleen <ak@linux.intel.com>,
+        Sathyanarayanan Kuppuswamy 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        Tianyu Lan <Tianyu.Lan@microsoft.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>
+Subject: Re: [PATCH v3 4/8] powerpc/pseries/svm: Add a powerpc version of
+ cc_platform_has()
+Message-ID: <YUCOTIPPsJJpLO/d@zn.tnic>
+References: <cover.1631141919.git.thomas.lendacky@amd.com>
+ <9d4fc3f8ea7b325aaa1879beab1286876f45d450.1631141919.git.thomas.lendacky@amd.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <9d4fc3f8ea7b325aaa1879beab1286876f45d450.1631141919.git.thomas.lendacky@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2021-09-14 at 12:52 +0200, Emanuele Giuseppe Esposito wrote:
-> > I would do it this way:
-> > 
-> > struct svm_nested_state {
-> >          ...
-> > 	/* cached fields from the vmcb12 */
-> > 	struct  vmcb_control_area_cached ctl;
-> > 	struct  vmcb_save_area_cached save;
-> >          ...
-> > };
-> > 
-> > 
+On Wed, Sep 08, 2021 at 05:58:35PM -0500, Tom Lendacky wrote:
+> Introduce a powerpc version of the cc_platform_has() function. This will
+> be used to replace the powerpc mem_encrypt_active() implementation, so
+> the implementation will initially only support the CC_ATTR_MEM_ENCRYPT
+> attribute.
 > 
-> The only thing that requires a little bit of additional work when 
-> applying this is svm_get_nested_state() (and theoretically 
-> svm_set_nested_state(), in option 2). In this function, nested.ctl is 
-> copied in user_vmcb->control. But now nested.ctl is not anymore a 
-> vmcb_control_area, so the sizes differ.
-> 
-> There are 2 options here:
-> 1) copy nested.ctl into a full vmcb_control_area, and copy it to user 
-> space without modifying the API. The advantage is that the API is left 
-> intact, but an additional copy is required.
+> Cc: Michael Ellerman <mpe@ellerman.id.au>
+> Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+> Cc: Paul Mackerras <paulus@samba.org>
+> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+> ---
+>  arch/powerpc/platforms/pseries/Kconfig       |  1 +
+>  arch/powerpc/platforms/pseries/Makefile      |  2 ++
+>  arch/powerpc/platforms/pseries/cc_platform.c | 26 ++++++++++++++++++++
+>  3 files changed, 29 insertions(+)
+>  create mode 100644 arch/powerpc/platforms/pseries/cc_platform.c
 
-Thankfully there KVM_GET_NESTED_STATE is not performance critical at all,
-so a copy isn't that big problem, other that it is a bit ugly.
-Ugh..
+Michael,
 
-> 
-> 2) modify KVM_GET_NESTED_STATE and KVM_SET_NESTED_STATE to handle 
-> vmcb_control_area_cached. Advantage is that there is a lightweight copy 
-> + the benefits explained by you in the previous email (no unset field).
+can I get an ACK for the ppc bits to carry them through the tip tree
+pls?
 
-That would break the KVM_GET_NESTED_STATE ABI without a very good reason,
-especially since some of the currently unused fields in the ctl (there
-are I think very few of them), might became used later on, needing
-to break the ABI again.
+Btw, on a related note, cross-compiling this throws the following error here:
 
-Best regards,
-	Maxim Levitsky
+$ make CROSS_COMPILE=/home/share/src/crosstool/gcc-9.4.0-nolibc/powerpc64-linux/bin/powerpc64-linux- V=1 ARCH=powerpc
 
+...
 
+/home/share/src/crosstool/gcc-9.4.0-nolibc/powerpc64-linux/bin/powerpc64-linux-gcc -Wp,-MD,arch/powerpc/boot/.crt0.o.d -D__ASSEMBLY__ -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs -fno-strict-aliasing -O2 -msoft-float -mno-altivec -mno-vsx -pipe -fomit-frame-pointer -fno-builtin -fPIC -nostdinc -include ./include/linux/compiler_attributes.h -I./arch/powerpc/include -I./arch/powerpc/include/generated  -I./include -I./arch/powerpc/include/uapi -I./arch/powerpc/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/compiler-version.h -include ./include/linux/kconfig.h -m32 -isystem /home/share/src/crosstool/gcc-9.4.0-nolibc/powerpc64-linux/bin/../lib/gcc/powerpc64-linux/9.4.0/include -mbig-endian -nostdinc -c -o arch/powerpc/boot/crt0.o arch/powerpc/boot/crt0.S
+In file included from <command-line>:
+././include/linux/compiler_attributes.h:62:5: warning: "__has_attribute" is not defined, evaluates to 0 [-Wundef]
+   62 | #if __has_attribute(__assume_aligned__)
+      |     ^~~~~~~~~~~~~~~
+././include/linux/compiler_attributes.h:62:20: error: missing binary operator before token "("
+   62 | #if __has_attribute(__assume_aligned__)
+      |                    ^
+././include/linux/compiler_attributes.h:88:5: warning: "__has_attribute" is not defined, evaluates to 0 [-Wundef]
+   88 | #if __has_attribute(__copy__)
+      |     ^~~~~~~~~~~~~~~
+...
 
-> 
-> I am not sure which one is the preferred way here.
-> 
-> Thank you,
-> Emanuele
-> 
+Known issue?
 
+This __has_attribute() thing is supposed to be supported
+in gcc since 5.1 and I'm using the crosstool stuff from
+https://www.kernel.org/pub/tools/crosstool/ and gcc-9.4 above is pretty
+new so that should not happen actually.
 
+But it does...
+
+Hmmm.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
