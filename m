@@ -2,142 +2,280 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AC0AB40BB07
-	for <lists+kvm@lfdr.de>; Wed, 15 Sep 2021 00:15:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 44CEE40BB7B
+	for <lists+kvm@lfdr.de>; Wed, 15 Sep 2021 00:31:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235446AbhINWQ2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Sep 2021 18:16:28 -0400
-Received: from mail-mw2nam12on2043.outbound.protection.outlook.com ([40.107.244.43]:35136
-        "EHLO NAM12-MW2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S234701AbhINWQ1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Sep 2021 18:16:27 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Mfhf9igWcIvEr06CfIbuTLwqjAWpc523aSxnbQi4tzcFaHV5hUlUlvsBX8WyJiWU2aWEgF9RljyryZtTyTqd2yvS+HAIqSxPeA3KokXCLV2CXPfX9g+3x05LuFPq5jfJ4DkcdnLyy2pZIOtG3/4w6Ny2LiLoU1+aqbvd/1kTcOb+t2GzUZM9wnKzuC9bbPnuekaDGVr7++har0b/7aFRbN1/5JJJG5J5DiGbBn2YTMi8lFAkpiYXxYcUXVz7w13P8EaCP1DZ95Yc15kDvcsMF2maYaU+hRb6Cl3gliukyniqNg/XJkc1l0qV2WzOIxLrgDLezPgfI2qmrTSyhbRhUg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
- bh=11mzLZdW8kY//KpXbBnGuKQPE+l0X88l91mlt0GIATI=;
- b=bcxAa49ZiaZZT1UpoBtH2+b7gggh7ayyylvlALun3xGvpUvfnuF9ws3N0IjExhVtmpAE+ns4PXCTkNH4USBWk23ysl18kHyEPo39kk2gISrAyjxGz8lhGR5oFMVhVCEi2cXq0OGesdBu3id+AWOJvH/XVdi2SFk+HdLRzXga00tmiCfxf5sFeVksp89WmZQTS6aOrJGn5uhfbJ9evBdWVVXoj+xnqPBzzjHX/oCaz+fNQtqJhHLJBoISvCTFAnE80+Yl3hvZt8/r9V98ofIGT8VdnJahiSh0wnM65mRPO1BtcB512YgvMB4DNUxOn30TIbbJjGCMcho2C0oVcj6xzA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=11mzLZdW8kY//KpXbBnGuKQPE+l0X88l91mlt0GIATI=;
- b=cnS7HP9Pp6xf8Oj8OKXlsSmoKB0Hu/1hLVigGd6StCzqYKww3bWjJaGJcR5RzAwh6MFwkGd9s4eklEmHI0C0JABHc2x4aqNKBM7aBjwr8MHiqz+KoXQWZoEbk66qu21r2Qjt7HD1o4mRfOhxAmQUuqtKvRiOfuE+MxKIjV/k0KA=
-Authentication-Results: kozuka.jp; dkim=none (message not signed)
- header.d=none;kozuka.jp; dmarc=none action=none header.from=amd.com;
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
- by SA0PR12MB4430.namprd12.prod.outlook.com (2603:10b6:806:70::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4500.18; Tue, 14 Sep
- 2021 22:15:08 +0000
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::78b7:7336:d363:9be3]) by SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::78b7:7336:d363:9be3%6]) with mapi id 15.20.4500.019; Tue, 14 Sep 2021
- 22:15:08 +0000
-Cc:     brijesh.singh@amd.com, Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Peter Gonda <pgonda@google.com>,
-        Marc Orr <marcorr@google.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Masahiro Kozuka <masa.koz@kozuka.jp>
-Subject: Re: [PATCH 1/2] KVM: SEV: Pin guest memory for write for
- RECEIVE_UPDATE_DATA
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-References: <20210914210951.2994260-1-seanjc@google.com>
- <20210914210951.2994260-2-seanjc@google.com>
-From:   Brijesh Singh <brijesh.singh@amd.com>
-Message-ID: <1bd21635-a198-327f-cca1-7fd8bc116c91@amd.com>
-Date:   Tue, 14 Sep 2021 17:15:06 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
-In-Reply-To: <20210914210951.2994260-2-seanjc@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SN6PR2101CA0007.namprd21.prod.outlook.com
- (2603:10b6:805:106::17) To SN6PR12MB2718.namprd12.prod.outlook.com
- (2603:10b6:805:6f::22)
-MIME-Version: 1.0
-Received: from [10.236.31.95] (165.204.77.1) by SN6PR2101CA0007.namprd21.prod.outlook.com (2603:10b6:805:106::17) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4544.1 via Frontend Transport; Tue, 14 Sep 2021 22:15:07 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 08aa05d9-e12e-4b0f-1dbc-08d977cd1c66
-X-MS-TrafficTypeDiagnostic: SA0PR12MB4430:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SA0PR12MB4430AAD19EF50073E4818706E5DA9@SA0PR12MB4430.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:5797;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: E3hjeltXjjY99O9exa299jjTX3UpHJ2PMzpxRYo0SoxCxXQPTqM/+2Ld8mMlcETm3cwtl0BsqoCdZjyI1G7Aa51ZxPAq01d8g82L4ABE6PFeCMRFFp55pRnjz8ZRV2YxPy1wyoYFNYFwrb/cEN8t9Mf93cDrevZzn0ya4+3SEuzajiWaLkG4zF5wRapLZ7KHqNwnLpYJIL2SaTtIBBOLTUH1MirzCBxOH5A+Xlom/zmCuFsTrGbzSqPnsht9+EHCCs2jbNiOaHxT3lyBATQbT/3A90HbgRxJAxg9M0Y7B0i9zhjpTteiJZcD7MqEci+fwnxAqF4BZTXyXfrx0zlIazuwJbVVTQgiby/5nQis5vZEmOQqUH2/ZqdmDqnfqBe/BRWzM3h2QWUdIhTEXUvc5SUTQdhPiT7Z5maJi2VcFeP3sGQNzqlZnWpTU+YkeUJ2PjkJ2xUfP6zd6PtmKsLeOdPDYgYBb9Goc4cJ9j9I9Lr6wKauZrSfAkXs36bxSy64+jkzJS7Pi4ld+HW3w4dcVfu2pDknuZQZ4qqhugQkKloI5Vvy9uF7kabuRtV1ht4KELd+mkoC5aV8wPdEeagzarbTLZn1UKtrZUj1teIQQ+yoHxMKkz7ok08ACx1+c13YebrEYUYgus/8mvQgOrkTv40stT9ODv2TJiMWdnw4jd+6WFkzraFo3uawrS6KckUHCyq6N7etgIfQTy9E/fK7O8t885SIHnze3Q6JXkHm4QUlAuE0ZxLF/mWmEY3wIvRs31qWHn6TOzigEtIXg/duAw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(396003)(346002)(376002)(366004)(136003)(478600001)(186003)(2616005)(4326008)(31696002)(26005)(8676002)(16576012)(6486002)(956004)(5660300002)(8936002)(53546011)(31686004)(44832011)(52116002)(4744005)(86362001)(66476007)(7416002)(2906002)(38100700002)(38350700002)(54906003)(316002)(66556008)(110136005)(36756003)(66946007)(83380400001)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?d1JybHgwM1NzdlF2WEdXNXp1WjByS3piNUZqQVFsUjJuK1J0bkp0M2R0T2tm?=
- =?utf-8?B?cU9RRkJMWEdBTUNaUzJGaGRiN3kzbm9hVnhDRjFaTW9YdTFDYldieE81N3BN?=
- =?utf-8?B?Q1VTMmJqVTZjYkFqMjlFZWJWZWQwNklKRko4WjVmNGxUVnhlWDRNZCt4OFdt?=
- =?utf-8?B?V0R6V3g1ZUZBOEVTTTRPMDA1WmhUWkgyZVl5OW56RzcvSG9vK0dNQUNTRGJS?=
- =?utf-8?B?SG83eHJrTXhYN0VnNHk2WnJ4NnBSYThqaFl6K01WbXp6SnJteTc5blY4TDRI?=
- =?utf-8?B?bXVzZ1dVMlYxOU1vUUw1ZWkyYk16UTJkZGV0NCtna2l1RVNZZ0xVVlpEZ0I0?=
- =?utf-8?B?QUZHT2dJTXl3cWQ0bUUvcEpXdmtPQ0Y2blVHVkFweUNYdDBIdklPNy81N0I5?=
- =?utf-8?B?MDJoQ2F6TGtValNSamxIM1RxNjdKVUgwaUYrOUpiSHU3em5DeXlpcUFZYXRt?=
- =?utf-8?B?MTlSN0FtYzJRT1RpSU54eC9jZ2pzSjJQclFSS2N3V3JzOUphN3JmM1N2UUha?=
- =?utf-8?B?T2Q4djdVZkorQmdLZTRKSVFqS0dnYmJuZzNOZVJ1c0dSakY4MmhRSWUvUnBr?=
- =?utf-8?B?aldJZzNzbUxFSHAwT2Zuc0x4MStuRTJ5aWZ6YVJjV3ZlcHA0REFLU2J0V0Zp?=
- =?utf-8?B?NW5ZU0Z3bmI5VDg3YmY3a1g4WEgxNmRadjNFS3drS3VCeG9LVlNvUWpnNko2?=
- =?utf-8?B?QWlWK2JGWHNpeVd1bFF2OTJqbUl1cmFxSFFZcUdDWEtMVW1QYVBSUEJBMkJz?=
- =?utf-8?B?SS9kZmFveExSdWpXaTI2MGpOSC9XQktFUlVSS0o1bTdrdzRQbW1iQnRxb1Zw?=
- =?utf-8?B?eGR0TmpMamd0ekFFeG80cDdiSkVFQUR2V3VHNFBNM0RSU1g3aDBDSEYrVkJr?=
- =?utf-8?B?KzBXOXVTT00yNktNY25zUVpQMzdHOUhleUc1MVRxVG1JSDBmSngyR2JRdnhN?=
- =?utf-8?B?akJ5cDVpcjZ0Qlk1NlM0ZWNCK2V5SUlvTEt1RlJyQy81Q0NRUk14c3EyRFdB?=
- =?utf-8?B?ZElzRGJlOGwyamhWdGtMSCtBdkw2OVNEaVI1anhaci85VWM3ZkJqaFhFSXMy?=
- =?utf-8?B?aWJWS09PcUZEYmQzMjl0OUV0ZkYwM0hkK3loYm83eTVvdlRJREtVNWVlbWI4?=
- =?utf-8?B?R0Q3N04zS2pDeG51bXd6SEJBVzRmWFdHNlNzTDd4UWpNd0RDaFBlcTM1a0Zx?=
- =?utf-8?B?Q2VUbndVSklmakswS29FalVxZytKa1QwY3pwN3d0cGJqYWJleUtJRTE4Lzgy?=
- =?utf-8?B?VDFjWVptQ0htMGxZSlIwbEsrejFMbWpmSlo1QWJjS2tHUit6Y0E0TmlpTTJm?=
- =?utf-8?B?bHFSYWFtOHdBS1FqdzlvNUE1MXpyZ1NGUHg2dzQvNGxiU3ZKNUJqNXpwWUZw?=
- =?utf-8?B?WEg3K01iMGF2WGVlK1BjRnJ1cWN5dE5TTTg4Tm90MWJsalRCVCtPMGZUNWd2?=
- =?utf-8?B?M1hIMXJsdUt2bk5uWGxXWG1KRzh0SVJvbDFIM1p0VThaODJhN0lIYkl3VEZU?=
- =?utf-8?B?Z1RoaDkvYXpJZWhiNlY4MUtyNEljZXgrWjNDYTJ0enc2cFdxT3JqclZhSnY4?=
- =?utf-8?B?VHRKTTltMk01dTdHY2hPNXE3cEpXZ1UwOWN0YTJ6Z0NQbHYyenAxZGxzOFk5?=
- =?utf-8?B?MXFiTHdqUGxlM2dZS2hDNVpWRlVqekxoc2pUVmFsMXZVejZkOTVML095TmpG?=
- =?utf-8?B?c3d3Z243VTdQRnhjVzFCL0VPcG1Ua1g1VVZJVU95MENtTGVuOWtQa1BKemNn?=
- =?utf-8?Q?kYnXwTRijw+mbBcspTRjDR4/h6ZsHvxstcPr0k8?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 08aa05d9-e12e-4b0f-1dbc-08d977cd1c66
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Sep 2021 22:15:07.9610
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: GCyRgrgvWgeYZO8iKee/dczec2jL/5ihtTZzlfKCBEIkLtZhT5oYkB10gfX1uupqMDrh/LlvcZPFjnm75dcSUg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4430
+        id S235639AbhINWco (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Sep 2021 18:32:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39466 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235137AbhINWck (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Sep 2021 18:32:40 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48C48C061762
+        for <kvm@vger.kernel.org>; Tue, 14 Sep 2021 15:31:22 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 63-20020a250d42000000b0059dc43162c9so847808ybn.23
+        for <kvm@vger.kernel.org>; Tue, 14 Sep 2021 15:31:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=EE9zcrGALS0AmzIOcz/rem1alKDBMQ7pd13ZNxH1nSA=;
+        b=pZ7eBZ80BpvrufxvDCQPciTIRfG8+svNCHDEO/tUDxJz0YhNMtHuG7GHSKrfuuQ+5V
+         5+d/F+i84q6Q4e0tIkNEXBCPnmBhjkkPoLyWarXVKAcSHcwuS4pNbYPnVbnW52+/xx1e
+         kY0AJDiVSTda523hlM8M214BgHZaKjtrvAHY6UohR21Iez5gOAd8bq+ORny1eD9SIqQH
+         S61MrKr1RNE+BdduEb/bnmvX+LYqFEE5tbZIplMIr8UW8Zh2zaH4l8RuqB5DOcR8OOwl
+         OsqqfgQAeFExrhjMvktynlwazX4S8QxPL/RidfBeF+9M1leYh2c3jh4oGpo57spmzhmq
+         EAHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=EE9zcrGALS0AmzIOcz/rem1alKDBMQ7pd13ZNxH1nSA=;
+        b=OeOEAuMQQ46MjtDvmKV6199ofxvaWrDRTw5BnMqeHpMuZDDazkOVMvBkjbZAxgtj4H
+         gvs5wgxhvyimsKn79aQcTdrvk++bi1vBmf8UGD5Rz2msz+sk8/rhyj9S7EfgWDsK0wEL
+         bTPHEfKFDDyQ1psXmgCrond5Ky2Q+Y0MD3OuOBDhCPjNwuaksTFS0kEAFZdMuRvFY8RW
+         ylcmmkj4qFsgB+yv3nnaMK3bYCASecR8PSe/lsYFDacaMJWRM2H/bIRoVkYY4fcJqyIj
+         SVAC0LefZozagYnblPWHxx4bLePZgk6DFoB5/vNtrPdo1es9BsWddkoptckztwOaP/w+
+         6nyw==
+X-Gm-Message-State: AOAM533kQPjBDXwsLo/YKCu3hYcTYiSqlWTOi0MFWNlalDeKadufQcJB
+        nZ/YS+6pz4IjyoxAGBOfYCpp2kk1WORH
+X-Google-Smtp-Source: ABdhPJyL0hd2dTusZRy8zhikD+3TvkMkTMn5/JhFbTQwfFhCzWUTIsX5NDiI3yX4HUYgRmVtoykyXKpqPtAe
+X-Received: from rananta-virt.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1bcc])
+ (user=rananta job=sendgmr) by 2002:a5b:7c4:: with SMTP id t4mr2016493ybq.509.1631658681501;
+ Tue, 14 Sep 2021 15:31:21 -0700 (PDT)
+Date:   Tue, 14 Sep 2021 22:30:59 +0000
+Message-Id: <20210914223114.435273-1-rananta@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.0.309.g3052b89438-goog
+Subject: [PATCH v7 00/15] KVM: arm64: selftests: Introduce arch_timer selftest
+From:   Raghavendra Rao Ananta <rananta@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Andrew Jones <drjones@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc:     Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hello,
 
+The patch series adds a KVM selftest to validate the behavior of
+ARM's generic timer (patch-14). The test programs the timer IRQs
+periodically, and for each interrupt, it validates the behaviour
+against the architecture specifications. The test further provides
+a command-line interface to configure the number of vCPUs, the
+period of the timer, and the number of iterations that the test
+has to run for.
 
-On 9/14/21 4:09 PM, Sean Christopherson wrote:
-> Require the target guest page to be writable when pinning memory for
-> RECEIVE_UPDATE_DATA.  Per the SEV API, the PSP writes to guest memory:
-> 
->    The result is then encrypted with GCTX.VEK and written to the memory
->    pointed to by GUEST_PADDR field.
-> 
-> Fixes: 15fb7de1a7f5 ("KVM: SVM: Add KVM_SEV_RECEIVE_UPDATE_DATA command")
-> Cc: stable@vger.kernel.org
-> Cc: Peter Gonda <pgonda@google.com>
-> Cc: Marc Orr <marcorr@google.com>
-> Cc: Tom Lendacky <thomas.lendacky@amd.com>
-> Cc: Brijesh Singh <brijesh.singh@amd.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+Patch-15 adds an option to randomly migrate the vCPUs to different
+physical CPUs across the system. The bug for the fix provided by
+Marc with commit 3134cc8beb69d0d ("KVM: arm64: vgic: Resample HW
+pending state on deactivation") was discovered using arch_timer
+test with vCPU migrations.
 
-Reviewed-by: Brijesh Singh <brijesh.singh@amd.com>
+Since the test heavily depends on interrupts, patch-13 adds a host
+library to setup ARM Generic Interrupt Controller v3 (GICv3). This
+includes creating a vGIC device, setting up distributor and
+redistributor attributes, and mapping the guest physical addresses.
+Symmetrical to this, patch-12 adds a guest library to talk to the vGIC,
+which includes initializing the controller, enabling/disabling the
+interrupts, and so on.
 
-thanks
+The following patches are utility patches that the above ones make use
+of:
+Patch-1 adds readl/writel support for guests to access MMIO space.
+
+Patch-2 imports arch/arm64/include/asm/sysreg.h into
+tools/arch/arm64/include/asm/ to make use of the register encodings
+and read/write definitions.
+
+Patch-3 is not directly related to the test, but makes
+aarch64/debug-exceptions.c use the read/write definitions from the
+imported sysreg.h and remove the existing definitions of read_sysreg()
+and write_sysreg().
+
+Patch-4 introduces ARM64_SYS_KVM_REG, that helps convert the SYS_*
+register encodings in sysreg.h to be acceptable by get_reg() and set_reg().
+It further replaces the users of ARM64_SYS_REG to use the new macro.
+
+Patch-5 adds the support for cpu_relax().
+
+Patch-6 adds basic arch_timer framework.
+
+Patch-7 adds udelay() support for the guests to utilize.
+
+Patch-8 adds local_irq_enable() and local_irq_disable() for the guests
+to enable/disable interrupts.
+
+Patch-9 is also unrelated to the test. It modifies the prototype of
+aarch64_vcpu_setup() to accept vcpuid as uint32_t, to keep it consistent
+with the other parts of code.
+
+Patch-10 adds the support to get the vcpuid for the guests. This allows
+them to access any cpu-centric private data in the upcoming patches.
+
+Patch-11 adds a light-weight support for spinlocks for the guests to
+use.
+
+The patch series, specifically the library support, is derived from the
+kvm-unit-tests and the kernel itself.
+
+Regards,
+Raghavendra
+
+v6 -> v7:
+
+Addressed comments by Andrew:
+
+- Changed the prototype of aarch64_vcpu_setup() to accept vcpuid as
+  uint32_t.
+- Modified the prototype of guest_get_vcpuid() to return uint32_t.
+- Renamed assert messages in lib/aarch64/vgic.c to use "Number".
+
+v5 -> v6:
+
+- Corrected the syntax for write_sysreg_s in gic_v3.c (11/14) so that
+  the file can be compiled with the unmodified
+  arch/arm64/include/asm/sysreg.h that's imported into tools/.
+
+v4 -> v5:
+
+Addressed the comments by Andrew, Oliver, and Reiji (Thanks, again):
+- Squashed patches 17/18 and 18/18 into 3/18 and 14/18, respectively.
+- Dropped patches to keep track kvm_utils of nr_vcpus (12/18) and
+  vm_get_mode() (13/18) as they were no longer needed.
+- Instead of creating the a map, exporting the vcpuid to the guest
+  is done by using the TPIDR_EL1 register.
+- Just to be on the safer side, gic.c's gic_dist_init() explicitly
+  checks if gic_ops is NULL.
+- Move sysreg.h from within selftests to tool/arch/arm64/include/asm/.
+- Rename ARM64_SYS_KVM_REG to KVM_ARM64_SYS_REG to improve readability.
+- Use the GIC regions' sizes from asm/kvm.h instead of re-defining it
+  in the vgic host support.
+- Get the timer IRQ numbers via timer's device attributes
+  (KVM_ARM_VCPU_TIMER_IRQ_PTIMER, KVM_ARM_VCPU_TIMER_IRQ_VTIMER) instead
+  of depending on default numbers to be safe.
+- Add check to see if the vCPU migrations are in fact enabled, before
+  looking for at least two online physical CPUs for the test.
+- Add missing blank lines in the arch_timer test.
+
+v3 -> v4:
+
+Addressed the comments by Andrew, Oliver, and Ricardo (Thank you):
+- Reimplemented get_vcpuid() by exporting a map of vcpuid:mpidr to the
+  guest.
+- Import sysreg.h from arch/arm64/include/asm/sysreg.h to get the system
+  register encodings and its read/write support. As a result, delete the
+  existing definitions in processor.h.
+- Introduce ARM64_SYS_KVM_REG that converts SYS_* register definitions
+  from sysreg.h into the encodings accepted by get_reg() and set_reg().
+- Hence, remove the existing encodings of system registers (CPACR_EL1,
+  TCR_EL1, and friends) and replace all the its consumers throughout
+  the selftests with ARM64_SYS_KVM_REG.
+- Keep track of number of vCPUs in 'struct kvm_vm'.
+- Add a helper method to get the KVM VM's mode.
+- Modify the vGIC host function vgic_v3_setup to make use of the above
+  two helper methods, which prevents it from accepting nr_vcpus as
+  an argument.
+- Move the definition of REDIST_REGION_ATTR_ADDR from lib/aarch64/vgic.c
+  to include/aarch64/vgic.h.
+- Make the selftest, vgic_init.c, use the definition of REDIST_REGION_ATTR_ADDR
+  from include/aarch64/vgic.h.
+- Turn ON vCPU migration by default (-m 2).
+- Add pr_debug() to log vCPU migrations. Helpful for diagnosis.
+- Change TEST_ASSERT(false,...) to TEST_FAIL() in the base arch_timer
+  test.
+- Include linux/types.h for __force definitions.
+- Change the type of 'val' to 'int' in spin_lock() to match the lock
+  value type.
+- Fix typos in code files and comments.
+
+v2 -> v3:
+
+- Addressed the comments from Ricardo regarding moving the vGIC host
+  support for selftests to its own library.
+- Added an option (-m) to migrate the guest vCPUs to physical CPUs
+  in the system.
+
+v1 -> v2:
+
+Addressed comments from Zenghui in include/aarch64/arch_timer.h:
+- Correct the header description
+- Remove unnecessary inclusion of linux/sizes.h
+- Re-arrange CTL_ defines in ascending order
+- Remove inappropriate 'return' from timer_set_* functions, which
+  returns 'void'.
+
+v1: https://lore.kernel.org/kvmarm/20210813211211.2983293-1-rananta@google.com/
+v2: https://lore.kernel.org/kvmarm/20210818184311.517295-1-rananta@google.com/
+v3: https://lore.kernel.org/kvmarm/20210901211412.4171835-1-rananta@google.com/
+v4: https://lore.kernel.org/kvmarm/20210909013818.1191270-1-rananta@google.com/
+v5: https://lore.kernel.org/kvmarm/20210913204930.130715-1-rananta@google.com/
+v6: https://lore.kernel.org/kvmarm/20210913230955.156323-1-rananta@google.com/
+
+Raghavendra Rao Ananta (15):
+  KVM: arm64: selftests: Add MMIO readl/writel support
+  tools: arm64: Import sysreg.h
+  KVM: arm64: selftests: Use read/write definitions from sysreg.h
+  KVM: arm64: selftests: Introduce ARM64_SYS_KVM_REG
+  KVM: arm64: selftests: Add support for cpu_relax
+  KVM: arm64: selftests: Add basic support for arch_timers
+  KVM: arm64: selftests: Add basic support to generate delays
+  KVM: arm64: selftests: Add support to disable and enable local IRQs
+  KVM: arm64: selftests: Maintain consistency for vcpuid type
+  KVM: arm64: selftests: Add guest support to get the vcpuid
+  KVM: arm64: selftests: Add light-weight spinlock support
+  KVM: arm64: selftests: Add basic GICv3 support
+  KVM: arm64: selftests: Add host support for vGIC
+  KVM: arm64: selftests: Add arch_timer test
+  KVM: arm64: selftests: arch_timer: Support vCPU migration
+
+ tools/arch/arm64/include/asm/sysreg.h         | 1296 +++++++++++++++++
+ tools/testing/selftests/kvm/.gitignore        |    1 +
+ tools/testing/selftests/kvm/Makefile          |    3 +-
+ .../selftests/kvm/aarch64/arch_timer.c        |  479 ++++++
+ .../selftests/kvm/aarch64/debug-exceptions.c  |   30 +-
+ .../selftests/kvm/aarch64/psci_cpu_on_test.c  |    2 +-
+ .../testing/selftests/kvm/aarch64/vgic_init.c |    3 +-
+ .../kvm/include/aarch64/arch_timer.h          |  142 ++
+ .../selftests/kvm/include/aarch64/delay.h     |   25 +
+ .../selftests/kvm/include/aarch64/gic.h       |   21 +
+ .../selftests/kvm/include/aarch64/processor.h |   90 +-
+ .../selftests/kvm/include/aarch64/spinlock.h  |   13 +
+ .../selftests/kvm/include/aarch64/vgic.h      |   20 +
+ .../testing/selftests/kvm/include/kvm_util.h  |    2 +
+ tools/testing/selftests/kvm/lib/aarch64/gic.c |   95 ++
+ .../selftests/kvm/lib/aarch64/gic_private.h   |   21 +
+ .../selftests/kvm/lib/aarch64/gic_v3.c        |  240 +++
+ .../selftests/kvm/lib/aarch64/gic_v3.h        |   70 +
+ .../selftests/kvm/lib/aarch64/processor.c     |   24 +-
+ .../selftests/kvm/lib/aarch64/spinlock.c      |   27 +
+ .../testing/selftests/kvm/lib/aarch64/vgic.c  |   70 +
+ 21 files changed, 2626 insertions(+), 48 deletions(-)
+ create mode 100644 tools/arch/arm64/include/asm/sysreg.h
+ create mode 100644 tools/testing/selftests/kvm/aarch64/arch_timer.c
+ create mode 100644 tools/testing/selftests/kvm/include/aarch64/arch_timer.h
+ create mode 100644 tools/testing/selftests/kvm/include/aarch64/delay.h
+ create mode 100644 tools/testing/selftests/kvm/include/aarch64/gic.h
+ create mode 100644 tools/testing/selftests/kvm/include/aarch64/spinlock.h
+ create mode 100644 tools/testing/selftests/kvm/include/aarch64/vgic.h
+ create mode 100644 tools/testing/selftests/kvm/lib/aarch64/gic.c
+ create mode 100644 tools/testing/selftests/kvm/lib/aarch64/gic_private.h
+ create mode 100644 tools/testing/selftests/kvm/lib/aarch64/gic_v3.c
+ create mode 100644 tools/testing/selftests/kvm/lib/aarch64/gic_v3.h
+ create mode 100644 tools/testing/selftests/kvm/lib/aarch64/spinlock.c
+ create mode 100644 tools/testing/selftests/kvm/lib/aarch64/vgic.c
+
+-- 
+2.33.0.309.g3052b89438-goog
+
