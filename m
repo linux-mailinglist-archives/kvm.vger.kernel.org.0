@@ -2,67 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D8A6940AC0F
-	for <lists+kvm@lfdr.de>; Tue, 14 Sep 2021 12:55:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A99FB40ACA0
+	for <lists+kvm@lfdr.de>; Tue, 14 Sep 2021 13:39:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231879AbhINK4c (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Sep 2021 06:56:32 -0400
-Received: from mga05.intel.com ([192.55.52.43]:54916 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230153AbhINK4a (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Sep 2021 06:56:30 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10106"; a="307508763"
-X-IronPort-AV: E=Sophos;i="5.85,292,1624345200"; 
-   d="scan'208";a="307508763"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Sep 2021 03:55:13 -0700
-X-IronPort-AV: E=Sophos;i="5.85,292,1624345200"; 
-   d="scan'208";a="451982794"
-Received: from krentach-mobl1.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.251.142.231])
-  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Sep 2021 03:55:10 -0700
-Date:   Tue, 14 Sep 2021 22:55:08 +1200
-From:   Kai Huang <kai.huang@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
-        linux-sgx@vger.kernel.org, jarkko@kernel.org,
-        dave.hansen@linux.intel.com, yang.zhong@intel.com
-Subject: Re: [PATCH 2/2] x86: sgx_vepc: implement SGX_IOC_VEPC_REMOVE ioctl
-Message-Id: <20210914225508.032db86d89e6d207789ec1ea@intel.com>
-In-Reply-To: <20210913131153.1202354-3-pbonzini@redhat.com>
-References: <20210913131153.1202354-1-pbonzini@redhat.com>
-        <20210913131153.1202354-3-pbonzini@redhat.com>
-X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+        id S232456AbhINLk6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Sep 2021 07:40:58 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:47604 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232420AbhINLkx (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 14 Sep 2021 07:40:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1631619575;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=VXsGLVph1NbqQ2nkvDoWH9B2JiDcc6lqU3jEfo1REJk=;
+        b=SWLmyt/kaSxpj4MLSWPnV9hKO8tEBoiocDkndHhrqdufWdoI+3xW0YmSR242T8d3e0O9Rh
+        2Xbr/h2kBNAuWN6dABimbyur9/WxHRyblAu2Q6s2tS47K7v3OeUxwtVKGrw3GLZrmJyH9h
+        B2aVJ+HLAbhTIJ6imDM18qouvZRQWU0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-456-WrrSKas9MgCaVgh6GAv1lQ-1; Tue, 14 Sep 2021 07:39:32 -0400
+X-MC-Unique: WrrSKas9MgCaVgh6GAv1lQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 498B71811EC1;
+        Tue, 14 Sep 2021 11:39:30 +0000 (UTC)
+Received: from starship (unknown [10.35.206.50])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 16CA81002388;
+        Tue, 14 Sep 2021 11:39:24 +0000 (UTC)
+Message-ID: <5fec07dfcfd53421293c3814796f1aa4add4a126.camel@redhat.com>
+Subject: Re: [RFC PATCH 3/3] nSVM: use svm->nested.save to load vmcb12
+ registers and avoid TOC/TOU races
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        linux-kernel@vger.kernel.org
+Date:   Tue, 14 Sep 2021 14:39:23 +0300
+In-Reply-To: <a1ab92dd-6e76-fb30-d570-582cd3ebecd3@redhat.com>
+References: <20210903102039.55422-1-eesposit@redhat.com>
+         <20210903102039.55422-4-eesposit@redhat.com>
+         <21d2bf8c4e3eb3fc5d297fd13300557ec686b625.camel@redhat.com>
+         <73b5a5bb-48f2-3a08-c76b-a82b5b69c406@redhat.com>
+         <9585f1387b2581d30b74cd163a9aac2adbd37a93.camel@redhat.com>
+         <2b1e17416cef1e37f42e9bc8b2283b03d2651cb2.camel@redhat.com>
+         <ee207b0c-eab3-13ba-44be-999f849008d2@redhat.com>
+         <fb828c752fac255c6a1d997ff27dfc5264a5c658.camel@redhat.com>
+         <a1ab92dd-6e76-fb30-d570-582cd3ebecd3@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 13 Sep 2021 09:11:53 -0400 Paolo Bonzini wrote:
-> Windows expects all pages to be in uninitialized state on startup.
-> Add a ioctl that does this with EREMOVE, so that userspace can bring
-> the pages back to this state also when resetting the VM.
-> Pure userspace implementations, such as closing and reopening the device,
-> are racy.
+On Tue, 2021-09-14 at 12:52 +0200, Emanuele Giuseppe Esposito wrote:
+> > I would do it this way:
+> > 
+> > struct svm_nested_state {
+> >          ...
+> > 	/* cached fields from the vmcb12 */
+> > 	struct  vmcb_control_area_cached ctl;
+> > 	struct  vmcb_save_area_cached save;
+> >          ...
+> > };
+> > 
+> > 
 > 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  arch/x86/include/uapi/asm/sgx.h |  2 ++
->  arch/x86/kernel/cpu/sgx/virt.c  | 36 +++++++++++++++++++++++++++++++++
->  2 files changed, 38 insertions(+)
+> The only thing that requires a little bit of additional work when 
+> applying this is svm_get_nested_state() (and theoretically 
+> svm_set_nested_state(), in option 2). In this function, nested.ctl is 
+> copied in user_vmcb->control. But now nested.ctl is not anymore a 
+> vmcb_control_area, so the sizes differ.
 > 
-> diff --git a/arch/x86/include/uapi/asm/sgx.h b/arch/x86/include/uapi/asm/sgx.h
-> index 9690d6899ad9..f79d84ce8033 100644
-> --- a/arch/x86/include/uapi/asm/sgx.h
-> +++ b/arch/x86/include/uapi/asm/sgx.h
-> @@ -27,6 +27,8 @@ enum sgx_page_flags {
->  	_IOW(SGX_MAGIC, 0x02, struct sgx_enclave_init)
->  #define SGX_IOC_ENCLAVE_PROVISION \
->  	_IOW(SGX_MAGIC, 0x03, struct sgx_enclave_provision)
-> +#define SGX_IOC_VEPC_REMOVE \
-> +	_IO(SGX_MAGIC, 0x04)
+> There are 2 options here:
+> 1) copy nested.ctl into a full vmcb_control_area, and copy it to user 
+> space without modifying the API. The advantage is that the API is left 
+> intact, but an additional copy is required.
 
-Perhaps SGX_IOC_VEPC_RESET is better than REMOVE, since this ioctl doesn't
-actually remove any EPC page from virtual EPC device, but just reset to a clean
-slate (by using EREMOVE).
+Thankfully there KVM_GET_NESTED_STATE is not performance critical at all,
+so a copy isn't that big problem, other that it is a bit ugly.
+Ugh..
+
+> 
+> 2) modify KVM_GET_NESTED_STATE and KVM_SET_NESTED_STATE to handle 
+> vmcb_control_area_cached. Advantage is that there is a lightweight copy 
+> + the benefits explained by you in the previous email (no unset field).
+
+That would break the KVM_GET_NESTED_STATE ABI without a very good reason,
+especially since some of the currently unused fields in the ctl (there
+are I think very few of them), might became used later on, needing
+to break the ABI again.
+
+Best regards,
+	Maxim Levitsky
+
+
+
+> 
+> I am not sure which one is the preferred way here.
+> 
+> Thank you,
+> Emanuele
+> 
+
+
