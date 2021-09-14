@@ -2,305 +2,232 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2192940BBA9
-	for <lists+kvm@lfdr.de>; Wed, 15 Sep 2021 00:35:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C8CF40BBB9
+	for <lists+kvm@lfdr.de>; Wed, 15 Sep 2021 00:39:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235878AbhINWgU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Sep 2021 18:36:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39608 "EHLO
+        id S235660AbhINWlK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Sep 2021 18:41:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41544 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235846AbhINWdc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Sep 2021 18:33:32 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD1CFC06178A
-        for <kvm@vger.kernel.org>; Tue, 14 Sep 2021 15:31:56 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 83-20020a251956000000b0059948f541cbso947022ybz.7
-        for <kvm@vger.kernel.org>; Tue, 14 Sep 2021 15:31:56 -0700 (PDT)
+        with ESMTP id S235478AbhINWlK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Sep 2021 18:41:10 -0400
+Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07860C061762
+        for <kvm@vger.kernel.org>; Tue, 14 Sep 2021 15:39:52 -0700 (PDT)
+Received: by mail-lf1-x134.google.com with SMTP id a4so1739044lfg.8
+        for <kvm@vger.kernel.org>; Tue, 14 Sep 2021 15:39:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=mkrEw/6odZA643/v871JIfxaL0FOz/JzQ68NluiA4Io=;
-        b=pWguaZ1X+xc+kKgb8hGucMka7FFypIerPRLXgRPBLAECFpye62NakBo8+/PZ4szLMK
-         0qBUCuVwIjlDg6CGOVVgtJS/H5b+HA0k7Bz+dVFJ3Z66BMhybAZTx9Q+zbYjuvzNm0uE
-         pENB4oui1tQ2AGPrZY3vIqtHyJQSmhclt0fnLauAEtMiGrH94dv9Tj+XZf0CJ0/uP1y1
-         RcZTOwSg8YPttPXs+F+gesKkiD/xrnxhe4cL1t96RKvMzT6MCUQ6+mvOtqke9Rxd8hQU
-         BQvpFhqZUuV78y6q+EpEsFCwitAu1cnKeW6Zuix/Nl8BRhGfi+H3Uhc5Vwv5g9zzpB08
-         3PsQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=+ZE2BawIU65HDTYQakuJiXPZQ2/PmXQG0jqaaUOAG3k=;
+        b=km4VCJqBJmlVrj14YwftblNq9T/nY2fuwDrkz+OhI7AfiWKEFvprziUIS0ZOjuM/r1
+         8rxYGKwS/d6aXpYDdHFdy4d2N3J7jWuPzxGWgiIZai5+lCRRzoN9k+WXSwwv5IJEurpY
+         119iNHScaih4bf0g9YH2D305Pa803HfX3UsoNjpavJrU5E2ULDGpaGPWaCROWaBtdvK3
+         pNm3MwpfjUw+kjMWPsGvANFpvvA8Z4CFutIWC15ANrQGgr30wpbFLRFdTfYpOtiPbiWG
+         nztIWzEbKol4gpNCt10dWnsPsC2BiAptgVpJ2TtstWNXd4eaa9gIEzxrUsqZQcqAsexj
+         q0pw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=mkrEw/6odZA643/v871JIfxaL0FOz/JzQ68NluiA4Io=;
-        b=coePhgzQZKSpC6VyjaNeeqvpYNzvyhkcGpJrJPGktsjaR5jOAvunYCI/JaL/Mz89Wa
-         /gyfz1djCG//8MGgdFOv7xuJhtASpoJpYriuQuoJZgczeLZqo8JzIPThAc5YKph14cam
-         E8pSSRoX1/I/gPz5JEoj73VjxqV+SKqg6FSS8zcYZO3FxrUHm5067ALutb8jrZYB7V5u
-         l9jkTKZiQ88eDI4s+NzcqzzliqGIQfujcgaGXme0kTWkuaPDncVBOLiuYEIkxEc1ykAM
-         ktXVYzTXSN/FzqwMn3rcpEPMBgOfNFnH4GFXyiTnh/n3ZneYmm6tTA9+ArWQh6zAlGFF
-         dmbA==
-X-Gm-Message-State: AOAM531PLcgROtwfkcMOu8aMbP6wPGTeEbeYEqWGLzO03iVgSOthmjIH
-        R5bPNpCH4rt0qLZ1QoqGsCX3Xn9+AJTM
-X-Google-Smtp-Source: ABdhPJzpZoa9zZGM5vyPXwbQ3eFL89rD2TZs6diqA8ymkENI2ijJ9n/sNgUdRcVwqCDFoumpgDFICiXbFpuB
-X-Received: from rananta-virt.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1bcc])
- (user=rananta job=sendgmr) by 2002:a25:eb0b:: with SMTP id
- d11mr1889054ybs.101.1631658715856; Tue, 14 Sep 2021 15:31:55 -0700 (PDT)
-Date:   Tue, 14 Sep 2021 22:31:14 +0000
-In-Reply-To: <20210914223114.435273-1-rananta@google.com>
-Message-Id: <20210914223114.435273-16-rananta@google.com>
-Mime-Version: 1.0
-References: <20210914223114.435273-1-rananta@google.com>
-X-Mailer: git-send-email 2.33.0.309.g3052b89438-goog
-Subject: [PATCH v7 15/15] KVM: arm64: selftests: arch_timer: Support vCPU migration
-From:   Raghavendra Rao Ananta <rananta@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Andrew Jones <drjones@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc:     Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=+ZE2BawIU65HDTYQakuJiXPZQ2/PmXQG0jqaaUOAG3k=;
+        b=kXhGlxXo5rPTn7BRBvyi5nztZBU3C+Jdd35IvNJtwRdaOuXbyvPzEZBtwCAOD9dOeR
+         aRA2yKJ5dIa/KuP+UZb3fBQjBoi3Q5EXu/lJl5K074qAuQG2bMg27qFK7gBi29iTfdbM
+         7QJpYkvOZOtRuC3Bc8NMw56bQjY+YprWRyS1FN+mxupaAfIaCvW9Hp/lmzMhyvZk8lGv
+         QDIfxnkn9mBrSir3zZEdre5trekhZ9Z3FtoJoUcWeE8Rnm20HwIPzilqE8sdsXnR2Mga
+         FaCsn3lzon57VwW7L6QhpByajDiPSB46lGPdG+p4ALeZPJXazUR2++RcbyHFTDH8qdKy
+         nDTg==
+X-Gm-Message-State: AOAM531DpsJon/SdtoOBWDXHd0uqTL5yWsQdLCLmRABoYbL9+ZdiXyI+
+        ICNZ4tTCaIhAOTH3bsTjNFa+LFo/kdHAGF1XE2N7gA==
+X-Google-Smtp-Source: ABdhPJxDxDrtWmPmN+FLHlNZw8mZA3aFHQX5XQpuMJbH10sfPsxgt8RqC6wuCf4rlESxpvmaBV314+yphKvuMEeSM2E=
+X-Received: by 2002:ac2:483b:: with SMTP id 27mr8966677lft.644.1631659190112;
+ Tue, 14 Sep 2021 15:39:50 -0700 (PDT)
+MIME-Version: 1.0
+References: <20210914200639.3305617-1-pgonda@google.com> <YUEVQDEvLbdJF+sj@google.com>
+In-Reply-To: <YUEVQDEvLbdJF+sj@google.com>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Tue, 14 Sep 2021 16:39:38 -0600
+Message-ID: <CAMkAt6rSsKuzE__pAodiJR9wFU-B3942+kdkQG-3M+jxhVco2w@mail.gmail.com>
+Subject: Re: [PATCH] KVM: SEV: Acquire vcpu mutex when updating VMSA
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm list <kvm@vger.kernel.org>, Marc Orr <marcorr@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Brijesh Singh <brijesh.singh@amd.com>, stable@vger.kernel.org,
+        linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Since the timer stack (hardware and KVM) is per-CPU, there
-are potential chances for races to occur when the scheduler
-decides to migrate a vCPU thread to a different physical CPU.
-Hence, include an option to stress-test this part as well by
-forcing the vCPUs to migrate across physical CPUs in the
-system at a particular rate.
+On Tue, Sep 14, 2021 at 3:34 PM Sean Christopherson <seanjc@google.com> wro=
+te:
+>
+> On Tue, Sep 14, 2021, Peter Gonda wrote:
+> > Adds mutex guard to the VMSA updating code. Also adds a check to skip a
+> > vCPU if it has already been LAUNCH_UPDATE_VMSA'd which should allow
+> > userspace to retry this ioctl until all the vCPUs can be successfully
+> > LAUNCH_UPDATE_VMSA'd. Because this operation cannot be undone we cannot
+> > unwind if one vCPU fails.
+> >
+> > Fixes: ad73109ae7ec ("KVM: SVM: Provide support to launch and run an SE=
+V-ES guest")
+> >
+> > Signed-off-by: Peter Gonda <pgonda@google.com>
+> > Cc: Marc Orr <marcorr@google.com>
+> > Cc: Paolo Bonzini <pbonzini@redhat.com>
+> > Cc: Sean Christopherson <seanjc@google.com>
+> > Cc: Brijesh Singh <brijesh.singh@amd.com>
+> > Cc: kvm@vger.kernel.org
+> > Cc: stable@vger.kernel.org
+> > Cc: linux-kernel@vger.kernel.org
+> > ---
+> >  arch/x86/kvm/svm/sev.c | 24 +++++++++++++++++++-----
+> >  1 file changed, 19 insertions(+), 5 deletions(-)
+> >
+> > diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> > index 75e0b21ad07c..9a2ebd0328ca 100644
+> > --- a/arch/x86/kvm/svm/sev.c
+> > +++ b/arch/x86/kvm/svm/sev.c
+> > @@ -598,22 +598,29 @@ static int sev_es_sync_vmsa(struct vcpu_svm *svm)
+> >  static int sev_launch_update_vmsa(struct kvm *kvm, struct kvm_sev_cmd =
+*argp)
+> >  {
+> >       struct kvm_sev_info *sev =3D &to_kvm_svm(kvm)->sev_info;
+> > -     struct sev_data_launch_update_vmsa vmsa;
+> > +     struct sev_data_launch_update_vmsa vmsa =3D {0};
+> >       struct kvm_vcpu *vcpu;
+> >       int i, ret;
+> >
+> >       if (!sev_es_guest(kvm))
+> >               return -ENOTTY;
+> >
+> > -     vmsa.reserved =3D 0;
+> > -
+>
+> Zeroing all of 'vmsa' is an unrelated chagne and belongs in a separate pa=
+tch.  I
+> would even go so far as to say it's unnecessary, even field of the struct=
+ is
+> explicitly written before it's consumed.
 
-Originally, the bug for the fix with commit 3134cc8beb69d0d
-("KVM: arm64: vgic: Resample HW pending state on deactivation")
-was discovered using arch_timer test with vCPU migrations and
-can be easily reproduced.
+I'll remove this.
 
-Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-Reviewed-by: Andrew Jones <drjones@redhat.com>
----
- .../selftests/kvm/aarch64/arch_timer.c        | 115 +++++++++++++++++-
- 1 file changed, 114 insertions(+), 1 deletion(-)
+>
+> >       kvm_for_each_vcpu(i, vcpu, kvm) {
+> >               struct vcpu_svm *svm =3D to_svm(vcpu);
+> >
+> > +             ret =3D mutex_lock_killable(&vcpu->mutex);
+> > +             if (ret)
+> > +                     goto out_unlock;
+>
+> Rather than multiple unlock labels, move the guts of the loop to a wrappe=
+r.
+> As discussed off list, this really should be a vCPU-scoped ioctl, but tha=
+t ship
+> has sadly sailed :-(  We can at least imitate that by making the VM-scope=
+d ioctl
+> nothing but a wrapper.
+>
+> > +
+> > +             /* Skip to the next vCPU if this one has already be updat=
+ed. */
+>
+> s/be/been
+>
+> Uber nit, there may not be a next vCPU.  It'd be more slightly more accur=
+ate to
+> say something like "Do nothing if this vCPU has already been updated".
+>
+> > +             ret =3D sev_es_sync_vmsa(svm);
+> > +             if (svm->vcpu.arch.guest_state_protected)
+> > +                     goto unlock;
+>
+> This belongs in a separate patch, too.  It also introduces a bug (arguabl=
+y two)
+> in that it adds a duplicate call to sev_es_sync_vmsa().  The second bug i=
+s that
+> if sev_es_sync_vmsa() fails _and_ the vCPU is already protected, this wil=
+l cause
+> that failure to be squashed.
 
-diff --git a/tools/testing/selftests/kvm/aarch64/arch_timer.c b/tools/testing/selftests/kvm/aarch64/arch_timer.c
-index 3b6ea6a462f4..228e7ed5531c 100644
---- a/tools/testing/selftests/kvm/aarch64/arch_timer.c
-+++ b/tools/testing/selftests/kvm/aarch64/arch_timer.c
-@@ -14,6 +14,8 @@
-  *
-  * The test provides command-line options to configure the timer's
-  * period (-p), number of vCPUs (-n), and iterations per stage (-i).
-+ * To stress-test the timer stack even more, an option to migrate the
-+ * vCPUs across pCPUs (-m), at a particular rate, is also provided.
-  *
-  * Copyright (c) 2021, Google LLC.
-  */
-@@ -24,6 +26,8 @@
- #include <pthread.h>
- #include <linux/kvm.h>
- #include <linux/sizes.h>
-+#include <linux/bitmap.h>
-+#include <sys/sysinfo.h>
- 
- #include "kvm_util.h"
- #include "processor.h"
-@@ -36,17 +40,20 @@
- #define NR_TEST_ITERS_DEF		5
- #define TIMER_TEST_PERIOD_MS_DEF	10
- #define TIMER_TEST_ERR_MARGIN_US	100
-+#define TIMER_TEST_MIGRATION_FREQ_MS	2
- 
- struct test_args {
- 	int nr_vcpus;
- 	int nr_iter;
- 	int timer_period_ms;
-+	int migration_freq_ms;
- };
- 
- static struct test_args test_args = {
- 	.nr_vcpus = NR_VCPUS_DEF,
- 	.nr_iter = NR_TEST_ITERS_DEF,
- 	.timer_period_ms = TIMER_TEST_PERIOD_MS_DEF,
-+	.migration_freq_ms = TIMER_TEST_MIGRATION_FREQ_MS,
- };
- 
- #define msecs_to_usecs(msec)		((msec) * 1000LL)
-@@ -80,6 +87,9 @@ static struct test_vcpu_shared_data vcpu_shared_data[KVM_MAX_VCPUS];
- 
- static int vtimer_irq, ptimer_irq;
- 
-+static unsigned long *vcpu_done_map;
-+static pthread_mutex_t vcpu_done_map_lock;
-+
- static void
- guest_configure_timer_action(struct test_vcpu_shared_data *shared_data)
- {
-@@ -215,6 +225,11 @@ static void *test_vcpu_run(void *arg)
- 
- 	vcpu_run(vm, vcpuid);
- 
-+	/* Currently, any exit from guest is an indication of completion */
-+	pthread_mutex_lock(&vcpu_done_map_lock);
-+	set_bit(vcpuid, vcpu_done_map);
-+	pthread_mutex_unlock(&vcpu_done_map_lock);
-+
- 	switch (get_ucall(vm, vcpuid, &uc)) {
- 	case UCALL_SYNC:
- 	case UCALL_DONE:
-@@ -233,9 +248,78 @@ static void *test_vcpu_run(void *arg)
- 	return NULL;
- }
- 
-+static uint32_t test_get_pcpu(void)
-+{
-+	uint32_t pcpu;
-+	unsigned int nproc_conf;
-+	cpu_set_t online_cpuset;
-+
-+	nproc_conf = get_nprocs_conf();
-+	sched_getaffinity(0, sizeof(cpu_set_t), &online_cpuset);
-+
-+	/* Randomly find an available pCPU to place a vCPU on */
-+	do {
-+		pcpu = rand() % nproc_conf;
-+	} while (!CPU_ISSET(pcpu, &online_cpuset));
-+
-+	return pcpu;
-+}
-+
-+static int test_migrate_vcpu(struct test_vcpu *vcpu)
-+{
-+	int ret;
-+	cpu_set_t cpuset;
-+	uint32_t new_pcpu = test_get_pcpu();
-+
-+	CPU_ZERO(&cpuset);
-+	CPU_SET(new_pcpu, &cpuset);
-+
-+	pr_debug("Migrating vCPU: %u to pCPU: %u\n", vcpu->vcpuid, new_pcpu);
-+
-+	ret = pthread_setaffinity_np(vcpu->pt_vcpu_run,
-+					sizeof(cpuset), &cpuset);
-+
-+	/* Allow the error where the vCPU thread is already finished */
-+	TEST_ASSERT(ret == 0 || ret == ESRCH,
-+			"Failed to migrate the vCPU:%u to pCPU: %u; ret: %d\n",
-+			vcpu->vcpuid, new_pcpu, ret);
-+
-+	return ret;
-+}
-+
-+static void *test_vcpu_migration(void *arg)
-+{
-+	unsigned int i, n_done;
-+	bool vcpu_done;
-+
-+	do {
-+		usleep(msecs_to_usecs(test_args.migration_freq_ms));
-+
-+		for (n_done = 0, i = 0; i < test_args.nr_vcpus; i++) {
-+			pthread_mutex_lock(&vcpu_done_map_lock);
-+			vcpu_done = test_bit(i, vcpu_done_map);
-+			pthread_mutex_unlock(&vcpu_done_map_lock);
-+
-+			if (vcpu_done) {
-+				n_done++;
-+				continue;
-+			}
-+
-+			test_migrate_vcpu(&test_vcpu[i]);
-+		}
-+	} while (test_args.nr_vcpus != n_done);
-+
-+	return NULL;
-+}
-+
- static void test_run(struct kvm_vm *vm)
- {
- 	int i, ret;
-+	pthread_t pt_vcpu_migration;
-+
-+	pthread_mutex_init(&vcpu_done_map_lock, NULL);
-+	vcpu_done_map = bitmap_alloc(test_args.nr_vcpus);
-+	TEST_ASSERT(vcpu_done_map, "Failed to allocate vcpu done bitmap\n");
- 
- 	for (i = 0; i < test_args.nr_vcpus; i++) {
- 		ret = pthread_create(&test_vcpu[i].pt_vcpu_run, NULL,
-@@ -243,8 +327,23 @@ static void test_run(struct kvm_vm *vm)
- 		TEST_ASSERT(!ret, "Failed to create vCPU-%d pthread\n", i);
- 	}
- 
-+	/* Spawn a thread to control the vCPU migrations */
-+	if (test_args.migration_freq_ms) {
-+		srand(time(NULL));
-+
-+		ret = pthread_create(&pt_vcpu_migration, NULL,
-+					test_vcpu_migration, NULL);
-+		TEST_ASSERT(!ret, "Failed to create the migration pthread\n");
-+	}
-+
-+
- 	for (i = 0; i < test_args.nr_vcpus; i++)
- 		pthread_join(test_vcpu[i].pt_vcpu_run, NULL);
-+
-+	if (test_args.migration_freq_ms)
-+		pthread_join(pt_vcpu_migration, NULL);
-+
-+	bitmap_free(vcpu_done_map);
- }
- 
- static void test_init_timer_irq(struct kvm_vm *vm)
-@@ -301,6 +400,8 @@ static void test_print_help(char *name)
- 		NR_TEST_ITERS_DEF);
- 	pr_info("\t-p: Periodicity (in ms) of the guest timer (default: %u)\n",
- 		TIMER_TEST_PERIOD_MS_DEF);
-+	pr_info("\t-m: Frequency (in ms) of vCPUs to migrate to different pCPU. 0 to turn off (default: %u)\n",
-+		TIMER_TEST_MIGRATION_FREQ_MS);
- 	pr_info("\t-h: print this help screen\n");
- }
- 
-@@ -308,7 +409,7 @@ static bool parse_args(int argc, char *argv[])
- {
- 	int opt;
- 
--	while ((opt = getopt(argc, argv, "hn:i:p:")) != -1) {
-+	while ((opt = getopt(argc, argv, "hn:i:p:m:")) != -1) {
- 		switch (opt) {
- 		case 'n':
- 			test_args.nr_vcpus = atoi(optarg);
-@@ -335,6 +436,13 @@ static bool parse_args(int argc, char *argv[])
- 				goto err;
- 			}
- 			break;
-+		case 'm':
-+			test_args.migration_freq_ms = atoi(optarg);
-+			if (test_args.migration_freq_ms < 0) {
-+				pr_info("0 or positive value needed for -m\n");
-+				goto err;
-+			}
-+			break;
- 		case 'h':
- 		default:
- 			goto err;
-@@ -358,6 +466,11 @@ int main(int argc, char *argv[])
- 	if (!parse_args(argc, argv))
- 		exit(KSFT_SKIP);
- 
-+	if (test_args.migration_freq_ms && get_nprocs() < 2) {
-+		print_skip("At least two physical CPUs needed for vCPU migration");
-+		exit(KSFT_SKIP);
-+	}
-+
- 	vm = test_vm_create();
- 	test_run(vm);
- 	kvm_vm_free(vm);
--- 
-2.33.0.309.g3052b89438-goog
+I'll move skipping logic to a seperate patch
 
+>
+> In the end, I think the least gross implementation will look something li=
+ke this,
+> implemented over two patches (one for the lock, one for the protected che=
+ck).
+>
+> static int __sev_launch_update_vmsa(struct kvm *kvm, struct kvm_vcpu *vcp=
+u,
+>                                     int *error)
+> {
+>         struct sev_data_launch_update_vmsa vmsa;
+>         struct vcpu_svm *svm =3D to_svm(vcpu);
+>         int ret;
+>
+>         /*
+>          * Do nothing if this vCPU has already been updated.  This is all=
+owed
+>          * to let userspace retry LAUNCH_UPDATE_VMSA if the command fails=
+ on a
+>          * later vCPU.
+>          */
+>         if (svm->vcpu.arch.guest_state_protected)
+>                 return 0;
+>
+>         /* Perform some pre-encryption checks against the VMSA */
+>         ret =3D sev_es_sync_vmsa(svm);
+>         if (ret)
+>                 return ret;
+>
+>         /*
+>          * The LAUNCH_UPDATE_VMSA command will perform in-place
+>          * encryption of the VMSA memory content (i.e it will write
+>          * the same memory region with the guest's key), so invalidate
+>          * it first.
+>          */
+>         clflush_cache_range(svm->vmsa, PAGE_SIZE);
+>
+>         vmsa.reserved =3D 0;
+>         vmsa.handle =3D to_kvm_svm(kvm)->sev_info.handle;
+>         vmsa.address =3D __sme_pa(svm->vmsa);
+>         vmsa.len =3D PAGE_SIZE;
+>         return sev_issue_cmd(kvm, SEV_CMD_LAUNCH_UPDATE_VMSA, &vmsa, erro=
+r);
+> }
+>
+> static int sev_launch_update_vmsa(struct kvm *kvm, struct kvm_sev_cmd *ar=
+gp)
+> {
+>         struct kvm_vcpu *vcpu;
+>         int i, ret;
+>
+>         if (!sev_es_guest(kvm))
+>                 return -ENOTTY;
+>
+>         kvm_for_each_vcpu(i, vcpu, kvm) {
+>                 ret =3D mutex_lock_killable(&vcpu->mutex);
+>                 if (ret)
+>                         return ret;
+>
+>                 ret =3D __sev_launch_update_vmsa(kvm, vcpu, &argp->error)=
+;
+>
+>                 mutex_unlock(&vcpu->mutex);
+">                 if (ret)
+>                         return ret;
+>         }
+>         return 0;
+> }
+
+That looks reasonable to me. I didn't know if changes headed for LTS
+should be smaller so I avoided doing this refactor. From:
+https://www.kernel.org/doc/html/v4.11/process/stable-kernel-rules.html#stab=
+le-kernel-rules
+seems to say less than 100 lines is ideal. I guess this could also be
+a "theoretical race condition=E2=80=9D anyways so maybe not for LTS anyways=
+.
+Thoughts?
