@@ -2,183 +2,168 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D539D40B67A
-	for <lists+kvm@lfdr.de>; Tue, 14 Sep 2021 20:03:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 741E640B685
+	for <lists+kvm@lfdr.de>; Tue, 14 Sep 2021 20:06:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231366AbhINSFN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Sep 2021 14:05:13 -0400
-Received: from mail-bn7nam10on2064.outbound.protection.outlook.com ([40.107.92.64]:45111
-        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S230220AbhINSFM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Sep 2021 14:05:12 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=KtwvNpDHcIyxn4MJ/4XS6T1OngN0PAwuwhbsb6ELoUyfhKhc3ZKf6uYE3TQu6ikUAG3tuhN8kftVs+FWD2YHFXvDa9d0gXxFDo9iVYy10gk49DdrOVOvVoXOJOPxp7CNPFmOHHoAp9V9eSalr/4Irikp2QAjpUr13A8vlxUvLyS6py5SYRwNrRkhpYLADceRKaFt9qZj+NQvqtsLsie3n10+A2YYqBFMdphnL7TahA7LQ8ePFDfMdSPG4RMWabzgK6qVYiTTkLRmq1AbzuHXbhfTPU5EEw6enmW1pq5mQrBK8CzTokgfJv4ddmjsblEtsFpWhBCBFq+8gir+tLhO5g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
- bh=CziS3kcNiMlg1T3C8z/0IzI6f+KlNa+AU7IFzvLvNOY=;
- b=SsJsqzN6PgTKGEFYUvWarmjNoFSQ2qkhoL6baz/0myqxd9kV0yKTycKJkFGCFbCAlBiM9chjhuUWfTn9lZdC7ce4R7HWqVoTUFzXTi9fAGfRMLVvJ8GPDm4/l09Aahs9hPQ2L7pAgBO6Skvp8CjC8ZRb5GAhT2O0VdY924ZURtRgewSt2pVYiZHZY8CLHcKIBzJMDCkFTAnKmg0nNVI+HktHpmCE4daVHNLZye8RHQk5YztfXIrLKfUme4iXZQ/LalVRyiNN28+FSxLButHjsv5maDYkQKAoytsDs35zL3Wrb69wayDO15TAwW+Z7Aos7Yq5AydmzdS21S83suOSog==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=CziS3kcNiMlg1T3C8z/0IzI6f+KlNa+AU7IFzvLvNOY=;
- b=Kzu6wjOgHbHR5u0XYGPZTfHdZEIYe5+NFEUif88/qAstW60i69Hstzao7CAh8n7G0jqGcg3eka8hOK7zjEIr+G2P3mSQ043SclEPxhV5VH0wAY6yvTGDqrpbrwFQ201lQklnpckM9wTZgPtO0u4KkCBuLnuHhDsAR8BJMHlN4Mo20CXuKCwVNjbfHyMfjgYkzARAz8HTatR6ZYjpHRJyPSars/P0RNaloAcX7HG76Bu5Awnl0ETeJIE+jMXAWnm07VHDPuoTHk6tP8LQ1eFBP0qqItY5KOhRd2K9Pctqb36ZPSpSClmN9kH6vr3dUyeLXAueTA2yZXjwYydeO4Y4YA==
-Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=nvidia.com;
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
- by BL1PR12MB5190.namprd12.prod.outlook.com (2603:10b6:208:31c::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4500.16; Tue, 14 Sep
- 2021 18:03:53 +0000
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::e8af:232:915e:2f95]) by BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::e8af:232:915e:2f95%8]) with mapi id 15.20.4500.019; Tue, 14 Sep 2021
- 18:03:53 +0000
-Date:   Tue, 14 Sep 2021 15:03:50 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        David Airlie <airlied@linux.ie>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
+        id S231739AbhINSHk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Sep 2021 14:07:40 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33052 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229464AbhINSHj (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 14 Sep 2021 14:07:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1631642781;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=WdkTeh35hskFjppx/AtCQ+7sni5H8rOPzWMjSfWm50U=;
+        b=V1x/lpqKZrj/nOekKwl9yjJBE979ubRrXkUP/oRc678n8F5WfdI3y+o/Gq6y9rkL3Y4BVK
+        k3P8iUwVyjXubW5F4dAbwe/8DqFSDiyR/yJxMhZM3QvWRoDz9gngQFiVhb2EA/U0AAHVmr
+        BobHd/o+Oh4Y3BFYv1YsZE9nageGhQ8=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-403-XDALBIM2OYSaWSXR8M7bnw-1; Tue, 14 Sep 2021 14:06:20 -0400
+X-MC-Unique: XDALBIM2OYSaWSXR8M7bnw-1
+Received: by mail-wm1-f72.google.com with SMTP id m9-20020a05600c4f4900b003057c761567so980589wmq.1
+        for <kvm@vger.kernel.org>; Tue, 14 Sep 2021 11:06:20 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:cc:references:from:organization
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=WdkTeh35hskFjppx/AtCQ+7sni5H8rOPzWMjSfWm50U=;
+        b=3bQz9OPx9pXzPnMYb/gSlsRcle/nsPhlSBAvFfSwjBMXHTgaxwSQfz7p4SlnyFP2hx
+         2H1S5wUZjqkPOIpt5R1O6mzmXCAuQSaPJqvyj84BHqHdhldyDR0mMDnpwYrsNJn4a/T4
+         NY/BeJE+nUAGWX+3RfLpYJ/hQJ6LvR5vUmIRODriA6i93RIjZ9BvYtjV05UGaoIUuMp9
+         hTdOK2hgqj+wDTLrhJLXALKKbFWdV3TfVUjuKIrtlGCB13W8CzwIFXhroM0qb4IHeM/d
+         rYh2ksL+rEkPF6Gfsa6Pe/4nLgO1C0CMOWkt0D7QPJ0stK36hrYwYPvV6pOAJ2aolRQx
+         5wDQ==
+X-Gm-Message-State: AOAM530gVlDnf7hA3c8dkf3Sxnuz9A0/OGgHye7j4+jPb6wyI8M6KRfh
+        R+nJQ39vEyU+Ak2ZEGrkrLM26CILDuDit6D2iGRoHvWtisxl28a44dWURKHtL61YRKDJ4NP8GzX
+        BOgMy2Oz9dKVQ
+X-Received: by 2002:a1c:c903:: with SMTP id f3mr450197wmb.101.1631642779382;
+        Tue, 14 Sep 2021 11:06:19 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzKIqckQty8a8VOzJidD+CVHVc1oyd0LQz0Ukul/JPoVTfeji3ABJKcoR2cUc0zjpzdgVfVPg==
+X-Received: by 2002:a1c:c903:: with SMTP id f3mr450166wmb.101.1631642779102;
+        Tue, 14 Sep 2021 11:06:19 -0700 (PDT)
+Received: from [192.168.3.132] (p5b0c6041.dip0.t-ipconnect.de. [91.12.96.65])
+        by smtp.gmail.com with ESMTPSA id g143sm1846758wme.16.2021.09.14.11.06.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 14 Sep 2021 11:06:18 -0700 (PDT)
+Subject: Re: [PATCH resend RFC 0/9] s390: fixes, cleanups and optimizations
+ for page table walkers
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, linux-mm@kvack.org,
         Christian Borntraeger <borntraeger@de.ibm.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        dri-devel@lists.freedesktop.org,
-        Eric Farman <farman@linux.ibm.com>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
         Heiko Carstens <hca@linux.ibm.com>,
-        intel-gfx@lists.freedesktop.org,
-        intel-gvt-dev@lists.freedesktop.org,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
-        linux-s390@vger.kernel.org,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>, Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH v2 1/9] vfio/ccw: Use functions for alloc/free of the
- vfio_ccw_private
-Message-ID: <20210914180350.GG4065468@nvidia.com>
-References: <0-v2-7d3a384024cf+2060-ccw_mdev_jgg@nvidia.com>
- <1-v2-7d3a384024cf+2060-ccw_mdev_jgg@nvidia.com>
- <YTtBDbVsRveVE3i9@infradead.org>
- <87sfy7gnr2.fsf@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87sfy7gnr2.fsf@redhat.com>
-X-ClientProxiedBy: MN2PR18CA0017.namprd18.prod.outlook.com
- (2603:10b6:208:23c::22) To BL0PR12MB5506.namprd12.prod.outlook.com
- (2603:10b6:208:1cb::22)
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Niklas Schnelle <schnelle@linux.ibm.com>,
+        Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>
+References: <20210909162248.14969-1-david@redhat.com>
+ <20210914185033.367020b3@p-imbrenda>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat
+Message-ID: <858a5f3b-99c0-6da3-6a60-8d01886399c6@redhat.com>
+Date:   Tue, 14 Sep 2021 20:06:17 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Received: from mlx.ziepe.ca (142.162.113.129) by MN2PR18CA0017.namprd18.prod.outlook.com (2603:10b6:208:23c::22) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4500.14 via Frontend Transport; Tue, 14 Sep 2021 18:03:53 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1mQCmc-000YTR-VB; Tue, 14 Sep 2021 15:03:50 -0300
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 2b13a6db-b226-4577-a1da-08d977aa0339
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5190:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <BL1PR12MB5190B774E2E3C55C34B9C5AAC2DA9@BL1PR12MB5190.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: E8FvhBcqOISa6XICjz1Urr5f0S5w++LUFgonvJkfaBk29RMP28L4qo5s3oQt59hG9fOEopIwgordIOJoC6S/PgMXIAoXBX051wRKeoFv9KVovPJg0hxRLdsVnygNGVldmLwCCWsfUt+/8Fb86+Py7GWODhKkEunE/50BHsNXtXtjTrgxNI4yQ6ywgs8KZJt9ezQt6+v0v0hBVbuGN85BvrjKE5UAIhA6hpWyPJsr9yeyutdOQQ0gMhpHH1pzyZQy81vwWzasYOn4yWyM2elsHHNbnkjBrsO7RZch/4h8tY8xP8vueoSQVuGyDyuhDuO3lS6s7+CNhI+kxcxLPhTH5TuUiCkBANZdaSFq3PaTykNN6QDYDbECL2Bx5lS9Y+V8LGGYmK5SZI3bKIXHIEEakpuzvTm77RmrDoNF/P7XQizULyZ7SvYzEN8Mdq5WjIAYaijauB6TLDnet2fupBMx0UvNFzj/PUKrEr5SjTE7rArwNo1QbjBPNlpQQtiC1Go9TurxoVZ2Gc/KV+dKju0leoqJWIYWVrEwbEYSD1i0bw+bn6UxzbkYHcYkdldGBuqSMbvh2gUQokjSL3o+BLKo2l2ppNb2e8zGi8mUWpgj86pQso/82xxy/PGSldAwf4vcOhV+QhdlVT1GDRy0wePX3Q==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(346002)(136003)(396003)(366004)(39860400002)(66556008)(66476007)(8936002)(36756003)(54906003)(1076003)(33656002)(66946007)(26005)(316002)(2616005)(6916009)(2906002)(38100700002)(8676002)(83380400001)(9786002)(53546011)(9746002)(7416002)(4326008)(186003)(5660300002)(478600001)(86362001)(426003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?GHPDTgXzphz0Ldlv8YB1F4hm5ZM03ta0Da3ZwQaUAzgDE2kv8UmbP2G5qt2g?=
- =?us-ascii?Q?hxiUk8cRiNKIhsymVKVIjKpWEnwi+OnYudFrF4LG93DDPzmNH5ML1kS1D6X/?=
- =?us-ascii?Q?3beC/TcY3QUKlV+HNDSSS7LzvylRIW4GF5C5LVTbBcQDO3TlDSCymu5svldU?=
- =?us-ascii?Q?v2MpKtGG6iES93gHJfveougMyxJCUlajFav2H70vRdvYmU/Qrlhlk4ij7nZ0?=
- =?us-ascii?Q?bFNxyB9Xb8IU5IwE6qWo0HQVuFmsV5D7GBUx+OMnBbxoTh49gLndBNwdV8mz?=
- =?us-ascii?Q?R7seBqxTFa8XZ4jCbocKExaKYUNSL6JHrDjwauCbtoQSeg1K6vxnZtxWV9dw?=
- =?us-ascii?Q?0W9/lTy0DiwrXcWdq4Ag8yroo5fumACOLx8Dnbi5RyBYNdC/wM+FM6fsCxd8?=
- =?us-ascii?Q?3VT8/YWTcOK0Ms5jo3tzuCC/gKCygcgDlKtCuyLqQj8OCv9n6vA/tQfV+pRd?=
- =?us-ascii?Q?iXgVMweqVy+0C6bMp859cQZtLkAEZgPsfve1P6PL+5fjmCFUg9jFACQWRS0T?=
- =?us-ascii?Q?kKmKcLAIy2dJkPRdAz9t7KWHiIgCcWlm06/3fBqwcRe7aBOGMShXHzxFKjDy?=
- =?us-ascii?Q?q2HaZgVrxjRUoGgL/1dFgJJeP7Phw0YVU/4WZc2EUGEDXtEKPXUQLEbe1Zty?=
- =?us-ascii?Q?GfIiq/4dJLYc4+lsn1BG2nLrcfVvaMh0Q4fplm1BPGnNw4RqJScO3tqIg4dV?=
- =?us-ascii?Q?UEuwhegiAO7CZ2NdcBbU4zq+Mw+3T4Jih52svi5aXrA7i4nLuCjRhbtHVd7T?=
- =?us-ascii?Q?IshRGZM1e8iS3laYC/n5rkbanpax8ZHGvFbBK1HCg95VYDyrPrM1yXGztj33?=
- =?us-ascii?Q?1sG3RTTM98yoy2C3zdWv//7+3Fofu6GR5B6K7UFsAQQ1FsT64ydKRvsbFznK?=
- =?us-ascii?Q?17QOG7amMojqLYHYCudovW4rCR5yRLcy7vLvLpQ5q6PYZ7q4LBrIkWg0Gpu3?=
- =?us-ascii?Q?DjnKUs9l2Ua3UYDief5JZBXNaBCgLArx66oxvokkzUUNIjDTJ4KohpqjhxWY?=
- =?us-ascii?Q?ORwwo3Y7HatMvJ7wesnTGZsfn+ww3DhCVGqYU1D6ZBqWpNRVBV+gqDkhUo8M?=
- =?us-ascii?Q?V+IzkYHdOLAGZGb4oNCcx6MLPdUjQMX322PX7/KmguNGwvg510GmZFj0yOlA?=
- =?us-ascii?Q?q58lGigmKMY4Z2KIO5bXaI0sZ0qWHQZf5ZdiRBRgObZrG6g/vWEwbdcV2TZU?=
- =?us-ascii?Q?RF4ZCYjiyKtuB9jJDV0STOfoU5eGxNXY1YB2glBAc050c777r3+KR//yMYX3?=
- =?us-ascii?Q?ZAZ51TDLIdFxB5qs8rzsR76Z+3WZ/FeKpER9OvuYC41xv+NafteriiVSods5?=
- =?us-ascii?Q?U3b/07a/5b5LY+mbDeLTOrCJ?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2b13a6db-b226-4577-a1da-08d977aa0339
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Sep 2021 18:03:53.4628
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: b/ZiNFS2yVlx68HZ5fHXXIR9x17lLounB9lOkHMK61x9rj/8mQhVeik2FEHF9p6P
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5190
+In-Reply-To: <20210914185033.367020b3@p-imbrenda>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 14, 2021 at 05:50:25PM +0200, Cornelia Huck wrote:
-> On Fri, Sep 10 2021, Christoph Hellwig <hch@infradead.org> wrote:
+On 14.09.21 18:50, Claudio Imbrenda wrote:
+> On Thu,  9 Sep 2021 18:22:39 +0200
+> David Hildenbrand <david@redhat.com> wrote:
 > 
-> > On Thu, Sep 09, 2021 at 04:38:41PM -0300, Jason Gunthorpe wrote:
-> >> +
-> >> +	private = kzalloc(sizeof(*private), GFP_KERNEL | GFP_DMA);
-> >> +	if (!private)
-> >> +		return ERR_PTR(-ENOMEM);
-> >
-> > Nit: there is no need to add GFP_KERNEL when using GFP_DMA.
-> >
-> > Also a question to the s390 maintainers: why do we need 31-bit
-> > addressability for the main private data structure?
+>> Resend because I missed ccing people on the actual patches ...
+>>
+>> RFC because the patches are essentially untested and I did not actually
+>> try to trigger any of the things these patches are supposed to fix. It
 > 
-> I don't think we need it anymore since c98e16b2fa12 ("s390/cio: Convert
-> ccw_io_region to pointer") and probably should just drop the GFP_DMA.
+> this is an interesting series, and the code makes sense, but I would
+> really like to see some regression tests, and maybe even some
+> selftests to trigger (at least some of) the issues.
 
-I added this to the series:
+Yep, it most certainly needs regression testing before picking any of 
+this. selftests would be great, but I won't find time for it in the 
+foreseeable future.
 
-From 0d40f9c57430400a81aa60920b70761535967048 Mon Sep 17 00:00:00 2001
-From: Jason Gunthorpe <jgg@nvidia.com>
-Date: Tue, 14 Sep 2021 14:21:49 -0300
-Subject: [PATCH] vfio/ccw: Remove unneeded GFP_DMA
+> 
+> the follow-up question is: how did we manage to go on so long without
+> noticing these issues? :D
 
-Since the ccw_io_region was split out of the private the allocation no
-longer needs the GFP_DMA. Remove it.
+Excellent question - I guess we simply weren't aware of the dos and 
+don'ts when dealing with process page tables :)
 
-Reported-by: Christoph Hellwig <hch@infradead.org>
-Fixes: c98e16b2fa12 ("s390/cio: Convert ccw_io_region to pointer")
-Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
----
- drivers/s390/cio/vfio_ccw_drv.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+>> merely matches my current understanding (and what other code does :) ). I
+>> did compile-test as far as possible.
+>>
+>> After learning more about the wonderful world of page tables and their
+>> interaction with the mmap_sem and VMAs, I spotted some issues in our
+>> page table walkers that allow user space to trigger nasty behavior when
+>> playing dirty tricks with munmap() or mmap() of hugetlb. While some issues
+>> should be hard to trigger, others are fairly easy because we provide
+>> conventient interfaces (e.g., KVM_S390_GET_SKEYS and KVM_S390_SET_SKEYS).
+>>
+>> Future work:
+>> - Don't use get_locked_pte() when it's not required to actually allocate
+>>    page tables -- similar to how storage keys are now handled. Examples are
+>>    get_pgste() and __gmap_zap.
+>> - Don't use get_locked_pte() and instead let page fault logic allocate page
+>>    tables when we actually do need page tables -- also, similar to how
+>>    storage keys are now handled. Examples are set_pgste_bits() and
+>>    pgste_perform_essa().
+>> - Maybe switch to mm/pagewalk.c to avoid custom page table walkers. For
+>>    __gmap_zap() that's very easy.
+>>
+>> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+>> Cc: Janosch Frank <frankja@linux.ibm.com>
+>> Cc: Cornelia Huck <cohuck@redhat.com>
+>> Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>
+>> Cc: Heiko Carstens <hca@linux.ibm.com>
+>> Cc: Vasily Gorbik <gor@linux.ibm.com>
+>> Cc: Niklas Schnelle <schnelle@linux.ibm.com>
+>> Cc: Gerald Schaefer <gerald.schaefer@linux.ibm.com>
+>> Cc: Ulrich Weigand <Ulrich.Weigand@de.ibm.com>
+>>
+>> David Hildenbrand (9):
+>>    s390/gmap: validate VMA in __gmap_zap()
+>>    s390/gmap: don't unconditionally call pte_unmap_unlock() in
+>>      __gmap_zap()
+>>    s390/mm: validate VMA in PGSTE manipulation functions
+>>    s390/mm: fix VMA and page table handling code in storage key handling
+>>      functions
+>>    s390/uv: fully validate the VMA before calling follow_page()
+>>    s390/pci_mmio: fully validate the VMA before calling follow_pte()
+>>    s390/mm: no need for pte_alloc_map_lock() if we know the pmd is
+>>      present
+>>    s390/mm: optimize set_guest_storage_key()
+>>    s390/mm: optimize reset_guest_reference_bit()
+>>
+>>   arch/s390/kernel/uv.c    |   2 +-
+>>   arch/s390/mm/gmap.c      |  11 +++-
+>>   arch/s390/mm/pgtable.c   | 109 +++++++++++++++++++++++++++------------
+>>   arch/s390/pci/pci_mmio.c |   4 +-
+>>   4 files changed, 89 insertions(+), 37 deletions(-)
+>>
+>>
+>> base-commit: 7d2a07b769330c34b4deabeed939325c77a7ec2f
+> 
 
-diff --git a/drivers/s390/cio/vfio_ccw_drv.c b/drivers/s390/cio/vfio_ccw_drv.c
-index 76099bcb765b45..371558ec92045d 100644
---- a/drivers/s390/cio/vfio_ccw_drv.c
-+++ b/drivers/s390/cio/vfio_ccw_drv.c
-@@ -161,7 +161,7 @@ static int vfio_ccw_sch_probe(struct subchannel *sch)
- 		return -ENODEV;
- 	}
- 
--	private = kzalloc(sizeof(*private), GFP_KERNEL | GFP_DMA);
-+	private = kzalloc(sizeof(*private), GFP_KERNEL);
- 	if (!private)
- 		return -ENOMEM;
- 
+
 -- 
-2.33.0
+Thanks,
 
+David / dhildenb
 
