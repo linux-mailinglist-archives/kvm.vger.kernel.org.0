@@ -2,97 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9B5D740C1EE
-	for <lists+kvm@lfdr.de>; Wed, 15 Sep 2021 10:43:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6CF5740C1F2
+	for <lists+kvm@lfdr.de>; Wed, 15 Sep 2021 10:44:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236946AbhIOIoT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Sep 2021 04:44:19 -0400
-Received: from mga05.intel.com ([192.55.52.43]:27364 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233002AbhIOIoQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Sep 2021 04:44:16 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10107"; a="307810161"
-X-IronPort-AV: E=Sophos;i="5.85,294,1624345200"; 
-   d="scan'208";a="307810161"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Sep 2021 01:42:57 -0700
-X-IronPort-AV: E=Sophos;i="5.85,294,1624345200"; 
-   d="scan'208";a="544748425"
-Received: from yangzhon-virtual.bj.intel.com (HELO yangzhon-Virtual) ([10.238.144.101])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-SHA256; 15 Sep 2021 01:42:54 -0700
-Date:   Wed, 15 Sep 2021 16:28:57 +0800
-From:   Yang Zhong <yang.zhong@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
-        linux-sgx@vger.kernel.org, jarkko@kernel.org,
-        dave.hansen@linux.intel.com, yang.zhong@intel.com
-Subject: Re: [RFC/RFT PATCH 0/2] x86: sgx_vepc: implement ioctl to EREMOVE
- all pages
-Message-ID: <20210915082857.GA30272@yangzhon-Virtual>
-References: <20210913131153.1202354-1-pbonzini@redhat.com>
- <20210914071030.GA28797@yangzhon-Virtual>
- <8e1c6b6d-6a73-827e-f496-b17b3c0f8c89@redhat.com>
+        id S232676AbhIOIpk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Sep 2021 04:45:40 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47189 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231747AbhIOIpk (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 15 Sep 2021 04:45:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1631695461;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ADrqp1/QUIGA/T7aV/2lJTe0h/xjpqwDvAEv0yJIxIE=;
+        b=Wue1J18LTE3Hie5Wu9ZummcLQPD9zm6wShMTEFSgnbye3s5is1tjs69eaJO2JlBa+liI7Z
+        s8kvirKSqKtINW75cjyLC0zWt0OsRyhJ2imd/0S8REg9vnF9+RYVmldnUzzV8b+2bjwJ7x
+        vEOTN2iugv3Fqw2uhmPiez+UeE2aG1w=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-223-umwbts8aMz2s5_lHxtNAsQ-1; Wed, 15 Sep 2021 04:44:20 -0400
+X-MC-Unique: umwbts8aMz2s5_lHxtNAsQ-1
+Received: by mail-ed1-f70.google.com with SMTP id y10-20020a056402270a00b003c8adc4d40cso1179955edd.15
+        for <kvm@vger.kernel.org>; Wed, 15 Sep 2021 01:44:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=ADrqp1/QUIGA/T7aV/2lJTe0h/xjpqwDvAEv0yJIxIE=;
+        b=ZKk/hlFj91R/UDycp6F+wGtUW2Qr3QhJiTDpmH9n0kgN3oaoSBCWAYXYf1J2oBiUgK
+         beNy1XDqXp8p1gloiGfD3ogBrjxV8PIRfLQVmK84YoH6F1nZMJYfJXOq6o7lSxifBLHE
+         d0hDMS/ZFwzORbZg4/KUnANVEIbYNULuN2WsNI7Xbe5JsaAO6kEpRRSwVuM3I9A7g/2i
+         Smt/4SxbzrNSsctNJAaWnxy4dyb9djTQ+j/NilN4qL0DvYMYQhBAXn66+arhsXsZXpCG
+         DckWNBVCCPb72WlZkLK3+au7HnBv7phck1ZB47poA4n8mXcuQAxkd2+BJvwq5GcfNDbF
+         A0xQ==
+X-Gm-Message-State: AOAM530VeNrP5uyUfuXhW6SjVdrNDFrN3brzf/t8ArBbEci7ciQKQjVS
+        jO6iAdQgDF3IzNax4WSlwCQu/IXD+wTTPAee63C8prCav+kuiieA26nqVa9SO5rB4sHm7qcd4tm
+        gQ41HPWK28Xb3
+X-Received: by 2002:a17:906:720e:: with SMTP id m14mr23382026ejk.500.1631695458863;
+        Wed, 15 Sep 2021 01:44:18 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxYJf8R+muJrg6i1DgERLQ+Qjby5sOQnwwLs5CQhAF0+bn8gEhcl2FLgZ/RVYOHNg30uMCZAA==
+X-Received: by 2002:a17:906:720e:: with SMTP id m14mr23382008ejk.500.1631695458655;
+        Wed, 15 Sep 2021 01:44:18 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id mq25sm5416905ejc.71.2021.09.15.01.44.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 15 Sep 2021 01:44:18 -0700 (PDT)
+Subject: Re: [PATCH] KVM: SEV: Disable KVM_CAP_VM_COPY_ENC_CONTEXT_FROM for
+ SEV-ES
+To:     Sean Christopherson <seanjc@google.com>,
+        Peter Gonda <pgonda@google.com>
+Cc:     kvm list <kvm@vger.kernel.org>, Marc Orr <marcorr@google.com>,
+        Nathan Tempelman <natet@google.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        linux-kernel@vger.kernel.org
+References: <20210914171551.3223715-1-pgonda@google.com>
+ <YUDcvRB3/QOXSi8H@google.com>
+ <CAMkAt6opZoFfW_DiyJUREBAtd8503C6j+ZbjS9YL3z+bhqHR8Q@mail.gmail.com>
+ <YUDsy4W0/FeIEJDr@google.com>
+ <CAMkAt6r9W=bTzLkojjAuc5VpwJnSzg7+JUp=rnK-jO88hSKmxw@mail.gmail.com>
+ <YUDuv1aTauPz9aqo@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <8d58d4cb-bc0b-30a9-6218-323c9ffd1037@redhat.com>
+Date:   Wed, 15 Sep 2021 10:44:09 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8e1c6b6d-6a73-827e-f496-b17b3c0f8c89@redhat.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <YUDuv1aTauPz9aqo@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 14, 2021 at 12:19:31PM +0200, Paolo Bonzini wrote:
-> On 14/09/21 09:10, Yang Zhong wrote:
-> >On Mon, Sep 13, 2021 at 09:11:51AM -0400, Paolo Bonzini wrote:
-> >>Based on discussions from the previous week(end), this series implements
-> >>a ioctl that performs EREMOVE on all pages mapped by a /dev/sgx_vepc
-> >>file descriptor.  Other possibilities, such as closing and reopening
-> >>the device, are racy.
-> >>
-> >>The patches are untested, but I am posting them because they are simple
-> >>and so that Yang Zhong can try using them in QEMU.
-> >>
-> >
-> >   Paolo, i re-implemented one reset patch in the Qemu side to call this ioctl(),
-> >   and did some tests on Windows and Linux guest, the Windows/Linux guest reboot
-> >   work well.
-> >
-> >   So, it is time for me to send this reset patch to Qemu community? or wait for
-> >   this kernel patchset merged? thanks!
+On 14/09/21 20:49, Sean Christopherson wrote:
+> On Tue, Sep 14, 2021, Peter Gonda wrote:
+>> I do not think so. You cannot call KVM_SEV_LAUNCH_UPDATE_VMSA on the mirror
+>> because svm_mem_enc_op() blocks calls from the mirror. So either you have to
+>> update vmsa from the mirror or have the original VM read through its mirror's
+>> vCPUs when calling KVM_SEV_LAUNCH_UPDATE_VMSA. Not sure which way is better
+>> but I don't see a way to do this without updating KVM.
 > 
-> Let's wait for this patch to be accepted first.  I'll wait a little
-> more for Jarkko and Dave to comment on this, and include your
-> "Tested-by".
-> 
-> I will also add cond_resched() on the final submission.
-> 
+> Ah, right, I forgot all of the SEV ioctls are blocked on the mirror.  Put something
+> to that effect into the changelog to squash any argument about whether or not this
+> is the correct KVM behavior.
 
-  Thanks Paolo, i will send Qemu patch once this patchset is accepted.
+Indeed, at least KVM_SEV_LAUNCH_UPDATE_VMSA would have to be allowed in 
+the mirror VM.  Do you think anything else would be necessary?
 
-  This day, i also did corner cases test and updated related Qemu reset patch.
-   
-   do {
-       ret = ioctl(fd, SGX_IOC_VEPC_REMOVE);
-       /* this printf is only for debug*/
-       printf("-------sgx ret=%d and n=%d---\n", ret, n++);
-       if(ret)
-           sleep(1);
-   } while (ret);  
+Paolo
 
-  (1). The VEPC size=10M, start 4 enclaves(each ~2G size) in the VM side.
-       then do the 'system_reset' in the Qemu monitor tool.
-       
-  (2). The VEPC size=10G, start 500 enclaves(each ~20M size) in the VM side.
-       then do the 'system_reset' in the Qemu monitor tool.
-
-  The ret will show the failures number(SECS pages number, 4 and 500) got from kernel side,
-  after sleep 1s, the ioctl will return 0 failures.
-
-  If this reset is triggered by guest bios, there is 0 SECS page got from kernel, which will
-  not block VM booting.
-
-  So, until now, the kernel patches work well. If any new issue, i will update it to all. thanks!      
-
-  Yang
-
-> Paolo
