@@ -2,126 +2,199 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 51C9040CAEE
-	for <lists+kvm@lfdr.de>; Wed, 15 Sep 2021 18:46:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 19D7A40CB68
+	for <lists+kvm@lfdr.de>; Wed, 15 Sep 2021 19:09:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229908AbhIOQrk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Sep 2021 12:47:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35630 "EHLO
+        id S229872AbhIORKv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Sep 2021 13:10:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41064 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229515AbhIOQrg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Sep 2021 12:47:36 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE6D3C061574;
-        Wed, 15 Sep 2021 09:46:17 -0700 (PDT)
-Received: from zn.tnic (p200300ec2f0d07008534a6109a52ea91.dip0.t-ipconnect.de [IPv6:2003:ec:2f0d:700:8534:a610:9a52:ea91])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 04D0A1EC051F;
-        Wed, 15 Sep 2021 18:46:12 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1631724372;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=ohcK2lrqZI/0Un5cQQISQvRNuEO3HIFBods4v3gznU8=;
-        b=OinwDiMHyIs6ppSqYums+HJ/wABxvhGKKUPvdDics4JXpIwsFCihfmg/tYjRwayQUS5zAl
-        /A8dCEMw7DwHpgzspvS586x6N5hMBRCXCrXZr4wBrq7mNNSRVp8ss+I1qG84M8RgMvHJvz
-        7a85Vcl/oUKHuIwbTjsfd22UCB+v5Mg=
-Date:   Wed, 15 Sep 2021 18:46:03 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Tom Lendacky <thomas.lendacky@amd.com>,
-        Sathyanarayanan Kuppuswamy 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>
-Cc:     linux-kernel@vger.kernel.org, x86@kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
-        iommu@lists.linux-foundation.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-graphics-maintainer@vmware.com,
-        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        kexec@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Andi Kleen <ak@linux.intel.com>,
-        Tianyu Lan <Tianyu.Lan@microsoft.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        Ard Biesheuvel <ardb@kernel.org>, Baoquan He <bhe@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Dave Young <dyoung@redhat.com>,
-        David Airlie <airlied@linux.ie>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-        Maxime Ripard <mripard@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Paul Mackerras <paulus@samba.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Thomas Zimmermann <tzimmermann@suse.de>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v3 0/8] Implement generic cc_platform_has() helper
- function
-Message-ID: <YUIjS6lKEY5AadZx@zn.tnic>
-References: <cover.1631141919.git.thomas.lendacky@amd.com>
+        with ESMTP id S229479AbhIORKu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Sep 2021 13:10:50 -0400
+Received: from mail-ot1-x334.google.com (mail-ot1-x334.google.com [IPv6:2607:f8b0:4864:20::334])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40315C061574
+        for <kvm@vger.kernel.org>; Wed, 15 Sep 2021 10:09:31 -0700 (PDT)
+Received: by mail-ot1-x334.google.com with SMTP id c42-20020a05683034aa00b0051f4b99c40cso4539455otu.0
+        for <kvm@vger.kernel.org>; Wed, 15 Sep 2021 10:09:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=BHR7QtxSQA+/ZedfBKDXb+NcR7qgBuUccMd7nT8tD0k=;
+        b=HFUlyDSV/PDxVFFF9p8abTMB/VRvN5zoI2a2tQfpl2PbcRHpXLQAdDBD/76ejENIN3
+         t9qQS+FXTdBL05lhAdXuyRGRCZ68NFianmrJSo67fEsMqPEYj/CSPivfSbrSfuocSyQk
+         ykDT1pgkygwsN04Mho/nYvS2Lz0c6GSTSq+qoLoLTrsi3FWvUTC0laq0A4N08SoLw3GI
+         VUsu2CYAb7OGs9KXNtMBk8FviT6fFT1bpI0+0ZPoF0WIlS3papnwN/GQAhA/Y96DpAre
+         5ylwNz1Q12t/g2XHtbjd0g1k4lOdG+nSbV0PoEJ9ewGx/rIKa9fbCPv/MY4dPfPuD6MU
+         pF9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=BHR7QtxSQA+/ZedfBKDXb+NcR7qgBuUccMd7nT8tD0k=;
+        b=Y8bQTSxAP8/I4ZyGB2sklcs6EaTfn7ldTyZCYO/ZlVamlFQPJdG0RPzrHI87fybjUB
+         UaD25gDBeMa9GzNGlwXjKyZAYmMfPh804JwRe63AT7BkOUeAX1mH3CZKapSfAGJ201Cr
+         Wt7zGjhjX5OMhJ7nHPiiHyqz6JMBe7xZqYHTQfxNr2C5jfAYNLQ/PdGA2th1jGVsM6Oa
+         6oovjbpq5FntjSY9moHaVnUeJcAuqwUJAA3zP/Dfyy6gt6d2zv7RMTRWtFshX6Cu/wcs
+         uD2RHJHNQjEU7wEEEG7ugqidixSFDbYIIKahlexMxqVVU8ipWw5mEYQ5V2ODqKjNo8RB
+         n1zg==
+X-Gm-Message-State: AOAM5311LsaXJf0J6gnOq3+h/jGdPn+KcVgVMKkmw9aERZxqISABCKCi
+        MkSHWaLzckjTztu4v74pjETG+nAJcDIVrkHSSVOYTA==
+X-Google-Smtp-Source: ABdhPJzHU3zgWSrQLQ78yZpdZbzwnhl3H/9f0MKI8xapxPTofOi4gpEq7qToTtFMwZBYHbFkd63BhevCVxUInD+JDkc=
+X-Received: by 2002:a05:6830:349c:: with SMTP id c28mr925796otu.35.1631725770184;
+ Wed, 15 Sep 2021 10:09:30 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <cover.1631141919.git.thomas.lendacky@amd.com>
+References: <20210914164727.3007031-1-pgonda@google.com> <20210914164727.3007031-4-pgonda@google.com>
+In-Reply-To: <20210914164727.3007031-4-pgonda@google.com>
+From:   Marc Orr <marcorr@google.com>
+Date:   Wed, 15 Sep 2021 10:09:18 -0700
+Message-ID: <CAA03e5HvC_1KTz_Gyw2uvZkHFpvZJcmrRVTc6ZaOCqCqH16YtQ@mail.gmail.com>
+Subject: Re: [PATCH 3/4 V8] selftest: KVM: Add open sev dev helper
+To:     Peter Gonda <pgonda@google.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        David Rientjes <rientjes@google.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 08, 2021 at 05:58:31PM -0500, Tom Lendacky wrote:
-> This patch series provides a generic helper function, cc_platform_has(),
-> to replace the sme_active(), sev_active(), sev_es_active() and
-> mem_encrypt_active() functions.
-> 
-> It is expected that as new confidential computing technologies are
-> added to the kernel, they can all be covered by a single function call
-> instead of a collection of specific function calls all called from the
-> same locations.
-> 
-> The powerpc and s390 patches have been compile tested only. Can the
-> folks copied on this series verify that nothing breaks for them. Also,
-> a new file, arch/powerpc/platforms/pseries/cc_platform.c, has been
-> created for powerpc to hold the out of line function.
+On Tue, Sep 14, 2021 at 9:47 AM Peter Gonda <pgonda@google.com> wrote:
+>
+> Refactors out open path support from open_kvm_dev_path_or_exit() and
+> adds new helper for SEV device path.
+>
+> Signed-off-by: Peter Gonda <pgonda@google.com>
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Cc: Marc Orr <marcorr@google.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Sean Christopherson <seanjc@google.com>
+> Cc: David Rientjes <rientjes@google.com>
+> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Cc: Brijesh Singh <brijesh.singh@amd.com>
+> Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+> Cc: Wanpeng Li <wanpengli@tencent.com>
+> Cc: Jim Mattson <jmattson@google.com>
+> Cc: Joerg Roedel <joro@8bytes.org>
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Ingo Molnar <mingo@redhat.com>
+> Cc: Borislav Petkov <bp@alien8.de>
+> Cc: "H. Peter Anvin" <hpa@zytor.com>
+> Cc: kvm@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> ---
+>  .../testing/selftests/kvm/include/kvm_util.h  |  1 +
+>  .../selftests/kvm/include/x86_64/svm_util.h   |  2 ++
+>  tools/testing/selftests/kvm/lib/kvm_util.c    | 24 +++++++++++--------
+>  tools/testing/selftests/kvm/lib/x86_64/svm.c  | 13 ++++++++++
+>  4 files changed, 30 insertions(+), 10 deletions(-)
+>
+> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+> index 010b59b13917..368e88305046 100644
+> --- a/tools/testing/selftests/kvm/include/kvm_util.h
+> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
+> @@ -80,6 +80,7 @@ struct vm_guest_mode_params {
+>  };
+>  extern const struct vm_guest_mode_params vm_guest_mode_params[];
+>
+> +int open_path_or_exit(const char *path, int flags);
+>  int open_kvm_dev_path_or_exit(void);
+>  int kvm_check_cap(long cap);
+>  int vm_enable_cap(struct kvm_vm *vm, struct kvm_enable_cap *cap);
+> diff --git a/tools/testing/selftests/kvm/include/x86_64/svm_util.h b/tools/testing/selftests/kvm/include/x86_64/svm_util.h
+> index b7531c83b8ae..587fbe408b99 100644
+> --- a/tools/testing/selftests/kvm/include/x86_64/svm_util.h
+> +++ b/tools/testing/selftests/kvm/include/x86_64/svm_util.h
+> @@ -46,4 +46,6 @@ static inline bool cpu_has_svm(void)
+>         return ecx & CPUID_SVM;
+>  }
+>
+> +int open_sev_dev_path_or_exit(void);
+> +
+>  #endif /* SELFTEST_KVM_SVM_UTILS_H */
+> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> index 10a8ed691c66..06a6c04010fb 100644
+> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> @@ -31,6 +31,19 @@ static void *align(void *x, size_t size)
+>         return (void *) (((size_t) x + mask) & ~mask);
+>  }
+>
+> +int open_path_or_exit(const char *path, int flags)
+> +{
+> +       int fd;
+> +
+> +       fd = open(path, flags);
+> +       if (fd < 0) {
+> +               print_skip("%s not available (errno: %d)", path, errno);
+> +               exit(KSFT_SKIP);
+> +       }
+> +
+> +       return fd;
+> +}
+> +
+>  /*
+>   * Open KVM_DEV_PATH if available, otherwise exit the entire program.
+>   *
+> @@ -42,16 +55,7 @@ static void *align(void *x, size_t size)
+>   */
+>  static int _open_kvm_dev_path_or_exit(int flags)
+>  {
+> -       int fd;
+> -
+> -       fd = open(KVM_DEV_PATH, flags);
+> -       if (fd < 0) {
+> -               print_skip("%s not available, is KVM loaded? (errno: %d)",
+> -                          KVM_DEV_PATH, errno);
+> -               exit(KSFT_SKIP);
+> -       }
+> -
+> -       return fd;
+> +       return open_path_or_exit(KVM_DEV_PATH, flags);
+>  }
+>
+>  int open_kvm_dev_path_or_exit(void)
+> diff --git a/tools/testing/selftests/kvm/lib/x86_64/svm.c b/tools/testing/selftests/kvm/lib/x86_64/svm.c
+> index 2ac98d70d02b..14a8618efa9c 100644
+> --- a/tools/testing/selftests/kvm/lib/x86_64/svm.c
+> +++ b/tools/testing/selftests/kvm/lib/x86_64/svm.c
+> @@ -13,6 +13,8 @@
+>  #include "processor.h"
+>  #include "svm_util.h"
+>
+> +#define SEV_DEV_PATH "/dev/sev"
+> +
+>  struct gpr64_regs guest_regs;
+>  u64 rflags;
+>
+> @@ -160,3 +162,14 @@ void nested_svm_check_supported(void)
+>                 exit(KSFT_SKIP);
+>         }
+>  }
+> +
+> +/*
+> + * Open SEV_DEV_PATH if available, otherwise exit the entire program.
+> + *
+> + * Return:
+> + *   The opened file descriptor of /dev/sev.
+> + */
+> +int open_sev_dev_path_or_exit(void)
+> +{
+> +       return open_path_or_exit(SEV_DEV_PATH, 0);
+> +}
+> --
+> 2.33.0.309.g3052b89438-goog
+>
 
-...
-
-> 
-> Tom Lendacky (8):
->   x86/ioremap: Selectively build arch override encryption functions
->   mm: Introduce a function to check for confidential computing features
->   x86/sev: Add an x86 version of cc_platform_has()
->   powerpc/pseries/svm: Add a powerpc version of cc_platform_has()
->   x86/sme: Replace occurrences of sme_active() with cc_platform_has()
->   x86/sev: Replace occurrences of sev_active() with cc_platform_has()
->   x86/sev: Replace occurrences of sev_es_active() with cc_platform_has()
->   treewide: Replace the use of mem_encrypt_active() with
->     cc_platform_has()
-
-Ok, modulo the minor things the plan is to take this through tip after
--rc2 releases in order to pick up the powerpc build fix and have a clean
-base (-rc2) to base stuff on, at the same time.
-
-Pls holler if something's still amiss.
-
-Sathya,
-
-if you want to prepare the Intel variant intel_cc_platform_has() ontop
-of those and send it to me, that would be good because then I can
-integrate it all in one branch which can be used to base future work
-ontop.
-
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Reviewed-by: Marc Orr <marcorr@google.com>
