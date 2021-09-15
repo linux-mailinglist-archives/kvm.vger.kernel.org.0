@@ -2,26 +2,26 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0AC0640C301
-	for <lists+kvm@lfdr.de>; Wed, 15 Sep 2021 11:51:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7752740C303
+	for <lists+kvm@lfdr.de>; Wed, 15 Sep 2021 11:51:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237379AbhIOJwr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Sep 2021 05:52:47 -0400
-Received: from frasgout.his.huawei.com ([185.176.79.56]:3816 "EHLO
+        id S237382AbhIOJxJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Sep 2021 05:53:09 -0400
+Received: from frasgout.his.huawei.com ([185.176.79.56]:3817 "EHLO
         frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237370AbhIOJwi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Sep 2021 05:52:38 -0400
-Received: from fraeml737-chm.china.huawei.com (unknown [172.18.147.207])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4H8b5W1fG7z67yhZ;
-        Wed, 15 Sep 2021 17:49:03 +0800 (CST)
+        with ESMTP id S237403AbhIOJwq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Sep 2021 05:52:46 -0400
+Received: from fraeml735-chm.china.huawei.com (unknown [172.18.147.201])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4H8b5T68skz67xLd;
+        Wed, 15 Sep 2021 17:49:01 +0800 (CST)
 Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- fraeml737-chm.china.huawei.com (10.206.15.218) with Microsoft SMTP Server
+ fraeml735-chm.china.huawei.com (10.206.15.216) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.8; Wed, 15 Sep 2021 11:51:17 +0200
+ 15.1.2308.8; Wed, 15 Sep 2021 11:51:25 +0200
 Received: from A2006125610.china.huawei.com (10.47.83.177) by
  lhreml710-chm.china.huawei.com (10.201.108.61) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.8; Wed, 15 Sep 2021 10:51:11 +0100
+ 15.1.2308.8; Wed, 15 Sep 2021 10:51:19 +0100
 From:   Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 To:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <linux-crypto@vger.kernel.org>
@@ -29,9 +29,9 @@ CC:     <alex.williamson@redhat.com>, <jgg@nvidia.com>,
         <mgurtovoy@nvidia.com>, <linuxarm@huawei.com>,
         <liulongfang@huawei.com>, <prime.zeng@hisilicon.com>,
         <jonathan.cameron@huawei.com>, <wangzhou1@hisilicon.com>
-Subject: [PATCH v3 2/6] crypto: hisilicon/qm: Move few definitions to common header
-Date:   Wed, 15 Sep 2021 10:50:33 +0100
-Message-ID: <20210915095037.1149-3-shameerali.kolothum.thodi@huawei.com>
+Subject: [PATCH v3 3/6] hisi_acc_qm: Move PCI device IDs to common header
+Date:   Wed, 15 Sep 2021 10:50:34 +0100
+Message-ID: <20210915095037.1149-4-shameerali.kolothum.thodi@huawei.com>
 X-Mailer: git-send-email 2.12.0.windows.1
 In-Reply-To: <20210915095037.1149-1-shameerali.kolothum.thodi@huawei.com>
 References: <20210915095037.1149-1-shameerali.kolothum.thodi@huawei.com>
@@ -45,161 +45,145 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Longfang Liu <liulongfang@huawei.com>
+Move the PCI Device IDs of HiSilicon ACC devices to
+a common header and use a uniform naming convention.
 
-Move Doorbell and Mailbox definitions to common header
-file. Also export QM mailbox functions.
+This will be useful when we introduce the vfio PCI
+HiSilicon ACC live migration driver in subsequent patches.
 
-This will be useful when we introduce VFIO PCI HiSilicon
-ACC live migration driver.
-
-Signed-off-by: Longfang Liu <liulongfang@huawei.com>
 Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 ---
- drivers/crypto/hisilicon/qm.c | 32 +++++------------------------
- include/linux/hisi_acc_qm.h   | 38 +++++++++++++++++++++++++++++++++++
- 2 files changed, 43 insertions(+), 27 deletions(-)
+ drivers/crypto/hisilicon/hpre/hpre_main.c | 12 +++++-------
+ drivers/crypto/hisilicon/sec2/sec_main.c  |  2 --
+ drivers/crypto/hisilicon/zip/zip_main.c   | 11 ++++-------
+ include/linux/hisi_acc_qm.h               |  7 +++++++
+ 4 files changed, 16 insertions(+), 16 deletions(-)
 
-diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-index e791a4fe47bc..1a16a2e0af12 100644
---- a/drivers/crypto/hisilicon/qm.c
-+++ b/drivers/crypto/hisilicon/qm.c
-@@ -33,23 +33,6 @@
- #define QM_ABNORMAL_EVENT_IRQ_VECTOR	3
+diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
+index 65a641396c07..1de67b5baae3 100644
+--- a/drivers/crypto/hisilicon/hpre/hpre_main.c
++++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
+@@ -68,8 +68,6 @@
+ #define HPRE_REG_RD_INTVRL_US		10
+ #define HPRE_REG_RD_TMOUT_US		1000
+ #define HPRE_DBGFS_VAL_MAX_LEN		20
+-#define HPRE_PCI_DEVICE_ID		0xa258
+-#define HPRE_PCI_VF_DEVICE_ID		0xa259
+ #define HPRE_QM_USR_CFG_MASK		GENMASK(31, 1)
+ #define HPRE_QM_AXI_CFG_MASK		GENMASK(15, 0)
+ #define HPRE_QM_VFG_AX_MASK		GENMASK(7, 0)
+@@ -111,8 +109,8 @@
+ static const char hpre_name[] = "hisi_hpre";
+ static struct dentry *hpre_debugfs_root;
+ static const struct pci_device_id hpre_dev_ids[] = {
+-	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, HPRE_PCI_DEVICE_ID) },
+-	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, HPRE_PCI_VF_DEVICE_ID) },
++	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, HPRE_PF_PCI_DEVICE_ID) },
++	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, HPRE_VF_PCI_DEVICE_ID) },
+ 	{ 0, }
+ };
  
- /* mailbox */
--#define QM_MB_CMD_SQC			0x0
--#define QM_MB_CMD_CQC			0x1
--#define QM_MB_CMD_EQC			0x2
--#define QM_MB_CMD_AEQC			0x3
--#define QM_MB_CMD_SQC_BT		0x4
--#define QM_MB_CMD_CQC_BT		0x5
--#define QM_MB_CMD_SQC_VFT_V2		0x6
--#define QM_MB_CMD_STOP_QP		0x8
--#define QM_MB_CMD_SRC			0xc
--#define QM_MB_CMD_DST			0xd
+@@ -242,7 +240,7 @@ MODULE_PARM_DESC(uacce_mode, UACCE_MODE_DESC);
+ 
+ static int pf_q_num_set(const char *val, const struct kernel_param *kp)
+ {
+-	return q_num_set(val, kp, HPRE_PCI_DEVICE_ID);
++	return q_num_set(val, kp, HPRE_PF_PCI_DEVICE_ID);
+ }
+ 
+ static const struct kernel_param_ops hpre_pf_q_num_ops = {
+@@ -921,7 +919,7 @@ static int hpre_debugfs_init(struct hisi_qm *qm)
+ 	qm->debug.sqe_mask_len = HPRE_SQE_MASK_LEN;
+ 	hisi_qm_debug_init(qm);
+ 
+-	if (qm->pdev->device == HPRE_PCI_DEVICE_ID) {
++	if (qm->pdev->device == HPRE_PF_PCI_DEVICE_ID) {
+ 		ret = hpre_ctrl_debug_init(qm);
+ 		if (ret)
+ 			goto failed_to_create;
+@@ -958,7 +956,7 @@ static int hpre_qm_init(struct hisi_qm *qm, struct pci_dev *pdev)
+ 	qm->sqe_size = HPRE_SQE_SIZE;
+ 	qm->dev_name = hpre_name;
+ 
+-	qm->fun_type = (pdev->device == HPRE_PCI_DEVICE_ID) ?
++	qm->fun_type = (pdev->device == HPRE_PF_PCI_DEVICE_ID) ?
+ 			QM_HW_PF : QM_HW_VF;
+ 	if (qm->fun_type == QM_HW_PF) {
+ 		qm->qp_base = HPRE_PF_DEF_Q_BASE;
+diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
+index 90551bf38b52..890ff6ab18dd 100644
+--- a/drivers/crypto/hisilicon/sec2/sec_main.c
++++ b/drivers/crypto/hisilicon/sec2/sec_main.c
+@@ -20,8 +20,6 @@
+ 
+ #define SEC_VF_NUM			63
+ #define SEC_QUEUE_NUM_V1		4096
+-#define SEC_PF_PCI_DEVICE_ID		0xa255
+-#define SEC_VF_PCI_DEVICE_ID		0xa256
+ 
+ #define SEC_BD_ERR_CHK_EN0		0xEFFFFFFF
+ #define SEC_BD_ERR_CHK_EN1		0x7ffff7fd
+diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
+index 7148201ce76e..f35b8fd1ecfe 100644
+--- a/drivers/crypto/hisilicon/zip/zip_main.c
++++ b/drivers/crypto/hisilicon/zip/zip_main.c
+@@ -15,9 +15,6 @@
+ #include <linux/uacce.h>
+ #include "zip.h"
+ 
+-#define PCI_DEVICE_ID_ZIP_PF		0xa250
+-#define PCI_DEVICE_ID_ZIP_VF		0xa251
 -
--#define QM_MB_CMD_SEND_BASE		0x300
--#define QM_MB_EVENT_SHIFT		8
--#define QM_MB_BUSY_SHIFT		13
--#define QM_MB_OP_SHIFT			14
--#define QM_MB_CMD_DATA_ADDR_L		0x304
--#define QM_MB_CMD_DATA_ADDR_H		0x308
- #define QM_MB_PING_ALL_VFS		0xffff
- #define QM_MB_CMD_DATA_SHIFT		32
- #define QM_MB_CMD_DATA_MASK		GENMASK(31, 0)
-@@ -99,19 +82,12 @@
- #define QM_DB_CMD_SHIFT_V1		16
- #define QM_DB_INDEX_SHIFT_V1		32
- #define QM_DB_PRIORITY_SHIFT_V1		48
--#define QM_DOORBELL_SQ_CQ_BASE_V2	0x1000
--#define QM_DOORBELL_EQ_AEQ_BASE_V2	0x2000
- #define QM_QUE_ISO_CFG_V		0x0030
- #define QM_PAGE_SIZE			0x0034
- #define QM_QUE_ISO_EN			0x100154
- #define QM_CAPBILITY			0x100158
- #define QM_QP_NUN_MASK			GENMASK(10, 0)
- #define QM_QP_DB_INTERVAL		0x10000
--#define QM_QP_MAX_NUM_SHIFT		11
--#define QM_DB_CMD_SHIFT_V2		12
--#define QM_DB_RAND_SHIFT_V2		16
--#define QM_DB_INDEX_SHIFT_V2		32
--#define QM_DB_PRIORITY_SHIFT_V2		48
+ #define HZIP_QUEUE_NUM_V1		4096
  
- #define QM_MEM_START_INIT		0x100040
- #define QM_MEM_INIT_DONE		0x100044
-@@ -596,7 +572,7 @@ static void qm_mb_pre_init(struct qm_mailbox *mailbox, u8 cmd,
- }
+ #define HZIP_CLOCK_GATE_CTRL		0x301004
+@@ -246,7 +243,7 @@ MODULE_PARM_DESC(uacce_mode, UACCE_MODE_DESC);
  
- /* return 0 mailbox ready, -ETIMEDOUT hardware timeout */
--static int qm_wait_mb_ready(struct hisi_qm *qm)
-+int qm_wait_mb_ready(struct hisi_qm *qm)
+ static int pf_q_num_set(const char *val, const struct kernel_param *kp)
  {
- 	u32 val;
- 
-@@ -604,6 +580,7 @@ static int qm_wait_mb_ready(struct hisi_qm *qm)
- 					  val, !((val >> QM_MB_BUSY_SHIFT) &
- 					  0x1), POLL_PERIOD, POLL_TIMEOUT);
- }
-+EXPORT_SYMBOL_GPL(qm_wait_mb_ready);
- 
- /* 128 bit should be written to hardware at one time to trigger a mailbox */
- static void qm_mb_write(struct hisi_qm *qm, const void *src)
-@@ -648,8 +625,8 @@ static int qm_mb_nolock(struct hisi_qm *qm, struct qm_mailbox *mailbox)
- 	return -EBUSY;
+-	return q_num_set(val, kp, PCI_DEVICE_ID_ZIP_PF);
++	return q_num_set(val, kp, ZIP_PF_PCI_DEVICE_ID);
  }
  
--static int qm_mb(struct hisi_qm *qm, u8 cmd, dma_addr_t dma_addr, u16 queue,
--		 bool op)
-+int qm_mb(struct hisi_qm *qm, u8 cmd, dma_addr_t dma_addr, u16 queue,
-+	  bool op)
- {
- 	struct qm_mailbox mailbox;
- 	int ret;
-@@ -665,6 +642,7 @@ static int qm_mb(struct hisi_qm *qm, u8 cmd, dma_addr_t dma_addr, u16 queue,
+ static const struct kernel_param_ops pf_q_num_ops = {
+@@ -268,8 +265,8 @@ module_param_cb(vfs_num, &vfs_num_ops, &vfs_num, 0444);
+ MODULE_PARM_DESC(vfs_num, "Number of VFs to enable(1-63), 0(default)");
  
- 	return ret;
- }
-+EXPORT_SYMBOL_GPL(qm_mb);
+ static const struct pci_device_id hisi_zip_dev_ids[] = {
+-	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_ZIP_PF) },
+-	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_ZIP_VF) },
++	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, ZIP_PF_PCI_DEVICE_ID) },
++	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, ZIP_VF_PCI_DEVICE_ID) },
+ 	{ 0, }
+ };
+ MODULE_DEVICE_TABLE(pci, hisi_zip_dev_ids);
+@@ -834,7 +831,7 @@ static int hisi_zip_qm_init(struct hisi_qm *qm, struct pci_dev *pdev)
+ 	qm->sqe_size = HZIP_SQE_SIZE;
+ 	qm->dev_name = hisi_zip_name;
  
- static void qm_db_v1(struct hisi_qm *qm, u16 qn, u8 cmd, u16 index, u8 priority)
- {
+-	qm->fun_type = (pdev->device == PCI_DEVICE_ID_ZIP_PF) ?
++	qm->fun_type = (pdev->device == ZIP_PF_PCI_DEVICE_ID) ?
+ 			QM_HW_PF : QM_HW_VF;
+ 	if (qm->fun_type == QM_HW_PF) {
+ 		qm->qp_base = HZIP_PF_DEF_Q_BASE;
 diff --git a/include/linux/hisi_acc_qm.h b/include/linux/hisi_acc_qm.h
-index 3068093229a5..8befb59c6fb3 100644
+index 8befb59c6fb3..2d209bf15419 100644
 --- a/include/linux/hisi_acc_qm.h
 +++ b/include/linux/hisi_acc_qm.h
-@@ -34,6 +34,40 @@
- #define QM_WUSER_M_CFG_ENABLE		0x1000a8
- #define WUSER_M_CFG_ENABLE		0xffffffff
+@@ -9,6 +9,13 @@
+ #include <linux/module.h>
+ #include <linux/pci.h>
  
-+/* mailbox */
-+#define QM_MB_CMD_SQC                   0x0
-+#define QM_MB_CMD_CQC                   0x1
-+#define QM_MB_CMD_EQC                   0x2
-+#define QM_MB_CMD_AEQC                  0x3
-+#define QM_MB_CMD_SQC_BT                0x4
-+#define QM_MB_CMD_CQC_BT                0x5
-+#define QM_MB_CMD_SQC_VFT_V2            0x6
-+#define QM_MB_CMD_STOP_QP               0x8
-+#define QM_MB_CMD_SRC                   0xc
-+#define QM_MB_CMD_DST                   0xd
++#define ZIP_PF_PCI_DEVICE_ID		0xa250
++#define ZIP_VF_PCI_DEVICE_ID		0xa251
++#define SEC_PF_PCI_DEVICE_ID		0xa255
++#define SEC_VF_PCI_DEVICE_ID		0xa256
++#define HPRE_PF_PCI_DEVICE_ID		0xa258
++#define HPRE_VF_PCI_DEVICE_ID		0xa259
 +
-+#define QM_MB_CMD_SEND_BASE		0x300
-+#define QM_MB_EVENT_SHIFT               8
-+#define QM_MB_BUSY_SHIFT		13
-+#define QM_MB_OP_SHIFT			14
-+#define QM_MB_CMD_DATA_ADDR_L		0x304
-+#define QM_MB_CMD_DATA_ADDR_H		0x308
-+#define QM_MB_MAX_WAIT_CNT		6000
-+
-+/* doorbell */
-+#define QM_DOORBELL_CMD_SQ              0
-+#define QM_DOORBELL_CMD_CQ              1
-+#define QM_DOORBELL_CMD_EQ              2
-+#define QM_DOORBELL_CMD_AEQ             3
-+
-+#define QM_DOORBELL_SQ_CQ_BASE_V2	0x1000
-+#define QM_DOORBELL_EQ_AEQ_BASE_V2	0x2000
-+#define QM_QP_MAX_NUM_SHIFT             11
-+#define QM_DB_CMD_SHIFT_V2		12
-+#define QM_DB_RAND_SHIFT_V2		16
-+#define QM_DB_INDEX_SHIFT_V2		32
-+#define QM_DB_PRIORITY_SHIFT_V2		48
-+
- /* qm cache */
- #define QM_CACHE_CTL			0x100050
- #define SQC_CACHE_ENABLE		BIT(0)
-@@ -414,6 +448,10 @@ pci_ers_result_t hisi_qm_dev_slot_reset(struct pci_dev *pdev);
- void hisi_qm_reset_prepare(struct pci_dev *pdev);
- void hisi_qm_reset_done(struct pci_dev *pdev);
- 
-+int qm_wait_mb_ready(struct hisi_qm *qm);
-+int qm_mb(struct hisi_qm *qm, u8 cmd, dma_addr_t dma_addr, u16 queue,
-+	  bool op);
-+
- struct hisi_acc_sgl_pool;
- struct hisi_acc_hw_sgl *hisi_acc_sg_buf_map_to_hw_sgl(struct device *dev,
- 	struct scatterlist *sgl, struct hisi_acc_sgl_pool *pool,
+ #define QM_QNUM_V1			4096
+ #define QM_QNUM_V2			1024
+ #define QM_MAX_VFS_NUM_V2		63
 -- 
 2.17.1
 
