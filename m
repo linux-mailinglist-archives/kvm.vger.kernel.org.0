@@ -2,167 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1A78440CB83
-	for <lists+kvm@lfdr.de>; Wed, 15 Sep 2021 19:18:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 06B2940CB88
+	for <lists+kvm@lfdr.de>; Wed, 15 Sep 2021 19:18:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229893AbhIORTT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Sep 2021 13:19:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43068 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229479AbhIORTS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Sep 2021 13:19:18 -0400
-Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 514ABC061764
-        for <kvm@vger.kernel.org>; Wed, 15 Sep 2021 10:17:59 -0700 (PDT)
-Received: by mail-pf1-x44a.google.com with SMTP id 3-20020a620603000000b0042aea40c2ddso2205628pfg.9
-        for <kvm@vger.kernel.org>; Wed, 15 Sep 2021 10:17:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=r8HJUwu+ryJ7nGO/o5ObN7ZG57DnEl80AhMlVx8YKrw=;
-        b=OhxQgrQGX2IxTWw2nx1ea95CmDC6zFPVX/tes5tJfOxJtHTnlR+hdx6SzCTGntvE7A
-         kJbhe9eTq+55s2OK0ma7fUwJh0H+JMVSW9KA97xm10Uq26ObdWpa2Ie0ixVOeWL4ZTXf
-         K9chFqEW6J2dXjyvTRfqMHlo7YBV/0yNOcJ9fl1qfX/wiq+Q8eMXTxzRoAT8Wmclj5Rw
-         E79jdHo2FHBuYVQGLdlEQSpxOcSCOiBMw3ZXtCqbEbkO32y6PkpJbZDxcFi1zxFX00cl
-         0soJCge27mVw0cUF3m6JuSvtfc1VuRC2HLIXMhgCjtGbSeBmvxURdOw3CwW6HCAEEksO
-         Nwfg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=r8HJUwu+ryJ7nGO/o5ObN7ZG57DnEl80AhMlVx8YKrw=;
-        b=n8Bx8k4Nqi9HAiiwiHRu8pTRozRA2vzWGxTQSpRCbu7BJvZ/8q7pWLwmrHKRw1mC7c
-         d+VSGilE+D7QBOmQvPj9EYz3dvw1e9cutdfU6l54OA9i/2ycRpMwy5gR5DAjF7afODZO
-         X0CmnQrA5Jsjk2/256YBUi1tY4xVA/KxesU9uV6nbamTgRcDOpjQx70Mf2ouI0MaXD8d
-         zl9wLBu9b/oB5WkLcrSwGzpCr0N3+6zBnYfl+3WKMQCMDldvwstVthOwCAq7uSPuuzVl
-         Yyur5fwfQoZrIU+FfT2wt64RoVLHkOyGBFDxD4Di12VkTJnqx9xIuuWEP9KYPszv8wg6
-         zWfw==
-X-Gm-Message-State: AOAM53103IqMm9ZYyshUPoHt8otxakNANg5pIl+1xC0ngYGe2gKH3BQS
-        4wWtOpdBKBt+JZIma+R4olnWp/78T0BdjMbxz25i6Rzr8kauHHDTsvVJIyLg4PlSgqsAQ65cVxX
-        /HS1QWW2Z16aXZ4YmK85uFltP21mZVizP3d+dnr28E2/C6BvXJNgJiq8crA==
-X-Google-Smtp-Source: ABdhPJx3oPusIcEI63lSFHTu8CTZnjejnRB+WtLO2ePsPEe2W9YW9GjGOpf+qWWkKbAcn4svKE0grwu4PhI=
-X-Received: from pgonda1.kir.corp.google.com ([2620:15c:29:204:4d5e:3ba7:52f7:ec45])
- (user=pgonda job=sendgmr) by 2002:a17:90a:fd85:: with SMTP id
- cx5mr9728475pjb.168.1631726278586; Wed, 15 Sep 2021 10:17:58 -0700 (PDT)
-Date:   Wed, 15 Sep 2021 10:17:55 -0700
-Message-Id: <20210915171755.3773766-1-pgonda@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.33.0.464.g1972c5931b-goog
-Subject: [PATCH V2] KVM: SEV: Acquire vcpu mutex when updating VMSA
-From:   Peter Gonda <pgonda@google.com>
-To:     kvm@vger.kernel.org
-Cc:     Peter Gonda <pgonda@google.com>, Marc Orr <marcorr@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Brijesh Singh <brijesh.singh@amd.com>, stable@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        id S230272AbhIORT7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Sep 2021 13:19:59 -0400
+Received: from pegase2.c-s.fr ([93.17.235.10]:49777 "EHLO pegase2.c-s.fr"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229566AbhIORT6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Sep 2021 13:19:58 -0400
+Received: from localhost (mailhub3.si.c-s.fr [172.26.127.67])
+        by localhost (Postfix) with ESMTP id 4H8n4F0x0Hz9sV4;
+        Wed, 15 Sep 2021 19:18:37 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from pegase2.c-s.fr ([172.26.127.65])
+        by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id PKzNyxImFUbI; Wed, 15 Sep 2021 19:18:37 +0200 (CEST)
+Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
+        by pegase2.c-s.fr (Postfix) with ESMTP id 4H8n4D73HWz9sV3;
+        Wed, 15 Sep 2021 19:18:36 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+        by messagerie.si.c-s.fr (Postfix) with ESMTP id D8C808B77C;
+        Wed, 15 Sep 2021 19:18:36 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from messagerie.si.c-s.fr ([127.0.0.1])
+        by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
+        with ESMTP id QXqNkIx7zBCr; Wed, 15 Sep 2021 19:18:36 +0200 (CEST)
+Received: from PO20335.IDSI0.si.c-s.fr (unknown [192.168.204.250])
+        by messagerie.si.c-s.fr (Postfix) with ESMTP id 11BA38B763;
+        Wed, 15 Sep 2021 19:18:34 +0200 (CEST)
+Subject: Re: [PATCH v3 4/8] powerpc/pseries/svm: Add a powerpc version of
+ cc_platform_has()
+To:     Borislav Petkov <bp@alien8.de>,
+        Michael Ellerman <mpe@ellerman.id.au>
+Cc:     Sathyanarayanan Kuppuswamy 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        linux-efi@vger.kernel.org, Brijesh Singh <brijesh.singh@amd.com>,
+        kvm@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        platform-driver-x86@vger.kernel.org,
+        Paul Mackerras <paulus@samba.org>, linux-s390@vger.kernel.org,
+        Andi Kleen <ak@linux.intel.com>,
+        Joerg Roedel <joro@8bytes.org>, x86@kernel.org,
+        amd-gfx@lists.freedesktop.org,
+        Christoph Hellwig <hch@infradead.org>,
+        linux-graphics-maintainer@vmware.com,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Tianyu Lan <Tianyu.Lan@microsoft.com>,
+        kexec@lists.infradead.org, linux-kernel@vger.kernel.org,
+        iommu@lists.linux-foundation.org, linux-fsdevel@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org
+References: <cover.1631141919.git.thomas.lendacky@amd.com>
+ <9d4fc3f8ea7b325aaa1879beab1286876f45d450.1631141919.git.thomas.lendacky@amd.com>
+ <YUCOTIPPsJJpLO/d@zn.tnic> <87lf3yk7g4.fsf@mpe.ellerman.id.au>
+ <YUHGDbtiGrDz5+NS@zn.tnic>
+From:   Christophe Leroy <christophe.leroy@csgroup.eu>
+Message-ID: <f8388f18-5e90-5d0f-d681-0b17f8307dd4@csgroup.eu>
+Date:   Wed, 15 Sep 2021 19:18:34 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
+MIME-Version: 1.0
+In-Reply-To: <YUHGDbtiGrDz5+NS@zn.tnic>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: fr-FR
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Adds vcpu mutex guard to the VMSA updating code. Refactors out
-__sev_launch_update_vmsa() function to deal with per vCPU parts
-of sev_launch_update_vmsa().
 
-Fixes: ad73109ae7ec ("KVM: SVM: Provide support to launch and run an SEV-ES guest")
 
-Signed-off-by: Peter Gonda <pgonda@google.com>
-Cc: Marc Orr <marcorr@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Sean Christopherson <seanjc@google.com>
-Cc: Brijesh Singh <brijesh.singh@amd.com>
-Cc: kvm@vger.kernel.org
-Cc: stable@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
----
+Le 15/09/2021 à 12:08, Borislav Petkov a écrit :
+> On Wed, Sep 15, 2021 at 10:28:59AM +1000, Michael Ellerman wrote:
+>> I don't love it, a new C file and an out-of-line call to then call back
+>> to a static inline that for most configuration will return false ... but
+>> whatever :)
+> 
+> Yeah, hch thinks it'll cause a big mess otherwise:
+> 
+> https://lore.kernel.org/lkml/YSScWvpXeVXw%2Fed5@infradead.org/
 
-V2
- * Refactor per vcpu work to separate function.
- * Remove check to skip already initialized VMSAs.
- * Removed vmsa struct zeroing.
+Could you please provide more explicit explanation why inlining such an 
+helper is considered as bad practice and messy ?
 
----
- arch/x86/kvm/svm/sev.c | 53 ++++++++++++++++++++++++------------------
- 1 file changed, 30 insertions(+), 23 deletions(-)
+Because as demonstrated in my previous response some days ago, taking 
+that outline ends up with an unneccessary ugly generated code and we 
+don't benefit front GCC's capability to fold in and opt out unreachable 
+code.
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 75e0b21ad07c..766510fe3abb 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -595,43 +595,50 @@ static int sev_es_sync_vmsa(struct vcpu_svm *svm)
- 	return 0;
- }
- 
--static int sev_launch_update_vmsa(struct kvm *kvm, struct kvm_sev_cmd *argp)
-+static int __sev_launch_update_vmsa(struct kvm *kvm, struct kvm_vcpu *vcpu,
-+				    int *error)
- {
--	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
- 	struct sev_data_launch_update_vmsa vmsa;
-+	struct vcpu_svm *svm = to_svm(vcpu);
-+	int ret;
-+
-+	/* Perform some pre-encryption checks against the VMSA */
-+	ret = sev_es_sync_vmsa(svm);
-+	if (ret)
-+		return ret;
-+
-+	/*
-+	 * The LAUNCH_UPDATE_VMSA command will perform in-place encryption of
-+	 * the VMSA memory content (i.e it will write the same memory region
-+	 * with the guest's key), so invalidate it first.
-+	 */
-+	clflush_cache_range(svm->vmsa, PAGE_SIZE);
-+
-+	vmsa.reserved = 0;
-+	vmsa.handle = to_kvm_svm(kvm)->sev_info.handle;
-+	vmsa.address = __sme_pa(svm->vmsa);
-+	vmsa.len = PAGE_SIZE;
-+	return sev_issue_cmd(kvm, SEV_CMD_LAUNCH_UPDATE_VMSA, &vmsa, error);
-+}
-+
-+static int sev_launch_update_vmsa(struct kvm *kvm, struct kvm_sev_cmd *argp)
-+{
- 	struct kvm_vcpu *vcpu;
- 	int i, ret;
- 
- 	if (!sev_es_guest(kvm))
- 		return -ENOTTY;
- 
--	vmsa.reserved = 0;
--
--	kvm_for_each_vcpu(i, vcpu, kvm) {
--		struct vcpu_svm *svm = to_svm(vcpu);
--
--		/* Perform some pre-encryption checks against the VMSA */
--		ret = sev_es_sync_vmsa(svm);
-+	kvm_for_each_vcpu(i, vcpu, kvm) {
-+		ret = mutex_lock_killable(&vcpu->mutex);
- 		if (ret)
- 			return ret;
- 
--		/*
--		 * The LAUNCH_UPDATE_VMSA command will perform in-place
--		 * encryption of the VMSA memory content (i.e it will write
--		 * the same memory region with the guest's key), so invalidate
--		 * it first.
--		 */
--		clflush_cache_range(svm->vmsa, PAGE_SIZE);
-+		ret = __sev_launch_update_vmsa(kvm, vcpu, &argp->error);
- 
--		vmsa.handle = sev->handle;
--		vmsa.address = __sme_pa(svm->vmsa);
--		vmsa.len = PAGE_SIZE;
--		ret = sev_issue_cmd(kvm, SEV_CMD_LAUNCH_UPDATE_VMSA, &vmsa,
--				    &argp->error);
-+		mutex_unlock(&vcpu->mutex);
- 		if (ret)
- 			return ret;
--
--		svm->vcpu.arch.guest_state_protected = true;
- 	}
- 
- 	return 0;
--- 
-2.33.0.464.g1972c5931b-goog
+As pointed by Michael in most cases the function will just return false 
+so behind the performance concern, there is also the code size and code 
+coverage topic that is to be taken into account. And even when the 
+function doesn't return false, the only thing it does folds into a 
+single powerpc instruction so there is really no point in making a 
+dedicated out-of-line fonction for that and suffer the cost and the size 
+of a function call and to justify the addition of a dedicated C file.
 
+
+> 
+> I guess less ifdeffery is nice too.
+
+I can't see your point here. Inlining the function wouldn't add any 
+ifdeffery as far as I can see.
+
+So, would you mind reconsidering your approach and allow architectures 
+to provide inline implementation by just not enforcing a generic 
+prototype ? Or otherwise provide more details and exemple of why the 
+cons are more important versus the pros ?
+
+Thanks
+Christophe
