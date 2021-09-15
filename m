@@ -2,117 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4E8AF40C9C9
-	for <lists+kvm@lfdr.de>; Wed, 15 Sep 2021 18:10:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C2C9C40CA22
+	for <lists+kvm@lfdr.de>; Wed, 15 Sep 2021 18:32:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230022AbhIOQMF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Sep 2021 12:12:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55264 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229547AbhIOQMD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Sep 2021 12:12:03 -0400
-Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B7F2C061574
-        for <kvm@vger.kernel.org>; Wed, 15 Sep 2021 09:10:44 -0700 (PDT)
-Received: by mail-lf1-x135.google.com with SMTP id x27so7085109lfu.5
-        for <kvm@vger.kernel.org>; Wed, 15 Sep 2021 09:10:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=LG6oYYKQ5hdREOt/eg92Zw7cqO0Rzzfom1gwS1jbMGo=;
-        b=CVtbjEk5K4t/prVtq6j3LDnqxK2VUaLQhWN9DR2to9qfBh1IA2zItyoEd0LcJ9i4yZ
-         cexL6csyt7Av3MfMFFP1MMgcREc7JyE5RNZg0Tw2eOG07Ht5S7Ifp9lrIlwGuN14UZ3s
-         c1POtIjYVGXt1Yf9wk+0o6afCv+4a39i1tHCuHGlsjZMWaMV4Dn3lwvqCPBYScOkxZ17
-         jhsAxq/nOk47WeJ4JTnFI7swTWxgKDozPUGeQvLCg56o4/I1XrBjTsvIR3RrcfjYDaOy
-         IqSfG7g38s0euoVDbuZ/lI/klUUIj42kwdrdz2K+zUV7wknN9ERzRM2b4rHBfA6p+prC
-         /FmQ==
+        id S229647AbhIOQeB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Sep 2021 12:34:01 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:60501 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229479AbhIOQeB (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 15 Sep 2021 12:34:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1631723561;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=YHkGOnRH445M1d9hLlLUWfMXPA2J8M8wItfcEOw5gl8=;
+        b=ZWokIJBvEh6iKbPazDpPYFQYIzbyGQeAmOtN0CnPZe3J8DxWYNBGfJoUGTQ0ikySBGBQ0B
+        Ltj5Z4PXu2XW39eqpzf1Yopa4912b2RHxsc7pmOEUshGborHYOxgcrpNtGU+8FtBlNda9J
+        pKHMFvljzAp1wlwYXUokzGLK+k3oe00=
+Received: from mail-oo1-f72.google.com (mail-oo1-f72.google.com
+ [209.85.161.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-86-T0UhG7jWN7GXB3sTYtiBBQ-1; Wed, 15 Sep 2021 12:32:40 -0400
+X-MC-Unique: T0UhG7jWN7GXB3sTYtiBBQ-1
+Received: by mail-oo1-f72.google.com with SMTP id 68-20020a4a0d47000000b0028fe7302d04so3630095oob.8
+        for <kvm@vger.kernel.org>; Wed, 15 Sep 2021 09:32:38 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=LG6oYYKQ5hdREOt/eg92Zw7cqO0Rzzfom1gwS1jbMGo=;
-        b=GVc6UaKrc5XgBSQvl/VU62mtJ+YA+ybvEakP79+fsWtj7JdirphuqVkj+Nvdp6SU97
-         DK+cnzyqFEZhCF2gJb7myKPsKVqeJLysxS67JfPPJdz/pMSQLBuZZJOHAq00LyE4vlQW
-         Kp8wlX+EoZRxShPU7TGmhPR17cZrEzBjK1pECmmR9PNzYDcMtHs4Ve0fwlxY8VWGKGRB
-         ENKMjIXKcZeTLlSpZveZdLwO8Ep+SnfOf5FJr72T0sRx2XPG+XW8r57THkrSx2VX4hGR
-         j9UFNgwZJHef0cTFZDejDl0EeAnsrk60NN0YYGf/Hg2bPMjgUJWeD3k+04PDgQn7Qttu
-         A8Qg==
-X-Gm-Message-State: AOAM53318JzJfTBApaj8IzKU2MlO2A7operWYnoxA5R0w39jXxwRwJVx
-        Od/+x9IUIDslkHC5+8Nl46oOkPrFHrMYnmlyYDB9kA==
-X-Google-Smtp-Source: ABdhPJwR0G1WRzA28YLxO95CjUKaPkIJXXQeDRc9wNQZlNdHnZmcAdwjge/2MmmhKBKCpnCzlllmX9brYKMNSsouk1U=
-X-Received: by 2002:ac2:483b:: with SMTP id 27mr530040lft.644.1631722242444;
- Wed, 15 Sep 2021 09:10:42 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=YHkGOnRH445M1d9hLlLUWfMXPA2J8M8wItfcEOw5gl8=;
+        b=SpTIoL3GxyG3toSotExBot+QfcRM2j59WNlSSFqnP9Goi5HC9pbm1fERqHOtZbxYDS
+         LiAEQJZx4PxohlkIqSX1hBynEc7C3ZWg0kXJfKgUG2Oa7Xw4blHzWrtL08RE5cK+xtL4
+         d6ZbZC1245e5ef9uE7ViCRh6e+AGDw35u9PRCMg1s1OxG39m/BskTGW1rerdVzNHN/WZ
+         BV53nS4BtZ4yhKb+Pkk7myyQBOCQewXMCdbf804s52NBtYvcJa/FGZ3BsST5Vl0BtID1
+         +4v09BgX2YwPM/eKk306oEN1hAQRGg8Gk4bHQCyrlhNzoR0f6SYJ7LD/iubEpt39fqDV
+         AtCA==
+X-Gm-Message-State: AOAM532ay0wFGK+EwJYGGtLrj0bvRTtzL7K4azbwxngLaLdtGEsMuNPP
+        V/RHkTqfTXh47Bj+6IsiVSRZo4mNiojP/UZwvXJbJLeu1/NkSX8vfYGzjPpYbIwZrKi2LTSkY4K
+        PgmrlHk0314j8
+X-Received: by 2002:a9d:6398:: with SMTP id w24mr777171otk.140.1631723557706;
+        Wed, 15 Sep 2021 09:32:37 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyEqEMq5Emx3QGBfkQ0rbyCrZIePE3tj2f7Z2WEi4Rv/KLV4WT4gXmfCPEt+bUaapt3BePG7Q==
+X-Received: by 2002:a9d:6398:: with SMTP id w24mr777147otk.140.1631723557449;
+        Wed, 15 Sep 2021 09:32:37 -0700 (PDT)
+Received: from redhat.com ([198.99.80.109])
+        by smtp.gmail.com with ESMTPSA id q131sm122216oif.44.2021.09.15.09.32.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Sep 2021 09:32:37 -0700 (PDT)
+Date:   Wed, 15 Sep 2021 10:32:35 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Matthew Ruffell <matthew.ruffell@canonical.com>
+Cc:     linux-pci@vger.kernel.org, lkml <linux-kernel@vger.kernel.org>,
+        kvm@vger.kernel.org, nathan.langford@xcelesunifiedtechnologies.com
+Subject: Re: [PROBLEM] Frequently get "irq 31: nobody cared" when passing
+ through 2x GPUs that share same pci switch via vfio
+Message-ID: <20210915103235.097202d2.alex.williamson@redhat.com>
+In-Reply-To: <9e8d0e9e-1d94-35e8-be1f-cf66916c24b2@canonical.com>
+References: <d4084296-9d36-64ec-8a79-77d82ac6d31c@canonical.com>
+        <20210914104301.48270518.alex.williamson@redhat.com>
+        <9e8d0e9e-1d94-35e8-be1f-cf66916c24b2@canonical.com>
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <20210914171551.3223715-1-pgonda@google.com> <YUDcvRB3/QOXSi8H@google.com>
- <CAMkAt6opZoFfW_DiyJUREBAtd8503C6j+ZbjS9YL3z+bhqHR8Q@mail.gmail.com>
- <YUDsy4W0/FeIEJDr@google.com> <CAMkAt6r9W=bTzLkojjAuc5VpwJnSzg7+JUp=rnK-jO88hSKmxw@mail.gmail.com>
- <YUDuv1aTauPz9aqo@google.com> <8d58d4cb-bc0b-30a9-6218-323c9ffd1037@redhat.com>
-In-Reply-To: <8d58d4cb-bc0b-30a9-6218-323c9ffd1037@redhat.com>
-From:   Peter Gonda <pgonda@google.com>
-Date:   Wed, 15 Sep 2021 10:10:31 -0600
-Message-ID: <CAMkAt6oPijfkPjT4ARpVmXfdczChf2k3ACBwK0YZeuGOxMAE8Q@mail.gmail.com>
-Subject: Re: [PATCH] KVM: SEV: Disable KVM_CAP_VM_COPY_ENC_CONTEXT_FROM for SEV-ES
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        kvm list <kvm@vger.kernel.org>, Marc Orr <marcorr@google.com>,
-        Nathan Tempelman <natet@google.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 15, 2021 at 2:44 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 14/09/21 20:49, Sean Christopherson wrote:
-> > On Tue, Sep 14, 2021, Peter Gonda wrote:
-> >> I do not think so. You cannot call KVM_SEV_LAUNCH_UPDATE_VMSA on the mirror
-> >> because svm_mem_enc_op() blocks calls from the mirror. So either you have to
-> >> update vmsa from the mirror or have the original VM read through its mirror's
-> >> vCPUs when calling KVM_SEV_LAUNCH_UPDATE_VMSA. Not sure which way is better
-> >> but I don't see a way to do this without updating KVM.
-> >
-> > Ah, right, I forgot all of the SEV ioctls are blocked on the mirror.  Put something
-> > to that effect into the changelog to squash any argument about whether or not this
-> > is the correct KVM behavior.
->
-> Indeed, at least KVM_SEV_LAUNCH_UPDATE_VMSA would have to be allowed in
-> the mirror VM.  Do you think anything else would be necessary?
+On Wed, 15 Sep 2021 16:44:38 +1200
+Matthew Ruffell <matthew.ruffell@canonical.com> wrote:
+> On 15/09/21 4:43 am, Alex Williamson wrote:
+> > 
+> > FWIW, I have access to a system with an NVIDIA K1 and M60, both use
+> > this same switch on-card and I've not experienced any issues assigning
+> > all the GPUs to a single VM.  Topo:
+> > 
+> >  +-[0000:40]-+-02.0-[42-47]----00.0-[43-47]--+-08.0-[44]----00.0
+> >  |                                           +-09.0-[45]----00.0
+> >  |                                           +-10.0-[46]----00.0
+> >  |                                           \-11.0-[47]----00.0
+> >  \-[0000:00]-+-03.0-[04-07]----00.0-[05-07]--+-08.0-[06]----00.0
+> >                                              \-10.0-[07]----00.0
 
-Thanks Paolo. Yes I think that only the KVM_SEV_LAUNCH_UPDATE_VMSA
-ioctl needs to be allowed on the mirror VM. But I don't think that's
-the only changes needed. Additionally the mirror VM will need the sev
-'handle' and the sev device 'fd' copied in vm_vm_copy_asid_from(). The
-handle is needed for KVM_SEV_LAUNCH_UPDATE_VMSA, the fd is required
-for sev_issue_cmd(). Also you you'd need to mirror es_active bool. (I
-think its quite confusing that svm_vm_copy_asid_from() only copies
-some of the metadata in sev_info but I can see why as the locked pages
-and cg group metadata shouldn't be copied.)  I *think* that would be
-all that's needed but I haven't tried or tested this in any way.
 
-svm_vm_copy_asid_from() {
+I've actually found that the above configuration, assigning all 6 GPUs
+to a VM reproduces this pretty readily by simply rebooting the VM.  In
+my case, I don't have the panic-on-warn/oops that must be set on your
+kernel, so the result is far more benign, the IRQ gets masked until
+it's re-registered.
 
-   asid = to_kvm_svm(source_kvm)->sev_info.asid;
-+ handle = to_kvm_svm(source_kvm)->sev_info.handle;
-+ fd = to_kvm_svm(source_kvm)->sev_info.fd;
-+ es_active = to_kvm_svm(source_kvm)->sev_info.es_active;
+The fact that my upstream ports are using MSI seems irrelevant.
 
-...
+Adding debugging to the vfio-pci interrupt handler, it's correctly
+deferring the interrupt as the GPU device is not identifying itself as
+the source of the interrupt via the status register.  In fact, setting
+the disable INTx bit in the GPU command register while the interrupt
+storm occurs does not stop the interrupts.
 
-    /* Set enc_context_owner and copy its encryption context over */
-    mirror_sev = &to_kvm_svm(kvm)->sev_info;
-    mirror_sev->enc_context_owner = source_kvm;
-    mirror_sev->asid = asid;
-    mirror_sev->active = true;
-+  mirror_sev->handle = handle;
-+  mirror_sev->fd = fd;
-+ mirror_sev->es_active = es_active;
+The interrupt storm does seem to be related to the bus resets, but I
+can't figure out yet how multiple devices per switch factors into the
+issue.  Serializing all bus resets via a mutex doesn't seem to change
+the behavior.
 
-Paolo would you prefer a patch to enable ES mirroring or continue with
-this patch to disable it for now?
+I'm still investigating, but if anyone knows how to get access to the
+Broadcom datasheet or errata for this switch, please let me know.
+Thanks,
 
->
-> Paolo
->
+Alex
+
