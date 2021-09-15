@@ -2,126 +2,167 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3463D40CF13
-	for <lists+kvm@lfdr.de>; Wed, 15 Sep 2021 23:56:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 95E4240CF17
+	for <lists+kvm@lfdr.de>; Wed, 15 Sep 2021 23:58:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232400AbhIOV5m (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Sep 2021 17:57:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49860 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232154AbhIOV5l (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Sep 2021 17:57:41 -0400
-Received: from mail-il1-x12d.google.com (mail-il1-x12d.google.com [IPv6:2607:f8b0:4864:20::12d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A7E9C061574
-        for <kvm@vger.kernel.org>; Wed, 15 Sep 2021 14:56:22 -0700 (PDT)
-Received: by mail-il1-x12d.google.com with SMTP id b15so4535605ils.10
-        for <kvm@vger.kernel.org>; Wed, 15 Sep 2021 14:56:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=aShydBVRXLiIBWXuwQG0mC/y0LItYbBYk4fdb7bSweg=;
-        b=mhl/9K6NnogX97B7j2gz0qJTH0ZVsMLmXrFpdtv40Yp4khd/fQ2wrgsyYH1chrwM2N
-         JZwtiCQXmgZvS8I4hhNxX1a7ssUHxX600hsXHHxWdaZzMFscRLkuVxdHkMgG6WxKZOHu
-         fr2WZAM6toG6qaGzMUZx45TnS6qpS5wlvSX2LmT4WEoL0eacSZDynRSbI/yU5FXfc+gn
-         FB45EHshqvpyfZCJw6loFUtmMi4Ikr3u/HGkyMO1vFt2u2dRQdnL4sWnGk9hTi/RLQ6i
-         WsPx0EtWUIqs9cYoDhRz+ntuiE/HB1+gnm0BtKRpOXN4D9ucUd0iTxOY0nMobP0uufS7
-         XLOg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=aShydBVRXLiIBWXuwQG0mC/y0LItYbBYk4fdb7bSweg=;
-        b=fWaI+oDq6SWtDiWAOoSMYFb5mwmrlzniHq8qQHrEVAEcfebIXp4omYfOhmLZdi41BK
-         hq/OT8Y653X//9+6bTM+DzUsPXRFXkHEXoYydPh4PQqfCWN6tWX6rPJrIdFhHTCSxNCJ
-         TLijwDcw49mByRgSb+vsPCUcoI/0gXzKjxGpDKuBaFCwC1SLXF+G7zyEG84xfYnnBQdf
-         NY4ATKMPrUiZxJfx9SHif1ueU1ILlG3thGZ0HtAFmGJgStQxj09s6MCsYH+iZa6jv9iN
-         p+zj1B39KryEAlgC/53YfvMv/wGjVCS+LfgSIeOiF/8aTRreNnqLyDWEn6Kml7ZvPhWB
-         mdYQ==
-X-Gm-Message-State: AOAM530XGdAQRyF/tsHHctu2rpMQMiqdAow8G6hRiy2DS8QL5r/xsflN
-        DMuliB0eNo3WystPBPF2qLD2rU2T78yBBi4mx01P5A==
-X-Google-Smtp-Source: ABdhPJwmF88B0tJamhGjuVSZRad/o61oOeqJHHQcTzifuttq6i+69/QQ51H32pbMDHHKexI+q58ZW+wGLcWCDmsq2As=
-X-Received: by 2002:a92:870f:: with SMTP id m15mr1573244ild.2.1631742981900;
- Wed, 15 Sep 2021 14:56:21 -0700 (PDT)
+        id S232537AbhIOV7R (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Sep 2021 17:59:17 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:17604 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229543AbhIOV7Q (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 15 Sep 2021 17:59:16 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.0.43) with SMTP id 18FLfnuf017276;
+        Wed, 15 Sep 2021 17:57:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=r0zjDPmxQlHjqKY3YS+Mw50PM/TTUsowd6SU3TAyazw=;
+ b=aGHLz+XEFU5xya3U5icf20cqAKNsyD/LXGWbo2H1OsrA2/U8vRR4Mq0GJcS3O5cDQRtZ
+ r4y1uvKuJjG5nNQEk/RyaE0psIWD43YSOCGYZOxYYsFLacsqt2XoSMMiJIJClBkQrygg
+ 9QxyObqyHEVshLzau/Z5B2epwA+6jbBL/azfKMmoxW1UaPOUNaK0o/jfVKeVyxx/D3Dc
+ unMLpZ3QR3l5nHk8l0VwATxhITMFHKmnXGOkJWcje4MELGYDkFvSfcejio8xQsGl2Gut
+ 37aNRfwubp1S1KBaA6D2rrVwsoY15kUbUWK/J2grbBZeHybablYHXGGFr17hH4VSUttS ZA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3b3rymr9c9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 15 Sep 2021 17:57:56 -0400
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 18FLhhCJ029044;
+        Wed, 15 Sep 2021 17:57:56 -0400
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3b3rymr9bp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 15 Sep 2021 17:57:55 -0400
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 18FLbGZ8022784;
+        Wed, 15 Sep 2021 21:57:53 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma04ams.nl.ibm.com with ESMTP id 3b0m3abcgs-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 15 Sep 2021 21:57:53 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 18FLvokV36700416
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 15 Sep 2021 21:57:50 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 48FEE4204B;
+        Wed, 15 Sep 2021 21:57:50 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C166F42042;
+        Wed, 15 Sep 2021 21:57:49 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 15 Sep 2021 21:57:49 +0000 (GMT)
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Cornelia Huck <cohuck@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Pierre Morel <pmorel@linux.ibm.com>,
+        Michael Mueller <mimu@linux.ibm.com>,
+        linux-s390@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     bfu@redhat.com, Vineeth Vijayan <vneethv@linux.ibm.com>
+Subject: [PATCH 1/1] virtio/s390: fix vritio-ccw device teardown
+Date:   Wed, 15 Sep 2021 23:57:42 +0200
+Message-Id: <20210915215742.1793314-1-pasic@linux.ibm.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-References: <20210915213034.1613552-1-dmatlack@google.com> <20210915213034.1613552-2-dmatlack@google.com>
-In-Reply-To: <20210915213034.1613552-2-dmatlack@google.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Wed, 15 Sep 2021 14:56:11 -0700
-Message-ID: <CANgfPd_cAsT-Kt7CnVyEWN4g3tWhqLjGeX4iKRUxuw4i4OhUxg@mail.gmail.com>
-Subject: Re: [PATCH 1/3] KVM: selftests: Change backing_src flag to -s in demand_paging_test
-To:     David Matlack <dmatlack@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm <kvm@vger.kernel.org>,
-        Andrew Jones <drjones@redhat.com>,
-        Axel Rasmussen <axelrasmussen@google.com>,
-        Yanan Wang <wangyanan55@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: EcaMy9tItbwygH455Px6hHg4hFKm1Mos
+X-Proofpoint-GUID: 1qNY67DORGcy9q3LXMmJznCPVsezn5A_
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.182.1,Aquarius:18.0.687,Hydra:6.0.235,FMLib:17.0.607.475
+ definitions=2020-10-13_15,2020-10-13_02,2020-04-07_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 impostorscore=0
+ suspectscore=0 priorityscore=1501 adultscore=0 phishscore=0 malwarescore=0
+ mlxlogscore=999 lowpriorityscore=0 clxscore=1011 mlxscore=0 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2109030001
+ definitions=main-2109150122
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 15, 2021 at 2:30 PM David Matlack <dmatlack@google.com> wrote:
->
-> Every other KVM selftest uses -s for the backing_src, so switch
-> demand_paging_test to match.
->
-> Signed-off-by: David Matlack <dmatlack@google.com>
+Since commit 48720ba56891 ("virtio/s390: use DMA memory for ccw I/O and
+classic notifiers") we were supposed to make sure that
+virtio_ccw_release_dev() completes before the ccw device, and the
+attached dma pool are torn down, but unfortunately we did not.
+Before that commit it used to be OK to delay cleaning up the memory
+allocated by virtio-ccw indefinitely (which isn't really intuitive for
+guys used to destruction happens in reverse construction order).
 
-Reviewed-by: Ben Gardon <bgardon@google.com>
+To accomplish this let us take a reference on the ccw device before we
+allocate the dma_area and give it up after dma_area was freed.
 
-> ---
->  tools/testing/selftests/kvm/demand_paging_test.c | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
->
-> diff --git a/tools/testing/selftests/kvm/demand_paging_test.c b/tools/testing/selftests/kvm/demand_paging_test.c
-> index e79c1b64977f..735c081e774e 100644
-> --- a/tools/testing/selftests/kvm/demand_paging_test.c
-> +++ b/tools/testing/selftests/kvm/demand_paging_test.c
-> @@ -416,7 +416,7 @@ static void help(char *name)
->  {
->         puts("");
->         printf("usage: %s [-h] [-m vm_mode] [-u uffd_mode] [-d uffd_delay_usec]\n"
-> -              "          [-b memory] [-t type] [-v vcpus] [-o]\n", name);
-> +              "          [-b memory] [-s type] [-v vcpus] [-o]\n", name);
->         guest_modes_help();
->         printf(" -u: use userfaultfd to handle vCPU page faults. Mode is a\n"
->                "     UFFD registration mode: 'MISSING' or 'MINOR'.\n");
-> @@ -426,7 +426,7 @@ static void help(char *name)
->         printf(" -b: specify the size of the memory region which should be\n"
->                "     demand paged by each vCPU. e.g. 10M or 3G.\n"
->                "     Default: 1G\n");
-> -       printf(" -t: The type of backing memory to use. Default: anonymous\n");
-> +       printf(" -s: The type of backing memory to use. Default: anonymous\n");
->         backing_src_help();
->         printf(" -v: specify the number of vCPUs to run.\n");
->         printf(" -o: Overlap guest memory accesses instead of partitioning\n"
-> @@ -446,7 +446,7 @@ int main(int argc, char *argv[])
->
->         guest_modes_append_default();
->
-> -       while ((opt = getopt(argc, argv, "hm:u:d:b:t:v:o")) != -1) {
-> +       while ((opt = getopt(argc, argv, "hm:u:d:b:s:v:o")) != -1) {
->                 switch (opt) {
->                 case 'm':
->                         guest_modes_cmdline(optarg);
-> @@ -465,7 +465,7 @@ int main(int argc, char *argv[])
->                 case 'b':
->                         guest_percpu_mem_size = parse_size(optarg);
->                         break;
-> -               case 't':
-> +               case 's':
->                         p.src_type = parse_backing_src_type(optarg);
->                         break;
->                 case 'v':
-> @@ -485,7 +485,7 @@ int main(int argc, char *argv[])
->
->         if (p.uffd_mode == UFFDIO_REGISTER_MODE_MINOR &&
->             !backing_src_is_shared(p.src_type)) {
-> -               TEST_FAIL("userfaultfd MINOR mode requires shared memory; pick a different -t");
-> +               TEST_FAIL("userfaultfd MINOR mode requires shared memory; pick a different -s");
->         }
->
->         for_each_guest_mode(run_test, &p);
-> --
-> 2.33.0.309.g3052b89438-goog
->
+Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
+Fixes: 48720ba56891 ("virtio/s390: use DMA memory for ccw I/O and
+classic notifiers")
+Reported-by: bfu@redhat.com
+---
+
+I'm not certain this is the only hot-unplug and teardonw related problem
+with virtio-ccw.
+
+Some things that are not perfectly clear to me:
+* What would happen if we observed an hot-unplug while we are doing
+  wait_event() in ccw_io_helper()? Do we get stuck? I don't thin we
+  are guaranteed to receive an irq for a subchannel that is gone.
+* cdev->online seems to be manipulated under cdev->ccwlock, but
+  in virtio_ccw_remove() we look at it to decide should we clean up
+  or not. What is the idea there? I guess we want to avoid doing
+  if nothing is there or twice. But I don't understand how stuff
+  interlocks.
+* Can virtio_ccw_remove() get called while !cdev->online and 
+  virtio_ccw_online() is running on a different cpu? If yes, what would
+  happen then?
+ 
+The main addresse of these questions is Conny ;).
+
+An alternative to this approach would be to inc and dec the refcount
+in ccw_device_dma_zalloc() and ccw_device_dma_free() respectively.
+
+---
+ drivers/s390/virtio/virtio_ccw.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/drivers/s390/virtio/virtio_ccw.c b/drivers/s390/virtio/virtio_ccw.c
+index d35e7a3f7067..99141df3259b 100644
+--- a/drivers/s390/virtio/virtio_ccw.c
++++ b/drivers/s390/virtio/virtio_ccw.c
+@@ -1006,10 +1006,12 @@ static void virtio_ccw_release_dev(struct device *_d)
+ {
+ 	struct virtio_device *dev = dev_to_virtio(_d);
+ 	struct virtio_ccw_device *vcdev = to_vc_device(dev);
++	struct ccw_device *cdev = READ_ONCE(vcdev->cdev);
+ 
+ 	ccw_device_dma_free(vcdev->cdev, vcdev->dma_area,
+ 			    sizeof(*vcdev->dma_area));
+ 	kfree(vcdev);
++	put_device(&cdev->dev);
+ }
+ 
+ static int irb_is_error(struct irb *irb)
+@@ -1262,6 +1264,7 @@ static int virtio_ccw_online(struct ccw_device *cdev)
+ 	struct virtio_ccw_device *vcdev;
+ 	unsigned long flags;
+ 
++	get_device(&cdev->dev);
+ 	vcdev = kzalloc(sizeof(*vcdev), GFP_KERNEL);
+ 	if (!vcdev) {
+ 		dev_warn(&cdev->dev, "Could not get memory for virtio\n");
+@@ -1315,6 +1318,7 @@ static int virtio_ccw_online(struct ccw_device *cdev)
+ 				    sizeof(*vcdev->dma_area));
+ 	}
+ 	kfree(vcdev);
++	put_device(&cdev->dev);
+ 	return ret;
+ }
+ 
+
+base-commit: 3ca706c189db861b2ca2019a0901b94050ca49d8
+-- 
+2.25.1
+
