@@ -2,278 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9B4F440CF34
-	for <lists+kvm@lfdr.de>; Thu, 16 Sep 2021 00:05:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8F8CD40CF57
+	for <lists+kvm@lfdr.de>; Thu, 16 Sep 2021 00:33:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231555AbhIOWGq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Sep 2021 18:06:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:37404 "EHLO
+        id S232796AbhIOWey (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Sep 2021 18:34:54 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:21871 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229461AbhIOWGq (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 15 Sep 2021 18:06:46 -0400
+        by vger.kernel.org with ESMTP id S232866AbhIOWes (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 15 Sep 2021 18:34:48 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1631743526;
+        s=mimecast20190719; t=1631745208;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=dMp/sI2Rm01zPuZNRVi86nS+PEgZAAga45IqZVfIBjw=;
-        b=AMrqAaDnoVijZPVpu+cNhkqsySprwsIfRrglDY8RHjcr3QvQlY8dvXCXSwLsqXZnkzWQzR
-        wpgmRRSacxImrBnTP+34jAepnxkThQy4tkTPBqzI9ds5XNKVRNjH0p0OxoJZJbzWksC02R
-        JAkuvKiIDv1DfkRJbVp4Tns48PLY9CU=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-221-UjzYHRgKNmKH-3T9J_7ckw-1; Wed, 15 Sep 2021 18:05:25 -0400
-X-MC-Unique: UjzYHRgKNmKH-3T9J_7ckw-1
-Received: by mail-ed1-f72.google.com with SMTP id z6-20020a50cd06000000b003d2c2e38f1fso3089493edi.1
-        for <kvm@vger.kernel.org>; Wed, 15 Sep 2021 15:05:24 -0700 (PDT)
+        bh=fDx/Hr0zc1j4NXN/rU1ooxqT+kr9dmLC76FBxnVhemM=;
+        b=SVHebgT+o/jk+1jy8zPXh5kIuVUAus2ZPKrzdqieeAx5n1WB1xEL3XJVeMzIxAHWb938vi
+        F0/pXY8LOxmxFXnmfUpdxdZFICj3v1p3P5BkgVilORin9RR92/QH+ypcdtcraIDVwYNG6K
+        y/N1ZfJafu09MphvoOoxn2wX/VCZtJ4=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-468-WX9IZRcLP2-BT6tpGPJFow-1; Wed, 15 Sep 2021 18:33:27 -0400
+X-MC-Unique: WX9IZRcLP2-BT6tpGPJFow-1
+Received: by mail-ed1-f69.google.com with SMTP id b8-20020a056402350800b003c5e3d4e2a7so3152988edd.2
+        for <kvm@vger.kernel.org>; Wed, 15 Sep 2021 15:33:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=dMp/sI2Rm01zPuZNRVi86nS+PEgZAAga45IqZVfIBjw=;
-        b=LIv6k9pkIHCfCQ2bVH7iNn2QLm4frGIupyNpUk8nt3y/SrCDaq8Ipq22J3ET8Fjia1
-         z9DxaCMSPIqm/gX3LtxmkAsAZIl14layiRM99P2AW4cmqcyY83PxrwxI1r8YhIIad+6S
-         em+ykHzV4jjiWrAZtEYWQNxF9kfDtvW++BF7+dS9Ahk8nQy2DzCvxBt4jWoCzMZw35kK
-         lVibi4UbesiAPTTM11oyZ8fz62yqgSaGOtOcr7xkLojIQBNgFEBdwli2ttl+hyocU82T
-         hrOI8N0UYa7Q5RwMaBtspxBX2k3b4YhEYu2e7HtVUwSDyMxYmocmw02enOqH7w4WRf/a
-         0l6w==
-X-Gm-Message-State: AOAM531mlWtHvKob9Y1AFsQ0Ch8Ut9mJpDSTGZBgNbxqa4r5Lsw3SCdx
-        wyRVooSqMsJSHy9Tzq64L0pSGsun5YklPdW6E0CWIP5uyQ+PfTEaUYXCFf8LWqgL7eEMDyeOq3A
-        rcHRl9QSxxu0A
-X-Received: by 2002:a05:6402:289b:: with SMTP id eg27mr2606336edb.25.1631743523466;
-        Wed, 15 Sep 2021 15:05:23 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwAFxCW/oySlfxsQ5AZ0GlEIAFftfmqz/FOcxMikLcmLmH/47igneYFiCf/Wqo8Q5b7US3b5g==
-X-Received: by 2002:a05:6402:289b:: with SMTP id eg27mr2606296edb.25.1631743523224;
-        Wed, 15 Sep 2021 15:05:23 -0700 (PDT)
+        bh=fDx/Hr0zc1j4NXN/rU1ooxqT+kr9dmLC76FBxnVhemM=;
+        b=tv1ug2baj1qxXuqI2XpRTLcsTzdLqtSUe6MP+hEB0UAFR+RzXxvAbCTnTbNNdnVFoG
+         3acMNnBUpqk/ZfdsFfXaJz8+pcO94WE3GoXIs8H9BH7z11R6Pai7QPrZz0dMQBmF4SRS
+         pNsik14nWjpWHJ1SOZv6IU6vj67LBLhTsIp4GDl1V7BWO0X7l/lDTYyiWeS1CVwzcxzX
+         m/ZWGtUCZLaGNZ3D05ruB/ZrTxigF8ZbgegWqDuLYfgTNUv3mzYrA9vGD0M2lIv/AZ2f
+         SesyXduVfNAYlUQ2vwZ8xflyix0xyDd9g+3W5EiqEEqeaGV9D0GWDY9ZqUF9o2rp+6QZ
+         NJyQ==
+X-Gm-Message-State: AOAM531pnLXODtYFBU0+COvMkFnSy+mZe7Y7y+OeKhTzEPL/vQdTDtDm
+        tzu2HmKfAhbFL9KOIlyqFPBTDe2HxYmvhwctjI66ws0/xFM4SeR+61N01UljA8BAxI2ktLKPFhj
+        baL/rCV2ERao7
+X-Received: by 2002:a05:6402:1428:: with SMTP id c8mr2269619edx.128.1631745206103;
+        Wed, 15 Sep 2021 15:33:26 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxUJFtYM9G6+R9bGG1vMz7osgEWwyPrwk4Z98OZ0Q4jPrnjDELrmFauFLB3m0vrCnBTkdhmGw==
+X-Received: by 2002:a05:6402:1428:: with SMTP id c8mr2269599edx.128.1631745205935;
+        Wed, 15 Sep 2021 15:33:25 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.gmail.com with ESMTPSA id c2sm542467edk.50.2021.09.15.15.05.19
+        by smtp.gmail.com with ESMTPSA id w25sm580072edi.22.2021.09.15.15.33.24
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 15 Sep 2021 15:05:22 -0700 (PDT)
-Subject: Re: [PATCH] target/i386: Include 'hw/i386/apic.h' locally
-To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
-        qemu-devel@nongnu.org
-Cc:     Eduardo Habkost <ehabkost@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>, haxm-team@intel.com,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Colin Xu <colin.xu@intel.com>,
-        Reinoud Zandijk <reinoud@netbsd.org>,
-        Sunil Muthuswamy <sunilmut@microsoft.com>,
-        Wenchao Wang <wenchao.wang@intel.com>, kvm@vger.kernel.org,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Kamil Rytarowski <kamil@netbsd.org>,
-        Roman Bolshakov <r.bolshakov@yadro.com>,
-        Cameron Esfahani <dirty@apple.com>
-References: <20210902152243.386118-1-f4bug@amsat.org>
+        Wed, 15 Sep 2021 15:33:25 -0700 (PDT)
+Subject: Re: [PATCH] KVM: SEV: Disable KVM_CAP_VM_COPY_ENC_CONTEXT_FROM for
+ SEV-ES
+To:     Peter Gonda <pgonda@google.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        kvm list <kvm@vger.kernel.org>, Marc Orr <marcorr@google.com>,
+        Nathan Tempelman <natet@google.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        linux-kernel@vger.kernel.org
+References: <20210914171551.3223715-1-pgonda@google.com>
+ <YUDcvRB3/QOXSi8H@google.com>
+ <CAMkAt6opZoFfW_DiyJUREBAtd8503C6j+ZbjS9YL3z+bhqHR8Q@mail.gmail.com>
+ <YUDsy4W0/FeIEJDr@google.com>
+ <CAMkAt6r9W=bTzLkojjAuc5VpwJnSzg7+JUp=rnK-jO88hSKmxw@mail.gmail.com>
+ <YUDuv1aTauPz9aqo@google.com>
+ <8d58d4cb-bc0b-30a9-6218-323c9ffd1037@redhat.com>
+ <CAMkAt6oPijfkPjT4ARpVmXfdczChf2k3ACBwK0YZeuGOxMAE8Q@mail.gmail.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a4cba848-e668-7cf1-fe93-b5da3a4ac6dc@redhat.com>
-Date:   Thu, 16 Sep 2021 00:05:18 +0200
+Message-ID: <9feed4e4-937e-2f11-bb56-0da5959c7dbd@redhat.com>
+Date:   Thu, 16 Sep 2021 00:33:23 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <20210902152243.386118-1-f4bug@amsat.org>
+In-Reply-To: <CAMkAt6oPijfkPjT4ARpVmXfdczChf2k3ACBwK0YZeuGOxMAE8Q@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 02/09/21 17:22, Philippe Mathieu-Daudé wrote:
-> Instead of including a sysemu-specific header in "cpu.h"
-> (which is shared with user-mode emulations), include it
-> locally when required.
+On 15/09/21 18:10, Peter Gonda wrote:
+> svm_vm_copy_asid_from() {
 > 
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> ---
-> Based-on: <20210902151715.383678-1-f4bug@amsat.org>
-> "accel/tcg: Restrict TCGCPUOps::cpu_exec_interrupt() to sysemu"
+>     asid = to_kvm_svm(source_kvm)->sev_info.asid;
+> + handle = to_kvm_svm(source_kvm)->sev_info.handle;
+> + fd = to_kvm_svm(source_kvm)->sev_info.fd;
+> + es_active = to_kvm_svm(source_kvm)->sev_info.es_active;
+> 
+> ...
+> 
+>      /* Set enc_context_owner and copy its encryption context over */
+>      mirror_sev = &to_kvm_svm(kvm)->sev_info;
+>      mirror_sev->enc_context_owner = source_kvm;
+>      mirror_sev->asid = asid;
+>      mirror_sev->active = true;
+> +  mirror_sev->handle = handle;
+> +  mirror_sev->fd = fd;
+> + mirror_sev->es_active = es_active;
+> 
+> Paolo would you prefer a patch to enable ES mirroring or continue with
+> this patch to disable it for now?
 
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+If it's possible to enable it, it would be better.  The above would be a 
+reasonable patch for 5.15-rc.
 
 Paolo
-
-> ---
->   target/i386/cpu.h                    | 4 ----
->   hw/i386/kvmvapic.c                   | 1 +
->   hw/i386/x86.c                        | 1 +
->   target/i386/cpu-sysemu.c             | 1 +
->   target/i386/cpu.c                    | 1 +
->   target/i386/gdbstub.c                | 4 ++++
->   target/i386/hax/hax-all.c            | 1 +
->   target/i386/helper.c                 | 1 +
->   target/i386/hvf/x86_emu.c            | 1 +
->   target/i386/nvmm/nvmm-all.c          | 1 +
->   target/i386/tcg/seg_helper.c         | 4 ++++
->   target/i386/tcg/sysemu/misc_helper.c | 1 +
->   target/i386/whpx/whpx-all.c          | 1 +
->   13 files changed, 18 insertions(+), 4 deletions(-)
-> 
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index c7cc65e92d5..eddafd1acd5 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -2046,10 +2046,6 @@ typedef X86CPU ArchCPU;
->   #include "exec/cpu-all.h"
->   #include "svm.h"
->   
-> -#if !defined(CONFIG_USER_ONLY)
-> -#include "hw/i386/apic.h"
-> -#endif
-> -
->   static inline void cpu_get_tb_cpu_state(CPUX86State *env, target_ulong *pc,
->                                           target_ulong *cs_base, uint32_t *flags)
->   {
-> diff --git a/hw/i386/kvmvapic.c b/hw/i386/kvmvapic.c
-> index 43f8a8f679e..7333818bdd1 100644
-> --- a/hw/i386/kvmvapic.c
-> +++ b/hw/i386/kvmvapic.c
-> @@ -16,6 +16,7 @@
->   #include "sysemu/hw_accel.h"
->   #include "sysemu/kvm.h"
->   #include "sysemu/runstate.h"
-> +#include "hw/i386/apic.h"
->   #include "hw/i386/apic_internal.h"
->   #include "hw/sysbus.h"
->   #include "hw/boards.h"
-> diff --git a/hw/i386/x86.c b/hw/i386/x86.c
-> index 00448ed55aa..e0218f8791f 100644
-> --- a/hw/i386/x86.c
-> +++ b/hw/i386/x86.c
-> @@ -43,6 +43,7 @@
->   #include "target/i386/cpu.h"
->   #include "hw/i386/topology.h"
->   #include "hw/i386/fw_cfg.h"
-> +#include "hw/i386/apic.h"
->   #include "hw/intc/i8259.h"
->   #include "hw/rtc/mc146818rtc.h"
->   
-> diff --git a/target/i386/cpu-sysemu.c b/target/i386/cpu-sysemu.c
-> index 1078e3d157f..65709e41903 100644
-> --- a/target/i386/cpu-sysemu.c
-> +++ b/target/i386/cpu-sysemu.c
-> @@ -30,6 +30,7 @@
->   #include "hw/qdev-properties.h"
->   
->   #include "exec/address-spaces.h"
-> +#include "hw/i386/apic.h"
->   #include "hw/i386/apic_internal.h"
->   
->   #include "cpu-internal.h"
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 97e250e8760..04f59043804 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -33,6 +33,7 @@
->   #include "standard-headers/asm-x86/kvm_para.h"
->   #include "hw/qdev-properties.h"
->   #include "hw/i386/topology.h"
-> +#include "hw/i386/apic.h"
->   #ifndef CONFIG_USER_ONLY
->   #include "exec/address-spaces.h"
->   #include "hw/boards.h"
-> diff --git a/target/i386/gdbstub.c b/target/i386/gdbstub.c
-> index 098a2ad15a9..5438229c1a9 100644
-> --- a/target/i386/gdbstub.c
-> +++ b/target/i386/gdbstub.c
-> @@ -21,6 +21,10 @@
->   #include "cpu.h"
->   #include "exec/gdbstub.h"
->   
-> +#ifndef CONFIG_USER_ONLY
-> +#include "hw/i386/apic.h"
-> +#endif
-> +
->   #ifdef TARGET_X86_64
->   static const int gpr_map[16] = {
->       R_EAX, R_EBX, R_ECX, R_EDX, R_ESI, R_EDI, R_EBP, R_ESP,
-> diff --git a/target/i386/hax/hax-all.c b/target/i386/hax/hax-all.c
-> index bf65ed6fa92..cd89e3233a9 100644
-> --- a/target/i386/hax/hax-all.c
-> +++ b/target/i386/hax/hax-all.c
-> @@ -32,6 +32,7 @@
->   #include "sysemu/reset.h"
->   #include "sysemu/runstate.h"
->   #include "hw/boards.h"
-> +#include "hw/i386/apic.h"
->   
->   #include "hax-accel-ops.h"
->   
-> diff --git a/target/i386/helper.c b/target/i386/helper.c
-> index 533b29cb91b..874beda98ae 100644
-> --- a/target/i386/helper.c
-> +++ b/target/i386/helper.c
-> @@ -26,6 +26,7 @@
->   #ifndef CONFIG_USER_ONLY
->   #include "sysemu/hw_accel.h"
->   #include "monitor/monitor.h"
-> +#include "hw/i386/apic.h"
->   #endif
->   
->   void cpu_sync_bndcs_hflags(CPUX86State *env)
-> diff --git a/target/i386/hvf/x86_emu.c b/target/i386/hvf/x86_emu.c
-> index 7c8203b21fb..fb3e88959d4 100644
-> --- a/target/i386/hvf/x86_emu.c
-> +++ b/target/i386/hvf/x86_emu.c
-> @@ -45,6 +45,7 @@
->   #include "x86_flags.h"
->   #include "vmcs.h"
->   #include "vmx.h"
-> +#include "hw/i386/apic.h"
->   
->   void hvf_handle_io(struct CPUState *cpu, uint16_t port, void *data,
->                      int direction, int size, uint32_t count);
-> diff --git a/target/i386/nvmm/nvmm-all.c b/target/i386/nvmm/nvmm-all.c
-> index 28dee4c5ee3..4c07cfc7194 100644
-> --- a/target/i386/nvmm/nvmm-all.c
-> +++ b/target/i386/nvmm/nvmm-all.c
-> @@ -22,6 +22,7 @@
->   #include "qemu/queue.h"
->   #include "migration/blocker.h"
->   #include "strings.h"
-> +#include "hw/i386/apic.h"
->   
->   #include "nvmm-accel-ops.h"
->   
-> diff --git a/target/i386/tcg/seg_helper.c b/target/i386/tcg/seg_helper.c
-> index 13c6e6ee62e..71fd2bf8d06 100644
-> --- a/target/i386/tcg/seg_helper.c
-> +++ b/target/i386/tcg/seg_helper.c
-> @@ -28,6 +28,10 @@
->   #include "helper-tcg.h"
->   #include "seg_helper.h"
->   
-> +#ifndef CONFIG_USER_ONLY
-> +#include "hw/i386/apic.h"
-> +#endif
-> +
->   /* return non zero if error */
->   static inline int load_segment_ra(CPUX86State *env, uint32_t *e1_ptr,
->                                  uint32_t *e2_ptr, int selector,
-> diff --git a/target/i386/tcg/sysemu/misc_helper.c b/target/i386/tcg/sysemu/misc_helper.c
-> index e7a2ebde813..dbeda8d0b0f 100644
-> --- a/target/i386/tcg/sysemu/misc_helper.c
-> +++ b/target/i386/tcg/sysemu/misc_helper.c
-> @@ -24,6 +24,7 @@
->   #include "exec/cpu_ldst.h"
->   #include "exec/address-spaces.h"
->   #include "tcg/helper-tcg.h"
-> +#include "hw/i386/apic.h"
->   
->   void helper_outb(CPUX86State *env, uint32_t port, uint32_t data)
->   {
-> diff --git a/target/i386/whpx/whpx-all.c b/target/i386/whpx/whpx-all.c
-> index 3e925b9da70..9ab844fd05d 100644
-> --- a/target/i386/whpx/whpx-all.c
-> +++ b/target/i386/whpx/whpx-all.c
-> @@ -20,6 +20,7 @@
->   #include "qemu/main-loop.h"
->   #include "hw/boards.h"
->   #include "hw/i386/ioapic.h"
-> +#include "hw/i386/apic.h"
->   #include "hw/i386/apic_internal.h"
->   #include "qemu/error-report.h"
->   #include "qapi/error.h"
-> 
 
