@@ -2,56 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EF50640CEC5
-	for <lists+kvm@lfdr.de>; Wed, 15 Sep 2021 23:28:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CF15F40CEC8
+	for <lists+kvm@lfdr.de>; Wed, 15 Sep 2021 23:28:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232258AbhIOV3b (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Sep 2021 17:29:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43588 "EHLO
+        id S232392AbhIOV3d (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Sep 2021 17:29:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43604 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231927AbhIOV3a (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Sep 2021 17:29:30 -0400
-Received: from mail-io1-xd32.google.com (mail-io1-xd32.google.com [IPv6:2607:f8b0:4864:20::d32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3192C061574
-        for <kvm@vger.kernel.org>; Wed, 15 Sep 2021 14:28:11 -0700 (PDT)
-Received: by mail-io1-xd32.google.com with SMTP id a22so5314521iok.12
-        for <kvm@vger.kernel.org>; Wed, 15 Sep 2021 14:28:11 -0700 (PDT)
+        with ESMTP id S232356AbhIOV3c (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Sep 2021 17:29:32 -0400
+Received: from mail-il1-x12d.google.com (mail-il1-x12d.google.com [IPv6:2607:f8b0:4864:20::12d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03374C061764
+        for <kvm@vger.kernel.org>; Wed, 15 Sep 2021 14:28:13 -0700 (PDT)
+Received: by mail-il1-x12d.google.com with SMTP id i13so4483896ilm.4
+        for <kvm@vger.kernel.org>; Wed, 15 Sep 2021 14:28:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linuxfoundation.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=FDA4AbD60SFQgHVVfmZC7gzxpvrFiSmOOYbTULWaLEg=;
-        b=Qjzr/Msnp4BvPg/qNnrI0V1bBRyfDQKd5QFJi4DBTQ5AhuP2EdO4J2mlMt6YLgC0QI
-         MRPmRnmVkIodrj9Qy5xs0GHL/Lcfs38Gjqdn+Bhq1Yy3qXebQxzmtSB1YHgovlkTfjJK
-         sr93BTNkDWmEB76iRgnmV4JYn31QbCTDCi7nU=
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=5/05t+cft47v+XjdfjmqtyGwgO/Y9iAdxp4y0oub3sQ=;
+        b=EM5CoyJnEhE01BEs479VfIK4jImJFA22maAiLWfX5Z5H5XLK6PeVPVtKY+6RzJT87g
+         H2wcT9fOX9GB0dUitCiGG5KaaQ1Quna3ubgUKRq++A8LoyLlgRCHzrLG4Kr6Uzpa0s7/
+         a2HRzuRsOc5tj+nz+zso25WUH+s7WG+oOfKMg=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=FDA4AbD60SFQgHVVfmZC7gzxpvrFiSmOOYbTULWaLEg=;
-        b=oHW3FQPGuc/erAtYFuOnJ2K15dqm0Ns0CNoyp9upJBlx4xMLjFnGKj8Aqa98p6MKPj
-         SQN6Q5QV4oXw3HDvZbNi/gVALx3ZI7zMn8lNWmRsRmY0jo/WdZbk4m0M/xGJOmxrFWYF
-         l9WdVzQLh6Ja365pqXr3KasE6wOFig9OibrUNXwqFgcSqBxMokP0OP9WLApxFTozVNFF
-         vOcaE0DHvHF1/F4aDF5mtq4b7c1/5JXcFHGEW9uPY01gou6tjwAlfFM+0oddnSprmb4r
-         QHvmZhaxuMpiS3QUn/aKE2A6WpUWv3Z+Bp1gaQdLDcM9Lc6BmhFUUJjcgw5Hfhquetxk
-         7YCA==
-X-Gm-Message-State: AOAM532VtarQ4OZ4jG93N1xGuO+L4TlPg9LCpJPHLFQxtfTH9q0Lw0ZZ
-        uN4zhjsM1aQGbftI0vv7Pbir0g==
-X-Google-Smtp-Source: ABdhPJw7MApHWV4jaw0J0zFKmXPFTdcnTqBXPZ1RmVMFUrAhVKKMFiD7J9ZQNHlpVEP9I8Sc5YDgMA==
-X-Received: by 2002:a05:6638:1606:: with SMTP id x6mr1766871jas.25.1631741291173;
-        Wed, 15 Sep 2021 14:28:11 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=5/05t+cft47v+XjdfjmqtyGwgO/Y9iAdxp4y0oub3sQ=;
+        b=zyujyCHLFkMXo8HLN/KiQE8TuKZfRZGS3XcsVojmKBkwT9qRHauPa7OmCQBsR8nhxL
+         yclCW3y6amT8YFX4SLqS7dV917PTg2CQLp7YWmM74VsQ33miXi2XlFPLVQsOxsjyg1LE
+         Rw3cgCC3qPQYgG9LKlxxinQrmAaAmiMS85WC74UoZospqsSUPjE+njpFGsXQWkiJzDi4
+         i/MbpGrPcSqssDvEVFwI1SPMxP8H64I5x6pfBuK7WB2eOaYpAmgKlAWTkUzHLqETF+v3
+         n1KUOzcgdrHhn5mdDLDWtGGDuMR622q1eR4rPtJ7pzWQXLHAGDC7pdOvqjGOug1SNi2G
+         AXHA==
+X-Gm-Message-State: AOAM533uzotVwa6vB0DcIPa7a0fAJJ6a6LVebwS5MxW5Xfx0r6aGrokB
+        SKFBYWC/+huEZAUsdoVbjEC0yg==
+X-Google-Smtp-Source: ABdhPJzxwqX7gRE030Q48r8VOe+p/R3TO1zws/jz/AaNUPiJtQPKoSMaf/CgIE2QH4dRMm+QAjA+MQ==
+X-Received: by 2002:a92:bf0c:: with SMTP id z12mr1588379ilh.241.1631741292332;
+        Wed, 15 Sep 2021 14:28:12 -0700 (PDT)
 Received: from shuah-t480s.internal (c-24-9-64-241.hsd1.co.comcast.net. [24.9.64.241])
-        by smtp.gmail.com with ESMTPSA id f2sm622884ioz.14.2021.09.15.14.28.10
+        by smtp.gmail.com with ESMTPSA id f2sm622884ioz.14.2021.09.15.14.28.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Sep 2021 14:28:10 -0700 (PDT)
+        Wed, 15 Sep 2021 14:28:11 -0700 (PDT)
 From:   Shuah Khan <skhan@linuxfoundation.org>
 To:     pbonzini@redhat.com, shuah@kernel.org
 Cc:     Shuah Khan <skhan@linuxfoundation.org>, kvm@vger.kernel.org,
         linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 0/4] selftests: kvm: fscanf warn fixes and cleanups 
-Date:   Wed, 15 Sep 2021 15:28:05 -0600
-Message-Id: <cover.1631737524.git.skhan@linuxfoundation.org>
+Subject: [PATCH 1/4] selftests:kvm: fix get_warnings_count() ignoring fscanf() return warn
+Date:   Wed, 15 Sep 2021 15:28:06 -0600
+Message-Id: <9dfad43fb500a77f7a08e5e7b80dcb07172d6e44.1631737524.git.skhan@linuxfoundation.org>
 X-Mailer: git-send-email 2.30.2
+In-Reply-To: <cover.1631737524.git.skhan@linuxfoundation.org>
+References: <cover.1631737524.git.skhan@linuxfoundation.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -59,24 +61,33 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch series fixes fscanf() ignoring return value warnings.
-Consolidates get_run_delay() duplicate defines moving it to
-common library.
+Fix get_warnings_count() to check fscanf() return value to get rid
+of the following warning:
 
-Shuah Khan (4):
-  selftests:kvm: fix get_warnings_count() ignoring fscanf() return warn
-  selftests:kvm: fix get_trans_hugepagesz() ignoring fscanf() return
-    warn
-  selftests: kvm: move get_run_delay() into lib/test_util
-  selftests: kvm: fix get_run_delay() ignoring fscanf() return warn
+x86_64/mmio_warning_test.c: In function ‘get_warnings_count’:
+x86_64/mmio_warning_test.c:85:2: warning: ignoring return value of ‘fscanf’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+   85 |  fscanf(f, "%d", &warnings);
+      |  ^~~~~~~~~~~~~~~~~~~~~~~~~~
 
- .../testing/selftests/kvm/include/test_util.h |  3 +++
- tools/testing/selftests/kvm/lib/test_util.c   | 22 ++++++++++++++++++-
- tools/testing/selftests/kvm/steal_time.c      | 16 --------------
- .../selftests/kvm/x86_64/mmio_warning_test.c  |  3 ++-
- .../selftests/kvm/x86_64/xen_shinfo_test.c    | 15 -------------
- 5 files changed, 26 insertions(+), 33 deletions(-)
+Signed-off-by: Shuah Khan <skhan@linuxfoundation.org>
+---
+ tools/testing/selftests/kvm/x86_64/mmio_warning_test.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
+diff --git a/tools/testing/selftests/kvm/x86_64/mmio_warning_test.c b/tools/testing/selftests/kvm/x86_64/mmio_warning_test.c
+index e6480fd5c4bd..8039e1eff938 100644
+--- a/tools/testing/selftests/kvm/x86_64/mmio_warning_test.c
++++ b/tools/testing/selftests/kvm/x86_64/mmio_warning_test.c
+@@ -82,7 +82,8 @@ int get_warnings_count(void)
+ 	FILE *f;
+ 
+ 	f = popen("dmesg | grep \"WARNING:\" | wc -l", "r");
+-	fscanf(f, "%d", &warnings);
++	if (fscanf(f, "%d", &warnings) < 1)
++		warnings = 0;
+ 	fclose(f);
+ 
+ 	return warnings;
 -- 
 2.30.2
 
