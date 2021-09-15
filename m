@@ -2,97 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6CF5740C1F2
-	for <lists+kvm@lfdr.de>; Wed, 15 Sep 2021 10:44:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 94E0040C2F7
+	for <lists+kvm@lfdr.de>; Wed, 15 Sep 2021 11:51:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232676AbhIOIpk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Sep 2021 04:45:40 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47189 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231747AbhIOIpk (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 15 Sep 2021 04:45:40 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1631695461;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ADrqp1/QUIGA/T7aV/2lJTe0h/xjpqwDvAEv0yJIxIE=;
-        b=Wue1J18LTE3Hie5Wu9ZummcLQPD9zm6wShMTEFSgnbye3s5is1tjs69eaJO2JlBa+liI7Z
-        s8kvirKSqKtINW75cjyLC0zWt0OsRyhJ2imd/0S8REg9vnF9+RYVmldnUzzV8b+2bjwJ7x
-        vEOTN2iugv3Fqw2uhmPiez+UeE2aG1w=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-223-umwbts8aMz2s5_lHxtNAsQ-1; Wed, 15 Sep 2021 04:44:20 -0400
-X-MC-Unique: umwbts8aMz2s5_lHxtNAsQ-1
-Received: by mail-ed1-f70.google.com with SMTP id y10-20020a056402270a00b003c8adc4d40cso1179955edd.15
-        for <kvm@vger.kernel.org>; Wed, 15 Sep 2021 01:44:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=ADrqp1/QUIGA/T7aV/2lJTe0h/xjpqwDvAEv0yJIxIE=;
-        b=ZKk/hlFj91R/UDycp6F+wGtUW2Qr3QhJiTDpmH9n0kgN3oaoSBCWAYXYf1J2oBiUgK
-         beNy1XDqXp8p1gloiGfD3ogBrjxV8PIRfLQVmK84YoH6F1nZMJYfJXOq6o7lSxifBLHE
-         d0hDMS/ZFwzORbZg4/KUnANVEIbYNULuN2WsNI7Xbe5JsaAO6kEpRRSwVuM3I9A7g/2i
-         Smt/4SxbzrNSsctNJAaWnxy4dyb9djTQ+j/NilN4qL0DvYMYQhBAXn66+arhsXsZXpCG
-         DckWNBVCCPb72WlZkLK3+au7HnBv7phck1ZB47poA4n8mXcuQAxkd2+BJvwq5GcfNDbF
-         A0xQ==
-X-Gm-Message-State: AOAM530VeNrP5uyUfuXhW6SjVdrNDFrN3brzf/t8ArBbEci7ciQKQjVS
-        jO6iAdQgDF3IzNax4WSlwCQu/IXD+wTTPAee63C8prCav+kuiieA26nqVa9SO5rB4sHm7qcd4tm
-        gQ41HPWK28Xb3
-X-Received: by 2002:a17:906:720e:: with SMTP id m14mr23382026ejk.500.1631695458863;
-        Wed, 15 Sep 2021 01:44:18 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxYJf8R+muJrg6i1DgERLQ+Qjby5sOQnwwLs5CQhAF0+bn8gEhcl2FLgZ/RVYOHNg30uMCZAA==
-X-Received: by 2002:a17:906:720e:: with SMTP id m14mr23382008ejk.500.1631695458655;
-        Wed, 15 Sep 2021 01:44:18 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id mq25sm5416905ejc.71.2021.09.15.01.44.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 15 Sep 2021 01:44:18 -0700 (PDT)
-Subject: Re: [PATCH] KVM: SEV: Disable KVM_CAP_VM_COPY_ENC_CONTEXT_FROM for
- SEV-ES
-To:     Sean Christopherson <seanjc@google.com>,
-        Peter Gonda <pgonda@google.com>
-Cc:     kvm list <kvm@vger.kernel.org>, Marc Orr <marcorr@google.com>,
-        Nathan Tempelman <natet@google.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        linux-kernel@vger.kernel.org
-References: <20210914171551.3223715-1-pgonda@google.com>
- <YUDcvRB3/QOXSi8H@google.com>
- <CAMkAt6opZoFfW_DiyJUREBAtd8503C6j+ZbjS9YL3z+bhqHR8Q@mail.gmail.com>
- <YUDsy4W0/FeIEJDr@google.com>
- <CAMkAt6r9W=bTzLkojjAuc5VpwJnSzg7+JUp=rnK-jO88hSKmxw@mail.gmail.com>
- <YUDuv1aTauPz9aqo@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8d58d4cb-bc0b-30a9-6218-323c9ffd1037@redhat.com>
-Date:   Wed, 15 Sep 2021 10:44:09 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        id S237237AbhIOJwS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Sep 2021 05:52:18 -0400
+Received: from frasgout.his.huawei.com ([185.176.79.56]:3814 "EHLO
+        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231860AbhIOJwR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Sep 2021 05:52:17 -0400
+Received: from fraeml738-chm.china.huawei.com (unknown [172.18.147.207])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4H8b4w348nz67xvT;
+        Wed, 15 Sep 2021 17:48:32 +0800 (CST)
+Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
+ fraeml738-chm.china.huawei.com (10.206.15.219) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.8; Wed, 15 Sep 2021 11:50:56 +0200
+Received: from A2006125610.china.huawei.com (10.47.83.177) by
+ lhreml710-chm.china.huawei.com (10.201.108.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.8; Wed, 15 Sep 2021 10:50:50 +0100
+From:   Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+To:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>
+CC:     <alex.williamson@redhat.com>, <jgg@nvidia.com>,
+        <mgurtovoy@nvidia.com>, <linuxarm@huawei.com>,
+        <liulongfang@huawei.com>, <prime.zeng@hisilicon.com>,
+        <jonathan.cameron@huawei.com>, <wangzhou1@hisilicon.com>
+Subject: [PATCH v3 0/6] vfio/hisilicon: add acc live migration driver
+Date:   Wed, 15 Sep 2021 10:50:31 +0100
+Message-ID: <20210915095037.1149-1-shameerali.kolothum.thodi@huawei.com>
+X-Mailer: git-send-email 2.12.0.windows.1
 MIME-Version: 1.0
-In-Reply-To: <YUDuv1aTauPz9aqo@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.47.83.177]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ lhreml710-chm.china.huawei.com (10.201.108.61)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 14/09/21 20:49, Sean Christopherson wrote:
-> On Tue, Sep 14, 2021, Peter Gonda wrote:
->> I do not think so. You cannot call KVM_SEV_LAUNCH_UPDATE_VMSA on the mirror
->> because svm_mem_enc_op() blocks calls from the mirror. So either you have to
->> update vmsa from the mirror or have the original VM read through its mirror's
->> vCPUs when calling KVM_SEV_LAUNCH_UPDATE_VMSA. Not sure which way is better
->> but I don't see a way to do this without updating KVM.
-> 
-> Ah, right, I forgot all of the SEV ioctls are blocked on the mirror.  Put something
-> to that effect into the changelog to squash any argument about whether or not this
-> is the correct KVM behavior.
+Hi,
 
-Indeed, at least KVM_SEV_LAUNCH_UPDATE_VMSA would have to be allowed in 
-the mirror VM.  Do you think anything else would be necessary?
+Thanks to the introduction of vfio_pci_core subsystem framework[0],
+now it is possible to provide vendor specific functionality to
+vfio pci devices. This series attempts to add vfio live migration
+support for HiSilicon ACC VF devices based on the new framework.
 
-Paolo
+HiSilicon ACC VF device MMIO space includes both the functional
+register space and migration control register space. As discussed
+in RFCv1[1], this may create security issues as these regions get
+shared between the Guest driver and the migration driver.
+Based on the feedback, we tried to address those concerns in
+this version. 
+
+This is now sanity tested on HiSilicon platforms that support these
+ACC devices.
+
+Thanks,
+Shameer
+
+[0] https://lore.kernel.org/kvm/20210826103912.128972-1-yishaih@nvidia.com/
+[1] https://lore.kernel.org/lkml/20210415220137.GA1672608@nvidia.com/
+
+Change History:
+
+RFC v2 --> v3
+ -Dropped RFC tag as the vfio_pci_core subsystem framework is now 
+  part of 5.15-rc1.
+ -Added override methods for vfio_device_ops read/write/mmap calls 
+  to limit the access within the functional register space.
+ -Patches 1 to 3 are code refactoring to move the common ACC QM 
+  definitions and header around.
+
+RFCv1 --> RFCv2
+
+ -Adds a new vendor-specific vfio_pci driver(hisi-acc-vfio-pci)
+  for HiSilicon ACC VF devices based on the new vfio-pci-core
+  framework proposal.
+
+ -Since HiSilicon ACC VF device MMIO space contains both the
+  functional register space and migration control register space,
+  override the vfio_device_ops ioctl method to report only the
+  functional space to VMs.
+
+ -For a successful migration, we still need access to VF dev
+  functional register space mainly to read the status registers.
+  But accessing these while the Guest vCPUs are running may leave
+  a security hole. To avoid any potential security issues, we
+  map/unmap the MMIO regions on a need basis and is safe to do so.
+  (Please see hisi_acc_vf_ioremap/unmap() fns in patch #4).
+ 
+ -Dropped debugfs support for now.
+ -Uses common QM functions for mailbox access(patch #3).
+
+Longfang Liu (2):
+  crypto: hisilicon/qm: Move few definitions to common header
+  hisi_acc_vfio_pci: Add support for VFIO live migration
+
+Shameer Kolothum (4):
+  crypto: hisilicon/qm: Move the QM header to include/linux
+  hisi_acc_qm: Move PCI device IDs to common header
+  hisi-acc-vfio-pci: add new vfio_pci driver for HiSilicon ACC devices
+  hisi_acc_vfio_pci: Restrict access to VF dev BAR2 migration region
+
+ drivers/crypto/hisilicon/hpre/hpre.h          |    2 +-
+ drivers/crypto/hisilicon/hpre/hpre_main.c     |   12 +-
+ drivers/crypto/hisilicon/qm.c                 |   34 +-
+ drivers/crypto/hisilicon/sec2/sec.h           |    2 +-
+ drivers/crypto/hisilicon/sec2/sec_main.c      |    2 -
+ drivers/crypto/hisilicon/sgl.c                |    2 +-
+ drivers/crypto/hisilicon/zip/zip.h            |    2 +-
+ drivers/crypto/hisilicon/zip/zip_main.c       |   11 +-
+ drivers/vfio/pci/Kconfig                      |   13 +
+ drivers/vfio/pci/Makefile                     |    3 +
+ drivers/vfio/pci/hisi_acc_vfio_pci.c          | 1217 +++++++++++++++++
+ drivers/vfio/pci/hisi_acc_vfio_pci.h          |  117 ++
+ .../qm.h => include/linux/hisi_acc_qm.h       |   45 +
+ 13 files changed, 1414 insertions(+), 48 deletions(-)
+ create mode 100644 drivers/vfio/pci/hisi_acc_vfio_pci.c
+ create mode 100644 drivers/vfio/pci/hisi_acc_vfio_pci.h
+ rename drivers/crypto/hisilicon/qm.h => include/linux/hisi_acc_qm.h (88%)
+
+-- 
+2.17.1
 
