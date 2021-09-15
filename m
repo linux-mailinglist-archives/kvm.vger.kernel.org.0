@@ -2,120 +2,198 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B451940BCA8
-	for <lists+kvm@lfdr.de>; Wed, 15 Sep 2021 02:29:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EFC4240BD14
+	for <lists+kvm@lfdr.de>; Wed, 15 Sep 2021 03:19:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236149AbhIOAaY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Sep 2021 20:30:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37756 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229991AbhIOAaX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Sep 2021 20:30:23 -0400
-Received: from ozlabs.org (bilbo.ozlabs.org [IPv6:2401:3900:2:1::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53563C061574;
-        Tue, 14 Sep 2021 17:29:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
-        s=201909; t=1631665743;
-        bh=HgCpSqOauKiPM+dBPwX1rVKc5DllbEYyPqTeHP+eUfA=;
-        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-        b=nobrDH5nGZu7v+B+3sYvcmgWwQ6HXMJcFwBQJdDWX9HZxhJmSYRfeLJ5bqM1L8nAT
-         Zv7FEyFybAcOR9q2SSYXqyD/igi9xudle6V5yasFwsCuG7S0oozCaRNikxkvD596/w
-         6l43PVixwL61h3NyNDnNd5sNzqDNGCDn9FEcD1fB6an9gsKEzr5R3Isof7M+Dp+CFm
-         Flkym9C4vSI8DMWcOL/ydbmO/xhA1U449O7gqRfyeoJq9Tl/sPJDKQcCHDPv+s1Rp6
-         4loBfWLosZBa6f9xlvgT7ZD+EwPUzeNUvScHtwtaoHQpWTi57p46qNn2qlhGqy8rED
-         FWCERXkM6X8Sg==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4H8LgJ0MSWz9sVq;
-        Wed, 15 Sep 2021 10:28:59 +1000 (AEST)
-From:   Michael Ellerman <mpe@ellerman.id.au>
-To:     Borislav Petkov <bp@alien8.de>
-Cc:     Tom Lendacky <thomas.lendacky@amd.com>,
-        linux-kernel@vger.kernel.org, x86@kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
-        iommu@lists.linux-foundation.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-graphics-maintainer@vmware.com,
-        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        kexec@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Andi Kleen <ak@linux.intel.com>,
-        Sathyanarayanan Kuppuswamy 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        Tianyu Lan <Tianyu.Lan@microsoft.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>
-Subject: Re: [PATCH v3 4/8] powerpc/pseries/svm: Add a powerpc version of
- cc_platform_has()
-In-Reply-To: <YUCOTIPPsJJpLO/d@zn.tnic>
-References: <cover.1631141919.git.thomas.lendacky@amd.com>
- <9d4fc3f8ea7b325aaa1879beab1286876f45d450.1631141919.git.thomas.lendacky@amd.com>
- <YUCOTIPPsJJpLO/d@zn.tnic>
-Date:   Wed, 15 Sep 2021 10:28:59 +1000
-Message-ID: <87lf3yk7g4.fsf@mpe.ellerman.id.au>
+        id S231156AbhIOBUk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Sep 2021 21:20:40 -0400
+Received: from mga05.intel.com ([192.55.52.43]:19355 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229548AbhIOBUj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Sep 2021 21:20:39 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10107"; a="307729551"
+X-IronPort-AV: E=Sophos;i="5.85,292,1624345200"; 
+   d="scan'208";a="307729551"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Sep 2021 18:19:21 -0700
+X-IronPort-AV: E=Sophos;i="5.85,292,1624345200"; 
+   d="scan'208";a="544371674"
+Received: from zhoushua-mobl1.ccr.corp.intel.com (HELO [10.255.30.237]) ([10.255.30.237])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Sep 2021 18:19:14 -0700
+Message-ID: <186c330e-be42-4c49-545c-8f73573b5869@intel.com>
+Date:   Wed, 15 Sep 2021 09:19:12 +0800
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Firefox/91.0 Thunderbird/91.0.3
+Subject: Re: [PATCH V10 01/18] perf/core: Use static_call to optimize
+ perf_guest_info_callbacks
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     peterz@infradead.org, pbonzini@redhat.com, bp@alien8.de,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, kan.liang@linux.intel.com, ak@linux.intel.com,
+        wei.w.wang@intel.com, eranian@google.com, liuxiangdong5@huawei.com,
+        linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
+        like.xu.linux@gmail.com, boris.ostrvsky@oracle.com,
+        Like Xu <like.xu@linux.intel.com>,
+        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+        Guo Ren <guoren@kernel.org>, Nick Hu <nickhu@andestech.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-csky@vger.kernel.org, linux-riscv@lists.infradead.org,
+        xen-devel@lists.xenproject.org
+References: <20210806133802.3528-1-lingshan.zhu@intel.com>
+ <20210806133802.3528-2-lingshan.zhu@intel.com> <YSfykbECnC6J02Yk@google.com>
+From:   "Zhu, Lingshan" <lingshan.zhu@intel.com>
+In-Reply-To: <YSfykbECnC6J02Yk@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Borislav Petkov <bp@alien8.de> writes:
-> On Wed, Sep 08, 2021 at 05:58:35PM -0500, Tom Lendacky wrote:
->> Introduce a powerpc version of the cc_platform_has() function. This will
->> be used to replace the powerpc mem_encrypt_active() implementation, so
->> the implementation will initially only support the CC_ATTR_MEM_ENCRYPT
->> attribute.
->> 
->> Cc: Michael Ellerman <mpe@ellerman.id.au>
->> Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
->> Cc: Paul Mackerras <paulus@samba.org>
->> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
->> ---
->>  arch/powerpc/platforms/pseries/Kconfig       |  1 +
->>  arch/powerpc/platforms/pseries/Makefile      |  2 ++
->>  arch/powerpc/platforms/pseries/cc_platform.c | 26 ++++++++++++++++++++
->>  3 files changed, 29 insertions(+)
->>  create mode 100644 arch/powerpc/platforms/pseries/cc_platform.c
+
+
+On 8/27/2021 3:59 AM, Sean Christopherson wrote:
+> TL;DR: Please don't merge this patch, it's broken and is also built on a shoddy
+>         foundation that I would like to fix.
+Hi Sean,Peter, Paolo
+
+I will send out an V11 which drops this patch since it's buggy, and Sean 
+is working on fix this.
+Does this sound good?
+
+Thanks,
+Zhu Lingshan
 >
-> Michael,
+> On Fri, Aug 06, 2021, Zhu Lingshan wrote:
+>> diff --git a/kernel/events/core.c b/kernel/events/core.c
+>> index 464917096e73..e466fc8176e1 100644
+>> --- a/kernel/events/core.c
+>> +++ b/kernel/events/core.c
+>> @@ -6489,9 +6489,18 @@ static void perf_pending_event(struct irq_work *entry)
+>>    */
+>>   struct perf_guest_info_callbacks *perf_guest_cbs;
+>>   
+>> +/* explicitly use __weak to fix duplicate symbol error */
+>> +void __weak arch_perf_update_guest_cbs(void)
+>> +{
+>> +}
+>> +
+>>   int perf_register_guest_info_callbacks(struct perf_guest_info_callbacks *cbs)
+>>   {
+>> +	if (WARN_ON_ONCE(perf_guest_cbs))
+>> +		return -EBUSY;
+>> +
+>>   	perf_guest_cbs = cbs;
+>> +	arch_perf_update_guest_cbs();
+> This is horribly broken, it fails to cleanup the static calls when KVM unregisters
+> the callbacks, which happens when the vendor module, e.g. kvm_intel, is unloaded.
+> The explosion doesn't happen until 'kvm' is unloaded because the functions are
+> implemented in 'kvm', i.e. the use-after-free is deferred a bit.
 >
-> can I get an ACK for the ppc bits to carry them through the tip tree
-> pls?
-
-Yeah.
-
-I don't love it, a new C file and an out-of-line call to then call back
-to a static inline that for most configuration will return false ... but
-whatever :)
-
-Acked-by: Michael Ellerman <mpe@ellerman.id.au> (powerpc)
-
-
-> Btw, on a related note, cross-compiling this throws the following error here:
+>    BUG: unable to handle page fault for address: ffffffffa011bb90
+>    #PF: supervisor instruction fetch in kernel mode
+>    #PF: error_code(0x0010) - not-present page
+>    PGD 6211067 P4D 6211067 PUD 6212063 PMD 102b99067 PTE 0
+>    Oops: 0010 [#1] PREEMPT SMP
+>    CPU: 0 PID: 1047 Comm: rmmod Not tainted 5.14.0-rc2+ #460
+>    Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 0.0.0 02/06/2015
+>    RIP: 0010:0xffffffffa011bb90
+>    Code: Unable to access opcode bytes at RIP 0xffffffffa011bb66.
+>    Call Trace:
+>     <NMI>
+>     ? perf_misc_flags+0xe/0x50
+>     ? perf_prepare_sample+0x53/0x6b0
+>     ? perf_event_output_forward+0x67/0x160
+>     ? kvm_clock_read+0x14/0x30
+>     ? kvm_sched_clock_read+0x5/0x10
+>     ? sched_clock_cpu+0xd/0xd0
+>     ? __perf_event_overflow+0x52/0xf0
+>     ? handle_pmi_common+0x1f2/0x2d0
+>     ? __flush_tlb_all+0x30/0x30
+>     ? intel_pmu_handle_irq+0xcf/0x410
+>     ? nmi_handle+0x5/0x260
+>     ? perf_event_nmi_handler+0x28/0x50
+>     ? nmi_handle+0xc7/0x260
+>     ? lock_release+0x2b0/0x2b0
+>     ? default_do_nmi+0x6b/0x170
+>     ? exc_nmi+0x103/0x130
+>     ? end_repeat_nmi+0x16/0x1f
+>     ? lock_release+0x2b0/0x2b0
+>     ? lock_release+0x2b0/0x2b0
+>     ? lock_release+0x2b0/0x2b0
+>     </NMI>
+>    Modules linked in: irqbypass [last unloaded: kvm]
 >
-> $ make CROSS_COMPILE=/home/share/src/crosstool/gcc-9.4.0-nolibc/powerpc64-linux/bin/powerpc64-linux- V=1 ARCH=powerpc
+> Even more fun, the existing perf_guest_cbs framework is also broken, though it's
+> much harder to get it to fail, and probably impossible to get it to fail without
+> some help.  The issue is that perf_guest_cbs is global, which means that it can
+> be nullified by KVM (during module unload) while the callbacks are being accessed
+> by a PMI handler on a different CPU.
 >
-> ...
+> The bug has escaped notice because all dererfences of perf_guest_cbs follow the
+> same "perf_guest_cbs && perf_guest_cbs->is_in_guest()" pattern, and AFAICT the
+> compiler never reload perf_guest_cbs in this sequence.  The compiler does reload
+> perf_guest_cbs for any future dereferences, but the ->is_in_guest() guard all but
+> guarantees the PMI handler will win the race, e.g. to nullify perf_guest_cbs,
+> KVM has to completely exit the guest and teardown down all VMs before it can be
+> unloaded.
 >
-> /home/share/src/crosstool/gcc-9.4.0-nolibc/powerpc64-linux/bin/powerpc64-linux-gcc -Wp,-MD,arch/powerpc/boot/.crt0.o.d -D__ASSEMBLY__ -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs -fno-strict-aliasing -O2 -msoft-float -mno-altivec -mno-vsx -pipe -fomit-frame-pointer -fno-builtin -fPIC -nostdinc -include ./include/linux/compiler_attributes.h -I./arch/powerpc/include -I./arch/powerpc/include/generated  -I./include -I./arch/powerpc/include/uapi -I./arch/powerpc/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/compiler-version.h -include ./include/linux/kconfig.h -m32 -isystem /home/share/src/crosstool/gcc-9.4.0-nolibc/powerpc64-linux/bin/../lib/gcc/powerpc64-linux/9.4.0/include -mbig-endian -nostdinc -c -o arch/powerpc/boot/crt0.o arch/powerpc/boot/crt0.S
-> In file included from <command-line>:
-> ././include/linux/compiler_attributes.h:62:5: warning: "__has_attribute" is not defined, evaluates to 0 [-Wundef]
->    62 | #if __has_attribute(__assume_aligned__)
->       |     ^~~~~~~~~~~~~~~
-> ././include/linux/compiler_attributes.h:62:20: error: missing binary operator before token "("
->    62 | #if __has_attribute(__assume_aligned__)
->       |                    ^
-> ././include/linux/compiler_attributes.h:88:5: warning: "__has_attribute" is not defined, evaluates to 0 [-Wundef]
->    88 | #if __has_attribute(__copy__)
->       |     ^~~~~~~~~~~~~~~
-> ...
+> But with a help, e.g. RAED_ONCE(perf_guest_cbs), unloading kvm_intel can trigger
+> a NULL pointer derference, e.g. this tweak
 >
-> Known issue?
+> diff --git a/arch/x86/events/core.c b/arch/x86/events/core.c
+> index 1eb45139fcc6..202e5ad97f82 100644
+> --- a/arch/x86/events/core.c
+> +++ b/arch/x86/events/core.c
+> @@ -2954,7 +2954,7 @@ unsigned long perf_misc_flags(struct pt_regs *regs)
+>   {
+>          int misc = 0;
+>
+> -       if (perf_guest_cbs && perf_guest_cbs->is_in_guest()) {
+> +       if (READ_ONCE(perf_guest_cbs) && READ_ONCE(perf_guest_cbs)->is_in_guest()) {
+>                  if (perf_guest_cbs->is_user_mode())
+>                          misc |= PERF_RECORD_MISC_GUEST_USER;
+>                  else
+>
+>
+> while spamming module load/unload leads to:
+>
+>    BUG: kernel NULL pointer dereference, address: 0000000000000000
+>    #PF: supervisor read access in kernel mode
+>    #PF: error_code(0x0000) - not-present page
+>    PGD 0 P4D 0
+>    Oops: 0000 [#1] PREEMPT SMP
+>    CPU: 6 PID: 1825 Comm: stress Not tainted 5.14.0-rc2+ #459
+>    Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 0.0.0 02/06/2015
+>    RIP: 0010:perf_misc_flags+0x1c/0x70
+>    Call Trace:
+>     perf_prepare_sample+0x53/0x6b0
+>     perf_event_output_forward+0x67/0x160
+>     __perf_event_overflow+0x52/0xf0
+>     handle_pmi_common+0x207/0x300
+>     intel_pmu_handle_irq+0xcf/0x410
+>     perf_event_nmi_handler+0x28/0x50
+>     nmi_handle+0xc7/0x260
+>     default_do_nmi+0x6b/0x170
+>     exc_nmi+0x103/0x130
+>     asm_exc_nmi+0x76/0xbf
+>
+>
+> The good news is that I have a series that should fix both the existing NULL pointer
+> bug and mostly obviate the need for static calls.  The bad news is that my approach,
+> making perf_guest_cbs per-CPU, likely complicates turning these into static calls,
+> though I'm guessing it's still a solvable problem.
+>
+> Tangentially related, IMO we should make architectures opt-in to getting
+> perf_guest_cbs and nuke all of the code in the below files.  Except for arm,
+> which recently lost KVM support, it's all a bunch of useless copy-paste code that
+> serves no purpose and just complicates cleanups like this.
+>
+>>   arch/arm/kernel/perf_callchain.c   | 16 +++++++-----
+>>   arch/csky/kernel/perf_callchain.c  |  4 +--
+>>   arch/nds32/kernel/perf_event_cpu.c | 16 +++++++-----
+>>   arch/riscv/kernel/perf_callchain.c |  4 +--
 
-Yeah, fixed in mainline today, thanks for trying to cross compile :)
-
-cheers
