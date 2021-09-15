@@ -2,132 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7BF9040C67C
-	for <lists+kvm@lfdr.de>; Wed, 15 Sep 2021 15:36:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C592B40C68C
+	for <lists+kvm@lfdr.de>; Wed, 15 Sep 2021 15:40:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234403AbhIONhU convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Wed, 15 Sep 2021 09:37:20 -0400
-Received: from frasgout.his.huawei.com ([185.176.79.56]:3822 "EHLO
-        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233472AbhIONhT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Sep 2021 09:37:19 -0400
-Received: from fraeml703-chm.china.huawei.com (unknown [172.18.147.201])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4H8h4q2gZdz67Mx2;
-        Wed, 15 Sep 2021 21:33:47 +0800 (CST)
-Received: from lhreml719-chm.china.huawei.com (10.201.108.70) by
- fraeml703-chm.china.huawei.com (10.206.15.52) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2308.8; Wed, 15 Sep 2021 15:35:58 +0200
-Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- lhreml719-chm.china.huawei.com (10.201.108.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.8; Wed, 15 Sep 2021 14:35:57 +0100
-Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
- lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
- 15.01.2308.008; Wed, 15 Sep 2021 14:35:57 +0100
-From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>,
-        Shameerali Kolothum Thodi 
-        <shameerali.kolothum.thodi@huawei.com>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "mgurtovoy@nvidia.com" <mgurtovoy@nvidia.com>,
-        liulongfang <liulongfang@huawei.com>,
-        "Zengtao (B)" <prime.zeng@hisilicon.com>,
-        "Jonathan Cameron" <jonathan.cameron@huawei.com>,
-        "Wangzhou (B)" <wangzhou1@hisilicon.com>
-Subject: RE: [PATCH v3 4/6] hisi-acc-vfio-pci: add new vfio_pci driver for
- HiSilicon ACC devices
-Thread-Topic: [PATCH v3 4/6] hisi-acc-vfio-pci: add new vfio_pci driver for
- HiSilicon ACC devices
-Thread-Index: AQHXqhdFSlg0yljEzk6Hfj1kozgJ0quk++8AgAAMoPA=
-Date:   Wed, 15 Sep 2021 13:35:57 +0000
-Message-ID: <d5579a725a3c41e08f9096fb8d2d8d64@huawei.com>
-References: <20210915095037.1149-1-shameerali.kolothum.thodi@huawei.com>
- <20210915095037.1149-5-shameerali.kolothum.thodi@huawei.com>
- <20210915125146.GI4065468@nvidia.com>
-In-Reply-To: <20210915125146.GI4065468@nvidia.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.47.83.177]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        id S234504AbhIONmI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Sep 2021 09:42:08 -0400
+Received: from smtp-fw-2101.amazon.com ([72.21.196.25]:20764 "EHLO
+        smtp-fw-2101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233395AbhIONmH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Sep 2021 09:42:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
+  t=1631713249; x=1663249249;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=9SyFPUNj7I5Ph0+cJPH2EJBPGqn85KC6XI4O4pHXcoY=;
+  b=ljZJ+Ia3cLVUEnnLa2/m5HoFAa1YeVHD9Pm+OZw6zUwCYgWsBjHYFJGE
+   c6wu6Gw+wFq+f3c5KCzvgdfi6jImVk3mDqptM+p1kTbn5mwDCeoakataw
+   eYmGPAyif8M0SP79TGsdmBuvvV95BW/kLoMGvHRjwsH0o3DFlQB+EoBj4
+   Y=;
+X-IronPort-AV: E=Sophos;i="5.85,295,1624320000"; 
+   d="scan'208";a="137451068"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-pdx-2a-ff3df2fe.us-west-2.amazon.com) ([10.43.8.2])
+  by smtp-border-fw-2101.iad2.amazon.com with ESMTP; 15 Sep 2021 13:40:38 +0000
+Received: from EX13D07EUA003.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
+        by email-inbound-relay-pdx-2a-ff3df2fe.us-west-2.amazon.com (Postfix) with ESMTPS id 65A0741661;
+        Wed, 15 Sep 2021 13:40:37 +0000 (UTC)
+Received: from dev-dsk-faresx-1b-818bcd8f.eu-west-1.amazon.com (10.43.161.176)
+ by EX13D07EUA003.ant.amazon.com (10.43.165.176) with Microsoft SMTP Server
+ (TLS) id 15.0.1497.23; Wed, 15 Sep 2021 13:40:31 +0000
+From:   Fares Mehanna <faresx@amazon.de>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>
+CC:     Fares Mehanna <faresx@amazon.de>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+Subject: [PATCH] kvm: x86: Add AMD PMU MSRs to msrs_to_save_all[]
+Date:   Wed, 15 Sep 2021 13:39:50 +0000
+Message-ID: <20210915133951.22389-1-faresx@amazon.de>
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+X-Originating-IP: [10.43.161.176]
+X-ClientProxiedBy: EX13D24UWB002.ant.amazon.com (10.43.161.159) To
+ EX13D07EUA003.ant.amazon.com (10.43.165.176)
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Intel PMU MSRs is in msrs_to_save_all[], so add AMD PMU MSRs to have a
+consistent behavior between Intel and AMD when using KVM_GET_MSRS,
+KVM_SET_MSRS or KVM_GET_MSR_INDEX_LIST.
 
+We have to add legacy and new MSRs to handle guests running without
+X86_FEATURE_PERFCTR_CORE.
 
-> -----Original Message-----
-> From: Jason Gunthorpe [mailto:jgg@nvidia.com]
-> Sent: 15 September 2021 13:52
-> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-> Cc: kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
-> linux-crypto@vger.kernel.org; alex.williamson@redhat.com;
-> mgurtovoy@nvidia.com; Linuxarm <linuxarm@huawei.com>; liulongfang
-> <liulongfang@huawei.com>; Zengtao (B) <prime.zeng@hisilicon.com>;
-> Jonathan Cameron <jonathan.cameron@huawei.com>; Wangzhou (B)
-> <wangzhou1@hisilicon.com>
-> Subject: Re: [PATCH v3 4/6] hisi-acc-vfio-pci: add new vfio_pci driver for
-> HiSilicon ACC devices
-> 
-> On Wed, Sep 15, 2021 at 10:50:35AM +0100, Shameer Kolothum wrote:
-> > +static const struct vfio_device_ops hisi_acc_vfio_pci_ops = {
-> > +	.name		= "hisi-acc-vfio-pci",
-> > +	.open_device	= hisi_acc_vfio_pci_open_device,
-> > +	.close_device	= vfio_pci_core_close_device,
-> > +	.ioctl		= vfio_pci_core_ioctl,
-> > +	.read		= vfio_pci_core_read,
-> > +	.write		= vfio_pci_core_write,
-> > +	.mmap		= vfio_pci_core_mmap,
-> > +	.request	= vfio_pci_core_request,
-> > +	.match		= vfio_pci_core_match,
-> > +};
-> 
-> Avoid horizontal alignments please
+Signed-off-by: Fares Mehanna <faresx@amazon.de>
+---
+ arch/x86/kvm/x86.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-Sure.
-
-> 
-> > +static void hisi_acc_vfio_pci_remove(struct pci_dev *pdev) {
-> > +	struct vfio_pci_core_device *vdev = dev_get_drvdata(&pdev->dev);
-> > +
-> > +	vfio_pci_core_unregister_device(vdev);
-> > +	vfio_pci_core_uninit_device(vdev);
-> > +	kfree(vdev);
-> > +}
-> > +
-> > +static const struct pci_device_id hisi_acc_vfio_pci_table[] = {
-> > +	{ PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_VENDOR_ID_HUAWEI,
-> SEC_VF_PCI_DEVICE_ID) },
-> > +	{ PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_VENDOR_ID_HUAWEI,
-> HPRE_VF_PCI_DEVICE_ID) },
-> > +	{ PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_VENDOR_ID_HUAWEI,
-> ZIP_VF_PCI_DEVICE_ID) },
-> > +	{ 0, }
-> 
-> Just {}
-
-Ok.
-
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 28ef14155726..14bc21fb698c 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -1332,6 +1332,13 @@ static const u32 msrs_to_save_all[] = {
+ 	MSR_ARCH_PERFMON_EVENTSEL0 + 12, MSR_ARCH_PERFMON_EVENTSEL0 + 13,
+ 	MSR_ARCH_PERFMON_EVENTSEL0 + 14, MSR_ARCH_PERFMON_EVENTSEL0 + 15,
+ 	MSR_ARCH_PERFMON_EVENTSEL0 + 16, MSR_ARCH_PERFMON_EVENTSEL0 + 17,
++
++	MSR_K7_EVNTSEL0, MSR_K7_EVNTSEL1, MSR_K7_EVNTSEL2, MSR_K7_EVNTSEL3,
++	MSR_K7_PERFCTR0, MSR_K7_PERFCTR1, MSR_K7_PERFCTR2, MSR_K7_PERFCTR3,
++	MSR_F15H_PERF_CTL0, MSR_F15H_PERF_CTL1, MSR_F15H_PERF_CTL2,
++	MSR_F15H_PERF_CTL3, MSR_F15H_PERF_CTL4, MSR_F15H_PERF_CTL5,
++	MSR_F15H_PERF_CTR0, MSR_F15H_PERF_CTR1, MSR_F15H_PERF_CTR2,
++	MSR_F15H_PERF_CTR3, MSR_F15H_PERF_CTR4, MSR_F15H_PERF_CTR5,
+ };
  
-> > +};
-> > +
-> > +MODULE_DEVICE_TABLE(pci, hisi_acc_vfio_pci_table);
-> > +
-> > +static struct pci_driver hisi_acc_vfio_pci_driver = {
-> > +	.name			= "hisi-acc-vfio-pci",
-> 
-> This shoud be KBUILD_MODNAME, the string must always match the module
-> name
+ static u32 msrs_to_save[ARRAY_SIZE(msrs_to_save_all)];
+-- 
+2.32.0
 
-Ok. Will update.
 
-Thanks,
-Shameer
+
+
+Amazon Development Center Germany GmbH
+Krausenstr. 38
+10117 Berlin
+Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
+Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
+Sitz: Berlin
+Ust-ID: DE 289 237 879
+
+
+
