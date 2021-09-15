@@ -2,326 +2,218 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 76F9840CBB2
-	for <lists+kvm@lfdr.de>; Wed, 15 Sep 2021 19:28:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A7D5540CBC1
+	for <lists+kvm@lfdr.de>; Wed, 15 Sep 2021 19:34:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229734AbhIOR3U (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Sep 2021 13:29:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45364 "EHLO
+        id S230073AbhIORft (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Sep 2021 13:35:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46898 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229465AbhIOR3U (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Sep 2021 13:29:20 -0400
-Received: from mail-oi1-x229.google.com (mail-oi1-x229.google.com [IPv6:2607:f8b0:4864:20::229])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D705C061575
-        for <kvm@vger.kernel.org>; Wed, 15 Sep 2021 10:28:01 -0700 (PDT)
-Received: by mail-oi1-x229.google.com with SMTP id bi4so5129335oib.9
-        for <kvm@vger.kernel.org>; Wed, 15 Sep 2021 10:28:01 -0700 (PDT)
+        with ESMTP id S229479AbhIORfs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Sep 2021 13:35:48 -0400
+Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07A9AC061575
+        for <kvm@vger.kernel.org>; Wed, 15 Sep 2021 10:34:29 -0700 (PDT)
+Received: by mail-pg1-x52e.google.com with SMTP id h3so3430178pgb.7
+        for <kvm@vger.kernel.org>; Wed, 15 Sep 2021 10:34:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=c8zUWKPUgTZABevow7z0k9jmN0O/6BSh3As22IG3b64=;
-        b=HAQH5/gGAxa+81crhk6Hx+MOwpYF5prlm2W2nAqX3OrwZ7nZHGBLGgcgBrlJf6ETj2
-         6+O5wNpcOeHihQDP1EVLq2UiXVqrVSdcd24zqkTsVd8ARmlBtWlzVdAOKWfAPQQVS37z
-         LM2Rp8oxN6EYiLS2lmYRdwLu4BKEsTdwhTBg7vm34JZY98QdljfTChACENIlLDTlU0Lt
-         n1O8dgRZSvQ/ziR7P9Bygq6ivU2cSuV6MNOLjS2r/GdQVYQNG2zCtdHhmHcS56jYVsiv
-         CDijH1owZ+IWe8ptp8hs+c5xlDPeHOfp+qLUkteSU5yEh19EJpPqdA3a7G3AvziBGdeT
-         h1Rg==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=EyS/9Qsd9gUKNQPcEpSrk4F18zzLtkGCpQKngXDMwfU=;
+        b=mAxPRGAK5eSu1lHet4zMaWFQ+sLuzVD06vNP3F7UzYxzX3yHGvzIKiRW89YrLGpJHj
+         jEwxlfSy0KPW+flpx9wbHx2J/eKlP2MfDJD8omqUYRKH/RGR1m1CDZbqdGqg51c2/9ba
+         p/nYisdscju180mDAFecfpYn2V4hsKaQ/HrLZEW72NdJWmvnoR+L9oSfLRAtwy9tVYRv
+         OGlYEVPPGUbSaFPOXdo+gIT9XQ2z/vp2JEY+TL0Jk18M8I6CZvA5E4IQtX8unTdlKiW3
+         vQ/Bw76NfZXNgy5OC/1xuZHQTB/H+sfNmhAfutw6FlzUWtJWBFuOxD8SMOpSB2ld9l5S
+         kd6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=c8zUWKPUgTZABevow7z0k9jmN0O/6BSh3As22IG3b64=;
-        b=faCQHJYJQViIoldaQTd5p2L5m8uxBIB1x8U1qQH5CYIcDcnSStCNinFj/cqojIfKMj
-         eRaoP8u3b3R/jMvx53JA7f72ZJZxN8LgjLcdhpkdyuAbHXKNFmSsiyU9gljhN1GMgGaG
-         xKvxbSFNLDwdPjA3mWepqGqpfSQapkDE80yfyHPIsI0li2RlMfAkvNOIy9YLMi6hVtBQ
-         ixBcWVSjUk1tO9m8fXDzfrNcBzYa9wfQUIUXLpAVTlZCpbOxOeTXGD4vfhku4XqCmQCO
-         4kKxrz5m+Q2nHKy6UBfggzQ/OCJIHaR6Gb4b42VPvQZNrMCIU1e912EWnEK0yhNg1bRT
-         JPJA==
-X-Gm-Message-State: AOAM531s7s2BFTNtkGRT17adTM/K0himJ94HKATWWtw/7IumE+o/F4Mi
-        n/WhapMPi1RNMZ+EHiqDTqSEVYjC2UDY4EYAmIHEgA==
-X-Google-Smtp-Source: ABdhPJxkqNKf3VSBi4jAjYYBibMyvn7Hvgz/QsNT/Bw7Vz+1LNhJJixcOgb7IJDS676erMJt/FhFAwZbE1XGz9XrCZg=
-X-Received: by 2002:a05:6808:21a5:: with SMTP id be37mr606899oib.172.1631726880229;
- Wed, 15 Sep 2021 10:28:00 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=EyS/9Qsd9gUKNQPcEpSrk4F18zzLtkGCpQKngXDMwfU=;
+        b=ui6hxusvYxu+k3UJANoiL+08bEAIH79gFAWlC+vok5ADWTUQiaZ2+NEOB4aXesYVcE
+         R2H1TaHJ5nzUUU18d/CRJ9bQp1TUKKjxdy/MGe2rnCwalMZ7YNHW9JDAuzzODBVeqyGj
+         Mvm48Zg/2QLIU488YQKq8RZaCQVWEHzFHidx5xHXcCMKM20UaV7SlAknqojqgcpXzdts
+         9MDiOP/aiwB5zpbzL8/B6ylgorS2NGSulS9lxIFofRKjT8M2uRrh2TV5z9PPSs9oZTxl
+         laKuC4cSQOiCysd0MS2pce07wwxAu2yTcFzBdMoM/FyfilrTp3cZBw0vn42OD0uvm6z6
+         QwUg==
+X-Gm-Message-State: AOAM533YWVJiJzPLcOCr32GWGZSxG7zNKgplSVGzgnr74H4dkN3XauE1
+        +l6ldHVTo+p7FRAhH94CsVIEow==
+X-Google-Smtp-Source: ABdhPJwSbso//lb+HtXmuN/0GOl9ZBIGeiQJ8+kmS4rN1gMHYHR1JjEscGi8dTr2QexoQ9zdtAQVdA==
+X-Received: by 2002:a63:d205:: with SMTP id a5mr868823pgg.30.1631727268205;
+        Wed, 15 Sep 2021 10:34:28 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id b20sm482105pfl.9.2021.09.15.10.34.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Sep 2021 10:34:27 -0700 (PDT)
+Date:   Wed, 15 Sep 2021 17:34:23 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Reiji Watanabe <reijiw@google.com>
+Subject: Re: [PATCH 2/3] KVM: VMX: Move RESET emulation to vmx_vcpu_reset()
+Message-ID: <YUIunxwjea/wq3gd@google.com>
+References: <20210914230840.3030620-1-seanjc@google.com>
+ <20210914230840.3030620-3-seanjc@google.com>
+ <875yv2167g.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-References: <20210914164727.3007031-1-pgonda@google.com> <20210914164727.3007031-5-pgonda@google.com>
-In-Reply-To: <20210914164727.3007031-5-pgonda@google.com>
-From:   Marc Orr <marcorr@google.com>
-Date:   Wed, 15 Sep 2021 10:27:49 -0700
-Message-ID: <CAA03e5EtxED=9C8tL8hwstHBMbj6nzDwA87yMfK9kk5BUTqF2w@mail.gmail.com>
-Subject: Re: [PATCH 4/4 V8] selftest: KVM: Add intra host migration tests
-To:     Peter Gonda <pgonda@google.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        Sean Christopherson <seanjc@google.com>,
-        David Rientjes <rientjes@google.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <875yv2167g.fsf@vitty.brq.redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 14, 2021 at 9:47 AM Peter Gonda <pgonda@google.com> wrote:
->
-> Adds testcases for intra host migration for SEV and SEV-ES. Also adds
-> locking test to confirm no deadlock exists.
->
-> Signed-off-by: Peter Gonda <pgonda@google.com>
-> Suggested-by: Sean Christopherson <seanjc@google.com>
-> Reviewed-by: Marc Orr <marcorr@google.com>
-> Cc: Marc Orr <marcorr@google.com>
-> Cc: Sean Christopherson <seanjc@google.com>
-> Cc: David Rientjes <rientjes@google.com>
-> Cc: Brijesh Singh <brijesh.singh@amd.com>
-> Cc: kvm@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> ---
->  tools/testing/selftests/kvm/Makefile          |   1 +
->  .../selftests/kvm/x86_64/sev_vm_tests.c       | 203 ++++++++++++++++++
->  2 files changed, 204 insertions(+)
->  create mode 100644 tools/testing/selftests/kvm/x86_64/sev_vm_tests.c
->
-> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> index c103873531e0..44fd3566fb51 100644
-> --- a/tools/testing/selftests/kvm/Makefile
-> +++ b/tools/testing/selftests/kvm/Makefile
-> @@ -72,6 +72,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/vmx_pmu_msrs_test
->  TEST_GEN_PROGS_x86_64 += x86_64/xen_shinfo_test
->  TEST_GEN_PROGS_x86_64 += x86_64/xen_vmcall_test
->  TEST_GEN_PROGS_x86_64 += x86_64/vmx_pi_mmio_test
-> +TEST_GEN_PROGS_x86_64 += x86_64/sev_vm_tests
->  TEST_GEN_PROGS_x86_64 += access_tracking_perf_test
->  TEST_GEN_PROGS_x86_64 += demand_paging_test
->  TEST_GEN_PROGS_x86_64 += dirty_log_test
-> diff --git a/tools/testing/selftests/kvm/x86_64/sev_vm_tests.c b/tools/testing/selftests/kvm/x86_64/sev_vm_tests.c
-> new file mode 100644
-> index 000000000000..ec3bbc96e73a
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/x86_64/sev_vm_tests.c
-> @@ -0,0 +1,203 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +#include <linux/kvm.h>
-> +#include <linux/psp-sev.h>
-> +#include <stdio.h>
-> +#include <sys/ioctl.h>
-> +#include <stdlib.h>
-> +#include <errno.h>
-> +#include <pthread.h>
-> +
-> +#include "test_util.h"
-> +#include "kvm_util.h"
-> +#include "processor.h"
-> +#include "svm_util.h"
-> +#include "kselftest.h"
-> +#include "../lib/kvm_util_internal.h"
-> +
-> +#define SEV_POLICY_ES 0b100
-> +
-> +#define NR_MIGRATE_TEST_VCPUS 4
-> +#define NR_MIGRATE_TEST_VMS 3
-> +#define NR_LOCK_TESTING_THREADS 3
-> +#define NR_LOCK_TESTING_ITERATIONS 10000
-> +
-> +static void sev_ioctl(int vm_fd, int cmd_id, void *data)
-> +{
-> +       struct kvm_sev_cmd cmd = {
-> +               .id = cmd_id,
-> +               .data = (uint64_t)data,
-> +               .sev_fd = open_sev_dev_path_or_exit(),
-> +       };
-> +       int ret;
-> +
-> +       ret = ioctl(vm_fd, KVM_MEMORY_ENCRYPT_OP, &cmd);
-> +       TEST_ASSERT((ret == 0 || cmd.error == SEV_RET_SUCCESS),
-> +                   "%d failed: return code: %d, errno: %d, fw error: %d",
-> +                   cmd_id, ret, errno, cmd.error);
-> +}
-> +
-> +static struct kvm_vm *sev_vm_create(bool es)
-> +{
-> +       struct kvm_vm *vm;
-> +       struct kvm_sev_launch_start start = { 0 };
-> +       int i;
-> +
-> +       vm = vm_create(VM_MODE_DEFAULT, 0, O_RDWR);
-> +       sev_ioctl(vm->fd, es ? KVM_SEV_ES_INIT : KVM_SEV_INIT, NULL);
-> +       for (i = 0; i < NR_MIGRATE_TEST_VCPUS; ++i)
-> +               vm_vcpu_add(vm, i);
-> +       if (es)
-> +               start.policy |= SEV_POLICY_ES;
-> +       sev_ioctl(vm->fd, KVM_SEV_LAUNCH_START, &start);
-> +       if (es)
-> +               sev_ioctl(vm->fd, KVM_SEV_LAUNCH_UPDATE_VMSA, NULL);
-> +       return vm;
-> +}
+On Wed, Sep 15, 2021, Vitaly Kuznetsov wrote:
+> Sean Christopherson <seanjc@google.com> writes:
+> > +static void __vmx_vcpu_reset(struct kvm_vcpu *vcpu)
+> > +{
+> > +	struct vcpu_vmx *vmx = to_vmx(vcpu);
+> > +
+> > +	init_vmcs(vmx);
+> > +
+> > +	if (nested)
+> > +		memcpy(&vmx->nested.msrs, &vmcs_config.nested, sizeof(vmx->nested.msrs));
+> > +
+> > +	vcpu_setup_sgx_lepubkeyhash(vcpu);
+> > +
+> > +	vmx->nested.posted_intr_nv = -1;
+> > +	vmx->nested.current_vmptr = -1ull;
+> > +	vmx->nested.hv_evmcs_vmptr = EVMPTR_INVALID;
+> 
+> What would happen in (hypothetical) case when enlightened VMCS is
+> currently in use? If we zap 'hv_evmcs_vmptr' here, the consequent
+> nested_release_evmcs() (called from
+> nested_vmx_handle_enlightened_vmptrld(), for example) will not do 
+> kvm_vcpu_unmap() while it should.
 
-I should've suggested this in my original review. But is it worth
-moving `sev_vm_create()` and `sev_ioctl()` into the broader selftests
-library, so others can leverage this function to write selftests?
+The short answer is that there's a lot of stuff that needs to be addressed before
+KVM can expose a RESET ioctl().  My goal with these patches is to carve out the
+stubs and move the few bits of RESET emulation into the "stubs".  This is the same
+answer for the MSR question/comment at the end.
 
-> +
-> +static struct kvm_vm *__vm_create(void)
-> +{
-> +       struct kvm_vm *vm;
-> +       int i;
-> +
-> +       vm = vm_create(VM_MODE_DEFAULT, 0, O_RDWR);
-> +       for (i = 0; i < NR_MIGRATE_TEST_VCPUS; ++i)
-> +               vm_vcpu_add(vm, i);
-> +
-> +       return vm;
-> +}
-> +
-> +static int __sev_migrate_from(int dst_fd, int src_fd)
-> +{
-> +       struct kvm_enable_cap cap = {
-> +               .cap = KVM_CAP_VM_MIGRATE_PROTECTED_VM_FROM,
-> +               .args = { src_fd }
-> +       };
-> +
-> +       return ioctl(dst_fd, KVM_ENABLE_CAP, &cap);
-> +}
-> +
-> +
-> +static void sev_migrate_from(int dst_fd, int src_fd)
-> +{
-> +       int ret;
-> +
-> +       ret = __sev_migrate_from(dst_fd, src_fd);
-> +       TEST_ASSERT(!ret, "Migration failed, ret: %d, errno: %d\n", ret, errno);
-> +}
-> +
-> +static void test_sev_migrate_from(bool es)
-> +{
-> +       struct kvm_vm *src_vm;
-> +       struct kvm_vm *dst_vms[NR_MIGRATE_TEST_VMS];
-> +       int i;
-> +
-> +       src_vm = sev_vm_create(es);
-> +       for (i = 0; i < NR_MIGRATE_TEST_VMS; ++i)
-> +               dst_vms[i] = __vm_create();
-> +
-> +       /* Initial migration from the src to the first dst. */
-> +       sev_migrate_from(dst_vms[0]->fd, src_vm->fd);
-> +
-> +       for (i = 1; i < NR_MIGRATE_TEST_VMS; i++)
-> +               sev_migrate_from(dst_vms[i]->fd, dst_vms[i - 1]->fd);
-> +
-> +       /* Migrate the guest back to the original VM. */
-> +       sev_migrate_from(src_vm->fd, dst_vms[NR_MIGRATE_TEST_VMS - 1]->fd);
-> +
-> +       kvm_vm_free(src_vm);
-> +       for (i = 0; i < NR_MIGRATE_TEST_VMS; ++i)
-> +               kvm_vm_free(dst_vms[i]);
-> +}
-> +
-> +struct locking_thread_input {
-> +       struct kvm_vm *vm;
-> +       int source_fds[NR_LOCK_TESTING_THREADS];
-> +};
-> +
-> +static void *locking_test_thread(void *arg)
-> +{
-> +       int i, j;
-> +       struct locking_thread_input *input = (struct locking_test_thread *)arg;
-> +
-> +       for (i = 0; i < NR_LOCK_TESTING_ITERATIONS; ++i) {
-> +               j = i % NR_LOCK_TESTING_THREADS;
-> +               __sev_migrate_from(input->vm->fd, input->source_fds[j]);
-> +       }
-> +
-> +       return NULL;
-> +}
-> +
-> +static void test_sev_migrate_locking(void)
-> +{
-> +       struct locking_thread_input input[NR_LOCK_TESTING_THREADS];
-> +       pthread_t pt[NR_LOCK_TESTING_THREADS];
-> +       int i;
-> +
-> +       for (i = 0; i < NR_LOCK_TESTING_THREADS; ++i) {
-> +               input[i].vm = sev_vm_create(/* es= */ false);
-> +               input[0].source_fds[i] = input[i].vm->fd;
-> +       }
-> +       for (i = 1; i < NR_LOCK_TESTING_THREADS; ++i)
-> +               memcpy(input[i].source_fds, input[0].source_fds,
-> +                      sizeof(input[i].source_fds));
-> +
-> +       for (i = 0; i < NR_LOCK_TESTING_THREADS; ++i)
-> +               pthread_create(&pt[i], NULL, locking_test_thread, &input[i]);
-> +
-> +       for (i = 0; i < NR_LOCK_TESTING_THREADS; ++i)
-> +               pthread_join(pt[i], NULL);
-> +}
-> +
-> +static void test_sev_migrate_parameters(void)
-> +{
-> +       struct kvm_vm *sev_vm, *sev_es_vm, *vm_no_vcpu, *vm_no_sev,
-> +               *sev_es_vm_no_vmsa;
-> +       int ret;
-> +
-> +       sev_vm = sev_vm_create(/* es= */ false);
-> +       sev_es_vm = sev_vm_create(/* es= */ true);
-> +       vm_no_vcpu = vm_create(VM_MODE_DEFAULT, 0, O_RDWR);
-> +       vm_no_sev = __vm_create();
-> +       sev_es_vm_no_vmsa = vm_create(VM_MODE_DEFAULT, 0, O_RDWR);
-> +       sev_ioctl(sev_es_vm_no_vmsa->fd, KVM_SEV_ES_INIT, NULL);
-> +       vm_vcpu_add(sev_es_vm_no_vmsa, 1);
-> +
-> +
-> +       ret = __sev_migrate_from(sev_vm->fd, sev_es_vm->fd);
-> +       TEST_ASSERT(
-> +               ret == -1 && errno == EINVAL,
-> +               "Should not be able migrate to SEV enabled VM. ret: %d, errno: %d\n",
-> +               ret, errno);
-> +
-> +       ret = __sev_migrate_from(sev_es_vm->fd, sev_vm->fd);
-> +       TEST_ASSERT(
-> +               ret == -1 && errno == EINVAL,
-> +               "Should not be able migrate to SEV-ES enabled VM. ret: %d, errno: %d\n",
-> +               ret, errno);
-> +
-> +       ret = __sev_migrate_from(vm_no_vcpu->fd, sev_es_vm->fd);
-> +       TEST_ASSERT(
-> +               ret == -1 && errno == EINVAL,
-> +               "SEV-ES migrations require same number of vCPUS. ret: %d, errno: %d\n",
-> +               ret, errno);
+> This, however, got me thinking: should we free all-things-nested with
+> free_nested()/nested_vmx_free_vcpu() upon vcpu reset? I can't seem to
+> find us doing that... (I do remember that INIT is blocked in VMX-root
+> mode and nobody else besides kvm_arch_vcpu_create()/
+> kvm_apic_accept_events() seems to call kvm_vcpu_reset()) but maybe we
+> should at least add a WARN_ON() guardian here?
 
-How do we know that this failed because `vm_no_vcpu` has no vCPUs or
-because it's not a SEV-ES VM?
+I think that makes sense.  Maybe use CR0 as a sentinel since it has a non-zero
+RESET value?  E.g. WARN if CR0 is non-zero at RESET.
 
-> +
-> +       ret = __sev_migrate_from(vm_no_vcpu->fd, sev_es_vm_no_vmsa->fd);
-> +       TEST_ASSERT(
-> +               ret == -1 && errno == EINVAL,
-> +               "SEV-ES migrations require UPDATE_VMSA. ret %d, errno: %d\n",
-> +               ret, errno);
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 86539c1686fa..3ac074376821 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -10813,6 +10813,11 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+        unsigned long new_cr0;
+        u32 eax, dummy;
 
-Same question. How do we know why this failed? `sev_es_vm_no_vmsa` did
-not have any vCPUs added. Would it be cleaner to add an additional
-param to `sev_vm_create()` to skip calling UPDATE_VMSA? Then,
-`sev_es_vm_no_vmsa` can be created from `sev_vm_create()` and it's
-obvious to the read that the VMs are identical except for this aspect.
++       /*
++        * <comment about KVM not supporting arbitrary RESET>
++        */
++       WARN_ON_ONCE(!init_event && old_cr0);
++
+        kvm_lapic_reset(vcpu, init_event);
 
-> +
-> +       ret = __sev_migrate_from(vm_no_vcpu->fd, vm_no_sev->fd);
-> +       TEST_ASSERT(ret == -1 && errno == EINVAL,
-> +                   "Migrations require SEV enabled. ret %d, errno: %d\n", ret,
-> +                   errno);
+        vcpu->arch.hflags = 0;
 
-`vm_no_sev` has vCPUs. Therefore, how do we know why this failed --
-(a) differing vCPU counts or (b) no SEV?
+Huh, typing that out made me realize commit 0aa1837533e5 ("KVM: x86: Properly
+reset MMU context at vCPU RESET/INIT") technically introduced a bug.  kvm_vcpu_reset()
+does kvm_read_cr0() and thus reads vmcs.GUEST_CR0 because vcpu->arch.regs_avail is
+(correctly) not stuffed to ALL_ONES until later in kvm_vcpu_reset().  init_vmcs()
+doesn't explicitly zero vmcs.GUEST_CR0 (along with many other guest fields), and
+so VMREAD(GUEST_CR0) is technically consuming garbage.  In practice, it's consuming
+'0' because no known CPU or VMM inverts values in the VMCS, i.e. zero allocating
+the VMCS is functionally equivalent to writing '0' to all fields via VMWRITE.
 
-> +}
-> +
-> +int main(int argc, char *argv[])
-> +{
-> +       test_sev_migrate_from(/* es= */ false);
-> +       test_sev_migrate_from(/* es= */ true);
-> +       test_sev_migrate_locking();
-> +       test_sev_migrate_parameters();
-> +       return 0;
-> +}
-> --
-> 2.33.0.309.g3052b89438-goog
->
+And staring more at kvm_vcpu_reset(), this code is terrifying for INIT
+
+	memset(vcpu->arch.regs, 0, sizeof(vcpu->arch.regs));
+	vcpu->arch.regs_avail = ~0;
+	vcpu->arch.regs_dirty = ~0;
+
+because it means cr0 and cr4 are marked available+dirty without immediately writing
+vcpu->arch.cr0/cr4.  And VMX subtly relies on that, as vmx_set_cr0() grabs CR0.PG
+via kvm_read_cr0_bits(), i.e. zeroing vcpu->arch.cr0 would "break" the INIT flow.
+Ignoring for the moment that CR0.PG is never guest-owned and thus never stale in
+vcpu->arch.cr0, KVM is also technically relying on the earlier kvm_read_cr0() in
+kvm_vcpu_reset() to ensure vcpu->arch.cr0 is fresh.
+
+Stuffing regs_avail technically means vmx_set_rflags() -> vmx_get_rflags() is
+consuming stale data.  It doesn't matter in practice because the old value is
+only used to re-evaluate vmx->emulation_required, which is guaranteed to be up
+refreshed by vmx_set_cr0() and friends.  PDPTRs and EXIT_INFO are in a similar
+boat; KVM shouldn't be reading those fields (CR0.PG=0, not an exit path), but
+marking them dirty without actually updating the cached values is wrong.
+
+There's also one concrete bug: KVM doesn't set vcpu->arch.cr3=0 on RESET/INIT.
+That bug has gone unnoticed because no real word BIOS/kernel is going to rely on
+INIT to set CR3=0.  
+
+I'm strongly leaning towards stuffing regs_avail/dirty in kvm_arch_vcpu_create(),
+and relying on explicit kvm_register_mark_dirty() calls for the 3 or so cases where
+x86 code writes a vcpu->arch register directly.  That would fix the CR0 read bug
+and also prevent subtle bugs from sneaking in.  Adding new EXREGS would be slightly
+more costly, but IMO that's a good thing as would force us to actually think about
+how to handle each register.
+
+E.g. implement this over 2-3 patches:
+
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 114847253e0a..743146ac8307 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -4385,6 +4385,7 @@ static void vmx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+        kvm_set_cr8(vcpu, 0);
+
+        vmx_segment_cache_clear(vmx);
++       kvm_register_mark_available(vcpu, VCPU_EXREG_SEGMENTS);
+
+        seg_setup(VCPU_SREG_CS);
+        vmcs_write16(GUEST_CS_SELECTOR, 0xf000);
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 86539c1686fa..ab907a0b9eeb 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -10656,6 +10656,8 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+        int r;
+
+        vcpu->arch.last_vmentry_cpu = -1;
++       vcpu->arch.regs_avail = ~0;
++       vcpu->arch.regs_dirty = ~0;
+
+        if (!irqchip_in_kernel(vcpu->kvm) || kvm_vcpu_is_reset_bsp(vcpu))
+                vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
+@@ -10874,9 +10876,9 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+                vcpu->arch.xcr0 = XFEATURE_MASK_FP;
+        }
+
++       /* All GPRs except RDX (handled below) are zeroed on RESET/INIT. */
+        memset(vcpu->arch.regs, 0, sizeof(vcpu->arch.regs));
+-       vcpu->arch.regs_avail = ~0;
+-       vcpu->arch.regs_dirty = ~0;
++       kvm_register_mark_dirty(vcpu, VCPU_REGS_RSP);
+
+        /*
+         * Fall back to KVM's default Family/Model/Stepping of 0x600 (P6/Athlon)
+@@ -10897,6 +10899,9 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+        kvm_set_rflags(vcpu, X86_EFLAGS_FIXED);
+        kvm_rip_write(vcpu, 0xfff0);
+
++       vcpu->arch.cr3 = 0;
++       kvm_register_mark_dirty(vcpu, VCPU_EXREG_CR3);
++
+        /*
+         * CR0.CD/NW are set on RESET, preserved on INIT.  Note, some versions
+         * of Intel's SDM list CD/NW as being set on INIT, but they contradict
+
+> Side topic: we don't seem to reset Hyper-V specific MSRs either,
+> probably relying on userspace VMM doing the right thing but this is also
+> not ideal I believe.
+
