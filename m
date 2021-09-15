@@ -2,90 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A062340BC56
-	for <lists+kvm@lfdr.de>; Wed, 15 Sep 2021 01:43:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B451940BCA8
+	for <lists+kvm@lfdr.de>; Wed, 15 Sep 2021 02:29:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235966AbhINXow (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Sep 2021 19:44:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55924 "EHLO
+        id S236149AbhIOAaY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Sep 2021 20:30:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37756 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233774AbhINXou (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Sep 2021 19:44:50 -0400
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB124C061764
-        for <kvm@vger.kernel.org>; Tue, 14 Sep 2021 16:43:30 -0700 (PDT)
-Received: by mail-pl1-x62c.google.com with SMTP id n4so455669plh.9
-        for <kvm@vger.kernel.org>; Tue, 14 Sep 2021 16:43:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=8O+Hy6We6pSl0DNT8xui4/8ZZ/lZgMhSAyPrG/8P2Ww=;
-        b=oBbEAG+7FvjkbqO7CpvRLFUIxM3766nu3aMkROo6iWBNl+TYiwyE3gtvbgifiEov3l
-         2Gq682Im2gXqCtjoMObMjTRSsP+KYH/KoviNQzjlvP/qqw+cFHzSPBfVUzhciitBkEMf
-         QstU8wTvI4+7x9gztxTlEhQv1RUiS4pBfuP+otYpBsQJxscX/Xnh6GT/c3k8aG4KKvBJ
-         9Vag7UGjME5jWsPFG0J4KmhykpaX+b2ydeG/za6E6zL3r8w2ohtyp8MGw++ceNfpPws0
-         OVJYrvSM/1tKBRHoZfvWibTBQOJMZ/t3efk2/xjycZ2Z2uBqAdX546KLbLMwFiyZOolx
-         Ky/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=8O+Hy6We6pSl0DNT8xui4/8ZZ/lZgMhSAyPrG/8P2Ww=;
-        b=ZqP5uOEh7WtBNtoUBfFxEUgPsvWe+2VRzsqjb/RNKTaPQHC9K+7MfW5S3X5HwRJunb
-         T87A2QZ6bT2ojHUSDNtuISRhRJe0xFK60pL1ZC7qKd/jcb7Vyh+gVLXDs3a+lbOPOZ3f
-         ObfzYXuFrJvholVEjCJFg0xiwiIDfLYxlSpdzlcsZNBmSe/h6JoKZxlFInXD6kcwM3UE
-         m3J6KJ8chZLZWO0V/nARkC7AGSV9uIqMlMoFX/W7M+d73L1Swah3DXE3flgdBw4v9pCR
-         lxGfAx9w0rGgeG7iAsd4XgeF6W6mv3ZQ1WHPnFlprh3VvUkg2fQXITBXd0F36zkWDMBM
-         xA1Q==
-X-Gm-Message-State: AOAM530/iCEAmzBPPb3jLq4Ys31UTaW0G2ATZ0P8PHRWLefoAne7lbCH
-        4MfKiBH+vPfY7DBS12S1BxJT3ppLBzhrJQ==
-X-Google-Smtp-Source: ABdhPJyj23XbbLxNyB4sJkNtXn+USgxVzCsmWrwtl0ite0P6RNMul8bZnegi9bZ3G4X1QsMqKyJIFg==
-X-Received: by 2002:a17:90a:f002:: with SMTP id bt2mr4963401pjb.207.1631663010164;
-        Tue, 14 Sep 2021 16:43:30 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id v23sm11084092pff.155.2021.09.14.16.43.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Sep 2021 16:43:29 -0700 (PDT)
-Date:   Tue, 14 Sep 2021 23:43:25 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Peter Gonda <pgonda@google.com>
-Cc:     kvm list <kvm@vger.kernel.org>, Marc Orr <marcorr@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Brijesh Singh <brijesh.singh@amd.com>, stable@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: SEV: Acquire vcpu mutex when updating VMSA
-Message-ID: <YUEznQvx+bycn9Iq@google.com>
-References: <20210914200639.3305617-1-pgonda@google.com>
- <YUEVQDEvLbdJF+sj@google.com>
- <CAMkAt6rSsKuzE__pAodiJR9wFU-B3942+kdkQG-3M+jxhVco2w@mail.gmail.com>
+        with ESMTP id S229991AbhIOAaX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Sep 2021 20:30:23 -0400
+Received: from ozlabs.org (bilbo.ozlabs.org [IPv6:2401:3900:2:1::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53563C061574;
+        Tue, 14 Sep 2021 17:29:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
+        s=201909; t=1631665743;
+        bh=HgCpSqOauKiPM+dBPwX1rVKc5DllbEYyPqTeHP+eUfA=;
+        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+        b=nobrDH5nGZu7v+B+3sYvcmgWwQ6HXMJcFwBQJdDWX9HZxhJmSYRfeLJ5bqM1L8nAT
+         Zv7FEyFybAcOR9q2SSYXqyD/igi9xudle6V5yasFwsCuG7S0oozCaRNikxkvD596/w
+         6l43PVixwL61h3NyNDnNd5sNzqDNGCDn9FEcD1fB6an9gsKEzr5R3Isof7M+Dp+CFm
+         Flkym9C4vSI8DMWcOL/ydbmO/xhA1U449O7gqRfyeoJq9Tl/sPJDKQcCHDPv+s1Rp6
+         4loBfWLosZBa6f9xlvgT7ZD+EwPUzeNUvScHtwtaoHQpWTi57p46qNn2qlhGqy8rED
+         FWCERXkM6X8Sg==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4H8LgJ0MSWz9sVq;
+        Wed, 15 Sep 2021 10:28:59 +1000 (AEST)
+From:   Michael Ellerman <mpe@ellerman.id.au>
+To:     Borislav Petkov <bp@alien8.de>
+Cc:     Tom Lendacky <thomas.lendacky@amd.com>,
+        linux-kernel@vger.kernel.org, x86@kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
+        iommu@lists.linux-foundation.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-graphics-maintainer@vmware.com,
+        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        kexec@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Andi Kleen <ak@linux.intel.com>,
+        Sathyanarayanan Kuppuswamy 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        Tianyu Lan <Tianyu.Lan@microsoft.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>
+Subject: Re: [PATCH v3 4/8] powerpc/pseries/svm: Add a powerpc version of
+ cc_platform_has()
+In-Reply-To: <YUCOTIPPsJJpLO/d@zn.tnic>
+References: <cover.1631141919.git.thomas.lendacky@amd.com>
+ <9d4fc3f8ea7b325aaa1879beab1286876f45d450.1631141919.git.thomas.lendacky@amd.com>
+ <YUCOTIPPsJJpLO/d@zn.tnic>
+Date:   Wed, 15 Sep 2021 10:28:59 +1000
+Message-ID: <87lf3yk7g4.fsf@mpe.ellerman.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAMkAt6rSsKuzE__pAodiJR9wFU-B3942+kdkQG-3M+jxhVco2w@mail.gmail.com>
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 14, 2021, Peter Gonda wrote:
-> That looks reasonable to me. I didn't know if changes headed for LTS
-> should be smaller so I avoided doing this refactor. From:
-> https://www.kernel.org/doc/html/v4.11/process/stable-kernel-rules.html#stable-kernel-rules
-> seems to say less than 100 lines is ideal.
+Borislav Petkov <bp@alien8.de> writes:
+> On Wed, Sep 08, 2021 at 05:58:35PM -0500, Tom Lendacky wrote:
+>> Introduce a powerpc version of the cc_platform_has() function. This will
+>> be used to replace the powerpc mem_encrypt_active() implementation, so
+>> the implementation will initially only support the CC_ATTR_MEM_ENCRYPT
+>> attribute.
+>> 
+>> Cc: Michael Ellerman <mpe@ellerman.id.au>
+>> Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+>> Cc: Paul Mackerras <paulus@samba.org>
+>> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+>> ---
+>>  arch/powerpc/platforms/pseries/Kconfig       |  1 +
+>>  arch/powerpc/platforms/pseries/Makefile      |  2 ++
+>>  arch/powerpc/platforms/pseries/cc_platform.c | 26 ++++++++++++++++++++
+>>  3 files changed, 29 insertions(+)
+>>  create mode 100644 arch/powerpc/platforms/pseries/cc_platform.c
+>
+> Michael,
+>
+> can I get an ACK for the ppc bits to carry them through the tip tree
+> pls?
 
-Most the rules are more like guidelines ;-)  In seriousness, there's a balance to
-be had between minimizing the diff and keeping everything maintainable.  E.g. if
-the fix is kept small and then the upstream code is immediately refactored, any
-future fixes to the refactored code will be harder to backport.  And the actual
-fix would also be poorly tested in upstream since folks would be testing the
-refactored version of the code.
+Yeah.
 
-> I guess this could also be a "theoretical race condition” anyways so maybe
-> not for LTS anyways.
+I don't love it, a new C file and an out-of-line call to then call back
+to a static inline that for most configuration will return false ... but
+whatever :)
 
-If there's doubt, write a test :-)  The "theoretical race condition" thing is to
-discourage people from backporting fixes for ridiculously tiny windows that may
-or may not be exploitable.  This is a giant gaping chasm that userspace can drive
-a car through, e.g. literally "do KVM_RUN at the same time".
+Acked-by: Michael Ellerman <mpe@ellerman.id.au> (powerpc)
+
+
+> Btw, on a related note, cross-compiling this throws the following error here:
+>
+> $ make CROSS_COMPILE=/home/share/src/crosstool/gcc-9.4.0-nolibc/powerpc64-linux/bin/powerpc64-linux- V=1 ARCH=powerpc
+>
+> ...
+>
+> /home/share/src/crosstool/gcc-9.4.0-nolibc/powerpc64-linux/bin/powerpc64-linux-gcc -Wp,-MD,arch/powerpc/boot/.crt0.o.d -D__ASSEMBLY__ -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs -fno-strict-aliasing -O2 -msoft-float -mno-altivec -mno-vsx -pipe -fomit-frame-pointer -fno-builtin -fPIC -nostdinc -include ./include/linux/compiler_attributes.h -I./arch/powerpc/include -I./arch/powerpc/include/generated  -I./include -I./arch/powerpc/include/uapi -I./arch/powerpc/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/compiler-version.h -include ./include/linux/kconfig.h -m32 -isystem /home/share/src/crosstool/gcc-9.4.0-nolibc/powerpc64-linux/bin/../lib/gcc/powerpc64-linux/9.4.0/include -mbig-endian -nostdinc -c -o arch/powerpc/boot/crt0.o arch/powerpc/boot/crt0.S
+> In file included from <command-line>:
+> ././include/linux/compiler_attributes.h:62:5: warning: "__has_attribute" is not defined, evaluates to 0 [-Wundef]
+>    62 | #if __has_attribute(__assume_aligned__)
+>       |     ^~~~~~~~~~~~~~~
+> ././include/linux/compiler_attributes.h:62:20: error: missing binary operator before token "("
+>    62 | #if __has_attribute(__assume_aligned__)
+>       |                    ^
+> ././include/linux/compiler_attributes.h:88:5: warning: "__has_attribute" is not defined, evaluates to 0 [-Wundef]
+>    88 | #if __has_attribute(__copy__)
+>       |     ^~~~~~~~~~~~~~~
+> ...
+>
+> Known issue?
+
+Yeah, fixed in mainline today, thanks for trying to cross compile :)
+
+cheers
