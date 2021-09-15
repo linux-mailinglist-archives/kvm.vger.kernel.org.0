@@ -2,122 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9071140CED1
-	for <lists+kvm@lfdr.de>; Wed, 15 Sep 2021 23:28:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6C6F740CEDA
+	for <lists+kvm@lfdr.de>; Wed, 15 Sep 2021 23:30:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232273AbhIOV3m (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Sep 2021 17:29:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43650 "EHLO
+        id S232258AbhIOVcA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Sep 2021 17:32:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44238 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232481AbhIOV3i (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Sep 2021 17:29:38 -0400
-Received: from mail-io1-xd29.google.com (mail-io1-xd29.google.com [IPv6:2607:f8b0:4864:20::d29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6ABEEC0613D9
-        for <kvm@vger.kernel.org>; Wed, 15 Sep 2021 14:28:18 -0700 (PDT)
-Received: by mail-io1-xd29.google.com with SMTP id n24so5319893ion.10
-        for <kvm@vger.kernel.org>; Wed, 15 Sep 2021 14:28:18 -0700 (PDT)
+        with ESMTP id S231927AbhIOVb6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Sep 2021 17:31:58 -0400
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69B3AC061574
+        for <kvm@vger.kernel.org>; Wed, 15 Sep 2021 14:30:39 -0700 (PDT)
+Received: by mail-pj1-x104a.google.com with SMTP id s9-20020a17090aa10900b001797c5272b4so5075480pjp.7
+        for <kvm@vger.kernel.org>; Wed, 15 Sep 2021 14:30:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linuxfoundation.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=WQkUPnYzyIj6imY2siHAssmMkcSFNpsLGyNs+c8n/bw=;
-        b=JnjBCXkfoljTWoBOUnDg5Vh8CuSHnEFvjPkYN63ahVDLJ75Z55KcQrMVr1Upl7MOOk
-         cpNiNqEZ6l0Ju6k2PLrOYQFjiNSlNki3UjEzt14EaCivli7ZnnGyar9KGDqVb3OxLyQ3
-         LAtbPUVkd08fC23fX077KsNd7hLN52tZZFoIQ=
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=J4eYxZIeQjwgVfStz22W3PI/nvaYP2gIF4yhA0KrQ54=;
+        b=ftWB43/19w6hUBaLXiS9O6PtsYSX0IQsCsVtXbhF+5LRxsBizL2YdGw1HcAIZ/QWk+
+         3IsYPrJgSPzDFpfLDIp2PdwG2naPODnYn9HPWYUL50O7vx8HlmQYpt1NQB28xSxv8eQ9
+         P6IUQk2pP7xLVnuxyEMPdAPjpnK0/xGLTwYxisvdLdmlt+ipOtjF3u/gqkvh7Lugs/gY
+         dOU9WS+SjJ93/HFfRpy8+4R3xVY77T1Mrny0GMcyQ8etMFfBekTNY6l0n0xKpRZ0BAfu
+         UjH6TVakd/2q1tOK+XMtZ/96wOAft/B7YU+vzu6oG1DwY9iwqhdVJDYER9L2ONdYxyn7
+         9uRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=WQkUPnYzyIj6imY2siHAssmMkcSFNpsLGyNs+c8n/bw=;
-        b=5rbvWAw262yfYQNTAx/QpSy+qyr372UQrePigI1FtQ+VaBfD0N/nr/TDsP/RPnhfDE
-         UK0Dc7XMqyQYlBWZGQPNnPfsL3ko9aQzpuPl+KhFhnSFNCDLUZQ+oYPar0BwB1XbhL1D
-         i/F99PI81hVpg2V4N7ZyDOPAymO+xEKVG57KWnPj4hzmyqrSWfvW5Ntk6GO34NYDS7XE
-         6lddotNvf5iwl1ZJ2/JcJV7OcM/LkCEqH6SN1aSKuafNH8DAiElShGIW3A4JnUhsgycR
-         2BRH24ARMOdxa7kRSjczvxPEcsTnG2IOy2S8BRCDLF5F+TTU2xbbD22Gm99h+Ps2xP+j
-         a4Pg==
-X-Gm-Message-State: AOAM532f/A183sqdRnjUsYTvDmEKPee1yfg1ILhXQzcYt1MxBlkG4xYX
-        CODGPIUHQ6VkuTVLWhfx7rOrVA==
-X-Google-Smtp-Source: ABdhPJzjtcPBMtUHKJAWFKiFoS6ecKsz+u8ONbHYrQElJFVMLe6T1I0LuiCyK11t4QYYrKuwNRxzaQ==
-X-Received: by 2002:a05:6638:2109:: with SMTP id n9mr1748840jaj.17.1631741297845;
-        Wed, 15 Sep 2021 14:28:17 -0700 (PDT)
-Received: from shuah-t480s.internal (c-24-9-64-241.hsd1.co.comcast.net. [24.9.64.241])
-        by smtp.gmail.com with ESMTPSA id f2sm622884ioz.14.2021.09.15.14.28.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Sep 2021 14:28:16 -0700 (PDT)
-From:   Shuah Khan <skhan@linuxfoundation.org>
-To:     pbonzini@redhat.com, shuah@kernel.org
-Cc:     Shuah Khan <skhan@linuxfoundation.org>, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 4/4] selftests: kvm: fix get_run_delay() ignoring fscanf() return warn
-Date:   Wed, 15 Sep 2021 15:28:09 -0600
-Message-Id: <b93a1779df180a61e765bb67be7a83600585901c.1631737524.git.skhan@linuxfoundation.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <cover.1631737524.git.skhan@linuxfoundation.org>
-References: <cover.1631737524.git.skhan@linuxfoundation.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=J4eYxZIeQjwgVfStz22W3PI/nvaYP2gIF4yhA0KrQ54=;
+        b=UqPM3jjMn2cAGaqfrxX+ZAmxc5rR/ZS7/x7qu4szdM/a4EAd/hymkt83MEVzLScBwR
+         UO5snEMpkcnhEdMG7o8bDWhVdSC7LCOnLAOofvkxMjtJY3+wQ4t4p1xaRSSf6rnDssBt
+         3YpTCANITkbNxdATpu6CYQWs7A15yRs3L3a+KP+UA1Ob/OeqRcvMUCQWA4pYpVwxTEtQ
+         OCZ5x+1TQvX7UZgTAteMEnY4yrm6iQZK9t8fN2O5oBOKJ/04V0DbNfHizrlZ75gy3j2x
+         CKZG4HzTBt8emH/g8BOLOp8EPZjXa9avBAngIMTc81nYRyi5s5IYSJnjbqVoDmzTvBuu
+         p8Ig==
+X-Gm-Message-State: AOAM533OINqdCA7l1JhfUXP51W1tlGCB3toCqHwd+MLC/ADjfoUI80yz
+        9o0kn5hdqXFEB5sN5koh0d/htl6WDNDncg==
+X-Google-Smtp-Source: ABdhPJxXjgWJjF6uZZXk458HROOMHT1OYABM5hMIOsG8Gg1WMApfVou2NjMsrnYwk5anYSrc85wWTXlUdbd8yQ==
+X-Received: from dmatlack-heavy.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
+ (user=dmatlack job=sendgmr) by 2002:a17:902:bb94:b0:13c:9113:5652 with SMTP
+ id m20-20020a170902bb9400b0013c91135652mr1624934pls.70.1631741438850; Wed, 15
+ Sep 2021 14:30:38 -0700 (PDT)
+Date:   Wed, 15 Sep 2021 21:30:31 +0000
+Message-Id: <20210915213034.1613552-1-dmatlack@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.0.309.g3052b89438-goog
+Subject: [PATCH 0/3] KVM: selftests: Small fixes for dirty_log_perf_test
+From:   David Matlack <dmatlack@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, Andrew Jones <drjones@redhat.com>,
+        Ben Gardon <bgardon@google.com>,
+        Axel Rasmussen <axelrasmussen@google.com>,
+        Yanan Wang <wangyanan55@huawei.com>,
+        David Matlack <dmatlack@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Fix get_run_delay() to check fscanf() return value to get rid of the
-following warning. When fscanf() fails return MIN_RUN_DELAY_NS from
-get_run_delay(). Move MIN_RUN_DELAY_NS from steal_time.c to test_util.h
-so get_run_delay() and steal_time.c can use it.
+This series fixes 2 bugs in dirty_log_perf_test:
+ - Incorrect interleaving of help messages for -s and -x (patch 2)
+ - Buffer overflow when using multiple slots (patch 3)
 
-lib/test_util.c: In function ‘get_run_delay’:
-lib/test_util.c:316:2: warning: ignoring return value of ‘fscanf’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
-  316 |  fscanf(fp, "%ld %ld ", &val[0], &val[1]);
-      |  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Both bugs were introduced by commit 609e6202ea5f ("KVM: selftests:
+Support multiple slots in dirty_log_perf_test").
 
-Signed-off-by: Shuah Khan <skhan@linuxfoundation.org>
----
- tools/testing/selftests/kvm/include/test_util.h | 2 ++
- tools/testing/selftests/kvm/lib/test_util.c     | 4 +++-
- tools/testing/selftests/kvm/steal_time.c        | 1 -
- 3 files changed, 5 insertions(+), 2 deletions(-)
+Patch 1 is a small tangentially related cleanup to use a consistent
+flag for the backing source across all selftests.
 
-diff --git a/tools/testing/selftests/kvm/include/test_util.h b/tools/testing/selftests/kvm/include/test_util.h
-index c7409b9b4e5b..451fed5ce8e7 100644
---- a/tools/testing/selftests/kvm/include/test_util.h
-+++ b/tools/testing/selftests/kvm/include/test_util.h
-@@ -95,6 +95,8 @@ struct vm_mem_backing_src_alias {
- 	uint32_t flag;
- };
- 
-+#define MIN_RUN_DELAY_NS	200000UL
-+
- bool thp_configured(void);
- size_t get_trans_hugepagesz(void);
- size_t get_def_hugetlb_pagesz(void);
-diff --git a/tools/testing/selftests/kvm/lib/test_util.c b/tools/testing/selftests/kvm/lib/test_util.c
-index f80dd38a38b2..a9107bfae402 100644
---- a/tools/testing/selftests/kvm/lib/test_util.c
-+++ b/tools/testing/selftests/kvm/lib/test_util.c
-@@ -313,7 +313,9 @@ long get_run_delay(void)
- 
- 	sprintf(path, "/proc/%ld/schedstat", syscall(SYS_gettid));
- 	fp = fopen(path, "r");
--	fscanf(fp, "%ld %ld ", &val[0], &val[1]);
-+	/* Return MIN_RUN_DELAY_NS upon failure just to be safe */
-+	if (fscanf(fp, "%ld %ld ", &val[0], &val[1]) < 2)
-+		val[1] = MIN_RUN_DELAY_NS;
- 	fclose(fp);
- 
- 	return val[1];
-diff --git a/tools/testing/selftests/kvm/steal_time.c b/tools/testing/selftests/kvm/steal_time.c
-index 51fe95a5c36a..2172d65b85e4 100644
---- a/tools/testing/selftests/kvm/steal_time.c
-+++ b/tools/testing/selftests/kvm/steal_time.c
-@@ -19,7 +19,6 @@
- 
- #define NR_VCPUS		4
- #define ST_GPA_BASE		(1 << 30)
--#define MIN_RUN_DELAY_NS	200000UL
- 
- static void *st_gva[NR_VCPUS];
- static uint64_t guest_stolen_time[NR_VCPUS];
+David Matlack (3):
+  KVM: selftests: Change backing_src flag to -s in demand_paging_test
+  KVM: selftests: Refactor help message for -s backing_src
+  KVM: selftests: Fix dirty bitmap offset calculation
+
+ .../selftests/kvm/access_tracking_perf_test.c |  6 ++---
+ .../selftests/kvm/demand_paging_test.c        | 13 +++++------
+ .../selftests/kvm/dirty_log_perf_test.c       | 23 +++++++++++++------
+ .../testing/selftests/kvm/include/test_util.h |  5 +++-
+ .../selftests/kvm/kvm_page_table_test.c       |  7 ++----
+ tools/testing/selftests/kvm/lib/test_util.c   | 17 ++++++++++----
+ 6 files changed, 43 insertions(+), 28 deletions(-)
+
 -- 
-2.30.2
+2.33.0.309.g3052b89438-goog
 
