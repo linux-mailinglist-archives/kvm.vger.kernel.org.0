@@ -2,128 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D2C1F40DC46
-	for <lists+kvm@lfdr.de>; Thu, 16 Sep 2021 16:03:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2B87340DD7E
+	for <lists+kvm@lfdr.de>; Thu, 16 Sep 2021 17:03:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238063AbhIPOFK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Sep 2021 10:05:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:50506 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235546AbhIPOFJ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 16 Sep 2021 10:05:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1631801028;
+        id S238992AbhIPPET (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Sep 2021 11:04:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56386 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238971AbhIPPEO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Sep 2021 11:04:14 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60AE0C061574;
+        Thu, 16 Sep 2021 08:02:52 -0700 (PDT)
+Received: from zn.tnic (p200300ec2f11c600e73b4cdd38695acb.dip0.t-ipconnect.de [IPv6:2003:ec:2f11:c600:e73b:4cdd:3869:5acb])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 56F431EC0136;
+        Thu, 16 Sep 2021 17:02:46 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1631804566;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=InkSSQy+zkt1/Sq2nJaTJOAqUI+Qk6BMdAVU8hoiD9c=;
-        b=JzpCOuhTM7msh1MensiJ3xLj8cQEmy9n7jp5Ef7WdTgfDLqLmKqE7AkjJYGM+a/FKXvXwR
-        roBEK/b0whzny3FJLJ9OUfPGS6iqUePYo+5nKoTXCumAz/jCRYxKJkF4bgx/P1vR3pMYmu
-        jgqACkIpn9iGeClf44L4cQZ3PZMddT4=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-392-NkTi5dK-N1GA-7ZGArVI9Q-1; Thu, 16 Sep 2021 10:03:46 -0400
-X-MC-Unique: NkTi5dK-N1GA-7ZGArVI9Q-1
-Received: by mail-wr1-f72.google.com with SMTP id z1-20020adfec81000000b0015b085dbde3so2472476wrn.14
-        for <kvm@vger.kernel.org>; Thu, 16 Sep 2021 07:03:46 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:organization
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=InkSSQy+zkt1/Sq2nJaTJOAqUI+Qk6BMdAVU8hoiD9c=;
-        b=lxw266D9uXXCFXQqYTosAMk2OLrZiz8qMNMT39rReguKfqIlZt2olX4UFPbB5iG6CC
-         GJm/cys6eu7EzA4kQFa8brthTCgMQKp5zJeAyt+ufOwFYyjp3Gvgr3zVwtEaFjG2PSbm
-         uF9z5gTDTpNHr6FVOlvADgDjqa+D8cBb828a+5P1DHWLuYV7BUQvro9yWg1dRbjjgb2b
-         QqhZJBrUDObGHs21BJEEMfTNXNEwCcqZZ/QWHYg0tlH8EZifraJWfTQU9KItj4z+09vm
-         tW131jbbb/wOlc0fSA4lk8Jj1m2Lky0mYv937P0eomzVhWpdLK67XfcUeG3tMovne0OD
-         im7w==
-X-Gm-Message-State: AOAM532GrFJwJrrzmK9JCVN2OrnzMDXdJvxgo61XQuU0SNKaRhHCX5hv
-        cAkTR0Hvizv2Wu52NhNJwStMfAUViUNJQ0Rcfu4YpKE02PTF7VhqYsLymxlEGmKszbjhCFKkBDb
-        CPMScJZe4WjEl
-X-Received: by 2002:adf:e74b:: with SMTP id c11mr6371110wrn.101.1631801025691;
-        Thu, 16 Sep 2021 07:03:45 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx/lhk0vbwJSHMlHYygHpizbHLXpjbz403gb1bSwePYyjBwbWX/UNKyVaKVGPdD3tXAKLjHow==
-X-Received: by 2002:adf:e74b:: with SMTP id c11mr6371074wrn.101.1631801025407;
-        Thu, 16 Sep 2021 07:03:45 -0700 (PDT)
-Received: from [192.168.3.132] (p4ff23828.dip0.t-ipconnect.de. [79.242.56.40])
-        by smtp.gmail.com with ESMTPSA id s15sm3612858wrb.22.2021.09.16.07.03.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 16 Sep 2021 07:03:44 -0700 (PDT)
-Subject: Re: [PATCH v4 1/1] s390x: KVM: accept STSI for CPU topology
- information
-To:     Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        borntraeger@de.ibm.com, frankja@linux.ibm.com, cohuck@redhat.com,
-        thuth@redhat.com, imbrenda@linux.ibm.com, hca@linux.ibm.com,
-        gor@linux.ibm.com
-References: <1631799845-24860-1-git-send-email-pmorel@linux.ibm.com>
- <1631799845-24860-2-git-send-email-pmorel@linux.ibm.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-Message-ID: <eef5ed95-3f54-b709-894d-cdf75bc3180b@redhat.com>
-Date:   Thu, 16 Sep 2021 16:03:43 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=Ry9NO0W0dY1PlRpeMUb1ltduv1HjeDhspaE6VFY8fE0=;
+        b=dzihOSpZSIsZh7rL/9DrKrEUKj+fwC3WBoadhJkTSM7ks3hY+DLbUVbUxsNt3sZ013SNbv
+        1uoFXr/UPHLRN/IWfbqSc9ua9o0PdzpF9X5dQXtDeWZUajOJiu0Yx7FrtLENXoeeq5i90A
+        kjm7WIQn/Y72ZtAGCfVPiXsaokbbn6M=
+Date:   Thu, 16 Sep 2021 17:02:40 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     "Kuppuswamy, Sathyanarayanan" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>
+Cc:     Tom Lendacky <thomas.lendacky@amd.com>,
+        linux-kernel@vger.kernel.org, x86@kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
+        iommu@lists.linux-foundation.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-graphics-maintainer@vmware.com,
+        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        kexec@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Andi Kleen <ak@linux.intel.com>,
+        Tianyu Lan <Tianyu.Lan@microsoft.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        Ard Biesheuvel <ardb@kernel.org>, Baoquan He <bhe@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Dave Young <dyoung@redhat.com>,
+        David Airlie <airlied@linux.ie>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+        Maxime Ripard <mripard@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Paul Mackerras <paulus@samba.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Thomas Zimmermann <tzimmermann@suse.de>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v3 0/8] Implement generic cc_platform_has() helper
+ function
+Message-ID: <YUNckGH0+KXdEmqu@zn.tnic>
+References: <cover.1631141919.git.thomas.lendacky@amd.com>
+ <YUIjS6lKEY5AadZx@zn.tnic>
+ <d48e6a17-d2b4-67da-56d1-fc9a61dfe2b8@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <1631799845-24860-2-git-send-email-pmorel@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <d48e6a17-d2b4-67da-56d1-fc9a61dfe2b8@linux.intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
->   struct kvm_vm_stat {
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index 51d1594bd6cd..f3887e13c5db 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -608,6 +608,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->   	case KVM_CAP_S390_PROTECTED:
->   		r = is_prot_virt_host();
->   		break;
-> +	case KVM_CAP_S390_CPU_TOPOLOGY:
-> +		r = test_facility(11);
-> +		break;
->   	default:
->   		r = 0;
->   	}
-> @@ -819,6 +822,19 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap)
->   		icpt_operexc_on_all_vcpus(kvm);
->   		r = 0;
->   		break;
-> +	case KVM_CAP_S390_CPU_TOPOLOGY:
+On Wed, Sep 15, 2021 at 10:26:06AM -0700, Kuppuswamy, Sathyanarayanan wrote:
+> I have a Intel variant patch (please check following patch). But it includes
+> TDX changes as well. Shall I move TDX changes to different patch and just
+> create a separate patch for adding intel_cc_platform_has()?
 
-As given in my example, this should be
+Yes, please, so that I can expedite that stuff separately and so that it
+can go in early in order for future work to be based ontop.
 
-r = -EINVAL;
-mutex_lock(&kvm->lock);
-if (kvm->created_vcpus) {
-	r = -EBUSY;
-} else if (test_facility(11)) {
-...
-}
-
-Similar to how we handle KVM_CAP_S390_VECTOR_REGISTERS.
-
-[...]
-
-> +
-> +	/* PTF needs both host and guest facilities to enable interpretation */
-> +	if (test_kvm_facility(vcpu->kvm, 11) && test_facility(11))
-> +		vcpu->arch.sie_block->ecb |= ECB_PTF;
-
-This should be simplified to
-
-if (test_kvm_facility(vcpu->kvm, 11))
-
-then. (vsie code below is correct)
-
+Thx.
 
 -- 
-Thanks,
+Regards/Gruss,
+    Boris.
 
-David / dhildenb
-
+https://people.kernel.org/tglx/notes-about-netiquette
