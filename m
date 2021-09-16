@@ -2,206 +2,228 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0180F40D2D0
-	for <lists+kvm@lfdr.de>; Thu, 16 Sep 2021 07:13:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 30AC840D3AE
+	for <lists+kvm@lfdr.de>; Thu, 16 Sep 2021 09:19:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234300AbhIPFOw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Sep 2021 01:14:52 -0400
-Received: from smtp-relay-internal-0.canonical.com ([185.125.188.122]:60042
-        "EHLO smtp-relay-internal-0.canonical.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230193AbhIPFOv (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 16 Sep 2021 01:14:51 -0400
-Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com [209.85.214.197])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 5EE983F31C
-        for <kvm@vger.kernel.org>; Thu, 16 Sep 2021 05:13:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-        s=20210705; t=1631769210;
-        bh=hSiD7I+b6Yuq8W+sJ8bufKGiKQgP8tTvc9YDJ5YkefU=;
-        h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-         In-Reply-To:Content-Type;
-        b=Ns7vLkOwDC4CWhDdYloFYk55l8ZGf3Ha/rGHPNmPBm+GzO3eczEVzsSSKj5GaMZpn
-         0I9vURCGKB5oqNVCTJuuVJzAywFKY6asrGcYWp/Xhl+X2oHTDkQO+IRuyYn1zz5mKQ
-         9YSTy/mEfVcAYnGP80uxUrBsgQ0i0i3PSe0XQeO8trA4ONcyQyzqfnEulCQeTIT0fC
-         Gk0nR2g9Jswfwk1FF34EFwBAjbjhK1j5+p56CsbcetFbmje9U1ezuaEbNU+10I2Hlp
-         6xSIbgDJhHwROwPIHT7Fi2F4X1mNB7fkT7nPUoq+ExWAbRNBRAGjIph67Rnzj33sNQ
-         LjZplmLgjaBhQ==
-Received: by mail-pl1-f197.google.com with SMTP id c11-20020a170902724b00b0013ca44249e9so289257pll.10
-        for <kvm@vger.kernel.org>; Wed, 15 Sep 2021 22:13:30 -0700 (PDT)
+        id S234693AbhIPHUo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Sep 2021 03:20:44 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42582 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232254AbhIPHUh (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 16 Sep 2021 03:20:37 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1631776757;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=LGfg0GcIluFSJ92DGpwm8iHnNl5dpXDbW0fpaZHOCJ0=;
+        b=E/v2+Q+OUs6oQClmwbXvw+3pqXNnXz5RuDOIipBbCaGF51k63Nx0ngn8CO8K3ak6cgUWcD
+        lgSxOrP4mC5ItItoeoyfSypbop6AyVkQvP3SUvAzXUOqPwtX8h+2k8ssEleM6hZTZyH2+k
+        W/rBXMpNHwVh+mltupAjpvdTg1SQe+A=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-523-hAHV608KMZqwTE3C71Xvpw-1; Thu, 16 Sep 2021 03:19:15 -0400
+X-MC-Unique: hAHV608KMZqwTE3C71Xvpw-1
+Received: by mail-ed1-f69.google.com with SMTP id y17-20020a50e611000000b003d051004603so4380861edm.8
+        for <kvm@vger.kernel.org>; Thu, 16 Sep 2021 00:19:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=hSiD7I+b6Yuq8W+sJ8bufKGiKQgP8tTvc9YDJ5YkefU=;
-        b=ciRi2O4mVymm6LqcEZu5Yb2jplA78koV1grT4Z5EO23WXYewDEw3/Sf2kmu7WDNQ14
-         aaCoUQgAtSFqvk0AZm4WIJqhJUWrOEBVVkmVmV9rCtMjonqEBPikAWYYyJ34sc8L70gg
-         vCxolg8H3585xdwboIbkub75HdfrChrYGaM023HCW2z+JywjVQNnb1J3k86/RY8Yd/pD
-         arftZ2yk/nn0Gl9U+3S/8zJm8nyEfVfmcPHk0recP2g+QvfC9/F7RyToAsKee0reX1eI
-         4CQAc/dst2l/b9KflYP6aNZ+bYRvijrFv3Bbrb1LH5jN6dVzvBIMjuhSL185R9LMfOgQ
-         HjIQ==
-X-Gm-Message-State: AOAM533QyZcB4la0s5fl69lZHuGH4+WWzvP+1Laf0fiOr3GF1nqleXSF
-        pJqY2SCz8OAW4crYNVZCfCsLv4wRzQR/+w89V9lH28/67fu82IswXBCOUo67WmG8e1YmYxAQC4L
-        LUF49AxhSos6XMGwN5xa1kGsT9xXP5A==
-X-Received: by 2002:a17:903:1208:b0:13a:8c8:8a33 with SMTP id l8-20020a170903120800b0013a08c88a33mr2955896plh.89.1631769208660;
-        Wed, 15 Sep 2021 22:13:28 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzL+9MLr7N9W7Q9KOrVaSyEil3UeLX/dMrujMKOIQ5bZoFKNvaH6rKNCaPbQBEkbICsbNCmXQ==
-X-Received: by 2002:a17:903:1208:b0:13a:8c8:8a33 with SMTP id l8-20020a170903120800b0013a08c88a33mr2955869plh.89.1631769208277;
-        Wed, 15 Sep 2021 22:13:28 -0700 (PDT)
-Received: from [192.168.1.107] (125-237-197-94-fibre.sparkbb.co.nz. [125.237.197.94])
-        by smtp.gmail.com with ESMTPSA id z9sm1443369pfn.22.2021.09.15.22.13.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 15 Sep 2021 22:13:27 -0700 (PDT)
-Subject: Re: [PROBLEM] Frequently get "irq 31: nobody cared" when passing
- through 2x GPUs that share same pci switch via vfio
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     linux-pci@vger.kernel.org, lkml <linux-kernel@vger.kernel.org>,
-        kvm@vger.kernel.org, nathan.langford@xcelesunifiedtechnologies.com
-References: <d4084296-9d36-64ec-8a79-77d82ac6d31c@canonical.com>
- <20210914104301.48270518.alex.williamson@redhat.com>
- <9e8d0e9e-1d94-35e8-be1f-cf66916c24b2@canonical.com>
- <20210915103235.097202d2.alex.williamson@redhat.com>
-From:   Matthew Ruffell <matthew.ruffell@canonical.com>
-Message-ID: <4d9d0366-1769-691f-fcb0-3b14d468e36e@canonical.com>
-Date:   Thu, 16 Sep 2021 17:13:21 +1200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=LGfg0GcIluFSJ92DGpwm8iHnNl5dpXDbW0fpaZHOCJ0=;
+        b=iXyz22osd2ptQdOvmvaaNY2+ARsOKjXTkwYd/SRJWFAx6ys/CV5BFEYMPfrbgZG1Gm
+         VfloHF6twBJsQJJp/pum5HlCuXfZmmokVOlwk9fXIO/Y3fMv5S+fqyX3ffwu6SJpPOB3
+         9ujG8I/ADUvZtK50MD0LkK3DfzOxdIOJ2eBCCMiBx2jwfZp61YmaR3RmhBK5pA2nn0lB
+         ifIeVjjiHMu/pRxh3nGNwo+PeB2iDR5CcJR5rBNFOsCOjnE0/Tl9xtbe4wy6CoFLB4bV
+         0vp9PvFvIRKo5Rm7nLdHDkqJQ7J13raUm1z957Oni1zVIkEWfGdhuvOdDvKXZ6QX3Y0g
+         yavg==
+X-Gm-Message-State: AOAM531JSCGWaxaO/YlgbSz3EfU/eDuvGQF2PSCAXSGiW97C2Pud5PF3
+        VR2anpMEKhetUKVQjZoTKZvoWISvoJ+2ntgSsYdleopfDXGLCgfJYZG9XYixJuTJZU0V5UnXFqw
+        EoldvxWNQrvsY
+X-Received: by 2002:a17:907:75da:: with SMTP id jl26mr4735651ejc.300.1631776754166;
+        Thu, 16 Sep 2021 00:19:14 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzM8a8cQ5bqm/0JB8lYSrx8o4brn0zc/3kIz05qhtVinvsJWf+IE2TSrwxq+ncm0peCSQxHeA==
+X-Received: by 2002:a17:907:75da:: with SMTP id jl26mr4735635ejc.300.1631776753873;
+        Thu, 16 Sep 2021 00:19:13 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id la1sm851403ejc.48.2021.09.16.00.19.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Sep 2021 00:19:13 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Reiji Watanabe <reijiw@google.com>
+Subject: Re: [PATCH 2/3] KVM: VMX: Move RESET emulation to vmx_vcpu_reset()
+In-Reply-To: <YUIunxwjea/wq3gd@google.com>
+References: <20210914230840.3030620-1-seanjc@google.com>
+ <20210914230840.3030620-3-seanjc@google.com>
+ <875yv2167g.fsf@vitty.brq.redhat.com> <YUIunxwjea/wq3gd@google.com>
+Date:   Thu, 16 Sep 2021 09:19:12 +0200
+Message-ID: <87wnnhyolr.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20210915103235.097202d2.alex.williamson@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 16/09/21 4:32 am, Alex Williamson wrote:
-> On Wed, 15 Sep 2021 16:44:38 +1200
-> Matthew Ruffell <matthew.ruffell@canonical.com> wrote:
->> On 15/09/21 4:43 am, Alex Williamson wrote:
->>>
->>> FWIW, I have access to a system with an NVIDIA K1 and M60, both use
->>> this same switch on-card and I've not experienced any issues assigning
->>> all the GPUs to a single VM.  Topo:
->>>
->>>  +-[0000:40]-+-02.0-[42-47]----00.0-[43-47]--+-08.0-[44]----00.0
->>>  |                                           +-09.0-[45]----00.0
->>>  |                                           +-10.0-[46]----00.0
->>>  |                                           \-11.0-[47]----00.0
->>>  \-[0000:00]-+-03.0-[04-07]----00.0-[05-07]--+-08.0-[06]----00.0
->>>                                              \-10.0-[07]----00.0
-> 
-> 
-> I've actually found that the above configuration, assigning all 6 GPUs
-> to a VM reproduces this pretty readily by simply rebooting the VM.  In
-> my case, I don't have the panic-on-warn/oops that must be set on your
-> kernel, so the result is far more benign, the IRQ gets masked until
-> it's re-registered.
-> 
-> The fact that my upstream ports are using MSI seems irrelevant.
+Sean Christopherson <seanjc@google.com> writes:
 
-Hi Alex,
+> On Wed, Sep 15, 2021, Vitaly Kuznetsov wrote:
+>> Sean Christopherson <seanjc@google.com> writes:
+>> > +static void __vmx_vcpu_reset(struct kvm_vcpu *vcpu)
+>> > +{
+>> > +	struct vcpu_vmx *vmx = to_vmx(vcpu);
+>> > +
+>> > +	init_vmcs(vmx);
+>> > +
+>> > +	if (nested)
+>> > +		memcpy(&vmx->nested.msrs, &vmcs_config.nested, sizeof(vmx->nested.msrs));
+>> > +
+>> > +	vcpu_setup_sgx_lepubkeyhash(vcpu);
+>> > +
+>> > +	vmx->nested.posted_intr_nv = -1;
+>> > +	vmx->nested.current_vmptr = -1ull;
+>> > +	vmx->nested.hv_evmcs_vmptr = EVMPTR_INVALID;
+>> 
+>> What would happen in (hypothetical) case when enlightened VMCS is
+>> currently in use? If we zap 'hv_evmcs_vmptr' here, the consequent
+>> nested_release_evmcs() (called from
+>> nested_vmx_handle_enlightened_vmptrld(), for example) will not do 
+>> kvm_vcpu_unmap() while it should.
+>
+> The short answer is that there's a lot of stuff that needs to be addressed before
+> KVM can expose a RESET ioctl().  My goal with these patches is to carve out the
+> stubs and move the few bits of RESET emulation into the "stubs".  This is the same
+> answer for the MSR question/comment at the end.
+>
+>> This, however, got me thinking: should we free all-things-nested with
+>> free_nested()/nested_vmx_free_vcpu() upon vcpu reset? I can't seem to
+>> find us doing that... (I do remember that INIT is blocked in VMX-root
+>> mode and nobody else besides kvm_arch_vcpu_create()/
+>> kvm_apic_accept_events() seems to call kvm_vcpu_reset()) but maybe we
+>> should at least add a WARN_ON() guardian here?
+>
+> I think that makes sense.  Maybe use CR0 as a sentinel since it has a non-zero
+> RESET value?  E.g. WARN if CR0 is non-zero at RESET.
+>
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 86539c1686fa..3ac074376821 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -10813,6 +10813,11 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+>         unsigned long new_cr0;
+>         u32 eax, dummy;
+>
+> +       /*
+> +        * <comment about KVM not supporting arbitrary RESET>
+> +        */
+> +       WARN_ON_ONCE(!init_event && old_cr0);
+> +
+>         kvm_lapic_reset(vcpu, init_event);
+>
+>         vcpu->arch.hflags = 0;
+>
 
+Should work (assuming nothing in VMX would want to call vmx_vcpu_reset()/
+__vmx_vcpu_reset() directly).
 
+> Huh, typing that out made me realize commit 0aa1837533e5 ("KVM: x86: Properly
+> reset MMU context at vCPU RESET/INIT") technically introduced a bug.  kvm_vcpu_reset()
+> does kvm_read_cr0() and thus reads vmcs.GUEST_CR0 because vcpu->arch.regs_avail is
+> (correctly) not stuffed to ALL_ONES until later in kvm_vcpu_reset().  init_vmcs()
+> doesn't explicitly zero vmcs.GUEST_CR0 (along with many other guest fields), and
+> so VMREAD(GUEST_CR0) is technically consuming garbage.  In practice, it's consuming
+> '0' because no known CPU or VMM inverts values in the VMCS, i.e. zero allocating
+> the VMCS is functionally equivalent to writing '0' to all fields via VMWRITE.
+>
+> And staring more at kvm_vcpu_reset(), this code is terrifying for INIT
+>
+> 	memset(vcpu->arch.regs, 0, sizeof(vcpu->arch.regs));
+> 	vcpu->arch.regs_avail = ~0;
+> 	vcpu->arch.regs_dirty = ~0;
+>
+> because it means cr0 and cr4 are marked available+dirty without immediately writing
+> vcpu->arch.cr0/cr4.  And VMX subtly relies on that, as vmx_set_cr0() grabs CR0.PG
+> via kvm_read_cr0_bits(), i.e. zeroing vcpu->arch.cr0 would "break" the INIT flow.
+> Ignoring for the moment that CR0.PG is never guest-owned and thus never stale in
+> vcpu->arch.cr0, KVM is also technically relying on the earlier kvm_read_cr0() in
+> kvm_vcpu_reset() to ensure vcpu->arch.cr0 is fresh.
+>
+> Stuffing regs_avail technically means vmx_set_rflags() -> vmx_get_rflags() is
+> consuming stale data.  It doesn't matter in practice because the old value is
+> only used to re-evaluate vmx->emulation_required, which is guaranteed to be up
+> refreshed by vmx_set_cr0() and friends.  PDPTRs and EXIT_INFO are in a similar
+> boat; KVM shouldn't be reading those fields (CR0.PG=0, not an exit path), but
+> marking them dirty without actually updating the cached values is wrong.
+>
+> There's also one concrete bug: KVM doesn't set vcpu->arch.cr3=0 on RESET/INIT.
+> That bug has gone unnoticed because no real word BIOS/kernel is going to rely on
+> INIT to set CR3=0.  
+>
+> I'm strongly leaning towards stuffing regs_avail/dirty in kvm_arch_vcpu_create(),
+> and relying on explicit kvm_register_mark_dirty() calls for the 3 or so cases where
+> x86 code writes a vcpu->arch register directly.  That would fix the CR0 read bug
+> and also prevent subtle bugs from sneaking in.  Adding new EXREGS would be slightly
+> more costly, but IMO that's a good thing as would force us to actually think about
+> how to handle each register.
+>
+> E.g. implement this over 2-3 patches:
+>
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 114847253e0a..743146ac8307 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -4385,6 +4385,7 @@ static void vmx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+>         kvm_set_cr8(vcpu, 0);
+>
+>         vmx_segment_cache_clear(vmx);
+> +       kvm_register_mark_available(vcpu, VCPU_EXREG_SEGMENTS);
+>
+>         seg_setup(VCPU_SREG_CS);
+>         vmcs_write16(GUEST_CS_SELECTOR, 0xf000);
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 86539c1686fa..ab907a0b9eeb 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -10656,6 +10656,8 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+>         int r;
+>
+>         vcpu->arch.last_vmentry_cpu = -1;
+> +       vcpu->arch.regs_avail = ~0;
+> +       vcpu->arch.regs_dirty = ~0;
+>
+>         if (!irqchip_in_kernel(vcpu->kvm) || kvm_vcpu_is_reset_bsp(vcpu))
+>                 vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
+> @@ -10874,9 +10876,9 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+>                 vcpu->arch.xcr0 = XFEATURE_MASK_FP;
+>         }
+>
+> +       /* All GPRs except RDX (handled below) are zeroed on RESET/INIT. */
+>         memset(vcpu->arch.regs, 0, sizeof(vcpu->arch.regs));
+> -       vcpu->arch.regs_avail = ~0;
+> -       vcpu->arch.regs_dirty = ~0;
+> +       kvm_register_mark_dirty(vcpu, VCPU_REGS_RSP);
+>
+>         /*
+>          * Fall back to KVM's default Family/Model/Stepping of 0x600 (P6/Athlon)
+> @@ -10897,6 +10899,9 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+>         kvm_set_rflags(vcpu, X86_EFLAGS_FIXED);
+>         kvm_rip_write(vcpu, 0xfff0);
+>
+> +       vcpu->arch.cr3 = 0;
+> +       kvm_register_mark_dirty(vcpu, VCPU_EXREG_CR3);
+> +
+>         /*
+>          * CR0.CD/NW are set on RESET, preserved on INIT.  Note, some versions
+>          * of Intel's SDM list CD/NW as being set on INIT, but they contradict
+>
 
-It is good news that you can reproduce an interrupt storm locally. Did a single
+A selftest for vCPU create/reset would be really helpful. I can even
+volunteer to [eventually] write one :-)
 
-reboot trigger the storm, or did you have to loop the VM a few times?
+-- 
+Vitaly
 
-
-
-On our system, if we don't have panic-on-warn/oops set, the system will
-
-eventually grind to a halt and lock up, so we try to reset earlier on the first
-
-oops, but we still get stuck in the crashkernel copying the IR tables from dmar.
-
-> 
-> Adding debugging to the vfio-pci interrupt handler, it's correctly
-> deferring the interrupt as the GPU device is not identifying itself as
-> the source of the interrupt via the status register.  In fact, setting
-> the disable INTx bit in the GPU command register while the interrupt
-> storm occurs does not stop the interrupts.
-> 
-
-Interesting. So the source of the interrupts could be from the PEX switch
-
-itself?
-
-
-
-We did a run with DisIntx+ set on the PEX switches, but it didn't make any
-
-difference. Serial log showing DisIntx+ and full dmesg below:
-
-
-
-https://paste.ubuntu.com/p/n3XshCxPT8/
-
-> The interrupt storm does seem to be related to the bus resets, but I
-> can't figure out yet how multiple devices per switch factors into the
-> issue.  Serializing all bus resets via a mutex doesn't seem to change
-> the behavior.
-
-Very interesting indeed.
-
-> I'm still investigating, but if anyone knows how to get access to the
-> Broadcom datasheet or errata for this switch, please let me know.
-
-I have tried reaching out to Broadcom asking for the datasheet and errata, but
-
-I am unsure if they will get back to me.
-
-
-
-They list the errata as publicly available on their website, in the 
-
-Documentation > errata tab.
-
-https://www.broadcom.com/products/pcie-switches-bridges/pcie-switches/pex8749#documentation
-
-
-
-The file "PEX 8749/48/47/33/32/25/24/23/17/16/13/12 Errata" seems to be missing
-
-though.
-
-https://docs.broadcom.com/docs/PEX8749-48-47-33-32-25-24-23-17-16-13-12%20Errata-and-Cautions
-
-
-
-An Intel document talks about the errata for the PEX 8749:
-
-https://www.intel.com/content/dam/www/programmable/us/en/pdfs/literature/rn/rn-ias-n3000-n.pdf
-
-It links to the following URL, also missing.
-
-https://docs.broadcom.com/docs/pub-005018
-
-
-
-I did however find an older errata document at:
-
-
-
-PEX 87xx Errata Version 1.14, September 25, 2015
-
-https://docs.broadcom.com/doc/pub-005017
-
-
-
-I will keep trying, and I will let you know if we manage to come across any
-
-documents.
-
-
-
-Thank you for your efforts.
-
-Matthew
-
-> Thanks,
-> Alex
-> 
