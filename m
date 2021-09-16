@@ -2,345 +2,191 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1370440DB92
-	for <lists+kvm@lfdr.de>; Thu, 16 Sep 2021 15:44:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 25BF740DBF6
+	for <lists+kvm@lfdr.de>; Thu, 16 Sep 2021 15:58:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240347AbhIPNpf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Sep 2021 09:45:35 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36004 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S240250AbhIPNpe (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 16 Sep 2021 09:45:34 -0400
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.0.43) with SMTP id 18GBa6Cg002000;
-        Thu, 16 Sep 2021 09:44:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references; s=pp1;
- bh=kZVRZLAPxzcyjQLHqtwgjfY3uYB0sodKgSkQOztW3RY=;
- b=RKQLnamiocZvRJtXmGmUdt2zZNpyPUQgwyxWH+Zwc3g4rIlfo8VrNh6nnv2wWaczhzXl
- 7UQq9PHKUUw750ymyEMCzRRuIPzF2B+0/MPdbx3FpITb14+q1LseAUNs/Xt6Fw0AG2wX
- xiRhVMJAYnyaLi70n9OfOENXzE4c9KoLPiaaDJreX948bu9mqxA81RyIxwJGFtT6Wd46
- e1EZMxqqO+ODGcjQh1dQCB9POyvSjWBSQjeTldDrQ+9aJ4oB+jiVM3Uw2FE/Q9zVVmvG
- mTVNU5iWY86UuvxfGZHbVftweGFliUL6mk/D6850PwYUyzf4NJY/wc1Pls9ydISjUo0h UA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3b417ngx1g-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 16 Sep 2021 09:44:13 -0400
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 18GCxCKZ008909;
-        Thu, 16 Sep 2021 09:44:12 -0400
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3b417ngx16-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 16 Sep 2021 09:44:12 -0400
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 18GDhunL016358;
-        Thu, 16 Sep 2021 13:44:10 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma04fra.de.ibm.com with ESMTP id 3b0m3ahcqe-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 16 Sep 2021 13:44:10 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 18GDi7Un49807766
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 16 Sep 2021 13:44:07 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6935011C066;
-        Thu, 16 Sep 2021 13:44:07 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DBF4B11C05E;
-        Thu, 16 Sep 2021 13:44:06 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.190.206])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 16 Sep 2021 13:44:06 +0000 (GMT)
-From:   Pierre Morel <pmorel@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        borntraeger@de.ibm.com, frankja@linux.ibm.com, cohuck@redhat.com,
-        david@redhat.com, thuth@redhat.com, imbrenda@linux.ibm.com,
-        hca@linux.ibm.com, gor@linux.ibm.com, pmorel@linux.ibm.com
-Subject: [PATCH v4 1/1] s390x: KVM: accept STSI for CPU topology information
-Date:   Thu, 16 Sep 2021 15:44:05 +0200
-Message-Id: <1631799845-24860-2-git-send-email-pmorel@linux.ibm.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1631799845-24860-1-git-send-email-pmorel@linux.ibm.com>
-References: <1631799845-24860-1-git-send-email-pmorel@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: W8Zt0vhfjlinFrB7575FuhbPeeGB2dw3
-X-Proofpoint-GUID: XXcYIA7Ud7tv4GyOT4SnuJT2qYZ-jyCK
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.182.1,Aquarius:18.0.687,Hydra:6.0.235,FMLib:17.0.607.475
- definitions=2020-10-13_15,2020-10-13_02,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 bulkscore=0
- mlxscore=0 clxscore=1011 mlxlogscore=999 priorityscore=1501 phishscore=0
- spamscore=0 suspectscore=0 lowpriorityscore=0 adultscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2109030001
- definitions=main-2109160070
+        id S236328AbhIPN76 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Sep 2021 09:59:58 -0400
+Received: from mail-mw2nam12on2042.outbound.protection.outlook.com ([40.107.244.42]:6465
+        "EHLO NAM12-MW2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S232753AbhIPN75 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Sep 2021 09:59:57 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=UpV/gnKDcobGB6GrvxVl3b62wc9RLB0vArNDaQR00S3mvPDnxtEz6IG8yrIubrMVtiVS8aJNEs91KeLG78b3MJf/FCMJbedV7YBq/A+UZTF1/0Ty69IzhSAjSk/wEw5n4s5b6hdexrDdi6uurKCJxCVU/OtW8XePyX0gEjDr1AMnb5QaizTODyRE2muBavvHYb2PWuP6e0DS+oxYATHNJJywIlWFeT2h2EtCj4y/EpMolyKDqWPmzDSpLP061KoXjAGbLq38IqltJvaGQLiuqOAj01/Q3AvN79/UrjRg8U6NVYeqOEgnU29yS6XOll25ssQt7awP1CKT9vVjEFlWLA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
+ bh=jOKj1pXxm6TK3BhA4iaZ/DrpQRZk2NTT4QSu5qigxDA=;
+ b=BzUXhx/lTCapAaO5gbe7lWw+sRdINGtkdNHazjqANWrzSHW8kLO0Tqbm8ewhcJZqU1G8Qsj7w5IEhGf+l86Q45derG5Ww+EC2vBuMxj4GQsD+alYROZyTeh3BE3XNR2PVzjnGYmPYqg0SoNm6jyR6aIk4hulZea++L1QmZSdRuMakQCpS5YABJ5L3eXg9tOW1X41xDWlyaSvaE2+ZWCKkOYstJSCq2hfpvMaXygpChlfgqjv6FOJcoOkkRUhjVv3rQh6df5YxgrmLt1tbU5DjTU7hZCPCgD02w/poMAtjnPPPr5mCdchOKHffGpzuzHUDmFiPCue7/TlEMz5Cc6sZA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=jOKj1pXxm6TK3BhA4iaZ/DrpQRZk2NTT4QSu5qigxDA=;
+ b=fs0RGJzhLOPiiIt/UkxwkVMd8yUggzlBDCvuTPdv5JlKhKC1mCDVKWkbuyg8QSEnYrktcy3oKrKfdmgjBsT9xw9O89R3XXb18OA9BhIOZfSxu6zLJ+K/A3IZYNnatE0cZpdE8ovzW21WzTErPEfUbxy62os5O35W8bd8HJ7W6uyWXzSx+3oHKHodO5qhjGzZU1Q6pj9OmJ8enuZrg8coy7VlU82gYov82f2eZLhGqydkV38tXDIidrlIt++e1iBpT4ohI39+Ehwo0GRhLY6tVOAFjbsuYud9xV3MG7ANyN2Gz3A8H+rpciPstfPcWxnf1IMeohEvLD01y7sceHRyoQ==
+Authentication-Results: huawei.com; dkim=none (message not signed)
+ header.d=none;huawei.com; dmarc=none action=none header.from=nvidia.com;
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
+ by BL1PR12MB5361.namprd12.prod.outlook.com (2603:10b6:208:31f::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4523.14; Thu, 16 Sep
+ 2021 13:58:35 +0000
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::e8af:232:915e:2f95]) by BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::e8af:232:915e:2f95%8]) with mapi id 15.20.4523.016; Thu, 16 Sep 2021
+ 13:58:35 +0000
+Date:   Thu, 16 Sep 2021 10:58:33 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "mgurtovoy@nvidia.com" <mgurtovoy@nvidia.com>,
+        liulongfang <liulongfang@huawei.com>,
+        "Zengtao (B)" <prime.zeng@hisilicon.com>,
+        Jonathan Cameron <jonathan.cameron@huawei.com>,
+        "Wangzhou (B)" <wangzhou1@hisilicon.com>
+Subject: Re: [PATCH v3 6/6] hisi_acc_vfio_pci: Add support for VFIO live
+ migration
+Message-ID: <20210916135833.GB327412@nvidia.com>
+References: <20210915095037.1149-1-shameerali.kolothum.thodi@huawei.com>
+ <20210915095037.1149-7-shameerali.kolothum.thodi@huawei.com>
+ <20210915130742.GJ4065468@nvidia.com>
+ <fe5d6659e28244da82b7028b403e11ae@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <fe5d6659e28244da82b7028b403e11ae@huawei.com>
+X-ClientProxiedBy: YT1PR01CA0139.CANPRD01.PROD.OUTLOOK.COM
+ (2603:10b6:b01:2f::18) To BL0PR12MB5506.namprd12.prod.outlook.com
+ (2603:10b6:208:1cb::22)
+MIME-Version: 1.0
+Received: from mlx.ziepe.ca (206.223.160.26) by YT1PR01CA0139.CANPRD01.PROD.OUTLOOK.COM (2603:10b6:b01:2f::18) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4523.14 via Frontend Transport; Thu, 16 Sep 2021 13:58:34 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1mQruL-001NeO-Ej; Thu, 16 Sep 2021 10:58:33 -0300
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 6f2d7184-86cb-4da4-0d2a-08d9791a1334
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5361:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <BL1PR12MB536143A01A30887F6D272EA4C2DC9@BL1PR12MB5361.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: ruwKQwpkmo6itMkvqbUVrqp2lURTj0W2UvwN0Y4bY7gmwsvf5vGnYf5D7MKT/SO4eIfX0F3OF0+hxFhMgxcwPOA4AxKorTR1BweqlcKLQr12g9brtI6vaydt0R7Dx4u0LHd08TaxuurqWeBwXcbY/RIVobPvhnMTcUy99ZCsd8jGtRUlOiKnkPkDKzj0HUmMBRKirwWl9VqJsZ5qGhareXsiCxZpZOzh5BGIJHPsfe26aoFdN54BIeLw/ybngPBPPvUeOmxvvm0O/+yGcBPPawb17CuvA3CvJnnQtVD0Sy9cVn5AQ5Ct82lRPmWNbiFeYpevYrdXP7AypzItVtGhAOiRjORp+y16bffUi8DsMtOTkdikjZ5L9uN3EjgRCOG7EegiHrp613nhqueVG2ZAP56mK+l8EkpiVHWZv56/VbrSoDt6JVOXZuA6oyZJgqKfKFO7Pmi9ih6HSVUN3I38NfEGc3FW1sw0l4CmOfp1J1wkshuSVlHNuR0XUZOH/7PWfJvswPD9rOcc/6JPBvPEq+1qYwr9TNSKvUAR/x5LAPJGy5kDjVMJxAgaUQ2Kwhbm2hmRcZUUeguBSTFOK08OKq3DkYzn+DqyitC33PTSHndHnC+9boyqahqqySWOUNlAJiid4s7zCB9PWpA+DNuzEN6o6UuYwcwGhONZcyftERc2hpaEj5Cab9Q7CShAocWW
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(33656002)(5660300002)(508600001)(9786002)(4326008)(83380400001)(6916009)(8936002)(53546011)(86362001)(66946007)(26005)(1076003)(186003)(54906003)(426003)(2616005)(66556008)(316002)(66476007)(38100700002)(8676002)(36756003)(2906002)(9746002)(27376004);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?c3RvSHlTREllWlJWQzVmSGRGQTlQbmV3RUI5VWpGZUUzZnBRSzg0S3FpM0JU?=
+ =?utf-8?B?NWlNYlByMkNVaUZ4bXZtSFN3WlV4MVFrcFFhMk9BUW4yR0Zma2NzRnEzUFVT?=
+ =?utf-8?B?aTF6RDl5NC94ZHFUV2xhZXdpUDhuOWZoMC84Z2NmcU83R09PMDRUeVEwd3dX?=
+ =?utf-8?B?SHR1azVTQjlBT0VJUWVaYlVRa1B2OFMraE5yR3VuMlM5OFVoN1NwSUpWVk5L?=
+ =?utf-8?B?Qm5wOVkrUzZMNGJvQjdVSVNOQmV5N1lUSHoyUUE2L3VDc3I2eXlSTWlXU2x1?=
+ =?utf-8?B?Z0RGd0FQU2ZuVTRTdmRuZDl2V2pQWkJvT3FVZmtnQjhLSVA3SVBXM2M0OHNK?=
+ =?utf-8?B?d2N1YkdOZzJFWGFhRTQwVFc0NnZSQXQxblFSUFkwZUxCVzRPVWRXTy9sc2Jm?=
+ =?utf-8?B?VnErQnc1UnlxWWJUcElzZzVaVVB2OFFPcXQ0aHE0M1hMbDNkZEhTOVVHMU15?=
+ =?utf-8?B?ZzhiVlNOb3ZEdTZCOXNESkl1TmZTVGEzOUxPYUEybE9wS3BQdGtxd1dTM1Ja?=
+ =?utf-8?B?R055U3RSOWROR09NSzJlV3Q4Wk1VdkR0T2hnT2V5NGNXeUlVZGZhV0lyTFBF?=
+ =?utf-8?B?VFVDSWtXZThkNzdacTBRSDcwWUV1amgwVjFlZHcwaHdsWHdBdXBNMjNOMTR4?=
+ =?utf-8?B?bFd1d1pkMnRMTTQwUWZmWUJrWmt1TnFnRGJmbkJtcFJyVGZNTHNodnFSWUNE?=
+ =?utf-8?B?T21uc3p1SzM4T2ZoVERnWS9KNkRtNjFMRWNSeTVXaktvMWRpYURXdHJCZi9W?=
+ =?utf-8?B?Q2VUUzZUb0o1djVTM3FiMytEQ1ovNzRiRExtdTJsSTRHd084UWpuaSs3aGgy?=
+ =?utf-8?B?VVd0VlRlOWs0SkRoWHJhdWdyMEF5ZkFIZG9mU210Tk4rQnR2OHNLUnFzaDJ0?=
+ =?utf-8?B?MHZBYThPRlhjZlJYYW9sbmlsaStYSUhJVUtFYVBoenVBL202K0wvQ25RMXFJ?=
+ =?utf-8?B?b1JuTGdtV2VWZDdiMU5jOFVDUU9lQmp1SXVkSFVhSk5BS3hIZ2IrTndwbWUv?=
+ =?utf-8?B?Y0xLR1paa0ErQjZsRGMrOFFod0FoYmRGL08ybnZldEpNaDErcGJZQ2lMc1F4?=
+ =?utf-8?B?VlBXOFMvRG9iSlN0aDIvRDY1UEZOQllLTDBONjRzaU1KVlVSMTN4RnZzSENJ?=
+ =?utf-8?B?YVFsd2pSVnFvVTh4NEhjdk9MM25tVEFxSnBXdm01K3l0M1Fzek5jbWF5QnFy?=
+ =?utf-8?B?OGo2Nk51N2I5elBrVmVhNk5xTTB2WlFUQ0RicWtmeXUzdFg5MENDMEhQZVY3?=
+ =?utf-8?B?YXU1Qyt0U01oMCtCY3c3TTI1OGxrczNZcXNUTHhjWUhkUzhxSXFnN1gycktL?=
+ =?utf-8?B?emdGa2hxQzVzTDFNNWRiREhqZGNIU3REdExMbzVuYVVrYzdhY253cGhadDBI?=
+ =?utf-8?B?SndrYUNsUFpzWlFHRWZQNEZscVRGOFp6MUlscG04MGg3Mnlkb1Z4cFIrTklw?=
+ =?utf-8?B?aFpnVDduQmF6UEFRZlVRcnBzbW9iV2NsT2JydHRvYWc1WnpyU05EUi9KU0RR?=
+ =?utf-8?B?cEtuSUN2a1N4V0gxVUhPRG5YRjFDQ2NhblFuSlFjSFJwamRsUkhFaE1mMjFk?=
+ =?utf-8?B?WXFNL0NhZUplcGowTGFKMnNKczVIcWI1UmcyVi95V2EzaGs0ZE5PWGE0R0lS?=
+ =?utf-8?B?RFh4dnFJK25Xdmo4cXRjNDlyakpaY0QrWXg0WDJCeG5OaWZyVzFCT0ZhMlBo?=
+ =?utf-8?B?bHFRUTZoUjdSVEFmSnhKc0d3VjBZazBIN2tOLzlOUEJMK0lteWFyTzdZeWpL?=
+ =?utf-8?Q?RODLRX45cJ3R3yi20FwGPeFlByjrGcacfW1BAmv?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6f2d7184-86cb-4da4-0d2a-08d9791a1334
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Sep 2021 13:58:34.9338
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: rzrSfNYiMiYxoWo3Dlwwmyawp7qSt9p8xgVLXJ5dKr4Sqgo2duB+VEJbd8ZdO7gL
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5361
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We let the userland hypervisor know if the machine support the CPU
-topology facility using a new KVM capability: KVM_CAP_S390_CPU_TOPOLOGY.
+On Wed, Sep 15, 2021 at 01:28:47PM +0000, Shameerali Kolothum Thodi wrote:
+> 
+> 
+> > From: Jason Gunthorpe [mailto:jgg@nvidia.com]
+> > Sent: 15 September 2021 14:08
+> > To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+> > Cc: kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
+> > linux-crypto@vger.kernel.org; alex.williamson@redhat.com;
+> > mgurtovoy@nvidia.com; Linuxarm <linuxarm@huawei.com>; liulongfang
+> > <liulongfang@huawei.com>; Zengtao (B) <prime.zeng@hisilicon.com>;
+> > Jonathan Cameron <jonathan.cameron@huawei.com>; Wangzhou (B)
+> > <wangzhou1@hisilicon.com>
+> > Subject: Re: [PATCH v3 6/6] hisi_acc_vfio_pci: Add support for VFIO live
+> > migration
+> > 
+> > On Wed, Sep 15, 2021 at 10:50:37AM +0100, Shameer Kolothum wrote:
+> > > +/*
+> > > + * HiSilicon ACC VF dev MMIO space contains both the functional register
+> > > + * space and the migration control register space. We hide the migration
+> > > + * control space from the Guest. But to successfully complete the live
+> > > + * migration, we still need access to the functional MMIO space assigned
+> > > + * to the Guest. To avoid any potential security issues, we need to be
+> > > + * careful not to access this region while the Guest vCPUs are running.
+> > > + *
+> > > + * Hence check the device state before we map the region.
+> > > + */
+> > 
+> > The prior patch prevents mapping this area into the guest at all,
+> > right?
+> 
+> That’s right. It will prevent Guest from mapping this area.
+> 
+> > So why the comment and logic? If the MMIO area isn't mapped then there
+> > is nothing to do, right?
+> > 
+> > The only risk is P2P transactions from devices in the same IOMMU
+> > group, and you might do well to mitigate that by asserting that the
+> > device is in a singleton IOMMU group?
+> 
+> This was added as an extra protection. I will add the singleton check instead.
+> 
+> > > +static int hisi_acc_vfio_pci_init(struct vfio_pci_core_device *vdev)
+> > > +{
+> > > +	struct acc_vf_migration *acc_vf_dev;
+> > > +	struct pci_dev *pdev = vdev->pdev;
+> > > +	struct pci_dev *pf_dev, *vf_dev;
+> > > +	struct hisi_qm *pf_qm;
+> > > +	int vf_id, ret;
+> > > +
+> > > +	pf_dev = pdev->physfn;
+> > > +	vf_dev = pdev;
+> > > +
+> > > +	pf_qm = pci_get_drvdata(pf_dev);
+> > > +	if (!pf_qm) {
+> > > +		pr_err("HiSi ACC qm driver not loaded\n");
+> > > +		return -EINVAL;
+> > > +	}
+> > 
+> > Nope, this is locked wrong and has no lifetime management.
+> 
+> Ok. Holding the device_lock() sufficient here?
 
-The PTF instruction will report a topology change if there is any change
-with a previous STSI_15_1_2 SYSIB.
-Changes inside a STSI_15_1_2 SYSIB occur if CPU bits are set or clear
-inside the CPU Topology List Entry CPU mask field, which happens with
-changes in CPU polarization, dedication, CPU types and adding or
-removing CPUs in a socket.
+You can't hold a hisi_qm pointer with some kind of lifecycle
+management of that pointer. device_lock/etc is necessary to call
+pci_get_drvdata()
 
-The reporting to the guest is done using the Multiprocessor
-Topology-Change-Report (MTCR) bit of the utility entry of the guest's
-SCA which will be cleared during the interpretation of PTF.
-
-To check if the topology has been modified we use a new field of the
-arch vCPU to save the previous real CPU ID at the end of a schedule
-and verify on next schedule that the CPU used is in the same socket.
-
-We assume in this patch:
-- no polarization change: only horizontal polarization is currently
-  used in linux.
-- no CPU Type change: only IFL Type are supported in Linux
-- Dedication: with this patch, only a complete dedicated CPU stack can
-  take benefit of the CPU Topology.
-
-STSI(15.1.x) gives information on the CPU configuration topology.
-Let's accept the interception of STSI with the function code 15 and
-let the userland part of the hypervisor handle it when userland
-support the CPU Topology facility.
-
-Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
----
- Documentation/virt/kvm/api.rst   | 16 ++++++++++
- arch/s390/include/asm/kvm_host.h | 14 ++++++---
- arch/s390/kvm/kvm-s390.c         | 51 +++++++++++++++++++++++++++++++-
- arch/s390/kvm/priv.c             |  7 ++++-
- arch/s390/kvm/vsie.c             |  3 ++
- include/uapi/linux/kvm.h         |  1 +
- 6 files changed, 86 insertions(+), 6 deletions(-)
-
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index dae68e68ca23..8f0248b31963 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -7241,3 +7241,19 @@ The argument to KVM_ENABLE_CAP is also a bitmask, and must be a subset
- of the result of KVM_CHECK_EXTENSION.  KVM will forward to userspace
- the hypercalls whose corresponding bit is in the argument, and return
- ENOSYS for the others.
-+
-+8.17 KVM_CAP_S390_CPU_TOPOLOGY
-+------------------------------
-+
-+:Capability: KVM_CAP_S390_CPU_TOPOLOGY
-+:Architectures: s390
-+:Type: vm
-+
-+This capability indicates that kvm will provide the S390 CPU Topology facility
-+which consist of the interpretation of the PTF instruction for the Function
-+Code 2 along with interception and forwarding of both the PTF instruction
-+with function Codes 0 or 1 and the STSI(15,1,x) instruction to the userland
-+hypervisor.
-+
-+The stfle facility 11, CPU Topology facility, should not be provided to the
-+guest without this capability.
-diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
-index bf1ab0630ec1..e1aaf3d47a46 100644
---- a/arch/s390/include/asm/kvm_host.h
-+++ b/arch/s390/include/asm/kvm_host.h
-@@ -95,15 +95,19 @@ struct bsca_block {
- 	union ipte_control ipte_control;
- 	__u64	reserved[5];
- 	__u64	mcn;
--	__u64	reserved2;
-+#define ESCA_UTILITY_MTCR	0x8000
-+	__u16	utility;
-+	__u8	reserved2[6];
- 	struct bsca_entry cpu[KVM_S390_BSCA_CPU_SLOTS];
- };
- 
- struct esca_block {
- 	union ipte_control ipte_control;
--	__u64   reserved1[7];
-+	__u64   reserved1[6];
-+	__u16	utility;
-+	__u8	reserved2[6];
- 	__u64   mcn[4];
--	__u64   reserved2[20];
-+	__u64   reserved3[20];
- 	struct esca_entry cpu[KVM_S390_ESCA_CPU_SLOTS];
- };
- 
-@@ -228,7 +232,7 @@ struct kvm_s390_sie_block {
- 	__u8	icptcode;		/* 0x0050 */
- 	__u8	icptstatus;		/* 0x0051 */
- 	__u16	ihcpu;			/* 0x0052 */
--	__u8	reserved54;		/* 0x0054 */
-+	__u8	mtcr;			/* 0x0054 */
- #define IICTL_CODE_NONE		 0x00
- #define IICTL_CODE_MCHK		 0x01
- #define IICTL_CODE_EXT		 0x02
-@@ -247,6 +251,7 @@ struct kvm_s390_sie_block {
- #define ECB_SPECI	0x08
- #define ECB_SRSI	0x04
- #define ECB_HOSTPROTINT	0x02
-+#define ECB_PTF		0x01
- 	__u8	ecb;			/* 0x0061 */
- #define ECB2_CMMA	0x80
- #define ECB2_IEP	0x20
-@@ -748,6 +753,7 @@ struct kvm_vcpu_arch {
- 	bool skey_enabled;
- 	struct kvm_s390_pv_vcpu pv;
- 	union diag318_info diag318_info;
-+	int prev_cpu;
- };
- 
- struct kvm_vm_stat {
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index 51d1594bd6cd..f3887e13c5db 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -608,6 +608,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_S390_PROTECTED:
- 		r = is_prot_virt_host();
- 		break;
-+	case KVM_CAP_S390_CPU_TOPOLOGY:
-+		r = test_facility(11);
-+		break;
- 	default:
- 		r = 0;
- 	}
-@@ -819,6 +822,19 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap)
- 		icpt_operexc_on_all_vcpus(kvm);
- 		r = 0;
- 		break;
-+	case KVM_CAP_S390_CPU_TOPOLOGY:
-+		mutex_lock(&kvm->lock);
-+		if (kvm->created_vcpus) {
-+			r = -EBUSY;
-+		} else {
-+			set_kvm_facility(kvm->arch.model.fac_mask, 11);
-+			set_kvm_facility(kvm->arch.model.fac_list, 11);
-+			r = 0;
-+		}
-+		mutex_unlock(&kvm->lock);
-+		VM_EVENT(kvm, 3, "ENABLE: CPU TOPOLOGY %s",
-+			 r ? "(not available)" : "(success)");
-+		break;
- 	default:
- 		r = -EINVAL;
- 		break;
-@@ -3067,18 +3083,44 @@ __u64 kvm_s390_get_cpu_timer(struct kvm_vcpu *vcpu)
- 	return value;
- }
- 
--void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
-+static void kvm_s390_set_mtcr(struct kvm_vcpu *vcpu)
- {
-+	struct esca_block *esca = vcpu->kvm->arch.sca;
- 
-+	if (vcpu->arch.sie_block->ecb & ECB_PTF) {
-+		ipte_lock(vcpu);
-+		WRITE_ONCE(esca->utility, ESCA_UTILITY_MTCR);
-+		ipte_unlock(vcpu);
-+	}
-+}
-+
-+void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
-+{
- 	gmap_enable(vcpu->arch.enabled_gmap);
- 	kvm_s390_set_cpuflags(vcpu, CPUSTAT_RUNNING);
- 	if (vcpu->arch.cputm_enabled && !is_vcpu_idle(vcpu))
- 		__start_cpu_timer_accounting(vcpu);
- 	vcpu->cpu = cpu;
-+
-+	/*
-+	 * With PTF interpretation the guest will be aware of topology
-+	 * change when the Multiprocessor Topology-Change-Report is pending.
-+	 * We check for events modifying the result of STSI_15_2:
-+	 * - A new vCPU has been hotplugged (prev_cpu == -1)
-+	 * - The real CPU backing up the vCPU moved to another socket
-+	 */
-+	if (vcpu->arch.sie_block->ecb & ECB_PTF) {
-+		if (vcpu->arch.prev_cpu == -1 ||
-+		    (topology_physical_package_id(cpu) !=
-+		     topology_physical_package_id(vcpu->arch.prev_cpu)))
-+			kvm_s390_set_mtcr(vcpu);
-+	}
- }
- 
- void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
- {
-+	/* Remember which CPU was backing the vCPU */
-+	vcpu->arch.prev_cpu = vcpu->cpu;
- 	vcpu->cpu = -1;
- 	if (vcpu->arch.cputm_enabled && !is_vcpu_idle(vcpu))
- 		__stop_cpu_timer_accounting(vcpu);
-@@ -3198,6 +3240,13 @@ static int kvm_s390_vcpu_setup(struct kvm_vcpu *vcpu)
- 		vcpu->arch.sie_block->ecb |= ECB_HOSTPROTINT;
- 	if (test_kvm_facility(vcpu->kvm, 9))
- 		vcpu->arch.sie_block->ecb |= ECB_SRSI;
-+
-+	/* PTF needs both host and guest facilities to enable interpretation */
-+	if (test_kvm_facility(vcpu->kvm, 11) && test_facility(11))
-+		vcpu->arch.sie_block->ecb |= ECB_PTF;
-+	/* Set the prev_cpu value to an impossible value to detect a new vcpu */
-+	vcpu->arch.prev_cpu = -1;
-+
- 	if (test_kvm_facility(vcpu->kvm, 73))
- 		vcpu->arch.sie_block->ecb |= ECB_TE;
- 	/* no facility bit, can opt in because we do not need
-diff --git a/arch/s390/kvm/priv.c b/arch/s390/kvm/priv.c
-index 9928f785c677..8581b6881212 100644
---- a/arch/s390/kvm/priv.c
-+++ b/arch/s390/kvm/priv.c
-@@ -856,7 +856,8 @@ static int handle_stsi(struct kvm_vcpu *vcpu)
- 	if (vcpu->arch.sie_block->gpsw.mask & PSW_MASK_PSTATE)
- 		return kvm_s390_inject_program_int(vcpu, PGM_PRIVILEGED_OP);
- 
--	if (fc > 3) {
-+	if ((fc > 3 && fc != 15) ||
-+	    (fc == 15 && !test_kvm_facility(vcpu->kvm, 11))) {
- 		kvm_s390_set_psw_cc(vcpu, 3);
- 		return 0;
- 	}
-@@ -893,6 +894,10 @@ static int handle_stsi(struct kvm_vcpu *vcpu)
- 			goto out_no_data;
- 		handle_stsi_3_2_2(vcpu, (void *) mem);
- 		break;
-+	case 15:
-+		trace_kvm_s390_handle_stsi(vcpu, fc, sel1, sel2, operand2);
-+		insert_stsi_usr_data(vcpu, operand2, ar, fc, sel1, sel2);
-+		return -EREMOTE;
- 	}
- 	if (kvm_s390_pv_cpu_is_protected(vcpu)) {
- 		memcpy((void *)sida_origin(vcpu->arch.sie_block), (void *)mem,
-diff --git a/arch/s390/kvm/vsie.c b/arch/s390/kvm/vsie.c
-index acda4b6fc851..da0397cf2cc7 100644
---- a/arch/s390/kvm/vsie.c
-+++ b/arch/s390/kvm/vsie.c
-@@ -503,6 +503,9 @@ static int shadow_scb(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page)
- 	/* Host-protection-interruption introduced with ESOP */
- 	if (test_kvm_cpu_feat(vcpu->kvm, KVM_S390_VM_CPU_FEAT_ESOP))
- 		scb_s->ecb |= scb_o->ecb & ECB_HOSTPROTINT;
-+	/* CPU Topology */
-+	if (test_kvm_facility(vcpu->kvm, 11))
-+		scb_s->ecb |= scb_o->ecb & ECB_PTF;
- 	/* transactional execution */
- 	if (test_kvm_facility(vcpu->kvm, 73) && wants_tx) {
- 		/* remap the prefix is tx is toggled on */
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index d9e4aabcb31a..081ce0cd44b9 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1112,6 +1112,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_BINARY_STATS_FD 203
- #define KVM_CAP_EXIT_ON_EMULATION_FAILURE 204
- #define KVM_CAP_ARM_MTE 205
-+#define KVM_CAP_S390_CPU_TOPOLOGY 206
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
--- 
-2.25.1
-
+Jason
