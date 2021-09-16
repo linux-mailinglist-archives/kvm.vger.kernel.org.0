@@ -2,130 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E638440D497
-	for <lists+kvm@lfdr.de>; Thu, 16 Sep 2021 10:33:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8E02C40D4A0
+	for <lists+kvm@lfdr.de>; Thu, 16 Sep 2021 10:34:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234998AbhIPIeJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Sep 2021 04:34:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49550 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235120AbhIPIeF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Sep 2021 04:34:05 -0400
-Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B507C061767
-        for <kvm@vger.kernel.org>; Thu, 16 Sep 2021 01:32:45 -0700 (PDT)
-Received: by mail-wr1-x432.google.com with SMTP id s16so1493278wra.10
-        for <kvm@vger.kernel.org>; Thu, 16 Sep 2021 01:32:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dme-org.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=jxlL0lGtv5ZlNrPQbf90760XLEjt/UFew72/NT7P6ZA=;
-        b=TkTWRVF+5Q7Su3IUaesuhgf4CtLDdMSqoQgis6/0kVEgCS2xqDGymVIOELO3gYGYTB
-         e2SxJlu5+fKJqBBEjqHq2o1+9vd+KD8skQfo5Rpb/nlUSzaPqRW8Lei0/HUwgFkSdIAG
-         oEdHGSp1kHWO3MrUUi4vBU+/qkp49b26WEEMww/cNRsoBZ22a929EP/U3gQkvEAyAMqE
-         CB0T6twNdt6LcikTrYASFmN4ztePGAtLJH0SgTbcRyh1EM3v7UecYNhsS/gBe7nt+Ivc
-         ITPu5MHfPqsM96Bt2I2GKNLDo3Nuwq1zv+C3BIJP2RT3pVfAjH3BQUfsAvcLwi0W4Qad
-         faGA==
+        id S235108AbhIPIfz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Sep 2021 04:35:55 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:40929 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235069AbhIPIfy (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 16 Sep 2021 04:35:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1631781273;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=ysgxFh+Uq2Xc4lpxlU3Gi7GGna/jURbkzsCYWw4VARM=;
+        b=fgd6oFW783/t2HkdyLUkl8Lsg6T+BPQ4dAMSjdlPbKb2rRm8aBiY5UiqHPf1g1e2UsxlCT
+        f+ZowyEve8iu+Hcg1F7syAnlj51920tK9NM9A363uGnetsSrUy4ENlBifcb4P7FrjjlwY0
+        PbrjPBj4pE/aQJoEFQW1TKGQUwJrS/4=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-344-MoedIpDbN0aldEBd_UvpaA-1; Thu, 16 Sep 2021 04:34:32 -0400
+X-MC-Unique: MoedIpDbN0aldEBd_UvpaA-1
+Received: by mail-ed1-f69.google.com with SMTP id o23-20020a509b17000000b003d739e2931dso2927887edi.4
+        for <kvm@vger.kernel.org>; Thu, 16 Sep 2021 01:34:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=jxlL0lGtv5ZlNrPQbf90760XLEjt/UFew72/NT7P6ZA=;
-        b=R005tU1+mPJOJM8poLw/YxqBQ7gfQjFBzWPxg3eaUD70DHavwV2sLNUETNuu1p4A71
-         GSygilMmHPwQSjdhAhARy0yUovt1iB5KAI3GSfzDfe5dNxhHGtmcnXInnrZkFztGwEUT
-         PZmAbm7/tjhkKmRKcER8f/Amkyek5bkqGZxQYhfyN8OAa2xy2739eH9ALCNxivhI0hhi
-         Ut2ePSqy37GGRysZu9DBgIcSQhm+RgtQDE29N1pogo/zNt8sT8jwko1Mo7euwAgLf1AE
-         G+gI7tdyN9wCKGrwghYqN8yBxKtKPCE8agHBzA6gowEBSCrH3lnxQoFDWXezgzPoYEvb
-         N2zQ==
-X-Gm-Message-State: AOAM531IT1rMcleZmJ7bs3/mKL1X+Y/A/Kgo7YvrujNuzt7QbUBvhSsX
-        rClst2o8Y3ClobP9u/03di93UKIUYM/Z9ZJcC7Y=
-X-Google-Smtp-Source: ABdhPJyfE8/wyEQRvmpiR7oOPNOL4J2PzWMdBSBvGwpu/s4Fd6Im8ZXwX9obCHi1pvvQC+8rA7nVsw==
-X-Received: by 2002:adf:e384:: with SMTP id e4mr4705046wrm.64.1631781163393;
-        Thu, 16 Sep 2021 01:32:43 -0700 (PDT)
-Received: from disaster-area.hh.sledj.net ([2001:8b0:bb71:7140:64::1])
-        by smtp.gmail.com with ESMTPSA id c135sm6760024wme.6.2021.09.16.01.32.42
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=ysgxFh+Uq2Xc4lpxlU3Gi7GGna/jURbkzsCYWw4VARM=;
+        b=IhtBfbR6Vdaz1Y2Opg0QGF9jWnidH7AtNIR4vjBgrs0b9jWvihqVAl6h7vG4HDwp0d
+         Bgq5hQxNegAN0CD4s5dAcE8QzjIVn3Q5y7gk7Ljapn/qRCXM9cNqHe3YqyD6UZgjR4n7
+         75T78EImpaVLVd6EP3pqBpxaDT4QQ4I0jmxpISM95wI5ppxh/5YDlf5GbfQPcuw/yeVq
+         q62XKtIeJvnbCCcy+B9x3W9gz6Q9Rd5Xf8O650p3edONZZxE0YP/dz1wIBDeNDvKJ84B
+         Rwda1lsEsha4R5lB6BfiDs9cfbL/jhGsgGbo6I97V1+wqYJ0qjGRDZHq3zU1+8XAxRLi
+         vzmg==
+X-Gm-Message-State: AOAM531CI2GVSCPgCb8ud+pxGx9QU0IqoakaC67zq8o1iMFhvH/7Sn0D
+        GyG7qs/MLdCO4mRCSBbbqBslsalzl0zAIymSweXpWg0ptTcjOg0yFFDq6tbq9WFotXss2fKu7pq
+        ufsod3H/TDSX4
+X-Received: by 2002:a50:d84c:: with SMTP id v12mr5084703edj.203.1631781271441;
+        Thu, 16 Sep 2021 01:34:31 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy4/W8Bt0P12BC1fBHHvgQVlm/tm55MGjLwhcze3VUm+n6sGA1LHo1TEnQqUl7eTNVymjGErQ==
+X-Received: by 2002:a50:d84c:: with SMTP id v12mr5084693edj.203.1631781271271;
+        Thu, 16 Sep 2021 01:34:31 -0700 (PDT)
+Received: from gator.home (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
+        by smtp.gmail.com with ESMTPSA id t24sm1090758edr.84.2021.09.16.01.34.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Sep 2021 01:32:43 -0700 (PDT)
-From:   David Edmondson <dme@dme.org>
-X-Google-Original-From: David Edmondson <david.edmondson@oracle.com>
-Received: from localhost (disaster-area.hh.sledj.net [local])
-        by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id 6aff296b;
-        Thu, 16 Sep 2021 08:32:39 +0000 (UTC)
-To:     linux-kernel@vger.kernel.org
-Cc:     Wanpeng Li <wanpengli@tencent.com>, Joerg Roedel <joro@8bytes.org>,
-        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Jim Mattson <jmattson@google.com>,
-        David Edmondson <david.edmondson@oracle.com>
-Subject: [PATCH v5 4/4] KVM: x86: SGX must obey the KVM_INTERNAL_ERROR_EMULATION protocol
-Date:   Thu, 16 Sep 2021 09:32:39 +0100
-Message-Id: <20210916083239.2168281-5-david.edmondson@oracle.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20210916083239.2168281-1-david.edmondson@oracle.com>
-References: <20210916083239.2168281-1-david.edmondson@oracle.com>
+        Thu, 16 Sep 2021 01:34:30 -0700 (PDT)
+Date:   Thu, 16 Sep 2021 10:34:28 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     David Matlack <dmatlack@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Ben Gardon <bgardon@google.com>,
+        Axel Rasmussen <axelrasmussen@google.com>,
+        Yanan Wang <wangyanan55@huawei.com>
+Subject: Re: [PATCH 1/3] KVM: selftests: Change backing_src flag to -s in
+ demand_paging_test
+Message-ID: <20210916083428.tkocvvhdlugrts7t@gator.home>
+References: <20210915213034.1613552-1-dmatlack@google.com>
+ <20210915213034.1613552-2-dmatlack@google.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210915213034.1613552-2-dmatlack@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When passing the failing address and size out to user space, SGX must
-ensure not to trample on the earlier fields of the emulation_failure
-sub-union of struct kvm_run.
+On Wed, Sep 15, 2021 at 09:30:32PM +0000, David Matlack wrote:
+> Every other KVM selftest uses -s for the backing_src, so switch
+> demand_paging_test to match.
+> 
+> Signed-off-by: David Matlack <dmatlack@google.com>
+> ---
+>  tools/testing/selftests/kvm/demand_paging_test.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
+>
 
-Signed-off-by: David Edmondson <david.edmondson@oracle.com>
-Reviewed-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/vmx/sgx.c | 16 +++++-----------
- 1 file changed, 5 insertions(+), 11 deletions(-)
-
-diff --git a/arch/x86/kvm/vmx/sgx.c b/arch/x86/kvm/vmx/sgx.c
-index 6693ebdc0770..35e7ec91ae86 100644
---- a/arch/x86/kvm/vmx/sgx.c
-+++ b/arch/x86/kvm/vmx/sgx.c
-@@ -53,11 +53,9 @@ static int sgx_get_encls_gva(struct kvm_vcpu *vcpu, unsigned long offset,
- static void sgx_handle_emulation_failure(struct kvm_vcpu *vcpu, u64 addr,
- 					 unsigned int size)
- {
--	vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
--	vcpu->run->internal.suberror = KVM_INTERNAL_ERROR_EMULATION;
--	vcpu->run->internal.ndata = 2;
--	vcpu->run->internal.data[0] = addr;
--	vcpu->run->internal.data[1] = size;
-+	uint64_t data[2] = { addr, size };
-+
-+	__kvm_prepare_emulation_failure_exit(vcpu, data, ARRAY_SIZE(data));
- }
- 
- static int sgx_read_hva(struct kvm_vcpu *vcpu, unsigned long hva, void *data,
-@@ -112,9 +110,7 @@ static int sgx_inject_fault(struct kvm_vcpu *vcpu, gva_t gva, int trapnr)
- 	 * but the error code isn't (yet) plumbed through the ENCLS helpers.
- 	 */
- 	if (trapnr == PF_VECTOR && !boot_cpu_has(X86_FEATURE_SGX2)) {
--		vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
--		vcpu->run->internal.suberror = KVM_INTERNAL_ERROR_EMULATION;
--		vcpu->run->internal.ndata = 0;
-+		kvm_prepare_emulation_failure_exit(vcpu);
- 		return 0;
- 	}
- 
-@@ -155,9 +151,7 @@ static int __handle_encls_ecreate(struct kvm_vcpu *vcpu,
- 	sgx_12_0 = kvm_find_cpuid_entry(vcpu, 0x12, 0);
- 	sgx_12_1 = kvm_find_cpuid_entry(vcpu, 0x12, 1);
- 	if (!sgx_12_0 || !sgx_12_1) {
--		vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
--		vcpu->run->internal.suberror = KVM_INTERNAL_ERROR_EMULATION;
--		vcpu->run->internal.ndata = 0;
-+		kvm_prepare_emulation_failure_exit(vcpu);
- 		return 0;
- 	}
- 
--- 
-2.33.0
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 
