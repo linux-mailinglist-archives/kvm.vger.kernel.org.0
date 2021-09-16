@@ -2,154 +2,172 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 73F1C40D0D5
-	for <lists+kvm@lfdr.de>; Thu, 16 Sep 2021 02:29:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2A37040D120
+	for <lists+kvm@lfdr.de>; Thu, 16 Sep 2021 03:16:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233356AbhIPAar (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Sep 2021 20:30:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56042 "EHLO
+        id S233688AbhIPBRk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Sep 2021 21:17:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38126 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233237AbhIPAar (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Sep 2021 20:30:47 -0400
-Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D64AC061574
-        for <kvm@vger.kernel.org>; Wed, 15 Sep 2021 17:29:27 -0700 (PDT)
-Received: by mail-lf1-x135.google.com with SMTP id m3so9561468lfu.2
-        for <kvm@vger.kernel.org>; Wed, 15 Sep 2021 17:29:27 -0700 (PDT)
+        with ESMTP id S233284AbhIPBRi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Sep 2021 21:17:38 -0400
+Received: from mail-il1-x129.google.com (mail-il1-x129.google.com [IPv6:2607:f8b0:4864:20::129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE9A4C061574
+        for <kvm@vger.kernel.org>; Wed, 15 Sep 2021 18:16:18 -0700 (PDT)
+Received: by mail-il1-x129.google.com with SMTP id q14so5007718ils.5
+        for <kvm@vger.kernel.org>; Wed, 15 Sep 2021 18:16:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=NOfNAXzWn2iNMFgc8Qpag7WikiQmaWSgLADwLsaraKM=;
-        b=RqJG0j4GgjA7iI5CRivFjxgbuCf+nP9u6xFAid3MlHdwlJfMudK0KpCKrxLZ46SBF7
-         rR5Vv3JvutAmBd6dJV4KYYjyILZf1+cNUzjIJX9XLzWwru9Y7HMr9B5A6MaW/DVheSPq
-         wOUccdkk1ReUK5OuUxblX6p/WONbNKE3Bwmohaap8nkKokoiMDW3tJbA/hzOLc/KLKmk
-         MBMQxdhe6TMSweVLXHoPiZEjz3irSeD5CruoOLqnu9htDp8hYnQYwRJI+/xonst3P9hV
-         ZbmvXOL0Ti/meQZXHNE8K+6vZ27OUQsMLhpSabGxzYo+bQ5ofNUd1iPHt526ThdPhxeg
-         iUgw==
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=BLpPuYBBwu6jhlHfdJjEr/EV1Gc0Mpugp36hBO202rY=;
+        b=hOuiFgqepHLEJU0JVNWirieRfpQ++zd4t85VqYPfUx6Vnfd8eG6BIvaRIHMfh4cRuS
+         6itBrYCbYj7kKtG1+MkAD1fmWvhgcWj+c9t1JxJOTW4PqP/93PWMv8Dz8xzVD35N9y7k
+         k+ls3nh9hyYP0Wgzi47E2sw9/xreDIDXXH7F1EGCqmm05ZiRtrx2a4lrqo5fCSnwC0f2
+         0q/swfScp5mHRxvC29Po/62pYPtnO54M+mQSfzpaIYznRe89+CLhXmSlEI5t4SRRrS/F
+         xZvS57Yh5vsWj3Ie3DLwUPRzbyAnpR8sAzvbJS5+t4JHyQe7FP7KlB9O5fotGMYUnyiE
+         LG5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=NOfNAXzWn2iNMFgc8Qpag7WikiQmaWSgLADwLsaraKM=;
-        b=km3eXgxGcKTvTqLecO7Xzu8lkq8yZ9LkuZb3ufoy4fw56oDD6hh6i7Qwl+KL89JykY
-         wLAXqb5iIjvpTeAEY6E7YPlYwUaO8uYmdJyAI+FtDF3jR0PVY+o3z8XKbQzVKHMh/DWZ
-         UCCG8YdVFSY6gbUrj4/ZprJSHATrJejfsNJqdUIVvOJnyL9gNd1kkpUZJdCE7FHRlW+U
-         Lqn6kf0VCdLATx9lW2SPab/qk7Qb+YznNiUWxzHIcHTbDBFjfGJvx4y/jQ1EksZ2IzUP
-         PdNFE7PdVoQzr31NNrx6BGqaReIyt95qaCkY7vcqvOr1yhw+thuD55ssso03hiVvbn0p
-         KvsQ==
-X-Gm-Message-State: AOAM531IilPXs2dEmXKQwYOyKOi9mXCR5HclJ4fuCfhVG3B+7k1Y5L6w
-        TA1ZHhf/7bGOugO8foUdpZO1qATb8+S/9zuNnA4mcUbqU08=
-X-Google-Smtp-Source: ABdhPJyrwCXvXHPsKxmnmZxnhio6nxknVnpzxlDURWvBK+RSSf7n9cThp6ilakysgV6ZySlBFsadYLOS0t0RO1aBjDI=
-X-Received: by 2002:a2e:a4ca:: with SMTP id p10mr2394120ljm.415.1631752165357;
- Wed, 15 Sep 2021 17:29:25 -0700 (PDT)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=BLpPuYBBwu6jhlHfdJjEr/EV1Gc0Mpugp36hBO202rY=;
+        b=NEy9x+5CqOX750tnS/BNZbiuv3t0F2XypUulI4Bx4L5emR+Ycs0GDls6pN0zX9J51K
+         5hoBasYkeDRE6jnRNpw325UNeh3XHc2zMtJZjDlvvLYxKM9GnqgIpRPj3l3tNuDd3hQj
+         kH8OiUDcIbMCOtfzQhRUIUyBatDTff+8GL5L+Pir1UVYXlUGWBHy9v0cltlFLHOYDtFg
+         CfzAjMY3jctutHtS4zsJjrwyW2y/xcEnvW+7/2AVWUjujr1kgkNkjPpG4egzBDmXIAbV
+         Wmkvdp3Vc5nTX0TvRWHXeo89iJuWbEuY2PcigrAnywunHoVGYXphsBVVvWmsnV9hCFII
+         8FrA==
+X-Gm-Message-State: AOAM5302XYspz3Du82t3eCZbehKp2m7qt7SOaG8n8kdQF1JJEFz/QHV3
+        psPsQuNGe7Fk7IKGn6j1XXKhjII71/H6U+Md6VSIBg==
+X-Google-Smtp-Source: ABdhPJwtEj56I6eqqZdp7QARgE4ulencEwVudq7Qz+Pk/x4XkBXCfojyXtUnz182/auTlKOb6M+d1/WiyTs1dTJoMxk=
+X-Received: by 2002:a92:a307:: with SMTP id a7mr2109622ili.308.1631754977880;
+ Wed, 15 Sep 2021 18:16:17 -0700 (PDT)
 MIME-Version: 1.0
-From:   Bill Sherwood <bsherwood218@gmail.com>
-Date:   Wed, 15 Sep 2021 20:29:12 -0400
-Message-ID: <CA+Pe=gchWL+f1xuVCDgJADoTn6gtG58UUKyyRrjc+JrpgjovgQ@mail.gmail.com>
-Subject: Windows guests become unresponsive and display black screen in VNC
-To:     kvm@vger.kernel.org
+References: <cover.1629726117.git.ashish.kalra@amd.com> <6fd25c749205dd0b1eb492c60d41b124760cc6ae.1629726117.git.ashish.kalra@amd.com>
+In-Reply-To: <6fd25c749205dd0b1eb492c60d41b124760cc6ae.1629726117.git.ashish.kalra@amd.com>
+From:   Steve Rutherford <srutherford@google.com>
+Date:   Wed, 15 Sep 2021 18:15:41 -0700
+Message-ID: <CABayD+fnZ+Ho4qoUjB6YfWW+tFGUuftpsVBF3d=-kcU0-CEu0g@mail.gmail.com>
+Subject: Re: [PATCH v6 1/5] x86/kvm: Add AMD SEV specific Hypercall3
+To:     Ashish Kalra <Ashish.Kalra@amd.com>, seanjc@google.com
+Cc:     pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com,
+        hpa@zytor.com, joro@8bytes.org, bp@alien8.de,
+        thomas.lendacky@amd.com, x86@kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, brijesh.singh@amd.com,
+        dovmurik@linux.ibm.com, tobin@linux.ibm.com, jejb@linux.ibm.com,
+        dgilbert@redhat.com
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Host is Ubuntu 20.04 - 5.4.0-26-generic
+On Tue, Aug 24, 2021 at 4:04 AM Ashish Kalra <Ashish.Kalra@amd.com> wrote:
+>
+> From: Brijesh Singh <brijesh.singh@amd.com>
+>
+> KVM hypercall framework relies on alternative framework to patch the
+> VMCALL -> VMMCALL on AMD platform. If a hypercall is made before
+> apply_alternative() is called then it defaults to VMCALL. The approach
+> works fine on non SEV guest. A VMCALL would causes #UD, and hypervisor
+> will be able to decode the instruction and do the right things. But
+> when SEV is active, guest memory is encrypted with guest key and
+> hypervisor will not be able to decode the instruction bytes.
+>
+> To highlight the need to provide this interface, capturing the
+> flow of apply_alternatives() :
+> setup_arch() call init_hypervisor_platform() which detects
+> the hypervisor platform the kernel is running under and then the
+> hypervisor specific initialization code can make early hypercalls.
+> For example, KVM specific initialization in case of SEV will try
+> to mark the "__bss_decrypted" section's encryption state via early
+> page encryption status hypercalls.
+>
+> Now, apply_alternatives() is called much later when setup_arch()
+> calls check_bugs(), so we do need some kind of an early,
+> pre-alternatives hypercall interface. Other cases of pre-alternatives
+> hypercalls include marking per-cpu GHCB pages as decrypted on SEV-ES
+> and per-cpu apf_reason, steal_time and kvm_apic_eoi as decrypted for
+> SEV generally.
+>
+> Add SEV specific hypercall3, it unconditionally uses VMMCALL. The hypercall
+> will be used by the SEV guest to notify encrypted pages to the hypervisor.
+>
+> This kvm_sev_hypercall3() function is abstracted and used as follows :
+> All these early hypercalls are made through early_set_memory_XX() interfaces,
+> which in turn invoke pv_ops (paravirt_ops).
+>
+> This early_set_memory_XX() -> pv_ops.mmu.notify_page_enc_status_changed()
+> is a generic interface and can easily have SEV, TDX and any other
+> future platform specific abstractions added to it.
+>
+> Currently, pv_ops.mmu.notify_page_enc_status_changed() callback is setup to
+> invoke kvm_sev_hypercall3() in case of SEV.
+>
+> Similarly, in case of TDX, pv_ops.mmu.notify_page_enc_status_changed()
+> can be setup to a TDX specific callback.
+>
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Ingo Molnar <mingo@redhat.com>
+> Cc: "H. Peter Anvin" <hpa@zytor.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Joerg Roedel <joro@8bytes.org>
+> Cc: Borislav Petkov <bp@suse.de>
+> Cc: Tom Lendacky <thomas.lendacky@amd.com>
+> Cc: x86@kernel.org
+> Cc: kvm@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Reviewed-by: Steve Rutherford <srutherford@google.com>
+> Reviewed-by: Venu Busireddy <venu.busireddy@oracle.com>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+> ---
+>  arch/x86/include/asm/kvm_para.h | 12 ++++++++++++
+>  1 file changed, 12 insertions(+)
+>
+> diff --git a/arch/x86/include/asm/kvm_para.h b/arch/x86/include/asm/kvm_para.h
+> index 69299878b200..56935ebb1dfe 100644
+> --- a/arch/x86/include/asm/kvm_para.h
+> +++ b/arch/x86/include/asm/kvm_para.h
+> @@ -83,6 +83,18 @@ static inline long kvm_hypercall4(unsigned int nr, unsigned long p1,
+>         return ret;
+>  }
+>
+> +static inline long kvm_sev_hypercall3(unsigned int nr, unsigned long p1,
+> +                                     unsigned long p2, unsigned long p3)
+> +{
+> +       long ret;
+> +
+> +       asm volatile("vmmcall"
+> +                    : "=a"(ret)
+> +                    : "a"(nr), "b"(p1), "c"(p2), "d"(p3)
+> +                    : "memory");
+> +       return ret;
+> +}
+> +
+>  #ifdef CONFIG_KVM_GUEST
+>  void kvmclock_init(void);
+>  void kvmclock_disable(void);
+> --
+> 2.17.1
+>
 
-KVM is 1:4.2-3ubuntu6.17
+Looking at these threads, this patch either:
+1) Needs review/approval from a maintainer that is interested or
+2) Should flip back to using alternative (as suggested by Sean). In
+particular: `ALTERNATIVE("vmmcall", "vmcall",
+ALT_NOT(X86_FEATURE_VMMCALL))`. My understanding is that the advantage
+of this is that (after calling apply alternatives) you get exactly the
+same behavior as before. But before apply alternatives, you get the
+desired flipped behavior. The previous patch changed the behavior
+after apply alternatives in a very slight manner (if feature flags
+were not set, you'd get a different instruction).
 
-Guest OS -- various flavors of Windows 2012 server or greater
+I personally don't have strong feelings on this decision, but this
+decision does need to be made for this patch series to move forward.
 
-Symptom:   Guests will appear to be running fine for some time (hours
-or days), occasionally a perfectly running guest will "lock up" and
-become unresponsive to network, VNC, etc..   We are unable to access
-the VM and the only resort is to destroy the VM - shutdown will not
-tear down the VM.
+I'd also be curious to hear Sean's opinion on this since he was vocal
+about this previously.
 
-Looking at a number of things, we can see the following via trace_pipe
--- nothing else is emitted while in the hung state.
-
- cat /sys/kernel/debug/tracing/trace_pipe | grep -i <pid>
-
-.....
-
- <...>-3441924 [004] .... 1907374.582975: kvm_set_irq: gsi 0 level 1 source 0
-           <...>-3441924 [004] .... 1907374.582977: kvm_pic_set_irq:
-chip 0 pin 0 (edge|masked)
-           <...>-3441924 [004] .... 1907374.582979:
-kvm_apic_accept_irq: apicid 0 vec 209 (Fixed|edge)
-           <...>-3441924 [004] .... 1907374.582981:
-kvm_ioapic_set_irq: pin 2 dst 1 vec 209 (Fixed|logical|edge)
-           <...>-3441924 [004] .... 1907374.582983: kvm_set_irq: gsi 0
-level 0 source 0
-           <...>-3441924 [004] .... 1907374.582984: kvm_pic_set_irq:
-chip 0 pin 0 (edge|masked)
-           <...>-3441924 [004] .... 1907374.582984:
-kvm_ioapic_set_irq: pin 2 dst 1 vec 209 (Fixed|logical|edge)
-           <...>-3441924 [004] .... 1907374.583457: kvm_set_irq: gsi 0
-level 1 source 0
-           <...>-3441924 [004] .... 1907374.583459: kvm_pic_set_irq:
-chip 0 pin 0 (edge|masked)
-           <...>-3441924 [004] .... 1907374.583461:
-kvm_apic_accept_irq: apicid 0 vec 209 (Fixed|edge)
-           <...>-3441924 [004] .... 1907374.583462:
-kvm_ioapic_set_irq: pin 2 dst 1 vec 209 (Fixed|logical|edge)
-           <...>-3441924 [004] .... 1907374.583464: kvm_set_irq: gsi 0
-level 0 source 0
-.....
-
-
-----------------------
-
-
-Strace (15 second) output:
-
- 55.39    0.082181          16      4937           ioctl
- 23.05    0.034208          14      2390           ppoll
- 21.56    0.031990          13      2379           futex
-  0.00    0.000001           0        30           read
------- ----------- ----------- --------- --------- ----------------
-100.00    0.148380                  9736           total
-
-
------------------------
-
-KVM stat live output:
-
-        APIC_ACCESS      11491    44.50%     5.12%      1.82us
-5021.41us      9.41us ( +-   9.87% )
-       EPT_MISCONFIG       8007    31.01%    17.51%     11.25us
-11003.56us     46.18us ( +-   8.59% )
-                 HLT       3804    14.73%    76.26%      2.19us
-3962.04us    423.30us ( +-   0.44% )
-  EXTERNAL_INTERRUPT       2492     9.65%     0.46%      0.96us
-163.72us      3.91us ( +-   4.36% )
-   PAUSE_INSTRUCTION         14     0.05%     0.00%      1.24us
-6.59us      3.40us ( +-  14.61% )
-      IO_INSTRUCTION          8     0.03%     0.64%      8.34us
-13470.05us   1693.58us ( +-  99.34% )
-   PENDING_INTERRUPT          3     0.01%     0.00%      2.31us
-3.69us      2.99us ( +-  13.36% )
-       EPT_VIOLATION          2     0.01%     0.00%      7.74us
-9.37us      8.56us ( +-   9.51% )
-       EXCEPTION_NMI          1     0.00%     0.00%      3.09us
-3.09us      3.09us ( +-   0.00% )
- TPR_BELOW_THRESHOLD          1     0.00%     0.00%      2.39us
-2.39us      2.39us ( +-   0.00% )
-
-
-We have tried quite a few of the HyperV enlightenments and clock
-settings and those do not resolve the issue
-
-We can reproduce the issue by stopping all guests(7) on the host and
-starting them up at the same time - this may take a couple of
-cycles(2-3) en-masse restarts and 1 or 2 out of the 7 will exhibit
-this behavior
-
-
-CPU is host-passthrough
-Server has 24 cores with 256G of ram
-
-
-Looking to see if anyone in the community has encountered this problem.
-
-Thanks
-Bill
+Thanks,
+Steve
