@@ -2,90 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A71FE40E96F
-	for <lists+kvm@lfdr.de>; Thu, 16 Sep 2021 20:02:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7181840E4B2
+	for <lists+kvm@lfdr.de>; Thu, 16 Sep 2021 19:25:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345806AbhIPRyK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Sep 2021 13:54:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37486 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1358316AbhIPRwz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Sep 2021 13:52:55 -0400
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3EF9C0613E7
-        for <kvm@vger.kernel.org>; Thu, 16 Sep 2021 09:33:51 -0700 (PDT)
-Received: by mail-pf1-x435.google.com with SMTP id j6so6435928pfa.4
-        for <kvm@vger.kernel.org>; Thu, 16 Sep 2021 09:33:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=tiqX7dnBSpraIxKgwlGElCJ7y3YLSYI9MnLnrLWRpJg=;
-        b=iNlOkaj31rhWycqF0fbB4UX7Nr3By3h2mdYTW1OCnx4iArZusdd3Dj4q57ZJaDUbY/
-         0ZLarEKWdS0JjcAIZBFSM8JH2VAybQolk28ufoXN/e24Azz/3Gz2yw0+MGqry6ZxjVZi
-         7xaJDfS9utb4FJgwLJkMqz6baFRdwHbC11oGKBJvH0Z7oe/3NsZAtZLAxpKorbDT+kUL
-         y4FELIhKoUd4Sqgie3qzEpfiNY3/KDxAXfphaoVl/YKDGxLHzIIJUtvNvXQWcycGip3E
-         +hWkYdXbqZoK1Wp9/+9VvpU9wDKCARsoRqA9h7/48EoLWSU6W61m11ZEviIAiur0nzI3
-         ssFQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=tiqX7dnBSpraIxKgwlGElCJ7y3YLSYI9MnLnrLWRpJg=;
-        b=qF3kgJTGJ3MucNrvgkNDisfH3LhHOM4WxsgmcpR3KodEq3mKjM78vW7LnOnIVMcJtT
-         q4CpZkebWGsVaYaLKxT5GP3oAFsFZzIHrjqH8xPQjCVgw8rUsn7R3MDXsh1qc8vTbnx/
-         7VAkJkxAII4C9xNEKoICsbY9MxkPIQmjx+fCs4UW7k79w00UUOKLKw/cuEt97+Bf8Jm0
-         3m9LBzUZDgzJeUrXGanp+srcw0+3jOHPwEWTLqEnzkTKvxamHjbPu4VlCOBpK94kH3YE
-         fDw0F81v2o/4glw/kQysuyQ4Ry/og9jO+xSuyaw7ncV4YrtndbOOR1ssZKD7ulO5Cbmb
-         ZZeg==
-X-Gm-Message-State: AOAM532JYikdm6CbLApqOBAL20MpHR4OOPYD2rv+F8Aaedk6vTKtc6bk
-        k9G2hZA9n8BwORDROM7pLOgFsQ==
-X-Google-Smtp-Source: ABdhPJxtOORah2T5ITGMwmMG9Gl/LK+cVqNihUnXIOc6WfpasBFIXzv9W2gxguosKdSbRk8Rl3kcRg==
-X-Received: by 2002:a63:7e11:: with SMTP id z17mr5668827pgc.436.1631810031271;
-        Thu, 16 Sep 2021 09:33:51 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id z17sm3564469pfh.110.2021.09.16.09.33.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Sep 2021 09:33:50 -0700 (PDT)
-Date:   Thu, 16 Sep 2021 16:33:46 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     David Edmondson <dme@dme.org>
-Cc:     linux-kernel@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        id S1344749AbhIPRFP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Sep 2021 13:05:15 -0400
+Received: from mail.skyhub.de ([5.9.137.197]:37514 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1346683AbhIPQ55 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Sep 2021 12:57:57 -0400
+Received: from zn.tnic (p200300ec2f11c6001e49ea6afe1054f5.dip0.t-ipconnect.de [IPv6:2003:ec:2f11:c600:1e49:ea6a:fe10:54f5])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 211431EC0277;
+        Thu, 16 Sep 2021 18:56:30 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1631811390;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=CsguPVegY1Z3/cHkTvyO5SSM87RXYzv+szSa5MU4dro=;
+        b=Y9B3Lju7uANekQ/vNO1kgsIJoEUoNMktGkOPAuf61gUG3/WfraP1VY1HDl/EF4DE+WMM0G
+        ofFGOckCcDnYYrqRrz50rI90T6nYdB8WXn2m2WPaCJAiVmQZKUs9nmqa7f9Kvafb01t8GQ
+        YNWW7riHkc74G2m2g7g3cj+hKDcPN14=
+Date:   Thu, 16 Sep 2021 18:56:22 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        David Matlack <dmatlack@google.com>,
-        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
+        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        David Edmondson <david.edmondson@oracle.com>,
-        Joao Martins <joao.m.martins@oracle.com>
-Subject: Re: [PATCH v5 3/4] KVM: x86: On emulation failure, convey the exit
- reason, etc. to userspace
-Message-ID: <YUNx6hC80pBKd6a4@google.com>
-References: <20210916083239.2168281-1-david.edmondson@oracle.com>
- <20210916083239.2168281-4-david.edmondson@oracle.com>
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH Part2 v5 01/45] x86/cpufeatures: Add SEV-SNP CPU feature
+Message-ID: <YUN3Nquhsn4OD9S8@zn.tnic>
+References: <20210820155918.7518-1-brijesh.singh@amd.com>
+ <20210820155918.7518-2-brijesh.singh@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20210916083239.2168281-4-david.edmondson@oracle.com>
+In-Reply-To: <20210820155918.7518-2-brijesh.singh@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 16, 2021, David Edmondson wrote:
-> Should instruction emulation fail, include the VM exit reason, etc. in
-> the emulation_failure data passed to userspace, in order that the VMM
-> can report it as a debugging aid when describing the failure.
+On Fri, Aug 20, 2021 at 10:58:34AM -0500, Brijesh Singh wrote:
+> Add CPU feature detection for Secure Encrypted Virtualization with
+> Secure Nested Paging. This feature adds a strong memory integrity
+> protection to help prevent malicious hypervisor-based attacks like
+> data replay, memory re-mapping, and more.
 > 
-> Suggested-by: Joao Martins <joao.m.martins@oracle.com>
-> Signed-off-by: David Edmondson <david.edmondson@oracle.com>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 > ---
+>  arch/x86/include/asm/cpufeatures.h       | 1 +
+>  arch/x86/kernel/cpu/amd.c                | 3 ++-
+>  tools/arch/x86/include/asm/cpufeatures.h | 1 +
+>  3 files changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
+> index d0ce5cfd3ac1..62f458680772 100644
+> --- a/arch/x86/include/asm/cpufeatures.h
+> +++ b/arch/x86/include/asm/cpufeatures.h
+> @@ -398,6 +398,7 @@
+>  #define X86_FEATURE_SEV			(19*32+ 1) /* AMD Secure Encrypted Virtualization */
+>  #define X86_FEATURE_VM_PAGE_FLUSH	(19*32+ 2) /* "" VM Page Flush MSR is supported */
+>  #define X86_FEATURE_SEV_ES		(19*32+ 3) /* AMD Secure Encrypted Virtualization - Encrypted State */
+> +#define X86_FEATURE_SEV_SNP		(19*32+4)  /* AMD Secure Encrypted Virtualization - Secure Nested Paging */
 
-Again with  the From: caveat,
+s/AMD Secure Encrypted Virtualization/AMD SEV/g
 
-Reviewed-by: Sean Christopherson <seanjc@google.com>
+Bit 1 above already has that string - no need for repeating it
+everywhere.
 
+Also, note the vertical alignment (space after the '+'):
 
-Thanks for doing this David!
+					(19*32+ 4)
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
