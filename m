@@ -2,53 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C173140EA69
-	for <lists+kvm@lfdr.de>; Thu, 16 Sep 2021 20:56:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D11C140EA68
+	for <lists+kvm@lfdr.de>; Thu, 16 Sep 2021 20:56:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345072AbhIPS5x (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Sep 2021 14:57:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52080 "EHLO
+        id S1344089AbhIPS5u (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Sep 2021 14:57:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51640 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245557AbhIPS53 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S245508AbhIPS53 (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 16 Sep 2021 14:57:29 -0400
-Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E447C04A154
-        for <kvm@vger.kernel.org>; Thu, 16 Sep 2021 11:15:42 -0700 (PDT)
-Received: by mail-qv1-xf49.google.com with SMTP id e8-20020a0cf348000000b0037a350958f2so63297015qvm.7
-        for <kvm@vger.kernel.org>; Thu, 16 Sep 2021 11:15:42 -0700 (PDT)
+Received: from mail-qk1-x749.google.com (mail-qk1-x749.google.com [IPv6:2607:f8b0:4864:20::749])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9501DC04A155
+        for <kvm@vger.kernel.org>; Thu, 16 Sep 2021 11:15:43 -0700 (PDT)
+Received: by mail-qk1-x749.google.com with SMTP id e22-20020a05620a209600b003d5ff97bff7so44934123qka.1
+        for <kvm@vger.kernel.org>; Thu, 16 Sep 2021 11:15:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=Pe7x0KqNWpd27U8B0VgFmhUlzq7CaBZRDC7FTGm6BYo=;
-        b=c/zDfdFNoGgGDawStlpHk9tXybqTTvO3qklooPCSh2RZyn1jO926yAJN3EkzROcnWV
-         +7Jv8frVlp+AjiKuCpYLQYVNhudtlSi3aG5XE0qVftcRBxmfkVHYUFK2g3I/ufLuYsD5
-         yXWxHrl/35QQy9F3h5xRX4vnkMen65DAtcmDUlpWA2jh2qYxeZTWx7cuJq7rLgB37IjF
-         FR1hGU1oD+z2TrGqXS1Hb1S8jn7kM7JHUntQZubO19eBArz72mowND7VvAXe/MPZogEM
-         wCS3fOC64SO9FdoDCKIccrMyRTFwuxu7FOoW75kCgb27aM9H/lW5xEtfwu2ZTfFFx8KR
-         /M9A==
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=EqfJ4nsZ26w2OY+w0/ZRQGVHhFarrWqQ77C9H9qe4wk=;
+        b=jCgTfuzY3Xi/FfyO0lx2uvq5fA0lVuB+u2I9budg5JdSmdUW6fkucj/6Iswn5+9u81
+         S5Hii45+Igo8DnjUigtICHwVREClRsu6Tt94jvAfHqx/W4EdvzOWJfxyBJRSO/PtALZt
+         511OJi7qp+hjaP2T2gNjcMes9QckyDHsJh+2BGWhGKw0M1JamoY1Gp59mcwwonYWw3jo
+         YzlI/iWllIFsVn66gc/48kc2LhIAYzj4gD09j2aRz8ifMS/+7cKghKSzkamlf41sDmLH
+         xwJx2x4VOpX8THrVq3tJaaLDKzBQd47kw3OExONFC73ii1Dcr8WZjUXHO6zWaFv0mYYj
+         2w9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=Pe7x0KqNWpd27U8B0VgFmhUlzq7CaBZRDC7FTGm6BYo=;
-        b=ud4Sm5W+LUrcoBjrVG6hAFsJef1qVJGgN6oC4TWM0KomG4x5w88yyP5Kig6u2kFIOq
-         sy6n8WkecWBiDLlNP3XKNjEzmXGF8BagGGriUGdOvlV6i+A3EeTQaLFDIBU98NZmVt3y
-         YusDG4nkevrSHV3G3sKXWA8C91KDt+2BLXL/QjGzaqiWuJNRp//r6ovLgM+w2PQdI/+u
-         44uWfrhwlTRWZjvOY037Lw5vRSSwfQhSRRoAubq4qxLS7OxvmzhC9Isk5Suz6EwWFoHv
-         K4GvFff13xrJnubmq6JvCxFxHCkrqJgJCqqiZkY+STNeWSsIM947+EGRbXGoFFgFnfCa
-         J4qw==
-X-Gm-Message-State: AOAM533o5OGBHNOZY4HRFnzLO/ZGOG9axEmzQB/NpuRSYbEge7GTw/Zh
-        oJPZ00+cUYzb7lYAtzhW6I7Y0H2QQ5WQNovNA4O+Igf7wCYPLoP+XeeNTFE0t4qbKGVWTWX7Xzd
-        dZNn5QPzPQ1U91s5xpFJZdvnMZ/kOCtux4XQfgLc5JKLY9MJgAy+0O+21Bg==
-X-Google-Smtp-Source: ABdhPJyvIbX+FueQ86OOu11wGIo24Yj/vbCnWhhfcLYDpB8XPsQIlfG3Y+cSd9yAQkcLoDzHF5ajFaxNvtk=
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=EqfJ4nsZ26w2OY+w0/ZRQGVHhFarrWqQ77C9H9qe4wk=;
+        b=N01Is4iHvMqi5KY3fjT1c4Af0I2SqQYlFuXt/gK3rEaKgayQX5OeEToB6saX138ro8
+         QH0fBlOPPoVIBcW1cxjLwDRnZ9qEI5DINgpK9l8BFY5aFlpWwg8+xuUrsssNkpzJjTMr
+         5uCRjcT7nYTIvQ6nLY8BAYdibnEIjJnLP6LP0WoYN7gpeAMh54v5j/Svg805GuVPXdvj
+         AjlF+SBK/HHXj272ZXQkmoDC/G0iOuW9CYhicvyjYFxfjgq86N9CABgAMgCr4Yn29Yed
+         pn/mab6UWxWoaX6YJPyTaKapn7TwlNARHHgLGfX9OEhKVBtKA4kPnvjs+BOznc8X+xdt
+         vRfQ==
+X-Gm-Message-State: AOAM533z1XFMRLuU5PBUdXNMtpPeJbt2OZsSa+in93N7THad7effb1eV
+        XHEEJqCtCk/SVpypyWHKXDbFDrWGKaYcN/XvWlTGKEeQJPIu1oGPr5/9eH3Vtb8mBsG8W7vnkpS
+        FXg61HDjYbc3ZApZoD2OwJh75Bbgx/C52KX1fgdZBfifnEl++mBIfdEkQDw==
+X-Google-Smtp-Source: ABdhPJzJVShjUP9eV6I0zKA9rrR+wmqb3KVny8yYAxYLYNtJU8sisB/xFAD1ErUlrDRx7ismNi4ONuO4ygA=
 X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a0c:9146:: with SMTP id q64mr6704127qvq.38.1631816141556;
- Thu, 16 Sep 2021 11:15:41 -0700 (PDT)
-Date:   Thu, 16 Sep 2021 18:15:31 +0000
-Message-Id: <20210916181538.968978-1-oupton@google.com>
+ (user=oupton job=sendgmr) by 2002:a05:6214:431:: with SMTP id
+ a17mr6549014qvy.48.1631816142691; Thu, 16 Sep 2021 11:15:42 -0700 (PDT)
+Date:   Thu, 16 Sep 2021 18:15:32 +0000
+In-Reply-To: <20210916181538.968978-1-oupton@google.com>
+Message-Id: <20210916181538.968978-2-oupton@google.com>
 Mime-Version: 1.0
+References: <20210916181538.968978-1-oupton@google.com>
 X-Mailer: git-send-email 2.33.0.464.g1972c5931b-goog
-Subject: [PATCH v8 0/7] KVM: x86: Add idempotent controls for migrating system
- counter state
+Subject: [PATCH v8 1/7] kvm: x86: abstract locking around pvclock_update_vm_gtod_copy
 From:   Oliver Upton <oupton@google.com>
 To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -72,85 +75,170 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM's current means of saving/restoring system counters is plagued with
-temporal issues. On x86, we migrate the guest's system counter by-value
-through the respective guest's IA32_TSC value. Restoring system counters
-by-value is brittle as the state is not idempotent: the host system
-counter is still oscillating between the attempted save and restore.
-Furthermore, VMMs may wish to transparently live migrate guest VMs,
-meaning that they include the elapsed time due to live migration blackout
-in the guest system counter view. The VMM thread could be preempted for
-any number of reasons (scheduler, L0 hypervisor under nested) between the
-time that it calculates the desired guest counter value and when
-KVM actually sets this counter state.
+From: Paolo Bonzini <pbonzini@redhat.com>
 
-Despite the value-based interface that we present to userspace, KVM
-actually has idempotent guest controls by way of the TSC offset.
-We can avoid all of the issues associated with a value-based interface
-by abstracting these offset controls in a new device attribute. This
-series introduces new vCPU device attributes to provide userspace access
-to the vCPU's system counter offset.
+Updates to the kvmclock parameters needs to do a complicated dance of
+KVM_REQ_MCLOCK_INPROGRESS and KVM_REQ_CLOCK_UPDATE in addition to taking
+pvclock_gtod_sync_lock.  Place that in two functions that can be called
+on all of master clock update, KVM_SET_CLOCK, and Hyper-V reenlightenment.
 
-Patches 1-2 are Paolo's refactorings around locking and the
-KVM_{GET,SET}_CLOCK ioctls.
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Oliver Upton <oupton@google.com>
+---
+ arch/x86/include/asm/kvm_host.h |  1 -
+ arch/x86/kvm/x86.c              | 62 +++++++++++++++------------------
+ 2 files changed, 29 insertions(+), 34 deletions(-)
 
-Patch 3 cures a race where use_master_clock is read outside of the
-pvclock lock in the KVM_GET_CLOCK ioctl.
-
-Patch 4 adopts Paolo's suggestion, augmenting the KVM_{GET,SET}_CLOCK
-ioctls to provide userspace with a (host_tsc, realtime) instant. This is
-essential for a VMM to perform precise migration of the guest's system
-counters.
-
-Patch 5 does away with the pvclock spin lock in favor of a sequence
-lock based on the tsc_write_lock. The original patch is from Paolo, I
-touched it up a bit to fix a deadlock and some unused variables that
-caused -Werror to scream.
-
-Patch 6 extracts the TSC synchronization tracking code in a way that it
-can be used for both offset-based and value-based TSC synchronization
-schemes.
-
-Finally, patch 7 implements a vCPU device attribute which allows VMMs to
-get at the TSC offset of a vCPU.
-
-This series was tested with the new KVM selftests for the KVM clock and
-system counter offset controls on Haswell hardware. Kernel was built
-with CONFIG_LOCKDEP given the new locking changes/lockdep assertions
-here.
-
-Note that these tests are mailed as a separate series due to the
-dependencies in both x86 and arm64.
-
-Applies cleanly to 5.15-rc1
-
-v8: http://lore.kernel.org/r/20210816001130.3059564-1-oupton@google.com
-
-v7 -> v8:
- - Rebased to 5.15-rc1
- - Picked up Paolo's version of the series, which includes locking
-   changes
- - Make KVM advertise KVM_CAP_VCPU_ATTRIBUTES
-
-Oliver Upton (4):
-  KVM: x86: Fix potential race in KVM_GET_CLOCK
-  KVM: x86: Report host tsc and realtime values in KVM_GET_CLOCK
-  KVM: x86: Refactor tsc synchronization code
-  KVM: x86: Expose TSC offset controls to userspace
-
-Paolo Bonzini (3):
-  kvm: x86: abstract locking around pvclock_update_vm_gtod_copy
-  KVM: x86: extract KVM_GET_CLOCK/KVM_SET_CLOCK to separate functions
-  kvm: x86: protect masterclock with a seqcount
-
- Documentation/virt/kvm/api.rst          |  42 ++-
- Documentation/virt/kvm/devices/vcpu.rst |  57 +++
- arch/x86/include/asm/kvm_host.h         |  12 +-
- arch/x86/include/uapi/asm/kvm.h         |   4 +
- arch/x86/kvm/x86.c                      | 458 ++++++++++++++++--------
- include/uapi/linux/kvm.h                |   7 +-
- 6 files changed, 419 insertions(+), 161 deletions(-)
-
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index f8f48a7ec577..be6805fc0260 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1866,7 +1866,6 @@ u64 kvm_calc_nested_tsc_multiplier(u64 l1_multiplier, u64 l2_multiplier);
+ unsigned long kvm_get_linear_rip(struct kvm_vcpu *vcpu);
+ bool kvm_is_linear_rip(struct kvm_vcpu *vcpu, unsigned long linear_rip);
+ 
+-void kvm_make_mclock_inprogress_request(struct kvm *kvm);
+ void kvm_make_scan_ioapic_request(struct kvm *kvm);
+ void kvm_make_scan_ioapic_request_mask(struct kvm *kvm,
+ 				       unsigned long *vcpu_bitmap);
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 28ef14155726..1082b48418c3 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -2755,35 +2755,42 @@ static void pvclock_update_vm_gtod_copy(struct kvm *kvm)
+ #endif
+ }
+ 
+-void kvm_make_mclock_inprogress_request(struct kvm *kvm)
++static void kvm_make_mclock_inprogress_request(struct kvm *kvm)
+ {
+ 	kvm_make_all_cpus_request(kvm, KVM_REQ_MCLOCK_INPROGRESS);
+ }
+ 
+-static void kvm_gen_update_masterclock(struct kvm *kvm)
++static void kvm_start_pvclock_update(struct kvm *kvm)
+ {
+-#ifdef CONFIG_X86_64
+-	int i;
+-	struct kvm_vcpu *vcpu;
+ 	struct kvm_arch *ka = &kvm->arch;
+-	unsigned long flags;
+-
+-	kvm_hv_invalidate_tsc_page(kvm);
+ 
+ 	kvm_make_mclock_inprogress_request(kvm);
+ 
+ 	/* no guest entries from this point */
+-	spin_lock_irqsave(&ka->pvclock_gtod_sync_lock, flags);
+-	pvclock_update_vm_gtod_copy(kvm);
+-	spin_unlock_irqrestore(&ka->pvclock_gtod_sync_lock, flags);
++	spin_lock_irq(&ka->pvclock_gtod_sync_lock);
++}
+ 
++static void kvm_end_pvclock_update(struct kvm *kvm)
++{
++	struct kvm_arch *ka = &kvm->arch;
++	struct kvm_vcpu *vcpu;
++	int i;
++
++	spin_unlock_irq(&ka->pvclock_gtod_sync_lock);
+ 	kvm_for_each_vcpu(i, vcpu, kvm)
+ 		kvm_make_request(KVM_REQ_CLOCK_UPDATE, vcpu);
+ 
+ 	/* guest entries allowed */
+ 	kvm_for_each_vcpu(i, vcpu, kvm)
+ 		kvm_clear_request(KVM_REQ_MCLOCK_INPROGRESS, vcpu);
+-#endif
++}
++
++static void kvm_update_masterclock(struct kvm *kvm)
++{
++	kvm_hv_invalidate_tsc_page(kvm);
++	kvm_start_pvclock_update(kvm);
++	pvclock_update_vm_gtod_copy(kvm);
++	kvm_end_pvclock_update(kvm);
+ }
+ 
+ u64 get_kvmclock_ns(struct kvm *kvm)
+@@ -6079,12 +6086,10 @@ long kvm_arch_vm_ioctl(struct file *filp,
+ 			goto out;
+ 
+ 		r = 0;
+-		/*
+-		 * TODO: userspace has to take care of races with VCPU_RUN, so
+-		 * kvm_gen_update_masterclock() can be cut down to locked
+-		 * pvclock_update_vm_gtod_copy().
+-		 */
+-		kvm_gen_update_masterclock(kvm);
++
++		kvm_hv_invalidate_tsc_page(kvm);
++		kvm_start_pvclock_update(kvm);
++		pvclock_update_vm_gtod_copy(kvm);
+ 
+ 		/*
+ 		 * This pairs with kvm_guest_time_update(): when masterclock is
+@@ -6093,15 +6098,12 @@ long kvm_arch_vm_ioctl(struct file *filp,
+ 		 * is slightly ahead) here we risk going negative on unsigned
+ 		 * 'system_time' when 'user_ns.clock' is very small.
+ 		 */
+-		spin_lock_irq(&ka->pvclock_gtod_sync_lock);
+ 		if (kvm->arch.use_master_clock)
+ 			now_ns = ka->master_kernel_ns;
+ 		else
+ 			now_ns = get_kvmclock_base_ns();
+ 		ka->kvmclock_offset = user_ns.clock - now_ns;
+-		spin_unlock_irq(&ka->pvclock_gtod_sync_lock);
+-
+-		kvm_make_all_cpus_request(kvm, KVM_REQ_CLOCK_UPDATE);
++		kvm_end_pvclock_update(kvm);
+ 		break;
+ 	}
+ 	case KVM_GET_CLOCK: {
+@@ -8107,14 +8109,13 @@ static void tsc_khz_changed(void *data)
+ static void kvm_hyperv_tsc_notifier(void)
+ {
+ 	struct kvm *kvm;
+-	struct kvm_vcpu *vcpu;
+ 	int cpu;
+-	unsigned long flags;
+ 
+ 	mutex_lock(&kvm_lock);
+ 	list_for_each_entry(kvm, &vm_list, vm_list)
+ 		kvm_make_mclock_inprogress_request(kvm);
+ 
++	/* no guest entries from this point */
+ 	hyperv_stop_tsc_emulation();
+ 
+ 	/* TSC frequency always matches when on Hyper-V */
+@@ -8125,16 +8126,11 @@ static void kvm_hyperv_tsc_notifier(void)
+ 	list_for_each_entry(kvm, &vm_list, vm_list) {
+ 		struct kvm_arch *ka = &kvm->arch;
+ 
+-		spin_lock_irqsave(&ka->pvclock_gtod_sync_lock, flags);
++		spin_lock_irq(&ka->pvclock_gtod_sync_lock);
+ 		pvclock_update_vm_gtod_copy(kvm);
+-		spin_unlock_irqrestore(&ka->pvclock_gtod_sync_lock, flags);
+-
+-		kvm_for_each_vcpu(cpu, vcpu, kvm)
+-			kvm_make_request(KVM_REQ_CLOCK_UPDATE, vcpu);
+-
+-		kvm_for_each_vcpu(cpu, vcpu, kvm)
+-			kvm_clear_request(KVM_REQ_MCLOCK_INPROGRESS, vcpu);
++		kvm_end_pvclock_update(kvm);
+ 	}
++
+ 	mutex_unlock(&kvm_lock);
+ }
+ #endif
+@@ -9418,7 +9414,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+ 		if (kvm_check_request(KVM_REQ_MIGRATE_TIMER, vcpu))
+ 			__kvm_migrate_timers(vcpu);
+ 		if (kvm_check_request(KVM_REQ_MASTERCLOCK_UPDATE, vcpu))
+-			kvm_gen_update_masterclock(vcpu->kvm);
++			kvm_update_masterclock(vcpu->kvm);
+ 		if (kvm_check_request(KVM_REQ_GLOBAL_CLOCK_UPDATE, vcpu))
+ 			kvm_gen_kvmclock_update(vcpu);
+ 		if (kvm_check_request(KVM_REQ_CLOCK_UPDATE, vcpu)) {
 -- 
 2.33.0.309.g3052b89438-goog
 
