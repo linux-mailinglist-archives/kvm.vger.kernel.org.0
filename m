@@ -2,187 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 34F3240EA77
-	for <lists+kvm@lfdr.de>; Thu, 16 Sep 2021 20:56:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 81A2540E9DE
+	for <lists+kvm@lfdr.de>; Thu, 16 Sep 2021 20:29:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345103AbhIPS6M (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Sep 2021 14:58:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51626 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245256AbhIPS5e (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Sep 2021 14:57:34 -0400
-Received: from mail-qt1-x849.google.com (mail-qt1-x849.google.com [IPv6:2607:f8b0:4864:20::849])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBC6DC04A163
-        for <kvm@vger.kernel.org>; Thu, 16 Sep 2021 11:16:08 -0700 (PDT)
-Received: by mail-qt1-x849.google.com with SMTP id l22-20020a05622a175600b0029d63a970f6so63145487qtk.23
-        for <kvm@vger.kernel.org>; Thu, 16 Sep 2021 11:16:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=Xw4+tgKVLmvm8JQWsGHVEpFbMf77zCGqq8rbz5yrSuw=;
-        b=aqj3HRCmfQvWoQtSN5RzC1ysFfx+mQMpaBU2bf9JiwokiR0SsR1mjFVZwlMsYRWd5F
-         S1wO4hvUJBxqXeG0m7E3iOLmvRhccSonfYKnGvnrmcxRXwiajJF8WrW/0OjYx2jBhPNg
-         mSeQYdEI69TgXBb0UzLjUrlsKeOQachsm67AH76Wx+H8gHYl2PSGhNNq6W7jYvQM/XC3
-         LXaisjjlREFlx0rMPKJ2YsgTBksZdWAA2o3kTilLBfa1XqxawES6tGn2os4UI+BOIu19
-         gZFLCmlXEaeNDs7eyflXYmGj3j9j1rvbHboi2PjGfs2Sd46TUcfd88SDJvadas/9BxEe
-         FnxA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=Xw4+tgKVLmvm8JQWsGHVEpFbMf77zCGqq8rbz5yrSuw=;
-        b=gAXhuD5iGX0CqoA+T25h6FLatFtZ02hWR8NE4JS0tLX08MKDVleEtoSLuuRoeLlxvD
-         Sd/BgtybrLUqyAtrUjBIo2hN0EsvQthVYF/beR9ij8wPjzSK4Io8dmncvImEa6ngfapg
-         zh4B5nrcd7iNuSzsb+fUcbAuxWCMlNUT8gc2K+icFFL8CLamSYZJzJrHS5I/6X4iE8oI
-         gCEYScsy8d9gMkzAeI9ISU/mangfrUF25ne+c40Ms1Tujd90sAOhqG9XCEaxopaMALZx
-         l+zrw4QCHdOUByQbs4+Mh6b2DqQWQ/WlZ1+dwSFeQxiWTJP6VY9Hj/gUz4PrH9+SMvCl
-         ah0A==
-X-Gm-Message-State: AOAM531ygagaE2FSS1aD4hwY1IavydhF5LTV6oW5+2VSHxavajacJutn
-        S3TB4gDtk6sPWa0JaK/woxEtu+foqYAvXI8syOO89LvIWgpHKwIK/Pl+CbO0/LlTYNO5ZiCSEv1
-        ozzSfmt0pObgd6b1tUFSNkgy1jGRAc8xfiGoWoygEC7z0bjPr6tkLblYQig==
-X-Google-Smtp-Source: ABdhPJwwEMjf9bn2Y68JHX2UcSLI5bYpoUc13K4VaVdU55eP01YXVcQ93R0zLYLdVbktp7FtkAMXNw1xICs=
-X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a05:6214:1372:: with SMTP id
- c18mr4801098qvw.28.1631816167832; Thu, 16 Sep 2021 11:16:07 -0700 (PDT)
-Date:   Thu, 16 Sep 2021 18:15:55 +0000
-In-Reply-To: <20210916181555.973085-1-oupton@google.com>
-Message-Id: <20210916181555.973085-10-oupton@google.com>
-Mime-Version: 1.0
-References: <20210916181555.973085-1-oupton@google.com>
-X-Mailer: git-send-email 2.33.0.464.g1972c5931b-goog
-Subject: [PATCH v8 9/9] selftests: KVM: Test vtimer offset reg in get-reg-list
-From:   Oliver Upton <oupton@google.com>
-To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-arm-kernel@lists.infradead.org,
-        Andrew Jones <drjones@redhat.com>,
-        Will Deacon <will@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Oliver Upton <oupton@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S1343811AbhIPSbS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Sep 2021 14:31:18 -0400
+Received: from mail-co1nam11on2065.outbound.protection.outlook.com ([40.107.220.65]:64225
+        "EHLO NAM11-CO1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S245412AbhIPSbH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Sep 2021 14:31:07 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=VUbaVO5RfyX88f/7sEFF7CnxU/YAOGqQuAwdRUUG9nzieEjThOWOeb1XZ/EsLkyO5JWFOstpXfUxnZ3S/Gty+ilPr7cfvHVABtT69VWaE2GPyWn3bCAbqcL9QZvttjRYLaISLKc5L66m1WnO1P+5VTpv1uULf0etfHTmKHabYKpAXX0dbH9RT8gURoR4aW4/V2BpzyJaL+rjns35JyBNVrIKBVaU1JxckzZmXiisw2eg3rzy+PMjDqab8y/JF3KBZjGiktRyLn1pFVkJUXQ5U8tjBb0JCoVGQ/yAmKeSJns74VRpPkgLiofi4sNQHatkPRFa85FJ3G2xA8lbKr92+g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
+ bh=QDyDV7jWAEb4taF1dRSbXiMJAeWJGyX96WXp+4fYUdc=;
+ b=BN4Irf/753DLCFe8NRu7hCcCR7pKdtT3uQKXS9jQKBvG4/QSaVOD9SXOJmIukjjr58kZNaZvD11Ti2XtzwlR5azRbvQA7hDw5EYMnqMB3jbEh8NvZ17rGPIzBp4og/mR/zfZAs3PpcOEeD5kFDnjiW435xAfUWrja8S8kVsCXayMEiSAOWdptHxIhrQUS7zRg+Je/eXpoCFQcutildRSQBOUTf5Cj48uMAUosZRxc3B/luj89QqwwV+rxCff0dJVT2vIblhqolVcR6vNg5dUXCIaN7ggvjR5LFFi14hHsG9ncZ25ulVo/Vo7HmXIO5pmM1b7copjOkoA8O2YN4/QDA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.112.34) smtp.rcpttodomain=lists.infradead.org
+ smtp.mailfrom=nvidia.com; dmarc=pass (p=quarantine sp=none pct=100)
+ action=none header.from=nvidia.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=QDyDV7jWAEb4taF1dRSbXiMJAeWJGyX96WXp+4fYUdc=;
+ b=igNTpOm0dwhWght1NOBD8s/XCvUVKIM19oVUeHzxgwx1HA+9Hi31lOLGRFXosNInjSTmc2EXyKjUofN3JYlezvUyIKfBByVibKe1K2Rb2hgIC8fCEZ+HV7M7Mc2mPRNCm8fU0cFgc8mlnp/i1nqUz2iWAYvCCA3V3JApuK8b1c5T4tmOmTrJYXMYGYUWkT8wtOCStUMPBziSCtwA1QTwcvRrmHVuprkprbzNlKXtmfHMw/ioYymDuCjJfJCEvNqkHnUR3NJoCjVKAqK9GSjdF/y3ZwVFBcqrn3FLR2lTVA15q0nVbdAVMPoXTS/F1OQjvrmwZfkk48OA6H/NqN15xA==
+Received: from BN6PR1701CA0022.namprd17.prod.outlook.com
+ (2603:10b6:405:15::32) by BYAPR12MB4694.namprd12.prod.outlook.com
+ (2603:10b6:a03:a5::23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4523.14; Thu, 16 Sep
+ 2021 18:29:45 +0000
+Received: from BN8NAM11FT003.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:405:15:cafe::dc) by BN6PR1701CA0022.outlook.office365.com
+ (2603:10b6:405:15::32) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4523.14 via Frontend
+ Transport; Thu, 16 Sep 2021 18:29:45 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.34)
+ smtp.mailfrom=nvidia.com; lists.infradead.org; dkim=none (message not signed)
+ header.d=none;lists.infradead.org; dmarc=pass action=none
+ header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.112.34 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.112.34; helo=mail.nvidia.com;
+Received: from mail.nvidia.com (216.228.112.34) by
+ BN8NAM11FT003.mail.protection.outlook.com (10.13.177.90) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.4523.14 via Frontend Transport; Thu, 16 Sep 2021 18:29:44 +0000
+Received: from HQMAIL105.nvidia.com (172.20.187.12) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.18; Thu, 16 Sep
+ 2021 18:29:42 +0000
+Received: from Asurada-Nvidia (172.20.187.6) by mail.nvidia.com
+ (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1497.18 via Frontend
+ Transport; Thu, 16 Sep 2021 18:29:42 +0000
+Date:   Thu, 16 Sep 2021 11:21:56 -0700
+From:   Nicolin Chen <nicolinc@nvidia.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+CC:     Jason Gunthorpe <jgg@nvidia.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "thierry.reding@gmail.com" <thierry.reding@gmail.com>,
+        "will@kernel.org" <will@kernel.org>,
+        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+        "corbet@lwn.net" <corbet@lwn.net>,
+        "linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>
+Subject: Re: [RFC][PATCH v2 00/13] iommu/arm-smmu-v3: Add NVIDIA
+ implementation
+Message-ID: <20210916182155.GA29656@Asurada-Nvidia>
+References: <20210831025923.15812-1-nicolinc@nvidia.com>
+ <20210831101549.237151fa.alex.williamson@redhat.com>
+ <BN9PR11MB5433E064405A1AFEC50C1C9F8CCD9@BN9PR11MB5433.namprd11.prod.outlook.com>
+ <20210902144524.GU1721383@nvidia.com>
+ <BN9PR11MB54337332A83176241C984EC58CCE9@BN9PR11MB5433.namprd11.prod.outlook.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <BN9PR11MB54337332A83176241C984EC58CCE9@BN9PR11MB5433.namprd11.prod.outlook.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 58d49d23-25c3-43d5-21e5-08d9793ff4d7
+X-MS-TrafficTypeDiagnostic: BYAPR12MB4694:
+X-Microsoft-Antispam-PRVS: <BYAPR12MB4694071662EC2C4EF2EBAFBAABDC9@BYAPR12MB4694.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: /W+GJbluUwgxjml3MEQoeki7zPIuneZBYfJBnhLbWam3O5gRZJN+OBq4BqB2bUtHV7XWptOz6CqFycFvX5ht+5V5yF33mmcF+YWrdfzN3sab34pwUo1NLgr7vaueG09zTR33Ej67NoUkDttM05ZlOo5kKl/CcUGPyIIWCFD38rbNUAJKs91BgzpfZNpQBCDbgVBMwW7bZHwtpgF6l/eW4zau34ueDRi4CBfJYrGA9nSDAupfhv/pD07GfnAnv6Zc7NKsIEfE0GfT+YWjZIEsUI73XvqUB+yG8rPXfJm12YAHceDJW0CYXeBxyo4FZ9VK8CI6MIK/w7T9VtpbdJ80lOK65fJdxH8sHh27H8TE3GjFAPh98JxrQ8gc07kCtF1UyxuwBie+2w1zVS1fwCoInnQAlfhfot4ap0dOvRF9Zs971HvrXep3rKP8Hv2vfYI5c3uhlAEOqcQBRpNgD4RAIDs+7Dd7OELjdSYUaiVa671fh0ZXCujI29ZC1orr/LeIphlyizwpm6DKwJ8eGRzteEW4YfCexRDhecyZlyZ6jSBYIybcQCv0K19EypKTa4CCHHRxtNXueWc30Li9AyPrBSpRVYbqA0GqeqVApMJu4ejsS2409rEhVljj17WnNilrKuEoOfu1jd54yEPTgGdqssEWqoNFuVEcBuK37n0uehMpC4GwVP/At/KWykilNZayD2D5YXM2qyegYfQi12S4Rg==
+X-Forefront-Antispam-Report: CIP:216.228.112.34;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid03.nvidia.com;CAT:NONE;SFS:(4636009)(36840700001)(46966006)(8936002)(508600001)(54906003)(6666004)(7416002)(33716001)(316002)(356005)(5660300002)(336012)(8676002)(26005)(186003)(83380400001)(4326008)(82310400003)(36860700001)(86362001)(47076005)(55016002)(33656002)(426003)(9686003)(1076003)(7636003)(70206006)(70586007)(2906002)(6916009);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Sep 2021 18:29:44.5536
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 58d49d23-25c3-43d5-21e5-08d9793ff4d7
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.34];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT003.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR12MB4694
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Assert that KVM exposes KVM_REG_ARM_TIMER_OFFSET in the KVM_GET_REG_LIST
-ioctl when userspace buys in to the new behavior.
+Hi Kevin,
 
-Signed-off-by: Oliver Upton <oupton@google.com>
----
- .../selftests/kvm/aarch64/get-reg-list.c      | 42 +++++++++++++++++++
- 1 file changed, 42 insertions(+)
+On Thu, Sep 02, 2021 at 10:27:06PM +0000, Tian, Kevin wrote:
 
-diff --git a/tools/testing/selftests/kvm/aarch64/get-reg-list.c b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-index cc898181faab..4f337d8b793a 100644
---- a/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-+++ b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-@@ -40,6 +40,7 @@ static __u64 *blessed_reg, blessed_n;
- struct reg_sublist {
- 	const char *name;
- 	long capability;
-+	long enable_capability;
- 	int feature;
- 	bool finalize;
- 	__u64 *regs;
-@@ -397,6 +398,19 @@ static void check_supported(struct vcpu_config *c)
- 	}
- }
- 
-+static void enable_caps(struct kvm_vm *vm, struct vcpu_config *c)
-+{
-+	struct kvm_enable_cap cap = {0};
-+	struct reg_sublist *s;
-+
-+	for_each_sublist(c, s) {
-+		if (s->enable_capability) {
-+			cap.cap = s->enable_capability;
-+			vm_enable_cap(vm, &cap);
-+		}
-+	}
-+}
-+
- static bool print_list;
- static bool print_filtered;
- static bool fixup_core_regs;
-@@ -412,6 +426,8 @@ static void run_test(struct vcpu_config *c)
- 	check_supported(c);
- 
- 	vm = vm_create(VM_MODE_DEFAULT, DEFAULT_GUEST_PHY_PAGES, O_RDWR);
-+	enable_caps(vm, c);
-+
- 	prepare_vcpu_init(c, &init);
- 	aarch64_vcpu_add_default(vm, 0, &init, NULL);
- 	finalize_vcpu(vm, 0, c);
-@@ -1014,6 +1030,10 @@ static __u64 sve_rejects_set[] = {
- 	KVM_REG_ARM64_SVE_VLS,
- };
- 
-+static __u64 vtimer_offset_regs[] = {
-+	KVM_REG_ARM_TIMER_OFFSET,
-+};
-+
- #define BASE_SUBLIST \
- 	{ "base", .regs = base_regs, .regs_n = ARRAY_SIZE(base_regs), }
- #define VREGS_SUBLIST \
-@@ -1025,6 +1045,10 @@ static __u64 sve_rejects_set[] = {
- 	{ "sve", .capability = KVM_CAP_ARM_SVE, .feature = KVM_ARM_VCPU_SVE, .finalize = true, \
- 	  .regs = sve_regs, .regs_n = ARRAY_SIZE(sve_regs), \
- 	  .rejects_set = sve_rejects_set, .rejects_set_n = ARRAY_SIZE(sve_rejects_set), }
-+#define VTIMER_OFFSET_SUBLIST \
-+	{ "vtimer_offset", .capability = KVM_CAP_ARM_VTIMER_OFFSET, \
-+	  .enable_capability = KVM_CAP_ARM_VTIMER_OFFSET, .regs = vtimer_offset_regs, \
-+	  .regs_n = ARRAY_SIZE(vtimer_offset_regs), }
- 
- static struct vcpu_config vregs_config = {
- 	.sublists = {
-@@ -1041,6 +1065,14 @@ static struct vcpu_config vregs_pmu_config = {
- 	{0},
- 	},
- };
-+static struct vcpu_config vregs_vtimer_config = {
-+	.sublists = {
-+	BASE_SUBLIST,
-+	VREGS_SUBLIST,
-+	VTIMER_OFFSET_SUBLIST,
-+	{0},
-+	},
-+};
- static struct vcpu_config sve_config = {
- 	.sublists = {
- 	BASE_SUBLIST,
-@@ -1056,11 +1088,21 @@ static struct vcpu_config sve_pmu_config = {
- 	{0},
- 	},
- };
-+static struct vcpu_config sve_vtimer_config = {
-+	.sublists = {
-+	BASE_SUBLIST,
-+	SVE_SUBLIST,
-+	VTIMER_OFFSET_SUBLIST,
-+	{0},
-+	},
-+};
- 
- static struct vcpu_config *vcpu_configs[] = {
- 	&vregs_config,
- 	&vregs_pmu_config,
-+	&vregs_vtimer_config,
- 	&sve_config,
- 	&sve_pmu_config,
-+	&sve_vtimer_config,
- };
- static int vcpu_configs_n = ARRAY_SIZE(vcpu_configs);
--- 
-2.33.0.464.g1972c5931b-goog
+> > Indeed, this looks like a flavour of the accelerated invalidation
+> > stuff we've talked about already.
+> >
+> > I would see it probably exposed as some HW specific IOCTL on the iommu
+> > fd to get access to the accelerated invalidation for IOASID's in the
+> > FD.
+> >
+> > Indeed, this seems like a further example of why /dev/iommu is looking
+> > like a good idea as this RFC is very complicated to do something
+> > fairly simple.
+> >
+> > Where are thing on the /dev/iommu work these days?
+> 
+> We are actively working on the basic skeleton. Our original plan is to send
+> out the 1st draft before LPC, with support of vfio type1 semantics and
+> and pci dev only (single-device group). But later we realized that adding
+> multi-devices group support is also necessary even in the 1st draft to avoid
+> some dirty hacks and build the complete picture. This will add some time
+> though. If things go well, we'll still try hit the original plan. If not, it will be
+> soon after LPC.
 
+As I also want to take a look at your work for this implementation,
+would you please CC me when you send out your patches? Thank you!
