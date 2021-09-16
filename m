@@ -2,179 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A2C9640D3DD
-	for <lists+kvm@lfdr.de>; Thu, 16 Sep 2021 09:36:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0CEDD40D490
+	for <lists+kvm@lfdr.de>; Thu, 16 Sep 2021 10:32:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234715AbhIPHh5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Sep 2021 03:37:57 -0400
-Received: from mga09.intel.com ([134.134.136.24]:55143 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234296AbhIPHh4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Sep 2021 03:37:56 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10108"; a="222546991"
-X-IronPort-AV: E=Sophos;i="5.85,297,1624345200"; 
-   d="scan'208";a="222546991"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Sep 2021 00:36:35 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.85,297,1624345200"; 
-   d="scan'208";a="472680027"
-Received: from chaop.bj.intel.com (HELO localhost) ([10.240.192.135])
-  by orsmga007.jf.intel.com with ESMTP; 16 Sep 2021 00:36:28 -0700
-Date:   Thu, 16 Sep 2021 15:36:27 +0800
-From:   Chao Peng <chao.p.peng@linux.intel.com>
-To:     "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Cc:     "Kirill A. Shutemov" <kirill@shutemov.name>,
-        Andy Lutomirski <luto@kernel.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+        id S235103AbhIPIeE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Sep 2021 04:34:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49526 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234998AbhIPIeC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Sep 2021 04:34:02 -0400
+Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72949C061764
+        for <kvm@vger.kernel.org>; Thu, 16 Sep 2021 01:32:42 -0700 (PDT)
+Received: by mail-wr1-x430.google.com with SMTP id u15so8124467wru.6
+        for <kvm@vger.kernel.org>; Thu, 16 Sep 2021 01:32:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=dme-org.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=oFu13wmCnF/37EBkxbUdYYt/K4h+t6Hv1eCLqfXNqes=;
+        b=Sn5bheHf0iSHwsOdWoqxxUlz/J99xRxIXA+PBePH1XJ3U13n8sqi2FGOLami1rEi3j
+         Rz0KgDu+5/lHtypZZ5qMzpQymLUgYOX+QPyAqOM8p8EkTyLZCd9uNNC2bvENAFdc1+Wd
+         kemSVx75uManSLwFszUd+5d14iA/ca5a5TAIAJ8cuLFg9h1S6cgDbvxBjezYb/0VNYD0
+         aJL0O867xX+QlTNg2JCNhMawaARUHDVHCvNEGCN3u2RbaHMzd+TAVlvCu/en1oNGvtfB
+         ckTJZrvkEqZhLmFWjLFH2i4fcOsDm6vEQBjTYt0jDKfEbXCkfg1bZDYTtIqvBXJGDYFo
+         5v6Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=oFu13wmCnF/37EBkxbUdYYt/K4h+t6Hv1eCLqfXNqes=;
+        b=ffeHbsyzxe4sIQ7voXEaalwSVeUe8hIvjVNIUlD3CJbR5Q8GSiAtbkwPJ3FSPIFung
+         9JQsmEEpDeoyv43aa2LNfhOJRwUteNbeNXNBJhYc/eaG6az8oAMH0fzmkfmXWOf/I5mC
+         7X5/NMA8b3ZG5hWOiXskS6iFrNypgc3X0uOqmVNiMRA1LBBhA8hg7/6Je0Jb5kvKVU9B
+         K+XaI4UHwnDcG0hOp/oLV7eKVg2OdsKThiqR7rpqTSVk/KU24pIaQ3UkzR6hZZKT1azT
+         OUZl/Au0g1z+QwxVA85X6pyYSjUOct8tdZdYB0m9nYznnI5Y7wwwW6McAPVfGvp6+L54
+         yoKQ==
+X-Gm-Message-State: AOAM533clYOxI41bxIYTX27qc2jWRMByqgKlv6iqJgVw4l8L+HW7Fwpd
+        AB+5PE+qroe6Fj6RRVGncbOojQ==
+X-Google-Smtp-Source: ABdhPJy0sexYyoTk6Wr66xcXBOrlvZXHvHNRLDXv/Tze2AbIXg3H8e+aw5d+XRFVSUTXeqmu7LlMbQ==
+X-Received: by 2002:adf:eec3:: with SMTP id a3mr4674259wrp.276.1631781161031;
+        Thu, 16 Sep 2021 01:32:41 -0700 (PDT)
+Received: from disaster-area.hh.sledj.net ([2001:8b0:bb71:7140:64::1])
+        by smtp.gmail.com with ESMTPSA id c135sm6760024wme.6.2021.09.16.01.32.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Sep 2021 01:32:40 -0700 (PDT)
+From:   David Edmondson <dme@dme.org>
+X-Google-Original-From: David Edmondson <david.edmondson@oracle.com>
+Received: from localhost (disaster-area.hh.sledj.net [local])
+        by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id 6e8fdd15;
+        Thu, 16 Sep 2021 08:32:39 +0000 (UTC)
+To:     linux-kernel@vger.kernel.org
+Cc:     Wanpeng Li <wanpengli@tencent.com>, Joerg Roedel <joro@8bytes.org>,
+        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Borislav Petkov <bp@alien8.de>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Joerg Roedel <jroedel@suse.de>,
-        Andi Kleen <ak@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
+        Sean Christopherson <seanjc@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
         Thomas Gleixner <tglx@linutronix.de>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Varad Gautam <varad.gautam@suse.com>,
-        Dario Faggioli <dfaggioli@suse.com>, x86@kernel.org,
-        linux-mm@kvack.org, linux-coco@lists.linux.dev,
-        Kuppuswamy Sathyanarayanan 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        David Hildenbrand <david@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>
-Subject: Re: [RFC] KVM: mm: fd-based approach for supporting KVM guest
- private memory
-Message-ID: <20210916073627.GA18399@chaop.bj.intel.com>
-Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
-References: <20210824005248.200037-1-seanjc@google.com>
- <20210902184711.7v65p5lwhpr2pvk7@box.shutemov.name>
- <YTE1GzPimvUB1FOF@google.com>
- <20210903191414.g7tfzsbzc7tpkx37@box.shutemov.name>
- <02806f62-8820-d5f9-779c-15c0e9cd0e85@kernel.org>
- <20210910171811.xl3lms6xoj3kx223@box.shutemov.name>
- <20210915195857.GA52522@chaop.bj.intel.com>
- <20210915141147.s4mgtcfv3ber5fnt@black.fi.intel.com>
+        Jim Mattson <jmattson@google.com>,
+        David Edmondson <david.edmondson@oracle.com>
+Subject: [PATCH v5 0/4] KVM: x86: Convey the exit reason, etc. to user-space on emulation failure
+Date:   Thu, 16 Sep 2021 09:32:35 +0100
+Message-Id: <20210916083239.2168281-1-david.edmondson@oracle.com>
+X-Mailer: git-send-email 2.33.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=gb2312
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20210915141147.s4mgtcfv3ber5fnt@black.fi.intel.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 15, 2021 at 05:11:47PM +0300, Kirill A. Shutemov wrote:
-> On Wed, Sep 15, 2021 at 07:58:57PM +0000, Chao Peng wrote:
-> > On Fri, Sep 10, 2021 at 08:18:11PM +0300, Kirill A. Shutemov wrote:
-> > > On Fri, Sep 03, 2021 at 12:15:51PM -0700, Andy Lutomirski wrote:
-> > > > On 9/3/21 12:14 PM, Kirill A. Shutemov wrote:
-> > > > > On Thu, Sep 02, 2021 at 08:33:31PM +0000, Sean Christopherson wrote:
-> > > > >> Would requiring the size to be '0' at F_SEAL_GUEST time solve that problem?
-> > > > > 
-> > > > > I guess. Maybe we would need a WRITE_ONCE() on set. I donno. I will look
-> > > > > closer into locking next.
-> > > > 
-> > > > We can decisively eliminate this sort of failure by making the switch
-> > > > happen at open time instead of after.  For a memfd-like API, this would
-> > > > be straightforward.  For a filesystem, it would take a bit more thought.
-> > > 
-> > > I think it should work fine as long as we check seals after i_size in the
-> > > read path. See the comment in shmem_file_read_iter().
-> > > 
-> > > Below is updated version. I think it should be good enough to start
-> > > integrate with KVM.
-> > > 
-> > > I also attach a test-case that consists of kernel patch and userspace
-> > > program. It demonstrates how it can be integrated into KVM code.
-> > > 
-> > > One caveat I noticed is that guest_ops::invalidate_page_range() can be
-> > > called after the owner (struct kvm) has being freed. It happens because
-> > > memfd can outlive KVM. So the callback has to check if such owner exists,
-> > > than check that there's a memslot with such inode.
-> > 
-> > Would introducing memfd_unregister_guest() fix this?
-> 
-> I considered this, but it get complex quickly.
-> 
-> At what point it gets called? On KVM memslot destroy?
+To help when debugging failures in the field, if instruction emulation
+fails, report the VM exit reason, etc. to userspace in order that it
+can be recorded.
 
-I meant when the VM gets destroyed.
+The SGX changes here are compiled but untested.
 
-> 
-> What if multiple KVM slot share the same memfd? Add refcount into memfd on
-> how many times the owner registered the memfd?
-> 
-> It would leave us in strange state: memfd refcount owners (struct KVM) and
-> KVM memslot pins the struct file. Weird refcount exchnage program.
-> 
-> I hate it.
+v5:
+- Add some Reviewed-by (Sean).
+- Build-time complaint about sizing rather than run-time calculation (Sean).
+- Clarify that the format of the auxiliary debug data is undefined (Sean).
+- ndata_start -> info_start (Sean).
+- sizeof(variable) rather than sizeof(type) (Sean).
 
-But yes agree things will get much complex in practice.
+v4:
+- Update the API for preparing emulation failure report (Sean)
+- sgx uses the provided API in all relevant cases (Sean)
+- Clarify the intended layout of kvm_run.emulation_failure.
 
-> 
-> > > I guess it should be okay: we have vm_list we can check owner against.
-> > > We may consider replace vm_list with something more scalable if number of
-> > > VMs will get too high.
-> > > 
-> > > Any comments?
-> > > 
-> > > diff --git a/include/linux/memfd.h b/include/linux/memfd.h
-> > > index 4f1600413f91..3005e233140a 100644
-> > > --- a/include/linux/memfd.h
-> > > +++ b/include/linux/memfd.h
-> > > @@ -4,13 +4,34 @@
-> > >  
-> > >  #include <linux/file.h>
-> > >  
-> > > +struct guest_ops {
-> > > +	void (*invalidate_page_range)(struct inode *inode, void *owner,
-> > > +				      pgoff_t start, pgoff_t end);
-> > > +};
-> > 
-> > I can see there are two scenarios to invalidate page(s), when punching a
-> > hole or ftruncating to 0, in either cases KVM should already been called
-> > with necessary information from usersapce with memory slot punch hole
-> > syscall or memory slot delete syscall, so wondering this callback is
-> > really needed.
-> 
-> So what you propose? Forbid truncate/punch from userspace and make KVM
-> handle punch hole/truncate from within kernel? I think it's layering
-> violation.
+v3:
+- Convey any debug data un-flagged after the ABI specified data in
+  struct emulation_failure (Sean)
+- Obey the ABI protocol in sgx_handle_emulation_failure() (Sean)
 
-As far as I understand the flow for punch hole/truncate in this design,
-there will be two steps for userspace:
-  1. punch hole/delete kvm memory slot, and then
-  2. puncn hole/truncate on the memory backing store fd.
+v2:
+- Improve patch comments (dmatlock)
+- Intel should provide the full exit reason (dmatlock)
+- Pass a boolean rather than flags (dmatlock)
+- Use the helper in kvm_task_switch() and kvm_handle_memory_failure()
+  (dmatlock)
+- Describe the exit_reason field of the emulation_failure structure
+  (dmatlock)
 
-In concept we can do whatever needed for invalidation in either steps.
-If we can do the invalidation in step 1 then we don¡¯t need bothering
-this callback. This is what I mean but agree the current callback can
-also work.
+David Edmondson (4):
+  KVM: x86: Clarify the kvm_run.emulation_failure structure layout
+  KVM: x86: Get exit_reason as part of kvm_x86_ops.get_exit_info
+  KVM: x86: On emulation failure, convey the exit reason, etc. to
+    userspace
+  KVM: x86: SGX must obey the KVM_INTERNAL_ERROR_EMULATION protocol
 
-> 
-> > > +
-> > > +struct guest_mem_ops {
-> > > +	unsigned long (*get_lock_pfn)(struct inode *inode, pgoff_t offset);
-> > > +	void (*put_unlock_pfn)(unsigned long pfn);
-> > 
-> > Same as above, I¡¯m not clear on which time put_unlock_pfn() would be
-> > called, I¡¯m thinking the page can be put_and_unlock when userspace
-> > punching a hole or ftruncating to 0 on the fd.
-> 
-> No. put_unlock_pfn() has to be called after the pfn is in SEPT. This way
-> we close race between SEPT population and truncate/punch. get_lock_pfn()
-> would stop truncate untile put_unlock_pfn() called.
+ arch/x86/include/asm/kvm_host.h | 10 +++--
+ arch/x86/kvm/svm/svm.c          |  8 ++--
+ arch/x86/kvm/trace.h            |  9 ++--
+ arch/x86/kvm/vmx/nested.c       |  2 +-
+ arch/x86/kvm/vmx/sgx.c          | 16 +++-----
+ arch/x86/kvm/vmx/vmx.c          | 11 +++--
+ arch/x86/kvm/x86.c              | 73 ++++++++++++++++++++++++++-------
+ include/uapi/linux/kvm.h        | 14 ++++++-
+ 8 files changed, 99 insertions(+), 44 deletions(-)
 
-Okay, makes sense.
+-- 
+2.33.0
 
-Thanks,
-Chao
