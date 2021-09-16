@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B8C6840E6CA
-	for <lists+kvm@lfdr.de>; Thu, 16 Sep 2021 19:31:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D13C540E7FC
+	for <lists+kvm@lfdr.de>; Thu, 16 Sep 2021 20:00:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347126AbhIPRZT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Sep 2021 13:25:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59920 "EHLO
+        id S1350006AbhIPRnb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Sep 2021 13:43:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35464 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348016AbhIPRXQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Sep 2021 13:23:16 -0400
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 213A7C08EA78
-        for <kvm@vger.kernel.org>; Thu, 16 Sep 2021 09:20:47 -0700 (PDT)
-Received: by mail-pj1-x102d.google.com with SMTP id v19so4922706pjh.2
-        for <kvm@vger.kernel.org>; Thu, 16 Sep 2021 09:20:47 -0700 (PDT)
+        with ESMTP id S1355727AbhIPRmE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Sep 2021 13:42:04 -0400
+Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A715EC08ECAB
+        for <kvm@vger.kernel.org>; Thu, 16 Sep 2021 09:23:58 -0700 (PDT)
+Received: by mail-pg1-x532.google.com with SMTP id f129so6666762pgc.1
+        for <kvm@vger.kernel.org>; Thu, 16 Sep 2021 09:23:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=pPI/VFw1zzsayAVnvWLbDx7Hpbl9/4fZcCkZww1rQGI=;
-        b=U5tiGDAAZOHXxrls9q5Eta2fq2CUA7BHgHHf3T5jpCvkx/QPHyRPhBPfweZG0EMPtM
-         /hlDJCtbiPTvlayHon3zcnd9yz7sqPJ5lHP5Z8Pbkh1PbB3UqMcdw2sKBS3NPmvwKQhn
-         Ucpy6KMSK1/HxW/9YJBDM1TK4/IJvjzEajlNl5gRxAAB4IUDKR/QTRpPK+BokmdnQUFb
-         y6I2Jh720jk1mUDT6GaH6lBgO6Y3F4P5tEomc6Ik8jIVNQpMKX3n/+XkOxEDMFtpYKng
-         1XrZKUDHT5h/Mhc78bF1oTYRWj5BBrB4vHRsb/ajjorHArSS1sNlRWp45oEUmsp9X+z/
-         gAXg==
+        bh=os8rPPCaF89PPiVrnE71sKF7gfEFVZ9yV2+yV9yUHR4=;
+        b=Qb7LcVXCEjjeuIheMzTtc2GBg9gKLbCPL2bZUc8zBpPNURrWsv9Dgnvee8UtwAWpM2
+         KqT/003vxruXr7KvESOWEYGCW8cDiHRUrvna29ezRiXEL0TG94mmXTtGX1qDpQheicNK
+         EJpOb2fAMBJcuXde7O4ul41Iesw4VTEKh6ryNr188Zt3lxJIhepqVgbGqltAtB8l7cJC
+         x+Lwo12+goZKaiUbtn4AKpOiy98M1xmhxYd9QVM7NtVIHyWIpiL2gX+CfyqquAh+t7D9
+         fYg7i6oEdhc/SOq5/aTlsBUyZuH+LbjSZnyz/W7186frV3GulKYIBjerp9S0M0sKpBB7
+         NMrQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=pPI/VFw1zzsayAVnvWLbDx7Hpbl9/4fZcCkZww1rQGI=;
-        b=T6lDivrRePzETHyaP+ETiH02DVCcey1dA3PhECpCu6YcJSVzdGlZzhghRlohxN5Pso
-         L5eP6z9QLU/Eb2koWXofSPTkLLTn/aFVOCRE5TBe7iv+uscN+zhcAgl0HYe96rDiLMEE
-         lwwU5CyI9dnkcbuQP5YjX0BrgASnL3ispvtzmXO4TefevBnWy/4o9MiD3Hnn7dCIOCAb
-         gaUYe21RbjW29zfkDOaSwbwjGzeiHNehA/a0JNQflOQuLSV/4nyKD2X0U/kV9q2CKR1y
-         cvErz8iaTeJ9nxyiIxlQxXO77Zzbh6YP57O5yu8zVEozcgToDGF+fpruA99d4jiX1nmS
-         B7JQ==
-X-Gm-Message-State: AOAM5324U6LLkach7CxduqfdCU8mIuaBGHCvOGrWYfE5oj/uN7QXjjZH
-        fSZSb8PbLMf46h7dP0Fh5iT9ig==
-X-Google-Smtp-Source: ABdhPJwOi/rPghzGiGvxWRxUWAxSCfJoIvU2qR/dq192mzrvuKW2ywbsmxspallCqVizxJKSmmm1ww==
-X-Received: by 2002:a17:902:82c2:b0:13c:916b:96a with SMTP id u2-20020a17090282c200b0013c916b096amr5611228plz.61.1631809246433;
-        Thu, 16 Sep 2021 09:20:46 -0700 (PDT)
+        bh=os8rPPCaF89PPiVrnE71sKF7gfEFVZ9yV2+yV9yUHR4=;
+        b=hy0kYn0pjYg4jEccQ+UFs8EgKA/cldyoUYn1dVpWZkIo24h8aZGKzZgDxZcwnN0QR7
+         amXPQWDo9JIeqJCvAfHuhbjQQU78NLl1rBu2mk88RDar52ckZrpdV9BuwhknTJg/XDnP
+         ajX6v2Lidye4zofBtEETgBrdjrrrhRzNDvKl/a790Kx8yMqPmFHdUwwzOyGkucTtUFSM
+         YakDu8F9DPRaS9yALCAWJ1Ci3EixwAnLTUcHPa2KcyDzuORkBMYL0n/4l/iZZHX0SQ44
+         5gJASvNIEcmX/sE7IawPL0WL+l5Ia/AFxjKXNMZZwWsOrn1mhIV77K++g3eDgFSGNOJg
+         UWZw==
+X-Gm-Message-State: AOAM5316Sl+FqHSc6MG3yvfyxnwWmUly/9LwxqrRAXigZ2K8W1uIK5rI
+        ynSU4WkQhGtVa09RYgxf3C89mQ==
+X-Google-Smtp-Source: ABdhPJwl7DlrIO8koo0hDyar+Y2gWKmCVex6gaphG2oB4GTxCDsWv80YTpH1lwK43hPlXQ/YtKlphw==
+X-Received: by 2002:a63:b349:: with SMTP id x9mr5643759pgt.139.1631809438005;
+        Thu, 16 Sep 2021 09:23:58 -0700 (PDT)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id d4sm8224656pjo.12.2021.09.16.09.20.45
+        by smtp.gmail.com with ESMTPSA id 19sm3761871pfh.12.2021.09.16.09.23.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Sep 2021 09:20:45 -0700 (PDT)
-Date:   Thu, 16 Sep 2021 16:20:42 +0000
+        Thu, 16 Sep 2021 09:23:57 -0700 (PDT)
+Date:   Thu, 16 Sep 2021 16:23:53 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     David Edmondson <dme@dme.org>
 Cc:     linux-kernel@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
@@ -60,64 +60,27 @@ Cc:     linux-kernel@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Jim Mattson <jmattson@google.com>,
         David Edmondson <david.edmondson@oracle.com>
-Subject: Re: [PATCH v5 1/4] KVM: x86: Clarify the kvm_run.emulation_failure
- structure layout
-Message-ID: <YUNu2npJv2LPBRop@google.com>
+Subject: Re: [PATCH v5 2/4] KVM: x86: Get exit_reason as part of
+ kvm_x86_ops.get_exit_info
+Message-ID: <YUNvmbtmgRkhLguj@google.com>
 References: <20210916083239.2168281-1-david.edmondson@oracle.com>
- <20210916083239.2168281-2-david.edmondson@oracle.com>
+ <20210916083239.2168281-3-david.edmondson@oracle.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210916083239.2168281-2-david.edmondson@oracle.com>
+In-Reply-To: <20210916083239.2168281-3-david.edmondson@oracle.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Thu, Sep 16, 2021, David Edmondson wrote:
-
-For all these patches, assuming you want the Author credit to go to your @oracle.com
-email, they need an explicit
-
-  From: David Edmondson <david.edmondson@oracle.com>
-
-otherwise git will default to the "From" email header and make the Author
-"David Edmondson <dme@dme.org>".  And then checkpatch will rightly complain that
-the SOB does not match the Author.
-
-Adding From: can be handled automatically by "git format-patch" via "--from", e.g.
-
-  git format-patch --from="David Edmondson <dme@dme.org>" ...
-
-> Until more flags for kvm_run.emulation_failure flags are defined, it
-> is undetermined whether new payload elements corresponding to those
-> flags will be additive or alternative. As a hint to userspace that an
-> alternative is possible, wrap the current payload elements in a union.
+> Extend the get_exit_info static call to provide the reason for the VM
+> exit. Modify relevant trace points to use this rather than extracting
+> the reason in the caller.
 > 
-> Suggested-by: Sean Christopherson <seanjc@google.com>
 > Signed-off-by: David Edmondson <david.edmondson@oracle.com>
 > ---
->  include/uapi/linux/kvm.h | 8 ++++++--
->  1 file changed, 6 insertions(+), 2 deletions(-)
-> 
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index a067410ebea5..8618fe973215 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -402,8 +402,12 @@ struct kvm_run {
->  			__u32 suberror;
->  			__u32 ndata;
->  			__u64 flags;
-> -			__u8  insn_size;
-> -			__u8  insn_bytes[15];
-> +			union {
-> +				struct {
-> +					__u8  insn_size;
-> +					__u8  insn_bytes[15];
-> +				};
-> +			};
->  		} emulation_failure;
->  		/* KVM_EXIT_OSI */
->  		struct {
-> -- 
-> 2.33.0
-> 
+
+With the From: / Author thing fixed,
+
+Reviewed-by: Sean Christopherson <seanjc@google.com>
