@@ -2,158 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0D55240D532
-	for <lists+kvm@lfdr.de>; Thu, 16 Sep 2021 10:59:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6B6EC40D614
+	for <lists+kvm@lfdr.de>; Thu, 16 Sep 2021 11:24:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235239AbhIPJAp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Sep 2021 05:00:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:50462 "EHLO
+        id S235771AbhIPJZi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Sep 2021 05:25:38 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23723 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234462AbhIPJAn (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 16 Sep 2021 05:00:43 -0400
+        by vger.kernel.org with ESMTP id S235725AbhIPJZb (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 16 Sep 2021 05:25:31 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1631782763;
+        s=mimecast20190719; t=1631784251;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=t2Z/Tfws0/ZPIkBTJwi6vBLPKuMktwH7w8C6L94eoVM=;
-        b=G37tWJXZgJiTawDu+EWUQkxqQIqtNGr2OS2sboJ68TjLxP1BJ2HCchOBNR1RUpPpyE36Ra
-        QFaEI7NxT9wzJIsXKdl/5Bfc+qjMBk/6JTZ0L6D9jxbVSYzK3SmwaWeAhouOhYyNzYymio
-        sr8our5csTOncndMxOOJ0q5V+Q6PMbU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-54-GlU6ZhEVPs-lOiN55UKk5A-1; Thu, 16 Sep 2021 04:59:19 -0400
-X-MC-Unique: GlU6ZhEVPs-lOiN55UKk5A-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 24861100CCC1;
-        Thu, 16 Sep 2021 08:59:18 +0000 (UTC)
-Received: from localhost (unknown [10.39.192.155])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id B554960FDD;
-        Thu, 16 Sep 2021 08:59:17 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Halil Pasic <pasic@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Pierre Morel <pmorel@linux.ibm.com>,
-        Michael Mueller <mimu@linux.ibm.com>,
-        linux-s390@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     bfu@redhat.com, Vineeth Vijayan <vneethv@linux.ibm.com>
-Subject: Re: [PATCH 1/1] virtio/s390: fix vritio-ccw device teardown
-In-Reply-To: <20210915215742.1793314-1-pasic@linux.ibm.com>
-Organization: Red Hat GmbH
-References: <20210915215742.1793314-1-pasic@linux.ibm.com>
-User-Agent: Notmuch/0.32.1 (https://notmuchmail.org)
-Date:   Thu, 16 Sep 2021 10:59:15 +0200
-Message-ID: <87pmt8hp5o.fsf@redhat.com>
+        bh=0dHlztnaiRHcaPy45MsGDKnkv/q5nQ+if9oZqgd4ekg=;
+        b=HD963SCQMKUwIw8chxZAAqNqLLLAymnyHDtHlX3a6hW3j6bKDdMeeq30nxh7KjiftnuGhl
+        v0Ryq23yGV3mKVjUxoTczeVit7bShs76JKZPFj54MZiUjnB8CLCwwpyfgq13XkQk0DD5HZ
+        Ac4R5M+lfHyey9XY0nR4uWEoYbB0XBs=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-441-Nfn9QBzEM4iMaTg8nXwBmA-1; Thu, 16 Sep 2021 05:24:09 -0400
+X-MC-Unique: Nfn9QBzEM4iMaTg8nXwBmA-1
+Received: by mail-ed1-f72.google.com with SMTP id j6-20020aa7de86000000b003d4ddaf2bf9so4744550edv.7
+        for <kvm@vger.kernel.org>; Thu, 16 Sep 2021 02:24:09 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=0dHlztnaiRHcaPy45MsGDKnkv/q5nQ+if9oZqgd4ekg=;
+        b=ZWjqEYLZf5Ee98yiAmCLqUNK24kVMqtS5EuqNxhXelsZCyd53e8cW+/0I9I0RdcgjR
+         HOFZq4carMO86Us7LjumRwaMmSqqRzDAHWam94iDRg6OIpVGnY/XEha5F035/bD6Jtgg
+         AiOzXfgGHVZ/C9WpEQADVh9QpdMYZV3Z4UIl+7MFfCzL9Z09jd+IvkOM3OkSnJYuRdI5
+         9m9UzUzfbWYHUdxajfoGiii6/Ic15Tquh87uaRze4UebEbpvluuxgqdUL0fAf4HGA4gZ
+         5+0g4etj+G/ipDmyKfBKyJG4usJ3q07ibmAmnvDUL7AFu3czIAW01RHI6JrfZHec8nRh
+         ZKig==
+X-Gm-Message-State: AOAM532D7y5Ww4qeObDLdmIwG4cv4ZQfQwfDMtuhkrfk8Wm6tW/ogUpa
+        UC3K3asrNnrpmxvBoFfe8b9u+kAedxU5+DTTgNOY2NvmV8G5pc5S/im9ZU8XdvaPn4BgplLSFiq
+        4eLvdpM3rrikx
+X-Received: by 2002:a17:907:2653:: with SMTP id ar19mr5092599ejc.431.1631784248169;
+        Thu, 16 Sep 2021 02:24:08 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzxSCHk9AOfST+otT+0wr2XQnUZQCly3Lf1LowqYXIayIW1WAv+zy/RvKF5ZgnYhDlPWePO4Q==
+X-Received: by 2002:a17:907:2653:: with SMTP id ar19mr5092579ejc.431.1631784247943;
+        Thu, 16 Sep 2021 02:24:07 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id n10sm954257ejk.86.2021.09.16.02.24.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 16 Sep 2021 02:24:07 -0700 (PDT)
+To:     "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>
+Cc:     "Kirill A. Shutemov" <kirill@shutemov.name>,
+        Andy Lutomirski <luto@kernel.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Borislav Petkov <bp@alien8.de>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Joerg Roedel <jroedel@suse.de>,
+        Andi Kleen <ak@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Varad Gautam <varad.gautam@suse.com>,
+        Dario Faggioli <dfaggioli@suse.com>, x86@kernel.org,
+        linux-mm@kvack.org, linux-coco@lists.linux.dev,
+        Kuppuswamy Sathyanarayanan 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        David Hildenbrand <david@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>
+References: <20210824005248.200037-1-seanjc@google.com>
+ <20210902184711.7v65p5lwhpr2pvk7@box.shutemov.name>
+ <YTE1GzPimvUB1FOF@google.com>
+ <20210903191414.g7tfzsbzc7tpkx37@box.shutemov.name>
+ <02806f62-8820-d5f9-779c-15c0e9cd0e85@kernel.org>
+ <20210910171811.xl3lms6xoj3kx223@box.shutemov.name>
+ <20210915195857.GA52522@chaop.bj.intel.com>
+ <20210915141147.s4mgtcfv3ber5fnt@black.fi.intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [RFC] KVM: mm: fd-based approach for supporting KVM guest private
+ memory
+Message-ID: <179fdb45-d8a4-9567-edfe-2168794f599e@redhat.com>
+Date:   Thu, 16 Sep 2021 11:24:05 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <20210915141147.s4mgtcfv3ber5fnt@black.fi.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 15 2021, Halil Pasic <pasic@linux.ibm.com> wrote:
+On 15/09/21 16:11, Kirill A. Shutemov wrote:
+>> Would introducing memfd_unregister_guest() fix this?
+> I considered this, but it get complex quickly.
+> 
+> At what point it gets called? On KVM memslot destroy?
+> 
+> What if multiple KVM slot share the same memfd? Add refcount into memfd on
+> how many times the owner registered the memfd?
 
-> Since commit 48720ba56891 ("virtio/s390: use DMA memory for ccw I/O and
-> classic notifiers") we were supposed to make sure that
-> virtio_ccw_release_dev() completes before the ccw device, and the
-> attached dma pool are torn down, but unfortunately we did not.
-> Before that commit it used to be OK to delay cleaning up the memory
-> allocated by virtio-ccw indefinitely (which isn't really intuitive for
-> guys used to destruction happens in reverse construction order).
->
-> To accomplish this let us take a reference on the ccw device before we
-> allocate the dma_area and give it up after dma_area was freed.
->
-> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
-> Fixes: 48720ba56891 ("virtio/s390: use DMA memory for ccw I/O and
-> classic notifiers")
-> Reported-by: bfu@redhat.com
-> ---
->
-> I'm not certain this is the only hot-unplug and teardonw related problem
-> with virtio-ccw.
->
-> Some things that are not perfectly clear to me:
-> * What would happen if we observed an hot-unplug while we are doing
->   wait_event() in ccw_io_helper()? Do we get stuck? I don't thin we
->   are guaranteed to receive an irq for a subchannel that is gone.
+You will always have multiple KVM slots sharing the same memfd, because 
+memslots are SRCU-protected.  So there will be multiple generations of 
+memslots around and unregistering must be delayed to after 
+synchronize_srcu (around the call to kvm_arch_commit_memory_region).
 
-Hm. I think we may need to do a wake_up during remove handling.
+So KVM could just call memfd_{,un}register_guest as many times as it 
+calls fdget/fput.  Looking at your test device, it would be like the 
+following pseudo-patch:
 
-> * cdev->online seems to be manipulated under cdev->ccwlock, but
->   in virtio_ccw_remove() we look at it to decide should we clean up
->   or not. What is the idea there? I guess we want to avoid doing
->   if nothing is there or twice. But I don't understand how stuff
->   interlocks.
+	case GUEST_MEM_REGISTER: {
+		struct fd memfd = fdget(arg);
+		memfd_file = memfd.file;
+		return memfd_register_guest(memfd_file->f_inode, file,
+					    &guest_ops, &guest_mem_ops);
+	}
+	case GUEST_MEM_UNREGISTER: {
+		if (!memfd_file)
+			return -EINVAL;
 
-We only created the virtio device when we onlined the ccw device. Do you
-have a better idea how to check for that? (And yes, I'm not sure the
-locking is correct.)
++		memfd_unregister_guest(memfd_file->f_inode, file);
+		fput(memfd_file);
+		memfd_file = NULL;
+		guest_mem_ops = NULL;
+		return 0;
 
-> * Can virtio_ccw_remove() get called while !cdev->online and 
->   virtio_ccw_online() is running on a different cpu? If yes, what would
->   happen then?
+and shmem_unregister_guest would be something like
 
-All of the remove/online/... etc. callbacks are invoked via the ccw bus
-code. We have to trust that it gets it correct :) (Or have the common
-I/O layer maintainers double-check it.)
+	struct shmem_inode_info *info = SHMEM_I(inode);
 
->  
-> The main addresse of these questions is Conny ;).
->
-> An alternative to this approach would be to inc and dec the refcount
-> in ccw_device_dma_zalloc() and ccw_device_dma_free() respectively.
+	if (WARN_ON_ONCE(info->guest_owner != owner))
+		return;
+	if (--info->guest_usage_count)
+		return;
+	info->guest_owner = NULL;
+	info->guest_ops = NULL;
 
-Yeah, I also thought about that. This would give us more get/put
-operations, but might be the safer option.
+Paolo
 
->
-> ---
->  drivers/s390/virtio/virtio_ccw.c | 4 ++++
->  1 file changed, 4 insertions(+)
->
-> diff --git a/drivers/s390/virtio/virtio_ccw.c b/drivers/s390/virtio/virtio_ccw.c
-> index d35e7a3f7067..99141df3259b 100644
-> --- a/drivers/s390/virtio/virtio_ccw.c
-> +++ b/drivers/s390/virtio/virtio_ccw.c
-> @@ -1006,10 +1006,12 @@ static void virtio_ccw_release_dev(struct device *_d)
->  {
->  	struct virtio_device *dev = dev_to_virtio(_d);
->  	struct virtio_ccw_device *vcdev = to_vc_device(dev);
-> +	struct ccw_device *cdev = READ_ONCE(vcdev->cdev);
->  
->  	ccw_device_dma_free(vcdev->cdev, vcdev->dma_area,
->  			    sizeof(*vcdev->dma_area));
->  	kfree(vcdev);
-> +	put_device(&cdev->dev);
->  }
->  
->  static int irb_is_error(struct irb *irb)
-> @@ -1262,6 +1264,7 @@ static int virtio_ccw_online(struct ccw_device *cdev)
->  	struct virtio_ccw_device *vcdev;
->  	unsigned long flags;
->  
-> +	get_device(&cdev->dev);
->  	vcdev = kzalloc(sizeof(*vcdev), GFP_KERNEL);
->  	if (!vcdev) {
->  		dev_warn(&cdev->dev, "Could not get memory for virtio\n");
-> @@ -1315,6 +1318,7 @@ static int virtio_ccw_online(struct ccw_device *cdev)
->  				    sizeof(*vcdev->dma_area));
->  	}
->  	kfree(vcdev);
-> +	put_device(&cdev->dev);
->  	return ret;
->  }
->  
->
-> base-commit: 3ca706c189db861b2ca2019a0901b94050ca49d8
-> -- 
-> 2.25.1
+> It would leave us in strange state: memfd refcount owners (struct KVM) and
+> KVM memslot pins the struct file. Weird refcount exchnage program.
 
