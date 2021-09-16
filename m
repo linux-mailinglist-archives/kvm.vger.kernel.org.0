@@ -2,99 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D92C40EA57
-	for <lists+kvm@lfdr.de>; Thu, 16 Sep 2021 20:55:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4952340EA5E
+	for <lists+kvm@lfdr.de>; Thu, 16 Sep 2021 20:56:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240651AbhIPS4z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Sep 2021 14:56:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52160 "EHLO
+        id S1343790AbhIPS5d (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Sep 2021 14:57:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243404AbhIPS4u (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Sep 2021 14:56:50 -0400
-Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8CFFC0470DC
-        for <kvm@vger.kernel.org>; Thu, 16 Sep 2021 11:08:32 -0700 (PDT)
-Received: by mail-pg1-x534.google.com with SMTP id h3so6938917pgb.7
-        for <kvm@vger.kernel.org>; Thu, 16 Sep 2021 11:08:32 -0700 (PDT)
+        with ESMTP id S238702AbhIPS51 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Sep 2021 14:57:27 -0400
+Received: from mail-il1-x14a.google.com (mail-il1-x14a.google.com [IPv6:2607:f8b0:4864:20::14a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10256C04A14A
+        for <kvm@vger.kernel.org>; Thu, 16 Sep 2021 11:15:24 -0700 (PDT)
+Received: by mail-il1-x14a.google.com with SMTP id p10-20020a92d28a000000b0022b5f9140f7so14845693ilp.9
+        for <kvm@vger.kernel.org>; Thu, 16 Sep 2021 11:15:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Fch+BCg3HR41ekUQjpG3GOdcfqruvNbMqhruqZCG9TM=;
-        b=VU0JKe77kfS2lcfPh1Xksu/gXWYm5U2CRSHOjk5wD2KeQu276EK+jc2VnrC+wYEeAQ
-         7vVV2DIqLaw6SSw7xvewUzVEXCYwUkOr7AW92q8SIXbhxYIvWTTDNohDSOt9JOjn49WO
-         gm8tB1EP1n/uKUy6loqkqzZdzigOSa9I7wtKuRkve1V23pZ+1QYW4lJt8qrGllATObLl
-         X4R1niqoSsq4NJujBzn2M19ZdG9tp2ls2rnqXmPpALn+mxXDCqxVbDwdjofWjJ/w7nQD
-         owDwXSkc+7m/21ui1P/aysnEZptJ+ZTBKjaoTEhFnIkPt59+QZKwjjwsW7cvL0fpu8Fd
-         ZvBg==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=btDL3L/+bb3DbBRXEgGoHsE8Zt71CBQL97fPH4EXk/A=;
+        b=pH3ZPSHyuyqIdw7sVb6pv1UZzHZwd5tpk6oKk5pjSrUAGZjaI6gPpcnwmDwWIogj5j
+         zj/3RnzxsG3WAEUhnmKI2g0W+tsSXBeox49VmFI5O+cpKSsRpG/6GdcRVsEh7H69XLxb
+         XOCV8gStUGRy/QembchUDT3ZrwTt9voEZqdtsOVVh1EdYKxtygL1sfUnFlqfSlCayr3t
+         HbiYWAEvdfR74JBhPty46cWzByaiwZHagXS7CSXSfkcVw7Uj5nHRYsUlPFFfU0JkmTYg
+         HtQtxiOVYuCMtNh4+rjvCaFJCVWe0PvSpdy9xi6x/3YSDDF8pGUZYGKCaMNPV/IUnAkq
+         mkcA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Fch+BCg3HR41ekUQjpG3GOdcfqruvNbMqhruqZCG9TM=;
-        b=aHAZncksf8REA9SghAzaVsXaIH0VgLZIww2j0leGlSl+Bw8OHv+6a8Ku/zafr7hs3O
-         kksdUeWhJZQi8jzfExVz7nXpBY/Z9g3pEEVXZ/p+NPBfCwMSC7CeWaEk0MzS+7XEm8x0
-         5lP5BYK2P+ToL2fEVNyRE3HtTRgXM8BsArIR1QdbuxoOgLGNAjqPAuqBZSs2HerJdzSw
-         cG5ooWHuuo6jSE+ZSi7wzLnNPkw5XICAkDJP+KOc993YMmGjdT60Xa9Bve5UrLWyIzlX
-         pHtPIyhFJUJTvH9lZCaEO3ZYj2cqitLf7Ftvf9J0vg9iYlp8tX5a9+Eg1z4J9Gs1p0ks
-         0z8w==
-X-Gm-Message-State: AOAM531r0Tgtc7a1hk9tb6snIPDCs7PNGebX1UxxY0qgGBrZ82bK5koh
-        FnmiRvG4s5YDXL0hehx2ItNfuN2GNo8BWcNa/9cWggK/cZkWCg==
-X-Google-Smtp-Source: ABdhPJyPKSbJBJFs3Yy9jFyd4gTJG/sE+FH3APZQjVELwURMUUYv1ahDn7xBjbzC+yIyaxKSPecp94leOoKZ9E1vipo=
-X-Received: by 2002:a63:af4a:: with SMTP id s10mr6024367pgo.469.1631815712207;
- Thu, 16 Sep 2021 11:08:32 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210914171551.3223715-1-pgonda@google.com> <YUDcvRB3/QOXSi8H@google.com>
- <CAMkAt6opZoFfW_DiyJUREBAtd8503C6j+ZbjS9YL3z+bhqHR8Q@mail.gmail.com>
- <YUDsy4W0/FeIEJDr@google.com> <CAMkAt6r9W=bTzLkojjAuc5VpwJnSzg7+JUp=rnK-jO88hSKmxw@mail.gmail.com>
- <YUDuv1aTauPz9aqo@google.com> <8d58d4cb-bc0b-30a9-6218-323c9ffd1037@redhat.com>
- <CAMkAt6oPijfkPjT4ARpVmXfdczChf2k3ACBwK0YZeuGOxMAE8Q@mail.gmail.com> <9feed4e4-937e-2f11-bb56-0da5959c7dbd@redhat.com>
-In-Reply-To: <9feed4e4-937e-2f11-bb56-0da5959c7dbd@redhat.com>
-From:   Nathan Tempelman <natet@google.com>
-Date:   Thu, 16 Sep 2021 11:08:21 -0700
-Message-ID: <CAKiEG5oirC30Ga=mrzKq24mkwSYvbzMw9AVfL6epVG4O0EZE7A@mail.gmail.com>
-Subject: Re: [PATCH] KVM: SEV: Disable KVM_CAP_VM_COPY_ENC_CONTEXT_FROM for SEV-ES
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Peter Gonda <pgonda@google.com>,
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=btDL3L/+bb3DbBRXEgGoHsE8Zt71CBQL97fPH4EXk/A=;
+        b=kUSHmJjfm+UIul1Wiks1c5qoGZHz22/G+SDSjXE9aQ1ko7PGhNCAnAu0B5MkfebmBC
+         A/3f+3vzIGAJLcWHb8ZC7LldLZrx72Qxcx+95esPIFnYLcaapXGQWVhO5Lg/lp2LbnwD
+         YFOAENLGgXERo0Bv8KtyP51X73A41y44IavjlD39iJpV0SeEniG9eOMrv+e3ukD3kE4O
+         uhewcD+KagzkFiRCNEj7RqK/iPhzOfInQ6pBgOP7Ke2SOWpZnaHhU23mekkOTCWhKMGe
+         YfZtFNqgxAEIhb/LP5xfPHhz6lHESv/UFo53B65+CwKkYiNNxCj+nvE9tUZBK35MLmc+
+         B/Rg==
+X-Gm-Message-State: AOAM531laKfRRr3e/zDk/EmpQBSMz0Cw6/PvjJtczNQNQw0ovrYE6DRo
+        PzuQutl2PAA5y0UsFztJytdMy2CmvETk5Nik/1/Ri5Yn/tSj3Ap9VDqwUF7oP6knRtCzyas0Qnc
+        UT3Iz7XzaC5EYoQ+PexDVz41efQvdJis1/4vXwCFHy4LHAmQq+eeAkeHgpw==
+X-Google-Smtp-Source: ABdhPJxFWTKFCHnmW32IKSDzUpsnORPNcQrlWReCXvncQJer79Nhv+dt9vMYUea9GMm6JAvZIYiN8o71iQI=
+X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
+ (user=oupton job=sendgmr) by 2002:a92:90a:: with SMTP id y10mr5002860ilg.108.1631816123285;
+ Thu, 16 Sep 2021 11:15:23 -0700 (PDT)
+Date:   Thu, 16 Sep 2021 18:15:02 +0000
+Message-Id: <20210916181510.963449-1-oupton@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.0.464.g1972c5931b-goog
+Subject: [PATCH v8 0/8] KVM: arm64: Add idempotent controls to migrate guest counter
+From:   Oliver Upton <oupton@google.com>
+To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
-        kvm list <kvm@vger.kernel.org>, Marc Orr <marcorr@google.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        linux-kernel@vger.kernel.org
+        Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-arm-kernel@lists.infradead.org,
+        Andrew Jones <drjones@redhat.com>,
+        Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Oliver Upton <oupton@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 15, 2021 at 3:33 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 15/09/21 18:10, Peter Gonda wrote:
-> > svm_vm_copy_asid_from() {
-> >
-> >     asid = to_kvm_svm(source_kvm)->sev_info.asid;
-> > + handle = to_kvm_svm(source_kvm)->sev_info.handle;
-> > + fd = to_kvm_svm(source_kvm)->sev_info.fd;
-> > + es_active = to_kvm_svm(source_kvm)->sev_info.es_active;
-> >
-> > ...
-> >
-> >      /* Set enc_context_owner and copy its encryption context over */
-> >      mirror_sev = &to_kvm_svm(kvm)->sev_info;
-> >      mirror_sev->enc_context_owner = source_kvm;
-> >      mirror_sev->asid = asid;
-> >      mirror_sev->active = true;
-> > +  mirror_sev->handle = handle;
-> > +  mirror_sev->fd = fd;
-> > + mirror_sev->es_active = es_active;
-> >
-> > Paolo would you prefer a patch to enable ES mirroring or continue with
-> > this patch to disable it for now?
->
-> If it's possible to enable it, it would be better.  The above would be a
-> reasonable patch for 5.15-rc.
->
-> Paolo
->
+Currently, on KVM/arm64, we only allow a VMM to migrate the guest's
+virtual counter by-value. Saving and restoring the counter by value is
+problematic in the fact that the recorded state is not idempotent.
+Furthermore, we obfuscate from userspace the fact that the architecture
+actually provides offset-based controls.
 
-+1. We don't have any immediate plans for sev-es, but it would be nice
-to have while we're here. But if you want to make the trivial fix I
-can come along and do it later.
+Another issue is that KVM/arm64 doesn't provide userspace with the
+controls of the physical counter-timer. This series aims to address both
+issues by adding offset-based controls for the virtual and physical
+counters.
+
+Patches 1-2 are refactor changes required to provide offset controls to
+userspace and putting in some generic plumbing to use for both physical
+and virtual offsets.
+
+Patch 3 is a minor refactor, creating a helper function to get the
+number of timer registers for a particular vCPU.
+
+Patch 4 exposes a vCPU's virtual offset through the KVM_*_ONE_REG
+ioctls. When NV support is added to KVM, CNTVOFF_EL2 will be considered
+a guest system register. So, it is safe to expose it now through that
+ioctl.
+
+Patch 5 adds a cpufeature bit to detect 'full' ECV implementations,
+providing EL2 with the ability to offset the physical counter-timer.
+
+Patch 6 exposes a vCPU's physical offset as a vCPU device attribute.
+This is deliberate, as the attribute is not architectural; KVM uses this
+attribute to track the host<->guest offset.
+
+Patch 7 is a prepatory change for the sake of physical offset emulation,
+as counter-timer traps must be configured separately for each vCPU.
+
+Patch 8 allows non-ECV hosts to support the physical offset vCPU device
+attribute, by trapping and emulating the physical counter registers.
+
+This series was tested on an Ampere Mt. Jade system (non-ECV, VHE and
+nVHE). I did not test this on the FVP, as I need to really figure out
+tooling for it on my workstation.
+
+Applies cleanly to v5.15-rc1
+
+v7: http://lore.kernel.org/r/20210816001217.3063400-1-oupton@google.com
+
+v7 -> v8:
+ - Only use ECV if !VHE
+ - Only expose CNTVOFF_EL2 register to userspace with opt-in
+ - Refer to the direct_ptimer explicitly
+
+Oliver Upton (8):
+  KVM: arm64: Refactor update_vtimer_cntvoff()
+  KVM: arm64: Separate guest/host counter offset values
+  KVM: arm64: Make a helper function to get nr of timer regs
+  KVM: arm64: Allow userspace to configure a vCPU's virtual offset
+  arm64: cpufeature: Enumerate support for FEAT_ECV >= 0x2
+  KVM: arm64: Allow userspace to configure a guest's counter-timer
+    offset
+  KVM: arm64: Configure timer traps in vcpu_load() for VHE
+  KVM: arm64: Emulate physical counter offsetting on non-ECV systems
+
+ Documentation/arm64/booting.rst         |   7 +
+ Documentation/virt/kvm/api.rst          |  23 +++
+ Documentation/virt/kvm/devices/vcpu.rst |  28 ++++
+ arch/arm64/include/asm/kvm_host.h       |   3 +
+ arch/arm64/include/asm/sysreg.h         |   5 +
+ arch/arm64/include/uapi/asm/kvm.h       |   2 +
+ arch/arm64/kernel/cpufeature.c          |  10 ++
+ arch/arm64/kvm/arch_timer.c             | 196 +++++++++++++++++++++---
+ arch/arm64/kvm/arm.c                    |   9 +-
+ arch/arm64/kvm/guest.c                  |  28 +++-
+ arch/arm64/kvm/hyp/include/hyp/switch.h |  32 ++++
+ arch/arm64/kvm/hyp/nvhe/timer-sr.c      |  11 +-
+ arch/arm64/tools/cpucaps                |   1 +
+ include/clocksource/arm_arch_timer.h    |   1 +
+ include/kvm/arm_arch_timer.h            |  14 +-
+ include/uapi/linux/kvm.h                |   1 +
+ 16 files changed, 337 insertions(+), 34 deletions(-)
+
+-- 
+2.33.0.309.g3052b89438-goog
+
