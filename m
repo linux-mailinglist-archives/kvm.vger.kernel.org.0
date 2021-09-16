@@ -2,98 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 08B1240D087
-	for <lists+kvm@lfdr.de>; Thu, 16 Sep 2021 02:02:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 73F1C40D0D5
+	for <lists+kvm@lfdr.de>; Thu, 16 Sep 2021 02:29:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233101AbhIPADs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Sep 2021 20:03:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49842 "EHLO
+        id S233356AbhIPAar (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Sep 2021 20:30:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56042 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233065AbhIPADm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Sep 2021 20:03:42 -0400
-Received: from mail-il1-x130.google.com (mail-il1-x130.google.com [IPv6:2607:f8b0:4864:20::130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1A61C061766
-        for <kvm@vger.kernel.org>; Wed, 15 Sep 2021 17:02:22 -0700 (PDT)
-Received: by mail-il1-x130.google.com with SMTP id a20so4828170ilq.7
-        for <kvm@vger.kernel.org>; Wed, 15 Sep 2021 17:02:22 -0700 (PDT)
+        with ESMTP id S233237AbhIPAar (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Sep 2021 20:30:47 -0400
+Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D64AC061574
+        for <kvm@vger.kernel.org>; Wed, 15 Sep 2021 17:29:27 -0700 (PDT)
+Received: by mail-lf1-x135.google.com with SMTP id m3so9561468lfu.2
+        for <kvm@vger.kernel.org>; Wed, 15 Sep 2021 17:29:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linuxfoundation.org; s=google;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=Ax8LShNyO/ytGnXDG0PMZkXXR8JTT6V4lJvXKtadg9U=;
-        b=SkOrlPfjrXdP/RELV+Vo7978cJgloQd/OPaiCrR1IlQJh60BxLSh4Jq3HO7QRKjsIt
-         Vd3UzKhvuMbIu9EivUwLSukwAaPJD6nyAKBEgiYmdZ59wm9CluMW+9MchrdXvemv+KY6
-         0UIBnyzjfRcB5cKCGhHx5SLBWPeDfZaJ3kFxI=
+        d=gmail.com; s=20210112;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=NOfNAXzWn2iNMFgc8Qpag7WikiQmaWSgLADwLsaraKM=;
+        b=RqJG0j4GgjA7iI5CRivFjxgbuCf+nP9u6xFAid3MlHdwlJfMudK0KpCKrxLZ46SBF7
+         rR5Vv3JvutAmBd6dJV4KYYjyILZf1+cNUzjIJX9XLzWwru9Y7HMr9B5A6MaW/DVheSPq
+         wOUccdkk1ReUK5OuUxblX6p/WONbNKE3Bwmohaap8nkKokoiMDW3tJbA/hzOLc/KLKmk
+         MBMQxdhe6TMSweVLXHoPiZEjz3irSeD5CruoOLqnu9htDp8hYnQYwRJI+/xonst3P9hV
+         ZbmvXOL0Ti/meQZXHNE8K+6vZ27OUQsMLhpSabGxzYo+bQ5ofNUd1iPHt526ThdPhxeg
+         iUgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Ax8LShNyO/ytGnXDG0PMZkXXR8JTT6V4lJvXKtadg9U=;
-        b=7nFtMIzABbEEg1sBauq5avrASwOWJn9V82N5/dS1zpY3u7eLpaA+n4l2keGzXNS3WT
-         iQDs8zXTcJqEO4wAP+/c1WkRq4rxdn9TXG2m55/E+XAPwIMRpT5lPRp+RFU1Z/f4bXv0
-         l4LjY9IRDUXoR+WRp1XHzJWMGaL7DxBDrJlCyukeT6BJ3yXFFMOYS3eWLMr9x1FLxoCo
-         jHDuxPj68m2ms7mMlgrvd59F2Mt0nZgpPDeZ6k84n4cg2a9Z4HWsxNzm9734Ou+zP0JB
-         FCX+gvhkzk0SjghEQZh33HDXpQpN+oQorHanlpcaoKiMeGYj1SzgmzF6vcKDLC+cPXD7
-         iOnA==
-X-Gm-Message-State: AOAM533yRxeFkaiPbH8zAsKPxBlZUMkGvX93xsHItVMr0h4FGiQCFPhA
-        KNA8rquD3sJHJl8Yr5aRv2kGtw==
-X-Google-Smtp-Source: ABdhPJz/RWH8z4Hqoi2kvBlptcDKBKVHEfRehR1OOG7S9aDfiBX8O/Dmxg2CcInJc+gDvk3gjl/Ctw==
-X-Received: by 2002:a05:6e02:1d8b:: with SMTP id h11mr1855401ila.94.1631750541908;
-        Wed, 15 Sep 2021 17:02:21 -0700 (PDT)
-Received: from [192.168.1.112] (c-24-9-64-241.hsd1.co.comcast.net. [24.9.64.241])
-        by smtp.gmail.com with ESMTPSA id s10sm737176iom.40.2021.09.15.17.02.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 15 Sep 2021 17:02:21 -0700 (PDT)
-Subject: Re: [PATCH 0/4] selftests: kvm: fscanf warn fixes and cleanups
-To:     Paolo Bonzini <pbonzini@redhat.com>, shuah@kernel.org
-Cc:     kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Shuah Khan <skhan@linuxfoundation.org>
-References: <cover.1631737524.git.skhan@linuxfoundation.org>
- <56178039-ab72-fca3-38fa-a1d422e4d3ef@redhat.com>
-From:   Shuah Khan <skhan@linuxfoundation.org>
-Message-ID: <aca932b9-5864-be95-c9f6-f745b6a6b7f3@linuxfoundation.org>
-Date:   Wed, 15 Sep 2021 18:02:20 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=NOfNAXzWn2iNMFgc8Qpag7WikiQmaWSgLADwLsaraKM=;
+        b=km3eXgxGcKTvTqLecO7Xzu8lkq8yZ9LkuZb3ufoy4fw56oDD6hh6i7Qwl+KL89JykY
+         wLAXqb5iIjvpTeAEY6E7YPlYwUaO8uYmdJyAI+FtDF3jR0PVY+o3z8XKbQzVKHMh/DWZ
+         UCCG8YdVFSY6gbUrj4/ZprJSHATrJejfsNJqdUIVvOJnyL9gNd1kkpUZJdCE7FHRlW+U
+         Lqn6kf0VCdLATx9lW2SPab/qk7Qb+YznNiUWxzHIcHTbDBFjfGJvx4y/jQ1EksZ2IzUP
+         PdNFE7PdVoQzr31NNrx6BGqaReIyt95qaCkY7vcqvOr1yhw+thuD55ssso03hiVvbn0p
+         KvsQ==
+X-Gm-Message-State: AOAM531IilPXs2dEmXKQwYOyKOi9mXCR5HclJ4fuCfhVG3B+7k1Y5L6w
+        TA1ZHhf/7bGOugO8foUdpZO1qATb8+S/9zuNnA4mcUbqU08=
+X-Google-Smtp-Source: ABdhPJyrwCXvXHPsKxmnmZxnhio6nxknVnpzxlDURWvBK+RSSf7n9cThp6ilakysgV6ZySlBFsadYLOS0t0RO1aBjDI=
+X-Received: by 2002:a2e:a4ca:: with SMTP id p10mr2394120ljm.415.1631752165357;
+ Wed, 15 Sep 2021 17:29:25 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <56178039-ab72-fca3-38fa-a1d422e4d3ef@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+From:   Bill Sherwood <bsherwood218@gmail.com>
+Date:   Wed, 15 Sep 2021 20:29:12 -0400
+Message-ID: <CA+Pe=gchWL+f1xuVCDgJADoTn6gtG58UUKyyRrjc+JrpgjovgQ@mail.gmail.com>
+Subject: Windows guests become unresponsive and display black screen in VNC
+To:     kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/15/21 4:34 PM, Paolo Bonzini wrote:
-> On 15/09/21 23:28, Shuah Khan wrote:
->> This patch series fixes fscanf() ignoring return value warnings.
->> Consolidates get_run_delay() duplicate defines moving it to
->> common library.
->>
->> Shuah Khan (4):
->>    selftests:kvm: fix get_warnings_count() ignoring fscanf() return warn
->>    selftests:kvm: fix get_trans_hugepagesz() ignoring fscanf() return
->>      warn
->>    selftests: kvm: move get_run_delay() into lib/test_util
->>    selftests: kvm: fix get_run_delay() ignoring fscanf() return warn
->>
->>   .../testing/selftests/kvm/include/test_util.h |  3 +++
->>   tools/testing/selftests/kvm/lib/test_util.c   | 22 ++++++++++++++++++-
->>   tools/testing/selftests/kvm/steal_time.c      | 16 --------------
->>   .../selftests/kvm/x86_64/mmio_warning_test.c  |  3 ++-
->>   .../selftests/kvm/x86_64/xen_shinfo_test.c    | 15 -------------
->>   5 files changed, 26 insertions(+), 33 deletions(-)
->>
-> 
-> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-> 
-> Thanks Shuah!
-> 
+Host is Ubuntu 20.04 - 5.4.0-26-generic
 
-Thank you. I can take these through linux-kselftest - let me know
-if that causes issues for kvm tree.
+KVM is 1:4.2-3ubuntu6.17
 
-thanks,
--- Shuah
+Guest OS -- various flavors of Windows 2012 server or greater
+
+Symptom:   Guests will appear to be running fine for some time (hours
+or days), occasionally a perfectly running guest will "lock up" and
+become unresponsive to network, VNC, etc..   We are unable to access
+the VM and the only resort is to destroy the VM - shutdown will not
+tear down the VM.
+
+Looking at a number of things, we can see the following via trace_pipe
+-- nothing else is emitted while in the hung state.
+
+ cat /sys/kernel/debug/tracing/trace_pipe | grep -i <pid>
+
+.....
+
+ <...>-3441924 [004] .... 1907374.582975: kvm_set_irq: gsi 0 level 1 source 0
+           <...>-3441924 [004] .... 1907374.582977: kvm_pic_set_irq:
+chip 0 pin 0 (edge|masked)
+           <...>-3441924 [004] .... 1907374.582979:
+kvm_apic_accept_irq: apicid 0 vec 209 (Fixed|edge)
+           <...>-3441924 [004] .... 1907374.582981:
+kvm_ioapic_set_irq: pin 2 dst 1 vec 209 (Fixed|logical|edge)
+           <...>-3441924 [004] .... 1907374.582983: kvm_set_irq: gsi 0
+level 0 source 0
+           <...>-3441924 [004] .... 1907374.582984: kvm_pic_set_irq:
+chip 0 pin 0 (edge|masked)
+           <...>-3441924 [004] .... 1907374.582984:
+kvm_ioapic_set_irq: pin 2 dst 1 vec 209 (Fixed|logical|edge)
+           <...>-3441924 [004] .... 1907374.583457: kvm_set_irq: gsi 0
+level 1 source 0
+           <...>-3441924 [004] .... 1907374.583459: kvm_pic_set_irq:
+chip 0 pin 0 (edge|masked)
+           <...>-3441924 [004] .... 1907374.583461:
+kvm_apic_accept_irq: apicid 0 vec 209 (Fixed|edge)
+           <...>-3441924 [004] .... 1907374.583462:
+kvm_ioapic_set_irq: pin 2 dst 1 vec 209 (Fixed|logical|edge)
+           <...>-3441924 [004] .... 1907374.583464: kvm_set_irq: gsi 0
+level 0 source 0
+.....
+
+
+----------------------
+
+
+Strace (15 second) output:
+
+ 55.39    0.082181          16      4937           ioctl
+ 23.05    0.034208          14      2390           ppoll
+ 21.56    0.031990          13      2379           futex
+  0.00    0.000001           0        30           read
+------ ----------- ----------- --------- --------- ----------------
+100.00    0.148380                  9736           total
+
+
+-----------------------
+
+KVM stat live output:
+
+        APIC_ACCESS      11491    44.50%     5.12%      1.82us
+5021.41us      9.41us ( +-   9.87% )
+       EPT_MISCONFIG       8007    31.01%    17.51%     11.25us
+11003.56us     46.18us ( +-   8.59% )
+                 HLT       3804    14.73%    76.26%      2.19us
+3962.04us    423.30us ( +-   0.44% )
+  EXTERNAL_INTERRUPT       2492     9.65%     0.46%      0.96us
+163.72us      3.91us ( +-   4.36% )
+   PAUSE_INSTRUCTION         14     0.05%     0.00%      1.24us
+6.59us      3.40us ( +-  14.61% )
+      IO_INSTRUCTION          8     0.03%     0.64%      8.34us
+13470.05us   1693.58us ( +-  99.34% )
+   PENDING_INTERRUPT          3     0.01%     0.00%      2.31us
+3.69us      2.99us ( +-  13.36% )
+       EPT_VIOLATION          2     0.01%     0.00%      7.74us
+9.37us      8.56us ( +-   9.51% )
+       EXCEPTION_NMI          1     0.00%     0.00%      3.09us
+3.09us      3.09us ( +-   0.00% )
+ TPR_BELOW_THRESHOLD          1     0.00%     0.00%      2.39us
+2.39us      2.39us ( +-   0.00% )
+
+
+We have tried quite a few of the HyperV enlightenments and clock
+settings and those do not resolve the issue
+
+We can reproduce the issue by stopping all guests(7) on the host and
+starting them up at the same time - this may take a couple of
+cycles(2-3) en-masse restarts and 1 or 2 out of the 7 will exhibit
+this behavior
+
+
+CPU is host-passthrough
+Server has 24 cores with 256G of ram
+
+
+Looking to see if anyone in the community has encountered this problem.
+
+Thanks
+Bill
