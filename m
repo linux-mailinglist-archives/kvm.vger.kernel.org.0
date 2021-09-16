@@ -2,228 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 30AC840D3AE
-	for <lists+kvm@lfdr.de>; Thu, 16 Sep 2021 09:19:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BA2B740D3E4
+	for <lists+kvm@lfdr.de>; Thu, 16 Sep 2021 09:37:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234693AbhIPHUo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Sep 2021 03:20:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42582 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232254AbhIPHUh (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 16 Sep 2021 03:20:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1631776757;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=LGfg0GcIluFSJ92DGpwm8iHnNl5dpXDbW0fpaZHOCJ0=;
-        b=E/v2+Q+OUs6oQClmwbXvw+3pqXNnXz5RuDOIipBbCaGF51k63Nx0ngn8CO8K3ak6cgUWcD
-        lgSxOrP4mC5ItItoeoyfSypbop6AyVkQvP3SUvAzXUOqPwtX8h+2k8ssEleM6hZTZyH2+k
-        W/rBXMpNHwVh+mltupAjpvdTg1SQe+A=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-523-hAHV608KMZqwTE3C71Xvpw-1; Thu, 16 Sep 2021 03:19:15 -0400
-X-MC-Unique: hAHV608KMZqwTE3C71Xvpw-1
-Received: by mail-ed1-f69.google.com with SMTP id y17-20020a50e611000000b003d051004603so4380861edm.8
-        for <kvm@vger.kernel.org>; Thu, 16 Sep 2021 00:19:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=LGfg0GcIluFSJ92DGpwm8iHnNl5dpXDbW0fpaZHOCJ0=;
-        b=iXyz22osd2ptQdOvmvaaNY2+ARsOKjXTkwYd/SRJWFAx6ys/CV5BFEYMPfrbgZG1Gm
-         VfloHF6twBJsQJJp/pum5HlCuXfZmmokVOlwk9fXIO/Y3fMv5S+fqyX3ffwu6SJpPOB3
-         9ujG8I/ADUvZtK50MD0LkK3DfzOxdIOJ2eBCCMiBx2jwfZp61YmaR3RmhBK5pA2nn0lB
-         ifIeVjjiHMu/pRxh3nGNwo+PeB2iDR5CcJR5rBNFOsCOjnE0/Tl9xtbe4wy6CoFLB4bV
-         0vp9PvFvIRKo5Rm7nLdHDkqJQ7J13raUm1z957Oni1zVIkEWfGdhuvOdDvKXZ6QX3Y0g
-         yavg==
-X-Gm-Message-State: AOAM531JSCGWaxaO/YlgbSz3EfU/eDuvGQF2PSCAXSGiW97C2Pud5PF3
-        VR2anpMEKhetUKVQjZoTKZvoWISvoJ+2ntgSsYdleopfDXGLCgfJYZG9XYixJuTJZU0V5UnXFqw
-        EoldvxWNQrvsY
-X-Received: by 2002:a17:907:75da:: with SMTP id jl26mr4735651ejc.300.1631776754166;
-        Thu, 16 Sep 2021 00:19:14 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzM8a8cQ5bqm/0JB8lYSrx8o4brn0zc/3kIz05qhtVinvsJWf+IE2TSrwxq+ncm0peCSQxHeA==
-X-Received: by 2002:a17:907:75da:: with SMTP id jl26mr4735635ejc.300.1631776753873;
-        Thu, 16 Sep 2021 00:19:13 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id la1sm851403ejc.48.2021.09.16.00.19.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Sep 2021 00:19:13 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Reiji Watanabe <reijiw@google.com>
-Subject: Re: [PATCH 2/3] KVM: VMX: Move RESET emulation to vmx_vcpu_reset()
-In-Reply-To: <YUIunxwjea/wq3gd@google.com>
-References: <20210914230840.3030620-1-seanjc@google.com>
- <20210914230840.3030620-3-seanjc@google.com>
- <875yv2167g.fsf@vitty.brq.redhat.com> <YUIunxwjea/wq3gd@google.com>
-Date:   Thu, 16 Sep 2021 09:19:12 +0200
-Message-ID: <87wnnhyolr.fsf@vitty.brq.redhat.com>
+        id S234841AbhIPHik (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Sep 2021 03:38:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37062 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234296AbhIPHij (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Sep 2021 03:38:39 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67D8DC061574;
+        Thu, 16 Sep 2021 00:37:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=2++NPtO3N0EKqFjod0lHOXuAnY0BGUp6aM9ZEKLL5JE=; b=fWRQGikoRH60qW6X6cnfcWri00
+        fDV87hJx5JKFIvzB1VghIwXfR96995PVo8kJThgH16NHXA2LcXb/0OUEJDBAk0Bl2qY21EgB/LD6j
+        yuWyo9QXuRb+rz8UdmseafctcU4F9oq4wcHZEeHDZVIzPeJnu/6YD92kHFeC+wADiwV5E0NuXTS9x
+        jELwwp0a1YxSUBTjc7IgjCeSLvhtV8GlZBWss3rZbkljK+45CzD5XrvvLhnYPJ9BPLbg34ibU5Ghh
+        G1NZvE9u3nz/CT9pZxRqgWh1izea0fJlYNRSpJ58AX24QI5uzGRKRidRWQ1bEE28SggGB+0Z9QdPn
+        qQ0W6UAQ==;
+Received: from hch by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mQlvQ-00GQBb-Sl; Thu, 16 Sep 2021 07:35:38 +0000
+Date:   Thu, 16 Sep 2021 08:35:16 +0100
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Christophe Leroy <christophe.leroy@csgroup.eu>
+Cc:     Borislav Petkov <bp@alien8.de>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Sathyanarayanan Kuppuswamy 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        linux-efi@vger.kernel.org, Brijesh Singh <brijesh.singh@amd.com>,
+        kvm@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        platform-driver-x86@vger.kernel.org,
+        Paul Mackerras <paulus@samba.org>, linux-s390@vger.kernel.org,
+        Andi Kleen <ak@linux.intel.com>,
+        Joerg Roedel <joro@8bytes.org>, x86@kernel.org,
+        amd-gfx@lists.freedesktop.org,
+        Christoph Hellwig <hch@infradead.org>,
+        linux-graphics-maintainer@vmware.com,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Tianyu Lan <Tianyu.Lan@microsoft.com>,
+        kexec@lists.infradead.org, linux-kernel@vger.kernel.org,
+        iommu@lists.linux-foundation.org, linux-fsdevel@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org
+Subject: Re: [PATCH v3 4/8] powerpc/pseries/svm: Add a powerpc version of
+ cc_platform_has()
+Message-ID: <YULztMRLJ55YLVU9@infradead.org>
+References: <cover.1631141919.git.thomas.lendacky@amd.com>
+ <9d4fc3f8ea7b325aaa1879beab1286876f45d450.1631141919.git.thomas.lendacky@amd.com>
+ <YUCOTIPPsJJpLO/d@zn.tnic>
+ <87lf3yk7g4.fsf@mpe.ellerman.id.au>
+ <YUHGDbtiGrDz5+NS@zn.tnic>
+ <f8388f18-5e90-5d0f-d681-0b17f8307dd4@csgroup.eu>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f8388f18-5e90-5d0f-d681-0b17f8307dd4@csgroup.eu>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <seanjc@google.com> writes:
+On Wed, Sep 15, 2021 at 07:18:34PM +0200, Christophe Leroy wrote:
+> Could you please provide more explicit explanation why inlining such an
+> helper is considered as bad practice and messy ?
 
-> On Wed, Sep 15, 2021, Vitaly Kuznetsov wrote:
->> Sean Christopherson <seanjc@google.com> writes:
->> > +static void __vmx_vcpu_reset(struct kvm_vcpu *vcpu)
->> > +{
->> > +	struct vcpu_vmx *vmx = to_vmx(vcpu);
->> > +
->> > +	init_vmcs(vmx);
->> > +
->> > +	if (nested)
->> > +		memcpy(&vmx->nested.msrs, &vmcs_config.nested, sizeof(vmx->nested.msrs));
->> > +
->> > +	vcpu_setup_sgx_lepubkeyhash(vcpu);
->> > +
->> > +	vmx->nested.posted_intr_nv = -1;
->> > +	vmx->nested.current_vmptr = -1ull;
->> > +	vmx->nested.hv_evmcs_vmptr = EVMPTR_INVALID;
->> 
->> What would happen in (hypothetical) case when enlightened VMCS is
->> currently in use? If we zap 'hv_evmcs_vmptr' here, the consequent
->> nested_release_evmcs() (called from
->> nested_vmx_handle_enlightened_vmptrld(), for example) will not do 
->> kvm_vcpu_unmap() while it should.
->
-> The short answer is that there's a lot of stuff that needs to be addressed before
-> KVM can expose a RESET ioctl().  My goal with these patches is to carve out the
-> stubs and move the few bits of RESET emulation into the "stubs".  This is the same
-> answer for the MSR question/comment at the end.
->
->> This, however, got me thinking: should we free all-things-nested with
->> free_nested()/nested_vmx_free_vcpu() upon vcpu reset? I can't seem to
->> find us doing that... (I do remember that INIT is blocked in VMX-root
->> mode and nobody else besides kvm_arch_vcpu_create()/
->> kvm_apic_accept_events() seems to call kvm_vcpu_reset()) but maybe we
->> should at least add a WARN_ON() guardian here?
->
-> I think that makes sense.  Maybe use CR0 as a sentinel since it has a non-zero
-> RESET value?  E.g. WARN if CR0 is non-zero at RESET.
->
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 86539c1686fa..3ac074376821 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -10813,6 +10813,11 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
->         unsigned long new_cr0;
->         u32 eax, dummy;
->
-> +       /*
-> +        * <comment about KVM not supporting arbitrary RESET>
-> +        */
-> +       WARN_ON_ONCE(!init_event && old_cr0);
-> +
->         kvm_lapic_reset(vcpu, init_event);
->
->         vcpu->arch.hflags = 0;
->
+Because now we get architectures to all subly differ.  Look at the mess
+for ioremap and the ioremap* variant.
 
-Should work (assuming nothing in VMX would want to call vmx_vcpu_reset()/
-__vmx_vcpu_reset() directly).
-
-> Huh, typing that out made me realize commit 0aa1837533e5 ("KVM: x86: Properly
-> reset MMU context at vCPU RESET/INIT") technically introduced a bug.  kvm_vcpu_reset()
-> does kvm_read_cr0() and thus reads vmcs.GUEST_CR0 because vcpu->arch.regs_avail is
-> (correctly) not stuffed to ALL_ONES until later in kvm_vcpu_reset().  init_vmcs()
-> doesn't explicitly zero vmcs.GUEST_CR0 (along with many other guest fields), and
-> so VMREAD(GUEST_CR0) is technically consuming garbage.  In practice, it's consuming
-> '0' because no known CPU or VMM inverts values in the VMCS, i.e. zero allocating
-> the VMCS is functionally equivalent to writing '0' to all fields via VMWRITE.
->
-> And staring more at kvm_vcpu_reset(), this code is terrifying for INIT
->
-> 	memset(vcpu->arch.regs, 0, sizeof(vcpu->arch.regs));
-> 	vcpu->arch.regs_avail = ~0;
-> 	vcpu->arch.regs_dirty = ~0;
->
-> because it means cr0 and cr4 are marked available+dirty without immediately writing
-> vcpu->arch.cr0/cr4.  And VMX subtly relies on that, as vmx_set_cr0() grabs CR0.PG
-> via kvm_read_cr0_bits(), i.e. zeroing vcpu->arch.cr0 would "break" the INIT flow.
-> Ignoring for the moment that CR0.PG is never guest-owned and thus never stale in
-> vcpu->arch.cr0, KVM is also technically relying on the earlier kvm_read_cr0() in
-> kvm_vcpu_reset() to ensure vcpu->arch.cr0 is fresh.
->
-> Stuffing regs_avail technically means vmx_set_rflags() -> vmx_get_rflags() is
-> consuming stale data.  It doesn't matter in practice because the old value is
-> only used to re-evaluate vmx->emulation_required, which is guaranteed to be up
-> refreshed by vmx_set_cr0() and friends.  PDPTRs and EXIT_INFO are in a similar
-> boat; KVM shouldn't be reading those fields (CR0.PG=0, not an exit path), but
-> marking them dirty without actually updating the cached values is wrong.
->
-> There's also one concrete bug: KVM doesn't set vcpu->arch.cr3=0 on RESET/INIT.
-> That bug has gone unnoticed because no real word BIOS/kernel is going to rely on
-> INIT to set CR3=0.  
->
-> I'm strongly leaning towards stuffing regs_avail/dirty in kvm_arch_vcpu_create(),
-> and relying on explicit kvm_register_mark_dirty() calls for the 3 or so cases where
-> x86 code writes a vcpu->arch register directly.  That would fix the CR0 read bug
-> and also prevent subtle bugs from sneaking in.  Adding new EXREGS would be slightly
-> more costly, but IMO that's a good thing as would force us to actually think about
-> how to handle each register.
->
-> E.g. implement this over 2-3 patches:
->
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 114847253e0a..743146ac8307 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -4385,6 +4385,7 @@ static void vmx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
->         kvm_set_cr8(vcpu, 0);
->
->         vmx_segment_cache_clear(vmx);
-> +       kvm_register_mark_available(vcpu, VCPU_EXREG_SEGMENTS);
->
->         seg_setup(VCPU_SREG_CS);
->         vmcs_write16(GUEST_CS_SELECTOR, 0xf000);
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 86539c1686fa..ab907a0b9eeb 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -10656,6 +10656,8 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
->         int r;
->
->         vcpu->arch.last_vmentry_cpu = -1;
-> +       vcpu->arch.regs_avail = ~0;
-> +       vcpu->arch.regs_dirty = ~0;
->
->         if (!irqchip_in_kernel(vcpu->kvm) || kvm_vcpu_is_reset_bsp(vcpu))
->                 vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
-> @@ -10874,9 +10876,9 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
->                 vcpu->arch.xcr0 = XFEATURE_MASK_FP;
->         }
->
-> +       /* All GPRs except RDX (handled below) are zeroed on RESET/INIT. */
->         memset(vcpu->arch.regs, 0, sizeof(vcpu->arch.regs));
-> -       vcpu->arch.regs_avail = ~0;
-> -       vcpu->arch.regs_dirty = ~0;
-> +       kvm_register_mark_dirty(vcpu, VCPU_REGS_RSP);
->
->         /*
->          * Fall back to KVM's default Family/Model/Stepping of 0x600 (P6/Athlon)
-> @@ -10897,6 +10899,9 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
->         kvm_set_rflags(vcpu, X86_EFLAGS_FIXED);
->         kvm_rip_write(vcpu, 0xfff0);
->
-> +       vcpu->arch.cr3 = 0;
-> +       kvm_register_mark_dirty(vcpu, VCPU_EXREG_CR3);
-> +
->         /*
->          * CR0.CD/NW are set on RESET, preserved on INIT.  Note, some versions
->          * of Intel's SDM list CD/NW as being set on INIT, but they contradict
->
-
-A selftest for vCPU create/reset would be really helpful. I can even
-volunteer to [eventually] write one :-)
-
--- 
-Vitaly
-
+The only good reason to allow for inlines if if they are used in a hot
+path.  Which cc_platform_has is not, especially not on powerpc.
