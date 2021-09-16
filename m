@@ -2,133 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C273340ECDF
-	for <lists+kvm@lfdr.de>; Thu, 16 Sep 2021 23:45:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AB23240ED40
+	for <lists+kvm@lfdr.de>; Fri, 17 Sep 2021 00:18:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239084AbhIPVqz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Sep 2021 17:46:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35300 "EHLO
+        id S240927AbhIPWUS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Sep 2021 18:20:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42886 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238288AbhIPVqs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Sep 2021 17:46:48 -0400
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90620C061756
-        for <kvm@vger.kernel.org>; Thu, 16 Sep 2021 14:45:27 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id g15-20020a63564f000000b00261998c1b70so6376230pgm.5
-        for <kvm@vger.kernel.org>; Thu, 16 Sep 2021 14:45:27 -0700 (PDT)
+        with ESMTP id S240917AbhIPWUR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Sep 2021 18:20:17 -0400
+Received: from mail-qt1-x830.google.com (mail-qt1-x830.google.com [IPv6:2607:f8b0:4864:20::830])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A6E3C061574
+        for <kvm@vger.kernel.org>; Thu, 16 Sep 2021 15:18:56 -0700 (PDT)
+Received: by mail-qt1-x830.google.com with SMTP id u4so7084362qta.2
+        for <kvm@vger.kernel.org>; Thu, 16 Sep 2021 15:18:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
-        bh=R5NhbA+pjUVPZNfNHPtaYNtNYTv1h+ja92HfpRStBqA=;
-        b=LlzVqBRk9HyqIgkEKwTRdfPTOIlc3qOVXfopYaEeFe9ZewruQYdODOZc8ASQp5OKCr
-         Fl7/fBaZ6EHFKNXJ+xM1+VbZvBIswyWIiv0TEV7LOY++QwJvEVoGtioABjNg40Qn3TMA
-         unYRCZZpwXzX+cv1A4dD/X6mHRxaNWtuNhCSi55oFbCJsobXuBQEfo5PI0WwyK3cL0a9
-         utyujJWR0SBfQ+Pg+0ED6h3oWQP7PTBC6Q/WhqqWFLJLRF+M+Eeqg2JkmSwEqDt9iPtb
-         ribrRQ8TyqBF/g79W4DNfjSteKGfhXaqLR/r0oqZsHexVUqAxtuwTNvMRN/a1XIYDPSl
-         9bug==
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=jg0fjI4mzvpqL26OKbCWQCPKXFmy+FcW+lRA5Qu3IKk=;
+        b=QHAKQiGB2K/b8XTJLTLdRdDzwcDFi2l43y7S4X2N5dF72a1otcWInJHcMMxQ3Ls16W
+         TaTUYiDEmp8l2T+cS3bknCTa6n3Ua2LiiG8M1aqv/DcLGrJv3IywZC+36eDnWPY2SPyn
+         2AW8eyI1ceKG8UrFcGhH2js9h+X+3mS+pADMglyrx6NmNC35nuVp1UcCrDmwwiqnzkNo
+         MbEhuX6NBdtTgy5nk3tTg6/CnsIhe4Q5YAQpHhvCkLFZbt7t4JZHw9kB3YfG9HyaoRXJ
+         CA79k3hMf9e4+rccpBhqQh9Dh+EGdDW5I425nDarVbx+LQA2E7XsOLWma7O6ouIDwhyo
+         NfVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
-         :from:to:cc;
-        bh=R5NhbA+pjUVPZNfNHPtaYNtNYTv1h+ja92HfpRStBqA=;
-        b=ZgtDVtjgJ/JBswEw0pL35vpoaxTvG1SIxtpCJDLRAA3Zw3s5iYkrQy5Fe6mKwoR5kd
-         +v53W+ggN/g6qqjski9nGrNH4+RDQOtE1PCzJ4MmvseW2eYYDL/cC4sTwBUpOCx2DLU3
-         x6HteB4FDklDmRwuo/Mqe2G4b90TlAuc8GlfS+z7RIGpJ1Yi+TG7MsVlYY39o0rCJL69
-         90G2EPuENlYZyvszpzO2kcmm4p4f6FCDd6ZBfE2j7SZCVL5/IB0j8yQZjcWZq1IDprho
-         rG4znR/icRPDi5V0eMHa1TMFg0nQz2xd8Jg3xM83eOhbOj1LcUJiRIpZQExBuqgJc5oc
-         tMzw==
-X-Gm-Message-State: AOAM533+cd2E7tWjhiVLTlFj5DIPdrS5bGh9Mki6AqjgJNvKdRQDxCo2
-        /G4mn2sUG8xmUclVIi8UqlJVOs1Yh4wm
-X-Google-Smtp-Source: ABdhPJyJ3GLd7Y4KTIshP0TGJLp8e0qxBx7aK4BWozn5MOmt0QCKuiQq7LSf2MbjftzPa+72dT3WDDKPV4P0
-X-Received: from mizhang-super.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1071])
- (user=mizhang job=sendgmr) by 2002:a17:90a:1a52:: with SMTP id
- 18mr17365103pjl.43.1631828726904; Thu, 16 Sep 2021 14:45:26 -0700 (PDT)
-Reply-To: Mingwei Zhang <mizhang@google.com>
-Date:   Thu, 16 Sep 2021 21:45:22 +0000
-Message-Id: <20210916214522.1560893-1-mizhang@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.33.0.464.g1972c5931b-goog
-Subject: [PATCH v2] KVM: SVM: fix missing sev_decommission() in sev_receive_start()
-From:   Mingwei Zhang <mizhang@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Alper Gun <alpergun@google.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        David Rienjes <rientjes@google.com>,
-        Marc Orr <marcorr@google.com>, John Allen <john.allen@amd.com>,
-        Peter Gonda <pgonda@google.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Vipin Sharma <vipinsh@google.com>,
-        Mingwei Zhang <mizhang@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=jg0fjI4mzvpqL26OKbCWQCPKXFmy+FcW+lRA5Qu3IKk=;
+        b=Jz+aSQkz+PHvcXXB6b6UxTUiM95ov4FPJl68jP+ql0Xys3cv+vFMoI0U03zK25A3vO
+         GzhejW3AxWUZjLIzyfrbIt0NHt0VexFjL0oAT7L0H9p1UGc4n3WFAWfEG3oIoIrakA3N
+         G3aQdM97JF+l3ZT7sTfth41f3hduvgi6xKYXiQIY9Pj9hq/FYivxmGsBiw40iV4u0mtl
+         LOldC6ny3/n3bjbb6Ml8pmlQp+zgyvCEx/FqxITQES8AG/4q08OlPCEcdWT9OLMo0MbY
+         nJNegZLrGK5158B13r8ltF28IewBwx9tCh4nLHTRrqledQkuUiPHmuj+0yxedvoatzUC
+         MW9w==
+X-Gm-Message-State: AOAM531dHkEjTqOprFSXBupVTv4drJfotmdPy8e1Uv1qPo24wtpDfHjS
+        qst4W76LfKnUFAMb9OGwgeOF1A==
+X-Google-Smtp-Source: ABdhPJzClgP2WLrg1toGycJU63Bp0qKrn9vg2BPbmvW5HYeX2aILTcy13XfFqdIpRKeQFsYJ3HdS/Q==
+X-Received: by 2002:ac8:7b52:: with SMTP id m18mr7620868qtu.128.1631830735505;
+        Thu, 16 Sep 2021 15:18:55 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-162-113-129.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.129])
+        by smtp.gmail.com with ESMTPSA id 69sm3875425qke.55.2021.09.16.15.18.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Sep 2021 15:18:54 -0700 (PDT)
+Received: from jgg by mlx with local (Exim 4.94)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1mQziY-001tUD-9l; Thu, 16 Sep 2021 19:18:54 -0300
+Date:   Thu, 16 Sep 2021 19:18:54 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Kirti Wankhede <kwankhede@nvidia.com>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Terrence Xu <terrence.xu@intel.com>, kvm@vger.kernel.org,
+        Kevin Tian <kevin.tian@intel.com>
+Subject: Re: [PATCH 11/14] vfio: clean up the check for mediated device in
+ vfio_iommu_type1
+Message-ID: <20210916221854.GT3544071@ziepe.ca>
+References: <20210913071606.2966-1-hch@lst.de>
+ <20210913071606.2966-12-hch@lst.de>
+ <c4ef0d8a-39f4-4834-f8f2-beffd2f2f8ae@nvidia.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c4ef0d8a-39f4-4834-f8f2-beffd2f2f8ae@nvidia.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-DECOMMISSION the current SEV context if binding an ASID fails after
-RECEIVE_START. Per AMD's SEV API, RECEIVE_START generates a new guest
-context and thus needs to be paired with DECOMMISSION:
+On Fri, Sep 17, 2021 at 01:25:59AM +0530, Kirti Wankhede wrote:
+> 
+> 
+> On 9/13/2021 12:46 PM, Christoph Hellwig wrote:
+> > Pass the group flags to ->attach_group and remove the messy check for
+> > the bus type.
+> > 
+> 
+> I like the way vfio_group_type is used in this patch, that removes messy way
+> to call symbol_get(mdev_bus_type).
+> 
+> Any thoughts on how VFIO_IOMMU, i.e. IOMMU backed mdev, can be implemented?
+> 
+> For IOMMU backed mdev, mdev->dev->iommu_group should be same as
+> mdev->type->parent->dev->iommu_group or in other words, parent device would
+> be DMA alias for the mdev device with the restriction - single mdev device
+> can be created for the physical device. Is it possible to link iommu_group
+> of these two devices some way?
 
-AMD SEV API v0.24 Section 1.3.3
+You just use the new style mdev API and directly call
+vfio_register_group_dev and it will pick up the
+parent->dev->iommu_group naturally like everything else using physical
+iommu groups.
 
-  "The RECEIVE_START command is the only command other than the
-  LAUNCH_START command that generates a new guest context and guest
-  handle."
-
-The missing DECOMMISSION can result in subsequent SEV launch failures due
-to insufficient resource. In particular, both LAUNCH_START and
-RECEIVE_START command will fail with SEV_RET_RESOURCE_LIMIT error.
-
-Note, LAUNCH_START suffered from the same bug, but was previously fixed by
-[1]. However, the same bug could come back to LAUNCH_START if RECEIVE_START
-part was not fixed.
-
-So add the sev_decommission() function in sev_receive_start.
-
-[1] commit 934002cd660b ("KVM: SVM: Call SEV Guest Decommission if ASID
-			 binding fails").
-
-Cc: Alper Gun <alpergun@google.com>
-Cc: Borislav Petkov <bp@alien8.de>
-Cc: Brijesh Singh <brijesh.singh@amd.com>
-Cc: David Rienjes <rientjes@google.com>
-Cc: Marc Orr <marcorr@google.com>
-Cc: John Allen <john.allen@amd.com>
-Cc: Peter Gonda <pgonda@google.com>
-Cc: Sean Christopherson <seanjc@google.com>
-Cc: Tom Lendacky <thomas.lendacky@amd.com>
-Cc: Vipin Sharma <vipinsh@google.com>
-
-Reviewed-by: Marc Orr <marcorr@google.com>
-Reviewed-by: Sean Christopherson <seanjc@google.com>
-Acked-by: Brijesh Singh <brijesh.singh@amd.com>
-Fixes: af43cbbf954b ("KVM: SVM: Add support for KVM_SEV_RECEIVE_START command")
-Signed-off-by: Mingwei Zhang <mizhang@google.com>
----
- arch/x86/kvm/svm/sev.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 75e0b21ad07c..55d8b9c933c3 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -1397,8 +1397,10 @@ static int sev_receive_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 
- 	/* Bind ASID to this guest */
- 	ret = sev_bind_asid(kvm, start.handle, error);
--	if (ret)
-+	if (ret) {
-+		sev_decommission(start.handle);
- 		goto e_free_session;
-+	}
- 
- 	params.handle = start.handle;
- 	if (copy_to_user((void __user *)(uintptr_t)argp->data,
--- 
-2.33.0.464.g1972c5931b-goog
-
+Jason
