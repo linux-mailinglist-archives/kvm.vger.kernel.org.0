@@ -2,155 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0199F40FA6E
-	for <lists+kvm@lfdr.de>; Fri, 17 Sep 2021 16:40:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3FC7940FAEC
+	for <lists+kvm@lfdr.de>; Fri, 17 Sep 2021 16:57:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243460AbhIQOlb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Sep 2021 10:41:31 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:45039 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1343603AbhIQOja (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 17 Sep 2021 10:39:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1631889488;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=iOTb3UE3yMAXob/FqBUe/TKYJnFydFEqXkEY8HDT4zI=;
-        b=OWVREdzGI7gOkzL2cz9k6AstPRvBCyxSWW3lnMxIk5ClqBax07oJ7vaqKAhUt34MvkwuZK
-        1nCeJ9mQ/Xo9i5U8/uOhbAjuS8fWNCu5Tn42+RiMvTUGW3nh0U52jiaEEse8E5qRCjb2Aa
-        TutT/8ZTAMpME77lIETcYsM9oV+Gi98=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-34-f4qtFLsONraZNqNdM3BV9g-1; Fri, 17 Sep 2021 10:38:05 -0400
-X-MC-Unique: f4qtFLsONraZNqNdM3BV9g-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4D087BBEEC;
-        Fri, 17 Sep 2021 14:38:02 +0000 (UTC)
-Received: from localhost (unknown [10.39.192.115])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4E6111001281;
-        Fri, 17 Sep 2021 14:37:46 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Eric Farman <farman@linux.ibm.com>,
-        David Airlie <airlied@linux.ie>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        dri-devel@lists.freedesktop.org,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        intel-gfx@lists.freedesktop.org,
-        intel-gvt-dev@lists.freedesktop.org,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
-        linux-s390@vger.kernel.org,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>, Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH v2 0/9] Move vfio_ccw to the new mdev API
-In-Reply-To: <20210917125109.GE327412@nvidia.com>
-Organization: Red Hat GmbH
-References: <0-v2-7d3a384024cf+2060-ccw_mdev_jgg@nvidia.com>
- <1e431e58465b86430d02d429c86c427f7088bf1f.camel@linux.ibm.com>
- <20210913192407.GZ2505917@nvidia.com>
- <6f55044373dea4515b831957981bbf333e03de59.camel@linux.ibm.com>
- <20210914133618.GD4065468@nvidia.com> <87h7ejh0q3.fsf@redhat.com>
- <20210917125109.GE327412@nvidia.com>
-User-Agent: Notmuch/0.32.1 (https://notmuchmail.org)
-Date:   Fri, 17 Sep 2021 16:37:44 +0200
-Message-ID: <87ee9ngtdz.fsf@redhat.com>
+        id S239195AbhIQO7I (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Sep 2021 10:59:08 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:2948 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S236034AbhIQO7H (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 17 Sep 2021 10:59:07 -0400
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 18HEsirx025491;
+        Fri, 17 Sep 2021 10:57:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=OPmAXWDDT6mpkYX81WXwDayugIiACXQbp3UZf0I+Mh8=;
+ b=T4WYvE4gBvFy0iYpxfZFSOjbGvnu6hGkcd+1dMZWcOmENOwVlKGtR16Hj6ixSX7bUCuJ
+ etcEKgoxoSG46MJnhPj7MZjXjRPD4w/J9DEgOK36J+Z2CoWT2MCwKwk8DeUeKx9k4yR0
+ Mfpei5xBexe8mTCJcl3Vql0Xl09tV0AFXQQFRo7Z33+9RQLvd0c6m5V0JQDST3pbTt58
+ 6CT/WF6Ti0hspPB5Ogt1ltNyqbiUZ73Tt+JzeFfg7BcPddFXGpLAOQd7iRNCnqRYujIx
+ uSrJloHX+XRO0oIpH1WkJq8hZ0S841z0w/C2lIDRgRw4EJ3utIw+lHcMateGF1k+vTww ZA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3b4k5r6ghq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 17 Sep 2021 10:57:44 -0400
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 18HEt0RN026358;
+        Fri, 17 Sep 2021 10:57:44 -0400
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3b4k5r6gh0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 17 Sep 2021 10:57:44 -0400
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 18HEulk5027932;
+        Fri, 17 Sep 2021 14:57:42 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma03fra.de.ibm.com with ESMTP id 3b0m3adphu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 17 Sep 2021 14:57:42 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 18HEvcd555116064
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 17 Sep 2021 14:57:38 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4ADB652063;
+        Fri, 17 Sep 2021 14:57:38 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.145.1.138])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id C643E5204E;
+        Fri, 17 Sep 2021 14:57:37 +0000 (GMT)
+Date:   Fri, 17 Sep 2021 16:57:35 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     kvm@vger.kernel.org, cohuck@redhat.com, frankja@linux.ibm.com,
+        thuth@redhat.com, pasic@linux.ibm.com, david@redhat.com,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Ulrich.Weigand@de.ibm.com,
+        Gerald Schaefer <gerald.schaefer@linux.ibm.com>
+Subject: Re: [PATCH v4 06/14] KVM: s390: pv: properly handle page flags for
+ protected guests
+Message-ID: <20210917165735.1e86d02b@p-imbrenda>
+In-Reply-To: <35e4b7a3-42d8-6b8f-e2e7-5b6a81dfcfa3@de.ibm.com>
+References: <20210818132620.46770-1-imbrenda@linux.ibm.com>
+        <20210818132620.46770-7-imbrenda@linux.ibm.com>
+        <1a44ff5c-f59f-2f37-2585-084294ed5e11@de.ibm.com>
+        <20210906175618.4ce0323f@p-imbrenda>
+        <35e4b7a3-42d8-6b8f-e2e7-5b6a81dfcfa3@de.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: KmcHDqXiD8Sl-rBswjkfDOQsNx4XgGUM
+X-Proofpoint-GUID: JLssg89AUaE9N8_YjYkcfv6fdO2NH29d
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.391,FMLib:17.0.607.475
+ definitions=2021-09-17_06,2021-09-17_02,2020-04-07_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 spamscore=0
+ adultscore=0 bulkscore=0 suspectscore=0 clxscore=1015 malwarescore=0
+ mlxscore=0 mlxlogscore=999 phishscore=0 lowpriorityscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2109030001 definitions=main-2109170093
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 17 2021, Jason Gunthorpe <jgg@nvidia.com> wrote:
+On Mon, 6 Sep 2021 18:16:10 +0200
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-> On Fri, Sep 17, 2021 at 01:59:16PM +0200, Cornelia Huck wrote:
->> >  		ret = cio_cancel_halt_clear(sch, &iretry);
->> > -
->> >  		if (ret == -EIO) {
->> >  			pr_err("vfio_ccw: could not quiesce subchannel 0.%x.%04x!\n",
->> >  			       sch->schid.ssid, sch->schid.sch_no);
->> > -			break;
->> > +			return ret;
->> 
->> Looking at this, I wonder why we had special-cased -EIO -- for -ENODEV
->> we should be done as well, as then the device is dead and we do not need
->> to disable it.
->
-> cio_cancel_halt_clear() should probably succeed in that case.
+> On 06.09.21 17:56, Claudio Imbrenda wrote:
+> > On Mon, 6 Sep 2021 17:46:40 +0200
+> > Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+> >   
+> >> On 18.08.21 15:26, Claudio Imbrenda wrote:  
+> >>> Introduce variants of the convert and destroy page functions that also
+> >>> clear the PG_arch_1 bit used to mark them as secure pages.
+> >>>
+> >>> These new functions can only be called on pages for which a reference
+> >>> is already being held.
+> >>>
+> >>> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> >>> Acked-by: Janosch Frank <frankja@linux.ibm.com>  
+> >>
+> >> Can you refresh my mind? We do have over-indication of PG_arch_1 and this
+> >> might result in spending some unneeded cycles but in the end this will be
+> >> correct. Right?
+> >> And this patch will fix some unnecessary places that add overindication.  
+> > 
+> > correct, PG_arch_1 will still overindicate, but with this patch it will
+> > happen less.
+> > 
+> > And PG_arch_1 overindication is perfectly fine from a correctness point
+> > of view.  
+> 
+> Maybe add something like this to the patch description then.
+> 
+> >>> +/*
+> >>> + * The caller must already hold a reference to the page
+> >>> + */
+> >>> +int uv_destroy_owned_page(unsigned long paddr)
+> >>> +{
+> >>> +	struct page *page = phys_to_page(paddr);  
+> 
+> Do we have to protect against weird mappings without struct page here? I have not
+> followed the discussion about this topic. Maybe Gerald knows if we can have memory
+> without struct pages.
 
-It will actually give us -ENODEV, as the very first call in that
-function will already fail.
+at first glance, it seems we can't have mappings without a struct page
 
->
->> > @@ -413,13 +403,28 @@ static void fsm_close(struct vfio_ccw_private *private,
->> >  		spin_unlock_irq(sch->lock);
->> >  
->> >  		if (ret == -EBUSY)
->> > -			wait_for_completion_timeout(&completion, 3*HZ);
->> > +			wait_for_completion_timeout(&completion, 3 * HZ);
->> >  
->> >  		private->completion = NULL;
->> >  		flush_workqueue(vfio_ccw_work_q);
->> >  		spin_lock_irq(sch->lock);
->> >  		ret = cio_disable_subchannel(sch);
->> >  	} while (ret == -EBUSY);
->> > +	return ret;
->> > +}
->> > +
->> > +static void fsm_close(struct vfio_ccw_private *private,
->> > +		      enum vfio_ccw_event event)
->> > +{
->> > +	struct subchannel *sch = private->sch;
->> > +	int ret;
->> > +
->> > +	spin_lock_irq(sch->lock);
->> > +	if (!sch->schib.pmcw.ena)
->> > +		goto err_unlock;
->> > +	ret = cio_disable_subchannel(sch);
->> 
->> cio_disable_subchannel() should be happy to disable an already disabled
->> subchannel, so I guess we can just walk through this and end up in
->> CLOSED state... unless entering with !ena actually indicates that we
->> messed up somewhere else in the state machine. I still need to find time
->> to read the patches.
->
-> I don't know, I looked at that ena stuff for a bit and couldn't guess
-> what it is trying to do.
-
-It is one of the bits in the pmcw control block that can be modified; if
-it is 1, the subchannel is enabled and can be used for I/O, if it is 0,
-the subchannel is disabled and all instructions that initiate or stop
-I/O will fail. Basically, you enable the subchannel if you actually want
-to access the device associated with it. Online/offline for (normal
-usage) ccw devices maps (among other things) to associated subchannel
-enabled/disabled; for a subchannel that is supposed to be passed via
-vfio-ccw, we want to have it enabled so that it is actually usable.
-
-I think the ena checking had been inspired from what the ccw bus
-does. We could probably just forge ahead in any case and the called
-functions in the css bus would be able to handle it just fine, but I
-have not double checked.
-
-> Arguably the channel should not be ripped away from vfio while the FSM
-> is in the open states, so I'm not sure what a lot of this is for.
-
-We could have surprise removal (i.e. a subchannel in active use being
-ripped out), as that's what happens on real hardware as well. E.g. doing
-a device_del in QEMU.
+> 
+> >>> +	int rc;
+> >>> +
+> >>> +	get_page(page);
+> >>> +	rc = uv_destroy_page(paddr);
+> >>> +	if (!rc)
+> >>> +		clear_bit(PG_arch_1, &page->flags);
+> >>> +	put_page(page);
+> >>> +	return rc;
+> >>> +}
+> >>> +
+> >>>    /*
+> >>>     * Requests the Ultravisor to encrypt a guest page and make it
+> >>>     * accessible to the host for paging (export).
+> >>> @@ -154,6 +170,22 @@ int uv_convert_from_secure(unsigned long paddr)
+> >>>    	return 0;
+> >>>    }
+> >>>    
+> >>> +/*
+> >>> + * The caller must already hold a reference to the page
+> >>> + */
+> >>> +int uv_convert_owned_from_secure(unsigned long paddr)
+> >>> +{
+> >>> +	struct page *page = phys_to_page(paddr);  
+> 
+> Same here. If this is not an issue (and you add something to the patch description as
+> outlined above)
+> 
+> Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> 
+> 
 
