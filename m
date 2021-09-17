@@ -2,296 +2,186 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 76B5240F84D
-	for <lists+kvm@lfdr.de>; Fri, 17 Sep 2021 14:50:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D537A40F855
+	for <lists+kvm@lfdr.de>; Fri, 17 Sep 2021 14:51:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244648AbhIQMwJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Sep 2021 08:52:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:47294 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S238390AbhIQMwI (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 17 Sep 2021 08:52:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1631883046;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=uCTb0i5bhg0GPw5LPlOWZkUi+K08luznvhgHpnorCdU=;
-        b=McU0pKXy+RB5Bo2qGW8roL38+viyBydK7A72Wj6pNt2HSy6mIQxro9J2EBGFV/xb5mCJp4
-        rZwrqdNOB6ONERdzA+LlVhNbH6y1hZdbYtvrYMaZs3RVQ4qKykuxZlDJjVtWDVBdF8sCyd
-        2UoslUaL3SBzD/jyeotizb9eN0eAut4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-576-MdcLyZspNmGihxrypG96Dw-1; Fri, 17 Sep 2021 08:50:45 -0400
-X-MC-Unique: MdcLyZspNmGihxrypG96Dw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 619F1196632A;
-        Fri, 17 Sep 2021 12:50:43 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 541B660843;
-        Fri, 17 Sep 2021 12:50:42 +0000 (UTC)
-From:   Emanuele Giuseppe Esposito <eesposit@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        linux-kernel@vger.kernel.org,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>
-Subject: [RFC PATCH 2/2] nSVM: use vmcb_ctrl_area_cached instead of vmcb_control_area in svm_nested_state
-Date:   Fri, 17 Sep 2021 08:49:56 -0400
-Message-Id: <20210917124956.2042052-3-eesposit@redhat.com>
-In-Reply-To: <20210917124956.2042052-1-eesposit@redhat.com>
-References: <20210917124956.2042052-1-eesposit@redhat.com>
+        id S244702AbhIQMwf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Sep 2021 08:52:35 -0400
+Received: from mail-bn7nam10on2049.outbound.protection.outlook.com ([40.107.92.49]:30529
+        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S235614AbhIQMwe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Sep 2021 08:52:34 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=aKdo1qyUZpBNpdy+0dTS1JitrLsNyMP6c6Zx0E5X9ef8V2Psx0b3DgJ5/DRwZJtCh6MhW6CVFFwz7DfORnjT1Xos6Q7VqShpZzCzWnYVLUYbyQTUMfCLCXkmrsKFb4pcB3Iibl49TFSNKOPLqwHNaIOk/uilL4e9wbAzalxy2lCelRXM83IqxobydnljYakS/kPVouzXtyDyIi3Fm4rHPwAYKy1ndLiUoe7Sjl7dbFQlS5SR/sX8w4ezL2AhSGP2N5mRO72yv+kaOwSw07VT64r7wWhLUZVd5rT5ZkZSruOoaILmWOVYJ68eyh1bU1akNioasaz9n86F9u8hDXvT7A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
+ bh=dyyZGHjXktmTbel+r8nnOW3wp19JjPu0VfBJTz7A4ZY=;
+ b=Z0S2O0O94rI+FeHnwqDTgeWY6JJq400ftR7IojPaqOq+AAnhD3I9CmexV6aVkzaZT9vnjAtOqVKt2b0v8maV6HVf7ZojoArFVeIgPTOMwlFeKasZaU0qy/uvaFXmC1P/nTSdOaC4m2JV/XW9TLu0HZXmrPtF2Ae9dpVQ7mT8OeFpAwJKQGoL9Oh7WCgagwSjc+BWzo+swC0tygxn9efWhrnN8Sg7LDd075HcM6hAzBpblvzh1c1BEHEP8ZSVIy6+9Rsmp814KFp0rA5KhCLTqoy4cWc8Be9vIxY1DgVPLDOCKyhceSuXmuFCT5wITFTExJ5QxHByiZcDesaZuKBOTQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=dyyZGHjXktmTbel+r8nnOW3wp19JjPu0VfBJTz7A4ZY=;
+ b=kqEJlpd2+2aovEhCipG3LHPIsFyZLesyytg2Xo/fuU0gYMD1ErvvzJzRU64+7t576UCYAWlziw1Ul4emKH0Dur44LTj0e9I7frN8KFeb5A76Gqa57GACMXJWMelsg91vBDlHjLurENQNk2LKnnatDU7hAswyhoqj74/0LCCRdVIy1zLWp+1VaPo1wd1Lhl+nEqywiKbzwP4oH8Qw4XFyrFmqsBoVZQwkzf6Ve6gep23kKzVaChQa2SwI2l6eJOtavNhJxt+CmqHMgB3Ec3PERg1+lusfGpKreCJ5MKJyUKNPusbikJpgGOdcAyOwjxTFPcnhQxj8Bht75OMVGvSyxQ==
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=nvidia.com;
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
+ by BL1PR12MB5125.namprd12.prod.outlook.com (2603:10b6:208:309::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4523.14; Fri, 17 Sep
+ 2021 12:51:10 +0000
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::e8af:232:915e:2f95]) by BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::e8af:232:915e:2f95%8]) with mapi id 15.20.4523.017; Fri, 17 Sep 2021
+ 12:51:10 +0000
+Date:   Fri, 17 Sep 2021 09:51:09 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Eric Farman <farman@linux.ibm.com>,
+        David Airlie <airlied@linux.ie>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        dri-devel@lists.freedesktop.org,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
+        linux-s390@vger.kernel.org,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>, Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH v2 0/9] Move vfio_ccw to the new mdev API
+Message-ID: <20210917125109.GE327412@nvidia.com>
+References: <0-v2-7d3a384024cf+2060-ccw_mdev_jgg@nvidia.com>
+ <1e431e58465b86430d02d429c86c427f7088bf1f.camel@linux.ibm.com>
+ <20210913192407.GZ2505917@nvidia.com>
+ <6f55044373dea4515b831957981bbf333e03de59.camel@linux.ibm.com>
+ <20210914133618.GD4065468@nvidia.com>
+ <87h7ejh0q3.fsf@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87h7ejh0q3.fsf@redhat.com>
+X-ClientProxiedBy: BL0PR02CA0106.namprd02.prod.outlook.com
+ (2603:10b6:208:51::47) To BL0PR12MB5506.namprd12.prod.outlook.com
+ (2603:10b6:208:1cb::22)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Received: from mlx.ziepe.ca (142.162.113.129) by BL0PR02CA0106.namprd02.prod.outlook.com (2603:10b6:208:51::47) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4523.14 via Frontend Transport; Fri, 17 Sep 2021 12:51:10 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1mRDKf-0024Rh-5C; Fri, 17 Sep 2021 09:51:09 -0300
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: c86e99d7-0a52-4545-5779-08d979d9d2e1
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5125:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <BL1PR12MB5125EE197A1EBCAF16B4CAA2C2DD9@BL1PR12MB5125.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 6MYs0xyX/0zhsiIG1UDx7pwCePmSNsDxrG00I4ytYtFlSga8xre1nLXDIOvJp/IgxNUF4ebJu/6IK3enMKJI72NEa+9pJKa8I+YCuNSVw2me7fhjFjuvf/zuLbXxZebKEj21L8WB0nHUp6Q7p8YAx9utWjzxgmOikF+uSKl2utreUWkyfEqHVCZisGXKGMAC7JbKKEyUyn77JszEY53zJpAQaFJb4Zjdu55yL+VO7s71cBhNt34ccp2Z9nlVt7C8ikUWH9XcNgOYjvtr6GmwJJKu01N1EcLZIDyg/73siN2TYa8q0MIB4Pq6/E5UBBjeJDeeL0dH5J2BiBIWpfWTI9rMP/HpbplC2MXP/gmNJxlUHtk0cLFIox1njengGp0eW+Jg7xD128DYd07KbBdKtjkem5sp0BIQQUiDS+RNbBuplimLS44soy2nPcNp6ZHJh0e6FP8nOlGYZeZay9kku7OIPwe1p0r7UrdgkcVZRlaYymFKxRyuCCILpeA+v9DH/mx5NKxIazZHK+PVlaxhWe8eh8UZKRS9e2fpMNV2qv84oxVjcYY1vqqRpGSMxcF5sZX3+jHXlZOXpEURJ54s+owY5EMpt3ZDcviUp4HJQgRFhV0QLqvbFS0Zz3QZlkSgaScpqwafg9nLBsfvcxZIQlWKkRb1CYJjVoLxLEaxnIaOA+1Xx/ATxAMMGhn6kiG0
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(376002)(39860400002)(136003)(366004)(346002)(36756003)(426003)(1076003)(6916009)(38100700002)(8936002)(186003)(316002)(54906003)(2906002)(83380400001)(2616005)(33656002)(7416002)(66946007)(478600001)(4326008)(66556008)(5660300002)(86362001)(8676002)(9786002)(26005)(66476007)(9746002)(27376004);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?mvOMimYqEO/wydYEW5TcBDBRdDfDgxFDYvQjLnvt0/ntb1ndWlVRLiPQm0+k?=
+ =?us-ascii?Q?l46/qsp3xHIPBxvjBMD3jR4s3Xua4WVJeUL/G7B0TF61OvpwCVPAJK9O9u/w?=
+ =?us-ascii?Q?VmEmPaTo5LgLSXGMjeNUx4fBSIUSqtEkM8QOpoEjqDpFcE705CJL/A4fmAeC?=
+ =?us-ascii?Q?N0Rju0h0O7RxfHRcWYpQ5CSWWRTaRJ/pev1IHmRsslX+O3Xlqx4edHvK0bIC?=
+ =?us-ascii?Q?ok0wz2ECDPvHe0TNkeDDYJbhE3D5GOQD2ZOxQph+/D5WSF8BquuecXMTcKKg?=
+ =?us-ascii?Q?5ggBTCbeaKBv4pMCY3BpivFlOfzdtd9S3I13hA8xaUfkoYSwvD9Qn9C0PdbB?=
+ =?us-ascii?Q?4nOwfQxAISg5FPbn4/wBWlx5bqV1t8ag5jgxYv9KujzwJcM/GWAUtzDmYONg?=
+ =?us-ascii?Q?zlNBGnsECqsOVU/a62YgUn0NmEC2HWaAByHewEhC0gQGiBKRYjDtYaiYIyRw?=
+ =?us-ascii?Q?MrH6RWrfQJnkRZ7ZS/HRPdyO8Y8DFvPuPz++KUNH1HWtnpw/zfK25POVKLdM?=
+ =?us-ascii?Q?1zQBZ3VsRFiSA0W1atuOkaraawlgcexGo3PLGeIR/HKGCPlmN59sNGIJf62V?=
+ =?us-ascii?Q?1AdVQWkdLBStaIzhMWGPnAaK1ze5jiV752RmQ/IhgrNUiv5HYrhmJr9HlLtJ?=
+ =?us-ascii?Q?ntajVI6KnBEUcIEU8zlHHOJqK0SVGAzAhRZlz5rBFTyU9+QHn7hYWJKX/8FY?=
+ =?us-ascii?Q?33XeS/5ZenEYcu0Y27jC/txHvyv9ge82wBc4hf9jHUB3n3i3kvV/K8TMGGpw?=
+ =?us-ascii?Q?T9IeCpKhsNeCC9/RGzuFMsLjZpx8IalZX3juGbwJWViJQxOOfVxp3+mDO+wm?=
+ =?us-ascii?Q?rm5+rlnJvs2JyEXJqM2NEcc7gjjDOaeBPnH3Ih5ZmmX2c+EqKLi/WKFYTqY7?=
+ =?us-ascii?Q?1XFJPN8GIroOF9D+shhejUx273K80CU0IG4R2PTduetHwgdDAJph9op/vpZz?=
+ =?us-ascii?Q?SbCLyXZorYNDaZnJe69eof6Uyy5fjYnDyvlOmwn3jU5QDHYKyXRhiw9MPW6Y?=
+ =?us-ascii?Q?vAGhGLNzb5eay0ZtL6MLgNP5/J2jhx9Q3fNE3KCvCfW6IVhALX/SejlIM2iV?=
+ =?us-ascii?Q?H/7aQwpEilaXGLPIVPH6S7xYmPyLhBTtpp5HlmUwBPhaK86UsOEzaOiAOUmY?=
+ =?us-ascii?Q?UTGLruBiTyMgCmvYh6U3GKI84l/xuPvDTTnYJ3rCo8lGbaUeQKVkrAgISq4T?=
+ =?us-ascii?Q?MxW6v3gPPrDDHq4vVTa4T5NCAEZGYKPxzsjGZ841xhwr77O25v2OKraVG2Qh?=
+ =?us-ascii?Q?ys3DUxIThipsgaUaZr3Qhhlzcxngszo9xYTrFGvWbPlrhhTUXwiwHRYX4YSJ?=
+ =?us-ascii?Q?FqmKf31jXV6RC6A8cZF1eSH2?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c86e99d7-0a52-4545-5779-08d979d9d2e1
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Sep 2021 12:51:10.6913
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: zVwOGHykLHvBdA9Ah8HXvklZxiHmAA9/eLEpGOlEhB5Bj/FDCvDZtDJ1ThF5Wsh/
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5125
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This requires changing all vmcb_is_intercept(&svm->nested.ctl, ...)
-calls with vmcb_is_intercept_cached().
+On Fri, Sep 17, 2021 at 01:59:16PM +0200, Cornelia Huck wrote:
+> >  		ret = cio_cancel_halt_clear(sch, &iretry);
+> > -
+> >  		if (ret == -EIO) {
+> >  			pr_err("vfio_ccw: could not quiesce subchannel 0.%x.%04x!\n",
+> >  			       sch->schid.ssid, sch->schid.sch_no);
+> > -			break;
+> > +			return ret;
+> 
+> Looking at this, I wonder why we had special-cased -EIO -- for -ENODEV
+> we should be done as well, as then the device is dead and we do not need
+> to disable it.
 
-In addition, in svm_get_nested_state() user space expects a
-vmcb_control_area struct, so we need to copy back all fields
-in a temporary structure to provide to the user space.
+cio_cancel_halt_clear() should probably succeed in that case.
 
-Signed-off-by: Emanuele Giuseppe Esposito <eesposit@redhat.com>
----
- arch/x86/kvm/svm/nested.c | 42 ++++++++++++++++++++++-----------------
- arch/x86/kvm/svm/svm.c    |  4 ++--
- arch/x86/kvm/svm/svm.h    |  8 ++++----
- 3 files changed, 30 insertions(+), 24 deletions(-)
+> > @@ -413,13 +403,28 @@ static void fsm_close(struct vfio_ccw_private *private,
+> >  		spin_unlock_irq(sch->lock);
+> >  
+> >  		if (ret == -EBUSY)
+> > -			wait_for_completion_timeout(&completion, 3*HZ);
+> > +			wait_for_completion_timeout(&completion, 3 * HZ);
+> >  
+> >  		private->completion = NULL;
+> >  		flush_workqueue(vfio_ccw_work_q);
+> >  		spin_lock_irq(sch->lock);
+> >  		ret = cio_disable_subchannel(sch);
+> >  	} while (ret == -EBUSY);
+> > +	return ret;
+> > +}
+> > +
+> > +static void fsm_close(struct vfio_ccw_private *private,
+> > +		      enum vfio_ccw_event event)
+> > +{
+> > +	struct subchannel *sch = private->sch;
+> > +	int ret;
+> > +
+> > +	spin_lock_irq(sch->lock);
+> > +	if (!sch->schib.pmcw.ena)
+> > +		goto err_unlock;
+> > +	ret = cio_disable_subchannel(sch);
+> 
+> cio_disable_subchannel() should be happy to disable an already disabled
+> subchannel, so I guess we can just walk through this and end up in
+> CLOSED state... unless entering with !ena actually indicates that we
+> messed up somewhere else in the state machine. I still need to find time
+> to read the patches.
 
-diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index d06a95156535..1f8c90cc4fc3 100644
---- a/arch/x86/kvm/svm/nested.c
-+++ b/arch/x86/kvm/svm/nested.c
-@@ -58,8 +58,8 @@ static void svm_inject_page_fault_nested(struct kvm_vcpu *vcpu, struct x86_excep
-        struct vcpu_svm *svm = to_svm(vcpu);
-        WARN_ON(!is_guest_mode(vcpu));
- 
--       if (vmcb_is_intercept(&svm->nested.ctl, INTERCEPT_EXCEPTION_OFFSET + PF_VECTOR) &&
--	   !svm->nested.nested_run_pending) {
-+	if (vmcb_is_intercept_cached(&svm->nested.ctl, INTERCEPT_EXCEPTION_OFFSET + PF_VECTOR) &&
-+	    !svm->nested.nested_run_pending) {
-                svm->vmcb->control.exit_code = SVM_EXIT_EXCP_BASE + PF_VECTOR;
-                svm->vmcb->control.exit_code_hi = 0;
-                svm->vmcb->control.exit_info_1 = fault->error_code;
-@@ -121,7 +121,8 @@ static void nested_svm_uninit_mmu_context(struct kvm_vcpu *vcpu)
- 
- void recalc_intercepts(struct vcpu_svm *svm)
- {
--	struct vmcb_control_area *c, *h, *g;
-+	struct vmcb_control_area *c, *h;
-+	struct vmcb_ctrl_area_cached *g;
- 	unsigned int i;
- 
- 	vmcb_mark_dirty(svm->vmcb, VMCB_INTERCEPTS);
-@@ -163,7 +164,7 @@ void recalc_intercepts(struct vcpu_svm *svm)
- 	vmcb_set_intercept(c, INTERCEPT_VMSAVE);
- }
- 
--static void copy_vmcb_control_area(struct vmcb_control_area *dst,
-+static void copy_vmcb_control_area(struct vmcb_ctrl_area_cached *dst,
- 				   struct vmcb_control_area *from)
- {
- 	unsigned int i;
-@@ -219,7 +220,7 @@ static bool nested_svm_vmrun_msrpm(struct vcpu_svm *svm)
- 	 */
- 	int i;
- 
--	if (!(vmcb_is_intercept(&svm->nested.ctl, INTERCEPT_MSR_PROT)))
-+	if (!(vmcb_is_intercept_cached(&svm->nested.ctl, INTERCEPT_MSR_PROT)))
- 		return true;
- 
- 	for (i = 0; i < MSRPM_OFFSETS; i++) {
-@@ -255,9 +256,9 @@ static bool nested_svm_check_bitmap_pa(struct kvm_vcpu *vcpu, u64 pa, u32 size)
- }
- 
- static bool nested_vmcb_check_controls(struct kvm_vcpu *vcpu,
--				       struct vmcb_control_area *control)
-+				       struct vmcb_ctrl_area_cached *control)
- {
--	if (CC(!vmcb_is_intercept(control, INTERCEPT_VMRUN)))
-+	if (CC(!vmcb_is_intercept_cached(control, INTERCEPT_VMRUN)))
- 		return false;
- 
- 	if (CC(control->asid == 0))
-@@ -971,7 +972,7 @@ static int nested_svm_exit_handled_msr(struct vcpu_svm *svm)
- 	u32 offset, msr, value;
- 	int write, mask;
- 
--	if (!(vmcb_is_intercept(&svm->nested.ctl, INTERCEPT_MSR_PROT)))
-+	if (!(vmcb_is_intercept_cached(&svm->nested.ctl, INTERCEPT_MSR_PROT)))
- 		return NESTED_EXIT_HOST;
- 
- 	msr    = svm->vcpu.arch.regs[VCPU_REGS_RCX];
-@@ -998,7 +999,7 @@ static int nested_svm_intercept_ioio(struct vcpu_svm *svm)
- 	u8 start_bit;
- 	u64 gpa;
- 
--	if (!(vmcb_is_intercept(&svm->nested.ctl, INTERCEPT_IOIO_PROT)))
-+	if (!(vmcb_is_intercept_cached(&svm->nested.ctl, INTERCEPT_IOIO_PROT)))
- 		return NESTED_EXIT_HOST;
- 
- 	port = svm->vmcb->control.exit_info_1 >> 16;
-@@ -1029,12 +1030,12 @@ static int nested_svm_intercept(struct vcpu_svm *svm)
- 		vmexit = nested_svm_intercept_ioio(svm);
- 		break;
- 	case SVM_EXIT_READ_CR0 ... SVM_EXIT_WRITE_CR8: {
--		if (vmcb_is_intercept(&svm->nested.ctl, exit_code))
-+		if (vmcb_is_intercept_cached(&svm->nested.ctl, exit_code))
- 			vmexit = NESTED_EXIT_DONE;
- 		break;
- 	}
- 	case SVM_EXIT_READ_DR0 ... SVM_EXIT_WRITE_DR7: {
--		if (vmcb_is_intercept(&svm->nested.ctl, exit_code))
-+		if (vmcb_is_intercept_cached(&svm->nested.ctl, exit_code))
- 			vmexit = NESTED_EXIT_DONE;
- 		break;
- 	}
-@@ -1052,7 +1053,7 @@ static int nested_svm_intercept(struct vcpu_svm *svm)
- 		break;
- 	}
- 	default: {
--		if (vmcb_is_intercept(&svm->nested.ctl, exit_code))
-+		if (vmcb_is_intercept_cached(&svm->nested.ctl, exit_code))
- 			vmexit = NESTED_EXIT_DONE;
- 	}
- 	}
-@@ -1130,7 +1131,7 @@ static void nested_svm_inject_exception_vmexit(struct vcpu_svm *svm)
- 
- static inline bool nested_exit_on_init(struct vcpu_svm *svm)
- {
--	return vmcb_is_intercept(&svm->nested.ctl, INTERCEPT_INIT);
-+	return vmcb_is_intercept_cached(&svm->nested.ctl, INTERCEPT_INIT);
- }
- 
- static int svm_check_nested_events(struct kvm_vcpu *vcpu)
-@@ -1261,6 +1262,7 @@ static int svm_get_nested_state(struct kvm_vcpu *vcpu,
- 				u32 user_data_size)
- {
- 	struct vcpu_svm *svm;
-+	struct vmcb_control_area ctl_temp;
- 	struct kvm_nested_state kvm_state = {
- 		.flags = 0,
- 		.format = KVM_STATE_NESTED_FORMAT_SVM,
-@@ -1302,7 +1304,8 @@ static int svm_get_nested_state(struct kvm_vcpu *vcpu,
- 	 */
- 	if (clear_user(user_vmcb, KVM_STATE_NESTED_SVM_VMCB_SIZE))
- 		return -EFAULT;
--	if (copy_to_user(&user_vmcb->control, &svm->nested.ctl,
-+	copy_vmcb_ctrl_area_cached(&ctl_temp, &svm->nested.ctl);
-+	if (copy_to_user(&user_vmcb->control, &ctl_temp,
- 			 sizeof(user_vmcb->control)))
- 		return -EFAULT;
- 	if (copy_to_user(&user_vmcb->save, &svm->vmcb01.ptr->save,
-@@ -1373,8 +1376,9 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
- 		goto out_free;
- 
- 	ret = -EINVAL;
--	if (!nested_vmcb_check_controls(vcpu, ctl))
--		goto out_free;
-+	nested_load_control_from_vmcb12(svm, ctl);
-+	if (!nested_vmcb_check_controls(vcpu, &svm->nested.ctl))
-+		goto out_free_ctl;
- 
- 	/*
- 	 * Processor state contains L2 state.  Check that it is
-@@ -1382,7 +1386,7 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
- 	 */
- 	cr0 = kvm_read_cr0(vcpu);
-         if (((cr0 & X86_CR0_CD) == 0) && (cr0 & X86_CR0_NW))
--		goto out_free;
-+		goto out_free_ctl;
- 
- 	/*
- 	 * Validate host state saved from before VMRUN (see
-@@ -1428,7 +1432,6 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
- 	svm->nested.vmcb12_gpa = kvm_state->hdr.svm.vmcb_pa;
- 
- 	svm_copy_vmrun_state(&svm->vmcb01.ptr->save, save);
--	nested_load_control_from_vmcb12(svm, ctl);
- 
- 	svm_switch_vmcb(svm, &svm->nested.vmcb02);
- 	nested_vmcb02_prepare_control(svm);
-@@ -1438,6 +1441,9 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
- out_free_save:
- 	memset(&svm->nested.save, 0, sizeof(struct vmcb_save_area_cached));
- 
-+out_free_ctl:
-+	memset(&svm->nested.ctl, 0, sizeof(struct vmcb_ctrl_area_cached));
-+
- out_free:
- 	kfree(save);
- 	kfree(ctl);
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 169b930322ef..5ec4f56b3b09 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -2465,7 +2465,7 @@ static bool check_selective_cr0_intercepted(struct kvm_vcpu *vcpu,
- 	bool ret = false;
- 
- 	if (!is_guest_mode(vcpu) ||
--	    (!(vmcb_is_intercept(&svm->nested.ctl, INTERCEPT_SELECTIVE_CR0))))
-+	    (!(vmcb_is_intercept_cached(&svm->nested.ctl, INTERCEPT_SELECTIVE_CR0))))
- 		return false;
- 
- 	cr0 &= ~SVM_CR0_SELECTIVE_MASK;
-@@ -4184,7 +4184,7 @@ static int svm_check_intercept(struct kvm_vcpu *vcpu,
- 		    info->intercept == x86_intercept_clts)
- 			break;
- 
--		if (!(vmcb_is_intercept(&svm->nested.ctl,
-+		if (!(vmcb_is_intercept_cached(&svm->nested.ctl,
- 					INTERCEPT_SELECTIVE_CR0)))
- 			break;
- 
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index a00be2516cc6..69dbce80b4b8 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -152,7 +152,7 @@ struct svm_nested_state {
- 	bool nested_run_pending;
- 
- 	/* cache for control fields of the guest */
--	struct vmcb_control_area ctl;
-+	struct vmcb_ctrl_area_cached ctl;
- 	struct vmcb_save_area_cached save;
- 
- 	bool initialized;
-@@ -487,17 +487,17 @@ static inline bool nested_svm_virtualize_tpr(struct kvm_vcpu *vcpu)
- 
- static inline bool nested_exit_on_smi(struct vcpu_svm *svm)
- {
--	return vmcb_is_intercept(&svm->nested.ctl, INTERCEPT_SMI);
-+	return vmcb_is_intercept_cached(&svm->nested.ctl, INTERCEPT_SMI);
- }
- 
- static inline bool nested_exit_on_intr(struct vcpu_svm *svm)
- {
--	return vmcb_is_intercept(&svm->nested.ctl, INTERCEPT_INTR);
-+	return vmcb_is_intercept_cached(&svm->nested.ctl, INTERCEPT_INTR);
- }
- 
- static inline bool nested_exit_on_nmi(struct vcpu_svm *svm)
- {
--	return vmcb_is_intercept(&svm->nested.ctl, INTERCEPT_NMI);
-+	return vmcb_is_intercept_cached(&svm->nested.ctl, INTERCEPT_NMI);
- }
- 
- int enter_svm_guest_mode(struct kvm_vcpu *vcpu, u64 vmcb_gpa, struct vmcb *vmcb12);
--- 
-2.27.0
+I don't know, I looked at that ena stuff for a bit and couldn't guess
+what it is trying to do.
 
+Arguably the channel should not be ripped away from vfio while the FSM
+is in the open states, so I'm not sure what a lot of this is for.
+
+Jason
