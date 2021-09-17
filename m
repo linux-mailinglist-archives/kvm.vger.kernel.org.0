@@ -2,139 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5033A40F346
-	for <lists+kvm@lfdr.de>; Fri, 17 Sep 2021 09:29:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3748240F3DE
+	for <lists+kvm@lfdr.de>; Fri, 17 Sep 2021 10:14:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240404AbhIQHbM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Sep 2021 03:31:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53080 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236843AbhIQHbL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Sep 2021 03:31:11 -0400
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2026FC061574;
-        Fri, 17 Sep 2021 00:29:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=17mkqfuKdfnPg9YSAeGWHc/O4GLOFEnsaFTJ4hUb1Qc=; b=R175PzEhjMPDTuiig9T+/8FvBN
-        wCwITbQjI86keC2UZcKL3oHklcXqScPxlhfsprjzgtQHXNUwlN8OYqdLQ7ztxGmPqLPGGL1HvK5TW
-        8un1CwadAtDZMXP8kHm7KJ60CKQlzq6kBsXmSOCidcFaqUG49FGQ/Q91WQSCSzrudnHUpN1n/dtAK
-        3oCiHTPea1eYl35kiZcqB3afHwTSqwkSRYpje8CyTQKsMtTXOUjDfhQXOeCpbGDLw3jXUuiLQwU+o
-        fpmbPjE5lGD64IJe7KimQfKhdgCV7/TWkKj798HvtN0fT0soP/DzPI91f4RdvEreoDEx02Cp2qq0O
-        NM1LgiIg==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mR8Ig-003p42-0g; Fri, 17 Sep 2021 07:28:46 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 64E5430031A;
-        Fri, 17 Sep 2021 09:28:42 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id EBC3F2B27F98D; Fri, 17 Sep 2021 09:28:41 +0200 (CEST)
-Date:   Fri, 17 Sep 2021 09:28:41 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Ingo Molnar <mingo@redhat.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Will Deacon <will@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Marc Zyngier <maz@kernel.org>, Guo Ren <guoren@kernel.org>,
-        Nick Hu <nickhu@andestech.com>,
-        Greentime Hu <green.hu@gmail.com>,
-        Vincent Chen <deanbo422@gmail.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Borislav Petkov <bp@alien8.de>, x86@kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Juergen Gross <jgross@suse.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@redhat.com>,
-        Namhyung Kim <namhyung@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-csky@vger.kernel.org, linux-riscv@lists.infradead.org,
-        kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
-        Artem Kashkanov <artem.kashkanov@intel.com>,
-        Like Xu <like.xu.linux@gmail.com>,
-        Zhu Lingshan <lingshan.zhu@intel.com>
-Subject: Re: [PATCH v2 00/13] perf: KVM: Fix, optimize, and clean up callbacks
-Message-ID: <YURDqVZ1UXKCiKPV@hirez.programming.kicks-ass.net>
-References: <20210828003558.713983-1-seanjc@google.com>
- <20210828201336.GD4353@worktop.programming.kicks-ass.net>
- <YUO5J/jTMa2KGbsq@google.com>
+        id S233367AbhIQIPz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Sep 2021 04:15:55 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:8024 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S229837AbhIQIPy (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 17 Sep 2021 04:15:54 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 18H7UT0Q020803;
+        Fri, 17 Sep 2021 04:14:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=D72Nmltq5W761HKc8q5yf4qEMem+vL6IcD2L/nSKoec=;
+ b=HdF4u9HK+PXauaX4EGimJAqSwUQN9m8xrvWBvmSFKrMkq6+AOgAng4XjGVv03APpIp3c
+ 5U0Z2hx9ZQ1vbmo6Ah9NcuG/WshCt8+UwzWT+XGX6tfpkve/sf/qfIoMfe0CuvMeZ7q1
+ vkp689eyJNKjEg0MGfszoWXjHN//DeJBsx5w9kp9Q8lJS82zfpQvgKqjTXJU09dzi/DI
+ JyFU1nmnCMlUZxaKhSJnHId8FvKddOKd6PdxrlnQAapLCSnzJV9u1S+VV39IAEcbthQM
+ 9rampl8LZyD6ILfD3gHcZS73wuw7vfwfIHhFKANRlvHQmt+pAmy5CuyzLTwJlcvydoy5 HA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3b4ppmrvqq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 17 Sep 2021 04:14:31 -0400
+Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 18H8CnT0020157;
+        Fri, 17 Sep 2021 04:14:31 -0400
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3b4ppmrvqa-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 17 Sep 2021 04:14:31 -0400
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 18H8D39x029176;
+        Fri, 17 Sep 2021 08:14:29 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma06fra.de.ibm.com with ESMTP id 3b0kqkhrfm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 17 Sep 2021 08:14:29 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 18H89l8g56361376
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 17 Sep 2021 08:09:47 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C4060A405F;
+        Fri, 17 Sep 2021 08:14:25 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 48BCBA4054;
+        Fri, 17 Sep 2021 08:14:25 +0000 (GMT)
+Received: from oc3016276355.ibm.com (unknown [9.145.70.78])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 17 Sep 2021 08:14:25 +0000 (GMT)
+Subject: Re: [PATCH v4 1/1] s390x: KVM: accept STSI for CPU topology
+ information
+To:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        borntraeger@de.ibm.com, frankja@linux.ibm.com, cohuck@redhat.com,
+        thuth@redhat.com, imbrenda@linux.ibm.com, hca@linux.ibm.com,
+        gor@linux.ibm.com
+References: <1631799845-24860-1-git-send-email-pmorel@linux.ibm.com>
+ <1631799845-24860-2-git-send-email-pmorel@linux.ibm.com>
+ <eef5ed95-3f54-b709-894d-cdf75bc3180b@redhat.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+Message-ID: <d5a752d3-9de0-5f7e-fefa-76b680b1d2a7@linux.ibm.com>
+Date:   Fri, 17 Sep 2021 10:14:25 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YUO5J/jTMa2KGbsq@google.com>
+In-Reply-To: <eef5ed95-3f54-b709-894d-cdf75bc3180b@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: vfrr3HJkTCHB8QQyscuCERwC2DXcARzi
+X-Proofpoint-GUID: W6T2wZ_OjEKcyUUzYd4oNyNnpdDdygo_
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.391,FMLib:17.0.607.475
+ definitions=2021-09-17_03,2021-09-16_01,2020-04-07_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 adultscore=0
+ bulkscore=0 mlxlogscore=999 priorityscore=1501 impostorscore=0
+ lowpriorityscore=0 spamscore=0 phishscore=0 clxscore=1015 suspectscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2109030001 definitions=main-2109170047
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 16, 2021 at 09:37:43PM +0000, Sean Christopherson wrote:
-> On Sat, Aug 28, 2021, Peter Zijlstra wrote:
 
-> Argh, sorry, I somehow managed to miss all of your replies.  I'll get back to
-> this series next week.  Thanks for the quick response!
+
+On 9/16/21 4:03 PM, David Hildenbrand wrote:
+>>   struct kvm_vm_stat {
+>> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+>> index 51d1594bd6cd..f3887e13c5db 100644
+>> --- a/arch/s390/kvm/kvm-s390.c
+>> +++ b/arch/s390/kvm/kvm-s390.c
+>> @@ -608,6 +608,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, 
+>> long ext)
+>>       case KVM_CAP_S390_PROTECTED:
+>>           r = is_prot_virt_host();
+>>           break;
+>> +    case KVM_CAP_S390_CPU_TOPOLOGY:
+>> +        r = test_facility(11);
+>> +        break;
+>>       default:
+>>           r = 0;
+>>       }
+>> @@ -819,6 +822,19 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm, 
+>> struct kvm_enable_cap *cap)
+>>           icpt_operexc_on_all_vcpus(kvm);
+>>           r = 0;
+>>           break;
+>> +    case KVM_CAP_S390_CPU_TOPOLOGY:
 > 
-> > Lets keep the whole intel_pt crud inside x86...
+> As given in my example, this should be
 > 
-> In theory, I like the idea of burying intel_pt inside x86 (and even in
-> Intel+VMX code for the most part), but the actual implementation is a
-> bit gross.  Because of the whole "KVM can be a module" thing,
-
-ARGH!! we should really fix that. I've heard other archs have made much
-better choices here.
-
-> either
-> the static call and __static_call_return0 would need to be exported,
-> or a new register/unregister pair would have to be exported.
-
-So I don't mind exporting __static_call_return0, but exporting a raw
-static_call is much like exporting a function pointer :/
-
-> The unregister path would also need its own synchronize_rcu().  In general, I
-> don't love duplicating the logic, but it's not the end of the world.
+> r = -EINVAL;
+> mutex_lock(&kvm->lock);
+> if (kvm->created_vcpus) {
+>      r = -EBUSY;
+> } else if (test_facility(11)) {
+> ...
+> }
 > 
-> Either way works for me.  Paolo or Peter, do either of you have a preference?
-
-Can we de-feature kvm as a module and only have this PT functionality
-when built-in? :-)
-
-
-> > ---
-> > Index: linux-2.6/arch/x86/events/core.c
-> > ===================================================================
-> > --- linux-2.6.orig/arch/x86/events/core.c
-> > +++ linux-2.6/arch/x86/events/core.c
-> > @@ -92,7 +92,7 @@ DEFINE_STATIC_CALL_RET0(x86_pmu_guest_ge
-> >  
-> >  DEFINE_STATIC_CALL_RET0(x86_guest_state, *(perf_guest_cbs->state));
-> >  DEFINE_STATIC_CALL_RET0(x86_guest_get_ip, *(perf_guest_cbs->get_ip));
-> > -DEFINE_STATIC_CALL_RET0(x86_guest_handle_intel_pt_intr, *(perf_guest_cbs->handle_intel_pt_intr));
-> > +DEFINE_STATIC_CALL_RET0(x86_guest_handle_intel_pt_intr, unsigned int (*)(void));
+> Similar to how we handle KVM_CAP_S390_VECTOR_REGISTERS.
 > 
-> FWIW, the param needs to be a raw function, not a function pointer. 
+> [...]
+> 
+>> +
+>> +    /* PTF needs both host and guest facilities to enable 
+>> interpretation */
+>> +    if (test_kvm_facility(vcpu->kvm, 11) && test_facility(11))
+>> +        vcpu->arch.sie_block->ecb |= ECB_PTF;
+> 
+> This should be simplified to
+> 
+> if (test_kvm_facility(vcpu->kvm, 11))
+> 
+> then. (vsie code below is correct)
+> 
+> 
 
-Yeah, I keep making that mistake.. and I wrote the bloody thing :/
+OK, the idea was to let the hypervisor the possibility to do userland 
+emulation if it wanted.
+But I can modify as you want.
 
-I have a 'fix' for that, but I need to finish that and also flag-day
-change :-(
+Regards,
+Pierre
 
-  https://lkml.kernel.org/r/YS+0eIeAJsRRArk4@hirez.programming.kicks-ass.net
+-- 
+Pierre Morel
+IBM Lab Boeblingen
