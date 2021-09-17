@@ -2,86 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5334D40FDB1
-	for <lists+kvm@lfdr.de>; Fri, 17 Sep 2021 18:15:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C4C2740FDB6
+	for <lists+kvm@lfdr.de>; Fri, 17 Sep 2021 18:16:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240920AbhIQQRQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Sep 2021 12:17:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55342 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230301AbhIQQRN (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 17 Sep 2021 12:17:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1631895350;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=wAFQPGPyFN6MzK3bzK8jBC17iHiKc9AgbxXN8TxrV2g=;
-        b=Y+kLmyqvevPO0M1lv4CBuDscbgZU1euGtIdTb5vLax83dj2R8Q/0ehw1u1pVQqp7rePoon
-        f+f7oTgXjbUMnSysreJPbisTEutw/O49Way1m8mOtp9dVoF4VJ0/eK11EmRnYiWfrBmHhy
-        iTr0j9ClQiw4d9UbZB0/X1nrW9kPQTQ=
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
- [209.85.216.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-589-rAigjA9TNKu2rj7Ai9DWcQ-1; Fri, 17 Sep 2021 12:15:47 -0400
-X-MC-Unique: rAigjA9TNKu2rj7Ai9DWcQ-1
-Received: by mail-pj1-f71.google.com with SMTP id v10-20020a17090ac90a00b0019936bc24c7so7647076pjt.7
-        for <kvm@vger.kernel.org>; Fri, 17 Sep 2021 09:15:46 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=wAFQPGPyFN6MzK3bzK8jBC17iHiKc9AgbxXN8TxrV2g=;
-        b=UuTL+SGJTrsLKBVWFt3xqflZqTr0BoKYx8/Jw5JMtEQlaTQqWQ5giT2GGJoVaFKsUb
-         tJLrkRAFM/s10FJ5j8yFO5lGnjdbvKnnVG+gxHnEIgbFx9w/kKjimnOZurxTRwiICOQv
-         6xeJnV5+gvrL2gu8mpPuL71s+vROAwYezk8wUjCvmerIGvwZvqSdMtrf1wsTPYFcIhoe
-         ibIpIlnZgRX93ZTpFwZMd/6WaLOz6+/veTSHXZJGBoi0aPH9aP/CFr35TM3iDdO9Oqm9
-         nb6xAdjgzAI6HVU6dq9485zML+A+M+7/sW8fi/w0aTaLEbJifdZBW3R7riwy7zuuA/tc
-         DF2w==
-X-Gm-Message-State: AOAM532vasBZaYyLSKFDchItZvAQac7nLitax5/4NPNXWOSr4GVd+6Pj
-        AC1nJyh7Bb4E+gkTiYSqdnCi/N9FycH0PAumlSnKJA6ejVcuSc9zmLKD2Cad3VMyIrPa+iwiKxU
-        YaOyTWj5CHdk7qE4UmnNtPaqZgeIi
-X-Received: by 2002:a17:902:d717:b0:133:a5f6:6be6 with SMTP id w23-20020a170902d71700b00133a5f66be6mr10309167ply.14.1631895346053;
-        Fri, 17 Sep 2021 09:15:46 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzOhNz2zbDcVfa/AWoVfQ6vVBkU8H3tVtK9RFm4Mi0iUZKgxzNDBV2Mk++eD7V1IurjLU3QnjPe+x14oLufnf4=
-X-Received: by 2002:a17:902:d717:b0:133:a5f6:6be6 with SMTP id
- w23-20020a170902d71700b00133a5f66be6mr10309138ply.14.1631895345720; Fri, 17
- Sep 2021 09:15:45 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210914230840.3030620-1-seanjc@google.com>
-In-Reply-To: <20210914230840.3030620-1-seanjc@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Date:   Fri, 17 Sep 2021 18:15:34 +0200
-Message-ID: <CABgObfYz1b3YO4a9tR02TourLmsnS48RWrOprrsEh=NpbQfjRA@mail.gmail.com>
-Subject: Re: [PATCH 0/3] KVM: x86: Clean up RESET "emulation"
+        id S243832AbhIQQRZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Sep 2021 12:17:25 -0400
+Received: from mga02.intel.com ([134.134.136.20]:26386 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S242090AbhIQQRU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Sep 2021 12:17:20 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10110"; a="210059600"
+X-IronPort-AV: E=Sophos;i="5.85,301,1624345200"; 
+   d="scan'208";a="210059600"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Sep 2021 09:15:57 -0700
+X-IronPort-AV: E=Sophos;i="5.85,301,1624345200"; 
+   d="scan'208";a="546478915"
+Received: from zengguan-mobl.ccr.corp.intel.com (HELO [10.254.208.219]) ([10.254.208.219])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Sep 2021 09:15:52 -0700
+Subject: Re: [PATCH v4 3/6] KVM: VMX: Detect Tertiary VM-Execution control
+ when setup VMCS config
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>,
-        "Kernel Mailing List, Linux" <linux-kernel@vger.kernel.org>,
-        Reiji Watanabe <reijiw@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        Joerg Roedel <joro@8bytes.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Kim Phillips <kim.phillips@amd.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Jethro Beekman <jethro@fortanix.com>,
+        "Huang, Kai" <kai.huang@intel.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Hu, Robert" <robert.hu@intel.com>,
+        "Gao, Chao" <chao.gao@intel.com>,
+        Robert Hoo <robert.hu@linux.intel.com>
+References: <20210809032925.3548-1-guang.zeng@intel.com>
+ <20210809032925.3548-4-guang.zeng@intel.com> <YTvPu0REr+Wg3/s3@google.com>
+From:   Zeng Guang <guang.zeng@intel.com>
+Message-ID: <60d6f343-058a-5fbe-5265-ccb38689bb93@intel.com>
+Date:   Sat, 18 Sep 2021 00:15:50 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Firefox/78.0 Thunderbird/78.14.0
+MIME-Version: 1.0
+In-Reply-To: <YTvPu0REr+Wg3/s3@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 15, 2021 at 1:08 AM Sean Christopherson <seanjc@google.com> wrote:
-> Add dedicated helpers to emulate RESET instead of having the relevant code
-> scattered through vcpu_create() and vcpu_reset().  Paolo, I think this is
-> what you meant by "have init_vmcb/svm_vcpu_reset look more like the VMX
-> code"[*].
+On 9/11/2021 5:35 AM, Sean Christopherson wrote:
+> On Mon, Aug 09, 2021, Zeng Guang wrote:
+>> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+>> index 927a552393b9..ee8c5664dc95 100644
+>> --- a/arch/x86/kvm/vmx/vmx.c
+>> +++ b/arch/x86/kvm/vmx/vmx.c
+>> @@ -2391,6 +2391,23 @@ static __init int adjust_vmx_controls(u32 ctl_min, u32 ctl_opt,
+>>   	return 0;
+>>   }
+>>   
+>> +static __init int adjust_vmx_controls_64(u64 ctl_min, u64 ctl_opt,
+>> +					 u32 msr, u64 *result)
+>> +{
+>> +	u64 vmx_msr;
+>> +	u64 ctl = ctl_min | ctl_opt;
+>> +
+>> +	rdmsrl(msr, vmx_msr);
+>> +	ctl &= vmx_msr; /* bit == 1 means it can be set */
+>> +
+>> +	/* Ensure minimum (required) set of control bits are supported. */
+>> +	if (ctl_min & ~ctl)
+>> +		return -EIO;
+>> +
+>> +	*result = ctl;
+>> +	return 0;
+>> +}
+> More succinctly, since we don't need to force-set bits in the final value:
 >
-> [*] https://lore.kernel.org/all/c3563870-62c3-897d-3148-e48bb755310c@redhat.com/
-
-That assumes that I remember what I meant :) but I do like it so yes,
-that was it. Especially the fact that init_vmcb now has a single
-caller. I would further consider moving save area initialization to
-*_vcpu_reset, and keeping the control fields in init_vmcb/vmcs. That
-would make it easier to relate the two functions to separate parts of
-the manuals.
-
-I should go back to KVM next week. Context switching with KVM Forum
-and Kangrejos this week made everything so much slower than I'd liked.
-
-Paolo
-
+> 	u64 allowed1;
+>
+> 	rdmsrl(msr, allowed1);
+>
+> 	/* Ensure minimum (required) set of control bits are supported. */
+> 	if (ctl_min & ~allowed1)
+> 		return -EIO;
+>
+> 	*result = (ctl_min | ctl_opt) & allowed1;
+> 	return 0;
+Yes, it becomes more concise. I will change it . Thanks.
+>>   static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
+>>   				    struct vmx_capability *vmx_cap)
+>>   {
