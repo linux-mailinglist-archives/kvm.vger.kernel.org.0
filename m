@@ -2,169 +2,174 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 48A5D40F446
-	for <lists+kvm@lfdr.de>; Fri, 17 Sep 2021 10:40:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 28A2740F6F6
+	for <lists+kvm@lfdr.de>; Fri, 17 Sep 2021 13:59:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234065AbhIQIlu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Sep 2021 04:41:50 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29572 "EHLO
+        id S242538AbhIQMAu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Sep 2021 08:00:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:47583 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S245420AbhIQIlt (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 17 Sep 2021 04:41:49 -0400
+        by vger.kernel.org with ESMTP id S242509AbhIQMAu (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 17 Sep 2021 08:00:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1631868027;
+        s=mimecast20190719; t=1631879967;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=uPwMqjjw/KE/1k5TJSCA0cyO58yfO/wcRwrm76t+5zo=;
-        b=d3rqJR81Ae4TM62NXMoZxR0nJTla7ibJiDfJzZ3KvW4zj1o74td1ziYp7bv1BY+ytcDU3K
-        Dy6dgkC8vNC4nCzaZ7LdJSPtndEvpEAo/EDi2blbkEjgGG1HnGIj9L1zzaLF3BlW8oT9sK
-        U/sGvXfwoKCUkcUkdeXOM4ajF9k+VmI=
+        bh=uZP54lIQNa3SFVPU1L+sJMJyXHw+9iH2dBIPo6OwbrY=;
+        b=ANYE11v1xiKUCWRO3A/bMIeiGsP4/AnvfwE6IEsfsJoTHYg0IRj4NV8tjPIL6CntxnlrIp
+        e6eWgwO+fGYGnravCBneF7lK9oDRwX4FUXrX+zxIMk/Rx4gPYYUSdPGCtuz1mq1C8cWzxm
+        NBJ9uhu/U/4h7ljeJZxleE0RtEvQHdU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-175-DTmpkWiNPRCSYSDfy3mD9w-1; Fri, 17 Sep 2021 04:40:24 -0400
-X-MC-Unique: DTmpkWiNPRCSYSDfy3mD9w-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+ us-mta-336-jftDKVi4NEuTuslHgpAfkg-1; Fri, 17 Sep 2021 07:59:24 -0400
+X-MC-Unique: jftDKVi4NEuTuslHgpAfkg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9F3648145E6;
-        Fri, 17 Sep 2021 08:40:22 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3F02110168C4;
+        Fri, 17 Sep 2021 11:59:21 +0000 (UTC)
 Received: from localhost (unknown [10.39.192.115])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 38D2760C9F;
-        Fri, 17 Sep 2021 08:40:22 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0E73B5D6D5;
+        Fri, 17 Sep 2021 11:59:18 +0000 (UTC)
 From:   Cornelia Huck <cohuck@redhat.com>
-To:     Halil Pasic <pasic@linux.ibm.com>
-Cc:     Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        Eric Farman <farman@linux.ibm.com>
+Cc:     David Airlie <airlied@linux.ie>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
         Christian Borntraeger <borntraeger@de.ibm.com>,
-        Pierre Morel <pmorel@linux.ibm.com>,
-        Michael Mueller <mimu@linux.ibm.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        dri-devel@lists.freedesktop.org,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
         linux-s390@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, bfu@redhat.com,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
         Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>
-Subject: Re: [PATCH 1/1] virtio/s390: fix vritio-ccw device teardown
-In-Reply-To: <20210916151835.4ab512b2.pasic@linux.ibm.com>
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>, Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH v2 0/9] Move vfio_ccw to the new mdev API
+In-Reply-To: <20210914133618.GD4065468@nvidia.com>
 Organization: Red Hat GmbH
-References: <20210915215742.1793314-1-pasic@linux.ibm.com>
- <87pmt8hp5o.fsf@redhat.com> <20210916151835.4ab512b2.pasic@linux.ibm.com>
+References: <0-v2-7d3a384024cf+2060-ccw_mdev_jgg@nvidia.com>
+ <1e431e58465b86430d02d429c86c427f7088bf1f.camel@linux.ibm.com>
+ <20210913192407.GZ2505917@nvidia.com>
+ <6f55044373dea4515b831957981bbf333e03de59.camel@linux.ibm.com>
+ <20210914133618.GD4065468@nvidia.com>
 User-Agent: Notmuch/0.32.1 (https://notmuchmail.org)
-Date:   Fri, 17 Sep 2021 10:40:20 +0200
-Message-ID: <87mtobh9xn.fsf@redhat.com>
+Date:   Fri, 17 Sep 2021 13:59:16 +0200
+Message-ID: <87h7ejh0q3.fsf@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 16 2021, Halil Pasic <pasic@linux.ibm.com> wrote:
+On Tue, Sep 14 2021, Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-> On Thu, 16 Sep 2021 10:59:15 +0200
-> Cornelia Huck <cohuck@redhat.com> wrote:
->
->> > Since commit 48720ba56891 ("virtio/s390: use DMA memory for ccw I/O and
->> > classic notifiers") we were supposed to make sure that
->> > virtio_ccw_release_dev() completes before the ccw device, and the
->> > attached dma pool are torn down, but unfortunately we did not.
->> > Before that commit it used to be OK to delay cleaning up the memory
->> > allocated by virtio-ccw indefinitely (which isn't really intuitive for
->> > guys used to destruction happens in reverse construction order).
->> >
->> > To accomplish this let us take a reference on the ccw device before we
->> > allocate the dma_area and give it up after dma_area was freed.
->> >
->> > Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
->> > Fixes: 48720ba56891 ("virtio/s390: use DMA memory for ccw I/O and
->> > classic notifiers")
->> > Reported-by: bfu@redhat.com
->> > ---
->> >
->> > I'm not certain this is the only hot-unplug and teardonw related problem
->> > with virtio-ccw.
->> >
->> > Some things that are not perfectly clear to me:
->> > * What would happen if we observed an hot-unplug while we are doing
->> >   wait_event() in ccw_io_helper()? Do we get stuck? I don't thin we
->> >   are guaranteed to receive an irq for a subchannel that is gone.  
+> On Mon, Sep 13, 2021 at 04:31:54PM -0400, Eric Farman wrote:
+>> > I rebased it and fixed it up here:
+>> > 
+>> > https://github.com/jgunthorpe/linux/tree/vfio_ccw
+>> > 
+>> > Can you try again?
 >> 
->> Hm. I think we may need to do a wake_up during remove handling.
+>> That does address the crash, but then why is it processing a BROKEN
+>> event? Seems problematic. 
 >
-> My guess is that the BQL is saving us from ever seeing this with QEMU
-> as the hypervisor-userspace. Nevertheless I don't think we should rely
-> on that.
+> The stuff related to the NOT_OPER looked really wonky to me. I'm
+> guessing this is the issue - not sure about the pmcw.ena either..
 
-I agree. Let's do that via a separate patch.
-
->
->> 
->> > * cdev->online seems to be manipulated under cdev->ccwlock, but
->> >   in virtio_ccw_remove() we look at it to decide should we clean up
->> >   or not. What is the idea there? I guess we want to avoid doing
->> >   if nothing is there or twice. But I don't understand how stuff
->> >   interlocks.  
->> 
->> We only created the virtio device when we onlined the ccw device. Do you
->> have a better idea how to check for that? (And yes, I'm not sure the
->> locking is correct.)
->> 
->
-> Thanks, if I find time for it, I will try to understand this better and
-> come back with my findings.
->
->> > * Can virtio_ccw_remove() get called while !cdev->online and 
->> >   virtio_ccw_online() is running on a different cpu? If yes, what would
->> >   happen then?  
->> 
->> All of the remove/online/... etc. callbacks are invoked via the ccw bus
->> code. We have to trust that it gets it correct :) (Or have the common
->> I/O layer maintainers double-check it.)
->> 
->
-> Vineeth, what is your take on this? Are the struct ccw_driver
-> virtio_ccw_remove and the virtio_ccw_online callbacks mutually
-> exclusive. Please notice that we may initiate the onlining by
-> calling ccw_device_set_online() from a workqueue.
->
-> @Conny: I'm not sure what is your definition of 'it gets it correct'...
-> I doubt CIO can make things 100% foolproof in this area.
-
-Not 100% foolproof, but "don't online a device that is in the progress
-of going away" seems pretty basic to me.
+[I have still not been able to digest the whole series, sorry.]
 
 >
->> >  
->> > The main addresse of these questions is Conny ;).
->
-> In any case, I think we can go step by step. I would like the issue
-> this patch intends to address, addressed first. Then we can think
-> about the rest.
->
->> >
->> > An alternative to this approach would be to inc and dec the refcount
->> > in ccw_device_dma_zalloc() and ccw_device_dma_free() respectively.  
->> 
->> Yeah, I also thought about that. This would give us more get/put
->> operations, but might be the safer option.
->
-> My understanding is, that having the ccw device go away while in a
-> middle of doing ccw stuff (about to submit, or waiting for a channel
-> program, or whatever) was bad before.
+> diff --git a/drivers/s390/cio/vfio_ccw_fsm.c b/drivers/s390/cio/vfio_ccw_fsm.c
+> index 5ea392959c0711..0d4d4f425befac 100644
+> --- a/drivers/s390/cio/vfio_ccw_fsm.c
+> +++ b/drivers/s390/cio/vfio_ccw_fsm.c
+> @@ -380,29 +380,19 @@ static void fsm_open(struct vfio_ccw_private *private,
+>  	spin_unlock_irq(sch->lock);
+>  }
+>  
+> -static void fsm_close(struct vfio_ccw_private *private,
+> -		      enum vfio_ccw_event event)
+> +static int flush_sch(struct vfio_ccw_private *private)
+>  {
+>  	struct subchannel *sch = private->sch;
+>  	DECLARE_COMPLETION_ONSTACK(completion);
+>  	int iretry, ret = 0;
+>  
+> -	spin_lock_irq(sch->lock);
+> -	if (!sch->schib.pmcw.ena)
+> -		goto err_unlock;
+> -	ret = cio_disable_subchannel(sch);
+> -	if (ret != -EBUSY)
+> -		goto err_unlock;
+> -
+>  	iretry = 255;
+>  	do {
+> -
+>  		ret = cio_cancel_halt_clear(sch, &iretry);
+> -
+>  		if (ret == -EIO) {
+>  			pr_err("vfio_ccw: could not quiesce subchannel 0.%x.%04x!\n",
+>  			       sch->schid.ssid, sch->schid.sch_no);
+> -			break;
+> +			return ret;
 
-What do you mean with "was bad before"?
+Looking at this, I wonder why we had special-cased -EIO -- for -ENODEV
+we should be done as well, as then the device is dead and we do not need
+to disable it.
 
-> So my intuition tells me that
-> drivers should manage explicitly. Yes virtio_ccw happens to have dma
-> memory whose lifetime is more or less the lifetime of struct virtio_ccw,
-> but that may not be always the case.
+>  		}
+>  
+>  		/*
+> @@ -413,13 +403,28 @@ static void fsm_close(struct vfio_ccw_private *private,
+>  		spin_unlock_irq(sch->lock);
+>  
+>  		if (ret == -EBUSY)
+> -			wait_for_completion_timeout(&completion, 3*HZ);
+> +			wait_for_completion_timeout(&completion, 3 * HZ);
+>  
+>  		private->completion = NULL;
+>  		flush_workqueue(vfio_ccw_work_q);
+>  		spin_lock_irq(sch->lock);
+>  		ret = cio_disable_subchannel(sch);
+>  	} while (ret == -EBUSY);
+> +	return ret;
+> +}
+> +
+> +static void fsm_close(struct vfio_ccw_private *private,
+> +		      enum vfio_ccw_event event)
+> +{
+> +	struct subchannel *sch = private->sch;
+> +	int ret;
+> +
+> +	spin_lock_irq(sch->lock);
+> +	if (!sch->schib.pmcw.ena)
+> +		goto err_unlock;
+> +	ret = cio_disable_subchannel(sch);
 
-I'm not sure what you're getting at here. Regardless of the lifetime of
-the dma memory, it depends on the presence of the ccw device to which it
-is tied. This means that the ccw device must not be released while the
-dma memory is alive. We can use the approach in your patch here due to
-the lifetime of the dma memory that virtio-ccw allocates when we start
-using the device and frees when we stop using the device, or we can use
-get/put with every allocate/release dma memory pair, which should be
-safe for everyone?
+cio_disable_subchannel() should be happy to disable an already disabled
+subchannel, so I guess we can just walk through this and end up in
+CLOSED state... unless entering with !ena actually indicates that we
+messed up somewhere else in the state machine. I still need to find time
+to read the patches.
+
+> +	if (ret == -EBUSY)
+> +		ret = flush_sch(private);
+>  	if (ret)
+>  		goto err_unlock;
+>  	private->state = VFIO_CCW_STATE_CLOSED;
 
