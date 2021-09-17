@@ -2,92 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0BDD140FEAF
-	for <lists+kvm@lfdr.de>; Fri, 17 Sep 2021 19:35:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E00D40FEB1
+	for <lists+kvm@lfdr.de>; Fri, 17 Sep 2021 19:37:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237238AbhIQRgY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Sep 2021 13:36:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51636 "EHLO
+        id S238937AbhIQRiX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Sep 2021 13:38:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52078 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230393AbhIQRgX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Sep 2021 13:36:23 -0400
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8139EC061574
-        for <kvm@vger.kernel.org>; Fri, 17 Sep 2021 10:35:01 -0700 (PDT)
-Received: by mail-pj1-x102f.google.com with SMTP id j1so7423867pjv.3
-        for <kvm@vger.kernel.org>; Fri, 17 Sep 2021 10:35:01 -0700 (PDT)
+        with ESMTP id S231295AbhIQRiW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Sep 2021 13:38:22 -0400
+Received: from mail-qk1-x749.google.com (mail-qk1-x749.google.com [IPv6:2607:f8b0:4864:20::749])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AE50C061574
+        for <kvm@vger.kernel.org>; Fri, 17 Sep 2021 10:37:00 -0700 (PDT)
+Received: by mail-qk1-x749.google.com with SMTP id 21-20020a370815000000b003d5a81a4d12so69555005qki.3
+        for <kvm@vger.kernel.org>; Fri, 17 Sep 2021 10:37:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=e0hxS1eA5SlhYk+DVF+mEtmVrvpsQDkQJiWQ1Vtnubg=;
-        b=sfJ7oAcPPNCOIpZ+NVb5trqZfpF5qCbn1z9GUSaoW+C4bkSHRHhY+kh5T1mZUEmYIR
-         gWomWno1SuJJbGeKBEfIC96I34bb+SL066ueQHXTLcqYSL9/DZeLrGz+MwsLKTePIZbA
-         Qb7Bwu5aUszUMXb7tBsCxO3DhLCbykgiPGWb6cCHl1q28ssDrds5YR1DNwhiHLU5r58a
-         TuaFzxmeFs0gzZg5uxn0xJhxoQaUkRwfYLabcgogNph/4+PQdOV20lXVuXU8yafQ2pPJ
-         nMLzfukKS8xtl0qj+8evJvI+ZUdjSQjZuCusRQ62QcCHLR4hddRAgDcbgy6wlnEdkPfM
-         cJ/A==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=j3hYscMbXUl4Blxte5huLmi9fE1/+32DfcMIllD4jkk=;
+        b=OJN+r2xSncvTtnDY7D1o8fb7GCsFa7p+mMPRtRymF/JdogiC8RlUMKUSPI63y5o/K1
+         gME6uNvi5jDTxwYtbwId4Mq2szkOJl6TjIwhr1zNcmZzUX7YMSElrU6G8g8P1aimYn1M
+         EEVmyepq9RcopReUJzq3YfsAd7TY19qZnyfwHrNfB25vU8thvzl0IgmFfW+zGVG7HOI1
+         s1GCoMT8So3mDkwF2FSax3gmrEQEzlz5NMkPLNlwEP21Wc2vOWPDsDy2QDZGaWT0ClXk
+         vTb6uEzPENbRR0rtc6llBWh47pCYtpn/M2p9khvoictU1Ly7IeU9fceQ54Ig/Da/dhj0
+         aibA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=e0hxS1eA5SlhYk+DVF+mEtmVrvpsQDkQJiWQ1Vtnubg=;
-        b=yRoNH30PyDVKDzW2bnP7Q+2oNtFP3KUAGN3S49mxj2JYZGf4yjdrmJ9MQYIKlPRh0O
-         he/8Me7NbOEJx1Gl/oGaHx6esg+p78FEI7LMwfWZOoGcEwodMsDRp+2ozXfhzCwGUiVa
-         zYu7IOBI6YWwQQByxTdSkF7a2YEjNGeDrFGenRwBH2kWLkEZxrX4mCyMnt6CG7FMQwaN
-         kQMfSCyNJlnJKkmkYOfMUFlS3aQyWwzTpnGqLW/A0GGN+iPq5e7usCMuJC2aBuWIMvfb
-         YLFFBb11eM1L6DS76xEAAbQlHMVi2nu3IjhO+imRyYmPfVfIoKE/s1ErICGXkw9UwVms
-         Hiug==
-X-Gm-Message-State: AOAM533gG1q5BZ7lsKEWxe8BSzoZh3XEeIXvxTv7gEl88zXdVnnWA/ht
-        VjT7jFOaGH0pHI9PLn3tcpjKSg==
-X-Google-Smtp-Source: ABdhPJys65X648pqZciB9u5LcuOf0aQ81Kz254oKZko7YmkOnLX8KA1sk61/l9g707kyMtHlNTjS8Q==
-X-Received: by 2002:a17:902:8d84:b0:13a:6690:8a08 with SMTP id v4-20020a1709028d8400b0013a66908a08mr10659715plo.25.1631900100818;
-        Fri, 17 Sep 2021 10:35:00 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id k190sm6937624pfd.211.2021.09.17.10.34.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Sep 2021 10:35:00 -0700 (PDT)
-Date:   Fri, 17 Sep 2021 17:34:56 +0000
-From:   Sean Christopherson <seanjc@google.com>
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=j3hYscMbXUl4Blxte5huLmi9fE1/+32DfcMIllD4jkk=;
+        b=rJI0/l2dER27XV1v5RtPLkmSt37bNw+LO2GeRD/1ihCriRzjXqSASKCiPnQlK5kXXz
+         uaC2YU8u91oP0c1WWGF/lquJAQLhZlu6TjIj1GckcFcuIZXO3ilTStLEdUhJBUsqLGyE
+         Z2JZ9wCxRKPfzulXvNK28UjWRZgiOosnSBMe4JzHv72wo0adsICo9HYBq91oaDV0nZOd
+         /R0w9OR2d3CmA9GEiShGc1HD3fYk7BdA9VT8iKVYSS6Bu0zV+C+hTyVc9wmZ3t5BuK5F
+         yOqMRR9slY4VO7yYK0hcwJMXjs1eCkWpbT/5IREMk0mrb0lxj7Rr/UvCrAXhIsGRpMVf
+         s9Qg==
+X-Gm-Message-State: AOAM530jKRm9eb8xPDLVzM+9leiF7bJ4Jf2BHJBVXYDzEgg2w8lL4/KX
+        /kIoAdFJ2Ye7ewC2cd95GOOSVQUxT6PC3Q==
+X-Google-Smtp-Source: ABdhPJykwnKgUFCaLS861ZdYxYSIk5LCg6mxDChItfFD2Seq3T7CS2CzEbovyO9jV6tHrrGdzqwlGfPkm77vMQ==
+X-Received: from dmatlack-heavy.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
+ (user=dmatlack job=sendgmr) by 2002:a25:c184:: with SMTP id
+ r126mr13918623ybf.123.1631900219046; Fri, 17 Sep 2021 10:36:59 -0700 (PDT)
+Date:   Fri, 17 Sep 2021 17:36:54 +0000
+Message-Id: <20210917173657.44011-1-dmatlack@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.0.464.g1972c5931b-goog
+Subject: [PATCH v2 0/3] KVM: selftests: Small fixes for dirty_log_perf_test
+From:   David Matlack <dmatlack@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>,
-        "Kernel Mailing List, Linux" <linux-kernel@vger.kernel.org>,
-        Reiji Watanabe <reijiw@google.com>
-Subject: Re: [PATCH 0/3] KVM: x86: Clean up RESET "emulation"
-Message-ID: <YUTRwNT/O5Ny0MOQ@google.com>
-References: <20210914230840.3030620-1-seanjc@google.com>
- <CABgObfYz1b3YO4a9tR02TourLmsnS48RWrOprrsEh=NpbQfjRA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CABgObfYz1b3YO4a9tR02TourLmsnS48RWrOprrsEh=NpbQfjRA@mail.gmail.com>
+Cc:     kvm@vger.kernel.org, Andrew Jones <drjones@redhat.com>,
+        Ben Gardon <bgardon@google.com>,
+        Axel Rasmussen <axelrasmussen@google.com>,
+        Yanan Wang <wangyanan55@huawei.com>,
+        David Matlack <dmatlack@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 17, 2021, Paolo Bonzini wrote:
-> On Wed, Sep 15, 2021 at 1:08 AM Sean Christopherson <seanjc@google.com> wrote:
-> > Add dedicated helpers to emulate RESET instead of having the relevant code
-> > scattered through vcpu_create() and vcpu_reset().  Paolo, I think this is
-> > what you meant by "have init_vmcb/svm_vcpu_reset look more like the VMX
-> > code"[*].
-> >
-> > [*] https://lore.kernel.org/all/c3563870-62c3-897d-3148-e48bb755310c@redhat.com/
-> 
-> That assumes that I remember what I meant :)
+This series fixes 2 bugs in dirty_log_perf_test:
+ - Incorrect interleaving of help messages for -s and -x (patch 2)
+ - Buffer overflow when using multiple slots (patch 3)
 
-Ha!  That's why I write changelogs with --verbose :-)
+Both bugs were introduced by commit 609e6202ea5f ("KVM: selftests:
+Support multiple slots in dirty_log_perf_test").
 
-> but I do like it so yes, that was it. Especially the fact that init_vmcb now
-> has a single caller. I would further consider moving save area initialization
-> to *_vcpu_reset, and keeping the control fields in init_vmcb/vmcs. That would
-> make it easier to relate the two functions to separate parts of the manuals.
+Patch 1 is a small tangentially related cleanup to use a consistent
+flag for the backing source across all selftests.
 
-I like the idea, but I think I'd prefer to tackle that at the same time as generic
-support for handling MSRs at RESET/INIT.  E.g. instead of manually writing
-vmcs.GUEST_SYSENTER_* at RESET, provide infrastruture to automagically run through
-all emulated/virtualized at RESET and/or INIT as appropriate to initialize the
-guest value.
+v2:
+ - Add Ben and Andrew's SOB to patches 1 and 2
+ - Delete stray newline in patch 2 [Andrew]
+ - Make print_available_backing_src_types static [Andrew]
+ - Create a separate dirty bitmap per slot [Andrew, Ben]
+
+v1: https://lore.kernel.org/kvm/20210915213034.1613552-1-dmatlack@google.com/
+
+David Matlack (3):
+  KVM: selftests: Change backing_src flag to -s in demand_paging_test
+  KVM: selftests: Refactor help message for -s backing_src
+  KVM: selftests: Create a separate dirty bitmap per slot
+
+ .../selftests/kvm/access_tracking_perf_test.c |  6 +-
+ .../selftests/kvm/demand_paging_test.c        | 13 ++--
+ .../selftests/kvm/dirty_log_perf_test.c       | 63 +++++++++++++------
+ .../testing/selftests/kvm/include/test_util.h |  4 +-
+ .../selftests/kvm/kvm_page_table_test.c       |  7 +--
+ tools/testing/selftests/kvm/lib/test_util.c   | 17 +++--
+ 6 files changed, 69 insertions(+), 41 deletions(-)
+
+-- 
+2.33.0.464.g1972c5931b-goog
+
