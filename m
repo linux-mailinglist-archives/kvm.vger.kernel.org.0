@@ -2,103 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C4C2740FDB6
-	for <lists+kvm@lfdr.de>; Fri, 17 Sep 2021 18:16:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7C4CE40FE2E
+	for <lists+kvm@lfdr.de>; Fri, 17 Sep 2021 18:54:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243832AbhIQQRZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Sep 2021 12:17:25 -0400
-Received: from mga02.intel.com ([134.134.136.20]:26386 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S242090AbhIQQRU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Sep 2021 12:17:20 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10110"; a="210059600"
-X-IronPort-AV: E=Sophos;i="5.85,301,1624345200"; 
-   d="scan'208";a="210059600"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Sep 2021 09:15:57 -0700
-X-IronPort-AV: E=Sophos;i="5.85,301,1624345200"; 
-   d="scan'208";a="546478915"
-Received: from zengguan-mobl.ccr.corp.intel.com (HELO [10.254.208.219]) ([10.254.208.219])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Sep 2021 09:15:52 -0700
-Subject: Re: [PATCH v4 3/6] KVM: VMX: Detect Tertiary VM-Execution control
- when setup VMCS config
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        id S243443AbhIQQzU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Sep 2021 12:55:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42154 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S244604AbhIQQzU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Sep 2021 12:55:20 -0400
+Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC0D5C061767
+        for <kvm@vger.kernel.org>; Fri, 17 Sep 2021 09:53:57 -0700 (PDT)
+Received: by mail-pg1-x52f.google.com with SMTP id w8so10166916pgf.5
+        for <kvm@vger.kernel.org>; Fri, 17 Sep 2021 09:53:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=fRMxd8azh7E1BFxsMIqGYJmHYephRNLnlBlA+X7n5iE=;
+        b=OCd2JnsFm+PC0WRg9Dy8nwrv0xb6S01W9Op4r/ZIu2wiEWDdIoF9l2WbVBKByhSPPF
+         pgrkna7a3wLYVWEKuAik8asYNbpDEgJtdjZ+5dk4g6kfSL2XrdSoKcoPwqesfcoOwhOu
+         WWbUTglAWniqlHYXmzaYzrF0F49uRRMs/V59Ek2JYLZBnMp92N934h45zumxZj/0PpGD
+         /zvBIntmv3EDlaS6KVxhx1MfK4sOMy/cLwcByoT+tkw90D/Cj3jlQCjxNda2rrqk2GSV
+         L6ETbBTdUnfohyRSi9IUyYAHcI9Z9pYHZQ5tjcYdmN/t6vpNHZYY3PO0hm+uRnpvMlkD
+         xKpA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=fRMxd8azh7E1BFxsMIqGYJmHYephRNLnlBlA+X7n5iE=;
+        b=BHXK3D+ohz90iMV4XN3Be8Hx1yAVVo1KFLto3jty58qI6dd+PV+MBbDBlTxRMYaNnQ
+         8Ja+8EIih5Tm+K+vBe3aFhuiJ+of30CurK7iEnhd1PohchjUXuUe2bcexx+8aBlPTn3a
+         mngwVctU5j6ElqVJtv9QVRRGfds8mUcdj+QzEwmPCj4nowkMobJe2onWTKUU2ykC55CI
+         2sSoWRnrJQ4cpQdcGSW4iSQ+sGsM4WcvFPDL0SaklcuF5ZEsjlVAgecySbzED2qKKwB2
+         SuDS78R3vbeCHtXSP2fgfvww99GS0HjVnfaYXSndFxuSTaoGJ9hOScIXjVXiIcHD8vZP
+         iMVw==
+X-Gm-Message-State: AOAM5305LiK+P6ZCy82tiFAQ6qr4Ky5j2a1A0ScccEImXUjCEGxqY/yC
+        7g0B+het8UOOQOjVx2scG2mmKQ==
+X-Google-Smtp-Source: ABdhPJyVPh/MP+xok4eNnL6IICz9yFWugy2q7G+GDgXi8Z/wRNwWTua9Dj2q+LfRii59WPG0Vad6Iw==
+X-Received: by 2002:a05:6a00:174a:b0:433:9589:bdb5 with SMTP id j10-20020a056a00174a00b004339589bdb5mr11713777pfc.5.1631897636965;
+        Fri, 17 Sep 2021 09:53:56 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id h21sm6580708pfc.118.2021.09.17.09.53.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 Sep 2021 09:53:56 -0700 (PDT)
+Date:   Fri, 17 Sep 2021 16:53:52 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     Ingo Molnar <mingo@redhat.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Will Deacon <will@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Marc Zyngier <maz@kernel.org>, Guo Ren <guoren@kernel.org>,
+        Nick Hu <nickhu@andestech.com>,
+        Greentime Hu <green.hu@gmail.com>,
+        Vincent Chen <deanbo422@gmail.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Borislav Petkov <bp@alien8.de>, x86@kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Juergen Gross <jgross@suse.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Jiri Olsa <jolsa@redhat.com>,
+        Namhyung Kim <namhyung@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Kim Phillips <kim.phillips@amd.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Jethro Beekman <jethro@fortanix.com>,
-        "Huang, Kai" <kai.huang@intel.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Hu, Robert" <robert.hu@intel.com>,
-        "Gao, Chao" <chao.gao@intel.com>,
-        Robert Hoo <robert.hu@linux.intel.com>
-References: <20210809032925.3548-1-guang.zeng@intel.com>
- <20210809032925.3548-4-guang.zeng@intel.com> <YTvPu0REr+Wg3/s3@google.com>
-From:   Zeng Guang <guang.zeng@intel.com>
-Message-ID: <60d6f343-058a-5fbe-5265-ccb38689bb93@intel.com>
-Date:   Sat, 18 Sep 2021 00:15:50 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Firefox/78.0 Thunderbird/78.14.0
+        Stefano Stabellini <sstabellini@kernel.org>,
+        linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-csky@vger.kernel.org, linux-riscv@lists.infradead.org,
+        kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
+        Artem Kashkanov <artem.kashkanov@intel.com>,
+        Like Xu <like.xu.linux@gmail.com>,
+        Zhu Lingshan <lingshan.zhu@intel.com>
+Subject: Re: [PATCH v2 00/13] perf: KVM: Fix, optimize, and clean up callbacks
+Message-ID: <YUTIIG4ZCKMbqrFi@google.com>
+References: <20210828003558.713983-1-seanjc@google.com>
+ <20210828201336.GD4353@worktop.programming.kicks-ass.net>
+ <YUO5J/jTMa2KGbsq@google.com>
+ <YURDqVZ1UXKCiKPV@hirez.programming.kicks-ass.net>
 MIME-Version: 1.0
-In-Reply-To: <YTvPu0REr+Wg3/s3@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YURDqVZ1UXKCiKPV@hirez.programming.kicks-ass.net>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/11/2021 5:35 AM, Sean Christopherson wrote:
-> On Mon, Aug 09, 2021, Zeng Guang wrote:
->> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
->> index 927a552393b9..ee8c5664dc95 100644
->> --- a/arch/x86/kvm/vmx/vmx.c
->> +++ b/arch/x86/kvm/vmx/vmx.c
->> @@ -2391,6 +2391,23 @@ static __init int adjust_vmx_controls(u32 ctl_min, u32 ctl_opt,
->>   	return 0;
->>   }
->>   
->> +static __init int adjust_vmx_controls_64(u64 ctl_min, u64 ctl_opt,
->> +					 u32 msr, u64 *result)
->> +{
->> +	u64 vmx_msr;
->> +	u64 ctl = ctl_min | ctl_opt;
->> +
->> +	rdmsrl(msr, vmx_msr);
->> +	ctl &= vmx_msr; /* bit == 1 means it can be set */
->> +
->> +	/* Ensure minimum (required) set of control bits are supported. */
->> +	if (ctl_min & ~ctl)
->> +		return -EIO;
->> +
->> +	*result = ctl;
->> +	return 0;
->> +}
-> More succinctly, since we don't need to force-set bits in the final value:
->
-> 	u64 allowed1;
->
-> 	rdmsrl(msr, allowed1);
->
-> 	/* Ensure minimum (required) set of control bits are supported. */
-> 	if (ctl_min & ~allowed1)
-> 		return -EIO;
->
-> 	*result = (ctl_min | ctl_opt) & allowed1;
-> 	return 0;
-Yes, it becomes more concise. I will change it . Thanks.
->>   static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
->>   				    struct vmx_capability *vmx_cap)
->>   {
+On Fri, Sep 17, 2021, Peter Zijlstra wrote:
+> On Thu, Sep 16, 2021 at 09:37:43PM +0000, Sean Christopherson wrote:
+> So I don't mind exporting __static_call_return0, but exporting a raw
+> static_call is much like exporting a function pointer :/
+
+Ya, that part is quite gross.
+
+> > The unregister path would also need its own synchronize_rcu().  In general, I
+> > don't love duplicating the logic, but it's not the end of the world.
+> > 
+> > Either way works for me.  Paolo or Peter, do either of you have a preference?
+> 
+> Can we de-feature kvm as a module and only have this PT functionality
+> when built-in? :-)
+
+I agree that many of the for-KVM exports are ugly, especially several of the
+perf exports, but I will fight tooth and nail to keep KVM-as-a-module.  It is
+invaluable for development and testing, and in the not-too-distant future there
+is KVM-maintenance related functionality that we'd like to implement that relies
+on KVM being a module.
+
+I would be more than happy to help explore approaches that reduce the for-KVM
+exports, but I am strongly opposed to defeaturing KVM-as-a-module.  I have a few
+nascent ideas for eliminating a handful of a random exports, but no clever ideas
+for eliminating perf's for-KVM exports.
