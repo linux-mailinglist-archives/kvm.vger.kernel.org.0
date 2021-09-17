@@ -2,196 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 25C0040FEB4
-	for <lists+kvm@lfdr.de>; Fri, 17 Sep 2021 19:37:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1D36440FEB5
+	for <lists+kvm@lfdr.de>; Fri, 17 Sep 2021 19:37:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239897AbhIQRi1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Sep 2021 13:38:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52098 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240045AbhIQRi0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Sep 2021 13:38:26 -0400
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEDA9C061574
-        for <kvm@vger.kernel.org>; Fri, 17 Sep 2021 10:37:03 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id z127-20020a633385000000b002618d24cfacso8278841pgz.16
-        for <kvm@vger.kernel.org>; Fri, 17 Sep 2021 10:37:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=sdn1PmaQtPltchy5ksgHmZbBH0mJaPBGIRQI080ax7I=;
-        b=QbLFISl0tUzRa5q4FW67gOMxv/oMtQzPA9wC2QyXxneAlqeT7adkfMrx4G9J5ylN4/
-         Ozp0KA2zdDwp4FNEylzqucBpfHnRRJbfxhoziiu+YfsI71x2655i30IGf5LnQmMjHEUL
-         IyZZWinkI4rx+OSoNDM+IYfpl6twO5zBTPmg33T4rdstHOFOGyhCVK82ldTm+Xe08/8U
-         5OuO9ZuHcYZrKDKFL10V5mIQfEqDMDuIgrZZcZliKRLrFrTxZzt3Wd7H0/G5oJeOvEfv
-         lxtKWpBFO0CSeNZmvA8lrsbDpd5rr6DyEnIRNOdhTH/VllbwDLnmqcqwVN3i8ivdxMAv
-         Kvqw==
+        id S240159AbhIQRiv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Sep 2021 13:38:51 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42650 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S237238AbhIQRit (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 17 Sep 2021 13:38:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1631900247;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=TQ69tgYk0yh6UZaHgteT2LE/TfdaRnldb8roVNiJD38=;
+        b=iRda8VoJz912C313Y5Txs3k1PPbTu6enWBdm2zv7k8QzcuepFuJP2FOd3k/sdtV7qaGdX4
+        ZwUWpsJ6aEr06Ytq7VQ7a77ElfszHiFYQEnF7kRBpkxKaKAiQWJjMy4EDNms6n4dDdCWOx
+        J8IIVB0aESEt6JaWqo88O+ZmSKcKR+Y=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-219-ogkwsfYdO1qGW_qO0P7jFw-1; Fri, 17 Sep 2021 13:37:25 -0400
+X-MC-Unique: ogkwsfYdO1qGW_qO0P7jFw-1
+Received: by mail-ed1-f72.google.com with SMTP id z6-20020a50cd06000000b003d2c2e38f1fso9745798edi.1
+        for <kvm@vger.kernel.org>; Fri, 17 Sep 2021 10:37:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=sdn1PmaQtPltchy5ksgHmZbBH0mJaPBGIRQI080ax7I=;
-        b=cabVUlHt7zcn9G/77t8AeG+1TtaZZ2ciancRoFJOnTPXh1agkYfOmB3HsyIIlKZ3ae
-         iV5s526WpCdGOMzz390YNPqfcmABEQkPxOA3tG+6g3Hu/YB103Pxa2Kep7iNnQe0RhQm
-         hOOCKpyL6w0fbrMzRVUjfP3wcafYZ9PYuLnqQ78iLD/0OZ+C8MeKQOpc03hZW2aPCkWY
-         E0/czVcoq8cYtjzhwE6q7ZnyiKL6R6odGYv+IrzprFI/1YJo5usIqVzg6opoSFrGG1eh
-         NmYgjORKyFG8Fp4/jppWU/MSDbzwB2oVfDXewx6mQboNBrRC0fJrSdy4F60uESwI4qUo
-         t3Pw==
-X-Gm-Message-State: AOAM532FiySrhqNew+R3GsXlYkMYd+IiEv/sZb5MKGSdfPhnNvmThdV3
-        9XoC77lQcwc94PnPRGGsj4nVZi3zYFZkFQ==
-X-Google-Smtp-Source: ABdhPJxrQ0jLDBEV9oXeqFMT17SE79FyD9jzoHntaZAPJqKrq4Vwnq49pLqjYDsIuAPcBBOx2bHz/Wue9FMhzA==
-X-Received: from dmatlack-heavy.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
- (user=dmatlack job=sendgmr) by 2002:a17:902:7602:b0:13a:2968:a37 with SMTP id
- k2-20020a170902760200b0013a29680a37mr10638097pll.30.1631900223438; Fri, 17
- Sep 2021 10:37:03 -0700 (PDT)
-Date:   Fri, 17 Sep 2021 17:36:57 +0000
-In-Reply-To: <20210917173657.44011-1-dmatlack@google.com>
-Message-Id: <20210917173657.44011-4-dmatlack@google.com>
-Mime-Version: 1.0
-References: <20210917173657.44011-1-dmatlack@google.com>
-X-Mailer: git-send-email 2.33.0.464.g1972c5931b-goog
-Subject: [PATCH v2 3/3] KVM: selftests: Create a separate dirty bitmap per slot
-From:   David Matlack <dmatlack@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, Andrew Jones <drjones@redhat.com>,
-        Ben Gardon <bgardon@google.com>,
-        Axel Rasmussen <axelrasmussen@google.com>,
-        Yanan Wang <wangyanan55@huawei.com>,
-        David Matlack <dmatlack@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=TQ69tgYk0yh6UZaHgteT2LE/TfdaRnldb8roVNiJD38=;
+        b=kdeJb7rl4c3Cnti2/3MUwH/l++obzMr47Tvv7nsBlfGIDj0PHPDq0hBWIijnBUjQIo
+         n1A3ODR/7BNLH3q1K6o24PbEzTg5BBqSW88fsz++ThSPhI/oJtTr5sIjrsBVuH+iZ1na
+         rC13iPOGqznBLS/UGlcQEX5IrNGMCpIoWF2TOYIX9SHANYvGj4alLtgd228m42YGJgyD
+         GxrzslRw6CHSyy47VjIbOOjes/lI/ogrMpt76/rz2g7BmZ7AnFA2HJn63aUifLwa7P3x
+         eYmt7mnck4IGvsfON9VKvcu7WzbEgaK31qFm3H2bH4HdWK6Ts4+6KhZDTjKYBZ8//9Xt
+         6THQ==
+X-Gm-Message-State: AOAM531Z7ajQyrK9aB6lKbyfE6YCiTUqZ71JqPhBinPB/dORJ9fSq57n
+        E8iS5XS1UeEolED2syO2iRHM9lcStBQ7x65tFLC+7DcWc79IcC5vWT4LcRiNxgj7ZMDTpRZpklh
+        VyKcHSfBrWVDw
+X-Received: by 2002:aa7:d582:: with SMTP id r2mr13896174edq.324.1631900244583;
+        Fri, 17 Sep 2021 10:37:24 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyLtBte+3SaIrVpcwkvtQdqnblyNWMQHx8gbT1bNYByKRPARqRI8cZxbuL5acvrGWIvc77JMg==
+X-Received: by 2002:aa7:d582:: with SMTP id r2mr13896157edq.324.1631900244407;
+        Fri, 17 Sep 2021 10:37:24 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id k20sm2532336ejd.33.2021.09.17.10.37.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 17 Sep 2021 10:37:22 -0700 (PDT)
+Subject: Re: [PATCH 0/3] KVM: x86: Clean up RESET "emulation"
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>,
+        "Kernel Mailing List, Linux" <linux-kernel@vger.kernel.org>,
+        Reiji Watanabe <reijiw@google.com>
+References: <20210914230840.3030620-1-seanjc@google.com>
+ <CABgObfYz1b3YO4a9tR02TourLmsnS48RWrOprrsEh=NpbQfjRA@mail.gmail.com>
+ <YUTRwNT/O5Ny0MOQ@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <a77e3edd-2b58-fb46-8a76-2d8446892992@redhat.com>
+Date:   Fri, 17 Sep 2021 19:37:21 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
+MIME-Version: 1.0
+In-Reply-To: <YUTRwNT/O5Ny0MOQ@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The calculation to get the per-slot dirty bitmap was incorrect leading
-to a buffer overrun. Fix it by splitting out the dirty bitmap into a
-separate bitmap per slot.
+On 17/09/21 19:34, Sean Christopherson wrote:
+>> but I do like it so yes, that was it. Especially the fact that init_vmcb now
+>> has a single caller. I would further consider moving save area initialization
+>> to *_vcpu_reset, and keeping the control fields in init_vmcb/vmcs. That would
+>> make it easier to relate the two functions to separate parts of the manuals.
+>
+> I like the idea, but I think I'd prefer to tackle that at the same time as generic
+> support for handling MSRs at RESET/INIT.
 
-Fixes: 609e6202ea5f ("KVM: selftests: Support multiple slots in dirty_log_perf_test")
-Signed-off-by: David Matlack <dmatlack@google.com>
----
- .../selftests/kvm/dirty_log_perf_test.c       | 54 +++++++++++++------
- 1 file changed, 39 insertions(+), 15 deletions(-)
+No problem, just roughly sketching some ideas for the future.  But 
+you're absolutely right that some MSRs have effects on the control areas 
+rather than the save area (and some have effects on neither).
 
-diff --git a/tools/testing/selftests/kvm/dirty_log_perf_test.c b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-index 5ad9f2bc7369..c981f93e2043 100644
---- a/tools/testing/selftests/kvm/dirty_log_perf_test.c
-+++ b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-@@ -118,42 +118,64 @@ static inline void disable_dirty_logging(struct kvm_vm *vm, int slots)
- 	toggle_dirty_logging(vm, slots, false);
- }
- 
--static void get_dirty_log(struct kvm_vm *vm, int slots, unsigned long *bitmap,
--			  uint64_t nr_pages)
-+static void get_dirty_log(struct kvm_vm *vm, unsigned long *bitmaps[], int slots)
- {
--	uint64_t slot_pages = nr_pages / slots;
- 	int i;
- 
- 	for (i = 0; i < slots; i++) {
- 		int slot = PERF_TEST_MEM_SLOT_INDEX + i;
--		unsigned long *slot_bitmap = bitmap + i * slot_pages;
- 
--		kvm_vm_get_dirty_log(vm, slot, slot_bitmap);
-+		kvm_vm_get_dirty_log(vm, slot, bitmaps[i]);
- 	}
- }
- 
--static void clear_dirty_log(struct kvm_vm *vm, int slots, unsigned long *bitmap,
--			    uint64_t nr_pages)
-+static void clear_dirty_log(struct kvm_vm *vm, unsigned long *bitmaps[],
-+			    int slots, uint64_t pages_per_slot)
- {
--	uint64_t slot_pages = nr_pages / slots;
- 	int i;
- 
- 	for (i = 0; i < slots; i++) {
- 		int slot = PERF_TEST_MEM_SLOT_INDEX + i;
--		unsigned long *slot_bitmap = bitmap + i * slot_pages;
- 
--		kvm_vm_clear_dirty_log(vm, slot, slot_bitmap, 0, slot_pages);
-+		kvm_vm_clear_dirty_log(vm, slot, bitmaps[i], 0, pages_per_slot);
- 	}
- }
- 
-+static unsigned long **alloc_bitmaps(int slots, uint64_t pages_per_slot)
-+{
-+	unsigned long **bitmaps;
-+	int i;
-+
-+	bitmaps = malloc(slots * sizeof(bitmaps[0]));
-+	TEST_ASSERT(bitmaps, "Failed to allocate bitmaps array.");
-+
-+	for (i = 0; i < slots; i++) {
-+		bitmaps[i] = bitmap_alloc(pages_per_slot);
-+		TEST_ASSERT(bitmaps[i], "Failed to allocate slot bitmap.");
-+	}
-+
-+	return bitmaps;
-+}
-+
-+static void free_bitmaps(unsigned long *bitmaps[], int slots)
-+{
-+	int i;
-+
-+	for (i = 0; i < slots; i++)
-+		free(bitmaps[i]);
-+
-+	free(bitmaps);
-+}
-+
- static void run_test(enum vm_guest_mode mode, void *arg)
- {
- 	struct test_params *p = arg;
- 	pthread_t *vcpu_threads;
- 	struct kvm_vm *vm;
--	unsigned long *bmap;
-+	unsigned long **bitmaps;
- 	uint64_t guest_num_pages;
- 	uint64_t host_num_pages;
-+	uint64_t pages_per_slot;
- 	int vcpu_id;
- 	struct timespec start;
- 	struct timespec ts_diff;
-@@ -171,7 +193,9 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 	guest_num_pages = (nr_vcpus * guest_percpu_mem_size) >> vm_get_page_shift(vm);
- 	guest_num_pages = vm_adjust_num_guest_pages(mode, guest_num_pages);
- 	host_num_pages = vm_num_host_pages(mode, guest_num_pages);
--	bmap = bitmap_alloc(host_num_pages);
-+	pages_per_slot = host_num_pages / p->slots;
-+
-+	bitmaps = alloc_bitmaps(p->slots, pages_per_slot);
- 
- 	if (dirty_log_manual_caps) {
- 		cap.cap = KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2;
-@@ -239,7 +263,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 			iteration, ts_diff.tv_sec, ts_diff.tv_nsec);
- 
- 		clock_gettime(CLOCK_MONOTONIC, &start);
--		get_dirty_log(vm, p->slots, bmap, host_num_pages);
-+		get_dirty_log(vm, bitmaps, p->slots);
- 		ts_diff = timespec_elapsed(start);
- 		get_dirty_log_total = timespec_add(get_dirty_log_total,
- 						   ts_diff);
-@@ -248,7 +272,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 
- 		if (dirty_log_manual_caps) {
- 			clock_gettime(CLOCK_MONOTONIC, &start);
--			clear_dirty_log(vm, p->slots, bmap, host_num_pages);
-+			clear_dirty_log(vm, bitmaps, p->slots, pages_per_slot);
- 			ts_diff = timespec_elapsed(start);
- 			clear_dirty_log_total = timespec_add(clear_dirty_log_total,
- 							     ts_diff);
-@@ -281,7 +305,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 			clear_dirty_log_total.tv_nsec, avg.tv_sec, avg.tv_nsec);
- 	}
- 
--	free(bmap);
-+	free_bitmaps(bitmaps, p->slots);
- 	free(vcpu_threads);
- 	perf_test_destroy_vm(vm);
- }
--- 
-2.33.0.464.g1972c5931b-goog
+Thanks,
+
+Paolo
+
+> E.g. instead of manually writing
+> vmcs.GUEST_SYSENTER_* at RESET, provide infrastruture to automagically run through
+> all emulated/virtualized at RESET and/or INIT as appropriate to initialize the
+> guest value.
+> 
 
