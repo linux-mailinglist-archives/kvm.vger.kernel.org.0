@@ -2,154 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3748240F3DE
-	for <lists+kvm@lfdr.de>; Fri, 17 Sep 2021 10:14:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 48A5D40F446
+	for <lists+kvm@lfdr.de>; Fri, 17 Sep 2021 10:40:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233367AbhIQIPz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Sep 2021 04:15:55 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:8024 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S229837AbhIQIPy (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 17 Sep 2021 04:15:54 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 18H7UT0Q020803;
-        Fri, 17 Sep 2021 04:14:31 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=D72Nmltq5W761HKc8q5yf4qEMem+vL6IcD2L/nSKoec=;
- b=HdF4u9HK+PXauaX4EGimJAqSwUQN9m8xrvWBvmSFKrMkq6+AOgAng4XjGVv03APpIp3c
- 5U0Z2hx9ZQ1vbmo6Ah9NcuG/WshCt8+UwzWT+XGX6tfpkve/sf/qfIoMfe0CuvMeZ7q1
- vkp689eyJNKjEg0MGfszoWXjHN//DeJBsx5w9kp9Q8lJS82zfpQvgKqjTXJU09dzi/DI
- JyFU1nmnCMlUZxaKhSJnHId8FvKddOKd6PdxrlnQAapLCSnzJV9u1S+VV39IAEcbthQM
- 9rampl8LZyD6ILfD3gHcZS73wuw7vfwfIHhFKANRlvHQmt+pAmy5CuyzLTwJlcvydoy5 HA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3b4ppmrvqq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 17 Sep 2021 04:14:31 -0400
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 18H8CnT0020157;
-        Fri, 17 Sep 2021 04:14:31 -0400
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3b4ppmrvqa-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 17 Sep 2021 04:14:31 -0400
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 18H8D39x029176;
-        Fri, 17 Sep 2021 08:14:29 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma06fra.de.ibm.com with ESMTP id 3b0kqkhrfm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 17 Sep 2021 08:14:29 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 18H89l8g56361376
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 17 Sep 2021 08:09:47 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C4060A405F;
-        Fri, 17 Sep 2021 08:14:25 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 48BCBA4054;
-        Fri, 17 Sep 2021 08:14:25 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.70.78])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 17 Sep 2021 08:14:25 +0000 (GMT)
-Subject: Re: [PATCH v4 1/1] s390x: KVM: accept STSI for CPU topology
- information
-To:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        borntraeger@de.ibm.com, frankja@linux.ibm.com, cohuck@redhat.com,
-        thuth@redhat.com, imbrenda@linux.ibm.com, hca@linux.ibm.com,
-        gor@linux.ibm.com
-References: <1631799845-24860-1-git-send-email-pmorel@linux.ibm.com>
- <1631799845-24860-2-git-send-email-pmorel@linux.ibm.com>
- <eef5ed95-3f54-b709-894d-cdf75bc3180b@redhat.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Message-ID: <d5a752d3-9de0-5f7e-fefa-76b680b1d2a7@linux.ibm.com>
-Date:   Fri, 17 Sep 2021 10:14:25 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+        id S234065AbhIQIlu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Sep 2021 04:41:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29572 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S245420AbhIQIlt (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 17 Sep 2021 04:41:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1631868027;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=uPwMqjjw/KE/1k5TJSCA0cyO58yfO/wcRwrm76t+5zo=;
+        b=d3rqJR81Ae4TM62NXMoZxR0nJTla7ibJiDfJzZ3KvW4zj1o74td1ziYp7bv1BY+ytcDU3K
+        Dy6dgkC8vNC4nCzaZ7LdJSPtndEvpEAo/EDi2blbkEjgGG1HnGIj9L1zzaLF3BlW8oT9sK
+        U/sGvXfwoKCUkcUkdeXOM4ajF9k+VmI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-175-DTmpkWiNPRCSYSDfy3mD9w-1; Fri, 17 Sep 2021 04:40:24 -0400
+X-MC-Unique: DTmpkWiNPRCSYSDfy3mD9w-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9F3648145E6;
+        Fri, 17 Sep 2021 08:40:22 +0000 (UTC)
+Received: from localhost (unknown [10.39.192.115])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 38D2760C9F;
+        Fri, 17 Sep 2021 08:40:22 +0000 (UTC)
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Halil Pasic <pasic@linux.ibm.com>
+Cc:     Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Pierre Morel <pmorel@linux.ibm.com>,
+        Michael Mueller <mimu@linux.ibm.com>,
+        linux-s390@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, bfu@redhat.com,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>
+Subject: Re: [PATCH 1/1] virtio/s390: fix vritio-ccw device teardown
+In-Reply-To: <20210916151835.4ab512b2.pasic@linux.ibm.com>
+Organization: Red Hat GmbH
+References: <20210915215742.1793314-1-pasic@linux.ibm.com>
+ <87pmt8hp5o.fsf@redhat.com> <20210916151835.4ab512b2.pasic@linux.ibm.com>
+User-Agent: Notmuch/0.32.1 (https://notmuchmail.org)
+Date:   Fri, 17 Sep 2021 10:40:20 +0200
+Message-ID: <87mtobh9xn.fsf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <eef5ed95-3f54-b709-894d-cdf75bc3180b@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: vfrr3HJkTCHB8QQyscuCERwC2DXcARzi
-X-Proofpoint-GUID: W6T2wZ_OjEKcyUUzYd4oNyNnpdDdygo_
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.391,FMLib:17.0.607.475
- definitions=2021-09-17_03,2021-09-16_01,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 adultscore=0
- bulkscore=0 mlxlogscore=999 priorityscore=1501 impostorscore=0
- lowpriorityscore=0 spamscore=0 phishscore=0 clxscore=1015 suspectscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2109030001 definitions=main-2109170047
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, Sep 16 2021, Halil Pasic <pasic@linux.ibm.com> wrote:
 
+> On Thu, 16 Sep 2021 10:59:15 +0200
+> Cornelia Huck <cohuck@redhat.com> wrote:
+>
+>> > Since commit 48720ba56891 ("virtio/s390: use DMA memory for ccw I/O and
+>> > classic notifiers") we were supposed to make sure that
+>> > virtio_ccw_release_dev() completes before the ccw device, and the
+>> > attached dma pool are torn down, but unfortunately we did not.
+>> > Before that commit it used to be OK to delay cleaning up the memory
+>> > allocated by virtio-ccw indefinitely (which isn't really intuitive for
+>> > guys used to destruction happens in reverse construction order).
+>> >
+>> > To accomplish this let us take a reference on the ccw device before we
+>> > allocate the dma_area and give it up after dma_area was freed.
+>> >
+>> > Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
+>> > Fixes: 48720ba56891 ("virtio/s390: use DMA memory for ccw I/O and
+>> > classic notifiers")
+>> > Reported-by: bfu@redhat.com
+>> > ---
+>> >
+>> > I'm not certain this is the only hot-unplug and teardonw related problem
+>> > with virtio-ccw.
+>> >
+>> > Some things that are not perfectly clear to me:
+>> > * What would happen if we observed an hot-unplug while we are doing
+>> >   wait_event() in ccw_io_helper()? Do we get stuck? I don't thin we
+>> >   are guaranteed to receive an irq for a subchannel that is gone.  
+>> 
+>> Hm. I think we may need to do a wake_up during remove handling.
+>
+> My guess is that the BQL is saving us from ever seeing this with QEMU
+> as the hypervisor-userspace. Nevertheless I don't think we should rely
+> on that.
 
-On 9/16/21 4:03 PM, David Hildenbrand wrote:
->>   struct kvm_vm_stat {
->> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
->> index 51d1594bd6cd..f3887e13c5db 100644
->> --- a/arch/s390/kvm/kvm-s390.c
->> +++ b/arch/s390/kvm/kvm-s390.c
->> @@ -608,6 +608,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, 
->> long ext)
->>       case KVM_CAP_S390_PROTECTED:
->>           r = is_prot_virt_host();
->>           break;
->> +    case KVM_CAP_S390_CPU_TOPOLOGY:
->> +        r = test_facility(11);
->> +        break;
->>       default:
->>           r = 0;
->>       }
->> @@ -819,6 +822,19 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm, 
->> struct kvm_enable_cap *cap)
->>           icpt_operexc_on_all_vcpus(kvm);
->>           r = 0;
->>           break;
->> +    case KVM_CAP_S390_CPU_TOPOLOGY:
-> 
-> As given in my example, this should be
-> 
-> r = -EINVAL;
-> mutex_lock(&kvm->lock);
-> if (kvm->created_vcpus) {
->      r = -EBUSY;
-> } else if (test_facility(11)) {
-> ...
-> }
-> 
-> Similar to how we handle KVM_CAP_S390_VECTOR_REGISTERS.
-> 
-> [...]
-> 
->> +
->> +    /* PTF needs both host and guest facilities to enable 
->> interpretation */
->> +    if (test_kvm_facility(vcpu->kvm, 11) && test_facility(11))
->> +        vcpu->arch.sie_block->ecb |= ECB_PTF;
-> 
-> This should be simplified to
-> 
-> if (test_kvm_facility(vcpu->kvm, 11))
-> 
-> then. (vsie code below is correct)
-> 
-> 
+I agree. Let's do that via a separate patch.
 
-OK, the idea was to let the hypervisor the possibility to do userland 
-emulation if it wanted.
-But I can modify as you want.
+>
+>> 
+>> > * cdev->online seems to be manipulated under cdev->ccwlock, but
+>> >   in virtio_ccw_remove() we look at it to decide should we clean up
+>> >   or not. What is the idea there? I guess we want to avoid doing
+>> >   if nothing is there or twice. But I don't understand how stuff
+>> >   interlocks.  
+>> 
+>> We only created the virtio device when we onlined the ccw device. Do you
+>> have a better idea how to check for that? (And yes, I'm not sure the
+>> locking is correct.)
+>> 
+>
+> Thanks, if I find time for it, I will try to understand this better and
+> come back with my findings.
+>
+>> > * Can virtio_ccw_remove() get called while !cdev->online and 
+>> >   virtio_ccw_online() is running on a different cpu? If yes, what would
+>> >   happen then?  
+>> 
+>> All of the remove/online/... etc. callbacks are invoked via the ccw bus
+>> code. We have to trust that it gets it correct :) (Or have the common
+>> I/O layer maintainers double-check it.)
+>> 
+>
+> Vineeth, what is your take on this? Are the struct ccw_driver
+> virtio_ccw_remove and the virtio_ccw_online callbacks mutually
+> exclusive. Please notice that we may initiate the onlining by
+> calling ccw_device_set_online() from a workqueue.
+>
+> @Conny: I'm not sure what is your definition of 'it gets it correct'...
+> I doubt CIO can make things 100% foolproof in this area.
 
-Regards,
-Pierre
+Not 100% foolproof, but "don't online a device that is in the progress
+of going away" seems pretty basic to me.
 
--- 
-Pierre Morel
-IBM Lab Boeblingen
+>
+>> >  
+>> > The main addresse of these questions is Conny ;).
+>
+> In any case, I think we can go step by step. I would like the issue
+> this patch intends to address, addressed first. Then we can think
+> about the rest.
+>
+>> >
+>> > An alternative to this approach would be to inc and dec the refcount
+>> > in ccw_device_dma_zalloc() and ccw_device_dma_free() respectively.  
+>> 
+>> Yeah, I also thought about that. This would give us more get/put
+>> operations, but might be the safer option.
+>
+> My understanding is, that having the ccw device go away while in a
+> middle of doing ccw stuff (about to submit, or waiting for a channel
+> program, or whatever) was bad before.
+
+What do you mean with "was bad before"?
+
+> So my intuition tells me that
+> drivers should manage explicitly. Yes virtio_ccw happens to have dma
+> memory whose lifetime is more or less the lifetime of struct virtio_ccw,
+> but that may not be always the case.
+
+I'm not sure what you're getting at here. Regardless of the lifetime of
+the dma memory, it depends on the presence of the ccw device to which it
+is tied. This means that the ccw device must not be released while the
+dma memory is alive. We can use the approach in your patch here due to
+the lifetime of the dma memory that virtio-ccw allocates when we start
+using the device and frees when we stop using the device, or we can use
+get/put with every allocate/release dma memory pair, which should be
+safe for everyone?
+
