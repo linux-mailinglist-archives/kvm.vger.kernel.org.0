@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E528841027F
-	for <lists+kvm@lfdr.de>; Sat, 18 Sep 2021 02:59:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8648B410281
+	for <lists+kvm@lfdr.de>; Sat, 18 Sep 2021 02:59:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244946AbhIRA6u (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Sep 2021 20:58:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36970 "EHLO
+        id S1343695AbhIRA65 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Sep 2021 20:58:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37018 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243226AbhIRA6t (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Sep 2021 20:58:49 -0400
-Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89B4EC061766;
-        Fri, 17 Sep 2021 17:57:26 -0700 (PDT)
-Received: by mail-pf1-x430.google.com with SMTP id g14so10782644pfm.1;
-        Fri, 17 Sep 2021 17:57:26 -0700 (PDT)
+        with ESMTP id S245742AbhIRA64 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Sep 2021 20:58:56 -0400
+Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B3DAC061574;
+        Fri, 17 Sep 2021 17:57:34 -0700 (PDT)
+Received: by mail-pg1-x531.google.com with SMTP id k24so11193717pgh.8;
+        Fri, 17 Sep 2021 17:57:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=vCtWUpjznOPCx64IjyJAYKRRtTFfsaLvDBezHp1+q7w=;
-        b=ESQnvmjKaGYPzGqT4QgPrYFVgNh0VBSC9I962/dp8hme/0f1lpDyK3YbMWGW1ljrTO
-         vv5EVHDbJvzjOeECMO+WLoBTf+vFizuNbp6BdGp52f/IRBErU8/Bpa30brmiqax4TWrt
-         YhB98ytQUgUcJlkDXRJXuxixWgDkR+CMDY2zVUPJKFyKvK7anEc37Ov+79bhVdq7bphP
-         VUsMaZjn64uskcfHMekLAXQXbxRzacjURuvVGj0u7p2oJmJqCaZg8wNehasVOpMPOjNa
-         BqhEGL4Ctp0gg3jCGmNI2YcNAscxeHtJbexReeUu4hhkyOaRFVMvG0b2FNeaPvIPyU0j
-         w9Kw==
+        bh=fZOpI0Kg9/SwIlD9AruKFcQ1gB54Skfl4iNTdeLQxsk=;
+        b=gcj1lMhCGb960WHbCZmDbWnmCIQawH5HQPuUyDL1FqU2v+bSGrbp5k0UTeo7P7vQcO
+         vekhdBPbDnJp1gu7sBlonFC7qRjyaCKaicXInqlINNppFmxPZhdAwwqiC/E9xc3FJKvp
+         eUyI8AJLvt9dNH0fLdfHcG/9wDecB/AuheZjhq0U1A3/ZEC+WG7jxupzrFIMyE/+mceh
+         TMdvY5PF0lPzs24jIWKprn7YszAa0twCJleFUNyC83VGHUsFwhul7NSlXr+BELAiaMky
+         8+FthGU/dKCfr7iX2I/6WhPCjqx8cNMhetyvl3Lz8GKpR4JnerJElS7QbIR+39hYpnN7
+         9DMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=vCtWUpjznOPCx64IjyJAYKRRtTFfsaLvDBezHp1+q7w=;
-        b=pyA29+t57Mn1ncl882TThF+AOUTK7BK96/ctnXDE1+k2CT9KqqPirrSIDJ5OPH5DON
-         mV9+FVwy5Z1DKk1o6zCOY9If/MNUSA444OeyGa+GNfqFx7RhTBZTOCJ2IhBW1lkiyASU
-         /epahvJYhTlJW7p0FMVzn7VSSUmEfYXzANO9Hv+iY9f8vL0NdADLvLVz0hev582v1ty3
-         5R3xj7dAhuVS9UGjd15UdjCnE3jEZCqeeZuZKWrpVDR7ujvrhEEXy8kHzyPZpfliEOF4
-         eXCJjH8hEIH8udiqzhV6G/dp8EvKZcZssmRGVWfcjCjfVOiGQi2EueaElb0B9m/3GcVJ
-         74RQ==
-X-Gm-Message-State: AOAM530mhRmb+2mYM9K1MdEQKu3+d937Cj8GzQzXtny45lJcQyLhcLEX
-        YDmPFF2+KIF37pp81+lgb0Uzlp6Z9i0=
-X-Google-Smtp-Source: ABdhPJy7X8mZJQnJbufUi7d86Ijo7iELmpnS9ALzzkNy89/yA05fNTrEpr1LZiWak3Qg/lBUHrlnnw==
-X-Received: by 2002:a63:1f45:: with SMTP id q5mr12136728pgm.385.1631926646013;
-        Fri, 17 Sep 2021 17:57:26 -0700 (PDT)
+        bh=fZOpI0Kg9/SwIlD9AruKFcQ1gB54Skfl4iNTdeLQxsk=;
+        b=KO4JqUh38iqd/yn04kkBoOrIQO0LKQhwNLV+3+abTI/OGRrdb9+cZSVbeaGFW/9Bug
+         AwNm8anNI5OKN7iBYqxGXcJCnY2TSgWlpctUiHPPZcP7D/JEF6XkB63CPxyTwm7cxUDs
+         KiLchQYRJwScVQqdgrJRW9e/28eEX6UFqAsIxWxQbvnouwPJWWPEPvXZrwDrYUoBeblm
+         Wcfu3eeMksUzLIPFuDYV1stVK4ELgXJYeB6ZhUXIAaIusu/1vKZr3vZbk7vianYkEZPL
+         l1n8FFND2tHrEbkgbKM/R1rsVPcLWMwmXSGQTpVA3Y7QYCzf2I7AmamrpYCsIEpT33hr
+         7vNA==
+X-Gm-Message-State: AOAM530Guqoru0botvLy7Cg4ENjgcs03KtHC5BHGDYGt5mLJbgTDbLtX
+        Ht03X5lgQ8IYg5aS3XDqeIa9QiTRLXw=
+X-Google-Smtp-Source: ABdhPJwbk09tnMeg41qjh0f52hhNukoj1z39zpZtN02KDU/j2EZxNgb5EXnl9/Ukpe989TOqUAxilA==
+X-Received: by 2002:a63:3587:: with SMTP id c129mr12462353pga.127.1631926653208;
+        Fri, 17 Sep 2021 17:57:33 -0700 (PDT)
 Received: from localhost ([47.251.4.198])
-        by smtp.gmail.com with ESMTPSA id g13sm7402390pfi.176.2021.09.17.17.57.24
+        by smtp.gmail.com with ESMTPSA id i7sm362314pgp.39.2021.09.17.17.57.32
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 17 Sep 2021 17:57:25 -0700 (PDT)
+        Fri, 17 Sep 2021 17:57:32 -0700 (PDT)
 From:   Lai Jiangshan <jiangshanlai@gmail.com>
 To:     linux-kernel@vger.kernel.org
 Cc:     Lai Jiangshan <laijs@linux.alibaba.com>,
@@ -60,9 +60,9 @@ Cc:     Lai Jiangshan <laijs@linux.alibaba.com>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
         kvm@vger.kernel.org
-Subject: [PATCH V2 08/10] KVM: X86: Remove FNAME(update_pte)
-Date:   Sat, 18 Sep 2021 08:56:34 +0800
-Message-Id: <20210918005636.3675-9-jiangshanlai@gmail.com>
+Subject: [PATCH V2 09/10] KVM: X86: Don't unsync pagetables when speculative
+Date:   Sat, 18 Sep 2021 08:56:35 +0800
+Message-Id: <20210918005636.3675-10-jiangshanlai@gmail.com>
 X-Mailer: git-send-email 2.19.1.6.gb485710b
 In-Reply-To: <20210918005636.3675-1-jiangshanlai@gmail.com>
 References: <20210918005636.3675-1-jiangshanlai@gmail.com>
@@ -74,41 +74,67 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Lai Jiangshan <laijs@linux.alibaba.com>
 
-Its solo caller is changed to use FNAME(prefetch_gpte) directly.
+We'd better only unsync the pagetable when there just was a really
+write fault on a level-1 pagetable.
 
 Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
 ---
- arch/x86/kvm/mmu/paging_tmpl.h | 10 +---------
- 1 file changed, 1 insertion(+), 9 deletions(-)
+ arch/x86/kvm/mmu/mmu.c          | 6 +++++-
+ arch/x86/kvm/mmu/mmu_internal.h | 3 ++-
+ arch/x86/kvm/mmu/spte.c         | 2 +-
+ 3 files changed, 8 insertions(+), 3 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index c3edbc0f06b3..ca5fdd07cfa2 100644
---- a/arch/x86/kvm/mmu/paging_tmpl.h
-+++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -589,14 +589,6 @@ FNAME(prefetch_gpte)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
- 	return true;
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index ff52e8354148..e3213d804647 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -2577,7 +2577,8 @@ static void kvm_unsync_page(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
+  * were marked unsync (or if there is no shadow page), -EPERM if the SPTE must
+  * be write-protected.
+  */
+-int mmu_try_to_unsync_pages(struct kvm_vcpu *vcpu, gfn_t gfn, bool can_unsync)
++int mmu_try_to_unsync_pages(struct kvm_vcpu *vcpu, gfn_t gfn, bool can_unsync,
++			    bool speculative)
+ {
+ 	struct kvm_mmu_page *sp;
+ 	bool locked = false;
+@@ -2603,6 +2604,9 @@ int mmu_try_to_unsync_pages(struct kvm_vcpu *vcpu, gfn_t gfn, bool can_unsync)
+ 		if (sp->unsync)
+ 			continue;
+ 
++		if (speculative)
++			return -EEXIST;
++
+ 		/*
+ 		 * TDP MMU page faults require an additional spinlock as they
+ 		 * run with mmu_lock held for read, not write, and the unsync
+diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+index 658d8d228d43..f5d8be787993 100644
+--- a/arch/x86/kvm/mmu/mmu_internal.h
++++ b/arch/x86/kvm/mmu/mmu_internal.h
+@@ -116,7 +116,8 @@ static inline bool kvm_vcpu_ad_need_write_protect(struct kvm_vcpu *vcpu)
+ 	       kvm_x86_ops.cpu_dirty_log_size;
  }
  
--static void FNAME(update_pte)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
--			      u64 *spte, const void *pte)
--{
--	pt_element_t gpte = *(const pt_element_t *)pte;
--
--	FNAME(prefetch_gpte)(vcpu, sp, spte, gpte, false);
--}
--
- static bool FNAME(gpte_changed)(struct kvm_vcpu *vcpu,
- 				struct guest_walker *gw, int level)
- {
-@@ -1001,7 +993,7 @@ static void FNAME(invlpg)(struct kvm_vcpu *vcpu, gva_t gva, hpa_t root_hpa)
- 						       sizeof(pt_element_t)))
- 				break;
+-int mmu_try_to_unsync_pages(struct kvm_vcpu *vcpu, gfn_t gfn, bool can_unsync);
++int mmu_try_to_unsync_pages(struct kvm_vcpu *vcpu, gfn_t gfn, bool can_unsync,
++			    bool speculative);
  
--			FNAME(update_pte)(vcpu, sp, sptep, &gpte);
-+			FNAME(prefetch_gpte)(vcpu, sp, sptep, gpte, false);
- 		}
- 
- 		if (!sp->unsync_children)
+ void kvm_mmu_gfn_disallow_lpage(const struct kvm_memory_slot *slot, gfn_t gfn);
+ void kvm_mmu_gfn_allow_lpage(const struct kvm_memory_slot *slot, gfn_t gfn);
+diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
+index 3e97cdb13eb7..b68a580f3510 100644
+--- a/arch/x86/kvm/mmu/spte.c
++++ b/arch/x86/kvm/mmu/spte.c
+@@ -159,7 +159,7 @@ int make_spte(struct kvm_vcpu *vcpu, unsigned int pte_access, int level,
+ 		 * e.g. it's write-tracked (upper-level SPs) or has one or more
+ 		 * shadow pages and unsync'ing pages is not allowed.
+ 		 */
+-		if (mmu_try_to_unsync_pages(vcpu, gfn, can_unsync)) {
++		if (mmu_try_to_unsync_pages(vcpu, gfn, can_unsync, speculative)) {
+ 			pgprintk("%s: found shadow page for %llx, marking ro\n",
+ 				 __func__, gfn);
+ 			ret |= SET_SPTE_WRITE_PROTECTED_PT;
 -- 
 2.19.1.6.gb485710b
 
