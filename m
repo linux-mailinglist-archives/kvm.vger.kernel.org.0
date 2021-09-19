@@ -2,25 +2,25 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EFD13410A3E
-	for <lists+kvm@lfdr.de>; Sun, 19 Sep 2021 08:42:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 68FBB410A42
+	for <lists+kvm@lfdr.de>; Sun, 19 Sep 2021 08:42:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236920AbhISGn0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 19 Sep 2021 02:43:26 -0400
-Received: from mga03.intel.com ([134.134.136.65]:37215 "EHLO mga03.intel.com"
+        id S236621AbhISGnm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 19 Sep 2021 02:43:42 -0400
+Received: from mga11.intel.com ([192.55.52.93]:41280 "EHLO mga11.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236912AbhISGnW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 19 Sep 2021 02:43:22 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10111"; a="223042919"
+        id S235995AbhISGnb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 19 Sep 2021 02:43:31 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10111"; a="219805436"
 X-IronPort-AV: E=Sophos;i="5.85,305,1624345200"; 
-   d="scan'208";a="223042919"
+   d="scan'208";a="219805436"
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2021 23:41:57 -0700
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2021 23:42:04 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.85,305,1624345200"; 
-   d="scan'208";a="510701919"
+   d="scan'208";a="510701940"
 Received: from yiliu-dev.bj.intel.com (HELO iov-dual.bj.intel.com) ([10.238.156.135])
-  by fmsmga008.fm.intel.com with ESMTP; 18 Sep 2021 23:41:50 -0700
+  by fmsmga008.fm.intel.com with ESMTP; 18 Sep 2021 23:41:56 -0700
 From:   Liu Yi L <yi.l.liu@intel.com>
 To:     alex.williamson@redhat.com, jgg@nvidia.com, hch@lst.de,
         jasowang@redhat.com, joro@8bytes.org
@@ -34,9 +34,9 @@ Cc:     jean-philippe@linaro.org, kevin.tian@intel.com, parav@mellanox.com,
         iommu@lists.linux-foundation.org, dwmw2@infradead.org,
         linux-kernel@vger.kernel.org, baolu.lu@linux.intel.com,
         david@gibson.dropbear.id.au, nicolinc@nvidia.com
-Subject: [RFC 04/20] iommu: Add iommu_device_get_info interface
-Date:   Sun, 19 Sep 2021 14:38:32 +0800
-Message-Id: <20210919063848.1476776-5-yi.l.liu@intel.com>
+Subject: [RFC 05/20] vfio/pci: Register device to /dev/vfio/devices
+Date:   Sun, 19 Sep 2021 14:38:33 +0800
+Message-Id: <20210919063848.1476776-6-yi.l.liu@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20210919063848.1476776-1-yi.l.liu@intel.com>
 References: <20210919063848.1476776-1-yi.l.liu@intel.com>
@@ -46,110 +46,149 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Lu Baolu <baolu.lu@linux.intel.com>
+This patch exposes the device-centric interface for vfio-pci devices. To
+be compatiable with existing users, vfio-pci exposes both legacy group
+interface and device-centric interface.
 
-This provides an interface for upper layers to get the per-device iommu
-attributes.
+As explained in last patch, this change doesn't apply to devices which
+cannot be forced to snoop cache by their upstream iommu. Such devices
+are still expected to be opened via the legacy group interface.
 
-    int iommu_device_get_info(struct device *dev,
-                              enum iommu_devattr attr, void *data);
+When the device is opened via /dev/vfio/devices, vfio-pci should prevent
+the user from accessing the assigned device because the device is still
+attached to the default domain which may allow user-initiated DMAs to
+touch arbitrary place. The user access must be blocked until the device
+is later bound to an iommufd (see patch 08). The binding acts as the
+contract for putting the device in a security context which ensures user-
+initiated DMAs via this device cannot harm the rest of the system.
 
-The first attribute (IOMMU_DEV_INFO_FORCE_SNOOP) is added. It tells if
-the iommu can force DMA to snoop cache. At this stage, only PCI devices
-which have this attribute set could use the iommufd, this is due to
-supporting no-snoop DMA requires additional refactoring work on the
-current kvm-vfio contract. The following patch will have vfio check this
-attribute to decide whether a pci device can be exposed through
-/dev/vfio/devices.
+This patch introduces a vdev->block_access flag for this purpose. It's set
+when the device is opened via /dev/vfio/devices and cleared after binding
+to iommufd succeeds. mmap and r/w handlers check this flag to decide whether
+user access should be blocked or not.
 
-Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
+An alternative option is to use a dummy fops when the device is opened and
+then switch to the real fops (replace_fops()) after binding. Appreciate
+inputs on which option is better.
+
+The legacy group interface doesn't have this problem. Its uAPI requires the
+user to first put the device into a security context via container/group
+attaching process, before opening the device through the groupfd.
+
+Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
 ---
- drivers/iommu/iommu.c | 16 ++++++++++++++++
- include/linux/iommu.h | 19 +++++++++++++++++++
- 2 files changed, 35 insertions(+)
+ drivers/vfio/pci/vfio_pci.c         | 25 +++++++++++++++++++++++--
+ drivers/vfio/pci/vfio_pci_private.h |  1 +
+ drivers/vfio/vfio.c                 |  3 ++-
+ include/linux/vfio.h                |  1 +
+ 4 files changed, 27 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-index 63f0af10c403..5ea3a007fd7c 100644
---- a/drivers/iommu/iommu.c
-+++ b/drivers/iommu/iommu.c
-@@ -3260,3 +3260,19 @@ static ssize_t iommu_group_store_type(struct iommu_group *group,
+diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+index 318864d52837..145addde983b 100644
+--- a/drivers/vfio/pci/vfio_pci.c
++++ b/drivers/vfio/pci/vfio_pci.c
+@@ -572,6 +572,10 @@ static int vfio_pci_open(struct vfio_device *core_vdev)
  
- 	return ret;
- }
-+
-+/* Expose per-device iommu attributes. */
-+int iommu_device_get_info(struct device *dev, enum iommu_devattr attr, void *data)
-+{
-+	const struct iommu_ops *ops;
-+
-+	if (!dev->bus || !dev->bus->iommu_ops)
-+		return -EINVAL;
-+
-+	ops = dev->bus->iommu_ops;
-+	if (unlikely(!ops->device_info))
+ 		vfio_spapr_pci_eeh_open(vdev->pdev);
+ 		vfio_pci_vf_token_user_add(vdev, 1);
++		if (!vfio_device_in_container(core_vdev))
++			atomic_set(&vdev->block_access, 1);
++		else
++			atomic_set(&vdev->block_access, 0);
+ 	}
+ 	vdev->refcnt++;
+ error:
+@@ -1374,6 +1378,9 @@ static ssize_t vfio_pci_rw(struct vfio_pci_device *vdev, char __user *buf,
+ {
+ 	unsigned int index = VFIO_PCI_OFFSET_TO_INDEX(*ppos);
+ 
++	if (atomic_read(&vdev->block_access))
 +		return -ENODEV;
 +
-+	return ops->device_info(dev, attr, data);
-+}
-+EXPORT_SYMBOL_GPL(iommu_device_get_info);
-diff --git a/include/linux/iommu.h b/include/linux/iommu.h
-index 32d448050bf7..52a6d33c82dc 100644
---- a/include/linux/iommu.h
-+++ b/include/linux/iommu.h
-@@ -150,6 +150,14 @@ enum iommu_dev_features {
- 	IOMMU_DEV_FEAT_IOPF,
+ 	if (index >= VFIO_PCI_NUM_REGIONS + vdev->num_regions)
+ 		return -EINVAL;
+ 
+@@ -1640,6 +1647,9 @@ static int vfio_pci_mmap(struct vfio_device *core_vdev, struct vm_area_struct *v
+ 	u64 phys_len, req_len, pgoff, req_start;
+ 	int ret;
+ 
++	if (atomic_read(&vdev->block_access))
++		return -ENODEV;
++
+ 	index = vma->vm_pgoff >> (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT);
+ 
+ 	if (index >= VFIO_PCI_NUM_REGIONS + vdev->num_regions)
+@@ -1978,6 +1988,8 @@ static int vfio_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 	struct vfio_pci_device *vdev;
+ 	struct iommu_group *group;
+ 	int ret;
++	u32 flags;
++	bool snoop = false;
+ 
+ 	if (vfio_pci_is_denylisted(pdev))
+ 		return -EINVAL;
+@@ -2046,9 +2058,18 @@ static int vfio_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 		vfio_pci_set_power_state(vdev, PCI_D3hot);
+ 	}
+ 
+-	ret = vfio_register_group_dev(&vdev->vdev);
+-	if (ret)
++	flags = VFIO_DEVNODE_GROUP;
++	ret = iommu_device_get_info(&pdev->dev,
++				    IOMMU_DEV_INFO_FORCE_SNOOP, &snoop);
++	if (!ret && snoop)
++		flags |= VFIO_DEVNODE_NONGROUP;
++
++	ret = vfio_register_device(&vdev->vdev, flags);
++	if (ret) {
++		pr_debug("Failed to register device interface\n");
+ 		goto out_power;
++	}
++
+ 	dev_set_drvdata(&pdev->dev, vdev);
+ 	return 0;
+ 
+diff --git a/drivers/vfio/pci/vfio_pci_private.h b/drivers/vfio/pci/vfio_pci_private.h
+index 5a36272cecbf..f12012e30b53 100644
+--- a/drivers/vfio/pci/vfio_pci_private.h
++++ b/drivers/vfio/pci/vfio_pci_private.h
+@@ -143,6 +143,7 @@ struct vfio_pci_device {
+ 	struct mutex		vma_lock;
+ 	struct list_head	vma_list;
+ 	struct rw_semaphore	memory_lock;
++	atomic_t		block_access;
  };
  
-+/**
-+ * enum iommu_devattr - Per device IOMMU attributes
-+ * @IOMMU_DEV_INFO_FORCE_SNOOP [bool]: IOMMU can force DMA to be snooped.
-+ */
-+enum iommu_devattr {
-+	IOMMU_DEV_INFO_FORCE_SNOOP,
-+};
-+
- #define IOMMU_PASID_INVALID	(-1U)
- 
- #ifdef CONFIG_IOMMU_API
-@@ -215,6 +223,7 @@ struct iommu_iotlb_gather {
-  *		- IOMMU_DOMAIN_IDENTITY: must use an identity domain
-  *		- IOMMU_DOMAIN_DMA: must use a dma domain
-  *		- 0: use the default setting
-+ * @device_info: query per-device iommu attributes
-  * @pgsize_bitmap: bitmap of all possible supported page sizes
-  * @owner: Driver module providing these ops
-  */
-@@ -283,6 +292,8 @@ struct iommu_ops {
- 
- 	int (*def_domain_type)(struct device *dev);
- 
-+	int (*device_info)(struct device *dev, enum iommu_devattr attr, void *data);
-+
- 	unsigned long pgsize_bitmap;
- 	struct module *owner;
- };
-@@ -604,6 +615,8 @@ struct iommu_sva *iommu_sva_bind_device(struct device *dev,
- void iommu_sva_unbind_device(struct iommu_sva *handle);
- u32 iommu_sva_get_pasid(struct iommu_sva *handle);
- 
-+int iommu_device_get_info(struct device *dev, enum iommu_devattr attr, void *data);
-+
- #else /* CONFIG_IOMMU_API */
- 
- struct iommu_ops {};
-@@ -999,6 +1012,12 @@ static inline struct iommu_fwspec *dev_iommu_fwspec_get(struct device *dev)
- {
- 	return NULL;
+ #define is_intx(vdev) (vdev->irq_type == VFIO_PCI_INTX_IRQ_INDEX)
+diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
+index 1e87b25962f1..22851747e92c 100644
+--- a/drivers/vfio/vfio.c
++++ b/drivers/vfio/vfio.c
+@@ -1789,10 +1789,11 @@ static int vfio_device_fops_open(struct inode *inode, struct file *filep)
+ 	return ret;
  }
-+
-+static inline int iommu_device_get_info(struct device *dev,
-+					enum iommu_devattr type, void *data)
-+{
-+	return -ENODEV;
-+}
- #endif /* CONFIG_IOMMU_API */
+ 
+-static bool vfio_device_in_container(struct vfio_device *device)
++bool vfio_device_in_container(struct vfio_device *device)
+ {
+ 	return !!(device->group && device->group->container);
+ }
++EXPORT_SYMBOL_GPL(vfio_device_in_container);
+ 
+ static int vfio_device_fops_release(struct inode *inode, struct file *filep)
+ {
+diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+index 9448b751b663..fd0629acb948 100644
+--- a/include/linux/vfio.h
++++ b/include/linux/vfio.h
+@@ -81,6 +81,7 @@ enum vfio_iommu_notify_type {
+ 
+ extern int vfio_register_device(struct vfio_device *device, u32 flags);
+ extern void vfio_unregister_device(struct vfio_device *device);
++extern bool vfio_device_in_container(struct vfio_device *device);
  
  /**
+  * struct vfio_iommu_driver_ops - VFIO IOMMU driver callbacks
 -- 
 2.25.1
 
