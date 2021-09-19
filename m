@@ -2,25 +2,25 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 67F69410A4A
-	for <lists+kvm@lfdr.de>; Sun, 19 Sep 2021 08:42:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A1BEB410A50
+	for <lists+kvm@lfdr.de>; Sun, 19 Sep 2021 08:43:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237142AbhISGoB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 19 Sep 2021 02:44:01 -0400
-Received: from mga09.intel.com ([134.134.136.24]:2320 "EHLO mga09.intel.com"
+        id S238014AbhISGoH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 19 Sep 2021 02:44:07 -0400
+Received: from mga06.intel.com ([134.134.136.31]:31650 "EHLO mga06.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S237056AbhISGnq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 19 Sep 2021 02:43:46 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10111"; a="223030183"
+        id S236976AbhISGnt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 19 Sep 2021 02:43:49 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10111"; a="284011053"
 X-IronPort-AV: E=Sophos;i="5.85,305,1624345200"; 
-   d="scan'208";a="223030183"
+   d="scan'208";a="284011053"
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2021 23:42:17 -0700
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2021 23:42:24 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.85,305,1624345200"; 
-   d="scan'208";a="510701981"
+   d="scan'208";a="510701998"
 Received: from yiliu-dev.bj.intel.com (HELO iov-dual.bj.intel.com) ([10.238.156.135])
-  by fmsmga008.fm.intel.com with ESMTP; 18 Sep 2021 23:42:11 -0700
+  by fmsmga008.fm.intel.com with ESMTP; 18 Sep 2021 23:42:18 -0700
 From:   Liu Yi L <yi.l.liu@intel.com>
 To:     alex.williamson@redhat.com, jgg@nvidia.com, hch@lst.de,
         jasowang@redhat.com, joro@8bytes.org
@@ -34,9 +34,9 @@ Cc:     jean-philippe@linaro.org, kevin.tian@intel.com, parav@mellanox.com,
         iommu@lists.linux-foundation.org, dwmw2@infradead.org,
         linux-kernel@vger.kernel.org, baolu.lu@linux.intel.com,
         david@gibson.dropbear.id.au, nicolinc@nvidia.com
-Subject: [RFC 07/20] iommu/iommufd: Add iommufd_[un]bind_device()
-Date:   Sun, 19 Sep 2021 14:38:35 +0800
-Message-Id: <20210919063848.1476776-8-yi.l.liu@intel.com>
+Subject: [RFC 08/20] vfio/pci: Add VFIO_DEVICE_BIND_IOMMUFD
+Date:   Sun, 19 Sep 2021 14:38:36 +0800
+Message-Id: <20210919063848.1476776-9-yi.l.liu@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20210919063848.1476776-1-yi.l.liu@intel.com>
 References: <20210919063848.1476776-1-yi.l.liu@intel.com>
@@ -46,283 +46,207 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Under the /dev/iommu model, iommufd provides the interface for I/O page
-tables management such as dma map/unmap. However, it cannot work
-independently since the device is still owned by the device-passthrough
-frameworks (VFIO, vDPA, etc.) and vice versa. Device-passthrough frameworks
-should build a connection between its device and the iommufd to delegate
-the I/O page table management affairs to iommufd.
+This patch adds VFIO_DEVICE_BIND_IOMMUFD for userspace to bind the vfio
+device to an iommufd. No VFIO_DEVICE_UNBIND_IOMMUFD interface is provided
+because it's implicitly done when the device fd is closed.
 
-This patch introduces iommufd_[un]bind_device() helpers for the device-
-passthrough framework to build such connection. The helper functions then
-invoke iommu core (iommu_device_init/exit_user_dma()) to establish/exit
-security context for the bound device. Each successfully bound device is
-internally tracked by an iommufd_device object. This object is returned
-to the caller for subsequent attaching operations on the device as well.
-
-The caller should pass a user-provided cookie to mark the device in the
-iommufd. Later this cookie will be used to represent the device in iommufd
-uAPI, e.g. when querying device capabilities or handling per-device I/O
-page faults. One alternative is to have iommufd allocate a device label
-and return to the user. Either way works, but cookie is slightly preferred
-per earlier discussion as it may allow the user to inject faults slightly
-faster without ID->vRID lookup.
-
-iommu_[un]bind_device() functions are only used for physical devices. Other
-variants will be introduced in the future, e.g.:
-
--  iommu_[un]bind_device_pasid() for mdev/subdev which requires pasid granular
-   DMA isolation;
--  iommu_[un]bind_sw_mdev() for sw mdev which relies on software measures
-   instead of iommu to isolate DMA;
+In concept a vfio device can be bound to multiple iommufds, each hosting
+a subset of I/O address spaces attached by this device. However as a
+starting point (matching current vfio), only one I/O address space is
+supported per vfio device. It implies one device can only be attached
+to one iommufd at this point.
 
 Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
 ---
- drivers/iommu/iommufd/iommufd.c | 160 +++++++++++++++++++++++++++++++-
- include/linux/iommufd.h         |  38 ++++++++
- 2 files changed, 196 insertions(+), 2 deletions(-)
- create mode 100644 include/linux/iommufd.h
+ drivers/vfio/pci/Kconfig            |  1 +
+ drivers/vfio/pci/vfio_pci.c         | 72 ++++++++++++++++++++++++++++-
+ drivers/vfio/pci/vfio_pci_private.h |  8 ++++
+ include/uapi/linux/vfio.h           | 30 ++++++++++++
+ 4 files changed, 110 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/iommu/iommufd/iommufd.c b/drivers/iommu/iommufd/iommufd.c
-index 710b7e62988b..e16ca21e4534 100644
---- a/drivers/iommu/iommufd/iommufd.c
-+++ b/drivers/iommu/iommufd/iommufd.c
-@@ -16,10 +16,30 @@
- #include <linux/miscdevice.h>
- #include <linux/mutex.h>
- #include <linux/iommu.h>
-+#include <linux/iommufd.h>
-+#include <linux/xarray.h>
-+#include <asm-generic/bug.h>
+diff --git a/drivers/vfio/pci/Kconfig b/drivers/vfio/pci/Kconfig
+index 5e2e1b9a9fd3..3abfb098b4dc 100644
+--- a/drivers/vfio/pci/Kconfig
++++ b/drivers/vfio/pci/Kconfig
+@@ -5,6 +5,7 @@ config VFIO_PCI
+ 	depends on MMU
+ 	select VFIO_VIRQFD
+ 	select IRQ_BYPASS_MANAGER
++	select IOMMUFD
+ 	help
+ 	  Support for the PCI VFIO bus driver.  This is required to make
+ 	  use of PCI drivers using the VFIO framework.
+diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+index 145addde983b..20006bb66430 100644
+--- a/drivers/vfio/pci/vfio_pci.c
++++ b/drivers/vfio/pci/vfio_pci.c
+@@ -552,6 +552,16 @@ static void vfio_pci_release(struct vfio_device *core_vdev)
+ 			vdev->req_trigger = NULL;
+ 		}
+ 		mutex_unlock(&vdev->igate);
++
++		mutex_lock(&vdev->videv_lock);
++		if (vdev->videv) {
++			struct vfio_iommufd_device *videv = vdev->videv;
++
++			vdev->videv = NULL;
++			iommufd_unbind_device(videv->idev);
++			kfree(videv);
++		}
++		mutex_unlock(&vdev->videv_lock);
+ 	}
  
- /* Per iommufd */
- struct iommufd_ctx {
- 	refcount_t refs;
-+	struct mutex lock;
-+	struct xarray device_xa; /* xarray of bound devices */
+ 	mutex_unlock(&vdev->reflck->lock);
+@@ -780,7 +790,66 @@ static long vfio_pci_ioctl(struct vfio_device *core_vdev,
+ 		container_of(core_vdev, struct vfio_pci_device, vdev);
+ 	unsigned long minsz;
+ 
+-	if (cmd == VFIO_DEVICE_GET_INFO) {
++	if (cmd == VFIO_DEVICE_BIND_IOMMUFD) {
++		struct vfio_device_iommu_bind_data bind_data;
++		unsigned long minsz;
++		struct iommufd_device *idev;
++		struct vfio_iommufd_device *videv;
++
++		/*
++		 * Reject the request if the device is already opened and
++		 * attached to a container.
++		 */
++		if (vfio_device_in_container(core_vdev))
++			return -ENOTTY;
++
++		minsz = offsetofend(struct vfio_device_iommu_bind_data, dev_cookie);
++
++		if (copy_from_user(&bind_data, (void __user *)arg, minsz))
++			return -EFAULT;
++
++		if (bind_data.argsz < minsz ||
++		    bind_data.flags || bind_data.iommu_fd < 0)
++			return -EINVAL;
++
++		mutex_lock(&vdev->videv_lock);
++		/*
++		 * Allow only one iommufd per device until multiple
++		 * address spaces (e.g. vSVA) support is introduced
++		 * in the future.
++		 */
++		if (vdev->videv) {
++			mutex_unlock(&vdev->videv_lock);
++			return -EBUSY;
++		}
++
++		idev = iommufd_bind_device(bind_data.iommu_fd,
++					   &vdev->pdev->dev,
++					   bind_data.dev_cookie);
++		if (IS_ERR(idev)) {
++			mutex_unlock(&vdev->videv_lock);
++			return PTR_ERR(idev);
++		}
++
++		videv = kzalloc(sizeof(*videv), GFP_KERNEL);
++		if (!videv) {
++			iommufd_unbind_device(idev);
++			mutex_unlock(&vdev->videv_lock);
++			return -ENOMEM;
++		}
++		videv->idev = idev;
++		videv->iommu_fd = bind_data.iommu_fd;
++		/*
++		 * A security context has been established. Unblock
++		 * user access.
++		 */
++		if (atomic_read(&vdev->block_access))
++			atomic_set(&vdev->block_access, 0);
++		vdev->videv = videv;
++		mutex_unlock(&vdev->videv_lock);
++
++		return 0;
++	} else if (cmd == VFIO_DEVICE_GET_INFO) {
+ 		struct vfio_device_info info;
+ 		struct vfio_info_cap caps = { .buf = NULL, .size = 0 };
+ 		unsigned long capsz;
+@@ -2031,6 +2100,7 @@ static int vfio_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 	mutex_init(&vdev->vma_lock);
+ 	INIT_LIST_HEAD(&vdev->vma_list);
+ 	init_rwsem(&vdev->memory_lock);
++	mutex_init(&vdev->videv_lock);
+ 
+ 	ret = vfio_pci_reflck_attach(vdev);
+ 	if (ret)
+diff --git a/drivers/vfio/pci/vfio_pci_private.h b/drivers/vfio/pci/vfio_pci_private.h
+index f12012e30b53..bd784accac35 100644
+--- a/drivers/vfio/pci/vfio_pci_private.h
++++ b/drivers/vfio/pci/vfio_pci_private.h
+@@ -14,6 +14,7 @@
+ #include <linux/types.h>
+ #include <linux/uuid.h>
+ #include <linux/notifier.h>
++#include <linux/iommufd.h>
+ 
+ #ifndef VFIO_PCI_PRIVATE_H
+ #define VFIO_PCI_PRIVATE_H
+@@ -99,6 +100,11 @@ struct vfio_pci_mmap_vma {
+ 	struct list_head	vma_next;
+ };
+ 
++struct vfio_iommufd_device {
++	struct iommufd_device *idev;
++	int iommu_fd;
 +};
 +
-+/*
-+ * A iommufd_device object represents the binding relationship
-+ * between iommufd and device. It is created per a successful
-+ * binding request from device driver. The bound device must be
-+ * a physical device so far. Subdevice will be supported later
-+ * (with additional PASID information). An user-assigned cookie
-+ * is also recorded to mark the device in the /dev/iommu uAPI.
-+ */
-+struct iommufd_device {
-+	unsigned int id;
-+	struct iommufd_ctx *ictx;
-+	struct device *dev; /* always be the physical device */
-+	u64 dev_cookie;
+ struct vfio_pci_device {
+ 	struct vfio_device	vdev;
+ 	struct pci_dev		*pdev;
+@@ -144,6 +150,8 @@ struct vfio_pci_device {
+ 	struct list_head	vma_list;
+ 	struct rw_semaphore	memory_lock;
+ 	atomic_t		block_access;
++	struct mutex		videv_lock;
++	struct vfio_iommufd_device *videv;
  };
  
- static int iommufd_fops_open(struct inode *inode, struct file *filep)
-@@ -32,15 +52,58 @@ static int iommufd_fops_open(struct inode *inode, struct file *filep)
- 		return -ENOMEM;
+ #define is_intx(vdev) (vdev->irq_type == VFIO_PCI_INTX_IRQ_INDEX)
+diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+index ef33ea002b0b..c902abd60339 100644
+--- a/include/uapi/linux/vfio.h
++++ b/include/uapi/linux/vfio.h
+@@ -190,6 +190,36 @@ struct vfio_group_status {
  
- 	refcount_set(&ictx->refs, 1);
-+	mutex_init(&ictx->lock);
-+	xa_init_flags(&ictx->device_xa, XA_FLAGS_ALLOC);
- 	filep->private_data = ictx;
+ /* --------------- IOCTLs for DEVICE file descriptors --------------- */
  
- 	return ret;
- }
- 
-+static void iommufd_ctx_get(struct iommufd_ctx *ictx)
-+{
-+	refcount_inc(&ictx->refs);
-+}
-+
-+static const struct file_operations iommufd_fops;
-+
-+/**
-+ * iommufd_ctx_fdget - Acquires a reference to the internal iommufd context.
-+ * @fd: [in] iommufd file descriptor.
-+ *
-+ * Returns a pointer to the iommufd context, otherwise NULL;
-+ *
-+ */
-+static struct iommufd_ctx *iommufd_ctx_fdget(int fd)
-+{
-+	struct fd f = fdget(fd);
-+	struct file *file = f.file;
-+	struct iommufd_ctx *ictx;
-+
-+	if (!file)
-+		return NULL;
-+
-+	if (file->f_op != &iommufd_fops)
-+		return NULL;
-+
-+	ictx = file->private_data;
-+	if (ictx)
-+		iommufd_ctx_get(ictx);
-+	fdput(f);
-+	return ictx;
-+}
-+
-+/**
-+ * iommufd_ctx_put - Releases a reference to the internal iommufd context.
-+ * @ictx: [in] Pointer to iommufd context.
-+ *
-+ */
- static void iommufd_ctx_put(struct iommufd_ctx *ictx)
- {
--	if (refcount_dec_and_test(&ictx->refs))
--		kfree(ictx);
-+	if (!refcount_dec_and_test(&ictx->refs))
-+		return;
-+
-+	WARN_ON(!xa_empty(&ictx->device_xa));
-+	kfree(ictx);
- }
- 
- static int iommufd_fops_release(struct inode *inode, struct file *filep)
-@@ -86,6 +149,99 @@ static struct miscdevice iommu_misc_dev = {
- 	.mode = 0666,
- };
- 
-+/**
-+ * iommufd_bind_device - Bind a physical device marked by a device
-+ *			 cookie to an iommu fd.
-+ * @fd:		[in] iommufd file descriptor.
-+ * @dev:	[in] Pointer to a physical device struct.
-+ * @dev_cookie:	[in] A cookie to mark the device in /dev/iommu uAPI.
-+ *
-+ * A successful bind establishes a security context for the device
-+ * and returns struct iommufd_device pointer. Otherwise returns
-+ * error pointer.
-+ *
-+ */
-+struct iommufd_device *iommufd_bind_device(int fd, struct device *dev,
-+					   u64 dev_cookie)
-+{
-+	struct iommufd_ctx *ictx;
-+	struct iommufd_device *idev;
-+	unsigned long index;
-+	unsigned int id;
-+	int ret;
-+
-+	ictx = iommufd_ctx_fdget(fd);
-+	if (!ictx)
-+		return ERR_PTR(-EINVAL);
-+
-+	mutex_lock(&ictx->lock);
-+
-+	/* check duplicate registration */
-+	xa_for_each(&ictx->device_xa, index, idev) {
-+		if (idev->dev == dev || idev->dev_cookie == dev_cookie) {
-+			idev = ERR_PTR(-EBUSY);
-+			goto out_unlock;
-+		}
-+	}
-+
-+	idev = kzalloc(sizeof(*idev), GFP_KERNEL);
-+	if (!idev) {
-+		ret = -ENOMEM;
-+		goto out_unlock;
-+	}
-+
-+	/* Establish the security context */
-+	ret = iommu_device_init_user_dma(dev, (unsigned long)ictx);
-+	if (ret)
-+		goto out_free;
-+
-+	ret = xa_alloc(&ictx->device_xa, &id, idev,
-+		       XA_LIMIT(IOMMUFD_DEVID_MIN, IOMMUFD_DEVID_MAX),
-+		       GFP_KERNEL);
-+	if (ret) {
-+		idev = ERR_PTR(ret);
-+		goto out_user_dma;
-+	}
-+
-+	idev->ictx = ictx;
-+	idev->dev = dev;
-+	idev->dev_cookie = dev_cookie;
-+	idev->id = id;
-+	mutex_unlock(&ictx->lock);
-+
-+	return idev;
-+out_user_dma:
-+	iommu_device_exit_user_dma(idev->dev);
-+out_free:
-+	kfree(idev);
-+out_unlock:
-+	mutex_unlock(&ictx->lock);
-+	iommufd_ctx_put(ictx);
-+
-+	return ERR_PTR(ret);
-+}
-+EXPORT_SYMBOL_GPL(iommufd_bind_device);
-+
-+/**
-+ * iommufd_unbind_device - Unbind a physical device from iommufd
-+ *
-+ * @idev: [in] Pointer to the internal iommufd_device struct.
-+ *
-+ */
-+void iommufd_unbind_device(struct iommufd_device *idev)
-+{
-+	struct iommufd_ctx *ictx = idev->ictx;
-+
-+	mutex_lock(&ictx->lock);
-+	xa_erase(&ictx->device_xa, idev->id);
-+	mutex_unlock(&ictx->lock);
-+	/* Exit the security context */
-+	iommu_device_exit_user_dma(idev->dev);
-+	kfree(idev);
-+	iommufd_ctx_put(ictx);
-+}
-+EXPORT_SYMBOL_GPL(iommufd_unbind_device);
-+
- static int __init iommufd_init(void)
- {
- 	int ret;
-diff --git a/include/linux/iommufd.h b/include/linux/iommufd.h
-new file mode 100644
-index 000000000000..1603a13937e9
---- /dev/null
-+++ b/include/linux/iommufd.h
-@@ -0,0 +1,38 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
 +/*
-+ * IOMMUFD API definition
++ * VFIO_DEVICE_BIND_IOMMUFD - _IOR(VFIO_TYPE, VFIO_BASE + 19,
++ *				struct vfio_device_iommu_bind_data)
 + *
-+ * Copyright (C) 2021 Intel Corporation
++ * Bind a vfio_device to the specified iommufd
 + *
-+ * Author: Liu Yi L <yi.l.liu@intel.com>
++ * The user should provide a device cookie when calling this ioctl. The
++ * cookie is later used in iommufd for capability query, iotlb invalidation
++ * and I/O fault handling.
++ *
++ * User is not allowed to access the device before the binding operation
++ * is completed.
++ *
++ * Unbind is automatically conducted when device fd is closed.
++ *
++ * Input parameters:
++ *	- iommu_fd;
++ *	- dev_cookie;
++ *
++ * Return: 0 on success, -errno on failure.
 + */
-+#ifndef __LINUX_IOMMUFD_H
-+#define __LINUX_IOMMUFD_H
++struct vfio_device_iommu_bind_data {
++	__u32	argsz;
++	__u32	flags;
++	__s32	iommu_fd;
++	__u64	dev_cookie;
++};
 +
-+#include <linux/types.h>
-+#include <linux/errno.h>
-+#include <linux/err.h>
-+#include <linux/device.h>
++#define VFIO_DEVICE_BIND_IOMMUFD	_IO(VFIO_TYPE, VFIO_BASE + 19)
 +
-+#define IOMMUFD_DEVID_MAX	((unsigned int)(0x7FFFFFFF))
-+#define IOMMUFD_DEVID_MIN	0
-+
-+struct iommufd_device;
-+
-+#if IS_ENABLED(CONFIG_IOMMUFD)
-+struct iommufd_device *
-+iommufd_bind_device(int fd, struct device *dev, u64 dev_cookie);
-+void iommufd_unbind_device(struct iommufd_device *idev);
-+
-+#else /* !CONFIG_IOMMUFD */
-+static inline struct iommufd_device *
-+iommufd_bind_device(int fd, struct device *dev, u64 dev_cookie)
-+{
-+	return ERR_PTR(-ENODEV);
-+}
-+
-+static inline void iommufd_unbind_device(struct iommufd_device *idev)
-+{
-+}
-+#endif /* CONFIG_IOMMUFD */
-+#endif /* __LINUX_IOMMUFD_H */
+ /**
+  * VFIO_DEVICE_GET_INFO - _IOR(VFIO_TYPE, VFIO_BASE + 7,
+  *						struct vfio_device_info)
 -- 
 2.25.1
 
