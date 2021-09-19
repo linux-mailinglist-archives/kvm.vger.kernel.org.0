@@ -2,25 +2,25 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3CED0410A6C
-	for <lists+kvm@lfdr.de>; Sun, 19 Sep 2021 08:44:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 09C1D410A6E
+	for <lists+kvm@lfdr.de>; Sun, 19 Sep 2021 08:45:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238305AbhISGqR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 19 Sep 2021 02:46:17 -0400
-Received: from mga18.intel.com ([134.134.136.126]:25699 "EHLO mga18.intel.com"
+        id S237712AbhISGqj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 19 Sep 2021 02:46:39 -0400
+Received: from mga12.intel.com ([192.55.52.136]:28921 "EHLO mga12.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S237599AbhISGqE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 19 Sep 2021 02:46:04 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10111"; a="210081756"
+        id S236937AbhISGqb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 19 Sep 2021 02:46:31 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10111"; a="202493466"
 X-IronPort-AV: E=Sophos;i="5.85,305,1624345200"; 
-   d="scan'208";a="210081756"
+   d="scan'208";a="202493466"
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2021 23:43:25 -0700
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2021 23:43:32 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.85,305,1624345200"; 
-   d="scan'208";a="510702155"
+   d="scan'208";a="510702171"
 Received: from yiliu-dev.bj.intel.com (HELO iov-dual.bj.intel.com) ([10.238.156.135])
-  by fmsmga008.fm.intel.com with ESMTP; 18 Sep 2021 23:43:18 -0700
+  by fmsmga008.fm.intel.com with ESMTP; 18 Sep 2021 23:43:25 -0700
 From:   Liu Yi L <yi.l.liu@intel.com>
 To:     alex.williamson@redhat.com, jgg@nvidia.com, hch@lst.de,
         jasowang@redhat.com, joro@8bytes.org
@@ -34,9 +34,9 @@ Cc:     jean-philippe@linaro.org, kevin.tian@intel.com, parav@mellanox.com,
         iommu@lists.linux-foundation.org, dwmw2@infradead.org,
         linux-kernel@vger.kernel.org, baolu.lu@linux.intel.com,
         david@gibson.dropbear.id.au, nicolinc@nvidia.com
-Subject: [RFC 17/20] iommu/iommufd: Report iova range to userspace
-Date:   Sun, 19 Sep 2021 14:38:45 +0800
-Message-Id: <20210919063848.1476776-18-yi.l.liu@intel.com>
+Subject: [RFC 18/20] iommu/iommufd: Add IOMMU_[UN]MAP_DMA on IOASID
+Date:   Sun, 19 Sep 2021 14:38:46 +0800
+Message-Id: <20210919063848.1476776-19-yi.l.liu@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20210919063848.1476776-1-yi.l.liu@intel.com>
 References: <20210919063848.1476776-1-yi.l.liu@intel.com>
@@ -48,231 +48,232 @@ X-Mailing-List: kvm@vger.kernel.org
 
 [HACK. will fix in v2]
 
-IOVA range is critical info for userspace to manage DMA for an I/O address
-space. This patch reports the valid iova range info of a given device.
-
-Due to aforementioned hack, this info comes from the hacked vfio type1
-driver. To follow the same format in vfio, we also introduce a cap chain
-format in IOMMU_DEVICE_GET_INFO to carry the iova range info.
+This patch introduces vfio type1v2-equivalent interface to userspace. Due
+to aforementioned hack, iommufd currently calls exported vfio symbols to
+handle map/unmap requests from the user.
 
 Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
 ---
- drivers/iommu/iommu.c           |  2 ++
- drivers/iommu/iommufd/iommufd.c | 41 +++++++++++++++++++++++++++-
- drivers/vfio/vfio_iommu_type1.c | 47 ++++++++++++++++++++++++++++++---
- include/linux/vfio.h            |  2 ++
- include/uapi/linux/iommu.h      |  3 +++
- 5 files changed, 90 insertions(+), 5 deletions(-)
+ drivers/iommu/iommufd/iommufd.c | 104 ++++++++++++++++++++++++++++++++
+ include/uapi/linux/iommu.h      |  29 +++++++++
+ 2 files changed, 133 insertions(+)
 
-diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-index b6178997aef1..44bba346ab52 100644
---- a/drivers/iommu/iommu.c
-+++ b/drivers/iommu/iommu.c
-@@ -2755,6 +2755,7 @@ void iommu_get_resv_regions(struct device *dev, struct list_head *list)
- 	if (ops && ops->get_resv_regions)
- 		ops->get_resv_regions(dev, list);
- }
-+EXPORT_SYMBOL_GPL(iommu_get_resv_regions);
- 
- void iommu_put_resv_regions(struct device *dev, struct list_head *list)
- {
-@@ -2763,6 +2764,7 @@ void iommu_put_resv_regions(struct device *dev, struct list_head *list)
- 	if (ops && ops->put_resv_regions)
- 		ops->put_resv_regions(dev, list);
- }
-+EXPORT_SYMBOL_GPL(iommu_put_resv_regions);
- 
- /**
-  * generic_iommu_put_resv_regions - Reserved region driver helper
 diff --git a/drivers/iommu/iommufd/iommufd.c b/drivers/iommu/iommufd/iommufd.c
-index 25373a0e037a..cbf5e30062a6 100644
+index cbf5e30062a6..f5f2274d658c 100644
 --- a/drivers/iommu/iommufd/iommufd.c
 +++ b/drivers/iommu/iommufd/iommufd.c
-@@ -19,6 +19,7 @@
- #include <linux/iommufd.h>
- #include <linux/xarray.h>
- #include <asm-generic/bug.h>
-+#include <linux/vfio.h>
+@@ -55,6 +55,7 @@ struct iommufd_ioas {
+ 	struct mutex lock;
+ 	struct list_head device_list;
+ 	struct iommu_domain *domain;
++	struct vfio_iommu *vfio_iommu; /* FIXME: added for reusing vfio_iommu_type1 code */
+ };
  
- /* Per iommufd */
- struct iommufd_ctx {
-@@ -298,6 +299,38 @@ iommu_find_device_from_cookie(struct iommufd_ctx *ictx, u64 dev_cookie)
- 	return dev;
- }
+ /*
+@@ -158,6 +159,7 @@ static void ioas_put_locked(struct iommufd_ioas *ioas)
+ 		return;
  
-+static int iommu_device_add_cap_chain(struct device *dev, unsigned long arg,
-+				      struct iommu_device_info *info)
-+{
-+	struct vfio_info_cap caps = { .buf = NULL, .size = 0 };
-+	int ret;
-+
-+	ret = vfio_device_add_iova_cap(dev, &caps);
-+	if (ret)
-+		return ret;
-+
-+	if (caps.size) {
-+		info->flags |= IOMMU_DEVICE_INFO_CAPS;
-+
-+		if (info->argsz < sizeof(*info) + caps.size) {
-+			info->argsz = sizeof(*info) + caps.size;
-+		} else {
-+			vfio_info_cap_shift(&caps, sizeof(*info));
-+			if (copy_to_user((void __user *)arg +
-+					sizeof(*info), caps.buf,
-+					caps.size)) {
-+				kfree(caps.buf);
-+				info->flags &= ~IOMMU_DEVICE_INFO_CAPS;
-+				return -EFAULT;
-+			}
-+			info->cap_offset = sizeof(*info);
-+		}
-+
-+		kfree(caps.buf);
-+	}
-+	return 0;
-+}
-+
- static void iommu_device_build_info(struct device *dev,
- 				    struct iommu_device_info *info)
- {
-@@ -324,8 +357,9 @@ static int iommufd_get_device_info(struct iommufd_ctx *ictx,
- 	struct iommu_device_info info;
+ 	WARN_ON(!list_empty(&ioas->device_list));
++	vfio_iommu_type1_release(ioas->vfio_iommu); /* FIXME: reused vfio code */
+ 	xa_erase(&ictx->ioasid_xa, ioasid);
+ 	iommufd_ctx_put(ictx);
+ 	kfree(ioas);
+@@ -185,6 +187,7 @@ static int iommufd_ioasid_alloc(struct iommufd_ctx *ictx, unsigned long arg)
+ 	struct iommufd_ioas *ioas;
  	unsigned long minsz;
- 	struct device *dev;
-+	int ret;
+ 	int ioasid, ret;
++	struct vfio_iommu *vfio_iommu;
  
--	minsz = offsetofend(struct iommu_device_info, addr_width);
-+	minsz = offsetofend(struct iommu_device_info, cap_offset);
+ 	minsz = offsetofend(struct iommu_ioasid_alloc, addr_width);
  
- 	if (copy_from_user(&info, (void __user *)arg, minsz))
- 		return -EFAULT;
-@@ -341,6 +375,11 @@ static int iommufd_get_device_info(struct iommufd_ctx *ictx,
+@@ -211,6 +214,18 @@ static int iommufd_ioasid_alloc(struct iommufd_ctx *ictx, unsigned long arg)
+ 		return ret;
+ 	}
  
- 	iommu_device_build_info(dev, &info);
- 
-+	info.cap_offset = 0;
-+	ret = iommu_device_add_cap_chain(dev, arg, &info);
-+	if (ret)
-+		pr_info_ratelimited("No cap chain added, error %d\n", ret);
++	/* FIXME: get a vfio_iommu object for dma map/unmap management */
++	vfio_iommu = vfio_iommu_type1_open(VFIO_TYPE1v2_IOMMU);
++	if (IS_ERR(vfio_iommu)) {
++		pr_err_ratelimited("Failed to get vfio_iommu object\n");
++		mutex_lock(&ictx->lock);
++		xa_erase(&ictx->ioasid_xa, ioasid);
++		mutex_unlock(&ictx->lock);
++		kfree(ioas);
++		return PTR_ERR(vfio_iommu);
++	}
++	ioas->vfio_iommu = vfio_iommu;
 +
+ 	ioas->ioasid = ioasid;
+ 
+ 	/* only supports kernel managed I/O page table so far */
+@@ -383,6 +398,49 @@ static int iommufd_get_device_info(struct iommufd_ctx *ictx,
  	return copy_to_user((void __user *)arg, &info, minsz) ? -EFAULT : 0;
  }
  
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index c1c6bc803d94..28c1699aed6b 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -2963,15 +2963,15 @@ static int vfio_iommu_iova_add_cap(struct vfio_info_cap *caps,
++static int iommufd_process_dma_op(struct iommufd_ctx *ictx,
++				  unsigned long arg, bool map)
++{
++	struct iommu_ioasid_dma_op dma;
++	unsigned long minsz;
++	struct iommufd_ioas *ioas = NULL;
++	int ret;
++
++	minsz = offsetofend(struct iommu_ioasid_dma_op, padding);
++
++	if (copy_from_user(&dma, (void __user *)arg, minsz))
++		return -EFAULT;
++
++	if (dma.argsz < minsz || dma.flags || dma.ioasid < 0)
++		return -EINVAL;
++
++	ioas = ioasid_get_ioas(ictx, dma.ioasid);
++	if (!ioas) {
++		pr_err_ratelimited("unkonwn IOASID %u\n", dma.ioasid);
++		return -EINVAL;
++	}
++
++	mutex_lock(&ioas->lock);
++
++	/*
++	 * Needs to block map/unmap request from userspace before IOASID
++	 * is attached to any device.
++	 */
++	if (list_empty(&ioas->device_list)) {
++		ret = -EINVAL;
++		goto out;
++	}
++
++	if (map)
++		ret = vfio_iommu_type1_map_dma(ioas->vfio_iommu, arg + minsz);
++	else
++		ret = vfio_iommu_type1_unmap_dma(ioas->vfio_iommu, arg + minsz);
++out:
++	mutex_unlock(&ioas->lock);
++	ioas_put(ioas);
++	return ret;
++};
++
+ static long iommufd_fops_unl_ioctl(struct file *filep,
+ 				   unsigned int cmd, unsigned long arg)
+ {
+@@ -409,6 +467,12 @@ static long iommufd_fops_unl_ioctl(struct file *filep,
+ 	case IOMMU_IOASID_FREE:
+ 		ret = iommufd_ioasid_free(ictx, arg);
+ 		break;
++	case IOMMU_MAP_DMA:
++		ret = iommufd_process_dma_op(ictx, arg, true);
++		break;
++	case IOMMU_UNMAP_DMA:
++		ret = iommufd_process_dma_op(ictx, arg, false);
++		break;
+ 	default:
+ 		pr_err_ratelimited("unsupported cmd %u\n", cmd);
+ 		break;
+@@ -478,6 +542,39 @@ static int ioas_check_device_compatibility(struct iommufd_ioas *ioas,
  	return 0;
  }
  
--static int vfio_iommu_iova_build_caps(struct vfio_iommu *iommu,
--				      struct vfio_info_cap *caps)
-+static int vfio_iova_list_build_caps(struct list_head *iova_list,
-+				     struct vfio_info_cap *caps)
- {
- 	struct vfio_iommu_type1_info_cap_iova_range *cap_iovas;
- 	struct vfio_iova *iova;
- 	size_t size;
- 	int iovas = 0, i = 0, ret;
- 
--	list_for_each_entry(iova, &iommu->iova_list, list)
-+	list_for_each_entry(iova, iova_list, list)
- 		iovas++;
- 
- 	if (!iovas) {
-@@ -2990,7 +2990,7 @@ static int vfio_iommu_iova_build_caps(struct vfio_iommu *iommu,
- 
- 	cap_iovas->nr_iovas = iovas;
- 
--	list_for_each_entry(iova, &iommu->iova_list, list) {
-+	list_for_each_entry(iova, iova_list, list) {
- 		cap_iovas->iova_ranges[i].start = iova->start;
- 		cap_iovas->iova_ranges[i].end = iova->end;
- 		i++;
-@@ -3002,6 +3002,45 @@ static int vfio_iommu_iova_build_caps(struct vfio_iommu *iommu,
- 	return ret;
- }
- 
-+static int vfio_iommu_iova_build_caps(struct vfio_iommu *iommu,
-+				      struct vfio_info_cap *caps)
++/* HACK:
++ * vfio_iommu_add/remove_device() is hacky implementation for
++ * this version to add the device/group to vfio iommu type1.
++ */
++static int vfio_iommu_add_device(struct vfio_iommu *vfio_iommu,
++				 struct device *dev,
++				 struct iommu_domain *domain)
 +{
-+	return vfio_iova_list_build_caps(&iommu->iova_list, caps);
-+}
-+
-+/* HACK: called by /dev/iommu core to build iova range cap for a device */
-+int vfio_device_add_iova_cap(struct device *dev, struct vfio_info_cap *caps)
-+{
-+	u64 awidth;
-+	dma_addr_t aperture_end;
-+	LIST_HEAD(iova);
-+	LIST_HEAD(dev_resv_regions);
++	struct iommu_group *group;
 +	int ret;
 +
-+	ret = iommu_device_get_info(dev, IOMMU_DEV_INFO_ADDR_WIDTH, &awidth);
-+	if (ret)
-+		return ret;
++	group = iommu_group_get(dev);
++	if (!group)
++		return -EINVAL;
 +
-+	/* FIXME: needs to use geometry info reported by iommu core. */
-+	aperture_end = ((dma_addr_t)1) << awidth;
-+
-+	ret = vfio_iommu_iova_insert(&iova, 0, aperture_end);
-+	if (ret)
-+		return ret;
-+
-+	iommu_get_resv_regions(dev, &dev_resv_regions);
-+	ret = vfio_iommu_resv_exclude(&iova, &dev_resv_regions);
-+	if (ret)
-+		goto out;
-+
-+	ret = vfio_iova_list_build_caps(&iova, caps);
-+out:
-+	vfio_iommu_iova_free(&iova);
-+	iommu_put_resv_regions(dev, &dev_resv_regions);
++	ret = vfio_iommu_add_group(vfio_iommu, group, domain);
++	iommu_group_put(group);
 +	return ret;
 +}
-+EXPORT_SYMBOL_GPL(vfio_device_add_iova_cap);
 +
- static int vfio_iommu_migration_build_caps(struct vfio_iommu *iommu,
- 					   struct vfio_info_cap *caps)
- {
-diff --git a/include/linux/vfio.h b/include/linux/vfio.h
-index d904ee5a68cc..605b8e828be4 100644
---- a/include/linux/vfio.h
-+++ b/include/linux/vfio.h
-@@ -212,6 +212,8 @@ extern int vfio_info_add_capability(struct vfio_info_cap *caps,
- extern int vfio_set_irqs_validate_and_prepare(struct vfio_irq_set *hdr,
- 					      int num_irqs, int max_irq_type,
- 					      size_t *data_size);
-+extern int vfio_device_add_iova_cap(struct device *dev,
-+				    struct vfio_info_cap *caps);
++static void vfio_iommu_remove_device(struct vfio_iommu *vfio_iommu,
++				     struct device *dev)
++{
++	struct iommu_group *group;
++
++	group = iommu_group_get(dev);
++	if (!group)
++		return;
++
++	vfio_iommu_remove_group(vfio_iommu, group);
++	iommu_group_put(group);
++}
++
+ /**
+  * iommufd_device_attach_ioasid - attach device to an ioasid
+  * @idev: [in] Pointer to struct iommufd_device.
+@@ -539,11 +636,17 @@ int iommufd_device_attach_ioasid(struct iommufd_device *idev, int ioasid)
+ 	if (ret)
+ 		goto out_domain;
  
- struct pci_dev;
- #if IS_ENABLED(CONFIG_VFIO_SPAPR_EEH)
++	ret = vfio_iommu_add_device(ioas->vfio_iommu, idev->dev, domain);
++	if (ret)
++		goto out_detach;
++
+ 	ioas_dev->idev = idev;
+ 	list_add(&ioas_dev->next, &ioas->device_list);
+ 	mutex_unlock(&ioas->lock);
+ 
+ 	return 0;
++out_detach:
++	iommu_detach_device(domain, idev->dev);
+ out_domain:
+ 	ioas_free_domain_if_empty(ioas);
+ out_free:
+@@ -579,6 +682,7 @@ void iommufd_device_detach_ioasid(struct iommufd_device *idev, int ioasid)
+ 	}
+ 
+ 	list_del(&ioas_dev->next);
++	vfio_iommu_remove_device(ioas->vfio_iommu, idev->dev);
+ 	iommu_detach_device(ioas->domain, idev->dev);
+ 	ioas_free_domain_if_empty(ioas);
+ 	kfree(ioas_dev);
 diff --git a/include/uapi/linux/iommu.h b/include/uapi/linux/iommu.h
-index 49731be71213..f408ad3c8ade 100644
+index f408ad3c8ade..fe815cc1f665 100644
 --- a/include/uapi/linux/iommu.h
 +++ b/include/uapi/linux/iommu.h
-@@ -68,6 +68,7 @@
-  *		   +---------------+------------+
-  *		   ...
-  * @addr_width:    the address width of supported I/O address spaces.
-+ * @cap_offset:	   Offset within info struct of first cap
-  *
-  * Availability: after device is bound to iommufd
-  */
-@@ -77,9 +78,11 @@ struct iommu_device_info {
- #define IOMMU_DEVICE_INFO_ENFORCE_SNOOP	(1 << 0) /* IOMMU enforced snoop */
- #define IOMMU_DEVICE_INFO_PGSIZES	(1 << 1) /* supported page sizes */
- #define IOMMU_DEVICE_INFO_ADDR_WIDTH	(1 << 2) /* addr_wdith field valid */
-+#define IOMMU_DEVICE_INFO_CAPS		(1 << 3) /* info supports cap chain */
- 	__u64	dev_cookie;
- 	__u64   pgsize_bitmap;
- 	__u32	addr_width;
-+	__u32   cap_offset;
- };
+@@ -141,6 +141,35 @@ struct iommu_ioasid_alloc {
  
- #define IOMMU_DEVICE_GET_INFO	_IO(IOMMU_TYPE, IOMMU_BASE + 1)
+ #define IOMMU_IOASID_FREE		_IO(IOMMU_TYPE, IOMMU_BASE + 3)
+ 
++/*
++ * Map/unmap process virtual addresses to I/O virtual addresses.
++ *
++ * Provide VFIO type1 equivalent semantics. Start with the same
++ * restriction e.g. the unmap size should match those used in the
++ * original mapping call.
++ *
++ * @argsz:	user filled size of this data.
++ * @flags:	reserved for future extension.
++ * @ioasid:	the handle of target I/O address space.
++ * @data:	the operation payload, refer to vfio_iommu_type1_dma_{un}map.
++ *
++ * FIXME:
++ *	userspace needs to include uapi/vfio.h as well as interface reuses
++ *	the map/unmap logic from vfio iommu type1.
++ *
++ * Return: 0 on success, -errno on failure.
++ */
++struct iommu_ioasid_dma_op {
++	__u32	argsz;
++	__u32	flags;
++	__s32	ioasid;
++	__u32	padding;
++	__u8	data[];
++};
++
++#define IOMMU_MAP_DMA	_IO(IOMMU_TYPE, IOMMU_BASE + 4)
++#define IOMMU_UNMAP_DMA	_IO(IOMMU_TYPE, IOMMU_BASE + 5)
++
+ #define IOMMU_FAULT_PERM_READ	(1 << 0) /* read */
+ #define IOMMU_FAULT_PERM_WRITE	(1 << 1) /* write */
+ #define IOMMU_FAULT_PERM_EXEC	(1 << 2) /* exec */
 -- 
 2.25.1
 
