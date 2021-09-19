@@ -2,66 +2,273 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 150C9410BC0
-	for <lists+kvm@lfdr.de>; Sun, 19 Sep 2021 15:22:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5C40D410BC5
+	for <lists+kvm@lfdr.de>; Sun, 19 Sep 2021 15:37:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231174AbhISNXs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 19 Sep 2021 09:23:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58308 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229996AbhISNXr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 19 Sep 2021 09:23:47 -0400
-Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 829F4C061574
-        for <kvm@vger.kernel.org>; Sun, 19 Sep 2021 06:22:22 -0700 (PDT)
-Received: by mail-wm1-x331.google.com with SMTP id j134-20020a1c238c000000b0030b32367649so7206424wmj.3
-        for <kvm@vger.kernel.org>; Sun, 19 Sep 2021 06:22:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:reply-to:from:date:message-id:subject:to;
-        bh=6katzmw4TujhDC3hIZKt/O7+4p5hxMTeoFZg37I1Vn8=;
-        b=kPCmdm3i8JNeZJKPP1WMV/4Hxg4XjLXIAfr/c8fUbmdD6PjMVQViEnKiAXkq00X45Y
-         4K6CVVAiUCsUropN8Szv7sHBx5wpRs25JJ9DBqyLQppARQ1gLibBj+se+DZOmJ9/qazF
-         /HsiSPfzfOjyiDUYOB1cl7/CzglgEK8TS1MB9YPCD29RAsM7xlJHwh6KlTdUIURn/yuz
-         P9lk5Zsp8LLLEdc11Pt72bihqab/LWlljI2a3w6cjRtHsDs6/GIN/XRLQ6uWVk+hKqzh
-         QNEQG09zENFB7AjRDkJmhPnB85MGU8q4F1aGg2M8rjrmIISkak7UhT2K5ZKMTnx9Rl9z
-         CrSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to;
-        bh=6katzmw4TujhDC3hIZKt/O7+4p5hxMTeoFZg37I1Vn8=;
-        b=ruDSqnTBHzuXUorcfaf2itqsA12jfXMaCmBDQ492ziEyWg35xp5AXzn160//rf+ZgT
-         MHqx4EQ65di68/eaP9d3wbyLCHgkj8BzISH0Ev9AHvzv5cwI+qKZ8EcZMQs+bC+/IRlW
-         nWdC7tsi0x9iCNkaWDXp5NWsFxNH5pQA60C//sxQr9ctEYXWfxZKDhzmwJ5a71j796Vd
-         AMt0VevVf7K2z6ACjzZVM8Ovjif2zAJLKkH5pRMvPigfGGQZuBA6LCVzOW9Yb1s2yGNr
-         5UBnqlICXs33a90jZWfLGtX2BM99fiWtKK934WWEnmk67u3mRWyolvB755wxCE5npfwt
-         2tJw==
-X-Gm-Message-State: AOAM533dKrQhOSukqyaEIhKB160PNXSROSNJb93a1sabouXJArKFmuUu
-        RgAdmHln0pH5rT5OTE/56e1llHXb/Brx5DBuKiU=
-X-Google-Smtp-Source: ABdhPJxxS9WRzJnOiALHUZYUeTjGXRZke3i7WJMaAzl7NbINGwJX5ztT96mo+oqP2i7kTYAHIAcm2FXfIYJl1VdtfAw=
-X-Received: by 2002:a1c:1dcd:: with SMTP id d196mr19192626wmd.9.1632057740906;
- Sun, 19 Sep 2021 06:22:20 -0700 (PDT)
-MIME-Version: 1.0
-Received: by 2002:a05:6000:2a3:0:0:0:0 with HTTP; Sun, 19 Sep 2021 06:22:20
- -0700 (PDT)
-Reply-To: sroomf70@gmail.com
-From:   "Prof. Dr Diane" <confianzayrentabilidad@gmail.com>
-Date:   Sun, 19 Sep 2021 06:22:20 -0700
-Message-ID: <CANrrfX7fHwvF5m3AZA2Zwty6oHojgXhwO=NHuSXpbJzTMor0aA@mail.gmail.com>
-Subject: Greetings,
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
+        id S231294AbhISNi1 convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Sun, 19 Sep 2021 09:38:27 -0400
+Received: from mail.kernel.org ([198.145.29.99]:53420 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230520AbhISNi0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 19 Sep 2021 09:38:26 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 4C7D46101C;
+        Sun, 19 Sep 2021 13:37:01 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1mRx07-00BcgR-81; Sun, 19 Sep 2021 14:36:59 +0100
+Date:   Sun, 19 Sep 2021 14:36:46 +0100
+Message-ID: <877dfcwutt.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc:     linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>
+Subject: Re: REGRESSION: Upgrading host kernel from 5.11 to 5.13 breaks QEMU guests - perf/fw_devlink/kvm
+In-Reply-To: <YUYRKVflRtUytzy5@shell.armlinux.org.uk>
+References: <YUYRKVflRtUytzy5@shell.armlinux.org.uk>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8BIT
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: linux@armlinux.org.uk, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, will@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
--- 
-Good Day,
-I'm Prof. Dr Diane, please a huge amount of payment was made into your
-account. as soon as your respond is noted the payment confirmation
-slip will immediately send to you.  please do not hesitate to reply as
-soon as you receive this message. awaiting your urgent reply please.
+Hi Russell,
 
-Best regards
-Prof. Dr Diane
+Thanks for the heads-up.
+
+On Sat, 18 Sep 2021 17:17:45 +0100,
+"Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
+> 
+> Hi,
+> 
+> This morning, I upgraded my VM host from Debian Buster to Debian
+> Bullseye. This host (Armada 8040) runs libvirt. I placed all the VMs
+> into managedsave, which basically means their state is saved out by
+> QEMU ready to be resumed once the upgrade is complete.
+> 
+> Initially, I was running 5.11 on the host, which didn't have POSIX
+> ACLs enabled on tmpfs. Sadly, upgrading to Bullseye now requires
+> this to be enabled, so I upgraded the kernel to 5.13 to avoid this
+> problem - without POSIX ACLs on tmpfs, qemu refuses to even start.
+> 
+> Under Bullseye with 5.13, I could start new VMs, but I could not
+> resume the saved VMs - it would spit out:
+> 
+> 2021-09-18T11:14:14.456227Z qemu-system-aarch64: Invalid value 236 expecting positive value <= 162
+> 2021-09-18T11:14:14.456269Z qemu-system-aarch64: Failed to load cpu:cpreg_vmstate_array_len
+> 2021-09-18T11:14:14.456279Z qemu-system-aarch64: error while loading state for instance 0x0 of device 'cpu'
+> 2021-09-18T11:14:14.456887Z qemu-system-aarch64: load of migration failed: Invalid argument
+> 
+> Essentially, what this is complaining about is that the register
+> list returned by the KVM_GET_REG_LIST ioctl has reduced in size,
+> meaning that the saved VM has more registers that need to be set
+> (236 of them, after QEMU's filtering) than those which are actually
+> available under 5.13 (162 after QEMU's filtering).
+> 
+> After much debugging, and writing a program to create a VM and CPU,
+> and retrieve the register list etc, I have finally tracked down
+> exactly what is going on...
+> 
+> Under 5.13, KVM believes there is no PMU, so it doesn't advertise the
+> PMU registers, despite the hardware having a PMU and the kernel
+> having support.
+> 
+> kvm_arm_support_pmu_v3() determines whether the PMU_V3 feature is
+> available or not.
+> 
+> Under 5.11, this was determined via:
+> 
+> 	perf_num_counters() > 0
+> 
+> which in turn was derived from (essentially):
+> 
+> 	__oprofile_cpu_pmu && __oprofile_cpu_pmu->num_events > 0
+> 
+> __oprofile_cpu_pmu can be set at any time when the PMU has been
+> initialised, and due to initialisation ordering, it appears to happen
+> much later in the kernel boot.
+> 
+> However, under 5.13, oprofile has been removed, and this test is no
+> longer present. Instead, kvm attempts to determine the availability
+> of PMUv3 when it initialises, and fails to because the PMU has not
+> yet been initialised. If there is no PMU at the point KVM initialises,
+> then KVM will never advertise a PMU.
+> 
+> This change of behaviour is what breaks KVM on Armada 8040, causing
+> a userspace regression.
+> 
+> What makes this more confusing is the PMU errors have gone:
+> 
+> 5.13:
+> [    0.170514] PCI: CLS 0 bytes, default 64
+> [    0.171085] kvm [1]: IPA Size Limit: 44 bits
+> [    0.172532] kvm [1]: vgic interrupt IRQ9
+> [    0.172650] kvm: pmu event creation failed -2
+> [    0.172688] kvm [1]: Hyp mode initialized successfully
+> ...
+> [    1.479833] hw perfevents: enabled with armv8_cortex_a72 PMU driver, 7 counters available
+>
+
+[...]
+
+Urgh. That's a bummer. T1he PMU driver only comes up once it has found
+its interrupt controller, which on the Armada 8040 is not the GIC, but
+some weird thing on the side that doesn't actually serve any real
+purpose. On HW where the PMU is directly wired into the GIC, it all
+works fine, though by luck rather than by design.
+
+Anyway, rant over. This is a bug that needs addressing so that KVM can
+initialise correctly irrespective of the probing order. This probably
+means that the static key controlling KVM's behaviour wrt the PMU must
+be controlled by the PMU infrastructure itself, rather than KVM trying
+to probe for it.
+
+Can you please give the following hack a go (on top of 5.15-rc1)? I've
+briefly tested it on my McBin, and it did the trick. I've also tested
+it on the M1 (which really doesn't have an architectural PMU) to
+verify that it was correctly failing.
+
+Thanks,
+
+	M.
+
+From 9c26e3e6bbcbc3a583b3974e7a9017029d31fe29 Mon Sep 17 00:00:00 2001
+From: Marc Zyngier <maz@kernel.org>
+Date: Sun, 19 Sep 2021 14:09:49 +0100
+Subject: [PATCH] KVM: arm64: Fix PMU probe ordering
+
+Russell reported that since 5.13, KVM's probing of the PMU has
+started to fail on his HW. As it turns out, there is an implicit
+ordering dependency between the architectural PMU probing code and
+and KVM's own probing. If, due to probe ordering reasons, KVM probes
+before the PMU driver, it will fail to detect the PMU and prevent it
+from being advertised to guests as well as the VMM.
+
+Obviously, this is one probing too many, and we should be able to
+deal with any ordering.
+
+Add a callback from the PMU code into KVM to advertise the registration
+of a host CPU PMU, allowing for any probing order.
+
+Fixes: 5421db1be3b1 ("KVM: arm64: Divorce the perf code from oprofile helpers")
+Reported-by: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+Link: https://lore.kernel.org/r/YUYRKVflRtUytzy5@shell.armlinux.org.uk
+Cc: stable@vger.kernel.org
+---
+ arch/arm64/kvm/perf.c        |  3 ---
+ arch/arm64/kvm/pmu-emul.c    | 12 +++++++++++-
+ drivers/perf/arm_pmu.c       |  2 ++
+ include/kvm/arm_pmu.h        |  3 ---
+ include/linux/perf/arm_pmu.h |  6 ++++++
+ 5 files changed, 19 insertions(+), 7 deletions(-)
+
+diff --git a/arch/arm64/kvm/perf.c b/arch/arm64/kvm/perf.c
+index f9bb3b14130e..c84fe24b2ea1 100644
+--- a/arch/arm64/kvm/perf.c
++++ b/arch/arm64/kvm/perf.c
+@@ -50,9 +50,6 @@ static struct perf_guest_info_callbacks kvm_guest_cbs = {
+ 
+ int kvm_perf_init(void)
+ {
+-	if (kvm_pmu_probe_pmuver() != ID_AA64DFR0_PMUVER_IMP_DEF && !is_protected_kvm_enabled())
+-		static_branch_enable(&kvm_arm_pmu_available);
+-
+ 	return perf_register_guest_info_callbacks(&kvm_guest_cbs);
+ }
+ 
+diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+index f5065f23b413..588100c52f34 100644
+--- a/arch/arm64/kvm/pmu-emul.c
++++ b/arch/arm64/kvm/pmu-emul.c
+@@ -740,7 +740,17 @@ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
+ 	kvm_pmu_create_perf_event(vcpu, select_idx);
+ }
+ 
+-int kvm_pmu_probe_pmuver(void)
++void kvm_host_pmu_init(struct arm_pmu *pmu)
++{
++	if (pmu->pmuver != 0 &&
++	    pmu->pmuver != ID_AA64DFR0_PMUVER_IMP_DEF &&
++	    !is_protected_kvm_enabled()) {
++		static_branch_enable(&kvm_arm_pmu_available);
++		kvm_info("PMU detected and enabled\n");
++	}
++}
++
++static int kvm_pmu_probe_pmuver(void)
+ {
+ 	struct perf_event_attr attr = { };
+ 	struct perf_event *event;
+diff --git a/drivers/perf/arm_pmu.c b/drivers/perf/arm_pmu.c
+index 3cbc3baf087f..295cc7952d0e 100644
+--- a/drivers/perf/arm_pmu.c
++++ b/drivers/perf/arm_pmu.c
+@@ -952,6 +952,8 @@ int armpmu_register(struct arm_pmu *pmu)
+ 		pmu->name, pmu->num_events,
+ 		has_nmi ? ", using NMIs" : "");
+ 
++	kvm_host_pmu_init(pmu);
++
+ 	return 0;
+ 
+ out_destroy:
+diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+index 864b9997efb2..90f21898aad8 100644
+--- a/include/kvm/arm_pmu.h
++++ b/include/kvm/arm_pmu.h
+@@ -61,7 +61,6 @@ int kvm_arm_pmu_v3_get_attr(struct kvm_vcpu *vcpu,
+ int kvm_arm_pmu_v3_has_attr(struct kvm_vcpu *vcpu,
+ 			    struct kvm_device_attr *attr);
+ int kvm_arm_pmu_v3_enable(struct kvm_vcpu *vcpu);
+-int kvm_pmu_probe_pmuver(void);
+ #else
+ struct kvm_pmu {
+ };
+@@ -118,8 +117,6 @@ static inline u64 kvm_pmu_get_pmceid(struct kvm_vcpu *vcpu, bool pmceid1)
+ 	return 0;
+ }
+ 
+-static inline int kvm_pmu_probe_pmuver(void) { return 0xf; }
+-
+ #endif
+ 
+ #endif
+diff --git a/include/linux/perf/arm_pmu.h b/include/linux/perf/arm_pmu.h
+index 505480217cf1..2512e2f9cd4e 100644
+--- a/include/linux/perf/arm_pmu.h
++++ b/include/linux/perf/arm_pmu.h
+@@ -163,6 +163,12 @@ int arm_pmu_acpi_probe(armpmu_init_fn init_fn);
+ static inline int arm_pmu_acpi_probe(armpmu_init_fn init_fn) { return 0; }
+ #endif
+ 
++#ifdef CONFIG_KVM
++void kvm_host_pmu_init(struct arm_pmu *pmu);
++#else
++#define kvm_host_pmu_init(x)	do { } while(0)
++#endif
++
+ /* Internal functions only for core arm_pmu code */
+ struct arm_pmu *armpmu_alloc(void);
+ struct arm_pmu *armpmu_alloc_atomic(void);
+-- 
+2.30.2
+
+
+-- 
+Without deviation from the norm, progress is not possible.
