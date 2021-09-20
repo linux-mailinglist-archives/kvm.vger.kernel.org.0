@@ -2,109 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C52D941159D
-	for <lists+kvm@lfdr.de>; Mon, 20 Sep 2021 15:25:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E2AA4115A8
+	for <lists+kvm@lfdr.de>; Mon, 20 Sep 2021 15:26:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239903AbhITN1Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Sep 2021 09:27:16 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59822 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S239486AbhITN0p (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 20 Sep 2021 09:26:45 -0400
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 18KDD3Xg008200;
-        Mon, 20 Sep 2021 09:25:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=J5G0WDA426aE6v+ncOcz/FJT1JNYhV5RiXlsQOGjjpk=;
- b=eTf9xS7SzJ+n01ZKsZd4VXK+s9WWoiLvFbprDqht4a22gCfkCX290fH9MZK7ipD2YP21
- VkOWVrHxi4GB1o88x3piO0AFDKgcOqXDJUcGagEIL2WbZQZhkQRrk3o6OGUGClkH8HoZ
- mPPGo3RiQVuuZWbv/Gs7ctLMIVFlUhi1Ul1+Ds6JuAbUonYCj4NmjWaaqOSQ3sK8SqjZ
- 208/JCH/B+DdARk7Sf31fRDc9UtwThHQztSlv9MijoFNDHZr9k3TyPDX7CU2mMlLONkc
- sfWkKNa9NWaZ8gk23JabBSy+yoOFZvlszlHLwE5urT4oTArsyB0fJjeUlUc8g6fLnzDk +Q== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3b5wjy1jh3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 20 Sep 2021 09:25:18 -0400
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 18KDFDOL017685;
-        Mon, 20 Sep 2021 09:25:17 -0400
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3b5wjy1jgb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 20 Sep 2021 09:25:17 -0400
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 18KDD6QC018945;
-        Mon, 20 Sep 2021 13:25:15 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma01fra.de.ibm.com with ESMTP id 3b57r8r55x-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 20 Sep 2021 13:25:15 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 18KDPBG741353602
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 20 Sep 2021 13:25:11 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 021E8A4057;
-        Mon, 20 Sep 2021 13:25:11 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8E2C1A4080;
-        Mon, 20 Sep 2021 13:25:10 +0000 (GMT)
-Received: from p-imbrenda.ibmuc.com (unknown [9.145.9.241])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 20 Sep 2021 13:25:10 +0000 (GMT)
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     cohuck@redhat.com, borntraeger@de.ibm.com, frankja@linux.ibm.com,
-        thuth@redhat.com, pasic@linux.ibm.com, david@redhat.com,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Ulrich.Weigand@de.ibm.com
-Subject: [PATCH v5 14/14] KVM: s390: pv: avoid export before import if possible
-Date:   Mon, 20 Sep 2021 15:25:02 +0200
-Message-Id: <20210920132502.36111-15-imbrenda@linux.ibm.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20210920132502.36111-1-imbrenda@linux.ibm.com>
-References: <20210920132502.36111-1-imbrenda@linux.ibm.com>
+        id S239706AbhITN2A (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Sep 2021 09:28:00 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:58098 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S239673AbhITN0z (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 20 Sep 2021 09:26:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1632144328;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=PbgRxY1Kwyd5e8Ybt8IMEeqXmoKho8XjkJuR4TeH6UA=;
+        b=egEtzuDPleOs5h24EfTK3Zlxs0G2/5X2XL+aY9qgppYyPzTIaGwv/z8zBbh/CjpVYs9wpq
+        DkDdeyeYSjQIM/wqD28JFu0gIR4dPUb62YQ7we7HY58JZ3Y80iGgkpzuZbnivR6gs1nkx1
+        cnYOMUjcISpF0IB15RLzx4paHxRUCGs=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-270-LODDWeW0NKu7JW1O4TqVIg-1; Mon, 20 Sep 2021 09:25:26 -0400
+X-MC-Unique: LODDWeW0NKu7JW1O4TqVIg-1
+Received: by mail-ed1-f71.google.com with SMTP id z6-20020a50cd06000000b003d2c2e38f1fso15606796edi.1
+        for <kvm@vger.kernel.org>; Mon, 20 Sep 2021 06:25:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=PbgRxY1Kwyd5e8Ybt8IMEeqXmoKho8XjkJuR4TeH6UA=;
+        b=w/26ZhMOpHiFpVVDJNIXkSw/ekWnP6vZ+GuwWFMJ0KbZzXa5sDWM+MrqnrHk20tO8V
+         48yHhe4aq2T/uPRdy42VdJWs6KL9AVdyWCdmKbG7DBuCaBUO6nNTTbazZhaArQElP+9E
+         GnQ9sgqSum6+hPhyMNOhB95Mh+x8MwL1BRnnUo9eq1PNeswzGsfEbSuJnYuQ8wjn3MKI
+         z48qVSuSQwV0d4XcU0cM88ggHlkkkcKFwkgPfXNcPjaZcZw8LkxmTTetlf4GjWEKf1wA
+         nJeqAUF7KUW0T4cI2OzPcuSB57hSkQxRXjiP+AV7YGsQor5VyUwGRj3vrn5lwX2XAkRk
+         00Gw==
+X-Gm-Message-State: AOAM533KMGdxeXDqii49hHsEAbQ5sOrks3biZH0hLNuTZA2fKlgZuYMs
+        Cpjb3IxNvI+NF1FTFNJ6SBQINl+qigGrTnK9T7Tg1NRQq5A+BIb82jkFax25O8xHP5LXGHrjjtZ
+        3Ure/YzjSQnoS
+X-Received: by 2002:aa7:d6c7:: with SMTP id x7mr29573529edr.180.1632144325556;
+        Mon, 20 Sep 2021 06:25:25 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxLYE9jEem7SAWRV34u22CAUUh9OWwyzW8vzAsRSoIpdWAdoor6vNz9n92Gjou/xYgF8O4zsA==
+X-Received: by 2002:aa7:d6c7:: with SMTP id x7mr29573517edr.180.1632144325398;
+        Mon, 20 Sep 2021 06:25:25 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id dn28sm7045838edb.76.2021.09.20.06.25.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 20 Sep 2021 06:25:24 -0700 (PDT)
+Subject: Re: [kvm-unit-tests PATCH 1/1] svm: Fix MBZ reserved bits of AMD CR4
+ register
+To:     Wei Huang <wei.huang2@amd.com>, kvm@vger.kernel.org
+Cc:     thuth@redhat.com, drjones@redhat.com, babu.moger@amd.com,
+        krish.sadhukhan@oracle.com
+References: <20210916184551.119561-1-wei.huang2@amd.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <1b4829dd-1e7c-da10-e4a1-35971e8b6492@redhat.com>
+Date:   Mon, 20 Sep 2021 15:25:24 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: o4Ak_TsStp_v5MN8lD5X2Mrdg8f9YvqR
-X-Proofpoint-ORIG-GUID: TPslmHp9BEiHbyf4A4Vzmv-tWhZUOyEQ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.391,FMLib:17.0.607.475
- definitions=2021-09-20_07,2021-09-20_01,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 mlxlogscore=999
- spamscore=0 malwarescore=0 clxscore=1015 suspectscore=0 priorityscore=1501
- adultscore=0 phishscore=0 impostorscore=0 lowpriorityscore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2109030001
- definitions=main-2109200079
+In-Reply-To: <20210916184551.119561-1-wei.huang2@amd.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-If the appropriate UV feature bit is set, there is no need to perform
-an export before import.
+On 16/09/21 20:45, Wei Huang wrote:
+> According to AMD APM, Volume 2: System Programming (Rev. 3.37, March 2021),
+> CR4 register is defined to have the following MBZ reserved bits:
+>    * Bit 12 - 15
+>    * Bit 19
+>    * Bit 24 - 63
+> Additionally Bit 12 will be used by LA57 in future CPUs. Fix the CR4
+> reserved bit definition to match with APM and prevent potential test_cr4()
+> failures.
 
-Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
----
- arch/s390/kernel/uv.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+So the difference is LA57 and CET.  Queued, thanks!
 
-diff --git a/arch/s390/kernel/uv.c b/arch/s390/kernel/uv.c
-index 5d595013f92b..2a8211112f69 100644
---- a/arch/s390/kernel/uv.c
-+++ b/arch/s390/kernel/uv.c
-@@ -251,7 +251,8 @@ static int make_secure_pte(pte_t *ptep, unsigned long addr,
- 
- static bool should_export_before_import(struct uv_cb_header *uvcb, struct mm_struct *mm)
- {
--	return uvcb->cmd != UVC_CMD_UNPIN_PAGE_SHARED &&
-+	return !test_bit_inv(BIT_UV_FEAT_MISC, &uv_info.uv_feature_indications) &&
-+		uvcb->cmd != UVC_CMD_UNPIN_PAGE_SHARED &&
- 		atomic_read(&mm->context.protected_count) > 1;
- }
- 
--- 
-2.31.1
+Paolo
+
+> -#define	SVM_CR4_LEGACY_RESERVED_MASK		0xff88f000U
+> +#define	SVM_CR4_LEGACY_RESERVED_MASK		0xff08e000U
 
