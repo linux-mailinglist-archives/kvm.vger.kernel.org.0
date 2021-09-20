@@ -2,100 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8F02A412AE7
-	for <lists+kvm@lfdr.de>; Tue, 21 Sep 2021 04:01:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 00B40412D50
+	for <lists+kvm@lfdr.de>; Tue, 21 Sep 2021 05:17:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241631AbhIUCCe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Sep 2021 22:02:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34160 "EHLO
+        id S232055AbhIUDTI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Sep 2021 23:19:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41366 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238570AbhIUB5q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Sep 2021 21:57:46 -0400
-Received: from mail-qt1-x84a.google.com (mail-qt1-x84a.google.com [IPv6:2607:f8b0:4864:20::84a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F1B7C08EA7E
-        for <kvm@vger.kernel.org>; Mon, 20 Sep 2021 18:01:40 -0700 (PDT)
-Received: by mail-qt1-x84a.google.com with SMTP id r5-20020ac85e85000000b0029bd6ee5179so198822583qtx.18
-        for <kvm@vger.kernel.org>; Mon, 20 Sep 2021 18:01:40 -0700 (PDT)
+        with ESMTP id S239283AbhIUC2g (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Sep 2021 22:28:36 -0400
+Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0B11C06114F
+        for <kvm@vger.kernel.org>; Mon, 20 Sep 2021 12:23:43 -0700 (PDT)
+Received: by mail-lf1-x12e.google.com with SMTP id g1so72544045lfj.12
+        for <kvm@vger.kernel.org>; Mon, 20 Sep 2021 12:23:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=XqeN3hyu4xVF/UFXFp3XkUay0dLcSsRd5uf44abCA2Q=;
-        b=HlQnSCmXttBhWRfulvS9JxQUQJlpPBD/crbVGiQ7AxEI2pbDQrmfVVS1TrWccw05Ez
-         eCEsECHpCm917mn23DJC9oZgkSzmu3asArrLun7/xRx3hNhroie5AKTRnXBi6yxoKHoC
-         b8GKFhPnoo+BgJywlBZdiDb/6n/3Q1mq5w/RXjJVKxT7iiB2y++xEYRtbRwzJi8A/huk
-         FaDjs6fz5H1BJJ8DL/iyaU72EoY1d5tkHHZEoT5qdqIDOkY+8BkMvBelQfJ8mdzapsbD
-         d/9Sj6LOnSH4Dq2uOAaFw4RaX7m0U6znUaYtajJHJWAvtiliUjl7xZwx2mdQh50WPD7E
-         XLiQ==
+        d=shutemov-name.20210112.gappssmtp.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=lfxmCAIn9aHEGlNTCFP6oI4sdv4GtF/cTPp74Gw1WBM=;
+        b=51peZIPp0Z/EhYUJjOrVhklffvLaouyg2C5XP2pPvI6GKpQqRTRJNH9z0riNU6JUST
+         o0XwKLmOpbRlulubaDys5ESijC7RfZDY0btoMVLhd24Wbuq4HCPaAcFG5bL/hMGrqGtL
+         7xl5z5ix8Uq+1/IFKbmMGW0qkcT6Kblu2SXf54ogQOpF0XmbXZnVwYt6ayxUDZ2i0zc5
+         ndwQC+lLTjKOM/5Nx96ULxzCt3Is+WBaiGfGuvvkAWuKo2L9VaqIf1rPaXJawFd0DZaR
+         UVhdwOrDahN59n5xgeFFwe62qLfoeS4Srs8f0W8HdLOxbwittlQusCzObDZLZ8VTA7Ay
+         5WSw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=XqeN3hyu4xVF/UFXFp3XkUay0dLcSsRd5uf44abCA2Q=;
-        b=Z0M/jkDC8f4nIf5ApU4bpKzgcwUU87ruLRcoYqJllLTYZWG2YfntUS5Ou/NNdOh/M/
-         IB4RgdoGrT+ftfVFVWgbhdcCoRYHJpz1D1OSN7NxqsWKKkldNcM4E6+/3e4zBe9cILma
-         PmTW5WBDTNtYZ2M72HId/z5oLxfRWUJ/iHA02sbKhltBO4BsZ8hdRJ9nKQCfCMrF16Xu
-         jjROJ3zn1a8BV9N39q+vgq/XbpbZ8ir6h+3BacYtvRP0bRoOtThciIn/DN38UrXQO8r8
-         /2ySJ1XXHRpBubxiAFy+vBfwWSAG7dFnTYpryCT2l1qjQk6kF1YX0nI4nK7X8iJRvAd4
-         AfSQ==
-X-Gm-Message-State: AOAM530LT52o71dvAKad/Viq5tH92d1FaJ7PtrSlyYVHY6zzyuKNAwt4
-        ftU204+vl7jML19U1CxvD6mXAYkm4ZYbhjaMaDIrhxno927w87L4HIS39TR/dJ3blbTHzrHwIsQ
-        mVlx9Jij9BIH23224sLnWa7DOftid2QZzr/bSxMIELuyE/ArV1ZynvhMOyw==
-X-Google-Smtp-Source: ABdhPJw4f4/voRxb0xXPFNT+rq0rQnSg1TwSBIEaiOSR4mzrEZAZp1YmF5XBLZs+tg0K7NHBTbfgA7u7PCM=
-X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a05:6214:408:: with SMTP id
- z8mr19753705qvx.21.1632186099152; Mon, 20 Sep 2021 18:01:39 -0700 (PDT)
-Date:   Tue, 21 Sep 2021 01:01:20 +0000
-In-Reply-To: <20210921010120.1256762-1-oupton@google.com>
-Message-Id: <20210921010120.1256762-3-oupton@google.com>
-Mime-Version: 1.0
-References: <20210921010120.1256762-1-oupton@google.com>
-X-Mailer: git-send-email 2.33.0.464.g1972c5931b-goog
-Subject: [PATCH 2/2] selftests: KVM: Fix 'asm-operand-width' warnings in steal_time.c
-From:   Oliver Upton <oupton@google.com>
-To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Oliver Upton <oupton@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=lfxmCAIn9aHEGlNTCFP6oI4sdv4GtF/cTPp74Gw1WBM=;
+        b=E6rvK1q/nqS5j/H9bitmccujZFL6sCQX5cgzKIamhZgMmcmn6oJn7lGnV/CwO76wjA
+         P4YwY76Ri2xFEvqnmVpsz0UXoW5rz7l1k8nGXXz9oVSCkWv9Do7Td4GODuIt1Yi60i1R
+         M2SjXcqA9roiBoGC+rVut4HnGUfJS4164tbWsAlm0rvMCY3/C92bRdgRO6UBwLLHnPW+
+         TAMh6Q0jyVJkzeBMOnlaOXjZWWBDZ+N+/GW105xYweHQxAOgVMB4jrn9Xzlkhk9uzPGL
+         YQ+gvBTx2QMzu/STJJUIxi8s4Rcit/0EBnGAHQa0Hx02NH2KuAXu03qPWHTHgbnxLFo3
+         6tDA==
+X-Gm-Message-State: AOAM5325duaU7OS0SH4qWFRXqEeIvtLpCAx+I+fNSsEf7cCTmRdlGi0A
+        wG6zoNnwpC62+kbIg/P1gXqXnw==
+X-Google-Smtp-Source: ABdhPJzBd1RwKOZT1XWwd9VMdTBk2dtlBYL+yyroRGVVu01s956l3lUsknRhzDPFsjv00pVQxtEqOw==
+X-Received: by 2002:a05:651c:83:: with SMTP id 3mr23323003ljq.341.1632165822010;
+        Mon, 20 Sep 2021 12:23:42 -0700 (PDT)
+Received: from box.localdomain ([86.57.175.117])
+        by smtp.gmail.com with ESMTPSA id j21sm1858858ljh.87.2021.09.20.12.23.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 Sep 2021 12:23:41 -0700 (PDT)
+Received: by box.localdomain (Postfix, from userid 1000)
+        id B961C103053; Mon, 20 Sep 2021 22:23:41 +0300 (+03)
+Date:   Mon, 20 Sep 2021 22:23:41 +0300
+From:   "Kirill A. Shutemov" <kirill@shutemov.name>
+To:     Tom Lendacky <thomas.lendacky@amd.com>
+Cc:     linux-kernel@vger.kernel.org, x86@kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
+        iommu@lists.linux-foundation.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-graphics-maintainer@vmware.com,
+        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        kexec@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+        Borislav Petkov <bp@alien8.de>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Andi Kleen <ak@linux.intel.com>,
+        Sathyanarayanan Kuppuswamy 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        Tianyu Lan <Tianyu.Lan@microsoft.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v3 5/8] x86/sme: Replace occurrences of sme_active() with
+ cc_platform_has()
+Message-ID: <20210920192341.maue7db4lcbdn46x@box.shutemov.name>
+References: <cover.1631141919.git.thomas.lendacky@amd.com>
+ <367624d43d35d61d5c97a8b289d9ddae223636e9.1631141919.git.thomas.lendacky@amd.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <367624d43d35d61d5c97a8b289d9ddae223636e9.1631141919.git.thomas.lendacky@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Building steal_time.c for arm64 with clang throws the following:
+On Wed, Sep 08, 2021 at 05:58:36PM -0500, Tom Lendacky wrote:
+> diff --git a/arch/x86/mm/mem_encrypt_identity.c b/arch/x86/mm/mem_encrypt_identity.c
+> index 470b20208430..eff4d19f9cb4 100644
+> --- a/arch/x86/mm/mem_encrypt_identity.c
+> +++ b/arch/x86/mm/mem_encrypt_identity.c
+> @@ -30,6 +30,7 @@
+>  #include <linux/kernel.h>
+>  #include <linux/mm.h>
+>  #include <linux/mem_encrypt.h>
+> +#include <linux/cc_platform.h>
+>  
+>  #include <asm/setup.h>
+>  #include <asm/sections.h>
+> @@ -287,7 +288,7 @@ void __init sme_encrypt_kernel(struct boot_params *bp)
+>  	unsigned long pgtable_area_len;
+>  	unsigned long decrypted_base;
+>  
+> -	if (!sme_active())
+> +	if (!cc_platform_has(CC_ATTR_HOST_MEM_ENCRYPT))
+>  		return;
+>  
+>  	/*
 
->> steal_time.c:130:22: error: value size does not match register size specified by the constraint and modifier [-Werror,-Wasm-operand-widths]
-          : "=r" (ret) : "r" (func), "r" (arg) :
-                              ^
->> steal_time.c:130:34: error: value size does not match register size specified by the constraint and modifier [-Werror,-Wasm-operand-widths]
-          : "=r" (ret) : "r" (func), "r" (arg) :
-                                          ^
+This change break boot for me (in KVM on Intel host). It only reproduces
+with allyesconfig. More reasonable config works fine, but I didn't try to
+find exact cause in config.
 
-Silence by casting operands to 64 bits.
+Convertion to cc_platform_has() in __startup_64() in 8/8 has the same
+effect.
 
-Signed-off-by: Oliver Upton <oupton@google.com>
----
- tools/testing/selftests/kvm/steal_time.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I believe it caused by sme_me_mask access from __startup_64() without
+fixup_pointer() magic. I think __startup_64() requires special treatement
+and we should avoid cc_platform_has() there (or have a special version of
+the helper). Note that only AMD requires these cc_platform_has() to return
+true.
 
-diff --git a/tools/testing/selftests/kvm/steal_time.c b/tools/testing/selftests/kvm/steal_time.c
-index ecec30865a74..eb75b31122c5 100644
---- a/tools/testing/selftests/kvm/steal_time.c
-+++ b/tools/testing/selftests/kvm/steal_time.c
-@@ -127,7 +127,7 @@ static int64_t smccc(uint32_t func, uint32_t arg)
- 		"mov	x1, %2\n"
- 		"hvc	#0\n"
- 		"mov	%0, x0\n"
--	: "=r" (ret) : "r" (func), "r" (arg) :
-+	: "=r" (ret) : "r" ((uint64_t)func), "r" ((uint64_t)arg) :
- 	  "x0", "x1", "x2", "x3");
- 
- 	return ret;
 -- 
-2.33.0.464.g1972c5931b-goog
-
+ Kirill A. Shutemov
