@@ -2,20 +2,20 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 46CBB41283C
-	for <lists+kvm@lfdr.de>; Mon, 20 Sep 2021 23:42:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D83D541283E
+	for <lists+kvm@lfdr.de>; Mon, 20 Sep 2021 23:42:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243937AbhITVnS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Sep 2021 17:43:18 -0400
-Received: from vps-vb.mhejs.net ([37.28.154.113]:45412 "EHLO vps-vb.mhejs.net"
+        id S244569AbhITVnW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Sep 2021 17:43:22 -0400
+Received: from vps-vb.mhejs.net ([37.28.154.113]:45414 "EHLO vps-vb.mhejs.net"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232273AbhITVlS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S233066AbhITVlS (ORCPT <rfc822;kvm@vger.kernel.org>);
         Mon, 20 Sep 2021 17:41:18 -0400
 Received: from MUA
         by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <mail@maciej.szmigiero.name>)
-        id 1mSR0V-0006PJ-Ck; Mon, 20 Sep 2021 23:39:23 +0200
+        id 1mSR0a-0006PW-Mj; Mon, 20 Sep 2021 23:39:28 +0200
 From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>
@@ -37,9 +37,9 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         Claudio Imbrenda <imbrenda@linux.ibm.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v5 03/13] KVM: Add "old" memslot parameter to kvm_arch_prepare_memory_region()
-Date:   Mon, 20 Sep 2021 23:38:51 +0200
-Message-Id: <8f82dce37b6db5262e16d3d0ad7037e49813e18f.1632171479.git.maciej.szmigiero@oracle.com>
+Subject: [PATCH v5 04/13] KVM: x86: Move n_memslots_pages recalc to kvm_arch_prepare_memory_region()
+Date:   Mon, 20 Sep 2021 23:38:52 +0200
+Message-Id: <2a4ceee16546deeab7090efea2ee9c0db5444b84.1632171479.git.maciej.szmigiero@oracle.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <cover.1632171478.git.maciej.szmigiero@oracle.com>
 References: <cover.1632171478.git.maciej.szmigiero@oracle.com>
@@ -51,150 +51,77 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
 
-This is needed for the next commit, which moves n_memslots_pages
-recalculation from kvm_arch_commit_memory_region() to the aforementioned
-function to allow for returning an error code.
-
-While we are at it let's also rename the "memslot" parameter to "new" for
-consistency with kvm_arch_commit_memory_region(), which uses the same
-argument set now.
-
-No functional change intended.
+This allows us to return a proper error code in case we spot an underflow.
 
 Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
 ---
- arch/arm64/kvm/mmu.c       | 7 ++++---
- arch/mips/kvm/mips.c       | 3 ++-
- arch/powerpc/kvm/powerpc.c | 5 +++--
- arch/s390/kvm/kvm-s390.c   | 3 ++-
- arch/x86/kvm/x86.c         | 5 +++--
- include/linux/kvm_host.h   | 3 ++-
- virt/kvm/kvm_main.c        | 2 +-
- 7 files changed, 17 insertions(+), 11 deletions(-)
+ arch/x86/kvm/x86.c | 49 ++++++++++++++++++++++++++--------------------
+ 1 file changed, 28 insertions(+), 21 deletions(-)
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 1a94a7ca48f2..6d93ae1edb6d 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1486,7 +1486,8 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
- }
- 
- int kvm_arch_prepare_memory_region(struct kvm *kvm,
--				   struct kvm_memory_slot *memslot,
-+				   const struct kvm_memory_slot *old,
-+				   struct kvm_memory_slot *new,
- 				   const struct kvm_userspace_memory_region *mem,
- 				   enum kvm_mr_change change)
- {
-@@ -1502,7 +1503,7 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
- 	 * Prevent userspace from creating a memory region outside of the IPA
- 	 * space addressable by the KVM guest IPA space.
- 	 */
--	if ((memslot->base_gfn + memslot->npages) > (kvm_phys_size(kvm) >> PAGE_SHIFT))
-+	if ((new->base_gfn + new->npages) > (kvm_phys_size(kvm) >> PAGE_SHIFT))
- 		return -EFAULT;
- 
- 	mmap_read_lock(current->mm);
-@@ -1534,7 +1535,7 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
- 
- 		if (vma->vm_flags & VM_PFNMAP) {
- 			/* IO region dirty page logging not allowed */
--			if (memslot->flags & KVM_MEM_LOG_DIRTY_PAGES) {
-+			if (new->flags & KVM_MEM_LOG_DIRTY_PAGES) {
- 				ret = -EINVAL;
- 				break;
- 			}
-diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
-index 75c6f264c626..8587c260c6fb 100644
---- a/arch/mips/kvm/mips.c
-+++ b/arch/mips/kvm/mips.c
-@@ -233,7 +233,8 @@ void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
- }
- 
- int kvm_arch_prepare_memory_region(struct kvm *kvm,
--				   struct kvm_memory_slot *memslot,
-+				   const struct kvm_memory_slot *old,
-+				   struct kvm_memory_slot *new,
- 				   const struct kvm_userspace_memory_region *mem,
- 				   enum kvm_mr_change change)
- {
-diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
-index b4e6f70b97b9..6ecb6a51d82f 100644
---- a/arch/powerpc/kvm/powerpc.c
-+++ b/arch/powerpc/kvm/powerpc.c
-@@ -706,11 +706,12 @@ void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *slot)
- }
- 
- int kvm_arch_prepare_memory_region(struct kvm *kvm,
--				   struct kvm_memory_slot *memslot,
-+				   const struct kvm_memory_slot *old,
-+				   struct kvm_memory_slot *new,
- 				   const struct kvm_userspace_memory_region *mem,
- 				   enum kvm_mr_change change)
- {
--	return kvmppc_core_prepare_memory_region(kvm, memslot, mem, change);
-+	return kvmppc_core_prepare_memory_region(kvm, new, mem, change);
- }
- 
- void kvm_arch_commit_memory_region(struct kvm *kvm,
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index 752a0ffab9bf..3fd0f4afe742 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -5016,7 +5016,8 @@ vm_fault_t kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
- 
- /* Section: memory related */
- int kvm_arch_prepare_memory_region(struct kvm *kvm,
--				   struct kvm_memory_slot *memslot,
-+				   const struct kvm_memory_slot *old,
-+				   struct kvm_memory_slot *new,
- 				   const struct kvm_userspace_memory_region *mem,
- 				   enum kvm_mr_change change)
- {
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 2e4fe2511c5d..97d86223427d 100644
+index 97d86223427d..0fffb8414009 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -11506,12 +11506,13 @@ void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen)
- }
- 
- int kvm_arch_prepare_memory_region(struct kvm *kvm,
--				struct kvm_memory_slot *memslot,
-+				const struct kvm_memory_slot *old,
-+				struct kvm_memory_slot *new,
+@@ -11511,9 +11511,23 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
  				const struct kvm_userspace_memory_region *mem,
  				enum kvm_mr_change change)
  {
- 	if (change == KVM_MR_CREATE || change == KVM_MR_MOVE)
--		return kvm_alloc_memslot_metadata(kvm, memslot,
-+		return kvm_alloc_memslot_metadata(kvm, new,
- 						  mem->memory_size >> PAGE_SHIFT);
+-	if (change == KVM_MR_CREATE || change == KVM_MR_MOVE)
+-		return kvm_alloc_memslot_metadata(kvm, new,
+-						  mem->memory_size >> PAGE_SHIFT);
++	if (change == KVM_MR_CREATE || change == KVM_MR_MOVE) {
++		int ret;
++
++		ret = kvm_alloc_memslot_metadata(kvm, new,
++						 mem->memory_size >> PAGE_SHIFT);
++		if (ret)
++			return ret;
++
++		if (change == KVM_MR_CREATE)
++			kvm->arch.n_memslots_pages += new->npages;
++	} else if (change == KVM_MR_DELETE) {
++		if (WARN_ON(kvm->arch.n_memslots_pages < old->npages))
++			return -EIO;
++
++		kvm->arch.n_memslots_pages -= old->npages;
++	}
++
  	return 0;
  }
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 041ca7f15ea4..c6963f6f1eb8 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -832,7 +832,8 @@ int __kvm_set_memory_region(struct kvm *kvm,
- void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *slot);
- void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen);
- int kvm_arch_prepare_memory_region(struct kvm *kvm,
--				struct kvm_memory_slot *memslot,
-+				const struct kvm_memory_slot *old,
-+				struct kvm_memory_slot *new,
- 				const struct kvm_userspace_memory_region *mem,
- 				enum kvm_mr_change change);
- void kvm_arch_commit_memory_region(struct kvm *kvm,
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 439d3b4cd1a9..c3c71a9e85c9 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -1571,7 +1571,7 @@ static int kvm_set_memslot(struct kvm *kvm,
- 		kvm_copy_memslots(slots, __kvm_memslots(kvm, as_id));
+ 
+@@ -11610,24 +11624,17 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
+ 				const struct kvm_memory_slot *new,
+ 				enum kvm_mr_change change)
+ {
+-	if (change == KVM_MR_CREATE || change == KVM_MR_DELETE) {
+-		if (change == KVM_MR_CREATE)
+-			kvm->arch.n_memslots_pages += new->npages;
+-		else {
+-			WARN_ON(kvm->arch.n_memslots_pages < old->npages);
+-			kvm->arch.n_memslots_pages -= old->npages;
+-		}
+-
+-		if (!kvm->arch.n_requested_mmu_pages) {
+-			u64 memslots_pages;
+-			unsigned long nr_mmu_pages;
+-
+-			memslots_pages = kvm->arch.n_memslots_pages * KVM_PERMILLE_MMU_PAGES;
+-			do_div(memslots_pages, 1000);
+-			nr_mmu_pages = max_t(typeof(nr_mmu_pages),
+-					     memslots_pages, KVM_MIN_ALLOC_MMU_PAGES);
+-			kvm_mmu_change_mmu_pages(kvm, nr_mmu_pages);
+-		}
++	/* Only CREATE or DELETE affects n_memslots_pages */
++	if ((change == KVM_MR_CREATE || change == KVM_MR_DELETE) &&
++	    !kvm->arch.n_requested_mmu_pages) {
++		u64 memslots_pages;
++		unsigned long nr_mmu_pages;
++
++		memslots_pages = kvm->arch.n_memslots_pages * KVM_PERMILLE_MMU_PAGES;
++		do_div(memslots_pages, 1000);
++		nr_mmu_pages = max_t(typeof(nr_mmu_pages),
++				     memslots_pages, KVM_MIN_ALLOC_MMU_PAGES);
++		kvm_mmu_change_mmu_pages(kvm, nr_mmu_pages);
  	}
  
--	r = kvm_arch_prepare_memory_region(kvm, new, mem, change);
-+	r = kvm_arch_prepare_memory_region(kvm, old, new, mem, change);
- 	if (r)
- 		goto out_slots;
- 
+ 	kvm_mmu_slot_apply_flags(kvm, old, new, change);
