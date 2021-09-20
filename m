@@ -2,109 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7A02A411666
-	for <lists+kvm@lfdr.de>; Mon, 20 Sep 2021 16:09:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EF87641166E
+	for <lists+kvm@lfdr.de>; Mon, 20 Sep 2021 16:10:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230175AbhITOK7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Sep 2021 10:10:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46800 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229567AbhITOK6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Sep 2021 10:10:58 -0400
-Received: from mail-oo1-xc35.google.com (mail-oo1-xc35.google.com [IPv6:2607:f8b0:4864:20::c35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C2E2C061574
-        for <kvm@vger.kernel.org>; Mon, 20 Sep 2021 07:09:32 -0700 (PDT)
-Received: by mail-oo1-xc35.google.com with SMTP id y47-20020a4a9832000000b00290fb9f6d3fso5918429ooi.3
-        for <kvm@vger.kernel.org>; Mon, 20 Sep 2021 07:09:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=qzAdTsGqrarKrbZiLgQ+yqd08O5g2KPS2fQJ1adRAbE=;
-        b=Lc5yTDdu4Z3ESLWgSn8P+Yyo1JXoXNnAwo7xIH57GWzVa7TVzjcFv4yNw2009ZQ5Zi
-         qPA1ibsjJp5bIhAVuwjxCm+Io/CPD9HVF9biAgL65DiCGnM2XTe164wB+IYCSfsDWDMk
-         DcyLd1ntMHf4fpszz2py6D2mpdB1vdmF37E/L3X8eMeFn/pBrbTbOe1RIETYK3xbIFzX
-         ghTEMZjdySpQv9CTWdSzOTNizZM8UNm5hpPfuLRX0Wz6WSkFn4Mm2smHwmgdc90PHDvv
-         j/GV4JfTTPPhj2rff2ZLrbFlVqSC4hudG78SAJBcHQvskuD3oP2bzCfDPf76nCRDOp+I
-         W1cA==
+        id S232057AbhITOMO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Sep 2021 10:12:14 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53553 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229567AbhITOMN (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 20 Sep 2021 10:12:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1632147046;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=RbxjU0qTM37tjAGcJkV92O2IEWr+qZ+g6bo7srNL7rU=;
+        b=aNV+zdEvcFO1+Wejwaa/A4xl0wV4JG30miBvOC420WQus8WD5QKFJjzX9iW+RqfBHTgZsu
+        o/N/p5mSlwerMTHKg8FKuxYBeNBSzZfhAOza6RsEgRQYmSCoVJqvCKpB24qdLA+Qt6gMfe
+        rWbaMWtWP/qEnQMySfe93yo1tj0OIvg=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-559-L5kQ7FcVOCKexI3GiJx2fA-1; Mon, 20 Sep 2021 10:10:45 -0400
+X-MC-Unique: L5kQ7FcVOCKexI3GiJx2fA-1
+Received: by mail-qv1-f72.google.com with SMTP id w10-20020a0cb54a000000b0037a9848b92fso183321033qvd.0
+        for <kvm@vger.kernel.org>; Mon, 20 Sep 2021 07:10:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=qzAdTsGqrarKrbZiLgQ+yqd08O5g2KPS2fQJ1adRAbE=;
-        b=c9TV4oJ6tjORfssV9HhgdbQwrb0hLi5JgqSnSYAArmyxQxcdIEy/huVAMiaRKeW16N
-         yJ5kA5vWwCcZpKJZuO+X9oaaulsDFL82pyk7QQvPmj7w68m1lC1PDOHogrFjtwkLWAxZ
-         kUIwI4s/Ab1m/zwlSN+P7WndJvJiUrWNpKpWmKryx3R7WaP04hDCj5ANWmHsdko9+TF7
-         tZvMhpLFZXhIuIHUDVQROsK18sxuOxfKPbVnvSCp2gtbwAk7zU+kc7mWPyAOP4osGibb
-         IOvZU02gewwOEUpKhlch7OY1/+p4fnw09bYdtQBNe5EFpXWrTUQFiYZVGG7rlP/2Wj3s
-         mJQQ==
-X-Gm-Message-State: AOAM533o6BY143VMw5jzmaA/lmjIPuOSXwWa2QcC0q06ZhUMXjMEW56m
-        DyKcDRqz2K5EFPbsMjlJ3yTAhWLttECkkWKt8D7OVg==
-X-Google-Smtp-Source: ABdhPJzcGkhhRgG63cEAKiVJaDA4QJ+7e3xmIVMV1M65aTlgH1dCw2yj+iWheoNkqPW9cH7sK0KJqPYXfV3EypeyiR4=
-X-Received: by 2002:a4a:b6c2:: with SMTP id w2mr17432044ooo.59.1632146971367;
- Mon, 20 Sep 2021 07:09:31 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=RbxjU0qTM37tjAGcJkV92O2IEWr+qZ+g6bo7srNL7rU=;
+        b=R8VYEV63YM1GkZ2ZZcE/pkZq01ldmnX1y1ZTVtPCE08Oep4iwyV/DgtGXtX/3rayHs
+         ZoQF2gIgepXTPJXMhstiqBjS4XZOu/YXU7jg1bWT66Pxk9zRcdpyNHryHoa0LbxZeuB2
+         GkeJQuQ2r2i9g08fjia783AsHL/kKDJZLJuad+PGrUjg7CEoui6Q7UPOBxqRMyYvcyeC
+         +nYLr2Xzuw7hOy2z8p3tMyzkJwTWyE10hphESD2frH05U/c2OxZCP0+bw47LoA5I6LtA
+         OCFzOu59CmYvrOw5QF1xWlhsyRgvcwFoIi9Ja8MoQz+jPy9rRr04rt7BpQ8Kjt5UuT6r
+         6uNw==
+X-Gm-Message-State: AOAM533D0E0jOUiAz3wbC/ut1TvU8pqLF8lqzlmhH1IC9NAloy/R9E/Q
+        IFFvYM7sFR0Dt3je1fdboYwDEK93cVAhDKHpoZPbltgHfMkkHJGP0qwA1YJp2O2bRXHeC9CfIzR
+        8L0HMEIhaZ0MD
+X-Received: by 2002:ac8:7d42:: with SMTP id h2mr22673698qtb.220.1632147044850;
+        Mon, 20 Sep 2021 07:10:44 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzWtW6bdXbF26ywHKskWeYY4oyhJXrq1VU07T3GfA9xT30QFw0t/ifo6u7f0E5c8BrMFZVPBg==
+X-Received: by 2002:ac8:7d42:: with SMTP id h2mr22673675qtb.220.1632147044667;
+        Mon, 20 Sep 2021 07:10:44 -0700 (PDT)
+Received: from gator (nat-pool-brq-u.redhat.com. [213.175.37.12])
+        by smtp.gmail.com with ESMTPSA id t5sm5678861qkj.61.2021.09.20.07.10.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 Sep 2021 07:10:43 -0700 (PDT)
+Date:   Mon, 20 Sep 2021 16:10:39 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Pierre Morel <pmorel@linux.ibm.com>,
+        Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org,
+        frankja@linux.ibm.com, david@redhat.com, cohuck@redhat.com,
+        imbrenda@linux.ibm.com
+Subject: Re: [kvm-unit-tests PATCH 1/2] Makefile: Fix cscope
+Message-ID: <20210920141039.jfb2iektdzdjldy5@gator>
+References: <1629908421-8543-1-git-send-email-pmorel@linux.ibm.com>
+ <1629908421-8543-2-git-send-email-pmorel@linux.ibm.com>
+ <1dd4c64e-3866-98c9-8178-dbff90dca55f@redhat.com>
+ <2aaffea2-0a20-1a6d-eebb-69b6cfe6e83c@linux.ibm.com>
+ <20210827102204.3y6gdpchn77cz7yo@gator.home>
+ <327ff7e0-82d8-a12d-7565-e476b1dbcca8@redhat.com>
 MIME-Version: 1.0
-References: <20210827101609.2808181-1-tabba@google.com> <20210827101609.2808181-2-tabba@google.com>
- <87pmt3v15x.wl-maz@kernel.org>
-In-Reply-To: <87pmt3v15x.wl-maz@kernel.org>
-From:   Fuad Tabba <tabba@google.com>
-Date:   Mon, 20 Sep 2021 15:08:54 +0100
-Message-ID: <CA+EHjTx3_rdfGn6d079ZG2W48eibknHiQyBZSCNyb9ukqHS63A@mail.gmail.com>
-Subject: Re: [PATCH v5 1/8] KVM: arm64: Pass struct kvm to per-EC handlers
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvmarm@lists.cs.columbia.edu, will@kernel.org, james.morse@arm.com,
-        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
-        mark.rutland@arm.com, christoffer.dall@arm.com,
-        pbonzini@redhat.com, drjones@redhat.com, oupton@google.com,
-        qperret@google.com, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kernel-team@android.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <327ff7e0-82d8-a12d-7565-e476b1dbcca8@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+On Mon, Sep 20, 2021 at 03:27:11PM +0200, Paolo Bonzini wrote:
+> On 27/08/21 12:22, Andrew Jones wrote:
+> > > 51b8f0b1 2017-11-23 Andrew Jones Makefile: fix cscope target
+> > No surprise there, that's when the $(PWD) use was first introduced.
+> > 
+> > > So I add Andrew as CC, I did forgot to do before.
+> > > 
+> > I'll send a patch changing $(PWD) to $(shell pwd)
+> 
+> I could not find the patch using $(CURDIR) in my mailbox, though I found
+> it on spinics.net.  I fudged the following
+> 
+> From 164507376abae4be15b0f65aa14d56f179198a99 Mon Sep 17 00:00:00 2001
+> From: Andrew Jones <drjones@redhat.com>
+> Date: Fri, 27 Aug 2021 12:31:15 +0200
+> Subject: [PATCH kvm-unit-tests] Makefile: Don't trust PWD
+> 
+> It's possible that PWD is already set to something which isn't
+> the full path of the current working directory. Let's use $(CURDIR)
+> instead, which is always correct.
+> 
+> Suggested-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> 
+> diff --git a/Makefile b/Makefile
+> index f7b9f28..6792b93 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -119,7 +119,7 @@ cscope: cscope_dirs = lib lib/libfdt lib/linux $(TEST_DIR) $(ARCH_LIBDIRS) lib/a
+>  cscope:
+>  	$(RM) ./cscope.*
+>  	find -L $(cscope_dirs) -maxdepth 1 \
+> -		-name '*.[chsS]' -exec realpath --relative-base=$(PWD) {} \; | sort -u > ./cscope.files
+> +		-name '*.[chsS]' -exec realpath --relative-base=$(CURDIR) {} \; | sort -u > ./cscope.files
+>  	cscope -bk
+>  .PHONY: tags
+> 
+> and queued it.
 
-> > diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> > index 0397606c0951..7cbff0ee59a5 100644
-> > --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> > +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> > @@ -163,7 +163,7 @@ static inline void __hyp_sve_restore_guest(struct kvm_vcpu *vcpu)
-> >   * If FP/SIMD is not implemented, handle the trap and inject an undefined
-> >   * instruction exception to the guest. Similarly for trapped SVE accesses.
-> >   */
-> > -static bool kvm_hyp_handle_fpsimd(struct kvm_vcpu *vcpu, u64 *exit_code)
-> > +static inline bool kvm_hyp_handle_fpsimd(struct kvm_vcpu *vcpu, u64 *exit_code)
->
-> No, please don't do that. We already have function pointers for each
-> of these, so by doing that you are forcing the compiler to emit the
-> code *twice*.
->
-> Instead, call into the relevant EC handler by using the base array
-> that already does the non-protected handling.
->
-...
-> > -static const exit_handler_fn *kvm_get_exit_handler_array(void);
-> > +const exit_handler_fn *kvm_get_exit_handler_array(struct kvm *kvm);
->
-> Why? What breaks if when this is static? There really shouldn't be
-> anything else referencing this array.
+Hi Paolo,
 
-For the two points above, the reason I did that is because later
-patches call these functions from the newly added
-arch/arm64/kvm/hyp/nvhe/sys_regs.c. That said, I think that the code
-that calls them more naturally belongs in
-arch/arm64/kvm/hyp/nvhe/switch.c instead.
+You'll get a conflict when you go to merge because I already did it :-)
 
-I'll fix that, rebase on 5.15-rc2, and respin.
+commit 3d4eb24cb5b4de6c26f79b849fe2818d5315a691 (origin/misc/queue, misc/queue)
+Author: Andrew Jones <drjones@redhat.com>
+Date:   Fri Aug 27 12:25:27 2021 +0200
+
+    Makefile: Don't trust PWD
+    
+    PWD comes from the environment and it's possible that it's already
+    set to something which isn't the full path of the current working
+    directory. Use the make variable $(CURDIR) instead.
+    
+    Reviewed-by: Pierre Morel <pmorel@linux.ibm.com>
+    Reviewed-by: Thomas Huth <thuth@redhat.com>
+    Suggested-by: Thomas Huth <thuth@redhat.com>
+    Signed-off-by: Andrew Jones <drjones@redhat.com>
+
+
+
+misc/queue is something I recently invented for stuff like this in order
+to help lighten your load a bit.
 
 Thanks,
-/fuad
+drew
 
-
-> Thanks,
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
