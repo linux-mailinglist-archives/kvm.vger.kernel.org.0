@@ -2,202 +2,185 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 28FD6411464
-	for <lists+kvm@lfdr.de>; Mon, 20 Sep 2021 14:28:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 60C1E411474
+	for <lists+kvm@lfdr.de>; Mon, 20 Sep 2021 14:30:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238038AbhITMaG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Sep 2021 08:30:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:42303 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233543AbhITMaF (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 20 Sep 2021 08:30:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632140918;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=bbQ8h/wkBS10Efo8Um8TUhVatac0+20cWgk++bQq2ME=;
-        b=UTNH7lvNmESK4ljGlSFUFOGM+eCvRooyeMqapeV67uMW5DR4nNtwWQD0g0cIIiH2CcTA0Q
-        tVNk2fBWpt6hKMERpq+70HA7Al+PfvBzGdWgF/1ISVaHLIMrF3svpLTyxspn7CLFRuwFLX
-        Rv3p0g92Y/zVcQVWW4GVwmNBiKyuSlY=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-370-HLvFKP9NMYmw5bZJHSuEOQ-1; Mon, 20 Sep 2021 08:28:37 -0400
-X-MC-Unique: HLvFKP9NMYmw5bZJHSuEOQ-1
-Received: by mail-wr1-f71.google.com with SMTP id r15-20020adfce8f000000b0015df1098ccbso5940948wrn.4
-        for <kvm@vger.kernel.org>; Mon, 20 Sep 2021 05:28:37 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=bbQ8h/wkBS10Efo8Um8TUhVatac0+20cWgk++bQq2ME=;
-        b=zuOZ4bZ2+lVDw5p6wmVIKm9BpnqnAGl+tcKwgrKrlKA9Iiwil2u8Om7a/502LgQST2
-         L7NXY4rfqACsHu9EC9t9y0lbzBS+Kf5QzSSXhKIUN+PZxPtLtF0Cwpj95seYa54UqBst
-         8HEFaEOOHCtzuxTCTSJPbasn403EmqvKi+/FZE9TUbvTreORQM/Ba5mF1SXE4bsX6AkN
-         ms5PmHu2xhcDxtA6bOAj5iGm9v0lf/EneePNi4rZnyz3zYjoVotaieDsmxBK86zLtGUS
-         h5FhnWpQeqttaSkl7th7EZDRggzHycM88xVEOdyAxId0K2i1RaD0o07L5mtrHt0zwYVu
-         pg9Q==
-X-Gm-Message-State: AOAM5332kxf1m9N4zn1gcpbxS0OeUidfTR+FI0HoC7IGwBifcsYmG2qp
-        5Gd9gaL26IBBjHzp9tYtlldvjzYtgDmaFeHxvTWnUNzQzXKC8pcvvrrfnGX69t+Owb+g77xn6zo
-        Z0+OZZTmYRxZk
-X-Received: by 2002:a05:6000:14d:: with SMTP id r13mr28662725wrx.420.1632140916058;
-        Mon, 20 Sep 2021 05:28:36 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxzOtn1g3FI6YAdIMt8FsZF+ei+aITEY4UXbrvUzTUEapa6XDjXm/kHFoQf2LfEEBBOLiZ3jw==
-X-Received: by 2002:a05:6000:14d:: with SMTP id r13mr28662707wrx.420.1632140915903;
-        Mon, 20 Sep 2021 05:28:35 -0700 (PDT)
-Received: from gator (nat-pool-brq-u.redhat.com. [213.175.37.12])
-        by smtp.gmail.com with ESMTPSA id a75sm16193423wmd.4.2021.09.20.05.28.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Sep 2021 05:28:35 -0700 (PDT)
-Date:   Mon, 20 Sep 2021 14:28:33 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Oliver Upton <oupton@google.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-arm-kernel@lists.infradead.org,
-        Will Deacon <will@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v8 9/9] selftests: KVM: Test vtimer offset reg in
- get-reg-list
-Message-ID: <20210920122833.wlo7xj4ckq4upjch@gator>
-References: <20210916181555.973085-1-oupton@google.com>
- <20210916181555.973085-10-oupton@google.com>
-MIME-Version: 1.0
+        id S238285AbhITMbt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Sep 2021 08:31:49 -0400
+Received: from mail-mw2nam10on2048.outbound.protection.outlook.com ([40.107.94.48]:43488
+        "EHLO NAM10-MW2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S238255AbhITMbs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Sep 2021 08:31:48 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ehj8icQXyFzVyLdMfUtntCdP5Mkr/9wEdxCh2QI3nYLJv47DL+gzLYe8vRKhwvkfZ51owv/oUzln1hfE8WE7mfjYG4s2AbngOyRI51fbx4tsDuq2Kum+0hZlZ+WHqU4q13SNekWg1harYssx5h4aWC2+59MDjJfVSViIFtgqcL6Fs78biiRaDBwDqHw1yyEevOT/gCmMbjqkJqOiomo56qCBeLsYn5/nbThGs2w30/gL3NN6e7wl6/7PQgGaLXMqMQ6x2XpbMwm9inTdHLmn8fLuPaJ8fy6kE46cjIHsHfR2swjDi/n5kweg2fSen4EsVP8GtO0/dAjISCcQJLh74Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
+ bh=IssaKHXOlL/5l0F6k2RTzUEkiUmlswMaQF/zqO0vG0M=;
+ b=lmgUAjwnxwiW0D3Lw2O3jPksH4nshdRIjE8BmXbN1UaZdPkQGyoXmS6W9UFJngGOCEjNsOm41lnOnG8Pa19iY2j3UElsAh+jh9xP1gNmThOz4zTgoJmLqiXOsko8fue8u+0dOMf0PtMIwVBDHcbTKGSDuv0UYADJTgwyTZlaY7Mkv0X1M8HpzgCR42qzObABT+wFEEyXCdruP69lN9SHRTe8L4LT1qdRoAqQhzBuc9lxjyISO/Mm17H8WccYKXZejWcoEmXM6zsoApNM3ejq351RWXVt4TRMevIaKmlWvV6DCl/Uu5RN1imgixPi65u62lfYrdMl290J5A1lZbScnQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=IssaKHXOlL/5l0F6k2RTzUEkiUmlswMaQF/zqO0vG0M=;
+ b=na2nzhjDmgZrskV1wjnLPwvp9IdaoI3wZR9RgIuUF1PvIAayzpelSX44SWrXWYCDv05zNHo7bKd4t4LRnEXDdp6ZFn9r20xwWvweEkgfaEFr5+LD9lw0o4uukiYLlQaUlSqoDdINH81MR/GfnpvSPvGI4ajiGUoUaNDj/cnjCH+fVrcFDm6cnacjOBYDbtsUSCtoDUsrIkVeJa1MnrnXaFlTYCezS6xf3K40X4ScbcX7sdiub0iqyJb9d/ZNcPtZYW2zdFHK7BuVhXsCG+DfuCJscRRDfHYRmpXGgUw7Q7PJsLrwC6rw/BFAWj8R+XWrPxJBedsFnsvsIQ7ICZhsZA==
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=nvidia.com;
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
+ by BL1PR12MB5304.namprd12.prod.outlook.com (2603:10b6:208:314::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4523.16; Mon, 20 Sep
+ 2021 12:30:20 +0000
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::e8af:232:915e:2f95]) by BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::e8af:232:915e:2f95%8]) with mapi id 15.20.4523.018; Mon, 20 Sep 2021
+ 12:30:20 +0000
+Date:   Mon, 20 Sep 2021 09:30:18 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     David Airlie <airlied@linux.ie>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        dri-devel@lists.freedesktop.org,
+        Eric Farman <farman@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
+        linux-s390@vger.kernel.org,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>, Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH v2 4/9] vfio/ccw: Make the FSM complete and synchronize
+ it to the mdev
+Message-ID: <20210920123018.GF327412@nvidia.com>
+References: <4-v2-7d3a384024cf+2060-ccw_mdev_jgg@nvidia.com>
+ <87zgs7fni1.fsf@redhat.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210916181555.973085-10-oupton@google.com>
+In-Reply-To: <87zgs7fni1.fsf@redhat.com>
+X-ClientProxiedBy: MN2PR15CA0038.namprd15.prod.outlook.com
+ (2603:10b6:208:237::7) To BL0PR12MB5506.namprd12.prod.outlook.com
+ (2603:10b6:208:1cb::22)
+MIME-Version: 1.0
+Received: from mlx.ziepe.ca (142.162.113.129) by MN2PR15CA0038.namprd15.prod.outlook.com (2603:10b6:208:237::7) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4523.14 via Frontend Transport; Mon, 20 Sep 2021 12:30:19 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1mSIR8-002upC-PD; Mon, 20 Sep 2021 09:30:18 -0300
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: c254cade-8a1c-4cda-6472-08d97c3268c5
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5304:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <BL1PR12MB530416AA84CE31D4F6C6D2D0C2A09@BL1PR12MB5304.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: YC6IdPbEWZqLMz59p/DdbFRsTaeRZqRe9Hb7ThZOnNuDLeas8hZknoOdiGgTGLH45RVyjp42LPjjvxN60FFY5V09q8dPX3Y3wLnaNZG98PDbEZhoI5v12IS6ikLKY7eIuITH/Il6Qkavlv8vCCZqiaBEiST4XdosREdvlJ4cACKOtMtEGnjeAcWogXvcyZ8mMbvbJyZUQ/0EGjC2eDD7sEEblZ42h/8bPAxKK9Z3n5V4gGQmOiIEk8T5pcQA3uZTuJ8bCcDJ3SQqnVZgme9OgGvQRAOkCJePvayFG9O1MMNkpfj+PCGr5wgokxmajw1yNpfaJjL4x6GWsR7K3Wjho4WvCHSLyn/VHP4R4z6jgAXzhFtUvXJ2ntUyWVEhCNdWYaDF+ai5iDcaL+UPXxUSXoZ9/AyVx97Lm1qGJwGLd0nwa3D3ImSS1ePzaXW9BX7TITxqrk4xXwJK0i4XvioJ2xjW9MLB8+HBY0EYS6W1jKkK5CFEwPYs3o3TdFNGVY5eTkvIFPg1myc7zXkvD9OclGIMIgycQfTi4MgKYgjrvXYxDgb4TAUJpdt8M5PewZPHJRVDyKUGcr9YRji/gKrrLW5yd6r+ACn8uvUUjw2E8cGn6FuDsHhfI3w+EmPsBXJ1HlTdG5HZcmFCfjaPGKbfl3aM3Jxo7eayhejEThoQ9aBR5pvC+sFCDyaB2i716Y9n3IMLJdAzJoxcG3dhS9W6rA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(346002)(136003)(376002)(396003)(366004)(36756003)(38100700002)(8676002)(5660300002)(83380400001)(54906003)(9786002)(478600001)(9746002)(7416002)(26005)(66946007)(2616005)(186003)(66556008)(86362001)(66476007)(6916009)(1076003)(426003)(4326008)(2906002)(316002)(8936002)(33656002)(27376004);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?c+DDouDLRV8yd13CEC0atE2mnc3Xy5WTvS8XHvZpjEwgj7Loi4p3WSNe2ZaS?=
+ =?us-ascii?Q?QUYupXl8dGTqYJBm7BZEVB2SLPjXjJ+aQDz5JBXdBulp2ruQO+5fAky6Xe6x?=
+ =?us-ascii?Q?vXTrAhudfLMlGuKD5Qxvwe5x6NtSIuSEOpAX/s66yLoix+ZPqvFbud+CK19f?=
+ =?us-ascii?Q?do8xVwIHsLssYe++g5pU4atrZDPKwKj1mUAuTe6JdcYtU7Ce85PxXRFYfeFL?=
+ =?us-ascii?Q?pPiC543jAk+YUl14YfjWQqUDUN74haqxlHctwGkfebI5HxM8d5d/ygxwDzbc?=
+ =?us-ascii?Q?TZ1UnJw+/xou/7hRvuJxiOcc83iLjMfmU7YfYThAs5tvbG8iYpGnuscWlY+B?=
+ =?us-ascii?Q?ncM0NYxZ0EpdkCf51WF7KQy9coKMHIdfrfrEoOckJL1ACK0kGKPfIrpP9hYi?=
+ =?us-ascii?Q?jj6rWxWg4eUKtwmRufETT1lcedrlGgI4fExQSdr5AknDhV7ViuN8o69joxbO?=
+ =?us-ascii?Q?Jq325G59SQCSLhjcJExgoeseVIH1mOX0zAskx9VD3+bdVu4bIacSmTfXLSt9?=
+ =?us-ascii?Q?awXKqBTWkPViu/sLrGoofl/R7GvkKPhngVoybReKGF3vchwR+Tv+2fe7hMNd?=
+ =?us-ascii?Q?WGbidh9rtah+R7U91YL8toTPel7BicnvFIsGw0kFignRLqOjZ4OT8pBdnhTI?=
+ =?us-ascii?Q?XfywzbdcZoZsodMrnlO0Whflg6I4YDllsXrLT1fafFPSoCx0Zttj0U94jWoC?=
+ =?us-ascii?Q?nprbGCgdZzLymJagaJicChkEhPPGjWRQ6AucPGGH9J50X9pFgBhErNY4P7Hg?=
+ =?us-ascii?Q?9PRtjwCqXB35+PGWxCc8xFulZGLNI0uy/MXtmx+15O+TX3qB7CRBsTynS0kT?=
+ =?us-ascii?Q?oyQqrnUtOB4um7UeCrt6W+X7KlaNc0aJ5fehHlAbi36EpM/oiomFRASZTRA3?=
+ =?us-ascii?Q?T0cwu8Rvb+FR47tQBDPexpJGM5ovg/iz09h1i8iLtGQV0EaPS4dNTwqCiR0P?=
+ =?us-ascii?Q?bJRrw1VNWZqreId+f9iEEsSic1dR14dBr3cZ8HFxw4+ih7yjwOasei4x+PBC?=
+ =?us-ascii?Q?qIIz9afAqQ34/TshufkmhrlnH/cJxZ8+QhLOrRRMNjrSn+wOqg2y/OFE5P+r?=
+ =?us-ascii?Q?QmNs3lZwO4k6QHrYAr3jpajDIirBScRQ/FfyeLYxjmlgSFR4ruDeITnjn5hI?=
+ =?us-ascii?Q?TLWvE9wvc085GDf+UG8mxVb2bJ7/9taZL/CMpnINqBdDBcSwghTuSuoiDGsG?=
+ =?us-ascii?Q?o0+QT+D8MBzXE4chdq+6b/th0CGMLO5JZoWog8wHO+Iv0a4eCtYCAFk6wCG9?=
+ =?us-ascii?Q?7nFl6V9r9loCpUgDvTRKNXh5WxJ7AKEVXcV7uQ8hz/ZCQHd6vG8vz9XtoJ4J?=
+ =?us-ascii?Q?aHa8CI1myG7syjUCg22VnWF1?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c254cade-8a1c-4cda-6472-08d97c3268c5
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Sep 2021 12:30:19.9881
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: FJr/WZ1e1EfiJwXbzSz0hUCWQG2jwLe+qXG0XML3VS0+2kIUxgtiN2m/gfuwg7qb
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5304
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 16, 2021 at 06:15:55PM +0000, Oliver Upton wrote:
-> Assert that KVM exposes KVM_REG_ARM_TIMER_OFFSET in the KVM_GET_REG_LIST
-> ioctl when userspace buys in to the new behavior.
+On Mon, Sep 20, 2021 at 02:19:18PM +0200, Cornelia Huck wrote:
+> On Thu, Sep 09 2021, Jason Gunthorpe <jgg@nvidia.com> wrote:
 > 
-> Signed-off-by: Oliver Upton <oupton@google.com>
-> ---
->  .../selftests/kvm/aarch64/get-reg-list.c      | 42 +++++++++++++++++++
->  1 file changed, 42 insertions(+)
+> > The subchannel should be left in a quiescent state unless the VFIO device
+> > FD is opened. When the FD is opened bring the chanel to active and allow
+> > the VFIO device to operate. When the device FD is closed then quiesce the
+> > channel.
+> >
+> > To make this work the FSM needs to handle the transitions to/from open and
+> > closed so everything is sequenced. Rename state NOT_OPER to BROKEN and use
+> > it wheneven the driver has malfunctioned. STANDBY becomes CLOSED. The
+> > normal case FSM looks like:
+> >     CLOSED -> IDLE -> PROCESS/PENDING* -> IDLE -> CLOSED
+> >
+> > With a possible branch off to BROKEN from any state. Once the device is in
+> > BROKEN it cannot be recovered other than be reloading the driver.
 > 
-> diff --git a/tools/testing/selftests/kvm/aarch64/get-reg-list.c b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-> index cc898181faab..4f337d8b793a 100644
-> --- a/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-> +++ b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-> @@ -40,6 +40,7 @@ static __u64 *blessed_reg, blessed_n;
->  struct reg_sublist {
->  	const char *name;
->  	long capability;
-> +	long enable_capability;
+> Hm, not sure whether it is a good idea to conflate "something went
+> wrong" and "device is not operational". 
 
-cap.cap is a __u32
+Yes, but that is exactly what this FSM is currently doing, NO_OPER is
+a dumping ground for all kinds of wonky stuff, and what exactly it is
+supposed to mean or do is unclear.
 
->  	int feature;
->  	bool finalize;
->  	__u64 *regs;
-> @@ -397,6 +398,19 @@ static void check_supported(struct vcpu_config *c)
->  	}
->  }
->  
-> +static void enable_caps(struct kvm_vm *vm, struct vcpu_config *c)
-> +{
-> +	struct kvm_enable_cap cap = {0};
-> +	struct reg_sublist *s;
-> +
-> +	for_each_sublist(c, s) {
-> +		if (s->enable_capability) {
-> +			cap.cap = s->enable_capability;
-> +			vm_enable_cap(vm, &cap);
-> +		}
-> +	}
-> +}
-> +
->  static bool print_list;
->  static bool print_filtered;
->  static bool fixup_core_regs;
-> @@ -412,6 +426,8 @@ static void run_test(struct vcpu_config *c)
->  	check_supported(c);
->  
->  	vm = vm_create(VM_MODE_DEFAULT, DEFAULT_GUEST_PHY_PAGES, O_RDWR);
-> +	enable_caps(vm, c);
-> +
->  	prepare_vcpu_init(c, &init);
->  	aarch64_vcpu_add_default(vm, 0, &init, NULL);
->  	finalize_vcpu(vm, 0, c);
-> @@ -1014,6 +1030,10 @@ static __u64 sve_rejects_set[] = {
->  	KVM_REG_ARM64_SVE_VLS,
->  };
->  
-> +static __u64 vtimer_offset_regs[] = {
-> +	KVM_REG_ARM_TIMER_OFFSET,
-> +};
-> +
->  #define BASE_SUBLIST \
->  	{ "base", .regs = base_regs, .regs_n = ARRAY_SIZE(base_regs), }
->  #define VREGS_SUBLIST \
-> @@ -1025,6 +1045,10 @@ static __u64 sve_rejects_set[] = {
->  	{ "sve", .capability = KVM_CAP_ARM_SVE, .feature = KVM_ARM_VCPU_SVE, .finalize = true, \
->  	  .regs = sve_regs, .regs_n = ARRAY_SIZE(sve_regs), \
->  	  .rejects_set = sve_rejects_set, .rejects_set_n = ARRAY_SIZE(sve_rejects_set), }
-> +#define VTIMER_OFFSET_SUBLIST \
-> +	{ "vtimer_offset", .capability = KVM_CAP_ARM_VTIMER_OFFSET, \
-> +	  .enable_capability = KVM_CAP_ARM_VTIMER_OFFSET, .regs = vtimer_offset_regs, \
-> +	  .regs_n = ARRAY_SIZE(vtimer_offset_regs), }
->  
->  static struct vcpu_config vregs_config = {
->  	.sublists = {
-> @@ -1041,6 +1065,14 @@ static struct vcpu_config vregs_pmu_config = {
->  	{0},
->  	},
->  };
-> +static struct vcpu_config vregs_vtimer_config = {
-> +	.sublists = {
-> +	BASE_SUBLIST,
-> +	VREGS_SUBLIST,
-> +	VTIMER_OFFSET_SUBLIST,
-> +	{0},
-> +	},
-> +};
->  static struct vcpu_config sve_config = {
->  	.sublists = {
->  	BASE_SUBLIST,
-> @@ -1056,11 +1088,21 @@ static struct vcpu_config sve_pmu_config = {
->  	{0},
->  	},
->  };
-> +static struct vcpu_config sve_vtimer_config = {
-> +	.sublists = {
-> +	BASE_SUBLIST,
-> +	SVE_SUBLIST,
-> +	VTIMER_OFFSET_SUBLIST,
-> +	{0},
-> +	},
-> +};
->  
->  static struct vcpu_config *vcpu_configs[] = {
->  	&vregs_config,
->  	&vregs_pmu_config,
-> +	&vregs_vtimer_config,
->  	&sve_config,
->  	&sve_pmu_config,
-> +	&sve_vtimer_config,
->  };
->  static int vcpu_configs_n = ARRAY_SIZE(vcpu_configs);
-> -- 
-> 2.33.0.464.g1972c5931b-goog
->
+> while the former case could mean all kind of
+> things, but the subchannel will likely stay around. I think NOT_OPER
+> was always meant to be a transitional state.
 
-Other than the enable_capability type nit
+Then these sorts of failures should recover the device and FSM back to
+an appropriate operational state and keep going - but I'm not going to
+attempt to guess when each of the conditions are recoverable or not.
 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
- 
+> > Delete the triply redundant calls to
+> > vfio_ccw_sch_quiesce(). vfio_ccw_mdev_close_device() always leaves the
+> > subchannel quiescent. vfio_ccw_mdev_remove() cannot return until
+> > vfio_ccw_mdev_close_device() completes and vfio_ccw_sch_remove() cannot
+> > return until vfio_ccw_mdev_remove() completes. Have the FSM code take care
+> > of calling cp_free() when appropriate.
+> 
+> I remember some serialization issues wrt cp_free() etc. coming up every
+> now and than; that might need extra care (I'm taking a look.)
 
+I'm not too surprised, things like NOT_OPER just exiting the usual FSM
+logic mean stuff couldn't be properly sequenced.
+
+The new logic puts a cp_free in each of arcs entering the terminal
+states broken/closed and all the flows that would get us to
+vfio_ccw_mdev_remove() will enter one of those states.
+
+It is quite possible this patch needs someone who actually understand
+this HW to polish it up - the point was to show how ccw should be
+cleanly structured. I'd like to go ahead with the other patches and
+leave this for the ccw maintainers if it is needs significant
+work. The other patches are what are blocking the core code cleanups.
+
+Jason
