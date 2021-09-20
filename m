@@ -2,149 +2,280 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 27DBA412959
-	for <lists+kvm@lfdr.de>; Tue, 21 Sep 2021 01:21:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8D484412ADD
+	for <lists+kvm@lfdr.de>; Tue, 21 Sep 2021 04:00:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240262AbhITXXQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Sep 2021 19:23:16 -0400
-Received: from mail-dm6nam10on2077.outbound.protection.outlook.com ([40.107.93.77]:53297
-        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S232608AbhITXVP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Sep 2021 19:21:15 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=QsE7Gt/Uwou63tVxLqGKCbn7K7KKJae3nqTyFOZ65dnEBiCxuQshEK3vmA3EbF1A7IM0k9pZXDU1vwhStY6zfolYX7yIJdbWxWq4uCbS2iQm8b/dOHSpWcKZ5sFKSRtHdhp8R27DfTtNCU9/ykh2upoEul0zc5uSFVeNLD6hO72B9vsA2JKXBnEqPZaYqKdVfkjk7tfdCJqqWXNQ7GexFTP6fndXIpSt7EP3s0FQH8u8ae6l5Gd1fboyr7mQr57h1D+SphLYYu2+i8XCFNxl/QT3XqmQfDgh49jc9AfRxybPYB1dDCFnQBMUSEp1wRCX5RQ3NAjrq6HKbUcbWCEqmw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
- bh=43IBSeo0W3Ec+FNkmCphNKVWn3E33oerX3fYDSN5M0I=;
- b=SlhUdNy1XLiJDhjjku8GafE2GhWDaWXX7Akbrfxn0f1g6sNxxGwtNzUriotZRDnj2ex6VwK5iAl4RI0NalWgYptmA2WQB0tTDb6S2f+0KUTmwAfarA0AbOrhDNmD1qOWn4Lp8SXYYUlZuuZCKK+sf6ZeecOTb1XQ7KcFboraz3Jf/yL5xbVjOFnGtGqql4y9XOYQFRIKj/XL1oZAnFndq5nO4xz6TggL7RF8tmeL+g19U2cglZzEXk2lLGYQCMT8+8t9RECC5BcAzQ4PdR+RgRvtRh0RXeLJfiCZYwBWYC1I2HiQ/1a2pG7VcFr4/3r2Wwwlb0mX+CNkca5eeq7tJA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=43IBSeo0W3Ec+FNkmCphNKVWn3E33oerX3fYDSN5M0I=;
- b=PP+b3oqP3Co9YqZMuR39j3/vMceKTioVgYmJrX+HXN1+OB0Qj4yUJ7ARABMXa9YGUnN1PZ2xsGbDyaxnlYtdYahPxi9dQ5URc+VXnV9ZDHMzk+3IVQ+Osuz0xBP8oSSgUBLDwpMfF/AY+I+OI81iuiZupnK91G4QLZPeMidFYqNxPVLNgkFL8t0RYqOWrfVBLTJXwamg6YHCXtsfaWhl9A8BU+psXZhkvs1770rWvGM2mgu3dyKLuNqbOqDWmc1nI1rleka4Ch28TjOW1XuTnUb8Ieq8mGy7X/25GzJnF2i4A2sCq5R1cl79AMn7pTa8xX9geYUuP87KdzYWcrVjiA==
-Authentication-Results: linux.ibm.com; dkim=none (message not signed)
- header.d=none;linux.ibm.com; dmarc=none action=none header.from=nvidia.com;
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
- by BL1PR12MB5255.namprd12.prod.outlook.com (2603:10b6:208:315::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4523.14; Mon, 20 Sep
- 2021 23:19:46 +0000
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::e8af:232:915e:2f95]) by BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::e8af:232:915e:2f95%8]) with mapi id 15.20.4523.018; Mon, 20 Sep 2021
- 23:19:46 +0000
-Date:   Mon, 20 Sep 2021 20:19:45 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Tony Krowiak <akrowiak@linux.ibm.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        linux-s390@vger.kernel.org, Halil Pasic <pasic@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Christoph Hellwig <hch@lst.de>, kvm@vger.kernel.org
-Subject: Re: [PATCH v2] vfio/ap_ops: Add missed vfio_uninit_group_dev()
-Message-ID: <20210920231945.GG327412@nvidia.com>
-References: <0-v2-25656bbbb814+41-ap_uninit_jgg@nvidia.com>
- <20210916125130.2db0961e.alex.williamson@redhat.com>
- <ee2a0623-84d5-8c21-cc40-de5991ff94b1@linux.ibm.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ee2a0623-84d5-8c21-cc40-de5991ff94b1@linux.ibm.com>
-X-ClientProxiedBy: MN2PR05CA0062.namprd05.prod.outlook.com
- (2603:10b6:208:236::31) To BL0PR12MB5506.namprd12.prod.outlook.com
- (2603:10b6:208:1cb::22)
+        id S229985AbhIUCB4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Sep 2021 22:01:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59964 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232993AbhIUBmG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Sep 2021 21:42:06 -0400
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D9C8C05BD17
+        for <kvm@vger.kernel.org>; Mon, 20 Sep 2021 14:01:08 -0700 (PDT)
+Received: by mail-pl1-x630.google.com with SMTP id j14so4777281plx.4
+        for <kvm@vger.kernel.org>; Mon, 20 Sep 2021 14:01:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=gMqOitjzmCQqPLydZxrgluXOWmrPfX3VRNVeCUVBy3o=;
+        b=GX4yoFsrVJpe0FdNIt2y8W4WSc4Y8bWLY7KijA99Vuch9COJF7Ig4MqXcWat3byzTC
+         +8xWx/2KlW6RzOLl/6W5IHqhL9TtkpTHpkTGAGIccc4ZtLjPXR+/SOJNkSQJbFq7esPP
+         434AxG2LOS5BckxSdNf3rf9MxPnzzfqkek4JaGNhHrzGOWmAQNkAvwGTZB51LhI22hvC
+         UMHVf8abdSVeQ/1mZCSwMCh/22L14HGjHgYMLNLC8Gsp7TZ9BlHGTHmrg4WdoFzcLdiG
+         80rrD6qxAFUcHTHEKNTW10PJbhskK8bcNcPzvuK8+i0IDHAvU+b+hUPZZjXP7Kw+PL+q
+         lKTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=gMqOitjzmCQqPLydZxrgluXOWmrPfX3VRNVeCUVBy3o=;
+        b=CrrduoL/5KJPH+v7h+tpmq9YFKAPW+J3Z904xi+ISX2auK7MDEvvJTA2E0PpCX2/Iu
+         HBWiRAU7suIsFOvhUAeFDIJ997dyUwX3+//R63MShJkUfzSquumOtC3lT6rlI5n5bXfW
+         ReEL33UQSQD5FpnXYoufjKtqI6jrJM+mywNd8iq/b9t1TDGyx6ZBfGoHgRJxJkFB0JEt
+         myiJqp9AxTEqYArIaK3NloKj2Qyh1fD9BGm5koTSb8VIlcbwpMJuQV7yQzxC2vcZvN0/
+         FlxE0Ww8PjmiknQkAF8ZX/S/+O6eqzQdSwZJCD4EnpZI3EvDGb4oVWa3uvFmt+3V8p81
+         D4Mw==
+X-Gm-Message-State: AOAM532YyzdR3/2uKRQAdPvfTRDpkgxNo7OOW4v2XPARcepPgwnD3ppY
+        99oGBpHZ7XfaF9mjN3i4TZRG2Q==
+X-Google-Smtp-Source: ABdhPJyg3oB/XzSpT9Kkd+vPQhvlDdWGP5AoHUUrvfiOBaz7mm7f66cwqigRfT7nvvS33rGlIkUing==
+X-Received: by 2002:a17:902:bb81:b0:12d:a7ec:3d85 with SMTP id m1-20020a170902bb8100b0012da7ec3d85mr24339535pls.17.1632171667403;
+        Mon, 20 Sep 2021 14:01:07 -0700 (PDT)
+Received: from google.com (150.12.83.34.bc.googleusercontent.com. [34.83.12.150])
+        by smtp.gmail.com with ESMTPSA id g15sm2970307pfu.155.2021.09.20.14.01.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 Sep 2021 14:01:06 -0700 (PDT)
+Date:   Mon, 20 Sep 2021 14:01:03 -0700
+From:   Ricardo Koller <ricarkol@google.com>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     Eric Auger <eric.auger@redhat.com>, kvm@vger.kernel.org,
+        maz@kernel.org, kvmarm@lists.cs.columbia.edu, drjones@redhat.com,
+        Paolo Bonzini <pbonzini@redhat.com>, oupton@google.com,
+        james.morse@arm.com, suzuki.poulose@arm.com, shuah@kernel.org,
+        jingzhangos@google.com, pshier@google.com, rananta@google.com,
+        reijiw@google.com
+Subject: Re: [PATCH 1/2] KVM: arm64: vgic: check redist region is not above
+ the VM IPA size
+Message-ID: <YUj2j1tU/AVNlVh9@google.com>
+References: <20210908210320.1182303-1-ricarkol@google.com>
+ <20210908210320.1182303-2-ricarkol@google.com>
+ <b368e9cf-ec28-1768-edf9-dfdc7fa108f8@arm.com>
+ <YTo6kX7jGeR3XvPg@google.com>
+ <5eb41efd-2ff2-d25b-5801-f4a56457a09f@arm.com>
+ <80bdbdb3-1bff-aa99-c49b-76d6bd960aa9@redhat.com>
+ <YTuytfGTDlaoz0yH@google.com>
+ <cc916884-9b76-9784-c3ce-3469cb7682ab@arm.com>
+ <YUAVDfuSbG35WEOR@google.com>
+ <1906a1cf-3fb5-0ecf-4422-bef1ac6eef90@arm.com>
 MIME-Version: 1.0
-Received: from mlx.ziepe.ca (142.162.113.129) by MN2PR05CA0062.namprd05.prod.outlook.com (2603:10b6:208:236::31) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4544.7 via Frontend Transport; Mon, 20 Sep 2021 23:19:46 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1mSSZd-0037cE-Gv; Mon, 20 Sep 2021 20:19:45 -0300
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: e077c65e-06fb-4e87-6b31-08d97c8d22c2
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5255:
-X-Microsoft-Antispam-PRVS: <BL1PR12MB5255D92F9006B71CAA514046C2A09@BL1PR12MB5255.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: XAnCWvgvVD0dv9qlZySsI75EomNNcc6Iuwb77nFSN9wg1n/PFHisoBo2nDcK5140IGDJifzX58UMdbFxOla3VS5x1wdpUWGCMRY+Bicd/aYTCqebMriotyGNNzBfqhfQYli2Wv1DfjTWAeYUsdF0/c4ghZm+QIsmJkaZpafFhB1zer5p23roo+gD4YQbyXeVFa7aflWGIUaki59p6zhFH6jwkAhJ0XV1Yq1T9aZP2vBiRCmzPzZAkDevekYtp2tr0S/XMejCVhqnanw+F03qMEfVYxsQf8zxPlVSm9tS7li+Z3jcGy8eXtR/nKzeuGotYx2Kb+IriFxIrX1vYMRC3aGa7kkLjP/pim9aIU5NUReulycAU1Vg37XICEo0Fqy6gNbAVrNvxcy1m89KEeRJYhJo1SmDZ6FGupu0iMbnIPXIkn+CuD6eIL6XEjtsfnypcJt98ExFI1j35T6TEZO46ZfoC2SgVVrAIgPxmKwBVG1rNOACv3dzIMtzEOHER5VCVlt/3H7pzIwJ8xLEZo4YJbrwfC0oqP43hrQco5yH77RGcOVzgGDVUVfDByzb/Ej0GSr5IKnwg3LJh214UdsQtZrzMIBBTKuulnAHH52ofkgmJggjzlgywgFX+w2ASsKDCBfCnASnRcW/40asNo9hshCAUMjIMbMhxVUzAnQdvku5TRJFVOHoJnLoXjnCDqaHqTGF8b8V7pVap+Ivr+qfbQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(7416002)(508600001)(66476007)(66556008)(66946007)(6916009)(36756003)(1076003)(83380400001)(33656002)(2906002)(8676002)(426003)(53546011)(2616005)(9786002)(9746002)(186003)(38100700002)(8936002)(54906003)(86362001)(5660300002)(4326008)(316002)(26005)(27376004);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?aIsB3WiUGCRqlPCpMs6v7UTzLH1GfXzn5qIC922RJnjVhyHEs1cdRuUFNgku?=
- =?us-ascii?Q?dG6mFyXf/buKVU8PbXrN+HPFkG8XD5aRt5tZXzTeAsk0Xsi+gY968ot2+Yas?=
- =?us-ascii?Q?pUa/rJk2TfoGek28u1OVR3T0Cjb5KaLjrmMhGdZkEb0cjCeLLbuqxidHrJlX?=
- =?us-ascii?Q?0oizVPwk5cBCCkSc9usUokavoRMh2YaBIci6bJsv0rSk/W6v7mokF8m50iP8?=
- =?us-ascii?Q?XugWv760u9Ysw72SRbxJwWIYnFL4oG9tgR/T1SX0IlSmNLil/+WHnL24ONKY?=
- =?us-ascii?Q?K2YCtDkr9ilcDlSg0VBIS6KJ6uvDB+Pe/m64pOiN20Kcy2RTZqGfLLXrEABJ?=
- =?us-ascii?Q?3Ra9Zl58t0iDP5gcH1fOiUKggepbbNYJuME6w6BgzpQxqI0dpt+DVxDLdSmh?=
- =?us-ascii?Q?ab5i8PJ2fqWGKQYJNdpkoMD2D9XaWnRaVANc7Yqo8io41taZZOQXK3fwMsW8?=
- =?us-ascii?Q?vFHDxe6RayornqA+6wHP4yPFiGfVvF+iQS1jv3y8XUkVfhVSE6sMTCQSC3pB?=
- =?us-ascii?Q?kSTHbQl/h0Q0+dbXNUAo0aTc0wZpUbSgIhdPGlB4urs3tmGGl6cCQR6RKq8/?=
- =?us-ascii?Q?+9ajIpyhYDNU+LyYIVTWqt0krN3gJS1iCaO+n8+SYSk4Pu9dOrtW090PCgBd?=
- =?us-ascii?Q?USyO6sxeMMpEU4bMymipBrgoGJLwEGaZy5QQffRd7NiOSVKaGPXhpzXWUxzM?=
- =?us-ascii?Q?EytQkI5ANmDi/bYH/RjDFuxtldLGP5nl6LSS+RdT67FZej0VdCm5suf6Lpv5?=
- =?us-ascii?Q?+VquspxMwOoksl8XUSPeJHpzJrKsF6oA18GipPrlbbWJNVVO6G5m9hsY3kJ+?=
- =?us-ascii?Q?3eaWWYTTrhfTPiROencvmbDKEV2dUL+G+kdqKQ9QeQxTrXBc4/TSX3H1Klgn?=
- =?us-ascii?Q?z8XFVRe9F1j/8FqiMQXKca++pHkflOQ9kY2QgZq667GPcdLSnDmn2uK4MCHg?=
- =?us-ascii?Q?P+gDa2eJ+BH3YjBv9gaE4F7HXhAI+QB3UGb8ZQTGMp5QchSD9TJ9JELUHgT8?=
- =?us-ascii?Q?pZxqNeZmxCocm3x5G0n8d57TcqAfQZUJrAcfpdLtikpebVyDqLJmTTSVuRuD?=
- =?us-ascii?Q?Mz8qZ0ZNv1b6BvlJtD6ZsVY7aSl8AWWobWrIoo1ry+3ibnOmu/gJs6vS5n/5?=
- =?us-ascii?Q?jKMLMzhAygxNKlOKPEyr2xPLdOZXEn92Eb/+a4puSXSTOL/9qW3LmwYCIdZM?=
- =?us-ascii?Q?Nsg0zeAFWbPmmSJa0bn8FYykOHjW3nJddKwZg0ek65w1gfOPFVomigUrxr2N?=
- =?us-ascii?Q?gqW4hrTS15xU0P1Y8NFUfxX8AGzfbCVKCgUkCAoFtuDkKEvIVhIa3PEohOvc?=
- =?us-ascii?Q?s9kIzwLsWr69ZfSR7uLGZ/yf?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e077c65e-06fb-4e87-6b31-08d97c8d22c2
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Sep 2021 23:19:46.6349
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: g9bXjfuLcKOf6JcAgA5pONCDCP/iPPJIcR/W0O4YeyRTdxY1o8VQ6cMS9SpLiKSK
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5255
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <1906a1cf-3fb5-0ecf-4422-bef1ac6eef90@arm.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 20, 2021 at 05:26:25PM -0400, Tony Krowiak wrote:
+On Tue, Sep 14, 2021 at 12:00:35PM +0100, Alexandru Elisei wrote:
+> Hi Ricardo,
 > 
+> (adding kvm@vger.kernel.org to CC because the email this is a reply to got
+> rejected because of html content)
 > 
-> On 9/16/21 2:51 PM, Alex Williamson wrote:
-> > On Fri, 10 Sep 2021 20:06:30 -0300
-> > Jason Gunthorpe <jgg@nvidia.com> wrote:
-> > 
-> > > Without this call an xarray entry is leaked when the vfio_ap device is
-> > > unprobed. It was missed when the below patch was rebased across the
-> > > dev_set patch.
-> > > 
-> > > Fixes: eb0feefd4c02 ("vfio/ap_ops: Convert to use vfio_register_group_dev()")
-> > > Reviewed-by: Christoph Hellwig <hch@lst.de>
-> > > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> > >   drivers/s390/crypto/vfio_ap_ops.c | 2 ++
-> > >   1 file changed, 2 insertions(+)
-> > Hi Tony, Halil, Jason (H),
-> > 
-> > Any acks for this one?  Thanks,
-> > 
-> > Alex
+> On 9/14/21 04:20, Ricardo Koller wrote:
+> > Hi Alexandru, Eric,
+> >
+> > On Mon, Sep 13, 2021 at 11:15:33AM +0100, Alexandru Elisei wrote:
+> >> Hi Eric, Ricardo,
+> >>
+> >> On 9/10/21 20:32, Ricardo Koller wrote:
+> >>> Hi Alexandru and Eric,
+> >>>
+> >>> On Fri, Sep 10, 2021 at 10:42:23AM +0200, Eric Auger wrote:
+> >>>> Hi Alexandru,
+> >>>>
+> >>>> On 9/10/21 10:28 AM, Alexandru Elisei wrote:
+> >>>>> Hi Ricardo,
+> >>>>>
+> >>>>> On 9/9/21 5:47 PM, Ricardo Koller wrote:
+> >>>>>> On Thu, Sep 09, 2021 at 11:20:15AM +0100, Alexandru Elisei wrote:
+> >>>>>>> Hi Ricardo,
+> >>>>>>>
+> >>>>>>> On 9/8/21 10:03 PM, Ricardo Koller wrote:
+> >>>>>>>> Extend vgic_v3_check_base() to verify that the redistributor regions
+> >>>>>>>> don't go above the VM-specified IPA size (phys_size). This can happen
+> >>>>>>>> when using the legacy KVM_VGIC_V3_ADDR_TYPE_REDIST attribute with:
+> >>>>>>>>
+> >>>>>>>>   base + size > phys_size AND base < phys_size
+> >>>>>>>>
+> >>>>>>>> vgic_v3_check_base() is used to check the redist regions bases when
+> >>>>>>>> setting them (with the vcpus added so far) and when attempting the first
+> >>>>>>>> vcpu-run.
+> >>>>>>>>
+> >>>>>>>> Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> >>>>>>>> ---
+> >>>>>>>>  arch/arm64/kvm/vgic/vgic-v3.c | 4 ++++
+> >>>>>>>>  1 file changed, 4 insertions(+)
+> >>>>>>>>
+> >>>>>>>> diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
+> >>>>>>>> index 66004f61cd83..5afd9f6f68f6 100644
+> >>>>>>>> --- a/arch/arm64/kvm/vgic/vgic-v3.c
+> >>>>>>>> +++ b/arch/arm64/kvm/vgic/vgic-v3.c
+> >>>>>>>> @@ -512,6 +512,10 @@ bool vgic_v3_check_base(struct kvm *kvm)
+> >>>>>>>>  		if (rdreg->base + vgic_v3_rd_region_size(kvm, rdreg) <
+> >>>>>>>>  			rdreg->base)
+> >>>>>>>>  			return false;
+> >>>>>>>> +
+> >>>>>>>> +		if (rdreg->base + vgic_v3_rd_region_size(kvm, rdreg) >
+> >>>>>>>> +			kvm_phys_size(kvm))
+> >>>>>>>> +			return false;
+> >>>>>>> Looks to me like this same check (and the overflow one before it) is done when
+> >>>>>>> adding a new Redistributor region in kvm_vgic_addr() -> vgic_v3_set_redist_base()
+> >>>>>>> -> vgic_v3_alloc_redist_region() -> vgic_check_ioaddr(). As far as I can tell,
+> >>>>>>> kvm_vgic_addr() handles both ways of setting the Redistributor address.
+> >>>>>>>
+> >>>>>>> Without this patch, did you manage to set a base address such that base + size >
+> >>>>>>> kvm_phys_size()?
+> >>>>>>>
+> >>>>>> Yes, with the KVM_VGIC_V3_ADDR_TYPE_REDIST legacy API. The easiest way
+> >>>>>> to get to this situation is with the selftest in patch 2.  I then tried
+> >>>>>> an extra experiment: map the first redistributor, run the first vcpu,
+> >>>>>> and access the redist from inside the guest. KVM didn't complain in any
+> >>>>>> of these steps.
+> >>>>> Yes, Eric pointed out that I was mistaken and there is no check being done for
+> >>>>> base + size > kvm_phys_size().
+> >>>>>
+> >>>>> What I was trying to say is that this check is better done when the user creates a
+> >>>>> Redistributor region, not when a VCPU is first run. We have everything we need to
+> >>>>> make the check when a region is created, why wait until the VCPU is run?
+> >>>>>
+> >>>>> For example, vgic_v3_insert_redist_region() is called each time the adds a new
+> >>>>> Redistributor region (via either of the two APIs), and already has a check for the
+> >>>>> upper limit overflowing (identical to the check in vgic_v3_check_base()). I would
+> >>>>> add the check against the maximum IPA size there.
+> >>>> you seem to refer to an old kernel as vgic_v3_insert_redist_region was
+> >>>> renamed into� vgic_v3_alloc_redist_region in
+> >>>> e5a35635464b kvm: arm64: vgic-v3: Introduce vgic_v3_free_redist_region()
+> >>>>
+> >>>> I think in case you use the old rdist API you do not know yet the size
+> >>>> of the redist region at this point (count=0), hence Ricardo's choice to
+> >>>> do the check latter.
+> >>> Just wanted to add one more detail. vgic_v3_check_base() is also called
+> >>> when creating the redistributor region (via vgic_v3_set_redist_base ->
+> >>> vgic_register_redist_iodev). This patch reuses that check for the old
+> >>> redist API to also check for "base + size > kvm_phys_size()" with a size
+> >>> calculated using the vcpus added so far.
+> >> @Eric: Indeed I was looking at an older kernel by mistake, thank you for pointing
+> >> that out!
+> >>
+> >> Thank you both for the explanations, the piece I was missing was the fact that
+> >> KVM_VGIC_V3_ADDR_TYPE_REDIST specifies only the base address and the limit for the
+> >> region is the number of VCPUs * (KVM_VGIC_V3_REDIST_SIZE = 128K), which makes it
+> >> necessary to have the check when each VCPU is first run (as far as I can tell,
+> >> VCPUs can be created at any time).
+> >>
+> >>>>> Also, because vgic_v3_insert_redist_region() already checks for overflow, I
+> >>>>> believe the overflow check in vgic_v3_check_base() is redundant.
+> >>>>>
+> >>> It's redundant for the new redist API, but still needed for the old
+> >>> redist API.
+> >> Indeed.
+> >>
+> >>>>> As far as I can tell, vgic_v3_check_base() is there to make sure that the
+> >>>>> Distributor doesn't overlap with any of the Redistributors, and because the
+> >>>>> Redistributors and the Distributor can be created in any order, we defer the check
+> >>>>> until the first VCPU is run. I might be wrong about this, someone please correct
+> >>>>> me if I'm wrong.
+> >>>>>
+> >>>>> Also, did you verify that KVM is also doing this check for GICv2? KVM does
+> >>>>> something similar and calls vgic_v2_check_base() when mapping the GIC resources,
+> >>>>> and I don't see a check for the maximum IPA size in that function either.
+> >>>> I think vgic_check_ioaddr() called in kvm_vgic_addr() does the job (it
+> >>>> checks the base @)
+> >>>>
+> >>> It seems that GICv2 suffers from the same problem. The cpu interface
+> >>> base is checked but the end can extend above IPA size. Note that the cpu
+> >>> interface is 8KBs and vgic_check_ioaddr() is only checking that its base
+> >> ... except that the doc for KVM_VGIC_V2_ADDR_TYPE_CPU says that the CPU interface
+> >> region is 4K, while the check in vgic_v2_check_base() is done against
+> >> KVM_VGIC_V2_CPU_SIZE, which is 8K.
+> > The "GIC virtual CPU interface" alone is slightly more than 4K: GICV_DIR
+> > is at 0x1000. The documentation might need to be updated.
+> >
+> >> I suppose that the CPU interface region is 8K
+> >> because ARM IHI 0048B.b strongly recommends that the virtual CPU interface control
+> >> registers are in a separate 4KB region, and KVM wants to emulate a GICv2 as close
+> >> to the real thing as possible?
+> > Are the "virtual CPU interface control" registers the ones starting with
+> > GICH_? If yes, then I'm a bit confused, as those are not exposed to the
+> > guest (to my knowledge).
 > 
-> I installed this on a test system running the latest linux
-> code from our library and ran our test suite. I got the
-> following running a simple test case that assigns some
-> adapters and domains to a mediated device then
-> starts a guest using the mdev.
+> Yes, those are the ones, and I also did find that they are not exposed to the guest.
+> 
+> Comparing the KVM documentation with what KVM actually does, I assumed that the
+> 8KB was a forward looking decision, in case nested virtualization will support
+> GICv2, which means that the GICH_* registers would also have to be exposed. Making
+> the CPU interface for a CPU 8KB from the start would avoid changes or additions to
+> the API if that happens.
+> 
+> However, after further digging through the spec, I found that the virtual CPU
+> interface is specified to be 8KB (Table 5-10 of ARM IHI 0048B.b). I think that's
+> the reason KVM treats it as 8KB.
 
-Oh, neat. There is no reason for this stuff to be in the
-matrix_dev->lock, it should be symmetrical with the error unwind in
-probe.
+Thanks for checking Alexandru. Will send a commit to update the
+documentation as well then (v3).
 
-I'll resend it.
+Regards,
+Ricardo
 
-Thanks,
-Jason
+> 
+> Thanks,
+> 
+> Alex
+> 
+> >
+> >>> is 4KB aligned and below IPA size. The distributor region is 4KB so
+> >>> vgic_check_ioaddr() is enough in that case.
+> >>>
+> >>> What about the following?
+> >>>
+> >>> I can work on the next version of this patch (v2 has the GICv2 issue)
+> >>> which adds vgic_check_range(), which is like vgic_check_ioaddr() but
+> >>> with a size arg.  kvm_vgic_addr() can then call vgic_check_range() and
+> >>> do all the checks for GICv2 and GICv3. Note that for GICv2, there's no
+> >>> need to wait until first vcpu run to do the check. Also note that I will
+> >>> have to keep the change in vgic_v3_check_base() to check for the old v3
+> >>> redist API at first vcpu run.
+> >> Sounds good.
+> >>
+> >> Thanks,
+> >>
+> >> Alex
+> >>
+> >>> Thanks,
+> >>> Ricardo
+> >>>
+> >>>> Thanks
+> >>>>
+> >>>> Eric
+> > Will do, thank you both.
+> >
+> > Ricardo
+> >
+> >>>>> Thanks,
+> >>>>>
+> >>>>> Alex
+> >>>>>
+> >>>>>> Thanks,
+> >>>>>> Ricardo
+> >>>>>>
+> >>>>>>> Thanks,
+> >>>>>>>
+> >>>>>>> Alex
+> >>>>>>>
+> >>>>>>>>  	}
+> >>>>>>>>  
+> >>>>>>>>  	if (IS_VGIC_ADDR_UNDEF(d->vgic_dist_base))
