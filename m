@@ -2,124 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0B4094118C7
-	for <lists+kvm@lfdr.de>; Mon, 20 Sep 2021 18:00:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E1BE54118DC
+	for <lists+kvm@lfdr.de>; Mon, 20 Sep 2021 18:07:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236609AbhITQB5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Sep 2021 12:01:57 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:54370 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231770AbhITQB4 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 20 Sep 2021 12:01:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632153629;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=/mUAEG3/Zyx+LoPhPJ8bEPbOJOvIOT0iUS/M6XNysYc=;
-        b=Lxz3wTYNRhrSCv4lQYuIkWpukVSA4MaJTtspKz3PKf5OX5qwSw74OR9HUUiXiLSqIU6MeD
-        bFZQjsYkgCeF+7EobzbcOjsWJVdzo3MJPT5YsYySX5wEnoUCiYVHFsSd7H1XfvG4reC5A1
-        WnpC+a0+xzRA7Sxk7XRCWnZjAm2OEBQ=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-400-4T7NZt5ZO7qYyj-JrGxapw-1; Mon, 20 Sep 2021 12:00:28 -0400
-X-MC-Unique: 4T7NZt5ZO7qYyj-JrGxapw-1
-Received: by mail-ed1-f69.google.com with SMTP id j6-20020aa7de86000000b003d4ddaf2bf9so16080716edv.7
-        for <kvm@vger.kernel.org>; Mon, 20 Sep 2021 09:00:27 -0700 (PDT)
+        id S238363AbhITQIh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Sep 2021 12:08:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46680 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232262AbhITQIh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Sep 2021 12:08:37 -0400
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60F44C061574
+        for <kvm@vger.kernel.org>; Mon, 20 Sep 2021 09:07:10 -0700 (PDT)
+Received: by mail-pf1-x430.google.com with SMTP id 145so2757769pfz.11
+        for <kvm@vger.kernel.org>; Mon, 20 Sep 2021 09:07:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=itsXyZ7jguPhr3bK0GIBz8XHWfLYp7eKoXqnDU/8Lpk=;
+        b=Uy95jo46zcjnm1ARS467XhRXqOoHrxDj5afayc9YrQfXOn6c7dq/LA4TVa8BKcFu5P
+         aKybacCfrfrMN8ZUXMlUPmocznl+1Ig7+uQX7omlu/vjsElNmEumpkBkq4w2hS5YgSxT
+         nkXPiSDtvzRIGeKk0Llj/yT1yta+YLeJOWtJt8eGTZ06x7rmTESoLMSDA31FBbIeVAHA
+         LItf0RKF6EWuI9FmX1vxwXBN0FO2b5EUiXDlB1/wAr+TZRR/Itc8UeGSB96vmJLMTe1i
+         v8S8GLrRsn5YnyGLSYktPfyKmWGhjWA8/cr9x4IVhNtM9J3gGjwKpMwUy5f91vGirpNz
+         7u0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=/mUAEG3/Zyx+LoPhPJ8bEPbOJOvIOT0iUS/M6XNysYc=;
-        b=ZQjiijGt+FU5S7zpxujOStWHAAAyTNXdTvg+NoGUgM7ftKbuP9FbxKoB/WNGCOmxhY
-         XQQmM2E1oD9kG0w3skv+Td6kRsW/scUPR7i35zu3FoZq6CIK1yCbXD8kXXruGJZmV0OY
-         uGEBIUOMLSceHPcudsEVD/WrFfY+AltdWLRntbkzlf6GU2UyS9cpjoPxD5tm4bpD937t
-         cXVmUyE6+ZqNiv8VnGKmP5WhhRZd7ZQaPZKTqqTP5CjTR6RR9r0Ylajj2DfWByPUy+vl
-         h0VkFFmWIy2lSiNdVkZi2AHlnu3RZbZD1/WOU+e4OxMr4UQEjGmHUwLfwgrl7JGtE31Z
-         QZOg==
-X-Gm-Message-State: AOAM530A9GuyK6Al+cp6MDyjawTeyF9KhwR5tmiC0LcUvkTdXKpYAsdV
-        gnh3eq6Ke9QT2iqQyLy4Db/67shhIp9sjBHaPDdzBbP1pXwIUV5lRfTYO97tvukXLO38nGeAQ0S
-        vrDkY6P5EzRuS
-X-Received: by 2002:a50:c949:: with SMTP id p9mr30384443edh.326.1632153626558;
-        Mon, 20 Sep 2021 09:00:26 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJws9T17EII7HneSbh4vp1OHAfNCrt3yNUYClmwn0ioBeM6nfEubraJCuopvqhL570FUXQ0OqQ==
-X-Received: by 2002:a50:c949:: with SMTP id p9mr30384400edh.326.1632153626347;
-        Mon, 20 Sep 2021 09:00:26 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id g1sm2618942edv.25.2021.09.20.09.00.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 20 Sep 2021 09:00:25 -0700 (PDT)
-To:     Zixuan Wang <zixuanwang@google.com>, kvm@vger.kernel.org,
-        drjones@redhat.com
-Cc:     marcorr@google.com, baekhw@google.com, tmroeder@google.com,
-        erdemaktas@google.com, rientjes@google.com, seanjc@google.com,
-        brijesh.singh@amd.com, Thomas.Lendacky@amd.com,
-        varad.gautam@suse.com, jroedel@suse.de, bp@suse.de
-References: <20210827031222.2778522-1-zixuanwang@google.com>
- <20210827031222.2778522-15-zixuanwang@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH v2 14/17] x86 AMD SEV-ES: Load GDT with
- UEFI segments
-Message-ID: <34173c4c-d704-5d28-8aac-c2debf224a86@redhat.com>
-Date:   Mon, 20 Sep 2021 18:00:24 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=itsXyZ7jguPhr3bK0GIBz8XHWfLYp7eKoXqnDU/8Lpk=;
+        b=I6EGHmoBoRU6rv51xkntlcfqtAhvpez+pFMWrNoDSgn8ZW29XVDvMV+hEXA9mcHV/V
+         lmpvKgED2n1DJag+7Zb7UX1Y8hW3BWnIwZba/xWKyEX16ZfmSiPlolndmoqJhz8L5KQS
+         HRycS0/Cf6ytROYVCIenNqG8cVTSlw+ay78ngTKoXdF6TbLHs89bUGXqMDJIcc1iQLeM
+         CALePLyT/qjFLmSozOlSINmkqfsyedvgbXSBy0WgJaIppXPfF6NIUXvLxf+t5Oydba8b
+         9bGDmWtaVFx9I62yN1jfN/Vft14Tc+nwFHNOpD5247FLMSfsbUMFnSuHXh3TbTb8hZt8
+         6tbw==
+X-Gm-Message-State: AOAM532Nb86hfRP6Zvdl00NSCsAELYAU/xGAaPK/2R0CCPO9humLIqpY
+        ksTFLbTMOyxjZbZCMrE1BK1ePg==
+X-Google-Smtp-Source: ABdhPJwfGga4x4k4I1A/DBJ/7hT5H15rnGUWQbAes0XcZJteGNIYvIfYM3Zjc73a/TQuNZjaAorFrg==
+X-Received: by 2002:a62:4e4a:0:b0:444:59c3:665e with SMTP id c71-20020a624e4a000000b0044459c3665emr20809877pfb.0.1632154029683;
+        Mon, 20 Sep 2021 09:07:09 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id m28sm15749201pgl.9.2021.09.20.09.07.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 Sep 2021 09:07:09 -0700 (PDT)
+Date:   Mon, 20 Sep 2021 16:07:04 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Steve Rutherford <srutherford@google.com>
+Cc:     Ashish Kalra <Ashish.Kalra@amd.com>, pbonzini@redhat.com,
+        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
+        joro@8bytes.org, bp@alien8.de, thomas.lendacky@amd.com,
+        x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        brijesh.singh@amd.com, dovmurik@linux.ibm.com, tobin@linux.ibm.com,
+        jejb@linux.ibm.com, dgilbert@redhat.com
+Subject: Re: [PATCH v6 1/5] x86/kvm: Add AMD SEV specific Hypercall3
+Message-ID: <YUixqL+SRVaVNF07@google.com>
+References: <cover.1629726117.git.ashish.kalra@amd.com>
+ <6fd25c749205dd0b1eb492c60d41b124760cc6ae.1629726117.git.ashish.kalra@amd.com>
+ <CABayD+fnZ+Ho4qoUjB6YfWW+tFGUuftpsVBF3d=-kcU0-CEu0g@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20210827031222.2778522-15-zixuanwang@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CABayD+fnZ+Ho4qoUjB6YfWW+tFGUuftpsVBF3d=-kcU0-CEu0g@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 27/08/21 05:12, Zixuan Wang wrote:
-> + *
-> + * This is because KVM-Unit-Tests reuses UEFI #VC handler that requires UEFI
-> + * code and data segments to run. The UEFI #VC handler crashes the guest VM if
-> + * these segments are not available. So we need to copy these two UEFI segments
-> + * into KVM-Unit-Tests GDT.
-> + *
-> + * UEFI uses 0x30 as code segment and 0x38 as data segment. Fortunately, these
-> + * segments can be safely overridden in KVM-Unit-Tests as they are used as
-> + * protected mode and real mode segments (see x86/efi/efistart64.S for more
-> + * details), which are not used in EFI set up process.
+On Wed, Sep 15, 2021, Steve Rutherford wrote:
+> Looking at these threads, this patch either:
+> 1) Needs review/approval from a maintainer that is interested or
+> 2) Should flip back to using alternative (as suggested by Sean). In
+> particular: `ALTERNATIVE("vmmcall", "vmcall",
+> ALT_NOT(X86_FEATURE_VMMCALL))`. My understanding is that the advantage
+> of this is that (after calling apply alternatives) you get exactly the
+> same behavior as before. But before apply alternatives, you get the
+> desired flipped behavior. The previous patch changed the behavior
+> after apply alternatives in a very slight manner (if feature flags
+> were not set, you'd get a different instruction).
+> 
+> I personally don't have strong feelings on this decision, but this
+> decision does need to be made for this patch series to move forward.
+> 
+> I'd also be curious to hear Sean's opinion on this since he was vocal
+> about this previously.
 
-Is 0x30/0x38 the same as kvm-unit-tests's 0x08/0x10?  Can kvm-unit-tests
-simply change its ring-0 64-bit CS/DS to 0x30 and 0x38 instead of 0x08
-and 0x10?  I can help with that too, since there would be some more
-shuffling to keep similar descriptors together:
+Pulling in Ashish's last email from the previous thread, which I failed to respond
+to.
 
-  * 0x00         NULL descriptor               NULL descriptor
-  * 0x08         intr_alt_stack TSS            ring-0 code segment (32-bit)
-  * 0x10 (0x13)  **unused**                    ring-3 code segment (64-bit)
-  * 0x18         ring-0 code segment (P=0)     ring-0 code segment (64-bit, P=0)
-  * 0x20         ring-0 code segment (16-bit)  same
-  * 0x28         ring-0 data segment (16-bit)  same
-  * 0x30         ring-0 code segment (32-bit)  ring-0 code segment (64-bit)
-  * 0x38         ring-0 data segment (32-bit)  ring-0 data segment (32/64-bit)
-  * 0x40 (0x43)  ring-3 code segment (32-bit)  same
-  * 0x48 (0x4b)  ring-3 data segment (32-bit)  ring-3 data segment (32/64-bit)
-  * 0x50-0x78    free to use for test cases    same
+https://lore.kernel.org/all/20210820133223.GA28059@ashkalra_ubuntu_server/T/#u
 
-or:
+On Fri, Aug 20, 2021, Ashish Kalra wrote:
+> On Thu, Aug 19, 2021 at 11:15:26PM +0000, Sean Christopherson wrote:
+> > On Thu, Aug 19, 2021, Kalra, Ashish wrote:
+> > >
+> > > > On Aug 20, 2021, at 3:38 AM, Kalra, Ashish <Ashish.Kalra@amd.com> wrote:
+> > > > I think it makes more sense to stick to the original approach/patch, i.e.,
+> > > > introducing a new private hypercall interface like kvm_sev_hypercall3() and
+> > > > let early paravirtualized kernel code invoke this private hypercall
+> > > > interface wherever required.
+> >
+> > I don't like the idea of duplicating code just because the problem is tricky to
+> > solve.  Right now it's just one function, but it could balloon to multiple in
+> > the future.  Plus there's always the possibility of a new, pre-alternatives
+> > kvm_hypercall() being added in generic code, at which point using an SEV-specific
+> > variant gets even uglier.
 
-old	new
-----	----
-0x00	0x00
-0x20	0x08
-0x48	0x10
-0x18	0x18
-0x28	0x20
-0x30	0x28
-0x08	0x30
-0x10	0x38
-0x38	0x40
-0x40	0x48
+...
 
-Thanks,
+> Now, apply_alternatives() is called much later when setup_arch() calls
+> check_bugs(), so we do need some kind of an early, pre-alternatives
+> hypercall interface.
+>
+> Other cases of pre-alternatives hypercalls include marking per-cpu GHCB
+> pages as decrypted on SEV-ES and per-cpu apf_reason, steal_time and
+> kvm_apic_eoi as decrypted for SEV generally.
+>
+> Actually using this kvm_sev_hypercall3() function may be abstracted
+> quite nicely. All these early hypercalls are made through
+> early_set_memory_XX() interfaces, which in turn invoke pv_ops.
+>
+> Now, pv_ops can have this SEV/TDX specific abstractions.
+>
+> Currently, pv_ops.mmu.notify_page_enc_status_changed() callback is setup
+> to kvm_sev_hypercall3() in case of SEV.
+>
+> Similarly, in case of TDX, pv_ops.mmu.notify_page_enc_status_changed() can
+> be setup to a TDX specific callback.
+>
+> Therefore, this early_set_memory_XX() -> pv_ops.mmu.notify_page_enc_status_changed()
+> is a generic interface and can easily have SEV, TDX and any other future platform
+> specific abstractions added to it.
 
-Paolo
+Unless there's some fundamental technical hurdle I'm overlooking, if pv_ops can
+be configured early enough to handle this, then so can alternatives.  Adding
+notify_page_enc_status_changed() may be necessary in the future, e.g. for TDX
+or SNP, but IMO that is orthogonal to adding a generic, 100% redundant helper.
 
+I appreciate that simply swapping the default from VMCALL->VMMCALL is a bit dirty
+since it gives special meaning to the default value, but if that's the argument
+against reusing kvm_hypercall3() then we should solve the early alternatives
+problem, not fudge around it.
