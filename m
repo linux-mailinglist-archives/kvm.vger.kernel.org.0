@@ -2,240 +2,324 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ED2BF412805
-	for <lists+kvm@lfdr.de>; Mon, 20 Sep 2021 23:28:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4A5A7412836
+	for <lists+kvm@lfdr.de>; Mon, 20 Sep 2021 23:41:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241029AbhITVaC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Sep 2021 17:30:02 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:65456 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S241418AbhITV2C (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 20 Sep 2021 17:28:02 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 18KLISUx009517;
-        Mon, 20 Sep 2021 17:26:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=9kFhm53QcT7+4EfYrDgx81icFdLX/KQefo3HC8LLR7Y=;
- b=Gb+KKwodbWfDkwHeimSlv15rpP3YZM4wc4o7jqYDg49FxALkUrD5vOcmQUL87dMhi3Hg
- BQnzrEqXlHdA3JX8XNUU61ND+3Ft7SlCfHcfB8Smx2kdFRitEBNtqp8ZzRmqLiZbDapj
- oQP6fwUNfP8kmsUwIph7AkGlO5O5j9p7cIhtrJRdRHIXH652CslaQllo8+jJ2a1bZHdq
- 5YNeTTpl9pF4Rxa9mfXgVN2NmCVLMX/NWvqf1dtO72y0q2DHHgyffZWVRuX7yYFmhT6n
- GvkE3rxRTH76MNR47ygIDSUVdxHjKrvJVVtuqE+d4zgI4DWHncB+1O8BfJ+hgiOfqR4t xw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3b723mg4kx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 20 Sep 2021 17:26:30 -0400
-Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 18KLKVSj021825;
-        Mon, 20 Sep 2021 17:26:29 -0400
-Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com [169.63.121.186])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3b723mg4km-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 20 Sep 2021 17:26:29 -0400
-Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
-        by ppma03wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 18KL797j012857;
-        Mon, 20 Sep 2021 21:26:28 GMT
-Received: from b03cxnp08025.gho.boulder.ibm.com (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
-        by ppma03wdc.us.ibm.com with ESMTP id 3b57ra1923-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 20 Sep 2021 21:26:28 +0000
-Received: from b03ledav001.gho.boulder.ibm.com (b03ledav001.gho.boulder.ibm.com [9.17.130.232])
-        by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 18KLQRJQ35783058
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 20 Sep 2021 21:26:27 GMT
-Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 22B2B6E052;
-        Mon, 20 Sep 2021 21:26:27 +0000 (GMT)
-Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D99996E056;
-        Mon, 20 Sep 2021 21:26:25 +0000 (GMT)
-Received: from cpe-172-100-181-211.stny.res.rr.com (unknown [9.65.75.198])
-        by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Mon, 20 Sep 2021 21:26:25 +0000 (GMT)
-Subject: Re: [PATCH v2] vfio/ap_ops: Add missed vfio_uninit_group_dev()
-To:     Alex Williamson <alex.williamson@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        linux-s390@vger.kernel.org, Halil Pasic <pasic@linux.ibm.com>,
+        id S241277AbhITVnJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Sep 2021 17:43:09 -0400
+Received: from vps-vb.mhejs.net ([37.28.154.113]:45314 "EHLO vps-vb.mhejs.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232667AbhITVlI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Sep 2021 17:41:08 -0400
+Received: from MUA
+        by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <mail@maciej.szmigiero.name>)
+        id 1mSR0F-0006Oz-AN; Mon, 20 Sep 2021 23:39:07 +0200
+From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
         Cornelia Huck <cohuck@redhat.com>,
-        Christoph Hellwig <hch@lst.de>, kvm@vger.kernel.org
-References: <0-v2-25656bbbb814+41-ap_uninit_jgg@nvidia.com>
- <20210916125130.2db0961e.alex.williamson@redhat.com>
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-Message-ID: <ee2a0623-84d5-8c21-cc40-de5991ff94b1@linux.ibm.com>
-Date:   Mon, 20 Sep 2021 17:26:25 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v5 00/13] KVM: Scalable memslots implementation
+Date:   Mon, 20 Sep 2021 23:38:48 +0200
+Message-Id: <cover.1632171478.git.maciej.szmigiero@oracle.com>
+X-Mailer: git-send-email 2.33.0
 MIME-Version: 1.0
-In-Reply-To: <20210916125130.2db0961e.alex.williamson@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 3HiD1DPH96dK5_9XMoGzanyhsqbibFYO
-X-Proofpoint-ORIG-GUID: ld0Gxn_220CH0vjPVNsmK0mGqVm2gpb_
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.391,FMLib:17.0.607.475
- definitions=2021-09-20_07,2021-09-20_01,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 bulkscore=0
- spamscore=0 adultscore=0 clxscore=1011 impostorscore=0 mlxscore=0
- phishscore=0 priorityscore=1501 lowpriorityscore=0 mlxlogscore=999
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2109030001 definitions=main-2109200120
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
 
+The current memslot code uses a (reverse) gfn-ordered memslot array
+for keeping track of them.
+This only allows quick binary search by gfn, quick lookup by hva is
+not possible (the implementation has to do a linear scan of the whole
+memslot array).
 
-On 9/16/21 2:51 PM, Alex Williamson wrote:
-> On Fri, 10 Sep 2021 20:06:30 -0300
-> Jason Gunthorpe <jgg@nvidia.com> wrote:
->
->> Without this call an xarray entry is leaked when the vfio_ap device is
->> unprobed. It was missed when the below patch was rebased across the
->> dev_set patch.
->>
->> Fixes: eb0feefd4c02 ("vfio/ap_ops: Convert to use vfio_register_group_dev()")
->> Reviewed-by: Christoph Hellwig <hch@lst.de>
->> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
->> ---
->>   drivers/s390/crypto/vfio_ap_ops.c | 2 ++
->>   1 file changed, 2 insertions(+)
-> Hi Tony, Halil, Jason (H),
->
-> Any acks for this one?  Thanks,
->
-> Alex
+Because the memslot array that is currently in use cannot be modified
+every memslot management operation (create, delete, move, change
+flags) has to make a copy of the whole array so it has a scratch copy
+to work on.
 
-I installed this on a test system running the latest linux
-code from our library and ran our test suite. I got the
-following running a simple test case that assigns some
-adapters and domains to a mediated device then
-starts a guest using the mdev.
+Strictly speaking, however, it is only necessary to make copy of the
+memslot that is being modified, copying all the memslots currently
+present is just a limitation of the array-based memslot implementation.
 
-[Sep20 23:19] ======================================================
-[  +0.000001] WARNING: possible circular locking dependency detected
-[  +0.000002] 5.15.0-rc1-10318-gac08b1c68d1b-dirty #15 Not tainted
-[  +0.000002] ------------------------------------------------------
-[  +0.000001] nose2/1993 is trying to acquire lock:
-[  +0.000002] 00000000cf2a5520 (&new_dev_set->lock){+.+.}-{3:3}, at: 
-vfio_uninit_group_dev+0x3c/0xf0 [vfio]
-[  +0.000012]
-               but task is already holding lock:
-[  +0.000001] 00000000c84424d8 (&matrix_dev->lock){+.+.}-{3:3}, at: 
-vfio_ap_mdev_remove+0x48/0xc8 [vfio_ap]
-[  +0.000006]
-               which lock already depends on the new lock.
+Two memslot sets, however, are still needed so the VM continues to run
+on the currently active set while the requested operation is being
+performed on the second, currently inactive one.
 
-[  +0.000002]
-               the existing dependency chain (in reverse order) is:
-[  +0.000001]
-               -> #1 (&matrix_dev->lock){+.+.}-{3:3}:
-[  +0.000004]        __lock_acquire+0x64c/0xc40
-[  +0.000005]        reacquire_held_locks+0x134/0x228
-[  +0.000002]        __lock_release+0xc6/0x338
-[  +0.000002]        lock_release+0x1b0/0x298
-[  +0.000001]        __mutex_unlock_slowpath+0x3a/0x2d8
-[  +0.000005]        vfio_ap_mdev_unset_kvm.part.0+0xa6/0xc0 [vfio_ap]
-[  +0.000003]        vfio_device_fops_release+0x64/0xe8 [vfio]
-[  +0.000003]        __fput+0xae/0x288
-[  +0.000005]        task_work_run+0x76/0xc0
-[  +0.000005]        do_exit+0x268/0x5c0
-[  +0.000005]        do_group_exit+0x48/0xc0
-[  +0.000050]        __s390x_sys_exit_group+0x2e/0x30
-[  +0.000002]        __do_syscall+0x1c2/0x1f0
-[  +0.000004]        system_call+0x78/0xa0
-[  +0.000003]
-               -> #0 (&new_dev_set->lock){+.+.}-{3:3}:
-[  +0.000004]        check_prev_add+0xe0/0xed8
-[  +0.000002]        validate_chain+0x9ca/0xde8
-[  +0.000001]        __lock_acquire+0x64c/0xc40
-[  +0.000002]        lock_acquire.part.0+0xec/0x258
-[  +0.000002]        lock_acquire+0xb0/0x200
-[  +0.000001]        __mutex_lock+0xa2/0x8f8
-[  +0.000002]        mutex_lock_nested+0x32/0x40
-[  +0.000002]        vfio_uninit_group_dev+0x3c/0xf0 [vfio]
-[  +0.000004]        vfio_ap_mdev_remove+0x90/0xc8 [vfio_ap]
-[  +0.000002]        mdev_remove+0x32/0x58 [mdev]
-[  +0.000004]        __device_release_driver+0x18a/0x238
-[  +0.000005]        device_release_driver+0x40/0x50
-[  +0.000002]        bus_remove_device+0x110/0x1a0
-[  +0.000002]        device_del+0x19c/0x3e8
-[  +0.000002]        mdev_device_remove_common+0x3c/0xb0 [mdev]
-[  +0.000003]        mdev_device_remove+0xac/0x100 [mdev]
-[  +0.000002]        remove_store+0x78/0x90 [mdev]
-[  +0.000003]        kernfs_fop_write_iter+0x13e/0x1e0
-[  +0.000004]        new_sync_write+0x100/0x190
-[  +0.000003]        vfs_write+0x230/0x2e0
-[  +0.000002]        ksys_write+0x6c/0xf8
-[  +0.000002]        __do_syscall+0x1c2/0x1f0
-[  +0.000002]        system_call+0x78/0xa0
-[  +0.000002]
-               other info that might help us debug this:
+In order to have two memslot sets, but only one copy of the actual
+memslots it is necessary to split out the memslot data from the
+memslot sets.
 
-[  +0.000002]  Possible unsafe locking scenario:
+The memslots themselves should be also kept independent of each other
+so they can be individually added or deleted.
 
-[  +0.000001]        CPU0                    CPU1
-[  +0.000001]        ----                    ----
-[  +0.000001]   lock(&matrix_dev->lock);
-[  +0.000002] lock(&new_dev_set->lock);
-[  +0.000002] lock(&matrix_dev->lock);
-[  +0.000002]   lock(&new_dev_set->lock);
-[  +0.000002]
-                *** DEADLOCK ***
+These two memslot sets should normally point to the same set of memslots.
+They can, however, be desynchronized when performing a memslot management
+operation by replacing the memslot to be modified by its copy.
+After the operation is complete, both memslot sets once again point to
+the same, common set of memslot data.
 
-[  +0.000001] 7 locks held by nose2/1993:
-[  +0.000002]  #0: 00000000b373af00 (&f->f_pos_lock){+.+.}-{3:3}, at: 
-__fdget_pos+0x6a/0x80
-[  +0.000007]  #1: 00000000978e4498 (sb_writers#4){.+.+}-{0:0}, at: 
-ksys_write+0x6c/0xf8
-[  +0.000005]  #2: 00000000b4b89490 (&of->mutex){+.+.}-{3:3}, at: 
-kernfs_fop_write_iter+0x102/0x1e0
-[  +0.000006]  #3: 00000000ca215210 (kn->active#215){++++}-{0:0}, at: 
-sysfs_remove_file_self+0x42/0x78
-[  +0.000006]  #4: 00000000cb7d85b8 (&parent->unreg_sem){++++}-{3:3}, 
-at: mdev_device_remove+0x9c/0x100 [mdev]
-[  +0.000005]  #5: 00000000cb188990 (&dev->mutex){....}-{3:3}, at: 
-device_release_driver+0x32/0x50
-[  +0.000006]  #6: 00000000c84424d8 (&matrix_dev->lock){+.+.}-{3:3}, at: 
-vfio_ap_mdev_remove+0x48/0xc8 [vfio_ap]
-[  +0.000005]
-               stack backtrace:
-[  +0.000002] CPU: 6 PID: 1993 Comm: nose2 Not tainted 
-5.15.0-rc1-10318-gac08b1c68d1b-dirty #15
-[  +0.000003] Hardware name: IBM 8561 T01 701 (LPAR)
-[  +0.000002] Call Trace:
-[  +0.000001]  [<0000000328775056>] dump_stack_lvl+0x8e/0xc8
-[  +0.000003]  [<0000000327b4b648>] check_noncircular+0x168/0x188
-[  +0.000003]  [<0000000327b4c708>] check_prev_add+0xe0/0xed8
-[  +0.000002]  [<0000000327b4deca>] validate_chain+0x9ca/0xde8
-[  +0.000002]  [<0000000327b50ec4>] __lock_acquire+0x64c/0xc40
-[  +0.000002]  [<0000000327b4facc>] lock_acquire.part.0+0xec/0x258
-[  +0.000002]  [<0000000327b4fce8>] lock_acquire+0xb0/0x200
-[  +0.000002]  [<00000003287839d2>] __mutex_lock+0xa2/0x8f8
-[  +0.000002]  [<000000032878425a>] mutex_lock_nested+0x32/0x40
-[  +0.000002]  [<000003ff801c3ce4>] vfio_uninit_group_dev+0x3c/0xf0 [vfio]
-[  +0.000004]  [<000003ff805e0000>] vfio_ap_mdev_remove+0x90/0xc8 [vfio_ap]
-[  +0.000003]  [<000003ff802339fa>] mdev_remove+0x32/0x58 [mdev]
-[  +0.000003]  [<00000003283e9c92>] __device_release_driver+0x18a/0x238
-[  +0.000003]  [<00000003283e9d80>] device_release_driver+0x40/0x50
-[  +0.000003]  [<00000003283e8e28>] bus_remove_device+0x110/0x1a0
-[  +0.000002]  [<00000003283e2cb4>] device_del+0x19c/0x3e8
-[  +0.000002]  [<000003ff8023270c>] mdev_device_remove_common+0x3c/0xb0 
-[mdev]
-[  +0.000003]  [<000003ff80232fcc>] mdev_device_remove+0xac/0x100 [mdev]
-[  +0.000003]  [<000003ff80233220>] remove_store+0x78/0x90 [mdev]
-[  +0.000003]  [<0000000327eefaae>] kernfs_fop_write_iter+0x13e/0x1e0
-[  +0.000003]  [<0000000327dfa160>] new_sync_write+0x100/0x190
-[  +0.000002]  [<0000000327dfd038>] vfs_write+0x230/0x2e0
-[  +0.000003]  [<0000000327dfd354>] ksys_write+0x6c/0xf8
-[  +0.000002]  [<00000003287787b2>] __do_syscall+0x1c2/0x1f0
-[  +0.000002]  [<000000032878b178>] system_call+0x78/0xa0
-[  +0.000003] INFO: lockdep is turned off.
+This series implements the aforementioned idea.
+
+The new implementation uses two trees to perform quick lookups:
+For tracking of gfn an ordinary rbtree is used since memslots cannot
+overlap in the guest address space and so this data structure is
+sufficient for ensuring that lookups are done quickly.
+
+For tracking of hva, however, an interval tree is needed since they
+can overlap between memslots.
+
+ID to memslot mappings are kept in a hash table instead of using a
+statically allocated "id_to_index" array.
+
+The "last used slot" mini-caches (both per-slot set one and per-vCPU one),
+that keep track of the last found-by-gfn memslot, are still present in the
+new code.
+
+There was also a desire to make the new structure operate on "pay as
+you go" basis, that is, that the user only pays the price of the
+memslot count that is actually used, not of the maximum count allowed.
+
+The operation semantics were carefully matched to the original
+implementation, the outside-visible behavior should not change.
+Only the timing will be different.
+
+Making lookup and memslot management operations O(log(n)) brings some
+performance benefits (tested on a Xeon 8167M machine):
+509 slots in use:
+Test            Before          After           Improvement
+Map             0.0232s         0.0223s          4%
+Unmap           0.0724s         0.0315s         56%
+Unmap 2M        0.00155s        0.000869s       44%
+Move active     0.000101s       0.0000792s      22%
+Move inactive   0.000108s       0.0000847s      21%
+Slot setup      0.0135s         0.00803s        41%
+
+100 slots in use:
+Test            Before          After           Improvement
+Map             0.0195s         0.0191s         None
+Unmap           0.0374s         0.0312s         17%
+Unmap 2M        0.000470s       0.000447s        5%
+Move active     0.0000956s      0.0000800s      16%
+Move inactive   0.000101s       0.0000840s      17%
+Slot setup      0.00260s        0.00174s        33%
+
+50 slots in use:
+Test            Before          After           Improvement
+Map             0.0192s         0.0190s         None
+Unmap           0.0339s         0.0311s          8%
+Unmap 2M        0.000399s       0.000395s       None
+Move active     0.0000999s      0.0000854s      15%
+Move inactive   0.0000992s      0.0000826s      17%
+Slot setup      0.00141s        0.000990s       30%
+
+30 slots in use:
+Test            Before          After           Improvement
+Map             0.0192s         0.0190s         None
+Unmap           0.0325s         0.0310s          5%
+Unmap 2M        0.000373s       0.000373s       None
+Move active     0.000100s       0.0000865s      14%
+Move inactive   0.000106s       0.0000918s      13%
+Slot setup      0.000989s       0.000775s       22%
+
+10 slots in use:
+Test            Before          After           Improvement
+Map             0.0192s         0.0186s          3%
+Unmap           0.0313s         0.0310s         None
+Unmap 2M        0.000348s       0.000351s       None
+Move active     0.000110s       0.0000948s      14%
+Move inactive   0.000111s       0.0000933s      16%
+Slot setup      0.000342s       0.000283s       17%
+
+32k slots in use:
+Test            Before          After           Improvement
+Map (8194)       0.200s         0.0541s         73%
+Unmap            3.88s          0.0351s         99%
+Unmap 2M         3.88s          0.0348s         99%
+Move active      0.00142s       0.0000786s      94%
+Move inactive    0.00148s       0.0000880s      94%
+Slot setup      16.1s           0.59s           96%
+
+Since the map test can be done with up to 8194 slots, the result above
+for this test was obtained running it with that maximum number of
+slots.
+
+In both the old and new memslot code case the measurements were done
+against the new KVM selftest framework, with TDP MMU disabled.
+
+On x86-64 the code was well tested, passed KVM unit tests and KVM
+selftests with KASAN on.
+And, of course, booted various guests successfully (including nested
+ones with TDP MMU enabled).
+On other KVM platforms the code was compile-tested only.
+
+Changes since v1:
+* Drop the already merged HVA handler retpoline-friendliness patch,
+
+* Split the scalable memslots patch into 8 smaller ones,
+
+* Rebase onto the current kvm/queue,
+
+* Make sure that ranges at both memslot's hva_nodes are always
+initialized,
+
+* Remove kvm_mmu_calculate_default_mmu_pages() prototype, too,
+when removing this function,
+
+* Redo benchmarks, measure 32k memslots on the old implementation, too.
+
+Changes since v2:
+* Rebase onto the current kvm/queue, taking into account the now-merged
+MMU notifiers rewrite.
+This reduces the diffstat by ~50 lines.
+
+Changes since v3:
+* Rebase onto the current (Aug 12) kvm/queue, taking into account the
+introduction of slots_arch_lock (and lazy rmaps allocation) and per-vCPU
+"last used slot" mini-cache,
+
+* Change n_memslots_pages to u64 to avoid overflowing it on 32-bit KVM,
+
+* Skip the kvm_mmu_change_mmu_pages() call for memslot operations that
+don't change the total page count anyway,
+
+* Move n_memslots_pages recalc to kvm_arch_prepare_memory_region() so
+a proper error code can be returned in case we spot an underflow,
+
+* Integrate the open-coded s390 gfn_to_memslot_approx() into the main KVM
+code by adding "approx" parameter to the existing __gfn_to_memslot() while
+renaming it to __gfn_to_memslot_approx() and introducing
+__gfn_to_memslot() wrapper so existing call sites won't be affected,
+since __gfn_to_memslot() now offers an extra functionality over
+search_memslots().
+This last fact wasn't the case at the time the previous version of this
+series was posted,
+
+* Split out the move of WARN that's triggered on invalid memslot index to
+a separate patch,
+
+* Rename the old slot variable in kvm_memslot_delete() to "oldslot",
+add an additional comment why we delete a memslot from the hash table
+in kvm_memslot_move_backward() in "KVM: Resolve memslot ID via a hash
+table instead of via a static array" patch,
+
+* Rename a patch from "Introduce memslots hva tree" to "Use interval tree
+to do fast hva lookup in memslots",
+
+* Document that the kvm_for_each_hva_range_memslot() range is inclusive,
+
+* Rename kvm_for_each_hva_range_memslot to
+kvm_for_each_memslot_in_hva_range, move this macro to kvm_main.c,
+
+* Update the WARN in __kvm_handle_hva_range() and kvm_zap_gfn_range() to
+also trigger on empty ranges,
+
+* Use "bkt" instead of "ctr" for hash bucket index variables,
+
+* Add a comment describing the idea behind the memslots dual set system
+above struct kvm_memory_slot,
+
+* Rename "memslots_all" to "__memslots" in struct kvm and add comments
+there describing its two memslot members,
+
+* Remove kvm_memslots_idx() helper and store the set index explicitly in
+the particular memslots set instead,
+
+* Open code kvm_init_memslots(),
+
+* Rename swap_memslots() into kvm_swap_active_memslots() and make it
+also swap pointers themselves to the provided two sets,
+
+* Initialize "parent" outside of the for loop in kvm_memslot_gfn_insert(),
+
+* Add kvm_memslot_gfn_erase() and kvm_memslot_gfn_replace() helpers,
+
+* Fold kvm_init_memslot_hva_ranges() into kvm_copy_memslot(),
+
+* Remove kvm_copy_replace_memslot() and introduce kvm_activate_memslot()
+instead,
+
+* Rename "slotsact" / "slotsina" into "active" / "inactive" in
+kvm_set_memslot(), add a big comment what are the semantics of
+"slotact" / "slotina" variables to this function,
+
+* Move WARN about a missing old slot to kvm_set_memslot() and return -EIO
+in this case,
+
+* Set KVM_MEMSLOT_INVALID flag on a temporary slot before (rather than
+after) replacing it in the inactive set in kvm_set_memslot() as it is a bit
+more intuitive way to do it,
+
+* Move handling of an error from kvm_arch_prepare_memory_region() directly
+below a call to this function in kvm_set_memslot() from the end of this
+function,
+
+* Rework some of the comments in kvm_set_memslot(),
+
+* Rename "oldslot" / "nslot" into "old" / "new" here and there in
+"Keep memslots in tree-based structures instead of array-based ones"
+patch,
+
+* Add Sean's "Co-developed-by:" to the aforementioned patch since many of
+its above changes are coming from his proposed patch (and he did a lot
+of good work reviewing both this patch and the whole series),
+
+* Introduce kvm_for_each_memslot_in_gfn_range() and use it in the last two
+patches,
+
+* Unfold long lines here and there,
+
+* Retest the patch series.
+
+Changes since v4:
+* Rebase onto v5.15-rc2 (torvalds/master),
+
+* Fix 64-bit division of n_memslots_pages for 32-bit KVM,
+
+* Collect Claudio's Reviewed-by tags for some of the patches.
+
+ arch/arm64/kvm/Kconfig              |   1 +
+ arch/arm64/kvm/mmu.c                |  15 +-
+ arch/mips/kvm/Kconfig               |   1 +
+ arch/mips/kvm/mips.c                |   3 +-
+ arch/powerpc/kvm/Kconfig            |   1 +
+ arch/powerpc/kvm/book3s_64_mmu_hv.c |   4 +-
+ arch/powerpc/kvm/book3s_hv.c        |   3 +-
+ arch/powerpc/kvm/book3s_hv_nested.c |   4 +-
+ arch/powerpc/kvm/book3s_hv_uvmem.c  |  14 +-
+ arch/powerpc/kvm/powerpc.c          |   5 +-
+ arch/s390/kvm/Kconfig               |   1 +
+ arch/s390/kvm/kvm-s390.c            |  66 +--
+ arch/s390/kvm/kvm-s390.h            |  14 +
+ arch/s390/kvm/pv.c                  |   4 +-
+ arch/x86/include/asm/kvm_host.h     |   2 +-
+ arch/x86/kvm/Kconfig                |   1 +
+ arch/x86/kvm/debugfs.c              |   6 +-
+ arch/x86/kvm/mmu/mmu.c              |  35 +-
+ arch/x86/kvm/x86.c                  |  42 +-
+ include/linux/kvm_host.h            | 224 +++++++---
+ virt/kvm/kvm_main.c                 | 651 +++++++++++++++-------------
+ 21 files changed, 624 insertions(+), 473 deletions(-)
+
