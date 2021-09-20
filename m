@@ -2,104 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1437C4118E8
-	for <lists+kvm@lfdr.de>; Mon, 20 Sep 2021 18:10:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E04B241218F
+	for <lists+kvm@lfdr.de>; Mon, 20 Sep 2021 20:06:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239104AbhITQMP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Sep 2021 12:12:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47554 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234422AbhITQMP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Sep 2021 12:12:15 -0400
-Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6894AC061760
-        for <kvm@vger.kernel.org>; Mon, 20 Sep 2021 09:10:48 -0700 (PDT)
-Received: by mail-pg1-x52b.google.com with SMTP id 17so17846451pgp.4
-        for <kvm@vger.kernel.org>; Mon, 20 Sep 2021 09:10:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=RHPENS35TK70dwgRtuqMxqQYFvEywydxESq3g0YeWeY=;
-        b=a+D32SSgnrOzLf2jTTB3XXObCufAjGVIs0SqMoiQUV7ljWXr4dz4YtA+HOcz+prtgm
-         5s8aG0yU5rTM2wmxo1wlsWi2IjIAIOCC4wS5T7rT7gl1MLstD6X4zH3J3dUDcYaSScIi
-         pU9yWEXihPjBpN0472qyPrL1LIwtZEzBsxcu7521ETNdy555l/L+OPfvWyDwtrHwq3KX
-         5Yy5s2XogiXel6mGab+Mgl8BANm7UD4s9PtRVksaZ5w5DICYmKnWrTmAAXHR0ky9MUUx
-         +O4cfzZADqj+nhpcUB8vMDH2T6+CjBTupY76CQsuFUD2muVBVp6hp+KUgJ2PISB3B/j8
-         wrwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=RHPENS35TK70dwgRtuqMxqQYFvEywydxESq3g0YeWeY=;
-        b=qiWB0bWvAQMFxegY538zOfcr+QF/KP3iW4zSvNN4/57OSU6fgsT/N5sSD9PUPjq6y+
-         RVt12vtWasqeMdGDrA8hzyPrVIphnWioO4rGMphbcUrKR2h778QMaty2njXOrH54HM2q
-         HGLER9J8VbGvS/O7JzW/Kib6QBNF2cW5ev5odNlp7Pa+0GMeIN+77pwL/pF5Ctz7v9Y7
-         m3IVjCKB8bXV/6AOV8BaB3OhcyGMoTfYtzLmSOW01UCPIQh6G6U6VM+SXx+o1Aa5rLpL
-         mDC0conF9Idp1o2YjuqwKPT67GYS8uB7DQ2O99du9EvvH83b+G54k/VwMgPRqhGQiUZ1
-         gaVA==
-X-Gm-Message-State: AOAM531aKVsAVH2uNFAUkoS3f7ZbZrv6NWWgXDEKFiI0P884QzXcQyVu
-        uH5bx+xh4sNJ+1PdsAY+awddqA==
-X-Google-Smtp-Source: ABdhPJx5qH4XRk3aI1atwoaavXlPJ3g+FMogcSusD/ahOJ1VHNmO+V2cxDDuhPlNlaQNjZaeRkUToQ==
-X-Received: by 2002:a63:7402:: with SMTP id p2mr24070517pgc.472.1632154247688;
-        Mon, 20 Sep 2021 09:10:47 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id j6sm15420414pgq.0.2021.09.20.09.10.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Sep 2021 09:10:47 -0700 (PDT)
-Date:   Mon, 20 Sep 2021 16:10:43 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Joerg Roedel <joro@8bytes.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-coco@lists.linux.dev,
-        Joerg Roedel <jroedel@suse.de>
-Subject: Re: [PATCH v2 1/4] KVM: SVM: Get rid of *ghcb_msr_bits() functions
-Message-ID: <YUiyg1W1cDxVbgzs@google.com>
-References: <20210722115245.16084-1-joro@8bytes.org>
- <20210722115245.16084-2-joro@8bytes.org>
- <YS/sqmgbS6ACRfSD@google.com>
- <YToM5akzNrlqHTJz@8bytes.org>
+        id S1358403AbhITSGb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Sep 2021 14:06:31 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:50484 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1357381AbhITSEH (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 20 Sep 2021 14:04:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1632160960;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=WwlG7m0Pkd8z9L6TGcVmgxQFpqMvFaegkPkOTNgv/sc=;
+        b=VeeGQe96y7KXLsToaREdwGYLsFlDOqV/569ewjRs3U5dDJKlHHqT2sQsTP69KI28HJWogp
+        mBDQdXDUTagciw3Os0Eb82jJ5R6gkeTonrL3LtcjZwRKuUq5yr37qqH6yGJkXJZYcLAQsR
+        O5TMofG9LtSIsT4tqnLiC7nA8IJ3DMY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-60-7Hnru5NkPEWPmrJvytwe_g-1; Mon, 20 Sep 2021 14:02:39 -0400
+X-MC-Unique: 7Hnru5NkPEWPmrJvytwe_g-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DAAA51084684;
+        Mon, 20 Sep 2021 18:02:35 +0000 (UTC)
+Received: from localhost (unknown [10.39.193.92])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id DA7BD19D9D;
+        Mon, 20 Sep 2021 18:02:30 +0000 (UTC)
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>, David Airlie <airlied@linux.ie>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        dri-devel@lists.freedesktop.org,
+        Eric Farman <farman@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
+        linux-s390@vger.kernel.org,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>
+Cc:     Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH v2 6/9] vfio/mdev: Add mdev available instance checking
+ to the core
+In-Reply-To: <6-v2-7d3a384024cf+2060-ccw_mdev_jgg@nvidia.com>
+Organization: Red Hat GmbH
+References: <6-v2-7d3a384024cf+2060-ccw_mdev_jgg@nvidia.com>
+User-Agent: Notmuch/0.32.1 (https://notmuchmail.org)
+Date:   Mon, 20 Sep 2021 20:02:29 +0200
+Message-ID: <87tuiff7m2.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YToM5akzNrlqHTJz@8bytes.org>
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 09, 2021, Joerg Roedel wrote:
-> On Wed, Sep 01, 2021 at 09:12:10PM +0000, Sean Christopherson wrote:
-> > On Thu, Jul 22, 2021, Joerg Roedel wrote:
-> > >  	case GHCB_MSR_TERM_REQ: {
-> > >  		u64 reason_set, reason_code;
-> > >  
-> > > -		reason_set = get_ghcb_msr_bits(svm,
-> > > -					       GHCB_MSR_TERM_REASON_SET_MASK,
-> > > -					       GHCB_MSR_TERM_REASON_SET_POS);
-> > > -		reason_code = get_ghcb_msr_bits(svm,
-> > > -						GHCB_MSR_TERM_REASON_MASK,
-> > > -						GHCB_MSR_TERM_REASON_POS);
-> > > +		reason_set  = GHCB_MSR_TERM_REASON_SET(control->ghcb_gpa);
-> > > +		reason_code = GHCB_MSR_TERM_REASON(control->ghcb_gpa);
-> > > +
-> > >  		pr_info("SEV-ES guest requested termination: %#llx:%#llx\n",
-> > >  			reason_set, reason_code);
-> > > +
-> > >  		fallthrough;
-> > 
-> > Not related to this patch, but why use fallthrough and more importantly, why is
-> > this an -EINVAL return?  Why wouldn't KVM forward the request to userspace instead
-> > of returning an opaque -EINVAL?
-> 
-> I guess it is to signal an error condition up the call-chain to get the
-> guest terminated, like requested.
+On Thu, Sep 09 2021, Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-Yes, but it's odd bizarre/unfortunate that KVM doesn't take this opportunity to
-forward the termination info to the VMM.  The above pr_info() should not exist.
-If that information is relevant then it should be handed to the VMM directly, not
-dumped to dmesg.
+> Many of the mdev drivers use a simple counter for keeping track of the
+> available instances. Move this code to the core code and store the counter
+> in the mdev_type. Implement it using correct locking, fixing mdpy.
+>
+> Drivers provide a get_available() callback to set the number of available
+> instances for their mtypes which is fixed at registration time. The core
+> provides a standard sysfs attribute to return the available_instances.
+
+So, according to the documentation, available_instances is
+mandatory. This means that drivers either need to provide get_available
+or implement their own version of the attribute. I think we want to
+update vfio-mediated-device.rst as well?
+
+>
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> ---
+>  drivers/s390/cio/vfio_ccw_drv.c       |  1 -
+>  drivers/s390/cio/vfio_ccw_ops.c       | 26 ++++++-------------
+>  drivers/s390/cio/vfio_ccw_private.h   |  2 --
+>  drivers/s390/crypto/vfio_ap_ops.c     | 32 ++++++-----------------
+>  drivers/s390/crypto/vfio_ap_private.h |  2 --
+>  drivers/vfio/mdev/mdev_core.c         | 11 +++++++-
+>  drivers/vfio/mdev/mdev_private.h      |  2 ++
+>  drivers/vfio/mdev/mdev_sysfs.c        | 37 +++++++++++++++++++++++++++
+>  include/linux/mdev.h                  |  2 ++
+>  samples/vfio-mdev/mdpy.c              | 22 +++++-----------
+>  10 files changed, 73 insertions(+), 64 deletions(-)
+
+Otherwise, looks good.
+
