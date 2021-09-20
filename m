@@ -2,102 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F0DA84115D5
-	for <lists+kvm@lfdr.de>; Mon, 20 Sep 2021 15:31:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6BBA64115F6
+	for <lists+kvm@lfdr.de>; Mon, 20 Sep 2021 15:40:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232938AbhITNcm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Sep 2021 09:32:42 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:40056 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230072AbhITNcm (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 20 Sep 2021 09:32:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632144675;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=xz1yHvJT5G0H7LDF/uZnPMGXqDofxfq2CbtHSEBu2sk=;
-        b=c07ygDcbu2CzBFVPzNYtvzDQoKV5uAmnp3TPG/xmd/MV1uuUBF48ME9cgvjgflPMZ2lH3X
-        yNfEsGik4hmJVdUwLpZ3Ks+X8bafpc8YrzpUAwLL5TqrD6trfUWi3pCmt2CmnZC/loIRhf
-        lsCeDfWuwR6G3ZK9th4gGRH+Y900VtM=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-46-aEcUDycKOtalwTP0GGlfpw-1; Mon, 20 Sep 2021 09:31:13 -0400
-X-MC-Unique: aEcUDycKOtalwTP0GGlfpw-1
-Received: by mail-ed1-f72.google.com with SMTP id d1-20020a50f681000000b003d860fcf4ffso2889504edn.22
-        for <kvm@vger.kernel.org>; Mon, 20 Sep 2021 06:31:12 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=xz1yHvJT5G0H7LDF/uZnPMGXqDofxfq2CbtHSEBu2sk=;
-        b=IRfil1A2/NplsImZ87K3XOb3qOoeZ4b6/5uJRe1dp7RP+V3/SkQwP1KUsFOSYgdF0S
-         RDq9CPkYDXgbPKCn/SxEA8bpb+t6pP+gtegPjAUoR5MH4eFmgaj1eOLVOu4mXINBtzVk
-         lwhlMHkY9DEqzMiKOLN2T/xLmyE+DPq370rU6Jx3ArANm9A2olv2rTKZM0x9tmsABrii
-         RU7ywXKBUUKnslwJg2Qt5w/MHEQrV/swZSrPUOXsWB7YD+qKlbM9Mx+zENms3lwiBBK/
-         fSh9NaVbFEGU6gXfBzAaP881Hl0g3K98cmRggAcDwU5I7g3OpO3wImrz/foqzNVzNYlj
-         +gig==
-X-Gm-Message-State: AOAM531/CcZBwyFRxn7c3FA+d9zoFVyhjgpHgtRGqfj1EutFzb5Zg+Pi
-        05L0GRPvBctyLdybuIx0DJ07VLSBP/W+WDG22KdTBqL3f9TYWhN4GuWygo1PEhn+tuJ4JPnGcfD
-        03vYs3pr++FIV
-X-Received: by 2002:a17:906:3854:: with SMTP id w20mr27327201ejc.537.1632144671352;
-        Mon, 20 Sep 2021 06:31:11 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwGXwIILRfcZIcuNMjTC0OYZlD8U2iRcDRsn9jNsaRBkPErPU3iHJcHI4ysvtjAFHIkhD3StA==
-X-Received: by 2002:a17:906:3854:: with SMTP id w20mr27327186ejc.537.1632144671151;
-        Mon, 20 Sep 2021 06:31:11 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id n19sm3401902ejl.78.2021.09.20.06.31.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 20 Sep 2021 06:31:10 -0700 (PDT)
-Subject: Re: [kvm-unit-tests PATCH v3 0/7] x86: Fix duplicate symbols w/ clang
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, Bill Wendling <morbo@google.com>
-References: <20210909183207.2228273-1-seanjc@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8e3f9f5a-77cf-5ad6-f5fd-7cb5cf85852b@redhat.com>
-Date:   Mon, 20 Sep 2021 15:31:08 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
-MIME-Version: 1.0
-In-Reply-To: <20210909183207.2228273-1-seanjc@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        id S239451AbhITNmK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Sep 2021 09:42:10 -0400
+Received: from mail.kernel.org ([198.145.29.99]:50376 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S239325AbhITNmJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Sep 2021 09:42:09 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 32B9260F21;
+        Mon, 20 Sep 2021 13:40:42 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1mSJXE-00Bm01-5z; Mon, 20 Sep 2021 14:40:40 +0100
+Date:   Mon, 20 Sep 2021 14:40:39 +0100
+Message-ID: <87o88nuzzc.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Peter Zijlstra <peterz@infradead.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Will Deacon <will@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Guo Ren <guoren@kernel.org>, Nick Hu <nickhu@andestech.com>,
+        Greentime Hu <green.hu@gmail.com>,
+        Vincent Chen <deanbo422@gmail.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Borislav Petkov <bp@alien8.de>, x86@kernel.org,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Juergen Gross <jgross@suse.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Jiri Olsa <jolsa@redhat.com>,
+        Namhyung Kim <namhyung@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-csky@vger.kernel.org, linux-riscv@lists.infradead.org,
+        kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
+        Artem Kashkanov <artem.kashkanov@intel.com>,
+        Like Xu <like.xu.linux@gmail.com>,
+        Zhu Lingshan <lingshan.zhu@intel.com>
+Subject: Re: [PATCH v2 00/13] perf: KVM: Fix, optimize, and clean up callbacks
+In-Reply-To: <7a5825d1-d6e9-8ac8-5df2-cce693525da7@redhat.com>
+References: <20210828003558.713983-1-seanjc@google.com>
+        <20210828201336.GD4353@worktop.programming.kicks-ass.net>
+        <YUO5J/jTMa2KGbsq@google.com>
+        <YURDqVZ1UXKCiKPV@hirez.programming.kicks-ass.net>
+        <662e93f9-e858-689d-d203-742731ecad2c@redhat.com>
+        <87tuifv3mb.wl-maz@kernel.org>
+        <7a5825d1-d6e9-8ac8-5df2-cce693525da7@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, peterz@infradead.org, seanjc@google.com, mingo@redhat.com, acme@kernel.org, will@kernel.org, mark.rutland@arm.com, catalin.marinas@arm.com, guoren@kernel.org, nickhu@andestech.com, green.hu@gmail.com, deanbo422@gmail.com, paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, tglx@linutronix.de, bp@alien8.de, x86@kernel.org, boris.ostrovsky@oracle.com, jgross@suse.com, alexander.shishkin@linux.intel.com, jolsa@redhat.com, namhyung@kernel.org, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, hpa@zytor.com, vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org, sstabellini@kernel.org, linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-csky@vger.kernel.org, linux-riscv@lists.infradead.org, kvm@vger.kernel.org, xen-devel@lists.xenproject.org, artem.kashkanov@intel.com, like.xu.linux@gmail.com, lingsha
+ n.zhu@intel.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 09/09/21 20:32, Sean Christopherson wrote:
-> Add a "noinline" macro to mirror the kernel's wrapping of the attribute
-> and to save typing, and use it to fix a variety of duplicate symbol errors
-> that pop up with some versions of clang due to clang aggressively inlining
-> functions that define globally visible labels in inline asm blobs.
+On Mon, 20 Sep 2021 14:18:30 +0100,
+Paolo Bonzini <pbonzini@redhat.com> wrote:
 > 
-> Bill Wendling (5):
->    lib: define the "noinline" macro
->    x86: realmode: mark exec_in_big_real_mode as noinline
->    x86: svm: mark test_run as noinline
->    x86: umip: mark do_ring3 as noinline
->    x86: vmx: mark some test_* functions as noinline
+> On 20/09/21 14:22, Marc Zyngier wrote:
+> >> I think that's only ARM, and even then it is only because of
+> >> limitations of the hardware which mostly apply only if VHE is not in
+> >> use.
+> >> 
+> >> If anything, it's ARM that should support module build in VHE mode
+> >> (Linux would still need to know whether it will be running at EL1 or
+> >> EL2, but KVM's functionality is as self-contained as on x86 in the VHE
+> >> case).
+> > I don't see this happening anytime soon. At least not before we
+> > declare the arm64 single kernel image policy to be obsolete.
 > 
-> Sean Christopherson (2):
->    lib: Drop x86/processor.h's barrier() in favor of compiler.h version
->    lib: Move __unused attribute macro to compiler.h
-> 
->   lib/libcflat.h       | 3 +--
->   lib/linux/compiler.h | 2 ++
->   lib/x86/processor.h  | 5 -----
->   x86/pmu_lbr.c        | 4 ++--
->   x86/realmode.c       | 4 +++-
->   x86/svm.c            | 2 +-
->   x86/umip.c           | 2 +-
->   x86/vmx.c            | 6 +++---
->   8 files changed, 13 insertions(+), 15 deletions(-)
-> 
+> --verbose please. :)  I am sure you're right, but I don't understand
+> the link between the two.
 
-Queued, thanks.
+To start making KVM/arm64 modular, you'd have to build it such as
+there is no support for the nVHE hypervisor anymore. Which would mean
+two different configs (one that can only work with VHE, and one for
+the rest) and contradicts the current single kernel image policy.
 
-Paolo
+It is bad enough that we have to support 3 sets of page sizes.
+Doubling the validation space for the sake of being able to unload KVM
+seems a dubious prospect.
 
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
