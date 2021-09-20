@@ -2,121 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D7F3D411296
-	for <lists+kvm@lfdr.de>; Mon, 20 Sep 2021 12:07:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 073DC4112CF
+	for <lists+kvm@lfdr.de>; Mon, 20 Sep 2021 12:24:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234414AbhITKJC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Sep 2021 06:09:02 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36427 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230289AbhITKJB (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 20 Sep 2021 06:09:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632132454;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=odkZV5dq7VYtsOMJXDg+2n8h1mYSCLrv0qFp+DsAT2Y=;
-        b=fWPVwQFNCZUhMEFMasDkkd4JGOnj5uyYR1MQe1ptU4rDHqav+s0kuy8Tf5Ewm/nq9q1gY9
-        s11N3KDbm5/FJenM7QsMaMSFfTGU3Gm/UETvmdLwIShmbbXQ3knb9tLHO/znQIZS7gt/rf
-        pE2utzpOvzQzaCaKc2Jl9UC14/X4fVc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-269-OvxKwz2wN0ygX4b2jsTIuQ-1; Mon, 20 Sep 2021 06:07:33 -0400
-X-MC-Unique: OvxKwz2wN0ygX4b2jsTIuQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S234976AbhITKZ2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Sep 2021 06:25:28 -0400
+Received: from mail.kernel.org ([198.145.29.99]:52892 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230495AbhITKZZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Sep 2021 06:25:25 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 16C8B835DE4;
-        Mon, 20 Sep 2021 10:07:31 +0000 (UTC)
-Received: from localhost (unknown [10.39.193.92])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id C6CFE101E24F;
-        Mon, 20 Sep 2021 10:07:24 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>
-Cc:     Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Pierre Morel <pmorel@linux.ibm.com>,
-        Michael Mueller <mimu@linux.ibm.com>,
-        linux-s390@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, bfu@redhat.com
-Subject: Re: [PATCH 1/1] virtio/s390: fix vritio-ccw device teardown
-In-Reply-To: <88b514a4416cf72cda53a31ad2e15c13586350e4.camel@linux.ibm.com>
-Organization: Red Hat GmbH
-References: <20210915215742.1793314-1-pasic@linux.ibm.com>
- <87pmt8hp5o.fsf@redhat.com> <20210916151835.4ab512b2.pasic@linux.ibm.com>
- <87mtobh9xn.fsf@redhat.com> <20210920003935.1369f9fe.pasic@linux.ibm.com>
- <88b514a4416cf72cda53a31ad2e15c13586350e4.camel@linux.ibm.com>
-User-Agent: Notmuch/0.32.1 (https://notmuchmail.org)
-Date:   Mon, 20 Sep 2021 12:07:23 +0200
-Message-ID: <878rzrh86c.fsf@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+        by mail.kernel.org (Postfix) with ESMTPSA id EBBAC60FED;
+        Mon, 20 Sep 2021 10:23:58 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1mSGSq-00Bjnp-Un; Mon, 20 Sep 2021 11:23:57 +0100
+Date:   Mon, 20 Sep 2021 11:23:56 +0100
+Message-ID: <87y27rv937.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Will Deacon <will@kernel.org>
+Cc:     "Russell King (Oracle)" <linux@armlinux.org.uk>,
+        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: Re: REGRESSION: Upgrading host kernel from 5.11 to 5.13 breaks QEMU guests - perf/fw_devlink/kvm
+In-Reply-To: <20210920095656.GA11961@willie-the-truck>
+References: <YUYRKVflRtUytzy5@shell.armlinux.org.uk>
+        <877dfcwutt.wl-maz@kernel.org>
+        <20210920095656.GA11961@willie-the-truck>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: will@kernel.org, linux@armlinux.org.uk, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 20 2021, Vineeth Vijayan <vneethv@linux.ibm.com> wrote:
+On Mon, 20 Sep 2021 10:56:57 +0100,
+Will Deacon <will@kernel.org> wrote:
+> 
+> On Sun, Sep 19, 2021 at 02:36:46PM +0100, Marc Zyngier wrote:
+> > From 9c26e3e6bbcbc3a583b3974e7a9017029d31fe29 Mon Sep 17 00:00:00 2001
+> > From: Marc Zyngier <maz@kernel.org>
+> > Date: Sun, 19 Sep 2021 14:09:49 +0100
+> > Subject: [PATCH] KVM: arm64: Fix PMU probe ordering
+> > 
+> > Russell reported that since 5.13, KVM's probing of the PMU has
+> > started to fail on his HW. As it turns out, there is an implicit
+> > ordering dependency between the architectural PMU probing code and
+> > and KVM's own probing. If, due to probe ordering reasons, KVM probes
+> > before the PMU driver, it will fail to detect the PMU and prevent it
+> > from being advertised to guests as well as the VMM.
+> > 
+> > Obviously, this is one probing too many, and we should be able to
+> > deal with any ordering.
+> > 
+> > Add a callback from the PMU code into KVM to advertise the registration
+> > of a host CPU PMU, allowing for any probing order.
+> > 
+> > Fixes: 5421db1be3b1 ("KVM: arm64: Divorce the perf code from oprofile helpers")
+> > Reported-by: "Russell King (Oracle)" <linux@armlinux.org.uk>
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > Link: https://lore.kernel.org/r/YUYRKVflRtUytzy5@shell.armlinux.org.uk
+> > Cc: stable@vger.kernel.org
+> > ---
+> >  arch/arm64/kvm/perf.c        |  3 ---
+> >  arch/arm64/kvm/pmu-emul.c    | 12 +++++++++++-
+> >  drivers/perf/arm_pmu.c       |  2 ++
+> >  include/kvm/arm_pmu.h        |  3 ---
+> >  include/linux/perf/arm_pmu.h |  6 ++++++
+> >  5 files changed, 19 insertions(+), 7 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/perf.c b/arch/arm64/kvm/perf.c
+> > index f9bb3b14130e..c84fe24b2ea1 100644
+> > --- a/arch/arm64/kvm/perf.c
+> > +++ b/arch/arm64/kvm/perf.c
+> > @@ -50,9 +50,6 @@ static struct perf_guest_info_callbacks kvm_guest_cbs = {
+> >  
+> >  int kvm_perf_init(void)
+> >  {
+> > -	if (kvm_pmu_probe_pmuver() != ID_AA64DFR0_PMUVER_IMP_DEF && !is_protected_kvm_enabled())
+> > -		static_branch_enable(&kvm_arm_pmu_available);
+> > -
+> >  	return perf_register_guest_info_callbacks(&kvm_guest_cbs);
+> >  }
+> >  
+> > diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> > index f5065f23b413..588100c52f34 100644
+> > --- a/arch/arm64/kvm/pmu-emul.c
+> > +++ b/arch/arm64/kvm/pmu-emul.c
+> > @@ -740,7 +740,17 @@ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
+> >  	kvm_pmu_create_perf_event(vcpu, select_idx);
+> >  }
+> >  
+> > -int kvm_pmu_probe_pmuver(void)
+> > +void kvm_host_pmu_init(struct arm_pmu *pmu)
+> > +{
+> > +	if (pmu->pmuver != 0 &&
+> > +	    pmu->pmuver != ID_AA64DFR0_PMUVER_IMP_DEF &&
+> > +	    !is_protected_kvm_enabled()) {
+> > +		static_branch_enable(&kvm_arm_pmu_available);
+> > +		kvm_info("PMU detected and enabled\n");
+> > +	}
+> > +}
+> > +
+> > +static int kvm_pmu_probe_pmuver(void)
+> >  {
+> >  	struct perf_event_attr attr = { };
+> >  	struct perf_event *event;
+> > diff --git a/drivers/perf/arm_pmu.c b/drivers/perf/arm_pmu.c
+> > index 3cbc3baf087f..295cc7952d0e 100644
+> > --- a/drivers/perf/arm_pmu.c
+> > +++ b/drivers/perf/arm_pmu.c
+> > @@ -952,6 +952,8 @@ int armpmu_register(struct arm_pmu *pmu)
+> >  		pmu->name, pmu->num_events,
+> >  		has_nmi ? ", using NMIs" : "");
+> >  
+> > +	kvm_host_pmu_init(pmu);
+> 
+> Just a nit, but I think this will get called for each PMU we probe
+> on a big.LITTLE system which is probably harmless, but possible not
+> what you want?
 
-> On Mon, 2021-09-20 at 00:39 +0200, Halil Pasic wrote:
->> On Fri, 17 Sep 2021 10:40:20 +0200
->> Cornelia Huck <cohuck@redhat.com> wrote:
->> 
-> ...snip...
->> > > 
->> > > Thanks, if I find time for it, I will try to understand this
->> > > better and
->> > > come back with my findings.
->> > >  
->> > > > > * Can virtio_ccw_remove() get called while !cdev->online and 
->> > > > >   virtio_ccw_online() is running on a different cpu? If yes,
->> > > > > what would
->> > > > >   happen then?    
->> > > > 
->> > > > All of the remove/online/... etc. callbacks are invoked via the
->> > > > ccw bus
->> > > > code. We have to trust that it gets it correct :) (Or have the
->> > > > common
->> > > > I/O layer maintainers double-check it.)
->> > > >   
->> > > 
->> > > Vineeth, what is your take on this? Are the struct ccw_driver
->> > > virtio_ccw_remove and the virtio_ccw_online callbacks mutually
->> > > exclusive. Please notice that we may initiate the onlining by
->> > > calling ccw_device_set_online() from a workqueue.
->> > > 
->> > > @Conny: I'm not sure what is your definition of 'it gets it
->> > > correct'...
->> > > I doubt CIO can make things 100% foolproof in this area.  
->> > 
->> > Not 100% foolproof, but "don't online a device that is in the
->> > progress
->> > of going away" seems pretty basic to me.
->> > 
->> 
->> I hope Vineeth will chime in on this.
-> Considering the online/offline processing, 
-> The ccw_device_set_offline function or the online/offline is handled
-> inside device_lock. Also, the online_store function takes care of
-> avoiding multiple online/offline processing. 
->
-> Now, when we consider the unconditional remove of the device,
-> I am not familiar with the virtio_ccw driver. My assumptions are based
-> on how CIO/dasd drivers works. If i understand correctly, the dasd
-> driver sets different flags to make sure that a device_open is getting
-> prevented while the the device is in progress of offline-ing. 
+Yeah, it is a bit ugly, but harmless. In the future, it would be
+useful to track which PMU is used on which CPUs, and this will give us
+a decent hook.
 
-Hm, if we are invoking the online/offline callbacks under the device
-lock already, how would that affect the remove callback? Shouldn't they
-be serialized under the device lock already? I think we are fine.
+I'll tone the print down though.
 
-For dasd, I think they also need to deal with the block device
-lifetimes. For virtio-ccw, we are basically a transport that does not
-know about devices further down the chain (that are associated with the
-virtio device, whose lifetime is tied to online/offline processing.) I'd
-presume that the serialization above would be enough.
+Thanks,
 
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
