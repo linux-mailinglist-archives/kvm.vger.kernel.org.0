@@ -2,106 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E04B241218F
-	for <lists+kvm@lfdr.de>; Mon, 20 Sep 2021 20:06:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EA11A412290
+	for <lists+kvm@lfdr.de>; Mon, 20 Sep 2021 20:15:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358403AbhITSGb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Sep 2021 14:06:31 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:50484 "EHLO
+        id S1358661AbhITSQI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Sep 2021 14:16:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25145 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1357381AbhITSEH (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 20 Sep 2021 14:04:07 -0400
+        by vger.kernel.org with ESMTP id S1358183AbhITSFg (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 20 Sep 2021 14:05:36 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632160960;
+        s=mimecast20190719; t=1632161047;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=WwlG7m0Pkd8z9L6TGcVmgxQFpqMvFaegkPkOTNgv/sc=;
-        b=VeeGQe96y7KXLsToaREdwGYLsFlDOqV/569ewjRs3U5dDJKlHHqT2sQsTP69KI28HJWogp
-        mBDQdXDUTagciw3Os0Eb82jJ5R6gkeTonrL3LtcjZwRKuUq5yr37qqH6yGJkXJZYcLAQsR
-        O5TMofG9LtSIsT4tqnLiC7nA8IJ3DMY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-60-7Hnru5NkPEWPmrJvytwe_g-1; Mon, 20 Sep 2021 14:02:39 -0400
-X-MC-Unique: 7Hnru5NkPEWPmrJvytwe_g-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DAAA51084684;
-        Mon, 20 Sep 2021 18:02:35 +0000 (UTC)
-Received: from localhost (unknown [10.39.193.92])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id DA7BD19D9D;
-        Mon, 20 Sep 2021 18:02:30 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>, David Airlie <airlied@linux.ie>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        dri-devel@lists.freedesktop.org,
-        Eric Farman <farman@linux.ibm.com>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        intel-gfx@lists.freedesktop.org,
-        intel-gvt-dev@lists.freedesktop.org,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
-        linux-s390@vger.kernel.org,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>
-Cc:     Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH v2 6/9] vfio/mdev: Add mdev available instance checking
- to the core
-In-Reply-To: <6-v2-7d3a384024cf+2060-ccw_mdev_jgg@nvidia.com>
-Organization: Red Hat GmbH
-References: <6-v2-7d3a384024cf+2060-ccw_mdev_jgg@nvidia.com>
-User-Agent: Notmuch/0.32.1 (https://notmuchmail.org)
-Date:   Mon, 20 Sep 2021 20:02:29 +0200
-Message-ID: <87tuiff7m2.fsf@redhat.com>
+        bh=SWVwHRq14ilsQLOc2MssbVuHnIq/hySiCsUjJjq23mo=;
+        b=H4hCN7xE9GZptnUJuBtZQ9819Gc4gNuEx50wwtFNlZnVkJFW9/a3fD+XJ2fDVKL0U6T7eS
+        vi+231gV2Q95KfgSBKDY4M6qWASh+lojeUyonkeEu+34Z+zyCJokxNYwevxnm8SxS7fdEU
+        ZZk1gLUr41cEIrZafRGZFNDhOIvOmgQ=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-131-BHcSuFZRPperNC7fr9N1EA-1; Mon, 20 Sep 2021 14:04:06 -0400
+X-MC-Unique: BHcSuFZRPperNC7fr9N1EA-1
+Received: by mail-wr1-f71.google.com with SMTP id c2-20020adfa302000000b0015e4260febdso5432667wrb.20
+        for <kvm@vger.kernel.org>; Mon, 20 Sep 2021 11:04:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=SWVwHRq14ilsQLOc2MssbVuHnIq/hySiCsUjJjq23mo=;
+        b=AxlFAtu0nSFTvOmy0IhIYaleBQzASxeq8sLfnb/dqsTjjBYNCCm7CysVVB0N4u4qDZ
+         CWM5Zheoyk7zfYm4MTsOoEkJIltom58LoJTbJY7yuSBdSJ7HxGmzqkOmpMC/Ij1tVE0o
+         44MxhILv5PWNcJNvkxtt6+sSaMskluGOo8dpNOhRvns9JVaycYqsUtf5hnAvGrqqRBuI
+         P8hEwCWWI7t2zG5ijnjh0Vk5f3R629eavh5UVi99SKcQcgwEWoXNeZY2YfyVJzIFJmVM
+         RiuSH5uCDSR6v3owkvqQO84dOpAbmSThKiHdsIyGyDmVpPWhI4wAf/aO63V8ElVSaQnJ
+         EI+A==
+X-Gm-Message-State: AOAM532ulPvQTAmRi6Z48ASOcA+/XMB6Ax0f3F+SHxrJrJX/APiViYZE
+        DZGBR9bGeTaooKatXZW2dQbz36NFKzbeOL8CwjPxlbfuOsO5Px+ljR6KsAb2/1mVpRVdoooHSkp
+        nJKiiyxa9GHUm
+X-Received: by 2002:a1c:4b15:: with SMTP id y21mr316150wma.183.1632161044728;
+        Mon, 20 Sep 2021 11:04:04 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzsiXlWpB/5J0lr5JzRS5MkeXcdzSbANExZMY5rVvhRsi9JXbEvgdzcU/Xcv1j0BqCSxQP6vg==
+X-Received: by 2002:a1c:4b15:: with SMTP id y21mr316126wma.183.1632161044523;
+        Mon, 20 Sep 2021 11:04:04 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id j134sm287087wmj.27.2021.09.20.11.04.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 20 Sep 2021 11:04:03 -0700 (PDT)
+Subject: Re: [kvm-unit-tests PATCH 1/2] Makefile: Fix cscope
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     Pierre Morel <pmorel@linux.ibm.com>,
+        Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org,
+        frankja@linux.ibm.com, david@redhat.com, cohuck@redhat.com,
+        imbrenda@linux.ibm.com
+References: <1629908421-8543-1-git-send-email-pmorel@linux.ibm.com>
+ <1629908421-8543-2-git-send-email-pmorel@linux.ibm.com>
+ <1dd4c64e-3866-98c9-8178-dbff90dca55f@redhat.com>
+ <2aaffea2-0a20-1a6d-eebb-69b6cfe6e83c@linux.ibm.com>
+ <20210827102204.3y6gdpchn77cz7yo@gator.home>
+ <327ff7e0-82d8-a12d-7565-e476b1dbcca8@redhat.com>
+ <20210920141039.jfb2iektdzdjldy5@gator>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <7b2d795b-a65c-1983-868c-b4ae38d939f8@redhat.com>
+Date:   Mon, 20 Sep 2021 20:04:02 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <20210920141039.jfb2iektdzdjldy5@gator>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 09 2021, Jason Gunthorpe <jgg@nvidia.com> wrote:
+On 20/09/21 16:10, Andrew Jones wrote:
+> Hi Paolo,
+> 
+> You'll get a conflict when you go to merge because I already did it :-)
+> 
+> commit 3d4eb24cb5b4de6c26f79b849fe2818d5315a691 (origin/misc/queue, misc/queue)
+> Author: Andrew Jones <drjones@redhat.com>
+> Date:   Fri Aug 27 12:25:27 2021 +0200
+> 
+>      Makefile: Don't trust PWD
+>      
+>      PWD comes from the environment and it's possible that it's already
+>      set to something which isn't the full path of the current working
+>      directory. Use the make variable $(CURDIR) instead.
+>      
+>      Reviewed-by: Pierre Morel <pmorel@linux.ibm.com>
+>      Reviewed-by: Thomas Huth <thuth@redhat.com>
+>      Suggested-by: Thomas Huth <thuth@redhat.com>
+>      Signed-off-by: Andrew Jones <drjones@redhat.com>
+> 
+> 
+> 
+> misc/queue is something I recently invented for stuff like this in order
+> to help lighten your load a bit.
 
-> Many of the mdev drivers use a simple counter for keeping track of the
-> available instances. Move this code to the core code and store the counter
-> in the mdev_type. Implement it using correct locking, fixing mdpy.
->
-> Drivers provide a get_available() callback to set the number of available
-> instances for their mtypes which is fixed at registration time. The core
-> provides a standard sysfs attribute to return the available_instances.
-
-So, according to the documentation, available_instances is
-mandatory. This means that drivers either need to provide get_available
-or implement their own version of the attribute. I think we want to
-update vfio-mediated-device.rst as well?
-
->
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> ---
->  drivers/s390/cio/vfio_ccw_drv.c       |  1 -
->  drivers/s390/cio/vfio_ccw_ops.c       | 26 ++++++-------------
->  drivers/s390/cio/vfio_ccw_private.h   |  2 --
->  drivers/s390/crypto/vfio_ap_ops.c     | 32 ++++++-----------------
->  drivers/s390/crypto/vfio_ap_private.h |  2 --
->  drivers/vfio/mdev/mdev_core.c         | 11 +++++++-
->  drivers/vfio/mdev/mdev_private.h      |  2 ++
->  drivers/vfio/mdev/mdev_sysfs.c        | 37 +++++++++++++++++++++++++++
->  include/linux/mdev.h                  |  2 ++
->  samples/vfio-mdev/mdpy.c              | 22 +++++-----------
->  10 files changed, 73 insertions(+), 64 deletions(-)
-
-Otherwise, looks good.
+Ok, are you going to create a merge request?
 
