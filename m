@@ -2,20 +2,20 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D83D541283E
-	for <lists+kvm@lfdr.de>; Mon, 20 Sep 2021 23:42:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3856A412840
+	for <lists+kvm@lfdr.de>; Mon, 20 Sep 2021 23:42:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244569AbhITVnW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Sep 2021 17:43:22 -0400
-Received: from vps-vb.mhejs.net ([37.28.154.113]:45414 "EHLO vps-vb.mhejs.net"
+        id S244847AbhITVnY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Sep 2021 17:43:24 -0400
+Received: from vps-vb.mhejs.net ([37.28.154.113]:45450 "EHLO vps-vb.mhejs.net"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233066AbhITVlS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Sep 2021 17:41:18 -0400
+        id S235349AbhITVlX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Sep 2021 17:41:23 -0400
 Received: from MUA
         by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <mail@maciej.szmigiero.name>)
-        id 1mSR0a-0006PW-Mj; Mon, 20 Sep 2021 23:39:28 +0200
+        id 1mSR0g-0006Q5-2P; Mon, 20 Sep 2021 23:39:34 +0200
 From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>
@@ -37,9 +37,9 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         Claudio Imbrenda <imbrenda@linux.ibm.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v5 04/13] KVM: x86: Move n_memslots_pages recalc to kvm_arch_prepare_memory_region()
-Date:   Mon, 20 Sep 2021 23:38:52 +0200
-Message-Id: <2a4ceee16546deeab7090efea2ee9c0db5444b84.1632171479.git.maciej.szmigiero@oracle.com>
+Subject: [PATCH v5 05/13] KVM: Integrate gfn_to_memslot_approx() into search_memslots()
+Date:   Mon, 20 Sep 2021 23:38:53 +0200
+Message-Id: <d0d2c6fda0a21962eefcf28b37a603caa4be1819.1632171479.git.maciej.szmigiero@oracle.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <cover.1632171478.git.maciej.szmigiero@oracle.com>
 References: <cover.1632171478.git.maciej.szmigiero@oracle.com>
@@ -51,77 +51,160 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
 
-This allows us to return a proper error code in case we spot an underflow.
+s390 arch has gfn_to_memslot_approx() which is almost identical to
+search_memslots(), differing only in that in case the gfn falls in a hole
+one of the memslots bordering the hole is returned.
+
+Add this lookup mode as an option to search_memslots() so we don't have two
+almost identical functions for looking up a memslot by its gfn.
 
 Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 ---
- arch/x86/kvm/x86.c | 49 ++++++++++++++++++++++++++--------------------
- 1 file changed, 28 insertions(+), 21 deletions(-)
+ arch/s390/kvm/kvm-s390.c | 39 ++-------------------------------------
+ include/linux/kvm_host.h | 25 ++++++++++++++++++++++---
+ virt/kvm/kvm_main.c      |  2 +-
+ 3 files changed, 25 insertions(+), 41 deletions(-)
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 97d86223427d..0fffb8414009 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -11511,9 +11511,23 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
- 				const struct kvm_userspace_memory_region *mem,
- 				enum kvm_mr_change change)
- {
--	if (change == KVM_MR_CREATE || change == KVM_MR_MOVE)
--		return kvm_alloc_memslot_metadata(kvm, new,
--						  mem->memory_size >> PAGE_SHIFT);
-+	if (change == KVM_MR_CREATE || change == KVM_MR_MOVE) {
-+		int ret;
-+
-+		ret = kvm_alloc_memslot_metadata(kvm, new,
-+						 mem->memory_size >> PAGE_SHIFT);
-+		if (ret)
-+			return ret;
-+
-+		if (change == KVM_MR_CREATE)
-+			kvm->arch.n_memslots_pages += new->npages;
-+	} else if (change == KVM_MR_DELETE) {
-+		if (WARN_ON(kvm->arch.n_memslots_pages < old->npages))
-+			return -EIO;
-+
-+		kvm->arch.n_memslots_pages -= old->npages;
-+	}
-+
- 	return 0;
- }
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index 3fd0f4afe742..540fa948baa5 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -1941,41 +1941,6 @@ static long kvm_s390_set_skeys(struct kvm *kvm, struct kvm_s390_skeys *args)
+ /* for consistency */
+ #define KVM_S390_CMMA_SIZE_MAX ((u32)KVM_S390_SKEYS_MAX)
  
-@@ -11610,24 +11624,17 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
- 				const struct kvm_memory_slot *new,
- 				enum kvm_mr_change change)
+-/*
+- * Similar to gfn_to_memslot, but returns the index of a memslot also when the
+- * address falls in a hole. In that case the index of one of the memslots
+- * bordering the hole is returned.
+- */
+-static int gfn_to_memslot_approx(struct kvm_memslots *slots, gfn_t gfn)
+-{
+-	int start = 0, end = slots->used_slots;
+-	int slot = atomic_read(&slots->last_used_slot);
+-	struct kvm_memory_slot *memslots = slots->memslots;
+-
+-	if (gfn >= memslots[slot].base_gfn &&
+-	    gfn < memslots[slot].base_gfn + memslots[slot].npages)
+-		return slot;
+-
+-	while (start < end) {
+-		slot = start + (end - start) / 2;
+-
+-		if (gfn >= memslots[slot].base_gfn)
+-			end = slot;
+-		else
+-			start = slot + 1;
+-	}
+-
+-	if (start >= slots->used_slots)
+-		return slots->used_slots - 1;
+-
+-	if (gfn >= memslots[start].base_gfn &&
+-	    gfn < memslots[start].base_gfn + memslots[start].npages) {
+-		atomic_set(&slots->last_used_slot, start);
+-	}
+-
+-	return start;
+-}
+-
+ static int kvm_s390_peek_cmma(struct kvm *kvm, struct kvm_s390_cmma_log *args,
+ 			      u8 *res, unsigned long bufsize)
  {
--	if (change == KVM_MR_CREATE || change == KVM_MR_DELETE) {
--		if (change == KVM_MR_CREATE)
--			kvm->arch.n_memslots_pages += new->npages;
--		else {
--			WARN_ON(kvm->arch.n_memslots_pages < old->npages);
--			kvm->arch.n_memslots_pages -= old->npages;
--		}
--
--		if (!kvm->arch.n_requested_mmu_pages) {
--			u64 memslots_pages;
--			unsigned long nr_mmu_pages;
--
--			memslots_pages = kvm->arch.n_memslots_pages * KVM_PERMILLE_MMU_PAGES;
--			do_div(memslots_pages, 1000);
--			nr_mmu_pages = max_t(typeof(nr_mmu_pages),
--					     memslots_pages, KVM_MIN_ALLOC_MMU_PAGES);
--			kvm_mmu_change_mmu_pages(kvm, nr_mmu_pages);
--		}
-+	/* Only CREATE or DELETE affects n_memslots_pages */
-+	if ((change == KVM_MR_CREATE || change == KVM_MR_DELETE) &&
-+	    !kvm->arch.n_requested_mmu_pages) {
-+		u64 memslots_pages;
-+		unsigned long nr_mmu_pages;
-+
-+		memslots_pages = kvm->arch.n_memslots_pages * KVM_PERMILLE_MMU_PAGES;
-+		do_div(memslots_pages, 1000);
-+		nr_mmu_pages = max_t(typeof(nr_mmu_pages),
-+				     memslots_pages, KVM_MIN_ALLOC_MMU_PAGES);
-+		kvm_mmu_change_mmu_pages(kvm, nr_mmu_pages);
+@@ -2002,8 +1967,8 @@ static int kvm_s390_peek_cmma(struct kvm *kvm, struct kvm_s390_cmma_log *args,
+ static unsigned long kvm_s390_next_dirty_cmma(struct kvm_memslots *slots,
+ 					      unsigned long cur_gfn)
+ {
+-	int slotidx = gfn_to_memslot_approx(slots, cur_gfn);
+-	struct kvm_memory_slot *ms = slots->memslots + slotidx;
++	struct kvm_memory_slot *ms = __gfn_to_memslot_approx(slots, cur_gfn, true);
++	int slotidx = ms - slots->memslots;
+ 	unsigned long ofs = cur_gfn - ms->base_gfn;
+ 
+ 	if (ms->base_gfn + ms->npages <= cur_gfn) {
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index c6963f6f1eb8..8fd9644f40b2 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -1231,10 +1231,14 @@ try_get_memslot(struct kvm_memslots *slots, int slot_index, gfn_t gfn)
+  * Returns a pointer to the memslot that contains gfn and records the index of
+  * the slot in index. Otherwise returns NULL.
+  *
++ * With "approx" set returns the memslot also when the address falls
++ * in a hole. In that case one of the memslots bordering the hole is
++ * returned.
++ *
+  * IMPORTANT: Slots are sorted from highest GFN to lowest GFN!
+  */
+ static inline struct kvm_memory_slot *
+-search_memslots(struct kvm_memslots *slots, gfn_t gfn, int *index)
++search_memslots(struct kvm_memslots *slots, gfn_t gfn, int *index, bool approx)
+ {
+ 	int start = 0, end = slots->used_slots;
+ 	struct kvm_memory_slot *memslots = slots->memslots;
+@@ -1252,11 +1256,20 @@ search_memslots(struct kvm_memslots *slots, gfn_t gfn, int *index)
+ 			start = slot + 1;
  	}
  
- 	kvm_mmu_slot_apply_flags(kvm, old, new, change);
++	if (approx && start >= slots->used_slots) {
++		*index = slots->used_slots - 1;
++		return &memslots[slots->used_slots - 1];
++	}
++
+ 	slot = try_get_memslot(slots, start, gfn);
+ 	if (slot) {
+ 		*index = start;
+ 		return slot;
+ 	}
++	if (approx) {
++		*index = start;
++		return &memslots[start];
++	}
+ 
+ 	return NULL;
+ }
+@@ -1267,7 +1280,7 @@ search_memslots(struct kvm_memslots *slots, gfn_t gfn, int *index)
+  * itself isn't here as an inline because that would bloat other code too much.
+  */
+ static inline struct kvm_memory_slot *
+-__gfn_to_memslot(struct kvm_memslots *slots, gfn_t gfn)
++__gfn_to_memslot_approx(struct kvm_memslots *slots, gfn_t gfn, bool approx)
+ {
+ 	struct kvm_memory_slot *slot;
+ 	int slot_index = atomic_read(&slots->last_used_slot);
+@@ -1276,7 +1289,7 @@ __gfn_to_memslot(struct kvm_memslots *slots, gfn_t gfn)
+ 	if (slot)
+ 		return slot;
+ 
+-	slot = search_memslots(slots, gfn, &slot_index);
++	slot = search_memslots(slots, gfn, &slot_index, approx);
+ 	if (slot) {
+ 		atomic_set(&slots->last_used_slot, slot_index);
+ 		return slot;
+@@ -1285,6 +1298,12 @@ __gfn_to_memslot(struct kvm_memslots *slots, gfn_t gfn)
+ 	return NULL;
+ }
+ 
++static inline struct kvm_memory_slot *
++__gfn_to_memslot(struct kvm_memslots *slots, gfn_t gfn)
++{
++	return __gfn_to_memslot_approx(slots, gfn, false);
++}
++
+ static inline unsigned long
+ __gfn_to_hva_memslot(const struct kvm_memory_slot *slot, gfn_t gfn)
+ {
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index c3c71a9e85c9..14043a6edb88 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -2062,7 +2062,7 @@ struct kvm_memory_slot *kvm_vcpu_gfn_to_memslot(struct kvm_vcpu *vcpu, gfn_t gfn
+ 	 * search_memslots() instead of __gfn_to_memslot() to avoid
+ 	 * thrashing the VM-wide last_used_index in kvm_memslots.
+ 	 */
+-	slot = search_memslots(slots, gfn, &slot_index);
++	slot = search_memslots(slots, gfn, &slot_index, false);
+ 	if (slot) {
+ 		vcpu->last_used_slot = slot_index;
+ 		return slot;
