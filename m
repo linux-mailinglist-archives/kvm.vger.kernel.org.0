@@ -2,48 +2,48 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C827E412FEC
-	for <lists+kvm@lfdr.de>; Tue, 21 Sep 2021 10:10:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A1CE2412FED
+	for <lists+kvm@lfdr.de>; Tue, 21 Sep 2021 10:10:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230488AbhIUIME (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Sep 2021 04:12:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34308 "EHLO
+        id S230516AbhIUIMF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Sep 2021 04:12:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34322 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230032AbhIUIMB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Sep 2021 04:12:01 -0400
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57A2EC061574
-        for <kvm@vger.kernel.org>; Tue, 21 Sep 2021 01:10:33 -0700 (PDT)
-Received: by mail-pj1-x1032.google.com with SMTP id mv7-20020a17090b198700b0019c843e7233so1941966pjb.4
-        for <kvm@vger.kernel.org>; Tue, 21 Sep 2021 01:10:33 -0700 (PDT)
+        with ESMTP id S230503AbhIUIME (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Sep 2021 04:12:04 -0400
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A37C0C061574
+        for <kvm@vger.kernel.org>; Tue, 21 Sep 2021 01:10:36 -0700 (PDT)
+Received: by mail-pf1-x42c.google.com with SMTP id 145so4817393pfz.11
+        for <kvm@vger.kernel.org>; Tue, 21 Sep 2021 01:10:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=z1XhbmNjXuxATXULuRYAdEo5pXlezWSkYfiPLBzzUfs=;
-        b=U83bLqev3pRm8sTSPZ4rnpHt3wXQ4oKXvlcl3wjlCuQiJzNeLy/+9rUuQoGOc40KHY
-         07/IH1lYr9TJf2NuJl2UJxjLU5NE1cWjqayNFQSh/qKAkG9qqTLlMYM03CEyQDQIeR5T
-         V4XwsDK45HRaEwumcPHtrwtwlRMwMSj6XiUnQ=
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=gqSb6j4QRhVbcfEJejcSoBsQvuv4/cNZIL9rAN4Q0hA=;
+        b=PELG7kS3lN8UtXOhNNLdA4nqJ60qmLHh7+zrQsC6JizwO6CT+YPqFBafj62bp7SZqj
+         t0dkM6lqQETxe3vXhlMjoTQ6gsFbPGw50UtjDmL652mw7ovatrVJiAddT3xcjTFascjj
+         hK5fO3Fy/tpm5EYWb/YSD23E2SMl6sjoWWDrQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=z1XhbmNjXuxATXULuRYAdEo5pXlezWSkYfiPLBzzUfs=;
-        b=DJNzA1GzP0oAQJsscVJVMNfIsY5U5trHo+Gq7ytPStGWKUfnKssJMbSdBHt2Gl0HUs
-         h7ZXHBaI1jp7I/OdZAst6pdHm6XxfRtU7ErorwzBK/1M9mZpd3bOA1Bxckq18NvLhllG
-         WJ22aM/+SMfyaiMOF/eEY1xhax3VM9ggdXdoyp8LPGQZQB4OoVFkvr79BYB3y001qLzn
-         9Z1gQVBk0e7L0SX+/qMd0AU+BtlvqtGPYVrmY+RTGOqkGtREK35nVzOfBN82Dyzdm27/
-         uF0d0xzpYBz6pVtQsReikms1velz3TG5L1ZYh3B6LiRWtd9CKczes6nbUr9dCAdR3DzW
-         0MoQ==
-X-Gm-Message-State: AOAM532+oA4DeL7/+p+bHH66a1YQAE2AiJxcA1MpJP4q38uPVAJvpa80
-        crK2wyflFP1vzx+X/tMI9llcBj4uYuGX1g==
-X-Google-Smtp-Source: ABdhPJz5VDycvTD77TKaG0JLsFI8IbnpJ0VyeVpNS+ZZTTexE0J9DFPiLhV/Rzil95TilYH+dj2A/Q==
-X-Received: by 2002:a17:90a:1944:: with SMTP id 4mr3877285pjh.62.1632211832640;
-        Tue, 21 Sep 2021 01:10:32 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=gqSb6j4QRhVbcfEJejcSoBsQvuv4/cNZIL9rAN4Q0hA=;
+        b=3C/Fs1chXuTzvzjLSFsfh5emkm52vft0NNw4cbJl/TW01x7N/m1oc9bSDBx00eGHUw
+         dTQ0kFvi1LylT7xz8V9wzVdX7wb/Jpxdt9UzHEfJwziKIFL4kVTY41rAJDyTYe0AnCfS
+         /d1QHTJM2H+gIZw1T5eH5fW9QVKPmui12cEfx5HiXyQH7f2H4sjeoAdV/tRXVc5K4hP6
+         gyDtZNZ046tqQ3/M2PDkn5zZyx9Iu7coiq3Zrqbebpjp64J6IexJTaSx8AgMV3aahzeM
+         XlSfai8z+JFhEOBL5zyberLRUYWkZLHECx0bqVDfmxC+Mm6bB0z0vF9tbqnvHvAKyg6N
+         Ss9w==
+X-Gm-Message-State: AOAM531r/X11LnlcL4rhaltcMKHojs2bCm6OkY/9fMoPxrGBLAewPsbU
+        X7Baf+NZmdB1M6HPXAEujBZy8NKj2SxCbA==
+X-Google-Smtp-Source: ABdhPJzEf69drbQ3iEQj+oBbjYexjFbvcsB9OmJbkWU0ykpWZgd3uHqpEwhVmCovht8coMxX6SMWnQ==
+X-Received: by 2002:a62:1717:0:b0:440:527f:6664 with SMTP id 23-20020a621717000000b00440527f6664mr27914710pfx.73.1632211836048;
+        Tue, 21 Sep 2021 01:10:36 -0700 (PDT)
 Received: from localhost ([2401:fa00:8f:203:2b35:ed47:4cb5:84b])
-        by smtp.gmail.com with UTF8SMTPSA id y3sm5669658pfr.140.2021.09.21.01.10.30
+        by smtp.gmail.com with UTF8SMTPSA id w22sm12947071pgc.56.2021.09.21.01.10.34
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 Sep 2021 01:10:32 -0700 (PDT)
+        Tue, 21 Sep 2021 01:10:35 -0700 (PDT)
 From:   David Stevens <stevensd@chromium.org>
 X-Google-Original-From: David Stevens <stevensd@google.com>
 To:     kvm@vger.kernel.org
@@ -54,10 +54,12 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>,
         David Stevens <stevensd@chromium.org>
-Subject: [PATCH 0/3] KVM: x86: skip gfn_track allocation when possible
-Date:   Tue, 21 Sep 2021 17:10:07 +0900
-Message-Id: <20210921081010.457591-1-stevensd@google.com>
+Subject: [PATCH 1/3] KVM: x86: add config for non-kvm users of page tracking
+Date:   Tue, 21 Sep 2021 17:10:08 +0900
+Message-Id: <20210921081010.457591-2-stevensd@google.com>
 X-Mailer: git-send-email 2.33.0.464.g1972c5931b-goog
+In-Reply-To: <20210921081010.457591-1-stevensd@google.com>
+References: <20210921081010.457591-1-stevensd@google.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -66,41 +68,39 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: David Stevens <stevensd@chromium.org>
 
-Skip allocating gfn_track arrays when tracking of guest write access to
-pages is not required. For VMs where the allocation can be avoided, this
-saves 2 bytes per 4KB of guest memory.
+Add a config option that allows kvm to determine whether or not there
+are any external users of page tracking.
 
-Write tracking is used to manage shadow page tables in three cases -
-when tdp is not supported, when nested virtualization is used, and for
-GVT-g. By combining the existing tdp_enable flag and nested module param
-with a new config that indicates when something outside of KVM (i.e.
-GVT-g) needs write tracking, KVM can determine when initializing a VM
-if gfn_track arrays are definitely not necessary.
+Signed-off-by: David Stevens <stevensd@chromium.org>
+---
+ arch/x86/kvm/Kconfig         | 3 +++
+ drivers/gpu/drm/i915/Kconfig | 1 +
+ 2 files changed, 4 insertions(+)
 
-This straightforward approach has the downside that for VMs where nested
-virtualization is enabled but never used, gfn_track arrays are still
-allocated. Instead of going so far as to try to initialize things on
-demand, key off of whether or not X86_FEATURE_VMX is set in the guest's
-cpuid to support per-VM configuration instead of system wide
-configuration based on the nested module param.
-
-David Stevens (3):
-  KVM: x86: add config for non-kvm users of page tracking
-  KVM: x86/mmu: skip page tracking when possible
-  KVM: VMX: skip page tracking based on cpuid
-
- arch/x86/include/asm/kvm-x86-ops.h    |  1 +
- arch/x86/include/asm/kvm_host.h       |  4 +-
- arch/x86/include/asm/kvm_page_track.h |  7 ++-
- arch/x86/kvm/Kconfig                  |  3 ++
- arch/x86/kvm/cpuid.c                  | 55 +++++++++++++++-----
- arch/x86/kvm/mmu/page_track.c         | 74 +++++++++++++++++++++++++--
- arch/x86/kvm/svm/svm.c                | 10 +++-
- arch/x86/kvm/vmx/vmx.c                | 13 ++++-
- arch/x86/kvm/x86.c                    |  5 +-
- drivers/gpu/drm/i915/Kconfig          |  1 +
- 10 files changed, 150 insertions(+), 23 deletions(-)
-
+diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+index ac69894eab88..619186138176 100644
+--- a/arch/x86/kvm/Kconfig
++++ b/arch/x86/kvm/Kconfig
+@@ -129,4 +129,7 @@ config KVM_MMU_AUDIT
+ 	 This option adds a R/W kVM module parameter 'mmu_audit', which allows
+ 	 auditing of KVM MMU events at runtime.
+ 
++config KVM_EXTERNAL_WRITE_TRACKING
++	bool
++
+ endif # VIRTUALIZATION
+diff --git a/drivers/gpu/drm/i915/Kconfig b/drivers/gpu/drm/i915/Kconfig
+index f960f5d7664e..107762427648 100644
+--- a/drivers/gpu/drm/i915/Kconfig
++++ b/drivers/gpu/drm/i915/Kconfig
+@@ -126,6 +126,7 @@ config DRM_I915_GVT_KVMGT
+ 	depends on DRM_I915_GVT
+ 	depends on KVM
+ 	depends on VFIO_MDEV
++	select KVM_EXTERNAL_WRITE_TRACKING
+ 	default n
+ 	help
+ 	  Choose this option if you want to enable KVMGT support for
 -- 
 2.33.0.464.g1972c5931b-goog
 
