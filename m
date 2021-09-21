@@ -2,192 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 99372413A07
-	for <lists+kvm@lfdr.de>; Tue, 21 Sep 2021 20:22:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5371F413A0D
+	for <lists+kvm@lfdr.de>; Tue, 21 Sep 2021 20:25:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232644AbhIUSXt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Sep 2021 14:23:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34702 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232729AbhIUSXr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Sep 2021 14:23:47 -0400
-Received: from mail-io1-xd30.google.com (mail-io1-xd30.google.com [IPv6:2607:f8b0:4864:20::d30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F996C061574
-        for <kvm@vger.kernel.org>; Tue, 21 Sep 2021 11:22:09 -0700 (PDT)
-Received: by mail-io1-xd30.google.com with SMTP id h129so4194715iof.1
-        for <kvm@vger.kernel.org>; Tue, 21 Sep 2021 11:22:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=9+MHxSXYWf62H1mi1zwglh1AL9XfTUwDuHjSd9t/urI=;
-        b=jyujWDhde9Ijat2B16V/yQFlxPDr13NnlzjpfFtbN/4jk4xVU5OLGyChRGgfFmiXEf
-         17pwo3aMGu4v0FWTN96FMwOVx0HdSEeCJ+7wkdtk4JUYaDxEQbuf2WnEBLE3qTc6NCEJ
-         128fHPjCV0jY/+/G0916Bz0MK+UcCJ2RMVLryO23dF42QcZRJtWwLrGq10JGSk37NEhl
-         DYWU+Ew1iSYu8FV2BX4Q7uYsRpPZDyyOnSZzQoqqU4a/74glpc3LlyZ6HtAGwd74hn7I
-         uqByjmnxA/EzblonHNyVc/aN2CZOQ8r+6PY1ZZBNbaNdOYE36rcMq+0gD009RAKIUV0k
-         r51w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=9+MHxSXYWf62H1mi1zwglh1AL9XfTUwDuHjSd9t/urI=;
-        b=zgm+WChCVRqDxV2hMfibHBR+O46bRRTe70xY1UKD9TU5Z7roLglDCre4j1ndkiFMsw
-         jh0siD2ez57tp3Q27Vg70UnDOVBCLC125Ms8nNqSONxbgzSJVdULssbuzwsa3vQIEoMj
-         mu1+8L0zAk+/BlCKclpbQ13rBdh5wosTm6tUqojAoDOpmwZVXLXrQKEPHGr9Xvumq3Mi
-         oOryugI7a4qI8DtmADKIwuEzB+FHgVW3Zh55wazcRuUaI8pukE4Pp0/c08y+xg62E/A8
-         JcRxOuYgmSJ8KNQmn0NxTFgkbMU0Ix3wwEEKUUOnxI5QhAHRwihrgSscPY8vUerjltbO
-         Xeng==
-X-Gm-Message-State: AOAM531JPYcW3USI4A8aIYM6PSMx2G9okRiQLZCkvrPYdUn1EewXrRB6
-        b0VWCyJhHIqH0zEJ+rgXPx6ZAw==
-X-Google-Smtp-Source: ABdhPJxbTKfRsy2+nMboYmvHPECb+3i1VPhDhlxB7htZ/MIZ22coBg216qMnOQCeKMbph/gje7gM7Q==
-X-Received: by 2002:a05:6638:2393:: with SMTP id q19mr1249131jat.109.1632248528551;
-        Tue, 21 Sep 2021 11:22:08 -0700 (PDT)
-Received: from google.com (194.225.68.34.bc.googleusercontent.com. [34.68.225.194])
-        by smtp.gmail.com with ESMTPSA id w4sm3355197iox.25.2021.09.21.11.22.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Sep 2021 11:22:07 -0700 (PDT)
-Date:   Tue, 21 Sep 2021 18:22:04 +0000
-From:   Oliver Upton <oupton@google.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <Alexandru.Elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH 0/6] KVM: arm64: Implement PSCI SYSTEM_SUSPEND support
-Message-ID: <YUoizIJ+xQTreLtP@google.com>
-References: <20210819223640.3564975-1-oupton@google.com>
- <87ilzecbkj.wl-maz@kernel.org>
- <CAOQ_QsgOtufyB6_qGAs4fQf6kd81FSMSj44uiVRgoFQWOf3nRA@mail.gmail.com>
- <87a6kocmcx.wl-maz@kernel.org>
- <CAOQ_QshZe8ay03XqCo4DkM6zUaOuEoS5bRbrOy+FsuXaJ=YyKA@mail.gmail.com>
- <87k0jauurx.wl-maz@kernel.org>
+        id S232956AbhIUS0t (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Sep 2021 14:26:49 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41112 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232890AbhIUS0s (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 21 Sep 2021 14:26:48 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 18LHClbs018413;
+        Tue, 21 Sep 2021 14:25:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=yUCduo/+FNeUPxDRhu1f5vXQoveIvMutiZCSsB7+WSE=;
+ b=bMaBaV8ffDypiiCsgH0z473+w7HnQHrCmYut2IjbPv6C1jPWHgL49mE19ENLQwJvgnb+
+ cZXdj2V/wH+xB1Ewlvo61qj1MDC9wvpjewceaQb9p/hhCYjSuWLb3p+u90+d1MaE4hgN
+ z2ev261u+8NnaZH6C8xtx0r8VxXOJDMfi8KsUhAUM2nBPU/YHGnN5LiDQs43T+gETlTn
+ xQPdrOT15fkWSrzy82sO4rSeQGVPEnViP/zT35nNvqnB6SBCVNBF1zf0JSj4i235dmk4
+ vRwH4ILAzu0N8AHxnNksWlosnby3y5K4gV8FhDGcr2uJQyR9D3YDTbgdfaQsWRIsrstS Gw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3b7kkg9fjj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 21 Sep 2021 14:25:18 -0400
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 18LIKGCC002051;
+        Tue, 21 Sep 2021 14:25:17 -0400
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3b7kkg9fhs-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 21 Sep 2021 14:25:17 -0400
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 18LIHHa4029307;
+        Tue, 21 Sep 2021 18:25:14 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma02fra.de.ibm.com with ESMTP id 3b57r9fe0y-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 21 Sep 2021 18:25:14 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 18LIPA7a2753116
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 21 Sep 2021 18:25:11 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B865B52057;
+        Tue, 21 Sep 2021 18:25:10 +0000 (GMT)
+Received: from li-748c07cc-28e5-11b2-a85c-e3822d7eceb3.ibm.com (unknown [9.171.53.36])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 19E8152077;
+        Tue, 21 Sep 2021 18:25:10 +0000 (GMT)
+Message-ID: <f4dc7040554fd7e9c7067aab2213b3639cfc6987.camel@linux.ibm.com>
+Subject: Re: [PATCH 1/1] virtio/s390: fix vritio-ccw device teardown
+From:   Vineeth Vijayan <vneethv@linux.ibm.com>
+To:     Halil Pasic <pasic@linux.ibm.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Pierre Morel <pmorel@linux.ibm.com>,
+        Michael Mueller <mimu@linux.ibm.com>,
+        linux-s390@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, bfu@redhat.com,
+        Peter Oberparleiter <oberpar@linux.ibm.com>
+Date:   Tue, 21 Sep 2021 20:25:09 +0200
+In-Reply-To: <20210921185222.246b15bb.pasic@linux.ibm.com>
+References: <20210915215742.1793314-1-pasic@linux.ibm.com>
+         <87pmt8hp5o.fsf@redhat.com> <20210916151835.4ab512b2.pasic@linux.ibm.com>
+         <87mtobh9xn.fsf@redhat.com> <20210920003935.1369f9fe.pasic@linux.ibm.com>
+         <88b514a4416cf72cda53a31ad2e15c13586350e4.camel@linux.ibm.com>
+         <878rzrh86c.fsf@redhat.com> <20210921052548.4eea231f.pasic@linux.ibm.com>
+         <05b1ac0e4aa4a1c7df1a8994c898630e9b2e384d.camel@linux.ibm.com>
+         <20210921185222.246b15bb.pasic@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-16.el8) 
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 0Ci8AMH7zOq2wX571aPN8cNde7Yq4fRB
+X-Proofpoint-ORIG-GUID: 0iig0ErpBc7Z_dJZR9LRPPvSFK2wT6FU
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87k0jauurx.wl-maz@kernel.org>
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.391,FMLib:17.0.607.475
+ definitions=2021-09-21_05,2021-09-20_01,2020-04-07_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 suspectscore=0
+ priorityscore=1501 impostorscore=0 adultscore=0 malwarescore=0
+ phishscore=0 clxscore=1015 mlxlogscore=999 lowpriorityscore=0 mlxscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2109030001 definitions=main-2109210107
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hey Marc,
-
-On Tue, Sep 21, 2021 at 10:45:22AM +0100, Marc Zyngier wrote:
-> > > > > - How do you define which interrupts are actual wake-up events?
-> > > > >   Nothing in the GIC architecture defines what a wake-up is (let alone
-> > > > >   a wake-up event).
-> > > >
-> > > > Good point.
-> > > >
-> > > > One possible implementation of suspend could just be a `WFI` in a
-> > > > higher EL. In this case, KVM could emulate WFI wake up events
-> > > > according to D1.16.2 in DDI 0487G.a. But I agree, it isn't entirely
-> > > > clear what constitutes a wakeup from powered down state.
-> > >
-> > > It isn't, and it is actually IMPDEF (there isn't much in the ARM ARM
-> > > in terms of what constitutes a low power state). And even if you
-> > > wanted to emulate a WFI in userspace, the problem of interrupts that
-> > > have their source in the kernel remains. How to you tell userspace
-> > > that such an event has occurred if the vcpu thread isn't in the
-> > > kernel?
-> > 
-> > Well, are there any objections to saying for the KVM implementation we
-> > observe the WFI wake-up events per the cited section of the ARM ARM?
+On Tue, 2021-09-21 at 18:52 +0200, Halil Pasic wrote:
+> > > > lock already,   
+> > > 
+> > > I believe we have a misunderstanding here. I believe that Vineeth
+> > > is
+> > > trying to tell us, that online_store_handle_offline() and
+> > > online_store_handle_offline() are called under the a device lock
+> > > of
+> > > the ccw device. Right, Vineeth?  
+> > Yes. I wanted to bring-out both the scenario.The
+> > set_offline/_online()
+> > calls and the unconditional-remove call.
 > 
-> These are fine. However, what of the GIC, for example? Can any GIC
-> interrupt wake-up the guest? I'm happy to say "yes" to this, but I
-> suspect others will have a different idea, and the thought of
-> introducing an IMPDEF wake-up interrupt controller doesn't fill me
-> with joy.
->
+> I don't understand the paragraph above. I can't map the terms
+> set_offline/_online() and unconditional-remove call to chunks of
+> code.
+> :( 
+online_store() function can be used to set_online/set_offline manually
+from the sysfs entry.
+And an unconditional-remove call, for CIO, starts with a CRW which
+indicates there is a subchannel_event which needs to be taken care.
+This sch_event() (in device.c) then try to find the reason for this CRW
+and act accordingly. This would lead to device_del and end up calling
+the remove function of the driver.
 
-I'm planning to propose exactly this in the next series; any GIC
-interrupt will wake the guest. I'd argue that if someone wants to do
-anything else, their window of opportunity is the exit to userspace.
+> > For the set_online The virtio_ccw_online() also invoked with
+> > ccwlock
+> > held. (ref: ccw_device_set_online)
+> 
+> I don't think virtio_ccw_online() is invoked with the ccwlock held. I
+> think we call virtio_ccw_online() in this line:
+> https://elixir.bootlin.com/linux/v5.15-rc2/source/drivers/s390/cio/device.c#L394
+> and we have released the cdev->ccwlock literally 2 lines above.
+My bad. I overlooked it! 
+> 
+> 
+> > > Conny, I believe, by online/offline callbacks, you mean
+> > > virtio_ccw_online() and virtio_ccw_offline(), right?
+> > > 
+> > > But the thing is that virtio_ccw_online() may get called (and is
+> > > typically called, AFAICT) with no locks held via:
+> > > virtio_ccw_probe() --> async_schedule(virtio_ccw_auto_online,
+> > > cdev)
+> > > -*-> virtio_ccw_auto_online(cdev) --> ccw_device_set_online(cdev)
+> > > -->
+> > > virtio_ccw_online()
+> > > 
+> > > Furthermore after a closer look, I believe because we don't take
+> > > a reference to the cdev in probe, we may get
+> > > virtio_ccw_auto_online()
+> > > called with an invalid pointer (the pointer is guaranteed to be
+> > > valid
+> > > in probe, but because of async we have no guarantee that it will
+> > > be
+> > > called in the context of probe).
+> > > 
+> > > Shouldn't we take a reference to the cdev in probe?  
+> > We just had a quick look at the virtio_ccw_probe() function.
+> > Did you mean to have a get_device() during the probe() and
+> > put_device()
+> > just after the virtio_ccw_auto_online() ?
+> 
+> Yes, that would ensure that cdev pointer is still valid when
+> virtio_ccw_auto_online() is executed, and that things are cleaned up
+> properly, I guess. But I'm not 100% sure about all the interactions.
+> AFAIR ccw_device_set_online(cdev) would bail out if !drv. But then
+> we have the case where we already assigned it to a new driver (e.g.
+> vfio for dasd).
+> 
+> BTW I believe if we have a problem here, the dasd driver has the same
+> problem as well. The code looks very, very similar.
+You are right about that. I am trying to recreate that issue with DASD
+now. And working on the patch as well.
+> 
+> And shouldn't this auto-online be common CIO functionality? What is
+> the
+> reason the char devices don't seem to have it?
+I am not sure about that. I dont understand why it should be a CIO
+functionality. 
+> 
+> Regards,
+> Halil
 
-[...]
-
-> > Just to check understanding for v2:
-> > 
-> > We agree that an exit to userspace is fine so it has the opportunity
-> > to do something crazy when the guest attempts a suspend. If a VMM does
-> > nothing and immediately re-enters the kernel, we emulate the suspend
-> > there by waiting for some event to fire, which for our purposes we
-> > will say is an interrupt originating from userspace or the kernel
-> > (WFI). In all, the SUSPEND exit type does not indicate that emulation
-> > terminates with the VMM. It only indicates we are about to block in
-> > the kernel.
-> > 
-> > If there is some IMPDEF event specific to the VMM, it should signal
-> > the vCPU thread to kick it out of the kernel, make it runnable, and
-> > re-enter. No need to do anything special from the kernel perspective
-> > for this. This is only for the case where we decide to block in the
-> > kernel.
-> 
-> This looks sensible. One question though: I think there is an implicit
-> requirement that the guest should be "migratable" in that state. How
-> does the above handles it? If the "suspend state" is solely held in
-> the kernel, we need to be able to snapshot it, and I don't like the
-> sound of that...
-> 
-> We could instead keep the "suspend state" in the VMM:
-> 
-> On PSCI_SUSPEND, the guest exits to userspace. If the VMM wants to
-> honour the supend request, it reenters the guest with RUN+SUSPEND,
-> which results in a WFI. On each wake-up, the guest exits to userspace,
-> and it is the VMM responsibility to either perform the wake-up (RUN)
-> or stay in suspend (RUN+SUSPEND).
-> 
-> This ensures that the guest never transitions out of suspend without
-> the VMM knowing, and the VMM can always force a resume by kicking the
-> thread back to userspace.
-> 
-> Thoughts?
-
-Agreed. I was mulling on exactly how to clue in the VMM about the
-suspend state. What if we just encode it in KVM_{GET,SET}_MP_STATE? We'd
-avoid the need for new UAPI that way. We could introduce a new state,
-KVM_MP_STATE_SUSPENDED, which would clue KVM to do the suspend as we've
-discussed. We would exit to userspace with KVM_MP_STATE_RUNNABLE,
-meaning the VMM would need to set the MP state explicitly for the
-in-kernel suspend to work.
-
-[...]
-
-> > > > On the contrary, it is up to KVM's implementation to
-> > > > guarantee caches are clean when servicing the guest request.
-> > >
-> > > This last point is pretty unclear to me. If the guest doesn't clean to
-> > > the PoC (or even to one of the PoPs) when it calls into suspend,
-> > > that's a clear indication that it doesn't care about its data. Why
-> > > should KVM be more conservative here? It shouldn't be in the business
-> > > of working around guest bugs.
-> > 
-> > PSCI is vague on this, sadly. DEN0022D.b, 5.4.8 "Implementation
-> > responsibilities: Cache and coherency management states" that for
-> > CPU_SUSPEND, the PSCI implementation must perform a cache clean
-> > operation before entering the powerdown state. I don't see any reason
-> > why SYSTEM_SUSPEND should be excluded from this requirement.
-> 
-> I'm not sure that's the case. CPU_SUSPEND may not use the resume
-> entry-point if the suspend results is a shallower state than expected
-> (i.e. the call just returns instead of behaving like a CPU boot).
-> 
-> However, a successful SYSTEM_SUSPEND always results in the deepest
-> possible state. The guest should know that. There is also the fact
-> that performing a full clean to the PoC is going to be pretty
-> expensive, and I'd like to avoid that.
-> 
-> I'll try and reach out to some of the ARM folks for clarification on
-> the matter.
-
-That'd be very helpful!
-
---
-Thanks,
-Oliver
