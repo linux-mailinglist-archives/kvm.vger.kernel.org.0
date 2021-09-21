@@ -2,67 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8895E41359E
-	for <lists+kvm@lfdr.de>; Tue, 21 Sep 2021 16:51:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 750CC4135A0
+	for <lists+kvm@lfdr.de>; Tue, 21 Sep 2021 16:52:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233751AbhIUOxE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Sep 2021 10:53:04 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:54178 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233689AbhIUOxD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Sep 2021 10:53:03 -0400
-Received: from zn.tnic (p200300ec2f0d060045983051645feb8a.dip0.t-ipconnect.de [IPv6:2003:ec:2f0d:600:4598:3051:645f:eb8a])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id F0F071EC0298;
-        Tue, 21 Sep 2021 16:51:29 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1632235890;
+        id S233773AbhIUOxu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Sep 2021 10:53:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50748 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233705AbhIUOxt (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 21 Sep 2021 10:53:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1632235940;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=0tySSr94j0qUYtXGolsce93msuCdyyz2sqwhXQ9+Bes=;
-        b=EJQOmTG5tVchKBo5DTrA4Ye/B7/qnkYFKoZYsbAmqoVHquC1gOD6Ue85L5Nk3mPnbCuSt+
-        XVWyfwqisvYxlyGp7A6hlETsfCrCo6HVdwIeRZyKKlb5XqbO9Bv2Gp9Jpgo71EmXD8loCC
-        MhyUvHntAC/Z2r8QmsoXEED+q8Q8DSU=
-Date:   Tue, 21 Sep 2021 16:51:23 +0200
-From:   Borislav Petkov <bp@alien8.de>
+         in-reply-to:in-reply-to:references:references;
+        bh=HpHwM4IlNbbtXG5gk4xvKzJNKCkJO1w4ngTakIDhsD8=;
+        b=Is79W1P+EM1lGztV9EwPq+F81c1LPcm4cdYVZcw25YA2qdoikhw5vfxKw6vPzy9VWonnri
+        WxN6gkMhdhs8ydtEh9d3CW78YXzJ/lTghK29WS0mwZ4IGsll5MgP3TR42jHi2Zz0kl63je
+        m4VjdZ0qpfSXhyQTTgpvbSuLwzNFKJs=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-351-mrLCp4SpOReLdPN1Ka-bgg-1; Tue, 21 Sep 2021 10:52:19 -0400
+X-MC-Unique: mrLCp4SpOReLdPN1Ka-bgg-1
+Received: by mail-wr1-f69.google.com with SMTP id x2-20020a5d54c2000000b0015dfd2b4e34so9033425wrv.6
+        for <kvm@vger.kernel.org>; Tue, 21 Sep 2021 07:52:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=HpHwM4IlNbbtXG5gk4xvKzJNKCkJO1w4ngTakIDhsD8=;
+        b=apMb9tzMpqC7gfEdJq+o/erJYW8vF+vegk7+ch3omwdnr0YMtPDP86Q5iPJt2NMX0m
+         NLWG6QzFDgdeQfOvGWLnspU54KTcDBh/HZhq8wciZVlBsQdRwmWfBPX/g5ITb7XTkiZI
+         Aaxw2r3fB1MrxxqBya/F8W3YRrtrOEeecDKxxu1rvj9BkLybmbehPzAnpwMIAA5dUBGN
+         7zLCjY9sbBj9iItNEW2JYVMW93ypUKCutnqeJ+6E+RGT8ZATQCpGnTpE8eRiD5xbGDS/
+         LsHve0Q8viJbG1ZD9xNp1V7Q9sCGG04uyuKmpcM7qxkgi/IjfKriCQxn5ubyNQPnu+qm
+         LCww==
+X-Gm-Message-State: AOAM533Ul3PYZjKzexmWz6/2mbTJOD0L/9ipqLUGcywHMlWX6AoxnzBU
+        RdJIjsl4J24lrm/UPDi8anNLSgq30GS7CylesJoxs1WsSX9MCJynZN69++I/xvDS3GsKaH3Llnr
+        jaxli8UhOAqDo
+X-Received: by 2002:a7b:cc96:: with SMTP id p22mr5024429wma.83.1632235938224;
+        Tue, 21 Sep 2021 07:52:18 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz89bRhSQKhdzxgLJDawIQc7RqTVfaU492Kzd7n2o2D9y4JPckvBeRqIBfPoRyJzEanJcpJCA==
+X-Received: by 2002:a7b:cc96:: with SMTP id p22mr5024405wma.83.1632235938045;
+        Tue, 21 Sep 2021 07:52:18 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id o7sm24424262wro.45.2021.09.21.07.52.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Sep 2021 07:52:17 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     Ashish Kalra <ashish.kalra@amd.com>,
-        Steve Rutherford <srutherford@google.com>, pbonzini@redhat.com,
-        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
-        joro@8bytes.org, thomas.lendacky@amd.com, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        brijesh.singh@amd.com, dovmurik@linux.ibm.com, tobin@linux.ibm.com,
-        jejb@linux.ibm.com, dgilbert@redhat.com
-Subject: Re: [PATCH v6 1/5] x86/kvm: Add AMD SEV specific Hypercall3
-Message-ID: <YUnxa2gy4DzEI2uY@zn.tnic>
-References: <cover.1629726117.git.ashish.kalra@amd.com>
- <6fd25c749205dd0b1eb492c60d41b124760cc6ae.1629726117.git.ashish.kalra@amd.com>
- <CABayD+fnZ+Ho4qoUjB6YfWW+tFGUuftpsVBF3d=-kcU0-CEu0g@mail.gmail.com>
- <YUixqL+SRVaVNF07@google.com>
- <20210921095838.GA17357@ashkalra_ubuntu_server>
- <YUnjEU+1icuihmbR@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Reiji Watanabe <reijiw@google.com>
+Subject: Re: [PATCH v2 06/10] KVM: x86: Fold fx_init() into
+ kvm_arch_vcpu_create()
+In-Reply-To: <20210921000303.400537-7-seanjc@google.com>
+References: <20210921000303.400537-1-seanjc@google.com>
+ <20210921000303.400537-7-seanjc@google.com>
+Date:   Tue, 21 Sep 2021 16:52:16 +0200
+Message-ID: <87tuie7zhb.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <YUnjEU+1icuihmbR@google.com>
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 21, 2021 at 01:50:09PM +0000, Sean Christopherson wrote:
-> apply_alternatives() is a generic helper that can work on any struct alt_instr
-> array, e.g. KVM_HYPERCALL can put its alternative into a different section that's
-> patched as soon as the VMM is identified.
+Sean Christopherson <seanjc@google.com> writes:
 
-Where exactly in the boot process you wanna move it?
+> Move the few bits of relevant fx_init() code into kvm_arch_vcpu_create(),
+> dropping the superfluous check on vcpu->arch.guest_fpu that was blindly
+> and wrongly added by commit ed02b213098a ("KVM: SVM: Guest FPU state
+> save/restore not needed for SEV-ES guest").
 
-As Ashish says, you need the boot_cpu_data bits properly set before it
-runs.
+I have more questions to the above mentioned commit: why is it OK to
+'return 0' from kvm_vcpu_ioctl_x86_set_xsave() without writing anything
+to 'guest_xsave'? Same goes to kvm_arch_vcpu_ioctl_get_fpu(). Whould't
+it be better to throw an error as we can't actually get this information
+for encrypted guests? It's probably too late to change this now I
+suppose ...
+
+>
+> Note, KVM currently allocates and then frees FPU state for SEV-ES guests,
+> rather than avoid the allocation in the first place.  While that approach
+> is inarguably inefficient and unnecessary, it's a cleanup for the future.
+>
+> No functional change intended.
+>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/kvm/x86.c | 16 ++++------------
+>  1 file changed, 4 insertions(+), 12 deletions(-)
+>
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 6fd3fe21863e..ec61b90d9b73 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -10614,17 +10614,6 @@ static int sync_regs(struct kvm_vcpu *vcpu)
+>  	return 0;
+>  }
+>  
+> -static void fx_init(struct kvm_vcpu *vcpu)
+> -{
+> -	if (!vcpu->arch.guest_fpu)
+> -		return;
+> -
+> -	fpstate_init(&vcpu->arch.guest_fpu->state);
+> -	if (boot_cpu_has(X86_FEATURE_XSAVES))
+> -		vcpu->arch.guest_fpu->state.xsave.header.xcomp_bv =
+> -			host_xcr0 | XSTATE_COMPACTION_ENABLED;
+> -}
+> -
+>  void kvm_free_guest_fpu(struct kvm_vcpu *vcpu)
+>  {
+>  	if (vcpu->arch.guest_fpu) {
+> @@ -10703,7 +10692,10 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+>  		pr_err("kvm: failed to allocate vcpu's fpu\n");
+>  		goto free_user_fpu;
+>  	}
+> -	fx_init(vcpu);
+> +	fpstate_init(&vcpu->arch.guest_fpu->state);
+> +	if (boot_cpu_has(X86_FEATURE_XSAVES))
+> +		vcpu->arch.guest_fpu->state.xsave.header.xcomp_bv =
+> +			host_xcr0 | XSTATE_COMPACTION_ENABLED;
+>  
+>  	vcpu->arch.maxphyaddr = cpuid_query_maxphyaddr(vcpu);
+>  	vcpu->arch.reserved_gpa_bits = kvm_vcpu_reserved_gpa_bits_raw(vcpu);
+
+Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 
 -- 
-Regards/Gruss,
-    Boris.
+Vitaly
 
-https://people.kernel.org/tglx/notes-about-netiquette
