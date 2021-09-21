@@ -2,136 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9F325412F3D
-	for <lists+kvm@lfdr.de>; Tue, 21 Sep 2021 09:19:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C827E412FEC
+	for <lists+kvm@lfdr.de>; Tue, 21 Sep 2021 10:10:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230138AbhIUHUk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Sep 2021 03:20:40 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26568 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230031AbhIUHUi (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 21 Sep 2021 03:20:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632208749;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=vd756pui6KEC1UbpIk1pqZxBtMYyZDzhx0CEGUXBa3g=;
-        b=gCm1hs7A7EefNvG2JMRJntP6f/kJ408bMnGSt+dRoC4l1Z4Jjpn04Ne+y662hsULpWHlox
-        G0b1bsOjiYwYOrhrXnnooWlDYWllvo4rcjQiAMn+rkLpMOsB1ssI2fbmu8uwNBAoqLrsHo
-        8Xh3SxvfP6hwwFrGUiWb6XqZtBApC18=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-379-T8p1NE_wMpiU1e-XvmJ49w-1; Tue, 21 Sep 2021 03:19:08 -0400
-X-MC-Unique: T8p1NE_wMpiU1e-XvmJ49w-1
-Received: by mail-ed1-f72.google.com with SMTP id e7-20020a50d4c7000000b003d871ecccd8so4173598edj.18
-        for <kvm@vger.kernel.org>; Tue, 21 Sep 2021 00:19:08 -0700 (PDT)
+        id S230488AbhIUIME (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Sep 2021 04:12:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34308 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230032AbhIUIMB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Sep 2021 04:12:01 -0400
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57A2EC061574
+        for <kvm@vger.kernel.org>; Tue, 21 Sep 2021 01:10:33 -0700 (PDT)
+Received: by mail-pj1-x1032.google.com with SMTP id mv7-20020a17090b198700b0019c843e7233so1941966pjb.4
+        for <kvm@vger.kernel.org>; Tue, 21 Sep 2021 01:10:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=z1XhbmNjXuxATXULuRYAdEo5pXlezWSkYfiPLBzzUfs=;
+        b=U83bLqev3pRm8sTSPZ4rnpHt3wXQ4oKXvlcl3wjlCuQiJzNeLy/+9rUuQoGOc40KHY
+         07/IH1lYr9TJf2NuJl2UJxjLU5NE1cWjqayNFQSh/qKAkG9qqTLlMYM03CEyQDQIeR5T
+         V4XwsDK45HRaEwumcPHtrwtwlRMwMSj6XiUnQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=vd756pui6KEC1UbpIk1pqZxBtMYyZDzhx0CEGUXBa3g=;
-        b=UUqQ3H/ZcYnJrrEFYDopa2+Ye5Ue1HYkD/G6XPx0j3SRJP7JEeIXK8ya+xNbXj+xoO
-         GDKYYPYIZIT2sG1Cvyf626A3GgDc+CXmJ74OyAz2Gjz20fEfp3Ft+8B4CudkSBWHJWUE
-         DR5Y2mBseh20fYoQJvQmKqMdZo7oJlWICCToSaFgo+qzTsVYqeTbv6aKe30ZAEfSkMU9
-         iGA1P2tLa7DLRde9vmgk7A8nMWB0cY7hoMo0g8lASrEQZ6J0Zu7tDfS8qW7avO7Eh12g
-         TwJWTAqGyXxZxMjZo6jPOHY6fhOCuV5te20TQs+dbNMGhQ3d5hsGg2UGb8ERhIQFUnr5
-         dUVQ==
-X-Gm-Message-State: AOAM533UQLFOXTh/LIG1e3DHJUL2QZ+Ev4hW7g/DJBPlaoc672QcQ0xm
-        PpzoSeE6GyPyqa3oi4qhSn5dX0FRGK33OucnhXC0+YL3qPDhxw8Qbi4Rxedoam5PPkzVCMgWqEC
-        2vh38IUBHWyg/
-X-Received: by 2002:a17:906:39cb:: with SMTP id i11mr34466638eje.168.1632208747404;
-        Tue, 21 Sep 2021 00:19:07 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwI0XEybugInECb0uqIoYxDJZLvNGiDElvnIwBQk5rwedeJJwROpvlubrUCVRAUxU8E/axZ8g==
-X-Received: by 2002:a17:906:39cb:: with SMTP id i11mr34466616eje.168.1632208747251;
-        Tue, 21 Sep 2021 00:19:07 -0700 (PDT)
-Received: from gator.home (cst2-174-28.cust.vodafone.cz. [31.30.174.28])
-        by smtp.gmail.com with ESMTPSA id bf28sm8078306edb.45.2021.09.21.00.19.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Sep 2021 00:19:06 -0700 (PDT)
-Date:   Tue, 21 Sep 2021 09:19:04 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Oliver Upton <oupton@google.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=z1XhbmNjXuxATXULuRYAdEo5pXlezWSkYfiPLBzzUfs=;
+        b=DJNzA1GzP0oAQJsscVJVMNfIsY5U5trHo+Gq7ytPStGWKUfnKssJMbSdBHt2Gl0HUs
+         h7ZXHBaI1jp7I/OdZAst6pdHm6XxfRtU7ErorwzBK/1M9mZpd3bOA1Bxckq18NvLhllG
+         WJ22aM/+SMfyaiMOF/eEY1xhax3VM9ggdXdoyp8LPGQZQB4OoVFkvr79BYB3y001qLzn
+         9Z1gQVBk0e7L0SX+/qMd0AU+BtlvqtGPYVrmY+RTGOqkGtREK35nVzOfBN82Dyzdm27/
+         uF0d0xzpYBz6pVtQsReikms1velz3TG5L1ZYh3B6LiRWtd9CKczes6nbUr9dCAdR3DzW
+         0MoQ==
+X-Gm-Message-State: AOAM532+oA4DeL7/+p+bHH66a1YQAE2AiJxcA1MpJP4q38uPVAJvpa80
+        crK2wyflFP1vzx+X/tMI9llcBj4uYuGX1g==
+X-Google-Smtp-Source: ABdhPJz5VDycvTD77TKaG0JLsFI8IbnpJ0VyeVpNS+ZZTTexE0J9DFPiLhV/Rzil95TilYH+dj2A/Q==
+X-Received: by 2002:a17:90a:1944:: with SMTP id 4mr3877285pjh.62.1632211832640;
+        Tue, 21 Sep 2021 01:10:32 -0700 (PDT)
+Received: from localhost ([2401:fa00:8f:203:2b35:ed47:4cb5:84b])
+        by smtp.gmail.com with UTF8SMTPSA id y3sm5669658pfr.140.2021.09.21.01.10.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 21 Sep 2021 01:10:32 -0700 (PDT)
+From:   David Stevens <stevensd@chromium.org>
+X-Google-Original-From: David Stevens <stevensd@google.com>
+To:     kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Sean Christopherson <seanjc@google.com>
-Subject: Re: [PATCH 2/2] selftests: KVM: Fix 'asm-operand-width' warnings in
- steal_time.c
-Message-ID: <20210921071904.5irj3q5yiquoubj2@gator.home>
-References: <20210921010120.1256762-1-oupton@google.com>
- <20210921010120.1256762-3-oupton@google.com>
+        Joerg Roedel <joro@8bytes.org>,
+        David Stevens <stevensd@chromium.org>
+Subject: [PATCH 0/3] KVM: x86: skip gfn_track allocation when possible
+Date:   Tue, 21 Sep 2021 17:10:07 +0900
+Message-Id: <20210921081010.457591-1-stevensd@google.com>
+X-Mailer: git-send-email 2.33.0.464.g1972c5931b-goog
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210921010120.1256762-3-oupton@google.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 21, 2021 at 01:01:20AM +0000, Oliver Upton wrote:
-> Building steal_time.c for arm64 with clang throws the following:
-> 
-> >> steal_time.c:130:22: error: value size does not match register size specified by the constraint and modifier [-Werror,-Wasm-operand-widths]
->           : "=r" (ret) : "r" (func), "r" (arg) :
->                               ^
-> >> steal_time.c:130:34: error: value size does not match register size specified by the constraint and modifier [-Werror,-Wasm-operand-widths]
->           : "=r" (ret) : "r" (func), "r" (arg) :
->                                           ^
-> 
-> Silence by casting operands to 64 bits.
-> 
-> Signed-off-by: Oliver Upton <oupton@google.com>
-> ---
->  tools/testing/selftests/kvm/steal_time.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/steal_time.c b/tools/testing/selftests/kvm/steal_time.c
-> index ecec30865a74..eb75b31122c5 100644
-> --- a/tools/testing/selftests/kvm/steal_time.c
-> +++ b/tools/testing/selftests/kvm/steal_time.c
-> @@ -127,7 +127,7 @@ static int64_t smccc(uint32_t func, uint32_t arg)
->  		"mov	x1, %2\n"
->  		"hvc	#0\n"
->  		"mov	%0, x0\n"
-> -	: "=r" (ret) : "r" (func), "r" (arg) :
-> +	: "=r" (ret) : "r" ((uint64_t)func), "r" ((uint64_t)arg) :
+From: David Stevens <stevensd@chromium.org>
 
-Actually, I think I'd rather fix this smccc implementation to match the
-spec, which I think should be done like this
+Skip allocating gfn_track arrays when tracking of guest write access to
+pages is not required. For VMs where the allocation can be avoided, this
+saves 2 bytes per 4KB of guest memory.
 
-diff --git a/tools/testing/selftests/kvm/steal_time.c b/tools/testing/selftests/kvm/steal_time.c
-index ecec30865a74..7da957259ce4 100644
---- a/tools/testing/selftests/kvm/steal_time.c
-+++ b/tools/testing/selftests/kvm/steal_time.c
-@@ -118,12 +118,12 @@ struct st_time {
-        uint64_t st_time;
- };
- 
--static int64_t smccc(uint32_t func, uint32_t arg)
-+static int64_t smccc(uint32_t func, uint64_t arg)
- {
-        unsigned long ret;
- 
-        asm volatile(
--               "mov    x0, %1\n"
-+               "mov    w0, %w1\n"
-                "mov    x1, %2\n"
-                "hvc    #0\n"
-                "mov    %0, x0\n"
+Write tracking is used to manage shadow page tables in three cases -
+when tdp is not supported, when nested virtualization is used, and for
+GVT-g. By combining the existing tdp_enable flag and nested module param
+with a new config that indicates when something outside of KVM (i.e.
+GVT-g) needs write tracking, KVM can determine when initializing a VM
+if gfn_track arrays are definitely not necessary.
 
+This straightforward approach has the downside that for VMs where nested
+virtualization is enabled but never used, gfn_track arrays are still
+allocated. Instead of going so far as to try to initialize things on
+demand, key off of whether or not X86_FEATURE_VMX is set in the guest's
+cpuid to support per-VM configuration instead of system wide
+configuration based on the nested module param.
 
-Thanks,
-drew
+David Stevens (3):
+  KVM: x86: add config for non-kvm users of page tracking
+  KVM: x86/mmu: skip page tracking when possible
+  KVM: VMX: skip page tracking based on cpuid
 
->  	  "x0", "x1", "x2", "x3");
->  
->  	return ret;
-> -- 
-> 2.33.0.464.g1972c5931b-goog
-> 
+ arch/x86/include/asm/kvm-x86-ops.h    |  1 +
+ arch/x86/include/asm/kvm_host.h       |  4 +-
+ arch/x86/include/asm/kvm_page_track.h |  7 ++-
+ arch/x86/kvm/Kconfig                  |  3 ++
+ arch/x86/kvm/cpuid.c                  | 55 +++++++++++++++-----
+ arch/x86/kvm/mmu/page_track.c         | 74 +++++++++++++++++++++++++--
+ arch/x86/kvm/svm/svm.c                | 10 +++-
+ arch/x86/kvm/vmx/vmx.c                | 13 ++++-
+ arch/x86/kvm/x86.c                    |  5 +-
+ drivers/gpu/drm/i915/Kconfig          |  1 +
+ 10 files changed, 150 insertions(+), 23 deletions(-)
+
+-- 
+2.33.0.464.g1972c5931b-goog
 
