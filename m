@@ -2,186 +2,241 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 166904133F0
-	for <lists+kvm@lfdr.de>; Tue, 21 Sep 2021 15:19:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 17B6E413423
+	for <lists+kvm@lfdr.de>; Tue, 21 Sep 2021 15:31:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232909AbhIUNUn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Sep 2021 09:20:43 -0400
-Received: from mail-dm6nam11hn2248.outbound.protection.outlook.com ([52.100.172.248]:1408
-        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S231658AbhIUNUl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Sep 2021 09:20:41 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=I4Jo6PsZZuSa55LhS5vJ5tkAaccmSCMIBo+4eMR9edGMnIMwNXuafqGTEPjXb2jd5JweQ+ap+I+hY83sP3XGX+Zb0DQs/pl5XuNSX+CmGNGs7S1DnguZ5Qm7Puil+oGGByN83JVbvSYFsbTm4wnGd10ACof+/DcISQeRrveIZShQlAl3mdTXS0ArTBqz9hwDf0Z2hrf7oGqRDb6Bw7N4czUf5tZjdenfVoWOXPb6o92DDjyHULkV4Jy/S17aht+lEbR3GZghF4yD85COzMjEUxCvOvScD1/kLn4XV6YwRlaTMtEim9N2Zs5Rq/SA2/8w25E5yusABm4MclSfScEM4A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
- bh=94Wdtz1P7371BO9JoG/h7kHcocoe9ZpMfQ2pCiWwlgg=;
- b=oI1SvlrBb2ahyihfWAD2cvNbUtti+aKXR8PNkqW7ubV5vCLGU8JyK7ST+Y49rjPA+41kKvTT9UZWf0puaj2qejwfAJeYl2QWR/D7IatLRtw3mJRSSCJCXARFDwV2HNWD/hM//2UwugecBmsTY66qTi/jBpn9G3foJt3WQYbinCChltM4rf+wGb8UFUStTHKOW3xeeh6RO2XWfq4kWTynk5XeAWhHfvuoReULXnQdvRr0V1cjoXe8dynSBvTANbEOB3BnreSFt5w85NMyeePpHdI0cdAjWtJ7C5Asec1zgntNRt+kMRuaeAG4msxwMPBi+0sYkMURK2fh9Mtq99naPQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=94Wdtz1P7371BO9JoG/h7kHcocoe9ZpMfQ2pCiWwlgg=;
- b=OI0NY3eczvHXpyr4B6M3/luDLf7OK3iOBC/OUH2aMypDHOOinuKP/k1PmSt8XPeRybTTbmko7rloxhdI4zilwFFzR197d0oaqeUkGmuwv/8Kw5WdeCZ4TVghZS/tnVYYGCpweengXUS8gMbNTLAYAZAr77kLHedsqjCJ/b7gNSuHfiSVJwMwIZlgvuJTcgH/opCJV1cdlvoqVYGbRitfpzBCj/WDy5KtRr5DBlgr9KuIAdw58nPOGUhlMU0fb6Ewa1miymXh4FWk1h1rw8hKNhRQEIwGI8TeV9HE+jHLrsFk5mRUnuPtjRDDbjmxnEySguV18j0cYHSXN2NL1YfQZg==
-Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=nvidia.com;
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
- by BL1PR12MB5336.namprd12.prod.outlook.com (2603:10b6:208:314::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4523.14; Tue, 21 Sep
- 2021 13:19:10 +0000
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::e8af:232:915e:2f95]) by BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::e8af:232:915e:2f95%8]) with mapi id 15.20.4544.013; Tue, 21 Sep 2021
- 13:19:09 +0000
-Date:   Tue, 21 Sep 2021 10:19:08 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     David Airlie <airlied@linux.ie>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        dri-devel@lists.freedesktop.org,
-        Eric Farman <farman@linux.ibm.com>,
-        Harald Freudenberger <freude@linux.ibm.com>,
+        id S233223AbhIUNcr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Sep 2021 09:32:47 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35108 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233238AbhIUNcl (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 21 Sep 2021 09:32:41 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 18LD9X76023324;
+        Tue, 21 Sep 2021 09:31:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ mime-version : content-transfer-encoding; s=pp1;
+ bh=GoNAd1sEGXSP/XzocatogQMnkY9qkbqTLHUnurI+Rvo=;
+ b=eaF1xUnrT1CEtiXUEgitGdpoOT2fs+c+U+fgsRXPXFuhuwT7pSWbE85z9H43KrNW7d5P
+ LmvZEMTtnylDRE1/zGzbLn0cFAsXqVTQ0DAyoOg8qnIZhUIJF1TBm7zqFjsXFZ382hIn
+ kYMYyMPs8n0ACEtM0iUxBfL34QcR/4a8szi/3HN5qekTf6FKrOWc+dMg+Pdu4CvttqDn
+ 2goq6pSAY6QSm3wM1nK5OXAH6BMxcaAkJDQZobHNPtnzQI4NUWO3fI0UoRs/zEfI9QN1
+ /vrZzQrDwda/ZqPuoc+5uEOsu1yLqQsed24hoCcS5wX4ExKfokoh4ETrG2nvcCp5U0Jb 3A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3b7f699ueg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 21 Sep 2021 09:31:11 -0400
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 18LDCSMW004488;
+        Tue, 21 Sep 2021 09:31:10 -0400
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3b7f699udm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 21 Sep 2021 09:31:10 -0400
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 18LDNGWl012687;
+        Tue, 21 Sep 2021 13:31:08 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma03fra.de.ibm.com with ESMTP id 3b57r9ccrk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 21 Sep 2021 13:31:08 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 18LDV54U3605186
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 21 Sep 2021 13:31:05 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 32E4E52059;
+        Tue, 21 Sep 2021 13:31:05 +0000 (GMT)
+Received: from li-748c07cc-28e5-11b2-a85c-e3822d7eceb3.ibm.com (unknown [9.171.53.36])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 650CD5206B;
+        Tue, 21 Sep 2021 13:31:04 +0000 (GMT)
+Message-ID: <05b1ac0e4aa4a1c7df1a8994c898630e9b2e384d.camel@linux.ibm.com>
+Subject: Re: [PATCH 1/1] virtio/s390: fix vritio-ccw device teardown
+From:   Vineeth Vijayan <vneethv@linux.ibm.com>
+To:     Halil Pasic <pasic@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>
+Cc:     Heiko Carstens <hca@linux.ibm.com>,
         Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        intel-gfx@lists.freedesktop.org,
-        intel-gvt-dev@lists.freedesktop.org,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Pierre Morel <pmorel@linux.ibm.com>,
+        Michael Mueller <mimu@linux.ibm.com>,
         linux-s390@vger.kernel.org,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>, Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH v2 6/9] vfio/mdev: Add mdev available instance checking
- to the core
-Message-ID: <20210921131908.GK327412@nvidia.com>
-References: <6-v2-7d3a384024cf+2060-ccw_mdev_jgg@nvidia.com>
- <87tuiff7m2.fsf@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87tuiff7m2.fsf@redhat.com>
-X-ClientProxiedBy: MN2PR17CA0009.namprd17.prod.outlook.com
- (2603:10b6:208:15e::22) To BL0PR12MB5506.namprd12.prod.outlook.com
- (2603:10b6:208:1cb::22)
-MIME-Version: 1.0
-Received: from mlx.ziepe.ca (142.162.113.129) by MN2PR17CA0009.namprd17.prod.outlook.com (2603:10b6:208:15e::22) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4544.13 via Frontend Transport; Tue, 21 Sep 2021 13:19:09 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1mSffw-003Kbx-LZ; Tue, 21 Sep 2021 10:19:08 -0300
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 377f0363-5917-479c-8236-08d97d026576
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5336:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <BL1PR12MB5336BE1F0CDC1310B37D6C11C2A19@BL1PR12MB5336.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?Pf6gzM7XhP3b+WfteTXY5QtMZlaWU/fnDfnm2hNovolJjrjhn2k7PV4I7yMv?=
- =?us-ascii?Q?yUlfayAV+cM+jNOOkOUkS6w4vQFRv0YcEkCHl8hBOw7bnj/00qRlWeKR+9lO?=
- =?us-ascii?Q?dS3x8CwwQM0fGGJ+tqhrBisnnv6XpbeEv4iVjKpsXowJzavTQJDQ1saxBzWx?=
- =?us-ascii?Q?Q6liETo5u8blPya80i9G0KsjekWi/9Au5PtpH+FwX6onjr5eeuv+VzMxuMUI?=
- =?us-ascii?Q?9Kpq/SwfKW5Y2p6zihBvybOu3kPVAvp4Wk4Wio/ywJhP6C7SvPKrx66b6DFf?=
- =?us-ascii?Q?XTGD56QzLv70W3IgJL7dUIeP97DYyFcCrZh1mawhD/anuQW3TCJwGPTWJQyB?=
- =?us-ascii?Q?b1tFCS1VxrCbqXZiqBri6Dn0lGEyuUUi6IAVid8tDwR96MP/p8lvnnWDi+tW?=
- =?us-ascii?Q?cO0p7Qkt1OS+I2F7pNvSIARJ7wyoE5LGbnRZFNXJcOCpYCEeqWzD+KlAaF2c?=
- =?us-ascii?Q?7Fm1rEkaCKYG5Ogh7cCD/9c2pRKLYvwUOk5MKgwprJ8Ud/oMtRmiT48qpZZ2?=
- =?us-ascii?Q?c4IFEAwgDmfbV38gwFZ2yCykqaa0Aw/b6QD5tPF+8ldWji5G/2YEpn2B1drW?=
- =?us-ascii?Q?vzFDU/QocDwPMzsVVl0o+eKWqNAtJRv6NcyC11815dyOS3InapTJpP//njHa?=
- =?us-ascii?Q?P27aRv/bBfKaGcrEOrkxoHdHwUoQFdCCMLBHNlpupX7PoGtMWzmztaWI5Ra9?=
- =?us-ascii?Q?SOIHwMzPr+Nq9hIqX4m85/pl0z7uVuxTTpt7dWaztPNB32a+8bLe+j3RYT5N?=
- =?us-ascii?Q?oSbf01/IlgPhfv5dF+X/KspJzFREy8kN1BuNZBDdJhgdd+/i0OQFk0UtDEGH?=
- =?us-ascii?Q?RvVzv/6FXr+/eOmSOmW6MQ9UHCQVyGamOIQsYk514HKlI3Ep3671g0YqQEJ3?=
- =?us-ascii?Q?XRdpQn3VDZvdjP6uoWAhheaeVDQYSSXIYQDHsXe8lAPqO2NV/nslwWMhRVPS?=
- =?us-ascii?Q?fPZ16QoELp0yaqFjPfwhObt12NMGgmTiFsX0itHmeTjaNm4ZHiR8dJBng6KT?=
- =?us-ascii?Q?O6gX36okDzlr9Mi2ro5jTOes35wvcQermwb3vwF7NDFC2EY=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:5;SRV:;IPV:NLI;SFV:SPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:OSPM;SFS:(4636009)(366004)(33656002)(9786002)(9746002)(5660300002)(38100700002)(8676002)(8936002)(4326008)(26005)(7416002)(66476007)(86362001)(66556008)(186003)(66946007)(508600001)(54906003)(2906002)(6916009)(2616005)(83380400001)(36756003)(1076003)(316002)(426003)(27376004)(131093003);DIR:OUT;SFP:1501;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?u/FSAdOJ8fM6QbvbhBc/zuGgqWfd8KSeKZdkf0zFIBxAZgXa/M6HXdKqhGX5?=
- =?us-ascii?Q?VX+YNa5zy1A5MUlSJ/dt4XAFSBDt1btP4rt9Sgxj7EV+0gDI0Vnnx54jJKPB?=
- =?us-ascii?Q?SGnQ+Dwvtz2B08gUQC0bEr/N6mu6H3dcMWtevFB+v9cneg3fbFoSV/GGEjiD?=
- =?us-ascii?Q?5UcvWgPzkc9MYCI1kkUf+BMPb7Q1q8BFbtvWI4rzJCaIThRzh/RyaKKrVdNy?=
- =?us-ascii?Q?3Rcb0xEo5NfBaTeI5aPqDIPVIBCpNmRQvqVxY4tHdHD/QbOKO4IW4zHIjGgc?=
- =?us-ascii?Q?MZ/bqVsZowNaotgitEATVkGRUQrDtLFNlXpWez7u6vSNMjqtbaPyauP2V9kH?=
- =?us-ascii?Q?C8rxPndSwwILH0fw/TwzQWFCqyfEGRApO9tBi7tqqO6qQ33ek30AtIj0/tcx?=
- =?us-ascii?Q?UMsR2Qlt+Uz4I27YwxLvM9tgTX9QCikDPvrA7h7ZWUFUhO3bc3zacvs7xJuK?=
- =?us-ascii?Q?VOMqawQRqdaO9wT3BXyNeLschu42YoXqXmQ7xztB4bPKhbohowhXIyETdgGQ?=
- =?us-ascii?Q?jrVb0UzrjC0zL+ZZbfu1KoJLWx6idU1RH5yDQR3fxfT7TPgSEtqraQGfO0DM?=
- =?us-ascii?Q?jrQVKCrj7fFtahJXr+odW0uE+QT8zZ1ahAr+CxoKKEvXjDo8DSg6ca1G1Hrc?=
- =?us-ascii?Q?mZT4UIrBoktdSzKu4AicZAz2kq06s1sA6ie572Dw9/1DBXizfjTueMuUMS6z?=
- =?us-ascii?Q?zxhT+v1dWZbHRdq7ToxmwjCd6sck3Pln0JonPEiCry9wE7SSn0q1TzZZUtih?=
- =?us-ascii?Q?mfjjMVibCTx2EytwpsROxA1qe1OTMHvIK/3myH52Yd05/mOtUIRHXs3Y0hPU?=
- =?us-ascii?Q?ce8Mvc3obdD6zdufHso7k+srexFUcR1d+nqvNNCOlGQgPI9htudP08cDAB21?=
- =?us-ascii?Q?VA+FyXtQiX3SLy4tz0H3YtWAv5WrlYDZz6Ak2/k8y5e2ZUpSILyiLeQQVOxM?=
- =?us-ascii?Q?9eJ986thUHBLH5JvmmbG4Kx608KWzAqq2Rx/LKqfwKHxS0xhPK4TztO1MO6O?=
- =?us-ascii?Q?vkb6WhlvRlvWs1tdT+Q03jhXvQOntivM6EZJG6QrE4tFFjLlEpzTix6gOa87?=
- =?us-ascii?Q?C1l5iwesIwC5VxhN2tPFBBbXXiJs91e3ZWlKyW1luQ9X7Wpezp+4aUiBeuMn?=
- =?us-ascii?Q?492Y1JKAr1NoqPjdceCCjCSFSMtkN30U2qDfJ1CmZOjU9gsktfw7xQg6EPnN?=
- =?us-ascii?Q?MpUxw/9xbHzvH6Im3ALM/F77k4uPuWYVWbaFnLwhIG+rFXKw6y+nvM23J3VE?=
- =?us-ascii?Q?K05U8EJ4QEj8UPsc8k6B3UW0XjYy+meTbQRees2NssZdlqx3vGb0tptzw4ct?=
- =?us-ascii?Q?7XVdKvUKdXzLh+KQFOEMkjkn38MnBzGbmQuI3mG2EgLS9Q=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 377f0363-5917-479c-8236-08d97d026576
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Sep 2021 13:19:09.8603
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: GSXci/sgOsyBy993lndKI8yPYwidWvkowVgIRUoTmphFHM09gQgw+3NTLDwj78RD
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5336
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, bfu@redhat.com
+Date:   Tue, 21 Sep 2021 15:31:03 +0200
+In-Reply-To: <20210921052548.4eea231f.pasic@linux.ibm.com>
+References: <20210915215742.1793314-1-pasic@linux.ibm.com>
+         <87pmt8hp5o.fsf@redhat.com> <20210916151835.4ab512b2.pasic@linux.ibm.com>
+         <87mtobh9xn.fsf@redhat.com> <20210920003935.1369f9fe.pasic@linux.ibm.com>
+         <88b514a4416cf72cda53a31ad2e15c13586350e4.camel@linux.ibm.com>
+         <878rzrh86c.fsf@redhat.com> <20210921052548.4eea231f.pasic@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-16.el8) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: Lyo5OewEPVXFuzjf8nd1sJPAg6M_keGk
+X-Proofpoint-ORIG-GUID: Pp3h7m0TlpJ3hPqjosFbLyyFADrNqMz-
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.391,FMLib:17.0.607.475
+ definitions=2021-09-21_01,2021-09-20_01,2020-04-07_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 phishscore=0
+ priorityscore=1501 mlxscore=0 lowpriorityscore=0 malwarescore=0
+ impostorscore=0 adultscore=0 mlxlogscore=999 clxscore=1015 bulkscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2109030001 definitions=main-2109210083
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 20, 2021 at 08:02:29PM +0200, Cornelia Huck wrote:
-> On Thu, Sep 09 2021, Jason Gunthorpe <jgg@nvidia.com> wrote:
+On Tue, 2021-09-21 at 05:25 +0200, Halil Pasic wrote:
+> On Mon, 20 Sep 2021 12:07:23 +0200
+> Cornelia Huck <cohuck@redhat.com> wrote:
 > 
-> > Many of the mdev drivers use a simple counter for keeping track of the
-> > available instances. Move this code to the core code and store the counter
-> > in the mdev_type. Implement it using correct locking, fixing mdpy.
-> >
-> > Drivers provide a get_available() callback to set the number of available
-> > instances for their mtypes which is fixed at registration time. The core
-> > provides a standard sysfs attribute to return the available_instances.
+> > On Mon, Sep 20 2021, Vineeth Vijayan <vneethv@linux.ibm.com> wrote:
+> > 
+> > > On Mon, 2021-09-20 at 00:39 +0200, Halil Pasic wrote:  
+> > > > On Fri, 17 Sep 2021 10:40:20 +0200
+> > > > Cornelia Huck <cohuck@redhat.com> wrote:
+> > > >   
+> > > ...snip...  
+> > > > > > Thanks, if I find time for it, I will try to understand
+> > > > > > this
+> > > > > > better and
+> > > > > > come back with my findings.
+> > > > > >    
+> > > > > > > > * Can virtio_ccw_remove() get called while !cdev-
+> > > > > > > > >online and 
+> > > > > > > >   virtio_ccw_online() is running on a different cpu? If
+> > > > > > > > yes,
+> > > > > > > > what would
+> > > > > > > >   happen then?      
+> > > > > > > 
+> > > > > > > All of the remove/online/... etc. callbacks are invoked
+> > > > > > > via the
+> > > > > > > ccw bus
+> > > > > > > code. We have to trust that it gets it correct :) (Or
+> > > > > > > have the
+> > > > > > > common
+> > > > > > > I/O layer maintainers double-check it.)
+> > > > > > >     
+> > > > > > 
+> > > > > > Vineeth, what is your take on this? Are the struct
+> > > > > > ccw_driver
+> > > > > > virtio_ccw_remove and the virtio_ccw_online callbacks
+> > > > > > mutually
+> > > > > > exclusive. Please notice that we may initiate the onlining
+> > > > > > by
+> > > > > > calling ccw_device_set_online() from a workqueue.
+> > > > > > 
+> > > > > > @Conny: I'm not sure what is your definition of 'it gets it
+> > > > > > correct'...
+> > > > > > I doubt CIO can make things 100% foolproof in this
+> > > > > > area.    
+> > > > > 
+> > > > > Not 100% foolproof, but "don't online a device that is in the
+> > > > > progress
+> > > > > of going away" seems pretty basic to me.
+> > > > >   
+> > > > 
+> > > > I hope Vineeth will chime in on this.  
+> > > Considering the online/offline processing, 
+> > > The ccw_device_set_offline function or the online/offline is
+> > > handled
+> > > inside device_lock. Also, the online_store function takes care of
+> > > avoiding multiple online/offline processing. 
+> > > 
+> > > Now, when we consider the unconditional remove of the device,
+> > > I am not familiar with the virtio_ccw driver. My assumptions are
+> > > based
+> > > on how CIO/dasd drivers works. If i understand correctly, the
+> > > dasd
+> > > driver sets different flags to make sure that a device_open is
+> > > getting
+> > > prevented while the the device is in progress of offline-ing.   
+> > 
+> > Hm, if we are invoking the online/offline callbacks under the
+> > device
+> > lock already, 
 > 
-> So, according to the documentation, available_instances is
-> mandatory. This means that drivers either need to provide get_available
-> or implement their own version of the attribute. I think we want to
-> update vfio-mediated-device.rst as well?
+> I believe we have a misunderstanding here. I believe that Vineeth is
+> trying to tell us, that online_store_handle_offline() and
+> online_store_handle_offline() are called under the a device lock of
+> the ccw device. Right, Vineeth?
+Yes. I wanted to bring-out both the scenario.The set_offline/_online()
+calls and the unconditional-remove call. 
+For the set_online The virtio_ccw_online() also invoked with ccwlock
+held. (ref: ccw_device_set_online)
+> 
+> Conny, I believe, by online/offline callbacks, you mean
+> virtio_ccw_online() and virtio_ccw_offline(), right?
+> 
+> But the thing is that virtio_ccw_online() may get called (and is
+> typically called, AFAICT) with no locks held via:
+> virtio_ccw_probe() --> async_schedule(virtio_ccw_auto_online, cdev)
+> -*-> virtio_ccw_auto_online(cdev) --> ccw_device_set_online(cdev) -->
+> virtio_ccw_online()
+> 
+> Furthermore after a closer look, I believe because we don't take
+> a reference to the cdev in probe, we may get virtio_ccw_auto_online()
+> called with an invalid pointer (the pointer is guaranteed to be valid
+> in probe, but because of async we have no guarantee that it will be
+> called in the context of probe).
+> 
+> Shouldn't we take a reference to the cdev in probe?
+We just had a quick look at the virtio_ccw_probe() function.
+Did you mean to have a get_device() during the probe() and put_device()
+just after the virtio_ccw_auto_online() ?
 
-I added this, and something similar for the device_api patch too, thanks
+> reason for the async?
+> 
+> 
+> > how would that affect the remove callback?
+> 
+> I believe dev->bus->remove(dev) is called by 
+> bus_remove_device() with the device lock held. I.e. I believe that
+> means
+> that virtio_ccw_remove() is called with the ccw devices device lock
+> held. Vineeth can you confirm that?
+This is what my understanding too.
+When we disconnect a working/online device, the CIO layer gets a CRW
+which indicates this disconnection. Then the subchannel driver endup
+un-registering the ccw-device. This ccw_device_unregister() then
+invokes device_del(), which invokes the bus->driver->remove calls which
+is called with @dev-lock held.
+> 
+> 
+> The thing is, both virtio_ccw_remove() and virtio_ccw_offline() are
+> very similar, with the notable exception that offline assumes we are
+> online() at the moment, while remove() does the same only if it
+> decides based on vcdev && cdev->online that we are online.
+> 
+> 
+> > Shouldn't they
+> > be serialized under the device lock already? I think we are fine.
+> 
+> AFAICT virtio_ccw_remove() and virtio_ccw_offline() are serialized
+> against each other under the device lock. And also against
+> virtio_ccw_online() iff it was initiated via the sysfs, and not via
+> the auto-online mechanism.
+> 
+> Thus I don't think we are fine at the moment.
+> 
+> > For dasd, I think they also need to deal with the block device
+> > lifetimes. For virtio-ccw, we are basically a transport that does
+> > not
+> > know about devices further down the chain (that are associated with
+> > the
+> > virtio device, whose lifetime is tied to online/offline
+> > processing.) I'd
+> > presume that the serialization above would be enough.
+> > 
+> 
+> I don't know about dasd that much. For the reasons stated above, I
+> don't
+> think the serialization we have right now is entirely sufficient.
+> 
+> Regards,
+> Halil
 
-diff --git a/Documentation/driver-api/vfio-mediated-device.rst b/Documentation/driver-api/vfio-mediated-device.rst
-index 9f26079cacae35..0a130d76b33a48 100644
---- a/Documentation/driver-api/vfio-mediated-device.rst
-+++ b/Documentation/driver-api/vfio-mediated-device.rst
-@@ -106,6 +106,7 @@ structure to represent a mediated device's driver::
- 	     int  (*probe)  (struct mdev_device *dev);
- 	     void (*remove) (struct mdev_device *dev);
- 	     struct device_driver    driver;
-+	     unsigned int (*get_available)(struct mdev_type *mtype);
-      };
- 
- A mediated bus driver for mdev should use this structure in the function calls
-@@ -230,7 +231,8 @@ Directories and files under the sysfs for Each Physical Device
- * available_instances
- 
-   This attribute should show the number of devices of type <type-id> that can be
--  created.
-+  created. Drivers can supply a get_availble() function pointer to have the core
-+  code create and maintain this sysfs automatically.
- 
- * [device]
- 
