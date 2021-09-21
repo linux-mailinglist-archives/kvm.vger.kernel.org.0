@@ -2,114 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1B2E9413541
-	for <lists+kvm@lfdr.de>; Tue, 21 Sep 2021 16:23:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D1775413561
+	for <lists+kvm@lfdr.de>; Tue, 21 Sep 2021 16:31:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233578AbhIUOZF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Sep 2021 10:25:05 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:41392 "EHLO
+        id S233671AbhIUOch (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Sep 2021 10:32:37 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41649 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233545AbhIUOZE (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 21 Sep 2021 10:25:04 -0400
+        by vger.kernel.org with ESMTP id S233688AbhIUOcg (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 21 Sep 2021 10:32:36 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632234216;
+        s=mimecast20190719; t=1632234667;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=wDh0oMN6VwKrbIN4CU/frP4g1lxciAjNHJADjKyJ4Io=;
-        b=cZHv9kaHe0DfJiYmioMSQzveuqtRSy1kxSIudYjWoIHg9XEKRdPmrcsDIZ5k1WlKwTpWPf
-        7tHgg8U1V+7nBHLAqwZiGx0k0b+ZA0bSauayCauwrL8IxlGsjWbjTMaPc+c/Yk1fgqvOJU
-        yL1ZsziD9QExEBl6v9MtIsKkaSOOPBo=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-424-vLjKb52oOmG90gkUoKlNBg-1; Tue, 21 Sep 2021 10:23:33 -0400
-X-MC-Unique: vLjKb52oOmG90gkUoKlNBg-1
-Received: by mail-wr1-f70.google.com with SMTP id l9-20020adfc789000000b00160111fd4e8so3723512wrg.17
-        for <kvm@vger.kernel.org>; Tue, 21 Sep 2021 07:23:33 -0700 (PDT)
+        bh=MOX0Dc/uscmy0FcdNSM5vS8dhWPJhduTSx1fXAnSXC8=;
+        b=FwYtxjDjVCw9V/TUF/Wb9IJf5yoNA8Doc6Rwg0J7vse7+RufmDQJJjvOeF0DyEU1DRwcHy
+        qAP2qhZIbo1eI6rItaSjj+rOrRolqVENP08qnseiteVadyWk6DusflwTp2bSggqOLY9Ql+
+        ZXwd5eU0oTZh+spYV+2JHR38D60ysU0=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-99-wMzZUtTkN5-nAVIc6hrFEQ-1; Tue, 21 Sep 2021 10:31:06 -0400
+X-MC-Unique: wMzZUtTkN5-nAVIc6hrFEQ-1
+Received: by mail-wr1-f69.google.com with SMTP id e1-20020adfa741000000b0015e424fdd01so8527095wrd.11
+        for <kvm@vger.kernel.org>; Tue, 21 Sep 2021 07:31:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=wDh0oMN6VwKrbIN4CU/frP4g1lxciAjNHJADjKyJ4Io=;
-        b=EPXfQybC6Mm8X8Lu/ahJqsUvTLqbmD51y7OQ7yhHxGKeS2ADYo1xOhSesmU4tOFh0s
-         EQVzp+xG6hLtuvBoTeV9JUhZ7ffzPt4BlBHkd3Z7k+8DCqkR8H0mMRfZd4lD13dREVFM
-         jX/WKHIqU7lvkf3DWwbbRH4lnEaQslbhyYARu/IunllDYiEQCTQ1usTF7JZ+pj3feRbJ
-         spWzE0iA6WTocmBxKHqPm84+AVzRVYCtX8c4wtirUfZwGCGQV2sibOshw4Vy8NsZquB8
-         ajXf3FT7RyS16d5AhPm52UzN91qpjQKcYQi9r+uc/UpExnQT/d+e/tFbX5JpOO1EWVvt
-         PRVQ==
-X-Gm-Message-State: AOAM531uBZ+GDvh8XLt0suPQdVmqm+/mu9JK2MfBNGDTCeAnKsHNEueX
-        S3Gl+PXoebIofrj9GKU64BxN1reahNDPdqYjLFFP10KxPvsLzk5tkJ61PT8hDs1A1VjGNcryZnA
-        nlREPlj6kDiZ+
-X-Received: by 2002:a05:600c:1552:: with SMTP id f18mr4829443wmg.184.1632234212186;
-        Tue, 21 Sep 2021 07:23:32 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy8dBsUGmpSS/VnNnROL3eISK4+6sMfIjPu7vf/SpQmq1Qcp7XpNAZWxQfzCtY6FcM1lKR9/g==
-X-Received: by 2002:a05:600c:1552:: with SMTP id f18mr4829420wmg.184.1632234212000;
-        Tue, 21 Sep 2021 07:23:32 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id k6sm2873679wmo.37.2021.09.21.07.23.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Sep 2021 07:23:31 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Reiji Watanabe <reijiw@google.com>
-Subject: Re: [PATCH v2 04/10] KVM: x86: Remove defunct setting of CR0.ET for
- guests during vCPU create
-In-Reply-To: <20210921000303.400537-5-seanjc@google.com>
-References: <20210921000303.400537-1-seanjc@google.com>
- <20210921000303.400537-5-seanjc@google.com>
-Date:   Tue, 21 Sep 2021 16:23:30 +0200
-Message-ID: <87zgs680t9.fsf@vitty.brq.redhat.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=MOX0Dc/uscmy0FcdNSM5vS8dhWPJhduTSx1fXAnSXC8=;
+        b=Xh2teThHU+MpxHAcVtyS41o6I9Uba0aJDdjf0Wh9dOs+MGSpAR0Sn7aDfDWEEhCv5p
+         thNOL4GU07MZBjJZGdc4OyeQBv8ZeumjyPw937011T6e4uoXbEpkBIxRWR5vKvMmwuoB
+         IsSOEGAAuL2ik5AXGRA9jXK7knh4ZPITXGGfbj1uKMBw1VPYn2Yt/f5ikZx9qruidpW9
+         Brez4446CA0au5d4CfPtVzieRyXzjqRpPbWhZug8oJKKBGFNUbWGaN1eDk6CrIYsoMe6
+         qZ4dufJd3HiFMZJhdVisARexhkZSZA9tYmWEFelyXIkjPQieU2upawGLP61BOXDvcCOy
+         j5sg==
+X-Gm-Message-State: AOAM531jse+bn/COe7SzfPtmug60NMx0JPJ98aVi3A2H1uEL6Utk68Hf
+        7z1Zm+dy1SCBLdOrtAlUL6MiguCQjrQtVQqamiV6WR2JNxx6x0NeSMuOvag6GY3iksUMbjqH7BK
+        /1SQy10e+Ouco
+X-Received: by 2002:a5d:618c:: with SMTP id j12mr5290851wru.189.1632234664880;
+        Tue, 21 Sep 2021 07:31:04 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzEM4NkwElgrp8f4cKqvFX/IpJVIPqq7dPySdWEovhmE4HewFeU/2oUKAxYrjP8y0ckUQpo6w==
+X-Received: by 2002:a5d:618c:: with SMTP id j12mr5290820wru.189.1632234664676;
+        Tue, 21 Sep 2021 07:31:04 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id r27sm19634987wrr.70.2021.09.21.07.31.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 21 Sep 2021 07:31:04 -0700 (PDT)
+Subject: Re: [PATCH] [backport for 4.19/5.4 stable] KVM: remember position in
+ kvm->vcpus array
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        stable@vger.kernel.org
+Cc:     gregkh@linuxfoundation.org, KVM <kvm@vger.kernel.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Thomas Huth <thuth@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>
+References: <20210921134815.17615-1-borntraeger@de.ibm.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <280d7fb4-a02a-f8db-8af0-b567699cea80@redhat.com>
+Date:   Tue, 21 Sep 2021 16:31:03 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20210921134815.17615-1-borntraeger@de.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <seanjc@google.com> writes:
-
-> Drop code to set CR0.ET for the guest during initialization of the guest
-> FPU.  The code was added as a misguided bug fix by commit 380102c8e431
-> ("KVM Set the ET flag in CR0 after initializing FX") to resolve an issue
-> where vcpu->cr0 (now vcpu->arch.cr0) was not correctly initialized on SVM
-> systems.  While init_vmcb() did set CR0.ET, it only did so in the VMCB,
-> and subtly did not update vcpu->cr0.  Stuffing CR0.ET worked around the
-> immediate problem, but did not fix the real bug of vcpu->cr0 and the VMCB
-> being out of sync.  That underlying bug was eventually remedied by commit
-> 18fa000ae453 ("KVM: SVM: Reset cr0 properly on vcpu reset").
->
-> No functional change intended.
-
-fx_init() is only called from kvm_arch_vcpu_create() (and inlined later
-in the series) a few lines before kvm_vcpu_reset() which stuffs CR0 with 
-X86_CR0_ET too and it doesn't seem that arch.cr0 value is important in
-between.
-
->
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+On 21/09/21 15:48, Christian Borntraeger wrote:
+> From: Radim Krčmář <rkrcmar@redhat.com>
+> 
+> Fetching an index for any vcpu in kvm->vcpus array by traversing
+> the entire array everytime is costly.
+> This patch remembers the position of each vcpu in kvm->vcpus array
+> by storing it in vcpus_idx under kvm_vcpu structure.
+> 
+> Signed-off-by: Radim Krčmář <rkrcmar@redhat.com>
+> Signed-off-by: Nitesh Narayan Lal <nitesh@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> [borntraeger@de.ibm.com]: backport to 4.19 (also fits for 5.4)
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 > ---
->  arch/x86/kvm/x86.c | 2 --
->  1 file changed, 2 deletions(-)
->
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index ab907a0b9eeb..e0bff5473813 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -10628,8 +10628,6 @@ static void fx_init(struct kvm_vcpu *vcpu)
->  	 * Ensure guest xcr0 is valid for loading
->  	 */
->  	vcpu->arch.xcr0 = XFEATURE_MASK_FP;
+>   include/linux/kvm_host.h | 11 +++--------
+>   virt/kvm/kvm_main.c      |  5 +++--
+>   2 files changed, 6 insertions(+), 10 deletions(-)
+> 
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 8dd4ebb58e97..827f70ce0b49 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -248,7 +248,8 @@ struct kvm_vcpu {
+>   	struct preempt_notifier preempt_notifier;
+>   #endif
+>   	int cpu;
+> -	int vcpu_id;
+> +	int vcpu_id; /* id given by userspace at creation */
+> +	int vcpu_idx; /* index in kvm->vcpus array */
+>   	int srcu_idx;
+>   	int mode;
+>   	u64 requests;
+> @@ -551,13 +552,7 @@ static inline struct kvm_vcpu *kvm_get_vcpu_by_id(struct kvm *kvm, int id)
+>   
+>   static inline int kvm_vcpu_get_idx(struct kvm_vcpu *vcpu)
+>   {
+> -	struct kvm_vcpu *tmp;
+> -	int idx;
 > -
-> -	vcpu->arch.cr0 |= X86_CR0_ET;
->  }
->  
->  void kvm_free_guest_fpu(struct kvm_vcpu *vcpu)
+> -	kvm_for_each_vcpu(idx, tmp, vcpu->kvm)
+> -		if (tmp == vcpu)
+> -			return idx;
+> -	BUG();
+> +	return vcpu->vcpu_idx;
+>   }
+>   
+>   #define kvm_for_each_memslot(memslot, slots)	\
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index a3d82113ae1c..86ef740763b5 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -2751,7 +2751,8 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, u32 id)
+>   		goto unlock_vcpu_destroy;
+>   	}
+>   
+> -	BUG_ON(kvm->vcpus[atomic_read(&kvm->online_vcpus)]);
+> +	vcpu->vcpu_idx = atomic_read(&kvm->online_vcpus);
+> +	BUG_ON(kvm->vcpus[vcpu->vcpu_idx]);
+>   
+>   	/* Now it's all set up, let userspace reach it */
+>   	kvm_get_kvm(kvm);
+> @@ -2761,7 +2762,7 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, u32 id)
+>   		goto unlock_vcpu_destroy;
+>   	}
+>   
+> -	kvm->vcpus[atomic_read(&kvm->online_vcpus)] = vcpu;
+> +	kvm->vcpus[vcpu->vcpu_idx] = vcpu;
+>   
+>   	/*
+>   	 * Pairs with smp_rmb() in kvm_get_vcpu.  Write kvm->vcpus
+> 
 
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 
--- 
-Vitaly
+The backport makes sense given the code in the stable branch now calls 
+kvm_vcpu_get_idx more than it used to.
+
+Paolo
 
