@@ -2,157 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D1775413561
-	for <lists+kvm@lfdr.de>; Tue, 21 Sep 2021 16:31:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0310641357B
+	for <lists+kvm@lfdr.de>; Tue, 21 Sep 2021 16:37:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233671AbhIUOch (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Sep 2021 10:32:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41649 "EHLO
+        id S233749AbhIUOjQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Sep 2021 10:39:16 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:45937 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233688AbhIUOcg (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 21 Sep 2021 10:32:36 -0400
+        by vger.kernel.org with ESMTP id S233744AbhIUOjO (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 21 Sep 2021 10:39:14 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632234667;
+        s=mimecast20190719; t=1632235066;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=MOX0Dc/uscmy0FcdNSM5vS8dhWPJhduTSx1fXAnSXC8=;
-        b=FwYtxjDjVCw9V/TUF/Wb9IJf5yoNA8Doc6Rwg0J7vse7+RufmDQJJjvOeF0DyEU1DRwcHy
-        qAP2qhZIbo1eI6rItaSjj+rOrRolqVENP08qnseiteVadyWk6DusflwTp2bSggqOLY9Ql+
-        ZXwd5eU0oTZh+spYV+2JHR38D60ysU0=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-99-wMzZUtTkN5-nAVIc6hrFEQ-1; Tue, 21 Sep 2021 10:31:06 -0400
-X-MC-Unique: wMzZUtTkN5-nAVIc6hrFEQ-1
-Received: by mail-wr1-f69.google.com with SMTP id e1-20020adfa741000000b0015e424fdd01so8527095wrd.11
-        for <kvm@vger.kernel.org>; Tue, 21 Sep 2021 07:31:06 -0700 (PDT)
+        bh=k0O7QoPLWspZx6BtAPcQquZycVQ3JnmWHZekZJRvmzk=;
+        b=ArdAyv7388KOVnawfyyy2JotMdVBS8v5T+4IlGedbricg3viFo7MESwYEZikZ6ncIgL+zx
+        lXMiYZcRrIg3FkGw7Rw2CPatvsGrMMq0/dakJTll0IERXyHu4/NxIJdbAjSbBs9vSVK9SM
+        0RU6y8NvMAcCXwzkKWC+rrRdpu07spw=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-504-5l7E38qLOQiUoAxqE61L5w-1; Tue, 21 Sep 2021 10:37:44 -0400
+X-MC-Unique: 5l7E38qLOQiUoAxqE61L5w-1
+Received: by mail-wr1-f70.google.com with SMTP id k2-20020adfc702000000b0016006b2da9bso3943326wrg.1
+        for <kvm@vger.kernel.org>; Tue, 21 Sep 2021 07:37:44 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=MOX0Dc/uscmy0FcdNSM5vS8dhWPJhduTSx1fXAnSXC8=;
-        b=Xh2teThHU+MpxHAcVtyS41o6I9Uba0aJDdjf0Wh9dOs+MGSpAR0Sn7aDfDWEEhCv5p
-         thNOL4GU07MZBjJZGdc4OyeQBv8ZeumjyPw937011T6e4uoXbEpkBIxRWR5vKvMmwuoB
-         IsSOEGAAuL2ik5AXGRA9jXK7knh4ZPITXGGfbj1uKMBw1VPYn2Yt/f5ikZx9qruidpW9
-         Brez4446CA0au5d4CfPtVzieRyXzjqRpPbWhZug8oJKKBGFNUbWGaN1eDk6CrIYsoMe6
-         qZ4dufJd3HiFMZJhdVisARexhkZSZA9tYmWEFelyXIkjPQieU2upawGLP61BOXDvcCOy
-         j5sg==
-X-Gm-Message-State: AOAM531jse+bn/COe7SzfPtmug60NMx0JPJ98aVi3A2H1uEL6Utk68Hf
-        7z1Zm+dy1SCBLdOrtAlUL6MiguCQjrQtVQqamiV6WR2JNxx6x0NeSMuOvag6GY3iksUMbjqH7BK
-        /1SQy10e+Ouco
-X-Received: by 2002:a5d:618c:: with SMTP id j12mr5290851wru.189.1632234664880;
-        Tue, 21 Sep 2021 07:31:04 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzEM4NkwElgrp8f4cKqvFX/IpJVIPqq7dPySdWEovhmE4HewFeU/2oUKAxYrjP8y0ckUQpo6w==
-X-Received: by 2002:a5d:618c:: with SMTP id j12mr5290820wru.189.1632234664676;
-        Tue, 21 Sep 2021 07:31:04 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id r27sm19634987wrr.70.2021.09.21.07.31.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 Sep 2021 07:31:04 -0700 (PDT)
-Subject: Re: [PATCH] [backport for 4.19/5.4 stable] KVM: remember position in
- kvm->vcpus array
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        stable@vger.kernel.org
-Cc:     gregkh@linuxfoundation.org, KVM <kvm@vger.kernel.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Thomas Huth <thuth@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-References: <20210921134815.17615-1-borntraeger@de.ibm.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <280d7fb4-a02a-f8db-8af0-b567699cea80@redhat.com>
-Date:   Tue, 21 Sep 2021 16:31:03 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=k0O7QoPLWspZx6BtAPcQquZycVQ3JnmWHZekZJRvmzk=;
+        b=i2/llbMdVCBiU65ZlqSpKzJP8PuKfVMSUNkC2F71b0T5m2KNC9n9qtIeuVgUN8N/PB
+         mpoyJz9+SIWsBF4ZjleQADMpWKt8EF5Bv9hg/rbEzgM/aax9NwkkNnamHNp5/QfGCTn7
+         WbXZofcECw2NI7IQ+WbiMK/0F5OtuWRw1toIZT49bYZE4sQRyMQaN+sIq7F/lpTmg/60
+         a7B5pxcd5ZgqOcqICtDtjdpMNBrQlfl5phKuX3MhoTHP8QcF+gjzhsQgZ5zMiVuSzvsA
+         M/FVb7ovf4t4io+J/Adjsrr8tccTEfCvLX04k1hYakgKouv5Qtlr2mYxvKbBOivg5S7t
+         v4tw==
+X-Gm-Message-State: AOAM531R8QSb+5U19FkQgBTSf03R2iG8FQwTrd17VfR7TOJN3lrPftrg
+        AQgmF6Mn2JCGsVIeXN1CVIad7zyt71U5suY//RRocHMG2jo8bRQU6kVib9BXWSrOS3qG9bktw+Y
+        JIH6OIH5QXHfE
+X-Received: by 2002:a1c:2056:: with SMTP id g83mr4966840wmg.27.1632235063675;
+        Tue, 21 Sep 2021 07:37:43 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwOhtVDx1wjCMqGuF0SrwkNbv1M0n5PyDTKOHEe0ouzPcLmgHlypcvqzU6rba7ynbULjyMCpQ==
+X-Received: by 2002:a1c:2056:: with SMTP id g83mr4966811wmg.27.1632235063447;
+        Tue, 21 Sep 2021 07:37:43 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id c17sm23850602wrn.54.2021.09.21.07.37.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Sep 2021 07:37:42 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Reiji Watanabe <reijiw@google.com>
+Subject: Re: [PATCH v2 05/10] KVM: x86: Remove defunct setting of XCR0 for
+ guest during vCPU create
+In-Reply-To: <20210921000303.400537-6-seanjc@google.com>
+References: <20210921000303.400537-1-seanjc@google.com>
+ <20210921000303.400537-6-seanjc@google.com>
+Date:   Tue, 21 Sep 2021 16:37:41 +0200
+Message-ID: <87wnna805m.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20210921134815.17615-1-borntraeger@de.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 21/09/21 15:48, Christian Borntraeger wrote:
-> From: Radim Krčmář <rkrcmar@redhat.com>
-> 
-> Fetching an index for any vcpu in kvm->vcpus array by traversing
-> the entire array everytime is costly.
-> This patch remembers the position of each vcpu in kvm->vcpus array
-> by storing it in vcpus_idx under kvm_vcpu structure.
-> 
-> Signed-off-by: Radim Krčmář <rkrcmar@redhat.com>
-> Signed-off-by: Nitesh Narayan Lal <nitesh@redhat.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> [borntraeger@de.ibm.com]: backport to 4.19 (also fits for 5.4)
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Sean Christopherson <seanjc@google.com> writes:
+
+> Drop code to initialize XCR0 during fx_init(), a.k.a. vCPU creation, as
+> XCR0 has been initialized during kvm_vcpu_reset() (for RESET) since
+> commit a554d207dc46 ("KVM: X86: Processor States following Reset or INIT").
+>
+> Back when XCR0 support was added by commit 2acf923e38fb ("KVM: VMX:
+> Enable XSAVE/XRSTOR for guest"), KVM didn't differentiate between RESET
+> and INIT.  Ignoring the fact that calling fx_init() for INIT is obviously
+> wrong, e.g. FPU state after INIT is not the same as after RESET, setting
+> XCR0 in fx_init() was correct.
+>
+> Eventually fx_init() got moved to kvm_arch_vcpu_init(), a.k.a. vCPU
+> creation (ignore the terrible name) by commit 0ee6a5172573 ("x86/fpu,
+> kvm: Simplify fx_init()").  Finally, commit 95a0d01eef7a ("KVM: x86: Move
+> all vcpu init code into kvm_arch_vcpu_create()") killed off
+> kvm_arch_vcpu_init(),
+
+Technically, empty kvm_arch_vcpu_init() was still alive for a few more
+commits and only ddd259c9aaba ("KVM: Drop kvm_arch_vcpu_init() and
+kvm_arch_vcpu_uninit()") killed it for real but a curious reader can
+find all these gory details himself)
+
+> leaving behind the oddity of redundant setting of
+> guest state during vCPU creation.
+>
+> No functional change intended.
+>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
->   include/linux/kvm_host.h | 11 +++--------
->   virt/kvm/kvm_main.c      |  5 +++--
->   2 files changed, 6 insertions(+), 10 deletions(-)
-> 
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 8dd4ebb58e97..827f70ce0b49 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -248,7 +248,8 @@ struct kvm_vcpu {
->   	struct preempt_notifier preempt_notifier;
->   #endif
->   	int cpu;
-> -	int vcpu_id;
-> +	int vcpu_id; /* id given by userspace at creation */
-> +	int vcpu_idx; /* index in kvm->vcpus array */
->   	int srcu_idx;
->   	int mode;
->   	u64 requests;
-> @@ -551,13 +552,7 @@ static inline struct kvm_vcpu *kvm_get_vcpu_by_id(struct kvm *kvm, int id)
->   
->   static inline int kvm_vcpu_get_idx(struct kvm_vcpu *vcpu)
->   {
-> -	struct kvm_vcpu *tmp;
-> -	int idx;
+>  arch/x86/kvm/x86.c | 7 +------
+>  1 file changed, 1 insertion(+), 6 deletions(-)
+>
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index e0bff5473813..6fd3fe21863e 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -993,7 +993,7 @@ static int __kvm_set_xcr(struct kvm_vcpu *vcpu, u32 index, u64 xcr)
+>  	/*
+>  	 * Do not allow the guest to set bits that we do not support
+>  	 * saving.  However, xcr0 bit 0 is always set, even if the
+> -	 * emulated CPU does not support XSAVE (see fx_init).
+> +	 * emulated CPU does not support XSAVE (see kvm_vcpu_reset()).
+>  	 */
+>  	valid_bits = vcpu->arch.guest_supported_xcr0 | XFEATURE_MASK_FP;
+>  	if (xcr0 & ~valid_bits)
+> @@ -10623,11 +10623,6 @@ static void fx_init(struct kvm_vcpu *vcpu)
+>  	if (boot_cpu_has(X86_FEATURE_XSAVES))
+>  		vcpu->arch.guest_fpu->state.xsave.header.xcomp_bv =
+>  			host_xcr0 | XSTATE_COMPACTION_ENABLED;
 > -
-> -	kvm_for_each_vcpu(idx, tmp, vcpu->kvm)
-> -		if (tmp == vcpu)
-> -			return idx;
-> -	BUG();
-> +	return vcpu->vcpu_idx;
->   }
->   
->   #define kvm_for_each_memslot(memslot, slots)	\
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index a3d82113ae1c..86ef740763b5 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -2751,7 +2751,8 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, u32 id)
->   		goto unlock_vcpu_destroy;
->   	}
->   
-> -	BUG_ON(kvm->vcpus[atomic_read(&kvm->online_vcpus)]);
-> +	vcpu->vcpu_idx = atomic_read(&kvm->online_vcpus);
-> +	BUG_ON(kvm->vcpus[vcpu->vcpu_idx]);
->   
->   	/* Now it's all set up, let userspace reach it */
->   	kvm_get_kvm(kvm);
-> @@ -2761,7 +2762,7 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, u32 id)
->   		goto unlock_vcpu_destroy;
->   	}
->   
-> -	kvm->vcpus[atomic_read(&kvm->online_vcpus)] = vcpu;
-> +	kvm->vcpus[vcpu->vcpu_idx] = vcpu;
->   
->   	/*
->   	 * Pairs with smp_rmb() in kvm_get_vcpu.  Write kvm->vcpus
-> 
+> -	/*
+> -	 * Ensure guest xcr0 is valid for loading
+> -	 */
+> -	vcpu->arch.xcr0 = XFEATURE_MASK_FP;
+>  }
+>  
+>  void kvm_free_guest_fpu(struct kvm_vcpu *vcpu)
 
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 
-The backport makes sense given the code in the stable branch now calls 
-kvm_vcpu_get_idx more than it used to.
-
-Paolo
+-- 
+Vitaly
 
