@@ -2,76 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A18A41395A
-	for <lists+kvm@lfdr.de>; Tue, 21 Sep 2021 19:59:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3AEB6413961
+	for <lists+kvm@lfdr.de>; Tue, 21 Sep 2021 20:00:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232056AbhIUSAv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Sep 2021 14:00:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:42544 "EHLO
+        id S232110AbhIUSBg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Sep 2021 14:01:36 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:49530 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232052AbhIUSAu (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 21 Sep 2021 14:00:50 -0400
+        by vger.kernel.org with ESMTP id S232101AbhIUSBf (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 21 Sep 2021 14:01:35 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632247161;
+        s=mimecast20190719; t=1632247206;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=zJEAcSEIgId9AwYVRC0qQ3ajHWBc7r/Wum0Va5Cj43g=;
-        b=e3/QXpBSnbSxpapmMgpxQZrr8NkPHN3drLIbMfvpDGZbX8AxTI8O6zxmYIa6/dqkx7Vrii
-        iDeXyjAnL5tR8/Y1X0qI9ycQSwC1Uj2UEAE2ICRqtvdnfJ1cELI4VQXVpxS32agHjxPDD2
-        0vQFm2aCS58msQk2TRjvd/fdJgbCj3I=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-412-N7-ewaLgOSOon9M-e9W6ug-1; Tue, 21 Sep 2021 13:59:20 -0400
-X-MC-Unique: N7-ewaLgOSOon9M-e9W6ug-1
-Received: by mail-wr1-f71.google.com with SMTP id x2-20020a5d54c2000000b0015dfd2b4e34so9503587wrv.6
-        for <kvm@vger.kernel.org>; Tue, 21 Sep 2021 10:59:19 -0700 (PDT)
+        bh=7JfYcZW2NbckggyMTPgWKycE7DRVJIAvYonCutHYoos=;
+        b=QibDx4taHQKt5Yq5k2qILpdNAHAvXNK0fV1k+mB0l3OYIHx5uTz8E/OzCt+KRaxdlJxOvA
+        D9hytIJB6hl8YyDLVoqAT1UsKAFLky5Rh3nnn3WhOvghseu5m2Id+tF6S+hvLndXeudE5h
+        3jhcuvIGSeTe9LXGAwojnC9PTQrcRng=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-114-8AqWeryFNb6wvhI5taQK3Q-1; Tue, 21 Sep 2021 14:00:05 -0400
+X-MC-Unique: 8AqWeryFNb6wvhI5taQK3Q-1
+Received: by mail-wr1-f69.google.com with SMTP id r7-20020a5d6947000000b0015e0f68a63bso9548513wrw.22
+        for <kvm@vger.kernel.org>; Tue, 21 Sep 2021 11:00:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=zJEAcSEIgId9AwYVRC0qQ3ajHWBc7r/Wum0Va5Cj43g=;
-        b=T8SHWhyd/VGd9OjSwH1vAKyuyJq7ciyOuYzBqrHEEl85JPOnPTaeUC6cmd8REQbNgv
-         pyYbPAKfLbxfczu3Pq2Ey8JkiQgSONxWmpze+dcTfCI8EnZrAQYkkmSqw2yOjMvG20W+
-         qWek7cKgktq5LJmpNU8boIOv3pcCKYsTViki90iyQWTL6djBcL5FkcoJ4llU2/9hAbUz
-         tK6zGySbTAM3w3daU5jGVdp6VQLY3/F/VTpY9i6Tf/I9nmZwMwuqliHdNZDyDhx+oftb
-         s2Dq4lIkB34pCxFR5/8/n33JHqkFOfTmqaw0Bkd5RP1zvd93CiKN7xikti50VRD3G/4B
-         4DEw==
-X-Gm-Message-State: AOAM530n4KJY0bssa0CvyUTYjwBeZZdqS5h3WMsZ0koeiaLP+3aXFy40
-        jL7bz5ZYXppYJ9oVZlFTXs5ML5fDDUobbhyeCiqkhtClxV9FU890mA/o0e65DuHEqz1nu8cWFF/
-        JTE8UrThV9wEF
-X-Received: by 2002:a7b:c112:: with SMTP id w18mr6169888wmi.86.1632247158799;
-        Tue, 21 Sep 2021 10:59:18 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzE58/MDukCj9/T6TCsmIk/mI3Qr4J4pYFiogRVuZatAFTjuNxHA7WL3p8No1sKEner6nUpvw==
-X-Received: by 2002:a7b:c112:: with SMTP id w18mr6169872wmi.86.1632247158573;
-        Tue, 21 Sep 2021 10:59:18 -0700 (PDT)
+        bh=7JfYcZW2NbckggyMTPgWKycE7DRVJIAvYonCutHYoos=;
+        b=ZJJbdSZK24jf2BjzO7V4K9gNoy/bsPuEIPQ8lvwN9udyLm2AU84UAA3L+xgK8GG0Dc
+         LTD6DhQ8vf8B7+EpmmQHoFCXZzcpp7QXeit3JIfbJS6tRKKeL7wQnS5STGwXOqXjAtkg
+         awtspeDdG2eWbFfB3L9lHrbbUe7e6X50gRsGwRfLx0mxCwsV4+04VI+tmW9KaKUG7cg9
+         sKn/OCFaUoQv3/EIZzNH6kLNdA7TYKY/t4fvoxDKbuZMQwM9n3stYP1OlL2DuyMwpddT
+         waDZvbRZ7qvWKj1E0zouy3AUjKJKm9yLVGzw5UtRmIGrfUN5PsHNYp+eXXtTstVLFEBH
+         37vw==
+X-Gm-Message-State: AOAM530ZMKEZmCOTTE9iy6ps8INY5S2PrnSGibfa8ijMm6FbR++9OpYS
+        hFjqclKB97qbZM9fPGk6Ldtf45VJ6WFMH9ZP575SQcP6KSnp+tudeA95pJbbNtJAoIuTUiAHKWs
+        1hqnkzjPvw5Zk
+X-Received: by 2002:a5d:64a7:: with SMTP id m7mr36596958wrp.171.1632247204355;
+        Tue, 21 Sep 2021 11:00:04 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxRzE0XDhDN+YzVRHql1Lso3OsD+/0fE4vZgdDKs5KMBqTMa32DRdaFtYAvn1nk3N1rLTZCjQ==
+X-Received: by 2002:a5d:64a7:: with SMTP id m7mr36596927wrp.171.1632247204162;
+        Tue, 21 Sep 2021 11:00:04 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id f19sm3626219wmf.11.2021.09.21.10.59.17
+        by smtp.gmail.com with ESMTPSA id g131sm3526365wme.22.2021.09.21.11.00.02
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 Sep 2021 10:59:17 -0700 (PDT)
-Subject: Re: [PATCH 1/2] KVM: SEV: Pin guest memory for write for
- RECEIVE_UPDATE_DATA
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Peter Gonda <pgonda@google.com>,
-        Marc Orr <marcorr@google.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Masahiro Kozuka <masa.koz@kozuka.jp>
-References: <20210914210951.2994260-1-seanjc@google.com>
- <20210914210951.2994260-2-seanjc@google.com>
+        Tue, 21 Sep 2021 11:00:03 -0700 (PDT)
+Subject: Re: [PATCH] selftests: KVM: Gracefully handle missing vCPU features
+To:     Oliver Upton <oupton@google.com>, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu
+Cc:     Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Andrew Jones <drjones@redhat.com>
+References: <20210818212940.1382549-1-oupton@google.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <bdbe4098-a72c-6e73-6f1e-88c2ebc07571@redhat.com>
-Date:   Tue, 21 Sep 2021 19:59:16 +0200
+Message-ID: <bd8abbac-925b-ff1e-f494-8f1c21fe7bd1@redhat.com>
+Date:   Tue, 21 Sep 2021 20:00:02 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <20210914210951.2994260-2-seanjc@google.com>
+In-Reply-To: <20210818212940.1382549-1-oupton@google.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -79,40 +77,57 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 14/09/21 23:09, Sean Christopherson wrote:
-> Require the target guest page to be writable when pinning memory for
-> RECEIVE_UPDATE_DATA.  Per the SEV API, the PSP writes to guest memory:
+On 18/08/21 23:29, Oliver Upton wrote:
+> An error of ENOENT for the KVM_ARM_VCPU_INIT ioctl indicates that one of
+> the requested feature flags is not supported by the kernel/hardware.
+> Detect the case when KVM doesn't support the requested features and skip
+> the test rather than failing it.
 > 
->    The result is then encrypted with GCTX.VEK and written to the memory
->    pointed to by GUEST_PADDR field.
-> 
-> Fixes: 15fb7de1a7f5 ("KVM: SVM: Add KVM_SEV_RECEIVE_UPDATE_DATA command")
-> Cc: stable@vger.kernel.org
-> Cc: Peter Gonda <pgonda@google.com>
-> Cc: Marc Orr <marcorr@google.com>
-> Cc: Tom Lendacky <thomas.lendacky@amd.com>
-> Cc: Brijesh Singh <brijesh.singh@amd.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> Cc: Andrew Jones <drjones@redhat.com>
+> Signed-off-by: Oliver Upton <oupton@google.com>
 > ---
->   arch/x86/kvm/svm/sev.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+> Applies to 5.14-rc6. Tested by running all selftests on an Ampere Mt.
+> Jade system.
 > 
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 75e0b21ad07c..95228ba3cd8f 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -1464,7 +1464,7 @@ static int sev_receive_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>   .../testing/selftests/kvm/lib/aarch64/processor.c | 15 ++++++++++++++-
+>   1 file changed, 14 insertions(+), 1 deletion(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+> index 632b74d6b3ca..b1064a0c5e62 100644
+> --- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+> @@ -216,6 +216,7 @@ void aarch64_vcpu_setup(struct kvm_vm *vm, int vcpuid, struct kvm_vcpu_init *ini
+>   {
+>   	struct kvm_vcpu_init default_init = { .target = -1, };
+>   	uint64_t sctlr_el1, tcr_el1;
+> +	int ret;
 >   
->   	/* Pin guest memory */
->   	guest_page = sev_pin_memory(kvm, params.guest_uaddr & PAGE_MASK,
-> -				    PAGE_SIZE, &n, 0);
-> +				    PAGE_SIZE, &n, 1);
->   	if (IS_ERR(guest_page)) {
->   		ret = PTR_ERR(guest_page);
->   		goto e_free_trans;
+>   	if (!init)
+>   		init = &default_init;
+> @@ -226,7 +227,19 @@ void aarch64_vcpu_setup(struct kvm_vm *vm, int vcpuid, struct kvm_vcpu_init *ini
+>   		init->target = preferred.target;
+>   	}
+>   
+> -	vcpu_ioctl(vm, vcpuid, KVM_ARM_VCPU_INIT, init);
+> +	ret = _vcpu_ioctl(vm, vcpuid, KVM_ARM_VCPU_INIT, init);
+> +
+> +	/*
+> +	 * Missing kernel feature support should result in skipping the test,
+> +	 * not failing it.
+> +	 */
+> +	if (ret && errno == ENOENT) {
+> +		print_skip("requested vCPU features not supported; skipping test.");
+> +		exit(KSFT_SKIP);
+> +	}
+> +
+> +	TEST_ASSERT(!ret, "KVM_ARM_VCPU_INIT failed, rc: %i errno: %i (%s)",
+> +		    ret, errno, strerror(errno));
+>   
+>   	/*
+>   	 * Enable FP/ASIMD to avoid trapping when accessing Q0-Q15
 > 
 
-Queued both, thanks.
+Queued, thanks.
 
 Paolo
 
