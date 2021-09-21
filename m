@@ -2,72 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 32B1641386B
-	for <lists+kvm@lfdr.de>; Tue, 21 Sep 2021 19:36:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F0A54138B1
+	for <lists+kvm@lfdr.de>; Tue, 21 Sep 2021 19:38:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231165AbhIURhe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Sep 2021 13:37:34 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43064 "EHLO
+        id S230421AbhIURjv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Sep 2021 13:39:51 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:30942 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231134AbhIURhc (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 21 Sep 2021 13:37:32 -0400
+        by vger.kernel.org with ESMTP id S229523AbhIURju (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 21 Sep 2021 13:39:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632245763;
+        s=mimecast20190719; t=1632245901;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=UgPiDD5j2AqzF61mlGvIsvFPJ7w1YHs7HAZrifi1D00=;
-        b=WksF02vLXfsWp2B3buSaRXU5ipK7W0c44CFKjO+TSF4tWdMuojR/JTbfr9JB44TwxMcAgQ
-        YqqQ98xpA5R4bdweMSUs67KCC0Tlv11c2JuVleOMY23qraRr/XFy5aOKTb2MU3juMGeCWE
-        mvsiJejvhqqxbxFNXAp0Zj0Mev8rWuk=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-505-ACP4XaLwN6aNYz-orI9NvA-1; Tue, 21 Sep 2021 13:36:02 -0400
-X-MC-Unique: ACP4XaLwN6aNYz-orI9NvA-1
-Received: by mail-wr1-f70.google.com with SMTP id u10-20020adfae4a000000b0016022cb0d2bso1693840wrd.19
-        for <kvm@vger.kernel.org>; Tue, 21 Sep 2021 10:36:01 -0700 (PDT)
+        bh=Ps7sRkcD6VYl85kI1uxsep0hwsJ0/fdk/o4evC4yU9U=;
+        b=dV54fTW5lIp1Pf8+xCJYuE616EchGA/UdQ9pfM4wMapMOzw1MaNr8h+k7SlhX2QaE7FK4l
+        fJtNh9n6ut9rKNHhOsV0uNcyToN6Z0oEy2EV0Ho31TwBWAhsEGzGeIQFifiX1oJ7NaQIOg
+        jQp/1Y/IjKet0QpSvRkwkG8+2JM2OVs=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-322-4vINjJUGN--YkU5lma6SXQ-1; Tue, 21 Sep 2021 13:38:19 -0400
+X-MC-Unique: 4vINjJUGN--YkU5lma6SXQ-1
+Received: by mail-ed1-f70.google.com with SMTP id r7-20020aa7c147000000b003d1f18329dcso19881364edp.13
+        for <kvm@vger.kernel.org>; Tue, 21 Sep 2021 10:38:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=UgPiDD5j2AqzF61mlGvIsvFPJ7w1YHs7HAZrifi1D00=;
-        b=0oXROzC7M9+BAh7LBJc3SegiWIGULwx3EINbuoRaYLRD2OMwlX4L8SxTZPkPSyZDLB
-         A2El3tP20wql/rXDxG1/a97Dc1GAKvu4AA7LzcPq5nLrAf2rdxowPi+HEjyBcQdBhCIN
-         6kEtb3qiQro/xCUJfVI8CfZkOvhYIMWCJQrQSPPrrqTvD4ZlEjLD1jH/pDZlrY7Z0SHv
-         vXc+ba/vZbQXMrIcexkW4WRM5FuJxMpFIBrcufcvYdCyNyIiUmcFDKbuH+3U+sVKjD2W
-         zgFnuYymJLNDoRunbGvtF6b5UJIk442Irx3PWkvriQl0JX1nAOUdP3tE3Z3r/rvgP47B
-         VuHA==
-X-Gm-Message-State: AOAM530EmZU64CLizejwUk1sVg/p0znLGcsy53M7LEu/zWFcSn1dTtpv
-        S17mTZo0SBZRmyRBlqi7UdRyuwremCblte5cIfbdd/W+nMFzahWvp5oEZx09ucZfyiYwFIXaw/4
-        bQnhLGQQJNI+0
-X-Received: by 2002:a1c:1f09:: with SMTP id f9mr5875565wmf.58.1632245760831;
-        Tue, 21 Sep 2021 10:36:00 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwUUudoY9HvptrgZ5/LyJJD0yp4dO/ucGU04k4bELWDe4QqQ5pOXt5EjJz4lAP6jqqovVOSVA==
-X-Received: by 2002:a1c:1f09:: with SMTP id f9mr5875546wmf.58.1632245760567;
-        Tue, 21 Sep 2021 10:36:00 -0700 (PDT)
+        bh=Ps7sRkcD6VYl85kI1uxsep0hwsJ0/fdk/o4evC4yU9U=;
+        b=gTIc2D1LbJCE2XFNeKDTTZFHIt2WYhkb2jYK/HZl4+ynJLojDDMH4Oseh77MB/w+FP
+         MZxtcGbkcDqZ9b4cDZrYT/4Bcfa1x4F54QVrhKFGoAGUqUWeCpVJoRXb4w8e6lKdUDck
+         AqOTre45gwCxeVGU/oAWbNEd2vPdUtlOtcjvXyyKTi82S7Mwu/t9Q92Au4D/CIXl0dlw
+         uem4s9IrfzRBGTVOmAM1eyteJJI7bJTf1VtuX1nwCFc/0dZqq5V2UnOFpUNS73vU+sOt
+         x5a0u8gm+4uFpAJOXtJkJS7laeYW+lHdznzVHMsnGw5JDIsSVPwX+rab/qLgHasS3RU0
+         U9mg==
+X-Gm-Message-State: AOAM530X/K2XZJWgNikf9IXQhVNtoGUdyoGzcJqzeeQyz99JQWONR1HI
+        +5UHSA4E/hOE3nsZM/rFe7oMykE9ojFiW/CfZ0fYxZNyv+5oBAfm5hHhQmOa72RWnaXdwL/o8WU
+        O51aAZo1sSkiU
+X-Received: by 2002:a17:906:dbcb:: with SMTP id yc11mr36471902ejb.111.1632245898683;
+        Tue, 21 Sep 2021 10:38:18 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyeGPiiIE6s377p1uYluTAIC8tQvILE4GRsSkZJJoDkyFhMyBtQ6u9q0bUlYbHFk0utlKJ7EQ==
+X-Received: by 2002:a17:906:dbcb:: with SMTP id yc11mr36471879ejb.111.1632245898484;
+        Tue, 21 Sep 2021 10:38:18 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id m2sm3520973wmm.3.2021.09.21.10.35.58
+        by smtp.gmail.com with ESMTPSA id qc12sm816874ejb.117.2021.09.21.10.38.16
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 Sep 2021 10:35:59 -0700 (PDT)
-Subject: Re: [PATCH v2 02/10] KVM: x86: Clear KVM's cached guest CR3 at
- RESET/INIT
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
+        Tue, 21 Sep 2021 10:38:17 -0700 (PDT)
+Subject: Re: [PATCH 2/2] selftests: KVM: Fix 'asm-operand-width' warnings in
+ steal_time.c
+To:     Andrew Jones <drjones@redhat.com>, Oliver Upton <oupton@google.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Reiji Watanabe <reijiw@google.com>
-References: <20210921000303.400537-1-seanjc@google.com>
- <20210921000303.400537-3-seanjc@google.com>
+        Sean Christopherson <seanjc@google.com>
+References: <20210921010120.1256762-1-oupton@google.com>
+ <20210921010120.1256762-3-oupton@google.com>
+ <20210921071904.5irj3q5yiquoubj2@gator.home>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <395d8222-9168-8568-255e-da57c2ac8b5b@redhat.com>
-Date:   Tue, 21 Sep 2021 19:35:56 +0200
+Message-ID: <b242d9d8-ec1c-bba5-6272-a7a42e2e4011@redhat.com>
+Date:   Tue, 21 Sep 2021 19:38:15 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <20210921000303.400537-3-seanjc@google.com>
+In-Reply-To: <20210921071904.5irj3q5yiquoubj2@gator.home>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -75,37 +78,60 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 21/09/21 02:02, Sean Christopherson wrote:
-> Explicitly zero the guest's CR3 and mark it available+dirty at RESET/INIT.
-> Per Intel's SDM and AMD's APM, CR3 is zeroed at both RESET and INIT.  For
-> RESET, this is a nop as vcpu is zero-allocated.  For INIT, the bug has
-> likely escaped notice because no firmware/kernel puts its page tables root
-> at PA=0, let alone relies on INIT to get the desired CR3 for such page
-> tables.
+On 21/09/21 09:19, Andrew Jones wrote:
+> On Tue, Sep 21, 2021 at 01:01:20AM +0000, Oliver Upton wrote:
+>> Building steal_time.c for arm64 with clang throws the following:
+>>
+>>>> steal_time.c:130:22: error: value size does not match register size specified by the constraint and modifier [-Werror,-Wasm-operand-widths]
+>>            : "=r" (ret) : "r" (func), "r" (arg) :
+>>                                ^
+>>>> steal_time.c:130:34: error: value size does not match register size specified by the constraint and modifier [-Werror,-Wasm-operand-widths]
+>>            : "=r" (ret) : "r" (func), "r" (arg) :
+>>                                            ^
+>>
+>> Silence by casting operands to 64 bits.
+>>
+>> Signed-off-by: Oliver Upton <oupton@google.com>
+>> ---
+>>   tools/testing/selftests/kvm/steal_time.c | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/tools/testing/selftests/kvm/steal_time.c b/tools/testing/selftests/kvm/steal_time.c
+>> index ecec30865a74..eb75b31122c5 100644
+>> --- a/tools/testing/selftests/kvm/steal_time.c
+>> +++ b/tools/testing/selftests/kvm/steal_time.c
+>> @@ -127,7 +127,7 @@ static int64_t smccc(uint32_t func, uint32_t arg)
+>>   		"mov	x1, %2\n"
+>>   		"hvc	#0\n"
+>>   		"mov	%0, x0\n"
+>> -	: "=r" (ret) : "r" (func), "r" (arg) :
+>> +	: "=r" (ret) : "r" ((uint64_t)func), "r" ((uint64_t)arg) :
 > 
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->   arch/x86/kvm/x86.c | 3 +++
->   1 file changed, 3 insertions(+)
+> Actually, I think I'd rather fix this smccc implementation to match the
+> spec, which I think should be done like this
 > 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index e77a5bf2d940..2cb38c67ed43 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -10899,6 +10899,9 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
->   	kvm_set_rflags(vcpu, X86_EFLAGS_FIXED);
->   	kvm_rip_write(vcpu, 0xfff0);
+> diff --git a/tools/testing/selftests/kvm/steal_time.c b/tools/testing/selftests/kvm/steal_time.c
+> index ecec30865a74..7da957259ce4 100644
+> --- a/tools/testing/selftests/kvm/steal_time.c
+> +++ b/tools/testing/selftests/kvm/steal_time.c
+> @@ -118,12 +118,12 @@ struct st_time {
+>          uint64_t st_time;
+>   };
 >   
-> +	vcpu->arch.cr3 = 0;
-> +	kvm_register_mark_dirty(vcpu, VCPU_EXREG_CR3);
-> +
->   	/*
->   	 * CR0.CD/NW are set on RESET, preserved on INIT.  Note, some versions
->   	 * of Intel's SDM list CD/NW as being set on INIT, but they contradict
+> -static int64_t smccc(uint32_t func, uint32_t arg)
+> +static int64_t smccc(uint32_t func, uint64_t arg)
+>   {
+>          unsigned long ret;
+>   
+>          asm volatile(
+> -               "mov    x0, %1\n"
+> +               "mov    w0, %w1\n"
+>                  "mov    x1, %2\n"
+>                  "hvc    #0\n"
+>                  "mov    %0, x0\n"
 > 
 
-Queued patches 1-2 for 5.15-rc3, thanks.
+Agreed, can you send out a patch?  Thanks,
 
 Paolo
 
