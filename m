@@ -2,133 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 39CFF413C0C
-	for <lists+kvm@lfdr.de>; Tue, 21 Sep 2021 23:09:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DE02C413C47
+	for <lists+kvm@lfdr.de>; Tue, 21 Sep 2021 23:21:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235301AbhIUVLK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Sep 2021 17:11:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:35144 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235298AbhIUVLF (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 21 Sep 2021 17:11:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632258574;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=MlpLbPlo4KBTm6av7Erxbr1sl480yKpqTzkq1T4fFto=;
-        b=SGYXnnQzQdgtsoi2eZAVlAMOYtv8XQuIfkOx8OKXgcJl85OxrwuyKCGc75ID11gHUqCajK
-        nROoAd06Kc/9x6OHPLgYquaSglUyKCZZvID54+Hbqo4szfw8mGgmkIkjzkucxsfH6JzjCF
-        Lz076xO1KzgGRW8IsDxioasWEAF43j8=
-Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com
- [209.85.167.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-1-dUF8OLX6OUuU2RPu9Elxwg-1; Tue, 21 Sep 2021 17:09:33 -0400
-X-MC-Unique: dUF8OLX6OUuU2RPu9Elxwg-1
-Received: by mail-oi1-f199.google.com with SMTP id m189-20020aca58c6000000b0027381ff1c37so379436oib.22
-        for <kvm@vger.kernel.org>; Tue, 21 Sep 2021 14:09:32 -0700 (PDT)
+        id S229586AbhIUVWb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Sep 2021 17:22:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47438 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233238AbhIUVW3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Sep 2021 17:22:29 -0400
+Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81468C061575
+        for <kvm@vger.kernel.org>; Tue, 21 Sep 2021 14:21:00 -0700 (PDT)
+Received: by mail-lf1-x12f.google.com with SMTP id z24so2781588lfu.13
+        for <kvm@vger.kernel.org>; Tue, 21 Sep 2021 14:21:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=shutemov-name.20210112.gappssmtp.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=GYWKxxwDs0cZgU7zoLo4TUhsJ8M50sSfexrGGa7nvK0=;
+        b=6GA+nKi4dJGN5Y/djnNixBrKu6T3pljCu3U/BgzvrwouwWOron03nG2FotSmE1IvQS
+         MgoEePxggSU/gxjqerZifjJ0UmN+Rpgv4VXnbx+GeN6FcHZXKGVGGXh/gwowELfGRgeB
+         k1v+6RGz165vVjf8qTg9T5T2FYUEcrHSwLBk5fRy4e1eic4Bwe7QkdtvB988rBItCSlw
+         5pJbiBObITlEWIumnOpwgWSOod/vvf6//SPAXj5IzXKsXsn8DowBeLy2GH+tdsAPmUH0
+         ZbwUoQIW4DTzzxX46eJW+ys3iupLGzexzYNkzIcWmfRnNP3AUY1kX51pUUaEoehoA6Yb
+         KPPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=MlpLbPlo4KBTm6av7Erxbr1sl480yKpqTzkq1T4fFto=;
-        b=e1tCddqxpIwyeXLJMakS3rDroADm5Ld7IY0TRfhnnaC2YuHq2BcHmtzxsJcFgLaTp7
-         ADxgiw23SyWtE5p5JoFzGbllugWTnOcKUay1POPDgqKbcFHmNsRwDhRvGHp5MmGWOBhG
-         FbBg2Jot21SJCpAGx9SIEUYMqH8CN6cy8ZKNIjduLczBnw9VH7heM2GqNv5H5/GUT1e8
-         ej8YMdtkerENbKVo42BphAeVieRKd7c3sJdzFDkLHrlmAH5xBDLWRLRjHcz11lxZzeRA
-         mXRftkCYeoS9Z/UUSES2f4d0bck/q4yA3nIVIVuLI54x4Lfqlus4kaJvZLX/Tf6DpTvj
-         88HQ==
-X-Gm-Message-State: AOAM5330X08ilk/UPOWrzUJ0W3p0N5GbqeQaQ+cnZ092SIqrX3Ag32Ui
-        8OzdVwBwUW+bdCAAw/XUQVAdiNBFlqet7MPb/SKxhR6qSoB8o0h2enzlQnMkspW8YJ2XK8kjdqd
-        HE5Z3jer78nPT
-X-Received: by 2002:aca:120f:: with SMTP id 15mr1525395ois.62.1632258571923;
-        Tue, 21 Sep 2021 14:09:31 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyhqVoP+OVs+kyF/lfOuiIjVaG7CDYwxfFsiO8jsmgxqmlxGTrRDnls5rys+4wGpfrkbujdyw==
-X-Received: by 2002:aca:120f:: with SMTP id 15mr1525386ois.62.1632258571725;
-        Tue, 21 Sep 2021 14:09:31 -0700 (PDT)
-Received: from redhat.com ([198.99.80.109])
-        by smtp.gmail.com with ESMTPSA id k23sm55513ood.12.2021.09.21.14.09.30
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=GYWKxxwDs0cZgU7zoLo4TUhsJ8M50sSfexrGGa7nvK0=;
+        b=ItJwI464ooiuuDHA2qKmJzcUnUMcvoqCyh581UwxHupTuDhlRGv4LjUOMhMqOjja0j
+         xmmPSDM/bbtKh0DFO+0Sjx7VlCUOrUG6cxFncrvNFBOuVQwVLQehNoMcSETNPtbNOkbI
+         DuswSIbDmZOZ7yDXpaTQxxjU7DBQjN9cxoP6KJ9n5QkMiNULRMvhc+1UEAA9EgJhc15k
+         2j2UTLgHUHfpkVnq0i36Ng/GZUnNh5q9Q2nMPyKWoEtpsqeT/jzGaeCRGAVWvFSsSxbN
+         dicEvD8gq7HRs5APeKPGcQL96icusntZBBpmenKR/QxrFnCvFfYBzjE3RYrsz+R4ildQ
+         BXlA==
+X-Gm-Message-State: AOAM53284ijRUntrC0wUiNTkFSi8c2BKzkVuDQ8i+arbdvv8FZBSiKW0
+        cAq1ij7TuDghX7GxgwvawwR1Kg==
+X-Google-Smtp-Source: ABdhPJwekUVL/x16ZZDpG4z5bQ8XnWA1mYPT1pSdbtQA7F8rIf0C+IYx6L1iOsCNob4BliQK4ObStw==
+X-Received: by 2002:a2e:5009:: with SMTP id e9mr25102801ljb.245.1632259258818;
+        Tue, 21 Sep 2021 14:20:58 -0700 (PDT)
+Received: from box.localdomain ([86.57.175.117])
+        by smtp.gmail.com with ESMTPSA id t12sm13948lfc.55.2021.09.21.14.20.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Sep 2021 14:09:31 -0700 (PDT)
-Date:   Tue, 21 Sep 2021 15:09:29 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Liu Yi L <yi.l.liu@intel.com>, hch@lst.de, jasowang@redhat.com,
-        joro@8bytes.org, jean-philippe@linaro.org, kevin.tian@intel.com,
-        parav@mellanox.com, lkml@metux.net, pbonzini@redhat.com,
-        lushenming@huawei.com, eric.auger@redhat.com, corbet@lwn.net,
-        ashok.raj@intel.com, yi.l.liu@linux.intel.com,
-        jun.j.tian@intel.com, hao.wu@intel.com, dave.jiang@intel.com,
-        jacob.jun.pan@linux.intel.com, kwankhede@nvidia.com,
-        robin.murphy@arm.com, kvm@vger.kernel.org,
-        iommu@lists.linux-foundation.org, dwmw2@infradead.org,
-        linux-kernel@vger.kernel.org, baolu.lu@linux.intel.com,
-        david@gibson.dropbear.id.au, nicolinc@nvidia.com
-Subject: Re: [RFC 05/20] vfio/pci: Register device to /dev/vfio/devices
-Message-ID: <20210921150929.5977702c.alex.williamson@redhat.com>
-In-Reply-To: <20210921164001.GR327412@nvidia.com>
-References: <20210919063848.1476776-1-yi.l.liu@intel.com>
-        <20210919063848.1476776-6-yi.l.liu@intel.com>
-        <20210921164001.GR327412@nvidia.com>
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        Tue, 21 Sep 2021 14:20:58 -0700 (PDT)
+Received: by box.localdomain (Postfix, from userid 1000)
+        id 1B39910305C; Wed, 22 Sep 2021 00:20:59 +0300 (+03)
+Date:   Wed, 22 Sep 2021 00:20:59 +0300
+From:   "Kirill A. Shutemov" <kirill@shutemov.name>
+To:     Borislav Petkov <bp@alien8.de>
+Cc:     Tom Lendacky <thomas.lendacky@amd.com>,
+        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, x86@kernel.org,
+        iommu@lists.linux-foundation.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-graphics-maintainer@vmware.com,
+        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        kexec@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Andi Kleen <ak@linux.intel.com>,
+        Sathyanarayanan Kuppuswamy 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        Tianyu Lan <Tianyu.Lan@microsoft.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v3 5/8] x86/sme: Replace occurrences of sme_active() with
+ cc_platform_has()
+Message-ID: <20210921212059.wwlytlmxoft4cdth@box.shutemov.name>
+References: <cover.1631141919.git.thomas.lendacky@amd.com>
+ <367624d43d35d61d5c97a8b289d9ddae223636e9.1631141919.git.thomas.lendacky@amd.com>
+ <20210920192341.maue7db4lcbdn46x@box.shutemov.name>
+ <77df37e1-0496-aed5-fd1d-302180f1edeb@amd.com>
+ <YUoao0LlqQ6+uBrq@zn.tnic>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YUoao0LlqQ6+uBrq@zn.tnic>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 21 Sep 2021 13:40:01 -0300
-Jason Gunthorpe <jgg@nvidia.com> wrote:
+On Tue, Sep 21, 2021 at 07:47:15PM +0200, Borislav Petkov wrote:
+> On Tue, Sep 21, 2021 at 12:04:58PM -0500, Tom Lendacky wrote:
+> > Looks like instrumentation during early boot. I worked with Boris offline to
+> > exclude arch/x86/kernel/cc_platform.c from some of the instrumentation and
+> > that allowed an allyesconfig to boot.
+> 
+> And here's the lineup I have so far, I'd appreciate it if ppc and s390 folks
+> could run it too:
+> 
+> https://git.kernel.org/pub/scm/linux/kernel/git/bp/bp.git/log/?h=rc2-cc
 
-> On Sun, Sep 19, 2021 at 02:38:33PM +0800, Liu Yi L wrote:
-> > This patch exposes the device-centric interface for vfio-pci devices. To
-> > be compatiable with existing users, vfio-pci exposes both legacy group
-> > interface and device-centric interface.
-> > 
-> > As explained in last patch, this change doesn't apply to devices which
-> > cannot be forced to snoop cache by their upstream iommu. Such devices
-> > are still expected to be opened via the legacy group interface.
+Still broken for me with allyesconfig.
 
-This doesn't make much sense to me.  The previous patch indicates
-there's work to be done in updating the kvm-vfio contract to understand
-DMA coherency, so you're trying to limit use cases to those where the
-IOMMU enforces coherency, but there's QEMU work to be done to support
-the iommufd uAPI at all.  Isn't part of that work to understand how KVM
-will be told about non-coherent devices rather than "meh, skip it in the
-kernel"?  Also let's not forget that vfio is not only for KVM.
+gcc version 11.2.0 (Gentoo 11.2.0 p1)
+GNU ld (Gentoo 2.37_p1 p0) 2.37
+
+I still believe calling cc_platform_has() from __startup_64() is totally
+broken as it lacks proper wrapping while accessing global variables.
+
+I think sme_get_me_mask() has the same problem. I just happened to work
+(until next compiler update).
+
+This hack makes kernel boot again:
+
+diff --git a/arch/x86/kernel/head64.c b/arch/x86/kernel/head64.c
+index f98c76a1d16c..e9110a44bf1b 100644
+--- a/arch/x86/kernel/head64.c
++++ b/arch/x86/kernel/head64.c
+@@ -285,7 +285,7 @@ unsigned long __head __startup_64(unsigned long physaddr,
+ 	 * there is no need to zero it after changing the memory encryption
+ 	 * attribute.
+ 	 */
+-	if (cc_platform_has(CC_ATTR_MEM_ENCRYPT)) {
++	if (0 && cc_platform_has(CC_ATTR_MEM_ENCRYPT)) {
+ 		vaddr = (unsigned long)__start_bss_decrypted;
+ 		vaddr_end = (unsigned long)__end_bss_decrypted;
+ 		for (; vaddr < vaddr_end; vaddr += PMD_SIZE) {
+diff --git a/arch/x86/mm/mem_encrypt_identity.c b/arch/x86/mm/mem_encrypt_identity.c
+index eff4d19f9cb4..91638ed0b1db 100644
+--- a/arch/x86/mm/mem_encrypt_identity.c
++++ b/arch/x86/mm/mem_encrypt_identity.c
+@@ -288,7 +288,7 @@ void __init sme_encrypt_kernel(struct boot_params *bp)
+ 	unsigned long pgtable_area_len;
+ 	unsigned long decrypted_base;
  
-> > When the device is opened via /dev/vfio/devices, vfio-pci should prevent
-> > the user from accessing the assigned device because the device is still
-> > attached to the default domain which may allow user-initiated DMAs to
-> > touch arbitrary place. The user access must be blocked until the device
-> > is later bound to an iommufd (see patch 08). The binding acts as the
-> > contract for putting the device in a security context which ensures user-
-> > initiated DMAs via this device cannot harm the rest of the system.
-> > 
-> > This patch introduces a vdev->block_access flag for this purpose. It's set
-> > when the device is opened via /dev/vfio/devices and cleared after binding
-> > to iommufd succeeds. mmap and r/w handlers check this flag to decide whether
-> > user access should be blocked or not.  
-> 
-> This should not be in vfio_pci.
-> 
-> AFAIK there is no condition where a vfio driver can work without being
-> connected to some kind of iommu back end, so the core code should
-> handle this interlock globally. A vfio driver's ops should not be
-> callable until the iommu is connected.
-> 
-> The only vfio_pci patch in this series should be adding a new callback
-> op to take in an iommufd and register the pci_device as a iommufd
-> device.
-
-Couldn't the same argument be made that registering a $bus device as an
-iommufd device is a common interface that shouldn't be the
-responsibility of the vfio device driver?  Is userspace opening the
-non-group device anything more than a reservation of that device if
-access is withheld until iommu isolation?  I also don't really want to
-predict how ioctls might evolve to guess whether only blocking .read,
-.write, and .mmap callbacks are sufficient.  Thanks,
-
-Alex
-
+-	if (!cc_platform_has(CC_ATTR_HOST_MEM_ENCRYPT))
++	if (1 || !cc_platform_has(CC_ATTR_HOST_MEM_ENCRYPT))
+ 		return;
+ 
+ 	/*
+-- 
+ Kirill A. Shutemov
