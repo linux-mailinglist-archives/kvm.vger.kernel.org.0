@@ -2,162 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 27B524134B4
-	for <lists+kvm@lfdr.de>; Tue, 21 Sep 2021 15:45:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2B47B4134CF
+	for <lists+kvm@lfdr.de>; Tue, 21 Sep 2021 15:48:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233299AbhIUNqk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Sep 2021 09:46:40 -0400
-Received: from mail-bn1nam07on2078.outbound.protection.outlook.com ([40.107.212.78]:60294
-        "EHLO NAM02-BN1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S233289AbhIUNqk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Sep 2021 09:46:40 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=R75jtLS1xM5yJxXr+PE8H+2Ec/+IN5lW+HuuXEaprKAbReg7bpg/77fd+F4/qG4atPHRX5P5dn1RByW2s/o0iU6QklGpmAgO9fE8gJhzyMCnocQz7pd2F0bH4mQfvW4KsKYkgAwpfvfHylwszTumTnzq59icZ4lpiCzUisSmw+E/iBMVDU3g4d/8++AnmyrbInge7m9Oi/jSt1yIUGS6fCX265vPrqwAzDy+na7sT/hrtXlvjCl4DEZZktlI+tXh6DA1mPhY+hIO77G2gagasyS266g+0n6c2YmUIUV76H9t+Q+G2k7JiqC0cK1DJ3ljXExm8EyiFF+BSw2uz4BPEw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
- bh=Nc+1R6n9uacoJl6dRDPvcVxljHhtW21u21zWiNRIc78=;
- b=X8fbqMs0Q1T6PlgE6OTrgaWr2Fvo0ZPuyo9RxF0lPwdxVLaVGepwjkLUL7Kev69EZnJfeS5rk6pP+kfe9RzHTfjhU0D14A+RCH+5QSxv6841eYf/nvM69iDYoLps+NicE+ht+eqaap3xnfnrDSA9rLmNxA6oClbmO0pnNxQORDl40SSbIT7Du0dCr8rAcOwC/5AE4bzO5kw0L4YN5uz/gpxyz6eIfiwCP7kaDaqj+yi5mrwz475Qcx6ALNNE2RSVr1EG6iw+VaC/yRlyf8VoLIJ+gIdeO9VY2kYRsuGz/sQ0PEiiozOpZDIXq1nceAITkLOYxz0SgCOd8R8XLFPHSw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Nc+1R6n9uacoJl6dRDPvcVxljHhtW21u21zWiNRIc78=;
- b=YznDBPPMOY0/eE58uGOFreNm69+PS4NZNJSc5Po5wYBhUqQzCcoJ+t7VzBD8n50oBKmxRZG3dX/jPh9YZ83LYW4LV5lpsKMmUMcD4H/c07g9U+B6ohmj7WD6kMFfcqzKH9NQqgUnxGgrrAKNN60RzhSKvTXisZptp3n8+ixW33JOcVI0vuu6cmr5tHmbGtTx9ldfO6rkjoMHxgpiXgn5MqJgenxZDe1ISWIDNy+c0pBUne5l1Lotv2E6cRf8uIwHYTwAC4xSvOaRpsAKPRxiz+oPeKsPm6SiJ4+qN1Snaaq9BoeEIPvPjeCR3zlfS+cFtHD6jai8hfST1arqQ9mJaQ==
-Authentication-Results: intel.com; dkim=none (message not signed)
- header.d=none;intel.com; dmarc=none action=none header.from=nvidia.com;
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
- by BL1PR12MB5221.namprd12.prod.outlook.com (2603:10b6:208:30b::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4523.14; Tue, 21 Sep
- 2021 13:45:10 +0000
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::e8af:232:915e:2f95]) by BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::e8af:232:915e:2f95%8]) with mapi id 15.20.4544.013; Tue, 21 Sep 2021
- 13:45:10 +0000
-Date:   Tue, 21 Sep 2021 10:45:08 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Liu Yi L <yi.l.liu@intel.com>
-Cc:     alex.williamson@redhat.com, hch@lst.de, jasowang@redhat.com,
-        joro@8bytes.org, jean-philippe@linaro.org, kevin.tian@intel.com,
-        parav@mellanox.com, lkml@metux.net, pbonzini@redhat.com,
-        lushenming@huawei.com, eric.auger@redhat.com, corbet@lwn.net,
-        ashok.raj@intel.com, yi.l.liu@linux.intel.com,
-        jun.j.tian@intel.com, hao.wu@intel.com, dave.jiang@intel.com,
-        jacob.jun.pan@linux.intel.com, kwankhede@nvidia.com,
-        robin.murphy@arm.com, kvm@vger.kernel.org,
-        iommu@lists.linux-foundation.org, dwmw2@infradead.org,
-        linux-kernel@vger.kernel.org, baolu.lu@linux.intel.com,
-        david@gibson.dropbear.id.au, nicolinc@nvidia.com
-Subject: Re: [RFC 00/20] Introduce /dev/iommu for userspace I/O address space
- management
-Message-ID: <20210921134508.GL327412@nvidia.com>
-References: <20210919063848.1476776-1-yi.l.liu@intel.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210919063848.1476776-1-yi.l.liu@intel.com>
-X-ClientProxiedBy: MN2PR10CA0018.namprd10.prod.outlook.com
- (2603:10b6:208:120::31) To BL0PR12MB5506.namprd12.prod.outlook.com
- (2603:10b6:208:1cb::22)
+        id S233429AbhIUNt5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Sep 2021 09:49:57 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:65530 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S233428AbhIUNtx (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 21 Sep 2021 09:49:53 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 18LDRCw5016875;
+        Tue, 21 Sep 2021 09:48:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-type :
+ content-transfer-encoding; s=pp1;
+ bh=SqvjPubLHu3KNaK7W4fiBVIRY7dIc0KmJSzZMlI/9XQ=;
+ b=BJSR3o0ywsskBTD7pqQfXHnpni8POe/BnWxV3TtfXZJmSsv8fZVm8DvWm5TAwuE4x0HA
+ ncTkwjKnpudnohp5b3iMhDMHHUDYjKHQh0Os2H4LpsBKgyn4hr/WsSkwvrEdVtFB1kPc
+ aJp/GdD5Ex8M/UqJ1nh1jNEFl2/5QL+VNgVbYQPn4V+h30z4WxQF59htjnWDMc4oJVsj
+ bTS/pLlfZ/oIbjUJTEoV9Oj1TswX0KMN7HJVWwHiRiiqX/ywick2EIeIbKhIy7IckupF
+ ThRgE2wQU2k7+f9qU013Wpk/9BBJTEulQFO40IzgVXesO7pRyefW5I92HkPpf9743cv/ Tw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3b7b7u15ka-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 21 Sep 2021 09:48:24 -0400
+Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 18LDWtef030148;
+        Tue, 21 Sep 2021 09:48:24 -0400
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3b7b7u15jn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 21 Sep 2021 09:48:24 -0400
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 18LDhGFC029879;
+        Tue, 21 Sep 2021 13:48:22 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma02fra.de.ibm.com with ESMTP id 3b57r9cn27-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 21 Sep 2021 13:48:22 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 18LDmGKs56557870
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 21 Sep 2021 13:48:16 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 80C5511C058;
+        Tue, 21 Sep 2021 13:48:16 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7656F11C06C;
+        Tue, 21 Sep 2021 13:48:16 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Tue, 21 Sep 2021 13:48:16 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 25651)
+        id 11939E07EE; Tue, 21 Sep 2021 15:48:16 +0200 (CEST)
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+To:     stable@vger.kernel.org
+Cc:     gregkh@linuxfoundation.org, KVM <kvm@vger.kernel.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Thomas Huth <thuth@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: [PATCH] [backport for 4.19/5.4 stable] KVM: remember position in kvm->vcpus array
+Date:   Tue, 21 Sep 2021 15:48:15 +0200
+Message-Id: <20210921134815.17615-1-borntraeger@de.ibm.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Received: from mlx.ziepe.ca (142.162.113.129) by MN2PR10CA0018.namprd10.prod.outlook.com (2603:10b6:208:120::31) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4544.13 via Frontend Transport; Tue, 21 Sep 2021 13:45:09 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1mSg56-003Shl-Vn; Tue, 21 Sep 2021 10:45:09 -0300
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: d615b4d4-890f-4ce0-29f8-08d97d06077a
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5221:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <BL1PR12MB5221A7E41CA9A5DB2547F497C2A19@BL1PR12MB5221.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:480;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: pPD36VXbO9At6kr/wWl+CaHqx3W1u9u0tjqhKiSaE/TXQRTMpczesMA3ZfF+9IzddYwbVNKAQJ6EPfDx6Nsrq5wXg1BneqmbfLFvZtGnN8wdQ2RtbgWVhY6o7cA+q8zWBjzPilQTHGWlkDt3Kp+QmmSjmV/eNv7ilMLo5LsWrms1Ho9YVFBdkGJPbIDYzybIF8kzWw1WfGtqtXrOQiMWDhQDC+8fmtyRFLVI9NHsC66PxZKDqebYaTguSDyfvLwOdYua2Lgr+sxrU4AsZQDNJgDwYwq4MtoOyVqzeg2JOHyjo2RUrgrxjOs0OfABa2O1he7TsYUwZwyADuSC3eH/n88hqFqrSUon9eVAzbbVUBC68saeuwvv8d5AqQ3nOQBJUs5ZhNtmTCNla30avfWEIzNwujq9b6f/GMJdPoyBkZNpMr6ApMVXUfA4QPYYGlarvASXKyU8/kvEQZaGQFBhgyUJ67KFzFAkgTVWlD00QH2WOtI/2BHPpX8E0HoulHFRzcR6quM3b0Ozzi0vEFwL7hppqiGJavcGQw6AhLc8Rfapq0q6yKqS0vdBA6EETw3mKXYuGGOhSpXHWl11w6n8cLkobahRyj+Z0FM3PVZW48LrU3ChmCua+CnQj3Zq5jpuu8b4ZThs/xV9npWiY9Suht4r/lfh38Q9S26HKq4t3S13eujbouPp2n5wQKrW3l4d
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(186003)(86362001)(26005)(426003)(1076003)(8676002)(2616005)(8936002)(2906002)(66946007)(66476007)(107886003)(36756003)(38100700002)(4326008)(83380400001)(33656002)(9746002)(508600001)(316002)(5660300002)(7416002)(9786002)(66556008)(6916009)(27376004);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?kNlgUgIKJuwgssXD/cYJ6xuD64uoug/UV0bEXfN6WmVUtb381FpRPvgtqGwZ?=
- =?us-ascii?Q?eMmCJT2sO9oZrrp5s01Osnudj9AiQU7we5xtbZSDZ0oHXgWVllI4WH6eH+Vq?=
- =?us-ascii?Q?GV1u4mpPMA6r9LnssxReahgqZgrDy6dPYNl3tOWLckPibWNLz93/818fqc/x?=
- =?us-ascii?Q?8t9IYkiqMgsDlTLS5w2Jvy2mo651a747pcblLfGERJHrDvA+OHQSE4cfo9TG?=
- =?us-ascii?Q?lyNGbO9U9SWH98b3t3xeF8nHPzo57owzNSDBtrbN1T5UTi/GjJFw89IEQYFP?=
- =?us-ascii?Q?FDMYmwB2FuD/rYGhqBa78RF0wfykr8zmbj74cbNo8iW4OWQj9nzms/f1t9ns?=
- =?us-ascii?Q?qxezLyuXe3e++uG7ReBTsNbPLPObV4a3aKT8TVSMcryzbea48+1xcIH1Sv0F?=
- =?us-ascii?Q?J3npZXE5m4Q7cKDUnd3rV5hoDcoL6aSOjX6897MLPtxvMkm0iMfOA7DkHxPv?=
- =?us-ascii?Q?p22rKnSRyKPYT1GwiZqA5hC1XtZDnKX/FW6cP9i3nP2r6L4aOROBQ52l9xbV?=
- =?us-ascii?Q?XGm/DZrKIdLgcK/K2jhsFiP93zsRBIpFm1sTeKR/uVgOi/dYOEC8/0gEQDmt?=
- =?us-ascii?Q?BAUZ/WYbJFv4sGgVe8+PL52uHiPKUZ1LBic6qq8OH1POJdFeWZ4L9hgITVno?=
- =?us-ascii?Q?8SZWt0521WssI59rUUTDdTqxvUO8/FqiQgDc+rzjmexIqI6avPa0g36pemJ1?=
- =?us-ascii?Q?bHQwR/qyE9O3SEV2Dsa8zPS0w8CoeKLkwzxhCWqO6xjIOS/OAXCaLYJOBxtt?=
- =?us-ascii?Q?HbhvZAkwvG7UvaBy7drtSOSWUyZSfNZwDIgtbEpUUFTIOqhF7ViUJJFTQ0jW?=
- =?us-ascii?Q?w0iWVTFaigZYlugRhuEFmozs6N+w8WcizeRLuug3Tg8bgou4ufpRoWQZSTFY?=
- =?us-ascii?Q?xhwYIA9ux5oTiT36J464YOMI6TqUdW/x5AIFMV8dPM0A27CARVWm6kupPgAZ?=
- =?us-ascii?Q?H6uNPRB7CthsqWHUU9p0Ld7J5fEC1SEQQjpe3o7JRp5lb4HwBQZ22GekPZ3p?=
- =?us-ascii?Q?Fg8lJC2DrYNMVQW1HsnMTSML+i86brhC8QgdZ4Zts1Swc6w4BVE+ajHgHi2p?=
- =?us-ascii?Q?aPw4K+74lzLHzQcCXVN/feRtaobNii2BxJsr3tY4JLUVDtPl28oUUok2Ih0t?=
- =?us-ascii?Q?DWg/FPr89uWDcOEpGn7Hx3f+UbcNKdFZIe22Mz1kY8Isvs3ecvruGY54riev?=
- =?us-ascii?Q?eQ2n7CdNfU7OmoPaGQhlxDJ1P3aajhazzryWUkAdyZ7t9hcDtEHg+x6/Kklw?=
- =?us-ascii?Q?GXlRI8dAzC8itf9n+uGOnBdR+eV7EZxLXsQwtt4mdFU0ta3bY84tgLcJeiNu?=
- =?us-ascii?Q?i2xdwMoqOg8opHiDctpf9znz?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d615b4d4-890f-4ce0-29f8-08d97d06077a
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Sep 2021 13:45:10.1126
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: phWVkSgZ6pg1QXj0j41IVwWqGBcQHApB4o833pkXQnur2ztxA5Vly4PPti0im5oo
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5221
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: -3tHm8Y9-2rczQ5iTOgfj_3orM6YaSxR
+X-Proofpoint-ORIG-GUID: TPsZ7XBaaKlxAjJfmxJqnu_jZzmh6rV8
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.391,FMLib:17.0.607.475
+ definitions=2021-09-21_01,2021-09-20_01,2020-04-07_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 mlxlogscore=430
+ lowpriorityscore=0 malwarescore=0 clxscore=1015 bulkscore=0
+ priorityscore=1501 spamscore=0 impostorscore=0 adultscore=0 phishscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2109030001 definitions=main-2109210083
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Sep 19, 2021 at 02:38:28PM +0800, Liu Yi L wrote:
-> Linux now includes multiple device-passthrough frameworks (e.g. VFIO and
-> vDPA) to manage secure device access from the userspace. One critical task
-> of those frameworks is to put the assigned device in a secure, IOMMU-
-> protected context so user-initiated DMAs are prevented from doing harm to
-> the rest of the system.
+From: Radim Krčmář <rkrcmar@redhat.com>
 
-Some bot will probably send this too, but it has compile warnings and
-needs to be rebased to 5.15-rc1
+Fetching an index for any vcpu in kvm->vcpus array by traversing
+the entire array everytime is costly.
+This patch remembers the position of each vcpu in kvm->vcpus array
+by storing it in vcpus_idx under kvm_vcpu structure.
 
-drivers/iommu/iommufd/iommufd.c:269:6: warning: variable 'ret' is used uninitialized whenever 'if' condition is false [-Wsometimes-uninitialized]
-        if (refcount_read(&ioas->refs) > 1) {
-            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-drivers/iommu/iommufd/iommufd.c:277:9: note: uninitialized use occurs here
-        return ret;
-               ^~~
-drivers/iommu/iommufd/iommufd.c:269:2: note: remove the 'if' if its condition is always true
-        if (refcount_read(&ioas->refs) > 1) {
-        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-drivers/iommu/iommufd/iommufd.c:253:17: note: initialize the variable 'ret' to silence this warning
-        int ioasid, ret;
-                       ^
-                        = 0
-drivers/iommu/iommufd/iommufd.c:727:7: warning: variable 'ret' is used uninitialized whenever 'if' condition is true [-Wsometimes-uninitialized]
-                if (idev->dev == dev || idev->dev_cookie == dev_cookie) {
-                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-drivers/iommu/iommufd/iommufd.c:767:17: note: uninitialized use occurs here
-        return ERR_PTR(ret);
-                       ^~~
-drivers/iommu/iommufd/iommufd.c:727:3: note: remove the 'if' if its condition is always false
-                if (idev->dev == dev || idev->dev_cookie == dev_cookie) {
-                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-drivers/iommu/iommufd/iommufd.c:727:7: warning: variable 'ret' is used uninitialized whenever '||' condition is true [-Wsometimes-uninitialized]
-                if (idev->dev == dev || idev->dev_cookie == dev_cookie) {
-                    ^~~~~~~~~~~~~~~~
-drivers/iommu/iommufd/iommufd.c:767:17: note: uninitialized use occurs here
-        return ERR_PTR(ret);
-                       ^~~
-drivers/iommu/iommufd/iommufd.c:727:7: note: remove the '||' if its condition is always false
-                if (idev->dev == dev || idev->dev_cookie == dev_cookie) {
-                    ^~~~~~~~~~~~~~~~~~~
-drivers/iommu/iommufd/iommufd.c:717:9: note: initialize the variable 'ret' to silence this warning
-        int ret;
-               ^
-                = 0
+Signed-off-by: Radim Krčmář <rkrcmar@redhat.com>
+Signed-off-by: Nitesh Narayan Lal <nitesh@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+[borntraeger@de.ibm.com]: backport to 4.19 (also fits for 5.4)
+Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+---
+ include/linux/kvm_host.h | 11 +++--------
+ virt/kvm/kvm_main.c      |  5 +++--
+ 2 files changed, 6 insertions(+), 10 deletions(-)
 
-Jason
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 8dd4ebb58e97..827f70ce0b49 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -248,7 +248,8 @@ struct kvm_vcpu {
+ 	struct preempt_notifier preempt_notifier;
+ #endif
+ 	int cpu;
+-	int vcpu_id;
++	int vcpu_id; /* id given by userspace at creation */
++	int vcpu_idx; /* index in kvm->vcpus array */
+ 	int srcu_idx;
+ 	int mode;
+ 	u64 requests;
+@@ -551,13 +552,7 @@ static inline struct kvm_vcpu *kvm_get_vcpu_by_id(struct kvm *kvm, int id)
+ 
+ static inline int kvm_vcpu_get_idx(struct kvm_vcpu *vcpu)
+ {
+-	struct kvm_vcpu *tmp;
+-	int idx;
+-
+-	kvm_for_each_vcpu(idx, tmp, vcpu->kvm)
+-		if (tmp == vcpu)
+-			return idx;
+-	BUG();
++	return vcpu->vcpu_idx;
+ }
+ 
+ #define kvm_for_each_memslot(memslot, slots)	\
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index a3d82113ae1c..86ef740763b5 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -2751,7 +2751,8 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, u32 id)
+ 		goto unlock_vcpu_destroy;
+ 	}
+ 
+-	BUG_ON(kvm->vcpus[atomic_read(&kvm->online_vcpus)]);
++	vcpu->vcpu_idx = atomic_read(&kvm->online_vcpus);
++	BUG_ON(kvm->vcpus[vcpu->vcpu_idx]);
+ 
+ 	/* Now it's all set up, let userspace reach it */
+ 	kvm_get_kvm(kvm);
+@@ -2761,7 +2762,7 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, u32 id)
+ 		goto unlock_vcpu_destroy;
+ 	}
+ 
+-	kvm->vcpus[atomic_read(&kvm->online_vcpus)] = vcpu;
++	kvm->vcpus[vcpu->vcpu_idx] = vcpu;
+ 
+ 	/*
+ 	 * Pairs with smp_rmb() in kvm_get_vcpu.  Write kvm->vcpus
+-- 
+2.31.1
+
