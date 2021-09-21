@@ -2,111 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2AC91413063
-	for <lists+kvm@lfdr.de>; Tue, 21 Sep 2021 10:46:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C82A04130BD
+	for <lists+kvm@lfdr.de>; Tue, 21 Sep 2021 11:24:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231278AbhIUIsJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Sep 2021 04:48:09 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:11690 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231239AbhIUIsI (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 21 Sep 2021 04:48:08 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 18L7TUdi021405;
-        Tue, 21 Sep 2021 04:46:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=PobOmmegEH6kXd2FN2lCCRb2+GTx6TIzMiNiHKbLoPs=;
- b=Nip2LyXBHqzNYS5VL/uoP8tvS0Sm2C+N9AqloUwTtOuTo7EcN/LxT6RUjT4IZ98vg54C
- 90a7oii9vtnP79diHtgxBym01ahxSXGRXRuVXsoBhjvHfT7BBAwbRpNEZBemqlh0lOYB
- nlhjE6DnqK0ICkZ6iSpFezcjciqF13Gm8NxRSx7UzVfwWy2BqCI5+WRDi/E+J+CwLuE3
- JpB9PIOdzIniBErgvDX42oPJoUwDronCGbK/ImPTXJkdJwHRnLr8XF1hG6nLUe5fkMMC
- /db6k6ZUStxL03UwLCZbmIIjeVJb1yI/bMEjOUohkHXcZcuQEIk+d4J7ISa2c5n9eiSf 9A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3b7b25hkqm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 21 Sep 2021 04:46:35 -0400
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 18L7UBD8023271;
-        Tue, 21 Sep 2021 04:46:35 -0400
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3b7b25hkqa-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 21 Sep 2021 04:46:35 -0400
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 18L8XDoe009919;
-        Tue, 21 Sep 2021 08:46:33 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma04ams.nl.ibm.com with ESMTP id 3b57r9hsvg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 21 Sep 2021 08:46:33 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 18L8kTvT37814560
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 21 Sep 2021 08:46:29 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1585A5204F;
-        Tue, 21 Sep 2021 08:46:29 +0000 (GMT)
-Received: from li-43c5434c-23b8-11b2-a85c-c4958fb47a68.ibm.com (unknown [9.171.63.127])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 4CA6652051;
-        Tue, 21 Sep 2021 08:46:28 +0000 (GMT)
-Subject: Re: [PATCH 0/1] KVM: s390: backport for stable of "KVM: s390: index
-To:     Paolo Bonzini <pbonzini@redhat.com>, stable@vger.kernel.org
-Cc:     gregkh@linuxfoundation.org, KVM <kvm@vger.kernel.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Thomas Huth <thuth@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Nitesh Narayan Lal <nitesh@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>
-References: <20210920150616.15668-1-borntraeger@de.ibm.com>
- <b9b9e014-d8d9-1a76-679b-cd7af54ad3f9@redhat.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Message-ID: <e8881cf8-987c-e2b2-5cda-8e3c5a19cc99@de.ibm.com>
-Date:   Tue, 21 Sep 2021 10:46:27 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+        id S231386AbhIUJ0F (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Sep 2021 05:26:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50962 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231310AbhIUJ0E (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Sep 2021 05:26:04 -0400
+Received: from mail-lf1-x143.google.com (mail-lf1-x143.google.com [IPv6:2a00:1450:4864:20::143])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30B6FC061575
+        for <kvm@vger.kernel.org>; Tue, 21 Sep 2021 02:24:36 -0700 (PDT)
+Received: by mail-lf1-x143.google.com with SMTP id u8so27470540lff.9
+        for <kvm@vger.kernel.org>; Tue, 21 Sep 2021 02:24:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:reply-to:from:date:message-id:subject:to;
+        bh=9/WkdH8I7SISzvTO/uk8FQH2z0Yov9Zen7PU8kYoFrw=;
+        b=MisqEEqXJOUA+Z/R4bTfS7NjnvQ8epYW8aDprDNsCCGLr6y2DxtT6CJdF8ZS7mAGAq
+         mxd09ociga+xAxC7yRcQYZbOMaY0sdr08J88DJmdk4XVyB9/SMc1Ic9+q2NeA4yQSRPt
+         gy+vz5MQdgnQjX52OZuekMyH2GyIkJBc3UapiyxGwnzjTYkMzVNzHRRqzPBYMK5sAn2C
+         nF2i7UbsElwTF42lF/B9LGP3a23grzl8AMAbMyfiFps0ZT+o6tyZvYDpnb4OkgInjW2O
+         h5At3ZHlrIO980Pf5IpgL6oKO/RWiByAqkrVA8Dk3f5M1qcMMTShvGwsy3hQ9PObTTMg
+         OyYg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
+         :subject:to;
+        bh=9/WkdH8I7SISzvTO/uk8FQH2z0Yov9Zen7PU8kYoFrw=;
+        b=YZRSJ7k3pUh+kZhIp5L9Djdgy03i9mKrSQH/07P4tgXJTJ1mxbkfLyudmG0Qq7oYQb
+         UwPcykRxkNfFwGSFkqHslW9QhmQ4AJrKa0G/KGT9BzzJFznnL8MAav8dKaoPiJArGgaa
+         G9dmMuYkK5JbHemJIyhAdfwQVu44ZOdFtOk129VpwP26ypYyKhCn0j4sqddA1Zra9MnN
+         tOixZo8P8r0gZEPfc31Jbxle0g7u7d/b+1QmhHWVwmRAC+YSpyy+eONH+rPB2bcvU5Oi
+         2uWRmUWAXCtAA5olVL3GPJTlqFkACLXDIEWWtaP6dIqiyy9xWSBhHc4lyrlVBEEy80uo
+         EGDg==
+X-Gm-Message-State: AOAM53267U1C2uRpNSCzww/39Tfc9uav7zfLg13C9usLOymVhfF/vfi0
+        vDxzbkmkQZJpDrUDn5FoGLQ+rClPtnATPSey8uA=
+X-Google-Smtp-Source: ABdhPJyRTWk4TtGCUjZ909rDVRYViyMFIGUOS2Zq6x+Od69nMwOnQwQjTk9wf+VQ7jXaux24rcbDRKj4R/Ww5NdQkH8=
+X-Received: by 2002:a2e:131a:: with SMTP id 26mr26416519ljt.46.1632216274047;
+ Tue, 21 Sep 2021 02:24:34 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <b9b9e014-d8d9-1a76-679b-cd7af54ad3f9@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 3I4wTNbfXkT_iyYtuGRFVcr9x30Xim7d
-X-Proofpoint-GUID: qlA7xGCSlnlUQg_f-vCG7Uo7MIE894kJ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.391,FMLib:17.0.607.475
- definitions=2021-09-21_01,2021-09-20_01,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 impostorscore=0
- mlxscore=0 lowpriorityscore=0 adultscore=0 malwarescore=0
- priorityscore=1501 mlxlogscore=999 spamscore=0 suspectscore=0
- clxscore=1015 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2109030001 definitions=main-2109210055
+Received: by 2002:a2e:7507:0:0:0:0:0 with HTTP; Tue, 21 Sep 2021 02:24:33
+ -0700 (PDT)
+Reply-To: mussaomra2017@gmail.com
+From:   omra musa <allianceoffice2017@gmail.com>
+Date:   Tue, 21 Sep 2021 09:24:33 +0000
+Message-ID: <CAN+bYYeB4UNYGSHm5VMxVA5MKa+Laxig7SrzEyOG909YxXskwA@mail.gmail.com>
+Subject: I NEED YOUR URGENT RESPOND.
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+From Mr Omra Musa
+Bank Of Africa (B.O.A)
+Burkina Faso Ouagadougou
 
+My Dear Friend,
 
-Am 20.09.21 um 20:05 schrieb Paolo Bonzini:
-> On 20/09/21 17:06, Christian Borntraeger wrote:
->> here is a backport for 4.19 of
->> commit a3e03bc1368 ("KVM: s390: index kvm->arch.idle_mask by vcpu_idx")
->> This basically removes the kick_mask parts that were introduced with
->> kernel 5.0 and fixes up the location of the idle_mask to the older
->> place.
->>
->> FWIW, it might be a good idea to also backport
->> 8750e72a79dd ("KVM: remember position in kvm->vcpus array") to avoid
->> a performance regression for large guests (many vCPUs) when this patch
->> is applied.
->> @Paolo Bonzini, would you be ok with 8750e72a79dd in older stable releases?
-> 
-> Sure, I suppose you're going to send a separate backport that I can ack.
+Please I want you to read this letter very carefully and I must
+apologize for barging this message into your mail box without any
+formal introduction due to the urgency and confidential of this issue
+and I know that this message will come to you as a surprise. Please
+this is not a joke and I will not like you to joke with it.
 
-It does seem to apply when cherry-picked, but I can send it as a patch if you and Greg
-prefer it that way.
+I am Mr Omra Musa Manager in Bank Of Africa (B.O.A) Ouagadougou,
+Burkina Faso. I Hoped that you will not expose or betray this trust
+and confident that I am about to establish with you for the mutual
+benefit of you and I. This fund was deposited in our bank by Mr.
+Kattan Azmal from Jordan who died in a plane crash in 2000 Tbm 700
+aircraft on 31st July with his wife and the whole crew on board.
+
+I need your urgent assistance in transferring the sum of ($15) million
+USD into your account within 14 working banking days. This money has
+been deposited for years in our Bank without claim due to the owner of
+this fund died along with his entire family in an air crash since July
+31st 2000.
+
+The reason why i contacted you is that after the bank audit in 24th of
+November, we found out that this fund has remained unclaimed since the
+death of the deceased costumer.
+
+I want our bank to release this fund to you as the nearest person to
+our deceased customer while i come over to your country to share this
+fund with you as soon as you confirm this fund into your account and
+ask me to come over. I don't want the money to go into our Bank
+treasure as an abandoned fund. So this is the reason why i contacted
+you so that our bank will release this money to you as the next of kin
+to the deceased customer. Please I would like you to keep this
+proposal as a top secret and delete it if you are not interesting.
+
+Upon the receipt of your reply and indication of your capability, i
+will give you full details on how the business will be executed and
+also note that you will have 50% of the above mentioned sum if you
+agree to handle this business with me while 50% be for me, Because i
+don't want anyone here in our bank to know my involvement until you
+confirm this fund into your account and ask me to come over for the
+sharing as I indicated.
+
+I am looking forward to hear from you immediately for further information
+
+THE REQUESTED INFORMATIONS BELOW
+==================================
+1. FULL NAME..............
+2. TELEPHONE NUMBERS/MOBILE/FAX.......
+3. YOUR AGE......
+4. YOUR SEX.........
+5. YOUR OCCUPATION........
+6. YOUR COUNTRY AND CITY......
+7. YOUR HOME ADDRESS........
+8. MARITAL STATUS............
+
+Sincerely,
+Mr Omra Musa
+
+You can reply to my private email address at mussaomra2017@gmail.com
