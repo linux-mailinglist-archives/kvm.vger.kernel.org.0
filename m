@@ -2,57 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 48DD7412AF5
+	by mail.lfdr.de (Postfix) with ESMTP id E3A42412AF6
 	for <lists+kvm@lfdr.de>; Tue, 21 Sep 2021 04:03:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241640AbhIUCCV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Sep 2021 22:02:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34056 "EHLO
+        id S241655AbhIUCCW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Sep 2021 22:02:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34254 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238087AbhIUB5E (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S238097AbhIUB5E (ORCPT <rfc822;kvm@vger.kernel.org>);
         Mon, 20 Sep 2021 21:57:04 -0400
-Received: from mail-qv1-xf4a.google.com (mail-qv1-xf4a.google.com [IPv6:2607:f8b0:4864:20::f4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93CBBC06B672
-        for <kvm@vger.kernel.org>; Mon, 20 Sep 2021 17:03:17 -0700 (PDT)
-Received: by mail-qv1-xf4a.google.com with SMTP id w10-20020a0cb54a000000b0037a9848b92fso205072056qvd.0
-        for <kvm@vger.kernel.org>; Mon, 20 Sep 2021 17:03:17 -0700 (PDT)
+Received: from mail-qt1-x849.google.com (mail-qt1-x849.google.com [IPv6:2607:f8b0:4864:20::849])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED991C06B675
+        for <kvm@vger.kernel.org>; Mon, 20 Sep 2021 17:03:19 -0700 (PDT)
+Received: by mail-qt1-x849.google.com with SMTP id b15-20020a05622a020f00b0029e28300d94so193772429qtx.16
+        for <kvm@vger.kernel.org>; Mon, 20 Sep 2021 17:03:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=lnMsVbgXZSmhXWrHP7wqt1Q9KdoJ86/a0TU5NI0dZL0=;
-        b=JdXsaOwAegsIRMFsfIK/aHqzKCXpZOjtCdyN1pLzgkzbwKV7ceMhrO0Ryl66L95Juo
-         5+RkUx10rZgWGEheJP7alH/Uuuk4J6AaMx+6I4JwDoNHuLZ/LkrxWHigIGF4geaSR1Yz
-         +aUXvE6Uws6s8xHGKyvBZ6nl9LmibGkzbU8g0SltqT77dqxBOivyJea0OB9rH7NjRfa4
-         qkO//3qmd8k77fQcCxg6DDcdTTVcp1vfpd8u0pAJCJoijinyKaNzqn6+DXrICjs8fRH9
-         /p0UYJ1x03EmpuW1otBKMrceoZ0eAG/iEjsD++uJ3unXEYjIw9ckv9r2oaiwTtMyucUi
-         hxtA==
+        bh=YqbfZzjQ/AvQBDn1Ta/tO376jL+V+ic9nvcn2Wxl4Rg=;
+        b=m9ro+zMtK9BWHdfacSbUJWo531Hv4pR/faXM+xmClXk+ok9MryvEuFd0x/d5L6e/9j
+         IrjVc/PwOU0g7gQvItCHupC8zty6YMToKHi3Q9yG3sJkM82yspz5w8G84W233HRpl3JJ
+         XnKOQq7ji09wv0vMWn+fmoDk8LFjLyNbSE2EVsGe+27HZoD5+MxCQNwSpHMkwvLXKyJL
+         AFsDPedAmMJ4vmHRGomcFPt0Vr1VI6YEaq5hoBZ+sN3fUc5TX/bgNCypw+1z3t9grcM+
+         DyHK231hyAftxptqsi12MwoZpgHryvTz7FFvfzuvB9e77pTG6A9GmsJZCWRVVbnBiUlw
+         T9+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=lnMsVbgXZSmhXWrHP7wqt1Q9KdoJ86/a0TU5NI0dZL0=;
-        b=xImYomHZEZSlsIKWo6iSVGafH65eJDL8PwJZWrkHvvwXa1xEgFi2ORuHRafm4UdPCv
-         6J0Owgrkhb2ZXUS7HE7nH3a9Fxc3sj1hGDU/SBBpy+h0Tji1ZnAXfmu+Uln29qyQquBc
-         ThrjmrUl5jL8jOtEpAbtRtSCh7IA3y1iAM7/oY6zYYHkesyshNsGKX5bd9JqgK/FUnT9
-         3E6Di4+ifQpiMu5GMI8bsrlvVxlwmeBLeAQsSCbLLM1MXFifj7eYmgzbfClA5xOF/Il6
-         h/AqA1HLDD3Uz3DJ9y7e4TPQ7H45qeMK33mPASxBbya9VC518sevCAlZZnxQluPrYEOx
-         d8Hg==
-X-Gm-Message-State: AOAM530qVq/WF22OVoVG7IlWZUKbDQfAL+RO3w33W4rhxqMCoEwpYWO+
-        qtWwplatO6+qLE/PB7WvW/lKi5ByTkc=
-X-Google-Smtp-Source: ABdhPJwhQVNoU3h+SyfxzcrLIxnFSQuy7EH7U+fsu80SneGkLGciUzHOcKWaKFNCwJ3atvSZMYgYve8HpNo=
+        bh=YqbfZzjQ/AvQBDn1Ta/tO376jL+V+ic9nvcn2Wxl4Rg=;
+        b=EPffVPu3LjxAJJmrRpenMu7pxkHz3tQ3epSKEwvqPh0wUwI3Vi8yapVp73biNB9v+J
+         TDUbghFrRWvDSAHZolJjS6ScV+pjtl+0SIkZJkMqCsGwgUc2evn9k3nSatyHg6hcDsPH
+         t3JOOG/51qDdBxfvs4ckpXfKnjOx2OcSQUwHHJ3lxLKIhles0XNT5jtFadN/PQtgRIW8
+         5OckTMTBeeilT8/CRHHTq5X3Bl2Qa2wn4aJffujv/SdByAK6xcBYg+f3QNa62dk8N4LI
+         K1CheT7yZvifJ9oUmPmXIve7TyPT74K2UJk0BaYkN2B1Nx3lVR3ABRcK5lBUP/UBgkJC
+         L9JQ==
+X-Gm-Message-State: AOAM530d+krFOh0tjExijfJ7QxOItFWBTFYgOuBK6Igb9FItObbG4H0E
+        gwA9TPGNEX5byNkjt1Iqdwc5PkrV+DE=
+X-Google-Smtp-Source: ABdhPJx6JRWuZjXtbBYQjXOmlmmGG6p6WyfxQOm9rxpa+uw/CaVsgYLx1i+MUg/Fz1wYvxZAh2JYX3vHqzM=
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:90:200:e430:8766:b902:5ee3])
- (user=seanjc job=sendgmr) by 2002:a25:9d89:: with SMTP id v9mr35514584ybp.8.1632182596734;
- Mon, 20 Sep 2021 17:03:16 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a25:734a:: with SMTP id o71mr32934031ybc.74.1632182599124;
+ Mon, 20 Sep 2021 17:03:19 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Mon, 20 Sep 2021 17:02:58 -0700
+Date:   Mon, 20 Sep 2021 17:02:59 -0700
 In-Reply-To: <20210921000303.400537-1-seanjc@google.com>
-Message-Id: <20210921000303.400537-6-seanjc@google.com>
+Message-Id: <20210921000303.400537-7-seanjc@google.com>
 Mime-Version: 1.0
 References: <20210921000303.400537-1-seanjc@google.com>
 X-Mailer: git-send-email 2.33.0.464.g1972c5931b-goog
-Subject: [PATCH v2 05/10] KVM: x86: Remove defunct setting of XCR0 for guest
- during vCPU create
+Subject: [PATCH v2 06/10] KVM: x86: Fold fx_init() into kvm_arch_vcpu_create()
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -66,55 +65,56 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Drop code to initialize XCR0 during fx_init(), a.k.a. vCPU creation, as
-XCR0 has been initialized during kvm_vcpu_reset() (for RESET) since
-commit a554d207dc46 ("KVM: X86: Processor States following Reset or INIT").
+Move the few bits of relevant fx_init() code into kvm_arch_vcpu_create(),
+dropping the superfluous check on vcpu->arch.guest_fpu that was blindly
+and wrongly added by commit ed02b213098a ("KVM: SVM: Guest FPU state
+save/restore not needed for SEV-ES guest").
 
-Back when XCR0 support was added by commit 2acf923e38fb ("KVM: VMX:
-Enable XSAVE/XRSTOR for guest"), KVM didn't differentiate between RESET
-and INIT.  Ignoring the fact that calling fx_init() for INIT is obviously
-wrong, e.g. FPU state after INIT is not the same as after RESET, setting
-XCR0 in fx_init() was correct.
-
-Eventually fx_init() got moved to kvm_arch_vcpu_init(), a.k.a. vCPU
-creation (ignore the terrible name) by commit 0ee6a5172573 ("x86/fpu,
-kvm: Simplify fx_init()").  Finally, commit 95a0d01eef7a ("KVM: x86: Move
-all vcpu init code into kvm_arch_vcpu_create()") killed off
-kvm_arch_vcpu_init(), leaving behind the oddity of redundant setting of
-guest state during vCPU creation.
+Note, KVM currently allocates and then frees FPU state for SEV-ES guests,
+rather than avoid the allocation in the first place.  While that approach
+is inarguably inefficient and unnecessary, it's a cleanup for the future.
 
 No functional change intended.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/x86.c | 7 +------
- 1 file changed, 1 insertion(+), 6 deletions(-)
+ arch/x86/kvm/x86.c | 16 ++++------------
+ 1 file changed, 4 insertions(+), 12 deletions(-)
 
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index e0bff5473813..6fd3fe21863e 100644
+index 6fd3fe21863e..ec61b90d9b73 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -993,7 +993,7 @@ static int __kvm_set_xcr(struct kvm_vcpu *vcpu, u32 index, u64 xcr)
- 	/*
- 	 * Do not allow the guest to set bits that we do not support
- 	 * saving.  However, xcr0 bit 0 is always set, even if the
--	 * emulated CPU does not support XSAVE (see fx_init).
-+	 * emulated CPU does not support XSAVE (see kvm_vcpu_reset()).
- 	 */
- 	valid_bits = vcpu->arch.guest_supported_xcr0 | XFEATURE_MASK_FP;
- 	if (xcr0 & ~valid_bits)
-@@ -10623,11 +10623,6 @@ static void fx_init(struct kvm_vcpu *vcpu)
- 	if (boot_cpu_has(X86_FEATURE_XSAVES))
- 		vcpu->arch.guest_fpu->state.xsave.header.xcomp_bv =
- 			host_xcr0 | XSTATE_COMPACTION_ENABLED;
--
--	/*
--	 * Ensure guest xcr0 is valid for loading
--	 */
--	vcpu->arch.xcr0 = XFEATURE_MASK_FP;
+@@ -10614,17 +10614,6 @@ static int sync_regs(struct kvm_vcpu *vcpu)
+ 	return 0;
  }
  
+-static void fx_init(struct kvm_vcpu *vcpu)
+-{
+-	if (!vcpu->arch.guest_fpu)
+-		return;
+-
+-	fpstate_init(&vcpu->arch.guest_fpu->state);
+-	if (boot_cpu_has(X86_FEATURE_XSAVES))
+-		vcpu->arch.guest_fpu->state.xsave.header.xcomp_bv =
+-			host_xcr0 | XSTATE_COMPACTION_ENABLED;
+-}
+-
  void kvm_free_guest_fpu(struct kvm_vcpu *vcpu)
+ {
+ 	if (vcpu->arch.guest_fpu) {
+@@ -10703,7 +10692,10 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+ 		pr_err("kvm: failed to allocate vcpu's fpu\n");
+ 		goto free_user_fpu;
+ 	}
+-	fx_init(vcpu);
++	fpstate_init(&vcpu->arch.guest_fpu->state);
++	if (boot_cpu_has(X86_FEATURE_XSAVES))
++		vcpu->arch.guest_fpu->state.xsave.header.xcomp_bv =
++			host_xcr0 | XSTATE_COMPACTION_ENABLED;
+ 
+ 	vcpu->arch.maxphyaddr = cpuid_query_maxphyaddr(vcpu);
+ 	vcpu->arch.reserved_gpa_bits = kvm_vcpu_reserved_gpa_bits_raw(vcpu);
 -- 
 2.33.0.464.g1972c5931b-goog
 
