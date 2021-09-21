@@ -2,57 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D54EA412AE1
-	for <lists+kvm@lfdr.de>; Tue, 21 Sep 2021 04:00:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3A8BB412AE3
+	for <lists+kvm@lfdr.de>; Tue, 21 Sep 2021 04:01:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241563AbhIUCCL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Sep 2021 22:02:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34160 "EHLO
+        id S241710AbhIUCC0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Sep 2021 22:02:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34452 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238073AbhIUB5E (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Sep 2021 21:57:04 -0400
-Received: from mail-qk1-x74a.google.com (mail-qk1-x74a.google.com [IPv6:2607:f8b0:4864:20::74a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49D0DC06B66E
-        for <kvm@vger.kernel.org>; Mon, 20 Sep 2021 17:03:13 -0700 (PDT)
-Received: by mail-qk1-x74a.google.com with SMTP id t18-20020a05620a0b1200b003f8729fdd04so158436088qkg.5
-        for <kvm@vger.kernel.org>; Mon, 20 Sep 2021 17:03:13 -0700 (PDT)
+        with ESMTP id S238117AbhIUB5G (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Sep 2021 21:57:06 -0400
+Received: from mail-qt1-x84a.google.com (mail-qt1-x84a.google.com [IPv6:2607:f8b0:4864:20::84a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F65CC06B67C
+        for <kvm@vger.kernel.org>; Mon, 20 Sep 2021 17:03:26 -0700 (PDT)
+Received: by mail-qt1-x84a.google.com with SMTP id n19-20020ac81e13000000b0029f679691eeso199388204qtl.20
+        for <kvm@vger.kernel.org>; Mon, 20 Sep 2021 17:03:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=7ySQ7PzHzecQkNA7fuuC9dVS9Ycf6xIgHtLk0jm/WMk=;
-        b=fw+KWXlLNh2fa9IxHz5fE2f4PlO5c8TJsApHW2RJelnJ65DuB6p+yssry8A+9LSKDE
-         AJTX5LQ/RkzF89E8NPksvnb03OhPIUZYUZZpne/Y6O2QUpeEqKqILkhjuF52nNvYZ859
-         8genJkp33FiqCPnqr125Y3/RED1JWUxvuQCcSnI2QgO/AIWaDPU1mTJ8CJu72fWBs5Jr
-         cF/3CCjP1cUAW4NY8h3s4qOp1ziOYSpZCR7R/kxEINlGXcNhfmEPCN3yDGp90hlR9cNE
-         qvhWvu9Zk2UCuXpiYCbSRzpE0+AIY1XoG+eS45o7V/n/eEa8kJfCWzojC1N4qHftE15g
-         AxRg==
+        bh=V4gYi0TTIcL9PO81BBz2SfHWERFnKGqZgSsduom9Vy4=;
+        b=fj+ZKUq090Lg18RcXbI0BNLZBuoYwaOPE8nbhI2hFpZj/fx+vhFHviqt0CGNmAbecw
+         mVi8RyoMjYBVibTmbMtIUJ92d+MkQkZw57a1VZapNnnesvEq+1F+B9XYEqXIpKHejw3Q
+         HT9H4po5u/0IWv+vUVNqpSR+V6aS+8bPKfRcfvSCVJUoQ6FJqtXAG7ZMqOVMgCvyGPvM
+         XtULIdBZCEIWyXP2Iw1zBj6MYwoyYUOESVi+et/508aKJAa8mnLNe0WdVABCdjpx1iTU
+         PsECijMK7T4B9S8bzPtuM3k1JvuDNAUa+1xGu7JhNCuyQXnUcWMUbzIpkF1S2ipyi7Xb
+         OZKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=7ySQ7PzHzecQkNA7fuuC9dVS9Ycf6xIgHtLk0jm/WMk=;
-        b=Eym/3yESbfcCnCenuI6R9X/EsVpyFMlf4TtgzZ/vCofdHh+Pp7oDlxQ5mA1BKScRNm
-         XFiPZLtoxawXSQINJVbqSUw+e0WoVRy7KPKIyJL6bY8sRU40elUgFkD6Cahjn3AB8EU8
-         4b6hU1wJ4VQlAjPgttr/rskPCV6GcfsMXWFEIyRdsY5TRMWJVB79JycbKzUxPytk2ttU
-         YzlAjGVdSphPwcgKvhzLNjxTqGMlAJeFmE/qJW95xjBMmdiPFshVkVouzyDo8J8x7egi
-         buB4Zv2ZOXt0oyMnsNLHoEy6Mh4lUsm+SmOA8jjzqn4ZAuN3pucFHnG3d1yRVNHxj0Cg
-         sDrA==
-X-Gm-Message-State: AOAM531btQ/uJ8LTaBNQmPFgDua/05YHV1m1JkOeKY88Ei5Xgat0a9oO
-        ynDodeENvQPbshlcRWzDkyzfRj/+EDs=
-X-Google-Smtp-Source: ABdhPJzKtDAhlL41PSsN3qvFgBT0gaVvW3TWjbUFRNfc75CQpNiThhjhAk0MFSGV5KVrAFzUiUe5XrWVfEc=
+        bh=V4gYi0TTIcL9PO81BBz2SfHWERFnKGqZgSsduom9Vy4=;
+        b=nfRi8MWbZR+v2FSeN3pSIcguTS/5xhND65SaFnOJ13JuLL4MjZx9c41pXnB/v70LBi
+         cu44zc9oDG0LCO0Zo1miBiPk8Co468J1EKC+U4oWyYebieR5hL8VDcsSMi35zyNZtGO7
+         x+jfSZ+6aY9x3fjJ/4Nh9UjqfcwtlQVUuWA2g1XGMnPIiTunTDc9CCTS96v0R9PhdMCt
+         CbdWRnciesA+v4knvrVvrTaLdqrKj4C/5uoBBPh/KGsVVPNhdJ6KohJ3mBSxu2wWilFv
+         jNozKxZmCapSRjMpJCPRHyhIzJ0dK0sSDz8xmVDEtKrDG915luuubvLTPjrZePiRPmow
+         9cNA==
+X-Gm-Message-State: AOAM5328I8nmM8ANfdyLR4y7sLqc0dSjuc3ngxjZnO6TwJ8+rmG+XlLT
+        YhGGOpEg16uouvlHy9G9SsIdlqmnFpQ=
+X-Google-Smtp-Source: ABdhPJyeFixbXPhvqafDv+PeB1G0P7Cn7fCErjew3IAz4pJRTBhzKf13g4EpLOuVByUkOiAtgXrkx2TxgTU=
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:90:200:e430:8766:b902:5ee3])
- (user=seanjc job=sendgmr) by 2002:a05:6214:528:: with SMTP id
- x8mr27797931qvw.30.1632182592456; Mon, 20 Sep 2021 17:03:12 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a25:c504:: with SMTP id v4mr35945979ybe.308.1632182605667;
+ Mon, 20 Sep 2021 17:03:25 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Mon, 20 Sep 2021 17:02:56 -0700
+Date:   Mon, 20 Sep 2021 17:03:02 -0700
 In-Reply-To: <20210921000303.400537-1-seanjc@google.com>
-Message-Id: <20210921000303.400537-4-seanjc@google.com>
+Message-Id: <20210921000303.400537-10-seanjc@google.com>
 Mime-Version: 1.0
 References: <20210921000303.400537-1-seanjc@google.com>
 X-Mailer: git-send-email 2.33.0.464.g1972c5931b-goog
-Subject: [PATCH v2 03/10] KVM: x86: Do not mark all registers as avail/dirty
- during RESET/INIT
+Subject: [PATCH v2 09/10] KVM: SVM: Move RESET emulation to svm_vcpu_reset()
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -66,56 +65,115 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Do not blindly mark all registers as available+dirty at RESET/INIT, and
-instead rely on writes to registers to go through the proper mutators or
-to explicitly mark registers as dirty.  INIT in particular does not blindly
-overwrite all registers, e.g. select bits in CR0 are preserved across INIT,
-thus marking registers available+dirty without first reading the register
-from hardware is incorrect.
+Move RESET emulation for SVM vCPUs to svm_vcpu_reset(), and drop an extra
+init_vmcb() from svm_create_vcpu() in the process.  Hopefully KVM will
+someday expose a dedicated RESET ioctl(), and in the meantime separating
+"create" from "RESET" is a nice cleanup.
 
-In practice this is a benign bug as KVM doesn't let the guest control CR0
-bits that are preserved across INIT, and all other true registers are
-explicitly written during the RESET/INIT flows.  The PDPTRs and EX_INFO
-"registers" are not explicitly written, but accessing those values during
-RESET/INIT is nonsensical and would be a KVM bug regardless of register
-caching.
+Keep the call to svm_switch_vmcb() so that misuse of svm->vmcb at worst
+breaks the guest, e.g. premature accesses doesn't cause a NULL pointer
+dereference.
 
-Fixes: 66f7b72e1171 ("KVM: x86: Make register state after reset conform to specification")
-[sean: !!! NOT FOR STABLE !!!]
+Cc: Reiji Watanabe <reijiw@google.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/vmx/vmx.c | 1 +
- arch/x86/kvm/x86.c     | 4 ++--
- 2 files changed, 3 insertions(+), 2 deletions(-)
+ arch/x86/kvm/svm/sev.c |  6 +++---
+ arch/x86/kvm/svm/svm.c | 29 +++++++++++++++++------------
+ arch/x86/kvm/svm/svm.h |  2 +-
+ 3 files changed, 21 insertions(+), 16 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index fada1055f325..d44d07d5a02f 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -4448,6 +4448,7 @@ static void vmx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
- 	kvm_set_cr8(vcpu, 0);
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 75e0b21ad07c..4cf40021dde4 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -2599,11 +2599,11 @@ void sev_es_init_vmcb(struct vcpu_svm *svm)
+ 	set_msr_interception(vcpu, svm->msrpm, MSR_IA32_LASTINTTOIP, 1, 1);
+ }
  
- 	vmx_segment_cache_clear(vmx);
-+	kvm_register_mark_available(vcpu, VCPU_EXREG_SEGMENTS);
- 
- 	seg_setup(VCPU_SREG_CS);
- 	vmcs_write16(GUEST_CS_SELECTOR, 0xf000);
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 2cb38c67ed43..ab907a0b9eeb 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -10876,9 +10876,9 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
- 		vcpu->arch.xcr0 = XFEATURE_MASK_FP;
- 	}
- 
-+	/* All GPRs except RDX (handled below) are zeroed on RESET/INIT. */
- 	memset(vcpu->arch.regs, 0, sizeof(vcpu->arch.regs));
--	vcpu->arch.regs_avail = ~0;
--	vcpu->arch.regs_dirty = ~0;
-+	kvm_register_mark_dirty(vcpu, VCPU_REGS_RSP);
- 
+-void sev_es_create_vcpu(struct vcpu_svm *svm)
++void sev_es_vcpu_reset(struct vcpu_svm *svm)
+ {
  	/*
- 	 * Fall back to KVM's default Family/Model/Stepping of 0x600 (P6/Athlon)
+-	 * Set the GHCB MSR value as per the GHCB specification when creating
+-	 * a vCPU for an SEV-ES guest.
++	 * Set the GHCB MSR value as per the GHCB specification when emulating
++	 * vCPU RESET for an SEV-ES guest.
+ 	 */
+ 	set_ghcb_msr(svm, GHCB_MSR_SEV_INFO(GHCB_VERSION_MAX,
+ 					    GHCB_VERSION_MIN,
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 1a70e11f0487..bb79ae8e8bcd 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -1303,6 +1303,19 @@ static void init_vmcb(struct kvm_vcpu *vcpu)
+ 
+ }
+ 
++static void __svm_vcpu_reset(struct kvm_vcpu *vcpu)
++{
++	struct vcpu_svm *svm = to_svm(vcpu);
++
++	svm_vcpu_init_msrpm(vcpu, svm->msrpm);
++
++	svm_init_osvw(vcpu);
++	vcpu->arch.microcode_version = 0x01000065;
++
++	if (sev_es_guest(vcpu->kvm))
++		sev_es_vcpu_reset(svm);
++}
++
+ static void svm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+ {
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+@@ -1311,6 +1324,9 @@ static void svm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+ 	svm->virt_spec_ctrl = 0;
+ 
+ 	init_vmcb(vcpu);
++
++	if (!init_event)
++		__svm_vcpu_reset(vcpu);
+ }
+ 
+ void svm_switch_vmcb(struct vcpu_svm *svm, struct kvm_vmcb_info *target_vmcb)
+@@ -1370,24 +1386,13 @@ static int svm_create_vcpu(struct kvm_vcpu *vcpu)
+ 
+ 	svm->vmcb01.ptr = page_address(vmcb01_page);
+ 	svm->vmcb01.pa = __sme_set(page_to_pfn(vmcb01_page) << PAGE_SHIFT);
++	svm_switch_vmcb(svm, &svm->vmcb01);
+ 
+ 	if (vmsa_page)
+ 		svm->vmsa = page_address(vmsa_page);
+ 
+ 	svm->guest_state_loaded = false;
+ 
+-	svm_switch_vmcb(svm, &svm->vmcb01);
+-	init_vmcb(vcpu);
+-
+-	svm_vcpu_init_msrpm(vcpu, svm->msrpm);
+-
+-	svm_init_osvw(vcpu);
+-	vcpu->arch.microcode_version = 0x01000065;
+-
+-	if (sev_es_guest(vcpu->kvm))
+-		/* Perform SEV-ES specific VMCB creation updates */
+-		sev_es_create_vcpu(svm);
+-
+ 	return 0;
+ 
+ error_free_vmsa_page:
+diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+index 524d943f3efc..001698919148 100644
+--- a/arch/x86/kvm/svm/svm.h
++++ b/arch/x86/kvm/svm/svm.h
+@@ -561,7 +561,7 @@ void sev_free_vcpu(struct kvm_vcpu *vcpu);
+ int sev_handle_vmgexit(struct kvm_vcpu *vcpu);
+ int sev_es_string_io(struct vcpu_svm *svm, int size, unsigned int port, int in);
+ void sev_es_init_vmcb(struct vcpu_svm *svm);
+-void sev_es_create_vcpu(struct vcpu_svm *svm);
++void sev_es_vcpu_reset(struct vcpu_svm *svm);
+ void sev_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector);
+ void sev_es_prepare_guest_switch(struct vcpu_svm *svm, unsigned int cpu);
+ void sev_es_unmap_ghcb(struct vcpu_svm *svm);
 -- 
 2.33.0.464.g1972c5931b-goog
 
