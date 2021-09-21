@@ -2,147 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 25A11412A07
-	for <lists+kvm@lfdr.de>; Tue, 21 Sep 2021 02:42:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C8B3F412AE5
+	for <lists+kvm@lfdr.de>; Tue, 21 Sep 2021 04:01:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233758AbhIUAnv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Sep 2021 20:43:51 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:23712 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S230220AbhIUAlu (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 20 Sep 2021 20:41:50 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 18KNtE3x000426;
-        Mon, 20 Sep 2021 20:40:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=yVM7zOPRxS6nVLAci1t9AXbV5zJn1EiXzX46PrWtdIg=;
- b=FXF5d1vBArH7ggi4P/KvQ162cjaZ+4fXXE1kgVwPm/bx+7D2TrJm8AdsOgxfITUfUCyG
- kPFtVsaDwyEwFdzGN08b6m3EH/O0yCAvUxcX6MlfCTwWmDUIa9U6qbKJ3+ozamlbB5cn
- atIfSEQs8AwuJKSt1VQltNho2f3dsijVIy7/ue/uxdMuYLJZvgZ0LETyVYt/iTzNchC1
- 57YABivFjrNj3FNufp80wJL/qZR0t7OYlmyHU68dRBUxa/5Go3o6KiG/66BZGVQXNyug
- BEuq9sgF3LLBmhd+kw1/s3FsD2w4EEDX8S0eqbEMC0d2Uy/b+ZKhFzbOQsDyBB2jn10u 5A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3b70f5des6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 20 Sep 2021 20:40:19 -0400
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 18L0KpiC006872;
-        Mon, 20 Sep 2021 20:40:18 -0400
-Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com [169.47.144.26])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3b70f5dery-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 20 Sep 2021 20:40:18 -0400
-Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
-        by ppma04wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 18L0I6EF019418;
-        Tue, 21 Sep 2021 00:40:17 GMT
-Received: from b03cxnp07028.gho.boulder.ibm.com (b03cxnp07028.gho.boulder.ibm.com [9.17.130.15])
-        by ppma04wdc.us.ibm.com with ESMTP id 3b57ra47ha-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 21 Sep 2021 00:40:17 +0000
-Received: from b03ledav001.gho.boulder.ibm.com (b03ledav001.gho.boulder.ibm.com [9.17.130.232])
-        by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 18L0eGZA50921736
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 21 Sep 2021 00:40:16 GMT
-Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 20E4F6E052;
-        Tue, 21 Sep 2021 00:40:16 +0000 (GMT)
-Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6844E6E050;
-        Tue, 21 Sep 2021 00:40:13 +0000 (GMT)
-Received: from cpe-172-100-181-211.stny.res.rr.com (unknown [9.65.75.198])
-        by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Tue, 21 Sep 2021 00:40:13 +0000 (GMT)
-Subject: Re: [PATCH v2] vfio/ap_ops: Add missed vfio_uninit_group_dev()
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        linux-s390@vger.kernel.org, Halil Pasic <pasic@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Christoph Hellwig <hch@lst.de>, kvm@vger.kernel.org
-References: <0-v2-25656bbbb814+41-ap_uninit_jgg@nvidia.com>
- <20210916125130.2db0961e.alex.williamson@redhat.com>
- <ee2a0623-84d5-8c21-cc40-de5991ff94b1@linux.ibm.com>
- <20210920231945.GG327412@nvidia.com>
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-Message-ID: <72fe03f8-dbd0-89e4-036f-e5c7ecc02263@linux.ibm.com>
-Date:   Mon, 20 Sep 2021 20:40:11 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
-MIME-Version: 1.0
-In-Reply-To: <20210920231945.GG327412@nvidia.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 3Iw-orvwK4dAGbS-zK8RldTCv6CK96AK
-X-Proofpoint-ORIG-GUID: LEnd-x9llfuOhwzSC6UjUpWl89u_VsEV
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.391,FMLib:17.0.607.475
- definitions=2021-09-20_07,2021-09-20_01,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 malwarescore=0
- adultscore=0 impostorscore=0 lowpriorityscore=0 phishscore=0 clxscore=1015
- spamscore=0 mlxlogscore=999 priorityscore=1501 suspectscore=0 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2109030001
- definitions=main-2109210000
+        id S238117AbhIUCCb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Sep 2021 22:02:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34508 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238247AbhIUB5p (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Sep 2021 21:57:45 -0400
+Received: from mail-io1-xd49.google.com (mail-io1-xd49.google.com [IPv6:2607:f8b0:4864:20::d49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9ABCC0C7519
+        for <kvm@vger.kernel.org>; Mon, 20 Sep 2021 18:01:37 -0700 (PDT)
+Received: by mail-io1-xd49.google.com with SMTP id x12-20020a056602160c00b005d61208080cso6508099iow.6
+        for <kvm@vger.kernel.org>; Mon, 20 Sep 2021 18:01:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=AZxEc7laRqt6V8YHSa5vqSWjCI5HaoGZ4mJ7JHaw6Zc=;
+        b=cX0LKE7fT40auep7yCqW5ITglnAAxckVqperzelP1kE2yjjWPnEwOKa2XxUssnw8yb
+         WD5SJDXKkO8FUuuGzW1uOKkRDqcvTsAf0pRjUIEyMSaO3PiAtbWd826EGXRErXepOoHo
+         /BzV0MmpeIMvRdDXXut1PLDZGgdYSsrt0LyNTTO+KtcusiUMNC+HsAumskEYnWGBqWrx
+         R6tCipSjUt2ryLtkwA75ZsQtFJ0+OnDzMix6S1OTtRaGx4PJlcT4PHKL2r0FO/DYxhTd
+         a3A+qzPkmNr7rwm+uV6npNsmyuqgxgtxxfefDyTgeA+IsijrziHcTdB01h0QdarPcnNW
+         qX2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=AZxEc7laRqt6V8YHSa5vqSWjCI5HaoGZ4mJ7JHaw6Zc=;
+        b=P2Jp6JAeBZpqTczYaDxy8CKj6FaO9RicWly4haw7wNeU9ALO8rFgXGRd6IoEJGdHFr
+         wGrn6hah4+PEhUDPbyPecKXhtZX//KBt5OtqqLqgVyRHa0xWCz4rJ+ka3A1jOerIjPot
+         bM73yWHs6CK56bMx2xyQ7EAMPxA4BW1i1bAQmz3gvgQclZzk/KPCJh1IaC8JNx9LlraD
+         StFRjJh0t6RE9zTwiuWEk5RoKUH510BvLaTj1t/f0j65P3fogv5IMs4ii9gxt3ioCIh5
+         bdCwc4y1DFQnf6QkocXVMiml3d8Au51bCydpp9YSDcLDWPPtikEO/VNmKUzm9yrg1ENJ
+         5yww==
+X-Gm-Message-State: AOAM531VEmKxExJOitQtteAxlv70Hyx055jq3rWeqDs6eOFKZVBe2l3X
+        ftTBrypET3thTveeko2WHuOKWWwk8Fx72Fbtp4RCb5VikpSxCp3yDxf5wyC663msfmi0rdU6QD4
+        sRbCJRAXp7roN49XgYWLMQSqNr/3UHcZjAhHihgy3uo4I5ykgb33LA70SGQ==
+X-Google-Smtp-Source: ABdhPJy+6CqPGc9baw+MQq8vlxCxkzBOaf9TIcRw3XWtgq5EF7mdn/4X+ydpnjNH9l2D2xO8RuWumIS+V/M=
+X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
+ (user=oupton job=sendgmr) by 2002:a02:9082:: with SMTP id x2mr21487329jaf.44.1632186096964;
+ Mon, 20 Sep 2021 18:01:36 -0700 (PDT)
+Date:   Tue, 21 Sep 2021 01:01:18 +0000
+Message-Id: <20210921010120.1256762-1-oupton@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.0.464.g1972c5931b-goog
+Subject: [PATCH 0/2] selftests: KVM: Fix some compiler warnings
+From:   Oliver Upton <oupton@google.com>
+To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Oliver Upton <oupton@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Building KVM selftests for arm64 using clang throws a couple compiler
+warnings. This series addresses the warnings found insofar that
+selftests can be built quietly for arm64 with clang.
 
+Series applies cleanly to 5.15-rc2.
 
-On 9/20/21 7:19 PM, Jason Gunthorpe wrote:
-> On Mon, Sep 20, 2021 at 05:26:25PM -0400, Tony Krowiak wrote:
->>
->> On 9/16/21 2:51 PM, Alex Williamson wrote:
->>> On Fri, 10 Sep 2021 20:06:30 -0300
->>> Jason Gunthorpe <jgg@nvidia.com> wrote:
->>>
->>>> Without this call an xarray entry is leaked when the vfio_ap device is
->>>> unprobed. It was missed when the below patch was rebased across the
->>>> dev_set patch.
->>>>
->>>> Fixes: eb0feefd4c02 ("vfio/ap_ops: Convert to use vfio_register_group_dev()")
->>>> Reviewed-by: Christoph Hellwig <hch@lst.de>
->>>> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
->>>>    drivers/s390/crypto/vfio_ap_ops.c | 2 ++
->>>>    1 file changed, 2 insertions(+)
->>> Hi Tony, Halil, Jason (H),
->>>
->>> Any acks for this one?  Thanks,
->>>
->>> Alex
->> I installed this on a test system running the latest linux
->> code from our library and ran our test suite. I got the
->> following running a simple test case that assigns some
->> adapters and domains to a mediated device then
->> starts a guest using the mdev.
-> Oh, neat. There is no reason for this stuff to be in the
-> matrix_dev->lock, it should be symmetrical with the error unwind in
-> probe.
+Oliver Upton (2):
+  selftests: KVM: Fix compiler warning in demand_paging_test
+  selftests: KVM: Fix 'asm-operand-width' warnings in steal_time.c
 
-I moved the vfio_uninit_group_dev outside of the matrix_dev->lock
-and it fixed the problem:
+ tools/testing/selftests/kvm/demand_paging_test.c | 2 +-
+ tools/testing/selftests/kvm/steal_time.c         | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-static void vfio_ap_mdev_remove(struct mdev_device *mdev)
-         mutex_lock(&matrix_dev->lock);
-         vfio_ap_mdev_reset_queues(matrix_mdev);
-         list_del(&matrix_mdev->node);
-         atomic_inc(&matrix_dev->available_instances);
-         mutex_unlock(&matrix_dev->lock);
-
-         vfio_uninit_group_dev(&matrix_mdev->vdev);
-         kfree(matrix_mdev);
-  }
-
->
-> I'll resend it.
->
-> Thanks,
-> Jason
+-- 
+2.33.0.464.g1972c5931b-goog
 
