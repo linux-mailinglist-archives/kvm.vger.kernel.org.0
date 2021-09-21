@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8A8DE413820
-	for <lists+kvm@lfdr.de>; Tue, 21 Sep 2021 19:11:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 91DD9413823
+	for <lists+kvm@lfdr.de>; Tue, 21 Sep 2021 19:11:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230122AbhIURM4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Sep 2021 13:12:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46140 "EHLO
+        id S230251AbhIURM7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Sep 2021 13:12:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46148 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229696AbhIURMz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Sep 2021 13:12:55 -0400
-Received: from mail-qt1-x849.google.com (mail-qt1-x849.google.com [IPv6:2607:f8b0:4864:20::849])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7402C061574
-        for <kvm@vger.kernel.org>; Tue, 21 Sep 2021 10:11:26 -0700 (PDT)
-Received: by mail-qt1-x849.google.com with SMTP id f34-20020a05622a1a2200b0029c338949c1so220211284qtb.8
-        for <kvm@vger.kernel.org>; Tue, 21 Sep 2021 10:11:26 -0700 (PDT)
+        with ESMTP id S229622AbhIURM4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Sep 2021 13:12:56 -0400
+Received: from mail-qk1-x749.google.com (mail-qk1-x749.google.com [IPv6:2607:f8b0:4864:20::749])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9906EC061574
+        for <kvm@vger.kernel.org>; Tue, 21 Sep 2021 10:11:27 -0700 (PDT)
+Received: by mail-qk1-x749.google.com with SMTP id e22-20020a05620a209600b003d5ff97bff7so184548206qka.1
+        for <kvm@vger.kernel.org>; Tue, 21 Sep 2021 10:11:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=jzWR7Fq+/HAR8FRZ5CmWSQlSyJSKtGaA1okeOYzuzGU=;
-        b=SRNa1zbX4Hlo2D0JzsaExaDQ/o+xv5a3XVc2p1Ds3bUplbwmS3q6FzHFGfO6viO3tx
-         UryxD6046QZNjR9r+69hcdSw2WNjndojahCKDtDMVFLbsnQLby9zo1kaKVVSvhYZ35Ab
-         N1XuaLB9ymwxPiDzOqnDCatr7f+AnGBW/FZ8jw1+tXmchZcorWtKXb7X+iVDB6Lsnw+6
-         Dr7bGpQ5U09p+edUYGyTkyxZocA6S25DGmN6ZVbyhQ5KMRM1oJBRrg5DQUDEyg2nDsTl
-         TBLDdFnK5k+0atVZS7dXSqIDQ16oPe7jTkoMHF5iu43OgOpq3zC+jP+TJoPPbSPfsvgV
-         l6yg==
+        bh=jbjtkKJClRIdxDxc/X394uGXktg3U8/Y+QRIQienfdo=;
+        b=mWyNrrEh7r2ySTiW4Dae4QnrEPDgY8hXI/P5NufdPFUir6Y5L1t9mujB8p860FHuh1
+         SkaMHh2ZuA1gBH/UCa5MOFmkQh4d6dDm9uxwx/G2ArlH+4Oim4gB5YUHp83i4cMlNyIK
+         18rU1nqfj0abE/L6uEOAHDD27ah2ztfzg9ixYn08nweN6UI9yBG2sX3EFrUH/vRUJRT+
+         mYKQYyPIk7W0nOqEqZGnfNAakiuSl4Myn4dFO9vmOUe0ckxXrfENjdZuPxFYuDZQ4kV1
+         KcfN2jvnXwIQnQ0MkHp9bYrkYsS9+EMUpup7y93HrhHcrN5jcH7ADq655ZTZFj4qScZH
+         xDfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=jzWR7Fq+/HAR8FRZ5CmWSQlSyJSKtGaA1okeOYzuzGU=;
-        b=H+nTvQycenVqaL8b9iiFyIGD1WZfR0HAXVIAscHwF40T5I7RKMLFs2h9GxCVvAdg9a
-         cxkz4fSN5p2Frt688EQnvMpS845ncN2d1/oltz3U6tKlAU8kVQdUPHCRvrNV3APPbjBn
-         ZGFfFLDVaa1+/+QbwJGL8mmrgf0yYlQlZqoi6NKx5warY1YPe5M+HE96Gru+SR3r3quv
-         JpgXnWT6FrAoqSslOiXsMuN+bIOzwc7p5+lNjktsQAIKwu47csh5DnsMZLGxeF1BoOGM
-         KlnKHJbi/3+V+queORSpoPZXcHHFees8JetSAcJyL3ATuki3HG16wlLTEPT6NFr5vZO6
-         ggAw==
-X-Gm-Message-State: AOAM532s2P60wIffMUVz8QYOuCP474CUl9trTe3jnwgJXFHJyyVDWJ5n
-        gS5cJ82aKr3l33Pr9fv+AHjLa3V9ylJWP/aL+riWJvSe/pGlP4FxG0Low7T995L9k5C9scttnrX
-        ZLmKm52SOt+EcJhSQ76J1xBiGk4DBNutN+MSdSaRa/nIevBkwDMALa85nWA==
-X-Google-Smtp-Source: ABdhPJxTaVdhnf2NYKqOfGZMxyn1rqiFJZMJSy1HY3CHx0lbCdjT7xpbhLQC0Atg6HG9LiGEYTEt9oY+BH8=
+        bh=jbjtkKJClRIdxDxc/X394uGXktg3U8/Y+QRIQienfdo=;
+        b=K/skbVaTEyfTB+R8yK3YOuCdpWi3d4h0+Mg3VchOKFrCkAhwkEpAbnkGPEtjqXRYNn
+         zqQ1EGBsb9fasF+n4qSakHxMcbSUCoOzzn8cENH6NNTu4Q3H0LylBZFiWeIdCwBlwhNr
+         kqnjDmd8wRp6JLOkFIFm+plJlDY6U2TcvVuQv1ge1NW7Gz8a/bV56e0Djo2blpYV1PE6
+         Pdv7W293cJYXqGU7FtqzYP6HdPgO26JVCKGOqzYAGne25+d8zE5YdAmm72G4jhSOqGAj
+         PV4cUkxGvdu+nyi8MkXwiiy+CM4Sc0fibAaXJCFV3cE7FEoJoFHdOwrSD8CIUXg4MrIb
+         leEg==
+X-Gm-Message-State: AOAM5318Tj2xXjjA9WtPJn3MhyeWecHeP7q6BHvL/0GM379b4MuBOqZT
+        LfLf+CY/garJyZ2s3HqspcDSx0qD30Dz3Rfpw7RamksrZWWx/PiyEDnCsRQ22mp9AQ5RKkvyyl0
+        ZldBBGHTGhcWVm3Tz2Ups4ontAaACW4456BxvKoAy103tmTkifHOkyJCTAQ==
+X-Google-Smtp-Source: ABdhPJwfa7oXjKMcTr6hpyAwdrgF4UuepCosJxs3eddjQEmY8Byeb5DZI6myHOWAQLWj8DDqFVtOMt3A/Zw=
 X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a25:eb0b:: with SMTP id d11mr37032784ybs.101.1632244285806;
- Tue, 21 Sep 2021 10:11:25 -0700 (PDT)
-Date:   Tue, 21 Sep 2021 17:11:20 +0000
+ (user=oupton job=sendgmr) by 2002:a25:424a:: with SMTP id p71mr41188110yba.243.1632244286770;
+ Tue, 21 Sep 2021 10:11:26 -0700 (PDT)
+Date:   Tue, 21 Sep 2021 17:11:21 +0000
 In-Reply-To: <20210921171121.2148982-1-oupton@google.com>
-Message-Id: <20210921171121.2148982-2-oupton@google.com>
+Message-Id: <20210921171121.2148982-3-oupton@google.com>
 Mime-Version: 1.0
 References: <20210921171121.2148982-1-oupton@google.com>
 X-Mailer: git-send-email 2.33.0.464.g1972c5931b-goog
-Subject: [PATCH v2 1/2] selftests: KVM: Fix check for !POLLIN in demand_paging_test
+Subject: [PATCH v2 2/2] selftests: KVM: Align SMCCC call with the spec in steal_time
 From:   Oliver Upton <oupton@google.com>
 To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 Cc:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
@@ -67,30 +67,39 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The logical not operator applies only to the left hand side of a bitwise
-operator. As such, the check for POLLIN not being set in revents wrong.
-Fix it by adding parentheses around the bitwise expression.
+The SMC64 calling convention passes a function identifier in w0 and its
+parameters in x1-x17. Given this, there are two deviations in the
+SMC64 call performed by the steal_time test: the function identifier is
+assigned to a 64 bit register and the parameter is only 32 bits wide.
 
-Fixes: 4f72180eb4da ("KVM: selftests: Add demand paging content to the demand paging test")
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+Align the call with the SMCCC by using a 32 bit register to handle the
+function identifier and increasing the parameter width to 64 bits.
+
+Suggested-by: Andrew Jones <drjones@redhat.com>
 Signed-off-by: Oliver Upton <oupton@google.com>
 ---
- tools/testing/selftests/kvm/demand_paging_test.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tools/testing/selftests/kvm/steal_time.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/demand_paging_test.c b/tools/testing/selftests/kvm/demand_paging_test.c
-index e79c1b64977f..10edae425ab3 100644
---- a/tools/testing/selftests/kvm/demand_paging_test.c
-+++ b/tools/testing/selftests/kvm/demand_paging_test.c
-@@ -179,7 +179,7 @@ static void *uffd_handler_thread_fn(void *arg)
- 			return NULL;
- 		}
+diff --git a/tools/testing/selftests/kvm/steal_time.c b/tools/testing/selftests/kvm/steal_time.c
+index ecec30865a74..aafaa8e38b7c 100644
+--- a/tools/testing/selftests/kvm/steal_time.c
++++ b/tools/testing/selftests/kvm/steal_time.c
+@@ -118,12 +118,12 @@ struct st_time {
+ 	uint64_t st_time;
+ };
  
--		if (!pollfd[0].revents & POLLIN)
-+		if (!(pollfd[0].revents & POLLIN))
- 			continue;
+-static int64_t smccc(uint32_t func, uint32_t arg)
++static int64_t smccc(uint32_t func, uint64_t arg)
+ {
+ 	unsigned long ret;
  
- 		r = read(uffd, &msg, sizeof(msg));
+ 	asm volatile(
+-		"mov	x0, %1\n"
++		"mov	w0, %w1\n"
+ 		"mov	x1, %2\n"
+ 		"hvc	#0\n"
+ 		"mov	%0, x0\n"
 -- 
 2.33.0.464.g1972c5931b-goog
 
