@@ -2,105 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1EED7414666
-	for <lists+kvm@lfdr.de>; Wed, 22 Sep 2021 12:32:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 495BD41468F
+	for <lists+kvm@lfdr.de>; Wed, 22 Sep 2021 12:39:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235137AbhIVKeC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Sep 2021 06:34:02 -0400
-Received: from mga05.intel.com ([192.55.52.43]:41410 "EHLO mga05.intel.com"
+        id S234885AbhIVKkc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Sep 2021 06:40:32 -0400
+Received: from mail.kernel.org ([198.145.29.99]:48514 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234760AbhIVKd4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Sep 2021 06:33:56 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10114"; a="309117992"
-X-IronPort-AV: E=Sophos;i="5.85,313,1624345200"; 
-   d="scan'208";a="309117992"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Sep 2021 03:32:26 -0700
-X-IronPort-AV: E=Sophos;i="5.85,313,1624345200"; 
-   d="scan'208";a="550197430"
-Received: from xiaoyaol-mobl.ccr.corp.intel.com (HELO [10.255.29.182]) ([10.255.29.182])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Sep 2021 03:32:24 -0700
-Subject: Re: [PATCH] KVM: VMX: Check if bus lock vmexit was preempted
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Hao Xiang <hao.xiang@linux.alibaba.com>, kvm@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, chenyi.qiang@intel.com,
-        shannon.zhao@linux.alibaba.com,
-        Sean Christopherson <seanjc@google.com>
-References: <1631964600-73707-1-git-send-email-hao.xiang@linux.alibaba.com>
- <87b411c3-da75-e074-91a4-a73891f9f5f8@redhat.com>
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-Message-ID: <57597778-836c-7bac-7f1d-bcdae0cd6ac4@intel.com>
-Date:   Wed, 22 Sep 2021 18:32:22 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Firefox/78.0 Thunderbird/78.14.0
+        id S234734AbhIVKkb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Sep 2021 06:40:31 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id C14CF61215;
+        Wed, 22 Sep 2021 10:39:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1632307141;
+        bh=V4GF0nAj0v2eTQCwITPWL26u6zIOuflM776Qsk3ZCGk=;
+        h=From:To:Cc:Subject:Date:From;
+        b=ci/ZAlTRBCsUreVxw+bq9fvZPLziyWvfEpX4JTfC/5VxKWMpy6zrAMC7cZ++KZC9u
+         /5UPZ/XxyI2yM3liEvX5Lwdeza1wWahvemoLmEhXMxavOPHwioWsvrO74Bhi1OFzk4
+         aJEl3m4pPBfL0VFsq98XgHAKfl2/EYbATUVKs1hL+kFKkRKKOYddsLT9fHsaM0IK46
+         E4uzFjLAmkiYck4JTtTpIbBdG5nUqclTTcJs3e5FVh1XIfFp4BlQFbWMAmzCh4P2I4
+         41tnuE+3E2MAhAj5oKQtmxCUiC3t7sW7ZhEQ8y/wv3MyBy8EoVO4QTZ1PXimu7Qo8c
+         Ypf6IO2GhJU0Q==
+From:   Leon Romanovsky <leon@kernel.org>
+To:     Alex Williamson <alex.williamson@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Leon Romanovsky <leonro@nvidia.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Kirti Wankhede <kwankhede@nvidia.com>, kvm@vger.kernel.org,
+        linux-pci@vger.kernel.org, netdev@vger.kernel.org,
+        Saeed Mahameed <saeedm@nvidia.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Max Gurtovoy <maxg@nvidia.com>
+Subject: [PATCH mlx5-next 0/7] Add mlx5 live migration driver
+Date:   Wed, 22 Sep 2021 13:38:49 +0300
+Message-Id: <cover.1632305919.git.leonro@nvidia.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-In-Reply-To: <87b411c3-da75-e074-91a4-a73891f9f5f8@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/22/2021 6:02 PM, Paolo Bonzini wrote:
-> On 18/09/21 13:30, Hao Xiang wrote:
->> exit_reason.bus_lock_detected is not only set when bus lock VM exit
->> was preempted, in fact, this bit is always set if bus locks are
->> detected no matter what the exit_reason.basic is.
->>
->> So the bus_lock_vmexit handling in vmx_handle_exit should be duplicated
->> when exit_reason.basic is EXIT_REASON_BUS_LOCK(74). We can avoid it by
->> checking if bus lock vmexit was preempted in vmx_handle_exit.
-> 
-> I don't understand, does this mean that bus_lock_detected=1 if 
-> basic=EXIT_REASON_BUS_LOCK?  If so, can we instead replace the contents 
-> of handle_bus_lock_vmexit with
-> 
->      /* Do nothing and let vmx_handle_exit exit to userspace.  */
->      WARN_ON(!to_vmx(vcpu)->exit_reason.bus_lock_detected);
->      return 0;
-> 
-> ?
-> 
-> That would be doable only if this is architectural behavior and not a 
-> processor erratum, of course.
+From: Leon Romanovsky <leonro@nvidia.com>
 
-EXIT_REASON.bus_lock_detected may or may not be set when exit reason == 
-EXIT_REASON_BUS_LOCK. Intel will update ISE or SDM to state it.
+From Yishai:
 
-Maybe we can do below in handle_bus_lock_vmexit handler:
+This series adds mlx5 live migration driver for VFs that are migrated
+capable.
 
-	if (!to_vmx(vcpu)->exit_reason.bus_lock_detected)
-		to_vmx(vcpu)->exit_reason.bus_lock_detected = 1;
+It uses vfio_pci_core to register to the VFIO subsystem and then
+implements the mlx5 specific logic in the migration area.
 
-But is manually changing the hardware reported value for software 
-purpose a good thing?
+The migration implementation follows the definition from uapi/vfio.h and
+uses the mlx5 VF->PF command channel to achieve it.
 
+The series adds an API in the vfio core layer to check migration state
+transition validity as part of a migration flow. This ensures that all
+migration implementations follow a consistent migration state machine.
 
-> Thanks,
-> 
-> Paolo
-> 
->> Signed-off-by: Hao Xiang <hao.xiang@linux.alibaba.com>
->> ---
->>   arch/x86/kvm/vmx/vmx.c | 3 ++-
->>   1 file changed, 2 insertions(+), 1 deletion(-)
->>
->> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
->> index 0c2c0d5..5ddf1df 100644
->> --- a/arch/x86/kvm/vmx/vmx.c
->> +++ b/arch/x86/kvm/vmx/vmx.c
->> @@ -6054,7 +6054,8 @@ static int vmx_handle_exit(struct kvm_vcpu 
->> *vcpu, fastpath_t exit_fastpath)
->>        * still need to exit to user space when bus lock detected to 
->> inform
->>        * that there is a bus lock in guest.
->>        */
->> -    if (to_vmx(vcpu)->exit_reason.bus_lock_detected) {
->> +    if (to_vmx(vcpu)->exit_reason.bus_lock_detected &&
->> +            to_vmx(vcpu)->exit_reason.basic != EXIT_REASON_BUS_LOCK) {
->>           if (ret > 0)
->>               vcpu->run->exit_reason = KVM_EXIT_X86_BUS_LOCK;
->>
-> 
+As part of the migration process the VF doesn't ride on mlx5_core, the
+device is driving *two* different PCI devices, the PF owned by mlx5_core
+and the VF owned by the mlx5 vfio driver.
+
+The mlx5_core of the PF is accessed only during the narrow window of the
+VF's ioctl that requires its services.
+
+The series also exposes from the PCI sub system an API named
+pci_iov_vf_id() to get the index of the VF. The PCI core uses this index
+internally, often called the vf_id, during the setup of the VF, eg
+pci_iov_add_virtfn().
+
+The returned VF index is needed by the mlx5 vfio driver for its internal
+operations to configure/control its VFs as part of the migration
+process.
+
+With the above functionality in place the driver implements the
+suspend/resume flows to work over QEMU.
+
+Thanks
+
+-----------------------------------------------------
+Alex,
+
+This series touches our ethernet and RDMA drivers, so we will need to
+route the patches through separate shared branch (mlx5-next) in order
+to eliminate the chances of merge conflicts between different subsystems.
+
+Thanks
+
+Jason Gunthorpe (1):
+  PCI/IOV: Provide internal VF index
+
+Yishai Hadas (6):
+  vfio: Add an API to check migration state transition validity
+  vfio/pci_core: Make the region->release() function optional
+  net/mlx5: Introduce migration bits and structures
+  net/mlx5: Expose APIs to get/put the mlx5 core device
+  mlx5_vfio_pci: Expose migration commands over mlx5 device
+  mlx5_vfio_pci: Implement vfio_pci driver for mlx5 devices
+
+ .../net/ethernet/mellanox/mlx5/core/main.c    |  43 +
+ drivers/pci/iov.c                             |  14 +
+ drivers/vfio/pci/Kconfig                      |  11 +
+ drivers/vfio/pci/Makefile                     |   3 +
+ drivers/vfio/pci/mlx5_vfio_pci.c              | 736 ++++++++++++++++++
+ drivers/vfio/pci/mlx5_vfio_pci_cmd.c          | 358 +++++++++
+ drivers/vfio/pci/mlx5_vfio_pci_cmd.h          |  43 +
+ drivers/vfio/pci/vfio_pci_core.c              |   3 +-
+ drivers/vfio/vfio.c                           |  41 +
+ include/linux/mlx5/driver.h                   |   3 +
+ include/linux/mlx5/mlx5_ifc.h                 | 145 +++-
+ include/linux/pci.h                           |   7 +-
+ include/linux/vfio.h                          |   1 +
+ 13 files changed, 1405 insertions(+), 3 deletions(-)
+ create mode 100644 drivers/vfio/pci/mlx5_vfio_pci.c
+ create mode 100644 drivers/vfio/pci/mlx5_vfio_pci_cmd.c
+ create mode 100644 drivers/vfio/pci/mlx5_vfio_pci_cmd.h
+
+-- 
+2.31.1
 
