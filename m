@@ -2,90 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A5B0C41528B
-	for <lists+kvm@lfdr.de>; Wed, 22 Sep 2021 23:17:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B8F804152B4
+	for <lists+kvm@lfdr.de>; Wed, 22 Sep 2021 23:24:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237987AbhIVVSs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Sep 2021 17:18:48 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:32772 "EHLO
+        id S237859AbhIVVZn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Sep 2021 17:25:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49670 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237840AbhIVVSr (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 22 Sep 2021 17:18:47 -0400
+        by vger.kernel.org with ESMTP id S237802AbhIVVZn (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 22 Sep 2021 17:25:43 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632345437;
+        s=mimecast20190719; t=1632345851;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=/gYLvFBwTWP63mHQyIOLQDvO3hmF+2iVnEein9qF53Y=;
-        b=G9NZG6L/GhdGFp2d4yc9CQ4GNDzxJvhr/lIijCMfUKX2htWSvOl/974bv6FPF/qUoKqqlo
-        uohIIlFQLsFlE6HbqRPVsVxMoP5+LYNCuXOY8RF0K1frItrU0+qPfDxMVjkFP6nv/opKGH
-        3W6JDmDfI8YUc8NCcEmZUPL4XAAsRUI=
-Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com
- [209.85.161.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-41-7pENrMjGMQOlq32h3bovag-1; Wed, 22 Sep 2021 17:17:15 -0400
-X-MC-Unique: 7pENrMjGMQOlq32h3bovag-1
-Received: by mail-oo1-f69.google.com with SMTP id z23-20020a4ad597000000b0029174f63d3eso2462332oos.18
-        for <kvm@vger.kernel.org>; Wed, 22 Sep 2021 14:17:15 -0700 (PDT)
+        bh=5bSXV/WbyIuvflNI0O5gv8cTQJk2LfpQktDl+auRuYw=;
+        b=RaOfdIkvkcmxJccv6Rnz8ML0XfRXrH4mx5SvhD9o7j7Bcg6NIliufn6f51kROwXuUzcMR0
+        ognTE7CaIzsU44T/9cP/0y8LFzFS+JyXxyrv7btxuOwbs/fc0ng0OYuCPuJLI/HsWCih0e
+        gf/QZt23/9SxRvwPGcE8q1Ng9I6hHjw=
+Received: from mail-oi1-f198.google.com (mail-oi1-f198.google.com
+ [209.85.167.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-501-VkB6kjujNueKJe82f0oqug-1; Wed, 22 Sep 2021 17:24:10 -0400
+X-MC-Unique: VkB6kjujNueKJe82f0oqug-1
+Received: by mail-oi1-f198.google.com with SMTP id 20-20020aca2814000000b002690d9b60aaso2613553oix.0
+        for <kvm@vger.kernel.org>; Wed, 22 Sep 2021 14:24:10 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
          :references:organization:mime-version:content-transfer-encoding;
-        bh=/gYLvFBwTWP63mHQyIOLQDvO3hmF+2iVnEein9qF53Y=;
-        b=dG73Kvy0aahEPN44SrIl10Afp/hd4rAwHfzWLn/6IUdzxjZ4hhEagFBfVk0Ry0aBez
-         xDQby/Z+dsMSDDMYyyW3sgU7TBh/Wxwh9KTRzqJ0bacdXN5EGdgvWoS6JkRMxN+JEGzt
-         ZBz7KQA4TZ52VMc23EY4REteb+guQw+cy+fb41SvX2U+lp7ecB75stiBvxB7ZpHIapfy
-         qR9eUYSJ4c0vlLtVPxKPGrSYToJtqCLZh+/QKTQSNtN9yI7rZLDPCW5q5+9J8kylz4YJ
-         gJtNM7SRgD1UwPY8gaGb3wcBaeVb/0OCHVAfieZnPpwoJRs9blpkfcqQldijmL3AzTli
-         mROg==
-X-Gm-Message-State: AOAM533hZz0iesioUnlZKng6Uk0Vri52qhxRWKxpCfHQ6btCOIRNFLV+
-        rM+YKV1yX91MEww3PtoHzQM41JXJTxwqoRFHeO0L3Sm0B1hbluGSRPIaY/PSBSEImkKurQDMXEN
-        sEYlVJiL+7tBQ
-X-Received: by 2002:a05:6830:2486:: with SMTP id u6mr1135216ots.93.1632345435217;
-        Wed, 22 Sep 2021 14:17:15 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxc6iyyZw+WQTCkXn6zRwyOEIFjLLsl9TFY8nydX9jzhc7fYSxkdPKhBdO818HVxgfS9lMqEQ==
-X-Received: by 2002:a05:6830:2486:: with SMTP id u6mr1135191ots.93.1632345435007;
-        Wed, 22 Sep 2021 14:17:15 -0700 (PDT)
+        bh=5bSXV/WbyIuvflNI0O5gv8cTQJk2LfpQktDl+auRuYw=;
+        b=btTqN3auyNX5BntVMmTZy8KD0N3TBvZKJfzEkDRQR/mDBsbwrDQl+XOz6MpTFVlntV
+         GjgkaoxZqDW6GfYWylImIHIgXeU03JkS7hfxV3sOmRFB5gjKdAerRwvP4Sg2KMAVoD8Q
+         X+jCBYBtQX769+6bOmZ+AyjTYZAp4NyPFemphQ7YJutbqEXV1+HIO6YZ+gh0Jxgc47w3
+         5+fQKTKzs1+1K8v/l+xQpioyNZD1+VBYIAZteDKz9AH3RrFvIGAEa8DO/wBBb4oOpGee
+         tVTHmtRsSxmDqu3zHmQIjuq+x2dYaJ9jIRaIVEt6wNbFXVYa6XPlhFLHPTEORn6Oo7o8
+         W4WQ==
+X-Gm-Message-State: AOAM5308C9RsVv16xcLPfyGx5W5kutcNwUIg2KBbR08OlgjYmiyD95K/
+        jV3ofWfW/TRJHrwcfFG2DT60dukC7/6ynNgq7+qnzeZLWJsl/87Oe0PHPWjjZVGDOh1v/yNmu02
+        0Ta8X0B/eThM5
+X-Received: by 2002:a05:6808:2026:: with SMTP id q38mr1062579oiw.15.1632345849576;
+        Wed, 22 Sep 2021 14:24:09 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxdoCWR7q3blhAcNoLIpqhCzivqr2u9tYk00GR6mvZvaI93uSxrNhlQY0cnvU77gFLtK4G4DA==
+X-Received: by 2002:a05:6808:2026:: with SMTP id q38mr1062549oiw.15.1632345849392;
+        Wed, 22 Sep 2021 14:24:09 -0700 (PDT)
 Received: from redhat.com ([198.99.80.109])
-        by smtp.gmail.com with ESMTPSA id j4sm802381oia.56.2021.09.22.14.17.13
+        by smtp.gmail.com with ESMTPSA id s24sm788936otp.36.2021.09.22.14.24.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Sep 2021 14:17:14 -0700 (PDT)
-Date:   Wed, 22 Sep 2021 15:17:12 -0600
+        Wed, 22 Sep 2021 14:24:09 -0700 (PDT)
+Date:   Wed, 22 Sep 2021 15:24:07 -0600
 From:   Alex Williamson <alex.williamson@redhat.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
-        "hch@lst.de" <hch@lst.de>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        "parav@mellanox.com" <parav@mellanox.com>,
-        "lkml@metux.net" <lkml@metux.net>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "lushenming@huawei.com" <lushenming@huawei.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "corbet@lwn.net" <corbet@lwn.net>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "yi.l.liu@linux.intel.com" <yi.l.liu@linux.intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "dwmw2@infradead.org" <dwmw2@infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-        "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>
-Subject: Re: [RFC 05/20] vfio/pci: Register device to /dev/vfio/devices
-Message-ID: <20210922151712.20162912.alex.williamson@redhat.com>
-In-Reply-To: <BN9PR11MB5433D909662D484EFE9C82E28CA29@BN9PR11MB5433.namprd11.prod.outlook.com>
+To:     Liu Yi L <yi.l.liu@intel.com>
+Cc:     jgg@nvidia.com, hch@lst.de, jasowang@redhat.com, joro@8bytes.org,
+        jean-philippe@linaro.org, kevin.tian@intel.com, parav@mellanox.com,
+        lkml@metux.net, pbonzini@redhat.com, lushenming@huawei.com,
+        eric.auger@redhat.com, corbet@lwn.net, ashok.raj@intel.com,
+        yi.l.liu@linux.intel.com, jun.j.tian@intel.com, hao.wu@intel.com,
+        dave.jiang@intel.com, jacob.jun.pan@linux.intel.com,
+        kwankhede@nvidia.com, robin.murphy@arm.com, kvm@vger.kernel.org,
+        iommu@lists.linux-foundation.org, dwmw2@infradead.org,
+        linux-kernel@vger.kernel.org, baolu.lu@linux.intel.com,
+        david@gibson.dropbear.id.au, nicolinc@nvidia.com
+Subject: Re: [RFC 10/20] iommu/iommufd: Add IOMMU_DEVICE_GET_INFO
+Message-ID: <20210922152407.1bfa6ff7.alex.williamson@redhat.com>
+In-Reply-To: <20210919063848.1476776-11-yi.l.liu@intel.com>
 References: <20210919063848.1476776-1-yi.l.liu@intel.com>
-        <20210919063848.1476776-6-yi.l.liu@intel.com>
-        <20210921164001.GR327412@nvidia.com>
-        <20210921150929.5977702c.alex.williamson@redhat.com>
-        <BN9PR11MB5433D909662D484EFE9C82E28CA29@BN9PR11MB5433.namprd11.prod.outlook.com>
+        <20210919063848.1476776-11-yi.l.liu@intel.com>
 Organization: Red Hat
 X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
@@ -95,52 +77,29 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 22 Sep 2021 01:19:08 +0000
-"Tian, Kevin" <kevin.tian@intel.com> wrote:
+On Sun, 19 Sep 2021 14:38:38 +0800
+Liu Yi L <yi.l.liu@intel.com> wrote:
 
-> > From: Alex Williamson <alex.williamson@redhat.com>
-> > Sent: Wednesday, September 22, 2021 5:09 AM
-> > 
-> > On Tue, 21 Sep 2021 13:40:01 -0300
-> > Jason Gunthorpe <jgg@nvidia.com> wrote:
-> >   
-> > > On Sun, Sep 19, 2021 at 02:38:33PM +0800, Liu Yi L wrote:  
-> > > > This patch exposes the device-centric interface for vfio-pci devices. To
-> > > > be compatiable with existing users, vfio-pci exposes both legacy group
-> > > > interface and device-centric interface.
-> > > >
-> > > > As explained in last patch, this change doesn't apply to devices which
-> > > > cannot be forced to snoop cache by their upstream iommu. Such devices
-> > > > are still expected to be opened via the legacy group interface.  
-> > 
-> > This doesn't make much sense to me.  The previous patch indicates
-> > there's work to be done in updating the kvm-vfio contract to understand
-> > DMA coherency, so you're trying to limit use cases to those where the
-> > IOMMU enforces coherency, but there's QEMU work to be done to support
-> > the iommufd uAPI at all.  Isn't part of that work to understand how KVM
-> > will be told about non-coherent devices rather than "meh, skip it in the
-> > kernel"?  Also let's not forget that vfio is not only for KVM.  
-> 
-> The policy here is that VFIO will not expose such devices (no enforce-snoop)
-> in the new device hierarchy at all. In this case QEMU will fall back to the
-> group interface automatically and then rely on the existing contract to connect 
-> vfio and QEMU. It doesn't need to care about the whatever new contract
-> until such devices are exposed in the new interface.
-> 
-> yes, vfio is not only for KVM. But here it's more a task split based on staging
-> consideration. imo it's not necessary to further split task into supporting
-> non-snoop device for userspace driver and then for kvm.
+> +struct iommu_device_info {
+> +	__u32	argsz;
+> +	__u32	flags;
+> +#define IOMMU_DEVICE_INFO_ENFORCE_SNOOP	(1 << 0) /* IOMMU enforced snoop */
 
-Patch 10 introduces an iommufd interface for QEMU to learn whether the
-IOMMU enforces DMA coherency, at that point QEMU could revert to the
-legacy interface, or register the iommufd with KVM, or otherwise
-establish non-coherent DMA with KVM as necessary.  We're adding cruft
-to the kernel here to enforce an unnecessary limitation.
-
-If there are reasons the kernel can't support the device interface,
-that's a valid reason not to present the interface, but this seems like
-picking a specific gap that userspace is already able to detect from
-this series at the expense of other use cases.  Thanks,
+Is this too PCI specific, or perhaps too much of the mechanism rather
+than the result?  ie. should we just indicate if the IOMMU guarantees
+coherent DMA?  Thanks,
 
 Alex
+
+> +#define IOMMU_DEVICE_INFO_PGSIZES	(1 << 1) /* supported page sizes */
+> +#define IOMMU_DEVICE_INFO_ADDR_WIDTH	(1 << 2) /* addr_wdith field valid */
+> +	__u64	dev_cookie;
+> +	__u64   pgsize_bitmap;
+> +	__u32	addr_width;
+> +};
+> +
+> +#define IOMMU_DEVICE_GET_INFO	_IO(IOMMU_TYPE, IOMMU_BASE + 1)
+>  
+>  #define IOMMU_FAULT_PERM_READ	(1 << 0) /* read */
+>  #define IOMMU_FAULT_PERM_WRITE	(1 << 1) /* write */
 
