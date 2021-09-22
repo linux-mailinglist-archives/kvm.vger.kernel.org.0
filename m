@@ -2,208 +2,366 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B830B414DE4
-	for <lists+kvm@lfdr.de>; Wed, 22 Sep 2021 18:16:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5AF3E414E30
+	for <lists+kvm@lfdr.de>; Wed, 22 Sep 2021 18:34:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236506AbhIVQRj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Sep 2021 12:17:39 -0400
-Received: from foss.arm.com ([217.140.110.172]:51214 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233094AbhIVQRj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Sep 2021 12:17:39 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9B3F5113E;
-        Wed, 22 Sep 2021 09:16:08 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 866393F719;
-        Wed, 22 Sep 2021 09:16:05 -0700 (PDT)
-Message-ID: <138537dc-64ef-ab3b-6977-4cc19de7fee3@arm.com>
-Date:   Wed, 22 Sep 2021 17:17:39 +0100
+        id S236653AbhIVQgL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Sep 2021 12:36:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58492 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236618AbhIVQgK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Sep 2021 12:36:10 -0400
+Received: from mail-ot1-x329.google.com (mail-ot1-x329.google.com [IPv6:2607:f8b0:4864:20::329])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64E36C061756
+        for <kvm@vger.kernel.org>; Wed, 22 Sep 2021 09:34:40 -0700 (PDT)
+Received: by mail-ot1-x329.google.com with SMTP id 97-20020a9d006a000000b00545420bff9eso4276359ota.8
+        for <kvm@vger.kernel.org>; Wed, 22 Sep 2021 09:34:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=m6J+OkKKPxNvNc7nO5L1z2FUZYCyj9JJhrvRz003S+U=;
+        b=KTSra+1iGuvxVBVCe4ILUIzFlth9B3j2n/GFGQNJo5DLFuOAYLrvj2AoM8h+VbX+am
+         8qoH0YApr7O78kvVJZonmSel+O+s8fKvDu9BDDQ95gsIGEh+ydOuMdAU/LEU1nUg5tn8
+         QBKKa6Kbmwc5fKraW3iX+ugFWEvK/2+ulRlTa6tMD8U6PoCVY1T/ZMMbTAZebfD5J8Vd
+         tEKEnwY4xS4OC5IPMBbPSFv7ogkPSotRCfQKauaaBc+krBS30Vna93d2v+Z3XizrPHq8
+         TBYXGUAJwxF25cVtFPHVagzTLCTTereQBGkkX9PTzfHVbAtJoLOYml4d7HBHbhupjRK9
+         RMYw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=m6J+OkKKPxNvNc7nO5L1z2FUZYCyj9JJhrvRz003S+U=;
+        b=J3Z+4qrfMArdbQul+Bs3hVYnH0qRJwEvgDDY5SE7pll0Vnfs9bgT2p5uvxmbQOo/tT
+         XfPlEVucQTaP01rny8wFGTJkbWDNUcWxGCB/+ka4EemCXSwx9+PBmX5H3YQ6p6aaGzJj
+         lo+FXentP4VB6iM2lFcQVTgooWqwsy83T7DiTnqt8D/refQ8ZIjlr+EoAzNroD8E19KG
+         zmukKpeqCVUXMfR6MzSXXIZD6XJLtP7nv8UQf3Wy3IGlPT1lB0rt68QqVoY/cCVuh/2S
+         CnsTW6gdsxBg8ov0Tp3A+mM3LZPBqSZc2fWkS7gZRNTFMbuwo8BMq0OEw1BKPI5TNDPj
+         C6Pw==
+X-Gm-Message-State: AOAM53010pLZCpmBgZ2ULQ3ZubHILIPMgyBgoRP9qXRKcH7kGDKstQGz
+        2yULTY2j+h/PfD2QT7kK0hJOvJVAWmkYqgCSJaOD8Q==
+X-Google-Smtp-Source: ABdhPJwhH7ylfTFdHidq/NqGlpYM4yEq3gBUTpINtkcIIlkXLJpstb8WONddtQTzkXGYvk8zLQv/27rXDflTivw601M=
+X-Received: by 2002:a05:6830:2b27:: with SMTP id l39mr20125otv.25.1632328479385;
+ Wed, 22 Sep 2021 09:34:39 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.1
-Subject: Re: [PATCH v8 2/8] KVM: arm64: Separate guest/host counter offset
- values
-Content-Language: en-US
-To:     Oliver Upton <oupton@google.com>, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+References: <20210914164727.3007031-1-pgonda@google.com> <20210914164727.3007031-5-pgonda@google.com>
+ <CAA03e5EtxED=9C8tL8hwstHBMbj6nzDwA87yMfK9kk5BUTqF2w@mail.gmail.com> <CAMkAt6oBHLPcXvaeAtHp+Tmt5BKwNDZd-jvDf2+BY=_2-=VJ-Q@mail.gmail.com>
+In-Reply-To: <CAMkAt6oBHLPcXvaeAtHp+Tmt5BKwNDZd-jvDf2+BY=_2-=VJ-Q@mail.gmail.com>
+From:   Marc Orr <marcorr@google.com>
+Date:   Wed, 22 Sep 2021 09:34:28 -0700
+Message-ID: <CAA03e5Gj7QzDD=7XY5KpmThHdS=0K6WTcmZxfA0S3PTbdo9wqg@mail.gmail.com>
+Subject: Re: [PATCH 4/4 V8] selftest: KVM: Add intra host migration tests
+To:     Peter Gonda <pgonda@google.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
         Sean Christopherson <seanjc@google.com>,
-        Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-arm-kernel@lists.infradead.org,
-        Andrew Jones <drjones@redhat.com>,
-        Will Deacon <will@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>
-References: <20210916181510.963449-1-oupton@google.com>
- <20210916181510.963449-3-oupton@google.com>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-In-Reply-To: <20210916181510.963449-3-oupton@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+        David Rientjes <rientjes@google.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Oliver,
+On Tue, Sep 21, 2021 at 7:20 AM Peter Gonda <pgonda@google.com> wrote:
+>
+> On Wed, Sep 15, 2021 at 11:28 AM Marc Orr <marcorr@google.com> wrote:
+> >
+> > On Tue, Sep 14, 2021 at 9:47 AM Peter Gonda <pgonda@google.com> wrote:
+> > >
+> > > Adds testcases for intra host migration for SEV and SEV-ES. Also adds
+> > > locking test to confirm no deadlock exists.
+> > >
+> > > Signed-off-by: Peter Gonda <pgonda@google.com>
+> > > Suggested-by: Sean Christopherson <seanjc@google.com>
+> > > Reviewed-by: Marc Orr <marcorr@google.com>
+> > > Cc: Marc Orr <marcorr@google.com>
+> > > Cc: Sean Christopherson <seanjc@google.com>
+> > > Cc: David Rientjes <rientjes@google.com>
+> > > Cc: Brijesh Singh <brijesh.singh@amd.com>
+> > > Cc: kvm@vger.kernel.org
+> > > Cc: linux-kernel@vger.kernel.org
+> > > ---
+> > >  tools/testing/selftests/kvm/Makefile          |   1 +
+> > >  .../selftests/kvm/x86_64/sev_vm_tests.c       | 203 ++++++++++++++++++
+> > >  2 files changed, 204 insertions(+)
+> > >  create mode 100644 tools/testing/selftests/kvm/x86_64/sev_vm_tests.c
+> > >
+> > > diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+> > > index c103873531e0..44fd3566fb51 100644
+> > > --- a/tools/testing/selftests/kvm/Makefile
+> > > +++ b/tools/testing/selftests/kvm/Makefile
+> > > @@ -72,6 +72,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/vmx_pmu_msrs_test
+> > >  TEST_GEN_PROGS_x86_64 += x86_64/xen_shinfo_test
+> > >  TEST_GEN_PROGS_x86_64 += x86_64/xen_vmcall_test
+> > >  TEST_GEN_PROGS_x86_64 += x86_64/vmx_pi_mmio_test
+> > > +TEST_GEN_PROGS_x86_64 += x86_64/sev_vm_tests
+> > >  TEST_GEN_PROGS_x86_64 += access_tracking_perf_test
+> > >  TEST_GEN_PROGS_x86_64 += demand_paging_test
+> > >  TEST_GEN_PROGS_x86_64 += dirty_log_test
+> > > diff --git a/tools/testing/selftests/kvm/x86_64/sev_vm_tests.c b/tools/testing/selftests/kvm/x86_64/sev_vm_tests.c
+> > > new file mode 100644
+> > > index 000000000000..ec3bbc96e73a
+> > > --- /dev/null
+> > > +++ b/tools/testing/selftests/kvm/x86_64/sev_vm_tests.c
+> > > @@ -0,0 +1,203 @@
+> > > +// SPDX-License-Identifier: GPL-2.0-only
+> > > +#include <linux/kvm.h>
+> > > +#include <linux/psp-sev.h>
+> > > +#include <stdio.h>
+> > > +#include <sys/ioctl.h>
+> > > +#include <stdlib.h>
+> > > +#include <errno.h>
+> > > +#include <pthread.h>
+> > > +
+> > > +#include "test_util.h"
+> > > +#include "kvm_util.h"
+> > > +#include "processor.h"
+> > > +#include "svm_util.h"
+> > > +#include "kselftest.h"
+> > > +#include "../lib/kvm_util_internal.h"
+> > > +
+> > > +#define SEV_POLICY_ES 0b100
+> > > +
+> > > +#define NR_MIGRATE_TEST_VCPUS 4
+> > > +#define NR_MIGRATE_TEST_VMS 3
+> > > +#define NR_LOCK_TESTING_THREADS 3
+> > > +#define NR_LOCK_TESTING_ITERATIONS 10000
+> > > +
+> > > +static void sev_ioctl(int vm_fd, int cmd_id, void *data)
+> > > +{
+> > > +       struct kvm_sev_cmd cmd = {
+> > > +               .id = cmd_id,
+> > > +               .data = (uint64_t)data,
+> > > +               .sev_fd = open_sev_dev_path_or_exit(),
+> > > +       };
+> > > +       int ret;
+> > > +
+> > > +       ret = ioctl(vm_fd, KVM_MEMORY_ENCRYPT_OP, &cmd);
+> > > +       TEST_ASSERT((ret == 0 || cmd.error == SEV_RET_SUCCESS),
+> > > +                   "%d failed: return code: %d, errno: %d, fw error: %d",
+> > > +                   cmd_id, ret, errno, cmd.error);
+> > > +}
+> > > +
+> > > +static struct kvm_vm *sev_vm_create(bool es)
+> > > +{
+> > > +       struct kvm_vm *vm;
+> > > +       struct kvm_sev_launch_start start = { 0 };
+> > > +       int i;
+> > > +
+> > > +       vm = vm_create(VM_MODE_DEFAULT, 0, O_RDWR);
+> > > +       sev_ioctl(vm->fd, es ? KVM_SEV_ES_INIT : KVM_SEV_INIT, NULL);
+> > > +       for (i = 0; i < NR_MIGRATE_TEST_VCPUS; ++i)
+> > > +               vm_vcpu_add(vm, i);
+> > > +       if (es)
+> > > +               start.policy |= SEV_POLICY_ES;
+> > > +       sev_ioctl(vm->fd, KVM_SEV_LAUNCH_START, &start);
+> > > +       if (es)
+> > > +               sev_ioctl(vm->fd, KVM_SEV_LAUNCH_UPDATE_VMSA, NULL);
+> > > +       return vm;
+> > > +}
+> >
+> > I should've suggested this in my original review. But is it worth
+> > moving `sev_vm_create()` and `sev_ioctl()` into the broader selftests
+> > library, so others can leverage this function to write selftests?
+>
+> This function isn't fully complete. It doesn't get to launch_finish,
+> i.e. it only goes far enough for copyless migration ioctls to work. I
+> think this would be a good expansion but could happen in follow up
+> series, thoughts?
 
-I don't understand what this patch is trying to achieve, so I'm just going to ask
-some high level questions before I go through the code.
-
-On 9/16/21 19:15, Oliver Upton wrote:
-> In some instances, a VMM may want to update the guest's counter-timer
-> offset in a transparent manner, meaning that changes to the hardware
-> value do not affect the synthetic register presented to the guest or the
-> VMM through said guest's architectural state. Lay the groundwork to
-> separate guest offset register writes from the hardware values utilized
-> by KVM.
-
-I find this description very hard to parse. What do you mean by the "register
-presented to the guest or the VMM through said guest's architectural state"?
-
-If I understand the code correctly, what the patch does is to create another copy
-of __vcpu_sys_reg(CNTVOFF_EL2) in vcpu_vtimer(vcpu)->host_offset in a very
-roundabout manner, in the function timer_set_guest_offset() (please correct me if
-I'm wrong). The commit doesn't explain why that is done at all, except for this
-part: "In some instances, a VMM may want to update the guest's counter-timer
-offset in a transparent manner", which looks very cryptic, at least to me.
-
-In the cover letter, you mention adding support for a physical timer offset. I
-think it would make the commits clearer to follow if there was a better
-distinction between changes to the virtual timer offset and physical timer offsets.
+SGTM. Let's leave it here for now then.
 
 >
-> Signed-off-by: Oliver Upton <oupton@google.com>
-> Reviewed-by: Andrew Jones <drjones@redhat.com>
-> ---
->  arch/arm64/kvm/arch_timer.c  | 42 +++++++++++++++++++++++++++---------
->  include/kvm/arm_arch_timer.h |  3 +++
->  2 files changed, 35 insertions(+), 10 deletions(-)
+> >
+> > > +
+> > > +static struct kvm_vm *__vm_create(void)
+> > > +{
+> > > +       struct kvm_vm *vm;
+> > > +       int i;
+> > > +
+> > > +       vm = vm_create(VM_MODE_DEFAULT, 0, O_RDWR);
+> > > +       for (i = 0; i < NR_MIGRATE_TEST_VCPUS; ++i)
+> > > +               vm_vcpu_add(vm, i);
+> > > +
+> > > +       return vm;
+> > > +}
+> > > +
+> > > +static int __sev_migrate_from(int dst_fd, int src_fd)
+> > > +{
+> > > +       struct kvm_enable_cap cap = {
+> > > +               .cap = KVM_CAP_VM_MIGRATE_PROTECTED_VM_FROM,
+> > > +               .args = { src_fd }
+> > > +       };
+> > > +
+> > > +       return ioctl(dst_fd, KVM_ENABLE_CAP, &cap);
+> > > +}
+> > > +
+> > > +
+> > > +static void sev_migrate_from(int dst_fd, int src_fd)
+> > > +{
+> > > +       int ret;
+> > > +
+> > > +       ret = __sev_migrate_from(dst_fd, src_fd);
+> > > +       TEST_ASSERT(!ret, "Migration failed, ret: %d, errno: %d\n", ret, errno);
+> > > +}
+> > > +
+> > > +static void test_sev_migrate_from(bool es)
+> > > +{
+> > > +       struct kvm_vm *src_vm;
+> > > +       struct kvm_vm *dst_vms[NR_MIGRATE_TEST_VMS];
+> > > +       int i;
+> > > +
+> > > +       src_vm = sev_vm_create(es);
+> > > +       for (i = 0; i < NR_MIGRATE_TEST_VMS; ++i)
+> > > +               dst_vms[i] = __vm_create();
+> > > +
+> > > +       /* Initial migration from the src to the first dst. */
+> > > +       sev_migrate_from(dst_vms[0]->fd, src_vm->fd);
+> > > +
+> > > +       for (i = 1; i < NR_MIGRATE_TEST_VMS; i++)
+> > > +               sev_migrate_from(dst_vms[i]->fd, dst_vms[i - 1]->fd);
+> > > +
+> > > +       /* Migrate the guest back to the original VM. */
+> > > +       sev_migrate_from(src_vm->fd, dst_vms[NR_MIGRATE_TEST_VMS - 1]->fd);
+> > > +
+> > > +       kvm_vm_free(src_vm);
+> > > +       for (i = 0; i < NR_MIGRATE_TEST_VMS; ++i)
+> > > +               kvm_vm_free(dst_vms[i]);
+> > > +}
+> > > +
+> > > +struct locking_thread_input {
+> > > +       struct kvm_vm *vm;
+> > > +       int source_fds[NR_LOCK_TESTING_THREADS];
+> > > +};
+> > > +
+> > > +static void *locking_test_thread(void *arg)
+> > > +{
+> > > +       int i, j;
+> > > +       struct locking_thread_input *input = (struct locking_test_thread *)arg;
+> > > +
+> > > +       for (i = 0; i < NR_LOCK_TESTING_ITERATIONS; ++i) {
+> > > +               j = i % NR_LOCK_TESTING_THREADS;
+> > > +               __sev_migrate_from(input->vm->fd, input->source_fds[j]);
+> > > +       }
+> > > +
+> > > +       return NULL;
+> > > +}
+> > > +
+> > > +static void test_sev_migrate_locking(void)
+> > > +{
+> > > +       struct locking_thread_input input[NR_LOCK_TESTING_THREADS];
+> > > +       pthread_t pt[NR_LOCK_TESTING_THREADS];
+> > > +       int i;
+> > > +
+> > > +       for (i = 0; i < NR_LOCK_TESTING_THREADS; ++i) {
+> > > +               input[i].vm = sev_vm_create(/* es= */ false);
+> > > +               input[0].source_fds[i] = input[i].vm->fd;
+> > > +       }
+> > > +       for (i = 1; i < NR_LOCK_TESTING_THREADS; ++i)
+> > > +               memcpy(input[i].source_fds, input[0].source_fds,
+> > > +                      sizeof(input[i].source_fds));
+> > > +
+> > > +       for (i = 0; i < NR_LOCK_TESTING_THREADS; ++i)
+> > > +               pthread_create(&pt[i], NULL, locking_test_thread, &input[i]);
+> > > +
+> > > +       for (i = 0; i < NR_LOCK_TESTING_THREADS; ++i)
+> > > +               pthread_join(pt[i], NULL);
+> > > +}
+> > > +
+> > > +static void test_sev_migrate_parameters(void)
+> > > +{
+> > > +       struct kvm_vm *sev_vm, *sev_es_vm, *vm_no_vcpu, *vm_no_sev,
+> > > +               *sev_es_vm_no_vmsa;
+> > > +       int ret;
+> > > +
+> > > +       sev_vm = sev_vm_create(/* es= */ false);
+> > > +       sev_es_vm = sev_vm_create(/* es= */ true);
+> > > +       vm_no_vcpu = vm_create(VM_MODE_DEFAULT, 0, O_RDWR);
+> > > +       vm_no_sev = __vm_create();
+> > > +       sev_es_vm_no_vmsa = vm_create(VM_MODE_DEFAULT, 0, O_RDWR);
+> > > +       sev_ioctl(sev_es_vm_no_vmsa->fd, KVM_SEV_ES_INIT, NULL);
+> > > +       vm_vcpu_add(sev_es_vm_no_vmsa, 1);
+> > > +
+> > > +
+> > > +       ret = __sev_migrate_from(sev_vm->fd, sev_es_vm->fd);
+> > > +       TEST_ASSERT(
+> > > +               ret == -1 && errno == EINVAL,
+> > > +               "Should not be able migrate to SEV enabled VM. ret: %d, errno: %d\n",
+> > > +               ret, errno);
+> > > +
+> > > +       ret = __sev_migrate_from(sev_es_vm->fd, sev_vm->fd);
+> > > +       TEST_ASSERT(
+> > > +               ret == -1 && errno == EINVAL,
+> > > +               "Should not be able migrate to SEV-ES enabled VM. ret: %d, errno: %d\n",
+> > > +               ret, errno);
+> > > +
+> > > +       ret = __sev_migrate_from(vm_no_vcpu->fd, sev_es_vm->fd);
+> > > +       TEST_ASSERT(
+> > > +               ret == -1 && errno == EINVAL,
+> > > +               "SEV-ES migrations require same number of vCPUS. ret: %d, errno: %d\n",
+> > > +               ret, errno);
+> >
+> > How do we know that this failed because `vm_no_vcpu` has no vCPUs or
+> > because it's not a SEV-ES VM?
 >
-> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-> index c0101db75ad4..cf2f4a034dbe 100644
-> --- a/arch/arm64/kvm/arch_timer.c
-> +++ b/arch/arm64/kvm/arch_timer.c
-> @@ -84,11 +84,9 @@ u64 timer_get_cval(struct arch_timer_context *ctxt)
->  
->  static u64 timer_get_offset(struct arch_timer_context *ctxt)
->  {
-> -	struct kvm_vcpu *vcpu = ctxt->vcpu;
-> -
->  	switch(arch_timer_ctx_index(ctxt)) {
->  	case TIMER_VTIMER:
-> -		return __vcpu_sys_reg(vcpu, CNTVOFF_EL2);
-> +		return ctxt->host_offset;
->  	default:
->  		return 0;
->  	}
-> @@ -128,17 +126,33 @@ static void timer_set_cval(struct arch_timer_context *ctxt, u64 cval)
->  
->  static void timer_set_offset(struct arch_timer_context *ctxt, u64 offset)
->  {
-> -	struct kvm_vcpu *vcpu = ctxt->vcpu;
-> -
->  	switch(arch_timer_ctx_index(ctxt)) {
->  	case TIMER_VTIMER:
-> -		__vcpu_sys_reg(vcpu, CNTVOFF_EL2) = offset;
-> +		ctxt->host_offset = offset;
->  		break;
->  	default:
->  		WARN(offset, "timer %ld\n", arch_timer_ctx_index(ctxt));
->  	}
->  }
->  
-> +static void timer_set_guest_offset(struct arch_timer_context *ctxt, u64 offset)
-> +{
-> +	struct kvm_vcpu *vcpu = ctxt->vcpu;
-> +
-> +	switch (arch_timer_ctx_index(ctxt)) {
-> +	case TIMER_VTIMER: {
-> +		u64 host_offset = timer_get_offset(ctxt);
-> +
-> +		host_offset += offset - __vcpu_sys_reg(vcpu, CNTVOFF_EL2);
-> +		__vcpu_sys_reg(vcpu, CNTVOFF_EL2) = offset;
-> +		timer_set_offset(ctxt, host_offset);
-> +		break;
-> +	}
-> +	default:
-> +		WARN_ONCE(offset, "timer %ld\n", arch_timer_ctx_index(ctxt));
-> +	}
-> +}
-> +
->  u64 kvm_phys_timer_read(void)
->  {
->  	return timecounter->cc->read(timecounter->cc);
-> @@ -749,7 +763,8 @@ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu)
->  
->  /* Make offset updates for all timer contexts atomic */
->  static void update_timer_offset(struct kvm_vcpu *vcpu,
-> -				enum kvm_arch_timers timer, u64 offset)
-> +				enum kvm_arch_timers timer, u64 offset,
-> +				bool guest_visible)
->  {
->  	int i;
->  	struct kvm *kvm = vcpu->kvm;
-> @@ -758,13 +773,20 @@ static void update_timer_offset(struct kvm_vcpu *vcpu,
->  	lockdep_assert_held(&kvm->lock);
->  
->  	kvm_for_each_vcpu(i, tmp, kvm)
-> -		timer_set_offset(vcpu_get_timer(tmp, timer), offset);
-> +		if (guest_visible)
-> +			timer_set_guest_offset(vcpu_get_timer(tmp, timer),
-> +					       offset);
-> +		else
-> +			timer_set_offset(vcpu_get_timer(tmp, timer), offset);
->  
->  	/*
->  	 * When called from the vcpu create path, the CPU being created is not
->  	 * included in the loop above, so we just set it here as well.
->  	 */
-> -	timer_set_offset(vcpu_get_timer(vcpu, timer), offset);
-> +	if (guest_visible)
-> +		timer_set_guest_offset(vcpu_get_timer(vcpu, timer), offset);
-> +	else
-> +		timer_set_offset(vcpu_get_timer(vcpu, timer), offset);
->  }
->  
->  static void update_vtimer_cntvoff(struct kvm_vcpu *vcpu, u64 cntvoff)
-> @@ -772,7 +794,7 @@ static void update_vtimer_cntvoff(struct kvm_vcpu *vcpu, u64 cntvoff)
->  	struct kvm *kvm = vcpu->kvm;
->  
->  	mutex_lock(&kvm->lock);
-> -	update_timer_offset(vcpu, TIMER_VTIMER, cntvoff);
-> +	update_timer_offset(vcpu, TIMER_VTIMER, cntvoff, true);
->  	mutex_unlock(&kvm->lock);
->  }
->  
-> diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
-> index 51c19381108c..9d65d4a29f81 100644
-> --- a/include/kvm/arm_arch_timer.h
-> +++ b/include/kvm/arm_arch_timer.h
-> @@ -42,6 +42,9 @@ struct arch_timer_context {
->  	/* Duplicated state from arch_timer.c for convenience */
->  	u32				host_timer_irq;
->  	u32				host_timer_irq_flags;
-> +
-> +	/* offset relative to the host's physical counter-timer */
-> +	u64				host_offset;
+> Actually with V8 we only migrate to none SEV(-ES)? enabled guests.
 
-I find the name and the comment very confusing. The name makes me think it
-represents the host's virtual timer offset, but that is always 0. Judging from the
-code, host_offset refers to the guest's virtual timer offset. The comment refers
-to the host's physical counter-timer, which makes me believe the opposite, that
-it's the offset from the physical timer.
+I think my point is that the test case should be written to treat the
+underlying KVM code as a black box. Without looking at the KVM code,
+the test case should be setup to be accepted perfectly by KVM and then
+mutated in a minimal way to trigger the intended failure case.
 
-Thanks,
+Here, we've defined `vm_no_vcpu`, which as far as I can tell is: (1)
+not a SEV VM, (2) not a SEV-ES VM, (3) has no vCPUs. Based on the
+error message in the TEST_ASSERT, the intention here is to verify that
+a migration that would otherwise works, fails because the target has a
+different number of vCPUs than the source. Therefore, I think
+`vm_no_vcpu` should be defined as a SEV-ES VM, so that the test case
+is setup such that it would've otherwise passed if `vm_no_vcpu` had
+the correct number of vCPUs added.
 
-Alex
+>
+> >
+> > > +
+> > > +       ret = __sev_migrate_from(vm_no_vcpu->fd, sev_es_vm_no_vmsa->fd);
+> > > +       TEST_ASSERT(
+> > > +               ret == -1 && errno == EINVAL,
+> > > +               "SEV-ES migrations require UPDATE_VMSA. ret %d, errno: %d\n",
+> > > +               ret, errno);
+> >
+> > Same question. How do we know why this failed? `sev_es_vm_no_vmsa` did
+> > not have any vCPUs added. Would it be cleaner to add an additional
+> > param to `sev_vm_create()` to skip calling UPDATE_VMSA? Then,
+> > `sev_es_vm_no_vmsa` can be created from `sev_vm_create()` and it's
+> > obvious to the read that the VMs are identical except for this aspect.
+> >
+> > > +
+> > > +       ret = __sev_migrate_from(vm_no_vcpu->fd, vm_no_sev->fd);
+> > > +       TEST_ASSERT(ret == -1 && errno == EINVAL,
+> > > +                   "Migrations require SEV enabled. ret %d, errno: %d\n", ret,
+> > > +                   errno);
+> >
+> > `vm_no_sev` has vCPUs. Therefore, how do we know why this failed --
+> > (a) differing vCPU counts or (b) no SEV?
+>
+> Ditto we require dst to be none SEV enabled.
 
->  };
->  
->  struct timer_map {
+Understood. But I think the test should treat KVM as a black box.
+Therefore, I think in this test case, `vm_no_vcpu` should be defined
+to have the same number of vCPUs as `vm_no_sev`.
+
+>
+> >
+> > > +}
+> > > +
+> > > +int main(int argc, char *argv[])
+> > > +{
+> > > +       test_sev_migrate_from(/* es= */ false);
+> > > +       test_sev_migrate_from(/* es= */ true);
+> > > +       test_sev_migrate_locking();
+> > > +       test_sev_migrate_parameters();
+> > > +       return 0;
+> > > +}
+> > > --
+> > > 2.33.0.309.g3052b89438-goog
+> > >
