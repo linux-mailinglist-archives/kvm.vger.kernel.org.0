@@ -2,119 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8127E41453D
-	for <lists+kvm@lfdr.de>; Wed, 22 Sep 2021 11:35:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5D955414555
+	for <lists+kvm@lfdr.de>; Wed, 22 Sep 2021 11:38:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234387AbhIVJhO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Sep 2021 05:37:14 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41198 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234388AbhIVJhN (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 22 Sep 2021 05:37:13 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 18M80aF3029224;
-        Wed, 22 Sep 2021 05:35:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=1qehM8NKMfNJcBQOyakbw6L+bnhEY5Zr5z5Wv3Sjm1s=;
- b=F7buMNIght93koiJLFIvc/NNn3RFQ43zpwHCIN81ahU1uLsYq2Fi6R7tiwMs2PUzslMe
- HiJwvBVwxrX0iSmezfcUf0yOYqVZSjtMO7nQ0wMwAO0zbJEYkHzoNDOx6C1RGRYQi7oT
- cS9Jm97lcHmy1+VSK0yph430K+ibCLELOFZ6DOoITpz0iAvYKmFbs8y03v9nlWsmuHS1
- hOL+s7jFfDbuWUGMrrGM+HedFQ/iWBbBEyhi7Oy28TtS7mpc59PGgALCsnmTeIkXEVi3
- GFqqTVs/yACHF4hpLZG9FRgA3RZRPe84I+rha1AQCDIQbGWMTAK0vDR/e7l3JDsYjFxn /g== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3b80kr9yq5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 22 Sep 2021 05:35:43 -0400
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 18M8Ru5m006675;
-        Wed, 22 Sep 2021 05:35:42 -0400
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3b80kr9ype-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 22 Sep 2021 05:35:42 -0400
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 18M9VqWQ025276;
-        Wed, 22 Sep 2021 09:35:40 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma06ams.nl.ibm.com with ESMTP id 3b7q6nmv29-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 22 Sep 2021 09:35:40 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 18M9Uoak51970540
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 22 Sep 2021 09:30:50 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B0AB7AE056;
-        Wed, 22 Sep 2021 09:35:36 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 21869AE05A;
-        Wed, 22 Sep 2021 09:35:36 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.145.3.24])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 22 Sep 2021 09:35:36 +0000 (GMT)
-Date:   Wed, 22 Sep 2021 11:34:59 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, thuth@redhat.com, david@redhat.com,
-        linux-s390@vger.kernel.org, seiden@linux.ibm.com
-Subject: Re: [kvm-unit-tests PATCH 9/9] s390x: skrf: Fix tprot assembly
-Message-ID: <20210922113459.56737df3@p-imbrenda>
-In-Reply-To: <20210922071811.1913-10-frankja@linux.ibm.com>
-References: <20210922071811.1913-1-frankja@linux.ibm.com>
-        <20210922071811.1913-10-frankja@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        id S234421AbhIVJkT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Sep 2021 05:40:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44686 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234418AbhIVJkK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Sep 2021 05:40:10 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DBE7C061574;
+        Wed, 22 Sep 2021 02:38:19 -0700 (PDT)
+Received: from zn.tnic (p200300ec2f0efa00e1b20f6d5f00f371.dip0.t-ipconnect.de [IPv6:2003:ec:2f0e:fa00:e1b2:f6d:5f00:f371])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 8A4101EC04E4;
+        Wed, 22 Sep 2021 11:38:13 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1632303493;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=nehvbtp+iVTeyyMzkseD676nsbARQC8Fz0zTVaQUD18=;
+        b=Im+KSGCT0T1VMIm8WO9h8Oks9HOlxtRwhQ2VGhoavv9UnIJXkRFGzamH4+IXhhr91N63Ig
+        T/5OuKTubgkJFniabg0xpI4tI1Ug9MzWuyRJWRm0jpakGBieOuo2UNPhUqYrVoqe6s8/OS
+        5kRFMMx8KdGgGAVsjHy9KQLo2KiOfD4=
+Date:   Wed, 22 Sep 2021 11:38:08 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Ashish Kalra <ashish.kalra@amd.com>,
+        Steve Rutherford <srutherford@google.com>, pbonzini@redhat.com,
+        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
+        joro@8bytes.org, thomas.lendacky@amd.com, x86@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        brijesh.singh@amd.com, dovmurik@linux.ibm.com, tobin@linux.ibm.com,
+        jejb@linux.ibm.com, dgilbert@redhat.com
+Subject: Re: [PATCH v6 1/5] x86/kvm: Add AMD SEV specific Hypercall3
+Message-ID: <YUr5gCgNe7tT0U/+@zn.tnic>
+References: <cover.1629726117.git.ashish.kalra@amd.com>
+ <6fd25c749205dd0b1eb492c60d41b124760cc6ae.1629726117.git.ashish.kalra@amd.com>
+ <CABayD+fnZ+Ho4qoUjB6YfWW+tFGUuftpsVBF3d=-kcU0-CEu0g@mail.gmail.com>
+ <YUixqL+SRVaVNF07@google.com>
+ <20210921095838.GA17357@ashkalra_ubuntu_server>
+ <YUnjEU+1icuihmbR@google.com>
+ <YUnxa2gy4DzEI2uY@zn.tnic>
+ <YUoDJxfNZgNjY8zh@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: Ohpbl40oOlP-gG2ThfUq2YpChstPtoMX
-X-Proofpoint-ORIG-GUID: 72yWcRWxX2Qw5aM16M1awaFPFmMRIpSS
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.391,FMLib:17.0.607.475
- definitions=2021-09-22_03,2021-09-20_01,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 bulkscore=0
- mlxlogscore=999 mlxscore=0 malwarescore=0 adultscore=0 lowpriorityscore=0
- impostorscore=0 clxscore=1015 suspectscore=0 priorityscore=1501
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2109200000 definitions=main-2109220066
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <YUoDJxfNZgNjY8zh@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 22 Sep 2021 07:18:11 +0000
-Janosch Frank <frankja@linux.ibm.com> wrote:
+On Tue, Sep 21, 2021 at 04:07:03PM +0000, Sean Christopherson wrote:
+> init_hypervisor_platform(), after x86_init.hyper.init_platform() so that the
+> PV support can set the desired feature flags.  Since kvm_hypercall*() is only
+> used by KVM guests, set_cpu_cap(c, X86_FEATURE_VMMCALL) can be moved out of
+> early_init_amd/hygon() and into kvm_init_platform().
 
-> It's a base + displacement address so we need to address it via 0(%[addr]).
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+See below.
 
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> Another option would be to refactor apply_alternatives() to allow
+> the caller to provide a different feature check mechanism than
+> boot_cpu_has(), which I think would let us drop X86_FEATURE_VMMCALL,
+> X86_FEATURE_VMCALL, and X86_FEATURE_VMW_VMMCALL from cpufeatures. That
+> might get more than a bit gross though.
 
-but see comment below
+Uuuf.
 
-> ---
->  s390x/skrf.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/s390x/skrf.c b/s390x/skrf.c
-> index 8ca7588c..84fb762c 100644
-> --- a/s390x/skrf.c
-> +++ b/s390x/skrf.c
-> @@ -103,7 +103,7 @@ static void test_tprot(void)
->  {
->  	report_prefix_push("tprot");
->  	expect_pgm_int();
-> -	asm volatile("tprot	%[addr],0xf0(0)\n"
-> +	asm volatile("tprot	0(%[addr]),0xf0(0)\n"
+So here's what I'm seeing (line numbers given to show when stuff
+happens):
 
-I think the displacement defaults to 0 if not specified?
+start_kernel
+|-> 953: setup_arch
+    |-> 794: early_cpu_init
+    |-> 936: init_hypervisor_platform
+|
+|-> 1134: check_bugs
+	  |-> alternative_instructions
 
-did you get a warning, or why are you changing this now?
+at line 794 setup_arch() calls early_cpu_init() which would end up
+setting X86_FEATURE_VMMCALL on an AMD guest, based on CPUID information.
 
->  		     : : [addr] "a" (pagebuf) : );
->  	check_pgm_int_code(PGM_INT_CODE_SPECIAL_OPERATION);
->  	report_prefix_pop();
+init_hypervisor_platform() happens after that.
 
+The alternatives patching happens in check_bugs() at line 1134. Which
+means, if one would consider moving the patching up, one would have
+to audit all the code between line 953 and 1134, whether it does
+set_cpu_cap() or some of the other helpers to set or clear bits in
+boot_cpu_data which controls the patching.
+
+So for that I have only one thing to say: can'o'worms. We tried to move
+the memblock allocations placement in the boot process and generated at
+least 4 regressions. I'm still testing the fix for the fix for the 4th
+regression.
+
+So moving stuff in the fragile boot process makes my hair stand up.
+
+Refactoring apply_alternatives() to patch only for X86_FEATURE_VMMCALL
+and then patch again, I dunno, this stuff is fragile and it might cause
+some other similarly nasty fallout. And those are hard to debug because
+one does not see immediately when boot_cpu_data features are missing and
+functionality is behaving differently because of that.
+
+So what's wrong with:
+
+kvm_hypercall3:
+
+	if (cpu_feature_enabled(X86_FEATURE_VMMCALL))
+		return kvm_sev_hypercall3(...);
+
+	/* rest of code */
+
+?
+
+Dunno we probably had that already in those old versions and maybe that
+was shot down for another reason but it should get you what you want
+without having to test the world and more for regressions possibly
+happening from disturbing the house of cards called x86 boot order.
+
+IMHO, I'd say.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
