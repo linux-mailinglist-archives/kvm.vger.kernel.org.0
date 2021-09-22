@@ -2,74 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 61920414D03
-	for <lists+kvm@lfdr.de>; Wed, 22 Sep 2021 17:30:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D9346414D38
+	for <lists+kvm@lfdr.de>; Wed, 22 Sep 2021 17:37:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236422AbhIVPb7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Sep 2021 11:31:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:44621 "EHLO
+        id S236463AbhIVPjL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Sep 2021 11:39:11 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:53470 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236395AbhIVPb6 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 22 Sep 2021 11:31:58 -0400
+        by vger.kernel.org with ESMTP id S236477AbhIVPjK (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 22 Sep 2021 11:39:10 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632324628;
+        s=mimecast20190719; t=1632325060;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=d3JsLpxzQ+uhSu3TGOCWtptCmz4xP0JT6j/hot5bD5w=;
-        b=BwD2cZWvnbp6icZN7rR1YOW2VoSQvSJks460NA1mERvpBB2Lxdjc0Cs69Ap8PpOqVozPdK
-        +BwRDIbu31o6pwYCfzb6gRB150ai8nbuUl0Ts4WEgN3E1WVPeETkq4t3/+ZdPchRDun8PG
-        n8IMX8Dtj/JMJUbD7PT9SDxmU3JVF7U=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-248-V0oyaDIyMsSTEcIGk3VDzw-1; Wed, 22 Sep 2021 11:30:27 -0400
-X-MC-Unique: V0oyaDIyMsSTEcIGk3VDzw-1
-Received: by mail-ed1-f69.google.com with SMTP id c7-20020a05640227c700b003d27f41f1d4so3448832ede.16
-        for <kvm@vger.kernel.org>; Wed, 22 Sep 2021 08:30:26 -0700 (PDT)
+        bh=yPMfBTlyhQaNIBRsQlgsKkEXI7vjlBDH2c8APmBdvAw=;
+        b=dT1p/WT4wrWIQ6UyqHMatzrNPTJ5pIImQ+JDI4c5yLOSIvBC2XMynthPikwplSvtWwqsa3
+        o3I9zxBuYAhBLXFX7Ebkfcmr0JBjO46D8w5O9Z0fxQ4n8E98hQCGSYky82x+IfsYOLCfO6
+        0z9LPeYti4xV4YAWxm1WBA0L+SA1rnQ=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-136-ExqxGsXkPkKjqJ8Qo4N0pA-1; Wed, 22 Sep 2021 11:37:39 -0400
+X-MC-Unique: ExqxGsXkPkKjqJ8Qo4N0pA-1
+Received: by mail-ed1-f72.google.com with SMTP id m20-20020aa7c2d4000000b003d1add00b8aso3593092edp.0
+        for <kvm@vger.kernel.org>; Wed, 22 Sep 2021 08:37:38 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=d3JsLpxzQ+uhSu3TGOCWtptCmz4xP0JT6j/hot5bD5w=;
-        b=4dUywdODSHCYyZ0/oov3/yI3xwME5kPkGBKV2cj7yVtMypNNxZL/mrCJLbn3f3sxT+
-         7d/tj5BJ4WYgJSxvVS2t7HAwIBj2Wn3arpdnTz5zuUD+zQYA2UUYgVs/X1I4FZPNlyq/
-         jHdPHHFrvbOoDfIowpO8AjdOcvKToPCR5+506OFiqLDg5uvbEKASQA6QPKewdA2v/EBg
-         uwkngslUZ7Je/ZV2Gl/q4b0V+RmbLeQ/tLC+x6Ze1CB9hcdul2MBJuHp64wSRofmfxw9
-         pzcgdrLAbjO8TMNuXEvEeGMlx4z7Apkw1Hz3tsghN3E3DikpB97LVpFL2EwZnKHfsiyG
-         ZJ/A==
-X-Gm-Message-State: AOAM531MWp+3z/I8bIiuAGJVJDRBzfTmdqzwldHDRHr9nIX605mSHweo
-        ISTkS4SIz7SvvAkvZ3VCoDZDaJxM+TCtLx9viIdQSNMtGokYRWVYgGp2NuF8knHT67+HhV8O5IQ
-        hIPLQ/bVc1ubf
-X-Received: by 2002:a50:c31c:: with SMTP id a28mr216091edb.384.1632324625936;
-        Wed, 22 Sep 2021 08:30:25 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw02+/MQdKVUxCJnsyoBcCJU+R107o2lVynj8H1Ua46GB1mUTBMgqeB9rChSSQAr9JrISxe/g==
-X-Received: by 2002:a50:c31c:: with SMTP id a28mr216042edb.384.1632324625725;
-        Wed, 22 Sep 2021 08:30:25 -0700 (PDT)
+        bh=yPMfBTlyhQaNIBRsQlgsKkEXI7vjlBDH2c8APmBdvAw=;
+        b=0cbpFE3Eks3BCo4EDLAqRT10/5NUuAUtroxp+VKJ0B241lfiqldlsDgu9j1mz1KVnN
+         rATfcdhjWtgAWxYOrXb4n5rdUsA2zXKNHg3stS0NB+/jHLRFVnxSwXnIwNLosoYJlRhO
+         5+HsEKFXv70mwcidMHTuymf5Pw35sysvzGG5N3bKHaQZm3ro+o5g04E1hZChDj0ClGHz
+         VNAf219Je7VlT4CFgZLVSokxFU9cyjjP9Q+Oaunq+ZHnpQIgX02C25RS/fQsC457n62x
+         qB1R+ghhN24/1sSxwNcpWhdS+nu854J/MqARW3Mp5U+Xy4uNITZCF9je8gyXK6/M6k0M
+         tnMA==
+X-Gm-Message-State: AOAM533HA/O5bjGFd9y9M/oWU7QNZwQ8a28L9CaQYXwreUIsqgflfo3n
+        MXVvn7rA7m73Bt8eiaN6bgPEB2Z6TYvyXazP8ygPBMV+9C4C5Hx5ak/XjTCJhpn7V6fC9KAMDE6
+        OUpnYfo80HxoT
+X-Received: by 2002:a17:907:1df1:: with SMTP id og49mr176118ejc.35.1632325057663;
+        Wed, 22 Sep 2021 08:37:37 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxqc1iXc2OLrx6isUvPIHnN9Gan4Ne4+V8C0dmc4M3Gy8q4yKHumt8T875e2Dt+Me/ihh1nbg==
+X-Received: by 2002:a17:907:1df1:: with SMTP id og49mr176096ejc.35.1632325057433;
+        Wed, 22 Sep 2021 08:37:37 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id n13sm1186280ejk.97.2021.09.22.08.30.21
+        by smtp.gmail.com with ESMTPSA id z20sm1398413edl.61.2021.09.22.08.37.36
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 22 Sep 2021 08:30:25 -0700 (PDT)
-Subject: Re: [PATCH] kvm: x86: Add AMD PMU MSRs to msrs_to_save_all[]
-To:     Fares Mehanna <faresx@amazon.de>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20210915133951.22389-1-faresx@amazon.de>
+        Wed, 22 Sep 2021 08:37:36 -0700 (PDT)
+Subject: Re: [PATCH v1 3/3] KVM: arm64: Add histogram stats for handling time
+ of arch specific exit reasons
+To:     Marc Zyngier <maz@kernel.org>, Jing Zhang <jingzhangos@google.com>
+Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>,
+        Will Deacon <will@kernel.org>,
+        David Matlack <dmatlack@google.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Sean Christopherson <seanjc@google.com>
+References: <20210922010851.2312845-1-jingzhangos@google.com>
+ <20210922010851.2312845-3-jingzhangos@google.com>
+ <87czp0voqg.wl-maz@kernel.org>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <3932c56b-a12a-904d-b727-1dad2b1d35b1@redhat.com>
-Date:   Wed, 22 Sep 2021 17:30:20 +0200
+Message-ID: <d16ecbd2-2bc9-2691-a21d-aef4e6f007b9@redhat.com>
+Date:   Wed, 22 Sep 2021 17:37:35 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <20210915133951.22389-1-faresx@amazon.de>
+In-Reply-To: <87czp0voqg.wl-maz@kernel.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -77,40 +77,18 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 15/09/21 15:39, Fares Mehanna wrote:
-> Intel PMU MSRs is in msrs_to_save_all[], so add AMD PMU MSRs to have a
-> consistent behavior between Intel and AMD when using KVM_GET_MSRS,
-> KVM_SET_MSRS or KVM_GET_MSR_INDEX_LIST.
-> 
-> We have to add legacy and new MSRs to handle guests running without
-> X86_FEATURE_PERFCTR_CORE.
-> 
-> Signed-off-by: Fares Mehanna <faresx@amazon.de>
-> ---
->   arch/x86/kvm/x86.c | 7 +++++++
->   1 file changed, 7 insertions(+)
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 28ef14155726..14bc21fb698c 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -1332,6 +1332,13 @@ static const u32 msrs_to_save_all[] = {
->   	MSR_ARCH_PERFMON_EVENTSEL0 + 12, MSR_ARCH_PERFMON_EVENTSEL0 + 13,
->   	MSR_ARCH_PERFMON_EVENTSEL0 + 14, MSR_ARCH_PERFMON_EVENTSEL0 + 15,
->   	MSR_ARCH_PERFMON_EVENTSEL0 + 16, MSR_ARCH_PERFMON_EVENTSEL0 + 17,
-> +
-> +	MSR_K7_EVNTSEL0, MSR_K7_EVNTSEL1, MSR_K7_EVNTSEL2, MSR_K7_EVNTSEL3,
-> +	MSR_K7_PERFCTR0, MSR_K7_PERFCTR1, MSR_K7_PERFCTR2, MSR_K7_PERFCTR3,
-> +	MSR_F15H_PERF_CTL0, MSR_F15H_PERF_CTL1, MSR_F15H_PERF_CTL2,
-> +	MSR_F15H_PERF_CTL3, MSR_F15H_PERF_CTL4, MSR_F15H_PERF_CTL5,
-> +	MSR_F15H_PERF_CTR0, MSR_F15H_PERF_CTR1, MSR_F15H_PERF_CTR2,
-> +	MSR_F15H_PERF_CTR3, MSR_F15H_PERF_CTR4, MSR_F15H_PERF_CTR5,
->   };
->   
->   static u32 msrs_to_save[ARRAY_SIZE(msrs_to_save_all)];
-> 
+On 22/09/21 13:22, Marc Zyngier wrote:
+> Frankly, this is a job for BPF and the tracing subsystem, not for some
+> hardcoded syndrome accounting. It would allow to extract meaningful
+> information, prevent bloat, and crucially make it optional. Even empty
+> trace points like the ones used in the scheduler would be infinitely
+> better than this (load your own module that hooks into these trace
+> points, expose the data you want, any way you want).
 
-Queued, thanks.
+I agree.  I had left out for later the similar series you had for x86, 
+but I felt the same as Marc; even just counting the number of 
+occurrences of each exit reason is a nontrivial amount of memory to 
+spend on each vCPU.
 
 Paolo
 
