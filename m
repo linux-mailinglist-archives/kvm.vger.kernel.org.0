@@ -2,110 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5FE89415136
-	for <lists+kvm@lfdr.de>; Wed, 22 Sep 2021 22:11:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A9A69415131
+	for <lists+kvm@lfdr.de>; Wed, 22 Sep 2021 22:11:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237535AbhIVUM6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Sep 2021 16:12:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52020 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237325AbhIVUM5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Sep 2021 16:12:57 -0400
-Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A7A8C061574
-        for <kvm@vger.kernel.org>; Wed, 22 Sep 2021 13:11:27 -0700 (PDT)
-Received: by mail-lf1-x134.google.com with SMTP id b15so16188822lfe.7
-        for <kvm@vger.kernel.org>; Wed, 22 Sep 2021 13:11:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=dVTubL4Vzgwqf5bG5nXBsZsCrKLQu1xFmttf3pz2Rh4=;
-        b=AInJtG0K9A1qcgpMhBYjzvczg/GeGNhYQSeJkhDqWeTQIauQOain412w7RTDWhdgPt
-         Yikew3akNNEJ84PFmGQxR/RrMitWuGxtQ2vMKMyhKAWS6HzRaHcthRAAl1l6COhpOO6N
-         vwC51R5I22nAcBcVfK2GuGqghn/9cxsveq3GKhhCL/ZgkqZnecywi10pf1AMF9FtW9jN
-         qvhYv35/VGLRtRe1fKz1wMSoEl4A3MO7hZecLaPPC+p2FnpauNvve77/auSjUY7GSJgH
-         Z7Cd6TEwh95p6NZAbOLGoSeboA1Ug2X0nCTwsaIrd2gcIennnwgDnpKyHbqg/llotpQE
-         CwsA==
+        id S237419AbhIVUMM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Sep 2021 16:12:12 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56578 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S237364AbhIVUML (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 22 Sep 2021 16:12:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1632341441;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=LVDSHQbpVe8JTY8isblrL8p142CPVwt8+X+MPr7eWPw=;
+        b=a233ldhimVDIrls1bZs8+PfFFGWYCGNYZ4CfC0NXQcJty1QiPd0vpUzgKEnlG8O0mA/qEX
+        FvtMxNi3GoN+USyDGNIEwOjzpQ8uEkLtFYkVLucsV7feU+sEEL2I8+RutpvS4r30nUg5m8
+        eNG9RVvSPK7DTCvoozKZB988UmRE2Ro=
+Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com
+ [209.85.167.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-469-nd62RlVEMBOSpShppZZGMw-1; Wed, 22 Sep 2021 16:10:40 -0400
+X-MC-Unique: nd62RlVEMBOSpShppZZGMw-1
+Received: by mail-oi1-f199.google.com with SMTP id y185-20020acaafc2000000b0027359453ad4so2470146oie.6
+        for <kvm@vger.kernel.org>; Wed, 22 Sep 2021 13:10:39 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=dVTubL4Vzgwqf5bG5nXBsZsCrKLQu1xFmttf3pz2Rh4=;
-        b=HF/3oc37ZwHYG+/uLeZ/nt25nGRMJVxSUIi1+9UJx3vy8fSy9xxG/fzmHvGsFyBVEA
-         5WZGQD9Hfyx8+0Q5ykdvcuzRby9fjCqmCaAzcyXl5HwM69BMf/YiKJJsr8QQoCG1wdhg
-         9XgUKj5t35QDugzDa5ExbYF0uIqFJobOO6aP6KbfRrPh7M8r+AuybUJXOH6VmZQiYvOx
-         TLw44un+8gdb0mYNPIgAf/3oiCUcf6guBba2lZd/c2/BvDR+YmMopfW9rfg4y16Igku6
-         jJIrzsfXQ38SwJsgUWtqMdPvj/uIyTBWYC+YEbcGTCOHF1D8Rn9Z/YHNtMmQMe8zLju/
-         PLtg==
-X-Gm-Message-State: AOAM5302yfjHZlJPXDDlKAidHIKpRiKs8mwHHKiUQyBNe+tIWEXe4xOa
-        LwA0kO6w4+QdfdHRgloWm32FdUimEX5kVvB/7sU=
-X-Google-Smtp-Source: ABdhPJyP1zn22cj4nPsmYXdOLfFtQfirEl3asSQzrIaS0usstr2xKTAbNahSPAHJQNqc6wddGne/5ngP4geneNBRFhI=
-X-Received: by 2002:a2e:a604:: with SMTP id v4mr1249400ljp.258.1632341485564;
- Wed, 22 Sep 2021 13:11:25 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=LVDSHQbpVe8JTY8isblrL8p142CPVwt8+X+MPr7eWPw=;
+        b=nNAS/tzMD+573hcIaHesQWDgg4Rf+8bpT1mD5pvSQ9zGvpQvRq8PS8zWtQami5AokO
+         xXlKxd1DEWWOVh9upSHnXGxN0zILKh61gquNAnNg1AUW8RDw4vitODtZe8Aa4gA44p1e
+         fQjALny0OSI1HmGpfwvijcn6IpHVtRHhZmrn5C2qyvbHVljO5s36tbV9ZgLiXLlN2PXB
+         ZQ61jCHDSyZ2EGMVTI695U43V6sGy9N06+8T2I93doQPuBaLCwfnRyfGLv86DN2F8C6E
+         TWi4wr4hvCFn+pOAlJS5cB+LGWG5XgwiWDt6V4TXDArHDxlE+ERjmGQADsCxrKz4s6cP
+         ziwA==
+X-Gm-Message-State: AOAM533mtkNmAQquMlDpV85fR85PHmerbK7V/Zu1UeDhrShauJTETmcw
+        yT07Aa07w198jg+qXbnNqvnxJCjDRYxz87wCFNlz3SdGJkZdew4pi6gF3iHk0gVzH9tkJJMDFt9
+        QPuJwwmAMgZNI
+X-Received: by 2002:aca:5f09:: with SMTP id t9mr785747oib.157.1632341439238;
+        Wed, 22 Sep 2021 13:10:39 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzsexkS3ssuL6wF9vSWKPex4M0QKWRz+hAFF7uOcJjumY+ZptpBRjRLEImjoapaxD27rGKTYw==
+X-Received: by 2002:aca:5f09:: with SMTP id t9mr785712oib.157.1632341438954;
+        Wed, 22 Sep 2021 13:10:38 -0700 (PDT)
+Received: from redhat.com ([198.99.80.109])
+        by smtp.gmail.com with ESMTPSA id a15sm720852otq.13.2021.09.22.13.10.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 Sep 2021 13:10:38 -0700 (PDT)
+Date:   Wed, 22 Sep 2021 14:10:36 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>, "hch@lst.de" <hch@lst.de>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+        "parav@mellanox.com" <parav@mellanox.com>,
+        "lkml@metux.net" <lkml@metux.net>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "lushenming@huawei.com" <lushenming@huawei.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "corbet@lwn.net" <corbet@lwn.net>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "yi.l.liu@linux.intel.com" <yi.l.liu@linux.intel.com>,
+        "Tian, Jun J" <jun.j.tian@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "dwmw2@infradead.org" <dwmw2@infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
+        "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>
+Subject: Re: [RFC 03/20] vfio: Add vfio_[un]register_device()
+Message-ID: <20210922141036.5cd46b2b.alex.williamson@redhat.com>
+In-Reply-To: <20210922122252.GG327412@nvidia.com>
+References: <20210919063848.1476776-1-yi.l.liu@intel.com>
+        <20210919063848.1476776-4-yi.l.liu@intel.com>
+        <20210921160108.GO327412@nvidia.com>
+        <BN9PR11MB5433D4590BA725C79196E0248CA19@BN9PR11MB5433.namprd11.prod.outlook.com>
+        <20210922005337.GC327412@nvidia.com>
+        <BN9PR11MB54338D108AF5A87614717EF98CA29@BN9PR11MB5433.namprd11.prod.outlook.com>
+        <20210922122252.GG327412@nvidia.com>
+Organization: Red Hat
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <20210827031222.2778522-1-zixuanwang@google.com>
- <20210827031222.2778522-2-zixuanwang@google.com> <20210921163311.deya72m7z2dkmhgc@gator.home>
-In-Reply-To: <20210921163311.deya72m7z2dkmhgc@gator.home>
-From:   Zixuan Wang <zxwang42@gmail.com>
-Date:   Wed, 22 Sep 2021 13:10:00 -0700
-Message-ID: <CAEDJ5ZQ4ZP0SaTWZrW6wgFTQtcNJMjkns0cjPC1JX01Fp_RXBg@mail.gmail.com>
-Subject: Re: [kvm-unit-tests PATCH v2 01/17] x86 UEFI: Copy code from Linux
-To:     Andrew Jones <drjones@redhat.com>
-Cc:     Zixuan Wang <zixuanwang@google.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Marc Orr <marcorr@google.com>,
-        "Hyunwook (Wooky) Baek" <baekhw@google.com>,
-        Tom Roeder <tmroeder@google.com>, erdemaktas@google.com,
-        rientjes@google.com, seanjc@google.com, brijesh.singh@amd.com,
-        Thomas.Lendacky@amd.com, varad.gautam@suse.com, jroedel@suse.de,
-        bp@suse.de
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 21, 2021 at 9:33 AM Andrew Jones <drjones@redhat.com> wrote:
->
-> On Fri, Aug 27, 2021 at 03:12:06AM +0000, Zixuan Wang wrote:
-> > From: Varad Gautam <varad.gautam@suse.com>
-> >
-> > Copy UEFI-related definitions from Linux, so the follow-up commits can
-> > develop UEFI function calls based on these definitions, without relying
-> > on GNU-EFI library.
-> >
-> > Signed-off-by: Varad Gautam <varad.gautam@suse.com>
-> > ---
-> >  lib/linux/uefi.h | 518 +++++++++++++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 518 insertions(+)
-> >  create mode 100644 lib/linux/uefi.h
-> >
-> > diff --git a/lib/linux/uefi.h b/lib/linux/uefi.h
-> > new file mode 100644
-> > index 0000000..567cddc
-> > --- /dev/null
-> > +++ b/lib/linux/uefi.h
->
-> Any reason to rename this to uefi.h even though it's efi.h in Linux?
+On Wed, 22 Sep 2021 09:22:52 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-This file is from Varad's patch set [1]. I can rename the file to
-efi.h in the next version if Varad is OK with it.
+> On Wed, Sep 22, 2021 at 09:23:34AM +0000, Tian, Kevin wrote:
+> 
+> > > Providing an ioctl to bind to a normal VFIO container or group might
+> > > allow a reasonable fallback in userspace..  
+> > 
+> > I didn't get this point though. An error in binding already allows the
+> > user to fall back to the group path. Why do we need introduce another
+> > ioctl to explicitly bind to container via the nongroup interface?   
+> 
+> New userspace still needs a fallback path if it hits the 'try and
+> fail'. Keeping the device FD open and just using a different ioctl to
+> bind to a container/group FD, which new userspace can then obtain as a
+> fallback, might be OK.
+> 
+> Hard to see without going through the qemu parts, so maybe just keep
+> it in mind
 
-[1] https://lore.kernel.org/kvm/20210819113400.26516-1-varad.gautam@suse.com/
+If we assume that the container/group/device interface is essentially
+deprecated once we have iommufd, it doesn't make a lot of sense to me
+to tack on a container/device interface just so userspace can avoid
+reverting to the fully legacy interface.
 
-> Usually I'd suggest we take the whole file from Linux (but that would
-> be a mess for this one, so no) or that we only take what we need, when
-> we need it, rather than dumping a bunch of stuff up front which may or
-> may not be needed. Skimming through though, it looks like we'll likely
-> need most the stuff brought over. So I guess I'm OK with this approach.
->
-> Thanks,
-> drew
+But why would we create vfio device interface files at all if they
+can't work?  I'm not really on board with creating a try-and-fail
+interface for a mechanism that cannot work for a given device.  The
+existence of the device interface should indicate that it's supported.
+Thanks,
 
-Thank you for the detailed explanation! Another reason to keep this a
-separate commit is to preserve Varad's full authorship of these 2
-commits. We already re-organized Varad's 6 patches into these 2, and
-do not want to further reduce Varad's authorships.
+Alex
 
-Best regards,
-Zixuan
