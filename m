@@ -2,90 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2C7BA4147B5
-	for <lists+kvm@lfdr.de>; Wed, 22 Sep 2021 13:20:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1BF3E4147BA
+	for <lists+kvm@lfdr.de>; Wed, 22 Sep 2021 13:22:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235622AbhIVLVc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Sep 2021 07:21:32 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28766 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235586AbhIVLV2 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 22 Sep 2021 07:21:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632309598;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=mM5VXmI58akpcs3K7I7iFiF0Ov8PqxzFl08K4hexAMI=;
-        b=eRQcT6CbrzuMqRPMSeMVPB539vH6E2KP0W9aPy5iCA6zRUJfxjZpAinPf3Hjvj+pvZGmuz
-        HPhnYuUTC2moT5rUhVfSm98BFpmeGtuHgf1HDmqTiNxx5FSLMHKGIcvXvvL++B7jjEX3id
-        taX8qpzbfE8a0BeOEygws9heF/r4ey0=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-87-WFxaxzn4MzOXH2uh0OphIw-1; Wed, 22 Sep 2021 07:19:57 -0400
-X-MC-Unique: WFxaxzn4MzOXH2uh0OphIw-1
-Received: by mail-ed1-f69.google.com with SMTP id 14-20020a508e4e000000b003d84544f33eso2732979edx.2
-        for <kvm@vger.kernel.org>; Wed, 22 Sep 2021 04:19:56 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=mM5VXmI58akpcs3K7I7iFiF0Ov8PqxzFl08K4hexAMI=;
-        b=OtMZi9pgDHRyS2F5lD1tswDHYguBOD46hmXX/peSKdg6bhpaHBRpympyvD1uF70tJp
-         mYR4hHlEyNZgjXpCcsrL7GwmiL+l20a32FTv/hOYg4HcwlnKHZeRu1KCFZNf8+n6JTq+
-         8iaJvD/9f0LmsmSDJXkAj60A+udZ3XedgJ4LqhqRCKsFbsHQv+pWoeVoOPcwOxP1fjoW
-         8SByLo1e6ywgXO3bP3hZQPTWdlc7KepXhm69O+G7H8UqeBSBE8p0SnQ9t/eAaXFT5WXZ
-         O6+4yWSwIWHKZDOn6e1GYvzO6CG+ozkqkrNR4SdybO2H/SeOLXkSquUu86qHZON/zA0Y
-         B4sw==
-X-Gm-Message-State: AOAM531uoitq3e1Xfd/Thua14TRIFmd5V/qXQ/bFAkBVZ2GYsh/RCr20
-        bhcSXoVSsh+gmXTAbUQMgImDSBC3PUSnJGvPsfkon/M3mwbbPmX+kU+dbj39NYrEsWwuZsNE4vR
-        Lji2JpqnlqBtx
-X-Received: by 2002:a05:6402:51d2:: with SMTP id r18mr41815545edd.108.1632309595907;
-        Wed, 22 Sep 2021 04:19:55 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyJDDT9/sA4pO1Xp2Sgz12Z3rLjflnS/C4nVxy1R6VLaR4Jo/8bxeTcnus3Xzg95TO+xhIOhg==
-X-Received: by 2002:a05:6402:51d2:: with SMTP id r18mr41815525edd.108.1632309595692;
-        Wed, 22 Sep 2021 04:19:55 -0700 (PDT)
-Received: from gator.home (cst2-174-28.cust.vodafone.cz. [31.30.174.28])
-        by smtp.gmail.com with ESMTPSA id q6sm897041eju.45.2021.09.22.04.19.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Sep 2021 04:19:54 -0700 (PDT)
-Date:   Wed, 22 Sep 2021 13:19:53 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Ben Gardon <bgardon@google.com>,
-        David Matlack <dmatlack@google.com>, kvm <kvm@vger.kernel.org>,
-        Axel Rasmussen <axelrasmussen@google.com>,
-        Yanan Wang <wangyanan55@huawei.com>
-Subject: Re: [PATCH 3/3] KVM: selftests: Fix dirty bitmap offset calculation
-Message-ID: <20210922111953.sc66aavyghobf2lf@gator.home>
-References: <20210915213034.1613552-1-dmatlack@google.com>
- <20210915213034.1613552-4-dmatlack@google.com>
- <CANgfPd_WkrdXJ3qYmv_DKLbKDsNs8KJK4i9sX3+kR_cwNmbJ_w@mail.gmail.com>
- <20210916084922.x33twpy74auxojrk@gator.home>
- <11b4e1ba-e9cd-8bc7-4c5d-a7b79611c20f@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <11b4e1ba-e9cd-8bc7-4c5d-a7b79611c20f@redhat.com>
+        id S235648AbhIVLYU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Sep 2021 07:24:20 -0400
+Received: from mail.kernel.org ([198.145.29.99]:40588 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S235151AbhIVLYT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Sep 2021 07:24:19 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 2D15660560;
+        Wed, 22 Sep 2021 11:22:50 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1mT0Ku-00CJGO-5T; Wed, 22 Sep 2021 12:22:48 +0100
+Date:   Wed, 22 Sep 2021 12:22:47 +0100
+Message-ID: <87czp0voqg.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Jing Zhang <jingzhangos@google.com>
+Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Will Deacon <will@kernel.org>,
+        David Matlack <dmatlack@google.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Sean Christopherson <seanjc@google.com>
+Subject: Re: [PATCH v1 3/3] KVM: arm64: Add histogram stats for handling time of arch specific exit reasons
+In-Reply-To: <20210922010851.2312845-3-jingzhangos@google.com>
+References: <20210922010851.2312845-1-jingzhangos@google.com>
+        <20210922010851.2312845-3-jingzhangos@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: jingzhangos@google.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, will@kernel.org, dmatlack@google.com, pshier@google.com, oupton@google.com, seanjc@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 22, 2021 at 01:09:57PM +0200, Paolo Bonzini wrote:
-> On 16/09/21 10:49, Andrew Jones wrote:
-> > > I was a little confused initially because we're allocating only one
-> > > dirty bitmap in userspace even when we have multiple slots, but that's
-> > > not a problem.
-> > It's also confusing to me. Wouldn't it be better to create a bitmap per
-> > slot? I think the new constraint that host mem must be a multiple of 64
-> > is unfortunate.
+Hi Jing,
+
+On Wed, 22 Sep 2021 02:08:51 +0100,
+Jing Zhang <jingzhangos@google.com> wrote:
 > 
-> Yeah, I wouldn't mind if someone took a look at that.  Also because anyway
-> this patch doesn't apply to master right now, I've queued 1-2 only.
+> These logarithmic histogram stats are useful for monitoring performance
+> of handling for different kinds of VCPU exit reasons.
+> 
+> Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> ---
+>  arch/arm64/include/asm/kvm_host.h | 36 ++++++++++++
+>  arch/arm64/kvm/arm.c              |  4 ++
+>  arch/arm64/kvm/guest.c            | 43 ++++++++++++++
+>  arch/arm64/kvm/handle_exit.c      | 95 +++++++++++++++++++++++++++++++
+>  4 files changed, 178 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 4d65de22add3..f1a29ca3d4f3 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -417,6 +417,9 @@ struct kvm_vcpu_arch {
+>  
+>  	/* Arch specific exit reason */
+>  	enum arm_exit_reason exit_reason;
+> +
+> +	/* The timestamp for the last VCPU exit */
+> +	u64 last_exit_time;
+>  };
+>  
+>  /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
+> @@ -605,6 +608,8 @@ struct kvm_vm_stat {
+>  	struct kvm_vm_stat_generic generic;
+>  };
+>  
+> +#define ARM_EXIT_HIST_CNT	64
+> +
+>  struct kvm_vcpu_stat {
+>  	struct kvm_vcpu_stat_generic generic;
+>  	u64 mmio_exit_user;
+> @@ -641,6 +646,36 @@ struct kvm_vcpu_stat {
+>  		u64 exit_fp_asimd;
+>  		u64 exit_pac;
+>  	};
+> +	/* Histogram stats for handling time of arch specific exit reasons */
+> +	struct {
+> +		u64 exit_unknown_hist[ARM_EXIT_HIST_CNT];
+> +		u64 exit_irq_hist[ARM_EXIT_HIST_CNT];
+> +		u64 exit_el1_serror_hist[ARM_EXIT_HIST_CNT];
+> +		u64 exit_hyp_gone_hist[ARM_EXIT_HIST_CNT];
+> +		u64 exit_il_hist[ARM_EXIT_HIST_CNT];
+> +		u64 exit_wfi_hist[ARM_EXIT_HIST_CNT];
+> +		u64 exit_wfe_hist[ARM_EXIT_HIST_CNT];
+> +		u64 exit_cp15_32_hist[ARM_EXIT_HIST_CNT];
+> +		u64 exit_cp15_64_hist[ARM_EXIT_HIST_CNT];
+> +		u64 exit_cp14_32_hist[ARM_EXIT_HIST_CNT];
+> +		u64 exit_cp14_ls_hist[ARM_EXIT_HIST_CNT];
+> +		u64 exit_cp14_64_hist[ARM_EXIT_HIST_CNT];
+> +		u64 exit_hvc32_hist[ARM_EXIT_HIST_CNT];
+> +		u64 exit_smc32_hist[ARM_EXIT_HIST_CNT];
+> +		u64 exit_hvc64_hist[ARM_EXIT_HIST_CNT];
+> +		u64 exit_smc64_hist[ARM_EXIT_HIST_CNT];
+> +		u64 exit_sys64_hist[ARM_EXIT_HIST_CNT];
+> +		u64 exit_sve_hist[ARM_EXIT_HIST_CNT];
+> +		u64 exit_iabt_low_hist[ARM_EXIT_HIST_CNT];
+> +		u64 exit_dabt_low_hist[ARM_EXIT_HIST_CNT];
+> +		u64 exit_softstp_low_hist[ARM_EXIT_HIST_CNT];
+> +		u64 exit_watchpt_low_hist[ARM_EXIT_HIST_CNT];
+> +		u64 exit_breakpt_low_hist[ARM_EXIT_HIST_CNT];
+> +		u64 exit_bkpt32_hist[ARM_EXIT_HIST_CNT];
+> +		u64 exit_brk64_hist[ARM_EXIT_HIST_CNT];
+> +		u64 exit_fp_asimd_hist[ARM_EXIT_HIST_CNT];
+> +		u64 exit_pac_hist[ARM_EXIT_HIST_CNT];
+> +	};
 
-David posted a v2 on Sept. 17 with the bitmap split up per slot for patch
-3/3. I think the other patches got some tweaks too.
+I'm sorry, but I don't think this is right, and I really wish you had
+reached out before putting any effort in this.
 
-Thanks
-drew
+This appears to be as ~13kB per vcpu worth of data that means
+*nothing*. Counting exception syndrome occurrences doesn't say
+anything about how important the associated exception is. A few
+examples:
 
+- exit_hyp_gone_hist: KVM is gone. We've removed the hypervisor. What
+  is the point of this? How many values do you expect?
+
+- exit_dabt_low_hist: page faults. Crucial data, isn't it? Permission,
+  Access, or Translation fault? At which level? Caused by userspace or
+  kernel? Resulted in a page being allocated or not? Read from swap?
+  Successful or not?
+
+- exit_pac_hist, exit_fp_asimd_hist: actually handled early, and only
+  end-up in that part of the hypervisor when there is nothing to do
+  (either there is no corresponding HW or the feature is disabled).
+
+- exit_sys64_hist: System register traps. Which sysreg? With what effect?
+
+Blindly exposing these numbers doesn't result in anything that can be
+used for any sort of useful analysis and bloats the already huge data
+structures. It also affects every single user, most of which do not
+care about this data. It also doesn't scale. Are you going to keep
+adding these counters and histograms every time the architecture (or
+KVM itself) grows some new event?
+
+Frankly, this is a job for BPF and the tracing subsystem, not for some
+hardcoded syndrome accounting. It would allow to extract meaningful
+information, prevent bloat, and crucially make it optional. Even empty
+trace points like the ones used in the scheduler would be infinitely
+better than this (load your own module that hooks into these trace
+points, expose the data you want, any way you want).
+
+As it stands, there is no way I'd be considering merging something
+that looks like this series.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
