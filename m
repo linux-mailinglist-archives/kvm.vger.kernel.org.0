@@ -2,64 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DC73F415417
-	for <lists+kvm@lfdr.de>; Thu, 23 Sep 2021 01:46:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6B1AC41542E
+	for <lists+kvm@lfdr.de>; Thu, 23 Sep 2021 01:49:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238507AbhIVXsV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Sep 2021 19:48:21 -0400
-Received: from mga09.intel.com ([134.134.136.24]:6302 "EHLO mga09.intel.com"
+        id S238522AbhIVXuy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Sep 2021 19:50:54 -0400
+Received: from mga03.intel.com ([134.134.136.65]:2922 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230412AbhIVXsU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Sep 2021 19:48:20 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10115"; a="223759493"
+        id S230414AbhIVXux (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Sep 2021 19:50:53 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10115"; a="223769152"
 X-IronPort-AV: E=Sophos;i="5.85,315,1624345200"; 
-   d="scan'208";a="223759493"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Sep 2021 16:46:40 -0700
+   d="scan'208";a="223769152"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Sep 2021 16:49:22 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.85,315,1624345200"; 
-   d="scan'208";a="435622324"
-Received: from fmsmsx606.amr.corp.intel.com ([10.18.126.86])
-  by orsmga006.jf.intel.com with ESMTP; 22 Sep 2021 16:46:39 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx606.amr.corp.intel.com (10.18.126.86) with Microsoft SMTP Server
+   d="scan'208";a="613732644"
+Received: from orsmsx604.amr.corp.intel.com ([10.22.229.17])
+  by fmsmga001.fm.intel.com with ESMTP; 22 Sep 2021 16:49:22 -0700
+Received: from orsmsx607.amr.corp.intel.com (10.22.229.20) by
+ ORSMSX604.amr.corp.intel.com (10.22.229.17) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2242.12; Wed, 22 Sep 2021 16:46:39 -0700
-Received: from fmsmsx607.amr.corp.intel.com (10.18.126.87) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ 15.1.2242.12; Wed, 22 Sep 2021 16:49:21 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX607.amr.corp.intel.com (10.22.229.20) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2242.12; Wed, 22 Sep 2021 16:46:38 -0700
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx607.amr.corp.intel.com (10.18.126.87) with Microsoft SMTP Server
+ 15.1.2242.12; Wed, 22 Sep 2021 16:49:21 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2242.12 via Frontend Transport; Wed, 22 Sep 2021 16:46:38 -0700
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (104.47.74.49) by
- edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ 15.1.2242.12 via Frontend Transport; Wed, 22 Sep 2021 16:49:21 -0700
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.172)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2242.12; Wed, 22 Sep 2021 16:46:38 -0700
+ 15.1.2242.12; Wed, 22 Sep 2021 16:49:21 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gPkvpAc+5UrZQoXSL2sLGgHow36V5D0sjGMUOkRtjcKsSMYMzatmadSo9hKGZqI2DycVCHxlUyKraYv3MOllMOAsMHzNRfOo1phkijBexlU+gFDEOCpb9XCvcfKaZqS7MtkBJoUSiS2Hn8z6/XXneueRmNgU9s93k6hZ9wTmNXzlXao0RutKeZKQMIWy80pPVjKvxPRqz6Zp+NynqRVWuMopPhvvdcV1jwUH+E9HDtEEUsc+/w031yxfHLub6E925f5IRhvjQUggJkHzwX0CWUsvgwWMX121b5J4f6bS4PeCk49ZPW9UoHqdiE6QgeLvT4DQEzxGfzfzWcluFkknGA==
+ b=NbhwXKOkxG33QCDkbwtRF7+8oMGpuanK6FvdLopMFZky61SVwmsVm+/nv+SIr1sg+1votGzAbPN+6PUrLmGXw/G6bwa2dMgcvAmtzFOFZYSAovDnB+DYINA89g4JblfmPNZX7nRZG/AA/7nhaMJv73IpD0o9k1mTmnxbh6XYHnLPOuV4ODwXjKxtaN+dQ8zOjDG26Hps7brjD9ODuzftt8a2yWn3KvVqAH3ftn74EMdpHzJop0dvxbm8eQ6PyRxt6Et+p4OYxyOXzVNXftX+vONcmmxg45SEUkHCsmhoiEZUiNmAljj598VXjIwFgBXdUlxsAoonUZO7E0+KZLa62Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
- bh=osmHD2jPBC1MaLmYBm+c67rk/xQNqAeagiXfqg6mmqU=;
- b=M4VIRnSbG+bT5Itu85x8UcfrwZ/fFpMpMDZRAGkXGNmmsCF4V7mR0HmC4vVuOmljSGCtR25+T1dsfejJvc2MWzVLrHFnn7FrspN/JrZGPIw1x8ukfW9ByLVn88gP8d/kMiw1UPIY6zJO9QD38jk8zxNgt9dV7rZEI4ACXYDUaDABlOhZXTJtqKbQ92472J/UqULBTUcF71KOTg6kQcBEquLHIh090hynviCC/Eeb7Kf42iJBPizBRQOCnhMf40yb/Ufr+c4l3A49LYmaFUT2KAtsYDDcWDvun/j4z0s3Fds8B5A6nSbDOAlN+FUpet9GTcT3PvRW3SvTkhNvWBB9wg==
+ bh=TH7JcUQsQoNLmOba5BBs/WL71Q4X77ZOsEJQWoWxp5I=;
+ b=GsHrqH5A/hQUHxKsdzchsAKNGgpGxcQxu7oMThAyBuqJAwD/Bctq3hkNnIV+/0vDnqD9Sciy9IltfNECLeSeFy16rlvDTCqYkh57Vn8jCxjihHSnKWwEkNNO384CeACHCO5zOfo4BAd0Azf63qsQip9L2LpZtDVOEZCl+l3GIgUv0i8n7clpbj2nxQox6FmPJmAx42NRAr7IzhO/L8z57JmTqFU1Kof14TMDC9ugpgNkHujCZufYw9LKuzwRXp1cDTKbH2kDXuaQhW2ybzGjdm/mF5u+6i0RwbeNC0PhkeZzcYegoHJVlkErlpEWzgTLLhKSP5DhBPRAu8L35L7WmA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
  s=selector2-intel-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=osmHD2jPBC1MaLmYBm+c67rk/xQNqAeagiXfqg6mmqU=;
- b=eDzYs9xHU1zjsrNsSQkRgFE8plRO0xuzwDP80cJHNY1bMq5QJKJxKWTCNSi8vGTvG6s/OiZra50V6EE5TpTto/SROd10c/ZtQGQusFdexR6g1BI8kkAMw4iZwns+qMsNNAG3bGqIbMLXCUYrNR1IPzjXXO3WE005hCMGcm4oaDo=
+ bh=TH7JcUQsQoNLmOba5BBs/WL71Q4X77ZOsEJQWoWxp5I=;
+ b=oardsoebnUTtlRjVKh6ZuZcZ7muQC7uqNqgH3gpzOXK69uqhUK8Dv1VHK8K4iEfZoz4jVHt0SBtPACwYXlGB6xZpCS2gbYHRUjtWEMeYz+dEdhySgb23ExszdeZ5N9qCSoWF4L6Rl/NxyhpS5azhJEZRRuwbjTTaHHS9ggGPeIU=
 Received: from BL1PR11MB5429.namprd11.prod.outlook.com (2603:10b6:208:30b::13)
- by BL0PR11MB3012.namprd11.prod.outlook.com (2603:10b6:208:79::14) with
+ by BL0PR11MB2931.namprd11.prod.outlook.com (2603:10b6:208:7d::33) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4544.14; Wed, 22 Sep
- 2021 23:45:33 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4544.13; Wed, 22 Sep
+ 2021 23:49:16 +0000
 Received: from BL1PR11MB5429.namprd11.prod.outlook.com
  ([fe80::8160:3227:5fe4:c494]) by BL1PR11MB5429.namprd11.prod.outlook.com
  ([fe80::8160:3227:5fe4:c494%3]) with mapi id 15.20.4544.014; Wed, 22 Sep 2021
- 23:45:33 +0000
+ 23:49:16 +0000
 From:   "Tian, Kevin" <kevin.tian@intel.com>
 To:     Alex Williamson <alex.williamson@redhat.com>
 CC:     Jason Gunthorpe <jgg@nvidia.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
@@ -87,22 +87,18 @@ CC:     Jason Gunthorpe <jgg@nvidia.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
         "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
         "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
         "nicolinc@nvidia.com" <nicolinc@nvidia.com>
-Subject: RE: [RFC 03/20] vfio: Add vfio_[un]register_device()
-Thread-Topic: [RFC 03/20] vfio: Add vfio_[un]register_device()
-Thread-Index: AQHXrSFwNP3/pIcrZ0iM9X/cSoy0lKuuqYQAgAB3MFCAAB2WgIAAjDNwgAA0YACAAIKvAIAAJpDggAAEmwCAAA5k4A==
-Date:   Wed, 22 Sep 2021 23:45:33 +0000
-Message-ID: <BL1PR11MB5429B107D90E3CDE21139CE98CA29@BL1PR11MB5429.namprd11.prod.outlook.com>
+Subject: RE: [RFC 05/20] vfio/pci: Register device to /dev/vfio/devices
+Thread-Topic: [RFC 05/20] vfio/pci: Register device to /dev/vfio/devices
+Thread-Index: AQHXrSF8PdwE3l0WRkaTif5FzzsyqKuutGGAgABLSoCAAENA4IABUT0AgAApt5A=
+Date:   Wed, 22 Sep 2021 23:49:16 +0000
+Message-ID: <BL1PR11MB5429DCBBC0ECB7B8958D2E658CA29@BL1PR11MB5429.namprd11.prod.outlook.com>
 References: <20210919063848.1476776-1-yi.l.liu@intel.com>
-        <20210919063848.1476776-4-yi.l.liu@intel.com>
-        <20210921160108.GO327412@nvidia.com>
-        <BN9PR11MB5433D4590BA725C79196E0248CA19@BN9PR11MB5433.namprd11.prod.outlook.com>
-        <20210922005337.GC327412@nvidia.com>
-        <BN9PR11MB54338D108AF5A87614717EF98CA29@BN9PR11MB5433.namprd11.prod.outlook.com>
-        <20210922122252.GG327412@nvidia.com>
-        <20210922141036.5cd46b2b.alex.williamson@redhat.com>
-        <BN9PR11MB543366158EA87572902EFF5E8CA29@BN9PR11MB5433.namprd11.prod.outlook.com>
- <20210922164506.66976218.alex.williamson@redhat.com>
-In-Reply-To: <20210922164506.66976218.alex.williamson@redhat.com>
+        <20210919063848.1476776-6-yi.l.liu@intel.com>
+        <20210921164001.GR327412@nvidia.com>
+        <20210921150929.5977702c.alex.williamson@redhat.com>
+        <BN9PR11MB5433D909662D484EFE9C82E28CA29@BN9PR11MB5433.namprd11.prod.outlook.com>
+ <20210922151712.20162912.alex.williamson@redhat.com>
+In-Reply-To: <20210922151712.20162912.alex.williamson@redhat.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -110,144 +106,127 @@ X-MS-TNEF-Correlator:
 authentication-results: redhat.com; dkim=none (message not signed)
  header.d=none;redhat.com; dmarc=none action=none header.from=intel.com;
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 23c23023-6e36-45e1-421a-08d97e231188
-x-ms-traffictypediagnostic: BL0PR11MB3012:
+x-ms-office365-filtering-correlation-id: bd4c3460-3c68-4476-f371-08d97e2396a2
+x-ms-traffictypediagnostic: BL0PR11MB2931:
 x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
 x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <BL0PR11MB301276D380926A03413861CD8CA29@BL0PR11MB3012.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8882;
+x-microsoft-antispam-prvs: <BL0PR11MB2931CE092A8FFCBFDF8924F88CA29@BL0PR11MB2931.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8273;
 x-ms-exchange-senderadcheck: 1
 x-ms-exchange-antispam-relay: 0
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: OAeF3lCIPUYux2NKdWe/mW/NA0bmqA5fopCI7Z0GGgrtgWcnYocT3KthZJQg30GVd6M3CMUZBVI1XTQVGwpxIZpMtKS0G2JfLlQWTdHS0XZBr/gTJrstijXqhgUr2cK7NS0oV/xf1tcDDumTbUjxVHr2lB4lM3symS6T6AZ6R0Y7/g5dTUbD6G3T/agH4NtgfzZZ4pflK4Zdn9eljmIVmCJFVCkQWiaxV4kvw5ABfLdUr1Zc9ZMow1mYl6pg3zSWPrgt/PxUrn5YNIlwt6zY37VmqjgTScUR3MtSCWb8Wpw8l9X9jdP2CqE/ahwCSp5VOeh5yQiC9tdWgEXtfG2KX66mII6NTnngS6aH9RztxbuBafWlQYbpTZi/YqedY+d9fvaGg2BpAScxfIi0024oRKV48SUKSiMbrrU8d7XtScumUajXWP4BkPmvY7rHTLaM8aoLUk6+HFstGfhNYOnPTyaUKv185FVgXg5O6/C+sLjdd80F6+scvPG8pTbWjWzcSYZZoxrCzpacrPGAeOIhnmAHjqJTe4s2H30SO3F0mQIEXna2ljHKxMI3/qwBdqA0U/LWDvyzxjjXFpJMvaLklag9TCDXESWjfa38Ixm9+2KYHiMt7pyW5cK+a4WzDZb7XE/UH9YDFfoyGD0/Xf/6NxQ+ztdyE87w8jmEj5WR2IAkj0nJkHb+HXCP0xSbc4HQUCoD8zbzpnBDZYkqf056fg==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5429.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(316002)(6506007)(66476007)(76116006)(66556008)(64756008)(54906003)(66446008)(66946007)(55016002)(52536014)(8936002)(6916009)(8676002)(4326008)(38070700005)(2906002)(26005)(186003)(508600001)(71200400001)(38100700002)(122000001)(33656002)(5660300002)(7696005)(7416002)(83380400001)(86362001)(9686003);DIR:OUT;SFP:1102;
+x-microsoft-antispam-message-info: MWaUMBNLE+zKjeq1CLcyU9tBN+bw9fzanbOIwTB+Gzvzw+cIrUPJPVIGvAjwZ45ik379tL/DvOFgQLpHQC8jQHHGfSF3WHRMP95OKYbZREd/VoKmuYf64cyASD8J9dWgfZD+VHKg1VNouu1uTc0lK4PZYvaeReqN2w3IM+5ZcPN/bgCw7cDzHvQrU9glCvTqE+bFGJ8cI9UlDFaUSM+bK80NV54Qz9j7df5h2VAMEXN28kJs/MswuAFBcNGQrEb+BG7M1R/+L7MLdtFVRG63gFeYrP7oWysdmGkFVcV4gVt0fp5IHNm1Uncdu8cZgrxcFi4ZQos4Q7gnWoKrQ6KpDY+JFJmRn8mogTNHmfzxsLo67LS1h5rWTZ/wldvova5bo8Cka7p7H2fxI8RSbokr0/+AGADhdMqaLavrecve96WU7NOKkN+JGkQ6ukFCZZ+KJCyvmffjoLk9LPtU4hN4MWYyfEL8Dgd+IAZMiktWXorNV1gLmXJdNPiFj2cVpcgFhz/YhuHaINTIOMFS6Ghb8aAlWARDoRWM6x335FAOx2wPBtfdn5N/IBIdnrzRZ5aYkjnWQ+LEXQSxAq2yi9fYF9puhGaSCpiF6EZTJUg3w8QQ27LjCRlrbpoAbxRUJdZw/EknCpo5vFU5VxMS9tZuSyqsHE9BAB4eSRXFvohui5CqkV0DtKF302ESZhnsKIO5GbUMDx4F9dyJKoCipdcT/g==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5429.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(2906002)(38070700005)(52536014)(186003)(8936002)(4326008)(83380400001)(8676002)(54906003)(6506007)(6916009)(64756008)(508600001)(66946007)(66476007)(66446008)(66556008)(38100700002)(33656002)(316002)(5660300002)(122000001)(26005)(71200400001)(9686003)(7696005)(86362001)(55016002)(7416002)(76116006);DIR:OUT;SFP:1102;
 x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?VGgCCvw8mZ/AYOC/9QO3pv7IlGAfWbXDlYcxYTq6Bp93NhpL29Pdz8HJHlpP?=
- =?us-ascii?Q?Xb89rxSzNFnmLWgrB6IYXUjoqUgtv7Ba/+FMiqpXDxq5JYVBUGriHOBhAwvO?=
- =?us-ascii?Q?DhtFq6KPu9DLjz850MTXW1u55h/RL/FisNOj/vB+IF3JiNecdMv24hkgRaJv?=
- =?us-ascii?Q?qzXa8Jzd2MhH0OtthUNeE/8+IaB0rVaDitOzCjemZeJFXK0dCoNdu2M12/B/?=
- =?us-ascii?Q?dK9JjAnS2ZDi3WMwTaAC1cEtPynNCg067zGInx0+N6WR1l2/uQPSFIgQozjq?=
- =?us-ascii?Q?4+V8I/S9pqZJQ29yr41QBujWWU6XIOxkMEI6KlpgW9nqtn70PmlPfz9NiWUj?=
- =?us-ascii?Q?XEFvPRRd2cipAEgNZ45IxLFGQoEyzANFO8vsO8WPxMe4W3rDoWd8kiVrmvEq?=
- =?us-ascii?Q?Uy3zlHCZx/6PZgKasWm7p0xG0w75dxG605GtPS7vxEkJ6IhN5BE6buzF2GTn?=
- =?us-ascii?Q?yZcYhncv6sr/UEofrnGCRo7mL2EbuRtxJDZIYtk/99Oxy3/FBZKvsAYPxdgk?=
- =?us-ascii?Q?3BYs+Hh+rm9R2B4FBCW4kZSwpuGD/gSPj/d7NBsx/IMSTWxfipRGPZZcnaLA?=
- =?us-ascii?Q?bcNW/qjSGoxJwfrLwqBP3pD2MibBgVGTyEXIe1p5IJKzUwHKQ9ePaehwHgXH?=
- =?us-ascii?Q?wsiiWV1aRlEWa/OrmChOFBhqYaURDka4O1JHYxIbbv9+nK/cyqNfUJXlWHM0?=
- =?us-ascii?Q?03YY1Jfwe0OPuaWLH1nc5PCyIv0bk+8ZbrgOQL7XZekz4XuUKwV15scZrEjc?=
- =?us-ascii?Q?hde8g31YnhfxDzBV8szMrSDNgQmoY2RlqLN3BCdgujQEY/x1WFp4xD6v7iWx?=
- =?us-ascii?Q?CjcbZP8DzOoupy73o/TuEgDCVYHN3gL4A3AypnXKcz5+uvEhzTK8ntQgGCOf?=
- =?us-ascii?Q?o90DfbHL8QTTUdXlXk6d2JYqhJvbBgUXgvq/cxNU2Ao6+MvHKGuepS/3JZZ0?=
- =?us-ascii?Q?V2+cjqwO2MIota9N5uIZpJi3ilMzsWqfyN0Gil4mfYufdvfLZmwanEFxNE2f?=
- =?us-ascii?Q?eBAf8JzonJV0HKi1S2bDyjNkHruIsy3U+Ppnm1MUkM4aIBHv7FCLrhFBviSP?=
- =?us-ascii?Q?ixVjGQZGP4VS4ULmFWAT5uoU7xmFasGouz2cyWYvzdsRXXSolqbiQ5dYD/Vx?=
- =?us-ascii?Q?u59RO8CRAms4OfSzmRz8TnnT11HtsBCHQeD0yNJuSnWiRgqffntMkSun2kUh?=
- =?us-ascii?Q?Q4s5SMlaUM68Hdyr98MqgrdWHFyRf2CoTO/kvPkvY+EHa73I8mJfY/d3BLOd?=
- =?us-ascii?Q?98fWz9MJ2GxiRlJBkrUswCo5+hgoeihgRB4VMTT3GIsoDped7wMIeUzbxex/?=
- =?us-ascii?Q?mmca7wEprfim9f3HXMDHG0G9?=
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?d+KKbUUo/m0h2DZxGktSocCbRaDBe3oHobyHqjSOhHACl+lfzZ8NZ+fuYpoJ?=
+ =?us-ascii?Q?MO4i91ikcdRSxdPUkawPwYmk0mT8EHO2j/SpS6NyOM6qnoqpIwj3ZMk2/6D7?=
+ =?us-ascii?Q?X6aJXPUM6YZQ8Yd3e6Qfltj6ATcY9YH3lZ7DQuWg3EIWYU8Fwi+sxaUL7+op?=
+ =?us-ascii?Q?YcSd8smd3KDGVPz8GF9BejA7yfRqUxyRXrWIjfwx5LRehqu1D+C0OE50j/P1?=
+ =?us-ascii?Q?drsANLJSxs5BOZY3x7IVzue0tClxGmoa24cBdmeAfSKMvc/Ur6DmZ3aP95cQ?=
+ =?us-ascii?Q?SQAzAZ/v5iMrlhazjhmdcCBPGyiAMb2e2NEeiwRB5wZmvwrz4TRrcsrEI86h?=
+ =?us-ascii?Q?+HKz8hYqRsSlYj2eBKA8EIlLGIfWQX17kG6PuC9Cu1FHZ3anY3tXnCeCqwGT?=
+ =?us-ascii?Q?VuzCaB0qI2u7zZOMtNnaiaVaaEZJq1Ikr7z6OVsIbhfF//UqrwOY85gR7O6o?=
+ =?us-ascii?Q?tG4QXegrpIhT69Zcb2umyys454GJvdWty2aMW4DEm0nkzNUcy8EC/tJHhgEt?=
+ =?us-ascii?Q?HnnRE78HS0AN+y7Zc49M21N3ofbyiJy7mEwkDv9zA6OfMH8VI+enlB+Tu7ee?=
+ =?us-ascii?Q?leNbbYoHgRpUMddsWRXnQv00HqrZFsW8rGelb+7YsQO+YZ8HPEd5M65xwLgj?=
+ =?us-ascii?Q?c2+e1t6YoyxhG6kwrKSI9SU6QAW/YQMo04QIyMIFaNGaikGZtJLCQDknkxd8?=
+ =?us-ascii?Q?T4u7Emgi7xA9zSwGWEd2dps9yg6lf/LwI0z+VJspjaw7bzyMmAuhhnSvud/A?=
+ =?us-ascii?Q?o7UfGUSjCFNFw9rtmKx+koKee1RRXNEha9DjyS2t7X6TtR1kBeeGfkoQvJxU?=
+ =?us-ascii?Q?oJL1Ddd6CJKlCQEPbzyRnwaP4hkBHw5X45lPZeOT0wUdaZ9vrZfK4u1rksc2?=
+ =?us-ascii?Q?UYmaplAwlUqCpm0rwROcYkY+L27FJU18CO9+pDLlWd9NM4bxS3w26hPzA+DP?=
+ =?us-ascii?Q?dw6u6FDR0WzHgs0BiwjFfl0JiKLugcsXvEMd0a2V1RiWKl77b2ZQVeI3xSjM?=
+ =?us-ascii?Q?84uf+sGsFoyjI0bXzx371jIfBvEupRkPYhK5YH0a2rBj+5dNshx5h8eTK1rw?=
+ =?us-ascii?Q?oV58diur1Lk1DXkw88xW66USwd45RW1MuEatmimHm8+vq8xoyGuFWxnzR7Vo?=
+ =?us-ascii?Q?Pw7pK+twk4WboWFtaHeM9OJmqFCWcngts6ya1njg3c7CyQMvc3yAv08rANKb?=
+ =?us-ascii?Q?UOURd2sjDk7fCtKOt1Ec57lIjUahsnfvFvl8ZQAFRNs2DRhUV/W/pqd/oWkt?=
+ =?us-ascii?Q?zHFsfDfP7r0CXBk6P77PDyOJsJIWV5/uvWnT2uPxFjHUNiz83vvvD6YJFwVD?=
+ =?us-ascii?Q?X3nYCUo3uJ4SUwK2Jot98OGA?=
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-MS-Exchange-CrossTenant-AuthAs: Internal
 X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5429.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 23c23023-6e36-45e1-421a-08d97e231188
-X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Sep 2021 23:45:33.0224
+X-MS-Exchange-CrossTenant-Network-Message-Id: bd4c3460-3c68-4476-f371-08d97e2396a2
+X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Sep 2021 23:49:16.2995
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: f3Lom9n6tc6sku1WO55nksdmshU3arLW6qihFlp0SC1J3dGb7E72CrwWpCwc3LedmauL4A5lMQ52ky8bCorkzw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR11MB3012
+X-MS-Exchange-CrossTenant-userprincipalname: Dp27FtNkiqsEbXadr84nZfDG0oyk/+B8PO0aK+7YN2JgSM9cjaa2LMOvTARCfNHtAcT/AqTCzIFO3Xg3caRu6g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR11MB2931
 X-OriginatorOrg: intel.com
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 > From: Alex Williamson <alex.williamson@redhat.com>
-> Sent: Thursday, September 23, 2021 6:45 AM
+> Sent: Thursday, September 23, 2021 5:17 AM
 >=20
-> On Wed, 22 Sep 2021 22:34:42 +0000
+> On Wed, 22 Sep 2021 01:19:08 +0000
 > "Tian, Kevin" <kevin.tian@intel.com> wrote:
 >=20
 > > > From: Alex Williamson <alex.williamson@redhat.com>
-> > > Sent: Thursday, September 23, 2021 4:11 AM
+> > > Sent: Wednesday, September 22, 2021 5:09 AM
 > > >
-> > > On Wed, 22 Sep 2021 09:22:52 -0300
+> > > On Tue, 21 Sep 2021 13:40:01 -0300
 > > > Jason Gunthorpe <jgg@nvidia.com> wrote:
 > > >
-> > > > On Wed, Sep 22, 2021 at 09:23:34AM +0000, Tian, Kevin wrote:
-> > > >
-> > > > > > Providing an ioctl to bind to a normal VFIO container or group =
-might
-> > > > > > allow a reasonable fallback in userspace..
+> > > > On Sun, Sep 19, 2021 at 02:38:33PM +0800, Liu Yi L wrote:
+> > > > > This patch exposes the device-centric interface for vfio-pci devi=
+ces. To
+> > > > > be compatiable with existing users, vfio-pci exposes both legacy =
+group
+> > > > > interface and device-centric interface.
 > > > > >
-> > > > > I didn't get this point though. An error in binding already allow=
-s the
-> > > > > user to fall back to the group path. Why do we need introduce
-> another
-> > > > > ioctl to explicitly bind to container via the nongroup interface?
-> > > >
-> > > > New userspace still needs a fallback path if it hits the 'try and
-> > > > fail'. Keeping the device FD open and just using a different ioctl =
-to
-> > > > bind to a container/group FD, which new userspace can then obtain a=
-s
-> a
-> > > > fallback, might be OK.
-> > > >
-> > > > Hard to see without going through the qemu parts, so maybe just kee=
-p
-> > > > it in mind
+> > > > > As explained in last patch, this change doesn't apply to devices =
+which
+> > > > > cannot be forced to snoop cache by their upstream iommu. Such
+> devices
+> > > > > are still expected to be opened via the legacy group interface.
 > > >
-> > > If we assume that the container/group/device interface is essentially
-> > > deprecated once we have iommufd, it doesn't make a lot of sense to me
-> > > to tack on a container/device interface just so userspace can avoid
-> > > reverting to the fully legacy interface.
-> > >
-> > > But why would we create vfio device interface files at all if they
-> > > can't work?  I'm not really on board with creating a try-and-fail
-> > > interface for a mechanism that cannot work for a given device.  The
-> > > existence of the device interface should indicate that it's supported=
-.
-> > > Thanks,
-> > >
+> > > This doesn't make much sense to me.  The previous patch indicates
+> > > there's work to be done in updating the kvm-vfio contract to understa=
+nd
+> > > DMA coherency, so you're trying to limit use cases to those where the
+> > > IOMMU enforces coherency, but there's QEMU work to be done to
+> support
+> > > the iommufd uAPI at all.  Isn't part of that work to understand how K=
+VM
+> > > will be told about non-coherent devices rather than "meh, skip it in =
+the
+> > > kernel"?  Also let's not forget that vfio is not only for KVM.
 > >
-> > Now it's a try-and-fail model even for devices which support iommufd.
-> > Per Jason's suggestion, a device is always opened with a parked fops
-> > which supports only bind. Binding serves as the contract for handling
-> > exclusive ownership on a device and switching to normal fops if
-> > succeed. So the user has to try-and-fail in case multiple threads attem=
-pt
-> > to open a same device. Device which doesn't support iommufd is not
-> > different, except binding request 100% fails (due to missing .bind_iomm=
-ufd
-> > in kernel driver).
+> > The policy here is that VFIO will not expose such devices (no enforce-s=
+noop)
+> > in the new device hierarchy at all. In this case QEMU will fall back to=
+ the
+> > group interface automatically and then rely on the existing contract to
+> connect
+> > vfio and QEMU. It doesn't need to care about the whatever new contract
+> > until such devices are exposed in the new interface.
+> >
+> > yes, vfio is not only for KVM. But here it's more a task split based on=
+ staging
+> > consideration. imo it's not necessary to further split task into suppor=
+ting
+> > non-snoop device for userspace driver and then for kvm.
 >=20
-> That's a rather important difference.  I don't really see how that's
-> comparable to the mutually exclusive nature of the legacy vs device
-
-I didn't get the 'comparable' part. Can you elaborate?
-
-> interface.  We're not going to present a vfio device interface for SW
-> mdevs that can't participate in iommufd, right?  Thanks,
+> Patch 10 introduces an iommufd interface for QEMU to learn whether the
+> IOMMU enforces DMA coherency, at that point QEMU could revert to the
+> legacy interface, or register the iommufd with KVM, or otherwise
+> establish non-coherent DMA with KVM as necessary.  We're adding cruft
+> to the kernel here to enforce an unnecessary limitation.
+>=20
+> If there are reasons the kernel can't support the device interface,
+> that's a valid reason not to present the interface, but this seems like
+> picking a specific gap that userspace is already able to detect from
+> this series at the expense of other use cases.  Thanks,
 >=20
 
-Did you see any problem if exposing sw mdev now? Following above
-explanation the try-and-fail model should still work...
-
-btw I realized another related piece regarding to the new layout that
-Jason suggested, which have sys device node include a link to the vfio
-devnode:
-
-	/sys/bus/pci/devices/DDDD:BB:DD.F/vfio/vfioX/dev
-
-This for sure requires specific vfio driver support to get the link establi=
-shed.
-if we only do it for vfio-pci in the start, then for other devices which do=
-n't
-support iommufd there is no way for the user to identify the corresponding
-vfio devnode even it's still exposed. Then try-and-fail model may not even
-been reached for those devices.
+I see your point now. Yes I agree that the kernel cruft is unnecessary
+limitation here. The user should rely on the device/iommufd capability
+to decide whether non-coherent DMA should go through legacy or
+new interface.
 
 Thanks
 Kevin
