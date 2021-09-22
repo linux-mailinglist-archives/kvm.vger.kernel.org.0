@@ -2,99 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7DD8541524B
-	for <lists+kvm@lfdr.de>; Wed, 22 Sep 2021 23:01:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2A48E41525A
+	for <lists+kvm@lfdr.de>; Wed, 22 Sep 2021 23:06:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237759AbhIVVCl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Sep 2021 17:02:41 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:38561 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S238085AbhIVVCh (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 22 Sep 2021 17:02:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632344466;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=EkcI36nWkyMmdwAV3luppztFyqzSlOhfIH0Z+Rmy1YE=;
-        b=VT3NmozO3j94IEhNrMP6NpdTUsUs50wyjakj69R7DrWM4lwOHrUk/1SHAMhO17RDI48GZX
-        fAOwAZFc80iQaPxKd10TiJnASdpdwO0Z8GA5INZ3vsVPcPz8SqKRIa6aFneJ/U9NR1f/zT
-        LVSr6v0JakIXNAcK3jJp+uNwY2+JNy4=
-Received: from mail-oi1-f200.google.com (mail-oi1-f200.google.com
- [209.85.167.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-596-7Mj3MpSmP-OHAZ-DRgsNbw-1; Wed, 22 Sep 2021 17:01:05 -0400
-X-MC-Unique: 7Mj3MpSmP-OHAZ-DRgsNbw-1
-Received: by mail-oi1-f200.google.com with SMTP id y65-20020aca4b44000000b002719194f1e0so2530693oia.7
-        for <kvm@vger.kernel.org>; Wed, 22 Sep 2021 14:01:04 -0700 (PDT)
+        id S237804AbhIVVHa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Sep 2021 17:07:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36642 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237778AbhIVVH3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Sep 2021 17:07:29 -0400
+Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BB45C061574
+        for <kvm@vger.kernel.org>; Wed, 22 Sep 2021 14:05:59 -0700 (PDT)
+Received: by mail-lf1-x131.google.com with SMTP id e15so17237150lfr.10
+        for <kvm@vger.kernel.org>; Wed, 22 Sep 2021 14:05:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=shutemov-name.20210112.gappssmtp.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=/PcqjgcRCkyIpO5H00bhPWTTbPCMNXWR4nKgirdi3Io=;
+        b=xEkq7SUZRewChVZqWhm4cS96l8pPzSSEz+ScgQL56dgjn10FcSw+jLPv0OY9bYezIP
+         CYphaUGJXn/snvtDU3KSfg579Nb5Qlk3NtUo6CuASAlclCh3ui7cA33wRO6foyyQk9sK
+         Mw3x0Ft59CKVBwMroO3W4lugA/tv5mEWbElbrHB+wIwMc5ZNjOZSS8KT6h+Zon+cf4qv
+         JmEltnmffmbEBqUsebTV11v0B5U1mVwBUj3sW1gLZspQ54hm7TrP9j1QPJEblcLAhwI2
+         nEggNK9m8gYxewjcBCYSYCHLIhl9iSTZmO6vl1lqR1Tl54TSO4jEGxDT96zBALyLtnLS
+         Hi0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=EkcI36nWkyMmdwAV3luppztFyqzSlOhfIH0Z+Rmy1YE=;
-        b=B5VCWdbGbkPROFIiLVST18KXnpEXWb2YUiresStfCsnVWSxIazmR6Sh2U6qA3hYNaz
-         eqKzSIG0u5kvJr4Up42UbV87CZvuC0UPf2Hyd7IcSxdhtpBHtf114IgGFnCJ4qTtZmGu
-         4u0BeVjcb7Bloi5PeYbrb23hICFW/szzk5jrBnsWvS3iqv7j+m2XhS3Q2VC2itVZ1NQm
-         Es6sBQIfkTIOl7yVEox1ZKUoEn7WC9Dui2QOEOLoKo46m+PVCx7r5SB1DwuWULSI2l0x
-         r7YNiR9+uBLsIOIJGhjWxTBYR/v/iQDuELx0LZcvVkqEKqNqOUkTgTZTi38G96FsfX5w
-         YCrQ==
-X-Gm-Message-State: AOAM531OepoaJWizzu/pv8pNVXE9H6666jXOx3I2UsRpON7c6FvUyCET
-        /nPGDviyqwTUp4Bea+mWFM56YRwMbjnM2GVsxqydwqwfX6LbIw32BtA/jNyHhN7slUm2UEaZthm
-        4zmky7qIcUqI2
-X-Received: by 2002:a9d:72db:: with SMTP id d27mr1019221otk.279.1632344464317;
-        Wed, 22 Sep 2021 14:01:04 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy1foDmaxSBss0gFC+IJcIZIQhSoVK6YGjP2/EeJFqHN5DuMyQV2c7d4zQ3lhJ0DoWQZHDvuQ==
-X-Received: by 2002:a9d:72db:: with SMTP id d27mr1019192otk.279.1632344464096;
-        Wed, 22 Sep 2021 14:01:04 -0700 (PDT)
-Received: from redhat.com ([198.99.80.109])
-        by smtp.gmail.com with ESMTPSA id v4sm696691ott.72.2021.09.22.14.01.02
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=/PcqjgcRCkyIpO5H00bhPWTTbPCMNXWR4nKgirdi3Io=;
+        b=dv4ktR3rGsuIXqHlgeqBRSzpxLQmw8fUTN3sFqBrh3zNsxcEM+W5M6WGmZKJZvogB3
+         g1GosCfeSTRQYXigfPCathumHv78Zh3sZy7laFn6SYeGqWJbEpYstmwPIdeZYJVJBCHY
+         kYoHzAZX4M9/k17uv/bqScywcj3WX6OQzxC6jEFFJ0aL1hN0wRwvt0JsBQyleH5oiHnO
+         w12JcaANM88XTMV8amPg2BOBE35eCz5E3Ar520HPd5MBZgeXxf1Sv8mrYXcL1JS0EoS7
+         60knGebNvWZM40BVJHnT/ZJ/fMkA7Q9sgL54adzFxJHoEnHHMcMkSsLuUbiMuDMY1Ieq
+         o4CA==
+X-Gm-Message-State: AOAM533U7xTTM9cS6App4qa8WpcGJS+R/gsXzVNGmLdJ9TITwryke2pa
+        rlsSr6v4rSTj9+8N44euTY1lHQ==
+X-Google-Smtp-Source: ABdhPJxFaBhI/uy8npc3Dtax2q52q/CAXrrCmDjvazERLjrealUJSj+rQLNB+0RcTEMnHlaiKFjmmA==
+X-Received: by 2002:a05:6512:5c2:: with SMTP id o2mr917110lfo.207.1632344757440;
+        Wed, 22 Sep 2021 14:05:57 -0700 (PDT)
+Received: from box.localdomain ([86.57.175.117])
+        by smtp.gmail.com with ESMTPSA id bi33sm370467ljb.89.2021.09.22.14.05.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Sep 2021 14:01:03 -0700 (PDT)
-Date:   Wed, 22 Sep 2021 15:01:01 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Liu Yi L <yi.l.liu@intel.com>, hch@lst.de, jasowang@redhat.com,
-        joro@8bytes.org, jean-philippe@linaro.org, kevin.tian@intel.com,
-        parav@mellanox.com, lkml@metux.net, pbonzini@redhat.com,
-        lushenming@huawei.com, eric.auger@redhat.com, corbet@lwn.net,
-        ashok.raj@intel.com, yi.l.liu@linux.intel.com,
-        jun.j.tian@intel.com, hao.wu@intel.com, dave.jiang@intel.com,
-        jacob.jun.pan@linux.intel.com, kwankhede@nvidia.com,
-        robin.murphy@arm.com, kvm@vger.kernel.org,
-        iommu@lists.linux-foundation.org, dwmw2@infradead.org,
-        linux-kernel@vger.kernel.org, baolu.lu@linux.intel.com,
-        david@gibson.dropbear.id.au, nicolinc@nvidia.com
-Subject: Re: [RFC 08/20] vfio/pci: Add VFIO_DEVICE_BIND_IOMMUFD
-Message-ID: <20210922150101.5548eb6f.alex.williamson@redhat.com>
-In-Reply-To: <20210921172939.GU327412@nvidia.com>
-References: <20210919063848.1476776-1-yi.l.liu@intel.com>
-        <20210919063848.1476776-9-yi.l.liu@intel.com>
-        <20210921172939.GU327412@nvidia.com>
-Organization: Red Hat
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        Wed, 22 Sep 2021 14:05:56 -0700 (PDT)
+Received: by box.localdomain (Postfix, from userid 1000)
+        id 60F2A10304D; Thu, 23 Sep 2021 00:05:58 +0300 (+03)
+Date:   Thu, 23 Sep 2021 00:05:58 +0300
+From:   "Kirill A. Shutemov" <kirill@shutemov.name>
+To:     Borislav Petkov <bp@alien8.de>
+Cc:     Tom Lendacky <thomas.lendacky@amd.com>,
+        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, x86@kernel.org,
+        iommu@lists.linux-foundation.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-graphics-maintainer@vmware.com,
+        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        kexec@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Andi Kleen <ak@linux.intel.com>,
+        Sathyanarayanan Kuppuswamy 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        Tianyu Lan <Tianyu.Lan@microsoft.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v3 5/8] x86/sme: Replace occurrences of sme_active() with
+ cc_platform_has()
+Message-ID: <20210922210558.itofvu3725dap5xx@box.shutemov.name>
+References: <77df37e1-0496-aed5-fd1d-302180f1edeb@amd.com>
+ <YUoao0LlqQ6+uBrq@zn.tnic>
+ <20210921212059.wwlytlmxoft4cdth@box.shutemov.name>
+ <YUpONYwM4dQXAOJr@zn.tnic>
+ <20210921213401.i2pzaotgjvn4efgg@box.shutemov.name>
+ <00f52bf8-cbc6-3721-f40e-2f51744751b0@amd.com>
+ <20210921215830.vqxd75r4eyau6cxy@box.shutemov.name>
+ <01891f59-7ec3-cf62-a8fc-79f79ca76587@amd.com>
+ <20210922143015.vvxvh6ec73lffvkf@box.shutemov.name>
+ <YUuJZ2qOgbdpfk6N@zn.tnic>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YUuJZ2qOgbdpfk6N@zn.tnic>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 21 Sep 2021 14:29:39 -0300
-Jason Gunthorpe <jgg@nvidia.com> wrote:
-
-> On Sun, Sep 19, 2021 at 02:38:36PM +0800, Liu Yi L wrote:
-> > +struct vfio_device_iommu_bind_data {
-> > +	__u32	argsz;
-> > +	__u32	flags;
-> > +	__s32	iommu_fd;
-> > +	__u64	dev_cookie;  
+On Wed, Sep 22, 2021 at 09:52:07PM +0200, Borislav Petkov wrote:
+> On Wed, Sep 22, 2021 at 05:30:15PM +0300, Kirill A. Shutemov wrote:
+> > Not fine, but waiting to blowup with random build environment change.
 > 
-> Missing explicit padding
+> Why is it not fine?
 > 
-> Always use __aligned_u64 in uapi headers, fix all the patches.
+> Are you suspecting that the compiler might generate something else and
+> not a rip-relative access?
 
-We don't need padding or explicit alignment if we just swap the order
-of iommu_fd and dev_cookie.  Thanks,
+Yes. We had it before for __supported_pte_mask and other users of
+fixup_pointer().
 
-Alex
+See for instance 4a09f0210c8b ("x86/boot/64/clang: Use fixup_pointer() to
+access '__supported_pte_mask'")
 
+Unless we find other way to guarantee RIP-relative access, we must use
+fixup_pointer() to access any global variables.
+
+-- 
+ Kirill A. Shutemov
