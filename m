@@ -2,155 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 86183414541
-	for <lists+kvm@lfdr.de>; Wed, 22 Sep 2021 11:35:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 58309414538
+	for <lists+kvm@lfdr.de>; Wed, 22 Sep 2021 11:34:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234438AbhIVJhU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Sep 2021 05:37:20 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:5624 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234428AbhIVJhR (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 22 Sep 2021 05:37:17 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 18M80aN4029237;
-        Wed, 22 Sep 2021 05:35:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=Jc+yrN3iX9HOGp9i+voSmsZ5bGCf+5OLvIIOZbWOZ2k=;
- b=ltJNG6CEkf8aW3dQTBUYfSAIMH8Bz9ufY5ipKDtm+Wc+ODT55qq1x6/0pyj5sm2/xq/p
- mlkrc45Mj8NKG80aGuQWpn7YMf0Cp08Ak2R/3Y2Kb7XGQpatt5ZpJN9y5WNaZHqSyQOf
- Y94fNI0aiLQHEvx9KC+BJRWhfDEvQL6Aj4Kpd6e9DHDW9+eKqAqY9VWQZdm/xgg8GakG
- p9EwTgdjcVm4oQxWqzzJ40Egw2GULr5gTlw4jAZniwIqFu9treyooUSEZ60UcP2AwFL+
- zYRtp9Btmx8KC1Jv/pPR4295B9UXxxv8CrpiMNbuddNnxRqtUc0eWo4hoSdZn6J0RY9x iw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3b80kr9yru-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 22 Sep 2021 05:35:47 -0400
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 18M91XXP030024;
-        Wed, 22 Sep 2021 05:35:47 -0400
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3b80kr9yr6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 22 Sep 2021 05:35:47 -0400
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 18M9Vfb2026383;
-        Wed, 22 Sep 2021 09:35:45 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma01fra.de.ibm.com with ESMTP id 3b7q6jckph-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 22 Sep 2021 09:35:44 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 18M9ZfP554198660
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 22 Sep 2021 09:35:41 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 93C84AE045;
-        Wed, 22 Sep 2021 09:35:41 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3B3C3AE051;
-        Wed, 22 Sep 2021 09:35:41 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.145.3.24])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 22 Sep 2021 09:35:41 +0000 (GMT)
-Date:   Wed, 22 Sep 2021 11:31:52 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, thuth@redhat.com, david@redhat.com,
-        linux-s390@vger.kernel.org, seiden@linux.ibm.com
-Subject: Re: [kvm-unit-tests PATCH 8/9] s390x: Add sthyi cc==0 r2+1
- verification
-Message-ID: <20210922113152.2489e72a@p-imbrenda>
-In-Reply-To: <20210922071811.1913-9-frankja@linux.ibm.com>
-References: <20210922071811.1913-1-frankja@linux.ibm.com>
-        <20210922071811.1913-9-frankja@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        id S234284AbhIVJgS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Sep 2021 05:36:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43770 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234388AbhIVJgR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Sep 2021 05:36:17 -0400
+Received: from mail-oi1-x233.google.com (mail-oi1-x233.google.com [IPv6:2607:f8b0:4864:20::233])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C2CDC061762
+        for <kvm@vger.kernel.org>; Wed, 22 Sep 2021 02:34:48 -0700 (PDT)
+Received: by mail-oi1-x233.google.com with SMTP id x124so3515277oix.9
+        for <kvm@vger.kernel.org>; Wed, 22 Sep 2021 02:34:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=/C5mpNbBmoPckO9Tuag0+wSlj6t5R7giav+EX45XDOs=;
+        b=eHUe3bWDDn4qkPUZo4L4Z0fcAsB9+J9fwawyvO20NlVVljHF5Dtyq9mp40XzuCfugU
+         NHEckbfbiVwqEWpnfEPq8bTt1o37LWXNGtrqfr0sFfYNgS8h8tWThWGcTQci4jAos33h
+         n6Rkq9dFWSiwcS4K93c93eBqCfSRWtyHNFtUdbY9NhzsAtomPXkjDbXP75bohHWU5UKH
+         kmPOTplel3Q/Av0SQdbKvDCGPHWq72z8LXny4D7Yp4kmDD+CCc+jkvB8PvBI5ZFiBmOC
+         DnG/42K+/Kdmy0ACKkEn36FZY/SgTJaP857A2cCbQt5wvhCIh0HENe/1hFreclaSwL32
+         rF1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=/C5mpNbBmoPckO9Tuag0+wSlj6t5R7giav+EX45XDOs=;
+        b=Y3lStEHVqledYahU4+pR52Gb5lK59rJUbzxIxUZAXFq9DdXADZr2vVjCo6tyvAUyTK
+         Gulaj/iU4MJtNYFnD9af3mgg0RccqKUXduysiLg81PEwX6V4CvSgHIi6NjUbFjWpf+Yl
+         gJS9O4m/h/7PxPVKmIzxnuxF/MIKrfaSyPSoJfxOWh57tvyff6QO126UJQu/5VaBdRvp
+         IK5hlx+kvSnsrcdeSSlsR23lBGS1REHDcxdLsC9tKPy3WQR82EjXyE0fRTfL+1W/t6qC
+         MK0JPH1qNnG5PGnAhd8aSMHTejMSVH+11PympaEQU58Au2OW7u7nFVsFsQ9OynJQX3k3
+         69Fw==
+X-Gm-Message-State: AOAM53016og0SrkcYPjtsaSwvoz12ki5DQPbYUxN0l8MABWOpfyhD1/Q
+        LoOedsGH4fxvubVSCBhC+hihYUn27PcLBaCX8OBEEw==
+X-Google-Smtp-Source: ABdhPJw2dFdgLvXM1SuivMLDkuM1fFDGcYbJFC1w6JcFr8gg6Ni02AGH23NLtCL/i+T7xPsvIBHzYOWc2NbQAOc7svQ=
+X-Received: by 2002:aca:604:: with SMTP id 4mr265229oig.8.1632303287537; Wed,
+ 22 Sep 2021 02:34:47 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: JPc7P8T61Fz1-wsB_vRiqjotvoL3LNdV
-X-Proofpoint-ORIG-GUID: J6Uc5GfylHdWRazH84KBm715PZnukn3V
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.391,FMLib:17.0.607.475
- definitions=2021-09-22_03,2021-09-20_01,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 bulkscore=0
- mlxlogscore=999 mlxscore=0 malwarescore=0 adultscore=0 lowpriorityscore=0
- impostorscore=0 clxscore=1015 suspectscore=0 priorityscore=1501
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2109200000 definitions=main-2109220066
+References: <20210827101609.2808181-1-tabba@google.com> <20210827101609.2808181-3-tabba@google.com>
+ <20210908123837.exyhsn6t2c7nmbox@gator>
+In-Reply-To: <20210908123837.exyhsn6t2c7nmbox@gator>
+From:   Fuad Tabba <tabba@google.com>
+Date:   Wed, 22 Sep 2021 10:34:11 +0100
+Message-ID: <CA+EHjTx+Rfd4UXvNPnL8siGfM=7PuWxCtKuWOGDRyMqEQKgxPw@mail.gmail.com>
+Subject: Re: [PATCH v5 2/8] KVM: arm64: Add missing field descriptor for MDCR_EL2
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     kvmarm@lists.cs.columbia.edu, maz@kernel.org, will@kernel.org,
+        james.morse@arm.com, alexandru.elisei@arm.com,
+        suzuki.poulose@arm.com, mark.rutland@arm.com,
+        christoffer.dall@arm.com, pbonzini@redhat.com, oupton@google.com,
+        qperret@google.com, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kernel-team@android.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 22 Sep 2021 07:18:10 +0000
-Janosch Frank <frankja@linux.ibm.com> wrote:
+Hi Andrew,
 
-> On success r2 + 1 should be 0, let's also check for that.
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+On Wed, Sep 8, 2021 at 1:38 PM Andrew Jones <drjones@redhat.com> wrote:
+>
+> On Fri, Aug 27, 2021 at 11:16:03AM +0100, Fuad Tabba wrote:
+> > It's not currently used. Added for completeness.
+> >
+> > No functional change intended.
+> >
+> > Suggested-by: Marc Zyngier <maz@kernel.org>
+> > Signed-off-by: Fuad Tabba <tabba@google.com>
+> > ---
+> >  arch/arm64/include/asm/kvm_arm.h | 1 +
+> >  1 file changed, 1 insertion(+)
+> >
+> > diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> > index 327120c0089f..a39fcf318c77 100644
+> > --- a/arch/arm64/include/asm/kvm_arm.h
+> > +++ b/arch/arm64/include/asm/kvm_arm.h
+> > @@ -295,6 +295,7 @@
+> >  #define MDCR_EL2_HPMFZO              (UL(1) << 29)
+> >  #define MDCR_EL2_MTPME               (UL(1) << 28)
+> >  #define MDCR_EL2_TDCC                (UL(1) << 27)
+> > +#define MDCR_EL2_HLP         (UL(1) << 26)
+> >  #define MDCR_EL2_HCCD                (UL(1) << 23)
+> >  #define MDCR_EL2_TTRF                (UL(1) << 19)
+> >  #define MDCR_EL2_HPMD                (UL(1) << 17)
+> > --
+> > 2.33.0.259.gc128427fd7-goog
+> >
+>
+> If we're proactively adding bits per the most recent spec, then I guess we
+> could also add HPMFZS (bit 36). Otherwise,
 
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Seems someone has beaten me to it. HPMFZS is in 5.15-rc2 at least
+(which I'm going to be rebasing on/respinning).
 
-but see comment below
+Thanks,
+/fuad
 
-> ---
->  s390x/sthyi.c | 20 +++++++++++---------
->  1 file changed, 11 insertions(+), 9 deletions(-)
-> 
-> diff --git a/s390x/sthyi.c b/s390x/sthyi.c
-> index db90b56f..4b153bf4 100644
-> --- a/s390x/sthyi.c
-> +++ b/s390x/sthyi.c
-> @@ -24,16 +24,16 @@ static inline int sthyi(uint64_t vaddr, uint64_t fcode, uint64_t *rc,
->  {
->  	register uint64_t code asm("0") = fcode;
->  	register uint64_t addr asm("2") = vaddr;
-> -	register uint64_t rc3 asm("3") = 0;
-> +	register uint64_t rc3 asm("3") = 42;
-
-I am not a big fan of the asm constraints, in the kernel we are
-trying to move away from them, but I guess as long as it works it's ok
-
->  	int cc = 0;
->  
-> -	asm volatile(".insn rre,0xB2560000,%[r1],%[r2]\n"
-> -		     "ipm	 %[cc]\n"
-> -		     "srl	 %[cc],28\n"
-> -		     : [cc] "=d" (cc)
-> -		     : [code] "d" (code), [addr] "a" (addr), [r1] "i" (r1),
-> -		       [r2] "i" (r2)
-> -		     : "memory", "cc", "r3");
-> +	asm volatile(
-> +		".insn   rre,0xB2560000,%[r1],%[r2]\n"
-> +		"ipm     %[cc]\n"
-> +		"srl     %[cc],28\n"
-> +		: [cc] "=d" (cc), "+d" (rc3)
-> +		: [code] "d" (code), [addr] "a" (addr), [r1] "i" (r1), [r2] "i" (r2)
-> +		: "memory", "cc");
->  	if (rc)
->  		*rc = rc3;
->  	return cc;
-> @@ -139,16 +139,18 @@ static void test_fcode0(void)
->  	struct sthyi_hdr_sctn *hdr;
->  	struct sthyi_mach_sctn *mach;
->  	struct sthyi_par_sctn *par;
-> +	uint64_t rc = 42;
->  
->  	/* Zero destination memory. */
->  	memset(pagebuf, 0, PAGE_SIZE);
->  
->  	report_prefix_push("fcode 0");
-> -	sthyi((uint64_t)pagebuf, 0, NULL, 0, 2);
-> +	sthyi((uint64_t)pagebuf, 0, &rc, 0, 2);
->  	hdr = (void *)pagebuf;
->  	mach = (void *)pagebuf + hdr->INFMOFF;
->  	par = (void *)pagebuf + hdr->INFPOFF;
->  
-> +	report(!rc, "r2 + 1 == 0");
->  	test_fcode0_hdr(hdr);
->  	test_fcode0_mach(mach);
->  	test_fcode0_par(par);
-
+>
+> Reviewed-by: Andrew Jones <drjones@redhat.com>
+>
