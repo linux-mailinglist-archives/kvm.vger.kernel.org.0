@@ -2,329 +2,197 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C8D53413EDF
-	for <lists+kvm@lfdr.de>; Wed, 22 Sep 2021 03:09:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C92F8413EEE
+	for <lists+kvm@lfdr.de>; Wed, 22 Sep 2021 03:19:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232271AbhIVBKa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Sep 2021 21:10:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42464 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231271AbhIVBK3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Sep 2021 21:10:29 -0400
-Received: from mail-qt1-x84a.google.com (mail-qt1-x84a.google.com [IPv6:2607:f8b0:4864:20::84a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74BA0C061574
-        for <kvm@vger.kernel.org>; Tue, 21 Sep 2021 18:09:00 -0700 (PDT)
-Received: by mail-qt1-x84a.google.com with SMTP id e5-20020ac84905000000b002a69dc43859so5729770qtq.10
-        for <kvm@vger.kernel.org>; Tue, 21 Sep 2021 18:09:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=f+eE05PCo8qChOi7C3TCse89XUY8p/e5JYZmdwEBrZo=;
-        b=dJPqGgERbK013/94/AiM4dAyiKix1/DKn7frupuhal/2UEb+36tkSAU2QR5HuvuUrP
-         I5lfIfz9mix3ljONjQSJPZsqUxztzw7TWpmga75sAbCpjGjAK5UHn8GmdunRx04JBBEa
-         OSPrE6uEN4QUVW+aVCib2A81IVnBp5IFyxqGxm6PvXA4MAE2YJQNDMR3/msn9XXHFFW6
-         9X8ORVIypjoWIBFobLZl9reRnKzG6nKCZzWycg2LhY+60z/e3pfcSmkqhxYxDAaDxsvp
-         2eiyr+v4RXb88q/WrE74qS+8EHkrtgmikQdbp6ikP1p8w2pEsPV13MN/vtenr9P9f0qK
-         EdAw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=f+eE05PCo8qChOi7C3TCse89XUY8p/e5JYZmdwEBrZo=;
-        b=SeFn+ko931h35liS0ywB6x9yOYN263eO2sKn8p/Ae+tj45sj8FBKbh/StQHKGyoWfu
-         dccUp96jDZgUpGV2YcfmTWAI7ESEeWHferlUi3BNdCNKbTtFKRVxkWI3O3N6k7hcpi4A
-         xQLelHMGVRRMeBv0DMAdBDsLTzpB60Z7xSwh12g0SLIBKclFOTBMCyhd0MRaMegHwx/8
-         Q7+M4Au1PZwt0dj7T0wM3OB7TiHKsSbyE6uwZVXEsj4scTLkCULQCFyHGaDdBFK1cjIH
-         BDQ0DGcfJj0sKe9tQvKA5Dfj294mALwU46A8PXchYXRZzDfEDKEMp0UZFiNc0RGYOX5b
-         TzEg==
-X-Gm-Message-State: AOAM531O0bgtUGPv/jt5naXqLnGfa3Y5dmBfjiWzI9cF//kxqiDGNfl5
-        CoMnXajj8ErOjc3PzKJvlpRGxZcpkc4ozQXmJhwHTqbkdZOH3pLCPxIFVEDwqW3tMIF1KjPemse
-        s0oJNQNp2xMpmiDQ9vSgQuv2s+pb2BVI3ptUdKwp9W4Erzsgqmc7X9GRHL6bB0Xz9SWwVipw=
-X-Google-Smtp-Source: ABdhPJy3KpjeASdvmJujfjGe+YN1WNhBl+SU4AAgG4BY/Um41MpzopZrZLsD49XgUs0vHx6qrAvH2+FIjjqSM5Xoxw==
-X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1acf])
- (user=jingzhangos job=sendgmr) by 2002:a0c:e381:: with SMTP id
- a1mr29432178qvl.42.1632272939620; Tue, 21 Sep 2021 18:08:59 -0700 (PDT)
-Date:   Wed, 22 Sep 2021 01:08:51 +0000
-In-Reply-To: <20210922010851.2312845-1-jingzhangos@google.com>
-Message-Id: <20210922010851.2312845-3-jingzhangos@google.com>
-Mime-Version: 1.0
-References: <20210922010851.2312845-1-jingzhangos@google.com>
-X-Mailer: git-send-email 2.33.0.464.g1972c5931b-goog
-Subject: [PATCH v1 3/3] KVM: arm64: Add histogram stats for handling time of
- arch specific exit reasons
-From:   Jing Zhang <jingzhangos@google.com>
-To:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-        David Matlack <dmatlack@google.com>,
-        Peter Shier <pshier@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Jing Zhang <jingzhangos@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S231907AbhIVBUl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Sep 2021 21:20:41 -0400
+Received: from mga11.intel.com ([192.55.52.93]:31478 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230469AbhIVBUk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Sep 2021 21:20:40 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10114"; a="220299336"
+X-IronPort-AV: E=Sophos;i="5.85,312,1624345200"; 
+   d="scan'208";a="220299336"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Sep 2021 18:19:11 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.85,312,1624345200"; 
+   d="scan'208";a="533518961"
+Received: from orsmsx604.amr.corp.intel.com ([10.22.229.17])
+  by fmsmga004.fm.intel.com with ESMTP; 21 Sep 2021 18:19:10 -0700
+Received: from orsmsx609.amr.corp.intel.com (10.22.229.22) by
+ ORSMSX604.amr.corp.intel.com (10.22.229.17) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2242.12; Tue, 21 Sep 2021 18:19:10 -0700
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX609.amr.corp.intel.com (10.22.229.22) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2242.12; Tue, 21 Sep 2021 18:19:10 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2242.12 via Frontend Transport; Tue, 21 Sep 2021 18:19:10 -0700
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (104.47.73.47) by
+ edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2242.12; Tue, 21 Sep 2021 18:19:09 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=OF5DIvsgafmhk2hYuBo2oSRc/oo1bHaHpaJ6gZTGgRjmU9rdB0e7Cs2cYjKSZ9ISHgZn2TCvlz+JkzjlaGVCNQrTyNQofdbRwW67blzKGzL4yvki4J71RTzywg5w28QAJUUE3AjOTAvuGiRFO/SgwCPvjamJoVQVPgTBJkrykALTy0r+rW+eu6nT6VQxMIILNbmPnXr2Jnd+VO016Wxdm4bua2gmY6u6+9VJJXkvMpSGFeq4dhfAiI6sQ/c/XuDBFL8SKPSKvk28k4bwbPtcsQUkZALjtAogO4leYabV4LimYCIo9wDeah2z//rRucYTbnkcIz0el8gJqwDdGXQRcQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
+ bh=sQ4ZG/amrHNG4QudsOrGUgaXtgBpR8JjwBve7yL5Xl4=;
+ b=ZaT189IeHOtf20bV97f3kzBrAgTwBBdczIYccLaVEgK4Os8qDvIwHcS1e/v++fBDI8JLZ7+saaB0I0kRc2IZ8a5O8Lo1gycJkg0VUt0WslXg/lBDuzW7Js5xshgX7dxLQmSNuPfL8o92MCdabHycrTRqxafrD4m+YC48OS1CIrH2qCw/aJyefzBJKwvSreU7drvjfPjT2z5ud2m0Rklgorsvgh+aliTjHYwmZTvH5/PGS056BLy4/fODbUCbfq0YnOgmVWREXenRsihdvAwfbboUuAjBC+fqrbDoPI5Csq+7LgI+7CC3vbBMYd14wJmnNDab2UDUx6QuZ58NKtNQzA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
+ s=selector2-intel-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=sQ4ZG/amrHNG4QudsOrGUgaXtgBpR8JjwBve7yL5Xl4=;
+ b=yk4WWZ00eKApm8PkpZ8JDuJbQT+jkt3DAoAXzV+U1iHkJ967bMyTCjoV4/A1KJ2rRALnPpvwhjF8rGHEESXx53Q7KMBVpunEmmxlyc1sz9grdifRxgxyP2ThmkEWctcQn1iLVMt2gEDYxd8Pghyqrdb6sCLw67WrUa7PRjMUF90=
+Received: from BN9PR11MB5433.namprd11.prod.outlook.com (2603:10b6:408:11e::13)
+ by BN6PR1101MB2339.namprd11.prod.outlook.com (2603:10b6:404:94::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4523.17; Wed, 22 Sep
+ 2021 01:19:08 +0000
+Received: from BN9PR11MB5433.namprd11.prod.outlook.com
+ ([fe80::ddb7:fa7f:2cc:45df]) by BN9PR11MB5433.namprd11.prod.outlook.com
+ ([fe80::ddb7:fa7f:2cc:45df%8]) with mapi id 15.20.4523.018; Wed, 22 Sep 2021
+ 01:19:08 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Alex Williamson <alex.williamson@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>
+CC:     "Liu, Yi L" <yi.l.liu@intel.com>, "hch@lst.de" <hch@lst.de>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+        "parav@mellanox.com" <parav@mellanox.com>,
+        "lkml@metux.net" <lkml@metux.net>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "lushenming@huawei.com" <lushenming@huawei.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "corbet@lwn.net" <corbet@lwn.net>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "yi.l.liu@linux.intel.com" <yi.l.liu@linux.intel.com>,
+        "Tian, Jun J" <jun.j.tian@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "dwmw2@infradead.org" <dwmw2@infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
+        "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>
+Subject: RE: [RFC 05/20] vfio/pci: Register device to /dev/vfio/devices
+Thread-Topic: [RFC 05/20] vfio/pci: Register device to /dev/vfio/devices
+Thread-Index: AQHXrSF8PdwE3l0WRkaTif5FzzsyqKuutGGAgABLSoCAAENA4A==
+Date:   Wed, 22 Sep 2021 01:19:08 +0000
+Message-ID: <BN9PR11MB5433D909662D484EFE9C82E28CA29@BN9PR11MB5433.namprd11.prod.outlook.com>
+References: <20210919063848.1476776-1-yi.l.liu@intel.com>
+        <20210919063848.1476776-6-yi.l.liu@intel.com>
+        <20210921164001.GR327412@nvidia.com>
+ <20210921150929.5977702c.alex.williamson@redhat.com>
+In-Reply-To: <20210921150929.5977702c.alex.williamson@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: e390139b-0f86-4f16-448f-08d97d66f9fd
+x-ms-traffictypediagnostic: BN6PR1101MB2339:
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <BN6PR1101MB2339FCA2396C055CD3D714A88CA29@BN6PR1101MB2339.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:4502;
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: ObTPsIxaoIJu0DOY9CIJilxhGUEcPZGcua5tdESB/ObFT4AJD7Gkfhrjs7QYFYMw56yPi9FdLnGReFs/HVP+TY2OTzQxbNJMqTnH445tRNhytI9Mh4uZOMnKFk1EH8rixoShu1YNrOQRlwQepFsVWtcHh0W0qF8ZYbk8MliP7ODkl4qWLXdTc8rIdpbCWkvYkF45WzZTlPAjG4zGkFKVnH5CI41MCO86Df285v88adA/+9cEC4wjPAJFg5UfODC9Ii3/lcfp9Bgq0YvxkEJKOdaOO/6FTaskgmTiMGGLykxPz7Omcb6mANc8+ngCgFmvzeDhF7EnhbtCC6K2js6lK/HhFMrmzQ723sUWRzXAuiv1rDxENvFhdNrSu7Obj2Ckv0EkkpNaVs/i69NVlfRkDb0pi4EXtCf5i6rib/emqJZF7RilPZgRPeQSsfbJ9sT3cCixpMWdJYNqccnYTUDn2tKOWXNFxQRUWh5bvcFpVG+BGlIgdIQU3LEIOvqm7yU2nNReC7WubkTG/3Dm1J+3hBJ9tp50UDNesK2uDhdIlUjLWT/dhnBrsXDXegKaeXT7rqajkKwEbf0rAdepMdP5KBpvHfvRy19c+Cpr2HLD2EP64DK/7NY1cWlBcwzcyrCVDgWgwsTWehD7xuSo6RQVpwYwgHHH2VKFUzAeUzlV/ogbI2hLaP4aTg2kR/Fon3aN8svEZicNmP31/YnXO/6Qlw==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5433.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(6506007)(66476007)(66446008)(66556008)(38100700002)(4326008)(86362001)(55016002)(64756008)(52536014)(110136005)(5660300002)(2906002)(9686003)(316002)(71200400001)(54906003)(76116006)(38070700005)(8676002)(33656002)(66946007)(122000001)(7696005)(83380400001)(7416002)(186003)(26005)(8936002)(508600001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?JbSlH8V1xkMnkd2Uh+BLFGaVeGjU3gySoPoRFQsdAlb0e2feDDJYzhxVp9/M?=
+ =?us-ascii?Q?ECYNMxFxWHLVLtEVxDGAniVpLZurcd+lAGLXyksIoQmpgVksM++jztysWVvO?=
+ =?us-ascii?Q?yxY3HgUhCinrtbed3uECged5IH+SnGG1h8+e3zGbNXLmsSx+wuCOOmpnp+VH?=
+ =?us-ascii?Q?BXAQqxqTiKyeZ/2bbjFy7zNRz/hiSJ9fzCZFVb5x4Pq0WkQagGZWV/3XZ1eb?=
+ =?us-ascii?Q?aBACppupkxeWr1iPCFlmGPAPTCNtFTT4oa9yqB5O4wb5Cu72IfEWp6gH2liz?=
+ =?us-ascii?Q?psafhuP9CqMolBp0BKoJyBHcP1QFzGiuA04RnOLKkyCEpTKa6/+yXEUIL6rK?=
+ =?us-ascii?Q?e93Ykj85gdjOCzadj+QQumZnCmWjQKw98eciilx75sUw+s7CG5ndV7bcH3YM?=
+ =?us-ascii?Q?ch+AYYCde7ii64UUojqJeZJ6rVHYDSRuR72S25JKkHKNKq4dZMsHYdtiOP/8?=
+ =?us-ascii?Q?wfuUs5Pl+SrikaaDD2k7YJs+5yF+vxsDWwGpHHqIS3aY7RAylE1sTysBmJik?=
+ =?us-ascii?Q?uJ5EBdfnMCgwJjvYFqJYlDIPRfs/V8Qi4KdLSV4gZwQ48jZY9NML1m4CtXUe?=
+ =?us-ascii?Q?a4qi4jRy3VlBUoXwutjLttpe2+trA8dXvtI2a8ASq1d5m4O886hagBeWD9UQ?=
+ =?us-ascii?Q?MtejXp4tAYspiApOJPUD4VxrijM9BCJa/dYwpaiATQtvdYIO9l/f6P7ew+5C?=
+ =?us-ascii?Q?3vlpuqRmphHEVAPN27MnuDUziKQC20WgfHo3DTTLMRU4PE7+oIaz17nR8Bfv?=
+ =?us-ascii?Q?P6CW/PExkbzWgVfJQWNMpPDzodVQ5nY/Ob/ADl73zOmXxovErk6W0tFKCV7Q?=
+ =?us-ascii?Q?0LrPYj75Yqa4VXzsbym8EyabjlT2mfyJ2RolqGbtEj2Qa+xo2oePzLNym6LH?=
+ =?us-ascii?Q?8lbWtNxK5R6BBcBZ9jBYIaV8JV4aDYqKTuD+x8jTgO4FrVNPPZaWxfPdJgSS?=
+ =?us-ascii?Q?4zA+uAWmFOlcU6sByctpN0+J18M0hnLFffOvp/KSyFYjQyV7P4Ma7yBzXSgs?=
+ =?us-ascii?Q?2F7sFbpHYdrS0gFctyBfO1fQ7rdel9MFwRCwQGB44rcld+WXi/Pv4e2Fk8Fh?=
+ =?us-ascii?Q?rCsphUWcpqIbes9zGkbXq3AXkYGaR4R8wFBPUwAezpZy4XZ1HIQwhuOs187+?=
+ =?us-ascii?Q?Yiebx6EqTH6tyU+fXabeZv6NX5VmTQz0zz+uqJclJu5V0bEXhwf+qTlpCPWN?=
+ =?us-ascii?Q?2728O3p/ZwVnp2yLuraMsuyhjkj74skuJpu2bJrW0hjo9qg0Jy+JTEo8Iwbs?=
+ =?us-ascii?Q?5y6zd7IP85Tz0jalhT3fEXoHJl2niOsgHToPCepRVXpF8tmeEiQ2ZcrcNP7w?=
+ =?us-ascii?Q?UhE=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5433.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e390139b-0f86-4f16-448f-08d97d66f9fd
+X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Sep 2021 01:19:08.1855
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: J+BIDJH9FQZ+p1VqZw4e9TvnHnfL75/klROHwPkeqgrvZSsJxJuSYnB/zPNwbYC5bTRUETgXhcFRhe2I7ZjSDg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR1101MB2339
+X-OriginatorOrg: intel.com
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-These logarithmic histogram stats are useful for monitoring performance
-of handling for different kinds of VCPU exit reasons.
+> From: Alex Williamson <alex.williamson@redhat.com>
+> Sent: Wednesday, September 22, 2021 5:09 AM
+>=20
+> On Tue, 21 Sep 2021 13:40:01 -0300
+> Jason Gunthorpe <jgg@nvidia.com> wrote:
+>=20
+> > On Sun, Sep 19, 2021 at 02:38:33PM +0800, Liu Yi L wrote:
+> > > This patch exposes the device-centric interface for vfio-pci devices.=
+ To
+> > > be compatiable with existing users, vfio-pci exposes both legacy grou=
+p
+> > > interface and device-centric interface.
+> > >
+> > > As explained in last patch, this change doesn't apply to devices whic=
+h
+> > > cannot be forced to snoop cache by their upstream iommu. Such devices
+> > > are still expected to be opened via the legacy group interface.
+>=20
+> This doesn't make much sense to me.  The previous patch indicates
+> there's work to be done in updating the kvm-vfio contract to understand
+> DMA coherency, so you're trying to limit use cases to those where the
+> IOMMU enforces coherency, but there's QEMU work to be done to support
+> the iommufd uAPI at all.  Isn't part of that work to understand how KVM
+> will be told about non-coherent devices rather than "meh, skip it in the
+> kernel"?  Also let's not forget that vfio is not only for KVM.
 
-Signed-off-by: Jing Zhang <jingzhangos@google.com>
----
- arch/arm64/include/asm/kvm_host.h | 36 ++++++++++++
- arch/arm64/kvm/arm.c              |  4 ++
- arch/arm64/kvm/guest.c            | 43 ++++++++++++++
- arch/arm64/kvm/handle_exit.c      | 95 +++++++++++++++++++++++++++++++
- 4 files changed, 178 insertions(+)
+The policy here is that VFIO will not expose such devices (no enforce-snoop=
+)
+in the new device hierarchy at all. In this case QEMU will fall back to the
+group interface automatically and then rely on the existing contract to con=
+nect=20
+vfio and QEMU. It doesn't need to care about the whatever new contract
+until such devices are exposed in the new interface.
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 4d65de22add3..f1a29ca3d4f3 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -417,6 +417,9 @@ struct kvm_vcpu_arch {
- 
- 	/* Arch specific exit reason */
- 	enum arm_exit_reason exit_reason;
-+
-+	/* The timestamp for the last VCPU exit */
-+	u64 last_exit_time;
- };
- 
- /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
-@@ -605,6 +608,8 @@ struct kvm_vm_stat {
- 	struct kvm_vm_stat_generic generic;
- };
- 
-+#define ARM_EXIT_HIST_CNT	64
-+
- struct kvm_vcpu_stat {
- 	struct kvm_vcpu_stat_generic generic;
- 	u64 mmio_exit_user;
-@@ -641,6 +646,36 @@ struct kvm_vcpu_stat {
- 		u64 exit_fp_asimd;
- 		u64 exit_pac;
- 	};
-+	/* Histogram stats for handling time of arch specific exit reasons */
-+	struct {
-+		u64 exit_unknown_hist[ARM_EXIT_HIST_CNT];
-+		u64 exit_irq_hist[ARM_EXIT_HIST_CNT];
-+		u64 exit_el1_serror_hist[ARM_EXIT_HIST_CNT];
-+		u64 exit_hyp_gone_hist[ARM_EXIT_HIST_CNT];
-+		u64 exit_il_hist[ARM_EXIT_HIST_CNT];
-+		u64 exit_wfi_hist[ARM_EXIT_HIST_CNT];
-+		u64 exit_wfe_hist[ARM_EXIT_HIST_CNT];
-+		u64 exit_cp15_32_hist[ARM_EXIT_HIST_CNT];
-+		u64 exit_cp15_64_hist[ARM_EXIT_HIST_CNT];
-+		u64 exit_cp14_32_hist[ARM_EXIT_HIST_CNT];
-+		u64 exit_cp14_ls_hist[ARM_EXIT_HIST_CNT];
-+		u64 exit_cp14_64_hist[ARM_EXIT_HIST_CNT];
-+		u64 exit_hvc32_hist[ARM_EXIT_HIST_CNT];
-+		u64 exit_smc32_hist[ARM_EXIT_HIST_CNT];
-+		u64 exit_hvc64_hist[ARM_EXIT_HIST_CNT];
-+		u64 exit_smc64_hist[ARM_EXIT_HIST_CNT];
-+		u64 exit_sys64_hist[ARM_EXIT_HIST_CNT];
-+		u64 exit_sve_hist[ARM_EXIT_HIST_CNT];
-+		u64 exit_iabt_low_hist[ARM_EXIT_HIST_CNT];
-+		u64 exit_dabt_low_hist[ARM_EXIT_HIST_CNT];
-+		u64 exit_softstp_low_hist[ARM_EXIT_HIST_CNT];
-+		u64 exit_watchpt_low_hist[ARM_EXIT_HIST_CNT];
-+		u64 exit_breakpt_low_hist[ARM_EXIT_HIST_CNT];
-+		u64 exit_bkpt32_hist[ARM_EXIT_HIST_CNT];
-+		u64 exit_brk64_hist[ARM_EXIT_HIST_CNT];
-+		u64 exit_fp_asimd_hist[ARM_EXIT_HIST_CNT];
-+		u64 exit_pac_hist[ARM_EXIT_HIST_CNT];
-+	};
- };
- 
- int kvm_vcpu_preferred_target(struct kvm_vcpu_init *init);
-@@ -715,6 +750,7 @@ void force_vm_exit(const cpumask_t *mask);
- 
- int handle_exit(struct kvm_vcpu *vcpu, int exception_index);
- void handle_exit_early(struct kvm_vcpu *vcpu, int exception_index);
-+void update_hist_exit_stats(struct kvm_vcpu *vcpu);
- 
- int kvm_handle_cp14_load_store(struct kvm_vcpu *vcpu);
- int kvm_handle_cp14_32(struct kvm_vcpu *vcpu);
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index fe102cd2e518..156f80b699d3 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -795,6 +795,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
- 	ret = 1;
- 	run->exit_reason = KVM_EXIT_UNKNOWN;
- 	while (ret > 0) {
-+		/* Update histogram stats for exit reasons */
-+		update_hist_exit_stats(vcpu);
-+
- 		/*
- 		 * Check conditions before entering the guest
- 		 */
-@@ -903,6 +906,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
- 		 */
- 		guest_exit();
- 		trace_kvm_exit(ret, kvm_vcpu_trap_get_class(vcpu), *vcpu_pc(vcpu));
-+		vcpu->arch.last_exit_time = ktime_to_ns(ktime_get());
- 
- 		/* Exit types that need handling before we can be preempted */
- 		handle_exit_early(vcpu, ret);
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index abd9327d7110..bbf51578fdec 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -75,6 +75,49 @@ const struct _kvm_stats_desc kvm_vcpu_stats_desc[] = {
- 	STATS_DESC_COUNTER(VCPU, exit_brk64),
- 	STATS_DESC_COUNTER(VCPU, exit_fp_asimd),
- 	STATS_DESC_COUNTER(VCPU, exit_pac),
-+	/* Histogram stats for handling time of arch specific exit reasons */
-+	STATS_DESC_LOGHIST_TIME_NSEC(
-+			VCPU, exit_unknown_hist, ARM_EXIT_HIST_CNT),
-+	STATS_DESC_LOGHIST_TIME_NSEC(
-+			VCPU, exit_irq_hist, ARM_EXIT_HIST_CNT),
-+	STATS_DESC_LOGHIST_TIME_NSEC(
-+			VCPU, exit_el1_serror_hist, ARM_EXIT_HIST_CNT),
-+	STATS_DESC_LOGHIST_TIME_NSEC(
-+			VCPU, exit_hyp_gone_hist, ARM_EXIT_HIST_CNT),
-+	STATS_DESC_LOGHIST_TIME_NSEC(VCPU, exit_il_hist, ARM_EXIT_HIST_CNT),
-+	STATS_DESC_LOGHIST_TIME_NSEC(VCPU, exit_wfi_hist, ARM_EXIT_HIST_CNT),
-+	STATS_DESC_LOGHIST_TIME_NSEC(VCPU, exit_wfe_hist, ARM_EXIT_HIST_CNT),
-+	STATS_DESC_LOGHIST_TIME_NSEC(
-+			VCPU, exit_cp15_32_hist, ARM_EXIT_HIST_CNT),
-+	STATS_DESC_LOGHIST_TIME_NSEC(
-+			VCPU, exit_cp15_64_hist, ARM_EXIT_HIST_CNT),
-+	STATS_DESC_LOGHIST_TIME_NSEC(
-+			VCPU, exit_cp14_32_hist, ARM_EXIT_HIST_CNT),
-+	STATS_DESC_LOGHIST_TIME_NSEC(
-+			VCPU, exit_cp14_ls_hist, ARM_EXIT_HIST_CNT),
-+	STATS_DESC_LOGHIST_TIME_NSEC(
-+			VCPU, exit_cp14_64_hist, ARM_EXIT_HIST_CNT),
-+	STATS_DESC_LOGHIST_TIME_NSEC(VCPU, exit_hvc32_hist, ARM_EXIT_HIST_CNT),
-+	STATS_DESC_LOGHIST_TIME_NSEC(VCPU, exit_smc32_hist, ARM_EXIT_HIST_CNT),
-+	STATS_DESC_LOGHIST_TIME_NSEC(VCPU, exit_hvc64_hist, ARM_EXIT_HIST_CNT),
-+	STATS_DESC_LOGHIST_TIME_NSEC(VCPU, exit_smc64_hist, ARM_EXIT_HIST_CNT),
-+	STATS_DESC_LOGHIST_TIME_NSEC(VCPU, exit_sys64_hist, ARM_EXIT_HIST_CNT),
-+	STATS_DESC_LOGHIST_TIME_NSEC(VCPU, exit_sve_hist, ARM_EXIT_HIST_CNT),
-+	STATS_DESC_LOGHIST_TIME_NSEC(
-+			VCPU, exit_iabt_low_hist, ARM_EXIT_HIST_CNT),
-+	STATS_DESC_LOGHIST_TIME_NSEC(
-+			VCPU, exit_dabt_low_hist, ARM_EXIT_HIST_CNT),
-+	STATS_DESC_LOGHIST_TIME_NSEC(
-+			VCPU, exit_softstp_low_hist, ARM_EXIT_HIST_CNT),
-+	STATS_DESC_LOGHIST_TIME_NSEC(
-+			VCPU, exit_watchpt_low_hist, ARM_EXIT_HIST_CNT),
-+	STATS_DESC_LOGHIST_TIME_NSEC(
-+			VCPU, exit_breakpt_low_hist, ARM_EXIT_HIST_CNT),
-+	STATS_DESC_LOGHIST_TIME_NSEC(VCPU, exit_bkpt32_hist, ARM_EXIT_HIST_CNT),
-+	STATS_DESC_LOGHIST_TIME_NSEC(VCPU, exit_brk64_hist, ARM_EXIT_HIST_CNT),
-+	STATS_DESC_LOGHIST_TIME_NSEC(
-+			VCPU, exit_fp_asimd_hist, ARM_EXIT_HIST_CNT),
-+	STATS_DESC_LOGHIST_TIME_NSEC(VCPU, exit_pac_hist, ARM_EXIT_HIST_CNT),
- };
- 
- const struct kvm_stats_header kvm_vcpu_stats_header = {
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index e83cd52078b2..5e642a6275c1 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -395,3 +395,98 @@ void __noreturn __cold nvhe_hyp_panic_handler(u64 esr, u64 spsr,
- 	panic("HYP panic:\nPS:%08llx PC:%016llx ESR:%08llx\nFAR:%016llx HPFAR:%016llx PAR:%016llx\nVCPU:%016lx\n",
- 	      spsr, elr_virt, esr, far, hpfar, par, vcpu);
- }
-+
-+void update_hist_exit_stats(struct kvm_vcpu *vcpu)
-+{
-+	u64 val = ktime_to_ns(ktime_get()) - vcpu->arch.last_exit_time;
-+
-+	if (unlikely(!vcpu->arch.last_exit_time))
-+		return;
-+
-+	switch (vcpu->arch.exit_reason) {
-+	case ARM_EXIT_UNKNOWN:
-+		KVM_STATS_LOG_HIST_UPDATE(vcpu->stat.exit_unknown_hist, val);
-+		break;
-+	case ARM_EXIT_IRQ:
-+		KVM_STATS_LOG_HIST_UPDATE(vcpu->stat.exit_irq_hist, val);
-+		break;
-+	case ARM_EXIT_EL1_SERROR:
-+		KVM_STATS_LOG_HIST_UPDATE(vcpu->stat.exit_el1_serror_hist, val);
-+		break;
-+	case ARM_EXIT_HYP_GONE:
-+		KVM_STATS_LOG_HIST_UPDATE(vcpu->stat.exit_hyp_gone_hist, val);
-+		break;
-+	case ARM_EXIT_IL:
-+		KVM_STATS_LOG_HIST_UPDATE(vcpu->stat.exit_il_hist, val);
-+		break;
-+	case ARM_EXIT_WFI:
-+		KVM_STATS_LOG_HIST_UPDATE(vcpu->stat.exit_wfi_hist, val);
-+		break;
-+	case ARM_EXIT_WFE:
-+		KVM_STATS_LOG_HIST_UPDATE(vcpu->stat.exit_wfe_hist, val);
-+		break;
-+	case ARM_EXIT_CP15_32:
-+		KVM_STATS_LOG_HIST_UPDATE(vcpu->stat.exit_cp15_32_hist, val);
-+		break;
-+	case ARM_EXIT_CP15_64:
-+		KVM_STATS_LOG_HIST_UPDATE(vcpu->stat.exit_cp15_64_hist, val);
-+		break;
-+	case ARM_EXIT_CP14_32:
-+		KVM_STATS_LOG_HIST_UPDATE(vcpu->stat.exit_cp14_32_hist, val);
-+		break;
-+	case ARM_EXIT_CP14_LS:
-+		KVM_STATS_LOG_HIST_UPDATE(vcpu->stat.exit_cp14_ls_hist, val);
-+		break;
-+	case ARM_EXIT_CP14_64:
-+		KVM_STATS_LOG_HIST_UPDATE(vcpu->stat.exit_cp14_64_hist, val);
-+		break;
-+	case ARM_EXIT_HVC32:
-+		KVM_STATS_LOG_HIST_UPDATE(vcpu->stat.exit_hvc32_hist, val);
-+		break;
-+	case ARM_EXIT_SMC32:
-+		KVM_STATS_LOG_HIST_UPDATE(vcpu->stat.exit_smc32_hist, val);
-+		break;
-+	case ARM_EXIT_HVC64:
-+		KVM_STATS_LOG_HIST_UPDATE(vcpu->stat.exit_hvc64_hist, val);
-+		break;
-+	case ARM_EXIT_SMC64:
-+		KVM_STATS_LOG_HIST_UPDATE(vcpu->stat.exit_smc64_hist, val);
-+		break;
-+	case ARM_EXIT_SYS64:
-+		KVM_STATS_LOG_HIST_UPDATE(vcpu->stat.exit_sys64_hist, val);
-+		break;
-+	case ARM_EXIT_SVE:
-+		KVM_STATS_LOG_HIST_UPDATE(vcpu->stat.exit_sve_hist, val);
-+		break;
-+	case ARM_EXIT_IABT_LOW:
-+		KVM_STATS_LOG_HIST_UPDATE(vcpu->stat.exit_iabt_low_hist, val);
-+		break;
-+	case ARM_EXIT_DABT_LOW:
-+		KVM_STATS_LOG_HIST_UPDATE(vcpu->stat.exit_dabt_low_hist, val);
-+		break;
-+	case ARM_EXIT_SOFTSTP_LOW:
-+		KVM_STATS_LOG_HIST_UPDATE(
-+				vcpu->stat.exit_softstp_low_hist, val);
-+		break;
-+	case ARM_EXIT_WATCHPT_LOW:
-+		KVM_STATS_LOG_HIST_UPDATE(
-+				vcpu->stat.exit_watchpt_low_hist, val);
-+		break;
-+	case ARM_EXIT_BREAKPT_LOW:
-+		KVM_STATS_LOG_HIST_UPDATE(
-+				vcpu->stat.exit_breakpt_low_hist, val);
-+		break;
-+	case ARM_EXIT_BKPT32:
-+		KVM_STATS_LOG_HIST_UPDATE(vcpu->stat.exit_bkpt32_hist, val);
-+		break;
-+	case ARM_EXIT_BRK64:
-+		KVM_STATS_LOG_HIST_UPDATE(vcpu->stat.exit_brk64_hist, val);
-+		break;
-+	case ARM_EXIT_FP_ASIMD:
-+		KVM_STATS_LOG_HIST_UPDATE(vcpu->stat.exit_fp_asimd_hist, val);
-+		break;
-+	case ARM_EXIT_PAC:
-+		KVM_STATS_LOG_HIST_UPDATE(vcpu->stat.exit_pac_hist, val);
-+		break;
-+	}
-+}
--- 
-2.33.0.464.g1972c5931b-goog
+yes, vfio is not only for KVM. But here it's more a task split based on sta=
+ging
+consideration. imo it's not necessary to further split task into supporting
+non-snoop device for userspace driver and then for kvm.
 
