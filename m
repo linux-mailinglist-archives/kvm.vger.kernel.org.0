@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0505B414980
+	by mail.lfdr.de (Postfix) with ESMTP id BB8BB414982
 	for <lists+kvm@lfdr.de>; Wed, 22 Sep 2021 14:47:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236104AbhIVMsw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Sep 2021 08:48:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60772 "EHLO
+        id S236109AbhIVMs5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Sep 2021 08:48:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60790 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236106AbhIVMsq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Sep 2021 08:48:46 -0400
-Received: from mail-qt1-x849.google.com (mail-qt1-x849.google.com [IPv6:2607:f8b0:4864:20::849])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1545BC061757
-        for <kvm@vger.kernel.org>; Wed, 22 Sep 2021 05:47:16 -0700 (PDT)
-Received: by mail-qt1-x849.google.com with SMTP id l22-20020a05622a175600b0029d63a970f6so8025331qtk.23
-        for <kvm@vger.kernel.org>; Wed, 22 Sep 2021 05:47:16 -0700 (PDT)
+        with ESMTP id S235958AbhIVMst (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Sep 2021 08:48:49 -0400
+Received: from mail-wr1-x44a.google.com (mail-wr1-x44a.google.com [IPv6:2a00:1450:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E22C8C061762
+        for <kvm@vger.kernel.org>; Wed, 22 Sep 2021 05:47:18 -0700 (PDT)
+Received: by mail-wr1-x44a.google.com with SMTP id m18-20020adfe952000000b0015b0aa32fd6so2047993wrn.12
+        for <kvm@vger.kernel.org>; Wed, 22 Sep 2021 05:47:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=vKd/FRP6xsxd1NyZwlcpU67d7iFrsPIxsqbAVx8bTdw=;
-        b=aoIrsXHec9SBUmB+2mcUIKsJUltZUnhZAmwED91yXvPDDH0hn387xceQEQTJMcldNT
-         2/Yjz04rygS5eguuM37aCW/UMofNUEYKQKeP2SjXwr08kQ3ncvFkQ5JQeH41ty2yU46R
-         rGtvzSwn4DeRWawKnVMIpy436eIkv1KWDE4Y62bEBmV6HAL1e1Kel099zJP8AIObK+d6
-         Xi0nagwlCUrhFZ7EW0HgoNJgH32UGaxb+pykycp/hk/wSSAVzoulC84CUgvvOLjgCr4a
-         0zSLJuvf+ceTqnNHfqlUoL/CBh9gJXMITqMt58WAlHud/B13nefjnyxrAdFViTNlC9g/
-         C8Sw==
+        bh=ncTfbrWWXjvnrM1t5gDCcZGArioiisqz5PzMYrE1ABU=;
+        b=ZDMybYywTFQQpVUc/dVOu/y6W7gTrKthBO61GH3XhwlQGnlKOClij0roOppKg7XSEP
+         clbFYJCsJIFAy0uAppeo3k0ycBs81jPTm7rVX7FizUStIsnee+DvhptZ/GwRqMrqAs3Q
+         rWUizLEJWwSDhsZhUC9K5yHWBSdif9a41afkAp+dXp7Y5z3pQnlea4M1mC3XDaq/Wul1
+         G9Vq7aJ9v1hVMeLqEkakhEYiOQNmglrJbpo32OI27oT2Ye6gILcdZugwMB46ObzIWWWd
+         W2mlR4Ntc+oKd4WPrapVx1fY5arueErTvdM6UfqY7WpNyKQ+meEZY1BoUnQ+RocSMOJs
+         ojmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=vKd/FRP6xsxd1NyZwlcpU67d7iFrsPIxsqbAVx8bTdw=;
-        b=ljoIK5Qsff58z13uQbjUudXSogGxdJ4RL6KrX6Kd7QAz1pkv5PhoOxRD/GDYAzwAKh
-         jmDMdSuwuh1oRNpFw7WJr+YCqzkH3HSxsvWiGLiHeRhrRHHFs35+K7JjkwrpQzb+yYqy
-         KSFT9SW/OXr1pZe+vzTWv6omMjP/94r87xWI+39+/IJMM6rDkRESoMtlq7jcvh8Dq0AO
-         KsBY4C7NxgrbXkDOQSD4pFVtw/48TGqzKOMilfwbwSthdbE2W8dWTDbuLSpeEF96INLJ
-         Mj6sU+yf0paXBTqLCHsxSvphGs4pwu4YQ04wzwhRY9ikHbqJ3aPWOk1AjYnucDAZ0MOv
-         rajQ==
-X-Gm-Message-State: AOAM533Hxc+osaD6HFGcfLDkQgtiC/ku79JQ05aGxTguDYejGyEifnRd
-        MiQAovdJHkXU0wuC/ykB7NHp1EBGEA==
-X-Google-Smtp-Source: ABdhPJxK+J/4nEIn+GrBuqd/cPmlWnyMGlRJcdSlgCB8WvLAhxMnGsnFlZ1r4pp0DunJBFb+U7LxVLudDA==
+        bh=ncTfbrWWXjvnrM1t5gDCcZGArioiisqz5PzMYrE1ABU=;
+        b=l8gmgBdkAS0vd4dhBqebL/+qS5QxGDdHcoRBzoHLBT3OSsYQ1+UEKE+QqB0LK+ni6N
+         z8ibWSk4c1xkLeU7QNLTS2s1UayQYLuzTxe6yLPYitILKsd3oBC/jln2fasBRyHALGYN
+         6vnDucRukV9L3mUEACsdkafVdnvdAY9Co2rB6XL+blLLO6CCi2Y0X3P3GWDTIwHBrQjS
+         UvrjB7Sxqg1jH+ZFH49WXn5vwv8kKgpdQLNyHuhcu8TKVHSEOoFPjXLt7O0eQvXUQfB6
+         O+QgkDAYcRTTttihk3202gVP4sJzbdIIFV5/9bdFBv1wr6LdDKsWsaTDwit7/ECs2IEV
+         IPyA==
+X-Gm-Message-State: AOAM530arW0RiYCBPqwTiQdmkvATpzmQkIkuD3KI5YIYHSIb8z8iOwYK
+        +tq9rCYrym4Nfu5K2mnrvWMZhvIjMw==
+X-Google-Smtp-Source: ABdhPJyqqbcbmWWxFUAoN0ubpIg901FVokDG3zdESYltfWovzpoZnxktaZaX+Lno4ei5g7zYuT5P8w37yw==
 X-Received: from tabba.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:482])
- (user=tabba job=sendgmr) by 2002:ad4:55b3:: with SMTP id f19mr36952746qvx.16.1632314835185;
- Wed, 22 Sep 2021 05:47:15 -0700 (PDT)
-Date:   Wed, 22 Sep 2021 13:46:56 +0100
+ (user=tabba job=sendgmr) by 2002:adf:db0c:: with SMTP id s12mr360252wri.322.1632314837410;
+ Wed, 22 Sep 2021 05:47:17 -0700 (PDT)
+Date:   Wed, 22 Sep 2021 13:46:57 +0100
 In-Reply-To: <20210922124704.600087-1-tabba@google.com>
-Message-Id: <20210922124704.600087-5-tabba@google.com>
+Message-Id: <20210922124704.600087-6-tabba@google.com>
 Mime-Version: 1.0
 References: <20210922124704.600087-1-tabba@google.com>
 X-Mailer: git-send-email 2.33.0.464.g1972c5931b-goog
-Subject: [PATCH v6 04/12] KVM: arm64: Add missing FORCE prerequisite in Makefile
+Subject: [PATCH v6 05/12] KVM: arm64: Pass struct kvm to per-EC handlers
 From:   Fuad Tabba <tabba@google.com>
 To:     kvmarm@lists.cs.columbia.edu
 Cc:     maz@kernel.org, will@kernel.org, james.morse@arm.com,
@@ -65,26 +65,64 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add missing FORCE prerequisite for hyp relocation target.
+We need struct kvm to check for protected VMs to be able to pick
+the right handlers for them in subsequent patches.
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/hyp/nvhe/Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 4 ++--
+ arch/arm64/kvm/hyp/nvhe/switch.c        | 2 +-
+ arch/arm64/kvm/hyp/vhe/switch.c         | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
-index 5df6193fc430..8d741f71377f 100644
---- a/arch/arm64/kvm/hyp/nvhe/Makefile
-+++ b/arch/arm64/kvm/hyp/nvhe/Makefile
-@@ -54,7 +54,7 @@ $(obj)/kvm_nvhe.tmp.o: $(obj)/hyp.lds $(addprefix $(obj)/,$(hyp-obj)) FORCE
- #    runtime. Because the hypervisor is part of the kernel binary, relocations
- #    produce a kernel VA. We enumerate relocations targeting hyp at build time
- #    and convert the kernel VAs at those positions to hyp VAs.
--$(obj)/hyp-reloc.S: $(obj)/kvm_nvhe.tmp.o $(obj)/gen-hyprel
-+$(obj)/hyp-reloc.S: $(obj)/kvm_nvhe.tmp.o $(obj)/gen-hyprel FORCE
- 	$(call if_changed,hyprel)
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index 0397606c0951..733e39f5aaaf 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -403,7 +403,7 @@ static bool kvm_hyp_handle_dabt_low(struct kvm_vcpu *vcpu, u64 *exit_code)
  
- # 5) Compile hyp-reloc.S and link it into the existing partially linked object.
+ typedef bool (*exit_handler_fn)(struct kvm_vcpu *, u64 *);
+ 
+-static const exit_handler_fn *kvm_get_exit_handler_array(void);
++static const exit_handler_fn *kvm_get_exit_handler_array(struct kvm *kvm);
+ 
+ /*
+  * Allow the hypervisor to handle the exit with an exit handler if it has one.
+@@ -413,7 +413,7 @@ static const exit_handler_fn *kvm_get_exit_handler_array(void);
+  */
+ static inline bool kvm_hyp_handle_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+ {
+-	const exit_handler_fn *handlers = kvm_get_exit_handler_array();
++	const exit_handler_fn *handlers = kvm_get_exit_handler_array(kern_hyp_va(vcpu->kvm));
+ 	exit_handler_fn fn;
+ 
+ 	fn = handlers[kvm_vcpu_trap_get_class(vcpu)];
+diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+index c52d580708e0..49080c607838 100644
+--- a/arch/arm64/kvm/hyp/nvhe/switch.c
++++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+@@ -170,7 +170,7 @@ static const exit_handler_fn hyp_exit_handlers[] = {
+ 	[ESR_ELx_EC_PAC]		= kvm_hyp_handle_ptrauth,
+ };
+ 
+-static const exit_handler_fn *kvm_get_exit_handler_array(void)
++static const exit_handler_fn *kvm_get_exit_handler_array(struct kvm *kvm)
+ {
+ 	return hyp_exit_handlers;
+ }
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index 0e0d342358f7..34a4bd9f67a7 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -108,7 +108,7 @@ static const exit_handler_fn hyp_exit_handlers[] = {
+ 	[ESR_ELx_EC_PAC]		= kvm_hyp_handle_ptrauth,
+ };
+ 
+-static const exit_handler_fn *kvm_get_exit_handler_array(void)
++static const exit_handler_fn *kvm_get_exit_handler_array(struct kvm *kvm)
+ {
+ 	return hyp_exit_handlers;
+ }
 -- 
 2.33.0.464.g1972c5931b-goog
 
