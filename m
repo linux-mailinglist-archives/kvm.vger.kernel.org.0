@@ -2,115 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2A48E41525A
-	for <lists+kvm@lfdr.de>; Wed, 22 Sep 2021 23:06:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A5B0C41528B
+	for <lists+kvm@lfdr.de>; Wed, 22 Sep 2021 23:17:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237804AbhIVVHa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Sep 2021 17:07:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36642 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237778AbhIVVH3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Sep 2021 17:07:29 -0400
-Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BB45C061574
-        for <kvm@vger.kernel.org>; Wed, 22 Sep 2021 14:05:59 -0700 (PDT)
-Received: by mail-lf1-x131.google.com with SMTP id e15so17237150lfr.10
-        for <kvm@vger.kernel.org>; Wed, 22 Sep 2021 14:05:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=shutemov-name.20210112.gappssmtp.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=/PcqjgcRCkyIpO5H00bhPWTTbPCMNXWR4nKgirdi3Io=;
-        b=xEkq7SUZRewChVZqWhm4cS96l8pPzSSEz+ScgQL56dgjn10FcSw+jLPv0OY9bYezIP
-         CYphaUGJXn/snvtDU3KSfg579Nb5Qlk3NtUo6CuASAlclCh3ui7cA33wRO6foyyQk9sK
-         Mw3x0Ft59CKVBwMroO3W4lugA/tv5mEWbElbrHB+wIwMc5ZNjOZSS8KT6h+Zon+cf4qv
-         JmEltnmffmbEBqUsebTV11v0B5U1mVwBUj3sW1gLZspQ54hm7TrP9j1QPJEblcLAhwI2
-         nEggNK9m8gYxewjcBCYSYCHLIhl9iSTZmO6vl1lqR1Tl54TSO4jEGxDT96zBALyLtnLS
-         Hi0w==
+        id S237987AbhIVVSs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Sep 2021 17:18:48 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:32772 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S237840AbhIVVSr (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 22 Sep 2021 17:18:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1632345437;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=/gYLvFBwTWP63mHQyIOLQDvO3hmF+2iVnEein9qF53Y=;
+        b=G9NZG6L/GhdGFp2d4yc9CQ4GNDzxJvhr/lIijCMfUKX2htWSvOl/974bv6FPF/qUoKqqlo
+        uohIIlFQLsFlE6HbqRPVsVxMoP5+LYNCuXOY8RF0K1frItrU0+qPfDxMVjkFP6nv/opKGH
+        3W6JDmDfI8YUc8NCcEmZUPL4XAAsRUI=
+Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com
+ [209.85.161.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-41-7pENrMjGMQOlq32h3bovag-1; Wed, 22 Sep 2021 17:17:15 -0400
+X-MC-Unique: 7pENrMjGMQOlq32h3bovag-1
+Received: by mail-oo1-f69.google.com with SMTP id z23-20020a4ad597000000b0029174f63d3eso2462332oos.18
+        for <kvm@vger.kernel.org>; Wed, 22 Sep 2021 14:17:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=/PcqjgcRCkyIpO5H00bhPWTTbPCMNXWR4nKgirdi3Io=;
-        b=dv4ktR3rGsuIXqHlgeqBRSzpxLQmw8fUTN3sFqBrh3zNsxcEM+W5M6WGmZKJZvogB3
-         g1GosCfeSTRQYXigfPCathumHv78Zh3sZy7laFn6SYeGqWJbEpYstmwPIdeZYJVJBCHY
-         kYoHzAZX4M9/k17uv/bqScywcj3WX6OQzxC6jEFFJ0aL1hN0wRwvt0JsBQyleH5oiHnO
-         w12JcaANM88XTMV8amPg2BOBE35eCz5E3Ar520HPd5MBZgeXxf1Sv8mrYXcL1JS0EoS7
-         60knGebNvWZM40BVJHnT/ZJ/fMkA7Q9sgL54adzFxJHoEnHHMcMkSsLuUbiMuDMY1Ieq
-         o4CA==
-X-Gm-Message-State: AOAM533U7xTTM9cS6App4qa8WpcGJS+R/gsXzVNGmLdJ9TITwryke2pa
-        rlsSr6v4rSTj9+8N44euTY1lHQ==
-X-Google-Smtp-Source: ABdhPJxFaBhI/uy8npc3Dtax2q52q/CAXrrCmDjvazERLjrealUJSj+rQLNB+0RcTEMnHlaiKFjmmA==
-X-Received: by 2002:a05:6512:5c2:: with SMTP id o2mr917110lfo.207.1632344757440;
-        Wed, 22 Sep 2021 14:05:57 -0700 (PDT)
-Received: from box.localdomain ([86.57.175.117])
-        by smtp.gmail.com with ESMTPSA id bi33sm370467ljb.89.2021.09.22.14.05.56
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=/gYLvFBwTWP63mHQyIOLQDvO3hmF+2iVnEein9qF53Y=;
+        b=dG73Kvy0aahEPN44SrIl10Afp/hd4rAwHfzWLn/6IUdzxjZ4hhEagFBfVk0Ry0aBez
+         xDQby/Z+dsMSDDMYyyW3sgU7TBh/Wxwh9KTRzqJ0bacdXN5EGdgvWoS6JkRMxN+JEGzt
+         ZBz7KQA4TZ52VMc23EY4REteb+guQw+cy+fb41SvX2U+lp7ecB75stiBvxB7ZpHIapfy
+         qR9eUYSJ4c0vlLtVPxKPGrSYToJtqCLZh+/QKTQSNtN9yI7rZLDPCW5q5+9J8kylz4YJ
+         gJtNM7SRgD1UwPY8gaGb3wcBaeVb/0OCHVAfieZnPpwoJRs9blpkfcqQldijmL3AzTli
+         mROg==
+X-Gm-Message-State: AOAM533hZz0iesioUnlZKng6Uk0Vri52qhxRWKxpCfHQ6btCOIRNFLV+
+        rM+YKV1yX91MEww3PtoHzQM41JXJTxwqoRFHeO0L3Sm0B1hbluGSRPIaY/PSBSEImkKurQDMXEN
+        sEYlVJiL+7tBQ
+X-Received: by 2002:a05:6830:2486:: with SMTP id u6mr1135216ots.93.1632345435217;
+        Wed, 22 Sep 2021 14:17:15 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxc6iyyZw+WQTCkXn6zRwyOEIFjLLsl9TFY8nydX9jzhc7fYSxkdPKhBdO818HVxgfS9lMqEQ==
+X-Received: by 2002:a05:6830:2486:: with SMTP id u6mr1135191ots.93.1632345435007;
+        Wed, 22 Sep 2021 14:17:15 -0700 (PDT)
+Received: from redhat.com ([198.99.80.109])
+        by smtp.gmail.com with ESMTPSA id j4sm802381oia.56.2021.09.22.14.17.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Sep 2021 14:05:56 -0700 (PDT)
-Received: by box.localdomain (Postfix, from userid 1000)
-        id 60F2A10304D; Thu, 23 Sep 2021 00:05:58 +0300 (+03)
-Date:   Thu, 23 Sep 2021 00:05:58 +0300
-From:   "Kirill A. Shutemov" <kirill@shutemov.name>
-To:     Borislav Petkov <bp@alien8.de>
-Cc:     Tom Lendacky <thomas.lendacky@amd.com>,
-        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, x86@kernel.org,
-        iommu@lists.linux-foundation.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-graphics-maintainer@vmware.com,
-        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        kexec@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Andi Kleen <ak@linux.intel.com>,
-        Sathyanarayanan Kuppuswamy 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        Tianyu Lan <Tianyu.Lan@microsoft.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v3 5/8] x86/sme: Replace occurrences of sme_active() with
- cc_platform_has()
-Message-ID: <20210922210558.itofvu3725dap5xx@box.shutemov.name>
-References: <77df37e1-0496-aed5-fd1d-302180f1edeb@amd.com>
- <YUoao0LlqQ6+uBrq@zn.tnic>
- <20210921212059.wwlytlmxoft4cdth@box.shutemov.name>
- <YUpONYwM4dQXAOJr@zn.tnic>
- <20210921213401.i2pzaotgjvn4efgg@box.shutemov.name>
- <00f52bf8-cbc6-3721-f40e-2f51744751b0@amd.com>
- <20210921215830.vqxd75r4eyau6cxy@box.shutemov.name>
- <01891f59-7ec3-cf62-a8fc-79f79ca76587@amd.com>
- <20210922143015.vvxvh6ec73lffvkf@box.shutemov.name>
- <YUuJZ2qOgbdpfk6N@zn.tnic>
+        Wed, 22 Sep 2021 14:17:14 -0700 (PDT)
+Date:   Wed, 22 Sep 2021 15:17:12 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
+        "hch@lst.de" <hch@lst.de>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+        "parav@mellanox.com" <parav@mellanox.com>,
+        "lkml@metux.net" <lkml@metux.net>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "lushenming@huawei.com" <lushenming@huawei.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "corbet@lwn.net" <corbet@lwn.net>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "yi.l.liu@linux.intel.com" <yi.l.liu@linux.intel.com>,
+        "Tian, Jun J" <jun.j.tian@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "dwmw2@infradead.org" <dwmw2@infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
+        "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>
+Subject: Re: [RFC 05/20] vfio/pci: Register device to /dev/vfio/devices
+Message-ID: <20210922151712.20162912.alex.williamson@redhat.com>
+In-Reply-To: <BN9PR11MB5433D909662D484EFE9C82E28CA29@BN9PR11MB5433.namprd11.prod.outlook.com>
+References: <20210919063848.1476776-1-yi.l.liu@intel.com>
+        <20210919063848.1476776-6-yi.l.liu@intel.com>
+        <20210921164001.GR327412@nvidia.com>
+        <20210921150929.5977702c.alex.williamson@redhat.com>
+        <BN9PR11MB5433D909662D484EFE9C82E28CA29@BN9PR11MB5433.namprd11.prod.outlook.com>
+Organization: Red Hat
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YUuJZ2qOgbdpfk6N@zn.tnic>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 22, 2021 at 09:52:07PM +0200, Borislav Petkov wrote:
-> On Wed, Sep 22, 2021 at 05:30:15PM +0300, Kirill A. Shutemov wrote:
-> > Not fine, but waiting to blowup with random build environment change.
+On Wed, 22 Sep 2021 01:19:08 +0000
+"Tian, Kevin" <kevin.tian@intel.com> wrote:
+
+> > From: Alex Williamson <alex.williamson@redhat.com>
+> > Sent: Wednesday, September 22, 2021 5:09 AM
+> > 
+> > On Tue, 21 Sep 2021 13:40:01 -0300
+> > Jason Gunthorpe <jgg@nvidia.com> wrote:
+> >   
+> > > On Sun, Sep 19, 2021 at 02:38:33PM +0800, Liu Yi L wrote:  
+> > > > This patch exposes the device-centric interface for vfio-pci devices. To
+> > > > be compatiable with existing users, vfio-pci exposes both legacy group
+> > > > interface and device-centric interface.
+> > > >
+> > > > As explained in last patch, this change doesn't apply to devices which
+> > > > cannot be forced to snoop cache by their upstream iommu. Such devices
+> > > > are still expected to be opened via the legacy group interface.  
+> > 
+> > This doesn't make much sense to me.  The previous patch indicates
+> > there's work to be done in updating the kvm-vfio contract to understand
+> > DMA coherency, so you're trying to limit use cases to those where the
+> > IOMMU enforces coherency, but there's QEMU work to be done to support
+> > the iommufd uAPI at all.  Isn't part of that work to understand how KVM
+> > will be told about non-coherent devices rather than "meh, skip it in the
+> > kernel"?  Also let's not forget that vfio is not only for KVM.  
 > 
-> Why is it not fine?
+> The policy here is that VFIO will not expose such devices (no enforce-snoop)
+> in the new device hierarchy at all. In this case QEMU will fall back to the
+> group interface automatically and then rely on the existing contract to connect 
+> vfio and QEMU. It doesn't need to care about the whatever new contract
+> until such devices are exposed in the new interface.
 > 
-> Are you suspecting that the compiler might generate something else and
-> not a rip-relative access?
+> yes, vfio is not only for KVM. But here it's more a task split based on staging
+> consideration. imo it's not necessary to further split task into supporting
+> non-snoop device for userspace driver and then for kvm.
 
-Yes. We had it before for __supported_pte_mask and other users of
-fixup_pointer().
+Patch 10 introduces an iommufd interface for QEMU to learn whether the
+IOMMU enforces DMA coherency, at that point QEMU could revert to the
+legacy interface, or register the iommufd with KVM, or otherwise
+establish non-coherent DMA with KVM as necessary.  We're adding cruft
+to the kernel here to enforce an unnecessary limitation.
 
-See for instance 4a09f0210c8b ("x86/boot/64/clang: Use fixup_pointer() to
-access '__supported_pte_mask'")
+If there are reasons the kernel can't support the device interface,
+that's a valid reason not to present the interface, but this seems like
+picking a specific gap that userspace is already able to detect from
+this series at the expense of other use cases.  Thanks,
 
-Unless we find other way to guarantee RIP-relative access, we must use
-fixup_pointer() to access any global variables.
+Alex
 
--- 
- Kirill A. Shutemov
