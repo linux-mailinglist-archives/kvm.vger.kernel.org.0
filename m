@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 62DC741498D
+	by mail.lfdr.de (Postfix) with ESMTP id C3CF141498E
 	for <lists+kvm@lfdr.de>; Wed, 22 Sep 2021 14:47:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236125AbhIVMtG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Sep 2021 08:49:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60852 "EHLO
+        id S236144AbhIVMtH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Sep 2021 08:49:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60854 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236159AbhIVMtA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S236158AbhIVMtA (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 22 Sep 2021 08:49:00 -0400
-Received: from mail-qk1-x74a.google.com (mail-qk1-x74a.google.com [IPv6:2607:f8b0:4864:20::74a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE86CC061768
-        for <kvm@vger.kernel.org>; Wed, 22 Sep 2021 05:47:28 -0700 (PDT)
-Received: by mail-qk1-x74a.google.com with SMTP id w17-20020ae9e511000000b00431497430b7so10057827qkf.12
-        for <kvm@vger.kernel.org>; Wed, 22 Sep 2021 05:47:28 -0700 (PDT)
+Received: from mail-qt1-x84a.google.com (mail-qt1-x84a.google.com [IPv6:2607:f8b0:4864:20::84a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 943E9C061574
+        for <kvm@vger.kernel.org>; Wed, 22 Sep 2021 05:47:30 -0700 (PDT)
+Received: by mail-qt1-x84a.google.com with SMTP id x28-20020ac8701c000000b0029f4b940566so8227252qtm.19
+        for <kvm@vger.kernel.org>; Wed, 22 Sep 2021 05:47:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=VDXP3setiKLnEkr+m8sXiGgb9NQ7LpnbUrrcIbXKtWo=;
-        b=YhjUmlV5OpV1LXBTgzD8/h4cw2tRnnfej2OdpOQpSGJxMxFm+HDvY9vdNn7/RVXaxA
-         lVbEnrUF58QW9sv1C6OK93B5CyDwhDWtQ4NMEpn/M8vw6kRj8RiFofXL2HGYyVZ46ghF
-         oMxWjdWfsofPMRxWOOdMyIvmnVxOyner4uS2ykvqR73D33N3r/sub3jwu3PTk/Crd/c4
-         y3V/DEQoTtMLQ7dGuaD7wLT3jw6R5oSx2QT8EDVkWoffehArauEXCYepe5rAYc01TdzY
-         vbQSAEObj8/viDQul62w2oFY9l+j0cxFaDKLITiZVWrv7+OFhyHSy1SFp7xEU/TMu9yI
-         5KqA==
+        bh=fhuyzDrWVkEjtHzFzN+Fx6ExKEiC8uquGig/dbG3Bns=;
+        b=nC1xPUxkO/dCfs8FVpTPJ8s8ewk2VV5qT2a4qephLr4t+EZ5A/JCaPLQIOMf+T4A/F
+         HD3I6c8yXTN2Z1GmvjAB9kHrih+iGQhAnSj1eKpqqyjbYMxx5FzYKn/LNr25KlV8WOU7
+         CcDVOxXpkPE/wH4yhdOaoYTeBKhVu3k7Xpbf8LOWTzYwQTU5G11agDQnhZ993/d6nOuo
+         e1Zutmt0OI78WrqGYEv1VInt2IpLFMQGCTIjv7vJxx231AmMFGbcOlYGjkTYsksFY5tn
+         byC+9fZxDfQkQ2z8VdC1X5jVwHcf9KuiWm1qDyHW9xbjqQ1JBPkX9mywJExzn54KfSYI
+         j6kg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=VDXP3setiKLnEkr+m8sXiGgb9NQ7LpnbUrrcIbXKtWo=;
-        b=BMRoU/UCUpADgVAWsqcoiUimWkRTiouDG3nA4Ihh33I6+EMLippausnmCFZEkVByC9
-         GVIdlPqObisnz/GTSrSIdcnizuL+A+7N+Nav1vWoFSVdzXV13Kl3EmWHDiPzqJPZ0Qp4
-         lMudp8FTtIAplmRd7OSa7dw6btb6hAAhNOSBy9eTFDZGlhNpB3rTHS9Xoj2owvCqS2m3
-         W9iChLHsI5NXTjXUUJjBRYl6uLHPpXh+Q+Ugf3F8FNuyBmG4DouIIutvmMZ4eQ1D44B0
-         Jc9ZZa+VoptrQrn0lEsS4fVT7HxZUFpzmWds6BcHuScJ+rWDSH8DK/ge/mddfyQYdXVn
-         4Fcg==
-X-Gm-Message-State: AOAM532iyQ9Lh3bHsiocn/aL8sTXCOR93m1iR9+QNQMojpVBjzE9MQgq
-        FQh4vXZe6Dkh81fnbrCNxy3zhfBnuA==
-X-Google-Smtp-Source: ABdhPJyQbCBi9wL/tzdvEaSavXwKPtQuvp/ahZuW35rtc+EuWLIOI43tUp6sSo2sedY/Dgz5GrvXBg5Ung==
+        bh=fhuyzDrWVkEjtHzFzN+Fx6ExKEiC8uquGig/dbG3Bns=;
+        b=C/ohPLFHsSQHnZRYnhV4R2vE0ZaFU8It1frxpMxHbeASs5UsRxtJPayjnV4ipIQiei
+         mF00dW8CzK/sWdlykiJ8A36pGjzn2Lu18zP4HtGWvziRallQdAsc+cFyHxNjo4IAH3sy
+         MCRY72ln688A+2e/aFMY3CLPAZr7qR+b3Hyr1g04x5/jYz5HFMFJ7NhygkwFubxzEeMP
+         RCA4/WmvPx1jlyybLQLgYWGJ1DvTbotJY1yYLDaOZAWet+ZssAUWMJVWiR7OZiVAo4d+
+         nSNyj3qAeUdn42qmRZgbjQs7XKjJqo6WIfoGzHfZYSB9arJzzPO+KbETA59MuKFDk4Kq
+         /Fqg==
+X-Gm-Message-State: AOAM532Ljbr7mbpA+o2AMPEq8e8UzmXtIWDX/zBlgHVEPKvrt5sDyn0F
+        8kbJL3qNA3CnibP/g5xhsJ3OCXZYjg==
+X-Google-Smtp-Source: ABdhPJxbrBtZRxlrZyFXhw9pE2+iVlXS5BSDuMMG1cQhJ1gtaZoBRAu5TJ0pEsjLM6ux6doDiNfYq5ulMg==
 X-Received: from tabba.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:482])
- (user=tabba job=sendgmr) by 2002:a25:8881:: with SMTP id d1mr15958608ybl.289.1632314847844;
- Wed, 22 Sep 2021 05:47:27 -0700 (PDT)
-Date:   Wed, 22 Sep 2021 13:47:02 +0100
+ (user=tabba job=sendgmr) by 2002:ad4:556d:: with SMTP id w13mr8188690qvy.4.1632314849777;
+ Wed, 22 Sep 2021 05:47:29 -0700 (PDT)
+Date:   Wed, 22 Sep 2021 13:47:03 +0100
 In-Reply-To: <20210922124704.600087-1-tabba@google.com>
-Message-Id: <20210922124704.600087-11-tabba@google.com>
+Message-Id: <20210922124704.600087-12-tabba@google.com>
 Mime-Version: 1.0
 References: <20210922124704.600087-1-tabba@google.com>
 X-Mailer: git-send-email 2.33.0.464.g1972c5931b-goog
-Subject: [PATCH v6 10/12] KVM: arm64: Move sanitized copies of CPU features
+Subject: [PATCH v6 11/12] KVM: arm64: Trap access to pVM restricted features
 From:   Fuad Tabba <tabba@google.com>
 To:     kvmarm@lists.cs.columbia.edu
 Cc:     maz@kernel.org, will@kernel.org, james.morse@arm.com,
@@ -65,49 +65,122 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Move the sanitized copies of the CPU feature registers to the
-recently created sys_regs.c. This consolidates all copies in a
-more relevant file.
+Trap accesses to restricted features for VMs running in protected
+mode.
 
-No functional change intended.
+Access to feature registers are emulated, and only supported
+features are exposed to protected VMs.
 
-Acked-by: Will Deacon <will@kernel.org>
+Accesses to restricted registers as well as restricted
+instructions are trapped, and an undefined exception is injected
+into the protected guests, i.e., with EC = 0x0 (unknown reason).
+This EC is the one used, according to the Arm Architecture
+Reference Manual, for unallocated or undefined system registers
+or instructions.
+
+Only affects the functionality of protected VMs. Otherwise,
+should not affect non-protected VMs when KVM is running in
+protected mode.
+
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/hyp/nvhe/mem_protect.c | 6 ------
- arch/arm64/kvm/hyp/nvhe/sys_regs.c    | 2 ++
- 2 files changed, 2 insertions(+), 6 deletions(-)
+ arch/arm64/kvm/hyp/nvhe/switch.c | 60 ++++++++++++++++++++++++++++++++
+ 1 file changed, 60 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-index 2a07d63b8498..f6d96e60b323 100644
---- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-+++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-@@ -25,12 +25,6 @@ struct host_kvm host_kvm;
+diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+index 49080c607838..2bf5952f651b 100644
+--- a/arch/arm64/kvm/hyp/nvhe/switch.c
++++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+@@ -20,6 +20,7 @@
+ #include <asm/kprobes.h>
+ #include <asm/kvm_asm.h>
+ #include <asm/kvm_emulate.h>
++#include <asm/kvm_fixed_config.h>
+ #include <asm/kvm_hyp.h>
+ #include <asm/kvm_mmu.h>
+ #include <asm/fpsimd.h>
+@@ -28,6 +29,7 @@
+ #include <asm/thread_info.h>
  
- static struct hyp_pool host_s2_pool;
+ #include <nvhe/mem_protect.h>
++#include <nvhe/sys_regs.h>
  
--/*
-- * Copies of the host's CPU features registers holding sanitized values.
-- */
--u64 id_aa64mmfr0_el1_sys_val;
--u64 id_aa64mmfr1_el1_sys_val;
--
- const u8 pkvm_hyp_id = 1;
+ /* Non-VHE specific context */
+ DEFINE_PER_CPU(struct kvm_host_data, kvm_host_data);
+@@ -158,6 +160,49 @@ static void __pmu_switch_to_host(struct kvm_cpu_context *host_ctxt)
+ 		write_sysreg(pmu->events_host, pmcntenset_el0);
+ }
  
- static void *host_s2_zalloc_pages_exact(size_t size)
-diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-index ef8456c54b18..13163be83756 100644
---- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-+++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-@@ -19,6 +19,8 @@ u64 id_aa64pfr0_el1_sys_val;
- u64 id_aa64pfr1_el1_sys_val;
- u64 id_aa64isar0_el1_sys_val;
- u64 id_aa64isar1_el1_sys_val;
-+u64 id_aa64mmfr0_el1_sys_val;
-+u64 id_aa64mmfr1_el1_sys_val;
- u64 id_aa64mmfr2_el1_sys_val;
++/**
++ * Handler for protected VM restricted exceptions.
++ *
++ * Inject an undefined exception into the guest and return true to indicate that
++ * the hypervisor has handled the exit, and control should go back to the guest.
++ */
++static bool kvm_handle_pvm_restricted(struct kvm_vcpu *vcpu, u64 *exit_code)
++{
++	__inject_undef64(vcpu);
++	return true;
++}
++
++/**
++ * Handler for protected VM MSR, MRS or System instruction execution in AArch64.
++ *
++ * Returns true if the hypervisor has handled the exit, and control should go
++ * back to the guest, or false if it hasn't.
++ */
++static bool kvm_handle_pvm_sys64(struct kvm_vcpu *vcpu, u64 *exit_code)
++{
++	if (kvm_handle_pvm_sysreg(vcpu, exit_code))
++		return true;
++	else
++		return kvm_hyp_handle_sysreg(vcpu, exit_code);
++}
++
++/**
++ * Handler for protected floating-point and Advanced SIMD accesses.
++ *
++ * Returns true if the hypervisor has handled the exit, and control should go
++ * back to the guest, or false if it hasn't.
++ */
++static bool kvm_handle_pvm_fpsimd(struct kvm_vcpu *vcpu, u64 *exit_code)
++{
++	/* Linux guests assume support for floating-point and Advanced SIMD. */
++	BUILD_BUG_ON(!FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_FP),
++				PVM_ID_AA64PFR0_ALLOW));
++	BUILD_BUG_ON(!FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_ASIMD),
++				PVM_ID_AA64PFR0_ALLOW));
++
++	return kvm_hyp_handle_fpsimd(vcpu, exit_code);
++}
++
+ static const exit_handler_fn hyp_exit_handlers[] = {
+ 	[0 ... ESR_ELx_EC_MAX]		= NULL,
+ 	[ESR_ELx_EC_CP15_32]		= kvm_hyp_handle_cp15,
+@@ -170,8 +215,23 @@ static const exit_handler_fn hyp_exit_handlers[] = {
+ 	[ESR_ELx_EC_PAC]		= kvm_hyp_handle_ptrauth,
+ };
  
- static inline void inject_undef64(struct kvm_vcpu *vcpu)
++static const exit_handler_fn pvm_exit_handlers[] = {
++	[0 ... ESR_ELx_EC_MAX]		= NULL,
++	[ESR_ELx_EC_CP15_32]		= kvm_hyp_handle_cp15,
++	[ESR_ELx_EC_CP15_64]		= kvm_hyp_handle_cp15,
++	[ESR_ELx_EC_SYS64]		= kvm_handle_pvm_sys64,
++	[ESR_ELx_EC_SVE]		= kvm_handle_pvm_restricted,
++	[ESR_ELx_EC_FP_ASIMD]		= kvm_handle_pvm_fpsimd,
++	[ESR_ELx_EC_IABT_LOW]		= kvm_hyp_handle_iabt_low,
++	[ESR_ELx_EC_DABT_LOW]		= kvm_hyp_handle_dabt_low,
++	[ESR_ELx_EC_PAC]		= kvm_hyp_handle_ptrauth,
++};
++
+ static const exit_handler_fn *kvm_get_exit_handler_array(struct kvm *kvm)
+ {
++	if (unlikely(kvm_vm_is_protected(kvm)))
++		return pvm_exit_handlers;
++
+ 	return hyp_exit_handlers;
+ }
+ 
 -- 
 2.33.0.464.g1972c5931b-goog
 
