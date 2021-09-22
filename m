@@ -2,244 +2,211 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 65D31413E2A
-	for <lists+kvm@lfdr.de>; Wed, 22 Sep 2021 01:56:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0DAC2413E37
+	for <lists+kvm@lfdr.de>; Wed, 22 Sep 2021 02:05:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231264AbhIUX5k (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Sep 2021 19:57:40 -0400
-Received: from mga03.intel.com ([134.134.136.65]:4790 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229824AbhIUX5j (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Sep 2021 19:57:39 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10114"; a="223529940"
-X-IronPort-AV: E=Sophos;i="5.85,311,1624345200"; 
-   d="scan'208";a="223529940"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Sep 2021 16:56:09 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.85,311,1624345200"; 
-   d="scan'208";a="533499833"
-Received: from fmsmsx605.amr.corp.intel.com ([10.18.126.85])
-  by fmsmga004.fm.intel.com with ESMTP; 21 Sep 2021 16:56:09 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx605.amr.corp.intel.com (10.18.126.85) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2242.12; Tue, 21 Sep 2021 16:56:09 -0700
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2242.12 via Frontend Transport; Tue, 21 Sep 2021 16:56:09 -0700
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.103)
- by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2242.12; Tue, 21 Sep 2021 16:56:09 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ko6DgvZmzGgZ85QiBibKWZJv8zjFuHaSP6D/IlhncyRhI0+PaQHdhcRo6vxEiojIH+TL6GgbGyOWPdMAsR2EZ9F/+WWaclB4ByLhOlQGpsBvPwCed8hwv7mVgd2utkuaNFEhJhVc5GCN/1TtN+pmUP6VYdDD5+ZWjHDwDhCuN7e+0Ya5WwwdW/5OVkDxsi8eZCpa10yPv0nUCivd9EmIZf3c2Y9DxXbExQ65bmwh0C0wbeYx/dPzFUw7UPZ/5zx642WLpY/R+nrjsiRMdjuL/TgLH5AIAHV4SwoCTQjeETeibj6uhmeo9QVepynEhe/w8WMAsN3poHn3BhHrVQdVhQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
- bh=YZJCGR+ZAXiL2Kp+7TlxbNkx0Lw5h8j8iwq6vcpm5dY=;
- b=AtBwBmHqBMlS06C8PPg635sY81qkOum5WFjbSZmDkh5Za/lOlvXBchbfcYDk3ii1EVulNwlsrf77/efzf7t9Ic27rBKteGlUUi4rD6E8WKAbEuuq/1ZJAJAU9KxsfeMYfoQl+DoaDkLpvnvxGt3u8DpVGT0Eqc35vaf+ynb4kD2AeD93we9OnOdmust5C4/cQr1ZwAvbcrtOVlLClxnlAqiXOCayKp0ynLKBWreYd5xP4D3hdFKwtFW0KTBy58PVAzVo4KT2aBlZHX7a7U1HshZPmXcezCiBQQ4z615Bu5qNmtjnretmFWsG3Dwu7yNB87KgN50oAJS210XRATxDEQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
- s=selector2-intel-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YZJCGR+ZAXiL2Kp+7TlxbNkx0Lw5h8j8iwq6vcpm5dY=;
- b=TAYbqBls1LX9dU2HHTL4Bni1my8QxctNbkLB/ebpyO9gnfJmul/Q2+DRkNXwnmMG6ZMj1W7KRLsBbMyWcr51euIhcwHo7e2OLTnUTEhVAKcdVn6DcdFW4wV6W+MW3nfiUzavpEoPgRKt7x6jTkHdJcta5Nt8TlSu6A6kfyAOl+k=
-Received: from BN9PR11MB5433.namprd11.prod.outlook.com (2603:10b6:408:11e::13)
- by BN6PR11MB2018.namprd11.prod.outlook.com (2603:10b6:404:4a::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4523.18; Tue, 21 Sep
- 2021 23:56:06 +0000
-Received: from BN9PR11MB5433.namprd11.prod.outlook.com
- ([fe80::ddb7:fa7f:2cc:45df]) by BN9PR11MB5433.namprd11.prod.outlook.com
- ([fe80::ddb7:fa7f:2cc:45df%8]) with mapi id 15.20.4523.018; Tue, 21 Sep 2021
- 23:56:06 +0000
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>, "Liu, Yi L" <yi.l.liu@intel.com>
-CC:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "hch@lst.de" <hch@lst.de>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        "parav@mellanox.com" <parav@mellanox.com>,
-        "lkml@metux.net" <lkml@metux.net>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "lushenming@huawei.com" <lushenming@huawei.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "corbet@lwn.net" <corbet@lwn.net>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "yi.l.liu@linux.intel.com" <yi.l.liu@linux.intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "dwmw2@infradead.org" <dwmw2@infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-        "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>
-Subject: RE: [RFC 02/20] vfio: Add device class for /dev/vfio/devices
-Thread-Topic: [RFC 02/20] vfio: Add device class for /dev/vfio/devices
-Thread-Index: AQHXrSFvz6zvm2xHBUaW/Kl+BWVvQauuqGKAgACCWyA=
-Date:   Tue, 21 Sep 2021 23:56:06 +0000
-Message-ID: <BN9PR11MB5433A709ED352FD81DDBF5A68CA19@BN9PR11MB5433.namprd11.prod.outlook.com>
-References: <20210919063848.1476776-1-yi.l.liu@intel.com>
- <20210919063848.1476776-3-yi.l.liu@intel.com>
- <20210921155705.GN327412@nvidia.com>
-In-Reply-To: <20210921155705.GN327412@nvidia.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: nvidia.com; dkim=none (message not signed)
- header.d=none;nvidia.com; dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 929ec524-fb3d-4899-a949-08d97d5b60c5
-x-ms-traffictypediagnostic: BN6PR11MB2018:
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <BN6PR11MB201814A23D61B188AA9A2AC38CA19@BN6PR11MB2018.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8882;
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: qgVl3NlSL7WULDSbVqMFBmTRXa5tqvhnp8m2MfE0/az2KAzXbvg1LMISL+Lt2haGLKQzESIt9d/tVXZ+M4WwXxnzKeLg0swNyiNdmFqeB7C6kl8QyHQOskG9Z8x/Yfz8gOt/w25NhqabtduV6qYuID1YYshQ59bZlFvfjKMDZFaY0jurAv1gghvyoe7kxLBUuqtxWyfQ9EUH053eX9JKdin+Wwc+hm+S9fmv/H6Slil+pTahFAwEEvWaItB39gMv4onc59ORONM6YNTrq2tnaWPMRtciZ5G+Q/hwbKjwUxSEOlocqCLdevwcE6IfY9+Wm1D2RRiiI+PYIyCR1E3PvCRjRs3bAjeT+DSS1JyQmHTEwRyGqXhfYyuckms5fUGHe6jVTIVlZAEZsV2Fp1CuvXcliBx1Iks+GMEN66/dfThynPSQi8qZksjqKnuLCib7+1HBzUVJzH8nEZgUihnzhpPrdxXUrn/IwBHLOUnluSs5qLstZZjG6tXcq0IenFyfMVW6pZoBl6Ygy7wqjQa3VBbRFkYpSrQZK1jmn0FzrPTsi+6gLrjjjICQAZHEIqM7YNNbQKNnTp/hoRFBx1bzlXh/Tp5gIrAZBgDJgoHuGx/YCtqXEsSfCeEbHEXsuUberDXIZsiK6Vn2YaAxBx+qCSqxIOjkOhidQI841qG3CvCMwHzLBVtH+dLCzy1vfOVLjc8x+/CneYss6qBrKD6mWA==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5433.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(55016002)(33656002)(4326008)(508600001)(26005)(122000001)(7696005)(71200400001)(110136005)(38100700002)(5660300002)(66556008)(9686003)(8936002)(186003)(86362001)(54906003)(7416002)(2906002)(66476007)(66446008)(64756008)(6636002)(83380400001)(8676002)(76116006)(316002)(6506007)(52536014)(66946007)(38070700005);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?7Urv1aMhxGgcWkF8iDxXX/OiYCox1FJ2V/osZL4hbktVMPhtzPObcEnh7Nq2?=
- =?us-ascii?Q?q6Q+qnnGgcEW1PJzKNqQf/rWJHN1rtHFz8iDUJ7nu2ErarNGDcWZlLnVQSuW?=
- =?us-ascii?Q?gN65G5map6GcOIXADBrNKzE4I2BrH5l5nAil7zjiRMFUH7tfZSSjNi8j9PUN?=
- =?us-ascii?Q?bOkZrc4duu28RV2PZyQLNtGt0A4kYW5izGu7DU9Up/UkH8Wwfb9sNQzGdJm4?=
- =?us-ascii?Q?YlcfDkjvVnlxqNMHmvDMOiWeJVNEUu3ul8u7doGgmem52JVYnw5ggSl45l0/?=
- =?us-ascii?Q?T5PhldkeustHw4PNYtzvoEl3Z16AckaYkixzSOW5rk94m20pwO6iFaNOlzPs?=
- =?us-ascii?Q?UH9YdWj1Ktegp9ycCmtTsOsIAB7BBdUdPRDeKcvkSnwwup7Omb2ihyaVF0BC?=
- =?us-ascii?Q?W8j8lQ12EqhYBgvoFyOKsXdq7MS0ErTqjtp26ozOc/uQy36lkprBbn8eyaJw?=
- =?us-ascii?Q?0owGrb16q17R9uSYrjhciyci5HFKKoOqUpjQdRXfcng9hQUrryCKJ0UzPcZ+?=
- =?us-ascii?Q?Oz2s3/c8vMYGBjmSrFYjfNtdLVh7RVVx9yNZIaetgoV9SM/cXr5WinaQ3SGJ?=
- =?us-ascii?Q?3sg/JN0M9SnbflmVerPBac4YFMn/z5qU42yJos3lHagzgyXE8FZV8qxCRgzs?=
- =?us-ascii?Q?TMwaZyBHyO+Fq9xDuY6SYS6M1psdBNGNwcn1WrH6kbNiXM2i6oKGyK2CWIEa?=
- =?us-ascii?Q?Ca5zAohxyiXlEAYg0jVLBj7rvEOpgfShPVbjlagX9YhM/ImHWNEiRUCMSPQR?=
- =?us-ascii?Q?SSMOFk5oMRp1ZDNsY0/oAUvO1NkKmmq+cO/UNKDrUl2LKHwBajC+hzNTLvgN?=
- =?us-ascii?Q?SCym2t5dOp38X+nJfwtiJUOM2pJD8DpPTz/0E5Uqvq7idiWodg1TL9KM/zWb?=
- =?us-ascii?Q?7g17mooZA7RetY5yY8IghsCbY4Zih5NkgU1Hbxu6qXO8wfYtyb4qh968SwRL?=
- =?us-ascii?Q?F6xYBzHOxJgl/DYo6zInlXH8bJbZy+Y4VYQZRpjlNj0WRXE00TDIYL6XVgMr?=
- =?us-ascii?Q?AFl7Bdn6jI3Akobgr1NN9GO6cRTCqEGODxjloos3d+RPhzVMjSr0tjeWQEX8?=
- =?us-ascii?Q?3aVB4TfdSicvtTYHjQHdtxqt+Bk4ARnmNJIsPgULflptl3BV4NePVNHpOm/a?=
- =?us-ascii?Q?dz/6GFCqnbeysNffE1nGc0f9bOoPTLt2Oaki/MxKWiB8JXUH+9NxQ3KWxqfE?=
- =?us-ascii?Q?00fMHG7pqRG9fIQQNTisYop+WSW2cOoBQ+e9W+INmTZtbjx6ldum7EKB+oko?=
- =?us-ascii?Q?pX422O6K1oz3Pib2fDO9BXLlNKHFYfLHq7iYl4TwLt+PDAh37MREJ7WDYbCi?=
- =?us-ascii?Q?oCI=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5433.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 929ec524-fb3d-4899-a949-08d97d5b60c5
-X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Sep 2021 23:56:06.7000
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: SfquCW+fxlGZQ7IQXTuItZXV4BDMElcFx2eKb1rs9WoAJ0otHQU2Cn+dyLnqKkSU2TizClh9yGAwF1HAUd6jWw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR11MB2018
-X-OriginatorOrg: intel.com
+        id S231365AbhIVAHO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Sep 2021 20:07:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56682 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231354AbhIVAHN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Sep 2021 20:07:13 -0400
+Received: from mail-qt1-x84a.google.com (mail-qt1-x84a.google.com [IPv6:2607:f8b0:4864:20::84a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 328CDC061757
+        for <kvm@vger.kernel.org>; Tue, 21 Sep 2021 17:05:44 -0700 (PDT)
+Received: by mail-qt1-x84a.google.com with SMTP id b20-20020ac87fd4000000b002a69ee90efbso5177851qtk.11
+        for <kvm@vger.kernel.org>; Tue, 21 Sep 2021 17:05:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=phOg6sfjUxaw2dev9sQjUWZF+Yytb7b5OFt6ForYj/8=;
+        b=iUirf8Xy9HBHz1WXV3sP98cQFZc4uLbiWcks09YKieGNfFGG+gs0k72fDMm3HygsTL
+         bTb1E9YXxvDETi2LPUmOcN81qVU8N8EHMfwEIhym5xr1GL4nuPP5VSQWu2ilOytZoTGS
+         29N5LX0Q1nAT/Yc19LBLlvpkIdDWZ9R0T+ikDFK/YvQdlOVrTR3jtpdXiFmTcxfOUu8s
+         Y4Gz2V9KUWdc0VylyfjHYjfz7ZmN9V9G49FIJvjgEkSVzn9mYiMA4K/jF7NhytdmJ3F/
+         hUx1PUAps9mDw+Jed5eSqhmcHrheKl00VcwQxkkBJMKDmZCGnvuYJgWoF05Eip0DYKf0
+         Y9bA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=phOg6sfjUxaw2dev9sQjUWZF+Yytb7b5OFt6ForYj/8=;
+        b=DDLlItMMg8Y1dB93Dan/+w9SWSaxVcVEM0trk4oiZg+iCEQsYO/dBh0iPKEERmBrGi
+         7p1w3HY+/zSXUBpEz7svQpP1kxYZn5mtDY8/nv88+1bLC1GNbxTCtIcKrlLEERLCR3x5
+         HPGQxDq+/0VIjKHaKCEWVKL1fKhIRb207NPvlPXUZemwV74XZqDHEhmeFdPGJbfpoFv1
+         WxsQxZ5yERjsN0ExZnx4N6dMvamaIQGEt5IAVrX3usyHRF+lP48R9Ld54Ad+AzQMhLY7
+         PSl6KgEf0W95k15xwsozH1fWecLMVh3BOt6vG270yZuW/mTljNLQ9od/avHih8XWJlNG
+         vktQ==
+X-Gm-Message-State: AOAM530KWRYo+9OgO2zBG76HtcUncjYE1jDAvuUsIMJk0TweQr6Hhgc6
+        OQ99b04UYYIbixkHgRYJy/ka/LUYhak=
+X-Google-Smtp-Source: ABdhPJwRFbj6xeEYgNbL67Zce9IIY/R6nA0AUChux2cSB+iV33dupsb1zwE380RUBsEvPw8un2YtVWvkUMY=
+X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:90:200:b022:92d6:d37b:686c])
+ (user=seanjc job=sendgmr) by 2002:a25:598b:: with SMTP id n133mr40023097ybb.290.1632269143022;
+ Tue, 21 Sep 2021 17:05:43 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Tue, 21 Sep 2021 17:05:17 -0700
+Message-Id: <20210922000533.713300-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.0.464.g1972c5931b-goog
+Subject: [PATCH v3 00/16] perf: KVM: Fix, optimize, and clean up callbacks
+From:   Sean Christopherson <seanjc@google.com>
+To:     Peter Zijlstra <peterz@infradead.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Will Deacon <will@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Marc Zyngier <maz@kernel.org>, Guo Ren <guoren@kernel.org>,
+        Nick Hu <nickhu@andestech.com>,
+        Greentime Hu <green.hu@gmail.com>,
+        Vincent Chen <deanbo422@gmail.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Juergen Gross <jgross@suse.com>
+Cc:     Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Jiri Olsa <jolsa@redhat.com>,
+        Namhyung Kim <namhyung@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        linux-arm-kernel@lists.infradead.org,
+        linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, linux-csky@vger.kernel.org,
+        linux-riscv@lists.infradead.org, kvm@vger.kernel.org,
+        xen-devel@lists.xenproject.org,
+        Artem Kashkanov <artem.kashkanov@intel.com>,
+        Like Xu <like.xu.linux@gmail.com>,
+        Zhu Lingshan <lingshan.zhu@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Jason Gunthorpe <jgg@nvidia.com>
-> Sent: Tuesday, September 21, 2021 11:57 PM
->=20
-> On Sun, Sep 19, 2021 at 02:38:30PM +0800, Liu Yi L wrote:
-> > This patch introduces a new interface (/dev/vfio/devices/$DEVICE) for
-> > userspace to directly open a vfio device w/o relying on container/group
-> > (/dev/vfio/$GROUP). Anything related to group is now hidden behind
-> > iommufd (more specifically in iommu core by this RFC) in a device-centr=
-ic
-> > manner.
-> >
-> > In case a device is exposed in both legacy and new interfaces (see next
-> > patch for how to decide it), this patch also ensures that when the devi=
-ce
-> > is already opened via one interface then the other one must be blocked.
-> >
-> > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> > ---
-> >  drivers/vfio/vfio.c  | 228 +++++++++++++++++++++++++++++++++++++++----
-> >  include/linux/vfio.h |   2 +
-> >  2 files changed, 213 insertions(+), 17 deletions(-)
->=20
-> > +static int vfio_init_device_class(void)
-> > +{
-> > +	int ret;
-> > +
-> > +	mutex_init(&vfio.device_lock);
-> > +	idr_init(&vfio.device_idr);
-> > +
-> > +	/* /dev/vfio/devices/$DEVICE */
-> > +	vfio.device_class =3D class_create(THIS_MODULE, "vfio-device");
-> > +	if (IS_ERR(vfio.device_class))
-> > +		return PTR_ERR(vfio.device_class);
-> > +
-> > +	vfio.device_class->devnode =3D vfio_device_devnode;
-> > +
-> > +	ret =3D alloc_chrdev_region(&vfio.device_devt, 0, MINORMASK + 1,
-> "vfio-device");
-> > +	if (ret)
-> > +		goto err_alloc_chrdev;
-> > +
-> > +	cdev_init(&vfio.device_cdev, &vfio_device_fops);
-> > +	ret =3D cdev_add(&vfio.device_cdev, vfio.device_devt, MINORMASK +
-> 1);
-> > +	if (ret)
-> > +		goto err_cdev_add;
->=20
-> Huh? This is not how cdevs are used. This patch needs rewriting.
->=20
-> The struct vfio_device should gain a 'struct device' and 'struct cdev'
-> as non-pointer members
->=20
-> vfio register path should end up doing cdev_device_add() for each
-> vfio_device
->=20
-> vfio_unregister path should do cdev_device_del()
->=20
-> No idr should be needed, an ida is used to allocate minor numbers
->=20
-> The struct device release function should trigger a kfree which
-> requires some reworking of the callers
->=20
-> vfio_init_group_dev() should do a device_initialize()
-> vfio_uninit_group_dev() should do a device_put()
+Peter, I left the Intel PT mess as-is.  Having to pass a NULL pointer
+from KVM arm64 seemed to be a lesser evil than more exports and multiple
+registration paths.
 
-All above are good suggestions!
+This is a combination of ~2 series to fix bugs in the perf+KVM callbacks,
+optimize the callbacks by employing static_call, and do a variety of
+cleanup in both perf and KVM.
 
->=20
-> The opened atomic is aweful. A newly created fd should start in a
-> state where it has a disabled fops
->=20
-> The only thing the disabled fops can do is register the device to the
-> iommu fd. When successfully registered the device gets the normal fops.
->=20
-> The registration steps should be done under a normal lock inside the
-> vfio_device. If a vfio_device is already registered then further
-> registration should fail.
->=20
-> Getting the device fd via the group fd triggers the same sequence as
-> above.
->=20
+Patch 1 fixes a mostly-theoretical bug where perf can deref a NULL
+pointer if KVM unregisters its callbacks while they're being accessed.
+In practice, compilers tend to avoid problematic reloads of the pointer
+and the PMI handler doesn't lose the race against module unloading,
+i.e doesn't hit a use-after-free.
 
-Above works if the group interface is also connected to iommufd, i.e.
-making vfio type1 as a shim. In this case we can use the registration
-status as the exclusive switch. But if we keep vfio type1 separate as
-today, then a new atomic is still necessary. This all depends on how
-we want to deal with vfio type1 and iommufd, and possibly what's
-discussed here just adds another pound to the shim option...
+Patches 2 and 3 fix an Intel PT handling bug where KVM incorrectly
+eats PT interrupts when PT is supposed to be owned entirely by the host.
 
-Thanks
-Kevin
+Patches 4-9 clean up perf's callback infrastructure and switch to
+static_call for arm64 and x86 (the only survivors).
+
+Patches 10-16 clean up related KVM code and unify the arm64/x86 callbacks.
+
+Based on "git://git.kernel.org/pub/scm/virt/kvm/kvm.git queue", commit
+680c7e3be6a3 ("KVM: x86: Exit to userspace ...").
+
+v3:
+  - Add wrappers for guest callbacks to that stubs can be provided when
+    GUEST_PERF_EVENTS=n.
+  - s/HAVE_GUEST_PERF_EVENTS/GUEST_PERF_EVENTS and select it from KVM
+    and XEN_PV instead of from top-level arm64/x86. [Paolo]
+  - Drop an unnecessary synchronize_rcu() when registering callbacks. [Peter]
+  - Retain a WARN_ON_ONCE() when unregistering callbacks if the caller
+    didn't provide the correct pointer. [Peter]
+  - Rework the static_call patch to move it all to common perf.
+  - Add a patch to drop the (un)register stubs, made possible after
+    having KVM+XEN_PV select GUEST_PERF_EVENTS.
+  - Split dropping guest callback "support" for arm, csky, etc... to a
+    separate patch, to make introducing GUEST_PERF_EVENTS cleaner.
+  
+v2 (relative to static_call v10):
+  - Split the patch into the semantic change (multiplexed ->state) and
+    introduction of static_call.
+  - Don't use '0' for "not a guest RIP".
+  - Handle unregister path.
+  - Drop changes for architectures that can be culled entirely.
+
+v2 (relative to v1):
+  - https://lkml.kernel.org/r/20210828003558.713983-6-seanjc@google.com
+  - Drop per-cpu approach. [Peter]
+  - Fix mostly-theoretical reload and use-after-free with READ_ONCE(),
+    WRITE_ONCE(), and synchronize_rcu(). [Peter]
+  - Avoid new exports like the plague. [Peter]
+
+v1:
+  - https://lkml.kernel.org/r/20210827005718.585190-1-seanjc@google.com
+
+v10 static_call:
+  - https://lkml.kernel.org/r/20210806133802.3528-2-lingshan.zhu@intel.com
+
+
+Like Xu (1):
+  perf/core: Rework guest callbacks to prepare for static_call support
+
+Sean Christopherson (15):
+  perf: Ensure perf_guest_cbs aren't reloaded between !NULL check and
+    deref
+  KVM: x86: Register perf callbacks after calling vendor's
+    hardware_setup()
+  KVM: x86: Register Processor Trace interrupt hook iff PT enabled in
+    guest
+  perf: Stop pretending that perf can handle multiple guest callbacks
+  perf: Drop dead and useless guest "support" from arm, csky, nds32 and
+    riscv
+  perf: Add wrappers for invoking guest callbacks
+  perf: Force architectures to opt-in to guest callbacks
+  perf/core: Use static_call to optimize perf_guest_info_callbacks
+  KVM: x86: Drop current_vcpu for kvm_running_vcpu + kvm_arch_vcpu
+    variable
+  KVM: x86: More precisely identify NMI from guest when handling PMI
+  KVM: Move x86's perf guest info callbacks to generic KVM
+  KVM: x86: Move Intel Processor Trace interrupt handler to vmx.c
+  KVM: arm64: Convert to the generic perf callbacks
+  KVM: arm64: Drop perf.c and fold its tiny bits of code into arm.c /
+    pmu.c
+  perf: Drop guest callback (un)register stubs
+
+ arch/arm/kernel/perf_callchain.c   | 28 ++------------
+ arch/arm64/include/asm/kvm_host.h  |  9 ++++-
+ arch/arm64/kernel/perf_callchain.c | 13 ++++---
+ arch/arm64/kvm/Kconfig             |  1 +
+ arch/arm64/kvm/Makefile            |  2 +-
+ arch/arm64/kvm/arm.c               | 11 +++++-
+ arch/arm64/kvm/perf.c              | 62 ------------------------------
+ arch/arm64/kvm/pmu.c               |  8 ++++
+ arch/csky/kernel/perf_callchain.c  | 10 -----
+ arch/nds32/kernel/perf_event_cpu.c | 29 ++------------
+ arch/riscv/kernel/perf_callchain.c | 10 -----
+ arch/x86/events/core.c             | 13 ++++---
+ arch/x86/events/intel/core.c       |  5 +--
+ arch/x86/include/asm/kvm_host.h    |  7 +++-
+ arch/x86/kvm/Kconfig               |  1 +
+ arch/x86/kvm/pmu.c                 |  2 +-
+ arch/x86/kvm/svm/svm.c             |  2 +-
+ arch/x86/kvm/vmx/vmx.c             | 25 +++++++++++-
+ arch/x86/kvm/x86.c                 | 58 +++++-----------------------
+ arch/x86/kvm/x86.h                 | 17 ++++++--
+ arch/x86/xen/Kconfig               |  1 +
+ arch/x86/xen/pmu.c                 | 32 +++++++--------
+ include/kvm/arm_pmu.h              |  1 +
+ include/linux/kvm_host.h           | 10 +++++
+ include/linux/perf_event.h         | 41 ++++++++++++++------
+ init/Kconfig                       |  4 ++
+ kernel/events/core.c               | 39 +++++++++++++------
+ virt/kvm/kvm_main.c                | 44 +++++++++++++++++++++
+ 28 files changed, 235 insertions(+), 250 deletions(-)
+ delete mode 100644 arch/arm64/kvm/perf.c
+
+-- 
+2.33.0.464.g1972c5931b-goog
+
