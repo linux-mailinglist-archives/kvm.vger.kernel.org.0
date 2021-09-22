@@ -2,138 +2,167 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C9EE4414C10
-	for <lists+kvm@lfdr.de>; Wed, 22 Sep 2021 16:32:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1C155414C22
+	for <lists+kvm@lfdr.de>; Wed, 22 Sep 2021 16:36:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236276AbhIVOdj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Sep 2021 10:33:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58516 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236157AbhIVOdh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Sep 2021 10:33:37 -0400
-Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D085AC061756
-        for <kvm@vger.kernel.org>; Wed, 22 Sep 2021 07:32:07 -0700 (PDT)
-Received: by mail-lf1-x12f.google.com with SMTP id i4so12808072lfv.4
-        for <kvm@vger.kernel.org>; Wed, 22 Sep 2021 07:32:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=shutemov-name.20210112.gappssmtp.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=ayCGrHt4GWDBHksaWpDlFPsTDgmCQyv1ZQQyBUlWV+I=;
-        b=vKVQE5RUe8kMs0wun4XuDGO3eTujOGs2RwESdLhyIqK2JwxlqZrlSJy3MrsXJkRafX
-         gBAYy/nccugQKoUll1gn8VoFbzjQhjrLzptB1R76SapyouDJT5ZGJIWbG+FX4hwJyS6V
-         RHRd5aepSbIC42CmHtd5u+dR4xuEL++muo/z0NTk8BMGL92wAA2PmP9KOi2aYe71/Bfr
-         QklC4Nhk0K/0QbQiJZijepS1OZ+jtAxihfchh+jQ4jf5+4U17tQ1xXPBbmD5a5nhc0Gd
-         SVGSB9p7xAW0QvKqL518rFLXTD4w7KZA2wBif/Kp2RKz31Lh+5HyNQaqaSmkfOyisrNC
-         k+Nw==
+        id S236272AbhIVOhc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Sep 2021 10:37:32 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:30714 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S236199AbhIVOhb (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 22 Sep 2021 10:37:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1632321361;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=J7r7WZi73y3jeV35KrEBClZuwOQN1huGyHTnf+LlAgM=;
+        b=g+6q/fhQFf0jJurUARcNjAfvYUgC3Gbvifin48VPHbIrYRGY/XxpkfBQhrbzXvyOMp3IwU
+        +c2oqSZj7pFZQdYlYQxxxGg9HEH0uHMhWgol+KUhKWugLUt9grmNB4r2ug5RN+WoMNI12n
+        IQWIjtKungDKP53zjruxtb/4nrCQoh0=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-424-m1GhIckwPT61sS9ZRqHHJg-1; Wed, 22 Sep 2021 10:35:59 -0400
+X-MC-Unique: m1GhIckwPT61sS9ZRqHHJg-1
+Received: by mail-ed1-f70.google.com with SMTP id h6-20020a50c386000000b003da01adc065so3309300edf.7
+        for <kvm@vger.kernel.org>; Wed, 22 Sep 2021 07:35:59 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=ayCGrHt4GWDBHksaWpDlFPsTDgmCQyv1ZQQyBUlWV+I=;
-        b=eG3IRexev+hAazil4nZPlTb6vwTXUakYEM0vT2CrWbHhFEIyfpQl4PPiOiHM7Um1YF
-         dSJ3p0en+OMuYqFnk4jepn1w8mWElmFfRdRtBnROaxpWqKW6GIQaPFJS2pdGDFiLpJ3A
-         77uOZs3d8Eb/1OtcuHphqc64jmSoNsGyk3Stervj4dv+6jnLOXC9zDQNSMbwzlMsDfRf
-         D7aILKN7jP9rlc+NfS3daizl+1z8G0mIXEnyVRv0wz3AtwZ0TB1lArvSHpmFbxUXf4pi
-         3TM7yZbJshltmj4RlnO/JWCJoeEh+fhAcNE12WhGz2q6nKkavwIvcirb1AoYz8cWjFrC
-         ke5Q==
-X-Gm-Message-State: AOAM530bpXnHxXB58dzy7kkshIGxH6YYRw9MpxEMJFZocS8MzImE6OPi
-        ouoNuWBZDcARXj2/FIoO7p1tiw==
-X-Google-Smtp-Source: ABdhPJz3SPlP/oK9QpFHL+xKtQ0nQUgNyOd556PIkN1KxMSQUqIwOiDbPwtupEbWOJByEgde/ChetQ==
-X-Received: by 2002:a05:651c:512:: with SMTP id o18mr35155713ljp.199.1632321016184;
-        Wed, 22 Sep 2021 07:30:16 -0700 (PDT)
-Received: from box.localdomain ([86.57.175.117])
-        by smtp.gmail.com with ESMTPSA id y9sm205960lfl.240.2021.09.22.07.30.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Sep 2021 07:30:15 -0700 (PDT)
-Received: by box.localdomain (Postfix, from userid 1000)
-        id E147C10304D; Wed, 22 Sep 2021 17:30:15 +0300 (+03)
-Date:   Wed, 22 Sep 2021 17:30:15 +0300
-From:   "Kirill A. Shutemov" <kirill@shutemov.name>
-To:     Tom Lendacky <thomas.lendacky@amd.com>
-Cc:     Borislav Petkov <bp@alien8.de>, linuxppc-dev@lists.ozlabs.org,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        x86@kernel.org, iommu@lists.linux-foundation.org,
-        kvm@vger.kernel.org, linux-efi@vger.kernel.org,
-        platform-driver-x86@vger.kernel.org,
-        linux-graphics-maintainer@vmware.com,
-        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        kexec@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Andi Kleen <ak@linux.intel.com>,
-        Sathyanarayanan Kuppuswamy 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        Tianyu Lan <Tianyu.Lan@microsoft.com>,
-        Christoph Hellwig <hch@infradead.org>,
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=J7r7WZi73y3jeV35KrEBClZuwOQN1huGyHTnf+LlAgM=;
+        b=PWYAMZmYLMnKYVCDyo9/Eu3vCrUZUVBZmgeX8VSnpYMdrk8fCQlQ80KEDyB8rS/lYU
+         GHK20/L4RCWp5ky3TDXYIsv8mPpKnWhB3qVaWPh166kPFHhfpgcGB4bvvoTaodmGr/Hh
+         PiC3ym3n8eMHthHtg/cwFqTS0b1B2BtvTfpqJ4j5wAZLtzZiz0vwHuXjaPstIOlnJhlT
+         D68AGC7ZwGba2nLfQBDaaUY26FqbwhBHWdLp9++/vHJ76wRE6TzUYT2Z0mgMEZF83fmH
+         4AtHTfsF4EnY6p4auvgat5ZgEV2g4UQECyw0FyVn4IK7ZDnOZsgTgBtk7/BRC5a9Nc9m
+         8nuQ==
+X-Gm-Message-State: AOAM532h5ymsG6dF7gIFc8rZ3ksJDLMmIjGOYKvJM/ElvRPjq+IvTlx2
+        M/fMu99dbauLwLoc/kdZOWDf6z18/Nu9toP2h52yihPgya39AzmlSEInd0C+IvdGBdhsR/mTm5z
+        otAKIrKiW5PSH
+X-Received: by 2002:a50:e10d:: with SMTP id h13mr37418808edl.77.1632321358689;
+        Wed, 22 Sep 2021 07:35:58 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxn2x/yjc20i/TrMOEcSyioIKKrKNDEeRWr2kJLseHFMqmfh1cKMw6mI4XIbBhSjmEXMTUjnA==
+X-Received: by 2002:a50:e10d:: with SMTP id h13mr37418782edl.77.1632321358479;
+        Wed, 22 Sep 2021 07:35:58 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id c10sm1136294eje.37.2021.09.22.07.35.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 22 Sep 2021 07:35:57 -0700 (PDT)
+Subject: Re: [PATCH v3 0/7] KVM: few more SMM fixes
+To:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
         Thomas Gleixner <tglx@linutronix.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Ingo Molnar <mingo@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v3 5/8] x86/sme: Replace occurrences of sme_active() with
- cc_platform_has()
-Message-ID: <20210922143015.vvxvh6ec73lffvkf@box.shutemov.name>
-References: <367624d43d35d61d5c97a8b289d9ddae223636e9.1631141919.git.thomas.lendacky@amd.com>
- <20210920192341.maue7db4lcbdn46x@box.shutemov.name>
- <77df37e1-0496-aed5-fd1d-302180f1edeb@amd.com>
- <YUoao0LlqQ6+uBrq@zn.tnic>
- <20210921212059.wwlytlmxoft4cdth@box.shutemov.name>
- <YUpONYwM4dQXAOJr@zn.tnic>
- <20210921213401.i2pzaotgjvn4efgg@box.shutemov.name>
- <00f52bf8-cbc6-3721-f40e-2f51744751b0@amd.com>
- <20210921215830.vqxd75r4eyau6cxy@box.shutemov.name>
- <01891f59-7ec3-cf62-a8fc-79f79ca76587@amd.com>
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Joerg Roedel <joro@8bytes.org>
+References: <20210913140954.165665-1-mlevitsk@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <22916f0c-2e3a-1fd6-905e-5d647c15c45b@redhat.com>
+Date:   Wed, 22 Sep 2021 16:35:56 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <01891f59-7ec3-cf62-a8fc-79f79ca76587@amd.com>
+In-Reply-To: <20210913140954.165665-1-mlevitsk@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 22, 2021 at 08:40:43AM -0500, Tom Lendacky wrote:
-> On 9/21/21 4:58 PM, Kirill A. Shutemov wrote:
-> > On Tue, Sep 21, 2021 at 04:43:59PM -0500, Tom Lendacky wrote:
-> > > On 9/21/21 4:34 PM, Kirill A. Shutemov wrote:
-> > > > On Tue, Sep 21, 2021 at 11:27:17PM +0200, Borislav Petkov wrote:
-> > > > > On Wed, Sep 22, 2021 at 12:20:59AM +0300, Kirill A. Shutemov wrote:
-> > > > > > I still believe calling cc_platform_has() from __startup_64() is totally
-> > > > > > broken as it lacks proper wrapping while accessing global variables.
-> > > > > 
-> > > > > Well, one of the issues on the AMD side was using boot_cpu_data too
-> > > > > early and the Intel side uses it too. Can you replace those checks with
-> > > > > is_tdx_guest() or whatever was the helper's name which would check
-> > > > > whether the the kernel is running as a TDX guest, and see if that helps?
-> > > > 
-> > > > There's no need in Intel check this early. Only AMD need it. Maybe just
-> > > > opencode them?
-> > > 
-> > > Any way you can put a gzipped/bzipped copy of your vmlinux file somewhere I
-> > > can grab it from and take a look at it?
-> > 
-> > You can find broken vmlinux and bzImage here:
-> > 
-> > https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fdrive.google.com%2Fdrive%2Ffolders%2F1n74vUQHOGebnF70Im32qLFY8iS3wvjIs%3Fusp%3Dsharing&amp;data=04%7C01%7Cthomas.lendacky%40amd.com%7C1c7adf380cbe4c1a6bb708d97d4af6ff%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637678583935705530%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000&amp;sdata=gA30x%2Bfu97tUx0p2UqI8HgjiL8bxDbK1GqgJBbUrUE4%3D&amp;reserved=0
-> > 
-> > Let me know when I can remove it.
+On 13/09/21 16:09, Maxim Levitsky wrote:
+> These are few SMM fixes I was working on last week.
 > 
-> Looking at everything, it is all RIP relative addressing, so those
-> accesses should be fine.
+> * Patch 1,2 fixes a minor issue that remained after
+>    commit 37be407b2ce8 ("KVM: nSVM: Fix L1 state corruption upon return from SMM")
+> 
+>    While now, returns to guest mode from SMM work due to restored state from HSAVE
+>    area, the guest entry still sees incorrect HSAVE state.
+> 
+>    This for example breaks return from SMM when the guest is 32 bit, due to PDPTRs
+>    loading which are done using incorrect MMU state which is incorrect,
+>    because it was setup with incorrect L1 HSAVE state.
+> 
+>    V3: updated with review feedback from Sean.
+> 
+> * Patch 3 fixes a theoretical issue that I introduced with my SREGS2 patchset,
+>    which Sean Christopherson pointed out.
+> 
+>    The issue is that KVM_REQ_GET_NESTED_STATE_PAGES request is not only used
+>    for completing the load of the nested state, but it is also used to complete
+>    exit from SMM to guest mode, and my compatibility hack of pdptrs_from_userspace
+>    was done assuming that this is not done.
+> 
+>    V3: I moved the reset of pdptrs_from_userspace to common x86 code.
+> 
+> * Patch 4 makes SVM SMM exit to be a bit more similar to how VMX does it
+>    by also raising KVM_REQ_GET_NESTED_STATE_PAGES requests.
+> 
+>    I do have doubts about why we need to do this on VMX though. The initial
+>    justification for this comes from
+> 
+>    7f7f1ba33cf2 ("KVM: x86: do not load vmcs12 pages while still in SMM")
+> 
+>    With all the MMU changes, I am not sure that we can still have a case
+>    of not up to date MMU when we enter the nested guest from SMM.
+>    On SVM it does seem to work anyway without this.
+> 
+> * Patch 5 fixes guest emulation failure when unrestricted_guest=0 and we reach
+>    handle_exception_nmi_irqoff.
+>    That function takes stale values from current vmcs and fails not taking into account
+>    the fact that we are emulating invalid guest state now, and thus no VM exit happened.
+> 
+> * Patch 6 fixed a corner case where return from SMM is slightly corrupting
+>    the L2 segment register state when unrestricted_guest=0 due to real mode segement
+>    caching register logic, but later it restores it correctly from SMMRAM.
+>    Fix this by not failing nested_vmx_enter_non_root_mode and delaying this
+>    failure to the next nested VM entry.
+> 
+> * Patch 7 fixes another corner case where emulation_required was not updated
+>    correctly on nested VMexit when restoring the L1 segement registers.
+> 
+> I still track 2 SMM issues:
+> 
+> 1. When HyperV guest is running nested, and uses SMM enabled OVMF, it crashes and
+>     reboots during the boot process.
+> 
+> 2. Nested migration on VMX is still broken when L1 floods itself with SMIs.
+> 
+> Best regards,
+> 	Maxim Levitsky
+> 
+> Maxim Levitsky (7):
+>    KVM: x86: nSVM: refactor svm_leave_smm and smm_enter_smm
+>    KVM: x86: nSVM: restore the L1 host state prior to resuming nested
+>      guest on SMM exit
+>    KVM: x86: reset pdptrs_from_userspace when exiting smm
+>    KVM: x86: SVM: call KVM_REQ_GET_NESTED_STATE_PAGES on exit from SMM
+>      mode
+>    KVM: x86: VMX: synthesize invalid VM exit when emulating invalid guest
+>      state
+>    KVM: x86: nVMX: don't fail nested VM entry on invalid guest state if
+>      !from_vmentry
+>    KVM: x86: nVMX: re-evaluate emulation_required on nested VM exit
+> 
+>   arch/x86/kvm/svm/nested.c |   9 ++-
+>   arch/x86/kvm/svm/svm.c    | 131 ++++++++++++++++++++------------------
+>   arch/x86/kvm/svm/svm.h    |   3 +-
+>   arch/x86/kvm/vmx/nested.c |   9 ++-
+>   arch/x86/kvm/vmx/vmx.c    |  28 ++++++--
+>   arch/x86/kvm/vmx/vmx.h    |   1 +
+>   arch/x86/kvm/x86.c        |   7 ++
+>   7 files changed, 113 insertions(+), 75 deletions(-)
+> 
 
-Not fine, but waiting to blowup with random build environment change.
+Queued, thanks.  However, I'm keeping patch 1 for 5.16 only.
 
-> Your image has the intel_cc_platform_has()
-> function, does it work if you remove that call? Because I think it may be
-> the early call into that function which looks like it has instrumentation
-> that uses %gs in __sanitizer_cov_trace_pc and %gs is not setup properly
-> yet. And since boot_cpu_data.x86_vendor will likely be zero this early it
-> will match X86_VENDOR_INTEL and call into that function.
+Paolo
 
-Right removing call to intel_cc_platform_has() or moving it to
-cc_platform.c fixes the issue.
-
--- 
- Kirill A. Shutemov
