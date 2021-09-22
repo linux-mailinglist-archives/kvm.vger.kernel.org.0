@@ -2,93 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D9346414D38
-	for <lists+kvm@lfdr.de>; Wed, 22 Sep 2021 17:37:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 62B80414D4B
+	for <lists+kvm@lfdr.de>; Wed, 22 Sep 2021 17:45:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236463AbhIVPjL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Sep 2021 11:39:11 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:53470 "EHLO
+        id S236417AbhIVPq5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Sep 2021 11:46:57 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:56522 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236477AbhIVPjK (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 22 Sep 2021 11:39:10 -0400
+        by vger.kernel.org with ESMTP id S232571AbhIVPq4 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 22 Sep 2021 11:46:56 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632325060;
+        s=mimecast20190719; t=1632325526;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=yPMfBTlyhQaNIBRsQlgsKkEXI7vjlBDH2c8APmBdvAw=;
-        b=dT1p/WT4wrWIQ6UyqHMatzrNPTJ5pIImQ+JDI4c5yLOSIvBC2XMynthPikwplSvtWwqsa3
-        o3I9zxBuYAhBLXFX7Ebkfcmr0JBjO46D8w5O9Z0fxQ4n8E98hQCGSYky82x+IfsYOLCfO6
-        0z9LPeYti4xV4YAWxm1WBA0L+SA1rnQ=
+        bh=s47uJvMz2TQnGUC16+QzZF+8Fos67Scg5vuqp2IND9Y=;
+        b=Zpx5R+kFQY4tQAHJpM/k9l6sBhUxeVVxjkngCfUv8odETZpen1gQDi0oKkuCautVxJ9EsW
+        NWkJTLZycQ7LHcDNizYknBp+Hmy5Lyl4+EZsqrNutp243Us/IB1sb2CG0Zszrvklua4atW
+        fKzFJ1nkltTdV8urerXCQi4SdThsUeI=
 Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
  [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-136-ExqxGsXkPkKjqJ8Qo4N0pA-1; Wed, 22 Sep 2021 11:37:39 -0400
-X-MC-Unique: ExqxGsXkPkKjqJ8Qo4N0pA-1
-Received: by mail-ed1-f72.google.com with SMTP id m20-20020aa7c2d4000000b003d1add00b8aso3593092edp.0
-        for <kvm@vger.kernel.org>; Wed, 22 Sep 2021 08:37:38 -0700 (PDT)
+ us-mta-150-udPYi2pgOEOwx9mLSiG4AA-1; Wed, 22 Sep 2021 11:45:24 -0400
+X-MC-Unique: udPYi2pgOEOwx9mLSiG4AA-1
+Received: by mail-ed1-f72.google.com with SMTP id r7-20020aa7c147000000b003d1f18329dcso3531641edp.13
+        for <kvm@vger.kernel.org>; Wed, 22 Sep 2021 08:45:24 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=yPMfBTlyhQaNIBRsQlgsKkEXI7vjlBDH2c8APmBdvAw=;
-        b=0cbpFE3Eks3BCo4EDLAqRT10/5NUuAUtroxp+VKJ0B241lfiqldlsDgu9j1mz1KVnN
-         rATfcdhjWtgAWxYOrXb4n5rdUsA2zXKNHg3stS0NB+/jHLRFVnxSwXnIwNLosoYJlRhO
-         5+HsEKFXv70mwcidMHTuymf5Pw35sysvzGG5N3bKHaQZm3ro+o5g04E1hZChDj0ClGHz
-         VNAf219Je7VlT4CFgZLVSokxFU9cyjjP9Q+Oaunq+ZHnpQIgX02C25RS/fQsC457n62x
-         qB1R+ghhN24/1sSxwNcpWhdS+nu854J/MqARW3Mp5U+Xy4uNITZCF9je8gyXK6/M6k0M
-         tnMA==
-X-Gm-Message-State: AOAM533HA/O5bjGFd9y9M/oWU7QNZwQ8a28L9CaQYXwreUIsqgflfo3n
-        MXVvn7rA7m73Bt8eiaN6bgPEB2Z6TYvyXazP8ygPBMV+9C4C5Hx5ak/XjTCJhpn7V6fC9KAMDE6
-        OUpnYfo80HxoT
-X-Received: by 2002:a17:907:1df1:: with SMTP id og49mr176118ejc.35.1632325057663;
-        Wed, 22 Sep 2021 08:37:37 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxqc1iXc2OLrx6isUvPIHnN9Gan4Ne4+V8C0dmc4M3Gy8q4yKHumt8T875e2Dt+Me/ihh1nbg==
-X-Received: by 2002:a17:907:1df1:: with SMTP id og49mr176096ejc.35.1632325057433;
-        Wed, 22 Sep 2021 08:37:37 -0700 (PDT)
+        bh=s47uJvMz2TQnGUC16+QzZF+8Fos67Scg5vuqp2IND9Y=;
+        b=JNm7KQTyDiVvg3J4e0TyXL9mGeOwJ7Yd5owOQ+yQZxmS6znByOek77LhOC6xE8NU1l
+         yjjwnV7u0V4al+kY87RRbfj2bTl+i594zlU2GhVCoNNCdVbU7zgErjjWZ1VYqIkSSz5D
+         PFeMcGYJKJW0BZQ8SCt/HYfG6PktAW55SsuOtB0q7nxx2ZgZ4zPOjn7Viy7V1cR1Z39D
+         P7gT+DtW+waUrW17kvCj14NlL/BzJQwcYnYUVHuGXLGlE2FdFanaU7MouUbYWZbGGDik
+         g2N0YG3RHs+MU8/V1B0vB0qFVmDQpgBgaR6Fgw8e4S0oS66zX5jguw1GWQ8T4JMcaQeH
+         9Erw==
+X-Gm-Message-State: AOAM5310Ag6DofQJRm1YRPwf9wPfQ5qXPTiexz92qsJ7Bly56t+Fp9gf
+        +91BY6NfF1g2wY0cgR31NsGNS255VfMOT5+NZLPAVxr0Y4rIQGmkwWTaz1WQJbCDkNBHiZ2izwb
+        8j3JvQFfeXkUA
+X-Received: by 2002:a05:6402:1011:: with SMTP id c17mr335078edu.144.1632325523535;
+        Wed, 22 Sep 2021 08:45:23 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJx9E7YPbKPpg2K5k5md15deOC/+gq8likqMYfogKDvxQnXwcsGrCD3ObAK82K9RPmuuvaCDIQ==
+X-Received: by 2002:a05:6402:1011:: with SMTP id c17mr335057edu.144.1632325523328;
+        Wed, 22 Sep 2021 08:45:23 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id z20sm1398413edl.61.2021.09.22.08.37.36
+        by smtp.gmail.com with ESMTPSA id c17sm1407211edu.11.2021.09.22.08.45.22
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 22 Sep 2021 08:37:36 -0700 (PDT)
-Subject: Re: [PATCH v1 3/3] KVM: arm64: Add histogram stats for handling time
- of arch specific exit reasons
-To:     Marc Zyngier <maz@kernel.org>, Jing Zhang <jingzhangos@google.com>
-Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>,
-        Will Deacon <will@kernel.org>,
-        David Matlack <dmatlack@google.com>,
-        Peter Shier <pshier@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Sean Christopherson <seanjc@google.com>
-References: <20210922010851.2312845-1-jingzhangos@google.com>
- <20210922010851.2312845-3-jingzhangos@google.com>
- <87czp0voqg.wl-maz@kernel.org>
+        Wed, 22 Sep 2021 08:45:22 -0700 (PDT)
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Joerg Roedel <joro@8bytes.org>
+References: <20210913140954.165665-1-mlevitsk@redhat.com>
+ <22916f0c-2e3a-1fd6-905e-5d647c15c45b@redhat.com>
+ <YUtBqsiur6uFWh3o@google.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d16ecbd2-2bc9-2691-a21d-aef4e6f007b9@redhat.com>
-Date:   Wed, 22 Sep 2021 17:37:35 +0200
+Subject: Re: [PATCH v3 0/7] KVM: few more SMM fixes
+Message-ID: <427038b4-a856-826c-e9f4-01678d33ab83@redhat.com>
+Date:   Wed, 22 Sep 2021 17:45:21 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <87czp0voqg.wl-maz@kernel.org>
+In-Reply-To: <YUtBqsiur6uFWh3o@google.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 22/09/21 13:22, Marc Zyngier wrote:
-> Frankly, this is a job for BPF and the tracing subsystem, not for some
-> hardcoded syndrome accounting. It would allow to extract meaningful
-> information, prevent bloat, and crucially make it optional. Even empty
-> trace points like the ones used in the scheduler would be infinitely
-> better than this (load your own module that hooks into these trace
-> points, expose the data you want, any way you want).
+On 22/09/21 16:46, Sean Christopherson wrote:
+> On Wed, Sep 22, 2021, Paolo Bonzini wrote:
+>> On 13/09/21 16:09, Maxim Levitsky wrote:
+>>>     KVM: x86: nVMX: re-evaluate emulation_required on nested VM exit
+> 
+> ...
+>   
+>> Queued, thanks.  However, I'm keeping patch 1 for 5.16 only.
+> 
+> I'm pretty sure the above patch is wrong, emulation_required can simply be
+> cleared on emulated VM-Exit.
 
-I agree.  I had left out for later the similar series you had for x86, 
-but I felt the same as Marc; even just counting the number of 
-occurrences of each exit reason is a nontrivial amount of memory to 
-spend on each vCPU.
+Are you sure?  I think you can at least set the host segment fields to a 
+data segment that requires emulation.  For example the DPL of the host 
+DS is hardcoded to zero, but the RPL comes from the selector field and 
+the DS selector is not validated.  Therefore a subsequent vmentry could 
+fail the access rights tests of 26.3.1.2 Checks on Guest Segment Registers:
+
+DS, ES, FS, GS. The DPL cannot be less than the RPL in the selector 
+field if (1) the “unrestricted guest” VM-execution control is 0; (2) the 
+register is usable; and (3) the Type in the access-rights field is in 
+the range 0 – 11 (data segment or non-conforming code segment).
 
 Paolo
 
