@@ -2,72 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 55B9B416360
-	for <lists+kvm@lfdr.de>; Thu, 23 Sep 2021 18:31:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B2AEF416364
+	for <lists+kvm@lfdr.de>; Thu, 23 Sep 2021 18:34:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242158AbhIWQcj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Sep 2021 12:32:39 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60080 "EHLO
+        id S234134AbhIWQgJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Sep 2021 12:36:09 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27470 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231518AbhIWQci (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 23 Sep 2021 12:32:38 -0400
+        by vger.kernel.org with ESMTP id S231171AbhIWQgD (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 23 Sep 2021 12:36:03 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632414666;
+        s=mimecast20190719; t=1632414871;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ReAUQEHsAwKoa1q6RysvsYhI2ACNzTPfF8Hdy5iXMw0=;
-        b=YIiivgl1/bYasMmjsKsj44q/8oCLAyVON6aBNSkzFY9htDYEHMwlkAL0RO3U+USEAMu+JE
-        /qm6fW0KkSQ0QbunXyIRueWng/zPDwbyUUz676cH44avKrF27YGfVRNV7h3RrjWKra5kMv
-        NHseZcoNQH6Avw/uw6Z2FmZnoIxtgb0=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-199-Si3cy6loO9mRfLWXxHrPSA-1; Thu, 23 Sep 2021 12:31:05 -0400
-X-MC-Unique: Si3cy6loO9mRfLWXxHrPSA-1
-Received: by mail-ed1-f72.google.com with SMTP id w24-20020a056402071800b003cfc05329f8so7295087edx.19
-        for <kvm@vger.kernel.org>; Thu, 23 Sep 2021 09:31:05 -0700 (PDT)
+        bh=wWJIS2kE+szXqAFxlHSk2kWCjmNxITRa7Gc/WMUXuy8=;
+        b=WfKa+GVM4sg4meqU+H2lxZiFqMxXa1ZziYF+b00tHXNPlwTcSG5RRJKEcov16rIIAM4+QZ
+        yuPaoS7mT2xITwRe/7hq6NQgDFoRnyW2rziz/5B9rbxJISwKUON7Tqao1EF3C/wr8WQMFW
+        VZFTFPPjwvVged6C7EBrYT3L8q72dR0=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-203-KzDsY3ynO_ycccO-9S1aNQ-1; Thu, 23 Sep 2021 12:34:30 -0400
+X-MC-Unique: KzDsY3ynO_ycccO-9S1aNQ-1
+Received: by mail-ej1-f70.google.com with SMTP id 22-20020a170906301600b005ca77a21183so99849ejz.20
+        for <kvm@vger.kernel.org>; Thu, 23 Sep 2021 09:34:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=ReAUQEHsAwKoa1q6RysvsYhI2ACNzTPfF8Hdy5iXMw0=;
-        b=69lmQw/SZT2KtMCjrARWbHuQmAlLYw1V8CwQ6KMjmPomReUiS54mlIZ2j1T4PXSg/L
-         M11mNF5WrYS7Kk1BvW+weQ3S59OGJbo+eFQwSjhxRIkJ2illjYOae9GNk2ZP4v54U0wH
-         jb4ZKHO8LgpXW5Q/yKgy3b9nnm7410I+WirkhnIixiO6xWay6jMWFys5frdxCwqmNYf7
-         gWqn3UOYeNUJ0iYBUZBMMw07coOso2R50E2WtUqNf1Pl696uVo59nFsvgtXL6QGZrQWL
-         kHexpQCXK1/NsDN1ZoQwp8NPk7bRnUIXq0ZTE7rlc4fEC6uHTH7LdR4GV7cmFIpHHm4P
-         ahWA==
-X-Gm-Message-State: AOAM530jjTrfkVYukCBcS0xl3xU4ExnRNTddcVzJxNLNl7/9ngg/dKEd
-        7M51niTqw3X2MT1R7AzK1EQDMgEQl9UTtQ+0NEGkzya0Cd+4iKEdvUvYC8gOSaf6KtYEtv3iUfw
-        XL0CSyBvDqAjH
-X-Received: by 2002:a17:906:b0c8:: with SMTP id bk8mr6075162ejb.412.1632414664133;
-        Thu, 23 Sep 2021 09:31:04 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwInEIsJxSHkzX1MDiYbYOZkhAwP9PSkQ8WrzNvIgdL9T6O1HyCF8t8hj/Oj2Pf+4HO4t6zxg==
-X-Received: by 2002:a17:906:b0c8:: with SMTP id bk8mr6075143ejb.412.1632414663949;
-        Thu, 23 Sep 2021 09:31:03 -0700 (PDT)
+        bh=wWJIS2kE+szXqAFxlHSk2kWCjmNxITRa7Gc/WMUXuy8=;
+        b=Go5mzSPdI05mi4sBun5Ij3m+9hQa3smb3R0YkgRXmBAvYMuuX+3zsd78ulNrKtADxF
+         G3ipXzQiKu0iLVqGEuT1vlwlT4ghTNadS0WiXdxUnb5JY0G57hN4AYZ4N0M+lDTcqbCl
+         0w/f93fJ0lMwyavBB43uSfg4K6YQBOJM1vLsAWYHdbPQT009P45ubePSS1JH+HKtSrQf
+         5mI9Xsjzx4soiOXST9PvnrtUkKS8pqOZ6S0SjnlEpPPbLmwWz5ez+Cy/xR0VZYRW7UjC
+         lBSCBGceRH5xou7No6OXonLULuXZsKrEmwX2kCFUqDTXglXR5cWCnyq8Wyb0znvHT3Ze
+         nFdg==
+X-Gm-Message-State: AOAM532scyJyhSytXAuqisZDKbgzuNvfvCK5puP7gXNnkeq2KuJYukue
+        hhHp1ihoJL2Tk+CGieuZYkl3bLWzy1dxphkoExYDyeRDB6BARuXKMWbqEmdk+34fPVnZVkITGdb
+        L9Hw43XtZPZt+
+X-Received: by 2002:a05:6402:1437:: with SMTP id c23mr6481472edx.247.1632414868846;
+        Thu, 23 Sep 2021 09:34:28 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyUms4bSxmu1S2j/lCVpl/iaye5bwxmfEaXwPEOBI4b/7vkjYl1tRGerBCTiMwIo/f04qiszg==
+X-Received: by 2002:a05:6402:1437:: with SMTP id c23mr6481443edx.247.1632414868641;
+        Thu, 23 Sep 2021 09:34:28 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id bq4sm3385984ejb.43.2021.09.23.09.31.02
+        by smtp.gmail.com with ESMTPSA id 6sm3361080ejx.82.2021.09.23.09.34.27
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 23 Sep 2021 09:31:03 -0700 (PDT)
-Subject: Re: [PATCH] KVM: x86/mmu: Refactor slot null check in
- kvm_mmu_hugepage_adjust
-To:     David Matlack <dmatlack@google.com>
-Cc:     kvm@vger.kernel.org, Ben Gardon <bgardon@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-References: <20210824233407.1845924-1-dmatlack@google.com>
+        Thu, 23 Sep 2021 09:34:28 -0700 (PDT)
+Subject: Re: [PATCH] kvm: irqfd: avoid update unmodified entries of the
+ routing
+To:     "Longpeng(Mike)" <longpeng2@huawei.com>
+Cc:     seanjc@google.com, vkuznets@redhat.com, wanpengli@tencent.com,
+        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, hpa@zytor.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, arei.gonglei@huawei.com
+References: <20210827080003.2689-1-longpeng2@huawei.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <5082d726-c54b-8f80-09d9-490ef7ace6ef@redhat.com>
-Date:   Thu, 23 Sep 2021 18:31:02 +0200
+Message-ID: <2b8efa4f-36db-a4d5-f07d-987f6053627b@redhat.com>
+Date:   Thu, 23 Sep 2021 18:34:26 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <20210824233407.1845924-1-dmatlack@google.com>
+In-Reply-To: <20210827080003.2689-1-longpeng2@huawei.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -75,42 +73,116 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 25/08/21 01:34, David Matlack wrote:
-> The current code is correct but relies on is_error_noslot_pfn() to
-> ensure slot is not null. The only reason is_error_noslot_pfn() was
-> checked instead is because we did not have the slot before
-> commit 6574422f913e ("KVM: x86/mmu: Pass the memslot around via struct
-> kvm_page_fault") and looking up the memslot is expensive.
+On 27/08/21 10:00, Longpeng(Mike) wrote:
+> All of the irqfds would to be updated when update the irq
+> routing, it's too expensive if there're too many irqfds.
 > 
-> Now that the slot is available, explicitly check if it's null and
-> get rid of the redundant is_error_noslot_pfn() check.
+> However we can reduce the cost by avoid some unnecessary
+> updates. For irqs of MSI type on X86, the update can be
+> saved if the msi values are not change.
 > 
-> Suggested-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: David Matlack <dmatlack@google.com>
+> The vfio migration could receives benefit from this optimi-
+> zaiton. The test VM has 128 vcpus and 8 VF (with 65 vectors
+> enabled), so the VM has more than 520 irqfds. We mesure the
+> cost of the vfio_msix_enable (in QEMU, it would set routing
+> for each irqfd) for each VF, and we can see the total cost
+> can be significantly reduced.
+> 
+>                  Origin         Apply this Patch
+> 1st             8              4
+> 2nd             15             5
+> 3rd             22             6
+> 4th             24             6
+> 5th             36             7
+> 6th             44             7
+> 7th             51             8
+> 8th             58             8
+> Total           258ms          51ms
+> 
+> We're also tring to optimize the QEMU part [1], but it's still
+> worth to optimize the KVM to gain more benefits.
+> 
+> [1] https://lists.gnu.org/archive/html/qemu-devel/2021-08/msg04215.html
+> 
+> Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
 > ---
->   arch/x86/kvm/mmu/mmu.c | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
+>   arch/x86/kvm/x86.c       |  9 +++++++++
+>   include/linux/kvm_host.h |  2 ++
+>   virt/kvm/eventfd.c       | 15 ++++++++++++++-
+>   3 files changed, 25 insertions(+), 1 deletion(-)
 > 
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 4853c033e6ce..9b5424bcb173 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -2925,10 +2925,10 @@ void kvm_mmu_hugepage_adjust(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
->   	if (unlikely(fault->max_level == PG_LEVEL_4K))
->   		return;
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index e5d5c5e..22cf20e 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -12023,6 +12023,15 @@ int kvm_arch_update_irqfd_routing(struct kvm *kvm, unsigned int host_irq,
+>   	return static_call(kvm_x86_update_pi_irte)(kvm, host_irq, guest_irq, set);
+>   }
 >   
-> -	if (is_error_noslot_pfn(fault->pfn) || kvm_is_reserved_pfn(fault->pfn))
-> +	if (!slot || kvm_slot_dirty_track_enabled(slot))
->   		return;
+> +bool kvm_arch_irqfd_route_changed(struct kvm_kernel_irq_routing_entry *old,
+> +				  struct kvm_kernel_irq_routing_entry *new)
+> +{
+> +	if (new->type != KVM_IRQ_ROUTING_MSI)
+> +		return true;
+> +
+> +	return !!memcmp(&old->msi, &new->msi, sizeof(new->msi));
+> +}
+> +
+>   bool kvm_vector_hashing_enabled(void)
+>   {
+>   	return vector_hashing;
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index ae7735b..c0954ae 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -1621,6 +1621,8 @@ void kvm_arch_irq_bypass_del_producer(struct irq_bypass_consumer *,
+>   void kvm_arch_irq_bypass_start(struct irq_bypass_consumer *);
+>   int kvm_arch_update_irqfd_routing(struct kvm *kvm, unsigned int host_irq,
+>   				  uint32_t guest_irq, bool set);
+> +bool kvm_arch_irqfd_route_changed(struct kvm_kernel_irq_routing_entry *,
+> +				  struct kvm_kernel_irq_routing_entry *);
+>   #endif /* CONFIG_HAVE_KVM_IRQ_BYPASS */
 >   
-> -	if (kvm_slot_dirty_track_enabled(slot))
-> +	if (kvm_is_reserved_pfn(fault->pfn))
->   		return;
+>   #ifdef CONFIG_HAVE_KVM_INVALID_WAKEUPS
+> diff --git a/virt/kvm/eventfd.c b/virt/kvm/eventfd.c
+> index e996989..2ad013b 100644
+> --- a/virt/kvm/eventfd.c
+> +++ b/virt/kvm/eventfd.c
+> @@ -281,6 +281,13 @@ int  __attribute__((weak)) kvm_arch_update_irqfd_routing(
+>   {
+>   	return 0;
+>   }
+> +
+> +bool __attribute__((weak)) kvm_arch_irqfd_route_changed(
+> +				struct kvm_kernel_irq_routing_entry *old,
+> +				struct kvm_kernel_irq_routing_entry *new)
+> +{
+> +	return true;
+> +}
+>   #endif
 >   
->   	/*
+>   static int
+> @@ -615,10 +622,16 @@ void kvm_irq_routing_update(struct kvm *kvm)
+>   	spin_lock_irq(&kvm->irqfds.lock);
+>   
+>   	list_for_each_entry(irqfd, &kvm->irqfds.items, list) {
+> +#ifdef CONFIG_HAVE_KVM_IRQ_BYPASS
+> +		/* Under irqfds.lock, so can read irq_entry safely */
+> +		struct kvm_kernel_irq_routing_entry old = irqfd->irq_entry;
+> +#endif
+> +
+>   		irqfd_update(kvm, irqfd);
+>   
+>   #ifdef CONFIG_HAVE_KVM_IRQ_BYPASS
+> -		if (irqfd->producer) {
+> +		if (irqfd->producer &&
+> +		    kvm_arch_irqfd_route_changed(&old, &irqfd->irq_entry)) {
+>   			int ret = kvm_arch_update_irqfd_routing(
+>   					irqfd->kvm, irqfd->producer->irq,
+>   					irqfd->gsi, 1);
 > 
 
-Squashed, thanks.
+Queued, thanks.
 
 Paolo
 
