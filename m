@@ -2,27 +2,27 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9EC0C416152
-	for <lists+kvm@lfdr.de>; Thu, 23 Sep 2021 16:44:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 21AEF416153
+	for <lists+kvm@lfdr.de>; Thu, 23 Sep 2021 16:44:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241781AbhIWOpc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S241766AbhIWOpc (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Thu, 23 Sep 2021 10:45:32 -0400
-Received: from foss.arm.com ([217.140.110.172]:35552 "EHLO foss.arm.com"
+Received: from foss.arm.com ([217.140.110.172]:35558 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S241780AbhIWOp3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Sep 2021 10:45:29 -0400
+        id S241761AbhIWOpa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Sep 2021 10:45:30 -0400
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8192211FB;
-        Thu, 23 Sep 2021 07:43:57 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C91F6D6E;
+        Thu, 23 Sep 2021 07:43:58 -0700 (PDT)
 Received: from monolith.cable.virginm.net (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7CF383F718;
-        Thu, 23 Sep 2021 07:43:56 -0700 (PDT)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C40FD3F718;
+        Thu, 23 Sep 2021 07:43:57 -0700 (PDT)
 From:   Alexandru Elisei <alexandru.elisei@arm.com>
 To:     will@kernel.org, julien.thierry.kdev@gmail.com, kvm@vger.kernel.org
 Cc:     christoffer.dall@arm.com, vivek.gautam@arm.com
-Subject: [PATCH kvmtool 09/10] arm64: Use the default offset when the kernel image magic is not found
-Date:   Thu, 23 Sep 2021 15:45:04 +0100
-Message-Id: <20210923144505.60776-10-alexandru.elisei@arm.com>
+Subject: [PATCH kvmtool 10/10] arm64: Be more permissive when parsing the kernel header
+Date:   Thu, 23 Sep 2021 15:45:05 +0100
+Message-Id: <20210923144505.60776-11-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20210923144505.60776-1-alexandru.elisei@arm.com>
 References: <20210923144505.60776-1-alexandru.elisei@arm.com>
@@ -32,60 +32,71 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Commit fd0a05bd27dd ("arm64: Obtain text offset from kernel image") added
-support for getting the kernel offset from the kernel header. The code
-checks for the kernel header magic number, and if not found, prints a
-warning and continues searching for the kernel offset in the image.
+kvmtool complains loudly when it parses the kernel header and doesn't find
+what it expects, but unless it outright fails to read the kernel image, it
+will copy the image in the guest memory at the default offset of 0x80000.
 
-The -k/--kernel option can be used to load things which are not a Linux
-kernel, but behave like one, like a kvm-unit-tests test. The tests don't
-have a valid kernel header, and because kvmtool insists on searching for
-the offset, creating a virtual machine can fail with this message:
+There's no technical reason to stop the user from loading payloads other
+than a Linux kernel with the --kernel option. These payloads can behave
+just like a kernel and can use an initrd (which is not possible with
+--firmware), but don't have the kernel header (like kvm-unit-tests), and
+the warnings kvmtool emites can be confusing for this type of payloads.
 
-$ ./vm run -c2 -m256 -k ../kvm-unit-tests/arm/cache.flat
-  # lkvm run -k ../kvm-unit-tests/arm/cache.flat -m 256 -c 2 --name guest-7529
-  Warning: Kernel image magic not matching
-  Warning: unable to translate host address 0x910100a502a00085 to guest
-  Fatal: kernel image too big to contain in guest memory.
+Change the warnings to debug statements, which can be enabled via the
+--debug kvmtool command line option, to make them disappear for these cases
+where they aren't really relevant.
 
-The host address is a random number read from the test binary from the
-location where text_offset is found in the kernel header. Before the
-commit, the test was executing just fine:
-
-$ ./vm run -c2 -m256 -k ../kvm-unit-tests/arm/cache.flat
-  # lkvm run -k ../kvm-unit-tests/arm/cache.flat -m 256 -c 2 --name guest-8105
-INFO: IDC-DIC: dcache clean to PoU required
-INFO: IDC-DIC: icache invalidation to PoU required
-PASS: IDC-DIC: code generation
-SUMMARY: 1 tests
-
-Change kvm__arch_get_kern_offset() so it returns the default text_offset
-value if the kernel image magic number is not found, making it possible
-again to use something other than a Linux kernel with --kernel.
-
-Reported-by: Vivek Kumar Gautam <vivek.gautam@arm.com>
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- arm/aarch64/kvm.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ arm/aarch64/kvm.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
 diff --git a/arm/aarch64/kvm.c b/arm/aarch64/kvm.c
-index 4e66a22ec06d..b38365fb7156 100644
+index b38365fb7156..56a0aedc263d 100644
 --- a/arm/aarch64/kvm.c
 +++ b/arm/aarch64/kvm.c
-@@ -35,8 +35,10 @@ unsigned long long kvm__arch_get_kern_offset(struct kvm *kvm, int fd)
+@@ -16,7 +16,7 @@ unsigned long long kvm__arch_get_kern_offset(struct kvm *kvm, int fd)
+ 	struct arm64_image_header header;
+ 	off_t cur_offset;
+ 	ssize_t size;
+-	const char *warn_str;
++	const char *debug_str;
  
+ 	/* the 32bit kernel offset is a well known value */
+ 	if (kvm->cfg.arch.aarch32_guest)
+@@ -25,8 +25,8 @@ unsigned long long kvm__arch_get_kern_offset(struct kvm *kvm, int fd)
+ 	cur_offset = lseek(fd, 0, SEEK_CUR);
+ 	if (cur_offset == (off_t)-1 ||
+ 	    lseek(fd, 0, SEEK_SET) == (off_t)-1) {
+-		warn_str = "Failed to seek in kernel image file";
+-		goto fail;
++		debug_str = "Failed to seek in kernel image file";
++		goto default_offset;
+ 	}
+ 
+ 	size = xread(fd, &header, sizeof(header));
+@@ -36,16 +36,16 @@ unsigned long long kvm__arch_get_kern_offset(struct kvm *kvm, int fd)
  	lseek(fd, cur_offset, SEEK_SET);
  
--	if (memcmp(&header.magic, ARM64_IMAGE_MAGIC, sizeof(header.magic)))
--		pr_warning("Kernel image magic not matching");
-+	if (memcmp(&header.magic, ARM64_IMAGE_MAGIC, sizeof(header.magic))) {
-+		warn_str = "Kernel image magic not matching";
-+		goto fail;
-+	}
+ 	if (memcmp(&header.magic, ARM64_IMAGE_MAGIC, sizeof(header.magic))) {
+-		warn_str = "Kernel image magic not matching";
+-		goto fail;
++		debug_str = "Kernel image magic not matching";
++		goto default_offset;
+ 	}
  
  	if (le64_to_cpu(header.image_size))
  		return le64_to_cpu(header.text_offset);
+ 
+-	warn_str = "Image size is 0";
+-fail:
+-	pr_warning("%s, assuming TEXT_OFFSET to be 0x80000", warn_str);
++	debug_str = "Image size is 0";
++default_offset:
++	pr_debug("%s, assuming TEXT_OFFSET to be 0x80000", debug_str);
+ 	return 0x80000;
+ }
+ 
 -- 
 2.31.1
 
