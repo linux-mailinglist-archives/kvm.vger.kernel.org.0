@@ -2,109 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 59A2341611E
-	for <lists+kvm@lfdr.de>; Thu, 23 Sep 2021 16:36:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B7567416146
+	for <lists+kvm@lfdr.de>; Thu, 23 Sep 2021 16:43:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241666AbhIWOiG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Sep 2021 10:38:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46044 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S241605AbhIWOiG (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 23 Sep 2021 10:38:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632407794;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=tM3g7fUHbsu5UDZIXRUIRPhWsRqGb+aH3IjlBpgEGsU=;
-        b=VqRhG2tC0TwluiuLGMRhbvsdRyJvCJ6wYtsfsJe8SJcLFbmYQ2uW2bgSPaEQ/PYLtHdlMM
-        fytT326rLAd/K7XELk4/R7X/OoJaEKLo2qe8wbrB0RxVklQoSMdLwOWrSrKKogOKWUQnbD
-        oXUXcS3mxeGk6qswZ3EHIv0ydodYafg=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-593-TpdOc-n8Pk6UOw-vhok0Jg-1; Thu, 23 Sep 2021 10:36:33 -0400
-X-MC-Unique: TpdOc-n8Pk6UOw-vhok0Jg-1
-Received: by mail-wr1-f72.google.com with SMTP id f7-20020a5d50c7000000b0015e288741a4so5317558wrt.9
-        for <kvm@vger.kernel.org>; Thu, 23 Sep 2021 07:36:33 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=tM3g7fUHbsu5UDZIXRUIRPhWsRqGb+aH3IjlBpgEGsU=;
-        b=56VjqeCN8uiA6g47EEaqSGaP3io0mNznl0wg7yxDRjgaxM/q48uA2nH8AL6LL96c93
-         8Dh6OeYSENkqTVEyP/0M01t5IZB003HTmH+k9ArLRgHwO/vhF423AibTlEyq7Y6Uwemg
-         DtW/dqeeI3Zhegvw8cyJDgU6VDh8u2tAQtVqcLOolJYyh0nt+odGZBeW0KqLpSs3B87Y
-         Q9wk8mVrQO1ZuzDWLuj+ZVGrH7wIcAeXGNwvlqtV2b9Qv1OrWyQPiqOm/f4pGaCH6OcD
-         pTYatHxRmjwNMm8KLwKYmxsdF/7WpCnKHDEHoSoLMI7vCtggoN0+QmIO4WtQIaeuc/rm
-         toKA==
-X-Gm-Message-State: AOAM533FSYiU+8ZK5PA1odcGiyw5dS4xZqo7+IQxOMZ5BHAieN1dO8CI
-        U5yoxVBX1uoFEZ3pZHOUuvQd294jwM2jHw70vI9PNtrfmknEszJeL/ZDHZmi0y2JhX9//tk+KlX
-        LEkRj8K+JAgX06epSfD725pyBZcdKGV/5gDw1WdiGmUer2RoRUFPLLQhIx6i4p+xP
-X-Received: by 2002:a5d:568a:: with SMTP id f10mr5484180wrv.314.1632407791718;
-        Thu, 23 Sep 2021 07:36:31 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzI7VO+gl5FNNX2Qjt40hO60rJs1kdwuEagO0synF/stcFYOiwV4VSXa+cDxEnaUvFMYPBXcA==
-X-Received: by 2002:a5d:568a:: with SMTP id f10mr5484141wrv.314.1632407791497;
-        Thu, 23 Sep 2021 07:36:31 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id c9sm3493853wmb.41.2021.09.23.07.36.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 23 Sep 2021 07:36:30 -0700 (PDT)
-Subject: Re: [PATCH V2 02/10] KVM: X86: Synchronize the shadow pagetable
- before link it
-To:     Lai Jiangshan <jiangshanlai@gmail.com>,
-        linux-kernel@vger.kernel.org
-Cc:     Lai Jiangshan <laijs@linux.alibaba.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Avi Kivity <avi@redhat.com>, kvm@vger.kernel.org
-References: <20210918005636.3675-1-jiangshanlai@gmail.com>
- <20210918005636.3675-3-jiangshanlai@gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <40f67a70-5076-3806-1ec7-a4ac50d13774@redhat.com>
-Date:   Thu, 23 Sep 2021 16:36:24 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        id S241674AbhIWOpR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Sep 2021 10:45:17 -0400
+Received: from foss.arm.com ([217.140.110.172]:35462 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S241670AbhIWOpR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Sep 2021 10:45:17 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 87B2BD6E;
+        Thu, 23 Sep 2021 07:43:45 -0700 (PDT)
+Received: from monolith.cable.virginm.net (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 813783F718;
+        Thu, 23 Sep 2021 07:43:44 -0700 (PDT)
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     will@kernel.org, julien.thierry.kdev@gmail.com, kvm@vger.kernel.org
+Cc:     christoffer.dall@arm.com, vivek.gautam@arm.com
+Subject: [PATCH kvmtool 00/10] Run kvm-unit-tests with --kernel
+Date:   Thu, 23 Sep 2021 15:44:55 +0100
+Message-Id: <20210923144505.60776-1-alexandru.elisei@arm.com>
+X-Mailer: git-send-email 2.33.0
 MIME-Version: 1.0
-In-Reply-To: <20210918005636.3675-3-jiangshanlai@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 18/09/21 02:56, Lai Jiangshan wrote:
-> +			 * It also makes KVM_REQ_MMU_SYNC request if the @sp
-> +			 * is linked on a different addr to expedite it.
-> +			 */
-> +			if (sp->unsync_children &&
-> +			    mmu_sync_children(vcpu, sp, false)) {
-> +				kvm_make_request(KVM_REQ_MMU_SYNC, vcpu);
-> +				return RET_PF_RETRY;
-> +			}
->   		}
+What prompted this series (which I really hoped will turn out smaller than
+it did) is my attempt to add support for kvmtool to kvm-unit-tests
+automated test runner [1]. When working through the review comments for
+that series, I realized that kvmtool must be able to load an initrd when
+running a test to get all the features that tests rely on.
 
-I think we can put the sync in mmu_sync_children:
+kvm-unit-tests uses the initrd, which is expected to be a text file in the
+format key=value, to pass parameters to a test. The initrd is by default
+generated by the runner script, but the location of a custom initrd file
+can also be set using the environment variable KVM_UNIT_TEST_ENV (many
+thanks to Andrew Jones for explaining that). Contained in the automatically
+generated initrd is information about the presence of certain commits in
+the host kernel.  These commits are important because they fix serious bugs
+in KVM, and running tests which are designed to exercise the fix on systems
+where it isn't present can cause the host kernel to crash. kvm-unit-tests
+calls these bug fixing commits erratas, and their presence is signalled by
+an entry ERRATA_<commit_id>=y in the initrd.
 
--			if (!can_yield)
-+			if (!can_yield) {
-+				/*
-+				 * Some progress has been made so the caller
-+				 * can simply retry, but we can expedite the
-+				 * process by forcing a sync to happen.
-+				 */
-+				kvm_make_request(KVM_REQ_MMU_SYNC, vcpu);
-  				return -EINTR;
-+			}
+Using --kernel to run a test is not possible for two reasons:
 
-Paolo
+1. Commit fd0a05bd27dd ("arm64: Obtain text offset from kernel image") made
+it such that the kernel load offset is read from the binary file even if
+the kernel header is not detected. kvmtool will try to load a test at a
+random address read from the text section of the binary, which most of the
+time is well above the upper limit for the VM's RAM in a normal VM
+configuration.
+
+2. kvm-unit-tests uses the kernel command line as the source for various
+test parameters. kvmtool modifies the kernel command line that the user
+specified to try to make it as painless as possible to boot a kernel, but
+for a test this means that parsing the kernel command line for the required
+parameters fails because of those unexpected, and in this case, unwanted
+additions.
+
+Currently, running any kvm-unit-tests test with kvmtool can only be done
+with --firmware, which does not touch the command line, but it has the
+downside of not being able to load an initrd. I decided to add a new
+kvmtool command line option, --nodefaults, which disables all the automated
+stuff that kvmtool does without being explicitly told so by the user (which
+includes modifying the kernel command line).
+
+I believe a --nodefaults option has merit even outside enabling support for
+automating kvm-unit-tests runs. There are legitimate reasons for a user to
+remove all the parameters that kvmtool adds to the kernel command line
+(like testing or trying to understand how something works), or the
+generated rootfs filesystem (for example, the initrd with the rootfs is
+included in the kernel). I think that giving the user as much control as
+possible is very useful for a program like kvmtool, which lends itself very
+well to quick testing and prototyping.
+
+The --nocompat option was added because compat warnings, in certain
+situations, can be more confusing than useful on arm64, which has virtio in
+defconfig. Of course, this is under the assumption that a user who removes
+virtio from the kernel config knows what he's doing, but the compat
+warnings are still shown by default just in case. Also, with the --firmware
+option, the assumption that every guest is a Linux kernel and has working
+virtio is not really true any more.
+
+A quick summary of the patches:
+
+* Patches #1 through #4 are for making kvmtool's command line more
+  informative when options are ignored because --kernel and --firmware are
+  handled differently.
+
+* Patch #5 removes kvm->cfg.image_count, which is really the same
+  thing as kvm->nr_disks. I found this very confusing when trying to
+  understand the function kvm_cmd_run_init(), but the patch is not
+  necessary for what this series is trying to achieve.
+
+* Patch #6 is a preparatory patch and #7 adds the --nodefaults option.
+
+* Patch #8 adds the --nocompat option.
+
+* Patch #9 and #10 is my attempt at making kvmtool slightly more lenient
+  when loading something other than a kernel with --kernel. Patch #9 is
+  squarely aimed at loading kvm-unit-tests with --kernel (which was possible
+  before kernel header parsing, but not anymore). Patch #10 is my attempt
+  at hiding a warning which is harmless in the context of loading a
+  kvm-unit-tests test.
+
+[1] https://lists.cs.columbia.edu/pipermail/kvmarm/2021-July/047747.html
+
+Alexandru Elisei (10):
+  builtin-run: Treat specifying both --kernel and --firmware as an error
+  builtin-run: Warn when ignoring initrd because --firmware was
+    specified
+  builtin-run: Do not attempt to find vmlinux if --firmware
+  builtin-run: Abstract argument validation into a separate function
+  Use kvm->nr_disks instead of kvm->cfg.image_count
+  builtin-run: Move kernel command line generation to a separate
+    function
+  Add --nodefaults command line argument
+  Add --nocompat option to disable compat warnings
+  arm64: Use the default offset when the kernel image magic is not found
+  arm64: Be more permissive when parsing the kernel header
+
+ arm/aarch64/kvm.c        |  18 ++---
+ arm/fdt.c                |   3 +-
+ builtin-run.c            | 144 ++++++++++++++++++++++++---------------
+ disk/core.c              |  18 ++---
+ guest_compat.c           |   1 +
+ include/kvm/kvm-config.h |   3 +-
+ mips/kvm.c               |   3 +-
+ 7 files changed, 114 insertions(+), 76 deletions(-)
+
+-- 
+2.31.1
 
