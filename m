@@ -2,27 +2,27 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BB03041614E
-	for <lists+kvm@lfdr.de>; Thu, 23 Sep 2021 16:44:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1002441614F
+	for <lists+kvm@lfdr.de>; Thu, 23 Sep 2021 16:44:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241736AbhIWOp3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Sep 2021 10:45:29 -0400
-Received: from foss.arm.com ([217.140.110.172]:35528 "EHLO foss.arm.com"
+        id S241771AbhIWOpb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Sep 2021 10:45:31 -0400
+Received: from foss.arm.com ([217.140.110.172]:35536 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S241773AbhIWOp0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Sep 2021 10:45:26 -0400
+        id S241766AbhIWOp1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Sep 2021 10:45:27 -0400
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E45BCD6E;
-        Thu, 23 Sep 2021 07:43:54 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3A2B6113E;
+        Thu, 23 Sep 2021 07:43:56 -0700 (PDT)
 Received: from monolith.cable.virginm.net (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DECCD3F718;
-        Thu, 23 Sep 2021 07:43:53 -0700 (PDT)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3402D3F718;
+        Thu, 23 Sep 2021 07:43:55 -0700 (PDT)
 From:   Alexandru Elisei <alexandru.elisei@arm.com>
 To:     will@kernel.org, julien.thierry.kdev@gmail.com, kvm@vger.kernel.org
 Cc:     christoffer.dall@arm.com, vivek.gautam@arm.com
-Subject: [PATCH kvmtool 07/10] Add --nodefaults command line argument
-Date:   Thu, 23 Sep 2021 15:45:02 +0100
-Message-Id: <20210923144505.60776-8-alexandru.elisei@arm.com>
+Subject: [PATCH kvmtool 08/10] Add --nocompat option to disable compat warnings
+Date:   Thu, 23 Sep 2021 15:45:03 +0100
+Message-Id: <20210923144505.60776-9-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20210923144505.60776-1-alexandru.elisei@arm.com>
 References: <20210923144505.60776-1-alexandru.elisei@arm.com>
@@ -32,115 +32,76 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-kvmtool attempts to make it as easier as possible on the user to run a VM
-by doing a few different things: it tries to create a rootfs filesystem in
-a directory if not disk or initrd is set by the user, and it adds various
-parameters to the kernel command line based on the VM configuration
-options.
+Commit e66942073035 ("kvm tools: Guest kernel compatability") added the
+functionality that enables devices to print a warning message if the device
+hasn't been initialized by the time the VM is destroyed. The purpose of
+these messages is to let the user know if the kernel hasn't been built with
+the correct Kconfig options to take advantage of the said devices (all
+using virtio).
 
-While this is generally very useful, today there isn't any way for the user
-to prohibit this behaviour, even though there are situations where this
-might not be desirable, like, for example: loading something which is not a
-kernel (kvm-unit-tests comes to mind, which expects test parameters on the
-kernel command line); the kernel has a built-in initramfs and there is no
-need to generate the root filesystem, or it not possible; and what is
-probably the most important use case, when the user is actively trying to
-break things for testing purposes.
+Since then, kvmtool has evolved and now supports loading different payloads
+(like firmware images), and having those warnings even when it is entirely
+intentional for the payload not to touch the devices can be confusing for
+the user and makes the output unnecessarily verbose in those cases.
 
-Add a --nodefaults command line argument which disables everything that
-cannot be disabled via another command line switch. The purpose of this
-knob is not to disable the default options for arguments that can be set
-via the kvmtool command line, but rather to inhibit behaviour that cannot
-be disabled otherwise.
+Add the --nocompat option to disable the warnings; the warnings are still
+enabled by default.
 
+Reported-by: Christoffer Dall <christoffer.dall@arm.com>
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- arm/fdt.c                |  3 ++-
- builtin-run.c            | 13 +++++++++++--
- include/kvm/kvm-config.h |  1 +
- mips/kvm.c               |  3 ++-
- 4 files changed, 16 insertions(+), 4 deletions(-)
+ builtin-run.c            | 5 ++++-
+ guest_compat.c           | 1 +
+ include/kvm/kvm-config.h | 1 +
+ 3 files changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/arm/fdt.c b/arm/fdt.c
-index 7032985e99a3..635de7f27fa5 100644
---- a/arm/fdt.c
-+++ b/arm/fdt.c
-@@ -136,9 +136,10 @@ static int setup_fdt(struct kvm *kvm)
- 		if (kvm->cfg.kernel_cmdline)
- 			_FDT(fdt_property_string(fdt, "bootargs",
- 						 kvm->cfg.kernel_cmdline));
--	} else
-+	} else if (kvm->cfg.real_cmdline) {
- 		_FDT(fdt_property_string(fdt, "bootargs",
- 					 kvm->cfg.real_cmdline));
-+	}
- 
- 	_FDT(fdt_property_u64(fdt, "kaslr-seed", kvm->cfg.arch.kaslr_seed));
- 	_FDT(fdt_property_string(fdt, "stdout-path", "serial0"));
 diff --git a/builtin-run.c b/builtin-run.c
-index 478b5a95b726..9a1a0c1fa6fb 100644
+index 9a1a0c1fa6fb..a736b63ce7e5 100644
 --- a/builtin-run.c
 +++ b/builtin-run.c
-@@ -108,6 +108,9 @@ void kvm_run_set_wrapper_sandbox(void)
- 	OPT_BOOLEAN('\0', "sdl", &(cfg)->sdl, "Enable SDL framebuffer"),\
- 	OPT_BOOLEAN('\0', "rng", &(cfg)->virtio_rng, "Enable virtio"	\
- 			" Random Number Generator"),			\
-+	OPT_BOOLEAN('\0', "nodefaults", &(cfg)->nodefaults, "Disable"   \
-+			" implicit configuration that cannot be"	\
-+			" disabled otherwise"),				\
+@@ -111,6 +111,8 @@ void kvm_run_set_wrapper_sandbox(void)
+ 	OPT_BOOLEAN('\0', "nodefaults", &(cfg)->nodefaults, "Disable"   \
+ 			" implicit configuration that cannot be"	\
+ 			" disabled otherwise"),				\
++	OPT_BOOLEAN('\0', "nocompat", &(cfg)->nocompat, "Disable"	\
++			" compat warnings"),				\
  	OPT_CALLBACK('\0', "9p", NULL, "dir_to_share,tag_name",		\
  		     "Enable virtio 9p to share files between host and"	\
  		     " guest", virtio_9p_rootdir_parser, kvm),		\
-@@ -642,7 +645,10 @@ static struct kvm *kvm_cmd_run_init(int argc, const char **argv)
- 		}
- 	}
+@@ -709,7 +711,8 @@ static int kvm_cmd_run_work(struct kvm *kvm)
  
--	if (!kvm->cfg.using_rootfs && !kvm->cfg.disk_image[0].filename && !kvm->cfg.initrd_filename) {
-+	if (!kvm->cfg.nodefaults &&
-+	    !kvm->cfg.using_rootfs &&
-+	    !kvm->cfg.disk_image[0].filename &&
-+	    !kvm->cfg.initrd_filename) {
- 		char tmp[PATH_MAX];
+ static void kvm_cmd_run_exit(struct kvm *kvm, int guest_ret)
+ {
+-	compat__print_all_messages();
++	if (!kvm->cfg.nocompat)
++		compat__print_all_messages();
  
- 		kvm_setup_create_new(kvm->cfg.custom_rootfs_name);
-@@ -662,7 +668,10 @@ static struct kvm *kvm_cmd_run_init(int argc, const char **argv)
- 			die("Failed to setup init for guest.");
- 	}
+ 	init_list__exit(kvm);
  
--	kvm_run_set_real_cmdline(kvm);
-+	if (kvm->cfg.nodefaults)
-+		kvm->cfg.real_cmdline = kvm->cfg.kernel_cmdline;
-+	else
-+		kvm_run_set_real_cmdline(kvm);
+diff --git a/guest_compat.c b/guest_compat.c
+index fd4704b20b16..a413c12ccd2e 100644
+--- a/guest_compat.c
++++ b/guest_compat.c
+@@ -88,6 +88,7 @@ int compat__print_all_messages(void)
  
- 	if (kvm->cfg.kernel_filename) {
- 		printf("  # %s run -k %s -m %Lu -c %d --name %s\n", KVM_BINARY_NAME,
+ 		printf("\n  # KVM compatibility warning.\n\t%s\n\t%s\n",
+ 			msg->title, msg->desc);
++		printf("\tTo stop seeing this warning, use the --nocompat option.\n");
+ 
+ 		list_del(&msg->list);
+ 		compat__free(msg);
 diff --git a/include/kvm/kvm-config.h b/include/kvm/kvm-config.h
-index 35d45c0f7ab1..6a5720c4c7d4 100644
+index 6a5720c4c7d4..329aa46e6eda 100644
 --- a/include/kvm/kvm-config.h
 +++ b/include/kvm/kvm-config.h
-@@ -27,6 +27,7 @@ struct kvm_config {
- 	u8 num_vfio_devices;
+@@ -28,6 +28,7 @@ struct kvm_config {
  	u64 vsock_cid;
  	bool virtio_rng;
-+	bool nodefaults;
+ 	bool nodefaults;
++	bool nocompat;
  	int active_console;
  	int debug_iodelay;
  	int nrcpus;
-diff --git a/mips/kvm.c b/mips/kvm.c
-index e110e5d5de8a..3470dbb2e433 100644
---- a/mips/kvm.c
-+++ b/mips/kvm.c
-@@ -131,7 +131,8 @@ static void kvm__mips_install_cmdline(struct kvm *kvm)
- 			(unsigned long long)kvm->ram_size - KVM_MMIO_START,
- 			(unsigned long long)(KVM_MMIO_START + KVM_MMIO_SIZE));
- 
--	strcat(p + cmdline_offset, kvm->cfg.real_cmdline); /* maximum size is 2K */
-+	if (kvm->cfg.real_cmdline)
-+		strcat(p + cmdline_offset, kvm->cfg.real_cmdline); /* maximum size is 2K */
- 
- 	while (p[cmdline_offset]) {
- 		if (!isspace(p[cmdline_offset])) {
 -- 
 2.31.1
 
