@@ -2,183 +2,307 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AD38E4165DD
-	for <lists+kvm@lfdr.de>; Thu, 23 Sep 2021 21:16:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C67E4165E5
+	for <lists+kvm@lfdr.de>; Thu, 23 Sep 2021 21:17:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242911AbhIWTSB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Sep 2021 15:18:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58650 "EHLO
+        id S242931AbhIWTTR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Sep 2021 15:19:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59034 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242929AbhIWTSA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Sep 2021 15:18:00 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C43B2C061574
-        for <kvm@vger.kernel.org>; Thu, 23 Sep 2021 12:16:28 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id i77-20020a25d150000000b005b1d20152b0so299874ybg.14
-        for <kvm@vger.kernel.org>; Thu, 23 Sep 2021 12:16:28 -0700 (PDT)
+        with ESMTP id S242839AbhIWTTQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Sep 2021 15:19:16 -0400
+Received: from mail-ot1-x32f.google.com (mail-ot1-x32f.google.com [IPv6:2607:f8b0:4864:20::32f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E708BC061757
+        for <kvm@vger.kernel.org>; Thu, 23 Sep 2021 12:17:44 -0700 (PDT)
+Received: by mail-ot1-x32f.google.com with SMTP id x33-20020a9d37a4000000b0054733a85462so9941459otb.10
+        for <kvm@vger.kernel.org>; Thu, 23 Sep 2021 12:17:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=iaLxJyQl/R2XLxgbK/Yc9KCKg/FcSd6fsVvahhw1gbk=;
-        b=MqZIRMrNmbaHF93vIL8MIjYz2FQMq964YhsWtPj5J9/0PZjaTBZpanOXfeFLtiaHD6
-         Hsgb+G10pPVRL3jFu9SHOfUQVSQ7fGYx/a82WtqnoWdfGLYU2XoGYrqILas2jRPIB+/E
-         kmYvDT8rmmUHm2NSVM0jhH3pOM6ZobF3TeTwVtJtYZKa9pvK+gVSBWawg72Bvnql/ZaW
-         jnudsfUiXLzKsyUzFN8yATBQoCq2+iJdo2ChUcjejGtjDrjsCYIVX1iLmpqv2SVDf9/r
-         WOpKinDu5OyTWsFnWFIcnGYP9vXMkQFAcN6ygsEvgfxniC2rcaMQlYG0BigOBa9xfF8s
-         uPdg==
+        bh=LljGpfowrgivlRJFftpyDSU2BC04nSpPhM5eTXaFlr8=;
+        b=RAEdX72B6FJ8jw2x0FecoX4YekDfJKpt4KQDs/G7WIW+nNaklHbXDWQAUYj0t/JaJA
+         W6hAufJVFkCXJxttIR9GzclXE2yluJI6Bwx53jtS0jbPDjn1rlKV6tBgBi4ArQLfsZCi
+         Cn6S6RQyKUVhromBPbhmSLdKQCprrgOesWVX0ED1SN/D63o/DXwt4XTlk33AJPUYBK6R
+         wLtbGlC8TXtukuJd+LDL+BkSYLD/qSgLHPM/TmI5pJq7f+uqj1ABsIC00RlD+0Nka0Gu
+         mvuMEdkYIFQ171A8dVY0zC5YcScytshrd/pyp7zQDJqlNYIx5SnZso5D+J3/EI/CELhR
+         D6Xg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=iaLxJyQl/R2XLxgbK/Yc9KCKg/FcSd6fsVvahhw1gbk=;
-        b=m7QDqGMT8MPLkjzGHs4sy38ADFDwffNZ0J4X0gfqam3aH9x1KKbKxsJ5EryrhCwZuZ
-         0ZFQF4oPECCsr/E4H3qdgqkYH/cp/NGAJ4DC8UeEWTr/eMzuYQ+n2lxjN7tC/qfb5AwO
-         qFN9X0EDmX05JQzLhmEVjDbGbi2O/0bcjbaHLxsRJTcWU5DO0GDd0xZXs2MLMerJ/OCR
-         qa2TFIukXPf+I+zQ+bQDLuYW7V5WJ0GZv50G6oSodUsZIP3WOr6FqptRp1hh1Y4E/qVN
-         nA+gDhn0DuEuU1cHktzp5QK+L2XSXQknRcSU7F2nPjBN/Qb8bWjT9DLamcMBfLbKuxQm
-         HXUQ==
-X-Gm-Message-State: AOAM531hXPSWiKb5m+GJc2NzxTQGie8FF3SK81158Yoz8z4mGI5r/kyK
-        lPXtiNw+nXgn7ys87Q42fAdedCbFuLo=
-X-Google-Smtp-Source: ABdhPJyjXGf6r7078NOSI+fwirDQAYTFCKMH/ZKp0jWghQ7m5qJfBJ9PqydzFMi5FrxM+rw+lmH3oJ2XpIA=
-X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a25:2d4c:: with SMTP id s12mr7301465ybe.350.1632424587972;
- Thu, 23 Sep 2021 12:16:27 -0700 (PDT)
-Date:   Thu, 23 Sep 2021 19:16:10 +0000
-In-Reply-To: <20210923191610.3814698-1-oupton@google.com>
-Message-Id: <20210923191610.3814698-12-oupton@google.com>
-Mime-Version: 1.0
-References: <20210923191610.3814698-1-oupton@google.com>
-X-Mailer: git-send-email 2.33.0.685.g46640cef36-goog
-Subject: [PATCH v2 11/11] selftests: KVM: Test SYSTEM_SUSPEND PSCI call
-From:   Oliver Upton <oupton@google.com>
-To:     kvmarm@lists.cs.columbia.edu
-Cc:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>,
-        kvm@vger.kernel.org, Oliver Upton <oupton@google.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=LljGpfowrgivlRJFftpyDSU2BC04nSpPhM5eTXaFlr8=;
+        b=vJ7izN3v76bLVbiEmxC8jBerl1lM+XveXSVsGvm8zGwMb+407wgscL4ZewfXlHtWNU
+         xt8CjLKXZoeMHM/cqbEtiMkDSgeBrlYuttKSI7gJarZYr5w8xK5hph23zH5dqRU32gQN
+         AZ84D+VTRMKxFwXQ8m9jpOauIlDWAu3yyuxjvMBLKG+mpfRtUNcS33v+cVwNRt4+Be4R
+         8CjJUiHiUYgmMiyfHbeLlGknr1j+Y310B+ClH5g1yNQDJ4N9Uvux9JMkTE4hYdGDlINS
+         J12QTdd3b4i3Ualq+PFOXcwKE7EgQgIKUyxPsQ3wTsYJ3CwPeF9HEfbV5KjeEYDSabxT
+         WamQ==
+X-Gm-Message-State: AOAM531kJeschU75hXr/lyaWvB7y/D0VQpXbU6gEFji7AsdVFTVPlVBe
+        qY4RmoeP3PU42kyUsBHBSKdIacU4bnNZLDyCjH5k6pIZ85GUaQ==
+X-Google-Smtp-Source: ABdhPJy3a+ciB5HUuEkyF15D9a+i+PcNr0ycw4p0pLC+2f3JAb7ZPosK7g7KqsUO3QngeZ/iGwl0M1spnBB1SuLc6LI=
+X-Received: by 2002:a9d:71d4:: with SMTP id z20mr309962otj.29.1632424663779;
+ Thu, 23 Sep 2021 12:17:43 -0700 (PDT)
+MIME-Version: 1.0
+References: <20210820155918.7518-1-brijesh.singh@amd.com> <20210820155918.7518-22-brijesh.singh@amd.com>
+ <YUt8KOiwTwwa6xZK@work-vm> <b3f340dc-ceee-3d04-227d-741ad0c17c49@amd.com>
+In-Reply-To: <b3f340dc-ceee-3d04-227d-741ad0c17c49@amd.com>
+From:   Marc Orr <marcorr@google.com>
+Date:   Thu, 23 Sep 2021 12:17:32 -0700
+Message-ID: <CAA03e5FTpmCXqsB9OZfkxVY4TQb8n5KfRiFAsmd6jjvbb1DdCQ@mail.gmail.com>
+Subject: Re: [PATCH Part2 v5 21/45] KVM: SVM: Make AVIC backing, VMSA and VMCB
+ memory allocation SNP safe
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        x86 <x86@kernel.org>, LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>, linux-coco@lists.linux.dev,
+        linux-mm@kvack.org, linux-crypto@vger.kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Assert that the vCPU exits to userspace with KVM_SYSTEM_EVENT_SUSPEND if
-it correctly executes the SYSTEM_SUSPEND PSCI call. Additionally, assert
-that the guest PSCI call fails if preconditions are not met (more than 1
-running vCPU).
+On Thu, Sep 23, 2021 at 11:09 AM Brijesh Singh <brijesh.singh@amd.com> wrote:
+>
+>
+> On 9/22/21 1:55 PM, Dr. David Alan Gilbert wrote:
+> > * Brijesh Singh (brijesh.singh@amd.com) wrote:
+> >> Implement a workaround for an SNP erratum where the CPU will incorrectly
+> >> signal an RMP violation #PF if a hugepage (2mb or 1gb) collides with the
+> >> RMP entry of a VMCB, VMSA or AVIC backing page.
+> >>
+> >> When SEV-SNP is globally enabled, the CPU marks the VMCB, VMSA, and AVIC
+> >> backing   pages as "in-use" in the RMP after a successful VMRUN.  This is
+> >> done for _all_ VMs, not just SNP-Active VMs.
+> > Can you explain what 'globally enabled' means?
+>
+> This means that SNP is enabled in  host SYSCFG_MSR.Snp=1. Once its
+> enabled then RMP checks are enforced.
+>
+>
+> > Or more specifically, can we trip this bug on public hardware that has
+> > the SNP enabled in the bios, but no SNP init in the host OS?
+>
+> Enabling the SNP support on host is 3 step process:
+>
+> step1 (bios): reserve memory for the RMP table.
+>
+> step2 (host): initialize the RMP table memory, set the SYSCFG msr to
+> enable the SNP feature
+>
+> step3 (host): call the SNP_INIT to initialize the SNP firmware (this is
+> needed only if you ever plan to launch SNP guest from this host).
+>
+> The "SNP globally enabled" means the step 1 to 2. The RMP checks are
+> enforced as soon as step 2 is completed.
 
-Signed-off-by: Oliver Upton <oupton@google.com>
----
- .../testing/selftests/kvm/aarch64/psci_test.c | 75 +++++++++++++++++++
- 1 file changed, 75 insertions(+)
+It might be good to update the code to reflect this reply, such that
+the new `snp_safe_alloc_page()` function introduced in this patch only
+deviates from "normal" page allocation logic when these two conditions
+are met. We could introduce a global variable, `snp_globally_enabled`
+that defaults to false and gets set to true after we write the SYSCFG
+MSR.
 
-diff --git a/tools/testing/selftests/kvm/aarch64/psci_test.c b/tools/testing/selftests/kvm/aarch64/psci_test.c
-index 90312be335da..5b881ca4d102 100644
---- a/tools/testing/selftests/kvm/aarch64/psci_test.c
-+++ b/tools/testing/selftests/kvm/aarch64/psci_test.c
-@@ -45,6 +45,16 @@ static uint64_t psci_affinity_info(uint64_t target_affinity,
- 	return res.a0;
- }
- 
-+static uint64_t psci_system_suspend(uint64_t entry_addr, uint64_t context_id)
-+{
-+	struct arm_smccc_res res;
-+
-+	smccc_hvc(PSCI_1_0_FN64_SYSTEM_SUSPEND, entry_addr, context_id,
-+		  0, 0, 0, 0, 0, &res);
-+
-+	return res.a0;
-+}
-+
- static void guest_test_cpu_on(uint64_t target_cpu)
- {
- 	GUEST_ASSERT(!psci_cpu_on(target_cpu, CPU_ON_ENTRY_ADDR, CPU_ON_CONTEXT_ID));
-@@ -69,6 +79,13 @@ static void vcpu_power_off(struct kvm_vm *vm, uint32_t vcpuid)
- 	vcpu_set_mp_state(vm, vcpuid, &mp_state);
- }
- 
-+static void guest_test_system_suspend(void)
-+{
-+	uint64_t r = psci_system_suspend(CPU_ON_ENTRY_ADDR, CPU_ON_CONTEXT_ID);
-+
-+	GUEST_SYNC(r);
-+}
-+
- static struct kvm_vm *setup_vm(void *guest_code)
- {
- 	struct kvm_vcpu_init init;
-@@ -136,8 +153,66 @@ static void host_test_cpu_on(void)
- 	kvm_vm_free(vm);
- }
- 
-+static void enable_system_suspend(struct kvm_vm *vm)
-+{
-+	struct kvm_enable_cap cap = {
-+		.cap = KVM_CAP_ARM_SYSTEM_SUSPEND,
-+	};
-+
-+	vm_enable_cap(vm, &cap);
-+}
-+
-+static void host_test_system_suspend(void)
-+{
-+	struct kvm_run *run;
-+	struct kvm_vm *vm;
-+
-+	vm = setup_vm(guest_test_system_suspend);
-+	enable_system_suspend(vm);
-+
-+	vcpu_power_off(vm, VCPU_ID_TARGET);
-+	run = vcpu_state(vm, VCPU_ID_SOURCE);
-+
-+	enter_guest(vm, VCPU_ID_SOURCE);
-+
-+	TEST_ASSERT(run->exit_reason == KVM_EXIT_SYSTEM_EVENT,
-+		    "Unhandled exit reason: %u (%s)",
-+		    run->exit_reason, exit_reason_str(run->exit_reason));
-+	TEST_ASSERT(run->system_event.type == KVM_SYSTEM_EVENT_SUSPEND,
-+		    "Unhandled system event: %u (expected: %u)",
-+		    run->system_event.type, KVM_SYSTEM_EVENT_SUSPEND);
-+
-+	assert_vcpu_reset(vm, VCPU_ID_SOURCE);
-+	kvm_vm_free(vm);
-+}
-+
-+static void host_test_system_suspend_fails(void)
-+{
-+	struct kvm_vm *vm;
-+	struct ucall uc;
-+
-+	vm = setup_vm(guest_test_system_suspend);
-+	enable_system_suspend(vm);
-+
-+	enter_guest(vm, VCPU_ID_SOURCE);
-+	TEST_ASSERT(get_ucall(vm, VCPU_ID_SOURCE, &uc) == UCALL_SYNC,
-+		    "Unhandled ucall: %lu", uc.cmd);
-+	TEST_ASSERT(uc.args[1] == PSCI_RET_DENIED,
-+		    "Unrecognized PSCI return code: %lu (expected: %u)",
-+		    uc.args[1], PSCI_RET_DENIED);
-+
-+	kvm_vm_free(vm);
-+}
-+
- int main(void)
- {
-+	if (!kvm_check_cap(KVM_CAP_ARM_SYSTEM_SUSPEND)) {
-+		print_skip("KVM_CAP_ARM_SYSTEM_SUSPEND not supported");
-+		exit(KSFT_SKIP);
-+	}
-+
- 	host_test_cpu_on();
-+	host_test_system_suspend();
-+	host_test_system_suspend_fails();
- 	return 0;
- }
--- 
-2.33.0.685.g46640cef36-goog
+> thanks
+>
+> >
+> > Dave
+> >
+> >> If the hypervisor accesses an in-use page through a writable translation,
+> >> the CPU will throw an RMP violation #PF.  On early SNP hardware, if an
+> >> in-use page is 2mb aligned and software accesses any part of the associated
+> >> 2mb region with a hupage, the CPU will incorrectly treat the entire 2mb
+> >> region as in-use and signal a spurious RMP violation #PF.
+> >>
+> >> The recommended is to not use the hugepage for the VMCB, VMSA or
+> >> AVIC backing page. Add a generic allocator that will ensure that the page
+> >> returns is not hugepage (2mb or 1gb) and is safe to be used when SEV-SNP
+> >> is enabled.
+> >>
+> >> Co-developed-by: Marc Orr <marcorr@google.com>
+> >> Signed-off-by: Marc Orr <marcorr@google.com>
+> >> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> >> ---
+> >>  arch/x86/include/asm/kvm-x86-ops.h |  1 +
+> >>  arch/x86/include/asm/kvm_host.h    |  1 +
+> >>  arch/x86/kvm/lapic.c               |  5 ++++-
+> >>  arch/x86/kvm/svm/sev.c             | 35 ++++++++++++++++++++++++++++++
+> >>  arch/x86/kvm/svm/svm.c             | 16 ++++++++++++--
+> >>  arch/x86/kvm/svm/svm.h             |  1 +
+> >>  6 files changed, 56 insertions(+), 3 deletions(-)
+> >>
+> >> diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+> >> index a12a4987154e..36a9c23a4b27 100644
+> >> --- a/arch/x86/include/asm/kvm-x86-ops.h
+> >> +++ b/arch/x86/include/asm/kvm-x86-ops.h
+> >> @@ -122,6 +122,7 @@ KVM_X86_OP_NULL(enable_direct_tlbflush)
+> >>  KVM_X86_OP_NULL(migrate_timers)
+> >>  KVM_X86_OP(msr_filter_changed)
+> >>  KVM_X86_OP_NULL(complete_emulated_msr)
+> >> +KVM_X86_OP(alloc_apic_backing_page)
+> >>
+> >>  #undef KVM_X86_OP
+> >>  #undef KVM_X86_OP_NULL
+> >> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> >> index 974cbfb1eefe..5ad6255ff5d5 100644
+> >> --- a/arch/x86/include/asm/kvm_host.h
+> >> +++ b/arch/x86/include/asm/kvm_host.h
+> >> @@ -1453,6 +1453,7 @@ struct kvm_x86_ops {
+> >>      int (*complete_emulated_msr)(struct kvm_vcpu *vcpu, int err);
+> >>
+> >>      void (*vcpu_deliver_sipi_vector)(struct kvm_vcpu *vcpu, u8 vector);
+> >> +    void *(*alloc_apic_backing_page)(struct kvm_vcpu *vcpu);
+> >>  };
+> >>
+> >>  struct kvm_x86_nested_ops {
+> >> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> >> index ba5a27879f1d..05b45747b20b 100644
+> >> --- a/arch/x86/kvm/lapic.c
+> >> +++ b/arch/x86/kvm/lapic.c
+> >> @@ -2457,7 +2457,10 @@ int kvm_create_lapic(struct kvm_vcpu *vcpu, int timer_advance_ns)
+> >>
+> >>      vcpu->arch.apic = apic;
+> >>
+> >> -    apic->regs = (void *)get_zeroed_page(GFP_KERNEL_ACCOUNT);
+> >> +    if (kvm_x86_ops.alloc_apic_backing_page)
+> >> +            apic->regs = static_call(kvm_x86_alloc_apic_backing_page)(vcpu);
+> >> +    else
+> >> +            apic->regs = (void *)get_zeroed_page(GFP_KERNEL_ACCOUNT);
+> >>      if (!apic->regs) {
+> >>              printk(KERN_ERR "malloc apic regs error for vcpu %x\n",
+> >>                     vcpu->vcpu_id);
+> >> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> >> index 1644da5fc93f..8771b878193f 100644
+> >> --- a/arch/x86/kvm/svm/sev.c
+> >> +++ b/arch/x86/kvm/svm/sev.c
+> >> @@ -2703,3 +2703,38 @@ void sev_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector)
+> >>              break;
+> >>      }
+> >>  }
+> >> +
+> >> +struct page *snp_safe_alloc_page(struct kvm_vcpu *vcpu)
+> >> +{
+> >> +    unsigned long pfn;
+> >> +    struct page *p;
+> >> +
+> >> +    if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
+> >> +            return alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
 
+Continuing my other comment, above: if we introduce a
+`snp_globally_enabled` var, we could use that here, rather than
+`cpu_feature_enabled(X86_FEATURE_SEV_SNP)`.
+
+> >> +
+> >> +    /*
+> >> +     * Allocate an SNP safe page to workaround the SNP erratum where
+> >> +     * the CPU will incorrectly signal an RMP violation  #PF if a
+> >> +     * hugepage (2mb or 1gb) collides with the RMP entry of VMCB, VMSA
+> >> +     * or AVIC backing page. The recommeded workaround is to not use the
+> >> +     * hugepage.
+> >> +     *
+> >> +     * Allocate one extra page, use a page which is not 2mb aligned
+> >> +     * and free the other.
+> >> +     */
+> >> +    p = alloc_pages(GFP_KERNEL_ACCOUNT | __GFP_ZERO, 1);
+> >> +    if (!p)
+> >> +            return NULL;
+> >> +
+> >> +    split_page(p, 1);
+> >> +
+> >> +    pfn = page_to_pfn(p);
+> >> +    if (IS_ALIGNED(__pfn_to_phys(pfn), PMD_SIZE)) {
+> >> +            pfn++;
+> >> +            __free_page(p);
+> >> +    } else {
+> >> +            __free_page(pfn_to_page(pfn + 1));
+> >> +    }
+> >> +
+> >> +    return pfn_to_page(pfn);
+> >> +}
+> >> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> >> index 25773bf72158..058eea8353c9 100644
+> >> --- a/arch/x86/kvm/svm/svm.c
+> >> +++ b/arch/x86/kvm/svm/svm.c
+> >> @@ -1368,7 +1368,7 @@ static int svm_create_vcpu(struct kvm_vcpu *vcpu)
+> >>      svm = to_svm(vcpu);
+> >>
+> >>      err = -ENOMEM;
+> >> -    vmcb01_page = alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
+> >> +    vmcb01_page = snp_safe_alloc_page(vcpu);
+> >>      if (!vmcb01_page)
+> >>              goto out;
+> >>
+> >> @@ -1377,7 +1377,7 @@ static int svm_create_vcpu(struct kvm_vcpu *vcpu)
+> >>               * SEV-ES guests require a separate VMSA page used to contain
+> >>               * the encrypted register state of the guest.
+> >>               */
+> >> -            vmsa_page = alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
+> >> +            vmsa_page = snp_safe_alloc_page(vcpu);
+> >>              if (!vmsa_page)
+> >>                      goto error_free_vmcb_page;
+> >>
+> >> @@ -4539,6 +4539,16 @@ static int svm_vm_init(struct kvm *kvm)
+> >>      return 0;
+> >>  }
+> >>
+> >> +static void *svm_alloc_apic_backing_page(struct kvm_vcpu *vcpu)
+> >> +{
+> >> +    struct page *page = snp_safe_alloc_page(vcpu);
+> >> +
+> >> +    if (!page)
+> >> +            return NULL;
+> >> +
+> >> +    return page_address(page);
+> >> +}
+> >> +
+> >>  static struct kvm_x86_ops svm_x86_ops __initdata = {
+> >>      .hardware_unsetup = svm_hardware_teardown,
+> >>      .hardware_enable = svm_hardware_enable,
+> >> @@ -4667,6 +4677,8 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
+> >>      .complete_emulated_msr = svm_complete_emulated_msr,
+> >>
+> >>      .vcpu_deliver_sipi_vector = svm_vcpu_deliver_sipi_vector,
+> >> +
+> >> +    .alloc_apic_backing_page = svm_alloc_apic_backing_page,
+> >>  };
+> >>
+> >>  static struct kvm_x86_init_ops svm_init_ops __initdata = {
+> >> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+> >> index d1f1512a4b47..e40800e9c998 100644
+> >> --- a/arch/x86/kvm/svm/svm.h
+> >> +++ b/arch/x86/kvm/svm/svm.h
+> >> @@ -575,6 +575,7 @@ void sev_es_create_vcpu(struct vcpu_svm *svm);
+> >>  void sev_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector);
+> >>  void sev_es_prepare_guest_switch(struct vcpu_svm *svm, unsigned int cpu);
+> >>  void sev_es_unmap_ghcb(struct vcpu_svm *svm);
+> >> +struct page *snp_safe_alloc_page(struct kvm_vcpu *vcpu);
+> >>
+> >>  /* vmenter.S */
+> >>
+> >> --
+> >> 2.17.1
+> >>
+> >>
