@@ -2,69 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4E502416330
-	for <lists+kvm@lfdr.de>; Thu, 23 Sep 2021 18:26:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7A04A416352
+	for <lists+kvm@lfdr.de>; Thu, 23 Sep 2021 18:27:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242152AbhIWQ13 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Sep 2021 12:27:29 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:57846 "EHLO
+        id S242471AbhIWQ2x (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Sep 2021 12:28:53 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42184 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S242077AbhIWQ1X (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 23 Sep 2021 12:27:23 -0400
+        by vger.kernel.org with ESMTP id S242257AbhIWQ2r (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 23 Sep 2021 12:28:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632414351;
+        s=mimecast20190719; t=1632414435;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=b8Ah2Qh7p6T0mn87VL57RtyibfllbNYrDwoM7m+3Joo=;
-        b=Ca0qzmDtNybsVO+eg3J0BzYW7ghYR/kenAkb56bbfELK75MqVZlMsyU+fwe/CKwTkxpDaQ
-        RZELhPgXh7yTuaRwerjHuJAzwXIiIlf65v9Ddf/xSucjaapwT/6L/J0i9jE8FJkGmo8q/F
-        nhX6IziVcx3Pwv7+PBv3+sSYhSZPbQ8=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-148-nGrwA-RFON-SjNcRYmsXSQ-1; Thu, 23 Sep 2021 12:25:50 -0400
-X-MC-Unique: nGrwA-RFON-SjNcRYmsXSQ-1
-Received: by mail-ej1-f71.google.com with SMTP id k23-20020a170906055700b005e8a5cb6925so88004eja.9
-        for <kvm@vger.kernel.org>; Thu, 23 Sep 2021 09:25:50 -0700 (PDT)
+        bh=z/oIhWC7fKtGzqQpQFubKmVS4zDGgUypTCxx/i3WpJk=;
+        b=E1ICqCy5f0168WMaBKC+Z7Zyxc4hyjKsdaZFdtNIxK2NcQUzpHfSmP+vI8m3FYDFMWUdf3
+        ewHeZ5s0LKygRzMUmvG18UY7k8FRs14+wYh1sWSUnq38p2IFUR8TuFFb7Sfd/Vpydt6uBl
+        gQ9Avgnfd9Xdn4fHbdyG4xSKXkgtCm0=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-283-37594I9DPdaR97aaJOWNbA-1; Thu, 23 Sep 2021 12:27:14 -0400
+X-MC-Unique: 37594I9DPdaR97aaJOWNbA-1
+Received: by mail-ed1-f69.google.com with SMTP id o23-20020a509b17000000b003d739e2931dso7329913edi.4
+        for <kvm@vger.kernel.org>; Thu, 23 Sep 2021 09:27:13 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=b8Ah2Qh7p6T0mn87VL57RtyibfllbNYrDwoM7m+3Joo=;
-        b=oX8Gq5pCGXdx4IHbbTIdWCphO6CaDV73jRdaeUyKXKUnAG9KLgMxs/P2rjdMHqJzUZ
-         9ps9b0y2I6lcJn1+VAijFRLTNPA4iq9aUQJjQtliaK/Txgtt9jT3CwfW14nMblR7YddM
-         nW1vm9GTJGWn23HtgjPnkhnmtkQwIH8skcnhWP6Trl0OO2+4bn2zuWWGfshT47wNJ/+6
-         5F8fahXYckl0bPXIe8RFzhDoqxG5PCnHCp27AKLOY2kWZzgfWJEg8/drBOJex6JQlIU9
-         Bq3u123YOQthTuDmrW1OcEhWWU4bgFCtrqv+JdI9P4NqHGNCUEkrW4TFDZ3WDBlreGwL
-         squg==
-X-Gm-Message-State: AOAM5335BLTCEp9NbYDA0oTLFmQyBITe7zoKy3xMQx+uRwqFT7dWHU4e
-        /KRnYEyHtb+jJZ26fnHjmmOw/PTtdCjBKD/WyNShuoTopju3SXuQ9U/rU7dcKTchAu3udOo19vF
-        PatyBy83TF4/q
-X-Received: by 2002:aa7:da93:: with SMTP id q19mr6706453eds.206.1632414349554;
-        Thu, 23 Sep 2021 09:25:49 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx9XnSwLPcjGBamhpDTdT3EiRg8QNymAoajRgXO8jyqO9O2UVhfynrBSpJ2DkEt/MKXS42ECQ==
-X-Received: by 2002:aa7:da93:: with SMTP id q19mr6706421eds.206.1632414349350;
-        Thu, 23 Sep 2021 09:25:49 -0700 (PDT)
+        bh=z/oIhWC7fKtGzqQpQFubKmVS4zDGgUypTCxx/i3WpJk=;
+        b=h9ckwV1xm0LG7u9BfrtW2+kzJx1sRF0kDkV1nXjgbGZb89tTWfZsd1xluqBQvCvGXs
+         1MLFBHF9V+SJOWmmavQz38lxgn8g7XT8gJbEUralZHRH0HpZVuvplMau7Fyrsm2F59wf
+         zLQnuFyxObZy3WYXnXI8FNjY+9q6cy51DS9fP/WGSv6z9J0aTfYF+pkNDRnCxVkWzU0i
+         R490KKheKHH/hhezqTjf7eRvyTwn/9nBhxruNbNVzBJXTsznHsEdxGTpq0+5uqHydIxl
+         1OqLjVPgiRZtjU/2/nGCZ/sQsMAvg3IUomSeVerfPTWyXozCxobuHnZgAz+ABLM4E8+T
+         nSPQ==
+X-Gm-Message-State: AOAM5339b+DCpHpVsQ9n4Fc7HcVvJR3bNa4VTs5Qs+HwFZR+b8fKapbG
+        q0v//1VXF38lCSCE5spUVz7s33FWnFezQ4t0/pnxMbrMhKUSt1ql3Y/5lhTvP2cNvJxEDnFcd9x
+        FmGTDRslX1iaw
+X-Received: by 2002:a50:9d44:: with SMTP id j4mr6516600edk.173.1632414432819;
+        Thu, 23 Sep 2021 09:27:12 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyjtsayXjj1zF617T7nkdYFU89qfJnNI5OfixDS0D2PT/D4EIs3CWG+OjES7T9V4qthIO2T+g==
+X-Received: by 2002:a50:9d44:: with SMTP id j4mr6516062edk.173.1632414427707;
+        Thu, 23 Sep 2021 09:27:07 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id gl2sm3237224ejb.110.2021.09.23.09.25.47
+        by smtp.gmail.com with ESMTPSA id u10sm3720729eds.83.2021.09.23.09.27.04
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 23 Sep 2021 09:25:48 -0700 (PDT)
-Subject: Re: [PATCH] kvm: selftests: Fix spelling mistake "missmatch" ->
- "mismatch"
-To:     Colin King <colin.king@canonical.com>,
-        Shuah Khan <shuah@kernel.org>, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org
-Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20210826120752.12633-1-colin.king@canonical.com>
+        Thu, 23 Sep 2021 09:27:07 -0700 (PDT)
+Subject: Re: [PATCH] KVM: x86/mmu: Complete prefetch for trailing SPTEs for
+ direct, legacy MMU
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Sergey Senozhatsky <senozhatsky@google.com>,
+        Ben Gardon <bgardon@google.com>
+References: <20210818235615.2047588-1-seanjc@google.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <02094ffc-11c4-8b72-f889-a0654f95d2bb@redhat.com>
-Date:   Thu, 23 Sep 2021 18:25:47 +0200
+Message-ID: <c47ae22f-39ba-7f6b-c9c4-105a2e4c026d@redhat.com>
+Date:   Thu, 23 Sep 2021 18:27:03 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <20210826120752.12633-1-colin.king@canonical.com>
+In-Reply-To: <20210818235615.2047588-1-seanjc@google.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -72,31 +76,63 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 26/08/21 14:07, Colin King wrote:
-> From: Colin Ian King <colin.king@canonical.com>
+On 19/08/21 01:56, Sean Christopherson wrote:
+> Make a final call to direct_pte_prefetch_many() if there are "trailing"
+> SPTEs to prefetch, i.e. SPTEs for GFNs following the faulting GFN.  The
+> call to direct_pte_prefetch_many() in the loop only handles the case
+> where there are !PRESENT SPTEs preceding a PRESENT SPTE.
 > 
-> There is a spelling mistake in an error message. Fix it.
+> E.g. if the faulting GFN is a multiple of 8 (the prefetch size) and all
+> SPTEs for the following GFNs are !PRESENT, the loop will terminate with
+> "start = sptep+1" and not prefetch any SPTEs.
 > 
-> Signed-off-by: Colin Ian King <colin.king@canonical.com>
+> Prefetching trailing SPTEs as intended can drastically reduce the number
+> of guest page faults, e.g. accessing the first byte of every 4kb page in
+> a 6gb chunk of virtual memory, in a VM with 8gb of preallocated memory,
+> the number of pf_fixed events observed in L0 drops from ~1.75M to <0.27M.
+> 
+> Note, this only affects memory that is backed by 4kb pages as KVM doesn't
+> prefetch when installing hugepages.  Shadow paging prefetching is not
+> affected as it does not batch the prefetches due to the need to process
+> the corresponding guest PTE.  The TDP MMU is not affected because it
+> doesn't have prefetching, yet...
+> 
+> Fixes: 957ed9effd80 ("KVM: MMU: prefetch ptes when intercepted guest #PF")
+> Cc: Sergey Senozhatsky <senozhatsky@google.com>
+> Cc: Ben Gardon <bgardon@google.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
->   tools/testing/selftests/kvm/lib/sparsebit.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/tools/testing/selftests/kvm/lib/sparsebit.c b/tools/testing/selftests/kvm/lib/sparsebit.c
-> index a0d0c83d83de..50e0cf41a7dd 100644
-> --- a/tools/testing/selftests/kvm/lib/sparsebit.c
-> +++ b/tools/testing/selftests/kvm/lib/sparsebit.c
-> @@ -1866,7 +1866,7 @@ void sparsebit_validate_internal(struct sparsebit *s)
->   		 * of total bits set.
->   		 */
->   		if (s->num_set != total_bits_set) {
-> -			fprintf(stderr, "Number of bits set missmatch,\n"
-> +			fprintf(stderr, "Number of bits set mismatch,\n"
->   				"  s->num_set: 0x%lx total_bits_set: 0x%lx",
->   				s->num_set, total_bits_set);
+> Cc'd Ben as this highlights a potential gap with the TDP MMU, which lacks
+> prefetching of any sort.  For large VMs, which are likely backed by
+> hugepages anyways, this is a non-issue as the benefits of holding mmu_lock
+> for read likely masks the cost of taking more VM-Exits.  But VMs with a
+> small number of vCPUs won't benefit as much from parallel page faults,
+> e.g. there's no benefit at all if there's a single vCPU.
+> 
+>   arch/x86/kvm/mmu/mmu.c | 4 +++-
+>   1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index a272ccbddfa1..daf7df35f788 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -2818,11 +2818,13 @@ static void __direct_pte_prefetch(struct kvm_vcpu *vcpu,
+>   			if (!start)
+>   				continue;
+>   			if (direct_pte_prefetch_many(vcpu, sp, start, spte) < 0)
+> -				break;
+> +				return;
+>   			start = NULL;
+>   		} else if (!start)
+>   			start = spte;
+>   	}
+> +	if (start)
+> +		direct_pte_prefetch_many(vcpu, sp, start, spte);
+>   }
 >   
+>   static void direct_pte_prefetch(struct kvm_vcpu *vcpu, u64 *sptep)
 > 
-
 
 Queued, thanks.
 
