@@ -2,130 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6F51D415B3E
-	for <lists+kvm@lfdr.de>; Thu, 23 Sep 2021 11:44:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AF70A415B4E
+	for <lists+kvm@lfdr.de>; Thu, 23 Sep 2021 11:48:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240222AbhIWJq2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Sep 2021 05:46:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27779 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S238217AbhIWJq1 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 23 Sep 2021 05:46:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632390296;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Op2qoA0X6Ury/zosiAJXrERLFd0OXj6FZBc06wzqmPc=;
-        b=B2AOMBIx2iD1GXOzpT19Ku/fNVXKwazwKfbFG2Mu92fj/aR3BWGZEPJ0rn7yRifp6YHZFm
-        ut+zOKgVoBSCIz/Q9urtZNyH0Fx9yKMhXXaCnHxcJSLFHrEnfx1MAxAJA9P3O6g+oYOnOK
-        IO+E/shgXpTToSCuGO8eca77lAL8nKQ=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-465-RbEDTqNsNxi3RXzeCeltbA-1; Thu, 23 Sep 2021 05:44:54 -0400
-X-MC-Unique: RbEDTqNsNxi3RXzeCeltbA-1
-Received: by mail-ed1-f72.google.com with SMTP id q17-20020a50c351000000b003d81427d25cso6190851edb.15
-        for <kvm@vger.kernel.org>; Thu, 23 Sep 2021 02:44:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Op2qoA0X6Ury/zosiAJXrERLFd0OXj6FZBc06wzqmPc=;
-        b=U/MBvZZju8eyH6+Jes2Sq/nnl/+O0QgdM6aVjDmgcoHw5guppzk7hchwlPWldcn9NB
-         5gmhjUaFV6FbuIbeUT9Jk0vX5j1dVfRdsKDU2Z5drUKX91Z7qg3Agl2yCTMpy2Z9vaE3
-         /17pXagqhw7Cgnq19rqHedOsmQxQdX8zR+6SSujcL9L0HFC2mS6ac4qKoR0zYfkaLkWk
-         lPfFvIWFUYGLXUqi2+Q+Fam9SHZjBccq/3QpFnKCsJeepC0FYoGGD2ByIyVmAYT+pJQ1
-         nhnjjFqWmJgkGEOt0v/UJroW0NySmBYwtoV9WMBiVc67iwoiN19Aj5nLRXSgaF5xf/ux
-         3+nw==
-X-Gm-Message-State: AOAM533LGZdM/tivvghAYukxn6h4miS8lHmaoCP/95Wtwm1NHLHWfDb6
-        SKOkA428xk+0rAJZrHByr2pnGrYIs0GdKtIwXEv2IG7MUkS/vufoc16ZzL9DzfQZNq+HVH6dran
-        fk0ujtzXWfWWD
-X-Received: by 2002:a50:d88a:: with SMTP id p10mr4332445edj.274.1632390293738;
-        Thu, 23 Sep 2021 02:44:53 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyPCN0OqTken5jvVkYlVKwejgNBxL3gEDAFz0FGtJBhVhqwLaHEpc/KSsW/W8jn3S34zdGMNA==
-X-Received: by 2002:a50:d88a:: with SMTP id p10mr4332419edj.274.1632390293499;
-        Thu, 23 Sep 2021 02:44:53 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id bj10sm2653827ejb.17.2021.09.23.02.44.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 23 Sep 2021 02:44:52 -0700 (PDT)
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
-        KVMARM <kvmarm@lists.cs.columbia.edu>,
-        Will Deacon <will@kernel.org>,
-        David Matlack <dmatlack@google.com>,
-        Peter Shier <pshier@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Ben Gardon <bgardon@google.com>,
-        Aaron Lewis <aaronlewis@google.com>,
-        Venkatesh Srinivas <venkateshs@google.com>
-References: <20210922010851.2312845-1-jingzhangos@google.com>
- <20210922010851.2312845-3-jingzhangos@google.com>
- <87czp0voqg.wl-maz@kernel.org>
- <d16ecbd2-2bc9-2691-a21d-aef4e6f007b9@redhat.com>
- <YUtyVEpMBityBBNl@google.com> <875yusv3vm.wl-maz@kernel.org>
- <a1e77794-de94-1fb7-c7d3-a80c34f770a4@redhat.com>
- <8735pvvip9.wl-maz@kernel.org>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v1 3/3] KVM: arm64: Add histogram stats for handling time
- of arch specific exit reasons
-Message-ID: <2120a93b-2e15-117d-349c-9045cef23439@redhat.com>
-Date:   Thu, 23 Sep 2021 11:44:49 +0200
+        id S240232AbhIWJt1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Sep 2021 05:49:27 -0400
+Received: from pegase2.c-s.fr ([93.17.235.10]:52743 "EHLO pegase2.c-s.fr"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S240175AbhIWJt0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Sep 2021 05:49:26 -0400
+Received: from localhost (mailhub3.si.c-s.fr [172.26.127.67])
+        by localhost (Postfix) with ESMTP id 4HFVhS1HTcz9sTZ;
+        Thu, 23 Sep 2021 11:47:52 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from pegase2.c-s.fr ([172.26.127.65])
+        by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id N2iojAvTUjrW; Thu, 23 Sep 2021 11:47:52 +0200 (CEST)
+Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
+        by pegase2.c-s.fr (Postfix) with ESMTP id 4HFVhS0G8Vz9sTX;
+        Thu, 23 Sep 2021 11:47:52 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+        by messagerie.si.c-s.fr (Postfix) with ESMTP id E65698B775;
+        Thu, 23 Sep 2021 11:47:51 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from messagerie.si.c-s.fr ([127.0.0.1])
+        by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
+        with ESMTP id HEg50hnqH7U5; Thu, 23 Sep 2021 11:47:51 +0200 (CEST)
+Received: from PO20335.IDSI0.si.c-s.fr (unknown [192.168.202.200])
+        by messagerie.si.c-s.fr (Postfix) with ESMTP id 224928B763;
+        Thu, 23 Sep 2021 11:47:50 +0200 (CEST)
+Subject: Re: [PATCH 3/3] memblock: cleanup memblock_free interface
+To:     Mike Rapoport <rppt@kernel.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     devicetree@vger.kernel.org, linux-efi@vger.kernel.org,
+        Mike Rapoport <rppt@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-sh@vger.kernel.org,
+        linux-um@lists.infradead.org, linux-kernel@vger.kernel.org,
+        kasan-dev@googlegroups.com, linux-mips@vger.kernel.org,
+        linux-mm@kvack.org, iommu@lists.linux-foundation.org,
+        linux-usb@vger.kernel.org, linux-alpha@vger.kernel.org,
+        sparclinux@vger.kernel.org, xen-devel@lists.xenproject.org,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-snps-arc@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
+        linux-riscv@lists.infradead.org,
+        linux-arm-kernel@lists.infradead.org
+References: <20210923074335.12583-1-rppt@kernel.org>
+ <20210923074335.12583-4-rppt@kernel.org>
+From:   Christophe Leroy <christophe.leroy@csgroup.eu>
+Message-ID: <1101e3c7-fcb7-a632-8e22-47f4a01ea02e@csgroup.eu>
+Date:   Thu, 23 Sep 2021 11:47:48 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <8735pvvip9.wl-maz@kernel.org>
+In-Reply-To: <20210923074335.12583-4-rppt@kernel.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Language: fr-FR
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 23/09/21 09:45, Marc Zyngier wrote:
-> On Thu, 23 Sep 2021 07:36:21 +0100,
-> Paolo Bonzini <pbonzini@redhat.com> wrote:
->>
->> On 22/09/21 20:53, Marc Zyngier wrote:
->>> I definitely regret adding the current KVM trace points, as they
->>> don't show what I need, and I can't change them as they are ABI.
->>
->> I disagree that they are ABI.  And even if you don't want to change
->> them, you can always add parameters or remove them.
+
+
+Le 23/09/2021 à 09:43, Mike Rapoport a écrit :
+> From: Mike Rapoport <rppt@linux.ibm.com>
 > 
-> We'll have to agree to disagree here. Experience has told me that
-> anything that gets exposed to userspace has to stay forever. There are
-> countless examples of that on the arm64 side (cue the bogomips debate,
-> the recent /proc/interrupts repainting).
-
-Files certainly have the problem that there are countless ways to parse 
-them, most of them wrong.  This for example was taken into account when 
-designing the binary stats format, where it's clear that the only fixed 
-format (ABI) is the description of the stats themselves.
-
-However yeah, you're right that what constitutes an API is complicated. 
-  Tracepoints and binary stats make it trivial to add stuff (including 
-adding more info in the case of a tracepoint), but removing is tricky.
-
-Another important aspect is whether there are at all any tools using the 
-tracepoints.  In the case of the block subsystem there's blktrace, but 
-KVM doesn't have anything fancy (tracing is really only used by humans 
-via trace-cmd, or by kvmstat which doesn't care about which tracepoints 
-are there).
-
-> We had that discussion a few KSs ago (triggered by this[1] if I
-> remember correctly), and I don't think anything has changed since.
+> For ages memblock_free() interface dealt with physical addresses even
+> despite the existence of memblock_alloc_xx() functions that return a
+> virtual pointer.
 > 
-> As for removing them, that would probably be best for some (if not
-> most) of them.
+> Introduce memblock_phys_free() for freeing physical ranges and repurpose
+> memblock_free() to free virtual pointers to make the following pairing
+> abundantly clear:
+> 
+> 	int memblock_phys_free(phys_addr_t base, phys_addr_t size);
+> 	phys_addr_t memblock_phys_alloc(phys_addr_t base, phys_addr_t size);
+> 
+> 	void *memblock_alloc(phys_addr_t size, phys_addr_t align);
+> 	void memblock_free(void *ptr, size_t size);
+> 
+> Replace intermediate memblock_free_ptr() with memblock_free() and drop
+> unnecessary aliases memblock_free_early() and memblock_free_early_nid().
+> 
+> Suggested-by: Linus Torvalds <torvalds@linux-foundation.org>
+> Signed-off-by: Mike Rapoport <rppt@linux.ibm.com>
+> ---
 
-I'd say just go ahead.  System calls are removed every now and then if 
-they are considered obsolete or a failed experiment.  Tracepoints are in 
-the same boat.
+> diff --git a/arch/s390/kernel/smp.c b/arch/s390/kernel/smp.c
+> index 1a04e5bdf655..37826d8c4f74 100644
+> --- a/arch/s390/kernel/smp.c
+> +++ b/arch/s390/kernel/smp.c
+> @@ -723,7 +723,7 @@ void __init smp_save_dump_cpus(void)
+>   			/* Get the CPU registers */
+>   			smp_save_cpu_regs(sa, addr, is_boot_cpu, page);
+>   	}
+> -	memblock_free(page, PAGE_SIZE);
+> +	memblock_phys_free(page, PAGE_SIZE);
+>   	diag_amode31_ops.diag308_reset();
+>   	pcpu_set_smt(0);
+>   }
+> @@ -880,7 +880,7 @@ void __init smp_detect_cpus(void)
+>   
+>   	/* Add CPUs present at boot */
+>   	__smp_rescan_cpus(info, true);
+> -	memblock_free_early((unsigned long)info, sizeof(*info));
+> +	memblock_free(info, sizeof(*info));
+>   }
+>   
+>   /*
 
-Paolo
+I'm a bit lost. IIUC memblock_free_early() and memblock_free() where 
+identical.
 
+In the first hunk memblock_free() gets replaced by memblock_phys_free()
+In the second hunk memblock_free_early() gets replaced by memblock_free()
+
+I think it would be easier to follow if you could split it in several 
+patches:
+- First patch: Create memblock_phys_free() and change all relevant 
+memblock_free() to memblock_phys_free() - Or change memblock_free() to 
+memblock_phys_free() and make memblock_free() an alias of it.
+- Second patch: Make memblock_free_ptr() become memblock_free() and 
+change all remaining callers to the new semantics (IIUC 
+memblock_free(__pa(ptr)) becomes memblock_free(ptr) and make 
+memblock_free_ptr() an alias of memblock_free()
+- Fourth patch: Replace and drop memblock_free_ptr()
+- Fifth patch: Drop memblock_free_early() and memblock_free_early_nid() 
+(All users should have been upgraded to memblock_free_phys() in patch 1 
+or memblock_free() in patch 2)
+
+Christophe
