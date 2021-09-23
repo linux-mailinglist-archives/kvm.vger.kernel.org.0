@@ -2,243 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 049B04159EB
-	for <lists+kvm@lfdr.de>; Thu, 23 Sep 2021 10:15:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 10992415AA1
+	for <lists+kvm@lfdr.de>; Thu, 23 Sep 2021 11:12:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239892AbhIWIQq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Sep 2021 04:16:46 -0400
-Received: from smtp-out2.suse.de ([195.135.220.29]:51426 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237996AbhIWIQq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Sep 2021 04:16:46 -0400
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id A60422027D;
-        Thu, 23 Sep 2021 08:15:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1632384912; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=QSLhmvEk1Pq1iiswl5snzLhelQGabqOAvRi47xucKUc=;
-        b=dQkZNFnVmjFTdqDDt9GU9DTIEjBGZRbIA2ofbDcmiIB8bDqVrDggJ8ZwgPcJOAAnibhKSk
-        wohDp1nG/Y0sL0SW/01jfOSBK8tJNu5AzCDV/dTnleWkyjK5RMbnhh0I5Wt/IQmwJHm3zx
-        ZvfeJvE8TpXAAdEAgm6wdTBm9F+eeO8=
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 13F2613DC7;
-        Thu, 23 Sep 2021 08:15:12 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id ojiaA5A3TGF2FQAAMHmgww
-        (envelope-from <jgross@suse.com>); Thu, 23 Sep 2021 08:15:12 +0000
-Subject: Re: [PATCH 3/3] memblock: cleanup memblock_free interface
-To:     Mike Rapoport <rppt@kernel.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        devicetree@vger.kernel.org, iommu@lists.linux-foundation.org,
-        kasan-dev@googlegroups.com, kvm@vger.kernel.org,
-        linux-alpha@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-efi@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mips@vger.kernel.org, linux-mm@kvack.org,
-        linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-        linux-sh@vger.kernel.org, linux-snps-arc@lists.infradead.org,
-        linux-um@lists.infradead.org, linux-usb@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, sparclinux@vger.kernel.org,
-        xen-devel@lists.xenproject.org, Mike Rapoport <rppt@linux.ibm.com>
-References: <20210923074335.12583-1-rppt@kernel.org>
- <20210923074335.12583-4-rppt@kernel.org>
-From:   Juergen Gross <jgross@suse.com>
-Message-ID: <60c0d0f9-e4c6-ef66-b85b-0d091f8cba15@suse.com>
-Date:   Thu, 23 Sep 2021 10:15:11 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.12.0
+        id S240067AbhIWJNm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Sep 2021 05:13:42 -0400
+Received: from smtp-fw-9102.amazon.com ([207.171.184.29]:60083 "EHLO
+        smtp-fw-9102.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S240022AbhIWJNl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Sep 2021 05:13:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1632388331; x=1663924331;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=v4X1BIGL/DqHhTXBvwLBdIPfkx8V3Gd+NTzjIy3vOyk=;
+  b=LT1TZ2P1eFeVn5npbO9U2QnhUBjH2x3cVGjGOZNeqcASkMScFhl4lfLB
+   UWC3kPaCaiDsT+PNvk/Ff5TQCpvAPcnb2bNvd2g1Ctz7mdagzDuXYEd6j
+   hZrtSQKUnKaSf3/EV1a4P/yUu0eK0AOhS9oOh1+A8Wu3lIBgHb1IOejld
+   Q=;
+X-IronPort-AV: E=Sophos;i="5.85,316,1624320000"; 
+   d="scan'208";a="162038528"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-pdx-2c-5c4a15b1.us-west-2.amazon.com) ([10.25.36.214])
+  by smtp-border-fw-9102.sea19.amazon.com with ESMTP; 23 Sep 2021 09:12:03 +0000
+Received: from EX13MTAUWC001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
+        by email-inbound-relay-pdx-2c-5c4a15b1.us-west-2.amazon.com (Postfix) with ESMTPS id C5D0941AB3;
+        Thu, 23 Sep 2021 09:12:01 +0000 (UTC)
+Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
+ EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.23; Thu, 23 Sep 2021 09:12:01 +0000
+Received: from [0.0.0.0] (10.43.162.36) by EX13D20UWC001.ant.amazon.com
+ (10.43.162.244) with Microsoft SMTP Server (TLS) id 15.0.1497.23; Thu, 23 Sep
+ 2021 09:11:59 +0000
+Message-ID: <08d356da-17ce-d380-1fc9-18ba7ec67020@amazon.com>
+Date:   Thu, 23 Sep 2021 11:11:57 +0200
 MIME-Version: 1.0
-In-Reply-To: <20210923074335.12583-4-rppt@kernel.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="zppOVwffTjZ5Oe49Vq0wbEbRvLUF4dOID"
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:93.0)
+ Gecko/20100101 Thunderbird/93.0
+Subject: Re: [kvm-unit-tests PATCH] x86/msr.c generalize to any input msr
+Content-Language: en-US
+To:     yqwfh <amdeniulari@protonmail.com>, <kvm@vger.kernel.org>
+CC:     Daniele Ahmed <ahmeddan@amazon.com>,
+        Thomas Huth <thuth@redhat.com>,
+        "Paolo Bonzini" <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Andrew Jones <drjones@redhat.com>
+References: <20210810143029.2522-1-amdeniulari@protonmail.com>
+From:   Alexander Graf <graf@amazon.com>
+In-Reply-To: <20210810143029.2522-1-amdeniulari@protonmail.com>
+X-Originating-IP: [10.43.162.36]
+X-ClientProxiedBy: EX13D20UWA003.ant.amazon.com (10.43.160.97) To
+ EX13D20UWC001.ant.amazon.com (10.43.162.244)
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---zppOVwffTjZ5Oe49Vq0wbEbRvLUF4dOID
-Content-Type: multipart/mixed; boundary="AxmgW1XtM0JJFTzWHwG0o4gfWFl7DFvoM";
- protected-headers="v1"
-From: Juergen Gross <jgross@suse.com>
-To: Mike Rapoport <rppt@kernel.org>,
- Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, devicetree@vger.kernel.org,
- iommu@lists.linux-foundation.org, kasan-dev@googlegroups.com,
- kvm@vger.kernel.org, linux-alpha@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-efi@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-mips@vger.kernel.org,
- linux-mm@kvack.org, linux-riscv@lists.infradead.org,
- linux-s390@vger.kernel.org, linux-sh@vger.kernel.org,
- linux-snps-arc@lists.infradead.org, linux-um@lists.infradead.org,
- linux-usb@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
- sparclinux@vger.kernel.org, xen-devel@lists.xenproject.org,
- Mike Rapoport <rppt@linux.ibm.com>
-Message-ID: <60c0d0f9-e4c6-ef66-b85b-0d091f8cba15@suse.com>
-Subject: Re: [PATCH 3/3] memblock: cleanup memblock_free interface
-References: <20210923074335.12583-1-rppt@kernel.org>
- <20210923074335.12583-4-rppt@kernel.org>
-In-Reply-To: <20210923074335.12583-4-rppt@kernel.org>
+SGkgRGFuaWVsZSEKCk9uIDEwLjA4LjIxIDE2OjMxLCB5cXdmaCB3cm90ZToKPiBJZiBhbiBNU1Ig
+ZGVzY3JpcHRpb24gaXMgcHJvdmlkZWQgYXMgaW5wdXQgYnkgdGhlIHVzZXIsCj4gcnVuIHRoZSB0
+ZXN0IGFnYWluc3QgdGhhdCBNU1IuIFRoaXMgYWxsb3dzIHRoZSB1c2VyIHRvCj4gcnVuIHRlc3Rz
+IG9uIGN1c3RvbSBNU1Incy4KPiAKPiBPdGhlcndpc2UgcnVuIGFsbCBkZWZhdWx0IHRlc3RzLgoK
+VGhpcyBwYXRjaCBkZXNjcmlwdGlvbiBpcyBtaXNzaW5nIHRoZSByYXRpb25hbGUuIEl0IGNvbWVz
+IHRocm91Z2ggCmxpZ2h0bHkgd2hlcmUgeW91IHNheSAiVGhpcyBhbGxvd3MgdGhlIHVzZXIgdG8g
+cnVuIHRlc3RzIG9uIGN1c3RvbSAKTVNScyIsIGJ1dCB0aGF0IHN0aWxsIGRvZXNuJ3QgZXhwbGFp
+biB3aHkgeW91IHdvdWxkIG5lZWQgdGhhdCBmdW5jdGlvbmFsaXR5LgoKVGhlIG1vc3QgaW1wb3J0
+YW50IHBpZWNlIHRvIHRyYW5zbWl0IGluIHRoZSBwYXRjaCBkZXNjcmlwdGlvbiBpcyBhbHdheXMg
+CnRoZSAiV2h5Ii4gT25seSBhZnRlciB0aGF0IGl0IHNvcnRlZCwgeW91IG1vdmUgb24gdG8gYSBx
+dWljayAiSG93Ii4KCj4gCj4gU2lnbmVkLW9mZi1ieTogRGFuaWVsZSBBaG1lZCA8YWhtZWRkYW5A
+YW1hem9uLmNvbT4KClBsZWFzZSBzZW5kIHRoZSBlbWFpbCBmcm9tIHRoZSBzYW1lIGFjY291bnQg
+dGhhdCB5b3VyIFNvQiBsaW5lIHF1b3RlcyA6KQoKSXQgdXN1YWxseSBhbHNvIGhlbHBzIHRvIEND
+IHBlb3BsZSB0aGF0IHdvcmtlZCBvbiB0aGUgc2FtZSBmaWxlIGJlZm9yZS4gClVzdWFsbHksIGdl
+dF9tYWludGFpbmVycy5wbCBzaG91bGQgZXh0cmFjdCB0aGF0IGxpc3QgYXV0b21hdGljYWxseSBm
+b3IgCnlvdSBidXQgSSByZWFsaXplZCB0aGF0IHRoZXJlIGlzIG5vIHN1Y2ggZmlsZSBpbiB0aGUg
+a3ZtLXVuaXQtdGVzdHMgdHJlZSAKZXZlbiB0aG91Z2ggd2UgaGF2ZSBhIE1BSU5UQUlORVJTIG9u
+ZS4KClBhb2xvLCB3aGF0IGlzIHRoZSBtZXRob2QgeW91J2QgcHJlZmVyIHRvIGRldGVybWluZSB3
+aG8gdG8gQ0Mgb24gCmt2bS11bml0LXRlc3RzIHN1Ym1pc3Npb25zPwoKPiAtLS0KPiAgIHg4Ni9t
+c3IuYyB8IDQ4ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKystLS0tLS0tLS0tLS0t
+LQo+ICAgMSBmaWxlIGNoYW5nZWQsIDM0IGluc2VydGlvbnMoKyksIDE0IGRlbGV0aW9ucygtKQo+
+IAo+IGRpZmYgLS1naXQgYS94ODYvbXNyLmMgYi94ODYvbXNyLmMKPiBpbmRleCA3YTU1MWM0Li41
+NTQwMTRlIDEwMDY0NAo+IC0tLSBhL3g4Ni9tc3IuYwo+ICsrKyBiL3g4Ni9tc3IuYwo+IEBAIC0z
+LDYgKzMsNyBAQAo+ICAgI2luY2x1ZGUgImxpYmNmbGF0LmgiCj4gICAjaW5jbHVkZSAicHJvY2Vz
+c29yLmgiCj4gICAjaW5jbHVkZSAibXNyLmgiCj4gKyNpbmNsdWRlIDxzdGRsaWIuaD4KPiAgIAo+
+ICAgc3RydWN0IG1zcl9pbmZvIHsKPiAgIAlpbnQgaW5kZXg7Cj4gQEAgLTc3LDI1ICs3OCw0NCBA
+QCBzdGF0aWMgdm9pZCB0ZXN0X3JkbXNyX2ZhdWx0KHN0cnVjdCBtc3JfaW5mbyAqbXNyKQo+ICAg
+CSAgICAgICAiRXhwZWN0ZWQgI0dQIG9uIFJEU01SKCVzKSwgZ290IHZlY3RvciAlZCIsIG1zci0+
+bmFtZSwgdmVjdG9yKTsKPiAgIH0KPiAgIAo+ICtzdGF0aWMgdm9pZCB0ZXN0X21zcihzdHJ1Y3Qg
+bXNyX2luZm8gKm1zciwgYm9vbCBpc182NGJpdF9ob3N0KQo+ICt7Cj4gKwlpZiAoaXNfNjRiaXRf
+aG9zdCB8fCAhbXNyLT5pc182NGJpdF9vbmx5KSB7Cj4gKwkJdGVzdF9tc3JfcncobXNyLCBtc3It
+PnZhbHVlKTsKPiArCj4gKwkJLyoKPiArCQkgKiBUaGUgNjQtYml0IG9ubHkgTVNScyB0aGF0IHRh
+a2UgYW4gYWRkcmVzcyBhbHdheXMgcGVyZm9ybQo+ICsJCSAqIGNhbm9uaWNhbCBjaGVja3Mgb24g
+Ym90aCBJbnRlbCBhbmQgQU1ELgo+ICsJCSAqLwo+ICsJCWlmIChtc3ItPmlzXzY0Yml0X29ubHkg
+JiYKPiArCQkgICAgbXNyLT52YWx1ZSA9PSBhZGRyXzY0KQo+ICsJCQl0ZXN0X3dybXNyX2ZhdWx0
+KG1zciwgTk9OQ0FOT05JQ0FMKTsKPiArCX0gZWxzZSB7Cj4gKwkJdGVzdF93cm1zcl9mYXVsdCht
+c3IsIG1zci0+dmFsdWUpOwo+ICsJCXRlc3RfcmRtc3JfZmF1bHQobXNyKTsKPiArCX0KPiArfQo+
+ICsKCkkgd291bGQgcHJlZmVyIGlmIHlvdSBzZXBhcmF0ZSB0aGUgImV4dHJhY3QgaW5kaXZpZHVh
+bCBNU1IgbG9naWMgaW50byAKZnVuY3Rpb24iIHBhcnQgZnJvbSB0aGUgIkFkZCBhIG5ldyBtb2Rl
+IG9mIG9wZXJhdGlvbiB0byB0ZXN0IGEgCnBhcnRpY3VsYXIgTVNSIiBwYXJ0IGludG8gdHdvIHNl
+cGFyYXRlIHBhdGNoZXMuIFRoYXQgd2F5IGl0J3MgZWFzaWVyIHRvIApyZXZpZXcuCgo+ICAgaW50
+IG1haW4oaW50IGFjLCBjaGFyICoqYXYpCj4gICB7Cj4gICAJYm9vbCBpc182NGJpdF9ob3N0ID0g
+dGhpc19jcHVfaGFzKFg4Nl9GRUFUVVJFX0xNKTsKPiAgIAlpbnQgaTsKPiAgIAo+IC0JZm9yIChp
+ID0gMCA7IGkgPCBBUlJBWV9TSVpFKG1zcl9pbmZvKTsgaSsrKSB7Cj4gLQkJaWYgKGlzXzY0Yml0
+X2hvc3QgfHwgIW1zcl9pbmZvW2ldLmlzXzY0Yml0X29ubHkpIHsKPiAtCQkJdGVzdF9tc3Jfcnco
+Jm1zcl9pbmZvW2ldLCBtc3JfaW5mb1tpXS52YWx1ZSk7Cj4gLQo+IC0JCQkvKgo+IC0JCQkgKiBU
+aGUgNjQtYml0IG9ubHkgTVNScyB0aGF0IHRha2UgYW4gYWRkcmVzcyBhbHdheXMgcGVyZm9ybQo+
+IC0JCQkgKiBjYW5vbmljYWwgY2hlY2tzIG9uIGJvdGggSW50ZWwgYW5kIEFNRC4KPiAtCQkJICov
+Cj4gLQkJCWlmIChtc3JfaW5mb1tpXS5pc182NGJpdF9vbmx5ICYmCj4gLQkJCSAgICBtc3JfaW5m
+b1tpXS52YWx1ZSA9PSBhZGRyXzY0KQo+IC0JCQkJdGVzdF93cm1zcl9mYXVsdCgmbXNyX2luZm9b
+aV0sIE5PTkNBTk9OSUNBTCk7Cj4gLQkJfSBlbHNlIHsKPiAtCQkJdGVzdF93cm1zcl9mYXVsdCgm
+bXNyX2luZm9baV0sIG1zcl9pbmZvW2ldLnZhbHVlKTsKPiAtCQkJdGVzdF9yZG1zcl9mYXVsdCgm
+bXNyX2luZm9baV0pOwo+ICsJaWYgKGFjID09IDQpIHsKClRoaXMgbWVhbnMgeW91IHJlcXVpcmUg
+MyBjb21wbGV0ZWx5IHVuZG9jdW1lbnRlZCBjb21tYW5kIGxpbmUgYXJndW1lbnRzLCAKbm8/IEkn
+bSBzdXJlIGV2ZW4geW91IGFzIHRoZSBhdXRob3Igb2YgdGhpcyBwYXRjaCB3aWxsIGZvcmdldCB3
+aGF0IHRoZXkgCmFyZSBpbiAyIHllYXJzIDopLgoKU2hvdWxkbid0IHRoZXJlIGJlIHNvbWUgZG9j
+dW1lbnRhdGlvbiB0aGF0IGV4cGxhaW5zIHVzZXJzIHRoYXQgYW5kIGhvdyAKdGhleSBjYW4gdXNl
+IHRoaXMgc3BlY2lhbCBtb2RlIG9mIG9wZXJhdGlvbiBzb21ld2hlcmU/Cgo+ICsJCWNoYXIgbXNy
+X25hbWVbMTZdOwo+ICsJCWludCBpbmRleCA9IHN0cnRvdWwoYXZbMV0sIE5VTEwsIDB4MTApOwo+
+ICsJCXNucHJpbnRmKG1zcl9uYW1lLCBzaXplb2YobXNyX25hbWUpLCAiTVNSOjB4JXgiLCBpbmRl
+eCk7Cj4gKwo+ICsJCXN0cnVjdCBtc3JfaW5mbyBtc3IgPSB7Cj4gKwkJCS5pbmRleCA9IGluZGV4
+LAo+ICsJCQkubmFtZSA9IG1zcl9uYW1lLAo+ICsJCQkuaXNfNjRiaXRfb25seSA9ICFzdHJjbXAo
+YXZbM10sICIwIiksCgpXaHkgZG8geW91IG5lZWQgdG8gcGFzcyB0aGlzIHdoZW4geW91IGludm9r
+ZSB0aGUgdGVzdCBtYW51YWxseT8KCj4gKwkJCS52YWx1ZSA9IHN0cnRvdWwoYXZbMl0sIE5VTEws
+IDB4MTApCgpPdmVyYWxsLCB0aGUgY29tbWFuZCBsaW5lIHBhcnNpbmcgaXMgcHJldHR5IGFkIGhv
+YyBhbmQgd291bGRuJ3Qgc2NhbGUgCndlbGwgd2l0aCB1cGRhdGVzLiBQYW9sbywgaXMgdGhlcmUg
+YW55IGNvbW1vbiB0aGVtZSBvbiBjb21tYW5kIGxpbmUgCmFyZ3VtZW50IHBhc3Npbmc/IERvIHdl
+IGRvIHRoaW5ncyBsaWtlIGNvbW1hbmQgbGluZSBvcHRpb25zPyBIZWxwIHRleHRzPyAKRG8gd2Ug
+aGF2ZSBzb21ldGhpbmcgZXZlbiByZW1vdGVseSBzaW1pbGFyIHRvIGdldG9wdD8KCgpUaGFua3Ms
+CgpBbGV4Cgo+ICsJCX07Cj4gKwkJdGVzdF9tc3IoJm1zciwgaXNfNjRiaXRfaG9zdCk7Cj4gKwl9
+IGVsc2Ugewo+ICsJCWZvciAoaSA9IDAgOyBpIDwgQVJSQVlfU0laRShtc3JfaW5mbyk7IGkrKykg
+ewo+ICsJCQl0ZXN0X21zcigmbXNyX2luZm9baV0sIGlzXzY0Yml0X2hvc3QpOwo+ICAgCQl9Cj4g
+ICAJfQo+ICAgCj4gCgoKCgpBbWF6b24gRGV2ZWxvcG1lbnQgQ2VudGVyIEdlcm1hbnkgR21iSApL
+cmF1c2Vuc3RyLiAzOAoxMDExNyBCZXJsaW4KR2VzY2hhZWZ0c2Z1ZWhydW5nOiBDaHJpc3RpYW4g
+U2NobGFlZ2VyLCBKb25hdGhhbiBXZWlzcwpFaW5nZXRyYWdlbiBhbSBBbXRzZ2VyaWNodCBDaGFy
+bG90dGVuYnVyZyB1bnRlciBIUkIgMTQ5MTczIEIKU2l0ejogQmVybGluClVzdC1JRDogREUgMjg5
+IDIzNyA4NzkKCgo=
 
---AxmgW1XtM0JJFTzWHwG0o4gfWFl7DFvoM
-Content-Type: multipart/mixed;
- boundary="------------CFB99E0866EE66F8CFC01FC3"
-Content-Language: en-US
-
-This is a multi-part message in MIME format.
---------------CFB99E0866EE66F8CFC01FC3
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-
-On 23.09.21 09:43, Mike Rapoport wrote:
-> From: Mike Rapoport <rppt@linux.ibm.com>
->=20
-> For ages memblock_free() interface dealt with physical addresses even
-> despite the existence of memblock_alloc_xx() functions that return a
-> virtual pointer.
->=20
-> Introduce memblock_phys_free() for freeing physical ranges and repurpos=
-e
-> memblock_free() to free virtual pointers to make the following pairing
-> abundantly clear:
->=20
-> 	int memblock_phys_free(phys_addr_t base, phys_addr_t size);
-> 	phys_addr_t memblock_phys_alloc(phys_addr_t base, phys_addr_t size);
->=20
-> 	void *memblock_alloc(phys_addr_t size, phys_addr_t align);
-> 	void memblock_free(void *ptr, size_t size);
->=20
-> Replace intermediate memblock_free_ptr() with memblock_free() and drop
-> unnecessary aliases memblock_free_early() and memblock_free_early_nid()=
-=2E
->=20
-> Suggested-by: Linus Torvalds <torvalds@linux-foundation.org>
-> Signed-off-by: Mike Rapoport <rppt@linux.ibm.com>
-
-arch/x86/xen/ parts: Reviewed-by: Juergen Gross <jgross@suse.com>
-
-
-Juergen
-
---------------CFB99E0866EE66F8CFC01FC3
-Content-Type: application/pgp-keys;
- name="OpenPGP_0xB0DE9DD628BF132F.asc"
-Content-Transfer-Encoding: quoted-printable
-Content-Description: OpenPGP public key
-Content-Disposition: attachment;
- filename="OpenPGP_0xB0DE9DD628BF132F.asc"
-
------BEGIN PGP PUBLIC KEY BLOCK-----
-
-xsBNBFOMcBYBCACgGjqjoGvbEouQZw/ToiBg9W98AlM2QHV+iNHsEs7kxWhKMjrioyspZKOBy=
-cWx
-w3ie3j9uvg9EOB3aN4xiTv4qbnGiTr3oJhkB1gsb6ToJQZ8uxGq2kaV2KL9650I1SJvedYm8O=
-f8Z
-d621lSmoKOwlNClALZNew72NjJLEzTalU1OdT7/i1TXkH09XSSI8mEQ/ouNcMvIJNwQpd369y=
-9bf
-IhWUiVXEK7MlRgUG6MvIj6Y3Am/BBLUVbDa4+gmzDC9ezlZkTZG2t14zWPvxXP3FAp2pkW0xq=
-G7/
-377qptDmrk42GlSKN4z76ELnLxussxc7I2hx18NUcbP8+uty4bMxABEBAAHNHEp1ZXJnZW4gR=
-3Jv
-c3MgPGpnQHBmdXBmLm5ldD7CwHkEEwECACMFAlOMcBYCGwMHCwkIBwMCAQYVCAIJCgsEFgIDA=
-QIe
-AQIXgAAKCRCw3p3WKL8TL0KdB/93FcIZ3GCNwFU0u3EjNbNjmXBKDY4FUGNQH2lvWAUy+dnyT=
-hpw
-dtF/jQ6j9RwE8VP0+NXcYpGJDWlNb9/JmYqLiX2Q3TyevpB0CA3dbBQp0OW0fgCetToGIQrg0=
-MbD
-1C/sEOv8Mr4NAfbauXjZlvTj30H2jO0u+6WGM6nHwbh2l5O8ZiHkH32iaSTfN7Eu5RnNVUJbv=
-oPH
-Z8SlM4KWm8rG+lIkGurqqu5gu8q8ZMKdsdGC4bBxdQKDKHEFExLJK/nRPFmAuGlId1E3fe10v=
-5QL
-+qHI3EIPtyfE7i9Hz6rVwi7lWKgh7pe0ZvatAudZ+JNIlBKptb64FaiIOAWDCx1SzR9KdWVyZ=
-2Vu
-IEdyb3NzIDxqZ3Jvc3NAc3VzZS5jb20+wsB5BBMBAgAjBQJTjHCvAhsDBwsJCAcDAgEGFQgCC=
-QoL
-BBYCAwECHgECF4AACgkQsN6d1ii/Ey/HmQf/RtI7kv5A2PS4RF7HoZhPVPogNVbC4YA6lW7Dr=
-Wf0
-teC0RR3MzXfy6pJ+7KLgkqMlrAbN/8Dvjoz78X+5vhH/rDLa9BuZQlhFmvcGtCF8eR0T1v0nC=
-/nu
-AFVGy+67q2DH8As3KPu0344TBDpAvr2uYM4tSqxK4DURx5INz4ZZ0WNFHcqsfvlGJALDeE0Lh=
-ITT
-d9jLzdDad1pQSToCnLl6SBJZjDOX9QQcyUigZFtCXFst4dlsvddrxyqT1f17+2cFSdu7+ynLm=
-XBK
-7abQ3rwJY8SbRO2iRulogc5vr/RLMMlscDAiDkaFQWLoqHHOdfO9rURssHNN8WkMnQfvUewRz=
-80h
-SnVlcmdlbiBHcm9zcyA8amdyb3NzQG5vdmVsbC5jb20+wsB5BBMBAgAjBQJTjHDXAhsDBwsJC=
-AcD
-AgEGFQgCCQoLBBYCAwECHgECF4AACgkQsN6d1ii/Ey8PUQf/ehmgCI9jB9hlgexLvgOtf7PJn=
-FOX
-gMLdBQgBlVPO3/D9R8LtF9DBAFPNhlrsfIG/SqICoRCqUcJ96Pn3P7UUinFG/I0ECGF4EvTE1=
-jnD
-kfJZr6jrbjgyoZHiw/4BNwSTL9rWASyLgqlA8u1mf+c2yUwcGhgkRAd1gOwungxcwzwqgljf0=
-N51
-N5JfVRHRtyfwq/ge+YEkDGcTU6Y0sPOuj4Dyfm8fJzdfHNQsWq3PnczLVELStJNdapwPOoE+l=
-otu
-fe3AM2vAEYJ9rTz3Cki4JFUsgLkHFqGZarrPGi1eyQcXeluldO3m91NK/1xMI3/+8jbO0tsn1=
-tqS
-EUGIJi7ox80eSnVlcmdlbiBHcm9zcyA8amdyb3NzQHN1c2UuZGU+wsB5BBMBAgAjBQJTjHDrA=
-hsD
-BwsJCAcDAgEGFQgCCQoLBBYCAwECHgECF4AACgkQsN6d1ii/Ey+LhQf9GL45eU5vOowA2u5N3=
-g3O
-ZUEBmDHVVbqMtzwlmNC4k9Kx39r5s2vcFl4tXqW7g9/ViXYuiDXb0RfUpZiIUW89siKrkzmQ5=
-dM7
-wRqzgJpJwK8Bn2MIxAKArekWpiCKvBOB/Cc+3EXE78XdlxLyOi/NrmSGRIov0karw2RzMNOu5=
-D+j
-LRZQd1Sv27AR+IP3I8U4aqnhLpwhK7MEy9oCILlgZ1QZe49kpcumcZKORmzBTNh30FVKK1Evm=
-V2x
-AKDoaEOgQB4iFQLhJCdP1I5aSgM5IVFdn7v5YgEYuJYx37IoN1EblHI//x/e2AaIHpzK5h88N=
-Eaw
-QsaNRpNSrcfbFmAg987ATQRTjHAWAQgAyzH6AOODMBjgfWE9VeCgsrwH3exNAU32gLq2xvjpW=
-nHI
-s98ndPUDpnoxWQugJ6MpMncr0xSwFmHEgnSEjK/PAjppgmyc57BwKII3sV4on+gDVFJR6Y8ZR=
-wgn
-BC5mVM6JjQ5xDk8WRXljExRfUX9pNhdE5eBOZJrDRoLUmmjDtKzWaDhIg/+1Hzz93X4fCQkNV=
-bVF
-LELU9bMaLPBG/x5q4iYZ2k2ex6d47YE1ZFdMm6YBYMOljGkZKwYde5ldM9mo45mmwe0icXKLk=
-pEd
-IXKTZeKDO+Hdv1aqFuAcccTg9RXDQjmwhC3yEmrmcfl0+rPghO0Iv3OOImwTEe4co3c1mwARA=
-QAB
-wsBfBBgBAgAJBQJTjHAWAhsMAAoJELDendYovxMvQ/gH/1ha96vm4P/L+bQpJwrZ/dneZcmEw=
-Tbe
-8YFsw2V/Buv6Z4Mysln3nQK5ZadD534CF7TDVft7fC4tU4PONxF5D+/tvgkPfDAfF77zy2AH1=
-vJz
-Q1fOU8lYFpZXTXIHb+559UqvIB8AdgR3SAJGHHt4RKA0F7f5ipYBBrC6cyXJyyoprT10EMvU8=
-VGi
-wXvTyJz3fjoYsdFzpWPlJEBRMedCot60g5dmbdrZ5DWClAr0yau47zpWj3enf1tLWaqcsuylW=
-svi
-uGjKGw7KHQd3bxALOknAp4dN3QwBYCKuZ7AddY9yjynVaD5X7nF9nO5BjR/i1DG86lem3iBDX=
-zXs
-ZDn8R38=3D
-=3D2wuH
------END PGP PUBLIC KEY BLOCK-----
-
---------------CFB99E0866EE66F8CFC01FC3--
-
---AxmgW1XtM0JJFTzWHwG0o4gfWFl7DFvoM--
-
---zppOVwffTjZ5Oe49Vq0wbEbRvLUF4dOID
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature"
-
------BEGIN PGP SIGNATURE-----
-
-wsB5BAABCAAjFiEEhRJncuj2BJSl0Jf3sN6d1ii/Ey8FAmFMN48FAwAAAAAACgkQsN6d1ii/Ey8D
-fwf/WV3EUVWvjXkc64q0a0it6LMGy2AtQrh8KdDecuLV8iH5bKTnqNAZOUoV6sYTeiLsSSnRTLOt
-yKKjkWsC9/gUsyuO0B8Zw/VX/zoXJqp7T57FfmW+37qcslFuLzImqvDxdU65n/jEbme+VExmw6UF
-yy1ATxxxhQIxeTDXB3SfE0f6rX4Fw1DUqQc25bFNpD1wzdp1xG6qhH31/CWUI/V/frEfuzZrrN5F
-Uimkqk3+xjrqqpYh2fb/Pwpd77LFOdIrV4gH0oyl0NA3x3QMNi+67FrbMtuRHZij1jnpwoY1RiUc
-uVxzINJ+LJh0g8836hHAkPh5tQNBjV7C6V7LXddn6g==
-=Fnkp
------END PGP SIGNATURE-----
-
---zppOVwffTjZ5Oe49Vq0wbEbRvLUF4dOID--
