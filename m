@@ -2,142 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D230416664
-	for <lists+kvm@lfdr.de>; Thu, 23 Sep 2021 22:10:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EFAD2416675
+	for <lists+kvm@lfdr.de>; Thu, 23 Sep 2021 22:15:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243028AbhIWULq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Sep 2021 16:11:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:50661 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229932AbhIWULp (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 23 Sep 2021 16:11:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632427813;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=pm6ldAPw3QBicFualtGkXcxl0EGrBnYy1E2YrtIEBcU=;
-        b=FvnQ/OlMgYezjgX6s025E9fSNOL7oz5bxtVmofXvdUbTas//UYgL0brT0LNUAARVhBW2VY
-        2xh0injU/SNf6J7OTZKFvc60jUFMHGHw43gCvX38aL1WxskyDm6l4ut2tuUDP6CCBXF024
-        5L2o2F7621196neOlckfocig10EYD2I=
-Received: from mail-oi1-f198.google.com (mail-oi1-f198.google.com
- [209.85.167.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-226-g8Da_IzMOKuXE8CN2T1ePQ-1; Thu, 23 Sep 2021 16:10:12 -0400
-X-MC-Unique: g8Da_IzMOKuXE8CN2T1ePQ-1
-Received: by mail-oi1-f198.google.com with SMTP id l6-20020a056808020600b00273c0972441so4869914oie.14
-        for <kvm@vger.kernel.org>; Thu, 23 Sep 2021 13:10:11 -0700 (PDT)
+        id S243084AbhIWUR1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Sep 2021 16:17:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43906 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S243068AbhIWUR0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Sep 2021 16:17:26 -0400
+Received: from mail-io1-xd36.google.com (mail-io1-xd36.google.com [IPv6:2607:f8b0:4864:20::d36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3975C061574
+        for <kvm@vger.kernel.org>; Thu, 23 Sep 2021 13:15:54 -0700 (PDT)
+Received: by mail-io1-xd36.google.com with SMTP id p80so9679161iod.10
+        for <kvm@vger.kernel.org>; Thu, 23 Sep 2021 13:15:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=JPc+ABXarfxXepFwMKo48Oe1UzLRxS69NAKG8VNocoQ=;
+        b=hQo5uYSne1TJBBf9RdJB3DxVuqBUJEMvu5S5/N+VRcG+sGRgyWo3lTlot2bt65MKPz
+         ZB9F6zjWxYufa1YhqQi0HkSZpNps2aS045YmU4YDym/aeyJR6cQcCSXwEakLkFW5ko1d
+         +YOrIBC0xtT82QN26TJdPw6+tgRxIZeoH05Gnq0r95vol+EZtPAAs8fW8NY5mektdoY+
+         lJ5Pq27FDD7jEzg5PhtALk22ol6kAwOlzo0DBbwHD1ayU5YDCFkIgPkltxRdsm31mDg+
+         cl1aBM+97pceIikRKcL8klD84d7SD+FMwJP2E9JNeEVCRIjgA9tvi+UJ7r+Vhof3fX2T
+         LHGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=pm6ldAPw3QBicFualtGkXcxl0EGrBnYy1E2YrtIEBcU=;
-        b=4jCSl2cmnd0hh/+RZVgj3se/zqrHo/1CDg/WB/8QJ8/Ow83kwi+j9mMyfw+nVIdGdY
-         3X84M4U4gWDmmzLsLTXmLkuC/MfF9Z5BXAxIuHAB7knMAVrOIqhag2zpk7il7WZRjHCv
-         FyQ/CeCMeTWTnRGr8JMhzUUFdORER+/LUI7+TGCEg+9SjkYZWYzzgF5fPJbcnqNMScD8
-         Ztx5A3ef6dFZAA4Gqlhe9AR2IT2aRXjJ5wtqgqJXKwu2bvpEAJLZZhOrpZ3E3Y8WhGzT
-         jMk3UnWM3xwqKNZbBnPRnsA823vwV8oo393G5XsiaAGBy0IRBbUX3kJPVylVtY4N/J1+
-         VvpA==
-X-Gm-Message-State: AOAM530gBghl0edSy1UvexqMpUtSgCymtUQyHsbCzb+Xa7yTXdGUiia+
-        mTBSh1VxF9cWzWz2YkXlvECbzKHcg2tbzkHtmoFmxNYTwb71wKA37WKiHtAmQ2JAqcJN4baxnaZ
-        zvEMX13SSgF8/
-X-Received: by 2002:a05:6830:3101:: with SMTP id b1mr510077ots.21.1632427811291;
-        Thu, 23 Sep 2021 13:10:11 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzNoizfos0xOXONbPoXxhPavPdK/o+164G5dpAJrJuPwhpQDVyihOFF+oINDFaTtoFUCQrNhQ==
-X-Received: by 2002:a05:6830:3101:: with SMTP id b1mr510058ots.21.1632427811056;
-        Thu, 23 Sep 2021 13:10:11 -0700 (PDT)
-Received: from redhat.com ([198.99.80.109])
-        by smtp.gmail.com with ESMTPSA id d7sm1614012ooa.36.2021.09.23.13.10.10
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=JPc+ABXarfxXepFwMKo48Oe1UzLRxS69NAKG8VNocoQ=;
+        b=Au2U6MEY/hL4pwDGD0kx25s9VR6sqgm2dLJC4KY93yAkehePYVRu7O4Y8GaChiIQlH
+         Km+PqDBlwt55fVk1r5QRVBwI5mzXMH+NbuKeZVxeeG402VxZgzAC5DfNvej5bYqJoV3V
+         3daqcov8ebP5Q4YAN19+7xI3xFwut7PjuMC9B4hOSF8J5eO6irv2cI2HzoB+eiTOPE93
+         YNlcwYsg70O6D+Au3elIQfsBoQujco0i1oi7k9bi5PXhnfwwENFcpj82xf9xmTvC66Y8
+         kpH02MeuvsNiazzMqD+ob27DqEaK8WzOpW5Fai4TYMuGDhMCn7joCQ00X1bLwoZFpiOG
+         rsYw==
+X-Gm-Message-State: AOAM5333Wy0YFelM0KjNElkHXqeBReJFYCx3tCVKDkfH58Yfia7uBKkn
+        r47LU1e1xB1vjW82/vVdfdFD/PBoS+sNeg==
+X-Google-Smtp-Source: ABdhPJxM4cssV+WmLQLIXzuWCCZybqJxIjRtk5nsOr/aQ+/ddiyBdJqkF8qXyRfSkGma2tFbyuWJSw==
+X-Received: by 2002:a02:b704:: with SMTP id g4mr5700224jam.7.1632428153752;
+        Thu, 23 Sep 2021 13:15:53 -0700 (PDT)
+Received: from google.com (194.225.68.34.bc.googleusercontent.com. [34.68.225.194])
+        by smtp.gmail.com with ESMTPSA id c11sm3031576ilu.74.2021.09.23.13.15.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Sep 2021 13:10:10 -0700 (PDT)
-Date:   Thu, 23 Sep 2021 14:10:09 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Tony Krowiak <akrowiak@linux.ibm.com>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        linux-s390@vger.kernel.org, Halil Pasic <pasic@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Christoph Hellwig <hch@lst.de>, kvm@vger.kernel.org
-Subject: Re: [PATCH v3] vfio/ap_ops: Add missed vfio_uninit_group_dev()
-Message-ID: <20210923141009.5196b90b.alex.williamson@redhat.com>
-In-Reply-To: <20210922131150.GP327412@nvidia.com>
-References: <0-v3-f9b50340cdbb+e4-ap_uninit_jgg@nvidia.com>
-        <4a50ed05-c60c-aad0-bceb-de9665602aed@linux.ibm.com>
-        <20210922131150.GP327412@nvidia.com>
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        Thu, 23 Sep 2021 13:15:53 -0700 (PDT)
+Date:   Thu, 23 Sep 2021 20:15:49 +0000
+From:   Oliver Upton <oupton@google.com>
+To:     kvmarm@lists.cs.columbia.edu
+Cc:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH v2 00/11] KVM: arm64: Implement PSCI SYSTEM_SUSPEND
+ support
+Message-ID: <YUzgdbYk8BeCnHyW@google.com>
+References: <20210923191610.3814698-1-oupton@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210923191610.3814698-1-oupton@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 22 Sep 2021 10:11:50 -0300
-Jason Gunthorpe <jgg@nvidia.com> wrote:
-
-> On Wed, Sep 22, 2021 at 09:05:06AM -0400, Tony Krowiak wrote:
-> > 
-> > 
-> > On 9/21/21 8:11 AM, Jason Gunthorpe wrote:  
-> > > Without this call an xarray entry is leaked when the vfio_ap device is
-> > > unprobed. It was missed when the below patch was rebased across the
-> > > dev_set patch. Keep the remove function in the same order as the error
-> > > unwind in probe.
-> > > 
-> > > Fixes: eb0feefd4c02 ("vfio/ap_ops: Convert to use vfio_register_group_dev()")
-> > > Reviewed-by: Christoph Hellwig <hch@lst.de>
-> > > Tested-by: Tony Krowiak <akrowiak@linux.ibm.com>
-> > > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> > >   drivers/s390/crypto/vfio_ap_ops.c | 4 +++-
-> > >   1 file changed, 3 insertions(+), 1 deletion(-)
-> > > 
-> > > v3:
-> > >   - Keep the remove sequence the same as remove to avoid a lockdep splat
-> > > v2: https://lore.kernel.org/r/0-v2-25656bbbb814+41-ap_uninit_jgg@nvidia.com/
-> > >   - Fix corrupted diff
-> > > v1: https://lore.kernel.org/r/0-v1-3a05c6000668+2ce62-ap_uninit_jgg@nvidia.com/
-> > > 
-> > > diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
-> > > index 118939a7729a1e..623d5269a52ce5 100644
-> > > +++ b/drivers/s390/crypto/vfio_ap_ops.c
-> > > @@ -361,6 +361,7 @@ static int vfio_ap_mdev_probe(struct mdev_device *mdev)
-> > >   	mutex_lock(&matrix_dev->lock);
-> > >   	list_del(&matrix_mdev->node);
-> > >   	mutex_unlock(&matrix_dev->lock);
-> > > +	vfio_uninit_group_dev(&matrix_mdev->vdev);
-> > >   	kfree(matrix_mdev);
-> > >   err_dec_available:
-> > >   	atomic_inc(&matrix_dev->available_instances);
-> > > @@ -376,9 +377,10 @@ static void vfio_ap_mdev_remove(struct mdev_device *mdev)
-> > >   	mutex_lock(&matrix_dev->lock);
-> > >   	vfio_ap_mdev_reset_queues(matrix_mdev);
-> > >   	list_del(&matrix_mdev->node);
-> > > +	mutex_unlock(&matrix_dev->lock);
-> > > +	vfio_uninit_group_dev(&matrix_mdev->vdev);
-> > >   	kfree(matrix_mdev);
-> > >   	atomic_inc(&matrix_dev->available_instances);  
-> > 
-> > I think the above line of code should be done under the
-> > matrix_dev->lock after removing the matrix_mdev from
-> > the list since it is changing a value in matrix_dev.  
+On Thu, Sep 23, 2021 at 07:15:59PM +0000, Oliver Upton wrote:
+> Certain VMMs/operators may wish to give their guests the ability to
+> initiate a system suspend that could result in the VM being saved to
+> persistent storage to be resumed at a later time. The PSCI v1.0
+> specification describes an SMC, SYSTEM_SUSPEND, that allows a kernel to
+> request a system suspend. This call is optional for v1.0, and KVM
+> elected to not support the call in its v1.0 implementation.
 > 
-> No, the read-side doesn't hold the lock
+> This series adds support for the SYSTEM_SUSPEND PSCI call to KVM/arm64.
+> Since this is a system-scoped event, KVM cannot quiesce the VM on its
+> own. We add a new system exit type in this series to clue in userspace
+> that a suspend was requested. Per the KVM_EXIT_SYSTEM_EVENT ABI, a VMM
+> that doesn't care about this event can simply resume the guest without
+> issue (we set up the calling vCPU to come out of reset correctly on next
+> KVM_RUN). If a VMM would like to have KVM emulate the suspend, it can do
+> so by setting the vCPU's MP state to KVM_MP_STATE_HALTED. Support for
+> this state has been added in this series.
 > 
-> 	if ((atomic_dec_if_positive(&matrix_dev->available_instances) < 0))
-> 		return -EPERM;
+> Patch 1 is an unrelated cleanup, dropping an unused parameter
 > 
-> I think it is just a leftover from the atomic conversion that Alex
-> did to keep it under the matrix_dev struct.
+> Patch 2 simplifies how KVM filters SMC64 functions for AArch32 guests.
 > 
-> If we were going to hold the lock then it wouldn't need to be an
-> atomic.
+> Patch 3 wraps up the vCPU reset logic used by the PSCI CPU_ON
+> implementation in KVM for subsequent use, as we must queue up a reset
+> for the vCPU that requested a system suspend.
+> 
+> Patch 4 is another unrelated cleanup, fixing the naming for the
+> KVM_REQ_SLEEP handler to avoid confusion and remain consistent with the
+> handler introduced in this series.
+> 
+> Patch 5 changes how WFI-like events are handled in KVM (WFI instruction,
+> PSCI CPU_SUSPEND). Instead of directly blocking the vCPU in the
+> respective handlers, set a request bit and block before resuming the
+> guest. WFI and PSCI CPU_SUSPEND do not require deferral of
+> kvm_vcpu_block(), but SYSTEM_SUSPEND does. Rather than adding a deferral
+> mechanism just for SYSTEM_SUSPEND, it is a bit cleaner to have all
+> blocking events just request the event.
+> 
+> Patch 6 actually adds PSCI SYSTEM_SUSPEND support to KVM, and adds the
+> necessary UAPI to pair with the call.
+> 
+> Patch 7 renames the PSCI selftest to something more generic, as we will
+> test more than just CPU_ON.
+> 
+> Patch 8 creates a common helper for making SMC64 calls in KVM selftests,
+> rather than having tests open-code their own approach.
+> 
+> Patch 9 makes the PSCI test use KVM_SET_MP_STATE for powering off a vCPU
+> rather than the vCPU init flag. This change is necessary to separate
+> generic VM setup from the setup for a particular PSCI test.
+> 
+> Patch 10 reworks psci_test into a bunch of helpers, making it easier to
+> build additional test cases with the common parts.
+> 
+> Finally, patch 11 adds 2 test cases for the SYSTEM_SUSPEND PSCI call.
+> Verify that the call succeeds if all other vCPUs have been powered off
+> and that it fails if more than the calling vCPU is powered on.
+> 
+> This series applies cleanly to v5.15-rc2. Testing was performed on an
+> Ampere Mt. Jade system.
 
-Tony, I'd love to get an ack if you're satisfied with this so we can
-close up fixes for v5.15.  Thanks,
+Gah, forgot to summarize updates:
 
-Alex
+v1 -> v2:
+ - Rebase to 5.15-rc2
+ - Allow userspace to request in-kernel suspend emulation (Marc)
+ - Add another test case for SYSTEM_SUSPEND, cleaning up the PSCI
+   selftest
+ - Create a common SMCCC function for KVM selftests
 
+v1: http://lore.kernel.org/r/20210819223640.3564975-1-oupton@google.com
+
+> Oliver Upton (11):
+>   KVM: arm64: Drop unused vcpu param to kvm_psci_valid_affinity()
+>   KVM: arm64: Clean up SMC64 PSCI filtering for AArch32 guests
+>   KVM: arm64: Encapsulate reset request logic in a helper function
+>   KVM: arm64: Rename the KVM_REQ_SLEEP handler
+>   KVM: arm64: Defer WFI emulation as a requested event
+>   KVM: arm64: Add support for SYSTEM_SUSPEND PSCI call
+>   selftests: KVM: Rename psci_cpu_on_test to psci_test
+>   selftests: KVM: Create helper for making SMCCC calls
+>   selftests: KVM: Use KVM_SET_MP_STATE to power off vCPU in psci_test
+>   selftests: KVM: Refactor psci_test to make it amenable to new tests
+>   selftests: KVM: Test SYSTEM_SUSPEND PSCI call
+> 
+>  Documentation/virt/kvm/api.rst                |   6 +
+>  arch/arm64/include/asm/kvm_host.h             |   4 +
+>  arch/arm64/kvm/arm.c                          |  21 +-
+>  arch/arm64/kvm/handle_exit.c                  |   3 +-
+>  arch/arm64/kvm/psci.c                         | 138 ++++++++---
+>  include/uapi/linux/kvm.h                      |   2 +
+>  tools/testing/selftests/kvm/.gitignore        |   2 +-
+>  tools/testing/selftests/kvm/Makefile          |   2 +-
+>  .../selftests/kvm/aarch64/psci_cpu_on_test.c  | 121 ----------
+>  .../testing/selftests/kvm/aarch64/psci_test.c | 218 ++++++++++++++++++
+>  .../selftests/kvm/include/aarch64/processor.h |  22 ++
+>  .../selftests/kvm/lib/aarch64/processor.c     |  25 ++
+>  tools/testing/selftests/kvm/steal_time.c      |  13 +-
+>  13 files changed, 403 insertions(+), 174 deletions(-)
+>  delete mode 100644 tools/testing/selftests/kvm/aarch64/psci_cpu_on_test.c
+>  create mode 100644 tools/testing/selftests/kvm/aarch64/psci_test.c
+> 
+> -- 
+> 2.33.0.685.g46640cef36-goog
+> 
