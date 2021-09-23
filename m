@@ -2,126 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9D30C416620
-	for <lists+kvm@lfdr.de>; Thu, 23 Sep 2021 21:46:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7D230416664
+	for <lists+kvm@lfdr.de>; Thu, 23 Sep 2021 22:10:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242979AbhIWTro (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Sep 2021 15:47:44 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:10952 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S242861AbhIWTrn (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 23 Sep 2021 15:47:43 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 18NJW36f031236;
-        Thu, 23 Sep 2021 15:45:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : references : mime-version : content-type :
- in-reply-to; s=pp1; bh=OlfxwL5SxCQJGsEygNnP+Bd9S5CycoibyIwI1T9qbFQ=;
- b=o2g9xUdg4iWokOSpifGukNkZK7jrG3PCnBFvuz4C7oP+gzjHDglARWvYTHBDYKWgrmUN
- nywTanPgUpTOTd5/xMfhi1L+mJwrCvVoKxej3UCLp5sG7C25GVynwAmr4q0nxjw5T5YF
- XfSS+haqO/MAAWW7EoLHEph+pIjpH8koxcOuzA2lkqyOwZ+Lt0jX5schDBGsmjxT7nCn
- nj0KpCKZ1MAIxT1dHKe+ArroeI/VY7R10b19vbUGLmbRaxdWWrC+tHtvcRU2gpGyiZee
- fQz965XLLMlLTgvc9SCxBhiIocufoeoMuCL9s+OrHLUbKOqWsHzC5EoSrMfU3XKh1xK9 Bg== 
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3b8wkuupat-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 23 Sep 2021 15:45:58 -0400
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 18NJRuDe003688;
-        Thu, 23 Sep 2021 19:45:56 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma03fra.de.ibm.com with ESMTP id 3b7q6kd587-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 23 Sep 2021 19:45:56 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 18NJjrxv44106172
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 23 Sep 2021 19:45:53 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A19734C04A;
-        Thu, 23 Sep 2021 19:45:53 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 903DC4C05A;
-        Thu, 23 Sep 2021 19:45:51 +0000 (GMT)
-Received: from linux.ibm.com (unknown [9.145.159.121])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Thu, 23 Sep 2021 19:45:51 +0000 (GMT)
-Date:   Thu, 23 Sep 2021 22:45:49 +0300
-From:   Mike Rapoport <rppt@linux.ibm.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     Mike Rapoport <rppt@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        devicetree <devicetree@vger.kernel.org>,
-        iommu <iommu@lists.linux-foundation.org>,
-        kasan-dev <kasan-dev@googlegroups.com>,
-        KVM list <kvm@vger.kernel.org>,
-        alpha <linux-alpha@vger.kernel.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        linux-efi <linux-efi@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "open list:BROADCOM NVRAM DRIVER" <linux-mips@vger.kernel.org>,
-        Linux-MM <linux-mm@kvack.org>,
-        linux-riscv <linux-riscv@lists.infradead.org>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Linux-sh list <linux-sh@vger.kernel.org>,
-        "open list:SYNOPSYS ARC ARCHITECTURE" 
-        <linux-snps-arc@lists.infradead.org>,
-        linux-um <linux-um@lists.infradead.org>,
-        linux-usb@vger.kernel.org,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        linux-sparc <sparclinux@vger.kernel.org>,
-        xen-devel@lists.xenproject.org
-Subject: Re: [PATCH 0/3] memblock: cleanup memblock_free interface
-Message-ID: <YUzZberbgZE+7HEo@linux.ibm.com>
-References: <20210923074335.12583-1-rppt@kernel.org>
- <CAHk-=wiJB8H5pZz-AKaSJ7ViRtdxQGJT7eOByp8DJx2OwZSYwA@mail.gmail.com>
+        id S243028AbhIWULq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Sep 2021 16:11:46 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:50661 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229932AbhIWULp (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 23 Sep 2021 16:11:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1632427813;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=pm6ldAPw3QBicFualtGkXcxl0EGrBnYy1E2YrtIEBcU=;
+        b=FvnQ/OlMgYezjgX6s025E9fSNOL7oz5bxtVmofXvdUbTas//UYgL0brT0LNUAARVhBW2VY
+        2xh0injU/SNf6J7OTZKFvc60jUFMHGHw43gCvX38aL1WxskyDm6l4ut2tuUDP6CCBXF024
+        5L2o2F7621196neOlckfocig10EYD2I=
+Received: from mail-oi1-f198.google.com (mail-oi1-f198.google.com
+ [209.85.167.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-226-g8Da_IzMOKuXE8CN2T1ePQ-1; Thu, 23 Sep 2021 16:10:12 -0400
+X-MC-Unique: g8Da_IzMOKuXE8CN2T1ePQ-1
+Received: by mail-oi1-f198.google.com with SMTP id l6-20020a056808020600b00273c0972441so4869914oie.14
+        for <kvm@vger.kernel.org>; Thu, 23 Sep 2021 13:10:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=pm6ldAPw3QBicFualtGkXcxl0EGrBnYy1E2YrtIEBcU=;
+        b=4jCSl2cmnd0hh/+RZVgj3se/zqrHo/1CDg/WB/8QJ8/Ow83kwi+j9mMyfw+nVIdGdY
+         3X84M4U4gWDmmzLsLTXmLkuC/MfF9Z5BXAxIuHAB7knMAVrOIqhag2zpk7il7WZRjHCv
+         FyQ/CeCMeTWTnRGr8JMhzUUFdORER+/LUI7+TGCEg+9SjkYZWYzzgF5fPJbcnqNMScD8
+         Ztx5A3ef6dFZAA4Gqlhe9AR2IT2aRXjJ5wtqgqJXKwu2bvpEAJLZZhOrpZ3E3Y8WhGzT
+         jMk3UnWM3xwqKNZbBnPRnsA823vwV8oo393G5XsiaAGBy0IRBbUX3kJPVylVtY4N/J1+
+         VvpA==
+X-Gm-Message-State: AOAM530gBghl0edSy1UvexqMpUtSgCymtUQyHsbCzb+Xa7yTXdGUiia+
+        mTBSh1VxF9cWzWz2YkXlvECbzKHcg2tbzkHtmoFmxNYTwb71wKA37WKiHtAmQ2JAqcJN4baxnaZ
+        zvEMX13SSgF8/
+X-Received: by 2002:a05:6830:3101:: with SMTP id b1mr510077ots.21.1632427811291;
+        Thu, 23 Sep 2021 13:10:11 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzNoizfos0xOXONbPoXxhPavPdK/o+164G5dpAJrJuPwhpQDVyihOFF+oINDFaTtoFUCQrNhQ==
+X-Received: by 2002:a05:6830:3101:: with SMTP id b1mr510058ots.21.1632427811056;
+        Thu, 23 Sep 2021 13:10:11 -0700 (PDT)
+Received: from redhat.com ([198.99.80.109])
+        by smtp.gmail.com with ESMTPSA id d7sm1614012ooa.36.2021.09.23.13.10.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Sep 2021 13:10:10 -0700 (PDT)
+Date:   Thu, 23 Sep 2021 14:10:09 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Tony Krowiak <akrowiak@linux.ibm.com>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        linux-s390@vger.kernel.org, Halil Pasic <pasic@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Christoph Hellwig <hch@lst.de>, kvm@vger.kernel.org
+Subject: Re: [PATCH v3] vfio/ap_ops: Add missed vfio_uninit_group_dev()
+Message-ID: <20210923141009.5196b90b.alex.williamson@redhat.com>
+In-Reply-To: <20210922131150.GP327412@nvidia.com>
+References: <0-v3-f9b50340cdbb+e4-ap_uninit_jgg@nvidia.com>
+        <4a50ed05-c60c-aad0-bceb-de9665602aed@linux.ibm.com>
+        <20210922131150.GP327412@nvidia.com>
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAHk-=wiJB8H5pZz-AKaSJ7ViRtdxQGJT7eOByp8DJx2OwZSYwA@mail.gmail.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: NmcKtlYbna1qS7iyZ4wr-YnA7UP6mwwQ
-X-Proofpoint-ORIG-GUID: NmcKtlYbna1qS7iyZ4wr-YnA7UP6mwwQ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.391,FMLib:17.0.607.475
- definitions=2021-09-23_06,2021-09-23_01,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- lowpriorityscore=0 mlxscore=0 malwarescore=0 spamscore=0
- priorityscore=1501 bulkscore=0 clxscore=1015 suspectscore=0
- mlxlogscore=691 adultscore=0 phishscore=0 classifier=spam adjust=0
- reason=mlx scancount=1 engine=8.12.0-2109200000
- definitions=main-2109230115
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Linus,
+On Wed, 22 Sep 2021 10:11:50 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-On Thu, Sep 23, 2021 at 09:01:46AM -0700, Linus Torvalds wrote:
-> On Thu, Sep 23, 2021 at 12:43 AM Mike Rapoport <rppt@kernel.org> wrote:
-> >
-> You need to be a LOT more careful.
+> On Wed, Sep 22, 2021 at 09:05:06AM -0400, Tony Krowiak wrote:
+> > 
+> > 
+> > On 9/21/21 8:11 AM, Jason Gunthorpe wrote:  
+> > > Without this call an xarray entry is leaked when the vfio_ap device is
+> > > unprobed. It was missed when the below patch was rebased across the
+> > > dev_set patch. Keep the remove function in the same order as the error
+> > > unwind in probe.
+> > > 
+> > > Fixes: eb0feefd4c02 ("vfio/ap_ops: Convert to use vfio_register_group_dev()")
+> > > Reviewed-by: Christoph Hellwig <hch@lst.de>
+> > > Tested-by: Tony Krowiak <akrowiak@linux.ibm.com>
+> > > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> > >   drivers/s390/crypto/vfio_ap_ops.c | 4 +++-
+> > >   1 file changed, 3 insertions(+), 1 deletion(-)
+> > > 
+> > > v3:
+> > >   - Keep the remove sequence the same as remove to avoid a lockdep splat
+> > > v2: https://lore.kernel.org/r/0-v2-25656bbbb814+41-ap_uninit_jgg@nvidia.com/
+> > >   - Fix corrupted diff
+> > > v1: https://lore.kernel.org/r/0-v1-3a05c6000668+2ce62-ap_uninit_jgg@nvidia.com/
+> > > 
+> > > diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
+> > > index 118939a7729a1e..623d5269a52ce5 100644
+> > > +++ b/drivers/s390/crypto/vfio_ap_ops.c
+> > > @@ -361,6 +361,7 @@ static int vfio_ap_mdev_probe(struct mdev_device *mdev)
+> > >   	mutex_lock(&matrix_dev->lock);
+> > >   	list_del(&matrix_mdev->node);
+> > >   	mutex_unlock(&matrix_dev->lock);
+> > > +	vfio_uninit_group_dev(&matrix_mdev->vdev);
+> > >   	kfree(matrix_mdev);
+> > >   err_dec_available:
+> > >   	atomic_inc(&matrix_dev->available_instances);
+> > > @@ -376,9 +377,10 @@ static void vfio_ap_mdev_remove(struct mdev_device *mdev)
+> > >   	mutex_lock(&matrix_dev->lock);
+> > >   	vfio_ap_mdev_reset_queues(matrix_mdev);
+> > >   	list_del(&matrix_mdev->node);
+> > > +	mutex_unlock(&matrix_dev->lock);
+> > > +	vfio_uninit_group_dev(&matrix_mdev->vdev);
+> > >   	kfree(matrix_mdev);
+> > >   	atomic_inc(&matrix_dev->available_instances);  
+> > 
+> > I think the above line of code should be done under the
+> > matrix_dev->lock after removing the matrix_mdev from
+> > the list since it is changing a value in matrix_dev.  
 > 
-> From a trivial check - exactly because I looked at doing it with a
-> script, and decided it's not so easy - I found cases like this:
+> No, the read-side doesn't hold the lock
 > 
-> -               memblock_free(__pa(paca_ptrs) + new_ptrs_size,
-> +               memblock_free(paca_ptrs + new_ptrs_size,
+> 	if ((atomic_dec_if_positive(&matrix_dev->available_instances) < 0))
+> 		return -EPERM;
 > 
-> which is COMPLETELY wrong.
+> I think it is just a leftover from the atomic conversion that Alex
+> did to keep it under the matrix_dev struct.
+> 
+> If we were going to hold the lock then it wouldn't need to be an
+> atomic.
 
-I did use a coccinelle script that's slightly more robust that a sed you've
-sent, but then I did a manual review, hence the two small patches with
-fixes. Indeed I missed this one, so to be on the safe side I'll rename only
-the obvious cases where coccinelle can be used reliably and leave all the
-rest as it's now. If somebody cares enough they can update it later.
- 
-> And no, making the scripting just replace '__pa(x)' with '(void *)(x)'
+Tony, I'd love to get an ack if you're satisfied with this so we can
+close up fixes for v5.15.  Thanks,
 
-These were actually manual and they are required for variables that
-used as virtual addresses but have unsigned long type, like e.g.
-initrd_start. So it's either __pa(x) or (void *).
+Alex
 
--- 
-Sincerely yours,
-Mike.
