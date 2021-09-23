@@ -2,107 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C0FD7415DEC
-	for <lists+kvm@lfdr.de>; Thu, 23 Sep 2021 14:09:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 152C6415DF2
+	for <lists+kvm@lfdr.de>; Thu, 23 Sep 2021 14:11:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240797AbhIWMK5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Sep 2021 08:10:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42768 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240713AbhIWMKz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Sep 2021 08:10:55 -0400
-Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC6DEC061574;
-        Thu, 23 Sep 2021 05:09:23 -0700 (PDT)
-Received: by mail-ed1-x533.google.com with SMTP id eg28so22961491edb.1;
-        Thu, 23 Sep 2021 05:09:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=7FNpljz891PYGt4hpcoO6CG6SoftxC4uPB0i1upIek8=;
-        b=ibVmWXzu1aD8kMpJYIOpTRXb3me3E5LR6UwoOCsWvNvNnF+uIa9MOqneeVmeAC4jSy
-         u8iQVfjlyzy5Bot3fiB87O9Z8hYaLgKQhvn6dxxsD1CX47rf9hISIJ1FG2OVCo/6Fddc
-         GQT6KyMm8LlzTqPvHDJb/59hVBNw0N2ASXsnyaSoFmzWYtPUU1hx4/7/DI2JXhRNMvSQ
-         0OrJh/l7+rxuEIjnY2dM/JEf2FcdxhTKRphIayPivMRwr0GAv+egSx5bYbVEC6KgshFG
-         XtkJarqgWDuAL3T/xdct4cEYsTlbxSjQ6Ka0mjnnB4qpsH+kcIbaRzprqrzwNDLiPoEL
-         csrg==
+        id S240713AbhIWMND (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Sep 2021 08:13:03 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:36047 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S240619AbhIWMNC (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 23 Sep 2021 08:13:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1632399090;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=+ZYLxYRodoRHYx95kXrw1Pr6lp8NG1jW3l7FzybD6ks=;
+        b=HlTX+CNshlIobHWJiISGzSWbgv2NQ/O/blPqBv0jjLG5lmimOA9jR38THx+g7kpzNL1KUD
+        VW5W0lrCCGkQObod982gGbaGUFUrE/5J8tYYQRJT6tJCLE2sd9zUR69hW9JVMNJ1fjY4g1
+        41bIz3SVSP6QWVboXhDEcYDkhcDUs4M=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-21-RdU2kyt3PBOJHXaWIwbfag-1; Thu, 23 Sep 2021 08:11:29 -0400
+X-MC-Unique: RdU2kyt3PBOJHXaWIwbfag-1
+Received: by mail-wr1-f69.google.com with SMTP id z2-20020a5d4c82000000b0015b140e0562so4968232wrs.7
+        for <kvm@vger.kernel.org>; Thu, 23 Sep 2021 05:11:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=7FNpljz891PYGt4hpcoO6CG6SoftxC4uPB0i1upIek8=;
-        b=Irx1rxTq/qVuup12U29s5b4IEOn06p7wwOF0gFAxROS3eScmwEWAGjXYT/BqALwPxq
-         ohMTaUCtwMXZyTNsIYX1M93kK71NeGpxAvmGfXCm2Kbf+f6nRycXv/jTyjmUP+gfxeRX
-         g1wDz9/coI4Udzwh28DOuLh8c7zrOR6MU6CzzooMyobCxRijAioVXBfnaJaH//9byXhO
-         0WYfnLMLI0zNSbB55aFnLj9npaprZQX0taLQQHpsSXpb5w4sv9lbDzTYBu9qb2Yl7A40
-         EMn2AacmdfQ8krYtQuGvJj1CEAzfVwRRKHgMUmaC7KRP2o4VT0bCECuctlcQEuf70/al
-         simQ==
-X-Gm-Message-State: AOAM533CWNySewh2ppvgW3FvaUg5t2lmBeAXoSfD3rhSit6GmCOqtsq/
-        QABgwCTgKbI3KEAFoV0fTQo=
-X-Google-Smtp-Source: ABdhPJz+2RmFRrOTPX9HlyA2A1fEmvS7RoZtYawSlfMhJiIBX2b2m3juOof3jON/2RoPWBdfvvAyYg==
-X-Received: by 2002:a50:9d83:: with SMTP id w3mr5043356ede.305.1632398962313;
-        Thu, 23 Sep 2021 05:09:22 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id ck10sm3353455edb.43.2021.09.23.05.09.07
+        bh=+ZYLxYRodoRHYx95kXrw1Pr6lp8NG1jW3l7FzybD6ks=;
+        b=p5i7P/izMyx3zVbdAnZNxQE/so5HnV2p6Xi6Kf+pAuyi8rvgyBfcHLguuiBBATbW69
+         dfuBuIPWXn2549TGsUbmLjY5G1L/4Hh9bxxtlFtwSLqytgb/XrRRsx9tTMHrZERGMtp7
+         pkcr4Nyaa9agQZRYSF/gJJ2mt7V11ZSUXSWV3uFM3xE2S6LI4Rf7JyU17DGp6BpWJlCZ
+         8tQdBb3dp0Mj8E5uIF4aJuYtecaMV2nvU1w+Ocxupmshk+P5LbtpRbIYbTzdau6F4DKH
+         xbiy0ShMjU8kvSN4NM/2kMD/C45Ixi7KsMBbv31J5TYQbWcNXcLy4Dk/GfmrUTPW6s9G
+         klbg==
+X-Gm-Message-State: AOAM531GOaF8ZWHbJ9+F5evSXDYrWopUvaYp5qj6NfSjAblkGUf29xza
+        8Vh4yAgPV5NtWAYgyYKX0Nk1ivrO2irTIp59m5/EJamK8e8C9UfaLRlcMzUPCUq7U6EBaTgtwwW
+        icwmk0qV0DGXe
+X-Received: by 2002:adf:f2c4:: with SMTP id d4mr4819163wrp.434.1632399088295;
+        Thu, 23 Sep 2021 05:11:28 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxNY86nqoVtoLOCUpc2er0+Hq6REk+ai1lDUo7cRZFqBpegXrsP1oIm5QPG+LF9y1jpw9MiOQ==
+X-Received: by 2002:adf:f2c4:: with SMTP id d4mr4819134wrp.434.1632399088071;
+        Thu, 23 Sep 2021 05:11:28 -0700 (PDT)
+Received: from [192.168.100.42] ([82.142.21.142])
+        by smtp.gmail.com with ESMTPSA id i18sm5174091wrn.64.2021.09.23.05.11.27
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 23 Sep 2021 05:09:21 -0700 (PDT)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Subject: Re: [PATCH 1/2] x86: sgx_vepc: extract sgx_vepc_remove_page
-To:     Jarkko Sakkinen <jarkko@kernel.org>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     x86@kernel.org, linux-sgx@vger.kernel.org,
-        dave.hansen@linux.intel.com, yang.zhong@intel.com
-References: <20210920125401.2389105-1-pbonzini@redhat.com>
- <20210920125401.2389105-2-pbonzini@redhat.com>
- <060cfbbaa2c7a1a0643584aa79e6d6f3ab7c8f64.camel@kernel.org>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a0a2a628-62c5-d620-7714-2c28e4429e71@redhat.com>
-Date:   Thu, 23 Sep 2021 14:08:56 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        Thu, 23 Sep 2021 05:11:27 -0700 (PDT)
+Message-ID: <579a6630-f6c6-3c2c-039e-4182a1033b0f@redhat.com>
+Date:   Thu, 23 Sep 2021 14:11:26 +0200
 MIME-Version: 1.0
-In-Reply-To: <060cfbbaa2c7a1a0643584aa79e6d6f3ab7c8f64.camel@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [PATCH kvm-unit-tests] MAINTAINERS: add S lines
 Content-Language: en-US
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Cc:     Thomas Huth <thuth@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Andrew Jones <drjones@redhat.com>
+References: <20210923114814.229844-1-pbonzini@redhat.com>
+From:   Laurent Vivier <lvivier@redhat.com>
+In-Reply-To: <20210923114814.229844-1-pbonzini@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 21/09/21 21:44, Jarkko Sakkinen wrote:
-> "On bare-metal SGX, start of a power cycle zeros all of its reserved 
-> memory. This happens after every reboot, but in addition to that 
-> happens after waking up from any of the sleep states."
+On 23/09/2021 13:48, Paolo Bonzini wrote:
+> Mark PPC as maintained since it is a bit more stagnant than the rest.
 > 
-> I can speculate and imagine where this might useful, but no matter
-> how trivial or complex it is, this patch needs to nail a concrete
-> usage example. I'd presume you know well the exact changes needed for
-> QEMU, so from that knowledge it should be easy to write the
-> motivational part.
+> Everything else is supported---strange but true.
+> 
+> Cc: Laurent Vivier <lvivier@redhat.com>
+> Cc: Thomas Huth <thuth@redhat.com>
+> Cc: Janosch Frank <frankja@linux.ibm.com>
+> Cc: Andrew Jones <drjones@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>   MAINTAINERS | 5 +++++
+>   1 file changed, 5 insertions(+)
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 89b21c2..4fc01a5 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -56,6 +56,7 @@ Maintainers
+>   M: Paolo Bonzini <pbonzini@redhat.com>
+>   M: Thomas Huth <thuth@redhat.com>
+>   M: Andrew Jones <drjones@redhat.com>
+> +S: Supported
+>   L: kvm@vger.kernel.org
+>   T: https://gitlab.com/kvm-unit-tests/kvm-unit-tests.git
+>   
+> @@ -64,6 +65,7 @@ Architecture Specific Code:
+>   
+>   ARM
+>   M: Andrew Jones <drjones@redhat.com>
+> +S: Supported
+>   L: kvm@vger.kernel.org
+>   L: kvmarm@lists.cs.columbia.edu
+>   F: arm/*
+> @@ -74,6 +76,7 @@ T: https://gitlab.com/rhdrjones/kvm-unit-tests.git
+>   POWERPC
+>   M: Laurent Vivier <lvivier@redhat.com>
+>   M: Thomas Huth <thuth@redhat.com>
+> +S: Maintained
+>   L: kvm@vger.kernel.org
+>   L: kvm-ppc@vger.kernel.org
+>   F: powerpc/*
+> @@ -83,6 +86,7 @@ F: lib/ppc64/*
+>   S390X
+>   M: Thomas Huth <thuth@redhat.com>
+>   M: Janosch Frank <frankja@linux.ibm.com>
+> +S: Supported
+>   R: Cornelia Huck <cohuck@redhat.com>
+>   R: Claudio Imbrenda <imbrenda@linux.ibm.com>
+>   R: David Hildenbrand <david@redhat.com>
+> @@ -93,6 +97,7 @@ F: lib/s390x/*
+>   
+>   X86
+>   M: Paolo Bonzini <pbonzini@redhat.com>
+> +S: Supported
+>   L: kvm@vger.kernel.org
+>   F: x86/*
+>   F: lib/x86/*
+> 
 
-Assuming that it's obvious that QEMU knows how to reset a machine (which 
-includes writes to the ACPI reset register, or wakeup from sleep 
-states), the question of "why does userspace reuse vEPC" should be 
-answered by this paragraph:
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
 
-"One way to do this is to simply close and reopen the /dev/sgx_vepc file
-descriptor and re-mmap the virtual EPC.  However, this is problematic
-because it prevents sandboxing the userspace (for example forbidding
-open() after the guest starts, or running in a mount namespace that
-does not have access to /dev; both are doable with pre-opened file
-descriptors and/or SCM_RIGHTS file descriptor passing)."
-
-> Even to a Linux guest, since EPC should stil be represented in the
-> state that matches the hardware.  It'd be essentially a corrupted
-> state, even if there was measures to resist this. Windows guests
-> failing is essentially a side-effect of an issue, not an issue in the
-> Windows guests.
-
-Right, Linux is more liberal than it needs to be and ksgxd does the 
-EREMOVE itself at the beginning (__sgx_sanitize_pages).  Windows has 
-stronger expectations of what can and cannot happen before it boots, 
-which are entirely justified.
-
-Paolo
