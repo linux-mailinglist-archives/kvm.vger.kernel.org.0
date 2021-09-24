@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D41124178AD
-	for <lists+kvm@lfdr.de>; Fri, 24 Sep 2021 18:33:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 70B614178C7
+	for <lists+kvm@lfdr.de>; Fri, 24 Sep 2021 18:33:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347728AbhIXQeP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Sep 2021 12:34:15 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:43241 "EHLO
+        id S1347421AbhIXQe4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Sep 2021 12:34:56 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:29353 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1347562AbhIXQdo (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 24 Sep 2021 12:33:44 -0400
+        by vger.kernel.org with ESMTP id S1347534AbhIXQdn (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 24 Sep 2021 12:33:43 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632501131;
+        s=mimecast20190719; t=1632501129;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=iM8RwW4DuJD/gTDxpnUKn09Mj0cXhEPEhrCBKhqSA4M=;
-        b=ftX3Cc2NPj3kvckBsuAqB8KfZ81Nk5mZH/By4AotYtw7cDKmi+ngBe+CV3Ki7FrHgr0Ex3
-        tvJM5wvUHBZavbbEBWlqwerVrJ3JSW6iJBUKPIbgZzJryjQQT826XSY8Fc6ZgKVBpyjDrn
-        eUaYZSbHN4sNMdhKOBvwIxfPYWRbX2U=
+        bh=Gn1zn/rbvliUrNM/Z2t5HEAi7A10SPc9HMnuFcnoNQ4=;
+        b=LT8xdGMdp+atqUyuhHiG+jqxErpUPNNKk79zQJumLgazTZnENcgJaYs9pQObvfC3bHgBHY
+        ftsd96E6ZnnWYRztJDT/ffJ7VOK62At17U3am9AKwGM80ocvqie/O6sBufMBrRhsdLWgCx
+        fHx3F9/ItDmmkGGNXWWfemjEp1nZBJE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-220-MbgS6LCRNH-j2-OYfPUF6A-1; Fri, 24 Sep 2021 12:32:06 -0400
-X-MC-Unique: MbgS6LCRNH-j2-OYfPUF6A-1
+ us-mta-296-j9x7XY8ZOlaH22ns46zx6g-1; Fri, 24 Sep 2021 12:32:08 -0400
+X-MC-Unique: j9x7XY8ZOlaH22ns46zx6g-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D078991275;
-        Fri, 24 Sep 2021 16:32:05 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9E04F802E71;
+        Fri, 24 Sep 2021 16:32:06 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4CFC75C1CF;
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E5B9F795B0;
         Fri, 24 Sep 2021 16:32:05 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     dmatlack@google.com, seanjc@google.com
-Subject: [PATCH v3 21/31] KVM: x86/mmu: Avoid memslot lookup in page_fault_handle_page_track
-Date:   Fri, 24 Sep 2021 12:31:42 -0400
-Message-Id: <20210924163152.289027-22-pbonzini@redhat.com>
+Subject: [PATCH v3 22/31] KVM: MMU: inline set_spte in mmu_set_spte
+Date:   Fri, 24 Sep 2021 12:31:43 -0400
+Message-Id: <20210924163152.289027-23-pbonzini@redhat.com>
 In-Reply-To: <20210924163152.289027-1-pbonzini@redhat.com>
 References: <20210924163152.289027-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -48,92 +48,78 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: David Matlack <dmatlack@google.com>
+Since the two callers of set_spte do different things with the results,
+inlining it actually makes the code simpler to reason about.  For example,
+mmu_set_spte looks quite like tdp_mmu_map_handle_target_level, but the
+similarity is hidden by set_spte.
 
-Now that kvm_page_fault has a pointer to the memslot it can be passed
-down to the page tracking code to avoid a redundant slot lookup.
-
-No functional change intended.
-
-Signed-off-by: David Matlack <dmatlack@google.com>
-Message-Id: <20210813203504.2742757-5-dmatlack@google.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/include/asm/kvm_page_track.h |  2 ++
- arch/x86/kvm/mmu/mmu.c                |  2 +-
- arch/x86/kvm/mmu/page_track.c         | 20 +++++++++++++-------
- 3 files changed, 16 insertions(+), 8 deletions(-)
+ arch/x86/kvm/mmu/mmu.c | 31 ++++++++++++++++---------------
+ 1 file changed, 16 insertions(+), 15 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_page_track.h b/arch/x86/include/asm/kvm_page_track.h
-index 6a5f3acf2b33..9cd9230e5cc8 100644
---- a/arch/x86/include/asm/kvm_page_track.h
-+++ b/arch/x86/include/asm/kvm_page_track.h
-@@ -61,6 +61,8 @@ void kvm_slot_page_track_remove_page(struct kvm *kvm,
- 				     enum kvm_page_track_mode mode);
- bool kvm_page_track_is_active(struct kvm_vcpu *vcpu, gfn_t gfn,
- 			      enum kvm_page_track_mode mode);
-+bool kvm_slot_page_track_is_active(struct kvm_memory_slot *slot, gfn_t gfn,
-+				   enum kvm_page_track_mode mode);
- 
- void
- kvm_page_track_register_notifier(struct kvm *kvm,
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 754578458cb7..d63fe7b10bd1 100644
+index d63fe7b10bd1..6ba7c60bd4f8 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3819,7 +3819,7 @@ static bool page_fault_handle_page_track(struct kvm_vcpu *vcpu,
- 	 * guest is writing the page which is write tracked which can
- 	 * not be fixed by page fault handler.
- 	 */
--	if (kvm_page_track_is_active(vcpu, fault->gfn, KVM_PAGE_TRACK_WRITE))
-+	if (kvm_slot_page_track_is_active(fault->slot, fault->gfn, KVM_PAGE_TRACK_WRITE))
- 		return true;
- 
- 	return false;
-diff --git a/arch/x86/kvm/mmu/page_track.c b/arch/x86/kvm/mmu/page_track.c
-index 21427e84a82e..859800f7bb95 100644
---- a/arch/x86/kvm/mmu/page_track.c
-+++ b/arch/x86/kvm/mmu/page_track.c
-@@ -136,19 +136,14 @@ void kvm_slot_page_track_remove_page(struct kvm *kvm,
- }
- EXPORT_SYMBOL_GPL(kvm_slot_page_track_remove_page);
- 
--/*
-- * check if the corresponding access on the specified guest page is tracked.
-- */
--bool kvm_page_track_is_active(struct kvm_vcpu *vcpu, gfn_t gfn,
--			      enum kvm_page_track_mode mode)
-+bool kvm_slot_page_track_is_active(struct kvm_memory_slot *slot, gfn_t gfn,
-+				   enum kvm_page_track_mode mode)
+@@ -2700,10 +2700,12 @@ static int mmu_set_spte(struct kvm_vcpu *vcpu, u64 *sptep,
+ 			gfn_t gfn, kvm_pfn_t pfn, bool speculative,
+ 			bool host_writable)
  {
--	struct kvm_memory_slot *slot;
- 	int index;
++	struct kvm_mmu_page *sp = sptep_to_sp(sptep);
+ 	int was_rmapped = 0;
+-	int set_spte_ret;
+ 	int ret = RET_PF_FIXED;
+ 	bool flush = false;
++	int make_spte_ret;
++	u64 spte;
  
- 	if (WARN_ON(!page_track_mode_is_valid(mode)))
- 		return false;
+ 	pgprintk("%s: spte %llx write_fault %d gfn %llx\n", __func__,
+ 		 *sptep, write_fault, gfn);
+@@ -2734,30 +2736,29 @@ static int mmu_set_spte(struct kvm_vcpu *vcpu, u64 *sptep,
+ 			was_rmapped = 1;
+ 	}
  
--	slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
- 	if (!slot)
- 		return false;
- 
-@@ -156,6 +151,17 @@ bool kvm_page_track_is_active(struct kvm_vcpu *vcpu, gfn_t gfn,
- 	return !!READ_ONCE(slot->arch.gfn_track[mode][index]);
- }
- 
-+/*
-+ * check if the corresponding access on the specified guest page is tracked.
-+ */
-+bool kvm_page_track_is_active(struct kvm_vcpu *vcpu, gfn_t gfn,
-+			      enum kvm_page_track_mode mode)
-+{
-+	struct kvm_memory_slot *slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
+-	set_spte_ret = set_spte(vcpu, sptep, pte_access, level, gfn, pfn,
+-				speculative, true, host_writable);
+-	if (set_spte_ret & SET_SPTE_WRITE_PROTECTED_PT) {
++	make_spte_ret = make_spte(vcpu, pte_access, level, gfn, pfn, *sptep, speculative,
++				 true, host_writable, sp_ad_disabled(sp), &spte);
 +
-+	return kvm_slot_page_track_is_active(slot, gfn, mode);
-+}
++	if (*sptep == spte) {
++		ret = RET_PF_SPURIOUS;
++	} else {
++		trace_kvm_mmu_set_spte(level, gfn, sptep);
++		flush |= mmu_spte_update(sptep, spte);
++	}
 +
- void kvm_page_track_cleanup(struct kvm *kvm)
- {
- 	struct kvm_page_track_notifier_head *head;
++	if (make_spte_ret & SET_SPTE_WRITE_PROTECTED_PT) {
+ 		if (write_fault)
+ 			ret = RET_PF_EMULATE;
+ 	}
+ 
+-	if (set_spte_ret & SET_SPTE_NEED_REMOTE_TLB_FLUSH || flush)
++	if (flush)
+ 		kvm_flush_remote_tlbs_with_address(vcpu->kvm, gfn,
+ 				KVM_PAGES_PER_HPAGE(level));
+ 
+-	/*
+-	 * The fault is fully spurious if and only if the new SPTE and old SPTE
+-	 * are identical, and emulation is not required.
+-	 */
+-	if ((set_spte_ret & SET_SPTE_SPURIOUS) && ret == RET_PF_FIXED) {
+-		WARN_ON_ONCE(!was_rmapped);
+-		return RET_PF_SPURIOUS;
+-	}
+-
+ 	pgprintk("%s: setting spte %llx\n", __func__, *sptep);
+-	trace_kvm_mmu_set_spte(level, gfn, sptep);
+ 
+ 	if (!was_rmapped) {
++		WARN_ON_ONCE(ret == RET_PF_SPURIOUS);
+ 		kvm_update_page_stats(vcpu->kvm, level, 1);
+ 		rmap_add(vcpu, sptep, gfn);
+ 	}
 -- 
 2.27.0
 
