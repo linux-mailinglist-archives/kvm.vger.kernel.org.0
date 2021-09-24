@@ -2,163 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ADCC8417903
-	for <lists+kvm@lfdr.de>; Fri, 24 Sep 2021 18:43:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3638E417A00
+	for <lists+kvm@lfdr.de>; Fri, 24 Sep 2021 19:49:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343652AbhIXQpU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Sep 2021 12:45:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:39345 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233969AbhIXQpT (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 24 Sep 2021 12:45:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632501826;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=2ayfGdTCBtiqgPiJaceqi1OGn0mBN7usLeKdCjt4NNw=;
-        b=Et+NPhxDCb8MUTmqcsquftp1YII6Fa+6JCf0GTd5UaSoz3z5EPl1NakfokzDae4veSg+Zn
-        LYQIAuu56YTpo1yfOt9G1Ba8UIsMWrD4+pw/OuHQfc8q2yrQoUL/Icl6iLCEIwKeHC0iXM
-        wYMMHvenrhWwxVdM2tDStpE/wLyRIu4=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-346-hxXd30D_MM-di50BrDBdRg-1; Fri, 24 Sep 2021 12:43:45 -0400
-X-MC-Unique: hxXd30D_MM-di50BrDBdRg-1
-Received: by mail-ed1-f69.google.com with SMTP id m20-20020aa7c2d4000000b003d1add00b8aso10931137edp.0
-        for <kvm@vger.kernel.org>; Fri, 24 Sep 2021 09:43:44 -0700 (PDT)
+        id S1344701AbhIXRu2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Sep 2021 13:50:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56298 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1343935AbhIXRu1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Sep 2021 13:50:27 -0400
+Received: from mail-qk1-x734.google.com (mail-qk1-x734.google.com [IPv6:2607:f8b0:4864:20::734])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37188C061571
+        for <kvm@vger.kernel.org>; Fri, 24 Sep 2021 10:48:54 -0700 (PDT)
+Received: by mail-qk1-x734.google.com with SMTP id f130so28910463qke.6
+        for <kvm@vger.kernel.org>; Fri, 24 Sep 2021 10:48:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=yoEgOEHGEfKDPPB50DM9Q3Ht4ndinHKWIXanXTejSuM=;
+        b=ZTwbzaLo9ESWXi2KsjQmX5+btl0GuHKmULyhje0thd0GiJAZcxUjdIhHZ+ahAKNJFz
+         EbBepDcYycb0aRDoBaHYrtTO3L7fyEAYAag6C14+oJdaAu6UAplOBKEEYEVGpLQjro3Q
+         NaRdVk6iGyb1gSQm51Z+BQOBGbaZE8XTUXbB/Z3budv4eczrjy6FO4m0DpXOv2jEpe+J
+         MpNUOSIBPYnykeYuMOva/KH0QFuxrLuSxLJvVPD7HjVCJ3Ni5i3flWj+nZbuouMj2znv
+         piFvdjfr9l2uVofPGlmkK+9dU/d7XLCChvp7iqVWeez6b4XPynH/XAV+rgKwqDycK58K
+         OFAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=2ayfGdTCBtiqgPiJaceqi1OGn0mBN7usLeKdCjt4NNw=;
-        b=s+7Dx8GRGy5X3QPuQzbbpk5Y6DszGeFn4ML87yTLORCG5H8Od5imreQB8DJ3O+nc5B
-         R9dxWAFnjtMJfcIet5TK3opbG/GDDFgI5lERvTWJeXA1JAPetz/So/BdLSDWRSL2QtPl
-         iCXdJ9ingeQxUr2Fsh85JkwDo7iIko4KIfX75J7KbSWN4/CABVjFmT0peCvvt24Rnno1
-         q+6J6eeM9xlNW7t4TSv4iqzoXXV781BABBndrCR2KgVKY6I2mFzsEEY41UnQ2uq+O75Z
-         ZgnMrDnvYGDYoeRFxWIScAce7oGuM4veAE067irqQbqyklFI/N9+zm/DUuK82CNnOIS1
-         4a8A==
-X-Gm-Message-State: AOAM531jPVWcYDXs49M4+5EJ6nUhCBxmtFYF60Ug3p3rbuyubhBOWHX9
-        tHT6qYHh5ZH5isI2LMITq4dHsXHikgKt8Iv7JM5TTsO2/Y3RjDM2zA8ptwzcnBYQ/NHLf+X+S8W
-        +tjJxB0gjSIXW
-X-Received: by 2002:a17:906:1484:: with SMTP id x4mr12169309ejc.72.1632501823822;
-        Fri, 24 Sep 2021 09:43:43 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy+Yv3J2nN2uB7FgYH5ZxA5zjL/80SexpKmfVSqrcDD0N8I1bfA249hQ9sfmzeDIxBqSeb+tQ==
-X-Received: by 2002:a17:906:1484:: with SMTP id x4mr12169286ejc.72.1632501823639;
-        Fri, 24 Sep 2021 09:43:43 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id z3sm5228855eju.34.2021.09.24.09.43.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 24 Sep 2021 09:43:43 -0700 (PDT)
-Message-ID: <9982d53a-8160-d7f7-09eb-ea640f99136b@redhat.com>
-Date:   Fri, 24 Sep 2021 18:43:41 +0200
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=yoEgOEHGEfKDPPB50DM9Q3Ht4ndinHKWIXanXTejSuM=;
+        b=YxgCnjdpidt6TL8nQ6jT+3OYfshTdiplNzDZQuwpT+RdZMP2qkXM/tnOpJUwtIXpWB
+         jZJ5vI5CQ4BsHNdH6+nkedy+cOFKhNUJqi5vmgEztgIC3tgL9IeEYYAgPGkLOHyRLOqJ
+         i3F7D65f9cWBSByQQNkwEm8Jsrl2xbE6JIA0foI2VnjR8kXib1Yygibdmf5dsQ6uHlJu
+         YMuFwzLpXoVnhHIoNtCtEbiGChT/eM3JMbCmOrNXrOIyXeDyrcBCQZ+hq4HBhnKPDrum
+         Ijyls4gnOPt2R9L89D3hXSTFdqXvBPk+0BGoOAvRr92sVsVdLOK/uOCupivUfK9kE6Dz
+         p+kw==
+X-Gm-Message-State: AOAM532+E+mcmwvNL6VejCissFBIUvpV7+OmWmOl6SpoWio3ErjRMLaK
+        b9Q0h/+1p118aM463n0bGqPr7g==
+X-Google-Smtp-Source: ABdhPJz6QpqSWau+vaijaHsn7z+Hvc/Gm9sZZYU/ZA9TLvhi9KIWmLagix73WKn9aG0bPRI9zittVQ==
+X-Received: by 2002:a37:88a:: with SMTP id 132mr11655424qki.151.1632505733448;
+        Fri, 24 Sep 2021 10:48:53 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-162-113-129.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.129])
+        by smtp.gmail.com with ESMTPSA id q5sm963643qkl.64.2021.09.24.10.48.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 24 Sep 2021 10:48:52 -0700 (PDT)
+Received: from jgg by mlx with local (Exim 4.94)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1mTpJc-005FPz-AF; Fri, 24 Sep 2021 14:48:52 -0300
+Date:   Fri, 24 Sep 2021 14:48:52 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Terrence Xu <terrence.xu@intel.com>, kvm@vger.kernel.org
+Subject: Re: [PATCH 13/15] vfio/iommu_type1: initialize pgsize_bitmap in
+ ->open
+Message-ID: <20210924174852.GZ3544071@ziepe.ca>
+References: <20210924155705.4258-1-hch@lst.de>
+ <20210924155705.4258-14-hch@lst.de>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [PATCH v8 0/9] selftests: KVM: Test offset-based counter controls
-Content-Language: en-US
-To:     Oliver Upton <oupton@google.com>, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-arm-kernel@lists.infradead.org,
-        Andrew Jones <drjones@redhat.com>,
-        Will Deacon <will@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>
-References: <20210916181555.973085-1-oupton@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20210916181555.973085-1-oupton@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210924155705.4258-14-hch@lst.de>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 16/09/21 20:15, Oliver Upton wrote:
-> This series implements new tests for the x86 and arm64 counter migration
-> changes that I've mailed out. These are sent separately as a dependent
-> change since there are cross-arch dependencies here.
+On Fri, Sep 24, 2021 at 05:57:03PM +0200, Christoph Hellwig wrote:
+> Ensure pgsize_bitmap is always valid by initializing it to ULONG_MAX
+> in vfio_iommu_type1_open and remove the now pointless update for
+> the external domain case in vfio_iommu_type1_attach_group, which was
+> just setting pgsize_bitmap to ULONG_MAX when only external domains
+> were attached.
 > 
-> Patch 1 yanks the pvclock headers into the tools/ directory so we can
-> make use of them within a KVM selftest guest.
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+>  drivers/vfio/vfio_iommu_type1.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> Patch 2 tests the new capabilities of the KVM_*_CLOCK ioctls, ensuring
-> that the kernel accounts for elapsed time when restoring the KVM clock.
-> 
-> Patches 3-4 add some device attribute helpers and clean up some mistakes
-> in the assertions thereof.
-> 
-> Patch 5 implements a test for the KVM_VCPU_TSC_OFFSET attribute,
-> asserting that manipulation of the offset results in correct TSC values
-> within the guest.
-> 
-> Patch 6 adds basic arm64 support to the counter offset test, checking
-> that the virtual counter-timer offset works correctly. Patch 7 does the
-> same for the physical counter-timer offset.
-> 
-> Patch 8 adds a benchmark for physical counter offsetting, since most
-> implementations available right now will rely on emulation.
-> 
-> Lastly, patch 9 extends the get-reg-list test to check for
-> KVM_REG_ARM_TIMER_OFFSET if userspace opts-in to the kernel capability.
-> 
-> This series applies cleanly to 5.15-rc1
-> 
-> Tests were ran against the respective architecture changes on the
-> following systems:
-> 
->   - Haswell (x86)
->   - Ampere Mt. Jade (non-ECV, nVHE and VHE)
+> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> index a48e9f597cb213..2c698e1a29a1d8 100644
+> +++ b/drivers/vfio/vfio_iommu_type1.c
+> @@ -2196,7 +2196,6 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+>  		if (!iommu->external_domain) {
+>  			INIT_LIST_HEAD(&domain->group_list);
+>  			iommu->external_domain = domain;
+> -			vfio_update_pgsize_bitmap(iommu);
+>  		} else {
+>  			kfree(domain);
+>  		}
+> @@ -2582,6 +2581,7 @@ static void *vfio_iommu_type1_open(unsigned long arg)
+>  	mutex_init(&iommu->lock);
+>  	BLOCKING_INIT_NOTIFIER_HEAD(&iommu->notifier);
+>  	init_waitqueue_head(&iommu->vaddr_wait);
+> +	iommu->pgsize_bitmap = ULONG_MAX;
 
-Queued patches 1-5, thanks.
+I wonder if this needs the PAGE_MASK/SIZE stuff?
 
-Paolo
+   iommu->pgsize_bitmap = ULONG_MASK & PAGE_MASK;
 
-> v7: https://lore.kernel.org/r/20210816001246.3067312-1-oupton@google.com
-> 
-> v7 -> v8:
->   - Rebased to 5.15-rc1
->   - Dropped helper for checking if reg exists in reg list (no longer
->     necessary)
->   - Test and enable KVM_CAP_ARM_VTIMER_OFFSET
->   - Add get-reg-list changes
-> 
-> Oliver Upton (9):
->    tools: arch: x86: pull in pvclock headers
->    selftests: KVM: Add test for KVM_{GET,SET}_CLOCK
->    selftests: KVM: Fix kvm device helper ioctl assertions
->    selftests: KVM: Add helpers for vCPU device attributes
->    selftests: KVM: Introduce system counter offset test
->    selftests: KVM: Add support for aarch64 to system_counter_offset_test
->    selftests: KVM: Test physical counter offsetting
->    selftests: KVM: Add counter emulation benchmark
->    selftests: KVM: Test vtimer offset reg in get-reg-list
-> 
->   tools/arch/x86/include/asm/pvclock-abi.h      |  48 ++++
->   tools/arch/x86/include/asm/pvclock.h          | 103 ++++++++
->   tools/testing/selftests/kvm/.gitignore        |   3 +
->   tools/testing/selftests/kvm/Makefile          |   4 +
->   .../kvm/aarch64/counter_emulation_benchmark.c | 207 ++++++++++++++++
->   .../selftests/kvm/aarch64/get-reg-list.c      |  42 ++++
->   .../selftests/kvm/include/aarch64/processor.h |  24 ++
->   .../testing/selftests/kvm/include/kvm_util.h  |  11 +
->   tools/testing/selftests/kvm/lib/kvm_util.c    |  44 +++-
->   .../kvm/system_counter_offset_test.c          | 220 ++++++++++++++++++
->   .../selftests/kvm/x86_64/kvm_clock_test.c     | 204 ++++++++++++++++
->   11 files changed, 907 insertions(+), 3 deletions(-)
->   create mode 100644 tools/arch/x86/include/asm/pvclock-abi.h
->   create mode 100644 tools/arch/x86/include/asm/pvclock.h
->   create mode 100644 tools/testing/selftests/kvm/aarch64/counter_emulation_benchmark.c
->   create mode 100644 tools/testing/selftests/kvm/system_counter_offset_test.c
->   create mode 100644 tools/testing/selftests/kvm/x86_64/kvm_clock_test.c
-> 
+?
 
+vfio_update_pgsize_bitmap() goes to some trouble to avoid setting bits
+below the CPU page size here
+
+Jason
