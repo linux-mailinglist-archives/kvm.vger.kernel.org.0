@@ -2,52 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E9BE341757C
-	for <lists+kvm@lfdr.de>; Fri, 24 Sep 2021 15:23:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ED9A541757B
+	for <lists+kvm@lfdr.de>; Fri, 24 Sep 2021 15:23:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345985AbhIXNYz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Sep 2021 09:24:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49818 "EHLO
+        id S1345526AbhIXNYy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Sep 2021 09:24:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49542 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345612AbhIXNYs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1344913AbhIXNYs (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 24 Sep 2021 09:24:48 -0400
-Received: from mail-wr1-x44a.google.com (mail-wr1-x44a.google.com [IPv6:2a00:1450:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52EF3C061787
-        for <kvm@vger.kernel.org>; Fri, 24 Sep 2021 05:54:03 -0700 (PDT)
-Received: by mail-wr1-x44a.google.com with SMTP id j16-20020adfa550000000b0016012acc443so7988321wrb.14
-        for <kvm@vger.kernel.org>; Fri, 24 Sep 2021 05:54:03 -0700 (PDT)
+Received: from mail-qk1-x749.google.com (mail-qk1-x749.google.com [IPv6:2607:f8b0:4864:20::749])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16698C061788
+        for <kvm@vger.kernel.org>; Fri, 24 Sep 2021 05:54:05 -0700 (PDT)
+Received: by mail-qk1-x749.google.com with SMTP id v14-20020a05620a0f0e00b0043355ed67d1so32214391qkl.7
+        for <kvm@vger.kernel.org>; Fri, 24 Sep 2021 05:54:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=OK6zX7a7Qmpm9rcrKEHoYPqhV/r9BP9zx58SZZJogJ0=;
-        b=GNrClkroJVv0xqGduCn431JjZYAgBcefo+GE2TtYTnpcG56X7HcTUhuRaLKJwneHtE
-         eSL4iKbTDAxftMm+g7YkiMcfTB5GLfW11rOgyvSI/bXARk1QentPTxUFSjZ3nZDWgtJN
-         FRMfEPmokHDXnbzKTDL10PC9zZ71dVwOLJIOGRjlnKvUOmU1MzuIHy2ZeGdR7tHderJS
-         nqkwYljbsEaTvhdirFplNdFPitdYKaHLa85GXk++V/vBi4FyFZlBGbMi1JehX4vJixKB
-         MhVKCofHHsmuf9wwcd8UHhQPyfR32ofqDqOySXA1+3kmeeQbQAZo62i8fUQi0pYU/mTX
-         vIEg==
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=+LaJv4Ut995m+xStn+CJit8kroqDB8BrAul4VeyUpto=;
+        b=WJfhJpBhFcx1yU6q2A5dq5o7v7/qoJ76LzW3bnFH/OqCKw8Y4BBx7H1VMcJ4tZ7Q84
+         ycy5/fqgEuZ65y0fbocguVBTBdv8nbPd9ycSN1MZ/ZAy6kKPqAOs9K4UgY4nk42W8VDA
+         jvZpEP6TxuYQ0tLZJycyC0xa/yoyJRa/NGylRXWjBBIUJSwBl6H90fh73Dket8vr+QbB
+         RlBOGE1MBPLxUDMmPF6uPJF2HxT5qdB3y0sJhY2yBAnQRIjroQ1eZj05uFdc4MjgZAGX
+         VAbsty9cYie2RSCLZF24ZKZDUxnrL0oCE+b2BWloYYD1AWXMRq+QxF3CHa+gXfriviqy
+         qWfw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=OK6zX7a7Qmpm9rcrKEHoYPqhV/r9BP9zx58SZZJogJ0=;
-        b=BtuvP1MWC6zCXOFw6r8P75b69GgGgcViBs822BghX9LvPoxXxuSNASTqs9Oylv6mx8
-         fVKmz3ZGnnmXVNvaBH0ImYB5dxfW5TIvFSNasSO1uvpV/Xtttd7S/EOT9LYRutcl/D57
-         850gCXcTG9tTvi4q/hMDCk0EvAZF5PXkIImYjsf0O84pxA8+1KxIP7v5IhWtWjHUhp0A
-         aHrWVM9P2Ml3AqmvKtxGUhiTS/aDYL60jq4dSY7JlltAPyG5CJXlVPuhTGdOS2MaNupL
-         0z0KhiGDMsk4g9nT8aWFGJWDgGKTHLzoy/J5LnWMPS8Rhjt6fCsxR/M2tcqNSxXgIP47
-         9TLg==
-X-Gm-Message-State: AOAM531diFYnWapVmAyDD8oRuE2s3zwDTSrI98z5hlCqRkqlK5XHcydo
-        gQPKqt89FsGk0q8ti7l9a0ZFKYNu7g==
-X-Google-Smtp-Source: ABdhPJwbJMTUwuBvfVMKqt+69OKDT6aY4QYIvI5Vf0wA9E0WLxB6W8XSl5oavUA13H1PTMaEnRHHfEPidg==
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=+LaJv4Ut995m+xStn+CJit8kroqDB8BrAul4VeyUpto=;
+        b=p6rAKzfnfJlJcNXDScsF7QxjIk9DsIB0//4dYr6xmYh6UXyKbiU6sqLZP7T93lYW4P
+         VWFbYsSJtxhgj71bpI8wXYT3I4FGoC5FGoqPQ6GjKniUfLU1KkOBLq4Bxj6Z+wr9yLY8
+         v0e5dm1fmSzDECun6LKUxQzFKJiIlLczKufA24+BtYGtEoGhDRkAF/Jog78hd54KLJgO
+         Xu/wqY0OZ/AJkpKVkzorHWyvR4/GypfbtUBrjPcNi5mW9Jjn3Gc0pcXVrm4ObfeZkx1S
+         knkevvEx/C+wwxZJ48IhXRqP3+XhAYL+zuaN8+MP52gePvr2cTVgsslFJUZc6mHVR2C8
+         UaGA==
+X-Gm-Message-State: AOAM531X4ja/j+6kxOI/4knjCAXAQLcpGBahz2vCwl0OWpKvzc9YMhkf
+        oTNiyNg/SfqwXHPpWDyhI4j3IMtHcg==
+X-Google-Smtp-Source: ABdhPJz8XJjf9DmrCXNeHJp2ahBQOSArt9tPtY1bK5GAiDObokO9lS6nGswDDTChpYk6XAR7Ybe+AHcL3Q==
 X-Received: from tabba.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:482])
- (user=tabba job=sendgmr) by 2002:a05:600c:22d6:: with SMTP id
- 22mr2005356wmg.17.1632488041842; Fri, 24 Sep 2021 05:54:01 -0700 (PDT)
-Date:   Fri, 24 Sep 2021 13:53:29 +0100
-Message-Id: <20210924125359.2587041-1-tabba@google.com>
+ (user=tabba job=sendgmr) by 2002:a05:6214:1372:: with SMTP id
+ c18mr9505426qvw.28.1632488043829; Fri, 24 Sep 2021 05:54:03 -0700 (PDT)
+Date:   Fri, 24 Sep 2021 13:53:30 +0100
+In-Reply-To: <20210924125359.2587041-1-tabba@google.com>
+Message-Id: <20210924125359.2587041-2-tabba@google.com>
 Mime-Version: 1.0
+References: <20210924125359.2587041-1-tabba@google.com>
 X-Mailer: git-send-email 2.33.0.685.g46640cef36-goog
-Subject: [RFC PATCH v1 00/30] Reduce scope of vcpu state at hyp by refactoring
- out state hyp needs
+Subject: [RFC PATCH v1 01/30] KVM: arm64: placeholder to check if VM is protected
 From:   Fuad Tabba <tabba@google.com>
 To:     kvmarm@lists.cs.columbia.edu
 Cc:     maz@kernel.org, will@kernel.org, james.morse@arm.com,
@@ -61,140 +64,37 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+Add a function to check whether a VM is protected (under pKVM).
+Since the creation of protected VMs isn't enabled yet, this is a
+placeholder that always returns false. The intention is for this
+to become a check for protected VMs in the future (see Will's RFC).
 
-This is a prolog to a series where we try to maintain virtual machine and vcpu
-state for protected VMs at the hypervisor [1].
+No functional change intended.
 
-The main issue is that in KVM, the VM state (struct kvm) and the vcpu state
-(struct kvm_vcpu) are created by the host and are always accessible by it. For
-protected VMs (pKVM [2]), only the hypervisor should have access to their state
-and not trust the host to access it. Therefore, the hypervisor should maintain
-a copy of VM state for all protected VMs to use that is not accessible by the
-host.
+Acked-by: Will Deacon <will@kernel.org>
+Signed-off-by: Fuad Tabba <tabba@google.com>
 
-The problem with using and with maintaining a copy of the existing kvm_vcpu
-struct at the hypervisor is that it's big. Depending on the configuration, it
-is in the order of 10kB (ymmv) per vcpu. Whereas most of what it needs to run a
-VM is the kvm_cpu_ctxt and some hyp-related registers and flags, which amount
-to less than 2kB. Many of the functions use the vcpu struct when all they
-access is kvm_cpu_ctxt. Other functions only need that as well as a few
-hypervisor state variables. Moreover, we would like to use the existing code,
-rather than write new code for protected VMs that use new or special
-structures.
+Link: https://lore.kernel.org/kvmarm/20210603183347.1695-1-will@kernel.org/
+---
+ arch/arm64/include/asm/kvm_host.h | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-This patch series reduces the scope of the functions that only need
-kvm_cpu_ctxt to just that. It also takes out the few elements that are relevant
-to the hypervisor from kvm_vcpu_arch into a new structure, vcpu_hyp_state. This
-allows the remainder of the series to reduce the scope of everything accessed
-by the hypervisor, at least for protected VMs, to kvm_cpu_ctxt and
-vcpu_hyp_state (and maybe vgic if supported for protected VMs).
-
-This series uses coccinelle semantic patches [3] as much as possible when
-changes are made repetitively across many files. All patches that use
-coccinelle are prefixed with COCCI.
-
-Based on Linux 5.13-rc6.
-
-Cheers,
-/fuad
-
-[1] https://android-kvm.googlesource.com/linux/+/refs/heads/tabba/el2-state-cocci-out
-
-[2] Once complete, protected KVM adds the ability to create protected VMs.
-These protected VMs are protected from the host Linux kernel (and from other
-VMs), where the host does not have access to guest memory,even if compromised.
-Normal (nVHE) guests can still be created and run in parallel with protected
-VMs. Their functionality should not be affected.
-
-For protected VMs, the host should not even have access to a protected guest's
-state or anything that would enable it to manipulate it (e.g., vcpu register
-context and el2 system registers); only hyp would have that access. If the host
-could access that state, then it might be able to get around the protection
-provided.  Therefore, anything that is sensitive and that would require such
-access needs to happen at hyp, hence the code in nvhe running only at hyp.
-
-For more details about pKVM, please refer to Will's talk at KVM Forum 2020:
-https://mirrors.edge.kernel.org/pub/linux/kernel/people/will/slides/kvmforum-2020-edited.pdf
-https://www.youtube.com/watch?v=edqJSzsDRxk
-
-[3] https://coccinelle.gitlabpages.inria.fr/website/
-
-Fuad Tabba (30):
-  KVM: arm64: placeholder to check if VM is protected
-  [DONOTMERGE] Temporarily disable unused variable warning
-  [DONOTMERGE] Coccinelle scripts for refactoring
-  KVM: arm64: remove unused parameters and asm offsets
-  KVM: arm64: add accessors for kvm_cpu_context
-  KVM: arm64: COCCI: use_ctxt_access.cocci: use kvm_cpu_context
-    accessors
-  KVM: arm64: COCCI: add_ctxt.cocci use_ctxt.cocci: reduce scope of
-    functions to kvm_cpu_ctxt
-  KVM: arm64: add hypervisor state accessors
-  KVM: arm64: COCCI: vcpu_hyp_accessors.cocci: use accessors for
-    hypervisor state vcpu variables
-  KVM: arm64: Add accessors for hypervisor state in kvm_vcpu_arch
-  KVM: arm64: create and use a new vcpu_hyp_state struct
-  KVM: arm64: COCCI: add_hypstate.cocci use_hypstate.cocci: Reduce scope
-    of functions to hyp_state
-  KVM: arm64: change function parameters to use kvm_cpu_ctxt and
-    hyp_state
-  KVM: arm64: reduce scope of vgic v2
-  KVM: arm64: COCCI: vgic3_cpu.cocci: reduce scope of vgic v3
-  KVM: arm64: reduce scope of vgic_v3 access parameters
-  KVM: arm64: access __hyp_running_vcpu via accessors only
-  KVM: arm64: reduce scope of __guest_exit to only depend on
-    kvm_cpu_context
-  KVM: arm64: change calls of get_loaded_vcpu to get_loaded_vcpu_ctxt
-  KVM: arm64: add __hyp_running_ctxt and __hyp_running_hyps
-  KVM: arm64: transition code to __hyp_running_ctxt and
-    __hyp_running_hyps
-  KVM: arm64: reduce scope of __guest_enter to depend only on
-    kvm_cpu_ctxt
-  KVM: arm64: COCCI: remove_unused.cocci: remove unused ctxt and
-    hypstate variables
-  KVM: arm64: remove unused functions
-  KVM: arm64: separate kvm_run() for protected VMs
-  KVM: arm64: pVM activate_traps to use vcpu_ctxt and vcpu_hyp_state
-  KVM: arm64: remove unsupported pVM features
-  KVM: arm64: reduce scope of pVM fixup_guest_exit to hyp_state and
-    kvm_cpu_ctxt
-  [DONOTMERGE] Remove Coccinelle scripts added for refactoring
-  [DONOTMERGE] Re-enable warnings
-
- arch/arm64/include/asm/kvm_asm.h           |  33 ++-
- arch/arm64/include/asm/kvm_emulate.h       | 292 ++++++++++++++++-----
- arch/arm64/include/asm/kvm_host.h          | 110 ++++++--
- arch/arm64/include/asm/kvm_hyp.h           |  14 +-
- arch/arm64/kernel/asm-offsets.c            |   7 +-
- arch/arm64/kvm/arm.c                       |   2 +-
- arch/arm64/kvm/debug.c                     |  28 +-
- arch/arm64/kvm/fpsimd.c                    |  22 +-
- arch/arm64/kvm/guest.c                     |  30 +--
- arch/arm64/kvm/handle_exit.c               |   8 +-
- arch/arm64/kvm/hyp/aarch32.c               |  26 +-
- arch/arm64/kvm/hyp/entry.S                 |  23 +-
- arch/arm64/kvm/hyp/exception.c             | 113 ++++----
- arch/arm64/kvm/hyp/hyp-entry.S             |   8 +-
- arch/arm64/kvm/hyp/include/hyp/adjust_pc.h |  26 +-
- arch/arm64/kvm/hyp/include/hyp/debug-sr.h  |   6 +-
- arch/arm64/kvm/hyp/include/hyp/switch.h    | 101 ++++---
- arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h |  43 +--
- arch/arm64/kvm/hyp/nvhe/debug-sr.c         |   8 +-
- arch/arm64/kvm/hyp/nvhe/host.S             |   4 +-
- arch/arm64/kvm/hyp/nvhe/switch.c           | 155 ++++++++---
- arch/arm64/kvm/hyp/nvhe/timer-sr.c         |   4 +-
- arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c   |  32 ++-
- arch/arm64/kvm/hyp/vgic-v3-sr.c            | 242 +++++++++++------
- arch/arm64/kvm/hyp/vhe/switch.c            |  40 +--
- arch/arm64/kvm/hyp/vhe/sysreg-sr.c         |   3 +-
- arch/arm64/kvm/inject_fault.c              |  10 +-
- arch/arm64/kvm/reset.c                     |  16 +-
- arch/arm64/kvm/sys_regs.c                  |   4 +-
- 29 files changed, 951 insertions(+), 459 deletions(-)
-
-
-base-commit: 6d53b3be3b9be497fbe054f35154f508deac729c
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 7cd7d5c8c4bc..adb21a7f0891 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -763,6 +763,11 @@ void kvm_arch_free_vm(struct kvm *kvm);
+ 
+ int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long type);
+ 
++static inline bool kvm_vm_is_protected(struct kvm *kvm)
++{
++	return false;
++}
++
+ int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int feature);
+ bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu);
+ 
 -- 
 2.33.0.685.g46640cef36-goog
 
