@@ -2,56 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 40CF8417588
+	by mail.lfdr.de (Postfix) with ESMTP id D35AF41758A
 	for <lists+kvm@lfdr.de>; Fri, 24 Sep 2021 15:24:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345810AbhIXNZ2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Sep 2021 09:25:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50056 "EHLO
+        id S1345808AbhIXNZb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Sep 2021 09:25:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50656 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345528AbhIXNY6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1346002AbhIXNY6 (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 24 Sep 2021 09:24:58 -0400
-Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34107C08EB28
-        for <kvm@vger.kernel.org>; Fri, 24 Sep 2021 05:54:30 -0700 (PDT)
-Received: by mail-qv1-xf49.google.com with SMTP id j4-20020ad454c4000000b0037a900dda7aso30435618qvx.14
-        for <kvm@vger.kernel.org>; Fri, 24 Sep 2021 05:54:30 -0700 (PDT)
+Received: from mail-wr1-x44a.google.com (mail-wr1-x44a.google.com [IPv6:2a00:1450:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E58C9C08EB2D
+        for <kvm@vger.kernel.org>; Fri, 24 Sep 2021 05:54:32 -0700 (PDT)
+Received: by mail-wr1-x44a.google.com with SMTP id k2-20020adfc702000000b0016006b2da9bso7996637wrg.1
+        for <kvm@vger.kernel.org>; Fri, 24 Sep 2021 05:54:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=tcAwNt45Vh1nx0SA/+pHzECez1ST6+QmIJi+nsrNrnY=;
-        b=rRJqgmjLCucwh+wufx8j237AwU9kX/U6m3gu4FcHEgCl+7TjZpNNRxFyoVmz2wJBhi
-         SyVaJHfYhbMRpDDAZD4yRAxl3UbZs8T1bKZ4mlI1LrPCKDeS9f+Qj6WH4IP2NuyoO4tT
-         VupZMeTBPVWdBvyzICj7uTz7Rkrth+DuXDdeD4CFu4yB1rKnLlkaOJhA/3ZcWF5DX78d
-         xCXOMpDIn9HAdiF1sHJUrZa1jdz0AKjfBdkfhTKIZVMCcz5n+Gw+nKohd8+YBRfoUFep
-         YuBpZr6s8s/Dsj1iCua9XlGC2xMHtcNAyDby42cvr1ruvD75NDgPLpDA/yxRoaWHy83P
-         GBxQ==
+        bh=iSSWi58NWKOpw0/j/jthgGrijZ2kgwmPgBIUtV8ETrY=;
+        b=YPs8fe54kX7jNCksdMFXe0yl0eg5/mV5V/gzTwhmbgLTmlcb/RfkH5tjD8pG9ykQI7
+         4qHQSge5XK5NRfCYmF9+FR9qVClA0ZxZvGXQrNRTSlpydveHokALYA9t+7sl2sEi4i8K
+         i6IG06/j1uJFNz94nZsXZIM/NqOhAWYJOW+oBT2D1jNBt/D8sjKIUvaXhfzaK63UDkM6
+         RHekE5GpHYY+vDcJTV32Z70zHzoHPzx/JQD2Px5+LnYr13K0/uaGdyhvCqnCDZs+Ako+
+         LpJP8KUeCbQodUcsenuY6SKU5OuodaMJefDk6yOTBf0RcF38yZgBqYjk0BGysIbgDT26
+         pEug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=tcAwNt45Vh1nx0SA/+pHzECez1ST6+QmIJi+nsrNrnY=;
-        b=vN1A++C7T0JLSOlV8rfNw7clOF80fg+8AGOxNuI0DZxoLiIuRstoThGB27OquYpzQl
-         i2DJnfn4WqDuvprzP7oAtCozdGYWDhJtpPin3WbtTwWF9Flu4If1ECrIKl+/qTWq94oO
-         TdVRgJ7HtXubdXyXZk2wQMnnza9MUFe+sEZ3IFZrbh5vk+xasAONygxrxuu2v9O+2wG9
-         7Z20QPIbqLSrrRzFrlh7ZjulX3UQ29997OEumNNZwA1KULuQO3zKB3slfarP7i6F6MDK
-         8GyI25hbIp8B+PC3WVW1LspgZo5DVjyk942BolL+0LNLImV6rUuB+PzXCXxXSJMHUahc
-         WFUw==
-X-Gm-Message-State: AOAM5303ZTBXjX0S/Pl0QY6wv0Gv0bVhkIFUmRUaU8UCI2cXtM6RxDVW
-        5SEvdXVaSK7u6QnJI4uCaXlA00KyaQ==
-X-Google-Smtp-Source: ABdhPJwH2gVvKjdWYkyW8o/mToo0z94tmPdYf5a/AXeifZH/51OHiESFtVRdGTkNYrDA6ygLN0UnaBeGBg==
+        bh=iSSWi58NWKOpw0/j/jthgGrijZ2kgwmPgBIUtV8ETrY=;
+        b=SV9jru+dxwMYhnam9fqTpGCVaLVxwYwJEOw33wMgQFM2Q1LRK1GTPjXknT8hfUH30n
+         tZVOq1596Zw/pIqTj+OdwcsDjZcxgWCqxsUVtelYmhhjdGN/lUz4bgr3J91PYVxO/0kD
+         Ff2mC46rHAuJqWQ9bUDhMC26p1JvKYI8xrhPK8Iw/yo8auq23O9g+Mgh2a2C2nVzFr8v
+         2zb57Tn4l4x6+NssQ1Qm7GTCBRL1m+cvIKf3oWunBGQpKXX2z63gTniU8zN4iKYo7+Oj
+         n+1CtGEELa8o2LGljkHN3Tlb0u8BfWVOPN4NPwnKTua++6ia/3gbz0HwndqY/soRlZ6z
+         iWKg==
+X-Gm-Message-State: AOAM531WW5kwFAElitLoO05qFWvw89xhEmnG+Ga6C9FfmIsR2ZNMx9ON
+        z1Fc72Tf0hkJw2GweUv24TWNpF2eew==
+X-Google-Smtp-Source: ABdhPJwfXwizprVtGpfhH9CMgSvy4oJQcTlOwGhEYh7h/UCWQzWob21fBAkjNrZp9qiNYIRW3sxPzk3w1w==
 X-Received: from tabba.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:482])
- (user=tabba job=sendgmr) by 2002:ad4:4a8f:: with SMTP id h15mr9910607qvx.2.1632488069370;
- Fri, 24 Sep 2021 05:54:29 -0700 (PDT)
-Date:   Fri, 24 Sep 2021 13:53:42 +0100
+ (user=tabba job=sendgmr) by 2002:a7b:c405:: with SMTP id k5mr1951606wmi.24.1632488071450;
+ Fri, 24 Sep 2021 05:54:31 -0700 (PDT)
+Date:   Fri, 24 Sep 2021 13:53:43 +0100
 In-Reply-To: <20210924125359.2587041-1-tabba@google.com>
-Message-Id: <20210924125359.2587041-14-tabba@google.com>
+Message-Id: <20210924125359.2587041-15-tabba@google.com>
 Mime-Version: 1.0
 References: <20210924125359.2587041-1-tabba@google.com>
 X-Mailer: git-send-email 2.33.0.685.g46640cef36-goog
-Subject: [RFC PATCH v1 13/30] KVM: arm64: change function parameters to use
- kvm_cpu_ctxt and hyp_state
+Subject: [RFC PATCH v1 14/30] KVM: arm64: reduce scope of vgic v2
 From:   Fuad Tabba <tabba@google.com>
 To:     kvmarm@lists.cs.columbia.edu
 Cc:     maz@kernel.org, will@kernel.org, james.morse@arm.com,
@@ -65,286 +64,153 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-__kvm_skip_instr, kvm_condition_valid, and __kvm_adjust_pc are
-passed the vcpu when all they need is the context as well as the
-hypervisor state. Refactor them to use these instead.
+vgic v2 interface functions are passed vcpu, when the state
+that they need is the vgic distributor, as well as the
+kvm_cpu_context and the recently created vcpu_hyp_state. Reduce
+the scope of its interface functions to these structs.
 
-These functions are called directly or indirectly in future
-patches from contexts that don't have access to the whole vcpu.
+Pass the vgic distributor to fixup_guest_exit so that it's not
+dependent on struct kvm for the vgic state. NOTE: this change to
+fixup_guest_exit is temporary, and will be tidied up in in a
+subsequent patch in this series.
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/include/asm/kvm_emulate.h       | 15 ++++++++++-----
- arch/arm64/kvm/hyp/aarch32.c               | 14 +++++---------
- arch/arm64/kvm/hyp/exception.c             | 19 ++++++++++---------
- arch/arm64/kvm/hyp/include/hyp/adjust_pc.h | 14 ++++++--------
- arch/arm64/kvm/hyp/include/hyp/switch.h    |  2 +-
- arch/arm64/kvm/hyp/nvhe/switch.c           |  2 +-
- arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c   |  6 +++---
- arch/arm64/kvm/hyp/vgic-v3-sr.c            |  4 ++--
- arch/arm64/kvm/hyp/vhe/switch.c            |  2 +-
- 9 files changed, 39 insertions(+), 39 deletions(-)
+ arch/arm64/include/asm/kvm_hyp.h         |  2 +-
+ arch/arm64/kvm/hyp/include/hyp/switch.h  |  4 ++--
+ arch/arm64/kvm/hyp/nvhe/switch.c         |  4 +++-
+ arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c | 16 ++++++----------
+ arch/arm64/kvm/hyp/vhe/switch.c          |  3 ++-
+ 5 files changed, 14 insertions(+), 15 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index e095afeecd10..28fc4781249e 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -33,8 +33,8 @@ enum exception_type {
- 	except_type_serror	= 0x180,
- };
- 
--bool kvm_condition_valid32(const struct kvm_vcpu *vcpu);
--void kvm_skip_instr32(struct kvm_vcpu *vcpu);
-+bool kvm_condition_valid32(const struct kvm_cpu_context *vcpu_ctxt, const struct vcpu_hyp_state *vcpu_hyps);
-+void kvm_skip_instr32(struct kvm_cpu_context *vcpu_ctxt, struct vcpu_hyp_state *vcpu_hyps);
- 
- void kvm_inject_undefined(struct kvm_vcpu *vcpu);
- void kvm_inject_vabt(struct kvm_vcpu *vcpu);
-@@ -162,14 +162,19 @@ static __always_inline bool vcpu_mode_is_32bit(const struct kvm_vcpu *vcpu)
- 	return ctxt_mode_is_32bit(&vcpu_ctxt(vcpu));
- }
- 
--static __always_inline bool kvm_condition_valid(const struct kvm_vcpu *vcpu)
-+static __always_inline bool __kvm_condition_valid(const struct kvm_cpu_context *vcpu_ctxt, const struct vcpu_hyp_state *vcpu_hyps)
- {
--	if (vcpu_mode_is_32bit(vcpu))
--		return kvm_condition_valid32(vcpu);
-+	if (ctxt_mode_is_32bit(vcpu_ctxt))
-+		return kvm_condition_valid32(vcpu_ctxt, vcpu_hyps);
- 
- 	return true;
- }
- 
-+static __always_inline bool kvm_condition_valid(const struct kvm_vcpu *vcpu)
-+{
-+	return __kvm_condition_valid(&vcpu->arch.ctxt, &hyp_state(vcpu));
-+}
-+
- static inline void ctxt_set_thumb(struct kvm_cpu_context *ctxt)
- {
- 	*ctxt_cpsr(ctxt) |= PSR_AA32_T_BIT;
-diff --git a/arch/arm64/kvm/hyp/aarch32.c b/arch/arm64/kvm/hyp/aarch32.c
-index 2d45e13d1b12..2feb2f8d9907 100644
---- a/arch/arm64/kvm/hyp/aarch32.c
-+++ b/arch/arm64/kvm/hyp/aarch32.c
-@@ -44,20 +44,18 @@ static const unsigned short cc_map[16] = {
- /*
-  * Check if a trapped instruction should have been executed or not.
+diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+index 2737e05a16b2..d9a8872a7efb 100644
+--- a/arch/arm64/include/asm/kvm_hyp.h
++++ b/arch/arm64/include/asm/kvm_hyp.h
+@@ -55,7 +55,7 @@ DECLARE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
   */
--bool kvm_condition_valid32(const struct kvm_vcpu *vcpu)
-+bool kvm_condition_valid32(const struct kvm_cpu_context *vcpu_ctxt, const struct vcpu_hyp_state *vcpu_hyps)
- {
--	const struct vcpu_hyp_state *vcpu_hyps = &hyp_state(vcpu);
--	const struct kvm_cpu_context *vcpu_ctxt = &vcpu_ctxt(vcpu);
- 	unsigned long cpsr;
- 	u32 cpsr_cond;
- 	int cond;
+ #define __kvm_swab32(x)	___constant_swab32(x)
  
- 	/* Top two bits non-zero?  Unconditional. */
--	if (kvm_vcpu_get_esr(vcpu) >> 30)
-+	if (kvm_hyp_state_get_esr(vcpu_hyps) >> 30)
- 		return true;
+-int __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu);
++int __vgic_v2_perform_cpuif_access(struct vgic_dist *vgic, struct kvm_cpu_context *ctxt, struct vcpu_hyp_state *hyps);
  
- 	/* Is condition field valid? */
--	cond = kvm_vcpu_get_condition(vcpu);
-+	cond = kvm_hyp_state_get_condition(vcpu_hyps);
- 	if (cond == 0xE)
- 		return true;
- 
-@@ -125,15 +123,13 @@ static void kvm_adjust_itstate(struct kvm_cpu_context *vcpu_ctxt)
-  * kvm_skip_instr - skip a trapped instruction and proceed to the next
-  * @vcpu: The vcpu pointer
-  */
--void kvm_skip_instr32(struct kvm_vcpu *vcpu)
-+void kvm_skip_instr32(struct kvm_cpu_context *vcpu_ctxt, struct vcpu_hyp_state *vcpu_hyps)
- {
--	struct vcpu_hyp_state *vcpu_hyps = &hyp_state(vcpu);
--	struct kvm_cpu_context *vcpu_ctxt = &vcpu_ctxt(vcpu);
- 	u32 pc = *ctxt_pc(vcpu_ctxt);
- 	bool is_thumb;
- 
- 	is_thumb = !!(*ctxt_cpsr(vcpu_ctxt) & PSR_AA32_T_BIT);
--	if (is_thumb && !kvm_vcpu_trap_il_is32bit(vcpu))
-+	if (is_thumb && !kvm_hyp_state_trap_il_is32bit(vcpu_hyps))
- 		pc += 2;
- 	else
- 		pc += 4;
-diff --git a/arch/arm64/kvm/hyp/exception.c b/arch/arm64/kvm/hyp/exception.c
-index d4c2905b595d..a08806efe031 100644
---- a/arch/arm64/kvm/hyp/exception.c
-+++ b/arch/arm64/kvm/hyp/exception.c
-@@ -329,11 +329,9 @@ static void enter_exception32(struct kvm_cpu_context *vcpu_ctxt, u32 mode,
- 	*ctxt_pc(vcpu_ctxt) = vect_offset;
- }
- 
--static void kvm_inject_exception(struct kvm_vcpu *vcpu)
-+static void kvm_inject_exception(struct kvm_cpu_context *vcpu_ctxt, struct vcpu_hyp_state *vcpu_hyps)
- {
--	struct vcpu_hyp_state *vcpu_hyps = &hyp_state(vcpu);
--	struct kvm_cpu_context *vcpu_ctxt = &vcpu_ctxt(vcpu);
--	if (vcpu_el1_is_32bit(vcpu)) {
-+	if (hyp_state_el1_is_32bit(vcpu_hyps)) {
- 		switch (hyp_state_flags(vcpu_hyps) & KVM_ARM64_EXCEPT_MASK) {
- 		case KVM_ARM64_EXCEPT_AA32_UND:
- 			enter_exception32(vcpu_ctxt, PSR_AA32_MODE_UND, 4);
-@@ -370,16 +368,19 @@ static void kvm_inject_exception(struct kvm_vcpu *vcpu)
-  * Adjust the guest PC (and potentially exception state) depending on
-  * flags provided by the emulation code.
-  */
--void __kvm_adjust_pc(struct kvm_vcpu *vcpu)
-+void kvm_adjust_pc(struct kvm_cpu_context *vcpu_ctxt, struct vcpu_hyp_state *vcpu_hyps)
- {
--	struct vcpu_hyp_state *vcpu_hyps = &hyp_state(vcpu);
--	struct kvm_cpu_context *vcpu_ctxt = &vcpu_ctxt(vcpu);
- 	if (hyp_state_flags(vcpu_hyps) & KVM_ARM64_PENDING_EXCEPTION) {
--		kvm_inject_exception(vcpu);
-+		kvm_inject_exception(vcpu_ctxt, vcpu_hyps);
- 		hyp_state_flags(vcpu_hyps) &= ~(KVM_ARM64_PENDING_EXCEPTION |
- 				      KVM_ARM64_EXCEPT_MASK);
- 	} else 	if (hyp_state_flags(vcpu_hyps) & KVM_ARM64_INCREMENT_PC) {
--		kvm_skip_instr(vcpu);
-+		kvm_skip_instr(vcpu_ctxt, vcpu_hyps);
- 		hyp_state_flags(vcpu_hyps) &= ~KVM_ARM64_INCREMENT_PC;
- 	}
- }
-+
-+void __kvm_adjust_pc(struct kvm_vcpu *vcpu)
-+{
-+	kvm_adjust_pc(&vcpu_ctxt(vcpu), &hyp_state(vcpu));
-+}
-diff --git a/arch/arm64/kvm/hyp/include/hyp/adjust_pc.h b/arch/arm64/kvm/hyp/include/hyp/adjust_pc.h
-index 9bbe452a461a..4e0cfbe635e5 100644
---- a/arch/arm64/kvm/hyp/include/hyp/adjust_pc.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/adjust_pc.h
-@@ -13,12 +13,10 @@
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_host.h>
- 
--static inline void kvm_skip_instr(struct kvm_vcpu *vcpu)
-+static inline void kvm_skip_instr(struct kvm_cpu_context *vcpu_ctxt, struct vcpu_hyp_state *vcpu_hyps)
- {
--	struct vcpu_hyp_state *vcpu_hyps = &hyp_state(vcpu);
--	struct kvm_cpu_context *vcpu_ctxt = &vcpu_ctxt(vcpu);
- 	if (ctxt_mode_is_32bit(vcpu_ctxt)) {
--		kvm_skip_instr32(vcpu);
-+		kvm_skip_instr32(vcpu_ctxt, vcpu_hyps);
- 	} else {
- 		*ctxt_pc(vcpu_ctxt) += 4;
- 		*ctxt_cpsr(vcpu_ctxt) &= ~PSR_BTYPE_MASK;
-@@ -32,14 +30,12 @@ static inline void kvm_skip_instr(struct kvm_vcpu *vcpu)
-  * Skip an instruction which has been emulated at hyp while most guest sysregs
-  * are live.
-  */
--static inline void __kvm_skip_instr(struct kvm_vcpu *vcpu)
-+static inline void __kvm_skip_instr(struct kvm_cpu_context *vcpu_ctxt, struct vcpu_hyp_state *vcpu_hyps)
- {
--	struct vcpu_hyp_state *vcpu_hyps = &hyp_state(vcpu);
--	struct kvm_cpu_context *vcpu_ctxt = &vcpu_ctxt(vcpu);
- 	*ctxt_pc(vcpu_ctxt) = read_sysreg_el2(SYS_ELR);
- 	ctxt_gp_regs(vcpu_ctxt)->pstate = read_sysreg_el2(SYS_SPSR);
- 
--	kvm_skip_instr(vcpu);
-+	kvm_skip_instr(vcpu_ctxt, vcpu_hyps);
- 
- 	write_sysreg_el2(ctxt_gp_regs(vcpu_ctxt)->pstate, SYS_SPSR);
- 	write_sysreg_el2(*ctxt_pc(vcpu_ctxt), SYS_ELR);
-@@ -54,4 +50,6 @@ static inline void kvm_skip_host_instr(void)
- 	write_sysreg_el2(read_sysreg_el2(SYS_ELR) + 4, SYS_ELR);
- }
- 
-+void kvm_adjust_pc(struct kvm_cpu_context *vcpu_ctxt, struct vcpu_hyp_state *vcpu_hyps);
-+
- #endif
+ void __vgic_v3_save_state(struct vgic_v3_cpu_if *cpu_if);
+ void __vgic_v3_restore_state(struct vgic_v3_cpu_if *cpu_if);
 diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index 5ee8aac86fdc..075719c07009 100644
+index 075719c07009..30fcfe84f609 100644
 --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
 +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -350,7 +350,7 @@ static inline bool handle_tx2_tvm(struct kvm_vcpu *vcpu)
- 		return false;
- 	}
+@@ -424,7 +424,7 @@ static inline bool __hyp_handle_ptrauth(struct kvm_vcpu *vcpu)
+  * the guest, false when we should restore the host state and return to the
+  * main run loop.
+  */
+-static inline bool fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
++static inline bool fixup_guest_exit(struct kvm_vcpu *vcpu, struct vgic_dist *vgic, u64 *exit_code)
+ {
+ 	struct vcpu_hyp_state *vcpu_hyps = &hyp_state(vcpu);
+ 	struct kvm_cpu_context *vcpu_ctxt = &vcpu_ctxt(vcpu);
+@@ -486,7 +486,7 @@ static inline bool fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 			!kvm_vcpu_abt_iss1tw(vcpu);
  
--	__kvm_skip_instr(vcpu);
-+	__kvm_skip_instr(vcpu_ctxt, vcpu_hyps);
- 	return true;
- }
+ 		if (valid) {
+-			int ret = __vgic_v2_perform_cpuif_access(vcpu);
++			int ret = __vgic_v2_perform_cpuif_access(vgic, vcpu_ctxt, vcpu_hyps);
  
+ 			if (ret == 1)
+ 				goto guest;
 diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-index d9326085387b..eadbf2ccaf68 100644
+index eadbf2ccaf68..164b0f899f7b 100644
 --- a/arch/arm64/kvm/hyp/nvhe/switch.c
 +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-@@ -204,7 +204,7 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
- 	 */
- 	__debug_save_host_buffers_nvhe(vcpu);
+@@ -172,6 +172,8 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+ {
+ 	struct vcpu_hyp_state *vcpu_hyps = &hyp_state(vcpu);
+ 	struct kvm_cpu_context *vcpu_ctxt = &vcpu_ctxt(vcpu);
++	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
++	struct vgic_dist *vgic = &kvm->arch.vgic;
+ 	struct kvm_cpu_context *host_ctxt;
+ 	struct kvm_cpu_context *guest_ctxt;
+ 	bool pmu_switch_needed;
+@@ -230,7 +232,7 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+ 		exit_code = __guest_enter(vcpu);
  
--	__kvm_adjust_pc(vcpu);
-+	kvm_adjust_pc(vcpu_ctxt, vcpu_hyps);
+ 		/* And we're baaack! */
+-	} while (fixup_guest_exit(vcpu, &exit_code));
++	} while (fixup_guest_exit(vcpu, vgic, &exit_code));
  
- 	/*
- 	 * We must restore the 32-bit state before the sysregs, thanks
+ 	__sysreg_save_state_nvhe(guest_ctxt);
+ 	__sysreg32_save_state(vcpu);
 diff --git a/arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c b/arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c
-index 84304d6d455a..acd0d21394e3 100644
+index acd0d21394e3..787f973af43a 100644
 --- a/arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c
 +++ b/arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c
-@@ -55,13 +55,13 @@ int __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu)
+@@ -34,19 +34,15 @@ static bool __is_be(struct kvm_cpu_context *vcpu_ctxt)
+  *  0: Not a GICV access
+  * -1: Illegal GICV access successfully performed
+  */
+-int __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu)
++int __vgic_v2_perform_cpuif_access(struct vgic_dist *vgic, struct kvm_cpu_context *vcpu_ctxt, struct vcpu_hyp_state *vcpu_hyps)
+ {
+-	struct vcpu_hyp_state *vcpu_hyps = &hyp_state(vcpu);
+-	struct kvm_cpu_context *vcpu_ctxt = &vcpu_ctxt(vcpu);
+-	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
+-	struct vgic_dist *vgic = &kvm->arch.vgic;
+ 	phys_addr_t fault_ipa;
+ 	void __iomem *addr;
+ 	int rd;
+ 
+ 	/* Build the full address */
+-	fault_ipa  = kvm_vcpu_get_fault_ipa(vcpu);
+-	fault_ipa |= kvm_vcpu_get_hfar(vcpu) & GENMASK(11, 0);
++	fault_ipa  = kvm_hyp_state_get_fault_ipa(vcpu_hyps);
++	fault_ipa |= kvm_hyp_state_get_hfar(vcpu_hyps) & GENMASK(11, 0);
+ 
+ 	/* If not for GICV, move on */
+ 	if (fault_ipa <  vgic->vgic_cpu_base ||
+@@ -54,7 +50,7 @@ int __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu)
+ 		return 0;
  
  	/* Reject anything but a 32bit access */
- 	if (kvm_vcpu_dabt_get_as(vcpu) != sizeof(u32)) {
--		__kvm_skip_instr(vcpu);
-+		__kvm_skip_instr(vcpu_ctxt, vcpu_hyps);
+-	if (kvm_vcpu_dabt_get_as(vcpu) != sizeof(u32)) {
++	if (kvm_hyp_state_dabt_get_as(vcpu_hyps) != sizeof(u32)) {
+ 		__kvm_skip_instr(vcpu_ctxt, vcpu_hyps);
+ 		return -1;
+ 	}
+@@ -65,11 +61,11 @@ int __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu)
  		return -1;
  	}
  
- 	/* Not aligned? Don't bother */
- 	if (fault_ipa & 3) {
--		__kvm_skip_instr(vcpu);
-+		__kvm_skip_instr(vcpu_ctxt, vcpu_hyps);
- 		return -1;
- 	}
+-	rd = kvm_vcpu_dabt_get_rd(vcpu);
++	rd = kvm_hyp_state_dabt_get_rd(vcpu_hyps);
+ 	addr  = kvm_vgic_global_state.vcpu_hyp_va;
+ 	addr += fault_ipa - vgic->vgic_cpu_base;
  
-@@ -85,7 +85,7 @@ int __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu)
- 		ctxt_set_reg(vcpu_ctxt, rd, data);
- 	}
- 
--	__kvm_skip_instr(vcpu);
-+	__kvm_skip_instr(vcpu_ctxt, vcpu_hyps);
- 
- 	return 1;
- }
-diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-index 725b2976e7c2..d025a5830dcc 100644
---- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
-+++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-@@ -1086,7 +1086,7 @@ int __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu)
- 	esr = kvm_vcpu_get_esr(vcpu);
- 	if (ctxt_mode_is_32bit(vcpu_ctxt)) {
- 		if (!kvm_condition_valid(vcpu)) {
--			__kvm_skip_instr(vcpu);
-+			__kvm_skip_instr(vcpu_ctxt, vcpu_hyps);
- 			return 1;
- 		}
- 
-@@ -1198,7 +1198,7 @@ int __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu)
- 	rt = kvm_vcpu_sys_get_rt(vcpu);
- 	fn(vcpu, vmcr, rt);
- 
--	__kvm_skip_instr(vcpu);
-+	__kvm_skip_instr(vcpu_ctxt, vcpu_hyps);
- 
- 	return 1;
- }
+-	if (kvm_vcpu_dabt_iswrite(vcpu)) {
++	if (kvm_hyp_state_dabt_iswrite(vcpu_hyps)) {
+ 		u32 data = ctxt_get_reg(vcpu_ctxt, rd);
+ 		if (__is_be(vcpu_ctxt)) {
+ 			/* guest pre-swabbed data, undo this for writel() */
 diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index c9da0d1c7e72..395274532c20 100644
+index 395274532c20..f315058a50ca 100644
 --- a/arch/arm64/kvm/hyp/vhe/switch.c
 +++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -135,7 +135,7 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
- 	__load_guest_stage2(vcpu->arch.hw_mmu);
- 	__activate_traps(vcpu);
+@@ -111,6 +111,7 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+ {
+ 	struct vcpu_hyp_state *vcpu_hyps = &hyp_state(vcpu);
+ 	struct kvm_cpu_context *vcpu_ctxt = &vcpu_ctxt(vcpu);
++	struct vgic_dist *vgic = &vcpu->kvm->arch.vgic;
+ 	struct kvm_cpu_context *host_ctxt;
+ 	struct kvm_cpu_context *guest_ctxt;
+ 	u64 exit_code;
+@@ -145,7 +146,7 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+ 		exit_code = __guest_enter(vcpu);
  
--	__kvm_adjust_pc(vcpu);
-+	kvm_adjust_pc(vcpu_ctxt, vcpu_hyps);
+ 		/* And we're baaack! */
+-	} while (fixup_guest_exit(vcpu, &exit_code));
++	} while (fixup_guest_exit(vcpu, vgic, &exit_code));
  
- 	sysreg_restore_guest_state_vhe(guest_ctxt);
- 	__debug_switch_to_guest(vcpu);
+ 	sysreg_save_guest_state_vhe(guest_ctxt);
+ 
 -- 
 2.33.0.685.g46640cef36-goog
 
