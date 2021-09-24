@@ -2,53 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 922B9417C7D
-	for <lists+kvm@lfdr.de>; Fri, 24 Sep 2021 22:49:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D427417C81
+	for <lists+kvm@lfdr.de>; Fri, 24 Sep 2021 22:49:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343663AbhIXUuo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Sep 2021 16:50:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41296 "EHLO
+        id S1346301AbhIXUuv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Sep 2021 16:50:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41308 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243488AbhIXUuo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Sep 2021 16:50:44 -0400
-Received: from mail-qt1-x84a.google.com (mail-qt1-x84a.google.com [IPv6:2607:f8b0:4864:20::84a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1005C061571
-        for <kvm@vger.kernel.org>; Fri, 24 Sep 2021 13:49:10 -0700 (PDT)
-Received: by mail-qt1-x84a.google.com with SMTP id 7-20020ac85907000000b002a5391eff67so39692925qty.1
-        for <kvm@vger.kernel.org>; Fri, 24 Sep 2021 13:49:10 -0700 (PDT)
+        with ESMTP id S243493AbhIXUuq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Sep 2021 16:50:46 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0239C061571
+        for <kvm@vger.kernel.org>; Fri, 24 Sep 2021 13:49:12 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id v16-20020a256110000000b005b23a793d77so5051160ybb.15
+        for <kvm@vger.kernel.org>; Fri, 24 Sep 2021 13:49:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
-        bh=9uQma88kyFtTCD66aTAT4dBZ3xnbMYTqia+UpO7dM68=;
-        b=q8M1GSzF/uBUsavt23wy+YLJPWcBBcZT5BXEK0AYGqqYtHjRFmnyHF8TwQknKBDtpI
-         0409cYtHRvf+eCPbBBcysULI1JCsSl0bZZ+s1Nk09CTJ+90Ps91HkbgULhl5FaJSP14e
-         mT8dZdSQl7md3C+dxBbFXAZJhg0ad4SCdTETFaJa9GDOACcgO5F7P5FODb1WAlPfaJx6
-         Q+wEsNq6VTqNUkP6s+rmozQ1MP5SeE/cgFcBKmlWX0P/UkQJIZ2V/2kq08VAAjn061Ic
-         mR2+0pM5roN2Yyv3cJYYzmadD4MGnubNTce+WM4TMTiA+C68V1hWlpQNVejiMxwONs1J
-         Bhew==
+        h=reply-to:date:in-reply-to:message-id:mime-version:references
+         :subject:from:to:cc;
+        bh=G74OtwsYBHjAwQsuxzvUtu1zmCPSrPcI538yigYdt1E=;
+        b=RNFyKzGru3cJXJKZQfVT4MzWkrUENcXO1LmDMZzo+6pxejMNcKVGUWmlqf+2/D3ae2
+         5VNtE/raYzwhmMHzMOzGr/XbGM/3l8TJdZs4dAvYzOqfVfaCUQ0mZDx4XUpHhpX4muEc
+         3+ajUf6o0Q7LpCtFbwJrLNI4VZhVA0xgBeZjl58zhzaRUO91QRW0y3NcTCW443y4Jd49
+         QrFiSm+12GikonnjXSmhaYjYFQbkzRWlQtJct67pCcWWKvM+syQNlydyLSB9l456Em2v
+         EnSuOw19L8JcLE7gX/SYD2iJVMNOaYRTbv18gzXgd31Lqr29g7A+ZG/9KG8OBw7Ew7I3
+         vrpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
-         :from:to:cc;
-        bh=9uQma88kyFtTCD66aTAT4dBZ3xnbMYTqia+UpO7dM68=;
-        b=ap1x5XBIVE1xMGS0UzJOnXzucVIX0NHgka0Uy/5XbnrYhDTFwoLGEpW/LKDXIl/qZK
-         yrsJnZCcwsGXsDoLNA7dRVD6NHh+74+HAX+uyYDFQ3GmQUAN/Qi8rz0F5NEsIkK6PBkc
-         6OL3Gk2MgsuxloSMMzjDvCOlaraHPIbeeRxWqQ38a91WFay3Qbxb6bee00ogPWE0XDz4
-         DPiNAuKPk0SOP8uFoSLJgcFqz83b8Bgi0IkoqePNYFPjykz2meH/L9OI94VKD32p4wBC
-         C1HQ3ODSbSrXJXdI/vyoVcYQT9uO1aTknR/qy9Dri0rfDpPDD69dyiRbPRm9gbfAvFF3
-         0mxA==
-X-Gm-Message-State: AOAM5304f03uk3LyfJVn2UA2KwbM4NkJEy2xjhVnZ+lTiQA+2h0vg/MY
-        RoQ+haFwrQ2dQvL7X2h/AlSXq8S+q/Y=
-X-Google-Smtp-Source: ABdhPJxiLtviXzL8CQQcYg6Uoaj/fu0Jl4WDxgw9fGltT1ZWUZgWB3/7mOhylUer2mA9ZebhG56wP4C/Hj4=
+        h=x-gm-message-state:reply-to:date:in-reply-to:message-id
+         :mime-version:references:subject:from:to:cc;
+        bh=G74OtwsYBHjAwQsuxzvUtu1zmCPSrPcI538yigYdt1E=;
+        b=B9IxyVwcBH2eCXrPIFMm1CFud9cCZZCT4VXpPYVe2QJACKc9iB3FcEfZzN5HVXyRmx
+         vG/hUO8EEr2sVf7OCAfx7u4u9a/3XuKRb4PBUWMX555xxpFoEAH0GdPkyu8Iu5xlkkJT
+         yIIp3Pjc9V49Nno2/26qSZGK6FFBwenA6haVVvyCAUMtT53ilqDy/0NRvRtBDjGCVC+H
+         X4vaubsUwGB0q4ECnC6hMGD7YStglmEZLGbchVYBPknrG0fpXgFYRnrWMbsrq+369XWX
+         Y8uNGWbTZCeUGs4MZEVmgOjC6cuPD9OJ/xseTEGqtzT7/29tSb2fOtyYteGG9VkECZF+
+         MFaw==
+X-Gm-Message-State: AOAM533keM0oNKnJvKApnylT97VO+5fxuG+UNfN/T5WDDxD8VmhR/meb
+        CWo9REsI1kgrx52CaD3zbSTtVlEGF/E=
+X-Google-Smtp-Source: ABdhPJx5EiwGSiEB0rebnm7530IZcR1XL7H+hIaRCY54BjTfA6mxM1Ij8lgFvFs7ZWk6Q8AKhbv4ZOEi4xs=
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:90:200:4c72:89be:dba3:2bcb])
- (user=seanjc job=sendgmr) by 2002:a05:6214:13e3:: with SMTP id
- ch3mr12068427qvb.35.1632516550025; Fri, 24 Sep 2021 13:49:10 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a25:1208:: with SMTP id 8mr15191229ybs.7.1632516552154;
+ Fri, 24 Sep 2021 13:49:12 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 24 Sep 2021 13:49:04 -0700
-Message-Id: <20210924204907.1111817-1-seanjc@google.com>
+Date:   Fri, 24 Sep 2021 13:49:05 -0700
+In-Reply-To: <20210924204907.1111817-1-seanjc@google.com>
+Message-Id: <20210924204907.1111817-2-seanjc@google.com>
 Mime-Version: 1.0
+References: <20210924204907.1111817-1-seanjc@google.com>
 X-Mailer: git-send-email 2.33.0.685.g46640cef36-goog
-Subject: [PATCH v3 0/3] KVM: x86: MSR filtering and related fixes
+Subject: [PATCH v3 1/3] KVM: nVMX: Handle dynamic MSR intercept toggling
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -62,29 +65,352 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Fix two nVMX bugs related to MSR filtering (one directly, one indirectly),
-and additional cleanup on top.  The main SRCU fix from the original series
-was merged, but these got left behind.
+Always check vmcs01's MSR bitmap when merging L0 and L1 bitmaps for L2,
+and always update the relevant bits in vmcs02.  This fixes two distinct,
+but intertwined bugs related to dynamic MSR bitmap modifications.
 
-v3:
-  - Rebase to 9f6090b09d66 ("KVM: MMU: make spte .... in make_spte")
+The first issue is that KVM fails to enable MSR interception in vmcs02
+for the FS/GS base MSRs if L1 first runs L2 with interception disabled,
+and later enables interception.
 
-v2:
-  - https://lkml.kernel.org/r/20210318224310.3274160-1-seanjc@google.com
-  - Make the macro insanity slightly less insane. [Paolo]
+The second issue is that KVM fails to honor userspace MSR filtering when
+preparing vmcs02.
 
-v1: https://lkml.kernel.org/r/20210316184436.2544875-1-seanjc@google.com
+Fix both issues simultaneous as fixing only one of the issues (doesn't
+matter which) would create a mess that no one should have to bisect.
+Fixing only the first bug would exacerbate the MSR filtering issue as
+userspace would see inconsistent behavior depending on the whims of L1.
+Fixing only the second bug (MSR filtering) effectively requires fixing
+the first, as the nVMX code only knows how to transition vmcs02's
+bitmap from 1->0.
 
-Sean Christopherson (3):
-  KVM: nVMX: Handle dynamic MSR intercept toggling
-  KVM: VMX: Macrofy the MSR bitmap getters and setters
-  KVM: nVMX: Clean up x2APIC MSR handling for L2
+Move the various accessor/mutators that are currently buried in vmx.c
+into vmx.h so that they can be shared by the nested code.
 
- arch/x86/kvm/vmx/nested.c | 164 +++++++++++++++-----------------------
- arch/x86/kvm/vmx/vmx.c    |  67 +---------------
- arch/x86/kvm/vmx/vmx.h    |  28 +++++++
- 3 files changed, 95 insertions(+), 164 deletions(-)
+Fixes: 1a155254ff93 ("KVM: x86: Introduce MSR filtering")
+Fixes: d69129b4e46a ("KVM: nVMX: Disable intercept for FS/GS base MSRs in vmcs02 when possible")
+Cc: stable@vger.kernel.org
+Cc: Alexander Graf <graf@amazon.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/vmx/nested.c | 111 +++++++++++++++++---------------------
+ arch/x86/kvm/vmx/vmx.c    |  67 ++---------------------
+ arch/x86/kvm/vmx/vmx.h    |  63 ++++++++++++++++++++++
+ 3 files changed, 116 insertions(+), 125 deletions(-)
 
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index eedcebf58004..3c9657f6923e 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -523,29 +523,6 @@ static int nested_vmx_check_tpr_shadow_controls(struct kvm_vcpu *vcpu,
+ 	return 0;
+ }
+ 
+-/*
+- * Check if MSR is intercepted for L01 MSR bitmap.
+- */
+-static bool msr_write_intercepted_l01(struct kvm_vcpu *vcpu, u32 msr)
+-{
+-	unsigned long *msr_bitmap;
+-	int f = sizeof(unsigned long);
+-
+-	if (!cpu_has_vmx_msr_bitmap())
+-		return true;
+-
+-	msr_bitmap = to_vmx(vcpu)->vmcs01.msr_bitmap;
+-
+-	if (msr <= 0x1fff) {
+-		return !!test_bit(msr, msr_bitmap + 0x800 / f);
+-	} else if ((msr >= 0xc0000000) && (msr <= 0xc0001fff)) {
+-		msr &= 0x1fff;
+-		return !!test_bit(msr, msr_bitmap + 0xc00 / f);
+-	}
+-
+-	return true;
+-}
+-
+ /*
+  * If a msr is allowed by L0, we should check whether it is allowed by L1.
+  * The corresponding bit will be cleared unless both of L0 and L1 allow it.
+@@ -599,6 +576,34 @@ static inline void enable_x2apic_msr_intercepts(unsigned long *msr_bitmap)
+ 	}
+ }
+ 
++#define BUILD_NVMX_MSR_INTERCEPT_HELPER(rw)					\
++static inline									\
++void nested_vmx_set_msr_##rw##_intercept(struct vcpu_vmx *vmx,			\
++					 unsigned long *msr_bitmap_l1,		\
++					 unsigned long *msr_bitmap_l0, u32 msr)	\
++{										\
++	if (vmx_test_msr_bitmap_##rw(vmx->vmcs01.msr_bitmap, msr) ||		\
++	    vmx_test_msr_bitmap_##rw(msr_bitmap_l1, msr))			\
++		vmx_set_msr_bitmap_##rw(msr_bitmap_l0, msr);			\
++	else									\
++		vmx_clear_msr_bitmap_##rw(msr_bitmap_l0, msr);			\
++}
++BUILD_NVMX_MSR_INTERCEPT_HELPER(read)
++BUILD_NVMX_MSR_INTERCEPT_HELPER(write)
++
++static inline void nested_vmx_set_intercept_for_msr(struct vcpu_vmx *vmx,
++						    unsigned long *msr_bitmap_l1,
++						    unsigned long *msr_bitmap_l0,
++						    u32 msr, int types)
++{
++	if (types & MSR_TYPE_R)
++		nested_vmx_set_msr_read_intercept(vmx, msr_bitmap_l1,
++						  msr_bitmap_l0, msr);
++	if (types & MSR_TYPE_W)
++		nested_vmx_set_msr_write_intercept(vmx, msr_bitmap_l1,
++						   msr_bitmap_l0, msr);
++}
++
+ /*
+  * Merge L0's and L1's MSR bitmap, return false to indicate that
+  * we do not use the hardware.
+@@ -606,10 +611,11 @@ static inline void enable_x2apic_msr_intercepts(unsigned long *msr_bitmap)
+ static inline bool nested_vmx_prepare_msr_bitmap(struct kvm_vcpu *vcpu,
+ 						 struct vmcs12 *vmcs12)
+ {
++	struct vcpu_vmx *vmx = to_vmx(vcpu);
+ 	int msr;
+ 	unsigned long *msr_bitmap_l1;
+-	unsigned long *msr_bitmap_l0 = to_vmx(vcpu)->nested.vmcs02.msr_bitmap;
+-	struct kvm_host_map *map = &to_vmx(vcpu)->nested.msr_bitmap_map;
++	unsigned long *msr_bitmap_l0 = vmx->nested.vmcs02.msr_bitmap;
++	struct kvm_host_map *map = &vmx->nested.msr_bitmap_map;
+ 
+ 	/* Nothing to do if the MSR bitmap is not in use.  */
+ 	if (!cpu_has_vmx_msr_bitmap() ||
+@@ -660,44 +666,27 @@ static inline bool nested_vmx_prepare_msr_bitmap(struct kvm_vcpu *vcpu,
+ 		}
+ 	}
+ 
+-	/* KVM unconditionally exposes the FS/GS base MSRs to L1. */
+-#ifdef CONFIG_X86_64
+-	nested_vmx_disable_intercept_for_msr(msr_bitmap_l1, msr_bitmap_l0,
+-					     MSR_FS_BASE, MSR_TYPE_RW);
+-
+-	nested_vmx_disable_intercept_for_msr(msr_bitmap_l1, msr_bitmap_l0,
+-					     MSR_GS_BASE, MSR_TYPE_RW);
+-
+-	nested_vmx_disable_intercept_for_msr(msr_bitmap_l1, msr_bitmap_l0,
+-					     MSR_KERNEL_GS_BASE, MSR_TYPE_RW);
+-#endif
+-
+ 	/*
+-	 * Checking the L0->L1 bitmap is trying to verify two things:
+-	 *
+-	 * 1. L0 gave a permission to L1 to actually passthrough the MSR. This
+-	 *    ensures that we do not accidentally generate an L02 MSR bitmap
+-	 *    from the L12 MSR bitmap that is too permissive.
+-	 * 2. That L1 or L2s have actually used the MSR. This avoids
+-	 *    unnecessarily merging of the bitmap if the MSR is unused. This
+-	 *    works properly because we only update the L01 MSR bitmap lazily.
+-	 *    So even if L0 should pass L1 these MSRs, the L01 bitmap is only
+-	 *    updated to reflect this when L1 (or its L2s) actually write to
+-	 *    the MSR.
++	 * Always check vmcs01's bitmap to honor userspace MSR filters and any
++	 * other runtime changes to vmcs01's bitmap, e.g. dynamic pass-through.
+ 	 */
+-	if (!msr_write_intercepted_l01(vcpu, MSR_IA32_SPEC_CTRL))
+-		nested_vmx_disable_intercept_for_msr(
+-					msr_bitmap_l1, msr_bitmap_l0,
+-					MSR_IA32_SPEC_CTRL,
+-					MSR_TYPE_R | MSR_TYPE_W);
+-
+-	if (!msr_write_intercepted_l01(vcpu, MSR_IA32_PRED_CMD))
+-		nested_vmx_disable_intercept_for_msr(
+-					msr_bitmap_l1, msr_bitmap_l0,
+-					MSR_IA32_PRED_CMD,
+-					MSR_TYPE_W);
+-
+-	kvm_vcpu_unmap(vcpu, &to_vmx(vcpu)->nested.msr_bitmap_map, false);
++#ifdef CONFIG_X86_64
++	nested_vmx_set_intercept_for_msr(vmx, msr_bitmap_l1, msr_bitmap_l0,
++					 MSR_FS_BASE, MSR_TYPE_RW);
++
++	nested_vmx_set_intercept_for_msr(vmx, msr_bitmap_l1, msr_bitmap_l0,
++					 MSR_GS_BASE, MSR_TYPE_RW);
++
++	nested_vmx_set_intercept_for_msr(vmx, msr_bitmap_l1, msr_bitmap_l0,
++					 MSR_KERNEL_GS_BASE, MSR_TYPE_RW);
++#endif
++	nested_vmx_set_intercept_for_msr(vmx, msr_bitmap_l1, msr_bitmap_l0,
++					 MSR_IA32_SPEC_CTRL, MSR_TYPE_RW);
++
++	nested_vmx_set_intercept_for_msr(vmx, msr_bitmap_l1, msr_bitmap_l0,
++					 MSR_IA32_PRED_CMD, MSR_TYPE_W);
++
++	kvm_vcpu_unmap(vcpu, &vmx->nested.msr_bitmap_map, false);
+ 
+ 	return true;
+ }
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index d118daed0530..86a8c2713039 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -766,29 +766,6 @@ void vmx_update_exception_bitmap(struct kvm_vcpu *vcpu)
+ 	vmcs_write32(EXCEPTION_BITMAP, eb);
+ }
+ 
+-/*
+- * Check if MSR is intercepted for currently loaded MSR bitmap.
+- */
+-static bool msr_write_intercepted(struct kvm_vcpu *vcpu, u32 msr)
+-{
+-	unsigned long *msr_bitmap;
+-	int f = sizeof(unsigned long);
+-
+-	if (!cpu_has_vmx_msr_bitmap())
+-		return true;
+-
+-	msr_bitmap = to_vmx(vcpu)->loaded_vmcs->msr_bitmap;
+-
+-	if (msr <= 0x1fff) {
+-		return !!test_bit(msr, msr_bitmap + 0x800 / f);
+-	} else if ((msr >= 0xc0000000) && (msr <= 0xc0001fff)) {
+-		msr &= 0x1fff;
+-		return !!test_bit(msr, msr_bitmap + 0xc00 / f);
+-	}
+-
+-	return true;
+-}
+-
+ static void clear_atomic_switch_msr_special(struct vcpu_vmx *vmx,
+ 		unsigned long entry, unsigned long exit)
+ {
+@@ -3695,46 +3672,6 @@ void free_vpid(int vpid)
+ 	spin_unlock(&vmx_vpid_lock);
+ }
+ 
+-static void vmx_clear_msr_bitmap_read(ulong *msr_bitmap, u32 msr)
+-{
+-	int f = sizeof(unsigned long);
+-
+-	if (msr <= 0x1fff)
+-		__clear_bit(msr, msr_bitmap + 0x000 / f);
+-	else if ((msr >= 0xc0000000) && (msr <= 0xc0001fff))
+-		__clear_bit(msr & 0x1fff, msr_bitmap + 0x400 / f);
+-}
+-
+-static void vmx_clear_msr_bitmap_write(ulong *msr_bitmap, u32 msr)
+-{
+-	int f = sizeof(unsigned long);
+-
+-	if (msr <= 0x1fff)
+-		__clear_bit(msr, msr_bitmap + 0x800 / f);
+-	else if ((msr >= 0xc0000000) && (msr <= 0xc0001fff))
+-		__clear_bit(msr & 0x1fff, msr_bitmap + 0xc00 / f);
+-}
+-
+-static void vmx_set_msr_bitmap_read(ulong *msr_bitmap, u32 msr)
+-{
+-	int f = sizeof(unsigned long);
+-
+-	if (msr <= 0x1fff)
+-		__set_bit(msr, msr_bitmap + 0x000 / f);
+-	else if ((msr >= 0xc0000000) && (msr <= 0xc0001fff))
+-		__set_bit(msr & 0x1fff, msr_bitmap + 0x400 / f);
+-}
+-
+-static void vmx_set_msr_bitmap_write(ulong *msr_bitmap, u32 msr)
+-{
+-	int f = sizeof(unsigned long);
+-
+-	if (msr <= 0x1fff)
+-		__set_bit(msr, msr_bitmap + 0x800 / f);
+-	else if ((msr >= 0xc0000000) && (msr <= 0xc0001fff))
+-		__set_bit(msr & 0x1fff, msr_bitmap + 0xc00 / f);
+-}
+-
+ void vmx_disable_intercept_for_msr(struct kvm_vcpu *vcpu, u32 msr, int type)
+ {
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
+@@ -6749,7 +6686,9 @@ static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
+ 	 * If the L02 MSR bitmap does not intercept the MSR, then we need to
+ 	 * save it.
+ 	 */
+-	if (unlikely(!msr_write_intercepted(vcpu, MSR_IA32_SPEC_CTRL)))
++	if (unlikely(cpu_has_vmx_msr_bitmap() &&
++		     vmx_test_msr_bitmap_write(vmx->loaded_vmcs->msr_bitmap,
++					       MSR_IA32_SPEC_CTRL)))
+ 		vmx->spec_ctrl = native_read_msr(MSR_IA32_SPEC_CTRL);
+ 
+ 	x86_spec_ctrl_restore_host(vmx->spec_ctrl, 0);
+diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+index 592217fd7d92..3f9c8548625d 100644
+--- a/arch/x86/kvm/vmx/vmx.h
++++ b/arch/x86/kvm/vmx/vmx.h
+@@ -400,6 +400,69 @@ static inline void vmx_set_intercept_for_msr(struct kvm_vcpu *vcpu, u32 msr,
+ 
+ void vmx_update_cpu_dirty_logging(struct kvm_vcpu *vcpu);
+ 
++static inline bool vmx_test_msr_bitmap_read(ulong *msr_bitmap, u32 msr)
++{
++	int f = sizeof(unsigned long);
++
++	if (msr <= 0x1fff)
++		return test_bit(msr, msr_bitmap + 0x000 / f);
++	else if ((msr >= 0xc0000000) && (msr <= 0xc0001fff))
++		return test_bit(msr & 0x1fff, msr_bitmap + 0x400 / f);
++	return true;
++}
++
++static inline bool vmx_test_msr_bitmap_write(ulong *msr_bitmap, u32 msr)
++{
++	int f = sizeof(unsigned long);
++
++	if (msr <= 0x1fff)
++		return test_bit(msr, msr_bitmap + 0x800 / f);
++	else if ((msr >= 0xc0000000) && (msr <= 0xc0001fff))
++		return test_bit(msr & 0x1fff, msr_bitmap + 0xc00 / f);
++	return true;
++}
++
++static inline void vmx_clear_msr_bitmap_read(ulong *msr_bitmap, u32 msr)
++{
++	int f = sizeof(unsigned long);
++
++	if (msr <= 0x1fff)
++		__clear_bit(msr, msr_bitmap + 0x000 / f);
++	else if ((msr >= 0xc0000000) && (msr <= 0xc0001fff))
++		__clear_bit(msr & 0x1fff, msr_bitmap + 0x400 / f);
++}
++
++static inline void vmx_clear_msr_bitmap_write(ulong *msr_bitmap, u32 msr)
++{
++	int f = sizeof(unsigned long);
++
++	if (msr <= 0x1fff)
++		__clear_bit(msr, msr_bitmap + 0x800 / f);
++	else if ((msr >= 0xc0000000) && (msr <= 0xc0001fff))
++		__clear_bit(msr & 0x1fff, msr_bitmap + 0xc00 / f);
++}
++
++static inline void vmx_set_msr_bitmap_read(ulong *msr_bitmap, u32 msr)
++{
++	int f = sizeof(unsigned long);
++
++	if (msr <= 0x1fff)
++		__set_bit(msr, msr_bitmap + 0x000 / f);
++	else if ((msr >= 0xc0000000) && (msr <= 0xc0001fff))
++		__set_bit(msr & 0x1fff, msr_bitmap + 0x400 / f);
++}
++
++static inline void vmx_set_msr_bitmap_write(ulong *msr_bitmap, u32 msr)
++{
++	int f = sizeof(unsigned long);
++
++	if (msr <= 0x1fff)
++		__set_bit(msr, msr_bitmap + 0x800 / f);
++	else if ((msr >= 0xc0000000) && (msr <= 0xc0001fff))
++		__set_bit(msr & 0x1fff, msr_bitmap + 0xc00 / f);
++}
++
++
+ static inline u8 vmx_get_rvi(void)
+ {
+ 	return vmcs_read16(GUEST_INTR_STATUS) & 0xff;
 -- 
 2.33.0.685.g46640cef36-goog
 
