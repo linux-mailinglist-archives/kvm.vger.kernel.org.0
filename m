@@ -2,84 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D9A06417819
-	for <lists+kvm@lfdr.de>; Fri, 24 Sep 2021 18:01:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C776D41781A
+	for <lists+kvm@lfdr.de>; Fri, 24 Sep 2021 18:01:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347253AbhIXQC6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Sep 2021 12:02:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59384 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347186AbhIXQC5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Sep 2021 12:02:57 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4526BC061571
-        for <kvm@vger.kernel.org>; Fri, 24 Sep 2021 09:01:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-        Content-Type:Content-ID:Content-Description;
-        bh=u+Fwh3FY3v88AJUR/voPvS9eUvIwQdqL+LN9kAeUZgo=; b=r+PT0NfrTc+EBy9dBzcODbZplR
-        ssWHnYbIrwfs0vzrMvSJMbo5lz2agQDSHka7NAWf20PN3Aw3zOCZHfbmvxLYP0mWPMS66aXZlbKF7
-        ydEhGZHuQjk3SsQCD352ztZDdkrFXXmML+c2XlBZTql1LMK92gdvfVH0P1fNkUKBwpuXAWIjP62+h
-        8uRiQdQyB6MXf2O35kktCgswnbRqJ86tswvyZhALbjbjrEx+HYvV1L4DMVsuBy29IAvepwqtuqvJ0
-        UoiH74trB9dVgbpYgSWZT0SfkTyXkrYwjHW0HSaoHhST/L8hbvUp7raxaHAZN9s0GfxUJ2tECxSZl
-        aEkt82Lw==;
-Received: from [2001:4bb8:184:72db:e8f6:c47e:192b:5622] (helo=localhost)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mTnbZ-007N0F-HP; Fri, 24 Sep 2021 15:59:36 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Diana Craciun <diana.craciun@oss.nxp.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Terrence Xu <terrence.xu@intel.com>, kvm@vger.kernel.org,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Kevin Tian <kevin.tian@intel.com>
-Subject: [PATCH 03/15] vfio: remove the iommudata check in vfio_noiommu_attach_group
-Date:   Fri, 24 Sep 2021 17:56:53 +0200
-Message-Id: <20210924155705.4258-4-hch@lst.de>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210924155705.4258-1-hch@lst.de>
-References: <20210924155705.4258-1-hch@lst.de>
+        id S1347261AbhIXQDF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Sep 2021 12:03:05 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:22578 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1347247AbhIXQDA (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 24 Sep 2021 12:03:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1632499286;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=TudUTjEP0k1/HE5s4PUTK9xUpG/DldUIjjGXuBeaV2g=;
+        b=g/ZgxEMRcj7I5tPKCwoWjr+qUzzUAuGynRLu0oeHn81ivyV435URmV1h89SiylcRllUI6R
+        hj9mfwh9fEycRU9kca3jlhCt239czumGKCOZCsRaJmg9s6LmilQhi0jOBzHbnDj8N7OoEy
+        h29hVIC4arbZ4a63QCidU42OdwACvcw=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-264-JKcAi0zuO1C23Z_ce2_lNA-1; Fri, 24 Sep 2021 12:01:20 -0400
+X-MC-Unique: JKcAi0zuO1C23Z_ce2_lNA-1
+Received: by mail-wr1-f69.google.com with SMTP id m1-20020a056000180100b0015e1ec30ac3so8468563wrh.8
+        for <kvm@vger.kernel.org>; Fri, 24 Sep 2021 09:01:20 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=TudUTjEP0k1/HE5s4PUTK9xUpG/DldUIjjGXuBeaV2g=;
+        b=mpOspoFM5bzcY0qOo0InWrpsmGbSxVpEx1O0LYHg2RoFyjXq8Xu75MTBcG+yq/fo5u
+         Xf4f56OE0SyDZ8iCualoxkkOoCAAfmfGl+x71k6nk3BT3euZdKVePdBJ8440iGD1t+Xi
+         0bFvJE81v0kkutqWiiQuOAqMLTLfbpq1mDQatD9+FziX0PRyY5XE+pbCFz3nP7waEvKq
+         z7jiySjiAa56afe6QQxrzs18ZpyFgR0bUUx3aiWWm3hCmhSl4OVkunhHS89bZQem4BVh
+         xIt9b3+8P0VbGlxm9pJtWKa7j3knhMJ+0xtug/5SCuzCO8ADMSpR48U3CAa5zXWSHYwC
+         8hTw==
+X-Gm-Message-State: AOAM532MmTctLj58Zi8PdNoobpgXV2+5Ru9kLzNhRgTPUUsNx2QkLLzv
+        zcp6uzIkr9xxUFQEry4O3G7hvBRa3AJv369UzBLC/huQQCJzjhEyHjNTBIsYvYjST6QZS71J1Id
+        /v3+HryWIFzv2
+X-Received: by 2002:a7b:c845:: with SMTP id c5mr1032237wml.17.1632499279515;
+        Fri, 24 Sep 2021 09:01:19 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz/wZXfPe7Vy8SRZtDxf4Y674y47Z6H0NCE2CsQlcz9CeIwPLUy83tbmW0CljWDa+ec8tDF2Q==
+X-Received: by 2002:a7b:c845:: with SMTP id c5mr1032205wml.17.1632499279322;
+        Fri, 24 Sep 2021 09:01:19 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id i203sm12811432wma.7.2021.09.24.09.01.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 24 Sep 2021 09:01:18 -0700 (PDT)
+Message-ID: <4005b824-549a-094d-82f2-e921fcd22912@redhat.com>
+Date:   Fri, 24 Sep 2021 18:01:17 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [GIT PULL] KVM/rseq changes for Linux 5.15-rc3
+Content-Language: en-US
+To:     "Eric W. Biederman" <ebiederm@xmission.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Oleg Nesterov <oleg@redhat.com>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>
+References: <20210923181252.44385-1-pbonzini@redhat.com>
+ <CAHk-=wjp7psdNc8KpxVDmcVYaAAxDUvvFTgx21OwZJzkghktLg@mail.gmail.com>
+ <87r1deqa6b.fsf@disp2133>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <87r1deqa6b.fsf@disp2133>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-vfio_noiommu_attach_group has two callers:
+On 24/09/21 17:13, Eric W. Biederman wrote:
+> Does anyone have any idea what to call
+> tracehook_notify_resume so that it describes it's current usage?
 
- 1) __vfio_container_attach_groups is called by vfio_ioctl_set_iommu,
-    which just called vfio_iommu_driver_allowed
- 2) vfio_group_set_container requires already checks ->noiommu on the
-    vfio_group, which is propagated from the iommudata in
-    vfio_create_group
+There isn't a more precise definition than "sundry slowpaths to be 
+invoked before returning to userspace".  Whenever one of the triggering 
+conditions becomes true, set_notify_resume() is called and 
+tracehook_notify_resume() will execute them all.
 
-so this check is entirely superflous and can be removed.
-
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
-Reviewed-by: Kevin Tian <kevin.tian@intel.com>
----
- drivers/vfio/vfio.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
-index faf8e0d637bb94..8bd4b0b96b94a3 100644
---- a/drivers/vfio/vfio.c
-+++ b/drivers/vfio/vfio.c
-@@ -240,7 +240,7 @@ static long vfio_noiommu_ioctl(void *iommu_data,
- static int vfio_noiommu_attach_group(void *iommu_data,
- 				     struct iommu_group *iommu_group)
- {
--	return iommu_group_get_iommudata(iommu_group) == &noiommu ? 0 : -EINVAL;
-+	return 0;
- }
- 
- static void vfio_noiommu_detach_group(void *iommu_data,
--- 
-2.30.2
+Paolo
 
