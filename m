@@ -2,149 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5A622416B18
-	for <lists+kvm@lfdr.de>; Fri, 24 Sep 2021 06:57:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CA568416B39
+	for <lists+kvm@lfdr.de>; Fri, 24 Sep 2021 07:32:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244075AbhIXE6g (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Sep 2021 00:58:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48096 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231256AbhIXE6f (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Sep 2021 00:58:35 -0400
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 304E4C061574
-        for <kvm@vger.kernel.org>; Thu, 23 Sep 2021 21:57:03 -0700 (PDT)
-Received: by mail-pl1-x632.google.com with SMTP id j15so4233973plh.7
-        for <kvm@vger.kernel.org>; Thu, 23 Sep 2021 21:57:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=FhfKAFl2Cp1pTCS3Bb7r2rs05iyLq60w24OU87R4Csg=;
-        b=bbEeGZPt3coXPplXqb8SuClleUlX0a7cl3dbYTNip5d6pqAoYm1oYNWZbUOaPBcwYb
-         yZEmyVeuAfmB5G9IETW9PA4ZW6h0nZ/r994LOMy8xNt3YAZKlpNYfIJ5ajqz9QeluFD+
-         8Uaj++sxQj+LGgkPrdeUzCFqgWHG7/D4pPkbbqi87kCEYdsHObsmjj4RRXj19w7EYHHK
-         s03nXugTkRvv+D8uUg03I0R3V2dOi8kQmw6tJWPQg8H0WtYM6aeeD18fVagBC7Mt9575
-         OQYDNpYUdSbsAjcGpWSB0e6FadlHw4S/6XXCHCjd1dvsBC+LJT0ymfB/n8dWOrlP1N6g
-         rCYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=FhfKAFl2Cp1pTCS3Bb7r2rs05iyLq60w24OU87R4Csg=;
-        b=i+apV82j4oo4xSS5UiPSUVNbpobX1sPl+eXBceBv927qN6rq8sKMIjg9Yt6ovPxEd3
-         +OycUbnioWNQeExQ6XZNr8pdu0TBC9bkON5Sh+nEfD4HFWxQTUb1KfOOhaMRVSj93ZvS
-         uI/RolQCDFSDHGq35jmW0jkYxJD5BEjUpxZ1zOr/XBN3g46yNEl3LI4cItTQBEDFkdvj
-         Z6tSVK/TU8DIDreGVQol0oNlp/k905fbDTPemKDhrTYhGw6occykfloIJlFgQs5Yyqnk
-         n1gf90gQRyZMv5UpYFjROHjZyT3YgAT739PVEv5p92qzJR/DIobIYMCaKxcjg2y8MdL7
-         DNNw==
-X-Gm-Message-State: AOAM532RCRbXDfm039EsVK9Iofp3kDxzpghkQ7xpT5hw+xg2EgbNKmuv
-        SP00J6JOYkBCziiQq7nbXv2PpgA54aHWGA==
-X-Google-Smtp-Source: ABdhPJwliW/McnlmoE86OiLuWS+q9W9E1nRDSDE0qTX/YPeWCAFO/1nGnMNEEKep9JVlczSPs+dqhw==
-X-Received: by 2002:a17:903:1d1:b0:13c:897c:c04b with SMTP id e17-20020a17090301d100b0013c897cc04bmr7112736plh.76.1632459422468;
-        Thu, 23 Sep 2021 21:57:02 -0700 (PDT)
-Received: from google.com (150.12.83.34.bc.googleusercontent.com. [34.83.12.150])
-        by smtp.gmail.com with ESMTPSA id c16sm7076206pfo.163.2021.09.23.21.57.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Sep 2021 21:57:01 -0700 (PDT)
-Date:   Thu, 23 Sep 2021 21:56:58 -0700
-From:   Ricardo Koller <ricarkol@google.com>
-To:     Oliver Upton <oupton@google.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Sean Christopherson <seanjc@google.com>
-Subject: Re: [PATCH] selftests: KVM: Explicitly use movq to read xmm registers
-Message-ID: <YU1amie6LL/5JY8w@google.com>
-References: <20210924005147.1122357-1-oupton@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+        id S244133AbhIXFeU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Sep 2021 01:34:20 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51076 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S243369AbhIXFeU (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 24 Sep 2021 01:34:20 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 18O4TxLE003727;
+        Fri, 24 Sep 2021 01:32:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : content-type : in-reply-to :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=LcclFexTC3W4CGWQ05F30N7TENmKQs3CWJF8lIJhAyA=;
+ b=fM5r0pOd7rJd2mnURChsSfJfJrX/C+3BofObflhTYGzVXv/HEJS9Aw8BgIC//ggGIR4j
+ CZ5JxdcP59VcALFL5IzVij2oY4zwlRyWWbJs8bYZFXoi5eLF6aEHqAyx0sRU0twQi+Nx
+ uTzT35Ud5rz3mMLTSHcDte6njyO8gAKbwGxAXdnivxmbV3hoFkXGse9K5ImTnY3FP/yx
+ Dcg6IMAClTzZSYBturZR2pFZSHk8drui/RqjiPVFtbOoDuEmvxDYqAtOWfweNAxqZrTZ
+ HQI3Eeh+Tf3jj5APaqHV6+/E8KJV71sFQyUh51zWXPgx91EVjartcf89ESTdpFpWq0zU zQ== 
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3b97px199p-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 24 Sep 2021 01:32:30 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 18O5WBU3010032;
+        Fri, 24 Sep 2021 05:32:28 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma03ams.nl.ibm.com with ESMTP id 3b93gb1yvs-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 24 Sep 2021 05:32:28 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 18O5RWr150528586
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 24 Sep 2021 05:27:32 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A77234C04E;
+        Fri, 24 Sep 2021 05:32:25 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 26CB04C050;
+        Fri, 24 Sep 2021 05:32:23 +0000 (GMT)
+Received: from linux.ibm.com (unknown [9.145.159.121])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Fri, 24 Sep 2021 05:32:23 +0000 (GMT)
+Date:   Fri, 24 Sep 2021 08:32:21 +0300
+From:   Mike Rapoport <rppt@linux.ibm.com>
+To:     Christophe Leroy <christophe.leroy@csgroup.eu>
+Cc:     Mike Rapoport <rppt@kernel.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        devicetree@vger.kernel.org, linux-efi@vger.kernel.org,
+        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-sh@vger.kernel.org, linux-um@lists.infradead.org,
+        linux-kernel@vger.kernel.org, kasan-dev@googlegroups.com,
+        linux-mips@vger.kernel.org, linux-mm@kvack.org,
+        iommu@lists.linux-foundation.org, linux-usb@vger.kernel.org,
+        linux-alpha@vger.kernel.org, sparclinux@vger.kernel.org,
+        xen-devel@lists.xenproject.org,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-snps-arc@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
+        linux-riscv@lists.infradead.org,
+        linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH 3/3] memblock: cleanup memblock_free interface
+Message-ID: <YU1i5YyldfS1HH0j@linux.ibm.com>
+References: <20210923074335.12583-1-rppt@kernel.org>
+ <20210923074335.12583-4-rppt@kernel.org>
+ <1101e3c7-fcb7-a632-8e22-47f4a01ea02e@csgroup.eu>
+ <YUxsgN/uolhn1Ok+@linux.ibm.com>
+ <96e3da9f-70ff-e5c0-ef2e-cf0b636e5695@csgroup.eu>
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20210924005147.1122357-1-oupton@google.com>
+In-Reply-To: <96e3da9f-70ff-e5c0-ef2e-cf0b636e5695@csgroup.eu>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: EYYWPQtbK60SNKLXoEtnrAemGAQvCJn5
+X-Proofpoint-GUID: EYYWPQtbK60SNKLXoEtnrAemGAQvCJn5
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+MIME-Version: 1.0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.391,FMLib:17.0.607.475
+ definitions=2021-09-24_01,2021-09-23_01,2020-04-07_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ impostorscore=0 mlxscore=0 lowpriorityscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 mlxlogscore=856 adultscore=0 phishscore=0 suspectscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2109230001 definitions=main-2109240031
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 24, 2021 at 12:51:47AM +0000, Oliver Upton wrote:
-> Compiling the KVM selftests with clang emits the following warning:
+On Thu, Sep 23, 2021 at 03:54:46PM +0200, Christophe Leroy wrote:
 > 
-> >> include/x86_64/processor.h:297:25: error: variable 'xmm0' is uninitialized when used here [-Werror,-Wuninitialized]
-> >>                return (unsigned long)xmm0;
+> Le 23/09/2021 à 14:01, Mike Rapoport a écrit :
+> > On Thu, Sep 23, 2021 at 11:47:48AM +0200, Christophe Leroy wrote:
+> > > 
+> > > 
+> > > Le 23/09/2021 à 09:43, Mike Rapoport a écrit :
+> > > > From: Mike Rapoport <rppt@linux.ibm.com>
+> > > > 
+> > > > For ages memblock_free() interface dealt with physical addresses even
+> > > > despite the existence of memblock_alloc_xx() functions that return a
+> > > > virtual pointer.
+> > > > 
+> > > > Introduce memblock_phys_free() for freeing physical ranges and repurpose
+> > > > memblock_free() to free virtual pointers to make the following pairing
+> > > > abundantly clear:
+> > > > 
+> > > > 	int memblock_phys_free(phys_addr_t base, phys_addr_t size);
+> > > > 	phys_addr_t memblock_phys_alloc(phys_addr_t base, phys_addr_t size);
+> > > > 
+> > > > 	void *memblock_alloc(phys_addr_t size, phys_addr_t align);
+> > > > 	void memblock_free(void *ptr, size_t size);
+> > > > 
+> > > > Replace intermediate memblock_free_ptr() with memblock_free() and drop
+> > > > unnecessary aliases memblock_free_early() and memblock_free_early_nid().
+> > > > 
+> > > > Suggested-by: Linus Torvalds <torvalds@linux-foundation.org>
+> > > > Signed-off-by: Mike Rapoport <rppt@linux.ibm.com>
+> > > > ---
+> > > 
+> > > > diff --git a/arch/s390/kernel/smp.c b/arch/s390/kernel/smp.c
+> > > > index 1a04e5bdf655..37826d8c4f74 100644
+> > > > --- a/arch/s390/kernel/smp.c
+> > > > +++ b/arch/s390/kernel/smp.c
+> > > > @@ -723,7 +723,7 @@ void __init smp_save_dump_cpus(void)
+> > > >    			/* Get the CPU registers */
+> > > >    			smp_save_cpu_regs(sa, addr, is_boot_cpu, page);
+> > > >    	}
+> > > > -	memblock_free(page, PAGE_SIZE);
+> > > > +	memblock_phys_free(page, PAGE_SIZE);
+> > > >    	diag_amode31_ops.diag308_reset();
+> > > >    	pcpu_set_smt(0);
+> > > >    }
+> > > > @@ -880,7 +880,7 @@ void __init smp_detect_cpus(void)
+> > > >    	/* Add CPUs present at boot */
+> > > >    	__smp_rescan_cpus(info, true);
+> > > > -	memblock_free_early((unsigned long)info, sizeof(*info));
+> > > > +	memblock_free(info, sizeof(*info));
+> > > >    }
+> > > >    /*
+> > > 
+> > > I'm a bit lost. IIUC memblock_free_early() and memblock_free() where
+> > > identical.
+> > 
+> > Yes, they were, but all calls to memblock_free_early() were using
+> > __pa(vaddr) because they had a virtual address at hand.
 > 
-> where xmm0 is accessed via an uninitialized register variable.
-> 
-> Indeed, this is a misuse of register variables, which really should only
-> be used for specifying register constraints on variables passed to
-> inline assembly. Rather than attempting to read xmm registers via
-> register variables, just explicitly perform the movq from the desired
-> xmm register.
-> 
-> Fixes: 783e9e51266e ("kvm: selftests: add API testing infrastructure")
-> Signed-off-by: Oliver Upton <oupton@google.com>
-> ---
->  .../selftests/kvm/include/x86_64/processor.h  | 34 +++++++++----------
->  1 file changed, 17 insertions(+), 17 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
-> index 242ae8e09a65..eba8bd08293e 100644
-> --- a/tools/testing/selftests/kvm/include/x86_64/processor.h
-> +++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-> @@ -312,37 +312,37 @@ static inline void set_xmm(int n, unsigned long val)
->  	}
->  }
->  
-> -typedef unsigned long v1di __attribute__ ((vector_size (8)));
-> +#define GET_XMM(__xmm)							\
-> +({									\
-> +	unsigned long __val;						\
-> +	asm volatile("movq %%"#__xmm", %0" : "=r"(__val) : : #__xmm);	\
-> +	__val;								\
-> +})
-> +
->  static inline unsigned long get_xmm(int n)
->  {
->  	assert(n >= 0 && n <= 7);
->  
-> -	register v1di xmm0 __asm__("%xmm0");
-> -	register v1di xmm1 __asm__("%xmm1");
-> -	register v1di xmm2 __asm__("%xmm2");
-> -	register v1di xmm3 __asm__("%xmm3");
-> -	register v1di xmm4 __asm__("%xmm4");
-> -	register v1di xmm5 __asm__("%xmm5");
-> -	register v1di xmm6 __asm__("%xmm6");
-> -	register v1di xmm7 __asm__("%xmm7");
->  	switch (n) {
->  	case 0:
-> -		return (unsigned long)xmm0;
-> +		return GET_XMM(xmm0);
->  	case 1:
-> -		return (unsigned long)xmm1;
-> +		return GET_XMM(xmm1);
->  	case 2:
-> -		return (unsigned long)xmm2;
-> +		return GET_XMM(xmm2);
->  	case 3:
-> -		return (unsigned long)xmm3;
-> +		return GET_XMM(xmm3);
->  	case 4:
-> -		return (unsigned long)xmm4;
-> +		return GET_XMM(xmm4);
->  	case 5:
-> -		return (unsigned long)xmm5;
-> +		return GET_XMM(xmm5);
->  	case 6:
-> -		return (unsigned long)xmm6;
-> +		return GET_XMM(xmm6);
->  	case 7:
-> -		return (unsigned long)xmm7;
-> +		return GET_XMM(xmm7);
->  	}
-> +
-> +	/* never reached */
->  	return 0;
->  }
->  
-> -- 
-> 2.33.0.685.g46640cef36-goog
-> 
+> I'm still not following. In the above memblock_free_early() was taking
+> (unsigned long)info . Was it a bug ? 
 
-Reviewed-by: Ricardo Koller <ricarkol@google.com>
+Not really because s390 has pa == va:
+
+https://elixir.bootlin.com/linux/latest/source/arch/s390/include/asm/page.h#L169
+
+
+-- 
+Sincerely yours,
+Mike.
