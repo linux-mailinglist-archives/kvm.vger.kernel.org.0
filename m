@@ -2,85 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 45611417599
-	for <lists+kvm@lfdr.de>; Fri, 24 Sep 2021 15:24:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 10B2B41751F
+	for <lists+kvm@lfdr.de>; Fri, 24 Sep 2021 15:13:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345971AbhIXN0E (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Sep 2021 09:26:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50648 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345752AbhIXNZU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Sep 2021 09:25:20 -0400
-Received: from mail-wr1-x44a.google.com (mail-wr1-x44a.google.com [IPv6:2a00:1450:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DED50C03402E
-        for <kvm@vger.kernel.org>; Fri, 24 Sep 2021 05:55:05 -0700 (PDT)
-Received: by mail-wr1-x44a.google.com with SMTP id x7-20020a5d6507000000b0015dada209b1so7960217wru.15
-        for <kvm@vger.kernel.org>; Fri, 24 Sep 2021 05:55:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=pSU+osLY3SNvsXyTiQYlyo1U/eLzGKvNKDW/e+/rj1k=;
-        b=Xi9NRBx5XZozH8rB7huHuBAd6SihWjX6Jrjnf64+NQTSXskvNul2GqBxfiIf7CNmuT
-         0iKOKMJ44cK4ZU6Rwz1/SGVVEFbq8t5ri3zkvZ2XFXGbIfk1wobzhlceO01k5FRItErx
-         5m5N8vhxsF9ZucNOiJrzQxW+YlmxiRqOMNbZajajDFlgvy9PcYT3txzcp1UEEK+HymzZ
-         mZ88QWv7zrABazvTZ2E7mEGuKfuhe+OlDRgTvEyth3hWEwU/z3vdsXhBin4ahImA9ziu
-         kvrQd+XmUbwiD6UW0Cszh1IwSROmmsu/e32zONjnwXCme8AzBqfD3Btll6it+ZzXJu+X
-         bzoA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=pSU+osLY3SNvsXyTiQYlyo1U/eLzGKvNKDW/e+/rj1k=;
-        b=LoCIDBiR1/U7FzRnTsCk7T4RsL2w+KsLalWkac4fxkR/qzVqtompAtE4bEhEvd7M/c
-         DJLq8X+k6NGaCoCXk0GlNRK/NTOz+lSknBdizUKxbgcNhM5td5+WOctcay0djOUC4GbZ
-         yuu9sfE4nbfFemnpVpFaRX8Vcm/LVOvDfDrwPplfqYxJNcX/Ms09cjNykbjvD2ocS2M1
-         6LsoWNpzTEbuOZ71zXaWQevp6Y9jMwyFmcHJ3MCBWTys9FyuaEEOn5vtVFU43fzh9zUn
-         i3YwQhg8F+wOlzMWY1pEGP15Tl425RHh3QxngZ4EZzfMQzaADioNpBOAvbyTvSZKs5Kf
-         RKCA==
-X-Gm-Message-State: AOAM5308KGHkGO/+OJBvWqycKStCE/PjxGrufLgaeCmlByn64VPr4bJB
-        Ir2EU3gFD0VpgGoRR6M55/dmqGD4pQ==
-X-Google-Smtp-Source: ABdhPJyxAytgyRlwjG9Opamr3QJB1iEdrxd/ybpglcgq8dr0JcPPiKb6K3AtAV5QDJY8zF5YOBaDzRTtbA==
-X-Received: from tabba.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:482])
- (user=tabba job=sendgmr) by 2002:a1c:a757:: with SMTP id q84mr1960176wme.26.1632488104470;
- Fri, 24 Sep 2021 05:55:04 -0700 (PDT)
-Date:   Fri, 24 Sep 2021 13:53:59 +0100
-In-Reply-To: <20210924125359.2587041-1-tabba@google.com>
-Message-Id: <20210924125359.2587041-31-tabba@google.com>
-Mime-Version: 1.0
-References: <20210924125359.2587041-1-tabba@google.com>
-X-Mailer: git-send-email 2.33.0.685.g46640cef36-goog
-Subject: [RFC PATCH v1 30/30] [DONOTMERGE] Re-enable warnings
-From:   Fuad Tabba <tabba@google.com>
-To:     kvmarm@lists.cs.columbia.edu
-Cc:     maz@kernel.org, will@kernel.org, james.morse@arm.com,
-        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
-        mark.rutland@arm.com, christoffer.dall@arm.com, drjones@redhat.com,
-        qperret@google.com, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kernel-team@android.com,
-        tabba@google.com
-Content-Type: text/plain; charset="UTF-8"
+        id S1344733AbhIXNOc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Sep 2021 09:14:32 -0400
+Received: from mail.kernel.org ([198.145.29.99]:38838 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1346890AbhIXNMM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Sep 2021 09:12:12 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id D9CFE600D3;
+        Fri, 24 Sep 2021 13:08:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1632488927;
+        bh=DEsVxs5QhqXr9Us56Qs9QAHy1u7Pz1zYs7zcB+8p/O0=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:From;
+        b=oCiN2ZLP0OBWWJKhIXTdoEKBzx1SSQRtp5hdFjA060S6OBi1avIKghqNtF8WEPs4F
+         TTrBVcV/tYB5b4W55juUMbPfxOlRSzXokaakeGGiwp63Q8nRWkr1p04iQu97HO6/JQ
+         OtDTd8KpNpy3dTz2qaDOQxGsWcdWsPztbulQPw2nb9UAoekB0gvnUK/0Xn4RnUun5D
+         V+x87zvJRCBWlHlWMl4RiY0lhzJ8QeEuFZ8wqPfpNlrRciC1jtvOEnzlsTZIGE1y87
+         I68RbHim87p8mEcdmOoQj82Ur2jmBDpuT37SPE+26F1cFDkaq8Qo8cE1AVdEO24GHg
+         wSPrFdkxzDeqA==
+Date:   Fri, 24 Sep 2021 08:08:45 -0500
+From:   Bjorn Helgaas <helgaas@kernel.org>
+To:     Leon Romanovsky <leon@kernel.org>
+Cc:     Doug Ledford <dledford@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+        Saeed Mahameed <saeedm@nvidia.com>,
+        Yishai Hadas <yishaih@nvidia.com>
+Subject: Re: [PATCH mlx5-next 1/7] PCI/IOV: Provide internal VF index
+Message-ID: <20210924130845.GA410176@bhelgaas>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YUwgNPL++APsFJ49@unreal>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
----
- Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Thu, Sep 23, 2021 at 09:35:32AM +0300, Leon Romanovsky wrote:
+> On Wed, Sep 22, 2021 at 04:59:30PM -0500, Bjorn Helgaas wrote:
+> > On Wed, Sep 22, 2021 at 01:38:50PM +0300, Leon Romanovsky wrote:
+> > > From: Jason Gunthorpe <jgg@nvidia.com>
+> > > 
+> > > The PCI core uses the VF index internally, often called the vf_id,
+> > > during the setup of the VF, eg pci_iov_add_virtfn().
+> > > 
+> > > This index is needed for device drivers that implement live migration
+> > > for their internal operations that configure/control their VFs.
+> > >
+> > > Specifically, mlx5_vfio_pci driver that is introduced in coming patches
+> > > from this series needs it and not the bus/device/function which is
+> > > exposed today.
+> > > 
+> > > Add pci_iov_vf_id() which computes the vf_id by reversing the math that
+> > > was used to create the bus/device/function.
+> > > 
+> > > Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
+> > > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> > > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> > 
+> > Acked-by: Bjorn Helgaas <bhelgaas@google.com>
+> > 
+> > mlx5_core_sriov_set_msix_vec_count() looks like it does basically the
+> > same thing as pci_iov_vf_id() by iterating through VFs until it finds
+> > one with a matching devfn (although it *doesn't* check for a matching
+> > bus number, which seems like a bug).
+> > 
+> > Maybe that should use pci_iov_vf_id()?
+> 
+> Yes, I gave same comment internally and we decided to simply reduce the
+> amount of changes in mlx5_core to have less distractions and submit as a
+> followup. Most likely will add this hunk in v1.
 
-diff --git a/Makefile b/Makefile
-index 0278bd28bd97..ed669b2d705d 100644
---- a/Makefile
-+++ b/Makefile
-@@ -504,7 +504,7 @@ KBUILD_CFLAGS   := -Wall -Wundef -Werror=strict-prototypes -Wno-trigraphs \
- 		   -fno-strict-aliasing -fno-common -fshort-wchar -fno-PIE \
- 		   -Werror=implicit-function-declaration -Werror=implicit-int \
- 		   -Werror=return-type -Wno-format-security \
--		   -std=gnu89 -Wno-unused-variable -Wno-unused-function
-+		   -std=gnu89
- KBUILD_CPPFLAGS := -D__KERNEL__
- KBUILD_AFLAGS_KERNEL :=
- KBUILD_CFLAGS_KERNEL :=
--- 
-2.33.0.685.g46640cef36-goog
+I guess it backfired as far as reducing distractions, because now it
+just looks like a job half-done.
 
+And it still looks like the existing code is buggy.  This is called
+via sysfs, so if the PF is on bus X and the user writes to
+sriov_vf_msix_count for a VF on bus X+1, it looks like
+mlx5_core_sriov_set_msix_vec_count() will set the count for the wrong
+VF.
+
+Bjorn
