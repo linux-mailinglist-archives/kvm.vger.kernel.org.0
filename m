@@ -2,142 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 60B81416917
-	for <lists+kvm@lfdr.de>; Fri, 24 Sep 2021 02:52:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A1E084169FF
+	for <lists+kvm@lfdr.de>; Fri, 24 Sep 2021 04:24:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243675AbhIXAxc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Sep 2021 20:53:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50002 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232143AbhIXAxb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Sep 2021 20:53:31 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 012A8C061574
-        for <kvm@vger.kernel.org>; Thu, 23 Sep 2021 17:51:59 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id m16-20020a25d410000000b005ab243aaaf4so1353025ybf.20
-        for <kvm@vger.kernel.org>; Thu, 23 Sep 2021 17:51:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=5zJLsaCyRuyfAgJHK0NO/2qjz/xHTuNLfww2cDY3wZc=;
-        b=AWPrN28YZxlrkUw55d/+wP8wHc1VqClUupCBy+9GiM/x+Nmu3d463KD3yZPA+AGKS4
-         KEos1TKD35+2xki4IPbD1gq20FK9NlyQl4F6OalOvpgmFucaVqqnEnO/Nc6+hSPFDmvO
-         NGOn4pS9ecQpFOkPjHghU6LubyWQw9R21yZ7UvjqExL9vUupsKW+I7ebgGsgrC1ygG0A
-         ZKBC5kSdiIhDyoyGY4nsXtF/Je4YlBbDwM6goAKKk3M02svEmXo1cyAVsMif84BriWvh
-         p1SNaSB8qmz4z4YTdxUFt0oSK2gllk1TN5Ckcgv0YUJoLRNpozl7/OHgh3rOd8+Uu1j/
-         /gIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=5zJLsaCyRuyfAgJHK0NO/2qjz/xHTuNLfww2cDY3wZc=;
-        b=UtX2cC61UbHCQao9BAjHEutNc3u6n2NwjGYWChZ9YkqQZlefIJUj6wggZ+zifDWXZw
-         5tKzF29r7rIe3GuzB/DKx/MJgBgs9HOkZyKiDnRQtgYrmJjehVzhI0v6JYofd+dm8KP9
-         mjEzGtH7wqY1dTOU48JbcdCQ46KC1QFIpT/AY0tgE/AzsOk8El1/7K+nwGgKZg7oJ8b4
-         YEeB9jncs93SW4pg0SJciRjYVrwhgzJgh3CPhjkdhTKTKG3Nl3e6G8i6kbdJTlc8LkGy
-         5q86Prqf4KHM6rzwvYsjX8KLmN8KXj/2Qs6S89psvQ4ncGDWDkDnabOWCh6RGEm7bJdq
-         zSvA==
-X-Gm-Message-State: AOAM53269/LwZEQdtHUZBJYTtqT2oOIAkoLK2SD52jLDypbds9Elusu/
-        NMd1+opL8YbMmLg7z84JI2KL06q/45WKOP1dJWE+OAopZi8JOFPq5j+oUzrcYToVaD+HC+O+y8S
-        o2pU+2POPfA4GC/T8nazlp8smlBMo4pTuiTXQoyVivSmyJJUTyXIKIDjpUg==
-X-Google-Smtp-Source: ABdhPJy81zEtbxA/0CCCI3JjgDOIIr45GMlPsH+JyDe1Jf+y5wmjpREvcKfTdvmwuyuZWx8UJvVAP8a0AF8=
-X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a25:2e0f:: with SMTP id u15mr9845297ybu.133.1632444718119;
- Thu, 23 Sep 2021 17:51:58 -0700 (PDT)
-Date:   Fri, 24 Sep 2021 00:51:47 +0000
-Message-Id: <20210924005147.1122357-1-oupton@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.33.0.685.g46640cef36-goog
-Subject: [PATCH] selftests: KVM: Explicitly use movq to read xmm registers
-From:   Oliver Upton <oupton@google.com>
-To:     kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Oliver Upton <oupton@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S243913AbhIXC01 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Sep 2021 22:26:27 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45528 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S243813AbhIXC01 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 23 Sep 2021 22:26:27 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 18O1dPdV018047;
+        Thu, 23 Sep 2021 22:24:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=gVljcN2fkJI0NveeAGQk6omVa10K35Qwoy8qUoEqafY=;
+ b=W0ZOgIncXT0/VV2Tcderfk3GCZZTuU/ED7UoJusPhtnU4u2k4zVdqP9wVS0c6WcxA91P
+ JDhHq4wFGNexQ2Mbm63f9m3Mi0tbNKYRPVj6w5VEJxnJ+zsVEGmX93bird4lfwADUQrF
+ D1m5ECqC1W4iQx+Ci84NIoGBoxaYt2SOwgq5+AehQ2hPi19wVUvlZD1A3FkROqqR42gm
+ WqpmL5XDRmXA4uTz9hNa3AztavF58FnTZ+o4ud6BFxoX0HZwsmRyfSG1/4/n6vsinDGx
+ J7i3O6vXGSM+R+hstuRNYok4CsnlYJTJYrS3w7823SSwMyC3S9QjIFp2L6Ajz/I9H53/ 3w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3b93suaarc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 23 Sep 2021 22:24:50 -0400
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 18O2HE38020162;
+        Thu, 23 Sep 2021 22:24:49 -0400
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3b93suaar8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 23 Sep 2021 22:24:49 -0400
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+        by ppma04dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 18O2DZZb012224;
+        Fri, 24 Sep 2021 02:24:48 GMT
+Received: from b03cxnp07029.gho.boulder.ibm.com (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
+        by ppma04dal.us.ibm.com with ESMTP id 3b93g1tsk1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 24 Sep 2021 02:24:48 +0000
+Received: from b03ledav001.gho.boulder.ibm.com (b03ledav001.gho.boulder.ibm.com [9.17.130.232])
+        by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 18O2OlGL45220136
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 24 Sep 2021 02:24:47 GMT
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 24C7D6E056;
+        Fri, 24 Sep 2021 02:24:47 +0000 (GMT)
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C2C856E054;
+        Fri, 24 Sep 2021 02:24:45 +0000 (GMT)
+Received: from cpe-172-100-181-211.stny.res.rr.com (unknown [9.65.75.198])
+        by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Fri, 24 Sep 2021 02:24:45 +0000 (GMT)
+Subject: Re: [PATCH v3] vfio/ap_ops: Add missed vfio_uninit_group_dev()
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        linux-s390@vger.kernel.org, Halil Pasic <pasic@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Christoph Hellwig <hch@lst.de>, kvm@vger.kernel.org
+References: <0-v3-f9b50340cdbb+e4-ap_uninit_jgg@nvidia.com>
+ <4a50ed05-c60c-aad0-bceb-de9665602aed@linux.ibm.com>
+ <20210922131150.GP327412@nvidia.com>
+ <20210923141009.5196b90b.alex.williamson@redhat.com>
+From:   Tony Krowiak <akrowiak@linux.ibm.com>
+Message-ID: <065e2551-a61f-6703-95f5-91991f0a38f4@linux.ibm.com>
+Date:   Thu, 23 Sep 2021 22:24:45 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
+MIME-Version: 1.0
+In-Reply-To: <20210923141009.5196b90b.alex.williamson@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: RB6XA6m6oyXToPGsjQN7hFc-UoDO8Xlt
+X-Proofpoint-GUID: aaefuldBx7iQzcTZpVSPP6mlGA-WWyqe
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.391,FMLib:17.0.607.475
+ definitions=2021-09-23_07,2021-09-23_01,2020-04-07_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 spamscore=0
+ lowpriorityscore=0 suspectscore=0 mlxlogscore=999 mlxscore=0
+ priorityscore=1501 impostorscore=0 bulkscore=0 clxscore=1015
+ malwarescore=0 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2109230001 definitions=main-2109240009
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Compiling the KVM selftests with clang emits the following warning:
 
->> include/x86_64/processor.h:297:25: error: variable 'xmm0' is uninitialized when used here [-Werror,-Wuninitialized]
->>                return (unsigned long)xmm0;
 
-where xmm0 is accessed via an uninitialized register variable.
+On 9/23/21 4:10 PM, Alex Williamson wrote:
 
-Indeed, this is a misuse of register variables, which really should only
-be used for specifying register constraints on variables passed to
-inline assembly. Rather than attempting to read xmm registers via
-register variables, just explicitly perform the movq from the desired
-xmm register.
+> Tony, I'd love to get an ack if you're satisfied with this so we can
+> close up fixes for v5.15.  Thanks,
+>
+> Alex
 
-Fixes: 783e9e51266e ("kvm: selftests: add API testing infrastructure")
-Signed-off-by: Oliver Upton <oupton@google.com>
----
- .../selftests/kvm/include/x86_64/processor.h  | 34 +++++++++----------
- 1 file changed, 17 insertions(+), 17 deletions(-)
+Reviewed-by: Tony Krowiak <akrowiak@linux.ibm.com>
 
-diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
-index 242ae8e09a65..eba8bd08293e 100644
---- a/tools/testing/selftests/kvm/include/x86_64/processor.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-@@ -312,37 +312,37 @@ static inline void set_xmm(int n, unsigned long val)
- 	}
- }
- 
--typedef unsigned long v1di __attribute__ ((vector_size (8)));
-+#define GET_XMM(__xmm)							\
-+({									\
-+	unsigned long __val;						\
-+	asm volatile("movq %%"#__xmm", %0" : "=r"(__val) : : #__xmm);	\
-+	__val;								\
-+})
-+
- static inline unsigned long get_xmm(int n)
- {
- 	assert(n >= 0 && n <= 7);
- 
--	register v1di xmm0 __asm__("%xmm0");
--	register v1di xmm1 __asm__("%xmm1");
--	register v1di xmm2 __asm__("%xmm2");
--	register v1di xmm3 __asm__("%xmm3");
--	register v1di xmm4 __asm__("%xmm4");
--	register v1di xmm5 __asm__("%xmm5");
--	register v1di xmm6 __asm__("%xmm6");
--	register v1di xmm7 __asm__("%xmm7");
- 	switch (n) {
- 	case 0:
--		return (unsigned long)xmm0;
-+		return GET_XMM(xmm0);
- 	case 1:
--		return (unsigned long)xmm1;
-+		return GET_XMM(xmm1);
- 	case 2:
--		return (unsigned long)xmm2;
-+		return GET_XMM(xmm2);
- 	case 3:
--		return (unsigned long)xmm3;
-+		return GET_XMM(xmm3);
- 	case 4:
--		return (unsigned long)xmm4;
-+		return GET_XMM(xmm4);
- 	case 5:
--		return (unsigned long)xmm5;
-+		return GET_XMM(xmm5);
- 	case 6:
--		return (unsigned long)xmm6;
-+		return GET_XMM(xmm6);
- 	case 7:
--		return (unsigned long)xmm7;
-+		return GET_XMM(xmm7);
- 	}
-+
-+	/* never reached */
- 	return 0;
- }
- 
--- 
-2.33.0.685.g46640cef36-goog
+>
 
