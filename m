@@ -2,88 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D31D8416E16
-	for <lists+kvm@lfdr.de>; Fri, 24 Sep 2021 10:38:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 35106416E1B
+	for <lists+kvm@lfdr.de>; Fri, 24 Sep 2021 10:40:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244832AbhIXIif (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Sep 2021 04:38:35 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:48559 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S244808AbhIXIie (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 24 Sep 2021 04:38:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632472621;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=uoccDgu2GmJhRPeasYkI2ZMY0s3OFIWp9qaw8FYPVZU=;
-        b=gqkpzoLYNTvD5PNc2tIb7sT+PJBavuGYE6IutD0r33MPtR9k2NQFe+rMTvsTc01WUDq6Z4
-        aMOKRxY6kvDQ5nzIjZ3JwkOGCXXAT/fp8lDOPRKePo7+j/lWH3eAvkqhNQjoOHSUWnsZ4w
-        9wFc++TYfYWMeVUirJvDrRY/ObGmAbs=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-382-KuZrfzLhOtK-h2Eelc3xEg-1; Fri, 24 Sep 2021 04:37:00 -0400
-X-MC-Unique: KuZrfzLhOtK-h2Eelc3xEg-1
-Received: by mail-wr1-f72.google.com with SMTP id c15-20020a5d4ccf000000b0015dff622f39so7386572wrt.21
-        for <kvm@vger.kernel.org>; Fri, 24 Sep 2021 01:36:59 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=uoccDgu2GmJhRPeasYkI2ZMY0s3OFIWp9qaw8FYPVZU=;
-        b=4GefLoaCnb3TgdKbbe72BRvd2gKfGyPW4VWEwOuyAH9zmDs3rmS1Ih48VhVIr8Nfsb
-         6Diwh5SZ5i2JE6uZkgGnz5JJMjoVJvyZmUj+bGbl0B1Cfk/341zO6TuU8V2eYMMVC336
-         6rOFunOv6iXfQKvUZqVW12QysI4hwJUJpLRuQ1FsYUqMh/0U7aCZ+WOoMgJLCI/2pQNC
-         ++qkQWM6lAMdUlVMWJFRnAwx4r+/lV9gLmGyAtGKFFeEFD0zcWY5O0ECWObVTtb5DqFf
-         dpYm/xV2p3OwEGUTZvZlMelkxijKlqAyCufbNlXWPTJjFBP46gTXyQqiCWM508C6LRPs
-         kCPQ==
-X-Gm-Message-State: AOAM531TDyUVQSePuD293Xef0qZEGAeVH4fFnl2WJOSg4ZvGXzlBWmQQ
-        Sf/CYXQ+eHxz2Wq6MKVRNnrDtYeOdduQoTrCVSgXtj/VeG1t29S8AtlglfKMwc/UgTh7HIoWG03
-        Mv73n7XohIMwo
-X-Received: by 2002:a1c:7d4d:: with SMTP id y74mr747228wmc.181.1632472619007;
-        Fri, 24 Sep 2021 01:36:59 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxrPcl0J71cTLtO5JgmEE344bmxoKlMhYJnZbDHtkn/3Te02cYPEz+o0Ln+CHUwnb0Azs1Ggw==
-X-Received: by 2002:a1c:7d4d:: with SMTP id y74mr747209wmc.181.1632472618833;
-        Fri, 24 Sep 2021 01:36:58 -0700 (PDT)
-Received: from thuth.remote.csb (tmo-097-75.customers.d1-online.com. [80.187.97.75])
-        by smtp.gmail.com with ESMTPSA id t22sm3909173wmj.30.2021.09.24.01.36.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 24 Sep 2021 01:36:58 -0700 (PDT)
-Subject: Re: [PATCH kvm-unit-tests] MAINTAINERS: add S lines
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc:     Laurent Vivier <lvivier@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Andrew Jones <drjones@redhat.com>
-References: <20210923114814.229844-1-pbonzini@redhat.com>
-From:   Thomas Huth <thuth@redhat.com>
-Message-ID: <e8088857-d646-fe57-0d0d-801f701935ca@redhat.com>
-Date:   Fri, 24 Sep 2021 10:36:56 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+        id S244788AbhIXIkZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Sep 2021 04:40:25 -0400
+Received: from mail.kernel.org ([198.145.29.99]:36756 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S244765AbhIXIkY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Sep 2021 04:40:24 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id AB31B61211;
+        Fri, 24 Sep 2021 08:38:49 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1mTgjH-00Ci2m-O5; Fri, 24 Sep 2021 09:38:47 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     David Brazdil <dbrazdil@google.com>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Russell King <rmk+kernel@armlinux.org.uk>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Will Deacon <will@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kernel-team@android.com
+Subject: [GIT PULL] KVM/arm64 fixes for 5.15, take #1
+Date:   Fri, 24 Sep 2021 09:38:29 +0100
+Message-Id: <20210924083829.2766529-1-maz@kernel.org>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-In-Reply-To: <20210923114814.229844-1-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, dbrazdil@google.com, masahiroy@kernel.org, rmk+kernel@armlinux.org.uk, yuzenghui@huawei.com, will@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 23/09/2021 13.48, Paolo Bonzini wrote:
-> Mark PPC as maintained since it is a bit more stagnant than the rest.
-> 
-> Everything else is supported---strange but true.
-> 
-> Cc: Laurent Vivier <lvivier@redhat.com>
-> Cc: Thomas Huth <thuth@redhat.com>
-> Cc: Janosch Frank <frankja@linux.ibm.com>
-> Cc: Andrew Jones <drjones@redhat.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->   MAINTAINERS | 5 +++++
->   1 file changed, 5 insertions(+)
+Hi Paolo,
 
-Acked-by: Thomas Huth <thuth@redhat.com>
+Only two fixes so far for KVM/arm64: one patch squashing a Kbuild
+warning, and a fix for a regression when probing the availability of a
+PMU.
 
+Please pull,
+
+	M.
+
+The following changes since commit 6880fa6c56601bb8ed59df6c30fd390cc5f6dd8f:
+
+  Linux 5.15-rc1 (2021-09-12 16:28:37 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-5.15-1
+
+for you to fetch changes up to e840f42a49925707fca90e6c7a4095118fdb8c4d:
+
+  KVM: arm64: Fix PMU probe ordering (2021-09-20 12:43:34 +0100)
+
+----------------------------------------------------------------
+KVM/arm64 fixes for 5.15, take #1
+
+- Add missing FORCE target when building the EL2 object
+- Fix a PMU probe regression on some platforms
+
+----------------------------------------------------------------
+Marc Zyngier (1):
+      KVM: arm64: Fix PMU probe ordering
+
+Zenghui Yu (1):
+      KVM: arm64: nvhe: Fix missing FORCE for hyp-reloc.S build rule
+
+ arch/arm64/kvm/hyp/nvhe/Makefile | 2 +-
+ arch/arm64/kvm/perf.c            | 3 ---
+ arch/arm64/kvm/pmu-emul.c        | 9 ++++++++-
+ drivers/perf/arm_pmu.c           | 2 ++
+ include/kvm/arm_pmu.h            | 3 ---
+ include/linux/perf/arm_pmu.h     | 6 ++++++
+ 6 files changed, 17 insertions(+), 8 deletions(-)
