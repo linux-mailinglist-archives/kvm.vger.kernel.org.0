@@ -2,56 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4F95C417585
+	by mail.lfdr.de (Postfix) with ESMTP id A2647417586
 	for <lists+kvm@lfdr.de>; Fri, 24 Sep 2021 15:24:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345345AbhIXNZX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Sep 2021 09:25:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50032 "EHLO
+        id S1345170AbhIXNZ0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Sep 2021 09:25:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49810 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345221AbhIXNYy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1345558AbhIXNYy (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 24 Sep 2021 09:24:54 -0400
-Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09CFCC08EAF7
-        for <kvm@vger.kernel.org>; Fri, 24 Sep 2021 05:54:24 -0700 (PDT)
-Received: by mail-qv1-xf49.google.com with SMTP id e6-20020a0cb446000000b0037eeb9851dfso30074639qvf.17
-        for <kvm@vger.kernel.org>; Fri, 24 Sep 2021 05:54:24 -0700 (PDT)
+Received: from mail-qk1-x74a.google.com (mail-qk1-x74a.google.com [IPv6:2607:f8b0:4864:20::74a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BFBBC08EAF9
+        for <kvm@vger.kernel.org>; Fri, 24 Sep 2021 05:54:26 -0700 (PDT)
+Received: by mail-qk1-x74a.google.com with SMTP id u22-20020a05620a431600b0045dcc8487daso1143812qko.6
+        for <kvm@vger.kernel.org>; Fri, 24 Sep 2021 05:54:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=Q3Qv5RrzIkzZKkPoa+t7yuRspw6lMoesSpU7KdXvcDY=;
-        b=eyhYeIi0Yc+OpQ4WMWB6cehoP4mjxRW0OT/gINGnW1NX3nKXLh6PloH1z7YXRhLRXD
-         peezCPobScU708l00p9f5m1T/VHFeVITDCk9WMh1QSAlfuJK+hrFj7DW3hxAuc46fN2Z
-         F0kdWLjOE7agAn61bsssc7wGH5Qh4UWbFVUVFIZSbb7sZlE9xdGK0ta7jvigzphojt91
-         Jln4/X0wiH2ePbGsLP+kpJpWcswJzPsJS4Gbx3RnsC+83ctbyj+FXU+ucwZ5bY3f8pPw
-         4jaOO/FpP64PazSutjAhS86CC3QUmA6kgPtAYkIFkwb5jSW4fMZWarD6aA5DcqW/3Niu
-         yYLQ==
+        bh=LZOV2dq//fdarSZ1UQXRXLqBKRPy36MQCgMnGFxeKiY=;
+        b=i7wNsSyEZO3Xlq4SY8WT2jMhEBq6yM4BseM6UxtVbhob5zKaZA1doTwn0DklaFJS2J
+         LjLo/74OYhBloKd6aumy8koxoHfNV7/DYJzKOeMqQ65NyinAyxqchr5aDy0CYpDfOw3t
+         JM2pDEncfpfat3Mbl+MfvITadVXzbrAUxqM69iij9wjqJ+8GPmmWmw86KHpz6RuUYLq/
+         bt7kxSeLwbBL2g8F9PT4IrcOvb1n3g5mAneeZ2GG+fnnw4rWmPYIEbRrY2TEHKTtuZcC
+         fCpIu4w6jLfF+Eaqz8z6+bgq8cwl75ERIOks6W689Aq7x5XtM7RrPYZzgBTyOtyEjH7L
+         yyfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=Q3Qv5RrzIkzZKkPoa+t7yuRspw6lMoesSpU7KdXvcDY=;
-        b=wlc2aR/UMVlClq3KQHLEnPcK5nBMCld/9XC6/FWL9CxRrJqMhyK/nRb0lCJoupa5kK
-         vPFnEWGr7UZqn+oD/Yo/tkSw8eHQ/dMfzOaZ0AjhE8Ukz9pbHTMtdNhwM+TVWX1LJJG/
-         o6+sJFR9VB3lbWdccCUVS1E0Ezb+PwP6GgQBmTet+V1HmOMaeyyctYD4IT7tr1LyQ13r
-         otnVTGxmxXpY7ly03RgMPBypDJDQnF9sM1X9I56cod+FdbeolGu750+Fczmc8nE5iiWu
-         /2LuQb+bjMef46RdndZ6Gx5KtVIhoCqlbt09M7MVk58eXqfKNjhUR6kdPNTF3Yk+38/s
-         v4dQ==
-X-Gm-Message-State: AOAM531fGqEssewMEJLGkAgB1Ur7syyeT32uMYpYc+13zo4J8kHuf0Jj
-        T/xDZJsa8Debok1O5Y8m3LyJX1JqaQ==
-X-Google-Smtp-Source: ABdhPJy8hgrd2LxFyAX4SBH6cSNpiZRm1qTOTY9PtiLzl1pzwOaYr+Q+gCysP0BQDCTLObyPCMlvgepQPg==
+        bh=LZOV2dq//fdarSZ1UQXRXLqBKRPy36MQCgMnGFxeKiY=;
+        b=dlk4tlPzEe/KfsZWoA+gRLAVI5xGApPYK9WZ2pyZSAiamJr12oEpuQZYnJHVOotvxY
+         aFBlcpwHrFXkvxBm5Jt4WQHssGQ3CCkZLGf+iG2G4cx0G0nyRy91puGQiC+O5kXy3JQQ
+         ++TfSzd3EdbDBKq4RuEloPyFdU2g4qHi8AzKokgTSqx9HNkiO/kRMmmkyJaiHL/AOpi4
+         RpSRrLCBMM8Fgh4FTfMuqJfeoCWMDNAQ6fvsBU4d74N4lw5hJhYhynHwTia2tm/ZGCxX
+         dffCCywSg/ZcqdEjUP7enATAb4Au56voHFODwfGBqXfDG1pzpKG3GsTnr3evEMfj0bkO
+         I0Eg==
+X-Gm-Message-State: AOAM533EuP7/lGfF7R9YruIRw/rThUj3zcLcUpI4vvo3jeKXsmP+OM/+
+        DQH/LGnn6wRPuhzVLNMb9pzpIUIa9A==
+X-Google-Smtp-Source: ABdhPJyiUxiESUbsfUSqdfuMXJkScSsmcEa94A8nBj+cCsvl5tfCKO45MzFdUPEtgqstBChxPe4XLicMqw==
 X-Received: from tabba.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:482])
- (user=tabba job=sendgmr) by 2002:a05:6214:1430:: with SMTP id
- o16mr9792074qvx.66.1632488063188; Fri, 24 Sep 2021 05:54:23 -0700 (PDT)
-Date:   Fri, 24 Sep 2021 13:53:39 +0100
+ (user=tabba job=sendgmr) by 2002:a05:6214:1022:: with SMTP id
+ k2mr102283qvr.53.1632488065246; Fri, 24 Sep 2021 05:54:25 -0700 (PDT)
+Date:   Fri, 24 Sep 2021 13:53:40 +0100
 In-Reply-To: <20210924125359.2587041-1-tabba@google.com>
-Message-Id: <20210924125359.2587041-11-tabba@google.com>
+Message-Id: <20210924125359.2587041-12-tabba@google.com>
 Mime-Version: 1.0
 References: <20210924125359.2587041-1-tabba@google.com>
 X-Mailer: git-send-email 2.33.0.685.g46640cef36-goog
-Subject: [RFC PATCH v1 10/30] KVM: arm64: Add accessors for hypervisor state
- in kvm_vcpu_arch
+Subject: [RFC PATCH v1 11/30] KVM: arm64: create and use a new vcpu_hyp_state struct
 From:   Fuad Tabba <tabba@google.com>
 To:     kvmarm@lists.cs.columbia.edu
 Cc:     maz@kernel.org, will@kernel.org, james.morse@arm.com,
@@ -65,398 +64,112 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Some of the members of vcpu_arch represent state that belongs to
-the hypervisor. Future patches will factor these out into their
-own structure. To simplify the refactoring and make it easier to
-read, add accessors for the members of kvm_vcpu_arch that
-represent the hypervisor state.
+Create a struct for the hypervisor state from the related fields
+in vcpu_arch. This is needed in future patches to reduce the
+scope of functions from the vcpu as a whole to only the relevant
+state, via this newly created struct.
+
+Create a new instance of this struct in vcpu_arch and fix the
+accessors to use the new fields. Remove the existing fields from
+vcpu_arch.
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/include/asm/kvm_emulate.h | 182 ++++++++++++++++++++++-----
- arch/arm64/include/asm/kvm_host.h    |  38 ++++--
- 2 files changed, 181 insertions(+), 39 deletions(-)
+ arch/arm64/include/asm/kvm_host.h | 35 ++++++++++++++++++-------------
+ arch/arm64/kernel/asm-offsets.c   |  2 +-
+ 2 files changed, 21 insertions(+), 16 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 7d09a9356d89..e095afeecd10 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -41,9 +41,14 @@ void kvm_inject_vabt(struct kvm_vcpu *vcpu);
- void kvm_inject_dabt(struct kvm_vcpu *vcpu, unsigned long addr);
- void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr);
- 
-+static __always_inline bool hyp_state_el1_is_32bit(struct vcpu_hyp_state *vcpu_hyps)
-+{
-+	return !(hyp_state_hcr_el2(vcpu_hyps) & HCR_RW);
-+}
-+
- static __always_inline bool vcpu_el1_is_32bit(struct kvm_vcpu *vcpu)
- {
--	return !(vcpu_hcr_el2(vcpu) & HCR_RW);
-+	return hyp_state_el1_is_32bit(&hyp_state(vcpu));
- }
- 
- static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
-@@ -252,14 +257,19 @@ static inline bool vcpu_mode_priv(const struct kvm_vcpu *vcpu)
- 	return mode != PSR_MODE_EL0t;
- }
- 
-+static __always_inline u32 kvm_hyp_state_get_esr(const struct vcpu_hyp_state *vcpu_hyps)
-+{
-+	return hyp_state_fault(vcpu_hyps).esr_el2;
-+}
-+
- static __always_inline u32 kvm_vcpu_get_esr(const struct kvm_vcpu *vcpu)
- {
--	return vcpu_fault(vcpu).esr_el2;
-+	return kvm_hyp_state_get_esr(&hyp_state(vcpu));
- }
- 
--static __always_inline int kvm_vcpu_get_condition(const struct kvm_vcpu *vcpu)
-+static __always_inline u32 kvm_hyp_state_get_condition(const struct vcpu_hyp_state *vcpu_hyps)
- {
--	u32 esr = kvm_vcpu_get_esr(vcpu);
-+	u32 esr = kvm_hyp_state_get_esr(vcpu_hyps);
- 
- 	if (esr & ESR_ELx_CV)
- 		return (esr & ESR_ELx_COND_MASK) >> ESR_ELx_COND_SHIFT;
-@@ -267,111 +277,216 @@ static __always_inline int kvm_vcpu_get_condition(const struct kvm_vcpu *vcpu)
- 	return -1;
- }
- 
-+static __always_inline int kvm_vcpu_get_condition(const struct kvm_vcpu *vcpu)
-+{
-+	return kvm_hyp_state_get_condition(&hyp_state(vcpu));
-+}
-+
-+static __always_inline phys_addr_t kvm_hyp_state_get_hfar(const struct vcpu_hyp_state *vcpu_hyps)
-+{
-+	return hyp_state_fault(vcpu_hyps).far_el2;
-+}
-+
- static __always_inline unsigned long kvm_vcpu_get_hfar(const struct kvm_vcpu *vcpu)
- {
--	return vcpu_fault(vcpu).far_el2;
-+	return kvm_hyp_state_get_hfar(&hyp_state(vcpu));
-+}
-+
-+static __always_inline phys_addr_t kvm_hyp_state_get_fault_ipa(const struct vcpu_hyp_state *vcpu_hyps)
-+{
-+	return ((phys_addr_t) hyp_state_fault(vcpu_hyps).hpfar_el2 & HPFAR_MASK) << 8;
- }
- 
- static __always_inline phys_addr_t kvm_vcpu_get_fault_ipa(const struct kvm_vcpu *vcpu)
- {
--	return ((phys_addr_t) vcpu_fault(vcpu).hpfar_el2 & HPFAR_MASK) << 8;
-+	return kvm_hyp_state_get_fault_ipa(&hyp_state(vcpu));
-+}
-+
-+static __always_inline u32 kvm_hyp_state_get_disr(const struct vcpu_hyp_state *vcpu_hyps)
-+{
-+	return hyp_state_fault(vcpu_hyps).disr_el1;
- }
- 
- static inline u64 kvm_vcpu_get_disr(const struct kvm_vcpu *vcpu)
- {
--	return vcpu_fault(vcpu).disr_el1;
-+	return kvm_hyp_state_get_disr(&hyp_state(vcpu));
-+}
-+
-+static __always_inline u32 kvm_hyp_state_get_imm(const struct vcpu_hyp_state *vcpu_hyps)
-+{
-+	return kvm_hyp_state_get_esr(vcpu_hyps) & ESR_ELx_xVC_IMM_MASK;
- }
- 
- static inline u32 kvm_vcpu_hvc_get_imm(const struct kvm_vcpu *vcpu)
- {
--	return kvm_vcpu_get_esr(vcpu) & ESR_ELx_xVC_IMM_MASK;
-+	return kvm_hyp_state_get_imm(&hyp_state(vcpu));
-+}
-+
-+static __always_inline u32 kvm_hyp_state_dabt_isvalid(const struct vcpu_hyp_state *vcpu_hyps)
-+{
-+	return !!(kvm_hyp_state_get_esr(vcpu_hyps) & ESR_ELx_ISV);
- }
- 
- static __always_inline bool kvm_vcpu_dabt_isvalid(const struct kvm_vcpu *vcpu)
- {
--	return !!(kvm_vcpu_get_esr(vcpu) & ESR_ELx_ISV);
-+	return kvm_hyp_state_dabt_isvalid(&hyp_state(vcpu));
-+}
-+
-+static __always_inline u32 kvm_hyp_state_iss_nisv_sanitized(const struct vcpu_hyp_state *vcpu_hyps)
-+{
-+	return kvm_hyp_state_get_esr(vcpu_hyps) & (ESR_ELx_CM | ESR_ELx_WNR | ESR_ELx_FSC);
- }
- 
- static inline unsigned long kvm_vcpu_dabt_iss_nisv_sanitized(const struct kvm_vcpu *vcpu)
- {
--	return kvm_vcpu_get_esr(vcpu) & (ESR_ELx_CM | ESR_ELx_WNR | ESR_ELx_FSC);
-+	return kvm_hyp_state_iss_nisv_sanitized(&hyp_state(vcpu));
-+}
-+
-+static __always_inline u32 kvm_hyp_state_issext(const struct vcpu_hyp_state *vcpu_hyps)
-+{
-+	return !!(kvm_hyp_state_get_esr(vcpu_hyps) & ESR_ELx_SSE);
- }
- 
- static inline bool kvm_vcpu_dabt_issext(const struct kvm_vcpu *vcpu)
- {
--	return !!(kvm_vcpu_get_esr(vcpu) & ESR_ELx_SSE);
-+	return kvm_hyp_state_issext(&hyp_state(vcpu));
-+}
-+
-+static __always_inline u32 kvm_hyp_state_issf(const struct vcpu_hyp_state *vcpu_hyps)
-+{
-+	return !!(kvm_hyp_state_get_esr(vcpu_hyps) & ESR_ELx_SF);
- }
- 
- static inline bool kvm_vcpu_dabt_issf(const struct kvm_vcpu *vcpu)
- {
--	return !!(kvm_vcpu_get_esr(vcpu) & ESR_ELx_SF);
-+	return kvm_hyp_state_issf(&hyp_state(vcpu));
-+}
-+
-+static __always_inline phys_addr_t kvm_hyp_state_dabt_get_rd(const struct vcpu_hyp_state *vcpu_hyps)
-+{
-+	return (kvm_hyp_state_get_esr(vcpu_hyps) & ESR_ELx_SRT_MASK) >> ESR_ELx_SRT_SHIFT;
- }
- 
- static __always_inline int kvm_vcpu_dabt_get_rd(const struct kvm_vcpu *vcpu)
- {
--	return (kvm_vcpu_get_esr(vcpu) & ESR_ELx_SRT_MASK) >> ESR_ELx_SRT_SHIFT;
-+	return kvm_hyp_state_dabt_get_rd(&hyp_state(vcpu));
-+}
-+
-+static __always_inline u32 kvm_hyp_state_abt_iss1tw(const struct vcpu_hyp_state *vcpu_hyps)
-+{
-+	return !!(kvm_hyp_state_get_esr(vcpu_hyps) & ESR_ELx_S1PTW);
- }
- 
- static __always_inline bool kvm_vcpu_abt_iss1tw(const struct kvm_vcpu *vcpu)
- {
--	return !!(kvm_vcpu_get_esr(vcpu) & ESR_ELx_S1PTW);
-+	return kvm_hyp_state_abt_iss1tw(&hyp_state(vcpu));
- }
- 
- /* Always check for S1PTW *before* using this. */
-+static __always_inline u32 kvm_hyp_state_dabt_iswrite(const struct vcpu_hyp_state *vcpu_hyps)
-+{
-+	return kvm_hyp_state_get_esr(vcpu_hyps) & ESR_ELx_WNR;
-+}
-+
- static __always_inline bool kvm_vcpu_dabt_iswrite(const struct kvm_vcpu *vcpu)
- {
--	return kvm_vcpu_get_esr(vcpu) & ESR_ELx_WNR;
-+	return kvm_hyp_state_dabt_iswrite(&hyp_state(vcpu));
-+}
-+
-+static __always_inline u32 kvm_hyp_state_dabt_is_cm(const struct vcpu_hyp_state *vcpu_hyps)
-+{
-+	return !!(kvm_hyp_state_get_esr(vcpu_hyps) & ESR_ELx_CM);
- }
- 
- static inline bool kvm_vcpu_dabt_is_cm(const struct kvm_vcpu *vcpu)
- {
--	return !!(kvm_vcpu_get_esr(vcpu) & ESR_ELx_CM);
-+	return kvm_hyp_state_dabt_is_cm(&hyp_state(vcpu));
-+}
-+
-+static __always_inline phys_addr_t kvm_hyp_state_dabt_get_as(const struct vcpu_hyp_state *vcpu_hyps)
-+{
-+	return 1 << ((kvm_hyp_state_get_esr(vcpu_hyps) & ESR_ELx_SAS) >> ESR_ELx_SAS_SHIFT);
- }
- 
- static __always_inline unsigned int kvm_vcpu_dabt_get_as(const struct kvm_vcpu *vcpu)
- {
--	return 1 << ((kvm_vcpu_get_esr(vcpu) & ESR_ELx_SAS) >> ESR_ELx_SAS_SHIFT);
-+	return kvm_hyp_state_dabt_get_as(&hyp_state(vcpu));
- }
- 
- /* This one is not specific to Data Abort */
-+static __always_inline u32 kvm_hyp_state_trap_il_is32bit(const struct vcpu_hyp_state *vcpu_hyps)
-+{
-+	return !!(kvm_hyp_state_get_esr(vcpu_hyps) & ESR_ELx_IL);
-+}
-+
- static __always_inline bool kvm_vcpu_trap_il_is32bit(const struct kvm_vcpu *vcpu)
- {
--	return !!(kvm_vcpu_get_esr(vcpu) & ESR_ELx_IL);
-+	return kvm_hyp_state_trap_il_is32bit(&hyp_state(vcpu));
-+}
-+
-+static __always_inline u32 kvm_hyp_state_trap_get_class(const struct vcpu_hyp_state *vcpu_hyps)
-+{
-+	return ESR_ELx_EC(kvm_hyp_state_get_esr(vcpu_hyps));
- }
- 
- static __always_inline u8 kvm_vcpu_trap_get_class(const struct kvm_vcpu *vcpu)
- {
--	return ESR_ELx_EC(kvm_vcpu_get_esr(vcpu));
-+	return kvm_hyp_state_trap_get_class(&hyp_state(vcpu));
-+}
-+
-+static __always_inline u32 kvm_hyp_state_trap_is_iabt(const struct vcpu_hyp_state *vcpu_hyps)
-+{
-+	return kvm_hyp_state_trap_get_class(vcpu_hyps) == ESR_ELx_EC_IABT_LOW;
- }
- 
- static inline bool kvm_vcpu_trap_is_iabt(const struct kvm_vcpu *vcpu)
- {
--	return kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_IABT_LOW;
-+	return kvm_hyp_state_trap_is_iabt(&hyp_state(vcpu));
-+}
-+
-+static __always_inline u32 kvm_hyp_state_trap_is_exec_fault(const struct vcpu_hyp_state *vcpu_hyps)
-+{
-+	return kvm_hyp_state_trap_is_iabt(vcpu_hyps) && !kvm_hyp_state_abt_iss1tw(vcpu_hyps);
- }
- 
- static inline bool kvm_vcpu_trap_is_exec_fault(const struct kvm_vcpu *vcpu)
- {
--	return kvm_vcpu_trap_is_iabt(vcpu) && !kvm_vcpu_abt_iss1tw(vcpu);
-+	return kvm_hyp_state_trap_is_exec_fault(&hyp_state(vcpu));
-+}
-+
-+static __always_inline u32 kvm_hyp_state_trap_get_fault(const struct vcpu_hyp_state *vcpu_hyps)
-+{
-+	return kvm_hyp_state_get_esr(vcpu_hyps) & ESR_ELx_FSC;
- }
- 
- static __always_inline u8 kvm_vcpu_trap_get_fault(const struct kvm_vcpu *vcpu)
- {
--	return kvm_vcpu_get_esr(vcpu) & ESR_ELx_FSC;
-+	return kvm_hyp_state_trap_get_fault(&hyp_state(vcpu));
-+}
-+
-+static __always_inline u32 kvm_hyp_state_trap_get_fault_type(const struct vcpu_hyp_state *vcpu_hyps)
-+{
-+	return kvm_hyp_state_get_esr(vcpu_hyps) & ESR_ELx_FSC_TYPE;
- }
- 
- static __always_inline u8 kvm_vcpu_trap_get_fault_type(const struct kvm_vcpu *vcpu)
- {
--	return kvm_vcpu_get_esr(vcpu) & ESR_ELx_FSC_TYPE;
-+	return kvm_hyp_state_trap_get_fault_type(&hyp_state(vcpu));
-+}
-+
-+static __always_inline u32 kvm_hyp_state_trap_get_fault_level(const struct vcpu_hyp_state *vcpu_hyps)
-+{
-+	return kvm_hyp_state_get_esr(vcpu_hyps) & ESR_ELx_FSC_LEVEL;
- }
- 
- static __always_inline u8 kvm_vcpu_trap_get_fault_level(const struct kvm_vcpu *vcpu)
- {
--	return kvm_vcpu_get_esr(vcpu) & ESR_ELx_FSC_LEVEL;
-+	return kvm_hyp_state_trap_get_fault_level(&hyp_state(vcpu));
- }
- 
--static __always_inline bool kvm_vcpu_abt_issea(const struct kvm_vcpu *vcpu)
-+static __always_inline u32 kvm_hyp_state_abt_issea(const struct vcpu_hyp_state *vcpu_hyps)
- {
--	switch (kvm_vcpu_trap_get_fault(vcpu)) {
-+	switch (kvm_hyp_state_trap_get_fault(vcpu_hyps)) {
- 	case FSC_SEA:
- 	case FSC_SEA_TTW0:
- 	case FSC_SEA_TTW1:
-@@ -388,12 +503,23 @@ static __always_inline bool kvm_vcpu_abt_issea(const struct kvm_vcpu *vcpu)
- 	}
- }
- 
--static __always_inline int kvm_vcpu_sys_get_rt(struct kvm_vcpu *vcpu)
-+static __always_inline bool kvm_vcpu_abt_issea(const struct kvm_vcpu *vcpu)
-+{
-+	return kvm_hyp_state_abt_issea(&hyp_state(vcpu));
-+}
-+
-+static __always_inline u32 kvm_hyp_state_sys_get_rt(const struct vcpu_hyp_state *vcpu_hyps)
- {
--	u32 esr = kvm_vcpu_get_esr(vcpu);
-+	u32 esr = kvm_hyp_state_get_esr(vcpu_hyps);
- 	return ESR_ELx_SYS64_ISS_RT(esr);
- }
- 
-+
-+static __always_inline int kvm_vcpu_sys_get_rt(struct kvm_vcpu *vcpu)
-+{
-+	return kvm_hyp_state_sys_get_rt(&hyp_state(vcpu));
-+}
-+
- static inline bool kvm_is_write_fault(struct kvm_vcpu *vcpu)
- {
- 	if (kvm_vcpu_abt_iss1tw(vcpu))
 diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 280ee23dfc5a..3e5c173d2360 100644
+index 3e5c173d2360..dc4b5e133d86 100644
 --- a/arch/arm64/include/asm/kvm_host.h
 +++ b/arch/arm64/include/asm/kvm_host.h
-@@ -373,12 +373,21 @@ struct kvm_vcpu_arch {
+@@ -269,27 +269,35 @@ struct vcpu_reset_state {
+ 	bool		reset;
+ };
+ 
++/* Holds the hyp-relevant data of a vcpu.*/
++struct vcpu_hyp_state {
++	/* HYP configuration */
++	u64 hcr_el2;
++	u32 mdcr_el2;
++
++	/* Virtual SError ESR to restore when HCR_EL2.VSE is set */
++	u64 vsesr_el2;
++
++	/* Exception Information */
++	struct kvm_vcpu_fault_info fault;
++
++	/* Miscellaneous vcpu state flags */
++	u64 flags;
++};
++
+ struct kvm_vcpu_arch {
+ 	struct kvm_cpu_context ctxt;
+ 	void *sve_state;
+ 	unsigned int sve_max_vl;
+ 
++	struct vcpu_hyp_state hyp_state;
++
+ 	/* Stage 2 paging state used by the hardware on next switch */
+ 	struct kvm_s2_mmu *hw_mmu;
+ 
+-	/* HYP configuration */
+-	u64 hcr_el2;
+-	u32 mdcr_el2;
+-
+-	/* Exception Information */
+-	struct kvm_vcpu_fault_info fault;
+-
+ 	/* State of various workarounds, see kvm_asm.h for bit assignment */
+ 	u64 workaround_flags;
+ 
+-	/* Miscellaneous vcpu state flags */
+-	u64 flags;
+-
+ 	/*
+ 	 * We maintain more than a single set of debug registers to support
+ 	 * debugging the guest from the host and to maintain separate host and
+@@ -356,9 +364,6 @@ struct kvm_vcpu_arch {
+ 	/* Detect first run of a vcpu */
+ 	bool has_run_once;
+ 
+-	/* Virtual SError ESR to restore when HCR_EL2.VSE is set */
+-	u64 vsesr_el2;
+-
+ 	/* Additional reset state */
+ 	struct vcpu_reset_state	reset_state;
+ 
+@@ -373,7 +378,7 @@ struct kvm_vcpu_arch {
  	} steal;
  };
  
-+#define hyp_state(vcpu) ((vcpu)->arch)
-+
-+/* Accessors for hyp_state parameters related to the hypervistor state. */
-+#define hyp_state_hcr_el2(hyps) (hyps)->hcr_el2
-+#define hyp_state_mdcr_el2(hyps) (hyps)->mdcr_el2
-+#define hyp_state_vsesr_el2(hyps) (hyps)->vsesr_el2
-+#define hyp_state_fault(hyps) (hyps)->fault
-+#define hyp_state_flags(hyps) (hyps)->flags
-+
- /* Accessors for vcpu parameters related to the hypervistor state. */
--#define vcpu_hcr_el2(vcpu) (vcpu)->arch.hcr_el2
--#define vcpu_mdcr_el2(vcpu) (vcpu)->arch.mdcr_el2
--#define vcpu_vsesr_el2(vcpu) (vcpu)->arch.vsesr_el2
--#define vcpu_fault(vcpu) (vcpu)->arch.fault
--#define vcpu_flags(vcpu) (vcpu)->arch.flags
-+#define vcpu_hcr_el2(vcpu) hyp_state_hcr_el2(&hyp_state(vcpu))
-+#define vcpu_mdcr_el2(vcpu) hyp_state_mdcr_el2(&hyp_state(vcpu))
-+#define vcpu_vsesr_el2(vcpu) hyp_state_vsesr_el2(&hyp_state(vcpu))
-+#define vcpu_fault(vcpu) hyp_state_fault(&hyp_state(vcpu))
-+#define vcpu_flags(vcpu) hyp_state_flags(&hyp_state(vcpu))
+-#define hyp_state(vcpu) ((vcpu)->arch)
++#define hyp_state(vcpu) ((vcpu)->arch.hyp_state)
  
- /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
- #define vcpu_sve_pffr(vcpu) (kern_hyp_va((vcpu)->arch.sve_state) +	\
-@@ -441,18 +450,22 @@ struct kvm_vcpu_arch {
-  */
- #define KVM_ARM64_INCREMENT_PC		(1 << 9) /* Increment PC */
+ /* Accessors for hyp_state parameters related to the hypervistor state. */
+ #define hyp_state_hcr_el2(hyps) (hyps)->hcr_el2
+@@ -633,7 +638,7 @@ void kvm_arm_halt_guest(struct kvm *kvm);
+ void kvm_arm_resume_guest(struct kvm *kvm);
  
--#define vcpu_has_sve(vcpu) (system_supports_sve() &&			\
--			    ((vcpu)->arch.flags & KVM_ARM64_GUEST_HAS_SVE))
-+#define hyp_state_has_sve(hyps) (system_supports_sve() &&		\
-+			    (hyp_state_flags((hyps)) & KVM_ARM64_GUEST_HAS_SVE))
-+
-+#define vcpu_has_sve(vcpu) hyp_state_has_sve(&hyp_state(vcpu))
- 
- #ifdef CONFIG_ARM64_PTR_AUTH
--#define vcpu_has_ptrauth(vcpu)						\
-+#define hyp_state_has_ptrauth(hyps)					\
- 	((cpus_have_final_cap(ARM64_HAS_ADDRESS_AUTH) ||		\
- 	  cpus_have_final_cap(ARM64_HAS_GENERIC_AUTH)) &&		\
--	 (vcpu)->arch.flags & KVM_ARM64_GUEST_HAS_PTRAUTH)
-+	 hyp_state_flags(hyps) & KVM_ARM64_GUEST_HAS_PTRAUTH)
- #else
--#define vcpu_has_ptrauth(vcpu)		false
-+#define hyp_state_has_ptrauth(hyps)		false
- #endif
- 
-+#define vcpu_has_ptrauth(vcpu)	hyp_state_has_ptrauth(&hyp_state(vcpu))
-+
- #define vcpu_ctxt(vcpu) ((vcpu)->arch.ctxt)
- 
- /* VCPU Context accessors (direct) */
-@@ -794,8 +807,11 @@ static inline bool kvm_vm_is_protected(struct kvm *kvm)
- int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int feature);
- bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu);
- 
-+#define kvm_arm_hyp_state_sve_finalized(hyps) \
-+	(hyp_state_flags((hyps)) & KVM_ARM64_VCPU_SVE_FINALIZED)
-+
- #define kvm_arm_vcpu_sve_finalized(vcpu) \
--	((vcpu)->arch.flags & KVM_ARM64_VCPU_SVE_FINALIZED)
-+	kvm_arm_hyp_state_sve_finalized(&hyp_state(vcpu))
- 
- #define kvm_vcpu_has_pmu(vcpu)					\
- 	(test_bit(KVM_ARM_VCPU_PMU_V3, (vcpu)->arch.features))
+ #ifndef __KVM_NVHE_HYPERVISOR__
+-#define kvm_call_hyp_nvhe(f, ...)						\
++#define kvm_call_hyp_nvhe(f, ...)					\
+ 	({								\
+ 		struct arm_smccc_res res;				\
+ 									\
+diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offsets.c
+index c2cc3a2813e6..1776efc3cc9d 100644
+--- a/arch/arm64/kernel/asm-offsets.c
++++ b/arch/arm64/kernel/asm-offsets.c
+@@ -107,7 +107,7 @@ int main(void)
+   BLANK();
+ #ifdef CONFIG_KVM
+   DEFINE(VCPU_CONTEXT,		offsetof(struct kvm_vcpu, arch.ctxt));
+-  DEFINE(VCPU_FAULT_DISR,	offsetof(struct kvm_vcpu, arch.fault.disr_el1));
++  DEFINE(VCPU_FAULT_DISR,	offsetof(struct kvm_vcpu, arch.hyp_state.fault.disr_el1));
+   DEFINE(VCPU_WORKAROUND_FLAGS,	offsetof(struct kvm_vcpu, arch.workaround_flags));
+   DEFINE(CPU_USER_PT_REGS,	offsetof(struct kvm_cpu_context, regs));
+   DEFINE(CPU_APIAKEYLO_EL1,	offsetof(struct kvm_cpu_context, sys_regs[APIAKEYLO_EL1]));
 -- 
 2.33.0.685.g46640cef36-goog
 
