@@ -2,197 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C9E354178B5
-	for <lists+kvm@lfdr.de>; Fri, 24 Sep 2021 18:33:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4BA634178FD
+	for <lists+kvm@lfdr.de>; Fri, 24 Sep 2021 18:42:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347603AbhIXQeY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Sep 2021 12:34:24 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56877 "EHLO
+        id S245680AbhIXQoK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Sep 2021 12:44:10 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:28019 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1347621AbhIXQdu (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 24 Sep 2021 12:33:50 -0400
+        by vger.kernel.org with ESMTP id S233969AbhIXQoJ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 24 Sep 2021 12:44:09 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632501136;
+        s=mimecast20190719; t=1632501755;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=uKlMdj3BSFySTP+HPdwXzBv1uFuP75/+BZQPXc/8YM4=;
-        b=NJrqObtWeNu2+zAAn0MYS5TQ1t6vjkfzFPk0uPEtUnVzDf53RJYhAEFSGRlsCrzqQXBFsX
-        f8N3s18koEyaCUONIn6jkYA3nhz/2BBIEvGnvZUSUSBvGddFIvJyN2YJwN672Vl7KvSDed
-        SqdEV4UspmcY4F2pycck5d3MR5wNqIs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-531-8EowftFnP0quHWRdeWXYUQ-1; Fri, 24 Sep 2021 12:32:14 -0400
-X-MC-Unique: 8EowftFnP0quHWRdeWXYUQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CCC77A40D8;
-        Fri, 24 Sep 2021 16:32:13 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 672131A26A;
-        Fri, 24 Sep 2021 16:32:13 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     dmatlack@google.com, seanjc@google.com
-Subject: [PATCH v3 31/31] KVM: MMU: make spte an in-out argument in make_spte
-Date:   Fri, 24 Sep 2021 12:31:52 -0400
-Message-Id: <20210924163152.289027-32-pbonzini@redhat.com>
-In-Reply-To: <20210924163152.289027-1-pbonzini@redhat.com>
-References: <20210924163152.289027-1-pbonzini@redhat.com>
+        bh=SgDhT9oIEBb9h38x2W632anLjZkMC/1v2YrYWwdqtjo=;
+        b=GWv/DfYStenUHkZsgAE/FRW7PTM/NH6J9CFzh7hHSD7F72OwG5/O/rs0fXBChxsSOydYdV
+        jAN/lzp5/GRQJGSj9qSbow+ShpzR+/tshU+hsH7pMKFdWwppty2mDPPchgf5v8zI8MssQE
+        ZQ6NXwYz6Bl0NhJnPtItvJOJALbFZXk=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-442-Um1RtEvbN8OnwyNZnLkPng-1; Fri, 24 Sep 2021 12:42:34 -0400
+X-MC-Unique: Um1RtEvbN8OnwyNZnLkPng-1
+Received: by mail-ed1-f69.google.com with SMTP id e7-20020aa7d7c7000000b003d3e6df477cso10792162eds.20
+        for <kvm@vger.kernel.org>; Fri, 24 Sep 2021 09:42:33 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=SgDhT9oIEBb9h38x2W632anLjZkMC/1v2YrYWwdqtjo=;
+        b=YsftF4yKCXSgVTZGZyJS89dZ1RiwDuZgPgtlL88Pvjwave0hzYLdM6LNRYs5vnNcUS
+         y9U4c+6cNIcBptV5GO55AYYgIdi1GyS+ezg3t5CvXVCEL22pcntNMSoULwXVHsONul8x
+         qEjIED/UkH7gdDc3KwTnk+cPOXcWSvguaqrYTV13R7rYLEl1TwY3Ci06qOgtYlot8cBz
+         xSZsFM+JYm9BgGcNete/gjoL0PqqupJ+ikKoUWdJAva/BnTcPNz3WRUS0SVOmNhVfKmc
+         MReL353fTMru35ZcdaeP1F95Kpql5q4Ho3V7CTnzmctz2B2XTv02VUXpICTBPfDkSyZl
+         LDuQ==
+X-Gm-Message-State: AOAM532b9L6FegbAuwTW4jPfhTKxiW+UzPadwGTw3MdCSXaX6gzICpO7
+        8PJdhekg1wWZi4Y3Bm7uu4eQ/AMFkHuA6n574PgCL5FrafqSEQBuuZyb1dDXOjtnpqb2TbeJIUX
+        0/eAS55tqcgce
+X-Received: by 2002:a17:906:e299:: with SMTP id gg25mr12401356ejb.339.1632501752939;
+        Fri, 24 Sep 2021 09:42:32 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw7DGgQT1CNE4utgIdHx4UNlydMmiz9dbyvTw96aDiDa+sfFGPWN4xEYMtSN4Nf+fdJ7yHHsQ==
+X-Received: by 2002:a17:906:e299:: with SMTP id gg25mr12401338ejb.339.1632501752743;
+        Fri, 24 Sep 2021 09:42:32 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id cf16sm420363edb.51.2021.09.24.09.42.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 24 Sep 2021 09:42:31 -0700 (PDT)
+Message-ID: <e6af1bc9-6018-6fd7-fcc1-098b8af0ecdc@redhat.com>
+Date:   Fri, 24 Sep 2021 18:42:26 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [PATCH v8 5/7] kvm: x86: protect masterclock with a seqcount
+Content-Language: en-US
+To:     Oliver Upton <oupton@google.com>, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-arm-kernel@lists.infradead.org,
+        Andrew Jones <drjones@redhat.com>,
+        Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>
+References: <20210916181538.968978-1-oupton@google.com>
+ <20210916181538.968978-6-oupton@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20210916181538.968978-6-oupton@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Pass the old SPTE in the same variable that receives the new SPTE.  This
-reduces the number of arguments from 11 to 10.
+On 16/09/21 20:15, Oliver Upton wrote:
+> From: Paolo Bonzini<pbonzini@redhat.com>
+> 
+> Protect the reference point for kvmclock with a seqcount, so that
+> kvmclock updates for all vCPUs can proceed in parallel.  Xen runstate
+> updates will also run in parallel and not bounce the kvmclock cacheline.
+> 
+> nr_vcpus_matched_tsc is updated outside pvclock_update_vm_gtod_copy
+> though, so a spinlock must be kept for that one.
+> 
+> Signed-off-by: Paolo Bonzini<pbonzini@redhat.com>
+> [Oliver - drop unused locals, don't double acquire tsc_write_lock]
+> Signed-off-by: Oliver Upton<oupton@google.com>
+> ---
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/kvm/mmu/mmu.c         | 18 ++++++++----------
- arch/x86/kvm/mmu/paging_tmpl.h |  2 +-
- arch/x86/kvm/mmu/spte.c        |  7 ++++---
- arch/x86/kvm/mmu/spte.h        |  2 +-
- arch/x86/kvm/mmu/tdp_mmu.c     |  9 +++++----
- 5 files changed, 19 insertions(+), 19 deletions(-)
+This needs a small adjustment:
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 91292009780a..b363433bcd2c 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -2682,8 +2682,8 @@ static int mmu_set_spte(struct kvm_vcpu *vcpu, struct kvm_memory_slot *slot,
- 	int was_rmapped = 0;
- 	int ret = RET_PF_FIXED;
- 	bool flush = false;
-+	u64 spte = *sptep;
- 	bool wrprot;
--	u64 spte;
- 
- 	/* Prefetching always gets a writable pfn.  */
- 	bool host_writable = !fault || fault->map_writable;
-@@ -2691,35 +2691,33 @@ static int mmu_set_spte(struct kvm_vcpu *vcpu, struct kvm_memory_slot *slot,
- 	bool write_fault = fault && fault->write;
- 
- 	pgprintk("%s: spte %llx write_fault %d gfn %llx\n", __func__,
--		 *sptep, write_fault, gfn);
-+		 spte, write_fault, gfn);
- 
- 	if (unlikely(is_noslot_pfn(pfn))) {
- 		mark_mmio_spte(vcpu, sptep, gfn, pte_access);
- 		return RET_PF_EMULATE;
- 	}
- 
--	if (is_shadow_present_pte(*sptep)) {
-+	if (is_shadow_present_pte(spte)) {
- 		/*
- 		 * If we overwrite a PTE page pointer with a 2MB PMD, unlink
- 		 * the parent of the now unreachable PTE.
- 		 */
--		if (level > PG_LEVEL_4K && !is_large_pte(*sptep)) {
-+		if (level > PG_LEVEL_4K && !is_large_pte(spte)) {
- 			struct kvm_mmu_page *child;
--			u64 pte = *sptep;
--
--			child = to_shadow_page(pte & PT64_BASE_ADDR_MASK);
-+			child = to_shadow_page(spte & PT64_BASE_ADDR_MASK);
- 			drop_parent_pte(child, sptep);
- 			flush = true;
--		} else if (pfn != spte_to_pfn(*sptep)) {
-+		} else if (pfn != spte_to_pfn(spte)) {
- 			pgprintk("hfn old %llx new %llx\n",
--				 spte_to_pfn(*sptep), pfn);
-+				 spte_to_pfn(spte), pfn);
- 			drop_spte(vcpu->kvm, sptep);
- 			flush = true;
- 		} else
- 			was_rmapped = 1;
- 	}
- 
--	wrprot = make_spte(vcpu, sp, slot, pte_access, gfn, pfn, *sptep, speculative,
-+	wrprot = make_spte(vcpu, sp, slot, pte_access, gfn, pfn, speculative,
- 			   true, host_writable, &spte);
- 
- 	if (*sptep == spte) {
-diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index d8889e02c4b7..88551cfd06c6 100644
---- a/arch/x86/kvm/mmu/paging_tmpl.h
-+++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -1130,7 +1130,7 @@ static int FNAME(sync_page)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
- 		host_writable = spte & shadow_host_writable_mask;
- 		slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
- 		make_spte(vcpu, sp, slot, pte_access, gfn,
--			  spte_to_pfn(spte), spte, true, false,
-+			  spte_to_pfn(spte), true, false,
- 			  host_writable, &spte);
- 
- 		flush |= mmu_spte_update(sptep, spte);
-diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
-index 871f6114b0fa..91525388032e 100644
---- a/arch/x86/kvm/mmu/spte.c
-+++ b/arch/x86/kvm/mmu/spte.c
-@@ -92,10 +92,11 @@ static bool kvm_is_mmio_pfn(kvm_pfn_t pfn)
- bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
- 	       struct kvm_memory_slot *slot,
- 	       unsigned int pte_access, gfn_t gfn, kvm_pfn_t pfn,
--	       u64 old_spte, bool speculative, bool can_unsync,
--	       bool host_writable, u64 *new_spte)
-+	       bool speculative, bool can_unsync,
-+	       bool host_writable, u64 *sptep)
- {
- 	int level = sp->role.level;
-+	u64 old_spte = *sptep;
- 	u64 spte = SPTE_MMU_PRESENT_MASK;
- 	bool wrprot = false;
- 
-@@ -187,7 +188,7 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
- 		mark_page_dirty_in_slot(vcpu->kvm, slot, gfn);
- 	}
- 
--	*new_spte = spte;
-+	*sptep = spte;
- 	return wrprot;
- }
- 
-diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
-index 7c0b09461349..231531c6015a 100644
---- a/arch/x86/kvm/mmu/spte.h
-+++ b/arch/x86/kvm/mmu/spte.h
-@@ -337,7 +337,7 @@ static inline u64 get_mmio_spte_generation(u64 spte)
- bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
- 	       struct kvm_memory_slot *slot,
- 	       unsigned int pte_access, gfn_t gfn, kvm_pfn_t pfn,
--	       u64 old_spte, bool speculative, bool can_unsync,
-+	       bool speculative, bool can_unsync,
- 	       bool host_writable, u64 *new_spte);
- u64 make_nonleaf_spte(u64 *child_pt, bool ad_disabled);
- u64 make_mmio_spte(struct kvm_vcpu *vcpu, u64 gfn, unsigned int access);
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 953f24ded6bc..29b739c7bba4 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -903,13 +903,14 @@ static int tdp_mmu_map_handle_target_level(struct kvm_vcpu *vcpu,
- 	bool wrprot = false;
- 
- 	WARN_ON(sp->role.level != fault->goal_level);
--	if (unlikely(!fault->slot))
-+	if (unlikely(!fault->slot)) {
- 		new_spte = make_mmio_spte(vcpu, iter->gfn, ACC_ALL);
--	else
-+	} else {
-+		new_spte = iter->old_spte;
- 		wrprot = make_spte(vcpu, sp, fault->slot, ACC_ALL, iter->gfn,
--					 fault->pfn, iter->old_spte, fault->prefault, true,
-+					 fault->pfn, fault->prefault, true,
- 					 fault->map_writable, &new_spte);
--
-+	}
- 	if (new_spte == iter->old_spte)
- 		ret = RET_PF_SPURIOUS;
- 	else if (!tdp_mmu_set_spte_atomic(vcpu->kvm, iter, new_spte))
--- 
-2.27.0
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 07d00e711043..b0c21d42f453 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -11289,6 +11289,7 @@ void kvm_arch_free_vm(struct kvm *kvm)
+  int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+  {
+  	int ret;
++	unsigned long flags;
+  
+  	if (type)
+  		return -EINVAL;
+@@ -11314,7 +11315,10 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+  	mutex_init(&kvm->arch.apic_map_lock);
+  	seqcount_raw_spinlock_init(&kvm->arch.pvclock_sc, &kvm->arch.tsc_write_lock);
+  	kvm->arch.kvmclock_offset = -get_kvmclock_base_ns();
++
++	raw_spin_lock_irqsave(&kvm->arch.tsc_write_lock, flags);
+  	pvclock_update_vm_gtod_copy(kvm);
++	raw_spin_unlock_irqrestore(&kvm->arch.tsc_write_lock, flags);
+  
+  	kvm->arch.guest_can_read_msr_platform_info = true;
+  
 
