@@ -2,165 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D6542416A36
-	for <lists+kvm@lfdr.de>; Fri, 24 Sep 2021 04:54:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5A622416B18
+	for <lists+kvm@lfdr.de>; Fri, 24 Sep 2021 06:57:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243930AbhIXC4W (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Sep 2021 22:56:22 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:13534 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231579AbhIXC4V (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 23 Sep 2021 22:56:21 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 18O02VFJ017299;
-        Thu, 23 Sep 2021 22:54:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=zoqu0xjY8xvBr+WpJGH45TyxUeL+ccy34ZawDizGpFM=;
- b=MS1RYQqNh5MZNGpPu8ooZ+n+rwb6xjS5YnNgpjkZkgR2qu0f6CAqq7J5YLOV6XtYbYKu
- c7W63DC+KByz7rZxmeJyIdZakNY4JYAf47iSg3A8XsdxDrQ2l+zHUEtZNlK1/lWK4ihB
- cYbCU3BAss7FrYKb6fdrPOZb3SEwkd+0OT/jG1hiuOR3Ydp7L43r00VKJE3bMlc6xeW2
- hGHHBIRQbueZecv2v5lyGkNnvs3xMfwfPlMx7pOZkZ90wQ6qa5XNbj0vU8ik29jNdJeq
- FPXXjYcqKfaox/NSS+LnKABaLngBqvLpVZzApq1RIw80Wo/6spJRrWfAPTuwQncJajHS 8A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3b93snawsh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 23 Sep 2021 22:54:41 -0400
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 18O2dT9n018221;
-        Thu, 23 Sep 2021 22:54:40 -0400
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3b93snaws3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 23 Sep 2021 22:54:40 -0400
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
-        by ppma03dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 18O2lZsr002446;
-        Fri, 24 Sep 2021 02:54:39 GMT
-Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com [9.57.198.29])
-        by ppma03dal.us.ibm.com with ESMTP id 3b93g1u8yw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 24 Sep 2021 02:54:39 +0000
-Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com [9.57.199.109])
-        by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 18O2sc8144433820
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 24 Sep 2021 02:54:38 GMT
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 87BEB112067;
-        Fri, 24 Sep 2021 02:54:38 +0000 (GMT)
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 507CF112064;
-        Fri, 24 Sep 2021 02:54:32 +0000 (GMT)
-Received: from farman-thinkpad-t470p (unknown [9.211.34.14])
-        by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
-        Fri, 24 Sep 2021 02:54:32 +0000 (GMT)
-Message-ID: <40149f01475f5a68bbd92d560cd97f9d4ce4e581.camel@linux.ibm.com>
-Subject: Re: [PATCH v2 6/9] vfio/mdev: Add mdev available instance checking
- to the core
-From:   Eric Farman <farman@linux.ibm.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>, Cornelia Huck <cohuck@redhat.com>
-Cc:     David Airlie <airlied@linux.ie>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        dri-devel@lists.freedesktop.org,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        intel-gfx@lists.freedesktop.org,
-        intel-gvt-dev@lists.freedesktop.org,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
-        linux-s390@vger.kernel.org,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>, Christoph Hellwig <hch@lst.de>
-Date:   Thu, 23 Sep 2021 22:54:30 -0400
-In-Reply-To: <20210921131908.GK327412@nvidia.com>
-References: <6-v2-7d3a384024cf+2060-ccw_mdev_jgg@nvidia.com>
-         <87tuiff7m2.fsf@redhat.com> <20210921131908.GK327412@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-16.el8) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: B8BC6k_a_B_997uB0jzc3T2U0q5Lmp5u
-X-Proofpoint-ORIG-GUID: HB6TdxZZw3JHEK9Ne1Vst8GTlGdjJFQu
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.391,FMLib:17.0.607.475
- definitions=2021-09-23_07,2021-09-23_01,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 priorityscore=1501
- malwarescore=0 mlxlogscore=999 adultscore=0 bulkscore=0 impostorscore=0
- suspectscore=0 spamscore=0 clxscore=1015 phishscore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2109230001
- definitions=main-2109240011
+        id S244075AbhIXE6g (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Sep 2021 00:58:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48096 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231256AbhIXE6f (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Sep 2021 00:58:35 -0400
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 304E4C061574
+        for <kvm@vger.kernel.org>; Thu, 23 Sep 2021 21:57:03 -0700 (PDT)
+Received: by mail-pl1-x632.google.com with SMTP id j15so4233973plh.7
+        for <kvm@vger.kernel.org>; Thu, 23 Sep 2021 21:57:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=FhfKAFl2Cp1pTCS3Bb7r2rs05iyLq60w24OU87R4Csg=;
+        b=bbEeGZPt3coXPplXqb8SuClleUlX0a7cl3dbYTNip5d6pqAoYm1oYNWZbUOaPBcwYb
+         yZEmyVeuAfmB5G9IETW9PA4ZW6h0nZ/r994LOMy8xNt3YAZKlpNYfIJ5ajqz9QeluFD+
+         8Uaj++sxQj+LGgkPrdeUzCFqgWHG7/D4pPkbbqi87kCEYdsHObsmjj4RRXj19w7EYHHK
+         s03nXugTkRvv+D8uUg03I0R3V2dOi8kQmw6tJWPQg8H0WtYM6aeeD18fVagBC7Mt9575
+         OQYDNpYUdSbsAjcGpWSB0e6FadlHw4S/6XXCHCjd1dvsBC+LJT0ymfB/n8dWOrlP1N6g
+         rCYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=FhfKAFl2Cp1pTCS3Bb7r2rs05iyLq60w24OU87R4Csg=;
+        b=i+apV82j4oo4xSS5UiPSUVNbpobX1sPl+eXBceBv927qN6rq8sKMIjg9Yt6ovPxEd3
+         +OycUbnioWNQeExQ6XZNr8pdu0TBC9bkON5Sh+nEfD4HFWxQTUb1KfOOhaMRVSj93ZvS
+         uI/RolQCDFSDHGq35jmW0jkYxJD5BEjUpxZ1zOr/XBN3g46yNEl3LI4cItTQBEDFkdvj
+         Z6tSVK/TU8DIDreGVQol0oNlp/k905fbDTPemKDhrTYhGw6occykfloIJlFgQs5Yyqnk
+         n1gf90gQRyZMv5UpYFjROHjZyT3YgAT739PVEv5p92qzJR/DIobIYMCaKxcjg2y8MdL7
+         DNNw==
+X-Gm-Message-State: AOAM532RCRbXDfm039EsVK9Iofp3kDxzpghkQ7xpT5hw+xg2EgbNKmuv
+        SP00J6JOYkBCziiQq7nbXv2PpgA54aHWGA==
+X-Google-Smtp-Source: ABdhPJwliW/McnlmoE86OiLuWS+q9W9E1nRDSDE0qTX/YPeWCAFO/1nGnMNEEKep9JVlczSPs+dqhw==
+X-Received: by 2002:a17:903:1d1:b0:13c:897c:c04b with SMTP id e17-20020a17090301d100b0013c897cc04bmr7112736plh.76.1632459422468;
+        Thu, 23 Sep 2021 21:57:02 -0700 (PDT)
+Received: from google.com (150.12.83.34.bc.googleusercontent.com. [34.83.12.150])
+        by smtp.gmail.com with ESMTPSA id c16sm7076206pfo.163.2021.09.23.21.57.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Sep 2021 21:57:01 -0700 (PDT)
+Date:   Thu, 23 Sep 2021 21:56:58 -0700
+From:   Ricardo Koller <ricarkol@google.com>
+To:     Oliver Upton <oupton@google.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Sean Christopherson <seanjc@google.com>
+Subject: Re: [PATCH] selftests: KVM: Explicitly use movq to read xmm registers
+Message-ID: <YU1amie6LL/5JY8w@google.com>
+References: <20210924005147.1122357-1-oupton@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210924005147.1122357-1-oupton@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2021-09-21 at 10:19 -0300, Jason Gunthorpe wrote:
-> On Mon, Sep 20, 2021 at 08:02:29PM +0200, Cornelia Huck wrote:
-> > On Thu, Sep 09 2021, Jason Gunthorpe <jgg@nvidia.com> wrote:
-> > 
-> > > Many of the mdev drivers use a simple counter for keeping track
-> > > of the
-> > > available instances. Move this code to the core code and store
-> > > the counter
-> > > in the mdev_type. Implement it using correct locking, fixing
-> > > mdpy.
-> > > 
-> > > Drivers provide a get_available() callback to set the number of
-> > > available
-> > > instances for their mtypes which is fixed at registration time.
-> > > The core
-> > > provides a standard sysfs attribute to return the
-> > > available_instances.
-> > 
-> > So, according to the documentation, available_instances is
-> > mandatory. This means that drivers either need to provide
-> > get_available
-> > or implement their own version of the attribute. I think we want to
-> > update vfio-mediated-device.rst as well?
+On Fri, Sep 24, 2021 at 12:51:47AM +0000, Oliver Upton wrote:
+> Compiling the KVM selftests with clang emits the following warning:
 > 
-> I added this, and something similar for the device_api patch too,
-> thanks
+> >> include/x86_64/processor.h:297:25: error: variable 'xmm0' is uninitialized when used here [-Werror,-Wuninitialized]
+> >>                return (unsigned long)xmm0;
 > 
-> diff --git a/Documentation/driver-api/vfio-mediated-device.rst
-> b/Documentation/driver-api/vfio-mediated-device.rst
-> index 9f26079cacae35..0a130d76b33a48 100644
-> --- a/Documentation/driver-api/vfio-mediated-device.rst
-> +++ b/Documentation/driver-api/vfio-mediated-device.rst
-> @@ -106,6 +106,7 @@ structure to represent a mediated device's
-> driver::
->  	     int  (*probe)  (struct mdev_device *dev);
->  	     void (*remove) (struct mdev_device *dev);
->  	     struct device_driver    driver;
-> +	     unsigned int (*get_available)(struct mdev_type *mtype);
->       };
+> where xmm0 is accessed via an uninitialized register variable.
+> 
+> Indeed, this is a misuse of register variables, which really should only
+> be used for specifying register constraints on variables passed to
+> inline assembly. Rather than attempting to read xmm registers via
+> register variables, just explicitly perform the movq from the desired
+> xmm register.
+> 
+> Fixes: 783e9e51266e ("kvm: selftests: add API testing infrastructure")
+> Signed-off-by: Oliver Upton <oupton@google.com>
+> ---
+>  .../selftests/kvm/include/x86_64/processor.h  | 34 +++++++++----------
+>  1 file changed, 17 insertions(+), 17 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
+> index 242ae8e09a65..eba8bd08293e 100644
+> --- a/tools/testing/selftests/kvm/include/x86_64/processor.h
+> +++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
+> @@ -312,37 +312,37 @@ static inline void set_xmm(int n, unsigned long val)
+>  	}
+>  }
 >  
->  A mediated bus driver for mdev should use this structure in the
-> function calls
-> @@ -230,7 +231,8 @@ Directories and files under the sysfs for Each
-> Physical Device
->  * available_instances
+> -typedef unsigned long v1di __attribute__ ((vector_size (8)));
+> +#define GET_XMM(__xmm)							\
+> +({									\
+> +	unsigned long __val;						\
+> +	asm volatile("movq %%"#__xmm", %0" : "=r"(__val) : : #__xmm);	\
+> +	__val;								\
+> +})
+> +
+>  static inline unsigned long get_xmm(int n)
+>  {
+>  	assert(n >= 0 && n <= 7);
 >  
->    This attribute should show the number of devices of type <type-id> 
-> that can be
-> -  created.
-> +  created. Drivers can supply a get_availble() function pointer to 
+> -	register v1di xmm0 __asm__("%xmm0");
+> -	register v1di xmm1 __asm__("%xmm1");
+> -	register v1di xmm2 __asm__("%xmm2");
+> -	register v1di xmm3 __asm__("%xmm3");
+> -	register v1di xmm4 __asm__("%xmm4");
+> -	register v1di xmm5 __asm__("%xmm5");
+> -	register v1di xmm6 __asm__("%xmm6");
+> -	register v1di xmm7 __asm__("%xmm7");
+>  	switch (n) {
+>  	case 0:
+> -		return (unsigned long)xmm0;
+> +		return GET_XMM(xmm0);
+>  	case 1:
+> -		return (unsigned long)xmm1;
+> +		return GET_XMM(xmm1);
+>  	case 2:
+> -		return (unsigned long)xmm2;
+> +		return GET_XMM(xmm2);
+>  	case 3:
+> -		return (unsigned long)xmm3;
+> +		return GET_XMM(xmm3);
+>  	case 4:
+> -		return (unsigned long)xmm4;
+> +		return GET_XMM(xmm4);
+>  	case 5:
+> -		return (unsigned long)xmm5;
+> +		return GET_XMM(xmm5);
+>  	case 6:
+> -		return (unsigned long)xmm6;
+> +		return GET_XMM(xmm6);
+>  	case 7:
+> -		return (unsigned long)xmm7;
+> +		return GET_XMM(xmm7);
+>  	}
+> +
+> +	/* never reached */
+>  	return 0;
+>  }
+>  
+> -- 
+> 2.33.0.685.g46640cef36-goog
+> 
 
-s/availble/available/
-
-> have the core
-> +  code create and maintain this sysfs automatically.
->  
->  * [device]
->  
-
+Reviewed-by: Ricardo Koller <ricarkol@google.com>
