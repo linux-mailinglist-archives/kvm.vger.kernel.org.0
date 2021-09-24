@@ -2,94 +2,214 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B9A7A416F6B
-	for <lists+kvm@lfdr.de>; Fri, 24 Sep 2021 11:47:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 44B02416F83
+	for <lists+kvm@lfdr.de>; Fri, 24 Sep 2021 11:50:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245301AbhIXJse (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Sep 2021 05:48:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57892 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245228AbhIXJsd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Sep 2021 05:48:33 -0400
-Received: from mail-qk1-x743.google.com (mail-qk1-x743.google.com [IPv6:2607:f8b0:4864:20::743])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6F1EC061574
-        for <kvm@vger.kernel.org>; Fri, 24 Sep 2021 02:47:00 -0700 (PDT)
-Received: by mail-qk1-x743.google.com with SMTP id m7so10509021qke.8
-        for <kvm@vger.kernel.org>; Fri, 24 Sep 2021 02:47:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:sender:from:date:message-id:subject:to;
-        bh=k3+PIl84BDEKsR+afDftURi+daSqqQKQrezVjb4o2gs=;
-        b=JycDZr5r95WyxOaP2gfpgHjsLoWw9OQZ27/hR7+ajJaxXn9cDfEukxPO5OZ+M92DT0
-         XGj2PC4J9+XkpL1Krnu8O/UuPe3ZiX+fVRKyU7/jZWogRpVaGvN9iyDECpEbxUgpoOFW
-         jC16F8eE7r9vsvg/z30YauuXkSIcHygtBnW5C3eqcBeu8UJ7RK/UdsTmJMrI8DF8f2S0
-         0MyRuOEe97/3pz7ErJT2ESBgtHjlvXFCDh1kw6GdMXOVadnol1fkz6OdfyyhbLJIAuPK
-         TNaWEc9k0nOqDCiWK5Ikk5Zks8ZoMtFKtUnLysotOsRrpdxBbY6kMN/N4TH/6YbkuMqd
-         ZV1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:sender:from:date:message-id:subject
-         :to;
-        bh=k3+PIl84BDEKsR+afDftURi+daSqqQKQrezVjb4o2gs=;
-        b=S4nywQ+VLHbS1UlxBs0jBM3Idt24GvlwiHk8wnGRRPEXSi26ZwP6yZavo90DySPGha
-         XirqDVSifJqQ7ghWdCt5oTx1+oubloqKCzB6JNW5icOB0aOv4l4qC26fCE2w4ok3prx0
-         d6EfvcTYXjQa+eaJgh8jr1ElQt2+0prAyKox51L/MfUvzWToF1HVZZERNJNDmZKYZgxj
-         G9lf12nPxbL6YvuJiGqoaAe2HQ1OHyj+CoMN3SydeCdLmrCZeIbaigJ3bE8oOPx2qOWu
-         tsBd2SNOA6CKue1zDCvjC6hQtinrij99GCbne42ymIyYHDXkpA6Tx7k1OdINuIFPAWoV
-         UjAw==
-X-Gm-Message-State: AOAM532ka9f7LxYdZzFv9WKhE03CfAnRyy7wAfB5Vh6HvIp8mVkfTqxz
-        TFTRaIq3tyLljH3oHtmL0XWn0/ch/yLELMG0QBo=
-X-Google-Smtp-Source: ABdhPJyB4LSgPzGTXDu1fUkw9Qvmfa0w9wtfvviwvq9o/Jt1M15BvlTBQcoaaLBEQDD2Yw20H9kzD4InLwts7nhx1/A=
-X-Received: by 2002:a05:620a:444b:: with SMTP id w11mr9532142qkp.479.1632476819914;
- Fri, 24 Sep 2021 02:46:59 -0700 (PDT)
+        id S245383AbhIXJvh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Sep 2021 05:51:37 -0400
+Received: from mail.skyhub.de ([5.9.137.197]:56210 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S245340AbhIXJvh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Sep 2021 05:51:37 -0400
+Received: from zn.tnic (p200300ec2f0dd600d43e805889b23e24.dip0.t-ipconnect.de [IPv6:2003:ec:2f0d:d600:d43e:8058:89b2:3e24])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 7CF6F1EC0545;
+        Fri, 24 Sep 2021 11:49:58 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1632476998;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=BUpgk3dKEy8b32WZnzp1rzB730dZntv9H5UAz8bOGWk=;
+        b=lBrUymj/1QmZ4FQNJqYn/gxECEVEdHAREMp+ape5AjP0I4nJev+JIBIrOD29llxaI00Fe2
+        P14LnS7io2ZUdJ2JtgJTB2P4u9GLS4VrR09dA9mKUHmwTDVTTtQQMzpkB/jRIc6iuVq8/S
+        HyIw7qYuftFTRUW4mi2RTSTAobe14Do=
+Date:   Fri, 24 Sep 2021 11:49:52 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH Part2 v5 04/45] x86/sev: Add RMP entry lookup helpers
+Message-ID: <YU2fQMgw+PIBzSE4@zn.tnic>
+References: <20210820155918.7518-1-brijesh.singh@amd.com>
+ <20210820155918.7518-5-brijesh.singh@amd.com>
 MIME-Version: 1.0
-Sender: mrselisabethpeter999@gmail.com
-Received: by 2002:a0c:aacf:0:0:0:0:0 with HTTP; Fri, 24 Sep 2021 02:46:59
- -0700 (PDT)
-From:   Mrs Lila Haber <mrslilahabe2016@gmail.com>
-Date:   Fri, 24 Sep 2021 09:46:59 +0000
-X-Google-Sender-Auth: _C4kN9DpjLN3f-yGk3r5G6Ervuc
-Message-ID: <CAERax38WNCgEKyoXyphtKmru08UpnEO5fbNhHJZorbfwtqtrTg@mail.gmail.com>
-Subject: Dear Child of God
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20210820155918.7518-5-brijesh.singh@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Dear Child of God,
+On Fri, Aug 20, 2021 at 10:58:37AM -0500, Brijesh Singh wrote:
+> +struct __packed rmpentry {
+> +	union {
+> +		struct {
+> +			u64	assigned	: 1,
+> +				pagesize	: 1,
+> +				immutable	: 1,
+> +				rsvd1		: 9,
+> +				gpa		: 39,
+> +				asid		: 10,
+> +				vmsa		: 1,
+> +				validated	: 1,
+> +				rsvd2		: 1;
+> +		} info;
+> +		u64 low;
+> +	};
+> +	u64 high;
+> +};
 
-Calvary Greetings in the name of the LORD Almighty and Our LORD JESUS
-CHRIST the giver of every good thing. Good day and compliments of the
-seasons, i know this letter will definitely come to you as a huge
-surprise, but I implore you to take the time to go through it
-carefully as the decision you make will go off a long way to determine
-my future and continued existence. I am Mrs Lila Haber aging widow of
-57 years old suffering from long time illness.I have some funds I
-inherited from my late husband, the sum of (19.1Million Dollars) and I
-needed a very honest and God fearing who can withdraw this money then
-use the funds for Charity works. I WISH TO GIVE THIS FUNDS TO YOU FOR
-CHARITY WORKS. I found your email address from the internet after
-honest prayers to the LORD to bring me a helper and i decided to
-contact you if you may be willing and interested to handle these trust
-funds in good faith before anything happens to me.
+__packed goes at the end of the struct definition.
 
-I accept this decision because I do not have any child who will
-inherit this money after I die. I want your urgent reply to me so that
-I will give you the deposit receipt which the SECURITY COMPANY issued
-to me as next of kin for immediate transfer of the money to your
-account in your country, to start the good work of God, I want you to
-use the 25/percent of the total amount to help yourself in doing the
-project. I am desperately in keen need of assistance and I have
-summoned up courage to contact you for this task, you must not fail me
-and the millions of the poor people in our todays WORLD. This is no
-stolen money and there are no dangers involved,100% RISK FREE with
-full legal proof. Please if you would be able to use the funds for the
-Charity works kindly let me know immediately.I will appreciate your
-utmost confidentiality and trust in this matter to accomplish my heart
-desire, as I don't want anything that will jeopardize my last wish.
-Please
-kindly respond quickly for further details.
+> +
+> +#define rmpentry_assigned(x)	((x)->info.assigned)
+> +#define rmpentry_pagesize(x)	((x)->info.pagesize)
 
-Warmest Regards,
-Mrs Lila Haber
+Inline functions pls so that you can get typechecking too.
+
+>  
+>  #define RMPADJUST_VMSA_PAGE_BIT		BIT(16)
+>  
+> diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
+> index 7936c8139c74..f383d2a89263 100644
+> --- a/arch/x86/kernel/sev.c
+> +++ b/arch/x86/kernel/sev.c
+> @@ -54,6 +54,8 @@
+>   * bookkeeping, the range need to be added during the RMP entry lookup.
+>   */
+>  #define RMPTABLE_CPU_BOOKKEEPING_SZ	0x4000
+> +#define RMPENTRY_SHIFT			8
+> +#define rmptable_page_offset(x)	(RMPTABLE_CPU_BOOKKEEPING_SZ + (((unsigned long)x) >> RMPENTRY_SHIFT))
+>  
+>  /* For early boot hypervisor communication in SEV-ES enabled guests */
+>  static struct ghcb boot_ghcb_page __bss_decrypted __aligned(PAGE_SIZE);
+> @@ -2376,3 +2378,44 @@ static int __init snp_rmptable_init(void)
+>   * available after subsys_initcall().
+>   */
+>  fs_initcall(snp_rmptable_init);
+> +
+> +static struct rmpentry *__snp_lookup_rmpentry(u64 pfn, int *level)
+> +{
+> +	unsigned long vaddr, paddr = pfn << PAGE_SHIFT;
+> +	struct rmpentry *entry, *large_entry;
+> +
+> +	if (!pfn_valid(pfn))
+> +		return ERR_PTR(-EINVAL);
+> +
+> +	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
+> +		return ERR_PTR(-ENXIO);
+
+I think that check should happen first.
+
+> +
+> +	vaddr = rmptable_start + rmptable_page_offset(paddr);
+> +	if (unlikely(vaddr > rmptable_end))
+> +		return ERR_PTR(-ENXIO);
+
+Maybe the above -E should be -ENOENT instead so that you have unique
+error types for each check to facilitate debugging.
+
+> +
+> +	entry = (struct rmpentry *)vaddr;
+> +
+> +	/* Read a large RMP entry to get the correct page level used in RMP entry. */
+
+That comment needs rewriting.
+
+> +	vaddr = rmptable_start + rmptable_page_offset(paddr & PMD_MASK);
+> +	large_entry = (struct rmpentry *)vaddr;
+> +	*level = RMP_TO_X86_PG_LEVEL(rmpentry_pagesize(large_entry));
+> +
+> +	return entry;
+> +}
+> +
+> +/*
+> + * Return 1 if the RMP entry is assigned, 0 if it exists but is not assigned,
+> + * and -errno if there is no corresponding RMP entry.
+> + */
+
+kernel-doc format since it is being exported.
+
+> +int snp_lookup_rmpentry(u64 pfn, int *level)
+> +{
+> +	struct rmpentry *e;
+> +
+> +	e = __snp_lookup_rmpentry(pfn, level);
+> +	if (IS_ERR(e))
+> +		return PTR_ERR(e);
+> +
+> +	return !!rmpentry_assigned(e);
+> +}
+> +EXPORT_SYMBOL_GPL(snp_lookup_rmpentry);
+
+This export is for kvm, I presume?
+
+> diff --git a/include/linux/sev.h b/include/linux/sev.h
+> new file mode 100644
+> index 000000000000..1a68842789e1
+> --- /dev/null
+> +++ b/include/linux/sev.h
+> @@ -0,0 +1,30 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * AMD Secure Encrypted Virtualization
+> + *
+> + * Author: Brijesh Singh <brijesh.singh@amd.com>
+> + */
+> +
+> +#ifndef __LINUX_SEV_H
+> +#define __LINUX_SEV_H
+> +
+> +/* RMUPDATE detected 4K page and 2MB page overlap. */
+> +#define RMPUPDATE_FAIL_OVERLAP		7
+> +
+> +#ifdef CONFIG_AMD_MEM_ENCRYPT
+> +int snp_lookup_rmpentry(u64 pfn, int *level);
+> +int psmash(u64 pfn);
+> +int rmp_make_private(u64 pfn, u64 gpa, enum pg_level level, int asid, bool immutable);
+> +int rmp_make_shared(u64 pfn, enum pg_level level);
+> +#else
+> +static inline int snp_lookup_rmpentry(u64 pfn, int *level) { return 0; }
+> +static inline int psmash(u64 pfn) { return -ENXIO; }
+> +static inline int rmp_make_private(u64 pfn, u64 gpa, enum pg_level level, int asid,
+> +				   bool immutable)
+> +{
+> +	return -ENODEV;
+> +}
+> +static inline int rmp_make_shared(u64 pfn, enum pg_level level) { return -ENODEV; }
+> +
+> +#endif /* CONFIG_AMD_MEM_ENCRYPT */
+> +#endif /* __LINUX_SEV_H */
+> -- 
+
+What is going to use this linux/ namespace header?
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
