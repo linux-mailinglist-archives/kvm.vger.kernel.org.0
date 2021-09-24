@@ -2,103 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4472A417821
-	for <lists+kvm@lfdr.de>; Fri, 24 Sep 2021 18:03:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B706441788F
+	for <lists+kvm@lfdr.de>; Fri, 24 Sep 2021 18:32:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347288AbhIXQE6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Sep 2021 12:04:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:20724 "EHLO
+        id S1347438AbhIXQde (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Sep 2021 12:33:34 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:47011 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1347282AbhIXQE5 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 24 Sep 2021 12:04:57 -0400
+        by vger.kernel.org with ESMTP id S1347409AbhIXQdb (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 24 Sep 2021 12:33:31 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632499404;
+        s=mimecast20190719; t=1632501118;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=jeGa7zotF4OBKhVPjQPzs576lzN05jpN0HE3AwYSyTE=;
-        b=QyOYGWr5s2Dbs2XFAPfsnTPhwfVFOuobAVW1KqgNfOuRf/aFaH7/OdxtGbs5NGt9Y1q2Qk
-        9p3PIjvSSaOIbJm978EJ36y+55X5jRYL1YRHQm0uROWj4CF2XIVQAnOm6DVKHHKIAqsRqT
-        fX90rI37vxW5wggIDNzX8YX6k2HZoXY=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-362-5_kgQ8_2MxK9OxbF5-3y3w-1; Fri, 24 Sep 2021 12:03:22 -0400
-X-MC-Unique: 5_kgQ8_2MxK9OxbF5-3y3w-1
-Received: by mail-wr1-f70.google.com with SMTP id a17-20020adfed11000000b00160525e875aso953229wro.23
-        for <kvm@vger.kernel.org>; Fri, 24 Sep 2021 09:03:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=jeGa7zotF4OBKhVPjQPzs576lzN05jpN0HE3AwYSyTE=;
-        b=3Ci+smyf9brHEtkgqHpOoCzyOUGUJXLlI7+X1o5YP7Yt4mlNT78kDDShseqiAmPReC
-         sFpRSmp0noT8a4yuP5nqmMsxKkMzfI8G6hBCuaxm+mSySvv0c+Rw7TM+QVRuyBvhLifj
-         8irta58EveGtab8bkECtLQXVIw80F+uH7j30KqV0UKmafTur5fFCjHMaTsZXMmnNmX+A
-         82aLazzZn8jXkICUtdvVQkcYTcquQViFscdEgQn0IqlIV3znx4IO/qTroLOcTWQ7bzY2
-         mGmH4b9EFwI35Ho0+jMltXg02i0pFkLEyuXwa+TTvh6aLKhg6BV0wvQkAX2lBbai+0v7
-         HF+A==
-X-Gm-Message-State: AOAM53105mYUz17KOcNWCDtQa/MXVxw6nZN7QwymR81eoU94S5EXWGWm
-        rh0ObaQKxFkyVpr8GeWCH7QtxiGKRfBzkYiAsEwPUYe+dibrwtx4aPkINFfK8aK+MqbSXz/h5Jz
-        2GZZwcf1v5cUm
-X-Received: by 2002:a1c:21c3:: with SMTP id h186mr2940281wmh.18.1632499399039;
-        Fri, 24 Sep 2021 09:03:19 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzkSPlm4nXNmNz4MsL6i3ikKj/hofQJin1xv9Xzc76Hd6wkVSQwj2Rc48aOebkRJV2Rd5NdvQ==
-X-Received: by 2002:a1c:21c3:: with SMTP id h186mr2939823wmh.18.1632499394926;
-        Fri, 24 Sep 2021 09:03:14 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id k19sm8546808wmr.21.2021.09.24.09.03.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 24 Sep 2021 09:03:14 -0700 (PDT)
-Message-ID: <bfa9b495-dfe9-df5e-714c-12fd8dbe4fb5@redhat.com>
-Date:   Fri, 24 Sep 2021 18:03:13 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [PATCH V2 03/10] KVM: Remove tlbs_dirty
-Content-Language: en-US
-To:     Lai Jiangshan <laijs@linux.alibaba.com>,
-        Lai Jiangshan <jiangshanlai@gmail.com>,
-        linux-kernel@vger.kernel.org
-Cc:     kvm@vger.kernel.org
-References: <20210918005636.3675-1-jiangshanlai@gmail.com>
- <20210918005636.3675-4-jiangshanlai@gmail.com>
- <8dfdae11-7c51-530d-5c0d-83f778fa1e14@redhat.com>
- <8833ef9b-3156-7272-4171-66c4749145ab@linux.alibaba.com>
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=U2Y5/PxeGrVOyJwkORaGRMrwQ31fo9+n2UjUMf0sONY=;
+        b=QGW+ANGZvSomtkKQdZRGl7kSAT+iwdPWZc5p8b9ZaP6RRoRXiUE6tnpooop+MeWU1C9hvY
+        gKgeOWd66sxV7E24TbDjOgah4onVcIyaqOziASOzGOToqg7m0/7ql2fWwh3VzCGJmkRntJ
+        03FdHMBn58XhXqzzJw+EtC/8CRETNBo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-434-rCwcw5UbOVazqux64Zzpxw-1; Fri, 24 Sep 2021 12:31:54 -0400
+X-MC-Unique: rCwcw5UbOVazqux64Zzpxw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 91EE191272;
+        Fri, 24 Sep 2021 16:31:53 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 29F305FCAE;
+        Fri, 24 Sep 2021 16:31:53 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <8833ef9b-3156-7272-4171-66c4749145ab@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     dmatlack@google.com, seanjc@google.com
+Subject: [PATCH v3 00/31] KVM: x86: pass arguments on the page fault path via struct kvm_page_fault
+Date:   Fri, 24 Sep 2021 12:31:21 -0400
+Message-Id: <20210924163152.289027-1-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 24/09/21 17:40, Lai Jiangshan wrote:
-> 
-> 
-> On 2021/9/23 23:23, Paolo Bonzini wrote:
->> On 18/09/21 02:56, Lai Jiangshan wrote:
-> 
->>
->> Queued up to here for 5.15, thanks!
->>
->> Paolo
-> 
-> Any comments on other commits?
+The current kvm page fault handlers passes around many arguments to the
+functions.  To simplify those arguments and local variables, introduce
+a data structure, struct kvm_page_fault, to hold those arguments and
+variables.  struct kvm_page_fault is allocated on stack on the caller
+of kvm fault handler, kvm_mmu_do_page_fault(), and passed around.
 
-Queued now for 5.16. :)
+Later in the series, my patches are interleaved with David's work to
+add the memory slot to the struct and avoid repeated lookups.  Along the
+way you will find some cleanups of functions with a ludicrous number of
+arguments, so that they use struct kvm_page_fault as much as possible
+or at least receive related information from a single argument.  make_spte
+in particular goes from 11 to 10 arguments (yeah I know) despite gaining
+two for kvm_mmu_page and kvm_memory_slot.
 
-More precisely this is what I have queued from you for 5.16 only:
+This can be sometimes a bit debatable (for example struct kvm_mmu_page
+is used a little more on the TDP MMU paths), but overall I think the
+result is an improvement.  For example the SET_SPTE_* constants go
+away, and they absolutely didn't belong in the TDP MMU.  But if you
+disagree with some of the changes, please speak up loudly!
 
-       KVM: X86: Don't flush current tlb on shadow page modification
-       KVM: X86: Remove kvm_mmu_flush_or_zap()
-       KVM: X86: Change kvm_sync_page() to return true when remote flush is needed
-       KVM: X86: Zap the invalid list after remote tlb flushing
-       KVM: X86: Remove FNAME(update_pte)
-       KVM: X86: Don't unsync pagetables when speculative
-       KVM: X86: Don't check unsync if the original spte is writible
-       KVM: X86: Move PTE present check from loop body to __shadow_walk_next()
+Testing: survives kvm-unit-tests on Intel with all of ept=0, ept=1
+tdp_mmu=0, ept=1.  Will do more before committing to it in kvm/next of
+course.
 
 Paolo
+
+David Matlack (5):
+  KVM: x86/mmu: Fold rmap_recycle into rmap_add
+  KVM: x86/mmu: Pass the memslot around via struct kvm_page_fault
+  KVM: x86/mmu: Avoid memslot lookup in page_fault_handle_page_track
+  KVM: x86/mmu: Avoid memslot lookup in rmap_add
+  KVM: x86/mmu: Avoid memslot lookup in make_spte and
+    mmu_try_to_unsync_pages
+
+Paolo Bonzini (25):
+  KVM: MMU: pass unadulterated gpa to direct_page_fault
+  KVM: MMU: Introduce struct kvm_page_fault
+  KVM: MMU: change mmu->page_fault() arguments to kvm_page_fault
+  KVM: MMU: change direct_page_fault() arguments to kvm_page_fault
+  KVM: MMU: change page_fault_handle_page_track() arguments to
+    kvm_page_fault
+  KVM: MMU: change kvm_faultin_pfn() arguments to kvm_page_fault
+  KVM: MMU: change handle_abnormal_pfn() arguments to kvm_page_fault
+  KVM: MMU: change __direct_map() arguments to kvm_page_fault
+  KVM: MMU: change FNAME(fetch)() arguments to kvm_page_fault
+  KVM: MMU: change kvm_tdp_mmu_map() arguments to kvm_page_fault
+  KVM: MMU: change tdp_mmu_map_handle_target_level() arguments to
+    kvm_page_fault
+  KVM: MMU: change fast_page_fault() arguments to kvm_page_fault
+  KVM: MMU: change kvm_mmu_hugepage_adjust() arguments to kvm_page_fault
+  KVM: MMU: change disallowed_hugepage_adjust() arguments to
+    kvm_page_fault
+  KVM: MMU: change tracepoints arguments to kvm_page_fault
+  KVM: MMU: mark page dirty in make_spte
+  KVM: MMU: unify tdp_mmu_map_set_spte_atomic and
+    tdp_mmu_set_spte_atomic_no_dirty_log
+  KVM: MMU: inline set_spte in mmu_set_spte
+  KVM: MMU: inline set_spte in FNAME(sync_page)
+  KVM: MMU: clean up make_spte return value
+  KVM: MMU: remove unnecessary argument to mmu_set_spte
+  KVM: MMU: set ad_disabled in TDP MMU role
+  KVM: MMU: pass kvm_mmu_page struct to make_spte
+  KVM: MMU: pass struct kvm_page_fault to mmu_set_spte
+  KVM: MMU: make spte an in-out argument in make_spte
+
+Sean Christopherson (1):
+  KVM: x86/mmu: Verify shadow walk doesn't terminate early in page
+    faults
+
+ arch/x86/include/asm/kvm_host.h       |   4 +-
+ arch/x86/include/asm/kvm_page_track.h |   4 +-
+ arch/x86/kvm/mmu.h                    |  84 +++++-
+ arch/x86/kvm/mmu/mmu.c                | 408 +++++++++++---------------
+ arch/x86/kvm/mmu/mmu_internal.h       |  22 +-
+ arch/x86/kvm/mmu/mmutrace.h           |  18 +-
+ arch/x86/kvm/mmu/page_track.c         |   6 +-
+ arch/x86/kvm/mmu/paging_tmpl.h        | 137 +++++----
+ arch/x86/kvm/mmu/spte.c               |  29 +-
+ arch/x86/kvm/mmu/spte.h               |  14 +-
+ arch/x86/kvm/mmu/tdp_mmu.c            | 123 +++-----
+ arch/x86/kvm/mmu/tdp_mmu.h            |   4 +-
+ 12 files changed, 390 insertions(+), 463 deletions(-)
+
+-- 
+2.27.0
 
