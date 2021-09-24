@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ED9A541757B
-	for <lists+kvm@lfdr.de>; Fri, 24 Sep 2021 15:23:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3EA8041757D
+	for <lists+kvm@lfdr.de>; Fri, 24 Sep 2021 15:23:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345526AbhIXNYy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Sep 2021 09:24:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49542 "EHLO
+        id S1343893AbhIXNY4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Sep 2021 09:24:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49800 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344913AbhIXNYs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Sep 2021 09:24:48 -0400
-Received: from mail-qk1-x749.google.com (mail-qk1-x749.google.com [IPv6:2607:f8b0:4864:20::749])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16698C061788
-        for <kvm@vger.kernel.org>; Fri, 24 Sep 2021 05:54:05 -0700 (PDT)
-Received: by mail-qk1-x749.google.com with SMTP id v14-20020a05620a0f0e00b0043355ed67d1so32214391qkl.7
-        for <kvm@vger.kernel.org>; Fri, 24 Sep 2021 05:54:05 -0700 (PDT)
+        with ESMTP id S1345943AbhIXNYt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Sep 2021 09:24:49 -0400
+Received: from mail-wr1-x449.google.com (mail-wr1-x449.google.com [IPv6:2a00:1450:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0081C08EADE
+        for <kvm@vger.kernel.org>; Fri, 24 Sep 2021 05:54:07 -0700 (PDT)
+Received: by mail-wr1-x449.google.com with SMTP id r5-20020adfb1c5000000b0015cddb7216fso8008371wra.3
+        for <kvm@vger.kernel.org>; Fri, 24 Sep 2021 05:54:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=+LaJv4Ut995m+xStn+CJit8kroqDB8BrAul4VeyUpto=;
-        b=WJfhJpBhFcx1yU6q2A5dq5o7v7/qoJ76LzW3bnFH/OqCKw8Y4BBx7H1VMcJ4tZ7Q84
-         ycy5/fqgEuZ65y0fbocguVBTBdv8nbPd9ycSN1MZ/ZAy6kKPqAOs9K4UgY4nk42W8VDA
-         jvZpEP6TxuYQ0tLZJycyC0xa/yoyJRa/NGylRXWjBBIUJSwBl6H90fh73Dket8vr+QbB
-         RlBOGE1MBPLxUDMmPF6uPJF2HxT5qdB3y0sJhY2yBAnQRIjroQ1eZj05uFdc4MjgZAGX
-         VAbsty9cYie2RSCLZF24ZKZDUxnrL0oCE+b2BWloYYD1AWXMRq+QxF3CHa+gXfriviqy
-         qWfw==
+        bh=mlMa5h5NI5jeUNwNwY7Kha/NGSkd/By+lOHKgGZzb0o=;
+        b=SWEU9RA66/WxWXSbnVeHag8LsLPsWo8oCMibTA60uonOa2NMI7kIs3aQaiEtrgWRHO
+         DkA5OZF8LVYzQT/cr+FTPum/wkwXOpSGn6mBFh8390Hiu7bF6dK1T2mmYPopzXIWmMyg
+         ByH+xHvE1XIot1qXxE5Yurw1SAV9R/bSIpEHsErE6bNWq+FTIeI0q3cHMP95HMCchKHy
+         /07xpwd4F+PMcWHR7BQjwKn6vitYvJfybxPNVHcL9VT68KII8o60yJbc7fP7HXCzKda3
+         0SaLPyDqoC4Fh2pYJUv7rcuaRI3FlofdyqHQc/x/5vPvpDmPLw8FioGLue3WQ2c6a5dA
+         5IZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=+LaJv4Ut995m+xStn+CJit8kroqDB8BrAul4VeyUpto=;
-        b=p6rAKzfnfJlJcNXDScsF7QxjIk9DsIB0//4dYr6xmYh6UXyKbiU6sqLZP7T93lYW4P
-         VWFbYsSJtxhgj71bpI8wXYT3I4FGoC5FGoqPQ6GjKniUfLU1KkOBLq4Bxj6Z+wr9yLY8
-         v0e5dm1fmSzDECun6LKUxQzFKJiIlLczKufA24+BtYGtEoGhDRkAF/Jog78hd54KLJgO
-         Xu/wqY0OZ/AJkpKVkzorHWyvR4/GypfbtUBrjPcNi5mW9Jjn3Gc0pcXVrm4ObfeZkx1S
-         knkevvEx/C+wwxZJ48IhXRqP3+XhAYL+zuaN8+MP52gePvr2cTVgsslFJUZc6mHVR2C8
-         UaGA==
-X-Gm-Message-State: AOAM531X4ja/j+6kxOI/4knjCAXAQLcpGBahz2vCwl0OWpKvzc9YMhkf
-        oTNiyNg/SfqwXHPpWDyhI4j3IMtHcg==
-X-Google-Smtp-Source: ABdhPJz8XJjf9DmrCXNeHJp2ahBQOSArt9tPtY1bK5GAiDObokO9lS6nGswDDTChpYk6XAR7Ybe+AHcL3Q==
+        bh=mlMa5h5NI5jeUNwNwY7Kha/NGSkd/By+lOHKgGZzb0o=;
+        b=wOgcC0JNRKoG+HH9K5v6wuPHPY3oK9qVjSIAY+aJNmOoDpodxBc2sV1zwL6KeVISKa
+         h7lQUG4oZGm3Lq/xfBwaJho1YKQNXYp0dgb/Mou+hBkR0xcPJ86yY/qMwDMVWtfdqlxX
+         Fl279MCxTRIwkLyJNE/pN1RlhT5KP51RNl+pPF7zQIp+S2Pbdit7tR7bcLxJHCBpMROB
+         uk3h5c93DCgGkrnqeSo43tvBj2H4qNTRH1Jw2w7IZ5TGIgRl1DU9XMVonHDeobIuzP51
+         AiWlsx05mqY2b1i/DyVi9jjISEuE+wtVnDGwRyOW5ik5Sv/iQX/T+84kwRUfHv7JmgJi
+         4arg==
+X-Gm-Message-State: AOAM532E0QSTRsIb/tDg6P9bR35D7Yhdkxl+DgB36brXppmgnzZLw54B
+        U0m+uxXZUReq2QOMiyl97V43CkYAPg==
+X-Google-Smtp-Source: ABdhPJx6zVX5jtlMJbOyL+BbcPj3DUM9DjQf7WdSun6TSGOTKmjY7ZrgMDMtNn5ZOQ8+TC/ja/ahR0SWWQ==
 X-Received: from tabba.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:482])
- (user=tabba job=sendgmr) by 2002:a05:6214:1372:: with SMTP id
- c18mr9505426qvw.28.1632488043829; Fri, 24 Sep 2021 05:54:03 -0700 (PDT)
-Date:   Fri, 24 Sep 2021 13:53:30 +0100
+ (user=tabba job=sendgmr) by 2002:a5d:598f:: with SMTP id n15mr11204398wri.74.1632488046306;
+ Fri, 24 Sep 2021 05:54:06 -0700 (PDT)
+Date:   Fri, 24 Sep 2021 13:53:31 +0100
 In-Reply-To: <20210924125359.2587041-1-tabba@google.com>
-Message-Id: <20210924125359.2587041-2-tabba@google.com>
+Message-Id: <20210924125359.2587041-3-tabba@google.com>
 Mime-Version: 1.0
 References: <20210924125359.2587041-1-tabba@google.com>
 X-Mailer: git-send-email 2.33.0.685.g46640cef36-goog
-Subject: [RFC PATCH v1 01/30] KVM: arm64: placeholder to check if VM is protected
+Subject: [RFC PATCH v1 02/30] [DONOTMERGE] Temporarily disable unused variable warning
 From:   Fuad Tabba <tabba@google.com>
 To:     kvmarm@lists.cs.columbia.edu
 Cc:     maz@kernel.org, will@kernel.org, james.morse@arm.com,
@@ -64,37 +64,27 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a function to check whether a VM is protected (under pKVM).
-Since the creation of protected VMs isn't enabled yet, this is a
-placeholder that always returns false. The intention is for this
-to become a check for protected VMs in the future (see Will's RFC).
+Later patches add variables and functions that won't be used
+immediately.  Disable the warnings until the variables are used.
 
-No functional change intended.
-
-Acked-by: Will Deacon <will@kernel.org>
 Signed-off-by: Fuad Tabba <tabba@google.com>
-
-Link: https://lore.kernel.org/kvmarm/20210603183347.1695-1-will@kernel.org/
 ---
- arch/arm64/include/asm/kvm_host.h | 5 +++++
- 1 file changed, 5 insertions(+)
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 7cd7d5c8c4bc..adb21a7f0891 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -763,6 +763,11 @@ void kvm_arch_free_vm(struct kvm *kvm);
- 
- int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long type);
- 
-+static inline bool kvm_vm_is_protected(struct kvm *kvm)
-+{
-+	return false;
-+}
-+
- int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int feature);
- bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu);
- 
+diff --git a/Makefile b/Makefile
+index ed669b2d705d..0278bd28bd97 100644
+--- a/Makefile
++++ b/Makefile
+@@ -504,7 +504,7 @@ KBUILD_CFLAGS   := -Wall -Wundef -Werror=strict-prototypes -Wno-trigraphs \
+ 		   -fno-strict-aliasing -fno-common -fshort-wchar -fno-PIE \
+ 		   -Werror=implicit-function-declaration -Werror=implicit-int \
+ 		   -Werror=return-type -Wno-format-security \
+-		   -std=gnu89
++		   -std=gnu89 -Wno-unused-variable -Wno-unused-function
+ KBUILD_CPPFLAGS := -D__KERNEL__
+ KBUILD_AFLAGS_KERNEL :=
+ KBUILD_CFLAGS_KERNEL :=
 -- 
 2.33.0.685.g46640cef36-goog
 
