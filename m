@@ -2,122 +2,236 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8C29D417B31
-	for <lists+kvm@lfdr.de>; Fri, 24 Sep 2021 20:38:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 10C15417C1F
+	for <lists+kvm@lfdr.de>; Fri, 24 Sep 2021 22:05:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346349AbhIXSje (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Sep 2021 14:39:34 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:20689 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1345615AbhIXSje (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 24 Sep 2021 14:39:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632508679;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=p8izOp3w0kyjaONGOd6G+dgaLPoBS4GfuW3k+OdP5y4=;
-        b=foilflFlm3bZLVfX49tdUrlm4CxnptuIrTXFw5wAH9xbpyeA82Qh+A84dZoe2XgYqkZH0A
-        USzjcf7WW6OLbv3vDBQ/c3YymuCbFwIjFPmZUeuf92VxWds/TaNzP/IRHQm31Ug8oByHVp
-        cQ4MgLGEU8SAjv0aua9Bd1b3ByYD56E=
-Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com
- [209.85.210.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-232-k1x5pN_fNv6JsGLt6VS0xQ-1; Fri, 24 Sep 2021 14:37:58 -0400
-X-MC-Unique: k1x5pN_fNv6JsGLt6VS0xQ-1
-Received: by mail-ot1-f70.google.com with SMTP id k21-20020a9d7015000000b0054d5b451decso1171898otj.3
-        for <kvm@vger.kernel.org>; Fri, 24 Sep 2021 11:37:58 -0700 (PDT)
+        id S1348330AbhIXUGg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Sep 2021 16:06:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59512 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1348322AbhIXUGe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Sep 2021 16:06:34 -0400
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3F36C061613
+        for <kvm@vger.kernel.org>; Fri, 24 Sep 2021 13:05:00 -0700 (PDT)
+Received: by mail-pj1-x102e.google.com with SMTP id t20so7705209pju.5
+        for <kvm@vger.kernel.org>; Fri, 24 Sep 2021 13:05:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=7smASSk20sk/dEjIN22giVM2umfwDr5FaFIt4AQIQNU=;
+        b=KgW8iGp92Wt+B4rVc/D2LBIdBPKYYjk6X7qeaLEHmLXQ9nMWi/rOFr6rY4QDreXh4D
+         fhbPdvEpfpovCeMKsAhfIP8NrKuVZOJP9hXeCr3wcRys1i/A09+WHZBAEubjNvFLgd2r
+         +cSVSNGoRN9pRo/qjKgtj3KrcasoWQj2OjvMj0MxCMoJqC+nekmU7JI1hNXBg/yFGsuG
+         9sG1ctLgSf32d/2ZJ2TeGDxLZCD5o9WRl9S0OcMYaa7grIFeN7ub3yxa8U2H4VnHyu1R
+         TBHq9z5PMTtyh+sK+mTE7EN0xA+HzZ4EvITlFyZzBYD5Curgnj9eo42OUDDJBlYqGoDZ
+         gj1Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=p8izOp3w0kyjaONGOd6G+dgaLPoBS4GfuW3k+OdP5y4=;
-        b=ZdA56D0K/BNcRCxCosd4D0HCuk6DEZByIo6pzdJeWFl8Mt4k4EkUXm0hSEkd62dkKs
-         LPt8hS1zuoEIKmLZKXcrsxAUktOdExbPcDIAvN2tw23XYqL2bYIPsNal4t5XeBo31ZLw
-         iydRHq6PS6RMrWI9g/esGWsUKAMuig9MwBMVYx8EGSU0rzdB5tLp3at8sr+sv2h8cx6M
-         GLtxrNwdkD0RSAZ6U3AkrfNl5eFhovR4KYdnax21ewolkWCbnU3Kcff8D7r66yhDOHHp
-         QqYXPXD0dLrkBcmaJezS8Wb1Kx34QSNwMA1e6ock4hT32tJme/GTnF6scarYAoQqwkC3
-         hgdA==
-X-Gm-Message-State: AOAM531cg3RqwhiKekcDnNrclvOZusxxBRT3KPtC11o8I0QmMOcSqlmj
-        41dVbrTNKhyq7Nd7VS/ZTsxf4jtGbEutLm2m92F5vLp8M8DowyzCKa6Bm3EWnR31FaUSX/Znzn3
-        EWKGJ2xGUoZ1G
-X-Received: by 2002:a05:6830:13c2:: with SMTP id e2mr5417059otq.160.1632508677760;
-        Fri, 24 Sep 2021 11:37:57 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw+xTO/WIrlRoeZRSdG41a20dNxAhKJvL50z9NlXenoNRhwPFaBqjtq3aAnciKS6L9jmFMbdg==
-X-Received: by 2002:a05:6830:13c2:: with SMTP id e2mr5417035otq.160.1632508677368;
-        Fri, 24 Sep 2021 11:37:57 -0700 (PDT)
-Received: from redhat.com ([198.99.80.109])
-        by smtp.gmail.com with ESMTPSA id 21sm2362872oix.1.2021.09.24.11.37.56
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=7smASSk20sk/dEjIN22giVM2umfwDr5FaFIt4AQIQNU=;
+        b=Sn+JYliRoM9+ekPhgTlzbGmk9MzZjApTNYF9588sxPSjj42SbZhmytGEOcIIaVB6wi
+         7loKtsSsPiAzzbOLptIkETCP5J7pgnCxI3BQMA1D8z5bPdSV48rGlTFlwzcbpwCHGO9q
+         BTszNlo4pWKg1rrX+UShCoVpRKkBWNhYjBf0pw6tgA4CjnNWxGWZSoxAjyF3/t0t9+SJ
+         ZSpM6J0WefIAKlWYHq5ASCiG2aKnFT169H2CyfHlEf47wAVlhVu42jl9ItIgIXNDavh3
+         S4DRHxKz5Q+HTbZoWXptW1TcANqKdaLw+HXhgmHMcpxC89TQ/2DTl3kFl9l3+GyH4bo3
+         VkMg==
+X-Gm-Message-State: AOAM5330lM6y8AsuQVd2SEDbofI93d+LyTaldUGVTmdzvcyni/y8Nax+
+        Y1jouf7eAbFAssi0WjbL65WH0A==
+X-Google-Smtp-Source: ABdhPJwTik+vy0jOgauZgqIBhC3SnH0Oa3IU/AAwBwWdQPatVOVpsREoqShwOXDw3aI5CJO41skJAQ==
+X-Received: by 2002:a17:90a:47:: with SMTP id 7mr4425139pjb.46.1632513900051;
+        Fri, 24 Sep 2021 13:05:00 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id n19sm9764550pfa.60.2021.09.24.13.04.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Sep 2021 11:37:57 -0700 (PDT)
-Date:   Fri, 24 Sep 2021 12:37:55 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Diana Craciun <diana.craciun@oss.nxp.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Terrence Xu <terrence.xu@intel.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH 13/15] vfio/iommu_type1: initialize pgsize_bitmap in
- ->open
-Message-ID: <20210924123755.76041ee0.alex.williamson@redhat.com>
-In-Reply-To: <20210924174852.GZ3544071@ziepe.ca>
-References: <20210924155705.4258-1-hch@lst.de>
-        <20210924155705.4258-14-hch@lst.de>
-        <20210924174852.GZ3544071@ziepe.ca>
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        Fri, 24 Sep 2021 13:04:59 -0700 (PDT)
+Date:   Fri, 24 Sep 2021 20:04:53 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Joerg Roedel <joro@8bytes.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>, x86@kernel.org,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Joerg Roedel <jroedel@suse.de>
+Subject: Re: [PATCH v3 1/4] KVM: SVM: Get rid of set_ghcb_msr() and
+ *ghcb_msr_bits() functions
+Message-ID: <YU4u3Kk1UTQWfWZ4@google.com>
+References: <20210913141345.27175-1-joro@8bytes.org>
+ <20210913141345.27175-2-joro@8bytes.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210913141345.27175-2-joro@8bytes.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 24 Sep 2021 14:48:52 -0300
-Jason Gunthorpe <jgg@ziepe.ca> wrote:
+On Mon, Sep 13, 2021, Joerg Roedel wrote:
+>  static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
+> @@ -2377,16 +2371,14 @@ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
+>  
+>  	switch (ghcb_info) {
+>  	case GHCB_MSR_SEV_INFO_REQ:
+> -		set_ghcb_msr(svm, GHCB_MSR_SEV_INFO(GHCB_VERSION_MAX,
+> -						    GHCB_VERSION_MIN,
+> -						    sev_enc_bit));
+> +		svm->vmcb->control.ghcb_gpa = GHCB_MSR_SEV_INFO(GHCB_VERSION_MAX,
+> +								GHCB_VERSION_MIN,
+> +								sev_enc_bit);
 
-> On Fri, Sep 24, 2021 at 05:57:03PM +0200, Christoph Hellwig wrote:
-> > Ensure pgsize_bitmap is always valid by initializing it to ULONG_MAX
-> > in vfio_iommu_type1_open and remove the now pointless update for
-> > the external domain case in vfio_iommu_type1_attach_group, which was
-> > just setting pgsize_bitmap to ULONG_MAX when only external domains
-> > were attached.
-> > 
-> > Signed-off-by: Christoph Hellwig <hch@lst.de>
-> >  drivers/vfio/vfio_iommu_type1.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> > index a48e9f597cb213..2c698e1a29a1d8 100644
-> > +++ b/drivers/vfio/vfio_iommu_type1.c
-> > @@ -2196,7 +2196,6 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
-> >  		if (!iommu->external_domain) {
-> >  			INIT_LIST_HEAD(&domain->group_list);
-> >  			iommu->external_domain = domain;
-> > -			vfio_update_pgsize_bitmap(iommu);
-> >  		} else {
-> >  			kfree(domain);
-> >  		}
-> > @@ -2582,6 +2581,7 @@ static void *vfio_iommu_type1_open(unsigned long arg)
-> >  	mutex_init(&iommu->lock);
-> >  	BLOCKING_INIT_NOTIFIER_HEAD(&iommu->notifier);
-> >  	init_waitqueue_head(&iommu->vaddr_wait);
-> > +	iommu->pgsize_bitmap = ULONG_MAX;  
-> 
-> I wonder if this needs the PAGE_MASK/SIZE stuff?
-> 
->    iommu->pgsize_bitmap = ULONG_MASK & PAGE_MASK;
-> 
-> ?
-> 
-> vfio_update_pgsize_bitmap() goes to some trouble to avoid setting bits
-> below the CPU page size here
+Nit, "svm->vmcb->control." can be "control->".
 
-Yep, though PAGE_MASK should already be UL, so just PAGE_MASK itself
-should work.  The ULONG_MAX in the update function just allows us to
-detect sub-page, ex. if the IOMMU supports 2K we can expose 4K minimum,
-but we can't if the min IOMMU page is 64K.  Thanks,
+With that fixed,
 
-Alex
+Reviewed-by: Sean Christopherson <seanjc@google.com>
+
+>  		break;
+>  	case GHCB_MSR_CPUID_REQ: {
+>  		u64 cpuid_fn, cpuid_reg, cpuid_value;
+>  
+> -		cpuid_fn = get_ghcb_msr_bits(svm,
+> -					     GHCB_MSR_CPUID_FUNC_MASK,
+> -					     GHCB_MSR_CPUID_FUNC_POS);
+> +		cpuid_fn = GHCB_MSR_CPUID_FN(control->ghcb_gpa);
+>  
+>  		/* Initialize the registers needed by the CPUID intercept */
+>  		vcpu->arch.regs[VCPU_REGS_RAX] = cpuid_fn;
+> @@ -2398,9 +2390,8 @@ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
+>  			break;
+>  		}
+>  
+> -		cpuid_reg = get_ghcb_msr_bits(svm,
+> -					      GHCB_MSR_CPUID_REG_MASK,
+> -					      GHCB_MSR_CPUID_REG_POS);
+> +		cpuid_reg = GHCB_MSR_CPUID_REG(control->ghcb_gpa);
+> +
+>  		if (cpuid_reg == 0)
+>  			cpuid_value = vcpu->arch.regs[VCPU_REGS_RAX];
+>  		else if (cpuid_reg == 1)
+> @@ -2410,26 +2401,19 @@ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
+>  		else
+>  			cpuid_value = vcpu->arch.regs[VCPU_REGS_RDX];
+>  
+> -		set_ghcb_msr_bits(svm, cpuid_value,
+> -				  GHCB_MSR_CPUID_VALUE_MASK,
+> -				  GHCB_MSR_CPUID_VALUE_POS);
+> +		svm->vmcb->control.ghcb_gpa = ghcb_msr_cpuid_resp(cpuid_reg, cpuid_value);
+>  
+> -		set_ghcb_msr_bits(svm, GHCB_MSR_CPUID_RESP,
+> -				  GHCB_MSR_INFO_MASK,
+> -				  GHCB_MSR_INFO_POS);
+
+I don't mind using a helper instead of a macro (I completely agree the helper is
+easier to read), but we should be consistent, i.e. get rid of GHCB_MSR_SEV_INFO.
+And IMO that helper should handle the min/max version, not the callers.  Add this
+after patch 01 (modulo the above nit)?
+
+From 5c329f9e7156948697955a2745f32df024aa5ee6 Mon Sep 17 00:00:00 2001
+From: Sean Christopherson <seanjc@google.com>
+Date: Fri, 24 Sep 2021 12:58:31 -0700
+Subject: [PATCH] KVM: SVM: Add helper to generate GHCB MSR verson info, and
+ drop macro
+
+Convert the GHCB_MSR_SEV_INFO macro into a helper function, and have the
+helper hardcode the min/max versions instead of relying on the caller to
+do the same.  Under no circumstance should different pieces of KVM define
+different min/max versions.
+
+No functional change intended.
+
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/include/asm/sev-common.h |  5 -----
+ arch/x86/kvm/svm/sev.c            | 24 ++++++++++++++++++------
+ arch/x86/kvm/svm/svm.h            |  5 -----
+ 3 files changed, 18 insertions(+), 16 deletions(-)
+
+diff --git a/arch/x86/include/asm/sev-common.h b/arch/x86/include/asm/sev-common.h
+index 8540972cad04..886c36f0cb16 100644
+--- a/arch/x86/include/asm/sev-common.h
++++ b/arch/x86/include/asm/sev-common.h
+@@ -24,11 +24,6 @@
+ #define GHCB_MSR_VER_MIN_MASK		0xffff
+ #define GHCB_MSR_CBIT_POS		24
+ #define GHCB_MSR_CBIT_MASK		0xff
+-#define GHCB_MSR_SEV_INFO(_max, _min, _cbit)				\
+-	((((_max) & GHCB_MSR_VER_MAX_MASK) << GHCB_MSR_VER_MAX_POS) |	\
+-	 (((_min) & GHCB_MSR_VER_MIN_MASK) << GHCB_MSR_VER_MIN_POS) |	\
+-	 (((_cbit) & GHCB_MSR_CBIT_MASK) << GHCB_MSR_CBIT_POS) |	\
+-	 GHCB_MSR_SEV_INFO_RESP)
+ #define GHCB_MSR_INFO(v)		((v) & 0xfffUL)
+ #define GHCB_MSR_PROTO_MAX(v)		(((v) >> GHCB_MSR_VER_MAX_POS) & GHCB_MSR_VER_MAX_MASK)
+ #define GHCB_MSR_PROTO_MIN(v)		(((v) >> GHCB_MSR_VER_MIN_POS) & GHCB_MSR_VER_MIN_MASK)
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 7aa6ad4c3118..159b22bb74e4 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -2389,6 +2389,22 @@ static u64 ghcb_msr_cpuid_resp(u64 reg, u64 value)
+ 	return msr;
+ }
+
++/* The min/max GHCB version supported by KVM. */
++#define GHCB_VERSION_MAX	1ULL
++#define GHCB_VERSION_MIN	1ULL
++
++static u64 ghcb_msr_version_info(void)
++{
++	u64 msr;
++
++	msr  = GHCB_MSR_SEV_INFO_RESP;
++	msr |= GHCB_VERSION_MAX << GHCB_MSR_VER_MAX_POS;
++	msr |= GHCB_VERSION_MIN << GHCB_MSR_VER_MIN_POS;
++	msr |= sev_enc_bit << GHCB_MSR_CBIT_POS;
++
++	return msr;
++}
++
+ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
+ {
+ 	struct vmcb_control_area *control = &svm->vmcb->control;
+@@ -2403,9 +2419,7 @@ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
+
+ 	switch (ghcb_info) {
+ 	case GHCB_MSR_SEV_INFO_REQ:
+-		svm->vmcb->control.ghcb_gpa = GHCB_MSR_SEV_INFO(GHCB_VERSION_MAX,
+-								GHCB_VERSION_MIN,
+-								sev_enc_bit);
++		control->ghcb_gpa = ghcb_msr_version_info();
+ 		break;
+ 	case GHCB_MSR_CPUID_REQ: {
+ 		u64 cpuid_fn, cpuid_reg, cpuid_value;
+@@ -2621,9 +2635,7 @@ void sev_es_vcpu_reset(struct vcpu_svm *svm)
+ 	 * Set the GHCB MSR value as per the GHCB specification when emulating
+ 	 * vCPU RESET for an SEV-ES guest.
+ 	 */
+-	svm->vmcb->control.ghcb_gpa = GHCB_MSR_SEV_INFO(GHCB_VERSION_MAX,
+-							GHCB_VERSION_MIN,
+-							sev_enc_bit);
++	svm->vmcb->control.ghcb_gpa = ghcb_msr_version_info();
+ }
+
+ void sev_es_prepare_guest_switch(struct vcpu_svm *svm, unsigned int cpu)
+diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+index 0d7bbe548ac3..68e5f16a0554 100644
+--- a/arch/x86/kvm/svm/svm.h
++++ b/arch/x86/kvm/svm/svm.h
+@@ -544,11 +544,6 @@ void svm_vcpu_blocking(struct kvm_vcpu *vcpu);
+ void svm_vcpu_unblocking(struct kvm_vcpu *vcpu);
+
+ /* sev.c */
+-
+-#define GHCB_VERSION_MAX	1ULL
+-#define GHCB_VERSION_MIN	1ULL
+-
+-
+ extern unsigned int max_sev_asid;
+
+ void sev_vm_destroy(struct kvm *kvm);
+--
+2.33.0.685.g46640cef36-goog
+
 
