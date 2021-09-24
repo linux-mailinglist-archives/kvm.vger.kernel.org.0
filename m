@@ -2,123 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 535A3417852
-	for <lists+kvm@lfdr.de>; Fri, 24 Sep 2021 18:16:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4472A417821
+	for <lists+kvm@lfdr.de>; Fri, 24 Sep 2021 18:03:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347371AbhIXQRm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Sep 2021 12:17:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34800 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233727AbhIXQRl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Sep 2021 12:17:41 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53441C061571
-        for <kvm@vger.kernel.org>; Fri, 24 Sep 2021 09:16:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-        Content-Type:Content-ID:Content-Description;
-        bh=0u3sCG6aSbAnaHs3tV8zejtO5eParO8AbxR1fp5HsEg=; b=ne3R0ABYAXFle/Qu53ReN8kctD
-        S4sQTW/Eg2hKC167eRQH7L0nR1tlwMcqV7eMiBfRxjPtfW0aTHPz6SuDBsHg2JwTcDcFcOrlpJaR2
-        vgxIvQVt3eAGVb52UiVPEVsysfcLD4kAsGByI2QS00ki/8/AoFtYmACc9/FrpE84z+UoBob6CAPbV
-        BN8EG8FgPPFQyES54U+2Ywlx1qbVBWwg9VIUVWf9T7YWOf9uVRjE9SaxRhG8MdTFq8HGH+qyZVfbV
-        Jfdu6r9Z2KmbG+G3qsfQN9wRSMayxoCkfmTZM9N9XKNvBdsug64HW6zaDb/nhAmJ9jrGq9H6W0EJI
-        UX0hKaKg==;
-Received: from [2001:4bb8:184:72db:e8f6:c47e:192b:5622] (helo=localhost)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mTnpK-007Nmk-Qi; Fri, 24 Sep 2021 16:14:17 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Diana Craciun <diana.craciun@oss.nxp.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Terrence Xu <terrence.xu@intel.com>, kvm@vger.kernel.org,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Kevin Tian <kevin.tian@intel.com>
-Subject: [PATCH 15/15] vfio/iommu_type1: remove IS_IOMMU_CAP_DOMAIN_IN_CONTAINER
-Date:   Fri, 24 Sep 2021 17:57:05 +0200
-Message-Id: <20210924155705.4258-16-hch@lst.de>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210924155705.4258-1-hch@lst.de>
-References: <20210924155705.4258-1-hch@lst.de>
+        id S1347288AbhIXQE6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Sep 2021 12:04:58 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:20724 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1347282AbhIXQE5 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 24 Sep 2021 12:04:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1632499404;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=jeGa7zotF4OBKhVPjQPzs576lzN05jpN0HE3AwYSyTE=;
+        b=QyOYGWr5s2Dbs2XFAPfsnTPhwfVFOuobAVW1KqgNfOuRf/aFaH7/OdxtGbs5NGt9Y1q2Qk
+        9p3PIjvSSaOIbJm978EJ36y+55X5jRYL1YRHQm0uROWj4CF2XIVQAnOm6DVKHHKIAqsRqT
+        fX90rI37vxW5wggIDNzX8YX6k2HZoXY=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-362-5_kgQ8_2MxK9OxbF5-3y3w-1; Fri, 24 Sep 2021 12:03:22 -0400
+X-MC-Unique: 5_kgQ8_2MxK9OxbF5-3y3w-1
+Received: by mail-wr1-f70.google.com with SMTP id a17-20020adfed11000000b00160525e875aso953229wro.23
+        for <kvm@vger.kernel.org>; Fri, 24 Sep 2021 09:03:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=jeGa7zotF4OBKhVPjQPzs576lzN05jpN0HE3AwYSyTE=;
+        b=3Ci+smyf9brHEtkgqHpOoCzyOUGUJXLlI7+X1o5YP7Yt4mlNT78kDDShseqiAmPReC
+         sFpRSmp0noT8a4yuP5nqmMsxKkMzfI8G6hBCuaxm+mSySvv0c+Rw7TM+QVRuyBvhLifj
+         8irta58EveGtab8bkECtLQXVIw80F+uH7j30KqV0UKmafTur5fFCjHMaTsZXMmnNmX+A
+         82aLazzZn8jXkICUtdvVQkcYTcquQViFscdEgQn0IqlIV3znx4IO/qTroLOcTWQ7bzY2
+         mGmH4b9EFwI35Ho0+jMltXg02i0pFkLEyuXwa+TTvh6aLKhg6BV0wvQkAX2lBbai+0v7
+         HF+A==
+X-Gm-Message-State: AOAM53105mYUz17KOcNWCDtQa/MXVxw6nZN7QwymR81eoU94S5EXWGWm
+        rh0ObaQKxFkyVpr8GeWCH7QtxiGKRfBzkYiAsEwPUYe+dibrwtx4aPkINFfK8aK+MqbSXz/h5Jz
+        2GZZwcf1v5cUm
+X-Received: by 2002:a1c:21c3:: with SMTP id h186mr2940281wmh.18.1632499399039;
+        Fri, 24 Sep 2021 09:03:19 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzkSPlm4nXNmNz4MsL6i3ikKj/hofQJin1xv9Xzc76Hd6wkVSQwj2Rc48aOebkRJV2Rd5NdvQ==
+X-Received: by 2002:a1c:21c3:: with SMTP id h186mr2939823wmh.18.1632499394926;
+        Fri, 24 Sep 2021 09:03:14 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id k19sm8546808wmr.21.2021.09.24.09.03.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 24 Sep 2021 09:03:14 -0700 (PDT)
+Message-ID: <bfa9b495-dfe9-df5e-714c-12fd8dbe4fb5@redhat.com>
+Date:   Fri, 24 Sep 2021 18:03:13 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [PATCH V2 03/10] KVM: Remove tlbs_dirty
+Content-Language: en-US
+To:     Lai Jiangshan <laijs@linux.alibaba.com>,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        linux-kernel@vger.kernel.org
+Cc:     kvm@vger.kernel.org
+References: <20210918005636.3675-1-jiangshanlai@gmail.com>
+ <20210918005636.3675-4-jiangshanlai@gmail.com>
+ <8dfdae11-7c51-530d-5c0d-83f778fa1e14@redhat.com>
+ <8833ef9b-3156-7272-4171-66c4749145ab@linux.alibaba.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <8833ef9b-3156-7272-4171-66c4749145ab@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-IS_IOMMU_CAP_DOMAIN_IN_CONTAINER just obsfucated the checks being
-performed, so open code it in the callers.
+On 24/09/21 17:40, Lai Jiangshan wrote:
+> 
+> 
+> On 2021/9/23 23:23, Paolo Bonzini wrote:
+>> On 18/09/21 02:56, Lai Jiangshan wrote:
+> 
+>>
+>> Queued up to here for 5.15, thanks!
+>>
+>> Paolo
+> 
+> Any comments on other commits?
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
-Reviewed-by: Kevin Tian <kevin.tian@intel.com>
----
- drivers/vfio/vfio_iommu_type1.c | 13 +++++--------
- 1 file changed, 5 insertions(+), 8 deletions(-)
+Queued now for 5.16. :)
 
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index f1e408806e6871..7e89d3c1b825e2 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -139,9 +139,6 @@ struct vfio_regions {
- 	size_t len;
- };
- 
--#define IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)	\
--					(!list_empty(&iommu->domain_list))
--
- #define DIRTY_BITMAP_BYTES(n)	(ALIGN(n, BITS_PER_TYPE(u64)) / BITS_PER_BYTE)
- 
- /*
-@@ -879,7 +876,7 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
- 	 * already pinned and accounted. Accounting should be done if there is no
- 	 * iommu capable domain in the container.
- 	 */
--	do_accounting = !IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu);
-+	do_accounting = list_empty(&iommu->domain_list);
- 
- 	for (i = 0; i < npage; i++) {
- 		struct vfio_pfn *vpfn;
-@@ -968,7 +965,7 @@ static int vfio_iommu_type1_unpin_pages(void *iommu_data,
- 
- 	mutex_lock(&iommu->lock);
- 
--	do_accounting = !IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu);
-+	do_accounting = list_empty(&iommu->domain_list);
- 	for (i = 0; i < npage; i++) {
- 		struct vfio_dma *dma;
- 		dma_addr_t iova;
-@@ -1089,7 +1086,7 @@ static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
- 	if (!dma->size)
- 		return 0;
- 
--	if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu))
-+	if (list_empty(&iommu->domain_list))
- 		return 0;
- 
- 	/*
-@@ -1666,7 +1663,7 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
- 	vfio_link_dma(iommu, dma);
- 
- 	/* Don't pin and map if container doesn't contain IOMMU capable domain*/
--	if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu))
-+	if (list_empty(&iommu->domain_list))
- 		dma->size = size;
- 	else
- 		ret = vfio_pin_map_dma(iommu, dma, size);
-@@ -2472,7 +2469,7 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
- 		kfree(group);
- 
- 		if (list_empty(&iommu->emulated_iommu_groups) &&
--		    !IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)) {
-+		    list_empty(&iommu->domain_list)) {
- 			WARN_ON(iommu->notifier.head);
- 			vfio_iommu_unmap_unpin_all(iommu);
- 		}
--- 
-2.30.2
+More precisely this is what I have queued from you for 5.16 only:
+
+       KVM: X86: Don't flush current tlb on shadow page modification
+       KVM: X86: Remove kvm_mmu_flush_or_zap()
+       KVM: X86: Change kvm_sync_page() to return true when remote flush is needed
+       KVM: X86: Zap the invalid list after remote tlb flushing
+       KVM: X86: Remove FNAME(update_pte)
+       KVM: X86: Don't unsync pagetables when speculative
+       KVM: X86: Don't check unsync if the original spte is writible
+       KVM: X86: Move PTE present check from loop body to __shadow_walk_next()
+
+Paolo
 
