@@ -2,71 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 147F4417EFF
-	for <lists+kvm@lfdr.de>; Sat, 25 Sep 2021 02:57:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BF1374180E0
+	for <lists+kvm@lfdr.de>; Sat, 25 Sep 2021 11:50:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346610AbhIYA7M (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Sep 2021 20:59:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40398 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346541AbhIYA6e (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Sep 2021 20:58:34 -0400
-Received: from mail-qk1-x74a.google.com (mail-qk1-x74a.google.com [IPv6:2607:f8b0:4864:20::74a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D97E4C0613A8
-        for <kvm@vger.kernel.org>; Fri, 24 Sep 2021 17:56:01 -0700 (PDT)
-Received: by mail-qk1-x74a.google.com with SMTP id p23-20020a05620a22f700b003d5ac11ac5cso44222098qki.15
-        for <kvm@vger.kernel.org>; Fri, 24 Sep 2021 17:56:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=reply-to:date:in-reply-to:message-id:mime-version:references
-         :subject:from:to:cc;
-        bh=tGZGtRLoZzNRBWuDX4atzZ2k0Ip4ycJYdNIYDqARGnc=;
-        b=q8E3mpn27/Pass6ib5GcuNokaZJD0e7qJsR4kNTZjxo9jjWSI+mPtm05xarcRKasl1
-         eiFJZIt6Waa+VtYIE206wV5Amydeo2kxEZobGt+H4Q7ebAG/VEzonmVr8CFk6YXe+jXN
-         W06JSJIyK8g02iwbmqnvaWK7HXlJE0p7Kr92YW24blQoLluhFcvm1UzWcfdHx6Mdh9E3
-         XOOQzUfJHlMrFgWO0gIitekddWDl9aJ5BQBVyiZFtwCnwmzu20R18ovjRC2G+D/w+g99
-         M1FfmCuusJk2YNOkp6OkdVHAMCjUZdoms1MR0veWZuhlJz5kL9fGMpAA8u0K0cmeYPze
-         HHkg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:reply-to:date:in-reply-to:message-id
-         :mime-version:references:subject:from:to:cc;
-        bh=tGZGtRLoZzNRBWuDX4atzZ2k0Ip4ycJYdNIYDqARGnc=;
-        b=UReNkhFE+RdOYKMGUqtZfyw5BFc0fFnoVrd+oUDCa0OxO/jOQKN+PLZybX+hLLdAdb
-         lWRU/3BKrc25mOqGSbtCCPYsxsEkPeF/IjsGYxVhJ2/nmuqt29ACXzkEcqKQpsNLFqpu
-         xJi9R2773t5JyiulEUK/jCAiyas9/bSc4fm5LrBCtY10jELju3o3VU6lQOv65ebLkNGR
-         DMYpUIufx5v20bWA457xwmr9zQPXVYg/hk//w2ZZLUWOj2yCLgA0n5JWMap5hrWagh0G
-         eJk56ViDQlnENoX4JKZDoRE4yHU4bKCvak3Bx4gFWI7oO2YbLxK6ejT8SaTzqmrpdxzR
-         8oTA==
-X-Gm-Message-State: AOAM5325nQYpm3D5t14vwtxxylSC5lCreCfw7DXYsEYVrVxcGgJOOQXY
-        IMIv9t5IQGkvjzQZhJHe9H0kwxjNqNY=
-X-Google-Smtp-Source: ABdhPJyQYJ0x7OvSRpcYmAQ5BRWQd9bkmRh9jP0168EXXRbBHlQe+/VA1c8Ui0BDQ2o8LiZTwir9hfGFAMI=
-X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:90:200:4c72:89be:dba3:2bcb])
- (user=seanjc job=sendgmr) by 2002:a05:6214:2ec:: with SMTP id
- h12mr13351238qvu.1.1632531361061; Fri, 24 Sep 2021 17:56:01 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 24 Sep 2021 17:55:28 -0700
-In-Reply-To: <20210925005528.1145584-1-seanjc@google.com>
-Message-Id: <20210925005528.1145584-15-seanjc@google.com>
-Mime-Version: 1.0
-References: <20210925005528.1145584-1-seanjc@google.com>
-X-Mailer: git-send-email 2.33.0.685.g46640cef36-goog
-Subject: [PATCH 14/14] KVM: x86: Invoke kvm_vcpu_block() directly for
- non-HALTED wait states
-From:   Sean Christopherson <seanjc@google.com>
-To:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+        id S242130AbhIYJwI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 25 Sep 2021 05:52:08 -0400
+Received: from mail.kernel.org ([198.145.29.99]:58102 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S240182AbhIYJv5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 25 Sep 2021 05:51:57 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 441BD61279;
+        Sat, 25 Sep 2021 09:50:08 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1mU4Jq-00Cuoe-EB; Sat, 25 Sep 2021 10:50:06 +0100
+Date:   Sat, 25 Sep 2021 10:50:05 +0100
+Message-ID: <878rzlass2.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Huacai Chen <chenhuacai@kernel.org>,
         Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
         Paul Mackerras <paulus@ozlabs.org>,
         Christian Borntraeger <borntraeger@de.ibm.com>,
         Janosch Frank <frankja@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     James Morse <james.morse@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         David Hildenbrand <david@redhat.com>,
         Cornelia Huck <cohuck@redhat.com>,
         Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
@@ -76,46 +46,66 @@ Cc:     James Morse <james.morse@arm.com>,
         kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org,
         David Matlack <dmatlack@google.com>,
         Jing Zhang <jingzhangos@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH 07/14] KVM: Don't block+unblock when halt-polling is successful
+In-Reply-To: <20210925005528.1145584-8-seanjc@google.com>
+References: <20210925005528.1145584-1-seanjc@google.com>
+        <20210925005528.1145584-8-seanjc@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: seanjc@google.com, chenhuacai@kernel.org, aleksandar.qemu.devel@gmail.com, paulus@ozlabs.org, borntraeger@de.ibm.com, frankja@linux.ibm.com, pbonzini@redhat.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, david@redhat.com, cohuck@redhat.com, imbrenda@linux.ibm.com, vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org, kvm@vger.kernel.org, kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org, dmatlack@google.com, jingzhangos@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Call kvm_vcpu_block() directly for all wait states except HALTED so that
-kvm_vcpu_halt() is no longer a misnomer on x86.
+On Sat, 25 Sep 2021 01:55:21 +0100,
+Sean Christopherson <seanjc@google.com> wrote:
+> 
+> Invoke the arch hooks for block+unblock if and only if KVM actually
+> attempts to block the vCPU.  The only non-nop implementation is on arm64,
+> and if halt-polling is successful, there is no need for arm64 to put/load
+> the vGIC as KVM hasn't relinquished control of the vCPU in any way.
 
-Functionally, this means KVM will never attempt halt-polling or adjust
-vcpu->halt_poll_ns for INIT_RECEIVED (a.k.a. Wait-For-SIPI (WFS)) or
-AP_RESET_HOLD; UNINITIALIZED is handled in kvm_arch_vcpu_ioctl_run(),
-and x86 doesn't use any other "wait" states.
+This doesn't mean that there is no requirement for any state
+change. The put/load on GICv4 is crucial for performance, and the VMCR
+resync is a correctness requirement.
 
-As mentioned above, the motivation of this is purely so that "halt" isn't
-overloaded on x86, e.g. in KVM's stats.  Skipping halt-polling for WFS
-(and RESET_HOLD) has no meaningful effect on guest performance as there
-are typically single-digit numbers of INIT-SIPI sequences per AP vCPU,
-per boot, versus thousands of HLTs just to boot to console.
+> 
+> The primary motivation is to allow future cleanup to split out "block"
+> from "halt", but this is also likely a small performance boost on arm64
+> when halt-polling is successful.
+> 
+> Adjust the post-block path to update "cur" after unblocking, i.e. include
+> vGIC load time in halt_wait_ns and halt_wait_hist, so that the behavior
+> is consistent.  Moving just the pre-block arch hook would result in only
+> the vGIC put latency being included in the halt_wait stats.  There is no
+> obvious evidence that one way or the other is correct, so just ensure KVM
+> is consistent.
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/x86.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+This effectively reverts 07ab0f8d9a12 ("KVM: Call
+kvm_arch_vcpu_blocking early into the blocking sequence"), which was a
+huge gain on arm64, not to mention a correctness fix.
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index b444f9315766..a0f313c4bc49 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -9893,7 +9893,10 @@ static inline int vcpu_block(struct kvm *kvm, struct kvm_vcpu *vcpu)
- 	if (!kvm_arch_vcpu_runnable(vcpu) &&
- 	    (!kvm_x86_ops.pre_block || static_call(kvm_x86_pre_block)(vcpu) == 0)) {
- 		srcu_read_unlock(&kvm->srcu, vcpu->srcu_idx);
--		kvm_vcpu_halt(vcpu);
-+		if (vcpu->arch.mp_state == KVM_MP_STATE_HALTED)
-+			kvm_vcpu_halt(vcpu);
-+		else
-+			kvm_vcpu_block(vcpu);
- 		vcpu->srcu_idx = srcu_read_lock(&kvm->srcu);
- 
- 		if (kvm_x86_ops.post_block)
+Without this, a GICv4 machine will always pay for the full poll
+penalty, going into schedule(), and only then get a doorbell interrupt
+signalling telling the kernel that there was an interrupt.
+
+On a non-GICv4 machine, it means that interrupts injected by another
+thread during the pooling will be evaluated with an outdated priority
+mask, which can result in either a spurious wake-up or a missed
+wake-up.
+
+If it means introducing a new set of {pre,post}-poll arch-specific
+hooks, so be it. But I don't think this change is acceptable as is.
+
+Thanks,
+
+	M.
+
 -- 
-2.33.0.685.g46640cef36-goog
-
+Without deviation from the norm, progress is not possible.
