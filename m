@@ -2,110 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1834F4180F7
-	for <lists+kvm@lfdr.de>; Sat, 25 Sep 2021 12:10:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 63DF84182E1
+	for <lists+kvm@lfdr.de>; Sat, 25 Sep 2021 16:51:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244055AbhIYKMS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 25 Sep 2021 06:12:18 -0400
-Received: from mail.kernel.org ([198.145.29.99]:34904 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235805AbhIYKMS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 25 Sep 2021 06:12:18 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id D64C7610C9;
-        Sat, 25 Sep 2021 10:10:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1632564643;
-        bh=7g5nUt6S+63DfyoI33cOS6neqOn00oZEYSazRW7icKM=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=e87ZqnKl688T/SQGcH9+jwjV014Tulyt7Hb3OxSjdxnCIm7oEZ/EpJ73lS0FYFky+
-         w/MwitlU/UyQB3xXw7YZVKNcVS1KmP9X01uvgwDkuwXB3yUvmCneQ2EumdVqaGD+I7
-         oibmJ1i0v7DyUubmNeADkZerUZmsr3tXNZMwt0s8MRMAeW7hHPrw4A+cQuh+Lqyp70
-         RjO6S23V10pYJOBLZ5Kht/XmdgA0nn9Dt2OR+EqVL/1QjYUirI/PZ/Zx+ct6/4fNyT
-         QALmldECZr9nyTMlqDDYKWOytn11twX33WlFOnstjzbJUB9Lv9EIXUppsidnGUqccs
-         g6W9kC9yAb3ew==
-Date:   Sat, 25 Sep 2021 13:10:39 +0300
-From:   Leon Romanovsky <leon@kernel.org>
-To:     Bjorn Helgaas <helgaas@kernel.org>
-Cc:     Doug Ledford <dledford@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
-        Saeed Mahameed <saeedm@nvidia.com>,
-        Yishai Hadas <yishaih@nvidia.com>
-Subject: Re: [PATCH mlx5-next 1/7] PCI/IOV: Provide internal VF index
-Message-ID: <YU71n4WSIztOdpbw@unreal>
-References: <YUwgNPL++APsFJ49@unreal>
- <20210924130845.GA410176@bhelgaas>
+        id S1343745AbhIYOx1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 25 Sep 2021 10:53:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51294 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234173AbhIYOxZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 25 Sep 2021 10:53:25 -0400
+Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE705C061570
+        for <kvm@vger.kernel.org>; Sat, 25 Sep 2021 07:51:49 -0700 (PDT)
+Received: by mail-wr1-x42d.google.com with SMTP id i23so36566335wrb.2
+        for <kvm@vger.kernel.org>; Sat, 25 Sep 2021 07:51:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=D1NIBiKsJLet/LtgtEl9N8uYnLoHyxQP991kqXpIcyw=;
+        b=YOw2pv9ebkj+SD6dyN66r1sz5ImWnhuE1/NU5zJ+fIQcn+D4ncRESVjKU58DS+dE9G
+         UJAdGB+y1u1H7jg+2+BcMVUMovD1pwb/9xNI8oHPh4cnl1fJPGMoluC63jOLulGNIHzx
+         Vgl/Ok6wivXRNjSWDIrJfQV+/UUS1WrTz0NVni3AYqZj8Qkxd1729D6ihq+OO/SP5Xrn
+         k1ekZ8Kh4vaKb2IGL4F9TduJeD6bHWCC6atssDqBIDbJZ3sfA3YaWSO+Glb5LGVUNRDg
+         dt2Nb6l4U0v1o4A4lFERu7AV0sYz9AYrtJ1vf3YskPLWVcMAJ0q+I1akov2isqhIxo+5
+         pZQQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+         :in-reply-to:references:mime-version:content-transfer-encoding;
+        bh=D1NIBiKsJLet/LtgtEl9N8uYnLoHyxQP991kqXpIcyw=;
+        b=W3/SCOotxYkfMQDsr7sV1/a62fIyV/RYo0ECGU5i36uzfyFS3qpbYJzObIsK6esFvu
+         azeG9tBa2S7RFCgFhmGFFqA8TajsLFL1vHZ6sMBPbPIUIpXhWsRYg+MSmmGlNzQW1zAz
+         jQquWfptsof51q9h34Gj31JaPwdUpAdodtDw2r/OKKMBKSR3CqbUBtOEi2NCQtP+UFCq
+         qQ9j8icbYSoCZTs4rL+LJdOSkWHSEfgNw1PT4QO6bUfKT8jR7d6pNVmVetzdeQWdx6wZ
+         d4MK+xn6iML643MW4md/aH1lQi4T3E6oBpfg/N6K/ZbWviWcG/gesUZz8OLB/xrQ7bW9
+         IMbA==
+X-Gm-Message-State: AOAM53235NKSM2Dqqzi02loU3Rtu9YDpf2Uc6pyzKMD6P4FV0Lkik7+q
+        jc3MR97ZR8kUSZKZRQ6219A=
+X-Google-Smtp-Source: ABdhPJwPXRuJQaR6gpTRqV/YE5q1tGhHLUEN8yWUd/qyt7m3JhVHHlWnvVf5F5l/T3Ktxkn3CgFDrA==
+X-Received: by 2002:a05:600c:2e46:: with SMTP id q6mr7286713wmf.182.1632581508227;
+        Sat, 25 Sep 2021 07:51:48 -0700 (PDT)
+Received: from x1w.. (118.red-83-35-24.dynamicip.rima-tde.net. [83.35.24.118])
+        by smtp.gmail.com with ESMTPSA id m4sm13326459wrx.81.2021.09.25.07.51.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 25 Sep 2021 07:51:47 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= 
+        <philippe.mathieu.daude@gmail.com>
+From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To:     qemu-devel@nongnu.org
+Cc:     Richard Henderson <richard.henderson@linaro.org>,
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        kvm@vger.kernel.org (open list:Overall KVM CPUs)
+Subject: [PATCH v7 06/40] accel/kvm: Implement AccelOpsClass::has_work()
+Date:   Sat, 25 Sep 2021 16:50:44 +0200
+Message-Id: <20210925145118.1361230-7-f4bug@amsat.org>
+X-Mailer: git-send-email 2.31.1
+In-Reply-To: <20210925145118.1361230-1-f4bug@amsat.org>
+References: <20210925145118.1361230-1-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210924130845.GA410176@bhelgaas>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 24, 2021 at 08:08:45AM -0500, Bjorn Helgaas wrote:
-> On Thu, Sep 23, 2021 at 09:35:32AM +0300, Leon Romanovsky wrote:
-> > On Wed, Sep 22, 2021 at 04:59:30PM -0500, Bjorn Helgaas wrote:
-> > > On Wed, Sep 22, 2021 at 01:38:50PM +0300, Leon Romanovsky wrote:
-> > > > From: Jason Gunthorpe <jgg@nvidia.com>
-> > > > 
-> > > > The PCI core uses the VF index internally, often called the vf_id,
-> > > > during the setup of the VF, eg pci_iov_add_virtfn().
-> > > > 
-> > > > This index is needed for device drivers that implement live migration
-> > > > for their internal operations that configure/control their VFs.
-> > > >
-> > > > Specifically, mlx5_vfio_pci driver that is introduced in coming patches
-> > > > from this series needs it and not the bus/device/function which is
-> > > > exposed today.
-> > > > 
-> > > > Add pci_iov_vf_id() which computes the vf_id by reversing the math that
-> > > > was used to create the bus/device/function.
-> > > > 
-> > > > Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
-> > > > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> > > > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-> > > 
-> > > Acked-by: Bjorn Helgaas <bhelgaas@google.com>
-> > > 
-> > > mlx5_core_sriov_set_msix_vec_count() looks like it does basically the
-> > > same thing as pci_iov_vf_id() by iterating through VFs until it finds
-> > > one with a matching devfn (although it *doesn't* check for a matching
-> > > bus number, which seems like a bug).
-> > > 
-> > > Maybe that should use pci_iov_vf_id()?
-> > 
-> > Yes, I gave same comment internally and we decided to simply reduce the
-> > amount of changes in mlx5_core to have less distractions and submit as a
-> > followup. Most likely will add this hunk in v1.
-> 
-> I guess it backfired as far as reducing distractions, because now it
-> just looks like a job half-done.
+Implement KVM has_work() handler in AccelOpsClass and
+remove it from cpu_thread_is_idle() since cpu_has_work()
+is already called.
 
-Partially :)
-I didn't expect to see acceptance of this series in v0, we wanted to
-gather feedback as early as possible.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ accel/kvm/kvm-accel-ops.c | 6 ++++++
+ softmmu/cpus.c            | 2 +-
+ 2 files changed, 7 insertions(+), 1 deletion(-)
 
-> 
-> And it still looks like the existing code is buggy.  This is called
-> via sysfs, so if the PF is on bus X and the user writes to
-> sriov_vf_msix_count for a VF on bus X+1, it looks like
-> mlx5_core_sriov_set_msix_vec_count() will set the count for the wrong
-> VF.
+diff --git a/accel/kvm/kvm-accel-ops.c b/accel/kvm/kvm-accel-ops.c
+index 7516c67a3f5..6f4d5df3a0d 100644
+--- a/accel/kvm/kvm-accel-ops.c
++++ b/accel/kvm/kvm-accel-ops.c
+@@ -74,6 +74,11 @@ static void kvm_start_vcpu_thread(CPUState *cpu)
+                        cpu, QEMU_THREAD_JOINABLE);
+ }
+ 
++static bool kvm_cpu_has_work(CPUState *cpu)
++{
++    return kvm_halt_in_kernel();
++}
++
+ static void kvm_accel_ops_class_init(ObjectClass *oc, void *data)
+ {
+     AccelOpsClass *ops = ACCEL_OPS_CLASS(oc);
+@@ -83,6 +88,7 @@ static void kvm_accel_ops_class_init(ObjectClass *oc, void *data)
+     ops->synchronize_post_init = kvm_cpu_synchronize_post_init;
+     ops->synchronize_state = kvm_cpu_synchronize_state;
+     ops->synchronize_pre_loadvm = kvm_cpu_synchronize_pre_loadvm;
++    ops->has_work = kvm_cpu_has_work;
+ }
+ 
+ static const TypeInfo kvm_accel_ops_type = {
+diff --git a/softmmu/cpus.c b/softmmu/cpus.c
+index 85b06d3e685..c9f54a09989 100644
+--- a/softmmu/cpus.c
++++ b/softmmu/cpus.c
+@@ -90,7 +90,7 @@ bool cpu_thread_is_idle(CPUState *cpu)
+         return true;
+     }
+     if (!cpu->halted || cpu_has_work(cpu) ||
+-        kvm_halt_in_kernel() || whpx_apic_in_platform()) {
++        whpx_apic_in_platform()) {
+         return false;
+     }
+     return true;
+-- 
+2.31.1
 
-In mlx5_core_sriov_set_msix_vec_count(), we receive VF that is connected
-to PF which has "struct mlx5_core_dev". My expectation is that they share
-same bus as that PF was the one who created VFs. The mlx5 devices supports
-upto 256 VFs and it is far below the bus split mentioned in PCI spec.
-
-How can VF and their respective PF have different bus numbers?
-
-Thanks
-
-> 
-> Bjorn
