@@ -2,56 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AB02B417ED1
-	for <lists+kvm@lfdr.de>; Sat, 25 Sep 2021 02:55:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4C50B417ED3
+	for <lists+kvm@lfdr.de>; Sat, 25 Sep 2021 02:55:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346442AbhIYA5R (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Sep 2021 20:57:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40306 "EHLO
+        id S1346462AbhIYA5T (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Sep 2021 20:57:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40328 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346309AbhIYA5O (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Sep 2021 20:57:14 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AF3BC061613
-        for <kvm@vger.kernel.org>; Fri, 24 Sep 2021 17:55:40 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id f8-20020a2585480000b02905937897e3daso5817791ybn.2
-        for <kvm@vger.kernel.org>; Fri, 24 Sep 2021 17:55:40 -0700 (PDT)
+        with ESMTP id S1346381AbhIYA5Q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Sep 2021 20:57:16 -0400
+Received: from mail-qk1-x749.google.com (mail-qk1-x749.google.com [IPv6:2607:f8b0:4864:20::749])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7227DC061571
+        for <kvm@vger.kernel.org>; Fri, 24 Sep 2021 17:55:42 -0700 (PDT)
+Received: by mail-qk1-x749.google.com with SMTP id p23-20020a05620a22f700b003d5ac11ac5cso44221547qki.15
+        for <kvm@vger.kernel.org>; Fri, 24 Sep 2021 17:55:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=FC6lH+ozNX1rSn/Zvey/qYq1p870FyZo4a/L9N/Tnnw=;
-        b=H1jaweJg22GIvKz5wgIWDSWv9jBnold6xO8+Vir58J3vlW5yvGMJeY+RWUfUakOq0R
-         orXdIRa207F1tk4zi8vuNL8CHfSf+xkMzWW/nJggJB4dETOCDuAFmo/uxwSrXfHa281o
-         qUP6uOeam12R8fIodx3kiS3/hgxxDJx4AhPCjd3rZUC9XrvKS1+XNmDeTDwaJ19xQqhV
-         cyard+R6ZMOtQO+e0PqanrPIokG2Of63+8xBF7DfYrbPWcKhcpKGH/k2SRB/D5Z/gfcU
-         kBugNJHQN0/5+P2fD4RJGRBJy0JvWbzcwyoR231nRb6G1W76P8apmJbzeaDCVzireilR
-         R6gQ==
+        bh=uLdmTcdOYtZZFn/MuvyFluHWXgJOTY2/q4ao2KO0G1s=;
+        b=gPL1+MSjD+xrjkXRcOmwNqC67Mmvr7RuwzpFUcjOcMddzQt5ApvpYmHx9XRbluCLBL
+         Yg1nvCEit3T0YJNXit7IRIoK7VGM0aOPR2LyM5Quj71xnW24SDpghbthAKdIVpkpkzRd
+         X6gkLqVFB0i84k54sjonsicOkdWeYV2sQavG8Mv3aAQIe9i53EotyhPSycXboSC/o/x4
+         nIX64OghkAl/Sc0vGnSXFuQP7lt0994oRwNLKAlZQBXOCXCEC6YhE0vIEN6r/f82ulAH
+         xcNqf+D9f3lARXxv2SfegpANARLuOHGy1ceCMn8cGGb9ki40BxZxld2KVYTLW7PXUDEk
+         tT2g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=FC6lH+ozNX1rSn/Zvey/qYq1p870FyZo4a/L9N/Tnnw=;
-        b=b9T+0gci05Ocw2om8uSG+mmUD6MwAUByQ6psg64AfdOCSPY/LE5ib9qYVPQz2YyOqe
-         ItfNiet5laR5JbWGGosBsI/50tXWX4gDEdEczV9sHHBDMWLixa0yE4f9GgRnvsH/zt5J
-         z0LXabe/V/rXb6Esqym01Xe2cS6Cl2fLPcT+XHuiDPpXJWhCYC/XFUvOE2OBLH2sxaby
-         fMoayuxrgNznNs0KXfvVJ2n0WjYlCm4xANfJGl90JWm/BGLRNex2wenkSKWRh1DQVU58
-         NfmxuywJ5Sl1Gy1UoYak6IvK7JrmVRuDwX6IzZ7dsbVpzwK+ncBzJ4QHVsxhpAHbxl+5
-         ZKKA==
-X-Gm-Message-State: AOAM532R3HaIoCVJLTolgj+/Wz0aVxl9Kko5rDqiOU5Sn/2EIOq6mYDj
-        xW5z53O4rtHIiyj4AQ9OfXWLRgN5/QE=
-X-Google-Smtp-Source: ABdhPJxLhkd4HzFL3dM1t/bnW3GVwOoYRsLTHfSU097HYEpOs+mMFMdF2Jxk4a9ePTkex/UXZCMknlTjhiQ=
+        bh=uLdmTcdOYtZZFn/MuvyFluHWXgJOTY2/q4ao2KO0G1s=;
+        b=rLgyh6FoDfxcMdgSMuvrauENuMZO8LTDuxvbmsoh24l6dvBijA17a+1b/duJBd3vRp
+         +uI7dBNQLo1vr5zml5xZifLP600H128SV9A57R/KOvJpdr/kufw6e6dDWPOBYvesmIwS
+         QJN198kkZERlTHirzOw+1KjFiJtyb2IRtDPlBOKfV7qjFxpmdyAnZ9Lj5bsE1Q7NBRcT
+         fjVtWxseF26aFlG02H0oabYd0ypBtuFgHvUKO3TKHlUsUc0nd6QYyUDXemwcWhdD7Ro/
+         ht9OGHaM6jLUgDdH8q5Kbqr/iP/tAOSjl+BVADE/MRO19cq7g4R/hhQG174qJxIMKonK
+         dtBQ==
+X-Gm-Message-State: AOAM531CRBMID5tDVASwTNNM3Vb+0Kkcs5uKKp0YAbLpNkaXVeTVSDXr
+        ht85YuD0o0D7u1ty3nVZtw6Ot3mcKis=
+X-Google-Smtp-Source: ABdhPJyVJB4HLPJhBHC7Pbe0078HVzq+2LEwo+Z0/uFPixWTHq0eCSAqgxL/c3TZhIqWciWqG/9d+DXnsIA=
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:90:200:4c72:89be:dba3:2bcb])
- (user=seanjc job=sendgmr) by 2002:a25:d747:: with SMTP id o68mr16209002ybg.488.1632531339489;
- Fri, 24 Sep 2021 17:55:39 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a05:6214:54f:: with SMTP id
+ ci15mr12992188qvb.29.1632531341625; Fri, 24 Sep 2021 17:55:41 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 24 Sep 2021 17:55:18 -0700
+Date:   Fri, 24 Sep 2021 17:55:19 -0700
 In-Reply-To: <20210925005528.1145584-1-seanjc@google.com>
-Message-Id: <20210925005528.1145584-5-seanjc@google.com>
+Message-Id: <20210925005528.1145584-6-seanjc@google.com>
 Mime-Version: 1.0
 References: <20210925005528.1145584-1-seanjc@google.com>
 X-Mailer: git-send-email 2.33.0.685.g46640cef36-goog
-Subject: [PATCH 04/14] KVM: Reconcile discrepancies in halt-polling stats
+Subject: [PATCH 05/14] KVM: s390: Clear valid_wakeup in kvm_s390_handle_wait(),
+ not in arch hook
 From:   Sean Christopherson <seanjc@google.com>
 To:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
         Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
@@ -80,92 +81,51 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Move the halt-polling "success" and histogram stats update into the
-dedicated helper to fix a discrepancy where the success/fail "time" stats
-consider polling successful so long as the wait is avoided, but the main
-"success" and histogram stats consider polling successful if and only if
-a wake event was detected by the halt-polling loop.
+Move the clearing of valid_wakeup out of kvm_arch_vcpu_block_finish() so
+that a future patch can drop said arch hook.  Unlike the other blocking-
+related arch hooks (vcpu_blocking/unblocking()), vcpu_block_finish() needs
+to be called even if the KVM doesn't actually block the vCPU.  This will
+allow future patches to differentiate between truly blocking the vCPU and
+emulating a halt condition without introducing a contradiction.
 
-Move halt_attempted_poll to the helper as well so that all the stats are
-updated in a single location.  While it's a bit odd to update the stat
-well after the fact, practically speaking there's no meaningful advantage
-to updating before polling.
+Alternatively, the hook could be renamed to kvm_arch_vcpu_halt_finish(),
+but there's literally one call site in s390, and future cleanup can also
+be done to handle valid_wakeup fully within kvm_s390_handle_wait() and
+allow generic KVM to drop vcpu_valid_wakeup().
 
-Note, there is a functional change in addition to the success vs. fail
-change.  The histogram updates previously called ktime_get() instead of
-using "cur".  But that change is desirable as it means all the stats are
-now updated with the same polling time, and avoids the extra ktime_get(),
-which isn't expensive but isn't free either.
+No functional change intended.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- virt/kvm/kvm_main.c | 35 ++++++++++++++++-------------------
- 1 file changed, 16 insertions(+), 19 deletions(-)
+ arch/s390/kvm/interrupt.c | 1 +
+ arch/s390/kvm/kvm-s390.c  | 2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 12fe91a0a4c8..2ba22b68af3b 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -3202,12 +3202,23 @@ static int kvm_vcpu_check_block(struct kvm_vcpu *vcpu)
- static inline void update_halt_poll_stats(struct kvm_vcpu *vcpu, ktime_t start,
- 					  ktime_t end, bool success)
- {
-+	struct kvm_vcpu_stat_generic *stats = &vcpu->stat.generic;
- 	u64 poll_ns = ktime_to_ns(ktime_sub(end, start));
+diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
+index 10722455fd02..520450a7956f 100644
+--- a/arch/s390/kvm/interrupt.c
++++ b/arch/s390/kvm/interrupt.c
+@@ -1336,6 +1336,7 @@ int kvm_s390_handle_wait(struct kvm_vcpu *vcpu)
+ no_timer:
+ 	srcu_read_unlock(&vcpu->kvm->srcu, vcpu->srcu_idx);
+ 	kvm_vcpu_block(vcpu);
++	vcpu->valid_wakeup = false;
+ 	__unset_cpu_idle(vcpu);
+ 	vcpu->srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
  
--	if (success)
--		vcpu->stat.generic.halt_poll_success_ns += poll_ns;
--	else
--		vcpu->stat.generic.halt_poll_fail_ns += poll_ns;
-+	++vcpu->stat.generic.halt_attempted_poll;
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index 7cabe6778b1b..08ed68639a21 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -5082,7 +5082,7 @@ static inline unsigned long nonhyp_mask(int i)
+ 
+ void kvm_arch_vcpu_block_finish(struct kvm_vcpu *vcpu)
+ {
+-	vcpu->valid_wakeup = false;
 +
-+	if (success) {
-+		++vcpu->stat.generic.halt_successful_poll;
-+
-+		if (!vcpu_valid_wakeup(vcpu))
-+			++vcpu->stat.generic.halt_poll_invalid;
-+
-+		stats->halt_poll_success_ns += poll_ns;
-+		KVM_STATS_LOG_HIST_UPDATE(stats->halt_poll_success_hist, poll_ns);
-+	} else {
-+		stats->halt_poll_fail_ns += poll_ns;
-+		KVM_STATS_LOG_HIST_UPDATE(stats->halt_poll_fail_hist, poll_ns);
-+	}
  }
  
- /*
-@@ -3227,30 +3238,16 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
- 	if (do_halt_poll) {
- 		ktime_t stop = ktime_add_ns(ktime_get(), vcpu->halt_poll_ns);
- 
--		++vcpu->stat.generic.halt_attempted_poll;
- 		do {
- 			/*
- 			 * This sets KVM_REQ_UNHALT if an interrupt
- 			 * arrives.
- 			 */
--			if (kvm_vcpu_check_block(vcpu) < 0) {
--				++vcpu->stat.generic.halt_successful_poll;
--				if (!vcpu_valid_wakeup(vcpu))
--					++vcpu->stat.generic.halt_poll_invalid;
--
--				KVM_STATS_LOG_HIST_UPDATE(
--				      vcpu->stat.generic.halt_poll_success_hist,
--				      ktime_to_ns(ktime_get()) -
--				      ktime_to_ns(start));
-+			if (kvm_vcpu_check_block(vcpu) < 0)
- 				goto out;
--			}
- 			cpu_relax();
- 			poll_end = cur = ktime_get();
- 		} while (kvm_vcpu_can_poll(cur, stop));
--
--		KVM_STATS_LOG_HIST_UPDATE(
--				vcpu->stat.generic.halt_poll_fail_hist,
--				ktime_to_ns(ktime_get()) - ktime_to_ns(start));
- 	}
- 
- 
+ static int __init kvm_s390_init(void)
 -- 
 2.33.0.685.g46640cef36-goog
 
