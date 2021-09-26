@@ -2,300 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C460F4187D8
-	for <lists+kvm@lfdr.de>; Sun, 26 Sep 2021 11:09:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 97EF9418999
+	for <lists+kvm@lfdr.de>; Sun, 26 Sep 2021 16:55:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229753AbhIZJLb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 26 Sep 2021 05:11:31 -0400
-Received: from mail-mw2nam08on2069.outbound.protection.outlook.com ([40.107.101.69]:33600
-        "EHLO NAM04-MW2-obe.outbound.protection.outlook.com"
+        id S231905AbhIZO5E (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 26 Sep 2021 10:57:04 -0400
+Received: from mail-bn8nam12on2067.outbound.protection.outlook.com ([40.107.237.67]:51041
+        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S229687AbhIZJL0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 26 Sep 2021 05:11:26 -0400
+        id S231865AbhIZO5D (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 26 Sep 2021 10:57:03 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ZTkuGarOV4OsepjX4Af+txfq9enmQ3OtvbL+wRAyWghfH00cLeU3tS4gGwxu+cZqq4mHKXpm9yTdZVETy8J4g2c/3szaSQZs+F8z/fPHlAsYsRFrNgnPGjn0jPsbru571myTcVHfk86Od/fjDFAxn42F6NWpAuvHL3+7T7Q/hWJMkD03P0yMPfkrhUI/pLuJ5JAAWSicKK08dG0JCYaQUUL9UAI7F0hMk5u/3XP2GKF2ZsBIif7Nsz7t1XUJaGCklA4cQiw630NDnWQDxNKezSySsmWZoXXdRLlBECEl/r864mttQLU8SUE373+1CmXQmHg6ANR9a2Lm227ML4MHag==
+ b=HR71c4gMVygp/IheM+sNgb+EK+ubWH76DaM9oNoVrcMyCPnPad9VshBY690eUtTdb0aw0/YaPH3RtU+lMgvrWBVpKpeb3tDZ2nLQPuS/EiipEbKmUPguAv4eG5H9FwoaHY6a3wdxEx7r4WYY1fAL8zFWhynx7NfwkCNeYcHKO+l1SPDp9s+BIPqN2t8/WMbJJ/UDZxCNU8BzC00FAouy2cws21nut3PWu7R6WnleF6P5XzzwPUzsXYsZlgr9jpSkHogRkktluuV94cpcJbUDpljZ4HzgSLOTuctDY7GnNZGn0QV+zxXvn+goQGlFOQFcgLp/vqknBRDlNY2MGUCvBw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
- bh=EJkf39FG+ejw6aDjMXmV9u5iv8kq2mvaJNDPZlmavM0=;
- b=b95eUC4qhffArAENuF1qhw1XAOrZO7EHngDYp8iTNvKmnd0atXOtkTPYrrKVuyXYlIgDj+mceLfq1e0uA5wPFg+GOdUNLCZrMUX/B8i0Jwxs2FrzuOtElfSIET8RYTryxUhZTiSAlAhPLgy+Omz0aAYmFku66zn9S2a9mWop1pCzLhGA6x4vlu9bnk/4kpjYW/k9I87tLVF8mIVRldt2nrJizgZP95lGk/0aUMZQljA6UF973/Z2DfNQTbGN8q7ugBptsAZESNNrv/Kf5tChTzzK+gIhHsGkR0bdjitxznYH4dDIgv/iWEu5WY9tZh2DWUBGw30WDrIbgsroLKKwmQ==
+ bh=uHRr66ZZatUZhyxix272XCfk+BCj1odz2JKSclFs09s=;
+ b=AamoXTsgPFd4chvX9VNhrNUXh73Y7gnaj86EsFtCfhwyqJowSTLN8oX1becztTJ4j6AixgpI8Q4eer9FbuOrMLCx8hErKYTq2ZTYg8tuzc6zhr3u4RzXg4GFFW3qANDG4HTzZWlWBAxBQ8gyZGPZ8wsD+O535Gx0lMYUdMnA+kFab/croOGCi8FKtTviDv/MPa5S5njagKGHmvli10fBSDJJSbPcUHZyeM165Nz/IKKnDU8fRl6ukVDseuCCCDReGzulIVMq6U8QKOVkMdXZwAQTshEpH4CD20OaW/qdyhDL5pxnDX7AqVgyyLsWmXXqgBlwCPvIdMji7QB5YCO9gQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.112.36) smtp.rcpttodomain=huawei.com smtp.mailfrom=nvidia.com;
+ 216.228.112.34) smtp.rcpttodomain=infradead.org smtp.mailfrom=nvidia.com;
  dmarc=pass (p=quarantine sp=none pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=EJkf39FG+ejw6aDjMXmV9u5iv8kq2mvaJNDPZlmavM0=;
- b=f0pbGgKqiNN6kC4UTA+Z2RfeyUf23RW770MuJPHm3Cm3YTg3FV/cWQlV6o6uJUtvV6Rw1zkiTc3NkN2Aq8cDVI4LusWxYk5LEJbM28idNiWPZklsYKXP0xpeln1vilX/j8x4O3NJ0f6rCUnKMTwy62foJ+OoXPiWUfYWgz7NDmP9URtgI+6qOuy1ddSX7DJZsWj9sd8hdqYgfOENj23zOM3yP0ZQzyHP20MDsvqLcGI49vV2vSKJvOiHO2qsZb/ZfvQAgBWabg4by/t6zCXUZbfmRhRgdhr04x2nEN0EhUYW8zars+IPnT1/V3ain45+bIqTebCznUWz8tU6WBhBkA==
-Received: from BN9PR03CA0383.namprd03.prod.outlook.com (2603:10b6:408:f7::28)
- by DM6PR12MB4370.namprd12.prod.outlook.com (2603:10b6:5:2aa::10) with
+ bh=uHRr66ZZatUZhyxix272XCfk+BCj1odz2JKSclFs09s=;
+ b=C+LPyeCoSXR6glajUmAu0tNaKL+J/ZYXzamVaUwGwPlc+vlmOhBJWvBW9yKrMV059KXGG4+EdLb+73+A1sfBnUCSduyvqo2RodJEuHfPpzqucxXHD/p6/AZ9PBDRnfEcbY8iF8tq6dEoTMNFsk732A2Ul/eHekxdYKL5o6VXUk3x9QAOre6XkYQtuU8JlsUskS9WgBczlxxy/UpdjDMiqEOS5L3DpFHH6ZLE5k2wbeNlKqERRaRWHy6KSZiJMhsduhfKJh+BsC/uw97JThiKlN/N7i+xkOcPAyD7FhOZmSviP1l6Qu4GvmSLptEFC6Th3WJ725ObrS7Rk15XeLO/Lg==
+Received: from DS7PR03CA0197.namprd03.prod.outlook.com (2603:10b6:5:3b6::22)
+ by MN2PR12MB2973.namprd12.prod.outlook.com (2603:10b6:208:cc::19) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4544.13; Sun, 26 Sep
- 2021 09:09:48 +0000
-Received: from BN8NAM11FT049.eop-nam11.prod.protection.outlook.com
- (2603:10b6:408:f7:cafe::90) by BN9PR03CA0383.outlook.office365.com
- (2603:10b6:408:f7::28) with Microsoft SMTP Server (version=TLS1_2,
+ 2021 14:55:24 +0000
+Received: from DM6NAM11FT056.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:5:3b6:cafe::8e) by DS7PR03CA0197.outlook.office365.com
+ (2603:10b6:5:3b6::22) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4544.13 via Frontend
- Transport; Sun, 26 Sep 2021 09:09:49 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.36)
- smtp.mailfrom=nvidia.com; huawei.com; dkim=none (message not signed)
- header.d=none;huawei.com; dmarc=pass action=none header.from=nvidia.com;
+ Transport; Sun, 26 Sep 2021 14:55:24 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.34)
+ smtp.mailfrom=nvidia.com; infradead.org; dkim=none (message not signed)
+ header.d=none;infradead.org; dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.112.36 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.112.36; helo=mail.nvidia.com;
-Received: from mail.nvidia.com (216.228.112.36) by
- BN8NAM11FT049.mail.protection.outlook.com (10.13.177.157) with Microsoft SMTP
+ 216.228.112.34 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.112.34; helo=mail.nvidia.com;
+Received: from mail.nvidia.com (216.228.112.34) by
+ DM6NAM11FT056.mail.protection.outlook.com (10.13.173.99) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.4544.13 via Frontend Transport; Sun, 26 Sep 2021 09:09:48 +0000
-Received: from DRHQMAIL107.nvidia.com (10.27.9.16) by HQMAIL101.nvidia.com
- (172.20.187.10) with Microsoft SMTP Server (TLS) id 15.0.1497.18; Sun, 26 Sep
- 2021 09:09:45 +0000
-Received: from [172.27.12.58] (172.20.187.5) by DRHQMAIL107.nvidia.com
- (10.27.9.16) with Microsoft SMTP Server (TLS) id 15.0.1497.18; Sun, 26 Sep
- 2021 09:09:35 +0000
-Subject: Re: [PATCH mlx5-next 2/7] vfio: Add an API to check migration state
- transition validity
-To:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
-        "Leon Romanovsky" <leon@kernel.org>
-CC:     Doug Ledford <dledford@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "Kirti Wankhede" <kwankhede@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        Saeed Mahameed <saeedm@nvidia.com>,
-        liulongfang <liulongfang@huawei.com>
-References: <cover.1632305919.git.leonro@nvidia.com>
- <c87f55d6fec77a22b110d3c9611744e6b28bba46.1632305919.git.leonro@nvidia.com>
- <42729adc4df649f7b3ce5dc95e66e2dc@huawei.com> <YUxiPqShZT4bk0uL@unreal>
- <60989aa8-4231-0cdf-47bb-1e2026bd1f17@nvidia.com>
- <164439bb579d41639edf9a01a538a5ef@huawei.com>
+ 15.20.4544.13 via Frontend Transport; Sun, 26 Sep 2021 14:55:22 +0000
+Received: from HQMAIL107.nvidia.com (172.20.187.13) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.18; Sun, 26 Sep
+ 2021 14:55:22 +0000
+Received: from r-arch-stor02.mtr.labs.mlnx (172.20.187.5) by mail.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server id 15.0.1497.18 via Frontend
+ Transport; Sun, 26 Sep 2021 14:55:19 +0000
 From:   Max Gurtovoy <mgurtovoy@nvidia.com>
-Message-ID: <078fc846-1f72-adc0-339c-1b638c6c6e33@nvidia.com>
-Date:   Sun, 26 Sep 2021 12:09:31 +0300
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+To:     <mst@redhat.com>, <virtualization@lists.linux-foundation.org>,
+        <kvm@vger.kernel.org>, <stefanha@redhat.com>
+CC:     <oren@nvidia.com>, <nitzanc@nvidia.com>, <israelr@nvidia.com>,
+        <hch@infradead.org>, <linux-block@vger.kernel.org>,
+        <axboe@kernel.dk>, "Max Gurtovoy" <mgurtovoy@nvidia.com>
+Subject: [PATCH 1/2] virtio: introduce virtio_dev_to_node helper
+Date:   Sun, 26 Sep 2021 17:55:17 +0300
+Message-ID: <20210926145518.64164-1-mgurtovoy@nvidia.com>
+X-Mailer: git-send-email 2.18.1
 MIME-Version: 1.0
-In-Reply-To: <164439bb579d41639edf9a01a538a5ef@huawei.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Originating-IP: [172.20.187.5]
-X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
- DRHQMAIL107.nvidia.com (10.27.9.16)
+Content-Type: text/plain
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 5391ac67-a2fa-43c7-d8f0-08d980cd6435
-X-MS-TrafficTypeDiagnostic: DM6PR12MB4370:
-X-Microsoft-Antispam-PRVS: <DM6PR12MB4370382E59CBB673B0BAAD56DEA69@DM6PR12MB4370.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
+X-MS-Office365-Filtering-Correlation-Id: 21971e1f-abe1-42df-4ad0-08d980fdaabc
+X-MS-TrafficTypeDiagnostic: MN2PR12MB2973:
+X-Microsoft-Antispam-PRVS: <MN2PR12MB2973AB5ECCD75B6C0145DE8DDEA69@MN2PR12MB2973.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:6790;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: iFJPFMTsLY7nZh2tuRc4Vn1baq6CYEAFi891pfukU03b9GNYKskFwIi6k7xQFDw4t93KAbylY3yeKA5eGMAEV9XMBuzqXaZLFJo92oRlKrFXe+Pos+o6x/nBcRI3PrnpGxzVJw0XwFm1GagOqr0ri6aaZi0omC6SXGRfD7/KR6RIVj/MzVMkLWB8ihCKEG9F2PVoFZTIhE6qZUthvfrP9n6/pckX8s08csrOfyon7xFSo7kQLvjE1E8PwyW+BnsVm2e4g95cPwtWTBjlMa6RbCNLy2/HxZvu5bcoEBtxijV2Ozyjb4sCRFLDAYRs5EC8yEp3sDqc2GOgkCYt+hBjR83VWJ0DswMjm8kDm2AWYYowcIUHWLiRgdqhbknQG2N6JtMw6QY9CY9fyTR+yKn1IGwZ1qCMSQAR2iUZOIw2llNcR7+jA+eQpgg4Ij6f3ywU/5V2GAjJMNvRYZ32pKo1ks0Hys61mgf8U3zhckame0GMEBFCjxgrJjyUNkYrjN9krRUDcjbhquVu0UuI/H+KKhqkZUAiGszmNUaBhjEFFJdhrTbRkabm+VLXwRLAULLWliCq40wQ9XIP+H8Tys/aKWTNnjrhQPqToHO0rzdvjYVTDwFqFrseWQYVE92G9S4JQpE7MCkHcg+ahNCuCTHeb2KyHa5+l7TLTCYI4+ebbOPH0FZVstDKJkRNa5MF9NleByjQ+LrN2s96mILdnbGxzLJ/2o02Wa4oUzf5b/vqmjU=
-X-Forefront-Antispam-Report: CIP:216.228.112.36;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid05.nvidia.com;CAT:NONE;SFS:(4636009)(46966006)(36840700001)(6666004)(31696002)(83380400001)(54906003)(4326008)(110136005)(26005)(36906005)(5660300002)(2906002)(316002)(16576012)(356005)(36860700001)(16526019)(186003)(7636003)(336012)(8676002)(2616005)(82310400003)(31686004)(53546011)(426003)(8936002)(70206006)(70586007)(7416002)(508600001)(86362001)(47076005)(36756003)(43740500002);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: egfdnvEWT393RWJMsAgCSsj9myhQWp2dqW1NhFq0AF+nFjfoC6aJEH8HILOZD6FwXdQHavjMlIR49PGnDqpD2qnWcfHcSrrx5dsEfJCi0vlxmiyt4/oPNekp5Pf7YuTRSnws6KD7pH1M87g60ObEgWQwGeZp5IbX7qonFKdS9DrYpL2zQuQ6oWFZtNobjz77cl9c/9zxZL99tA6keUyzgv4ieoL/RH0fOzpQyf8vdIgSycLp125h8BcL4sZQXRyY/GI8HJf4y9BQCYwNvYTwzW+UWq8kczg8LCufGWCTGJ85e7d3y/5rUlQ0BkqWPsXxO8eeR1galn81ip4iRk7CzJltG3pGfJwKwIBcJLTKQ1xvCubg+U6nAosijU8/xNDxIKBaHlC1EEU1Zy3AbbvK0B/2nKcBATvMmYJVlsW/xBUZx+N4ZTzlrYdKEWRlZRw8p+QJpgQLtCGwA+4OInnLO8YK0tsybqVMpgXllztCoo+AZV9gBVTM00gOzR6afBdpXWPBoLGkD4UobCgz/09P0HFqKGa1OgdnXqAXrpfxguq+Cck48w7aKqV9BCnDUmdXjslFSoCdDU7vo5k3oLHzKTF9jGE4FpGmD9jxUu13b0+dE+d2LbZWO089pEl2v9Y3XH41gzoPoZwBpUvVnF60d24oNXPYmb0JW2LPwex71ONQ/WbtqSGc3Bl3m2T+bln5rxddp270KadvO+Te58/xIQ==
+X-Forefront-Antispam-Report: CIP:216.228.112.34;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid03.nvidia.com;CAT:NONE;SFS:(4636009)(46966006)(36840700001)(86362001)(8936002)(70586007)(54906003)(70206006)(47076005)(5660300002)(107886003)(26005)(356005)(316002)(186003)(36860700001)(36906005)(508600001)(82310400003)(4326008)(2616005)(7636003)(1076003)(8676002)(336012)(426003)(36756003)(110136005)(2906002);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Sep 2021 09:09:48.5858
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Sep 2021 14:55:22.8004
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5391ac67-a2fa-43c7-d8f0-08d980cd6435
+X-MS-Exchange-CrossTenant-Network-Message-Id: 21971e1f-abe1-42df-4ad0-08d980fdaabc
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.36];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT049.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.34];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT056.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4370
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB2973
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Also expose numa_node field as a sysfs attribute. Now virtio device
+drivers will be able to allocate memory that is node-local to the
+device. This significantly helps performance and it's oftenly used in
+other drivers such as NVMe, for example.
 
-On 9/24/2021 10:44 AM, Shameerali Kolothum Thodi wrote:
->
->> -----Original Message-----
->> From: Max Gurtovoy [mailto:mgurtovoy@nvidia.com]
->> Sent: 23 September 2021 14:56
->> To: Leon Romanovsky <leon@kernel.org>; Shameerali Kolothum Thodi
->> <shameerali.kolothum.thodi@huawei.com>
->> Cc: Doug Ledford <dledford@redhat.com>; Jason Gunthorpe
->> <jgg@nvidia.com>; Yishai Hadas <yishaih@nvidia.com>; Alex Williamson
->> <alex.williamson@redhat.com>; Bjorn Helgaas <bhelgaas@google.com>; David
->> S. Miller <davem@davemloft.net>; Jakub Kicinski <kuba@kernel.org>; Kirti
->> Wankhede <kwankhede@nvidia.com>; kvm@vger.kernel.org;
->> linux-kernel@vger.kernel.org; linux-pci@vger.kernel.org;
->> linux-rdma@vger.kernel.org; netdev@vger.kernel.org; Saeed Mahameed
->> <saeedm@nvidia.com>
->> Subject: Re: [PATCH mlx5-next 2/7] vfio: Add an API to check migration state
->> transition validity
->>
->>
->> On 9/23/2021 2:17 PM, Leon Romanovsky wrote:
->>> On Thu, Sep 23, 2021 at 10:33:10AM +0000, Shameerali Kolothum Thodi
->> wrote:
->>>>> -----Original Message-----
->>>>> From: Leon Romanovsky [mailto:leon@kernel.org]
->>>>> Sent: 22 September 2021 11:39
->>>>> To: Doug Ledford <dledford@redhat.com>; Jason Gunthorpe
->> <jgg@nvidia.com>
->>>>> Cc: Yishai Hadas <yishaih@nvidia.com>; Alex Williamson
->>>>> <alex.williamson@redhat.com>; Bjorn Helgaas <bhelgaas@google.com>;
->> David
->>>>> S. Miller <davem@davemloft.net>; Jakub Kicinski <kuba@kernel.org>; Kirti
->>>>> Wankhede <kwankhede@nvidia.com>; kvm@vger.kernel.org;
->>>>> linux-kernel@vger.kernel.org; linux-pci@vger.kernel.org;
->>>>> linux-rdma@vger.kernel.org; netdev@vger.kernel.org; Saeed Mahameed
->>>>> <saeedm@nvidia.com>
->>>>> Subject: [PATCH mlx5-next 2/7] vfio: Add an API to check migration state
->>>>> transition validity
->>>>>
->>>>> From: Yishai Hadas <yishaih@nvidia.com>
->>>>>
->>>>> Add an API in the core layer to check migration state transition validity
->>>>> as part of a migration flow.
->>>>>
->>>>> The valid transitions follow the expected usage as described in
->>>>> uapi/vfio.h and triggered by QEMU.
->>>>>
->>>>> This ensures that all migration implementations follow a consistent
->>>>> migration state machine.
->>>>>
->>>>> Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
->>>>> Reviewed-by: Kirti Wankhede <kwankhede@nvidia.com>
->>>>> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
->>>>> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
->>>>> ---
->>>>>    drivers/vfio/vfio.c  | 41
->> +++++++++++++++++++++++++++++++++++++++++
->>>>>    include/linux/vfio.h |  1 +
->>>>>    2 files changed, 42 insertions(+)
->>>>>
->>>>> diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
->>>>> index 3c034fe14ccb..c3ca33e513c8 100644
->>>>> --- a/drivers/vfio/vfio.c
->>>>> +++ b/drivers/vfio/vfio.c
->>>>> @@ -1664,6 +1664,47 @@ static int vfio_device_fops_release(struct
->> inode
->>>>> *inode, struct file *filep)
->>>>>    	return 0;
->>>>>    }
->>>>>
->>>>> +/**
->>>>> + * vfio_change_migration_state_allowed - Checks whether a migration
->> state
->>>>> + *   transition is valid.
->>>>> + * @new_state: The new state to move to.
->>>>> + * @old_state: The old state.
->>>>> + * Return: true if the transition is valid.
->>>>> + */
->>>>> +bool vfio_change_migration_state_allowed(u32 new_state, u32
->> old_state)
->>>>> +{
->>>>> +	enum { MAX_STATE = VFIO_DEVICE_STATE_RESUMING };
->>>>> +	static const u8 vfio_from_state_table[MAX_STATE + 1][MAX_STATE +
->> 1] = {
->>>>> +		[VFIO_DEVICE_STATE_STOP] = {
->>>>> +			[VFIO_DEVICE_STATE_RUNNING] = 1,
->>>>> +			[VFIO_DEVICE_STATE_RESUMING] = 1,
->>>>> +		},
->>>>> +		[VFIO_DEVICE_STATE_RUNNING] = {
->>>>> +			[VFIO_DEVICE_STATE_STOP] = 1,
->>>>> +			[VFIO_DEVICE_STATE_SAVING] = 1,
->>>>> +			[VFIO_DEVICE_STATE_SAVING |
->> VFIO_DEVICE_STATE_RUNNING]
->>>>> = 1,
->>>> Do we need to allow _RESUMING state here or not? As per the "State
->> transitions"
->>>> section from uapi/linux/vfio.h,
->>> It looks like we missed this state transition.
->>>
->>> Thanks
->> I'm not sure this state transition is valid.
->>
->> Kirti, When we would like to move from RUNNING to RESUMING ?
-> I guess it depends on what you report as your dev default state.
->
-> For HiSilicon ACC migration driver, we set the default to _RUNNING.
+Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
+---
+ drivers/virtio/virtio.c | 10 ++++++++++
+ include/linux/virtio.h  | 13 +++++++++++++
+ 2 files changed, 23 insertions(+)
 
-Where do you set it and report it ?
+diff --git a/drivers/virtio/virtio.c b/drivers/virtio/virtio.c
+index 588e02fb91d3..bdbd76c5c58c 100644
+--- a/drivers/virtio/virtio.c
++++ b/drivers/virtio/virtio.c
+@@ -60,12 +60,22 @@ static ssize_t features_show(struct device *_d,
+ }
+ static DEVICE_ATTR_RO(features);
+ 
++static ssize_t numa_node_show(struct device *_d,
++			      struct device_attribute *attr, char *buf)
++{
++	struct virtio_device *vdev = dev_to_virtio(_d);
++
++	return sysfs_emit(buf, "%d\n", virtio_dev_to_node(vdev));
++}
++static DEVICE_ATTR_RO(numa_node);
++
+ static struct attribute *virtio_dev_attrs[] = {
+ 	&dev_attr_device.attr,
+ 	&dev_attr_vendor.attr,
+ 	&dev_attr_status.attr,
+ 	&dev_attr_modalias.attr,
+ 	&dev_attr_features.attr,
++	&dev_attr_numa_node.attr,
+ 	NULL,
+ };
+ ATTRIBUTE_GROUPS(virtio_dev);
+diff --git a/include/linux/virtio.h b/include/linux/virtio.h
+index 41edbc01ffa4..05b586ac71d1 100644
+--- a/include/linux/virtio.h
++++ b/include/linux/virtio.h
+@@ -125,6 +125,19 @@ static inline struct virtio_device *dev_to_virtio(struct device *_dev)
+ 	return container_of(_dev, struct virtio_device, dev);
+ }
+ 
++/**
++ * virtio_dev_to_node - return the NUMA node for a given virtio device
++ * @vdev:	device to get the NUMA node for.
++ */
++static inline int virtio_dev_to_node(struct virtio_device *vdev)
++{
++	struct device *parent = vdev->dev.parent;
++
++	if (!parent)
++		return NUMA_NO_NODE;
++	return dev_to_node(parent);
++}
++
+ void virtio_add_status(struct virtio_device *dev, unsigned int status);
+ int register_virtio_device(struct virtio_device *dev);
+ void unregister_virtio_device(struct virtio_device *dev);
+-- 
+2.18.1
 
-
->
-> And when the migration starts, the destination side Qemu, set the
-> device state to _RESUMING(vfio_load_state()).
->
->  From the documentation, it looks like the assumption on default state of
-> the VFIO dev is _RUNNING.
->
-> "
-> *  001b => Device running, which is the default state
-> "
->
->> Sameerali, can you please re-test and update if you see this transition ?
-> Yes. And if I change the default state to _STOP, then the transition
-> is from _STOP --> _RESUMING.
->
-> But the documentation on State transitions doesn't have _STOP --> _RESUMING
-> transition as valid.
->
-> Thanks,
-> Shameer
->
->>
->>>> " * 4. To start the resuming phase, the device state should be transitioned
->> from
->>>>    *    the _RUNNING to the _RESUMING state."
->>>>
->>>> IIRC, I have seen that transition happening on the destination dev while
->> testing the
->>>> HiSilicon ACC dev migration.
->>>>
->>>> Thanks,
->>>> Shameer
->>>>
->>>>> +		},
->>>>> +		[VFIO_DEVICE_STATE_SAVING] = {
->>>>> +			[VFIO_DEVICE_STATE_STOP] = 1,
->>>>> +			[VFIO_DEVICE_STATE_RUNNING] = 1,
->>>>> +		},
->>>>> +		[VFIO_DEVICE_STATE_SAVING | VFIO_DEVICE_STATE_RUNNING]
->> = {
->>>>> +			[VFIO_DEVICE_STATE_RUNNING] = 1,
->>>>> +			[VFIO_DEVICE_STATE_SAVING] = 1,
->>>>> +		},
->>>>> +		[VFIO_DEVICE_STATE_RESUMING] = {
->>>>> +			[VFIO_DEVICE_STATE_RUNNING] = 1,
->>>>> +			[VFIO_DEVICE_STATE_STOP] = 1,
->>>>> +		},
->>>>> +	};
->>>>> +
->>>>> +	if (new_state > MAX_STATE || old_state > MAX_STATE)
->>>>> +		return false;
->>>>> +
->>>>> +	return vfio_from_state_table[old_state][new_state];
->>>>> +}
->>>>> +EXPORT_SYMBOL_GPL(vfio_change_migration_state_allowed);
->>>>> +
->>>>>    static long vfio_device_fops_unl_ioctl(struct file *filep,
->>>>>    				       unsigned int cmd, unsigned long arg)
->>>>>    {
->>>>> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
->>>>> index b53a9557884a..e65137a708f1 100644
->>>>> --- a/include/linux/vfio.h
->>>>> +++ b/include/linux/vfio.h
->>>>> @@ -83,6 +83,7 @@ extern struct vfio_device
->>>>> *vfio_device_get_from_dev(struct device *dev);
->>>>>    extern void vfio_device_put(struct vfio_device *device);
->>>>>
->>>>>    int vfio_assign_device_set(struct vfio_device *device, void *set_id);
->>>>> +bool vfio_change_migration_state_allowed(u32 new_state, u32
->> old_state);
->>>>>    /* events for the backend driver notify callback */
->>>>>    enum vfio_iommu_notify_type {
->>>>> --
->>>>> 2.31.1
