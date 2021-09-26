@@ -2,125 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2CDCC4186BF
-	for <lists+kvm@lfdr.de>; Sun, 26 Sep 2021 08:36:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8648041879F
+	for <lists+kvm@lfdr.de>; Sun, 26 Sep 2021 11:02:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231159AbhIZGi3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 26 Sep 2021 02:38:29 -0400
-Received: from mail.kernel.org ([198.145.29.99]:39858 "EHLO mail.kernel.org"
+        id S229713AbhIZJEI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 26 Sep 2021 05:04:08 -0400
+Received: from mail.kernel.org ([198.145.29.99]:39872 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229578AbhIZGi2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 26 Sep 2021 02:38:28 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 48DE660F93;
-        Sun, 26 Sep 2021 06:36:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1632638213;
-        bh=28oArhi0u0AmWqG/AavBH4MgxWMN2/sjbeEH/mw3iKc=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=alEjSWcDpCdzhQkOkBFYOPhQNwQERF9Tn/YsFDW8gnRwmMD+pV9bW5cH5Neq2KOKG
-         feKkdg4nYEaqHCdzrSBmjudBlqrHfUNzqA/NBZacoIuPCnOCNnEZZJaOmDfhXiGdRp
-         cjfrnBdpDn+fpbdHb3QBlYVip6+jiXHavCTr3ZKe2I2FT/IsWmceILP/hl8WaxWaar
-         621N16CbPuOt11ohNfn2B8Zqfh1doNB9mx1SJBFTljQOTpUxqX4zcW1wKqJaf650Ul
-         +BEjjEc7RNPpoBXJZDWU6uMW4HXRRNu/JIKh14FmoCK1LTis+0vc5W4socNPC5BeOq
-         Jd1mXdW/1pYvA==
-Date:   Sun, 26 Sep 2021 09:36:49 +0300
-From:   Leon Romanovsky <leon@kernel.org>
-To:     Bjorn Helgaas <helgaas@kernel.org>
-Cc:     Doug Ledford <dledford@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
-        Saeed Mahameed <saeedm@nvidia.com>,
-        Yishai Hadas <yishaih@nvidia.com>
-Subject: Re: [PATCH mlx5-next 1/7] PCI/IOV: Provide internal VF index
-Message-ID: <YVAVAfU3aL6JJg3i@unreal>
-References: <YU71n4WSIztOdpbw@unreal>
- <20210925174115.GA511131@bhelgaas>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210925174115.GA511131@bhelgaas>
+        id S229551AbhIZJEH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 26 Sep 2021 05:04:07 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 6F4DC60FC1;
+        Sun, 26 Sep 2021 09:02:31 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1mUQ3J-00D1iV-6U; Sun, 26 Sep 2021 10:02:29 +0100
+Date:   Sun, 26 Sep 2021 10:02:28 +0100
+Message-ID: <877df3btgb.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        David Matlack <dmatlack@google.com>,
+        Jing Zhang <jingzhangos@google.com>
+Subject: Re: [PATCH 07/14] KVM: Don't block+unblock when halt-polling is successful
+In-Reply-To: <80d90ee6-0d43-3735-5c26-be8c3d72d493@redhat.com>
+References: <20210925005528.1145584-1-seanjc@google.com>
+        <20210925005528.1145584-8-seanjc@google.com>
+        <878rzlass2.wl-maz@kernel.org>
+        <80d90ee6-0d43-3735-5c26-be8c3d72d493@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, seanjc@google.com, chenhuacai@kernel.org, aleksandar.qemu.devel@gmail.com, paulus@ozlabs.org, borntraeger@de.ibm.com, frankja@linux.ibm.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, david@redhat.com, cohuck@redhat.com, imbrenda@linux.ibm.com, vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org, kvm@vger.kernel.org, kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org, dmatlack@google.com, jingzhangos@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Sep 25, 2021 at 12:41:15PM -0500, Bjorn Helgaas wrote:
-> On Sat, Sep 25, 2021 at 01:10:39PM +0300, Leon Romanovsky wrote:
-> > On Fri, Sep 24, 2021 at 08:08:45AM -0500, Bjorn Helgaas wrote:
-> > > On Thu, Sep 23, 2021 at 09:35:32AM +0300, Leon Romanovsky wrote:
-> > > > On Wed, Sep 22, 2021 at 04:59:30PM -0500, Bjorn Helgaas wrote:
-> > > > > On Wed, Sep 22, 2021 at 01:38:50PM +0300, Leon Romanovsky wrote:
-> > > > > > From: Jason Gunthorpe <jgg@nvidia.com>
-> > > > > > 
-> > > > > > The PCI core uses the VF index internally, often called the vf_id,
-> > > > > > during the setup of the VF, eg pci_iov_add_virtfn().
-> > > > > > 
-> > > > > > This index is needed for device drivers that implement live migration
-> > > > > > for their internal operations that configure/control their VFs.
-> > > > > >
-> > > > > > Specifically, mlx5_vfio_pci driver that is introduced in coming patches
-> > > > > > from this series needs it and not the bus/device/function which is
-> > > > > > exposed today.
-> > > > > > 
-> > > > > > Add pci_iov_vf_id() which computes the vf_id by reversing the math that
-> > > > > > was used to create the bus/device/function.
-> > > > > > 
-> > > > > > Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
-> > > > > > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> > > > > > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-> > > > > 
-> > > > > Acked-by: Bjorn Helgaas <bhelgaas@google.com>
-> > > > > 
-> > > > > mlx5_core_sriov_set_msix_vec_count() looks like it does basically the
-> > > > > same thing as pci_iov_vf_id() by iterating through VFs until it finds
-> > > > > one with a matching devfn (although it *doesn't* check for a matching
-> > > > > bus number, which seems like a bug).
-> > ...
+On Sun, 26 Sep 2021 07:27:28 +0100,
+Paolo Bonzini <pbonzini@redhat.com> wrote:
 > 
-> > > And it still looks like the existing code is buggy.  This is called
-> > > via sysfs, so if the PF is on bus X and the user writes to
-> > > sriov_vf_msix_count for a VF on bus X+1, it looks like
-> > > mlx5_core_sriov_set_msix_vec_count() will set the count for the wrong
-> > > VF.
+> On 25/09/21 11:50, Marc Zyngier wrote:
+> >> there is no need for arm64 to put/load
+> >> the vGIC as KVM hasn't relinquished control of the vCPU in any way.
 > > 
-> > In mlx5_core_sriov_set_msix_vec_count(), we receive VF that is connected
-> > to PF which has "struct mlx5_core_dev". My expectation is that they share
-> > same bus as that PF was the one who created VFs. The mlx5 devices supports
-> > upto 256 VFs and it is far below the bus split mentioned in PCI spec.
-> > 
-> > How can VF and their respective PF have different bus numbers?
+> > This doesn't mean that there is no requirement for any state
+> > change. The put/load on GICv4 is crucial for performance, and the VMCR
+> > resync is a correctness requirement.
 > 
-> See PCIe r5.0, sec 9.2.1.2.  For example,
-> 
->   PF 0 on bus 20
->     First VF Offset   1
->     VF Stride         1
->     NumVFs          511
->   VF 0,1   through VF 0,255 on bus 20
->   VF 0,256 through VF 0,511 on bus 21
-> 
-> This is implemented in pci_iov_add_virtfn(), which computes the bus
-> number and devfn from the VF ID.
-> 
-> pci_iov_virtfn_devfn(VF 0,1) == pci_iov_virtfn_devfn(VF 0,256), so if
-> the user writes to sriov_vf_msix_count for VF 0,256, it looks like
-> we'll call mlx5_set_msix_vec_count() for VF 0,1 instead of VF 0,256.
+> I wouldn't even say it's crucial for performance: halt polling cannot
+> work and is a waste of time without (the current implementation of)
+> put/load.
 
-This is PCI spec split that I mentioned.
+Not quite. A non-V{LPI,SGI} could still be used as the a wake-up from
+WFI (which is the only reason we end-up on this path). Only LPIs (and
+SGIs on GICv4.1) can be directly injected, meaning that SPIs and PPIs
+still follow the standard SW injection model.
 
-> 
-> The spec encourages devices that require no more than 256 devices to
-> locate them all on the same bus number (PCIe r5.0, sec 9.1), so if you
-> only have 255 VFs, you may avoid the problem.
-> 
-> But in mlx5_core_sriov_set_msix_vec_count(), it's not obvious that it
-> is safe to assume the bus number is the same.
+However, there is still the ICH_VMCR_EL2 requirement (to get the
+up-to-date priority mask and group enable bits) for SW-injected
+interrupt wake-up to work correctly, and I really don't want to save
+that one eagerly on each shallow exit.
 
-No problem, we will make it more clear.
+> However, is activating the doorbell necessary?  If possible, polling
+> the VGIC directly for pending VLPIs without touching the ITS (for
+> example by emulating IAR reads) may make sense.  IIUC that must be
+> done at EL2 though, so maybe it would even make sense to move all of
+> halt polling to EL2 for the nVHE case.  It all depends on benchmark
+> results, of course.
 
-> 
-> Bjorn
+No, there is no architectural way to observe the VLPI state. EL2
+cannot impersonate the guest an read ICV_IAR1_EL1 (because it
+conveniently has the same encoding as ICC_IAR1_EL1), and if it could,
+it would be *destructive* (not what you want). The equivalent of the
+LR that is used to hold the highest priority VLPI presented to the
+virtual CPU interface is not visible to SW at all.
+
+There are exactly two ways for the hypervisor to get a hint about the
+VLPI state (and that's only a hint, as everything can be spurious):
+
+- Make the vPE non resident and use GICR_VPENDBASER.PendingLast bit to
+  find out whether there are pending VLPIs
+
+- Make the vPE non resident and get a doorbell interrupt
+
+See the common pattern?
+
+There is no polling mechanism, and the only way to flush the VLPI
+state to memory is to destroy the GIC view of the vPE, which is a bit
+counter-productive. It also only work on GICv4.1, and not GICv4 (which
+is why we don't support live migration on GICv4).
+
+> Sorry for the many stupid questions I'm asking lately, but I'm trying
+> to pay more attention to ARM and understand the VGIC and EL1/EL2 split
+> better.
+
+Feel free to ask any question. The more people understand how the
+architecture works, the better.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
