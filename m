@@ -2,49 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7268A4193C7
-	for <lists+kvm@lfdr.de>; Mon, 27 Sep 2021 14:01:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A48CE4193CF
+	for <lists+kvm@lfdr.de>; Mon, 27 Sep 2021 14:06:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234130AbhI0MC4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Sep 2021 08:02:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50964 "EHLO
+        id S234188AbhI0MIa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Sep 2021 08:08:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52218 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234134AbhI0MCz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Sep 2021 08:02:55 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F921C061575;
-        Mon, 27 Sep 2021 05:01:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=l2WBiCb5duYJRA9nKpihqrJOH1Qjg6utSrFiu8qAdtc=; b=ZGz56D9PDMH0Z9KBoJRxNY2ws2
-        uVWo1Tb+nHx18sJhRIukJIc3iQcK9Wq7R/S3CySv3a02INLlb1huajuVkEF24S64o6ZY278l4ONa2
-        HQrv0yZMzld8QDfhONwlXZgTm5TTqQ7Fik+veQ0TlPxViY0XWEmgtr2iXv0o/Co54MwG41vxpgUZN
-        A+2vYVjVnm+GZ9qtMcDthxkSJ1QJSqyimFyAk+MP8fAexcfwmxpvOU1zoUZ8l37UHiD0Dj/28XlkT
-        /p/s/usXaUf8qKamgnSKObW0qorVTPGgiQDpObevLviNeBs+6tZEuxpC8IuVh8AbwztReRuXb4wMt
-        E5c10lNQ==;
-Received: from hch by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mUpIF-009idw-Rh; Mon, 27 Sep 2021 11:59:48 +0000
-Date:   Mon, 27 Sep 2021 12:59:35 +0100
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Max Gurtovoy <mgurtovoy@nvidia.com>
-Cc:     hch@infradead.org, mst@redhat.com,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        stefanha@redhat.com, israelr@nvidia.com, nitzanc@nvidia.com,
-        oren@nvidia.com, linux-block@vger.kernel.org, axboe@kernel.dk
-Subject: Re: [PATCH v3 1/1] virtio-blk: avoid preallocating big SGL for data
-Message-ID: <YVGyJ7jkixtgPVSY@infradead.org>
-References: <20210901131434.31158-1-mgurtovoy@nvidia.com>
+        with ESMTP id S234087AbhI0MI3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Sep 2021 08:08:29 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A3B3C061575;
+        Mon, 27 Sep 2021 05:06:51 -0700 (PDT)
+Received: from zn.tnic (p200300ec2f088a001ce91a9f1eb42005.dip0.t-ipconnect.de [IPv6:2003:ec:2f08:8a00:1ce9:1a9f:1eb4:2005])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 4652F1EC034B;
+        Mon, 27 Sep 2021 14:06:46 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1632744406;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=fnzIy7z5nELIJDftnAE2ClbndYkwUROx0yEZJD+4zwQ=;
+        b=D3aTcAETUPoOq5c3TFgiqcuq4KxHukT2QcueH57GbqCHU3+DrKErqTl/r074Ip8jvUkPM5
+        1GXZw72qAAaEYJoAKUhM/pnUr/+tsxm+Qcy4+n8PQfDoOOQ3MEHWHnsd+TNcCSWAaP4+rr
+        JSA0ZHh0PbjJY7ZNdn5KchDeMhk+Ufw=
+Date:   Mon, 27 Sep 2021 14:06:40 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Babu Moger <babu.moger@amd.com>, tglx@linutronix.de,
+        mingo@redhat.com, x86@kernel.org, hpa@zytor.com, seanjc@google.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, tony.luck@intel.com, peterz@infradead.org,
+        kyung.min.park@intel.com, wei.huang2@amd.com, jgross@suse.com,
+        andrew.cooper3@citrix.com, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH] KVM: x86: Expose Predictive Store Forwarding Disable
+Message-ID: <YVGz0HXe+WNAXfdF@zn.tnic>
+References: <163244601049.30292.5855870305350227855.stgit@bmoger-ubuntu>
+ <YVGkDPbQmdwSw6Ff@zn.tnic>
+ <fcbbdf83-128a-2519-13e8-1c5d5735a0d2@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20210901131434.31158-1-mgurtovoy@nvidia.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <fcbbdf83-128a-2519-13e8-1c5d5735a0d2@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Looks good,
+On Mon, Sep 27, 2021 at 01:13:26PM +0200, Paolo Bonzini wrote:
+> Because the guest kernel needs to know which MSRs to write when you touch
+> the SSBD prctl, so that PSFD is properly disabled *inside the guest*.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+It already knows which - the same one which disables SSB. PSF is
+disabled *together* with SSB, for now...
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
