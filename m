@@ -2,127 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 22AEB419FBC
-	for <lists+kvm@lfdr.de>; Mon, 27 Sep 2021 22:05:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E30B641A080
+	for <lists+kvm@lfdr.de>; Mon, 27 Sep 2021 22:46:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236667AbhI0UHC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Sep 2021 16:07:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52108 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236657AbhI0UG5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Sep 2021 16:06:57 -0400
-Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8C51C061575
-        for <kvm@vger.kernel.org>; Mon, 27 Sep 2021 13:05:19 -0700 (PDT)
-Received: by mail-pg1-x534.google.com with SMTP id 17so18814859pgp.4
-        for <kvm@vger.kernel.org>; Mon, 27 Sep 2021 13:05:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=J1OTP+7DOGmeKvtWkpynSAHibvAphxBoBf7TlJ1W75g=;
-        b=nJh8y9Ji6F34ZL+jQC5GvuQsdn5mLwOEp8jloJUDmMe6dn3HrdoI/S/FslqkPVgtgh
-         xKjv46ot3H+sEkrUr3qHSBTFbHa+owZkstZR5JBmM58W4ka0J3+XU890WfZgQ92ELms3
-         7Ifyncde5P2FEeumN+HL3eg3VYKdnsuCVs905IJP3D9NGkuCAk49lQ286dmIV/zoeuY1
-         OH5jdcRW0CDNLKmGnDLvIbx0GIPiSvh6mteEIVaa2231AnsJFSjZHYarcSnZexORgcFx
-         ipYHtuIOyhe5oHruK/O8EBryz6Vd9zZzKrqJ894QDcOvAG845h6P2g9WYbpb5HD74Ui/
-         IKvQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=J1OTP+7DOGmeKvtWkpynSAHibvAphxBoBf7TlJ1W75g=;
-        b=jSCBIIs4okvvT5Qk1+Flek7zqIJnvX83gtatjjCoYB3syT1khv2eGIOatseYWYbIIT
-         9bNwH0784/vosOReLQhUmZfwT6nmtWqg6wi/IjdZtAD8wTQaxmC70HDB/8cbbqZzefB3
-         zUGcdM2fUq2OSqz1jOWai/BVjc1w05RKfHSGLXUPk2WFINpG3LTgnd+QHeSNqKBHKy7E
-         7WH+ZEaRMj1ZieWTxmtN0yJkc0keOjvmjgxZEmx6pAr5Hsx31lDaSTceCqeYBzO6Ai0X
-         TZyQQ25TL8mgz9bGJtenV1UBinp+jKmJehEAAhb27oMMoQSvsEdmYQQKK60E4PA6XXxE
-         qn3w==
-X-Gm-Message-State: AOAM531Q5sFdWCMWEUEtYN5Z6svEUHPsjkkeNTJQIprPggJ0NVzaKNBa
-        yfVWZjxq4zuXVWOBWPx4cqzDMg==
-X-Google-Smtp-Source: ABdhPJxTlxHvtc5rugG/tFQUBdwxNnPR3lb994WAssd3KxL7MTB0W9h/Ymf1p6dZMMoJeUKmlzLzpA==
-X-Received: by 2002:a63:4f0f:: with SMTP id d15mr1226386pgb.464.1632773118918;
-        Mon, 27 Sep 2021 13:05:18 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id 2sm252633pjt.23.2021.09.27.13.05.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Sep 2021 13:05:18 -0700 (PDT)
-Date:   Mon, 27 Sep 2021 20:05:14 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Andrew Jones <drjones@redhat.com>
-Cc:     Oliver Upton <oupton@google.com>, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>
-Subject: Re: [PATCH] selftests: KVM: Call ucall_init when setting up in
- rseq_test
-Message-ID: <YVIj+gExrHrjlQEm@google.com>
-References: <20210923220033.4172362-1-oupton@google.com>
- <YU0XIoeYpfm1Oy0j@google.com>
- <20210924064732.xqv2xjya3pxgmwr2@gator.home>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210924064732.xqv2xjya3pxgmwr2@gator.home>
+        id S237041AbhI0Urz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Sep 2021 16:47:55 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:64062 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S236414AbhI0Urz (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 27 Sep 2021 16:47:55 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 18RIokti026875;
+        Mon, 27 Sep 2021 16:46:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ mime-version : content-transfer-encoding; s=pp1;
+ bh=lwBg6ETHNmezOliV6uYm9wJHkponVlX6ZQYAIV/PAIw=;
+ b=lneehF2swa0M0E9cllaE1fMIH4mEQLsOiLYDwh35MKczOPU7V6O6GiRt0yw+u3gJpZQT
+ BI27BpxZSg9Gx/eV/G0VfjXpatjVNoCqZ3IkgAclpeMvRh07rbDnRH1lLjV/j446o6If
+ rdaQBOYKoDGoXDwqFoeCTA6T4+8gFyEQaW8wTg6j8cWk8JllVVZk8+PQ5E+lY3yp6KhZ
+ lkgSe7C2IDjFz7i4rSWyJXm0yxPZO/oiWoiDNxlX66vuZ95HAMPTIKauJnyxpMFCksfS
+ LEM8DsHIttRoU2/o5srtXKyYu9ai/j+d72w+gUeCNpYGKRwf7p5KUJMerhpkfZd3Afb5 nw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3bagx55xp1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 27 Sep 2021 16:46:08 -0400
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 18RJsJM4007485;
+        Mon, 27 Sep 2021 16:46:07 -0400
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3bagx55xnq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 27 Sep 2021 16:46:07 -0400
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+        by ppma01dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 18RKbMUk005939;
+        Mon, 27 Sep 2021 20:46:06 GMT
+Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com [9.57.198.26])
+        by ppma01dal.us.ibm.com with ESMTP id 3b9udb7dkp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 27 Sep 2021 20:46:06 +0000
+Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com [9.57.199.106])
+        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 18RKk5up11142088
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 27 Sep 2021 20:46:05 GMT
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8288B2805E;
+        Mon, 27 Sep 2021 20:46:05 +0000 (GMT)
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C892028058;
+        Mon, 27 Sep 2021 20:45:58 +0000 (GMT)
+Received: from farman-thinkpad-t470p (unknown [9.163.16.42])
+        by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
+        Mon, 27 Sep 2021 20:45:58 +0000 (GMT)
+Message-ID: <f1b64606c967e9adf12f4e026cdfdf910ade554e.camel@linux.ibm.com>
+Subject: Re: [PATCH v2 7/9] vfio/ccw: Remove private->mdev
+From:   Eric Farman <farman@linux.ibm.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     David Airlie <airlied@linux.ie>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        dri-devel@lists.freedesktop.org,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
+        linux-s390@vger.kernel.org,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>, Christoph Hellwig <hch@lst.de>
+Date:   Mon, 27 Sep 2021 16:45:56 -0400
+In-Reply-To: <20210927123253.GY964074@nvidia.com>
+References: <7-v2-7d3a384024cf+2060-ccw_mdev_jgg@nvidia.com>
+         <f887a563e688057d6759e6de65d480326f502331.camel@linux.ibm.com>
+         <20210927123253.GY964074@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-16.el8) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: v0DgXAfibzUmo_LUs0sDhAmrtXJUoU0-
+X-Proofpoint-ORIG-GUID: w-2bKWgqbBr-1g7NEf-wxPVRrKgqRuob
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.391,FMLib:17.0.607.475
+ definitions=2021-09-27_07,2021-09-24_02,2020-04-07_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=798 spamscore=0
+ impostorscore=0 suspectscore=0 phishscore=0 priorityscore=1501
+ lowpriorityscore=0 mlxscore=0 bulkscore=0 clxscore=1015 adultscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2109230001 definitions=main-2109270138
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 24, 2021, Andrew Jones wrote:
-> On Fri, Sep 24, 2021 at 12:09:06AM +0000, Sean Christopherson wrote:
-> > On Thu, Sep 23, 2021, Oliver Upton wrote:
-> > > While x86 does not require any additional setup to use the ucall
-> > > infrastructure, arm64 needs to set up the MMIO address used to signal a
-> > > ucall to userspace. rseq_test does not initialize the MMIO address,
-> > > resulting in the test spinning indefinitely.
+On Mon, 2021-09-27 at 09:32 -0300, Jason Gunthorpe wrote:
+> On Fri, Sep 24, 2021 at 04:45:02PM -0400, Eric Farman wrote:
+> > On Thu, 2021-09-09 at 16:38 -0300, Jason Gunthorpe wrote:
+> > > Having a mdev pointer floating about in addition to a struct
+> > > vfio_device
+> > > is confusing. It is only used for three things:
 > > > 
-> > > Fix the issue by calling ucall_init() during setup.
+> > > - Getting the mdev 'struct device *' - this is the same as
+> > >      private->vdev.dev
 > > > 
-> > > Fixes: 61e52f1630f5 ("KVM: selftests: Add a test for KVM_RUN+rseq to detect task migration bugs")
-> > > Signed-off-by: Oliver Upton <oupton@google.com>
-> > > ---
-> > >  tools/testing/selftests/kvm/rseq_test.c | 1 +
-> > >  1 file changed, 1 insertion(+)
+> > > - Printing the uuid of the mdev in logging. The uuid is also the
+> > > dev_name
+> > >   of the mdev so this is the same string as
+> > >      dev_name(private->vdev.dev)
 > > > 
-> > > diff --git a/tools/testing/selftests/kvm/rseq_test.c b/tools/testing/selftests/kvm/rseq_test.c
-> > > index 060538bd405a..c5e0dd664a7b 100644
-> > > --- a/tools/testing/selftests/kvm/rseq_test.c
-> > > +++ b/tools/testing/selftests/kvm/rseq_test.c
-> > > @@ -180,6 +180,7 @@ int main(int argc, char *argv[])
-> > >  	 * CPU affinity.
-> > >  	 */
-> > >  	vm = vm_create_default(VCPU_ID, 0, guest_code);
-> > > +	ucall_init(vm, NULL);
+> > > - A weird attempt to fence the vfio_ccw_sch_io_todo() work. This
+> > > work
+> > > is
+> > >   only queued during states IDLE/PROCESSING/PENDING and flushed
+> > > when
+> > >   entering CLOSED. Thus the work already cannot run when the mdev
+> > > is
+> > > NULL.
+> > >   Remove it.
+> > > 
+> > > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> > >  drivers/s390/cio/vfio_ccw_drv.c     |  6 ++--
+> > >  drivers/s390/cio/vfio_ccw_fsm.c     | 48 +++++++++++++--------
+> > > ----
+> > >  drivers/s390/cio/vfio_ccw_ops.c     | 16 ++++------
+> > >  drivers/s390/cio/vfio_ccw_private.h |  2 --
+> > >  include/linux/mdev.h                |  4 ---
+> > >  5 files changed, 30 insertions(+), 46 deletions(-)
 > > 
-> > Any reason not to do this automatically in vm_create()?  There is 0% chance I'm
-> > going to remember to add this next time I write a common selftest, arm64 is the
-> > oddball here.
+> > I like this patch. Unfortunately it depends on the removal of a
+> > hunk in
+> > patch 4, which sets the FSM state to different values based on
+> > whether
+> > private->mdev is NULL or not, so can't go on its own. Need to spend
+> > more time thinking about that patch.
+> 
+> The FSM patch is important, really what is happening is the FSM logic
+> takes on the roles that was being split all over the place with other
+> logic, like this mdev stuff. To make that work we need a FSM that
+> makes sense..
 
-Ugh, reading through arm64's ucall_init(), moving this to vm_create() is a bad
-idea.  If a test creates memory regions at hardcoded address, the test could
-randomly fail if ucall_init() selects a conflicting address.  More below.
+No argument from me about that. My point is that I could consume this
+patch easier than the FSM patch, and need to get back to that one.
 
-> Yes, please. But, it'll take more than just adding a ucall_init(vm, NULL)
-> call to vm_create. We should also modify aarch64's ucall_init to allow
-> a *new* explicit mapping to be made. It already allows an explicit mapping
-> when arg != NULL, but we'll need to unmap the default mapping first, now.
-> The reason is that a unit test may not be happy with the automatically
-> selected address (that hasn't happened yet, but...) and want to set its
-> own.
+Eric
 
-My vote would be to rework arm64's ucall_init() as a prep patch and drop the param
-in the process.  There are zero tests that provide a non-NULL value, but that's
-likely because tests that care deliberately defer ucall_init() until after memory
-regions and page tables have been configured.
+> 
+> Jason
 
-IMO, arm64's approach is unnecessarily complex (that's a common theme for KVM's
-selftests...).  The code attempts to avoid magic numbers by not hardcoding the MMIO
-range, but in doing so makes the end result even more magical, e.g. starting at
-5/8ths of min(MAX_PA, MAX_VA).
-
-E.g. why not put the ucall MMIO range immediately after the so called "default"
-memory region added at the end of vm_create()?  That way the location of the ucall
-range is completely predictable, and while still arbitrary, less magical.
