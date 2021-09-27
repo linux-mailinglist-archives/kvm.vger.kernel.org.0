@@ -2,89 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 134144193EB
-	for <lists+kvm@lfdr.de>; Mon, 27 Sep 2021 14:15:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4BA5C4193FE
+	for <lists+kvm@lfdr.de>; Mon, 27 Sep 2021 14:17:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234249AbhI0MRC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Sep 2021 08:17:02 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55917 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234210AbhI0MQ5 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 27 Sep 2021 08:16:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632744919;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=xfGw456gQ82ABMdVQA6RV36suyfhz5P7yHLPAXAnVXo=;
-        b=d7nSrpax0TV87RgWD7LzXTXA9fuuVOI1uv2oFJnZ3AQnUMGNDgf+x+KTIa2awZwH2kB8vJ
-        +P2TtpXIvmVyfmIT5yT/Jo3zh8RXhjxGfenzUZxKlp6aJ0tU5nWs37sNb3mMqw4kTWnuRm
-        DNaCJvCE8axavWrYWs8FR3rBWQVRmg8=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-529-bRzzUmA7NjGZL1EuviglFA-1; Mon, 27 Sep 2021 08:15:18 -0400
-X-MC-Unique: bRzzUmA7NjGZL1EuviglFA-1
-Received: by mail-ed1-f69.google.com with SMTP id s18-20020a508d12000000b003da7a7161d5so2086742eds.8
-        for <kvm@vger.kernel.org>; Mon, 27 Sep 2021 05:15:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=xfGw456gQ82ABMdVQA6RV36suyfhz5P7yHLPAXAnVXo=;
-        b=hOml7JlYIPqJPmwD2hvcTUCk0OAGKJ2UZikgJBruxWOH6+5ZoKHyi6Mk9NQNluyMje
-         R5GuKMlVDRH0KysiNCcyhJ1rzAmuHpxxMJ9PYktFOeCtjN5VFZLL2V2YpSN0aMMfF8Wp
-         +hbPqruhy41YLwlcbpyreeh8qTCcmDQGqSduUzrK3h+IycTdx2Kwyem+zJy3Mk9UYr7m
-         llfQtzlJlLV0JbO28YqBcpf8oP6knCS0SWfmUjAq7+H/0lV4hIqwJDbby3ux6Qz659sI
-         fWXo76WYeBYcP0+OXgetezVLLUi6V/31qZ2QDcz3UVejFsEMdnB57vthWlBxtxNjHfYE
-         IT3Q==
-X-Gm-Message-State: AOAM530Y3vs7xgFhBLxV0TA/eqAR7Z9aCD+fiSUQx0TIZTTmhCWx57qQ
-        KPjntouujX3rOfXXhULIf/PCzDm0bPHFpEW5mKBC/jBja3BMvYcZ+c1wSRLP2zBZQe7u3nWWGuT
-        H2Db5wjPAlnbM
-X-Received: by 2002:a17:906:645:: with SMTP id t5mr26598278ejb.163.1632744916820;
-        Mon, 27 Sep 2021 05:15:16 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwYrlEJwbP/ga5Kfs4eTDSfaiizoMsvrkJq+jpz3Bdf3pQgRF3DIzW7YPNIyOgL0671UqQlYg==
-X-Received: by 2002:a17:906:645:: with SMTP id t5mr26598256ejb.163.1632744916639;
-        Mon, 27 Sep 2021 05:15:16 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id p24sm10309001edq.27.2021.09.27.05.14.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 27 Sep 2021 05:15:15 -0700 (PDT)
-Message-ID: <bcd40d94-2634-a40c-0173-64063051a4b2@redhat.com>
-Date:   Mon, 27 Sep 2021 14:14:52 +0200
+        id S234326AbhI0MTE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Sep 2021 08:19:04 -0400
+Received: from mail-bn1nam07on2050.outbound.protection.outlook.com ([40.107.212.50]:24647
+        "EHLO NAM02-BN1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S234233AbhI0MTD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Sep 2021 08:19:03 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=agiqaOpuocXNn2VBHnrxJf1JY6DLxWs4kozlMSIR8SyBkzmO0x2blwz8KIni6eP3EbSS+JFCzjmdr4l1DLROD9SOh88cNdMuYWEvXfvOS5EpjtFuBt0FCCqdDHtap/rjNpotTJvg3qdKxKXgWT+8b0+wFvLAP6aZoHUeSSvFiI/9in46v0dmwPLbzP7FYGrQkVYmXaw6xECG0/npXpx+NnmoZb5q0bdPbjyB32xj8qCfxKDNZfkLo3Frc83UFDN8vlSuqcbELO5BPmBc3t33t3UuWbTNRz47Jun+RUTSEEY1rNMr9xHQtOzKBEKZht55AVO7Hi0uxXDdHnhQvwQE4w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
+ bh=W9m1z6xvN3k5+zHge28fDda3iAvvFB0YAk4Z5uEN8Jo=;
+ b=ey24yywDABUcFCSR8EhC11BTnAy3/ZBY2YjeMW3I2tJt8jjphSQx0Sl+vJxh0L0ion1PARm8I88tPEpVPhLz+/ChNbVQm5hYDRkKA3W6BsYjJb0gNApNV8fL52xUaq7OPCRvryRc4lLjndl+z5Av1vPtgtt/GDcEa8aYJz2NctPdTID3kPzkCNIx5FKREJbZoTMAtE3wHixfZ5ZwF4duIyJXBhBvC1dSVT2l0dzijy/STVdpSW/Caad1ViCiu5SfFwd1ZcK2DkNCNVft/r18862pcHS5ITPPULjUR/MOQpJqUNBLlVjhQllUaJPEA0MBbNSk+izgv70RyHJRKcYKaw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=W9m1z6xvN3k5+zHge28fDda3iAvvFB0YAk4Z5uEN8Jo=;
+ b=tDFfRXf2aDbTAMo3HQJVfnLAD1yag6U9LIHHwCyUz2v2azBAsOsPccpL9x73EYQBzz7NmS655SXkZVIFV/yGMAYKFQzYLoK4Pn1a1LkZ6N8W8FNbjRIlLANWGnTeCqY2BmEUIu41poPJjQkNFVoZa97x6rtLtsVZyIKHcXFemhjDyjUWgDHntENmszGRxO9fOO4aa8fY6BEnLk9V3hdvOZK8BiuGsdNAfZF1Z+MF2/ZUN7B87nb1JxqrzKaZhU5iDFm7c0KHErAqyAaGxlVC3ko/a1aLzcCRzRHhGp3Ovr3MTJbFMUdqQl9XcUkv0u/6BSQPFq/WNNMLbGeqPGRVng==
+Authentication-Results: linux.ibm.com; dkim=none (message not signed)
+ header.d=none;linux.ibm.com; dmarc=none action=none header.from=nvidia.com;
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
+ by BL1PR12MB5191.namprd12.prod.outlook.com (2603:10b6:208:318::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4544.13; Mon, 27 Sep
+ 2021 12:17:23 +0000
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::e8af:232:915e:2f95]) by BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::e8af:232:915e:2f95%8]) with mapi id 15.20.4544.021; Mon, 27 Sep 2021
+ 12:17:23 +0000
+Date:   Mon, 27 Sep 2021 09:17:22 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Eric Farman <farman@linux.ibm.com>
+Cc:     David Airlie <airlied@linux.ie>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        dri-devel@lists.freedesktop.org,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
+        linux-s390@vger.kernel.org,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>, Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH v2 3/9] vfio/ccw: Convert to use vfio_register_group_dev()
+Message-ID: <20210927121722.GX964074@nvidia.com>
+References: <3-v2-7d3a384024cf+2060-ccw_mdev_jgg@nvidia.com>
+ <9c1f3f9321f595e6d42dab1413637ad927b6bf2d.camel@linux.ibm.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9c1f3f9321f595e6d42dab1413637ad927b6bf2d.camel@linux.ibm.com>
+X-ClientProxiedBy: MN2PR04CA0028.namprd04.prod.outlook.com
+ (2603:10b6:208:d4::41) To BL0PR12MB5506.namprd12.prod.outlook.com
+ (2603:10b6:208:1cb::22)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [PATCH] KVM: x86: Expose Predictive Store Forwarding Disable
-Content-Language: en-US
-To:     Borislav Petkov <bp@alien8.de>
-Cc:     Babu Moger <babu.moger@amd.com>, tglx@linutronix.de,
-        mingo@redhat.com, x86@kernel.org, hpa@zytor.com, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, tony.luck@intel.com, peterz@infradead.org,
-        kyung.min.park@intel.com, wei.huang2@amd.com, jgross@suse.com,
-        andrew.cooper3@citrix.com, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-References: <163244601049.30292.5855870305350227855.stgit@bmoger-ubuntu>
- <YVGkDPbQmdwSw6Ff@zn.tnic> <fcbbdf83-128a-2519-13e8-1c5d5735a0d2@redhat.com>
- <YVGz0HXe+WNAXfdF@zn.tnic>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <YVGz0HXe+WNAXfdF@zn.tnic>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Received: from mlx.ziepe.ca (142.162.113.129) by MN2PR04CA0028.namprd04.prod.outlook.com (2603:10b6:208:d4::41) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4544.15 via Frontend Transport; Mon, 27 Sep 2021 12:17:23 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1mUpZS-006JTb-4t; Mon, 27 Sep 2021 09:17:22 -0300
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 85cb061c-2c0b-4d98-bb6e-08d981b0c2ee
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5191:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <BL1PR12MB5191455014FD8C64340F31C0C2A79@BL1PR12MB5191.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: PydL8Z43D7kRV1YnJvw5OsK8MVNMSkbwTqfIS2UtrK0dpYok/A7khynwjQWOWY+6MzFFdDVSQA3x9r/b38cP+iVewJeMmPR69VMtu96QcPC5VTMMF27/IOah0qPl/l8hN5khZOY84r3hDCpskXeAMd4NvRAp9lods8FnlMoyRve8kNActkKmrqJ/A5dn3S1KKJd+jZssfxPHbNM6FpE7hBm0iDJpgKo+lLh4UT+WQtZs5vZMfmPMQbVnRtMuGSoyPQa/4+j2wv/J1POIkeSw8YiOqwbrYxKCEzoLe1KfQ85uQ9poXEVbwSdY/+9r8Iiy+W8MaxRRBtVTd7mr4xajRcU2Kv72j2LAY5aQ9K5U4YlOGsBQwnZPw6dbCC1rZBpjmQQtmBrVxVGYkbtPyAUlAqblFadN9qzYVw1ZoWJ3dH80THBOLEw2nglqW8t7YwD9Yz0GciERBlcSS4cmzYyzbV4NxTmF1NtBmsP6G5O7TerIUUBbxxHgdtvt3SKXIdGCvdXV9SWmJV+tuXyXmQF6oiJOanEC4mH1E20QGkaai5NGc7y1VlYfOwP9RuGLhUMVGj/jSFtRgh8klJjxUtcK+URlIABuLNUu67IL0qf426aKM8DSQdzyTHe+dR4sfRl83MDQU4jQvyhcyzUJFbGOee023AC+izCCyhNha64d1vqsI3FCUpXyD5bcafAqJdZD
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(4326008)(2616005)(5660300002)(36756003)(8936002)(33656002)(8676002)(4744005)(508600001)(66946007)(426003)(1076003)(66476007)(66556008)(6916009)(186003)(86362001)(26005)(316002)(2906002)(9746002)(9786002)(38100700002)(7416002)(54906003)(27376004);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?g0wmhpp3IIh19Csj5jP8ziRWiWtLpnLmiovJqKF98JdrSXTLFGzKt2tfggax?=
+ =?us-ascii?Q?70+kcPj51dAwfvfeCe9lZInX7zfjxVwZVP5gOuK/tneSPOwg9PUfMIlWzND4?=
+ =?us-ascii?Q?xoXHf8bmDjD8iSiMCTS6V+3Fpsuw78iOL44PQ0PcaLgUjEzCIxWzB5gjm1PU?=
+ =?us-ascii?Q?IS8RMruHud0CGQhKEylmTVzicJN6GUNUha6mnf9nlbQ+GBWVq3WkfVzqXFFJ?=
+ =?us-ascii?Q?OAxhRBQwgn6ofVNoqreEs2CPA+k6dvUqi7MaFJ5yXjsKmieQhGEd7gEe1WLW?=
+ =?us-ascii?Q?c6hHllDt7jTbeo2kMWtD7J6l6WSmIevIgRzYvTHbz04hCvB1WeoXOBIDxl25?=
+ =?us-ascii?Q?m+CGYrtBKeBpb0yKYpE5JzcQASG94MAzIXq8bOiRHQazq6/NBCDuBM8SBs8X?=
+ =?us-ascii?Q?SgtnqVMcnA0aqxgDJKc3aQA6xXPOY9OjYvJ38tEqT6aJwpxG2jU6+Xw8VtWc?=
+ =?us-ascii?Q?WlLjIln1zRkCbViu9tLs6YEm9ao45SDggBKStl/CqE9z/BxXjka+yu7jNq0/?=
+ =?us-ascii?Q?cbycu+Ph66oB0KwTCOktKRcYt/eOJw0CSEPtU4RcqHKxq/io39bQO4I4QhZR?=
+ =?us-ascii?Q?qZNkurAeOueyS6sHxpRyBiuOu9IUSq/tBRRPiCqaPGo7nkygHqGYvhbvGIZB?=
+ =?us-ascii?Q?RZlBML9Mda85HUM3TpmS59kPOvGDehcfRvS3NuHP9sT9pYPeAhLU7ZWlNaPK?=
+ =?us-ascii?Q?bt+diP5UXaf//2sOF5lhX3bQO5HGV0nnPtjnePLBZrTJD23l0Le9idWUN0JR?=
+ =?us-ascii?Q?sziXbfP25yURQcJHfmh9cxP5lPNW70X2U78Rp9y/wKFqbr6EN4RKVVa1b269?=
+ =?us-ascii?Q?FeMOvLVrzJNmykoKYS5lTHDUT6Q9QvRzI5UAHfWBqISM5LvkYRJweCutxpVC?=
+ =?us-ascii?Q?zUoS0g3l7q/tvxjVJG9IAAxTsPEiNICNzPovR4rNGIaBf1h5g1nIAJmWShgG?=
+ =?us-ascii?Q?ksykAZjOPaHMfijMos8/HWAx/9TP8TiomQ1VsHKLulySmzfqmOZqn6AK/SiC?=
+ =?us-ascii?Q?DHdYMalBUyfaAwJkJ/9TnER/Y1EqXZRI0j0vk4mNKmU8suk5YgEIeOCt17Jv?=
+ =?us-ascii?Q?X1is/TKedMhk5XeYtMNiF9iVaf9KGKGEGWe7E1PEuf7lZOWXlf5f2qCa6PSC?=
+ =?us-ascii?Q?gnEJ/I69clXIjp/yhKISP+J92ZM0T6j3pkq0i/QmI1YpYFl/687HdRxpUuT+?=
+ =?us-ascii?Q?JQ7s7ddaXEdUkpdcvWccomjexOprBYGQiWjqQha/lxE4nciLarjnGj3H2o3v?=
+ =?us-ascii?Q?o3V+ot/uzSiQvnsmxPZ2WNApdhkdvvlDHQvMcuvO4udcwzsLw0YNmFEOetf7?=
+ =?us-ascii?Q?kB6JKW8Gpcu+ItDUK0aK1MYG?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 85cb061c-2c0b-4d98-bb6e-08d981b0c2ee
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Sep 2021 12:17:23.7823
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: YI6Wm4NByBe5XA5JY5yE4LhyA1LMaoEkYeX7WacJrElvanwBo7ciT4fAiVE9svOn
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5191
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 27/09/21 14:06, Borislav Petkov wrote:
->> Because the guest kernel needs to know which MSRs to write when you touch
->> the SSBD prctl, so that PSFD is properly disabled*inside the guest*.
-> It already knows which - the same one which disables SSB. PSF is
-> disabled*together*  with SSB, for now...
+On Fri, Sep 24, 2021 at 04:37:43PM -0400, Eric Farman wrote:
+> > @@ -528,6 +534,7 @@ static int __init vfio_ccw_sch_init(void)
+> >  
+> >  static void __exit vfio_ccw_sch_exit(void)
+> >  {
+> > +	mdev_unregister_driver(&vfio_ccw_mdev_driver);
+> 
+> Wouldn't it be better to mirror the unwind-init case, such that the
+> above goes...
+> 
+> >  	css_driver_unregister(&vfio_ccw_sch_driver);
+> >  	isc_unregister(VFIO_CCW_ISC);
+> 
+> ...here?
 
-Right, not which MSR to write but which value to write.  It doesn't know 
-that the PSF disable bit is valid unless the corresponding CPUID bit is set.
+Yes, I switched it
 
-Paolo
-
+Thanks,
+Jason
