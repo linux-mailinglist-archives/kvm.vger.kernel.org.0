@@ -2,75 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0EC5D419535
-	for <lists+kvm@lfdr.de>; Mon, 27 Sep 2021 15:39:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2A361419554
+	for <lists+kvm@lfdr.de>; Mon, 27 Sep 2021 15:46:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234595AbhI0Nkl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Sep 2021 09:40:41 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:55702 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234557AbhI0Nkk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Sep 2021 09:40:40 -0400
-Received: from zn.tnic (p200300ec2f088a003e7a3db711c29d58.dip0.t-ipconnect.de [IPv6:2003:ec:2f08:8a00:3e7a:3db7:11c2:9d58])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 15AF71EC013E;
-        Mon, 27 Sep 2021 15:38:57 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1632749937;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=VSilXSaUsjcqTdHj0wHV0zcv+Rs1cnoXDIbeePx4zfM=;
-        b=hzSAi7KRv/M0gqs5truYx7MvEqByYxNidg7nQzGNSiJY0Yu7bvX+aMb4IImeIMFAKXG2hA
-        1X6s6lkqvrO6mDD0WYPYOWUg382xagbGwTjiiqc7H8wbE+2J71JGzRga7uf97IH5TlMop4
-        +rGksarvdVyDi2H3n9gEWAfqQ6D/uBE=
-Date:   Mon, 27 Sep 2021 15:38:51 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Babu Moger <babu.moger@amd.com>, tglx@linutronix.de,
-        mingo@redhat.com, x86@kernel.org, hpa@zytor.com, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, tony.luck@intel.com, peterz@infradead.org,
-        kyung.min.park@intel.com, wei.huang2@amd.com, jgross@suse.com,
-        andrew.cooper3@citrix.com, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH] KVM: x86: Expose Predictive Store Forwarding Disable
-Message-ID: <YVHJa63c4eFygCOg@zn.tnic>
-References: <163244601049.30292.5855870305350227855.stgit@bmoger-ubuntu>
- <YVGkDPbQmdwSw6Ff@zn.tnic>
- <fcbbdf83-128a-2519-13e8-1c5d5735a0d2@redhat.com>
- <YVGz0HXe+WNAXfdF@zn.tnic>
- <bcd40d94-2634-a40c-0173-64063051a4b2@redhat.com>
- <YVG46L++WPBAHxQv@zn.tnic>
- <afc34b38-5596-3571-63e5-55fe82e87f6c@redhat.com>
+        id S234615AbhI0NsQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Sep 2021 09:48:16 -0400
+Received: from frasgout.his.huawei.com ([185.176.79.56]:3881 "EHLO
+        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234365AbhI0NsM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Sep 2021 09:48:12 -0400
+Received: from fraeml702-chm.china.huawei.com (unknown [172.18.147.200])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4HJ3kV5c1Wz67Zx5;
+        Mon, 27 Sep 2021 21:43:30 +0800 (CST)
+Received: from lhreml711-chm.china.huawei.com (10.201.108.62) by
+ fraeml702-chm.china.huawei.com (10.206.15.51) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2308.8; Mon, 27 Sep 2021 15:46:32 +0200
+Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
+ lhreml711-chm.china.huawei.com (10.201.108.62) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.8; Mon, 27 Sep 2021 14:46:32 +0100
+Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
+ lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
+ 15.01.2308.008; Mon, 27 Sep 2021 14:46:32 +0100
+From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "mgurtovoy@nvidia.com" <mgurtovoy@nvidia.com>,
+        liulongfang <liulongfang@huawei.com>,
+        "Zengtao (B)" <prime.zeng@hisilicon.com>,
+        "Jonathan Cameron" <jonathan.cameron@huawei.com>,
+        "Wangzhou (B)" <wangzhou1@hisilicon.com>
+Subject: RE: [PATCH v3 6/6] hisi_acc_vfio_pci: Add support for VFIO live
+ migration
+Thread-Topic: [PATCH v3 6/6] hisi_acc_vfio_pci: Add support for VFIO live
+ migration
+Thread-Index: AQHXqhdQM13RiELH60aUjxjG41fnUKulAGMAgAAGK3CAAZpfgIARVJdw
+Date:   Mon, 27 Sep 2021 13:46:31 +0000
+Message-ID: <a440256250c14182b9eefc77d5d399b8@huawei.com>
+References: <20210915095037.1149-1-shameerali.kolothum.thodi@huawei.com>
+ <20210915095037.1149-7-shameerali.kolothum.thodi@huawei.com>
+ <20210915130742.GJ4065468@nvidia.com>
+ <fe5d6659e28244da82b7028b403e11ae@huawei.com>
+ <20210916135833.GB327412@nvidia.com>
+In-Reply-To: <20210916135833.GB327412@nvidia.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.47.80.194]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <afc34b38-5596-3571-63e5-55fe82e87f6c@redhat.com>
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 27, 2021 at 02:54:08PM +0200, Paolo Bonzini wrote:
-> There are other guests than Linux.  This patch is just telling userspace
-> that KVM knows what the PSFD bit is.  It is also possible to expose the bit
-> in KVM without having any #define in cpufeatures.h
-
-Ok, then there's no need for the cpufeatures.h hunk.
-
-> or without the kernel using it. For example KVM had been exposing
-> FSGSBASE long before Linux supported it.
-
-Ok, please do that for now then, if you want to expose it to other
-guests. I'm sceptical they will have a use case for it either but I'm
-always open to suggestions.
-
-For the same reason as for baremetal, though, I wouldn't do that and do
-that solely through the SSBD control but that's your call.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogSmFzb24gR3VudGhvcnBl
+IFttYWlsdG86amdnQG52aWRpYS5jb21dDQo+IFNlbnQ6IDE2IFNlcHRlbWJlciAyMDIxIDE0OjU5
+DQo+IFRvOiBTaGFtZWVyYWxpIEtvbG90aHVtIFRob2RpIDxzaGFtZWVyYWxpLmtvbG90aHVtLnRo
+b2RpQGh1YXdlaS5jb20+DQo+IENjOiBrdm1Admdlci5rZXJuZWwub3JnOyBsaW51eC1rZXJuZWxA
+dmdlci5rZXJuZWwub3JnOw0KPiBsaW51eC1jcnlwdG9Admdlci5rZXJuZWwub3JnOyBhbGV4Lndp
+bGxpYW1zb25AcmVkaGF0LmNvbTsNCj4gbWd1cnRvdm95QG52aWRpYS5jb207IGxpdWxvbmdmYW5n
+IDxsaXVsb25nZmFuZ0BodWF3ZWkuY29tPjsgWmVuZ3RhbyAoQikNCj4gPHByaW1lLnplbmdAaGlz
+aWxpY29uLmNvbT47IEpvbmF0aGFuIENhbWVyb24NCj4gPGpvbmF0aGFuLmNhbWVyb25AaHVhd2Vp
+LmNvbT47IFdhbmd6aG91IChCKSA8d2FuZ3pob3UxQGhpc2lsaWNvbi5jb20+DQo+IFN1YmplY3Q6
+IFJlOiBbUEFUQ0ggdjMgNi82XSBoaXNpX2FjY192ZmlvX3BjaTogQWRkIHN1cHBvcnQgZm9yIFZG
+SU8gbGl2ZQ0KPiBtaWdyYXRpb24NCj4gDQo+IE9uIFdlZCwgU2VwIDE1LCAyMDIxIGF0IDAxOjI4
+OjQ3UE0gKzAwMDAsIFNoYW1lZXJhbGkgS29sb3RodW0gVGhvZGkNCj4gd3JvdGU6DQo+ID4NCj4g
+Pg0KPiA+ID4gRnJvbTogSmFzb24gR3VudGhvcnBlIFttYWlsdG86amdnQG52aWRpYS5jb21dDQo+
+ID4gPiBTZW50OiAxNSBTZXB0ZW1iZXIgMjAyMSAxNDowOA0KPiA+ID4gVG86IFNoYW1lZXJhbGkg
+S29sb3RodW0gVGhvZGkNCj4gPHNoYW1lZXJhbGkua29sb3RodW0udGhvZGlAaHVhd2VpLmNvbT4N
+Cj4gPiA+IENjOiBrdm1Admdlci5rZXJuZWwub3JnOyBsaW51eC1rZXJuZWxAdmdlci5rZXJuZWwu
+b3JnOw0KPiA+ID4gbGludXgtY3J5cHRvQHZnZXIua2VybmVsLm9yZzsgYWxleC53aWxsaWFtc29u
+QHJlZGhhdC5jb207DQo+ID4gPiBtZ3VydG92b3lAbnZpZGlhLmNvbTsgTGludXhhcm0gPGxpbnV4
+YXJtQGh1YXdlaS5jb20+OyBsaXVsb25nZmFuZw0KPiA+ID4gPGxpdWxvbmdmYW5nQGh1YXdlaS5j
+b20+OyBaZW5ndGFvIChCKSA8cHJpbWUuemVuZ0BoaXNpbGljb24uY29tPjsNCj4gPiA+IEpvbmF0
+aGFuIENhbWVyb24gPGpvbmF0aGFuLmNhbWVyb25AaHVhd2VpLmNvbT47IFdhbmd6aG91IChCKQ0K
+PiA+ID4gPHdhbmd6aG91MUBoaXNpbGljb24uY29tPg0KPiA+ID4gU3ViamVjdDogUmU6IFtQQVRD
+SCB2MyA2LzZdIGhpc2lfYWNjX3ZmaW9fcGNpOiBBZGQgc3VwcG9ydCBmb3IgVkZJTyBsaXZlDQo+
+ID4gPiBtaWdyYXRpb24NCj4gPiA+DQo+ID4gPiBPbiBXZWQsIFNlcCAxNSwgMjAyMSBhdCAxMDo1
+MDozN0FNICswMTAwLCBTaGFtZWVyIEtvbG90aHVtIHdyb3RlOg0KPiA+ID4gPiArLyoNCj4gPiA+
+ID4gKyAqIEhpU2lsaWNvbiBBQ0MgVkYgZGV2wqBNTUlPIHNwYWNlIGNvbnRhaW5zIGJvdGggdGhl
+IGZ1bmN0aW9uYWwNCj4gcmVnaXN0ZXINCj4gPiA+ID4gKyAqIHNwYWNlwqBhbmQgdGhlIG1pZ3Jh
+dGlvbiBjb250cm9sIHJlZ2lzdGVyIHNwYWNlLiBXZSBoaWRlIHRoZQ0KPiBtaWdyYXRpb24NCj4g
+PiA+ID4gKyAqIGNvbnRyb2wgc3BhY2XCoGZyb20gdGhlIEd1ZXN0LiBCdXQgdG8gc3VjY2Vzc2Z1
+bGx5IGNvbXBsZXRlIHRoZSBsaXZlDQo+ID4gPiA+ICsgKiBtaWdyYXRpb24sIHdlIHN0aWxsIG5l
+ZWQgYWNjZXNzIHRvIHRoZSBmdW5jdGlvbmFsIE1NSU8gc3BhY2UgYXNzaWduZWQNCj4gPiA+ID4g
+KyAqIHRvIHRoZSBHdWVzdC4gVG8gYXZvaWQgYW55IHBvdGVudGlhbCBzZWN1cml0eSBpc3N1ZXMs
+IHdlIG5lZWQgdG8gYmUNCj4gPiA+ID4gKyAqIGNhcmVmdWwgbm90IHRvIGFjY2VzcyB0aGlzIHJl
+Z2lvbiB3aGlsZSB0aGUgR3Vlc3QgdkNQVXMgYXJlIHJ1bm5pbmcuDQo+ID4gPiA+ICsgKg0KPiA+
+ID4gPiArICogSGVuY2UgY2hlY2sgdGhlIGRldmljZSBzdGF0ZSBiZWZvcmUgd2UgbWFwIHRoZSBy
+ZWdpb24uDQo+ID4gPiA+ICsgKi8NCj4gPiA+DQo+ID4gPiBUaGUgcHJpb3IgcGF0Y2ggcHJldmVu
+dHMgbWFwcGluZyB0aGlzIGFyZWEgaW50byB0aGUgZ3Vlc3QgYXQgYWxsLA0KPiA+ID4gcmlnaHQ/
+DQo+ID4NCj4gPiBUaGF04oCZcyByaWdodC4gSXQgd2lsbCBwcmV2ZW50IEd1ZXN0IGZyb20gbWFw
+cGluZyB0aGlzIGFyZWEuDQo+ID4NCj4gPiA+IFNvIHdoeSB0aGUgY29tbWVudCBhbmQgbG9naWM/
+IElmIHRoZSBNTUlPIGFyZWEgaXNuJ3QgbWFwcGVkIHRoZW4gdGhlcmUNCj4gPiA+IGlzIG5vdGhp
+bmcgdG8gZG8sIHJpZ2h0Pw0KPiA+ID4NCj4gPiA+IFRoZSBvbmx5IHJpc2sgaXMgUDJQIHRyYW5z
+YWN0aW9ucyBmcm9tIGRldmljZXMgaW4gdGhlIHNhbWUgSU9NTVUNCj4gPiA+IGdyb3VwLCBhbmQg
+eW91IG1pZ2h0IGRvIHdlbGwgdG8gbWl0aWdhdGUgdGhhdCBieSBhc3NlcnRpbmcgdGhhdCB0aGUN
+Cj4gPiA+IGRldmljZSBpcyBpbiBhIHNpbmdsZXRvbiBJT01NVSBncm91cD8NCj4gPg0KPiA+IFRo
+aXMgd2FzIGFkZGVkIGFzIGFuIGV4dHJhIHByb3RlY3Rpb24uIEkgd2lsbCBhZGQgdGhlIHNpbmds
+ZXRvbiBjaGVjayBpbnN0ZWFkLg0KPiA+DQo+ID4gPiA+ICtzdGF0aWMgaW50IGhpc2lfYWNjX3Zm
+aW9fcGNpX2luaXQoc3RydWN0IHZmaW9fcGNpX2NvcmVfZGV2aWNlICp2ZGV2KQ0KPiA+ID4gPiAr
+ew0KPiA+ID4gPiArCXN0cnVjdCBhY2NfdmZfbWlncmF0aW9uICphY2NfdmZfZGV2Ow0KPiA+ID4g
+PiArCXN0cnVjdCBwY2lfZGV2ICpwZGV2ID0gdmRldi0+cGRldjsNCj4gPiA+ID4gKwlzdHJ1Y3Qg
+cGNpX2RldiAqcGZfZGV2LCAqdmZfZGV2Ow0KPiA+ID4gPiArCXN0cnVjdCBoaXNpX3FtICpwZl9x
+bTsNCj4gPiA+ID4gKwlpbnQgdmZfaWQsIHJldDsNCj4gPiA+ID4gKw0KPiA+ID4gPiArCXBmX2Rl
+diA9IHBkZXYtPnBoeXNmbjsNCj4gPiA+ID4gKwl2Zl9kZXYgPSBwZGV2Ow0KPiA+ID4gPiArDQo+
+ID4gPiA+ICsJcGZfcW0gPSBwY2lfZ2V0X2RydmRhdGEocGZfZGV2KTsNCj4gPiA+ID4gKwlpZiAo
+IXBmX3FtKSB7DQo+ID4gPiA+ICsJCXByX2VycigiSGlTaSBBQ0MgcW0gZHJpdmVyIG5vdCBsb2Fk
+ZWRcbiIpOw0KPiA+ID4gPiArCQlyZXR1cm4gLUVJTlZBTDsNCj4gPiA+ID4gKwl9DQo+ID4gPg0K
+PiA+ID4gTm9wZSwgdGhpcyBpcyBsb2NrZWQgd3JvbmcgYW5kIGhhcyBubyBsaWZldGltZSBtYW5h
+Z2VtZW50Lg0KPiA+DQo+ID4gT2suIEhvbGRpbmcgdGhlIGRldmljZV9sb2NrKCkgc3VmZmljaWVu
+dCBoZXJlPw0KPiANCj4gWW91IGNhbid0IGhvbGQgYSBoaXNpX3FtIHBvaW50ZXIgd2l0aCBzb21l
+IGtpbmQgb2YgbGlmZWN5Y2xlDQo+IG1hbmFnZW1lbnQgb2YgdGhhdCBwb2ludGVyLiBkZXZpY2Vf
+bG9jay9ldGMgaXMgbmVjZXNzYXJ5IHRvIGNhbGwNCj4gcGNpX2dldF9kcnZkYXRhKCkNCg0KU2lu
+Y2UgdGhpcyBtaWdyYXRpb24gZHJpdmVyIG9ubHkgc3VwcG9ydHMgVkYgZGV2aWNlcyBhbmQgdGhl
+IFBGDQpkcml2ZXIgd2lsbCBub3QgYmUgcmVtb3ZlZCB1bnRpbCBhbGwgdGhlIFZGIGRldmljZXMg
+Z2V0cyByZW1vdmVkLA0KaXMgdGhlIGxvY2tpbmcgbmVjZXNzYXJ5IGhlcmU/DQoNClRoZSBmbG93
+IGZyb20gUEYgZHJpdmVyIHJlbW92ZSgpIHBhdGggaXMgc29tZXRoaW5nIGxpa2UgdGhpcywNCg0K
+aWYgKHFtLT5mdW5fdHlwZSA9PSBRTV9IV19QRiAmJiBxbS0+dmZzX251bSkNCgkJaGlzaV9xbV9z
+cmlvdl9kaXNhYmxlKHBkZXYsIHRydWUpOw0KICAgICAgICAgIHBjaV9kaXNhYmxlX3NyaW92KHBk
+ZXYpLg0KDQpUaGFua3MsDQpTaGFtZWVyDQoNCg0K
