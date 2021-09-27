@@ -2,100 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 469984194A6
-	for <lists+kvm@lfdr.de>; Mon, 27 Sep 2021 14:54:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E22F54194AE
+	for <lists+kvm@lfdr.de>; Mon, 27 Sep 2021 14:56:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234431AbhI0Mzw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Sep 2021 08:55:52 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:26909 "EHLO
+        id S234407AbhI0M6V (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Sep 2021 08:58:21 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40157 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234398AbhI0Mzv (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 27 Sep 2021 08:55:51 -0400
+        by vger.kernel.org with ESMTP id S234360AbhI0M6U (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 27 Sep 2021 08:58:20 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632747253;
+        s=mimecast20190719; t=1632747402;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=vqmCLZUE/RvdZRryhurm8ZYGJCB6f4ZHjcfNNE4aW4s=;
-        b=PODrkc9JYKOdWTwOBmSdo36BCDjrhdMqFxZ5pNXzZUOLF77M0BMSVk+mWHEV/sJu5eUVuK
-        2R5+BbQ0e6jq15fdYM31pyztzC7yy91B+2PWwr+BgMLerjWEYhnKZIJCYgg7gRrkN8crmz
-        5fKJ4kR73rEMxbG9Bfa02P8XX4DdUgk=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-194-HDqzCk6DPxaYsFsVzTa2hw-1; Mon, 27 Sep 2021 08:54:12 -0400
-X-MC-Unique: HDqzCk6DPxaYsFsVzTa2hw-1
-Received: by mail-ed1-f69.google.com with SMTP id ec14-20020a0564020d4e00b003cf5630c190so17802384edb.3
-        for <kvm@vger.kernel.org>; Mon, 27 Sep 2021 05:54:11 -0700 (PDT)
+        bh=8evR5N3FrUP1YdJdooxyAAIxmXSgiTAsg604Q8744VM=;
+        b=dxL9Z+5qkDEfWPpbMozhy68ikIiGcf2eiTxZEZdbmnOkxWojmNqqgRtn/Z/m7rpYg3T1Mc
+        cyTeXMLK3BEqjvB1Isg4VHLOIFcylKK7GJVdMdnnLrqrjXFGqhmEgeUTob/oim8nLTAsLh
+        htKWaeOD45yO5K27HbHUJ0yrjL1vGqI=
+Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com
+ [209.85.210.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-77-ODwSKF-9O66GwwyMol1LFA-1; Mon, 27 Sep 2021 08:56:40 -0400
+X-MC-Unique: ODwSKF-9O66GwwyMol1LFA-1
+Received: by mail-ot1-f71.google.com with SMTP id m12-20020a0568301e6c00b005469f1a7d70so14356904otr.15
+        for <kvm@vger.kernel.org>; Mon, 27 Sep 2021 05:56:39 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=vqmCLZUE/RvdZRryhurm8ZYGJCB6f4ZHjcfNNE4aW4s=;
-        b=pB16SmwXvnZvaFPuqrK43pMZx4+YQSyoTVuRsWUQH7OUnMe58lYB2f77GyCAbERheX
-         6AmulfdcHzFllMHYV+SRmaA+p5q+1pQG6FIykj29LmCFzu+5E4NhigQ4uWw2KPLtmC8T
-         pkSOV+HstAwax9EpNUxBkw5hlso6tQ3POkwASkGhERLePIbcANL7RRRpX1Dac5+2tVAR
-         +iNs3wgsM3aVWe8ShugeWX+n7tEd+XNNBtjpd/jfwWnA//HSSTecsheyKYAVH7Z015nE
-         hazg/S/hJgosRPaARkys8gJSh+zE93oXiTYWT2JJiF4Ledhg4v1qCcgrLyPZzKdgJuJp
-         6w6Q==
-X-Gm-Message-State: AOAM532KBA+JYsZ+0Q/tmHsC7xlM3iUdymoJUhC4nyLQHXnde1UVZn33
-        dErLcjQCwt+RrnaUX71cP6Wh6eH7nU5A/JCntF6GZgAy5IR2kTIeyX6UwhBSC5V/yIdXteqg1c4
-        lndu9uKjAZbso
-X-Received: by 2002:a05:6402:336:: with SMTP id q22mr23230097edw.53.1632747251021;
-        Mon, 27 Sep 2021 05:54:11 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwh2KYg0dnn8JVSWbgyFbmkyYWSZ1VqCAk6GrPkabmD/MjIijY41QSlBI2wv4H6jHN8FyRGNw==
-X-Received: by 2002:a05:6402:336:: with SMTP id q22mr23230070edw.53.1632747250829;
-        Mon, 27 Sep 2021 05:54:10 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id j6sm8611436ejk.114.2021.09.27.05.54.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 27 Sep 2021 05:54:10 -0700 (PDT)
-Message-ID: <afc34b38-5596-3571-63e5-55fe82e87f6c@redhat.com>
-Date:   Mon, 27 Sep 2021 14:54:08 +0200
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=8evR5N3FrUP1YdJdooxyAAIxmXSgiTAsg604Q8744VM=;
+        b=cin5dtG2SoyggtjdP7tCLkXDoWm/+RLyawMzm8tyRInXn56KDtltJB1vdQ3bOtg1h3
+         oCLPp22HRGAGHxOOs23g3/1RjGL7OqAHlF7mdKKOcTmzmftkerHe1zV91DaSdlQTsWS2
+         1RvKLaa7vN5GKwc4EaIJbmc2FgBNtYmi9FpLvZL132tnAWWFMTCa9cIYvGbvKc/Zgs/w
+         5UCTsD+m8Ll/r9qIpmxhRiiwtsz8bY981d/iQnP1e7zUrLUyG8mAhlysmnTgRbZTvFep
+         Hhz1u8/gjBkikOooBMtCVEzAEeYoIWszYWUxZB97IEnQss1tIKw/LWRQrr8alXyLZtYt
+         VWXA==
+X-Gm-Message-State: AOAM533xUdewAhUDh6gQustNuFPEWgX3vy7LpAANC5hXWYhdclNY43HX
+        pKnX3x/ZvuY9ntPCnLmpdxZkzKu9lES7cwAqvf0C85mYfaxBNwmUtKpEVh5A/t+o2Ftn4VmCsZG
+        234Jh9NAeGXaa
+X-Received: by 2002:a9d:34e:: with SMTP id 72mr17064558otv.172.1632747399185;
+        Mon, 27 Sep 2021 05:56:39 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyktlEzVcasGh0nHj9EKzP/wQACAnbEfa87ucpiBRKSd/5bKW/q9YyUErOwEEN12DL1FTQxyQ==
+X-Received: by 2002:a9d:34e:: with SMTP id 72mr17064544otv.172.1632747399001;
+        Mon, 27 Sep 2021 05:56:39 -0700 (PDT)
+Received: from redhat.com ([198.99.80.109])
+        by smtp.gmail.com with ESMTPSA id d10sm4220757ooj.24.2021.09.27.05.56.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 27 Sep 2021 05:56:38 -0700 (PDT)
+Date:   Mon, 27 Sep 2021 06:56:37 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jason Gunthorpe <jgg@ziepe.ca>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Terrence Xu <terrence.xu@intel.com>, kvm@vger.kernel.org
+Subject: Re: [PATCH 13/15] vfio/iommu_type1: initialize pgsize_bitmap in
+ ->open
+Message-ID: <20210927065637.696eb066.alex.williamson@redhat.com>
+In-Reply-To: <20210927114928.GA23909@lst.de>
+References: <20210924155705.4258-1-hch@lst.de>
+        <20210924155705.4258-14-hch@lst.de>
+        <20210924174852.GZ3544071@ziepe.ca>
+        <20210924123755.76041ee0.alex.williamson@redhat.com>
+        <20210927114928.GA23909@lst.de>
+Organization: Red Hat
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [PATCH] KVM: x86: Expose Predictive Store Forwarding Disable
-Content-Language: en-US
-To:     Borislav Petkov <bp@alien8.de>
-Cc:     Babu Moger <babu.moger@amd.com>, tglx@linutronix.de,
-        mingo@redhat.com, x86@kernel.org, hpa@zytor.com, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, tony.luck@intel.com, peterz@infradead.org,
-        kyung.min.park@intel.com, wei.huang2@amd.com, jgross@suse.com,
-        andrew.cooper3@citrix.com, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-References: <163244601049.30292.5855870305350227855.stgit@bmoger-ubuntu>
- <YVGkDPbQmdwSw6Ff@zn.tnic> <fcbbdf83-128a-2519-13e8-1c5d5735a0d2@redhat.com>
- <YVGz0HXe+WNAXfdF@zn.tnic> <bcd40d94-2634-a40c-0173-64063051a4b2@redhat.com>
- <YVG46L++WPBAHxQv@zn.tnic>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <YVG46L++WPBAHxQv@zn.tnic>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 27/09/21 14:28, Borislav Petkov wrote:
-> On Mon, Sep 27, 2021 at 02:14:52PM +0200, Paolo Bonzini wrote:
->> Right, not which MSR to write but which value to write.  It doesn't know
->> that the PSF disable bit is valid unless the corresponding CPUID bit is set.
+On Mon, 27 Sep 2021 13:49:28 +0200
+Christoph Hellwig <hch@lst.de> wrote:
+
+> On Fri, Sep 24, 2021 at 12:37:55PM -0600, Alex Williamson wrote:
+> > > > +	iommu->pgsize_bitmap = ULONG_MAX;    
+> > > 
+> > > I wonder if this needs the PAGE_MASK/SIZE stuff?
+> > > 
+> > >    iommu->pgsize_bitmap = ULONG_MASK & PAGE_MASK;
+> > > 
+> > > ?
+> > > 
+> > > vfio_update_pgsize_bitmap() goes to some trouble to avoid setting bits
+> > > below the CPU page size here  
+> > 
+> > Yep, though PAGE_MASK should already be UL, so just PAGE_MASK itself
+> > should work.  The ULONG_MAX in the update function just allows us to
+> > detect sub-page, ex. if the IOMMU supports 2K we can expose 4K minimum,
+> > but we can't if the min IOMMU page is 64K.  Thanks,  
 > 
-> There's no need for the separate PSF CPUID bit yet. We have decided for
-> now to not control PSF separately but disable it through SSB. Please
-> follow this thread:
+> Do you just want to update this or do you want a full resend of the
+> series?
 
-There are other guests than Linux.  This patch is just telling userspace 
-that KVM knows what the PSFD bit is.  It is also possible to expose the 
-bit in KVM without having any #define in cpufeatures.h or without the 
-kernel using it.  For example KVM had been exposing FSGSBASE long before 
-Linux supported it.
+So long as we have agreement, I can do it inline.  Are we doing
+s/ULONG_MAX/PAGE_MASK/ across both the diff and commit log?  Thanks,
 
-That said, the patch is incomplete because it should also add the new 
-CPUID bit to guest_has_spec_ctrl_msr (what KVM *really* cares about is 
-not the individual bits, only whether SPEC_CTRL exists at all).
-
-Paolo
+Alex
 
