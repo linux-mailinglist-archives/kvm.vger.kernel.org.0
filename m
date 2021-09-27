@@ -2,61 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1287D419E1C
-	for <lists+kvm@lfdr.de>; Mon, 27 Sep 2021 20:24:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8E5F9419E47
+	for <lists+kvm@lfdr.de>; Mon, 27 Sep 2021 20:29:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236125AbhI0S0K (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Sep 2021 14:26:10 -0400
-Received: from mail-bn7nam10on2058.outbound.protection.outlook.com ([40.107.92.58]:60385
-        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S229875AbhI0S0J (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Sep 2021 14:26:09 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=AI2bV0L1hohYsKZxnQwvSy9C59sU/wy2CiI8hqD5yisqAnskjnBzMmmWi9dkZM5YdaBd1xKFWwzn7MCyptm3wJQqlZZlK6WpvVwqvKy+aaEimlCtsdPD7V0WFJtVAvasXdaJLbSG3pjNrMcYQm4VU7ziutl4yHVxUvRpQuXURcaKSIxOh47oW7Hyy2nKPgSp12JwjiGmfrTFoJXC4SNwNVom15Q9iCYEIn4icDz0IxjghKwVl2RbdVXPd05ObJcXV85oFn82sws3gCsZ5gaFh1GQ5csmSGtA8MncXBmdc9uym8J96/G60KmqPn4DZTHQ93C4hp532fhpE+qYNWzZvA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
- bh=PHt3hq2nxv0YrXnJSnwOZ1Mlq+SXuKPGkBl9Wd0FpAc=;
- b=CFeNHE7eImb2iWb7vJ6VU8a2S+RkxjsOwwXL2cmzeqj76Ebo6S/6GtsvPsVLK5a50yAifiBG5+fOVDXEkP3OBr7tvIlRyOe/m8cVY8TLXEWUuTyBfjCloeHLHvSykuRYTMYxbR4l4v5p8sBFzqWjn1NuS05nWbIa1vEkHaHKWuZxtZb3gj7MiNcb1NMeGsDO7h5In+S3/KukJ2pgQS5SYYk7HPjq6fK397LD3nUUTEYrd90Zes0fQfzltZ5EZU3j/t2HoqrSBbYVMWyyiB1ci7fcxKzyxl9Fv9NOC0u5Vt2Cp8gp7As2KMZFH1eBbQ2j4jH60+i8V4IBFdO2WL15iw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.112.36) smtp.rcpttodomain=huawei.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=quarantine sp=none pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=PHt3hq2nxv0YrXnJSnwOZ1Mlq+SXuKPGkBl9Wd0FpAc=;
- b=CQS0zwu+GYAU9JnW9JhOsGqNHOOyWwoeiUNIcl0mcLDmq/W+2EFMOpcZ+vHMdbP4z1fpTEjXwv7aM0d1uIekfsSHqZRSP1Q/gRdyezfrtwnhlYhxGQv9Jt4hX2c2iD5keu1nSLfAzeaYTc/60n3jverRfPLLRxG8ygBvf7VQbbJgpL/IXlAn4w7dSKmIdf7f9vJ7vUehf5uoRmigWdfSoCTv7iDPitzRb8We+rbq4LS6zC/zeKfUKpB1M1Kyx1777StTWVziF/TkQr2JT+2pEVd4FgGy1vzs/3gt1K+P/3hWTnR3zvEFeCQACe2YmjIj40iquNdkGoOMvoO6Nl8xug==
-Received: from BN6PR22CA0065.namprd22.prod.outlook.com (2603:10b6:404:ca::27)
- by MN2PR12MB3181.namprd12.prod.outlook.com (2603:10b6:208:ae::27) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4544.13; Mon, 27 Sep
- 2021 18:24:28 +0000
-Received: from BN8NAM11FT049.eop-nam11.prod.protection.outlook.com
- (2603:10b6:404:ca:cafe::a3) by BN6PR22CA0065.outlook.office365.com
- (2603:10b6:404:ca::27) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4544.14 via Frontend
- Transport; Mon, 27 Sep 2021 18:24:28 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.36)
- smtp.mailfrom=nvidia.com; huawei.com; dkim=none (message not signed)
- header.d=none;huawei.com; dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.112.36 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.112.36; helo=mail.nvidia.com;
-Received: from mail.nvidia.com (216.228.112.36) by
- BN8NAM11FT049.mail.protection.outlook.com (10.13.177.157) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.4544.13 via Frontend Transport; Mon, 27 Sep 2021 18:24:28 +0000
-Received: from DRHQMAIL107.nvidia.com (10.27.9.16) by HQMAIL101.nvidia.com
- (172.20.187.10) with Microsoft SMTP Server (TLS) id 15.0.1497.18; Mon, 27 Sep
- 2021 18:24:27 +0000
-Received: from [172.27.0.62] (172.20.187.5) by DRHQMAIL107.nvidia.com
- (10.27.9.16) with Microsoft SMTP Server (TLS) id 15.0.1497.18; Mon, 27 Sep
- 2021 18:24:22 +0000
-Subject: Re: [PATCH mlx5-next 2/7] vfio: Add an API to check migration state
- transition validity
-To:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
-        "Leon Romanovsky" <leon@kernel.org>
+        id S236232AbhI0Sar (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Sep 2021 14:30:47 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:25973 "EHLO
+        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235991AbhI0Saq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Sep 2021 14:30:46 -0400
+Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.56])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4HJ9z55XSJzbmr1;
+        Tue, 28 Sep 2021 02:24:49 +0800 (CST)
+Received: from kwepemm600008.china.huawei.com (7.193.23.88) by
+ dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.8; Tue, 28 Sep 2021 02:29:05 +0800
+Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
+ kwepemm600008.china.huawei.com (7.193.23.88) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.8; Tue, 28 Sep 2021 02:29:04 +0800
+Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
+ lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
+ 15.01.2308.008; Mon, 27 Sep 2021 19:29:02 +0100
+From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To:     Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Leon Romanovsky <leon@kernel.org>
 CC:     Doug Ledford <dledford@redhat.com>,
         Jason Gunthorpe <jgg@nvidia.com>,
         Yishai Hadas <yishaih@nvidia.com>,
@@ -72,6 +43,13 @@ CC:     Doug Ledford <dledford@redhat.com>,
         "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
         Saeed Mahameed <saeedm@nvidia.com>,
         liulongfang <liulongfang@huawei.com>
+Subject: RE: [PATCH mlx5-next 2/7] vfio: Add an API to check migration state
+ transition validity
+Thread-Topic: [PATCH mlx5-next 2/7] vfio: Add an API to check migration state
+ transition validity
+Thread-Index: AQHXr54pt96rmXk0YUaXSN2Kf89+2auxakgA///+2wCAACw6gIABM1JQgAMzv4CAAIdJsIABpg6AgAARVTA=
+Date:   Mon, 27 Sep 2021 18:29:02 +0000
+Message-ID: <4d6a027b282b4e1ba7666c18be7e8d82@huawei.com>
 References: <cover.1632305919.git.leonro@nvidia.com>
  <c87f55d6fec77a22b110d3c9611744e6b28bba46.1632305919.git.leonro@nvidia.com>
  <42729adc4df649f7b3ce5dc95e66e2dc@huawei.com> <YUxiPqShZT4bk0uL@unreal>
@@ -79,248 +57,192 @@ References: <cover.1632305919.git.leonro@nvidia.com>
  <164439bb579d41639edf9a01a538a5ef@huawei.com>
  <078fc846-1f72-adc0-339c-1b638c6c6e33@nvidia.com>
  <85743eabdae04d08bb5eba7b6857496e@huawei.com>
-From:   Max Gurtovoy <mgurtovoy@nvidia.com>
-Message-ID: <fb8adab1-3409-691a-d02c-552155e4b601@nvidia.com>
-Date:   Mon, 27 Sep 2021 21:24:19 +0300
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
-MIME-Version: 1.0
-In-Reply-To: <85743eabdae04d08bb5eba7b6857496e@huawei.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
+ <fb8adab1-3409-691a-d02c-552155e4b601@nvidia.com>
+In-Reply-To: <fb8adab1-3409-691a-d02c-552155e4b601@nvidia.com>
+Accept-Language: en-GB, en-US
 Content-Language: en-US
-X-Originating-IP: [172.20.187.5]
-X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
- DRHQMAIL107.nvidia.com (10.27.9.16)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 3fa588d8-2668-4158-d30e-08d981e40af1
-X-MS-TrafficTypeDiagnostic: MN2PR12MB3181:
-X-Microsoft-Antispam-PRVS: <MN2PR12MB3181B62C58A0884C477CCD67DEA79@MN2PR12MB3181.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: HHbBeFpTakS162dBadK0Siz3lOm+SXBJcxBXRLjrTsXYs+Od9cxmjn5XwoAGa8nNJzZiFEAuRbmoxPTyqL7MkmZV2gyKzkyNfAaxarRAVhkxmUsk3IWybyUFE0qq0z/tycA5pc312dKpBoEuwTMSObtM/34S0/uv2wGSu2y4f/ByRXJjYUSF+CauM9LmD3QWuzZ2qDqZWP/T77WXJAR/KejGw1+hFhLo7Jefz9deBqYmbss6EIx4WnvuPgsNSJGMZzvJd39C5d8hZB/s7dRIWYnumqefbieFT6tkMRGOF+7XFLxfUe9j5c9uDn9fQUgWNOvsd72R/NhLM0j7KTKdx6O2EdTS+/dS1o8WoG8KfjADqxntbcjU9SQ/LNoxLL3RjeplUTUKO6wFRYk5Ob1LJ7/RkE2GaRajr9o7KGR6KWqm8NIJEGTmqmVpdUX5J7SDDYKwz4bsPO8k5lCW4BmOz8dg922GKcYQb01AArDZbLaWZn4LeM+HYETzwlrB4JsmL67BkJSgUvsS7Y9Rn43Vr4QuMWokZ8pQi2HirsE9luew0WLn8kFBmxGP8FxMvxcv2bBtKMJ7ZDHxJ+LQO+t3lbl7WQUua6mmVMUH4JqOa4HqNXPFzMftV333/S9PIn76LtQK8Ro3kNYCmE+tNoYILaaq3rtuanK7KtIfjUHJjwxnQujwmE0r+Z2bH6SKWNSXJPytdEcxAgZEHwXJWioLf5Yom0XQAfVpo9ZUBBG/TnQ=
-X-Forefront-Antispam-Report: CIP:216.228.112.36;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid05.nvidia.com;CAT:NONE;SFS:(4636009)(36840700001)(46966006)(110136005)(508600001)(8676002)(336012)(54906003)(70586007)(70206006)(2616005)(86362001)(36756003)(6666004)(16576012)(426003)(316002)(36906005)(31696002)(7636003)(356005)(31686004)(5660300002)(8936002)(186003)(53546011)(4326008)(82310400003)(16526019)(26005)(47076005)(7416002)(2906002)(83380400001)(36860700001)(43740500002);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Sep 2021 18:24:28.3534
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3fa588d8-2668-4158-d30e-08d981e40af1
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.36];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT049.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB3181
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.47.80.194]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-On 9/26/2021 7:17 PM, Shameerali Kolothum Thodi wrote:
->
->> -----Original Message-----
->> From: Max Gurtovoy [mailto:mgurtovoy@nvidia.com]
->> Sent: 26 September 2021 10:10
->> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>;
->> Leon Romanovsky <leon@kernel.org>
->> Cc: Doug Ledford <dledford@redhat.com>; Jason Gunthorpe
->> <jgg@nvidia.com>; Yishai Hadas <yishaih@nvidia.com>; Alex Williamson
->> <alex.williamson@redhat.com>; Bjorn Helgaas <bhelgaas@google.com>; David
->> S. Miller <davem@davemloft.net>; Jakub Kicinski <kuba@kernel.org>; Kirti
->> Wankhede <kwankhede@nvidia.com>; kvm@vger.kernel.org;
->> linux-kernel@vger.kernel.org; linux-pci@vger.kernel.org;
->> linux-rdma@vger.kernel.org; netdev@vger.kernel.org; Saeed Mahameed
->> <saeedm@nvidia.com>; liulongfang <liulongfang@huawei.com>
->> Subject: Re: [PATCH mlx5-next 2/7] vfio: Add an API to check migration state
->> transition validity
->>
->>
->> On 9/24/2021 10:44 AM, Shameerali Kolothum Thodi wrote:
->>>> -----Original Message-----
->>>> From: Max Gurtovoy [mailto:mgurtovoy@nvidia.com]
->>>> Sent: 23 September 2021 14:56
->>>> To: Leon Romanovsky <leon@kernel.org>; Shameerali Kolothum Thodi
->>>> <shameerali.kolothum.thodi@huawei.com>
->>>> Cc: Doug Ledford <dledford@redhat.com>; Jason Gunthorpe
->>>> <jgg@nvidia.com>; Yishai Hadas <yishaih@nvidia.com>; Alex Williamson
->>>> <alex.williamson@redhat.com>; Bjorn Helgaas <bhelgaas@google.com>;
->>>> David S. Miller <davem@davemloft.net>; Jakub Kicinski
->>>> <kuba@kernel.org>; Kirti Wankhede <kwankhede@nvidia.com>;
->>>> kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
->>>> linux-pci@vger.kernel.org; linux-rdma@vger.kernel.org;
->>>> netdev@vger.kernel.org; Saeed Mahameed <saeedm@nvidia.com>
->>>> Subject: Re: [PATCH mlx5-next 2/7] vfio: Add an API to check
->>>> migration state transition validity
->>>>
->>>>
->>>> On 9/23/2021 2:17 PM, Leon Romanovsky wrote:
->>>>> On Thu, Sep 23, 2021 at 10:33:10AM +0000, Shameerali Kolothum Thodi
->>>> wrote:
->>>>>>> -----Original Message-----
->>>>>>> From: Leon Romanovsky [mailto:leon@kernel.org]
->>>>>>> Sent: 22 September 2021 11:39
->>>>>>> To: Doug Ledford <dledford@redhat.com>; Jason Gunthorpe
->>>> <jgg@nvidia.com>
->>>>>>> Cc: Yishai Hadas <yishaih@nvidia.com>; Alex Williamson
->>>>>>> <alex.williamson@redhat.com>; Bjorn Helgaas <bhelgaas@google.com>;
->>>> David
->>>>>>> S. Miller <davem@davemloft.net>; Jakub Kicinski <kuba@kernel.org>;
->>>>>>> Kirti Wankhede <kwankhede@nvidia.com>; kvm@vger.kernel.org;
->>>>>>> linux-kernel@vger.kernel.org; linux-pci@vger.kernel.org;
->>>>>>> linux-rdma@vger.kernel.org; netdev@vger.kernel.org; Saeed Mahameed
->>>>>>> <saeedm@nvidia.com>
->>>>>>> Subject: [PATCH mlx5-next 2/7] vfio: Add an API to check migration
->>>>>>> state transition validity
->>>>>>>
->>>>>>> From: Yishai Hadas <yishaih@nvidia.com>
->>>>>>>
->>>>>>> Add an API in the core layer to check migration state transition
->>>>>>> validity as part of a migration flow.
->>>>>>>
->>>>>>> The valid transitions follow the expected usage as described in
->>>>>>> uapi/vfio.h and triggered by QEMU.
->>>>>>>
->>>>>>> This ensures that all migration implementations follow a
->>>>>>> consistent migration state machine.
->>>>>>>
->>>>>>> Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
->>>>>>> Reviewed-by: Kirti Wankhede <kwankhede@nvidia.com>
->>>>>>> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
->>>>>>> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
->>>>>>> ---
->>>>>>>     drivers/vfio/vfio.c  | 41
->>>> +++++++++++++++++++++++++++++++++++++++++
->>>>>>>     include/linux/vfio.h |  1 +
->>>>>>>     2 files changed, 42 insertions(+)
->>>>>>>
->>>>>>> diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c index
->>>>>>> 3c034fe14ccb..c3ca33e513c8 100644
->>>>>>> --- a/drivers/vfio/vfio.c
->>>>>>> +++ b/drivers/vfio/vfio.c
->>>>>>> @@ -1664,6 +1664,47 @@ static int vfio_device_fops_release(struct
->>>> inode
->>>>>>> *inode, struct file *filep)
->>>>>>>     	return 0;
->>>>>>>     }
->>>>>>>
->>>>>>> +/**
->>>>>>> + * vfio_change_migration_state_allowed - Checks whether a
->>>>>>> +migration
->>>> state
->>>>>>> + *   transition is valid.
->>>>>>> + * @new_state: The new state to move to.
->>>>>>> + * @old_state: The old state.
->>>>>>> + * Return: true if the transition is valid.
->>>>>>> + */
->>>>>>> +bool vfio_change_migration_state_allowed(u32 new_state, u32
->>>> old_state)
->>>>>>> +{
->>>>>>> +	enum { MAX_STATE = VFIO_DEVICE_STATE_RESUMING };
->>>>>>> +	static const u8 vfio_from_state_table[MAX_STATE + 1][MAX_STATE +
->>>> 1] = {
->>>>>>> +		[VFIO_DEVICE_STATE_STOP] = {
->>>>>>> +			[VFIO_DEVICE_STATE_RUNNING] = 1,
->>>>>>> +			[VFIO_DEVICE_STATE_RESUMING] = 1,
->>>>>>> +		},
->>>>>>> +		[VFIO_DEVICE_STATE_RUNNING] = {
->>>>>>> +			[VFIO_DEVICE_STATE_STOP] = 1,
->>>>>>> +			[VFIO_DEVICE_STATE_SAVING] = 1,
->>>>>>> +			[VFIO_DEVICE_STATE_SAVING |
->>>> VFIO_DEVICE_STATE_RUNNING]
->>>>>>> = 1,
->>>>>> Do we need to allow _RESUMING state here or not? As per the "State
->>>> transitions"
->>>>>> section from uapi/linux/vfio.h,
->>>>> It looks like we missed this state transition.
->>>>>
->>>>> Thanks
->>>> I'm not sure this state transition is valid.
->>>>
->>>> Kirti, When we would like to move from RUNNING to RESUMING ?
->>> I guess it depends on what you report as your dev default state.
->>>
->>> For HiSilicon ACC migration driver, we set the default to _RUNNING.
->> Where do you set it and report it ?
-> Currently, in _open_device() we set the device_state to _RUNNING.
-
-Why do you do it ?
-
->
-> I think in your case the default of vmig->vfio_dev_state == 0 (_STOP).
->
->>> And when the migration starts, the destination side Qemu, set the
->>> device state to _RESUMING(vfio_load_state()).
->>>
->>>   From the documentation, it looks like the assumption on default state
->>> of the VFIO dev is _RUNNING.
->>>
->>> "
->>> *  001b => Device running, which is the default state "
->>>
->>>> Sameerali, can you please re-test and update if you see this transition ?
->>> Yes. And if I change the default state to _STOP, then the transition
->>> is from _STOP --> _RESUMING.
->>>
->>> But the documentation on State transitions doesn't have _STOP -->
->>> _RESUMING transition as valid.
->>>
->>> Thanks,
->>> Shameer
->>>
->>>>>> " * 4. To start the resuming phase, the device state should be
->>>>>> transitioned
->>>> from
->>>>>>     *    the _RUNNING to the _RESUMING state."
->>>>>>
->>>>>> IIRC, I have seen that transition happening on the destination dev
->>>>>> while
->>>> testing the
->>>>>> HiSilicon ACC dev migration.
->>>>>>
->>>>>> Thanks,
->>>>>> Shameer
->>>>>>
->>>>>>> +		},
->>>>>>> +		[VFIO_DEVICE_STATE_SAVING] = {
->>>>>>> +			[VFIO_DEVICE_STATE_STOP] = 1,
->>>>>>> +			[VFIO_DEVICE_STATE_RUNNING] = 1,
->>>>>>> +		},
->>>>>>> +		[VFIO_DEVICE_STATE_SAVING | VFIO_DEVICE_STATE_RUNNING]
->>>> = {
->>>>>>> +			[VFIO_DEVICE_STATE_RUNNING] = 1,
->>>>>>> +			[VFIO_DEVICE_STATE_SAVING] = 1,
->>>>>>> +		},
->>>>>>> +		[VFIO_DEVICE_STATE_RESUMING] = {
->>>>>>> +			[VFIO_DEVICE_STATE_RUNNING] = 1,
->>>>>>> +			[VFIO_DEVICE_STATE_STOP] = 1,
->>>>>>> +		},
->>>>>>> +	};
->>>>>>> +
->>>>>>> +	if (new_state > MAX_STATE || old_state > MAX_STATE)
->>>>>>> +		return false;
->>>>>>> +
->>>>>>> +	return vfio_from_state_table[old_state][new_state];
->>>>>>> +}
->>>>>>> +EXPORT_SYMBOL_GPL(vfio_change_migration_state_allowed);
->>>>>>> +
->>>>>>>     static long vfio_device_fops_unl_ioctl(struct file *filep,
->>>>>>>     				       unsigned int cmd, unsigned long arg)
->>>>>>>     {
->>>>>>> diff --git a/include/linux/vfio.h b/include/linux/vfio.h index
->>>>>>> b53a9557884a..e65137a708f1 100644
->>>>>>> --- a/include/linux/vfio.h
->>>>>>> +++ b/include/linux/vfio.h
->>>>>>> @@ -83,6 +83,7 @@ extern struct vfio_device
->>>>>>> *vfio_device_get_from_dev(struct device *dev);
->>>>>>>     extern void vfio_device_put(struct vfio_device *device);
->>>>>>>
->>>>>>>     int vfio_assign_device_set(struct vfio_device *device, void
->>>>>>> *set_id);
->>>>>>> +bool vfio_change_migration_state_allowed(u32 new_state, u32
->>>> old_state);
->>>>>>>     /* events for the backend driver notify callback */
->>>>>>>     enum vfio_iommu_notify_type {
->>>>>>> --
->>>>>>> 2.31.1
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogTWF4IEd1cnRvdm95IFtt
+YWlsdG86bWd1cnRvdm95QG52aWRpYS5jb21dDQo+IFNlbnQ6IDI3IFNlcHRlbWJlciAyMDIxIDE5
+OjI0DQo+IFRvOiBTaGFtZWVyYWxpIEtvbG90aHVtIFRob2RpIDxzaGFtZWVyYWxpLmtvbG90aHVt
+LnRob2RpQGh1YXdlaS5jb20+Ow0KPiBMZW9uIFJvbWFub3Zza3kgPGxlb25Aa2VybmVsLm9yZz4N
+Cj4gQ2M6IERvdWcgTGVkZm9yZCA8ZGxlZGZvcmRAcmVkaGF0LmNvbT47IEphc29uIEd1bnRob3Jw
+ZQ0KPiA8amdnQG52aWRpYS5jb20+OyBZaXNoYWkgSGFkYXMgPHlpc2hhaWhAbnZpZGlhLmNvbT47
+IEFsZXggV2lsbGlhbXNvbg0KPiA8YWxleC53aWxsaWFtc29uQHJlZGhhdC5jb20+OyBCam9ybiBI
+ZWxnYWFzIDxiaGVsZ2Fhc0Bnb29nbGUuY29tPjsgRGF2aWQNCj4gUy4gTWlsbGVyIDxkYXZlbUBk
+YXZlbWxvZnQubmV0PjsgSmFrdWIgS2ljaW5za2kgPGt1YmFAa2VybmVsLm9yZz47IEtpcnRpDQo+
+IFdhbmtoZWRlIDxrd2Fua2hlZGVAbnZpZGlhLmNvbT47IGt2bUB2Z2VyLmtlcm5lbC5vcmc7DQo+
+IGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmc7IGxpbnV4LXBjaUB2Z2VyLmtlcm5lbC5vcmc7
+DQo+IGxpbnV4LXJkbWFAdmdlci5rZXJuZWwub3JnOyBuZXRkZXZAdmdlci5rZXJuZWwub3JnOyBT
+YWVlZCBNYWhhbWVlZA0KPiA8c2FlZWRtQG52aWRpYS5jb20+OyBsaXVsb25nZmFuZyA8bGl1bG9u
+Z2ZhbmdAaHVhd2VpLmNvbT4NCj4gU3ViamVjdDogUmU6IFtQQVRDSCBtbHg1LW5leHQgMi83XSB2
+ZmlvOiBBZGQgYW4gQVBJIHRvIGNoZWNrIG1pZ3JhdGlvbiBzdGF0ZQ0KPiB0cmFuc2l0aW9uIHZh
+bGlkaXR5DQo+IA0KPiANCj4gT24gOS8yNi8yMDIxIDc6MTcgUE0sIFNoYW1lZXJhbGkgS29sb3Ro
+dW0gVGhvZGkgd3JvdGU6DQo+ID4NCj4gPj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4g
+Pj4gRnJvbTogTWF4IEd1cnRvdm95IFttYWlsdG86bWd1cnRvdm95QG52aWRpYS5jb21dDQo+ID4+
+IFNlbnQ6IDI2IFNlcHRlbWJlciAyMDIxIDEwOjEwDQo+ID4+IFRvOiBTaGFtZWVyYWxpIEtvbG90
+aHVtIFRob2RpDQo+IDxzaGFtZWVyYWxpLmtvbG90aHVtLnRob2RpQGh1YXdlaS5jb20+Ow0KPiA+
+PiBMZW9uIFJvbWFub3Zza3kgPGxlb25Aa2VybmVsLm9yZz4NCj4gPj4gQ2M6IERvdWcgTGVkZm9y
+ZCA8ZGxlZGZvcmRAcmVkaGF0LmNvbT47IEphc29uIEd1bnRob3JwZQ0KPiA+PiA8amdnQG52aWRp
+YS5jb20+OyBZaXNoYWkgSGFkYXMgPHlpc2hhaWhAbnZpZGlhLmNvbT47IEFsZXggV2lsbGlhbXNv
+bg0KPiA+PiA8YWxleC53aWxsaWFtc29uQHJlZGhhdC5jb20+OyBCam9ybiBIZWxnYWFzIDxiaGVs
+Z2Fhc0Bnb29nbGUuY29tPjsNCj4gPj4gRGF2aWQgUy4gTWlsbGVyIDxkYXZlbUBkYXZlbWxvZnQu
+bmV0PjsgSmFrdWIgS2ljaW5za2kNCj4gPj4gPGt1YmFAa2VybmVsLm9yZz47IEtpcnRpIFdhbmto
+ZWRlIDxrd2Fua2hlZGVAbnZpZGlhLmNvbT47DQo+ID4+IGt2bUB2Z2VyLmtlcm5lbC5vcmc7IGxp
+bnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmc7DQo+ID4+IGxpbnV4LXBjaUB2Z2VyLmtlcm5lbC5v
+cmc7IGxpbnV4LXJkbWFAdmdlci5rZXJuZWwub3JnOw0KPiA+PiBuZXRkZXZAdmdlci5rZXJuZWwu
+b3JnOyBTYWVlZCBNYWhhbWVlZCA8c2FlZWRtQG52aWRpYS5jb20+Ow0KPiA+PiBsaXVsb25nZmFu
+ZyA8bGl1bG9uZ2ZhbmdAaHVhd2VpLmNvbT4NCj4gPj4gU3ViamVjdDogUmU6IFtQQVRDSCBtbHg1
+LW5leHQgMi83XSB2ZmlvOiBBZGQgYW4gQVBJIHRvIGNoZWNrDQo+ID4+IG1pZ3JhdGlvbiBzdGF0
+ZSB0cmFuc2l0aW9uIHZhbGlkaXR5DQo+ID4+DQo+ID4+DQo+ID4+IE9uIDkvMjQvMjAyMSAxMDo0
+NCBBTSwgU2hhbWVlcmFsaSBLb2xvdGh1bSBUaG9kaSB3cm90ZToNCj4gPj4+PiAtLS0tLU9yaWdp
+bmFsIE1lc3NhZ2UtLS0tLQ0KPiA+Pj4+IEZyb206IE1heCBHdXJ0b3ZveSBbbWFpbHRvOm1ndXJ0
+b3ZveUBudmlkaWEuY29tXQ0KPiA+Pj4+IFNlbnQ6IDIzIFNlcHRlbWJlciAyMDIxIDE0OjU2DQo+
+ID4+Pj4gVG86IExlb24gUm9tYW5vdnNreSA8bGVvbkBrZXJuZWwub3JnPjsgU2hhbWVlcmFsaSBL
+b2xvdGh1bSBUaG9kaQ0KPiA+Pj4+IDxzaGFtZWVyYWxpLmtvbG90aHVtLnRob2RpQGh1YXdlaS5j
+b20+DQo+ID4+Pj4gQ2M6IERvdWcgTGVkZm9yZCA8ZGxlZGZvcmRAcmVkaGF0LmNvbT47IEphc29u
+IEd1bnRob3JwZQ0KPiA+Pj4+IDxqZ2dAbnZpZGlhLmNvbT47IFlpc2hhaSBIYWRhcyA8eWlzaGFp
+aEBudmlkaWEuY29tPjsgQWxleA0KPiA+Pj4+IFdpbGxpYW1zb24gPGFsZXgud2lsbGlhbXNvbkBy
+ZWRoYXQuY29tPjsgQmpvcm4gSGVsZ2Fhcw0KPiA+Pj4+IDxiaGVsZ2Fhc0Bnb29nbGUuY29tPjsg
+RGF2aWQgUy4gTWlsbGVyIDxkYXZlbUBkYXZlbWxvZnQubmV0PjsNCj4gSmFrdWINCj4gPj4+PiBL
+aWNpbnNraSA8a3ViYUBrZXJuZWwub3JnPjsgS2lydGkgV2Fua2hlZGUgPGt3YW5raGVkZUBudmlk
+aWEuY29tPjsNCj4gPj4+PiBrdm1Admdlci5rZXJuZWwub3JnOyBsaW51eC1rZXJuZWxAdmdlci5r
+ZXJuZWwub3JnOw0KPiA+Pj4+IGxpbnV4LXBjaUB2Z2VyLmtlcm5lbC5vcmc7IGxpbnV4LXJkbWFA
+dmdlci5rZXJuZWwub3JnOw0KPiA+Pj4+IG5ldGRldkB2Z2VyLmtlcm5lbC5vcmc7IFNhZWVkIE1h
+aGFtZWVkIDxzYWVlZG1AbnZpZGlhLmNvbT4NCj4gPj4+PiBTdWJqZWN0OiBSZTogW1BBVENIIG1s
+eDUtbmV4dCAyLzddIHZmaW86IEFkZCBhbiBBUEkgdG8gY2hlY2sNCj4gPj4+PiBtaWdyYXRpb24g
+c3RhdGUgdHJhbnNpdGlvbiB2YWxpZGl0eQ0KPiA+Pj4+DQo+ID4+Pj4NCj4gPj4+PiBPbiA5LzIz
+LzIwMjEgMjoxNyBQTSwgTGVvbiBSb21hbm92c2t5IHdyb3RlOg0KPiA+Pj4+PiBPbiBUaHUsIFNl
+cCAyMywgMjAyMSBhdCAxMDozMzoxMEFNICswMDAwLCBTaGFtZWVyYWxpIEtvbG90aHVtDQo+ID4+
+Pj4+IFRob2RpDQo+ID4+Pj4gd3JvdGU6DQo+ID4+Pj4+Pj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdl
+LS0tLS0NCj4gPj4+Pj4+PiBGcm9tOiBMZW9uIFJvbWFub3Zza3kgW21haWx0bzpsZW9uQGtlcm5l
+bC5vcmddDQo+ID4+Pj4+Pj4gU2VudDogMjIgU2VwdGVtYmVyIDIwMjEgMTE6MzkNCj4gPj4+Pj4+
+PiBUbzogRG91ZyBMZWRmb3JkIDxkbGVkZm9yZEByZWRoYXQuY29tPjsgSmFzb24gR3VudGhvcnBl
+DQo+ID4+Pj4gPGpnZ0BudmlkaWEuY29tPg0KPiA+Pj4+Pj4+IENjOiBZaXNoYWkgSGFkYXMgPHlp
+c2hhaWhAbnZpZGlhLmNvbT47IEFsZXggV2lsbGlhbXNvbg0KPiA+Pj4+Pj4+IDxhbGV4LndpbGxp
+YW1zb25AcmVkaGF0LmNvbT47IEJqb3JuIEhlbGdhYXMNCj4gPj4+Pj4+PiA8YmhlbGdhYXNAZ29v
+Z2xlLmNvbT47DQo+ID4+Pj4gRGF2aWQNCj4gPj4+Pj4+PiBTLiBNaWxsZXIgPGRhdmVtQGRhdmVt
+bG9mdC5uZXQ+OyBKYWt1YiBLaWNpbnNraQ0KPiA+Pj4+Pj4+IDxrdWJhQGtlcm5lbC5vcmc+OyBL
+aXJ0aSBXYW5raGVkZSA8a3dhbmtoZWRlQG52aWRpYS5jb20+Ow0KPiA+Pj4+Pj4+IGt2bUB2Z2Vy
+Lmtlcm5lbC5vcmc7IGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmc7DQo+ID4+Pj4+Pj4gbGlu
+dXgtcGNpQHZnZXIua2VybmVsLm9yZzsgbGludXgtcmRtYUB2Z2VyLmtlcm5lbC5vcmc7DQo+ID4+
+Pj4+Pj4gbmV0ZGV2QHZnZXIua2VybmVsLm9yZzsgU2FlZWQgTWFoYW1lZWQgPHNhZWVkbUBudmlk
+aWEuY29tPg0KPiA+Pj4+Pj4+IFN1YmplY3Q6IFtQQVRDSCBtbHg1LW5leHQgMi83XSB2ZmlvOiBB
+ZGQgYW4gQVBJIHRvIGNoZWNrDQo+ID4+Pj4+Pj4gbWlncmF0aW9uIHN0YXRlIHRyYW5zaXRpb24g
+dmFsaWRpdHkNCj4gPj4+Pj4+Pg0KPiA+Pj4+Pj4+IEZyb206IFlpc2hhaSBIYWRhcyA8eWlzaGFp
+aEBudmlkaWEuY29tPg0KPiA+Pj4+Pj4+DQo+ID4+Pj4+Pj4gQWRkIGFuIEFQSSBpbiB0aGUgY29y
+ZSBsYXllciB0byBjaGVjayBtaWdyYXRpb24gc3RhdGUgdHJhbnNpdGlvbg0KPiA+Pj4+Pj4+IHZh
+bGlkaXR5IGFzIHBhcnQgb2YgYSBtaWdyYXRpb24gZmxvdy4NCj4gPj4+Pj4+Pg0KPiA+Pj4+Pj4+
+IFRoZSB2YWxpZCB0cmFuc2l0aW9ucyBmb2xsb3cgdGhlIGV4cGVjdGVkIHVzYWdlIGFzIGRlc2Ny
+aWJlZCBpbg0KPiA+Pj4+Pj4+IHVhcGkvdmZpby5oIGFuZCB0cmlnZ2VyZWQgYnkgUUVNVS4NCj4g
+Pj4+Pj4+Pg0KPiA+Pj4+Pj4+IFRoaXMgZW5zdXJlcyB0aGF0IGFsbCBtaWdyYXRpb24gaW1wbGVt
+ZW50YXRpb25zIGZvbGxvdyBhDQo+ID4+Pj4+Pj4gY29uc2lzdGVudCBtaWdyYXRpb24gc3RhdGUg
+bWFjaGluZS4NCj4gPj4+Pj4+Pg0KPiA+Pj4+Pj4+IFNpZ25lZC1vZmYtYnk6IFlpc2hhaSBIYWRh
+cyA8eWlzaGFpaEBudmlkaWEuY29tPg0KPiA+Pj4+Pj4+IFJldmlld2VkLWJ5OiBLaXJ0aSBXYW5r
+aGVkZSA8a3dhbmtoZWRlQG52aWRpYS5jb20+DQo+ID4+Pj4+Pj4gU2lnbmVkLW9mZi1ieTogSmFz
+b24gR3VudGhvcnBlIDxqZ2dAbnZpZGlhLmNvbT4NCj4gPj4+Pj4+PiBTaWduZWQtb2ZmLWJ5OiBM
+ZW9uIFJvbWFub3Zza3kgPGxlb25yb0BudmlkaWEuY29tPg0KPiA+Pj4+Pj4+IC0tLQ0KPiA+Pj4+
+Pj4+ICAgICBkcml2ZXJzL3ZmaW8vdmZpby5jICB8IDQxDQo+ID4+Pj4gKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKysrKysNCj4gPj4+Pj4+PiAgICAgaW5jbHVkZS9saW51eC92
+ZmlvLmggfCAgMSArDQo+ID4+Pj4+Pj4gICAgIDIgZmlsZXMgY2hhbmdlZCwgNDIgaW5zZXJ0aW9u
+cygrKQ0KPiA+Pj4+Pj4+DQo+ID4+Pj4+Pj4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvdmZpby92Zmlv
+LmMgYi9kcml2ZXJzL3ZmaW8vdmZpby5jIGluZGV4DQo+ID4+Pj4+Pj4gM2MwMzRmZTE0Y2NiLi5j
+M2NhMzNlNTEzYzggMTAwNjQ0DQo+ID4+Pj4+Pj4gLS0tIGEvZHJpdmVycy92ZmlvL3ZmaW8uYw0K
+PiA+Pj4+Pj4+ICsrKyBiL2RyaXZlcnMvdmZpby92ZmlvLmMNCj4gPj4+Pj4+PiBAQCAtMTY2NCw2
+ICsxNjY0LDQ3IEBAIHN0YXRpYyBpbnQNCj4gPj4+Pj4+PiB2ZmlvX2RldmljZV9mb3BzX3JlbGVh
+c2Uoc3RydWN0DQo+ID4+Pj4gaW5vZGUNCj4gPj4+Pj4+PiAqaW5vZGUsIHN0cnVjdCBmaWxlICpm
+aWxlcCkNCj4gPj4+Pj4+PiAgICAgCXJldHVybiAwOw0KPiA+Pj4+Pj4+ICAgICB9DQo+ID4+Pj4+
+Pj4NCj4gPj4+Pj4+PiArLyoqDQo+ID4+Pj4+Pj4gKyAqIHZmaW9fY2hhbmdlX21pZ3JhdGlvbl9z
+dGF0ZV9hbGxvd2VkIC0gQ2hlY2tzIHdoZXRoZXIgYQ0KPiA+Pj4+Pj4+ICttaWdyYXRpb24NCj4g
+Pj4+PiBzdGF0ZQ0KPiA+Pj4+Pj4+ICsgKiAgIHRyYW5zaXRpb24gaXMgdmFsaWQuDQo+ID4+Pj4+
+Pj4gKyAqIEBuZXdfc3RhdGU6IFRoZSBuZXcgc3RhdGUgdG8gbW92ZSB0by4NCj4gPj4+Pj4+PiAr
+ICogQG9sZF9zdGF0ZTogVGhlIG9sZCBzdGF0ZS4NCj4gPj4+Pj4+PiArICogUmV0dXJuOiB0cnVl
+IGlmIHRoZSB0cmFuc2l0aW9uIGlzIHZhbGlkLg0KPiA+Pj4+Pj4+ICsgKi8NCj4gPj4+Pj4+PiAr
+Ym9vbCB2ZmlvX2NoYW5nZV9taWdyYXRpb25fc3RhdGVfYWxsb3dlZCh1MzIgbmV3X3N0YXRlLCB1
+MzINCj4gPj4+PiBvbGRfc3RhdGUpDQo+ID4+Pj4+Pj4gK3sNCj4gPj4+Pj4+PiArCWVudW0geyBN
+QVhfU1RBVEUgPSBWRklPX0RFVklDRV9TVEFURV9SRVNVTUlORyB9Ow0KPiA+Pj4+Pj4+ICsJc3Rh
+dGljIGNvbnN0IHU4IHZmaW9fZnJvbV9zdGF0ZV90YWJsZVtNQVhfU1RBVEUgKw0KPiAxXVtNQVhf
+U1RBVEUNCj4gPj4+Pj4+PiArKw0KPiA+Pj4+IDFdID0gew0KPiA+Pj4+Pj4+ICsJCVtWRklPX0RF
+VklDRV9TVEFURV9TVE9QXSA9IHsNCj4gPj4+Pj4+PiArCQkJW1ZGSU9fREVWSUNFX1NUQVRFX1JV
+Tk5JTkddID0gMSwNCj4gPj4+Pj4+PiArCQkJW1ZGSU9fREVWSUNFX1NUQVRFX1JFU1VNSU5HXSA9
+IDEsDQo+ID4+Pj4+Pj4gKwkJfSwNCj4gPj4+Pj4+PiArCQlbVkZJT19ERVZJQ0VfU1RBVEVfUlVO
+TklOR10gPSB7DQo+ID4+Pj4+Pj4gKwkJCVtWRklPX0RFVklDRV9TVEFURV9TVE9QXSA9IDEsDQo+
+ID4+Pj4+Pj4gKwkJCVtWRklPX0RFVklDRV9TVEFURV9TQVZJTkddID0gMSwNCj4gPj4+Pj4+PiAr
+CQkJW1ZGSU9fREVWSUNFX1NUQVRFX1NBVklORyB8DQo+ID4+Pj4gVkZJT19ERVZJQ0VfU1RBVEVf
+UlVOTklOR10NCj4gPj4+Pj4+PiA9IDEsDQo+ID4+Pj4+PiBEbyB3ZSBuZWVkIHRvIGFsbG93IF9S
+RVNVTUlORyBzdGF0ZSBoZXJlIG9yIG5vdD8gQXMgcGVyIHRoZQ0KPiA+Pj4+Pj4gIlN0YXRlDQo+
+ID4+Pj4gdHJhbnNpdGlvbnMiDQo+ID4+Pj4+PiBzZWN0aW9uIGZyb20gdWFwaS9saW51eC92Zmlv
+LmgsDQo+ID4+Pj4+IEl0IGxvb2tzIGxpa2Ugd2UgbWlzc2VkIHRoaXMgc3RhdGUgdHJhbnNpdGlv
+bi4NCj4gPj4+Pj4NCj4gPj4+Pj4gVGhhbmtzDQo+ID4+Pj4gSSdtIG5vdCBzdXJlIHRoaXMgc3Rh
+dGUgdHJhbnNpdGlvbiBpcyB2YWxpZC4NCj4gPj4+Pg0KPiA+Pj4+IEtpcnRpLCBXaGVuIHdlIHdv
+dWxkIGxpa2UgdG8gbW92ZSBmcm9tIFJVTk5JTkcgdG8gUkVTVU1JTkcgPw0KPiA+Pj4gSSBndWVz
+cyBpdCBkZXBlbmRzIG9uIHdoYXQgeW91IHJlcG9ydCBhcyB5b3VyIGRldiBkZWZhdWx0IHN0YXRl
+Lg0KPiA+Pj4NCj4gPj4+IEZvciBIaVNpbGljb24gQUNDIG1pZ3JhdGlvbiBkcml2ZXIsIHdlIHNl
+dCB0aGUgZGVmYXVsdCB0byBfUlVOTklORy4NCj4gPj4gV2hlcmUgZG8geW91IHNldCBpdCBhbmQg
+cmVwb3J0IGl0ID8NCj4gPiBDdXJyZW50bHksIGluIF9vcGVuX2RldmljZSgpIHdlIHNldCB0aGUg
+ZGV2aWNlX3N0YXRlIHRvIF9SVU5OSU5HLg0KPiANCj4gV2h5IGRvIHlvdSBkbyBpdCA/DQoNCkl0
+IGlzIGJ5IHRoZSBhc3N1bXB0aW9uIHRoYXQgdGhlIGRlZmF1bHQgc3RhdGUgdG8gYmUgX1JVTk5J
+TkcgYW5kIHRoZW4NCndlIHRha2UgaXQgZnJvbSB0aGVyZSBmb3IgbWlncmF0aW9uIHN0YXRlIGNo
+YW5nZXMuDQoNCkFueSBwYXJ0aWN1bGFyIHJlYXNvbiB3aHkgaXQgbmVlZHMgdG8gYmUgaW4gX1NU
+T1Agc3RhdGU/IFdlIG5lZWQgdG8gdXBkYXRlDQp0aGUgZG9jdW1lbnRhdGlvbiBpbiB0aGF0IGNh
+c2UgdG8gYWxsb3cgX1NUT1AgLS0+IF9SRVNVTUlORy4NCg0KPiANCj4gPg0KPiA+IEkgdGhpbmsg
+aW4geW91ciBjYXNlIHRoZSBkZWZhdWx0IG9mIHZtaWctPnZmaW9fZGV2X3N0YXRlID09IDAgKF9T
+VE9QKS4NCj4gPg0KPiA+Pj4gQW5kIHdoZW4gdGhlIG1pZ3JhdGlvbiBzdGFydHMsIHRoZSBkZXN0
+aW5hdGlvbiBzaWRlIFFlbXUsIHNldCB0aGUNCj4gPj4+IGRldmljZSBzdGF0ZSB0byBfUkVTVU1J
+TkcodmZpb19sb2FkX3N0YXRlKCkpLg0KPiA+Pj4NCj4gPj4+ICAgRnJvbSB0aGUgZG9jdW1lbnRh
+dGlvbiwgaXQgbG9va3MgbGlrZSB0aGUgYXNzdW1wdGlvbiBvbiBkZWZhdWx0DQo+ID4+PiBzdGF0
+ZSBvZiB0aGUgVkZJTyBkZXYgaXMgX1JVTk5JTkcuDQo+ID4+Pg0KPiA+Pj4gIg0KPiA+Pj4gKiAg
+MDAxYiA9PiBEZXZpY2UgcnVubmluZywgd2hpY2ggaXMgdGhlIGRlZmF1bHQgc3RhdGUgIg0KPiA+
+Pj4NCj4gPj4+PiBTYW1lZXJhbGksIGNhbiB5b3UgcGxlYXNlIHJlLXRlc3QgYW5kIHVwZGF0ZSBp
+ZiB5b3Ugc2VlIHRoaXMgdHJhbnNpdGlvbiA/DQo+ID4+PiBZZXMuIEFuZCBpZiBJIGNoYW5nZSB0
+aGUgZGVmYXVsdCBzdGF0ZSB0byBfU1RPUCwgdGhlbiB0aGUgdHJhbnNpdGlvbg0KPiA+Pj4gaXMg
+ZnJvbSBfU1RPUCAtLT4gX1JFU1VNSU5HLg0KPiA+Pj4NCj4gPj4+IEJ1dCB0aGUgZG9jdW1lbnRh
+dGlvbiBvbiBTdGF0ZSB0cmFuc2l0aW9ucyBkb2Vzbid0IGhhdmUgX1NUT1AgLS0+DQo+ID4+PiBf
+UkVTVU1JTkcgdHJhbnNpdGlvbiBhcyB2YWxpZC4NCj4gPj4+DQo+ID4+PiBUaGFua3MsDQo+ID4+
+PiBTaGFtZWVyDQo+ID4+Pg0KPiA+Pj4+Pj4gIiAqIDQuIFRvIHN0YXJ0IHRoZSByZXN1bWluZyBw
+aGFzZSwgdGhlIGRldmljZSBzdGF0ZSBzaG91bGQgYmUNCj4gPj4+Pj4+IHRyYW5zaXRpb25lZA0K
+PiA+Pj4+IGZyb20NCj4gPj4+Pj4+ICAgICAqICAgIHRoZSBfUlVOTklORyB0byB0aGUgX1JFU1VN
+SU5HIHN0YXRlLiINCj4gPj4+Pj4+DQo+ID4+Pj4+PiBJSVJDLCBJIGhhdmUgc2VlbiB0aGF0IHRy
+YW5zaXRpb24gaGFwcGVuaW5nIG9uIHRoZSBkZXN0aW5hdGlvbg0KPiA+Pj4+Pj4gZGV2IHdoaWxl
+DQo+ID4+Pj4gdGVzdGluZyB0aGUNCj4gPj4+Pj4+IEhpU2lsaWNvbiBBQ0MgZGV2IG1pZ3JhdGlv
+bi4NCj4gPj4+Pj4+DQo+ID4+Pj4+PiBUaGFua3MsDQo+ID4+Pj4+PiBTaGFtZWVyDQo+ID4+Pj4+
+Pg0KPiA+Pj4+Pj4+ICsJCX0sDQo+ID4+Pj4+Pj4gKwkJW1ZGSU9fREVWSUNFX1NUQVRFX1NBVklO
+R10gPSB7DQo+ID4+Pj4+Pj4gKwkJCVtWRklPX0RFVklDRV9TVEFURV9TVE9QXSA9IDEsDQo+ID4+
+Pj4+Pj4gKwkJCVtWRklPX0RFVklDRV9TVEFURV9SVU5OSU5HXSA9IDEsDQo+ID4+Pj4+Pj4gKwkJ
+fSwNCj4gPj4+Pj4+PiArCQlbVkZJT19ERVZJQ0VfU1RBVEVfU0FWSU5HIHwNCj4gVkZJT19ERVZJ
+Q0VfU1RBVEVfUlVOTklOR10NCj4gPj4+PiA9IHsNCj4gPj4+Pj4+PiArCQkJW1ZGSU9fREVWSUNF
+X1NUQVRFX1JVTk5JTkddID0gMSwNCj4gPj4+Pj4+PiArCQkJW1ZGSU9fREVWSUNFX1NUQVRFX1NB
+VklOR10gPSAxLA0KPiA+Pj4+Pj4+ICsJCX0sDQo+ID4+Pj4+Pj4gKwkJW1ZGSU9fREVWSUNFX1NU
+QVRFX1JFU1VNSU5HXSA9IHsNCj4gPj4+Pj4+PiArCQkJW1ZGSU9fREVWSUNFX1NUQVRFX1JVTk5J
+TkddID0gMSwNCj4gPj4+Pj4+PiArCQkJW1ZGSU9fREVWSUNFX1NUQVRFX1NUT1BdID0gMSwNCj4g
+Pj4+Pj4+PiArCQl9LA0KPiA+Pj4+Pj4+ICsJfTsNCj4gPj4+Pj4+PiArDQo+ID4+Pj4+Pj4gKwlp
+ZiAobmV3X3N0YXRlID4gTUFYX1NUQVRFIHx8IG9sZF9zdGF0ZSA+IE1BWF9TVEFURSkNCj4gPj4+
+Pj4+PiArCQlyZXR1cm4gZmFsc2U7DQo+ID4+Pj4+Pj4gKw0KPiA+Pj4+Pj4+ICsJcmV0dXJuIHZm
+aW9fZnJvbV9zdGF0ZV90YWJsZVtvbGRfc3RhdGVdW25ld19zdGF0ZV07DQo+ID4+Pj4+Pj4gK30N
+Cj4gPj4+Pj4+PiArRVhQT1JUX1NZTUJPTF9HUEwodmZpb19jaGFuZ2VfbWlncmF0aW9uX3N0YXRl
+X2FsbG93ZWQpOw0KPiA+Pj4+Pj4+ICsNCj4gPj4+Pj4+PiAgICAgc3RhdGljIGxvbmcgdmZpb19k
+ZXZpY2VfZm9wc191bmxfaW9jdGwoc3RydWN0IGZpbGUgKmZpbGVwLA0KPiA+Pj4+Pj4+ICAgICAJ
+CQkJICAgICAgIHVuc2lnbmVkIGludCBjbWQsIHVuc2lnbmVkIGxvbmcgYXJnKQ0KPiA+Pj4+Pj4+
+ICAgICB7DQo+ID4+Pj4+Pj4gZGlmZiAtLWdpdCBhL2luY2x1ZGUvbGludXgvdmZpby5oIGIvaW5j
+bHVkZS9saW51eC92ZmlvLmggaW5kZXgNCj4gPj4+Pj4+PiBiNTNhOTU1Nzg4NGEuLmU2NTEzN2E3
+MDhmMSAxMDA2NDQNCj4gPj4+Pj4+PiAtLS0gYS9pbmNsdWRlL2xpbnV4L3ZmaW8uaA0KPiA+Pj4+
+Pj4+ICsrKyBiL2luY2x1ZGUvbGludXgvdmZpby5oDQo+ID4+Pj4+Pj4gQEAgLTgzLDYgKzgzLDcg
+QEAgZXh0ZXJuIHN0cnVjdCB2ZmlvX2RldmljZQ0KPiA+Pj4+Pj4+ICp2ZmlvX2RldmljZV9nZXRf
+ZnJvbV9kZXYoc3RydWN0IGRldmljZSAqZGV2KTsNCj4gPj4+Pj4+PiAgICAgZXh0ZXJuIHZvaWQg
+dmZpb19kZXZpY2VfcHV0KHN0cnVjdCB2ZmlvX2RldmljZSAqZGV2aWNlKTsNCj4gPj4+Pj4+Pg0K
+PiA+Pj4+Pj4+ICAgICBpbnQgdmZpb19hc3NpZ25fZGV2aWNlX3NldChzdHJ1Y3QgdmZpb19kZXZp
+Y2UgKmRldmljZSwgdm9pZA0KPiA+Pj4+Pj4+ICpzZXRfaWQpOw0KPiA+Pj4+Pj4+ICtib29sIHZm
+aW9fY2hhbmdlX21pZ3JhdGlvbl9zdGF0ZV9hbGxvd2VkKHUzMiBuZXdfc3RhdGUsIHUzMg0KPiA+
+Pj4+IG9sZF9zdGF0ZSk7DQo+ID4+Pj4+Pj4gICAgIC8qIGV2ZW50cyBmb3IgdGhlIGJhY2tlbmQg
+ZHJpdmVyIG5vdGlmeSBjYWxsYmFjayAqLw0KPiA+Pj4+Pj4+ICAgICBlbnVtIHZmaW9faW9tbXVf
+bm90aWZ5X3R5cGUgew0KPiA+Pj4+Pj4+IC0tDQo+ID4+Pj4+Pj4gMi4zMS4xDQo=
