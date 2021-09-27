@@ -2,140 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 55F6F4199CF
-	for <lists+kvm@lfdr.de>; Mon, 27 Sep 2021 18:59:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 607BD419AA3
+	for <lists+kvm@lfdr.de>; Mon, 27 Sep 2021 19:09:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235425AbhI0RA7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Sep 2021 13:00:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36704 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235401AbhI0RA6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Sep 2021 13:00:58 -0400
-Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08055C061575
-        for <kvm@vger.kernel.org>; Mon, 27 Sep 2021 09:59:20 -0700 (PDT)
-Received: by mail-lf1-x12a.google.com with SMTP id b20so80629452lfv.3
-        for <kvm@vger.kernel.org>; Mon, 27 Sep 2021 09:59:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=boyhOy7c3Zv3+YHD3yPMRV9jTZZHINKXKipnorJKcwg=;
-        b=EFsgbbFE2kAt7wByLaFcasmCsfVIgNxk/m8G/nDr+HQQCPZquhtvMBtAa+Duc5+kXQ
-         UtY1CeMLlZTD94anpjzQv4K2YgUm9xVsItVLuyYt7PzuN+o60dJjWiO6ZURLbhkP7mzD
-         l/1wphgAzzIFt+bnAvBUh1vmO0XgUCFQbkR5nyhNqwPHp4lRcD3QYQpAbbn7KH5W/ysv
-         OQmlCYcjYrF8BVfGjUkclx0OrNnd/IdHMhsMfPOv7/HS8Qxd6WyABtIhI1iDB0FR5uaE
-         W0Ua9w0Kzy0A9r7i69bL0pt1y0fFyfV6OwYtL3O/7ZJwWx+dXki0Z+PUBsXBMwLQP/I9
-         ShZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=boyhOy7c3Zv3+YHD3yPMRV9jTZZHINKXKipnorJKcwg=;
-        b=AhNRFnKHJXE/p6rCmaZJ1xmYAVGZA9bSWY3QShV9r87pwi0lSqPUrxpwDiulfRt5Sx
-         mF2erkCdZH1c4JJnqLN/10EACxA6FtEiFYwqVYyYv3YekwEsHwRVlQD1sdeRmalDsS0s
-         IP5s0oZjUMCxux41eT/0nrxdoqpIS3KasMI1bQWGFPyCYvLtpRXDiaW3195lQEi6Gu6w
-         Du5jzAZGe66ibxD2pnerl0NvHRIqbvLhNedjqB6bG4PNjJflX++yPytKTYVa6aI+9cwg
-         vLKAyisd5sfalVo/+r7hVf9Gfaa5aqIlADZ+Pec2/RgOdGLm0AvqBP+u3V24NgPTmefM
-         KTMw==
-X-Gm-Message-State: AOAM5335JcKfKdRW/PZgDB+3mc9xETGhcIXXHZ89LPuGwlyJVUWDalzv
-        BtAJ7lMlFU857fHkhIcCLj5SQqie0Stt6koMUgPRew==
-X-Google-Smtp-Source: ABdhPJyvrc2iIXbcC8YaiVkzYO41Psj9zevIrEPYYOmLf26TIPB4wujR7R6xkm6OJn238QJWJUKaISQGVYiRf4/ylng=
-X-Received: by 2002:a19:c349:: with SMTP id t70mr843112lff.102.1632761958145;
- Mon, 27 Sep 2021 09:59:18 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210925005528.1145584-1-seanjc@google.com> <03f2f5ab-e809-2ba5-bd98-3393c3b843d2@de.ibm.com>
- <YVHcY6y1GmvGJnMg@google.com> <f37ab68c-61ce-b6fb-7a49-831bacfc7424@redhat.com>
- <43e42f5c-9d9f-9e8b-3a61-9a053a818250@de.ibm.com>
-In-Reply-To: <43e42f5c-9d9f-9e8b-3a61-9a053a818250@de.ibm.com>
-From:   David Matlack <dmatlack@google.com>
-Date:   Mon, 27 Sep 2021 09:58:51 -0700
-Message-ID: <CALzav=cxeYieTkKJhT0kFZOjdv6k5eCZXKWs=ZQGCJg0x-oFjQ@mail.gmail.com>
-Subject: Re: disabling halt polling broken? (was Re: [PATCH 00/14] KVM:
- Halt-polling fixes, cleanups and a new stat)
-To:     Christian Borntraeger <borntraeger@de.ibm.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Jon Cargille <jcargill@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        David Hildenbrand <david@redhat.com>,
+        id S236481AbhI0RKt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Sep 2021 13:10:49 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:30598 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S236493AbhI0RJK (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 27 Sep 2021 13:09:10 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 18RH6rGm014024;
+        Mon, 27 Sep 2021 13:07:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=/pZLnV4O+hTOZCX7MZFbuguZgzytK6+jQqgZO/Bf5CY=;
+ b=WX7rdNCdRdRtZ0k+fh31F7DB1qGzw6tVXj/P2OBxAbpLbkNfnwcL7byB33ebk/MnTFdL
+ A8F+cYP5NYxwOUAxdGK0NjF2Z/qg1ImirTWUQzgsZvYk40zmrWgVLxyhLJ0C47k/T77F
+ CcK/TDwic/gMBAlCBL/RFPGXWFItPo9ewZoxsIp4ah44BLEZ2GZ6nNlTGYsAyF2aM5ti
+ nDGyOoMqIUxdjYvWrgdl+oScZSlF11x+75gzjW9bk3DiqDKPr2GO6n2VvRWTsBG0+tyE
+ EooQ6qe/K8TCyFc4PrWSO/wvhfmHtDw59W/GOGCVKIIBEHOG55tQJeNwXjaGcaTv1Bx6 Yg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3baguagu61-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 27 Sep 2021 13:07:29 -0400
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 18RH7Txg016078;
+        Mon, 27 Sep 2021 13:07:29 -0400
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3baguagtbn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 27 Sep 2021 13:07:26 -0400
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 18RGvmqx019480;
+        Mon, 27 Sep 2021 17:02:26 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma03fra.de.ibm.com with ESMTP id 3b9ud9dufp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 27 Sep 2021 17:02:26 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 18RGvKMM55312688
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 27 Sep 2021 16:57:20 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E092C4204D;
+        Mon, 27 Sep 2021 17:02:21 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 67CB842047;
+        Mon, 27 Sep 2021 17:02:21 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.145.4.56])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 27 Sep 2021 17:02:21 +0000 (GMT)
+Date:   Mon, 27 Sep 2021 19:01:57 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     David Hildenbrand <david@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, linux-mm@kvack.org,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
         Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        linux-arm-kernel@lists.infradead.org,
-        KVMARM <kvmarm@lists.cs.columbia.edu>,
-        LinuxMIPS <linux-mips@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        KVMPPC <kvm-ppc@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Jing Zhang <jingzhangos@google.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Janosch Frank <frankja@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Niklas Schnelle <schnelle@linux.ibm.com>,
+        Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>
+Subject: Re: [PATCH resend RFC 8/9] s390/mm: optimize
+ set_guest_storage_key()
+Message-ID: <20210927190157.65ce9f54@p-imbrenda>
+In-Reply-To: <20210909162248.14969-9-david@redhat.com>
+References: <20210909162248.14969-1-david@redhat.com>
+        <20210909162248.14969-9-david@redhat.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: skm3WqG9TvCnjM41kfvnFIQO-Wcerqxb
+X-Proofpoint-ORIG-GUID: sU04ZfL8nKoKUHEdrUF6uqMy17v9dSlw
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.391,FMLib:17.0.607.475
+ definitions=2021-09-27_06,2021-09-24_02,2020-04-07_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ suspectscore=0 impostorscore=0 mlxscore=0 bulkscore=0 adultscore=0
+ phishscore=0 clxscore=1015 spamscore=0 malwarescore=0 lowpriorityscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2109230001 definitions=main-2109270116
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 27, 2021 at 8:17 AM Christian Borntraeger
-<borntraeger@de.ibm.com> wrote:
->
->
->
-> Am 27.09.21 um 17:03 schrieb Paolo Bonzini:
-> > On 27/09/21 16:59, Sean Christopherson wrote:
-> >>> commit acd05785e48c01edb2c4f4d014d28478b5f19fb5
-> >>> Author:     David Matlack<dmatlack@google.com>
-> >>> AuthorDate: Fri Apr 17 15:14:46 2020 -0700
-> >>> Commit:     Paolo Bonzini<pbonzini@redhat.com>
-> >>> CommitDate: Fri Apr 24 12:53:17 2020 -0400
-> >>>
-> >>>      kvm: add capability for halt polling
-> >>>
-> >>> broke the possibility for an admin to disable halt polling for already running KVM guests.
-> >>> In past times doing
-> >>> echo 0 > /sys/module/kvm/parameters/halt_poll_ns
-> >>>
-> >>> stopped polling system wide.
-> >>> Now all KVM guests will use the halt_poll_ns value that was active during
-> >>> startup - even those that do not use KVM_CAP_HALT_POLL.
-> >>>
-> >>> I guess this was not intended?
-> >
-> > No, but...
-> >
-> >> I would go so far as to say that halt_poll_ns should be a hard limit on
-> >> the capability
-> >
-> > ... this would not be a good idea I think.  Anything that wants to do a lot of polling can just do "for (;;)".
+On Thu,  9 Sep 2021 18:22:47 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-I agree. It would also be a maintenance burden and subtle "gotcha" to
-have to increase halt_poll_ns anytime one wants to increase
-KVM_CAP_HALT_POLL.
+> We already optimize get_guest_storage_key() to assume that if we don't have
+> a PTE table and don't have a huge page mapped that the storage key is 0.
+> 
+> Similarly, optimize set_guest_storage_key() to simply do nothing in case
+> the key to set is 0.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 
-> >
-> > So I think there are two possibilities that makes sense:
-> >
-> > * track what is using KVM_CAP_HALT_POLL, and make writes to halt_poll_ns follow that
->
-> what about using halt_poll_ns for those VMs that did not uses KVM_CAP_HALT_POLL and the private number for those that did.
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 
-None of these options would cover Christian's original use-case
-though. (Write to module to disable halt-polling system-wide.)
+> ---
+>  arch/s390/mm/pgtable.c | 14 ++++++++++++--
+>  1 file changed, 12 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/s390/mm/pgtable.c b/arch/s390/mm/pgtable.c
+> index 4e77b8ebdcc5..534939a3eca5 100644
+> --- a/arch/s390/mm/pgtable.c
+> +++ b/arch/s390/mm/pgtable.c
+> @@ -792,13 +792,23 @@ int set_guest_storage_key(struct mm_struct *mm, unsigned long addr,
+>  	pmd_t *pmdp;
+>  	pte_t *ptep;
+>  
+> -	if (pmd_lookup(mm, addr, &pmdp))
+> +	/*
+> +	 * If we don't have a PTE table and if there is no huge page mapped,
+> +	 * we can ignore attempts to set the key to 0, because it already is 0.
+> +	 */
+> +	switch (pmd_lookup(mm, addr, &pmdp)) {
+> +	case -ENOENT:
+> +		return key ? -EFAULT : 0;
+> +	case 0:
+> +		break;
+> +	default:
+>  		return -EFAULT;
+> +	}
+>  
+>  	ptl = pmd_lock(mm, pmdp);
+>  	if (!pmd_present(*pmdp)) {
+>  		spin_unlock(ptl);
+> -		return -EFAULT;
+> +		return key ? -EFAULT : 0;
+>  	}
+>  
+>  	if (pmd_large(*pmdp)) {
 
-What about adding a writable "enable_halt_polling" module parameter
-that affects all VMs? Once that is in place we could also consider
-getting rid of halt_poll_ns entirely.
-
-> >
-> > * just make halt_poll_ns read-only.
-> >
-> > Paolo
-> >
