@@ -2,103 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A3B36418B44
-	for <lists+kvm@lfdr.de>; Sun, 26 Sep 2021 23:37:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 10EC1418ECE
+	for <lists+kvm@lfdr.de>; Mon, 27 Sep 2021 07:53:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230259AbhIZVjc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 26 Sep 2021 17:39:32 -0400
-Received: from gandalf.ozlabs.org ([150.107.74.76]:47587 "EHLO
-        gandalf.ozlabs.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230203AbhIZVjb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 26 Sep 2021 17:39:31 -0400
-X-Greylist: delayed 539 seconds by postgrey-1.27 at vger.kernel.org; Sun, 26 Sep 2021 17:39:31 EDT
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4HHf5z1L1Lz4xbL;
-        Mon, 27 Sep 2021 07:28:55 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-        s=201702; t=1632691735;
-        bh=+XN1ww0mHHW1+JZBjV/8qXo3Inu+Yv/12u2egqNhMHQ=;
-        h=Date:From:To:Cc:Subject:From;
-        b=eUgpL0ALqwFbR6RiXqIxT7AkGqfpkBOftyQlX3TW6T0s0buHUsHM+dlluqEWmQgjn
-         7U0xRg7Zc6F0w32QAaV87xHgoKlfZsQXBO0F59Dx42+MNBPO0ZCBTDjlHWY96XB8SD
-         MhdY1AvLUiLKNtXPaJoU+TlOZLCU9un68sV9nZYFnv9Q79jK1UfH4v91eU3iOSjKgh
-         FdX5AXtJJcHoWTPG6B4d5gj1+Sff2La9+BSFosAVO52ffA8ITvMtxlExYkTQgWtuU+
-         cWG/ughq7kG97FS8zRfxnWApshQiHQRNMvLxKCqb3/0d0BFApx4SmHwAP/QnINYp8W
-         dyxfKObE7qXBA==
-Date:   Mon, 27 Sep 2021 07:28:54 +1000
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>
-Cc:     Peter Gonda <pgonda@google.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>
-Subject: linux-next: Fixes tag needs some work in the kvm-fixes tree
-Message-ID: <20210927072854.6bf14f5c@canb.auug.org.au>
-MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/FS=lTeigZaKhWPq37.Bn1xi";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+        id S232941AbhI0FzD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Sep 2021 01:55:03 -0400
+Received: from out30-132.freemail.mail.aliyun.com ([115.124.30.132]:41615 "EHLO
+        out30-132.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232924AbhI0FzD (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 27 Sep 2021 01:55:03 -0400
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R211e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e01424;MF=hao.xiang@linux.alibaba.com;NM=1;PH=DS;RN=6;SR=0;TI=SMTPD_---0UpiJnEZ_1632722004;
+Received: from localhost(mailfrom:hao.xiang@linux.alibaba.com fp:SMTPD_---0UpiJnEZ_1632722004)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Mon, 27 Sep 2021 13:53:24 +0800
+From:   Hao Xiang <hao.xiang@linux.alibaba.com>
+To:     kvm@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, pbonzini@redhat.com,
+        seanjc@google.com, shannon.zhao@linux.alibaba.com,
+        Hao Xiang <hao.xiang@linux.alibaba.com>
+Subject: [PATCH] KVM: VMX: Remove redundant handling of bus lock vmexit
+Date:   Mon, 27 Sep 2021 13:53:22 +0800
+Message-Id: <1632722002-25003-1-git-send-email-hao.xiang@linux.alibaba.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---Sig_/FS=lTeigZaKhWPq37.Bn1xi
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+exit_reason.bus_lock_detected may or may not be set when exit reason is
+EXIT_REASON_BUS_LOCK. It is non-deterministic hardware behavior. Dealing
+with KVM_RUN_X86_BUS_LOCK in handle_bus_lock_vmexit could be redundant
+when exit_reason.basic is EXIT_REASON_BUS_LOCK.
 
-Hi all,
+We can remove redundant handling of bus lock vmexit. Set
+exit_reason.bus_lock_detected (bit 26) unconditionally, and deal with
+KVM_RUN_X86_BUS_LOCK only in vmx_handle_exit.
 
-In commit
+Signed-off-by: Hao Xiang <hao.xiang@linux.alibaba.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/x86/kvm/vmx/vmx.c | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
 
-  5b92b6ca92b6 ("KVM: SEV: Allow some commands for mirror VM")
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 0c2c0d5..f993c38 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -5561,9 +5561,13 @@ static int handle_encls(struct kvm_vcpu *vcpu)
+ 
+ static int handle_bus_lock_vmexit(struct kvm_vcpu *vcpu)
+ {
+-	vcpu->run->exit_reason = KVM_EXIT_X86_BUS_LOCK;
+-	vcpu->run->flags |= KVM_RUN_X86_BUS_LOCK;
+-	return 0;
++	struct vcpu_vmx *vmx = to_vmx(vcpu);
++
++	/* The dedicated flag (bit 26 of exit reason in vmcs field) may or may
++	 * not be set by hardware.
++	 */
++	vmx->exit_reason.bus_lock_detected = true;
++	return 1;
+ }
+ 
+ /*
+@@ -6050,9 +6054,8 @@ static int vmx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
+ 	int ret = __vmx_handle_exit(vcpu, exit_fastpath);
+ 
+ 	/*
+-	 * Even when current exit reason is handled by KVM internally, we
+-	 * still need to exit to user space when bus lock detected to inform
+-	 * that there is a bus lock in guest.
++	 * Exit to user space when bus lock detected to inform that there is
++	 * a bus lock in guest.
+ 	 */
+ 	if (to_vmx(vcpu)->exit_reason.bus_lock_detected) {
+ 		if (ret > 0)
+-- 
+1.8.3.1
 
-Fixes tag
-
-  Fixes: 54526d1fd593 ("KVM: x86: Support KVM VMs sharing SEV context", 202=
-1-04-21)
-
-has these problem(s):
-
-  - Subject has leading but no trailing quotes
-    Just use
-	git log -1 --format=3D'Fixes: %h ("%s")'
-
-In commit
-
-  f43c887cb7cb ("KVM: SEV: Update svm_vm_copy_asid_from for SEV-ES")
-
-Fixes tag
-
-  Fixes: 54526d1fd593 ("KVM: x86: Support KVM VMs sharing SEV context", 202=
-1-04-21)
-
-has these problem(s):
-
-  - Subject has leading but no trailing quotes
-    Just use
-	git log -1 --format=3D'Fixes: %h ("%s")'
-
-Do not include the date part in a fixes tag.  It adds nothing.
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/FS=lTeigZaKhWPq37.Bn1xi
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmFQ5hYACgkQAVBC80lX
-0GzS7gf/bRsGUjI1PGPog1L0jDga+zpmeWVZYOn3z9zgZSDLqD5Z1M9KcmZz42gR
-5zx5lfjutnbf2PPX7RfTlUrXBPEexQXYSJvMqXVx6HGI7yXmy5InU4fu9IWefnuJ
-z2JMsdbhy/ffgRt1GNSg5edkfzx1bcbd/F+M65hjxPon1FN3ivDBQn7evea9e/lI
-9DXKBBnkRlm3QdtQca35wvPHJJDIQtEuy5uAts7o6HFV7BF/PJ2Fd1h+OdGwXERx
-x4WNw1xMqAEYKa6DwrlurmoeH2xkDDsEgwRXwXcUVOt6+TjoX2z9Ky7kH0gEJ0mO
-YLtsgy7RT3/m1RkH2NB+JnKJJ1XpaA==
-=ggg+
------END PGP SIGNATURE-----
-
---Sig_/FS=lTeigZaKhWPq37.Bn1xi--
