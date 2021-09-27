@@ -2,130 +2,165 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D75C9419727
-	for <lists+kvm@lfdr.de>; Mon, 27 Sep 2021 17:04:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D4F9341975A
+	for <lists+kvm@lfdr.de>; Mon, 27 Sep 2021 17:09:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234930AbhI0PGF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Sep 2021 11:06:05 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59203 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234961AbhI0PGE (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 27 Sep 2021 11:06:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632755065;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=r/mgKtKp5KKfxcrjzch748kWu470axxG1OqY2NSG+pg=;
-        b=Sc7V1Frl4ReZn9uq1JummHKSFfr71YUfxKwoipQ73m63k4JfLfArj9h9xlR0gGWqFcNU+K
-        Bsk93bpVBRosYXDfAk0/jsHbywTven6vST8gxPb7+lm7Z0hhGWY9bmyKHkQQKLH5zEIol9
-        MlP745n+MqJbSxUL64Y6ubay9tXKMwk=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-383-9Yxs9dIsOEiTiYGDOPgaNw-1; Mon, 27 Sep 2021 11:03:59 -0400
-X-MC-Unique: 9Yxs9dIsOEiTiYGDOPgaNw-1
-Received: by mail-wr1-f70.google.com with SMTP id r15-20020adfce8f000000b0015df1098ccbso14260975wrn.4
-        for <kvm@vger.kernel.org>; Mon, 27 Sep 2021 08:03:59 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=r/mgKtKp5KKfxcrjzch748kWu470axxG1OqY2NSG+pg=;
-        b=WGWLz9ZiS1FDbhfCR0OjNvF+/n2KWNBZWver65QENo1/iDCTnXuWHNiAWaLPmBeRHq
-         gmy2p13r4TtsyzZ25/E8gR9gMUsl5fqasS51yfquImhwSiiZGI1QthVX56BWOrSMaEKA
-         YLXe705NuIfim7m6T3Ue9fgcP9Dr4C31RT6GGEPO2nRlouCo1v00yzAcRdMRzd9nR/dd
-         kVKt8lRGPKnhdrWGAPu50c4+IkY1QqWv/d3BkEvAMFjt6OHI3QN2Cv0eIK0iVnZbATxt
-         qnxG7FbACdObH/aE+t6cMM3/HpxpaohQNZE7npLfsfLw32eiTF1nPShxOFzKQ+Wmf9Vn
-         qGdQ==
-X-Gm-Message-State: AOAM530hfRAdkoxiEyLEsvvlw1MXT56AxrfLz7ZFyJfkLI4djIRaAfzN
-        s5yWQf2Hxd5CFrgLbu/jfzSHM0igUry5e9BQ1mVkw616BGBrnjQQgcDASLbJi220fIZBSXy4AdE
-        siyb147BNgaui
-X-Received: by 2002:a7b:c209:: with SMTP id x9mr388022wmi.9.1632755038171;
-        Mon, 27 Sep 2021 08:03:58 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxEdm9plI8QQmwPL2SFhkzquOawAtG2L3LzWjsrxEcUhatBpqdEXWMPsZ+lvaoVsF5QfHy+Uw==
-X-Received: by 2002:a7b:c209:: with SMTP id x9mr387973wmi.9.1632755037927;
-        Mon, 27 Sep 2021 08:03:57 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id c9sm15544500wmb.41.2021.09.27.08.03.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 27 Sep 2021 08:03:57 -0700 (PDT)
-Message-ID: <f37ab68c-61ce-b6fb-7a49-831bacfc7424@redhat.com>
-Date:   Mon, 27 Sep 2021 17:03:55 +0200
+        id S235024AbhI0PLK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Sep 2021 11:11:10 -0400
+Received: from mail-dm6nam10on2087.outbound.protection.outlook.com ([40.107.93.87]:57889
+        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S234972AbhI0PLJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Sep 2021 11:11:09 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=NDYavr81NKBq5plZodLomf1LoFxJ+t3sA9RCjV0LJ75b65c/dfi3dtmnCugE7d0OEHE5FPm+bZ4fMvkoYOxfyVormwuabQAMu9vn3wZ3txo1dCCuc4Rm7LAOeywJe2Z6gWL/K/KIGlhA3WRZrRyRJ/BAzdk2msBixwp4ZCaceV7UxGx9+DPNPs4sfgowOQnUZ6zxNVerEb3S/Nksn2OKrzvz/tngVJUyr9K1mghDE6B2gqeR7/oX9jXf1md24hwquJfI/TEN4BDIq94ds8YCvS6T3VrAtkBSBWAUXhr9n/T2963lmT+fgcwfyJB4KNx6BGy53oqEauDUxHwlaNn3+w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
+ bh=l/bm4ttqEwn495jrv6wBS+wY4PQ5uN6WfKQI50l/UHA=;
+ b=BviOWsDY1NHyjUUljmmIYn+ThFaOELtYEVLVJU5Lto7Ih3bN9HBInmpz4cI+Z/j8sRyq1wH/a/96MtDDoYIpfIos7u8x98ybmgKl3JmJYLQYGpd5wcDjYP/gRCvsTgOQR0his7osVwOKWMuGaLQTH+MsSXM/gTRKdY7Ir+kAxIvCpg/6AwposV8JrLakaxg1clodHoGnzDdNqoU6m7ABiWyNhIOZ9kVzgDI1mQ1oNEz9EXQszbm+4kxsWvJvJvsUXY9dnbVYEh/cVwL8ez+1bSqE8DHWaGFruL2VPdTq3j7csy4sssrAacpX8OsJAGzMCqm8c2JXjukolEJeHA6oaw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=l/bm4ttqEwn495jrv6wBS+wY4PQ5uN6WfKQI50l/UHA=;
+ b=B2r2ub3fOnkJR21EuRY7Zk1NOmjjBHb+C4KZldEJ9LVcGHo9FcBiate4CHFoBSTCkDhdZ2HqYBpXCa26mqs9EkM/IY8h13X1nSzY4hJle+h6yFXXR4MOeahKAorC8bffJU8eFXACn39698dyCndxLcvAm1Q6mKVk839PjkqbtvckDmiHm++uDwo7XrOZI3Wy8Sl+UUWmbp8QTlPCLtrgB65ojRj2CS3CA26PBsSP7Mpw35XZE6GRH3ltP/k+078oK9XhptxoJuCbgJNcPMGAz87znLyAxYNTqVlvwtnt27cW8A6faCoGFgAr5+tYCZy6LNhiltRrG7bDA+wzj5MVnQ==
+Authentication-Results: intel.com; dkim=none (message not signed)
+ header.d=none;intel.com; dmarc=none action=none header.from=nvidia.com;
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
+ by BL1PR12MB5256.namprd12.prod.outlook.com (2603:10b6:208:319::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4544.13; Mon, 27 Sep
+ 2021 15:09:29 +0000
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::e8af:232:915e:2f95]) by BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::e8af:232:915e:2f95%8]) with mapi id 15.20.4544.021; Mon, 27 Sep 2021
+ 15:09:29 +0000
+Date:   Mon, 27 Sep 2021 12:09:28 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     "Liu, Yi L" <yi.l.liu@intel.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "hch@lst.de" <hch@lst.de>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+        "parav@mellanox.com" <parav@mellanox.com>,
+        "lkml@metux.net" <lkml@metux.net>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "lushenming@huawei.com" <lushenming@huawei.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "corbet@lwn.net" <corbet@lwn.net>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "yi.l.liu@linux.intel.com" <yi.l.liu@linux.intel.com>,
+        "Tian, Jun J" <jun.j.tian@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "dwmw2@infradead.org" <dwmw2@infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
+        "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>
+Subject: Re: [RFC 06/20] iommu: Add iommu_device_init[exit]_user_dma
+ interfaces
+Message-ID: <20210927150928.GA1517957@nvidia.com>
+References: <20210919063848.1476776-1-yi.l.liu@intel.com>
+ <20210919063848.1476776-7-yi.l.liu@intel.com>
+ <20210921170943.GS327412@nvidia.com>
+ <BN9PR11MB5433DA330D4583387B59AA7F8CA29@BN9PR11MB5433.namprd11.prod.outlook.com>
+ <20210922123931.GI327412@nvidia.com>
+ <BN9PR11MB5433CE19425E85E7F52093278CA79@BN9PR11MB5433.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BN9PR11MB5433CE19425E85E7F52093278CA79@BN9PR11MB5433.namprd11.prod.outlook.com>
+X-ClientProxiedBy: MN2PR22CA0005.namprd22.prod.outlook.com
+ (2603:10b6:208:238::10) To BL0PR12MB5506.namprd12.prod.outlook.com
+ (2603:10b6:208:1cb::22)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: disabling halt polling broken? (was Re: [PATCH 00/14] KVM:
- Halt-polling fixes, cleanups and a new stat)
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>
-Cc:     David Matlack <dmatlack@google.com>,
-        Jon Cargille <jcargill@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jing Zhang <jingzhangos@google.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Janosch Frank <frankja@linux.ibm.com>
-References: <20210925005528.1145584-1-seanjc@google.com>
- <03f2f5ab-e809-2ba5-bd98-3393c3b843d2@de.ibm.com>
- <YVHcY6y1GmvGJnMg@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <YVHcY6y1GmvGJnMg@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Received: from mlx.ziepe.ca (142.162.113.129) by MN2PR22CA0005.namprd22.prod.outlook.com (2603:10b6:208:238::10) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4544.14 via Frontend Transport; Mon, 27 Sep 2021 15:09:29 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1mUsG0-006MzP-EK; Mon, 27 Sep 2021 12:09:28 -0300
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 5ae576e4-c0a7-4e0a-a3d3-08d981c8cd85
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5256:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <BL1PR12MB525660A1B1E66577523F6E33C2A79@BL1PR12MB5256.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:5516;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: URcKVQzoV96HRi5ayLccS6vKbzJAmfKSvvYURVW4xAlsoKS8EdsG46kXNh3uvpytu2yGxvgxDp/B7Tp7Zu/0v4f99UlhHkDYQox5YN/E6TDQ1cytZamM6sVXIgD71oEambP34uLmeb7W/kiTCd0r0jD/2NZXH/tLBkFXfATLeMgKSErlmcXsryP+rBgXmofkE/yqLFt5nv819cOfL6qQnKQzjO8jXs5ukgwAtZnokFje3KCdivQBRCpF64SJ3a1ZjvEXb+xuZYvE9OJkJjQIHQGwS7SDnYtEqe6HM24T83w2+qo9gb6gDMvo5sPf9/GrCUWe574fcA0LQSSz1FCmDzC/tHCOnDQ8lDO5Q1oshygHVrRJlWCEobe0OE93Rea7yN0ZOVhwGgxP1xgvUnAIBMpP1xWTA8rjMqn6mi6qTBR1yiVN22ei4jeHVTvYDGj1ktt3IzrZ5ZiV3p9o1tzFBwOx2sblYVV1Wgattkq6/Yk6e8l1mneumEP9J/4cV4kspSMvwFaFa/1PWw0XtNAjVtrWKG62W4sEI2+qM2rYoPncDuGDcYbYxZFETY8WSfC8X3e2Gss4gfAEJzy7qW/Thjzt1v43pFHELObjPpdY4266WNOgdmQYcm0cS1eoz4U7wDMEB308ZZgJaJO7QzSwkQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(1076003)(36756003)(86362001)(426003)(83380400001)(2616005)(26005)(186003)(508600001)(316002)(33656002)(5660300002)(8676002)(38100700002)(8936002)(54906003)(4326008)(9746002)(9786002)(66946007)(107886003)(66556008)(66476007)(2906002)(7416002)(6916009);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?vBkYur2JhgJ/hMToyO0s4HO+hBqSqURnJ0tpVwfVlVnds0047ym/ZcADDbM7?=
+ =?us-ascii?Q?FIyhU3a8/YfL2sLBDBYkHFXRETeZGz1oewxF+B/QcOFxJ4J7vyAwdNRynC5S?=
+ =?us-ascii?Q?QXrCluJsQmIoWJWcX0x1ajJe4uEF1ZL5ytILWrtzFDg9Q6GXHxWZk1601rqX?=
+ =?us-ascii?Q?ki9ClW37lSDKPIiPXS7iFupV3glcO4pINmxFeHQp/5QvnfHYIxWp9dzRe8ib?=
+ =?us-ascii?Q?00H9y5bDMA4iN71YCklRCYLDw+AHSgJKfiYMj7Evyt2MabbqvVaVc9R1xqPA?=
+ =?us-ascii?Q?FxhSURZmuLPFknoaCgur641FZSexhtgMayB17EGY2d+vsT4VjuQiWcEuGC2/?=
+ =?us-ascii?Q?18fXq8SO3z53yFQlfkmcHD7xetn9kMq9juKTgklU1l5yhhSoRz/YpSqed7J7?=
+ =?us-ascii?Q?XQ0/kLezl5lTqBjCwbIrrzpEPInIhVpVSutXOVQHkwBZurWPd4mKG28QNban?=
+ =?us-ascii?Q?JOWrgKPCP5vTiNcNa8CHYbSn8A696I19EK2Xuo/Nb3OoHiMgY+MBr+ZWKrbl?=
+ =?us-ascii?Q?/6r+tuD0HmzaHdr9nhQrYT9MO4taCs+AXM2ce5vvxp5c6UzKfwTApDT4vEXh?=
+ =?us-ascii?Q?bwX6iIxds8wkf8U1ElyJkz+b6YTzMYDdPx4GBvDKlrdec3ooqRd7X6LcewdF?=
+ =?us-ascii?Q?6MgFEgLK0+M9koLCut+84QWzA5gekerj5r0M4he23XJpsdEtglTu9m8QQvQW?=
+ =?us-ascii?Q?AA3Fp7pVYV6XJlItTmUhJlBDVeJh1t6Ai/M5T1iqEbHKs274B2SHGkbDZccV?=
+ =?us-ascii?Q?Twl82iYShjarV8+J/4f0W+usko2g2ypyv4Nl+b9PJvTMoEwksRtEDkp6sNvl?=
+ =?us-ascii?Q?6hvb2rlgc1IHdfER/3P1xvnp8EG2bU6n8UHMvhkSjiql8Dd5iutdbA0D8Rbm?=
+ =?us-ascii?Q?LpgIuzaVFxFzFgbusVu3m6OFjfPWc0DVzyqdd7GBoF/EgtCYp7b1GMYYGakI?=
+ =?us-ascii?Q?hfC+vtaW1hGcskJeW+bVbihX7Tu+QKxL8Kl0PY0EgOYHIb5X2hE7aZ6GORMc?=
+ =?us-ascii?Q?JiXTGRzAmN0NehCmNTYJL/aNczn9CC1aq8vOzHx+51af1KsXPuHvJ++/pwrh?=
+ =?us-ascii?Q?DUXdYRcMYmwvB7kNSriZ0R1zTnRTWSAWFN/DSd04IK9roZMW+SS16V40BmY6?=
+ =?us-ascii?Q?boBEc8mDZ39QPUcHgwis/Y/IRNkS3eMSTbmXc/MBZJE77oWICP8EBG2MMDW3?=
+ =?us-ascii?Q?apg66IzJjZAPOuYjTAoHDXic5aWzFgzFCgryyDvEW0CYE0EL46/C3YFvZb6G?=
+ =?us-ascii?Q?H1L3ptatFymUuL7ZvdwItOp3eu09IZmahGHGyOmzGzZIjOTUvFTKCYLPzRdL?=
+ =?us-ascii?Q?5AN9T8R7YuDFonvNmo7SoknH?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5ae576e4-c0a7-4e0a-a3d3-08d981c8cd85
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Sep 2021 15:09:29.4859
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: BFQQ/A8stHEOkF7pH4AZF9U5kn0D98sooG1SX1gFNjL9oV9UHaKqdnXSDMR4ggqg
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5256
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 27/09/21 16:59, Sean Christopherson wrote:
->> commit acd05785e48c01edb2c4f4d014d28478b5f19fb5
->> Author:     David Matlack<dmatlack@google.com>
->> AuthorDate: Fri Apr 17 15:14:46 2020 -0700
->> Commit:     Paolo Bonzini<pbonzini@redhat.com>
->> CommitDate: Fri Apr 24 12:53:17 2020 -0400
->> 
->>      kvm: add capability for halt polling
->> 
->> broke the possibility for an admin to disable halt polling for already running KVM guests.
->> In past times doing
->> echo 0 > /sys/module/kvm/parameters/halt_poll_ns
->> 
->> stopped polling system wide.
->> Now all KVM guests will use the halt_poll_ns value that was active during
->> startup - even those that do not use KVM_CAP_HALT_POLL.
->> 
->> I guess this was not intended?
+On Mon, Sep 27, 2021 at 09:42:58AM +0000, Tian, Kevin wrote:
 
-No, but...
+> +static int iommu_dev_viable(struct device *dev, void *data)
+> +{
+> +	enum dma_hint hint = *data;
+> +	struct device_driver *drv = READ_ONCE(dev->driver);
+> +
+> +	/* no conflict if the new device doesn't do DMA */
+> +	if (hint == DMA_FOR_NONE)
+> +		return 0;
+> +
+> +	/* no conflict if this device is driver-less, or doesn't do DMA */
+> +	if (!drv || (drv->dma_hint == DMA_FOR_NONE))
+> +		return 0;
 
-> I would go so far as to say that halt_poll_ns should be a hard limit on
-> the capability
+While it is kind of clever to fetch this in the drv like this, the
+locking just doesn't work right.
 
-... this would not be a good idea I think.  Anything that wants to do a 
-lot of polling can just do "for (;;)".
+The group itself needs to have an atomic that encodes what state it is
+in. You can read the initial state from the drv, under the
+device_lock, and update the atomic state
 
-So I think there are two possibilities that makes sense:
+Also, don't call it "hint", there is nothing hinty about this, it has
+definitive functional impacts.
 
-* track what is using KVM_CAP_HALT_POLL, and make writes to halt_poll_ns 
-follow that
+Greg will want to see a definiate benefit from this extra global code,
+so be sure to explain about why the BUG_ON is bad, and how driver core
+involvement is needed to fix it properly.
 
-* just make halt_poll_ns read-only.
-
-Paolo
-
+Jason
