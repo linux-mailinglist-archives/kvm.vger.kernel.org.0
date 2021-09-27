@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 97D1A419340
-	for <lists+kvm@lfdr.de>; Mon, 27 Sep 2021 13:41:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 30BB7419343
+	for <lists+kvm@lfdr.de>; Mon, 27 Sep 2021 13:41:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234100AbhI0Lmk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Sep 2021 07:42:40 -0400
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:26890 "EHLO
-        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234066AbhI0Lmi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Sep 2021 07:42:38 -0400
+        id S234135AbhI0Lmu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Sep 2021 07:42:50 -0400
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:50713 "EHLO
+        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234112AbhI0Lmn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Sep 2021 07:42:43 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1632742861; x=1664278861;
+  t=1632742866; x=1664278866;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:content-transfer-encoding:mime-version;
-  bh=CRrfzWFNEruuZH6Om+ebrLnHtuUHcHAu1c0S22vlEUo=;
-  b=g7GXcRoXeoSTStokn/EjjupXkORZ/JjN53WSDzKjuqS0udB7r7wdb8hC
-   iVzLDUJcmC2bikGQO0Q1oBT+CA/qpZAnTBDUz4uI9ZlLuge2dgwA6BxuB
-   FQmO69Hz9Th0KOPEoPPinw3g1qjlfmmzVnQvWZpskOVw4Lt0yo7ADx1B1
-   WQKPsCQkPmfIWeqT+4rjNpQZUa+VdF99fXyLgv7zN1Oyt2h3mGuILUDcr
-   5Rx+BHUQGB0GP2nFw9AJu+HwzVCFiT1PFxBtSSvyqYexCGf7NEGP5BREg
-   gxcQSQwUpjTF7MY9XFkpwLQ1duBYZJGOp5wn/PaExGeuPe93OFio7OOT7
-   g==;
+  bh=hko5XHbCXoex426z+rYgHaSj4go/BC5kXk1a2x9WDd4=;
+  b=YCgV/CkqeqSpc0CSIh5HaXlxaNTXK7sCwwPORo8YKUOGfid0oR+IOlvj
+   mylNmM2xaT8pBIIN/I5SYa8cPJfKBqLbb8cKBv7vU0jyia/TJZqQRx3fH
+   ps8g7HbI5dQTmrSMiK+lZqh3HaV2JeX6XtG15pgdBT8dcTQDI7S66W+Bo
+   3xgBgUrEXP21nzeYh3iTFjQvJce2j+dQ4ssuM5XLQ8Or24F83O2dA56Nq
+   ik6teOVw07AbhJbUYN8mJquZRhoKAi3Y+mel3CJNdRRUrrAmdAUuZyRLG
+   diN5RNlqmEt9LuBHERWkyT9Xo/CuykOaGum+mh6uUfDFnZiQQKwo9vCSY
+   w==;
 X-IronPort-AV: E=Sophos;i="5.85,326,1624291200"; 
-   d="scan'208";a="180126764"
-Received: from mail-co1nam11lp2171.outbound.protection.outlook.com (HELO NAM11-CO1-obe.outbound.protection.outlook.com) ([104.47.56.171])
-  by ob1.hgst.iphmx.com with ESMTP; 27 Sep 2021 19:40:59 +0800
+   d="scan'208";a="292706446"
+Received: from mail-bn8nam12lp2175.outbound.protection.outlook.com (HELO NAM12-BN8-obe.outbound.protection.outlook.com) ([104.47.55.175])
+  by ob1.hgst.iphmx.com with ESMTP; 27 Sep 2021 19:41:04 +0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=LbSmVk3msr04H8iHJaSRYwVJUseMtk/tX/L64l25/mb8FsA1y+PjgmgnfToD7jlpsLAP7b2SMlqr4VF/kZsD0nOIOodhUaRqddM5I21ykfrECPLfeMpdKD/u/7TkECEoUHyqoNwhL8oqx6cfhvyxNFvqqZgrg9I3g0XsEy4YP61HWv0DlD/31fxh4J9HnEqCz5gW8/O7tJlS0H47H/cLcP8ARO1auudqjTePUpwCa+0g3kNOH9HI0hzUtNtxGfRYxffC1wh+Eq+0FNuFIoPtECHyrP3pR3tvB0AOgqVnCIBzdNCRDuMVFlCwg15Vsl4xppGXpXA+/eN/GliGri7AdQ==
+ b=jTo0EkFBe0Bl/glm9w5wLzAvFhC1xAljQuP5BSDjJADYilqIb3dIeG+H3KqcO2bFmtA2tVXza+B1QRrBQ7xhn2VesjkZnnMf1qos6oGaFjhPNiDC7osGXGc7GJ1OtXmIf/Ank6i7FBhb9MPFTcPhWX4NrJzugBWULMwRDc+kRptx+Xbin8oak8iIhfCI+TJwxmkqcg9eoixTfMJh8JNsDF5B1l7+wsQTnRYGr1ZpwTgbmhrt6S2ODuFg2hECyI4xv12io33vllZxmJ5wC/QWzqjigmT6juw7S1IIlsePE2IDthiRTOIht3y9bvyn+Al7z2QUVjXV5ye08mpHtbFaFA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
- bh=eOD4Dm28arIgtRQBSGoRweHyef9miFlR6f8RYu1gWhc=;
- b=BRSaLGnjzhfgQsL2dHAAOE0dNi8KgBt/1mxAIx2EgVV4G49OMHoWiw8KG2DiHRITc09e5Z9wYt2AHfDc5k1WjWBkwYuPTPETKBp7BSUcX5lgRrkCRtRRq5tmpIhqoIJtutr4m/bfY3Pt3WZ0N2HLaeKLIvkexZf4GSetYIV+tVn+6m8Ymy6o4yIwStfFPBZrEqPt1A8tJCHU7EzqwvY0F2ZUrAtgWdYhQM9XQzlKwl8Q4A5pLG0likD97ybpNDxqdkXPv5ZjlyLmhmwLl1+agjcMOG4tU2q7Aq4OifEd3M1WQD2IPTADTuXAxEKdmguKuS4/I+J0dI3m0WQdVLmMZA==
+ bh=RicHWbZzvSAFskLPSR7zpZxtAd+RF/3oowI6voR3YRU=;
+ b=Nh8RIFYAZ/YjeYMbzeYvM7uixyZ6K7apt8F5KaiKN5dZSJmeQU3E8XHOKJekjH1UAPT3E+k4tdix/HtOx0FCBqLejanabmOqssCugBaiyOPdHK74onzZkI/hXtqN/T4VdTYjG6AUmVeHCWipqQa9kBt3pC6sgUdeoO+wOQku5IMFZTxia0hE0mxhYS1oEbnTi7F+JLguNkKlVVZI4NwFAB4MujWKja+Zx1DhyuD/pxPI4OMS0FC337VHEb4JS840ggm3JxxzvhO8nzQPv1sLnZM/TXvpxWDFXZM8zMzFfVJHbmsoh3lh1Mqp9n0G42MPE+HOQrKolAGcb1om9eQLZA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
  header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=eOD4Dm28arIgtRQBSGoRweHyef9miFlR6f8RYu1gWhc=;
- b=cHj7WJyXzBl2RjbrSa5D3LliZnsWzxjg4oUe7wevE/xTMEJW5nyhQmoBVSHphGKPWrs3Azi2mO5+57fpV+dH+Ot3XrrBVLcFdLWscHfIyWZANEbg7+b8lgUfnX1IJ+VCJOZfI2wIVLN3o7Dz4foroCwQ7NxKlID8xuFyzIvVG9s=
+ bh=RicHWbZzvSAFskLPSR7zpZxtAd+RF/3oowI6voR3YRU=;
+ b=BjH8+QeEb5FV5Jl99xNSX6E3w2gyXiIUqq3EUp5/UaGVHgSXJMnXbU5tZimbMsup4AUNKKODClesn1TJY9/wpg/Dmm8I1yfLpDm3Oh6LQPjib/pcoHSPoo3ZKgie6T6gFDJRjO6cGWaXlmS+8G/8oOOUGYEND9NT1LMoNwVMQag=
 Authentication-Results: dabbelt.com; dkim=none (message not signed)
  header.d=none;dabbelt.com; dmarc=none action=none header.from=wdc.com;
 Received: from CO6PR04MB7812.namprd04.prod.outlook.com (2603:10b6:303:138::6)
  by CO6PR04MB7841.namprd04.prod.outlook.com (2603:10b6:5:358::15) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4544.13; Mon, 27 Sep
- 2021 11:40:58 +0000
+ 2021 11:41:03 +0000
 Received: from CO6PR04MB7812.namprd04.prod.outlook.com
  ([fe80::6830:650b:8265:af0b]) by CO6PR04MB7812.namprd04.prod.outlook.com
  ([fe80::6830:650b:8265:af0b%6]) with mapi id 15.20.4544.021; Mon, 27 Sep 2021
- 11:40:58 +0000
+ 11:41:02 +0000
 From:   Anup Patel <anup.patel@wdc.com>
 To:     Palmer Dabbelt <palmer@dabbelt.com>,
         Palmer Dabbelt <palmerdabbelt@google.com>,
@@ -66,9 +66,9 @@ Cc:     Alexander Graf <graf@amazon.com>,
         Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
         kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
         linux-kernel@vger.kernel.org, Anup Patel <anup.patel@wdc.com>
-Subject: [PATCH v20 03/17] RISC-V: KVM: Implement VCPU create, init and destroy functions
-Date:   Mon, 27 Sep 2021 17:10:02 +0530
-Message-Id: <20210927114016.1089328-4-anup.patel@wdc.com>
+Subject: [PATCH v20 04/17] RISC-V: KVM: Implement VCPU interrupts and requests handling
+Date:   Mon, 27 Sep 2021 17:10:03 +0530
+Message-Id: <20210927114016.1089328-5-anup.patel@wdc.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20210927114016.1089328-1-anup.patel@wdc.com>
 References: <20210927114016.1089328-1-anup.patel@wdc.com>
@@ -78,249 +78,408 @@ X-ClientProxiedBy: MAXPR0101CA0051.INDPRD01.PROD.OUTLOOK.COM
  (2603:1096:a00:e::13) To CO6PR04MB7812.namprd04.prod.outlook.com
  (2603:10b6:303:138::6)
 MIME-Version: 1.0
-Received: from wdc.com (122.179.75.205) by MAXPR0101CA0051.INDPRD01.PROD.OUTLOOK.COM (2603:1096:a00:e::13) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4544.13 via Frontend Transport; Mon, 27 Sep 2021 11:40:54 +0000
+Received: from wdc.com (122.179.75.205) by MAXPR0101CA0051.INDPRD01.PROD.OUTLOOK.COM (2603:1096:a00:e::13) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4544.13 via Frontend Transport; Mon, 27 Sep 2021 11:40:58 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 5ec840db-ec47-494e-09df-08d981abac7a
+X-MS-Office365-Filtering-Correlation-Id: 2de0d84c-0166-4739-4d6d-08d981abaee8
 X-MS-TrafficTypeDiagnostic: CO6PR04MB7841:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <CO6PR04MB784159FAABC0C9A64132EDAC8DA79@CO6PR04MB7841.namprd04.prod.outlook.com>
+X-Microsoft-Antispam-PRVS: <CO6PR04MB7841091229D2243A8684C0158DA79@CO6PR04MB7841.namprd04.prod.outlook.com>
 WDCIPOUTBOUND: EOP-TRUE
-X-MS-Oob-TLC-OOBClassifiers: OLM:1284;
+X-MS-Oob-TLC-OOBClassifiers: OLM:3513;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Rj+ES6vFR0055uW2QWOp4T7tFPed/x+3MmF5A+2b/WhE6B08mxkje/pG86DCns7xWM3CQ5GSVCN/LN87GdZwDvU9U1uxk6uvQVoY0CCDVdkXWDBWzR58xpoM0iPEAlfguFLIMoMl7Lugf3aLj0fJaROCVxYJd0UkPaov5Ynnh8q2PEGMHNlz06SuEupAfmtPdmVUDP1w1fj83Ak5gKOvG9yBKEFL8hZtrQn2BW0GUGxvD9ZTElo81P5LjCzNPy3CqMm02an6M1jrlBD3PIsFhgJ59iQcp+nS6Uc8+3yXup6kdjWbYvpi/2vH0yc9/gfP1orggAFLmpmW04HsTf7wWngDn9bT/RW5EoQvJlKiBat3K670hL7jUNF6fCyeQm3ICrtnAuSfmbxhxrgh/CTbeunn1jrD1cb6e8077rf0gXoIMGQPz4rm+L1RSplJYgde8fOaWFpyZN8xJLHS62E98qZO5xEqw6OPYMTMIbrJXTD5EzcgetiFHMa6W6OoXzEvWDp9nqJzHy52DDVG/VjWOtfLDVWb+TmiUJI76pLcJzLXfJHFVEqlFOWe36e5blCCDdpmnBhPTjJD/9nC27pW7Kt9y6clig1Hihoer+829APkWE7H/Fi3Tg3ed5+LKod+P3Iu3t9kW+a6N2/32Z9DmNHheumDpp5iq47xLzu4WhHN0OTSl4O2h03DbBRZbSB9
+X-Microsoft-Antispam-Message-Info: R/nRB4CQQIx/UPReUds37FPYCr7MSKiaTedrCBD9CKoDJyhtOaiiH9xGsu7nFBmWVDZmjesHTR0/nUiVFd85U3nO3WfjzOGj0Di2Mh8NsKzRUWIVRAtiajly0DluxpjrWKUObGEvlZzV5v0gvYRTz9yKyFqZVj3QqyuXMfNNQABmXnqDquQTm5BGD4srWY63F5OV+DqxwGarrHiGBsUwJjZY4epZz/W+yjceSMKiKOOZkVq7GDyGIyq3iGmX2UWnSl1ccnuqI9zmC/ARZlTxSD2YxF4Kp+MSNMM4bu3M2bM9gYWqRmHcQIGhPOEyA3wg9kGcLjWAQ/DvCvq6u6ur1Np3SqXDJb4TfjHJ51MPRKc1Oms2Mld/1OHs0O9GgCdkvvITb3t+o/C4RgaWmvs6Snf7YdzYK8uwS11aExGvpSnzsdmEG2cSJtmWtswD67hrM7vsnsYdxoypWtvjL9qKOrvMLJ6fIbblYSVbHMZCIhnQZmXXBMGIw/sQdYP6wkybKEildIqyBjLPSobNQ6rRJUAhgurcORMG8B+ugo6ZG6pSOv8yPP73BavH2b06sVpiE4HMTq8cMRdAKSpM4VOHJpU3ooWJsln+CvtPJfwI/dwWw1deVjrx2Ju8aZuKciUVF4mnNOvAM4UdXTVCpdjNToB/OvmueWWV5Y1vDmrtNwwRuk04rpx2IKfs/lKY2n/a
 X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO6PR04MB7812.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(54906003)(316002)(110136005)(5660300002)(1076003)(66556008)(83380400001)(66946007)(66476007)(36756003)(38100700002)(38350700002)(55016002)(86362001)(508600001)(44832011)(8886007)(6666004)(2906002)(8676002)(956004)(2616005)(7696005)(8936002)(7416002)(4326008)(26005)(52116002)(186003);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?vZ1NEqNrrbuF+aijvkPv3XKPTTahppOvxF+S98Gsig/MisAD8OivZpRSe241?=
- =?us-ascii?Q?yZlpR2vJni6s+z54+VTaDFhSvIOMBCKMWAHIozNDnKevJfGyrNCohDPMXo85?=
- =?us-ascii?Q?VRYuDaBSyavi0hBc7D40aPsnDFIyp0so8eUJxpw/Z0CqjQ9GjjTHAWK1uv7s?=
- =?us-ascii?Q?EnSSilCVyFwlSdmSIPRsBNTucehfsnFUbvDzeRW53mQISs71wG/esP91bEDl?=
- =?us-ascii?Q?N8kvsvrW1xc1dNRCUDHuLCQffzUmmFBLbZKdamZWynkCnhZ8BCSzfdhgYUv6?=
- =?us-ascii?Q?VEqcMo+ZiorTOxJcM/Vn93uDBLLKU/6hZbi93ZUcbwWKYE0bYZuVHewKwRwx?=
- =?us-ascii?Q?krkuEB2I41gK5O6qHD/p+ghjN+HbztSUQVrPi+dKwqPtxNOSSb3H1J4VF7nl?=
- =?us-ascii?Q?fnIX4mW++YucbhpkhWeT+wsOpWWKKYj90QTNdQbi/bbsRYTnsokegpc+gBEK?=
- =?us-ascii?Q?i7xVi73HFb1UVdEdF/Sl89ft8iJBxvG8n9+4fZUZCH8/AW5nlBa5bkxcuzTm?=
- =?us-ascii?Q?B3h+OXotT3/1Ip9qLSSuADeclzcvrx34jHZogCOD0R2zpV1UTdyGef7s46o6?=
- =?us-ascii?Q?eF1HfUSQ8nzsTW4CZJ7aGC9z3oLlMQ/fBqVBzRKf42iu1yTPIStgs1XUCgXV?=
- =?us-ascii?Q?XwMM80EO16hc5rZqFE0Fuctm6rggKXmGEOSirOfixS/rw0nO/7qSsZo/6h7p?=
- =?us-ascii?Q?egDs+b0FWYCbHtUpLemZrG5IweRsqgu6yKejtOne+jTYgpI9yaF4bxvWlpdH?=
- =?us-ascii?Q?KnzLqvcHLQWJQvSFo2+zqeNqXrzyQjTc/bJL7fKLR6c2H3vw8ZEJfjyRKqvq?=
- =?us-ascii?Q?B3YGPXFnDVNBZVY8R9i63V7mDFntfF+ZZol3MY/Z5kVfYjMR5Oy4EMMSzdu6?=
- =?us-ascii?Q?8bYLJfDd+DQODqZSczZyxSUdsuSx8e21nSXAU88BMNQwkVw4dO0FFaWrLU54?=
- =?us-ascii?Q?7ZspKZOkbP7hBG1eBdEyLEa0wbXeSieJ9SuwF7nnjP81VijPX1DOYHpOCCFV?=
- =?us-ascii?Q?S8RN3MDo8c+s49/hJgLfXW7RIrzeLc3+gVcnkuTFyDKIf+txmyoCdWdJPiKw?=
- =?us-ascii?Q?mZRCkV7J+ESUxzQ4R41D4RzhS6Ie7CrSNX7RrGJ9kNaiMzmdMfwzvxqeVQ/5?=
- =?us-ascii?Q?9yP3B7GUIvtHf9pS8IZPI0q7Yob1yl1FIclB/7s4nKkaBmyW5R4gRSPtyhjV?=
- =?us-ascii?Q?Fq+3fD1bI1qFeAjvVEkEqk3Q0oWc/BROMyysOkpuEHzAmXG57EANn3yz0ewv?=
- =?us-ascii?Q?xW/R6qj/zUyAl143IHLvztjAvR59PAjRfpm4EX/mcgceXp+26SLaIZmU9NV8?=
- =?us-ascii?Q?SUSmL8jP1MvtEbnPQiZS7A1q?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?kUYBVIXer2qkKNGx/mMBPVyU6qnrmzdFRCQ1GQ7CMHu/NojS5goPiNI6jbBo?=
+ =?us-ascii?Q?7ln/BoCB0dhx2bFtW7D9QqphS4lvd44he6zooUClFxxrPCCAAOIrIurbcn+N?=
+ =?us-ascii?Q?haxzFzWeotg3NXxaosfq3Yww6oZJrPDo4jTXaWuA3WlqxHjV54s+tUGyjHUb?=
+ =?us-ascii?Q?3gK7MmIkXmiWP5cLX4n+1TWnuykShuDDh9O48OJgEmJhQLiSVujyl90xVmoN?=
+ =?us-ascii?Q?KVSbrsfg+6kHCfOkHDUvJFFAjNmqLpnhW6Ar3ZV8D/yYeSGOfzwh+A9QvMhK?=
+ =?us-ascii?Q?sQd8faPMAuJDNWmgbtYwWLl3x2fwHPXLy5Pf+rxOWAxss5TBDKFXc0WT/UXb?=
+ =?us-ascii?Q?dbU2kyLnUo/QSuPz/tBvdmsptKp8BG3UdhC8Y0ToiZaXQZ4+TBOW3zvcyo3U?=
+ =?us-ascii?Q?QkuMIkF+mGUJ9xgs9ThuQTK5fEf5+bPgobB+YAv/dX/M/g9VgK/c/86vzNNT?=
+ =?us-ascii?Q?ybSc3uE9pGCY+WFUyG3dxF9nj2UCmT9W0gI8TQkN1kp/ZfLoKIEMt4G+tpN5?=
+ =?us-ascii?Q?/s3qutO8Pnsu/IVVfBRUOrBIQE2sHX0ib5DM8IsOoapP5zn/T6PP4nXZC3bP?=
+ =?us-ascii?Q?yt8r13hAhqO9dy4X9hbHYR1XgCN/HYSkTsxGaJ0KwFauFMC/KbAWjloyNL2o?=
+ =?us-ascii?Q?vByLYOaxj4Gw8uV23Fe8WyiAMqREY6sd6JlxnQR2I+0O07T2Vhrzz/0Lnzwf?=
+ =?us-ascii?Q?QzUPnU1OMyHVrM3HLFMJLFL9O7x8s5REWndV8VwSZwxomsOhKPmA1SmT20G9?=
+ =?us-ascii?Q?h1M/rtUYgusNz7B63PRuzG8zP8n8k8LMJaa3kMjHJRwubUoT5xVfNyz9k6ne?=
+ =?us-ascii?Q?jwghGQLWl9EOvAEu2Sh8rQv2sAHxklz/jnU8Ggfpvqk+Re3sDqactLfXrq3V?=
+ =?us-ascii?Q?fxT3wTwMXOtrgpctw5xUlMAVnGS9N8wv6f3cb6JiCcEOcfr0lFFU6OAib/FG?=
+ =?us-ascii?Q?NLXst6zvEfohF9zu9DTXs3Kv/hYlMYcx6goeusXlHHeuiuCpQHZT1+DRKZmD?=
+ =?us-ascii?Q?TAjPUMZu3FDZ0K/sRJcr4boX974+NELB1TqUOzTEpVgRc4Jz873j4eV4qpIO?=
+ =?us-ascii?Q?ZnkS7af5LZJHTXkqHqjFavvl8yVwYGxYyCGTSYPzw5ZUTfDHQFDuIpFpWWD4?=
+ =?us-ascii?Q?jVHPfj+ZNN4bTA1DYmq01pzhuxRVjVdTmTULF6GpwOs3LHE6nzEpADlznEyr?=
+ =?us-ascii?Q?wN9VdL0xSrowNMVFZ2b+0h2XfobuGmUKrNwXtknnYMguT513gUALSQ4uQ/Ob?=
+ =?us-ascii?Q?TK8SsoM8kVtMR9p9oll33+u6ZfYFImutLR+UalNS0TXj2/uDfUEnd+Sv51aR?=
+ =?us-ascii?Q?cyvaY3QqqB4k9jaa5+42eIpG?=
 X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5ec840db-ec47-494e-09df-08d981abac7a
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2de0d84c-0166-4739-4d6d-08d981abaee8
 X-MS-Exchange-CrossTenant-AuthSource: CO6PR04MB7812.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Sep 2021 11:40:58.3940
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Sep 2021 11:41:02.7379
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: b61c8803-16f3-4c35-9b17-6f65f441df86
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 54wA3iu48KJHyw8PHItmLIJi9U8zAkL0cNHT3G8peS3AnK3I9qEz4uL8XMW+FbHkpqQbFpLPq4h36FQpEmxSsQ==
+X-MS-Exchange-CrossTenant-UserPrincipalName: ZFS9Vo6CFKSXR+jCdgjbg2gZc+DDRwX2/K5txkUaedydw9uNdDD9auLIuPRGsfuic05JcrkP4ge0gL5IKQgtlg==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO6PR04MB7841
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch implements VCPU create, init and destroy functions
-required by generic KVM module. We don't have much dynamic
-resources in struct kvm_vcpu_arch so these functions are quite
-simple for KVM RISC-V.
+This patch implements VCPU interrupts and requests which are both
+asynchronous events.
+
+The VCPU interrupts can be set/unset using KVM_INTERRUPT ioctl from
+user-space. In future, the in-kernel IRQCHIP emulation will use
+kvm_riscv_vcpu_set_interrupt() and kvm_riscv_vcpu_unset_interrupt()
+functions to set/unset VCPU interrupts.
+
+Important VCPU requests implemented by this patch are:
+KVM_REQ_SLEEP       - set whenever VCPU itself goes to sleep state
+KVM_REQ_VCPU_RESET  - set whenever VCPU reset is requested
+
+The WFI trap-n-emulate (added later) will use KVM_REQ_SLEEP request
+and kvm_riscv_vcpu_has_interrupt() function.
+
+The KVM_REQ_VCPU_RESET request will be used by SBI emulation (added
+later) to power-up a VCPU in power-off state. The user-space can use
+the GET_MPSTATE/SET_MPSTATE ioctls to get/set power state of a VCPU.
 
 Signed-off-by: Anup Patel <anup.patel@wdc.com>
 Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 Reviewed-by: Alexander Graf <graf@amazon.com>
 ---
- arch/riscv/include/asm/kvm_host.h | 69 +++++++++++++++++++++++++++++++
- arch/riscv/kvm/vcpu.c             | 55 ++++++++++++++++++++----
- 2 files changed, 115 insertions(+), 9 deletions(-)
+ arch/riscv/include/asm/kvm_host.h |  23 ++++
+ arch/riscv/include/uapi/asm/kvm.h |   3 +
+ arch/riscv/kvm/vcpu.c             | 184 +++++++++++++++++++++++++++---
+ 3 files changed, 197 insertions(+), 13 deletions(-)
 
 diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
-index 08a8f53bf814..0db663cf74e4 100644
+index 0db663cf74e4..e307528bbdbf 100644
 --- a/arch/riscv/include/asm/kvm_host.h
 +++ b/arch/riscv/include/asm/kvm_host.h
-@@ -57,7 +57,76 @@ struct kvm_cpu_trap {
- 	unsigned long htinst;
- };
+@@ -127,6 +127,21 @@ struct kvm_vcpu_arch {
+ 	/* CPU CSR context upon Guest VCPU reset */
+ 	struct kvm_vcpu_csr guest_reset_csr;
  
-+struct kvm_cpu_context {
-+	unsigned long zero;
-+	unsigned long ra;
-+	unsigned long sp;
-+	unsigned long gp;
-+	unsigned long tp;
-+	unsigned long t0;
-+	unsigned long t1;
-+	unsigned long t2;
-+	unsigned long s0;
-+	unsigned long s1;
-+	unsigned long a0;
-+	unsigned long a1;
-+	unsigned long a2;
-+	unsigned long a3;
-+	unsigned long a4;
-+	unsigned long a5;
-+	unsigned long a6;
-+	unsigned long a7;
-+	unsigned long s2;
-+	unsigned long s3;
-+	unsigned long s4;
-+	unsigned long s5;
-+	unsigned long s6;
-+	unsigned long s7;
-+	unsigned long s8;
-+	unsigned long s9;
-+	unsigned long s10;
-+	unsigned long s11;
-+	unsigned long t3;
-+	unsigned long t4;
-+	unsigned long t5;
-+	unsigned long t6;
-+	unsigned long sepc;
-+	unsigned long sstatus;
-+	unsigned long hstatus;
-+};
++	/*
++	 * VCPU interrupts
++	 *
++	 * We have a lockless approach for tracking pending VCPU interrupts
++	 * implemented using atomic bitops. The irqs_pending bitmap represent
++	 * pending interrupts whereas irqs_pending_mask represent bits changed
++	 * in irqs_pending. Our approach is modeled around multiple producer
++	 * and single consumer problem where the consumer is the VCPU itself.
++	 */
++	unsigned long irqs_pending;
++	unsigned long irqs_pending_mask;
 +
-+struct kvm_vcpu_csr {
-+	unsigned long vsstatus;
-+	unsigned long vsie;
-+	unsigned long vstvec;
-+	unsigned long vsscratch;
-+	unsigned long vsepc;
-+	unsigned long vscause;
-+	unsigned long vstval;
-+	unsigned long hvip;
-+	unsigned long vsatp;
-+	unsigned long scounteren;
-+};
-+
- struct kvm_vcpu_arch {
-+	/* VCPU ran at least once */
-+	bool ran_atleast_once;
-+
-+	/* ISA feature bits (similar to MISA) */
-+	unsigned long isa;
-+
-+	/* CPU context of Guest VCPU */
-+	struct kvm_cpu_context guest_context;
-+
-+	/* CPU CSR context of Guest VCPU */
-+	struct kvm_vcpu_csr guest_csr;
-+
-+	/* CPU context upon Guest VCPU reset */
-+	struct kvm_cpu_context guest_reset_context;
-+
-+	/* CPU CSR context upon Guest VCPU reset */
-+	struct kvm_vcpu_csr guest_reset_csr;
++	/* VCPU power-off state */
++	bool power_off;
 +
  	/* Don't run the VCPU (blocked) */
  	bool pause;
  
+@@ -150,4 +165,12 @@ int kvm_riscv_vcpu_exit(struct kvm_vcpu *vcpu, struct kvm_run *run,
+ 
+ static inline void __kvm_riscv_switch_to(struct kvm_vcpu_arch *vcpu_arch) {}
+ 
++int kvm_riscv_vcpu_set_interrupt(struct kvm_vcpu *vcpu, unsigned int irq);
++int kvm_riscv_vcpu_unset_interrupt(struct kvm_vcpu *vcpu, unsigned int irq);
++void kvm_riscv_vcpu_flush_interrupts(struct kvm_vcpu *vcpu);
++void kvm_riscv_vcpu_sync_interrupts(struct kvm_vcpu *vcpu);
++bool kvm_riscv_vcpu_has_interrupts(struct kvm_vcpu *vcpu, unsigned long mask);
++void kvm_riscv_vcpu_power_off(struct kvm_vcpu *vcpu);
++void kvm_riscv_vcpu_power_on(struct kvm_vcpu *vcpu);
++
+ #endif /* __RISCV_KVM_HOST_H__ */
+diff --git a/arch/riscv/include/uapi/asm/kvm.h b/arch/riscv/include/uapi/asm/kvm.h
+index 984d041a3e3b..3d3d703713c6 100644
+--- a/arch/riscv/include/uapi/asm/kvm.h
++++ b/arch/riscv/include/uapi/asm/kvm.h
+@@ -18,6 +18,9 @@
+ 
+ #define KVM_COALESCED_MMIO_PAGE_OFFSET 1
+ 
++#define KVM_INTERRUPT_SET	-1U
++#define KVM_INTERRUPT_UNSET	-2U
++
+ /* for KVM_GET_REGS and KVM_SET_REGS */
+ struct kvm_regs {
+ };
 diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-index 810b7ef30c0b..7b45aa23fba3 100644
+index 7b45aa23fba3..3342c7305265 100644
 --- a/arch/riscv/kvm/vcpu.c
 +++ b/arch/riscv/kvm/vcpu.c
-@@ -38,6 +38,27 @@ const struct kvm_stats_header kvm_vcpu_stats_header = {
- 		       sizeof(kvm_vcpu_stats_desc),
- };
+@@ -11,6 +11,7 @@
+ #include <linux/err.h>
+ #include <linux/kdebug.h>
+ #include <linux/module.h>
++#include <linux/percpu.h>
+ #include <linux/uaccess.h>
+ #include <linux/vmalloc.h>
+ #include <linux/sched/signal.h>
+@@ -57,6 +58,9 @@ static void kvm_riscv_reset_vcpu(struct kvm_vcpu *vcpu)
+ 	memcpy(csr, reset_csr, sizeof(*csr));
  
-+#define KVM_RISCV_ISA_ALLOWED	(riscv_isa_extension_mask(a) | \
-+				 riscv_isa_extension_mask(c) | \
-+				 riscv_isa_extension_mask(d) | \
-+				 riscv_isa_extension_mask(f) | \
-+				 riscv_isa_extension_mask(i) | \
-+				 riscv_isa_extension_mask(m) | \
-+				 riscv_isa_extension_mask(s) | \
-+				 riscv_isa_extension_mask(u))
+ 	memcpy(cntx, reset_cntx, sizeof(*cntx));
 +
-+static void kvm_riscv_reset_vcpu(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm_vcpu_csr *csr = &vcpu->arch.guest_csr;
-+	struct kvm_vcpu_csr *reset_csr = &vcpu->arch.guest_reset_csr;
-+	struct kvm_cpu_context *cntx = &vcpu->arch.guest_context;
-+	struct kvm_cpu_context *reset_cntx = &vcpu->arch.guest_reset_context;
-+
-+	memcpy(csr, reset_csr, sizeof(*csr));
-+
-+	memcpy(cntx, reset_cntx, sizeof(*cntx));
-+}
-+
++	WRITE_ONCE(vcpu->arch.irqs_pending, 0);
++	WRITE_ONCE(vcpu->arch.irqs_pending_mask, 0);
+ }
+ 
  int kvm_arch_vcpu_precreate(struct kvm *kvm, unsigned int id)
- {
- 	return 0;
-@@ -45,7 +66,25 @@ int kvm_arch_vcpu_precreate(struct kvm *kvm, unsigned int id)
- 
- int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
- {
--	/* TODO: */
-+	struct kvm_cpu_context *cntx;
-+
-+	/* Mark this VCPU never ran */
-+	vcpu->arch.ran_atleast_once = false;
-+
-+	/* Setup ISA features available to VCPU */
-+	vcpu->arch.isa = riscv_isa_extension_base(NULL) & KVM_RISCV_ISA_ALLOWED;
-+
-+	/* Setup reset state of shadow SSTATUS and HSTATUS CSRs */
-+	cntx = &vcpu->arch.guest_reset_context;
-+	cntx->sstatus = SR_SPP | SR_SPIE;
-+	cntx->hstatus = 0;
-+	cntx->hstatus |= HSTATUS_VTW;
-+	cntx->hstatus |= HSTATUS_SPVP;
-+	cntx->hstatus |= HSTATUS_SPV;
-+
-+	/* Reset VCPU */
-+	kvm_riscv_reset_vcpu(vcpu);
-+
- 	return 0;
- }
- 
-@@ -53,15 +92,10 @@ void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu)
- {
- }
- 
--int kvm_arch_vcpu_init(struct kvm_vcpu *vcpu)
--{
--	/* TODO: */
--	return 0;
--}
--
- void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
- {
--	/* TODO: */
-+	/* Flush the pages pre-allocated for Stage2 page table mappings */
-+	kvm_riscv_stage2_flush_cache(vcpu);
- }
+@@ -100,8 +104,7 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
  
  int kvm_cpu_has_pending_timer(struct kvm_vcpu *vcpu)
-@@ -197,6 +231,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
- 	struct kvm_cpu_trap trap;
- 	struct kvm_run *run = vcpu->run;
+ {
+-	/* TODO: */
+-	return 0;
++	return kvm_riscv_vcpu_has_interrupts(vcpu, 1UL << IRQ_VS_TIMER);
+ }
  
-+	/* Mark this VCPU ran at least once */
-+	vcpu->arch.ran_atleast_once = true;
+ void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu)
+@@ -114,20 +117,18 @@ void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu)
+ 
+ int kvm_arch_vcpu_runnable(struct kvm_vcpu *vcpu)
+ {
+-	/* TODO: */
+-	return 0;
++	return (kvm_riscv_vcpu_has_interrupts(vcpu, -1UL) &&
++		!vcpu->arch.power_off && !vcpu->arch.pause);
+ }
+ 
+ int kvm_arch_vcpu_should_kick(struct kvm_vcpu *vcpu)
+ {
+-	/* TODO: */
+-	return 0;
++	return kvm_vcpu_exiting_guest_mode(vcpu) == IN_GUEST_MODE;
+ }
+ 
+ bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu)
+ {
+-	/* TODO: */
+-	return false;
++	return (vcpu->arch.guest_context.sstatus & SR_SPP) ? true : false;
+ }
+ 
+ vm_fault_t kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
+@@ -138,7 +139,21 @@ vm_fault_t kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
+ long kvm_arch_vcpu_async_ioctl(struct file *filp,
+ 			       unsigned int ioctl, unsigned long arg)
+ {
+-	/* TODO; */
++	struct kvm_vcpu *vcpu = filp->private_data;
++	void __user *argp = (void __user *)arg;
 +
- 	vcpu->arch.srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
++	if (ioctl == KVM_INTERRUPT) {
++		struct kvm_interrupt irq;
++
++		if (copy_from_user(&irq, argp, sizeof(irq)))
++			return -EFAULT;
++
++		if (irq.irq == KVM_INTERRUPT_SET)
++			return kvm_riscv_vcpu_set_interrupt(vcpu, IRQ_VS_EXT);
++		else
++			return kvm_riscv_vcpu_unset_interrupt(vcpu, IRQ_VS_EXT);
++	}
++
+ 	return -ENOIOCTLCMD;
+ }
  
- 	/* Process MMIO value returned from user-space */
-@@ -270,7 +307,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
- 		 * get an interrupt between __kvm_riscv_switch_to() and
- 		 * local_irq_enable() which can potentially change CSRs.
- 		 */
--		trap.sepc = 0;
-+		trap.sepc = vcpu->arch.guest_context.sepc;
- 		trap.scause = csr_read(CSR_SCAUSE);
- 		trap.stval = csr_read(CSR_STVAL);
+@@ -187,18 +202,123 @@ int kvm_arch_vcpu_ioctl_set_regs(struct kvm_vcpu *vcpu, struct kvm_regs *regs)
+ 	return -EINVAL;
+ }
+ 
++void kvm_riscv_vcpu_flush_interrupts(struct kvm_vcpu *vcpu)
++{
++	struct kvm_vcpu_csr *csr = &vcpu->arch.guest_csr;
++	unsigned long mask, val;
++
++	if (READ_ONCE(vcpu->arch.irqs_pending_mask)) {
++		mask = xchg_acquire(&vcpu->arch.irqs_pending_mask, 0);
++		val = READ_ONCE(vcpu->arch.irqs_pending) & mask;
++
++		csr->hvip &= ~mask;
++		csr->hvip |= val;
++	}
++}
++
++void kvm_riscv_vcpu_sync_interrupts(struct kvm_vcpu *vcpu)
++{
++	unsigned long hvip;
++	struct kvm_vcpu_arch *v = &vcpu->arch;
++	struct kvm_vcpu_csr *csr = &vcpu->arch.guest_csr;
++
++	/* Read current HVIP and VSIE CSRs */
++	csr->vsie = csr_read(CSR_VSIE);
++
++	/* Sync-up HVIP.VSSIP bit changes does by Guest */
++	hvip = csr_read(CSR_HVIP);
++	if ((csr->hvip ^ hvip) & (1UL << IRQ_VS_SOFT)) {
++		if (hvip & (1UL << IRQ_VS_SOFT)) {
++			if (!test_and_set_bit(IRQ_VS_SOFT,
++					      &v->irqs_pending_mask))
++				set_bit(IRQ_VS_SOFT, &v->irqs_pending);
++		} else {
++			if (!test_and_set_bit(IRQ_VS_SOFT,
++					      &v->irqs_pending_mask))
++				clear_bit(IRQ_VS_SOFT, &v->irqs_pending);
++		}
++	}
++}
++
++int kvm_riscv_vcpu_set_interrupt(struct kvm_vcpu *vcpu, unsigned int irq)
++{
++	if (irq != IRQ_VS_SOFT &&
++	    irq != IRQ_VS_TIMER &&
++	    irq != IRQ_VS_EXT)
++		return -EINVAL;
++
++	set_bit(irq, &vcpu->arch.irqs_pending);
++	smp_mb__before_atomic();
++	set_bit(irq, &vcpu->arch.irqs_pending_mask);
++
++	kvm_vcpu_kick(vcpu);
++
++	return 0;
++}
++
++int kvm_riscv_vcpu_unset_interrupt(struct kvm_vcpu *vcpu, unsigned int irq)
++{
++	if (irq != IRQ_VS_SOFT &&
++	    irq != IRQ_VS_TIMER &&
++	    irq != IRQ_VS_EXT)
++		return -EINVAL;
++
++	clear_bit(irq, &vcpu->arch.irqs_pending);
++	smp_mb__before_atomic();
++	set_bit(irq, &vcpu->arch.irqs_pending_mask);
++
++	return 0;
++}
++
++bool kvm_riscv_vcpu_has_interrupts(struct kvm_vcpu *vcpu, unsigned long mask)
++{
++	unsigned long ie = ((vcpu->arch.guest_csr.vsie & VSIP_VALID_MASK)
++			    << VSIP_TO_HVIP_SHIFT) & mask;
++
++	return (READ_ONCE(vcpu->arch.irqs_pending) & ie) ? true : false;
++}
++
++void kvm_riscv_vcpu_power_off(struct kvm_vcpu *vcpu)
++{
++	vcpu->arch.power_off = true;
++	kvm_make_request(KVM_REQ_SLEEP, vcpu);
++	kvm_vcpu_kick(vcpu);
++}
++
++void kvm_riscv_vcpu_power_on(struct kvm_vcpu *vcpu)
++{
++	vcpu->arch.power_off = false;
++	kvm_vcpu_wake_up(vcpu);
++}
++
+ int kvm_arch_vcpu_ioctl_get_mpstate(struct kvm_vcpu *vcpu,
+ 				    struct kvm_mp_state *mp_state)
+ {
+-	/* TODO: */
++	if (vcpu->arch.power_off)
++		mp_state->mp_state = KVM_MP_STATE_STOPPED;
++	else
++		mp_state->mp_state = KVM_MP_STATE_RUNNABLE;
++
+ 	return 0;
+ }
+ 
+ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
+ 				    struct kvm_mp_state *mp_state)
+ {
+-	/* TODO: */
+-	return 0;
++	int ret = 0;
++
++	switch (mp_state->mp_state) {
++	case KVM_MP_STATE_RUNNABLE:
++		vcpu->arch.power_off = false;
++		break;
++	case KVM_MP_STATE_STOPPED:
++		kvm_riscv_vcpu_power_off(vcpu);
++		break;
++	default:
++		ret = -EINVAL;
++	}
++
++	return ret;
+ }
+ 
+ int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
+@@ -222,7 +342,33 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+ 
+ static void kvm_riscv_check_vcpu_requests(struct kvm_vcpu *vcpu)
+ {
+-	/* TODO: */
++	struct rcuwait *wait = kvm_arch_vcpu_get_wait(vcpu);
++
++	if (kvm_request_pending(vcpu)) {
++		if (kvm_check_request(KVM_REQ_SLEEP, vcpu)) {
++			rcuwait_wait_event(wait,
++				(!vcpu->arch.power_off) && (!vcpu->arch.pause),
++				TASK_INTERRUPTIBLE);
++
++			if (vcpu->arch.power_off || vcpu->arch.pause) {
++				/*
++				 * Awaken to handle a signal, request to
++				 * sleep again later.
++				 */
++				kvm_make_request(KVM_REQ_SLEEP, vcpu);
++			}
++		}
++
++		if (kvm_check_request(KVM_REQ_VCPU_RESET, vcpu))
++			kvm_riscv_reset_vcpu(vcpu);
++	}
++}
++
++static void kvm_riscv_update_hvip(struct kvm_vcpu *vcpu)
++{
++	struct kvm_vcpu_csr *csr = &vcpu->arch.guest_csr;
++
++	csr_write(CSR_HVIP, csr->hvip);
+ }
+ 
+ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+@@ -286,6 +432,15 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+ 		srcu_read_unlock(&vcpu->kvm->srcu, vcpu->arch.srcu_idx);
+ 		smp_mb__after_srcu_read_unlock();
+ 
++		/*
++		 * We might have got VCPU interrupts updated asynchronously
++		 * so update it in HW.
++		 */
++		kvm_riscv_vcpu_flush_interrupts(vcpu);
++
++		/* Update HVIP CSR for current CPU */
++		kvm_riscv_update_hvip(vcpu);
++
+ 		if (ret <= 0 ||
+ 		    kvm_request_pending(vcpu)) {
+ 			vcpu->mode = OUTSIDE_GUEST_MODE;
+@@ -313,6 +468,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
  		trap.htval = csr_read(CSR_HTVAL);
+ 		trap.htinst = csr_read(CSR_HTINST);
+ 
++		/* Syncup interrupts state with HW */
++		kvm_riscv_vcpu_sync_interrupts(vcpu);
++
+ 		/*
+ 		 * We may have taken a host interrupt in VS/VU-mode (i.e.
+ 		 * while executing the guest). This interrupt is still
 -- 
 2.25.1
 
