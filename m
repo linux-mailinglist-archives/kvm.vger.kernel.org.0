@@ -2,168 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1DC6C41944B
-	for <lists+kvm@lfdr.de>; Mon, 27 Sep 2021 14:32:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 469984194A6
+	for <lists+kvm@lfdr.de>; Mon, 27 Sep 2021 14:54:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234262AbhI0Mef (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Sep 2021 08:34:35 -0400
-Received: from mail-bn7nam10on2043.outbound.protection.outlook.com ([40.107.92.43]:51552
-        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S234239AbhI0Mee (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Sep 2021 08:34:34 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Sw/EJf6u79Y3NZkFEko7XC0cejMqOhV1rUtXOLLXQnvsXvJtZNdjaTOOtooCOOlH6p4OAFEQrdVA/WsaCD/q05foh0kLth4y1EXQsF1s506YHV8SuI5N+evhBVtXhjJ/GG6lK6gH99B64NXdwf6KwTM41xH8n0wpymah6BG7WH6xgXAavPVw+JY0nuLcQfTHSHCbBBaFzwEK2duA2rMLy0sYZO4YBPRGrnld79lrqr5aXlHjr3TwlVVcIhVZTMQDczF7LHrO3rjakAO0clNqSKcufP+EuUJsE9c1VnmihyMyAFe0ZPRsy61L2xI+VHlHyxAObbOXX8qBJ4h+H9TvFA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
- bh=VPuYeARoLAGaWd4B+MYD+Kvz4eTB/ENysfGucY3TCD4=;
- b=T91cYUKB9KqRWYib6TxzWcpb772d4X2/Glyt3MYG/aSiD55Zq47Z3DQuRnpIcMcWRvIA3uCNc4FQ45B2aFxWQoxZNYhGO87D+xq6AFP4Fha54nQql7chF4+vtj+7h+GusKGyIXkL9HvxUkMozwGynOnzCS+ywecpCtcJMQ6WOAxQbTVKzu/ZOfzthZdH1lOSG5IymbAK1ztClibk6+RVn5pWPOyx5t2+7AbMxRvzxN9aebdRmLHOtnQBT71FzaeHzO8aIYe39wwHtvzfIhH0dr/LuGGRRgTOOkxtI0y4FGREWCoEIFFdba5kX3Zuvn9ttj3vZR8NxtTnUjYNXKG6Pw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=VPuYeARoLAGaWd4B+MYD+Kvz4eTB/ENysfGucY3TCD4=;
- b=BkClbsX0vEsW3fkr3jKCcR8QtDTrEgp3aRlX0S3q63HusQQ6nM2KpERgH7DTseKW5plR0weVhA2LwK2JoxMVK2wm0hp8GikPvVFVelm5wPb+cvX9sEI3PoTnxaVUgUo6OgyAvdJJZNevcxwNDoQE/g7U8f7aCeqX42yqOsTbgtm4reKkxEy6ejsgqtC/xG+yvjXhiQosaCpC9kWXCO2ZlwYrFn9DViLJ2OlioEGWItcddnRyRS95uqu5kV9zXVNh92YZkpJ5lb89e8UDW7LKG32ZWS+68K4JP0LtJAK0CtpQtKQ2dl8y9KJW2AltP5RLiJcYaN3b9qcHlBaUhV3q0w==
-Authentication-Results: linux.ibm.com; dkim=none (message not signed)
- header.d=none;linux.ibm.com; dmarc=none action=none header.from=nvidia.com;
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
- by BL1PR12MB5361.namprd12.prod.outlook.com (2603:10b6:208:31f::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4544.14; Mon, 27 Sep
- 2021 12:32:55 +0000
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::e8af:232:915e:2f95]) by BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::e8af:232:915e:2f95%8]) with mapi id 15.20.4544.021; Mon, 27 Sep 2021
- 12:32:55 +0000
-Date:   Mon, 27 Sep 2021 09:32:53 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Eric Farman <farman@linux.ibm.com>
-Cc:     David Airlie <airlied@linux.ie>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        dri-devel@lists.freedesktop.org,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        intel-gfx@lists.freedesktop.org,
-        intel-gvt-dev@lists.freedesktop.org,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
-        linux-s390@vger.kernel.org,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>, Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH v2 7/9] vfio/ccw: Remove private->mdev
-Message-ID: <20210927123253.GY964074@nvidia.com>
-References: <7-v2-7d3a384024cf+2060-ccw_mdev_jgg@nvidia.com>
- <f887a563e688057d6759e6de65d480326f502331.camel@linux.ibm.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f887a563e688057d6759e6de65d480326f502331.camel@linux.ibm.com>
-X-ClientProxiedBy: MN2PR11CA0003.namprd11.prod.outlook.com
- (2603:10b6:208:23b::8) To BL0PR12MB5506.namprd12.prod.outlook.com
- (2603:10b6:208:1cb::22)
+        id S234431AbhI0Mzw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Sep 2021 08:55:52 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:26909 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234398AbhI0Mzv (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 27 Sep 2021 08:55:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1632747253;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=vqmCLZUE/RvdZRryhurm8ZYGJCB6f4ZHjcfNNE4aW4s=;
+        b=PODrkc9JYKOdWTwOBmSdo36BCDjrhdMqFxZ5pNXzZUOLF77M0BMSVk+mWHEV/sJu5eUVuK
+        2R5+BbQ0e6jq15fdYM31pyztzC7yy91B+2PWwr+BgMLerjWEYhnKZIJCYgg7gRrkN8crmz
+        5fKJ4kR73rEMxbG9Bfa02P8XX4DdUgk=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-194-HDqzCk6DPxaYsFsVzTa2hw-1; Mon, 27 Sep 2021 08:54:12 -0400
+X-MC-Unique: HDqzCk6DPxaYsFsVzTa2hw-1
+Received: by mail-ed1-f69.google.com with SMTP id ec14-20020a0564020d4e00b003cf5630c190so17802384edb.3
+        for <kvm@vger.kernel.org>; Mon, 27 Sep 2021 05:54:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=vqmCLZUE/RvdZRryhurm8ZYGJCB6f4ZHjcfNNE4aW4s=;
+        b=pB16SmwXvnZvaFPuqrK43pMZx4+YQSyoTVuRsWUQH7OUnMe58lYB2f77GyCAbERheX
+         6AmulfdcHzFllMHYV+SRmaA+p5q+1pQG6FIykj29LmCFzu+5E4NhigQ4uWw2KPLtmC8T
+         pkSOV+HstAwax9EpNUxBkw5hlso6tQ3POkwASkGhERLePIbcANL7RRRpX1Dac5+2tVAR
+         +iNs3wgsM3aVWe8ShugeWX+n7tEd+XNNBtjpd/jfwWnA//HSSTecsheyKYAVH7Z015nE
+         hazg/S/hJgosRPaARkys8gJSh+zE93oXiTYWT2JJiF4Ledhg4v1qCcgrLyPZzKdgJuJp
+         6w6Q==
+X-Gm-Message-State: AOAM532KBA+JYsZ+0Q/tmHsC7xlM3iUdymoJUhC4nyLQHXnde1UVZn33
+        dErLcjQCwt+RrnaUX71cP6Wh6eH7nU5A/JCntF6GZgAy5IR2kTIeyX6UwhBSC5V/yIdXteqg1c4
+        lndu9uKjAZbso
+X-Received: by 2002:a05:6402:336:: with SMTP id q22mr23230097edw.53.1632747251021;
+        Mon, 27 Sep 2021 05:54:11 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwh2KYg0dnn8JVSWbgyFbmkyYWSZ1VqCAk6GrPkabmD/MjIijY41QSlBI2wv4H6jHN8FyRGNw==
+X-Received: by 2002:a05:6402:336:: with SMTP id q22mr23230070edw.53.1632747250829;
+        Mon, 27 Sep 2021 05:54:10 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id j6sm8611436ejk.114.2021.09.27.05.54.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 27 Sep 2021 05:54:10 -0700 (PDT)
+Message-ID: <afc34b38-5596-3571-63e5-55fe82e87f6c@redhat.com>
+Date:   Mon, 27 Sep 2021 14:54:08 +0200
 MIME-Version: 1.0
-Received: from mlx.ziepe.ca (142.162.113.129) by MN2PR11CA0003.namprd11.prod.outlook.com (2603:10b6:208:23b::8) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4544.13 via Frontend Transport; Mon, 27 Sep 2021 12:32:55 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1mUpoU-006JoX-0b; Mon, 27 Sep 2021 09:32:54 -0300
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 2b6b6dde-8c8a-4eef-b973-08d981b2ee35
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5361:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <BL1PR12MB53614B30E68D92FBF33E4CE5C2A79@BL1PR12MB5361.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: +KGy/ruVUqPkAAZpRe/xrxVhchw6SNIgpS2N/GImST8+2+mG0OY5HxFSwiZ9C8U4bDj7P8Di6Vz6UW0e454NMujv/L6bRyKC8TO0t35b02ttzaVVL5vi1cIrKzt1jk/10KdowjqoPpfkq1ee2YjBOTUOvB8dCO1SwXGyUtG0texd2S+Rsn0Ab2NPyPHbhlG28MygIGS/tj4GAq3bcOgkuvow/97K35JrbMtHE3jNowFUyPimfJndtLjGU6ZP0AzRdQaCePraOQZvk7886emgPvubXbOitBypWasu4FpJWQP8UCU65f9A/dxQlLsB5s3PuduZ6pYP1O3uMhJlCPr0gG2qDGBKDxlvsD0GENjDLblh14r3aMgHPWAUCs0MbRSvvkUPhfewTPzVeN8mjWj+3kPNm7WWLYmEjvk0TBB7F4ObHrGlPa/HakMCq+mEQBYo0vbP+onvOVRPRkazyThevRcq7PIwbNYy/3MlTzBmzELVDHon5nFFFcVjaWWh4o3f/HnpvPbg3dEXUEfviPJv5WumgwQDQiUp86KToYAnmsrGjweOI+1Mh42ugd+vRhxJGcWx/KswLERK2T9xyHdEmO8UiW/Src42cebIWeXjvi498T6v2cyJdisIwmRqekPT/aQ5hTJWh28TGCcxZz9eSgDL/9E/2Vvowjxilhe8PShlzmdXVl0ixLGvtnalTwtv
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(5660300002)(186003)(36756003)(316002)(66946007)(38100700002)(508600001)(6916009)(1076003)(86362001)(54906003)(26005)(83380400001)(7416002)(4326008)(426003)(8936002)(8676002)(66556008)(66476007)(9746002)(9786002)(2616005)(2906002)(33656002)(27376004);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?xQBg7oaA/nsKBs7gEs9o5HnJTNwGmm/BinACDNN6SRiL/soxyzD6fnuTyDlj?=
- =?us-ascii?Q?9dS+7mfH8oc8ySu2a61x7H5/1/eMBmzGn7ZQpjWMiv5KZJKeEbp5YslF3lRO?=
- =?us-ascii?Q?DYJB3Z/TGMTXL5CbmVb73a/+szVKQZuOi9a2uTLMNx8LQeeXdgHDkBSGylhr?=
- =?us-ascii?Q?BHzG1cRTmR7A6qd6e9eYdyocBhSUW6j52WbTE3IJJixd48ZqMKBQAtPwuBFt?=
- =?us-ascii?Q?uigGuMCAq0jpaM0tTmjeEUtVbUDPRcr/zehKeFqxGraToqfEysIaLMQ+Dr4W?=
- =?us-ascii?Q?7j/ZnSjZC8r0OjaMCo25Ao200FBf79mpUMuPzFLXaTWP1Zg0rKNZ0jXe/CMD?=
- =?us-ascii?Q?YX2nJybakCjNXfRkaSVMrl4cyorU7vQYnOQOwC+lqBffhdphd187VjUVzqNm?=
- =?us-ascii?Q?bgEoOFI/5imb9rwXDI/G4bVYY52xyAFr1QvJ2xSm+tv2UHMS/mzRd6Xs1tiA?=
- =?us-ascii?Q?W2DNl6rVN2BAVxLrFAOQ/hAZfehVflZovFDaV1vyEM6buETcglCTXfG2pLWA?=
- =?us-ascii?Q?VLY2bE0akElQkZSDbwiz2Xmv3O6M336E9tTTPcRvOvgdwALcNPm71Bbno3a+?=
- =?us-ascii?Q?KbCvY7eUzrvB7cZsNlTKw5qmBbxxGeM0wCyrlSn8tktkAUy6R0I6CmP8Lx0G?=
- =?us-ascii?Q?1VvEE1QSsRvKlqP/pH61l7y9Jo3qDdO4lsR0C/lRPqcPYDXDpuBxFv9nmTqB?=
- =?us-ascii?Q?vEsEagVKMNguf69292xaOp7TrzxCQhZUZhSKnkVP6gFWSUUhatusV6w+UQEw?=
- =?us-ascii?Q?nDbLzjjgWAIwRl085hBVUrAWjppR5lHkdraJMdL8optzZnu97v5q3xYsiuam?=
- =?us-ascii?Q?LiIVyTQvBPkfqchfpmI29+BMvwiQe0MQjaB84HbIZhugfKBaJCyH1W/f6njR?=
- =?us-ascii?Q?vKip9Z/wxRubwGG5Mft6pFgtQUHVb3ZzWsBrQxn6+vtVysmTvC855WcrPLFF?=
- =?us-ascii?Q?MZzHwNbuJbDd5o9oez93Wy50kQdRG2pe61TaLIKNqalPwRQctKDJQGRmndeY?=
- =?us-ascii?Q?O84X92Vwhtfbi8WY2wjmTdqkkR7VIR+aezfsoXACNpRltfRUvnJlu26aw71/?=
- =?us-ascii?Q?60x4DqsolAkCvr8HenFhkvkroOvYSFSIYbhlQMOoPap44CbhBPIDkGBmbeaO?=
- =?us-ascii?Q?ku3iXOl9AkmJ+YGMWcx+ZMgHihvSzmMt4RzTQ5ov2/w27Ogqhx854NnfYxOA?=
- =?us-ascii?Q?YPPFnuW29fgJaBXGCvrlrClUdtlErO9KUbxH0ODLtioOBks8wxMggreFpYEU?=
- =?us-ascii?Q?Hwx+ov0hJuovAg5lw/D3zLxvleQ+I3f8vo0MRkjAxOoIcrxAQJQHR+uwo/0R?=
- =?us-ascii?Q?ne0DyyCSWcgmVwp18eepiiaG?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2b6b6dde-8c8a-4eef-b973-08d981b2ee35
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Sep 2021 12:32:55.3521
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: LEeJX/HROIopexUY6vjR/7c6DnFMfI3fGNwjxjVO6pw5IG1+KnwHnKXmm05A78dJ
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5361
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [PATCH] KVM: x86: Expose Predictive Store Forwarding Disable
+Content-Language: en-US
+To:     Borislav Petkov <bp@alien8.de>
+Cc:     Babu Moger <babu.moger@amd.com>, tglx@linutronix.de,
+        mingo@redhat.com, x86@kernel.org, hpa@zytor.com, seanjc@google.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, tony.luck@intel.com, peterz@infradead.org,
+        kyung.min.park@intel.com, wei.huang2@amd.com, jgross@suse.com,
+        andrew.cooper3@citrix.com, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+References: <163244601049.30292.5855870305350227855.stgit@bmoger-ubuntu>
+ <YVGkDPbQmdwSw6Ff@zn.tnic> <fcbbdf83-128a-2519-13e8-1c5d5735a0d2@redhat.com>
+ <YVGz0HXe+WNAXfdF@zn.tnic> <bcd40d94-2634-a40c-0173-64063051a4b2@redhat.com>
+ <YVG46L++WPBAHxQv@zn.tnic>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <YVG46L++WPBAHxQv@zn.tnic>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 24, 2021 at 04:45:02PM -0400, Eric Farman wrote:
-> On Thu, 2021-09-09 at 16:38 -0300, Jason Gunthorpe wrote:
-> > Having a mdev pointer floating about in addition to a struct
-> > vfio_device
-> > is confusing. It is only used for three things:
-> > 
-> > - Getting the mdev 'struct device *' - this is the same as
-> >      private->vdev.dev
-> > 
-> > - Printing the uuid of the mdev in logging. The uuid is also the
-> > dev_name
-> >   of the mdev so this is the same string as
-> >      dev_name(private->vdev.dev)
-> > 
-> > - A weird attempt to fence the vfio_ccw_sch_io_todo() work. This work
-> > is
-> >   only queued during states IDLE/PROCESSING/PENDING and flushed when
-> >   entering CLOSED. Thus the work already cannot run when the mdev is
-> > NULL.
-> >   Remove it.
-> > 
-> > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> >  drivers/s390/cio/vfio_ccw_drv.c     |  6 ++--
-> >  drivers/s390/cio/vfio_ccw_fsm.c     | 48 +++++++++++++------------
-> >  drivers/s390/cio/vfio_ccw_ops.c     | 16 ++++------
-> >  drivers/s390/cio/vfio_ccw_private.h |  2 --
-> >  include/linux/mdev.h                |  4 ---
-> >  5 files changed, 30 insertions(+), 46 deletions(-)
+On 27/09/21 14:28, Borislav Petkov wrote:
+> On Mon, Sep 27, 2021 at 02:14:52PM +0200, Paolo Bonzini wrote:
+>> Right, not which MSR to write but which value to write.  It doesn't know
+>> that the PSF disable bit is valid unless the corresponding CPUID bit is set.
 > 
-> I like this patch. Unfortunately it depends on the removal of a hunk in
-> patch 4, which sets the FSM state to different values based on whether
-> private->mdev is NULL or not, so can't go on its own. Need to spend
-> more time thinking about that patch.
+> There's no need for the separate PSF CPUID bit yet. We have decided for
+> now to not control PSF separately but disable it through SSB. Please
+> follow this thread:
 
-The FSM patch is important, really what is happening is the FSM logic
-takes on the roles that was being split all over the place with other
-logic, like this mdev stuff. To make that work we need a FSM that
-makes sense..
+There are other guests than Linux.  This patch is just telling userspace 
+that KVM knows what the PSFD bit is.  It is also possible to expose the 
+bit in KVM without having any #define in cpufeatures.h or without the 
+kernel using it.  For example KVM had been exposing FSGSBASE long before 
+Linux supported it.
 
-Jason
+That said, the patch is incomplete because it should also add the new 
+CPUID bit to guest_has_spec_ctrl_msr (what KVM *really* cares about is 
+not the individual bits, only whether SPEC_CTRL exists at all).
+
+Paolo
+
