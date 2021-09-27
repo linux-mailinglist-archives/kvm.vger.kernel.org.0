@@ -2,141 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8165E4197DF
-	for <lists+kvm@lfdr.de>; Mon, 27 Sep 2021 17:27:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B4F434197E2
+	for <lists+kvm@lfdr.de>; Mon, 27 Sep 2021 17:27:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235156AbhI0P2p (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Sep 2021 11:28:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:53544 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235117AbhI0P2o (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 27 Sep 2021 11:28:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632756426;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=L4NMWxT3cfbxRVFFnxXJnEGfN7af8pHyx3dvW9V5X/8=;
-        b=CVO93axk6jGKao0jiibQ2IoKWD1InQ2fNYM3AU3gI0bxj+awrsZ1Bf4fVSDcQK93eWNJgL
-        uoI93eWzsz1VTXCYQvYx2Z9NRTyu4NM+uPjUldDU+ayjKzQEpihaHz2cN/Ko44KYtbzVuX
-        bxmGzXGYIxQW/6l7T1e9TYcHIP6DGt4=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-190-h9cdnwg7NFedRsfU08Wyfw-1; Mon, 27 Sep 2021 11:27:00 -0400
-X-MC-Unique: h9cdnwg7NFedRsfU08Wyfw-1
-Received: by mail-wr1-f72.google.com with SMTP id r7-20020a5d6947000000b0015e0f68a63bso14233281wrw.22
-        for <kvm@vger.kernel.org>; Mon, 27 Sep 2021 08:27:00 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=L4NMWxT3cfbxRVFFnxXJnEGfN7af8pHyx3dvW9V5X/8=;
-        b=XX3axoLwLp7KMSogzqAI7Pa5dJOEIQm0m8U5SS7PWXUBco8kRZGxSfcyVOtfEszS1x
-         LFRVIXYK6WPyv1SWKWE9XT5UVOeb9KeLpxVsTDPV82h4G760B7rYMp7WoSq/7Pc+UUKY
-         i0i5mKeG/tnY7KbVLuxC0c+rjI4Ehr9xIYISOkBPBFN7L0Z8MY3HqLG4iNlxGbF3WquQ
-         EET9DVkvy+T5Hx7O0zyXe44jD9KRztbF8ur2WgU+AHzN8Nz1fpJNfjeLGc5EEe/mvBGU
-         ArZVUGM9Un8PI5PKOWd32mDODE5xux8raLA/kePYhfT+S4rj5HadSuUaXi3J9ncf6m7U
-         uNAw==
-X-Gm-Message-State: AOAM530o8BBZKHke+yH+iUDTx0Kl4GmMyyH8xd5x/JQRlW6vWdTkMr1O
-        GyfOUCl+RLCEvMAcTshlUVh/XJnlDWPeOru1RSGWiLbVPa+hrBRMg9RSoU9+NcXP8pbDANPX88t
-        IPR+kpxOqLLs4
-X-Received: by 2002:a05:600c:220e:: with SMTP id z14mr531314wml.84.1632756419167;
-        Mon, 27 Sep 2021 08:26:59 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJynSE4/E24J38JDzGwXrRxW5fcEgu/rr7EQCWyK0XK829+8JlB1tXqSvVH1kA6JoNxSkjvbdQ==
-X-Received: by 2002:a05:600c:220e:: with SMTP id z14mr531292wml.84.1632756419001;
-        Mon, 27 Sep 2021 08:26:59 -0700 (PDT)
-Received: from thuth.remote.csb (p549bb2bd.dip0.t-ipconnect.de. [84.155.178.189])
-        by smtp.gmail.com with ESMTPSA id c9sm15606090wmb.41.2021.09.27.08.26.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 27 Sep 2021 08:26:58 -0700 (PDT)
-Subject: Re: [kvm-unit-tests PATCH 3/9] s390x: uv-host: Fence a destroy cpu
- test on z15
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     david@redhat.com, linux-s390@vger.kernel.org, seiden@linux.ibm.com,
-        imbrenda@linux.ibm.com
-References: <20210922071811.1913-1-frankja@linux.ibm.com>
- <20210922071811.1913-4-frankja@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-Message-ID: <8035a911-4a76-50ed-cb07-edce48abdb9c@redhat.com>
-Date:   Mon, 27 Sep 2021 17:26:57 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
-MIME-Version: 1.0
-In-Reply-To: <20210922071811.1913-4-frankja@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+        id S235197AbhI0P2t convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Mon, 27 Sep 2021 11:28:49 -0400
+Received: from frasgout.his.huawei.com ([185.176.79.56]:3882 "EHLO
+        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235167AbhI0P2s (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Sep 2021 11:28:48 -0400
+Received: from fraeml701-chm.china.huawei.com (unknown [172.18.147.201])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4HJ5yZ1zygz67y04;
+        Mon, 27 Sep 2021 23:24:06 +0800 (CST)
+Received: from lhreml711-chm.china.huawei.com (10.201.108.62) by
+ fraeml701-chm.china.huawei.com (10.206.15.50) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2308.8; Mon, 27 Sep 2021 17:27:08 +0200
+Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
+ lhreml711-chm.china.huawei.com (10.201.108.62) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.8; Mon, 27 Sep 2021 16:27:07 +0100
+Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
+ lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
+ 15.01.2308.008; Mon, 27 Sep 2021 16:27:07 +0100
+From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        Leon Romanovsky <leonro@nvidia.com>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "mgurtovoy@nvidia.com" <mgurtovoy@nvidia.com>,
+        liulongfang <liulongfang@huawei.com>,
+        "Zengtao (B)" <prime.zeng@hisilicon.com>,
+        "Jonathan Cameron" <jonathan.cameron@huawei.com>,
+        "Wangzhou (B)" <wangzhou1@hisilicon.com>
+Subject: RE: [PATCH v3 6/6] hisi_acc_vfio_pci: Add support for VFIO live
+ migration
+Thread-Topic: [PATCH v3 6/6] hisi_acc_vfio_pci: Add support for VFIO live
+ migration
+Thread-Index: AQHXqhdQM13RiELH60aUjxjG41fnUKulAGMAgAAGK3CAAZpfgIARVJdwgAAGl4CAABbuYA==
+Date:   Mon, 27 Sep 2021 15:27:07 +0000
+Message-ID: <5570187c4a0a4da6969c0dba7aaaab5b@huawei.com>
+References: <20210915095037.1149-1-shameerali.kolothum.thodi@huawei.com>
+ <20210915095037.1149-7-shameerali.kolothum.thodi@huawei.com>
+ <20210915130742.GJ4065468@nvidia.com>
+ <fe5d6659e28244da82b7028b403e11ae@huawei.com>
+ <20210916135833.GB327412@nvidia.com>
+ <a440256250c14182b9eefc77d5d399b8@huawei.com>
+ <20210927150119.GB964074@nvidia.com>
+In-Reply-To: <20210927150119.GB964074@nvidia.com>
+Accept-Language: en-GB, en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.47.80.194]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+MIME-Version: 1.0
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 22/09/2021 09.18, Janosch Frank wrote:
-> Firmware will not give us the expected return code on z15 so let's
-> fence it for the z15 machine generation.
+
+
+> -----Original Message-----
+> From: Jason Gunthorpe [mailto:jgg@nvidia.com]
+> Sent: 27 September 2021 16:01
+> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>;
+> Leon Romanovsky <leonro@nvidia.com>
+> Cc: kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
+> linux-crypto@vger.kernel.org; alex.williamson@redhat.com;
+> mgurtovoy@nvidia.com; liulongfang <liulongfang@huawei.com>; Zengtao (B)
+> <prime.zeng@hisilicon.com>; Jonathan Cameron
+> <jonathan.cameron@huawei.com>; Wangzhou (B) <wangzhou1@hisilicon.com>
+> Subject: Re: [PATCH v3 6/6] hisi_acc_vfio_pci: Add support for VFIO live
+> migration
 > 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
->   lib/s390x/asm/arch_def.h | 14 ++++++++++++++
->   s390x/uv-host.c          | 11 +++++++----
->   2 files changed, 21 insertions(+), 4 deletions(-)
+> On Mon, Sep 27, 2021 at 01:46:31PM +0000, Shameerali Kolothum Thodi
+> wrote:
 > 
-> diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
-> index aa80d840..c8d2722a 100644
-> --- a/lib/s390x/asm/arch_def.h
-> +++ b/lib/s390x/asm/arch_def.h
-> @@ -219,6 +219,20 @@ static inline unsigned short stap(void)
->   	return cpu_address;
->   }
->   
-> +#define MACHINE_Z15A	0x8561
-> +#define MACHINE_Z15B	0x8562
-> +
-> +static inline uint16_t get_machine_id(void)
-> +{
-> +	uint64_t cpuid;
-> +
-> +	asm volatile("stidp %0" : "=Q" (cpuid));
-> +	cpuid = cpuid >> 16;
-> +	cpuid &= 0xffff;
-> +
-> +	return cpuid;
-> +}
-> +
->   static inline int tprot(unsigned long addr)
->   {
->   	int cc;
-> diff --git a/s390x/uv-host.c b/s390x/uv-host.c
-> index 66a11160..5e351120 100644
-> --- a/s390x/uv-host.c
-> +++ b/s390x/uv-host.c
-> @@ -111,6 +111,7 @@ static void test_config_destroy(void)
->   static void test_cpu_destroy(void)
->   {
->   	int rc;
-> +	uint16_t machineid = get_machine_id();
->   	struct uv_cb_nodata uvcb = {
->   		.header.len = sizeof(uvcb),
->   		.header.cmd = UVC_CMD_DESTROY_SEC_CPU,
-> @@ -125,10 +126,12 @@ static void test_cpu_destroy(void)
->   	       "hdr invalid length");
->   	uvcb.header.len += 8;
->   
-> -	uvcb.handle += 1;
-> -	rc = uv_call(0, (uint64_t)&uvcb);
-> -	report(rc == 1 && uvcb.header.rc == UVC_RC_INV_CHANDLE, "invalid handle");
-> -	uvcb.handle -= 1;
-> +	if (machineid != MACHINE_Z15A && machineid != MACHINE_Z15B) {
-> +		uvcb.handle += 1;
-> +		rc = uv_call(0, (uint64_t)&uvcb);
-> +		report(rc == 1 && uvcb.header.rc == UVC_RC_INV_CHANDLE, "invalid handle");
-> +		uvcb.handle -= 1;
-> +	}
+> > > > > Nope, this is locked wrong and has no lifetime management.
+> > > >
+> > > > Ok. Holding the device_lock() sufficient here?
+> > >
+> > > You can't hold a hisi_qm pointer with some kind of lifecycle
+> > > management of that pointer. device_lock/etc is necessary to call
+> > > pci_get_drvdata()
+> >
+> > Since this migration driver only supports VF devices and the PF
+> > driver will not be removed until all the VF devices gets removed,
+> > is the locking necessary here?
+> 
+> Oh.. That is really busted up. pci_sriov_disable() is called under the
+> device_lock(pf) and obtains the device_lock(vf).
+> 
+> This means a VF driver can never use the device_lock(pf), otherwise it
+> can deadlock itself if PF removal triggers VF removal.
 
-So this is a bug in the firmware? Any chance that it will still get fixed 
-for the z15? If so, would it make sense to turn this into a report_xfail() 
-instead?
+Exactly. I can easily simulate that in this driver.
 
-  Thomas
+> 
+> But you can't access these members without using the device_lock(), as
+> there really are no safety guarentees..
 
+Hmm.. I was hoping that we can avoid holding the lock since
+we are sure of the PF driver behavior. But right, there are no
+guarantee here.
+
+> The mlx5 patches have this same sketchy problem.
+> 
+> We may need a new special function 'pci_get_sriov_pf_devdata()' that
+> confirms the vf/pf relationship and explicitly interlocks with the
+> pci_sriov_enable/disable instead of using device_lock()
+> 
+> Leon, what do you think?
+> 
+
+Thanks,
+Shameer
