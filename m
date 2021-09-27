@@ -2,110 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DD4524197DA
-	for <lists+kvm@lfdr.de>; Mon, 27 Sep 2021 17:25:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8165E4197DF
+	for <lists+kvm@lfdr.de>; Mon, 27 Sep 2021 17:27:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235234AbhI0P1f (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Sep 2021 11:27:35 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58054 "EHLO
+        id S235156AbhI0P2p (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Sep 2021 11:28:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:53544 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235095AbhI0P1f (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 27 Sep 2021 11:27:35 -0400
+        by vger.kernel.org with ESMTP id S235117AbhI0P2o (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 27 Sep 2021 11:28:44 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632756356;
+        s=mimecast20190719; t=1632756426;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=xBGEP5tGgom1+kN1R+/bNbLDkQMV2fPI4kG5Llx+Ie4=;
-        b=Z26jZLSjty5JsLeRWSrxJ7A6VyGlRmjjtLnQFzYj08Yu0xEakmCYNTTC4wxSp6+4C5YyNQ
-        i3NTQffgPNXRAFATiVPNOYz6K/7uEw9tuhYMJ7g7cECSOmnwEZBR5JLF1WTKAePIr5laMD
-        6FR4R8T5BleQtIum4nHBGMNY824fPjM=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-509-KB-jjGBRNA2rz3kRSKODLg-1; Mon, 27 Sep 2021 11:25:53 -0400
-X-MC-Unique: KB-jjGBRNA2rz3kRSKODLg-1
-Received: by mail-wr1-f71.google.com with SMTP id s13-20020adfeccd000000b00160531902f4so6558444wro.2
-        for <kvm@vger.kernel.org>; Mon, 27 Sep 2021 08:25:53 -0700 (PDT)
+        bh=L4NMWxT3cfbxRVFFnxXJnEGfN7af8pHyx3dvW9V5X/8=;
+        b=CVO93axk6jGKao0jiibQ2IoKWD1InQ2fNYM3AU3gI0bxj+awrsZ1Bf4fVSDcQK93eWNJgL
+        uoI93eWzsz1VTXCYQvYx2Z9NRTyu4NM+uPjUldDU+ayjKzQEpihaHz2cN/Ko44KYtbzVuX
+        bxmGzXGYIxQW/6l7T1e9TYcHIP6DGt4=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-190-h9cdnwg7NFedRsfU08Wyfw-1; Mon, 27 Sep 2021 11:27:00 -0400
+X-MC-Unique: h9cdnwg7NFedRsfU08Wyfw-1
+Received: by mail-wr1-f72.google.com with SMTP id r7-20020a5d6947000000b0015e0f68a63bso14233281wrw.22
+        for <kvm@vger.kernel.org>; Mon, 27 Sep 2021 08:27:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=xBGEP5tGgom1+kN1R+/bNbLDkQMV2fPI4kG5Llx+Ie4=;
-        b=MWNMZBHxdamxLI5RuVPLHF5ggomItv75agsng7oHbvaoXcoXk4PqK38HR2c+v2AXs+
-         tLG8jt8FWIIrsjgbWScYuFIcsgzKIkpJaBlCDpSxR5RotGFud7JkNoff5VnrwKRjsMVp
-         4MIODdw7JRU9euT3+5+zHJhel47o1hS6InaOYXM2fI2IP7it/2GfHi5sr6P/fYOaSjkf
-         DF9sy64hOluR3Dltm5kP0yHW6FboMrVLNDiFBJrxZfn0wI3Tcm0BI0GEkBQSrc+PlwFs
-         Sx5Hqx4R73b4oriWcOaANdaIneCqPHspg2ZXXonPZcKWBSBij8pJBsnyk3B+L6+ouTQG
-         OGSA==
-X-Gm-Message-State: AOAM531furPvMP9f/ryCBXRzUYG5LYjFs7etYna3vv43SzvkqYldQuNm
-        d0z07PB4KV1FlFCnvKab4ruM/NfN+H9FVFl66SL/uZfDm5C3mb36cY+pO5vOEHGTEf+4VVy9UIF
-        g3QJSHB8ce4g5
-X-Received: by 2002:adf:e88d:: with SMTP id d13mr477968wrm.91.1632756352372;
-        Mon, 27 Sep 2021 08:25:52 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJws1BekiS36TGbShKY8RhMssUatC3zpVlGX2yvXwi/uWLlL1/wtlyqFvEN8KfWvzNAfHcjpJQ==
-X-Received: by 2002:adf:e88d:: with SMTP id d13mr477941wrm.91.1632756352144;
-        Mon, 27 Sep 2021 08:25:52 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id c18sm9557576wmb.27.2021.09.27.08.25.50
+        bh=L4NMWxT3cfbxRVFFnxXJnEGfN7af8pHyx3dvW9V5X/8=;
+        b=XX3axoLwLp7KMSogzqAI7Pa5dJOEIQm0m8U5SS7PWXUBco8kRZGxSfcyVOtfEszS1x
+         LFRVIXYK6WPyv1SWKWE9XT5UVOeb9KeLpxVsTDPV82h4G760B7rYMp7WoSq/7Pc+UUKY
+         i0i5mKeG/tnY7KbVLuxC0c+rjI4Ehr9xIYISOkBPBFN7L0Z8MY3HqLG4iNlxGbF3WquQ
+         EET9DVkvy+T5Hx7O0zyXe44jD9KRztbF8ur2WgU+AHzN8Nz1fpJNfjeLGc5EEe/mvBGU
+         ArZVUGM9Un8PI5PKOWd32mDODE5xux8raLA/kePYhfT+S4rj5HadSuUaXi3J9ncf6m7U
+         uNAw==
+X-Gm-Message-State: AOAM530o8BBZKHke+yH+iUDTx0Kl4GmMyyH8xd5x/JQRlW6vWdTkMr1O
+        GyfOUCl+RLCEvMAcTshlUVh/XJnlDWPeOru1RSGWiLbVPa+hrBRMg9RSoU9+NcXP8pbDANPX88t
+        IPR+kpxOqLLs4
+X-Received: by 2002:a05:600c:220e:: with SMTP id z14mr531314wml.84.1632756419167;
+        Mon, 27 Sep 2021 08:26:59 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJynSE4/E24J38JDzGwXrRxW5fcEgu/rr7EQCWyK0XK829+8JlB1tXqSvVH1kA6JoNxSkjvbdQ==
+X-Received: by 2002:a05:600c:220e:: with SMTP id z14mr531292wml.84.1632756419001;
+        Mon, 27 Sep 2021 08:26:59 -0700 (PDT)
+Received: from thuth.remote.csb (p549bb2bd.dip0.t-ipconnect.de. [84.155.178.189])
+        by smtp.gmail.com with ESMTPSA id c9sm15606090wmb.41.2021.09.27.08.26.58
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 27 Sep 2021 08:25:51 -0700 (PDT)
-Message-ID: <df876461-17a6-dbdd-2292-9822db68b6b8@redhat.com>
-Date:   Mon, 27 Sep 2021 17:25:49 +0200
+        Mon, 27 Sep 2021 08:26:58 -0700 (PDT)
+Subject: Re: [kvm-unit-tests PATCH 3/9] s390x: uv-host: Fence a destroy cpu
+ test on z15
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     david@redhat.com, linux-s390@vger.kernel.org, seiden@linux.ibm.com,
+        imbrenda@linux.ibm.com
+References: <20210922071811.1913-1-frankja@linux.ibm.com>
+ <20210922071811.1913-4-frankja@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+Message-ID: <8035a911-4a76-50ed-cb07-edce48abdb9c@redhat.com>
+Date:   Mon, 27 Sep 2021 17:26:57 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [PATCH v2] KVM: VMX: Fix a TSX_CTRL_CPUID_CLEAR field mask issue
+In-Reply-To: <20210922071811.1913-4-frankja@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-To:     Zhenzhong Duan <zhenzhong.duan@intel.com>, kvm@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        stable@vger.kernel.org, Sean Christopherson <seanjc@google.com>
-References: <20210926015545.281083-1-zhenzhong.duan@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20210926015545.281083-1-zhenzhong.duan@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 26/09/21 03:55, Zhenzhong Duan wrote:
-> When updating the host's mask for its MSR_IA32_TSX_CTRL user return entry,
-> clear the mask in the found uret MSR instead of vmx->guest_uret_msrs[i].
-> Modifying guest_uret_msrs directly is completely broken as 'i' does not
-> point at the MSR_IA32_TSX_CTRL entry.  In fact, it's guaranteed to be an
-> out-of-bounds accesses as is always set to kvm_nr_uret_msrs in a prior
-> loop. By sheer dumb luck, the fallout is limited to "only" failing to
-> preserve the host's TSX_CTRL_CPUID_CLEAR.  The out-of-bounds access is
-> benign as it's guaranteed to clear a bit in a guest MSR value, which are
-> always zero at vCPU creation on both x86-64 and i386.
+On 22/09/2021 09.18, Janosch Frank wrote:
+> Firmware will not give us the expected return code on z15 so let's
+> fence it for the z15 machine generation.
 > 
-> Cc: stable@vger.kernel.org
-> Fixes: 8ea8b8d6f869 ("KVM: VMX: Use common x86's uret MSR list as the one true list")
-> Signed-off-by: Zhenzhong Duan <zhenzhong.duan@intel.com>
-> Reviewed-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 > ---
->   arch/x86/kvm/vmx/vmx.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+>   lib/s390x/asm/arch_def.h | 14 ++++++++++++++
+>   s390x/uv-host.c          | 11 +++++++----
+>   2 files changed, 21 insertions(+), 4 deletions(-)
 > 
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 0c2c0d5ae873..cbf3d33432b9 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -6833,7 +6833,7 @@ static int vmx_create_vcpu(struct kvm_vcpu *vcpu)
->   		 */
->   		tsx_ctrl = vmx_find_uret_msr(vmx, MSR_IA32_TSX_CTRL);
->   		if (tsx_ctrl)
-> -			vmx->guest_uret_msrs[i].mask = ~(u64)TSX_CTRL_CPUID_CLEAR;
-> +			tsx_ctrl->mask = ~(u64)TSX_CTRL_CPUID_CLEAR;
->   	}
+> diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
+> index aa80d840..c8d2722a 100644
+> --- a/lib/s390x/asm/arch_def.h
+> +++ b/lib/s390x/asm/arch_def.h
+> @@ -219,6 +219,20 @@ static inline unsigned short stap(void)
+>   	return cpu_address;
+>   }
 >   
->   	err = alloc_loaded_vmcs(&vmx->vmcs01);
-> 
+> +#define MACHINE_Z15A	0x8561
+> +#define MACHINE_Z15B	0x8562
+> +
+> +static inline uint16_t get_machine_id(void)
+> +{
+> +	uint64_t cpuid;
+> +
+> +	asm volatile("stidp %0" : "=Q" (cpuid));
+> +	cpuid = cpuid >> 16;
+> +	cpuid &= 0xffff;
+> +
+> +	return cpuid;
+> +}
+> +
+>   static inline int tprot(unsigned long addr)
+>   {
+>   	int cc;
+> diff --git a/s390x/uv-host.c b/s390x/uv-host.c
+> index 66a11160..5e351120 100644
+> --- a/s390x/uv-host.c
+> +++ b/s390x/uv-host.c
+> @@ -111,6 +111,7 @@ static void test_config_destroy(void)
+>   static void test_cpu_destroy(void)
+>   {
+>   	int rc;
+> +	uint16_t machineid = get_machine_id();
+>   	struct uv_cb_nodata uvcb = {
+>   		.header.len = sizeof(uvcb),
+>   		.header.cmd = UVC_CMD_DESTROY_SEC_CPU,
+> @@ -125,10 +126,12 @@ static void test_cpu_destroy(void)
+>   	       "hdr invalid length");
+>   	uvcb.header.len += 8;
+>   
+> -	uvcb.handle += 1;
+> -	rc = uv_call(0, (uint64_t)&uvcb);
+> -	report(rc == 1 && uvcb.header.rc == UVC_RC_INV_CHANDLE, "invalid handle");
+> -	uvcb.handle -= 1;
+> +	if (machineid != MACHINE_Z15A && machineid != MACHINE_Z15B) {
+> +		uvcb.handle += 1;
+> +		rc = uv_call(0, (uint64_t)&uvcb);
+> +		report(rc == 1 && uvcb.header.rc == UVC_RC_INV_CHANDLE, "invalid handle");
+> +		uvcb.handle -= 1;
+> +	}
 
-Queued, thanks.
+So this is a bug in the firmware? Any chance that it will still get fixed 
+for the z15? If so, would it make sense to turn this into a report_xfail() 
+instead?
 
-Paolo
+  Thomas
 
