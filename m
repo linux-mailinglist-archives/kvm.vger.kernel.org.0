@@ -2,132 +2,187 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 782BE4196AB
-	for <lists+kvm@lfdr.de>; Mon, 27 Sep 2021 16:48:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 844974196EF
+	for <lists+kvm@lfdr.de>; Mon, 27 Sep 2021 17:00:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234931AbhI0Oth (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Sep 2021 10:49:37 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47206 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234782AbhI0Otg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Sep 2021 10:49:36 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 4EBD460FC2;
-        Mon, 27 Sep 2021 14:47:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1632754078;
-        bh=zqckSjMs/haPVLnH/e6bvk6XUWFiniRiJgluMdxeWvM=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:From;
-        b=jolkaP4PVHGIwcta4Q+Jfqy+PV2WJ6vfPkLXHN03Q7s6mil8+zYCcayHdOxNMoliJ
-         iEOr1/wM3wUxnYAOjW4sXhFZPOsPPGB4aVh4UFCJjYLmKqsZERIt2c2nlxz3ZYESaF
-         4+yywiWuKo9au59rileA3AWx0iHoybNjbHAObXFnP118MO+GwjUCmHyNqD42MP3ac6
-         jDnZRYo30bjudSmKZmycnwEs7yaD5+fUJRax1E8v939zGaqDH1hw6kYKoRw0uNT2Hu
-         h2fJzGiqgvR38omIAI2bBwl6RkndEmoGhIq3PJDu94RWvEQL/iQqICHN7bK96dU5E3
-         E5lB8hMnYfNVw==
-Date:   Mon, 27 Sep 2021 09:47:56 -0500
-From:   Bjorn Helgaas <helgaas@kernel.org>
-To:     Leon Romanovsky <leon@kernel.org>
-Cc:     Doug Ledford <dledford@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
-        Saeed Mahameed <saeedm@nvidia.com>,
-        Yishai Hadas <yishaih@nvidia.com>
-Subject: Re: [PATCH mlx5-next 1/7] PCI/IOV: Provide internal VF index
-Message-ID: <20210927144756.GA643630@bhelgaas>
+        id S234966AbhI0PBe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Sep 2021 11:01:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36272 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234873AbhI0PBc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Sep 2021 11:01:32 -0400
+Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47C9BC06176E
+        for <kvm@vger.kernel.org>; Mon, 27 Sep 2021 07:59:53 -0700 (PDT)
+Received: by mail-pg1-x536.google.com with SMTP id n18so18010710pgm.12
+        for <kvm@vger.kernel.org>; Mon, 27 Sep 2021 07:59:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=8d5KqXA5Mi92PwzZc0N/pdrf/YfLC80LCsk313TOlF8=;
+        b=m7Sxwd73+QIO2WuPaGefD2VV92Ixlana/rvgLp3fywdfnLLEysnYWnlbrJZMSHvky2
+         P+dNFDKl+i/DMSPcDLNPjzckqkQLgh9pdU/c3JQwnIagXzSzhgOa+ncEZvwMUJLQWG1m
+         fybm6n4GY1o2I/TIIMUtFfjJTQU9KFbL0J/XoEro7oVzMh1zw+XmI5tRZQQeuZDe42Dg
+         Tmmp6oePrkChYyER1Tnna/qEz55zzNMH1ZMLBsrMQL84AaEtkyNXBlm2Xx+ZucKX/mXL
+         yMhzhoMAfnJyECqCajIjTuZBzhOpC4zX9voYjWadeZj+T2l75O1okb7Y4J7XHlu7WdkY
+         kHUg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=8d5KqXA5Mi92PwzZc0N/pdrf/YfLC80LCsk313TOlF8=;
+        b=hAHdhPAk9bjp2Yw8Om6xea53LZrge7cQZPgG/YeNlJLM26iJVyTUrpxuFyQiEG9dM+
+         nMduh+1MOhJ+cx9BTV8U24E5NTKw0kXXlXQyM/PZ7JJHnD6KNvYYuSCpV7rm/oB02vlC
+         NIRdogbmKgrr5FO05WoWBMF7ETqebSdJQMCY0AUBy56LK24jEQRVWP/0HqAPqMedgZBn
+         KjNZRRKjJNFfZ/ObiS2xXx+h1Chy8UKqNqT7dtmcIE90MiAJfKZszL52dgG7IkoFdA1a
+         kZGpwZE2t1Gbcx36EdmWi0YT02R5jORHKpsxjIlkWtdOqS1agW+d1K0qBUtRFCqC2Ggm
+         ZJTg==
+X-Gm-Message-State: AOAM532GliyzGo7AAjBRTWQ3TnKSSb+NN7fHE6OO5OIoZdLvB6Ws06Rn
+        tNUw76B1jq01pw3K34hbmypOIw==
+X-Google-Smtp-Source: ABdhPJyg70ia4mflauFBTnYYkPuZeGu0PUo7u3KrQoV6hyYnlf5Ujo4gsfK+PdoDvaYqAOyRoeDCGg==
+X-Received: by 2002:a63:e057:: with SMTP id n23mr107748pgj.183.1632754792472;
+        Mon, 27 Sep 2021 07:59:52 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id n14sm19177569pgd.48.2021.09.27.07.59.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 27 Sep 2021 07:59:51 -0700 (PDT)
+Date:   Mon, 27 Sep 2021 14:59:47 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        David Matlack <dmatlack@google.com>,
+        Jon Cargille <jcargill@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jing Zhang <jingzhangos@google.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: disabling halt polling broken? (was Re: [PATCH 00/14] KVM:
+ Halt-polling fixes, cleanups and a new stat)
+Message-ID: <YVHcY6y1GmvGJnMg@google.com>
+References: <20210925005528.1145584-1-seanjc@google.com>
+ <03f2f5ab-e809-2ba5-bd98-3393c3b843d2@de.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YVGxLH+hi1NN0oq5@unreal>
+In-Reply-To: <03f2f5ab-e809-2ba5-bd98-3393c3b843d2@de.ibm.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 27, 2021 at 02:55:24PM +0300, Leon Romanovsky wrote:
-> On Sun, Sep 26, 2021 at 03:23:41PM -0500, Bjorn Helgaas wrote:
-> > On Sun, Sep 26, 2021 at 09:36:49AM +0300, Leon Romanovsky wrote:
-> > > On Sat, Sep 25, 2021 at 12:41:15PM -0500, Bjorn Helgaas wrote:
-> > > > On Sat, Sep 25, 2021 at 01:10:39PM +0300, Leon Romanovsky wrote:
-> > > > > On Fri, Sep 24, 2021 at 08:08:45AM -0500, Bjorn Helgaas wrote:
-> > > > > > On Thu, Sep 23, 2021 at 09:35:32AM +0300, Leon Romanovsky wrote:
-> > > > > > > On Wed, Sep 22, 2021 at 04:59:30PM -0500, Bjorn Helgaas wrote:
-> > > > > > > > On Wed, Sep 22, 2021 at 01:38:50PM +0300, Leon Romanovsky wrote:
-> > > > > > > > > From: Jason Gunthorpe <jgg@nvidia.com>
-> > > > > > > > > 
-> > > > > > > > > The PCI core uses the VF index internally, often called the vf_id,
-> > > > > > > > > during the setup of the VF, eg pci_iov_add_virtfn().
-> > > > > > > > > 
-> > > > > > > > > This index is needed for device drivers that implement live migration
-> > > > > > > > > for their internal operations that configure/control their VFs.
-> > > > > > > > >
-> > > > > > > > > Specifically, mlx5_vfio_pci driver that is introduced in coming patches
-> > > > > > > > > from this series needs it and not the bus/device/function which is
-> > > > > > > > > exposed today.
-> > > > > > > > > 
-> > > > > > > > > Add pci_iov_vf_id() which computes the vf_id by reversing the math that
-> > > > > > > > > was used to create the bus/device/function.
-> > > > > > > > > 
-> > > > > > > > > Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
-> > > > > > > > > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> > > > > > > > > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-> > > > > > > > 
-> > > > > > > > Acked-by: Bjorn Helgaas <bhelgaas@google.com>
-> > > > > > > > 
-> > > > > > > > mlx5_core_sriov_set_msix_vec_count() looks like it does basically the
-> > > > > > > > same thing as pci_iov_vf_id() by iterating through VFs until it finds
-> > > > > > > > one with a matching devfn (although it *doesn't* check for a matching
-> > > > > > > > bus number, which seems like a bug).
-> > > > > ...
-> > > > 
-> > > > > > And it still looks like the existing code is buggy.  This is called
-> > > > > > via sysfs, so if the PF is on bus X and the user writes to
-> > > > > > sriov_vf_msix_count for a VF on bus X+1, it looks like
-> > > > > > mlx5_core_sriov_set_msix_vec_count() will set the count for the wrong
-> > > > > > VF.
-> > > > > 
-> > > > > In mlx5_core_sriov_set_msix_vec_count(), we receive VF that is connected
-> > > > > to PF which has "struct mlx5_core_dev". My expectation is that they share
-> > > > > same bus as that PF was the one who created VFs. The mlx5 devices supports
-> > > > > upto 256 VFs and it is far below the bus split mentioned in PCI spec.
-> > > > > 
-> > > > > How can VF and their respective PF have different bus numbers?
-> > > > 
-> > > > See PCIe r5.0, sec 9.2.1.2.  For example,
-> > > > 
-> > > >   PF 0 on bus 20
-> > > >     First VF Offset   1
-> > > >     VF Stride         1
-> > > >     NumVFs          511
-> > > >   VF 0,1   through VF 0,255 on bus 20
-> > > >   VF 0,256 through VF 0,511 on bus 21
-> > > > 
-> > > > This is implemented in pci_iov_add_virtfn(), which computes the bus
-> > > > number and devfn from the VF ID.
-> > > > 
-> > > > pci_iov_virtfn_devfn(VF 0,1) == pci_iov_virtfn_devfn(VF 0,256), so if
-> > > > the user writes to sriov_vf_msix_count for VF 0,256, it looks like
-> > > > we'll call mlx5_set_msix_vec_count() for VF 0,1 instead of VF 0,256.
-> > > 
-> > > This is PCI spec split that I mentioned.
-> > > 
-> > > > 
-> > > > The spec encourages devices that require no more than 256 devices to
-> > > > locate them all on the same bus number (PCIe r5.0, sec 9.1), so if you
-> > > > only have 255 VFs, you may avoid the problem.
-> > > > 
-> > > > But in mlx5_core_sriov_set_msix_vec_count(), it's not obvious that it
-> > > > is safe to assume the bus number is the same.
-> > > 
-> > > No problem, we will make it more clear.
-> > 
-> > IMHO you should resolve it by using the new interface.  Better
-> > performing, unambiguous regardless of how many VFs the device
-> > supports.  What's the down side?
+On Mon, Sep 27, 2021, Christian Borntraeger wrote:
+> While looking into this series,
 > 
-> I don't see any. My previous answer worth to be written.
-> "No problem, we will make it more clear with this new function".
+> I realized that Davids patch
+> 
+> commit acd05785e48c01edb2c4f4d014d28478b5f19fb5
+> Author:     David Matlack <dmatlack@google.com>
+> AuthorDate: Fri Apr 17 15:14:46 2020 -0700
+> Commit:     Paolo Bonzini <pbonzini@redhat.com>
+> CommitDate: Fri Apr 24 12:53:17 2020 -0400
+> 
+>     kvm: add capability for halt polling
+> 
+> broke the possibility for an admin to disable halt polling for already running KVM guests.
+> In past times doing
+> echo 0 > /sys/module/kvm/parameters/halt_poll_ns
+> 
+> stopped polling system wide.
+> Now all KVM guests will use the halt_poll_ns value that was active during
+> startup - even those that do not use KVM_CAP_HALT_POLL.
+> 
+> I guess this was not intended?
 
-Great, sorry I missed that nuance :)
+Ouch.  I would go so far as to say that halt_poll_ns should be a hard limit on
+the capability.  What about having the per-VM variable track only the capability,
+and then use the module param to cap the max when doing adjustments?  E.g. add
+a variant of this early in the series?
+
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 80f78daa6b8d..f50e4e31a0cf 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -1078,8 +1078,6 @@ static struct kvm *kvm_create_vm(unsigned long type)
+                        goto out_err_no_arch_destroy_vm;
+        }
+
+-       kvm->max_halt_poll_ns = halt_poll_ns;
+-
+        r = kvm_arch_init_vm(kvm, type);
+        if (r)
+                goto out_err_no_arch_destroy_vm;
+@@ -3136,7 +3134,8 @@ void kvm_sigset_deactivate(struct kvm_vcpu *vcpu)
+        sigemptyset(&current->real_blocked);
+ }
+
+-static void grow_halt_poll_ns(struct kvm_vcpu *vcpu)
++static void grow_halt_poll_ns(struct kvm_vcpu *vcpu,
++                             unsigned int max_halt_poll_ns)
+ {
+        unsigned int old, val, grow, grow_start;
+
+@@ -3150,8 +3149,8 @@ static void grow_halt_poll_ns(struct kvm_vcpu *vcpu)
+        if (val < grow_start)
+                val = grow_start;
+
+-       if (val > vcpu->kvm->max_halt_poll_ns)
+-               val = vcpu->kvm->max_halt_poll_ns;
++       if (val > max_halt_poll_ns)
++               val = max_halt_poll_ns;
+
+        vcpu->halt_poll_ns = val;
+ out:
+@@ -3261,6 +3260,7 @@ void kvm_vcpu_halt(struct kvm_vcpu *vcpu)
+ {
+        bool halt_poll_allowed = !kvm_arch_no_poll(vcpu);
+        bool do_halt_poll = halt_poll_allowed && vcpu->halt_poll_ns;
++       unsigned int max_halt_poll_ns;
+        ktime_t start, cur, poll_end;
+        bool waited = false;
+        u64 halt_ns;
+@@ -3304,19 +3304,25 @@ void kvm_vcpu_halt(struct kvm_vcpu *vcpu)
+                update_halt_poll_stats(vcpu, start, poll_end, !waited);
+
+        if (halt_poll_allowed) {
++               max_halt_poll_ns = vcpu->kvm->max_halt_poll_ns;
++               if (max_halt_poll_ns)
++                       max_halt_poll_ns = min(max_halt_poll_ns, halt_poll_ns);
++               else
++                       max_halt_poll_ns = halt_poll_ns;
++
+                if (!vcpu_valid_wakeup(vcpu)) {
+                        shrink_halt_poll_ns(vcpu);
+-               } else if (vcpu->kvm->max_halt_poll_ns) {
++               } else if (max_halt_poll_ns) {
+                        if (halt_ns <= vcpu->halt_poll_ns)
+                                ;
+                        /* we had a long block, shrink polling */
+                        else if (vcpu->halt_poll_ns &&
+-                                halt_ns > vcpu->kvm->max_halt_poll_ns)
++                                halt_ns > max_halt_poll_ns)
+                                shrink_halt_poll_ns(vcpu);
+                        /* we had a short halt and our poll time is too small */
+-                       else if (vcpu->halt_poll_ns < vcpu->kvm->max_halt_poll_ns &&
+-                                halt_ns < vcpu->kvm->max_halt_poll_ns)
+-                               grow_halt_poll_ns(vcpu);
++                       else if (vcpu->halt_poll_ns < max_halt_poll_ns &&
++                                halt_ns < max_halt_poll_ns)
++                               grow_halt_poll_ns(vcpu, max_halt_poll_ns);
+                } else {
+                        vcpu->halt_poll_ns = 0;
+                }
