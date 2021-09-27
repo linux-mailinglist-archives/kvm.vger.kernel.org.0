@@ -2,95 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 31D6241932E
-	for <lists+kvm@lfdr.de>; Mon, 27 Sep 2021 13:34:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E44641932D
+	for <lists+kvm@lfdr.de>; Mon, 27 Sep 2021 13:34:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234099AbhI0Lf6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Sep 2021 07:35:58 -0400
-Received: from mga12.intel.com ([192.55.52.136]:7952 "EHLO mga12.intel.com"
+        id S234093AbhI0Lfz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Sep 2021 07:35:55 -0400
+Received: from mail.kernel.org ([198.145.29.99]:41806 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234087AbhI0Lfy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Sep 2021 07:35:54 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10119"; a="203949077"
-X-IronPort-AV: E=Sophos;i="5.85,326,1624345200"; 
-   d="scan'208";a="203949077"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Sep 2021 04:34:16 -0700
-X-IronPort-AV: E=Sophos;i="5.85,326,1624345200"; 
-   d="scan'208";a="561186742"
-Received: from blu2-mobl3.ccr.corp.intel.com (HELO [10.254.212.183]) ([10.254.212.183])
-  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Sep 2021 04:34:10 -0700
-Cc:     baolu.lu@linux.intel.com, "Liu, Yi L" <yi.l.liu@intel.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "hch@lst.de" <hch@lst.de>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        "parav@mellanox.com" <parav@mellanox.com>,
-        "lkml@metux.net" <lkml@metux.net>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "lushenming@huawei.com" <lushenming@huawei.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "corbet@lwn.net" <corbet@lwn.net>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "yi.l.liu@linux.intel.com" <yi.l.liu@linux.intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "dwmw2@infradead.org" <dwmw2@infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>,
-        Jason Gunthorpe <jgg@nvidia.com>
-References: <20210919063848.1476776-1-yi.l.liu@intel.com>
- <20210919063848.1476776-7-yi.l.liu@intel.com>
- <20210921170943.GS327412@nvidia.com>
- <BN9PR11MB5433DA330D4583387B59AA7F8CA29@BN9PR11MB5433.namprd11.prod.outlook.com>
- <20210922123931.GI327412@nvidia.com>
- <BN9PR11MB5433CE19425E85E7F52093278CA79@BN9PR11MB5433.namprd11.prod.outlook.com>
-From:   Lu Baolu <baolu.lu@linux.intel.com>
-Subject: Re: [RFC 06/20] iommu: Add iommu_device_init[exit]_user_dma
- interfaces
-Message-ID: <4625393e-6203-2319-9c9f-9f35beb1c04a@linux.intel.com>
-Date:   Mon, 27 Sep 2021 19:34:08 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+        id S233948AbhI0Lfw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Sep 2021 07:35:52 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id A0C2660F0F;
+        Mon, 27 Sep 2021 11:34:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1632742454;
+        bh=6UbwnYpNicjR1JStRo8iJiVRLVMUG38adSoFtPPxBW0=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=S0Bg5z5sLPjWjfXYHLabHfbBe2KozrkiecXTq752fNuPKu8VKs/Rt58LeqY0p6JZe
+         CQETOP+ZW9m46ko74rb0QsJeKQ+6gG8R1VdtEqVK8+/06V5Z6ydgLEY42Ug/83//Ak
+         kWy54QBu8EqDdUN3n2yCJygyB+e8s1PNGqhzYHZsUIv+du4qn6BhkCjfavcJYEXcjp
+         FyzOGwUqK0gyGChRIo2f3sraqcoWfWnby/gPMXU1qw1x9Ebs+Q7bD3wQn/dqL2OY5y
+         M8wp94XZsHuImJayX1xZ6+5Jmf/HCH7b6WX/bXBEdqgBK5Mkl2q6cdG7hcqZWnqaVE
+         ZJoo7HtGT700A==
+Date:   Mon, 27 Sep 2021 14:34:10 +0300
+From:   Leon Romanovsky <leon@kernel.org>
+To:     Max Gurtovoy <mgurtovoy@nvidia.com>
+Cc:     mst@redhat.com, virtualization@lists.linux-foundation.org,
+        kvm@vger.kernel.org, stefanha@redhat.com, oren@nvidia.com,
+        nitzanc@nvidia.com, israelr@nvidia.com, hch@infradead.org,
+        linux-block@vger.kernel.org, axboe@kernel.dk
+Subject: Re: [PATCH 2/2] virtio-blk: set NUMA affinity for a tagset
+Message-ID: <YVGsMsIjD2+aS3eC@unreal>
+References: <20210926145518.64164-1-mgurtovoy@nvidia.com>
+ <20210926145518.64164-2-mgurtovoy@nvidia.com>
 MIME-Version: 1.0
-In-Reply-To: <BN9PR11MB5433CE19425E85E7F52093278CA79@BN9PR11MB5433.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210926145518.64164-2-mgurtovoy@nvidia.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2021/9/27 17:42, Tian, Kevin wrote:
-> +int iommu_device_set_dma_hint(struct device *dev, enum dma_hint hint)
-> +{
-> +	struct iommu_group *group;
-> +	int ret;
-> +
-> +	group = iommu_group_get(dev);
-> +	/* not an iommu-probed device */
-> +	if (!group)
-> +		return 0;
-> +
-> +	mutex_lock(&group->mutex);
-> +	ret = __iommu_group_viable(group, hint);
-> +	mutex_unlock(&group->mutex);
-> +
-> +	iommu_group_put(group);
-> +	return ret;
-> +}
+On Sun, Sep 26, 2021 at 05:55:18PM +0300, Max Gurtovoy wrote:
+> To optimize performance, set the affinity of the block device tagset
+> according to the virtio device affinity.
+> 
+> Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
+> ---
+>  drivers/block/virtio_blk.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> index 9b3bd083b411..1c68c3e0ebf9 100644
+> --- a/drivers/block/virtio_blk.c
+> +++ b/drivers/block/virtio_blk.c
+> @@ -774,7 +774,7 @@ static int virtblk_probe(struct virtio_device *vdev)
+>  	memset(&vblk->tag_set, 0, sizeof(vblk->tag_set));
+>  	vblk->tag_set.ops = &virtio_mq_ops;
+>  	vblk->tag_set.queue_depth = queue_depth;
+> -	vblk->tag_set.numa_node = NUMA_NO_NODE;
+> +	vblk->tag_set.numa_node = virtio_dev_to_node(vdev);
 
-Conceptually, we could also move iommu_deferred_attach() from
-iommu_dma_ops here to save unnecessary checks in the hot DMA API
-paths?
+I afraid that by doing it, you will increase chances to see OOM, because
+in NUMA_NO_NODE, MM will try allocate memory in whole system, while in
+the latter mode only on specific NUMA which can be depleted.
 
-Best regards,
-baolu
+Thanks
+
+>  	vblk->tag_set.flags = BLK_MQ_F_SHOULD_MERGE;
+>  	vblk->tag_set.cmd_size =
+>  		sizeof(struct virtblk_req) +
+> -- 
+> 2.18.1
+> 
