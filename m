@@ -2,161 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E30B641A080
-	for <lists+kvm@lfdr.de>; Mon, 27 Sep 2021 22:46:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 11BA241A140
+	for <lists+kvm@lfdr.de>; Mon, 27 Sep 2021 23:18:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237041AbhI0Urz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Sep 2021 16:47:55 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:64062 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236414AbhI0Urz (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 27 Sep 2021 16:47:55 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 18RIokti026875;
-        Mon, 27 Sep 2021 16:46:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=lwBg6ETHNmezOliV6uYm9wJHkponVlX6ZQYAIV/PAIw=;
- b=lneehF2swa0M0E9cllaE1fMIH4mEQLsOiLYDwh35MKczOPU7V6O6GiRt0yw+u3gJpZQT
- BI27BpxZSg9Gx/eV/G0VfjXpatjVNoCqZ3IkgAclpeMvRh07rbDnRH1lLjV/j446o6If
- rdaQBOYKoDGoXDwqFoeCTA6T4+8gFyEQaW8wTg6j8cWk8JllVVZk8+PQ5E+lY3yp6KhZ
- lkgSe7C2IDjFz7i4rSWyJXm0yxPZO/oiWoiDNxlX66vuZ95HAMPTIKauJnyxpMFCksfS
- LEM8DsHIttRoU2/o5srtXKyYu9ai/j+d72w+gUeCNpYGKRwf7p5KUJMerhpkfZd3Afb5 nw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3bagx55xp1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 27 Sep 2021 16:46:08 -0400
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 18RJsJM4007485;
-        Mon, 27 Sep 2021 16:46:07 -0400
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3bagx55xnq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 27 Sep 2021 16:46:07 -0400
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
-        by ppma01dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 18RKbMUk005939;
-        Mon, 27 Sep 2021 20:46:06 GMT
-Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com [9.57.198.26])
-        by ppma01dal.us.ibm.com with ESMTP id 3b9udb7dkp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 27 Sep 2021 20:46:06 +0000
-Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com [9.57.199.106])
-        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 18RKk5up11142088
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 27 Sep 2021 20:46:05 GMT
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8288B2805E;
-        Mon, 27 Sep 2021 20:46:05 +0000 (GMT)
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C892028058;
-        Mon, 27 Sep 2021 20:45:58 +0000 (GMT)
-Received: from farman-thinkpad-t470p (unknown [9.163.16.42])
-        by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
-        Mon, 27 Sep 2021 20:45:58 +0000 (GMT)
-Message-ID: <f1b64606c967e9adf12f4e026cdfdf910ade554e.camel@linux.ibm.com>
-Subject: Re: [PATCH v2 7/9] vfio/ccw: Remove private->mdev
-From:   Eric Farman <farman@linux.ibm.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     David Airlie <airlied@linux.ie>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        dri-devel@lists.freedesktop.org,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        intel-gfx@lists.freedesktop.org,
-        intel-gvt-dev@lists.freedesktop.org,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
-        linux-s390@vger.kernel.org,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>, Christoph Hellwig <hch@lst.de>
-Date:   Mon, 27 Sep 2021 16:45:56 -0400
-In-Reply-To: <20210927123253.GY964074@nvidia.com>
-References: <7-v2-7d3a384024cf+2060-ccw_mdev_jgg@nvidia.com>
-         <f887a563e688057d6759e6de65d480326f502331.camel@linux.ibm.com>
-         <20210927123253.GY964074@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-16.el8) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: v0DgXAfibzUmo_LUs0sDhAmrtXJUoU0-
-X-Proofpoint-ORIG-GUID: w-2bKWgqbBr-1g7NEf-wxPVRrKgqRuob
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.391,FMLib:17.0.607.475
- definitions=2021-09-27_07,2021-09-24_02,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=798 spamscore=0
- impostorscore=0 suspectscore=0 phishscore=0 priorityscore=1501
- lowpriorityscore=0 mlxscore=0 bulkscore=0 clxscore=1015 adultscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2109230001 definitions=main-2109270138
+        id S237187AbhI0VTj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Sep 2021 17:19:39 -0400
+Received: from mail-bn8nam11on2064.outbound.protection.outlook.com ([40.107.236.64]:53473
+        "EHLO NAM11-BN8-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S230046AbhI0VTi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Sep 2021 17:19:38 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=GJoJxTD98ynnerUW6M1DAbK82VbD3WEpdz9K2ZhTl6URjVzPdm7+Wdgx1nDrqxF2wcqkxk9tmZ8VbH/h/H9NNx0HZt2f9xznftta09hhCm8jwXim6V3TgGekDy8bU3Zb5uPHimAFGXMJpHQmQFjsxuVcRqVmhAG7sybXh0irzuB7vMiOUNsCzCnpYiNKDW8NcHNEKZwBOKPXAtq+6TJdAzm7UDdzYzR/RpGck19nW8sedP7/YuUvyVBYvlnYub1Ew9MQFflHFUTyuNc6V/Tj2bFWqCjGzyH30qwtG+BhtjG3LRDUm69rieKKy6hR7LSu2C6GMaxvsxPhjhVzXJwwjw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
+ bh=KXJKXO7aCP1ZaNstUxrXrlmW773SZvHodmQeBZ/1xcI=;
+ b=Bk3tIvcPYXK+MH05hgdQT+oyqGMKza3qNW/q5qm1Fi5EqhxwX5i+V2izKs/uWE4Vhsop221Phdd2UxO9zstHQEb8JwEruTqqMhjtAsuCXMG8nFVzvStF1pkzBMq1hZoScc8eWx5+khQ9oBBvZDRJCdvc73h+eSr/2ENyJkzbb+bDdGnx/tvNkU1e7tMCaXtnagigle3c+JcRWB5L84+tef5/opztffCByzZ9G5Zi+T2fAPj3kv2I42NlUu2o8j8kJhZ4E/M1Lp/xeLD1JWSW//9Dh5o4RhNhSJYZYl1cBMaGycwrmLDTOf3MsyRzyZpqqR+u9jHS/65dJCZBMVnLfA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=KXJKXO7aCP1ZaNstUxrXrlmW773SZvHodmQeBZ/1xcI=;
+ b=jnxQIJk3OLH4S/FYE09BYxcsJxvRZRtKTzNJWT15g2wSjFv47+4vyXwyyiKPVRtUKPbTmCgwm1eAD0P70cn4uMoG6FQsnNYgcSLWtgszsSvLsRONMpjP8CZthZYz5trp7LxPJQue/ui1UthwkzwuLn23lH7qoO85p+pgIaKZwefsnEC3LbtS0gJkNThxsF8ehuOtmhSurqZDGIc2ZdaPV5M3Aeg7dtSWyOswj1ve5nkmfmflHk7hxGlORfCk9v6wHnCm+NYQWk4n9P+yf8Vm7TYjmEWrEXQkgyhZv7+em9VnPFj939BPHRMSZo1L1ExeXuIUAMB6JR9niks63VCDxg==
+Received: from BY5PR12MB3764.namprd12.prod.outlook.com (2603:10b6:a03:1ac::17)
+ by BY5PR12MB4950.namprd12.prod.outlook.com (2603:10b6:a03:1d9::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4544.20; Mon, 27 Sep
+ 2021 21:17:56 +0000
+Received: from BY5PR12MB3764.namprd12.prod.outlook.com
+ ([fe80::1d09:e72:91fd:ef05]) by BY5PR12MB3764.namprd12.prod.outlook.com
+ ([fe80::1d09:e72:91fd:ef05%7]) with mapi id 15.20.4544.021; Mon, 27 Sep 2021
+ 21:17:56 +0000
+From:   Krishna Reddy <vdumpa@nvidia.com>
+To:     Eric Auger <eric.auger@redhat.com>,
+        "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+        "will@kernel.org" <will@kernel.org>,
+        "maz@kernel.org" <maz@kernel.org>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "tn@semihalf.com" <tn@semihalf.com>,
+        "zhukeqian1@huawei.com" <zhukeqian1@huawei.com>
+CC:     "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "yi.l.liu@intel.com" <yi.l.liu@intel.com>,
+        "wangxingang5@huawei.com" <wangxingang5@huawei.com>,
+        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+        "zhangfei.gao@linaro.org" <zhangfei.gao@linaro.org>,
+        "zhangfei.gao@gmail.com" <zhangfei.gao@gmail.com>,
+        "vivek.gautam@arm.com" <vivek.gautam@arm.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+        "nicoleotsuka@gmail.com" <nicoleotsuka@gmail.com>,
+        "lushenming@huawei.com" <lushenming@huawei.com>,
+        Vikram Sethi <vsethi@nvidia.com>,
+        "chenxiang66@hisilicon.com" <chenxiang66@hisilicon.com>,
+        "jiangkunkun@huawei.com" <jiangkunkun@huawei.com>
+Subject: RE: [PATCH v15 00/12] SMMUv3 Nested Stage Setup (IOMMU part)
+Thread-Topic: [PATCH v15 00/12] SMMUv3 Nested Stage Setup (IOMMU part)
+Thread-Index: AQHXLsOhPIy4yfhMckeIjXIKtBMRG6u5a1sQ
+Date:   Mon, 27 Sep 2021 21:17:56 +0000
+Message-ID: <BY5PR12MB37640C26FEBC8AC6E3EDF40BB3A79@BY5PR12MB3764.namprd12.prod.outlook.com>
+References: <20210411111228.14386-1-eric.auger@redhat.com>
+In-Reply-To: <20210411111228.14386-1-eric.auger@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 3c005d6c-1a94-4ddd-599d-08d981fc467e
+x-ms-traffictypediagnostic: BY5PR12MB4950:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <BY5PR12MB495083C7E96B53C231859EA5B3A79@BY5PR12MB4950.namprd12.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:5797;
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: Cu/2mMwCOGEYEmLkBvHMuU7xqFiQi1U1VBgAAo5vz9BxqOZQVEl+z1Bh1Vfo5IFY9UUZ1YE0zbGDJbIlF79bUUVNeXTQEC7nUm/fpw5PugRKiR4xTR9tIR1VgEL+wIDjuFA51coeTHVqNUuQTjHdSTbGzqpG2cXbkDlSuhmQRf5Vh2NgXiC+/xWemBDrWarfaj+ckXJakISGCbEy2J733w4o3NIcb1qU+VJc1c5YLImYwLcFQVtItbP5lr1qngJnshep/uKG0NrIgsSeh3pT3cUkwQ+psrL+HrtPwH2WNUD3P1gI8khNEhomiAHEGJgJ6U+iDJDzGI+aXp/PnqDGUD3ZxPz3mjYkMpKiPrTjHNy/FXsdKKY0id8hwBXVPcJhsG3bjHLKdCk32CVeLgvH9oFuPfkIRgMCd/8Cf30eacv+G7D1lzoMQmY9ArPjzeqKU3kIsA8/+NU1JrJyoikEAbRkT/YDhIdGzaXCY7DyrsZCc9zbA93Y1/k/6+MFRrPCpDzwqzeHWJintRwaniExsNhBQj+6k+kQ7jV9Ouhm6cSNvkGqCYDh4Tj+aHokWru6BF4HebHRCGQRajSyi5paFH3l7eSKHTEcSpbWWIJrQROZ/knDlJxMyEtVplxzafiO45ZCWI9RbCJR2d2mpEztYCGJFp4kU88RZTrUUJPuhc28hejvuFZSWcuSGXbqUdKKIq0jkWDu9ANGlrE59dnkvrBPn5OmQNpMnyGi0GvreRZAjYAfqN6lnQPdOhFtuOVZagxpGEE03FE0gioHCihD5adv/qwwrw8LTeU2ubJtKIA=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY5PR12MB3764.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(52536014)(5660300002)(76116006)(110136005)(8676002)(54906003)(508600001)(316002)(9686003)(4326008)(8936002)(66946007)(26005)(66446008)(2906002)(64756008)(66556008)(66476007)(7416002)(55016002)(186003)(33656002)(7696005)(38070700005)(71200400001)(966005)(122000001)(86362001)(921005)(6506007)(38100700002)(4744005);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?Ypv8R93JZLG4spc4z1S4nCItxENoHjn2+YQeOs0VVjeNtnBzdbd3/RB7/9+2?=
+ =?us-ascii?Q?1/DgDcVovoGgDzCJYlke2rFD60ZVMuXsjX174/h+A3d0n863Xua3gMrfVgJV?=
+ =?us-ascii?Q?5dNgtmUcK0Y+ihPj9EdQuCN0qBKdEyCBhi4dHQKel5cn/H1b4koYnX7SfpWO?=
+ =?us-ascii?Q?0B0uq+o0pXMA1PVqk+iety3dd9EMK1gnk7lvd75R6RXV3DRwsLTyYW1HWApu?=
+ =?us-ascii?Q?wZGS+yL30bLlXopn7veWnMr6d9my5lNLwNVrSiCB0Exb0QwvL78GhspJic9y?=
+ =?us-ascii?Q?Pln3RnLRdHiJP/qK8CjFpG2p2OewkWz2YWL8QX8faI7NScuk0GU+1f18ueuQ?=
+ =?us-ascii?Q?Q8miUhOvd0hVOVAgFLU+yi0DkDpHhi5+8IoAKMgcyyN1ypPqLnbeKnswJt6Y?=
+ =?us-ascii?Q?+Bado/JwxR9uVclnkHp+4uDjnHtSpqdSDxn0eKlDlykglYpcIYl4qzd8mkNU?=
+ =?us-ascii?Q?ONg5wB5HrfE4bfnL7WY69UPUJbAAuYU+yfB1b6jV+f0NXW1YMCPCNDprz1uO?=
+ =?us-ascii?Q?F2PZ5Vmctus7GkVB0gX+qfQO2R33b7Z8laznCdY+71EYK9/jIiJxk/SfwwQV?=
+ =?us-ascii?Q?8CI7XlP0DqSU/TLjERnJIKXWaJBWg1BibokveBPi5+NTH1odQs7T7se5J2UK?=
+ =?us-ascii?Q?ErqdScTP24T0aEKhBZklgfEz79L/hwc5aYSYW2O0XmZahncVLMpRZMVe+Q4b?=
+ =?us-ascii?Q?H4GwNClYCE/Kne7qB5M50KDEpR9ucxHPEB5WPILL94lvT1t7vw6rtdnJcalC?=
+ =?us-ascii?Q?RaXzj7i8NSGPz8kYvl8YK0bEPUxOSVgWKLzSEXo74YD7FKPFaokvPwSSm8F7?=
+ =?us-ascii?Q?mKPQ9DyXOaz8zFH0/RkExBb7iUT9Bnqud5OzKRye61MNUVanslU1Ir6bo1xj?=
+ =?us-ascii?Q?tvqfSqJlXXjPoLJ+Fl8AnF6L2scMBtLru6dLa957GJL8R/zECDrP3afqgk8k?=
+ =?us-ascii?Q?+lZEafkrc4M3E850prCtf7L3PDni0iPS/YIyL2snswbwclKlwrdlAmNiHTGT?=
+ =?us-ascii?Q?WBa/yN4/UnGT79vuooISxFMqQBDkanL8JkClbLv4bFFk+fwLrErN0sDEEj2p?=
+ =?us-ascii?Q?ZhEAUzOWPzx2Ek1dOUU4aqvUtLakGqXIMzcC0Br9XPDh7wKf/SJSfEmb5vH9?=
+ =?us-ascii?Q?H7Gg3N6QtSJxoHXsgRuBJ+4KEns8FwGSz5AG9qlCv2+4uek3KL1ynLUqNPTH?=
+ =?us-ascii?Q?outczxiz0yiwsvdy54EddbD3XkJPLN3g66//7k6DZDdcfV1F0pqWLsbNBuSn?=
+ =?us-ascii?Q?c8kSiLOz0VoFe38t59A++97pO60OQUDvwdhpYX0dg9XRgObFTXQ0BXyvqJV5?=
+ =?us-ascii?Q?O0+6eg8Gcr0uJOkcsCTalHd9?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BY5PR12MB3764.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3c005d6c-1a94-4ddd-599d-08d981fc467e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Sep 2021 21:17:56.3733
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: yF27nB9jPxKNNPvx/xuAT/gkbt7Zkui37ZRGKkN1hS6uK2IoezKy6+sTgBKYxHD0dv1LJ6SoUgfxVeQCu1x+dw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4950
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 2021-09-27 at 09:32 -0300, Jason Gunthorpe wrote:
-> On Fri, Sep 24, 2021 at 04:45:02PM -0400, Eric Farman wrote:
-> > On Thu, 2021-09-09 at 16:38 -0300, Jason Gunthorpe wrote:
-> > > Having a mdev pointer floating about in addition to a struct
-> > > vfio_device
-> > > is confusing. It is only used for three things:
-> > > 
-> > > - Getting the mdev 'struct device *' - this is the same as
-> > >      private->vdev.dev
-> > > 
-> > > - Printing the uuid of the mdev in logging. The uuid is also the
-> > > dev_name
-> > >   of the mdev so this is the same string as
-> > >      dev_name(private->vdev.dev)
-> > > 
-> > > - A weird attempt to fence the vfio_ccw_sch_io_todo() work. This
-> > > work
-> > > is
-> > >   only queued during states IDLE/PROCESSING/PENDING and flushed
-> > > when
-> > >   entering CLOSED. Thus the work already cannot run when the mdev
-> > > is
-> > > NULL.
-> > >   Remove it.
-> > > 
-> > > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> > >  drivers/s390/cio/vfio_ccw_drv.c     |  6 ++--
-> > >  drivers/s390/cio/vfio_ccw_fsm.c     | 48 +++++++++++++--------
-> > > ----
-> > >  drivers/s390/cio/vfio_ccw_ops.c     | 16 ++++------
-> > >  drivers/s390/cio/vfio_ccw_private.h |  2 --
-> > >  include/linux/mdev.h                |  4 ---
-> > >  5 files changed, 30 insertions(+), 46 deletions(-)
-> > 
-> > I like this patch. Unfortunately it depends on the removal of a
-> > hunk in
-> > patch 4, which sets the FSM state to different values based on
-> > whether
-> > private->mdev is NULL or not, so can't go on its own. Need to spend
-> > more time thinking about that patch.
-> 
-> The FSM patch is important, really what is happening is the FSM logic
-> takes on the roles that was being split all over the place with other
-> logic, like this mdev stuff. To make that work we need a FSM that
-> makes sense..
+Hi Eric,
+> This is based on Jean-Philippe's
+> [PATCH v14 00/10] iommu: I/O page faults for SMMUv3
+> https://www.spinics.net/lists/arm-kernel/msg886518.html
+> (including the patches that were not pulled for 5.13)
+>
 
-No argument from me about that. My point is that I could consume this
-patch easier than the FSM patch, and need to get back to that one.
+Jean's patches have been merged to v5.14.
+Do you anticipate IOMMU/VFIO part patches getting into upstream kernel soon=
+?
 
-Eric
-
-> 
-> Jason
-
+-KR
