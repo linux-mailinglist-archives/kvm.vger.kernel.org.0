@@ -2,139 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D44C6419D40
-	for <lists+kvm@lfdr.de>; Mon, 27 Sep 2021 19:46:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6908B419D13
+	for <lists+kvm@lfdr.de>; Mon, 27 Sep 2021 19:39:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237452AbhI0Rrt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Sep 2021 13:47:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46420 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236232AbhI0Rrp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Sep 2021 13:47:45 -0400
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B339C06176E
-        for <kvm@vger.kernel.org>; Mon, 27 Sep 2021 10:33:46 -0700 (PDT)
-Received: by mail-pj1-x1031.google.com with SMTP id pf3-20020a17090b1d8300b0019e081aa87bso654490pjb.0
-        for <kvm@vger.kernel.org>; Mon, 27 Sep 2021 10:33:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=QVPOqaNlq7I3lDhzzEE0LSlmqb5BJv1DMZ8alEx/1nI=;
-        b=d285SG2vMoj7fWGLcc6kCiR/YbFmwFZ0r8FCUF/olwvOpdIeZoqHfRZvaCPNzDsw+I
-         DXfTdpdYvY1o3+xwclpJFqsOx9rx8gXxXILEPFDMXqDFGp4BJoLLTpbwH1u1XP+r1Qam
-         5szAUX8Uoct9SyiacXSLIaEMZeN1EKkEAgcpyL12gNGSfsGKRyH2m+hvt+6VnU5P+65Q
-         0VTTYCcD9hk6ReQ9O9Swq7+ugPD0ecGhrBD3WfyuwTtr/uZVPNTBMwKAB7m8BgvxcC2+
-         1ahXM7yNRUThnsg8QBfYfkaFmzHfumEXxhUu0VeZLeiCqPy+iDDU2pSUPBkNE2SVw6+C
-         hGgg==
+        id S237655AbhI0RlP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Sep 2021 13:41:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:25546 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S238913AbhI0Rkd (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 27 Sep 2021 13:40:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1632764334;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=jirQ9FfdlhvaJz4asll3MbjWE5MFUvpfdv5thabWi7A=;
+        b=iy4tiEGVsMXV/mZtJzo6+jo5P+HM4YI5WMmjrbDnQqP6a5SyvO/xQWwIy3sQmzA20OCFZm
+        LpHD1uCaeU1y7ceB8jUBAoL+Ey9rdzXd4bcpfgwNWAKXfDVx2zASLN2SUuBxQBxG8HIfrI
+        GNM8CLXldYzYSuNDfWuYdcLbndcgAAo=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-594-MjdEvpDkMmiyfLPVZOujeA-1; Mon, 27 Sep 2021 13:38:53 -0400
+X-MC-Unique: MjdEvpDkMmiyfLPVZOujeA-1
+Received: by mail-wm1-f69.google.com with SMTP id 5-20020a1c00050000b02902e67111d9f0so549443wma.4
+        for <kvm@vger.kernel.org>; Mon, 27 Sep 2021 10:38:53 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=QVPOqaNlq7I3lDhzzEE0LSlmqb5BJv1DMZ8alEx/1nI=;
-        b=Tc165ff2GfAybrFWyjDcS95fF5xfLip87gHTDBPeLuclre9O2DZYPktt3yUALCDo9M
-         3A1gtGdnPrTHBYGPoTIQi+J12WTKALhfjLs6ntPPAxd4AzxWnIH1QOV1ujN0b7MTvCoE
-         V1+P/dIbYs9YgLQmL70Ag7YSXBDIObmn/taP7Lg6VKz8mWrRyEULggPY83yh+KZsE/iD
-         Bp9YN2frE0k38bkNK3MZmhAw1GaMUb8Ua2dy9PxaYFQVxics+/QhOqRkYAdUrx9bXJ4m
-         eitF2XJ/bOLN3/U5N94P29KQRmPGewR7utdylKzNx1836YSdhPypBniar0eHmtDofPaU
-         DJxQ==
-X-Gm-Message-State: AOAM530+UpBrrF6muBxQ7jXotPMgDZoCAr6gkkSvXM5LOJvgHvO8Df8g
-        GXxRfCYOSFIrBP0O+DUkJTLkxA==
-X-Google-Smtp-Source: ABdhPJyGE9PssoIO8hd/mc9M/bvKl7HfH1PbwL6q6ROscf2AvxLZZUXzLqFUTTNdwUlFUFuHe69vkw==
-X-Received: by 2002:a17:90b:224b:: with SMTP id hk11mr253513pjb.231.1632764025351;
-        Mon, 27 Sep 2021 10:33:45 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id o17sm18385346pfp.126.2021.09.27.10.33.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Sep 2021 10:33:44 -0700 (PDT)
-Date:   Mon, 27 Sep 2021 17:33:41 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        David Matlack <dmatlack@google.com>,
-        Jon Cargille <jcargill@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        KVM ARM <kvmarm@lists.cs.columbia.edu>,
-        "open list:MIPS" <linux-mips@vger.kernel.org>,
-        kvm <kvm@vger.kernel.org>, kvm-ppc <kvm-ppc@vger.kernel.org>,
-        "Kernel Mailing List, Linux" <linux-kernel@vger.kernel.org>,
-        Jing Zhang <jingzhangos@google.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: disabling halt polling broken? (was Re: [PATCH 00/14] KVM:
- Halt-polling fixes, cleanups and a new stat)
-Message-ID: <YVIAdVxc+q2UWB+J@google.com>
-References: <20210925005528.1145584-1-seanjc@google.com>
- <03f2f5ab-e809-2ba5-bd98-3393c3b843d2@de.ibm.com>
- <YVHcY6y1GmvGJnMg@google.com>
- <f37ab68c-61ce-b6fb-7a49-831bacfc7424@redhat.com>
- <43e42f5c-9d9f-9e8b-3a61-9a053a818250@de.ibm.com>
- <CABgObfYtS6wiQe=BhF3t5usr7J6q4PWE4=rwZMMukfC9wT_6fA@mail.gmail.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=jirQ9FfdlhvaJz4asll3MbjWE5MFUvpfdv5thabWi7A=;
+        b=aODQrDIlwPdYm5SDVo4zR4Ia1V3vB5BMGaUNPM/5P8DXD5yUX28j5RjF7mcQ95JEWR
+         G3lyflzppWiHWbe0m9sWsFP4IY2hUs68p5iW5QVjMBKrN5R9TjTmoWS0rgXJ+1uoFYP2
+         upVFEl45Bi7+XeCE+y25/BsqecrDcaNQ9CaWApIhcFWZgygzfu9ToHqiwnNA8kVGOEG4
+         eXA3qFiYoJDm+YntcDiWgea5XC+wdFAm+O1KZ363FK9b8vvaeKJMXfheVriQS5jhXomg
+         D/FPrHyzCZQN5/rfmfrIBkzuorPgvbHUqpft+5sbOdf7e61ANvltWkdLAaBhiY2N41lB
+         Oc5g==
+X-Gm-Message-State: AOAM531v+S14ad0uuseC7sWfUetL1nQeXweSy1oyaIGTFftXo2+gkdjc
+        dVihOOoV3veSv2dmd1c0Xz8RDojmAtgJfrq/wWszQmtql9NJstUuhgMUePWSnN3W//7yF+ytjQ+
+        D4K7TWyaNiGuI
+X-Received: by 2002:a7b:cc8d:: with SMTP id p13mr334098wma.10.1632764332439;
+        Mon, 27 Sep 2021 10:38:52 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJygFnvXthhc22zdk5qwNvouSPfv7jgeqZp4tnutQ46qGYpl4iAodfS+D5/JP8rMpXiaGk50jQ==
+X-Received: by 2002:a7b:cc8d:: with SMTP id p13mr334084wma.10.1632764332259;
+        Mon, 27 Sep 2021 10:38:52 -0700 (PDT)
+Received: from thuth.remote.csb (p549bb2bd.dip0.t-ipconnect.de. [84.155.178.189])
+        by smtp.gmail.com with ESMTPSA id s2sm9315667wru.3.2021.09.27.10.38.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 27 Sep 2021 10:38:51 -0700 (PDT)
+Subject: Re: [kvm-unit-tests PATCH 4/9] lib: s390x: uv: Fix share return value
+ and print
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     david@redhat.com, linux-s390@vger.kernel.org, seiden@linux.ibm.com,
+        imbrenda@linux.ibm.com
+References: <20210922071811.1913-1-frankja@linux.ibm.com>
+ <20210922071811.1913-5-frankja@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+Message-ID: <333dcee3-2d66-5e76-bd0e-149ede04ef7a@redhat.com>
+Date:   Mon, 27 Sep 2021 19:38:50 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CABgObfYtS6wiQe=BhF3t5usr7J6q4PWE4=rwZMMukfC9wT_6fA@mail.gmail.com>
+In-Reply-To: <20210922071811.1913-5-frankja@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 27, 2021, Paolo Bonzini wrote:
-> On Mon, Sep 27, 2021 at 5:17 PM Christian Borntraeger
-> <borntraeger@de.ibm.com> wrote:
-> > > So I think there are two possibilities that makes sense:
-> > >
-> > > * track what is using KVM_CAP_HALT_POLL, and make writes to halt_poll_ns follow that
-> >
-> > what about using halt_poll_ns for those VMs that did not uses KVM_CAP_HALT_POLL and the private number for those that did.
+On 22/09/2021 09.18, Janosch Frank wrote:
+> Let's only return 0/1 for success/failure respectively.
+> If needed we can later add rc/rrc pointers so we can check for the
+> reasons of cc==1 cases like we do in the kernel.
 > 
-> Yes, that's what I meant.  David pointed out that doesn't allow you to
-> disable halt polling altogether, but for that you can always ask each
-> VM's userspace one by one, or just not use KVM_CAP_HALT_POLL. (Also, I
-> don't know about Google's usecase, but mine was actually more about
-> using KVM_CAP_HALT_POLL to *disable* halt polling on some VMs!).
+> As share might also be used in snippets it's best not to use prints to
 
-I kinda like the idea if special-casing halt_poll_ns=0, e.g. for testing or
-in-the-field mitigation if halt-polling is broken.  It'd be trivial to support, e.g.
+Maybe: s/share/share()/
+... so that it is clear that you're talking about the function here...
 
-@@ -3304,19 +3304,23 @@ void kvm_vcpu_halt(struct kvm_vcpu *vcpu)
-                update_halt_poll_stats(vcpu, start, poll_end, !waited);
+> avoid linking problems so lets remove the report_info().
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+>   lib/s390x/asm/uv.h | 9 +--------
+>   1 file changed, 1 insertion(+), 8 deletions(-)
+> 
+> diff --git a/lib/s390x/asm/uv.h b/lib/s390x/asm/uv.h
+> index ec10d1c4..2f099553 100644
+> --- a/lib/s390x/asm/uv.h
+> +++ b/lib/s390x/asm/uv.h
+> @@ -219,15 +219,8 @@ static inline int share(unsigned long addr, u16 cmd)
+>   		.header.len = sizeof(uvcb),
+>   		.paddr = addr
+>   	};
+> -	int cc;
+>   
+> -	cc = uv_call(0, (u64)&uvcb);
+> -	if (!cc && uvcb.header.rc == UVC_RC_EXECUTED)
+> -		return 0;
+> -
+> -	report_info("uv_call: cmd %04x cc %d response code: %04x", cc, cmd,
+> -		    uvcb.header.rc);
+> -	return -1;
+> +	return uv_call(0, (u64)&uvcb);
+>   }
 
-        if (halt_poll_allowed) {
-+               max_halt_poll_ns = vcpu->kvm->max_halt_poll_ns;
-+               if (!max_halt_poll_ns || !halt_poll_ns)  <------ squish the max if halt_poll_ns==0
-+                       max_halt_poll_ns = halt_poll_ns;
-+
-                if (!vcpu_valid_wakeup(vcpu)) {
-                        shrink_halt_poll_ns(vcpu);
--               } else if (vcpu->kvm->max_halt_poll_ns) {
-+               } else if (max_halt_poll_ns) {
-                        if (halt_ns <= vcpu->halt_poll_ns)
-                                ;
-                        /* we had a long block, shrink polling */
-                        else if (vcpu->halt_poll_ns &&
--                                halt_ns > vcpu->kvm->max_halt_poll_ns)
-+                                halt_ns > max_halt_poll_ns)
-                                shrink_halt_poll_ns(vcpu);
-                        /* we had a short halt and our poll time is too small */
--                       else if (vcpu->halt_poll_ns < vcpu->kvm->max_halt_poll_ns &&
--                                halt_ns < vcpu->kvm->max_halt_poll_ns)
--                               grow_halt_poll_ns(vcpu);
-+                       else if (vcpu->halt_poll_ns < max_halt_poll_ns &&
-+                                halt_ns < max_halt_poll_ns)
-+                               grow_halt_poll_ns(vcpu, max_halt_poll_ns);
-                } else {
-                        vcpu->halt_poll_ns = 0;
-                }
+Acked-by: Thomas Huth <thuth@redhat.com>
+
