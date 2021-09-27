@@ -2,68 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E71C4419375
-	for <lists+kvm@lfdr.de>; Mon, 27 Sep 2021 13:43:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6004C419376
+	for <lists+kvm@lfdr.de>; Mon, 27 Sep 2021 13:43:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234237AbhI0Loy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Sep 2021 07:44:54 -0400
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:36556 "EHLO
+        id S234389AbhI0LpB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Sep 2021 07:45:01 -0400
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:36563 "EHLO
         esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234042AbhI0Lol (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Sep 2021 07:44:41 -0400
+        with ESMTP id S234189AbhI0Lon (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Sep 2021 07:44:43 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1632742984; x=1664278984;
+  t=1632742986; x=1664278986;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:content-transfer-encoding:mime-version;
-  bh=TUSHSGKgY513FTY4kvyF1wBc/J5UHDuWpEEce7W2SYY=;
-  b=a0XNY9uzGjcoT4NYf/Tynf59CvKvX1MlF+OKzQsbG03T2lecwmg8ged2
-   A/hPjkEqLH4eal/2frcOzlrNcn3LCuEhPESW8FxE9DpCacJqcgaFgBd9Y
-   ecPe6qqI/ikQD+hATZjj7QC998zalWQsef7BxYzEyMW83ZLJFBfjFARwG
-   byosmGRRa2fj9ZB65wKfvY3mvxU2Acop66WmLzjaxPCF4lZ+v7Oedad/x
-   7vHd1wOg/MlQxmBFpBCs2Qnz8Unhnbyhyy5/tTamwLVVJxpJVNbGZDxY9
-   db7yKM/wVEgxBsYxifc6nEK3Fg9yc/y7GtDHPqFgi4NkF4WXchukgkh9o
-   A==;
+  bh=qyjSXJELHWvSvV9oYRAheCP/Wi4KRzpZ4SoeSJ+ZCFg=;
+  b=j8K2M2gqzr4Ei1QI8S27rx50B8eShMfh2qMJjsOp0LEuQAVd3s61KlMJ
+   DveeqTZ/h/F2r7o7D5UwgUR1YDJ6+T+KEo2nHXEjGMV+uFWRXmOH3vigj
+   a1dzmHExDKtkS0mWv+lQ8bv197op90oXHrFQPPjGZYmYgipvFPhademnt
+   oG9s4VFZ2zvyFmnbIYFuvO6pXFrlNdvJ89VTIGNualMlj8DHYtMGdrz3m
+   JBi0Q3cAcPn2EkNkvYZ0o//Wvo5+ASpSryjuwIMb4T7HiSaWhlncrc/sY
+   9t0qNQtlUGpUbsn482T3O8qiYmL0+SN8+xflChQqVgtGo/ww3x3UZqcbd
+   g==;
 X-IronPort-AV: E=Sophos;i="5.85,326,1624291200"; 
-   d="scan'208";a="181673173"
-Received: from mail-bn8nam08lp2045.outbound.protection.outlook.com (HELO NAM04-BN8-obe.outbound.protection.outlook.com) ([104.47.74.45])
-  by ob1.hgst.iphmx.com with ESMTP; 27 Sep 2021 19:43:03 +0800
+   d="scan'208";a="181673176"
+Received: from mail-bn8nam08lp2044.outbound.protection.outlook.com (HELO NAM04-BN8-obe.outbound.protection.outlook.com) ([104.47.74.44])
+  by ob1.hgst.iphmx.com with ESMTP; 27 Sep 2021 19:43:05 +0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=oVqvSgnAtoR1+6o2g+hKou3LVC8pKvkSp6t7hcz7Zrt0nP3sSXoXHFBX7j7wMPpba4QYOt5n99153I+J0ield/WVZdxVfIL95ygkSZslpEOZARrB8zcggeaf9TLBHbDf7X1YrXB4wfDF8gBJcobmXlrFnYqT2IWgdlG7v0mH9KtPRxsaw9EHB1ImkLrx8RHc68oXrfaqQe7ThvAMb9dipyxQs2g8Q0sFeaXMjpOgu4JTl8DCfPVp/HKKVLEeEBYHkeP+gFH8doLiYeRXldUFXpOZM3TRn9+MptChZzAwV7nM+NGumLdSrOod3njG8xlgn6Di6F6bmoKgg57FYEyXLg==
+ b=iVyZ5j4IAFV0sfSiW4YYsllWuBdx7fEGTjxCFiEyZ3tC/xtMhBEbzMnpjGX26KQkTOex5EAjGkPQVGPL0RvIGP8Nw7q5Qs9FZ7xaLra3UN1VPw7/GrOVOPPlKREQwaOJCBiV6NrqfPL/ZeTTA0m6WpxHI0oZSzVdFdi56vOlsaYQkafE0BxNgov90dq7QnnzXO5Pc4aL/fs5vZ1z/tkjXuQ/hh7WikfX/1RjnPXZ9zGMFNqy4xmHAq9agvgbev79VI5CBN0Ctav0YiXNSJpjoMRFvjaWb4hon6taGs20ysGHTJv594edSKDHCh3tOC1H4B+nt3/3vErUCup36gZKtQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
- bh=IUJLc6HbV5HqzPXnor3+5McW1YZUUpMFi+omPeRoeFk=;
- b=aa4lO/ZQJw+msM/G7yCeFPRmhUDnMim6wOjfRpSCiHZKu6djwAq/RjPi5R3tCBCamEchy15/GMRH1jMvFOY8Ee2aWojhzBYRrPzOxYf8qyB/nhC5vipcoZP73ER3Fe8lzNeey4rN3F59XjumtlRDaDHMzQfsRTHSnJGQXwr4FPc/Z/fGoXij6umvCtx38ZI7LL0AtpLD1QXx0BryvwM4vKWpODPHD+7kNf31QKL7mbFbXd460guU7SQqWKcy86rJgL3nYaAmK66Vs01n3Nxnm2c4iEDHWOVWx11FEL7Zfu1FSScEnEULK155uzRm14lPdGokh5HS5xYKEJvn7tYdfg==
+ bh=08yt89Q9GIfVQt8YmX3rqkut9qjhcuJwoF9DcI15KWc=;
+ b=giZV0ZNBBJ5leD0vRS6UDvCCL5HQzs5Qix+/bEksye35y5Lac9H5eP1Sn6zy66zAvGGb2g+MZ/Ds3VjVlqZXKwSMCNiFPjZ4w8eG224HxTfq9X+IVj3cLLjvKX8cp3deTXxQI5tJOQuPkJZz/zIaYTpgiK1ecSjutsO3++Ipx5DszGg/+/UuQV9Rl8gi/HqkSmR1gl0bwkoNPm6JzUP7SGdKxPTuhmQyaw3TrS2cQbznz5zSMzWQ7UXYqy5X2tIarvUUGCyuFBiV9dLxyEd5ID+Aq4AJwkmpik/5OxgjP1N46sUSu/gH2egYmpBGdU2a1Qxd+2LZdfA9XlcOLgHunw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
  header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=IUJLc6HbV5HqzPXnor3+5McW1YZUUpMFi+omPeRoeFk=;
- b=OP7iCN30GMUo/l7GETA96nei4dayT9L/MvitWZ+S4nmUU2mhH7n3JYxTEqi10Z9YeiJ984Z2+PVTkLnXXSxx3wr1wAAxrNn+HME7CMwNUzG5TyecjKkgXvFTj09bocBmoQpCqvLUUY++20/0yCOr8M4AQoSqLgl8IZ6QQDFOTqM=
+ bh=08yt89Q9GIfVQt8YmX3rqkut9qjhcuJwoF9DcI15KWc=;
+ b=jt8+O59XgmMeD33McqtE9m6/paow+4uMFg/O7S/dacs32EBQuvBWkg6TFoGUFpumoOmbDQqeCP6B5iRjGDxSDTMcltydxOl8ceeBHv/ByEHHBYawkisaMe5yqFiOUUkoOOX7EwJ0PRQ6Cx41hcoIV7INgHcat4Aai7YCYqOU0qA=
 Authentication-Results: kernel.org; dkim=none (message not signed)
  header.d=none;kernel.org; dmarc=none action=none header.from=wdc.com;
 Received: from CO6PR04MB7812.namprd04.prod.outlook.com (2603:10b6:303:138::6)
  by CO6PR04MB7841.namprd04.prod.outlook.com (2603:10b6:5:358::15) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4544.13; Mon, 27 Sep
- 2021 11:43:00 +0000
+ 2021 11:43:03 +0000
 Received: from CO6PR04MB7812.namprd04.prod.outlook.com
  ([fe80::6830:650b:8265:af0b]) by CO6PR04MB7812.namprd04.prod.outlook.com
  ([fe80::6830:650b:8265:af0b%6]) with mapi id 15.20.4544.021; Mon, 27 Sep 2021
- 11:43:00 +0000
+ 11:43:03 +0000
 From:   Anup Patel <anup.patel@wdc.com>
 To:     Will Deacon <will@kernel.org>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Atish Patra <atish.patra@wdc.com>,
         Alistair Francis <Alistair.Francis@wdc.com>,
         Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, Anup Patel <anup.patel@wdc.com>,
-        Vincent Chen <vincent.chen@sifive.com>
-Subject: [PATCH v9 5/8] riscv: Add PLIC device emulation
-Date:   Mon, 27 Sep 2021 17:12:24 +0530
-Message-Id: <20210927114227.1089403-6-anup.patel@wdc.com>
+        kvm-riscv@lists.infradead.org, Anup Patel <anup.patel@wdc.com>
+Subject: [PATCH v9 6/8] riscv: Generate FDT at runtime for Guest/VM
+Date:   Mon, 27 Sep 2021 17:12:25 +0530
+Message-Id: <20210927114227.1089403-7-anup.patel@wdc.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20210927114227.1089403-1-anup.patel@wdc.com>
 References: <20210927114227.1089403-1-anup.patel@wdc.com>
@@ -73,639 +72,403 @@ X-ClientProxiedBy: MA1PR01CA0173.INDPRD01.PROD.OUTLOOK.COM
  (2603:1096:a01:d::14) To CO6PR04MB7812.namprd04.prod.outlook.com
  (2603:10b6:303:138::6)
 MIME-Version: 1.0
-Received: from wdc.com (122.179.75.205) by MA1PR01CA0173.INDPRD01.PROD.OUTLOOK.COM (2603:1096:a01:d::14) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4544.14 via Frontend Transport; Mon, 27 Sep 2021 11:42:57 +0000
+Received: from wdc.com (122.179.75.205) by MA1PR01CA0173.INDPRD01.PROD.OUTLOOK.COM (2603:1096:a01:d::14) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4544.14 via Frontend Transport; Mon, 27 Sep 2021 11:43:00 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 085f3525-ea40-4dc6-5010-08d981abf51f
+X-MS-Office365-Filtering-Correlation-Id: e6deb653-3c8d-4af3-dcb1-08d981abf6ae
 X-MS-TrafficTypeDiagnostic: CO6PR04MB7841:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <CO6PR04MB784177EEF8726A1819F3ABAB8DA79@CO6PR04MB7841.namprd04.prod.outlook.com>
+X-Microsoft-Antispam-PRVS: <CO6PR04MB78417992D6F158E78247387E8DA79@CO6PR04MB7841.namprd04.prod.outlook.com>
 WDCIPOUTBOUND: EOP-TRUE
-X-MS-Oob-TLC-OOBClassifiers: OLM:5236;
+X-MS-Oob-TLC-OOBClassifiers: OLM:31;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 7gb1cM+JRwCSLt8U/bOCoSX6lL+Gc+0+Pn8RUPvQqhG7GwnaCmGz3UNbrJAkor4NECO7pdy2vmILsaYB29API87i27PxENqNyCAqP4GjhSXfJHuoOiqEiFjf/3bDCPf2CAZq7vke3sYT+InJVuNyyA1hzTcEEvh+bkhNZauix7DtsAMNjt1jKyhtSsdrGUDZ6AA01AxGG9/Ur22vgI1Rs/8Vlq57Fw/Al5IzWEqFGcUuxso/NBimwyvr/Uc/cRAJ1h3W09Gg7wywGRpV2V2WCFgy1VSGt+EbCTDsY821ebD+CGI7Hxd8EiIp7n/6PvVQ14PH2WrjxrX/O9sfixBJPUr77V3rmGm9RGbZQ8viWCGHn+ekB7hs3SR2yImYyFoUEBxOPAwBpNWmXuF1yJjgnPGj1Wsfl3YOnMUGqwUZR9vUu5kvFxyc9Yxp3MPOHM7LG7aWt+NM7VTzb4AloFlpwRInhdYcwPaarw3GNgbwlaKwQygVTngp5lijdAnkwfsiDHPUgjTehBf25wDJHhrqluQ3YX2R7eNrofmKzKdV0QZ3wDm+Jr1mj3fKjRpe+qMXH86+YsBj7XD9TsHRL10n57Ox0FMR56FitSEglyQ1gggwhn1gO6+8nrLk7sCCMqEJmfk1bTlKMgRyB5Mb+ZiNPN2OGdj9iUKnQI128cyvG4IWuizYz40DDKiIt94sLRHM
+X-Microsoft-Antispam-Message-Info: juCtLdGxqIgk/s47YG2dZnl67/Qwxl0xRJtWSoXs1+IP8U6WfmGgcciF1dESAnrOtS4yeI1NuP9BXB6WWGN/BOOfJDX3FDzXdSV1Bp+3fGZneRh3jWDOJBnrkmoDmQ8xCxa9fAs6Y4fQV3OdG0lxeeFvNJaMdCWp3wWjaokC3KA3q5sOIoCtE54TIF1i+Glh5rIW5Dwm4921LfhgUYe9OzHr6qDvSyvH9PgMg8SFasJJFMAo5HuC6J1QH1U7XQXuDGWBKDD7eOJs+INc1hWm8r4XoTLnG596E3F2g7U1w11uWb1YhYaylNXic1wYhW0QRBwC48cBbUsHDyQeXDV5WBcOmaLIrgZWAoOhSt549C2B6bF2FKirchUcPnDJkJJPdZsC4fwIKDZ7FV3aUMoQya8khkN8RWASjO5GSlunT06z+pchsdTUg275CbSp827dyWTCQb65C2RB4hEOvIBpZeP4XNCpWMrdOirD0r1JBIeAI1l/azh26vK6ogpyJpQ/cTGPn90vM1oOmeFA8nQupNpkJYAERq6lmkUsiwzFc0BUNzGUoUq8AAskXM5bWNO/mSl55PioNZ9m2qIMtr7zThs/XgnFfPA8aJw1h0bOFNOVbXIvj2tbxCxp+u6Iwz1pUPLPWCvWsO3mvQx5jv49fmRp6ITQyUOyltfzu9rsuO4QWTMU4mR4y0JSEXGCgEfZ44B5KaeDXH+NoAC3BduM5Q==
 X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO6PR04MB7812.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(54906003)(316002)(5660300002)(1076003)(66556008)(83380400001)(30864003)(66946007)(66476007)(36756003)(38100700002)(38350700002)(55016002)(86362001)(508600001)(6916009)(44832011)(8886007)(6666004)(2906002)(8676002)(956004)(2616005)(7696005)(8936002)(4326008)(26005)(52116002)(186003);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Dv8sP+Y2varedHA6nEUdrSLzB16KY3GlUNcgR2fnIS9mMI5fmqCg72Kki7jF?=
- =?us-ascii?Q?gebLQpX+kjMibsKotJXh47CxDhtiC5hIFUl0fy52ihfLBQs1TZccFb15n+mh?=
- =?us-ascii?Q?BcHLnDes8edq4CTM/Yu87+jLXPLCEe3/ofYBTRUjpebee/nx4R5/tA+UagRQ?=
- =?us-ascii?Q?FQPkoHlLJfJ5UnFE+srxakIDbGeOX6arI40WeLy6IjpY5eb+7NYMb3OJszsR?=
- =?us-ascii?Q?4zuic/sXj4E1kd21a+TPSBRDb2y11u8ppF3m16fcpz2U/QuqkDpDYm6U8NFN?=
- =?us-ascii?Q?LBVn3MbRcVCFricOyN4r7/1vv+qokX7RPLfVzHJTZqlrBAcS0ouur2QoQb/5?=
- =?us-ascii?Q?YL6DkUIExkbksh0hmidl9uVOhiQTR854H5t0d5otAEUzp0bW2yfjcdA+LfZL?=
- =?us-ascii?Q?nPOUjPuJQACvFXdRTTe+DDCHkZz5iJYbNq6/8I65KCSCxyVHj+1DKEp5BXC4?=
- =?us-ascii?Q?63hVk9+Y04XOYjFeQOUDEqzUYoytFG+LkXhIZk1GJzQyldqN10eyz6jZbcq5?=
- =?us-ascii?Q?p1Hl3sns1S8NFHXvNe/XvucikJUPuIcB0fJxRTtYmg6NH03wFZsIXwZOlIyE?=
- =?us-ascii?Q?assU8QppeJFwQoWLZNFB4p1st/T+V4PS7KRB5TIDUs57oBFPlWDEhkQIRLBi?=
- =?us-ascii?Q?oAaLYoNFbxNRIM5neQWpxEFm+Xf7PeK20l7vf8brnJzNaZycy7G7jOVWnX8K?=
- =?us-ascii?Q?cpSdgZpUHV14L7Y1tCpvl32P3TYiQ73Vzb5bx52pCAKHGP/Lisi84rO6GMT6?=
- =?us-ascii?Q?FqeSXflFpQOgXKjQ96w3jiVL/iS7cF3AN4Nrd8R+6egqw40TF/btI8e3dDRG?=
- =?us-ascii?Q?UTzZ+MRWLAglLLlNf4TPi+7h+n993bnkhHFV2ebLc7tUkNXGxPFt3csC7ta+?=
- =?us-ascii?Q?Y1eicBUeAvqyAbRaDXiFyf2bhSmBv3rukYaDlQTgpNCMtmI30Em2DFQUZSuR?=
- =?us-ascii?Q?fojjcaH02yWe0lcoIzv2MiAe+cWHFssQERSP7kpU8ChKK4gPfP7w81sYdRJR?=
- =?us-ascii?Q?tCfDREi5LjUZ/p+Uk4QZWcLWLQF3JpYH1c8yIybTlA4up5rzvdDNhR6Yh8/D?=
- =?us-ascii?Q?19pLdZ0j8tTSEc2UG1CF/DVHNyx6546tySx2OHxdiJxyYpJKMRR+zZ+ttMp7?=
- =?us-ascii?Q?qFSNGi6onMilZ8FIJHkbvNpxqpx0PFzXyMDoDR3LNUUxjNbbZDhD1/x1HskE?=
- =?us-ascii?Q?c1shmxDMNqXdi1rYwv6ikUfdVravLPV7oV/rrJWb+FDRCNByUHFGJCssnpDs?=
- =?us-ascii?Q?ZIX3PyywDwq9sZ/dOfBoVGLr+jqvTKGLXdUjIDx+yxTjensudypX2SSV4LFT?=
- =?us-ascii?Q?0vYni6qEnqEADYcH5LRsWk3F?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?ckUGfqp0XOUwsUqysW7SfWODTGV9PSsD2jDlQ5xuyrLXU12E4LEpCbIhGUXt?=
+ =?us-ascii?Q?PZtxrR4pEAbXestp2EyuHtn0XuvH8Pn4u4k4wi29LDCwPVbYxNa3KXccEKOh?=
+ =?us-ascii?Q?XURUiAtwb/YNEM+exPPn7ura5GSnbHBbyJNJdiMl82qMSo0JDmvA81D5K71j?=
+ =?us-ascii?Q?fZhSGx5Uiks7CUs+H7so6iAGoOA5HYqwAe9kxXA5oLG6BG85UJp55oX8S6II?=
+ =?us-ascii?Q?MhIlI2ymJPNqWEif8S/PRojG+r+8Qg+bEhSnyCbFfwEUC/xSmpmj0ZpBlo8o?=
+ =?us-ascii?Q?wfjrstYF8ozNcEeW32JkczNBHzWzuaoEstbKwX4UWm+uARj2J+GRsbkkY4KE?=
+ =?us-ascii?Q?16yVFgJRW8TxtMLD0PJa2dQ6ysRJI7F1+aDNZeINpKu9dQ1dTxuDW/lHdrDY?=
+ =?us-ascii?Q?kanDIflVm9R8IrjrUfdDOljl7c8Ap03gXONR5/0FCtEMKGFjM9QjD10cIE7H?=
+ =?us-ascii?Q?uspIhltcxP+f0CP6jwL7BfiALJ/RUtKpIqC3bB7ZA2kLHMFIPIzv2s/DKKTP?=
+ =?us-ascii?Q?RFfX+6qdxCTHyMK0OrLFFVTHEij3yKk5+Ido5VkgMDnR/Iy1hjLh1xTUoaan?=
+ =?us-ascii?Q?OijP/sdIhmylGZVjFZ5mmGiL/LR92gGzhtWezi7FW90eFDBQJLUQXOWJlJ64?=
+ =?us-ascii?Q?oOBofCKoMsJ8RykE6a03h1YfIE4jy0e9kBXKF5eV7dcMADy74YkamSHo2+Hu?=
+ =?us-ascii?Q?VIwkSuHvMwNvsey6S3FUhjGaMmqQewiIW6z2dIkPAv95Jtx3BkxnojsW7aTj?=
+ =?us-ascii?Q?a59yWRIK+GqEajMeQ3ni6ighg0FKoHcm2s1DVTBW3fYAETlAvqOVs9FJxiz+?=
+ =?us-ascii?Q?4z21noOPSUidaoYvouacpmMtsw5bFzN9sIYQ/VaAqzQqshm1rBg16wsod0Mw?=
+ =?us-ascii?Q?V7pzPoEiQKEzVJhquLGMug64SZsfVs4s3ia2B0TWoam1v/eNyMZnmpPTiXh8?=
+ =?us-ascii?Q?DzTfU2VO6++NEMYJzyACb4Jjd98lKACBs5TVrzo4Q5ddkDw5h2B1dQo3o49r?=
+ =?us-ascii?Q?vY8t2nTWliWm3oyOs5kv5DPGN73UiHpw86HuVNo85KdQJ6ssBUTLN6ULKgqu?=
+ =?us-ascii?Q?W02mUTSF3zX96feaJwwKSf8yV9YvkbPXek053Mrzafzrg0xag9gt+TkH4o6n?=
+ =?us-ascii?Q?w01uO8rngUM0A8vrZ8FlgAvvLLUsS3nPDwkkM6aOzx3YBDnRMc5+ICFqNZ4v?=
+ =?us-ascii?Q?0ToHKmGIiiNO9JZx1eyw4Q374hP2xlbWj6IL6XM70JV92ctLJzBLxWddz39f?=
+ =?us-ascii?Q?Cv8OnAY7wQnheh1o2TFwD4Vr7YYjpLfYUyDXLj8XeG1+clmun9RUkJk+YMaN?=
+ =?us-ascii?Q?YpKwqzozyTpHY3d3N39Ukc3/?=
 X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 085f3525-ea40-4dc6-5010-08d981abf51f
+X-MS-Exchange-CrossTenant-Network-Message-Id: e6deb653-3c8d-4af3-dcb1-08d981abf6ae
 X-MS-Exchange-CrossTenant-AuthSource: CO6PR04MB7812.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Sep 2021 11:43:00.2950
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Sep 2021 11:43:02.8846
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: b61c8803-16f3-4c35-9b17-6f65f441df86
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Ci9g3UhzOYV5r6waGaHA2vA+RO4DicRsprdNWHedoplw+HxXrjZ1HqOPoGd3x7rKjkhLMZErNl7kv+ox+wsQuw==
+X-MS-Exchange-CrossTenant-UserPrincipalName: sj9Yk4jtyh4FGJICHQBXZJXP6zlSMk5xn5frvWHYSAWMwKDxnzApEwR+yHbTK+tZcW/tY+HMJ/VsotZhd6oeww==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO6PR04MB7841
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The PLIC (platform level interrupt controller) manages peripheral
-interrupts in RISC-V world. The per-CPU interrupts are managed
-using CPU CSRs hence virtualized in-kernel by KVM RISC-V.
+We generate FDT at runtime for RISC-V Guest/VM so that KVMTOOL users
+don't have to pass FDT separately via command-line parameters.
 
-This patch adds PLIC device emulation for KVMTOOL RISC-V.
+Also, we provide "--dump-dtb <filename>" command-line option to dump
+generated FDT into a file for debugging purpose.
 
-Signed-off-by: Vincent Chen <vincent.chen@sifive.com>
-[For PLIC context CLAIM register emulation]
+Signed-off-by: Atish Patra <atish.patra@wdc.com>
 Signed-off-by: Anup Patel <anup.patel@wdc.com>
 ---
- Makefile                     |   1 +
- riscv/include/kvm/kvm-arch.h |   2 +
- riscv/irq.c                  |   4 +-
- riscv/plic.c                 | 518 +++++++++++++++++++++++++++++++++++
- 4 files changed, 523 insertions(+), 2 deletions(-)
- create mode 100644 riscv/plic.c
+ Makefile                            |   1 +
+ riscv/fdt.c                         | 192 ++++++++++++++++++++++++++++
+ riscv/include/kvm/fdt-arch.h        |   4 +
+ riscv/include/kvm/kvm-arch.h        |   2 +
+ riscv/include/kvm/kvm-config-arch.h |   6 +
+ riscv/plic.c                        |  50 ++++++++
+ 6 files changed, 255 insertions(+)
+ create mode 100644 riscv/fdt.c
 
 diff --git a/Makefile b/Makefile
-index 817f45c..eacf766 100644
+index eacf766..e4e1184 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -203,6 +203,7 @@ ifeq ($(ARCH),riscv)
+@@ -199,6 +199,7 @@ endif
+ ifeq ($(ARCH),riscv)
+ 	DEFINES		+= -DCONFIG_RISCV
+ 	ARCH_INCLUDE	:= riscv/include
++	OBJS		+= riscv/fdt.o
+ 	OBJS		+= riscv/ioport.o
  	OBJS		+= riscv/irq.o
  	OBJS		+= riscv/kvm.o
- 	OBJS		+= riscv/kvm-cpu.o
-+	OBJS		+= riscv/plic.o
- 	ifeq ($(RISCV_XLEN),32)
- 		CFLAGS	+= -mabi=ilp32d -march=rv32gc
- 	endif
-diff --git a/riscv/include/kvm/kvm-arch.h b/riscv/include/kvm/kvm-arch.h
-index 529d5b3..9face96 100644
---- a/riscv/include/kvm/kvm-arch.h
-+++ b/riscv/include/kvm/kvm-arch.h
-@@ -78,4 +78,6 @@ static inline bool riscv_addr_in_ioport_region(u64 phys_addr)
- 
- enum irq_type;
- 
-+void plic__irq_trig(struct kvm *kvm, int irq, int level, bool edge);
-+
- #endif /* KVM__KVM_ARCH_H */
-diff --git a/riscv/irq.c b/riscv/irq.c
-index 8e605ef..78a582d 100644
---- a/riscv/irq.c
-+++ b/riscv/irq.c
-@@ -4,10 +4,10 @@
- 
- void kvm__irq_line(struct kvm *kvm, int irq, int level)
- {
--	/* TODO: */
-+	plic__irq_trig(kvm, irq, level, false);
- }
- 
- void kvm__irq_trigger(struct kvm *kvm, int irq)
- {
--	/* TODO: */
-+	plic__irq_trig(kvm, irq, 1, true);
- }
-diff --git a/riscv/plic.c b/riscv/plic.c
+diff --git a/riscv/fdt.c b/riscv/fdt.c
 new file mode 100644
-index 0000000..d71226e
+index 0000000..6527ef7
 --- /dev/null
-+++ b/riscv/plic.c
-@@ -0,0 +1,518 @@
-+
++++ b/riscv/fdt.c
+@@ -0,0 +1,192 @@
 +#include "kvm/devices.h"
-+#include "kvm/ioeventfd.h"
-+#include "kvm/ioport.h"
++#include "kvm/fdt.h"
 +#include "kvm/kvm.h"
 +#include "kvm/kvm-cpu.h"
-+#include "kvm/irq.h"
-+#include "kvm/mutex.h"
++
++#include <stdbool.h>
 +
 +#include <linux/byteorder.h>
 +#include <linux/kernel.h>
-+#include <linux/kvm.h>
 +#include <linux/sizes.h>
 +
-+/*
-+ * From the RISC-V Privlidged Spec v1.10:
-+ *
-+ * Global interrupt sources are assigned small unsigned integer identifiers,
-+ * beginning at the value 1.  An interrupt ID of 0 is reserved to mean no
-+ * interrupt.  Interrupt identifiers are also used to break ties when two or
-+ * more interrupt sources have the same assigned priority. Smaller values of
-+ * interrupt ID take precedence over larger values of interrupt ID.
-+ *
-+ * While the RISC-V supervisor spec doesn't define the maximum number of
-+ * devices supported by the PLIC, the largest number supported by devices
-+ * marked as 'riscv,plic0' (which is the only device type this driver supports,
-+ * and is the only extant PLIC as of now) is 1024.  As mentioned above, device
-+ * 0 is defined to be non-existant so this device really only supports 1023
-+ * devices.
-+ */
-+
-+#define MAX_DEVICES	1024
-+#define MAX_CONTEXTS	15872
-+
-+/*
-+ * The PLIC consists of memory-mapped control registers, with a memory map as
-+ * follows:
-+ *
-+ * base + 0x000000: Reserved (interrupt source 0 does not exist)
-+ * base + 0x000004: Interrupt source 1 priority
-+ * base + 0x000008: Interrupt source 2 priority
-+ * ...
-+ * base + 0x000FFC: Interrupt source 1023 priority
-+ * base + 0x001000: Pending 0
-+ * base + 0x001FFF: Pending
-+ * base + 0x002000: Enable bits for sources 0-31 on context 0
-+ * base + 0x002004: Enable bits for sources 32-63 on context 0
-+ * ...
-+ * base + 0x0020FC: Enable bits for sources 992-1023 on context 0
-+ * base + 0x002080: Enable bits for sources 0-31 on context 1
-+ * ...
-+ * base + 0x002100: Enable bits for sources 0-31 on context 2
-+ * ...
-+ * base + 0x1F1F80: Enable bits for sources 992-1023 on context 15871
-+ * base + 0x1F1F84: Reserved
-+ * ...		    (higher context IDs would fit here, but wouldn't fit
-+ *		     inside the per-context priority vector)
-+ * base + 0x1FFFFC: Reserved
-+ * base + 0x200000: Priority threshold for context 0
-+ * base + 0x200004: Claim/complete for context 0
-+ * base + 0x200008: Reserved
-+ * ...
-+ * base + 0x200FFC: Reserved
-+ * base + 0x201000: Priority threshold for context 1
-+ * base + 0x201004: Claim/complete for context 1
-+ * ...
-+ * base + 0xFFE000: Priority threshold for context 15871
-+ * base + 0xFFE004: Claim/complete for context 15871
-+ * base + 0xFFE008: Reserved
-+ * ...
-+ * base + 0xFFFFFC: Reserved
-+ */
-+
-+/* Each interrupt source has a priority register associated with it. */
-+#define PRIORITY_BASE		0
-+#define PRIORITY_PER_ID		4
-+
-+/*
-+ * Each hart context has a vector of interupt enable bits associated with it.
-+ * There's one bit for each interrupt source.
-+ */
-+#define ENABLE_BASE		0x2000
-+#define ENABLE_PER_HART		0x80
-+
-+/*
-+ * Each hart context has a set of control registers associated with it.  Right
-+ * now there's only two: a source priority threshold over which the hart will
-+ * take an interrupt, and a register to claim interrupts.
-+ */
-+#define CONTEXT_BASE		0x200000
-+#define CONTEXT_PER_HART	0x1000
-+#define CONTEXT_THRESHOLD	0
-+#define CONTEXT_CLAIM		4
-+
-+#define REG_SIZE		0x1000000
-+
-+struct plic_state;
-+
-+struct plic_context {
-+	/* State to which this belongs */
-+	struct plic_state *s;
-+
-+	/* Static Configuration */
-+	u32 num;
-+	struct kvm_cpu *vcpu;
-+
-+	/* Local IRQ state */
-+	struct mutex irq_lock;
-+	u8 irq_priority_threshold;
-+	u32 irq_enable[MAX_DEVICES/32];
-+	u32 irq_pending[MAX_DEVICES/32];
-+	u8 irq_pending_priority[MAX_DEVICES];
-+	u32 irq_claimed[MAX_DEVICES/32];
-+	u32 irq_autoclear[MAX_DEVICES/32];
-+};
-+
-+struct plic_state {
-+	bool ready;
-+	struct kvm *kvm;
-+	struct device_header dev_hdr;
-+
-+	/* Static Configuration */
-+	u32 num_irq;
-+	u32 num_irq_word;
-+	u32 max_prio;
-+
-+	/* Context Array */
-+	u32 num_context;
-+	struct plic_context *contexts;
-+
-+	/* Global IRQ state */
-+	struct mutex irq_lock;
-+	u8 irq_priority[MAX_DEVICES];
-+	u32 irq_level[MAX_DEVICES/32];
-+};
-+
-+static struct plic_state plic;
-+
-+/* Note: Must be called with c->irq_lock held */
-+static u32 __plic_context_best_pending_irq(struct plic_state *s,
-+					   struct plic_context *c)
++static void dump_fdt(const char *dtb_file, void *fdt)
 +{
-+	u8 best_irq_prio = 0;
-+	u32 i, j, irq, best_irq = 0;
++	int count, fd;
 +
-+	for (i = 0; i < s->num_irq_word; i++) {
-+		if (!c->irq_pending[i])
-+			continue;
++	fd = open(dtb_file, O_CREAT | O_TRUNC | O_RDWR, 0666);
++	if (fd < 0)
++		die("Failed to write dtb to %s", dtb_file);
 +
-+		for (j = 0; j < 32; j++) {
-+			irq = i * 32 + j;
-+			if ((s->num_irq <= irq) ||
-+			    !(c->irq_pending[i] & (1 << j)) ||
-+			    (c->irq_claimed[i] & (1 << j)))
-+				continue;
++	count = write(fd, fdt, FDT_MAX_SIZE);
++	if (count < 0)
++		die_perror("Failed to dump dtb");
 +
-+			if (!best_irq ||
-+			    (best_irq_prio < c->irq_pending_priority[irq])) {
-+				best_irq = irq;
-+				best_irq_prio = c->irq_pending_priority[irq];
-+			}
++	pr_debug("Wrote %d bytes to dtb %s", count, dtb_file);
++	close(fd);
++}
++
++#define CPU_NAME_MAX_LEN 15
++#define CPU_ISA_MAX_LEN 128
++static void generate_cpu_nodes(void *fdt, struct kvm *kvm)
++{
++	int cpu, pos, i, index, valid_isa_len;
++	const char *valid_isa_order = "IEMAFDQCLBJTPVNSUHKORWXYZG";
++
++	_FDT(fdt_begin_node(fdt, "cpus"));
++	_FDT(fdt_property_cell(fdt, "#address-cells", 0x1));
++	_FDT(fdt_property_cell(fdt, "#size-cells", 0x0));
++	_FDT(fdt_property_cell(fdt, "timebase-frequency",
++				kvm->cpus[0]->riscv_timebase));
++
++	for (cpu = 0; cpu < kvm->nrcpus; ++cpu) {
++		char cpu_name[CPU_NAME_MAX_LEN];
++		char cpu_isa[CPU_ISA_MAX_LEN];
++		struct kvm_cpu *vcpu = kvm->cpus[cpu];
++
++		snprintf(cpu_name, CPU_NAME_MAX_LEN, "cpu@%x", cpu);
++
++		snprintf(cpu_isa, CPU_ISA_MAX_LEN, "rv%ld", vcpu->riscv_xlen);
++		pos = strlen(cpu_isa);
++		valid_isa_len = strlen(valid_isa_order);
++		for (i = 0; i < valid_isa_len; i++) {
++			index = valid_isa_order[i] - 'A';
++			if (vcpu->riscv_isa & (1 << (index)))
++				cpu_isa[pos++] = 'a' + index;
 +		}
-+	}
++		cpu_isa[pos] = '\0';
 +
-+	return best_irq;
-+}
-+
-+/* Note: Must be called with c->irq_lock held */
-+static void __plic_context_irq_update(struct plic_state *s,
-+				      struct plic_context *c)
-+{
-+	u32 best_irq = __plic_context_best_pending_irq(s, c);
-+	u32 virq = (best_irq) ? KVM_INTERRUPT_SET : KVM_INTERRUPT_UNSET;
-+
-+	if (ioctl(c->vcpu->vcpu_fd, KVM_INTERRUPT, &virq) < 0)
-+		pr_warning("KVM_INTERRUPT failed");
-+}
-+
-+/* Note: Must be called with c->irq_lock held */
-+static u32 __plic_context_irq_claim(struct plic_state *s,
-+				    struct plic_context *c)
-+{
-+	u32 virq = KVM_INTERRUPT_UNSET;
-+	u32 best_irq = __plic_context_best_pending_irq(s, c);
-+	u32 best_irq_word = best_irq / 32;
-+	u32 best_irq_mask = (1 << (best_irq % 32));
-+
-+	if (ioctl(c->vcpu->vcpu_fd, KVM_INTERRUPT, &virq) < 0)
-+		pr_warning("KVM_INTERRUPT failed");
-+
-+	if (best_irq) {
-+		if (c->irq_autoclear[best_irq_word] & best_irq_mask) {
-+			c->irq_pending[best_irq_word] &= ~best_irq_mask;
-+			c->irq_pending_priority[best_irq] = 0;
-+			c->irq_claimed[best_irq_word] &= ~best_irq_mask;
-+			c->irq_autoclear[best_irq_word] &= ~best_irq_mask;
-+		} else
-+			c->irq_claimed[best_irq_word] |= best_irq_mask;
-+	}
-+
-+	__plic_context_irq_update(s, c);
-+
-+	return best_irq;
-+}
-+
-+void plic__irq_trig(struct kvm *kvm, int irq, int level, bool edge)
-+{
-+	bool irq_marked = false;
-+	u8 i, irq_prio, irq_word;
-+	u32 irq_mask;
-+	struct plic_context *c = NULL;
-+	struct plic_state *s = &plic;
-+
-+	if (!s->ready)
-+		return;
-+
-+	if (irq <= 0 || s->num_irq <= (u32)irq)
-+		goto done;
-+
-+	mutex_lock(&s->irq_lock);
-+
-+	irq_prio = s->irq_priority[irq];
-+	irq_word = irq / 32;
-+	irq_mask = 1 << (irq % 32);
-+
-+	if (level)
-+		s->irq_level[irq_word] |= irq_mask;
-+	else
-+		s->irq_level[irq_word] &= ~irq_mask;
-+
-+	/*
-+	 * Note: PLIC interrupts are level-triggered. As of now,
-+	 * there is no notion of edge-triggered interrupts. To
-+	 * handle this we auto-clear edge-triggered interrupts
-+	 * when PLIC context CLAIM register is read.
-+	 */
-+	for (i = 0; i < s->num_context; i++) {
-+		c = &s->contexts[i];
-+
-+		mutex_lock(&c->irq_lock);
-+		if (c->irq_enable[irq_word] & irq_mask) {
-+			if (level) {
-+				c->irq_pending[irq_word] |= irq_mask;
-+				c->irq_pending_priority[irq] = irq_prio;
-+				if (edge)
-+					c->irq_autoclear[irq_word] |= irq_mask;
-+			} else {
-+				c->irq_pending[irq_word] &= ~irq_mask;
-+				c->irq_pending_priority[irq] = 0;
-+				c->irq_claimed[irq_word] &= ~irq_mask;
-+				c->irq_autoclear[irq_word] &= ~irq_mask;
-+			}
-+			__plic_context_irq_update(s, c);
-+			irq_marked = true;
-+		}
-+		mutex_unlock(&c->irq_lock);
-+
-+		if (irq_marked)
-+			break;
-+	}
-+
-+done:
-+	mutex_unlock(&s->irq_lock);
-+}
-+
-+static void plic__priority_read(struct plic_state *s,
-+				u64 offset, void *data)
-+{
-+	u32 irq = (offset >> 2);
-+
-+	if (irq == 0 || irq >= s->num_irq)
-+		return;
-+
-+	mutex_lock(&s->irq_lock);
-+	ioport__write32(data, s->irq_priority[irq]);
-+	mutex_unlock(&s->irq_lock);
-+}
-+
-+static void plic__priority_write(struct plic_state *s,
-+				 u64 offset, void *data)
-+{
-+	u32 val, irq = (offset >> 2);
-+
-+	if (irq == 0 || irq >= s->num_irq)
-+		return;
-+
-+	mutex_lock(&s->irq_lock);
-+	val = ioport__read32(data);
-+	val &= ((1 << PRIORITY_PER_ID) - 1);
-+	s->irq_priority[irq] = val;
-+	mutex_unlock(&s->irq_lock);
-+}
-+
-+static void plic__context_enable_read(struct plic_state *s,
-+				      struct plic_context *c,
-+				      u64 offset, void *data)
-+{
-+	u32 irq_word = offset >> 2;
-+
-+	if (s->num_irq_word < irq_word)
-+		return;
-+
-+	mutex_lock(&c->irq_lock);
-+	ioport__write32(data, c->irq_enable[irq_word]);
-+	mutex_unlock(&c->irq_lock);
-+}
-+
-+static void plic__context_enable_write(struct plic_state *s,
-+				       struct plic_context *c,
-+				       u64 offset, void *data)
-+{
-+	u8 irq_prio;
-+	u32 i, irq, irq_mask;
-+	u32 irq_word = offset >> 2;
-+	u32 old_val, new_val, xor_val;
-+
-+	if (s->num_irq_word < irq_word)
-+		return;
-+
-+	mutex_lock(&s->irq_lock);
-+
-+	mutex_lock(&c->irq_lock);
-+
-+	old_val = c->irq_enable[irq_word];
-+	new_val = ioport__read32(data);
-+
-+	if (irq_word == 0)
-+		new_val &= ~0x1;
-+
-+	c->irq_enable[irq_word] = new_val;
-+
-+	xor_val = old_val ^ new_val;
-+	for (i = 0; i < 32; i++) {
-+		irq = irq_word * 32 + i;
-+		irq_mask = 1 << i;
-+		irq_prio = s->irq_priority[irq];
-+		if (!(xor_val & irq_mask))
-+			continue;
-+		if ((new_val & irq_mask) &&
-+		    (s->irq_level[irq_word] & irq_mask)) {
-+			c->irq_pending[irq_word] |= irq_mask;
-+			c->irq_pending_priority[irq] = irq_prio;
-+		} else if (!(new_val & irq_mask)) {
-+			c->irq_pending[irq_word] &= ~irq_mask;
-+			c->irq_pending_priority[irq] = 0;
-+			c->irq_claimed[irq_word] &= ~irq_mask;
-+		}
-+	}
-+
-+	__plic_context_irq_update(s, c);
-+
-+	mutex_unlock(&c->irq_lock);
-+
-+	mutex_unlock(&s->irq_lock);
-+}
-+
-+static void plic__context_read(struct plic_state *s,
-+			       struct plic_context *c,
-+			       u64 offset, void *data)
-+{
-+	mutex_lock(&c->irq_lock);
-+
-+	switch (offset) {
-+	case CONTEXT_THRESHOLD:
-+		ioport__write32(data, c->irq_priority_threshold);
-+		break;
-+	case CONTEXT_CLAIM:
-+		ioport__write32(data, __plic_context_irq_claim(s, c));
-+		break;
-+	default:
-+		break;
-+	};
-+
-+	mutex_unlock(&c->irq_lock);
-+}
-+
-+static void plic__context_write(struct plic_state *s,
-+				struct plic_context *c,
-+				u64 offset, void *data)
-+{
-+	u32 val;
-+	bool irq_update = false;
-+
-+	mutex_lock(&c->irq_lock);
-+
-+	switch (offset) {
-+	case CONTEXT_THRESHOLD:
-+		val = ioport__read32(data);
-+		val &= ((1 << PRIORITY_PER_ID) - 1);
-+		if (val <= s->max_prio)
-+			c->irq_priority_threshold = val;
++		_FDT(fdt_begin_node(fdt, cpu_name));
++		_FDT(fdt_property_string(fdt, "device_type", "cpu"));
++		_FDT(fdt_property_string(fdt, "compatible", "riscv"));
++		if (vcpu->riscv_xlen == 64)
++			_FDT(fdt_property_string(fdt, "mmu-type",
++						 "riscv,sv48"));
 +		else
-+			irq_update = true;
-+		break;
-+	case CONTEXT_CLAIM:
-+		val = ioport__read32(data);
-+		if (val < plic.num_irq) {
-+			c->irq_claimed[val / 32] &= ~(1 << (val % 32));
-+			irq_update = true;
-+		}
-+		break;
-+	default:
-+		irq_update = true;
-+		break;
++			_FDT(fdt_property_string(fdt, "mmu-type",
++						 "riscv,sv32"));
++		_FDT(fdt_property_string(fdt, "riscv,isa", cpu_isa));
++		_FDT(fdt_property_cell(fdt, "reg", cpu));
++		_FDT(fdt_property_string(fdt, "status", "okay"));
++
++		_FDT(fdt_begin_node(fdt, "interrupt-controller"));
++		_FDT(fdt_property_string(fdt, "compatible", "riscv,cpu-intc"));
++		_FDT(fdt_property_cell(fdt, "#interrupt-cells", 1));
++		_FDT(fdt_property(fdt, "interrupt-controller", NULL, 0));
++		_FDT(fdt_property_cell(fdt, "phandle",
++					PHANDLE_CPU_INTC_BASE + cpu));
++		_FDT(fdt_end_node(fdt));
++
++		_FDT(fdt_end_node(fdt));
++	}
++
++	_FDT(fdt_end_node(fdt));
++}
++
++static int setup_fdt(struct kvm *kvm)
++{
++	struct device_header *dev_hdr;
++	u8 staging_fdt[FDT_MAX_SIZE];
++	u64 mem_reg_prop[]	= {
++		cpu_to_fdt64(kvm->arch.memory_guest_start),
++		cpu_to_fdt64(kvm->ram_size),
++	};
++	void *fdt		= staging_fdt;
++	void *fdt_dest		= guest_flat_to_host(kvm,
++						     kvm->arch.dtb_guest_start);
++	void (*generate_mmio_fdt_nodes)(void *, struct device_header *,
++					void (*)(void *, u8, enum irq_type));
++
++	/* Create new tree without a reserve map */
++	_FDT(fdt_create(fdt, FDT_MAX_SIZE));
++	_FDT(fdt_finish_reservemap(fdt));
++
++	/* Header */
++	_FDT(fdt_begin_node(fdt, ""));
++	_FDT(fdt_property_string(fdt, "compatible", "linux,dummy-virt"));
++	_FDT(fdt_property_cell(fdt, "#address-cells", 0x2));
++	_FDT(fdt_property_cell(fdt, "#size-cells", 0x2));
++
++	/* /chosen */
++	_FDT(fdt_begin_node(fdt, "chosen"));
++
++	/* Pass on our amended command line to a Linux kernel only. */
++	if (kvm->cfg.firmware_filename) {
++		if (kvm->cfg.kernel_cmdline)
++			_FDT(fdt_property_string(fdt, "bootargs",
++						 kvm->cfg.kernel_cmdline));
++	} else
++		_FDT(fdt_property_string(fdt, "bootargs",
++					 kvm->cfg.real_cmdline));
++
++	_FDT(fdt_property_string(fdt, "stdout-path", "serial0"));
++
++	/* Initrd */
++	if (kvm->arch.initrd_size != 0) {
++		u64 ird_st_prop = cpu_to_fdt64(kvm->arch.initrd_guest_start);
++		u64 ird_end_prop = cpu_to_fdt64(kvm->arch.initrd_guest_start +
++					       kvm->arch.initrd_size);
++
++		_FDT(fdt_property(fdt, "linux,initrd-start",
++				   &ird_st_prop, sizeof(ird_st_prop)));
++		_FDT(fdt_property(fdt, "linux,initrd-end",
++				   &ird_end_prop, sizeof(ird_end_prop)));
++	}
++
++	_FDT(fdt_end_node(fdt));
++
++	/* Memory */
++	_FDT(fdt_begin_node(fdt, "memory"));
++	_FDT(fdt_property_string(fdt, "device_type", "memory"));
++	_FDT(fdt_property(fdt, "reg", mem_reg_prop, sizeof(mem_reg_prop)));
++	_FDT(fdt_end_node(fdt));
++
++	/* CPUs */
++	generate_cpu_nodes(fdt, kvm);
++
++	/* Simple Bus */
++	_FDT(fdt_begin_node(fdt, "smb"));
++	_FDT(fdt_property_string(fdt, "compatible", "simple-bus"));
++	_FDT(fdt_property_cell(fdt, "#address-cells", 0x2));
++	_FDT(fdt_property_cell(fdt, "#size-cells", 0x2));
++	_FDT(fdt_property_cell(fdt, "interrupt-parent", PHANDLE_PLIC));
++	_FDT(fdt_property(fdt, "ranges", NULL, 0));
++
++	/* Virtio MMIO devices */
++	dev_hdr = device__first_dev(DEVICE_BUS_MMIO);
++	while (dev_hdr) {
++		generate_mmio_fdt_nodes = dev_hdr->data;
++		generate_mmio_fdt_nodes(fdt, dev_hdr, plic__generate_irq_prop);
++		dev_hdr = device__next_dev(dev_hdr);
++	}
++
++	/* IOPORT devices */
++	dev_hdr = device__first_dev(DEVICE_BUS_IOPORT);
++	while (dev_hdr) {
++		generate_mmio_fdt_nodes = dev_hdr->data;
++		generate_mmio_fdt_nodes(fdt, dev_hdr, plic__generate_irq_prop);
++		dev_hdr = device__next_dev(dev_hdr);
++	}
++
++	_FDT(fdt_end_node(fdt));
++
++	if (fdt_stdout_path) {
++		_FDT(fdt_begin_node(fdt, "aliases"));
++		_FDT(fdt_property_string(fdt, "serial0", fdt_stdout_path));
++		_FDT(fdt_end_node(fdt));
++
++		free(fdt_stdout_path);
++		fdt_stdout_path = NULL;
++	}
++
++	/* Finalise. */
++	_FDT(fdt_end_node(fdt));
++	_FDT(fdt_finish(fdt));
++
++	_FDT(fdt_open_into(fdt, fdt_dest, FDT_MAX_SIZE));
++	_FDT(fdt_pack(fdt_dest));
++
++	if (kvm->cfg.arch.dump_dtb_filename)
++		dump_fdt(kvm->cfg.arch.dump_dtb_filename, fdt_dest);
++	return 0;
++}
++late_init(setup_fdt);
+diff --git a/riscv/include/kvm/fdt-arch.h b/riscv/include/kvm/fdt-arch.h
+index 9450fc5..f7548e8 100644
+--- a/riscv/include/kvm/fdt-arch.h
++++ b/riscv/include/kvm/fdt-arch.h
+@@ -1,4 +1,8 @@
+ #ifndef KVM__KVM_FDT_H
+ #define KVM__KVM_FDT_H
+ 
++enum phandles {PHANDLE_RESERVED = 0, PHANDLE_PLIC, PHANDLES_MAX};
++
++#define PHANDLE_CPU_INTC_BASE	PHANDLES_MAX
++
+ #endif /* KVM__KVM_FDT_H */
+diff --git a/riscv/include/kvm/kvm-arch.h b/riscv/include/kvm/kvm-arch.h
+index 9face96..884c16b 100644
+--- a/riscv/include/kvm/kvm-arch.h
++++ b/riscv/include/kvm/kvm-arch.h
+@@ -78,6 +78,8 @@ static inline bool riscv_addr_in_ioport_region(u64 phys_addr)
+ 
+ enum irq_type;
+ 
++void plic__generate_irq_prop(void *fdt, u8 irq, enum irq_type irq_type);
++
+ void plic__irq_trig(struct kvm *kvm, int irq, int level, bool edge);
+ 
+ #endif /* KVM__KVM_ARCH_H */
+diff --git a/riscv/include/kvm/kvm-config-arch.h b/riscv/include/kvm/kvm-config-arch.h
+index 60c7333..526fca2 100644
+--- a/riscv/include/kvm/kvm-config-arch.h
++++ b/riscv/include/kvm/kvm-config-arch.h
+@@ -4,6 +4,12 @@
+ #include "kvm/parse-options.h"
+ 
+ struct kvm_config_arch {
++	const char	*dump_dtb_filename;
+ };
+ 
++#define OPT_ARCH_RUN(pfx, cfg)						\
++	pfx,								\
++	OPT_STRING('\0', "dump-dtb", &(cfg)->dump_dtb_filename,		\
++		   ".dtb file", "Dump generated .dtb to specified file"),
++
+ #endif /* KVM__KVM_CONFIG_ARCH_H */
+diff --git a/riscv/plic.c b/riscv/plic.c
+index d71226e..9344202 100644
+--- a/riscv/plic.c
++++ b/riscv/plic.c
+@@ -1,5 +1,6 @@
+ 
+ #include "kvm/devices.h"
++#include "kvm/fdt.h"
+ #include "kvm/ioeventfd.h"
+ #include "kvm/ioport.h"
+ #include "kvm/kvm.h"
+@@ -460,6 +461,54 @@ static void plic__mmio_callback(struct kvm_cpu *vcpu,
+ 	}
+ }
+ 
++void plic__generate_irq_prop(void *fdt, u8 irq, enum irq_type irq_type)
++{
++	u32 irq_prop[] = {
++		cpu_to_fdt32(irq)
 +	};
 +
-+	if (irq_update)
-+		__plic_context_irq_update(s, c);
-+
-+	mutex_unlock(&c->irq_lock);
++	_FDT(fdt_property(fdt, "interrupts", irq_prop, sizeof(irq_prop)));
 +}
 +
-+static void plic__mmio_callback(struct kvm_cpu *vcpu,
-+				u64 addr, u8 *data, u32 len,
-+				u8 is_write, void *ptr)
-+{
-+	u32 cntx;
-+	struct plic_state *s = ptr;
-+
-+	if (len != 4)
-+		die("plic: invalid len=%d", len);
-+
-+	addr &= ~0x3;
-+	addr -= RISCV_PLIC;
-+
-+	if (is_write) {
-+		if (PRIORITY_BASE <= addr && addr < ENABLE_BASE) {
-+			plic__priority_write(s, addr, data);
-+		} else if (ENABLE_BASE <= addr && addr < CONTEXT_BASE) {
-+			cntx = (addr - ENABLE_BASE) / ENABLE_PER_HART;
-+			addr -= cntx * ENABLE_PER_HART + ENABLE_BASE;
-+			if (cntx < s->num_context)
-+				plic__context_enable_write(s,
-+							   &s->contexts[cntx],
-+							   addr, data);
-+		} else if (CONTEXT_BASE <= addr && addr < REG_SIZE) {
-+			cntx = (addr - CONTEXT_BASE) / CONTEXT_PER_HART;
-+			addr -= cntx * CONTEXT_PER_HART + CONTEXT_BASE;
-+			if (cntx < s->num_context)
-+				plic__context_write(s, &s->contexts[cntx],
-+						    addr, data);
-+		}
-+	} else {
-+		if (PRIORITY_BASE <= addr && addr < ENABLE_BASE) {
-+			plic__priority_read(s, addr, data);
-+		} else if (ENABLE_BASE <= addr && addr < CONTEXT_BASE) {
-+			cntx = (addr - ENABLE_BASE) / ENABLE_PER_HART;
-+			addr -= cntx * ENABLE_PER_HART + ENABLE_BASE;
-+			if (cntx < s->num_context)
-+				plic__context_enable_read(s,
-+							  &s->contexts[cntx],
-+							  addr, data);
-+		} else if (CONTEXT_BASE <= addr && addr < REG_SIZE) {
-+			cntx = (addr - CONTEXT_BASE) / CONTEXT_PER_HART;
-+			addr -= cntx * CONTEXT_PER_HART + CONTEXT_BASE;
-+			if (cntx < s->num_context)
-+				plic__context_read(s, &s->contexts[cntx],
-+						   addr, data);
-+		}
-+	}
-+}
-+
-+static int plic__init(struct kvm *kvm)
++static void plic__generate_fdt_node(void *fdt,
++				    struct device_header *dev_hdr,
++				    void (*generate_irq_prop)(void *fdt,
++							      u8 irq,
++							      enum irq_type))
 +{
 +	u32 i;
-+	int ret;
-+	struct plic_context *c;
++	u32 reg_cells[4], *irq_cells;
 +
-+	plic.kvm = kvm;
-+	plic.dev_hdr = (struct device_header) {
-+		.bus_type	= DEVICE_BUS_MMIO,
-+	};
++	reg_cells[0] = 0;
++	reg_cells[1] = cpu_to_fdt32(RISCV_PLIC);
++	reg_cells[2] = 0;
++	reg_cells[3] = cpu_to_fdt32(RISCV_PLIC_SIZE);
 +
-+	plic.num_irq = MAX_DEVICES;
-+	plic.num_irq_word = plic.num_irq / 32;
-+	if ((plic.num_irq_word * 32) < plic.num_irq)
-+		plic.num_irq_word++;
-+	plic.max_prio = (1UL << PRIORITY_PER_ID) - 1;
++	irq_cells = calloc(plic.num_context * 2, sizeof(u32));
++	if (!irq_cells)
++		die("Failed to alloc irq_cells");
 +
-+	plic.num_context = kvm->nrcpus * 2;
-+	plic.contexts = calloc(plic.num_context, sizeof(struct plic_context));
-+	if (!plic.contexts)
-+		return -ENOMEM;
-+	for (i = 0; i < plic.num_context; i++) {
-+		c = &plic.contexts[i];
-+		c->s = &plic;
-+		c->num = i;
-+		c->vcpu = kvm->cpus[i / 2];
-+		mutex_init(&c->irq_lock);
++	_FDT(fdt_begin_node(fdt, "interrupt-controller@0c000000"));
++	_FDT(fdt_property_string(fdt, "compatible", "riscv,plic0"));
++	_FDT(fdt_property(fdt, "reg", reg_cells, sizeof(reg_cells)));
++	_FDT(fdt_property_cell(fdt, "#interrupt-cells", 1));
++	_FDT(fdt_property(fdt, "interrupt-controller", NULL, 0));
++	_FDT(fdt_property_cell(fdt, "riscv,max-priority", plic.max_prio));
++	_FDT(fdt_property_cell(fdt, "riscv,ndev", MAX_DEVICES - 1));
++	_FDT(fdt_property_cell(fdt, "phandle", PHANDLE_PLIC));
++	for (i = 0; i < (plic.num_context / 2); i++) {
++		irq_cells[4*i + 0] = cpu_to_fdt32(PHANDLE_CPU_INTC_BASE + i);
++		irq_cells[4*i + 1] = cpu_to_fdt32(0xffffffff);
++		irq_cells[4*i + 2] = cpu_to_fdt32(PHANDLE_CPU_INTC_BASE + i);
++		irq_cells[4*i + 3] = cpu_to_fdt32(9);
 +	}
++	_FDT(fdt_property(fdt, "interrupts-extended", irq_cells,
++			  sizeof(u32) * plic.num_context * 2));
++	_FDT(fdt_end_node(fdt));
 +
-+	mutex_init(&plic.irq_lock);
-+
-+	ret = kvm__register_mmio(kvm, RISCV_PLIC, RISCV_PLIC_SIZE,
-+				 false, plic__mmio_callback, &plic);
-+	if (ret)
-+		return ret;
-+
-+	ret = device__register(&plic.dev_hdr);
-+	if (ret)
-+		return ret;
-+
-+	plic.ready = true;
-+
-+	return 0;
-+
++	free(irq_cells);
 +}
-+dev_init(plic__init);
 +
-+static int plic__exit(struct kvm *kvm)
-+{
-+	plic.ready = false;
-+	kvm__deregister_mmio(kvm, RISCV_PLIC);
-+	free(plic.contexts);
-+
-+	return 0;
-+}
-+dev_exit(plic__exit);
+ static int plic__init(struct kvm *kvm)
+ {
+ 	u32 i;
+@@ -469,6 +518,7 @@ static int plic__init(struct kvm *kvm)
+ 	plic.kvm = kvm;
+ 	plic.dev_hdr = (struct device_header) {
+ 		.bus_type	= DEVICE_BUS_MMIO,
++		.data		= plic__generate_fdt_node,
+ 	};
+ 
+ 	plic.num_irq = MAX_DEVICES;
 -- 
 2.25.1
 
