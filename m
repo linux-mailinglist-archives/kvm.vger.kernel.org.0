@@ -2,146 +2,231 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0E421419C8E
-	for <lists+kvm@lfdr.de>; Mon, 27 Sep 2021 19:28:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3E460419D39
+	for <lists+kvm@lfdr.de>; Mon, 27 Sep 2021 19:44:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235622AbhI0RaE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Sep 2021 13:30:04 -0400
-Received: from mail-dm3nam07on2075.outbound.protection.outlook.com ([40.107.95.75]:49409
-        "EHLO NAM02-DM3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S237795AbhI0R1B (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Sep 2021 13:27:01 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=k2aXOLLNAcU3KjYMs8c9AIP+KNXvUlbeYcN20/8wMB48ypJE7srW70Vde6Q+ZpxLxMAVCJfvr6aIiItFjun5woB+M+GtCaZMYmxUsIy3Fg+Ze2NVFBcnY/iHEgus64jQSup4mXg/c36bSIeMopv1ppwi3DGE4fNuiRAY5C0WqduaFLvtlsdi69lggp3l+oTBxwZCISlsWl4b/xYx/Burxnqm09ausGB+cDU9uZqAHtMy/o46LHVMBOiAwfoZl1osbm4uKqJnhdmomowKnDgX2ZogKAxIhEp/uxKOyKDZ8n3NsJzHB4V+WdaKqdNsi9RHuxG1Dn+wM/WFtnLoGsXQUQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
- bh=E7CExuPcP6rxaeV2PFaCrKV32ZwGeNYCugkTCaN4qAI=;
- b=f3Bb9wPgzO0E7rPtHGpR9yldvjm6ilzs8jlcpWFgshPQqpaDdlQUcWXMvjsUKo7y0MLrtyfyAFYRbNy2EosfqQcZYePOYfW1dv4751jxh2/NgaRlFqZZ8J2zzH1ge7UrBFxWvBe2RWxFDXeCScLGPjk2qSlbXmUNfzzF/oqEaiVUM6XeOQ31w6bzRtxiWMOTgizQKfl2eCuN33U3XuTP7eh/3T71/QEFIhNWjzCTJcs0i29x/OEZ4u4GXaw2k5SnNt0lGgoBbXPx6hA8qqQoERj579cyHBUYPoHEhsYfQih9qwJwNip5mQSOXRb0ir/utBE4QDbvvYc9FISDd5cWFw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.112.34) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=quarantine sp=none pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=E7CExuPcP6rxaeV2PFaCrKV32ZwGeNYCugkTCaN4qAI=;
- b=XqQpjh6dzfZpWUmqvJv9oBPzNKhFEXyL0Be4Hc8WGWPX5Gs1lbj32VFieNhbF5hznn+OEivUsoQw5sFA4ve96w35+LPUnj4qwMbBnpMb66IpvtO/b4IAe9WWED6/PTMedGIAPBlrYdslzjJm4Y5+Rzis8gPqqIEJSovYDLOcWB/KvnQALygONnk6gyk3n1oNa61G3EnCVrr+thAUwbQdYLpSkQ9jW26ymWyJZFPSrFfl5dgq/+TIs8G6U/PQFZRRis/zPW5inQuydHhNP81rq7XGvDf0mDJ86RohmO4s3CkyGr1bKrojBK3VDO6Ro6sbOQAnF1Yt4EUmjyBxQZMHoA==
-Received: from DM3PR12CA0062.namprd12.prod.outlook.com (2603:10b6:0:56::30) by
- BN9PR12MB5147.namprd12.prod.outlook.com (2603:10b6:408:118::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4544.15; Mon, 27 Sep
- 2021 17:25:16 +0000
-Received: from DM6NAM11FT008.eop-nam11.prod.protection.outlook.com
- (2603:10b6:0:56:cafe::de) by DM3PR12CA0062.outlook.office365.com
- (2603:10b6:0:56::30) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4544.13 via Frontend
- Transport; Mon, 27 Sep 2021 17:25:16 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.34)
- smtp.mailfrom=nvidia.com; vger.kernel.org; dkim=none (message not signed)
- header.d=none;vger.kernel.org; dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.112.34 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.112.34; helo=mail.nvidia.com;
-Received: from mail.nvidia.com (216.228.112.34) by
- DM6NAM11FT008.mail.protection.outlook.com (10.13.172.85) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.4544.13 via Frontend Transport; Mon, 27 Sep 2021 17:25:16 +0000
-Received: from DRHQMAIL107.nvidia.com (10.27.9.16) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.18; Mon, 27 Sep
- 2021 17:25:15 +0000
-Received: from [172.27.0.62] (172.20.187.6) by DRHQMAIL107.nvidia.com
- (10.27.9.16) with Microsoft SMTP Server (TLS) id 15.0.1497.18; Mon, 27 Sep
- 2021 17:25:12 +0000
-Subject: Re: [PATCH 2/2] virtio-blk: set NUMA affinity for a tagset
-To:     Leon Romanovsky <leon@kernel.org>
-CC:     <mst@redhat.com>, <virtualization@lists.linux-foundation.org>,
-        <kvm@vger.kernel.org>, <stefanha@redhat.com>, <oren@nvidia.com>,
-        <nitzanc@nvidia.com>, <israelr@nvidia.com>, <hch@infradead.org>,
-        <linux-block@vger.kernel.org>, <axboe@kernel.dk>
-References: <20210926145518.64164-1-mgurtovoy@nvidia.com>
- <20210926145518.64164-2-mgurtovoy@nvidia.com> <YVGsMsIjD2+aS3eC@unreal>
-From:   Max Gurtovoy <mgurtovoy@nvidia.com>
-Message-ID: <0c155679-e1db-3d1e-2b4e-a0f12ce5950c@nvidia.com>
-Date:   Mon, 27 Sep 2021 20:25:09 +0300
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+        id S236780AbhI0Rqd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Sep 2021 13:46:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46400 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236369AbhI0Rq0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Sep 2021 13:46:26 -0400
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0A87C01C1C6
+        for <kvm@vger.kernel.org>; Mon, 27 Sep 2021 10:28:19 -0700 (PDT)
+Received: by mail-pl1-x630.google.com with SMTP id j14so12272586plx.4
+        for <kvm@vger.kernel.org>; Mon, 27 Sep 2021 10:28:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=ecZR8501JUA5HjJ4//gNp1dcXa6TfEaO5GlBtu6Su+A=;
+        b=GOtOu1nR9l539q+qbEcVbGsMPn51n8QQ32PMYKIi6hIg46kqbYOo+hyGorxaHeXyiT
+         V2tIDEC+I97Rg1zmhvPqeSzBeiBlCMUjmjZANJZzM9jX9QQBGLcV5QiWLXLdjVMX2MuS
+         sScGZznLE19gExlLe/Ai7FS2B5zHwdMU7MKsUpu1yak92XJeVKQbMEKqZ/hzEY/0boo6
+         sDlwFotvdcbYnahoS2c2Z8+mFOK1SJ2AB2kkvp6KT1bpJ8KctGOFh9LaiyRBGQUAyp5S
+         j7e9humkRF8Tiv6iuLdNX3komtUTfGZHyDUAJJ18POrEa009r1yW8e9FcOZick20MEx6
+         O+tQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=ecZR8501JUA5HjJ4//gNp1dcXa6TfEaO5GlBtu6Su+A=;
+        b=FYdPVkvTPc3X2GUhUcyw1GpaaZ+vL0ly5IA95LZ/O5nnJmZ6mxs1SuNeHo0ksSjKc3
+         DoCk8NSf5gq1iObK/MGi00pTZZtaENYjoAByXNfZn4Ng3yRvnu4jX0v99fpbz9Nddxzo
+         rresbvCyDI6PixQQqN7AjsLlPafPvYuDw6rjrq2GriOOPzloewD0SvSEgqVdQgTWK/Wd
+         3JRjsSthxmgizU2ijwFibfvLQiGxzocVJ47O6Zv/OJOPYeDl1bGCdKza+l5phz/JZkdb
+         FLCuwVDWTwvSGLtj2tRzWxVja/+75scZi45BdkbHmUmNVJUJ6wb+I9yF4tgX9xqtpest
+         BBsQ==
+X-Gm-Message-State: AOAM533RDY28Ktv2j0uYe3BRcU8nI0+8nhek7581x0aq+DoP1MB7MDU/
+        HtzzUJIbe7h5GxYlnS17texAGg==
+X-Google-Smtp-Source: ABdhPJxsqRCUhYx/WDAlHwlUhNALt8ImrF7i3ClqjdGVCi9orteLX/2Ra1fBVLm7dJRGmXOdFcEtpg==
+X-Received: by 2002:a17:902:9895:b0:13c:94f8:d74b with SMTP id s21-20020a170902989500b0013c94f8d74bmr678633plp.20.1632763698990;
+        Mon, 27 Sep 2021 10:28:18 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id c8sm17798035pfj.204.2021.09.27.10.28.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 27 Sep 2021 10:28:18 -0700 (PDT)
+Date:   Mon, 27 Sep 2021 17:28:14 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        David Matlack <dmatlack@google.com>,
+        Jing Zhang <jingzhangos@google.com>
+Subject: Re: [PATCH 07/14] KVM: Don't block+unblock when halt-polling is
+ successful
+Message-ID: <YVH/LjCqk/9PfDHn@google.com>
+References: <20210925005528.1145584-1-seanjc@google.com>
+ <20210925005528.1145584-8-seanjc@google.com>
+ <878rzlass2.wl-maz@kernel.org>
+ <80d90ee6-0d43-3735-5c26-be8c3d72d493@redhat.com>
+ <877df3btgb.wl-maz@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <YVGsMsIjD2+aS3eC@unreal>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Originating-IP: [172.20.187.6]
-X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
- DRHQMAIL107.nvidia.com (10.27.9.16)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 1e10660b-4f83-4d59-c8ec-08d981dbc5a5
-X-MS-TrafficTypeDiagnostic: BN9PR12MB5147:
-X-Microsoft-Antispam-PRVS: <BN9PR12MB5147BB86AE38DB73F98492D3DEA79@BN9PR12MB5147.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: vhap4u6sq5IUNFKiX2tK7tHi1XPDCgdOkZLNWiw4hvJHUEO4GveyN3q8CMYCyJudFopP6mu3J+z2/WvKcEDwjVuo0/+GxHsxvalyDUjqh4+L5vqvrSbrWrbvEijj+delsTaxm1unmsxx9LjyYFzbRlR0Oc/RzKGByAV9BelqeAxXc2BdQSHGQIGdmGj8RjmNxvRtXVp0hfOkoHKlznI232XXJJJ6eglatzHHFvQ2e9cotda7y6ejsSQd+Hjl77lSTQw4JTqPGOqSuTGeOt+SiYHDYRcCWGwgffBLOx48UAVHcnQO/GpJZrbnX9p/KIdfH3FQwsvFf27V4tfR/QC8IKaVdnOBeHuqHMF8wLRY1kigr4bSO/yQJC9WEjOpnLsDupR/ikwBMNccfzA0w2RcQhfhJ1SsgpGX/GexgqIhNKJD0Wc1aUqjwugZW3pvbwxDV2d9pVqjuCjYWHqtSKpSKQ2242R2QD/7sx2xfMwq66DYnwDpz069gPLY2SJYqQTUKTLnJhh/l09CUkkttgbD6KM9g0pam2chXepSUg12DTpMXP7yJQLOha0XeQPZ6Hql5MVqux1lFvBnJCyL600wmrufchld28DSNprXmFQj0lmBC9HnVJx7axy0r0yHylY3LofFgt9sCsE6sodXKDWVQx8cOs6APFJGDmX5CzVIrPmQY6w3aIz7FtRXR6EXj42TEs4XH5yEmfxC+k/015d2/3NtaQOfXHVq3gcGz9dl8iM=
-X-Forefront-Antispam-Report: CIP:216.228.112.34;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid03.nvidia.com;CAT:NONE;SFS:(4636009)(36840700001)(46966006)(2616005)(16526019)(83380400001)(8676002)(5660300002)(36756003)(47076005)(70586007)(70206006)(6916009)(356005)(8936002)(426003)(36906005)(54906003)(26005)(31696002)(4326008)(16576012)(186003)(6666004)(336012)(316002)(7636003)(508600001)(36860700001)(2906002)(53546011)(86362001)(82310400003)(31686004)(43740500002);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Sep 2021 17:25:16.2363
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1e10660b-4f83-4d59-c8ec-08d981dbc5a5
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.34];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT008.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR12MB5147
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <877df3btgb.wl-maz@kernel.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Sun, Sep 26, 2021, Marc Zyngier wrote:
+> On Sun, 26 Sep 2021 07:27:28 +0100,
+> Paolo Bonzini <pbonzini@redhat.com> wrote:
+> > 
+> > On 25/09/21 11:50, Marc Zyngier wrote:
+> > >> there is no need for arm64 to put/load
+> > >> the vGIC as KVM hasn't relinquished control of the vCPU in any way.
+> > > 
+> > > This doesn't mean that there is no requirement for any state
+> > > change. The put/load on GICv4 is crucial for performance, and the VMCR
+> > > resync is a correctness requirement.
 
-On 9/27/2021 2:34 PM, Leon Romanovsky wrote:
-> On Sun, Sep 26, 2021 at 05:55:18PM +0300, Max Gurtovoy wrote:
->> To optimize performance, set the affinity of the block device tagset
->> according to the virtio device affinity.
->>
->> Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
->> ---
->>   drivers/block/virtio_blk.c | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
->> index 9b3bd083b411..1c68c3e0ebf9 100644
->> --- a/drivers/block/virtio_blk.c
->> +++ b/drivers/block/virtio_blk.c
->> @@ -774,7 +774,7 @@ static int virtblk_probe(struct virtio_device *vdev)
->>   	memset(&vblk->tag_set, 0, sizeof(vblk->tag_set));
->>   	vblk->tag_set.ops = &virtio_mq_ops;
->>   	vblk->tag_set.queue_depth = queue_depth;
->> -	vblk->tag_set.numa_node = NUMA_NO_NODE;
->> +	vblk->tag_set.numa_node = virtio_dev_to_node(vdev);
-> I afraid that by doing it, you will increase chances to see OOM, because
-> in NUMA_NO_NODE, MM will try allocate memory in whole system, while in
-> the latter mode only on specific NUMA which can be depleted.
+Ah crud, I didn't blame that code beforehand, I simply assumed
+kvm_arch_vcpu_blocking() was purely for the blocking/schedule() sequence.  The
+comment in arm64's kvm_arch_vcpu_blocking() about kvm_arch_vcpu_runnable() makes
+more sense now too.
 
-This is a common methodology we use in the block layer and in NVMe 
-subsystem and we don't afraid of the OOM issue you raised.
+> > I wouldn't even say it's crucial for performance: halt polling cannot
+> > work and is a waste of time without (the current implementation of)
+> > put/load.
+> 
+> Not quite. A non-V{LPI,SGI} could still be used as the a wake-up from
+> WFI (which is the only reason we end-up on this path). Only LPIs (and
+> SGIs on GICv4.1) can be directly injected, meaning that SPIs and PPIs
+> still follow the standard SW injection model.
+> 
+> However, there is still the ICH_VMCR_EL2 requirement (to get the
+> up-to-date priority mask and group enable bits) for SW-injected
+> interrupt wake-up to work correctly, and I really don't want to save
+> that one eagerly on each shallow exit.
 
-This is not new and I guess that the kernel MM will (or should) be 
-handling the fallback you raised.
+IIUC, VMCR is resident in hardware while the guest is running, and KVM needs to
+retrieve the VMCR when processing interrupts to determine if a interrupt is above
+the priority threshold.  If that's the case, then IMO handling the VMCR via an
+arch hook is unnecessarily fragile, e.g. any generic call that leads to
+kvm_arch_vcpu_runnable() needs to know that arm64 lazily retrieves a guest
+register.  A better approach for VMCR would be to retrieve the value from
+hardware on-demand, e.g. via a hook in vgic_get_vmcr(), so that it's all but
+impossible to have bugs where KVM is working with a stale VMCR, e.g.
 
-Anyway, if we're doing this in NVMe I don't see a reason to afraid doing 
-it in virtio-blk.
+diff --git a/arch/arm64/kvm/vgic/vgic-mmio.c b/arch/arm64/kvm/vgic/vgic-mmio.c
+index 48c6067fc5ec..0784de0c4080 100644
+--- a/arch/arm64/kvm/vgic/vgic-mmio.c
++++ b/arch/arm64/kvm/vgic/vgic-mmio.c
+@@ -828,6 +828,13 @@ void vgic_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr)
+ 
+ void vgic_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr)
+ {
++       if (!vcpu->...->vmcr_available) {
++               preempt_disable();
++               kvm_vgic_vmcr_sync(vcpu);
++               preempt_enable();
++               vcpu->...->vmcr_available = true;
++       }
++
+        if (kvm_vgic_global_state.type == VGIC_V2)
+                vgic_v2_get_vmcr(vcpu, vmcr);
+        else
 
-Also, I've send a patch that decrease the size of the memory consumption 
-for virtio-blk few weeks ago so I guess we'll be just fine.
 
->
-> Thanks
->
->>   	vblk->tag_set.flags = BLK_MQ_F_SHOULD_MERGE;
->>   	vblk->tag_set.cmd_size =
->>   		sizeof(struct virtblk_req) +
->> -- 
->> 2.18.1
->>
+Regarding vGIC v4, does KVM require it to be resident in hardware while the vCPU
+is loaded?  If not, then we could do something like this, which would eliminate
+the arch hooks entirely if the VMCR is handled as above.
+
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index fe102cd2e518..efc862c4d802 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -365,31 +365,6 @@ int kvm_cpu_has_pending_timer(struct kvm_vcpu *vcpu)
+        return kvm_timer_is_pending(vcpu);
+ }
+
+-void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu)
+-{
+-       /*
+-        * If we're about to block (most likely because we've just hit a
+-        * WFI), we need to sync back the state of the GIC CPU interface
+-        * so that we have the latest PMR and group enables. This ensures
+-        * that kvm_arch_vcpu_runnable has up-to-date data to decide
+-        * whether we have pending interrupts.
+-        *
+-        * For the same reason, we want to tell GICv4 that we need
+-        * doorbells to be signalled, should an interrupt become pending.
+-        */
+-       preempt_disable();
+-       kvm_vgic_vmcr_sync(vcpu);
+-       vgic_v4_put(vcpu, true);
+-       preempt_enable();
+-}
+-
+-void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu)
+-{
+-       preempt_disable();
+-       vgic_v4_load(vcpu);
+-       preempt_enable();
+-}
+-
+ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ {
+        struct kvm_s2_mmu *mmu;
+@@ -697,7 +672,6 @@ static void check_vcpu_requests(struct kvm_vcpu *vcpu)
+                        /* The distributor enable bits were changed */
+                        preempt_disable();
+                        vgic_v4_put(vcpu, false);
+-                       vgic_v4_load(vcpu);
+                        preempt_enable();
+                }
+
+@@ -813,6 +787,13 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+                 */
+                preempt_disable();
+
++               /*
++                * Reload vGIC v4 if necessary, as it may be put on-demand so
++                * that KVM can detect directly injected interrupts, e.g. when
++                * determining if the vCPU is runnable due to a pending event.
++                */
++               vgic_v4_load(vcpu);
++
+                kvm_pmu_flush_hwstate(vcpu);
+
+                local_irq_disable();
+diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+index 5dad4996cfb2..3ef360a20a22 100644
+--- a/arch/arm64/kvm/vgic/vgic.c
++++ b/arch/arm64/kvm/vgic/vgic.c
+@@ -969,6 +969,16 @@ int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu)
+
+        vgic_get_vmcr(vcpu, &vmcr);
+
++       /*
++        * Tell GICv4 that we need doorbells to be signalled, should an
++        * interrupt become pending.
++        */
++       if (vcpu->arch.vgic_cpu.vgic_v3.its_vpe.vpe_resident) {
++               preempt_disable();
++               vgic_v4_put(vcpu, true);
++               preempt_enable();
++       }
++
+        raw_spin_lock_irqsave(&vgic_cpu->ap_list_lock, flags);
+
+        list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
