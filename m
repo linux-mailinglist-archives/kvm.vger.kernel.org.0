@@ -2,114 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7C04141906B
-	for <lists+kvm@lfdr.de>; Mon, 27 Sep 2021 10:09:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 433A0419163
+	for <lists+kvm@lfdr.de>; Mon, 27 Sep 2021 11:16:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233300AbhI0IL3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Sep 2021 04:11:29 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46080 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233362AbhI0IL3 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 27 Sep 2021 04:11:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632730191;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=l5HpZigQlfyuuUZ5v+ofmgDie9ICzyMUm/Yd5LeQNgs=;
-        b=Zl0pVuaBGhKjZ91cq4sV7i64vlKU3SjFTmY+OKJVP0FR1uH6ANNnc20s1MvT+8WdUik7E9
-        03Shkqvm2JL7OJXhA9REv4VDHRXmrqDmbBzmdAJyN33qSIEIzLJgk/h93oWIXYspbLH3iR
-        sDiwAB4iF08tRUETnwcNVcKptLRDA1I=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-423-_aKQvTj3OGGAeQFzAmzX2g-1; Mon, 27 Sep 2021 04:09:45 -0400
-X-MC-Unique: _aKQvTj3OGGAeQFzAmzX2g-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4518010168C3;
-        Mon, 27 Sep 2021 08:09:44 +0000 (UTC)
-Received: from localhost (unknown [10.39.192.180])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4750C6B54F;
-        Mon, 27 Sep 2021 08:09:41 +0000 (UTC)
-Date:   Mon, 27 Sep 2021 10:09:40 +0200
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Max Gurtovoy <mgurtovoy@nvidia.com>
-Cc:     mst@redhat.com, virtualization@lists.linux-foundation.org,
-        kvm@vger.kernel.org, oren@nvidia.com, nitzanc@nvidia.com,
-        israelr@nvidia.com, hch@infradead.org, linux-block@vger.kernel.org,
-        axboe@kernel.dk
-Subject: Re: [PATCH 2/2] virtio-blk: set NUMA affinity for a tagset
-Message-ID: <YVF8RBZSaJs9BScd@stefanha-x1.localdomain>
-References: <20210926145518.64164-1-mgurtovoy@nvidia.com>
- <20210926145518.64164-2-mgurtovoy@nvidia.com>
+        id S233632AbhI0JRf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Sep 2021 05:17:35 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57406 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233581AbhI0JRd (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 27 Sep 2021 05:17:33 -0400
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 18R90PNx016012
+        for <kvm@vger.kernel.org>; Mon, 27 Sep 2021 05:15:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=eEZi+8QpDN1bnE93Uj3YqnkvLLaR84KbeTV8J4g86mc=;
+ b=TNOqGFFq0P2krBcNNXb/o0ciwM6zy5BgGqTSzU33eJrLSriwXzeqUnAy0clC1Pvt4WqJ
+ zGDVuM12vNHpe0aN0aHDLad1hYhcz2CuIuZ4YORFRdutBzs/OwGlO1E6TLu+69/ZLCLG
+ 80rSuZlvRV7t76UNAsEFtXuYt1uhn/RWHr/2bTBZYGel+3btrgFqxSLjD/7WhkQ6I9ZS
+ /ZdS28DDPQqQOZHDNwlSuEEa0C5xwwanGwKh8HIzxAlQDec2vcTB7N1IdUACx0+/7nNq
+ pmb8j+lteAdyeSwbQoCG1ccJqdrj1sv0ifZo2D8RDs+rHNvM3uqUH2f8ungU5pD3Nxu6 Sg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3bah7yf43p-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Mon, 27 Sep 2021 05:15:55 -0400
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 18R80WrA020945
+        for <kvm@vger.kernel.org>; Mon, 27 Sep 2021 05:15:55 -0400
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3bah7yf43a-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 27 Sep 2021 05:15:55 -0400
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 18R9DJug013423;
+        Mon, 27 Sep 2021 09:15:53 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma03fra.de.ibm.com with ESMTP id 3b9ud9a644-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 27 Sep 2021 09:15:52 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 18R9AnRq45351418
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 27 Sep 2021 09:10:49 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 39405AE053;
+        Mon, 27 Sep 2021 09:15:50 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E03D8AE056;
+        Mon, 27 Sep 2021 09:15:49 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.159.107])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 27 Sep 2021 09:15:49 +0000 (GMT)
+Subject: Re: [PATCH kvm-unit-tests] MAINTAINERS: add S lines
+To:     Thomas Huth <thuth@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Cc:     Laurent Vivier <lvivier@redhat.com>,
+        Andrew Jones <drjones@redhat.com>
+References: <20210923114814.229844-1-pbonzini@redhat.com>
+ <ea922e07-bacd-350b-4a8e-898444f25ee8@linux.ibm.com>
+ <9a4fb722-201c-7398-9fab-2680b62220f9@redhat.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Message-ID: <18aa544c-96ac-9fc7-019c-912bb7bd1a07@linux.ibm.com>
+Date:   Mon, 27 Sep 2021 11:15:49 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="fF+gM4A/h2gK2jIm"
-Content-Disposition: inline
-In-Reply-To: <20210926145518.64164-2-mgurtovoy@nvidia.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <9a4fb722-201c-7398-9fab-2680b62220f9@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 4_tMb8akTFKwNIcrYSMZz_H0_ZeaDKTg
+X-Proofpoint-ORIG-GUID: wrtAJnI-iqd72OKyRy5F_84nfpj-rfYv
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.391,FMLib:17.0.607.475
+ definitions=2021-09-27_02,2021-09-24_02,2020-04-07_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 clxscore=1011
+ mlxscore=0 bulkscore=0 mlxlogscore=999 spamscore=0 phishscore=0
+ lowpriorityscore=0 priorityscore=1501 adultscore=0 suspectscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2109230001 definitions=main-2109270062
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 9/27/21 10:02 AM, Thomas Huth wrote:
+> On 27/09/2021 10.00, Janosch Frank wrote:
+>> On 9/23/21 1:48 PM, Paolo Bonzini wrote:
+>>> Mark PPC as maintained since it is a bit more stagnant than the rest.
+>>>
+>>> Everything else is supported---strange but true.
+>>>
+>>> Cc: Laurent Vivier <lvivier@redhat.com>
+>>> Cc: Thomas Huth <thuth@redhat.com>
+>>> Cc: Janosch Frank <frankja@linux.ibm.com>
+>>> Cc: Andrew Jones <drjones@redhat.com>
+>>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>>
+>> Acked-by: Janosch Frank <frankja@linux.ibm.com>
+>>
+>> Is there a reason why we suddenly want to add this i.e. is that
+>> indication used by anyone right now?
+> 
+> I think it's for the get_maintainers.pl script that has just been pushed to 
+> the repository some days ago.
+> 
+>   Thomas
+> 
 
---fF+gM4A/h2gK2jIm
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Sun, Sep 26, 2021 at 05:55:18PM +0300, Max Gurtovoy wrote:
-> To optimize performance, set the affinity of the block device tagset
-> according to the virtio device affinity.
->=20
-> Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
-> ---
->  drivers/block/virtio_blk.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> index 9b3bd083b411..1c68c3e0ebf9 100644
-> --- a/drivers/block/virtio_blk.c
-> +++ b/drivers/block/virtio_blk.c
-> @@ -774,7 +774,7 @@ static int virtblk_probe(struct virtio_device *vdev)
->  	memset(&vblk->tag_set, 0, sizeof(vblk->tag_set));
->  	vblk->tag_set.ops =3D &virtio_mq_ops;
->  	vblk->tag_set.queue_depth =3D queue_depth;
-> -	vblk->tag_set.numa_node =3D NUMA_NO_NODE;
-> +	vblk->tag_set.numa_node =3D virtio_dev_to_node(vdev);
->  	vblk->tag_set.flags =3D BLK_MQ_F_SHOULD_MERGE;
->  	vblk->tag_set.cmd_size =3D
->  		sizeof(struct virtblk_req) +
-
-I implemented NUMA affinity in the past and could not demonstrate a
-performance improvement:
-https://lists.linuxfoundation.org/pipermail/virtualization/2020-June/048248=
-=2Ehtml
-
-The pathological case is when a guest with vNUMA has the virtio-blk-pci
-device on the "wrong" host NUMA node. Then memory accesses should cross
-NUMA nodes. Still, it didn't seem to matter.
-
-Please share your benchmark results. If you haven't collected data yet
-you could even combine our patches to see if it helps. Thanks!
-
-Stefan
-
---fF+gM4A/h2gK2jIm
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmFRfEMACgkQnKSrs4Gr
-c8ijxgf/WJsZGMwBy3P0wAF4J4oXhH44ONmgK3OJh5n9i3QtyVEG73LkgnD5Gf9M
-9NZnRYgfeYce3jD3ymDS6xk/lqY205H+O1ZYUvFo4Kn/w3hJvpstwbgMKk6sm4XB
-NXsaB+0M7gsAm0HVgWzkDqanzOSLMFJZpF0Lvtj6/+9NYyRvBXbFkP6vCfLQEoQw
-0YB+df/mv5UMjUXg0BxiXrMalaQ6po2bNAhBe3PmMXsVIr3wG/gyyUxyugKyZFeK
-KE/I4zTmsgqO/72E5c9On7mSF5zZvQNLA00K29ENsGZbprNodTcDhqdaNhwRdSCw
-SOku06A0BIXyZlgMKBqTxm8nW5XX4A==
-=sWXI
------END PGP SIGNATURE-----
-
---fF+gM4A/h2gK2jIm--
-
+Ah, haven't seen that patch yet, time to read more mails...
+Thanks for the clarification!
