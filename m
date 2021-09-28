@@ -2,149 +2,229 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7F6D041BA4F
-	for <lists+kvm@lfdr.de>; Wed, 29 Sep 2021 00:24:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4DBA541BAED
+	for <lists+kvm@lfdr.de>; Wed, 29 Sep 2021 01:20:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243291AbhI1W0S (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Sep 2021 18:26:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50176 "EHLO
+        id S243214AbhI1XW1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Sep 2021 19:22:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34864 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243153AbhI1W0G (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Sep 2021 18:26:06 -0400
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D66BEC0617BC
-        for <kvm@vger.kernel.org>; Tue, 28 Sep 2021 15:23:45 -0700 (PDT)
-Received: by mail-pl1-x629.google.com with SMTP id bb10so130936plb.2
-        for <kvm@vger.kernel.org>; Tue, 28 Sep 2021 15:23:45 -0700 (PDT)
+        with ESMTP id S230349AbhI1XW1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Sep 2021 19:22:27 -0400
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A4C1C06161C
+        for <kvm@vger.kernel.org>; Tue, 28 Sep 2021 16:20:47 -0700 (PDT)
+Received: by mail-pf1-x42c.google.com with SMTP id w14so354332pfu.2
+        for <kvm@vger.kernel.org>; Tue, 28 Sep 2021 16:20:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=l3yJFNQhpQQjT2n8nhSzgm70VdXRHR0GUh1aWIMK9Ro=;
-        b=JjW3Rw/QrbkmGlARc27sQqxhIAPzCby5xWxB1R7jDVX754jpM/k051X4gtAsrdW+Lm
-         rUbJRoCrYARJ6sLIndnkY7cizuKAWPEtiMBDhbgMm8Gb+FMLvmfcPI6JrGSv1+d2wdLL
-         nddphNljETjJrPo5pxvlmqw9k264MKM5g5ktkOCcpIfynFmd6y39DVKtvNFflfgxf2s2
-         qjecxZztBVXr/RYy1s9rEPbmi36RAHFr6uxOrDflfX5S+HdKxdw6sjodcfaQ5Dan8tTV
-         TCpYs+yibX3VpTb1pJ1DfCZdpWLTfll9M3rCvMlT3bUGnyIAiZfEfRUy4DJ7zr0HvQQe
-         2aUg==
+        bh=UGqfj0Lu1yqe3ICg5RET+tLswWsdfuZHNoCTUNF/Uzs=;
+        b=ktTYgxEt+/Ampbz8uSBrRMPIAz/idvs23twHZPW49NiFLYNx0UrJMlpO/qSoV1Bomk
+         YUWDBgxRXfTYt7mqIz3yM9k71Qvwk4LZ93E1desyrK5VVDybtiUv7ubdJ28LEP39esq2
+         uuU+6ErIQAyonGVV+s3AGb+o+NsKYw4ovGye57m5ERw++PUxSv8C4TsCL3OI25AWuUOE
+         7Z8i+9ip2VS5JhpqoDKTXp2iRr8YB30Wu9BIkMy+IJRHdMzGHsVaU5A7AuZZSycPBXwG
+         7sYcqsMqaIJ6N2Lj6sNFSQbrsOFxC4yNvRAnFOYjalbNGjadVQZsO68TeLq3cAJuUHZx
+         qA5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=l3yJFNQhpQQjT2n8nhSzgm70VdXRHR0GUh1aWIMK9Ro=;
-        b=mDxBD6h5I0w3iH4l5uzxhCKfzCk2LXSdRcYjfQn35tqFfZ3/RgQBSroX/yge9qui3h
-         l4F0BoozQJE5ABnl4NSj8Twha4AmPK/P2UFAwWJHD900cP/gZ39vt5L5LXjRrzKt/NW9
-         aGSATqX0NyGTE7aiY1cW7SZt3zfqRB40hmuAzDmzS1FX8oms47Sqn5WLWuWqV4g0jlR5
-         N2brWO4pLlzI+04pRgyBK6ivAZzOXmSPXVRATEMsc28ih3GWEYYgYGEwHFVJyMJLva2J
-         0LlYljOOev1jtbaVkEa55Ap5XenVbLyEFEyuPYgWpb7RZ40GbDRFugJ+5IbftCbVwt4i
-         ZJpw==
-X-Gm-Message-State: AOAM530iJHaIstGLjycOYGKXNxUmzdbwsueZkokXuEKRpP4S4V+zF1Ny
-        +7Ammd/MpmLWOMrtb54LTUN3rQ==
-X-Google-Smtp-Source: ABdhPJzDHGOPtyMLQUah+/AinT9/mI/VC/378GrrgAQ2xdT7wY98L55jHudOrKTbZqVa9ZZzSEcaBw==
-X-Received: by 2002:a17:90a:e16:: with SMTP id v22mr2556179pje.209.1632867825079;
-        Tue, 28 Sep 2021 15:23:45 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id in23sm3455680pjb.57.2021.09.28.15.23.44
+        bh=UGqfj0Lu1yqe3ICg5RET+tLswWsdfuZHNoCTUNF/Uzs=;
+        b=3H7oHQIsZ9sIurb02K+0ExXafTvBXUzy9GbBAdrdni1FbwL9FZ6V+rQ0wJs9tquivF
+         kcYW3fE1Eh6/rVc8N5UsQv7sY1yPP5Lqx+rLKrrdC1lmFmXlfVMTohks2S30e8PhFFk7
+         g2Ntman7LM0Nq/PL1LunkwIuWAadjzIOqsm5njMKkqkoEV+Aqbpw71uzR28uWV1ZmAc7
+         Au5+aVMJOYRuwmFMO/r7Tmv5EKii76+dOumXTNQJJ8YhA7jSm5iq+D/GHMR3VYnhhcM8
+         ZNj0+oO/lGF8J0UfmsfZwR9XCVhRrIlKK+y0PaPOHyLp1ujfl9R5yS55ubuF7u2hFSsA
+         YKQQ==
+X-Gm-Message-State: AOAM533BA0w0R+WUQ5kz6cCYg5aMCHLsI0qbAedI3Lx9gjnwxWwjtcc4
+        YnqbXGoPJgDSfrGLdI3aKWxH9w==
+X-Google-Smtp-Source: ABdhPJwTa/py5geL3XY+CzwyaLKtYNqkjvb1RpNaBnglEbbxxOrFPI04Wm0x7FME079K+YbBCuZQ0Q==
+X-Received: by 2002:a63:a65:: with SMTP id z37mr7028095pgk.192.1632871246302;
+        Tue, 28 Sep 2021 16:20:46 -0700 (PDT)
+Received: from google.com (254.80.82.34.bc.googleusercontent.com. [34.82.80.254])
+        by smtp.gmail.com with ESMTPSA id z17sm190349pfj.185.2021.09.28.16.20.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Sep 2021 15:23:44 -0700 (PDT)
-Date:   Tue, 28 Sep 2021 22:23:40 +0000
-From:   Sean Christopherson <seanjc@google.com>
+        Tue, 28 Sep 2021 16:20:45 -0700 (PDT)
+Date:   Tue, 28 Sep 2021 23:20:41 +0000
+From:   David Matlack <dmatlack@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Maxim Levitsky <mlevitsk@redhat.com>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        kvm@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 2/3] nSVM: introduce smv->nested.save to cache save
- area fields
-Message-ID: <YVOV7EucFzF5S6So@google.com>
-References: <20210903102039.55422-1-eesposit@redhat.com>
- <20210903102039.55422-3-eesposit@redhat.com>
- <fbb40bb8c12715c0aa9d6a113784f8a21603e2b3.camel@redhat.com>
- <82acae8f-6b27-928f-0c00-1df8fc9d26b8@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        seanjc@google.com
+Subject: Re: [PATCH v3 31/31] KVM: MMU: make spte an in-out argument in
+ make_spte
+Message-ID: <YVOjSSahzJ/tf28g@google.com>
+References: <20210924163152.289027-1-pbonzini@redhat.com>
+ <20210924163152.289027-32-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <82acae8f-6b27-928f-0c00-1df8fc9d26b8@redhat.com>
+In-Reply-To: <20210924163152.289027-32-pbonzini@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 28, 2021, Paolo Bonzini wrote:
-> On 12/09/21 12:39, Maxim Levitsky wrote:
-> > On Fri, 2021-09-03 at 12:20 +0200, Emanuele Giuseppe Esposito wrote:
-> > > This is useful in next patch, to avoid having temporary
-> > > copies of vmcb12 registers and passing them manually.
-> > 
-> > This is NOT what I had in mind, but I do like that idea very much,
-> > IMHO this is much better than what I had in mind!
-> > 
-> > The only thing that I would change is that I woudn't reuse 'struct vmcb_save_area'
-> > for the copy, as this both wastes space (minor issue),
-> > and introduces a chance of someone later using non copied
-> > fields from it (can cause a bug later on).
-> > 
-> > I would just define a new struct for that (but keep same names
-> > for readability)
-> > 
-> > Maybe something like 'struct vmcb_save_area_cached'?
+On Fri, Sep 24, 2021 at 12:31:52PM -0400, Paolo Bonzini wrote:
+> Pass the old SPTE in the same variable that receives the new SPTE.  This
+> reduces the number of arguments from 11 to 10.
 > 
-> I agree, I like this too.  However, it needs a comment that this new struct
-> is not kept up-to-date, and is only valid until enter_svm_guest_mode.
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  arch/x86/kvm/mmu/mmu.c         | 18 ++++++++----------
+>  arch/x86/kvm/mmu/paging_tmpl.h |  2 +-
+>  arch/x86/kvm/mmu/spte.c        |  7 ++++---
+>  arch/x86/kvm/mmu/spte.h        |  2 +-
+>  arch/x86/kvm/mmu/tdp_mmu.c     |  9 +++++----
+>  5 files changed, 19 insertions(+), 19 deletions(-)
 > 
-> I might even propose a
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 91292009780a..b363433bcd2c 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -2682,8 +2682,8 @@ static int mmu_set_spte(struct kvm_vcpu *vcpu, struct kvm_memory_slot *slot,
+>  	int was_rmapped = 0;
+>  	int ret = RET_PF_FIXED;
+>  	bool flush = false;
+> +	u64 spte = *sptep;
+>  	bool wrprot;
+> -	u64 spte;
+>  
+>  	/* Prefetching always gets a writable pfn.  */
+>  	bool host_writable = !fault || fault->map_writable;
+> @@ -2691,35 +2691,33 @@ static int mmu_set_spte(struct kvm_vcpu *vcpu, struct kvm_memory_slot *slot,
+>  	bool write_fault = fault && fault->write;
+>  
+>  	pgprintk("%s: spte %llx write_fault %d gfn %llx\n", __func__,
+> -		 *sptep, write_fault, gfn);
+> +		 spte, write_fault, gfn);
+>  
+>  	if (unlikely(is_noslot_pfn(pfn))) {
+>  		mark_mmio_spte(vcpu, sptep, gfn, pte_access);
+>  		return RET_PF_EMULATE;
+>  	}
+>  
+> -	if (is_shadow_present_pte(*sptep)) {
+> +	if (is_shadow_present_pte(spte)) {
+>  		/*
+>  		 * If we overwrite a PTE page pointer with a 2MB PMD, unlink
+>  		 * the parent of the now unreachable PTE.
+>  		 */
+> -		if (level > PG_LEVEL_4K && !is_large_pte(*sptep)) {
+> +		if (level > PG_LEVEL_4K && !is_large_pte(spte)) {
+>  			struct kvm_mmu_page *child;
+> -			u64 pte = *sptep;
+> -
+> -			child = to_shadow_page(pte & PT64_BASE_ADDR_MASK);
+> +			child = to_shadow_page(spte & PT64_BASE_ADDR_MASK);
+>  			drop_parent_pte(child, sptep);
+>  			flush = true;
+> -		} else if (pfn != spte_to_pfn(*sptep)) {
+> +		} else if (pfn != spte_to_pfn(spte)) {
+>  			pgprintk("hfn old %llx new %llx\n",
+> -				 spte_to_pfn(*sptep), pfn);
+> +				 spte_to_pfn(spte), pfn);
+>  			drop_spte(vcpu->kvm, sptep);
+>  			flush = true;
+>  		} else
+>  			was_rmapped = 1;
+>  	}
+>  
+> -	wrprot = make_spte(vcpu, sp, slot, pte_access, gfn, pfn, *sptep, speculative,
+> +	wrprot = make_spte(vcpu, sp, slot, pte_access, gfn, pfn, speculative,
+>  			   true, host_writable, &spte);
+>  
+>  	if (*sptep == spte) {
+> diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+> index d8889e02c4b7..88551cfd06c6 100644
+> --- a/arch/x86/kvm/mmu/paging_tmpl.h
+> +++ b/arch/x86/kvm/mmu/paging_tmpl.h
+> @@ -1130,7 +1130,7 @@ static int FNAME(sync_page)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
+>  		host_writable = spte & shadow_host_writable_mask;
+>  		slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
+>  		make_spte(vcpu, sp, slot, pte_access, gfn,
+> -			  spte_to_pfn(spte), spte, true, false,
+> +			  spte_to_pfn(spte), true, false,
+>  			  host_writable, &spte);
+>  
+>  		flush |= mmu_spte_update(sptep, spte);
+> diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
+> index 871f6114b0fa..91525388032e 100644
+> --- a/arch/x86/kvm/mmu/spte.c
+> +++ b/arch/x86/kvm/mmu/spte.c
+> @@ -92,10 +92,11 @@ static bool kvm_is_mmio_pfn(kvm_pfn_t pfn)
+>  bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+>  	       struct kvm_memory_slot *slot,
+>  	       unsigned int pte_access, gfn_t gfn, kvm_pfn_t pfn,
+> -	       u64 old_spte, bool speculative, bool can_unsync,
+> -	       bool host_writable, u64 *new_spte)
+> +	       bool speculative, bool can_unsync,
+> +	       bool host_writable, u64 *sptep)
+
+I'd prefer a different name since `sptep` has specific meaning
+throughout the mmu code. (It's the address of the spte in the page
+table.)
+
+Case in point, I was going to suggest we can get rid of struct
+kvm_mmu_page since it can be derived from the sptep and then realized
+how wrong that was :).
+
+Instead of receiving the new spte as a parameter what do you think about
+changing make_spte to return the new spte? I think that would make the
+code more readable (but won't reduce the number of arguments because
+you'd have to add wrprot).
+
+>  {
+>  	int level = sp->role.level;
+> +	u64 old_spte = *sptep;
+>  	u64 spte = SPTE_MMU_PRESENT_MASK;
+>  	bool wrprot = false;
+>  
+> @@ -187,7 +188,7 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+>  		mark_page_dirty_in_slot(vcpu->kvm, slot, gfn);
+>  	}
+>  
+> -	*new_spte = spte;
+> +	*sptep = spte;
+>  	return wrprot;
+>  }
+>  
+> diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
+> index 7c0b09461349..231531c6015a 100644
+> --- a/arch/x86/kvm/mmu/spte.h
+> +++ b/arch/x86/kvm/mmu/spte.h
+> @@ -337,7 +337,7 @@ static inline u64 get_mmio_spte_generation(u64 spte)
+>  bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+>  	       struct kvm_memory_slot *slot,
+>  	       unsigned int pte_access, gfn_t gfn, kvm_pfn_t pfn,
+> -	       u64 old_spte, bool speculative, bool can_unsync,
+> +	       bool speculative, bool can_unsync,
+>  	       bool host_writable, u64 *new_spte);
+>  u64 make_nonleaf_spte(u64 *child_pt, bool ad_disabled);
+>  u64 make_mmio_spte(struct kvm_vcpu *vcpu, u64 gfn, unsigned int access);
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> index 953f24ded6bc..29b739c7bba4 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> @@ -903,13 +903,14 @@ static int tdp_mmu_map_handle_target_level(struct kvm_vcpu *vcpu,
+>  	bool wrprot = false;
+>  
+>  	WARN_ON(sp->role.level != fault->goal_level);
+> -	if (unlikely(!fault->slot))
+> +	if (unlikely(!fault->slot)) {
+>  		new_spte = make_mmio_spte(vcpu, iter->gfn, ACC_ALL);
+> -	else
+> +	} else {
+> +		new_spte = iter->old_spte;
+>  		wrprot = make_spte(vcpu, sp, fault->slot, ACC_ALL, iter->gfn,
+> -					 fault->pfn, iter->old_spte, fault->prefault, true,
+> +					 fault->pfn, fault->prefault, true,
+>  					 fault->map_writable, &new_spte);
+> -
+> +	}
+>  	if (new_spte == iter->old_spte)
+>  		ret = RET_PF_SPURIOUS;
+>  	else if (!tdp_mmu_set_spte_atomic(vcpu->kvm, iter, new_spte))
+> -- 
+> 2.27.0
 > 
-> #ifdef CONFIG_DEBUG_KERNEL
-> 	memset(&svm->nested.save, 0xaf, sizeof(svm->nested.save));
-> #endif
-> 
-> but there are no uses of CONFIG_DEBUG_KERNEL in all of Linux so it's
-> probably not the way one should use that symbol.  Can anybody think of a
-> similar alternative?  Or should the memset simply be unconditional?
-
-I still think this doesn't go far enough to prevent TOCTOU bugs, and in general
-KVM lacks a coherent design/approach in this area.  Case in point, the next patch
-fails to handle at least one, probably more, TOCTOU bugs.  CR3 is checked using
-KVM's copy (svm->nested.save)
-
-	/*
-	 * These checks are also performed by KVM_SET_SREGS,
-	 * except that EFER.LMA is not checked by SVM against
-	 * CR0.PG && EFER.LME.
-	 */
-	if ((save->efer & EFER_LME) && (save->cr0 & X86_CR0_PG)) {
-		if (CC(!(save->cr4 & X86_CR4_PAE)) ||
-		    CC(!(save->cr0 & X86_CR0_PE)) ||
-		    CC(kvm_vcpu_is_illegal_gpa(vcpu, save->cr3)))
-			return false;
-	}
-
-but KVM prepares vmcb02 and the MMU using the CR3 value directly from vmcb12.
-
-	nested_vmcb02_prepare_control(svm);
-	nested_vmcb02_prepare_save(svm, vmcb12);
-
-	ret = nested_svm_load_cr3(&svm->vcpu, vmcb12->save.cr3,
-				  nested_npt_enabled(svm), true);
-
-I assume there is similar badness in nested_vmcb02_prepare_save()'s usage of
-vmcb12, but even if there isn't, IMO that it's even a question/possibility means
-KVM is broken.  I.e. KVM should fully unmap L1's vmcb12 before doing _anything_.
-(1) map, (2) copy, (3) unmap, (4) check, (5) consume.  Yes, there are performance
-gains to be had (or lost), but we need a fully correct/functional baseline before
-we start worrying about performance.  E.g. the copy at step (2) can be optimized
-to copy only data that is not marked cleaned, but first we should have a version
-of KVM that has no optimizations and just copies the entire vmcb (or at least the
-chunks KVM consumes).
-
-On a related topic, this would be a good opportunity to resolve the naming
-discrepancies between VMX and SVM.  VMX generally refers to vmcs12 as KVM's copy
-of L1's VMCS, whereas SVM generally refers to vmcb12 as the "direct" mapping of
-L1's VMCB.  I'd prefer to go with VMX's terminology, i.e. rework nSVM to refer to
-the copy as vmcb12, but I'm more than a bit biased since I've spent so much time
-in nVMX,
