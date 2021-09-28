@@ -2,104 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1A8A341B84F
-	for <lists+kvm@lfdr.de>; Tue, 28 Sep 2021 22:29:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8F36B41B85F
+	for <lists+kvm@lfdr.de>; Tue, 28 Sep 2021 22:32:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242682AbhI1Uaz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Sep 2021 16:30:55 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35036 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234794AbhI1Uaw (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 28 Sep 2021 16:30:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632860952;
+        id S242635AbhI1Udq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Sep 2021 16:33:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52392 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S242016AbhI1Udo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Sep 2021 16:33:44 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DA5CC06161C;
+        Tue, 28 Sep 2021 13:32:04 -0700 (PDT)
+Received: from zn.tnic (p200300ec2f13b200371079131a9f19c8.dip0.t-ipconnect.de [IPv6:2003:ec:2f13:b200:3710:7913:1a9f:19c8])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 052251EC0758;
+        Tue, 28 Sep 2021 22:32:02 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1632861122;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Px75PZplZbEMaaLvg/IKZKQmq+Fd+/Xi4N5X7tKeYOU=;
-        b=ImWgttDYofD+RsRC+jkMU+UoWFiTfDACDAV2GEnw4DMTmypzhK0igLqN2bKIwYEtsyClOy
-        jkh2N3zoPszniSDqw2/sRl1eG86qutP7h0tIzI6wL8vDOxART8C4/IwVOynfZe1+ZCcJxp
-        lKRlHGh8Yxy1EOJxf8G0SMjUBrtAfp8=
-Received: from mail-yb1-f197.google.com (mail-yb1-f197.google.com
- [209.85.219.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-539-Vw_EfihCNfyznV2-tdv7tQ-1; Tue, 28 Sep 2021 16:29:11 -0400
-X-MC-Unique: Vw_EfihCNfyznV2-tdv7tQ-1
-Received: by mail-yb1-f197.google.com with SMTP id d81-20020a251d54000000b005b55772ca97so219979ybd.19
-        for <kvm@vger.kernel.org>; Tue, 28 Sep 2021 13:29:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=Px75PZplZbEMaaLvg/IKZKQmq+Fd+/Xi4N5X7tKeYOU=;
-        b=07mRfka6ozTRAU9iLj9zkOz8p2WqVxejExJdjLsefjpcZwSsBLT6+SUhJfennUtTzR
-         CDQlS/MDM6L0tMBnsHDoB5T3gi59JX+r977ci9pQv6nqxyciviH0bYNRbKdwi3rjRskp
-         QXCbQ/khxW9d1zW+3AL2eLf+tnfrH/PGZAoaE1B7rlJJgHAz/CXxMQ4wvydbA9Emi6w2
-         MSDj3rfPFOPwLzj5YOLpeyAY+qcJBWcpMAYmIHj64iysV8GLmvOVWZ6s9xd//9YURyuI
-         2ehqIUMNIr9OiD3NRVjd7LzUPPB25VyIWFG7+RVuxKMNm+WhrL3J9rZoNtW0CjPG5PKn
-         ObMg==
-X-Gm-Message-State: AOAM532OkgXumYb1KV93U3hUqkEi1WUos2fUfMM+jRizcdKjuhsaKXzR
-        DAgujNvEdjMxCAZLJM6ATCs7omvbH+fX8fYJw7lCigNPWi/oIzVznGbG42sQ+bPPC8fjy6rEQr7
-        2HTrKm5bbZAeX
-X-Received: by 2002:a05:6830:314e:: with SMTP id c14mr6935946ots.37.1632860552497;
-        Tue, 28 Sep 2021 13:22:32 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzR8N6ivbHyTQeeTuTu5EyUCFoNeJ/uw+Yu3F+JZpS9o76cUotJSm8am7W0TX6GQTPc2NRTNg==
-X-Received: by 2002:a05:6830:314e:: with SMTP id c14mr6935926ots.37.1632860552311;
-        Tue, 28 Sep 2021 13:22:32 -0700 (PDT)
-Received: from redhat.com ([198.99.80.109])
-        by smtp.gmail.com with ESMTPSA id 21sm41504oix.1.2021.09.28.13.22.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Sep 2021 13:22:32 -0700 (PDT)
-Date:   Tue, 28 Sep 2021 14:22:30 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Leon Romanovsky <leon@kernel.org>
-Cc:     Doug Ledford <dledford@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Kirti Wankhede <kwankhede@nvidia.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
-        Saeed Mahameed <saeedm@nvidia.com>
-Subject: Re: [PATCH mlx5-next 6/7] mlx5_vfio_pci: Expose migration commands
- over mlx5 device
-Message-ID: <20210928142230.20b0153a.alex.williamson@redhat.com>
-In-Reply-To: <7fc0cf0d76bb6df4679b55974959f5494e48f54d.1632305919.git.leonro@nvidia.com>
-References: <cover.1632305919.git.leonro@nvidia.com>
-        <7fc0cf0d76bb6df4679b55974959f5494e48f54d.1632305919.git.leonro@nvidia.com>
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=qbX+tgbw05504BlKd+vjCTQM+czUsH5nYZVV4FM0DG8=;
+        b=PQ4PKcJl3Lyadkflmx+j1VA5OiwXAdXTaEvbm7ew7wHmPI94m7AJwZOzgrvxFt4MxHlIwN
+        LDaduODsYvATrWtH3svQYbrndDcAuYcHl9AIp7EwQK4gZbGRwjVVHLxwvW78GbTZv51eLK
+        ObLlpU/8EnxkbEHepMYe/Hen7N4ZKDo=
+Date:   Tue, 28 Sep 2021 22:31:56 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     "Kuppuswamy, Sathyanarayanan" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        Andi Kleen <ak@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Ard Biesheuvel <ardb@kernel.org>, Baoquan He <bhe@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Young <dyoung@redhat.com>,
+        David Airlie <airlied@linux.ie>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "Kirill A. Shutemov" <kirill@shutemov.name>,
+        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+        Maxime Ripard <mripard@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Paul Mackerras <paulus@samba.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Thomas Zimmermann <tzimmermann@suse.de>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        VMware Graphics <linux-graphics-maintainer@vmware.com>,
+        Will Deacon <will@kernel.org>,
+        Christoph Hellwig <hch@infradead.org>, x86@kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
+        iommu@lists.linux-foundation.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        kexec@lists.infradead.org
+Subject: Re: [PATCH v4 0/8] Implement generic cc_platform_has() helper
+ function
+Message-ID: <YVN7vPE/7jecXcJ/@zn.tnic>
+References: <20210928191009.32551-1-bp@alien8.de>
+ <80593893-c63b-d481-45f1-42a3a6fd762a@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <80593893-c63b-d481-45f1-42a3a6fd762a@linux.intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 22 Sep 2021 13:38:55 +0300
-Leon Romanovsky <leon@kernel.org> wrote:
+On Tue, Sep 28, 2021 at 12:19:49PM -0700, Kuppuswamy, Sathyanarayanan wrote:
+> Intel CC support patch is not included in this series. You want me
+> to address the issue raised by Joerg before merging it?
 
-> From: Yishai Hadas <yishaih@nvidia.com>
-> 
-> Expose migration commands over the device, it includes: suspend, resume,
-> get vhca id, query/save/load state.
-> 
-> As part of this adds the APIs and data structure that are needed to
-> manage the migration data.
-> 
-> Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
-> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-> ---
->  drivers/vfio/pci/mlx5_vfio_pci_cmd.c | 358 +++++++++++++++++++++++++++
->  drivers/vfio/pci/mlx5_vfio_pci_cmd.h |  43 ++++
->  2 files changed, 401 insertions(+)
->  create mode 100644 drivers/vfio/pci/mlx5_vfio_pci_cmd.c
->  create mode 100644 drivers/vfio/pci/mlx5_vfio_pci_cmd.h
+Did you not see my email to you today:
 
-Should we set the precedent of a vendor sub-directory like we have
-elsewhere?  Either way I'd like to see a MAINTAINERS file update for the
-new driver.  Thanks,
+https://lkml.kernel.org/r/YVL4ZUGhfsh1QfRX@zn.tnic
 
-Alex
+?
 
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
