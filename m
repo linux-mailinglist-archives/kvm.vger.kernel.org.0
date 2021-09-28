@@ -2,39 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2AAD541A802
-	for <lists+kvm@lfdr.de>; Tue, 28 Sep 2021 07:59:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 405CF41A835
+	for <lists+kvm@lfdr.de>; Tue, 28 Sep 2021 08:01:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239405AbhI1GAz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Sep 2021 02:00:55 -0400
-Received: from mail.kernel.org ([198.145.29.99]:48780 "EHLO mail.kernel.org"
+        id S239368AbhI1GCu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Sep 2021 02:02:50 -0400
+Received: from mail.kernel.org ([198.145.29.99]:48756 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S238978AbhI1F7b (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Sep 2021 01:59:31 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 301A261353;
-        Tue, 28 Sep 2021 05:56:58 +0000 (UTC)
+        id S239086AbhI1GAx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Sep 2021 02:00:53 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id D8E6761378;
+        Tue, 28 Sep 2021 05:57:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1632808618;
-        bh=wFYGAkwb4/WUJWCk1IRMUqwJzEIWLJ7Jffepp7pbjqQ=;
+        s=k20201202; t=1632808634;
+        bh=xVsdVb9zL63spLoYUIih1YQ/ViuFczmdjpKNj5k36q4=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Les5pIBIiXmeptNewofLvTvRlsNuIF1akK9KdfjU4H63smOFDU/ijYmjCz0lJP3wf
-         LMqvgYa6N9INH9jtyHrsDxqMjy4539czIp5Dk36xX6rR1ocscATaksbu5Ndku7ilj9
-         yHQU7MD01Wx1UzNMV3tw0/79P0fWFmFWvnpe0GHPQz3aEUvkT5V+05RVt5KwhuT0rC
-         UvWrQE9pfqMz1soKC5UgtLr5dCJZC5idWuOZYe/Fd4AnuJ8xNu8OeWMfkW1+uUWLBj
-         vwOs5iMZgtcigolj6ZiAzMzk4Y54yBC0M5V9oabgTyOEtlYO8zK4cALWzCYkEQOEwu
-         xU403oXZ17vjQ==
+        b=pul9ExTpvGqfDQoOkZx/2tNXAjwFYfOG08Uy1KNnXGIAmg2U3NJL4wvdqy1SmJRyC
+         Pt/vfHV43S7Jo2ZfbBPJVTxm1LEOWlJwd6MoYC0O+DyStF4cHlGe9xB7pghsp2WO0r
+         AbWhNwZJ8n2CaDkV8F4IOA/aOXF7t5TI/fHQXcViXzM59aXcB2/415NjhqBq6bKg1k
+         FeIsZHm+A4ldP1V+Yzu82V39L8mWObN1vYfPruDtvassfZj2U2uroubdLDxrtI6ZPv
+         i/Jny1pTVIQOEJ413mK5IYI/skgWZ/d62VJPhKhb+qNE5djcEWMm5g67iP46iggWVC
+         b0wbXsffkH29A==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Shuah Khan <skhan@linuxfoundation.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Sasha Levin <sashal@kernel.org>, shuah@kernel.org,
         kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 16/23] selftests:kvm: fix get_warnings_count() ignoring fscanf() return warn
-Date:   Tue, 28 Sep 2021 01:56:37 -0400
-Message-Id: <20210928055645.172544-16-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 09/11] selftests:kvm: fix get_warnings_count() ignoring fscanf() return warn
+Date:   Tue, 28 Sep 2021 01:57:02 -0400
+Message-Id: <20210928055704.172814-9-sashal@kernel.org>
 X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20210928055645.172544-1-sashal@kernel.org>
-References: <20210928055645.172544-1-sashal@kernel.org>
+In-Reply-To: <20210928055704.172814-1-sashal@kernel.org>
+References: <20210928055704.172814-1-sashal@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-stable: review
@@ -65,7 +65,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/tools/testing/selftests/kvm/x86_64/mmio_warning_test.c b/tools/testing/selftests/kvm/x86_64/mmio_warning_test.c
-index e6480fd5c4bd..8039e1eff938 100644
+index 00bb97d76000..2cbc09aad7f6 100644
 --- a/tools/testing/selftests/kvm/x86_64/mmio_warning_test.c
 +++ b/tools/testing/selftests/kvm/x86_64/mmio_warning_test.c
 @@ -82,7 +82,8 @@ int get_warnings_count(void)
