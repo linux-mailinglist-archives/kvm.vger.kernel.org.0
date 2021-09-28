@@ -2,53 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 11E4E41B694
-	for <lists+kvm@lfdr.de>; Tue, 28 Sep 2021 20:48:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2579A41B697
+	for <lists+kvm@lfdr.de>; Tue, 28 Sep 2021 20:48:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242263AbhI1Stu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Sep 2021 14:49:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56294 "EHLO
+        id S242289AbhI1Stv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Sep 2021 14:49:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56300 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236720AbhI1Str (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Sep 2021 14:49:47 -0400
-Received: from mail-qt1-x84a.google.com (mail-qt1-x84a.google.com [IPv6:2607:f8b0:4864:20::84a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2039CC06161C
-        for <kvm@vger.kernel.org>; Tue, 28 Sep 2021 11:48:08 -0700 (PDT)
-Received: by mail-qt1-x84a.google.com with SMTP id x28-20020ac8701c000000b0029f4b940566so101314994qtm.19
-        for <kvm@vger.kernel.org>; Tue, 28 Sep 2021 11:48:08 -0700 (PDT)
+        with ESMTP id S242237AbhI1Stt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Sep 2021 14:49:49 -0400
+Received: from mail-qv1-xf4a.google.com (mail-qv1-xf4a.google.com [IPv6:2607:f8b0:4864:20::f4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC185C06161C
+        for <kvm@vger.kernel.org>; Tue, 28 Sep 2021 11:48:09 -0700 (PDT)
+Received: by mail-qv1-xf4a.google.com with SMTP id v10-20020ad4554a000000b0038250b18b6dso56828463qvy.12
+        for <kvm@vger.kernel.org>; Tue, 28 Sep 2021 11:48:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=qgqb6YKppRB8NfJVVv7xfeFr8BtHiKUWj2cOAf7GOM8=;
-        b=TLC2VRgTW9eZlhKSjXJgG6luzYm1j8ILJoYprMicHRJoF5l8NyLTLIX2KZegIO/n/Y
-         dv8/Z+h+iE5VBQP2KtRDTqg88Y6iS7IgJz7+69qP1G6FycrEVvhHCO34pqMP0JRZl64l
-         8+gnFDiA+Vyfud7PCbBBzuAL1TUDBqHcnpO5WDzEPDGa5JzrVrNFijCCgSXjbvbA7bFB
-         ixGCjz5lzQKTqRVXoELXTADjslwCiLxJzaCiEx1+sNRDekV9NuU0Qv3wvVlZr9CpLoJD
-         5+rzFq4vU+Bo+PgypWAUMgHTb1+6dZN/g4RoQnF05tSkT3Y3zDxenkP2jgYAF12de9Rl
-         EvIg==
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=O4Pf1pw7IvGHNe4ix1iHuqBRwQM1rzQrtDbARj3VD7U=;
+        b=mMMdCpyyOz9jvXo89g2rQ6b6Nh948to1i5C3FcPkKL21khzd0SJnqxQR4pkyDMx9wa
+         s0O07AEGyGZovHoZMQWntxZ96N3sLH8ged8VBIMRL3FOXckb8dsewQN2qvTmew6Mg8p0
+         Oolh9VInTIJlL5VZaT2EXghb9fy5iK+ewpnw//GSA/9/OPPM46+sSBbZ8QpqsfcCDI0L
+         hnzvrBsCQu6n04TqU7WBQFmmglwGBFckLdXNTpAVz4Yjxd4GOGyU9lwF+ghdGzg0WUiz
+         iB4cEZyX1mFt8GkSsJB84Cquma2SBzV8D+IDLTJmPek45HdWNKnpiemLZlZf80Badjv/
+         6dBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=qgqb6YKppRB8NfJVVv7xfeFr8BtHiKUWj2cOAf7GOM8=;
-        b=K117fyny3awpBWKNT3R53nN9NC+BiCHJ3be+q058u/VIZQBqKlqG4geqLGHyVCtFNd
-         tXelb6UFRGHdXRzjuYpcBHH2VZFsuLvetbHf8S21EDLs4HeujJ+3uwXM633q3R2/6hjJ
-         Mq/qLPK1+zto/AsfN7ZKrI4npgv1ilmkv+xql9UEvKKgPh5x5jErh0PynZZsV3BXsWD6
-         zFwWR52JB0JBP030HlhN+7LeMbO7SlofqNyldC79k5/h8lNGVFl11xRgJIyalRc0KFGa
-         VEcvNmk6lN6A9i/uqp/GB6NTDOsmxVDf6+9kuBIzxTZdcmPNu8PqtnvtbG66XSyMZwpr
-         rlOg==
-X-Gm-Message-State: AOAM5326E+2pmey39D/NDPnw0PN/wwqObgHOHqv5hxcHatm7UtABsAcG
-        o3ez2GeVBngWz5rHj/af4srbQ8zkSvOs6hwysEv9TBDng2WnaAZHBOfR3+ehutekEnv5ONNdZ7D
-        vVYoa3Ga8aQ7JXvqV619hkG2Se+GPwKJaDzJVMTJYIpNkuH6U870ssWfYGvsWN7U=
-X-Google-Smtp-Source: ABdhPJxmw0t3Ktxkm3ZcxHbs/rMQve8y9VxdIkWB/eXtfkGFPpQjbY6Vqo64auyj0jWhjiH+kb808xRC3FZlAA==
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=O4Pf1pw7IvGHNe4ix1iHuqBRwQM1rzQrtDbARj3VD7U=;
+        b=5NHPdyjwTFJQ8PRLC+oaEmPssAcgrTUcUavkHMSQ3RAqvYjXHlZZVKQQHXYHzf7Ndb
+         J9qg3P/YpdF5gdh9eZiu4LZEiagzTGTCzoqYOyp1fvZqUupwNmfEYVgsKO9ztxzU8gqB
+         w3GVZyxtrxS5x51LnEXvffy1X9c3cI50c5WxXXbpGP7IaYinzyyF1WnSThboaklECoe0
+         EseD23vPQRgGgezS3aoKZZTLBIaMKxAMiuE9MExXxBsgTVXmrbeDPFOcvgibw4HZyZDP
+         ekM2goHhmpq4k0sB4nnPvVVbnilKHvvjRoPwrzDaM9w+HJs1pJghDdemWd1zUCVVqJSK
+         EBmw==
+X-Gm-Message-State: AOAM533JmO+KnDMwOb0WAtFvzunKxxMCj0rUL/EkIV9UmoVUMND2ACFo
+        9DCsLIHkctJYoqdjxKTimgTD7GL0aO8xepKzwQirA+UcjZJh3YLnO9L0WtSKWe7xuMlAsprFExY
+        SmUi8EKzOAJ/5IgB7gLEOx5/Xs1Poss4oAo9Riw/m1X3AgN7bbJZQJylDW0bQNwE=
+X-Google-Smtp-Source: ABdhPJx5jNcltOLTjTdhqpjP1Bl4mvZcRKZjKlWdl3zBsvmwrNHy7AtNptUT7fjtgYO1crNJzy1+li0z/78wjg==
 X-Received: from ricarkol2.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:62fe])
- (user=ricarkol job=sendgmr) by 2002:a05:6214:12ac:: with SMTP id
- w12mr7283357qvu.44.1632854887215; Tue, 28 Sep 2021 11:48:07 -0700 (PDT)
-Date:   Tue, 28 Sep 2021 11:47:54 -0700
-Message-Id: <20210928184803.2496885-1-ricarkol@google.com>
+ (user=ricarkol job=sendgmr) by 2002:ad4:4a02:: with SMTP id
+ m2mr164765qvz.8.1632854888735; Tue, 28 Sep 2021 11:48:08 -0700 (PDT)
+Date:   Tue, 28 Sep 2021 11:47:55 -0700
+In-Reply-To: <20210928184803.2496885-1-ricarkol@google.com>
+Message-Id: <20210928184803.2496885-2-ricarkol@google.com>
 Mime-Version: 1.0
+References: <20210928184803.2496885-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.33.0.685.g46640cef36-goog
-Subject: [PATCH v3 00/10] KVM: arm64: vgic: Missing checks for REDIST/CPU and
- ITS regions above the VM IPA size
+Subject: [PATCH v3 01/10] kvm: arm64: vgic: Introduce vgic_check_iorange
 From:   Ricardo Koller <ricarkol@google.com>
 To:     kvm@vger.kernel.org, maz@kernel.org, kvmarm@lists.cs.columbia.edu,
         drjones@redhat.com, eric.auger@redhat.com, alexandru.elisei@arm.com
@@ -61,46 +64,67 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM doesn't check for redist, CPU interface, and ITS regions that extend
-partially above the guest addressable IPA range (phys_size).  This can happen
-when using the V[2|3]_ADDR_TYPE_CPU, ADDR_TYPE_REDIST[_REGION], or
-ITS_ADDR_TYPE attributes to set a new region that extends partially above
-phys_size (with the base below phys_size).  The issue is that vcpus can
-potentially run into a situation where some redistributors are addressable and
-others are not, or just the first half of the ITS is addressable.
+Add the new vgic_check_iorange helper that checks that an iorange is
+sane: the start address and size have valid alignments, the range is
+within the addressable PA range, start+size doesn't overflow, and the
+start wasn't already defined.
 
-Patches 1-4 fixes the issue for GICv2 and GICv3 (and the ITS). Patches 5-10 add
-some selftests for all these fixes. While adding these tests, these add support
-for some extra GICv2 and ITS device tests.
+No functional change.
 
-Changes:
-v3: add missing checks for GICv2 and the ITS, plus tests for the fixes.
-v2: adding a test for KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, and returning E2BIG
-    instead of EINVAL (thanks Alexandru and Eric).
+Signed-off-by: Ricardo Koller <ricarkol@google.com>
+---
+ arch/arm64/kvm/vgic/vgic-kvm-device.c | 22 ++++++++++++++++++++++
+ arch/arm64/kvm/vgic/vgic.h            |  4 ++++
+ 2 files changed, 26 insertions(+)
 
-Ricardo Koller (10):
-  kvm: arm64: vgic: Introduce vgic_check_iorange
-  KVM: arm64: vgic-v3: Check redist region is not above the VM IPA size
-  KVM: arm64: vgic-v2: Check cpu interface region is not above the VM
-    IPA size
-  KVM: arm64: vgic-v3: Check ITS region is not above the VM IPA size
-  KVM: arm64: selftests: Make vgic_init gic version agnostic
-  KVM: arm64: selftests: Make vgic_init/vm_gic_create version agnostic
-  KVM: arm64: selftests: Add some tests for GICv2 in vgic_init
-  KVM: arm64: selftests: Add tests for GIC redist/cpuif partially above
-    IPA range
-  KVM: arm64: selftests: Add test for legacy GICv3 REDIST base partially
-    above IPA range
-  KVM: arm64: selftests: Add basic ITS device tests
-
- arch/arm64/kvm/vgic/vgic-its.c                |   4 +-
- arch/arm64/kvm/vgic/vgic-kvm-device.c         |  29 +-
- arch/arm64/kvm/vgic/vgic-mmio-v3.c            |   6 +-
- arch/arm64/kvm/vgic/vgic-v3.c                 |   4 +
- arch/arm64/kvm/vgic/vgic.h                    |   4 +
- .../testing/selftests/kvm/aarch64/vgic_init.c | 372 +++++++++++++-----
- 6 files changed, 317 insertions(+), 102 deletions(-)
-
+diff --git a/arch/arm64/kvm/vgic/vgic-kvm-device.c b/arch/arm64/kvm/vgic/vgic-kvm-device.c
+index 7740995de982..f714aded67b2 100644
+--- a/arch/arm64/kvm/vgic/vgic-kvm-device.c
++++ b/arch/arm64/kvm/vgic/vgic-kvm-device.c
+@@ -29,6 +29,28 @@ int vgic_check_ioaddr(struct kvm *kvm, phys_addr_t *ioaddr,
+ 	return 0;
+ }
+ 
++int vgic_check_iorange(struct kvm *kvm, phys_addr_t *ioaddr,
++		       phys_addr_t addr, phys_addr_t alignment,
++		       phys_addr_t size)
++{
++	int ret;
++
++	ret = vgic_check_ioaddr(kvm, ioaddr, addr, alignment);
++	if (ret)
++		return ret;
++
++	if (!IS_ALIGNED(size, alignment))
++		return -EINVAL;
++
++	if (addr + size < addr)
++		return -EINVAL;
++
++	if (addr + size > kvm_phys_size(kvm))
++		return -E2BIG;
++
++	return 0;
++}
++
+ static int vgic_check_type(struct kvm *kvm, int type_needed)
+ {
+ 	if (kvm->arch.vgic.vgic_model != type_needed)
+diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
+index 14a9218641f5..c4df4dcef31f 100644
+--- a/arch/arm64/kvm/vgic/vgic.h
++++ b/arch/arm64/kvm/vgic/vgic.h
+@@ -175,6 +175,10 @@ void vgic_irq_handle_resampling(struct vgic_irq *irq,
+ int vgic_check_ioaddr(struct kvm *kvm, phys_addr_t *ioaddr,
+ 		      phys_addr_t addr, phys_addr_t alignment);
+ 
++int vgic_check_iorange(struct kvm *kvm, phys_addr_t *ioaddr,
++		       phys_addr_t addr, phys_addr_t alignment,
++		       phys_addr_t size);
++
+ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu);
+ void vgic_v2_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr);
+ void vgic_v2_clear_lr(struct kvm_vcpu *vcpu, int lr);
 -- 
 2.33.0.685.g46640cef36-goog
 
