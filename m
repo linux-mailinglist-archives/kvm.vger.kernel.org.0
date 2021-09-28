@@ -2,120 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C62B341AC88
-	for <lists+kvm@lfdr.de>; Tue, 28 Sep 2021 12:00:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6745541AC9A
+	for <lists+kvm@lfdr.de>; Tue, 28 Sep 2021 12:05:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240106AbhI1KCd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Sep 2021 06:02:33 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:2496 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S239815AbhI1KCc (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 28 Sep 2021 06:02:32 -0400
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 18S7sPbD039407;
-        Tue, 28 Sep 2021 06:00:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=m4BPNTiVpYdVMboFe1K0kunohLqnQVCHq7p6RsDz8pI=;
- b=JYlxvRubB7DIegTdhSpA2T6oHtk7d9B6HhunKUDuPTQlLqdgOH8juM75oRyIhlTy/C7s
- lK9t/eP8T1PRgAPKGsjbHx097LtXCohK3YFne8/SofFGHP2xOhYFxOcBQhpqssE8eeDo
- pyFwhF8NtsDq5vMSnckjnIK7lh5Q+Nt0PNYIqqxvkDbi0kP8HIiJyC0Nh8eUhhnLAP7M
- TIcih4+A1SNxmCU4UvWILNrVZIvNnOa+tZs1MuvPXhw8if7q5Q0/1D8oW82NpAvQo3T+
- Ou0pB8CuVnCi+lOJ29g/9Hpg7fCf05q5dWdTqSv9Zvk0ZP+MQBsOo2DNGiv9u3WgB09E Cw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3bbtew80s4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 28 Sep 2021 06:00:52 -0400
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 18S9e85W003226;
-        Tue, 28 Sep 2021 06:00:52 -0400
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3bbtew80rh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 28 Sep 2021 06:00:52 -0400
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 18S9rMTZ029115;
-        Tue, 28 Sep 2021 10:00:50 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma04ams.nl.ibm.com with ESMTP id 3b9ud9mcpu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 28 Sep 2021 10:00:50 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 18SA0khI50659778
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 28 Sep 2021 10:00:46 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A639C4C04A;
-        Tue, 28 Sep 2021 10:00:46 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5103D4C044;
-        Tue, 28 Sep 2021 10:00:46 +0000 (GMT)
-Received: from [9.145.12.195] (unknown [9.145.12.195])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 28 Sep 2021 10:00:46 +0000 (GMT)
-Message-ID: <697cc54a-e3dd-75d2-4274-0715f5c7c550@linux.ibm.com>
-Date:   Tue, 28 Sep 2021 12:00:45 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [kvm-unit-tests PATCH 5/9] lib: s390x: uv: Add UVC_ERR_DEBUG
- switch
-Content-Language: en-US
-To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
-Cc:     david@redhat.com, linux-s390@vger.kernel.org, seiden@linux.ibm.com,
-        imbrenda@linux.ibm.com
-References: <20210922071811.1913-1-frankja@linux.ibm.com>
- <20210922071811.1913-6-frankja@linux.ibm.com>
- <30a104a3-02a1-58a7-2377-de6221e7d20b@redhat.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-In-Reply-To: <30a104a3-02a1-58a7-2377-de6221e7d20b@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: nD8XrxBKzqBH-CE38r6FIVf0oEgqa-av
-X-Proofpoint-GUID: rQKkuzmhoYoQvGg_X6t6O1TTzydIL8BS
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.391,FMLib:17.0.607.475
- definitions=2021-09-28_05,2021-09-28_01,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
- lowpriorityscore=0 suspectscore=0 phishscore=0 mlxlogscore=999 spamscore=0
- bulkscore=0 priorityscore=1501 malwarescore=0 adultscore=0 impostorscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2109230001 definitions=main-2109280058
+        id S240090AbhI1KGu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Sep 2021 06:06:50 -0400
+Received: from mga14.intel.com ([192.55.52.115]:42106 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S240047AbhI1KGu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Sep 2021 06:06:50 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10120"; a="224313861"
+X-IronPort-AV: E=Sophos;i="5.85,329,1624345200"; 
+   d="scan'208";a="224313861"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Sep 2021 03:05:09 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.85,329,1624345200"; 
+   d="scan'208";a="707780985"
+Received: from sqa-gate.sh.intel.com (HELO robert-ivt.tsp.org) ([10.239.48.212])
+  by fmsmga005.fm.intel.com with ESMTP; 28 Sep 2021 03:05:07 -0700
+Message-ID: <64aad01b6bffd70fa3170cf262fe5d7c66f6b2d4.camel@linux.intel.com>
+Subject: Re: [PATCH v1 3/5] KVM: x86: nVMX: VMCS12 field's read/write
+ respects field existence bitmap
+From:   Robert Hoo <robert.hu@linux.intel.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     pbonzini@redhat.com, vkuznets@redhat.com, wanpengli@tencent.com,
+        jmattson@google.com, joro@8bytes.org, kvm@vger.kernel.org,
+        yu.c.zhang@linux.intel.com
+Date:   Tue, 28 Sep 2021 18:05:06 +0800
+In-Reply-To: <YTI7K9RozNIWXTyg@google.com>
+References: <1629192673-9911-1-git-send-email-robert.hu@linux.intel.com>
+         <1629192673-9911-4-git-send-email-robert.hu@linux.intel.com>
+         <YRvbvqhz6sknDEWe@google.com>
+         <b2bf00a6a8f3f88555bebf65b35579968ea45e2a.camel@linux.intel.com>
+         <YR2Tf9WPNEzrE7Xg@google.com>
+         <3ac79d874fb32c6472151cf879edfb2f1b646abf.camel@linux.intel.com>
+         <YS/lxNEKXLazkhc4@google.com>
+         <0b94844844521fc0446e3df0aa02d4df183f8107.camel@linux.intel.com>
+         <YTI7K9RozNIWXTyg@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-8.el7) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/27/21 19:41, Thomas Huth wrote:
-> On 22/09/2021 09.18, Janosch Frank wrote:
->> Every time something goes wrong in a way we don't expect, we need to
->> add debug prints to some UVC to get the unexpected return code.
->>
->> Let's just put the printing behind a macro so we can enable it if
->> needed via a simple switch.
->>
->> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->> ---
->>    lib/s390x/asm/uv.h | 12 ++++++++++++
->>    1 file changed, 12 insertions(+)
->>
->> diff --git a/lib/s390x/asm/uv.h b/lib/s390x/asm/uv.h
->> index 2f099553..0e958ad7 100644
->> --- a/lib/s390x/asm/uv.h
->> +++ b/lib/s390x/asm/uv.h
->> @@ -12,6 +12,9 @@
->>    #ifndef _ASMS390X_UV_H_
->>    #define _ASMS390X_UV_H_
->>    
->> +/* Enables printing of command code and return codes for failed UVCs */
->> +#define UVC_ERR_DEBUG	0
-> 
-> Do we maybe want a "#ifndef UVC_ERR_DEBUG" in front of this, so that we
-> could also set the macro to 1 from individual *.c files (or from the Makefile)?
-> 
->    Thomas
-> 
+On Fri, 2021-09-03 at 15:11 +0000, Sean Christopherson wrote:
+> ...
 
-When testing it's the least amount of work to set this to 1 so I 
-implemented it this way. If you think it's useful then I'll add the ifndef.
+Hi Sean,
+
+Sorry for so late reply. Multi-task, you know;-)
+
+The discussion about this patch has passed so long time and has
+diverged, actually. Let me summarize our previous discussions. Then we
+can converge things and settle direction.
+
+
+* Copy to/from shadow vmcs, no need to validate field existence or not.
+-- I agree.
+
+* Now that only VMCS-read/write need to validate field existence, can
+use static check instead of bitmap.
+* And borrow bit 0 in the field->offset table to denote conditional
+fields.
+
+Because:
+	Shadow control can have more chances to be cache-hit than
+bitmap.
+	The bitmap is per-VMX, additional memory allocation is not
+interesting.
+	
+Robert argued:
+	I still prefer to use bitmap to denote conditional fields.
+	If used static switchcase check rather than bitmap, the
+switchcase would be very long. Till today, ~51 conditional fields.
+	Though very less likely, we cannot guarantee no future use of
+bit 0 of field->offset table entry.
+	From perspective of runtime efficiency, read bitmap is better
+to do static check every time.
+	From the perspective of cache hit chance, shadow control (or
+nested_vmx_msrs) and bitmap are both in nested structure, I don't think
+they have essential difference.
+	The bitmap is just 62 bytes long now, I think it's tolerable.:)
+
+
+* Interaction with Shadow VMCS -- for those shadowed fields, we cannot
+trap its read/write, therefore cannot check its existence per vmx
+configuration L0 set for L1.
+	
+	This last point is the most messy one.
+
+	If we would like to solve this, you proposed as a middle ground
+to disable shadow VMCS totally when user space setting conflicts with
+what KVM figured out.
+
+	You also said, "This is quite the complicated mess for
+something I'm guessing no one actually cares about.  At what point do
+we chalk this up as a virtualization hole and sweep it under the rug?"
+-- I couldn't agree more.
+
+	We think to disable shadow VMCS totally is not good in any
+circumstances, for the sake of nested performance, etc..
+	We think there are 2 ways ahead:
+	1) Leave it as it is nowadays, i.e. discard this patch set.
+Perhaps we can add some build-check to force update that hard-coded
+assignment to vmcs-enum-max when necessary.
+
+	2) Make shadow vmcs bitmap per VM. This will have to allocate 2
+(or 3?) more pages (shadow read/write bitmaps) per VM. Then we can
+configure the shadow vmcs bitmap per user space configuration, i.e.
+don't shadow those conditional VMCS fields, force its read/write to go
+through handle_vm{read,write} gate.
+
+
+So, Sean, can you help converge our discussion and settle next step?
+Thanks.:-)
+
+
