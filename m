@@ -2,250 +2,231 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1DB5241AA02
-	for <lists+kvm@lfdr.de>; Tue, 28 Sep 2021 09:43:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 74A2341ABB6
+	for <lists+kvm@lfdr.de>; Tue, 28 Sep 2021 11:24:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239359AbhI1HpU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Sep 2021 03:45:20 -0400
-Received: from mga07.intel.com ([134.134.136.100]:21597 "EHLO mga07.intel.com"
+        id S239854AbhI1J0S (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Sep 2021 05:26:18 -0400
+Received: from mail.kernel.org ([198.145.29.99]:55652 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S239099AbhI1HpT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Sep 2021 03:45:19 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10120"; a="288300734"
-X-IronPort-AV: E=Sophos;i="5.85,328,1624345200"; 
-   d="scan'208";a="288300734"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Sep 2021 00:43:39 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.85,328,1624345200"; 
-   d="scan'208";a="561930976"
-Received: from fmsmsx604.amr.corp.intel.com ([10.18.126.84])
-  by fmsmga002.fm.intel.com with ESMTP; 28 Sep 2021 00:43:39 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx604.amr.corp.intel.com (10.18.126.84) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2242.12; Tue, 28 Sep 2021 00:43:39 -0700
-Received: from fmsmsx608.amr.corp.intel.com (10.18.126.88) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2242.12; Tue, 28 Sep 2021 00:43:38 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx608.amr.corp.intel.com (10.18.126.88) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2242.12 via Frontend Transport; Tue, 28 Sep 2021 00:43:38 -0700
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (104.47.57.46) by
- edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2242.12; Tue, 28 Sep 2021 00:43:38 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=kV051LYkpxXyNafLjOy3QzCggFzHFKsHBtpCSUuVFH1QaPfgrP9lpKiY2c5GcQb9dESdXlE4TAxk35oMozHBRzVTQFR/8eHEnIYJ2s+KWUec5Y018osdsITHXvMycnkccgRvyeviT9PysWSqZGQTdSx/+OtOwh1EC8K+WZygb3Bnyt/Bq9QkV1kVZIy1CvLqxlNi5NsoStNdLIZbLELARPsjzJx1tbUSDUESIwoh0i3jwPUX6jARHepZqiuYZ5eqefT9D+47z3PHMd/OHmWbPfV7KRTlV35rF8dDiPt2tRigfa1dugtae2OC45sMTQlzaHFqCevqg0+zNIxjo6hYUQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
- bh=L9z8XkhVB+mB0K7NmsBqMrSd+YAT3ynsIRu5QprvpD8=;
- b=Nhv+xAH2Yi/BZYgtaz4G779PbGEYYttgm/SwnXZKP+XRdly5OfPVItLFInmNnDRH3kLASbhse+3nbadgAScfMyRoraWKiIzj6zXHLRJdbNsAR/DOmhfcY+Zjdlrq09rcEhBhIjQhLnuQkhMBh/K1qN5hjgnrb4HCpsR3hMVvVoY0vqLE7oLvwR1OekfyCa35k1TNlBa+2Ym0N6s+fv654TSbjzSW6ISA6JUS1aNri2mcUZEVP0RncySWNe6PJzMCDBJzjci6SyT7lnwjTnGloX7MWEOBkxKoeoQ+gzokIBMqdRX25KHsIG3A4QXLZ6RraeeTL/0b0e6KtdKL2N2YAQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
- s=selector2-intel-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=L9z8XkhVB+mB0K7NmsBqMrSd+YAT3ynsIRu5QprvpD8=;
- b=tQks+1JGa6mFwb6dgKqVWZ3ODtlTEjpSMG+6XtZuaffpdNBc2PQDbnUxe8pmhxp/BU6VNdw0nyrMez38nGQJyzowmQ2Q3tW+rEVg3w0CU6HojMl/e2LwU2UXwKtr+WW3mekQJLyreCq/J0dIRO2bMqpTgR1nM0Gx+k6bXPQdOZk=
-Received: from BN9PR11MB5433.namprd11.prod.outlook.com (2603:10b6:408:11e::13)
- by BN9PR11MB5354.namprd11.prod.outlook.com (2603:10b6:408:11b::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4544.14; Tue, 28 Sep
- 2021 07:43:36 +0000
-Received: from BN9PR11MB5433.namprd11.prod.outlook.com
- ([fe80::ddb7:fa7f:2cc:45df]) by BN9PR11MB5433.namprd11.prod.outlook.com
- ([fe80::ddb7:fa7f:2cc:45df%8]) with mapi id 15.20.4544.021; Tue, 28 Sep 2021
- 07:43:36 +0000
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-CC:     Jason Gunthorpe <jgg@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "hch@lst.de" <hch@lst.de>,
-        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "corbet@lwn.net" <corbet@lwn.net>,
-        "parav@mellanox.com" <parav@mellanox.com>,
-        "lkml@metux.net" <lkml@metux.net>,
-        "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
-        "dwmw2@infradead.org" <dwmw2@infradead.org>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "lushenming@huawei.com" <lushenming@huawei.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>
-Subject: RE: [RFC 06/20] iommu: Add iommu_device_init[exit]_user_dma
- interfaces
-Thread-Topic: [RFC 06/20] iommu: Add iommu_device_init[exit]_user_dma
- interfaces
-Thread-Index: AQHXrSF9WDj+Z+DU+UqMJ7tQK2EdmauuvK2AgACKnbCAALw6gIAHYVYAgABthQCAABACQIAABTKAgAAAdqCAAGb7gIAAzXUQ
-Date:   Tue, 28 Sep 2021 07:43:36 +0000
-Message-ID: <BN9PR11MB54332256C5AAB9AECC88A7E38CA89@BN9PR11MB5433.namprd11.prod.outlook.com>
-References: <20210919063848.1476776-1-yi.l.liu@intel.com>
-        <20210919063848.1476776-7-yi.l.liu@intel.com>
-        <20210921170943.GS327412@nvidia.com>
-        <BN9PR11MB5433DA330D4583387B59AA7F8CA29@BN9PR11MB5433.namprd11.prod.outlook.com>
-        <20210922123931.GI327412@nvidia.com>
-        <BN9PR11MB5433CE19425E85E7F52093278CA79@BN9PR11MB5433.namprd11.prod.outlook.com>
-        <20210927115342.GW964074@nvidia.com>
-        <BN9PR11MB5433502FEF11940984774F278CA79@BN9PR11MB5433.namprd11.prod.outlook.com>
-        <20210927130935.GZ964074@nvidia.com>
-        <BN9PR11MB543327D25DCE242919F7909A8CA79@BN9PR11MB5433.namprd11.prod.outlook.com>
- <20210927131949.052d8481.alex.williamson@redhat.com>
-In-Reply-To: <20210927131949.052d8481.alex.williamson@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 63a0af7f-aa10-4021-eb5b-08d98253ae41
-x-ms-traffictypediagnostic: BN9PR11MB5354:
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <BN9PR11MB535415DA81CE95EC120B26D68CA89@BN9PR11MB5354.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: Su+fqBQoaqPms2kY4j0ZCTfFLXogjNbqm1sRPtsY8oPKZ3aKtjfdrsVQR84s/FgLUm5ucb0GJE10+gIl4N69WLu3UJDsdmL3qtWrtbrTQVcxq0eATO2aEvmzHKI+5A9I7ssUdhJ1IW+6am06ZnOd3lPmJEc52lPQZR9eKXNmiGDXDq29KUMqjSf+ou/DejF++NZxX2sG47+KJg9R4HDscOjksOnXkJr5UTwR3B1AyVGx8B2Yurl5iD0mlHX3bxDumzHgkSzjE6eihrvxD2s9ssWyLQ8JGXrwBQKX0c9kPB1P/+VOHR0VvCRLjvDKb/3AOc/njXOVMSyLC/ynyDjX/cd+zPAOA+FSDgYfjeXeiu+bP2vjjUVyIXByuyyzAmJpXsxmJ/bbAUzzqBzJBdsIZeeJMiy+sxA50eF6+QyZl9UiFBd2cAA4T8Mp2fRd1+cC7dfFjBEioKnwnQzLwmoDncAeNTm6r4t9uUcMHYIsiR7eqKU01iKeEeuQVE0KVPi7ICxaN2lbrKLBkH8ZQGQ3VUMEaqb8HLHPHVW2YGP4lCydb0ZnkZyolhxPh71mWkROFi4sXgXnDpabhNbsu3HSh+asxkgrDAYtDO971Un4Asoujph8JVAjgwMQ+9YEFEK1e2VZO18jttXDAVdTlaI+PQ5EHfiSRfqkTFuIVavleVKuWEVEs8d0SA2IBSJCGHk3mGo9v9PEw+VeXc1L4tIlgA==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5433.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(66946007)(71200400001)(7696005)(26005)(86362001)(186003)(83380400001)(8936002)(508600001)(6506007)(4326008)(6916009)(76116006)(66476007)(2906002)(66446008)(64756008)(66556008)(38100700002)(52536014)(8676002)(38070700005)(316002)(54906003)(9686003)(122000001)(55016002)(7416002)(5660300002)(33656002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?R09Yd3oyVlVrbm1lMmFYTEpUaXUwazR4aGJNMnQ0Vnd0aHVsakdFeUZkVkhS?=
- =?utf-8?B?OFZPOHBlTUlIVmx1dmRKdTZyTkhBUDJGMXdudU9Ec21DY0ZGWGhPMC9wL0hr?=
- =?utf-8?B?R0x1eHIxMDhXOEFhdUUrT0lqeGdYRzNhMXNnWFNCbnBZQnZMOW0xRjhFbjhU?=
- =?utf-8?B?bjNtclhzSGVpZWRIeldqdU9pcFlNd01YSkRHdXpXRGhJMStLd2lQNE94OExE?=
- =?utf-8?B?QXI3TENsbnRsR2RpQlh1WFJOWGdKaUdpTWNVWXA0aTY4WUZ4NFBmUWR1Z0J6?=
- =?utf-8?B?dWxYWTlkYTl4U095NG83YVNtSG1WbEZXZTJSanFqdUlzVnRGRXhrVU1laXc1?=
- =?utf-8?B?WnN0WTVUUklvSUVlTWduMmVxek1oYU5HdnQwVDhIRWxiWDN3aURPNTcyTnBj?=
- =?utf-8?B?anFyZHJjL3RjdjI5c2FITjJQSHFtUkRLMzl0OUswMUdQRGlsOHFObDBUQzYx?=
- =?utf-8?B?aUVmbHBDOER4RGw0cjJ6Zlo1ZHl2OHlWM1lLK0Z5eC8vSThMUFVBbVVvU0lm?=
- =?utf-8?B?VzdpVCtSOEduM2hPS3hPL1dJeEtoejk5OGppbytxbG9PNUMzNFBYT2lzYlpF?=
- =?utf-8?B?MW8rdG82bmVBMTZ1VlFocEM4MWZoS2ZuTG5aT1ozdlZzbkRhSWs1ajNyb0Vv?=
- =?utf-8?B?R1RiYmx2WjFoTlBWMmQ0UEQ3anRodmYwTVNEeG5IT0tRN3FRL0xLcE5wczE0?=
- =?utf-8?B?b0NLVjNjWlJpcW9QVVVYdmpmaC9WVEdKRU9XTTdVMXJNVGYxaFZiYzRMTVla?=
- =?utf-8?B?dnZwbnVWNW54MlA2Z3hZcnhQRlFWY1ZMUU40OVNCc0tLSXhueWtsOEtLR0g1?=
- =?utf-8?B?a3ZsTHRqTk1tM29WOVVnYTV1cS84ZHN6RGxNU3hLZnpmcktIS09OWGlNbFk3?=
- =?utf-8?B?cGhPeVZabDh1ODJ3bWhBaGREM09WWkJ1UjBjRmZzQWlCV3UraXNEcEczaVJN?=
- =?utf-8?B?d0NJYy9UbkdlQzkyOXpBN1pHTU9GRFRPNmswQVcxQnNlQ2I5Z3A5U2N1eURz?=
- =?utf-8?B?QndVRWE4Y3J0N0haTExncUQ4V3Bxd1cvTE9iV1NaUWFYQlpxZDVYc0VzdVlv?=
- =?utf-8?B?dUowem1aZzRGZ3laSGVVRDhTVTZIbk9RRU90NW5CdjJIWHNhMGpTZk1PNWtE?=
- =?utf-8?B?SEZxa1FqeWN1Y0hMK05VK082NGtWeHZZbGpZK2IvUWcxbzhTN2dWdWxwWjVY?=
- =?utf-8?B?YjZWUGZzL2hKSWNZUDhhaCtUdWtabXI3S0U2SlpGU3I2QmMramFDZFZtNjgx?=
- =?utf-8?B?ZXJ5d25pTFBlaGYycVBkVjI0MHJzSDFVOCtyQThQU0JZU1dTNWJBM3NDTUNB?=
- =?utf-8?B?SlNFWkE0WHdsSnUrYTE2V1N0RVpUa1A1L1RqN0w0OE9xbkZoMUMyZm8zV28r?=
- =?utf-8?B?WjltRkNQUGo2VkRJOFBFYzZjM0VmVzhiU0VraHhWa21IQVMycEN5NEJNKzM1?=
- =?utf-8?B?U3J3OWlRUFlXcmpHaDhpWDFkdW9sdXpJdG43Lzd6YTkrL1FKV2ZSK09kUHpa?=
- =?utf-8?B?Sld6QWwzdTEyT1JXeCt5QjJUTTMvY1FBODBleEZmMUc3K25CM0lOQ2RxV2lk?=
- =?utf-8?B?V0YxQjVGWlBmQkN3ZzBUMlZneVN0ekVrTnFJM3hoOXRzME85VjNzVnZwWEp3?=
- =?utf-8?B?OXFVYTM4TUxBdHhyVEsrb3EzWWFCNjlFWkRzSTdORFlza2c2cEUvVC9ITG05?=
- =?utf-8?B?YkR1V1A1VGtoRTRSZkdtbXk2VGg1L3NUMGVvK3ZTSjdYVnBpMjJmN28rbVc4?=
- =?utf-8?Q?kJrOELQAlecER2nheCGspt7wYUnJkblq/ws3Gcj?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5433.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 63a0af7f-aa10-4021-eb5b-08d98253ae41
-X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Sep 2021 07:43:36.5524
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 0RpNo0B4W3L/UMFUqFlOrIuKQEr6l0W59o1QGhe4fNj0giopvD7URwO8Tx6DmMkUyyPhUXgozV2npOe0iu38ag==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR11MB5354
-X-OriginatorOrg: intel.com
+        id S239831AbhI1J0R (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Sep 2021 05:26:17 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id D894961130;
+        Tue, 28 Sep 2021 09:24:37 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1mV9Ln-00DSn8-QY; Tue, 28 Sep 2021 10:24:35 +0100
+Date:   Tue, 28 Sep 2021 10:24:34 +0100
+Message-ID: <87o88dt5m5.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        David Matlack <dmatlack@google.com>,
+        Jing Zhang <jingzhangos@google.com>
+Subject: Re: [PATCH 07/14] KVM: Don't block+unblock when halt-polling is successful
+In-Reply-To: <YVH/LjCqk/9PfDHn@google.com>
+References: <20210925005528.1145584-1-seanjc@google.com>
+        <20210925005528.1145584-8-seanjc@google.com>
+        <878rzlass2.wl-maz@kernel.org>
+        <80d90ee6-0d43-3735-5c26-be8c3d72d493@redhat.com>
+        <877df3btgb.wl-maz@kernel.org>
+        <YVH/LjCqk/9PfDHn@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: seanjc@google.com, pbonzini@redhat.com, chenhuacai@kernel.org, aleksandar.qemu.devel@gmail.com, paulus@ozlabs.org, borntraeger@de.ibm.com, frankja@linux.ibm.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, david@redhat.com, cohuck@redhat.com, imbrenda@linux.ibm.com, vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org, kvm@vger.kernel.org, kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org, dmatlack@google.com, jingzhangos@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PiBGcm9tOiBBbGV4IFdpbGxpYW1zb24gPGFsZXgud2lsbGlhbXNvbkByZWRoYXQuY29tPg0KPiBT
-ZW50OiBUdWVzZGF5LCBTZXB0ZW1iZXIgMjgsIDIwMjEgMzoyMCBBTQ0KPiANCj4gT24gTW9uLCAy
-NyBTZXAgMjAyMSAxMzozMjozNCArMDAwMA0KPiAiVGlhbiwgS2V2aW4iIDxrZXZpbi50aWFuQGlu
-dGVsLmNvbT4gd3JvdGU6DQo+IA0KPiA+ID4gRnJvbTogSmFzb24gR3VudGhvcnBlDQo+ID4gPiBT
-ZW50OiBNb25kYXksIFNlcHRlbWJlciAyNywgMjAyMSA5OjEwIFBNDQo+ID4gPg0KPiA+ID4gT24g
-TW9uLCBTZXAgMjcsIDIwMjEgYXQgMDE6MDA6MDhQTSArMDAwMCwgVGlhbiwgS2V2aW4gd3JvdGU6
-DQo+ID4gPg0KPiA+ID4gPiA+IEkgdGhpbmsgZm9yIHN1Y2ggYSBuYXJyb3cgdXNhZ2UgeW91IHNo
-b3VsZCBub3QgY2hhbmdlIHRoZSBzdHJ1Y3QNCj4gPiA+ID4gPiBkZXZpY2VfZHJpdmVyLiBKdXN0
-IGhhdmUgcGNpX3N0dWIgY2FsbCBhIGZ1bmN0aW9uIHRvIGZsaXAgYmFjayB0byB1c2VyDQo+ID4g
-PiA+ID4gbW9kZS4NCj4gPiA+ID4NCj4gPiA+ID4gSGVyZSB3ZSB3YW50IHRvIGVuc3VyZSB0aGF0
-IGtlcm5lbCBkbWEgc2hvdWxkIGJlIGJsb2NrZWQNCj4gPiA+ID4gaWYgdGhlIGdyb3VwIGlzIGFs
-cmVhZHkgbWFya2VkIGZvciB1c2VyLWRtYS4gSWYgd2UganVzdCBibGluZGx5DQo+ID4gPiA+IGRv
-IGl0IGZvciBhbnkgZHJpdmVyIGF0IHRoaXMgcG9pbnQgKGFzIHlvdSBjb21tZW50ZWQgZWFybGll
-cik6DQo+ID4gPiA+DQo+ID4gPiA+ICsgICAgICAgcmV0ID0gaW9tbXVfc2V0X2tlcm5lbF9vd25l
-cnNoaXAoZGV2KTsNCj4gPiA+ID4gKyAgICAgICBpZiAocmV0KQ0KPiA+ID4gPiArICAgICAgICAg
-ICAgICAgcmV0dXJuIHJldDsNCj4gPiA+ID4NCj4gPiA+ID4gaG93IHdvdWxkIHBjaS1zdHViIHJl
-YWNoIGl0cyBmdW5jdGlvbiB0byBpbmRpY2F0ZSB0aGF0IGl0IGRvZXNuJ3QNCj4gPiA+ID4gZG8g
-ZG1hIGFuZCBmbGlwIGJhY2s/DQo+ID4gPg0KPiA+ID4gPiBEbyB5b3UgZW52aXNpb24gYSBzaW1w
-bGVyIHBvbGljeSB0aGF0IG5vIGRyaXZlciBjYW4gYmUgYm91bmQNCj4gPiA+ID4gdG8gdGhlIGdy
-b3VwIGlmIGl0J3MgYWxyZWFkeSBzZXQgZm9yIHVzZXItZG1hPyB3aGF0IGFib3V0IHZmaW8tcGNp
-DQo+ID4gPiA+IGl0c2VsZj8NCj4gPiA+DQo+ID4gPiBZZXMuLiBJJ20gbm90IHN1cmUgdGhlcmUg
-aXMgYSBnb29kIHVzZSBjYXNlIHRvIGFsbG93IHRoZSBzdHViIGRyaXZlcnMNCj4gPiA+IHRvIGxv
-YWQvdW5sb2FkIHdoaWxlIGEgVkZJTyBpcyBydW5uaW5nLiBBdCBsZWFzdCwgbm90IGEgc3Ryb25n
-IGVub3VnaA0KPiA+ID4gb25lIHRvIGp1c3RpZnkgYSBnbG9iYWwgY2hhbmdlIHRvIHRoZSBkcml2
-ZXIgY29yZS4uDQo+ID4NCj4gPiBJJ20gZmluZSB3aXRoIG5vdCBsb2FkaW5nIHBjaS1zdHViLiBG
-cm9tIHRoZSB2ZXJ5IDFzdCBjb21taXQgbXNnDQo+ID4gbG9va3MgcGNpLXN0dWIgd2FzIGludHJv
-ZHVjZWQgYmVmb3JlIHZmaW8gdG8gcHJldmVudCBob3N0IGRyaXZlcg0KPiA+IGxvYWRpbmcgd2hl
-biBkb2luZyBkZXZpY2UgYXNzaWdubWVudCB3aXRoIEtWTS4gSSdtIG5vdCBzdXJlDQo+ID4gd2hl
-dGhlciBvdGhlciB1c2FnZXMgYXJlIGJ1aWx0IG9uIHBjaS1zdHViIGxhdGVyLCBidXQgaW4gZ2Vu
-ZXJhbCBpdCdzDQo+ID4gbm90IGdvb2QgdG8gcG9zaXRpb24gZGV2aWNlcyBpbiBhIHNhbWUgZ3Jv
-dXAgaW50byBkaWZmZXJlbnQgdXNhZ2VzLg0KPiANCj4gSUlSQywgcGNpLXN0dWIgd2FzIGludmVu
-dGVkIGZvciBsZWdhY3kgS1ZNIGRldmljZSBhc3NpZ25tZW50IGJlY2F1c2UNCj4gS1ZNIHdhcyBu
-ZXZlciBhbiBhY3R1YWwgZGV2aWNlIGRyaXZlciwgaXQganVzdCBsYXRjaGVkIG9udG8gYW5kIHN0
-YXJ0ZWQNCj4gdXNpbmcgdGhlIGRldmljZS4gIElmIHRoZXJlIHdhcyBhbiBleGlzdGluZyBkcml2
-ZXIgZm9yIHRoZSBkZXZpY2UgdGhlbg0KPiBLVk0gd291bGQgZmFpbCB0byBnZXQgZGV2aWNlIHJl
-c291cmNlcy4gIFRoZXJlZm9yZSB0aGUgZGV2aWNlIG5lZWRlZCB0bw0KPiBiZSB1bmJvdW5kIGZy
-b20gaXRzIHN0YW5kYXJkIGhvc3QgZHJpdmVyLCBidXQgdGhhdCBsZWZ0IGl0IHN1c2NlcHRpYmxl
-DQo+IHRvIGRyaXZlciBsb2FkcyB1c3VycGluZyB0aGUgZGV2aWNlLiAgVGhlcmVmb3JlIHBjaS1z
-dHViIGNhbWUgYWxvbmcgdG8NCj4gZXNzZW50aWFsbHkgY2xhaW0gdGhlIGRldmljZSBvbiBiZWhh
-bGYgb2YgS1ZNLg0KPiANCj4gV2l0aCB2ZmlvLCB0aGVyZSBhcmUgYSBjb3VwbGUgdXNlIGNhc2Vz
-IG9mIHBjaS1zdHViIHRoYXQgY2FuIGJlDQo+IGludGVyZXN0aW5nLiAgVGhlIGZpcnN0IGlzIHRo
-YXQgcGNpLXN0dWIgaXMgZ2VuZXJhbGx5IGJ1aWx0IGludG8gdGhlDQo+IGtlcm5lbCwgbm90IGFz
-IGEgbW9kdWxlLCB3aGljaCBwcm92aWRlcyB1c2VycyB0aGUgYWJpbGl0eSB0byBzcGVjaWZ5IGEN
-Cj4gbGlzdCBvZiBpZHMgZm9yIHBjaS1zdHViIHRvIGNsYWltIG9uIHRoZSBrZXJuZWwgY29tbWFu
-ZCBsaW5lIHdpdGgNCj4gaGlnaGVyIHByaW9yaXR5IHRoYW4gbG9hZGFibGUgbW9kdWxlcy4gIFRo
-aXMgY2FuIHByZXZlbnQgZGVmYXVsdCBkcml2ZXINCj4gYmluZGluZ3MgdG8gZGV2aWNlcyB1bnRp
-bCB0b29scyBsaWtlIGRyaXZlcmN0bCBvciBib290IHRpbWUgc2NyaXB0aW5nDQo+IGdldHMgYSBz
-aG90IHRvIGxvYWQgdGhlIHVzZXIgZGVzaWduYXRlZCBkcml2ZXIgZm9yIGEgZGV2aWNlLg0KPiAN
-Cj4gVGhlIG90aGVyIHVzZSBjYXNlLCBpcyB0aGF0IGlmIGEgZ3JvdXAgaXMgY29tcG9zZWQgb2Yg
-bXVsdGlwbGUgZGV2aWNlcw0KPiBhbmQgYWxsIHRob3NlIGRldmljZXMgYXJlIGJvdW5kIHRvIHZm
-aW8gZHJpdmVycywgdGhlbiB0aGUgdXNlciBjYW4gZ2Fpbg0KPiBkaXJlY3QgYWNjZXNzIHRvIGVh
-Y2ggb2YgdGhvc2UgZGV2aWNlcy4gIElmIHdlIHdhbnRlZCB0byBpbnNlcnQgYQ0KPiBiYXJyaWVy
-IHRvIHJlc3RyaWN0IHVzZXIgYWNjZXNzIHRvIGNlcnRhaW4gZGV2aWNlcyB3aXRoaW4gYSBncm91
-cCwgd2UnZA0KPiBzdWdnZXN0IGJpbmRpbmcgdGhvc2UgZGV2aWNlcyB0byBwY2ktc3R1Yi4gIE9i
-dmlvdXNseSB3aXRoaW4gYSBncm91cCwgaXQNCj4gbWF5IHN0aWxsIGJlIHBvc3NpYmxlIHRvIG1h
-bmlwdWxhdGUgdGhlIGRldmljZSB2aWEgcDJwIERNQSwgYnV0IHRoZQ0KPiBiYXJyaWVyIGlzIG11
-Y2ggaGlnaGVyIGFuZCBkZXZpY2UsIGlmIG5vdCBwbGF0Zm9ybSwgc3BlY2lmaWMgdG8NCj4gbWFu
-aXB1bGF0ZSBzdWNoIGRldmljZXMuICBBbiBleGFtcGxlIHVzZSBjYXNlIG1pZ2h0IGJlIGEgY2hp
-cHNldA0KPiBFdGhlcm5ldCBjb250cm9sbGVyIGdyb3VwZWQgYW1vbmcgc3lzdGVtIG1hbmFnZW1l
-bnQgZnVuY3Rpb24gaW4gYQ0KPiBtdWx0aS1mdW5jdGlvbiByb290IGNvbXBsZXggaW50ZWdyYXRl
-ZCBlbmRwb2ludC4NCg0KVGhhbmtzIGZvciB0aGUgYmFja2dyb3VuZC4gSXQgcGVyZmVjdGx5IHJl
-ZmxlY3RzIGhvdyBtYW55IHRyaWNreSB0aGluZ3MNCnRoYXQgdmZpbyBoYXMgZXZvbHZlZCB0byBk
-ZWFsIHdpdGggYW5kIHdlJ2xsIGRpZyB0aGVtIG91dCBhZ2FpbiBpbiB0aGlzDQpyZWZhY3Rvcmlu
-ZyBwcm9jZXNzIHdpdGggeW91ciBoZWxwLiDwn5iKDQoNCmp1c3QgYSBuaXQgb24gdGhlIGxhc3Qg
-ZXhhbXBsZS4gSWYgYSBzeXN0ZW0gbWFuYWdlbWVudCBmdW5jdGlvbiBpcyANCmluIHN1Y2ggZ3Jv
-dXAsIGlzbid0IHRoZSByaWdodCBwb2xpY3kgaXMgdG8gZGlzYWxsb3cgYXNzaWduaW5nIGFueSBk
-ZXZpY2UNCmluIHRoaXMgZ3JvdXA/IEV2ZW4gdGhlIGJhcnJpZXIgaXMgaGlnaCwgYW55IGNoYW5j
-ZSBvZiBhbGxvd2luZyB0aGUgZ3Vlc3QNCnRvIGNvbnRyb2wgYSBzeXN0ZW0gbWFuYWdlbWVudCBm
-dW5jdGlvbiBpcyBkYW5nZXJvdXMuLi4NCg0KPiANCj4gPiBidXQgSSdtIGxpdHRsZSB3b3JyaWVk
-IHRoYXQgZXZlbiB2ZmlvLXBjaSBpdHNlbGYgY2Fubm90IGJlIGJvdW5kIG5vdywNCj4gPiB3aGlj
-aCBpbXBsaWVzIHRoYXQgYWxsIGRldmljZXMgaW4gYSBncm91cCB3aGljaCBhcmUgaW50ZW5kZWQg
-dG8gYmUNCj4gPiB1c2VkIGJ5IHRoZSB1c2VyIG11c3QgYmUgYm91bmQgdG8gdmZpby1wY2kgaW4g
-YSBicmVhdGggYmVmb3JlIHRoZQ0KPiA+IHVzZXIgYXR0ZW1wdHMgdG8gb3BlbiBhbnkgb2YgdGhl
-bSwgaS5lLiBsYXRlLWJpbmRpbmcgYW5kIGRldmljZS0NCj4gPiBob3RwbHVnIGlzIGRpc2FsbG93
-ZWQgYWZ0ZXIgdGhlIGluaXRpYWwgb3Blbi4gSSdtIG5vdCBzdXJlIGhvdw0KPiA+IGltcG9ydGFu
-dCBzdWNoIGFuIHVzYWdlIHdvdWxkIGJlLCBidXQgaXQgZG9lcyBjYXVzZSB1c2VyLXRhbmdpYmxl
-DQo+ID4gc2VtYW50aWNzIGNoYW5nZS4NCj4gDQo+IFllcCwgYSBoaWdoIHBvdGVudGlhbCB0byBi
-cmVhayB1c2Vyc3BhY2UsIGVzcGVjaWFsbHkgYXMgcGNpLXN0dWIgaGFzDQo+IGJlZW4gcmVjb21t
-ZW5kZWQgZm9yIHRoZSBjYXNlcyBub3RlZCBhYm92ZS4gIEkgZG9uJ3QgZXhwZWN0IHRoYXQgdG9v
-bHMNCj4gbGlrZSBsaWJ2aXJ0IG1hbmFnZSB1bmFzc2lnbmVkIGRldmljZXMgd2l0aGluIGEgZ3Jv
-dXAsIGJ1dCB0aGF0DQo+IHByb2JhYmx5IG1lYW5zIHRoYXQgdGhlcmUgYXJlIGFsbCBzb3J0cyBv
-ZiBhZC1ob2MgdXNlciBtZWNoYW5pc21zDQo+IGJleW9uZCBzaW1wbHkgYXNzaWduaW5nIGFsbCB0
-aGUgZGV2aWNlcy4gIFRoYW5rcywNCj4gDQoNClRoYW5rcw0KS2V2aW4NCg==
+On Mon, 27 Sep 2021 18:28:14 +0100,
+Sean Christopherson <seanjc@google.com> wrote:
+> 
+> On Sun, Sep 26, 2021, Marc Zyngier wrote:
+> > On Sun, 26 Sep 2021 07:27:28 +0100,
+> > Paolo Bonzini <pbonzini@redhat.com> wrote:
+> > > 
+> > > On 25/09/21 11:50, Marc Zyngier wrote:
+> > > >> there is no need for arm64 to put/load
+> > > >> the vGIC as KVM hasn't relinquished control of the vCPU in any way.
+> > > > 
+> > > > This doesn't mean that there is no requirement for any state
+> > > > change. The put/load on GICv4 is crucial for performance, and the VMCR
+> > > > resync is a correctness requirement.
+> 
+> Ah crud, I didn't blame that code beforehand, I simply assumed
+> kvm_arch_vcpu_blocking() was purely for the blocking/schedule()
+> sequence.  The comment in arm64's kvm_arch_vcpu_blocking() about
+> kvm_arch_vcpu_runnable() makes more sense now too.
+> 
+> > > I wouldn't even say it's crucial for performance: halt polling cannot
+> > > work and is a waste of time without (the current implementation of)
+> > > put/load.
+> > 
+> > Not quite. A non-V{LPI,SGI} could still be used as the a wake-up from
+> > WFI (which is the only reason we end-up on this path). Only LPIs (and
+> > SGIs on GICv4.1) can be directly injected, meaning that SPIs and PPIs
+> > still follow the standard SW injection model.
+> > 
+> > However, there is still the ICH_VMCR_EL2 requirement (to get the
+> > up-to-date priority mask and group enable bits) for SW-injected
+> > interrupt wake-up to work correctly, and I really don't want to save
+> > that one eagerly on each shallow exit.
+> 
+> IIUC, VMCR is resident in hardware while the guest is running, and
+> KVM needs to retrieve the VMCR when processing interrupts to
+> determine if a interrupt is above the priority threshold.  If that's
+> the case, then IMO handling the VMCR via an arch hook is
+> unnecessarily fragile, e.g. any generic call that leads to
+> kvm_arch_vcpu_runnable() needs to know that arm64 lazily retrieves a
+> guest register.
+
+Not quite. We only need to retrieve the VMCR if we are in a situation
+where we need to trigger a wake-up from WFI at the point where we have
+not done a vcpu_put() yet. All the other cases where the interrupt is
+injected are managed by the HW. And the only case where
+kvm_arch_vcpu_runnable() gets called is when blocking.
+
+I also don't get why a hook would be fragile, as long as it has well
+defined semantics.
+
+> A better approach for VMCR would be to retrieve the value from
+> hardware on-demand, e.g. via a hook in vgic_get_vmcr(), so that it's all but
+> impossible to have bugs where KVM is working with a stale VMCR, e.g.
+> 
+> diff --git a/arch/arm64/kvm/vgic/vgic-mmio.c b/arch/arm64/kvm/vgic/vgic-mmio.c
+> index 48c6067fc5ec..0784de0c4080 100644
+> --- a/arch/arm64/kvm/vgic/vgic-mmio.c
+> +++ b/arch/arm64/kvm/vgic/vgic-mmio.c
+> @@ -828,6 +828,13 @@ void vgic_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr)
+>  
+>  void vgic_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr)
+>  {
+> +       if (!vcpu->...->vmcr_available) {
+> +               preempt_disable();
+> +               kvm_vgic_vmcr_sync(vcpu);
+> +               preempt_enable();
+> +               vcpu->...->vmcr_available = true;
+> +       }
+> +
+
+But most of the uses of vgic_get_vmcr() are in contexts where the vcpu
+isn't running at all (such as save/restore). It really only operates
+on the shadow state, and what you have above will only lead to state
+corruption.
+
+>         if (kvm_vgic_global_state.type == VGIC_V2)
+>                 vgic_v2_get_vmcr(vcpu, vmcr);
+>         else
+> 
+> 
+> Regarding vGIC v4, does KVM require it to be resident in hardware
+> while the vCPU is loaded?
+
+It is a requirement. Otherwise, we end-up with an inconsistent state
+between the delivery of doorbells and the state of the vgic. Also,
+reloading the GICv4 state can be pretty expensive (multiple MMIO
+accesses), which is why we really don't want to do that on the hot
+path (kvm_arch_vcpu_ioctl_run() *is* a hot path).
+
+> If not, then we could do something like
+> this, which would eliminate the arch hooks entirely if the VMCR is
+> handled as above.
+> 
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index fe102cd2e518..efc862c4d802 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -365,31 +365,6 @@ int kvm_cpu_has_pending_timer(struct kvm_vcpu *vcpu)
+>         return kvm_timer_is_pending(vcpu);
+>  }
+> 
+> -void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu)
+> -{
+> -       /*
+> -        * If we're about to block (most likely because we've just hit a
+> -        * WFI), we need to sync back the state of the GIC CPU interface
+> -        * so that we have the latest PMR and group enables. This ensures
+> -        * that kvm_arch_vcpu_runnable has up-to-date data to decide
+> -        * whether we have pending interrupts.
+> -        *
+> -        * For the same reason, we want to tell GICv4 that we need
+> -        * doorbells to be signalled, should an interrupt become pending.
+> -        */
+> -       preempt_disable();
+> -       kvm_vgic_vmcr_sync(vcpu);
+> -       vgic_v4_put(vcpu, true);
+> -       preempt_enable();
+> -}
+> -
+> -void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu)
+> -{
+> -       preempt_disable();
+> -       vgic_v4_load(vcpu);
+> -       preempt_enable();
+> -}
+> -
+>  void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+>  {
+>         struct kvm_s2_mmu *mmu;
+> @@ -697,7 +672,6 @@ static void check_vcpu_requests(struct kvm_vcpu *vcpu)
+>                         /* The distributor enable bits were changed */
+>                         preempt_disable();
+>                         vgic_v4_put(vcpu, false);
+> -                       vgic_v4_load(vcpu);
+>                         preempt_enable();
+>                 }
+> 
+> @@ -813,6 +787,13 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+>                  */
+>                 preempt_disable();
+> 
+> +               /*
+> +                * Reload vGIC v4 if necessary, as it may be put on-demand so
+> +                * that KVM can detect directly injected interrupts, e.g. when
+> +                * determining if the vCPU is runnable due to a pending event.
+> +                */
+> +               vgic_v4_load(vcpu);
+
+You'd need to detect that a previous put has been done. But overall,
+it puts the complexity at the wrong place. WFI (aka kvm_vcpu_block) is
+the place where we want to handle this synchronisation, and not the
+run loop.
+
+Instead of having a well defined interface with the blocking code
+where we implement the required synchronisation, you spray the vgic
+crap all over, and it becomes much harder to reason about it. Guess
+what, I'm not keen on it.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
