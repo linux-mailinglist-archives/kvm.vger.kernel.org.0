@@ -2,229 +2,263 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4DBA541BAED
-	for <lists+kvm@lfdr.de>; Wed, 29 Sep 2021 01:20:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1034441BAF3
+	for <lists+kvm@lfdr.de>; Wed, 29 Sep 2021 01:21:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243214AbhI1XW1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Sep 2021 19:22:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34864 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230349AbhI1XW1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Sep 2021 19:22:27 -0400
-Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A4C1C06161C
-        for <kvm@vger.kernel.org>; Tue, 28 Sep 2021 16:20:47 -0700 (PDT)
-Received: by mail-pf1-x42c.google.com with SMTP id w14so354332pfu.2
-        for <kvm@vger.kernel.org>; Tue, 28 Sep 2021 16:20:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=UGqfj0Lu1yqe3ICg5RET+tLswWsdfuZHNoCTUNF/Uzs=;
-        b=ktTYgxEt+/Ampbz8uSBrRMPIAz/idvs23twHZPW49NiFLYNx0UrJMlpO/qSoV1Bomk
-         YUWDBgxRXfTYt7mqIz3yM9k71Qvwk4LZ93E1desyrK5VVDybtiUv7ubdJ28LEP39esq2
-         uuU+6ErIQAyonGVV+s3AGb+o+NsKYw4ovGye57m5ERw++PUxSv8C4TsCL3OI25AWuUOE
-         7Z8i+9ip2VS5JhpqoDKTXp2iRr8YB30Wu9BIkMy+IJRHdMzGHsVaU5A7AuZZSycPBXwG
-         7sYcqsMqaIJ6N2Lj6sNFSQbrsOFxC4yNvRAnFOYjalbNGjadVQZsO68TeLq3cAJuUHZx
-         qA5A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=UGqfj0Lu1yqe3ICg5RET+tLswWsdfuZHNoCTUNF/Uzs=;
-        b=3H7oHQIsZ9sIurb02K+0ExXafTvBXUzy9GbBAdrdni1FbwL9FZ6V+rQ0wJs9tquivF
-         kcYW3fE1Eh6/rVc8N5UsQv7sY1yPP5Lqx+rLKrrdC1lmFmXlfVMTohks2S30e8PhFFk7
-         g2Ntman7LM0Nq/PL1LunkwIuWAadjzIOqsm5njMKkqkoEV+Aqbpw71uzR28uWV1ZmAc7
-         Au5+aVMJOYRuwmFMO/r7Tmv5EKii76+dOumXTNQJJ8YhA7jSm5iq+D/GHMR3VYnhhcM8
-         ZNj0+oO/lGF8J0UfmsfZwR9XCVhRrIlKK+y0PaPOHyLp1ujfl9R5yS55ubuF7u2hFSsA
-         YKQQ==
-X-Gm-Message-State: AOAM533BA0w0R+WUQ5kz6cCYg5aMCHLsI0qbAedI3Lx9gjnwxWwjtcc4
-        YnqbXGoPJgDSfrGLdI3aKWxH9w==
-X-Google-Smtp-Source: ABdhPJwTa/py5geL3XY+CzwyaLKtYNqkjvb1RpNaBnglEbbxxOrFPI04Wm0x7FME079K+YbBCuZQ0Q==
-X-Received: by 2002:a63:a65:: with SMTP id z37mr7028095pgk.192.1632871246302;
-        Tue, 28 Sep 2021 16:20:46 -0700 (PDT)
-Received: from google.com (254.80.82.34.bc.googleusercontent.com. [34.82.80.254])
-        by smtp.gmail.com with ESMTPSA id z17sm190349pfj.185.2021.09.28.16.20.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Sep 2021 16:20:45 -0700 (PDT)
-Date:   Tue, 28 Sep 2021 23:20:41 +0000
-From:   David Matlack <dmatlack@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        seanjc@google.com
-Subject: Re: [PATCH v3 31/31] KVM: MMU: make spte an in-out argument in
- make_spte
-Message-ID: <YVOjSSahzJ/tf28g@google.com>
-References: <20210924163152.289027-1-pbonzini@redhat.com>
- <20210924163152.289027-32-pbonzini@redhat.com>
+        id S243267AbhI1XXO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Sep 2021 19:23:14 -0400
+Received: from mail-mw2nam08on2071.outbound.protection.outlook.com ([40.107.101.71]:30049
+        "EHLO NAM04-MW2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S243241AbhI1XXN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Sep 2021 19:23:13 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=lbXczw0Wg8bOuOax2Cu9JbkKxrNH29JG0v3WCrYcg0rISqf5yp2hhU6A4FL8TINatith98C6DjucvtLVNv4zzaCeM4Q8/ePas+sHtm3Oh3UyjgZn5ASIYHTCUtiVdR1wfWTiq+a8mDzME21rKPo4l4FkwjE7tnPP91DfrpfYfTi3kaw2064wAkrzGA9LkLO41QVNlnAPveGSe8Q7PkmgATSPO0FqzsLLYFAtbHNe1WsWIf+po9F+rYo/XbRZDa2mPV/vmzhVOQ8qEYtgVBPERCGj+WapFxEKm826gLwtmT0dXiG8cQmOEfVy5XeytlD8DCC9Oui1kh73QN3zlck24Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
+ bh=SqgvvHDv72zBwxwQ5icsMurcABlk7In9P56JZUzf9t4=;
+ b=ZvqVcni5KKcAZu1JWY/GrLrN8obPOmAzBuOivzJ4RsRQrlimjIB5uIxDd20i20uwRQcYWLDWH7NQzltjtObWbQc5v5TdSMbbJCmziF7iTyHM4JVDiV+PSI4f6gopluYbrTicNavGooiUs63Ubf8Nm0q0DLeLv7H1AvZuHRiORG/3defTLFlfmccPi8ZM8pCA7TIqzMX96oGKFVYmEIQtSilcqhI9d3ZtxaPmwwdszD1qG+Xn3TdjUUsoeXIAoXtNqM7OzxJXzloO2ewdrvQ64RyIIUnHOxZkZ37AhkzqKqXCSpIxsAXQOiC8ssk4W/HNJtoYovJGbK1pf15yi3LksQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=SqgvvHDv72zBwxwQ5icsMurcABlk7In9P56JZUzf9t4=;
+ b=gG2jMqZbVK8+0H0Y5PqOY0k+xWCkwleLKqgp4Bn7xAGAB7f0vxc725ZTJ3G138vO7crP3FAdeFpzjACkIswXY/sPmnM3FbxqEEUdeigmP7GMyDoS3JfmcsBE8zMPi7dhz1pcQLZlkgJc7GqH1jnpa7mj7AbnyF9A2TDw4ri8R+k=
+Authentication-Results: linux.intel.com; dkim=none (message not signed)
+ header.d=none;linux.intel.com; dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
+ by SA0PR12MB4511.namprd12.prod.outlook.com (2603:10b6:806:95::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4566.13; Tue, 28 Sep
+ 2021 23:21:31 +0000
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::78b7:7336:d363:9be3]) by SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::78b7:7336:d363:9be3%6]) with mapi id 15.20.4544.021; Tue, 28 Sep 2021
+ 23:21:31 +0000
+Subject: Re: [PATCH Part2 v5 38/45] KVM: SVM: Add support to handle Page State
+ Change VMGEXIT
+To:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
+References: <20210820155918.7518-1-brijesh.singh@amd.com>
+ <20210820155918.7518-39-brijesh.singh@amd.com> <YVLro9lWPguN7Wkv@work-vm>
+From:   Brijesh Singh <brijesh.singh@amd.com>
+Message-ID: <061b8a79-6530-6d3f-6a15-48e676e9ac71@amd.com>
+Date:   Tue, 28 Sep 2021 18:20:51 -0500
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.14.0
+In-Reply-To: <YVLro9lWPguN7Wkv@work-vm>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-ClientProxiedBy: CH2PR05CA0001.namprd05.prod.outlook.com (2603:10b6:610::14)
+ To SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210924163152.289027-32-pbonzini@redhat.com>
+Received: from Brijeshs-MacBook-Pro.local (8.46.75.75) by CH2PR05CA0001.namprd05.prod.outlook.com (2603:10b6:610::14) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4566.14 via Frontend Transport; Tue, 28 Sep 2021 23:21:00 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 7ccaf3d6-6c8e-4c10-0236-08d982d6b42b
+X-MS-TrafficTypeDiagnostic: SA0PR12MB4511:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <SA0PR12MB451167C7FE261F11CE7C1867E5A89@SA0PR12MB4511.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: ZvWH3xMbMBpx+boVSKXMaB4uAgW2AQIneEw/RS6z4lkqLx2dFUZY2y3Xs87TY+wFJNSSJ/WdavnCItiqtngHUOkBFXWfRwVvu01fuyNtnga5pPz1N8/qZUHodzTCg5j+1q8/9BUELaFle0PALh13TnDi5B9lT9q4fAgiFOosEEcBIpmzHtEquO+FHcPhjRuSBc+TDWI9IBUahFrx6tVXxohW2x71gvhhN+WTh/M2tp5tp8HiVt2CL3QF/jFA3lK/xst1I2zN5vERZ3Kvf96Uch/ZDmSh9MF82oh6bwPjVNoePNuei5P/4BewK9frfmjiRv1Rlw3YXVacTUx61lwMFItCLA1IHSU2ixkJPSN0i6Oc1qQFqyZkLmVEfLEos9AiaHOMNgPsZnhOR9jFU0EhXbFpOD4LQ0D6YZDKNh1ZhikQj66e3QI2GjnUFQ1Jawh24gbEfosHOUSXSQBqIVGau4niCItkRKQgJ+Vzu3aG6kiRMd/Vlvx6y+g6ge1KxEVgHKzbd+s7vTs2GDI4UlpHb6HIwgClDW+rLy1DAEtA2sgJ70ilbh7QoXmunr7WJ5Zt37tcQkj0t6/qDjyD3MZsQra7PA6A6IFscYR8yUFaExP1MnzmjHOpln0trQm/qWRBPmXlZVzwW4CdQxE5fCk354UCoiqzlJBL6LOViJvefoJjWl0s8XWF7IMS12CAZplNbFS/9RFhHv0lfsrZY2lFzWTqdsVXin6DyjY5dw8Lz78lCSqeWlGUTj4DfNoGBBpSXPX7wNPgyM7l+hSmfxgF8w==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(31686004)(6666004)(6916009)(86362001)(26005)(6506007)(6486002)(186003)(4326008)(2616005)(53546011)(36756003)(44832011)(7416002)(7406005)(956004)(5660300002)(38100700002)(83380400001)(508600001)(2906002)(6512007)(31696002)(38350700002)(8936002)(54906003)(52116002)(8676002)(66556008)(66476007)(66946007)(316002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NDFtdElyZHd5NG9ZODVYNllzOWVkT1FQNm9jZWc2b01OZHdEdWh4eFFjT2E5?=
+ =?utf-8?B?N1VtVnphc2NHd0FJM2lkeGZLMW5vdFRpQlFPYlV6K0tLQk5OMm5SV3FER1pU?=
+ =?utf-8?B?UmJHV0FUOHV4QzRxZEIxY3hHbm1pQWJiUzQyL0twQ3hMZGwzWlN2Z2p1b2Qv?=
+ =?utf-8?B?MFJGSzVtZnFXZVZzMGZYbnhseTdUYU1sTkRad0FxRDI1bW1ZYlRaUFg2ZVBk?=
+ =?utf-8?B?UjFUZy82b0VGcHZzT2NDVm5TNklWa2VhWHlXZVFINUhJUTRncW9ZSitLSHQz?=
+ =?utf-8?B?b3loNGdpL05INWZIancwYzNNUXFmK3plY2U4eWU0blV6dEhvU3IyRG5xNDlL?=
+ =?utf-8?B?ZlF2ellsdnFJOHdsWElqNEJhR0JyUXBEK3lOVjdVVGxjVW9Vbk1XRjBvMUMx?=
+ =?utf-8?B?cFdlVUU5MFBIU2RYU3NGc1ZKakRHR2grbEl4UHd0Q0x5RUVNVDMyMjUxN2xF?=
+ =?utf-8?B?eGhuajJtZU93Vlp1THMyYW9iK3M5MVcwV0hWVDFhRWg5eCtRbENJd1l1UUJl?=
+ =?utf-8?B?Z0N1Zk83NmZ2VGwzMkRDTUhLT212aWRMblFUdGtTR1p4ejNlYURsSjBDWEdZ?=
+ =?utf-8?B?cG8zWXMvT0Y4U1gvVFNHTEpPQTF2ZlZZYWRCL1BTaHVYMmxXWHBSQmxFV1R0?=
+ =?utf-8?B?QnZvdTNCaHVXT0ZoLzFkakNvZmtIYUxIcStwK3JzMjN5aDAzcHNmTDA4UGhp?=
+ =?utf-8?B?cXBDenJDUUxPOVdDamRLTWp0S1NybEZhYTY1RldyekNhS3ZucE1KcGlFOFNv?=
+ =?utf-8?B?TGdwNGhxRzNBaFFnUDdOaEZwSklZT1d5NDliR1JYbENZb0FYYkU0UVl6T2Vi?=
+ =?utf-8?B?ekp3ZmJFN2lpcXpaQU5GaWM0ZlgrckNSOUVoYyt1SlJRVzFtcFppdkIzbnF4?=
+ =?utf-8?B?Y1pVdkhmajdwZlJXVis2am1rTFFkemdVWVVFWWNGUFhYNDJZbWg1MTIybGh6?=
+ =?utf-8?B?TTJWUHp2L3JaeFVVcjdleGNzbVFuT0ViOGJsOVVTZmFPRWJaSmpsV3hrakJw?=
+ =?utf-8?B?dTVlWDZnUWZOdXRLZmkyNGV6UVF5MitqRUk1RytNUDhIL0VEZHBjaUJyOFhV?=
+ =?utf-8?B?OUhGK0dSS2V1OG0xUHEvV1hZTG10UzJYMGJxdnVDQWt3OHlRRHhIT0JZMHVU?=
+ =?utf-8?B?SUtpS2lyZVo0enF0Y2FRQW55SVhOYW1KUVBhQSt5SzRKL0lpaTB1b1V4N1M4?=
+ =?utf-8?B?dkpYYXhyR21SOUoyY0k0cHNYYWZJMTRCZjMvaGg1eE1QOFZLZmdEdzZLZjJQ?=
+ =?utf-8?B?THFaUGFHQTJXeFphMzR2TzlmU20vb3oxT1NJNkVWNnZUdVY3SDduMHZ0cGxi?=
+ =?utf-8?B?eXBCSCtmdUFYMmsvbWpVZHovc2U2c1VyUjFCVDJleUhtRlpDZ2hyaG9GTElR?=
+ =?utf-8?B?NTZMa3hOL29ycEV1aWlobkhsVktYTjJxdDZtS3o1WTBvbDVHV1A1YzRjRzNO?=
+ =?utf-8?B?Q2JBVnNGZHVCek85ek1mZG1zejhNeHVkTHJOd0ZNdzBOSVhyMGVPTHdFdUZ0?=
+ =?utf-8?B?TlNyMVE1Ky9ONUFtUGRGdlA2ZWpibnQzdXhFd1ZtYmZRWUZZWjdaTXJEQ3h0?=
+ =?utf-8?B?SlhFY3M3ZVpsKzl4THdoZVpiMTI4WG9hckVxUXdNaS9BS3pLTW5FRFh1S3dk?=
+ =?utf-8?B?SkliWkdjZDJzOUtWcEh4bS9qeHB4UHZBdUxadjFmQmFLTm5ZL2k4ZnViMzB4?=
+ =?utf-8?B?bDAxWHlnb1lodHlIY1hrSk5ueVQzcDh5Z2FVbHd1a1lKSWdzUTNEeGhmbzlt?=
+ =?utf-8?Q?PDGmlxp6BdYvPYRndxKhit9gG48Vbt/d/3mCeUt?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7ccaf3d6-6c8e-4c10-0236-08d982d6b42b
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Sep 2021 23:21:30.9204
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: sEQz2w6TeMNjF9dUucIgfvLSjecz+EC5n8QpxbLNQ2i5q+Wl9aMotfyHDtkt60wYekmn2PiZbzdFIJqnvRDYbw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4511
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 24, 2021 at 12:31:52PM -0400, Paolo Bonzini wrote:
-> Pass the old SPTE in the same variable that receives the new SPTE.  This
-> reduces the number of arguments from 11 to 10.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  arch/x86/kvm/mmu/mmu.c         | 18 ++++++++----------
->  arch/x86/kvm/mmu/paging_tmpl.h |  2 +-
->  arch/x86/kvm/mmu/spte.c        |  7 ++++---
->  arch/x86/kvm/mmu/spte.h        |  2 +-
->  arch/x86/kvm/mmu/tdp_mmu.c     |  9 +++++----
->  5 files changed, 19 insertions(+), 19 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 91292009780a..b363433bcd2c 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -2682,8 +2682,8 @@ static int mmu_set_spte(struct kvm_vcpu *vcpu, struct kvm_memory_slot *slot,
->  	int was_rmapped = 0;
->  	int ret = RET_PF_FIXED;
->  	bool flush = false;
-> +	u64 spte = *sptep;
->  	bool wrprot;
-> -	u64 spte;
->  
->  	/* Prefetching always gets a writable pfn.  */
->  	bool host_writable = !fault || fault->map_writable;
-> @@ -2691,35 +2691,33 @@ static int mmu_set_spte(struct kvm_vcpu *vcpu, struct kvm_memory_slot *slot,
->  	bool write_fault = fault && fault->write;
->  
->  	pgprintk("%s: spte %llx write_fault %d gfn %llx\n", __func__,
-> -		 *sptep, write_fault, gfn);
-> +		 spte, write_fault, gfn);
->  
->  	if (unlikely(is_noslot_pfn(pfn))) {
->  		mark_mmio_spte(vcpu, sptep, gfn, pte_access);
->  		return RET_PF_EMULATE;
->  	}
->  
-> -	if (is_shadow_present_pte(*sptep)) {
-> +	if (is_shadow_present_pte(spte)) {
->  		/*
->  		 * If we overwrite a PTE page pointer with a 2MB PMD, unlink
->  		 * the parent of the now unreachable PTE.
->  		 */
-> -		if (level > PG_LEVEL_4K && !is_large_pte(*sptep)) {
-> +		if (level > PG_LEVEL_4K && !is_large_pte(spte)) {
->  			struct kvm_mmu_page *child;
-> -			u64 pte = *sptep;
-> -
-> -			child = to_shadow_page(pte & PT64_BASE_ADDR_MASK);
-> +			child = to_shadow_page(spte & PT64_BASE_ADDR_MASK);
->  			drop_parent_pte(child, sptep);
->  			flush = true;
-> -		} else if (pfn != spte_to_pfn(*sptep)) {
-> +		} else if (pfn != spte_to_pfn(spte)) {
->  			pgprintk("hfn old %llx new %llx\n",
-> -				 spte_to_pfn(*sptep), pfn);
-> +				 spte_to_pfn(spte), pfn);
->  			drop_spte(vcpu->kvm, sptep);
->  			flush = true;
->  		} else
->  			was_rmapped = 1;
->  	}
->  
-> -	wrprot = make_spte(vcpu, sp, slot, pte_access, gfn, pfn, *sptep, speculative,
-> +	wrprot = make_spte(vcpu, sp, slot, pte_access, gfn, pfn, speculative,
->  			   true, host_writable, &spte);
->  
->  	if (*sptep == spte) {
-> diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-> index d8889e02c4b7..88551cfd06c6 100644
-> --- a/arch/x86/kvm/mmu/paging_tmpl.h
-> +++ b/arch/x86/kvm/mmu/paging_tmpl.h
-> @@ -1130,7 +1130,7 @@ static int FNAME(sync_page)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
->  		host_writable = spte & shadow_host_writable_mask;
->  		slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
->  		make_spte(vcpu, sp, slot, pte_access, gfn,
-> -			  spte_to_pfn(spte), spte, true, false,
-> +			  spte_to_pfn(spte), true, false,
->  			  host_writable, &spte);
->  
->  		flush |= mmu_spte_update(sptep, spte);
-> diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
-> index 871f6114b0fa..91525388032e 100644
-> --- a/arch/x86/kvm/mmu/spte.c
-> +++ b/arch/x86/kvm/mmu/spte.c
-> @@ -92,10 +92,11 @@ static bool kvm_is_mmio_pfn(kvm_pfn_t pfn)
->  bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
->  	       struct kvm_memory_slot *slot,
->  	       unsigned int pte_access, gfn_t gfn, kvm_pfn_t pfn,
-> -	       u64 old_spte, bool speculative, bool can_unsync,
-> -	       bool host_writable, u64 *new_spte)
-> +	       bool speculative, bool can_unsync,
-> +	       bool host_writable, u64 *sptep)
 
-I'd prefer a different name since `sptep` has specific meaning
-throughout the mmu code. (It's the address of the spte in the page
-table.)
+On 9/28/21 5:17 AM, Dr. David Alan Gilbert wrote:
+> * Brijesh Singh (brijesh.singh@amd.com) wrote:
+>> SEV-SNP VMs can ask the hypervisor to change the page state in the RMP
+>> table to be private or shared using the Page State Change NAE event
+>> as defined in the GHCB specification version 2.
+>>
+>> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+>> ---
+>>  arch/x86/include/asm/sev-common.h |  7 +++
+>>  arch/x86/kvm/svm/sev.c            | 82 +++++++++++++++++++++++++++++--
+>>  2 files changed, 84 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/arch/x86/include/asm/sev-common.h b/arch/x86/include/asm/sev-common.h
+>> index 4980f77aa1d5..5ee30bb2cdb8 100644
+>> --- a/arch/x86/include/asm/sev-common.h
+>> +++ b/arch/x86/include/asm/sev-common.h
+>> @@ -126,6 +126,13 @@ enum psc_op {
+>>  /* SNP Page State Change NAE event */
+>>  #define VMGEXIT_PSC_MAX_ENTRY		253
+>>  
+>> +/* The page state change hdr structure in not valid */
+>> +#define PSC_INVALID_HDR			1
+>> +/* The hdr.cur_entry or hdr.end_entry is not valid */
+>> +#define PSC_INVALID_ENTRY		2
+>> +/* Page state change encountered undefined error */
+>> +#define PSC_UNDEF_ERR			3
+>> +
+>>  struct psc_hdr {
+>>  	u16 cur_entry;
+>>  	u16 end_entry;
+>> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+>> index 6d9483ec91ab..0de85ed63e9b 100644
+>> --- a/arch/x86/kvm/svm/sev.c
+>> +++ b/arch/x86/kvm/svm/sev.c
+>> @@ -2731,6 +2731,7 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm, u64 *exit_code)
+>>  	case SVM_VMGEXIT_AP_JUMP_TABLE:
+>>  	case SVM_VMGEXIT_UNSUPPORTED_EVENT:
+>>  	case SVM_VMGEXIT_HV_FEATURES:
+>> +	case SVM_VMGEXIT_PSC:
+>>  		break;
+>>  	default:
+>>  		goto vmgexit_err;
+>> @@ -3004,13 +3005,13 @@ static int __snp_handle_page_state_change(struct kvm_vcpu *vcpu, enum psc_op op,
+>>  		 */
+>>  		rc = snp_check_and_build_npt(vcpu, gpa, level);
+>>  		if (rc)
+>> -			return -EINVAL;
+>> +			return PSC_UNDEF_ERR;
+>>  
+>>  		if (op == SNP_PAGE_STATE_PRIVATE) {
+>>  			hva_t hva;
+>>  
+>>  			if (snp_gpa_to_hva(kvm, gpa, &hva))
+>> -				return -EINVAL;
+>> +				return PSC_UNDEF_ERR;
+>>  
+>>  			/*
+>>  			 * Verify that the hva range is registered. This enforcement is
+>> @@ -3022,7 +3023,7 @@ static int __snp_handle_page_state_change(struct kvm_vcpu *vcpu, enum psc_op op,
+>>  			rc = is_hva_registered(kvm, hva, page_level_size(level));
+>>  			mutex_unlock(&kvm->lock);
+>>  			if (!rc)
+>> -				return -EINVAL;
+>> +				return PSC_UNDEF_ERR;
+>>  
+>>  			/*
+>>  			 * Mark the userspace range unmerable before adding the pages
+>> @@ -3032,7 +3033,7 @@ static int __snp_handle_page_state_change(struct kvm_vcpu *vcpu, enum psc_op op,
+>>  			rc = snp_mark_unmergable(kvm, hva, page_level_size(level));
+>>  			mmap_write_unlock(kvm->mm);
+>>  			if (rc)
+>> -				return -EINVAL;
+>> +				return PSC_UNDEF_ERR;
+>>  		}
+>>  
+>>  		write_lock(&kvm->mmu_lock);
+>> @@ -3062,8 +3063,11 @@ static int __snp_handle_page_state_change(struct kvm_vcpu *vcpu, enum psc_op op,
+>>  		case SNP_PAGE_STATE_PRIVATE:
+>>  			rc = rmp_make_private(pfn, gpa, level, sev->asid, false);
+>>  			break;
+>> +		case SNP_PAGE_STATE_PSMASH:
+>> +		case SNP_PAGE_STATE_UNSMASH:
+>> +			/* TODO: Add support to handle it */
+>>  		default:
+>> -			rc = -EINVAL;
+>> +			rc = PSC_INVALID_ENTRY;
+>>  			break;
+>>  		}
+>>  
+>> @@ -3081,6 +3085,65 @@ static int __snp_handle_page_state_change(struct kvm_vcpu *vcpu, enum psc_op op,
+>>  	return 0;
+>>  }
+>>  
+>> +static inline unsigned long map_to_psc_vmgexit_code(int rc)
+>> +{
+>> +	switch (rc) {
+>> +	case PSC_INVALID_HDR:
+>> +		return ((1ul << 32) | 1);
+>> +	case PSC_INVALID_ENTRY:
+>> +		return ((1ul << 32) | 2);
+>> +	case RMPUPDATE_FAIL_OVERLAP:
+>> +		return ((3ul << 32) | 2);
+>> +	default: return (4ul << 32);
+>> +	}
+> Are these the values defined in 56421 section 4.1.6 ?
+> If so, that says:
+>   SW_EXITINFO2[63:32] == 0x00000100
+>       The hypervisor encountered some other error situation and was not able to complete the
+>       request identified by page_state_change_header.cur_entry. It is left to the guest to decide how
+>       to proceed in this situation.
+>
+> so it looks like the default should be 0x100 rather than 4?
 
-Case in point, I was going to suggest we can get rid of struct
-kvm_mmu_page since it can be derived from the sptep and then realized
-how wrong that was :).
+Ah good catch, it should be 0x100. I will fix it.
 
-Instead of receiving the new spte as a parameter what do you think about
-changing make_spte to return the new spte? I think that would make the
-code more readable (but won't reduce the number of arguments because
-you'd have to add wrprot).
 
->  {
->  	int level = sp->role.level;
-> +	u64 old_spte = *sptep;
->  	u64 spte = SPTE_MMU_PRESENT_MASK;
->  	bool wrprot = false;
->  
-> @@ -187,7 +188,7 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
->  		mark_page_dirty_in_slot(vcpu->kvm, slot, gfn);
->  	}
->  
-> -	*new_spte = spte;
-> +	*sptep = spte;
->  	return wrprot;
->  }
->  
-> diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
-> index 7c0b09461349..231531c6015a 100644
-> --- a/arch/x86/kvm/mmu/spte.h
-> +++ b/arch/x86/kvm/mmu/spte.h
-> @@ -337,7 +337,7 @@ static inline u64 get_mmio_spte_generation(u64 spte)
->  bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
->  	       struct kvm_memory_slot *slot,
->  	       unsigned int pte_access, gfn_t gfn, kvm_pfn_t pfn,
-> -	       u64 old_spte, bool speculative, bool can_unsync,
-> +	       bool speculative, bool can_unsync,
->  	       bool host_writable, u64 *new_spte);
->  u64 make_nonleaf_spte(u64 *child_pt, bool ad_disabled);
->  u64 make_mmio_spte(struct kvm_vcpu *vcpu, u64 gfn, unsigned int access);
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index 953f24ded6bc..29b739c7bba4 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -903,13 +903,14 @@ static int tdp_mmu_map_handle_target_level(struct kvm_vcpu *vcpu,
->  	bool wrprot = false;
->  
->  	WARN_ON(sp->role.level != fault->goal_level);
-> -	if (unlikely(!fault->slot))
-> +	if (unlikely(!fault->slot)) {
->  		new_spte = make_mmio_spte(vcpu, iter->gfn, ACC_ALL);
-> -	else
-> +	} else {
-> +		new_spte = iter->old_spte;
->  		wrprot = make_spte(vcpu, sp, fault->slot, ACC_ALL, iter->gfn,
-> -					 fault->pfn, iter->old_spte, fault->prefault, true,
-> +					 fault->pfn, fault->prefault, true,
->  					 fault->map_writable, &new_spte);
-> -
-> +	}
->  	if (new_spte == iter->old_spte)
->  		ret = RET_PF_SPURIOUS;
->  	else if (!tdp_mmu_set_spte_atomic(vcpu->kvm, iter, new_spte))
-> -- 
-> 2.27.0
-> 
+> (It's a shame they're all magical constants, it would be nice if the
+> standard have them names)
+
+In early RFC's I had a macros to build the error code but based on
+feedback's went with this function with open coded values.
+
+thanks
+
+
