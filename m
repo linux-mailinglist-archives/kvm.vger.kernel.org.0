@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F102B41B9D0
-	for <lists+kvm@lfdr.de>; Wed, 29 Sep 2021 00:03:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BFA0641B9D5
+	for <lists+kvm@lfdr.de>; Wed, 29 Sep 2021 00:04:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243005AbhI1WE7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Sep 2021 18:04:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45356 "EHLO
+        id S243017AbhI1WGf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Sep 2021 18:06:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45730 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242130AbhI1WE6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Sep 2021 18:04:58 -0400
-Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28F0BC061746
-        for <kvm@vger.kernel.org>; Tue, 28 Sep 2021 15:03:18 -0700 (PDT)
-Received: by mail-pg1-x52f.google.com with SMTP id s11so496208pgr.11
-        for <kvm@vger.kernel.org>; Tue, 28 Sep 2021 15:03:18 -0700 (PDT)
+        with ESMTP id S242899AbhI1WGe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Sep 2021 18:06:34 -0400
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3B2DC061746
+        for <kvm@vger.kernel.org>; Tue, 28 Sep 2021 15:04:52 -0700 (PDT)
+Received: by mail-pj1-x1034.google.com with SMTP id il14-20020a17090b164e00b0019c7a7c362dso2727954pjb.0
+        for <kvm@vger.kernel.org>; Tue, 28 Sep 2021 15:04:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=HhWJHJzwSlwok1AmtMjKCRhZCZC7gZ0nzg2WuvY1qEE=;
-        b=tigZj4v4CeD0329C4UL89vBMNZKnQ83w87+ZjG/BkopVGCTWeqLcdLtmMMMyBh4mY7
-         7Dg9uin+BfDKQe3/AO/kBYz/oYXaVu1zZluev925ki7GPxG9RsFR+LVM6CwXOErqWOQ1
-         pcncNiTkf8gIAQ18xmLQoQFFSVJjeL/kv9WgotyouEYXoN9oN4CFt1v1v3hF+tD2MuSP
-         4hRr4rqTnaTfyQu2hB8T0n1Sl6+dT/y/KrjaEze5I0PN5XK1QLwnll8S68T9w3WOhivA
-         8src448DI7RUYdTJ7WPFB9p1z6qh3ARAEdVyO8+kHbRNjGL0an+DZUP9EMoHBQVa5OH2
-         UFig==
+        bh=s8TgaTkuAOfttq5Ji23XuWmZEPg/t1pbW45rjrv+GjY=;
+        b=LOKBGSSThTGJmZr52wMlTVIXy7gN0kcixsV7n11azJM+wFcpy4hdoZIRhH6FjCUukF
+         R3ek08fGm45mGkuiA0+Kxm49I86GkQOabdwCzh/L7J8ZtTUESfVtBd1ViQEJJ5vZmB0j
+         gVM3+sKMqY01a6pRSxMH/JV7N2k8jZaoTStvXT/CW+6ekMegbYoSEeVNZm/knJC1H2Iz
+         JpHolIs35AjaAocSgJu4Q8l0875P6gOMqZFX8yYi8BLrJDNQk0tBeB5SUgTVoQJk7Bxc
+         TaQ1FhIIJDiukqtBzIRTPyLdyC5LfChFTqz2xnOAHZ/G/Ty6/PTiLDypDINxMIzqkG+p
+         MNEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=HhWJHJzwSlwok1AmtMjKCRhZCZC7gZ0nzg2WuvY1qEE=;
-        b=pOS8305zi6pOiTAbpU2+v62bCmRyB4eI18Q3bABQo1IN0J3T/qN8qEOqg01+mDjBSC
-         bD7hpZSlcOWioj5ztQfvxfbgDA9Xq6xI+IArkaBzIudritPbVVY/xhFhwuBHS2PDFOHH
-         uOjA7JG25UGeUJyABjwGJbL6w2KBTSWe3NjU8GVhi3pjoIer+AR5xBfOzW6K597lEBn5
-         9GnCpU9DodsfuVw9l3zhzOdCsAGLTZTLqcsU+3wd4CTRXvzNpXOric5Ifr3tiLfaJXMK
-         4UDqpubEx/1A+YZxCrxfW2zKEwgxpYtcGinBtF+CEGbv4j5OWiEOvbSpuwA1HDnl9hIe
-         EA7w==
-X-Gm-Message-State: AOAM530Jnx4YC8xTeUTmADeCAK9rqSHYXDwOx46y78y01cEocXG/PcX/
-        mVka30YNMLWaSYeLKX9f5WQ8Yu5Ng/0b509S
-X-Google-Smtp-Source: ABdhPJz8FBfuYulYfix3SaPNrNClCNKJqQQmFIru90iSEGa1D9tLSPPzdOByJRFDeYbge7PjxYA/EA==
-X-Received: by 2002:aa7:980a:0:b0:43e:670:8505 with SMTP id e10-20020aa7980a000000b0043e06708505mr7905502pfl.74.1632866597392;
-        Tue, 28 Sep 2021 15:03:17 -0700 (PDT)
+        bh=s8TgaTkuAOfttq5Ji23XuWmZEPg/t1pbW45rjrv+GjY=;
+        b=uWVky7oxWrX/FXMunhP0NBFa6b58EEqR5SZN0Bw6eYP0+nkrrusT3pjaTbn3As4/3o
+         qxNUX1iBE4JXzRD3VxxL3PxCfA3Th3qVGGrPScYJ/MxZ78aySzt6qab2CBrw1AvErosy
+         /DG81eiGlgHUTV2JJIDAHvOqNccSE73Ph2NbBxEr9/F4yiKVj2mMp51KT0+as8nekC8J
+         rpHfP+KwE4bFNk4f3s1ePscTkSM08uXPJ/0Upgsq8GNLvLC7FkLKfxm2HFkt398p2WqH
+         vuNYSuGQoBTBpcpZIKgOrO1Cm6NGsb9Yzqt1o0ieBOf1TWzDY7K4OIjSta+OCcQhw0MX
+         VhBQ==
+X-Gm-Message-State: AOAM530WBDhkfnxVKpITVZFSXeXFEkpdTi8GqGa7vNHw6j2n8ITt774C
+        bxZ0aFXiMj+J25eEHHnarbKlWQ==
+X-Google-Smtp-Source: ABdhPJyZYZhKpQUljc7RVXwKUERY34mYmQfs2NuJ723fR6n2a6r5wthdOfaTSfpkU7ajTH5d6X1x0g==
+X-Received: by 2002:a17:90a:c982:: with SMTP id w2mr2466336pjt.30.1632866692006;
+        Tue, 28 Sep 2021 15:04:52 -0700 (PDT)
 Received: from google.com (254.80.82.34.bc.googleusercontent.com. [34.82.80.254])
-        by smtp.gmail.com with ESMTPSA id t33sm129606pfg.71.2021.09.28.15.03.16
+        by smtp.gmail.com with ESMTPSA id v26sm124276pfm.175.2021.09.28.15.04.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Sep 2021 15:03:16 -0700 (PDT)
-Date:   Tue, 28 Sep 2021 22:03:13 +0000
+        Tue, 28 Sep 2021 15:04:51 -0700 (PDT)
+Date:   Tue, 28 Sep 2021 22:04:47 +0000
 From:   David Matlack <dmatlack@google.com>
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
@@ -70,122 +70,88 @@ Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
         linux-mips@vger.kernel.org, kvm@vger.kernel.org,
         kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org,
         Jing Zhang <jingzhangos@google.com>
-Subject: Re: [PATCH 10/14] KVM: Split out a kvm_vcpu_block() helper from
- kvm_vcpu_halt()
-Message-ID: <YVORIQVU3Vz/gWUI@google.com>
+Subject: Re: [PATCH 11/14] KVM: stats: Add stat to detect if vcpu is
+ currently blocking
+Message-ID: <YVORf599tkw3MdGZ@google.com>
 References: <20210925005528.1145584-1-seanjc@google.com>
- <20210925005528.1145584-11-seanjc@google.com>
+ <20210925005528.1145584-12-seanjc@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210925005528.1145584-11-seanjc@google.com>
+In-Reply-To: <20210925005528.1145584-12-seanjc@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 24, 2021 at 05:55:24PM -0700, Sean Christopherson wrote:
-> Factor out the "block" part of kvm_vcpu_halt() so that x86 can emulate
-> non-halt wait/sleep/block conditions that should not be subjected to
-> halt-polling.
+On Fri, Sep 24, 2021 at 05:55:25PM -0700, Sean Christopherson wrote:
+> From: Jing Zhang <jingzhangos@google.com>
 > 
-> No functional change intended.
+> Add a "blocking" stat that userspace can use to detect the case where a
+> vCPU is not being run because of a vCPU/guest action, e.g. HLT or WFS on
+> x86, WFI on arm64, etc...  Current guest/host/halt stats don't show this
+> well, e.g. if a guest halts for a long period of time then the vCPU could
+> appear pathologically blocked due to a host condition, when in reality the
+> vCPU has been put into a not-runnable state by the guest.
 > 
+> Originally-by: Cannon Matthews <cannonmatthews@google.com>
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> [sean: renamed stat to "blocking", massaged changelog]
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
 
 Reviewed-by: David Matlack <dmatlack@google.com>
-
 > ---
->  include/linux/kvm_host.h |  1 +
->  virt/kvm/kvm_main.c      | 50 ++++++++++++++++++++++++++++------------
->  2 files changed, 36 insertions(+), 15 deletions(-)
+>  include/linux/kvm_host.h  | 3 ++-
+>  include/linux/kvm_types.h | 1 +
+>  virt/kvm/kvm_main.c       | 2 ++
+>  3 files changed, 5 insertions(+), 1 deletion(-)
 > 
 > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index d2a8be3fb9ba..655c2b24db2d 100644
+> index 655c2b24db2d..9bb1972e396a 100644
 > --- a/include/linux/kvm_host.h
 > +++ b/include/linux/kvm_host.h
-> @@ -966,6 +966,7 @@ void kvm_sigset_activate(struct kvm_vcpu *vcpu);
->  void kvm_sigset_deactivate(struct kvm_vcpu *vcpu);
+> @@ -1453,7 +1453,8 @@ struct _kvm_stats_desc {
+>  	STATS_DESC_LOGHIST_TIME_NSEC(VCPU_GENERIC, halt_poll_fail_hist,	       \
+>  			HALT_POLL_HIST_COUNT),				       \
+>  	STATS_DESC_LOGHIST_TIME_NSEC(VCPU_GENERIC, halt_wait_hist,	       \
+> -			HALT_POLL_HIST_COUNT)
+> +			HALT_POLL_HIST_COUNT),				       \
+> +	STATS_DESC_ICOUNTER(VCPU_GENERIC, blocking)
 >  
->  void kvm_vcpu_halt(struct kvm_vcpu *vcpu);
-> +bool kvm_vcpu_block(struct kvm_vcpu *vcpu);
->  void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu);
->  void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu);
->  bool kvm_vcpu_wake_up(struct kvm_vcpu *vcpu);
+>  extern struct dentry *kvm_debugfs_dir;
+>  
+> diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
+> index 2237abb93ccd..c4f9257bf32d 100644
+> --- a/include/linux/kvm_types.h
+> +++ b/include/linux/kvm_types.h
+> @@ -94,6 +94,7 @@ struct kvm_vcpu_stat_generic {
+>  	u64 halt_poll_success_hist[HALT_POLL_HIST_COUNT];
+>  	u64 halt_poll_fail_hist[HALT_POLL_HIST_COUNT];
+>  	u64 halt_wait_hist[HALT_POLL_HIST_COUNT];
+> +	u64 blocking;
+>  };
+>  
+>  #define KVM_STATS_NAME_SIZE	48
 > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 280cf1dca7db..fe34457530c2 100644
+> index fe34457530c2..2980d2b88559 100644
 > --- a/virt/kvm/kvm_main.c
 > +++ b/virt/kvm/kvm_main.c
-> @@ -3199,6 +3199,34 @@ static int kvm_vcpu_check_block(struct kvm_vcpu *vcpu)
->  	return ret;
->  }
->  
-> +/*
-> + * Block the vCPU until the vCPU is runnable, an event arrives, or a signal is
-> + * pending.  This is mostly used when halting a vCPU, but may also be used
-> + * directly for other vCPU non-runnable states, e.g. x86's Wait-For-SIPI.
-> + */
-> +bool kvm_vcpu_block(struct kvm_vcpu *vcpu)
-> +{
-> +	bool waited = false;
-> +
-> +	kvm_arch_vcpu_blocking(vcpu);
-> +
-> +	prepare_to_rcuwait(&vcpu->wait);
-> +	for (;;) {
-> +		set_current_state(TASK_INTERRUPTIBLE);
-> +
-> +		if (kvm_vcpu_check_block(vcpu) < 0)
-> +			break;
-> +
-> +		waited = true;
-> +		schedule();
-> +	}
-> +	finish_rcuwait(&vcpu->wait);
-> +
-> +	kvm_arch_vcpu_unblocking(vcpu);
-> +
-> +	return waited;
-> +}
-> +
->  static inline void update_halt_poll_stats(struct kvm_vcpu *vcpu, ktime_t start,
->  					  ktime_t end, bool success)
+> @@ -3208,6 +3208,7 @@ bool kvm_vcpu_block(struct kvm_vcpu *vcpu)
 >  {
-> @@ -3221,6 +3249,12 @@ static inline void update_halt_poll_stats(struct kvm_vcpu *vcpu, ktime_t start,
->  	}
+>  	bool waited = false;
+>  
+> +	vcpu->stat.generic.blocking = 1;
+>  	kvm_arch_vcpu_blocking(vcpu);
+>  
+>  	prepare_to_rcuwait(&vcpu->wait);
+> @@ -3223,6 +3224,7 @@ bool kvm_vcpu_block(struct kvm_vcpu *vcpu)
+>  	finish_rcuwait(&vcpu->wait);
+>  
+>  	kvm_arch_vcpu_unblocking(vcpu);
+> +	vcpu->stat.generic.blocking = 0;
+>  
+>  	return waited;
 >  }
->  
-> +/*
-> + * Emulate a vCPU halt condition, e.g. HLT on x86, WFI on arm, etc...  If halt
-> + * polling is enabled, busy wait for a short time before blocking to avoid the
-> + * expensive block+unblock sequence if a wake event arrives soon after the vCPU
-> + * is halted.
-> + */
->  void kvm_vcpu_halt(struct kvm_vcpu *vcpu)
->  {
->  	bool halt_poll_allowed = !kvm_arch_no_poll(vcpu);
-> @@ -3245,21 +3279,7 @@ void kvm_vcpu_halt(struct kvm_vcpu *vcpu)
->  		} while (kvm_vcpu_can_poll(cur, stop));
->  	}
->  
-> -	kvm_arch_vcpu_blocking(vcpu);
-> -
-> -	prepare_to_rcuwait(&vcpu->wait);
-> -	for (;;) {
-> -		set_current_state(TASK_INTERRUPTIBLE);
-> -
-> -		if (kvm_vcpu_check_block(vcpu) < 0)
-> -			break;
-> -
-> -		waited = true;
-> -		schedule();
-> -	}
-> -	finish_rcuwait(&vcpu->wait);
-> -
-> -	kvm_arch_vcpu_unblocking(vcpu);
-> +	waited = kvm_vcpu_block(vcpu);
->  
->  	cur = ktime_get();
->  	if (waited) {
 > -- 
 > 2.33.0.685.g46640cef36-goog
 > 
