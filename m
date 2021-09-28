@@ -2,136 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0332141B6A5
-	for <lists+kvm@lfdr.de>; Tue, 28 Sep 2021 20:48:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1388E41B6B9
+	for <lists+kvm@lfdr.de>; Tue, 28 Sep 2021 20:53:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242321AbhI1SuE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Sep 2021 14:50:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56370 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242273AbhI1SuC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Sep 2021 14:50:02 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D589C061753
-        for <kvm@vger.kernel.org>; Tue, 28 Sep 2021 11:48:22 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id q8-20020a056902150800b005b640f67812so19315052ybu.8
-        for <kvm@vger.kernel.org>; Tue, 28 Sep 2021 11:48:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=ZhEmB78EvpVTOsANLrCosu8pC98ZcmeaZO8tz0FwGlI=;
-        b=YNSS8yS/z8jbHApl7mmywh0W1TLkLd6JZW49ibxi38G0CqByei3gUhtbVVxcFCqznL
-         +eSsAuKpRCII6ctpAJcMLK326hVO9wf6Qjvb1e9jXGnbGH/7gyzCelwLv33aSk7XkPyY
-         WIuuK9d2jFhVnU6d9niPepKKA3DMV2pipGQ7dclPi7UGDZIu+GrbJt8UKsgcUF26H9b6
-         o3vAZSIUZAcmLp2DDQk0w3bzO+VAD1+87XkH6BnUlPEXFWJCVeYmz60YJEBqrfk7/1qm
-         AhEpJU+tSBBYGt+qBlpBNkVNzMtzmgVuViMRfT69EWX3K5xUUyVAZr6wQz0mUQVP5O5b
-         3lDQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=ZhEmB78EvpVTOsANLrCosu8pC98ZcmeaZO8tz0FwGlI=;
-        b=jC6QmlfulEqWjRRAL8LQdYNa/oMANAsEn7d1Iw7TzFX42QrIcgWQMZkzzqFWdPdQ0m
-         ZQWOqgUW4ILjCVDrF9oGDMx7DfuPwTkL6y2ZC4MBUUGLmGy9Wi6hlUo8i+wubaJfFtW4
-         KADQuxA7ktZzlvpVDlaauEReWH5q7Q1OWV3JihmthP7T1kvg4Q+Oam8FpBRtJv+WzJ9J
-         +6vGeOj/RQzUnGWKoMIzm3KQpxjsknMtUh4ZIQyKN4S82IGwOMddHh15+8tb2CNzEvbX
-         5BtEMBArWkwZXTlxflusup3bULjtT7tL2zvSjAwlZFXx+6PbkHEk5RWBgCWdTO9v6gvd
-         RBQg==
-X-Gm-Message-State: AOAM532C7WEM/2Xdj5wMu8wlHQLo58vOC7zYXs+xBNdmIPRNCeWS9sjT
-        RGeoX9DJPdBg2pqq7+9sEu3Gsu6oXJ1WZtCy1juwV+50in/r2fHYZA3E4S13Wz/tWaxh4tk8Mvv
-        Y+k0zx2BeKu9J+UHBnMrLHJj/7HM+1y+ubRWViiI/imtpl0bUnDWWWg/ZzIYqgug=
-X-Google-Smtp-Source: ABdhPJzDRwtz5/PIS4rEfzA7iNdd+2JLcH0fuSM5FcZ6MjFSl3lzeEEHGCn8BGM6vv2p+Afxprn6T8QiiqVT3w==
-X-Received: from ricarkol2.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:62fe])
- (user=ricarkol job=sendgmr) by 2002:a25:22d7:: with SMTP id
- i206mr9011325ybi.355.1632854901316; Tue, 28 Sep 2021 11:48:21 -0700 (PDT)
-Date:   Tue, 28 Sep 2021 11:48:03 -0700
-In-Reply-To: <20210928184803.2496885-1-ricarkol@google.com>
-Message-Id: <20210928184803.2496885-10-ricarkol@google.com>
-Mime-Version: 1.0
-References: <20210928184803.2496885-1-ricarkol@google.com>
-X-Mailer: git-send-email 2.33.0.685.g46640cef36-goog
-Subject: [PATCH v3 09/10] KVM: arm64: selftests: Add test for legacy GICv3
- REDIST base partially above IPA range
-From:   Ricardo Koller <ricarkol@google.com>
-To:     kvm@vger.kernel.org, maz@kernel.org, kvmarm@lists.cs.columbia.edu,
-        drjones@redhat.com, eric.auger@redhat.com, alexandru.elisei@arm.com
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, oupton@google.com,
-        james.morse@arm.com, suzuki.poulose@arm.com, shuah@kernel.org,
-        jingzhangos@google.com, pshier@google.com, rananta@google.com,
-        reijiw@google.com, Ricardo Koller <ricarkol@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S242237AbhI1Szh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Sep 2021 14:55:37 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:46802 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230109AbhI1Szf (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 28 Sep 2021 14:55:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1632855235;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=BW3DcANbaIeRGt53kKhrZ73VLTbnr1HV+49+aFBS5+U=;
+        b=CuwEGvmcDgKE1EpgT1ry3isYV502sc8I8AiVNK6eJQZrUfrQY4AB/8U+LQrB4X7SBOVrwG
+        aZyLlsyLfEQh5o71Rdvb7ujj1F7JH8hUox06niUgLz3EqYDT14bz5KO8eIvjkE4+tS34L9
+        0Ooz9y0iclNG+nCA/XVp4lrcQjS8vmY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-530-igZCvVubPYCdQeZRJCG22g-1; Tue, 28 Sep 2021 14:53:52 -0400
+X-MC-Unique: igZCvVubPYCdQeZRJCG22g-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EDA36100C660;
+        Tue, 28 Sep 2021 18:53:49 +0000 (UTC)
+Received: from fuller.cnet (ovpn-112-3.gru2.redhat.com [10.97.112.3])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1A54C19D9D;
+        Tue, 28 Sep 2021 18:53:48 +0000 (UTC)
+Received: by fuller.cnet (Postfix, from userid 1000)
+        id 82048416CE49; Tue, 28 Sep 2021 15:53:43 -0300 (-03)
+Date:   Tue, 28 Sep 2021 15:53:43 -0300
+From:   Marcelo Tosatti <mtosatti@redhat.com>
+To:     Oliver Upton <oupton@google.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-arm-kernel@lists.infradead.org,
+        Andrew Jones <drjones@redhat.com>,
+        Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH v8 4/7] KVM: x86: Report host tsc and realtime values in
+ KVM_GET_CLOCK
+Message-ID: <20210928185343.GA97247@fuller.cnet>
+References: <20210916181538.968978-1-oupton@google.com>
+ <20210916181538.968978-5-oupton@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210916181538.968978-5-oupton@google.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a new test into vgic_init which checks that the first vcpu fails to
-run if there is not sufficient REDIST space below the addressable IPA
-range.  This only applies to the KVM_VGIC_V3_ADDR_TYPE_REDIST legacy API
-as the required REDIST space is not know when setting the DIST region.
+On Thu, Sep 16, 2021 at 06:15:35PM +0000, Oliver Upton wrote:
+> Handling the migration of TSCs correctly is difficult, in part because
+> Linux does not provide userspace with the ability to retrieve a (TSC,
+> realtime) clock pair for a single instant in time. In lieu of a more
+> convenient facility, KVM can report similar information in the kvm_clock
+> structure.
+> 
+> Provide userspace with a host TSC & realtime pair iff the realtime clock
+> is based on the TSC. If userspace provides KVM_SET_CLOCK with a valid
+> realtime value, advance the KVM clock by the amount of elapsed time. Do
+> not step the KVM clock backwards, though, as it is a monotonic
+> oscillator.
+> 
+> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Oliver Upton <oupton@google.com>
+> ---
+>  Documentation/virt/kvm/api.rst  | 42 ++++++++++++++++++++++++++-------
+>  arch/x86/include/asm/kvm_host.h |  3 +++
+>  arch/x86/kvm/x86.c              | 36 +++++++++++++++++++++-------
+>  include/uapi/linux/kvm.h        |  7 +++++-
+>  4 files changed, 70 insertions(+), 18 deletions(-)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index a6729c8cf063..d0b9c986cf6c 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -993,20 +993,34 @@ such as migration.
+>  When KVM_CAP_ADJUST_CLOCK is passed to KVM_CHECK_EXTENSION, it returns the
+>  set of bits that KVM can return in struct kvm_clock_data's flag member.
+>  
+> -The only flag defined now is KVM_CLOCK_TSC_STABLE.  If set, the returned
+> -value is the exact kvmclock value seen by all VCPUs at the instant
+> -when KVM_GET_CLOCK was called.  If clear, the returned value is simply
+> -CLOCK_MONOTONIC plus a constant offset; the offset can be modified
+> -with KVM_SET_CLOCK.  KVM will try to make all VCPUs follow this clock,
+> -but the exact value read by each VCPU could differ, because the host
+> -TSC is not stable.
+> +FLAGS:
+> +
+> +KVM_CLOCK_TSC_STABLE.  If set, the returned value is the exact kvmclock
+> +value seen by all VCPUs at the instant when KVM_GET_CLOCK was called.
+> +If clear, the returned value is simply CLOCK_MONOTONIC plus a constant
+> +offset; the offset can be modified with KVM_SET_CLOCK.  KVM will try
+> +to make all VCPUs follow this clock, but the exact value read by each
+> +VCPU could differ, because the host TSC is not stable.
+> +
+> +KVM_CLOCK_REALTIME.  If set, the `realtime` field in the kvm_clock_data
+> +structure is populated with the value of the host's real time
+> +clocksource at the instant when KVM_GET_CLOCK was called. If clear,
+> +the `realtime` field does not contain a value.
+> +
+> +KVM_CLOCK_HOST_TSC.  If set, the `host_tsc` field in the kvm_clock_data
+> +structure is populated with the value of the host's timestamp counter (TSC)
+> +at the instant when KVM_GET_CLOCK was called. If clear, the `host_tsc` field
+> +does not contain a value.
 
-Note that using the REDIST_REGION API results in a different check at
-first vcpu run: that the number of redist regions is enough for all
-vcpus. And there is already a test for that case in, the first step of
-test_v3_new_redist_regions.
-
-Signed-off-by: Ricardo Koller <ricarkol@google.com>
----
- .../testing/selftests/kvm/aarch64/vgic_init.c | 34 +++++++++++++++++++
- 1 file changed, 34 insertions(+)
-
-diff --git a/tools/testing/selftests/kvm/aarch64/vgic_init.c b/tools/testing/selftests/kvm/aarch64/vgic_init.c
-index 77a1941e61fa..417a9a515cad 100644
---- a/tools/testing/selftests/kvm/aarch64/vgic_init.c
-+++ b/tools/testing/selftests/kvm/aarch64/vgic_init.c
-@@ -570,6 +570,39 @@ static void test_v3_last_bit_single_rdist(void)
- 	vm_gic_destroy(&v);
- }
- 
-+/* Uses the legacy REDIST region API. */
-+static void test_v3_redist_ipa_range_check_at_vcpu_run(void)
-+{
-+	struct vm_gic v;
-+	int ret, i;
-+	uint64_t addr;
-+
-+	v = vm_gic_create_with_vcpus(KVM_DEV_TYPE_ARM_VGIC_V3, 1);
-+
-+	/* Set space for 3 redists, we have 1 vcpu, so this succeeds. */
-+	addr = max_phys_size - (3 * 2 * 0x10000);
-+	kvm_device_access(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
-+				 KVM_VGIC_V3_ADDR_TYPE_REDIST, &addr, true);
-+
-+	addr = 0x00000;
-+	kvm_device_access(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
-+			KVM_VGIC_V3_ADDR_TYPE_DIST, &addr, true);
-+
-+	/* Add the rest of the VCPUs */
-+	for (i = 1; i < NR_VCPUS; ++i)
-+		vm_vcpu_add_default(v.vm, i, guest_code);
-+
-+	kvm_device_access(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
-+			  KVM_DEV_ARM_VGIC_CTRL_INIT, NULL, true);
-+
-+	/* Attempt to run a vcpu without enough redist space. */
-+	ret = run_vcpu(v.vm, 2);
-+	TEST_ASSERT(ret && errno == EINVAL,
-+		"redist base+size above PA range detected on 1st vcpu run");
-+
-+	vm_gic_destroy(&v);
-+}
-+
- /*
-  * Returns 0 if it's possible to create GIC device of a given type (V2 or V3).
-  */
-@@ -621,6 +654,7 @@ void run_tests(uint32_t gic_dev_type)
- 		test_v3_typer_accesses();
- 		test_v3_last_bit_redist_regions();
- 		test_v3_last_bit_single_rdist();
-+		test_v3_redist_ipa_range_check_at_vcpu_run();
- 	}
- }
- 
--- 
-2.33.0.685.g46640cef36-goog
+If the host TSCs are not stable, then KVM_CLOCK_HOST_TSC bit (and
+host_tsc field) are ambiguous. Shouldnt exposing them be conditional on 
+stable TSC for the host ?
 
