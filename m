@@ -2,126 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 190FF41A8ED
-	for <lists+kvm@lfdr.de>; Tue, 28 Sep 2021 08:25:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D6B0A41A913
+	for <lists+kvm@lfdr.de>; Tue, 28 Sep 2021 08:47:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238981AbhI1G1T (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Sep 2021 02:27:19 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:47917 "EHLO
+        id S238930AbhI1Gt0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Sep 2021 02:49:26 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:37443 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234207AbhI1G1S (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 28 Sep 2021 02:27:18 -0400
+        by vger.kernel.org with ESMTP id S234207AbhI1GtX (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 28 Sep 2021 02:49:23 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632810338;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
+        s=mimecast20190719; t=1632811664;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=9wq1dVPtAXDMCZC9S+u92KoCxHpT0A4H8ulsqFHsRII=;
-        b=XmJ1SjrVORrpurxHKPpspezhDSLg9Zih1bNjRiCjiZJt2l9BQmS/fMrITqEJVZE7Fn/FrK
-        YMwTk4+5lSBsmBMJ3gCHEN3m1qqeOuxh5LVuaISufkIKOoJSzOzqHsJtvahs/+GUmJPyc/
-        5BYaVglFnsj5VqQ8V3T4xMc0TkZL4jM=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-158-Kaf0pxWYPG2lBg4KcGlElg-1; Tue, 28 Sep 2021 02:25:37 -0400
-X-MC-Unique: Kaf0pxWYPG2lBg4KcGlElg-1
-Received: by mail-wm1-f72.google.com with SMTP id 200-20020a1c00d1000000b0030b3dce20e1so702423wma.0
-        for <kvm@vger.kernel.org>; Mon, 27 Sep 2021 23:25:37 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:reply-to:subject:to:cc:references:from
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-transfer-encoding:content-language;
-        bh=9wq1dVPtAXDMCZC9S+u92KoCxHpT0A4H8ulsqFHsRII=;
-        b=16GLSgPaERUajbqJe18Woax0BMrtmQR8Cp3n+w+7sRcFcV3OlBShq6kgQ8P+9fKQKg
-         EdPivDsQoERj9JuuZM8wVJeTBqEVdgXQkLA53oUgBW0urikSscIcIIqVr/3JyJnn6+SM
-         k+DokXsC70cbEPfY19r8l62ikH9S8JxXx2ctAKl6K/gj9TkzY//aAVvl/2/wbYVHIORM
-         QGPoTwT/REeixSNJnxAuqR4DJKxwCIOIxIlQEyssx1Wpu6ougiWyGFX0Jat0mI9xNP4a
-         I3Qjc6rS/tmpeFfzkVPAvkvkQMegpkvBl3xVhDEH15x+Ea40SCcRf/FYjNdNpA4F9e/t
-         khZw==
-X-Gm-Message-State: AOAM530c97v9n+6JQromEmUErEMgg2it+9bBapLRb5rDSCe5wy71+DeQ
-        QXxsg9nVhP4E8LqyP/phJUHsatMNCClhIu+fUYwT2uzLQNUwRpC+7PPysnv4cYcMSKh/Fh3sGIx
-        d5Z52lYtl3Cdg
-X-Received: by 2002:a5d:64cf:: with SMTP id f15mr4278535wri.284.1632810336271;
-        Mon, 27 Sep 2021 23:25:36 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzqSUu50iJ95OWE4UOFTINQsxuRK/ueiYpb9FlWfdG9FdcSiC/DUJ4GzrvCnuOU9QL4gLjBUA==
-X-Received: by 2002:a5d:64cf:: with SMTP id f15mr4278495wri.284.1632810336011;
-        Mon, 27 Sep 2021 23:25:36 -0700 (PDT)
-Received: from ?IPv6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id l10sm1663709wmq.42.2021.09.27.23.25.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 27 Sep 2021 23:25:35 -0700 (PDT)
-Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH v15 00/12] SMMUv3 Nested Stage Setup (IOMMU part)
-To:     Krishna Reddy <vdumpa@nvidia.com>,
-        "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
-        "will@kernel.org" <will@kernel.org>,
-        "maz@kernel.org" <maz@kernel.org>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "tn@semihalf.com" <tn@semihalf.com>,
-        "zhukeqian1@huawei.com" <zhukeqian1@huawei.com>
-Cc:     "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "yi.l.liu@intel.com" <yi.l.liu@intel.com>,
-        "wangxingang5@huawei.com" <wangxingang5@huawei.com>,
-        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        "zhangfei.gao@linaro.org" <zhangfei.gao@linaro.org>,
-        "zhangfei.gao@gmail.com" <zhangfei.gao@gmail.com>,
-        "vivek.gautam@arm.com" <vivek.gautam@arm.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-        "nicoleotsuka@gmail.com" <nicoleotsuka@gmail.com>,
-        "lushenming@huawei.com" <lushenming@huawei.com>,
-        Vikram Sethi <vsethi@nvidia.com>,
-        "chenxiang66@hisilicon.com" <chenxiang66@hisilicon.com>,
-        "jiangkunkun@huawei.com" <jiangkunkun@huawei.com>
-References: <20210411111228.14386-1-eric.auger@redhat.com>
- <BY5PR12MB37640C26FEBC8AC6E3EDF40BB3A79@BY5PR12MB3764.namprd12.prod.outlook.com>
-From:   Eric Auger <eric.auger@redhat.com>
-Message-ID: <c3fcc2fb-3173-af83-2b30-423c2c1ab83d@redhat.com>
-Date:   Tue, 28 Sep 2021 08:25:33 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        bh=sCmNJ5vO7haCV1drO5nn+RW5ibWF9pJv3xiWMlwH7+g=;
+        b=Q9qYjbHhMQqBR3sfzaNDA6GqGLSbYe0ovfOV/BgVL70LoXt7FMFbSE4aW8KN/3J0HW64Yd
+        8SxjJ55zfSlssuVSOc/yej9LAwxGHwN9VCWsBTsv18uOXf+lHLlnFW8kc0m4NuWDv0cb2H
+        LinPK9bKBialrEmV1q0xExpFuo44Q60=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-108-_X6jgUWMN0ePwSNylaNBSQ-1; Tue, 28 Sep 2021 02:47:40 -0400
+X-MC-Unique: _X6jgUWMN0ePwSNylaNBSQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ED4CD1808312;
+        Tue, 28 Sep 2021 06:47:38 +0000 (UTC)
+Received: from localhost (unknown [10.39.192.122])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 196165F70B;
+        Tue, 28 Sep 2021 06:47:34 +0000 (UTC)
+Date:   Tue, 28 Sep 2021 08:47:33 +0200
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     Max Gurtovoy <mgurtovoy@nvidia.com>
+Cc:     mst@redhat.com, virtualization@lists.linux-foundation.org,
+        kvm@vger.kernel.org, oren@nvidia.com, nitzanc@nvidia.com,
+        israelr@nvidia.com, hch@infradead.org, linux-block@vger.kernel.org,
+        axboe@kernel.dk
+Subject: Re: [PATCH 2/2] virtio-blk: set NUMA affinity for a tagset
+Message-ID: <YVK6hdcrXwQHrXQ9@stefanha-x1.localdomain>
+References: <20210926145518.64164-1-mgurtovoy@nvidia.com>
+ <20210926145518.64164-2-mgurtovoy@nvidia.com>
+ <YVF8RBZSaJs9BScd@stefanha-x1.localdomain>
+ <21295187-41c4-5fb6-21c3-28004eb7c5d8@nvidia.com>
 MIME-Version: 1.0
-In-Reply-To: <BY5PR12MB37640C26FEBC8AC6E3EDF40BB3A79@BY5PR12MB3764.namprd12.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="tlmjEO+SMhyWD/NG"
+Content-Disposition: inline
+In-Reply-To: <21295187-41c4-5fb6-21c3-28004eb7c5d8@nvidia.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Krishna,
 
-On 9/27/21 11:17 PM, Krishna Reddy wrote:
-> Hi Eric,
->> This is based on Jean-Philippe's
->> [PATCH v14 00/10] iommu: I/O page faults for SMMUv3
->> https://www.spinics.net/lists/arm-kernel/msg886518.html
->> (including the patches that were not pulled for 5.13)
->>
-> Jean's patches have been merged to v5.14.
-> Do you anticipate IOMMU/VFIO part patches getting into upstream kernel soon?
+--tlmjEO+SMhyWD/NG
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I am going to respin the smmu part rebased on v5.15. As for the VFIO
-part, this needs to be totally redesigned based on /dev/iommu (see
-[RFC 00/20] Introduce /dev/iommu for userspace I/O address space
-management).
+On Mon, Sep 27, 2021 at 08:39:30PM +0300, Max Gurtovoy wrote:
+>=20
+> On 9/27/2021 11:09 AM, Stefan Hajnoczi wrote:
+> > On Sun, Sep 26, 2021 at 05:55:18PM +0300, Max Gurtovoy wrote:
+> > > To optimize performance, set the affinity of the block device tagset
+> > > according to the virtio device affinity.
+> > >=20
+> > > Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
+> > > ---
+> > >   drivers/block/virtio_blk.c | 2 +-
+> > >   1 file changed, 1 insertion(+), 1 deletion(-)
+> > >=20
+> > > diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> > > index 9b3bd083b411..1c68c3e0ebf9 100644
+> > > --- a/drivers/block/virtio_blk.c
+> > > +++ b/drivers/block/virtio_blk.c
+> > > @@ -774,7 +774,7 @@ static int virtblk_probe(struct virtio_device *vd=
+ev)
+> > >   	memset(&vblk->tag_set, 0, sizeof(vblk->tag_set));
+> > >   	vblk->tag_set.ops =3D &virtio_mq_ops;
+> > >   	vblk->tag_set.queue_depth =3D queue_depth;
+> > > -	vblk->tag_set.numa_node =3D NUMA_NO_NODE;
+> > > +	vblk->tag_set.numa_node =3D virtio_dev_to_node(vdev);
+> > >   	vblk->tag_set.flags =3D BLK_MQ_F_SHOULD_MERGE;
+> > >   	vblk->tag_set.cmd_size =3D
+> > >   		sizeof(struct virtblk_req) +
+> > I implemented NUMA affinity in the past and could not demonstrate a
+> > performance improvement:
+> > https://lists.linuxfoundation.org/pipermail/virtualization/2020-June/04=
+8248.html
+> >=20
+> > The pathological case is when a guest with vNUMA has the virtio-blk-pci
+> > device on the "wrong" host NUMA node. Then memory accesses should cross
+> > NUMA nodes. Still, it didn't seem to matter.
+>=20
+> I think the reason you didn't see any improvement is since you didn't use
+> the right device for the node query. See my patch 1/2.
 
-I will provide some updated kernel and qemu branches for testing purpose
-only.
+That doesn't seem to be the case. Please see
+drivers/base/core.c:device_add():
 
-Thanks
+  /* use parent numa_node */
+  if (parent && (dev_to_node(dev) =3D=3D NUMA_NO_NODE))
+          set_dev_node(dev, dev_to_node(parent));
 
-Eric
->
-> -KR
->
+IMO it's cleaner to use dev_to_node(&vdev->dev) than to directly access
+the parent.
+
+Have I missed something?
+
+>=20
+> I can try integrating these patches in my series and fix it.
+>=20
+> BTW, we might not see a big improvement because of other bottlenecks but
+> this is known perf optimization we use often in block storage drivers.
+
+Let's see benchmark results. Otherwise this is just dead code that adds
+complexity.
+
+Stefan
+
+--tlmjEO+SMhyWD/NG
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmFSuoMACgkQnKSrs4Gr
+c8jpCgf8CGJHEk5t5Yz49uW2kuVSk/IZC3Uk7tJ7zK+xNzn1d2lgfpCvVl0a0AdC
+YxDeNMKrD5Oh+0AWZaOpenc0FMWZIC4gu85XGpyyxkbgcQWImQPTLNsR2l7ZlDsI
+thxfw+TkrccTvpq/X6J28iiMxqLi2HEvUd8bTj/4QVUQJgYpDyc75YflbJtwgcIv
+mmr8PBanK2J3O7AoNfPK+kARXD1/74w3p45z3iPLrnvFr79KgqEAH+34xSZCA2BJ
+ohOfaQJ68mrHkshlcblnsNAk2LZWPU8yoUSh4Buf7LcEMEbxbCGEHdZtuOgARhNM
+KxyuXSb7Q+TiRYQwAc6Sz2sSCqLFJg==
+=cy+s
+-----END PGP SIGNATURE-----
+
+--tlmjEO+SMhyWD/NG--
 
