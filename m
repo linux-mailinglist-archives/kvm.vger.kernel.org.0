@@ -2,150 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 66C7741B6D3
-	for <lists+kvm@lfdr.de>; Tue, 28 Sep 2021 21:01:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3975A41B6E3
+	for <lists+kvm@lfdr.de>; Tue, 28 Sep 2021 21:05:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242334AbhI1TDX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Sep 2021 15:03:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59540 "EHLO
+        id S242359AbhI1THZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Sep 2021 15:07:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60472 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242169AbhI1TDW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Sep 2021 15:03:22 -0400
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92E99C06161C
-        for <kvm@vger.kernel.org>; Tue, 28 Sep 2021 12:01:42 -0700 (PDT)
-Received: by mail-pj1-x1031.google.com with SMTP id oa12-20020a17090b1bcc00b0019f2d30c08fso31151pjb.0
-        for <kvm@vger.kernel.org>; Tue, 28 Sep 2021 12:01:42 -0700 (PDT)
+        with ESMTP id S242218AbhI1THY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Sep 2021 15:07:24 -0400
+Received: from mail-io1-xd32.google.com (mail-io1-xd32.google.com [IPv6:2607:f8b0:4864:20::d32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28375C061745
+        for <kvm@vger.kernel.org>; Tue, 28 Sep 2021 12:05:45 -0700 (PDT)
+Received: by mail-io1-xd32.google.com with SMTP id s20so28755594ioa.4
+        for <kvm@vger.kernel.org>; Tue, 28 Sep 2021 12:05:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=xt0gEcyOTVXB3cbfAORCeU0aPfpfHLNMXNfI9X69CVQ=;
-        b=P2WbyomAz9CC+YDhARNtEQPob4jnZ2g2oykK3Tx9s3ZzF3kIhs4M8u5I6nL6TYVoGq
-         rrOLmGGUE/wsUTWlv/vaHIT0qruIxiC5Hconls6bpVJIAswiiw3izm0NUdKLNEX/vTj1
-         hNuCFj8rB/KJEKNYPyTIjrwmUxsuMdqXz/A3MzGuI1a3Kwyq70MOLXcjCuAwjRmB7Dhb
-         kf47CJCAyIoWzJus9Q6TAK/lSg8ZsxvgmyTdZgT9A2DiUE772alKYF35OPb474XMP0BJ
-         1g92CPbM5JIG9MA0Bz7RxJUC/t1T7o89IaaifLPvH7z+3t2ti9exdaFi/jE6y9Sz0Jjp
-         UImg==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=LYaPMO4zSUN63L5x5xUSR1CDiXdGr7bJrgBZxfWWnRM=;
+        b=SGJcdHCygArkZYEIETz/wT+50dTV5xtQ1lZdrl9rOa78dS1YvLlQOq3YOhDQdB97q1
+         zo8M2ixafgU9SNvjwIFhI1+ygeNugw2tAsCo1DtZ9Ns6CFBTlUYmpgmZbNEO8VsSohge
+         qr7r/bBX45IiZeZC78iRqPy0U2KLBmJgPya+Hj8/CIo4U221V03qlABGqt5MjPF1O7Te
+         a3MTnKC+oOm0rCt+xLVcKP8X84tunJnE0eu2WPvm/uyOSlzgrEh6u702TQ35iyneOI4b
+         Sq2Y06PbIVovlsYid4ZzH/6ZdKBPO7LUN76gbJWOg/6+4RsAFF9vK/0dTYWDpAOkGyK/
+         jvoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=xt0gEcyOTVXB3cbfAORCeU0aPfpfHLNMXNfI9X69CVQ=;
-        b=QOn68PpAH+COeijFYwcjtIvi2EqGP0mwpFDjslf37BBJ3Jfgkybz1aJ19F7XnBVS2y
-         S+/NtUvep1d/+oyfD/2CwDIxP8NI5qaTqCI5BtNWflQh+OuZ1JVI5AVGAaWDMOEBoOEx
-         lAYwaPicUOlvCyyabIaCpjqrGnXsgqkodWRX4s8gAvilT04IRVUndx3xlnB3ffomzLbS
-         gWjPLHwlHhPx3uaYr00fMzhtcFMkdj4JxBXC31FrdqUDrV1s0uc0zB2Jo6ZjiWmKIgVH
-         6cgqRCKJTGRSQn0ILyyAxBFTUhiydWPJh1J0t/Rc4eF5GMa2m1B/vQVty5U6gfD4uxqN
-         nNJA==
-X-Gm-Message-State: AOAM532V++8hna4k6iuX8+x0wfypzAXf5PPyStL7vlFvH1kG6OrMrcnx
-        iHTUqc2p0r2ALJ6CO5F5TmUZMA==
-X-Google-Smtp-Source: ABdhPJwN22eVEV+ILvTVZFxrClU0H39RaKFVj+LTEdtXecOP9yW45Z7Ldv9r7U41GdYk3WWGVE+ldw==
-X-Received: by 2002:a17:902:b909:b0:13a:2d8e:12bc with SMTP id bf9-20020a170902b90900b0013a2d8e12bcmr6453208plb.6.1632855701799;
-        Tue, 28 Sep 2021 12:01:41 -0700 (PDT)
-Received: from google.com (254.80.82.34.bc.googleusercontent.com. [34.82.80.254])
-        by smtp.gmail.com with ESMTPSA id j24sm20993011pfh.65.2021.09.28.12.01.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Sep 2021 12:01:41 -0700 (PDT)
-Date:   Tue, 28 Sep 2021 19:01:38 +0000
-From:   David Matlack <dmatlack@google.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jing Zhang <jingzhangos@google.com>
-Subject: Re: [PATCH 03/14] KVM: Refactor and document halt-polling stats
- update helper
-Message-ID: <YVNmkuaUYwYvlbaY@google.com>
-References: <20210925005528.1145584-1-seanjc@google.com>
- <20210925005528.1145584-4-seanjc@google.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=LYaPMO4zSUN63L5x5xUSR1CDiXdGr7bJrgBZxfWWnRM=;
+        b=ihIbl2iBydzu4q22Y/2PkApgbcRYhmEHBjFo/N6AKK+lOf6ZdWS50XIF68N12QHZqw
+         4hBcYikexIVKOHSTCuzO3/4T7MfwDkFHICqPFDiCGToFQBoWXxb3SDvrAw0NRDXwyDe3
+         s9ARyi7VHpiAUc042uvtPfiNdJn0jB49mG70URruGki2ibQrMBH2Oi5EPAZsdy0RjH1G
+         uh18srjRHy6guLK2Kc1G9oA3LuB/OlinHh5VQXsvQpHCJPti2PT9id1b2UrfK4GWOAnI
+         pZr6MJkIAWwAEzM2jS979s6cCM5/TZTJmYULHQg4aTWh6QWtwBRWyUCd8Y2Om9y/b8FU
+         5saQ==
+X-Gm-Message-State: AOAM5318aQz3BKS23DrvLBMzWsoI97WbiLFYr/wDc2GpYKMfy8WJOnh5
+        tg675rbxDsVm9Sm0BzGv5VIJms8rWjHSN9djookoxQ==
+X-Google-Smtp-Source: ABdhPJye2c2rTcBY5maCu7+X+UzMZCbOkZHYNLHHfukiFlEG7A9xzy/JQd4I8fBvuBH8ndBmeHVokOpMGnvyAvT8xO4=
+X-Received: by 2002:a02:5444:: with SMTP id t65mr6164748jaa.42.1632855943923;
+ Tue, 28 Sep 2021 12:05:43 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210925005528.1145584-4-seanjc@google.com>
+References: <cover.1629726117.git.ashish.kalra@amd.com> <6fd25c749205dd0b1eb492c60d41b124760cc6ae.1629726117.git.ashish.kalra@amd.com>
+ <CABayD+fnZ+Ho4qoUjB6YfWW+tFGUuftpsVBF3d=-kcU0-CEu0g@mail.gmail.com>
+ <YUixqL+SRVaVNF07@google.com> <20210921095838.GA17357@ashkalra_ubuntu_server>
+ <YUnjEU+1icuihmbR@google.com> <YUnxa2gy4DzEI2uY@zn.tnic> <YUoDJxfNZgNjY8zh@google.com>
+ <YUr5gCgNe7tT0U/+@zn.tnic> <20210922121008.GA18744@ashkalra_ubuntu_server> <YUs1ejsDB4W4wKGF@zn.tnic>
+In-Reply-To: <YUs1ejsDB4W4wKGF@zn.tnic>
+From:   Steve Rutherford <srutherford@google.com>
+Date:   Tue, 28 Sep 2021 12:05:07 -0700
+Message-ID: <CABayD+eFeu1mWG-UGXC0QZuYu68B9wJNWJhjUo=HHgc_jsfBag@mail.gmail.com>
+Subject: Re: [PATCH v6 1/5] x86/kvm: Add AMD SEV specific Hypercall3
+To:     Borislav Petkov <bp@alien8.de>
+Cc:     Ashish Kalra <Ashish.Kalra@amd.com>,
+        Sean Christopherson <seanjc@google.com>, pbonzini@redhat.com,
+        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
+        joro@8bytes.org, thomas.lendacky@amd.com, x86@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        brijesh.singh@amd.com, dovmurik@linux.ibm.com, tobin@linux.ibm.com,
+        jejb@linux.ibm.com, dgilbert@redhat.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 24, 2021 at 05:55:17PM -0700, Sean Christopherson wrote:
-> Add a comment to document that halt-polling is considered successful even
-> if the polling loop itself didn't detect a wake event, i.e. if a wake
-> event was detect in the final kvm_vcpu_check_block().  Invert the param
-> to the update helper so that the helper is a dumb function that is "told"
-> whether or not polling was successful, as opposed to having it determinine
-> success/failure based on blocking behavior.
-> 
-> Opportunistically tweak the params to the update helper to reduce the
-> line length for the call site so that it fits on a single line, and so
-> that the prototype conforms to the more traditional kernel style.
-> 
-> No functional change intended.
-> 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-
-Reviewed-by: David Matlack <dmatlack@google.com>
-
-> ---
->  virt/kvm/kvm_main.c | 20 +++++++++++++-------
->  1 file changed, 13 insertions(+), 7 deletions(-)
-> 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 8b33f5045b4d..12fe91a0a4c8 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -3199,13 +3199,15 @@ static int kvm_vcpu_check_block(struct kvm_vcpu *vcpu)
->  	return ret;
->  }
->  
-> -static inline void
-> -update_halt_poll_stats(struct kvm_vcpu *vcpu, u64 poll_ns, bool waited)
-> +static inline void update_halt_poll_stats(struct kvm_vcpu *vcpu, ktime_t start,
-> +					  ktime_t end, bool success)
->  {
-> -	if (waited)
-> -		vcpu->stat.generic.halt_poll_fail_ns += poll_ns;
-> -	else
-> +	u64 poll_ns = ktime_to_ns(ktime_sub(end, start));
-> +
-> +	if (success)
->  		vcpu->stat.generic.halt_poll_success_ns += poll_ns;
-> +	else
-> +		vcpu->stat.generic.halt_poll_fail_ns += poll_ns;
->  }
->  
->  /*
-> @@ -3274,9 +3276,13 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
->  	kvm_arch_vcpu_unblocking(vcpu);
->  	block_ns = ktime_to_ns(cur) - ktime_to_ns(start);
->  
-> +	/*
-> +	 * Note, halt-polling is considered successful so long as the vCPU was
-> +	 * never actually scheduled out, i.e. even if the wake event arrived
-> +	 * after of the halt-polling loop itself, but before the full wait.
-> +	 */
->  	if (do_halt_poll)
-> -		update_halt_poll_stats(
-> -			vcpu, ktime_to_ns(ktime_sub(poll_end, start)), waited);
-> +		update_halt_poll_stats(vcpu, start, poll_end, !waited);
->  
->  	if (halt_poll_allowed) {
->  		if (!vcpu_valid_wakeup(vcpu)) {
-> -- 
-> 2.33.0.685.g46640cef36-goog
-> 
+On Wed, Sep 22, 2021 at 6:54 AM Borislav Petkov <bp@alien8.de> wrote:
+>
+> On Wed, Sep 22, 2021 at 12:10:08PM +0000, Ashish Kalra wrote:
+> > Then isn't it cleaner to simply do it via the paravirt_ops interface,
+> > i.e, pv_ops.mmu.notify_page_enc_status_changed() where the callback
+> > is only set when SEV and live migration feature are supported and
+> > invoked through early_set_memory_decrypted()/encrypted().
+> >
+> > Another memory encryption platform can set it's callback accordingly.
+>
+> Yeah, that sounds even cleaner to me.
+If I'm not mistaken, this is what the patch set does now?
