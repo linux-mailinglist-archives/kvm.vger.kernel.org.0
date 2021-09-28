@@ -2,109 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6220941B2F6
-	for <lists+kvm@lfdr.de>; Tue, 28 Sep 2021 17:30:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 56C7641B2FB
+	for <lists+kvm@lfdr.de>; Tue, 28 Sep 2021 17:31:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241628AbhI1PcO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Sep 2021 11:32:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32662 "EHLO
+        id S241646AbhI1PdY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Sep 2021 11:33:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:44777 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S241629AbhI1PcL (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 28 Sep 2021 11:32:11 -0400
+        by vger.kernel.org with ESMTP id S241586AbhI1PdX (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 28 Sep 2021 11:33:23 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632843031;
+        s=mimecast20190719; t=1632843103;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=8nfUMXC+UekTv9Q+thQkucTYO8+JG8hE9EwxakRMNd0=;
-        b=Psi50dYZ3clqCQ2EIaZZAa6fsif4E2oz+azvVq2Q/5plXIsXMoLVZ6cs+/J8yKZAEKtj0I
-        m6C9+xRTxXSQSq37uKWhUpmROd+HMJYf1BwsFq5SfefIIH/J1LvRmw7qAv+hqWX2phcZF6
-        cwcrEp/MS5Fe2ym2ra+DDO1/Z/AyTPU=
+        bh=v6GpwnFNLFoD/5DAOAzBRJuz7HI+snzdDzW1fJFOZpA=;
+        b=FRgwHT+cpUSlJizIHJ3ovkdnYeKb8Rk2rVA7uuAKKkxn4mRb0U9XLU0DuLFqisoTeRQBK8
+        tbyDR0iU+gX0N2dTbH0Z4unnlJvi+QjxPT3xXqc9peYidZ+CXaW3k3ZF0HvPRC7kewjKdN
+        vZrObspzmg7lbW3KH7vu56UgU5MGrAA=
 Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
  [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-461-DijLFa4IP3mbFOo8IUVpIA-1; Tue, 28 Sep 2021 11:30:30 -0400
-X-MC-Unique: DijLFa4IP3mbFOo8IUVpIA-1
-Received: by mail-ed1-f69.google.com with SMTP id h6-20020a50c386000000b003da01adc065so22212869edf.7
-        for <kvm@vger.kernel.org>; Tue, 28 Sep 2021 08:30:29 -0700 (PDT)
+ us-mta-248-QECT4Y0VPeyq5K_MAgkO8w-1; Tue, 28 Sep 2021 11:31:42 -0400
+X-MC-Unique: QECT4Y0VPeyq5K_MAgkO8w-1
+Received: by mail-ed1-f69.google.com with SMTP id c7-20020a05640227c700b003d27f41f1d4so22194316ede.16
+        for <kvm@vger.kernel.org>; Tue, 28 Sep 2021 08:31:41 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=8nfUMXC+UekTv9Q+thQkucTYO8+JG8hE9EwxakRMNd0=;
-        b=RhqQpM4MwfXLPzO3P+Aqp0iJ/4+lkO+TRNxGWrye2ZM1hXDXfvfqOFh2yRD5CdKB5S
-         Al11ZQ16YWp07hOkqHJVyVF5L+YVrO2IxbQ7XL5uX7xt/30gr8OvU44PfabOMzeTwZVn
-         3l5qfxwIeCYz6sTEd6NaNNxt9Sp5APAappWXM68gIBZCrh7/XYrP/bILR4LaT28O57wb
-         nc/EK747gvCuQ50jwyk0VjyNw/1bamxR4K8l973yieKfM4zGwPR06zpsMrurOpcRwQI8
-         G09Qi4dR/QIPo1CfJfRMoPYdeMOR0pdQXiT3mfKVgERLc/eQNRP4K/WXxwKwVxJanb3z
-         u3Hw==
-X-Gm-Message-State: AOAM532qE4f63C1XuX0e1/YthYyyfP+cqgVgU3DNfwsVeLvrJMrhRLSD
-        9Avrslfi65f+Kdjh0K0ZymlvYPSp+EleCYl9SgLGJQzE4s4pnxvMWwbPnSXByjBpeu8kGnBE3ly
-        3rA2gStQ1P3hj
-X-Received: by 2002:a50:d90b:: with SMTP id t11mr8138902edj.215.1632843028989;
-        Tue, 28 Sep 2021 08:30:28 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzwx0Zed07mMfNcMPJp44ILJOmNEJ8xvPdh0FNEGA01duLwFDm+toq4CLSk2QmPp61IoqnU0Q==
-X-Received: by 2002:a50:d90b:: with SMTP id t11mr8138886edj.215.1632843028825;
-        Tue, 28 Sep 2021 08:30:28 -0700 (PDT)
+        bh=v6GpwnFNLFoD/5DAOAzBRJuz7HI+snzdDzW1fJFOZpA=;
+        b=mwXQoaiCYDz8YFLhxEoUhUw6K+Aiu7N0+oKwqruRMk8w8oiKTlBeo5/lie/cclePd+
+         7p8dzYd7wVe4L77ZyW51UkeQQEW0cd48TQ3Y0y5u545WZHjfOr+sSKO+OFwZ/oMOib+P
+         DDvNouDOhf672P5om7nWxDlbnbyN52Q2Z6GIawWFRLTlbyYvJlILcJ6X6bnK2XVrgsw5
+         aQWnaW9BKwlv3R+VayjC2R97pKEqKinqoYU/QZPJlU26/DpjFdP9REVGfds8L/gy2X9g
+         y/XfY+Gpv86baYtRDjoluQZebdTSAn6lKeLarJBp6K36cXyU4B7+Bu1oLvYPUqpJHin5
+         LtIw==
+X-Gm-Message-State: AOAM532g/8gPbQa2G4TJUthPxMP3l3VIdpBsUX1ZIlYxywoeI3bmkh/S
+        +gD7GQqJAsVPyVhsF0xqQljijzu9C1//M+x4UVWh7YQbGvM+a+/pS/LOlgyuZAXscvBQ8jj7+dA
+        JUWQ4SAhEx5+x
+X-Received: by 2002:a50:9d02:: with SMTP id v2mr8200897ede.105.1632843099897;
+        Tue, 28 Sep 2021 08:31:39 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy9KEORJgv+1NyVVMLSqvL2/ehNZdI6YThiqtoox6E3tp0WoD24Otglwc/6aXjwnUOmCuRNEA==
+X-Received: by 2002:a50:9d02:: with SMTP id v2mr8200876ede.105.1632843099667;
+        Tue, 28 Sep 2021 08:31:39 -0700 (PDT)
 Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id d22sm10729845ejk.5.2021.09.28.08.30.27
+        by smtp.gmail.com with ESMTPSA id ca4sm10664105ejb.1.2021.09.28.08.31.38
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 28 Sep 2021 08:30:28 -0700 (PDT)
-Message-ID: <5fedbea6-4485-5de7-1a46-3646390931c2@redhat.com>
-Date:   Tue, 28 Sep 2021 17:30:27 +0200
+        Tue, 28 Sep 2021 08:31:38 -0700 (PDT)
+Message-ID: <c67b60f1-f96c-2d78-295f-6f1e17e5b152@redhat.com>
+Date:   Tue, 28 Sep 2021 17:31:37 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.1.0
-Subject: Re: [PATCH] selftests: KVM: Call ucall_init when setting up in
- rseq_test
+Subject: Re: [PATCH] selftests: KVM: Don't clobber XMM register when read
 Content-Language: en-US
-To:     Oliver Upton <oupton@google.com>, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu
-Cc:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Jim Mattson <jmattson@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Andrew Jones <drjones@redhat.com>
-References: <20210923220033.4172362-1-oupton@google.com>
+To:     Oliver Upton <oupton@google.com>, kvm@vger.kernel.org
+Cc:     Jim Mattson <jmattson@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Sean Christopherson <seanjc@google.com>
+References: <20210927223621.50178-1-oupton@google.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20210923220033.4172362-1-oupton@google.com>
+In-Reply-To: <20210927223621.50178-1-oupton@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 24/09/21 00:00, Oliver Upton wrote:
-> While x86 does not require any additional setup to use the ucall
-> infrastructure, arm64 needs to set up the MMIO address used to signal a
-> ucall to userspace. rseq_test does not initialize the MMIO address,
-> resulting in the test spinning indefinitely.
+On 28/09/21 00:36, Oliver Upton wrote:
+> There is no need to clobber a register that is only being read from.
+> Oops. Drop the XMM register from the clobbers list.
 > 
-> Fix the issue by calling ucall_init() during setup.
-> 
-> Fixes: 61e52f1630f5 ("KVM: selftests: Add a test for KVM_RUN+rseq to detect task migration bugs")
 > Signed-off-by: Oliver Upton <oupton@google.com>
 > ---
->   tools/testing/selftests/kvm/rseq_test.c | 1 +
->   1 file changed, 1 insertion(+)
+>   tools/testing/selftests/kvm/include/x86_64/processor.h | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/tools/testing/selftests/kvm/rseq_test.c b/tools/testing/selftests/kvm/rseq_test.c
-> index 060538bd405a..c5e0dd664a7b 100644
-> --- a/tools/testing/selftests/kvm/rseq_test.c
-> +++ b/tools/testing/selftests/kvm/rseq_test.c
-> @@ -180,6 +180,7 @@ int main(int argc, char *argv[])
->   	 * CPU affinity.
->   	 */
->   	vm = vm_create_default(VCPU_ID, 0, guest_code);
-> +	ucall_init(vm, NULL);
->   
->   	pthread_create(&migration_thread, NULL, migration_worker, 0);
+> diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
+> index eba8bd08293e..05e65ca1c30c 100644
+> --- a/tools/testing/selftests/kvm/include/x86_64/processor.h
+> +++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
+> @@ -315,7 +315,7 @@ static inline void set_xmm(int n, unsigned long val)
+>   #define GET_XMM(__xmm)							\
+>   ({									\
+>   	unsigned long __val;						\
+> -	asm volatile("movq %%"#__xmm", %0" : "=r"(__val) : : #__xmm);	\
+> +	asm volatile("movq %%"#__xmm", %0" : "=r"(__val));		\
+>   	__val;								\
+>   })
 >   
 > 
 
-Queued, thanks.
+Queued, thnaks.
 
 Paolo
 
