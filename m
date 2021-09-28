@@ -2,143 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8953141B76E
-	for <lists+kvm@lfdr.de>; Tue, 28 Sep 2021 21:20:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7D9DF41B774
+	for <lists+kvm@lfdr.de>; Tue, 28 Sep 2021 21:20:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242467AbhI1TVi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Sep 2021 15:21:38 -0400
-Received: from mga11.intel.com ([192.55.52.93]:23069 "EHLO mga11.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229678AbhI1TVi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Sep 2021 15:21:38 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10121"; a="221582568"
-X-IronPort-AV: E=Sophos;i="5.85,330,1624345200"; 
-   d="scan'208";a="221582568"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Sep 2021 12:19:53 -0700
-X-IronPort-AV: E=Sophos;i="5.85,330,1624345200"; 
-   d="scan'208";a="554270019"
-Received: from oogunmoy-mobl1.amr.corp.intel.com (HELO skuppusw-mobl5.amr.corp.intel.com) ([10.212.221.219])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Sep 2021 12:19:51 -0700
-Subject: Re: [PATCH v4 0/8] Implement generic cc_platform_has() helper
- function
-To:     Borislav Petkov <bp@alien8.de>, LKML <linux-kernel@vger.kernel.org>
-Cc:     Andi Kleen <ak@linux.intel.com>, Andy Lutomirski <luto@kernel.org>,
-        Ard Biesheuvel <ardb@kernel.org>, Baoquan He <bhe@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Young <dyoung@redhat.com>,
-        David Airlie <airlied@linux.ie>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "Kirill A. Shutemov" <kirill@shutemov.name>,
-        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-        Maxime Ripard <mripard@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Paul Mackerras <paulus@samba.org>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Thomas Zimmermann <tzimmermann@suse.de>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        VMware Graphics <linux-graphics-maintainer@vmware.com>,
-        Will Deacon <will@kernel.org>,
-        Christoph Hellwig <hch@infradead.org>, x86@kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
-        iommu@lists.linux-foundation.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        kexec@lists.infradead.org
-References: <20210928191009.32551-1-bp@alien8.de>
-From:   "Kuppuswamy, Sathyanarayanan" 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>
-Message-ID: <80593893-c63b-d481-45f1-42a3a6fd762a@linux.intel.com>
-Date:   Tue, 28 Sep 2021 12:19:49 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Firefox/78.0 Thunderbird/78.13.0
+        id S242506AbhI1TV4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Sep 2021 15:21:56 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23378 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S242496AbhI1TVq (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 28 Sep 2021 15:21:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1632856803;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Za4UIa1i/i1OBgAuhO+2BMEIFPExsbIEIdBHDtNVqsI=;
+        b=RyAiQ9C1fZlGABvh/tDHEbHwS8y/EBv8avx0NdMrZoGkHIV1RN6h5XzY/tPbsMl17k1G9Y
+        yhjRtshLj1CNwzJ7aKgcwz4vqFwaPX/Su+jRTT0XfI76TuOJfzy7QmUzmA2GpLHdoHNOfz
+        l6SUt3FXQACkEdhpU+Xj/bOLlaNfx0w=
+Received: from mail-ot1-f72.google.com (mail-ot1-f72.google.com
+ [209.85.210.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-157-n2wmtuvjO3-bjGf6V7kCLg-1; Tue, 28 Sep 2021 15:20:01 -0400
+X-MC-Unique: n2wmtuvjO3-bjGf6V7kCLg-1
+Received: by mail-ot1-f72.google.com with SMTP id a8-20020a9d4708000000b0054718779c33so22043747otf.5
+        for <kvm@vger.kernel.org>; Tue, 28 Sep 2021 12:20:01 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=Za4UIa1i/i1OBgAuhO+2BMEIFPExsbIEIdBHDtNVqsI=;
+        b=tEUBLxTE46vayor9UzPaLCxfl+LF8JSiaVcFBQeoDBjruXToKob5kSIid1G6w/gpxU
+         ApflI5UUGzYOZeabS79JJe7rGpYbi5UW50EfOhJBZdXg48iLipzxfpG8rQNZhD6vQ5Mz
+         DlCbUl7Jl8ELPyFwHunBi1oQKETfttTqktSa8KbPjuhYjdAu2+Cf9C9F/QytADBTMd9d
+         nBGUjr8TxTRAY1rIqDDXIobs+7erATnHFKGJBGfgNtfQBrCoHqPW70+8lZPr8BI9psY4
+         KBS0rjFJUPBzRasnslN/Lr0S5sQj/5r0RBm+RjHVxEqlPJbCBlVzU+TdE0ItWQVCacOD
+         W9fQ==
+X-Gm-Message-State: AOAM531fi3e2g1zr4mM27EE6Dw1vydKySmEgrvI6oAx8Nuei1FBrTeb/
+        W1TanRzyNDbHDPqi7hBs7gi74m57ybmuBE547BiGD/6bM/L1gRuX5Z0Ap6ISf22tdKVaPZS3idh
+        5CTDrTcx8k8iT
+X-Received: by 2002:a54:410b:: with SMTP id l11mr4950315oic.74.1632856800916;
+        Tue, 28 Sep 2021 12:20:00 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwNb7SJKsY1fAhfMc6h0vwSeXSkbF/My4fjrvTWCd7Z2VSqxK1ptej7nonv6fRLJYXuWORlyA==
+X-Received: by 2002:a54:410b:: with SMTP id l11mr4950299oic.74.1632856800685;
+        Tue, 28 Sep 2021 12:20:00 -0700 (PDT)
+Received: from redhat.com ([198.99.80.109])
+        by smtp.gmail.com with ESMTPSA id u15sm5269230oon.35.2021.09.28.12.19.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Sep 2021 12:20:00 -0700 (PDT)
+Date:   Tue, 28 Sep 2021 13:19:58 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     Leon Romanovsky <leon@kernel.org>,
+        Doug Ledford <dledford@redhat.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Kirti Wankhede <kwankhede@nvidia.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+        Saeed Mahameed <saeedm@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>
+Subject: Re: [PATCH mlx5-next 2/7] vfio: Add an API to check migration state
+ transition validity
+Message-ID: <20210928131958.61b3abec.alex.williamson@redhat.com>
+In-Reply-To: <20210927231239.GE3544071@ziepe.ca>
+References: <cover.1632305919.git.leonro@nvidia.com>
+        <c87f55d6fec77a22b110d3c9611744e6b28bba46.1632305919.git.leonro@nvidia.com>
+        <20210927164648.1e2d49ac.alex.williamson@redhat.com>
+        <20210927231239.GE3544071@ziepe.ca>
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20210928191009.32551-1-bp@alien8.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, 27 Sep 2021 20:12:39 -0300
+Jason Gunthorpe <jgg@ziepe.ca> wrote:
 
+> On Mon, Sep 27, 2021 at 04:46:48PM -0600, Alex Williamson wrote:
+> > > +	enum { MAX_STATE = VFIO_DEVICE_STATE_RESUMING };
+> > > +	static const u8 vfio_from_state_table[MAX_STATE + 1][MAX_STATE + 1] = {
+> > > +		[VFIO_DEVICE_STATE_STOP] = {
+> > > +			[VFIO_DEVICE_STATE_RUNNING] = 1,
+> > > +			[VFIO_DEVICE_STATE_RESUMING] = 1,
+> > > +		},  
+> > 
+> > Our state transition diagram is pretty weak on reachable transitions
+> > out of the _STOP state, why do we select only these two as valid?  
+> 
+> I have no particular opinion on specific states here, however adding
+> more states means more stuff for drivers to implement and more risk
+> driver writers will mess up this uAPI.
 
-On 9/28/21 12:10 PM, Borislav Petkov wrote:
-> From: Borislav Petkov <bp@suse.de>
-> 
-> Hi all,
-> 
-> here's v4 of the cc_platform_has() patchset with feedback incorporated.
-> 
-> I'm going to route this through tip if there are no objections.
+It looks like state transitions were largely discussed in v9 and v10 of
+the migration proposals:
 
-Intel CC support patch is not included in this series. You want me
-to address the issue raised by Joerg before merging it?
+https://lore.kernel.org/all/1573578220-7530-2-git-send-email-kwankhede@nvidia.com/
+https://lore.kernel.org/all/1576527700-21805-2-git-send-email-kwankhede@nvidia.com/
 
-> 
-> Thx.
-> 
-> Tom Lendacky (8):
->    x86/ioremap: Selectively build arch override encryption functions
->    arch/cc: Introduce a function to check for confidential computing
->      features
->    x86/sev: Add an x86 version of cc_platform_has()
->    powerpc/pseries/svm: Add a powerpc version of cc_platform_has()
->    x86/sme: Replace occurrences of sme_active() with cc_platform_has()
->    x86/sev: Replace occurrences of sev_active() with cc_platform_has()
->    x86/sev: Replace occurrences of sev_es_active() with cc_platform_has()
->    treewide: Replace the use of mem_encrypt_active() with
->      cc_platform_has()
-> 
->   arch/Kconfig                                 |  3 +
->   arch/powerpc/include/asm/mem_encrypt.h       |  5 --
->   arch/powerpc/platforms/pseries/Kconfig       |  1 +
->   arch/powerpc/platforms/pseries/Makefile      |  2 +
->   arch/powerpc/platforms/pseries/cc_platform.c | 26 ++++++
->   arch/powerpc/platforms/pseries/svm.c         |  5 +-
->   arch/s390/include/asm/mem_encrypt.h          |  2 -
->   arch/x86/Kconfig                             |  1 +
->   arch/x86/include/asm/io.h                    |  8 ++
->   arch/x86/include/asm/kexec.h                 |  2 +-
->   arch/x86/include/asm/mem_encrypt.h           | 12 +--
->   arch/x86/kernel/Makefile                     |  6 ++
->   arch/x86/kernel/cc_platform.c                | 69 +++++++++++++++
->   arch/x86/kernel/crash_dump_64.c              |  4 +-
->   arch/x86/kernel/head64.c                     |  9 +-
->   arch/x86/kernel/kvm.c                        |  3 +-
->   arch/x86/kernel/kvmclock.c                   |  4 +-
->   arch/x86/kernel/machine_kexec_64.c           | 19 +++--
->   arch/x86/kernel/pci-swiotlb.c                |  9 +-
->   arch/x86/kernel/relocate_kernel_64.S         |  2 +-
->   arch/x86/kernel/sev.c                        |  6 +-
->   arch/x86/kvm/svm/svm.c                       |  3 +-
->   arch/x86/mm/ioremap.c                        | 18 ++--
->   arch/x86/mm/mem_encrypt.c                    | 55 ++++--------
->   arch/x86/mm/mem_encrypt_identity.c           |  9 +-
->   arch/x86/mm/pat/set_memory.c                 |  3 +-
->   arch/x86/platform/efi/efi_64.c               |  9 +-
->   arch/x86/realmode/init.c                     |  8 +-
->   drivers/gpu/drm/amd/amdgpu/amdgpu_drv.c      |  4 +-
->   drivers/gpu/drm/drm_cache.c                  |  4 +-
->   drivers/gpu/drm/vmwgfx/vmwgfx_drv.c          |  4 +-
->   drivers/gpu/drm/vmwgfx/vmwgfx_msg.c          |  6 +-
->   drivers/iommu/amd/init.c                     |  7 +-
->   drivers/iommu/amd/iommu.c                    |  3 +-
->   drivers/iommu/amd/iommu_v2.c                 |  3 +-
->   drivers/iommu/iommu.c                        |  3 +-
->   fs/proc/vmcore.c                             |  6 +-
->   include/linux/cc_platform.h                  | 88 ++++++++++++++++++++
->   include/linux/mem_encrypt.h                  |  4 -
->   kernel/dma/swiotlb.c                         |  4 +-
->   40 files changed, 310 insertions(+), 129 deletions(-)
->   create mode 100644 arch/powerpc/platforms/pseries/cc_platform.c
->   create mode 100644 arch/x86/kernel/cc_platform.c
->   create mode 100644 include/linux/cc_platform.h
-> 
+I'm not seeing that we really excluded many transitions there.
 
--- 
-Sathyanarayanan Kuppuswamy
-Linux Kernel Developer
+> So only on those grounds I'd suggest to keep this to the minimum
+> needed instead of the maximum logically possible..
+> 
+> Also, probably the FSM comment from the uapi header file should be
+> moved into a function comment above this function?
+
+It's not clear this function shouldn't be anything more than:
+
+	if (new_state > MAX_STATE || old_state > MAX_STATE)
+		return false;	/* exited via device reset, */
+				/* entered via transition fault */
+
+	return true;
+
+That's still only 5 fully interconnected states to work between, and
+potentially a 6th if we decide _RESUMING|_RUNNING is valid for a device
+supporting post-copy.
+
+In defining the device state, we tried to steer away from defining it
+in terms of the QEMU migration API, but rather as a set of controls
+that could be used to support that API to leave us some degree of
+independence that QEMU implementation might evolve.
+
+To that extent, it actually seems easier for a device implementation to
+focus on bit definition rather than the state machine node.
+
+I'd also vote that any clarification of state validity and transitions
+belongs in the uAPI header and a transition test function should
+reference that header as the source of truth, rather than the other way
+around.  Thanks,
+
+Alex
+
