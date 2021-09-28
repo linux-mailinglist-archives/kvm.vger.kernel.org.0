@@ -2,186 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4542341B3D3
-	for <lists+kvm@lfdr.de>; Tue, 28 Sep 2021 18:26:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 32BDE41B3DE
+	for <lists+kvm@lfdr.de>; Tue, 28 Sep 2021 18:27:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241728AbhI1Q20 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Sep 2021 12:28:26 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38808 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S241702AbhI1Q2Z (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 28 Sep 2021 12:28:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632846405;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=vR8c6NsLOBOKtRR+igT5REdAQP6jWS9T8ZWr3CWbbOk=;
-        b=aV6QKk7m575lOJEmgY4S5cCgJy/GB1QzyHyjNyTv7umXNj9jOcqYWrr83v6D8EPJdvuanF
-        bC2Rhnz1iStpBIy6MAzGfbOgB5S8kl/WNJ0gPIAgd7t0Orj2yeP4myUCf3zI8Yn3xXHWin
-        UBbXhQ2XPZUJcipeNYkXWSC3iyQe8Zw=
-Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com
- [209.85.210.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-357-92dN23DgMkGtKbdt_wugZQ-1; Tue, 28 Sep 2021 12:26:44 -0400
-X-MC-Unique: 92dN23DgMkGtKbdt_wugZQ-1
-Received: by mail-ot1-f70.google.com with SMTP id l32-20020a9d1ca0000000b00546e6ec87afso21494745ota.11
-        for <kvm@vger.kernel.org>; Tue, 28 Sep 2021 09:26:44 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=vR8c6NsLOBOKtRR+igT5REdAQP6jWS9T8ZWr3CWbbOk=;
-        b=M9fMPngtV033wuVMV7sl1MYHmbnfrgWcK65V0Zoie9BK5ivkd2Bol96zWD2j07TLOK
-         9AkCbzdZMleQg0dByN7kQREAM18joTfvub2pAEttHdwWaGv7nv7nH5BLhjYA4/S9IXgj
-         CaCJ1APgjOEZKGOoif35nvlpdNwBNckCFAZk5YG+VzoEZAz2o3N8VLDIEQ7NSvbUhWg+
-         F4jUtoLAcR6p6nl8K/1xi3x8+x6NScdS8o2WrtngVR1Niey0JKSWOO+CUI97LrWCfiP9
-         qg9Eqvn1l6O5YgiAm3e2ugOpOThi7QRF4ElEMHvh6Ykf2G9bivBvHikt4ONtnAOWcG75
-         Jsbg==
-X-Gm-Message-State: AOAM5307uWpq8azOnF8JRcJVU47FJJqVAjw0qoXXz3k9Ei4FWd5E3tef
-        AMCgFdjCZr6gnvyBT4yORrwOOyJELZSm0aTfiSMtirLmPh25fjoRW+Cwg1PSdlB/R1oF9keZbRz
-        3TjdeCPu76q5E
-X-Received: by 2002:a9d:eac:: with SMTP id 41mr4740082otj.38.1632846403542;
-        Tue, 28 Sep 2021 09:26:43 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx1IG9jqGE9mq54HWFtwW0jt+nrscgPlPKb6PVqn3/v5AliJW96b01O572lk9obt2QieoW0Lg==
-X-Received: by 2002:a9d:eac:: with SMTP id 41mr4740061otj.38.1632846403290;
-        Tue, 28 Sep 2021 09:26:43 -0700 (PDT)
-Received: from redhat.com ([198.99.80.109])
-        by smtp.gmail.com with ESMTPSA id o126sm4579294oig.21.2021.09.28.09.26.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Sep 2021 09:26:42 -0700 (PDT)
-Date:   Tue, 28 Sep 2021 10:26:40 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "hch@lst.de" <hch@lst.de>,
-        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "corbet@lwn.net" <corbet@lwn.net>,
-        "parav@mellanox.com" <parav@mellanox.com>,
-        "lkml@metux.net" <lkml@metux.net>,
-        "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
-        "dwmw2@infradead.org" <dwmw2@infradead.org>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "lushenming@huawei.com" <lushenming@huawei.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>
-Subject: Re: [RFC 06/20] iommu: Add iommu_device_init[exit]_user_dma
- interfaces
-Message-ID: <20210928102640.4b115b09.alex.williamson@redhat.com>
-In-Reply-To: <BN9PR11MB54332256C5AAB9AECC88A7E38CA89@BN9PR11MB5433.namprd11.prod.outlook.com>
-References: <20210919063848.1476776-1-yi.l.liu@intel.com>
-        <20210919063848.1476776-7-yi.l.liu@intel.com>
-        <20210921170943.GS327412@nvidia.com>
-        <BN9PR11MB5433DA330D4583387B59AA7F8CA29@BN9PR11MB5433.namprd11.prod.outlook.com>
-        <20210922123931.GI327412@nvidia.com>
-        <BN9PR11MB5433CE19425E85E7F52093278CA79@BN9PR11MB5433.namprd11.prod.outlook.com>
-        <20210927115342.GW964074@nvidia.com>
-        <BN9PR11MB5433502FEF11940984774F278CA79@BN9PR11MB5433.namprd11.prod.outlook.com>
-        <20210927130935.GZ964074@nvidia.com>
-        <BN9PR11MB543327D25DCE242919F7909A8CA79@BN9PR11MB5433.namprd11.prod.outlook.com>
-        <20210927131949.052d8481.alex.williamson@redhat.com>
-        <BN9PR11MB54332256C5AAB9AECC88A7E38CA89@BN9PR11MB5433.namprd11.prod.outlook.com>
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        id S241792AbhI1Q30 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Sep 2021 12:29:26 -0400
+Received: from mail.kernel.org ([198.145.29.99]:59886 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S241768AbhI1Q3Z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Sep 2021 12:29:25 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 636A360EE9;
+        Tue, 28 Sep 2021 16:27:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1632846466;
+        bh=pxmRZz6UdCKyo/pIVTPGaxM9qJvC87Qcki0mcSQG0Gc=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=QOZ1Eyxws/1pmJeQ1d8Rz+AAw2zaFbTsRdmGXgZ0EuuCNMAnvjr0hvhZkhJZYEjfj
+         uW8aT2SBMEBI6njSafdsdsdK2Np+fmUeCOChkM6Tp/gt5QnJTmiUg0/vjJE+k6yUIE
+         VNiZh45LgC+8EhnSmzhPQzliLswMH2tgkFYLGahoPXXexWTnU6J7KKKL8jC82GzVRR
+         57UETot+3TQaJmhd1ITCbcBIcMkDwZAjD1hX0uVIIA+GVmMh9e+GKb1nuSBOtvX76c
+         0ZuADBIy+RtZmPDHKonWSA3KftxSaj8l94/qhoO58dfGzRDH1m2Dx0TA+IDh/jt3GK
+         QjdJG113AplqA==
+Date:   Tue, 28 Sep 2021 19:27:42 +0300
+From:   Leon Romanovsky <leon@kernel.org>
+To:     Max Gurtovoy <mgurtovoy@nvidia.com>
+Cc:     mst@redhat.com, virtualization@lists.linux-foundation.org,
+        kvm@vger.kernel.org, stefanha@redhat.com, oren@nvidia.com,
+        nitzanc@nvidia.com, israelr@nvidia.com, hch@infradead.org,
+        linux-block@vger.kernel.org, axboe@kernel.dk,
+        Yaron Gepstein <yarong@nvidia.com>,
+        Jason Gunthorpe <jgg@nvidia.com>
+Subject: Re: [PATCH 2/2] virtio-blk: set NUMA affinity for a tagset
+Message-ID: <YVNCflMxWh4m7ewU@unreal>
+References: <20210926145518.64164-1-mgurtovoy@nvidia.com>
+ <20210926145518.64164-2-mgurtovoy@nvidia.com>
+ <YVGsMsIjD2+aS3eC@unreal>
+ <0c155679-e1db-3d1e-2b4e-a0f12ce5950c@nvidia.com>
+ <YVIMIFxjRcfDDub4@unreal>
+ <f8de7c19-9f04-a458-6c1d-8133a83aa93f@nvidia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f8de7c19-9f04-a458-6c1d-8133a83aa93f@nvidia.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 28 Sep 2021 07:43:36 +0000
-"Tian, Kevin" <kevin.tian@intel.com> wrote:
+On Tue, Sep 28, 2021 at 06:59:15PM +0300, Max Gurtovoy wrote:
+> 
+> On 9/27/2021 9:23 PM, Leon Romanovsky wrote:
+> > On Mon, Sep 27, 2021 at 08:25:09PM +0300, Max Gurtovoy wrote:
+> > > On 9/27/2021 2:34 PM, Leon Romanovsky wrote:
+> > > > On Sun, Sep 26, 2021 at 05:55:18PM +0300, Max Gurtovoy wrote:
+> > > > > To optimize performance, set the affinity of the block device tagset
+> > > > > according to the virtio device affinity.
+> > > > > 
+> > > > > Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
+> > > > > ---
+> > > > >    drivers/block/virtio_blk.c | 2 +-
+> > > > >    1 file changed, 1 insertion(+), 1 deletion(-)
+> > > > > 
+> > > > > diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> > > > > index 9b3bd083b411..1c68c3e0ebf9 100644
+> > > > > --- a/drivers/block/virtio_blk.c
+> > > > > +++ b/drivers/block/virtio_blk.c
+> > > > > @@ -774,7 +774,7 @@ static int virtblk_probe(struct virtio_device *vdev)
+> > > > >    	memset(&vblk->tag_set, 0, sizeof(vblk->tag_set));
+> > > > >    	vblk->tag_set.ops = &virtio_mq_ops;
+> > > > >    	vblk->tag_set.queue_depth = queue_depth;
+> > > > > -	vblk->tag_set.numa_node = NUMA_NO_NODE;
+> > > > > +	vblk->tag_set.numa_node = virtio_dev_to_node(vdev);
+> > > > I afraid that by doing it, you will increase chances to see OOM, because
+> > > > in NUMA_NO_NODE, MM will try allocate memory in whole system, while in
+> > > > the latter mode only on specific NUMA which can be depleted.
+> > > This is a common methodology we use in the block layer and in NVMe subsystem
+> > > and we don't afraid of the OOM issue you raised.
+> > There are many reasons for that, but we are talking about virtio here
+> > and not about NVMe.
+> 
+> Ok. what reasons ?
 
-> > From: Alex Williamson <alex.williamson@redhat.com>
-> > Sent: Tuesday, September 28, 2021 3:20 AM
-> >=20
-> > On Mon, 27 Sep 2021 13:32:34 +0000
-> > "Tian, Kevin" <kevin.tian@intel.com> wrote:
-> >  =20
-> > > > From: Jason Gunthorpe
-> > > > Sent: Monday, September 27, 2021 9:10 PM
-> > > >
-> > > > On Mon, Sep 27, 2021 at 01:00:08PM +0000, Tian, Kevin wrote:
-> > > > =20
-> > > > > > I think for such a narrow usage you should not change the struct
-> > > > > > device_driver. Just have pci_stub call a function to flip back =
-to user
-> > > > > > mode. =20
-> > > > >
-> > > > > Here we want to ensure that kernel dma should be blocked
-> > > > > if the group is already marked for user-dma. If we just blindly
-> > > > > do it for any driver at this point (as you commented earlier):
-> > > > >
-> > > > > +       ret =3D iommu_set_kernel_ownership(dev);
-> > > > > +       if (ret)
-> > > > > +               return ret;
-> > > > >
-> > > > > how would pci-stub reach its function to indicate that it doesn't
-> > > > > do dma and flip back? =20
-> > > > =20
-> > > > > Do you envision a simpler policy that no driver can be bound
-> > > > > to the group if it's already set for user-dma? what about vfio-pci
-> > > > > itself? =20
-> > > >
-> > > > Yes.. I'm not sure there is a good use case to allow the stub drive=
-rs
-> > > > to load/unload while a VFIO is running. At least, not a strong enou=
-gh
-> > > > one to justify a global change to the driver core.. =20
-> > >
-> > > I'm fine with not loading pci-stub. From the very 1st commit msg
-> > > looks pci-stub was introduced before vfio to prevent host driver
-> > > loading when doing device assignment with KVM. I'm not sure
-> > > whether other usages are built on pci-stub later, but in general it's
-> > > not good to position devices in a same group into different usages. =
-=20
-> >=20
-> > IIRC, pci-stub was invented for legacy KVM device assignment because
-> > KVM was never an actual device driver, it just latched onto and started
-> > using the device.  If there was an existing driver for the device then
-> > KVM would fail to get device resources.  Therefore the device needed to
-> > be unbound from its standard host driver, but that left it susceptible
-> > to driver loads usurping the device.  Therefore pci-stub came along to
-> > essentially claim the device on behalf of KVM.
-> >=20
-> > With vfio, there are a couple use cases of pci-stub that can be
-> > interesting.  The first is that pci-stub is generally built into the
-> > kernel, not as a module, which provides users the ability to specify a
-> > list of ids for pci-stub to claim on the kernel command line with
-> > higher priority than loadable modules.  This can prevent default driver
-> > bindings to devices until tools like driverctl or boot time scripting
-> > gets a shot to load the user designated driver for a device.
-> >=20
-> > The other use case, is that if a group is composed of multiple devices
-> > and all those devices are bound to vfio drivers, then the user can gain
-> > direct access to each of those devices.  If we wanted to insert a
-> > barrier to restrict user access to certain devices within a group, we'd
-> > suggest binding those devices to pci-stub.  Obviously within a group, it
-> > may still be possible to manipulate the device via p2p DMA, but the
-> > barrier is much higher and device, if not platform, specific to
-> > manipulate such devices.  An example use case might be a chipset
-> > Ethernet controller grouped among system management function in a
-> > multi-function root complex integrated endpoint. =20
->=20
-> Thanks for the background. It perfectly reflects how many tricky things
-> that vfio has evolved to deal with and we'll dig them out again in this
-> refactoring process with your help. =F0=9F=98=8A
->=20
-> just a nit on the last example. If a system management function is=20
-> in such group, isn't the right policy is to disallow assigning any device
-> in this group? Even the barrier is high, any chance of allowing the guest
-> to control a system management function is dangerous...
+For example, NVMe are physical devices that rely on DMA operations,
+PCI connectivity e.t.c to operate. Such systems indeed can benefit from
+NUMA locality hints. At the end, these devices are physically connected
+to that NUMA node.
 
-We can advise that it's a risk, but we generally refrain from making
-such policy decisions.  Ideally the chipset vendor avoids
-configurations that require their users to choose between functionality
-and security ;)  Thanks,
+In our case, virtio-blk is a software interface that doesn't have all
+these limitations. On the contrary, the virtio-blk can be created on one
+CPU and moved later to be close to the QEMU which can run on another NUMA
+node.
 
-Alex
+Also this patch increases chances to get OOM by factor of NUMA nodes.
+Before your patch, the virtio_blk can allocate from X memory, after your
+patch it will be X/NUMB_NUMA_NODES.
 
+In addition, it has all chances to even hurt performance.
+
+So yes, post v2, but as Stefan and I asked, please provide supportive
+performance results, because what was done for another subsystem doesn't
+mean that it will be applicable here.
+
+Thanks
