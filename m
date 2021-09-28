@@ -2,104 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 32BDE41B3DE
-	for <lists+kvm@lfdr.de>; Tue, 28 Sep 2021 18:27:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C599441B3E5
+	for <lists+kvm@lfdr.de>; Tue, 28 Sep 2021 18:28:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241792AbhI1Q30 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Sep 2021 12:29:26 -0400
-Received: from mail.kernel.org ([198.145.29.99]:59886 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S241768AbhI1Q3Z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Sep 2021 12:29:25 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 636A360EE9;
-        Tue, 28 Sep 2021 16:27:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1632846466;
-        bh=pxmRZz6UdCKyo/pIVTPGaxM9qJvC87Qcki0mcSQG0Gc=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=QOZ1Eyxws/1pmJeQ1d8Rz+AAw2zaFbTsRdmGXgZ0EuuCNMAnvjr0hvhZkhJZYEjfj
-         uW8aT2SBMEBI6njSafdsdsdK2Np+fmUeCOChkM6Tp/gt5QnJTmiUg0/vjJE+k6yUIE
-         VNiZh45LgC+8EhnSmzhPQzliLswMH2tgkFYLGahoPXXexWTnU6J7KKKL8jC82GzVRR
-         57UETot+3TQaJmhd1ITCbcBIcMkDwZAjD1hX0uVIIA+GVmMh9e+GKb1nuSBOtvX76c
-         0ZuADBIy+RtZmPDHKonWSA3KftxSaj8l94/qhoO58dfGzRDH1m2Dx0TA+IDh/jt3GK
-         QjdJG113AplqA==
-Date:   Tue, 28 Sep 2021 19:27:42 +0300
-From:   Leon Romanovsky <leon@kernel.org>
-To:     Max Gurtovoy <mgurtovoy@nvidia.com>
-Cc:     mst@redhat.com, virtualization@lists.linux-foundation.org,
-        kvm@vger.kernel.org, stefanha@redhat.com, oren@nvidia.com,
-        nitzanc@nvidia.com, israelr@nvidia.com, hch@infradead.org,
-        linux-block@vger.kernel.org, axboe@kernel.dk,
-        Yaron Gepstein <yarong@nvidia.com>,
-        Jason Gunthorpe <jgg@nvidia.com>
-Subject: Re: [PATCH 2/2] virtio-blk: set NUMA affinity for a tagset
-Message-ID: <YVNCflMxWh4m7ewU@unreal>
-References: <20210926145518.64164-1-mgurtovoy@nvidia.com>
- <20210926145518.64164-2-mgurtovoy@nvidia.com>
- <YVGsMsIjD2+aS3eC@unreal>
- <0c155679-e1db-3d1e-2b4e-a0f12ce5950c@nvidia.com>
- <YVIMIFxjRcfDDub4@unreal>
- <f8de7c19-9f04-a458-6c1d-8133a83aa93f@nvidia.com>
+        id S241523AbhI1QaT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Sep 2021 12:30:19 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57287 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S241662AbhI1QaS (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 28 Sep 2021 12:30:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1632846518;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=kDCcNu7bbsfB2wNWfie8bDssTuWuW0RZ7Ty63uv/r1M=;
+        b=IyMF++LbkjiviZObVv9baWi8JprswZL4OVWakmZcV2DNHAPr7wGzCWFdjomOeJjg4pr+15
+        9Z76lXefjowpO3OMpAdJ7cnAXDerOusZR0ubVsAtCtcw/uJ+eICnTc59ixLoKy4OdA5urQ
+        d1Ye1MEXkamh5dyUjoDaQdpjYv64Tgc=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-479-f2ygvoFsOAevvo-S8LFSRQ-1; Tue, 28 Sep 2021 12:28:37 -0400
+X-MC-Unique: f2ygvoFsOAevvo-S8LFSRQ-1
+Received: by mail-wm1-f72.google.com with SMTP id a137-20020a1c7f8f000000b0030cda9c0feeso2284353wmd.7
+        for <kvm@vger.kernel.org>; Tue, 28 Sep 2021 09:28:37 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=kDCcNu7bbsfB2wNWfie8bDssTuWuW0RZ7Ty63uv/r1M=;
+        b=Zjx5N4K6v+9vhBTdOqFfvUhKOOGE3ZmXC958LaXYhWAIy+H0cw5WQd7P0bYo3zoHj4
+         ZaITrM5mAVwXArmK2piFDwulOlwdlTwnLdp+FDADmP9myk+NUsWxiUFqeSrKh/iYPpTb
+         mw3KwOLLyuWkSOn9Geoy5Ngw+Aycc9aXjTLlA+V32WwXPduGweiBrRnpnJ/sA/smEfIs
+         zfzs4+wCSF7kqG2i3+BvDLUT7wzfGGRN8YP/62jNBy6FbJQpB0v+qAkwK+U4VodnVrkn
+         LHNUiKKw56rKaIto4MEwdKEd9+XP86cJEtMgL9BbCLTKrWuCCWvUl32+KG3sOACMn+Qp
+         luYA==
+X-Gm-Message-State: AOAM530a+AJ611OG9COEeusDJfMT60H9LmmzFvlJAfUzWPiVFoJiHuJq
+        MfU+V15xXbVwJL7beYw1H1OHtDlOuYtH1hu6BTNMB8g6rzqvICHhwt7F9HIHZDO2HKmu7d/A3yz
+        KcbO0a2yGVoh4
+X-Received: by 2002:a05:600c:4f4e:: with SMTP id m14mr1696434wmq.5.1632846516275;
+        Tue, 28 Sep 2021 09:28:36 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyIGMbxvDql9Inlzz0uxzDc/AHYI9ULKoRx1AnDuL2Kv0h7yV7lWnzfXvMGEKmlsCahAE96iA==
+X-Received: by 2002:a05:600c:4f4e:: with SMTP id m14mr1696413wmq.5.1632846516070;
+        Tue, 28 Sep 2021 09:28:36 -0700 (PDT)
+Received: from thuth.remote.csb (p549bb2bd.dip0.t-ipconnect.de. [84.155.178.189])
+        by smtp.gmail.com with ESMTPSA id y11sm24343663wrg.18.2021.09.28.09.28.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 28 Sep 2021 09:28:35 -0700 (PDT)
+Subject: Re: [kvm-unit-tests PATCH 3/9] s390x: uv-host: Fence a destroy cpu
+ test on z15
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     david@redhat.com, linux-s390@vger.kernel.org, seiden@linux.ibm.com,
+        imbrenda@linux.ibm.com
+References: <20210922071811.1913-1-frankja@linux.ibm.com>
+ <20210922071811.1913-4-frankja@linux.ibm.com>
+ <8035a911-4a76-50ed-cb07-edce48abdb9c@redhat.com>
+ <11d1b08d-6605-97f7-84f3-49f20f8cc0c2@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+Message-ID: <604002cd-93e5-9495-aa87-df49d0e9a651@redhat.com>
+Date:   Tue, 28 Sep 2021 18:28:33 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f8de7c19-9f04-a458-6c1d-8133a83aa93f@nvidia.com>
+In-Reply-To: <11d1b08d-6605-97f7-84f3-49f20f8cc0c2@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 28, 2021 at 06:59:15PM +0300, Max Gurtovoy wrote:
+On 28/09/2021 13.21, Janosch Frank wrote:
+> On 9/27/21 17:26, Thomas Huth wrote:
+>> On 22/09/2021 09.18, Janosch Frank wrote:
+>>> Firmware will not give us the expected return code on z15 so let's
+>>> fence it for the z15 machine generation.
+>>>
+>>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>>> ---
+>>>    lib/s390x/asm/arch_def.h | 14 ++++++++++++++
+>>>    s390x/uv-host.c          | 11 +++++++----
+>>>    2 files changed, 21 insertions(+), 4 deletions(-)
+>>>
+>>> diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
+>>> index aa80d840..c8d2722a 100644
+>>> --- a/lib/s390x/asm/arch_def.h
+>>> +++ b/lib/s390x/asm/arch_def.h
+>>> @@ -219,6 +219,20 @@ static inline unsigned short stap(void)
+>>>        return cpu_address;
+>>>    }
+>>> +#define MACHINE_Z15A    0x8561
+>>> +#define MACHINE_Z15B    0x8562
+>>> +
+>>> +static inline uint16_t get_machine_id(void)
+>>> +{
+>>> +    uint64_t cpuid;
+>>> +
+>>> +    asm volatile("stidp %0" : "=Q" (cpuid));
+>>> +    cpuid = cpuid >> 16;
+>>> +    cpuid &= 0xffff;
+
+You could skip the masking line since the function returns an uint61_t anyway.
+
+>>> +
+>>> +    return cpuid;
+>>> +}
+>>> +
+>>>    static inline int tprot(unsigned long addr)
+>>>    {
+>>>        int cc;
+>>> diff --git a/s390x/uv-host.c b/s390x/uv-host.c
+>>> index 66a11160..5e351120 100644
+>>> --- a/s390x/uv-host.c
+>>> +++ b/s390x/uv-host.c
+>>> @@ -111,6 +111,7 @@ static void test_config_destroy(void)
+>>>    static void test_cpu_destroy(void)
+>>>    {
+>>>        int rc;
+>>> +    uint16_t machineid = get_machine_id();
+>>>        struct uv_cb_nodata uvcb = {
+>>>            .header.len = sizeof(uvcb),
+>>>            .header.cmd = UVC_CMD_DESTROY_SEC_CPU,
+>>> @@ -125,10 +126,12 @@ static void test_cpu_destroy(void)
+>>>               "hdr invalid length");
+>>>        uvcb.header.len += 8;
+>>> -    uvcb.handle += 1;
+>>> -    rc = uv_call(0, (uint64_t)&uvcb);
+>>> -    report(rc == 1 && uvcb.header.rc == UVC_RC_INV_CHANDLE, "invalid 
+>>> handle");
+>>> -    uvcb.handle -= 1;
+>>> +    if (machineid != MACHINE_Z15A && machineid != MACHINE_Z15B) {
+>>> +        uvcb.handle += 1;
+>>> +        rc = uv_call(0, (uint64_t)&uvcb);
+>>> +        report(rc == 1 && uvcb.header.rc == UVC_RC_INV_CHANDLE, "invalid 
+>>> handle");
+>>> +        uvcb.handle -= 1;
+>>> +    }
+>>
+>> So this is a bug in the firmware? Any chance that it will still get fixed
+>> for the z15? If so, would it make sense to turn this into a report_xfail()
+>> instead?
+>>
+>>    Thomas
+>>
 > 
-> On 9/27/2021 9:23 PM, Leon Romanovsky wrote:
-> > On Mon, Sep 27, 2021 at 08:25:09PM +0300, Max Gurtovoy wrote:
-> > > On 9/27/2021 2:34 PM, Leon Romanovsky wrote:
-> > > > On Sun, Sep 26, 2021 at 05:55:18PM +0300, Max Gurtovoy wrote:
-> > > > > To optimize performance, set the affinity of the block device tagset
-> > > > > according to the virtio device affinity.
-> > > > > 
-> > > > > Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
-> > > > > ---
-> > > > >    drivers/block/virtio_blk.c | 2 +-
-> > > > >    1 file changed, 1 insertion(+), 1 deletion(-)
-> > > > > 
-> > > > > diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> > > > > index 9b3bd083b411..1c68c3e0ebf9 100644
-> > > > > --- a/drivers/block/virtio_blk.c
-> > > > > +++ b/drivers/block/virtio_blk.c
-> > > > > @@ -774,7 +774,7 @@ static int virtblk_probe(struct virtio_device *vdev)
-> > > > >    	memset(&vblk->tag_set, 0, sizeof(vblk->tag_set));
-> > > > >    	vblk->tag_set.ops = &virtio_mq_ops;
-> > > > >    	vblk->tag_set.queue_depth = queue_depth;
-> > > > > -	vblk->tag_set.numa_node = NUMA_NO_NODE;
-> > > > > +	vblk->tag_set.numa_node = virtio_dev_to_node(vdev);
-> > > > I afraid that by doing it, you will increase chances to see OOM, because
-> > > > in NUMA_NO_NODE, MM will try allocate memory in whole system, while in
-> > > > the latter mode only on specific NUMA which can be depleted.
-> > > This is a common methodology we use in the block layer and in NVMe subsystem
-> > > and we don't afraid of the OOM issue you raised.
-> > There are many reasons for that, but we are talking about virtio here
-> > and not about NVMe.
-> 
-> Ok. what reasons ?
+> No, a xfail will not help here.
 
-For example, NVMe are physical devices that rely on DMA operations,
-PCI connectivity e.t.c to operate. Such systems indeed can benefit from
-NUMA locality hints. At the end, these devices are physically connected
-to that NUMA node.
+Ok, fair, then I think the patch is fine:
 
-In our case, virtio-blk is a software interface that doesn't have all
-these limitations. On the contrary, the virtio-blk can be created on one
-CPU and moved later to be close to the QEMU which can run on another NUMA
-node.
+Acked-by: Thomas Huth <thuth@redhat.com>
 
-Also this patch increases chances to get OOM by factor of NUMA nodes.
-Before your patch, the virtio_blk can allocate from X memory, after your
-patch it will be X/NUMB_NUMA_NODES.
 
-In addition, it has all chances to even hurt performance.
-
-So yes, post v2, but as Stefan and I asked, please provide supportive
-performance results, because what was done for another subsystem doesn't
-mean that it will be applicable here.
-
-Thanks
