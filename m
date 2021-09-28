@@ -2,96 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7623041B7AA
-	for <lists+kvm@lfdr.de>; Tue, 28 Sep 2021 21:35:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 32A8241B82D
+	for <lists+kvm@lfdr.de>; Tue, 28 Sep 2021 22:12:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242512AbhI1Thd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Sep 2021 15:37:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39372 "EHLO
+        id S242679AbhI1UNn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Sep 2021 16:13:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47862 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241529AbhI1Thc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Sep 2021 15:37:32 -0400
-Received: from mail-il1-x130.google.com (mail-il1-x130.google.com [IPv6:2607:f8b0:4864:20::130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DC68C061745
-        for <kvm@vger.kernel.org>; Tue, 28 Sep 2021 12:35:52 -0700 (PDT)
-Received: by mail-il1-x130.google.com with SMTP id k13so192407ilo.7
-        for <kvm@vger.kernel.org>; Tue, 28 Sep 2021 12:35:52 -0700 (PDT)
+        with ESMTP id S242609AbhI1UNm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Sep 2021 16:13:42 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 871CEC06161C
+        for <kvm@vger.kernel.org>; Tue, 28 Sep 2021 13:12:02 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id b5-20020a251b05000000b005b575f23711so261926ybb.4
+        for <kvm@vger.kernel.org>; Tue, 28 Sep 2021 13:12:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=64evIw52oRekIZbHwSiCOQxkuAatfjf85RCST3duN+k=;
-        b=Y+whdzRKhZBi4F0e10aKGWY8V/H37d7/fT7EfJLwEzHf9sW/3ImWPZ9ET2U5Weu4yz
-         ZBjRIgLcc3KjeErqmbig8bPdI+Ka8EUE0FIf5dIotawpBRnC5dom3MQafQisZ8LWVawZ
-         r1pRp649QhA/oJDCUS6senPdUWmeY4p6YtiBUjiG6faSu5HSv5lEtbfP7y0ezWGarR4D
-         pC1C6h2vjPZw+Rer1rFu40SivFJbautH9NtQFhC6bCu4Cmm1NNk6ZDeWvKI3J5H/YtB0
-         q0/KXjB+kwRbKGl91HsUrqE0Z03rLt11AcxhXGBqB4TNHeHroEl+vdN1zscWzQQApUAZ
-         M1nA==
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=2MtiYmsIZAKiCkiOVDptQ2jlzTFkcgsG+KFRVqe4f7g=;
+        b=Nc9t1pLswT3y0G3mxJl8UdpIzcua8x8wgYPHnJt4U4C7m+A+xdDKv+yPTgKb6X4pPB
+         tGeFDlt4eHfjy/+pg5ztGzMK0UPRlLSpv4/qQs7GYsu1cirMcqcPDs3aCS9B2XMaHwuh
+         jlaSseJfAO+NGWoERn46AEsCt2zIVJpAIch40je1xmUy5Gj0pybObZyMGNai0Z/tCaLG
+         Cju53o5orzJvYMyRaisaS0ZgR80mcDaYjuxuAoOeO2Q5VfFRuBYWf8sG8rR2HY/72qgO
+         smjiXPVlaMu/ZHmTujWM1OfRrO7aEeGjrz70ueFNHnUywNSxl32aKfpw+vmi1rHnqYup
+         PkYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=64evIw52oRekIZbHwSiCOQxkuAatfjf85RCST3duN+k=;
-        b=itgu3A3CDPdzZTLpEfWdv2NiKF7GuLzVYV1MRJB4akhd4GDAt/MDYJUPntC3sofpiV
-         Q/hGSFml2nTb7or4U1LMKQ+6fQfrDA+xKwLtnnqH829Xv5ryx7J+bIN7C8u0sBtKZbCS
-         zSj15ECSoNAtLEocO1Xk/wqToQboqg8o5cssZdTxKh0S1iNT2isE0zR7epe97leir72e
-         NAOi6TIiDpLQtE09PEHNMLxGdxg5arbf5DF0wrNl3larXhCPGBU9S+7VFrZzBmLcCNp/
-         14ARAnypKhxFkT+FmEYWqzgbrIUEGyqL6wEutLJjQp/hAKnQvgoSb52kKUw6E1LBrhf+
-         wpag==
-X-Gm-Message-State: AOAM533XGieIORQVKTiQquDtsfSneSxJNuWmsW9yYBmqeA68xSs5//AP
-        LuCXxk2/HUacgGnNqXoz31JPMg==
-X-Google-Smtp-Source: ABdhPJzFSVZGvIenvKrDxicIDxRtjRj8KENPEhcmGHIrbBWFLg+wtwG6D65MA29+I55UEiSKkXhAsQ==
-X-Received: by 2002:a05:6e02:1d1c:: with SMTP id i28mr5559430ila.33.1632857751863;
-        Tue, 28 Sep 2021 12:35:51 -0700 (PDT)
-Received: from ziepe.ca ([206.223.160.26])
-        by smtp.gmail.com with ESMTPSA id d6sm11787173ile.51.2021.09.28.12.35.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Sep 2021 12:35:51 -0700 (PDT)
-Received: from jgg by mlx with local (Exim 4.94)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1mVItK-007GOs-GL; Tue, 28 Sep 2021 16:35:50 -0300
-Date:   Tue, 28 Sep 2021 16:35:50 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Leon Romanovsky <leon@kernel.org>,
-        Doug Ledford <dledford@redhat.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Kirti Wankhede <kwankhede@nvidia.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
-        Saeed Mahameed <saeedm@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>
-Subject: Re: [PATCH mlx5-next 2/7] vfio: Add an API to check migration state
- transition validity
-Message-ID: <20210928193550.GR3544071@ziepe.ca>
-References: <cover.1632305919.git.leonro@nvidia.com>
- <c87f55d6fec77a22b110d3c9611744e6b28bba46.1632305919.git.leonro@nvidia.com>
- <20210927164648.1e2d49ac.alex.williamson@redhat.com>
- <20210927231239.GE3544071@ziepe.ca>
- <20210928131958.61b3abec.alex.williamson@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210928131958.61b3abec.alex.williamson@redhat.com>
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=2MtiYmsIZAKiCkiOVDptQ2jlzTFkcgsG+KFRVqe4f7g=;
+        b=ZDYqN8NAvt0YJkSYChaM/5Yd0I4mq4jucUSCATwjP8ulU36qvvmLdmDN0pln37uB58
+         V3osXkXxElshlW2Bs4KpjgNTcC77OZOIWRZ6uUq+cx+2C+YCWhoHUjcyJ6Rhzsj5q7ai
+         cwgCSudN5+DXcuxvsh69sXATA0sm9LkKidWXWbUZ5HLV270+5nlqXDESawVp/clLeF6O
+         nqVqHQRNb6ElPOR8XcGZKpvGz2pg/NCQpg+Qf6BuFSlt+8UJfh9ps+VSGgaF2CFqWpkv
+         JxYySzPCJMq3ccWoYIfRuFNWuSQDvZp6tJCT5fM0jmjkRYeSBW95ntJsx7ol/L2UYSwc
+         RJqw==
+X-Gm-Message-State: AOAM530nyAJfq38S6Dfy4e3Xh+3eP1tMSXWQ5BdBEEPGkuMFY6npjQpY
+        Vz9Tib1aHjQeGuAWwhpS4pOKOde2prN6JPfXsNC1cXKfnXByHbxCRThN7TkH1wEQCCmzj+c/VeL
+        Vgtupx/SSHDayfeUbG0MhwUdk3WQxfUWPiwfDwUslG7Inxi5ApKQ0UE4NDQF/Ofs=
+X-Google-Smtp-Source: ABdhPJw8MrJiLzblo6lnWZ5IAC2p8lhfkKmhypzz27FkHzMv1y+sZHucn0xw+0jnRkZwdZQ6VxVlyt03jGas1Q==
+X-Received: from ricarkol2.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:62fe])
+ (user=ricarkol job=sendgmr) by 2002:a25:d1cc:: with SMTP id
+ i195mr8710836ybg.195.1632859921712; Tue, 28 Sep 2021 13:12:01 -0700 (PDT)
+Date:   Tue, 28 Sep 2021 13:11:57 -0700
+Message-Id: <20210928201157.2510143-1-ricarkol@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.0.685.g46640cef36-goog
+Subject: [PATCH v3 10/10] KVM: arm64: selftests: Add basic ITS device tests
+From:   Ricardo Koller <ricarkol@google.com>
+To:     kvm@vger.kernel.org, maz@kernel.org, kvmarm@lists.cs.columbia.edu,
+        drjones@redhat.com, eric.auger@redhat.com, alexandru.elisei@arm.com
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, oupton@google.com,
+        james.morse@arm.com, suzuki.poulose@arm.com, shuah@kernel.org,
+        jingzhangos@google.com, pshier@google.com, rananta@google.com,
+        reijiw@google.com, Ricardo Koller <ricarkol@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 28, 2021 at 01:19:58PM -0600, Alex Williamson wrote:
+Add some ITS device tests: general KVM device tests (address not defined
+already, address aligned) and tests for the ITS region being within the
+addressable IPA range.
 
-> In defining the device state, we tried to steer away from defining it
-> in terms of the QEMU migration API, but rather as a set of controls
-> that could be used to support that API to leave us some degree of
-> independence that QEMU implementation might evolve.
+Signed-off-by: Ricardo Koller <ricarkol@google.com>
+---
+ .../testing/selftests/kvm/aarch64/vgic_init.c | 42 +++++++++++++++++++
+ 1 file changed, 42 insertions(+)
 
-That is certainly a different perspective, it would have been
-better to not express this idea as a FSM in that case...
+diff --git a/tools/testing/selftests/kvm/aarch64/vgic_init.c b/tools/testing/selftests/kvm/aarch64/vgic_init.c
+index 417a9a515cad..180221ec325d 100644
+--- a/tools/testing/selftests/kvm/aarch64/vgic_init.c
++++ b/tools/testing/selftests/kvm/aarch64/vgic_init.c
+@@ -603,6 +603,47 @@ static void test_v3_redist_ipa_range_check_at_vcpu_run(void)
+ 	vm_gic_destroy(&v);
+ }
+ 
++static void test_v3_its_region(void)
++{
++	struct vm_gic v;
++	uint64_t addr;
++	int its_fd, ret;
++
++	v = vm_gic_create_with_vcpus(KVM_DEV_TYPE_ARM_VGIC_V3, NR_VCPUS);
++	its_fd = kvm_create_device(v.vm, KVM_DEV_TYPE_ARM_VGIC_ITS, false);
++
++	addr = 0x401000;
++	ret = _kvm_device_access(its_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
++			  KVM_VGIC_ITS_ADDR_TYPE, &addr, true);
++	TEST_ASSERT(ret && errno == EINVAL,
++		"ITS region with misaligned address");
++
++	addr = max_phys_size;
++	ret = _kvm_device_access(its_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
++			  KVM_VGIC_ITS_ADDR_TYPE, &addr, true);
++	TEST_ASSERT(ret && errno == E2BIG,
++		"register ITS region with base address beyond IPA range");
++
++	addr = max_phys_size - 0x10000;
++	ret = _kvm_device_access(its_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
++			  KVM_VGIC_ITS_ADDR_TYPE, &addr, true);
++	TEST_ASSERT(ret && errno == E2BIG,
++		"Half of ITS region is beyond IPA range");
++
++	/* This one succeeds setting the ITS base */
++	addr = 0x400000;
++	kvm_device_access(its_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
++			  KVM_VGIC_ITS_ADDR_TYPE, &addr, true);
++
++	addr = 0x300000;
++	ret = _kvm_device_access(its_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
++			  KVM_VGIC_ITS_ADDR_TYPE, &addr, true);
++	TEST_ASSERT(ret && errno == EEXIST, "ITS base set again");
++
++	close(its_fd);
++	vm_gic_destroy(&v);
++}
++
+ /*
+  * Returns 0 if it's possible to create GIC device of a given type (V2 or V3).
+  */
+@@ -655,6 +696,7 @@ void run_tests(uint32_t gic_dev_type)
+ 		test_v3_last_bit_redist_regions();
+ 		test_v3_last_bit_single_rdist();
+ 		test_v3_redist_ipa_range_check_at_vcpu_run();
++		test_v3_its_region();
+ 	}
+ }
+ 
+-- 
+2.33.0.685.g46640cef36-goog
 
-So each state in mlx5vf_pci_set_device_state() should call the correct
-combination of (un)freeze, (un)quiesce and so on so each state
-reflects a defined operation of the device?
-
-Jason
