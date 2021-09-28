@@ -2,80 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3975A41B6E3
-	for <lists+kvm@lfdr.de>; Tue, 28 Sep 2021 21:05:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 95AB941B720
+	for <lists+kvm@lfdr.de>; Tue, 28 Sep 2021 21:10:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242359AbhI1THZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Sep 2021 15:07:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60472 "EHLO
+        id S242414AbhI1TMF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Sep 2021 15:12:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33306 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242218AbhI1THY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Sep 2021 15:07:24 -0400
-Received: from mail-io1-xd32.google.com (mail-io1-xd32.google.com [IPv6:2607:f8b0:4864:20::d32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28375C061745
-        for <kvm@vger.kernel.org>; Tue, 28 Sep 2021 12:05:45 -0700 (PDT)
-Received: by mail-io1-xd32.google.com with SMTP id s20so28755594ioa.4
-        for <kvm@vger.kernel.org>; Tue, 28 Sep 2021 12:05:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=LYaPMO4zSUN63L5x5xUSR1CDiXdGr7bJrgBZxfWWnRM=;
-        b=SGJcdHCygArkZYEIETz/wT+50dTV5xtQ1lZdrl9rOa78dS1YvLlQOq3YOhDQdB97q1
-         zo8M2ixafgU9SNvjwIFhI1+ygeNugw2tAsCo1DtZ9Ns6CFBTlUYmpgmZbNEO8VsSohge
-         qr7r/bBX45IiZeZC78iRqPy0U2KLBmJgPya+Hj8/CIo4U221V03qlABGqt5MjPF1O7Te
-         a3MTnKC+oOm0rCt+xLVcKP8X84tunJnE0eu2WPvm/uyOSlzgrEh6u702TQ35iyneOI4b
-         Sq2Y06PbIVovlsYid4ZzH/6ZdKBPO7LUN76gbJWOg/6+4RsAFF9vK/0dTYWDpAOkGyK/
-         jvoQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=LYaPMO4zSUN63L5x5xUSR1CDiXdGr7bJrgBZxfWWnRM=;
-        b=ihIbl2iBydzu4q22Y/2PkApgbcRYhmEHBjFo/N6AKK+lOf6ZdWS50XIF68N12QHZqw
-         4hBcYikexIVKOHSTCuzO3/4T7MfwDkFHICqPFDiCGToFQBoWXxb3SDvrAw0NRDXwyDe3
-         s9ARyi7VHpiAUc042uvtPfiNdJn0jB49mG70URruGki2ibQrMBH2Oi5EPAZsdy0RjH1G
-         uh18srjRHy6guLK2Kc1G9oA3LuB/OlinHh5VQXsvQpHCJPti2PT9id1b2UrfK4GWOAnI
-         pZr6MJkIAWwAEzM2jS979s6cCM5/TZTJmYULHQg4aTWh6QWtwBRWyUCd8Y2Om9y/b8FU
-         5saQ==
-X-Gm-Message-State: AOAM5318aQz3BKS23DrvLBMzWsoI97WbiLFYr/wDc2GpYKMfy8WJOnh5
-        tg675rbxDsVm9Sm0BzGv5VIJms8rWjHSN9djookoxQ==
-X-Google-Smtp-Source: ABdhPJye2c2rTcBY5maCu7+X+UzMZCbOkZHYNLHHfukiFlEG7A9xzy/JQd4I8fBvuBH8ndBmeHVokOpMGnvyAvT8xO4=
-X-Received: by 2002:a02:5444:: with SMTP id t65mr6164748jaa.42.1632855943923;
- Tue, 28 Sep 2021 12:05:43 -0700 (PDT)
+        with ESMTP id S242325AbhI1TMB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Sep 2021 15:12:01 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BB8EC06161C;
+        Tue, 28 Sep 2021 12:10:20 -0700 (PDT)
+Received: from zn.tnic (p200300ec2f13b20078349fd04295260b.dip0.t-ipconnect.de [IPv6:2003:ec:2f13:b200:7834:9fd0:4295:260b])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 394BC1EC067E;
+        Tue, 28 Sep 2021 21:10:18 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1632856218;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:
+         content-transfer-encoding:content-transfer-encoding:in-reply-to:
+         references; bh=GCnPTyFFnPSLiurFbR8iLYuDvIM/ZylVNPX31loBg1U=;
+        b=PgysYne7oRqig38Wg3EljqkqTDirqwkPAzRh5HiMtoiV+jJbJHTdrk3tVWUMlO9AliXjoI
+        QYxOn8YzMjaQP86uf/uYhrT2bAzVSbUmsndVFpCY5/rue9vmSI/Ae0ek/NbRQmmnCheeB1
+        XkhBbUOn81FbH/ZWzpMG01inkCayyvg=
+From:   Borislav Petkov <bp@alien8.de>
+To:     LKML <linux-kernel@vger.kernel.org>
+Cc:     Andi Kleen <ak@linux.intel.com>, Andy Lutomirski <luto@kernel.org>,
+        Ard Biesheuvel <ardb@kernel.org>, Baoquan He <bhe@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Young <dyoung@redhat.com>,
+        David Airlie <airlied@linux.ie>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "Kirill A. Shutemov" <kirill@shutemov.name>,
+        "Kuppuswamy, Sathyanarayanan" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+        Maxime Ripard <mripard@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Paul Mackerras <paulus@samba.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Thomas Zimmermann <tzimmermann@suse.de>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        VMware Graphics <linux-graphics-maintainer@vmware.com>,
+        Will Deacon <will@kernel.org>,
+        Christoph Hellwig <hch@infradead.org>, x86@kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
+        iommu@lists.linux-foundation.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        kexec@lists.infradead.org
+Subject: [PATCH v4 0/8] Implement generic cc_platform_has() helper function
+Date:   Tue, 28 Sep 2021 21:10:01 +0200
+Message-Id: <20210928191009.32551-1-bp@alien8.de>
+X-Mailer: git-send-email 2.29.2
 MIME-Version: 1.0
-References: <cover.1629726117.git.ashish.kalra@amd.com> <6fd25c749205dd0b1eb492c60d41b124760cc6ae.1629726117.git.ashish.kalra@amd.com>
- <CABayD+fnZ+Ho4qoUjB6YfWW+tFGUuftpsVBF3d=-kcU0-CEu0g@mail.gmail.com>
- <YUixqL+SRVaVNF07@google.com> <20210921095838.GA17357@ashkalra_ubuntu_server>
- <YUnjEU+1icuihmbR@google.com> <YUnxa2gy4DzEI2uY@zn.tnic> <YUoDJxfNZgNjY8zh@google.com>
- <YUr5gCgNe7tT0U/+@zn.tnic> <20210922121008.GA18744@ashkalra_ubuntu_server> <YUs1ejsDB4W4wKGF@zn.tnic>
-In-Reply-To: <YUs1ejsDB4W4wKGF@zn.tnic>
-From:   Steve Rutherford <srutherford@google.com>
-Date:   Tue, 28 Sep 2021 12:05:07 -0700
-Message-ID: <CABayD+eFeu1mWG-UGXC0QZuYu68B9wJNWJhjUo=HHgc_jsfBag@mail.gmail.com>
-Subject: Re: [PATCH v6 1/5] x86/kvm: Add AMD SEV specific Hypercall3
-To:     Borislav Petkov <bp@alien8.de>
-Cc:     Ashish Kalra <Ashish.Kalra@amd.com>,
-        Sean Christopherson <seanjc@google.com>, pbonzini@redhat.com,
-        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
-        joro@8bytes.org, thomas.lendacky@amd.com, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        brijesh.singh@amd.com, dovmurik@linux.ibm.com, tobin@linux.ibm.com,
-        jejb@linux.ibm.com, dgilbert@redhat.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 22, 2021 at 6:54 AM Borislav Petkov <bp@alien8.de> wrote:
->
-> On Wed, Sep 22, 2021 at 12:10:08PM +0000, Ashish Kalra wrote:
-> > Then isn't it cleaner to simply do it via the paravirt_ops interface,
-> > i.e, pv_ops.mmu.notify_page_enc_status_changed() where the callback
-> > is only set when SEV and live migration feature are supported and
-> > invoked through early_set_memory_decrypted()/encrypted().
-> >
-> > Another memory encryption platform can set it's callback accordingly.
->
-> Yeah, that sounds even cleaner to me.
-If I'm not mistaken, this is what the patch set does now?
+From: Borislav Petkov <bp@suse.de>
+
+Hi all,
+
+here's v4 of the cc_platform_has() patchset with feedback incorporated.
+
+I'm going to route this through tip if there are no objections.
+
+Thx.
+
+Tom Lendacky (8):
+  x86/ioremap: Selectively build arch override encryption functions
+  arch/cc: Introduce a function to check for confidential computing
+    features
+  x86/sev: Add an x86 version of cc_platform_has()
+  powerpc/pseries/svm: Add a powerpc version of cc_platform_has()
+  x86/sme: Replace occurrences of sme_active() with cc_platform_has()
+  x86/sev: Replace occurrences of sev_active() with cc_platform_has()
+  x86/sev: Replace occurrences of sev_es_active() with cc_platform_has()
+  treewide: Replace the use of mem_encrypt_active() with
+    cc_platform_has()
+
+ arch/Kconfig                                 |  3 +
+ arch/powerpc/include/asm/mem_encrypt.h       |  5 --
+ arch/powerpc/platforms/pseries/Kconfig       |  1 +
+ arch/powerpc/platforms/pseries/Makefile      |  2 +
+ arch/powerpc/platforms/pseries/cc_platform.c | 26 ++++++
+ arch/powerpc/platforms/pseries/svm.c         |  5 +-
+ arch/s390/include/asm/mem_encrypt.h          |  2 -
+ arch/x86/Kconfig                             |  1 +
+ arch/x86/include/asm/io.h                    |  8 ++
+ arch/x86/include/asm/kexec.h                 |  2 +-
+ arch/x86/include/asm/mem_encrypt.h           | 12 +--
+ arch/x86/kernel/Makefile                     |  6 ++
+ arch/x86/kernel/cc_platform.c                | 69 +++++++++++++++
+ arch/x86/kernel/crash_dump_64.c              |  4 +-
+ arch/x86/kernel/head64.c                     |  9 +-
+ arch/x86/kernel/kvm.c                        |  3 +-
+ arch/x86/kernel/kvmclock.c                   |  4 +-
+ arch/x86/kernel/machine_kexec_64.c           | 19 +++--
+ arch/x86/kernel/pci-swiotlb.c                |  9 +-
+ arch/x86/kernel/relocate_kernel_64.S         |  2 +-
+ arch/x86/kernel/sev.c                        |  6 +-
+ arch/x86/kvm/svm/svm.c                       |  3 +-
+ arch/x86/mm/ioremap.c                        | 18 ++--
+ arch/x86/mm/mem_encrypt.c                    | 55 ++++--------
+ arch/x86/mm/mem_encrypt_identity.c           |  9 +-
+ arch/x86/mm/pat/set_memory.c                 |  3 +-
+ arch/x86/platform/efi/efi_64.c               |  9 +-
+ arch/x86/realmode/init.c                     |  8 +-
+ drivers/gpu/drm/amd/amdgpu/amdgpu_drv.c      |  4 +-
+ drivers/gpu/drm/drm_cache.c                  |  4 +-
+ drivers/gpu/drm/vmwgfx/vmwgfx_drv.c          |  4 +-
+ drivers/gpu/drm/vmwgfx/vmwgfx_msg.c          |  6 +-
+ drivers/iommu/amd/init.c                     |  7 +-
+ drivers/iommu/amd/iommu.c                    |  3 +-
+ drivers/iommu/amd/iommu_v2.c                 |  3 +-
+ drivers/iommu/iommu.c                        |  3 +-
+ fs/proc/vmcore.c                             |  6 +-
+ include/linux/cc_platform.h                  | 88 ++++++++++++++++++++
+ include/linux/mem_encrypt.h                  |  4 -
+ kernel/dma/swiotlb.c                         |  4 +-
+ 40 files changed, 310 insertions(+), 129 deletions(-)
+ create mode 100644 arch/powerpc/platforms/pseries/cc_platform.c
+ create mode 100644 arch/x86/kernel/cc_platform.c
+ create mode 100644 include/linux/cc_platform.h
+
+-- 
+2.29.2
+
