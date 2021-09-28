@@ -2,133 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7ABC841B47E
-	for <lists+kvm@lfdr.de>; Tue, 28 Sep 2021 18:55:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 30DDD41B4A2
+	for <lists+kvm@lfdr.de>; Tue, 28 Sep 2021 19:00:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241803AbhI1Q5I (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Sep 2021 12:57:08 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:51115 "EHLO
+        id S241948AbhI1RBr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Sep 2021 13:01:47 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:36442 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229795AbhI1Q5H (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 28 Sep 2021 12:57:07 -0400
+        by vger.kernel.org with ESMTP id S241937AbhI1RBq (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 28 Sep 2021 13:01:46 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632848127;
+        s=mimecast20190719; t=1632848406;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=uud3srIrk5LfnP+oOg8qPl4zOzoxLHNL93JwPYw5eAU=;
-        b=asN0FPqXXpkBpxMEGOQ6pD3zoJzRm4nXH+7UumltI0I+uKP36rc3u/NG/gAUB75soAWmw+
-        foxgMLybt2DQAi8Xyx0mE+WKfYEryDcE8mDWPC8jvgFfqvmfq4AgFau5M1bMxvQMsDUbT9
-        nMN3MAOIhkYws/o/pDh0tnhBb5GnD/Y=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-146-qte1gzrbN1ux_BBCXQXIUg-1; Tue, 28 Sep 2021 12:55:26 -0400
-X-MC-Unique: qte1gzrbN1ux_BBCXQXIUg-1
-Received: by mail-ed1-f72.google.com with SMTP id h6-20020a50c386000000b003da01adc065so22495890edf.7
-        for <kvm@vger.kernel.org>; Tue, 28 Sep 2021 09:55:26 -0700 (PDT)
+        bh=XHmQkL+t1hn9bNMzRjhxH5e06VgDwe5vVOI99NJ41VU=;
+        b=dXyld5l7a+FSclBMEaGSFvUhZ4eDR+CIXin6Srdj9Gk0AokSL/ugzC1WVliWAL4KxkwDFx
+        6g3u+Ar16q/f3+lGwsyfootjA4/HJEzjUcs8bjGEAm838B31LlOtaTDugU6ehxe1/YepOu
+        THUAjd8iHGXkYOtfEK0YbZW5r21iAnY=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-108-b23zjFLVNleP397qXUpnbQ-1; Tue, 28 Sep 2021 13:00:04 -0400
+X-MC-Unique: b23zjFLVNleP397qXUpnbQ-1
+Received: by mail-ed1-f69.google.com with SMTP id w8-20020a50f108000000b003da70d30658so8755987edl.6
+        for <kvm@vger.kernel.org>; Tue, 28 Sep 2021 10:00:04 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=uud3srIrk5LfnP+oOg8qPl4zOzoxLHNL93JwPYw5eAU=;
-        b=T+xSKu+/O9sae+N4/TCD0uLWSxlvm+1bKVUP7qNXSsXoCZHCHe09BF8U6wnman2acj
-         WCG2EeLxfprdNgnDczTizH4sQKl3z2xhEpdqvw5ksJEoIOgsY5spU8uj0H+8L81N6E1K
-         4Vio1/CBg5zSBwxWYMNtoCgCgxBZDSN4pQw4AjDYm48kkWsyON0sn2cfHtdcmpckKVMD
-         tN4lFjkokdofNlw6HLPJwAyAtxnMHQVXhN1UnFuX8D6Lgttp/5A9ierPKFZTdJNA9vAl
-         0Id+b3ZGJ3wEnmW4NU0u8o8BIeSxeN9LlwtecGYO+LVp+5w+HvGQLqR2yrsHQDjbgrbU
-         Gaig==
-X-Gm-Message-State: AOAM5321hMPq1DNfvQi2h8Ap9IT3W9lD68EmXgdJJ08UcvrO/J4ErsPk
-        EM/4cKuUyBzVHCEdKTiUN1KLgtGwIjUkA2rmavkyfiLMBX0sw48W78Ie2BT2nf0JCrbsxUdYNAG
-        FPgHQgvU07H3m
-X-Received: by 2002:a50:9d02:: with SMTP id v2mr8699642ede.105.1632848125134;
-        Tue, 28 Sep 2021 09:55:25 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyUA31gkCDuEDDhxw+ZgG5BaT1/c/9pvhQxrlyQp/LzldVOGXUQaidw+sxotP0p8aexjvZXjg==
-X-Received: by 2002:a50:9d02:: with SMTP id v2mr8699623ede.105.1632848124937;
-        Tue, 28 Sep 2021 09:55:24 -0700 (PDT)
+        bh=XHmQkL+t1hn9bNMzRjhxH5e06VgDwe5vVOI99NJ41VU=;
+        b=ag1J2ZOxqxfG7fk8sB2BBnStYInRig3+iCS5J3Zf2+q1OqDMHBaSWB1r+7vBHabJ2u
+         bvCGGorGsJ3Goqu1tqOthjB2ZVyX/dwj9sLrofXogJxL/uSP8eMOGHBTazcHcRiZSCoR
+         dcnAa7JdLePkmsYXlMMlM2Cnl1Av7Z2rbEzRt5/iK61Dp22eJ+qKYBq3HxMH5xx5z5Zh
+         twkVKEbAJgN2O/p6GXhQRaQrhLDo5ywPWBgarcrt2XagW6qjctew//HXkRegXmhBCSe+
+         u88W//2NLtmI5KJseKMb4cV1lx+VWAmntziRH+SfF9fPQSo7VPc++eGwodSd2EL260gS
+         5YMA==
+X-Gm-Message-State: AOAM532FrLG3pB8JbVV9nvMLEezyqtd/7QQpZtrGZfqCeaTmiHA5406Q
+        +8lezTyXrHOAtCGjIIV2hVCVSXlkifM/0yHhIomTXrfe50i+C1t+MGccsPVbCVJAO+XHFZa5on0
+        nAT1H9d1P/jL9
+X-Received: by 2002:a17:907:7ba8:: with SMTP id ne40mr3981962ejc.517.1632848403454;
+        Tue, 28 Sep 2021 10:00:03 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz6tKIsCCUt9TxrFDO6yShTBPwBWa6pspy4jimhCeN64wkjbPt6rRgfyr3JVQdYrTFGFFBEQA==
+X-Received: by 2002:a17:907:7ba8:: with SMTP id ne40mr3981943ejc.517.1632848403295;
+        Tue, 28 Sep 2021 10:00:03 -0700 (PDT)
 Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id d22sm11289571ejj.47.2021.09.28.09.55.24
+        by smtp.gmail.com with ESMTPSA id 6sm10922163ejx.82.2021.09.28.10.00.02
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 28 Sep 2021 09:55:24 -0700 (PDT)
-Message-ID: <f7c2d5f5-3560-8666-90be-3605220cb93c@redhat.com>
-Date:   Tue, 28 Sep 2021 18:55:23 +0200
+        Tue, 28 Sep 2021 10:00:02 -0700 (PDT)
+Message-ID: <b17c4613-5e29-8170-c42b-125dc66b1dc1@redhat.com>
+Date:   Tue, 28 Sep 2021 19:00:01 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.1.0
-Subject: Re: [PATCH 2/5] nSVM: Check for optional commands and reserved
- encodings of TLB_CONTROL in nested VMCB
+Subject: Re: [PATCH v2 0/2] KVM: x86: skip gfn_track allocation when possible
 Content-Language: en-US
-To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>, kvm@vger.kernel.org
-Cc:     jmattson@google.com, seanjc@google.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, joro@8bytes.org
-References: <20210920235134.101970-1-krish.sadhukhan@oracle.com>
- <20210920235134.101970-3-krish.sadhukhan@oracle.com>
+To:     David Stevens <stevensd@chromium.org>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org
+References: <20210922045859.2011227-1-stevensd@google.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20210920235134.101970-3-krish.sadhukhan@oracle.com>
+In-Reply-To: <20210922045859.2011227-1-stevensd@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 21/09/21 01:51, Krish Sadhukhan wrote:
-> According to section "TLB Flush" in APM vol 2,
+On 22/09/21 06:58, David Stevens wrote:
+> From: David Stevens<stevensd@chromium.org>
 > 
->      "Support for TLB_CONTROL commands other than the first two, is
->       optional and is indicated by CPUID Fn8000_000A_EDX[FlushByAsid].
+> Skip allocating gfn_track arrays when tracking of guest write access to
+> pages is not required. For VMs where the allocation can be avoided, this
+> saves 2 bytes per 4KB of guest memory.
 > 
->       All encodings of TLB_CONTROL not defined in the APM are reserved."
+> Write tracking is used to manage shadow page tables in three cases -
+> when tdp is not supported, when nested virtualization is used, and for
+> GVT-g. If tdp_enable is set and the kernel is compiled without GVT-g,
+> then the gfn_track arrays can be allocated lazily when the shadow MMU is
+> initialized.
 > 
-> Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
-> ---
->   arch/x86/kvm/svm/nested.c | 19 +++++++++++++++++++
->   1 file changed, 19 insertions(+)
-> 
-> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-> index 5e13357da21e..028cc2a1f028 100644
-> --- a/arch/x86/kvm/svm/nested.c
-> +++ b/arch/x86/kvm/svm/nested.c
-> @@ -235,6 +235,22 @@ static bool nested_svm_check_bitmap_pa(struct kvm_vcpu *vcpu, u64 pa, u32 size)
->   	    kvm_vcpu_is_legal_gpa(vcpu, addr + size - 1);
->   }
->   
-> +static bool nested_svm_check_tlb_ctl(struct kvm_vcpu *vcpu, u8 tlb_ctl)
-> +{
-> +	switch(tlb_ctl) {
-> +		case TLB_CONTROL_DO_NOTHING:
-> +		case TLB_CONTROL_FLUSH_ALL_ASID:
-> +			return true;
-> +		case TLB_CONTROL_FLUSH_ASID:
-> +		case TLB_CONTROL_FLUSH_ASID_LOCAL:
-> +			if (guest_cpuid_has(vcpu, X86_FEATURE_FLUSHBYASID))
-> +				return true;
-> +			fallthrough;
+> v1 -> v2:
+>   - lazily allocate gfn_track when shadow MMU is initialized, instead
+>     of looking at cpuid
 
-Since nested FLUSHBYASID is not supported yet, this second set of case 
-labels can go away.
+Queued, thanks.
 
-Queued with that change, thanks.
-
-Paolo
-
-> +		default:
-> +			return false;
-> +	}
-> +}
-> +
->   static bool nested_vmcb_check_controls(struct kvm_vcpu *vcpu,
->   				       struct vmcb_control_area *control)
->   {
-> @@ -254,6 +270,9 @@ static bool nested_vmcb_check_controls(struct kvm_vcpu *vcpu,
->   					   IOPM_SIZE)))
->   		return false;
->   
-> +	if (CC(!nested_svm_check_tlb_ctl(vcpu, control->tlb_ctl)))
-> +		return false;
-> +
->   	return true;
->   }
->   
-> 
+paolo
 
