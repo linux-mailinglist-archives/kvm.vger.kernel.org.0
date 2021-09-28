@@ -2,150 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0B86B41B37B
-	for <lists+kvm@lfdr.de>; Tue, 28 Sep 2021 18:04:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 121B341B37D
+	for <lists+kvm@lfdr.de>; Tue, 28 Sep 2021 18:04:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241794AbhI1QFs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Sep 2021 12:05:48 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:24170 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S241786AbhI1QFr (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 28 Sep 2021 12:05:47 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 18SFCNtb002659;
-        Tue, 28 Sep 2021 12:03:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=7KE/l+fn+hjlTv8Mm7K3OhvpVA5YLs9/5BHfIjHaKO8=;
- b=CgcawE+Sl1hzL9SmWK+kibLgv2irfLPv80oxtLEUyIDaPWhzI2BWwz0PZneoGTymkFzq
- pAQahI7FnGjUa5gLreeP78Wa2QmiycGQGMWdcxQMlYRSy/oqoEV/4KqJMuJlf5lqcqfl
- r0HBSV/e5edI0MTkEzhCL8rqXSlDmunE4LzbIwpIcbnqovLv6P2r0rz0KHpUM4hS8Vf8
- JNvI1WZQWPaa7BBqhKRYQaA61JK/6Z+ZTScUlAeCDcC3mGRuSKghTQr5QZqwhenWK+fM
- nC/NW4kGmj6Zs/XCQRRVeML7ogHEwC8CPh/Co9RBfFZjXcSbx/vfe1ebS3kklrmAinZ+ Tg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3bbjbn0qrf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 28 Sep 2021 12:03:54 -0400
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 18SG283R007674;
-        Tue, 28 Sep 2021 12:03:53 -0400
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3bbjbn0qqt-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 28 Sep 2021 12:03:53 -0400
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 18SFvrMr004260;
-        Tue, 28 Sep 2021 16:03:52 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma03ams.nl.ibm.com with ESMTP id 3b9ud9yr6a-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 28 Sep 2021 16:03:51 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 18SFwkpV61342166
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 28 Sep 2021 15:58:46 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A92B152051;
-        Tue, 28 Sep 2021 16:03:47 +0000 (GMT)
-Received: from li-43c5434c-23b8-11b2-a85c-c4958fb47a68.ibm.com (unknown [9.171.40.159])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 04ADE52069;
-        Tue, 28 Sep 2021 16:03:46 +0000 (GMT)
-Subject: Re: [PATCH resend RFC 0/9] s390: fixes, cleanups and optimizations
- for page table walkers
-To:     David Hildenbrand <david@redhat.com>, linux-kernel@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, kvm@vger.kernel.org,
-        linux-mm@kvack.org, Janosch Frank <frankja@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Niklas Schnelle <schnelle@linux.ibm.com>,
-        Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>
-References: <20210909162248.14969-1-david@redhat.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Message-ID: <89c5c267-1299-3c91-465a-c5950d88658d@de.ibm.com>
-Date:   Tue, 28 Sep 2021 18:03:46 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+        id S241808AbhI1QFy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Sep 2021 12:05:54 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56682 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S241405AbhI1QFx (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 28 Sep 2021 12:05:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1632845052;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=zl4SSqGH76EGAl5YnV3M4ZHGi1GMO4rPMYPLM9TWK+w=;
+        b=hYx2hIYIHrEFwNN6g1wHsoV/MAbcOx1OYWZonCg1/SRTPVtNEgCtlx7G9+CskNRaSVZgwQ
+        UHZK4iSo6VVCOvZUlv6yiVSaXlOKO3s75LTzpj0JsnXLI7D1yprRI48IYAFSWtQWNObyLO
+        6tQf0bcH8ZdgyLtwEbOBNIBlE4UxOGM=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-439-OW-DHaiFNwWeyNgNu7aIKA-1; Tue, 28 Sep 2021 12:04:11 -0400
+X-MC-Unique: OW-DHaiFNwWeyNgNu7aIKA-1
+Received: by mail-ed1-f70.google.com with SMTP id z6-20020a50cd06000000b003d2c2e38f1fso22373776edi.1
+        for <kvm@vger.kernel.org>; Tue, 28 Sep 2021 09:04:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=zl4SSqGH76EGAl5YnV3M4ZHGi1GMO4rPMYPLM9TWK+w=;
+        b=T75KWybQ3pQWA52bXKK56T1zkYixrgz9txYhSurzuaVoSvjsEquN8bVDQJcAmC7RJU
+         DtxFCwozCOKBQV8EZNUDzdUbySDPwfWopVwMrlOKCWa2j3PxvoMXEwgRAqZrgfU8tkK5
+         eWZOoyhe0H1DQwQC8e5wyH1q5gpsucJ1zE+3ovluW4AGkxU7O2D2uoCFYpU1pWhL+3Up
+         p53UDzYuMzNvGazmzO3LeEyJufr/IV3c+v/5OwKVmi1qE9sCGFChKwDWXpl/iY8denRo
+         hJ1GeQwLy9RMIVp8RKAneMGSnTwsja4Tgwnr2HP0su5cNEnxQoRWswVHjonio0GT7bAU
+         uPQA==
+X-Gm-Message-State: AOAM533pFzL7QXR6IA3W94juXeJOVdOooT/7Zaelb63HDyu/mVvpyg2X
+        4SnyRmhyGMqvElPpRlV2ez36LTonMZjMVOuHoS3tyR67ELzGCOxpBJB2EnsAYoOE9WpPJtVyTWa
+        g96EvAlF346yN
+X-Received: by 2002:a50:d84c:: with SMTP id v12mr8488117edj.201.1632845049637;
+        Tue, 28 Sep 2021 09:04:09 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzTQSWfk3hicqWEfOfkekIGdJOm0afNPMpMcA+BVeW/cZsGMpXcyKKS0muyTXfODxT/BRUN5Q==
+X-Received: by 2002:a50:d84c:: with SMTP id v12mr8488091edj.201.1632845049421;
+        Tue, 28 Sep 2021 09:04:09 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id s3sm10751005eja.87.2021.09.28.09.04.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 28 Sep 2021 09:04:08 -0700 (PDT)
+Message-ID: <d1b1e0da-29f0-c443-6c86-9549bbe1c79d@redhat.com>
+Date:   Tue, 28 Sep 2021 18:04:04 +0200
 MIME-Version: 1.0
-In-Reply-To: <20210909162248.14969-1-david@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [PATCH] KVM: x86: Expose Predictive Store Forwarding Disable
 Content-Language: en-US
+To:     Babu Moger <babu.moger@amd.com>, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, x86@kernel.org
+Cc:     hpa@zytor.com, seanjc@google.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        tony.luck@intel.com, peterz@infradead.org,
+        kyung.min.park@intel.com, wei.huang2@amd.com, jgross@suse.com,
+        andrew.cooper3@citrix.com, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+References: <163244601049.30292.5855870305350227855.stgit@bmoger-ubuntu>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <163244601049.30292.5855870305350227855.stgit@bmoger-ubuntu>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: vB3pLLblhg1B0CygD1Boj2PN2rvMslgS
-X-Proofpoint-ORIG-GUID: Bi9WaOFC_I3K05CEVOg2NsEQ3xYkt1Xn
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.391,FMLib:17.0.607.475
- definitions=2021-09-28_05,2021-09-28_01,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 mlxlogscore=999
- clxscore=1015 suspectscore=0 bulkscore=0 phishscore=0 lowpriorityscore=0
- spamscore=0 priorityscore=1501 impostorscore=0 adultscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2109230001
- definitions=main-2109280094
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Am 09.09.21 um 18:22 schrieb David Hildenbrand:
-> Resend because I missed ccing people on the actual patches ...
-> 
-> RFC because the patches are essentially untested and I did not actually
-> try to trigger any of the things these patches are supposed to fix. It
-> merely matches my current understanding (and what other code does :) ). I
-> did compile-test as far as possible.
-> 
-> After learning more about the wonderful world of page tables and their
-> interaction with the mmap_sem and VMAs, I spotted some issues in our
-> page table walkers that allow user space to trigger nasty behavior when
-> playing dirty tricks with munmap() or mmap() of hugetlb. While some issues
-> should be hard to trigger, others are fairly easy because we provide
-> conventient interfaces (e.g., KVM_S390_GET_SKEYS and KVM_S390_SET_SKEYS).
-> 
-> Future work:
-> - Don't use get_locked_pte() when it's not required to actually allocate
->    page tables -- similar to how storage keys are now handled. Examples are
->    get_pgste() and __gmap_zap.
-> - Don't use get_locked_pte() and instead let page fault logic allocate page
->    tables when we actually do need page tables -- also, similar to how
->    storage keys are now handled. Examples are set_pgste_bits() and
->    pgste_perform_essa().
-> - Maybe switch to mm/pagewalk.c to avoid custom page table walkers. For
->    __gmap_zap() that's very easy.
-> 
-> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
-> Cc: Janosch Frank <frankja@linux.ibm.com>
-> Cc: Cornelia Huck <cohuck@redhat.com>
-> Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> Cc: Heiko Carstens <hca@linux.ibm.com>
-> Cc: Vasily Gorbik <gor@linux.ibm.com>
-> Cc: Niklas Schnelle <schnelle@linux.ibm.com>
-> Cc: Gerald Schaefer <gerald.schaefer@linux.ibm.com>
-> Cc: Ulrich Weigand <Ulrich.Weigand@de.ibm.com>
-> 
-> David Hildenbrand (9):
->    s390/gmap: validate VMA in __gmap_zap()
->    s390/gmap: don't unconditionally call pte_unmap_unlock() in
->      __gmap_zap()
->    s390/mm: validate VMA in PGSTE manipulation functions
->    s390/mm: fix VMA and page table handling code in storage key handling
->      functions
->    s390/uv: fully validate the VMA before calling follow_page()
->    s390/pci_mmio: fully validate the VMA before calling follow_pte()
->    s390/mm: no need for pte_alloc_map_lock() if we know the pmd is
->      present
->    s390/mm: optimize set_guest_storage_key()
->    s390/mm: optimize reset_guest_reference_bit()
-> 
->   arch/s390/kernel/uv.c    |   2 +-
->   arch/s390/mm/gmap.c      |  11 +++-
->   arch/s390/mm/pgtable.c   | 109 +++++++++++++++++++++++++++------------
->   arch/s390/pci/pci_mmio.c |   4 +-
->   4 files changed, 89 insertions(+), 37 deletions(-)
-> 
+On 24/09/21 03:15, Babu Moger wrote:
+>   arch/x86/include/asm/cpufeatures.h |    1 +
+>   arch/x86/kvm/cpuid.c               |    2 +-
+>   2 files changed, 2 insertions(+), 1 deletion(-)
 
-Thanks applied. Will run some test on those commits, but its already pushed
-out to my next tree to give it some coverage.
-g
+Queued, with a private #define instead of the one in cpufeatures.h:
+
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index fe03bd978761..343a01a05058 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -53,9 +53,16 @@ static u32 xstate_required_size(u64 xstate_bv, bool compacted)
+  	return ret;
+  }
+  
++/*
++ * This one is tied to SSB in the user API, and not
++ * visible in /proc/cpuinfo.
++ */
++#define KVM_X86_FEATURE_PSFD		(13*32+28) /* Predictive Store Forwarding Disable */
++
+  #define F feature_bit
+  #define SF(name) (boot_cpu_has(X86_FEATURE_##name) ? F(name) : 0)
+  
++
+  static inline struct kvm_cpuid_entry2 *cpuid_entry2_find(
+  	struct kvm_cpuid_entry2 *entries, int nent, u32 function, u32 index)
+  {
+@@ -500,7 +507,8 @@ void kvm_set_cpu_caps(void)
+  	kvm_cpu_cap_mask(CPUID_8000_0008_EBX,
+  		F(CLZERO) | F(XSAVEERPTR) |
+  		F(WBNOINVD) | F(AMD_IBPB) | F(AMD_IBRS) | F(AMD_SSBD) | F(VIRT_SSBD) |
+-		F(AMD_SSB_NO) | F(AMD_STIBP) | F(AMD_STIBP_ALWAYS_ON)
++		F(AMD_SSB_NO) | F(AMD_STIBP) | F(AMD_STIBP_ALWAYS_ON) |
++		__feature_bit(KVM_X86_FEATURE_PSFD)
+  	);
+  
+  	/*
+
+Paolo
+
