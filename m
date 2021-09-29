@@ -2,239 +2,347 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6FE7B41BE78
-	for <lists+kvm@lfdr.de>; Wed, 29 Sep 2021 06:45:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B3AFC41BE80
+	for <lists+kvm@lfdr.de>; Wed, 29 Sep 2021 06:55:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244143AbhI2Eqo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Sep 2021 00:46:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51292 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243949AbhI2Eqn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Sep 2021 00:46:43 -0400
-Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 439A1C06161C;
-        Tue, 28 Sep 2021 21:45:03 -0700 (PDT)
-Received: by mail-pg1-x535.google.com with SMTP id y186so1496272pgd.0;
-        Tue, 28 Sep 2021 21:45:03 -0700 (PDT)
+        id S243996AbhI2E5c (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Sep 2021 00:57:32 -0400
+Received: from gandalf.ozlabs.org ([150.107.74.76]:56633 "EHLO
+        gandalf.ozlabs.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S242323AbhI2E5b (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Sep 2021 00:57:31 -0400
+Received: by gandalf.ozlabs.org (Postfix, from userid 1007)
+        id 4HK3wj5V1xz4xbL; Wed, 29 Sep 2021 14:55:49 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=to:cc:references:subject:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-transfer-encoding:content-language;
-        bh=YsU7ZhT+rluSy+wUpfWMbC0oCvAGTAQ9i/VLdumPV1Q=;
-        b=nHSrWT9bWwawrg68rY5Vss1vCA59DdtrerGEfEagoupMYz78rAH1XFGyivUISbtaM5
-         bkguw8I0OkKynEk2i2X0NwLaLuKCmRyAaDKaWSYRcXNPzex4wg9y+6D/GRK1uQMA/RpK
-         DOkqz6aoTzMRgw/J6ZF24BVWbcWahIozvPExMypEZsXMWwRHx/RrTrcd5IJaEMAI+/UT
-         1xNqz9T4fl6w2S9l2LBzYd919shCzSeYchAFcebIv4IxVJZzKOjhv1eggdpNc/jDPf8m
-         kAzQXxxAxKOFwjp9NbmgyBnd1PSYZtogmFnG7F/vpVroiNnKMp4cpDFUOcAxML7aDGfC
-         Cqew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:to:cc:references:subject:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=YsU7ZhT+rluSy+wUpfWMbC0oCvAGTAQ9i/VLdumPV1Q=;
-        b=0T2YCH78hr4uG0G0BTTdojjN9J4AAxiGxQVexJOdfyV4E2fCxmI2bdNna9jdmJaTY+
-         lb5Kd5cKaYKZbVxZJLHPUhxFhZiDM7GtOjFKUNpPMq/6gua1EGGsgQbpJ1gq65JIBHZ2
-         +6zckCZT4V41mvnLpbLvZFbAYcLe1hYQMUnKU7TPy9q2fqTzTdKbYNF+aLqd8bykcjlW
-         1LyIMgG+b4vkdFmF6eZegohKrNACsawBryOyjQGPHPUZsPwHCSLLHadV3+uGtlth3pMa
-         dZY4HfE1DTFgaSMd93ksJVrBGlpo7X/dHqmf1FJ5AFoBx8i68RDrKu8R6hU+kGgTJ4dz
-         YqhQ==
-X-Gm-Message-State: AOAM531Q5cuiRVvkrg+CXTs8lSeRDrMFaLU0dM2yEbkMp4r4uWUjjmM/
-        GkX1ZMO5M9NvFgHwtZ8SJISIksQu6e/sQA==
-X-Google-Smtp-Source: ABdhPJzDj36dBl6WBIiuP3BcHPvTa78jUeH0WUzBTEtJOo9HpYygchFIkVHIQaTDv/W/KpZx8VyLIg==
-X-Received: by 2002:a62:1857:0:b0:44a:e385:a8fe with SMTP id 84-20020a621857000000b0044ae385a8femr9168974pfy.3.1632890702597;
-        Tue, 28 Sep 2021 21:45:02 -0700 (PDT)
-Received: from [10.44.201.164] ([154.21.212.187])
-        by smtp.gmail.com with ESMTPSA id z24sm865241pgu.54.2021.09.28.21.45.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 28 Sep 2021 21:45:02 -0700 (PDT)
-To:     stephenackerman16@gmail.com
-Cc:     djwong@kernel.org, kvm@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org
-References: <2b5ca6d3-fa7b-5e2f-c353-f07dcff993c1@gmail.com>
-Subject: Re: kvm crash in 5.14.1?
-From:   Stephen <stephenackerman16@gmail.com>
-Message-ID: <16c7a433-6e58-4213-bc00-5f6196fe22f5@gmail.com>
-Date:   Tue, 28 Sep 2021 21:44:59 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+        d=gibson.dropbear.id.au; s=201602; t=1632891349;
+        bh=j4IJARptHYsiuLRuyIgK0+MiDtR8ZH5cGfenXvO/Lsg=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Y0LPZwNlpB9G8ql9vsO06tGsfCZJryQyGg4+Zmb1Yx7WNTJOiQE1Z8PftrqquvEgQ
+         LW9YtgfsTDwLK9EZiVCTrs+WHfJSNx0DL0szmCoWAzMkJHQD7KD/wb6aumdFnYVpGm
+         /zU6Wq0un3M734iu/5xOfPFqD4IipRXxNcGQO+5s=
+Date:   Wed, 29 Sep 2021 14:55:41 +1000
+From:   David Gibson <david@gibson.dropbear.id.au>
+To:     Liu Yi L <yi.l.liu@intel.com>
+Cc:     alex.williamson@redhat.com, jgg@nvidia.com, hch@lst.de,
+        jasowang@redhat.com, joro@8bytes.org, jean-philippe@linaro.org,
+        kevin.tian@intel.com, parav@mellanox.com, lkml@metux.net,
+        pbonzini@redhat.com, lushenming@huawei.com, eric.auger@redhat.com,
+        corbet@lwn.net, ashok.raj@intel.com, yi.l.liu@linux.intel.com,
+        jun.j.tian@intel.com, hao.wu@intel.com, dave.jiang@intel.com,
+        jacob.jun.pan@linux.intel.com, kwankhede@nvidia.com,
+        robin.murphy@arm.com, kvm@vger.kernel.org,
+        iommu@lists.linux-foundation.org, dwmw2@infradead.org,
+        linux-kernel@vger.kernel.org, baolu.lu@linux.intel.com,
+        nicolinc@nvidia.com
+Subject: Re: [RFC 06/20] iommu: Add iommu_device_init[exit]_user_dma
+ interfaces
+Message-ID: <YVPxzad5TYHAc1H/@yekko>
+References: <20210919063848.1476776-1-yi.l.liu@intel.com>
+ <20210919063848.1476776-7-yi.l.liu@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <2b5ca6d3-fa7b-5e2f-c353-f07dcff993c1@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="LmpUe83dM2DcdbUy"
+Content-Disposition: inline
+In-Reply-To: <20210919063848.1476776-7-yi.l.liu@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello,
 
-I got this crash again on 5.14.7 in the early morning of the 27th.
-Things hung up shortly after I'd gone to bed. Uptime was 1 day 9 hours 9
-minutes.
+--LmpUe83dM2DcdbUy
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I've rolled back to 5.13.19 for now; since this bug seems to effect my
-system every day to few days. Please let me know if there's any
-additional useful information I can provide.
+On Sun, Sep 19, 2021 at 02:38:34PM +0800, Liu Yi L wrote:
+> From: Lu Baolu <baolu.lu@linux.intel.com>
+>=20
+> This extends iommu core to manage security context for passthrough
+> devices. Please bear a long explanation for how we reach this design
+> instead of managing it solely in iommufd like what vfio does today.
+>=20
+> Devices which cannot be isolated from each other are organized into an
+> iommu group. When a device is assigned to the user space, the entire
+> group must be put in a security context so that user-initiated DMAs via
+> the assigned device cannot harm the rest of the system. No user access
+> should be granted on a device before the security context is established
+> for the group which the device belongs to.
+>=20
+> Managing the security context must meet below criteria:
+>=20
+> 1)  The group is viable for user-initiated DMAs. This implies that the
+>     devices in the group must be either bound to a device-passthrough
+>     framework, or driver-less, or bound to a driver which is known safe
+>     (not do DMA).
+>=20
+> 2)  The security context should only allow DMA to the user's memory and
+>     devices in this group;
+>=20
+> 3)  After the security context is established for the group, the group
+>     viability must be continuously monitored before the user relinquishes
+>     all devices belonging to the group. The viability might be broken e.g.
+>     when a driver-less device is later bound to a driver which does DMA.
+>=20
+> 4)  The security context should not be destroyed before user access
+>     permission is withdrawn.
+>=20
+> Existing vfio introduces explicit container/group semantics in its uAPI
+> to meet above requirements. A single security context (iommu domain)
+> is created per container. Attaching group to container moves the entire
+> group into the associated security context, and vice versa. The user can
+> open the device only after group attach. A group can be detached only
+> after all devices in the group are closed. Group viability is monitored
+> by listening to iommu group events.
+>=20
+> Unlike vfio, iommufd adopts a device-centric design with all group
+> logistics hidden behind the fd. Binding a device to iommufd serves
+> as the contract to get security context established (and vice versa
+> for unbinding). One additional requirement in iommufd is to manage the
+> switch between multiple security contexts due to decoupled bind/attach:
+>=20
+> 1)  Open a device in "/dev/vfio/devices" with user access blocked;
 
-The VMs that I'm running include a Gitlab server + runner, Matrix
-Synapse server, and a Minecraft server.
+Probably worth clarifying that (1) must happen for *all* devices in
+the group before (2) happens for any device in the group.
 
-The Minecraft server seems to keep 1 core maxed out fairly regularly;
-otherwise they all have fairly low CPU load. The Minecraft server keeps
-memory usage maxed out; the other two VMs seem to use ~50-75% of RAM as
-reported by the Virtual Machine Manager UI and maybe a few % of CPU time
-at any given point.
+> 2)  Bind the device to an iommufd with an initial security context
+>     (an empty iommu domain which blocks dma) established for its
+>     group, with user access unblocked;
+>=20
+> 3)  Attach the device to a user-specified ioasid (shared by all devices
+>     attached to this ioasid). Before attaching, the device should be first
+>     detached from the initial context;
 
+So, this step can implicitly but observably change the behaviour for
+other devices in the group as well.  I don't love that kind of
+difficult to predict side effect, which is why I'm *still* not totally
+convinced by the device-centric model.
 
---------------------
+> 4)  Detach the device from the ioasid and switch it back to the initial
+>     security context;
 
-BUG: kernel NULL pointer dereference, address: 0000000000000068
-#PF: supervisor read access in kernel mode
-#PF: error_code(0x0000) - not-present page
-PGD 0 P4D 0
-Oops: 0000 [#1] SMP NOPTI
-CPU: 21 PID: 8494 Comm: CPU 7/KVM Tainted: G            E     5.14.7 #32
-Hardware name: Gigabyte Technology Co., Ltd. X570 AORUS ELITE WIFI/X570
-AORUS ELITE WIFI, BIOS F35 07/08/2021
-RIP: 0010:internal_get_user_pages_fast+0x738/0xda0
-Code: 84 24 a0 00 00 00 65 48 2b 04 25 28 00 00 00 0f 85 54 06 00 00 48
-81 c4 a8 00 00 00 44 89 e0 5b 5d 41 5c 41 5d 41 5e 41 5f c3 <48> 81 78
-68 a0 a3 >
-RSP: 0018:ffffb31845c43b40 EFLAGS: 00010046
-RAX: 0000000000000000 RBX: ffffe8499635d580 RCX: ffffe8499635d5b4
-RDX: 0000000000000000 RSI: 0000000000000001 RDI: ffffe8499635d580
-RBP: 00007f230d9c2000 R08: 0000000000000000 R09: ffffe8499635d580
-R10: 0000000000000000 R11: 000000000000000c R12: ffff8f54d1bbbe00
-R13: 000000ffffffffff R14: 0000000000080005 R15: 800000058d756867
-FS:  00007f22795fa640(0000) GS:ffff8f617ef40000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000068 CR3: 000000022a4a0000 CR4: 0000000000350ee0
-Call Trace:
- get_user_pages_fast_only+0x13/0x20
- __direct_pte_prefetch+0x12d/0x240 [kvm]
- ? mmu_set_spte+0x335/0x4d0 [kvm]
- ? kvm_mmu_max_mapping_level+0xf0/0x100 [kvm]
- direct_page_fault+0x850/0xab0 [kvm]
- ? kvm_mtrr_check_gfn_range_consistency+0x61/0x120 [kvm]
- kvm_check_async_pf_completion+0x9a/0x110 [kvm]
- kvm_arch_vcpu_ioctl_run+0x1667/0x16a0 [kvm]
- kvm_vcpu_ioctl+0x267/0x650 [kvm]
- __x64_sys_ioctl+0x83/0xb0
- do_syscall_64+0x3b/0xc0
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x7f238d1be957
-Code: 3c 1c 48 f7 d8 4c 39 e0 77 b9 e8 24 ff ff ff 85 c0 78 be 4c 89 e0
-5b 5d 41 5c c3 0f 1f 84 00 00 00 00 00 b8 10 00 00 00 0f 05 <48> 3d 01
-f0 ff ff >
-RSP: 002b:00007f22795f9528 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 000000000000ae80 RCX: 00007f238d1be957
-RDX: 0000000000000000 RSI: 000000000000ae80 RDI: 000000000000001c
-RBP: 000055e40b2f9870 R08: 000055e40aa305b8 R09: 000000000000002c
-R10: 0000000000000001 R11: 0000000000000246 R12: 0000000000000000
-R13: 000055e40ae7b020 R14: 0000000000000000 R15: 0000000000000000
-Modules linked in: md4(E) nls_utf8(E) cifs(E) dns_resolver(E) fscache(E)
-netfs(E) libdes(E) ufs(E) qnx4(E) hfsplus(E) hfs(E) minix(E) msdos(E)
-jfs(E) xf>
- binfmt_misc(E) intel_rapl_msr(E) intel_rapl_common(E) btusb(E) btrtl(E)
-edac_mce_amd(E) btbcm(E) btintel(E) kvm_amd(E) uvcvideo(E) bluetooth(E)
-videobu>
- sunrpc(E) efivarfs(E) ip_tables(E) x_tables(E) autofs4(E) ext4(E)
-crc16(E) mbcache(E) jbd2(E) btrfs(E) blake2b_generic(E) zstd_compress(E)
-raid10(E) ra>
-CR2: 0000000000000068
----[ end trace ce417e1d9ee841db ]---
-RIP: 0010:internal_get_user_pages_fast+0x738/0xda0
-Code: 84 24 a0 00 00 00 65 48 2b 04 25 28 00 00 00 0f 85 54 06 00 00 48
-81 c4 a8 00 00 00 44 89 e0 5b 5d 41 5c 41 5d 41 5e 41 5f c3 <48> 81 78
-68 a0 a3 >
-RSP: 0018:ffffb31845c43b40 EFLAGS: 00010046
-RAX: 0000000000000000 RBX: ffffe8499635d580 RCX: ffffe8499635d5b4
-RDX: 0000000000000000 RSI: 0000000000000001 RDI: ffffe8499635d580
-RBP: 00007f230d9c2000 R08: 0000000000000000 R09: ffffe8499635d580
-R10: 0000000000000000 R11: 000000000000000c R12: ffff8f54d1bbbe00
-R13: 000000ffffffffff R14: 0000000000080005 R15: 800000058d756867
-FS:  00007f22795fa640(0000) GS:ffff8f617ef40000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000068 CR3: 000000022a4a0000 CR4: 0000000000350ee0
-rcu: INFO: rcu_sched self-detected stall on CPU
-rcu:         9-....: (5233 ticks this GP) idle=5d2/1/0x4000000000000000
-softirq=8121851/8121851 fqs=2619
-        (t=5250 jiffies g=17211713 q=5567)
-Sending NMI from CPU 9 to CPUs 7:
-NMI backtrace for cpu 7
-CPU: 7 PID: 8492 Comm: CPU 5/KVM Tainted: G      D     E     5.14.7 #32
-Hardware name: Gigabyte Technology Co., Ltd. X570 AORUS ELITE WIFI/X570
-AORUS ELITE WIFI, BIOS F35 07/08/2021
-RIP: 0010:native_queued_spin_lock_slowpath+0x19c/0x1d0
-Code: c1 ee 12 83 e0 03 83 ee 01 48 c1 e0 05 48 63 f6 48 05 00 d7 02 00
-48 03 04 f5 80 2a 19 b6 48 89 10 8b 42 08 85 c0 75 09 f3 90 <8b> 42 08
-85 c0 74 >
-RSP: 0018:ffffb31845be3cb0 EFLAGS: 00000246
-RAX: 0000000000000000 RBX: ffffb31847e45000 RCX: 0000000000200000
-RDX: ffff8f617ebed700 RSI: 000000000000000c RDI: ffffb31847e45004
-RBP: ffffb31847e45004 R08: 0000000000200000 R09: ffffb31845be3d0c
-R10: 8000000000000000 R11: 000000000000000c R12: 0000000000000000
-R13: 0000000111bd11c0 R14: 0000000000000000 R15: ffff8f55d0e60000
-FS:  00007f227a5fc640(0000) GS:ffff8f617ebc0000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f87754dd9a8 CR3: 000000022a4a0000 CR4: 0000000000350ee0
-Call Trace:
- queued_write_lock_slowpath+0x73/0x80
- direct_page_fault+0x639/0xab0 [kvm]
- ? kvm_mtrr_check_gfn_range_consistency+0x61/0x120 [kvm]
- kvm_check_async_pf_completion+0x9a/0x110 [kvm]
- kvm_arch_vcpu_ioctl_run+0x1667/0x16a0 [kvm]
- kvm_vcpu_ioctl+0x267/0x650 [kvm]
- __x64_sys_ioctl+0x83/0xb0
- do_syscall_64+0x3b/0xc0
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x7f238d1be957
-Code: 3c 1c 48 f7 d8 4c 39 e0 77 b9 e8 24 ff ff ff 85 c0 78 be 4c 89 e0
-5b 5d 41 5c c3 0f 1f 84 00 00 00 00 00 b8 10 00 00 00 0f 05 <48> 3d 01
-f0 ff ff >
-RSP: 002b:00007f227a5fb528 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 000000000000ae80 RCX: 00007f238d1be957
-RDX: 0000000000000000 RSI: 000000000000ae80 RDI: 000000000000001a
-RBP: 000055e40b2de890 R08: 000055e40aa305b8 R09: c000000000000000
-R10: 0000000000000001 R11: 0000000000000246 R12: 0000000000000000
-R13: 000055e40ae7b020 R14: 0000000000000001 R15: 0000000000000000
-NMI backtrace for cpu 9
-CPU: 9 PID: 8493 Comm: CPU 6/KVM Tainted: G      D     E     5.14.7 #32
-Hardware name: Gigabyte Technology Co., Ltd. X570 AORUS ELITE WIFI/X570
-AORUS ELITE WIFI, BIOS F35 07/08/2021
-Call Trace:
- <IRQ>
- dump_stack_lvl+0x46/0x5a
- nmi_cpu_backtrace.cold+0x32/0x69
- ? lapic_can_unplug_cpu+0x80/0x80
- nmi_trigger_cpumask_backtrace+0xd7/0xe0
- rcu_dump_cpu_stacks+0xc1/0xef
- rcu_sched_clock_irq.cold+0xc7/0x1e9
- update_process_times+0x8c/0xc0
- tick_sched_handle+0x22/0x60
- tick_sched_timer+0x7a/0xd0
- ? tick_do_update_jiffies64.part.0+0xa0/0xa0
- __hrtimer_run_queues+0x12a/0x270
- hrtimer_interrupt+0x110/0x2c0
- __sysvec_apic_timer_interrupt+0x5c/0xd0
- sysvec_apic_timer_interrupt+0x6d/0x90
- </IRQ>
- asm_sysvec_apic_timer_interrupt+0x12/0x20
-RIP: 0010:queued_write_lock_slowpath+0x56/0x80
-Code: 0d 48 89 ef c6 07 00 0f 1f 40 00 5b 5d c3 f0 81 0b 00 01 00 00 ba
-ff 00 00 00 b9 00 01 00 00 8b 03 3d 00 01 00 00 74 0b f3 90 <8b> 03 3d
-00 01 00 >
-RSP: 0018:ffffb31845c1bc28 EFLAGS: 00000206
-RAX: 00000000000001ff RBX: ffffb31847e45000 RCX: 0000000000000100
-RDX: 00000000000000ff RSI: 0000000000000000 RDI: ffffb31847e45000
-RBP: ffffb31847e45004 R08: 0000000000000007 R09: ffffb31845c1bc7c
-R10: 8000000000000000 R11: 000fffffffe00000 R12: 0000000000000000
-R13: 0000000111bc0010 R14: 0000000000000000 R15: ffff8f55d0e62290
- direct_page_fault+0x639/0xab0 [kvm]
-<snip>
+Same non-local side effect at this step, of course.
 
-Thanks,
-    Stephen
+Btw, explicitly naming the "no DMA" context is probably a good idea,
+rather than referring to the "initial security context" (it's
+"initial" from the PoV of the iommufd, but not from the PoV of the
+device fd which was likely bound to the default kernel context before
+(2)).
 
+> 5)  Unbind the device from the iommufd, back to access blocked state and
+>     move its group out of the initial security context if it's the last
+>     unbound device in the group;
+
+Maybe worth clarifying that again (5) must happen for all devices in
+the group before rebiding any devices to regular kernel drivers.
+>=20
+> (multiple attach/detach could happen between 2 and 5).
+>=20
+> However existing iommu core has problem with above transition. Detach
+> in step 3/4 makes the device/group re-attached to the default domain
+> automatically, which opens the door for user-initiated DMAs to attack
+> the rest of the system. The existing vfio doesn't have this problem as
+> it combines 2/3 in one step (so does 4/5).
+>=20
+> Fixing this problem requires the iommu core to also participate in the
+> security context management. Following this direction we also move group
+> viability check into the iommu core, which allows iommufd to stay fully
+> device-centric w/o keeping any group knowledge (combining with the
+> extension to iommu_at[de]tach_device() in a latter patch).
+>=20
+> Basically two new interfaces are provided:
+>=20
+>         int iommu_device_init_user_dma(struct device *dev,
+>                         unsigned long owner);
+>         void iommu_device_exit_user_dma(struct device *dev);
+>=20
+> iommufd calls them respectively when handling device binding/unbinding
+> requests.
+>=20
+> The init_user_dma() for the 1st device in a group marks the entire group
+> for user-dma and establishes the initial security context (dma blocked)
+> according to aforementioned criteria. As long as the group is marked for
+> user-dma, auto-reattaching to default domain is disabled. Instead, upon
+> detaching the group is moved back to the initial security context.
+>=20
+> The caller also provides an owner id to mark the ownership so inadvertent
+> attempt from another caller on the same device can be captured. In this
+> RFC iommufd will use the fd context pointer as the owner id.
+>=20
+> The exit_user_dma() for the last device in the group clears the user-dma
+> mark and moves the group back to the default domain.
+>=20
+> Signed-off-by: Kevin Tian <kevin.tian@intel.com>
+> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
+> ---
+>  drivers/iommu/iommu.c | 145 +++++++++++++++++++++++++++++++++++++++++-
+>  include/linux/iommu.h |  12 ++++
+>  2 files changed, 154 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+> index 5ea3a007fd7c..bffd84e978fb 100644
+> --- a/drivers/iommu/iommu.c
+> +++ b/drivers/iommu/iommu.c
+> @@ -45,6 +45,8 @@ struct iommu_group {
+>  	struct iommu_domain *default_domain;
+>  	struct iommu_domain *domain;
+>  	struct list_head entry;
+> +	unsigned long user_dma_owner_id;
+
+Using an opaque integer doesn't seem like a good idea.  I think you
+probably want a pointer to a suitable struct dma_owner or the like
+(you could have one embedded in each iommufd struct, plus a global
+static kernel_default_owner).
+
+> +	refcount_t owner_cnt;
+>  };
+> =20
+>  struct group_device {
+> @@ -86,6 +88,7 @@ static int iommu_create_device_direct_mappings(struct i=
+ommu_group *group,
+>  static struct iommu_group *iommu_group_get_for_dev(struct device *dev);
+>  static ssize_t iommu_group_store_type(struct iommu_group *group,
+>  				      const char *buf, size_t count);
+> +static bool iommu_group_user_dma_viable(struct iommu_group *group);
+> =20
+>  #define IOMMU_GROUP_ATTR(_name, _mode, _show, _store)		\
+>  struct iommu_group_attribute iommu_group_attr_##_name =3D		\
+> @@ -275,7 +278,11 @@ int iommu_probe_device(struct device *dev)
+>  	 */
+>  	iommu_alloc_default_domain(group, dev);
+> =20
+> -	if (group->default_domain) {
+> +	/*
+> +	 * If any device in the group has been initialized for user dma,
+> +	 * avoid attaching the default domain.
+> +	 */
+> +	if (group->default_domain && !group->user_dma_owner_id) {
+>  		ret =3D __iommu_attach_device(group->default_domain, dev);
+>  		if (ret) {
+>  			iommu_group_put(group);
+> @@ -1664,6 +1671,17 @@ static int iommu_bus_notifier(struct notifier_bloc=
+k *nb,
+>  		group_action =3D IOMMU_GROUP_NOTIFY_BIND_DRIVER;
+>  		break;
+>  	case BUS_NOTIFY_BOUND_DRIVER:
+> +		/*
+> +		 * FIXME: Alternatively the attached drivers could generically
+> +		 * indicate to the iommu layer that they are safe for keeping
+> +		 * the iommu group user viable by calling some function around
+> +		 * probe(). We could eliminate this gross BUG_ON() by denying
+> +		 * probe to non-iommu-safe driver.
+> +		 */
+> +		mutex_lock(&group->mutex);
+> +		if (group->user_dma_owner_id)
+> +			BUG_ON(!iommu_group_user_dma_viable(group));
+> +		mutex_unlock(&group->mutex);
+>  		group_action =3D IOMMU_GROUP_NOTIFY_BOUND_DRIVER;
+>  		break;
+>  	case BUS_NOTIFY_UNBIND_DRIVER:
+> @@ -2304,7 +2322,11 @@ static int __iommu_attach_group(struct iommu_domai=
+n *domain,
+>  {
+>  	int ret;
+> =20
+> -	if (group->default_domain && group->domain !=3D group->default_domain)
+> +	/*
+> +	 * group->domain could be NULL when a domain is detached from the
+> +	 * group but the default_domain is not re-attached.
+> +	 */
+> +	if (group->domain && group->domain !=3D group->default_domain)
+>  		return -EBUSY;
+> =20
+>  	ret =3D __iommu_group_for_each_dev(group, domain,
+> @@ -2341,7 +2363,11 @@ static void __iommu_detach_group(struct iommu_doma=
+in *domain,
+>  {
+>  	int ret;
+> =20
+> -	if (!group->default_domain) {
+> +	/*
+> +	 * If any device in the group has been initialized for user dma,
+> +	 * avoid re-attaching the default domain.
+> +	 */
+> +	if (!group->default_domain || group->user_dma_owner_id) {
+>  		__iommu_group_for_each_dev(group, domain,
+>  					   iommu_group_do_detach_device);
+>  		group->domain =3D NULL;
+> @@ -3276,3 +3302,116 @@ int iommu_device_get_info(struct device *dev, enu=
+m iommu_devattr attr, void *dat
+>  	return ops->device_info(dev, attr, data);
+>  }
+>  EXPORT_SYMBOL_GPL(iommu_device_get_info);
+> +
+> +/*
+> + * IOMMU core interfaces for iommufd.
+> + */
+> +
+> +/*
+> + * FIXME: We currently simply follow vifo policy to mantain the group's
+> + * viability to user. Eventually, we should avoid below hard-coded list
+> + * by letting drivers indicate to the iommu layer that they are safe for
+> + * keeping the iommu group's user aviability.
+> + */
+> +static const char * const iommu_driver_allowed[] =3D {
+> +	"vfio-pci",
+> +	"pci-stub"
+> +};
+> +
+> +/*
+> + * An iommu group is viable for use by userspace if all devices are in
+> + * one of the following states:
+> + *  - driver-less
+> + *  - bound to an allowed driver
+> + *  - a PCI interconnect device
+> + */
+> +static int device_user_dma_viable(struct device *dev, void *data)
+
+I think this wants a "less friendly" more obviously local name.
+Really the only safe way to call this is via
+iommu_group_user_dma_viable(), which isn't obvious from this name.
+
+> +{
+> +	struct device_driver *drv =3D READ_ONCE(dev->driver);
+> +
+> +	if (!drv)
+> +		return 0;
+> +
+> +	if (dev_is_pci(dev)) {
+> +		struct pci_dev *pdev =3D to_pci_dev(dev);
+> +
+> +		if (pdev->hdr_type !=3D PCI_HEADER_TYPE_NORMAL)
+> +			return 0;
+> +	}
+> +
+> +	return match_string(iommu_driver_allowed,
+> +			    ARRAY_SIZE(iommu_driver_allowed),
+> +			    drv->name) < 0;
+> +}
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--LmpUe83dM2DcdbUy
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAmFT8cgACgkQbDjKyiDZ
+s5LDshAAueFk7I7J9EQynn1R/ejHdu7L+tBXBss/9oKVXmWsxGISBfaRvRufwDfb
+HOTWvRLaACMqCl3m1wmx9yC2D3iULgMUtpHdr3IuQBAt5EYO9KnG+IPM4TrHtq4P
+8CXUeF8cXHd4v0TWjrTCPMixBFHEgda2/TFa0WFMM5kTYqiVaHOPmlAZG6zfMtKK
+/TmUzqHkQZgs2+XGW7nlKbgWqQ/ecSfv8GywlSOWsSl8sSp5DVqXEkAWdD92b0yM
+wtXTJigVmCGkM+AXAnwHY+K9upDiKqU4qSE4rRS/1gvB1Mum3L1TQOxSbJ9ROkCj
+u6Wnv4sZe10n4/zmmPtJrLinKFnvOdvHPjHOnPdz/5UlR12oo1NukIQ/6SCBWnoE
+jgyzjN5C53l9PUiqgRg7etLoY0LOdlNqPRgA5LbYewDRioK0qiUF8e6GYqN/cnO1
+v6kdUcnRj+kICfqZA0ngvZWHyL4uL6kVfcQsZtqNZTu6lAA4qpcyvqQ/ZiGAhM8Q
+4fBtG6mOJTvfsHsP+XJNOsh4/6uKXLP4XJZVFIZ84SFQbpPnu3tydGuS29ZuLwkP
+fETNAjRG9x3QtedeYKVus6a2MZney34LjGyCD2wT5b+sfrcNTmeq2bs20kJAZ9DJ
+xurKzUUsz6hL70Bc7cfqcBpvzf1OMvPC8z/G2m5f2pwI5oD2KzU=
+=w3D3
+-----END PGP SIGNATURE-----
+
+--LmpUe83dM2DcdbUy--
