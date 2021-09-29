@@ -2,48 +2,48 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5904641BE3E
-	for <lists+kvm@lfdr.de>; Wed, 29 Sep 2021 06:29:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C1AE541BE3F
+	for <lists+kvm@lfdr.de>; Wed, 29 Sep 2021 06:30:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244090AbhI2Ebg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Sep 2021 00:31:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47754 "EHLO
+        id S244109AbhI2Ebi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Sep 2021 00:31:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47782 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243992AbhI2EbW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Sep 2021 00:31:22 -0400
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C47CFC061749
-        for <kvm@vger.kernel.org>; Tue, 28 Sep 2021 21:29:41 -0700 (PDT)
-Received: by mail-pl1-x62d.google.com with SMTP id y1so628174plk.10
-        for <kvm@vger.kernel.org>; Tue, 28 Sep 2021 21:29:41 -0700 (PDT)
+        with ESMTP id S243938AbhI2Eba (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Sep 2021 00:31:30 -0400
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E17BC061755
+        for <kvm@vger.kernel.org>; Tue, 28 Sep 2021 21:29:46 -0700 (PDT)
+Received: by mail-pj1-x1035.google.com with SMTP id ce20-20020a17090aff1400b0019f13f6a749so3030444pjb.4
+        for <kvm@vger.kernel.org>; Tue, 28 Sep 2021 21:29:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=Hv8jaPDpXo2lckUcZI4SGXI7WI1VKOIRItczgPJrrdM=;
-        b=FJ98v0iBVwAGgeYEO+zp5zVziLN+K2Y798In5ZKFK2IpK6jU0gfIxGGvq844h6b5z/
-         NTITVLamltvwViaR5m2RCo0HWjDVpgbYFJ/o6yM+l9dkEqeUkozur9EzIRR6aVsABAZm
-         kYl/TDBS7ih7n3o1GdmJcLck4FGP++aLVNiPw=
+        bh=OcDKPT+o8pM718i3RLMaqx3xW7Im6h5PXbupy2CRXlk=;
+        b=AlxJKNLVCtbK//MPu0SwfjNSQbHwwFNaK/3A0HUgxYAYkHcIT+rlmMLLt2qZrpyAyp
+         C5t1oA+CT6G5meEEeMzD5kZ8i4MvQTTRPGyO+QzHMZUkoUC3ZJlQo5YNYhLT1Gzx9doh
+         asWRl+ES1erLKQgBHQzTmUb6DExqco2ElcumI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=Hv8jaPDpXo2lckUcZI4SGXI7WI1VKOIRItczgPJrrdM=;
-        b=Vs0gC1RFVOEkAEWe9yY3yEfh4RRYN3HxWoY65fs+Kcd4yBy4Uf2xolt8Jp36CFTLyA
-         wYOs0j5N8cCygOnG1wiMU47BGUnOU5FoPDH7Vg3RJxUib75SJqBlEvs0YDKv6Eso0Fd8
-         9OSc/AuVStJzYJNXgz62VhFqkqx4K3V+6XyjK9ah5TWCsDKLEZWWAkydam9ANfiDA2uL
-         3ds60zcQi5Qa4pHRzPWeIRvyiuTwdlXRAjZYsesYubjmLlK6dNC1UAXY4m76bdD5Gf7F
-         fKHASpLo1XAySmY28QDNRMQtmA727LT4LZAsnrALggGJiAwxyHsmio4prQCM0dEHLP2g
-         7yuA==
-X-Gm-Message-State: AOAM532++mUqszEhyZjBodZ108QdwNYAFxKG/YFNzEa5CUzCZO07yOp2
-        hbrQHg2rRgviRDMKhaMcr+bc0Q==
-X-Google-Smtp-Source: ABdhPJwEkMqbbAu/1cu2nZEBZSb2/vV8Oo5ni2OXhrCUgdedZyhnhVtWf3t2lQrd1OeIKadK/ahPdQ==
-X-Received: by 2002:a17:90a:514b:: with SMTP id k11mr3866407pjm.103.1632889781346;
-        Tue, 28 Sep 2021 21:29:41 -0700 (PDT)
+        bh=OcDKPT+o8pM718i3RLMaqx3xW7Im6h5PXbupy2CRXlk=;
+        b=Bi+I7WxKB2b58ThwYJm3iZMA0ytR3nuJByk6Q4rePRuEc8s49E+1P1JhC1Sxv0Fh3W
+         JEhxmvFNjq36+8gIA3ObaWB1bmQhWQjkY6n17ML3nr/ZHsSepP977GH6f6Y5eQEw6ewj
+         f1Lq3ihD/+vF/umgZSQHZ6hq+fS2dS9iQTuL7/TUr4FSXGC0UADMi5Cw4OWnGcn0cmMW
+         jl5K41BBBmXsYMm021Cf77oXoFlwoD+kfjQ9zSm0GJ5KiR+XErVkTgMwnQHXcl+11eq9
+         h0xePJBr1SphyDc7wc4pxnh/nuyX3jAa/WHrOsCxhoqZLrvfCkI8xbH+Gesk3T4RivSy
+         w2SQ==
+X-Gm-Message-State: AOAM530qoQ5fQpefA8A/Bc1RKiIRFuPadXD0998teSlPkabWymqEZMWU
+        chbhS0yt9mpvbZ9fsoS11+HPZg==
+X-Google-Smtp-Source: ABdhPJzx/fGyiGUmfwWIVEkifAtKjOaGFTb3lns1h2o/LCiNDuEd1upLa4vG7ByFxiynE/6fn+dXhQ==
+X-Received: by 2002:a17:90a:f196:: with SMTP id bv22mr4057172pjb.212.1632889785769;
+        Tue, 28 Sep 2021 21:29:45 -0700 (PDT)
 Received: from localhost ([2401:fa00:8f:203:f818:368:93ef:fa36])
-        by smtp.gmail.com with UTF8SMTPSA id gk14sm269627pjb.35.2021.09.28.21.29.38
+        by smtp.gmail.com with UTF8SMTPSA id p17sm268006pjg.54.2021.09.28.21.29.42
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 28 Sep 2021 21:29:41 -0700 (PDT)
+        Tue, 28 Sep 2021 21:29:45 -0700 (PDT)
 From:   David Stevens <stevensd@chromium.org>
 X-Google-Original-From: David Stevens <stevensd@google.com>
 To:     Marc Zyngier <maz@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>
@@ -58,9 +58,9 @@ Cc:     James Morse <james.morse@arm.com>,
         linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         David Stevens <stevensd@chromium.org>
-Subject: [PATCH v4 2/4] KVM: x86/mmu: use gfn_to_pfn_page
-Date:   Wed, 29 Sep 2021 13:29:06 +0900
-Message-Id: <20210929042908.1313874-3-stevensd@google.com>
+Subject: [PATCH v4 3/4] KVM: arm64/mmu: use gfn_to_pfn_page
+Date:   Wed, 29 Sep 2021 13:29:07 +0900
+Message-Id: <20210929042908.1313874-4-stevensd@google.com>
 X-Mailer: git-send-email 2.33.0.685.g46640cef36-goog
 In-Reply-To: <20210929042908.1313874-1-stevensd@google.com>
 References: <20210929042908.1313874-1-stevensd@google.com>
@@ -77,324 +77,96 @@ gfn_to_pfn_page functions.
 
 Signed-off-by: David Stevens <stevensd@chromium.org>
 ---
- arch/x86/kvm/mmu/mmu.c          | 43 ++++++++++++++++++++-------------
- arch/x86/kvm/mmu/mmu_internal.h |  3 ++-
- arch/x86/kvm/mmu/paging_tmpl.h  | 23 +++++++++++-------
- arch/x86/kvm/mmu/tdp_mmu.c      |  6 ++---
- arch/x86/kvm/mmu/tdp_mmu.h      |  4 +--
- arch/x86/kvm/x86.c              |  6 +++--
- 6 files changed, 51 insertions(+), 34 deletions(-)
+ arch/arm64/kvm/mmu.c | 27 +++++++++++++++++----------
+ 1 file changed, 17 insertions(+), 10 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 2d7e61122af8..5a1adcc9cfbc 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -2783,8 +2783,9 @@ static int mmu_set_spte(struct kvm_vcpu *vcpu, u64 *sptep,
- 	return ret;
- }
- 
--static kvm_pfn_t pte_prefetch_gfn_to_pfn(struct kvm_vcpu *vcpu, gfn_t gfn,
--				     bool no_dirty_log)
-+static kvm_pfn_t pte_prefetch_gfn_to_pfn_page(struct kvm_vcpu *vcpu,
-+					      gfn_t gfn, bool no_dirty_log,
-+					      struct page **page)
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 1a94a7ca48f2..dc03cc66858e 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -829,7 +829,7 @@ static bool fault_supports_stage2_huge_mapping(struct kvm_memory_slot *memslot,
+ static unsigned long
+ transparent_hugepage_adjust(struct kvm *kvm, struct kvm_memory_slot *memslot,
+ 			    unsigned long hva, kvm_pfn_t *pfnp,
+-			    phys_addr_t *ipap)
++			    struct page **page, phys_addr_t *ipap)
  {
- 	struct kvm_memory_slot *slot;
- 
-@@ -2792,7 +2793,7 @@ static kvm_pfn_t pte_prefetch_gfn_to_pfn(struct kvm_vcpu *vcpu, gfn_t gfn,
- 	if (!slot)
- 		return KVM_PFN_ERR_FAULT;
- 
--	return gfn_to_pfn_memslot_atomic(slot, gfn);
-+	return gfn_to_pfn_page_memslot_atomic(slot, gfn, page);
- }
- 
- static int direct_pte_prefetch_many(struct kvm_vcpu *vcpu,
-@@ -2923,7 +2924,8 @@ int kvm_mmu_max_mapping_level(struct kvm *kvm,
- 
- int kvm_mmu_hugepage_adjust(struct kvm_vcpu *vcpu, gfn_t gfn,
- 			    int max_level, kvm_pfn_t *pfnp,
--			    bool huge_page_disallowed, int *req_level)
-+			    struct page *page, bool huge_page_disallowed,
-+			    int *req_level)
- {
- 	struct kvm_memory_slot *slot;
  	kvm_pfn_t pfn = *pfnp;
-@@ -2935,6 +2937,9 @@ int kvm_mmu_hugepage_adjust(struct kvm_vcpu *vcpu, gfn_t gfn,
- 	if (unlikely(max_level == PG_LEVEL_4K))
- 		return PG_LEVEL_4K;
  
-+	if (!page)
-+		return PG_LEVEL_4K;
-+
- 	if (is_error_noslot_pfn(pfn) || kvm_is_reserved_pfn(pfn))
- 		return PG_LEVEL_4K;
+@@ -838,7 +838,8 @@ transparent_hugepage_adjust(struct kvm *kvm, struct kvm_memory_slot *memslot,
+ 	 * sure that the HVA and IPA are sufficiently aligned and that the
+ 	 * block map is contained within the memslot.
+ 	 */
+-	if (fault_supports_stage2_huge_mapping(memslot, hva, PMD_SIZE) &&
++	if (*page &&
++	    fault_supports_stage2_huge_mapping(memslot, hva, PMD_SIZE) &&
+ 	    get_user_mapping_size(kvm, hva) >= PMD_SIZE) {
+ 		/*
+ 		 * The address we faulted on is backed by a transparent huge
+@@ -859,10 +860,11 @@ transparent_hugepage_adjust(struct kvm *kvm, struct kvm_memory_slot *memslot,
+ 		 * page accordingly.
+ 		 */
+ 		*ipap &= PMD_MASK;
+-		kvm_release_pfn_clean(pfn);
++		put_page(*page);
+ 		pfn &= ~(PTRS_PER_PMD - 1);
+-		get_page(pfn_to_page(pfn));
+ 		*pfnp = pfn;
++		*page = pfn_to_page(pfn);
++		get_page(*page);
  
-@@ -2984,7 +2989,8 @@ void disallowed_hugepage_adjust(u64 spte, gfn_t gfn, int cur_level,
- }
- 
- static int __direct_map(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
--			int map_writable, int max_level, kvm_pfn_t pfn,
-+			int map_writable, int max_level,
-+			kvm_pfn_t pfn, struct page *page,
- 			bool prefault, bool is_tdp)
- {
- 	bool nx_huge_page_workaround_enabled = is_nx_huge_page_enabled();
-@@ -2997,7 +3003,7 @@ static int __direct_map(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
- 	gfn_t gfn = gpa >> PAGE_SHIFT;
- 	gfn_t base_gfn = gfn;
- 
--	level = kvm_mmu_hugepage_adjust(vcpu, gfn, max_level, &pfn,
-+	level = kvm_mmu_hugepage_adjust(vcpu, gfn, max_level, &pfn, page,
- 					huge_page_disallowed, &req_level);
- 
- 	trace_kvm_mmu_spte_requested(gpa, level, pfn);
-@@ -3901,8 +3907,9 @@ static bool kvm_arch_setup_async_pf(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
- }
- 
- static bool kvm_faultin_pfn(struct kvm_vcpu *vcpu, bool prefault, gfn_t gfn,
--			 gpa_t cr2_or_gpa, kvm_pfn_t *pfn, hva_t *hva,
--			 bool write, bool *writable, int *r)
-+			 gpa_t cr2_or_gpa, kvm_pfn_t *pfn,
-+			 hva_t *hva, bool write, bool *writable,
-+			 struct page **page, int *r)
- {
- 	struct kvm_memory_slot *slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
- 	bool async;
-@@ -3936,8 +3943,8 @@ static bool kvm_faultin_pfn(struct kvm_vcpu *vcpu, bool prefault, gfn_t gfn,
+ 		return PMD_SIZE;
  	}
- 
- 	async = false;
--	*pfn = __gfn_to_pfn_memslot(slot, gfn, false, &async,
--				    write, writable, hva);
-+	*pfn = __gfn_to_pfn_page_memslot(slot, gfn, false, &async,
-+					 write, writable, hva, page);
- 	if (!async)
- 		return false; /* *pfn has correct page already */
- 
-@@ -3951,8 +3958,8 @@ static bool kvm_faultin_pfn(struct kvm_vcpu *vcpu, bool prefault, gfn_t gfn,
- 			goto out_retry;
- 	}
- 
--	*pfn = __gfn_to_pfn_memslot(slot, gfn, false, NULL,
--				    write, writable, hva);
-+	*pfn = __gfn_to_pfn_page_memslot(slot, gfn, false, NULL,
-+					 write, writable, hva, page);
- 
- out_retry:
- 	*r = RET_PF_RETRY;
-@@ -3969,6 +3976,7 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
- 	gfn_t gfn = gpa >> PAGE_SHIFT;
- 	unsigned long mmu_seq;
- 	kvm_pfn_t pfn;
-+	struct page *page;
- 	hva_t hva;
- 	int r;
- 
-@@ -3987,7 +3995,7 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
- 	smp_rmb();
- 
- 	if (kvm_faultin_pfn(vcpu, prefault, gfn, gpa, &pfn, &hva,
--			 write, &map_writable, &r))
-+			 write, &map_writable, &page, &r))
- 		return r;
- 
- 	if (handle_abnormal_pfn(vcpu, is_tdp ? 0 : gpa, gfn, pfn, ACC_ALL, &r))
-@@ -4008,17 +4016,18 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
- 
- 	if (is_tdp_mmu_fault)
- 		r = kvm_tdp_mmu_map(vcpu, gpa, error_code, map_writable, max_level,
--				    pfn, prefault);
-+				    pfn, page, prefault);
- 	else
--		r = __direct_map(vcpu, gpa, error_code, map_writable, max_level, pfn,
--				 prefault, is_tdp);
-+		r = __direct_map(vcpu, gpa, error_code, map_writable, max_level,
-+				 pfn, page, prefault, is_tdp);
- 
- out_unlock:
- 	if (is_tdp_mmu_fault)
- 		read_unlock(&vcpu->kvm->mmu_lock);
- 	else
- 		write_unlock(&vcpu->kvm->mmu_lock);
--	kvm_release_pfn_clean(pfn);
-+	if (page)
-+		put_page(page);
- 	return r;
- }
- 
-diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-index bf2bdbf333c2..08762a2d8d31 100644
---- a/arch/x86/kvm/mmu/mmu_internal.h
-+++ b/arch/x86/kvm/mmu/mmu_internal.h
-@@ -165,7 +165,8 @@ int kvm_mmu_max_mapping_level(struct kvm *kvm,
- 			      kvm_pfn_t pfn, int max_level);
- int kvm_mmu_hugepage_adjust(struct kvm_vcpu *vcpu, gfn_t gfn,
- 			    int max_level, kvm_pfn_t *pfnp,
--			    bool huge_page_disallowed, int *req_level);
-+			    struct page *page, bool huge_page_disallowed,
-+			    int *req_level);
- void disallowed_hugepage_adjust(u64 spte, gfn_t gfn, int cur_level,
- 				kvm_pfn_t *pfnp, int *goal_levelp);
- 
-diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index 7d03e9b7ccfa..4a61b96fcdef 100644
---- a/arch/x86/kvm/mmu/paging_tmpl.h
-+++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -564,6 +564,7 @@ FNAME(prefetch_gpte)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
- 	unsigned pte_access;
+@@ -955,6 +957,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	short vma_shift;
  	gfn_t gfn;
  	kvm_pfn_t pfn;
 +	struct page *page;
- 
- 	if (FNAME(prefetch_invalid_gpte)(vcpu, sp, spte, gpte))
- 		return false;
-@@ -573,8 +574,8 @@ FNAME(prefetch_gpte)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
- 	gfn = gpte_to_gfn(gpte);
- 	pte_access = sp->role.access & FNAME(gpte_access)(gpte);
- 	FNAME(protect_clean_gpte)(vcpu->arch.mmu, &pte_access, gpte);
--	pfn = pte_prefetch_gfn_to_pfn(vcpu, gfn,
--			no_dirty_log && (pte_access & ACC_WRITE_MASK));
-+	pfn = pte_prefetch_gfn_to_pfn_page(vcpu, gfn,
-+			no_dirty_log && (pte_access & ACC_WRITE_MASK), &page);
- 	if (is_error_pfn(pfn))
- 		return false;
- 
-@@ -585,7 +586,8 @@ FNAME(prefetch_gpte)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
- 	mmu_set_spte(vcpu, spte, pte_access, false, PG_LEVEL_4K, gfn, pfn,
- 		     true, true);
- 
--	kvm_release_pfn_clean(pfn);
-+	if (page)
-+		put_page(page);
- 	return true;
- }
- 
-@@ -665,8 +667,8 @@ static void FNAME(pte_prefetch)(struct kvm_vcpu *vcpu, struct guest_walker *gw,
-  */
- static int FNAME(fetch)(struct kvm_vcpu *vcpu, gpa_t addr,
- 			 struct guest_walker *gw, u32 error_code,
--			 int max_level, kvm_pfn_t pfn, bool map_writable,
--			 bool prefault)
-+			 int max_level, kvm_pfn_t pfn, struct page *page,
-+			 bool map_writable, bool prefault)
- {
- 	bool nx_huge_page_workaround_enabled = is_nx_huge_page_enabled();
- 	bool write_fault = error_code & PFERR_WRITE_MASK;
-@@ -723,7 +725,8 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, gpa_t addr,
- 	}
- 
- 	level = kvm_mmu_hugepage_adjust(vcpu, gw->gfn, max_level, &pfn,
--					huge_page_disallowed, &req_level);
-+					page, huge_page_disallowed,
-+					&req_level);
- 
- 	trace_kvm_mmu_spte_requested(addr, gw->level, pfn);
- 
-@@ -830,6 +833,7 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, gpa_t addr, u32 error_code,
- 	struct guest_walker walker;
- 	int r;
- 	kvm_pfn_t pfn;
-+	struct page *page;
- 	hva_t hva;
- 	unsigned long mmu_seq;
- 	bool map_writable, is_self_change_mapping;
-@@ -882,7 +886,7 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, gpa_t addr, u32 error_code,
+ 	bool logging_active = memslot_is_logging(memslot);
+ 	unsigned long fault_level = kvm_vcpu_trap_get_fault_level(vcpu);
+ 	unsigned long vma_pagesize, fault_granule;
+@@ -1056,8 +1059,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	 */
  	smp_rmb();
  
- 	if (kvm_faultin_pfn(vcpu, prefault, walker.gfn, addr, &pfn, &hva,
--			 write_fault, &map_writable, &r))
-+			 write_fault, &map_writable, &page, &r))
- 		return r;
+-	pfn = __gfn_to_pfn_memslot(memslot, gfn, false, NULL,
+-				   write_fault, &writable, NULL);
++	pfn = __gfn_to_pfn_page_memslot(memslot, gfn, false, NULL,
++					write_fault, &writable, NULL, &page);
+ 	if (pfn == KVM_PFN_ERR_HWPOISON) {
+ 		kvm_send_hwpoison_signal(hva, vma_shift);
+ 		return 0;
+@@ -1102,7 +1105,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 			vma_pagesize = fault_granule;
+ 		else
+ 			vma_pagesize = transparent_hugepage_adjust(kvm, memslot,
+-								   hva, &pfn,
++								   hva,
++								   &pfn, &page,
+ 								   &fault_ipa);
+ 	}
  
- 	if (handle_abnormal_pfn(vcpu, addr, walker.gfn, pfn, walker.pte_access, &r))
-@@ -916,13 +920,14 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, gpa_t addr, u32 error_code,
- 	r = make_mmu_pages_available(vcpu);
- 	if (r)
- 		goto out_unlock;
--	r = FNAME(fetch)(vcpu, addr, &walker, error_code, max_level, pfn,
-+	r = FNAME(fetch)(vcpu, addr, &walker, error_code, max_level, pfn, page,
- 			 map_writable, prefault);
- 	kvm_mmu_audit(vcpu, AUDIT_POST_PAGE_FAULT);
+@@ -1142,14 +1146,17 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 
+ 	/* Mark the page dirty only if the fault is handled successfully */
+ 	if (writable && !ret) {
+-		kvm_set_pfn_dirty(pfn);
++		if (page)
++			kvm_set_pfn_dirty(pfn);
+ 		mark_page_dirty_in_slot(kvm, memslot, gfn);
+ 	}
  
  out_unlock:
- 	write_unlock(&vcpu->kvm->mmu_lock);
+ 	spin_unlock(&kvm->mmu_lock);
+-	kvm_set_pfn_accessed(pfn);
 -	kvm_release_pfn_clean(pfn);
-+	if (page)
++	if (page) {
++		kvm_set_pfn_accessed(pfn);
 +		put_page(page);
- 	return r;
++	}
+ 	return ret != -EAGAIN ? ret : 0;
  }
  
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 64ccfc1fa553..dec735081c5e 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -987,8 +987,8 @@ static int tdp_mmu_map_handle_target_level(struct kvm_vcpu *vcpu, int write,
-  * page tables and SPTEs to translate the faulting guest physical address.
-  */
- int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
--		    int map_writable, int max_level, kvm_pfn_t pfn,
--		    bool prefault)
-+		    int map_writable, int max_level,
-+		    kvm_pfn_t pfn, struct page *page, bool prefault)
- {
- 	bool nx_huge_page_workaround_enabled = is_nx_huge_page_enabled();
- 	bool write = error_code & PFERR_WRITE_MASK;
-@@ -1004,7 +1004,7 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
- 	int level;
- 	int req_level;
- 
--	level = kvm_mmu_hugepage_adjust(vcpu, gfn, max_level, &pfn,
-+	level = kvm_mmu_hugepage_adjust(vcpu, gfn, max_level, &pfn, page,
- 					huge_page_disallowed, &req_level);
- 
- 	trace_kvm_mmu_spte_requested(gpa, level, pfn);
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
-index 358f447d4012..75526618601a 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.h
-+++ b/arch/x86/kvm/mmu/tdp_mmu.h
-@@ -49,8 +49,8 @@ void kvm_tdp_mmu_invalidate_all_roots(struct kvm *kvm);
- void kvm_tdp_mmu_zap_invalidated_roots(struct kvm *kvm);
- 
- int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
--		    int map_writable, int max_level, kvm_pfn_t pfn,
--		    bool prefault);
-+		    int map_writable, int max_level,
-+		    kvm_pfn_t pfn, struct page *page, bool prefault);
- 
- bool kvm_tdp_mmu_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range,
- 				 bool flush);
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 28ef14155726..6e9b9af9c687 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -7527,6 +7527,7 @@ static bool reexecute_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
- {
- 	gpa_t gpa = cr2_or_gpa;
- 	kvm_pfn_t pfn;
-+	struct page *page;
- 
- 	if (!(emulation_type & EMULTYPE_ALLOW_RETRY_PF))
- 		return false;
-@@ -7556,7 +7557,7 @@ static bool reexecute_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
- 	 * retry instruction -> write #PF -> emulation fail -> retry
- 	 * instruction -> ...
- 	 */
--	pfn = gfn_to_pfn(vcpu->kvm, gpa_to_gfn(gpa));
-+	pfn = gfn_to_pfn_page(vcpu->kvm, gpa_to_gfn(gpa), &page);
- 
- 	/*
- 	 * If the instruction failed on the error pfn, it can not be fixed,
-@@ -7565,7 +7566,8 @@ static bool reexecute_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
- 	if (is_error_noslot_pfn(pfn))
- 		return false;
- 
--	kvm_release_pfn_clean(pfn);
-+	if (page)
-+		put_page(page);
- 
- 	/* The instructions are well-emulated on direct mmu. */
- 	if (vcpu->arch.mmu->direct_map) {
 -- 
 2.33.0.685.g46640cef36-goog
 
