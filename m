@@ -2,118 +2,168 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 88A5841CF7E
-	for <lists+kvm@lfdr.de>; Thu, 30 Sep 2021 00:51:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 17B9D41CFD6
+	for <lists+kvm@lfdr.de>; Thu, 30 Sep 2021 01:21:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347241AbhI2WxK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Sep 2021 18:53:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46854 "EHLO
+        id S1347518AbhI2XWy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Sep 2021 19:22:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53654 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346417AbhI2WxJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Sep 2021 18:53:09 -0400
-Received: from mail-oi1-x232.google.com (mail-oi1-x232.google.com [IPv6:2607:f8b0:4864:20::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 210BDC061767
-        for <kvm@vger.kernel.org>; Wed, 29 Sep 2021 15:51:28 -0700 (PDT)
-Received: by mail-oi1-x232.google.com with SMTP id a3so4895824oid.6
-        for <kvm@vger.kernel.org>; Wed, 29 Sep 2021 15:51:28 -0700 (PDT)
+        with ESMTP id S1347503AbhI2XWx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Sep 2021 19:22:53 -0400
+Received: from mail-qv1-xf29.google.com (mail-qv1-xf29.google.com [IPv6:2607:f8b0:4864:20::f29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 684D9C06176A
+        for <kvm@vger.kernel.org>; Wed, 29 Sep 2021 16:21:11 -0700 (PDT)
+Received: by mail-qv1-xf29.google.com with SMTP id 11so2480971qvd.11
+        for <kvm@vger.kernel.org>; Wed, 29 Sep 2021 16:21:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=WU8/s6nJZiqD5ikoIrIIIMlSsQFbRRodZMrkDYnksts=;
-        b=hncdGne2BieVpABEtTAeJVqRRcRcM5dL1EKjajKjDPYP7c7AXe4zyINvFForPlku5s
-         MUs4BAfjombbizNyRC3Fg4vM2G1eOm6RB56RW+K8+3JM0cgWSMpBkwhpxl3TW+Rte4XT
-         vxCbpbgELHVVKfiDjCe6Z30AWbvCi4JKxjSXjuTjPzSIHmbE8LkCNHwrc1sdwcrwO8bz
-         AHZopxOYKz8vI4+dqtp9NB0zciG0m2s3yiQ7FussPTQigfB9QXhZbdipe57Apcg+NEp2
-         Vwq1vja1ihLb+9RrCeVSkmOE2MNVSj+lb/+qkZGsWXIRDtNBnq6r+nN0Fcc2vBd/iwHp
-         qfOQ==
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=vURlTPvciLNHVwm+qpgsVwGxUhwNfUJPxfecQWzYJYA=;
+        b=Zj4wWBdj3VdNHSQijjwB6d/B3Z0yaCN8DLkQcxtzl1osWudJFB0cEUVGPKm3xAsaSO
+         HAOWJFSL0bavVQUI0mkFRIWZCyMFsO+STG0IJHU/nSxslRhlvXPgAxlcy+Ci6caw+Z6d
+         qgJ9x+zAprvCKR0pseEjjuHFnYOORSg847Q4TTGYP+yH+tG3MwHf/9b7whw+grtiqA1M
+         znK7SI7VWx2TjKhDixK8WX2KKNeL4YOkI2oMVStoZVnsQm2iJzHjHx8UMmMVmhJTS/Ka
+         QqWnrgWcNOccgipN9UllCHzX852wNHqdchB2nxleAJaYT7DDZN85NjS6IiTjaZw5impT
+         tdBw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=WU8/s6nJZiqD5ikoIrIIIMlSsQFbRRodZMrkDYnksts=;
-        b=M+4HqwOu9dp6k0NtmXpLenaBAyjZmSgZLw/82/BClQMCcnRm5gsn+1cE2SM1q20tSG
-         uQF7j4p8yVE81vMU0ssyhhRflmsXbO8cTdf45Y6lymPs+T9cmoTjVxTesgCGzirl0zEw
-         /01erYh28MAU2kkyxhPn3Axk+HtYfnpUakstb5I9+w36VnkY5Z4yB5xbzKQIzVearpTV
-         H77VQyVxwBW5EI8/oKS/UfzpT8JSGs9EA86r9ToO41vI5EBkg5HuEntLXmb46isengQE
-         289IBbdzcWUXMFZzLLbQvpHj0QW64ZRH7UDKd6hZSuZrMwdyOXAsECblYQQJ6DqCw1eX
-         B+GA==
-X-Gm-Message-State: AOAM533iqg/yVNfKTUbWLdcjIDrv3+P+CUeXHqQOcuD3oaPtEwm60zR1
-        vnXohhYlZrz/kt2uJJJSoSWofSU9FMMzM6MB3Y30mx1uM9Nc4Q==
-X-Google-Smtp-Source: ABdhPJxljSFAAfihTbRWBIHykA6XCaBVvncALTdtJO0lg7XDHGlWcEph7S3ncu9oyZVxNnbiqqzefo0HJiL7sI5kyHQ=
-X-Received: by 2002:a05:6808:1494:: with SMTP id e20mr109086oiw.28.1632955887226;
- Wed, 29 Sep 2021 15:51:27 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=vURlTPvciLNHVwm+qpgsVwGxUhwNfUJPxfecQWzYJYA=;
+        b=OE6FSBjtNXTrFRgsAMEVXKWyfi3DxmxAlT2Fb3nfOGBw8D9xnm+zlnmi178q5EpaR1
+         jSlOa+Cj9pEHD0s287nKylMNtxLPg4b9TT2XKSxin0Dlgr98MziQUUsq4X5E73x0KIax
+         FZYNNNYCgGTtcvAykxYYhWohbgUAciMEebBGIsBL60cKNDRukRox+sLtNhsEomWrHP/E
+         PrPwj38sF02o7p5PPuCVXLbDmmq6j0O7sUfNj2Sj9ojVxMIavdQuaYtmLaynkSgK7wUg
+         JBoDdOmXoqsxCLEc83C67vga8Hc0/zgE9SiSIztgysjzYOCiPmupKVzR/aHrdEFlWP5q
+         PbQA==
+X-Gm-Message-State: AOAM533vMi8oTcpblGlXoMefoJy2imdHAIU7+8CxZPlNIS9XaloJX8Op
+        +p8Z08lm9E2eBXtGRfp5IHQSjg==
+X-Google-Smtp-Source: ABdhPJwA55qGt9RWeuL6e34LCWU3u3YFVjjxfHPaXpdwUVW8hGe1+xdfhpM0nZTosoDMpP4WenkAkw==
+X-Received: by 2002:a0c:c2c4:: with SMTP id c4mr2519771qvi.30.1632957670497;
+        Wed, 29 Sep 2021 16:21:10 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-162-113-129.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.129])
+        by smtp.gmail.com with ESMTPSA id i11sm469774qki.28.2021.09.29.16.21.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Sep 2021 16:21:10 -0700 (PDT)
+Received: from jgg by mlx with local (Exim 4.94)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1mVisv-007ihB-2W; Wed, 29 Sep 2021 20:21:09 -0300
+Date:   Wed, 29 Sep 2021 20:21:09 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Max Gurtovoy <mgurtovoy@nvidia.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Doug Ledford <dledford@redhat.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Kirti Wankhede <kwankhede@nvidia.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+        Saeed Mahameed <saeedm@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>
+Subject: Re: [PATCH mlx5-next 2/7] vfio: Add an API to check migration state
+ transition validity
+Message-ID: <20210929232109.GC3544071@ziepe.ca>
+References: <20210927231239.GE3544071@ziepe.ca>
+ <25c97be6-eb4a-fdc8-3ac1-5628073f0214@nvidia.com>
+ <20210929063551.47590fbb.alex.williamson@redhat.com>
+ <1eba059c-4743-4675-9f72-1a26b8f3c0f6@nvidia.com>
+ <20210929075019.48d07deb.alex.williamson@redhat.com>
+ <d2e94241-a146-c57d-cf81-8b7d8d00e62d@nvidia.com>
+ <20210929091712.6390141c.alex.williamson@redhat.com>
+ <e1ba006f-f181-0b89-822d-890396e81c7b@nvidia.com>
+ <20210929161433.GA1808627@ziepe.ca>
+ <29835bf4-d094-ae6d-1a32-08e65847b52c@nvidia.com>
 MIME-Version: 1.0
-References: <20210929222426.1855730-1-seanjc@google.com> <20210929222426.1855730-2-seanjc@google.com>
-In-Reply-To: <20210929222426.1855730-2-seanjc@google.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Wed, 29 Sep 2021 15:51:16 -0700
-Message-ID: <CALMp9eS4S1d-8nSdJDG8E1unemVB06=cb3_OWSaVivPJmk63PQ@mail.gmail.com>
-Subject: Re: [PATCH 1/2] KVM: x86: Swap order of CPUID entry "index" vs.
- "significant flag" checks
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        syzbot+f3985126b746b3d59c9d@syzkaller.appspotmail.com,
-        Alexander Potapenko <glider@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <29835bf4-d094-ae6d-1a32-08e65847b52c@nvidia.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 29, 2021 at 3:24 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> Check whether a CPUID entry's index is significant before checking for a
-> matching index to hack-a-fix an undefined behavior bug due to consuming
-> uninitialized data.  RESET/INIT emulation uses kvm_cpuid() to retrieve
-> CPUID.0x1, which does _not_ have a significant index, and fails to
-> initialize the dummy variable that doubles as EBX/ECX/EDX output _and_
-> ECX, a.k.a. index, input.
->
-> Practically speaking, it's _extremely_  unlikely any compiler will yield
-> code that causes problems, as the compiler would need to inline the
-> kvm_cpuid() call to detect the uninitialized data, and intentionally hose
-> the kernel, e.g. insert ud2, instead of simply ignoring the result of
-> the index comparison.
->
-> Although the sketchy "dummy" pattern was introduced in SVM by commit
-> 66f7b72e1171 ("KVM: x86: Make register state after reset conform to
-> specification"), it wasn't actually broken until commit 7ff6c0350315
-> ("KVM: x86: Remove stateful CPUID handling") arbitrarily swapped the
-> order of operations such that "index" was checked before the significant
-> flag.
->
-> Avoid consuming uninitialized data by reverting to checking the flag
-> before the index purely so that the fix can be easily backported; the
-> offending RESET/INIT code has been refactored, moved, and consolidated
-> from vendor code to common x86 since the bug was introduced.  A future
-> patch will directly address the bad RESET/INIT behavior.
->
-> The undefined behavior was detected by syzbot + KernelMemorySanitizer.
->
->   BUG: KMSAN: uninit-value in cpuid_entry2_find arch/x86/kvm/cpuid.c:68
->   BUG: KMSAN: uninit-value in kvm_find_cpuid_entry arch/x86/kvm/cpuid.c:1103
->   BUG: KMSAN: uninit-value in kvm_cpuid+0x456/0x28f0 arch/x86/kvm/cpuid.c:1183
->    cpuid_entry2_find arch/x86/kvm/cpuid.c:68 [inline]
->    kvm_find_cpuid_entry arch/x86/kvm/cpuid.c:1103 [inline]
->    kvm_cpuid+0x456/0x28f0 arch/x86/kvm/cpuid.c:1183
->    kvm_vcpu_reset+0x13fb/0x1c20 arch/x86/kvm/x86.c:10885
->    kvm_apic_accept_events+0x58f/0x8c0 arch/x86/kvm/lapic.c:2923
->    vcpu_enter_guest+0xfd2/0x6d80 arch/x86/kvm/x86.c:9534
->    vcpu_run+0x7f5/0x18d0 arch/x86/kvm/x86.c:9788
->    kvm_arch_vcpu_ioctl_run+0x245b/0x2d10 arch/x86/kvm/x86.c:10020
->
->   Local variable ----dummy@kvm_vcpu_reset created at:
->    kvm_vcpu_reset+0x1fb/0x1c20 arch/x86/kvm/x86.c:10812
->    kvm_apic_accept_events+0x58f/0x8c0 arch/x86/kvm/lapic.c:2923
->
-> Reported-by: syzbot+f3985126b746b3d59c9d@syzkaller.appspotmail.com
-> Reported-by: Alexander Potapenko <glider@google.com>
-> Fixes: 2a24be79b6b7 ("KVM: VMX: Set EDX at INIT with CPUID.0x1, Family-Model-Stepping")
-> Fixes: 7ff6c0350315 ("KVM: x86: Remove stateful CPUID handling")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-Reviewed-by: Jim Mattson <jmattson@google.com>
+On Thu, Sep 30, 2021 at 12:48:55AM +0300, Max Gurtovoy wrote:
+> 
+> On 9/29/2021 7:14 PM, Jason Gunthorpe wrote:
+> > On Wed, Sep 29, 2021 at 06:28:44PM +0300, Max Gurtovoy wrote:
+> > 
+> > > > So you have a device that's actively modifying its internal state,
+> > > > performing I/O, including DMA (thereby dirtying VM memory), all while
+> > > > in the _STOP state?  And you don't see this as a problem?
+> > > I don't see how is it different from vfio-pci situation.
+> > vfio-pci provides no way to observe the migration state. It isn't
+> > "000b"
+> 
+> Alex said that there is a problem of compatibility.
+
+Yes, when a vfio_device first opens it must be running - ie able to do
+DMA and otherwise operational.
+
+When we add the migration extension this cannot change, so after
+open_device() the device should be operational.
+
+The reported state in the migration region should accurately reflect
+what the device is currently doing. If the device is operational then
+it must report running, not stopped.
+
+Thus a driver cannot just zero initalize the migration "registers",
+they have to be accurate.
+
+> > > Maybe we need to rename STOP state. We can call it READY or LIVE or
+> > > NON_MIGRATION_STATE.
+> > It was a poor choice to use 000b as stop, but it doesn't really
+> > matter. The mlx5 driver should just pre-init this readable to running.
+> 
+> I guess we can do it for this reason. There is no functional problem nor
+> compatibility issue here as was mentioned.
+> 
+> But still we need the kernel to track transitions. We don't want to allow
+> moving from RESUMING to SAVING state for example. How this transition can be
+> allowed ?
+
+It seems semantically fine to me, as per Alex's note what will happen
+is defined:
+
+driver will see RESUMING toggle off so it will trigger a
+de-serialization
+
+driver will see SAVING toggled on so it will serialize the new state
+(either the pre-copy state or the post-copy state dpending on the
+running bit)
+
+Depending on the running bit the device may or may not be woken up.
+
+If de-serialization fails then the state goes to error and SAVING is
+ignored.
+
+The driver logic probably looks something like this:
+
+// Running toggles off
+if (oldstate & RUNNING != newstate & RUNNING && oldstate & RUNNING)
+    queice
+    freeze
+
+// Resuming toggles off
+if (oldstate & RESUMING != newstate & RESUMING && oldstate & RESUMING)
+   deserialize
+
+// Saving toggles on
+if (oldstate & SAVING != newstate & SAVING && newstate & SAVING)
+   if (!(newstate & RUNNING))
+     serialize post copy
+
+// Running toggles on
+if (oldstate & RUNNING != newstate & RUNNING && newstate & RUNNING)
+   unfreeze
+   unqueice
+
+I'd have to check that carefully against the state chart from my last
+email though..
+
+And need to check how the "Stop Active Transactions" bit fits in there
+
+Jason
