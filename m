@@ -2,99 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 084FC41C337
-	for <lists+kvm@lfdr.de>; Wed, 29 Sep 2021 13:15:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 232E541C35B
+	for <lists+kvm@lfdr.de>; Wed, 29 Sep 2021 13:21:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245661AbhI2LQl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Sep 2021 07:16:41 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:36211 "EHLO
+        id S230339AbhI2LWZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Sep 2021 07:22:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:25125 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S245644AbhI2LQk (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 29 Sep 2021 07:16:40 -0400
+        by vger.kernel.org with ESMTP id S245694AbhI2LWR (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 29 Sep 2021 07:22:17 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632914099;
+        s=mimecast20190719; t=1632914436;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=2UrR9+JDqwWAsQd7w1tOuz2e1wwJuSgcE9XEn53di/k=;
-        b=GBe/Dibw0RIr6rU/DlVnH0F2dtnVJykjOntR4TY/aHI7wHR111OhA51MO3A72WIy+AmTeS
-        daunoAmW/3ZAiNkVM6GQ9z7W2gAlVerOc6qRwVneWy3Bs1BHTFUlRMZt9iUYEqzEVac3xn
-        mkla82Cs6yKW7GEQobZiM0eD9OHOF6Q=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-130-ydM_KAymNkqaPDTp5wWPWQ-1; Wed, 29 Sep 2021 07:14:58 -0400
-X-MC-Unique: ydM_KAymNkqaPDTp5wWPWQ-1
-Received: by mail-ed1-f72.google.com with SMTP id 1-20020a508741000000b003da559ba1eeso2030749edv.13
-        for <kvm@vger.kernel.org>; Wed, 29 Sep 2021 04:14:58 -0700 (PDT)
+        bh=QT1rFRDBhzmSS+/lGbt19+2aAndXLLtwvTkh1G4vaX8=;
+        b=Cswm0QeTk1WyNE2MH8WI8CGhXf65dnA/VfUHKIf2ze+V5LPhmLiXdgR2ruGoAq5US1Kddo
+        qJPXiNc9wzcWTXGBrkl9wce/0sk4BPwxN10ZqX+5sGEUqc39tJ49lULzqjRKqot4v3ilTP
+        OOI+GYCqUQKmmVUsJ8hfRC19DKBvUGI=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-226-z05M6g0aP_6zw1T8pqkdZA-1; Wed, 29 Sep 2021 07:20:34 -0400
+X-MC-Unique: z05M6g0aP_6zw1T8pqkdZA-1
+Received: by mail-ed1-f70.google.com with SMTP id e21-20020a50a695000000b003daa0f84db2so1986452edc.23
+        for <kvm@vger.kernel.org>; Wed, 29 Sep 2021 04:20:34 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=2UrR9+JDqwWAsQd7w1tOuz2e1wwJuSgcE9XEn53di/k=;
-        b=3VUn2a8ovY+fdDSMDZWe98+WqAZ0i8E9P1c2nbANmAwoGx8KzeZQoKn3qlejUK5TMO
-         SGQ6GuxXet9gwO+BVt3y6eX4amEF/5b7h4sNQuOb7PLCOvVawe9NNCtuYN6UZtB8TK7l
-         k9R5w1ab5G6/6w5LoMDg84DzFWWQbECEzu7j0sqhXDYl/euT8a2GQwgdp91wSELfc93B
-         OFfmpiydRk05TmO+7TYLm7/WJVOcAj4XI5DqRQDvcb1bZwqwRnsGYb2MNgI5qtHlK5YZ
-         zdrsunNYBavDuVVQTnzpg8jvn1MBeaHcoQcsFGBOZIiI5N94YkvNlYfysSsQy44yJMB2
-         voyA==
-X-Gm-Message-State: AOAM531uRGeufb4Sr3714SmuQ6SFOk8shg++prFIdp/LwmTAXWPHL81o
-        fvGiuoUPndIbfbBGlY17XTxb4IRX6t4RyeH9OY7coaO+1vVB8OjbS96TzcHzVsGMS3gOFogvFRn
-        aNxMT+mriFR92
-X-Received: by 2002:a17:906:1198:: with SMTP id n24mr12815329eja.283.1632914096707;
-        Wed, 29 Sep 2021 04:14:56 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJynOCOkbL8ct1lIbFw71fO2P4GWkiUfjndIh7vD+uTq+8+C90XT21b1UbIRdt9nin8epHd/CA==
-X-Received: by 2002:a17:906:1198:: with SMTP id n24mr12815311eja.283.1632914096544;
-        Wed, 29 Sep 2021 04:14:56 -0700 (PDT)
+        bh=QT1rFRDBhzmSS+/lGbt19+2aAndXLLtwvTkh1G4vaX8=;
+        b=KgbaBbriInmIGqfc0tCF5diKk2Tyye74jHXuhUV+Ffy3L/dKb4b/8NUwiV9W4iFTHS
+         YL7qpilk93Po5PUUnhykZLZX7PgS7g9aJHl4HsIZkaRLN4CnPygXSneQpsyeRNbvhxQf
+         2Tt/hBSlFn/OBZ0eG47Xejy6WROfPkzAO7pWXMA603V/YEskk2bl524gDI9lCOBJHxtS
+         /nWgbWVlkUxvzh4RHaoC37YciMtffEnAcM/7UwIa9xPfsyozc3SK923nqnO130WoxiIG
+         Oe5qnD3L3LYyna52+sPH6cuVgMOeBYCxTXWHo+bp/Ufu3OFBEln4lkl+vGP2peg4qyZE
+         Vp6A==
+X-Gm-Message-State: AOAM531QBMDxytysR7sDVv5lvsEcInjcPGmWTL/Zxyx5ICeBhEwCmMsY
+        ThmreOZdc8xjWKe/qi1Q4pKXY6Vq3ACDJgIj5YT+hlgAO+PiGaTWiYpimnNiYxUAnJ1Hmw6Ntor
+        cp2c/vpU34F+7
+X-Received: by 2002:a50:d9cc:: with SMTP id x12mr14222004edj.44.1632914433624;
+        Wed, 29 Sep 2021 04:20:33 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyGsZ/Prx5O98qPZ8PyofLqYoLSSiZlZikvftKjUT4ZzCknxR+J5Y+KhHMLF54Y/OqTNkUIVA==
+X-Received: by 2002:a50:d9cc:: with SMTP id x12mr14221990edj.44.1632914433453;
+        Wed, 29 Sep 2021 04:20:33 -0700 (PDT)
 Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id d22sm1245820ejk.5.2021.09.29.04.14.55
+        by smtp.gmail.com with ESMTPSA id l16sm1352795eds.46.2021.09.29.04.20.32
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 29 Sep 2021 04:14:56 -0700 (PDT)
-Message-ID: <eb14c183-ef60-2e3b-839b-617ed39a5eea@redhat.com>
-Date:   Wed, 29 Sep 2021 13:14:55 +0200
+        Wed, 29 Sep 2021 04:20:32 -0700 (PDT)
+Message-ID: <b352c9db-6d1d-ceb9-e313-b96794f8b82f@redhat.com>
+Date:   Wed, 29 Sep 2021 13:20:31 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.1.0
-Subject: Re: [PATCH v3 31/31] KVM: MMU: make spte an in-out argument in
- make_spte
+Subject: Re: [PATCH v8 4/7] KVM: x86: Report host tsc and realtime values in
+ KVM_GET_CLOCK
 Content-Language: en-US
-To:     David Matlack <dmatlack@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        seanjc@google.com
-References: <20210924163152.289027-1-pbonzini@redhat.com>
- <20210924163152.289027-32-pbonzini@redhat.com> <YVOjSSahzJ/tf28g@google.com>
+To:     Marcelo Tosatti <mtosatti@redhat.com>,
+        Oliver Upton <oupton@google.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        Sean Christopherson <seanjc@google.com>,
+        Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-arm-kernel@lists.infradead.org,
+        Andrew Jones <drjones@redhat.com>,
+        Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>
+References: <20210916181538.968978-1-oupton@google.com>
+ <20210916181538.968978-5-oupton@google.com>
+ <20210928185343.GA97247@fuller.cnet>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <YVOjSSahzJ/tf28g@google.com>
+In-Reply-To: <20210928185343.GA97247@fuller.cnet>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 29/09/21 01:20, David Matlack wrote:
->>   bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
->>   	       struct kvm_memory_slot *slot,
->>   	       unsigned int pte_access, gfn_t gfn, kvm_pfn_t pfn,
->> -	       u64 old_spte, bool speculative, bool can_unsync,
->> -	       bool host_writable, u64 *new_spte)
->> +	       bool speculative, bool can_unsync,
->> +	       bool host_writable, u64 *sptep)
-> I'd prefer a different name since `sptep` has specific meaning
-> throughout the mmu code. (It's the address of the spte in the page
-> table.)
-> 
-> Case in point, I was going to suggest we can get rid of struct
-> kvm_mmu_page since it can be derived from the sptep and then realized
-> how wrong that was:).
-> 
-> Instead of receiving the new spte as a parameter what do you think about
-> changing make_spte to return the new spte? I think that would make the
-> code more readable (but won't reduce the number of arguments because
-> you'd have to add wrprot).
+On 28/09/21 20:53, Marcelo Tosatti wrote:
+>> +KVM_CLOCK_HOST_TSC.  If set, the `host_tsc` field in the kvm_clock_data
+>> +structure is populated with the value of the host's timestamp counter (TSC)
+>> +at the instant when KVM_GET_CLOCK was called. If clear, the `host_tsc` field
+>> +does not contain a value.
+> If the host TSCs are not stable, then KVM_CLOCK_HOST_TSC bit (and
+> host_tsc field) are ambiguous. Shouldnt exposing them be conditional on
+> stable TSC for the host ?
 > 
 
-You have a point.  I've dropped this patch for now.
+Yes, good point.
 
 Paolo
 
