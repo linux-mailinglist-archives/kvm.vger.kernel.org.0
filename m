@@ -2,296 +2,388 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6BFAD41CE94
-	for <lists+kvm@lfdr.de>; Wed, 29 Sep 2021 23:56:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C7ECD41CE9E
+	for <lists+kvm@lfdr.de>; Thu, 30 Sep 2021 00:01:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346370AbhI2V6H (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Sep 2021 17:58:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60973 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1346209AbhI2V6G (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 29 Sep 2021 17:58:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632952584;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=lLQsTdulw+5jwiqASL8F5vvvT6YsSpmb40XhW1+sUTA=;
-        b=fEMg6Yv6mhCMg7H8UEM5RUYp41ArWzaGLxNrIqaBB2LTagjY29NQJUVuC08jHwzj8Y05r1
-        sVHSiY9+L6Wti6CO6zkfi6g6H/HkqaWKPazdPjLeEGxOEXpQYcn5yDdAa7K73pXY45sv4j
-        tC5artM+AGgzj5VWP9vhviW+hrIu0hk=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-253-mwulZEQkNz6rGfpbRQEf4w-1; Wed, 29 Sep 2021 17:56:23 -0400
-X-MC-Unique: mwulZEQkNz6rGfpbRQEf4w-1
-Received: by mail-ed1-f69.google.com with SMTP id x26-20020a50f19a000000b003da81cce93bso3944821edl.19
-        for <kvm@vger.kernel.org>; Wed, 29 Sep 2021 14:56:22 -0700 (PDT)
+        id S1344190AbhI2WCo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Sep 2021 18:02:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35166 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230458AbhI2WCn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Sep 2021 18:02:43 -0400
+Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D28BC06161C
+        for <kvm@vger.kernel.org>; Wed, 29 Sep 2021 15:01:01 -0700 (PDT)
+Received: by mail-lf1-x12c.google.com with SMTP id e15so16704357lfr.10
+        for <kvm@vger.kernel.org>; Wed, 29 Sep 2021 15:01:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=rdNmIzWKakz8cj8ZaSAXUzCuWcNLQWisf1ex7FteUGQ=;
+        b=PPso02+776dwkmm8ALWWPxWmz4nRQIbW7M1z8hqb2aLiBvFDgTMd6dJuCtG2yZYkHn
+         Pv4U4mB1oqeQ1BCe8bWDQcMM9m9cXLYQX+NHaz2cEBv+8QbrI46x75oB1M96CXDBw2ke
+         T2Fkkd8TaADsVCHdhEbfwnu3i4KbeWJRNQxmhCQE+7Yks/ariqPEtAMq/fJsoOORfSFs
+         FFITahN0QMQbLYGyNuVN+qYWj1aA9WjCn7FLW23q2L0C2hTwP9EYv/pNbKkFFFntCyWm
+         NZmt+iY3rbqIArYKTHaL1qbv1TiRyfQGRQFvqJ2jvv8LZ7RR732fuk2J3Eo8SG1LCqMM
+         x3Hw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=lLQsTdulw+5jwiqASL8F5vvvT6YsSpmb40XhW1+sUTA=;
-        b=yawprNlHBDEQ/vU4ZxIOO9+NSjCqb2ajReS1hjWQHDwmzxkglVTey4Druti6RfFN23
-         4vNpy9a9U6ruQc/sM5fLpJCTrBfTMXv9ZQUGwLER6ztmsvjIEe99HOq6dcsSiFSW7oRi
-         hw5V9fDpch+k9UpPOgdwrpSNdUUdV94z4tu8ZMzmxO+dCsGsvCe8/bP9DioGgRmGIekY
-         sCPgvVVcvHr1SswGI5jUG281cx1YJvoafN1SwU2v2Hs16bAYxprttpUc0UJ0nra7ZpWl
-         FcoWIKs+/FTzL1PueSrb4Xii+kGh0ZuJ1XgXAosdpib+mllqEl5uX+V/KQgApBikuBc4
-         90ag==
-X-Gm-Message-State: AOAM530UVwu/YsKTmxUxyrRtSzZHS0Up8EgMs4E9est9fCRPNlFsg8k7
-        2uZe3DYA37uLu5bKpJs5MZPSIydo/T4TisBm/QFWzWizcHPKfnTnWX+viSM/Zkmoz6C1+Q+GYCi
-        uEqTaBA6byNr+
-X-Received: by 2002:a50:dace:: with SMTP id s14mr2770824edj.369.1632952581780;
-        Wed, 29 Sep 2021 14:56:21 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwxt02FT4s7ia2NJuh8uN4A8JtvHKcLZHBWOEaQtWmkmmO1fRHN4q3k0qbYi1t9fcinYAJ6jw==
-X-Received: by 2002:a50:dace:: with SMTP id s14mr2770801edj.369.1632952581596;
-        Wed, 29 Sep 2021 14:56:21 -0700 (PDT)
-Received: from redhat.com ([2.55.134.220])
-        by smtp.gmail.com with ESMTPSA id bq4sm570543ejb.43.2021.09.29.14.56.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Sep 2021 14:56:20 -0700 (PDT)
-Date:   Wed, 29 Sep 2021 17:56:17 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc:     qemu-devel@nongnu.org, haxm-team@intel.com,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Reinoud Zandijk <reinoud@netbsd.org>, qemu-trivial@nongnu.org,
-        Sunil Muthuswamy <sunilmut@microsoft.com>,
-        Colin Xu <colin.xu@intel.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Kamil Rytarowski <kamil@netbsd.org>,
-        Wenchao Wang <wenchao.wang@intel.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Roman Bolshakov <r.bolshakov@yadro.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Cameron Esfahani <dirty@apple.com>
-Subject: Re: [PATCH v3] target/i386: Include 'hw/i386/apic.h' locally
-Message-ID: <20210929175605-mutt-send-email-mst@kernel.org>
-References: <20210929163124.2523413-1-f4bug@amsat.org>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=rdNmIzWKakz8cj8ZaSAXUzCuWcNLQWisf1ex7FteUGQ=;
+        b=4S7KEv/jESofVW6BaYvRuZkBSm6wEZN7//dXgfmzOJjLWEdH+3C2nFYkFVBWYrWpg3
+         YOw3ktTlM2RoseFjF/DtipPzxVaFsPUGU2ngXMTs52BLIRzyEQfnfpcZu3eI3S2QSRms
+         VwqJA/L7Fdh0V2V3lY126IRNe6cdp5spStRRIvLGX3tmbIMK/kgNlCfkJo4q4smOSImB
+         p2yqulASv6kvaC4wMXXIA0GmsUM91FDSuo9tKUGvZMkpuGjkpDa5EZrKhIv3C2hBWeV3
+         Uq+UTeRoq/b68VhNy9JPqJabXK9fszX1D+1ydzZWRHzDYfEcA2OJ2OGOx/UWLH5As5xN
+         MrQw==
+X-Gm-Message-State: AOAM531xcDeE8kcKc7WlGi4WCzn8TzVE1y6JPvpkUK4gclKOWPqELrXu
+        eHwNtKnK+pL9ZJw30CnbGJhqCO/o720hPK4QdGdRaw==
+X-Google-Smtp-Source: ABdhPJwQW5OAYUmzDfM22Rl2KwZk2gL0jM5bvoqIaiIHSm1+/37jQlqWK8lQcELmfm3xuQOYXQJVXtek/PNAEPMkpZM=
+X-Received: by 2002:a05:651c:3c2:: with SMTP id f2mr2386774ljp.282.1632952859387;
+ Wed, 29 Sep 2021 15:00:59 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20210929163124.2523413-1-f4bug@amsat.org>
+References: <20210820155918.7518-1-brijesh.singh@amd.com> <20210820155918.7518-43-brijesh.singh@amd.com>
+In-Reply-To: <20210820155918.7518-43-brijesh.singh@amd.com>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Wed, 29 Sep 2021 16:00:47 -0600
+Message-ID: <CAMkAt6rZOkLofBNQqfutryGjJ6Mp4wD4EKEOo=fD1gCcT81+=g@mail.gmail.com>
+Subject: Re: [PATCH Part2 v5 42/45] KVM: SVM: Provide support for
+ SNP_GUEST_REQUEST NAE event
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>, linux-coco@lists.linux.dev,
+        linux-mm@kvack.org, linux-crypto@vger.kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        Marc Orr <marcorr@google.com>,
+        sathyanarayanan.kuppuswamy@linux.intel.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 29, 2021 at 06:31:24PM +0200, Philippe Mathieu-Daudé wrote:
-> Instead of including a sysemu-specific header in "cpu.h"
-> (which is shared with user-mode emulations), include it
-> locally when required.
-> 
-> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
-
+On Fri, Aug 20, 2021 at 10:01 AM Brijesh Singh <brijesh.singh@amd.com> wrote:
+>
+> Version 2 of GHCB specification added the support for two SNP Guest
+> Request Message NAE events. The events allows for an SEV-SNP guest to
+> make request to the SEV-SNP firmware through hypervisor using the
+> SNP_GUEST_REQUEST API define in the SEV-SNP firmware specification.
+>
+> The SNP_EXT_GUEST_REQUEST is similar to SNP_GUEST_REQUEST with the
+> difference of an additional certificate blob that can be passed through
+> the SNP_SET_CONFIG ioctl defined in the CCP driver. The CCP driver
+> provides snp_guest_ext_guest_request() that is used by the KVM to get
+> both the report and certificate data at once.
+>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 > ---
->  target/i386/cpu.h                    | 4 ----
->  hw/i386/kvmvapic.c                   | 1 +
->  hw/i386/x86.c                        | 1 +
->  target/i386/cpu-dump.c               | 1 +
->  target/i386/cpu-sysemu.c             | 1 +
->  target/i386/cpu.c                    | 1 +
->  target/i386/gdbstub.c                | 4 ++++
->  target/i386/hax/hax-all.c            | 1 +
->  target/i386/helper.c                 | 1 +
->  target/i386/hvf/hvf.c                | 1 +
->  target/i386/hvf/x86_emu.c            | 1 +
->  target/i386/nvmm/nvmm-all.c          | 1 +
->  target/i386/tcg/sysemu/misc_helper.c | 1 +
->  target/i386/tcg/sysemu/seg_helper.c  | 1 +
->  target/i386/whpx/whpx-all.c          | 1 +
->  15 files changed, 17 insertions(+), 4 deletions(-)
-> 
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index c2954c71ea0..4411718bb7a 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -2045,10 +2045,6 @@ typedef X86CPU ArchCPU;
->  #include "exec/cpu-all.h"
->  #include "svm.h"
->  
-> -#if !defined(CONFIG_USER_ONLY)
-> -#include "hw/i386/apic.h"
-> -#endif
-> -
->  static inline void cpu_get_tb_cpu_state(CPUX86State *env, target_ulong *pc,
->                                          target_ulong *cs_base, uint32_t *flags)
+>  arch/x86/kvm/svm/sev.c | 197 +++++++++++++++++++++++++++++++++++++++--
+>  arch/x86/kvm/svm/svm.h |   2 +
+>  2 files changed, 193 insertions(+), 6 deletions(-)
+>
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 712e8907bc39..81ccad412e55 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -19,6 +19,7 @@
+>  #include <linux/trace_events.h>
+>  #include <linux/sev.h>
+>  #include <linux/ksm.h>
+> +#include <linux/sev-guest.h>
+>  #include <asm/fpu/internal.h>
+>
+>  #include <asm/pkru.h>
+> @@ -338,6 +339,7 @@ static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>
+>                 init_srcu_struct(&sev->psc_srcu);
+>                 ret = sev_snp_init(&argp->error);
+> +               mutex_init(&sev->guest_req_lock);
+>         } else {
+>                 ret = sev_platform_init(&argp->error);
+>         }
+> @@ -1602,23 +1604,39 @@ static int sev_receive_finish(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>
+>  static void *snp_context_create(struct kvm *kvm, struct kvm_sev_cmd *argp)
 >  {
-> diff --git a/hw/i386/kvmvapic.c b/hw/i386/kvmvapic.c
-> index 43f8a8f679e..7333818bdd1 100644
-> --- a/hw/i386/kvmvapic.c
-> +++ b/hw/i386/kvmvapic.c
-> @@ -16,6 +16,7 @@
->  #include "sysemu/hw_accel.h"
->  #include "sysemu/kvm.h"
->  #include "sysemu/runstate.h"
-> +#include "hw/i386/apic.h"
->  #include "hw/i386/apic_internal.h"
->  #include "hw/sysbus.h"
->  #include "hw/boards.h"
-> diff --git a/hw/i386/x86.c b/hw/i386/x86.c
-> index 00448ed55aa..e0218f8791f 100644
-> --- a/hw/i386/x86.c
-> +++ b/hw/i386/x86.c
-> @@ -43,6 +43,7 @@
->  #include "target/i386/cpu.h"
->  #include "hw/i386/topology.h"
->  #include "hw/i386/fw_cfg.h"
-> +#include "hw/i386/apic.h"
->  #include "hw/intc/i8259.h"
->  #include "hw/rtc/mc146818rtc.h"
->  
-> diff --git a/target/i386/cpu-dump.c b/target/i386/cpu-dump.c
-> index 02b635a52cf..0158fd2bf28 100644
-> --- a/target/i386/cpu-dump.c
-> +++ b/target/i386/cpu-dump.c
-> @@ -22,6 +22,7 @@
->  #include "qemu/qemu-print.h"
->  #ifndef CONFIG_USER_ONLY
->  #include "hw/i386/apic_internal.h"
-> +#include "hw/i386/apic.h"
->  #endif
->  
->  /***********************************************************/
-> diff --git a/target/i386/cpu-sysemu.c b/target/i386/cpu-sysemu.c
-> index 37b7c562f53..4e8a6973d08 100644
-> --- a/target/i386/cpu-sysemu.c
-> +++ b/target/i386/cpu-sysemu.c
-> @@ -30,6 +30,7 @@
->  #include "hw/qdev-properties.h"
->  
->  #include "exec/address-spaces.h"
-> +#include "hw/i386/apic.h"
->  #include "hw/i386/apic_internal.h"
->  
->  #include "cpu-internal.h"
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 6b029f1bdf1..52422cbf21b 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -33,6 +33,7 @@
->  #include "standard-headers/asm-x86/kvm_para.h"
->  #include "hw/qdev-properties.h"
->  #include "hw/i386/topology.h"
-> +#include "hw/i386/apic.h"
->  #ifndef CONFIG_USER_ONLY
->  #include "exec/address-spaces.h"
->  #include "hw/boards.h"
-> diff --git a/target/i386/gdbstub.c b/target/i386/gdbstub.c
-> index 098a2ad15a9..5438229c1a9 100644
-> --- a/target/i386/gdbstub.c
-> +++ b/target/i386/gdbstub.c
-> @@ -21,6 +21,10 @@
->  #include "cpu.h"
->  #include "exec/gdbstub.h"
->  
-> +#ifndef CONFIG_USER_ONLY
-> +#include "hw/i386/apic.h"
-> +#endif
+> +       void *context = NULL, *certs_data = NULL, *resp_page = NULL;
+> +       struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+>         struct sev_data_snp_gctx_create data = {};
+> -       void *context;
+>         int rc;
+>
+> +       /* Allocate memory used for the certs data in SNP guest request */
+> +       certs_data = kmalloc(SEV_FW_BLOB_MAX_SIZE, GFP_KERNEL_ACCOUNT);
+> +       if (!certs_data)
+> +               return NULL;
 > +
->  #ifdef TARGET_X86_64
->  static const int gpr_map[16] = {
->      R_EAX, R_EBX, R_ECX, R_EDX, R_ESI, R_EDI, R_EBP, R_ESP,
-> diff --git a/target/i386/hax/hax-all.c b/target/i386/hax/hax-all.c
-> index bf65ed6fa92..cd89e3233a9 100644
-> --- a/target/i386/hax/hax-all.c
-> +++ b/target/i386/hax/hax-all.c
-> @@ -32,6 +32,7 @@
->  #include "sysemu/reset.h"
->  #include "sysemu/runstate.h"
->  #include "hw/boards.h"
-> +#include "hw/i386/apic.h"
->  
->  #include "hax-accel-ops.h"
->  
-> diff --git a/target/i386/helper.c b/target/i386/helper.c
-> index 533b29cb91b..874beda98ae 100644
-> --- a/target/i386/helper.c
-> +++ b/target/i386/helper.c
-> @@ -26,6 +26,7 @@
->  #ifndef CONFIG_USER_ONLY
->  #include "sysemu/hw_accel.h"
->  #include "monitor/monitor.h"
-> +#include "hw/i386/apic.h"
->  #endif
->  
->  void cpu_sync_bndcs_hflags(CPUX86State *env)
-> diff --git a/target/i386/hvf/hvf.c b/target/i386/hvf/hvf.c
-> index 4ba6e82fab3..50058a24f2a 100644
-> --- a/target/i386/hvf/hvf.c
-> +++ b/target/i386/hvf/hvf.c
-> @@ -70,6 +70,7 @@
->  #include <sys/sysctl.h>
->  
->  #include "hw/i386/apic_internal.h"
-> +#include "hw/i386/apic.h"
->  #include "qemu/main-loop.h"
->  #include "qemu/accel.h"
->  #include "target/i386/cpu.h"
-> diff --git a/target/i386/hvf/x86_emu.c b/target/i386/hvf/x86_emu.c
-> index 7c8203b21fb..fb3e88959d4 100644
-> --- a/target/i386/hvf/x86_emu.c
-> +++ b/target/i386/hvf/x86_emu.c
-> @@ -45,6 +45,7 @@
->  #include "x86_flags.h"
->  #include "vmcs.h"
->  #include "vmx.h"
-> +#include "hw/i386/apic.h"
->  
->  void hvf_handle_io(struct CPUState *cpu, uint16_t port, void *data,
->                     int direction, int size, uint32_t count);
-> diff --git a/target/i386/nvmm/nvmm-all.c b/target/i386/nvmm/nvmm-all.c
-> index a488b00e909..944bdb49663 100644
-> --- a/target/i386/nvmm/nvmm-all.c
-> +++ b/target/i386/nvmm/nvmm-all.c
-> @@ -22,6 +22,7 @@
->  #include "qemu/queue.h"
->  #include "migration/blocker.h"
->  #include "strings.h"
-> +#include "hw/i386/apic.h"
->  
->  #include "nvmm-accel-ops.h"
->  
-> diff --git a/target/i386/tcg/sysemu/misc_helper.c b/target/i386/tcg/sysemu/misc_helper.c
-> index 9ccaa054c4c..b1d3096e9c9 100644
-> --- a/target/i386/tcg/sysemu/misc_helper.c
-> +++ b/target/i386/tcg/sysemu/misc_helper.c
-> @@ -24,6 +24,7 @@
->  #include "exec/cpu_ldst.h"
->  #include "exec/address-spaces.h"
->  #include "tcg/helper-tcg.h"
-> +#include "hw/i386/apic.h"
->  
->  void helper_outb(CPUX86State *env, uint32_t port, uint32_t data)
->  {
-> diff --git a/target/i386/tcg/sysemu/seg_helper.c b/target/i386/tcg/sysemu/seg_helper.c
-> index bf3444c26b0..34f2c65d47f 100644
-> --- a/target/i386/tcg/sysemu/seg_helper.c
-> +++ b/target/i386/tcg/sysemu/seg_helper.c
-> @@ -24,6 +24,7 @@
->  #include "exec/cpu_ldst.h"
->  #include "tcg/helper-tcg.h"
->  #include "../seg_helper.h"
-> +#include "hw/i386/apic.h"
->  
->  #ifdef TARGET_X86_64
->  void helper_syscall(CPUX86State *env, int next_eip_addend)
-> diff --git a/target/i386/whpx/whpx-all.c b/target/i386/whpx/whpx-all.c
-> index 3e925b9da70..9ab844fd05d 100644
-> --- a/target/i386/whpx/whpx-all.c
-> +++ b/target/i386/whpx/whpx-all.c
-> @@ -20,6 +20,7 @@
->  #include "qemu/main-loop.h"
->  #include "hw/boards.h"
->  #include "hw/i386/ioapic.h"
-> +#include "hw/i386/apic.h"
->  #include "hw/i386/apic_internal.h"
->  #include "qemu/error-report.h"
->  #include "qapi/error.h"
-> -- 
-> 2.31.1
+>         /* Allocate memory for context page */
+>         context = snp_alloc_firmware_page(GFP_KERNEL_ACCOUNT);
+>         if (!context)
+> -               return NULL;
+> +               goto e_free;
+> +
+> +       /* Allocate a firmware buffer used during the guest command handling. */
+> +       resp_page = snp_alloc_firmware_page(GFP_KERNEL_ACCOUNT);
+> +       if (!resp_page)
+> +               goto e_free;
+>
+>         data.gctx_paddr = __psp_pa(context);
+>         rc = __sev_issue_cmd(argp->sev_fd, SEV_CMD_SNP_GCTX_CREATE, &data, &argp->error);
+> -       if (rc) {
+> -               snp_free_firmware_page(context);
+> -               return NULL;
+> -       }
+> +       if (rc)
+> +               goto e_free;
+> +
+> +       sev->snp_certs_data = certs_data;
+>
+>         return context;
+> +
+> +e_free:
+> +       snp_free_firmware_page(context);
+> +       kfree(certs_data);
+> +       return NULL;
+>  }
+>
+>  static int snp_bind_asid(struct kvm *kvm, int *error)
+> @@ -2248,6 +2266,8 @@ static int snp_decommission_context(struct kvm *kvm)
+>         snp_free_firmware_page(sev->snp_context);
+>         sev->snp_context = NULL;
+>
+> +       kfree(sev->snp_certs_data);
+> +
+>         return 0;
+>  }
+>
+> @@ -2746,6 +2766,8 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm, u64 *exit_code)
+>         case SVM_VMGEXIT_UNSUPPORTED_EVENT:
+>         case SVM_VMGEXIT_HV_FEATURES:
+>         case SVM_VMGEXIT_PSC:
+> +       case SVM_VMGEXIT_GUEST_REQUEST:
+> +       case SVM_VMGEXIT_EXT_GUEST_REQUEST:
+>                 break;
+>         default:
+>                 goto vmgexit_err;
+> @@ -3161,6 +3183,155 @@ static unsigned long snp_handle_page_state_change(struct vcpu_svm *svm)
+>         return rc ? map_to_psc_vmgexit_code(rc) : 0;
+>  }
+>
+> +static unsigned long snp_setup_guest_buf(struct vcpu_svm *svm,
+> +                                        struct sev_data_snp_guest_request *data,
+> +                                        gpa_t req_gpa, gpa_t resp_gpa)
+> +{
+> +       struct kvm_vcpu *vcpu = &svm->vcpu;
+> +       struct kvm *kvm = vcpu->kvm;
+> +       kvm_pfn_t req_pfn, resp_pfn;
+> +       struct kvm_sev_info *sev;
+> +
+> +       sev = &to_kvm_svm(kvm)->sev_info;
+> +
+> +       if (!IS_ALIGNED(req_gpa, PAGE_SIZE) || !IS_ALIGNED(resp_gpa, PAGE_SIZE))
+> +               return SEV_RET_INVALID_PARAM;
+> +
+> +       req_pfn = gfn_to_pfn(kvm, gpa_to_gfn(req_gpa));
+> +       if (is_error_noslot_pfn(req_pfn))
+> +               return SEV_RET_INVALID_ADDRESS;
+> +
+> +       resp_pfn = gfn_to_pfn(kvm, gpa_to_gfn(resp_gpa));
+> +       if (is_error_noslot_pfn(resp_pfn))
+> +               return SEV_RET_INVALID_ADDRESS;
+> +
+> +       if (rmp_make_private(resp_pfn, 0, PG_LEVEL_4K, 0, true))
+> +               return SEV_RET_INVALID_ADDRESS;
+> +
+> +       data->gctx_paddr = __psp_pa(sev->snp_context);
+> +       data->req_paddr = __sme_set(req_pfn << PAGE_SHIFT);
+> +       data->res_paddr = __sme_set(resp_pfn << PAGE_SHIFT);
+> +
+> +       return 0;
+> +}
+> +
+> +static void snp_cleanup_guest_buf(struct sev_data_snp_guest_request *data, unsigned long *rc)
+> +{
+> +       u64 pfn = __sme_clr(data->res_paddr) >> PAGE_SHIFT;
+> +       int ret;
+> +
+> +       ret = snp_page_reclaim(pfn);
+> +       if (ret)
+> +               *rc = SEV_RET_INVALID_ADDRESS;
+> +
+> +       ret = rmp_make_shared(pfn, PG_LEVEL_4K);
+> +       if (ret)
+> +               *rc = SEV_RET_INVALID_ADDRESS;
+> +}
+> +
+> +static void snp_handle_guest_request(struct vcpu_svm *svm, gpa_t req_gpa, gpa_t resp_gpa)
+> +{
+> +       struct sev_data_snp_guest_request data = {0};
+> +       struct kvm_vcpu *vcpu = &svm->vcpu;
+> +       struct kvm *kvm = vcpu->kvm;
+> +       struct kvm_sev_info *sev;
+> +       unsigned long rc;
+> +       int err;
+> +
+> +       if (!sev_snp_guest(vcpu->kvm)) {
+> +               rc = SEV_RET_INVALID_GUEST;
+> +               goto e_fail;
+> +       }
+> +
+> +       sev = &to_kvm_svm(kvm)->sev_info;
+> +
+> +       mutex_lock(&sev->guest_req_lock);
+> +
+> +       rc = snp_setup_guest_buf(svm, &data, req_gpa, resp_gpa);
+> +       if (rc)
+> +               goto unlock;
+> +
+> +       rc = sev_issue_cmd(kvm, SEV_CMD_SNP_GUEST_REQUEST, &data, &err);
+> +       if (rc)
+> +               /* use the firmware error code */
+> +               rc = err;
+> +
+> +       snp_cleanup_guest_buf(&data, &rc);
+> +
+> +unlock:
+> +       mutex_unlock(&sev->guest_req_lock);
+> +
+> +e_fail:
+> +       svm_set_ghcb_sw_exit_info_2(vcpu, rc);
+> +}
+> +
+> +static void snp_handle_ext_guest_request(struct vcpu_svm *svm, gpa_t req_gpa, gpa_t resp_gpa)
+> +{
+> +       struct sev_data_snp_guest_request req = {0};
+> +       struct kvm_vcpu *vcpu = &svm->vcpu;
+> +       struct kvm *kvm = vcpu->kvm;
+> +       unsigned long data_npages;
+> +       struct kvm_sev_info *sev;
+> +       unsigned long rc, err;
+> +       u64 data_gpa;
+> +
+> +       if (!sev_snp_guest(vcpu->kvm)) {
+> +               rc = SEV_RET_INVALID_GUEST;
+> +               goto e_fail;
+> +       }
+> +
+> +       sev = &to_kvm_svm(kvm)->sev_info;
+> +
+> +       data_gpa = vcpu->arch.regs[VCPU_REGS_RAX];
+> +       data_npages = vcpu->arch.regs[VCPU_REGS_RBX];
+> +
+> +       if (!IS_ALIGNED(data_gpa, PAGE_SIZE)) {
+> +               rc = SEV_RET_INVALID_ADDRESS;
+> +               goto e_fail;
+> +       }
+> +
+> +       /* Verify that requested blob will fit in certificate buffer */
+> +       if ((data_npages << PAGE_SHIFT) > SEV_FW_BLOB_MAX_SIZE) {
+> +               rc = SEV_RET_INVALID_PARAM;
+> +               goto e_fail;
+> +       }
+> +
+> +       mutex_lock(&sev->guest_req_lock);
+> +
+> +       rc = snp_setup_guest_buf(svm, &req, req_gpa, resp_gpa);
+> +       if (rc)
+> +               goto unlock;
+> +
+> +       rc = snp_guest_ext_guest_request(&req, (unsigned long)sev->snp_certs_data,
+> +                                        &data_npages, &err);
 
+What's the point of caching the certs from the sev_device in the
+sev_info struct if the snp_guest_ext_guest_request() function always
+seems to re-copy the certs back into |sev->snp_certs_data| on every
+call? I am probably missing something.
+
+
+> +       if (rc) {
+> +               /*
+> +                * If buffer length is small then return the expected
+> +                * length in rbx.
+> +                */
+> +               if (err == SNP_GUEST_REQ_INVALID_LEN)
+> +                       vcpu->arch.regs[VCPU_REGS_RBX] = data_npages;
+> +
+> +               /* pass the firmware error code */
+> +               rc = err;
+> +               goto cleanup;
+> +       }
+> +
+> +       /* Copy the certificate blob in the guest memory */
+> +       if (data_npages &&
+> +           kvm_write_guest(kvm, data_gpa, sev->snp_certs_data, data_npages << PAGE_SHIFT))
+> +               rc = SEV_RET_INVALID_ADDRESS;
+> +
+> +cleanup:
+> +       snp_cleanup_guest_buf(&req, &rc);
+> +
+> +unlock:
+> +       mutex_unlock(&sev->guest_req_lock);
+> +
+> +e_fail:
+> +       svm_set_ghcb_sw_exit_info_2(vcpu, rc);
+> +}
+> +
+>  static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
+>  {
+>         struct vmcb_control_area *control = &svm->vmcb->control;
+> @@ -3404,6 +3575,20 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
+>                 svm_set_ghcb_sw_exit_info_2(vcpu, rc);
+>                 break;
+>         }
+> +       case SVM_VMGEXIT_GUEST_REQUEST: {
+> +               snp_handle_guest_request(svm, control->exit_info_1, control->exit_info_2);
+> +
+> +               ret = 1;
+> +               break;
+> +       }
+> +       case SVM_VMGEXIT_EXT_GUEST_REQUEST: {
+> +               snp_handle_ext_guest_request(svm,
+> +                                            control->exit_info_1,
+> +                                            control->exit_info_2);
+> +
+> +               ret = 1;
+> +               break;
+> +       }
+>         case SVM_VMGEXIT_UNSUPPORTED_EVENT:
+>                 vcpu_unimpl(vcpu,
+>                             "vmgexit: unsupported event - exit_info_1=%#llx, exit_info_2=%#llx\n",
+> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+> index 280072995306..71fe46a778f3 100644
+> --- a/arch/x86/kvm/svm/svm.h
+> +++ b/arch/x86/kvm/svm/svm.h
+> @@ -92,6 +92,8 @@ struct kvm_sev_info {
+>         u64 snp_init_flags;
+>         void *snp_context;      /* SNP guest context page */
+>         struct srcu_struct psc_srcu;
+> +       void *snp_certs_data;
+> +       struct mutex guest_req_lock;
+>  };
+>
+>  struct kvm_svm {
+> --
+> 2.17.1
+>
