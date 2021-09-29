@@ -2,234 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 09ABA41BF27
-	for <lists+kvm@lfdr.de>; Wed, 29 Sep 2021 08:28:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CFA6741BF9D
+	for <lists+kvm@lfdr.de>; Wed, 29 Sep 2021 09:12:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244100AbhI2G3e (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Sep 2021 02:29:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45752 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244321AbhI2G3a (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Sep 2021 02:29:30 -0400
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [IPv6:2404:9400:2:0:216:3eff:fee2:21ea])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B5F7C061749;
-        Tue, 28 Sep 2021 23:27:50 -0700 (PDT)
+        id S244527AbhI2HON (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Sep 2021 03:14:13 -0400
+Received: from gandalf.ozlabs.org ([150.107.74.76]:52911 "EHLO
+        gandalf.ozlabs.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S244486AbhI2HOM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Sep 2021 03:14:12 -0400
 Received: by gandalf.ozlabs.org (Postfix, from userid 1007)
-        id 4HK5yr36wnz4xbQ; Wed, 29 Sep 2021 16:27:48 +1000 (AEST)
+        id 4HK6yQ59Mkz4xbQ; Wed, 29 Sep 2021 17:12:30 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gibson.dropbear.id.au; s=201602; t=1632896868;
-        bh=84Gyy3tmXwjpmsJHYbmrxXvK4fzmC1cEHvDeygx5s+k=;
+        d=gibson.dropbear.id.au; s=201602; t=1632899550;
+        bh=L08JZ1sawezeS015D9zgg+63/giIa2dhEn00NU5Gl9Y=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=AhGDfuYPOlGUSuom+ZFhfDR+0E6zEp1+ikOguhPsycEGfWi+lEdZ1J67HITD2BESc
-         LhxdiLgQOxdYonrF4rpT7AhUaE0Wgvc5HtY5RYwmrixbhEbT91DVUh6Kie1a7hE6/1
-         SZ/mzPVkZ8GOVNHS8h4nH/SJI4i2Gk41TuIjyI+s=
-Date:   Wed, 29 Sep 2021 16:23:36 +1000
+        b=kzcjZkVIb+59YwusaTa7TDofa176Y01SfMixfjEpvF52DXXtqMYoo/cnit3cVnrbz
+         FJpEABiRoF+LPSQAebuks5Y7LnwA+nuDbC3P74eseDZ6sXQrWSonXxWlTdus9grc8d
+         /fuzX/44k4p1mGzQ7m6ubwhzdVIm/+dkjaVtCTps=
+Date:   Wed, 29 Sep 2021 16:35:19 +1000
 From:   David Gibson <david@gibson.dropbear.id.au>
-To:     Liu Yi L <yi.l.liu@intel.com>
-Cc:     alex.williamson@redhat.com, jgg@nvidia.com, hch@lst.de,
-        jasowang@redhat.com, joro@8bytes.org, jean-philippe@linaro.org,
-        kevin.tian@intel.com, parav@mellanox.com, lkml@metux.net,
-        pbonzini@redhat.com, lushenming@huawei.com, eric.auger@redhat.com,
-        corbet@lwn.net, ashok.raj@intel.com, yi.l.liu@linux.intel.com,
-        jun.j.tian@intel.com, hao.wu@intel.com, dave.jiang@intel.com,
-        jacob.jun.pan@linux.intel.com, kwankhede@nvidia.com,
-        robin.murphy@arm.com, kvm@vger.kernel.org,
-        iommu@lists.linux-foundation.org, dwmw2@infradead.org,
-        linux-kernel@vger.kernel.org, baolu.lu@linux.intel.com,
-        nicolinc@nvidia.com
-Subject: Re: [RFC 10/20] iommu/iommufd: Add IOMMU_DEVICE_GET_INFO
-Message-ID: <YVQGaL8RHIw8q/Sq@yekko>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     "Liu, Yi L" <yi.l.liu@intel.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "jgg@nvidia.com" <jgg@nvidia.com>, "hch@lst.de" <hch@lst.de>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+        "parav@mellanox.com" <parav@mellanox.com>,
+        "lkml@metux.net" <lkml@metux.net>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "lushenming@huawei.com" <lushenming@huawei.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "corbet@lwn.net" <corbet@lwn.net>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "yi.l.liu@linux.intel.com" <yi.l.liu@linux.intel.com>,
+        "Tian, Jun J" <jun.j.tian@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "dwmw2@infradead.org" <dwmw2@infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>
+Subject: Re: [RFC 06/20] iommu: Add iommu_device_init[exit]_user_dma
+ interfaces
+Message-ID: <YVQJJ/ZlRoJbAt0+@yekko>
 References: <20210919063848.1476776-1-yi.l.liu@intel.com>
- <20210919063848.1476776-11-yi.l.liu@intel.com>
+ <20210919063848.1476776-7-yi.l.liu@intel.com>
+ <YVPxzad5TYHAc1H/@yekko>
+ <BN9PR11MB5433E1BF538C7D3632F4C6188CA99@BN9PR11MB5433.namprd11.prod.outlook.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="oXt6fvEiSX3VHBf1"
+        protocol="application/pgp-signature"; boundary="vlpAh7yLskJZWF4V"
 Content-Disposition: inline
-In-Reply-To: <20210919063848.1476776-11-yi.l.liu@intel.com>
+In-Reply-To: <BN9PR11MB5433E1BF538C7D3632F4C6188CA99@BN9PR11MB5433.namprd11.prod.outlook.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---oXt6fvEiSX3VHBf1
+--vlpAh7yLskJZWF4V
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Sep 19, 2021 at 02:38:38PM +0800, Liu Yi L wrote:
-> After a device is bound to the iommufd, userspace can use this interface
-> to query the underlying iommu capability and format info for this device.
-> Based on this information the user then creates I/O address space in a
-> compatible format with the to-be-attached devices.
+On Wed, Sep 29, 2021 at 05:38:56AM +0000, Tian, Kevin wrote:
+> > From: David Gibson <david@gibson.dropbear.id.au>
+> > Sent: Wednesday, September 29, 2021 12:56 PM
+> >=20
+> > >
+> > > Unlike vfio, iommufd adopts a device-centric design with all group
+> > > logistics hidden behind the fd. Binding a device to iommufd serves
+> > > as the contract to get security context established (and vice versa
+> > > for unbinding). One additional requirement in iommufd is to manage the
+> > > switch between multiple security contexts due to decoupled bind/attac=
+h:
+> > >
+> > > 1)  Open a device in "/dev/vfio/devices" with user access blocked;
+> >=20
+> > Probably worth clarifying that (1) must happen for *all* devices in
+> > the group before (2) happens for any device in the group.
 >=20
-> Device cookie which is registered at binding time is used to mark the
-> device which is being queried here.
+> No. User access is naturally blocked for other devices as long as they
+> are not opened yet.
+
+Uh... my point is that everything in the group has to be removed from
+regular kernel drivers before we reach step (2).  Is the plan that you
+must do that before you can even open them?  That's a reasonable
+choice, but then I think you should show that step in this description
+as well.
+
+> > > 2)  Bind the device to an iommufd with an initial security context
+> > >     (an empty iommu domain which blocks dma) established for its
+> > >     group, with user access unblocked;
+> > >
+> > > 3)  Attach the device to a user-specified ioasid (shared by all devic=
+es
+> > >     attached to this ioasid). Before attaching, the device should be =
+first
+> > >     detached from the initial context;
+> >=20
+> > So, this step can implicitly but observably change the behaviour for
+> > other devices in the group as well.  I don't love that kind of
+> > difficult to predict side effect, which is why I'm *still* not totally
+> > convinced by the device-centric model.
 >=20
-> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> ---
->  drivers/iommu/iommufd/iommufd.c | 68 +++++++++++++++++++++++++++++++++
->  include/uapi/linux/iommu.h      | 49 ++++++++++++++++++++++++
->  2 files changed, 117 insertions(+)
->=20
-> diff --git a/drivers/iommu/iommufd/iommufd.c b/drivers/iommu/iommufd/iomm=
-ufd.c
-> index e16ca21e4534..641f199f2d41 100644
-> --- a/drivers/iommu/iommufd/iommufd.c
-> +++ b/drivers/iommu/iommufd/iommufd.c
-> @@ -117,6 +117,71 @@ static int iommufd_fops_release(struct inode *inode,=
- struct file *filep)
->  	return 0;
->  }
-> =20
-> +static struct device *
-> +iommu_find_device_from_cookie(struct iommufd_ctx *ictx, u64 dev_cookie)
-> +{
-> +	struct iommufd_device *idev;
-> +	struct device *dev =3D NULL;
-> +	unsigned long index;
-> +
-> +	mutex_lock(&ictx->lock);
-> +	xa_for_each(&ictx->device_xa, index, idev) {
-> +		if (idev->dev_cookie =3D=3D dev_cookie) {
-> +			dev =3D idev->dev;
-> +			break;
-> +		}
-> +	}
-> +	mutex_unlock(&ictx->lock);
-> +
-> +	return dev;
-> +}
-> +
-> +static void iommu_device_build_info(struct device *dev,
-> +				    struct iommu_device_info *info)
-> +{
-> +	bool snoop;
-> +	u64 awidth, pgsizes;
-> +
-> +	if (!iommu_device_get_info(dev, IOMMU_DEV_INFO_FORCE_SNOOP, &snoop))
-> +		info->flags |=3D snoop ? IOMMU_DEVICE_INFO_ENFORCE_SNOOP : 0;
-> +
-> +	if (!iommu_device_get_info(dev, IOMMU_DEV_INFO_PAGE_SIZE, &pgsizes)) {
-> +		info->pgsize_bitmap =3D pgsizes;
-> +		info->flags |=3D IOMMU_DEVICE_INFO_PGSIZES;
-> +	}
-> +
-> +	if (!iommu_device_get_info(dev, IOMMU_DEV_INFO_ADDR_WIDTH, &awidth)) {
-> +		info->addr_width =3D awidth;
-> +		info->flags |=3D IOMMU_DEVICE_INFO_ADDR_WIDTH;
-> +	}
-> +}
-> +
-> +static int iommufd_get_device_info(struct iommufd_ctx *ictx,
-> +				   unsigned long arg)
-> +{
-> +	struct iommu_device_info info;
-> +	unsigned long minsz;
-> +	struct device *dev;
-> +
-> +	minsz =3D offsetofend(struct iommu_device_info, addr_width);
-> +
-> +	if (copy_from_user(&info, (void __user *)arg, minsz))
-> +		return -EFAULT;
-> +
-> +	if (info.argsz < minsz)
-> +		return -EINVAL;
-> +
-> +	info.flags =3D 0;
-> +
-> +	dev =3D iommu_find_device_from_cookie(ictx, info.dev_cookie);
-> +	if (!dev)
-> +		return -EINVAL;
-> +
-> +	iommu_device_build_info(dev, &info);
-> +
-> +	return copy_to_user((void __user *)arg, &info, minsz) ? -EFAULT : 0;
-> +}
-> +
->  static long iommufd_fops_unl_ioctl(struct file *filep,
->  				   unsigned int cmd, unsigned long arg)
->  {
-> @@ -127,6 +192,9 @@ static long iommufd_fops_unl_ioctl(struct file *filep,
->  		return ret;
-> =20
->  	switch (cmd) {
-> +	case IOMMU_DEVICE_GET_INFO:
-> +		ret =3D iommufd_get_device_info(ictx, arg);
-> +		break;
->  	default:
->  		pr_err_ratelimited("unsupported cmd %u\n", cmd);
->  		break;
-> diff --git a/include/uapi/linux/iommu.h b/include/uapi/linux/iommu.h
-> index 59178fc229ca..76b71f9d6b34 100644
-> --- a/include/uapi/linux/iommu.h
-> +++ b/include/uapi/linux/iommu.h
-> @@ -7,6 +7,55 @@
->  #define _UAPI_IOMMU_H
-> =20
->  #include <linux/types.h>
-> +#include <linux/ioctl.h>
-> +
-> +/* -------- IOCTLs for IOMMU file descriptor (/dev/iommu) -------- */
-> +
-> +#define IOMMU_TYPE	(';')
-> +#define IOMMU_BASE	100
-> +
-> +/*
-> + * IOMMU_DEVICE_GET_INFO - _IOR(IOMMU_TYPE, IOMMU_BASE + 1,
-> + *				struct iommu_device_info)
-> + *
-> + * Check IOMMU capabilities and format information on a bound device.
-> + *
-> + * The device is identified by device cookie (registered when binding
-> + * this device).
-> + *
-> + * @argsz:	   user filled size of this data.
-> + * @flags:	   tells userspace which capability info is available
-> + * @dev_cookie:	   user assinged cookie.
-> + * @pgsize_bitmap: Bitmap of supported page sizes. 1-setting of the
-> + *		   bit in pgsize_bitmap[63:12] indicates a supported
-> + *		   page size. Details as below table:
-> + *
-> + *		   +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D+
-> + *		   |  Bit[index]   |  Page Size |
-> + *		   +---------------+------------+
-> + *		   |  12           |  4 KB      |
-> + *		   +---------------+------------+
-> + *		   |  13           |  8 KB      |
-> + *		   +---------------+------------+
-> + *		   |  14           |  16 KB     |
-> + *		   +---------------+------------+
-> + *		   ...
-> + * @addr_width:    the address width of supported I/O address spaces.
-> + *
-> + * Availability: after device is bound to iommufd
-> + */
-> +struct iommu_device_info {
-> +	__u32	argsz;
-> +	__u32	flags;
-> +#define IOMMU_DEVICE_INFO_ENFORCE_SNOOP	(1 << 0) /* IOMMU enforced snoop=
- */
-> +#define IOMMU_DEVICE_INFO_PGSIZES	(1 << 1) /* supported page sizes */
-> +#define IOMMU_DEVICE_INFO_ADDR_WIDTH	(1 << 2) /* addr_wdith field valid =
-*/
-> +	__u64	dev_cookie;
-> +	__u64   pgsize_bitmap;
-> +	__u32	addr_width;
+> which side-effect is predicted here? The user anyway needs to be
+> aware of such group restriction regardless whether it uses group
+> or nongroup interface.
 
-I think this is where you should be reporting available IOVA windows,
-rather than just an address width.  I know that for ppc a real
-situation will be to have two different windows of different sizes:
-that is the effective address width depends on which IOVA window
-you're mapping into.
+Yes, exactly.  And with a group interface it's obvious it has to
+understand it.  With the non-group interface, you can get to this
+stage in ignorance of groups.  It will even work as long as you are
+lucky enough only to try with singleton-group devices.  Then you try
+it with two devices in the one group and doing (3) on device A will
+implicitly change the DMA environment of device B.
 
-
-> +};
-> +
-> +#define IOMMU_DEVICE_GET_INFO	_IO(IOMMU_TYPE, IOMMU_BASE + 1)
-> =20
->  #define IOMMU_FAULT_PERM_READ	(1 << 0) /* read */
->  #define IOMMU_FAULT_PERM_WRITE	(1 << 1) /* write */
+(or at least, it will if they share a group because they don't have
+distinguishable RIDs.  That's not the only multi-device group case,
+but it's one of them).
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -237,24 +132,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---oXt6fvEiSX3VHBf1
+--vlpAh7yLskJZWF4V
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAmFUBmgACgkQbDjKyiDZ
-s5KcNA/+IYrmUsKSSfvS/47hGdeBYJpksx+ZL28qskNmbeiW9fpqaLm9zXFIk4rM
-TYVhlAdZtzk1659i4sub5I0dDoWjOGX9xY46cnFveCUG+n5Wf0vScBH6XGRGSBId
-aVUqF2RRZJ5OCFaOsqK9m1EWjSAZ5zD+k6H9EQD+6F3JALEXz8CLJSnj4cUIY/20
-lrJJnkGY8sp5WjHlsCL1G5fvwMQiAyPgrGSKFhqTuOxDUuEtH5jqIOHYXjU54vwu
-fI+iWSQRaAJChS6MIbarg79+XKdqM07y6S50GWRRivpAO0HNbO+m5fnBsqQrMLVD
-YFPgcvz/BVpVQf8VKdjxroHiOcJlrWRrbgMocQTwqtRLzGK14gCiYhIVjSImyORm
-WKLjYtVBj/dcepThrhSgFtgf5+KW/QZA+UWcitNEDLGNyX9Zt1vCNyZ5Hw2tGNCv
-p3btffpwFArW+XBJ/MCLtDPyjeO4fpmcE0vpxX2kM1OJIPkXsbB2eEVeC2gjBxV1
-Gw5AtGzatKkPCWpDuc8yqRAuYCOTtaGsZBkAdLx6aKsqwq7m8hpn/P2nCWVOlEwv
-l+2goqLnjLvtaOnH7tf8GpCZ67LdYDgSqnM9dwXyOUtlyx4CYzVOkmgnIp01JHg4
-lARdTzJUUSug0rMN04JBeoMIw2UYTPSoDIcFcCE9HatkqcH11CI=
-=8Y79
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAmFUCSUACgkQbDjKyiDZ
+s5Knfw//Rw2uKWKlVgUYBuPqXP7H/GPzP0d7Hg2xFwsv688tH/erKlqjFroLLZFv
+2Kh4rygO7LibaX6bR5U8t+Dr6xms44sDRhSmcEYqIh2WiE0BlLIAjSQg8YhxIb4J
+s6E3xJ0xgDTH/c2ebBZPckFg4jXFZsCtJ5YykxCMZOVZsO7Go236aE9JvIuscatR
+TqYIEd2CDV5EELOnRItwWqF/FjfrrbhfavYENVQZU3qdbjQ90Ii1OpWe+wd9jWcd
+pudHU2xLjlvchw391gxc2y8qkLEev6E5ZbfOSKa/f6N3aLb55PcN8rqi+zfne9Na
+lzs30Gy5TRtEhT/VwsHXHnGz71ueqYPQcLMCBX7J/KgMIxnRtuQtLvYCxM9fzLFb
+7DGIXfPpAqla94JMsp4Z6R27pH2QFJQmORJDjJBOkN2UbF3ZkTqFoYxYPbAXQfZH
+UPVM7mdAsGtUEKEszBBqAUJG0wQhJweg63WEeczQh4gPR1J6g+ye2l5rXK9Mtl0s
+O3DQdpqXkp+dnEjvi2Ybzv0uPvfUbc+pX00a/N0vPB/OO6UfQiYcXx1t5k/A8bO+
+8TCgk8WUVMu1z48IG2k6QqQHuO5rMs8NH2NEIs4IownQuZcOtSUDs5p6IwbuNMEv
+scg9c+qzutZvCv/flGStpYdrSHMs9iF9n46ce8v9eovGQ99Nubk=
+=uIA1
 -----END PGP SIGNATURE-----
 
---oXt6fvEiSX3VHBf1--
+--vlpAh7yLskJZWF4V--
