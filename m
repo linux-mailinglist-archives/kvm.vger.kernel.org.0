@@ -2,208 +2,180 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 30BB341BF4F
-	for <lists+kvm@lfdr.de>; Wed, 29 Sep 2021 08:50:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B09E641BF68
+	for <lists+kvm@lfdr.de>; Wed, 29 Sep 2021 08:57:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244450AbhI2GwA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Sep 2021 02:52:00 -0400
-Received: from mail.kernel.org ([198.145.29.99]:48368 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S244194AbhI2Gv7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Sep 2021 02:51:59 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 8DD8B61381;
-        Wed, 29 Sep 2021 06:50:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1632898219;
-        bh=E1m+fcLpD0Wlj72IN6jL13t8OONZeJk7RLRYa9nXCnQ=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=thUQUgjdkd2q1v1WgiwyLfEk8z9PaoyVaRp7H0aeQt3uAjG4qO6mQfzZ/JcXvQqA6
-         RGfczIsLJfoKeOBC2UlY2roFcUnhZTGuSLxrohw6wNUFJa5KkeUJWzc9o5nuYGcjzk
-         crdOQno+axKIQ/YGfQjx1PJOpWwbkf5NPBDY6l+G+jzExSNPAIoAUgc0+v15Ns9kYw
-         qbbBbnHKYzKAmUAArGI21o7VsJ+DLSJHNZefybT0OaSs6XHHwW//6EUpnqD96/h+P7
-         74a94bUgtpr5DIHOXDKCJbeHIEzxuFWvtl8DC2koIIKTlUV/i5N6xCw4r3NM8zb3Wv
-         wQA5DCtRPATBA==
-Date:   Wed, 29 Sep 2021 09:50:15 +0300
-From:   Leon Romanovsky <leon@kernel.org>
-To:     Max Gurtovoy <mgurtovoy@nvidia.com>
-Cc:     mst@redhat.com, virtualization@lists.linux-foundation.org,
-        kvm@vger.kernel.org, stefanha@redhat.com, oren@nvidia.com,
-        nitzanc@nvidia.com, israelr@nvidia.com, hch@infradead.org,
-        linux-block@vger.kernel.org, axboe@kernel.dk,
-        Yaron Gepstein <yarong@nvidia.com>,
-        Jason Gunthorpe <jgg@nvidia.com>
-Subject: Re: [PATCH 2/2] virtio-blk: set NUMA affinity for a tagset
-Message-ID: <YVQMp4aIBJNi9qrH@unreal>
-References: <20210926145518.64164-1-mgurtovoy@nvidia.com>
- <20210926145518.64164-2-mgurtovoy@nvidia.com>
- <YVGsMsIjD2+aS3eC@unreal>
- <0c155679-e1db-3d1e-2b4e-a0f12ce5950c@nvidia.com>
- <YVIMIFxjRcfDDub4@unreal>
- <f8de7c19-9f04-a458-6c1d-8133a83aa93f@nvidia.com>
- <YVNCflMxWh4m7ewU@unreal>
- <f0cc8cb4-92dc-f5f9-ea50-aa312ac6a056@nvidia.com>
+        id S244461AbhI2G73 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Sep 2021 02:59:29 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54334 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229536AbhI2G72 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 29 Sep 2021 02:59:28 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 18T5SkVo022659;
+        Wed, 29 Sep 2021 02:57:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=Yeu3khHTm5BupXM7O0QrFwzJN1blGbA0zJSQEfZsP6w=;
+ b=Kdjclkf7M3yIt4TgwLA0CDrQVxbB9lQXRk6NU5oMIkWijuVNijCDFlohxJ1bqF/n10Ms
+ zbNo2ZzwcMGfSAUsZsxilnklDSay4eXI+0K1wbkiW3LnU83/If3DgfeYyIfIpsKs3ve0
+ fyEDGHnHMxvocZ84XnUC+eaADB9nooNU4bojiMygTBnd3Rc8tb62dOoZdpaF+BIqtH2X
+ vRgUg8wEO9rvnY86Nfx4eap52M53/ojKPlZa2kGqar+SFg/xO84NLCD8uQA2aMnRNU0r
+ s/cLIQrKVXV231iG5rpz7g9fUGwmAnZUpmzyDRCSOSDYVuYk8pe9GUAMhdTzl3jvNdpz KQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3bcj1k1pdv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 29 Sep 2021 02:57:00 -0400
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 18T6VVRm004893;
+        Wed, 29 Sep 2021 02:56:59 -0400
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3bcj1k1pd3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 29 Sep 2021 02:56:58 -0400
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 18T6pPq5021643;
+        Wed, 29 Sep 2021 06:56:56 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma04ams.nl.ibm.com with ESMTP id 3b9ud9vjg6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 29 Sep 2021 06:56:56 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 18T6uql7066264
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 29 Sep 2021 06:56:52 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id ADD5CA4055;
+        Wed, 29 Sep 2021 06:56:52 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0A55DA4057;
+        Wed, 29 Sep 2021 06:56:51 +0000 (GMT)
+Received: from li-43c5434c-23b8-11b2-a85c-c4958fb47a68.ibm.com (unknown [9.171.68.197])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 29 Sep 2021 06:56:50 +0000 (GMT)
+Subject: Re: disabling halt polling broken? (was Re: [PATCH 00/14] KVM:
+ Halt-polling fixes, cleanups and a new stat)
+To:     David Matlack <dmatlack@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Jon Cargille <jcargill@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        linux-arm-kernel@lists.infradead.org,
+        KVMARM <kvmarm@lists.cs.columbia.edu>,
+        LinuxMIPS <linux-mips@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        KVMPPC <kvm-ppc@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Jing Zhang <jingzhangos@google.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Janosch Frank <frankja@linux.ibm.com>
+References: <20210925005528.1145584-1-seanjc@google.com>
+ <03f2f5ab-e809-2ba5-bd98-3393c3b843d2@de.ibm.com>
+ <YVHcY6y1GmvGJnMg@google.com>
+ <f37ab68c-61ce-b6fb-7a49-831bacfc7424@redhat.com>
+ <43e42f5c-9d9f-9e8b-3a61-9a053a818250@de.ibm.com>
+ <CALzav=cxeYieTkKJhT0kFZOjdv6k5eCZXKWs=ZQGCJg0x-oFjQ@mail.gmail.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Message-ID: <c64d0810-3563-928e-55c1-e50da8639808@de.ibm.com>
+Date:   Wed, 29 Sep 2021 08:56:50 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f0cc8cb4-92dc-f5f9-ea50-aa312ac6a056@nvidia.com>
+In-Reply-To: <CALzav=cxeYieTkKJhT0kFZOjdv6k5eCZXKWs=ZQGCJg0x-oFjQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: oGT42cAErGJFR7G6oCrTzoCuADqRL6rZ
+X-Proofpoint-ORIG-GUID: eXsFnYoOLfQdZT2uYY5Pes1aFc7SZbXJ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.391,FMLib:17.0.607.475
+ definitions=2021-09-29_02,2021-09-28_01,2020-04-07_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 phishscore=0
+ mlxlogscore=999 mlxscore=0 spamscore=0 priorityscore=1501 clxscore=1015
+ impostorscore=0 malwarescore=0 lowpriorityscore=0 bulkscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2109230001 definitions=main-2109290038
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 29, 2021 at 02:28:08AM +0300, Max Gurtovoy wrote:
+
+
+Am 27.09.21 um 18:58 schrieb David Matlack:
+> On Mon, Sep 27, 2021 at 8:17 AM Christian Borntraeger
+> <borntraeger@de.ibm.com> wrote:
+>>
+>>
+>>
+>> Am 27.09.21 um 17:03 schrieb Paolo Bonzini:
+>>> On 27/09/21 16:59, Sean Christopherson wrote:
+>>>>> commit acd05785e48c01edb2c4f4d014d28478b5f19fb5
+>>>>> Author:     David Matlack<dmatlack@google.com>
+>>>>> AuthorDate: Fri Apr 17 15:14:46 2020 -0700
+>>>>> Commit:     Paolo Bonzini<pbonzini@redhat.com>
+>>>>> CommitDate: Fri Apr 24 12:53:17 2020 -0400
+>>>>>
+>>>>>       kvm: add capability for halt polling
+>>>>>
+>>>>> broke the possibility for an admin to disable halt polling for already running KVM guests.
+>>>>> In past times doing
+>>>>> echo 0 > /sys/module/kvm/parameters/halt_poll_ns
+>>>>>
+>>>>> stopped polling system wide.
+>>>>> Now all KVM guests will use the halt_poll_ns value that was active during
+>>>>> startup - even those that do not use KVM_CAP_HALT_POLL.
+>>>>>
+>>>>> I guess this was not intended?
+>>>
+>>> No, but...
+>>>
+>>>> I would go so far as to say that halt_poll_ns should be a hard limit on
+>>>> the capability
+>>>
+>>> ... this would not be a good idea I think.  Anything that wants to do a lot of polling can just do "for (;;)".
 > 
-> On 9/28/2021 7:27 PM, Leon Romanovsky wrote:
-> > On Tue, Sep 28, 2021 at 06:59:15PM +0300, Max Gurtovoy wrote:
-> > > On 9/27/2021 9:23 PM, Leon Romanovsky wrote:
-> > > > On Mon, Sep 27, 2021 at 08:25:09PM +0300, Max Gurtovoy wrote:
-> > > > > On 9/27/2021 2:34 PM, Leon Romanovsky wrote:
-> > > > > > On Sun, Sep 26, 2021 at 05:55:18PM +0300, Max Gurtovoy wrote:
-> > > > > > > To optimize performance, set the affinity of the block device tagset
-> > > > > > > according to the virtio device affinity.
-> > > > > > > 
-> > > > > > > Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
-> > > > > > > ---
-> > > > > > >     drivers/block/virtio_blk.c | 2 +-
-> > > > > > >     1 file changed, 1 insertion(+), 1 deletion(-)
-> > > > > > > 
-> > > > > > > diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> > > > > > > index 9b3bd083b411..1c68c3e0ebf9 100644
-> > > > > > > --- a/drivers/block/virtio_blk.c
-> > > > > > > +++ b/drivers/block/virtio_blk.c
-> > > > > > > @@ -774,7 +774,7 @@ static int virtblk_probe(struct virtio_device *vdev)
-> > > > > > >     	memset(&vblk->tag_set, 0, sizeof(vblk->tag_set));
-> > > > > > >     	vblk->tag_set.ops = &virtio_mq_ops;
-> > > > > > >     	vblk->tag_set.queue_depth = queue_depth;
-> > > > > > > -	vblk->tag_set.numa_node = NUMA_NO_NODE;
-> > > > > > > +	vblk->tag_set.numa_node = virtio_dev_to_node(vdev);
-> > > > > > I afraid that by doing it, you will increase chances to see OOM, because
-> > > > > > in NUMA_NO_NODE, MM will try allocate memory in whole system, while in
-> > > > > > the latter mode only on specific NUMA which can be depleted.
-> > > > > This is a common methodology we use in the block layer and in NVMe subsystem
-> > > > > and we don't afraid of the OOM issue you raised.
-> > > > There are many reasons for that, but we are talking about virtio here
-> > > > and not about NVMe.
-> > > Ok. what reasons ?
-> > For example, NVMe are physical devices that rely on DMA operations,
-> > PCI connectivity e.t.c to operate. Such systems indeed can benefit from
-> > NUMA locality hints. At the end, these devices are physically connected
-> > to that NUMA node.
+> I agree. It would also be a maintenance burden and subtle "gotcha" to
+> have to increase halt_poll_ns anytime one wants to increase
+> KVM_CAP_HALT_POLL.
+
+I think the idea of the upper bound is not about preventing wasting CPUs
+but to reconfigure existing poll intervals on a global level. So I think
+this idea is a bad idea in itself. Especially as the admin might not have
+access to the monitor of user QEMUs.
+
+>>>
+>>> So I think there are two possibilities that makes sense:
+>>>
+>>> * track what is using KVM_CAP_HALT_POLL, and make writes to halt_poll_ns follow that
+>>
+>> what about using halt_poll_ns for those VMs that did not uses KVM_CAP_HALT_POLL and the private number for those that did.
 > 
-> FYI Virtio devices are also physical devices that have PCI interface and
-> rely on DMA operations.
+> None of these options would cover Christian's original use-case
+> though. (Write to module to disable halt-polling system-wide.)
 > 
-> from virtio spec: "Virtio devices use normal bus mechanisms of interrupts
-> and DMA which should be familiar
-> to any device driver author".
+> What about adding a writable "enable_halt_polling" module parameter
 
-Yes, this is how bus in Linux is implemented, there is nothing new here. 
+that would then affect both classes with and without KVM_CAP_HALT_POLL.
 
-> 
-> Also we develop virtio HW at NVIDIA for blk and net devices with our SNAP
-> technology.
-> 
-> These devices are connected via PCI bus to the host.
+> that affects all VMs? Once that is in place we could also consider
+> getting rid of halt_poll_ns entirely.
 
-How all these related to general virtio-blk implementation?
+As far as I can tell QEMU does not yet use KVM_CAP_HALT_POLL.
+So having a system wide halt_poll_ns makes sense. And I think for all
+processes not using KVM_CAP_HALT_POLL we should really follow what
+halt_poll_ns is NOW and not what it used to be.
 
-> 
-> We also support SRIOV.
-> 
-> Same it true also for paravirt devices that are emulated by QEMU but still
-> the guest sees them as PCI devices.
-
-Yes, the key word here - "emulated".
-
-> 
-> > 
-> > In our case, virtio-blk is a software interface that doesn't have all
-> > these limitations. On the contrary, the virtio-blk can be created on one
-> > CPU and moved later to be close to the QEMU which can run on another NUMA
-> > node.
-> 
-> Not at all. virtio is HW interface.
-
-Virtio are para-virtualized devices that are represented as HW interfaces
-in the guest OS. They are not needed to be real devices in the hypervisor,
-which is my (and probably most of the world) use case.
-
-My QEMU command line contains something like that: "-drive file=IMAGE.img,if=virtio"
-
-> 
-> I don't understand what are you saying here ?
-> 
-> > 
-> > Also this patch increases chances to get OOM by factor of NUMA nodes.
-> 
-> This is common practice in Linux for storage drivers. Why does it bothers
-> you at all ?
-
-Do I need a reason to ask for a clarification for publicly posted patch
-in open mailing list?
-
-I use virtio and care about it.
-
-> 
-> I already decreased the memory footprint for virtio blk devices.
-
-As I wrote before, you decreased by several KB, but by this patch you
-limited available memory in magnitudes.
-
-> 
-> 
-> > Before your patch, the virtio_blk can allocate from X memory, after your
-> > patch it will be X/NUMB_NUMA_NODES.
-> 
-> So go ahead and change all the block layer if it bothers you so much.
-> 
-> Also please change the NVMe subsystem when you do it.
-
-I suggest less radical approach - don't take patches without proven
-benefit.
-
-We are in 2021, let's rely on NUMA node policy.
-
-> 
-> And lets see what the community will say.
-
-Stephen asked you for performance data too. I'm not alone here.
-
-> 
-> > In addition, it has all chances to even hurt performance.
-> > 
-> > So yes, post v2, but as Stefan and I asked, please provide supportive
-> > performance results, because what was done for another subsystem doesn't
-> > mean that it will be applicable here.
-> 
-> I will measure the perf but even if we wont see an improvement since it
-> might not be the bottleneck, this changes should be merged since this is the
-> way the block layer is optimized.
-
-This is not acceptance criteria to merge patches.
-
-> 
-> This is a micro optimization that commonly used also in other subsystem. And
-> non of your above reasons (PCI, SW device, DMA) is true.
-
-Every subsystem is different, in some it makes sense, in others it doesn't.
-
-We (RDMA) had very long discussion (together with perf data) and heavily tailored
-test to measure influence of per-node allocations and guess what? We didn't see
-any performance advantage.
-
-https://lore.kernel.org/linux-rdma/c34a864803f9bbd33d3f856a6ba2dd595ab708a7.1620729033.git.leonro@nvidia.com/
-
-> 
-> Virtio blk device is in 99% a PCI device (paravirt or real HW) exactly like
-> any other PCI device you are familiar with.
-> 
-> It's connected physically to some slot, it has a BAR, MMIO, configuration
-> space, etc..
-
-In general case, it is far from being true.
-
-> 
-> Thanks.
-> 
-> > 
-> > Thanks
