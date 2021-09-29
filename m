@@ -2,246 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6C41441C4A9
-	for <lists+kvm@lfdr.de>; Wed, 29 Sep 2021 14:25:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D078C41C4A6
+	for <lists+kvm@lfdr.de>; Wed, 29 Sep 2021 14:25:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245563AbhI2M07 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Sep 2021 08:26:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:37383 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1343655AbhI2M0n (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 29 Sep 2021 08:26:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632918302;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=waQ4HTSs8qPq9K3TVNjz+sz8qTXsPiA0So8ONix0NBI=;
-        b=MAHQmE/EHi0Q1KMCWWStleruz2yH/j5G7OkAKkuDckJhy4d32Ekr05QftLlZxJqFlRkzXA
-        xVdSzkCtfIVizI4o4ymvt/alKc1S6TO7KGpn5tXQCBUvO8XRAhoK1cjs/elb/P4+sOxe4h
-        iLySqp0lVJTMYDRI1f4vO8rUrXz9uN8=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-52-pKiMtkU6MfSdsUwx4x6C6Q-1; Wed, 29 Sep 2021 08:25:01 -0400
-X-MC-Unique: pKiMtkU6MfSdsUwx4x6C6Q-1
-Received: by mail-wm1-f69.google.com with SMTP id k5-20020a7bc3050000b02901e081f69d80so1135199wmj.8
-        for <kvm@vger.kernel.org>; Wed, 29 Sep 2021 05:25:00 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=waQ4HTSs8qPq9K3TVNjz+sz8qTXsPiA0So8ONix0NBI=;
-        b=sZ09LFC/q0gpZGy3emZMe3agxLEAQ1WaonJO0Qusg3EmsJ94aOQ0Dmv8yfEi69u75A
-         6zZ8GWDxtjES6RHWyevjgs7cFMG43ooZ63bOH/WeRY0Gv8WBVr1mEfJmTSBBquXXoR+o
-         8QklgSugvp9R8QG7RlfoCAR/M4FaIGwE4vf1hjNMsgmwO+PL/kG074QLtM9K6ydxRsvc
-         nCrVR+ZbnokFccnwRfj9O638EbczoyICv5KLJZ0ducABtAo9YrL01AhYTiEpX9CwI0QU
-         A6mN4RYISkDXR7fRkx+0dtdvCqAsg8aoO58Hj9dK08fp23clK+1p4K5oNFNS8xCnEUQp
-         ZIxg==
-X-Gm-Message-State: AOAM530ay2TbCWepun8d9r3I08ZclzA2n2K2DkS1EnhMSyI9oReeTS5j
-        maBTvAFBfJgc5Y74Nr6uCdENEcOF0rY8gh36o6CKcGVysVQEovPX5LtFI/pM3HR80HaFDMkLMnC
-        hGQpE4y7Mfzsr
-X-Received: by 2002:a1c:a78d:: with SMTP id q135mr10183676wme.36.1632918299927;
-        Wed, 29 Sep 2021 05:24:59 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyuN07HZpQF+5EFnsByLLu6j846FqRf2eW0h8MjJcBxzkrJaUI5JIyYXuTYzLs4OoebKilRLA==
-X-Received: by 2002:a1c:a78d:: with SMTP id q135mr10183645wme.36.1632918299729;
-        Wed, 29 Sep 2021 05:24:59 -0700 (PDT)
-Received: from work-vm (cpc109025-salf6-2-0-cust480.10-2.cable.virginm.net. [82.30.61.225])
-        by smtp.gmail.com with ESMTPSA id y197sm1786287wmc.18.2021.09.29.05.24.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Sep 2021 05:24:56 -0700 (PDT)
-Date:   Wed, 29 Sep 2021 13:24:53 +0100
-From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH Part2 v5 41/45] KVM: SVM: Add support to handle the RMP
- nested page fault
-Message-ID: <YVRbFVQlTHOM9iTX@work-vm>
-References: <20210820155918.7518-1-brijesh.singh@amd.com>
- <20210820155918.7518-42-brijesh.singh@amd.com>
-MIME-Version: 1.0
+        id S1343725AbhI2M05 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Sep 2021 08:26:57 -0400
+Received: from mail-bn8nam11on2066.outbound.protection.outlook.com ([40.107.236.66]:30176
+        "EHLO NAM11-BN8-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S245563AbhI2M0l (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Sep 2021 08:26:41 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=QOwD82EZzrTa8cqCgK/b5n1X/TDx6eW9/PRLPM/VWS0kNPzdn0WrUJ/TMQzE7VmgtCO8XG42YRg47kE9TDZ85Vr67e+p4b46W8Utz76Dj+nuyVcyJIphniu0IKsYSialB94WWUcEL1EiQKwGyN0B/+kuNa5owLSZ+dAdEEjuQLUbCz0ezB/S/R8KO+QEt7BS2LgZcnTFPuFrYflkJIVGl4jxo8GpZzG8FpJZgmmk/8Ml27bLgtaHZ75hEL9AGJBpY/EMj68pC0YtouGy9rnNVR7pq5y2nv4ctKaBkjf6w6t99+LM8D5O/hbp+yWNIe7qowv5GoP0UjvTqIM1m/L4bQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
+ bh=nXDfGQqIiEj2qC1+vwZ87u54zSwVmJ7sE6ErZEHzx/k=;
+ b=MywE1WhMc4KiI+hpMQ839TpmzRbE69kN8nchTvbL3blKsCn+c+lW1ks1tt9zZtQoymUvmESOA/KEwiUeeXkka2JLJ7X4HMv5orAj2cn5e9mUXY4pJh0dJb6GVFiEoe32NVJqr9XyKNSNpxGQWr823PoFQdLiiqm6poTVZwb89tHPkXjuc7EGp/ibdHcwg9RnRKvi6q3XlAuJOlA7/mUWCMAotEiIfE8J90ksE67DGD2Z1242om1Bx4rkmpiQ0rpXi//FaNJXVtnEQsphrhwuPmfJbtKwvDCKIAC/NO3QC7Tqkm6ys9xYeYeoduAtZajrRktYddtNg3LK7glTdw2qyw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=nXDfGQqIiEj2qC1+vwZ87u54zSwVmJ7sE6ErZEHzx/k=;
+ b=WLuy2+QXx1jgjKLVen0P5nlM4BWVHWq2ObvDgH3CIW1fFQCjNtvE+cd8hnBXGl12TpQraJSfoEHlplj4JPepW1uwfD6uZt4w/0lhY3hpmah/EnD5FcwadwXoBqd5SL0vc1MfpOPiNDftj5seSU8ZE0AwthvTBdZJ8xVN82VOURPDKgaxpKwZnPMMjmz+qC6hAqpr0eoCOHAocJFtaEusOUn0+BV7ESXxsJAhMeponxb4e3FERZ6Leb1FpvlK5+jzIojGx/BmtsURgfPVAbqfOWE3Juo6MUj/vrV04ELn058mAKb7G2jUiSrKJu39rvoT9Qcwf4fi0JpR2WKbVweHPA==
+Authentication-Results: gibson.dropbear.id.au; dkim=none (message not signed)
+ header.d=none;gibson.dropbear.id.au; dmarc=none action=none
+ header.from=nvidia.com;
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
+ by BL1PR12MB5173.namprd12.prod.outlook.com (2603:10b6:208:308::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4544.15; Wed, 29 Sep
+ 2021 12:24:59 +0000
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::e8af:232:915e:2f95]) by BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::e8af:232:915e:2f95%8]) with mapi id 15.20.4566.015; Wed, 29 Sep 2021
+ 12:24:59 +0000
+Date:   Wed, 29 Sep 2021 09:24:57 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     David Gibson <david@gibson.dropbear.id.au>
+Cc:     Liu Yi L <yi.l.liu@intel.com>, alex.williamson@redhat.com,
+        hch@lst.de, jasowang@redhat.com, joro@8bytes.org,
+        jean-philippe@linaro.org, kevin.tian@intel.com, parav@mellanox.com,
+        lkml@metux.net, pbonzini@redhat.com, lushenming@huawei.com,
+        eric.auger@redhat.com, corbet@lwn.net, ashok.raj@intel.com,
+        yi.l.liu@linux.intel.com, jun.j.tian@intel.com, hao.wu@intel.com,
+        dave.jiang@intel.com, jacob.jun.pan@linux.intel.com,
+        kwankhede@nvidia.com, robin.murphy@arm.com, kvm@vger.kernel.org,
+        iommu@lists.linux-foundation.org, dwmw2@infradead.org,
+        linux-kernel@vger.kernel.org, baolu.lu@linux.intel.com,
+        nicolinc@nvidia.com
+Subject: Re: [RFC 07/20] iommu/iommufd: Add iommufd_[un]bind_device()
+Message-ID: <20210929122457.GP964074@nvidia.com>
+References: <20210919063848.1476776-1-yi.l.liu@intel.com>
+ <20210919063848.1476776-8-yi.l.liu@intel.com>
+ <YVP44v4FVYJBSEEF@yekko>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210820155918.7518-42-brijesh.singh@amd.com>
-User-Agent: Mutt/2.0.7 (2021-05-04)
+In-Reply-To: <YVP44v4FVYJBSEEF@yekko>
+X-ClientProxiedBy: BL1PR13CA0298.namprd13.prod.outlook.com
+ (2603:10b6:208:2bc::33) To BL0PR12MB5506.namprd12.prod.outlook.com
+ (2603:10b6:208:1cb::22)
+MIME-Version: 1.0
+Received: from mlx.ziepe.ca (142.162.113.129) by BL1PR13CA0298.namprd13.prod.outlook.com (2603:10b6:208:2bc::33) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4566.8 via Frontend Transport; Wed, 29 Sep 2021 12:24:58 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1mVYdt-007YeH-R0; Wed, 29 Sep 2021 09:24:57 -0300
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 2df6b05c-d311-4356-624d-08d983442723
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5173:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <BL1PR12MB5173145AD51EFB7B7ECB6D66C2A99@BL1PR12MB5173.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: vtWmU6ATRPc60bTSU9qej6ZtzASyQTtW5Gb8CK82Oa1ZZ/yCKQYupgZw/Lv/U6+S9nRUeztnD5aWecIFKBurfhn1Xya+oiflPQCJLn5cYY33VBzOClU/OOP8hW85cMtucHEZuP2Is+fsEMbmxXPDSl/LgddIxWcQCdFcpRJtEMZ1HYg//tYgXdrq676cwR7FVkEhF8W04kO07rGGRWqTD8HloVB3HtDCSoekInHN+XxbqCHgQA5eEpK9O2ZD4MDW4K4ngi/47KbKrdgVQ4AO6JSajfZpSOdp6QcK+fhQawSevBSrC7sbre8nrXMJbj+mxUXnKYcPrDnbIeInb99Jf2zSaabEw8xy/BnU0UPIDOD5wsGE+tSOJreiiljTIMNgmnqDYfjB3OViamysJmPf+MnM0o4hgKYtvCn+UEa3EMMWZmHCr6xSTFILtlhj3A5vx/BQ2rGLD4mUcu9d+wxl0Eiwi6tOZwiirWB46UW0Z9cG2sQoMBnPWFxW5OM/xPTf79Du/sOA/dokSn1rDzCMvgPpbM4fkY6SBiQtNwAThOnqGeBP6Jh8h2OGhji30fyTcKsGqeIS3vZl+1HtI24Jyt25AreNhUHkFJt6xQojWJUiTm7PBMOAG8ERkRcTqNFwo+uQZlc6/Dl4jdXC7zr+3x8NtM6qtsnPkPLiH3N8O2E2rXo2zOZhZUXAYSEbfx9J
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(186003)(1076003)(4326008)(426003)(2616005)(107886003)(316002)(86362001)(8936002)(8676002)(33656002)(2906002)(5660300002)(9746002)(9786002)(66476007)(66556008)(508600001)(36756003)(38100700002)(26005)(6916009)(4744005)(66946007)(7416002)(27376004);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?E99KevviliFa87KkooUT6xWlCuukgD0tc6uNjcCuOkcrDDhE6Sbn47o5KTxw?=
+ =?us-ascii?Q?mtWI5ObcNrxaHtVSXwymvYUgkymnjr44BtVQcKukPF7ywbiMbZMYyVokwpOG?=
+ =?us-ascii?Q?HshN4j26WudqvuqNWJBQyFJzyPtYW8+blPhoZuRfzhTXTcLJleu9zYdO4jvL?=
+ =?us-ascii?Q?BOw8XxFmOseWfXgo7PM2rfFfIbLYyHZ3jO79BGx1vwPNyvyj+oWtRE2JTdZQ?=
+ =?us-ascii?Q?y3mScEVitJW3EWctNV99wHJXWyFydh/M0r4vZnd4QyPq7R5vxgPw8+sfKvrQ?=
+ =?us-ascii?Q?oQLeXNcEo2uCv3tw5ANqdEh0CyRmHLvp7j0NLt22LHizTb3FHskd9RmsnKYo?=
+ =?us-ascii?Q?w+4pPRrd+V3MTDfKw1nA6VxCmjJ2WttDbqezhxtOHUcGiuXc8863BTmpiAtw?=
+ =?us-ascii?Q?qwqZ6SqlwKU7a40AgwqjkNvuKdB+GRZ67MfOEpfb2mV1hX+U99DjwXKKbpLq?=
+ =?us-ascii?Q?GbkVo6T2CZiTK2Cws8B9UzM8IfeKz28oouNjjhRi1ZE58KUOUnhu5eKSXFgy?=
+ =?us-ascii?Q?p6Zg7tqNkDUrKJuDFum3qSiGDMwL1LooGMR1wM++83QejIsrJsMfxp6GUQqv?=
+ =?us-ascii?Q?0VKw23/EoesSGD3NubejFFmq3bQ2w6pralzmhFrifYWYwZFjyjgP5COgq78z?=
+ =?us-ascii?Q?E6PnCJoXPvypOUyRZvzl+tkPlhFxq71fRujknIxo/xcHakm8nReQJhYZhy+g?=
+ =?us-ascii?Q?pVHEpkcT8zwIvhsB6k4ejaUe2k3h1nFKhg86R2JCqhr2I7c3sZH5Z9mRPvu9?=
+ =?us-ascii?Q?ddVtftNFx2uF6LmcNQYarcZx6rSgj9nr28xzYZDW+aaZwlVi1taGN4jCsDdq?=
+ =?us-ascii?Q?ktj9nvsdcS8tnVt5fK+Ixo1fxBfMKucmcSNbWyW+WRWyaAodFE7zjCgA4HX4?=
+ =?us-ascii?Q?Ch0SBtwVt/7F9a6w2qoC/vgRsicZUZY4WQtujaZ5l1RU0DeUe3EyIm8+29rZ?=
+ =?us-ascii?Q?D/E88DiUPPERerkBK0SDm06FvNg1YaXrr1i/F2V9w6CS3UbjXBLo67+m7w1I?=
+ =?us-ascii?Q?bbhBQb3Ve6V4PepbBP6e6cQgIbHtnpOyNsHlJVELbxmY/ENq7TpdACc8Daob?=
+ =?us-ascii?Q?uflFH8ydsmEsIidVTgOlratwwbyAe/SdbPv8kmw5A3xvM3gwfwHJRtHsdO8g?=
+ =?us-ascii?Q?1UfIiBeH1UNJ+2ysqp1gd/GbjjMfgt8tF3Z5REpCKUbsGgQfY9rOUYWkMVcZ?=
+ =?us-ascii?Q?HWBppcvdrfQWwi/1LVjbTMjXZIc8ObJ7Zn7ecqaawzbaVSCZ6g3oTzz6LrB4?=
+ =?us-ascii?Q?aEPEXkkk1+l1pbcnrgGhsMcHjACA9T/+fEG4JsoAQ/4UYKp2fZmManGwiCSY?=
+ =?us-ascii?Q?hLxBNJY19IXVJEQbT8hTifoc?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2df6b05c-d311-4356-624d-08d983442723
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Sep 2021 12:24:58.9361
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: /n4uLlGVMQp5IYCqPOLQvTgOJzgktscN2S9xdWmBzV3djxge1cvRcIcH63CjhXSC
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5173
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-* Brijesh Singh (brijesh.singh@amd.com) wrote:
-> When SEV-SNP is enabled in the guest, the hardware places restrictions on
-> all memory accesses based on the contents of the RMP table. When hardware
-> encounters RMP check failure caused by the guest memory access it raises
-> the #NPF. The error code contains additional information on the access
-> type. See the APM volume 2 for additional information.
+On Wed, Sep 29, 2021 at 03:25:54PM +1000, David Gibson wrote:
+
+> > +struct iommufd_device {
+> > +	unsigned int id;
+> > +	struct iommufd_ctx *ictx;
+> > +	struct device *dev; /* always be the physical device */
+> > +	u64 dev_cookie;
 > 
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> ---
->  arch/x86/kvm/svm/sev.c | 76 ++++++++++++++++++++++++++++++++++++++++++
->  arch/x86/kvm/svm/svm.c | 14 +++++---
->  arch/x86/kvm/svm/svm.h |  1 +
->  3 files changed, 87 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 65b578463271..712e8907bc39 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -3651,3 +3651,79 @@ void sev_post_unmap_gfn(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn, int token)
->  
->  	srcu_read_unlock(&sev->psc_srcu, token);
->  }
-> +
-> +void handle_rmp_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code)
-> +{
-> +	int rmp_level, npt_level, rc, assigned;
-> +	struct kvm *kvm = vcpu->kvm;
-> +	gfn_t gfn = gpa_to_gfn(gpa);
-> +	bool need_psc = false;
-> +	enum psc_op psc_op;
-> +	kvm_pfn_t pfn;
-> +	bool private;
-> +
-> +	write_lock(&kvm->mmu_lock);
-> +
-> +	if (unlikely(!kvm_mmu_get_tdp_walk(vcpu, gpa, &pfn, &npt_level)))
-> +		goto unlock;
-> +
-> +	assigned = snp_lookup_rmpentry(pfn, &rmp_level);
-> +	if (unlikely(assigned < 0))
-> +		goto unlock;
-> +
-> +	private = !!(error_code & PFERR_GUEST_ENC_MASK);
-> +
-> +	/*
-> +	 * If the fault was due to size mismatch, or NPT and RMP page level's
-> +	 * are not in sync, then use PSMASH to split the RMP entry into 4K.
-> +	 */
-> +	if ((error_code & PFERR_GUEST_SIZEM_MASK) ||
-> +	    (npt_level == PG_LEVEL_4K && rmp_level == PG_LEVEL_2M && private)) {
-> +		rc = snp_rmptable_psmash(kvm, pfn);
-> +		if (rc)
-> +			pr_err_ratelimited("psmash failed, gpa 0x%llx pfn 0x%llx rc %d\n",
-> +					   gpa, pfn, rc);
-> +		goto out;
-> +	}
-> +
-> +	/*
-> +	 * If it's a private access, and the page is not assigned in the
-> +	 * RMP table, create a new private RMP entry. This can happen if
-> +	 * guest did not use the PSC VMGEXIT to transition the page state
-> +	 * before the access.
-> +	 */
-> +	if (!assigned && private) {
-> +		need_psc = 1;
-> +		psc_op = SNP_PAGE_STATE_PRIVATE;
-> +		goto out;
-> +	}
-> +
-> +	/*
-> +	 * If it's a shared access, but the page is private in the RMP table
-> +	 * then make the page shared in the RMP table. This can happen if
-> +	 * the guest did not use the PSC VMGEXIT to transition the page
-> +	 * state before the access.
-> +	 */
-> +	if (assigned && !private) {
-> +		need_psc = 1;
-> +		psc_op = SNP_PAGE_STATE_SHARED;
-> +	}
-> +
-> +out:
-> +	write_unlock(&kvm->mmu_lock);
-> +
-> +	if (need_psc)
-> +		rc = __snp_handle_page_state_change(vcpu, psc_op, gpa, PG_LEVEL_4K);
+> Why do you need both an 'id' and a 'dev_cookie'?  Since they're both
+> unique, couldn't you just use the cookie directly as the index into
+> the xarray?
 
-That 'rc' never goes anywhere - should it?
+ID is the kernel value in the xarray - xarray is much more efficient &
+safe with small kernel controlled values.
 
-> +	/*
-> +	 * The fault handler has updated the RMP pagesize, zap the existing
-> +	 * rmaps for large entry ranges so that nested page table gets rebuilt
-> +	 * with the updated RMP pagesize.
-> +	 */
-> +	gfn = gpa_to_gfn(gpa) & ~(KVM_PAGES_PER_HPAGE(PG_LEVEL_2M) - 1);
-> +	kvm_zap_gfn_range(kvm, gfn, gfn + PTRS_PER_PMD);
-> +	return;
-> +
-> +unlock:
-> +	write_unlock(&kvm->mmu_lock);
-> +}
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 3784d389247b..3ba62f21b113 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -1933,15 +1933,21 @@ static int pf_interception(struct kvm_vcpu *vcpu)
->  static int npf_interception(struct kvm_vcpu *vcpu)
->  {
->  	struct vcpu_svm *svm = to_svm(vcpu);
-> +	int rc;
->  
->  	u64 fault_address = svm->vmcb->control.exit_info_2;
->  	u64 error_code = svm->vmcb->control.exit_info_1;
->  
->  	trace_kvm_page_fault(fault_address, error_code);
-> -	return kvm_mmu_page_fault(vcpu, fault_address, error_code,
-> -			static_cpu_has(X86_FEATURE_DECODEASSISTS) ?
-> -			svm->vmcb->control.insn_bytes : NULL,
-> -			svm->vmcb->control.insn_len);
-> +	rc = kvm_mmu_page_fault(vcpu, fault_address, error_code,
-> +				static_cpu_has(X86_FEATURE_DECODEASSISTS) ?
-> +				svm->vmcb->control.insn_bytes : NULL,
-> +				svm->vmcb->control.insn_len);
+dev_cookie is a user assigned value that may not be unique. It's
+purpose is to allow userspace to receive and event and go back to its
+structure. Most likely userspace will store a pointer here, but it is
+also possible userspace could not use it.
 
-If kvm_mmu_page_fault failed, (rc!=0) do you still want to call your
-handler?
+It is a pretty normal pattern
 
-Dave
-
-> +	if (error_code & PFERR_GUEST_RMP_MASK)
-> +		handle_rmp_page_fault(vcpu, fault_address, error_code);
-> +
-> +	return rc;
->  }
->  
->  static int db_interception(struct kvm_vcpu *vcpu)
-> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-> index ff91184f9b4a..280072995306 100644
-> --- a/arch/x86/kvm/svm/svm.h
-> +++ b/arch/x86/kvm/svm/svm.h
-> @@ -626,6 +626,7 @@ struct page *snp_safe_alloc_page(struct kvm_vcpu *vcpu);
->  void sev_rmp_page_level_adjust(struct kvm *kvm, kvm_pfn_t pfn, int *level);
->  int sev_post_map_gfn(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn, int *token);
->  void sev_post_unmap_gfn(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn, int token);
-> +void handle_rmp_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code);
->  
->  /* vmenter.S */
->  
-> -- 
-> 2.17.1
-> 
-> 
--- 
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-
+Jason
