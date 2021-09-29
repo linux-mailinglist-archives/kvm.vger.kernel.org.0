@@ -2,147 +2,296 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8A46841CE69
-	for <lists+kvm@lfdr.de>; Wed, 29 Sep 2021 23:49:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6BFAD41CE94
+	for <lists+kvm@lfdr.de>; Wed, 29 Sep 2021 23:56:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344736AbhI2Vuz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Sep 2021 17:50:55 -0400
-Received: from mail-dm6nam11on2081.outbound.protection.outlook.com ([40.107.223.81]:11104
-        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1344935AbhI2Vux (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Sep 2021 17:50:53 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=esg99x0t/oMUVd0SsiuENixFCTpA24vkLgmm+t1hCiQ830b0x87qurh/EKVBo3eCKpcqIl1UgBtbh4SDRVyMRKY5A3cIPlLpODX/SiCFZwH05SNQ2lx/Q36fAozJIGlTChxcm1Xl8PZmOUXccOOZ6KdLVKOpShA0n4IFVQSv3INKM4ti0hIaZ7irATeE3nWPoC/gKAwlKUfM0qcKsZ/S8vdHLI4v9TFpngb3PvCiBdDTKFI7mGk/iG8gpcj60vWDSpvbJGhIOjtY41P5R/uMwrQUgzRGRqBIhNJTnwajxvoRW+OfHMo4iL83l0OEb33PuwCI2zyemKfLcdYNkrNGvA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
- bh=j6uIBgfrj/36cNcorP4Dwz6nJnv2/L+fiooMjtLw8q0=;
- b=GcpT2Uy8BaH1iX7y2z5w5/QSYwrfo5ogO19Usfg1zzxG/T4yr7DIKEXkYT2X53Djdwu7vmxRX+W1KTyp4f9nj3OrKXeoFHdDWwqHZjG0rsjtEcpHRe/p9elPHPluzgJTdceUNlA1ri2bcc1gND5fmsMNNCc5LybZ9Em9cqAa1+olUlj90O3blAhwb3VYiHvIpovqmnPlvpV1MMnqKo9RtglGpov9CeFmYAtP6PTnyjs5QnTNfVuqghlp2zFdg4yShqa9Q4f2EnquScnwWiuOWBaXagnfN8bWYzXJMlrDUZzP87jCFgH5bRAI10t8ZkhqO+Mm38kgNKbYgMRRY/ZziA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.112.34) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=quarantine sp=none pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=j6uIBgfrj/36cNcorP4Dwz6nJnv2/L+fiooMjtLw8q0=;
- b=raQacofIGbi74i5L89eHbDngLyBS9hcLQW6p/wmE2x6ZWmZnXB2JsF+9/exnZcGaItTqbGOhoGYLhjT217SWjq52jhgJCQEMhXg+PJ6vArTWfYWr+lIDtSXCF8hbbXDbtslu2FeaoHRNkZr2KGG12pQYsN4Nb0pCc1sYSl/s3a26PqXWiFJQVOJkli/nnMqKUGDXTV8O2oQJucHnbEgbDMAdUq4K40LxiUSJpMCFheswY6K1X+6piOibzmIAIO4zJArOeASkAof6V7TwS/Z/Rcpw9EJSkTAoGuYlEZJdnWJHtNj72nV+VGGiA17AoGHY7907nkW5/A8i8+tKY97mIg==
-Received: from MW4PR04CA0266.namprd04.prod.outlook.com (2603:10b6:303:88::31)
- by SA0PR12MB4493.namprd12.prod.outlook.com (2603:10b6:806:72::24) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4566.14; Wed, 29 Sep
- 2021 21:49:08 +0000
-Received: from CO1NAM11FT038.eop-nam11.prod.protection.outlook.com
- (2603:10b6:303:88:cafe::62) by MW4PR04CA0266.outlook.office365.com
- (2603:10b6:303:88::31) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4544.15 via Frontend
- Transport; Wed, 29 Sep 2021 21:49:08 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.34)
- smtp.mailfrom=nvidia.com; redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.112.34 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.112.34; helo=mail.nvidia.com;
-Received: from mail.nvidia.com (216.228.112.34) by
- CO1NAM11FT038.mail.protection.outlook.com (10.13.174.231) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.4566.14 via Frontend Transport; Wed, 29 Sep 2021 21:49:08 +0000
-Received: from [172.27.1.131] (172.20.187.6) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.18; Wed, 29 Sep
- 2021 21:49:03 +0000
-Subject: Re: [PATCH mlx5-next 2/7] vfio: Add an API to check migration state
- transition validity
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-CC:     Alex Williamson <alex.williamson@redhat.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Doug Ledford <dledford@redhat.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Kirti Wankhede <kwankhede@nvidia.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-pci@vger.kernel.org>,
-        <linux-rdma@vger.kernel.org>, <netdev@vger.kernel.org>,
-        Saeed Mahameed <saeedm@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>
-References: <c87f55d6fec77a22b110d3c9611744e6b28bba46.1632305919.git.leonro@nvidia.com>
- <20210927164648.1e2d49ac.alex.williamson@redhat.com>
- <20210927231239.GE3544071@ziepe.ca>
- <25c97be6-eb4a-fdc8-3ac1-5628073f0214@nvidia.com>
- <20210929063551.47590fbb.alex.williamson@redhat.com>
- <1eba059c-4743-4675-9f72-1a26b8f3c0f6@nvidia.com>
- <20210929075019.48d07deb.alex.williamson@redhat.com>
- <d2e94241-a146-c57d-cf81-8b7d8d00e62d@nvidia.com>
- <20210929091712.6390141c.alex.williamson@redhat.com>
- <e1ba006f-f181-0b89-822d-890396e81c7b@nvidia.com>
- <20210929161433.GA1808627@ziepe.ca>
-From:   Max Gurtovoy <mgurtovoy@nvidia.com>
-Message-ID: <29835bf4-d094-ae6d-1a32-08e65847b52c@nvidia.com>
-Date:   Thu, 30 Sep 2021 00:48:55 +0300
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+        id S1346370AbhI2V6H (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Sep 2021 17:58:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60973 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1346209AbhI2V6G (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 29 Sep 2021 17:58:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1632952584;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=lLQsTdulw+5jwiqASL8F5vvvT6YsSpmb40XhW1+sUTA=;
+        b=fEMg6Yv6mhCMg7H8UEM5RUYp41ArWzaGLxNrIqaBB2LTagjY29NQJUVuC08jHwzj8Y05r1
+        sVHSiY9+L6Wti6CO6zkfi6g6H/HkqaWKPazdPjLeEGxOEXpQYcn5yDdAa7K73pXY45sv4j
+        tC5artM+AGgzj5VWP9vhviW+hrIu0hk=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-253-mwulZEQkNz6rGfpbRQEf4w-1; Wed, 29 Sep 2021 17:56:23 -0400
+X-MC-Unique: mwulZEQkNz6rGfpbRQEf4w-1
+Received: by mail-ed1-f69.google.com with SMTP id x26-20020a50f19a000000b003da81cce93bso3944821edl.19
+        for <kvm@vger.kernel.org>; Wed, 29 Sep 2021 14:56:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=lLQsTdulw+5jwiqASL8F5vvvT6YsSpmb40XhW1+sUTA=;
+        b=yawprNlHBDEQ/vU4ZxIOO9+NSjCqb2ajReS1hjWQHDwmzxkglVTey4Druti6RfFN23
+         4vNpy9a9U6ruQc/sM5fLpJCTrBfTMXv9ZQUGwLER6ztmsvjIEe99HOq6dcsSiFSW7oRi
+         hw5V9fDpch+k9UpPOgdwrpSNdUUdV94z4tu8ZMzmxO+dCsGsvCe8/bP9DioGgRmGIekY
+         sCPgvVVcvHr1SswGI5jUG281cx1YJvoafN1SwU2v2Hs16bAYxprttpUc0UJ0nra7ZpWl
+         FcoWIKs+/FTzL1PueSrb4Xii+kGh0ZuJ1XgXAosdpib+mllqEl5uX+V/KQgApBikuBc4
+         90ag==
+X-Gm-Message-State: AOAM530UVwu/YsKTmxUxyrRtSzZHS0Up8EgMs4E9est9fCRPNlFsg8k7
+        2uZe3DYA37uLu5bKpJs5MZPSIydo/T4TisBm/QFWzWizcHPKfnTnWX+viSM/Zkmoz6C1+Q+GYCi
+        uEqTaBA6byNr+
+X-Received: by 2002:a50:dace:: with SMTP id s14mr2770824edj.369.1632952581780;
+        Wed, 29 Sep 2021 14:56:21 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwxt02FT4s7ia2NJuh8uN4A8JtvHKcLZHBWOEaQtWmkmmO1fRHN4q3k0qbYi1t9fcinYAJ6jw==
+X-Received: by 2002:a50:dace:: with SMTP id s14mr2770801edj.369.1632952581596;
+        Wed, 29 Sep 2021 14:56:21 -0700 (PDT)
+Received: from redhat.com ([2.55.134.220])
+        by smtp.gmail.com with ESMTPSA id bq4sm570543ejb.43.2021.09.29.14.56.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Sep 2021 14:56:20 -0700 (PDT)
+Date:   Wed, 29 Sep 2021 17:56:17 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc:     qemu-devel@nongnu.org, haxm-team@intel.com,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Reinoud Zandijk <reinoud@netbsd.org>, qemu-trivial@nongnu.org,
+        Sunil Muthuswamy <sunilmut@microsoft.com>,
+        Colin Xu <colin.xu@intel.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Kamil Rytarowski <kamil@netbsd.org>,
+        Wenchao Wang <wenchao.wang@intel.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Roman Bolshakov <r.bolshakov@yadro.com>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Cameron Esfahani <dirty@apple.com>
+Subject: Re: [PATCH v3] target/i386: Include 'hw/i386/apic.h' locally
+Message-ID: <20210929175605-mutt-send-email-mst@kernel.org>
+References: <20210929163124.2523413-1-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <20210929161433.GA1808627@ziepe.ca>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Originating-IP: [172.20.187.6]
-X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
- HQMAIL107.nvidia.com (172.20.187.13)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 53cf2461-f6c8-4768-ce0c-08d98392f6fb
-X-MS-TrafficTypeDiagnostic: SA0PR12MB4493:
-X-Microsoft-Antispam-PRVS: <SA0PR12MB44931AF1587AD68D08C07580DEA99@SA0PR12MB4493.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: aYSe4t9RiQ/MhZSZ/O9G+Ct9xBb3UQaFRvhodr350MF34I+QSTfyrT8/OPK1JP67dUMgyrVMWPyUopEZbN4bqn30BMsiPiu4mcpmixmc4tsU0paS0KL/iBUO7caKTQ5nzO3Fsm6RkBOulnaVa8LxuARDD4tsoNnWzwel1ugGhFcdxSC4XYXOrcPZvPhHrF4K0w9q9x6SZtFDvAV58ADW9KrIzJ8QrFoalUZCASdcb8hhH1yIUcyUfQKu0zjkr7r+lzOPz2HhaNslpOHiH3iRUGwKyZhZOEI2OyleTZt+EE9GymC9fUQjr2o6PHi/q5c9u3wqc/MUATL/tIxLQKmzazu7QwP1qMBqIIvuJ7Pg/dSpnYwFU4GP7RCHQRfNYudYFTWVbX5cw5pPUvaGQ5yoL8md+4llqjKMe3gVqxAjEsrRQ9ZsxStoXNPDF0r3vzL6klA2EuOc9JAqQeWhNn2yiKvwJ8YhmfB9+u/Q3SDKCZJXYwRFkWh3VxHbFh6q9LmM7R6ZFHXaPLdVfYBE57QVxbHhPz87MvbqdG3czy/psoHJLPZ3ROsOGopZMjI2+ZcCCSVKE9teApiRARibmDLJPZ70xdVVN1oglB07w0le6QMAkCpJrnZnMsj7+/Mo1vamOGDjIO6K2zx59DcpEB8hh1yjxi4HPRY4ziLLoowtn74yi6WkATp4VceUe6VR4sAJoPqIG5x1N6EwWdiOSQ2OK0U5QED1P98IoFxSqCLMhVA=
-X-Forefront-Antispam-Report: CIP:216.228.112.34;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid03.nvidia.com;CAT:NONE;SFS:(4636009)(36840700001)(46966006)(16526019)(31686004)(7636003)(6916009)(53546011)(5660300002)(4326008)(6666004)(356005)(83380400001)(186003)(82310400003)(508600001)(426003)(47076005)(336012)(36756003)(70586007)(31696002)(2616005)(8676002)(2906002)(7416002)(70206006)(54906003)(316002)(36860700001)(26005)(16576012)(8936002)(86362001)(43740500002);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Sep 2021 21:49:08.0684
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 53cf2461-f6c8-4768-ce0c-08d98392f6fb
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.34];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT038.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4493
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210929163124.2523413-1-f4bug@amsat.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, Sep 29, 2021 at 06:31:24PM +0200, Philippe Mathieu-Daudé wrote:
+> Instead of including a sysemu-specific header in "cpu.h"
+> (which is shared with user-mode emulations), include it
+> locally when required.
+> 
+> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-On 9/29/2021 7:14 PM, Jason Gunthorpe wrote:
-> On Wed, Sep 29, 2021 at 06:28:44PM +0300, Max Gurtovoy wrote:
->
->>> So you have a device that's actively modifying its internal state,
->>> performing I/O, including DMA (thereby dirtying VM memory), all while
->>> in the _STOP state?  And you don't see this as a problem?
->> I don't see how is it different from vfio-pci situation.
-> vfio-pci provides no way to observe the migration state. It isn't
-> "000b"
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
 
-Alex said that there is a problem of compatibility.
+> ---
+>  target/i386/cpu.h                    | 4 ----
+>  hw/i386/kvmvapic.c                   | 1 +
+>  hw/i386/x86.c                        | 1 +
+>  target/i386/cpu-dump.c               | 1 +
+>  target/i386/cpu-sysemu.c             | 1 +
+>  target/i386/cpu.c                    | 1 +
+>  target/i386/gdbstub.c                | 4 ++++
+>  target/i386/hax/hax-all.c            | 1 +
+>  target/i386/helper.c                 | 1 +
+>  target/i386/hvf/hvf.c                | 1 +
+>  target/i386/hvf/x86_emu.c            | 1 +
+>  target/i386/nvmm/nvmm-all.c          | 1 +
+>  target/i386/tcg/sysemu/misc_helper.c | 1 +
+>  target/i386/tcg/sysemu/seg_helper.c  | 1 +
+>  target/i386/whpx/whpx-all.c          | 1 +
+>  15 files changed, 17 insertions(+), 4 deletions(-)
+> 
+> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+> index c2954c71ea0..4411718bb7a 100644
+> --- a/target/i386/cpu.h
+> +++ b/target/i386/cpu.h
+> @@ -2045,10 +2045,6 @@ typedef X86CPU ArchCPU;
+>  #include "exec/cpu-all.h"
+>  #include "svm.h"
+>  
+> -#if !defined(CONFIG_USER_ONLY)
+> -#include "hw/i386/apic.h"
+> -#endif
+> -
+>  static inline void cpu_get_tb_cpu_state(CPUX86State *env, target_ulong *pc,
+>                                          target_ulong *cs_base, uint32_t *flags)
+>  {
+> diff --git a/hw/i386/kvmvapic.c b/hw/i386/kvmvapic.c
+> index 43f8a8f679e..7333818bdd1 100644
+> --- a/hw/i386/kvmvapic.c
+> +++ b/hw/i386/kvmvapic.c
+> @@ -16,6 +16,7 @@
+>  #include "sysemu/hw_accel.h"
+>  #include "sysemu/kvm.h"
+>  #include "sysemu/runstate.h"
+> +#include "hw/i386/apic.h"
+>  #include "hw/i386/apic_internal.h"
+>  #include "hw/sysbus.h"
+>  #include "hw/boards.h"
+> diff --git a/hw/i386/x86.c b/hw/i386/x86.c
+> index 00448ed55aa..e0218f8791f 100644
+> --- a/hw/i386/x86.c
+> +++ b/hw/i386/x86.c
+> @@ -43,6 +43,7 @@
+>  #include "target/i386/cpu.h"
+>  #include "hw/i386/topology.h"
+>  #include "hw/i386/fw_cfg.h"
+> +#include "hw/i386/apic.h"
+>  #include "hw/intc/i8259.h"
+>  #include "hw/rtc/mc146818rtc.h"
+>  
+> diff --git a/target/i386/cpu-dump.c b/target/i386/cpu-dump.c
+> index 02b635a52cf..0158fd2bf28 100644
+> --- a/target/i386/cpu-dump.c
+> +++ b/target/i386/cpu-dump.c
+> @@ -22,6 +22,7 @@
+>  #include "qemu/qemu-print.h"
+>  #ifndef CONFIG_USER_ONLY
+>  #include "hw/i386/apic_internal.h"
+> +#include "hw/i386/apic.h"
+>  #endif
+>  
+>  /***********************************************************/
+> diff --git a/target/i386/cpu-sysemu.c b/target/i386/cpu-sysemu.c
+> index 37b7c562f53..4e8a6973d08 100644
+> --- a/target/i386/cpu-sysemu.c
+> +++ b/target/i386/cpu-sysemu.c
+> @@ -30,6 +30,7 @@
+>  #include "hw/qdev-properties.h"
+>  
+>  #include "exec/address-spaces.h"
+> +#include "hw/i386/apic.h"
+>  #include "hw/i386/apic_internal.h"
+>  
+>  #include "cpu-internal.h"
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 6b029f1bdf1..52422cbf21b 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -33,6 +33,7 @@
+>  #include "standard-headers/asm-x86/kvm_para.h"
+>  #include "hw/qdev-properties.h"
+>  #include "hw/i386/topology.h"
+> +#include "hw/i386/apic.h"
+>  #ifndef CONFIG_USER_ONLY
+>  #include "exec/address-spaces.h"
+>  #include "hw/boards.h"
+> diff --git a/target/i386/gdbstub.c b/target/i386/gdbstub.c
+> index 098a2ad15a9..5438229c1a9 100644
+> --- a/target/i386/gdbstub.c
+> +++ b/target/i386/gdbstub.c
+> @@ -21,6 +21,10 @@
+>  #include "cpu.h"
+>  #include "exec/gdbstub.h"
+>  
+> +#ifndef CONFIG_USER_ONLY
+> +#include "hw/i386/apic.h"
+> +#endif
+> +
+>  #ifdef TARGET_X86_64
+>  static const int gpr_map[16] = {
+>      R_EAX, R_EBX, R_ECX, R_EDX, R_ESI, R_EDI, R_EBP, R_ESP,
+> diff --git a/target/i386/hax/hax-all.c b/target/i386/hax/hax-all.c
+> index bf65ed6fa92..cd89e3233a9 100644
+> --- a/target/i386/hax/hax-all.c
+> +++ b/target/i386/hax/hax-all.c
+> @@ -32,6 +32,7 @@
+>  #include "sysemu/reset.h"
+>  #include "sysemu/runstate.h"
+>  #include "hw/boards.h"
+> +#include "hw/i386/apic.h"
+>  
+>  #include "hax-accel-ops.h"
+>  
+> diff --git a/target/i386/helper.c b/target/i386/helper.c
+> index 533b29cb91b..874beda98ae 100644
+> --- a/target/i386/helper.c
+> +++ b/target/i386/helper.c
+> @@ -26,6 +26,7 @@
+>  #ifndef CONFIG_USER_ONLY
+>  #include "sysemu/hw_accel.h"
+>  #include "monitor/monitor.h"
+> +#include "hw/i386/apic.h"
+>  #endif
+>  
+>  void cpu_sync_bndcs_hflags(CPUX86State *env)
+> diff --git a/target/i386/hvf/hvf.c b/target/i386/hvf/hvf.c
+> index 4ba6e82fab3..50058a24f2a 100644
+> --- a/target/i386/hvf/hvf.c
+> +++ b/target/i386/hvf/hvf.c
+> @@ -70,6 +70,7 @@
+>  #include <sys/sysctl.h>
+>  
+>  #include "hw/i386/apic_internal.h"
+> +#include "hw/i386/apic.h"
+>  #include "qemu/main-loop.h"
+>  #include "qemu/accel.h"
+>  #include "target/i386/cpu.h"
+> diff --git a/target/i386/hvf/x86_emu.c b/target/i386/hvf/x86_emu.c
+> index 7c8203b21fb..fb3e88959d4 100644
+> --- a/target/i386/hvf/x86_emu.c
+> +++ b/target/i386/hvf/x86_emu.c
+> @@ -45,6 +45,7 @@
+>  #include "x86_flags.h"
+>  #include "vmcs.h"
+>  #include "vmx.h"
+> +#include "hw/i386/apic.h"
+>  
+>  void hvf_handle_io(struct CPUState *cpu, uint16_t port, void *data,
+>                     int direction, int size, uint32_t count);
+> diff --git a/target/i386/nvmm/nvmm-all.c b/target/i386/nvmm/nvmm-all.c
+> index a488b00e909..944bdb49663 100644
+> --- a/target/i386/nvmm/nvmm-all.c
+> +++ b/target/i386/nvmm/nvmm-all.c
+> @@ -22,6 +22,7 @@
+>  #include "qemu/queue.h"
+>  #include "migration/blocker.h"
+>  #include "strings.h"
+> +#include "hw/i386/apic.h"
+>  
+>  #include "nvmm-accel-ops.h"
+>  
+> diff --git a/target/i386/tcg/sysemu/misc_helper.c b/target/i386/tcg/sysemu/misc_helper.c
+> index 9ccaa054c4c..b1d3096e9c9 100644
+> --- a/target/i386/tcg/sysemu/misc_helper.c
+> +++ b/target/i386/tcg/sysemu/misc_helper.c
+> @@ -24,6 +24,7 @@
+>  #include "exec/cpu_ldst.h"
+>  #include "exec/address-spaces.h"
+>  #include "tcg/helper-tcg.h"
+> +#include "hw/i386/apic.h"
+>  
+>  void helper_outb(CPUX86State *env, uint32_t port, uint32_t data)
+>  {
+> diff --git a/target/i386/tcg/sysemu/seg_helper.c b/target/i386/tcg/sysemu/seg_helper.c
+> index bf3444c26b0..34f2c65d47f 100644
+> --- a/target/i386/tcg/sysemu/seg_helper.c
+> +++ b/target/i386/tcg/sysemu/seg_helper.c
+> @@ -24,6 +24,7 @@
+>  #include "exec/cpu_ldst.h"
+>  #include "tcg/helper-tcg.h"
+>  #include "../seg_helper.h"
+> +#include "hw/i386/apic.h"
+>  
+>  #ifdef TARGET_X86_64
+>  void helper_syscall(CPUX86State *env, int next_eip_addend)
+> diff --git a/target/i386/whpx/whpx-all.c b/target/i386/whpx/whpx-all.c
+> index 3e925b9da70..9ab844fd05d 100644
+> --- a/target/i386/whpx/whpx-all.c
+> +++ b/target/i386/whpx/whpx-all.c
+> @@ -20,6 +20,7 @@
+>  #include "qemu/main-loop.h"
+>  #include "hw/boards.h"
+>  #include "hw/i386/ioapic.h"
+> +#include "hw/i386/apic.h"
+>  #include "hw/i386/apic_internal.h"
+>  #include "qemu/error-report.h"
+>  #include "qapi/error.h"
+> -- 
+> 2.31.1
 
-I migration SW is not involved, nobody will read this migration state.
-
->> Maybe we need to rename STOP state. We can call it READY or LIVE or
->> NON_MIGRATION_STATE.
-> It was a poor choice to use 000b as stop, but it doesn't really
-> matter. The mlx5 driver should just pre-init this readable to running.
-
-I guess we can do it for this reason. There is no functional problem nor 
-compatibility issue here as was mentioned.
-
-But still we need the kernel to track transitions. We don't want to 
-allow moving from RESUMING to SAVING state for example. How this 
-transition can be allowed ?
-
-In this case we need to fail the request from the migration SW...
-
-
->
-> Jason
