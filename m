@@ -2,102 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 300C741C502
-	for <lists+kvm@lfdr.de>; Wed, 29 Sep 2021 14:56:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 766E741C505
+	for <lists+kvm@lfdr.de>; Wed, 29 Sep 2021 14:57:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343962AbhI2M60 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Sep 2021 08:58:26 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:46154 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1343919AbhI2M6Z (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 29 Sep 2021 08:58:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632920204;
+        id S1343965AbhI2M6j (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Sep 2021 08:58:39 -0400
+Received: from mail.skyhub.de ([5.9.137.197]:37772 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1343889AbhI2M6i (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Sep 2021 08:58:38 -0400
+Received: from zn.tnic (p200300ec2f0bd1007899710aba6f35e5.dip0.t-ipconnect.de [IPv6:2003:ec:2f0b:d100:7899:710a:ba6f:35e5])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id DAA481EC0570;
+        Wed, 29 Sep 2021 14:56:55 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1632920216;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=7IhsKr72AkHWnSlS1NFhAKch0JRdHqQulQ0Y+w3psvc=;
-        b=XhEMpKhj6cBCn7FrVMqsweNeZqXrBwI7c6yyVddxrlU5Yr69jUUPiAHfmoVefMt9InWBtj
-        TI/th0wcceh2fOQhxYP6YnOrPCPMLs0bQ6S87Z5G7dsqHF2sL+KB2bmyNFiydjKFtGHaQw
-        16xIeiYBkwLNXulkTpHAC9C/2Q/XVzA=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-460-5RZFDipzMFu3hLP6qkGn6Q-1; Wed, 29 Sep 2021 08:56:43 -0400
-X-MC-Unique: 5RZFDipzMFu3hLP6qkGn6Q-1
-Received: by mail-ed1-f69.google.com with SMTP id u17-20020a50d511000000b003daa3828c13so2299600edi.12
-        for <kvm@vger.kernel.org>; Wed, 29 Sep 2021 05:56:42 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=7IhsKr72AkHWnSlS1NFhAKch0JRdHqQulQ0Y+w3psvc=;
-        b=KRvsG7H0kZam6vtkjRIWnZbdzUofUo+4sNy5+TinmufszaYG4Hwj2Db+JZqUGprh/y
-         g4+tzAlUP9p6fGz95uhdjVEYBXZ2psFW6bVOpUkFsbz4qk0ZtYdgPzUuDsSxmfS9Oi7X
-         56L7JOTe69y1IB99TwheQLatTzoGA0oIKZFvUjWPBu+DEClvCHpA0sPqW7Q5hk56XTcp
-         lbrpbbPB7Z7/AjSPlnLsrSsMY2WeaunvY4/acWDuxiGt3NyfUIwYktw+Qk5jNmH0kXzc
-         CKZ8L8BsVj5s/8qAC3LCNKkgubpAhG81vl6XWsATXXhSi9SO1za6Xb2EeACCNR8LTPgr
-         aUgw==
-X-Gm-Message-State: AOAM531cd2jnmSlLG3OXci51aXgyWyrxRx7ARvQbWmCXwzwr2Zk/hZ93
-        DhWna7xXJ3LrSc/cd+8djv7WncPBVLeoRVuKf67btZ6SmadTwRbSGNXIIAdHnos3d8HD3pSC89X
-        BA5RSCGT77Ctt
-X-Received: by 2002:a17:906:ad5:: with SMTP id z21mr11870815ejf.109.1632920201620;
-        Wed, 29 Sep 2021 05:56:41 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy/pS49tyZl0DHErTrVe+A0+278VsjucPdVAQ3tGX6C+RNYeGLP+q79eyjCO3u7V/ZEd5RHwg==
-X-Received: by 2002:a17:906:ad5:: with SMTP id z21mr11870783ejf.109.1632920201379;
-        Wed, 29 Sep 2021 05:56:41 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id f10sm1544971edu.70.2021.09.29.05.56.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 29 Sep 2021 05:56:40 -0700 (PDT)
-Message-ID: <e19a07aa-e0a5-3be7-602c-a17963a7e307@redhat.com>
-Date:   Wed, 29 Sep 2021 14:56:36 +0200
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=2BP/UXowSthxUNPAy3ZuvlIlMNxQstja9jGS9Mw4h+Q=;
+        b=nrMuwfMvh0EJaU3jF7q6cS/9YbvzmA9n+Rmh931iVSFZWHQ+k+EmvHUF9nnWWKLL62ybpG
+        8/dGU8a2XKqRUgFNbyXdkHTVfd2SRK/F93Ag45XxqoGuDS3Ocr8xrh1u5ColtvHMDTpSs0
+        xV6X1ElJQzk8fuMsivGo0JSKoCDwn20=
+Date:   Wed, 29 Sep 2021 14:56:46 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH Part2 v5 04/45] x86/sev: Add RMP entry lookup helpers
+Message-ID: <YVRijqnxzd8y7gcD@zn.tnic>
+References: <20210820155918.7518-1-brijesh.singh@amd.com>
+ <20210820155918.7518-5-brijesh.singh@amd.com>
+ <YU2fQMgw+PIBzSE4@zn.tnic>
+ <a5be6103-f643-fed2-b01a-d0310f447d7a@amd.com>
+ <2041d0d2-a0f8-d063-13c0-79b5bbcc8b83@amd.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [PATCH -next] KVM: use vma_pages() helper
-Content-Language: en-US
-To:     Yang Li <yang.lee@linux.alibaba.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <1632900526-119643-1-git-send-email-yang.lee@linux.alibaba.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <1632900526-119643-1-git-send-email-yang.lee@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <2041d0d2-a0f8-d063-13c0-79b5bbcc8b83@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 29/09/21 09:28, Yang Li wrote:
-> Use vma_pages function on vma object instead of explicit computation.
-> 
-> Fix the following coccicheck warning:
-> ./virt/kvm/kvm_main.c:3526:29-35: WARNING: Consider using vma_pages
-> helper on vma
-> 
-> Reported-by: Abaci Robot <abaci@linux.alibaba.com>
-> Signed-off-by: Yang Li <yang.lee@linux.alibaba.com>
-> ---
->   virt/kvm/kvm_main.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 7851f3a..8f0e9ea 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -3523,7 +3523,7 @@ static vm_fault_t kvm_vcpu_fault(struct vm_fault *vmf)
->   static int kvm_vcpu_mmap(struct file *file, struct vm_area_struct *vma)
->   {
->   	struct kvm_vcpu *vcpu = file->private_data;
-> -	unsigned long pages = (vma->vm_end - vma->vm_start) >> PAGE_SHIFT;
-> +	unsigned long pages = vma_pages(vma);
->   
->   	if ((kvm_page_in_dirty_ring(vcpu->kvm, vma->vm_pgoff) ||
->   	     kvm_page_in_dirty_ring(vcpu->kvm, vma->vm_pgoff + pages - 1)) &&
-> 
+On Mon, Sep 27, 2021 at 11:04:04AM -0500, Brijesh Singh wrote:
+> Currently, we have only x86 drivers using it, are you thinking to move
+> this to arch/x86/include/asm/ ?
 
-Queued, thanks.
+arch/x86/include/asm/sev.h, yap.
 
-Paolo
+We can always create it later if needed by other architectures.
 
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
