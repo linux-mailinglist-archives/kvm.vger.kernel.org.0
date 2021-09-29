@@ -2,108 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 863E741CA04
-	for <lists+kvm@lfdr.de>; Wed, 29 Sep 2021 18:23:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AF7D041CA09
+	for <lists+kvm@lfdr.de>; Wed, 29 Sep 2021 18:24:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345481AbhI2QZ0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Sep 2021 12:25:26 -0400
-Received: from mout.kundenserver.de ([212.227.126.133]:50671 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233501AbhI2QZZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Sep 2021 12:25:25 -0400
-Received: from [192.168.100.1] ([82.142.21.142]) by mrelayeu.kundenserver.de
- (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MZTa2-1mHxLg3qiM-00WXPj; Wed, 29 Sep 2021 18:23:15 +0200
-Subject: Re: [PATCH] target/i386: Include 'hw/i386/apic.h' locally
-To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Cc:     Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        QEMU Trivial <qemu-trivial@nongnu.org>, haxm-team@intel.com,
-        Richard Henderson <richard.henderson@linaro.org>,
-        qemu-devel@nongnu.org, Cameron Esfahani <dirty@apple.com>,
-        Kamil Rytarowski <kamil@netbsd.org>,
-        Reinoud Zandijk <reinoud@netbsd.org>,
-        Colin Xu <colin.xu@intel.com>,
-        Roman Bolshakov <r.bolshakov@yadro.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sunil Muthuswamy <sunilmut@microsoft.com>,
-        Wenchao Wang <wenchao.wang@intel.com>
-References: <20210902152243.386118-1-f4bug@amsat.org>
- <a4cba848-e668-7cf1-fe93-b5da3a4ac6dc@redhat.com>
- <f3e89488-0d05-657a-34f7-060a7250517d@amsat.org>
- <f9e3c54f-a7cb-a043-f7fd-9d9d0dd61c16@vivier.eu>
- <6fa5f79c-8d3b-9534-26d6-ebe1ba937491@vivier.eu>
- <01ea5ea0-a61c-7bea-e1a6-639e3b9a2988@amsat.org>
-From:   Laurent Vivier <laurent@vivier.eu>
-Message-ID: <93245807-dfa9-be11-ccda-4601b09b204e@vivier.eu>
-Date:   Wed, 29 Sep 2021 18:23:12 +0200
+        id S1345697AbhI2Q0Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Sep 2021 12:26:16 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:25570 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1345551AbhI2Q0P (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 29 Sep 2021 12:26:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1632932674;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=WPjpZB7ZKa4VEqgp/LOlyRjs9pgY0FjMtIXN/7uEb5A=;
+        b=PPADVmBXp8TbxNqY6Es1vs6u0fIJ4QcZ7p8fwWwQbsf/S2Rluv39w4y6JXJvmhqIOabJl/
+        FSiM6CzCjy/8Lf+73Rm12g8qb5FoZZZh9ZkF3ZD8U5hm9m9Eb2Lrc2/kAutENq4oOwQp/V
+        8ehub9kIW1AYmUdP6hdqPA0qxiaJ5tM=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-25-3yjkkSutO_uQzEqf61uWkQ-1; Wed, 29 Sep 2021 12:24:32 -0400
+X-MC-Unique: 3yjkkSutO_uQzEqf61uWkQ-1
+Received: by mail-wr1-f69.google.com with SMTP id x2-20020a5d54c2000000b0015dfd2b4e34so805479wrv.6
+        for <kvm@vger.kernel.org>; Wed, 29 Sep 2021 09:24:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:reply-to:subject:to:cc:references:from
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-transfer-encoding:content-language;
+        bh=WPjpZB7ZKa4VEqgp/LOlyRjs9pgY0FjMtIXN/7uEb5A=;
+        b=tCA7VYPQVzMfRKcq6wTOFeHeCbbWhQDjls7KvKew8qmZAuOGZa4tiPElk5PValEbje
+         BKhwN/THfITnYYnS95mErTKfmK/NfsO5Di7feRrz5q6jhGDx1NaTHBoTOpzKcnGB8d97
+         RCAn6/IdaLwgAsGeaIp4TR5Y97K8Y3dUKQnmPUwe5x06YjeSG8Q4lynu5265SFy3W5yq
+         AfIYp4+Il3HDWVZoHwZBfj6qqqhlqZkuYHPjU9eQge8G97k0ZL7fd/l4Tufb1dbEFlwR
+         1/Ej50PQkVjwm9x7TQhbN5rhDfrxkItLhbEra92iWzG7PWi+e06h99wVYxcnUIG92Bxq
+         TsLw==
+X-Gm-Message-State: AOAM533n5UtPKaHiyC4hWUCB0HiP3ePFdwRLU+3h4QFjZJOC+qIWTzJl
+        hEKuQ423iRUAX28hMBnbyS1KmNfhZhbfgVdZQR1iDg/oKaR58pTZd7ZfIjnaEOBIP3xetj50Nzv
+        oDwqij7Esvj8b
+X-Received: by 2002:a7b:c1d2:: with SMTP id a18mr11253728wmj.28.1632932671041;
+        Wed, 29 Sep 2021 09:24:31 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyzuGBla69X4IO7m6rAp7nL6WSmtL324HkUosRDgfHqwWdWBE791/8ceRT5Q9xIMilR/CHJgA==
+X-Received: by 2002:a7b:c1d2:: with SMTP id a18mr11253705wmj.28.1632932670885;
+        Wed, 29 Sep 2021 09:24:30 -0700 (PDT)
+Received: from ?IPv6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id f63sm1734004wma.24.2021.09.29.09.24.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 29 Sep 2021 09:24:30 -0700 (PDT)
+Reply-To: eric.auger@redhat.com
+Subject: Re: [PATCH v3 04/10] KVM: arm64: vgic-v3: Check ITS region is not
+ above the VM IPA size
+To:     Ricardo Koller <ricarkol@google.com>, kvm@vger.kernel.org,
+        maz@kernel.org, kvmarm@lists.cs.columbia.edu, drjones@redhat.com,
+        alexandru.elisei@arm.com
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, oupton@google.com,
+        james.morse@arm.com, suzuki.poulose@arm.com, shuah@kernel.org,
+        jingzhangos@google.com, pshier@google.com, rananta@google.com,
+        reijiw@google.com
+References: <20210928184803.2496885-1-ricarkol@google.com>
+ <20210928184803.2496885-5-ricarkol@google.com>
+From:   Eric Auger <eric.auger@redhat.com>
+Message-ID: <fc09a2a3-960a-9444-d736-7a6171d710af@redhat.com>
+Date:   Wed, 29 Sep 2021 18:24:28 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-In-Reply-To: <01ea5ea0-a61c-7bea-e1a6-639e3b9a2988@amsat.org>
+In-Reply-To: <20210928184803.2496885-5-ricarkol@google.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:ujUwILF+IaWrbUmDUK4535pOr0wgpL/NREUKJ//ndHRlP4XxWTT
- V59KEogt101pcbP67gmnRi19v/k8pOWuLXuAxpDAf4T4DDBIkfY3ZaEfjoZIITnKEYrDoju
- 1Po+ZcfFaf2GW/S8VAsTY7fMbdKeCxU//J+tdyRUyQzkuEwyl1upmb+v0MLFdj5e3qe5d6X
- jgKkaCCCx8Vc/eUlg5sxA==
-X-Spam-Flag: NO
-X-UI-Out-Filterresults: notjunk:1;V03:K0:F5SE9UbnGXY=:ddTan/dSSXrU2CtCSwZL+U
- P3Steu/BIpv1WE4MlydqOiSIo1YND1ceDwGPKIarokF4ElJQ1o3mj3ODmPQVAuzq39Q36ynG9
- KeqT0qrE3dZeqFjQuoTwiBgMPwagbSpumP6T8JnmQyXxPPl0AD8LKL1PyUkHHtY8+YfJAof1W
- GXUOV41kuanSO5YLlTMAspclfmirke2h3S/aNB152Hq9tAFJI0ufkhygK2Yk4JYatprxmsaQC
- e92aBzx9cON8VCAK9CP5IVWFCzqSluap/NBiB7FebL4CpXtdPG9t2xBgL/vhR4pqCUAbJ9qY2
- Zwf8scmQcafJ6ER+ruBKHU3Aus9aw9gTjVOU+VuZbd/+OxmnKYlD+vB6CZWfuB5gWnY5SIyKe
- RI9TDvw8WO1mLNVargg/cUlyNjulrX9Ri+9D2UQmngM7zLXKKIIUK4bh5x4zacKmy06czqCks
- SfZm1gStvdCjMQA2Fjj1xapOa1gCiL+uQ9pC/q6XrTVaRk6TpLKiQdU7Eq5puFQ8qHY4YUrY0
- YFXeP5WrRCCLm6v+nyfjOq9iifrvvNuK4Z/wPSJ2slMld5c8jhEDee1Lhp9xQBS4lNF55x6bf
- hVt8vlgLU3J3uKSrDpI8a/2D8TzZWzXzk4FXpOBPQKPSQNvZrVi7iAzZOz2xxf59Qa5CxS7/N
- ATn+Fn1h3+g1fz2XESiL3T5aVQylOIW4a4fY9GVDaxOdw8fg4SG/uM0YYEHx2Q9UPK1JFS0VH
- eXRK1qgmsbWsrkTDvhtXn+EzvwOQT/2b8jERZA==
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Le 29/09/2021 à 18:06, Philippe Mathieu-Daudé a écrit :
-> On 9/29/21 17:16, Laurent Vivier wrote:
->> Le 29/09/2021 à 17:00, Laurent Vivier a écrit :
->>> Le 29/09/2021 à 16:08, Philippe Mathieu-Daudé a écrit :
->>>> On 9/16/21 00:05, Paolo Bonzini wrote:
->>>>> On 02/09/21 17:22, Philippe Mathieu-Daudé wrote:
->>>>>> Instead of including a sysemu-specific header in "cpu.h"
->>>>>> (which is shared with user-mode emulations), include it
->>>>>> locally when required.
->>>>>>
->>>>>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->>>>>> ---
->>>>>
->>>>> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
->>>>
->>>> Thank you, Cc'ing qemu-trivial@ :)
->>>>
->>>
->>> Applied to my trivial-patches branch.
->>>
->>
->> We have a problem:
->>
->> .../target/i386/tcg/sysemu/seg_helper.c:145:9: error: implicit declaration of function
->> 'apic_poll_irq' [-Werror=implicit-function-declaration]
->>   145 |         apic_poll_irq(cpu->apic_state);
->>       |         ^~~~~~~~~~~~~
->> .../target/i386/tcg/sysemu/seg_helper.c:145:9: error: nested extern declaration of 'apic_poll_irq'
->> [-Werror=nested-externs]
-> 
-> Hmm I'll check what changed since I sent that. It was working the day
-> Paolo Acked, because have the patch rebased / tested on top of commit
-> c99e34e537f ("Merge remote-tracking branch
-> 'remotes/vivier2/tags/linux-user-for-6.2-pull-request' into staging").
-> 
-> I should have rebased/retested today before Cc'ing you, sorry.
-> 
 
-On top of c99e34e537f I have the same error...
 
-Thanks,
-Laurent
+On 9/28/21 8:47 PM, Ricardo Koller wrote:
+> Verify that the ITS region does not extend beyond the VM-specified IPA
+> range (phys_size).
+>
+>   base + size > phys_size AND base < phys_size
+>
+> Add the missing check into vgic_its_set_attr() which is called when
+> setting the region.
+>
+> Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> ---
+>  arch/arm64/kvm/vgic/vgic-its.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+> index 61728c543eb9..321743b87002 100644
+> --- a/arch/arm64/kvm/vgic/vgic-its.c
+> +++ b/arch/arm64/kvm/vgic/vgic-its.c
+> @@ -2710,8 +2710,8 @@ static int vgic_its_set_attr(struct kvm_device *dev,
+>  		if (copy_from_user(&addr, uaddr, sizeof(addr)))
+>  			return -EFAULT;
+>  
+> -		ret = vgic_check_ioaddr(dev->kvm, &its->vgic_its_base,
+> -					addr, SZ_64K);
+> +		ret = vgic_check_iorange(dev->kvm, &its->vgic_its_base,
+> +					 addr, SZ_64K, KVM_VGIC_V3_ITS_SIZE);
+>  		if (ret)
+>  			return ret;
+>  
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+
+Eric
+
