@@ -2,101 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C25C741C0AC
-	for <lists+kvm@lfdr.de>; Wed, 29 Sep 2021 10:32:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C597441C0B5
+	for <lists+kvm@lfdr.de>; Wed, 29 Sep 2021 10:34:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244728AbhI2IeN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Sep 2021 04:34:13 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27179 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S244477AbhI2IeH (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 29 Sep 2021 04:34:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632904342;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=33L2kvYESyBjFzI5T12hFb+rWTsyBJjmF6Rb3+aaSJw=;
-        b=DPhtQRATFXW5DUFG4STk4GLNZOfKTq2utGGfhyMf423oCtWqRNIPl0k9OwXB917mrfZEPg
-        tQVRbCitHUN0IGWUpfghaY0cePxKbE5b3l4TfLfnb4LBnVKJPXKNj6Z6vMF5+2gn1Y3J1T
-        kxSMUQ6vnDNnJ74psLR1lPqCkZIAoHg=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-247-rrn94y8IM5e3H0uDotugXA-1; Wed, 29 Sep 2021 04:32:20 -0400
-X-MC-Unique: rrn94y8IM5e3H0uDotugXA-1
-Received: by mail-wm1-f70.google.com with SMTP id r66-20020a1c4445000000b0030cf0c97157so876287wma.1
-        for <kvm@vger.kernel.org>; Wed, 29 Sep 2021 01:32:20 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=33L2kvYESyBjFzI5T12hFb+rWTsyBJjmF6Rb3+aaSJw=;
-        b=j0gx44KNB0amyDE1hvw9aCqFaLBXwU30Hgo9CR+hwgt7z8ZzspLtdeS/Z9fIP0gJC7
-         cjNbSW/J7GBbHK9AY4ssaBXnmMTVvrLT9g8hM47Ehnbbz2KeruvhBUa84kUJ4KH8nm3k
-         TVfjNPLL8BCXZ9qS2zUkw/g1kU7FBOWo0FuZ5PlfSd16WC7UvZ0kFKrm3fMpnES9xZd2
-         /sriqMWMqP6YheVoJnUcY62v5bCQQriz+BOI8mpPvDuMxfazumWzpnzvwnAWLA51ixwW
-         I1fEaCZ7A9MOr6uwMUo14sOvaZHKKRZtncONl1Lt7JXVEn0LJ3ZT7xnddyAe5SlHmipm
-         YDwg==
-X-Gm-Message-State: AOAM531txsLU24H4975qZDJAjD7wNWaLvrNoH7QvMlsC1Sa51q/TWkl6
-        GIKHj+szeiQvqP8OQr7rq8iPnYLopdl2uCV7kniqv4MBA94+n0N3X69D7wtcByWCI2cGCFzW6Em
-        Xqh+XmeCBL9kU
-X-Received: by 2002:a1c:4407:: with SMTP id r7mr9093101wma.69.1632904339559;
-        Wed, 29 Sep 2021 01:32:19 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxiFH8QvVbSSfltUTVNYrFe4cgpOa802Pjd2dc9VAv6jOjC98+5gHvsdXJBd6/yPoXBjvvJDg==
-X-Received: by 2002:a1c:4407:: with SMTP id r7mr9093089wma.69.1632904339405;
-        Wed, 29 Sep 2021 01:32:19 -0700 (PDT)
-Received: from redhat.com ([2.55.12.29])
-        by smtp.gmail.com with ESMTPSA id l21sm851391wme.39.2021.09.29.01.32.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Sep 2021 01:32:18 -0700 (PDT)
-Date:   Wed, 29 Sep 2021 04:32:15 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Cindy Lu <lulu@redhat.com>
-Cc:     jasowang@redhat.com, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] vhost-vdpa:fix the worng input in config_cb
-Message-ID: <20210929043142-mutt-send-email-mst@kernel.org>
-References: <20210929075437.12985-1-lulu@redhat.com>
+        id S244736AbhI2Ig2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Sep 2021 04:36:28 -0400
+Received: from frasgout.his.huawei.com ([185.176.79.56]:3887 "EHLO
+        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S244595AbhI2Ig1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Sep 2021 04:36:27 -0400
+Received: from fraeml744-chm.china.huawei.com (unknown [172.18.147.200])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4HK8jh2QFbz67Lyy;
+        Wed, 29 Sep 2021 16:31:36 +0800 (CST)
+Received: from lhreml719-chm.china.huawei.com (10.201.108.70) by
+ fraeml744-chm.china.huawei.com (10.206.15.225) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.8; Wed, 29 Sep 2021 10:34:43 +0200
+Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
+ lhreml719-chm.china.huawei.com (10.201.108.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.8; Wed, 29 Sep 2021 09:34:43 +0100
+Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
+ lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
+ 15.01.2308.008; Wed, 29 Sep 2021 09:34:43 +0100
+From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+CC:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "jgg@nvidia.com" <jgg@nvidia.com>,
+        "mgurtovoy@nvidia.com" <mgurtovoy@nvidia.com>,
+        Linuxarm <linuxarm@huawei.com>,
+        liulongfang <liulongfang@huawei.com>,
+        "Zengtao (B)" <prime.zeng@hisilicon.com>,
+        "Jonathan Cameron" <jonathan.cameron@huawei.com>,
+        "Wangzhou (B)" <wangzhou1@hisilicon.com>,
+        "He, Shaopeng" <shaopeng.he@intel.com>,
+        "Zhao, Yan Y" <yan.y.zhao@intel.com>
+Subject: RE: [PATCH v3 0/6] vfio/hisilicon: add acc live migration driver
+Thread-Topic: [PATCH v3 0/6] vfio/hisilicon: add acc live migration driver
+Thread-Index: AQHXqhcv8rGxctog9kC36bxSe2rONqu6Z2mAgABdanA=
+Date:   Wed, 29 Sep 2021 08:34:42 +0000
+Message-ID: <2e0c062947b044179603ab45989808ff@huawei.com>
+References: <20210915095037.1149-1-shameerali.kolothum.thodi@huawei.com>
+ <BN9PR11MB5433DDA5FD4FC6C5EED62C278CA99@BN9PR11MB5433.namprd11.prod.outlook.com>
+In-Reply-To: <BN9PR11MB5433DDA5FD4FC6C5EED62C278CA99@BN9PR11MB5433.namprd11.prod.outlook.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.47.81.239]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210929075437.12985-1-lulu@redhat.com>
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 29, 2021 at 03:54:37PM +0800, Cindy Lu wrote:
-> Fix the worng input in for config_cb,
-> in function vhost_vdpa_config_cb, the input
-> cb.private was used as struct vhost_vdpa,
-> So the inuput was worng here, fix this issue
-> 
-> Signed-off-by: Cindy Lu <lulu@redhat.com>
-
-Maybe add
-
-Fixes: 776f395004d8 ("vhost_vdpa: Support config interrupt in vdpa")
-
-and fix typos in the commit log.
-
-> ---
->  drivers/vhost/vdpa.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-> index 942666425a45..e532cbe3d2f7 100644
-> --- a/drivers/vhost/vdpa.c
-> +++ b/drivers/vhost/vdpa.c
-> @@ -322,7 +322,7 @@ static long vhost_vdpa_set_config_call(struct vhost_vdpa *v, u32 __user *argp)
->  	struct eventfd_ctx *ctx;
->  
->  	cb.callback = vhost_vdpa_config_cb;
-> -	cb.private = v->vdpa;
-> +	cb.private = v;
->  	if (copy_from_user(&fd, argp, sizeof(fd)))
->  		return  -EFAULT;
->  
-> -- 
-> 2.21.3
-
+SGkgS2V2aW4sDQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogVGlhbiwg
+S2V2aW4gW21haWx0bzprZXZpbi50aWFuQGludGVsLmNvbV0NCj4gU2VudDogMjkgU2VwdGVtYmVy
+IDIwMjEgMDQ6NTgNCj4gVG86IFNoYW1lZXJhbGkgS29sb3RodW0gVGhvZGkgPHNoYW1lZXJhbGku
+a29sb3RodW0udGhvZGlAaHVhd2VpLmNvbT47DQo+IGt2bUB2Z2VyLmtlcm5lbC5vcmc7IGxpbnV4
+LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmc7DQo+IGxpbnV4LWNyeXB0b0B2Z2VyLmtlcm5lbC5vcmcN
+Cj4gQ2M6IGFsZXgud2lsbGlhbXNvbkByZWRoYXQuY29tOyBqZ2dAbnZpZGlhLmNvbTsgbWd1cnRv
+dm95QG52aWRpYS5jb207DQo+IExpbnV4YXJtIDxsaW51eGFybUBodWF3ZWkuY29tPjsgbGl1bG9u
+Z2ZhbmcgPGxpdWxvbmdmYW5nQGh1YXdlaS5jb20+Ow0KPiBaZW5ndGFvIChCKSA8cHJpbWUuemVu
+Z0BoaXNpbGljb24uY29tPjsgSm9uYXRoYW4gQ2FtZXJvbg0KPiA8am9uYXRoYW4uY2FtZXJvbkBo
+dWF3ZWkuY29tPjsgV2FuZ3pob3UgKEIpDQo+IDx3YW5nemhvdTFAaGlzaWxpY29uLmNvbT47IEhl
+LCBTaGFvcGVuZyA8c2hhb3BlbmcuaGVAaW50ZWwuY29tPjsgWmhhbywNCj4gWWFuIFkgPHlhbi55
+LnpoYW9AaW50ZWwuY29tPg0KPiBTdWJqZWN0OiBSRTogW1BBVENIIHYzIDAvNl0gdmZpby9oaXNp
+bGljb246IGFkZCBhY2MgbGl2ZSBtaWdyYXRpb24gZHJpdmVyDQo+IA0KPiBIaSwgU2hhbWVlciwN
+Cj4gDQo+ID4gRnJvbTogU2hhbWVlciBLb2xvdGh1bSA8c2hhbWVlcmFsaS5rb2xvdGh1bS50aG9k
+aUBodWF3ZWkuY29tPg0KPiA+IFNlbnQ6IFdlZG5lc2RheSwgU2VwdGVtYmVyIDE1LCAyMDIxIDU6
+NTEgUE0NCj4gPg0KPiA+IEhpLA0KPiA+DQo+ID4gVGhhbmtzIHRvIHRoZSBpbnRyb2R1Y3Rpb24g
+b2YgdmZpb19wY2lfY29yZSBzdWJzeXN0ZW0gZnJhbWV3b3JrWzBdLA0KPiA+IG5vdyBpdCBpcyBw
+b3NzaWJsZSB0byBwcm92aWRlIHZlbmRvciBzcGVjaWZpYyBmdW5jdGlvbmFsaXR5IHRvDQo+ID4g
+dmZpbyBwY2kgZGV2aWNlcy4gVGhpcyBzZXJpZXMgYXR0ZW1wdHMgdG8gYWRkIHZmaW8gbGl2ZSBt
+aWdyYXRpb24NCj4gPiBzdXBwb3J0IGZvciBIaVNpbGljb24gQUNDIFZGIGRldmljZXMgYmFzZWQg
+b24gdGhlIG5ldyBmcmFtZXdvcmsuDQo+ID4NCj4gPiBIaVNpbGljb24gQUNDIFZGIGRldmljZSBN
+TUlPIHNwYWNlIGluY2x1ZGVzIGJvdGggdGhlIGZ1bmN0aW9uYWwNCj4gPiByZWdpc3RlciBzcGFj
+ZSBhbmQgbWlncmF0aW9uIGNvbnRyb2wgcmVnaXN0ZXIgc3BhY2UuIEFzIGRpc2N1c3NlZA0KPiA+
+IGluIFJGQ3YxWzFdLCB0aGlzIG1heSBjcmVhdGUgc2VjdXJpdHkgaXNzdWVzIGFzIHRoZXNlIHJl
+Z2lvbnMgZ2V0DQo+ID4gc2hhcmVkIGJldHdlZW4gdGhlIEd1ZXN0IGRyaXZlciBhbmQgdGhlIG1p
+Z3JhdGlvbiBkcml2ZXIuDQo+ID4gQmFzZWQgb24gdGhlIGZlZWRiYWNrLCB3ZSB0cmllZCB0byBh
+ZGRyZXNzIHRob3NlIGNvbmNlcm5zIGluDQo+ID4gdGhpcyB2ZXJzaW9uLg0KPiANCj4gVGhpcyBz
+ZXJpZXMgZG9lc24ndCBtZW50aW9uIGFueXRoaW5nIHJlbGF0ZWQgdG8gZGlydHkgcGFnZSB0cmFj
+a2luZy4NCj4gQXJlIHlvdSByZWx5IG9uIEtlcWlhbidzIHNlcmllcyBmb3IgdXRpbGl6aW5nIGhh
+cmR3YXJlIGlvbW11IGRpcnR5DQo+IGJpdCAoZS5nLiBTTU1VIEhUVFUpPyANCg0KWWVzLCB0aGlz
+IGRvZXNuJ3QgaGF2ZSBkaXJ0eSBwYWdlIHRyYWNraW5nIGFuZCB0aGUgcGxhbiBpcyB0byBtYWtl
+IHVzZSBvZg0KS2VxaWFuJ3MgU01NVSBIVFRVIHdvcmsgdG8gaW1wcm92ZSBwZXJmb3JtYW5jZS4g
+V2UgaGF2ZSBkb25lIGJhc2ljDQpzYW5pdHkgdGVzdGluZyB3aXRoIHRob3NlIHBhdGNoZXMuICAN
+Cg0KVGhhbmtzLA0KU2hhbWVlcg0KDQpJZiBub3QsIHN1cHBvc2Ugc29tZSBzb2Z0d2FyZSB0cmlj
+ayBpcyBzdGlsbA0KPiByZXF1aXJlZCBlLmcuIGJ5IGR5bmFtaWNhbGx5IG1lZGlhdGluZyBndWVz
+dC1zdWJtaXR0ZWQgZGVzY3JpcHRvcnMNCj4gdG8gY29tcG9zZSB0aGUgZGlydHkgcGFnZSBpbmZv
+cm1hdGlvbiBpbiB0aGUgbWlncmF0aW9uIHBoYXNlLi4uDQo+IA0KPiBUaGFua3MNCj4gS2V2aW4N
+Cg==
