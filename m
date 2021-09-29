@@ -2,150 +2,165 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F2B4D41BD62
-	for <lists+kvm@lfdr.de>; Wed, 29 Sep 2021 05:28:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 66CDC41BCB2
+	for <lists+kvm@lfdr.de>; Wed, 29 Sep 2021 04:26:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243954AbhI2D3n (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Sep 2021 23:29:43 -0400
-Received: from gandalf.ozlabs.org ([150.107.74.76]:44577 "EHLO
-        gandalf.ozlabs.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243907AbhI2D3m (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Sep 2021 23:29:42 -0400
-Received: by gandalf.ozlabs.org (Postfix, from userid 1007)
-        id 4HK1zN6KgDz4xZJ; Wed, 29 Sep 2021 13:28:00 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gibson.dropbear.id.au; s=201602; t=1632886080;
-        bh=or14ij/yBL19FjOCDsq0iAERcyiiYaHgFexNi04sb48=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=jK76m0XsvCYgqc5O5vt60FBITyisxy37c72l0yhrARzYXhnqOHbuEDZXS3rqSNwKa
-         LDl3EBUKF3iXf6FoCnHsokBb8jPZenL2TYKf+4WEHthw3EjMsbu+Bw17crMQDvL7fv
-         MGdaUPaeiRdaBOALa7efNweYMOueSg3zZgFhhlD0=
-Date:   Wed, 29 Sep 2021 12:08:59 +1000
-From:   David Gibson <david@gibson.dropbear.id.au>
-To:     Liu Yi L <yi.l.liu@intel.com>
-Cc:     alex.williamson@redhat.com, jgg@nvidia.com, hch@lst.de,
-        jasowang@redhat.com, joro@8bytes.org, jean-philippe@linaro.org,
-        kevin.tian@intel.com, parav@mellanox.com, lkml@metux.net,
-        pbonzini@redhat.com, lushenming@huawei.com, eric.auger@redhat.com,
-        corbet@lwn.net, ashok.raj@intel.com, yi.l.liu@linux.intel.com,
-        jun.j.tian@intel.com, hao.wu@intel.com, dave.jiang@intel.com,
-        jacob.jun.pan@linux.intel.com, kwankhede@nvidia.com,
-        robin.murphy@arm.com, kvm@vger.kernel.org,
-        iommu@lists.linux-foundation.org, dwmw2@infradead.org,
-        linux-kernel@vger.kernel.org, baolu.lu@linux.intel.com,
-        nicolinc@nvidia.com
-Subject: Re: [RFC 02/20] vfio: Add device class for /dev/vfio/devices
-Message-ID: <YVPKu/F3IpPMtGCh@yekko>
+        id S243777AbhI2C1i (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Sep 2021 22:27:38 -0400
+Received: from mga17.intel.com ([192.55.52.151]:64380 "EHLO mga17.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S243226AbhI2C1i (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Sep 2021 22:27:38 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10121"; a="204995620"
+X-IronPort-AV: E=Sophos;i="5.85,331,1624345200"; 
+   d="scan'208";a="204995620"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Sep 2021 19:25:52 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.85,331,1624345200"; 
+   d="scan'208";a="476495153"
+Received: from allen-box.sh.intel.com (HELO [10.239.159.118]) ([10.239.159.118])
+  by orsmga007.jf.intel.com with ESMTP; 28 Sep 2021 19:25:45 -0700
+Cc:     baolu.lu@linux.intel.com, "Tian, Kevin" <kevin.tian@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "hch@lst.de" <hch@lst.de>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+        "parav@mellanox.com" <parav@mellanox.com>,
+        "lkml@metux.net" <lkml@metux.net>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "lushenming@huawei.com" <lushenming@huawei.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "corbet@lwn.net" <corbet@lwn.net>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "yi.l.liu@linux.intel.com" <yi.l.liu@linux.intel.com>,
+        "Tian, Jun J" <jun.j.tian@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "dwmw2@infradead.org" <dwmw2@infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>
+Subject: Re: [RFC 06/20] iommu: Add iommu_device_init[exit]_user_dma
+ interfaces
+To:     Jason Gunthorpe <jgg@nvidia.com>
 References: <20210919063848.1476776-1-yi.l.liu@intel.com>
- <20210919063848.1476776-3-yi.l.liu@intel.com>
+ <20210919063848.1476776-7-yi.l.liu@intel.com>
+ <20210921170943.GS327412@nvidia.com>
+ <BN9PR11MB5433DA330D4583387B59AA7F8CA29@BN9PR11MB5433.namprd11.prod.outlook.com>
+ <20210922123931.GI327412@nvidia.com>
+ <BN9PR11MB5433CE19425E85E7F52093278CA79@BN9PR11MB5433.namprd11.prod.outlook.com>
+ <20210927150928.GA1517957@nvidia.com>
+ <BN9PR11MB54337B7F65B98C2335B806938CA89@BN9PR11MB5433.namprd11.prod.outlook.com>
+ <20210928115751.GK964074@nvidia.com>
+ <9a314095-3db9-30fc-2ed9-4e46d385036d@linux.intel.com>
+ <20210928140712.GL964074@nvidia.com>
+From:   Lu Baolu <baolu.lu@linux.intel.com>
+Message-ID: <4ba3294b-1628-0522-17ff-8aa38ed5a615@linux.intel.com>
+Date:   Wed, 29 Sep 2021 10:22:12 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="rFAAVZBIABvNkDR9"
-Content-Disposition: inline
-In-Reply-To: <20210919063848.1476776-3-yi.l.liu@intel.com>
+In-Reply-To: <20210928140712.GL964074@nvidia.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 9/28/21 10:07 PM, Jason Gunthorpe wrote:
+> On Tue, Sep 28, 2021 at 09:35:05PM +0800, Lu Baolu wrote:
+>> Another issue is, when putting a device into user-dma mode, all devices
+>> belonging to the same iommu group shouldn't be bound with a kernel-dma
+>> driver. Kevin's prototype checks this by READ_ONCE(dev->driver). This is
+>> not lock safe as discussed below,
+>>
+>> https://lore.kernel.org/linux-iommu/20210927130935.GZ964074@nvidia.com/
+>>
+>> Any guidance on this?
+> 
+> Something like this?
+> 
+> 
+> int iommu_set_device_dma_owner(struct device *dev, enum device_dma_owner mode,
+> 			       struct file *user_owner)
+> {
+> 	struct iommu_group *group = group_from_dev(dev);
+> 
+> 	spin_lock(&iommu_group->dma_owner_lock);
+> 	switch (mode) {
+> 		case DMA_OWNER_KERNEL:
+> 			if (iommu_group->dma_users[DMA_OWNER_USERSPACE])
+> 				return -EBUSY;
+> 			break;
+> 		case DMA_OWNER_SHARED:
+> 			break;
+> 		case DMA_OWNER_USERSPACE:
+> 			if (iommu_group->dma_users[DMA_OWNER_KERNEL])
+> 				return -EBUSY;
+> 			if (iommu_group->dma_owner_file != user_owner) {
+> 				if (iommu_group->dma_users[DMA_OWNER_USERSPACE])
+> 					return -EPERM;
+> 				get_file(user_owner);
+> 				iommu_group->dma_owner_file = user_owner;
+> 			}
+> 			break;
+> 		default:
+> 			spin_unlock(&iommu_group->dma_owner_lock);
+> 			return -EINVAL;
+> 	}
+> 	iommu_group->dma_users[mode]++;
+> 	spin_unlock(&iommu_group->dma_owner_lock);
+> 	return 0;
+> }
+> 
+> int iommu_release_device_dma_owner(struct device *dev,
+> 				   enum device_dma_owner mode)
+> {
+> 	struct iommu_group *group = group_from_dev(dev);
+> 
+> 	spin_lock(&iommu_group->dma_owner_lock);
+> 	if (WARN_ON(!iommu_group->dma_users[mode]))
+> 		goto err_unlock;
+> 	if (!iommu_group->dma_users[mode]--) {
+> 		if (mode == DMA_OWNER_USERSPACE) {
+> 			fput(iommu_group->dma_owner_file);
+> 			iommu_group->dma_owner_file = NULL;
+> 		}
+> 	}
+> err_unlock:
+> 	spin_unlock(&iommu_group->dma_owner_lock);
+> }
+> 
+> 
+> Where, the driver core does before probe:
+> 
+>     iommu_set_device_dma_owner(dev, DMA_OWNER_KERNEL, NULL)
+> 
+> pci_stub/etc does in their probe func:
+> 
+>     iommu_set_device_dma_owner(dev, DMA_OWNER_SHARED, NULL)
+> 
+> And vfio/iommfd does when a struct vfio_device FD is attached:
+> 
+>     iommu_set_device_dma_owner(dev, DMA_OWNER_USERSPACE, group_file/iommu_file)
 
---rFAAVZBIABvNkDR9
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Really good design. It also helps alleviating some pains elsewhere in
+the iommu core.
 
-On Sun, Sep 19, 2021 at 02:38:30PM +0800, Liu Yi L wrote:
-> This patch introduces a new interface (/dev/vfio/devices/$DEVICE) for
-> userspace to directly open a vfio device w/o relying on container/group
-> (/dev/vfio/$GROUP). Anything related to group is now hidden behind
-> iommufd (more specifically in iommu core by this RFC) in a device-centric
-> manner.
->=20
-> In case a device is exposed in both legacy and new interfaces (see next
-> patch for how to decide it), this patch also ensures that when the device
-> is already opened via one interface then the other one must be blocked.
->=20
-> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-[snip]
+Just a nit comment, we also need DMA_OWNER_NONE which will be set when
+the driver core unbinds the driver from the device.
 
-> +static bool vfio_device_in_container(struct vfio_device *device)
-> +{
-> +	return !!(device->group && device->group->container);
+> 
+> Jason
+> 
 
-You don't need !! here.  && is already a logical operation, so returns
-a valid bool.
-
-> +}
-> +
->  static int vfio_device_fops_release(struct inode *inode, struct file *fi=
-lep)
->  {
->  	struct vfio_device *device =3D filep->private_data;
-> @@ -1560,7 +1691,16 @@ static int vfio_device_fops_release(struct inode *=
-inode, struct file *filep)
-> =20
->  	module_put(device->dev->driver->owner);
-> =20
-> -	vfio_group_try_dissolve_container(device->group);
-> +	if (vfio_device_in_container(device)) {
-> +		vfio_group_try_dissolve_container(device->group);
-> +	} else {
-> +		atomic_dec(&device->opened);
-> +		if (device->group) {
-> +			mutex_lock(&device->group->opened_lock);
-> +			device->group->opened--;
-> +			mutex_unlock(&device->group->opened_lock);
-> +		}
-> +	}
-> =20
->  	vfio_device_put(device);
-> =20
-> @@ -1613,6 +1753,7 @@ static int vfio_device_fops_mmap(struct file *filep=
-, struct vm_area_struct *vma)
-> =20
->  static const struct file_operations vfio_device_fops =3D {
->  	.owner		=3D THIS_MODULE,
-> +	.open		=3D vfio_device_fops_open,
->  	.release	=3D vfio_device_fops_release,
->  	.read		=3D vfio_device_fops_read,
->  	.write		=3D vfio_device_fops_write,
-> @@ -2295,6 +2436,52 @@ static struct miscdevice vfio_dev =3D {
->  	.mode =3D S_IRUGO | S_IWUGO,
->  };
-> =20
-> +static char *vfio_device_devnode(struct device *dev, umode_t *mode)
-> +{
-> +	return kasprintf(GFP_KERNEL, "vfio/devices/%s", dev_name(dev));
-
-Others have pointed out some problems with the use of dev_name()
-here.  I'll add that I think you'll make things much easier if instead
-of using one huge "devices" subdir, you use a separate subdir for each
-vfio sub-driver (so, one for PCI, one for each type of mdev, one for
-platform, etc.).  That should make avoiding name conflicts a lot simpler.
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---rFAAVZBIABvNkDR9
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAmFTyrkACgkQbDjKyiDZ
-s5LDRxAA45DlpAfiA499JLduAg68fEU3Bdr3uqrAxaxXW5bnLJVw9BLOv1YV6Izb
-GffTAoUJE/gceiS+dIPmE1A8Zxsdb3vCT3Ci8gKEevQ/zMcqBdnO5KZ//nRAlrMl
-vsDahtaUQy/3uxRqSA8r2jlEujuHfdFJzi5pNosxfLQkCiSkYzAG7ePdxDOEBhJv
-bqay3ZBkns2E8RjTZ8ytDBV2zHqQW3G2/kqFAK7qx8eefGROcDAv7NoroHt8EB8+
-EYBXZgj+4nQChP+wQoEmXkRzkDocPtS4IKODB1YjTTCKW4O0YI8TfuvnCCPRLrku
-VZFk4PNw9sADsqB4plA+3/QkeDLskC23/GTZ/+djAVcsSAs+Oyiisw63I7LibeKg
-h5LKefqlBoOURSgk9f0AHIYwaxoE7qXgsf7zGKcI80waLoVWkOQXSj5/D0asFtGf
-sZrthpsKPKAl40jH+lA35r98Acb/m8uJdICPUoG/QTtc8F/0UIjWKsZxJH8Wtss8
-FaCAP1lw3gKK76Trdi2XavMZFkRmWNatPKTiCaNY8qQRyt/RvAteJjnwR1R2RKji
-fAQo8P1ZNxAhrGdYI9QzAsy0pYyO0Va/TPy0lf9KRQHIH4ff2DGHQB0azLwyJ+JF
-3x7clC6gMiPwmHmWUMwTgrenfi6br6zggTRWzC2sWbs0iJCzIRo=
-=C+J/
------END PGP SIGNATURE-----
-
---rFAAVZBIABvNkDR9--
+Best regards,
+baolu
