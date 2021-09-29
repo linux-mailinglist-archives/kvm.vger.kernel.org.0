@@ -2,139 +2,173 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DC44541BD64
-	for <lists+kvm@lfdr.de>; Wed, 29 Sep 2021 05:28:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 461C441BD67
+	for <lists+kvm@lfdr.de>; Wed, 29 Sep 2021 05:28:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243927AbhI2D3q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Sep 2021 23:29:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33948 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243941AbhI2D3n (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Sep 2021 23:29:43 -0400
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [IPv6:2404:9400:2:0:216:3eff:fee2:21ea])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5752C061745;
-        Tue, 28 Sep 2021 20:28:02 -0700 (PDT)
+        id S243989AbhI2D3p (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Sep 2021 23:29:45 -0400
+Received: from gandalf.ozlabs.org ([150.107.74.76]:36685 "EHLO
+        gandalf.ozlabs.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S243929AbhI2D3m (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Sep 2021 23:29:42 -0400
 Received: by gandalf.ozlabs.org (Postfix, from userid 1007)
-        id 4HK1zN6cnQz4xbT; Wed, 29 Sep 2021 13:28:00 +1000 (AEST)
+        id 4HK1zN6nb2z4xbV; Wed, 29 Sep 2021 13:28:00 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gibson.dropbear.id.au; s=201602; t=1632886080;
-        bh=qzQIQZ4QRhIcmilmBeomTPiSlLs3WETVdIoKH8ljR5I=;
+        bh=Lh+wqN85LusSTOWoTTGpIhxEKSNXglqDi5cXmcybyPM=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=p5e2lRrXkAIwbSxkG3qdFSqNl4eS0ICYpOq4Hcu5VnMPhSadYB0m7dyvRiC++N3Lg
-         8arvLC3O7qOMZjze+SPIHfiKcZWeSnfEeejTsR98qNOzIYVzQKTVZTraACX8JjPnVJ
-         bBLKwH+HMNsXDmQWOS8SMuMsqAS3TnSMGTxZrasU=
-Date:   Wed, 29 Sep 2021 12:46:14 +1000
-From:   "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "hch@lst.de" <hch@lst.de>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        "parav@mellanox.com" <parav@mellanox.com>,
-        "lkml@metux.net" <lkml@metux.net>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "lushenming@huawei.com" <lushenming@huawei.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "corbet@lwn.net" <corbet@lwn.net>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "yi.l.liu@linux.intel.com" <yi.l.liu@linux.intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "dwmw2@infradead.org" <dwmw2@infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>
-Subject: Re: [RFC 03/20] vfio: Add vfio_[un]register_device()
-Message-ID: <YVPTdqWw6or3mK/h@yekko>
+        b=m7I2czU/ggIlbJAAyXgNdK8RQLIITkNN0SyDYxNIKsDzIiU5uNcek1Cfjb7jJp1WR
+         YwqoJQfaA1ULr8RKCo/228A0SIauH0eZFDoXW7OUbeei1V22P6MVvNhW4rciYaFQA/
+         9cfwuWQaJGiCzNlMpKNOef7AQANPmV5yDZ3dOncw=
+Date:   Wed, 29 Sep 2021 12:52:35 +1000
+From:   David Gibson <david@gibson.dropbear.id.au>
+To:     Liu Yi L <yi.l.liu@intel.com>
+Cc:     alex.williamson@redhat.com, jgg@nvidia.com, hch@lst.de,
+        jasowang@redhat.com, joro@8bytes.org, jean-philippe@linaro.org,
+        kevin.tian@intel.com, parav@mellanox.com, lkml@metux.net,
+        pbonzini@redhat.com, lushenming@huawei.com, eric.auger@redhat.com,
+        corbet@lwn.net, ashok.raj@intel.com, yi.l.liu@linux.intel.com,
+        jun.j.tian@intel.com, hao.wu@intel.com, dave.jiang@intel.com,
+        jacob.jun.pan@linux.intel.com, kwankhede@nvidia.com,
+        robin.murphy@arm.com, kvm@vger.kernel.org,
+        iommu@lists.linux-foundation.org, dwmw2@infradead.org,
+        linux-kernel@vger.kernel.org, baolu.lu@linux.intel.com,
+        nicolinc@nvidia.com
+Subject: Re: [RFC 04/20] iommu: Add iommu_device_get_info interface
+Message-ID: <YVPU89utk3JFPzS7@yekko>
 References: <20210919063848.1476776-1-yi.l.liu@intel.com>
- <20210919063848.1476776-4-yi.l.liu@intel.com>
- <20210921160108.GO327412@nvidia.com>
- <BN9PR11MB54330421CA825F5CAA44BAC98CA29@BN9PR11MB5433.namprd11.prod.outlook.com>
- <20210922010014.GE327412@nvidia.com>
+ <20210919063848.1476776-5-yi.l.liu@intel.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="M1+gRInfuzVDe7lG"
+        protocol="application/pgp-signature"; boundary="sQ2hNteQVd2DEBye"
 Content-Disposition: inline
-In-Reply-To: <20210922010014.GE327412@nvidia.com>
+In-Reply-To: <20210919063848.1476776-5-yi.l.liu@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---M1+gRInfuzVDe7lG
+--sQ2hNteQVd2DEBye
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Sep 21, 2021 at 10:00:14PM -0300, Jason Gunthorpe wrote:
-> On Wed, Sep 22, 2021 at 12:54:02AM +0000, Tian, Kevin wrote:
-> > > From: Jason Gunthorpe <jgg@nvidia.com>
-> > > Sent: Wednesday, September 22, 2021 12:01 AM
-> > >=20
-> > > >  One open about how to organize the device nodes under
-> > > /dev/vfio/devices/.
-> > > > This RFC adopts a simple policy by keeping a flat layout with mixed
-> > > devname
-> > > > from all kinds of devices. The prerequisite of this model is that d=
-evnames
-> > > > from different bus types are unique formats:
-> > >=20
-> > > This isn't reliable, the devname should just be vfio0, vfio1, etc
-> > >=20
-> > > The userspace can learn the correct major/minor by inspecting the
-> > > sysfs.
-> > >=20
-> > > This whole concept should disappear into the prior patch that adds the
-> > > struct device in the first place, and I think most of the code here
-> > > can be deleted once the struct device is used properly.
-> > >=20
-> >=20
-> > Can you help elaborate above flow? This is one area where we need
-> > more guidance.
-> >=20
-> > When Qemu accepts an option "-device vfio-pci,host=3DDDDD:BB:DD.F",
-> > how does Qemu identify which vifo0/1/... is associated with the specifi=
-ed=20
-> > DDDD:BB:DD.F?=20
+On Sun, Sep 19, 2021 at 02:38:32PM +0800, Liu Yi L wrote:
+> From: Lu Baolu <baolu.lu@linux.intel.com>
 >=20
-> When done properly in the kernel the file:
+> This provides an interface for upper layers to get the per-device iommu
+> attributes.
 >=20
-> /sys/bus/pci/devices/DDDD:BB:DD.F/vfio/vfioX/dev
->=20
-> Will contain the major:minor of the VFIO device.
->=20
-> Userspace then opens the /dev/vfio/devices/vfioX and checks with fstat
-> that the major:minor matches.
->=20
-> in the above pattern "pci" and "DDDD:BB:DD.FF" are the arguments passed
-> to qemu.
+>     int iommu_device_get_info(struct device *dev,
+>                               enum iommu_devattr attr, void *data);
 
-I thought part of the appeal of the device centric model was less
-grovelling around in sysfs for information.  Using type/address
-directly in /dev seems simpler than having to dig around matching
-things here.
-
-Note that this doesn't have to be done in kernel: you could have the
-kernel just call them /dev/vfio/devices/vfio0, ... but add udev rules
-that create symlinks from say /dev/vfio/pci/DDDD:BB:SS.F - >
-=2E./devices/vfioXX based on the sysfs information.
+That fact that this interface doesn't let you know how to size the
+data buffer, other than by just knowing the right size for each attr
+concerns me.
 
 >=20
-> You can look at this for some general over engineered code to handle
-> opening from a sysfs handle like above:
+> The first attribute (IOMMU_DEV_INFO_FORCE_SNOOP) is added. It tells if
+> the iommu can force DMA to snoop cache. At this stage, only PCI devices
+> which have this attribute set could use the iommufd, this is due to
+> supporting no-snoop DMA requires additional refactoring work on the
+> current kvm-vfio contract. The following patch will have vfio check this
+> attribute to decide whether a pci device can be exposed through
+> /dev/vfio/devices.
 >=20
-> https://github.com/linux-rdma/rdma-core/blob/master/util/open_cdev.c
+> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
+> ---
+>  drivers/iommu/iommu.c | 16 ++++++++++++++++
+>  include/linux/iommu.h | 19 +++++++++++++++++++
+>  2 files changed, 35 insertions(+)
 >=20
-> Jason
->=20
+> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+> index 63f0af10c403..5ea3a007fd7c 100644
+> --- a/drivers/iommu/iommu.c
+> +++ b/drivers/iommu/iommu.c
+> @@ -3260,3 +3260,19 @@ static ssize_t iommu_group_store_type(struct iommu=
+_group *group,
+> =20
+>  	return ret;
+>  }
+> +
+> +/* Expose per-device iommu attributes. */
+> +int iommu_device_get_info(struct device *dev, enum iommu_devattr attr, v=
+oid *data)
+> +{
+> +	const struct iommu_ops *ops;
+> +
+> +	if (!dev->bus || !dev->bus->iommu_ops)
+> +		return -EINVAL;
+> +
+> +	ops =3D dev->bus->iommu_ops;
+> +	if (unlikely(!ops->device_info))
+> +		return -ENODEV;
+> +
+> +	return ops->device_info(dev, attr, data);
+> +}
+> +EXPORT_SYMBOL_GPL(iommu_device_get_info);
+> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+> index 32d448050bf7..52a6d33c82dc 100644
+> --- a/include/linux/iommu.h
+> +++ b/include/linux/iommu.h
+> @@ -150,6 +150,14 @@ enum iommu_dev_features {
+>  	IOMMU_DEV_FEAT_IOPF,
+>  };
+> =20
+> +/**
+> + * enum iommu_devattr - Per device IOMMU attributes
+> + * @IOMMU_DEV_INFO_FORCE_SNOOP [bool]: IOMMU can force DMA to be snooped.
+> + */
+> +enum iommu_devattr {
+> +	IOMMU_DEV_INFO_FORCE_SNOOP,
+> +};
+> +
+>  #define IOMMU_PASID_INVALID	(-1U)
+> =20
+>  #ifdef CONFIG_IOMMU_API
+> @@ -215,6 +223,7 @@ struct iommu_iotlb_gather {
+>   *		- IOMMU_DOMAIN_IDENTITY: must use an identity domain
+>   *		- IOMMU_DOMAIN_DMA: must use a dma domain
+>   *		- 0: use the default setting
+> + * @device_info: query per-device iommu attributes
+>   * @pgsize_bitmap: bitmap of all possible supported page sizes
+>   * @owner: Driver module providing these ops
+>   */
+> @@ -283,6 +292,8 @@ struct iommu_ops {
+> =20
+>  	int (*def_domain_type)(struct device *dev);
+> =20
+> +	int (*device_info)(struct device *dev, enum iommu_devattr attr, void *d=
+ata);
+> +
+>  	unsigned long pgsize_bitmap;
+>  	struct module *owner;
+>  };
+> @@ -604,6 +615,8 @@ struct iommu_sva *iommu_sva_bind_device(struct device=
+ *dev,
+>  void iommu_sva_unbind_device(struct iommu_sva *handle);
+>  u32 iommu_sva_get_pasid(struct iommu_sva *handle);
+> =20
+> +int iommu_device_get_info(struct device *dev, enum iommu_devattr attr, v=
+oid *data);
+> +
+>  #else /* CONFIG_IOMMU_API */
+> =20
+>  struct iommu_ops {};
+> @@ -999,6 +1012,12 @@ static inline struct iommu_fwspec *dev_iommu_fwspec=
+_get(struct device *dev)
+>  {
+>  	return NULL;
+>  }
+> +
+> +static inline int iommu_device_get_info(struct device *dev,
+> +					enum iommu_devattr type, void *data)
+> +{
+> +	return -ENODEV;
+> +}
+>  #endif /* CONFIG_IOMMU_API */
+> =20
+>  /**
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -142,24 +176,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---M1+gRInfuzVDe7lG
+--sQ2hNteQVd2DEBye
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAmFT03YACgkQbDjKyiDZ
-s5L5+RAA2E2lYOOD4bTHuC/PsiWELLG1eQQa3Jb4G+sT+fOVdbBmt8zME8lEAiXb
-iKIx7FlKDY1YCkr3fHedUDTXNRKphIvtkJYkHS43zI2KaRkqn20pxvps6kjA0MvV
-IMdk+8ZiUyA806bldQ6iEYhk7K888zeHPhSBhdZ6tSiWi5Yg6llD0A+WTGVmI9vx
-pm6Cu3r80UouuTm2JY37yyYamFsGAGs0iVNiFxA/zhtGjJ5soKUOcqZSx4P8MfHD
-2GOsiRGlwRx2peP+yrqAw9CutaR4jphP2ehVoqjyKq4wzMZ7PQCkuoUiFo3fNFjs
-J8lUiY9PxisD+0rStds1WF1oPHocq2B/ALXzDlHPxFTitdH/OiDKZ0p86jHZcNVN
-QdqipuJH4bXo4iyqWg0ksf3ECdekPJo0xfN4aMmDLHst4mhjSslQz/0WPZlQJKCe
-cOiG2I6akTADkQR65q1bKyr2gZR0fZTZp0AwBGQ6Nj1I2iHKHOI05+/pQC9NCVkn
-pkWc6WL12WGybyo/GyDblf5h1bfZTDJFLxS16uymh/MT+LPjGtik1I4KQezl1IA5
-rAy5LpQ11dBOizN6dCO7XhmGLeRGXLXGxhe676t9fix+bibSYU0pvZUnffYHOxZw
-pOv6wsRFvaM4ZhTBIB8PcbgNZHreiWAoFGdvfjHVRVR1Xl9Kx2A=
-=JS/Z
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAmFT1PMACgkQbDjKyiDZ
+s5Kp4xAAuqP94XHXa8idfiJzr+Zmk3LlF5iLCDGNb7As35wm2B95WzFXrIvnG0PR
+9GuRnTDbazPssJA5PSwrI8g10LpZ52exjVV00iv1sU62Nk64xahNK+1jpLq5Ktsf
+621axCsT3ZqGHy7IQDfERmgJccl4FNdU2Jiv+uUiCcfeUTPNEx6UOggtUGfHMapF
+/RYgmuGlI34vI9TUz2y+SxBdfiDp9ySjhNnD5PEjggGy731te7iWKF3nJv4WBPPH
+1E0vEaj4ttoY9CnA3ta1waG8pZDJXtNcX3kXC+VE0hmd0KiazEIGt1cqqkZZ9khq
+40y+9nfCu2mzsD10qD8VMy3vwoDRnPChsepZRQdT884+J5OjlOk9shLZHdp8mjRh
+YDAyqlMyg6dNyHfH/scB7W+eTASkas6FkyNCNvGMFj1nGjGt4xssWFC3mUtHYE1s
+Bnd8g5HGZspQKn/hzaXoDgvi6TdNQzApVzIwY+I0AdKFnr3v3kFtIhOptfzKGYGT
+q0Ar3JXZAdppywVBThSRKWjMOIBUHbCkXUl6TVdo+ebmeKOJjceKY2BC3SQoDKiG
+Pv0vraoPolTkSq1iaKMnR+xwVmATYdZ6wAuKG4TIZ5I7yGAzK+0s5d6zS2mm66kN
+uBaU2bfeBKTDdz2xj1fxiK2vZ88TB0rDXoKagGCeKHAigohc82Y=
+=EJNn
 -----END PGP SIGNATURE-----
 
---M1+gRInfuzVDe7lG--
+--sQ2hNteQVd2DEBye--
