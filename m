@@ -2,147 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5267341CF5C
-	for <lists+kvm@lfdr.de>; Thu, 30 Sep 2021 00:44:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 09D2841CF78
+	for <lists+kvm@lfdr.de>; Thu, 30 Sep 2021 00:49:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347307AbhI2Wp7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Sep 2021 18:45:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27880 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1346866AbhI2Wp6 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 29 Sep 2021 18:45:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632955454;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=yDnZg0/6giW9XllEqIndueSNzorfdQE2gNriGLCrs+s=;
-        b=h8M1tPCq8+z43AqOHPq7P2YUgrIdTbx9ZuftrEY9UAdvpsU42nzvAiQdkELgVFw6JX/2sd
-        WrHqbzzKG39WsihwmBpQIFMRhDs5d/kdqnoOiuwf26YdXsa+w2ugiNx7HynsA7XfW/PVLm
-        XEOG+ndl4fQVTWGJtxwrLdSm6Fdxw18=
-Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com
- [209.85.210.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-525-W0tADwZOOo-ht9Evjyiang-1; Wed, 29 Sep 2021 18:44:12 -0400
-X-MC-Unique: W0tADwZOOo-ht9Evjyiang-1
-Received: by mail-ot1-f71.google.com with SMTP id 76-20020a9d0152000000b0053b372910bbso2954282otu.14
-        for <kvm@vger.kernel.org>; Wed, 29 Sep 2021 15:44:12 -0700 (PDT)
+        id S1347343AbhI2WvW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Sep 2021 18:51:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46410 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1347173AbhI2WvV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Sep 2021 18:51:21 -0400
+Received: from mail-oo1-xc33.google.com (mail-oo1-xc33.google.com [IPv6:2607:f8b0:4864:20::c33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5BC7C06161C
+        for <kvm@vger.kernel.org>; Wed, 29 Sep 2021 15:49:39 -0700 (PDT)
+Received: by mail-oo1-xc33.google.com with SMTP id b5-20020a4ac285000000b0029038344c3dso1253664ooq.8
+        for <kvm@vger.kernel.org>; Wed, 29 Sep 2021 15:49:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=e2OTP9/Iaal3kA6JcGQMsrbP+LXgzXaNrRHpdP8nXFo=;
+        b=G28j7WE82ccu1R0Oh+3pL1ssp6lEJumdTGsQ3x7h/CpuqpyWf8R+WjqiopNkB1NB4/
+         Zra/3R/RSSJZllQnqZu1Xj+YQ0FxpcgBvNwEkTau1kpz6b68svJZ50NRQ//U0PLJUdQR
+         DkUQeMxkcoKtyVm2uxaqrjOAY9i3fC4SerMzZdZVZ9b0XAcmZpL1q6MC3nsv+g3i/jJs
+         KUGbfDfWoHVGdrsjpnAkUfMu6i7V5EoF5AJ9nKytt9GVAuQ6+mCdlkFiRcjc4VXFL2Od
+         WJfs3bsK32BycM4a0wL1xW5yBug97qJvppkZLkNMUAP6kdwie83+7r/nG3EqS7rGSwvI
+         i4/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=yDnZg0/6giW9XllEqIndueSNzorfdQE2gNriGLCrs+s=;
-        b=KD8/tI/Abe337qE9lgl0/Gnv8JZOFK754N+AI+jmx5RmpYr+LPk/z10ldKcF6Y3EDu
-         swLzr82k4wcGBIudseFnNjbqevA17RODaZU2pf+ixIxPRZn6nMgdhs2M8mrN+hPZ6NA7
-         WAfL2XFRxdnKwCE7SptTBIUxiJjFOMjy3IsXCrpMSpCO8ho5BJ9XVMMv8iE9iBzKuU/F
-         XnnbVE7DzHyRKEaSLMexrGVbfK6A5pnrQ5qRqK1jq3N4Y8jXkDQcHXRRhMuYD0PIf/Bt
-         RKIOZsxKgC9pEjS6UTYiWVLzNLnaF/QyjAPdg5m5ZIBY9uktmQhOTYyNEpXW0EircpvO
-         c9WA==
-X-Gm-Message-State: AOAM530vEVbZkK+PQ8dbA0sAoj03mwjU1/WYLEt+x6wgNuyiwJYtLXM4
-        gZ4WLgAfLNIccavemaaplKoCeehYR86YYzHGBfcPZE6ekXzFLu2nEP36pHxxzlvTbcikeOYrRH9
-        7ZWwKzzHj/Rqh
-X-Received: by 2002:a05:6808:1595:: with SMTP id t21mr78468oiw.98.1632955451620;
-        Wed, 29 Sep 2021 15:44:11 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyVU6jEU+ZG3AcZVTtnnVZT8dq+yX76s5pQMOm4ir4e1zUDW6chJsiIv463tHWR/ZUtQthMIQ==
-X-Received: by 2002:a05:6808:1595:: with SMTP id t21mr78446oiw.98.1632955451416;
-        Wed, 29 Sep 2021 15:44:11 -0700 (PDT)
-Received: from redhat.com ([198.99.80.109])
-        by smtp.gmail.com with ESMTPSA id d21sm229884ooh.43.2021.09.29.15.44.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Sep 2021 15:44:10 -0700 (PDT)
-Date:   Wed, 29 Sep 2021 16:44:09 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Max Gurtovoy <mgurtovoy@nvidia.com>
-Cc:     Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
-        Doug Ledford <dledford@redhat.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Kirti Wankhede <kwankhede@nvidia.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-pci@vger.kernel.org>,
-        <linux-rdma@vger.kernel.org>, <netdev@vger.kernel.org>,
-        Saeed Mahameed <saeedm@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>
-Subject: Re: [PATCH mlx5-next 2/7] vfio: Add an API to check migration state
- transition validity
-Message-ID: <20210929164409.3c33e311.alex.williamson@redhat.com>
-In-Reply-To: <29835bf4-d094-ae6d-1a32-08e65847b52c@nvidia.com>
-References: <c87f55d6fec77a22b110d3c9611744e6b28bba46.1632305919.git.leonro@nvidia.com>
-        <20210927164648.1e2d49ac.alex.williamson@redhat.com>
-        <20210927231239.GE3544071@ziepe.ca>
-        <25c97be6-eb4a-fdc8-3ac1-5628073f0214@nvidia.com>
-        <20210929063551.47590fbb.alex.williamson@redhat.com>
-        <1eba059c-4743-4675-9f72-1a26b8f3c0f6@nvidia.com>
-        <20210929075019.48d07deb.alex.williamson@redhat.com>
-        <d2e94241-a146-c57d-cf81-8b7d8d00e62d@nvidia.com>
-        <20210929091712.6390141c.alex.williamson@redhat.com>
-        <e1ba006f-f181-0b89-822d-890396e81c7b@nvidia.com>
-        <20210929161433.GA1808627@ziepe.ca>
-        <29835bf4-d094-ae6d-1a32-08e65847b52c@nvidia.com>
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=e2OTP9/Iaal3kA6JcGQMsrbP+LXgzXaNrRHpdP8nXFo=;
+        b=0RIj3vi4HbKTMDdTnUWXxW6JD4JKzLoXakUdKEjWFY4G2qlMq+i2rn5jUOd5NBJ9mM
+         Rj4HOpupd+iniAyttOzFTdX4/6mhSBI+sugSe4vOnqGVTDUeebWEcKVuZFlImQ3xLWKZ
+         RQFBZalLYpkfLbegM0EFCgpoZ2ytFb+RcbZP0IMc/M7V9GnTs5yK+G+XhjDcolLeVQTl
+         uGK248LIq8DSINZ/7GQy3CcLIVSX0YfoQOGiMz7AUjlexWd3Qu7TnF4E9f5hBUz5wsFl
+         tdiXghnqd1Sx3FsoeLXv1BD8jbXgKMaQVnm74w+uhpEO27DjJASJgL1XMk28aTFmV9Sf
+         zEdQ==
+X-Gm-Message-State: AOAM533JDPHDNAMHuSDHJR+UWVGzTszKTXF+iQt8OY1wyQ4M+tWmj9UZ
+        x/DTMt8fjozw89daoyrs1jQzBKeGlxSHZny9yD/Bgw==
+X-Google-Smtp-Source: ABdhPJwfYZYVoJIZCIZZ0IzxjW4zfiQ4Yzrk0WBLtD+ahAtcf/rqByhKxVhje9lfN/nkWtK0vc3A9WW0Qv7Q8g8YFGM=
+X-Received: by 2002:a4a:de57:: with SMTP id z23mr2042527oot.70.1632955778679;
+ Wed, 29 Sep 2021 15:49:38 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20210929222426.1855730-1-seanjc@google.com> <20210929222426.1855730-3-seanjc@google.com>
+In-Reply-To: <20210929222426.1855730-3-seanjc@google.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Wed, 29 Sep 2021 15:49:27 -0700
+Message-ID: <CALMp9eQZH80_vWEz26OGr8cwhLEP4yoSt2UdSC_75Fy9sMxhhQ@mail.gmail.com>
+Subject: Re: [PATCH 2/2] KVM: x86: Manually retrieve CPUID.0x1 when getting
+ FMS for RESET/INIT
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        syzbot+f3985126b746b3d59c9d@syzkaller.appspotmail.com,
+        Alexander Potapenko <glider@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 30 Sep 2021 00:48:55 +0300
-Max Gurtovoy <mgurtovoy@nvidia.com> wrote:
-
-> On 9/29/2021 7:14 PM, Jason Gunthorpe wrote:
-> > On Wed, Sep 29, 2021 at 06:28:44PM +0300, Max Gurtovoy wrote:
-> >  
-> >>> So you have a device that's actively modifying its internal state,
-> >>> performing I/O, including DMA (thereby dirtying VM memory), all while
-> >>> in the _STOP state?  And you don't see this as a problem?  
-> >> I don't see how is it different from vfio-pci situation.  
-> > vfio-pci provides no way to observe the migration state. It isn't
-> > "000b"  
-> 
-> Alex said that there is a problem of compatibility.
-> 
-> I migration SW is not involved, nobody will read this migration state.
-
-The _STOP state has a specific meaning regardless of whether userspace
-reads the device state value.  I think what you're suggesting is that
-the device reports itself as _STOP'd but it's actually _RUNNING.  Is
-that the compatibility workaround, create a self inconsistency?
-
-We cannot impose on userspace to move a device from _STOP to _RUNNING
-simply because the device supports the migration region, nor should we
-report a device state that is inconsistent with the actual device state.
-
-> >> Maybe we need to rename STOP state. We can call it READY or LIVE or
-> >> NON_MIGRATION_STATE.  
-> > It was a poor choice to use 000b as stop, but it doesn't really
-> > matter. The mlx5 driver should just pre-init this readable to running.  
-> 
-> I guess we can do it for this reason. There is no functional problem nor 
-> compatibility issue here as was mentioned.
-> 
-> But still we need the kernel to track transitions. We don't want to 
-> allow moving from RESUMING to SAVING state for example. How this 
-> transition can be allowed ?
-> 
-> In this case we need to fail the request from the migration SW...
-
-_RESUMING to _SAVING seems like a good way to test round trip migration
-without running the device to modify the state.  Potentially it's a
-means to update a saved device migration data stream to a newer format
-using an intermediate driver version.
-
-If a driver is written such that it simply sees clearing the _RESUME
-bit as an indicator to de-serialize the data stream to the device, and
-setting the _SAVING flag as an indicator to re-serialize that data
-stream from the device, then this is just a means to make use of
-existing data paths.
-
-The uAPI specifies a means for drivers to reject a state change, but
-that risks failing to support a transition which might find mainstream
-use cases.  I don't think common code should be responsible for
-filtering out viable transitions.  Thanks,
-
-Alex
-
+On Wed, Sep 29, 2021 at 3:24 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> Manually look for a CPUID.0x1 entry instead of bouncing through
+> kvm_cpuid() when retrieving the Family-Model-Stepping information for
+> vCPU RESET/INIT.  This fixes a potential undefined behavior bug due to
+> kvm_cpuid() using the uninitialized "dummy" param as the ECX _input_,
+> a.k.a. the index.
+>
+> A more minimal fix would be to simply zero "dummy", but the extra work in
+> kvm_cpuid() is wasteful, and KVM should be treating the FMS retrieval as
+> an out-of-band access, e.g. same as how KVM computes guest.MAXPHYADDR.
+> Both Intel's SDM and AMD's APM describe the RDX value at RESET/INIT as
+> holding the CPU's FMS information, not as holding CPUID.0x1.EAX.  KVM's
+> usage of CPUID entries to get FMS is simply a pragmatic approach to avoid
+> having yet another way for userspace to provide inconsistent data.
+>
+> No functional change intended.
+>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+Reviewed-by: Jim Mattson <jmattson@google.com>
