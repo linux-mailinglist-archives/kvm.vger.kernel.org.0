@@ -2,168 +2,208 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 17B9D41CFD6
-	for <lists+kvm@lfdr.de>; Thu, 30 Sep 2021 01:21:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D64D841D01C
+	for <lists+kvm@lfdr.de>; Thu, 30 Sep 2021 01:42:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347518AbhI2XWy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Sep 2021 19:22:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53654 "EHLO
+        id S1347114AbhI2XnG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Sep 2021 19:43:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58294 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347503AbhI2XWx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Sep 2021 19:22:53 -0400
-Received: from mail-qv1-xf29.google.com (mail-qv1-xf29.google.com [IPv6:2607:f8b0:4864:20::f29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 684D9C06176A
-        for <kvm@vger.kernel.org>; Wed, 29 Sep 2021 16:21:11 -0700 (PDT)
-Received: by mail-qv1-xf29.google.com with SMTP id 11so2480971qvd.11
-        for <kvm@vger.kernel.org>; Wed, 29 Sep 2021 16:21:11 -0700 (PDT)
+        with ESMTP id S231238AbhI2Xm7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Sep 2021 19:42:59 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76EE0C06161C
+        for <kvm@vger.kernel.org>; Wed, 29 Sep 2021 16:41:16 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id t7-20020a258387000000b005b6d7220c79so4958815ybk.16
+        for <kvm@vger.kernel.org>; Wed, 29 Sep 2021 16:41:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=vURlTPvciLNHVwm+qpgsVwGxUhwNfUJPxfecQWzYJYA=;
-        b=Zj4wWBdj3VdNHSQijjwB6d/B3Z0yaCN8DLkQcxtzl1osWudJFB0cEUVGPKm3xAsaSO
-         HAOWJFSL0bavVQUI0mkFRIWZCyMFsO+STG0IJHU/nSxslRhlvXPgAxlcy+Ci6caw+Z6d
-         qgJ9x+zAprvCKR0pseEjjuHFnYOORSg847Q4TTGYP+yH+tG3MwHf/9b7whw+grtiqA1M
-         znK7SI7VWx2TjKhDixK8WX2KKNeL4YOkI2oMVStoZVnsQm2iJzHjHx8UMmMVmhJTS/Ka
-         QqWnrgWcNOccgipN9UllCHzX852wNHqdchB2nxleAJaYT7DDZN85NjS6IiTjaZw5impT
-         tdBw==
+        d=google.com; s=20210112;
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=nAs4diGKDtFAK12cMvvKORrzgu/SgnuyHpoTrsBgHf0=;
+        b=rkewn6O/NTtnG8iBVIuyAV/KNUOigYTEy6zKzajF/GXAKeXSbKz2owq4KfVxBM4iJI
+         mdSZIAuD3dfe5z+OyR76kxGM7las2APwhVj+ypximmHWAp736kWQQUZmki8o8z3o485c
+         gJdM4xKpTAHfedctxvAschl/FDHgNo53BjFZiMlnsjnnOxp17ZkMmjiYL1KI1ou6W/dA
+         Fwt+hxzrf9X9O7lgKtWGAFXxKQhtA1Hthi7xw01WyMpJMautD3pNy1YAm1DyQDXAYIwi
+         Fa2E97HywCTs2qBwie5XlYctD53pXAav20tW9VSPkdmLNbUY4NudlGkRPprrnnH+aPCy
+         QEjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=vURlTPvciLNHVwm+qpgsVwGxUhwNfUJPxfecQWzYJYA=;
-        b=OE6FSBjtNXTrFRgsAMEVXKWyfi3DxmxAlT2Fb3nfOGBw8D9xnm+zlnmi178q5EpaR1
-         jSlOa+Cj9pEHD0s287nKylMNtxLPg4b9TT2XKSxin0Dlgr98MziQUUsq4X5E73x0KIax
-         FZYNNNYCgGTtcvAykxYYhWohbgUAciMEebBGIsBL60cKNDRukRox+sLtNhsEomWrHP/E
-         PrPwj38sF02o7p5PPuCVXLbDmmq6j0O7sUfNj2Sj9ojVxMIavdQuaYtmLaynkSgK7wUg
-         JBoDdOmXoqsxCLEc83C67vga8Hc0/zgE9SiSIztgysjzYOCiPmupKVzR/aHrdEFlWP5q
-         PbQA==
-X-Gm-Message-State: AOAM533vMi8oTcpblGlXoMefoJy2imdHAIU7+8CxZPlNIS9XaloJX8Op
-        +p8Z08lm9E2eBXtGRfp5IHQSjg==
-X-Google-Smtp-Source: ABdhPJwA55qGt9RWeuL6e34LCWU3u3YFVjjxfHPaXpdwUVW8hGe1+xdfhpM0nZTosoDMpP4WenkAkw==
-X-Received: by 2002:a0c:c2c4:: with SMTP id c4mr2519771qvi.30.1632957670497;
-        Wed, 29 Sep 2021 16:21:10 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-162-113-129.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.129])
-        by smtp.gmail.com with ESMTPSA id i11sm469774qki.28.2021.09.29.16.21.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Sep 2021 16:21:10 -0700 (PDT)
-Received: from jgg by mlx with local (Exim 4.94)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1mVisv-007ihB-2W; Wed, 29 Sep 2021 20:21:09 -0300
-Date:   Wed, 29 Sep 2021 20:21:09 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Max Gurtovoy <mgurtovoy@nvidia.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Doug Ledford <dledford@redhat.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Kirti Wankhede <kwankhede@nvidia.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
-        Saeed Mahameed <saeedm@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>
-Subject: Re: [PATCH mlx5-next 2/7] vfio: Add an API to check migration state
- transition validity
-Message-ID: <20210929232109.GC3544071@ziepe.ca>
-References: <20210927231239.GE3544071@ziepe.ca>
- <25c97be6-eb4a-fdc8-3ac1-5628073f0214@nvidia.com>
- <20210929063551.47590fbb.alex.williamson@redhat.com>
- <1eba059c-4743-4675-9f72-1a26b8f3c0f6@nvidia.com>
- <20210929075019.48d07deb.alex.williamson@redhat.com>
- <d2e94241-a146-c57d-cf81-8b7d8d00e62d@nvidia.com>
- <20210929091712.6390141c.alex.williamson@redhat.com>
- <e1ba006f-f181-0b89-822d-890396e81c7b@nvidia.com>
- <20210929161433.GA1808627@ziepe.ca>
- <29835bf4-d094-ae6d-1a32-08e65847b52c@nvidia.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <29835bf4-d094-ae6d-1a32-08e65847b52c@nvidia.com>
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=nAs4diGKDtFAK12cMvvKORrzgu/SgnuyHpoTrsBgHf0=;
+        b=6sr/K2gLZN9UbQ8zVQfkOCqi71zUBdKz+VjVe79UcxcV7vyFZiH4amwfSFbpaXFW35
+         +LEvxSlXRwKvLP1TriOZTEgBM67YPyIjR5vWFTaMp8Eapruw9dwrqIGKekD0tU0GFO2J
+         XrGTjmz0JNZ3ffzc2hUVdm+HrgZ1dp8i72wiANvmfQnp3O+G+lnN74GJpGG/uHpOqPd6
+         QDEsxWTMM6ZZFpBQoTktYl55+rxTY555joOcoCUrR3AbRolSdwu8ZyVNj2MAqOiT1aYz
+         JA1Xg3WEcw6G5pa3SWvnYKPyGx6FevykbWvKh3Jpgk5I2lVQmYnN8ygpF9XysALub+SY
+         XqFQ==
+X-Gm-Message-State: AOAM530Tr45iAaTnZROUhVJjJNg6ue0gJME06hiSHjxRk4kr1abJGGVO
+        kz+xby6ts30F+GQHWyz5cf/Gbx8FON4=
+X-Google-Smtp-Source: ABdhPJzvdrLFMq8dFIXDrn7bAJTwPfp+fXRZRsjWvC1WEwrk0u12e3Ny5QGfdZIPDY8H3hO+UtDqIevOxe0=
+X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:90:200:e777:43b7:f76f:da52])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1504:: with SMTP id
+ q4mr3327370ybu.177.1632958875766; Wed, 29 Sep 2021 16:41:15 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Wed, 29 Sep 2021 16:41:12 -0700
+Message-Id: <20210929234112.1862848-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.0.685.g46640cef36-goog
+Subject: [PATCH] KVM: selftests: Ensure all migrations are performed when test
+ is affined
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Dongli Zhang <dongli.zhang@oracle.com>,
+        Sean Christopherson <seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 30, 2021 at 12:48:55AM +0300, Max Gurtovoy wrote:
-> 
-> On 9/29/2021 7:14 PM, Jason Gunthorpe wrote:
-> > On Wed, Sep 29, 2021 at 06:28:44PM +0300, Max Gurtovoy wrote:
-> > 
-> > > > So you have a device that's actively modifying its internal state,
-> > > > performing I/O, including DMA (thereby dirtying VM memory), all while
-> > > > in the _STOP state?  And you don't see this as a problem?
-> > > I don't see how is it different from vfio-pci situation.
-> > vfio-pci provides no way to observe the migration state. It isn't
-> > "000b"
-> 
-> Alex said that there is a problem of compatibility.
+Rework the CPU selection in the migration worker to ensure the specified
+number of migrations are performed when the test iteslf is affined to a
+subset of CPUs.  The existing logic skips iterations if the target CPU is
+not in the original set of possible CPUs, which causes the test to fail
+if too many iterations are skipped.
 
-Yes, when a vfio_device first opens it must be running - ie able to do
-DMA and otherwise operational.
+  ==== Test Assertion Failure ====
+  rseq_test.c:228: i > (NR_TASK_MIGRATIONS / 2)
+  pid=10127 tid=10127 errno=4 - Interrupted system call
+     1  0x00000000004018e5: main at rseq_test.c:227
+     2  0x00007fcc8fc66bf6: ?? ??:0
+     3  0x0000000000401959: _start at ??:?
+  Only performed 4 KVM_RUNs, task stalled too much?
 
-When we add the migration extension this cannot change, so after
-open_device() the device should be operational.
+Calculate the min/max possible CPUs as a cheap "best effort" to avoid
+high runtimes when the test is affined to a small percentage of CPUs.
+Alternatively, a list or xarray of the possible CPUs could be used, but
+even in a horrendously inefficient setup, such optimizations are not
+needed because the runtime is completely dominated by the cost of
+migrating the task, and the absolute runtime is well under a minute in
+even truly absurd setups, e.g. running on a subset of vCPUs in a VM that
+is heavily overcommited (16 vCPUs per pCPU).
 
-The reported state in the migration region should accurately reflect
-what the device is currently doing. If the device is operational then
-it must report running, not stopped.
+Fixes: 61e52f1630f5 ("KVM: selftests: Add a test for KVM_RUN+rseq to detect task migration bugs")
+Reported-by: Dongli Zhang <dongli.zhang@oracle.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ tools/testing/selftests/kvm/rseq_test.c | 69 +++++++++++++++++++++----
+ 1 file changed, 59 insertions(+), 10 deletions(-)
 
-Thus a driver cannot just zero initalize the migration "registers",
-they have to be accurate.
+diff --git a/tools/testing/selftests/kvm/rseq_test.c b/tools/testing/selftests/kvm/rseq_test.c
+index c5e0dd664a7b..4158da0da2bb 100644
+--- a/tools/testing/selftests/kvm/rseq_test.c
++++ b/tools/testing/selftests/kvm/rseq_test.c
+@@ -10,6 +10,7 @@
+ #include <signal.h>
+ #include <syscall.h>
+ #include <sys/ioctl.h>
++#include <sys/sysinfo.h>
+ #include <asm/barrier.h>
+ #include <linux/atomic.h>
+ #include <linux/rseq.h>
+@@ -39,6 +40,7 @@ static __thread volatile struct rseq __rseq = {
+ 
+ static pthread_t migration_thread;
+ static cpu_set_t possible_mask;
++static int min_cpu, max_cpu;
+ static bool done;
+ 
+ static atomic_t seq_cnt;
+@@ -57,20 +59,37 @@ static void sys_rseq(int flags)
+ 	TEST_ASSERT(!r, "rseq failed, errno = %d (%s)", errno, strerror(errno));
+ }
+ 
++static int next_cpu(int cpu)
++{
++	/*
++	 * Advance to the next CPU, skipping those that weren't in the original
++	 * affinity set.  Sadly, there is no CPU_SET_FOR_EACH, and cpu_set_t's
++	 * data storage is considered as opaque.  Note, if this task is pinned
++	 * to a small set of discontigous CPUs, e.g. 2 and 1023, this loop will
++	 * burn a lot cycles and the test will take longer than normal to
++	 * complete.
++	 */
++	do {
++		cpu++;
++		if (cpu > max_cpu) {
++			cpu = min_cpu;
++			TEST_ASSERT(CPU_ISSET(cpu, &possible_mask),
++				    "Min CPU = %d must always be usable", cpu);
++			break;
++		}
++	} while (!CPU_ISSET(cpu, &possible_mask));
++
++	return cpu;
++}
++
+ static void *migration_worker(void *ign)
+ {
+ 	cpu_set_t allowed_mask;
+-	int r, i, nr_cpus, cpu;
++	int r, i, cpu;
+ 
+ 	CPU_ZERO(&allowed_mask);
+ 
+-	nr_cpus = CPU_COUNT(&possible_mask);
+-
+-	for (i = 0; i < NR_TASK_MIGRATIONS; i++) {
+-		cpu = i % nr_cpus;
+-		if (!CPU_ISSET(cpu, &possible_mask))
+-			continue;
+-
++	for (i = 0, cpu = min_cpu; i < NR_TASK_MIGRATIONS; i++, cpu = next_cpu(cpu)) {
+ 		CPU_SET(cpu, &allowed_mask);
+ 
+ 		/*
+@@ -154,6 +173,36 @@ static void *migration_worker(void *ign)
+ 	return NULL;
+ }
+ 
++static int calc_min_max_cpu(void)
++{
++	int i, cnt, nproc;
++
++	if (CPU_COUNT(&possible_mask) < 2)
++		return -EINVAL;
++
++	/*
++	 * CPU_SET doesn't provide a FOR_EACH helper, get the min/max CPU that
++	 * this task is affined to in order to reduce the time spent querying
++	 * unusable CPUs, e.g. if this task is pinned to a small percentage of
++	 * total CPUs.
++	 */
++	nproc = get_nprocs_conf();
++	min_cpu = -1;
++	max_cpu = -1;
++	cnt = 0;
++
++	for (i = 0; i < nproc; i++) {
++		if (!CPU_ISSET(i, &possible_mask))
++			continue;
++		if (min_cpu == -1)
++			min_cpu = i;
++		max_cpu = i;
++		cnt++;
++	}
++
++	return (cnt < 2) ? -EINVAL : 0;
++}
++
+ int main(int argc, char *argv[])
+ {
+ 	int r, i, snapshot;
+@@ -167,8 +216,8 @@ int main(int argc, char *argv[])
+ 	TEST_ASSERT(!r, "sched_getaffinity failed, errno = %d (%s)", errno,
+ 		    strerror(errno));
+ 
+-	if (CPU_COUNT(&possible_mask) < 2) {
+-		print_skip("Only one CPU, task migration not possible\n");
++	if (calc_min_max_cpu()) {
++		print_skip("Only one usable CPU, task migration not possible");
+ 		exit(KSFT_SKIP);
+ 	}
+ 
+-- 
+2.33.0.685.g46640cef36-goog
 
-> > > Maybe we need to rename STOP state. We can call it READY or LIVE or
-> > > NON_MIGRATION_STATE.
-> > It was a poor choice to use 000b as stop, but it doesn't really
-> > matter. The mlx5 driver should just pre-init this readable to running.
-> 
-> I guess we can do it for this reason. There is no functional problem nor
-> compatibility issue here as was mentioned.
-> 
-> But still we need the kernel to track transitions. We don't want to allow
-> moving from RESUMING to SAVING state for example. How this transition can be
-> allowed ?
-
-It seems semantically fine to me, as per Alex's note what will happen
-is defined:
-
-driver will see RESUMING toggle off so it will trigger a
-de-serialization
-
-driver will see SAVING toggled on so it will serialize the new state
-(either the pre-copy state or the post-copy state dpending on the
-running bit)
-
-Depending on the running bit the device may or may not be woken up.
-
-If de-serialization fails then the state goes to error and SAVING is
-ignored.
-
-The driver logic probably looks something like this:
-
-// Running toggles off
-if (oldstate & RUNNING != newstate & RUNNING && oldstate & RUNNING)
-    queice
-    freeze
-
-// Resuming toggles off
-if (oldstate & RESUMING != newstate & RESUMING && oldstate & RESUMING)
-   deserialize
-
-// Saving toggles on
-if (oldstate & SAVING != newstate & SAVING && newstate & SAVING)
-   if (!(newstate & RUNNING))
-     serialize post copy
-
-// Running toggles on
-if (oldstate & RUNNING != newstate & RUNNING && newstate & RUNNING)
-   unfreeze
-   unqueice
-
-I'd have to check that carefully against the state chart from my last
-email though..
-
-And need to check how the "Stop Active Transactions" bit fits in there
-
-Jason
