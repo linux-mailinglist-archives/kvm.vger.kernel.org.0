@@ -2,151 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7CF0F41CA18
-	for <lists+kvm@lfdr.de>; Wed, 29 Sep 2021 18:29:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 633A141CA1B
+	for <lists+kvm@lfdr.de>; Wed, 29 Sep 2021 18:30:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344609AbhI2QbJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Sep 2021 12:31:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:48971 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1344370AbhI2QbI (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 29 Sep 2021 12:31:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632932966;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=NQx2xj6HF67LAuBQdKdhBIXW5cGRVi2ucKp6xvBgZPA=;
-        b=esuHkilKVoE1XNfa6/GXBIjq5ZnIU+zChP7oKlaHLQVRPe48g6e3c1mlzmbzxk0K42eyuB
-        1X96WjBPsctFnh93OyHC8jakM7JR5k4zrirlcH42klrCcEASZPfHGcfnaCExcehTP0SDdM
-        YoDU/W/9LR4fj9k4I7jnZFwXQRkObOU=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-306-EYSeCO33OVeN3z-Zznu0Wg-1; Wed, 29 Sep 2021 12:29:25 -0400
-X-MC-Unique: EYSeCO33OVeN3z-Zznu0Wg-1
-Received: by mail-wm1-f70.google.com with SMTP id y23-20020a05600c365700b003015b277f98so1033160wmq.2
-        for <kvm@vger.kernel.org>; Wed, 29 Sep 2021 09:29:25 -0700 (PDT)
+        id S1345517AbhI2Qbo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Sep 2021 12:31:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43884 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1344370AbhI2Qbn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Sep 2021 12:31:43 -0400
+Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2F80C06161C
+        for <kvm@vger.kernel.org>; Wed, 29 Sep 2021 09:30:01 -0700 (PDT)
+Received: by mail-wr1-x430.google.com with SMTP id t18so5379473wrb.0
+        for <kvm@vger.kernel.org>; Wed, 29 Sep 2021 09:30:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=sender:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=ZIL2fzsmyD973C3LK1fCqDkEUFPat/dEOaChN1UH7jk=;
+        b=WolWiv42bMY/oHLejn4em0YDf8/c6hwLWre46b16soX2Oc3kXytF8SbAfqowDDgOF5
+         ju7ucfWUUBpKx+1ircpHkIt9oAr95pTq5CRMv1ip1Ew+AYQIbNkQXVwr86XR9SKDCcgy
+         0hzHcEFGX2R8U2JuXlMJUuJtbjSa582rXP4bnUtLeigHiU8kzl6TRZmECUkE9kosh4Wp
+         wQeD4BS9PIKxbhMLxODJbU6FnKRok/AvVrneUDMW7o6KqPUj/7YPaJU7GpXEeos1aRY3
+         Ff136iGJ+PtaPYLi218B2mYlM/AfrNA68jnsrDPnvYqu08qYlF5GwNhhHawE5HXFs9Zf
+         vAJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:reply-to:subject:to:cc:references:from
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-transfer-encoding:content-language;
-        bh=NQx2xj6HF67LAuBQdKdhBIXW5cGRVi2ucKp6xvBgZPA=;
-        b=dl/AJB8nhxE2WMGjGQGathqaRwkCNRM+Ir5+VUuhOJmYwTuL+ogaq3pb8amRZgrGCt
-         87ODlHX3F8SvudspO4ESPdimIAvwyjYYkbiYmenEuiuPBBB9FFv+AQOa6fl0PxaSPqT3
-         /NnUKImhEfzuYLlK2CBGMu6yWhAv2u88PfLfBed+cvBrPTLi1tknzxO4CzBreB+0PGmi
-         8Vb7Pr0OaqcQoSEQC3wNIZhZtjwu0wqKEz9Kk66L7vCcLHaM9jJ2erAMv0OgM4atIwPO
-         r4cJ7iAaksl1TL+Hdt2kEnJGGZQGK3KBNKCb9XHs1q/AVp9LtcBOecRWjz7qbEH+04Cl
-         DHMw==
-X-Gm-Message-State: AOAM5304rTwI4ZQtKX6JhMFlenwO1vopcC9eScp7AptG9BgeAcjsBIQX
-        KhafvJX6uHxcaXgcRzJkIC9T696oCU4B2682TP97ZAYGuAIz0f3Z4I6+vWM6HAId60RCwDUwugM
-        38bBOT45y7/mu
-X-Received: by 2002:a1c:2c3:: with SMTP id 186mr10532338wmc.114.1632932964307;
-        Wed, 29 Sep 2021 09:29:24 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzjPYG2GldBAGUDiZVvrsb69nxkr4sn6oQ/M0aRFiAmWdoOXqQa1HfuXqlT+QG3rv5j6MMwAA==
-X-Received: by 2002:a1c:2c3:: with SMTP id 186mr10532307wmc.114.1632932964083;
-        Wed, 29 Sep 2021 09:29:24 -0700 (PDT)
-Received: from ?IPv6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id c185sm346633wma.8.2021.09.29.09.29.22
+        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
+         :subject:content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=ZIL2fzsmyD973C3LK1fCqDkEUFPat/dEOaChN1UH7jk=;
+        b=oE0vs7bi/7iKcatvzJk4Pfe3HSZTEWryhkFEKrzQ5okC00YYg0QYoUAoYusyCBKYS2
+         kApTqaK9vLjUmy72iQyF8zRiT1oOedauplEzrdVSmB2Lf4WkwzX0r/L+FTEBXQ2yMFbj
+         jRszId6qV9cS7v5ywFE1Q5bO+01EXUmURGgqR9WOv1XfgkspUI5NOkvNhd2d8H+L2ks6
+         FcBNqd2lh2ziy+2PW5bVuf6D1THlf6uNMCsMYSmBlB8qBS09IMWVWS3Y23qtxtz/7EHh
+         zpH2PfBFcfvaa6Iw0g8th1mXlMOlDU6/p1if82oMhXVn9lAV33U8hdbR5F1pAsRS0Vtg
+         w3Eg==
+X-Gm-Message-State: AOAM530oc4Z9ogqIlQyAE54ZWYWttFOOC9AUPmuqN3cGy13ZWXv+WLkp
+        tGkWEYVu2tIpz68E0t4d5aY=
+X-Google-Smtp-Source: ABdhPJyr2JDd3KWc00tPxqANAMzR6P2py5oRDv9PVX0RQORnHl9S/wpl3amXphivDc6lWRKFMB8stw==
+X-Received: by 2002:a5d:6d02:: with SMTP id e2mr994900wrq.198.1632933000633;
+        Wed, 29 Sep 2021 09:30:00 -0700 (PDT)
+Received: from [192.168.1.36] (118.red-83-35-24.dynamicip.rima-tde.net. [83.35.24.118])
+        by smtp.gmail.com with ESMTPSA id d2sm360747wrc.32.2021.09.29.09.29.59
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 29 Sep 2021 09:29:23 -0700 (PDT)
-Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH v3 01/10] kvm: arm64: vgic: Introduce vgic_check_iorange
-To:     Ricardo Koller <ricarkol@google.com>, kvm@vger.kernel.org,
-        maz@kernel.org, kvmarm@lists.cs.columbia.edu, drjones@redhat.com,
-        alexandru.elisei@arm.com
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, oupton@google.com,
-        james.morse@arm.com, suzuki.poulose@arm.com, shuah@kernel.org,
-        jingzhangos@google.com, pshier@google.com, rananta@google.com,
-        reijiw@google.com
-References: <20210928184803.2496885-1-ricarkol@google.com>
- <20210928184803.2496885-2-ricarkol@google.com>
-From:   Eric Auger <eric.auger@redhat.com>
-Message-ID: <4ab60884-e006-723a-c026-b3e8c0ccb349@redhat.com>
-Date:   Wed, 29 Sep 2021 18:29:21 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        Wed, 29 Sep 2021 09:30:00 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= 
+        <philippe.mathieu.daude@gmail.com>
+Message-ID: <63229ef1-6f77-8aa4-89a7-7759140a60db@amsat.org>
+Date:   Wed, 29 Sep 2021 18:29:58 +0200
 MIME-Version: 1.0
-In-Reply-To: <20210928184803.2496885-2-ricarkol@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [PATCH] target/i386: Include 'hw/i386/apic.h' locally
 Content-Language: en-US
+To:     Laurent Vivier <laurent@vivier.eu>
+Cc:     Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        QEMU Trivial <qemu-trivial@nongnu.org>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        qemu-devel@nongnu.org, Cameron Esfahani <dirty@apple.com>,
+        Kamil Rytarowski <kamil@netbsd.org>,
+        Paolo Bonzini <pbonzini@redhat.com>, haxm-team@intel.com,
+        Colin Xu <colin.xu@intel.com>,
+        Roman Bolshakov <r.bolshakov@yadro.com>,
+        Reinoud Zandijk <reinoud@netbsd.org>,
+        Sunil Muthuswamy <sunilmut@microsoft.com>,
+        Wenchao Wang <wenchao.wang@intel.com>
+References: <20210902152243.386118-1-f4bug@amsat.org>
+ <a4cba848-e668-7cf1-fe93-b5da3a4ac6dc@redhat.com>
+ <f3e89488-0d05-657a-34f7-060a7250517d@amsat.org>
+ <f9e3c54f-a7cb-a043-f7fd-9d9d0dd61c16@vivier.eu>
+ <6fa5f79c-8d3b-9534-26d6-ebe1ba937491@vivier.eu>
+ <01ea5ea0-a61c-7bea-e1a6-639e3b9a2988@amsat.org>
+ <93245807-dfa9-be11-ccda-4601b09b204e@vivier.eu>
+From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+In-Reply-To: <93245807-dfa9-be11-ccda-4601b09b204e@vivier.eu>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Ricardo,
+On 9/29/21 18:23, Laurent Vivier wrote:
+> Le 29/09/2021 à 18:06, Philippe Mathieu-Daudé a écrit :
+>> On 9/29/21 17:16, Laurent Vivier wrote:
+>>> Le 29/09/2021 à 17:00, Laurent Vivier a écrit :
+>>>> Le 29/09/2021 à 16:08, Philippe Mathieu-Daudé a écrit :
+>>>>> On 9/16/21 00:05, Paolo Bonzini wrote:
+>>>>>> On 02/09/21 17:22, Philippe Mathieu-Daudé wrote:
+>>>>>>> Instead of including a sysemu-specific header in "cpu.h"
+>>>>>>> (which is shared with user-mode emulations), include it
+>>>>>>> locally when required.
+>>>>>>>
+>>>>>>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>>>>>>> ---
+>>>>>>
+>>>>>> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+>>>>>
+>>>>> Thank you, Cc'ing qemu-trivial@ :)
+>>>>>
+>>>>
+>>>> Applied to my trivial-patches branch.
+>>>>
+>>>
+>>> We have a problem:
+>>>
+>>> .../target/i386/tcg/sysemu/seg_helper.c:145:9: error: implicit declaration of function
+>>> 'apic_poll_irq' [-Werror=implicit-function-declaration]
+>>>   145 |         apic_poll_irq(cpu->apic_state);
+>>>       |         ^~~~~~~~~~~~~
+>>> .../target/i386/tcg/sysemu/seg_helper.c:145:9: error: nested extern declaration of 'apic_poll_irq'
+>>> [-Werror=nested-externs]
+>>
+>> Hmm I'll check what changed since I sent that. It was working the day
+>> Paolo Acked, because have the patch rebased / tested on top of commit
+>> c99e34e537f ("Merge remote-tracking branch
+>> 'remotes/vivier2/tags/linux-user-for-6.2-pull-request' into staging").
+>>
+>> I should have rebased/retested today before Cc'ing you, sorry.
+>>
+> 
+> On top of c99e34e537f I have the same error...
 
-On 9/28/21 8:47 PM, Ricardo Koller wrote:
-> Add the new vgic_check_iorange helper that checks that an iorange is
-> sane: the start address and size have valid alignments, the range is
-> within the addressable PA range, start+size doesn't overflow, and the
-> start wasn't already defined.
->
-> No functional change.
->
-> Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> ---
->  arch/arm64/kvm/vgic/vgic-kvm-device.c | 22 ++++++++++++++++++++++
->  arch/arm64/kvm/vgic/vgic.h            |  4 ++++
->  2 files changed, 26 insertions(+)
->
-> diff --git a/arch/arm64/kvm/vgic/vgic-kvm-device.c b/arch/arm64/kvm/vgic/vgic-kvm-device.c
-> index 7740995de982..f714aded67b2 100644
-> --- a/arch/arm64/kvm/vgic/vgic-kvm-device.c
-> +++ b/arch/arm64/kvm/vgic/vgic-kvm-device.c
-> @@ -29,6 +29,28 @@ int vgic_check_ioaddr(struct kvm *kvm, phys_addr_t *ioaddr,
->  	return 0;
->  }
->  
-> +int vgic_check_iorange(struct kvm *kvm, phys_addr_t *ioaddr,
-> +		       phys_addr_t addr, phys_addr_t alignment,
-> +		       phys_addr_t size)
-> +{
-> +	int ret;
-> +
-> +	ret = vgic_check_ioaddr(kvm, ioaddr, addr, alignment);
-nit: not related to this patch but I am just wondering why we are
-passing phys_addr_t *ioaddr downto vgic_check_ioaddr and thus to
-
-vgic_check_iorange()? This must be a leftover of some old code?
-
-> +	if (ret)
-> +		return ret;
-> +
-> +	if (!IS_ALIGNED(size, alignment))
-> +		return -EINVAL;
-> +
-> +	if (addr + size < addr)
-> +		return -EINVAL;
-> +
-> +	if (addr + size > kvm_phys_size(kvm))
-> +		return -E2BIG;
-> +
-> +	return 0;
-> +}
-> +
->  static int vgic_check_type(struct kvm *kvm, int type_needed)
->  {
->  	if (kvm->arch.vgic.vgic_model != type_needed)
-> diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
-> index 14a9218641f5..c4df4dcef31f 100644
-> --- a/arch/arm64/kvm/vgic/vgic.h
-> +++ b/arch/arm64/kvm/vgic/vgic.h
-> @@ -175,6 +175,10 @@ void vgic_irq_handle_resampling(struct vgic_irq *irq,
->  int vgic_check_ioaddr(struct kvm *kvm, phys_addr_t *ioaddr,
->  		      phys_addr_t addr, phys_addr_t alignment);
->  
-> +int vgic_check_iorange(struct kvm *kvm, phys_addr_t *ioaddr,
-> +		       phys_addr_t addr, phys_addr_t alignment,
-> +		       phys_addr_t size);
-> +
->  void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu);
->  void vgic_v2_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr);
->  void vgic_v2_clear_lr(struct kvm_vcpu *vcpu, int lr);
-Besides
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Eric
-
+The problem is 0792e6c88d4 ("target/i386: Move
+x86_cpu_exec_interrupt() under sysemu/ folder").
