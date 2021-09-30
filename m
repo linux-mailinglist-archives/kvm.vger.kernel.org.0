@@ -2,94 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D06FB41E007
-	for <lists+kvm@lfdr.de>; Thu, 30 Sep 2021 19:19:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4954441E022
+	for <lists+kvm@lfdr.de>; Thu, 30 Sep 2021 19:24:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352500AbhI3RVW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Sep 2021 13:21:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48338 "EHLO
+        id S1352615AbhI3R0V (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Sep 2021 13:26:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49584 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352531AbhI3RVH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Sep 2021 13:21:07 -0400
-Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45959C06176A
-        for <kvm@vger.kernel.org>; Thu, 30 Sep 2021 10:19:23 -0700 (PDT)
-Received: by mail-pf1-x436.google.com with SMTP id w14so5614536pfu.2
-        for <kvm@vger.kernel.org>; Thu, 30 Sep 2021 10:19:23 -0700 (PDT)
+        with ESMTP id S1352614AbhI3R0T (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Sep 2021 13:26:19 -0400
+Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3C14C06176F
+        for <kvm@vger.kernel.org>; Thu, 30 Sep 2021 10:24:36 -0700 (PDT)
+Received: by mail-lf1-x12a.google.com with SMTP id b15so28224268lfe.7
+        for <kvm@vger.kernel.org>; Thu, 30 Sep 2021 10:24:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=FbUMduP+V7YnqmanKgM6nU8SaYibHpVmraBSeLg1aDM=;
-        b=bYLXQKEpsloNnvsHfy/j8500N9x/ynvqqMtXn5sN5GSVf9iu2E0yiCvHR6+tveYSRF
-         kmVrrANLCl4pgMNjtLDYSm5s3jem1aABmFVatjxdL16HrFTX2WjDb1B90K6jdb73d7f5
-         BCUMOf43v1SqO/6bCO9meJISuWfIcxI+RLkVFrLQJTUeUcEPrBEiapNuQs2ht64kUhNG
-         Udmw/pPF3P1scQ7K4tRSr3rVaUTpFnEOrTDmFvBiEyw0V6w7VPnU9fpmgDkPe6xf1+o/
-         g00yBzaTvFnTOWcdpnUB8/aaBQ4qDSmAG1PN1GMxv7JvQ/zDgYLDcinUPoUWZQDDMOcd
-         p++A==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=IOus6RZAODeflkitNKNtNRm/hVuYigDJWYb8TVA+haU=;
+        b=D2uC1NpXnCez3Ytp4VABnJkvuhi+0CS1VaFTV4avogW3x4OrLuLLvWQMiRKr1WKS4j
+         PTcaPWmLAuGANDqHrTiVVzKCY9yfkwlb8WF6Tf+gfa3rZe5IEYkji7+xmGl3rOEYvXJW
+         b5Sk2IDU4tM0PNkXD2K9uOT9iGAlVWXGtu/xvJUhdVEf1oEVw79VV3xiqTZJ6GPco5Hj
+         qI41SIPc3djWuAzkAyNJtK2/wFu3txyPfUazgTIrYiidLHB31U5f7cuCCV1DDN0mNPyT
+         Ayftn5S5JLoPEABEMCy6hvZqZX0QfyiS0qtlyoTlroaVcP740VEQqqWnj8H9ezw/JFos
+         Z8IQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=FbUMduP+V7YnqmanKgM6nU8SaYibHpVmraBSeLg1aDM=;
-        b=NYVnTdEwqJn0NpSGudNGtf8aTFx2qXeVekNYUrMye3zV7ajv7EhcpO2KCP/qBahgig
-         I17bazvWM20QzWmwkwvhL2dFZvaugwnkC84wXEuUn6hCxYrfwJLoS6cmjaGUucGRw+G8
-         b/8b9QjteM9Od8c0v/rAmzReDZHmSVGmC0lClctFcS6Hrncfsa2tNA7gkQSb5mFfidX9
-         s43ZV10JzQ4dtQE+nWyDOLrmHH4hBV2hrMXJbW82ZObuL9KuZqRSgc+WTnenl9fRXFLq
-         olxNIwg9fcK6MXXO2eOEooPOKJCaHVRq42+dy6nDF9bcrpF+mzC7MET0EBGtSpp+sokt
-         ktOw==
-X-Gm-Message-State: AOAM531Gxbvr+LXybRvEHccqkCjcXKR5orfBPoPqc7ZrKECyZdlm9Sxu
-        H7mjv8Vg5761JT+n+NLY7WPIPA==
-X-Google-Smtp-Source: ABdhPJzo4auAyDB0h9s5ykpt5niwliEjviFUy6E2xL/2EeRvCDpS3aPUP1uUEhuzYpWfypFK//XGoA==
-X-Received: by 2002:a63:1d5c:: with SMTP id d28mr5872510pgm.143.1633022362363;
-        Thu, 30 Sep 2021 10:19:22 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id w6sm3852283pfj.179.2021.09.30.10.19.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Sep 2021 10:19:21 -0700 (PDT)
-Date:   Thu, 30 Sep 2021 17:19:18 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Oliver Upton <oupton@google.com>, kvm@vger.kernel.org,
-        Peter Shier <pshier@google.com>, kvmarm@lists.cs.columbia.edu
-Subject: Re: [PATCH v2 06/11] KVM: arm64: Add support for SYSTEM_SUSPEND PSCI
- call
-Message-ID: <YVXxlg6g4fYsphwM@google.com>
-References: <20210923191610.3814698-1-oupton@google.com>
- <20210923191610.3814698-7-oupton@google.com>
- <877deytfes.wl-maz@kernel.org>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=IOus6RZAODeflkitNKNtNRm/hVuYigDJWYb8TVA+haU=;
+        b=0go42JVFFjUrqpY+lSCiSGWfjFICY8lTNJz8Z0Ii4U6mf4rQhf2/TkmZqQbzvCh4yM
+         hu7MJogSwqydHtk32GKKEx+WA3klfUK4jjAI9uqzNzyBXT2hI5B1a3xYFev0IAoPYnLA
+         9QTzkpWVYqxg5JlQobiekzxzAqPZ3DDuLeWn3yyEjieRe7MQDo6RjipGwftYVyWgZJiD
+         84KDebMJlFbd4687KUGdPgbuSjDCFkRBVHMRDMH32BWHROJPwacXC/pS463SRcyCZxTr
+         v3/RbGcD/3qFDVlD2PCphpk4Q2QM5/dObPXPXMH+kEGR5LBanC/fRLj2NANjvbJYjLfC
+         HrqA==
+X-Gm-Message-State: AOAM5318+/jVDAbLGFu4JO0Wuz4UaTjL6/dBiVNPhCERJD9EspQuXX/p
+        NrV5aD/408ASY7kAHIC1w1WsLfqTb7nWe0GYbqGzCA==
+X-Google-Smtp-Source: ABdhPJwfSVC7//d6/e+fZoayLkD2H1zJPhp0sz/K7FbaHBHjYfcsEHPJ7CByH+JJAViNtjzQ2spoMMRGnDDx4TU0YSE=
+X-Received: by 2002:a2e:95cc:: with SMTP id y12mr7165903ljh.337.1633022674911;
+ Thu, 30 Sep 2021 10:24:34 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <877deytfes.wl-maz@kernel.org>
+References: <YSVhV+UIMY12u2PW@google.com> <87mtp5q3gx.wl-maz@kernel.org>
+ <CAOQ_QshSaEm_cMYQfRTaXJwnVqeoN29rMLBej-snWd6_0HsgGw@mail.gmail.com>
+ <87fsuxq049.wl-maz@kernel.org> <20210825150713.5rpwzm4grfn7akcw@gator.home>
+ <CAOQ_QsgWiw9-BuGTUFpHqBw3simUaM4Tweb9y5_oz1UHdr4ELg@mail.gmail.com>
+ <877dg8ppnt.wl-maz@kernel.org> <YSfiN3Xq1vUzHeap@google.com>
+ <20210827074011.ci2kzo4cnlp3qz7h@gator.home> <CAOQ_Qsg2dKLLanSx6nMbC1Er9DSO3peLVEAJNvU1ZcRVmwaXgQ@mail.gmail.com>
+ <87ilyitt6e.wl-maz@kernel.org>
+In-Reply-To: <87ilyitt6e.wl-maz@kernel.org>
+From:   Oliver Upton <oupton@google.com>
+Date:   Thu, 30 Sep 2021 10:24:23 -0700
+Message-ID: <CAOQ_QshfXEGL691_MOJn0YbL94fchrngP8vuFReCW-=5UQtNKQ@mail.gmail.com>
+Subject: Re: KVM/arm64: Guest ABI changes do not appear rollback-safe
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Andrew Jones <drjones@redhat.com>, kvmarm@lists.cs.columbia.edu,
+        pshier@google.com, ricarkol@google.com, rananta@google.com,
+        reijiw@google.com, jingzhangos@google.com, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
+        Alexandru.Elisei@arm.com, suzuki.poulose@arm.com,
+        Peter Maydell <peter.maydell@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 30, 2021, Marc Zyngier wrote:
-> Hi Oliver,
-> 
-> On Thu, 23 Sep 2021 20:16:05 +0100,
-> Oliver Upton <oupton@google.com> wrote:
-> > 
-> > ARM DEN0022D 5.19 "SYSTEM_SUSPEND" describes a PSCI call that may be
-> > used to request a system be suspended. This is optional for PSCI v1.0
-> > and to date KVM has elected to not implement the call. However, a
-> > VMM/operator may wish to provide their guests with the ability to
-> > suspend/resume, necessitating this PSCI call.
-> > 
-> > Implement support for SYSTEM_SUSPEND according to the prescribed
-> > behavior in the specification. Add a new system event exit type,
-> > KVM_SYSTEM_EVENT_SUSPEND, to notify userspace when a VM has requested a
-> > system suspend. Make KVM_MP_STATE_HALTED a valid state on arm64.
-> 
-> KVM_MP_STATE_HALTED is a per-CPU state on x86 (it denotes HLT). Does
-> it make really sense to hijack this for something that is more of a
-> VM-wide state? I can see that it is tempting to do so as we're using
-> the WFI semantics (which are close to HLT's, in a twisted kind of
-> way), but I'm also painfully aware that gluing x86 expectations on
-> arm64 rarely leads to a palatable result.
+Hey Marc,
 
-Agreed, we literally have billions of possible KVM_MP_STATE_* values, and I'm pretty
-sure all of the existing states are arch-specific.  Some are common to multiple
-architectures, but I don't think _any_ are common to all architectures.
+On Thu, Sep 30, 2021 at 12:32 AM Marc Zyngier <maz@kernel.org> wrote:
+>
+> Hi Oliver,
+>
+> On Wed, 29 Sep 2021 19:22:05 +0100,
+> Oliver Upton <oupton@google.com> wrote:
+> >
+> > I have some lingering thoughts on this subject since we last spoke and
+> > wanted to discuss.
+> >
+> > I'm having a hard time figuring out how a VMM should handle a new
+> > hypercall identity register introduced on a newer kernel. In order to
+> > maintain guest ABI, the VMM would need to know about that register and
+> > zero it when restoring an older guest.
+>
+> Just as it would need to be able to discover any new system register
+> exposed by default, as it happens at all times. Which is why we have a
+> way to discover all the registers, architected or not.
+>
+> > Perhaps instead we could reserve a range of firmware registers as the
+> > 'hypercall identity' registers. Implement all of them as RAZ/WI by
+> > default, encouraging userspace to zero these registers away for older
+> > VMs but still allowing an old userspace to pick up new KVM features.
+> > Doing so would align the hypercall identity registers with the feature
+> > ID registers from the architecture.
+>
+> The range already exists in the form of the "coprocessor" 0x14. I
+> don't see the need to expose it as RAZ/WI, however. If userspace
+> doesn't know about how this pseudo-register works, it won't be able to
+> program it anyway.
+>
+> I don't buy the parallel with the ID-regs either. They are RAZ/WI by
+> default so that they don't UNDEF at runtime. The meaning of a RAZ
+> id-register is also well defined (feature not implemented), and the
+> CPU cannot write to them. In a way, the ID-regs *are* the enumeration
+> mechanism.
+>
+> Our firmware registers don't follow the same rules. Userspace can
+> write to them, and there is no such "not implemented" rule (case in
+> point, PSCI). We also have a separate enumeration mechanism
+> (GET_ONE_REG), which is (more or less) designed for userspace to find
+> what is implemented.
+>
+> For these reasons, I don't immediately see the point of advertising a
+> set of registers ahead of time, before userspace grows an
+> understanding of what these registers mean.
+
+Supposing we don't preallocate some hypercall ID registers, how can we
+safely migrate a guest from an older kernel to newer kernel? Ideally,
+we would preserve the hypercall feature set across the migration which
+could work for a while with the first set of registers that get
+defined, but whenever a new hypercall firmware register comes along
+then the VMM will be clueless to the new ABI.
+
+Fundamentally, I don't think userspace should need a patch to preserve
+ABI on a newer kernel. Despite that, it would seem that userspace will
+need to learn of any firmware registers that control hypercall
+features which come after the initial set that gets proposed. If
+KVM_GET_REG_LIST were to disambiguate between ID registers (hypercall,
+architectural feature ID registers) from other parts of the vCPU
+state, it would be clear to what registers to zero on a newer kernel.
+Apologies if it is distracting to mention the feature ID registers
+here, but both are on my mind currently and want to make sure there is
+some consistency in how features get handled on newer kernels,
+architected or not.
+
+--
+Thanks,
+Oliver
