@@ -2,140 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4954441E022
-	for <lists+kvm@lfdr.de>; Thu, 30 Sep 2021 19:24:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8FF4741E03C
+	for <lists+kvm@lfdr.de>; Thu, 30 Sep 2021 19:33:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352615AbhI3R0V (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Sep 2021 13:26:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49584 "EHLO
+        id S1352741AbhI3Rer (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Sep 2021 13:34:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51544 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352614AbhI3R0T (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Sep 2021 13:26:19 -0400
-Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3C14C06176F
-        for <kvm@vger.kernel.org>; Thu, 30 Sep 2021 10:24:36 -0700 (PDT)
-Received: by mail-lf1-x12a.google.com with SMTP id b15so28224268lfe.7
-        for <kvm@vger.kernel.org>; Thu, 30 Sep 2021 10:24:36 -0700 (PDT)
+        with ESMTP id S1352681AbhI3Req (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Sep 2021 13:34:46 -0400
+Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F50CC06176A
+        for <kvm@vger.kernel.org>; Thu, 30 Sep 2021 10:33:03 -0700 (PDT)
+Received: by mail-lf1-x129.google.com with SMTP id z24so28542899lfu.13
+        for <kvm@vger.kernel.org>; Thu, 30 Sep 2021 10:33:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=IOus6RZAODeflkitNKNtNRm/hVuYigDJWYb8TVA+haU=;
-        b=D2uC1NpXnCez3Ytp4VABnJkvuhi+0CS1VaFTV4avogW3x4OrLuLLvWQMiRKr1WKS4j
-         PTcaPWmLAuGANDqHrTiVVzKCY9yfkwlb8WF6Tf+gfa3rZe5IEYkji7+xmGl3rOEYvXJW
-         b5Sk2IDU4tM0PNkXD2K9uOT9iGAlVWXGtu/xvJUhdVEf1oEVw79VV3xiqTZJ6GPco5Hj
-         qI41SIPc3djWuAzkAyNJtK2/wFu3txyPfUazgTIrYiidLHB31U5f7cuCCV1DDN0mNPyT
-         Ayftn5S5JLoPEABEMCy6hvZqZX0QfyiS0qtlyoTlroaVcP740VEQqqWnj8H9ezw/JFos
-         Z8IQ==
+        bh=iKfk6HbG6TObfzRUE4EIW/odvNzsG1SnwK5+/9/zkj0=;
+        b=FZRkwMcuX90szqNm8YFb+9IVR7uiAeZo8r7TCRXR3IDZfCNFSlSfMMhs/4798maVNE
+         eNU1fPnAEMfL3RKUFRSjECHb286st1nKKy6Q2PA3fRGGfggOVmy7coNju0QA7C157LJa
+         XvFraoQx4x64Rww3mHpMWwfFF1ixtkG3dVgr/l2iAv/YJAIqMZCFin3oW6uQeOH2KOqF
+         NQoxJq8LAvdo0J7SOXyJ6xMUyrE8fRAxgmKVixVYkUCdr9bcniWqFe/GP+fNCU4uU8cG
+         u8GocJ0vHGdAEfCQhL4DrmOH6gHADQYm+8pAFClVByMFLRyOEs716JBCAZ0c+R2rLiJy
+         Hf5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=IOus6RZAODeflkitNKNtNRm/hVuYigDJWYb8TVA+haU=;
-        b=0go42JVFFjUrqpY+lSCiSGWfjFICY8lTNJz8Z0Ii4U6mf4rQhf2/TkmZqQbzvCh4yM
-         hu7MJogSwqydHtk32GKKEx+WA3klfUK4jjAI9uqzNzyBXT2hI5B1a3xYFev0IAoPYnLA
-         9QTzkpWVYqxg5JlQobiekzxzAqPZ3DDuLeWn3yyEjieRe7MQDo6RjipGwftYVyWgZJiD
-         84KDebMJlFbd4687KUGdPgbuSjDCFkRBVHMRDMH32BWHROJPwacXC/pS463SRcyCZxTr
-         v3/RbGcD/3qFDVlD2PCphpk4Q2QM5/dObPXPXMH+kEGR5LBanC/fRLj2NANjvbJYjLfC
-         HrqA==
-X-Gm-Message-State: AOAM5318+/jVDAbLGFu4JO0Wuz4UaTjL6/dBiVNPhCERJD9EspQuXX/p
-        NrV5aD/408ASY7kAHIC1w1WsLfqTb7nWe0GYbqGzCA==
-X-Google-Smtp-Source: ABdhPJwfSVC7//d6/e+fZoayLkD2H1zJPhp0sz/K7FbaHBHjYfcsEHPJ7CByH+JJAViNtjzQ2spoMMRGnDDx4TU0YSE=
-X-Received: by 2002:a2e:95cc:: with SMTP id y12mr7165903ljh.337.1633022674911;
- Thu, 30 Sep 2021 10:24:34 -0700 (PDT)
+        bh=iKfk6HbG6TObfzRUE4EIW/odvNzsG1SnwK5+/9/zkj0=;
+        b=Q0zecaD1nCOXr4I6H89IAVUqIVCMnDiWlXeJdjrR8M//8fNKXqzakp59Z/1VSHOf3y
+         chuWV6ul84LDUDw1euFazc95bT7gva/4oAN1G6qxfiMCU3ryPosfz3TNDg0gARh1tYBl
+         T4+e/hHrCayOLPAGZ02LOieA5c8JvIsgKPyRyL/Qeaop/v1VQypYw26iQuVhxIpfqdB5
+         cCQZaIsDvQqcIIcUPRhmibL4uF0QxDgiYAF5SsAe/LGFojJB+LGl/yhRd8Rm3okl1jpn
+         NxiFCmruoCAET2tcOKo1qfuZGqEiYotrT3Y3Iy52T9K9mgxeM4itrAfJOHy5/Dw1Gzx8
+         mgTQ==
+X-Gm-Message-State: AOAM531LxFWR4jLbqhxDj4bsL/VQvt4jCCWoZSyCp9GdcGMqRNBSiKJ4
+        kACYIx1zKEOos2V1KFjydg1JO3bqbZKABRUjzLwSkg==
+X-Google-Smtp-Source: ABdhPJzq/VatrgxhazbFBsyW1Zf46+5YaQA0HtXNK2rb6j4UxNfmN8UeiVWKq+G80yaEkN4sKybzTxB+SboJZ9UvAR4=
+X-Received: by 2002:a2e:719:: with SMTP id 25mr7561449ljh.251.1633023180023;
+ Thu, 30 Sep 2021 10:33:00 -0700 (PDT)
 MIME-Version: 1.0
-References: <YSVhV+UIMY12u2PW@google.com> <87mtp5q3gx.wl-maz@kernel.org>
- <CAOQ_QshSaEm_cMYQfRTaXJwnVqeoN29rMLBej-snWd6_0HsgGw@mail.gmail.com>
- <87fsuxq049.wl-maz@kernel.org> <20210825150713.5rpwzm4grfn7akcw@gator.home>
- <CAOQ_QsgWiw9-BuGTUFpHqBw3simUaM4Tweb9y5_oz1UHdr4ELg@mail.gmail.com>
- <877dg8ppnt.wl-maz@kernel.org> <YSfiN3Xq1vUzHeap@google.com>
- <20210827074011.ci2kzo4cnlp3qz7h@gator.home> <CAOQ_Qsg2dKLLanSx6nMbC1Er9DSO3peLVEAJNvU1ZcRVmwaXgQ@mail.gmail.com>
- <87ilyitt6e.wl-maz@kernel.org>
-In-Reply-To: <87ilyitt6e.wl-maz@kernel.org>
+References: <20210923191610.3814698-1-oupton@google.com> <20210923191610.3814698-6-oupton@google.com>
+ <878rzetk0o.wl-maz@kernel.org> <YVXvM2kw8PDou4qO@google.com>
+In-Reply-To: <YVXvM2kw8PDou4qO@google.com>
 From:   Oliver Upton <oupton@google.com>
-Date:   Thu, 30 Sep 2021 10:24:23 -0700
-Message-ID: <CAOQ_QshfXEGL691_MOJn0YbL94fchrngP8vuFReCW-=5UQtNKQ@mail.gmail.com>
-Subject: Re: KVM/arm64: Guest ABI changes do not appear rollback-safe
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Andrew Jones <drjones@redhat.com>, kvmarm@lists.cs.columbia.edu,
-        pshier@google.com, ricarkol@google.com, rananta@google.com,
-        reijiw@google.com, jingzhangos@google.com, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
-        Alexandru.Elisei@arm.com, suzuki.poulose@arm.com,
-        Peter Maydell <peter.maydell@linaro.org>
+Date:   Thu, 30 Sep 2021 10:32:49 -0700
+Message-ID: <CAOQ_QsjXs8sF+QY0NrSVBvO4xump7CttBU3et6V3O_hNYmCSig@mail.gmail.com>
+Subject: Re: [PATCH v2 05/11] KVM: arm64: Defer WFI emulation as a requested event
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org,
+        Peter Shier <pshier@google.com>, kvmarm@lists.cs.columbia.edu
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hey Marc,
-
-On Thu, Sep 30, 2021 at 12:32 AM Marc Zyngier <maz@kernel.org> wrote:
+On Thu, Sep 30, 2021 at 10:09 AM Sean Christopherson <seanjc@google.com> wrote:
 >
-> Hi Oliver,
+> On Thu, Sep 30, 2021, Marc Zyngier wrote:
+> > On Thu, 23 Sep 2021 20:16:04 +0100, Oliver Upton <oupton@google.com> wrote:
+> > > @@ -681,6 +687,9 @@ static void check_vcpu_requests(struct kvm_vcpu *vcpu)
+> > >             if (kvm_check_request(KVM_REQ_SLEEP, vcpu))
+> > >                     kvm_vcpu_sleep(vcpu);
+> > >
+> > > +           if (kvm_check_request(KVM_REQ_SUSPEND, vcpu))
+> > > +                   kvm_vcpu_suspend(vcpu);
+> > > +
 >
-> On Wed, 29 Sep 2021 19:22:05 +0100,
-> Oliver Upton <oupton@google.com> wrote:
+> ...
+>
+> > > diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+> > > index 275a27368a04..5e5ef9ff4fba 100644
+> > > --- a/arch/arm64/kvm/handle_exit.c
+> > > +++ b/arch/arm64/kvm/handle_exit.c
+> > > @@ -95,8 +95,7 @@ static int kvm_handle_wfx(struct kvm_vcpu *vcpu)
+> > >     } else {
+> > >             trace_kvm_wfx_arm64(*vcpu_pc(vcpu), false);
+> > >             vcpu->stat.wfi_exit_stat++;
+> > > -           kvm_vcpu_block(vcpu);
+> > > -           kvm_clear_request(KVM_REQ_UNHALT, vcpu);
+> > > +           kvm_make_request(KVM_REQ_SUSPEND, vcpu);
+> > >     }
+> > >
+> > >     kvm_incr_pc(vcpu);
 > >
-> > I have some lingering thoughts on this subject since we last spoke and
-> > wanted to discuss.
-> >
-> > I'm having a hard time figuring out how a VMM should handle a new
-> > hypercall identity register introduced on a newer kernel. In order to
-> > maintain guest ABI, the VMM would need to know about that register and
-> > zero it when restoring an older guest.
+> > This is a change in behaviour. At the point where the blocking
+> > happens, PC will have already been incremented. I'd rather you don't
+> > do that. Instead, make the helper available and call into it directly,
+> > preserving the current semantics.
 >
-> Just as it would need to be able to discover any new system register
-> exposed by default, as it happens at all times. Which is why we have a
-> way to discover all the registers, architected or not.
+> Is there architectural behavior that KVM can emulate?  E.g. if you were to probe a
+> physical CPU while it's waiting, would you observe the pre-WFI PC, or the post-WFI
+> PC?  Following arch behavior would be ideal because it eliminates subjectivity.
+> Regardless of the architectural behavior, changing KVM's behavior should be
+> done explicitly in a separate patch.
 >
-> > Perhaps instead we could reserve a range of firmware registers as the
-> > 'hypercall identity' registers. Implement all of them as RAZ/WI by
-> > default, encouraging userspace to zero these registers away for older
-> > VMs but still allowing an old userspace to pick up new KVM features.
-> > Doing so would align the hypercall identity registers with the feature
-> > ID registers from the architecture.
+> Irrespective of PC behavior, I would caution against using a request for handling
+> WFI.  Deferring the WFI opens up the possibility for all sorts of ordering
+> oddities, e.g. if KVM exits to userspace between here and check_vcpu_requests(),
+> then KVM can end up with a "spurious" pending KVM_REQ_SUSPEND if maniupaltes vCPU
+> state.  I highly doubt that userspace VMMs would actually do that, as it would
+> basically require a signal from userspace, but it's not impossible, and at the
+> very least the pending request is yet another thing to worry about in the future.
 >
-> The range already exists in the form of the "coprocessor" 0x14. I
-> don't see the need to expose it as RAZ/WI, however. If userspace
-> doesn't know about how this pseudo-register works, it won't be able to
-> program it anyway.
->
-> I don't buy the parallel with the ID-regs either. They are RAZ/WI by
-> default so that they don't UNDEF at runtime. The meaning of a RAZ
-> id-register is also well defined (feature not implemented), and the
-> CPU cannot write to them. In a way, the ID-regs *are* the enumeration
-> mechanism.
->
-> Our firmware registers don't follow the same rules. Userspace can
-> write to them, and there is no such "not implemented" rule (case in
-> point, PSCI). We also have a separate enumeration mechanism
-> (GET_ONE_REG), which is (more or less) designed for userspace to find
-> what is implemented.
->
-> For these reasons, I don't immediately see the point of advertising a
-> set of registers ahead of time, before userspace grows an
-> understanding of what these registers mean.
+> Unlike PSCI power-off, WFI isn't cross-vCPU, thus there's no hard requirement
+> for using a request.  And KVM_REQ_SLEEP also has an additional guard in that it
+> doesn't enter rcuwait if power_off (or pause) was cleared after the request was
+> made, e.g. if userspace stuffed vCPU state and set the vCPU RUNNABLE.
 
-Supposing we don't preallocate some hypercall ID registers, how can we
-safely migrate a guest from an older kernel to newer kernel? Ideally,
-we would preserve the hypercall feature set across the migration which
-could work for a while with the first set of registers that get
-defined, but whenever a new hypercall firmware register comes along
-then the VMM will be clueless to the new ABI.
+Yeah, I don't think the punt is necessary for anything but the case
+where userspace sets the MP state to request WFI behavior. A helper
+method amongst all WFI cases is sufficient, and using the deferral for
+everything is a change in behavior.
 
-Fundamentally, I don't think userspace should need a patch to preserve
-ABI on a newer kernel. Despite that, it would seem that userspace will
-need to learn of any firmware registers that control hypercall
-features which come after the initial set that gets proposed. If
-KVM_GET_REG_LIST were to disambiguate between ID registers (hypercall,
-architectural feature ID registers) from other parts of the vCPU
-state, it would be clear to what registers to zero on a newer kernel.
-Apologies if it is distracting to mention the feature ID registers
-here, but both are on my mind currently and want to make sure there is
-some consistency in how features get handled on newer kernels,
-architected or not.
+> > It is also likely to clash with Sean's kvm_vcpu_block() rework, but we
+> > can work around that.
+>
+> Ya.  Oliver, can you Cc me on future patches?  I'll try to keep my eyeballs on this
+> series.
 
---
-Thanks,
-Oliver
+Sure thing :)
