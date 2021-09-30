@@ -2,78 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3BE3341D688
-	for <lists+kvm@lfdr.de>; Thu, 30 Sep 2021 11:41:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0FF9F41D6BB
+	for <lists+kvm@lfdr.de>; Thu, 30 Sep 2021 11:48:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349499AbhI3Jmr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Sep 2021 05:42:47 -0400
-Received: from szxga03-in.huawei.com ([45.249.212.189]:24205 "EHLO
-        szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233877AbhI3Jmq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Sep 2021 05:42:46 -0400
-Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.53])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4HKpBK4pYVz8tXd;
-        Thu, 30 Sep 2021 17:40:09 +0800 (CST)
-Received: from dggema764-chm.china.huawei.com (10.1.198.206) by
- dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
- 15.1.2308.8; Thu, 30 Sep 2021 17:41:02 +0800
-Received: from [10.174.185.179] (10.174.185.179) by
- dggema764-chm.china.huawei.com (10.1.198.206) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2308.8; Thu, 30 Sep 2021 17:41:01 +0800
-Subject: Re: [PATCH v7 15/15] KVM: arm64: selftests: arch_timer: Support vCPU
- migration
-To:     Raghavendra Rao Ananta <rananta@google.com>
-CC:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        "Andrew Jones" <drjones@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        "Alexandru Elisei" <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        <kvm@vger.kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
-        Peter Shier <pshier@google.com>,
-        <linux-kernel@vger.kernel.org>, Will Deacon <will@kernel.org>,
-        <kvmarm@lists.cs.columbia.edu>,
-        <linux-arm-kernel@lists.infradead.org>
-References: <20210914223114.435273-1-rananta@google.com>
- <20210914223114.435273-16-rananta@google.com>
-From:   Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <61419b8f-4da9-955e-b8e3-1d401d91ab1a@huawei.com>
-Date:   Thu, 30 Sep 2021 17:41:00 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+        id S1349576AbhI3JtC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Sep 2021 05:49:02 -0400
+Received: from foss.arm.com ([217.140.110.172]:51308 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S238648AbhI3JtB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Sep 2021 05:49:01 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 14B2FD6E;
+        Thu, 30 Sep 2021 02:47:19 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8DD8C3F793;
+        Thu, 30 Sep 2021 02:47:17 -0700 (PDT)
+Message-ID: <acd37032-b07f-c30c-f65f-d40cd85d2e74@arm.com>
+Date:   Thu, 30 Sep 2021 10:48:50 +0100
 MIME-Version: 1.0
-In-Reply-To: <20210914223114.435273-16-rananta@google.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.1
+Subject: Re: [PATCH 1/5] KVM: arm64: Force ID_AA64PFR0_EL1.GIC=1 when exposing
+ a virtual GICv3
 Content-Language: en-US
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        kernel-team@android.com
+References: <20210924082542.2766170-1-maz@kernel.org>
+ <20210924082542.2766170-2-maz@kernel.org>
+ <7fe293a6-16af-929f-33b1-aa89675197b0@arm.com> <87k0iztljq.wl-maz@kernel.org>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+In-Reply-To: <87k0iztljq.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.185.179]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- dggema764-chm.china.huawei.com (10.1.198.206)
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2021/9/15 6:31, Raghavendra Rao Ananta wrote:
->  static void test_run(struct kvm_vm *vm)
->  {
->  	int i, ret;
-> +	pthread_t pt_vcpu_migration;
-> +
-> +	pthread_mutex_init(&vcpu_done_map_lock, NULL);
-> +	vcpu_done_map = bitmap_alloc(test_args.nr_vcpus);
+Hi Marc,
 
-This one fails to build.
+On 9/29/21 17:04, Marc Zyngier wrote:
+> Hi Alex,
+>
+> On Wed, 29 Sep 2021 16:29:09 +0100,
+> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+>> Hi Marc,
+>>
+>> On 9/24/21 09:25, Marc Zyngier wrote:
+>>> Until now, we always let ID_AA64PFR0_EL1.GIC reflect the value
+>>> visible on the host, even if we were running a GICv2-enabled VM
+>>> on a GICv3+compat host.
+>>>
+>>> That's fine, but we also now have the case of a host that does not
+>>> expose ID_AA64PFR0_EL1.GIC==1 despite having a vGIC. Yes, this is
+>>> confusing. Thank you M1.
+>>>
+>>> Let's go back to first principles and expose ID_AA64PFR0_EL1.GIC=1
+>>> when a GICv3 is exposed to the guest. This also hides a GICv4.1
+>>> CPU interface from the guest which has no business knowing about
+>>> the v4.1 extension.
+>> Had a look at the gic-v3 driver, and as far as I can tell it does
+>> not check that a GICv3 is advertised in ID_AA64PFR0_EL1. If I didn't
+>> get this wrong, then this patch is to ensure architectural
+>> compliance for a guest even if the hardware is not necessarily
+>> compliant, right?
+> Indeed. Not having this made some of my own tests fail on M1 as they
+> rely on ID_AA64PFR0_EL1.GIC being correct. I also pondered setting it
+> to 0 when emulating a GICv2, but that'd be a change in behaviour, and
+> I want to think a bit more about the effects of that.
+>
+>> GICv4.1 is an extension to GICv4 (which itself was an extension to
+>> GICv3) to add support for virtualization features (virtual SGIs), so
+>> I don't see any harm in hiding it from the guest, since the guest
+>> cannot virtual SGIs.
+> Indeed. The guest already has another way to look into this by
+> checking whether the distributor allows active-less SGIs.
 
-aarch64/arch_timer.c: In function 'test_run':
-aarch64/arch_timer.c:321:18: warning: implicit declaration of function 
-'bitmap_alloc'; did you mean 'bitmap_zalloc'? 
-[-Wimplicit-function-declaration]
-   vcpu_done_map = bitmap_alloc(test_args.nr_vcpus);
-                   ^~~~~~~~~~~~
-                   bitmap_zalloc
-aarch64/arch_timer.c:321:16: warning: assignment makes pointer from 
-integer without a cast [-Wint-conversion]
-   vcpu_done_map = bitmap_alloc(test_args.nr_vcpus);
-                 ^
+Thank you for the clarification, the patch looks good to me:
+
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+
+Thanks,
+
+Alex
+
+>
+> Thanks,
+>
+> 	M.
+>
