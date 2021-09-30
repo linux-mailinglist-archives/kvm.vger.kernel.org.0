@@ -2,82 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C29B341E0A8
-	for <lists+kvm@lfdr.de>; Thu, 30 Sep 2021 20:08:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4FCFF41E16B
+	for <lists+kvm@lfdr.de>; Thu, 30 Sep 2021 20:50:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353132AbhI3SKU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Sep 2021 14:10:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59760 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353043AbhI3SKT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Sep 2021 14:10:19 -0400
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15055C06176A
-        for <kvm@vger.kernel.org>; Thu, 30 Sep 2021 11:08:37 -0700 (PDT)
-Received: by mail-pj1-x1031.google.com with SMTP id v19so4779360pjh.2
-        for <kvm@vger.kernel.org>; Thu, 30 Sep 2021 11:08:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=EoZfu8bpen5KFMUVG6jLqzqied/lYe6mK0ma9Cef8Os=;
-        b=bXQfSxmBXOfT4WF1wCJ2uHhAn2c04X0SQKHS2xapCL9/Uhsl4XxrYsrnsseZhnbA60
-         b3qEkUcxB21kqfR4mXgiff7CBu78x9TTEzl0jDrljzdTFi35bN/2k1dmNFkQpcTLFTtN
-         C2Ky2PMllbuODghV5eIb0Yxe1DYKlq4jSZtLsriuQVzE7BwnOUkmePZH1dGOpGKmhIye
-         UxrQ77bpWdbAQDK/csIhkwjanA6B3nYpkd89EVa9Gwi3gvs1YvJFs+XoYLjw/9MMVkmm
-         kCxoN1yVCaXXDLrTwAI4w+eoV5ZCrwXGMd+XNb100w15ojbpdx+k+/6m6X+PqPdIz+jO
-         DG4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=EoZfu8bpen5KFMUVG6jLqzqied/lYe6mK0ma9Cef8Os=;
-        b=BdVNK5cW3UdYaikGCpfYVHjXd5iWK2ci0dfqfVSaVu0R7jokxng+xwwVaH0zHXCJNE
-         vlqYycUuh3lDVW57kHc/5mj7WQCi6TXgwOmMnw1SXMZIHdZ56g4x1suoLaPIlw8yNyE5
-         Z3xv3kV5cKzSKGIq5UVrIir/hc5fhvMVkb/uTj/WXMFr+KKv87Cw1wHbXL13xNr+SGEC
-         1GD/2gPr8oxlnzPOP+PL3etcwUVt9alK4ySugD8t6wGXDeXapqpqouCYwEr0x4Zssmsl
-         lS86rxr9Qlp25WCndEn/yVdU0gt670k75PmVPBs+Phn9ySh0Zugb/OIaD0xjzfvZ5SjB
-         qJoA==
-X-Gm-Message-State: AOAM532ULDjy1pk9zICU8BfF1o2Mt9oNikwNK39GqHI11370INXafd+U
-        cDw8hEs2wJaCE7KO5l1/Ew0ZrQ==
-X-Google-Smtp-Source: ABdhPJyofT3EyCRTUH4uH/kvj1uCfmupdajOzWbRL4wny0VfkHxLMQqDTXmIdg75I/pNah8kDYB0sQ==
-X-Received: by 2002:a17:90b:38d0:: with SMTP id nn16mr3499466pjb.112.1633025316319;
-        Thu, 30 Sep 2021 11:08:36 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id d22sm3668968pgi.73.2021.09.30.11.08.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Sep 2021 11:08:35 -0700 (PDT)
-Date:   Thu, 30 Sep 2021 18:08:32 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Oliver Upton <oupton@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org,
-        Peter Shier <pshier@google.com>, kvmarm@lists.cs.columbia.edu
-Subject: Re: [PATCH v2 05/11] KVM: arm64: Defer WFI emulation as a requested
- event
-Message-ID: <YVX9IOb1vyoJowQl@google.com>
-References: <20210923191610.3814698-1-oupton@google.com>
- <20210923191610.3814698-6-oupton@google.com>
- <878rzetk0o.wl-maz@kernel.org>
- <YVXvM2kw8PDou4qO@google.com>
- <CAOQ_QsjXs8sF+QY0NrSVBvO4xump7CttBU3et6V3O_hNYmCSig@mail.gmail.com>
+        id S1344996AbhI3Swa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Sep 2021 14:52:30 -0400
+Received: from mail.kernel.org ([198.145.29.99]:40636 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1344879AbhI3SwZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Sep 2021 14:52:25 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 8244C61216;
+        Thu, 30 Sep 2021 18:50:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1633027842;
+        bh=sHuklxRhVNrOUIGACjRjjFQjjWujtmMEebA4SOO7XVI=;
+        h=From:To:Cc:Subject:Date:From;
+        b=uHnQO7KnOuN+F6Kg/VYMCkYNZKP/FQuRQKsHlQ02RSvOU+Lsr6a/Ejf3NJuypnQ0r
+         wgcHaC0oqgL3wh/+Bjpr7enKokEpGkilkhAcBEHhE9uLRLhpb0YgHbs+X+j4bqDpV7
+         0AkfKl3RUdJBxJT+ECt+6aVhpjwQ315nbX0A7Nb4a9ZuqQ7VSnVENanCiGErOWceKw
+         TlOjeEhAK0IhpTcaKezOnHkaHC7hBR/4sk1qUNqqo7JqlIbR9UE+BEQUtaXKIMytSU
+         2kYuIhxuTpWdfCtUUQdGYdGcDoSXL5vM5e4zMX86OIlLp0nscaVxPuacUtXLN3LJw1
+         +kT+1vHV0j00g==
+From:   Mike Rapoport <rppt@kernel.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Christophe Leroy <christophe.leroy@csgroup.eu>,
+        Juergen Gross <jgross@suse.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Mike Rapoport <rppt@kernel.org>,
+        Mike Rapoport <rppt@linux.ibm.com>,
+        Shahab Vahedi <Shahab.Vahedi@synopsys.com>,
+        devicetree@vger.kernel.org, iommu@lists.linux-foundation.org,
+        kasan-dev@googlegroups.com, kvm@vger.kernel.org,
+        linux-alpha@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-efi@vger.kernel.org, linux-mips@vger.kernel.org,
+        linux-mm@kvack.org, linux-riscv@lists.infradead.org,
+        linux-s390@vger.kernel.org, linux-sh@vger.kernel.org,
+        linux-snps-arc@lists.infradead.org, linux-um@lists.infradead.org,
+        linux-usb@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        sparclinux@vger.kernel.org, xen-devel@lists.xenproject.org
+Subject: [PATCH v2 0/6] memblock: cleanup memblock_free interface
+Date:   Thu, 30 Sep 2021 21:50:25 +0300
+Message-Id: <20210930185031.18648-1-rppt@kernel.org>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAOQ_QsjXs8sF+QY0NrSVBvO4xump7CttBU3et6V3O_hNYmCSig@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 30, 2021, Oliver Upton wrote:
-> On Thu, Sep 30, 2021 at 10:09 AM Sean Christopherson <seanjc@google.com> wrote:
-> > Unlike PSCI power-off, WFI isn't cross-vCPU, thus there's no hard requirement
-> > for using a request.  And KVM_REQ_SLEEP also has an additional guard in that it
-> > doesn't enter rcuwait if power_off (or pause) was cleared after the request was
-> > made, e.g. if userspace stuffed vCPU state and set the vCPU RUNNABLE.
-> 
-> Yeah, I don't think the punt is necessary for anything but the case
-> where userspace sets the MP state to request WFI behavior. A helper
-> method amongst all WFI cases is sufficient, and using the deferral for
-> everything is a change in behavior.
+From: Mike Rapoport <rppt@linux.ibm.com>
 
-Is there an actual use case for letting userspace request WFI behavior?
+Hi,
+
+Following the discussion on [1] this is the fix for memblock freeing APIs
+mismatch. 
+
+The first patch is a cleanup of numa_distance allocation in arch_numa I've
+spotted during the conversion.
+The second patch is a fix for Xen memory freeing on some of the error
+paths.
+
+I agree with Christophe that doing step by step makes the thing easier to
+review, so the patches 3-6 do the actual cleanup step by step.
+
+This time I used stricter coccinelle scripts so that only straightforward
+uses would get converted.
+
+There still a couple of (void *) castings for the cases when a virtual
+address has unsigned long type rather than a pointer type, like e.g
+initrd_start.
+
+Since scripts/get_maintainer.pl returned more than 100 addresses I've
+trimmed the distribution list only to the relevant lists.
+
+Juergen and Shahab, I didn't keep your Reviewed-by because the patches are
+a bit different this time.
+
+v2:
+* split changes into several patches
+* use stricter coccinelle scripts 
+
+[1] https://lore.kernel.org/all/CAHk-=wj9k4LZTz+svCxLYs5Y1=+yKrbAUArH1+ghyG3OLd8VVg@mail.gmail.com
+
+Mike Rapoport (6):
+  arch_numa: simplify numa_distance allocation
+  xen/x86: free_p2m_page: use memblock_free_ptr() to free a virtual pointer
+  memblock: drop memblock_free_early_nid() and memblock_free_early()
+  memblock: stop aliasing __memblock_free_late with memblock_free_late
+  memblock: rename memblock_free to memblock_phys_free
+  memblock: use memblock_free for freeing virtual pointers
+
+ arch/alpha/kernel/core_irongate.c         |  2 +-
+ arch/arc/mm/init.c                        |  2 +-
+ arch/arm/mach-hisi/platmcpm.c             |  2 +-
+ arch/arm/mm/init.c                        |  2 +-
+ arch/arm64/mm/mmu.c                       |  4 ++--
+ arch/mips/mm/init.c                       |  2 +-
+ arch/mips/sgi-ip30/ip30-setup.c           |  6 +++---
+ arch/powerpc/kernel/dt_cpu_ftrs.c         |  4 ++--
+ arch/powerpc/kernel/paca.c                |  8 ++++----
+ arch/powerpc/kernel/setup-common.c        |  2 +-
+ arch/powerpc/kernel/setup_64.c            |  2 +-
+ arch/powerpc/platforms/powernv/pci-ioda.c |  2 +-
+ arch/powerpc/platforms/pseries/svm.c      |  3 +--
+ arch/riscv/kernel/setup.c                 |  4 ++--
+ arch/s390/kernel/setup.c                  |  8 ++++----
+ arch/s390/kernel/smp.c                    |  4 ++--
+ arch/s390/kernel/uv.c                     |  2 +-
+ arch/s390/mm/kasan_init.c                 |  2 +-
+ arch/sh/boards/mach-ap325rxa/setup.c      |  2 +-
+ arch/sh/boards/mach-ecovec24/setup.c      |  4 ++--
+ arch/sh/boards/mach-kfr2r09/setup.c       |  2 +-
+ arch/sh/boards/mach-migor/setup.c         |  2 +-
+ arch/sh/boards/mach-se/7724/setup.c       |  4 ++--
+ arch/sparc/kernel/smp_64.c                |  2 +-
+ arch/um/kernel/mem.c                      |  2 +-
+ arch/x86/kernel/setup.c                   |  4 ++--
+ arch/x86/kernel/setup_percpu.c            |  2 +-
+ arch/x86/mm/init.c                        |  2 +-
+ arch/x86/mm/kasan_init_64.c               |  4 ++--
+ arch/x86/mm/numa.c                        |  2 +-
+ arch/x86/mm/numa_emulation.c              |  2 +-
+ arch/x86/xen/mmu_pv.c                     |  6 +++---
+ arch/x86/xen/p2m.c                        |  2 +-
+ arch/x86/xen/setup.c                      |  6 +++---
+ drivers/base/arch_numa.c                  | 10 ++++------
+ drivers/firmware/efi/memmap.c             |  2 +-
+ drivers/macintosh/smu.c                   |  2 +-
+ drivers/of/kexec.c                        |  3 +--
+ drivers/of/of_reserved_mem.c              |  5 +++--
+ drivers/s390/char/sclp_early.c            |  2 +-
+ drivers/usb/early/xhci-dbc.c              | 10 +++++-----
+ drivers/xen/swiotlb-xen.c                 |  2 +-
+ include/linux/memblock.h                  | 23 +++--------------------
+ init/initramfs.c                          |  2 +-
+ init/main.c                               |  2 +-
+ kernel/dma/swiotlb.c                      |  2 +-
+ kernel/printk/printk.c                    |  4 ++--
+ lib/bootconfig.c                          |  2 +-
+ lib/cpumask.c                             |  2 +-
+ mm/cma.c                                  |  2 +-
+ mm/memblock.c                             | 22 +++++++++++-----------
+ mm/memory_hotplug.c                       |  2 +-
+ mm/percpu.c                               |  8 ++++----
+ mm/sparse.c                               |  2 +-
+ 54 files changed, 99 insertions(+), 119 deletions(-)
+
+
+base-commit: 5816b3e6577eaa676ceb00a848f0fd65fe2adc29
+-- 
+2.28.0
+
