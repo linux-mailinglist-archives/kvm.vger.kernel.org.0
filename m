@@ -2,139 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2323B41DCA7
-	for <lists+kvm@lfdr.de>; Thu, 30 Sep 2021 16:48:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 900BD41DD07
+	for <lists+kvm@lfdr.de>; Thu, 30 Sep 2021 17:11:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351717AbhI3Oti (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Sep 2021 10:49:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40386 "EHLO
+        id S245307AbhI3PNa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Sep 2021 11:13:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45954 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351376AbhI3Oth (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Sep 2021 10:49:37 -0400
-Received: from mail-qt1-x82d.google.com (mail-qt1-x82d.google.com [IPv6:2607:f8b0:4864:20::82d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11C34C06176F
-        for <kvm@vger.kernel.org>; Thu, 30 Sep 2021 07:47:55 -0700 (PDT)
-Received: by mail-qt1-x82d.google.com with SMTP id f15so5880741qtv.9
-        for <kvm@vger.kernel.org>; Thu, 30 Sep 2021 07:47:55 -0700 (PDT)
+        with ESMTP id S245139AbhI3PNQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Sep 2021 11:13:16 -0400
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B996C06176C
+        for <kvm@vger.kernel.org>; Thu, 30 Sep 2021 08:11:32 -0700 (PDT)
+Received: by mail-pj1-x1035.google.com with SMTP id k23-20020a17090a591700b001976d2db364so5039518pji.2
+        for <kvm@vger.kernel.org>; Thu, 30 Sep 2021 08:11:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
+        d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=YC0+VwHZzPhl2SPrhh657f3U1hNtJ/JCUlCIJ6KQy3I=;
-        b=ndkH5/wAJI5PynIxh8c+p/oo88o+89k9dDxUk0xgxTZH1LvmZlzhjwAYV5yYXxu8Tc
-         wF0b1+mqCRPb2q/JGI46tYxrDNiGY50UHsbAp5ybEiNhAuSCVrmbCFYYSTF+YVA8Lb2i
-         RNC/uWCyRsbHh0WfFsp84BG+2eUZ0pgHc0H8uL178Bhd1gBDUAbbajQcamvMX3huzkUD
-         aP3v1hLmRwUuPgKE94SsoEjkOam5Mg8f9HC89RAr5ESag+i9r4c94bS7FXpNtvDim4as
-         8ms8GAC7MnYNcuMW2hEhBxMcUSv7rCxsoOFh2C5HKiwIQWURyNdZOC0/nLAg+p3J0aKU
-         8iBA==
+        bh=QMXkTSWKWE6IOTwgZL4qEhWkaG0vz1XKQFudBOV/uFM=;
+        b=DZam6ASZNWqT//2uufR62sif+1Las8Y6W53M/dKFeka+a6T8T/wMUkKq4LfWwXrDlS
+         AKeBKhORnyrCWco1bRD79u/8tR+v1IoJ9YHG5NR4e5ZRNbA2UVO+wg4uvT4Ka9Sh0PaP
+         +HqPeWNFp/fTDC+GcAOuLLiUhXggiGO/IBIWXpAoxkXNqnXphVqgalZ6GrigCzDxzdt8
+         bN6SzD7IPT2CiRE+IqRFb+xUtOI83CD09AKDCCbbBEnGtlK0AEuMqQpHM1oixXKfRGzn
+         6ESDHBGFAj5axFshHo9uhJGDzEpH1jq++TVtyAV2fcuDl+xxzsrPhrXGJCVJTHWe3SBA
+         hUwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=YC0+VwHZzPhl2SPrhh657f3U1hNtJ/JCUlCIJ6KQy3I=;
-        b=6W52Cj4n0PyodXwGmVfCkPGybHtr993+IlVlHDL2Vc96/5mp4pz+bYLQQohfYFzVDR
-         s9QoBhn2HQQPN4ytPKak9LBsyhOdL+HCnhoVFzRaqKPLNZ8tkE+HyNRTSOPiJdrBq8UA
-         EQDAKl8Lrld5lV8KicEfHX1tOXHE7rY6phYQVYlDtQgsxIckNOY7/q/ub1FNgCPfW4Wy
-         FB1ensf9KYSCrO8ztxyxLCN53ut0PQnndMtSYALVRwHtFSkWQeU7QAbLlGpzxhr4Pbtx
-         u+LYmje1fQvHi+XvSJN//OueUFkOl4nTCjeAuNr8ElcJp04uWREUySaqDcPJU7hkS+51
-         3N7w==
-X-Gm-Message-State: AOAM532axbC37qtncx7KOMgOo1CJFumpqng6CZLJjt/YgNanG40XQY/h
-        c3+KciThMQv6JszhqgdmHJFkWQ==
-X-Google-Smtp-Source: ABdhPJxpuImR9KBUcfzATGTbSy0hBfBvmQhVEZSB9uz66LdCIDV/x85f7S999tzTSOGxHvl1SPYIMQ==
-X-Received: by 2002:ac8:6703:: with SMTP id e3mr6746279qtp.307.1633013274161;
-        Thu, 30 Sep 2021 07:47:54 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-162-113-129.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.129])
-        by smtp.gmail.com with ESMTPSA id f10sm1691905qtm.15.2021.09.30.07.47.53
+        bh=QMXkTSWKWE6IOTwgZL4qEhWkaG0vz1XKQFudBOV/uFM=;
+        b=A7HjUZ0TGcb5pdy0XRw18wCDMr6aHyftaIsf/KHqgRxSyKUXZBlQ3HaF6PgTsSjsHd
+         NLy8D2j2zWEOkCwVDsWgzmZK/TZkRmnvhkNzwvekj3L0n1LcZzXqu1VMiwBZh87l8Kqa
+         23YRVHZs5KDhFNrzUaCoZeJqljIHY72FZbOMRUMYke6tECUzEqCZ0UJcf8XobPaNtcoE
+         O++1fNK/aQNw+vMaavGaP5ENC8QeL7qKXXor84X69CLp895HF8IEjPs8p1ngDaE7q0N9
+         IaniyPI6x/3MxydJKzXLURWOcS6lMV/ulFKuSM/FQSSbwQGDKY7A1cbk5+xHnc15l4gy
+         CJYQ==
+X-Gm-Message-State: AOAM533VoswVdIKIpAIhoshcAps6Thv2vHNSkWDTtgWqCkgLHbo3EIXZ
+        UMjb4gfWzrRE734pVbY3kJcw3DcbKi9xww==
+X-Google-Smtp-Source: ABdhPJzWcwPdYwdLJ+5nxnLJ3fIdOxEitU8PB0EX6nFJI4cqI6Goe8KhCueoZ13Y7u1uUk383CaqNQ==
+X-Received: by 2002:a17:90a:181:: with SMTP id 1mr7110103pjc.214.1633014691201;
+        Thu, 30 Sep 2021 08:11:31 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id c4sm3380348pfd.80.2021.09.30.08.11.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Sep 2021 07:47:53 -0700 (PDT)
-Received: from jgg by jggl with local (Exim 4.94)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1mVxLk-000HbX-9P; Thu, 30 Sep 2021 11:47:52 -0300
-Date:   Thu, 30 Sep 2021 11:47:52 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Max Gurtovoy <mgurtovoy@nvidia.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Doug Ledford <dledford@redhat.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Kirti Wankhede <kwankhede@nvidia.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
-        Saeed Mahameed <saeedm@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>
-Subject: Re: [PATCH mlx5-next 2/7] vfio: Add an API to check migration state
- transition validity
-Message-ID: <20210930144752.GA67618@ziepe.ca>
-References: <20210929063551.47590fbb.alex.williamson@redhat.com>
- <1eba059c-4743-4675-9f72-1a26b8f3c0f6@nvidia.com>
- <20210929075019.48d07deb.alex.williamson@redhat.com>
- <d2e94241-a146-c57d-cf81-8b7d8d00e62d@nvidia.com>
- <20210929091712.6390141c.alex.williamson@redhat.com>
- <e1ba006f-f181-0b89-822d-890396e81c7b@nvidia.com>
- <20210929161433.GA1808627@ziepe.ca>
- <29835bf4-d094-ae6d-1a32-08e65847b52c@nvidia.com>
- <20210929232109.GC3544071@ziepe.ca>
- <d8324d96-c897-b914-16c6-ad0bbb9b13a5@nvidia.com>
+        Thu, 30 Sep 2021 08:11:30 -0700 (PDT)
+Date:   Thu, 30 Sep 2021 15:11:26 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        syzbot+f3985126b746b3d59c9d@syzkaller.appspotmail.com,
+        Alexander Potapenko <glider@google.com>
+Subject: Re: [PATCH 2/2] KVM: x86: Manually retrieve CPUID.0x1 when getting
+ FMS for RESET/INIT
+Message-ID: <YVXTnheIB6MCKGve@google.com>
+References: <20210929222426.1855730-1-seanjc@google.com>
+ <20210929222426.1855730-3-seanjc@google.com>
+ <75632fa9-e813-266c-7b72-cf9d8142cebf@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <d8324d96-c897-b914-16c6-ad0bbb9b13a5@nvidia.com>
+In-Reply-To: <75632fa9-e813-266c-7b72-cf9d8142cebf@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 30, 2021 at 12:34:19PM +0300, Max Gurtovoy wrote:
-
-> > When we add the migration extension this cannot change, so after
-> > open_device() the device should be operational.
+On Thu, Sep 30, 2021, Paolo Bonzini wrote:
+> On 30/09/21 00:24, Sean Christopherson wrote:
+> >  	 * RESET since KVM emulates RESET before exposing the vCPU to userspace,
+> >  	 * i.e. it'simpossible for kvm_cpuid() to find a valid entry on RESET.
+> > +	 * But, go through the motions in case that's ever remedied.  Note, the
+> > +	 * index for CPUID.0x1 is not significant, arbitrarily specify '0'.
 > 
-> if it's waiting for incoming migration blob, it is not running.
+> Just one nit, this comment change is not really needed because almost all
+> callers are using '0' for the same reason.
+>
+> But, perhaps adding kvm_find_cpuid_entry_index and removing the last
+> parameter from kvm_find_cpuid_entry would be a good idea.
 
-It cannot be waiting for a migration blob after open_device, that is
-not backwards compatible.
+I like this idea, but only if callers are forced to specify the index when the
+index is significant, e.g. add a magic CPUID_INDEX_DONT_CARE and WARN in
+cpuid_entry2_find() if index is significant and index == DONT_CARE.
 
-Just prior to open device the vfio pci layer will generate a FLR to
-the function so we expect that post open_device has a fresh from reset
-fully running device state.
+I'll fiddle with this, unless you want the honors?
 
-> > The reported state in the migration region should accurately reflect
-> > what the device is currently doing. If the device is operational then
-> > it must report running, not stopped.
-> 
-> STOP in migration meaning.
+> Also, the kvm_cpuid() reference needs to be changed, which I did upon
+> commit.
 
-As Alex and I have said several times STOP means the internal state is
-not allowed to change.
-
-> > driver will see RESUMING toggle off so it will trigger a
-> > de-serialization
-> 
-> You mean stop serialization ?
-
-No, I mean it will take all the migration data that has been uploaded
-through the migration region and de-serialize it into active device
-state.
-
-> > driver will see SAVING toggled on so it will serialize the new state
-> > (either the pre-copy state or the post-copy state dpending on the
-> > running bit)
-> 
-> lets leave the bits and how you implement the state numbering aside.
-
-You've missed the point. This isn't a FSM. It is a series of three
-control bits that we have assigned logical meaning their combinatoins.
-
-The algorithm I gave is a control centric algorithm not a state
-centric algorithm and matches the direction Alex thought this was
-being designed for.
- 
-> If you finish resuming you can move to a new state (that we should add) =>
-> RESUMED.
-
-It is not a state machine. Once you stop prentending this is
-implementing a FSM Alex's position makes perfect sense.
-
-Jason
+Doh, thanks!
