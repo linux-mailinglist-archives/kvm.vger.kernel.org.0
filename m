@@ -2,317 +2,192 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5AD3241E232
-	for <lists+kvm@lfdr.de>; Thu, 30 Sep 2021 21:23:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DD7F041E09A
+	for <lists+kvm@lfdr.de>; Thu, 30 Sep 2021 20:06:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346582AbhI3TZ3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Sep 2021 15:25:29 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:51730 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1346683AbhI3TZZ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 30 Sep 2021 15:25:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1633029819;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=69/2vnynzrwmO+C/hMNu41y0Mcok+R2//sJsybWafFQ=;
-        b=h7KVxyU9EXfxr/11jKYi2ZKznaYQzoRmCJzsVq0DHnr2VkiU4Yq15HpB12CJoyrO4zBhe8
-        bgRwu6/RDiINu1pXMY12Fmg59aBaB+cCvpdwY9nu485Jqzo3BOLTAEnT2DBThEhzBxUi/k
-        SedUpYnvpXS9sq+f+EvmdtcWfJChbrQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-90-_87xpljDPliji9Qtl4v77g-1; Thu, 30 Sep 2021 15:23:37 -0400
-X-MC-Unique: _87xpljDPliji9Qtl4v77g-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A72E5101872F;
-        Thu, 30 Sep 2021 19:23:35 +0000 (UTC)
-Received: from fuller.cnet (ovpn-112-4.gru2.redhat.com [10.97.112.4])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id C752C76C1F;
-        Thu, 30 Sep 2021 19:23:34 +0000 (UTC)
-Received: by fuller.cnet (Postfix, from userid 1000)
-        id A57B1416CE5D; Thu, 30 Sep 2021 14:51:07 -0300 (-03)
-Date:   Thu, 30 Sep 2021 14:51:07 -0300
-From:   Marcelo Tosatti <mtosatti@redhat.com>
-To:     Oliver Upton <oupton@google.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        id S1353070AbhI3SHk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Sep 2021 14:07:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59068 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1353104AbhI3SHf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Sep 2021 14:07:35 -0400
+Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90C0AC06176F
+        for <kvm@vger.kernel.org>; Thu, 30 Sep 2021 11:05:52 -0700 (PDT)
+Received: by mail-pl1-x62b.google.com with SMTP id n2so4596151plk.12
+        for <kvm@vger.kernel.org>; Thu, 30 Sep 2021 11:05:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=YuOwAQkWjXznFXi6rLlMpeEj3pgnoZUS9VAR7tSyz6I=;
+        b=YrTTbAhpXtued6yk9uC6PVSQ+GtYLJbkKmrVpJPwt3QklBL2b+uNE8TXilaT/DYofo
+         5Ie58IWMhHlTNlQUvr7bSKpZ4Aa9nSPeW3uWcc/UuVk0lQbxlk3eJ11vqlcKtW19ePN7
+         lchqwiACnk5e+wUAyBPi+5vGCjBm/OxlsGLpIycw3GkLAK09z9PlzZoJEmx1oQEM6dV1
+         19E/sIT5irQ0E7EzW6WXQe0lQ1D3N+hdvAy2L6Bgmic7wWu17g+KtGSqKjf5bqbqS3w5
+         XlqGr/D7HrR5xosTtqV7kalARiXpUXKIvqeCM3brW1ojq5kJl3g06KI6uzgAPbnqOKXS
+         KkZw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=YuOwAQkWjXznFXi6rLlMpeEj3pgnoZUS9VAR7tSyz6I=;
+        b=prz2MNtOev4iNdzucPBbrlh228dnbptNnpDQ3F/6/GwlhGnB0oE7v8w58DxV9uZyyH
+         J0GgJaql/g23qd6qIlJ746jxSZfsn0IJK109vCZUAhsQ3Rw32pCkZSJkDjXHLpUTCWD/
+         ozuzdgYGR/Wu38qJHILlPBSlUAF1McdJ4SEJjZ53xb2VvRyhMfYa28QRovJk+G+qR17l
+         Irc4uaRBqv+3Q8h/phLbE8XDyH2UlM6YwOs92KcwQwQkW86/Qr4X0oqpRGVMgveOY9LF
+         Bt1tn/3e00rrYT6dn9OVxHLDbhtFfpjtPDRtJEpbDF043GKt7yVAq2oaJHW8t18AjwEJ
+         r5kg==
+X-Gm-Message-State: AOAM530TVXzhb4H086VIcQnh/68LjYyhsTPYRSBRyaEeq4PVhiDXZZF0
+        +QKP55aoaknl0WvBVuV4eUTJbw==
+X-Google-Smtp-Source: ABdhPJwHSsswlwCvX1kziArEs9ci87GuqE1qECOm/i/AFl04pgRGM/ROFtbputz8GVgxVVVUBnO7CA==
+X-Received: by 2002:a17:902:868d:b0:13d:dfa7:f3f2 with SMTP id g13-20020a170902868d00b0013ddfa7f3f2mr5590566plo.30.1633025151825;
+        Thu, 30 Sep 2021 11:05:51 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id n66sm3845886pfd.21.2021.09.30.11.05.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 Sep 2021 11:05:51 -0700 (PDT)
+Date:   Thu, 30 Sep 2021 18:05:47 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     David Matlack <dmatlack@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
+        Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
+        KVMARM <kvmarm@lists.cs.columbia.edu>,
+        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
         Jim Mattson <jmattson@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-arm-kernel@lists.infradead.org,
-        Andrew Jones <drjones@redhat.com>,
-        Will Deacon <will@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v8 5/7] kvm: x86: protect masterclock with a seqcount
-Message-ID: <20210930175107.GA15071@fuller.cnet>
-References: <20210916181538.968978-1-oupton@google.com>
- <20210916181538.968978-6-oupton@google.com>
+        Ben Gardon <bgardon@google.com>,
+        Aaron Lewis <aaronlewis@google.com>,
+        Venkatesh Srinivas <venkateshs@google.com>
+Subject: Re: [PATCH v1 3/3] KVM: arm64: Add histogram stats for handling time
+ of arch specific exit reasons
+Message-ID: <YVX8e6GdLhhkoZh3@google.com>
+References: <20210922010851.2312845-1-jingzhangos@google.com>
+ <20210922010851.2312845-3-jingzhangos@google.com>
+ <87czp0voqg.wl-maz@kernel.org>
+ <d16ecbd2-2bc9-2691-a21d-aef4e6f007b9@redhat.com>
+ <YUtyVEpMBityBBNl@google.com>
+ <875yusv3vm.wl-maz@kernel.org>
+ <CALzav=cuzT=u6G0TCVZUfEgAKOCKTSCDE8x2v5qc-Gd_NL-pzg@mail.gmail.com>
+ <87zgrurwgq.wl-maz@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210916181538.968978-6-oupton@google.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <87zgrurwgq.wl-maz@kernel.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 16, 2021 at 06:15:36PM +0000, Oliver Upton wrote:
-> From: Paolo Bonzini <pbonzini@redhat.com>
-> 
-> Protect the reference point for kvmclock with a seqcount, so that
-> kvmclock updates for all vCPUs can proceed in parallel.  Xen runstate
-> updates will also run in parallel and not bounce the kvmclock cacheline.
-> 
-> nr_vcpus_matched_tsc is updated outside pvclock_update_vm_gtod_copy
-> though, so a spinlock must be kept for that one.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> [Oliver - drop unused locals, don't double acquire tsc_write_lock]
-> Signed-off-by: Oliver Upton <oupton@google.com>
-> ---
->  arch/x86/include/asm/kvm_host.h |  7 ++-
->  arch/x86/kvm/x86.c              | 83 +++++++++++++++++----------------
->  2 files changed, 49 insertions(+), 41 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 9c34b5b63e39..5accfe7246ce 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1087,6 +1087,11 @@ struct kvm_arch {
->  
->  	unsigned long irq_sources_bitmap;
->  	s64 kvmclock_offset;
-> +
-> +	/*
-> +	 * This also protects nr_vcpus_matched_tsc which is read from a
-> +	 * preemption-disabled region, so it must be a raw spinlock.
-> +	 */
->  	raw_spinlock_t tsc_write_lock;
->  	u64 last_tsc_nsec;
->  	u64 last_tsc_write;
-> @@ -1097,7 +1102,7 @@ struct kvm_arch {
->  	u64 cur_tsc_generation;
->  	int nr_vcpus_matched_tsc;
->  
-> -	spinlock_t pvclock_gtod_sync_lock;
-> +	seqcount_raw_spinlock_t pvclock_sc;
->  	bool use_master_clock;
->  	u64 master_kernel_ns;
->  	u64 master_cycle_now;
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index cb5d5cad5124..29156c49cd11 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -2533,9 +2533,7 @@ static void kvm_synchronize_tsc(struct kvm_vcpu *vcpu, u64 data)
->  	vcpu->arch.this_tsc_write = kvm->arch.cur_tsc_write;
->  
->  	kvm_vcpu_write_tsc_offset(vcpu, offset);
-> -	raw_spin_unlock_irqrestore(&kvm->arch.tsc_write_lock, flags);
->  
-> -	spin_lock_irqsave(&kvm->arch.pvclock_gtod_sync_lock, flags);
->  	if (!matched) {
->  		kvm->arch.nr_vcpus_matched_tsc = 0;
->  	} else if (!already_matched) {
-> @@ -2543,7 +2541,7 @@ static void kvm_synchronize_tsc(struct kvm_vcpu *vcpu, u64 data)
->  	}
->  
->  	kvm_track_tsc_matching(vcpu);
-> -	spin_unlock_irqrestore(&kvm->arch.pvclock_gtod_sync_lock, flags);
-> +	raw_spin_unlock_irqrestore(&kvm->arch.tsc_write_lock, flags);
->  }
->  
->  static inline void adjust_tsc_offset_guest(struct kvm_vcpu *vcpu,
-> @@ -2731,9 +2729,6 @@ static void pvclock_update_vm_gtod_copy(struct kvm *kvm)
->  	int vclock_mode;
->  	bool host_tsc_clocksource, vcpus_matched;
->  
-> -	vcpus_matched = (ka->nr_vcpus_matched_tsc + 1 ==
-> -			atomic_read(&kvm->online_vcpus));
-> -
->  	/*
->  	 * If the host uses TSC clock, then passthrough TSC as stable
->  	 * to the guest.
-> @@ -2742,6 +2737,10 @@ static void pvclock_update_vm_gtod_copy(struct kvm *kvm)
->  					&ka->master_kernel_ns,
->  					&ka->master_cycle_now);
->  
-> +	lockdep_assert_held(&kvm->arch.tsc_write_lock);
-> +	vcpus_matched = (ka->nr_vcpus_matched_tsc + 1 ==
-> +			atomic_read(&kvm->online_vcpus));
-> +
->  	ka->use_master_clock = host_tsc_clocksource && vcpus_matched
->  				&& !ka->backwards_tsc_observed
->  				&& !ka->boot_vcpu_runs_old_kvmclock;
-> @@ -2760,14 +2759,18 @@ static void kvm_make_mclock_inprogress_request(struct kvm *kvm)
->  	kvm_make_all_cpus_request(kvm, KVM_REQ_MCLOCK_INPROGRESS);
->  }
->  
-> -static void kvm_start_pvclock_update(struct kvm *kvm)
-> +static void __kvm_start_pvclock_update(struct kvm *kvm)
->  {
-> -	struct kvm_arch *ka = &kvm->arch;
-> +	raw_spin_lock_irq(&kvm->arch.tsc_write_lock);
-> +	write_seqcount_begin(&kvm->arch.pvclock_sc);
-> +}
->  
-> +static void kvm_start_pvclock_update(struct kvm *kvm)
-> +{
->  	kvm_make_mclock_inprogress_request(kvm);
->  
->  	/* no guest entries from this point */
-> -	spin_lock_irq(&ka->pvclock_gtod_sync_lock);
-> +	__kvm_start_pvclock_update(kvm);
->  }
->  
->  static void kvm_end_pvclock_update(struct kvm *kvm)
-> @@ -2776,7 +2779,8 @@ static void kvm_end_pvclock_update(struct kvm *kvm)
->  	struct kvm_vcpu *vcpu;
->  	int i;
->  
-> -	spin_unlock_irq(&ka->pvclock_gtod_sync_lock);
-> +	write_seqcount_end(&ka->pvclock_sc);
-> +	raw_spin_unlock_irq(&ka->tsc_write_lock);
->  	kvm_for_each_vcpu(i, vcpu, kvm)
->  		kvm_make_request(KVM_REQ_CLOCK_UPDATE, vcpu);
->  
-> @@ -2797,20 +2801,12 @@ static void get_kvmclock(struct kvm *kvm, struct kvm_clock_data *data)
->  {
->  	struct kvm_arch *ka = &kvm->arch;
->  	struct pvclock_vcpu_time_info hv_clock;
-> -	unsigned long flags;
->  
-> -	spin_lock_irqsave(&ka->pvclock_gtod_sync_lock, flags);
->  	if (!ka->use_master_clock) {
-> -		spin_unlock_irqrestore(&ka->pvclock_gtod_sync_lock, flags);
->  		data->clock = get_kvmclock_base_ns() + ka->kvmclock_offset;
->  		return;
->  	}
->  
-> -	data->flags |= KVM_CLOCK_TSC_STABLE;
-> -	hv_clock.tsc_timestamp = ka->master_cycle_now;
-> -	hv_clock.system_time = ka->master_kernel_ns + ka->kvmclock_offset;
-> -	spin_unlock_irqrestore(&ka->pvclock_gtod_sync_lock, flags);
-> -
->  	/* both __this_cpu_read() and rdtsc() should be on the same cpu */
->  	get_cpu();
->  
-> @@ -2825,6 +2821,9 @@ static void get_kvmclock(struct kvm *kvm, struct kvm_clock_data *data)
->  #endif
->  		data->host_tsc = rdtsc();
->  
-> +		data->flags |= KVM_CLOCK_TSC_STABLE;
-> +		hv_clock.tsc_timestamp = ka->master_cycle_now;
-> +		hv_clock.system_time = ka->master_kernel_ns + ka->kvmclock_offset;
->  		kvm_get_time_scale(NSEC_PER_SEC, __this_cpu_read(cpu_tsc_khz) * 1000LL,
->  				   &hv_clock.tsc_shift,
->  				   &hv_clock.tsc_to_system_mul);
-> @@ -2839,14 +2838,14 @@ static void get_kvmclock(struct kvm *kvm, struct kvm_clock_data *data)
->  u64 get_kvmclock_ns(struct kvm *kvm)
->  {
->  	struct kvm_clock_data data;
-> +	struct kvm_arch *ka = &kvm->arch;
-> +	unsigned seq;
->  
-> -	/*
-> -	 * Zero flags as it's accessed RMW, leave everything else uninitialized
-> -	 * as clock is always written and no other fields are consumed.
-> -	 */
-> -	data.flags = 0;
-> -
-> -	get_kvmclock(kvm, &data);
-> +	do {
-> +		seq = read_seqcount_begin(&ka->pvclock_sc);
-> +		data.flags = 0;
-> +		get_kvmclock(kvm, &data);
-> +	} while (read_seqcount_retry(&ka->pvclock_sc, seq));
->  	return data.clock;
->  }
->  
-> @@ -2912,6 +2911,7 @@ static void kvm_setup_pvclock_page(struct kvm_vcpu *v,
->  static int kvm_guest_time_update(struct kvm_vcpu *v)
->  {
->  	unsigned long flags, tgt_tsc_khz;
-> +	unsigned seq;
->  	struct kvm_vcpu_arch *vcpu = &v->arch;
->  	struct kvm_arch *ka = &v->kvm->arch;
->  	s64 kernel_ns;
-> @@ -2926,13 +2926,14 @@ static int kvm_guest_time_update(struct kvm_vcpu *v)
->  	 * If the host uses TSC clock, then passthrough TSC as stable
->  	 * to the guest.
->  	 */
-> -	spin_lock_irqsave(&ka->pvclock_gtod_sync_lock, flags);
-> -	use_master_clock = ka->use_master_clock;
-> -	if (use_master_clock) {
-> -		host_tsc = ka->master_cycle_now;
-> -		kernel_ns = ka->master_kernel_ns;
-> -	}
-> -	spin_unlock_irqrestore(&ka->pvclock_gtod_sync_lock, flags);
-> +	seq = read_seqcount_begin(&ka->pvclock_sc);
-> +	do {
-> +		use_master_clock = ka->use_master_clock;
-> +		if (use_master_clock) {
-> +			host_tsc = ka->master_cycle_now;
-> +			kernel_ns = ka->master_kernel_ns;
-> +		}
-> +	} while (read_seqcount_retry(&ka->pvclock_sc, seq));
->  
->  	/* Keep irq disabled to prevent changes to the clock */
->  	local_irq_save(flags);
-> @@ -5855,10 +5856,15 @@ int kvm_arch_pm_notifier(struct kvm *kvm, unsigned long state)
->  
->  static int kvm_vm_ioctl_get_clock(struct kvm *kvm, void __user *argp)
->  {
-> -	struct kvm_clock_data data;
-> +	struct kvm_clock_data data = { 0 };
-> +	unsigned seq;
-> +
-> +	do {
-> +		seq = read_seqcount_begin(&kvm->arch.pvclock_sc);
-> +		data.flags = 0;
-> +		get_kvmclock(kvm, &data);
-> +	} while (read_seqcount_retry(&kvm->arch.pvclock_sc, seq));
->  
-> -	memset(&data, 0, sizeof(data));
-> -	get_kvmclock(kvm, &data);
->  	if (copy_to_user(argp, &data, sizeof(data)))
->  		return -EFAULT;
->  
-> @@ -8159,9 +8165,7 @@ static void kvm_hyperv_tsc_notifier(void)
->  	kvm_max_guest_tsc_khz = tsc_khz;
->  
->  	list_for_each_entry(kvm, &vm_list, vm_list) {
-> -		struct kvm_arch *ka = &kvm->arch;
-> -
-> -		spin_lock_irq(&ka->pvclock_gtod_sync_lock);
-> +		__kvm_start_pvclock_update(kvm);
->  		pvclock_update_vm_gtod_copy(kvm);
->  		kvm_end_pvclock_update(kvm);
->  	}
-> @@ -11188,8 +11192,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
->  
->  	raw_spin_lock_init(&kvm->arch.tsc_write_lock);
->  	mutex_init(&kvm->arch.apic_map_lock);
-> -	spin_lock_init(&kvm->arch.pvclock_gtod_sync_lock);
-> -
-> +	seqcount_raw_spinlock_init(&kvm->arch.pvclock_sc, &kvm->arch.tsc_write_lock);
->  	kvm->arch.kvmclock_offset = -get_kvmclock_base_ns();
->  	pvclock_update_vm_gtod_copy(kvm);
->  
-> -- 
-> 2.33.0.309.g3052b89438-goog
-> 
-> 
+On Thu, Sep 30, 2021, Marc Zyngier wrote:
+> On Thu, 23 Sep 2021 00:22:12 +0100, David Matlack <dmatlack@google.com> wrote:
+> > 
+> > On Wed, Sep 22, 2021 at 11:53 AM Marc Zyngier <maz@kernel.org> wrote:
+> > > And I'm all for adding these hooks where it matters as long as they
+> > > are not considered ABI and don't appear in /sys/debug/tracing (in
+> > > general, no userspace visibility).
 
-ACK
+On our side (GCP), we very much want these to be ABI so that upgrading the
+kernel/KVM doesn't break the userspace collection of stats.
 
+> > > The scheduler is a interesting example of this, as it exposes all sort
+> > > of hooks for people to look under the hood. No user of the hook? No
+> > > overhead, no additional memory used. I may have heard that Android
+> > > makes heavy use of this.
+> > >
+> > > Because I'm pretty sure that whatever stat we expose, every cloud
+> > > vendor will want their own variant, so we may just as well put the
+> > > matter in their own hands.
+> > 
+> > I think this can be mitigated by requiring sufficient justification
+> > when adding a new stat to KVM. There has to be a real use-case and it
+> > has to be explained in the changelog. If a stat has a use-case for one
+> > cloud provider, it will likely be useful to other cloud providers as
+> > well.
+> 
+> My (limited) personal experience is significantly different. The
+> diversity of setups make the set of relevant stats pretty hard to
+> guess (there isn't much in common if you use KVM to strictly partition
+> a system vs oversubscribing it).
+
+To some extent that's true for GCP and x86[*].  I think our position can be
+succinctly described as a shotgun approach; we don't know exactly which stats will
+be useful when, so grab as many as we can within reason.  As mentioned earlier,
+burning 8kb+ of stats per vCPU is perfectly ok for our use cases because it's more
+or less negligible compared to the amount of memory assigned to VMs.
+
+This is why I think we should explore an approach that allows for enabling/disabling
+groups of stats at compile time. 
+
+[*] For x86 specifically, I think it's a bit easier to predict which stats are
+    useful because KVM x86 is responsible for a smaller set of functionality compared
+    to arm64, e.g. nearly everything at the system/platform level is handled by
+    userspace, and so there are natural exit points to userspace for many of the
+    intersesting touch points.  The places where we need stats are where userspace
+    doesn't have any visibility into what KVM is doing.
+
+> > > I also wouldn't discount BPF as a possibility. You could perfectly
+> > > have permanent BPF programs running from the moment you boot the
+> > > system, and use that to generate your histograms. This isn't necessary
+> > > a one off, debug only solution.
+> > >
+> > > > Logging is a similar story, e.g. using _ratelimited() printk to aid
+> > > > debug works well when there are a very limited number of VMs and
+> > > > there is a human that can react to arbitrary kernel messages, but
+> > > > it's basically useless when there are 10s or 100s of VMs and taking
+> > > > action on a kernel message requires a prior knowledge of the
+> > > > message.
+> > >
+> > > I'm not sure logging is remotely the same. For a start, the kernel
+> > > should not log anything unless something has oopsed (and yes, I still
+> > > have some bits to clean on the arm64 side). I'm not even sure what you
+> > > would want to log. I'd like to understand the need here, because I
+> > > feel like I'm missing something.
+
+I think we're generally on the same page: kernel logging bad.  x86 has historically
+used printks to "alert" userspace to notable behavior, e.g. when KVM knowingly
+emulates an instruction incorrectly, or when the guest crashes.  The incorrect
+instruction emulation isn't all that interesting since we're well aware of KVM's
+shortcomings, but guest crashes are an instance where "logging" _to userspace_ is
+very desirable, e.g. so that we can identify trends that may be due to bugs in
+the host, or to provide the customer with additional data to help them figure out
+what's wrong on their end.
+
+"logging" in quotes because it doesn't necessarily have to be traditional logging,
+e.g. for the crash cases, KVM already exits to userspace so the "hook" is there,
+what's lacking is a way for KVM to dump additional information about the crash.
+
+I brought up logging here purely to highlight that KVM, at least on the x86 side,
+lacks infrastructure for running at scale, likely because it hasn't been needed in
+the past.
+
+> > > > I'm certainly not expecting other people to solve our challenges,
+> > > > and I fully appreciate that there are many KVM users that don't care
+> > > > at all about scalability, but I'm hoping we can get the community at
+> > > > large, and especially maintainers and reviewers, to also consider
+> > > > at-scale use cases when designing, implementing, reviewing, etc...
+> > >
+> > > My take is that scalability has to go with flexibility. Anything that
+> > > gets hardcoded will quickly become a burden: I definitely regret
+> > > adding the current KVM trace points, as they don't show what I need,
+> > > and I can't change them as they are ABI.
+> > 
+> > This brings up a good discussion topic: To what extent are the KVM
+> > stats themselves an ABI? I don't think this is documented anywhere.
+> > The API itself is completely dynamic and does not hardcode a list of
+> > stats or metadata about them. Userspace has to read stats fd to see
+> > what's there.
+> > 
+> > Fwiw we just deleted the lpages stat without any drama.
+> 
+> Maybe the new discoverable interface makes dropping some stats
+> easier. But it still remains that what is useless for someone has the
+> potential of being crucial for someone else. I wouldn't be surprised
+> if someone would ask for this stat back once they upgrade to a recent
+> host kernel, probably in a couple of years from now.
+
+lpages is bad example, it wasn't deleted so much as it was replaced by stats for
+each page size (4kb, 2mb, 1gb).
+
+I don't think x86 has any (recent) examples of a stat being truly dropped (though
+there definitely some that IMO are quite useless).
