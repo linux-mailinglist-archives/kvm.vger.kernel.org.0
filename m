@@ -2,47 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 143AB41E3CA
-	for <lists+kvm@lfdr.de>; Fri,  1 Oct 2021 00:24:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8226B41E3EF
+	for <lists+kvm@lfdr.de>; Fri,  1 Oct 2021 00:28:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230049AbhI3WZn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Sep 2021 18:25:43 -0400
-Received: from mail-mw2nam10on2086.outbound.protection.outlook.com ([40.107.94.86]:7265
-        "EHLO NAM10-MW2-obe.outbound.protection.outlook.com"
+        id S237238AbhI3WaF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Sep 2021 18:30:05 -0400
+Received: from mail-bn8nam12on2054.outbound.protection.outlook.com ([40.107.237.54]:45216
+        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S229787AbhI3WZl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Sep 2021 18:25:41 -0400
+        id S230100AbhI3WaD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Sep 2021 18:30:03 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JZdo4Sbgm1QfBvexvLngKcY1Kfruzd7/x1N3oF3XYiPdVYz1Gn/FB7siPX5vXiK8m5M7qqrlFH+WjNIlOzx6OT6SCwPU1p5kTkCeFh3+LVu6gPDBv7IIUPXqIcAqUd81H0fzK2hMWVfF4aMrdhI83Q8bmJKHRwgwQIcZUpIEvajV2GvQEjqW8+v7xshlqeWXu8DxHGGp1+nMD8tRsOeYzYCxjR67520iHpo7bsiRXfHnybCkxRJJkzFMv88cKQyjM98q4YEnwR3xg1rQyJq5sg9qOlBQ77DAT2PF82Un9ULuFmVeV/8tzRoUjY3b2WAocOeqx/0ap/82Wc1JFd8spQ==
+ b=AyYHJJ1Z/yMvSTZBpUPz2ZxZS9s8hv35RsQ6zDaW3Iae6haTfpwhAwvrxlZ91zkUtTcsLDk0p1nZL2TnOTdT1jQjncMuu2EgnTpqf67JGqzIIw6aaE2P/345zh1JoEPksIHzJxG5HIVKb5ojy1D5Nl1pQrD7xPxeLjLGKwEVujhH6Rh7PPkq27wbYZaTdTx3Ha0T/q87UWXiHvAPv8zAmjwmVRtwqzKMWaxSVWGj4dnpUGNuQzpKSLknL69uaIT+/j/OYdZhDiAkAUycqPrzshG5V9+0uL+E2mizUAl1ThJ1mW130XL6yux6J0+4j3Ir13MHf8pNimw7BadetISL0g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=R8rYvPryZQKrIM8tEkD4vvVoNxAafaUuLd5XFu4X+ZA=;
- b=f0uZ13GQdcHvWFDCHZGiXxbG496999RkLJzTdYkU8ePdHMHKt3xRyDjh7JgEiGzK86/SVjQUbwWqdQmfQjW6MkOkallx+sEIGA6B6yIqkyd6Xm6PpI0IPx3a0dmA9+Kf4nzGnbjuyj8OYwuJw1cG44FYSoTusyw6dXkD6yJb53I65i5JCKFZaXU7D9u/fds7cd1a3N+AuOx1JDaewDTm7qimx7aT3zIfjrWk+UV8VPnbGmwsHr3/pZcgyKR/89HFvyYb7OwjfCvGhaDTkQMFhIg3sjqMm0FA6zhr5WhCETiReKOxt891oxK151804tcgCFnL3vHCppSYOWCdU76mLQ==
+ bh=X9HfDPX3U+cacno69Kq+AhmGfX0FvDxufW3PR8N7+ZI=;
+ b=Re4Eze0N9nf6/FtOTN3TxE6vEl8M11lJecd0ukIyPyQ3mQPOo+I2A1yRNcqe5nM8pdVKcIll5Es6JsBLHoXZpRJwYv7gJI1S3+KqSpKvpemU9bAC6zqASprRgtSaB9HLcarQxwGTG1zLQrAC0D1pM3rqbJOvDImd+YPuG2+otRglO4Ced4xqByJe5W0F3N/B758ANjEvhBbmgufF1KsCyq+ZpNZM6pU0Rk37lTM8QmjAyH1VqurHJoifeeuJSpU263WmSSnYWdIq0AHAXgHucYoRLH1M4TjqYFuD8/bC2SLAu8GhlJvgrAc33oPU6AEKYUxfvW5Bn3d1vfpfv3uS3A==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=R8rYvPryZQKrIM8tEkD4vvVoNxAafaUuLd5XFu4X+ZA=;
- b=oGeP9TP85U+ilU/nal3YOr1kf5Vn7uDTSjXQ3TuMLoNOfpw8jxD48yh7/q5xscCtBg4uyIX+fRu+911QSEMBkeSjKL5kRisjBm8nG0j1OE0vt7aMeApu5MTdlY0+PHWjokaCAgkykjTIMLClH5581aNhqFHNJEi9b4Luh7nHpyJUM2oxoE3bI3B9bkn6eFCEfPIsQ7npbuMEhhUwjAV432jEYaqh2oWQBeD9Xwgpa1el7eV5YMFTyPuVO4Y63vHwQW5VzJDF847uCeY6AtKavp82XVWOAJ/zPgp6gDqYA5RCHAb8segVXXh9EoHsT4nfQ6b4h5Hc/V3+/pY2lvFTJA==
-Authentication-Results: intel.com; dkim=none (message not signed)
- header.d=none;intel.com; dmarc=none action=none header.from=nvidia.com;
+ bh=X9HfDPX3U+cacno69Kq+AhmGfX0FvDxufW3PR8N7+ZI=;
+ b=MxHPBDHwqTzW/uuyCR6CJr59/DXAn5oFZIUsFNapPVLiCNJpYNMC+k5l4EYTe8tmGxSwNgzvLT/MtjGJnsX9gGqv5PUbAdTX0JCR89g5GFDYR+K+oYqqjsLMurU5DK/dO+pRPy4O0aPaKDieLOUtZiw/b0aFnPg/SXahTIAS516Ovgw7u8l75VXZdQH14A0/yQ1Pml4otvsDSXOYux6iYCVYqL6wCrl3l+ZWsL9RbeMXNaDUPGXoUHm5kQx7yJMpmdNqGgsos6w3upgExAJwt/JB4j0UuNXKoewUNH1uygbXDtEQ3eg+qVOGoMoq5YNOE3ZvA0f+5vEKLv690pkKqQ==
+Authentication-Results: gibson.dropbear.id.au; dkim=none (message not signed)
+ header.d=none;gibson.dropbear.id.au; dmarc=none action=none
+ header.from=nvidia.com;
 Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
  by BL1PR12MB5364.namprd12.prod.outlook.com (2603:10b6:208:314::18) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4566.14; Thu, 30 Sep
- 2021 22:23:57 +0000
+ 2021 22:28:19 +0000
 Received: from BL0PR12MB5506.namprd12.prod.outlook.com
  ([fe80::e8af:232:915e:2f95]) by BL0PR12MB5506.namprd12.prod.outlook.com
  ([fe80::e8af:232:915e:2f95%8]) with mapi id 15.20.4566.017; Thu, 30 Sep 2021
- 22:23:57 +0000
-Date:   Thu, 30 Sep 2021 19:23:55 -0300
+ 22:28:19 +0000
+Date:   Thu, 30 Sep 2021 19:28:18 -0300
 From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>, "hch@lst.de" <hch@lst.de>,
+To:     David Gibson <david@gibson.dropbear.id.au>
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "hch@lst.de" <hch@lst.de>,
         "jasowang@redhat.com" <jasowang@redhat.com>,
         "joro@8bytes.org" <joro@8bytes.org>,
         "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
@@ -64,119 +67,99 @@ Cc:     Alex Williamson <alex.williamson@redhat.com>,
         "dwmw2@infradead.org" <dwmw2@infradead.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-        "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
         "nicolinc@nvidia.com" <nicolinc@nvidia.com>
-Subject: Re: [RFC 10/20] iommu/iommufd: Add IOMMU_DEVICE_GET_INFO
-Message-ID: <20210930222355.GH964074@nvidia.com>
+Subject: Re: [RFC 06/20] iommu: Add iommu_device_init[exit]_user_dma
+ interfaces
+Message-ID: <20210930222818.GI964074@nvidia.com>
 References: <20210919063848.1476776-1-yi.l.liu@intel.com>
- <20210919063848.1476776-11-yi.l.liu@intel.com>
- <20210922152407.1bfa6ff7.alex.williamson@redhat.com>
- <20210922234954.GB964074@nvidia.com>
- <BN9PR11MB5433409DF766AAEF1BB2CF258CA39@BN9PR11MB5433.namprd11.prod.outlook.com>
- <BN9PR11MB54333BDB1E58387FD9999DF18CA39@BN9PR11MB5433.namprd11.prod.outlook.com>
- <20210923114219.GG964074@nvidia.com>
- <BN9PR11MB5433519229319BA951CA97638CAA9@BN9PR11MB5433.namprd11.prod.outlook.com>
+ <20210919063848.1476776-7-yi.l.liu@intel.com>
+ <YVPxzad5TYHAc1H/@yekko>
+ <BN9PR11MB5433E1BF538C7D3632F4C6188CA99@BN9PR11MB5433.namprd11.prod.outlook.com>
+ <YVQJJ/ZlRoJbAt0+@yekko>
+ <20210929125716.GT964074@nvidia.com>
+ <YVUqYsJTMkt1nnXL@yekko>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <BN9PR11MB5433519229319BA951CA97638CAA9@BN9PR11MB5433.namprd11.prod.outlook.com>
-X-ClientProxiedBy: BL1PR13CA0041.namprd13.prod.outlook.com
- (2603:10b6:208:257::16) To BL0PR12MB5506.namprd12.prod.outlook.com
+In-Reply-To: <YVUqYsJTMkt1nnXL@yekko>
+X-ClientProxiedBy: BLAPR03CA0106.namprd03.prod.outlook.com
+ (2603:10b6:208:32a::21) To BL0PR12MB5506.namprd12.prod.outlook.com
  (2603:10b6:208:1cb::22)
 MIME-Version: 1.0
-Received: from mlx.ziepe.ca (142.162.113.129) by BL1PR13CA0041.namprd13.prod.outlook.com (2603:10b6:208:257::16) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4587.8 via Frontend Transport; Thu, 30 Sep 2021 22:23:56 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1mW4T5-008DTq-Rv; Thu, 30 Sep 2021 19:23:55 -0300
+Received: from mlx.ziepe.ca (142.162.113.129) by BLAPR03CA0106.namprd03.prod.outlook.com (2603:10b6:208:32a::21) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4566.17 via Frontend Transport; Thu, 30 Sep 2021 22:28:19 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1mW4XK-008DY7-Av; Thu, 30 Sep 2021 19:28:18 -0300
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 660659d2-9d2f-4e8b-8ea8-08d98460fe49
+X-MS-Office365-Filtering-Correlation-Id: 7450b203-f7d4-4a4a-1e06-08d984619a99
 X-MS-TrafficTypeDiagnostic: BL1PR12MB5364:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <BL1PR12MB5364EA843231E93F4B9B2BC8C2AA9@BL1PR12MB5364.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
+X-Microsoft-Antispam-PRVS: <BL1PR12MB536492037E626F74E894CC67C2AA9@BL1PR12MB5364.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: WlCSvIhLy3PdGWTrMrMDSwohRiYaSuvQ7OP/2UKrWz8Dm+7y4gQSS1W2MlJGJnOoxLtzD+DRb/q62LCoxxmY9MPQUby8sJIqKQ+zbbP5bs1Kdc66XScNJchJKYWtb72+R71pHILQmguflmZEW2B9TaQfUK/amWaLtdfJSPopqNqESsbDYflhwdAEwY4jijhqpfnkxnXMPwE21X4J9tHeGEJZSMkTVShV9wt2XGy9/y9RTQg9oe0EL0yIAClCKjgQ9jME5eiAuV8ax7EjUsFuVZ5dUyYpAMhBOcyn9AdgfR5qE5CMT11he3VcHwKHyQWUOUDWpom3OIH0RWqAyWSRBc13MjT71DMNKDgP2zF8nItO3AwEa8Q1udRMUBqkB4xFtcPRv5B5omv418zyAjEegl+bhBwBEgig3uzlZX3kw7o/l931jcRI0q/3x/AiriDaP4Ur/Y1aiuswjT4QmVcpKcsgDEXFcrmd0SNKG3d3BNQGoAthS0Ww8Xhh8nq4p3QWXv4UYkjo9kBmsFvp7mcXbJ8PlU7Dof4VqHdgnAeGuirhcdFme3yJSZgAnnjaNuGLpWXhhH1JNaLETRXjc2MtHHepEZGKuXpj8piqhMHftOzUUv5nCTd9x/2xYycqQBA+vG/6j4iJS5cLG9pdQmAB3g7PTIxlvalOA4fqEC9mljDcYD0DqnjYduzVMqpalGZRvmYzZHTF1XhRXlz9XmAMiA==
+X-Microsoft-Antispam-Message-Info: s9oIawdJmpk6llTAOyCImWSBw4R6WgpN/+y2Q9SUSDETILkPOi6mXmmru0zAAGX6P0Xa34tVbcLZNov96214aTYV19c1TLu80I/CZwDjAC2DMtHH/EMTAjPHfI04X+4+8cH3FPAS8aC36TsXOOm6uFQkR9Ah1X+ir0+qq9EznNLrkTD15pgnqpyr71rsHONxFo5SLuX+QeeR3aSIXiWykenMPuRVm3MDpLy/hJDAyv/4ULiBPTlfDg9R304RCvxhsMZOG1YoCrY9sHPv9QcljATBy6aHnEn6i6OkEyZle+lHAYLoiDlGNCEvSY9/wupt/RoakMFoVQdrji4Yyvqdp5SczmVLyvd7szDWo+4uEu+rnZCQQDxGSdQX6/geNyGhWoNcLmNAuq7zSRvuaUYxgZDw1/zfp+gU8hsU3SlcwiJ69Fwy5BziFfykZZTHAkrQLcqTJPlhP7DVk2IPqYPpju2orejEpev1m0SpL3wHlhDFFitnh2+u2POMXM7kZgrxsTXJPksSnVUY4KahxlWAVmivmOwkqejVvr7Gz5lt5TBw6Ex2BcKDI5TxG1hitpwxwceaIqmHjtOa5K5bBopSI5qY1IK4sUhOgyu1hED7MpAV0rkA2z9WYWm4ogdBvS88FI3Xla3k6QIgb4MAqAZ1+5kbbssvx5ywP0EKRyMTwVtTIS025M33AAOTruFatKSXPfiX2VsDTHOx0Fm8oAGChQ==
 X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(66476007)(2616005)(4326008)(36756003)(38100700002)(66946007)(7416002)(6916009)(8936002)(2906002)(1076003)(66556008)(316002)(54906003)(83380400001)(8676002)(9786002)(186003)(26005)(5660300002)(86362001)(508600001)(426003)(33656002)(9746002)(107886003)(27376004);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?79NX4HWYP2dXDjiTOUCq5N1UCjFmRGk+GYjd1eTzU8ii/evP4zWAAH20KVwZ?=
- =?us-ascii?Q?okqL+KXgkuhEwj0rTYrBLyb8RkKc8rP3yeyf1PGPEVXZxPXtaupyUqf8/RPa?=
- =?us-ascii?Q?fIPNhbuCLtgL9EybbcFSvcTXvapEmroVEDkDKgf2ojwBCarSNGjB4DDQIVsQ?=
- =?us-ascii?Q?1+Fm+ofBAyDwSBX3xc5KTa/0cm5JDKRcnDrQimpVXNrbHF/P5A2139f2LaaN?=
- =?us-ascii?Q?YF8XrGo9kNZ+Zv3wTjadqLKolyiWD1ITeLea5MYnHzLfPc1mMZNWs8Pzyk8g?=
- =?us-ascii?Q?7QZsDDjibxC0Qn4KbppHvD4uzZoujrEjLrinlOoHEZJpD4yeFZmwVWWXf9uk?=
- =?us-ascii?Q?VSWXbZnRez5e8uiUoweedGxq93FXg+lNDBSvxTW+a2wxGSdzpRWX618r1GLn?=
- =?us-ascii?Q?u2w2+cDWsvAOJMJ5RtnutXHfJ5/zDN+PRZm74d49Xq4kMPNXFVi1lKFZ2hIY?=
- =?us-ascii?Q?1NjriIFRdEIJe0PYyNH5FnJjOK+tlCvu+W7wxT/rcwtMllfAsyfDcLWP+D4M?=
- =?us-ascii?Q?67pAUs2HtkN/WLjIrpHCt3f28BS/xZd+Qcp7F6xhIMbHp6MGdypbI5InzdFq?=
- =?us-ascii?Q?MXRevGtvM+b9eCPyxcnLBGONEUGQ6J+7eB6kKTHDYNbtKQOd+tWPch8iulKI?=
- =?us-ascii?Q?Okck62rmgj7SPG05PEj/wCwJC0MVyaOiayCOZkGy/lE3OJe/ULyL41RLJXlR?=
- =?us-ascii?Q?kNXeF2ry9XOIgfRG3kTwd19vU0zijoeGYBQlmZQHT5ZonJ0jtGeqd9IPD2SN?=
- =?us-ascii?Q?B7kj6inx+hFSAYH2bWAfq9nmoXhcmK0rWPVAGYWBUi/177w1bCS4On3ess7j?=
- =?us-ascii?Q?lnseJZTKOn2F+FKgTwT5/v/mFQpQIIXbm+IVz48Q0Y2Tnv/UU5lL9BYbYORM?=
- =?us-ascii?Q?kj9tSokhl03vgKZCCP6j9welweeE0xiHI1gAyADOoDw9mh/b3pCLJjEFE5p9?=
- =?us-ascii?Q?antJn149I3ocnfPLopCaHzpf9Bi+5y+mcb+7VbS1ggluXQ7cjK8br/HFWdSV?=
- =?us-ascii?Q?dXCy0N8kIJLPL4OoOVwpgqRg+mNFsVzlOBMjkbFcM6F3qEsvnGmOVVuTu5mH?=
- =?us-ascii?Q?GvuSUCM87U0LJ2zDMRM6zu0JFHVdS3CwtYPTM/iZ3qEVH9V1Wm6gMh8OTaB/?=
- =?us-ascii?Q?Bz0XH6e5lMiJNjMZ8oM5DtkhKqhb+COg332Dfj9cqmMs0y16ouS6Ros+CzVK?=
- =?us-ascii?Q?+GK01CK8+CgSZzQ5bU4xur6+YkTovBnw217T9NGKxAa5q7x0TWcMmy5Frsuy?=
- =?us-ascii?Q?KUA4aWTOR6xT7JQhNVN3fLZVxXqRnwXmhXyCdeiYjcOHB/LsA/saCRHu+w41?=
- =?us-ascii?Q?1Ju0BcgWxa3dFvvFDL7MRMFJhvqjj8ODtTdGa8Ha/+Lo6A=3D=3D?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Tn8raxUckz2dbkx8nuEjoHZ6t7mHCKoyinxsTbJa+r9zcqMTXeur0xTd8Gj9?=
+ =?us-ascii?Q?dWhvfND380QXCDP5cWNuoIV4vAkxg5xMKfVL/iHCufk52qJzCGB08+KlVYAv?=
+ =?us-ascii?Q?it1ARA6oSnaZ7F+8DmFthkGXcIGnHy8Ks3BgDcll234Xn+dEgHJmhgy37W4g?=
+ =?us-ascii?Q?fKc4mE1xsbZPPx/kNvM3ByJnOQW0PtnhpEQwxFkoJtJM8EZLdDwxWvcT/Ql2?=
+ =?us-ascii?Q?b2Rx9Yl54NPnAxMd//xnhKfFkRJ+Q/14x6QKk2KUJk3hRLBwzgBjV3r70fYj?=
+ =?us-ascii?Q?IPl8CG4vqMS4bl2pnH50c72B6n08lgo45Tnk28keSI7F1V4GCT4SA5GzdfpY?=
+ =?us-ascii?Q?5Y6HsOYVTYR1RAKTT8YbAEb2C1hw6wcHmYW5v2kYyPWYptUjadpGbXhP5GSc?=
+ =?us-ascii?Q?+7OirYvBBrHNG7IlPqieqG76F4Ezpb0rYKnreb8o0rZlZgSwPmZ4jPPclzDB?=
+ =?us-ascii?Q?axdDIG8ERVaq9BgObUQd+v//l5JBef/ZATrRuJU5+2Xq2bbN0o9i9HqVBh+4?=
+ =?us-ascii?Q?OdtEVJYf8zvNMkQMOpUnJ2ZLOQ8TMTYBubUgmDJ0+oO0bE6HBj5dOLgrhkoZ?=
+ =?us-ascii?Q?Dqd+9JkNsNIQjrzy6aMm97ctdDrGi4vcVzDwrmnPsoS3bX7NgP6r8jXijGQI?=
+ =?us-ascii?Q?fN1/vtcVcKle5G5CwrBcdKtzBAfrN2ohnreXS6ar7lbFF5M0NPfk+K0HuPY1?=
+ =?us-ascii?Q?lwySW+QF9WIi6d60XfteVkdYYzzMU1j6S4Vq1qngIqIInOT6PsDsCxbThTNt?=
+ =?us-ascii?Q?mopq6YXFyZ+1UrvcPj11mAZ+ZHM1i5e9QAYbow4XbqN7Kmhl1RxtHCGmMxmQ?=
+ =?us-ascii?Q?at4SHeP0hMd4eGRWDmKp71GKtL7WfePARqWKi4SdA2aQ3bAJNZvksiLGMHyK?=
+ =?us-ascii?Q?H7BDGo3wBY2Ru/yaM3o3q1VQ6gRZF06FyBNa4qETp6qalWJcsifTfWerw4Ot?=
+ =?us-ascii?Q?xYk7VOuBcLBxAN4OaRvxGn3DL9C+GufjFvB4q6BZhVh3p7q/WLocAEOGkuS3?=
+ =?us-ascii?Q?IO0nUWfQ/ZY0on8OcSBuXXbh2ZLK1jp3DJWIgtzeHwkKbcVGDG4QMMpRwm6Q?=
+ =?us-ascii?Q?g0DRuWCCqDfzXiVVmAGKChEOv//cY+KSMioLX+ULjSt9SDKA0GpXhcv49cqh?=
+ =?us-ascii?Q?ZXM+Q/3eS2tQ7Dxvm6oTADVE2ukR46/+agq+RlahQII1Gp/1WtM1sTbb7TQ6?=
+ =?us-ascii?Q?pXQ090XKhYMioWRoLDKcU7RlLo13dX4ZSKSSYdhZrgfG+gWW96B+2OUkv/TH?=
+ =?us-ascii?Q?BNVZTDFWXbGfIy0KOWGYrLCTFq8U6xUuJhGiWKB8w0EZc4NNG0vrD9WFqsZc?=
+ =?us-ascii?Q?PjjkA4rb1WZaB7MI3JKXG69w41P5Desnncbfo6HMeHEEsQ=3D=3D?=
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 660659d2-9d2f-4e8b-8ea8-08d98460fe49
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7450b203-f7d4-4a4a-1e06-08d984619a99
 X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Sep 2021 22:23:57.2444
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Sep 2021 22:28:19.2604
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Yg24VqEsfKxnMglP6ZEfidJAgmWXRJzvAQsfCem0GIp4qdPMeQu2sMwoWlDVDZaC
+X-MS-Exchange-CrossTenant-UserPrincipalName: nN6hZFGOll0NfB3g7ZE6n9zol6xYK2CEDJMfeWd36go/xQKKv9WiMxDXgpdPvA8q
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5364
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 30, 2021 at 09:35:45AM +0000, Tian, Kevin wrote:
+On Thu, Sep 30, 2021 at 01:09:22PM +1000, David Gibson wrote:
 
-> > The Intel functional issue is that Intel blocks the cache maintaince
-> > ops from the VM and the VM has no way to self-discover that the cache
-> > maintaince ops don't work.
+> > The *admin* the one responsible to understand the groups, not the
+> > applications. The admin has no idea what a group FD is - they should
+> > be looking at the sysfs and seeing the iommu_group directories.
 > 
-> the VM doesn't need to know whether the maintenance ops 
-> actually works.
+> Not just the admin.  If an app is given two devices in the same group
+> to use *both* it must understand that and act accordingly.
 
-Which is the whole problem.
+Yes, but this is true regardless of what the uAPI is, and for common
+app cases where we have a single IO Page table for all devices the app
+still doesn't need to care about groups since it can just assign all
+devices to the same IO page table and everything works out just fine.
 
-Intel has a design where the device driver tells the device to issue
-non-cachable TLPs.
+For instance qemu without a vIOMMU does not need to care about
+groups. It opens a single iommufd, creates a single IO page table that
+maps the guest physical space and assigns every device to that IO page
+table. No issue.
 
-The driver is supposed to know if it can issue the cache maintaince
-instructions - if it can then it should ask the device to issue
-no-snoop TLPs.
-
-For instance the same PCI driver on non-x86 should never ask the
-device to issue no-snoop TLPs because it has no idea how to restore
-cache coherence on eg ARM.
-
-Do you see the issue? This configuration where the hypervisor silently
-make wbsync a NOP breaks the x86 architecture because the guest has no
-idea it can no longer use no-snoop features.
-
-Using the IOMMU to forcibly prevent the device from issuing no-snoop
-makes this whole issue of the broken wbsync moot.
-
-It is important to be really clear on what this is about - this is not
-some idealized nice iommu feature - it is working around alot of
-backwards compatability baggage that is probably completely unique to
-x86.
-
-> > Other arches don't seem to have this specific problem...
-> 
-> I think the key is whether other archs allow driver to decide DMA
-> coherency and indirectly the underlying I/O page table format. 
-> If yes, then I don't see a reason why such decision should not be 
-> given to userspace for passthrough case.
-
-The choice all comes down to if the other arches have cache
-maintenance instructions in the VM that *don't work*
+Only if qemu is creating a vIOMMU does it need to start to look at the
+groups and ensure that the group becomes visible to the guest OS. Here
+the group fd doesn't really help anything
 
 Jason
+
+
