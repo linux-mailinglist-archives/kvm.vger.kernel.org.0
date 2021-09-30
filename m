@@ -2,118 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E0CFF41DFA3
-	for <lists+kvm@lfdr.de>; Thu, 30 Sep 2021 18:57:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6102041DFB2
+	for <lists+kvm@lfdr.de>; Thu, 30 Sep 2021 19:01:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352461AbhI3Q6x (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Sep 2021 12:58:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43188 "EHLO
+        id S1352470AbhI3RDa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Sep 2021 13:03:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44228 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344261AbhI3Q6w (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Sep 2021 12:58:52 -0400
-Received: from mail-qt1-x836.google.com (mail-qt1-x836.google.com [IPv6:2607:f8b0:4864:20::836])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 088E0C06176A
-        for <kvm@vger.kernel.org>; Thu, 30 Sep 2021 09:57:10 -0700 (PDT)
-Received: by mail-qt1-x836.google.com with SMTP id x9so6407186qtv.0
-        for <kvm@vger.kernel.org>; Thu, 30 Sep 2021 09:57:09 -0700 (PDT)
+        with ESMTP id S1351817AbhI3RD3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Sep 2021 13:03:29 -0400
+Received: from mail-qt1-x82d.google.com (mail-qt1-x82d.google.com [IPv6:2607:f8b0:4864:20::82d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56165C06176A
+        for <kvm@vger.kernel.org>; Thu, 30 Sep 2021 10:01:46 -0700 (PDT)
+Received: by mail-qt1-x82d.google.com with SMTP id j13so6374935qtq.6
+        for <kvm@vger.kernel.org>; Thu, 30 Sep 2021 10:01:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=ziepe.ca; s=google;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=S6YXfpFe2oyoHYDwjh9kH94qHaiTar/66XvSXAnCW4g=;
-        b=WRCxUf02fh2bjoA8377P/niAhxpKtgq/8s2Qb65HKtgJaYQcoQSeeKZjluErA9c0QB
-         jG6BSuDu4s89o0VhFixYNqHYMGg64pTiDFhhk7zCiyXi3+adD5QKiUBKc3PYL/Ag8EfO
-         34eEjhDSvCpPsR63j9HEq5vRjPJTvSyluDBqVL1Sey71waEfI0AU6gvPKnqFkSIqlisy
-         GeiTjFUbsSoblRd1+Z9oEuuDvm7oH0rs/Y+lgv65763hMsT5nvyBIyXa7dtSXMFHzrZM
-         Bs9Nx8+HQJfnNXp3kz8odCnjGl3a6o1efrypNUgpLKaOnhPheEeEtlwCZoR6WDDYNU6c
-         GXyA==
+        bh=4vHHMFNBH4hAm5F563BvE8+3o+7NJnRDr/RUjwsUT7o=;
+        b=QGIRkmLfQXIeyUEAHPlvDndXmMMIAMxSXtZXhhRKYvklIE9s9V0mxKkMNZc361fu2+
+         /oV28Ti2mLOszUCQtAVFm+lO7hdx7RISinOyXEgG679jauOsPEZJsDn97BSKI/Y+XZGn
+         nvKzE18TgoAr5yYwzqF0BLBR/d2XlDNYCnfE8BWTl7rPF2hP87rXsdSJGEEz4xNJo7IA
+         XD/7Y7rdo0+4GJu9Kcd/XwUsO2juMuUKx3MqXsyQc6zYkSOTMavlqDYBTbIG5C39TIF8
+         RnCcanamumbSy2k6pKQ2iu96IWFTPNHP8Dtw3MHS8f+D1FklgeJFEug0i3XEm+5ai9kb
+         OSaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=S6YXfpFe2oyoHYDwjh9kH94qHaiTar/66XvSXAnCW4g=;
-        b=y6Jgfby4ETSv50p8F3w3kp513V2/gieVeU7LOVVj3chBYE5u7JlF3tvoyfy+jtjCtd
-         l2dCNOiIGw3AWxOq/QtgwyRe37r0Ioxsz7K40+ntjy/iGqviyHzFQ3XYdO99VhmWo1pD
-         xA3YEQEBBA0giuI1dcutuXIoyCgOaVZPv1Q/5wGZYk+WQCy4zoPWJ3mueLUUi/1DXNDL
-         UELG/rBjjtu+XAiNAkoTdGNaUWSEgDgtVvcHtGKzxXImhBILea3LmlZKsbS30GhbJ1Xf
-         F0M39v/V/XdwqxSQTYUs/jdrT5nLh9waImfYn9Mp7R1XNWstogu3sE0aL+eTS4BNxSWF
-         Z8ZQ==
-X-Gm-Message-State: AOAM532xp9cJco9/7HHOTZqWCfFVfR+2kz+bNqz0Oawbwj1D89mx82vT
-        f6o3MYyrRJo2ghNlz1uFnUldNw==
-X-Google-Smtp-Source: ABdhPJwaVZrb6swbOMWyh5meDFfCVItnxXm0igkU1Y9f/FXaY61x5Pm69s2i65DGkSEkjPO+MY86Sw==
-X-Received: by 2002:ac8:435e:: with SMTP id a30mr7696711qtn.227.1633021029181;
-        Thu, 30 Sep 2021 09:57:09 -0700 (PDT)
+        bh=4vHHMFNBH4hAm5F563BvE8+3o+7NJnRDr/RUjwsUT7o=;
+        b=w+qLu4BpPnjCP9ijx1XaB03s2M1tt/5CXUigMoGY5nC4cLi+Qg/ePHRu/EDNsyV/mD
+         BSnkbjbYhQTOFgHnyzPgFfybxEbS8hygyiGGjA4zmVQoygZ0xtRbfbjLTE5OehEJyNNe
+         rOxHJvFWEzE3YHN4Z8qciOf6L0EDy/k8JH4Jgqw5cryk1hm/UTu6zGA1VDdMVcWbTJfs
+         2cgf4rSyzMSdmevk9ljM0O4kaAePJnMTDYqTv7Ip2CDhrM4yJIr9B1TLluu42nfqDjj1
+         xKnnZ4kGzjo/cooAtNIGy7FbYeoZGXjHYgVvcTSWsSu7EIJAfqUjcb6rlbubqyLPNGW2
+         Fc3w==
+X-Gm-Message-State: AOAM530mSuNYpC9AsbKVf6T6wSVJQiRG573lfiEEPHqXveAWx1UA5oPI
+        jvoVFVTv1ejlLqpQwocCtVRD8A==
+X-Google-Smtp-Source: ABdhPJzF+pPtZvhaFL1R8QP7BIsE2HJOfVSnKQcQu0YBk68rNLfkGNJ3nrCGS43Vfn59rLAM1LD5RQ==
+X-Received: by 2002:ac8:4084:: with SMTP id p4mr7765655qtl.306.1633021305549;
+        Thu, 30 Sep 2021 10:01:45 -0700 (PDT)
 Received: from ziepe.ca (hlfxns017vw-142-162-113-129.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.129])
-        by smtp.gmail.com with ESMTPSA id h4sm1924023qtb.67.2021.09.30.09.57.08
+        by smtp.gmail.com with ESMTPSA id l7sm1852806qth.81.2021.09.30.10.01.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Sep 2021 09:57:08 -0700 (PDT)
+        Thu, 30 Sep 2021 10:01:44 -0700 (PDT)
 Received: from jgg by jggl with local (Exim 4.94)
         (envelope-from <jgg@ziepe.ca>)
-        id 1mVzMp-000I1P-TV; Thu, 30 Sep 2021 13:57:07 -0300
-Date:   Thu, 30 Sep 2021 13:57:07 -0300
+        id 1mVzRH-000I2E-Ia; Thu, 30 Sep 2021 14:01:43 -0300
+Date:   Thu, 30 Sep 2021 14:01:43 -0300
 From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Kirti Wankhede <kwankhede@nvidia.com>,
-        Christoph Hellwig <hch@lst.de>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        Diana Craciun <diana.craciun@oss.nxp.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        "Xu, Terrence" <terrence.xu@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: [PATCH 11/14] vfio: clean up the check for mediated device in
- vfio_iommu_type1
-Message-ID: <20210930165707.GA69218@ziepe.ca>
-References: <20210913071606.2966-1-hch@lst.de>
- <20210913071606.2966-12-hch@lst.de>
- <c4ef0d8a-39f4-4834-f8f2-beffd2f2f8ae@nvidia.com>
- <20210916221854.GT3544071@ziepe.ca>
- <BN9PR11MB54333BE60F997D3A9183EDD38CDD9@BN9PR11MB5433.namprd11.prod.outlook.com>
- <20210917050543.GA22003@lst.de>
- <8a5ff811-3bba-996a-a8e0-faafe619f193@nvidia.com>
- <20210917125301.GU3544071@ziepe.ca>
- <20210930104620.56a1d3e9.alex.williamson@redhat.com>
+To:     Max Gurtovoy <mgurtovoy@nvidia.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Doug Ledford <dledford@redhat.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Kirti Wankhede <kwankhede@nvidia.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+        Saeed Mahameed <saeedm@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>
+Subject: Re: [PATCH mlx5-next 2/7] vfio: Add an API to check migration state
+ transition validity
+Message-ID: <20210930170143.GB69218@ziepe.ca>
+References: <20210929091712.6390141c.alex.williamson@redhat.com>
+ <e1ba006f-f181-0b89-822d-890396e81c7b@nvidia.com>
+ <20210929161433.GA1808627@ziepe.ca>
+ <29835bf4-d094-ae6d-1a32-08e65847b52c@nvidia.com>
+ <20210929232109.GC3544071@ziepe.ca>
+ <d8324d96-c897-b914-16c6-ad0bbb9b13a5@nvidia.com>
+ <20210930144752.GA67618@ziepe.ca>
+ <d5b68bb7-d4d3-e9d8-1834-dba505bb8595@nvidia.com>
+ <20210930162442.GB67618@ziepe.ca>
+ <c7a18080-3ffc-488b-577c-1e3b356bf66e@nvidia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210930104620.56a1d3e9.alex.williamson@redhat.com>
+In-Reply-To: <c7a18080-3ffc-488b-577c-1e3b356bf66e@nvidia.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 30, 2021 at 10:46:20AM -0600, Alex Williamson wrote:
-> I'm only aware that the PF driver enables basic SR-IOV configuration of
-> VFs, ie. the number of enabled VFs. 
+On Thu, Sep 30, 2021 at 07:51:22PM +0300, Max Gurtovoy wrote:
+> 
+> On 9/30/2021 7:24 PM, Jason Gunthorpe wrote:
+> > On Thu, Sep 30, 2021 at 06:32:07PM +0300, Max Gurtovoy wrote:
+> > > > Just prior to open device the vfio pci layer will generate a FLR to
+> > > > the function so we expect that post open_device has a fresh from reset
+> > > > fully running device state.
+> > > running also mean that the device doesn't have a clue on its internal state
+> > > ? or running means unfreezed and unquiesced ?
+> > The device just got FLR'd and it should be in a clean state and
+> > operating. Think the VM is booting for the first time.
+> 
+> During the resume phase in the dst, the VM is paused and not booting.
+> Migration SW is waiting to get memory and state from SRC. The device will
+> start from the exact point that was in the src.
+> 
+> it's exactly "000b => Device Stopped, not saving or resuming"
 
-This is quite common in the netdev world, for instance you use the PF
-driver to set the MAC addresses, QOS and other details on the VF
-devices.
+For this case qmeu should open the VFIO device and immediately issue a
+command to go to resuming. The kernel cannot know at open_device time
+which case userspace is trying to do. Due to backwards compat we
+assume userspace is going to boot a fresh VM.
 
-> only management of the number of child devices, but the flavor of each
-> child, for example the non-homogeneous slice of resources allocated per
-> child device.
+> Well, this is your design for the driver implementation. Nobody is
+> preventing other drivers to start deserializing device state into the device
+> during RESUMING bit on.
 
-Since the devices are PCI VFs they should be able to be used, with
-configuration, any place a PCI VF is usable. EG vfio-pci, a Kernel
-driver, etc.
+It is a logical model. Devices can stream the migration data directly
+into the internal state if they like. It just creates more conditions
+where they have report an error state.
 
-This is why the PF needs to provide the configuration to support all
-the use cases.
+> So if we moved from 100b to 010b somehow, one should deserialized its buffer
+> to the device, and then serialize it to migration region again ?
+
+Yes.
  
-> I'm not aware of any standard mechanism for a PF driver to apply a
-> configuration per VF.  
+> I guess its doable since the device is freeze and quiesced. But moving from
+> 100b to 011b is not possible, right ?
 
-devlink is the standard way these days. It can model the PCI devices
-and puts a control point in the PF driver.
+Why not?
 
-I'd defer to Jiri, Leon and others to explain the details of this
-though :)
+100b to 011b is no different than going indirectly 100b -> 001b -> 011b
 
-> create these sorts device flavors.  For example, we might expose NIC VFs
-> and administrative configuration should restrict VF1 to a 1Gbit
-> interface while VF2 gets 10Gbit.
-
-This is all being done already today through the PF driver using
-either netink or devlink interfaces
+The time spent in 001b is just negligable.
 
 Jason
