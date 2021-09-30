@@ -2,93 +2,322 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E22BB41D91F
-	for <lists+kvm@lfdr.de>; Thu, 30 Sep 2021 13:52:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1940141D9CC
+	for <lists+kvm@lfdr.de>; Thu, 30 Sep 2021 14:29:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350544AbhI3LyY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Sep 2021 07:54:24 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:55596 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234418AbhI3LyX (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 30 Sep 2021 07:54:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1633002760;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=q7ecDDE2gg2yCNk5Vcwg8Uhl8w5cvRkFs6n2BRT4swQ=;
-        b=T1qcgGYcAQ0nrDaXqkobT7ntDX3IfBgB0+Zk2JgHs0W25aE3NP2RMmUH9VyjkMeOM2Bc81
-        Eb3oludAXdcv2OmliL0kcRX3VuNlvoa3QQOoI8/aUrbkZLp+uMsi5o7Dz2ytXiYB/5pRAE
-        waZmLJZQBbUmcIUd12OYSFi1I4dP6Fs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-590-G3vizTh9Mm6z6kO_jUVSZA-1; Thu, 30 Sep 2021 07:52:39 -0400
-X-MC-Unique: G3vizTh9Mm6z6kO_jUVSZA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1350816AbhI3Mbd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Sep 2021 08:31:33 -0400
+Received: from mail.kernel.org ([198.145.29.99]:35922 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1350193AbhI3Mbd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Sep 2021 08:31:33 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4C3678145E5;
-        Thu, 30 Sep 2021 11:52:38 +0000 (UTC)
-Received: from starship (unknown [10.35.206.50])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 292D319C59;
-        Thu, 30 Sep 2021 11:52:30 +0000 (UTC)
-Message-ID: <376e11a40954de4705ba726371a50f98a8596e7c.camel@redhat.com>
-Subject: Re: [PATCH 0/3] KVM: qemu patches for few KVM features I developed
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     qemu-devel@nongnu.org
-Cc:     Marcelo Tosatti <mtosatti@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
-        kvm@vger.kernel.org,
-        Alex =?ISO-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Date:   Thu, 30 Sep 2021 14:52:29 +0300
-In-Reply-To: <20210914155214.105415-1-mlevitsk@redhat.com>
-References: <20210914155214.105415-1-mlevitsk@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+        by mail.kernel.org (Postfix) with ESMTPSA id 962066137A;
+        Thu, 30 Sep 2021 12:29:50 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1mVvC8-00Dylk-JN; Thu, 30 Sep 2021 13:29:48 +0100
+Date:   Thu, 30 Sep 2021 13:29:47 +0100
+Message-ID: <877deytfes.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Oliver Upton <oupton@google.com>
+Cc:     kvmarm@lists.cs.columbia.edu, James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH v2 06/11] KVM: arm64: Add support for SYSTEM_SUSPEND PSCI call
+In-Reply-To: <20210923191610.3814698-7-oupton@google.com>
+References: <20210923191610.3814698-1-oupton@google.com>
+        <20210923191610.3814698-7-oupton@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oupton@google.com, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, drjones@redhat.com, pshier@google.com, ricarkol@google.com, reijiw@google.com, rananta@google.com, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2021-09-14 at 18:52 +0300, Maxim Levitsky wrote:
-> These patches implement the qemu side logic to support
-> the KVM features I developed recently.
-> 
-> First two patches are for features that are already accepted
-> upstream, and I already posted them on the qemu mailing list once.
-> 
-> And the 3rd patch is for nested TSC scaling on SVM
-> which isn't yet accepted in KVM but can already be added to qemu since
-> it is conditional on KVM supporting it, and ABI wise it only relies
-> on SVM spec.
-> 
-> Best regards,
->     Maxim Levitsky
-> 
-> Maxim Levitsky (3):
->   KVM: use KVM_{GET|SET}_SREGS2 when supported.
->   gdbstub: implement NOIRQ support for single step on KVM
->   KVM: SVM: add migration support for nested TSC scaling
-> 
->  accel/kvm/kvm-all.c   |  30 +++++++++++
->  gdbstub.c             |  60 +++++++++++++++++----
->  include/sysemu/kvm.h  |  17 ++++++
->  target/i386/cpu.c     |   5 ++
->  target/i386/cpu.h     |   7 +++
->  target/i386/kvm/kvm.c | 122 +++++++++++++++++++++++++++++++++++++++++-
->  target/i386/machine.c |  53 ++++++++++++++++++
->  7 files changed, 282 insertions(+), 12 deletions(-)
-> 
-> -- 
-> 2.26.3
-> 
-> 
-Very polite ping on these patches.
+Hi Oliver,
 
-Best regards,
-   Maxim Levitsky
+On Thu, 23 Sep 2021 20:16:05 +0100,
+Oliver Upton <oupton@google.com> wrote:
+> 
+> ARM DEN0022D 5.19 "SYSTEM_SUSPEND" describes a PSCI call that may be
+> used to request a system be suspended. This is optional for PSCI v1.0
+> and to date KVM has elected to not implement the call. However, a
+> VMM/operator may wish to provide their guests with the ability to
+> suspend/resume, necessitating this PSCI call.
+> 
+> Implement support for SYSTEM_SUSPEND according to the prescribed
+> behavior in the specification. Add a new system event exit type,
+> KVM_SYSTEM_EVENT_SUSPEND, to notify userspace when a VM has requested a
+> system suspend. Make KVM_MP_STATE_HALTED a valid state on arm64.
 
+KVM_MP_STATE_HALTED is a per-CPU state on x86 (it denotes HLT). Does
+it make really sense to hijack this for something that is more of a
+VM-wide state? I can see that it is tempting to do so as we're using
+the WFI semantics (which are close to HLT's, in a twisted kind of
+way), but I'm also painfully aware that gluing x86 expectations on
+arm64 rarely leads to a palatable result.
+
+> Userspace can set this to request an in-kernel emulation of the suspend.
+> 
+> Signed-off-by: Oliver Upton <oupton@google.com>
+> ---
+>  Documentation/virt/kvm/api.rst    |  6 ++++
+>  arch/arm64/include/asm/kvm_host.h |  3 ++
+>  arch/arm64/kvm/arm.c              |  8 +++++
+>  arch/arm64/kvm/psci.c             | 60 +++++++++++++++++++++++++++++++
+>  include/uapi/linux/kvm.h          |  2 ++
+>  5 files changed, 79 insertions(+)
+
+This patch needs splitting. PSCI interface in one, mpstate stuff in
+another, userspace management last.
+
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index a6729c8cf063..361a57061b8f 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -5656,6 +5656,7 @@ should put the acknowledged interrupt vector into the 'epr' field.
+>    #define KVM_SYSTEM_EVENT_SHUTDOWN       1
+>    #define KVM_SYSTEM_EVENT_RESET          2
+>    #define KVM_SYSTEM_EVENT_CRASH          3
+> +  #define KVM_SYSTEM_EVENT_SUSPEND        4
+>  			__u32 type;
+>  			__u64 flags;
+>  		} system_event;
+> @@ -5680,6 +5681,11 @@ Valid values for 'type' are:
+>     has requested a crash condition maintenance. Userspace can choose
+>     to ignore the request, or to gather VM memory core dump and/or
+>     reset/shutdown of the VM.
+> + - KVM_SYSTEM_EVENT_SUSPEND -- the guest has requested that the VM
+> +   suspends. Userspace is not obliged to honor this, and may call KVM_RUN
+> +   again. Doing so will cause the guest to resume at its requested entry
+> +   point. For ARM64, userspace can request in-kernel suspend emulation
+> +   by setting the vCPU's MP state to KVM_MP_STATE_HALTED.
+>  
+>  ::
+>  
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 1beda1189a15..441eb6fa7adc 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -137,6 +137,9 @@ struct kvm_arch {
+>  
+>  	/* Memory Tagging Extension enabled for the guest */
+>  	bool mte_enabled;
+> +
+> +	/* PSCI SYSTEM_SUSPEND call enabled for the guest */
+> +	bool suspend_enabled;
+>  };
+>  
+>  struct kvm_vcpu_fault_info {
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index f1a375648e25..d875d3bcf3c5 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -101,6 +101,10 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+>  		}
+>  		mutex_unlock(&kvm->lock);
+>  		break;
+> +	case KVM_CAP_ARM_SYSTEM_SUSPEND:
+> +		r = 0;
+> +		kvm->arch.suspend_enabled = true;
+
+I don't really fancy adding another control here. Given that we now
+have the PSCI version being controlled by a firmware pseudo-register,
+I'd rather have that there.
+
+And if we do that, I wonder whether there would be any benefit in
+bumping the PSCI version to 1.1.
+
+> +		break;
+>  	default:
+>  		r = -EINVAL;
+>  		break;
+> @@ -215,6 +219,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>  	case KVM_CAP_SET_GUEST_DEBUG:
+>  	case KVM_CAP_VCPU_ATTRIBUTES:
+>  	case KVM_CAP_PTP_KVM:
+> +	case KVM_CAP_ARM_SYSTEM_SUSPEND:
+>  		r = 1;
+>  		break;
+>  	case KVM_CAP_SET_GUEST_DEBUG2:
+> @@ -470,6 +475,9 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
+>  	int ret = 0;
+>  
+>  	switch (mp_state->mp_state) {
+> +	case KVM_MP_STATE_HALTED:
+> +		kvm_make_request(KVM_REQ_SUSPEND, vcpu);
+> +		fallthrough;
+>  	case KVM_MP_STATE_RUNNABLE:
+>  		vcpu->arch.power_off = false;
+>  		break;
+
+> diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
+> index d453666ddb83..cf869f1f8615 100644
+> --- a/arch/arm64/kvm/psci.c
+> +++ b/arch/arm64/kvm/psci.c
+> @@ -203,6 +203,46 @@ static void kvm_psci_system_reset(struct kvm_vcpu *vcpu)
+>  	kvm_prepare_system_event(vcpu, KVM_SYSTEM_EVENT_RESET);
+>  }
+>  
+> +static int kvm_psci_system_suspend(struct kvm_vcpu *vcpu)
+> +{
+> +	unsigned long entry_addr, context_id;
+> +	struct kvm *kvm = vcpu->kvm;
+> +	unsigned long psci_ret = 0;
+> +	struct kvm_vcpu *tmp;
+> +	int ret = 0;
+> +	int i;
+> +
+> +	/*
+> +	 * The SYSTEM_SUSPEND PSCI call requires that all vCPUs (except the
+> +	 * calling vCPU) be in an OFF state, as determined by the
+> +	 * implementation.
+> +	 *
+> +	 * See ARM DEN0022D, 5.19 "SYSTEM_SUSPEND" for more details.
+> +	 */
+> +	mutex_lock(&kvm->lock);
+> +	kvm_for_each_vcpu(i, tmp, kvm) {
+> +		if (tmp != vcpu && !tmp->arch.power_off) {
+> +			psci_ret = PSCI_RET_DENIED;
+> +			ret = 1;
+> +			goto out;
+> +		}
+> +	}
+> +
+> +	entry_addr = smccc_get_arg1(vcpu);
+> +	context_id = smccc_get_arg2(vcpu);
+> +
+> +	kvm_psci_vcpu_request_reset(vcpu, entry_addr, context_id,
+> +				    kvm_vcpu_is_be(vcpu));
+
+So even if userspace doesn't want to honor the suspend request, the
+CPU ends up resetting? That's not wrong, but maybe a bit surprising.
+
+> +
+> +	memset(&vcpu->run->system_event, 0, sizeof(vcpu->run->system_event));
+> +	vcpu->run->system_event.type = KVM_SYSTEM_EVENT_SUSPEND;
+> +	vcpu->run->exit_reason = KVM_EXIT_SYSTEM_EVENT;
+
+Consider spinning out a helper common to this and kvm_prepare_system_event().
+
+> +out:
+> +	mutex_unlock(&kvm->lock);
+> +	smccc_set_retval(vcpu, psci_ret, 0, 0, 0);
+> +	return ret;
+> +}
+> +
+>  static void kvm_psci_narrow_to_32bit(struct kvm_vcpu *vcpu)
+>  {
+>  	int i;
+> @@ -223,6 +263,14 @@ static unsigned long kvm_psci_check_allowed_function(struct kvm_vcpu *vcpu, u32
+>  	if ((fn & PSCI_0_2_64BIT) && vcpu_mode_is_32bit(vcpu))
+>  		return PSCI_RET_NOT_SUPPORTED;
+>  
+> +	switch (fn) {
+> +	case PSCI_1_0_FN_SYSTEM_SUSPEND:
+> +	case PSCI_1_0_FN64_SYSTEM_SUSPEND:
+> +		if (!vcpu->kvm->arch.suspend_enabled)
+> +			return PSCI_RET_NOT_SUPPORTED;
+> +		break;
+> +	}
+> +
+>  	return 0;
+>  }
+>  
+> @@ -316,6 +364,10 @@ static int kvm_psci_1_0_call(struct kvm_vcpu *vcpu)
+>  	unsigned long val;
+>  	int ret = 1;
+>  
+> +	val = kvm_psci_check_allowed_function(vcpu, psci_fn);
+> +	if (val)
+> +		goto out;
+> +
+>  	switch(psci_fn) {
+>  	case PSCI_0_2_FN_PSCI_VERSION:
+>  		val = KVM_ARM_PSCI_1_0;
+> @@ -339,6 +391,8 @@ static int kvm_psci_1_0_call(struct kvm_vcpu *vcpu)
+>  		case PSCI_0_2_FN_SYSTEM_OFF:
+>  		case PSCI_0_2_FN_SYSTEM_RESET:
+>  		case PSCI_1_0_FN_PSCI_FEATURES:
+> +		case PSCI_1_0_FN_SYSTEM_SUSPEND:
+> +		case PSCI_1_0_FN64_SYSTEM_SUSPEND:
+>  		case ARM_SMCCC_VERSION_FUNC_ID:
+>  			val = 0;
+>  			break;
+> @@ -347,10 +401,16 @@ static int kvm_psci_1_0_call(struct kvm_vcpu *vcpu)
+>  			break;
+>  		}
+>  		break;
+> +	case PSCI_1_0_FN_SYSTEM_SUSPEND:
+> +		kvm_psci_narrow_to_32bit(vcpu);
+> +		fallthrough;
+> +	case PSCI_1_0_FN64_SYSTEM_SUSPEND:
+> +		return kvm_psci_system_suspend(vcpu);
+>  	default:
+>  		return kvm_psci_0_2_call(vcpu);
+>  	}
+>  
+> +out:
+>  	smccc_set_retval(vcpu, val, 0, 0, 0);
+>  	return ret;
+>  }
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index a067410ebea5..052b0e717b08 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -433,6 +433,7 @@ struct kvm_run {
+>  #define KVM_SYSTEM_EVENT_SHUTDOWN       1
+>  #define KVM_SYSTEM_EVENT_RESET          2
+>  #define KVM_SYSTEM_EVENT_CRASH          3
+> +#define KVM_SYSTEM_EVENT_SUSPEND        4
+>  			__u32 type;
+>  			__u64 flags;
+>  		} system_event;
+> @@ -1112,6 +1113,7 @@ struct kvm_ppc_resize_hpt {
+>  #define KVM_CAP_BINARY_STATS_FD 203
+>  #define KVM_CAP_EXIT_ON_EMULATION_FAILURE 204
+>  #define KVM_CAP_ARM_MTE 205
+> +#define KVM_CAP_ARM_SYSTEM_SUSPEND 206
+>  
+>  #ifdef KVM_CAP_IRQ_ROUTING
+>  
+
+I think there is an additional feature we need, which is to give
+control back to userspace every time a wake-up condition occurs (I did
+touch on that in [1]). This would give the opportunity to the VMM to
+do whatever it needs to perform.
+
+A typical use case would be to implement wake-up from certain
+interrupts only (mask non-wake-up IRQs on suspend request, return to
+the guest for WFI, wake-up returns to the VMM to restore the previous
+interrupt configuration, resume).
+
+Userspace would be free to clear the suspend state and resume the
+guest, or to reenter WFI.
+
+Thanks,
+
+	M.
+
+[1] https://lkml.kernel.org/kvm/87k0jauurx.wl-maz@kernel.org/
+
+-- 
+Without deviation from the norm, progress is not possible.
