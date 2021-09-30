@@ -2,89 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6DBE641D56A
-	for <lists+kvm@lfdr.de>; Thu, 30 Sep 2021 10:30:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B9CB041D5AB
+	for <lists+kvm@lfdr.de>; Thu, 30 Sep 2021 10:49:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349132AbhI3Ice (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Sep 2021 04:32:34 -0400
-Received: from mga06.intel.com ([134.134.136.31]:41230 "EHLO mga06.intel.com"
+        id S1348753AbhI3Iuy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Sep 2021 04:50:54 -0400
+Received: from mga03.intel.com ([134.134.136.65]:15625 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1348195AbhI3Icd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Sep 2021 04:32:33 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10122"; a="286154092"
+        id S1348335AbhI3Iuy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Sep 2021 04:50:54 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10122"; a="225213212"
 X-IronPort-AV: E=Sophos;i="5.85,335,1624345200"; 
-   d="scan'208";a="286154092"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Sep 2021 01:30:49 -0700
+   d="scan'208";a="225213212"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Sep 2021 01:49:11 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.85,335,1624345200"; 
-   d="scan'208";a="563949438"
-Received: from fmsmsx604.amr.corp.intel.com ([10.18.126.84])
-  by fmsmga002.fm.intel.com with ESMTP; 30 Sep 2021 01:30:48 -0700
-Received: from fmsmsx608.amr.corp.intel.com (10.18.126.88) by
- fmsmsx604.amr.corp.intel.com (10.18.126.84) with Microsoft SMTP Server
+   d="scan'208";a="521136575"
+Received: from orsmsx604.amr.corp.intel.com ([10.22.229.17])
+  by orsmga001.jf.intel.com with ESMTP; 30 Sep 2021 01:49:11 -0700
+Received: from orsmsx608.amr.corp.intel.com (10.22.229.21) by
+ ORSMSX604.amr.corp.intel.com (10.22.229.17) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2242.12; Thu, 30 Sep 2021 01:30:47 -0700
-Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
- fmsmsx608.amr.corp.intel.com (10.18.126.88) with Microsoft SMTP Server
+ 15.1.2242.12; Thu, 30 Sep 2021 01:49:11 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX608.amr.corp.intel.com (10.22.229.21) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2242.12; Thu, 30 Sep 2021 01:30:47 -0700
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ 15.1.2242.12; Thu, 30 Sep 2021 01:49:10 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2242.12 via Frontend Transport; Thu, 30 Sep 2021 01:30:47 -0700
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.173)
- by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ 15.1.2242.12 via Frontend Transport; Thu, 30 Sep 2021 01:49:10 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.174)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2242.12; Thu, 30 Sep 2021 01:30:46 -0700
+ 15.1.2242.12; Thu, 30 Sep 2021 01:49:09 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cRZ1rU9MQv2XfFnO3B88zIyhs+0hYvvZ2XIxDSkidp4G3vZZAvJhxizmTgRmkTM6/TE8RqppfwVZ+3Aj4P6ijikErKvAmgZTfvO/KFT5j4+4Bt6Mo7nJygDksP4H3dXMzzSRZsgK0Qci7HMLAWrAl7lWAyM58m6BAKNGvK4QlgybauAWGIj09l4ZwzCNHHgJMN1FgUKXvpudkKpFCwTo+tXnvG9frhghbZnpP0Ccm4RnZIdNW7Sm4Q1Y9VRYSHl3/b8g3QG/yvgBOvvKSPx/nXznKwhLp9751eldKanTlDJ6CYdePNttwEiXCs0xm7d+A6vDiauVMsQE4Nh1ILJsTw==
+ b=ijCB+WzxJYTKhWrcm4OmUs/MZvVnSvdwnWZrhVeO2VScJr+4X1xJMfAM3xtLzdWO+tg+RpQPmU5gGa6mwi6GyAzft7iUDXz6zuoFLtLL/BtlxeDEzqSyuMFa8fUf5xFzqeLLDRHwk29EB3tTNr8npt69+ifsO4cwB9u/hVBxA/pfdHg6twLFkmo4zoErAvegaqDf/4hIFd9Z+96xNFGNXBeoz3sw+qZ7lPUWo/PD3rlYf/vKcvarQ3yaML4cDwuo5Qnbn7UiaSGxX422cyPUNht+iX9P/1u//GWDb4syL9lO4j/386Bxqxkybs664e7S1lluvrQeBzXhaP2eCatsjg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
- bh=jc8lkyQdVlsD8ikjJFcZasVXpFY4fVVOMYq7+lThrMA=;
- b=Z8d1+7YrfR9YDRccdRkiKCsBVmxLx87MJ9e5fy8kGxlAjErr2iWTJNK72bscUl4HNz9G5nxYnL2V8RTPia/BIeXO5qQ48AbxV8WkJGOoko17cgveODTOl7Eq8/vqlBiX/GTyJkjlOzFbK5MCxoywsH52cwBQgFwJ+TCepR2dn3Jcz1qFrvrF9n/U+h7tJ0K5KTJf6qEm24Yx18IZRJhgxyKNbjZXQ11dqEdbT8XB1+YqBxshaVgD4zo+LEhtt/YA3Tjm22l/ZsXfJlpSiK96GQLQtY4SYNLr3hk0Uy2VA9xnSERUyf4oWr4H7iC1a4KQL8IfzbI6mO03DNuXw8wXQA==
+ bh=5VHI+4DLKk6dWUhNTtcdy6JYDw7zGm7GrQAsXRt2ORY=;
+ b=nrOsD+1m73LjCSUmJ06zSPJUa4YQ0J9fLav1rEiM6YfQhcUcmL8+4sFQNsZwgtVKNu0l+FXboM108vBl2OJnt3FLOYbk3roqLXqu8KaHb8gLEEmff2dsH3zS1Hr5OjatAxacXETkcmeRUM3abmx+2eh4817cmZgo+8lQALsS4blJ89ith+JsJJeUNcbmDQiF0C5lLSmhDU2jbcoEjy7xaEVzDXm5Hu5x0nMB5CSW1cibb+R74hiDBQJ/28SPK+HOadnFBZcHku5eZuov2RtuJJVXzu2Dl1DYA6dAas3YvbGhtYD0JNFX6eiqXfMjblWJzFefBqfG47qDD7eiMWX36w==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
  s=selector2-intel-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jc8lkyQdVlsD8ikjJFcZasVXpFY4fVVOMYq7+lThrMA=;
- b=PBdi1xDaPrCj3+z5P5ABmE0haaWOS+OMmWOyXHq+7TUd2//uUxYLv6i7EfE+omGerjoOBBV3DiY3fuFahgCnbIwHGtHwu6tEipRHtkQbwsDwqljxC8bz8Hp7ByKmuHSC4v/LQiu/Py8yhtcwLqGPyTfzuSo5PBQnWjXjfNQmSwU=
+ bh=5VHI+4DLKk6dWUhNTtcdy6JYDw7zGm7GrQAsXRt2ORY=;
+ b=wOCbnoqqJYH6dJO3IegxITz+wK37zq452oQ0qYEHCvrnqJ+MqseABD3kyCiLKNbrRzmYJwCJfXu6IdHKzrpz2/F2VViplBup2VF8jdPDZPcrmeVUl2Uxktt/jnbxzJNBShF+kadzdUZAZAj0oJYernteEvTjFdZGExXpVMSfPpc=
 Received: from BN9PR11MB5433.namprd11.prod.outlook.com (2603:10b6:408:11e::13)
- by BN6PR1101MB2339.namprd11.prod.outlook.com (2603:10b6:404:94::17) with
+ by BN8PR11MB3764.namprd11.prod.outlook.com (2603:10b6:408:90::25) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4544.15; Thu, 30 Sep
- 2021 08:30:42 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4566.14; Thu, 30 Sep
+ 2021 08:49:03 +0000
 Received: from BN9PR11MB5433.namprd11.prod.outlook.com
  ([fe80::ddb7:fa7f:2cc:45df]) by BN9PR11MB5433.namprd11.prod.outlook.com
  ([fe80::ddb7:fa7f:2cc:45df%8]) with mapi id 15.20.4544.021; Thu, 30 Sep 2021
- 08:30:42 +0000
+ 08:49:03 +0000
 From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "hch@lst.de" <hch@lst.de>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "corbet@lwn.net" <corbet@lwn.net>,
-        "parav@mellanox.com" <parav@mellanox.com>,
+To:     Jason Gunthorpe <jgg@nvidia.com>, "Lu, Baolu" <baolu.lu@intel.com>
+CC:     Jean-Philippe Brucker <jean-philippe@linaro.org>,
         Alex Williamson <alex.williamson@redhat.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>, "hch@lst.de" <hch@lst.de>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "parav@mellanox.com" <parav@mellanox.com>,
         "lkml@metux.net" <lkml@metux.net>,
-        "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
-        "dwmw2@infradead.org" <dwmw2@infradead.org>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "lushenming@huawei.com" <lushenming@huawei.com>,
         "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>
+        "lushenming@huawei.com" <lushenming@huawei.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "corbet@lwn.net" <corbet@lwn.net>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "yi.l.liu@linux.intel.com" <yi.l.liu@linux.intel.com>,
+        "Tian, Jun J" <jun.j.tian@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "dwmw2@infradead.org" <dwmw2@infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
+        "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>
 Subject: RE: [RFC 10/20] iommu/iommufd: Add IOMMU_DEVICE_GET_INFO
 Thread-Topic: [RFC 10/20] iommu/iommufd: Add IOMMU_DEVICE_GET_INFO
-Thread-Index: AQHXrSGNbNtRgavabUSKJjvt8l12BauwlhaAgAAouwCAACufAIAAgyUAgAAUFACAAAdkgIAAB/8AgAkqbYCAAEeFAIABQYSQ
-Date:   Thu, 30 Sep 2021 08:30:42 +0000
-Message-ID: <BN9PR11MB5433C9B5A0CD0B58163859EC8CAA9@BN9PR11MB5433.namprd11.prod.outlook.com>
+Thread-Index: AQHXrSGNbNtRgavabUSKJjvt8l12BauwlhaAgAAouwCAACufAIAAgyUAgAAUFACAAAdkgIAAB/8AgArAWrA=
+Date:   Thu, 30 Sep 2021 08:49:03 +0000
+Message-ID: <BN9PR11MB5433F33CB7CFBCD41BE2F5C68CAA9@BN9PR11MB5433.namprd11.prod.outlook.com>
 References: <20210919063848.1476776-1-yi.l.liu@intel.com>
  <20210919063848.1476776-11-yi.l.liu@intel.com>
  <20210922152407.1bfa6ff7.alex.williamson@redhat.com>
@@ -93,9 +100,7 @@ References: <20210919063848.1476776-1-yi.l.liu@intel.com>
  <YUxTvCt1mYDntO8z@myrica> <20210923112716.GE964074@nvidia.com>
  <BN9PR11MB5433BCFCF3B0CB657E9BFE898CA39@BN9PR11MB5433.namprd11.prod.outlook.com>
  <20210923122220.GL964074@nvidia.com>
- <BN9PR11MB5433D75C09C6FDA01C2B7CF48CA99@BN9PR11MB5433.namprd11.prod.outlook.com>
- <20210929123630.GS964074@nvidia.com>
-In-Reply-To: <20210929123630.GS964074@nvidia.com>
+In-Reply-To: <20210923122220.GL964074@nvidia.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -103,132 +108,96 @@ X-MS-TNEF-Correlator:
 authentication-results: nvidia.com; dkim=none (message not signed)
  header.d=none;nvidia.com; dmarc=none action=none header.from=intel.com;
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 4087b062-7bac-47a0-a7a8-08d983ec9787
-x-ms-traffictypediagnostic: BN6PR1101MB2339:
+x-ms-office365-filtering-correlation-id: a9ee9a22-cfb1-43c2-2d72-08d983ef27b8
+x-ms-traffictypediagnostic: BN8PR11MB3764:
 x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
 x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <BN6PR1101MB23396AF92A43DB35F18BE1078CAA9@BN6PR1101MB2339.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:3276;
+x-microsoft-antispam-prvs: <BN8PR11MB376456C48D3F4CA53BEA44288CAA9@BN8PR11MB3764.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8882;
 x-ms-exchange-senderadcheck: 1
 x-ms-exchange-antispam-relay: 0
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: EMf5dCDW355JlzDYAwX/pFdjvT0fJj618wXR+HINXUZr4gUvRPhkwqq4rdmAuMXZ9gb5wd0nOVlkm8zNe3vPj8xj6oiQdZ0/P4+G3e5Erz9Mls7VrDtfnCYRltBrJW1n/6t1way0kGQ2usrjOV+nNw7ca/ILXECFc2bcRe1lb8CYDTeRLYniWZEjNTe70vQZmB5k7iXce8UiwovidfnvL9545gmGIn3QdXdNyUSayvQG42bOQxasHL21OnxTsiqY9SnLI7HBzT/C0claz0McpyCc7IMlogS1+/wkyV/0a8eyZm4CSEY7Du0nUor6nl1kFgi8nJmOZbx63eK7LP1KvPPx4vIC+eb7YgNdSxSh6AU+8kWH0WmS7ZiD21ucQ5cTlrHJd6IqOBrZLfUwq4neimQhQu+yUdeqRlnrHxXGbs0WEhpZi615+01IHUqLKowJWxLgkznJuhFhWjLn4eJE1hA/PQzZnLsLlxP6128BtBa1eBImBjJd9H0JgtZk7Ayo1eIWzcMR0vzp0+xp0kv+mHdQqgLpYALUfyw73Mt94z+8ws3UD4XX1VaS+Yr+EBc2IE+4HWoBuZX/v0Wma/eKeqE9mwN8lOb5YLBjWvKd6YRFrDC86+WmQKXCjc7+tUA9kYGpov2MOumvUMD7eSk1c+YUvMO6zgqlMtJAMVExgCckWpT3Ni6vUvfW1RycaJk4gS02y7AfE3l9tZECTKiMbw==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5433.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(38100700002)(54906003)(71200400001)(4326008)(7416002)(122000001)(86362001)(316002)(6506007)(6916009)(38070700005)(83380400001)(7696005)(76116006)(66556008)(64756008)(66446008)(33656002)(52536014)(8676002)(66946007)(2906002)(26005)(9686003)(55016002)(8936002)(508600001)(66476007)(5660300002)(186003);DIR:OUT;SFP:1102;
+x-microsoft-antispam-message-info: 3EjEus8CUB63q8uA5K+cM5Aq5qRBg/AN+jvA+M9nNUC1pA2B9N0s4tzKns+qcuItXIc24IHYnAr2t4H/rzdSG1PxuduJkxhUgIEQC1Uv6Uyz20eNJ2a6NfrVkC5LjQy77WPvH5pkugSy89JU64ERBHcRStv8qrxp6SFsY+2eI4OFKQ4cNUOdR+uRfMPm0T/GDCJQKcrk6eOndKS0Q+onigMPLAL2MfFqgWZSI9yBYsQCjD1Io02NiPvGleWN+ZbBYVoMofXCK0ooMXpxi1Zt03tFmC3fGc6hogyhZQVU2Gr5L8N0eWZ1P0jP5nOKvQs98SsX0vNaOA8y4Ut+EliwbNUI/q1pmkzO+F6sCn+c+lJaIccNXoQPL0P1tr5io+E8u4mUfI93j66Fch/13fAOE3VizUGZpJ1uV2z0tkdR6oIUDOvflnCLVjjbd/pFU48QX8nWHoj3K681mwZSEO8Ypni66MCsfLogv1bkqFnFGol4/Kqw8s9QP/3XlB5wcOilFx++0ynKrCRwzuYHLu6VQxGNbxKCnYup0e15HEHRZiQW5VG7o/3Kz1wHBBAG/jfYOIFTh4bkdtIDAiPVB9PyNvzcZ3u0M0T4u1g9UbWgjxVxJS03RyHtgxTzWEazmaJbBhw6qY1R6qm5U8kNGXU5zsxIWTUYPCsHxK1hRf95NY9DumleOCvX+tdUw5Hn3OLEF54Lj7thgWwoPBhGT04GWQ==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5433.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(66446008)(64756008)(7696005)(2906002)(66476007)(86362001)(508600001)(66556008)(38070700005)(66946007)(76116006)(55016002)(9686003)(6506007)(122000001)(316002)(5660300002)(186003)(54906003)(110136005)(7416002)(8676002)(6636002)(38100700002)(52536014)(83380400001)(4326008)(71200400001)(33656002)(8936002)(26005);DIR:OUT;SFP:1102;
 x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?CztRSlScnZZXTdPM5vqtYaDCn4tGY+MoabF6eNa1Sei1I/kIj14d8aMyySHW?=
- =?us-ascii?Q?6yQzzd1yxoYyjiw2MP6KoMQ4dk6FE9oSHaCqzXW7hSSvBFWSB3DxVQWHdFaS?=
- =?us-ascii?Q?cmHGNv+zwcA6yYGgqWpP+EEVn0GRxF1kDvd6SQiP2Eiujvrmua8J8LB7Hpln?=
- =?us-ascii?Q?XLrtrG27pmwVNaPhzD7dOCUtiWuneNvQW6+5YTAtLib4pl9vfPQa/DLVt21S?=
- =?us-ascii?Q?FWIIYAW9LA6lJxanO1RRvqhOjNkM66G+gyPmRFjOVW35jGfr63HJb/Pd/bXr?=
- =?us-ascii?Q?sR0B/ywdUZbam+Imq3TM5gUK+uuzC8sqjch6CsnkRAOs66PF0sKCR5sHLyiN?=
- =?us-ascii?Q?0CDvGrJbpxjhK3vSumtWDAGArjSePVxjUddik4r/7oQcSnKTWBC1wI4GPtpU?=
- =?us-ascii?Q?WI3aOJrh2zE3hDUod7nIrj4V7+Y/qyQzAAhrycwndD0otggVWyYVlesShdmP?=
- =?us-ascii?Q?1BskHSucre4CJwrbXMHSjVU2U3vH4pI7uRJrpk3PlnkDFnY2LbVrJJJaQmYA?=
- =?us-ascii?Q?t+aD/TaLVMKnu38ZeBTP9NQTq17Y5ZW99F/py6GDbSHV5TFliCS3alxcIAuA?=
- =?us-ascii?Q?DFavze3Bk81ycxPQj6Ti37CsTSWSiqZxWel/USiCizbj1c0kQKTgwA6VoyQc?=
- =?us-ascii?Q?jex3UCm3Im+CDIWHy0s4qY0YRjI/uwLtLicj6bT7UOJzdAZQeMixqqyDaJR5?=
- =?us-ascii?Q?YP0ooRm0H9K9o1aBJVXY61czGRYrTO38mKrBZnlOUczSMxdW09IJrl+q1ERw?=
- =?us-ascii?Q?88lfrUHklsFZXH77f0efCiCqWXl+WLKiqt7OfnyNJ5txe/cyVDH9H8DfCiyy?=
- =?us-ascii?Q?jyJNielcsRRAYUjHWsOs9V36D2769CARHYRObiTpKtCMAA0ZiZ5z9e/VrOYJ?=
- =?us-ascii?Q?gBzARdb+eu/eubKS5MR1FwMegghPM0GdZeAStZsT6pYWqNgSJaasTlImogOF?=
- =?us-ascii?Q?CqYm7X/H7r6eTXWJjhcxLTVZe1Oko6/OtwHw57QJe/IapHHm9uAR4JDQt7Wc?=
- =?us-ascii?Q?C4w9Z8Z5ex3B/Flpqb2UhX1jT6SI47GSEewo+3wY4AUhRI6k6oTevAbdEpzn?=
- =?us-ascii?Q?Z6+EiZTOGmFkuVoVzuTsrQF3BxkM5Klg+gOiybzNMHhxZ0++1Q9/410FlNh4?=
- =?us-ascii?Q?5jPjIuI4AbqsO9b2kQBiC513+Im5w4WWkXDEIRnU4Zw/f4ueCLTLsbuDwQTF?=
- =?us-ascii?Q?larjkWdHFURKVNyKVhqeG/yxbvs64YEQyFOqejKJykpTDaJwzcHXQGIcsSt+?=
- =?us-ascii?Q?7cEQv2rtlSQbaTrEGC7L+7W6u9sF/+rLiNIplLmnUQR2KZV0r7765ob0jAKi?=
- =?us-ascii?Q?9HAXY26eUKvWW0wS5dNltQTL?=
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?2moWwzX1xIWu3/6sNGSLWS3MTPfxyVfjmjD5JBEFcFLGRIMNQSFBmmj5DCJN?=
+ =?us-ascii?Q?ucMEyZlgp0yCcid1xSTyjA6s/K/4DD7I2JVF0lUn6bsyRcHrqC3tigiSaRRl?=
+ =?us-ascii?Q?iUGy8/tjCeYldppO61Ylj17LzVpu6nfoC+GDbTC2Z7lzPVG+ixJT2SqQS86/?=
+ =?us-ascii?Q?iEEnKzqjdUxaEUDMlaZhL1ahrRY2wMAmGGkVe6lMSRD4ieVdPJnEfDe4OP39?=
+ =?us-ascii?Q?Jj5wK4TkIer1acb9MX/29IRZNgZomyU84D/GhMqLVO04d+CdRSToUP1zUwau?=
+ =?us-ascii?Q?ELcF2N0hyQDWJHU5uvkFoQ8rIhKS33tMryrMyE+9esekojHX4TUszqF98mQZ?=
+ =?us-ascii?Q?0W8CaEHgUiNP4j/SNBMqw/c/40aUXDo+cKMFsgj3vW0yOxPkvTLwTYVGVqx4?=
+ =?us-ascii?Q?uzHrWJdGcEeYT9HiUNFBI/Wku8coajhA0gXwJrKEaVmVeKy5T/QEhfBWB2Us?=
+ =?us-ascii?Q?uiKKI6QB478quT2qUTmb+9cuOQcDDe4zlmj8lRzOVEogwqTex2qroYjLWyBh?=
+ =?us-ascii?Q?rrhUtIiRsomMU5elkeV/zCWpy1LwLDfpY7NcCe0uYEKCn0igLChmjvLSLci4?=
+ =?us-ascii?Q?yNV/F2corlLo7y/2MgTKCTPSCGD3BZGyNG5GCb2pj8a3tfcoKXRxnc5oOf8f?=
+ =?us-ascii?Q?eDUeZhcK8QjeRtJw2XwjLKdWnttscA9C8HmeB50FqZLTEsYNFEQ5mRdFXN/J?=
+ =?us-ascii?Q?CvuY/Uls3xBwXuIYe5vO1blfIojbaDEdB/FIq35G5kIGuTqNeAPiopIL4aoD?=
+ =?us-ascii?Q?GvXrVXtQ9zMEYXnbquQU7f0sT6J0E2COd2jDtLJs2M2gEh8fEIaWvzEeo3CK?=
+ =?us-ascii?Q?YGvlqo2EOJhNu0iWUKmQoLpkVIAeco3syPgf5P4/4eLenKbs+EZKg10d63mT?=
+ =?us-ascii?Q?pp+be2GZwAGIZMDu0GA8A5v1/e8Myps0rnnsJq1l0G1xYXYMggW7MUKdkjbf?=
+ =?us-ascii?Q?uK9egLQslusWBETTpkcrsU6vr+ahAEvcGU6mSmKjBpxayy3/6E/kN8Zjvbk+?=
+ =?us-ascii?Q?qC1oREXYFxF0NdaSVkQUr7HrK+dPvwlPmdMZwrzqbsnjEF/lzzFiQPCCcFQX?=
+ =?us-ascii?Q?zCCRWvcROy/9j26wQJrxknyD5uvzglcjKAjruqIxD7W+3/1CQnegUnIUljY7?=
+ =?us-ascii?Q?XPannS9IjDgpNDUtlWpGxkDO1r4qbgoGulPHT+ZffhfjXDeC7o6eG56rYr/D?=
+ =?us-ascii?Q?qTZn0yHLDHsjuTqtTY1//rhvJsPJejo5czHXM9DBfrUlrVkCfSOEl3iwXEJv?=
+ =?us-ascii?Q?PFbhuhMav+Kv9NZlHtwUGez/z94+NnJbXH1JYQ0kWHuPdJgZ5EHdjh479c8E?=
+ =?us-ascii?Q?2sKMYk4seMNs2opXcj1deMpK?=
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-MS-Exchange-CrossTenant-AuthAs: Internal
 X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5433.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4087b062-7bac-47a0-a7a8-08d983ec9787
-X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Sep 2021 08:30:42.6609
+X-MS-Exchange-CrossTenant-Network-Message-Id: a9ee9a22-cfb1-43c2-2d72-08d983ef27b8
+X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Sep 2021 08:49:03.5255
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: /wAFMQ/7cNayD3zMjnpO0wxf86LvwWbsonVMEWyRYveUsO+Rq2s8gZ9g32u+XDNTECu0Qo59VowG3hqMPDfJgQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR1101MB2339
+X-MS-Exchange-CrossTenant-userprincipalname: vjS2p4SHKj55HAS3qBrcTF1uj5Snc7NLwN8lpLyROR3Ak4cu5Rn65H1JdJS95Udhgk8P2ufIs1F5BtUvj4Y3Dg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN8PR11MB3764
 X-OriginatorOrg: intel.com
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Jason Gunthorpe
-> Sent: Wednesday, September 29, 2021 8:37 PM
+> From: Jason Gunthorpe <jgg@nvidia.com>
+> Sent: Thursday, September 23, 2021 8:22 PM
 >=20
-> On Wed, Sep 29, 2021 at 08:48:28AM +0000, Tian, Kevin wrote:
->=20
-> > ARM:
-> >     - set to snoop format if IOMMU_CACHE
-> >     - set to nonsnoop format if !IOMMU_CACHE
-> > (in both cases TLP snoop bit is ignored?)
->=20
-> Where do you see this? I couldn't even find this functionality in the
-> ARM HW manual??
-
-Honestly speaking I'm getting confused by the complex attribute
-transformation control (default, replace, combine, input, output, etc.)
-in SMMU manual. Above was my impression after last check, but now
-I cannot find necessary info to build the same picture (except below=20
-code). :/
-
->=20
-> What I saw is ARM linking the IOMMU_CACHE to a IO PTE bit that causes
-> the cache coherence to be disabled, which is not ignoring no snoop.
-
-My impression was that snoop is one way of implementing cache
-coherency and now since the PTE can explicitly specify cache coherency=20
-like below:
-
-                else if (prot & IOMMU_CACHE)
-                        pte |=3D ARM_LPAE_PTE_MEMATTR_OIWB;
-                else
-                        pte |=3D ARM_LPAE_PTE_MEMATTR_NC;
-
-This setting in concept overrides the snoop attribute from the device thus
-make it sort of ignored?
-
-But I did see the manual says that:
---
-Note: To achieve this 'pull-down' behavior, the No_snoop flag might=20
-be carried through the SMMU and used to transform the SMMU output=20
-downstream.
---
-
-So again, just got confused here...
-
->=20
-> > I didn't identify the exact commit for above meaning change.
+> > > These are different things and need different bits. Since the ARM pat=
+h
+> > > has a lot more code supporting it, I'd suggest Intel should change
+> > > their code to use IOMMU_BLOCK_NO_SNOOP and abandon
+> IOMMU_CACHE.
 > >
-> > Robin, could you help share some thoughts here?
+> > I didn't fully get this point. The end result is same, i.e. making the =
+DMA
+> > cache-coherent when IOMMU_CACHE is set. Or if you help define the
+> > behavior of IOMMU_CACHE, what will you define now?
 >=20
-> It is this:
+> It is clearly specifying how the kernel API works:
 >=20
-> static int dma_info_to_prot(enum dma_data_direction dir, bool coherent,
-> 		     unsigned long attrs)
-> {
-> 	int prot =3D coherent ? IOMMU_CACHE : 0;
->=20
-> Which sets IOMMU_CACHE based on:
->=20
-> static void *iommu_dma_alloc(struct device *dev, size_t size,
-> 		dma_addr_t *handle, gfp_t gfp, unsigned long attrs)
-> {
-> 	bool coherent =3D dev_is_dma_coherent(dev);
-> 	int ioprot =3D dma_info_to_prot(DMA_BIDIRECTIONAL, coherent, attrs);
->=20
-> Driving IOMMU_CACHE from dev_is_dma_coherent() has *NOTHING* to do
-> with no-snoop TLPs and everything to do with the arch cache
-> maintenance API
+>  !IOMMU_CACHE
+>    must call arch cache flushers
+>  IOMMU_CACHE -
+>    do not call arch cache flushers
+>  IOMMU_CACHE|IOMMU_BLOCK_NO_SNOOP -
+>    dot not arch cache flushers, and ignore the no snoop bit.
 
-Maybe I'll get a clearer picture on this after understanding the difference=
-=20
-between cache coherency and snoop on ARM. They are sort of inter-
-changeable on Intel (or possibly on x86 since I just found that AMD=20
-completely ignores IOMMU_CACHE).
+Who will set IOMMU_BLOCK_NO_SNOOP? I feel this is arch specific
+knowledge about how cache coherency is implemented, i.e.=20
+when IOMMU_CACHE is set intel-iommu driver just maps it to
+blocking no-snoop. It's not necessarily to be an attribute in=20
+the same level as IOMMU_CACHE?
+
+>=20
+> On Intel it should refuse to create a !IOMMU_CACHE since the HW can't
+> do that.=20
+
+Agree. In reality I guess this is not hit because all devices are marked
+coherent on Intel platforms...
+
+Baolu, any insight here?
 
 Thanks
 Kevin
