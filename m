@@ -2,166 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A00DA41DA09
-	for <lists+kvm@lfdr.de>; Thu, 30 Sep 2021 14:41:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A9D2741DA50
+	for <lists+kvm@lfdr.de>; Thu, 30 Sep 2021 14:54:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351000AbhI3Mn1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Sep 2021 08:43:27 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:59523 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1351001AbhI3Mn0 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 30 Sep 2021 08:43:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1633005703;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Unbty8nNkK7YONUoWOx1LklE7WdRs1VG0UIIrgjCenI=;
-        b=HGZRWHAwRiMg7xk6aBelgvJMRTdsfxx6pOdYxyugg70517rkmMaJvhPh0tDcdPUvfcrA8I
-        PJ9JOHX0o+fNt/dnEWM3YvHcyiKU3ogIZnC9owsGPNhGVE87Js2gkLVPQ7QsWoNW8nVKJr
-        HbAwnMGjmW3jfXoBImcMpsc5pDgKpUM=
-Received: from mail-oi1-f197.google.com (mail-oi1-f197.google.com
- [209.85.167.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-172-siyubZwkMo-oGeKu1XKCmQ-1; Thu, 30 Sep 2021 08:41:42 -0400
-X-MC-Unique: siyubZwkMo-oGeKu1XKCmQ-1
-Received: by mail-oi1-f197.google.com with SMTP id w187-20020aca30c4000000b002739938efdeso4075774oiw.21
-        for <kvm@vger.kernel.org>; Thu, 30 Sep 2021 05:41:42 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=Unbty8nNkK7YONUoWOx1LklE7WdRs1VG0UIIrgjCenI=;
-        b=hwE/AOhvdj6UBsIW80l69bSQl5yHKYIWjgUq+HSfTXTeAjZbYSPW6JlwH/TteUNFN/
-         2M9CO4nfYO4emo7TDc+yZSk+qgVxebHS4CYK3evyiOVt5YJ07HoS27BZoDJ3eCujdJki
-         OzQBx13vg5pMyPOQmLC30+/NSryqnC+t0kcN5LrxILebE3hwvUIt/vYPpCr0Im1SHMi/
-         5F0BbBWWRVg0k+fQmwCQm/ZWj1rk4uusYsSEL76pu47l46paWB8pSWvuMePlqi0/lqG4
-         6hjQRDHbwGSWMvbK544+TU6EnhAH2MBDyFLqwdmn+6VW6sZQODXZxxNk2msZ9q4f4rf7
-         /rHg==
-X-Gm-Message-State: AOAM532IvZB17ZF0vhDbgzZlp68qitRoY8N3GoA2qhmZZE2X6Nfd/Auv
-        zD6ChzQ2s5QMN2QGQ3+/q1hItcyWX/P5xAvq6hCfjHE+Ag4+M9D08VKsw9I87BWklyvtFpltVDQ
-        oa+vg+MJaeBjL
-X-Received: by 2002:a05:6808:46:: with SMTP id v6mr2547345oic.72.1633005701662;
-        Thu, 30 Sep 2021 05:41:41 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwMRYKLy+B+MpdesoWZkxr5N1driI4Zy8XmLACnQxDaRZIHqyWhxnO2lDZUxuKPwWjg5RQWJg==
-X-Received: by 2002:a05:6808:46:: with SMTP id v6mr2547322oic.72.1633005701417;
-        Thu, 30 Sep 2021 05:41:41 -0700 (PDT)
-Received: from redhat.com ([198.99.80.109])
-        by smtp.gmail.com with ESMTPSA id e6sm530698otr.79.2021.09.30.05.41.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Sep 2021 05:41:40 -0700 (PDT)
-Date:   Thu, 30 Sep 2021 06:41:39 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Max Gurtovoy <mgurtovoy@nvidia.com>
-Cc:     Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
-        "Doug Ledford" <dledford@redhat.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        "Bjorn Helgaas" <bhelgaas@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        "Jakub Kicinski" <kuba@kernel.org>,
-        Kirti Wankhede <kwankhede@nvidia.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-pci@vger.kernel.org>,
-        <linux-rdma@vger.kernel.org>, <netdev@vger.kernel.org>,
-        Saeed Mahameed <saeedm@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>
-Subject: Re: [PATCH mlx5-next 2/7] vfio: Add an API to check migration state
- transition validity
-Message-ID: <20210930064139.57bb74c0.alex.williamson@redhat.com>
-In-Reply-To: <bad28179-cbca-9337-8e6b-d730f06c6c58@nvidia.com>
-References: <c87f55d6fec77a22b110d3c9611744e6b28bba46.1632305919.git.leonro@nvidia.com>
-        <20210927164648.1e2d49ac.alex.williamson@redhat.com>
-        <20210927231239.GE3544071@ziepe.ca>
-        <25c97be6-eb4a-fdc8-3ac1-5628073f0214@nvidia.com>
-        <20210929063551.47590fbb.alex.williamson@redhat.com>
-        <1eba059c-4743-4675-9f72-1a26b8f3c0f6@nvidia.com>
-        <20210929075019.48d07deb.alex.williamson@redhat.com>
-        <d2e94241-a146-c57d-cf81-8b7d8d00e62d@nvidia.com>
-        <20210929091712.6390141c.alex.williamson@redhat.com>
-        <e1ba006f-f181-0b89-822d-890396e81c7b@nvidia.com>
-        <20210929161433.GA1808627@ziepe.ca>
-        <29835bf4-d094-ae6d-1a32-08e65847b52c@nvidia.com>
-        <20210929164409.3c33e311.alex.williamson@redhat.com>
-        <bad28179-cbca-9337-8e6b-d730f06c6c58@nvidia.com>
-Organization: Red Hat
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        id S1351179AbhI3M4b (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Sep 2021 08:56:31 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:62764 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1351170AbhI3M4a (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 30 Sep 2021 08:56:30 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 18UCUapQ028472;
+        Thu, 30 Sep 2021 08:54:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : content-transfer-encoding : mime-version; s=pp1;
+ bh=9YUqKBOGrZeaWpxlV7/jnQU90tB+qyCPlOJUSkm5kiQ=;
+ b=Iu9OFJ8YIGA7AoymXC0BGisjZPWFZCAGDnhF0LAOgu/nlSF424POEG2vxqowL4sAd8ND
+ P9S0X1yz/3gfPwomaUqSgAFj9dMBAU1aEoF76LzaYg2ZH6sG4PPrwZcZ/kDc0X9qLXxn
+ zzxwKPN1ZSmqmXpHEFg1ZROBgk9vse985mwVnNI8voKpVhqfcPyUk2z4rQkQkRx99LO1
+ iGRZJ+lyxLQmm43UFB/WuKZXcEgLzdPdY37Bu5HLvmGwdMyLW4bxY2Z23Q9l9+3QKA7K
+ GGOvAhHI4l18lV1Xy1MQ2Ek/Hm2O2SrB53wtzC24l/dRbYFXcPWVq5QDE31Pm8A8QV35 ug== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3bdda8rf88-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 30 Sep 2021 08:54:47 -0400
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 18UCVImd032312;
+        Thu, 30 Sep 2021 08:54:47 -0400
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3bdda8rf79-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 30 Sep 2021 08:54:47 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 18UCq9SG018375;
+        Thu, 30 Sep 2021 12:54:44 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma03ams.nl.ibm.com with ESMTP id 3b9udakn2g-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 30 Sep 2021 12:54:44 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 18UCnWrM59638148
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 30 Sep 2021 12:49:32 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id F151F52051;
+        Thu, 30 Sep 2021 12:54:40 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTPS id DC11252050;
+        Thu, 30 Sep 2021 12:54:40 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 25651)
+        id 7CA4AE07C6; Thu, 30 Sep 2021 14:54:40 +0200 (CEST)
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     KVM <kvm@vger.kernel.org>, Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>
+Subject: [GIT PULL 0/1] KVM: s390: allow to compile without warning with W=1
+Date:   Thu, 30 Sep 2021 14:54:39 +0200
+Message-Id: <20210930125440.22777-1-borntraeger@de.ibm.com>
+X-Mailer: git-send-email 2.31.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: qcXRfKzkeInHC9DdD7ToAJn7eTkr4qG5
+X-Proofpoint-GUID: qac2m8AJ7HfAVuqo6mXSjwi7Tqtoe12G
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.391,FMLib:17.0.607.475
+ definitions=2021-09-30_04,2021-09-30_01,2020-04-07_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=844 clxscore=1015
+ impostorscore=0 suspectscore=0 bulkscore=0 phishscore=0 priorityscore=1501
+ spamscore=0 mlxscore=0 adultscore=0 lowpriorityscore=0 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2109230001
+ definitions=main-2109300079
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 30 Sep 2021 12:25:23 +0300
-Max Gurtovoy <mgurtovoy@nvidia.com> wrote:
+Paolo,
 
-> On 9/30/2021 1:44 AM, Alex Williamson wrote:
-> > On Thu, 30 Sep 2021 00:48:55 +0300
-> > Max Gurtovoy <mgurtovoy@nvidia.com> wrote:
-> >  
-> >> On 9/29/2021 7:14 PM, Jason Gunthorpe wrote:  
-> >>> On Wed, Sep 29, 2021 at 06:28:44PM +0300, Max Gurtovoy wrote:
-> >>>     
-> >>>>> So you have a device that's actively modifying its internal state,
-> >>>>> performing I/O, including DMA (thereby dirtying VM memory), all while
-> >>>>> in the _STOP state?  And you don't see this as a problem?  
-> >>>> I don't see how is it different from vfio-pci situation.  
-> >>> vfio-pci provides no way to observe the migration state. It isn't
-> >>> "000b"  
-> >> Alex said that there is a problem of compatibility.
-> >>
-> >> I migration SW is not involved, nobody will read this migration state.  
-> > The _STOP state has a specific meaning regardless of whether userspace
-> > reads the device state value.  I think what you're suggesting is that
-> > the device reports itself as _STOP'd but it's actually _RUNNING.  Is
-> > that the compatibility workaround, create a self inconsistency?  
-> 
->  From migration point of view the device is stopped.
+please pull for kvm/master a fix for W=1.
 
-The _RESUMING and _SAVING bits control the migration activity, the
-_RUNNING bit controls the ability of the device to modify its internal
-state and affect external state.  The initial state of the device is
-absolutely not stopped.
+The following changes since commit 5c49d1850ddd3240d20dc40b01f593e35a184f38:
 
-> > We cannot impose on userspace to move a device from _STOP to _RUNNING
-> > simply because the device supports the migration region, nor should we
-> > report a device state that is inconsistent with the actual device state.  
-> 
-> In this case we can think maybe moving to running during enabling the 
-> bus master..
+  KVM: VMX: Fix a TSX_CTRL_CPUID_CLEAR field mask issue (2021-09-27 11:25:40 -0400)
 
-There are no spontaneous state transitions, device_state changes only
-via user manipulation of the register.
+are available in the Git repository at:
 
-> >>>> Maybe we need to rename STOP state. We can call it READY or LIVE or
-> >>>> NON_MIGRATION_STATE.  
-> >>> It was a poor choice to use 000b as stop, but it doesn't really
-> >>> matter. The mlx5 driver should just pre-init this readable to running.  
-> >> I guess we can do it for this reason. There is no functional problem nor
-> >> compatibility issue here as was mentioned.
-> >>
-> >> But still we need the kernel to track transitions. We don't want to
-> >> allow moving from RESUMING to SAVING state for example. How this
-> >> transition can be allowed ?
-> >>
-> >> In this case we need to fail the request from the migration SW...  
-> > _RESUMING to _SAVING seems like a good way to test round trip migration
-> > without running the device to modify the state.  Potentially it's a
-> > means to update a saved device migration data stream to a newer format
-> > using an intermediate driver version.  
-> 
-> what do you mean by "without running the device to modify the state." ?
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git  tags/kvm-s390-master-5.15-1
 
-If a device is !_RUNNING it should not be advancing its internal state,
-therefore state-in == state-out.
- 
-> did you describe a case where you migrate from source to dst and then 
-> back to source with a new migration data format ?
+for you to fetch changes up to 25b5476a294cd5f7c7730f334f6b400d30bb783d:
 
-I'm speculating that as the driver evolves, the migration data stream
-generated from the device's migration region can change.  Hopefully in
-compatible ways.  The above sequence of restoring and extracting state
-without the complication of the device running could help to validate
-compatibility.  Thanks,
+  KVM: s390: Function documentation fixes (2021-09-28 17:56:54 +0200)
 
-Alex
+----------------------------------------------------------------
+KVM: s390: allow to compile without warning with W=1
 
+----------------------------------------------------------------
+Janosch Frank (1):
+      KVM: s390: Function documentation fixes
+
+ arch/s390/kvm/gaccess.c   | 12 ++++++++++++
+ arch/s390/kvm/intercept.c |  4 +++-
+ 2 files changed, 15 insertions(+), 1 deletion(-)
