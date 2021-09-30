@@ -2,97 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5A60641DF83
-	for <lists+kvm@lfdr.de>; Thu, 30 Sep 2021 18:45:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7851D41DF87
+	for <lists+kvm@lfdr.de>; Thu, 30 Sep 2021 18:46:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352292AbhI3QrQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Sep 2021 12:47:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:52814 "EHLO
+        id S1352301AbhI3QsI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Sep 2021 12:48:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:33046 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1352288AbhI3QrP (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 30 Sep 2021 12:47:15 -0400
+        by vger.kernel.org with ESMTP id S1352296AbhI3QsH (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 30 Sep 2021 12:48:07 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1633020332;
+        s=mimecast20190719; t=1633020384;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=DwjKvD8YF5gtcYPtNR5jajIiUW/9CEDaAKvvOa5euB8=;
-        b=Sbi1Z9ijOH39vzhBlacIjfsDxuXgqUijmrxxh1dvwQQVH/Lxx9bNC3B0bO0oBjb2GwOshX
-        fXOz+oe+BL4ev2YgJ2CZj4uD2jrcrnhqQotQXTp3vqsmBYvnSTHli/QBm5TwAa1F34e2O6
-        +IJDjkdZY4uPC6gTkc1uSob8HnZO0y0=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-240-XcvfpjgdN9K3oovF0vgZlQ-1; Thu, 30 Sep 2021 12:45:30 -0400
-X-MC-Unique: XcvfpjgdN9K3oovF0vgZlQ-1
-Received: by mail-wm1-f71.google.com with SMTP id 70-20020a1c0149000000b0030b7dd84d81so3235626wmb.3
-        for <kvm@vger.kernel.org>; Thu, 30 Sep 2021 09:45:30 -0700 (PDT)
+        bh=lL2MSBbRKO3rzthSQTrwQ8489lZtpiIJktx5C6l2Wsw=;
+        b=OytD/fpixAdP4NbyJT+p+ilQnYRf9j5xyq0kGh6j08jw+sR3wsL6jqyO7WXzwEe83qp5OS
+        AxkKoHYYF+Fu/Px1NUtLfTci05X1QpqmL2Ae/9WU0g0HFxJbqNwF+WpzfNBoC+ZstcKCWZ
+        iNR9IB2HdbR4vD22RxrArbKRcUJk2lw=
+Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com
+ [209.85.210.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-318-n84swrM4PgaSYKULvNqU9g-1; Thu, 30 Sep 2021 12:46:22 -0400
+X-MC-Unique: n84swrM4PgaSYKULvNqU9g-1
+Received: by mail-ot1-f70.google.com with SMTP id k102-20020a9d19ef000000b0054dd5fae7ceso49677otk.20
+        for <kvm@vger.kernel.org>; Thu, 30 Sep 2021 09:46:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=DwjKvD8YF5gtcYPtNR5jajIiUW/9CEDaAKvvOa5euB8=;
-        b=HRVBqo5pd5Npi4CW7B3qicrXSWA7aLdjNFrkN3CQ6+N6P2seuBa+nKNWyKqNN6f3Qs
-         5IBJ0kUCVRq7/JksRZO0lNRqBuK010FkhwONCzqaHY+/RcP5f07kJwW5iz6bRrbzrJdh
-         To9V2KS0nVg6Kqvq8p+Yv2hI5YwN97W0qEUVchFCXNd4Bp/kgOIC6V3dzrueLpcWVRM4
-         305ehXDQe7QLyejSllSaz22QqJaR/t/VoN31NY6FlTSIseQsZwzvbU5HZx3zY19D2j0+
-         VL54/ybzi10gW05/Tk/4k0AUzVEq58HgQUlmbc4ySNe9VfUL0MJ7euNDV29taGFwZ/ZD
-         pAYQ==
-X-Gm-Message-State: AOAM532AO9Ew7a2GUME4m40JQUViBLMPp52S+eiWSkQoMP7Tr+bfviTE
-        OHXxJDiixA0nX61jpLLeUx5gjvi30EmPR2EM1FN/rL9RPQ6AdY+C9pqxQq9kNxpfl0Goy/XkdRb
-        YQHArpgC0Rouk
-X-Received: by 2002:a1c:7302:: with SMTP id d2mr257626wmb.92.1633020329465;
-        Thu, 30 Sep 2021 09:45:29 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyzLugsmS9ArG342vN8W9Trx3UAuRgmORibyqOueNOWDRWcTqSsfBi3wftEHd8tLxGBSzo7qg==
-X-Received: by 2002:a1c:7302:: with SMTP id d2mr257602wmb.92.1633020329257;
-        Thu, 30 Sep 2021 09:45:29 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id r2sm3652294wmq.28.2021.09.30.09.45.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 30 Sep 2021 09:45:28 -0700 (PDT)
-Message-ID: <bf754b55-90f2-8055-468f-a2b9b76b4d02@redhat.com>
-Date:   Thu, 30 Sep 2021 18:45:27 +0200
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=lL2MSBbRKO3rzthSQTrwQ8489lZtpiIJktx5C6l2Wsw=;
+        b=q8HisLh0tUYul6uu8aGad48ZglOxaMYQlJn+w2uwmDzMGKTJRJbOl4pLcPgxSM0rNs
+         7AjLkqCQOgwhug7eCG27rHxwFuJkgPCSnAYs+HsCGnvr9Ep1pqAzOTZEIW3YbYsgMOqM
+         9VUGVEQBsTbvJ6J7OkvMRt0sc2saUaTdkg2IHuwuhe43pmZJT0fXaZ0vscCLQlFHjv2I
+         d1Vl/uIBCsw1pOgHDJ0ODA0PUWerYwoRtpd3TcgB+XtsSANyWxUfp3knB4556cWLv6PX
+         erebBND9PBcBw71k8gTN0rfe1uWbMNZFafqsA12B5VL3ogfZ1Z6G77GXQlJcvq/r+r4W
+         gEwg==
+X-Gm-Message-State: AOAM533xZatcQgPvrg/oToaebiFvCzDtOIULgaRvWWsC6OPD9AGlBaBk
+        cyWPOoqRy/ctCWb59oAeFhTyWwO+itS1b8vHFY/KuCAaONAWTisn7sLN4bQYtEl10FxagJ3hhCZ
+        fJrKVaR+32peY
+X-Received: by 2002:a05:6830:1653:: with SMTP id h19mr6390812otr.162.1633020382064;
+        Thu, 30 Sep 2021 09:46:22 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw6oB6LC3Lj38OQP4p+tzANlvyYhE187YKmuccQxwIaF6fK2COFADSgRLGU/vKlEAQwoKX0tw==
+X-Received: by 2002:a05:6830:1653:: with SMTP id h19mr6390803otr.162.1633020381885;
+        Thu, 30 Sep 2021 09:46:21 -0700 (PDT)
+Received: from redhat.com ([198.99.80.109])
+        by smtp.gmail.com with ESMTPSA id n4sm647381otr.59.2021.09.30.09.46.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 Sep 2021 09:46:21 -0700 (PDT)
+Date:   Thu, 30 Sep 2021 10:46:20 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     Kirti Wankhede <kwankhede@nvidia.com>,
+        Christoph Hellwig <hch@lst.de>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        "Xu, Terrence" <terrence.xu@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [PATCH 11/14] vfio: clean up the check for mediated device in
+ vfio_iommu_type1
+Message-ID: <20210930104620.56a1d3e9.alex.williamson@redhat.com>
+In-Reply-To: <20210917125301.GU3544071@ziepe.ca>
+References: <20210913071606.2966-1-hch@lst.de>
+        <20210913071606.2966-12-hch@lst.de>
+        <c4ef0d8a-39f4-4834-f8f2-beffd2f2f8ae@nvidia.com>
+        <20210916221854.GT3544071@ziepe.ca>
+        <BN9PR11MB54333BE60F997D3A9183EDD38CDD9@BN9PR11MB5433.namprd11.prod.outlook.com>
+        <20210917050543.GA22003@lst.de>
+        <8a5ff811-3bba-996a-a8e0-faafe619f193@nvidia.com>
+        <20210917125301.GU3544071@ziepe.ca>
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [PATCH 2/2] KVM: x86: Manually retrieve CPUID.0x1 when getting
- FMS for RESET/INIT
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        syzbot+f3985126b746b3d59c9d@syzkaller.appspotmail.com,
-        Alexander Potapenko <glider@google.com>
-References: <20210929222426.1855730-1-seanjc@google.com>
- <20210929222426.1855730-3-seanjc@google.com>
- <75632fa9-e813-266c-7b72-cf9d8142cebf@redhat.com>
- <YVXTnheIB6MCKGve@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <YVXTnheIB6MCKGve@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 30/09/21 17:11, Sean Christopherson wrote:
->>
->> But, perhaps adding kvm_find_cpuid_entry_index and removing the last
->> parameter from kvm_find_cpuid_entry would be a good idea.
-> I like this idea, but only if callers are forced to specify the index when the
-> index is significant, e.g. add a magic CPUID_INDEX_DONT_CARE and WARN in
-> cpuid_entry2_find() if index is significant and index == DONT_CARE.
+On Fri, 17 Sep 2021 09:53:01 -0300
+Jason Gunthorpe <jgg@ziepe.ca> wrote:
 
-Yeah, or it can just be that kvm_find_cpuid_entry passes -1 which acts 
-as the magic value.
+> On Fri, Sep 17, 2021 at 12:21:07PM +0530, Kirti Wankhede wrote:
+> > 
+> > 
+> > On 9/17/2021 10:35 AM, Christoph Hellwig wrote:  
+> > > On Fri, Sep 17, 2021 at 04:49:41AM +0000, Tian, Kevin wrote:  
+> > > > > You just use the new style mdev API and directly call
+> > > > > vfio_register_group_dev and it will pick up the
+> > > > > parent->dev->iommu_group naturally like everything else using physical
+> > > > > iommu groups.
+> > > > >   
+> > > >   
+> > 
+> > Directly calling vfio_register_group_dev() doesn't work without linking
+> > mdev->dev->iommu_group to mdev->type->parent->dev->iommu_group.  
+> 
+> You pass the PCI device, not the mdev to vfio_register_group_dev().
+> 
+> > > > For above usage (wrap pdev into mdev), isn't the right way to directly add
+> > > > vendor vfio-pci driver since vfio-pci-core has been split out now? It's not
+> > > > necessary to fake a mdev just for adding some mediation in the r/w path...  
+> > > 
+> > > Exactly.  
+> > 
+> > vfio-pci doesn't provide way to configure the device as mdev framework
+> > provide using mdev_types.  
+> 
+> The linux standard is for a PCI PF driver to configure it's VFs, not a
+> mdev or vfio.
 
-> I'll fiddle with this, unless you want the honors?
+Hi Jason,
 
-Not really. :)  Thanks,
+I'm only aware that the PF driver enables basic SR-IOV configuration of
+VFs, ie. the number of enabled VFs.  The mdev interface enables not
+only management of the number of child devices, but the flavor of each
+child, for example the non-homogeneous slice of resources allocated per
+child device.
 
-Paolo
+I think that's the sort of configuration Kirti is asking about here and
+I'm not aware of any standard mechanism for a PF driver to apply a
+configuration per VF.  A mediated path to a physical device isn't
+exclusive to providing features like migration, it can also be used to
+create these sorts device flavors.  For example, we might expose NIC VFs
+and administrative configuration should restrict VF1 to a 1Gbit
+interface while VF2 gets 10Gbit.
+
+Are we left to driver specific sysfs attributes to achieve this or can
+we create some form of standardization like mdev provides?  Thanks,
+
+Alex
 
