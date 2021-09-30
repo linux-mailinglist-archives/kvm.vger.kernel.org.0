@@ -2,202 +2,193 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B9CB041D5AB
-	for <lists+kvm@lfdr.de>; Thu, 30 Sep 2021 10:49:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AD9A641D5BB
+	for <lists+kvm@lfdr.de>; Thu, 30 Sep 2021 10:51:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348753AbhI3Iuy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Sep 2021 04:50:54 -0400
-Received: from mga03.intel.com ([134.134.136.65]:15625 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1348335AbhI3Iuy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Sep 2021 04:50:54 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10122"; a="225213212"
-X-IronPort-AV: E=Sophos;i="5.85,335,1624345200"; 
-   d="scan'208";a="225213212"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Sep 2021 01:49:11 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.85,335,1624345200"; 
-   d="scan'208";a="521136575"
-Received: from orsmsx604.amr.corp.intel.com ([10.22.229.17])
-  by orsmga001.jf.intel.com with ESMTP; 30 Sep 2021 01:49:11 -0700
-Received: from orsmsx608.amr.corp.intel.com (10.22.229.21) by
- ORSMSX604.amr.corp.intel.com (10.22.229.17) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2242.12; Thu, 30 Sep 2021 01:49:11 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX608.amr.corp.intel.com (10.22.229.21) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2242.12; Thu, 30 Sep 2021 01:49:10 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2242.12 via Frontend Transport; Thu, 30 Sep 2021 01:49:10 -0700
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.174)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2242.12; Thu, 30 Sep 2021 01:49:09 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ijCB+WzxJYTKhWrcm4OmUs/MZvVnSvdwnWZrhVeO2VScJr+4X1xJMfAM3xtLzdWO+tg+RpQPmU5gGa6mwi6GyAzft7iUDXz6zuoFLtLL/BtlxeDEzqSyuMFa8fUf5xFzqeLLDRHwk29EB3tTNr8npt69+ifsO4cwB9u/hVBxA/pfdHg6twLFkmo4zoErAvegaqDf/4hIFd9Z+96xNFGNXBeoz3sw+qZ7lPUWo/PD3rlYf/vKcvarQ3yaML4cDwuo5Qnbn7UiaSGxX422cyPUNht+iX9P/1u//GWDb4syL9lO4j/386Bxqxkybs664e7S1lluvrQeBzXhaP2eCatsjg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
- bh=5VHI+4DLKk6dWUhNTtcdy6JYDw7zGm7GrQAsXRt2ORY=;
- b=nrOsD+1m73LjCSUmJ06zSPJUa4YQ0J9fLav1rEiM6YfQhcUcmL8+4sFQNsZwgtVKNu0l+FXboM108vBl2OJnt3FLOYbk3roqLXqu8KaHb8gLEEmff2dsH3zS1Hr5OjatAxacXETkcmeRUM3abmx+2eh4817cmZgo+8lQALsS4blJ89ith+JsJJeUNcbmDQiF0C5lLSmhDU2jbcoEjy7xaEVzDXm5Hu5x0nMB5CSW1cibb+R74hiDBQJ/28SPK+HOadnFBZcHku5eZuov2RtuJJVXzu2Dl1DYA6dAas3YvbGhtYD0JNFX6eiqXfMjblWJzFefBqfG47qDD7eiMWX36w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
- s=selector2-intel-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5VHI+4DLKk6dWUhNTtcdy6JYDw7zGm7GrQAsXRt2ORY=;
- b=wOCbnoqqJYH6dJO3IegxITz+wK37zq452oQ0qYEHCvrnqJ+MqseABD3kyCiLKNbrRzmYJwCJfXu6IdHKzrpz2/F2VViplBup2VF8jdPDZPcrmeVUl2Uxktt/jnbxzJNBShF+kadzdUZAZAj0oJYernteEvTjFdZGExXpVMSfPpc=
-Received: from BN9PR11MB5433.namprd11.prod.outlook.com (2603:10b6:408:11e::13)
- by BN8PR11MB3764.namprd11.prod.outlook.com (2603:10b6:408:90::25) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4566.14; Thu, 30 Sep
- 2021 08:49:03 +0000
-Received: from BN9PR11MB5433.namprd11.prod.outlook.com
- ([fe80::ddb7:fa7f:2cc:45df]) by BN9PR11MB5433.namprd11.prod.outlook.com
- ([fe80::ddb7:fa7f:2cc:45df%8]) with mapi id 15.20.4544.021; Thu, 30 Sep 2021
- 08:49:03 +0000
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>, "Lu, Baolu" <baolu.lu@intel.com>
-CC:     Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>, "hch@lst.de" <hch@lst.de>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "parav@mellanox.com" <parav@mellanox.com>,
-        "lkml@metux.net" <lkml@metux.net>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "lushenming@huawei.com" <lushenming@huawei.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "corbet@lwn.net" <corbet@lwn.net>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "yi.l.liu@linux.intel.com" <yi.l.liu@linux.intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "dwmw2@infradead.org" <dwmw2@infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-        "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>
-Subject: RE: [RFC 10/20] iommu/iommufd: Add IOMMU_DEVICE_GET_INFO
-Thread-Topic: [RFC 10/20] iommu/iommufd: Add IOMMU_DEVICE_GET_INFO
-Thread-Index: AQHXrSGNbNtRgavabUSKJjvt8l12BauwlhaAgAAouwCAACufAIAAgyUAgAAUFACAAAdkgIAAB/8AgArAWrA=
-Date:   Thu, 30 Sep 2021 08:49:03 +0000
-Message-ID: <BN9PR11MB5433F33CB7CFBCD41BE2F5C68CAA9@BN9PR11MB5433.namprd11.prod.outlook.com>
-References: <20210919063848.1476776-1-yi.l.liu@intel.com>
- <20210919063848.1476776-11-yi.l.liu@intel.com>
- <20210922152407.1bfa6ff7.alex.williamson@redhat.com>
- <20210922234954.GB964074@nvidia.com>
- <BN9PR11MB543333AD3C81312115686AAA8CA39@BN9PR11MB5433.namprd11.prod.outlook.com>
- <YUxTvCt1mYDntO8z@myrica> <20210923112716.GE964074@nvidia.com>
- <BN9PR11MB5433BCFCF3B0CB657E9BFE898CA39@BN9PR11MB5433.namprd11.prod.outlook.com>
- <20210923122220.GL964074@nvidia.com>
-In-Reply-To: <20210923122220.GL964074@nvidia.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: nvidia.com; dkim=none (message not signed)
- header.d=none;nvidia.com; dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: a9ee9a22-cfb1-43c2-2d72-08d983ef27b8
-x-ms-traffictypediagnostic: BN8PR11MB3764:
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <BN8PR11MB376456C48D3F4CA53BEA44288CAA9@BN8PR11MB3764.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8882;
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 3EjEus8CUB63q8uA5K+cM5Aq5qRBg/AN+jvA+M9nNUC1pA2B9N0s4tzKns+qcuItXIc24IHYnAr2t4H/rzdSG1PxuduJkxhUgIEQC1Uv6Uyz20eNJ2a6NfrVkC5LjQy77WPvH5pkugSy89JU64ERBHcRStv8qrxp6SFsY+2eI4OFKQ4cNUOdR+uRfMPm0T/GDCJQKcrk6eOndKS0Q+onigMPLAL2MfFqgWZSI9yBYsQCjD1Io02NiPvGleWN+ZbBYVoMofXCK0ooMXpxi1Zt03tFmC3fGc6hogyhZQVU2Gr5L8N0eWZ1P0jP5nOKvQs98SsX0vNaOA8y4Ut+EliwbNUI/q1pmkzO+F6sCn+c+lJaIccNXoQPL0P1tr5io+E8u4mUfI93j66Fch/13fAOE3VizUGZpJ1uV2z0tkdR6oIUDOvflnCLVjjbd/pFU48QX8nWHoj3K681mwZSEO8Ypni66MCsfLogv1bkqFnFGol4/Kqw8s9QP/3XlB5wcOilFx++0ynKrCRwzuYHLu6VQxGNbxKCnYup0e15HEHRZiQW5VG7o/3Kz1wHBBAG/jfYOIFTh4bkdtIDAiPVB9PyNvzcZ3u0M0T4u1g9UbWgjxVxJS03RyHtgxTzWEazmaJbBhw6qY1R6qm5U8kNGXU5zsxIWTUYPCsHxK1hRf95NY9DumleOCvX+tdUw5Hn3OLEF54Lj7thgWwoPBhGT04GWQ==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5433.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(66446008)(64756008)(7696005)(2906002)(66476007)(86362001)(508600001)(66556008)(38070700005)(66946007)(76116006)(55016002)(9686003)(6506007)(122000001)(316002)(5660300002)(186003)(54906003)(110136005)(7416002)(8676002)(6636002)(38100700002)(52536014)(83380400001)(4326008)(71200400001)(33656002)(8936002)(26005);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?2moWwzX1xIWu3/6sNGSLWS3MTPfxyVfjmjD5JBEFcFLGRIMNQSFBmmj5DCJN?=
- =?us-ascii?Q?ucMEyZlgp0yCcid1xSTyjA6s/K/4DD7I2JVF0lUn6bsyRcHrqC3tigiSaRRl?=
- =?us-ascii?Q?iUGy8/tjCeYldppO61Ylj17LzVpu6nfoC+GDbTC2Z7lzPVG+ixJT2SqQS86/?=
- =?us-ascii?Q?iEEnKzqjdUxaEUDMlaZhL1ahrRY2wMAmGGkVe6lMSRD4ieVdPJnEfDe4OP39?=
- =?us-ascii?Q?Jj5wK4TkIer1acb9MX/29IRZNgZomyU84D/GhMqLVO04d+CdRSToUP1zUwau?=
- =?us-ascii?Q?ELcF2N0hyQDWJHU5uvkFoQ8rIhKS33tMryrMyE+9esekojHX4TUszqF98mQZ?=
- =?us-ascii?Q?0W8CaEHgUiNP4j/SNBMqw/c/40aUXDo+cKMFsgj3vW0yOxPkvTLwTYVGVqx4?=
- =?us-ascii?Q?uzHrWJdGcEeYT9HiUNFBI/Wku8coajhA0gXwJrKEaVmVeKy5T/QEhfBWB2Us?=
- =?us-ascii?Q?uiKKI6QB478quT2qUTmb+9cuOQcDDe4zlmj8lRzOVEogwqTex2qroYjLWyBh?=
- =?us-ascii?Q?rrhUtIiRsomMU5elkeV/zCWpy1LwLDfpY7NcCe0uYEKCn0igLChmjvLSLci4?=
- =?us-ascii?Q?yNV/F2corlLo7y/2MgTKCTPSCGD3BZGyNG5GCb2pj8a3tfcoKXRxnc5oOf8f?=
- =?us-ascii?Q?eDUeZhcK8QjeRtJw2XwjLKdWnttscA9C8HmeB50FqZLTEsYNFEQ5mRdFXN/J?=
- =?us-ascii?Q?CvuY/Uls3xBwXuIYe5vO1blfIojbaDEdB/FIq35G5kIGuTqNeAPiopIL4aoD?=
- =?us-ascii?Q?GvXrVXtQ9zMEYXnbquQU7f0sT6J0E2COd2jDtLJs2M2gEh8fEIaWvzEeo3CK?=
- =?us-ascii?Q?YGvlqo2EOJhNu0iWUKmQoLpkVIAeco3syPgf5P4/4eLenKbs+EZKg10d63mT?=
- =?us-ascii?Q?pp+be2GZwAGIZMDu0GA8A5v1/e8Myps0rnnsJq1l0G1xYXYMggW7MUKdkjbf?=
- =?us-ascii?Q?uK9egLQslusWBETTpkcrsU6vr+ahAEvcGU6mSmKjBpxayy3/6E/kN8Zjvbk+?=
- =?us-ascii?Q?qC1oREXYFxF0NdaSVkQUr7HrK+dPvwlPmdMZwrzqbsnjEF/lzzFiQPCCcFQX?=
- =?us-ascii?Q?zCCRWvcROy/9j26wQJrxknyD5uvzglcjKAjruqIxD7W+3/1CQnegUnIUljY7?=
- =?us-ascii?Q?XPannS9IjDgpNDUtlWpGxkDO1r4qbgoGulPHT+ZffhfjXDeC7o6eG56rYr/D?=
- =?us-ascii?Q?qTZn0yHLDHsjuTqtTY1//rhvJsPJejo5czHXM9DBfrUlrVkCfSOEl3iwXEJv?=
- =?us-ascii?Q?PFbhuhMav+Kv9NZlHtwUGez/z94+NnJbXH1JYQ0kWHuPdJgZ5EHdjh479c8E?=
- =?us-ascii?Q?2sKMYk4seMNs2opXcj1deMpK?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S1348244AbhI3Iwx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Sep 2021 04:52:53 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59235 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1348052AbhI3Iwx (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 30 Sep 2021 04:52:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1632991870;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=enboltUA+a2UXyd2ev7IOjW3eWnVQILj4KtkTqyYnes=;
+        b=gkI1PGbJEhgd5hXecWfxhUUFCErGBW7IU3QcAhWy/5PKiT+VDjF9T4HFcFEuJxk7dgGBgW
+        1gyyuQ0r6lMo4Ct57C4gU22FkuS9DWdfprs8o4OasF2HPxb4uPtwwrTqybS7SlPYDt8Eyd
+        Ka8ARVLBtm2KwnehBIs9jEA2tuet0lE=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-147-e1Y95RQvNlqQ8YZyq6fN9A-1; Thu, 30 Sep 2021 04:51:08 -0400
+X-MC-Unique: e1Y95RQvNlqQ8YZyq6fN9A-1
+Received: by mail-wm1-f70.google.com with SMTP id k6-20020a05600c0b4600b0030d2a0a259eso1259142wmr.6
+        for <kvm@vger.kernel.org>; Thu, 30 Sep 2021 01:51:08 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:reply-to:subject:to:cc:references:from
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-transfer-encoding:content-language;
+        bh=enboltUA+a2UXyd2ev7IOjW3eWnVQILj4KtkTqyYnes=;
+        b=m1g96D43630bTHS/enkIcMROxKAe6EcIkdjdfP8pU59UYVMAhOTwwzczS7mIxSZMAs
+         Nln/Pwt2sEg66W6/51ZaSKHri0SM+jjgKAnKQuEBHrfWVX0iYdJByOCIsCOujyclweqv
+         Ck3s2ewx2VxxlCdc0/JkJJ0WZN2SAseMXT0LJDOLYrrjWpW/4Q+EoIrtvJLPq+Jpv2dU
+         WyQVDiBf2RIHgnWUaWtopAPqHuaqoP5nGmdz91hSa6qE+cy/BYmiZrrlQEGCPRLW32uH
+         KvGAb0hTN+9x9l7vkd2FJFs5F+U1rNBKgYXlun/s4Znhp9GiHGvQjB50OCFAfMH7g1Ll
+         keVQ==
+X-Gm-Message-State: AOAM533EtcdjAYFPKtgCuKeT87s5HUXoCuKk8V09+exkSPbjD69R+367
+        UPd1Bg1eUDPtD4UbhmNda35HjT4Z5QCGiHsiMX/QDKZ50sJbTx4gUh9FmaZTw+4Klz0zEo+Z5dC
+        qqYLt8YsyokmO
+X-Received: by 2002:a5d:5552:: with SMTP id g18mr4749178wrw.188.1632991867660;
+        Thu, 30 Sep 2021 01:51:07 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxJRtTvop+yA+0hkKKZHSCU+xbXl8QpnQFT7wUWD5EhjNiBLYscMcOCJ9ssbH/VORwXH9Iz1A==
+X-Received: by 2002:a5d:5552:: with SMTP id g18mr4749162wrw.188.1632991867471;
+        Thu, 30 Sep 2021 01:51:07 -0700 (PDT)
+Received: from ?IPv6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id i92sm2300002wri.28.2021.09.30.01.51.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 30 Sep 2021 01:51:06 -0700 (PDT)
+Reply-To: eric.auger@redhat.com
+Subject: Re: [PATCH v3 08/10] KVM: arm64: selftests: Add tests for GIC
+ redist/cpuif partially above IPA range
+To:     Ricardo Koller <ricarkol@google.com>, kvm@vger.kernel.org,
+        maz@kernel.org, kvmarm@lists.cs.columbia.edu, drjones@redhat.com,
+        alexandru.elisei@arm.com
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, oupton@google.com,
+        james.morse@arm.com, suzuki.poulose@arm.com, shuah@kernel.org,
+        jingzhangos@google.com, pshier@google.com, rananta@google.com,
+        reijiw@google.com
+References: <20210928184803.2496885-1-ricarkol@google.com>
+ <20210928184803.2496885-9-ricarkol@google.com>
+From:   Eric Auger <eric.auger@redhat.com>
+Message-ID: <420f5eb6-4ed4-7c0b-266c-03b62a441b95@redhat.com>
+Date:   Thu, 30 Sep 2021 10:51:05 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5433.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a9ee9a22-cfb1-43c2-2d72-08d983ef27b8
-X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Sep 2021 08:49:03.5255
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: vjS2p4SHKj55HAS3qBrcTF1uj5Snc7NLwN8lpLyROR3Ak4cu5Rn65H1JdJS95Udhgk8P2ufIs1F5BtUvj4Y3Dg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN8PR11MB3764
-X-OriginatorOrg: intel.com
+In-Reply-To: <20210928184803.2496885-9-ricarkol@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Jason Gunthorpe <jgg@nvidia.com>
-> Sent: Thursday, September 23, 2021 8:22 PM
->=20
-> > > These are different things and need different bits. Since the ARM pat=
-h
-> > > has a lot more code supporting it, I'd suggest Intel should change
-> > > their code to use IOMMU_BLOCK_NO_SNOOP and abandon
-> IOMMU_CACHE.
-> >
-> > I didn't fully get this point. The end result is same, i.e. making the =
-DMA
-> > cache-coherent when IOMMU_CACHE is set. Or if you help define the
-> > behavior of IOMMU_CACHE, what will you define now?
->=20
-> It is clearly specifying how the kernel API works:
->=20
->  !IOMMU_CACHE
->    must call arch cache flushers
->  IOMMU_CACHE -
->    do not call arch cache flushers
->  IOMMU_CACHE|IOMMU_BLOCK_NO_SNOOP -
->    dot not arch cache flushers, and ignore the no snoop bit.
+Hi Ricardo,
 
-Who will set IOMMU_BLOCK_NO_SNOOP? I feel this is arch specific
-knowledge about how cache coherency is implemented, i.e.=20
-when IOMMU_CACHE is set intel-iommu driver just maps it to
-blocking no-snoop. It's not necessarily to be an attribute in=20
-the same level as IOMMU_CACHE?
+On 9/28/21 8:48 PM, Ricardo Koller wrote:
+> Add tests for checking that KVM returns the right error when trying to
+> set GICv2 CPU interfaces or GICv3 Redistributors partially above the
+> addressable IPA range. Also tighten the IPA range by replacing
+> KVM_CAP_ARM_VM_IPA_SIZE with the IPA range currently configured for the
+> guest (i.e., the default).
+>
+> The check for the GICv3 redistributor created using the REDIST legacy
+> API is not sufficient as this new test only checks the check done using
+> vcpus already created when setting the base. The next commit will add
+> the missing test which verifies that the KVM check is done at first vcpu
+> run.
+>
+> Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> ---
+>  .../testing/selftests/kvm/aarch64/vgic_init.c | 46 ++++++++++++++-----
+>  1 file changed, 35 insertions(+), 11 deletions(-)
+>
+> diff --git a/tools/testing/selftests/kvm/aarch64/vgic_init.c b/tools/testing/selftests/kvm/aarch64/vgic_init.c
+> index 92f5c6ca6b8b..77a1941e61fa 100644
+> --- a/tools/testing/selftests/kvm/aarch64/vgic_init.c
+> +++ b/tools/testing/selftests/kvm/aarch64/vgic_init.c
+> @@ -31,7 +31,7 @@ struct vm_gic {
+>  	uint32_t gic_dev_type;
+>  };
+>  
+> -static int max_ipa_bits;
+> +static uint64_t max_phys_size;
+>  
+>  /* helper to access a redistributor register */
+>  static int access_v3_redist_reg(int gicv3_fd, int vcpu, int offset,
+> @@ -150,16 +150,21 @@ static void subtest_dist_rdist(struct vm_gic *v)
+>  	TEST_ASSERT(ret && errno == EINVAL, "GIC redist/cpu base not aligned");
+>  
+>  	/* out of range address */
+> -	if (max_ipa_bits) {
+> -		addr = 1ULL << max_ipa_bits;
+> -		ret = _kvm_device_access(v->gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+> -					 dist.attr, &addr, true);
+> -		TEST_ASSERT(ret && errno == E2BIG, "dist address beyond IPA limit");
+> +	addr = max_phys_size;
+> +	ret = _kvm_device_access(v->gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+> +				 dist.attr, &addr, true);
+> +	TEST_ASSERT(ret && errno == E2BIG, "dist address beyond IPA limit");
+>  
+> -		ret = _kvm_device_access(v->gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+> -					 rdist.attr, &addr, true);
+> -		TEST_ASSERT(ret && errno == E2BIG, "redist address beyond IPA limit");
+> -	}
+> +	ret = _kvm_device_access(v->gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+> +				 rdist.attr, &addr, true);
+> +	TEST_ASSERT(ret && errno == E2BIG, "redist address beyond IPA limit");
+> +
+> +	/* Space for half a rdist (a rdist is: 2 * rdist.alignment). */
+> +	addr = max_phys_size - dist.alignment;
+> +	ret = _kvm_device_access(v->gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+> +				 rdist.attr, &addr, true);
+> +	TEST_ASSERT(ret && errno == E2BIG,
+> +			"half of the redist is beyond IPA limit");
+>  
+>  	/* set REDIST base address @0x0*/
+>  	addr = 0x00000;
+> @@ -248,7 +253,21 @@ static void subtest_v3_redist_regions(struct vm_gic *v)
+>  	kvm_device_access(v->gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+>  			  KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
+>  
+> -	addr = REDIST_REGION_ATTR_ADDR(1, 1ULL << max_ipa_bits, 0, 2);
+> +	addr = REDIST_REGION_ATTR_ADDR(1, max_phys_size, 0, 2);
+> +	ret = _kvm_device_access(v->gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+> +				 KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
+> +	TEST_ASSERT(ret && errno == E2BIG,
+> +		    "register redist region with base address beyond IPA range");
+> +
+> +	/* The last redist is above the pa range. */
+> +	addr = REDIST_REGION_ATTR_ADDR(1, max_phys_size - 0x10000, 0, 2);
+> +	ret = _kvm_device_access(v->gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+> +				 KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
+> +	TEST_ASSERT(ret && errno == E2BIG,
+> +		    "register redist region with base address beyond IPA range");
+s/base address/top address
+> +
+> +	/* The last redist is above the pa range. */
+> +	addr = REDIST_REGION_ATTR_ADDR(2, max_phys_size - 0x30000, 0, 2);
+>  	ret = _kvm_device_access(v->gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+>  				 KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
+Why this second check?
+>  	TEST_ASSERT(ret && errno == E2BIG,
+> @@ -608,8 +627,13 @@ void run_tests(uint32_t gic_dev_type)
+>  int main(int ac, char **av)
+>  {
+>  	int ret;
+> +	int max_ipa_bits, pa_bits;
+>  
+>  	max_ipa_bits = kvm_check_cap(KVM_CAP_ARM_VM_IPA_SIZE);
+> +	pa_bits = vm_guest_mode_params[VM_MODE_DEFAULT].pa_bits;
+> +	TEST_ASSERT(max_ipa_bits && pa_bits <= max_ipa_bits,
+> +		"The default PA range should not be larger than the max.");
+Isn't it already enforced in the test infra instead?
+I see in lib/kvm_util.c
 
->=20
-> On Intel it should refuse to create a !IOMMU_CACHE since the HW can't
-> do that.=20
+#ifdef __aarch64__
+        if (vm->pa_bits != 40)
+                vm->type = KVM_VM_TYPE_ARM_IPA_SIZE(vm->pa_bits);
+#endif
 
-Agree. In reality I guess this is not hit because all devices are marked
-coherent on Intel platforms...
+vm_open()
+> +	max_phys_size = 1ULL << pa_bits;
+>  
+>  	ret = test_kvm_device(KVM_DEV_TYPE_ARM_VGIC_V3);
+>  	if (!ret) {
+Eric
 
-Baolu, any insight here?
-
-Thanks
-Kevin
