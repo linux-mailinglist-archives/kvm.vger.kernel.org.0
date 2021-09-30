@@ -2,140 +2,171 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 278BC41D377
-	for <lists+kvm@lfdr.de>; Thu, 30 Sep 2021 08:34:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4C08241D3D7
+	for <lists+kvm@lfdr.de>; Thu, 30 Sep 2021 09:02:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348114AbhI3GgU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Sep 2021 02:36:20 -0400
-Received: from frasgout.his.huawei.com ([185.176.79.56]:3892 "EHLO
-        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236162AbhI3GgT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Sep 2021 02:36:19 -0400
-Received: from fraeml701-chm.china.huawei.com (unknown [172.18.147.226])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4HKk1C0VPPz67vpZ;
-        Thu, 30 Sep 2021 14:31:59 +0800 (CST)
-Received: from lhreml712-chm.china.huawei.com (10.201.108.63) by
- fraeml701-chm.china.huawei.com (10.206.15.50) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2308.8; Thu, 30 Sep 2021 08:34:34 +0200
-Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- lhreml712-chm.china.huawei.com (10.201.108.63) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.8; Thu, 30 Sep 2021 07:34:33 +0100
-Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
- lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
- 15.01.2308.008; Thu, 30 Sep 2021 07:34:33 +0100
-From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-CC:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "jgg@nvidia.com" <jgg@nvidia.com>,
-        "mgurtovoy@nvidia.com" <mgurtovoy@nvidia.com>,
-        Linuxarm <linuxarm@huawei.com>,
-        liulongfang <liulongfang@huawei.com>,
-        "Zengtao (B)" <prime.zeng@hisilicon.com>,
-        "Jonathan Cameron" <jonathan.cameron@huawei.com>,
-        "Wangzhou (B)" <wangzhou1@hisilicon.com>,
-        "He, Shaopeng" <shaopeng.he@intel.com>,
-        "Zhao, Yan Y" <yan.y.zhao@intel.com>
-Subject: RE: [PATCH v3 0/6] vfio/hisilicon: add acc live migration driver
-Thread-Topic: [PATCH v3 0/6] vfio/hisilicon: add acc live migration driver
-Thread-Index: AQHXqhcv8rGxctog9kC36bxSe2rONqu6Z2mAgABdanD///ilAIAAErXQgADy6QCAAGw8QA==
-Date:   Thu, 30 Sep 2021 06:34:33 +0000
-Message-ID: <61274f6497424f039397677fb5d003d0@huawei.com>
-References: <20210915095037.1149-1-shameerali.kolothum.thodi@huawei.com>
- <BN9PR11MB5433DDA5FD4FC6C5EED62C278CA99@BN9PR11MB5433.namprd11.prod.outlook.com>
- <2e0c062947b044179603ab45989808ff@huawei.com>
- <BN9PR11MB54338A0821C061FEE018F43E8CA99@BN9PR11MB5433.namprd11.prod.outlook.com>
- <a128301751974352a648bcc0f50bc464@huawei.com>
- <BN9PR11MB543384431856FEF80C1AA4C58CAA9@BN9PR11MB5433.namprd11.prod.outlook.com>
-In-Reply-To: <BN9PR11MB543384431856FEF80C1AA4C58CAA9@BN9PR11MB5433.namprd11.prod.outlook.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.47.83.34]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        id S1348443AbhI3HEB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Sep 2021 03:04:01 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:55384 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233661AbhI3HEA (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 30 Sep 2021 03:04:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1632985337;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ZHSiUrkZvCsxOeU5xfKaRYm9wqLGK3XFjTD1F2kLbP0=;
+        b=KuB0ODgd7374RzbPyp+hf0lIAXYL2Qs3oEUygawB43lHPBJze0sFL5jNeZAKh8ReXOY26G
+        WpM+sDDt62dDKucah2UaKJqY3S4QjmoplhXRPy5t2Br9yktStKGZGOVdaTx2hWtR2JwUTA
+        16RIyR4OvWh3H9XEhYnhYqTfKLTHpms=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-42-4zIrh3vRNWqCAUDbRa1mdg-1; Thu, 30 Sep 2021 03:02:16 -0400
+X-MC-Unique: 4zIrh3vRNWqCAUDbRa1mdg-1
+Received: by mail-wr1-f70.google.com with SMTP id k16-20020a5d6290000000b00160753b430fso1318199wru.11
+        for <kvm@vger.kernel.org>; Thu, 30 Sep 2021 00:02:16 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:reply-to:subject:to:cc:references:from
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-transfer-encoding:content-language;
+        bh=ZHSiUrkZvCsxOeU5xfKaRYm9wqLGK3XFjTD1F2kLbP0=;
+        b=EDstQC2AVXSPouISypxDXbw+7pKnN0cW58GicmFnJ8oVgB2XrdCycnPEs311Mgrwwv
+         iVjuVyekz9j7zeY4+wI7btzsVOzrTkw9E3aSLjJOz70Fg7cdA7sYlgdamrZjN2ld3/Yu
+         N3WPY2u0jtIH6T02TjX8AOcgLugabXK4nBRRel4nhShXyvWIalI1zDFleuCBcqXk6IPO
+         a5Ed8lc4Dx56KYqkRqwjITCNoWO7SlLLkfICn0GDUWohj1O5fqnvYJ0wvNFiVojJCkHE
+         qqlhGOOcn9MlWBmEspuYWpdenb3nSnU2Tt2eDLArs9CPGJel9Ntlgp8nPIRQ8uNgQnkR
+         PPXA==
+X-Gm-Message-State: AOAM533XXwomv/+eSTzWhxprLEi6GZs9VRT7lAfmCIUCsE0dS055jJP4
+        ri1mFcm1cXh0H03pluo1JeUzWkxeGUWI0lxfZsWA5y4u0H0uApU7dCaazkp/nv4KUwHOqnIN1G1
+        bY/3kC6H54yp9
+X-Received: by 2002:a1c:2c3:: with SMTP id 186mr3707471wmc.14.1632985335364;
+        Thu, 30 Sep 2021 00:02:15 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxF78XOIE/kiNSNg9Ko30J2+7Orfs0VyPIx6WyeXUiutZXvna7Xlsl7/OC8dJdC85oi6yDVfg==
+X-Received: by 2002:a1c:2c3:: with SMTP id 186mr3707452wmc.14.1632985335175;
+        Thu, 30 Sep 2021 00:02:15 -0700 (PDT)
+Received: from ?IPv6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id w17sm1878500wmi.42.2021.09.30.00.02.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 30 Sep 2021 00:02:14 -0700 (PDT)
+Reply-To: eric.auger@redhat.com
+Subject: Re: [PATCH v3 01/10] kvm: arm64: vgic: Introduce vgic_check_iorange
+To:     Ricardo Koller <ricarkol@google.com>
+Cc:     kvm@vger.kernel.org, maz@kernel.org, kvmarm@lists.cs.columbia.edu,
+        drjones@redhat.com, alexandru.elisei@arm.com,
+        Paolo Bonzini <pbonzini@redhat.com>, oupton@google.com,
+        james.morse@arm.com, suzuki.poulose@arm.com, shuah@kernel.org,
+        jingzhangos@google.com, pshier@google.com, rananta@google.com,
+        reijiw@google.com
+References: <20210928184803.2496885-1-ricarkol@google.com>
+ <20210928184803.2496885-2-ricarkol@google.com>
+ <4ab60884-e006-723a-c026-b3e8c0ccb349@redhat.com>
+ <YVTX1L8u8NMxHAyE@google.com>
+From:   Eric Auger <eric.auger@redhat.com>
+Message-ID: <1613b54f-2c4b-a57a-d4ba-92e866c5ff1f@redhat.com>
+Date:   Thu, 30 Sep 2021 09:02:12 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+In-Reply-To: <YVTX1L8u8NMxHAyE@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogVGlhbiwgS2V2aW4gW21h
-aWx0bzprZXZpbi50aWFuQGludGVsLmNvbV0NCj4gU2VudDogMzAgU2VwdGVtYmVyIDIwMjEgMDE6
-NDINCj4gVG86IFNoYW1lZXJhbGkgS29sb3RodW0gVGhvZGkgPHNoYW1lZXJhbGkua29sb3RodW0u
-dGhvZGlAaHVhd2VpLmNvbT47DQo+IGt2bUB2Z2VyLmtlcm5lbC5vcmc7IGxpbnV4LWtlcm5lbEB2
-Z2VyLmtlcm5lbC5vcmc7DQo+IGxpbnV4LWNyeXB0b0B2Z2VyLmtlcm5lbC5vcmcNCj4gQ2M6IGFs
-ZXgud2lsbGlhbXNvbkByZWRoYXQuY29tOyBqZ2dAbnZpZGlhLmNvbTsgbWd1cnRvdm95QG52aWRp
-YS5jb207DQo+IExpbnV4YXJtIDxsaW51eGFybUBodWF3ZWkuY29tPjsgbGl1bG9uZ2ZhbmcgPGxp
-dWxvbmdmYW5nQGh1YXdlaS5jb20+Ow0KPiBaZW5ndGFvIChCKSA8cHJpbWUuemVuZ0BoaXNpbGlj
-b24uY29tPjsgSm9uYXRoYW4gQ2FtZXJvbg0KPiA8am9uYXRoYW4uY2FtZXJvbkBodWF3ZWkuY29t
-PjsgV2FuZ3pob3UgKEIpDQo+IDx3YW5nemhvdTFAaGlzaWxpY29uLmNvbT47IEhlLCBTaGFvcGVu
-ZyA8c2hhb3BlbmcuaGVAaW50ZWwuY29tPjsgWmhhbywNCj4gWWFuIFkgPHlhbi55LnpoYW9AaW50
-ZWwuY29tPg0KPiBTdWJqZWN0OiBSRTogW1BBVENIIHYzIDAvNl0gdmZpby9oaXNpbGljb246IGFk
-ZCBhY2MgbGl2ZSBtaWdyYXRpb24gZHJpdmVyDQo+IA0KPiA+IEZyb206IFNoYW1lZXJhbGkgS29s
-b3RodW0gVGhvZGkNCj4gPiA8c2hhbWVlcmFsaS5rb2xvdGh1bS50aG9kaUBodWF3ZWkuY29tPg0K
-PiA+DQo+ID4gPiBGcm9tOiBUaWFuLCBLZXZpbiBbbWFpbHRvOmtldmluLnRpYW5AaW50ZWwuY29t
-XQ0KPiA+ID4gU2VudDogMjkgU2VwdGVtYmVyIDIwMjEgMTA6MDYNCj4gPiA+DQo+ID4gPiA+IEZy
-b206IFNoYW1lZXJhbGkgS29sb3RodW0gVGhvZGkNCj4gPiA+ID4gPHNoYW1lZXJhbGkua29sb3Ro
-dW0udGhvZGlAaHVhd2VpLmNvbT4NCj4gPiA+ID4NCj4gPiA+ID4gSGkgS2V2aW4sDQo+ID4gPiA+
-DQo+ID4gPiA+ID4gRnJvbTogVGlhbiwgS2V2aW4gW21haWx0bzprZXZpbi50aWFuQGludGVsLmNv
-bV0NCj4gPiA+ID4gPiBTZW50OiAyOSBTZXB0ZW1iZXIgMjAyMSAwNDo1OA0KPiA+ID4gPiA+DQo+
-ID4gPiA+ID4gSGksIFNoYW1lZXIsDQo+ID4gPiA+ID4NCj4gPiA+ID4gPiA+IEZyb206IFNoYW1l
-ZXIgS29sb3RodW0gPHNoYW1lZXJhbGkua29sb3RodW0udGhvZGlAaHVhd2VpLmNvbT4NCj4gPiA+
-ID4gPiA+IFNlbnQ6IFdlZG5lc2RheSwgU2VwdGVtYmVyIDE1LCAyMDIxIDU6NTEgUE0NCj4gPiA+
-ID4gPiA+DQo+ID4gPiA+ID4gPiBIaSwNCj4gPiA+ID4gPiA+DQo+ID4gPiA+ID4gPiBUaGFua3Mg
-dG8gdGhlIGludHJvZHVjdGlvbiBvZiB2ZmlvX3BjaV9jb3JlIHN1YnN5c3RlbSBmcmFtZXdvcmtb
-MF0sDQo+ID4gPiA+ID4gPiBub3cgaXQgaXMgcG9zc2libGUgdG8gcHJvdmlkZSB2ZW5kb3Igc3Bl
-Y2lmaWMgZnVuY3Rpb25hbGl0eSB0bw0KPiA+ID4gPiA+ID4gdmZpbyBwY2kgZGV2aWNlcy4gVGhp
-cyBzZXJpZXMgYXR0ZW1wdHMgdG8gYWRkIHZmaW8gbGl2ZSBtaWdyYXRpb24NCj4gPiA+ID4gPiA+
-IHN1cHBvcnQgZm9yIEhpU2lsaWNvbiBBQ0MgVkYgZGV2aWNlcyBiYXNlZCBvbiB0aGUgbmV3IGZy
-YW1ld29yay4NCj4gPiA+ID4gPiA+DQo+ID4gPiA+ID4gPiBIaVNpbGljb24gQUNDIFZGIGRldmlj
-ZSBNTUlPIHNwYWNlIGluY2x1ZGVzIGJvdGggdGhlIGZ1bmN0aW9uYWwNCj4gPiA+ID4gPiA+IHJl
-Z2lzdGVyIHNwYWNlIGFuZCBtaWdyYXRpb24gY29udHJvbCByZWdpc3RlciBzcGFjZS4gQXMgZGlz
-Y3Vzc2VkDQo+ID4gPiA+ID4gPiBpbiBSRkN2MVsxXSwgdGhpcyBtYXkgY3JlYXRlIHNlY3VyaXR5
-IGlzc3VlcyBhcyB0aGVzZSByZWdpb25zIGdldA0KPiA+ID4gPiA+ID4gc2hhcmVkIGJldHdlZW4g
-dGhlIEd1ZXN0IGRyaXZlciBhbmQgdGhlIG1pZ3JhdGlvbiBkcml2ZXIuDQo+ID4gPiA+ID4gPiBC
-YXNlZCBvbiB0aGUgZmVlZGJhY2ssIHdlIHRyaWVkIHRvIGFkZHJlc3MgdGhvc2UgY29uY2VybnMg
-aW4NCj4gPiA+ID4gPiA+IHRoaXMgdmVyc2lvbi4NCj4gPiA+ID4gPg0KPiA+ID4gPiA+IFRoaXMg
-c2VyaWVzIGRvZXNuJ3QgbWVudGlvbiBhbnl0aGluZyByZWxhdGVkIHRvIGRpcnR5IHBhZ2UgdHJh
-Y2tpbmcuDQo+ID4gPiA+ID4gQXJlIHlvdSByZWx5IG9uIEtlcWlhbidzIHNlcmllcyBmb3IgdXRp
-bGl6aW5nIGhhcmR3YXJlIGlvbW11IGRpcnR5DQo+ID4gPiA+ID4gYml0IChlLmcuIFNNTVUgSFRU
-VSk/DQo+ID4gPiA+DQo+ID4gPiA+IFllcywgdGhpcyBkb2Vzbid0IGhhdmUgZGlydHkgcGFnZSB0
-cmFja2luZyBhbmQgdGhlIHBsYW4gaXMgdG8gbWFrZSB1c2Ugb2YNCj4gPiA+ID4gS2VxaWFuJ3Mg
-U01NVSBIVFRVIHdvcmsgdG8gaW1wcm92ZSBwZXJmb3JtYW5jZS4gV2UgaGF2ZSBkb25lDQo+IGJh
-c2ljDQo+ID4gPiA+IHNhbml0eSB0ZXN0aW5nIHdpdGggdGhvc2UgcGF0Y2hlcy4NCj4gPiA+ID4N
-Cj4gPiA+DQo+ID4gPiBEbyB5b3UgcGxhbiB0byBzdXBwb3J0IG1pZ3JhdGlvbiB3L28gSFRUVSBh
-cyB0aGUgZmFsbGJhY2sgb3B0aW9uPw0KPiA+ID4gR2VuZXJhbGx5IG9uZSB3b3VsZCBleHBlY3Qg
-dGhlIGJhc2ljIGZ1bmN0aW9uYWxpdHkgcmVhZHkgYmVmb3JlIHRhbGtpbmcNCj4gPiA+IGFib3V0
-IG9wdGltaXphdGlvbi4NCj4gPg0KPiA+IFllcywgdGhlIHBsYW4gaXMgdG8gZ2V0IHRoZSBiYXNp
-YyBsaXZlIG1pZ3JhdGlvbiB3b3JraW5nIGFuZCB0aGVuIHdlIGNhbg0KPiA+IG9wdGltaXplDQo+
-ID4gaXQgd2l0aCBTTU1VIEhUVFUgd2hlbiBpdCBpcyBhdmFpbGFibGUuDQo+IA0KPiBUaGUgaW50
-ZXJlc3RpbmcgdGhpbmcgaXMgdGhhdCB3L28gSFRUVSB2ZmlvIHdpbGwganVzdCByZXBvcnQgZXZl
-cnkgcGlubmVkDQo+IHBhZ2UgYXMgZGlydHksIGkuZS4gdGhlIGVudGlyZSBndWVzdCBtZW1vcnkg
-aXMgZGlydHkuIFRoaXMgY29tcGxldGVseSBraWxscw0KPiB0aGUgYmVuZWZpdCBvZiBwcmVjb3B5
-IHBoYXNlIHNpbmNlIFFlbXUgc3RpbGwgbmVlZHMgdG8gdHJhbnNmZXIgdGhlIGVudGlyZQ0KPiBn
-dWVzdCBtZW1vcnkgaW4gdGhlIHN0b3AtY29weSBwaGFzZS4gVGhpcyBpcyBub3QgYSAnd29ya2lu
-ZycgbW9kZWwgZm9yDQo+IGxpdmUgbWlncmF0aW9uLg0KPiANCj4gU28gaXQgbmVlZHMgdG8gYmUg
-Y2xlYXIgd2hldGhlciBIVFRVIGlzIHJlYWxseSBhbiBvcHRpbWl6YXRpb24gb3INCj4gYSBoYXJk
-IGZ1bmN0aW9uYWwtcmVxdWlyZW1lbnQgZm9yIG1pZ3JhdGluZyBzdWNoIGRldmljZS4gSWYgdGhl
-IGxhdHRlcg0KPiB0aGUgbWlncmF0aW9uIHJlZ2lvbiBpbmZvIGlzIG5vdCBhIG5pY2UtdG8taGF2
-ZSB0aGluZy4NCg0KWWVzLCBhZ3JlZSB0aGF0IHdlIGhhdmUgdG8gdHJhbnNmZXIgdGhlIGVudGly
-ZSBHdWVzdCBtZW1vcnkgaW4gdGhpcyBjYXNlLg0KQnV0IGRvbid0IHRoaW5rIHRoYXQgaXMgYSBr
-aWxsZXIgaGVyZSBhcyB3ZSB3b3VsZCBzdGlsbCBsaWtlIHRvIGhhdmUgdGhlIA0KYmFzaWMgbGl2
-ZSBtaWdyYXRpb24gZW5hYmxlZCBvbiB0aGVzZSBwbGF0Zm9ybXMgYW5kIGNhbiBiZSB1c2VkDQp3
-aGVyZSB0aGUgY29uc3RyYWludHMgb2YgbWVtb3J5IHRyYW5zZmVyIGlzIGFjY2VwdGFibGUuDQog
-DQo+IGJ0dyB0aGUgZmFsbGJhY2sgb3B0aW9uIHRoYXQgSSByYWlzZWQgZWFybGllciBpcyBtb3Jl
-IGxpa2Ugc29tZSBzb2Z0d2FyZQ0KPiBtaXRpZ2F0aW9uIGZvciBjb2xsZWN0aW5nIGRpcnR5IHBh
-Z2VzLCBlLmcuIGFuYWx5emluZyB0aGUgcmluZyBkZXNjcmlwdG9ycw0KPiB0byBidWlsZCBzb2Z0
-d2FyZS10cmFja2VkIGRpcnR5IGluZm8gYnkgbWVkaWF0aW5nIHRoZSBjbWQgcG9ydGFsDQo+ICh3
-aGljaCByZXF1aXJlcyBkeW5hbWljYWxseSB1bm1hcHBpbmcgY21kIHBvcnRhbCBmcm9tIHRoZSBm
-YXN0LXBhdGgNCj4gdG8gZW5hYmxlIG1lZGlhdGlvbikuIFdlIGFyZSBsb29raW5nIGludG8gdGhp
-cyBvcHRpb24gZm9yIHNvbWUgcGxhdGZvcm0NCj4gd2hpY2ggbGFja3Mgb2YgSU9NTVUgZGlydHkg
-Yml0IHN1cHBvcnQuDQoNCkludGVyZXN0aW5nLiBJcyB0aGVyZSBhbnl0aGluZyBhdmFpbGFibGUg
-cHVibGljbHkgc28gdGhhdCB3ZSBjYW4gdGFrZSBhIGxvb2s/DQoNClRoYW5rcywNClNoYW1lZXIN
-Cg==
+Hi,
+
+On 9/29/21 11:17 PM, Ricardo Koller wrote:
+> On Wed, Sep 29, 2021 at 06:29:21PM +0200, Eric Auger wrote:
+>> Hi Ricardo,
+>>
+>> On 9/28/21 8:47 PM, Ricardo Koller wrote:
+>>> Add the new vgic_check_iorange helper that checks that an iorange is
+>>> sane: the start address and size have valid alignments, the range is
+>>> within the addressable PA range, start+size doesn't overflow, and the
+>>> start wasn't already defined.
+>>>
+>>> No functional change.
+>>>
+>>> Signed-off-by: Ricardo Koller <ricarkol@google.com>
+>>> ---
+>>>  arch/arm64/kvm/vgic/vgic-kvm-device.c | 22 ++++++++++++++++++++++
+>>>  arch/arm64/kvm/vgic/vgic.h            |  4 ++++
+>>>  2 files changed, 26 insertions(+)
+>>>
+>>> diff --git a/arch/arm64/kvm/vgic/vgic-kvm-device.c b/arch/arm64/kvm/vgic/vgic-kvm-device.c
+>>> index 7740995de982..f714aded67b2 100644
+>>> --- a/arch/arm64/kvm/vgic/vgic-kvm-device.c
+>>> +++ b/arch/arm64/kvm/vgic/vgic-kvm-device.c
+>>> @@ -29,6 +29,28 @@ int vgic_check_ioaddr(struct kvm *kvm, phys_addr_t *ioaddr,
+>>>  	return 0;
+>>>  }
+>>>  
+>>> +int vgic_check_iorange(struct kvm *kvm, phys_addr_t *ioaddr,
+>>> +		       phys_addr_t addr, phys_addr_t alignment,
+>>> +		       phys_addr_t size)
+>>> +{
+>>> +	int ret;
+>>> +
+>>> +	ret = vgic_check_ioaddr(kvm, ioaddr, addr, alignment);
+>> nit: not related to this patch but I am just wondering why we are
+>> passing phys_addr_t *ioaddr downto vgic_check_ioaddr and thus to
+>>
+>> vgic_check_iorange()? This must be a leftover of some old code?
+>>
+> It's used to check that the base of a region is not already set.
+> kvm_vgic_addr() uses it to make that check;
+> vgic_v3_alloc_redist_region() does not:
+>
+>   rdreg->base = VGIC_ADDR_UNDEF; // so the "not already defined" check passes
+>   ret = vgic_check_ioaddr(kvm, &rdreg->base, base, SZ_64K);
+Yes but I meant why a pointer?
+
+Eric
+>
+> Thanks,
+> Ricardo
+>
+>>> +	if (ret)
+>>> +		return ret;
+>>> +
+>>> +	if (!IS_ALIGNED(size, alignment))
+>>> +		return -EINVAL;
+>>> +
+>>> +	if (addr + size < addr)
+>>> +		return -EINVAL;
+>>> +
+>>> +	if (addr + size > kvm_phys_size(kvm))
+>>> +		return -E2BIG;
+>>> +
+>>> +	return 0;
+>>> +}
+>>> +
+>>>  static int vgic_check_type(struct kvm *kvm, int type_needed)
+>>>  {
+>>>  	if (kvm->arch.vgic.vgic_model != type_needed)
+>>> diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
+>>> index 14a9218641f5..c4df4dcef31f 100644
+>>> --- a/arch/arm64/kvm/vgic/vgic.h
+>>> +++ b/arch/arm64/kvm/vgic/vgic.h
+>>> @@ -175,6 +175,10 @@ void vgic_irq_handle_resampling(struct vgic_irq *irq,
+>>>  int vgic_check_ioaddr(struct kvm *kvm, phys_addr_t *ioaddr,
+>>>  		      phys_addr_t addr, phys_addr_t alignment);
+>>>  
+>>> +int vgic_check_iorange(struct kvm *kvm, phys_addr_t *ioaddr,
+>>> +		       phys_addr_t addr, phys_addr_t alignment,
+>>> +		       phys_addr_t size);
+>>> +
+>>>  void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu);
+>>>  void vgic_v2_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr);
+>>>  void vgic_v2_clear_lr(struct kvm_vcpu *vcpu, int lr);
+>> Besides
+>> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+>> Eric
+>>
+
