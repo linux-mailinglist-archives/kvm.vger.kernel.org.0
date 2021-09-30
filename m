@@ -2,114 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CF93B41E332
-	for <lists+kvm@lfdr.de>; Thu, 30 Sep 2021 23:20:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 72E7E41E35E
+	for <lists+kvm@lfdr.de>; Thu, 30 Sep 2021 23:27:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349331AbhI3VWl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Sep 2021 17:22:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46838 "EHLO
+        id S240862AbhI3V3a (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Sep 2021 17:29:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48516 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349281AbhI3VWj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Sep 2021 17:22:39 -0400
-Received: from mail-qk1-x731.google.com (mail-qk1-x731.google.com [IPv6:2607:f8b0:4864:20::731])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 782BCC06176A
-        for <kvm@vger.kernel.org>; Thu, 30 Sep 2021 14:20:52 -0700 (PDT)
-Received: by mail-qk1-x731.google.com with SMTP id q125so7215336qkd.12
-        for <kvm@vger.kernel.org>; Thu, 30 Sep 2021 14:20:52 -0700 (PDT)
+        with ESMTP id S229806AbhI3V31 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Sep 2021 17:29:27 -0400
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92F90C06176A
+        for <kvm@vger.kernel.org>; Thu, 30 Sep 2021 14:27:44 -0700 (PDT)
+Received: by mail-pf1-x434.google.com with SMTP id 187so1728283pfc.10
+        for <kvm@vger.kernel.org>; Thu, 30 Sep 2021 14:27:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=h/TBKn03dF9IntMFcuDE9WlvX4rnNMcxTnYaxfj4f3M=;
-        b=BlxMYaM/OWq2QOg73mmSIuZReJqS9WDVJwYpygBxYlCdpjQvMPkG8JUUJuWMEfe7VW
-         Kc4xJOkMskHk8O+awxj6C0zYig/iRuEgT85zngr4j5VHau1O2THU+xT3x/AlUo4/mD7V
-         wX52wLkXcsoyoK8aKbnCd70Ljj6pEqXvKGjjk=
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=r0i+4oh5ttmvKzGJaF4duXEtIwD8cGanxYr+JafZRCc=;
+        b=Lepz8HOPy8gYGMfKpd+iWWTvMcOMxwafkPOVcPvRlPcbhH7cbzDgC6rXgoDcB+zVgB
+         Ff3KhLPBGGD3uVIja2Dm3jbPkzC+TeUU8IrXKlsd3i5Zeah4yYApRrNVxE5PepUh/zlo
+         tkV+otCyCWwkHESL4eOLtedqPje8r8uYpgjKn4zlF+aynH+jiFhv8hGsPGXohQefpwnx
+         kCEUKtsw2XiAqQ4B1eW8J1udWHntxC5pW0LHt518UNkkS5HK1bIfRaONCerOCQvBsNiW
+         4kALVECg/PGMffjjw+V2LK2jp5wiSqNJ5/XaWD36qrHeXxtzdBFgKL7KX7HcOWcKVklx
+         gE4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=h/TBKn03dF9IntMFcuDE9WlvX4rnNMcxTnYaxfj4f3M=;
-        b=tAATY81iwITw5YvlBniJh/68tMx3cxWqtYgyq/4lfOjzC+scMZcIToZkC/IvRYhPb4
-         +4ARYOZNM3liTwBDjIY1Va72utDW9lFLlYWr1W3zZva0kU+5DKWwfnB/R/vz6697Hrwg
-         0fCrfAe1SPHXMpA87gbZHGeI+ZjW3lyZpWGa3Tl7Gg1hsee2NcWwRu/GAJPLjd0GNg+k
-         GqsgNj6eHteoI4kjW+LMmLYGSLfluBQJo5XdKfPYsUCMNdX3pkQe7cKxosxoQblwgjCz
-         g91/WeRIBquNjs/E+LMXFE/K00oq1iFgji81PYvUlVxrWmdTo4IdEZZqxVSMdqR7ou0V
-         YMZQ==
-X-Gm-Message-State: AOAM530tNkOfRQ6tnvVFHtpYGXRQo5ChyjdvQD7T2jX8jAlJs/7zx2pz
-        VMg7gIFC98uX7706dbVgBDALRTS0B3uH/f57daQ=
-X-Google-Smtp-Source: ABdhPJygn2uSDrIp6E6sSnZYJ3WX1JgjKzjIkYXdjEMYX9BBq8GU0YAy0GiNxLRW9WDuRZav4yCqUg==
-X-Received: by 2002:a37:951:: with SMTP id 78mr6966699qkj.244.1633036851210;
-        Thu, 30 Sep 2021 14:20:51 -0700 (PDT)
-Received: from mail-yb1-f178.google.com (mail-yb1-f178.google.com. [209.85.219.178])
-        by smtp.gmail.com with ESMTPSA id y15sm2189005qko.78.2021.09.30.14.20.50
-        for <kvm@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 30 Sep 2021 14:20:50 -0700 (PDT)
-Received: by mail-yb1-f178.google.com with SMTP id q81so8003202ybq.5
-        for <kvm@vger.kernel.org>; Thu, 30 Sep 2021 14:20:50 -0700 (PDT)
-X-Received: by 2002:a25:df06:: with SMTP id w6mr1562849ybg.459.1633036849801;
- Thu, 30 Sep 2021 14:20:49 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=r0i+4oh5ttmvKzGJaF4duXEtIwD8cGanxYr+JafZRCc=;
+        b=Ja1wwDvZbTgLGDUbOP0JGQJs8D5Bhbje8SlywclrG9dFizJGeRaLUPaajvCSnmQ9JY
+         yf93anm0BRffF3lDjoW7m2HzPzZM4pRQ8nHeXUq6KMjNGqewTP4lZNX4EmvXuKRMhUO5
+         SsiKRy+LQM9uL/kZkTpiMiYylGaoUBUtPlDiGZixWe/uUiQ3mK8wIlVPxoQfa3ZVrY+3
+         O9xD3hJJ4UPiRg0UrjK7kEu28o2WRZ2DE2PXNq/WTVPP9OSGjF/d+EEKMM+dtKS3YVFO
+         ZL/HrR5dy36TDEZVQr0gVyzc4XILn7Kh/caCjg4cyOq99PFOhf6/E2LOQDCNW60Ha4lp
+         FoKg==
+X-Gm-Message-State: AOAM533DPtxfTT3qfNlbB6eh90WEryh5VGvit7LgeGCV56WrfyfUlK8a
+        IoOU6c9l8goLTiC49zF76abKXw==
+X-Google-Smtp-Source: ABdhPJwokKb25gzszvdtUECo3bG3lRZr0uuSLd4XCMxKvvZtnpPLwddgYcgZEB3a0Ltdd5ZnEaTyGQ==
+X-Received: by 2002:a63:40c:: with SMTP id 12mr6830835pge.406.1633037263905;
+        Thu, 30 Sep 2021 14:27:43 -0700 (PDT)
+Received: from google.com (150.12.83.34.bc.googleusercontent.com. [34.83.12.150])
+        by smtp.gmail.com with ESMTPSA id n3sm5723593pjv.15.2021.09.30.14.27.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 Sep 2021 14:27:43 -0700 (PDT)
+Date:   Thu, 30 Sep 2021 14:27:39 -0700
+From:   Ricardo Koller <ricarkol@google.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     eric.auger@redhat.com, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, drjones@redhat.com,
+        alexandru.elisei@arm.com, Paolo Bonzini <pbonzini@redhat.com>,
+        oupton@google.com, james.morse@arm.com, suzuki.poulose@arm.com,
+        shuah@kernel.org, jingzhangos@google.com, pshier@google.com,
+        rananta@google.com, reijiw@google.com
+Subject: Re: [PATCH v3 05/10] KVM: arm64: selftests: Make vgic_init gic
+ version agnostic
+Message-ID: <YVYrywHjwhzgfmBz@google.com>
+References: <20210928184803.2496885-1-ricarkol@google.com>
+ <20210928184803.2496885-6-ricarkol@google.com>
+ <a629c99e-cb41-fb2d-d551-6397774ba765@redhat.com>
+ <87ee96trnl.wl-maz@kernel.org>
 MIME-Version: 1.0
-References: <20210930185031.18648-1-rppt@kernel.org>
-In-Reply-To: <20210930185031.18648-1-rppt@kernel.org>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Thu, 30 Sep 2021 14:20:33 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wjS76My8aJLWJAHd-5GnMEVC1D+kV7DgtV9GjcbtqZdig@mail.gmail.com>
-Message-ID: <CAHk-=wjS76My8aJLWJAHd-5GnMEVC1D+kV7DgtV9GjcbtqZdig@mail.gmail.com>
-Subject: Re: [PATCH v2 0/6] memblock: cleanup memblock_free interface
-To:     Mike Rapoport <rppt@kernel.org>
-Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>,
-        Juergen Gross <jgross@suse.com>,
-        Mike Rapoport <rppt@linux.ibm.com>,
-        Shahab Vahedi <Shahab.Vahedi@synopsys.com>,
-        devicetree <devicetree@vger.kernel.org>,
-        iommu <iommu@lists.linux-foundation.org>,
-        kasan-dev <kasan-dev@googlegroups.com>,
-        KVM list <kvm@vger.kernel.org>,
-        alpha <linux-alpha@vger.kernel.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        linux-efi <linux-efi@vger.kernel.org>,
-        "open list:BROADCOM NVRAM DRIVER" <linux-mips@vger.kernel.org>,
-        Linux-MM <linux-mm@kvack.org>,
-        linux-riscv <linux-riscv@lists.infradead.org>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Linux-sh list <linux-sh@vger.kernel.org>,
-        "open list:SYNOPSYS ARC ARCHITECTURE" 
-        <linux-snps-arc@lists.infradead.org>,
-        linux-um <linux-um@lists.infradead.org>,
-        linux-usb@vger.kernel.org,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        linux-sparc <sparclinux@vger.kernel.org>,
-        xen-devel@lists.xenproject.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87ee96trnl.wl-maz@kernel.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 30, 2021 at 11:50 AM Mike Rapoport <rppt@kernel.org> wrote:
->
-> The first patch is a cleanup of numa_distance allocation in arch_numa I've
-> spotted during the conversion.
-> The second patch is a fix for Xen memory freeing on some of the error
-> paths.
+On Thu, Sep 30, 2021 at 09:05:18AM +0100, Marc Zyngier wrote:
+> On Wed, 29 Sep 2021 18:12:59 +0100,
+> Eric Auger <eric.auger@redhat.com> wrote:
+> > 
+> > If the GICv3 supports compat with GICv2, I think you could be able to
+> > run both tests consecutively. So maybe don't return?
+> 
+> You'll need to recreate a full VM though. Even if the HW supports the
+> compat mode, our GICv3 emulation doesn't.
 
-Well, at least patch 2 looks like something that should go into 5.15
-and be marked for stable.
+I'm not sure how much work would that entail, but sounds like it might
+be too much for a selftest.
 
-Patch 1 looks like a trivial local cleanup, and could go in
-immediately. Patch 4 might be in that same category.
+Thanks,
+Ricardo
 
-The rest look like "next merge window" to me, since they are spread
-out and neither bugfixes nor tiny localized cleanups (iow renaming
-functions, global resulting search-and-replace things).
-
-So my gut feel is that two (maybe three) of these patches should go in
-asap, with three (maybe four) be left for 5.16.
-
-IOW, not trat this as a single series.
-
-Hmm?
-
-             Linus
+> 
+> Thanks,
+> 
+> 	M.
+> 
+> -- 
+> Without deviation from the norm, progress is not possible.
