@@ -2,141 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7626C41DEEE
-	for <lists+kvm@lfdr.de>; Thu, 30 Sep 2021 18:24:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 98B9D41DF01
+	for <lists+kvm@lfdr.de>; Thu, 30 Sep 2021 18:27:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350517AbhI3Q0a (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Sep 2021 12:26:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35426 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350292AbhI3Q01 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Sep 2021 12:26:27 -0400
-Received: from mail-qk1-x731.google.com (mail-qk1-x731.google.com [IPv6:2607:f8b0:4864:20::731])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E7D0C06176D
-        for <kvm@vger.kernel.org>; Thu, 30 Sep 2021 09:24:44 -0700 (PDT)
-Received: by mail-qk1-x731.google.com with SMTP id m7so6357328qke.8
-        for <kvm@vger.kernel.org>; Thu, 30 Sep 2021 09:24:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=oVCTC+nt3p3+hMxDZO10YpzPmIzmwpHDbufnIhpB5sw=;
-        b=Qzvudx/7eTIRT7u9f/lsM4lO+MLgg9dJvfErxgBhnEydnevVQWd23+D5YUSGowYATg
-         5LHFyriFS29ECLsNuDA85jLdOXHfRyzXgbJK/06ZjgAk8HVJonpWUIlnVMatc67PxWT1
-         dn7yqZLpL85aZ8BeVtsKxdoUsWqTIj59egY14M/B//S1wnOh3KRf/3FL55A1Ucv+9BLn
-         jZPeDKdfHkv+LAbUR5/w9ZQdrTCYAyvVBBbLp+uFkKln1Y/zLhjlaaUsKhBgTmEBItm+
-         qlUqzUZVxpXlGnSKyFyL0+KmJa1pa0URiUh1DxnXvMKSutxbzIzA/l2jhx2tK1C9ilDH
-         ds/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=oVCTC+nt3p3+hMxDZO10YpzPmIzmwpHDbufnIhpB5sw=;
-        b=UM2ONR84+D44dLQ/YjeoWzO92G07LTtIMtLYJj86s34FukSx/ns/r2KAL8pPLEuZBp
-         aAYr97h6/b6gKfiiwsBZ+Tqng39yrzveWovRgH3xH7njgI3FQZISg6ZneFy1d2nElgJX
-         Ks+T+K7dZ1K2hGli8Qmo6LL63gvZj6cUkim25NNwMjbPbU5OugyX12Lgr1FjS5Vh2FGc
-         rI13aVleqDsg3CEfTdZtoEA7aG3e3KbAUsVGCphsdi0RvN/S2x/vFWip+muYISUitqBw
-         nG6H38S7RD3d8z55uRco3XYvA8NCY7xLmrVGcmqA3Id0t1iVSRcqFcOfur0echXHVI9Z
-         Pueg==
-X-Gm-Message-State: AOAM530sCRHnyHXcCjOznGE7mwP5OG3NNCkn772Ku7p+3tqCS8WmVeIf
-        RiwzufU7aHX7Uz5iDkhYU8UiQg==
-X-Google-Smtp-Source: ABdhPJwg8n4C63Fas9mtIKb7ayOW8k3lmOKYhJda6CIKMcYnXdwDezyohMM/ijUu5YJfcNLzaFD4WA==
-X-Received: by 2002:a37:d4f:: with SMTP id 76mr5649048qkn.385.1633019083624;
-        Thu, 30 Sep 2021 09:24:43 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-162-113-129.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.129])
-        by smtp.gmail.com with ESMTPSA id y15sm1798840qko.78.2021.09.30.09.24.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Sep 2021 09:24:43 -0700 (PDT)
-Received: from jgg by jggl with local (Exim 4.94)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1mVyrS-000Hjq-5V; Thu, 30 Sep 2021 13:24:42 -0300
-Date:   Thu, 30 Sep 2021 13:24:42 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Max Gurtovoy <mgurtovoy@nvidia.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Doug Ledford <dledford@redhat.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Kirti Wankhede <kwankhede@nvidia.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
-        Saeed Mahameed <saeedm@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>
-Subject: Re: [PATCH mlx5-next 2/7] vfio: Add an API to check migration state
- transition validity
-Message-ID: <20210930162442.GB67618@ziepe.ca>
-References: <20210929075019.48d07deb.alex.williamson@redhat.com>
- <d2e94241-a146-c57d-cf81-8b7d8d00e62d@nvidia.com>
- <20210929091712.6390141c.alex.williamson@redhat.com>
- <e1ba006f-f181-0b89-822d-890396e81c7b@nvidia.com>
- <20210929161433.GA1808627@ziepe.ca>
- <29835bf4-d094-ae6d-1a32-08e65847b52c@nvidia.com>
- <20210929232109.GC3544071@ziepe.ca>
- <d8324d96-c897-b914-16c6-ad0bbb9b13a5@nvidia.com>
- <20210930144752.GA67618@ziepe.ca>
- <d5b68bb7-d4d3-e9d8-1834-dba505bb8595@nvidia.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <d5b68bb7-d4d3-e9d8-1834-dba505bb8595@nvidia.com>
+        id S1350925AbhI3Q3U (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Sep 2021 12:29:20 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49596 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1350367AbhI3Q3T (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Sep 2021 12:29:19 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 1050F61250;
+        Thu, 30 Sep 2021 16:27:37 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1mVyuF-00E2Bn-5n; Thu, 30 Sep 2021 17:27:35 +0100
+Date:   Thu, 30 Sep 2021 17:27:34 +0100
+Message-ID: <87tui2rpu1.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Will Deacon <will@kernel.org>
+Cc:     Fuad Tabba <tabba@google.com>, kvmarm@lists.cs.columbia.edu,
+        james.morse@arm.com, alexandru.elisei@arm.com,
+        suzuki.poulose@arm.com, mark.rutland@arm.com,
+        christoffer.dall@arm.com, pbonzini@redhat.com, drjones@redhat.com,
+        oupton@google.com, qperret@google.com, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kernel-team@android.com
+Subject: Re: [PATCH v6 03/12] KVM: arm64: Move early handlers to per-EC handlers
+In-Reply-To: <20210930133444.GC23809@willie-the-truck>
+References: <20210922124704.600087-1-tabba@google.com>
+        <20210922124704.600087-4-tabba@google.com>
+        <20210930133444.GC23809@willie-the-truck>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: will@kernel.org, tabba@google.com, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, mark.rutland@arm.com, christoffer.dall@arm.com, pbonzini@redhat.com, drjones@redhat.com, oupton@google.com, qperret@google.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 30, 2021 at 06:32:07PM +0300, Max Gurtovoy wrote:
-> > Just prior to open device the vfio pci layer will generate a FLR to
-> > the function so we expect that post open_device has a fresh from reset
-> > fully running device state.
+On Thu, 30 Sep 2021 14:35:57 +0100,
+Will Deacon <will@kernel.org> wrote:
+> > +static bool kvm_hyp_handle_cp15(struct kvm_vcpu *vcpu, u64 *exit_code)
+> > +{
+> > +	if (static_branch_unlikely(&vgic_v3_cpuif_trap) &&
+> > +	    __vgic_v3_perform_cpuif_access(vcpu) == 1)
+> > +		return true;
 > 
-> running also mean that the device doesn't have a clue on its internal state
-> ? or running means unfreezed and unquiesced ?
+> I think you're now calling this for the 64-bit CP15 access path, which I
+> don't think is correct. Maybe have separate handlers for 32-bit v4 64-bit
+> accesses?
 
-The device just got FLR'd and it should be in a clean state and
-operating. Think the VM is booting for the first time.
+FWIW, here's what I'm queuing as a fix.
 
-> > > > driver will see RESUMING toggle off so it will trigger a
-> > > > de-serialization
-> > > You mean stop serialization ?
-> > No, I mean it will take all the migration data that has been uploaded
-> > through the migration region and de-serialize it into active device
-> > state.
-> 
-> you should feed the device way before that.
+Thanks,
 
-I don't know what this means, when the resuming bit is set the
-migration data buffer is wiped and userspace should beging loading
-it. When the resuming bit is cleared whatever is in the migration
-buffer is deserialized into the current device internal state.
+	M.
 
-It is the opposite of saving. When the saving bit is set the current
-device state is serialized into the migration buffer and userspace and
-reads it out.
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index 0397606c0951..1e4177322be7 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -356,7 +356,7 @@ static bool kvm_hyp_handle_sysreg(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 	return false;
+ }
+ 
+-static bool kvm_hyp_handle_cp15(struct kvm_vcpu *vcpu, u64 *exit_code)
++static bool kvm_hyp_handle_cp15_32(struct kvm_vcpu *vcpu, u64 *exit_code)
+ {
+ 	if (static_branch_unlikely(&vgic_v3_cpuif_trap) &&
+ 	    __vgic_v3_perform_cpuif_access(vcpu) == 1)
+diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+index c52d580708e0..4f3992a1aabd 100644
+--- a/arch/arm64/kvm/hyp/nvhe/switch.c
++++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+@@ -160,8 +160,7 @@ static void __pmu_switch_to_host(struct kvm_cpu_context *host_ctxt)
+ 
+ static const exit_handler_fn hyp_exit_handlers[] = {
+ 	[0 ... ESR_ELx_EC_MAX]		= NULL,
+-	[ESR_ELx_EC_CP15_32]		= kvm_hyp_handle_cp15,
+-	[ESR_ELx_EC_CP15_64]		= kvm_hyp_handle_cp15,
++	[ESR_ELx_EC_CP15_32]		= kvm_hyp_handle_cp15_32,
+ 	[ESR_ELx_EC_SYS64]		= kvm_hyp_handle_sysreg,
+ 	[ESR_ELx_EC_SVE]		= kvm_hyp_handle_fpsimd,
+ 	[ESR_ELx_EC_FP_ASIMD]		= kvm_hyp_handle_fpsimd,
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index 0e0d342358f7..9aedc8afc8b9 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -98,8 +98,7 @@ void deactivate_traps_vhe_put(struct kvm_vcpu *vcpu)
+ 
+ static const exit_handler_fn hyp_exit_handlers[] = {
+ 	[0 ... ESR_ELx_EC_MAX]		= NULL,
+-	[ESR_ELx_EC_CP15_32]		= kvm_hyp_handle_cp15,
+-	[ESR_ELx_EC_CP15_64]		= kvm_hyp_handle_cp15,
++	[ESR_ELx_EC_CP15_32]		= kvm_hyp_handle_cp15_32,
+ 	[ESR_ELx_EC_SYS64]		= kvm_hyp_handle_sysreg,
+ 	[ESR_ELx_EC_SVE]		= kvm_hyp_handle_fpsimd,
+ 	[ESR_ELx_EC_FP_ASIMD]		= kvm_hyp_handle_fpsimd,
 
-> 1. you initialize at  _RUNNING bit == 001b. No problem.
-> 
-> 2. state stream arrives, migration SW raise _RESUMING bit. should it be 101b
-> or 100b ? for now it's 100b. But according to your statement is should be
-> 101b (invalid today) since device state can change. right ?
-
-Running means the device state chanages independently, the controlled
-change of the device state via deserializing the migration buffer is
-different. Both running and saving commands need running to be zero.
-
-ie commands that are marked invalid in the uapi comment are rejected
-at the start - and that is probably the core helper we should provide.
-
-> 3. Then you should indicate that all the state was serialized to the device
-> (actually to all the pci devices). 100b mean RESUMING and not RUNNING so
-> maybe this can say RESUMED and state can't change now ?
-
-State is not loaded into the device until the resuming bit is
-cleared. There is no RESUMED state until we incorporate Artem's
-proposal for an additional bit eg 1001b - running with DMA master
-disabled.
-
-Jason
+-- 
+Without deviation from the norm, progress is not possible.
