@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0939041D5E4
-	for <lists+kvm@lfdr.de>; Thu, 30 Sep 2021 11:00:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 880E841D613
+	for <lists+kvm@lfdr.de>; Thu, 30 Sep 2021 11:14:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349171AbhI3JCY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Sep 2021 05:02:24 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:42783 "EHLO
+        id S1349272AbhI3JPv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Sep 2021 05:15:51 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34550 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1348335AbhI3JCQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 30 Sep 2021 05:02:16 -0400
+        by vger.kernel.org with ESMTP id S1349263AbhI3JPv (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 30 Sep 2021 05:15:51 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632992434;
+        s=mimecast20190719; t=1632993248;
         h=from:from:reply-to:reply-to:subject:subject:date:date:
          message-id:message-id:to:to:cc:cc:mime-version:mime-version:
          content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=moU+7B0e6GAwk20kCPZuVoIHcKpWH+cvFU2qvdImZH8=;
-        b=HP0R63llqPA0KlQsCAaU4xfxuzlEJKeUihAMcyNizYQNhLc/tD1z7Iu84ZWCnPcTnv1xJV
-        ecBCsRFqBWiFfah3yRDdY0p/aARoOvBDEOC2fGPHJ1M1j2XFlJ6bktbwrelqpvGYUxVKcs
-        2/Nxu2nlUaE4d6RXLrVz5BHklwkaWAg=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-74-tDDBXgvQOmeNRGVOcSvgfQ-1; Thu, 30 Sep 2021 05:00:32 -0400
-X-MC-Unique: tDDBXgvQOmeNRGVOcSvgfQ-1
-Received: by mail-wm1-f70.google.com with SMTP id j21-20020a05600c1c1500b0030ccce95837so1715282wms.3
-        for <kvm@vger.kernel.org>; Thu, 30 Sep 2021 02:00:32 -0700 (PDT)
+        bh=5i00CB+tDLW94gAUllzqnCmt6UVPauV4nQL/hdD8AIo=;
+        b=dK1w64uxld0Gp51PRIDovytzfddnQKrwqh6HKukV9JiFEUeG8IszX2G7QdZZxXV5rcbxSW
+        fN6LjQRgE3x6Hycj81lJ9CR9OIP73L6yq0WCnMAuU+hxEMaEPecsgTtiyNIsDd+uJw24V/
+        g+FSAOPdKkfBb+cZ+2Tskxu5zK3Cwuc=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-505-t61XzqqhMBaH2ff6zUcrhQ-1; Thu, 30 Sep 2021 05:14:07 -0400
+X-MC-Unique: t61XzqqhMBaH2ff6zUcrhQ-1
+Received: by mail-wm1-f72.google.com with SMTP id z137-20020a1c7e8f000000b0030cd1800d86so2645936wmc.2
+        for <kvm@vger.kernel.org>; Thu, 30 Sep 2021 02:14:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:subject:to:cc:references:from
          :message-id:date:user-agent:mime-version:in-reply-to
          :content-transfer-encoding:content-language;
-        bh=moU+7B0e6GAwk20kCPZuVoIHcKpWH+cvFU2qvdImZH8=;
-        b=RQnv9OUnVWoQ4f2cXlNEsvdqj/N24P6W0nLB7TtSKk8taw9SEwgETylmFbpHHvEsjD
-         fXJEDbTiEpbhRwOG21m5sM9ohbwY7Dp66kwTNmynkM5yrvodmdPrMl0MOLFZMS+G7s8o
-         UClqj4O8vpeI8nAaNlfiBi5imHqBrBEC8Q8O8GCXnRsqN/iBpYt1QNfoOMjHm8/aHNx1
-         gxNf81g7qeYi0WbCVkZWyUcMnUvoeDLDBKTRQjgtUucoyLLFZnfJKmfnbx9i/TyBFZSq
-         vG/UQIlhIwc6+yuDEWori6q+m+DRctKJq9AVvbsUvbzdYB91UrwarU4CkyW4Cr657aGP
-         GtOw==
-X-Gm-Message-State: AOAM530Htf2mxZY+80SCDzoU+PumAfdjQ0x+jBFl1zUBnsYXnrDhe7TI
-        TLid+AQwmnsQaQSTL43uskYV9lu6BvwcAXos5CzgxlD4ASV7Yu3nx2cZUKYJcbRSzF+xxcZE5Ev
-        m1vc/H/LURF5E
-X-Received: by 2002:a5d:5255:: with SMTP id k21mr4845887wrc.421.1632992431049;
-        Thu, 30 Sep 2021 02:00:31 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwOLCH0kASjSLU5nF/dpC0BtrKbKaslmi2d2ORJoeYA7immIc46GSd/795Jm2ytJfdQZ7YycA==
-X-Received: by 2002:a5d:5255:: with SMTP id k21mr4845868wrc.421.1632992430873;
-        Thu, 30 Sep 2021 02:00:30 -0700 (PDT)
+        bh=5i00CB+tDLW94gAUllzqnCmt6UVPauV4nQL/hdD8AIo=;
+        b=bQbzJTcDfOG0vrfuagPREQdoiNQcejVynjIEZycTl7PAmOof6W0bBZQYA5yqkwgW0C
+         uLAvtt1ithGa7Vl5YEdwyJuX2duVYUcHcjQfb5ebgIsKiSJLADUcc3Hmt8ja4mKNpRPn
+         nXHg4s2I+4DVcnb5jS01OHlZt4Zt5+pEmfS8gBSPbCOcF0aL5TaIRopjfTxUkH56y/oP
+         4uVA1yonAj6b5SEQrJ36XDcCyO4i941UaW8zRug+LNEbiCtOe6Xq8NF3jm+3fCqNgXT5
+         eiwcTq+RErHgIViuZCWafR8lxB6pMbAk06Ql1R8XHsCwDocaUVXk7BWmacbVLc6jOY1H
+         Ahiw==
+X-Gm-Message-State: AOAM532igtSM/0UppuMamgVrPReyVcepaopevlU6bq0wx/ZK6sKosuXQ
+        LT7YbW62NcvjGKhMd1vNVI7w1bj+2M6b7EwkMqu1ZS8klqZ7es4t66A1DoqTvwDGQPrPcpwuVrn
+        jFYRxlrEngMij
+X-Received: by 2002:a7b:c5c9:: with SMTP id n9mr14773846wmk.141.1632993245865;
+        Thu, 30 Sep 2021 02:14:05 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwXnJJHykF2wK68naO4trA+VWC8AvHvLKrCrkS+NvdwtjLKTrVSexNUWshv4izEe7G3+3ZnWQ==
+X-Received: by 2002:a7b:c5c9:: with SMTP id n9mr14773822wmk.141.1632993245686;
+        Thu, 30 Sep 2021 02:14:05 -0700 (PDT)
 Received: from ?IPv6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id d8sm2508461wrv.80.2021.09.30.02.00.29
+        by smtp.gmail.com with ESMTPSA id r4sm2456106wma.48.2021.09.30.02.14.03
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 30 Sep 2021 02:00:30 -0700 (PDT)
+        Thu, 30 Sep 2021 02:14:04 -0700 (PDT)
 Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH v3 09/10] KVM: arm64: selftests: Add test for legacy GICv3
- REDIST base partially above IPA range
+Subject: Re: [PATCH v3 10/10] KVM: arm64: selftests: Add basic ITS device
+ tests
 To:     Ricardo Koller <ricarkol@google.com>, kvm@vger.kernel.org,
         maz@kernel.org, kvmarm@lists.cs.columbia.edu, drjones@redhat.com,
         alexandru.elisei@arm.com
@@ -63,92 +63,103 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>, oupton@google.com,
         jingzhangos@google.com, pshier@google.com, rananta@google.com,
         reijiw@google.com
 References: <20210928184803.2496885-1-ricarkol@google.com>
- <20210928184803.2496885-10-ricarkol@google.com>
+ <20210929001012.2539461-1-ricarkol@google.com>
 From:   Eric Auger <eric.auger@redhat.com>
-Message-ID: <b97a5ef9-d598-78f5-3ccf-d650ecc256c8@redhat.com>
-Date:   Thu, 30 Sep 2021 11:00:28 +0200
+Message-ID: <a7df5700-ebef-9fd3-3067-ae35cbaaf3a9@redhat.com>
+Date:   Thu, 30 Sep 2021 11:14:02 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.10.1
 MIME-Version: 1.0
-In-Reply-To: <20210928184803.2496885-10-ricarkol@google.com>
+In-Reply-To: <20210929001012.2539461-1-ricarkol@google.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Ricardo,
 
-
-On 9/28/21 8:48 PM, Ricardo Koller wrote:
-> Add a new test into vgic_init which checks that the first vcpu fails to
-> run if there is not sufficient REDIST space below the addressable IPA
-> range.  This only applies to the KVM_VGIC_V3_ADDR_TYPE_REDIST legacy API
-> as the required REDIST space is not know when setting the DIST region.
->
-> Note that using the REDIST_REGION API results in a different check at
-> first vcpu run: that the number of redist regions is enough for all
-> vcpus. And there is already a test for that case in, the first step of
-> test_v3_new_redist_regions.
+On 9/29/21 2:10 AM, Ricardo Koller wrote:
+> Add some ITS device tests: general KVM device tests (address not defined
+> already, address aligned) and tests for the ITS region being within the
+> addressable IPA range.
 >
 > Signed-off-by: Ricardo Koller <ricarkol@google.com>
 > ---
->  .../testing/selftests/kvm/aarch64/vgic_init.c | 34 +++++++++++++++++++
->  1 file changed, 34 insertions(+)
+>  .../testing/selftests/kvm/aarch64/vgic_init.c | 42 +++++++++++++++++++
+>  1 file changed, 42 insertions(+)
 >
 > diff --git a/tools/testing/selftests/kvm/aarch64/vgic_init.c b/tools/testing/selftests/kvm/aarch64/vgic_init.c
-> index 77a1941e61fa..417a9a515cad 100644
+> index 417a9a515cad..180221ec325d 100644
 > --- a/tools/testing/selftests/kvm/aarch64/vgic_init.c
 > +++ b/tools/testing/selftests/kvm/aarch64/vgic_init.c
-> @@ -570,6 +570,39 @@ static void test_v3_last_bit_single_rdist(void)
+> @@ -603,6 +603,47 @@ static void test_v3_redist_ipa_range_check_at_vcpu_run(void)
 >  	vm_gic_destroy(&v);
 >  }
 >  
-> +/* Uses the legacy REDIST region API. */
-> +static void test_v3_redist_ipa_range_check_at_vcpu_run(void)
+> +static void test_v3_its_region(void)
 > +{
 > +	struct vm_gic v;
-> +	int ret, i;
 > +	uint64_t addr;
+> +	int its_fd, ret;
 > +
-> +	v = vm_gic_create_with_vcpus(KVM_DEV_TYPE_ARM_VGIC_V3, 1);
+> +	v = vm_gic_create_with_vcpus(KVM_DEV_TYPE_ARM_VGIC_V3, NR_VCPUS);
+> +	its_fd = kvm_create_device(v.vm, KVM_DEV_TYPE_ARM_VGIC_ITS, false);
+this may fail if the ITS device has not been registered by KVM (host GICv2)
+
+Maybe refine the patch title mentionning this is an ITS device "init" test.
+as per Documentation/virt/kvm/devices/arm-vgic-its.rst we could also try
+instantiating the ITS before the GIC and try instantiating several ITSs
+with overlapping addresses.
+But I would totally understand if you consider this out of the scope of
+your  fixes + tests.
+
+Thanks!
+
+Eric
 > +
-> +	/* Set space for 3 redists, we have 1 vcpu, so this succeeds. */
-> +	addr = max_phys_size - (3 * 2 * 0x10000);
-> +	kvm_device_access(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
-> +				 KVM_VGIC_V3_ADDR_TYPE_REDIST, &addr, true);
-> +
-> +	addr = 0x00000;
-> +	kvm_device_access(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
-> +			KVM_VGIC_V3_ADDR_TYPE_DIST, &addr, true);
-> +
-> +	/* Add the rest of the VCPUs */
-> +	for (i = 1; i < NR_VCPUS; ++i)
-> +		vm_vcpu_add_default(v.vm, i, guest_code);
-> +
-> +	kvm_device_access(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
-> +			  KVM_DEV_ARM_VGIC_CTRL_INIT, NULL, true);
-> +
-> +	/* Attempt to run a vcpu without enough redist space. */
-> +	ret = run_vcpu(v.vm, 2);
+> +	addr = 0x401000;
+> +	ret = _kvm_device_access(its_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+> +			  KVM_VGIC_ITS_ADDR_TYPE, &addr, true);
 > +	TEST_ASSERT(ret && errno == EINVAL,
-> +		"redist base+size above PA range detected on 1st vcpu run");
+> +		"ITS region with misaligned address");
 > +
+> +	addr = max_phys_size;
+> +	ret = _kvm_device_access(its_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+> +			  KVM_VGIC_ITS_ADDR_TYPE, &addr, true);
+> +	TEST_ASSERT(ret && errno == E2BIG,
+> +		"register ITS region with base address beyond IPA range");
+> +
+> +	addr = max_phys_size - 0x10000;
+> +	ret = _kvm_device_access(its_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+> +			  KVM_VGIC_ITS_ADDR_TYPE, &addr, true);
+> +	TEST_ASSERT(ret && errno == E2BIG,
+> +		"Half of ITS region is beyond IPA range");
+> +
+> +	/* This one succeeds setting the ITS base */
+> +	addr = 0x400000;
+> +	kvm_device_access(its_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+> +			  KVM_VGIC_ITS_ADDR_TYPE, &addr, true);
+> +
+> +	addr = 0x300000;
+> +	ret = _kvm_device_access(its_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+> +			  KVM_VGIC_ITS_ADDR_TYPE, &addr, true);
+> +	TEST_ASSERT(ret && errno == EEXIST, "ITS base set again");
+> +
+> +	close(its_fd);
 > +	vm_gic_destroy(&v);
 > +}
 > +
 >  /*
 >   * Returns 0 if it's possible to create GIC device of a given type (V2 or V3).
 >   */
-> @@ -621,6 +654,7 @@ void run_tests(uint32_t gic_dev_type)
->  		test_v3_typer_accesses();
+> @@ -655,6 +696,7 @@ void run_tests(uint32_t gic_dev_type)
 >  		test_v3_last_bit_redist_regions();
 >  		test_v3_last_bit_single_rdist();
-> +		test_v3_redist_ipa_range_check_at_vcpu_run();
+>  		test_v3_redist_ipa_range_check_at_vcpu_run();
+> +		test_v3_its_region();
 >  	}
 >  }
 >  
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-
-Eric
 
