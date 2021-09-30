@@ -2,126 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B31A341DB5D
-	for <lists+kvm@lfdr.de>; Thu, 30 Sep 2021 15:44:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3FF3B41DBDD
+	for <lists+kvm@lfdr.de>; Thu, 30 Sep 2021 16:04:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351686AbhI3Npu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Sep 2021 09:45:50 -0400
-Received: from mga12.intel.com ([192.55.52.136]:39054 "EHLO mga12.intel.com"
+        id S1351731AbhI3OGH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Sep 2021 10:06:07 -0400
+Received: from mail.kernel.org ([198.145.29.99]:53874 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1351414AbhI3Npu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Sep 2021 09:45:50 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10122"; a="204671574"
-X-IronPort-AV: E=Sophos;i="5.85,336,1624345200"; 
-   d="scan'208";a="204671574"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Sep 2021 06:44:07 -0700
-X-IronPort-AV: E=Sophos;i="5.85,336,1624345200"; 
-   d="scan'208";a="564177724"
-Received: from blu2-mobl3.ccr.corp.intel.com (HELO [10.254.214.141]) ([10.254.214.141])
-  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Sep 2021 06:44:00 -0700
-Cc:     baolu.lu@linux.intel.com,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>, "hch@lst.de" <hch@lst.de>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "parav@mellanox.com" <parav@mellanox.com>,
-        "lkml@metux.net" <lkml@metux.net>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "lushenming@huawei.com" <lushenming@huawei.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "corbet@lwn.net" <corbet@lwn.net>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "yi.l.liu@linux.intel.com" <yi.l.liu@linux.intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "dwmw2@infradead.org" <dwmw2@infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        "Lu, Baolu" <baolu.lu@intel.com>
-References: <20210919063848.1476776-1-yi.l.liu@intel.com>
- <20210919063848.1476776-11-yi.l.liu@intel.com>
- <20210922152407.1bfa6ff7.alex.williamson@redhat.com>
- <20210922234954.GB964074@nvidia.com>
- <BN9PR11MB543333AD3C81312115686AAA8CA39@BN9PR11MB5433.namprd11.prod.outlook.com>
- <YUxTvCt1mYDntO8z@myrica> <20210923112716.GE964074@nvidia.com>
- <BN9PR11MB5433BCFCF3B0CB657E9BFE898CA39@BN9PR11MB5433.namprd11.prod.outlook.com>
- <20210923122220.GL964074@nvidia.com>
- <BN9PR11MB5433F33CB7CFBCD41BE2F5C68CAA9@BN9PR11MB5433.namprd11.prod.outlook.com>
-From:   Lu Baolu <baolu.lu@linux.intel.com>
-Subject: Re: [RFC 10/20] iommu/iommufd: Add IOMMU_DEVICE_GET_INFO
-Message-ID: <9a04c421-4a25-f1de-a896-321026b3f0ce@linux.intel.com>
-Date:   Thu, 30 Sep 2021 21:43:58 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
-MIME-Version: 1.0
-In-Reply-To: <BN9PR11MB5433F33CB7CFBCD41BE2F5C68CAA9@BN9PR11MB5433.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+        id S236263AbhI3OGG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Sep 2021 10:06:06 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id AFB8361440;
+        Thu, 30 Sep 2021 14:04:23 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1mVwfd-00E0Ac-T4; Thu, 30 Sep 2021 15:04:22 +0100
+Date:   Thu, 30 Sep 2021 15:04:21 +0100
+Message-ID: <87zgrurwgq.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     David Matlack <dmatlack@google.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
+        KVMARM <kvmarm@lists.cs.columbia.edu>,
+        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Ben Gardon <bgardon@google.com>,
+        Aaron Lewis <aaronlewis@google.com>,
+        Venkatesh Srinivas <venkateshs@google.com>
+Subject: Re: [PATCH v1 3/3] KVM: arm64: Add histogram stats for handling time of arch specific exit reasons
+In-Reply-To: <CALzav=cuzT=u6G0TCVZUfEgAKOCKTSCDE8x2v5qc-Gd_NL-pzg@mail.gmail.com>
+References: <20210922010851.2312845-1-jingzhangos@google.com>
+        <20210922010851.2312845-3-jingzhangos@google.com>
+        <87czp0voqg.wl-maz@kernel.org>
+        <d16ecbd2-2bc9-2691-a21d-aef4e6f007b9@redhat.com>
+        <YUtyVEpMBityBBNl@google.com>
+        <875yusv3vm.wl-maz@kernel.org>
+        <CALzav=cuzT=u6G0TCVZUfEgAKOCKTSCDE8x2v5qc-Gd_NL-pzg@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: dmatlack@google.com, seanjc@google.com, pbonzini@redhat.com, jingzhangos@google.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, will@kernel.org, pshier@google.com, oupton@google.com, jmattson@google.com, bgardon@google.com, aaronlewis@google.com, venkateshs@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2021/9/30 16:49, Tian, Kevin wrote:
->> From: Jason Gunthorpe <jgg@nvidia.com>
->> Sent: Thursday, September 23, 2021 8:22 PM
->>
->>>> These are different things and need different bits. Since the ARM path
->>>> has a lot more code supporting it, I'd suggest Intel should change
->>>> their code to use IOMMU_BLOCK_NO_SNOOP and abandon
->> IOMMU_CACHE.
->>>
->>> I didn't fully get this point. The end result is same, i.e. making the DMA
->>> cache-coherent when IOMMU_CACHE is set. Or if you help define the
->>> behavior of IOMMU_CACHE, what will you define now?
->>
->> It is clearly specifying how the kernel API works:
->>
->>   !IOMMU_CACHE
->>     must call arch cache flushers
->>   IOMMU_CACHE -
->>     do not call arch cache flushers
->>   IOMMU_CACHE|IOMMU_BLOCK_NO_SNOOP -
->>     dot not arch cache flushers, and ignore the no snoop bit.
+On Thu, 23 Sep 2021 00:22:12 +0100,
+David Matlack <dmatlack@google.com> wrote:
 > 
-> Who will set IOMMU_BLOCK_NO_SNOOP? I feel this is arch specific
-> knowledge about how cache coherency is implemented, i.e.
-> when IOMMU_CACHE is set intel-iommu driver just maps it to
-> blocking no-snoop. It's not necessarily to be an attribute in
-> the same level as IOMMU_CACHE?
+> On Wed, Sep 22, 2021 at 11:53 AM Marc Zyngier <maz@kernel.org> wrote:
+> >
+> > On Wed, 22 Sep 2021 19:13:40 +0100,
+> > Sean Christopherson <seanjc@google.com> wrote:
+> >
+> > > Stepping back a bit, this is one piece of the larger issue of how to
+> > > modernize KVM for hyperscale usage.  BPF and tracing are great when
+> > > the debugger has root access to the machine and can rerun the
+> > > failing workload at will.  They're useless for identifying trends
+> > > across large numbers of machines, triaging failures after the fact,
+> > > debugging performance issues with workloads that the debugger
+> > > doesn't have direct access to, etc...
+> >
+> > Which is why I suggested the use of trace points as kernel module
+> > hooks to perform whatever accounting you require. This would give you
+> > the same level of detail this series exposes.
 > 
->>
->> On Intel it should refuse to create a !IOMMU_CACHE since the HW can't
->> do that.
-> 
-> Agree. In reality I guess this is not hit because all devices are marked
-> coherent on Intel platforms...
-> 
-> Baolu, any insight here?
+> How would a kernel module (or BPF program) get the data to userspace?
+> The KVM stats interface that Jing added requires KVM to know how to
+> get the data when handling the read() syscall.
 
-I am trying to follow the discussion here. Please guide me if I didn't
-get the right context.
+I don't think it'd be that hard to funnel stats generated in a module
+through the same read interface.
 
-Here, we are discussing arch_sync_dma_for_cpu() and
-arch_sync_dma_for_device(). The x86 arch has clflush to sync dma buffer
-for device, but I can't see any instruction to sync dma buffer for cpu
-if the device is not cache coherent. Is that the reason why x86 can't
-have an implementation for arch_sync_dma_for_cpu(), hence all devices
-are marked coherent?
-
-> Thanks
-> Kevin
+> > And I'm all for adding these hooks where it matters as long as they
+> > are not considered ABI and don't appear in /sys/debug/tracing (in
+> > general, no userspace visibility).
+> >
+> > The scheduler is a interesting example of this, as it exposes all sort
+> > of hooks for people to look under the hood. No user of the hook? No
+> > overhead, no additional memory used. I may have heard that Android
+> > makes heavy use of this.
+> >
+> > Because I'm pretty sure that whatever stat we expose, every cloud
+> > vendor will want their own variant, so we may just as well put the
+> > matter in their own hands.
 > 
+> I think this can be mitigated by requiring sufficient justification
+> when adding a new stat to KVM. There has to be a real use-case and it
+> has to be explained in the changelog. If a stat has a use-case for one
+> cloud provider, it will likely be useful to other cloud providers as
+> well.
 
-Best regards,
-baolu
+My (limited) personal experience is significantly different. The
+diversity of setups make the set of relevant stats pretty hard to
+guess (there isn't much in common if you use KVM to strictly partition
+a system vs oversubscribing it).
+
+> 
+> >
+> > I also wouldn't discount BPF as a possibility. You could perfectly
+> > have permanent BPF programs running from the moment you boot the
+> > system, and use that to generate your histograms. This isn't necessary
+> > a one off, debug only solution.
+> >
+> > > Logging is a similar story, e.g. using _ratelimited() printk to aid
+> > > debug works well when there are a very limited number of VMs and
+> > > there is a human that can react to arbitrary kernel messages, but
+> > > it's basically useless when there are 10s or 100s of VMs and taking
+> > > action on a kernel message requires a prior knowledge of the
+> > > message.
+> >
+> > I'm not sure logging is remotely the same. For a start, the kernel
+> > should not log anything unless something has oopsed (and yes, I still
+> > have some bits to clean on the arm64 side). I'm not even sure what you
+> > would want to log. I'd like to understand the need here, because I
+> > feel like I'm missing something.
+> >
+> > > I'm certainly not expecting other people to solve our challenges,
+> > > and I fully appreciate that there are many KVM users that don't care
+> > > at all about scalability, but I'm hoping we can get the community at
+> > > large, and especially maintainers and reviewers, to also consider
+> > > at-scale use cases when designing, implementing, reviewing, etc...
+> >
+> > My take is that scalability has to go with flexibility. Anything that
+> > gets hardcoded will quickly become a burden: I definitely regret
+> > adding the current KVM trace points, as they don't show what I need,
+> > and I can't change them as they are ABI.
+> 
+> This brings up a good discussion topic: To what extent are the KVM
+> stats themselves an ABI? I don't think this is documented anywhere.
+> The API itself is completely dynamic and does not hardcode a list of
+> stats or metadata about them. Userspace has to read stats fd to see
+> what's there.
+> 
+> Fwiw we just deleted the lpages stat without any drama.
+
+Maybe the new discoverable interface makes dropping some stats
+easier. But it still remains that what is useless for someone has the
+potential of being crucial for someone else. I wouldn't be surprised
+if someone would ask for this stat back once they upgrade to a recent
+host kernel, probably in a couple of years from now.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
