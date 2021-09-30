@@ -2,41 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2683641E230
+	by mail.lfdr.de (Postfix) with ESMTP id 2C49B41E231
 	for <lists+kvm@lfdr.de>; Thu, 30 Sep 2021 21:23:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347072AbhI3TZ0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Sep 2021 15:25:26 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:30379 "EHLO
+        id S1347214AbhI3TZ2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Sep 2021 15:25:28 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23456 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1346582AbhI3TZZ (ORCPT
+        by vger.kernel.org with ESMTP id S1346668AbhI3TZZ (ORCPT
         <rfc822;kvm@vger.kernel.org>); Thu, 30 Sep 2021 15:25:25 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
         s=mimecast20190719; t=1633029819;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=zNOre0trKmNXxzVKIX9EN9wdmLQm4HURP5DLo5E2YLU=;
-        b=R0wPB50uqdopIKENYQ8JRQX8FqrfG7ZO1Rs43Ek2xf6lghTK3iG7CaZ1FnYSm+yXlh3Qhz
-        LjPR1aI3xIZSEKZceq14JCa8ojGZFX52xpt9HEOVgwlp5wLFqfpl6ycyeXTps23+o+vzsQ
-        of1uuLuDAWY5cV/EyR7Cg2NvlViDtKw=
+        bh=jbMK4HVV8asGVWazrnO0pSu8+WuJyIwLq7eFx41Wu2Y=;
+        b=A0JNxTLljkkxR//2rb/AUGhBvXsenl459rolhtr5ZyPFcj6wwZ4gT+pwYCstWtDvQpypZG
+        Uirnxxjb49PUZOj1T+EozF+RYlE/for4G0PyfAT7R0KORIFxNivbkY2qGHtGBlUqNQbk/Y
+        qhA3Cz7oh4wIUcGFvFshvMbbkOqMQE8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-466-wUqJRgtWPdmTb-Ww9-ZBDw-1; Thu, 30 Sep 2021 15:23:35 -0400
-X-MC-Unique: wUqJRgtWPdmTb-Ww9-ZBDw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+ us-mta-529-cmiU7vNvM7iplzx5ajQpMw-1; Thu, 30 Sep 2021 15:23:35 -0400
+X-MC-Unique: cmiU7vNvM7iplzx5ajQpMw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 06E3518D6A2C;
-        Thu, 30 Sep 2021 19:23:33 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C0727804173;
+        Thu, 30 Sep 2021 19:23:32 +0000 (UTC)
 Received: from fuller.cnet (ovpn-112-4.gru2.redhat.com [10.97.112.4])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 870F36CA2E;
-        Thu, 30 Sep 2021 19:23:31 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9594F69FC8;
+        Thu, 30 Sep 2021 19:23:30 +0000 (UTC)
 Received: by fuller.cnet (Postfix, from userid 1000)
-        id 108FF416D4AD; Thu, 30 Sep 2021 16:14:16 -0300 (-03)
-Date:   Thu, 30 Sep 2021 16:14:16 -0300
+        id 477D9416D5C1; Thu, 30 Sep 2021 16:21:07 -0300 (-03)
+Date:   Thu, 30 Sep 2021 16:21:07 -0300
 From:   Marcelo Tosatti <mtosatti@redhat.com>
-To:     Oliver Upton <oupton@google.com>
+To:     Oliver Upton <oupton@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>
 Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
         Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
@@ -52,117 +53,236 @@ Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
         linux-arm-kernel@lists.infradead.org,
         Andrew Jones <drjones@redhat.com>,
         Will Deacon <will@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v8 7/7] KVM: x86: Expose TSC offset controls to userspace
-Message-ID: <20210930191416.GA19068@fuller.cnet>
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Thomas Gleixner <tglx@linutronix.de>
+Subject: Re: [PATCH v8 4/7] KVM: x86: Report host tsc and realtime values in
+ KVM_GET_CLOCK
+Message-ID: <20210930192107.GB19068@fuller.cnet>
 References: <20210916181538.968978-1-oupton@google.com>
- <20210916181538.968978-8-oupton@google.com>
+ <20210916181538.968978-5-oupton@google.com>
+ <20210929185629.GA10933@fuller.cnet>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210916181538.968978-8-oupton@google.com>
+In-Reply-To: <20210929185629.GA10933@fuller.cnet>
 User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 16, 2021 at 06:15:38PM +0000, Oliver Upton wrote:
-> To date, VMM-directed TSC synchronization and migration has been a bit
-> messy. KVM has some baked-in heuristics around TSC writes to infer if
-> the VMM is attempting to synchronize. This is problematic, as it depends
-> on host userspace writing to the guest's TSC within 1 second of the last
-> write.
+On Wed, Sep 29, 2021 at 03:56:29PM -0300, Marcelo Tosatti wrote:
+> Oliver,
 > 
-> A much cleaner approach to configuring the guest's views of the TSC is to
-> simply migrate the TSC offset for every vCPU. Offsets are idempotent,
-> and thus not subject to change depending on when the VMM actually
-> reads/writes values from/to KVM. The VMM can then read the TSC once with
-> KVM_GET_CLOCK to capture a (realtime, host_tsc) pair at the instant when
-> the guest is paused.
+> Do you have any numbers for the improvement in guests CLOCK_REALTIME
+> accuracy across migration, when this is in place?
 > 
-> Cc: David Matlack <dmatlack@google.com>
-> Cc: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Oliver Upton <oupton@google.com>
-
-
-> ---
->  Documentation/virt/kvm/devices/vcpu.rst |  57 ++++++++++++
->  arch/x86/include/asm/kvm_host.h         |   1 +
->  arch/x86/include/uapi/asm/kvm.h         |   4 +
->  arch/x86/kvm/x86.c                      | 110 ++++++++++++++++++++++++
->  4 files changed, 172 insertions(+)
+> On Thu, Sep 16, 2021 at 06:15:35PM +0000, Oliver Upton wrote:
+> > Handling the migration of TSCs correctly is difficult, in part because
+> > Linux does not provide userspace with the ability to retrieve a (TSC,
+> > realtime) clock pair for a single instant in time. In lieu of a more
+> > convenient facility, KVM can report similar information in the kvm_clock
+> > structure.
+> > 
+> > Provide userspace with a host TSC & realtime pair iff the realtime clock
+> > is based on the TSC. If userspace provides KVM_SET_CLOCK with a valid
+> > realtime value, advance the KVM clock by the amount of elapsed time. Do
+> > not step the KVM clock backwards, though, as it is a monotonic
+> > oscillator.
+> > 
+> > Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+> > Signed-off-by: Oliver Upton <oupton@google.com>
+> > ---
+> >  Documentation/virt/kvm/api.rst  | 42 ++++++++++++++++++++++++++-------
+> >  arch/x86/include/asm/kvm_host.h |  3 +++
+> >  arch/x86/kvm/x86.c              | 36 +++++++++++++++++++++-------
+> >  include/uapi/linux/kvm.h        |  7 +++++-
+> >  4 files changed, 70 insertions(+), 18 deletions(-)
+> > 
+> > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> > index a6729c8cf063..d0b9c986cf6c 100644
+> > --- a/Documentation/virt/kvm/api.rst
+> > +++ b/Documentation/virt/kvm/api.rst
+> > @@ -993,20 +993,34 @@ such as migration.
+> >  When KVM_CAP_ADJUST_CLOCK is passed to KVM_CHECK_EXTENSION, it returns the
+> >  set of bits that KVM can return in struct kvm_clock_data's flag member.
+> >  
+> > -The only flag defined now is KVM_CLOCK_TSC_STABLE.  If set, the returned
+> > -value is the exact kvmclock value seen by all VCPUs at the instant
+> > -when KVM_GET_CLOCK was called.  If clear, the returned value is simply
+> > -CLOCK_MONOTONIC plus a constant offset; the offset can be modified
+> > -with KVM_SET_CLOCK.  KVM will try to make all VCPUs follow this clock,
+> > -but the exact value read by each VCPU could differ, because the host
+> > -TSC is not stable.
+> > +FLAGS:
+> > +
+> > +KVM_CLOCK_TSC_STABLE.  If set, the returned value is the exact kvmclock
+> > +value seen by all VCPUs at the instant when KVM_GET_CLOCK was called.
+> > +If clear, the returned value is simply CLOCK_MONOTONIC plus a constant
+> > +offset; the offset can be modified with KVM_SET_CLOCK.  KVM will try
+> > +to make all VCPUs follow this clock, but the exact value read by each
+> > +VCPU could differ, because the host TSC is not stable.
+> > +
+> > +KVM_CLOCK_REALTIME.  If set, the `realtime` field in the kvm_clock_data
+> > +structure is populated with the value of the host's real time
+> > +clocksource at the instant when KVM_GET_CLOCK was called. If clear,
+> > +the `realtime` field does not contain a value.
+> > +
+> > +KVM_CLOCK_HOST_TSC.  If set, the `host_tsc` field in the kvm_clock_data
+> > +structure is populated with the value of the host's timestamp counter (TSC)
+> > +at the instant when KVM_GET_CLOCK was called. If clear, the `host_tsc` field
+> > +does not contain a value.
+> >  
+> >  ::
+> >  
+> >    struct kvm_clock_data {
+> >  	__u64 clock;  /* kvmclock current value */
+> >  	__u32 flags;
+> > -	__u32 pad[9];
+> > +	__u32 pad0;
+> > +	__u64 realtime;
+> > +	__u64 host_tsc;
+> > +	__u32 pad[4];
+> >    };
+> >  
+> >  
+> > @@ -1023,12 +1037,22 @@ Sets the current timestamp of kvmclock to the value specified in its parameter.
+> >  In conjunction with KVM_GET_CLOCK, it is used to ensure monotonicity on scenarios
+> >  such as migration.
+> >  
+> > +FLAGS:
+> > +
+> > +KVM_CLOCK_REALTIME.  If set, KVM will compare the value of the `realtime` field
+> > +with the value of the host's real time clocksource at the instant when
+> > +KVM_SET_CLOCK was called. The difference in elapsed time is added to the final
+> > +kvmclock value that will be provided to guests.
+> > +
+> >  ::
+> >  
+> >    struct kvm_clock_data {
+> >  	__u64 clock;  /* kvmclock current value */
+> >  	__u32 flags;
+> > -	__u32 pad[9];
+> > +	__u32 pad0;
+> > +	__u64 realtime;
+> > +	__u64 host_tsc;
+> > +	__u32 pad[4];
+> >    };
+> >  
+> >  
+> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> > index be6805fc0260..9c34b5b63e39 100644
+> > --- a/arch/x86/include/asm/kvm_host.h
+> > +++ b/arch/x86/include/asm/kvm_host.h
+> > @@ -1936,4 +1936,7 @@ int kvm_cpu_dirty_log_size(void);
+> >  
+> >  int alloc_all_memslots_rmaps(struct kvm *kvm);
+> >  
+> > +#define KVM_CLOCK_VALID_FLAGS						\
+> > +	(KVM_CLOCK_TSC_STABLE | KVM_CLOCK_REALTIME | KVM_CLOCK_HOST_TSC)
+> > +
+> >  #endif /* _ASM_X86_KVM_HOST_H */
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index 523c4e5c109f..cb5d5cad5124 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -2815,10 +2815,20 @@ static void get_kvmclock(struct kvm *kvm, struct kvm_clock_data *data)
+> >  	get_cpu();
+> >  
+> >  	if (__this_cpu_read(cpu_tsc_khz)) {
+> > +#ifdef CONFIG_X86_64
+> > +		struct timespec64 ts;
+> > +
+> > +		if (kvm_get_walltime_and_clockread(&ts, &data->host_tsc)) {
+> > +			data->realtime = ts.tv_nsec + NSEC_PER_SEC * ts.tv_sec;
+> > +			data->flags |= KVM_CLOCK_REALTIME | KVM_CLOCK_HOST_TSC;
+> > +		} else
+> > +#endif
+> > +		data->host_tsc = rdtsc();
+> > +
+> >  		kvm_get_time_scale(NSEC_PER_SEC, __this_cpu_read(cpu_tsc_khz) * 1000LL,
+> >  				   &hv_clock.tsc_shift,
+> >  				   &hv_clock.tsc_to_system_mul);
+> > -		data->clock = __pvclock_read_cycles(&hv_clock, rdtsc());
+> > +		data->clock = __pvclock_read_cycles(&hv_clock, data->host_tsc);
+> >  	} else {
+> >  		data->clock = get_kvmclock_base_ns() + ka->kvmclock_offset;
+> >  	}
+> > @@ -4062,7 +4072,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+> >  		r = KVM_SYNC_X86_VALID_FIELDS;
+> >  		break;
+> >  	case KVM_CAP_ADJUST_CLOCK:
+> > -		r = KVM_CLOCK_TSC_STABLE;
+> > +		r = KVM_CLOCK_VALID_FLAGS;
+> >  		break;
+> >  	case KVM_CAP_X86_DISABLE_EXITS:
+> >  		r |=  KVM_X86_DISABLE_EXITS_HLT | KVM_X86_DISABLE_EXITS_PAUSE |
+> > @@ -5859,12 +5869,12 @@ static int kvm_vm_ioctl_set_clock(struct kvm *kvm, void __user *argp)
+> >  {
+> >  	struct kvm_arch *ka = &kvm->arch;
+> >  	struct kvm_clock_data data;
+> > -	u64 now_ns;
+> > +	u64 now_raw_ns;
+> >  
+> >  	if (copy_from_user(&data, argp, sizeof(data)))
+> >  		return -EFAULT;
+> >  
+> > -	if (data.flags)
+> > +	if (data.flags & ~KVM_CLOCK_REALTIME)
+> >  		return -EINVAL;
+> >  
+> >  	kvm_hv_invalidate_tsc_page(kvm);
+> > @@ -5878,11 +5888,21 @@ static int kvm_vm_ioctl_set_clock(struct kvm *kvm, void __user *argp)
+> >  	 * is slightly ahead) here we risk going negative on unsigned
+> >  	 * 'system_time' when 'data.clock' is very small.
+> >  	 */
+> > -	if (kvm->arch.use_master_clock)
+> > -		now_ns = ka->master_kernel_ns;
+> > +	if (data.flags & KVM_CLOCK_REALTIME) {
+> > +		u64 now_real_ns = ktime_get_real_ns();
+> > +
+> > +		/*
+> > +		 * Avoid stepping the kvmclock backwards.
+> > +		 */
+> > +		if (now_real_ns > data.realtime)
+> > +			data.clock += now_real_ns - data.realtime;
+> > +	}
 > 
-> diff --git a/Documentation/virt/kvm/devices/vcpu.rst b/Documentation/virt/kvm/devices/vcpu.rst
-> index 2acec3b9ef65..3b399d727c11 100644
-> --- a/Documentation/virt/kvm/devices/vcpu.rst
-> +++ b/Documentation/virt/kvm/devices/vcpu.rst
-> @@ -161,3 +161,60 @@ Specifies the base address of the stolen time structure for this VCPU. The
->  base address must be 64 byte aligned and exist within a valid guest memory
->  region. See Documentation/virt/kvm/arm/pvtime.rst for more information
->  including the layout of the stolen time structure.
-> +
-> +4. GROUP: KVM_VCPU_TSC_CTRL
-> +===========================
-> +
-> +:Architectures: x86
-> +
-> +4.1 ATTRIBUTE: KVM_VCPU_TSC_OFFSET
-> +
-> +:Parameters: 64-bit unsigned TSC offset
-> +
-> +Returns:
-> +
-> +	 ======= ======================================
-> +	 -EFAULT Error reading/writing the provided
-> +		 parameter address.
-> +	 -ENXIO  Attribute not supported
-> +	 ======= ======================================
-> +
-> +Specifies the guest's TSC offset relative to the host's TSC. The guest's
-> +TSC is then derived by the following equation:
-> +
-> +  guest_tsc = host_tsc + KVM_VCPU_TSC_OFFSET
-> +
-> +This attribute is useful for the precise migration of a guest's TSC. The
-> +following describes a possible algorithm to use for the migration of a
-> +guest's TSC:
-> +
-> +From the source VMM process:
-> +
-> +1. Invoke the KVM_GET_CLOCK ioctl to record the host TSC (t_0),
-> +   kvmclock nanoseconds (k_0), and realtime nanoseconds (r_0).
-> +
-> +2. Read the KVM_VCPU_TSC_OFFSET attribute for every vCPU to record the
-> +   guest TSC offset (off_n).
-> +
-> +3. Invoke the KVM_GET_TSC_KHZ ioctl to record the frequency of the
-> +   guest's TSC (freq).
-> +
-> +From the destination VMM process:
-> +
-> +4. Invoke the KVM_SET_CLOCK ioctl, providing the kvmclock nanoseconds
-> +   (k_0) and realtime nanoseconds (r_0) in their respective fields.
-> +   Ensure that the KVM_CLOCK_REALTIME flag is set in the provided
-> +   structure. KVM will advance the VM's kvmclock to account for elapsed
-> +   time since recording the clock values.
-> +
-> +5. Invoke the KVM_GET_CLOCK ioctl to record the host TSC (t_1) and
-> +   kvmclock nanoseconds (k_1).
-> +
-> +6. Adjust the guest TSC offsets for every vCPU to account for (1) time
-> +   elapsed since recording state and (2) difference in TSCs between the
-> +   source and destination machine:
-> +
-> +   new_off_n = t_0 + off_n + (k_1 - k_0) * freq - t_1
+> Forward jumps can also cause problems, for example:
+> 
+> * Kernel watchdogs
+> 
+> * https://patchwork.ozlabs.org/project/qemu-devel/patch/20130618233825.GA19042@amt.cnet/
+> 
+> So perhaps limiting the amount of forward jump that is allowed 
+> would be a good thing? (which can happen if the two hosts realtime
+> clocks are off).
+> 
+> Now by how much, i am not sure.
+> 
+> Or, as mentioned earlier, only enable KVM_CLOCK_REALTIME if userspace
+> KVM code checks clock synchronization.
+> 
+> Thomas, CC'ed, has deeper understanding of problems with 
+> forward time jumps than I do. Thomas, any comments?
 
-Hi Oliver,
+Thomas,
 
-This won't advance the TSC values themselves, right?
-This (advancing the TSC values by the realtime elapsed time) would be
-awesome because TSC clock_gettime() vdso is faster, and some
-applications prefer to just read from TSC directly.
-See "x86: kvmguest: use TSC clocksource if invariant TSC is exposed".
+Based on the earlier discussion about the problems of synchronizing
+the guests clock via a notification to the NTP/Chrony daemon 
+(where there is a window where applications can read the stale
+value of the clock), a possible solution would be triggering
+an NMI on the destination (so that it runs ASAP, with higher
+priority than application/kernel).
 
-The advancement with this patchset only applies to kvmclock.
+What would this NMI do, exactly?
+
+> As a note: this makes it not OK to use KVM_CLOCK_REALTIME flag 
+> for either vm pause / vm resume (well, if paused for long periods of time) 
+> or savevm / restorevm.
+
+Maybe with the NMI above, it would be possible to use
+the realtime clock as a way to know time elapsed between
+events and advance guest clock without the current 
+problematic window.
 
