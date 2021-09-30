@@ -2,209 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5921341E39E
-	for <lists+kvm@lfdr.de>; Fri,  1 Oct 2021 00:04:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DC4A841E3A4
+	for <lists+kvm@lfdr.de>; Fri,  1 Oct 2021 00:08:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345026AbhI3WGe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Sep 2021 18:06:34 -0400
-Received: from mail-dm6nam12on2082.outbound.protection.outlook.com ([40.107.243.82]:44289
-        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
+        id S1345795AbhI3WKK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Sep 2021 18:10:10 -0400
+Received: from mail-dm3nam07on2089.outbound.protection.outlook.com ([40.107.95.89]:20288
+        "EHLO NAM02-DM3-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S229644AbhI3WGd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Sep 2021 18:06:33 -0400
+        id S245132AbhI3WKJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Sep 2021 18:10:09 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=biBb4MV31vitCLQOM/6OY/5t5G4v6DLqzTmDowgQSXZWRX1RCpabY6C7pAioygXvdJy/uFeQJENylkuCykkdKlB+Lc+33FadFmWIqxKyy4DHC2rFJRNIUDuD/sARCiJJxqJDZGMir/lcEcesAUpCzinKA33G/MT0RQApvXg0sOHGV7K4030QLFoCr2snMjJRjtZ/GrSgT9BhUxVbsnqABZUqU6UF+wfFmsnhEA9sqnvTw6EeEt+NU58NtFs7Fv+59BhQbX6eu0jx1S6iq5eSqKjFyoVdGOWtB8znI66xadwlRv5b8Wthh9JbG+ltd4KCmd/QSehuNFq8KLKnNV1m1Q==
+ b=T8t9dKOUwzXwbtWXuU/vqXK2a5WUBJzsegTLlBvRoB3XTFk+B2INDzvMqpRJpQ6NnhPqB/fVCsucOcbykz4v1ouUFG0xOvU4BMGwD9yDRaa8iGBEgM3xbjDyyuDxDf0t+Z10T6D+x0ZGDEj6cWCu2n17VXtYfEwP5qrwX9f9TFk5GdoZ/iPrvHH/EFhMbDTfQ+33t6FGNSYrVgZ3TIvz4qecGEKWUlQxXNBQSl5RYQ49hEGkrcRcfHBunwVt3OYaUiJHvjVaSD0RpCqWqf+SsLZ5iOGB6KzromjAY5RkqGD00gJJOFICZ8/hdarLWQIHu4eIvGLHYDOU6v5KEbvUHA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=FfcxxNlGYqEXiUxdKX4+Uyx+9GZhHvQDWLhBVFEIiMA=;
- b=WhXRihRkkupa8ZQjQ9tNV8/Ev+cOl0X81mcDwZOhzW8MfmvtJFpWVsmrxLbtzr/W+BdyU9wd8D/AvZpxP3JvXa6KsHqxTjdtO8PxDDvxW1kqi6nj8kmCxn89zuZsgP0yaAQ3lKTORp7e5TfyDAYTXzCKFtiSVkACrviGJfOdJaXNzqS7u3I97NO2NHM98THrcfakTq1BfSL2Z+BaHRZIOVxPNnAQPWmxhwiSMDQMiKnVXqxi9Yjd+jMHvmXxGdC/3mdDJ/72squ6jDZoP5ZYnjcRW70o4rvRl6pk6JrcN9lMovFUBpV9GJ2I81ETNBIfI31+ORohTEJh4kNT5OKsoA==
+ bh=3uyD4Ff0OSsv6edYmNGdaHx7H1A2AQMtXF8tHjsQEUs=;
+ b=fcPLyKHL65/zLMEoe3n38bOGE4xwbpIEX503k+Oj8CmnUWDD90O7Izgo4iOwgfY8s0ZjncdfRy37oHq4gwgRPrdJTQKl9AviaDrhJmOmBee4d5VE3oycbqTkAG1f/TpSNTn+IKVGl4vwbMzWqDkGJm6Dj+wII3xPFclp2f8gIak4BbnL5dnS7uRZ4wlvLqT9m83x1Nlf+t542BiE9KnHagconm3c8jSdn6r+cYuJwyrLHWCuBBN4zL9wVvqR8lT2j4P4gL8t30EtL1E/4tQoRQ1FYC1/vfFn0tAn05BcQncPWm3LO0DxiyuT8io8uNFPhJ8dRE4vNspjLN0PUvcXLQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=FfcxxNlGYqEXiUxdKX4+Uyx+9GZhHvQDWLhBVFEIiMA=;
- b=q8fJOCeGB5fBAvb03qyZ/TugM48Zg471hwNFvfBSkBnHiYtHZwrG/7aa2LT5qbUw5sv+vudQQ/mblJa3aSyA4oWkfgDfDW6AGaGcJrVVrk7a0+mfHLugrKpPeve57Bw4ULGotwwLiQ44TQ6hbyFAbRfW1FBl3I//q6WHxEhv6JcYFT9ecdu0fsjf0p3Re/aneNU6S1DH7DnL/QIosDu6NZPWGnEacdSLB/ZE8rcnVXVeLxKu4AIvA2DqZjDutoA5p5QLXlUzxldMmICcHiXUPBwDkFFh1KN3jIiiw4Bhgoc11bwrabB1u7TStYpLWdDjvVJ8LXrWRiVLbwAkuviOhQ==
-Authentication-Results: linaro.org; dkim=none (message not signed)
- header.d=none;linaro.org; dmarc=none action=none header.from=nvidia.com;
+ bh=3uyD4Ff0OSsv6edYmNGdaHx7H1A2AQMtXF8tHjsQEUs=;
+ b=j1ucfU4B6TqHQpiuYvQhutZ8v65UCN2KN4syubVQc6y012YCRecFz7usFahmVJMJuwSDt/rKHqGmALCK7/F3VJzKo4aAJ0eRvXVqqgICf/exkqRTt6QII4dGw42+Dcsff9jCklhyoJk0lXxGin/2pllCxSTh9FHWMOFYU4SkKCzqf+rcAkrPWKf12mgl6mP/81Ei/fXeYesVUsZsZmLxCg4u5LSdt4q9E4RDbrHkLiISYHYp0yGejM7zpB3bzR9Z6jqaEjcMOj1gWAnv6AurVbliMjxCyhtfinJJ0STZhA7uCUEkL4auwUpO1jfz4YsIgUgrYwk4tCJ7DE8NmeEnKQ==
+Authentication-Results: intel.com; dkim=none (message not signed)
+ header.d=none;intel.com; dmarc=none action=none header.from=nvidia.com;
 Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
- by BL1PR12MB5206.namprd12.prod.outlook.com (2603:10b6:208:31c::5) with
+ by BL1PR12MB5223.namprd12.prod.outlook.com (2603:10b6:208:315::21) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4566.15; Thu, 30 Sep
- 2021 22:04:48 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4566.14; Thu, 30 Sep
+ 2021 22:08:24 +0000
 Received: from BL0PR12MB5506.namprd12.prod.outlook.com
  ([fe80::e8af:232:915e:2f95]) by BL0PR12MB5506.namprd12.prod.outlook.com
  ([fe80::e8af:232:915e:2f95%8]) with mapi id 15.20.4566.017; Thu, 30 Sep 2021
- 22:04:48 +0000
-Date:   Thu, 30 Sep 2021 19:04:46 -0300
+ 22:08:24 +0000
+Date:   Thu, 30 Sep 2021 19:08:22 -0300
 From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Jean-Philippe Brucker <jean-philippe@linaro.org>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "hch@lst.de" <hch@lst.de>, "Jiang, Dave" <dave.jiang@intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "corbet@lwn.net" <corbet@lwn.net>,
-        "parav@mellanox.com" <parav@mellanox.com>,
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     "Lu, Baolu" <baolu.lu@intel.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
         Alex Williamson <alex.williamson@redhat.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>, "hch@lst.de" <hch@lst.de>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "parav@mellanox.com" <parav@mellanox.com>,
         "lkml@metux.net" <lkml@metux.net>,
-        "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
-        "dwmw2@infradead.org" <dwmw2@infradead.org>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "lushenming@huawei.com" <lushenming@huawei.com>,
         "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>
+        "lushenming@huawei.com" <lushenming@huawei.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "corbet@lwn.net" <corbet@lwn.net>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "yi.l.liu@linux.intel.com" <yi.l.liu@linux.intel.com>,
+        "Tian, Jun J" <jun.j.tian@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "dwmw2@infradead.org" <dwmw2@infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
+        "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>
 Subject: Re: [RFC 10/20] iommu/iommufd: Add IOMMU_DEVICE_GET_INFO
-Message-ID: <20210930220446.GF964074@nvidia.com>
-References: <20210922234954.GB964074@nvidia.com>
+Message-ID: <20210930220822.GG964074@nvidia.com>
+References: <20210919063848.1476776-1-yi.l.liu@intel.com>
+ <20210919063848.1476776-11-yi.l.liu@intel.com>
+ <20210922152407.1bfa6ff7.alex.williamson@redhat.com>
+ <20210922234954.GB964074@nvidia.com>
  <BN9PR11MB543333AD3C81312115686AAA8CA39@BN9PR11MB5433.namprd11.prod.outlook.com>
  <YUxTvCt1mYDntO8z@myrica>
  <20210923112716.GE964074@nvidia.com>
  <BN9PR11MB5433BCFCF3B0CB657E9BFE898CA39@BN9PR11MB5433.namprd11.prod.outlook.com>
  <20210923122220.GL964074@nvidia.com>
- <BN9PR11MB5433D75C09C6FDA01C2B7CF48CA99@BN9PR11MB5433.namprd11.prod.outlook.com>
- <20210929123630.GS964074@nvidia.com>
- <BN9PR11MB5433C9B5A0CD0B58163859EC8CAA9@BN9PR11MB5433.namprd11.prod.outlook.com>
- <YVWSaU4CHFHnwEA5@myrica>
+ <BN9PR11MB5433F33CB7CFBCD41BE2F5C68CAA9@BN9PR11MB5433.namprd11.prod.outlook.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YVWSaU4CHFHnwEA5@myrica>
-X-ClientProxiedBy: MN2PR16CA0033.namprd16.prod.outlook.com
- (2603:10b6:208:134::46) To BL0PR12MB5506.namprd12.prod.outlook.com
+In-Reply-To: <BN9PR11MB5433F33CB7CFBCD41BE2F5C68CAA9@BN9PR11MB5433.namprd11.prod.outlook.com>
+X-ClientProxiedBy: MN2PR07CA0029.namprd07.prod.outlook.com
+ (2603:10b6:208:1a0::39) To BL0PR12MB5506.namprd12.prod.outlook.com
  (2603:10b6:208:1cb::22)
 MIME-Version: 1.0
-Received: from mlx.ziepe.ca (142.162.113.129) by MN2PR16CA0033.namprd16.prod.outlook.com (2603:10b6:208:134::46) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4566.14 via Frontend Transport; Thu, 30 Sep 2021 22:04:47 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1mW4AY-008DFG-QX; Thu, 30 Sep 2021 19:04:46 -0300
+Received: from mlx.ziepe.ca (142.162.113.129) by MN2PR07CA0029.namprd07.prod.outlook.com (2603:10b6:208:1a0::39) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4566.17 via Frontend Transport; Thu, 30 Sep 2021 22:08:23 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1mW4E2-008DI0-Sm; Thu, 30 Sep 2021 19:08:22 -0300
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 61e97d8c-1f70-4266-bccb-08d9845e5162
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5206:
+X-MS-Office365-Filtering-Correlation-Id: 0bbac8bb-0a19-476f-8973-08d9845ed251
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5223:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <BL1PR12MB52067556F773897A0697AF6FC2AA9@BL1PR12MB5206.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-Microsoft-Antispam-PRVS: <BL1PR12MB5223145604DE896BC3CCDD67C2AA9@BL1PR12MB5223.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:826;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: jpVXYNji1HYsUj4x4+zbSWsqoD9i4OKrka17+wbqjLZTfk7uM8bvBjtBgQceeuEfesBPxc2KCy9vZo0ukeDXrs3seFCmqlbgOh9joyneIL7bVc1CjGEQ4hB+jqcJC9HYPncB7StbwQVmXUrzpzdNgQJbcZ/+8/C18TEHcCuQkmjBFmiuaqQokq4rqf6TX/FoH55w0Q8xU1j6GHb8dClm+A2kan2V8RgczX9zjl64ikFDbrPSArD1kHbEq51cv2BScFD/VofUsHnWXr1tMaz6mcQurGs13+H5KOSCEPgS2IQuyBHgiiNsmlRwJ3b53iJyw3f+/Ta15cU/Sft6p8pto+vjuHpeZ19r/zzj50NUwbjAThLMh0nYCjj0+veJG2/3VXNyG9MBUxPvk5vpy9140U2da2GJzVIsWJvD7W/i9MqbWdh2BI56IzOPX5Aia2qTLYKbyUfDtDOStOqtFM0dUdeBMQrSKXiyI7818HjHDWHQ1lu2X7mpyWANxRtqLftZZ4eE0A/zrNowjeswsDXEd2Fbr8FQhC1mEpbqh0zyGrAqutfa8DQHNZnY1F3N1xAIDZ0dHJSBC8nLspEdpQL2nBA3mtV4SHXpRowe6aMAhW1LkI0D7GBxFPh5p1EF9k9KXKSMnpNMDpqsiWk7YeAMXf9xD29CEe1+9B2F+pFt79luGPpiFPJ/cptjgiAg7MaI
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(186003)(8676002)(1076003)(426003)(316002)(6916009)(7416002)(5660300002)(2616005)(508600001)(83380400001)(86362001)(9746002)(9786002)(66556008)(66476007)(8936002)(38100700002)(36756003)(54906003)(33656002)(26005)(4326008)(66946007)(2906002)(27376004);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: TkHrtYd4+Iwla1bVf/4E5abCTmQqhx+TvAvX5CiAG0Tuf3YTcZdyb9DR8ijMGql6bsdJao/bSGfnAEAd3jf9EcLH/popySDmzdB//rWPSpu11qgc0Z8KXExIOmBhUSqZ7nngfMMkP0qJdmqNMMBUDxaWKgmEPeuyzMPP0ndCi3wv7Rspl1qibGMHu6yvht5JgVhJ1B+1AsPkkkJIeUcFzWep9F+lQh856sYYHxaflz3phP8liSSAH3XEqTM8XJaSWU11BNWsFn1pTUSF+fbzbhvVOAL3vmfANBL78MVgpjH+68GdP715DKhSxEwE8U5lpG4NQIgWHo5ggMREp5zYRDWLJSZZg4+fCMBaxcEsRGYAmqr0raDd2QBfPwirvWtt+a/M/Oc+CiI1MK4CNW2hXZz2F1fLIwR7xOuAvEKyY0pUfmt0qhlolxY6rOvr8cUGNugdZ8lHobqx8GoFWHrb/apguTwcaWXfQ16ghNOp7AXhkq4rfqKoYQePblJpNwftFkVkVlC/rbtE/7GYZt+IezURThenz5OqXIVdccRr1A7TNLeiR5NcFShhVTgdtcYNobf3CwFxhyPRAy0TAO/TY9esE/N7enuDSVP3/VFkIEBPD9T3+qJ46SMO2OI+wX7Y1ioRrrFcp8cQWZYQ6L2d0zOVhms9IMDD8w27frqxxZ2Ranf4c7D0LYyOYFv/Q8DchMVQahwnt7LlCfw/pJ2SRw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(107886003)(5660300002)(316002)(83380400001)(1076003)(7416002)(2906002)(38100700002)(54906003)(66556008)(66476007)(36756003)(26005)(8676002)(6916009)(186003)(86362001)(9746002)(33656002)(8936002)(4326008)(426003)(508600001)(2616005)(9786002)(66946007)(27376004);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?tUvmr6mITBcCID8KCzovi1G1FApXao0FkVxMps/3ff/zPSKP7gjqYZ9patIz?=
- =?us-ascii?Q?26qUTttlTQ4HRvhuqhu4pR9q9Zc9gIBaGeZ4BgLIhBNPu6bb/hbVUEkV7C61?=
- =?us-ascii?Q?lvH/R0RoTgLfjz4vmCyMb45jb+6Uxxkm8W2YfTim8/G1uUyS6Ss8Rc2uvTf7?=
- =?us-ascii?Q?ZjvsbG01ZGGBH1y8ytnhEYT1P/jSvubwBwZ9xaUICKU2McbGgaJykQKzIqGQ?=
- =?us-ascii?Q?SIbCCoTDQtrV6d5eJw3I5CSmNEEy6BtR/qCRz+eisb6KiDwJU+ObBeEpAEcC?=
- =?us-ascii?Q?tJQSYbt+OZgNdV1YNo2FypaoyeLoHrlsP3YX7bsDLszqU23isGADmJsmw4U7?=
- =?us-ascii?Q?C/8E+55CUcIX09nZY/WtdZyS+5Ms7fdRXZKi4/+I/ijFrTEL1vLz/hCfBAva?=
- =?us-ascii?Q?Fri9Wda9M5tQn+NfelIGFpeKuniUZQfgS1vM9SLJUPdAGXj5X5459c9LelQl?=
- =?us-ascii?Q?vfIiifrz8YzZWMZ5CEyUrWr5KvMABntgEnSJdYOvQ2KPuHT8uWnvMMGLTJby?=
- =?us-ascii?Q?roIGLGKXjNFUZMT1eJnkDjh7c3RugJi6qpopR4k6RRuRA/bXUymWoUF2gXQJ?=
- =?us-ascii?Q?95ufCH0c7UgPD68Lhw5oHtJmk9wYK17SLjnxY84FOHWSaGqB87c/7yyIAlCI?=
- =?us-ascii?Q?wX0ZUj5zwE3hHVWZSqmif8NEjEKqG3Xzhxxr1moJrOvhCe7A4N1h+je4cbts?=
- =?us-ascii?Q?ckpggSqTwBZ6I9IkO+sEpTvze1++UKg0KNlcczEwE8NOw4BZq5/sKxPSn5ln?=
- =?us-ascii?Q?qEFFTW7Y5oU4IOQjq6jtRkl4xCmyJZiTLqLbWUZ5Qm2Bf/PrQoMvw39SNQkc?=
- =?us-ascii?Q?l8ta8sgURoXL2tULbElI7hV+pWIscwCd1KryJCPxGci1K7XyUbbvAwe2iInm?=
- =?us-ascii?Q?v4i1HNYYgOh63XiGBGXjrhVbFFk5+zd3dtrAOnAgk6haLYI9Qqpc+sZ+gB1T?=
- =?us-ascii?Q?fsoBa6eUUrO+koNiQncMqYyS5U/rdaDguoFN8rz3cpT1YPMb+jsfL/eLLE0S?=
- =?us-ascii?Q?F60qquXKHieKBD1i9Ij7/a8ndkPRuksUr5eQiFe5Mc2Y06gRTYCWMIj7hwWr?=
- =?us-ascii?Q?Ws0tnkECfH0kqgRHru42UcO86ZnC5LzRAtsaPTD8TKavgxB8K7x8S70YXS1G?=
- =?us-ascii?Q?QCqNJwSEJO8S89LVSA5tR1eySZs/goVxy4PTWDmtUHJOhauMbPyJ1/nG8N3x?=
- =?us-ascii?Q?n1ZLK6VrKTFiUS+eMfGNCns5V8gg/P2eCKqqSyxwagNCDQeNlAlGDeVt0AXx?=
- =?us-ascii?Q?1ydiqVJkqaWC2Sm1Lx4lPAbmPRhfDduXJ3pC+jl958LRkwxOMtoMerO0yD5d?=
- =?us-ascii?Q?I1WUSIFiWt6LztuKYEPKKckI?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?huhA6NyoZNr1q5faQSouxgjumTqP4iWRUWNlQ6Ac/wuP71ZBZEdVDQgf1hlJ?=
+ =?us-ascii?Q?Qpbz+ZjxYhxWgCcbMS5yj2C1ru/yT0owT6Ll2A3//heLpKyrLqKQMkjtFWN8?=
+ =?us-ascii?Q?+aw7TjdM3do+BGKg8vHuEi5GGUe/8A6+joozfcrO7rPZNdhEE3r9pf15CZ4W?=
+ =?us-ascii?Q?Z52Zl7h1jPJnGDVjU/TwU90lC/Au1t+Ab3dHN6e2a+gn+2s+vuocieRQcQQ4?=
+ =?us-ascii?Q?4wuz2lklUA4oE6xlO/OLmrDvTRCWhK9W8U9Dp55VXgEQLzk1ead89B4d7NX7?=
+ =?us-ascii?Q?ggi6PjZ0+QCiGD6GBBRkCyt3dMoPULj/Eqq9VYEAfJwWOE3h2BR3fRCoHbfG?=
+ =?us-ascii?Q?fW1ZcxLfM9JcaCZfAyukMA9Wqyurmx2qFF7JKjV/2bMmg+JVP4qg+afaQDhQ?=
+ =?us-ascii?Q?r16bNXVrqndW8O6tFLH2GqBCBffdL+dxJbPyxl42woNcRMXv1eTb5zIRY3pP?=
+ =?us-ascii?Q?fi64aXBEVobI6ad6Wtsw2jFG3Oba2WQoRUJE9+tBc7oY4iYY5wO0M4B3MYBF?=
+ =?us-ascii?Q?1AXveexOdcn983bMtWo154L0sZQjb7zK2WBH614JX10KawP7WLI/hIvOCdfI?=
+ =?us-ascii?Q?zt6zsLxCKvw+B4TD3x4P8Cs6sIxADR2144ynsOiKbtuzk7OfsloZloZbGbcs?=
+ =?us-ascii?Q?xZIBXUAz2GobRK6dnXea/En63xpWmXasSl4cYN7xoLl9eMNR6+qZ5sPDJinr?=
+ =?us-ascii?Q?7fU0/EsUTDqOJXlbWCn8UfHfcuDjw31B6ttZ8S6Jwkman48JtPA1w/4b8rPC?=
+ =?us-ascii?Q?5uex8zfSBg4KFErXdtnrRyX1gmdtvHDJPS4IDYm4k4YKEPaoXqfGaxo80Klv?=
+ =?us-ascii?Q?buifk2o4Ray7JMu4Wn5I6CipJkNZnaR3KEACnUD0LoCauURxd5IdSinsi5QR?=
+ =?us-ascii?Q?8QjSMWHvdvgZULtTrKegKenNVw1+MVnOZxeUmb8vdyDePS1XPiP6W8XExUm2?=
+ =?us-ascii?Q?CYQe9mVSziuUWhhEzab96C22SPW7DoRcwFP0tqeIwtzRCtMGC2NGf2YdgVGe?=
+ =?us-ascii?Q?WNsJ//GdY0aThhzJyOEJFemSUj+BEyYrNREAA2WskwnPY8wUdXBl+2kWuhw1?=
+ =?us-ascii?Q?E8e5Dg4co8iS/0Bn5XBO1SBCv/dhCnpoed8hcBDSlWwJY4XbWSGZOFiXCShe?=
+ =?us-ascii?Q?c/cCAcjPYnA1Nt5PLqaUMJQbpdtOsxecH8Mw4bqIzDJsx47uPJDDdqt8CQj6?=
+ =?us-ascii?Q?LbA4VAhkZVMMPS0IhskgqvUgqWj2bjKVqxFzcQulzSG4SEDU/jhHMhnP/bua?=
+ =?us-ascii?Q?jSDUB7/adR9ECrQIfITcf7fK20RUjgs9qM5a+K9stcinQd3WZS/zFfuHpFZ7?=
+ =?us-ascii?Q?g5hHK0fwqv/qscgSchpqQfuf?=
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 61e97d8c-1f70-4266-bccb-08d9845e5162
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0bbac8bb-0a19-476f-8973-08d9845ed251
 X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Sep 2021 22:04:48.0228
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Sep 2021 22:08:24.3412
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: HSkygK45tOONcnIeYWgKNt9ZE4UNQbDkxs+Gc7qSCWwqSzIFF/Xjk2WQyMG8Bohj
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5206
+X-MS-Exchange-CrossTenant-UserPrincipalName: zmZu0OkRqtyfRiuAKUaTtb37dctGIm9NFs8l4DeDOt1r+910l9lmmTkGK8M1T9ap
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5223
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 30, 2021 at 11:33:13AM +0100, Jean-Philippe Brucker wrote:
-> On Thu, Sep 30, 2021 at 08:30:42AM +0000, Tian, Kevin wrote:
-> > > From: Jason Gunthorpe
-> > > Sent: Wednesday, September 29, 2021 8:37 PM
-> > > 
-> > > On Wed, Sep 29, 2021 at 08:48:28AM +0000, Tian, Kevin wrote:
-> > > 
-> > > > ARM:
-> > > >     - set to snoop format if IOMMU_CACHE
-> > > >     - set to nonsnoop format if !IOMMU_CACHE
-> > > > (in both cases TLP snoop bit is ignored?)
-> > > 
-> > > Where do you see this? I couldn't even find this functionality in the
-> > > ARM HW manual??
+On Thu, Sep 30, 2021 at 08:49:03AM +0000, Tian, Kevin wrote:
+> > From: Jason Gunthorpe <jgg@nvidia.com>
+> > Sent: Thursday, September 23, 2021 8:22 PM
 > > 
-> > Honestly speaking I'm getting confused by the complex attribute
-> > transformation control (default, replace, combine, input, output, etc.)
-> > in SMMU manual. Above was my impression after last check, but now
-> > I cannot find necessary info to build the same picture (except below 
-> > code). :/
+> > > > These are different things and need different bits. Since the ARM path
+> > > > has a lot more code supporting it, I'd suggest Intel should change
+> > > > their code to use IOMMU_BLOCK_NO_SNOOP and abandon
+> > IOMMU_CACHE.
+> > >
+> > > I didn't fully get this point. The end result is same, i.e. making the DMA
+> > > cache-coherent when IOMMU_CACHE is set. Or if you help define the
+> > > behavior of IOMMU_CACHE, what will you define now?
 > > 
-> > > 
-> > > What I saw is ARM linking the IOMMU_CACHE to a IO PTE bit that causes
-> > > the cache coherence to be disabled, which is not ignoring no snoop.
+> > It is clearly specifying how the kernel API works:
 > > 
-> > My impression was that snoop is one way of implementing cache
-> > coherency and now since the PTE can explicitly specify cache coherency 
-> > like below:
-> > 
-> >                 else if (prot & IOMMU_CACHE)
-> >                         pte |= ARM_LPAE_PTE_MEMATTR_OIWB;
-> >                 else
-> >                         pte |= ARM_LPAE_PTE_MEMATTR_NC;
-> > 
-> > This setting in concept overrides the snoop attribute from the device thus
-> > make it sort of ignored?
+> >  !IOMMU_CACHE
+> >    must call arch cache flushers
+> >  IOMMU_CACHE -
+> >    do not call arch cache flushers
+> >  IOMMU_CACHE|IOMMU_BLOCK_NO_SNOOP -
+> >    dot not arch cache flushers, and ignore the no snoop bit.
 > 
-> To make sure we're talking about the same thing: "the snoop attribute from
-> the device" is the "No snoop" attribute in the PCI TLP, right?
-> 
-> The PTE flags define whether the memory access is cache-coherent or not.
-> * WB is cacheable (short for write-back cacheable. Doesn't matter here
->   what OI or RWA mean.)
-> * NC is non-cacheable.
-> 
->          | Normal PCI access | No_snoop PCI access
->   PTE WB | Cacheable         | Non-cacheable
->   PTE NC | Non-cacheable     | Non-cacheable
-> 
-> Cacheable memory access participate in cache coherency. Non-cacheable
-> accesses go directly to memory, do not cause cache allocation.
+> Who will set IOMMU_BLOCK_NO_SNOOP?
 
-This table is what I was thinking after reading through the ARM docs.
+Basically only qemu due to specialized x86 hypervisor knowledge.
 
-> On Arm cache coherency is configured through PTE attributes. I don't think
-> PCI No_snoop should be used because it's not necessarily supported
-> throughout the system and, as far as I understand, software can't discover
-> whether it is.
+The only purpose of this attribute is to support a specific
+virtualization use case where a whole bunch of stuff is broken
+together:
+ - the cache maintenance instructions are not available to a guest
+ - the guest isn't aware that the instructions don't work and tells
+   the device to issue no-snoop TLPs
+ - The device ignores the 'disable no-snoop' flag in the PCIe config
+   space
 
-The usage of no-snoop is a behavior of a device. A generic PCI driver
-should be able to program the device to generate no-snoop TLPs and
-ideally rely on an arch specific API in the OS to trigger the required
-cache maintenance.
-
-It doesn't make much sense for a portable driver to rely on a
-non-portable IO PTE flag to control coherency, since that is not a
-standards based approach.
-
-That said, Linux doesn't have a generic DMA API to support
-no-snoop. The few GPUs drivers that use this stuff just hardwired
-wbsync on Intel..
-
-What I don't really understand is why ARM, with an IOMMU that supports
-PTE WB, has devices where dev_is_dma_coherent() == false ? 
-
-Is it the case that DMA from those devices ignores the IO PTE's
-cachable mode?
+Thus things become broken.
 
 Jason
