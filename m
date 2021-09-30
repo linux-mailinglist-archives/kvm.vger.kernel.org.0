@@ -2,56 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A9D2741DA50
-	for <lists+kvm@lfdr.de>; Thu, 30 Sep 2021 14:54:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E11B141DA52
+	for <lists+kvm@lfdr.de>; Thu, 30 Sep 2021 14:55:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351179AbhI3M4b (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Sep 2021 08:56:31 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:62764 "EHLO
+        id S1351182AbhI3M4c (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Sep 2021 08:56:32 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:2132 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1351170AbhI3M4a (ORCPT
+        by vger.kernel.org with ESMTP id S1351173AbhI3M4a (ORCPT
         <rfc822;kvm@vger.kernel.org>); Thu, 30 Sep 2021 08:56:30 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 18UCUapQ028472;
-        Thu, 30 Sep 2021 08:54:47 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 18UBfkj8021433;
+        Thu, 30 Sep 2021 08:54:48 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : content-transfer-encoding : mime-version; s=pp1;
- bh=9YUqKBOGrZeaWpxlV7/jnQU90tB+qyCPlOJUSkm5kiQ=;
- b=Iu9OFJ8YIGA7AoymXC0BGisjZPWFZCAGDnhF0LAOgu/nlSF424POEG2vxqowL4sAd8ND
- P9S0X1yz/3gfPwomaUqSgAFj9dMBAU1aEoF76LzaYg2ZH6sG4PPrwZcZ/kDc0X9qLXxn
- zzxwKPN1ZSmqmXpHEFg1ZROBgk9vse985mwVnNI8voKpVhqfcPyUk2z4rQkQkRx99LO1
- iGRZJ+lyxLQmm43UFB/WuKZXcEgLzdPdY37Bu5HLvmGwdMyLW4bxY2Z23Q9l9+3QKA7K
- GGOvAhHI4l18lV1Xy1MQ2Ek/Hm2O2SrB53wtzC24l/dRbYFXcPWVq5QDE31Pm8A8QV35 ug== 
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=pp1;
+ bh=haGuvZUVxbk4neiM1DnZ40Zx6zG2foU0ApT3VZ9wlJw=;
+ b=eEF3y99tSf2Qhf6m4mD8aAF/v7iLscpHcIAtQDAR+98/VxVDt4xxxeTSDNKfAWcoV4Wo
+ GlWfYggkQnsaNeUpunLB09x+gGScds334fPgv1PurXaUf5CNo8OdrNR4ycCeWggfi0PK
+ IkbMEZxnpHFfferh/4QHiYrAhHGYTNkz+loUrtVtOTN0e+NK4sc9jA11GcPqHmBpARz+
+ HBSZi5dc/t30Il/ZXsZG8mSwgNP2VWPYjlJaQ6zuS34FKxJBX0pwfweOhxMLRnLY9LKN
+ c3lKTPvQg5jariGFx02g1xlB5UZZBXS6Fez8tmynLSrWmsqKlqqumlCbjF7vkdqE59tY qw== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3bdda8rf88-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3bdck6hke3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 30 Sep 2021 08:54:48 -0400
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 18UCBGik022313;
+        Thu, 30 Sep 2021 08:54:47 -0400
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3bdck6hkdc-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Thu, 30 Sep 2021 08:54:47 -0400
-Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 18UCVImd032312;
-        Thu, 30 Sep 2021 08:54:47 -0400
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3bdda8rf79-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 30 Sep 2021 08:54:47 -0400
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 18UCq9SG018375;
-        Thu, 30 Sep 2021 12:54:44 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma03ams.nl.ibm.com with ESMTP id 3b9udakn2g-1
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 18UCq7Os023036;
+        Thu, 30 Sep 2021 12:54:45 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma04fra.de.ibm.com with ESMTP id 3b9udaguqx-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Thu, 30 Sep 2021 12:54:44 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 18UCnWrM59638148
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 18UCsfdb48300328
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 30 Sep 2021 12:49:32 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id F151F52051;
-        Thu, 30 Sep 2021 12:54:40 +0000 (GMT)
+        Thu, 30 Sep 2021 12:54:41 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 446C24204B;
+        Thu, 30 Sep 2021 12:54:41 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2D18042042;
+        Thu, 30 Sep 2021 12:54:41 +0000 (GMT)
 Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTPS id DC11252050;
-        Thu, 30 Sep 2021 12:54:40 +0000 (GMT)
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Thu, 30 Sep 2021 12:54:41 +0000 (GMT)
 Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 25651)
-        id 7CA4AE07C6; Thu, 30 Sep 2021 14:54:40 +0200 (CEST)
+        id B6D23E168C; Thu, 30 Sep 2021 14:54:40 +0200 (CEST)
 From:   Christian Borntraeger <borntraeger@de.ibm.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     KVM <kvm@vger.kernel.org>, Janosch Frank <frankja@linux.ibm.com>,
@@ -62,51 +66,110 @@ Cc:     KVM <kvm@vger.kernel.org>, Janosch Frank <frankja@linux.ibm.com>,
         Christian Borntraeger <borntraeger@de.ibm.com>,
         Heiko Carstens <hca@linux.ibm.com>,
         Vasily Gorbik <gor@linux.ibm.com>
-Subject: [GIT PULL 0/1] KVM: s390: allow to compile without warning with W=1
-Date:   Thu, 30 Sep 2021 14:54:39 +0200
-Message-Id: <20210930125440.22777-1-borntraeger@de.ibm.com>
+Subject: [GIT PULL 1/1] KVM: s390: Function documentation fixes
+Date:   Thu, 30 Sep 2021 14:54:40 +0200
+Message-Id: <20210930125440.22777-2-borntraeger@de.ibm.com>
 X-Mailer: git-send-email 2.31.1
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: qcXRfKzkeInHC9DdD7ToAJn7eTkr4qG5
-X-Proofpoint-GUID: qac2m8AJ7HfAVuqo6mXSjwi7Tqtoe12G
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+In-Reply-To: <20210930125440.22777-1-borntraeger@de.ibm.com>
+References: <20210930125440.22777-1-borntraeger@de.ibm.com>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: Kof7mAzQpuE4Qfq_GVN2mAt-9GiHT7Hw
+X-Proofpoint-GUID: 3yPG1PVOOXgKmZe84gzrN6svTRp4-IqO
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.391,FMLib:17.0.607.475
  definitions=2021-09-30_04,2021-09-30_01,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=844 clxscore=1015
- impostorscore=0 suspectscore=0 bulkscore=0 phishscore=0 priorityscore=1501
- spamscore=0 mlxscore=0 adultscore=0 lowpriorityscore=0 malwarescore=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501 mlxscore=0
+ lowpriorityscore=0 bulkscore=0 impostorscore=0 spamscore=0 phishscore=0
+ mlxlogscore=961 malwarescore=0 adultscore=0 clxscore=1015 suspectscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2109230001
  definitions=main-2109300079
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo,
+From: Janosch Frank <frankja@linux.ibm.com>
 
-please pull for kvm/master a fix for W=1.
+The latest compile changes pointed us to a few instances where we use
+the kernel documentation style but don't explain all variables or
+don't adhere to it 100%.
 
-The following changes since commit 5c49d1850ddd3240d20dc40b01f593e35a184f38:
+It's easy to fix so let's do that.
 
-  KVM: VMX: Fix a TSX_CTRL_CPUID_CLEAR field mask issue (2021-09-27 11:25:40 -0400)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git  tags/kvm-s390-master-5.15-1
-
-for you to fetch changes up to 25b5476a294cd5f7c7730f334f6b400d30bb783d:
-
-  KVM: s390: Function documentation fixes (2021-09-28 17:56:54 +0200)
-
-----------------------------------------------------------------
-KVM: s390: allow to compile without warning with W=1
-
-----------------------------------------------------------------
-Janosch Frank (1):
-      KVM: s390: Function documentation fixes
-
+Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+---
  arch/s390/kvm/gaccess.c   | 12 ++++++++++++
  arch/s390/kvm/intercept.c |  4 +++-
  2 files changed, 15 insertions(+), 1 deletion(-)
+
+diff --git a/arch/s390/kvm/gaccess.c b/arch/s390/kvm/gaccess.c
+index b9f85b2dc053..6af59c59cc1b 100644
+--- a/arch/s390/kvm/gaccess.c
++++ b/arch/s390/kvm/gaccess.c
+@@ -894,6 +894,11 @@ int access_guest_real(struct kvm_vcpu *vcpu, unsigned long gra,
+ 
+ /**
+  * guest_translate_address - translate guest logical into guest absolute address
++ * @vcpu: virtual cpu
++ * @gva: Guest virtual address
++ * @ar: Access register
++ * @gpa: Guest physical address
++ * @mode: Translation access mode
+  *
+  * Parameter semantics are the same as the ones from guest_translate.
+  * The memory contents at the guest address are not changed.
+@@ -934,6 +939,11 @@ int guest_translate_address(struct kvm_vcpu *vcpu, unsigned long gva, u8 ar,
+ 
+ /**
+  * check_gva_range - test a range of guest virtual addresses for accessibility
++ * @vcpu: virtual cpu
++ * @gva: Guest virtual address
++ * @ar: Access register
++ * @length: Length of test range
++ * @mode: Translation access mode
+  */
+ int check_gva_range(struct kvm_vcpu *vcpu, unsigned long gva, u8 ar,
+ 		    unsigned long length, enum gacc_mode mode)
+@@ -956,6 +966,7 @@ int check_gva_range(struct kvm_vcpu *vcpu, unsigned long gva, u8 ar,
+ 
+ /**
+  * kvm_s390_check_low_addr_prot_real - check for low-address protection
++ * @vcpu: virtual cpu
+  * @gra: Guest real address
+  *
+  * Checks whether an address is subject to low-address protection and set
+@@ -979,6 +990,7 @@ int kvm_s390_check_low_addr_prot_real(struct kvm_vcpu *vcpu, unsigned long gra)
+  * @pgt: pointer to the beginning of the page table for the given address if
+  *	 successful (return value 0), or to the first invalid DAT entry in
+  *	 case of exceptions (return value > 0)
++ * @dat_protection: referenced memory is write protected
+  * @fake: pgt references contiguous guest memory block, not a pgtable
+  */
+ static int kvm_s390_shadow_tables(struct gmap *sg, unsigned long saddr,
+diff --git a/arch/s390/kvm/intercept.c b/arch/s390/kvm/intercept.c
+index 72b25b7cc6ae..2bd8f854f1b4 100644
+--- a/arch/s390/kvm/intercept.c
++++ b/arch/s390/kvm/intercept.c
+@@ -269,6 +269,7 @@ static int handle_prog(struct kvm_vcpu *vcpu)
+ 
+ /**
+  * handle_external_interrupt - used for external interruption interceptions
++ * @vcpu: virtual cpu
+  *
+  * This interception only occurs if the CPUSTAT_EXT_INT bit was set, or if
+  * the new PSW does not have external interrupts disabled. In the first case,
+@@ -315,7 +316,8 @@ static int handle_external_interrupt(struct kvm_vcpu *vcpu)
+ }
+ 
+ /**
+- * Handle MOVE PAGE partial execution interception.
++ * handle_mvpg_pei - Handle MOVE PAGE partial execution interception.
++ * @vcpu: virtual cpu
+  *
+  * This interception can only happen for guests with DAT disabled and
+  * addresses that are currently not mapped in the host. Thus we try to
+-- 
+2.31.1
+
