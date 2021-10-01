@@ -2,90 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7FA1441F00C
-	for <lists+kvm@lfdr.de>; Fri,  1 Oct 2021 16:54:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 25A5341F0C9
+	for <lists+kvm@lfdr.de>; Fri,  1 Oct 2021 17:12:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354667AbhJAOz5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Oct 2021 10:55:57 -0400
-Received: from mail.kernel.org ([198.145.29.99]:39860 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231764AbhJAOzy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Oct 2021 10:55:54 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id C22B5619E7;
-        Fri,  1 Oct 2021 14:54:10 +0000 (UTC)
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <maz@kernel.org>)
-        id 1mWJvM-00EDTt-R2; Fri, 01 Oct 2021 15:54:08 +0100
-Date:   Fri, 01 Oct 2021 15:54:08 +0100
-Message-ID: <87ee94ssmn.wl-maz@kernel.org>
-From:   Marc Zyngier <maz@kernel.org>
-To:     Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc:     linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, ascull@google.com,
-        dbrazdil@google.com, James Morse <james.morse@arm.com>,
+        id S1354806AbhJAPOK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Oct 2021 11:14:10 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:44452 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231890AbhJAPOJ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 1 Oct 2021 11:14:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1633101144;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=LW6fp9rG/lvp5l8prGyc0xe8qMlUDZGZChEO4If5ox0=;
+        b=cuh1A0UdTnY4C7/r5YpXA/HDZdcZRHAH0A4gSo61eS6Q6bvNilXlPMVfGSUCyuwmKis9UW
+        d9Zjldz9t86jJba30rS0Y4gkuAlD+rwF25Vi+mJFOhOOQ36ncRL+sI2aA4IN494+ZZ04yL
+        F8X4X6KLO+EiK9dnDq4ILEMbegAALHc=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-500-CqBgkAwoO12iTrT9UGR6uw-1; Fri, 01 Oct 2021 11:12:23 -0400
+X-MC-Unique: CqBgkAwoO12iTrT9UGR6uw-1
+Received: by mail-ed1-f69.google.com with SMTP id ec14-20020a0564020d4e00b003cf5630c190so10769058edb.3
+        for <kvm@vger.kernel.org>; Fri, 01 Oct 2021 08:12:23 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=LW6fp9rG/lvp5l8prGyc0xe8qMlUDZGZChEO4If5ox0=;
+        b=IEi7p2KDidZ4+PRytJowgmd5dcJ1hUX14SvaFl3/6XD7ldWdS2UxdQqICPLEH4xOZp
+         8Nqs/1AXGE4i8eCpVkofb72wS+auYCnNxQ1xA4Fo+WTJM7LyiqBBjTkgZuXmPgOk+G1n
+         UGtPzLPdBf6VLgUQ6zyEU+0nii/zCWzuXKmLSHBkc6jJiFMeRucEdrEPVvLqhm32ZR+Z
+         sX4Lf9KAGZDMzyEGzzTjoZU4y0FAPGrz++WUWDFKc4uhVh8NQfNjxJThIktu8qGgiS1k
+         bq3MLdXLWPQTK74E9OJBsiET7cAVc0oJvwF1nlRBxuTz672Ne/oWJn6qsz1cJDn6eGrN
+         rQgA==
+X-Gm-Message-State: AOAM530L918AEOwQGzc0RBZJHRBFbHRfDputxh2cyFJVI/5Jwfo1zPr7
+        I9g+WphC3KjdPGryj1IlL1st6yRE+02eLNkkJG7mBtjMoVPli1b5lMN8bXJCz5K5xL1IMvJ02x1
+        nqybSDEZQ46uJ
+X-Received: by 2002:a17:907:3e03:: with SMTP id hp3mr6732921ejc.183.1633101142618;
+        Fri, 01 Oct 2021 08:12:22 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxSleQpwCGZXW71w2qzpx6TzvbZz4Gx6iqhZH1Md89m/5OKOBFh+S0Y4ZfLrRfA1AXKxqbKQQ==
+X-Received: by 2002:a17:907:3e03:: with SMTP id hp3mr6732898ejc.183.1633101142335;
+        Fri, 01 Oct 2021 08:12:22 -0700 (PDT)
+Received: from [192.168.10.118] ([93.56.162.200])
+        by smtp.gmail.com with ESMTPSA id ee13sm1227751edb.14.2021.10.01.08.12.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 01 Oct 2021 08:12:21 -0700 (PDT)
+Message-ID: <7901cb84-052d-92b6-1e6a-028396c2c691@redhat.com>
+Date:   Fri, 1 Oct 2021 17:12:20 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [PATCH v8 7/7] KVM: x86: Expose TSC offset controls to userspace
+Content-Language: en-US
+To:     Marcelo Tosatti <mtosatti@redhat.com>
+Cc:     Oliver Upton <oupton@google.com>, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu,
+        Sean Christopherson <seanjc@google.com>,
+        Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>,
+        James Morse <james.morse@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
-        kernel-team@android.com
-Subject: Re: [PATCH] KVM: arm64: Allow KVM to be disabled from the command line
-In-Reply-To: <e80b2454-45c3-19a3-7a96-dcb484f9e2f5@arm.com>
-References: <20210903091652.985836-1-maz@kernel.org>
-        <5bc623f2-e4c1-cc9c-683c-2f95648f1a68@arm.com>
-        <87a6jutkyq.wl-maz@kernel.org>
-        <e80b2454-45c3-19a3-7a96-dcb484f9e2f5@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: suzuki.poulose@arm.com, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, ascull@google.com, dbrazdil@google.com, james.morse@arm.com, alexandru.elisei@arm.com, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-arm-kernel@lists.infradead.org,
+        Andrew Jones <drjones@redhat.com>,
+        Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>
+References: <20210916181538.968978-1-oupton@google.com>
+ <20210916181538.968978-8-oupton@google.com>
+ <20210930191416.GA19068@fuller.cnet>
+ <48151d08-ee29-2b98-b6e1-f3c8a1ff26bc@redhat.com>
+ <20211001103200.GA39746@fuller.cnet>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20211001103200.GA39746@fuller.cnet>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 01 Oct 2021 10:27:18 +0100,
-Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
+On 01/10/21 12:32, Marcelo Tosatti wrote:
+>> +1. Invoke the KVM_GET_CLOCK ioctl to record the host TSC (t_0), +
+>> kvmclock nanoseconds (k_0), and realtime nanoseconds (r_0). + [...]
+>>  +4. Invoke the KVM_SET_CLOCK ioctl, providing the kvmclock
+>> nanoseconds +   (k_0) and realtime nanoseconds (r_0) in their
+>> respective fields. +   Ensure that the KVM_CLOCK_REALTIME flag is
+>> set in the provided +   structure. KVM will advance the VM's
+>> kvmclock to account for elapsed +   time since recording the clock
+>> values.
 > 
-> On 30/09/2021 11:29, Marc Zyngier wrote:
-> > On Wed, 29 Sep 2021 11:35:46 +0100,
-> > Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
-> >> 
-> >>> +	if (strcmp(arg, "none") == 0 && !WARN_ON(is_kernel_in_hyp_mode())) {
-> >> 
-> >> nit: Does this really need to WARN here ? Unlike the "nvhe" case, if the
-> >> user wants to keep the KVM out of the picture for, say debugging
-> >> something, it is perfectly Ok to allow the kernel to be running at EL2
-> >> without having to change the Firmware to alter the landing EL for the
-> >> kernel ?
-> > 
-> > Well, the doc says "run in nVHE mode" and the option forces
-> > id_aa64mmfr1.vh=0. The WARN_ON() will only fires on broken^Wfruity HW
-> > that is VHE only. Note that this doesn't rely on any firmware change
-> > (we drop from EL2 to EL1 and stay there).
+> You can't advance both kvmclock (kvmclock_offset variable) and the
+> TSCs, which would be double counting.
 > 
-> Ah, ok. So the "none" is in fact "nvhe + no-kvm". Thats the bit I
-> missed. TBH, that name to me sounds like "no KVM" at all, which is what
-> we want. The question is, do we really need "none" to force vh == 0 ? I
-> understand this is only a problem on a rare set of HWs. But the generic
-> option looks deceiving.
-> 
-> That said, I am happy to leave this as is and the doc says so.
+> So you have to either add the elapsed realtime (1) between
+> KVM_GET_CLOCK to kvmclock (which this patch is doing), or to the
+> TSCs. If you do both, there is double counting. Am i missing
+> something?
 
-I think you have a point here. Conflating the two things is a bit odd,
-and we might as well let the user pick the configuration they want
-(they can always pass 'id_aa64mmfr1.vh=0' themselves).
+Probably one of these two (but it's worth pointing out both of them):
 
-I'll respin the patch with this change.
+1) the attribute that's introduced here *replaces*
+KVM_SET_MSR(MSR_IA32_TSC), so the TSC is not added.
 
-Thanks,
+2) the adjustment formula later in the algorithm does not care about how
+much time passed between step 1 and step 4.  It just takes two well
+known (TSC, kvmclock) pairs, and uses them to ensure the guest TSC is
+the same on the destination as if the guest was still running on the
+source.  It is irrelevant that one of them is before migration and one
+is after, all it matters is that one is on the source and one is on the
+destination.
 
-	M.
+Perhaps we can add to step 6 something like:
 
--- 
-Without deviation from the norm, progress is not possible.
+> +6. Adjust the guest TSC offsets for every vCPU to account for (1)
+> time +   elapsed since recording state and (2) difference in TSCs
+> between the +   source and destination machine: + +   new_off_n = t_0
+> + off_n + (k_1 - k_0) * freq - t_1 +
+
+"off + t - k * freq" is the guest TSC value corresponding to a time of 0
+in kvmclock.  The above formula ensures that it is the same on the
+destination as it was on the source.
+
+Also, the names are a bit hard to follow.  Perhaps
+
+	t_0		tsc_src
+	t_1		tsc_dest
+	k_0		guest_src
+	k_1		guest_dest
+	r_0		host_src
+	off_n		ofs_src[i]
+	new_off_n	ofs_dest[i]
+
+Paolo
+
