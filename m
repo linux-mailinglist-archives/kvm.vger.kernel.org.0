@@ -2,87 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 391AC41F2BD
-	for <lists+kvm@lfdr.de>; Fri,  1 Oct 2021 19:13:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 33DD341F2EB
+	for <lists+kvm@lfdr.de>; Fri,  1 Oct 2021 19:18:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231719AbhJARPF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Oct 2021 13:15:05 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33517 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231573AbhJARPF (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 1 Oct 2021 13:15:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1633108400;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=sVz9m61lZAuKjlDG6AN5kGL/PhCyfwRd/qN/VMo9F+Q=;
-        b=LIcogePoPiCpr4VTWFoUYq2Tqg+3xxNw9tXEUlkSe3ktLgql28SR01xl1r9irJrjcW50wJ
-        P5A5MUwPMGfF3CgPOaJbH83sY/jaYG8swMBLQTpPuDJaVwR1ezR9cdNTkKeP2vbDprDsHz
-        TYm/4JnWqMHnXeMGvAV6HXbBUp9qfms=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-343-tqiJCmPBMTW4bQ7ddJMOpw-1; Fri, 01 Oct 2021 13:13:17 -0400
-X-MC-Unique: tqiJCmPBMTW4bQ7ddJMOpw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 68B93100C661;
-        Fri,  1 Oct 2021 17:13:16 +0000 (UTC)
-Received: from virtlab511.virt.lab.eng.bos.redhat.com (virtlab511.virt.lab.eng.bos.redhat.com [10.19.152.198])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 197195F4F0;
-        Fri,  1 Oct 2021 17:13:16 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     torvalds@linux-foundation.org
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: [GIT PULL] More KVM fixes Linux 5.15-rc4
-Date:   Fri,  1 Oct 2021 13:13:10 -0400
-Message-Id: <20211001171310.16659-1-pbonzini@redhat.com>
+        id S1353938AbhJARUT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Oct 2021 13:20:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37240 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232086AbhJARUT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Oct 2021 13:20:19 -0400
+Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F610C06177D
+        for <kvm@vger.kernel.org>; Fri,  1 Oct 2021 10:18:34 -0700 (PDT)
+Received: by mail-lf1-x130.google.com with SMTP id g41so41152297lfv.1
+        for <kvm@vger.kernel.org>; Fri, 01 Oct 2021 10:18:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=eaKHWjFuwyKvxPTNwNYn3BuRwzDh6/0sQ7VogCTPG8s=;
+        b=j2KIPK1abEQDmLX+us5yk2H9k7jh1igya3VQ/oN9xVeP/qTGNtdxRNyctZTVU85ui4
+         xJIne31y6CyFJpieB6eP/2bh3PDy2m50SAmRYu/ijUYYq/iLj/yL5d/M3vedeb2FDDBi
+         4M4zEQTrzvyjXCojCxFwNvT+AIyJQ+AbJKDcjVtL4fyBBIxqFtpMz+OuKpDXtE/4WDyj
+         aj81I2Q052BvWtna4cBQGC+BcoNJcbiQKs+8whfG71t9o3RN64MYTrBs6Wf3/x1Cdjem
+         fpYF8ocFQNb/dSQ/fnx2U8zZijmANqJ+ivamgVGDnPWtYQWXmPz/QMBvaFB44GKew4qr
+         1ykw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=eaKHWjFuwyKvxPTNwNYn3BuRwzDh6/0sQ7VogCTPG8s=;
+        b=U/oVF/iP9aNPAARboH0/YqwXwlXKoeOx+E+gSlEMK324Z+PykkBSQv6l9mqY2QXx75
+         Lnvl21lD8sKDAIo/utBRGk1mq91qZchNDSHvXoJ5SQm2lhVntsChViU1g2cHovgPAe26
+         09cIefR+RJD8muR7rMCny/6rV9UDn+NJwkUBlP8e5hoT/AZyYz8dvfSvR3bS7zMInX6y
+         LGothlwxw7E4qFoKkALXMDInqpID2k643pFaAA3Nu9QfYXhJ7aqxwTfZm5wVCUKiajX0
+         1+YBF1/attVQwd7Z5uprWh0aJhHJZPIkUh/9nlpKERbdeJUIiH4RzAoUviHMmkf2KLOs
+         hUqw==
+X-Gm-Message-State: AOAM531KADvu52CIqWiUTJ60FGSZH3tN+/RJ8XGOUKmNDEH88Zy+0ahK
+        EQjXLTO8PRH9ka/mToX7voLX7gZL5TezRMDxgMpH2Q==
+X-Google-Smtp-Source: ABdhPJziBYyBg1MdhYdRfe+e6ZE01VBv+2vQ9vu2x8Ts5SH8U70CKxzXlOdmOq32hDBm3FqbdLKCLOzfyMCGxpPbV9g=
+X-Received: by 2002:a05:6512:110a:: with SMTP id l10mr6525108lfg.550.1633108712320;
+ Fri, 01 Oct 2021 10:18:32 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+References: <20210827153409.GV1721383@nvidia.com> <878rzdt3a3.fsf@intel.com>
+In-Reply-To: <878rzdt3a3.fsf@intel.com>
+From:   Nick Desaulniers <ndesaulniers@google.com>
+Date:   Fri, 1 Oct 2021 10:18:20 -0700
+Message-ID: <CAKwvOdkVAKOCH1hfSqNphKco8rLOmyAg0PVGzmpMRu6Svs1hSQ@mail.gmail.com>
+Subject: Re: [vfio:next 33/38] drivers/gpu/drm/i915/i915_pci.c:975:2: warning:
+ missing field 'override_only' initializer
+To:     Jani Nikula <jani.nikula@linux.intel.com>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>,
+        kernel test robot <lkp@intel.com>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        "llvm@lists.linux.dev" <llvm@lists.linux.dev>,
+        "kbuild-all@lists.01.org" <kbuild-all@lists.01.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        intel-gfx@lists.freedesktop.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Linus,
+On Fri, Oct 1, 2021 at 4:04 AM Jani Nikula <jani.nikula@linux.intel.com> wrote:
+>
+> Anyway, we've got
+>
+> subdir-ccflags-y += $(call cc-disable-warning, missing-field-initializers)
+> subdir-ccflags-y += $(call cc-disable-warning, initializer-overrides)
+>
+> in drivers/gpu/drm/i915/Makefile, so I wonder why they're not respected.
 
-The following changes since commit 50b078184604fea95adbb144ff653912fb0e48c6:
-
-  Merge tag 'kvmarm-fixes-5.15-1' of git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into kvm-master (2021-09-24 06:04:42 -0400)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
-
-for you to fetch changes up to 7b0035eaa7dab9fd33d6658ad6a755024bdce26c:
-
-  KVM: selftests: Ensure all migrations are performed when test is affined (2021-09-30 04:25:57 -0400)
-
-----------------------------------------------------------------
-Small x86 fixes.
-
-----------------------------------------------------------------
-Oliver Upton (1):
-      selftests: KVM: Don't clobber XMM register when read
-
-Sean Christopherson (2):
-      KVM: x86: Swap order of CPUID entry "index" vs. "significant flag" checks
-      KVM: selftests: Ensure all migrations are performed when test is affined
-
-Zelin Deng (2):
-      x86/kvmclock: Move this_cpu_pvti into kvmclock.h
-      ptp: Fix ptp_kvm_getcrosststamp issue for x86 ptp_kvm
-
-Zhenzhong Duan (1):
-      KVM: VMX: Fix a TSX_CTRL_CPUID_CLEAR field mask issue
-
- arch/x86/include/asm/kvmclock.h                    | 14 +++++
- arch/x86/kernel/kvmclock.c                         | 13 +---
- arch/x86/kvm/cpuid.c                               |  4 +-
- arch/x86/kvm/vmx/vmx.c                             |  2 +-
- drivers/ptp/ptp_kvm_x86.c                          |  9 +--
- .../selftests/kvm/include/x86_64/processor.h       |  2 +-
- tools/testing/selftests/kvm/rseq_test.c            | 69 ++++++++++++++++++----
- 7 files changed, 81 insertions(+), 32 deletions(-)
-
+You do have to be super careful with `:=` assignment in Make;
+generally folks mean to use `+=` and end up overwriting the existing
+KBUILD_CFLAGS.  I'm not sure if that's the issue here, but it's worth
+an audit of your Makefiles.
+-- 
+Thanks,
+~Nick Desaulniers
