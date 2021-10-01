@@ -2,59 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E229D41F4F7
-	for <lists+kvm@lfdr.de>; Fri,  1 Oct 2021 20:27:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 09B4741F510
+	for <lists+kvm@lfdr.de>; Fri,  1 Oct 2021 20:37:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1355894AbhJAS30 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Oct 2021 14:29:26 -0400
-Received: from mail.kernel.org ([198.145.29.99]:39194 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1355691AbhJAS3Z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Oct 2021 14:29:25 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPS id 2C7D661A51;
-        Fri,  1 Oct 2021 18:27:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1633112860;
-        bh=fT8VZCJfFgbodnGWbVRGq1XrFb1TRAuULsoSkEjYpUM=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=ZrTtMGSnB5dhhEpkOVBGok23k3Xfg83JhOqK0jOpae15+Z47cvtCJhZ+hZDGCz5Ad
-         r9dZs1sFhPggq8gf5HBt2Fl6O+NRXIFGrcLWaiaNFm6Sby0oxsA3PHddTWvrnIl5Dk
-         1c0K0mweinQe1vLOTZTITFdFiBmo3b+vc0VTqOet1CLfRaiOJ8G6cEbn/BlXlnp6OZ
-         MHwNzH0W1if9kL5OpKa/8uDp1VxheUyMebqI8259cPnD5mPp6RxTu75C8CedzZKTKL
-         Eom81I/FliOxR8zFF80AG8UDwwB/zDIDjaMaL9s0bUkPQ2w598tn3bbld7PZpIpop0
-         /zb/HIpEaL7LA==
-Received: from pdx-korg-docbuild-2.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by pdx-korg-docbuild-2.ci.codeaurora.org (Postfix) with ESMTP id 1CA21609D6;
-        Fri,  1 Oct 2021 18:27:40 +0000 (UTC)
-Subject: Re: [GIT PULL] More KVM fixes Linux 5.15-rc4
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <20211001171310.16659-1-pbonzini@redhat.com>
-References: <20211001171310.16659-1-pbonzini@redhat.com>
-X-PR-Tracked-List-Id: <kvm.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20211001171310.16659-1-pbonzini@redhat.com>
-X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
-X-PR-Tracked-Commit-Id: 7b0035eaa7dab9fd33d6658ad6a755024bdce26c
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: b2626f1e3245ddd810b69df86514774d6cb655ee
-Message-Id: <163311286005.3460.13685629815618822976.pr-tracker-bot@kernel.org>
-Date:   Fri, 01 Oct 2021 18:27:40 +0000
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     torvalds@linux-foundation.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
+        id S1354147AbhJASio (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Oct 2021 14:38:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55862 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1355969AbhJASig (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Oct 2021 14:38:36 -0400
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A6C9C061775;
+        Fri,  1 Oct 2021 11:36:44 -0700 (PDT)
+Received: by mail-pf1-x42e.google.com with SMTP id p1so2647059pfh.8;
+        Fri, 01 Oct 2021 11:36:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=U/jeo0cc4IS12fXu/3bym/iiyWz3QTfkGKyYijbo8pY=;
+        b=cPfJPl85flsr5d4GoEpVUbaPdgMoIQXFsKWqOJIawh2OktBJif4WDJTgJfCp+DZVLE
+         xWjav8cTfeSzwz6vvFgspe8IuaOqaPNp1QmAXMnLOJhWBr+i9jTOc6g0I++ZmPq70S2u
+         wz+gnit0JRnRxpEKSiaFE/4qg58Qj5poqu6BZscEk7exNp72iz2SVBawCsfF7bRb9kd4
+         WQHbaZ7lwO2hmVGRat0sOY4CbIqesw4bhvmbdOsncWv6mImb8vtBs90Az8MFfTQzaGqX
+         NLKwh1XOC6ZlMYoPzZDX2cqXJ7bDqFJFTjyJjRGAPHJ1urMr9+ZmccUHI/ZdKgggTBpL
+         HMCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=U/jeo0cc4IS12fXu/3bym/iiyWz3QTfkGKyYijbo8pY=;
+        b=p3PHMLbvL10ZT7WKQ3MUmMalH4Xgz4SBRI5LFbymV3M7k00S65G7KB4Cc5qX7eQk8Q
+         JsUYMVfDDmHcqSb3EsnzmcyEh0nOBVqDgC0nbBHXyHERFZeOsZ6rP3iRaYFgPXlee0wf
+         vmJ3h5k7Bln7j3ZEk10xfxZPIvlEStDjdfvkoZeMaUIAapj73mdUpF2tYauS3DxeinCi
+         U8b443AhUC9FnkJcYJGkJSoWjcC7/TUC5ROE9NdPi7qUr4OfIB7kFzsBaR4M6wxDIV8H
+         A+fhxsqMoarDLgyMSd3iBXNV04Vhijq9/DWM0dAht5tMNf5q8cMAZkyHd2UGXD7RZTgB
+         rCiQ==
+X-Gm-Message-State: AOAM532SN6xnR6UcfWMoch6otfb7/kqlT7QRc6pY9CF0AXvCTys+t+ip
+        EgB4Oui4+Jl6jxpWlYnRVBs=
+X-Google-Smtp-Source: ABdhPJxpcN7h+xroaO4ziJJc8u4TcIRQF/ZupaBuavc2M/JBoGPwQoLCynTihJtuxc2oGWN1VfWgvw==
+X-Received: by 2002:a62:e210:0:b0:44b:ae4c:8c01 with SMTP id a16-20020a62e210000000b0044bae4c8c01mr11498160pfi.45.1633113403479;
+        Fri, 01 Oct 2021 11:36:43 -0700 (PDT)
+Received: from localhost (searspoint.nvidia.com. [216.228.112.21])
+        by smtp.gmail.com with ESMTPSA id t23sm2310819pgn.25.2021.10.01.11.36.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 01 Oct 2021 11:36:43 -0700 (PDT)
+Date:   Fri, 1 Oct 2021 11:36:44 -0700
+From:   Yury Norov <yury.norov@gmail.com>
+To:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc:     Stephen Rothwell <sfr@canb.auug.org.au>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-mmc@vger.kernel.org, linux-perf-users@vger.kernel.org,
+        kvm@vger.kernel.org,
+        "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+        Alexander Lobakin <alobakin@pm.me>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Alexey Klimov <aklimov@redhat.com>,
+        Andrea Merello <andrea.merello@gmail.com>,
+        Arnaldo Carvalho de Melo <acme@redhat.com>,
+        Arnd Bergmann <arnd@arndb.de>, Ben Gardon <bgardon@google.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Brian Cain <bcain@codeaurora.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Christoph Lameter <cl@linux.com>,
+        Daniel Bristot de Oliveira <bristot@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Dennis Zhou <dennis@kernel.org>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Ian Rogers <irogers@google.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Jakub Kicinski <kuba@kernel.org>, Jiri Olsa <jolsa@redhat.com>,
+        Joe Perches <joe@perches.com>, Jonas Bonn <jonas@southpole.se>,
+        Leo Yan <leo.yan@linaro.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Xu <peterx@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Petr Mladek <pmladek@suse.com>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Rich Felker <dalias@libc.org>,
+        Samuel Mendoza-Jonas <sam@mendozajonas.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Tejun Heo <tj@kernel.org>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Will Deacon <will@kernel.org>,
+        Wolfram Sang <wsa+renesas@sang-engineering.com>,
+        Yoshinori Sato <ysato@users.sourceforge.jp>
+Subject: Re: [PATCH RESEND 2 00/16] Resend bitmap patches
+Message-ID: <YVdVPGaF2Gq1PGpG@yury-ThinkPad>
+References: <20211001181226.228340-1-yury.norov@gmail.com>
+ <YVdSK4rFmLVFrKrD@smile.fi.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YVdSK4rFmLVFrKrD@smile.fi.intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The pull request you sent on Fri,  1 Oct 2021 13:13:10 -0400:
+On Fri, Oct 01, 2021 at 09:23:39PM +0300, Andy Shevchenko wrote:
+> On Fri, Oct 01, 2021 at 11:12:10AM -0700, Yury Norov wrote:
+> > Hi Stephen,
+> > 
+> > Can you please take this series into the next tree? It has been already
+> > in next-tree for 5.14:
+> > 
+> > https://lore.kernel.org/linux-mmc/YSeduU41Ef568xhS@alley/T/
+> > 
+> > But it was damaged and we decided to merge it in 5.15 cycle. No changes
+> > comparing to 5.14, except for Andy's patch that was already upstreamed
+> > and therefore removed from here.
+> > 
+> > The git tree is here:
+> > 	https://github.com/norov/linux/tree/bitmap-20210929
+> 
+> 
+> This is a dup with the same subject. Which one should we look into?
 
-> https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+Please ignore this (short) series. It's a duplication, my connection
+was broken and I had to restart submitting.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/b2626f1e3245ddd810b69df86514774d6cb655ee
-
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Sorry for noise.
