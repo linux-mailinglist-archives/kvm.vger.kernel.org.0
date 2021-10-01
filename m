@@ -2,268 +2,190 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3353341ED20
-	for <lists+kvm@lfdr.de>; Fri,  1 Oct 2021 14:11:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7610241ED43
+	for <lists+kvm@lfdr.de>; Fri,  1 Oct 2021 14:22:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354322AbhJAMNh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Oct 2021 08:13:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:52353 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237143AbhJAMNg (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 1 Oct 2021 08:13:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1633090312;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=1WMoHDuRMv8a05PMxxecz9ri+FED1EzVSseeb3CdzN8=;
-        b=CMIVTzH2PejuIdbUla4sFhNDkNG8FdzHrRF/aACqBdc+kvxbwVgttKVK9HeC47+Be6JAFe
-        fc1KLdwW2q+0K7HJDzrQXMk8ysxLEid4NY3TmEMggntoTc7B0dJEimqSdVWb2WGFT9WBrB
-        NBhUNmbPli6jTzYMt9t0NffPJAqirw0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-587-5p5UB6B6NGWPnU9lOVTNuA-1; Fri, 01 Oct 2021 08:11:51 -0400
-X-MC-Unique: 5p5UB6B6NGWPnU9lOVTNuA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 27D6519253C4;
-        Fri,  1 Oct 2021 12:11:49 +0000 (UTC)
-Received: from fuller.cnet (ovpn-112-2.gru2.redhat.com [10.97.112.2])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7882160BF1;
-        Fri,  1 Oct 2021 12:11:48 +0000 (UTC)
-Received: by fuller.cnet (Postfix, from userid 1000)
-        id 400A3416CE5D; Fri,  1 Oct 2021 09:10:41 -0300 (-03)
-Date:   Fri, 1 Oct 2021 09:10:41 -0300
-From:   Marcelo Tosatti <mtosatti@redhat.com>
-To:     Thomas Gleixner <tglx@linutronix.de>
-Cc:     Oliver Upton <oupton@google.com>, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-arm-kernel@lists.infradead.org,
-        Andrew Jones <drjones@redhat.com>,
-        Will Deacon <will@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v8 4/7] KVM: x86: Report host tsc and realtime values in
- KVM_GET_CLOCK
-Message-ID: <20211001121041.GA45897@fuller.cnet>
-References: <20210916181538.968978-1-oupton@google.com>
- <20210916181538.968978-5-oupton@google.com>
- <20210929185629.GA10933@fuller.cnet>
- <20210930192107.GB19068@fuller.cnet>
- <871r557jls.ffs@tglx>
- <20211001120527.GA43086@fuller.cnet>
-MIME-Version: 1.0
+        id S231489AbhJAMYM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Oct 2021 08:24:12 -0400
+Received: from mail-bn8nam12on2081.outbound.protection.outlook.com ([40.107.237.81]:50240
+        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S230498AbhJAMYM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Oct 2021 08:24:12 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Rccj+PHeaAFCxg3nNrl9c86rJYSRPXqqMt5Y2Ve9P9w4n+p+4orEtD2ELxo54H/cNu8RoMBaQC1mPu1UiPNKJnWsLAjPlqN4A6RwldLCIgnnH9nT1Sn1gIeSEnBlezB4dN7/7ClyrL3F3sWhw6Z36Bl0fM4tZiGJU3qg1suiSUu9vR8R/oziKl34pQe0cBCXOGr7f+FU0uWdntUuLp8yxus3qqN4UrT0Mf9gkR4d7Ql/cd1wVFTuyZph89W62jJmR7WhU7+wrqOSXj6O/oFTDjVjfLN/GoICFzy7BiZrXIfMmmLcjIlsZp7vBo4LY8gd2RmLA0+ytUYgBAl8nZIznw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=u42DleCkTtJJfoHGEgEjQjktEqi/dlqvt8kSdy9ReIY=;
+ b=gEM5uLPsrk9zWqy4JeQy9llvQDUAghMn/ve60wzib3Hz7AGB6xrPMRWH7GRcC8Lw3N6m3go7OCCvWdNwACgY7d6xOSiCLcS2k0rd53kI52dN55f9RcuQe3DgLRkZganZd2cQKCaPQJaVRJprOW6lIb+UUKUEH008BiUiQFEgw/rzC+jKATo2kaFi3wVUDkWHbbsbM8QbsHYyYuAQhir8ayw9h+1/Dwxr6RZ95Kw56m9ix4gqsMoOPidmhS+jIuqxXpxnydy+UKAqNHcm5EwfmdDkh7XJDmgVbIccCZwKM4ApOuA5S5Vyjma/beYio7NCZIGcbmDIW8kzrQ7L8CPsNQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=u42DleCkTtJJfoHGEgEjQjktEqi/dlqvt8kSdy9ReIY=;
+ b=mlpO8kTiOVtn0DRWiKLXYObVQomjnRHDSbC8ZpEynXXZ60nIKq59WcCCbNT5Guybgwy3MUL+cWkvsLCJScPrSckGEqNTDDfv4pyBvHTJb5duxqDt3BLAD2C6L5CasvszDfC62uk7n6d3dRn50Y5xnKqNg8lwfFcLbegYrj7BUHn0DFqX0Pb9qjRfo01fWAtkXH0LHbVip0yc9YDYOuGRLBgXB6hke4SljxToYWYqHuPWvIZysiBGn8ExXpUm5CJp1GEPxDGb8CtF7ojbgig7P3zdNmgGWpB85pYJcbS8hsfjACpA63XaUzN2ywf8tZgrl+UiyFjd24xnFq4i/dI+Hg==
+Authentication-Results: gibson.dropbear.id.au; dkim=none (message not signed)
+ header.d=none;gibson.dropbear.id.au; dmarc=none action=none
+ header.from=nvidia.com;
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
+ by BL1PR12MB5377.namprd12.prod.outlook.com (2603:10b6:208:31f::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4566.19; Fri, 1 Oct
+ 2021 12:22:26 +0000
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::e8af:232:915e:2f95]) by BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::e8af:232:915e:2f95%8]) with mapi id 15.20.4566.019; Fri, 1 Oct 2021
+ 12:22:26 +0000
+Date:   Fri, 1 Oct 2021 09:22:25 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     David Gibson <david@gibson.dropbear.id.au>
+Cc:     Liu Yi L <yi.l.liu@intel.com>, alex.williamson@redhat.com,
+        hch@lst.de, jasowang@redhat.com, joro@8bytes.org,
+        jean-philippe@linaro.org, kevin.tian@intel.com, parav@mellanox.com,
+        lkml@metux.net, pbonzini@redhat.com, lushenming@huawei.com,
+        eric.auger@redhat.com, corbet@lwn.net, ashok.raj@intel.com,
+        yi.l.liu@linux.intel.com, jun.j.tian@intel.com, hao.wu@intel.com,
+        dave.jiang@intel.com, jacob.jun.pan@linux.intel.com,
+        kwankhede@nvidia.com, robin.murphy@arm.com, kvm@vger.kernel.org,
+        iommu@lists.linux-foundation.org, dwmw2@infradead.org,
+        linux-kernel@vger.kernel.org, baolu.lu@linux.intel.com,
+        nicolinc@nvidia.com
+Subject: Re: [RFC 11/20] iommu/iommufd: Add IOMMU_IOASID_ALLOC/FREE
+Message-ID: <20211001122225.GK964074@nvidia.com>
+References: <20210919063848.1476776-1-yi.l.liu@intel.com>
+ <20210919063848.1476776-12-yi.l.liu@intel.com>
+ <20210921174438.GW327412@nvidia.com>
+ <YVanJqG2pt6g+ROL@yekko>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211001120527.GA43086@fuller.cnet>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <YVanJqG2pt6g+ROL@yekko>
+X-ClientProxiedBy: BLAPR03CA0120.namprd03.prod.outlook.com
+ (2603:10b6:208:32a::35) To BL0PR12MB5506.namprd12.prod.outlook.com
+ (2603:10b6:208:1cb::22)
+MIME-Version: 1.0
+Received: from mlx.ziepe.ca (142.162.113.129) by BLAPR03CA0120.namprd03.prod.outlook.com (2603:10b6:208:32a::35) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4566.14 via Frontend Transport; Fri, 1 Oct 2021 12:22:25 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1mWHYX-008PM8-5U; Fri, 01 Oct 2021 09:22:25 -0300
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 30582f79-fcd5-43fb-2d95-08d984d620e6
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5377:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <BL1PR12MB5377F7C4E64EC81BE56BED89C2AB9@BL1PR12MB5377.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: ZDE7vFXZWj/WNIr6vf0XWOWX+l11Yg6jr1UGbF/FbQk7mtqtl+kNDKT6wf7/WA1rQwLOeB4VmMohqBus02BvOcGJDXBH/0ltvg/o8d5+GhKKLwsKqATT9ufvKhqSKBYJJTCKShzYuXppO5Cjwr+8MuepD1lopfnUCbU+2BpsXRWlkWHGQTvNcDvcQY980Nb/8PzZ7CK37wZ7hZMgurjxyvKZqkZ2+j4UdFqSDAKWcsToGlVAEHpz9nSPuA6f4YxXWSm7+qFOuxHXLWqonLT5WPeho9LqdV5BN6hoYNhamc4ghMuGFTOKGwQnuGK8holOk7sj1LB6pZv+3NZMP7fhws7DrSSCY3BBBKx0ilROludgvnHKCrEa5fhYKSoT12E4NBFOdN1UCcV8t9AGQEN4sGsg2Squ/dwnarEzT+bbAb1Z8Tz1ktUOsljNm9uNPwLYQX34dvmwcqJmdyr/Ao0d/cOOYhtiqRbP0Be0xnRHvyhI/M3ah50M3fka3i1aTTNXGw0+FMggooh4aaQCzrVYs6rVUS96AU4wo5751/vkU47DEh3N550jyFVTWXvmLK0gzi5sbDL+1/Cl69kjpgRMvEP2m0tetctRt7DTGMUxZ4PXShkhwuNCGq18jX0hvkYOOMHceo6IEhQDVh+7EuuYQRC/XytlAxoEl6jnQdpdTE5EdUt82iFKJgS3JhfQ4sQlPEUl0KOuTrSmLcWnFFFXnJBzjKXefQeZAynmv5A6Ftc=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(36756003)(2906002)(83380400001)(66946007)(8936002)(9746002)(7416002)(38100700002)(66476007)(9786002)(426003)(66556008)(186003)(2616005)(26005)(33656002)(6916009)(1076003)(508600001)(8676002)(316002)(107886003)(86362001)(5660300002)(4326008)(27376004)(84603001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?sHnF7Zm5h4u9kJMyX7bSDUB9ZpAeGRwa7ncE/PP2qNt32TZhE22SnewTq7Lx?=
+ =?us-ascii?Q?gECysAVBppbN8dy/DjWAoUgWfes2pDbqZXgfCnPJkUt33RxIVstXIgwwHKOn?=
+ =?us-ascii?Q?b2bVvBCdp5JbiuJdMsDtegeFqJtHvH+cYICYL9hzE70YciWNZPuZ7lILQtEy?=
+ =?us-ascii?Q?J5JFwO1LnvqwXP7QOViaWIL5i+0OOcQ81x//f+ImGhRACM5n9TFdJfsUlftn?=
+ =?us-ascii?Q?iXNLOUoU6S+U2UkKWryVeJO0c68OGfYMw0r7U73wNABCd+3V0s3fgycfOc4g?=
+ =?us-ascii?Q?LCe14MLH0nZaVv6/ftnEmKaxe7ILDV+m4sukO1OAnpCFC2yzoDN1HHJVSrXg?=
+ =?us-ascii?Q?u1R5nfEyESBIWfQLhPlKfXUtRzEI7A5Rxv+75tFl939glzoueNVseGP0WYwu?=
+ =?us-ascii?Q?FxDBPlmY3V6HYa0pJ4dFEEqFh1kFG+XTzIkpQv21QUsIIA6Ru5rtKIwY6qQf?=
+ =?us-ascii?Q?dPZ/ZTfcGTbkWZ+/e22NjhbjBVJcmLHbkYRmBVR2BwjPK3BnKZkpWCVugWVe?=
+ =?us-ascii?Q?wBSJm3wKND7z/IZ58y8QcAIfuJabL9xpP6uIOu+o68tBaUF7AAwcAhKJMlk+?=
+ =?us-ascii?Q?QhZvjUtiAuJUUvvLWvtgLtYNyshG9hpY9JTA303ylEBuuJ7NGkM8PiZmClhH?=
+ =?us-ascii?Q?OLWZgfjrgXDn7G7e3Hst5u3MqoihtiYwWIOeBFpUlKN2Ch190urPC2keox/3?=
+ =?us-ascii?Q?bDurKBytKnhDwY8Jw2byzyYBxOcIdEz1b9LGZFjkZCUqtKZT4tC8hvGf6SfR?=
+ =?us-ascii?Q?KIPmzicZhXziOmpNF0pO7UpQjUeZkrUob5N4uQzyq0pueeMf2ToCd5CdnmRO?=
+ =?us-ascii?Q?RIHkxGr+z7d/mX0ZqxytJTkecP+dvIV4MaGr94WQPSB9b/twSje0b7se1KYu?=
+ =?us-ascii?Q?pLMRxnzVndmUmguM2fATyxzEzKjc6Dwir6OIsuvEoukvA3W+QY9U6oG2V1zo?=
+ =?us-ascii?Q?0vOeTJMNDzNNWYzovZzCec/7iTUE5F/Zis7CKyKiVFHqQt3kXY62osq/GGlq?=
+ =?us-ascii?Q?ujJXxdt2Q0UliU26AT8SY7Z/44BcS1ieFiwBdsZ74WZ9Lx/sOqm+uTDO5z6y?=
+ =?us-ascii?Q?YOFnhDLMjMN+vcNzmKBHknPtqfx9TXphkvfHe0HDTefuxKGtVxTTsWQHjqAl?=
+ =?us-ascii?Q?c1PWXGk/lQZDxgZuIcEDw0ia3ecEu8/epTi2UkSMHjeq28eEbEqPM81Stt6I?=
+ =?us-ascii?Q?e0zfz3xru+GWJyNk8ebJn1POwmSQA7bky/9iDKl3N8TL1tLQ4SIII1lIwr8o?=
+ =?us-ascii?Q?G78gHTEMwHOsai2/Kxyy0mp1wciUq37bYmFKn87NBiFZ7KdgPjQ6lF+rT4WH?=
+ =?us-ascii?Q?WAP/vhgYAkkqdNqfciXuDcWL?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 30582f79-fcd5-43fb-2d95-08d984d620e6
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Oct 2021 12:22:26.2725
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: S3B4K5Mh25UvMWAFdm8UD6gqa8pQxI8o9J+aQsRN9+qXvV6WK2+EBvd9Kssnb6vp
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5377
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 01, 2021 at 09:05:27AM -0300, Marcelo Tosatti wrote:
-> On Fri, Oct 01, 2021 at 01:02:23AM +0200, Thomas Gleixner wrote:
-> > Marcelo,
+On Fri, Oct 01, 2021 at 04:13:58PM +1000, David Gibson wrote:
+> On Tue, Sep 21, 2021 at 02:44:38PM -0300, Jason Gunthorpe wrote:
+> > On Sun, Sep 19, 2021 at 02:38:39PM +0800, Liu Yi L wrote:
+> > > This patch adds IOASID allocation/free interface per iommufd. When
+> > > allocating an IOASID, userspace is expected to specify the type and
+> > > format information for the target I/O page table.
+> > > 
+> > > This RFC supports only one type (IOMMU_IOASID_TYPE_KERNEL_TYPE1V2),
+> > > implying a kernel-managed I/O page table with vfio type1v2 mapping
+> > > semantics. For this type the user should specify the addr_width of
+> > > the I/O address space and whether the I/O page table is created in
+> > > an iommu enfore_snoop format. enforce_snoop must be true at this point,
+> > > as the false setting requires additional contract with KVM on handling
+> > > WBINVD emulation, which can be added later.
+> > > 
+> > > Userspace is expected to call IOMMU_CHECK_EXTENSION (see next patch)
+> > > for what formats can be specified when allocating an IOASID.
+> > > 
+> > > Open:
+> > > - Devices on PPC platform currently use a different iommu driver in vfio.
+> > >   Per previous discussion they can also use vfio type1v2 as long as there
+> > >   is a way to claim a specific iova range from a system-wide address space.
+> > >   This requirement doesn't sound PPC specific, as addr_width for pci devices
+> > >   can be also represented by a range [0, 2^addr_width-1]. This RFC hasn't
+> > >   adopted this design yet. We hope to have formal alignment in v1 discussion
+> > >   and then decide how to incorporate it in v2.
 > > 
-> > On Thu, Sep 30 2021 at 16:21, Marcelo Tosatti wrote:
-> > > On Wed, Sep 29, 2021 at 03:56:29PM -0300, Marcelo Tosatti wrote:
-> > >> On Thu, Sep 16, 2021 at 06:15:35PM +0000, Oliver Upton wrote:
-> > >> 
-> > >> Thomas, CC'ed, has deeper understanding of problems with 
-> > >> forward time jumps than I do. Thomas, any comments?
-> > >
-> > > Based on the earlier discussion about the problems of synchronizing
-> > > the guests clock via a notification to the NTP/Chrony daemon 
-> > > (where there is a window where applications can read the stale
-> > > value of the clock), a possible solution would be triggering
-> > > an NMI on the destination (so that it runs ASAP, with higher
-> > > priority than application/kernel).
-> > >
-> > > What would this NMI do, exactly?
-> > 
-> > Nothing. You cannot do anything time related in an NMI.
-> > 
-> > You might queue irq work which handles that, but that would still not
-> > prevent user space or kernel space from observing the stale time stamp
-> > depending on the execution state from where it resumes.
+> > I think the request was to include a start/end IO address hint when
+> > creating the ios. When the kernel creates it then it can return the
+> > actual geometry including any holes via a query.
 > 
-> Yes.
+> So part of the point of specifying start/end addresses is that
+> explicitly querying holes shouldn't be necessary: if the requested
+> range crosses a hole, it should fail.  If you didn't really need all
+> that range, you shouldn't have asked for it.
 > 
-> > >> As a note: this makes it not OK to use KVM_CLOCK_REALTIME flag 
-> > >> for either vm pause / vm resume (well, if paused for long periods of time) 
-> > >> or savevm / restorevm.
-> > >
-> > > Maybe with the NMI above, it would be possible to use
-> > > the realtime clock as a way to know time elapsed between
-> > > events and advance guest clock without the current 
-> > > problematic window.
-> > 
-> > As much duct tape you throw at the problem, it cannot be solved ever
-> > because it's fundamentally broken. All you can do is to make the
-> > observation windows smaller, but that's just curing the symptom.
-> 
-> Yes.
-> 
-> > The problem is that the guest is paused/resumed without getting any
-> > information about that and the execution of the guest is stopped at an
-> > arbitrary instruction boundary from which it resumes after migration or
-> > restore. So there is no way to guarantee that after resume all vCPUs are
-> > executing in a state which can handle that.
-> > 
-> > But even if that would be the case, then what prevents the stale time
-> > stamps to be visible? Nothing:
-> > 
-> > T0:    t = now();
-> >          -> pause
-> >          -> resume
-> >          -> magic "fixup"
-> > T1:    dostuff(t);
-> 
-> Yes.
-> 
-> BTW, you could have a userspace notification (then applications 
-> could handle this if desired).
-> 
-> > But that's not a fundamental problem because every preemptible or
-> > interruptible code has the same issue:
-> > 
-> > T0:    t = now();
-> >          -> preemption or interrupt
-> > T1:    dostuff(t);
-> > 
-> > Which is usually not a problem, but It becomes a problem when T1 - T0 is
-> > greater than the usual expectations which can obviously be trivially
-> > achieved by guest migration or a savevm, restorevm cycle.
-> > 
-> > But let's go a step back and look at the clocks and their expectations:
-> > 
-> > CLOCK_MONOTONIC:
-> > 
-> >   Monotonically increasing clock which counts unless the system
-> >   is in suspend. On resume it continues counting without jumping
-> >   forward.
-> > 
-> >   That's the reference clock for everything else and therefore it
-> >   is important that it does _not_ jump around.
-> > 
-> >   The reasons why CLOCK_MONOTONIC stops during suspend is
-> >   historical and any attempt to change that breaks the world and
-> >   some more because making it jump forward will trigger all sorts
-> >   of timeouts, watchdogs and whatever. The last attempt to make
-> >   CLOCK_MONOTONIC behave like CLOCK_BOOTTIME was reverted within 3
-> >   weeks. It's not going to be attempted again. See a3ed0e4393d6
-> >   ("Revert: Unify CLOCK_MONOTONIC and CLOCK_BOOTTIME") for
-> >   details.
-> > 
-> >   Now the proposed change is creating exactly the same problem:
-> > 
-> >   >> > +	if (data.flags & KVM_CLOCK_REALTIME) {
-> >   >> > +		u64 now_real_ns = ktime_get_real_ns();
-> >   >> > +
-> >   >> > +		/*
-> >   >> > +		 * Avoid stepping the kvmclock backwards.
-> >   >> > +		 */
-> >   >> > +		if (now_real_ns > data.realtime)
-> >   >> > +			data.clock += now_real_ns - data.realtime;
-> >   >> > +	}
-> > 
-> >   IOW, it takes the time between pause and resume into account and
-> >   forwards the underlying base clock which makes CLOCK_MONOTONIC
-> >   jump forward by exactly that amount of time.
-> 
-> Well, it is assuming that the
-> 
->  T0:    t = now();
->  T1:    pause vm()
->  T2:	finish vm migration()
->  T3:    dostuff(t);
-> 
-> Interval between T1 and T2 is small (and that the guest
-> clocks are synchronized up to a given boundary).
-> 
-> But i suppose adding a limit to the forward clock advance 
-> (in the migration case) is useful:
-> 
-> 	1) If migration (well actually, only the final steps
-> 	   to finish migration, the time between when guest is paused
-> 	   on source and is resumed on destination) takes too long,
-> 	   then too bad: fix it to be shorter if you want the clocks
-> 	   to have close to zero change to realtime on migration.
-> 
-> 	2) Avoid the other bugs in case of large forward advance.
-> 
-> Maybe having it configurable, with a say, 1 minute maximum by default
-> is a good choice?
-> 
-> An alternative would be to advance only the guests REALTIME clock, from 
-> data about how long steps T1-T2 took.
-> 
-> >   So depending on the size of the delta you are running into exactly the
-> >   same problem as the final failed attempt to unify CLOCK_MONOTONIC and
-> >   CLOCK_BOOTTIME which btw. would have been a magic cure for virt.
-> > 
-> >   Too bad, not going to happen ever unless you fix all affected user
-> >   space and kernel side issues.
-> > 
-> > 
-> > CLOCK_BOOTTIME:
-> > 
-> >   CLOCK_MONOTONIC + time spent in suspend
-> > 
-> > 
-> > CLOCK_REALTIME/TAI:
-> > 
-> >   CLOCK_MONOTONIC + offset
-> > 
-> >   The offset is established by reading RTC at boot time and can be
-> >   changed by clock_settime(2) and adjtimex(2). The latter is used
-> >   by NTP/PTP.
-> > 
-> >   Any user of CLOCK_REALTIME has to be prepared for it to jump in
-> >   both directions, but of course NTP/PTP daemons have expectations
-> >   vs. such time jumps.
-> > 
-> >   They rightfully assume on a properly configured and administrated
-> >   system that there are only two things which can make CLOCK_REALTIME
-> >   jump:
-> > 
-> >   1) NTP/PTP daemon controlled
-> >   2) Suspend/resume related updates by the kernel
-> > 
-> > 
-> > Just for the record, these assumptions predate virtualization.
-> > 
-> > So now virt came along and created a hard to solve circular dependency
-> > problem:
-> > 
-> >    - If CLOCK_MONOTONIC stops for too long then NTP/PTP gets out of
-> >      sync, but everything else is happy.
-> >      
-> >    - If CLOCK_MONOTONIC jumps too far forward, then all hell breaks
-> >      lose, but NTP/PTP is happy.
-> 
-> One must handle the
-> 
->  T0:    t = now();
->           -> pause
->           -> resume
->           -> magic "fixup"
->  T1:    dostuff(t);
-> 
-> fact if one is going to use savevm/restorevm anyway, so...
-> (it is kind of unfixable, unless you modify your application
-> to accept notifications to redo any computation based on t, isnt it?).
+> Which means these aren't really "hints" but optionally supplied
+> constraints.
 
-https://lore.kernel.org/lkml/1289503802-22444-2-git-send-email-virtuoso@slind.org/
+We have to be very careful here, there are two very different use
+cases. When we are talking about the generic API I am mostly
+interested to see that applications like DPDK can use this API and be
+portable to any IOMMU HW the kernel supports. I view the fact that
+there is VFIO PPC specific code in DPDK as a failing of the kernel to
+provide a HW abstraction.
+
+This means we cannot define an input that has a magic HW specific
+value. DPDK can never provide that portably. Thus all these kinds of
+inputs in the generic API need to be hints, if they exist at all.
+
+As 'address space size hint'/'address space start hint' is both
+generic, useful, and providable by DPDK I think it is OK. PPC can use
+it to pick which of the two page table formats to use for this IOAS if
+it wants.
+
+The second use case is when we have a userspace driver for a specific
+HW IOMMU. Eg a vIOMMU in qemu doing specific PPC/ARM/x86 acceleration.
+We can look here for things to make general, but I would expect a
+fairly high bar. Instead, I would rather see the userspace driver
+communicate with the kernel driver in its own private language, so
+that the entire functionality of the unique HW can be used.
+
+So, when it comes to providing exact ranges as an input parameter we
+have to decide if that is done as some additional general data, or if
+it should be part of a IOAS_FORMAT_KERNEL_PPC. In this case I suggest
+the guiding factor should be if every single IOMMU implementation can
+be updated to support the value.
+
+Jason
+
 
