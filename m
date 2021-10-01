@@ -2,106 +2,159 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 16E7741E97F
-	for <lists+kvm@lfdr.de>; Fri,  1 Oct 2021 11:17:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E19741E996
+	for <lists+kvm@lfdr.de>; Fri,  1 Oct 2021 11:27:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352969AbhJAJTf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Oct 2021 05:19:35 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:23790 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1352995AbhJAJT3 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 1 Oct 2021 05:19:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1633079864;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=DGyCDTmKE3Puz9hbd1Bqa93m33TW7tkrO1GY0BEiFrw=;
-        b=G8Jl4WIKybM+gbcJax7zMZCw3ZEU2m9u551hCKS16JVEO7DJOd0IsOiVp9aJMUdjrrHgJT
-        MszqJ/XlzOn3w9bdqN+qvjwLLnJ8WNDgr/+1lRE25I4ENeneZAmE1JgDKJv69vRf4NkY0I
-        2HIAmdhQZAawn6qQcfiyhuxGF8DTAI0=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-232-jezCQGtYPberA3CPaXz6-g-1; Fri, 01 Oct 2021 05:17:43 -0400
-X-MC-Unique: jezCQGtYPberA3CPaXz6-g-1
-Received: by mail-wm1-f69.google.com with SMTP id x23-20020a05600c21d700b0030d23749278so3466554wmj.2
-        for <kvm@vger.kernel.org>; Fri, 01 Oct 2021 02:17:43 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=DGyCDTmKE3Puz9hbd1Bqa93m33TW7tkrO1GY0BEiFrw=;
-        b=O8DN4jZ+Q5gvuEDQqes3PK8CKcyimFKvacl1eO7PdYU2HaMwJQAkAPrmMwf+Ca5eRq
-         tKF7LryFAp1XUhBc8AaNHKlG1AjOD9DiWEa5JZl0YG0USgM2339o0ekPbh+tnbtPyYTI
-         9pgZIjo8OBNrvW1SQZegslSObOaJ2k7Rtdc6JBF0bjx6tllk30BffTP8/GPnBfP6ZWCV
-         g24qnmM7mR4IdGtqmPUJIJFQHNVfyQH7/Dt7HNvWwDZDcdWAOBgKaKTl3ZJmMSu1nOxe
-         /acK7HVf08052j+Qf0bSFjTjD5VTEbiDpHmb/wQCLl6aFeDh9zQKC37bAann+y0i5lUC
-         n/AQ==
-X-Gm-Message-State: AOAM532wJCKXVovgYSnaA7EO0ltwR6m61Ww9Am+WPHqM74jk/R/UaJ+B
-        lh+3UJ8wvJ4Aj2UhB21F/SsAXH5ZuEVwNjJ4PQrwuWF3lwHPA8S/vbH69L8W/jDKznqiJ3a5jvX
-        Myc9S9b1Ev+fk
-X-Received: by 2002:a5d:50cf:: with SMTP id f15mr11412189wrt.237.1633079862449;
-        Fri, 01 Oct 2021 02:17:42 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJykQN7F6N2QxuVMMTUM6KC2ZEoYFdxkECApzvn9zqqq6yIts+XecYdFr57VC3hfX4SQo9I9wA==
-X-Received: by 2002:a5d:50cf:: with SMTP id f15mr11412163wrt.237.1633079862215;
-        Fri, 01 Oct 2021 02:17:42 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.gmail.com with ESMTPSA id n186sm7166424wme.31.2021.10.01.02.17.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 01 Oct 2021 02:17:41 -0700 (PDT)
-Message-ID: <48151d08-ee29-2b98-b6e1-f3c8a1ff26bc@redhat.com>
-Date:   Fri, 1 Oct 2021 11:17:33 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [PATCH v8 7/7] KVM: x86: Expose TSC offset controls to userspace
-Content-Language: en-US
-To:     Marcelo Tosatti <mtosatti@redhat.com>,
-        Oliver Upton <oupton@google.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        Sean Christopherson <seanjc@google.com>,
-        Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>,
-        James Morse <james.morse@arm.com>,
+        id S1352892AbhJAJ3G (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Oct 2021 05:29:06 -0400
+Received: from foss.arm.com ([217.140.110.172]:38640 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229906AbhJAJ3F (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Oct 2021 05:29:05 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 50D24101E;
+        Fri,  1 Oct 2021 02:27:21 -0700 (PDT)
+Received: from [10.57.72.173] (unknown [10.57.72.173])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DE4CA3F70D;
+        Fri,  1 Oct 2021 02:27:19 -0700 (PDT)
+Subject: Re: [PATCH] KVM: arm64: Allow KVM to be disabled from the command
+ line
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, ascull@google.com,
+        dbrazdil@google.com, James Morse <james.morse@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-arm-kernel@lists.infradead.org,
-        Andrew Jones <drjones@redhat.com>,
-        Will Deacon <will@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>
-References: <20210916181538.968978-1-oupton@google.com>
- <20210916181538.968978-8-oupton@google.com>
- <20210930191416.GA19068@fuller.cnet>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20210930191416.GA19068@fuller.cnet>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+        kernel-team@android.com
+References: <20210903091652.985836-1-maz@kernel.org>
+ <5bc623f2-e4c1-cc9c-683c-2f95648f1a68@arm.com> <87a6jutkyq.wl-maz@kernel.org>
+From:   Suzuki K Poulose <suzuki.poulose@arm.com>
+Message-ID: <e80b2454-45c3-19a3-7a96-dcb484f9e2f5@arm.com>
+Date:   Fri, 1 Oct 2021 10:27:18 +0100
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.14.0
+MIME-Version: 1.0
+In-Reply-To: <87a6jutkyq.wl-maz@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 30/09/21 21:14, Marcelo Tosatti wrote:
->> +   new_off_n = t_0 + off_n + (k_1 - k_0) * freq - t_1
-> Hi Oliver,
+On 30/09/2021 11:29, Marc Zyngier wrote:
+> On Wed, 29 Sep 2021 11:35:46 +0100,
+> Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
+>>
+>> On 03/09/2021 10:16, Marc Zyngier wrote:
+>>> Although KVM can be compiled out of the kernel, it cannot be disabled
+>>> at runtime. Allow this possibility by introducing a new mode that
+>>> will prevent KVM from initialising.
+>>>
+>>> This is useful in the (limited) circumstances where you don't want
+>>> KVM to be available (what is wrong with you?), or when you want
+>>> to install another hypervisor instead (good luck with that).
+>>>
+>>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+>>> ---
+>>>    Documentation/admin-guide/kernel-parameters.txt |  3 +++
+>>>    arch/arm64/include/asm/kvm_host.h               |  1 +
+>>>    arch/arm64/kernel/idreg-override.c              |  1 +
+>>>    arch/arm64/kvm/arm.c                            | 14 +++++++++++++-
+>>>    4 files changed, 18 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+>>> index 91ba391f9b32..cc5f68846434 100644
+>>> --- a/Documentation/admin-guide/kernel-parameters.txt
+>>> +++ b/Documentation/admin-guide/kernel-parameters.txt
+>>> @@ -2365,6 +2365,9 @@
+>>>    	kvm-arm.mode=
+>>>    			[KVM,ARM] Select one of KVM/arm64's modes of operation.
+>>>    +			none: Forcefully disable KVM and run in nVHE
+>>> mode,
+>>> +			      preventing KVM from ever initialising.
+>>> +
+>>>    			nvhe: Standard nVHE-based mode, without support for
+>>>    			      protected guests.
+>>>    diff --git a/arch/arm64/include/asm/kvm_host.h
+>>> b/arch/arm64/include/asm/kvm_host.h
+>>> index f8be56d5342b..019490c67976 100644
+>>> --- a/arch/arm64/include/asm/kvm_host.h
+>>> +++ b/arch/arm64/include/asm/kvm_host.h
+>>> @@ -58,6 +58,7 @@
+>>>    enum kvm_mode {
+>>>    	KVM_MODE_DEFAULT,
+>>>    	KVM_MODE_PROTECTED,
+>>> +	KVM_MODE_NONE,
+>>>    };
+>>>    enum kvm_mode kvm_get_mode(void);
+>>>    diff --git a/arch/arm64/kernel/idreg-override.c
+>>> b/arch/arm64/kernel/idreg-override.c
+>>> index d8e606fe3c21..57013c1b6552 100644
+>>> --- a/arch/arm64/kernel/idreg-override.c
+>>> +++ b/arch/arm64/kernel/idreg-override.c
+>>> @@ -95,6 +95,7 @@ static const struct {
+>>>    	char	alias[FTR_ALIAS_NAME_LEN];
+>>>    	char	feature[FTR_ALIAS_OPTION_LEN];
+>>>    } aliases[] __initconst = {
+>>> +	{ "kvm-arm.mode=none",		"id_aa64mmfr1.vh=0" },
+>>>    	{ "kvm-arm.mode=nvhe",		"id_aa64mmfr1.vh=0" },
+>>>    	{ "kvm-arm.mode=protected",	"id_aa64mmfr1.vh=0" },
+>>>    	{ "arm64.nobti",		"id_aa64pfr1.bt=0" },
+>>> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+>>> index fe102cd2e518..cdc70e238316 100644
+>>> --- a/arch/arm64/kvm/arm.c
+>>> +++ b/arch/arm64/kvm/arm.c
+>>> @@ -2064,6 +2064,11 @@ int kvm_arch_init(void *opaque)
+>>>    		return -ENODEV;
+>>>    	}
+>>>    +	if (kvm_get_mode() == KVM_MODE_NONE) {
+>>> +		kvm_info("KVM disabled from command line\n");
+>>> +		return -ENODEV;
+>>> +	}
+>>> +
+>>>    	in_hyp_mode = is_kernel_in_hyp_mode();
+>>>      	if (cpus_have_final_cap(ARM64_WORKAROUND_DEVICE_LOAD_ACQUIRE)
+>>> ||
+>>> @@ -2137,8 +2142,15 @@ static int __init early_kvm_mode_cfg(char *arg)
+>>>    		return 0;
+>>>    	}
+>>>    -	if (strcmp(arg, "nvhe") == 0 &&
+>>> !WARN_ON(is_kernel_in_hyp_mode()))
+>>> +	if (strcmp(arg, "nvhe") == 0 && !WARN_ON(is_kernel_in_hyp_mode())) {
+>>> +		kvm_mode = KVM_MODE_DEFAULT;
+>>>    		return 0;
+>>> +	}
+>>> +
+>>> +	if (strcmp(arg, "none") == 0 && !WARN_ON(is_kernel_in_hyp_mode())) {
+>>
+>> nit: Does this really need to WARN here ? Unlike the "nvhe" case, if the
+>> user wants to keep the KVM out of the picture for, say debugging
+>> something, it is perfectly Ok to allow the kernel to be running at EL2
+>> without having to change the Firmware to alter the landing EL for the
+>> kernel ?
 > 
-> This won't advance the TSC values themselves, right?
+> Well, the doc says "run in nVHE mode" and the option forces
+> id_aa64mmfr1.vh=0. The WARN_ON() will only fires on broken^Wfruity HW
+> that is VHE only. Note that this doesn't rely on any firmware change
+> (we drop from EL2 to EL1 and stay there).
 
-Why not?  It affects the TSC offset in the vmcs, so the TSC in the VM is 
-advanced too.
+Ah, ok. So the "none" is in fact "nvhe + no-kvm". Thats the bit I
+missed. TBH, that name to me sounds like "no KVM" at all, which is what
+we want. The question is, do we really need "none" to force vh == 0 ? I
+understand this is only a problem on a rare set of HWs. But the generic
+option looks deceiving.
 
-Paolo
+That said, I am happy to leave this as is and the doc says so.
 
-> This (advancing the TSC values by the realtime elapsed time) would be
-> awesome because TSC clock_gettime() vdso is faster, and some
-> applications prefer to just read from TSC directly.
-> See "x86: kvmguest: use TSC clocksource if invariant TSC is exposed".
 > 
-> The advancement with this patchset only applies to kvmclock.
-> 
+> We could add another option (none-vhe?) that stays at EL2 and still
+> disables KVM if there is an appetite for it.
 
+Na. Don't think that is necessary.
+
+> 
+>> Otherwise,
+>>
+>> Acked-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+
+Suzuki
