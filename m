@@ -2,98 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DD7B841EE4C
-	for <lists+kvm@lfdr.de>; Fri,  1 Oct 2021 15:15:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1019341EEA3
+	for <lists+kvm@lfdr.de>; Fri,  1 Oct 2021 15:32:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231514AbhJANRJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Oct 2021 09:17:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36630 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231411AbhJANRI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Oct 2021 09:17:08 -0400
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE28CC061775;
-        Fri,  1 Oct 2021 06:15:24 -0700 (PDT)
+        id S1353421AbhJANeU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Oct 2021 09:34:20 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:57408 "EHLO
+        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1352901AbhJANeT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Oct 2021 09:34:19 -0400
 From:   Thomas Gleixner <tglx@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1633094123;
+        s=2020; t=1633095149;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=RgNzazZZZU00oypcQsc+q9dNMqyuBTQu7dV4Uj4peo8=;
-        b=kAghlOBmNBYKZ7yFt1D8HvA53eknujC2apli+DcHptTDUOwPX4Tvd+MgfLCl/5CcfqAH/u
-        s18YxBZ3v0mPOW4VkF9X2jgeej1bO834QKg2bLJgz9v5qgZfiYOmIXqydUn6il9XpID6FE
-        Ile+YsncSvMQU91GcEi3QIH2IKjywYQNCcJJMqOd2UTLlFFTCidmI3sS4eAVElDvfafqRY
-        igBOMIPisUgOX4yqmOHf6Gvwe3D2H5OMikACS3JqkpSmiHxr1ZI/CHsTTtrnbnq/hk+coI
-        nTDHWiRef+Zr5NnGBajgImcGIHqseFrFgU3xP7qneSPkK1erEvhz8/cVjPCXgA==
+        bh=HXoyc4jRDQBnUGo2gIo6eI8vmDogfCVzmxMMg8jeyVk=;
+        b=UTGTL+XZwMStbn79e3Ovx+epJ7xoXD0wVPPamqHwJLXO+jS5kUR1wD87+HrAilMGElEuNQ
+        PAwRgHs8i/DvKbeYr/LUVE9zuhwSgsnHCo8OEmLyLxUyr2cIIdl5ipwHyKg/VA31l1y3Pa
+        d2GipeRnDLt73TdTpKYzjqIKWENPVvYxKdkoqhTWWwqrJyYnPma7tbtQ9nrOzxGReJyCgL
+        BTX48mEDAdEeYYRCa+RgFP7xbLZvhrv+0ZMC9BD6ENNDDcuAOy83P5/n71HnPFE2eA3JGs
+        0LtsdTQGmm/+ZSbpPRGqE5lpEdYMMn8SlqDH/03Ffyhs7nUR5gEgg4KPJuC2CQ==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1633094123;
+        s=2020e; t=1633095149;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=RgNzazZZZU00oypcQsc+q9dNMqyuBTQu7dV4Uj4peo8=;
-        b=6SW5cTo2kSOzfHpxRq731VA9XPWyT8G0m2m5BdP2GhPdl/D/uMEeSsJ01pwdA9YrdH1eZb
-        YjeoaI+4ANVn1uAg==
+        bh=HXoyc4jRDQBnUGo2gIo6eI8vmDogfCVzmxMMg8jeyVk=;
+        b=StyaMW5j05uqR4WdXO07lpqqZoxUXbSXsGSEdErMUygddj6Td9VGxXzTnjsUHsz4vOvGEa
+        qlkq9HeZ4h3qV5Dw==
 To:     "Chang S. Bae" <chang.seok.bae@intel.com>, bp@suse.de,
         luto@kernel.org, mingo@kernel.org, x86@kernel.org
 Cc:     len.brown@intel.com, lenb@kernel.org, dave.hansen@intel.com,
         thiago.macieira@intel.com, jing2.liu@intel.com,
         ravi.v.shankar@intel.com, linux-kernel@vger.kernel.org,
         chang.seok.bae@intel.com, kvm@vger.kernel.org
-Subject: Re: [PATCH v10 04/28] x86/fpu/xstate: Modify address finders to
- handle both static and dynamic buffers
-In-Reply-To: <20210825155413.19673-5-chang.seok.bae@intel.com>
+Subject: Re: [PATCH v10 06/28] x86/fpu/xstate: Add new variables to indicate
+ dynamic XSTATE buffer size
+In-Reply-To: <20210825155413.19673-7-chang.seok.bae@intel.com>
 References: <20210825155413.19673-1-chang.seok.bae@intel.com>
- <20210825155413.19673-5-chang.seok.bae@intel.com>
-Date:   Fri, 01 Oct 2021 15:15:22 +0200
-Message-ID: <87ee946g45.ffs@tglx>
+ <20210825155413.19673-7-chang.seok.bae@intel.com>
+Date:   Fri, 01 Oct 2021 15:32:23 +0200
+Message-ID: <878rzc6fbs.ffs@tglx>
 MIME-Version: 1.0
 Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Chang,
-
 On Wed, Aug 25 2021 at 08:53, Chang S. Bae wrote:
+> +/**
+> + * struct fpu_xstate_buffer_config - xstate buffer configuration
+> + * @max_size:			The CPUID-enumerated all-feature "maximum" size
+> + *				for xstate per-task buffer.
+> + * @min_size:			The size to fit into the statically-allocated
+> + *				buffer. With dynamic states, this buffer no longer
+> + *				contains all the enabled state components.
+> + * @user_size:			The size of user-space buffer for signal and
+> + *				ptrace frames, in the non-compacted format.
+> + */
 
-> Have all the functions finding XSTATE address take a struct fpu * pointer
-> in preparation for dynamic state buffer support.
->
-> init_fpstate is a special case, which is indicated by a null pointer
-> parameter to get_xsave_addr() and __raw_xsave_addr().
+>  void fpstate_init(struct fpu *fpu)
+>  {
+>  	union fpregs_state *state;
+> +	unsigned int size;
+> +	u64 mask;
+>  
+> -	if (likely(fpu))
+> +	if (likely(fpu)) {
+>  		state = &fpu->state;
+> -	else
+> +		/* The dynamic user states are not prepared yet. */
+> +		mask = xfeatures_mask_all & ~xfeatures_mask_user_dynamic;
 
-Same comment vs. subject. Prepare ...
+The patch ordering is really odd. Why aren't you adding
 
-> +	if (fpu)
-> +		xsave = &fpu->state.xsave;
-> +	else
-> +		xsave = &init_fpstate.xsave;
-> +
-> +	return xsave + xstate_comp_offsets[xfeature_nr];
+     fpu->state_mask
+and
+     fpu->state_size
 
-So you have the same conditionals and the same comments vs. that NULL
-pointer oddity how many times now all over the place?
+first and initialize state_mask and state_size to the fixed mode and
+then add the dynamic sizing on top?
 
-That can be completely avoided:
+>  	/*
+>  	 * If the target FPU state is not resident in the CPU registers, just
+>  	 * memcpy() from current, else save CPU state directly to the target.
+> +	 *
+> +	 * KVM does not support dynamic user states yet. Assume the buffer
+> +	 * always has the minimum size.
+>  	 */
+>  	if (test_thread_flag(TIF_NEED_FPU_LOAD))
+>  		memcpy(&fpu->state, &current->thread.fpu.state,
+> -		       fpu_kernel_xstate_size);
+> +		       fpu_buf_cfg.min_size);
 
-Patch 1:
-
--union fpregs_state init_fpstate __ro_after_init;
-+static union fpregs_state init_fpstate __ro_after_init;
-+struct fpu init_fpu = { .state = &init_fpstate } __ro_after_init;
-
-and make all users of init_fpstate access it through init_fpu.
-
-Patches 2..N which change arguments from fpregs_state to fpu:
-
--	fun(init_fpu->state);
-+	fun(&init_fpu);
-
-Patch M which adds state_mask:
-
-@fpu__init_system_xstate()
-+	init_fpu.state_mask = xfeatures_mask_all;
+Which completely avoids the export of fpu_buf_cfg for KVM because the
+information is just available via struc fpu. As a bonus the export of
+fpu_kernel_xstate_size can be removed as well.
 
 Hmm?
 
