@@ -2,110 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1E74F41EB55
-	for <lists+kvm@lfdr.de>; Fri,  1 Oct 2021 13:04:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4FF1C41EB61
+	for <lists+kvm@lfdr.de>; Fri,  1 Oct 2021 13:06:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353305AbhJALGI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Oct 2021 07:06:08 -0400
-Received: from mga05.intel.com ([192.55.52.43]:3623 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1353310AbhJALGH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Oct 2021 07:06:07 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10123"; a="310945876"
-X-IronPort-AV: E=Sophos;i="5.85,337,1624345200"; 
-   d="scan'208";a="310945876"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Oct 2021 04:04:14 -0700
-X-IronPort-AV: E=Sophos;i="5.85,337,1624345200"; 
-   d="scan'208";a="709734709"
-Received: from kdoertel-mobl.ger.corp.intel.com (HELO localhost) ([10.251.222.34])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Oct 2021 04:04:07 -0700
-From:   Jani Nikula <jani.nikula@linux.intel.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>, kernel test robot <lkp@intel.com>
-Cc:     Max Gurtovoy <mgurtovoy@nvidia.com>,
-        "llvm\@lists.linux.dev" <llvm@lists.linux.dev>,
-        "kbuild-all\@lists.01.org" <kbuild-all@lists.01.org>,
-        "kvm\@vger.kernel.org" <kvm@vger.kernel.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        intel-gfx@lists.freedesktop.org
-Subject: Re: [vfio:next 33/38] drivers/gpu/drm/i915/i915_pci.c:975:2: warning: missing field 'override_only' initializer
-In-Reply-To: <20210827153409.GV1721383@nvidia.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
-References: <20210827153409.GV1721383@nvidia.com>
-Date:   Fri, 01 Oct 2021 14:04:04 +0300
-Message-ID: <878rzdt3a3.fsf@intel.com>
+        id S1353672AbhJALH7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Oct 2021 07:07:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34238 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1353454AbhJALH7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Oct 2021 07:07:59 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27484C061775;
+        Fri,  1 Oct 2021 04:06:15 -0700 (PDT)
+Received: from zn.tnic (p200300ec2f0e8e0006425ffdb1062ac0.dip0.t-ipconnect.de [IPv6:2003:ec:2f0e:8e00:642:5ffd:b106:2ac0])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 7CBB61EC0419;
+        Fri,  1 Oct 2021 13:06:12 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1633086372;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=JCBAeXE9Fm2/4A8nfF4qlTElC4omNaQJNghTb8YDddM=;
+        b=kTtfe1X/X1Cm8CiF7sqgmxJbnYSVBHwhUxmVIQWx22i7VqsRKC6EEWMxmDVCD+9RF7VzG5
+        QJBTrSVvQeE27As7XeJBpiyoxWoEGP1nFgkKyx5GnB9alDDmJT1lAjv2TqZFpTt2XpnmBK
+        KSzCimg6oBTl41PghKnK15OZssLqRMo=
+Date:   Fri, 1 Oct 2021 13:06:08 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH Part2 v5 06/45] x86/sev: Invalid pages from direct map
+ when adding it to RMP table
+Message-ID: <YVbroJ5RGWa5kZ6J@zn.tnic>
+References: <20210820155918.7518-1-brijesh.singh@amd.com>
+ <20210820155918.7518-7-brijesh.singh@amd.com>
+ <YVR5cOQOJxy12DcR@zn.tnic>
+ <60d6a70d-22ab-9e17-b243-7f5669b4b70d@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <60d6a70d-22ab-9e17-b243-7f5669b4b70d@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 27 Aug 2021, Jason Gunthorpe <jgg@nvidia.com> wrote:
-> On Fri, Aug 27, 2021 at 03:12:36PM +0000, kernel test robot wrote:
->> tree:   https://github.com/awilliam/linux-vfio.git next
->> head:   ea870730d83fc13a5fa2bd0e175176d7ac8a400a
->> commit: 343b7258687ecfbb363bfda8833a7cf641aac524 [33/38] PCI: Add 'override_only' field to struct pci_device_id
->> config: i386-randconfig-a004-20210827 (attached as .config)
->> compiler: clang version 14.0.0 (https://github.com/llvm/llvm-project 1076082a0d97bd5c16a25ee7cf3dbb6ee4b5a9fe)
->> reproduce (this is a W=1 build):
->>         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
->>         chmod +x ~/bin/make.cross
->>         # https://github.com/awilliam/linux-vfio/commit/343b7258687ecfbb363bfda8833a7cf641aac524
->>         git remote add vfio https://github.com/awilliam/linux-vfio.git
->>         git fetch --no-tags vfio next
->>         git checkout 343b7258687ecfbb363bfda8833a7cf641aac524
->>         # save the attached .config to linux build tree
->>         COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross ARCH=i386 
->> 
->> If you fix the issue, kindly add following tag as appropriate
->> Reported-by: kernel test robot <lkp@intel.com>
->
-> Ugh, this is due to this code:
->
-> #define INTEL_VGA_DEVICE(id, info) {		\
-> 	0x8086,	id,				\
-> 	~0, ~0,					\
-> 	0x030000, 0xff0000,			\
-> 	(unsigned long) info }
->
-> #define INTEL_QUANTA_VGA_DEVICE(info) {		\
-> 	0x8086,	0x16a,				\
-> 	0x152d,	0x8990,				\
-> 	0x030000, 0xff0000,			\
-> 	(unsigned long) info }
->
->
-> Which really should be using the normal pattern for defining these
-> structs:
->
-> #define PCI_DEVICE_CLASS(dev_class,dev_class_mask) \
->         .class = (dev_class), .class_mask = (dev_class_mask), \
->         .vendor = PCI_ANY_ID, .device = PCI_ANY_ID, \
->         .subvendor = PCI_ANY_ID, .subdevice = PCI_ANY_ID
->
-> The warning is also not a real issue, just clang being overzealous.
+On Thu, Sep 30, 2021 at 09:19:52AM -0700, Brijesh Singh wrote:
+> . The thought process is if in the future 
+> set_direct_map_default_noflush() is improved to restore the large
+> mapping then it will all work transparently.
 
-Stumbled upon this old report, sorry for the delayed response.
+That's only scratching the surface of the *why* this is done so please
+explain why this dance is being done in a comment above the code so that
+it is clear.
 
-The reason it's not using designated initializers is that the same file
-gets synced to some userspace projects (at least libdrm and
-igt-gpu-tools) which use the macros to initialize slightly different
-structs. For example, igt uses struct pci_id_match from libpciaccess-dev
-(/usr/include/pciaccess.h) and can't easily adapt to different member
-names.
+It is not really obvious why that hiding from the direct map is being
+done.
 
-Anyway, we've got
+Good reason from that memfd_secret mail are:
 
-subdir-ccflags-y += $(call cc-disable-warning, missing-field-initializers)
-subdir-ccflags-y += $(call cc-disable-warning, initializer-overrides)
+"* Prevent cross-process secret userspace memory exposures. Once the secret
+memory is allocated, the user can't accidentally pass it into the kernel to
+be transmitted somewhere. The secreremem pages cannot be accessed via the
+direct map and they are disallowed in GUP."
 
-in drivers/gpu/drm/i915/Makefile, so I wonder why they're not respected.
+and in general hiding RMP pages from the direct map is a nice additional
+protection.
 
-BR,
-Jani.
+Thx.
 
 -- 
-Jani Nikula, Intel Open Source Graphics Center
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
