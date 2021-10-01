@@ -2,117 +2,204 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F18A541F720
-	for <lists+kvm@lfdr.de>; Fri,  1 Oct 2021 23:51:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DABED41F78A
+	for <lists+kvm@lfdr.de>; Sat,  2 Oct 2021 00:44:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1355436AbhJAVxc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Oct 2021 17:53:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43842 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230202AbhJAVxb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Oct 2021 17:53:31 -0400
-Received: from mail-pl1-x644.google.com (mail-pl1-x644.google.com [IPv6:2607:f8b0:4864:20::644])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAA2FC061775
-        for <kvm@vger.kernel.org>; Fri,  1 Oct 2021 14:51:46 -0700 (PDT)
-Received: by mail-pl1-x644.google.com with SMTP id x8so7134384plv.8
-        for <kvm@vger.kernel.org>; Fri, 01 Oct 2021 14:51:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:sender:from:date:message-id:subject:to
-         :content-transfer-encoding;
-        bh=Y2F9tIAyLMuMdvZ+xZbB5A4lCV2UGNUjjsvsd+NvfA8=;
-        b=IqBodbAuszuKM8pQGAetZW2XgfcmkkdWtfG90hb70AyKL0ZJGvJqGFS7Rs+Sx0kHUB
-         d9Y1G2aNjzxF2NdweKtzDy3IvY3DwYP5QUnQGmBk6ttwcIKk951qVjuXMQYU+Z2Wk2/w
-         KPLxnLJywlX3HJVcSWO+nxbJ8JlYhcBeGBnx2wGgy7E846NMiUiO04+VqV63snN5ck0f
-         yLCcEpaTMwdjZRW8MBlC2D2/LBIHoWzFYOGtWVR9snyu3WyGHX/TlsOVVG+MVhOv5rLP
-         lJuqin0W3oJ4XZ/i1OHR5SkERHOxQKn8//xDQUK2f+oR1QiWSH/djYitY1a+uXIQwt7m
-         7fSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:sender:from:date:message-id:subject
-         :to:content-transfer-encoding;
-        bh=Y2F9tIAyLMuMdvZ+xZbB5A4lCV2UGNUjjsvsd+NvfA8=;
-        b=shzlqp4VGNuYLWB4E1q2abt30gallhyX2zhRRsEoiEXww+7lk2Q4d46D9IgNA9HgG4
-         CUSyaEQyzIrdSUAf32x6uE3ouDFqf2yEkz1ZMGwwYyPa69MNzoToo56fOwYocdKHp7bm
-         RECeF2JZVl08hDRyA55EU+tayrOKiZ+B8EvQd10VKfrT5rt+EfmsXt3gA4hNJooZFU1v
-         l7j8qnwzFVEcxtflZ/IPd+oINeZX5RbJY1Givd7K9o2VmbROXQ2rULXDmHMocS84P0Pz
-         E4dOj0Ce7ab4qnJgdXy4S61cb8jApm3NF+Zjyj3DoVebeTbz/zEObu42Bfxz/LbVoqo+
-         VZGQ==
-X-Gm-Message-State: AOAM532F3IofAn1t2t08eY8QN0XQuLdbuu2meJ7BM6d1qky4LUChujN5
-        Qc13bTStlN01ajCqdtpmCGJjqSv06ASh8ufyK5M=
-X-Google-Smtp-Source: ABdhPJxC+yqB+VhxdqIkc4kyi0lRinj3bC6agkHb9rhbIB5uPW/ulqsqhziWnxV741GZ5mXpft6L765ZbP3mM9AtPqw=
-X-Received: by 2002:a17:90a:854b:: with SMTP id a11mr22670686pjw.4.1633125106233;
- Fri, 01 Oct 2021 14:51:46 -0700 (PDT)
-MIME-Version: 1.0
-Sender: manuellawarlordibrahim7@gmail.com
-Received: by 2002:a05:6a10:1d8f:0:0:0:0 with HTTP; Fri, 1 Oct 2021 14:51:45
- -0700 (PDT)
-From:   manuella warlord ibrahim <manuellawarlordibrahim@gmail.com>
-Date:   Fri, 1 Oct 2021 14:51:45 -0700
-X-Google-Sender-Auth: LOvFaLwJ2Es9vdnyjS1uIl7wzk4
-Message-ID: <CA+ZVOZjYAhK2L3_4OTskUqKMQPemnDqnbXXWmNuC7goY5z1ALg@mail.gmail.com>
-Subject: =?UTF-8?Q?aspetter=C3=B2_di_leggerti=21=21=21?=
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        id S1355953AbhJAWp5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Oct 2021 18:45:57 -0400
+Received: from mga14.intel.com ([192.55.52.115]:57189 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1355927AbhJAWp4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Oct 2021 18:45:56 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10124"; a="225258580"
+X-IronPort-AV: E=Sophos;i="5.85,340,1624345200"; 
+   d="scan'208";a="225258580"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Oct 2021 15:44:11 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.85,340,1624345200"; 
+   d="scan'208";a="565343848"
+Received: from chang-linux-3.sc.intel.com ([172.25.66.175])
+  by fmsmga002.fm.intel.com with ESMTP; 01 Oct 2021 15:44:10 -0700
+From:   "Chang S. Bae" <chang.seok.bae@intel.com>
+To:     bp@suse.de, luto@kernel.org, tglx@linutronix.de, mingo@kernel.org,
+        x86@kernel.org
+Cc:     len.brown@intel.com, lenb@kernel.org, dave.hansen@intel.com,
+        thiago.macieira@intel.com, jing2.liu@intel.com,
+        ravi.v.shankar@intel.com, linux-kernel@vger.kernel.org,
+        chang.seok.bae@intel.com, kvm@vger.kernel.org
+Subject: [PATCH v11 02/29] x86/fpu/xstate: Modify the initialization helper to handle both static and dynamic buffers
+Date:   Fri,  1 Oct 2021 15:37:01 -0700
+Message-Id: <20211001223728.9309-3-chang.seok.bae@intel.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20211001223728.9309-1-chang.seok.bae@intel.com>
+References: <20211001223728.9309-1-chang.seok.bae@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Carissimo,
+Have the function initializing the XSTATE buffer take a struct fpu *
+pointer in preparation for dynamic state buffer support.
 
-So che questa e-mail ti sorprender=C3=A0 poich=C3=A9 non ci siamo conosciut=
-i o
-incontrati prima di considerare il fatto che ho trovato il tuo
-contatto e-mail tramite Internet alla ricerca di una persona di
-fiducia che possa aiutarmi.
+init_fpstate is a special case, which is indicated by a null pointer
+parameter to fpstate_init().
 
-Sono la signorina Manuella Warlord Ibrahim Coulibaly, una donna di 24
-anni della Repubblica della Costa d'Avorio, Africa occidentale, figlia
-del defunto capo Sgt. Warlord Ibrahim Coulibaly (alias Generale IB).
-Il mio defunto padre era un noto capo della milizia della Costa
-d'Avorio. =C3=88 morto gioved=C3=AC 28 aprile 2011 a seguito di uno scontro=
- con
-le forze repubblicane della Costa d'Avorio (FRCI). Sono costretto a
-contattarvi a causa dei maltrattamenti che sto ricevendo dalla mia
-matrigna.
+Also, fpstate_init_xstate() now accepts the state component bitmap to
+customize the compacted format.
 
-Aveva in programma di portarmi via tutti i tesori e le propriet=C3=A0 del
-mio defunto padre dopo la morte inaspettata del mio amato padre. Nel
-frattempo volevo viaggiare in Europa, ma lei nasconde il mio
-passaporto internazionale e altri documenti preziosi. Per fortuna non
-ha scoperto dove tenevo il fascicolo di mio padre che conteneva
-documenti importanti. Ora mi trovo attualmente nella Missione in
-Ghana.
+No functional change.
 
-Sto cercando relazioni a lungo termine e assistenza agli investimenti.
-Mio padre di beata memoria ha depositato la somma di 27,5 milioni di
-dollari in una banca ad Accra in Ghana con il mio nome come parente
-pi=C3=B9 prossimo. Avevo contattato la Banca per liquidare la caparra ma il
-Direttore di Filiale mi ha detto che essendo rifugiato, il mio status
-secondo la legge locale non mi autorizza ad effettuare l'operazione.
-Tuttavia, mi ha consigliato di fornire un fiduciario che star=C3=A0 a mio
-nome. Avrei voluto informare la mia matrigna di questo deposito ma
-temo che non mi offrir=C3=A0 nulla dopo lo svincolo del denaro.
+Signed-off-by: Chang S. Bae <chang.seok.bae@intel.com>
+Reviewed-by: Len Brown <len.brown@intel.com>
+Cc: x86@kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: kvm@vger.kernel.org
+---
+Changes from v5:
+* Moved fpstate_init_xstate() back to the header (again).
+* Massaged the changelog.
 
-Pertanto, decido di cercare il tuo aiuto per trasferire i soldi sul
-tuo conto bancario mentre mi trasferir=C3=B2 nel tuo paese e mi sistemer=C3=
-=B2
-con te. Poich=C3=A9 hai indicato il tuo interesse ad aiutarmi, ti dar=C3=B2=
- il
-numero di conto e il contatto della banca dove il mio amato padre
-defunto ha depositato i soldi con il mio nome come parente pi=C3=B9
-prossimo. =C3=88 mia intenzione risarcirti con il 40% del denaro totale per
-la tua assistenza e il saldo sar=C3=A0 il mio investimento in qualsiasi
-impresa redditizia che mi consiglierai poich=C3=A9 non hai alcuna idea
-sugli investimenti esteri. Per favore, tutte le comunicazioni devono
-avvenire tramite questo indirizzo e-mail per scopi riservati
-(manuellawarlordibrahimw@gmail.com).
+Changes from v4:
+* Added a proper function description. (Borislav Petkov)
+* Added the likely() statement as a null pointer is a special case.
 
-La ringrazio molto in attesa di una sua rapida risposta. Ti dar=C3=B2 i
-dettagli nella mia prossima mail dopo aver ricevuto la tua mail di
-accettazione per aiutarmi,
+Changes from v3:
+* Updated the changelog. (Borislav Petkov)
+* Updated the function comment to use kernel-doc style. (Borislav Petkov)
 
-Cordiali saluti
-Miss manuella signore della guerra Ibrahim Coulibaly
-(manuellawarlordibrahimw@gmail.com)
+Changes from v2:
+* Updated the changelog with task->fpu removed. (Borislav Petkov)
+---
+ arch/x86/include/asm/fpu/internal.h | 11 ++++++++++-
+ arch/x86/kernel/fpu/core.c          | 28 +++++++++++++++++-----------
+ arch/x86/kernel/fpu/init.c          |  2 +-
+ arch/x86/kernel/fpu/xstate.c        |  3 +--
+ arch/x86/kvm/x86.c                  |  2 +-
+ 5 files changed, 30 insertions(+), 16 deletions(-)
+
+diff --git a/arch/x86/include/asm/fpu/internal.h b/arch/x86/include/asm/fpu/internal.h
+index 5a18694a89b2..c7a64e2806a9 100644
+--- a/arch/x86/include/asm/fpu/internal.h
++++ b/arch/x86/include/asm/fpu/internal.h
+@@ -80,7 +80,7 @@ static __always_inline __pure bool use_fxsr(void)
+ 
+ extern union fpregs_state init_fpstate;
+ 
+-extern void fpstate_init(union fpregs_state *state);
++extern void fpstate_init(struct fpu *fpu);
+ #ifdef CONFIG_MATH_EMULATION
+ extern void fpstate_init_soft(struct swregs_state *soft);
+ #else
+@@ -88,6 +88,15 @@ static inline void fpstate_init_soft(struct swregs_state *soft) {}
+ #endif
+ extern void save_fpregs_to_fpstate(struct fpu *fpu);
+ 
++static inline void fpstate_init_xstate(struct xregs_state *xsave, u64 mask)
++{
++	/*
++	 * XRSTORS requires these bits set in xcomp_bv, or it will
++	 * trigger #GP:
++	 */
++	xsave->header.xcomp_bv = XCOMP_BV_COMPACTED_FORMAT | mask;
++}
++
+ /* Returns 0 or the negated trap number, which results in -EFAULT for #PF */
+ #define user_insn(insn, output, input...)				\
+ ({									\
+diff --git a/arch/x86/kernel/fpu/core.c b/arch/x86/kernel/fpu/core.c
+index 7ada7bd03a32..c0098f8422de 100644
+--- a/arch/x86/kernel/fpu/core.c
++++ b/arch/x86/kernel/fpu/core.c
+@@ -203,15 +203,6 @@ void fpu_sync_fpstate(struct fpu *fpu)
+ 	fpregs_unlock();
+ }
+ 
+-static inline void fpstate_init_xstate(struct xregs_state *xsave)
+-{
+-	/*
+-	 * XRSTORS requires these bits set in xcomp_bv, or it will
+-	 * trigger #GP:
+-	 */
+-	xsave->header.xcomp_bv = XCOMP_BV_COMPACTED_FORMAT | xfeatures_mask_all;
+-}
+-
+ static inline void fpstate_init_fxstate(struct fxregs_state *fx)
+ {
+ 	fx->cwd = 0x37f;
+@@ -229,8 +220,23 @@ static inline void fpstate_init_fstate(struct fregs_state *fp)
+ 	fp->fos = 0xffff0000u;
+ }
+ 
+-void fpstate_init(union fpregs_state *state)
++/**
++ *
++ * fpstate_init - initialize the xstate buffer
++ *
++ * If @fpu is NULL, initialize init_fpstate.
++ *
++ * @fpu:	A struct fpu * pointer
++ */
++void fpstate_init(struct fpu *fpu)
+ {
++	union fpregs_state *state;
++
++	if (likely(fpu))
++		state = &fpu->state;
++	else
++		state = &init_fpstate;
++
+ 	if (!static_cpu_has(X86_FEATURE_FPU)) {
+ 		fpstate_init_soft(&state->soft);
+ 		return;
+@@ -239,7 +245,7 @@ void fpstate_init(union fpregs_state *state)
+ 	memset(state, 0, fpu_kernel_xstate_size);
+ 
+ 	if (static_cpu_has(X86_FEATURE_XSAVES))
+-		fpstate_init_xstate(&state->xsave);
++		fpstate_init_xstate(&state->xsave, xfeatures_mask_all);
+ 	if (static_cpu_has(X86_FEATURE_FXSR))
+ 		fpstate_init_fxstate(&state->fxsave);
+ 	else
+diff --git a/arch/x86/kernel/fpu/init.c b/arch/x86/kernel/fpu/init.c
+index 64e29927cc32..e14c72bc8706 100644
+--- a/arch/x86/kernel/fpu/init.c
++++ b/arch/x86/kernel/fpu/init.c
+@@ -124,7 +124,7 @@ static void __init fpu__init_system_generic(void)
+ 	 * Set up the legacy init FPU context. (xstate init might overwrite this
+ 	 * with a more modern format, if the CPU supports it.)
+ 	 */
+-	fpstate_init(&init_fpstate);
++	fpstate_init(NULL);
+ 
+ 	fpu__init_system_mxcsr();
+ }
+diff --git a/arch/x86/kernel/fpu/xstate.c b/arch/x86/kernel/fpu/xstate.c
+index fc1d529547e6..0fed7fbcf2e8 100644
+--- a/arch/x86/kernel/fpu/xstate.c
++++ b/arch/x86/kernel/fpu/xstate.c
+@@ -395,8 +395,7 @@ static void __init setup_init_fpu_buf(void)
+ 	print_xstate_features();
+ 
+ 	if (boot_cpu_has(X86_FEATURE_XSAVES))
+-		init_fpstate.xsave.header.xcomp_bv = XCOMP_BV_COMPACTED_FORMAT |
+-						     xfeatures_mask_all;
++		fpstate_init_xstate(&init_fpstate.xsave, xfeatures_mask_all);
+ 
+ 	/*
+ 	 * Init all the features state with header.xfeatures being 0x0
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 28ef14155726..3263567729ed 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -10615,7 +10615,7 @@ static void fx_init(struct kvm_vcpu *vcpu)
+ 	if (!vcpu->arch.guest_fpu)
+ 		return;
+ 
+-	fpstate_init(&vcpu->arch.guest_fpu->state);
++	fpstate_init(vcpu->arch.guest_fpu);
+ 	if (boot_cpu_has(X86_FEATURE_XSAVES))
+ 		vcpu->arch.guest_fpu->state.xsave.header.xcomp_bv =
+ 			host_xcr0 | XSTATE_COMPACTION_ENABLED;
+-- 
+2.17.1
+
