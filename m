@@ -2,101 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B1F2E41EFCB
-	for <lists+kvm@lfdr.de>; Fri,  1 Oct 2021 16:41:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7FA1441F00C
+	for <lists+kvm@lfdr.de>; Fri,  1 Oct 2021 16:54:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231878AbhJAOnX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Oct 2021 10:43:23 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23392 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231840AbhJAOnW (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 1 Oct 2021 10:43:22 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1633099297;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=XkkeMCPL2Vp7JorOEy5gw2lNiI4B4lS4i/E97mBslbc=;
-        b=CnYxq89RKdbG0tm6sJ5O933RmGmynw9lpNuRdFXPWHkn54vsjoy6QmoYh8Pat428PoZo+S
-        tmdccellJqdcZcNoVj+BV+gBixL4OwSEfyJ/fP1yXXqKqG6A8nu1bqk7uycBhO0PeysmRP
-        2v895stSBz55zbaYQ+OKUmQ7pX/fcwY=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-317-jy6TLqy5OUSR4a2UFbUxUw-1; Fri, 01 Oct 2021 10:41:36 -0400
-X-MC-Unique: jy6TLqy5OUSR4a2UFbUxUw-1
-Received: by mail-ed1-f72.google.com with SMTP id m20-20020aa7c2d4000000b003d1add00b8aso10675299edp.0
-        for <kvm@vger.kernel.org>; Fri, 01 Oct 2021 07:41:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:from:to:cc:references:in-reply-to
-         :content-transfer-encoding;
-        bh=XkkeMCPL2Vp7JorOEy5gw2lNiI4B4lS4i/E97mBslbc=;
-        b=GYCbETpJrYbJtBi0brTFki4rkteFDgAmCZD5ttRr4voekhIo3/TGXWeX+0ZebQWE3c
-         3/qyxB1C4hk99QpDR3s2GRjNtccYpF72haT1GDxM/BnRlHQMB+iPne/VjwDLEqQMcQa9
-         qI3Qj4uZtut9ScePKuMq0eEfoW5gdlInYEgMAPyxncMxzuZYoBZBSru0c3GMaM4ekRIZ
-         2tnShqcqKJe1fygkzWRpr4j9a9YWlvvstQqz8dCVirS+zLk1gqFZhj+6nWTar5rG8TBv
-         GMHoXf4DR49UEzzYYhYq4O2dyPL8BjogmO6i/FJTKPTLJwOstcbQjicBnOEqZY1pJ+b0
-         cBPw==
-X-Gm-Message-State: AOAM53068f+4I2OxAcWHA0y9GQ4cdgD/uR9BqwnpJMxOX4v5fZpCGpAX
-        PbEKEuayfPj5OgV7qI0ZCHIEpd7E0zUIyL55VFCKdntFTWuf8FxEc28Ykgkc/U5acr2t1XJfMwp
-        cPu0x6GkMISoM
-X-Received: by 2002:a05:6402:1d9c:: with SMTP id dk28mr9728528edb.241.1633099295531;
-        Fri, 01 Oct 2021 07:41:35 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyIscIfxGLMs/yfLoygqBiGNTRk5EVkFolzj6ew78/IWPq8S7bQHiwT65Cmf2dESwTn0KKxSQ==
-X-Received: by 2002:a05:6402:1d9c:: with SMTP id dk28mr9728502edb.241.1633099295343;
-        Fri, 01 Oct 2021 07:41:35 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.gmail.com with ESMTPSA id jl12sm2938613ejc.120.2021.10.01.07.41.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 01 Oct 2021 07:41:34 -0700 (PDT)
-Message-ID: <746cfc82-ee7c-eba2-4443-7faf53baf083@redhat.com>
-Date:   Fri, 1 Oct 2021 16:41:33 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [PATCH v8 4/7] KVM: x86: Report host tsc and realtime values in
- KVM_GET_CLOCK
-Content-Language: en-US
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     Oliver Upton <oupton@google.com>, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>,
-        James Morse <james.morse@arm.com>,
+        id S1354667AbhJAOz5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Oct 2021 10:55:57 -0400
+Received: from mail.kernel.org ([198.145.29.99]:39860 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231764AbhJAOzy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Oct 2021 10:55:54 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id C22B5619E7;
+        Fri,  1 Oct 2021 14:54:10 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1mWJvM-00EDTt-R2; Fri, 01 Oct 2021 15:54:08 +0100
+Date:   Fri, 01 Oct 2021 15:54:08 +0100
+Message-ID: <87ee94ssmn.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc:     linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, ascull@google.com,
+        dbrazdil@google.com, James Morse <james.morse@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-arm-kernel@lists.infradead.org,
-        Andrew Jones <drjones@redhat.com>,
-        Will Deacon <will@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>
-References: <20210916181538.968978-1-oupton@google.com>
- <20210916181538.968978-5-oupton@google.com>
- <d88dae38-6e03-9d93-95fc-8c064e6fbb98@redhat.com>
-In-Reply-To: <d88dae38-6e03-9d93-95fc-8c064e6fbb98@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+        kernel-team@android.com
+Subject: Re: [PATCH] KVM: arm64: Allow KVM to be disabled from the command line
+In-Reply-To: <e80b2454-45c3-19a3-7a96-dcb484f9e2f5@arm.com>
+References: <20210903091652.985836-1-maz@kernel.org>
+        <5bc623f2-e4c1-cc9c-683c-2f95648f1a68@arm.com>
+        <87a6jutkyq.wl-maz@kernel.org>
+        <e80b2454-45c3-19a3-7a96-dcb484f9e2f5@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: suzuki.poulose@arm.com, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, ascull@google.com, dbrazdil@google.com, james.morse@arm.com, alexandru.elisei@arm.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 01/10/21 16:39, Paolo Bonzini wrote:
-> On 16/09/21 20:15, Oliver Upton wrote:
->> +    if (data.flags & ~KVM_CLOCK_REALTIME)
->>           return -EINVAL;
+On Fri, 01 Oct 2021 10:27:18 +0100,
+Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
 > 
-> Let's accept KVM_CLOCK_HOST_TSC here even though it's not used; there 
-> may be programs that expect to send back to KVM_SET_CLOCK whatever they 
-> got from KVM_GET_CLOCK.
+> On 30/09/2021 11:29, Marc Zyngier wrote:
+> > On Wed, 29 Sep 2021 11:35:46 +0100,
+> > Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
+> >> 
+> >>> +	if (strcmp(arg, "none") == 0 && !WARN_ON(is_kernel_in_hyp_mode())) {
+> >> 
+> >> nit: Does this really need to WARN here ? Unlike the "nvhe" case, if the
+> >> user wants to keep the KVM out of the picture for, say debugging
+> >> something, it is perfectly Ok to allow the kernel to be running at EL2
+> >> without having to change the Firmware to alter the landing EL for the
+> >> kernel ?
+> > 
+> > Well, the doc says "run in nVHE mode" and the option forces
+> > id_aa64mmfr1.vh=0. The WARN_ON() will only fires on broken^Wfruity HW
+> > that is VHE only. Note that this doesn't rely on any firmware change
+> > (we drop from EL2 to EL1 and stay there).
+> 
+> Ah, ok. So the "none" is in fact "nvhe + no-kvm". Thats the bit I
+> missed. TBH, that name to me sounds like "no KVM" at all, which is what
+> we want. The question is, do we really need "none" to force vh == 0 ? I
+> understand this is only a problem on a rare set of HWs. But the generic
+> option looks deceiving.
+> 
+> That said, I am happy to leave this as is and the doc says so.
 
-Nevermind, KVM_SET_CLOCK is already rejecting KVM_CLOCK_TSC_STABLE so no 
-need to do that!
+I think you have a point here. Conflating the two things is a bit odd,
+and we might as well let the user pick the configuration they want
+(they can always pass 'id_aa64mmfr1.vh=0' themselves).
 
-Paolo
+I'll respin the patch with this change.
 
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
