@@ -2,126 +2,204 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0123641F38C
-	for <lists+kvm@lfdr.de>; Fri,  1 Oct 2021 19:46:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 650A941F3C8
+	for <lists+kvm@lfdr.de>; Fri,  1 Oct 2021 19:53:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1355435AbhJARri (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Oct 2021 13:47:38 -0400
-Received: from mail.kernel.org ([198.145.29.99]:43988 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1355312AbhJARrg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Oct 2021 13:47:36 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 5D234619EC;
-        Fri,  1 Oct 2021 17:45:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1633110352;
-        bh=db7GD7Lnx1ZtZAtaCWF8cwt5PJRMhlQFMCeZ5e1Xap4=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=CA9DLkAq4PPpVa8KaA6SFQb3N2r+mJyrAjBXTOmwDu6gH7UNs6KSDSccC0dczmlYO
-         vHAnJeiTdCGtqjSkULM8CBsaU0V3Z/NestItDaJGjJv4anJEn3eUXWo/UiFY3D9P64
-         DEXxGfNa3Yipvff31Lba0s/krLrdIDRwCCeSImCwXNygbfyRAipD9t4zZbiR23D+o3
-         7tEYMxyT5s7Xkju18LLyMvGnpu5vd+VedA6hjV90lF66X1gZZha82M10vXOm7PWd7H
-         uBveIXumosPUh2i+TdI7cHYyVCNh4yOfDAXsDXQAufZz5d307YAAf9EFcm7TVfWWMg
-         Qal2JwOooV24Q==
-Date:   Fri, 1 Oct 2021 10:45:47 -0700
-From:   Nathan Chancellor <nathan@kernel.org>
-To:     Jani Nikula <jani.nikula@linux.intel.com>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>,
-        kernel test robot <lkp@intel.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        "llvm@lists.linux.dev" <llvm@lists.linux.dev>,
-        "kbuild-all@lists.01.org" <kbuild-all@lists.01.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        id S1355552AbhJARyo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Oct 2021 13:54:44 -0400
+Received: from mail-mw2nam10on2087.outbound.protection.outlook.com ([40.107.94.87]:56769
+        "EHLO NAM10-MW2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1355515AbhJARyl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Oct 2021 13:54:41 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=jSPDmywVuYJZr3FNiP7FVDp/gJJtIuYLCPQxxPs4wh/GA/TIlytPzORKo/rgZ/89Xii9tg1xq0WEEnbgxBlCNz2mA5fOA6wcTgIX7FiHHmBpwdwyeKHXYfGvkkueptL2cQnHjKavpeCq5lL0zuLlyg05E4nbYGdBUy+0wE+chSrcDlMX/ewh85FAjPuT06y4FuMtnm6e1cmDuv2kcyMwuAcw5/8Rxd75/s62/S9peY1xYiEmdzKRtu1ykxab9G/I+6cFOZheBc9R3PnC6tWnx/V8ga8zDgfigjidNkRumLI5NcJ8B1LQgCNS1GMKAU7cH/fN9VlTBU47s/dBAbxg5w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=xkS9M/++Xop7frTxsR2JxiOoUcqYsdqH9YI7swRWdqQ=;
+ b=E0V61+7Q2cMR+BXPAz8TpDa8Cy+5j7+ucqmCfH3c5hlK6/UqIJa+4BRlFN/iz089kPYMKl+mcp29exwXNaYXtt4p8MJD6LWJwREzl3YDQdp/Xf9TU1NPZ4apAApk51YY/jxFpPWRgflZzodwVb2a0nHPKki1exyBU0ZGlrid8jHUbeMjYXysXNZ5L5ud5U8gm549VoFCA9duKrbmtGbw7tubv5wc0S6pW835o2mXHmXXl+VxyiRiBRUZWGEZMRx/9KCVwpjiHSOzyHAiTJAM69SOukdqaqmaViV68CrmfUHWcwIkm5PeUorPCnFUoaSaqltIbjA83xla7/NKo2p2Lg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=xkS9M/++Xop7frTxsR2JxiOoUcqYsdqH9YI7swRWdqQ=;
+ b=sHrr20nhK4zD+KOX0PTiemXHqY/tDR/SHxhOek9p4nZUFGA9CLi/JQvmPumTz46yoL+7UBpY4fKlozxvGHb3ceGVfhtflj6PkA0KABP+jZ9CXSOAQPCyQes3NVq1IO6kOv8KsGBdxuJ3Ec9YbicxP8orfz3qcYiOoWv1zVSuSzQ245acDbWfBA10n/LRwMa3geh3cJpA7OPVpMWNFo3GehZJwz75vJANVFZ+vxsJIMvBW3dSEf8FVhxjK7BqtQRmcIDypkNE5oImnxM+o7DWpfp3f4lyWPEwxareCClZ2gnddthT0HJirYdURPIDPNz2IU5SfVc6NIKHG4QshMhT5Q==
+Authentication-Results: linux.ie; dkim=none (message not signed)
+ header.d=none;linux.ie; dmarc=none action=none header.from=nvidia.com;
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
+ by BL1PR12MB5126.namprd12.prod.outlook.com (2603:10b6:208:312::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4566.15; Fri, 1 Oct
+ 2021 17:52:53 +0000
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::e8af:232:915e:2f95]) by BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::e8af:232:915e:2f95%8]) with mapi id 15.20.4566.019; Fri, 1 Oct 2021
+ 17:52:53 +0000
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     David Airlie <airlied@linux.ie>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
         Alex Williamson <alex.williamson@redhat.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        dri-devel@lists.freedesktop.org,
+        Eric Farman <farman@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
         Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
+        linux-doc@vger.kernel.org, linux-s390@vger.kernel.org,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
         Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        intel-gfx@lists.freedesktop.org
-Subject: Re: [Intel-gfx] [vfio:next 33/38]
- drivers/gpu/drm/i915/i915_pci.c:975:2: warning: missing field
- 'override_only' initializer
-Message-ID: <YVdJS5RUjvokrSnn@archlinux-ax161>
-References: <20210827153409.GV1721383@nvidia.com>
- <878rzdt3a3.fsf@intel.com>
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Christoph Hellwig <hch@lst.de>
+Subject: [PATCH v3 00/10] Move vfio_ccw to the new mdev API
+Date:   Fri,  1 Oct 2021 14:52:41 -0300
+Message-Id: <0-v3-57c1502c62fd+2190-ccw_mdev_jgg@nvidia.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: BL1PR13CA0412.namprd13.prod.outlook.com
+ (2603:10b6:208:2c2::27) To BL0PR12MB5506.namprd12.prod.outlook.com
+ (2603:10b6:208:1cb::22)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <878rzdt3a3.fsf@intel.com>
+Received: from mlx.ziepe.ca (142.162.113.129) by BL1PR13CA0412.namprd13.prod.outlook.com (2603:10b6:208:2c2::27) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4587.7 via Frontend Transport; Fri, 1 Oct 2021 17:52:52 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1mWMiJ-00988w-Vb; Fri, 01 Oct 2021 14:52:51 -0300
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: abe9ef51-7ac8-45f5-5e94-08d985044a8c
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5126:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <BL1PR12MB512600B27324961DB45A73ECC2AB9@BL1PR12MB5126.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:2449;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: gGhD6tjleUCuKuUJK2ssHsnXtYbIzhW7w2bSKyVMIBvdmfFecUMqYozl4TDr9yg2sO228HsVuYYQjnLShFQPaQ/gDQkqLqdBNYFMOIRv8ziep2Zz3RWL/Zf7QbOZbAXzT20lC2Fmx+JMWbSNU4APtahxDZCvqWj4JhABB0wup/RqQC+5O5v9tiKgI5k0QvvRz5WIOynrNxwStMhq8QeQ9yGrHS4VuI4b9s7/RlQ+IJ580LidZ9osv22+Wa+GVR9fs9sEnjfCMZhTcy1uZMgx1IcIpx2yT4cgptLOhzyR3LjLIvtH1GQ1ATrKcWXbc0v7xB+dmxodBTHLR4aZtryMDXYAQ8oy9AiUDldxVrmq4lXNzMcboTdh56pqwi7nFz+sfw9F5uYdgL0CizBUxsIEJ1EpJvSxf6r0Jv0lf2wrSWgImdWdpluFO1TMOI1YKTTWXHvLapcCS6rQxX+nyQ9f46L7rvUyjz1AR1NBrxjOmFh4vNujIZa2tZ3DJVWrsLZN17UwbXGvpzO5TDhnQsD+30wOghr8zsQBn6dPaX0+jGakloox56kkcqLJBneZIAAH9xNAROPBYPgf3QnLdS4yvmkKdCHd4UuzPqTuuOZD4fecwiCiN70deg+ZFqKYr/p/A+GybuRN10gsmBOvcBXZaeHaAiH8pryqEwyZemGTuHpORXZE4/9WSoi74S39Fx1kQ//QmDorEHIZRSLVjEOQFDyKAAWUlrMSbWsL8pP4iVfkZeXXLo/5/6UMFhVWwloQIwwbQNQuBnFbSen77pc8cFnUW0ZgV+CMmFxDGTASm1ljfb9nLgdiwC8u+Xywjyb27H8lxQFPw5/FqhOELAEp/g==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(508600001)(921005)(2616005)(26005)(83380400001)(6666004)(966005)(186003)(426003)(9746002)(2906002)(86362001)(9786002)(38100700002)(4326008)(36756003)(8676002)(66556008)(66946007)(110136005)(54906003)(316002)(7416002)(5660300002)(8936002)(66476007)(4216001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?v8XIDuMd3+7v7AHKg7shkWINe3L9MInQKw0Aj5HKzKVH7MeQncl1ZoGBl0gQ?=
+ =?us-ascii?Q?EFsT+iruYq1Ooa+LOQwwdhxgv6Woan6liRbgKGDa7DKw66etflzaItPWHVvz?=
+ =?us-ascii?Q?Ym6IsamCEwq6FXGulHUDVWEwPw0h0cxOsK4TqVWd4YMLvEaAu0b9Tpc0fLYd?=
+ =?us-ascii?Q?9vXPtURDz8WUNy+JXZspjCVchp6TXVBh0kO8pAC3QgtoGzhEUXJqwDn+s2pd?=
+ =?us-ascii?Q?gOS0d3kffC3J1TsFFH5GyVlzDgIkJMCAj0ESjx1Ru5LwbwiHouZXkK864tIG?=
+ =?us-ascii?Q?rBcxu2K0h8BBbe23V4eOL3fgnvXJOFkJ3qjU03KxKTpP1+Y7QOer/3L7wEBv?=
+ =?us-ascii?Q?SDSd+IuRrwM4Ao93zUesQDdFuuvba6fR+1QBVbcPgozcyL37VGZtwT6OGlL0?=
+ =?us-ascii?Q?a9gpUTAcWho97NoZ6DMBVt91bAXM9orSqBlBPkFRSB1E8aMXiWCi5y5ECNYP?=
+ =?us-ascii?Q?CZ3swQgiwkzsneSn/V3uF0gUGDzr5uS6YtN81/X+cKbgRaApCSCw+wGpxaPN?=
+ =?us-ascii?Q?UYgZPmzeUcHzhefCKA1o+jbUcTqS3xf31o0RKY3d2JsG/drXvmJwRdRvZVg9?=
+ =?us-ascii?Q?mVxiX9UltAGF1dZMgrjbrCxSOZt9NPUqfp8LnP32dXRY1JRVSEn1RAwakoDJ?=
+ =?us-ascii?Q?hD7w1UGlQHlOe/lRswZAB3JkHRB3CHWMTh1t7mXsVZa/3/nyzmZDuM9fn1En?=
+ =?us-ascii?Q?Mw/AB7KL67LEaHFA/EsSa//UnH6k+UaCPYV9+V1LvnJqHvl3Dux1Ejn/Z9CU?=
+ =?us-ascii?Q?L30oU6Twli77XNiq7EQsxYqxdAtOfv9YYaOd9DUmrmVbqev3tiRzlc53X0BC?=
+ =?us-ascii?Q?a49R4ReN+1Z093KGqy+loBmgBlGTe+7baX8TKtabLRshVmUorvulPpsHLdQV?=
+ =?us-ascii?Q?RmW2RxiZpXJvdSWrnRU+Iw0HKtDi2J4Z2niK0qFXS999fNONBeOWzFMjS2Hm?=
+ =?us-ascii?Q?y+Lp5SRQTdxR1Rx8bwV4iQrOr2uBud7jMS7xBe+Q1lwLCTeTlqyyJRvI2tOH?=
+ =?us-ascii?Q?MqQqXkYePLREmDesKTSHOQCNSUhOS24JqAagzOLxCF9z5nsXDYgNY7FXFg9n?=
+ =?us-ascii?Q?8zzseXw7NMVHL4FErHMkA1lwcIsmNrKtGT8PhXoxj5Q6XXFoKDUtZ9ZcCtcw?=
+ =?us-ascii?Q?/53sHjO5PCu71eOzSOCBXSLS9S33dHmy6e1ZNvLm7tqP3pJeQVBTYcVKHtDR?=
+ =?us-ascii?Q?c1d3SN3wdXU1eAV196fnjWo4DuPYUhn5v6s7/wf9HzuNw3gxbGLOawF6Wyn9?=
+ =?us-ascii?Q?ycj2rSZH/W4sECSGxw0q4+pclo8aAEh7qAqK4VVz4V9pHG6jn/rf0YLnuij1?=
+ =?us-ascii?Q?qrhvwGyGGj8BpGeN/ucHOVGG?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: abe9ef51-7ac8-45f5-5e94-08d985044a8c
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Oct 2021 17:52:52.8892
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: dF87A3ctNLysHMh0Ekv87sNRl7Farx5f76wQFDfT/M4/5JR0ZzV9C3eb8psPbZhd
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5126
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 01, 2021 at 02:04:04PM +0300, Jani Nikula wrote:
-> On Fri, 27 Aug 2021, Jason Gunthorpe <jgg@nvidia.com> wrote:
-> > On Fri, Aug 27, 2021 at 03:12:36PM +0000, kernel test robot wrote:
-> >> tree:   https://github.com/awilliam/linux-vfio.git next
-> >> head:   ea870730d83fc13a5fa2bd0e175176d7ac8a400a
-> >> commit: 343b7258687ecfbb363bfda8833a7cf641aac524 [33/38] PCI: Add 'override_only' field to struct pci_device_id
-> >> config: i386-randconfig-a004-20210827 (attached as .config)
-> >> compiler: clang version 14.0.0 (https://github.com/llvm/llvm-project 1076082a0d97bd5c16a25ee7cf3dbb6ee4b5a9fe)
-> >> reproduce (this is a W=1 build):
-> >>         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-> >>         chmod +x ~/bin/make.cross
-> >>         # https://github.com/awilliam/linux-vfio/commit/343b7258687ecfbb363bfda8833a7cf641aac524
-> >>         git remote add vfio https://github.com/awilliam/linux-vfio.git
-> >>         git fetch --no-tags vfio next
-> >>         git checkout 343b7258687ecfbb363bfda8833a7cf641aac524
-> >>         # save the attached .config to linux build tree
-> >>         COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross ARCH=i386 
-> >> 
-> >> If you fix the issue, kindly add following tag as appropriate
-> >> Reported-by: kernel test robot <lkp@intel.com>
-> >
-> > Ugh, this is due to this code:
-> >
-> > #define INTEL_VGA_DEVICE(id, info) {		\
-> > 	0x8086,	id,				\
-> > 	~0, ~0,					\
-> > 	0x030000, 0xff0000,			\
-> > 	(unsigned long) info }
-> >
-> > #define INTEL_QUANTA_VGA_DEVICE(info) {		\
-> > 	0x8086,	0x16a,				\
-> > 	0x152d,	0x8990,				\
-> > 	0x030000, 0xff0000,			\
-> > 	(unsigned long) info }
-> >
-> >
-> > Which really should be using the normal pattern for defining these
-> > structs:
-> >
-> > #define PCI_DEVICE_CLASS(dev_class,dev_class_mask) \
-> >         .class = (dev_class), .class_mask = (dev_class_mask), \
-> >         .vendor = PCI_ANY_ID, .device = PCI_ANY_ID, \
-> >         .subvendor = PCI_ANY_ID, .subdevice = PCI_ANY_ID
-> >
-> > The warning is also not a real issue, just clang being overzealous.
-> 
-> Stumbled upon this old report, sorry for the delayed response.
-> 
-> The reason it's not using designated initializers is that the same file
-> gets synced to some userspace projects (at least libdrm and
-> igt-gpu-tools) which use the macros to initialize slightly different
-> structs. For example, igt uses struct pci_id_match from libpciaccess-dev
-> (/usr/include/pciaccess.h) and can't easily adapt to different member
-> names.
-> 
-> Anyway, we've got
-> 
-> subdir-ccflags-y += $(call cc-disable-warning, missing-field-initializers)
-> subdir-ccflags-y += $(call cc-disable-warning, initializer-overrides)
-> 
-> in drivers/gpu/drm/i915/Makefile, so I wonder why they're not respected.
+This addresses Cornelia's remark on the earlier patch that ccw has a
+confusing lifecycle. While it doesn't seem like the original attempt was
+functionally wrong, the result can be made better with a lot of further
+work.
 
-This report was from an i386 randconfig, which we recently had a lot of
-issues with:
+Reorganize the driver so that the mdev owns the private memory and
+controls the lifecycle, not the css_driver. The memory associated with the
+css_driver lifecycle is only the mdev_parent/mdev_type registration.
 
-https://git.kernel.org/linus/7fa6a2746616c8de4c40b748c2bb0656e00624ff
+Along the way we change when the sch is quiescent or not to be linked to
+the open/close_device lifetime of the vfio_device, which is sort of what
+it was tring to do already, just not completely.
 
-Applying my patch to remove most of the cc-disable-warnings in your
-Makefile would help avoid these reports in the future :)
+The troublesome racey lifecycle of the css_driver callbacks is made clear
+with simple vfio_device refcounting so a callback is only delivered into a
+registered vfio_device and has obvious correctness.
 
-https://lore.kernel.org/r/20210914194944.4004260-1-nathan@kernel.org/
+Move the only per-css_driver state, the "available instance" counter, into
+the core code and share that logic with many of the other drivers. The
+value is kept in the mdev_type memory.
 
-Cheers,
-Nathan
+This is on github: https://github.com/jgunthorpe/linux/commits/vfio_ccw
+
+v3:
+ - Rebase to Christoph's group work & rc3; use
+   vfio_register_emulated_iommu_dev()
+ - Remove GFP_DMA
+ - Order mdev_unregister_driver() symmetrically with init
+ - Rework what is considered a BROKEN event in fsm_close()
+ - NOP both CCW_EVENT_OPEN/CLOSE
+ - Documentation updates
+ - Remane goto label to err_init vfio_ccw_mdev_probe()
+ - Fix NULL pointer deref in mdev_device_create()
+v2: https://lore.kernel.org/r/0-v2-7d3a384024cf+2060-ccw_mdev_jgg@nvidia.com
+ - Clean up the lifecycle in ccw with 7 new patches
+ - Rebase
+v1: https://lore.kernel.org/all/7-v2-7667f42c9bad+935-vfio3_jgg@nvidia.com
+
+Jason Gunthorpe (10):
+  vfio/ccw: Remove unneeded GFP_DMA
+  vfio/ccw: Use functions for alloc/free of the vfio_ccw_private
+  vfio/ccw: Pass vfio_ccw_private not mdev_device to various functions
+  vfio/ccw: Convert to use vfio_register_emulated_iommu_dev()
+  vfio/ccw: Make the FSM complete and synchronize it to the mdev
+  vfio/mdev: Consolidate all the device_api sysfs into the core code
+  vfio/mdev: Add mdev available instance checking to the core
+  vfio/ccw: Remove private->mdev
+  vfio: Export vfio_device_try_get()
+  vfio/ccw: Move the lifecycle of the struct vfio_ccw_private to the
+    mdev
+
+ .../driver-api/vfio-mediated-device.rst       |   8 +-
+ drivers/gpu/drm/i915/gvt/kvmgt.c              |   9 +-
+ drivers/s390/cio/vfio_ccw_drv.c               | 282 ++++++++----------
+ drivers/s390/cio/vfio_ccw_fsm.c               | 158 +++++++---
+ drivers/s390/cio/vfio_ccw_ops.c               | 240 +++++++--------
+ drivers/s390/cio/vfio_ccw_private.h           |  42 ++-
+ drivers/s390/crypto/vfio_ap_ops.c             |  41 +--
+ drivers/s390/crypto/vfio_ap_private.h         |   2 -
+ drivers/vfio/mdev/mdev_core.c                 |  13 +-
+ drivers/vfio/mdev/mdev_private.h              |   2 +
+ drivers/vfio/mdev/mdev_sysfs.c                |  64 +++-
+ drivers/vfio/vfio.c                           |   3 +-
+ include/linux/mdev.h                          |  13 +-
+ include/linux/vfio.h                          |   1 +
+ samples/vfio-mdev/mbochs.c                    |   9 +-
+ samples/vfio-mdev/mdpy.c                      |  31 +-
+ samples/vfio-mdev/mtty.c                      |  10 +-
+ 17 files changed, 482 insertions(+), 446 deletions(-)
+
+
+base-commit: d9a0cd510c3383b61db6f70a84e0c3487f836a63
+-- 
+2.33.0
+
