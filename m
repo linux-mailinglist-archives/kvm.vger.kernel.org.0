@@ -2,159 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7E19741E996
-	for <lists+kvm@lfdr.de>; Fri,  1 Oct 2021 11:27:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 08FA441EB01
+	for <lists+kvm@lfdr.de>; Fri,  1 Oct 2021 12:33:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352892AbhJAJ3G (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Oct 2021 05:29:06 -0400
-Received: from foss.arm.com ([217.140.110.172]:38640 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229906AbhJAJ3F (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Oct 2021 05:29:05 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 50D24101E;
-        Fri,  1 Oct 2021 02:27:21 -0700 (PDT)
-Received: from [10.57.72.173] (unknown [10.57.72.173])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DE4CA3F70D;
-        Fri,  1 Oct 2021 02:27:19 -0700 (PDT)
-Subject: Re: [PATCH] KVM: arm64: Allow KVM to be disabled from the command
- line
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, ascull@google.com,
-        dbrazdil@google.com, James Morse <james.morse@arm.com>,
+        id S1353593AbhJAKfk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Oct 2021 06:35:40 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:33205 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1353178AbhJAKfj (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 1 Oct 2021 06:35:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1633084434;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=QSuR70xnv39bycvobYUkYW+O6E+zsW6wFcCu0xUN0TI=;
+        b=H6Dk0YRnUV4f4C6nbwANdwY49Y2qHUOT4MHatAvLrYalpobwxruKhB2+EAy5pwwIlJxPBw
+        idTAQ5TmStnCycitIFhkeAKhL07FeLQ72kGAoHdgHZnhfbyq95cPf30TIGwWidGluyxyrq
+        mGna1tTjoaYzoyRo0GPNe7ewzZR9zyc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-584-QXwW9Tt8MzW1jONRM1vepQ-1; Fri, 01 Oct 2021 06:33:53 -0400
+X-MC-Unique: QXwW9Tt8MzW1jONRM1vepQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 74D621927800;
+        Fri,  1 Oct 2021 10:33:51 +0000 (UTC)
+Received: from fuller.cnet (ovpn-112-4.gru2.redhat.com [10.97.112.4])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 93B5A18AD4;
+        Fri,  1 Oct 2021 10:33:50 +0000 (UTC)
+Received: by fuller.cnet (Postfix, from userid 1000)
+        id 3FC70416CE5D; Fri,  1 Oct 2021 07:32:00 -0300 (-03)
+Date:   Fri, 1 Oct 2021 07:32:00 -0300
+From:   Marcelo Tosatti <mtosatti@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Oliver Upton <oupton@google.com>, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu,
+        Sean Christopherson <seanjc@google.com>,
+        Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>,
+        James Morse <james.morse@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
-        kernel-team@android.com
-References: <20210903091652.985836-1-maz@kernel.org>
- <5bc623f2-e4c1-cc9c-683c-2f95648f1a68@arm.com> <87a6jutkyq.wl-maz@kernel.org>
-From:   Suzuki K Poulose <suzuki.poulose@arm.com>
-Message-ID: <e80b2454-45c3-19a3-7a96-dcb484f9e2f5@arm.com>
-Date:   Fri, 1 Oct 2021 10:27:18 +0100
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.14.0
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-arm-kernel@lists.infradead.org,
+        Andrew Jones <drjones@redhat.com>,
+        Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH v8 7/7] KVM: x86: Expose TSC offset controls to userspace
+Message-ID: <20211001103200.GA39746@fuller.cnet>
+References: <20210916181538.968978-1-oupton@google.com>
+ <20210916181538.968978-8-oupton@google.com>
+ <20210930191416.GA19068@fuller.cnet>
+ <48151d08-ee29-2b98-b6e1-f3c8a1ff26bc@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <87a6jutkyq.wl-maz@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <48151d08-ee29-2b98-b6e1-f3c8a1ff26bc@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 30/09/2021 11:29, Marc Zyngier wrote:
-> On Wed, 29 Sep 2021 11:35:46 +0100,
-> Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
->>
->> On 03/09/2021 10:16, Marc Zyngier wrote:
->>> Although KVM can be compiled out of the kernel, it cannot be disabled
->>> at runtime. Allow this possibility by introducing a new mode that
->>> will prevent KVM from initialising.
->>>
->>> This is useful in the (limited) circumstances where you don't want
->>> KVM to be available (what is wrong with you?), or when you want
->>> to install another hypervisor instead (good luck with that).
->>>
->>> Signed-off-by: Marc Zyngier <maz@kernel.org>
->>> ---
->>>    Documentation/admin-guide/kernel-parameters.txt |  3 +++
->>>    arch/arm64/include/asm/kvm_host.h               |  1 +
->>>    arch/arm64/kernel/idreg-override.c              |  1 +
->>>    arch/arm64/kvm/arm.c                            | 14 +++++++++++++-
->>>    4 files changed, 18 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
->>> index 91ba391f9b32..cc5f68846434 100644
->>> --- a/Documentation/admin-guide/kernel-parameters.txt
->>> +++ b/Documentation/admin-guide/kernel-parameters.txt
->>> @@ -2365,6 +2365,9 @@
->>>    	kvm-arm.mode=
->>>    			[KVM,ARM] Select one of KVM/arm64's modes of operation.
->>>    +			none: Forcefully disable KVM and run in nVHE
->>> mode,
->>> +			      preventing KVM from ever initialising.
->>> +
->>>    			nvhe: Standard nVHE-based mode, without support for
->>>    			      protected guests.
->>>    diff --git a/arch/arm64/include/asm/kvm_host.h
->>> b/arch/arm64/include/asm/kvm_host.h
->>> index f8be56d5342b..019490c67976 100644
->>> --- a/arch/arm64/include/asm/kvm_host.h
->>> +++ b/arch/arm64/include/asm/kvm_host.h
->>> @@ -58,6 +58,7 @@
->>>    enum kvm_mode {
->>>    	KVM_MODE_DEFAULT,
->>>    	KVM_MODE_PROTECTED,
->>> +	KVM_MODE_NONE,
->>>    };
->>>    enum kvm_mode kvm_get_mode(void);
->>>    diff --git a/arch/arm64/kernel/idreg-override.c
->>> b/arch/arm64/kernel/idreg-override.c
->>> index d8e606fe3c21..57013c1b6552 100644
->>> --- a/arch/arm64/kernel/idreg-override.c
->>> +++ b/arch/arm64/kernel/idreg-override.c
->>> @@ -95,6 +95,7 @@ static const struct {
->>>    	char	alias[FTR_ALIAS_NAME_LEN];
->>>    	char	feature[FTR_ALIAS_OPTION_LEN];
->>>    } aliases[] __initconst = {
->>> +	{ "kvm-arm.mode=none",		"id_aa64mmfr1.vh=0" },
->>>    	{ "kvm-arm.mode=nvhe",		"id_aa64mmfr1.vh=0" },
->>>    	{ "kvm-arm.mode=protected",	"id_aa64mmfr1.vh=0" },
->>>    	{ "arm64.nobti",		"id_aa64pfr1.bt=0" },
->>> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
->>> index fe102cd2e518..cdc70e238316 100644
->>> --- a/arch/arm64/kvm/arm.c
->>> +++ b/arch/arm64/kvm/arm.c
->>> @@ -2064,6 +2064,11 @@ int kvm_arch_init(void *opaque)
->>>    		return -ENODEV;
->>>    	}
->>>    +	if (kvm_get_mode() == KVM_MODE_NONE) {
->>> +		kvm_info("KVM disabled from command line\n");
->>> +		return -ENODEV;
->>> +	}
->>> +
->>>    	in_hyp_mode = is_kernel_in_hyp_mode();
->>>      	if (cpus_have_final_cap(ARM64_WORKAROUND_DEVICE_LOAD_ACQUIRE)
->>> ||
->>> @@ -2137,8 +2142,15 @@ static int __init early_kvm_mode_cfg(char *arg)
->>>    		return 0;
->>>    	}
->>>    -	if (strcmp(arg, "nvhe") == 0 &&
->>> !WARN_ON(is_kernel_in_hyp_mode()))
->>> +	if (strcmp(arg, "nvhe") == 0 && !WARN_ON(is_kernel_in_hyp_mode())) {
->>> +		kvm_mode = KVM_MODE_DEFAULT;
->>>    		return 0;
->>> +	}
->>> +
->>> +	if (strcmp(arg, "none") == 0 && !WARN_ON(is_kernel_in_hyp_mode())) {
->>
->> nit: Does this really need to WARN here ? Unlike the "nvhe" case, if the
->> user wants to keep the KVM out of the picture for, say debugging
->> something, it is perfectly Ok to allow the kernel to be running at EL2
->> without having to change the Firmware to alter the landing EL for the
->> kernel ?
+On Fri, Oct 01, 2021 at 11:17:33AM +0200, Paolo Bonzini wrote:
+> On 30/09/21 21:14, Marcelo Tosatti wrote:
+> > > +   new_off_n = t_0 + off_n + (k_1 - k_0) * freq - t_1
+> > Hi Oliver,
+> > 
+> > This won't advance the TSC values themselves, right?
 > 
-> Well, the doc says "run in nVHE mode" and the option forces
-> id_aa64mmfr1.vh=0. The WARN_ON() will only fires on broken^Wfruity HW
-> that is VHE only. Note that this doesn't rely on any firmware change
-> (we drop from EL2 to EL1 and stay there).
-
-Ah, ok. So the "none" is in fact "nvhe + no-kvm". Thats the bit I
-missed. TBH, that name to me sounds like "no KVM" at all, which is what
-we want. The question is, do we really need "none" to force vh == 0 ? I
-understand this is only a problem on a rare set of HWs. But the generic
-option looks deceiving.
-
-That said, I am happy to leave this as is and the doc says so.
-
+> Why not?  It affects the TSC offset in the vmcs, so the TSC in the VM is
+> advanced too.
 > 
-> We could add another option (none-vhe?) that stays at EL2 and still
-> disables KVM if there is an appetite for it.
+> Paolo
 
-Na. Don't think that is necessary.
++4. Invoke the KVM_SET_CLOCK ioctl, providing the kvmclock nanoseconds
++   (k_0) and realtime nanoseconds (r_0) in their respective fields.
++   Ensure that the KVM_CLOCK_REALTIME flag is set in the provided
++   structure. KVM will advance the VM's kvmclock to account for elapsed
++   time since recording the clock values.
 
+You can't advance both kvmclock (kvmclock_offset variable) and the TSCs,
+which would be double counting.
+
+So you have to either add the elapsed realtime (1) between KVM_GET_CLOCK
+to kvmclock (which this patch is doing), or to the TSCs. If you do both, there
+is double counting. Am i missing something?
+
+To make it clearer: TSC clocksource is faster than kvmclock source, so
+we'd rather use when possible, which is achievable with TSC scaling 
+support on HW.
+
+1: As mentioned earlier, just using the realtime clock delta between
+hosts can introduce problems. So need a scheme to:
+
+	- Find the offset between host clocks, with upper and lower
+	  bounds on error.
+	- Take appropriate actions based on that (for example,
+	  do not use KVM_CLOCK_REALTIME flag on KVM_SET_CLOCK
+	  if the delta between hosts is large).
+
+Which can be done in userspace or kernel space... (hum, but maybe
+delegating this to userspace will introduce different solutions
+of the same problem?).
+
+> > This (advancing the TSC values by the realtime elapsed time) would be
+> > awesome because TSC clock_gettime() vdso is faster, and some
+> > applications prefer to just read from TSC directly.
+> > See "x86: kvmguest: use TSC clocksource if invariant TSC is exposed".
+> > 
+> > The advancement with this patchset only applies to kvmclock.
+> > 
 > 
->> Otherwise,
->>
->> Acked-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> 
 
-Suzuki
