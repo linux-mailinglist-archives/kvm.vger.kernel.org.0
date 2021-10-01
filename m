@@ -2,102 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4FF1C41EB61
-	for <lists+kvm@lfdr.de>; Fri,  1 Oct 2021 13:06:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7537041EC24
+	for <lists+kvm@lfdr.de>; Fri,  1 Oct 2021 13:35:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353672AbhJALH7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Oct 2021 07:07:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34238 "EHLO
+        id S1354018AbhJALgs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Oct 2021 07:36:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41220 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353454AbhJALH7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Oct 2021 07:07:59 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27484C061775;
-        Fri,  1 Oct 2021 04:06:15 -0700 (PDT)
-Received: from zn.tnic (p200300ec2f0e8e0006425ffdb1062ac0.dip0.t-ipconnect.de [IPv6:2003:ec:2f0e:8e00:642:5ffd:b106:2ac0])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 7CBB61EC0419;
-        Fri,  1 Oct 2021 13:06:12 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1633086372;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=JCBAeXE9Fm2/4A8nfF4qlTElC4omNaQJNghTb8YDddM=;
-        b=kTtfe1X/X1Cm8CiF7sqgmxJbnYSVBHwhUxmVIQWx22i7VqsRKC6EEWMxmDVCD+9RF7VzG5
-        QJBTrSVvQeE27As7XeJBpiyoxWoEGP1nFgkKyx5GnB9alDDmJT1lAjv2TqZFpTt2XpnmBK
-        KSzCimg6oBTl41PghKnK15OZssLqRMo=
-Date:   Fri, 1 Oct 2021 13:06:08 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH Part2 v5 06/45] x86/sev: Invalid pages from direct map
- when adding it to RMP table
-Message-ID: <YVbroJ5RGWa5kZ6J@zn.tnic>
-References: <20210820155918.7518-1-brijesh.singh@amd.com>
- <20210820155918.7518-7-brijesh.singh@amd.com>
- <YVR5cOQOJxy12DcR@zn.tnic>
- <60d6a70d-22ab-9e17-b243-7f5669b4b70d@amd.com>
+        with ESMTP id S1353976AbhJALgq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Oct 2021 07:36:46 -0400
+Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E677C061775
+        for <kvm@vger.kernel.org>; Fri,  1 Oct 2021 04:35:02 -0700 (PDT)
+Received: by mail-ed1-x529.google.com with SMTP id dj4so34626708edb.5
+        for <kvm@vger.kernel.org>; Fri, 01 Oct 2021 04:35:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:reply-to:from:date:message-id:subject:to;
+        bh=5L/E4eErsLvrvRSyjenHMn1XgR3BfAibYkaUBTxnmho=;
+        b=kb6MbLUy++O6PNHhKSFPx9v4fFtwpvxJeNblR4kji6+6qq2Lucl0Bos7Wr8pcLX+hO
+         tRyb9xiWVR8p706SNC+HizJNgSL5UH7etOYT4KJNUPAxZsx19kSXdlPSkzuaY1jTWaLY
+         4tzz18G2my1E8FkqDzcvEfU/fmLr7epbivZsMIbMD2QsJgHn219yKjZHacudF+1Otelk
+         Ps1x6eI3Y+KniUoXNyOSthjl8bPizc7o0PNNLM7mCUJWrsXs698IFJfmckZW2ZuwAS6o
+         Sx6QKffvmRb5RhKFnE364qOhRDY4B39bqiG8gRsgkqiSO/SRZOJpzUOpTrf/l9gFCHVc
+         XGiQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
+         :subject:to;
+        bh=5L/E4eErsLvrvRSyjenHMn1XgR3BfAibYkaUBTxnmho=;
+        b=O5QwCF45gLyQsgeRzUNHTaMrL3ybV5uJ1akADttBqpsO+05X5P5T1A4KajtGtHUym6
+         Y+P6qQuclxPhRRsJN7aaihya8ScWxd2qDZFm/PTC3nudyTdekrn6jNqZxAAHCYfDXVUP
+         ZAsZ2AGn4k4RwBPA07imsQP/PyhxIjBsc1TEM7AYnntBKvXqks+CyatJhGmnNzv+LeRl
+         CMF10lU8/XtgB+V+6UfuEoCz34xIdosIWYFhh8lKBsGAU0CUmmR3NLVwqo5xwylwdbge
+         UoxfXICnq9VTvMKwNlccTINWyK70zXa6UnoXqfzECXhBC+Ls23LXqYVmKi2YogoSCG7H
+         Xh9Q==
+X-Gm-Message-State: AOAM531+YFp0AtH/vNtgkgKXi/EkDvdRCb7ybX+78RIzT9pHasNrZxOt
+        YTkmrLbwnLMOkcAJD8Hhvux1Ce4bmvS0ZA8fya8=
+X-Google-Smtp-Source: ABdhPJxO5JZDMou4ZeNj31LReXKwuJbss5Bcqb0SVbR3DI9xevoj0I1eyLAyk/Sg0BjFpvAB7vI/ZitZ52WunSuQcUw=
+X-Received: by 2002:a17:906:3882:: with SMTP id q2mr5834865ejd.396.1633088100599;
+ Fri, 01 Oct 2021 04:35:00 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <60d6a70d-22ab-9e17-b243-7f5669b4b70d@amd.com>
+Received: by 2002:a17:906:724a:0:0:0:0 with HTTP; Fri, 1 Oct 2021 04:34:58
+ -0700 (PDT)
+Reply-To: joymat52@gmail.com
+From:   Joyce Thomas <tjoyc1234@gmail.com>
+Date:   Fri, 1 Oct 2021 04:34:58 -0700
+Message-ID: <CAF-RpUjEy3ZrsPpj7r5ZFKjGM=JQyOMzOcWwONVKJZrBckwU0Q@mail.gmail.com>
+Subject: ATTN:
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 30, 2021 at 09:19:52AM -0700, Brijesh Singh wrote:
-> . The thought process is if in the future 
-> set_direct_map_default_noflush() is improved to restore the large
-> mapping then it will all work transparently.
-
-That's only scratching the surface of the *why* this is done so please
-explain why this dance is being done in a comment above the code so that
-it is clear.
-
-It is not really obvious why that hiding from the direct map is being
-done.
-
-Good reason from that memfd_secret mail are:
-
-"* Prevent cross-process secret userspace memory exposures. Once the secret
-memory is allocated, the user can't accidentally pass it into the kernel to
-be transmitted somewhere. The secreremem pages cannot be accessed via the
-direct map and they are disallowed in GUP."
-
-and in general hiding RMP pages from the direct map is a nice additional
-protection.
-
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Hello Dear
+My Name is Mr. Joyce Thomas. Contact me for more information on the
+transfer of ($7.9 million dollars) left by my late client from your
+Country. I want to present you as a business partner and next of kin
+of the fund. I will give you the details of this transaction, as soon
+as I hear from you. I need the information below:
+Full Name:
+Address:
+Occupation:
+Age:
+Personal Email:
+Personal Telephone:
+Best Regards,
+Mr.Joyce  Thomas
