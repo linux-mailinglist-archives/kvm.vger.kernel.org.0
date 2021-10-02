@@ -2,105 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 33FCB41FE41
-	for <lists+kvm@lfdr.de>; Sat,  2 Oct 2021 23:31:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BD03741FE88
+	for <lists+kvm@lfdr.de>; Sun,  3 Oct 2021 00:47:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234074AbhJBVdi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 2 Oct 2021 17:33:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44360 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229503AbhJBVdh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 2 Oct 2021 17:33:37 -0400
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E617C061714;
-        Sat,  2 Oct 2021 14:31:51 -0700 (PDT)
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1633210309;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to; bh=XAgRQtFBHsbRzmJ/Hn8rU+rglpQXhDRVc8VEErk4l88=;
-        b=OOgOM7YtXOhLWRkpS5/up6YJYIb5XY/mVgEOq+HXp4S6UaTts/077HIUsyQhhrCfBZLm4h
-        DcOhfXVkTGWfTIIui0TKbEg39RwGDEPWsbRZ29VbZcUHUt2KpdPqnUbq8gHXTK7Kt9hs0C
-        bqed1yCUaWPPFs4XtzvEyrJDD8ACNcAznsLRzqecIaJBqMJM/nxtdt3Z5yW2ho/sY22J0H
-        nrfYSLoejZuxwOYt/Voa/BTRfsJR0oAMq4/jclJmKGsCVrwaZeIvKXr5/DupT//1HGfLrA
-        bJJIW8bfUoxtdEFko5JHO5/bZ0QCfO1VcGYXlxgSOh5t48DJ9G9SquVWuRg0Zw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1633210309;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to; bh=XAgRQtFBHsbRzmJ/Hn8rU+rglpQXhDRVc8VEErk4l88=;
-        b=j6gtvaQTt1AY/2a2N7nrXZ1imOK6vuHY0DcXRKP3J/EuzAYA3QGu/iPDFJFkM0k2wP3Sjp
-        f9BQfS+vxRUDRDCg==
-To:     "Chang S. Bae" <chang.seok.bae@intel.com>, bp@suse.de,
-        luto@kernel.org, mingo@kernel.org, x86@kernel.org
-Cc:     len.brown@intel.com, lenb@kernel.org, dave.hansen@intel.com,
-        thiago.macieira@intel.com, jing2.liu@intel.com,
-        ravi.v.shankar@intel.com, linux-kernel@vger.kernel.org,
-        chang.seok.bae@intel.com, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v10 10/28] x86/fpu/xstate: Update the XSTATE save
- function to support dynamic states
-In-Reply-To: <87tui04urt.ffs@tglx>
-Date:   Sat, 02 Oct 2021 23:31:48 +0200
-Message-ID: <87pmsnglkr.ffs@tglx>
+        id S234155AbhJBWt3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 2 Oct 2021 18:49:29 -0400
+Received: from gandalf.ozlabs.org ([150.107.74.76]:49893 "EHLO
+        gandalf.ozlabs.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234050AbhJBWt2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 2 Oct 2021 18:49:28 -0400
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4HMMYm0llyz4xR9;
+        Sun,  3 Oct 2021 09:47:24 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+        s=201702; t=1633214860;
+        bh=WZxRlkQAJZ4tqNobecHm+w38BSGUESdihRsAdeUkre0=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=lroR3kmh4LYMftkmOxhvcJS7+pnh3a93hk6rg/CPpoYSU8ZWfL4YBiVSwyH06HYQn
+         f6fguCb0AxD7QUqw1YIyq/vJ62G3+TYTtylKrXTUiklrzA/2hOb2fC4LvM/wg4YFSH
+         KG8MQhBIPvHuJ1WmyKCn4j6p0KFhw65riWANZ2AVVLuS9pDXeGMd+I50l+GJoQRr6I
+         7foBJKgfmCZpsWy6Gj5dPHcRNuO3Ql45XAlDEVOgopLjJY1Os8xgFzWdtrAKgEFmdO
+         f4SQ2cUV6Sx1VEbHG7oGcVOzk6jJxI7YA6zFu7LMsSzMNOB/oKsTBZM+GOR73gkWW8
+         rv/N36CNA9/kg==
+Date:   Sun, 3 Oct 2021 09:47:22 +1100
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Yury Norov <yury.norov@gmail.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-mmc@vger.kernel.org, linux-perf-users@vger.kernel.org,
+        kvm@vger.kernel.org,
+        "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+        Alexander Lobakin <alobakin@pm.me>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Alexey Klimov <aklimov@redhat.com>,
+        Andrea Merello <andrea.merello@gmail.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Arnaldo Carvalho de Melo <acme@redhat.com>,
+        Arnd Bergmann <arnd@arndb.de>, Ben Gardon <bgardon@google.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Brian Cain <bcain@codeaurora.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Christoph Lameter <cl@linux.com>,
+        Daniel Bristot de Oliveira <bristot@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Dennis Zhou <dennis@kernel.org>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Ian Rogers <irogers@google.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Jakub Kicinski <kuba@kernel.org>, Jiri Olsa <jolsa@redhat.com>,
+        Joe Perches <joe@perches.com>, Jonas Bonn <jonas@southpole.se>,
+        Leo Yan <leo.yan@linaro.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Xu <peterx@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Petr Mladek <pmladek@suse.com>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Rich Felker <dalias@libc.org>,
+        Samuel Mendoza-Jonas <sam@mendozajonas.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Tejun Heo <tj@kernel.org>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Will Deacon <will@kernel.org>,
+        Wolfram Sang <wsa+renesas@sang-engineering.com>,
+        Yoshinori Sato <ysato@users.sourceforge.jp>
+Subject: Re: [PATCH RESEND 2 00/16] Resend bitmap patches
+Message-ID: <20211003094722.434c030d@canb.auug.org.au>
+In-Reply-To: <20211001181245.228419-1-yury.norov@gmail.com>
+References: <20211001181245.228419-1-yury.norov@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: multipart/signed; boundary="Sig_/oR.tVRCv.tbi8TditjTwdeB";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 01 2021 at 17:41, Thomas Gleixner wrote:
-> On Wed, Aug 25 2021 at 08:53, Chang S. Bae wrote:
->> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->> index 74dde635df40..7c46747f6865 100644
->> --- a/arch/x86/kvm/x86.c
->> +++ b/arch/x86/kvm/x86.c
->> @@ -9899,11 +9899,16 @@ static void kvm_save_current_fpu(struct fpu *fpu)
->>  	 * KVM does not support dynamic user states yet. Assume the buffer
->>  	 * always has the minimum size.
+--Sig_/oR.tVRCv.tbi8TditjTwdeB
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-I have to come back to this because that assumption is just broken.
+Hi Yury,
 
-create_vcpu()
-   vcpu->user_fpu = alloc_default_fpu_size();
-   vcpu->guest_fpu = alloc_default_fpu_size();
+On Fri,  1 Oct 2021 11:12:29 -0700 Yury Norov <yury.norov@gmail.com> wrote:
+>
+> Can you please take this series into the next tree? It has been already
+> in next-tree for 5.14:
+>=20
+> https://lore.kernel.org/linux-mmc/YSeduU41Ef568xhS@alley/T/
+>=20
+> But it was damaged and we decided to merge it in 5.15 cycle. No changes
+> comparing to 5.14, except for Andy's patch that was already upstreamed
+> and therefore removed from here.
+>=20
+> The git tree is here:
+> 	https://github.com/norov/linux/tree/bitmap-20210929
 
-vcpu_task()
-   get_amx_permission()
-   use_amx()
-     #NM
-     alloc_larger_state()
-   ...
-   kvm_arch_vcpu_ioctl_run()
-     kvm_arch_vcpu_ioctl_run()
-       kvm_load_guest_fpu()
-         kvm_save_current_fpu(vcpu->arch.user_fpu);
-           save_fpregs_to_fpstate(fpu);         <- Out of bounds write
+Sorry, I cannot include that in linux-next since it it based on (an old
+version of) linux-next itself.  If it needs to be based on other trees in
+linux-next, then it has to be added to Andrew Morton's patch series (in
+the post linux-next section.  Otherwise, if it can be based on Linus
+Torvald's tree (even with a few conflicts), then that is better.
 
-Adding a comment that KVM does not yet support dynamic user states does
-not cut it, really.
+--=20
+Cheers,
+Stephen Rothwell
 
-Even if the above is unlikely, it is possible and has to be handled
-correctly at the point where AMX support is enabled in the kernel
-independent of guest support.
+--Sig_/oR.tVRCv.tbi8TditjTwdeB
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
-You have two options:
+-----BEGIN PGP SIGNATURE-----
 
-  1) Always allocate the large buffer size which is required to
-     accomodate all possible features.
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmFY4XoACgkQAVBC80lX
+0Gxiwgf/emUO5IIiIm61dtXY7bC6BcDa1+b8CTRjOTsGOfFGUqPiJ8GdK6d0r6PJ
+dT8+GtWpM3a8+xy6hF5w0kb1/fhIErfy55w2qqIIsklK0rq8oesadwry63i4GTAY
+I7oyQWoPiukuEZnGo+57jxYhidDnL0KHQ6QcMWgUi+F6T63BFbWazHj54L6D3K9K
+/THBvsdN7qt3MZ1Ci+qlhAoT4kkp///yl7j4aP2NJKN2nXz5Fo7QjKHXFbLjtj+T
+RHBcZ5f+ceb9eohhPLBEQUoy5fzOwlOghwIZQiqRVwHyb3g5xiPrnjtYKc2+KkYp
+Tmc+zpG6K8cz+7j8pPw4X4ja8SL1Xw==
+=1SmH
+-----END PGP SIGNATURE-----
 
-     Trivial, but waste of memory.
-
-  2) Make the allocation dynamic which seems to be trivial to do in
-     kvm_load_guest_fpu() at least for vcpu->user_fpu.
-
-     The vcpu->guest_fpu handling can probably be postponed to the
-     point where AMX is actually exposed to guests, but it's probably
-     not the worst idea to think about the implications now.
-
-Paolo, any opinions?
-
-Thanks,
-
-        tglx
+--Sig_/oR.tVRCv.tbi8TditjTwdeB--
