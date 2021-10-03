@@ -2,130 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D7B0141FECB
-	for <lists+kvm@lfdr.de>; Sun,  3 Oct 2021 01:44:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C46DC41FF0D
+	for <lists+kvm@lfdr.de>; Sun,  3 Oct 2021 03:16:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234210AbhJBXpy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 2 Oct 2021 19:45:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44894 "EHLO
+        id S229512AbhJCBSi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 2 Oct 2021 21:18:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36848 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234280AbhJBXps (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 2 Oct 2021 19:45:48 -0400
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [IPv6:2404:9400:2:0:216:3eff:fee2:21ea])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF6D7C0613EF;
-        Sat,  2 Oct 2021 16:44:01 -0700 (PDT)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4HMNpy1d9Pz4xb9;
-        Sun,  3 Oct 2021 10:43:54 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-        s=201702; t=1633218235;
-        bh=jdy5JNJViBbQceeojrb8Lg+GiJVod62XNefz9Q9zGMg=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=rLO4CxydwThjUYpKtT+ewMDVdVfKgCUwXrMukvMI1VENAoBzrFq71t4MN+6vbfVl2
-         fpPtMPnefXCa8oYRNOzlImwID10tgnIpA9sveg8qEGU4QACpUb2AjUUDGx3ESg00Xs
-         zkUnh3hPftLvlEMti64+zjYQzCjeU6w/1fdveZCbQeJ6c2YqUItmyBjGVEVzyw8jv8
-         XK1pHUwz03abFsQ0b7r6dtl+8LbQzouyMfQW+zJCgzhTxj3AwcULYWKDNVuX0v8NXg
-         vBVj4+Rqgcu7D2yuTjoAwK9Htz79Vq6AZd5MBrdIdzef9FkZptW2qIDrCxEQxeFXFW
-         nmt2SFbhCMPKQ==
-Date:   Sun, 3 Oct 2021 10:43:53 +1100
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Yury Norov <yury.norov@gmail.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-mmc@vger.kernel.org, linux-perf-users@vger.kernel.org,
-        kvm@vger.kernel.org,
-        "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-        Alexander Lobakin <alobakin@pm.me>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Alexey Klimov <aklimov@redhat.com>,
-        Andrea Merello <andrea.merello@gmail.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Arnaldo Carvalho de Melo <acme@redhat.com>,
-        Arnd Bergmann <arnd@arndb.de>, Ben Gardon <bgardon@google.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Brian Cain <bcain@codeaurora.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Christoph Lameter <cl@linux.com>,
-        Daniel Bristot de Oliveira <bristot@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Dennis Zhou <dennis@kernel.org>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Ian Rogers <irogers@google.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Jakub Kicinski <kuba@kernel.org>, Jiri Olsa <jolsa@redhat.com>,
-        Joe Perches <joe@perches.com>, Jonas Bonn <jonas@southpole.se>,
-        Leo Yan <leo.yan@linaro.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Petr Mladek <pmladek@suse.com>,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        Rich Felker <dalias@libc.org>,
-        Samuel Mendoza-Jonas <sam@mendozajonas.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Tejun Heo <tj@kernel.org>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Will Deacon <will@kernel.org>,
-        Wolfram Sang <wsa+renesas@sang-engineering.com>,
-        Yoshinori Sato <ysato@users.sourceforge.jp>
-Subject: Re: [PATCH RESEND 2 00/16] Resend bitmap patches
-Message-ID: <20211003104353.7787c3e9@canb.auug.org.au>
-In-Reply-To: <YVjm3NXEhoBQtUSI@yury-ThinkPad>
-References: <20211001181245.228419-1-yury.norov@gmail.com>
-        <20211003094722.434c030d@canb.auug.org.au>
-        <YVjm3NXEhoBQtUSI@yury-ThinkPad>
+        with ESMTP id S229486AbhJCBSh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 2 Oct 2021 21:18:37 -0400
+Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0230EC0613EC
+        for <kvm@vger.kernel.org>; Sat,  2 Oct 2021 18:16:51 -0700 (PDT)
+Received: by mail-ed1-x531.google.com with SMTP id p13so21395352edw.0
+        for <kvm@vger.kernel.org>; Sat, 02 Oct 2021 18:16:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:reply-to:from:date:message-id:subject:to;
+        bh=k6fomv0sdqyhGG3g2MPtJX0afBVvlWccl4oJlzfMn9Y=;
+        b=RpVJ3K4tqWG7+At8bo5oxPTBOM6/7d+GNFita8TWlEX6hQWGXRXzRbFLAslgeej0x+
+         TWba0d+3cyEZjfYlCxt1wQHwxQt2O4A5qfCpNULCzKkvElwyuP5OQqqKa73nPaKNMj7F
+         Nih0FkQ07EjXu+5qAHXrJN3ByXcVN75NVRAvElyxSliYq7aLvp7HEnmF6UqnGA2Y2UVk
+         Vp5dfs0mbQ8TBIr3RJqXrjp3KIcdc49smfze7jKCE9F1T4GDvaSSd0ExFcr+/aYcLVs6
+         Ql8sT3RbH2b9dsiOvuKsEyDeABAXSBU0nsdHSCFancRNSroU4V0AP4HF8vCWUk1EDaE8
+         yrag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
+         :subject:to;
+        bh=k6fomv0sdqyhGG3g2MPtJX0afBVvlWccl4oJlzfMn9Y=;
+        b=gW2D8jvKPsPNYSphx/y2qdpf0npYJeNcBHI+R5OyqaSW5hGkYEXeI+JvPUv+poAELh
+         t94We2ky3T7yzvadMoMg972Uo6mB6dqYer6KQJ7tvYIKfyQuCkG3NfxGIJyJZKBhZ7ap
+         XyrP5kHxeZOzMiqiGA4fsW4lfjCZ5gS99JGpk3NzHBkPLtmm0JRsqEfikl8vksweA3KN
+         SoC9Fo1Sl2rbpkaXrUhrVk8PKQUTuUYifeoSzYVtzsbQHVyaMTZ8+Is38TrMw9EyvxJZ
+         UqKVmDj1BsxgLlugNCWAMOS5FYLewp16aPON6YUusxmbqylpyvc5C7XSMVb4qxEOgq+j
+         QFPg==
+X-Gm-Message-State: AOAM532Tu8zBayBQfGduPTD7Ge/mOj+JAFqjlWY+mwJOX16EBb2BECD/
+        ZjdqXs63uNAujU5GyuPDFNjDH4FArObkrp/LAXY=
+X-Google-Smtp-Source: ABdhPJzk+WRlN0e73gOF3On8ZdD0wSCg9/tDkUeahzJci8mWWmxEcN9vZyiIbIT2avnVWnv9zOIMlLu2P9zEthABAW0=
+X-Received: by 2002:a50:8d85:: with SMTP id r5mr7726386edh.312.1633223809605;
+ Sat, 02 Oct 2021 18:16:49 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/+sbm5rWV9n_aJg+5hEB3VwJ";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Received: by 2002:a50:a416:0:0:0:0:0 with HTTP; Sat, 2 Oct 2021 18:16:49 -0700 (PDT)
+Reply-To: asameraa950@gmail.com
+From:   Samera Ali <hasamuhammad24@gmail.com>
+Date:   Sat, 2 Oct 2021 18:16:49 -0700
+Message-ID: <CAEsd0fnmaTA20EepWFFVX6buAShPg7-R-Fi2L7xoFLqywcxfyw@mail.gmail.com>
+Subject: Hey dear
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---Sig_/+sbm5rWV9n_aJg+5hEB3VwJ
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Hey dear
 
-Hi Yury,
+Nice to meet you, Am Miss samera I found your email here in google
+search and I picked interest to contact you. I've something very
+important which I would like to discuss with you and I would
+appreciate if you respond back to me through my email address as to
+tell you more about me with my photos, my private email as fellows??
+[ asameraa950@gmail.com ]
 
-On Sat, 2 Oct 2021 16:10:20 -0700 Yury Norov <yury.norov@gmail.com> wrote:
->
-> Ok, I'll resend it based on Linus tree shortly
-
-There is no big hurry, the next linux-next release will not be until
-Tuesday (my time).  So you have time to retest after the rebase.
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/+sbm5rWV9n_aJg+5hEB3VwJ
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmFY7rkACgkQAVBC80lX
-0GxF9gf+KAnaxw0eisqqSqcepbYMcwRtN4jFLkus8fDpuO17V4jnFQLsw22GkxaP
-Mcrbu2fgU/PVCWgxn/3uRSlJnjb0jaZ44zVym1DBof8qIiX5YIiDjaTobS7r16L+
-Bbiaury6Fe2RTDRqsxgiMtSJ4+DzQXNyRqNocCsMSElLwDjs3YARuFBS+dh/enDA
-uqX2MA+FH2Ijb75pqd/ui1ydpehNWtgvCKFltoaVTKEV2NP7ex2617WmSifleQOy
-xnWdwCU3UH8FA05x0q6B1o9TgpqHSjDeuq5A8AlM/s2Efh9rAU3lh4JTkKC69XLo
-+B2Tj8og5FXwIiw40Ua9fIxIZ0uJ5w==
-=4tcx
------END PGP SIGNATURE-----
-
---Sig_/+sbm5rWV9n_aJg+5hEB3VwJ--
+From, samera ali
