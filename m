@@ -2,66 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C46DC41FF0D
-	for <lists+kvm@lfdr.de>; Sun,  3 Oct 2021 03:16:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DA13542003F
+	for <lists+kvm@lfdr.de>; Sun,  3 Oct 2021 07:47:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229512AbhJCBSi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 2 Oct 2021 21:18:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36848 "EHLO
+        id S229765AbhJCFtl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 3 Oct 2021 01:49:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39032 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229486AbhJCBSh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 2 Oct 2021 21:18:37 -0400
-Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0230EC0613EC
-        for <kvm@vger.kernel.org>; Sat,  2 Oct 2021 18:16:51 -0700 (PDT)
-Received: by mail-ed1-x531.google.com with SMTP id p13so21395352edw.0
-        for <kvm@vger.kernel.org>; Sat, 02 Oct 2021 18:16:50 -0700 (PDT)
+        with ESMTP id S229450AbhJCFti (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 3 Oct 2021 01:49:38 -0400
+Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9535AC0613EC;
+        Sat,  2 Oct 2021 22:47:51 -0700 (PDT)
+Received: by mail-pl1-x62b.google.com with SMTP id b22so8964728pls.1;
+        Sat, 02 Oct 2021 22:47:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:reply-to:from:date:message-id:subject:to;
-        bh=k6fomv0sdqyhGG3g2MPtJX0afBVvlWccl4oJlzfMn9Y=;
-        b=RpVJ3K4tqWG7+At8bo5oxPTBOM6/7d+GNFita8TWlEX6hQWGXRXzRbFLAslgeej0x+
-         TWba0d+3cyEZjfYlCxt1wQHwxQt2O4A5qfCpNULCzKkvElwyuP5OQqqKa73nPaKNMj7F
-         Nih0FkQ07EjXu+5qAHXrJN3ByXcVN75NVRAvElyxSliYq7aLvp7HEnmF6UqnGA2Y2UVk
-         Vp5dfs0mbQ8TBIr3RJqXrjp3KIcdc49smfze7jKCE9F1T4GDvaSSd0ExFcr+/aYcLVs6
-         Ql8sT3RbH2b9dsiOvuKsEyDeABAXSBU0nsdHSCFancRNSroU4V0AP4HF8vCWUk1EDaE8
-         yrag==
+        h=to:cc:references:subject:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-transfer-encoding:content-language;
+        bh=savTH8tOINZ2J99oLslSAWNZa5Ho6D9RgvdIZJ7bFnA=;
+        b=Y7uNNINBrkq5cxVztJ3SYWUhJ4cqOz8cuJbfN83wQn95FC/D2R99w+R2PGb9+omyw9
+         oUMBBOL7Q2qXknqyn+ueCjhRRkGnQvpvwzbs+lH1kJcT7mhA/Sv5L5QSKRg4csmSP3i7
+         KQf0X+t+NalR3wLVAXSHYb4TC8CIkajx690fgi5nQq7/ONabkjke8DE4NrtX3mbsKCov
+         6GKUAjmQjbUU46Au+jp8B3bHxUi4dgI9/hNH0sygbvUe0nxcWAjC9QFLyx8xMU0L23zo
+         3MbZYv6rWeB3f/d/ixsniSvPVzZlDq3h4NGCPXkQIMFaUYbnnngJuLp7T857lqiStDFe
+         WmlQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to;
-        bh=k6fomv0sdqyhGG3g2MPtJX0afBVvlWccl4oJlzfMn9Y=;
-        b=gW2D8jvKPsPNYSphx/y2qdpf0npYJeNcBHI+R5OyqaSW5hGkYEXeI+JvPUv+poAELh
-         t94We2ky3T7yzvadMoMg972Uo6mB6dqYer6KQJ7tvYIKfyQuCkG3NfxGIJyJZKBhZ7ap
-         XyrP5kHxeZOzMiqiGA4fsW4lfjCZ5gS99JGpk3NzHBkPLtmm0JRsqEfikl8vksweA3KN
-         SoC9Fo1Sl2rbpkaXrUhrVk8PKQUTuUYifeoSzYVtzsbQHVyaMTZ8+Is38TrMw9EyvxJZ
-         UqKVmDj1BsxgLlugNCWAMOS5FYLewp16aPON6YUusxmbqylpyvc5C7XSMVb4qxEOgq+j
-         QFPg==
-X-Gm-Message-State: AOAM532Tu8zBayBQfGduPTD7Ge/mOj+JAFqjlWY+mwJOX16EBb2BECD/
-        ZjdqXs63uNAujU5GyuPDFNjDH4FArObkrp/LAXY=
-X-Google-Smtp-Source: ABdhPJzk+WRlN0e73gOF3On8ZdD0wSCg9/tDkUeahzJci8mWWmxEcN9vZyiIbIT2avnVWnv9zOIMlLu2P9zEthABAW0=
-X-Received: by 2002:a50:8d85:: with SMTP id r5mr7726386edh.312.1633223809605;
- Sat, 02 Oct 2021 18:16:49 -0700 (PDT)
+        h=x-gm-message-state:to:cc:references:subject:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=savTH8tOINZ2J99oLslSAWNZa5Ho6D9RgvdIZJ7bFnA=;
+        b=LAT2rnWjzWef3CqOnK7hceQReCldU++G4ZUr7UgKe22BYQXR2MnvQbBS4HwlYhBZBG
+         mF9UOuTMkqsu+Ge2AQGZ84shRRGpiWtV7IGo19/5l8L7KlDWX8bKxlvNc4w4l1rjyoo2
+         xfB1qpBVTQUvxEkE4M5BRq2lbM2Prd5LQkuj5vvXph60p+JrQ/Mju3uWFdsmX7qEPPkI
+         4uibaMx66HRyryxGcmIo6Uz91fuKP2hqHlvqFdrMbYolaA7fWx8Qc/KUb022/YPRtRRp
+         X4nTTJlZ1Ac4tUrEk7OPboTNtJ3cYjDilymVzARRTjXDUB6Pyx/ux3cX8LMm6Vfqrnd+
+         pqYA==
+X-Gm-Message-State: AOAM5309FcmgNiS5BQgodW/YqAn/8xYdQU9EIZjSsX8GHFHLJgoNvfbn
+        7ttJdj8RezkTtyfxE3quv+Y=
+X-Google-Smtp-Source: ABdhPJy5HRxA5o6Rs+cSxf9+J2Z0L3aQbAXv7HdqnVMMAbnAdw/SICL9EIXJilE004Mcf5mNUIhaVQ==
+X-Received: by 2002:a17:902:d2c6:b0:13e:9bc9:1ae3 with SMTP id n6-20020a170902d2c600b0013e9bc91ae3mr5601433plc.87.1633240070503;
+        Sat, 02 Oct 2021 22:47:50 -0700 (PDT)
+Received: from [10.12.152.158] ([154.21.212.155])
+        by smtp.gmail.com with ESMTPSA id y7sm10286631pfr.33.2021.10.02.22.47.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 02 Oct 2021 22:47:50 -0700 (PDT)
+To:     seanjc@google.com
+Cc:     djwong@kernel.org, kvm@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, stephenackerman16@gmail.com
+References: <YVSEZTCbFZ+HD/f0@google.com>
+Subject: Re: kvm crash in 5.14.1?
+From:   Stephen <stephenackerman16@gmail.com>
+Message-ID: <85e40141-3c17-1dff-1ed0-b016c5d778b6@gmail.com>
+Date:   Sat, 2 Oct 2021 22:47:48 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 MIME-Version: 1.0
-Received: by 2002:a50:a416:0:0:0:0:0 with HTTP; Sat, 2 Oct 2021 18:16:49 -0700 (PDT)
-Reply-To: asameraa950@gmail.com
-From:   Samera Ali <hasamuhammad24@gmail.com>
-Date:   Sat, 2 Oct 2021 18:16:49 -0700
-Message-ID: <CAEsd0fnmaTA20EepWFFVX6buAShPg7-R-Fi2L7xoFLqywcxfyw@mail.gmail.com>
-Subject: Hey dear
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <YVSEZTCbFZ+HD/f0@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hey dear
+> I think this should fix the problems?
+>
+> diff --git a/include/linux/secretmem.h b/include/linux/secretmem.h
+> index 21c3771e6a56..988528b5da43 100644
+> --- a/include/linux/secretmem.h
+> +++ b/include/linux/secretmem.h
+> @@ -23,7 +23,7 @@ static inline bool page_is_secretmem(struct page *page)
+>         mapping = (struct address_space *)
+>                 ((unsigned long)page->mapping & ~PAGE_MAPPING_FLAGS);
+>
+> -       if (mapping != page->mapping)
+> +       if (!mapping || mapping != page->mapping)
+>                 return false;
+>
+>         return mapping->a_ops == &secretmem_aops;
 
-Nice to meet you, Am Miss samera I found your email here in google
-search and I picked interest to contact you. I've something very
-important which I would like to discuss with you and I would
-appreciate if you respond back to me through my email address as to
-tell you more about me with my photos, my private email as fellows??
-[ asameraa950@gmail.com ]
+I have validated that my system was stable after several days on
+v5.13.19. I'm now booted into a v5.14.8 kernel with this patch, and I'll
+try to report back if I see a crash; or in roughly a week if the system
+seems to have stabilized.
 
-From, samera ali
+Thanks,
+    Stephen
+
