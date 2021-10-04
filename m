@@ -2,153 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1D38D421318
-	for <lists+kvm@lfdr.de>; Mon,  4 Oct 2021 17:51:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 889F14213B1
+	for <lists+kvm@lfdr.de>; Mon,  4 Oct 2021 18:10:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236034AbhJDPxD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Oct 2021 11:53:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40908 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234672AbhJDPxD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Oct 2021 11:53:03 -0400
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AB5CC061745
-        for <kvm@vger.kernel.org>; Mon,  4 Oct 2021 08:51:14 -0700 (PDT)
-Received: by mail-pf1-x432.google.com with SMTP id q23so14870330pfs.9
-        for <kvm@vger.kernel.org>; Mon, 04 Oct 2021 08:51:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=xUHxcFcyLxlbEOzo0/4y2u7gqH4zbLfEbPVenn/dP48=;
-        b=Vfp46Kuwavj/NMt2Qg9t7k4RyZbxRURDyGDpz7aAdeKzY2h5om7qWhdP8UtSMxnga2
-         e9cuSjRGMR+mHKRJh/IUaMCHudDOu5Td3bYJ8xVrW+0G0ab/3taDA9xrfbngobjQ30rH
-         uLgiWs41UV7bDpFnnUWLQdCD9eUV5Sl33zSUfLaqrH1uunSfyooJJed2taMSmC+B9nZ+
-         IFKRFpB+EllKnb0UeyzeyaCW+p+1Wu5i3jNrrDLzhWxoFNtHAtcMY5LJjJsUd0yx34G2
-         gIfefmc1thscr9AQamZYcakBaGPjX/+UzXcuDGoPhG2i26t220Cv/4R1ASXQivBuDo4f
-         aAHQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=xUHxcFcyLxlbEOzo0/4y2u7gqH4zbLfEbPVenn/dP48=;
-        b=bbJX2cg7cPR0iSrQgrSqCVIFjH22lFbk/pPiIulI+CpfvKI8eBjJwb5b5YxclZQ917
-         qBFL7P+PWemCeNTqiFJ2zxiw6ctjT5anmPvnELVsmbHe1F8rGYGvvM0PPHYrLzvFSHVV
-         TtwiGtn60E7tbZirTQytiE5s4dFYvxKsv1EiIEq6YSoovnDo0Fkqc/SL6ukiqrr/cK0E
-         C6eBCaOcbcTrM98Xduiny8L0Lr5pZAxr5DlIxBTcYJ/1NUi3NG/Jg1NsbGJakbgUV92w
-         mPhajnPo/Y4lTARoWGnXiyCAzbtdLeMkx9qtXAW2nz06O00PXntNfX1YK80eN2MCTc5p
-         I4dw==
-X-Gm-Message-State: AOAM530n8OdR+HY0U4ahxpC9d8NnD7wDRtn5D5Rkqce1bh2x3GfQBHZj
-        DHwkk9ujs/Dppss7rBUQCeeH9g==
-X-Google-Smtp-Source: ABdhPJyC+5fhEKyG5XQpAML44RdjCbH4hWjl23Jf1ce6Vi2z9vI9fP3aC3o/6cQ93sYpsLIaRYkC4A==
-X-Received: by 2002:a62:4ec6:0:b0:44c:7488:e593 with SMTP id c189-20020a624ec6000000b0044c7488e593mr879676pfb.59.1633362673514;
-        Mon, 04 Oct 2021 08:51:13 -0700 (PDT)
-Received: from google.com (150.12.83.34.bc.googleusercontent.com. [34.83.12.150])
-        by smtp.gmail.com with ESMTPSA id v13sm2828697pjr.3.2021.10.04.08.51.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Oct 2021 08:51:12 -0700 (PDT)
-Date:   Mon, 4 Oct 2021 08:51:09 -0700
-From:   Ricardo Koller <ricarkol@google.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        drjones@redhat.com, eric.auger@redhat.com,
-        alexandru.elisei@arm.com, Paolo Bonzini <pbonzini@redhat.com>,
-        oupton@google.com, james.morse@arm.com, suzuki.poulose@arm.com,
-        shuah@kernel.org, jingzhangos@google.com, pshier@google.com,
-        rananta@google.com, reijiw@google.com
-Subject: Re: [PATCH v3 02/10] KVM: arm64: vgic-v3: Check redist region is not
- above the VM IPA size
-Message-ID: <YVsi7d4v7WLRRR6c@google.com>
-References: <20210928184803.2496885-1-ricarkol@google.com>
- <20210928184803.2496885-3-ricarkol@google.com>
- <87ilygsx8q.wl-maz@kernel.org>
+        id S236454AbhJDQM1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Oct 2021 12:12:27 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42303 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235966AbhJDQM0 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 4 Oct 2021 12:12:26 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1633363837;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=FVbkf/jcBFVRfE0J9D7YHJAbSJJPgT+ifzPwiDUviTs=;
+        b=b3NpiWp4ijdwDAbudElfAsYl19saL8CRi2cXebWL+S2F3I27hgOmeVsTkkSCJqdJqV4qQT
+        mmwqB0F7MIk9A/I9xL47dsfwv5g0fas3gsu5mcHDoTlUk9wwIMmjVIX4kT1Vs0S52/RN5X
+        a7DZ5hzerqz/KXPJKwrRKMFsxRI1Crg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-477-hCCZaHc_MPG_WGnU2LclOw-1; Mon, 04 Oct 2021 12:10:36 -0400
+X-MC-Unique: hCCZaHc_MPG_WGnU2LclOw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C474284A5E1;
+        Mon,  4 Oct 2021 16:10:34 +0000 (UTC)
+Received: from vitty.brq.redhat.com (unknown [10.40.194.218])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 618B618A50;
+        Mon,  4 Oct 2021 16:10:31 +0000 (UTC)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v2 0/4] KVM: nVMX: Enlightened MSR Bitmap feature for Hyper-V on KVM
+Date:   Mon,  4 Oct 2021 18:10:25 +0200
+Message-Id: <20211004161029.641155-1-vkuznets@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87ilygsx8q.wl-maz@kernel.org>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 01, 2021 at 02:14:29PM +0100, Marc Zyngier wrote:
-> On Tue, 28 Sep 2021 19:47:56 +0100,
-> Ricardo Koller <ricarkol@google.com> wrote:
-> > 
-> > Verify that the redistributor regions do not extend beyond the
-> > VM-specified IPA range (phys_size). This can happen when using
-> > KVM_VGIC_V3_ADDR_TYPE_REDIST or KVM_VGIC_V3_ADDR_TYPE_REDIST_REGIONS
-> > with:
-> > 
-> >   base + size > phys_size AND base < phys_size
-> > 
-> > Add the missing check into vgic_v3_alloc_redist_region() which is called
-> > when setting the regions, and into vgic_v3_check_base() which is called
-> > when attempting the first vcpu-run. The vcpu-run check does not apply to
-> > KVM_VGIC_V3_ADDR_TYPE_REDIST_REGIONS because the regions size is known
-> > before the first vcpu-run. Note that using the REDIST_REGIONS API
-> > results in a different check, which already exists, at first vcpu run:
-> > that the number of redist regions is enough for all vcpus.
-> > 
-> > Finally, this patch also enables some extra tests in
-> > vgic_v3_alloc_redist_region() by calculating "size" early for the legacy
-> > redist api: like checking that the REDIST region can fit all the already
-> > created vcpus.
-> > 
-> > Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> > ---
-> >  arch/arm64/kvm/vgic/vgic-mmio-v3.c | 6 ++++--
-> >  arch/arm64/kvm/vgic/vgic-v3.c      | 4 ++++
-> >  2 files changed, 8 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-> > index a09cdc0b953c..9be02bf7865e 100644
-> > --- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-> > +++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-> > @@ -796,7 +796,9 @@ static int vgic_v3_alloc_redist_region(struct kvm *kvm, uint32_t index,
-> >  	struct vgic_dist *d = &kvm->arch.vgic;
-> >  	struct vgic_redist_region *rdreg;
-> >  	struct list_head *rd_regions = &d->rd_regions;
-> > -	size_t size = count * KVM_VGIC_V3_REDIST_SIZE;
-> > +	int nr_vcpus = atomic_read(&kvm->online_vcpus);
-> > +	size_t size = count ? count * KVM_VGIC_V3_REDIST_SIZE
-> > +			    : nr_vcpus * KVM_VGIC_V3_REDIST_SIZE;
-> >  	int ret;
-> >  
-> >  	/* cross the end of memory ? */
-> > @@ -840,7 +842,7 @@ static int vgic_v3_alloc_redist_region(struct kvm *kvm, uint32_t index,
-> >  
-> >  	rdreg->base = VGIC_ADDR_UNDEF;
-> >  
-> > -	ret = vgic_check_ioaddr(kvm, &rdreg->base, base, SZ_64K);
-> > +	ret = vgic_check_iorange(kvm, &rdreg->base, base, SZ_64K, size);
-> >  	if (ret)
-> >  		goto free;
-> >  
-> > diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
-> > index 21a6207fb2ee..27ee674631b3 100644
-> > --- a/arch/arm64/kvm/vgic/vgic-v3.c
-> > +++ b/arch/arm64/kvm/vgic/vgic-v3.c
-> > @@ -486,6 +486,10 @@ bool vgic_v3_check_base(struct kvm *kvm)
-> >  		if (rdreg->base + vgic_v3_rd_region_size(kvm, rdreg) <
-> >  			rdreg->base)
-> >  			return false;
-> > +
-> > +		if (rdreg->base + vgic_v3_rd_region_size(kvm, rdreg) >
-> > +			kvm_phys_size(kvm))
-> > +			return false;
-> 
-> Why can't we replace these two checks with a single call to your new
-> fancy helper?
+Changes since v1:
+- Added Maxim's R-b tags to patches 1,2
+- Moved nested.msr_bitmap_changed clearing from nested_get_vmcs12_pages()
+  to nested_vmx_prepare_msr_bitmap [Maxim Levitsky]
+- Rebased to current kvm/queue.
 
-ACK using the new helper (on rdreg base and size).
+Updating MSR bitmap for L2 is not cheap and rearly needed. TLFS for Hyper-V
+offers 'Enlightened MSR Bitmap' feature which allows L1 hypervisor to
+inform L0 when it changes MSR bitmap, this eliminates the need to examine
+L1's MSR bitmap for L2 every time when 'real' MSR bitmap for L2 gets
+constructed.
 
-Thanks,
-Ricardo
+When the feature is enabled for Win10+WSL2, it shaves off around 700 CPU
+cycles from a nested vmexit cost (tight cpuid loop test).
 
-> 
-> Thanks,
-> 
-> 	M.
-> 
-> -- 
-> Without deviation from the norm, progress is not possible.
+First patch of the series is unrelated to the newly implemented feature,
+it fixes a bug in Enlightened MSR Bitmap usage when KVM runs as a nested
+hypervisor on top of Hyper-V.
+
+Vitaly Kuznetsov (4):
+  KVM: nVMX: Don't use Enlightened MSR Bitmap for L3
+  KVM: VMX: Introduce vmx_msr_bitmap_l01_changed() helper
+  KVM: nVMX: Track whether changes in L0 require MSR bitmap for L2 to be
+    rebuilt
+  KVM: nVMX: Implement Enlightened MSR Bitmap feature
+
+ arch/x86/kvm/hyperv.c     |  2 ++
+ arch/x86/kvm/vmx/nested.c | 29 +++++++++++++++++++++++++---
+ arch/x86/kvm/vmx/vmx.c    | 40 ++++++++++++++++++++++++++-------------
+ arch/x86/kvm/vmx/vmx.h    |  6 ++++++
+ 4 files changed, 61 insertions(+), 16 deletions(-)
+
+-- 
+2.31.1
+
