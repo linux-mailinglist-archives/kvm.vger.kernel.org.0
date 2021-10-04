@@ -2,35 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E3FA4420F53
-	for <lists+kvm@lfdr.de>; Mon,  4 Oct 2021 15:32:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C4E14420FB6
+	for <lists+kvm@lfdr.de>; Mon,  4 Oct 2021 15:35:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237443AbhJDNdy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Oct 2021 09:33:54 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47478 "EHLO mail.kernel.org"
+        id S237949AbhJDNhb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Oct 2021 09:37:31 -0400
+Received: from mail.kernel.org ([198.145.29.99]:48662 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S237185AbhJDNbu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Oct 2021 09:31:50 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 6CB2F61BA2;
-        Mon,  4 Oct 2021 13:14:21 +0000 (UTC)
+        id S237885AbhJDNfa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Oct 2021 09:35:30 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id CA3B461BAA;
+        Mon,  4 Oct 2021 13:16:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1633353261;
-        bh=fgpLNK0QJX5G7bMV1QQIBI+1zCB4DxuGWwDN6fjnozQ=;
+        s=korg; t=1633353366;
+        bh=HSo0HeoTq6932krhI7dspLP/+JlyL66tOuDir8PxY7w=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=mUXqn+ZlYge3ioQAKKhiUpZof36dvazghLsJXbVaN0r3cG6PxPRrhedUdvVvZNEnw
-         1NvVTn5R+bOEUQtjiWFBLhXhEt/QVtYhOSrbQD7hT1RWMjiwLbGQg2cPO/TzqjNxPU
-         eQhZm+mLitUaFcDPZXIFMktrlFvANMOCyfselwPk=
+        b=XO4t4BjCqebfSnyNCwtvPA42rP4Pvi+m4OnhCAkddvLXF4YuLKkLBvoaX05K3oM+F
+         SRC70qkdBOOlDBxTl5TPoDXhkn8826GbQsSILsFh35+SJUm9PObUQ7fAszdZiVLB+3
+         UvLoOxwc2Qx3shlJwn2eAhEy0f0WJ412LH2SVllo=
 From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To:     linux-kernel@vger.kernel.org
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         stable@vger.kernel.org, Peter Gonda <pgonda@google.com>,
         Marc Orr <marcorr@google.com>,
+        Nathan Tempelman <natet@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
+        Steve Rutherford <srutherford@google.com>,
         Brijesh Singh <brijesh.singh@amd.com>, kvm@vger.kernel.org
-Subject: [PATCH 5.14 057/172] KVM: SEV: Acquire vcpu mutex when updating VMSA
-Date:   Mon,  4 Oct 2021 14:51:47 +0200
-Message-Id: <20211004125046.837857428@linuxfoundation.org>
+Subject: [PATCH 5.14 058/172] KVM: SEV: Allow some commands for mirror VM
+Date:   Mon,  4 Oct 2021 14:51:48 +0200
+Message-Id: <20211004125046.868220573@linuxfoundation.org>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20211004125044.945314266@linuxfoundation.org>
 References: <20211004125044.945314266@linuxfoundation.org>
@@ -44,107 +46,67 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Peter Gonda <pgonda@google.com>
 
-commit bb18a677746543e7f5eeb478129c92cedb0f9658 upstream.
+commit 5b92b6ca92b65bef811048c481e4446f4828500a upstream.
 
-The update-VMSA ioctl touches data stored in struct kvm_vcpu, and
-therefore should not be performed concurrently with any VCPU ioctl
-that might cause KVM or the processor to use the same data.
+A mirrored SEV-ES VM will need to call KVM_SEV_LAUNCH_UPDATE_VMSA to
+setup its vCPUs and have them measured, and their VMSAs encrypted. Without
+this change, it is impossible to have mirror VMs as part of SEV-ES VMs.
 
-Adds vcpu mutex guard to the VMSA updating code. Refactors out
-__sev_launch_update_vmsa() function to deal with per vCPU parts
-of sev_launch_update_vmsa().
+Also allow the guest status check and debugging commands since they do
+not change any guest state.
 
-Fixes: ad73109ae7ec ("KVM: SVM: Provide support to launch and run an SEV-ES guest")
 Signed-off-by: Peter Gonda <pgonda@google.com>
 Cc: Marc Orr <marcorr@google.com>
+Cc: Nathan Tempelman <natet@google.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Sean Christopherson <seanjc@google.com>
+Cc: Steve Rutherford <srutherford@google.com>
 Cc: Brijesh Singh <brijesh.singh@amd.com>
 Cc: kvm@vger.kernel.org
-Cc: stable@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org
-Message-Id: <20210915171755.3773766-1-pgonda@google.com>
+Cc: stable@vger.kernel.org
+Fixes: 54526d1fd593 ("KVM: x86: Support KVM VMs sharing SEV context", 2021-04-21)
+Message-Id: <20210921150345.2221634-3-pgonda@google.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
- arch/x86/kvm/svm/sev.c |   53 +++++++++++++++++++++++++++----------------------
- 1 file changed, 30 insertions(+), 23 deletions(-)
+ arch/x86/kvm/svm/sev.c |   19 +++++++++++++++++--
+ 1 file changed, 17 insertions(+), 2 deletions(-)
 
 --- a/arch/x86/kvm/svm/sev.c
 +++ b/arch/x86/kvm/svm/sev.c
-@@ -596,43 +596,50 @@ static int sev_es_sync_vmsa(struct vcpu_
- 	return 0;
+@@ -1509,6 +1509,20 @@ static int sev_receive_finish(struct kvm
+ 	return sev_issue_cmd(kvm, SEV_CMD_RECEIVE_FINISH, &data, &argp->error);
  }
  
--static int sev_launch_update_vmsa(struct kvm *kvm, struct kvm_sev_cmd *argp)
-+static int __sev_launch_update_vmsa(struct kvm *kvm, struct kvm_vcpu *vcpu,
-+				    int *error)
- {
--	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
- 	struct sev_data_launch_update_vmsa vmsa;
-+	struct vcpu_svm *svm = to_svm(vcpu);
-+	int ret;
-+
-+	/* Perform some pre-encryption checks against the VMSA */
-+	ret = sev_es_sync_vmsa(svm);
-+	if (ret)
-+		return ret;
-+
++static bool cmd_allowed_from_miror(u32 cmd_id)
++{
 +	/*
-+	 * The LAUNCH_UPDATE_VMSA command will perform in-place encryption of
-+	 * the VMSA memory content (i.e it will write the same memory region
-+	 * with the guest's key), so invalidate it first.
++	 * Allow mirrors VM to call KVM_SEV_LAUNCH_UPDATE_VMSA to enable SEV-ES
++	 * active mirror VMs. Also allow the debugging and status commands.
 +	 */
-+	clflush_cache_range(svm->vmsa, PAGE_SIZE);
++	if (cmd_id == KVM_SEV_LAUNCH_UPDATE_VMSA ||
++	    cmd_id == KVM_SEV_GUEST_STATUS || cmd_id == KVM_SEV_DBG_DECRYPT ||
++	    cmd_id == KVM_SEV_DBG_ENCRYPT)
++		return true;
 +
-+	vmsa.reserved = 0;
-+	vmsa.handle = to_kvm_svm(kvm)->sev_info.handle;
-+	vmsa.address = __sme_pa(svm->vmsa);
-+	vmsa.len = PAGE_SIZE;
-+	return sev_issue_cmd(kvm, SEV_CMD_LAUNCH_UPDATE_VMSA, &vmsa, error);
++	return false;
 +}
 +
-+static int sev_launch_update_vmsa(struct kvm *kvm, struct kvm_sev_cmd *argp)
-+{
- 	struct kvm_vcpu *vcpu;
- 	int i, ret;
+ int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
+ {
+ 	struct kvm_sev_cmd sev_cmd;
+@@ -1525,8 +1539,9 @@ int svm_mem_enc_op(struct kvm *kvm, void
  
- 	if (!sev_es_guest(kvm))
- 		return -ENOTTY;
+ 	mutex_lock(&kvm->lock);
  
--	vmsa.reserved = 0;
--
- 	kvm_for_each_vcpu(i, vcpu, kvm) {
--		struct vcpu_svm *svm = to_svm(vcpu);
--
--		/* Perform some pre-encryption checks against the VMSA */
--		ret = sev_es_sync_vmsa(svm);
-+		ret = mutex_lock_killable(&vcpu->mutex);
- 		if (ret)
- 			return ret;
- 
--		/*
--		 * The LAUNCH_UPDATE_VMSA command will perform in-place
--		 * encryption of the VMSA memory content (i.e it will write
--		 * the same memory region with the guest's key), so invalidate
--		 * it first.
--		 */
--		clflush_cache_range(svm->vmsa, PAGE_SIZE);
--
--		vmsa.handle = sev->handle;
--		vmsa.address = __sme_pa(svm->vmsa);
--		vmsa.len = PAGE_SIZE;
--		ret = sev_issue_cmd(kvm, SEV_CMD_LAUNCH_UPDATE_VMSA, &vmsa,
--				    &argp->error);
-+		ret = __sev_launch_update_vmsa(kvm, vcpu, &argp->error);
-+
-+		mutex_unlock(&vcpu->mutex);
- 		if (ret)
- 			return ret;
--
--		svm->vcpu.arch.guest_state_protected = true;
+-	/* enc_context_owner handles all memory enc operations */
+-	if (is_mirroring_enc_context(kvm)) {
++	/* Only the enc_context_owner handles some memory enc operations. */
++	if (is_mirroring_enc_context(kvm) &&
++	    !cmd_allowed_from_miror(sev_cmd.id)) {
+ 		r = -EINVAL;
+ 		goto out;
  	}
- 
- 	return 0;
 
 
