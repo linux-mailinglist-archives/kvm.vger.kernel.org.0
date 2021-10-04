@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E17CD420CC9
-	for <lists+kvm@lfdr.de>; Mon,  4 Oct 2021 15:07:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 91EC1420E56
+	for <lists+kvm@lfdr.de>; Mon,  4 Oct 2021 15:23:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235766AbhJDNJ2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Oct 2021 09:09:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:34749 "EHLO
+        id S236370AbhJDNYY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Oct 2021 09:24:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58612 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235528AbhJDNIe (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 4 Oct 2021 09:08:34 -0400
+        by vger.kernel.org with ESMTP id S236562AbhJDNW6 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 4 Oct 2021 09:22:58 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1633352805;
+        s=mimecast20190719; t=1633353668;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=qnsTi4P2t5rHfDxTi+AL4MJi2UMQhITtd/TdiPxPp6M=;
-        b=AjKMMcCZ1Rcpqd/rRDmKqb3L8InJDGTVCwf5N2r4ueHRm7vAZnCp3hja0erOWH6azH48e8
-        ySsHbWt1tjUP10jo1hI/46EqwgxZDZOCnbVEQV7F/nmoopTAPX3BAxEF9aEW/xZdPaCIId
-        Y8HG9jUeP9hrkRsro99QzJlds7u3qEY=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-392-7ogIwmO3Pnq7bNTIUnOhtw-1; Mon, 04 Oct 2021 09:06:44 -0400
-X-MC-Unique: 7ogIwmO3Pnq7bNTIUnOhtw-1
-Received: by mail-wm1-f71.google.com with SMTP id x3-20020a05600c21c300b0030d2b0fb3b4so6677838wmj.5
-        for <kvm@vger.kernel.org>; Mon, 04 Oct 2021 06:06:43 -0700 (PDT)
+        bh=QdXHrZbjlTX2hL2cnlXaGZH+zUybT9BUpsuwVSkETB4=;
+        b=IfZt/vVTSMUsczgQ6LV7V8gNALtVTWD7LBzPbGNNqEmyctulMMM1oWq5Hxu2EfIl3jFI8J
+        gEc68nXX2mFX/nINl/adyOgucRufnH03awPM+Y4pAtRX20RX4GIGoXhRrmqASYw7eq3mJC
+        2DC2fcsct5zhFhAO04rsYoIzooLuM/A=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-447-o2DnSep6PWuLwRTM0a7ISw-1; Mon, 04 Oct 2021 09:21:06 -0400
+X-MC-Unique: o2DnSep6PWuLwRTM0a7ISw-1
+Received: by mail-wm1-f70.google.com with SMTP id 129-20020a1c0187000000b0030d4081c36cso4137389wmb.0
+        for <kvm@vger.kernel.org>; Mon, 04 Oct 2021 06:21:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=qnsTi4P2t5rHfDxTi+AL4MJi2UMQhITtd/TdiPxPp6M=;
-        b=QgyETU0Nf+L78E/nHgxtsDpVA4mggcsy8YUhKfB0gVCDB+b52vJcuO+iIeXB4L2PjA
-         fD/LvsgtUu0J0YJHcPxJAyTSujd6Q8IN5j4n6f5RwfrPflUS9DiihCSLqK3rUZCiVRa0
-         pp+i49Mi13M8g+eWGW/YQOkRWUOQ1qf4e1pGQa/eaX0HNcXpS2oetiiTZBlodHCaaJUw
-         z+WnFsNKSaASU+8ywe3FjfHKdyM6O2EW2QKzR24l+e2C4n1JhrvuP8ea40o48IbOlfS2
-         Iqzn/uWR2YPal4oj6ouFh7cCkCV+Dg1R2FBSHqpjai+n6LEgckaGswkmi6jSkzfSSNFp
-         NX8w==
-X-Gm-Message-State: AOAM531A+Dklj/0vgf9SN6ahU+R7x+TQbwriXr/mIPzkQVkB+km+K7eI
-        quBrL3FXKBvfjs1oTwUvfnlnWaTy4zwnGNKHi2GBFypNiihQRExBW+9rXgFnDTuL49c5NLCE1Ru
-        OsLu6mcC2ck2x
-X-Received: by 2002:a1c:7302:: with SMTP id d2mr18418029wmb.92.1633352802809;
-        Mon, 04 Oct 2021 06:06:42 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx6u7rJm/o+gD8enNn0q92rYYJEBAp6xhJB/ng4gligUpFtM5bppXVK6re4lDc+7mt4vFH2sw==
-X-Received: by 2002:a1c:7302:: with SMTP id d2mr18418000wmb.92.1633352802525;
-        Mon, 04 Oct 2021 06:06:42 -0700 (PDT)
+        bh=QdXHrZbjlTX2hL2cnlXaGZH+zUybT9BUpsuwVSkETB4=;
+        b=1HBmzpwy78XGkjUAgwr0mC8dqu9lJcio53Zs9po5Y1fLw3ohNp8qg9A36NQrTEbFmu
+         UH9uSQsTjffdKJ0kdUEmcNcP+Cm7c0IDRjQj7GfB2fnZ5vo13f7u5Sz3NM1a32Dten8O
+         qO5cpEPIV0kbm9TCb9jjdFuktLlLOthLs7n3UJX/YjcJ2diEh1cisLBSbAPNSrnZkhsG
+         gfjVqSBU3wbP3TgHAslzJmwgL9+p5HSu2bGPu0YNkdEXZfeBAmKbbGBEtazeMY+Y+cOq
+         inVSmxOEJEt3UqwPZ93aGUymK5/MUeQDDbhpadezHkeneQ+4uda4Svd9iOiZoVCxEOa5
+         u6mA==
+X-Gm-Message-State: AOAM531fot8+vpR46uYkz1hkvO9oW0/vrB1UwsTH0AMFiyx4UkBCVReF
+        qkKKkel5Qr396ecN1qBazu5B+q+M8jmNjn0ibEZ8Zx+0cPAIMqWQezaO9Gb+hJg1VOxVZ7GKZrU
+        qrL+9KPGzzx4O
+X-Received: by 2002:a05:600c:aca:: with SMTP id c10mr18543224wmr.174.1633353664708;
+        Mon, 04 Oct 2021 06:21:04 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzPcKD/IpY0LxksqttMrmZjJvyb2fHofFaSH+a213V5yw7vUVGWDaTFym4PPHX5sWRZueV89g==
+X-Received: by 2002:a05:600c:aca:: with SMTP id c10mr18543178wmr.174.1633353664387;
+        Mon, 04 Oct 2021 06:21:04 -0700 (PDT)
 Received: from gator (nat-pool-brq-u.redhat.com. [213.175.37.12])
-        by smtp.gmail.com with ESMTPSA id o7sm17031587wro.45.2021.10.04.06.06.41
+        by smtp.gmail.com with ESMTPSA id a25sm16181381wmj.34.2021.10.04.06.21.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Oct 2021 06:06:42 -0700 (PDT)
-Date:   Mon, 4 Oct 2021 15:06:40 +0200
+        Mon, 04 Oct 2021 06:21:04 -0700 (PDT)
+Date:   Mon, 4 Oct 2021 15:21:02 +0200
 From:   Andrew Jones <drjones@redhat.com>
 To:     Zixuan Wang <zixuanwang@google.com>
 Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, marcorr@google.com,
@@ -57,256 +57,278 @@ Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, marcorr@google.com,
         rientjes@google.com, seanjc@google.com, brijesh.singh@amd.com,
         Thomas.Lendacky@amd.com, varad.gautam@suse.com, jroedel@suse.de,
         bp@suse.de
-Subject: Re: [kvm-unit-tests PATCH v2 07/17] x86 UEFI: Set up memory allocator
-Message-ID: <20211004130640.hdse6xkg4m6jx5c2@gator>
+Subject: Re: [kvm-unit-tests PATCH v2 08/17] x86 UEFI: Set up RSDP after UEFI
+ boot up
+Message-ID: <20211004132102.lfsyabk2daeiejkx@gator>
 References: <20210827031222.2778522-1-zixuanwang@google.com>
- <20210827031222.2778522-8-zixuanwang@google.com>
+ <20210827031222.2778522-9-zixuanwang@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210827031222.2778522-8-zixuanwang@google.com>
+In-Reply-To: <20210827031222.2778522-9-zixuanwang@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 27, 2021 at 03:12:12AM +0000, Zixuan Wang wrote:
-> KVM-Unit-Tests library implements a memory allocator which requires
-> two arguments to set up (See `lib/alloc_phys.c:phys_alloc_init()` for
-> more details):
->    1. A base (start) physical address
->    2. Size of available memory for allocation
+On Fri, Aug 27, 2021 at 03:12:13AM +0000, Zixuan Wang wrote:
+> Root system description pointer (RSDP) is a data structure used in the
+> ACPI programming interface. In BIOS, RSDP is located within a
+> predefined memory area, so a program can scan the memory area and find
+> RSDP. But in UEFI, RSDP may not appear in that memory area, instead, a
+> program should find it in the EFI system table.
 > 
-> To get this memory info, we scan all the memory regions returned by
-> `LibMemoryMap()`, find out the largest free memory region and use it for
-> memory allocation.
+> This commit provides RSDP set up code in UEFI:
+>    1. Read RSDP from EFI system table
+>    2. Pass RSDP pointer to find_acpi_table_attr() function
 > 
-> After retrieving this memory info, we call `ExitBootServices` so that
-> KVM-Unit-Tests has full control of the machine, and UEFI will not touch
-> the memory after this point.
+> From this commit, the `x86/s3.c` test can run in UEFI and generates
+> similar output as in Seabios, note that:
+>    1. In its output, memory addresses are different than Seabios's, this
+>       is because EFI application starts from a dynamic runtime address,
+>       not a fixed predefined memory address
+>    2. There is a short delay (~5 secs) after the test case prints "PM1a
+>       event registers" line. This test case sleeps for a few seconds
+>       and then wakes up, so give it a few seconds to run.
 > 
-> Starting from this commit, `x86/hypercall.c` test case can run in UEFI
-> and generates the same output as in Seabios.
-> 
-> Co-developed-by: Varad Gautam <varad.gautam@suse.com>
-> Signed-off-by: Varad Gautam <varad.gautam@suse.com>
 > Signed-off-by: Zixuan Wang <zixuanwang@google.com>
 > ---
->  lib/efi.c           | 28 +++++++++++++---
->  lib/efi.h           |  2 +-
->  lib/x86/asm/setup.h | 16 +++++++++-
->  lib/x86/setup.c     | 78 ++++++++++++++++++++++++++++++++++++++++++++-
->  4 files changed, 116 insertions(+), 8 deletions(-)
+>  lib/efi.c           | 15 +++++++++++++++
+>  lib/efi.h           |  1 +
+>  lib/linux/uefi.h    | 15 +++++++++++++++
+>  lib/x86/acpi.c      | 38 +++++++++++++++++++++++++++++++-------
+>  lib/x86/acpi.h      | 11 +++++++++++
+>  lib/x86/asm/setup.h |  2 ++
+>  lib/x86/setup.c     | 13 +++++++++++++
+>  7 files changed, 88 insertions(+), 7 deletions(-)
 > 
 > diff --git a/lib/efi.c b/lib/efi.c
-> index 99307db..b7a69d3 100644
+> index b7a69d3..a0d4476 100644
 > --- a/lib/efi.c
 > +++ b/lib/efi.c
-> @@ -31,9 +31,10 @@ efi_status_t efi_get_memory_map(struct efi_boot_memmap *map)
->  	efi_memory_desc_t *m = NULL;
->  	efi_status_t status;
->  	unsigned long key = 0, map_size = 0, desc_size = 0;
-> +	u32 desc_ver;
->  
->  	status = efi_bs_call(get_memory_map, &map_size,
-> -			     NULL, &key, &desc_size, NULL);
-> +			     NULL, &key, &desc_size, &desc_ver);
->  	if (status != EFI_BUFFER_TOO_SMALL || map_size == 0)
->  		goto out;
->  
-> @@ -48,12 +49,13 @@ efi_status_t efi_get_memory_map(struct efi_boot_memmap *map)
->  
->  	/* Get the map. */
->  	status = efi_bs_call(get_memory_map, &map_size,
-> -			     m, &key, &desc_size, NULL);
-> +			     m, &key, &desc_size, &desc_ver);
->  	if (status != EFI_SUCCESS) {
->  		efi_free_pool(m);
->  		goto out;
->  	}
->  
-> +	*map->desc_ver = desc_ver;
->  	*map->desc_size = desc_size;
->  	*map->map_size = map_size;
->  	*map->key_ptr = key;
-> @@ -62,18 +64,34 @@ out:
->  	return status;
+> @@ -69,6 +69,21 @@ efi_status_t efi_exit_boot_services(void *handle, unsigned long mapkey)
+>  	return efi_bs_call(exit_boot_services, handle, mapkey);
 >  }
 >  
-> -efi_status_t efi_exit_boot_services(void *handle, struct efi_boot_memmap *map)
-> +efi_status_t efi_exit_boot_services(void *handle, unsigned long mapkey)
->  {
-> -	return efi_bs_call(exit_boot_services, handle, *map->key_ptr);
-> +	return efi_bs_call(exit_boot_services, handle, mapkey);
->  }
->  
+> +efi_status_t efi_get_system_config_table(efi_guid_t table_guid, void **table)
+> +{
+> +	size_t i;
+> +	efi_config_table_t *tables;
+> +
+> +	tables = (efi_config_table_t *)efi_system_table->tables;
+> +	for (i = 0; i < efi_system_table->nr_tables; i++) {
+> +		if (!memcmp(&table_guid, &tables[i].guid, sizeof(efi_guid_t))) {
+> +			*table = tables[i].table;
+> +			return EFI_SUCCESS;
+> +		}
+> +	}
+> +	return EFI_NOT_FOUND;
+> +}
+> +
 >  efi_status_t efi_main(efi_handle_t handle, efi_system_table_t *sys_tab)
 >  {
 >  	int ret;
-> +	unsigned long mapkey = 0;
-> +	efi_status_t status;
-> +	efi_bootinfo_t efi_bootinfo;
->  
->  	efi_system_table = sys_tab;
->  
-> -	setup_efi();
-> +	setup_efi_bootinfo(&efi_bootinfo);
-> +	status = setup_efi_pre_boot(&mapkey, &efi_bootinfo);
-> +	if (status != EFI_SUCCESS) {
-> +		printf("Failed to set up before ExitBootServices, exiting.\n");
-> +		return status;
-> +	}
-> +
-> +	status = efi_exit_boot_services(handle, mapkey);
-> +	if (status != EFI_SUCCESS) {
-> +		printf("Failed to exit boot services\n");
-> +		return status;
-> +	}
-> +
-> +	setup_efi(&efi_bootinfo);
->  	ret = main(__argc, __argv, __environ);
->  
->  	/* Shutdown the guest VM */
 > diff --git a/lib/efi.h b/lib/efi.h
-> index 60cdb6f..2d3772c 100644
+> index 2d3772c..dbb8159 100644
 > --- a/lib/efi.h
 > +++ b/lib/efi.h
-> @@ -11,7 +11,7 @@
->  
+> @@ -12,6 +12,7 @@
 >  efi_status_t _relocate(long ldbase, Elf64_Dyn *dyn, efi_handle_t handle, efi_system_table_t *sys_tab);
 >  efi_status_t efi_get_memory_map(struct efi_boot_memmap *map);
-> -efi_status_t efi_exit_boot_services(void *handle, struct efi_boot_memmap *map);
-> +efi_status_t efi_exit_boot_services(void *handle, unsigned long mapkey);
+>  efi_status_t efi_exit_boot_services(void *handle, unsigned long mapkey);
+> +efi_status_t efi_get_system_config_table(efi_guid_t table_guid, void **table);
 >  efi_status_t efi_main(efi_handle_t handle, efi_system_table_t *sys_tab);
 >  
 >  #endif /* _EFI_H_ */
+> diff --git a/lib/linux/uefi.h b/lib/linux/uefi.h
+> index 9adc7ab..d1d599f 100644
+> --- a/lib/linux/uefi.h
+> +++ b/lib/linux/uefi.h
+> @@ -58,6 +58,21 @@ typedef guid_t efi_guid_t;
+>  	(b) & 0xff, ((b) >> 8) & 0xff,						\
+>  	(c) & 0xff, ((c) >> 8) & 0xff, d } }
+>  
+> +#define ACPI_TABLE_GUID EFI_GUID(0xeb9d2d30, 0x2d88, 0x11d3, 0x9a, 0x16, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d)
+> +
+> +typedef struct {
+> +	efi_guid_t guid;
+> +	u32 table;
+> +} efi_config_table_32_t;
+> +
+> +typedef union {
+> +	struct {
+> +		efi_guid_t guid;
+> +		void *table;
+> +	};
+> +	efi_config_table_32_t mixed_mode;
+
+Can't we drop all the mixed_mode stuff? Or do we really want to support
+32-bit UEFI kvm-unit-tests?
+
+> +} efi_config_table_t;
+> +
+>  /*
+>   * Generic EFI table header
+>   */
+> diff --git a/lib/x86/acpi.c b/lib/x86/acpi.c
+> index 4373106..0f75d79 100644
+> --- a/lib/x86/acpi.c
+> +++ b/lib/x86/acpi.c
+> @@ -1,9 +1,37 @@
+>  #include "libcflat.h"
+>  #include "acpi.h"
+>  
+> +#ifdef TARGET_EFI
+> +struct rsdp_descriptor *efi_rsdp = NULL;
+> +
+> +void setup_efi_rsdp(struct rsdp_descriptor *rsdp) {
+> +	efi_rsdp = rsdp;
+> +}
+
+{ on its own line please
+
+> +
+> +static struct rsdp_descriptor *get_rsdp(void) {
+> +	if (efi_rsdp == NULL) {
+> +		printf("Can't find RSDP from UEFI, maybe setup_efi_rsdp() was not called\n");
+> +	}
+> +	return efi_rsdp;
+> +}
+> +#else
+> +static struct rsdp_descriptor *get_rsdp(void) {
+> +    struct rsdp_descriptor *rsdp;
+> +    unsigned long addr;
+> +    for(addr = 0xf0000; addr < 0x100000; addr += 16) {
+> +	rsdp = (void*)addr;
+> +	if (rsdp->signature == RSDP_SIGNATURE_8BYTE)
+> +          break;
+> +    }
+
+When moving code please take the opportunity to clean up its style.
+
+> +    if (addr == 0x100000) {
+> +        return NULL;
+> +    }
+> +    return rsdp;
+> +}
+> +#endif /* TARGET_EFI */
+> +
+>  void* find_acpi_table_addr(u32 sig)
+>  {
+> -    unsigned long addr;
+>      struct rsdp_descriptor *rsdp;
+>      struct rsdt_descriptor_rev1 *rsdt;
+>      void *end;
+> @@ -19,12 +47,8 @@ void* find_acpi_table_addr(u32 sig)
+>          return (void*)(ulong)fadt->firmware_ctrl;
+>      }
+>  
+> -    for(addr = 0xf0000; addr < 0x100000; addr += 16) {
+> -	rsdp = (void*)addr;
+> -	if (rsdp->signature == 0x2052545020445352LL)
+> -          break;
+> -    }
+> -    if (addr == 0x100000) {
+> +    rsdp = get_rsdp();
+> +    if (rsdp == NULL) {
+>          printf("Can't find RSDP\n");
+>          return 0;
+>      }
+> diff --git a/lib/x86/acpi.h b/lib/x86/acpi.h
+> index 1b80374..db8ee56 100644
+> --- a/lib/x86/acpi.h
+> +++ b/lib/x86/acpi.h
+> @@ -11,6 +11,13 @@
+>  #define FACP_SIGNATURE ACPI_SIGNATURE('F','A','C','P')
+>  #define FACS_SIGNATURE ACPI_SIGNATURE('F','A','C','S')
+>  
+> +
+> +#define ACPI_SIGNATURE_8BYTE(c1, c2, c3, c4, c5, c6, c7, c8) \
+> +	((uint64_t)(ACPI_SIGNATURE(c1, c2, c3, c4))) |       \
+> +	((uint64_t)(ACPI_SIGNATURE(c5, c6, c7, c8)) << 32)
+> +
+> +#define RSDP_SIGNATURE_8BYTE (ACPI_SIGNATURE_8BYTE('R', 'S', 'D', ' ', 'P', 'T', 'R', ' '))
+> +
+>  struct rsdp_descriptor {        /* Root System Descriptor Pointer */
+>      u64 signature;              /* ACPI signature, contains "RSD PTR " */
+>      u8  checksum;               /* To make sum of struct == 0 */
+> @@ -101,4 +108,8 @@ struct facs_descriptor_rev1
+>  
+>  void* find_acpi_table_addr(u32 sig);
+>  
+> +#ifdef TARGET_EFI
+> +void setup_efi_rsdp(struct rsdp_descriptor *rsdp);
+> +#endif /* TARGET_EFI */
+
+Unnecessary ifdef.
+
+> +
+>  #endif
 > diff --git a/lib/x86/asm/setup.h b/lib/x86/asm/setup.h
-> index eb1cf73..8ff31ef 100644
+> index 8ff31ef..40fd963 100644
 > --- a/lib/x86/asm/setup.h
 > +++ b/lib/x86/asm/setup.h
-> @@ -4,8 +4,22 @@
+> @@ -2,6 +2,7 @@
+>  #define _X86_ASM_SETUP_H_
+>  
 >  #ifdef TARGET_EFI
+> +#include "x86/acpi.h"
 >  #include "x86/apic.h"
 >  #include "x86/smp.h"
-> +#include "efi.h"
+>  #include "efi.h"
+> @@ -15,6 +16,7 @@
+>  typedef struct {
+>  	phys_addr_t free_mem_start;
+>  	phys_addr_t free_mem_size;
+> +	struct rsdp_descriptor *rsdp;
+>  } efi_bootinfo_t;
 >  
-> -void setup_efi(void);
-> +/*
-> + * efi_bootinfo_t: stores EFI-related machine info retrieved by
-> + * setup_efi_pre_boot(), and is then used by setup_efi(). setup_efi() cannot
-> + * retrieve this info as it is called after ExitBootServices and thus some EFI
-> + * resources are not available.
-> + */
-> +typedef struct {
-> +	phys_addr_t free_mem_start;
-> +	phys_addr_t free_mem_size;
-> +} efi_bootinfo_t;
-> +
-> +void setup_efi_bootinfo(efi_bootinfo_t *efi_bootinfo);
-> +void setup_efi(efi_bootinfo_t *efi_bootinfo);
-> +efi_status_t setup_efi_pre_boot(unsigned long *mapkey, efi_bootinfo_t *efi_bootinfo);
->  #endif /* TARGET_EFI */
->  
->  #endif /* _X86_ASM_SETUP_H_ */
+>  void setup_efi_bootinfo(efi_bootinfo_t *efi_bootinfo);
 > diff --git a/lib/x86/setup.c b/lib/x86/setup.c
-> index 0a065fe..a49e0d4 100644
+> index a49e0d4..1ddfb8c 100644
 > --- a/lib/x86/setup.c
 > +++ b/lib/x86/setup.c
-> @@ -131,6 +131,81 @@ extern phys_addr_t ring0stacktop;
->  extern gdt_entry_t gdt64[];
->  extern size_t ring0stacksize;
->  
-> +void setup_efi_bootinfo(efi_bootinfo_t *efi_bootinfo)
-> +{
-> +	efi_bootinfo->free_mem_size = 0;
-> +	efi_bootinfo->free_mem_start = 0;
-> +}
-> +
-> +static efi_status_t setup_pre_boot_memory(unsigned long *mapkey, efi_bootinfo_t *efi_bootinfo)
-> +{
-> +	int i;
-> +	unsigned long free_mem_total_pages;
-> +	efi_status_t status;
-> +	struct efi_boot_memmap map;
-> +	efi_memory_desc_t *buffer, *d;
-> +	unsigned long map_size, desc_size, buff_size;
-> +	u32 desc_ver;
-> +
-> +	map.map = &buffer;
-> +	map.map_size = &map_size;
-> +	map.desc_size = &desc_size;
-> +	map.desc_ver = &desc_ver;
-> +	map.buff_size = &buff_size;
-> +	map.key_ptr = mapkey;
-> +
-> +	status = efi_get_memory_map(&map);
-> +	if (status != EFI_SUCCESS) {
-> +		return status;
-> +	}
-> +
-> +	/*
-> +	 * The 'buffer' contains multiple descriptors that describe memory
-> +	 * regions maintained by UEFI. This code records the largest free
-> +	 * EFI_CONVENTIONAL_MEMORY region which will be used to set up the
-> +	 * memory allocator, so that the memory allocator can work in the
-> +	 * largest free continuous memory region.
-> +	 */
-> +	free_mem_total_pages = 0;
-> +	for (i = 0; i < map_size; i += desc_size) {
-> +		d = (efi_memory_desc_t *)(&((u8 *)buffer)[i]);
-> +		if (d->type == EFI_CONVENTIONAL_MEMORY) {
-> +			if (free_mem_total_pages < d->num_pages) {
-> +				free_mem_total_pages = d->num_pages;
-> +				efi_bootinfo->free_mem_size = free_mem_total_pages << EFI_PAGE_SHIFT;
-> +				efi_bootinfo->free_mem_start = d->phys_addr;
-> +			}
-> +		}
-> +	}
-> +
-> +	if (efi_bootinfo->free_mem_size == 0) {
-> +		return EFI_OUT_OF_RESOURCES;
-> +	}
-> +
-> +	return EFI_SUCCESS;
-> +}
-> +
-> +efi_status_t setup_efi_pre_boot(unsigned long *mapkey, efi_bootinfo_t *efi_bootinfo)
-> +{
-> +	efi_status_t status;
-> +
-> +	status = setup_pre_boot_memory(mapkey, efi_bootinfo);
-> +	if (status != EFI_SUCCESS) {
-> +		printf("setup_pre_boot_memory() failed: ");
-> +		switch (status) {
-> +		case EFI_OUT_OF_RESOURCES:
-> +			printf("No free memory region\n");
-> +			break;
-> +		default:
-> +			printf("Unknown error\n");
-> +			break;
-> +		}
-> +		return status;
-> +	}
-> +
-> +	return EFI_SUCCESS;
-> +}
-> +
->  static void setup_gdt_tss(void)
+> @@ -135,6 +135,7 @@ void setup_efi_bootinfo(efi_bootinfo_t *efi_bootinfo)
 >  {
->  	gdt_entry_t *tss_lo, *tss_hi;
-> @@ -169,7 +244,7 @@ static void setup_gdt_tss(void)
->  	load_gdt_tss(tss_offset);
+>  	efi_bootinfo->free_mem_size = 0;
+>  	efi_bootinfo->free_mem_start = 0;
+> +	efi_bootinfo->rsdp = NULL;
 >  }
 >  
-> -void setup_efi(void)
-> +void setup_efi(efi_bootinfo_t *efi_bootinfo)
+>  static efi_status_t setup_pre_boot_memory(unsigned long *mapkey, efi_bootinfo_t *efi_bootinfo)
+> @@ -185,6 +186,11 @@ static efi_status_t setup_pre_boot_memory(unsigned long *mapkey, efi_bootinfo_t
+>  	return EFI_SUCCESS;
+>  }
+>  
+> +static efi_status_t setup_pre_boot_rsdp(efi_bootinfo_t *efi_bootinfo)
+> +{
+> +	return efi_get_system_config_table(ACPI_TABLE_GUID, (void **)&efi_bootinfo->rsdp);
+> +}
+> +
+>  efi_status_t setup_efi_pre_boot(unsigned long *mapkey, efi_bootinfo_t *efi_bootinfo)
 >  {
->  	reset_apic();
->  	setup_gdt_tss();
-> @@ -179,6 +254,7 @@ void setup_efi(void)
->  	enable_apic();
+>  	efi_status_t status;
+> @@ -203,6 +209,12 @@ efi_status_t setup_efi_pre_boot(unsigned long *mapkey, efi_bootinfo_t *efi_booti
+>  		return status;
+>  	}
+>  
+> +	status = setup_pre_boot_rsdp(efi_bootinfo);
+> +	if (status != EFI_SUCCESS) {
+> +		printf("Cannot find RSDP in EFI system table\n");
+> +		return status;
+> +	}
+> +
+>  	return EFI_SUCCESS;
+>  }
+>  
+> @@ -255,6 +267,7 @@ void setup_efi(efi_bootinfo_t *efi_bootinfo)
 >  	enable_x2apic();
 >  	smp_init();
-> +	phys_alloc_init(efi_bootinfo->free_mem_start, efi_bootinfo->free_mem_size);
+>  	phys_alloc_init(efi_bootinfo->free_mem_start, efi_bootinfo->free_mem_size);
+> +	setup_efi_rsdp(efi_bootinfo->rsdp);
+
+What memory region is this table in? We should make sure it's reserved or
+copy the table out to somewhere that is reserved.
+
 >  }
 >  
 >  #endif /* TARGET_EFI */
@@ -314,9 +336,13 @@ On Fri, Aug 27, 2021 at 03:12:12AM +0000, Zixuan Wang wrote:
 > 2.33.0.259.gc128427fd7-goog
 >
 
-How about just getting the memory map (efi_boot_memmap) and then exiting
-boot services in arch-neutral code and then have arch-specific code decide
-what to do with the memory map?
+I'd much prefer we avoid too much of this split setup where we have a bit
+of setup in a common efi lib and then an x86 specific part that populates
+an x86 specific info structure before exiting boot services and then more
+x86 specific setup that uses that later... 
+
+Can't we do almost everything in lib/efi.c and only call out once into an
+arch_efi_setup function after exiting boot services?
 
 Thanks,
 drew
