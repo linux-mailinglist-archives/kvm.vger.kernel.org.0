@@ -2,135 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5780D4213BC
-	for <lists+kvm@lfdr.de>; Mon,  4 Oct 2021 18:11:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1C5274213C2
+	for <lists+kvm@lfdr.de>; Mon,  4 Oct 2021 18:13:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236566AbhJDQNO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Oct 2021 12:13:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:21547 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236621AbhJDQNE (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 4 Oct 2021 12:13:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1633363875;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=qHrvX3IT0PrHvWz0jB6gkvGTsIwTwVhbBS/SiQBSGZ0=;
-        b=UXYdSXq7F5X7mixWKKdaMP551j5jiqOnC3qiTkLuUQhmju5XzcyuEELLhb1Ai6+xqtZSSf
-        Rnb5WsYQa9JvtVCdyw3AfGSSSh1UdK4/g4KWGxXI2mbX8SmsdTZYRy3vYHcKzbwsRfwDGb
-        k6PesqrH588hUAJGbp3gItFtrG8BPXc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-542-Pqy9iBFSOvKA0umJTgmjcg-1; Mon, 04 Oct 2021 12:11:14 -0400
-X-MC-Unique: Pqy9iBFSOvKA0umJTgmjcg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F2AD6100C660;
-        Mon,  4 Oct 2021 16:11:12 +0000 (UTC)
-Received: from vitty.brq.redhat.com (unknown [10.40.194.218])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1054E652AD;
-        Mon,  4 Oct 2021 16:10:44 +0000 (UTC)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v2 4/4] KVM: nVMX: Implement Enlightened MSR Bitmap feature
-Date:   Mon,  4 Oct 2021 18:10:29 +0200
-Message-Id: <20211004161029.641155-5-vkuznets@redhat.com>
-In-Reply-To: <20211004161029.641155-1-vkuznets@redhat.com>
-References: <20211004161029.641155-1-vkuznets@redhat.com>
+        id S234043AbhJDQPj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Oct 2021 12:15:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46302 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236499AbhJDQPR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Oct 2021 12:15:17 -0400
+Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CF42C06174E
+        for <kvm@vger.kernel.org>; Mon,  4 Oct 2021 09:13:28 -0700 (PDT)
+Received: by mail-lf1-x12b.google.com with SMTP id b20so74352892lfv.3
+        for <kvm@vger.kernel.org>; Mon, 04 Oct 2021 09:13:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=wu2Sbxcf5EVRYolmaoh2RSe+DqpVoS+BAjX+Kaizi48=;
+        b=f/uWlCZP2+MFwzszq+m0m/TsYjyg7V/v86sUvQ8S9duOnhju8rZ8HKHGMe+gjCVmq6
+         MiqJhuiHfxe9QAe5wZdWtGxKDTh11YgDPeXlmzhK+a5wSamY1h0PYbEBfdpYVZLd+q3j
+         4x/8wPbPnNwgxUGbiBEs7D00SfKnxEctE0BaTwpOMbzOk9lLdevbvls9texMD57lb9lZ
+         0Cn6y61otXRZZLcbgaRO159+pbK5R6jivc/WCyZzttjJcb/DZdb+wGMHiTBr3wooaMxr
+         NHGqJxGhoX413/DJuZ2rR7s8iWvmMDqu6q1T2R6/4GQIdtoXBlbBHZA4C85kS4k8GyiJ
+         hbCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=wu2Sbxcf5EVRYolmaoh2RSe+DqpVoS+BAjX+Kaizi48=;
+        b=wHeihK1OahxQYY4Ov1gK0VVqDv0S24o1Bmdr3oDLBhZIDrL+sjQcZ+XqKC1umS4Xka
+         9TXqYociQYEYjSNaQGaOsLrAsNzlP5P4tBI+xEIp1BN8ySuFKbf8Sy6bqjLhMC+rSIlF
+         +zKFGSk900WmX87PeQ9j1FmU4jzbQhGNv7h9ZEb990JAMuXkRxLGLE094jfDI0UBr4YD
+         oD7IUr64NPtGRoZiFVphfSYYnEJiuNFe7CDHbgkFfx1PrdX1BJamQXL4lagc4xXMGSor
+         dsbW66mjcf+EymmkzO0zcD9WG5UJSCew1sS+8R7mbjs/cXF8F2Vy+3p8jse/oduplZPn
+         KPkg==
+X-Gm-Message-State: AOAM530kfBWP9LQe7XBUn0BByGx8W2KWoxDGdyedQjmeusVbPeFjD7DW
+        J5Cblup/D0daljnxrTDpDoSq5uHPkC+pICcrxibgVQ==
+X-Google-Smtp-Source: ABdhPJxvCRV7JJ//o6iMYzW5L1q/SZH90XtOI+mjrFOlvB4QT+GKZmFWCCbthQOs7zyoP8qP/M79xBk9fx7vs6r7l34=
+X-Received: by 2002:a19:6a16:: with SMTP id u22mr15585258lfu.444.1633364006443;
+ Mon, 04 Oct 2021 09:13:26 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+References: <1446878298.170497.1633338512925@office.mailbox.org>
+ <b6abc5a3-39ea-b463-9df5-f50bdcb16d08@redhat.com> <936688112.157288.1633339838738@office.mailbox.org>
+ <c4773ecc-053f-9bc6-03af-5039397a4531@redhat.com>
+In-Reply-To: <c4773ecc-053f-9bc6-03af-5039397a4531@redhat.com>
+From:   Nick Desaulniers <ndesaulniers@google.com>
+Date:   Mon, 4 Oct 2021 09:13:14 -0700
+Message-ID: <CAKwvOd=rrM4fGdGMkD5+kdA49a6K+JcUiR4K2-go=MMt++ukPA@mail.gmail.com>
+Subject: Re: [BUG] [5.15] Compilation error in arch/x86/kvm/mmu/spte.h with clang-14
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     torvic9@mailbox.org, "seanjc@google.com" <seanjc@google.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "nathan@kernel.org" <nathan@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "bp@alien8.de" <bp@alien8.de>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Updating MSR bitmap for L2 is not cheap and rearly needed. TLFS for Hyper-V
-offers 'Enlightened MSR Bitmap' feature which allows L1 hypervisor to
-inform L0 when it changes MSR bitmap, this eliminates the need to examine
-L1's MSR bitmap for L2 every time when 'real' MSR bitmap for L2 gets
-constructed.
+On Mon, Oct 4, 2021 at 2:49 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 04/10/21 11:30, torvic9@mailbox.org wrote:
+> >
+> >> Paolo Bonzini <pbonzini@redhat.com> hat am 04.10.2021 11:26 geschrieben:
+> >>
+> >>
+> >> On 04/10/21 11:08, torvic9@mailbox.org wrote:
+> >>> I encounter the following issue when compiling 5.15-rc4 with clang-14:
+> >>>
+> >>> In file included from arch/x86/kvm/mmu/mmu.c:27:
+> >>> arch/x86/kvm/mmu/spte.h:318:9: error: use of bitwise '|' with boolean operands [-Werror,-Wbitwise-instead-of-logical]
+> >>>           return __is_bad_mt_xwr(rsvd_check, spte) |
+> >>>                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> >>>                                                    ||
+> >>> arch/x86/kvm/mmu/spte.h:318:9: note: cast one or both operands to int to silence this warning
+> >>
+> >> The warning is wrong, as mentioned in the line right above:
+> >
+> > So it's an issue with clang-14 then?
+> > (I add Nick and Nathan)
+>
+> My clang here doesn't have the option, so I'm going to ask---are you
+> using W=1?  I can see why clang is warning for KVM's code, but in my
+> opinion such a check should only be in -Wextra.
 
-Use 'vmx->nested.msr_bitmap_changed' flag to implement the feature.
+This is a newly added warning in top of tree clang.
 
-Note, KVM already uses 'Enlightened MSR bitmap' feature when it runs as a
-nested hypervisor on top of Hyper-V. The newly introduced feature is going
-to be used by Hyper-V guests on KVM.
+>
+> Paolo
+>
+> >>
+> >>           /*
+> >>            * Use a bitwise-OR instead of a logical-OR to aggregate the reserved
+> >>            * bits and EPT's invalid memtype/XWR checks to avoid an extra Jcc
+> >>            * (this is extremely unlikely to be short-circuited as true).
+> >>            */
+> >>
+> >> Paolo
+> >
+>
 
-When the feature is enabled for Win10+WSL2, it shaves off around 700 CPU
-cycles from a nested vmexit cost (tight cpuid loop test).
 
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
- arch/x86/kvm/hyperv.c     |  2 ++
- arch/x86/kvm/vmx/nested.c | 20 ++++++++++++++++++--
- 2 files changed, 20 insertions(+), 2 deletions(-)
-
-diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-index 6f11cda2bfa4..a00de1dbec57 100644
---- a/arch/x86/kvm/hyperv.c
-+++ b/arch/x86/kvm/hyperv.c
-@@ -2516,6 +2516,8 @@ int kvm_get_hv_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid2 *cpuid,
- 
- 		case HYPERV_CPUID_NESTED_FEATURES:
- 			ent->eax = evmcs_ver;
-+			if (evmcs_ver)
-+				ent->eax |= HV_X64_NESTED_MSR_BITMAP;
- 
- 			break;
- 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 34c580b5dbab..b36004503f75 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -608,15 +608,30 @@ static inline bool nested_vmx_prepare_msr_bitmap(struct kvm_vcpu *vcpu,
- 						 struct vmcs12 *vmcs12)
- {
- 	int msr;
-+	struct vcpu_vmx *vmx = to_vmx(vcpu);
- 	unsigned long *msr_bitmap_l1;
--	unsigned long *msr_bitmap_l0 = to_vmx(vcpu)->nested.vmcs02.msr_bitmap;
--	struct kvm_host_map *map = &to_vmx(vcpu)->nested.msr_bitmap_map;
-+	unsigned long *msr_bitmap_l0 = vmx->nested.vmcs02.msr_bitmap;
-+	struct hv_enlightened_vmcs *evmcs = vmx->nested.hv_evmcs;
-+	struct kvm_host_map *map = &vmx->nested.msr_bitmap_map;
- 
- 	/* Nothing to do if the MSR bitmap is not in use.  */
- 	if (!cpu_has_vmx_msr_bitmap() ||
- 	    !nested_cpu_has(vmcs12, CPU_BASED_USE_MSR_BITMAPS))
- 		return false;
- 
-+	/*
-+	 * MSR bitmap update can be skipped when:
-+	 * - MSR bitmap for L1 hasn't changed.
-+	 * - Nested hypervisor (L1) is attempting to launch the same L2 as
-+	 *   before.
-+	 * - Nested hypervisor (L1) has enabled 'Enlightened MSR Bitmap' feature
-+	 *   and tells KVM (L0) there were no changes in MSR bitmap for L2.
-+	 */
-+	if (!vmx->nested.msr_bitmap_changed && evmcs &&
-+	    evmcs->hv_enlightenments_control.msr_bitmap &&
-+	    evmcs->hv_clean_fields & HV_VMX_ENLIGHTENED_CLEAN_FIELD_MSR_BITMAP)
-+		goto out_clear_msr_bitmap_changed;
-+
- 	if (kvm_vcpu_map(vcpu, gpa_to_gfn(vmcs12->msr_bitmap), map))
- 		return false;
- 
-@@ -700,6 +715,7 @@ static inline bool nested_vmx_prepare_msr_bitmap(struct kvm_vcpu *vcpu,
- 
- 	kvm_vcpu_unmap(vcpu, &to_vmx(vcpu)->nested.msr_bitmap_map, false);
- 
-+out_clear_msr_bitmap_changed:
- 	vmx->nested.msr_bitmap_changed = false;
- 
- 	return true;
 -- 
-2.31.1
-
+Thanks,
+~Nick Desaulniers
