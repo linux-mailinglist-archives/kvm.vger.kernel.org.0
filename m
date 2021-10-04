@@ -2,60 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DE7C14218AA
-	for <lists+kvm@lfdr.de>; Mon,  4 Oct 2021 22:49:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CE5C84218AB
+	for <lists+kvm@lfdr.de>; Mon,  4 Oct 2021 22:49:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236822AbhJDUvk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S236881AbhJDUvk (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Mon, 4 Oct 2021 16:51:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55556 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55566 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236804AbhJDUvh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Oct 2021 16:51:37 -0400
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 315DDC061745
-        for <kvm@vger.kernel.org>; Mon,  4 Oct 2021 13:49:48 -0700 (PDT)
-Received: by mail-pf1-x42b.google.com with SMTP id h1so4850031pfv.12
-        for <kvm@vger.kernel.org>; Mon, 04 Oct 2021 13:49:48 -0700 (PDT)
+        with ESMTP id S236849AbhJDUvi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Oct 2021 16:51:38 -0400
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB703C061749
+        for <kvm@vger.kernel.org>; Mon,  4 Oct 2021 13:49:49 -0700 (PDT)
+Received: by mail-pj1-x1029.google.com with SMTP id k23so1565463pji.0
+        for <kvm@vger.kernel.org>; Mon, 04 Oct 2021 13:49:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=hbxdixGOhL1Yj10MTwZ7tyD6Xe68ywa+lhDixo0V7Ik=;
-        b=eE/lUlC8Qk4ZntL1lZgNtpW7yBFVp5VNLkyce3RlsS0iouQhyWKHANSE7JODg6yCFz
-         zE+NsaTeM9gECYM5NdgwMvUUnnb6WkPqF6M/ifo7v4vQoX5jft9hdd5OLPhpNAli6u2L
-         ISzr/iGWYUlD5AXcSM6Lve/xkd85rQD0/otYvxhMzqnNAv8T7madjERVT/DugioG3s5G
-         q8+pb9fHRi6OTtgGeeveQIT5jkbDPqwEvU1VucyfNvhHtKUJ3IkZHNpCQpA8yKDRct8e
-         glAHUpVcmy7uAEL8CH1HK9tuSEUzsyL6/MJ3P8T+wsxA73d91b6Ozwg4VRVn6PgFMxzY
-         7nfw==
+        bh=8VvNjXnyjaiZ/2uDMcL9dog4rM3q7X5m0sWW0vporEg=;
+        b=VaOwzDsm7+mXz+09yCl2e0OFqZ05j9/mrLUhE6iVMDOrpqfqCQPcEK8EI/OQ8uMMvx
+         OzI4QtXYe6dRkAKQuhXF2//nMZl8d2vhC0jd39dTypVunQ7BuMD70XvYHgC+H1YJ5xIO
+         YqvObVkKqD0gMfomM67Wx+Zyn8Sgl4yoS6klnXgH9FXEj/xB+WHEWZJZ4XqmgTwm3VX5
+         5+WZJdGdtXFDIhlAgC46osW7OD+pSDFMUFZFqD7sZ1XcMvLhzr3Ia0VRBS8Q9WoyeAuq
+         4HEvzgiCg2q7FoHq3907NzNtBZAbKo0x7Vy9G0yFO0SoRJob2dkRDrbZpqTeJSHAiofC
+         /eug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=hbxdixGOhL1Yj10MTwZ7tyD6Xe68ywa+lhDixo0V7Ik=;
-        b=l5Roz+Wm+O/3EnpX4AagaAOxuPsMJUsjNiFzFF7NHDRTsz3ksOXpVBRBhcg2bdYiwC
-         C6UGJbKS44yEg00GLu7tkH3y6Od1pI3b7LtMCUVI6nPm/It+502RmpAwwvR8o4n0s2hw
-         GnCea0606gj/cWy21AMftEHf1B2uPvI56v/1QoayXAM21uRh/tNIoMw+4H8H6Ma6Jvho
-         JdL84XqM4s1JkDLtukNvTn98vr36fvQIu9I2mzTpmxWhrM/AuQOTA7KyxCjMM9MhV6mn
-         c/Ci2IJhglbS/2Lcp13GZAAyRKLtGr88C6ht3g1WgVyoswHt0wQ92izOZ8jIOGFWNpGQ
-         AtoA==
-X-Gm-Message-State: AOAM533DXOPYtJEIdxbAt+AVRSTe6PLFx6yaZD4s4YB1SPKj/xDiW/qw
-        4yqUA0gsLciRzILYibDaX+jMZrs7RjLNAQ==
-X-Google-Smtp-Source: ABdhPJx7XjC/+bV0xB9zEBZN7+IvrxbwzTdFAo88x3F39WXjVh2G5bsepVNfiNZs+VCFAZxVyNB/Jw==
-X-Received: by 2002:a63:2361:: with SMTP id u33mr12588362pgm.369.1633380587301;
-        Mon, 04 Oct 2021 13:49:47 -0700 (PDT)
+        bh=8VvNjXnyjaiZ/2uDMcL9dog4rM3q7X5m0sWW0vporEg=;
+        b=kuCCp0jG+7sRzlTcfJNRIakjtlbEfrEgph4znLwWxSlNJECHHk3k6VT6SAeQjb2D9B
+         dD4R4+0RS0EGVq9UTUXCNvZ9/acWwsE8X40is2RJ+LhWRdy+c+YjuuxfFT6RjtjwM1/u
+         svIx5mHusmThBEdERbOoDNhkFViMOyihEjtnm4ADm1fVcWwesvpSWM7yIhzgurYPCpbj
+         4F2YMyd0OXFBzURZ+HmiGYmzxAafWKsaTN/lpjVtnMk61K7qvw3ifDCQf5YTs49Sg/mN
+         ntlvYRkUv7U+aUiwZfBoDWUooDvxjO38YQXC3x1FoG8TMtobKZlMkRdwPCbDj3W4ceEd
+         kjug==
+X-Gm-Message-State: AOAM533WxA4p1HJfhqQl8df7HX9CijIsJBZSw4knb8Ea8Y4oxAoNSeJb
+        kZ10R40mssMyJmbczNZRpxXe6aqLvZuyCA==
+X-Google-Smtp-Source: ABdhPJxleKEyHjIO6/izRgjPdC9l0ZeVnDRBxEx/+LaiB/K/DF+jR0M1azwDtjRgivMr8Ehtd4ILbQ==
+X-Received: by 2002:a17:90a:312:: with SMTP id 18mr39253932pje.178.1633380588712;
+        Mon, 04 Oct 2021 13:49:48 -0700 (PDT)
 Received: from localhost.localdomain (netadmin.ucsd.edu. [137.110.160.224])
-        by smtp.gmail.com with ESMTPSA id o12sm13635063pjm.57.2021.10.04.13.49.45
+        by smtp.gmail.com with ESMTPSA id o12sm13635063pjm.57.2021.10.04.13.49.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Oct 2021 13:49:46 -0700 (PDT)
+        Mon, 04 Oct 2021 13:49:48 -0700 (PDT)
 From:   Zixuan Wang <zxwang42@gmail.com>
 To:     kvm@vger.kernel.org, pbonzini@redhat.com, drjones@redhat.com
 Cc:     marcorr@google.com, baekhw@google.com, tmroeder@google.com,
         erdemaktas@google.com, rientjes@google.com, seanjc@google.com,
         brijesh.singh@amd.com, Thomas.Lendacky@amd.com,
         varad.gautam@suse.com, jroedel@suse.de, bp@suse.de
-Subject: [kvm-unit-tests PATCH v3 09/17] x86 UEFI: Set up RSDP after UEFI boot up
-Date:   Mon,  4 Oct 2021 13:49:23 -0700
-Message-Id: <20211004204931.1537823-10-zxwang42@gmail.com>
+Subject: [kvm-unit-tests PATCH v3 10/17] x86 UEFI: Set up page tables
+Date:   Mon,  4 Oct 2021 13:49:24 -0700
+Message-Id: <20211004204931.1537823-11-zxwang42@gmail.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20211004204931.1537823-1-zxwang42@gmail.com>
 References: <20211004204931.1537823-1-zxwang42@gmail.com>
@@ -67,250 +67,174 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Zixuan Wang <zixuanwang@google.com>
 
-Root system description pointer (RSDP) is a data structure used in the
-ACPI programming interface. In BIOS, RSDP is located within a
-predefined memory area, so a program can scan the memory area and find
-RSDP. But in UEFI, RSDP may not appear in that memory area, instead, a
-program should find it in the EFI system table.
+UEFI sets up page tables before executing EFI application binaries.
+These page tables do not allow user space code to access kernel space
+memory. But `x86/syscall.c` test case places a user space function
+`syscall_tf_user32` inside kernel space memory. When using UEFI page
+tables, fetching this kernel memory from user space triggers a #PF
+fault, which is not expected by this test case.
 
-This commit provides RSDP set up code in UEFI:
-   1. Read RSDP from EFI system table
-   2. Pass RSDP pointer to find_acpi_table_attr() function
+KVM-Unit-Tests defines page tables that allow such behavior. So the
+solution to this problem is to load KVM-Unit-Tests' page tables:
 
-From this commit, the `x86/s3.c` test can run in UEFI and generates
-similar output as in Seabios, note that:
-   1. In its output, memory addresses are different than Seabios's, this
-      is because EFI application starts from a dynamic runtime address,
-      not a fixed predefined memory address
-   2. There is a short delay (~5 secs) after the test case prints "PM1a
-      event registers" line. This test case sleeps for a few seconds
-      and then wakes up, so give it a few seconds to run.
+   1. Copy the page table definition from `x86/cstart64.S`
+   2. Update page table entries with runtime memory addresses
+   3. Update CR3 register with the new page table root address
+
+Since this commit, `x86/syscall.c` can run in UEFI and generate same
+output as in Seabios, using the following command:
+
+   ./x86/efi/run ./x86/syscall.efi --cpu Opteron_G1,vendor=AuthenticAMD
 
 Signed-off-by: Zixuan Wang <zixuanwang@google.com>
 ---
- lib/efi.c           | 15 +++++++++++++++
- lib/efi.h           |  1 +
- lib/linux/efi.h     | 15 +++++++++++++++
- lib/x86/acpi.c      | 38 +++++++++++++++++++++++++++++++-------
- lib/x86/acpi.h      | 11 +++++++++++
- lib/x86/asm/setup.h |  2 ++
- lib/x86/setup.c     | 13 +++++++++++++
- 7 files changed, 88 insertions(+), 7 deletions(-)
+ lib/x86/asm/page.h   |  1 +
+ lib/x86/asm/setup.h  |  3 +++
+ lib/x86/setup.c      | 55 ++++++++++++++++++++++++++++++++++++++++++++
+ x86/efi/efistart64.S | 23 ++++++++++++++++++
+ 4 files changed, 82 insertions(+)
 
-diff --git a/lib/efi.c b/lib/efi.c
-index c1c3806..9506830 100644
---- a/lib/efi.c
-+++ b/lib/efi.c
-@@ -70,6 +70,21 @@ efi_status_t efi_exit_boot_services(void *handle, unsigned long mapkey)
- 	return efi_bs_call(exit_boot_services, handle, mapkey);
- }
+diff --git a/lib/x86/asm/page.h b/lib/x86/asm/page.h
+index fc14160..f6f740b 100644
+--- a/lib/x86/asm/page.h
++++ b/lib/x86/asm/page.h
+@@ -31,6 +31,7 @@ typedef unsigned long pgd_t;
+ #define PT_ACCESSED_MASK	(1ull << 5)
+ #define PT_DIRTY_MASK		(1ull << 6)
+ #define PT_PAGE_SIZE_MASK	(1ull << 7)
++#define PT_GLOBAL_MASK		(1ull << 8)
+ #define PT64_NX_MASK		(1ull << 63)
+ #define PT_ADDR_MASK		GENMASK_ULL(51, 12)
  
-+efi_status_t efi_get_system_config_table(efi_guid_t table_guid, void **table)
-+{
-+	size_t i;
-+	efi_config_table_t *tables;
-+
-+	tables = (efi_config_table_t *)efi_system_table->tables;
-+	for (i = 0; i < efi_system_table->nr_tables; i++) {
-+		if (!memcmp(&table_guid, &tables[i].guid, sizeof(efi_guid_t))) {
-+			*table = tables[i].table;
-+			return EFI_SUCCESS;
-+		}
-+	}
-+	return EFI_NOT_FOUND;
-+}
-+
- efi_status_t efi_main(efi_handle_t handle, efi_system_table_t *sys_tab)
- {
- 	int ret;
-diff --git a/lib/efi.h b/lib/efi.h
-index 0f1dafd..1b3abd0 100644
---- a/lib/efi.h
-+++ b/lib/efi.h
-@@ -16,6 +16,7 @@
- efi_status_t _relocate(long ldbase, Elf64_Dyn *dyn, efi_handle_t handle, efi_system_table_t *sys_tab);
- efi_status_t efi_get_memory_map(struct efi_boot_memmap *map);
- efi_status_t efi_exit_boot_services(void *handle, unsigned long mapkey);
-+efi_status_t efi_get_system_config_table(efi_guid_t table_guid, void **table);
- efi_status_t efi_main(efi_handle_t handle, efi_system_table_t *sys_tab);
- 
- #endif /* _EFI_H_ */
-diff --git a/lib/linux/efi.h b/lib/linux/efi.h
-index 3d68c28..7ac1082 100644
---- a/lib/linux/efi.h
-+++ b/lib/linux/efi.h
-@@ -58,6 +58,21 @@ typedef guid_t efi_guid_t;
- 	(b) & 0xff, ((b) >> 8) & 0xff,						\
- 	(c) & 0xff, ((c) >> 8) & 0xff, d } }
- 
-+#define ACPI_TABLE_GUID EFI_GUID(0xeb9d2d30, 0x2d88, 0x11d3, 0x9a, 0x16, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d)
-+
-+typedef struct {
-+	efi_guid_t guid;
-+	u32 table;
-+} efi_config_table_32_t;
-+
-+typedef union {
-+	struct {
-+		efi_guid_t guid;
-+		void *table;
-+	};
-+	efi_config_table_32_t mixed_mode;
-+} efi_config_table_t;
-+
- /*
-  * Generic EFI table header
-  */
-diff --git a/lib/x86/acpi.c b/lib/x86/acpi.c
-index 4373106..0f75d79 100644
---- a/lib/x86/acpi.c
-+++ b/lib/x86/acpi.c
-@@ -1,9 +1,37 @@
- #include "libcflat.h"
- #include "acpi.h"
- 
-+#ifdef TARGET_EFI
-+struct rsdp_descriptor *efi_rsdp = NULL;
-+
-+void setup_efi_rsdp(struct rsdp_descriptor *rsdp) {
-+	efi_rsdp = rsdp;
-+}
-+
-+static struct rsdp_descriptor *get_rsdp(void) {
-+	if (efi_rsdp == NULL) {
-+		printf("Can't find RSDP from UEFI, maybe setup_efi_rsdp() was not called\n");
-+	}
-+	return efi_rsdp;
-+}
-+#else
-+static struct rsdp_descriptor *get_rsdp(void) {
-+    struct rsdp_descriptor *rsdp;
-+    unsigned long addr;
-+    for(addr = 0xf0000; addr < 0x100000; addr += 16) {
-+	rsdp = (void*)addr;
-+	if (rsdp->signature == RSDP_SIGNATURE_8BYTE)
-+          break;
-+    }
-+    if (addr == 0x100000) {
-+        return NULL;
-+    }
-+    return rsdp;
-+}
-+#endif /* TARGET_EFI */
-+
- void* find_acpi_table_addr(u32 sig)
- {
--    unsigned long addr;
-     struct rsdp_descriptor *rsdp;
-     struct rsdt_descriptor_rev1 *rsdt;
-     void *end;
-@@ -19,12 +47,8 @@ void* find_acpi_table_addr(u32 sig)
-         return (void*)(ulong)fadt->firmware_ctrl;
-     }
- 
--    for(addr = 0xf0000; addr < 0x100000; addr += 16) {
--	rsdp = (void*)addr;
--	if (rsdp->signature == 0x2052545020445352LL)
--          break;
--    }
--    if (addr == 0x100000) {
-+    rsdp = get_rsdp();
-+    if (rsdp == NULL) {
-         printf("Can't find RSDP\n");
-         return 0;
-     }
-diff --git a/lib/x86/acpi.h b/lib/x86/acpi.h
-index 1b80374..db8ee56 100644
---- a/lib/x86/acpi.h
-+++ b/lib/x86/acpi.h
-@@ -11,6 +11,13 @@
- #define FACP_SIGNATURE ACPI_SIGNATURE('F','A','C','P')
- #define FACS_SIGNATURE ACPI_SIGNATURE('F','A','C','S')
- 
-+
-+#define ACPI_SIGNATURE_8BYTE(c1, c2, c3, c4, c5, c6, c7, c8) \
-+	((uint64_t)(ACPI_SIGNATURE(c1, c2, c3, c4))) |       \
-+	((uint64_t)(ACPI_SIGNATURE(c5, c6, c7, c8)) << 32)
-+
-+#define RSDP_SIGNATURE_8BYTE (ACPI_SIGNATURE_8BYTE('R', 'S', 'D', ' ', 'P', 'T', 'R', ' '))
-+
- struct rsdp_descriptor {        /* Root System Descriptor Pointer */
-     u64 signature;              /* ACPI signature, contains "RSD PTR " */
-     u8  checksum;               /* To make sum of struct == 0 */
-@@ -101,4 +108,8 @@ struct facs_descriptor_rev1
- 
- void* find_acpi_table_addr(u32 sig);
- 
-+#ifdef TARGET_EFI
-+void setup_efi_rsdp(struct rsdp_descriptor *rsdp);
-+#endif /* TARGET_EFI */
-+
- #endif
 diff --git a/lib/x86/asm/setup.h b/lib/x86/asm/setup.h
-index 3f0a870..ecfcd5c 100644
+index ecfcd5c..9cc135a 100644
 --- a/lib/x86/asm/setup.h
 +++ b/lib/x86/asm/setup.h
-@@ -6,6 +6,7 @@ unsigned long setup_tss(void);
- #endif /* __x86_64__ */
- 
+@@ -8,7 +8,9 @@ unsigned long setup_tss(void);
  #ifdef TARGET_EFI
-+#include "x86/acpi.h"
+ #include "x86/acpi.h"
  #include "x86/apic.h"
++#include "x86/processor.h"
  #include "x86/smp.h"
++#include "asm/page.h"
  #include "efi.h"
-@@ -19,6 +20,7 @@ unsigned long setup_tss(void);
- typedef struct {
- 	phys_addr_t free_mem_start;
- 	phys_addr_t free_mem_size;
-+	struct rsdp_descriptor *rsdp;
- } efi_bootinfo_t;
  
+ /*
+@@ -26,6 +28,7 @@ typedef struct {
  void setup_efi_bootinfo(efi_bootinfo_t *efi_bootinfo);
+ void setup_efi(efi_bootinfo_t *efi_bootinfo);
+ efi_status_t setup_efi_pre_boot(unsigned long *mapkey, efi_bootinfo_t *efi_bootinfo);
++void setup_5level_page_table(void);
+ #endif /* TARGET_EFI */
+ 
+ #endif /* _X86_ASM_SETUP_H_ */
 diff --git a/lib/x86/setup.c b/lib/x86/setup.c
-index 90f95a3..6d81ab6 100644
+index 6d81ab6..c1aa82a 100644
 --- a/lib/x86/setup.c
 +++ b/lib/x86/setup.c
-@@ -171,6 +171,7 @@ void setup_efi_bootinfo(efi_bootinfo_t *efi_bootinfo)
- {
- 	efi_bootinfo->free_mem_size = 0;
- 	efi_bootinfo->free_mem_start = 0;
-+	efi_bootinfo->rsdp = NULL;
- }
- 
- static efi_status_t setup_pre_boot_memory(unsigned long *mapkey, efi_bootinfo_t *efi_bootinfo)
-@@ -221,6 +222,11 @@ static efi_status_t setup_pre_boot_memory(unsigned long *mapkey, efi_bootinfo_t
+@@ -254,6 +254,60 @@ efi_status_t setup_efi_pre_boot(unsigned long *mapkey, efi_bootinfo_t *efi_booti
  	return EFI_SUCCESS;
  }
  
-+static efi_status_t setup_pre_boot_rsdp(efi_bootinfo_t *efi_bootinfo)
-+{
-+	return efi_get_system_config_table(ACPI_TABLE_GUID, (void **)&efi_bootinfo->rsdp);
-+}
++/* Defined in cstart64.S or efistart64.S */
++extern phys_addr_t ptl5;
++extern phys_addr_t ptl4;
++extern phys_addr_t ptl3;
++extern phys_addr_t ptl2;
 +
- efi_status_t setup_efi_pre_boot(unsigned long *mapkey, efi_bootinfo_t *efi_bootinfo)
- {
- 	efi_status_t status;
-@@ -239,6 +245,12 @@ efi_status_t setup_efi_pre_boot(unsigned long *mapkey, efi_bootinfo_t *efi_booti
- 		return status;
- 	}
- 
-+	status = setup_pre_boot_rsdp(efi_bootinfo);
-+	if (status != EFI_SUCCESS) {
-+		printf("Cannot find RSDP in EFI system table\n");
-+		return status;
++static void setup_page_table(void)
++{
++	pgd_t *curr_pt;
++	phys_addr_t flags;
++	int i;
++
++	/* Set default flags */
++	flags = PT_PRESENT_MASK | PT_WRITABLE_MASK | PT_USER_MASK;
++
++	/* Level 5 */
++	curr_pt = (pgd_t *)&ptl5;
++	curr_pt[0] = ((phys_addr_t)&ptl4) | flags;
++	/* Level 4 */
++	curr_pt = (pgd_t *)&ptl4;
++	curr_pt[0] = ((phys_addr_t)&ptl3) | flags;
++	/* Level 3 */
++	curr_pt = (pgd_t *)&ptl3;
++	for (i = 0; i < 4; i++) {
++		curr_pt[i] = (((phys_addr_t)&ptl2) + i * PAGE_SIZE) | flags;
++	}
++	/* Level 2 */
++	curr_pt = (pgd_t *)&ptl2;
++	flags |= PT_ACCESSED_MASK | PT_DIRTY_MASK | PT_PAGE_SIZE_MASK | PT_GLOBAL_MASK;
++	for (i = 0; i < 4 * 512; i++)	{
++		curr_pt[i] = ((phys_addr_t)(i << 21)) | flags;
 +	}
 +
- 	return EFI_SUCCESS;
- }
- 
-@@ -261,6 +273,7 @@ void setup_efi(efi_bootinfo_t *efi_bootinfo)
- 	enable_x2apic();
++	/* Load 4-level page table */
++	write_cr3((ulong)&ptl4);
++}
++
++void setup_5level_page_table(void)
++{
++	/*
++	 * TODO: This function is a place holder for now. It is defined because
++	 * some test cases (e.g. x86/access.c) expect it to exist. If this
++	 * function is not defined, gcc may generate wrong position-independent
++	 * code, which leads to incorrect memory access: if compiling
++	 * x86/access.efi without this function defined, several data structures
++	 * (e.g. apic_ops) get compile time offset memory addresses, but they
++	 * should get runtime %rip based addresses.
++	 *
++	 * The reason this function does not contain any code: Setting up 5
++	 * level page table requires x86 to enter the real mode. But real mode
++	 * is currently not supported in kvm-unit-tests under UEFI.
++	 */
++}
++
+ static void setup_gdt_tss(void)
+ {
+ 	size_t tss_offset;
+@@ -274,6 +328,7 @@ void setup_efi(efi_bootinfo_t *efi_bootinfo)
  	smp_init();
  	phys_alloc_init(efi_bootinfo->free_mem_start, efi_bootinfo->free_mem_size);
-+	setup_efi_rsdp(efi_bootinfo->rsdp);
+ 	setup_efi_rsdp(efi_bootinfo->rsdp);
++	setup_page_table();
  }
  
  #endif /* TARGET_EFI */
+diff --git a/x86/efi/efistart64.S b/x86/efi/efistart64.S
+index 57299a5..adfff3a 100644
+--- a/x86/efi/efistart64.S
++++ b/x86/efi/efistart64.S
+@@ -17,6 +17,29 @@ ring0stacksize = PAGE_SIZE
+ 	.align 16
+ ring0stacktop:
+ 
++.data
++
++.align PAGE_SIZE
++.globl ptl2
++ptl2:
++	. = . + 4 * PAGE_SIZE
++.align PAGE_SIZE
++
++.globl ptl3
++ptl3:
++	. = . + PAGE_SIZE
++.align PAGE_SIZE
++
++.globl ptl4
++ptl4:
++	. = . + PAGE_SIZE
++.align PAGE_SIZE
++
++.globl ptl5
++ptl5:
++	. = . + PAGE_SIZE
++.align PAGE_SIZE
++
+ .section .init
+ .code64
+ .text
 -- 
 2.33.0
 
