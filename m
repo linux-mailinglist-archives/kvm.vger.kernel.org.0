@@ -2,194 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 47E1F4208DA
-	for <lists+kvm@lfdr.de>; Mon,  4 Oct 2021 11:57:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D6189420915
+	for <lists+kvm@lfdr.de>; Mon,  4 Oct 2021 12:11:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232498AbhJDJ7F (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Oct 2021 05:59:05 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28489 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232161AbhJDJ7E (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 4 Oct 2021 05:59:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1633341435;
+        id S229760AbhJDKMu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Oct 2021 06:12:50 -0400
+Received: from mout-p-102.mailbox.org ([80.241.56.152]:60732 "EHLO
+        mout-p-102.mailbox.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230086AbhJDKMs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Oct 2021 06:12:48 -0400
+X-Greylist: delayed 3742 seconds by postgrey-1.27 at vger.kernel.org; Mon, 04 Oct 2021 06:12:48 EDT
+Received: from smtp2.mailbox.org (smtp2.mailbox.org [80.241.60.241])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mout-p-102.mailbox.org (Postfix) with ESMTPS id 4HNGh303SZzQkBK;
+        Mon,  4 Oct 2021 12:10:59 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=mailbox.org; h=
+        content-transfer-encoding:content-type:content-type:mime-version
+        :subject:subject:references:in-reply-to:message-id:from:from
+        :date:date:received; s=mail20150812; t=1633342256; bh=eS2EPe4eHl
+        2N1wDjzplFdaJCLfRzATCMbKor42NuLwQ=; b=E5gsHViEF9b6Qz9kxmyyixgv63
+        kgOfreOt975wyzF4qnLA2hTIqdcoBa6zprAKzC7UN8NqIyAveBotnzd+GFVX+PfP
+        VDd7q3wkmW+pvIaTlZJhU9asm/yJkqZSUJm7q/ii1UVv1gfA9wjvrSSYeF76j3s4
+        98tCJbElMG2Jw0Jq6IBILOrC1JOV1mJMMG0hCxM997GDW3JDayTrGSvITetvgTBa
+        trBUEvv5iPUe/kAa6CRzc4ZPyK352eHuMuXfNrP7dYRkVN2WZQat2OGb8yx8F1TP
+        3Hid3uLhVNoYn2lr/ZGbicG6EBqV8OuU8i+4Gkb4DFkCaKZYnYSofJaiwdgg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
+        t=1633342257;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=uN4kK1pXQZANYm2HaFwo6QaP04q5hMTYTuZqmJHwjTY=;
-        b=G0iTypB70q3sflzQM7R+1mHu82+8NPUzaRbBKIDGGD5Zd+6qCAmfSto2O6G0+DTNBt/ooq
-        b0/bj+TKaOkFrOVhnfYlGEPfwk4ScDOFFaDnoi+0P2DFDToRGQ74bD7uP3R90yxAKmZK/B
-        203JdLSI1//jK9Obw0LAzZh5rBZkzcU=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-321-eFJ9LHKDMB27Jkz0lHxhEQ-1; Mon, 04 Oct 2021 05:57:14 -0400
-X-MC-Unique: eFJ9LHKDMB27Jkz0lHxhEQ-1
-Received: by mail-wr1-f72.google.com with SMTP id j15-20020a5d564f000000b00160698bf7e9so4447097wrw.13
-        for <kvm@vger.kernel.org>; Mon, 04 Oct 2021 02:57:14 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=uN4kK1pXQZANYm2HaFwo6QaP04q5hMTYTuZqmJHwjTY=;
-        b=bkYBK/sBGePDs7hadfusgD/OMet7Fxw4oOp6cK8PeZusvfJpZhm9vZ240IOzAD+rfA
-         B9EEVnZ1DRF4CRurjbaeR7lxk13zpmKuivihRKs4YX4KO6055Kliwe4SP7kxazcPzaJQ
-         QdMieIq4MD+lHNKqtcmEhQc3q6752CCrxYvy2BuXRdUVm0Q4h+MTEI73Zz8BoXIAcmmA
-         A6M4zTwO3JFd6JMQzOeFurssaFz0z+tm+V6bLa0vw+7rHjaHyH6Lm+m0c1plbtaR2l61
-         HXwcf9DNqbYYOk/u0lpkZKB7BiWP0ghWTHABfFC+1DizVY1PqmQtvcbYJxOHV3ff6zaF
-         lASQ==
-X-Gm-Message-State: AOAM532A0OhxtsLXI8MhlegiNcbqLAZUQOz7c+Q0Kih8CQODsmFm9PUz
-        7p7pjyD26c/DFKwVweWkL99I/IcLI4772vI4e8pCks5YQk1RzA/4xaMPy2F/WRNgheD6BFksjhq
-        +7oXsk5r1YcSp
-X-Received: by 2002:adf:8b98:: with SMTP id o24mr13372075wra.302.1633341433472;
-        Mon, 04 Oct 2021 02:57:13 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzpWd/y8XqYfgDbtRv96Gzc0e4logE1MVVZzrOjkYgjzLmgLB8e4N0CQwcq7o26faMqWhKBmQ==
-X-Received: by 2002:adf:8b98:: with SMTP id o24mr13372042wra.302.1633341433218;
-        Mon, 04 Oct 2021 02:57:13 -0700 (PDT)
-Received: from work-vm (cpc109025-salf6-2-0-cust480.10-2.cable.virginm.net. [82.30.61.225])
-        by smtp.gmail.com with ESMTPSA id n186sm16112484wme.31.2021.10.04.02.57.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Oct 2021 02:57:12 -0700 (PDT)
-Date:   Mon, 4 Oct 2021 10:57:10 +0100
-From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To:     Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Cc:     qemu-devel@nongnu.org, Dov Murik <dovmurik@linux.ibm.com>,
-        Sergio Lopez <slp@redhat.com>, kvm@vger.kernel.org,
-        James Bottomley <jejb@linux.ibm.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        "Daniel P . Berrange" <berrange@redhat.com>
-Subject: Re: [PATCH v3 14/22] target/i386/sev: Move
- qmp_query_sev_attestation_report() to sev.c
-Message-ID: <YVrP9sGcUNuRuXm6@work-vm>
-References: <20211002125317.3418648-1-philmd@redhat.com>
- <20211002125317.3418648-15-philmd@redhat.com>
+        bh=zP6aY9O1wW8f739eGeU+KeGXD/SGH19xgBt/Oo3Iwx8=;
+        b=X+A/g8xWEi631k+mYpNmmMPDPuTcV9ftD+BsgNIoMqmOSUSFoILCzqjftRpMzGneEQ8PjR
+        lL6UYvywXHAciMZ2qSJxr2p5Xzh1FRRo+wGdoPAeKB1Cqgpp6u0bLsxedHz4ZWvNNLp59U
+        hitOCjveWwngbocwdfcOUqmUQPBh2b1YmMXCd1QrVGh9KFPqX1mUwZfIaN2zjREwGnVR7J
+        jIJlZOJsfV7ZxItfzPC5ILIkWuLFcJA4/Fd9gtaxbWiuQYLAmG5tQK+/yzOH4BlNNlGsYo
+        z52jIWktVJuJkVKp+DiPIVtoSlWSfCqaqdOa0iIcxdRBBfIpInSo6aeg7kPKBQ==
+X-Virus-Scanned: amavisd-new at heinlein-support.de
+Date:   Mon, 4 Oct 2021 12:10:55 +0200 (CEST)
+From:   torvic9@mailbox.org
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "ndesaulniers@google.com" <ndesaulniers@google.com>,
+        "nathan@kernel.org" <nathan@kernel.org>
+Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "bp@alien8.de" <bp@alien8.de>
+Message-ID: <1723492337.161319.1633342255263@office.mailbox.org>
+In-Reply-To: <c4773ecc-053f-9bc6-03af-5039397a4531@redhat.com>
+References: <1446878298.170497.1633338512925@office.mailbox.org>
+ <b6abc5a3-39ea-b463-9df5-f50bdcb16d08@redhat.com>
+ <936688112.157288.1633339838738@office.mailbox.org>
+ <c4773ecc-053f-9bc6-03af-5039397a4531@redhat.com>
+Subject: Re: [BUG] [5.15] Compilation error in arch/x86/kvm/mmu/spte.h with
+ clang-14
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20211002125317.3418648-15-philmd@redhat.com>
-User-Agent: Mutt/2.0.7 (2021-05-04)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Priority: 3
+Importance: Normal
+X-Rspamd-Queue-Id: 02CE317FC
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-* Philippe Mathieu-Daudé (philmd@redhat.com) wrote:
-> Move qmp_query_sev_attestation_report() from monitor.c to sev.c
-> and make sev_get_attestation_report() static. We don't need the
-> stub anymore, remove it.
+
+> Paolo Bonzini <pbonzini@redhat.com> hat am 04.10.2021 11:49 geschrieben:
 > 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
->  target/i386/sev_i386.h        |  2 --
->  target/i386/monitor.c         |  6 ------
->  target/i386/sev-sysemu-stub.c |  7 ++++---
->  target/i386/sev.c             | 12 ++++++++++--
->  4 files changed, 14 insertions(+), 13 deletions(-)
+>  
+> On 04/10/21 11:30, torvic9@mailbox.org wrote:
+> > 
+> >> Paolo Bonzini <pbonzini@redhat.com> hat am 04.10.2021 11:26 geschrieben:
+> >>
+> >>   
+> >> On 04/10/21 11:08, torvic9@mailbox.org wrote:
+> >>> I encounter the following issue when compiling 5.15-rc4 with clang-14:
+> >>>
+> >>> In file included from arch/x86/kvm/mmu/mmu.c:27:
+> >>> arch/x86/kvm/mmu/spte.h:318:9: error: use of bitwise '|' with boolean operands [-Werror,-Wbitwise-instead-of-logical]
+> >>>           return __is_bad_mt_xwr(rsvd_check, spte) |
+> >>>                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> >>>                                                    ||
+> >>> arch/x86/kvm/mmu/spte.h:318:9: note: cast one or both operands to int to silence this warning
+> >>
+> >> The warning is wrong, as mentioned in the line right above:
+> > 
+> > So it's an issue with clang-14 then?
+> > (I add Nick and Nathan)
 > 
-> diff --git a/target/i386/sev_i386.h b/target/i386/sev_i386.h
-> index 2d9a1a0112e..5f367f78eb7 100644
-> --- a/target/i386/sev_i386.h
-> +++ b/target/i386/sev_i386.h
-> @@ -27,8 +27,6 @@
->  extern SevInfo *sev_get_info(void);
->  extern char *sev_get_launch_measurement(void);
->  extern SevCapability *sev_get_capabilities(Error **errp);
-> -extern SevAttestationReport *
-> -sev_get_attestation_report(const char *mnonce, Error **errp);
->  
->  int sev_encrypt_flash(uint8_t *ptr, uint64_t len, Error **errp);
->  int sev_inject_launch_secret(const char *hdr, const char *secret,
-> diff --git a/target/i386/monitor.c b/target/i386/monitor.c
-> index a9f85acd473..c05d70252a2 100644
-> --- a/target/i386/monitor.c
-> +++ b/target/i386/monitor.c
-> @@ -764,12 +764,6 @@ void qmp_sev_inject_launch_secret(const char *packet_hdr,
->      sev_inject_launch_secret(packet_hdr, secret, gpa, errp);
->  }
->  
-> -SevAttestationReport *
-> -qmp_query_sev_attestation_report(const char *mnonce, Error **errp)
-> -{
-> -    return sev_get_attestation_report(mnonce, errp);
-> -}
-> -
->  SGXInfo *qmp_query_sgx(Error **errp)
->  {
->      return sgx_get_info(errp);
-> diff --git a/target/i386/sev-sysemu-stub.c b/target/i386/sev-sysemu-stub.c
-> index d556b4f091f..813b9a6a03b 100644
-> --- a/target/i386/sev-sysemu-stub.c
-> +++ b/target/i386/sev-sysemu-stub.c
-> @@ -13,6 +13,7 @@
->  
->  #include "qemu/osdep.h"
->  #include "qapi/qapi-commands-misc-target.h"
-> +#include "qapi/qmp/qerror.h"
->  #include "qapi/error.h"
->  #include "sev_i386.h"
->  
-> @@ -52,9 +53,9 @@ int sev_es_save_reset_vector(void *flash_ptr, uint64_t flash_size)
->      g_assert_not_reached();
->  }
->  
-> -SevAttestationReport *sev_get_attestation_report(const char *mnonce,
-> -                                                 Error **errp)
-> +SevAttestationReport *qmp_query_sev_attestation_report(const char *mnonce,
-> +                                                       Error **errp)
->  {
-> -    error_setg(errp, "SEV is not available in this QEMU");
-> +    error_setg(errp, QERR_UNSUPPORTED);
+> My clang here doesn't have the option, so I'm going to ask---are you 
+> using W=1?  I can see why clang is warning for KVM's code, but in my 
+> opinion such a check should only be in -Wextra.
 
-I did like that message making it clear the reason it was unsupported
-was this build, rather than lack of host support or not enabling it.
+I don't use any options (not that I'm aware of).
+Clang version 14.0.0 5f7a5353301b776ffb0e5fb048992898507bf7ee
 
-Dave
-
->      return NULL;
->  }
-> diff --git a/target/i386/sev.c b/target/i386/sev.c
-> index aefbef4bb63..91a217bbb85 100644
-> --- a/target/i386/sev.c
-> +++ b/target/i386/sev.c
-> @@ -31,6 +31,8 @@
->  #include "migration/blocker.h"
->  #include "qom/object.h"
->  #include "monitor/monitor.h"
-> +#include "qapi/qapi-commands-misc-target.h"
-> +#include "qapi/qmp/qerror.h"
->  #include "exec/confidential-guest-support.h"
->  #include "hw/i386/pc.h"
->  
-> @@ -487,8 +489,8 @@ out:
->      return cap;
->  }
->  
-> -SevAttestationReport *
-> -sev_get_attestation_report(const char *mnonce, Error **errp)
-> +static SevAttestationReport *sev_get_attestation_report(const char *mnonce,
-> +                                                        Error **errp)
->  {
->      struct kvm_sev_attestation_report input = {};
->      SevAttestationReport *report = NULL;
-> @@ -549,6 +551,12 @@ sev_get_attestation_report(const char *mnonce, Error **errp)
->      return report;
->  }
->  
-> +SevAttestationReport *qmp_query_sev_attestation_report(const char *mnonce,
-> +                                                       Error **errp)
-> +{
-> +    return sev_get_attestation_report(mnonce, errp);
-> +}
-> +
->  static int
->  sev_read_file_base64(const char *filename, guchar **data, gsize *len)
->  {
-> -- 
-> 2.31.1
 > 
--- 
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-
+> Paolo
+> 
+> >>
+> >>           /*
+> >>            * Use a bitwise-OR instead of a logical-OR to aggregate the reserved
+> >>            * bits and EPT's invalid memtype/XWR checks to avoid an extra Jcc
+> >>            * (this is extremely unlikely to be short-circuited as true).
+> >>            */
+> >>
+> >> Paolo
+> >
