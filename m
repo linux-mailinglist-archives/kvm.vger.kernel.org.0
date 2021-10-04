@@ -2,25 +2,25 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 25A3842156C
-	for <lists+kvm@lfdr.de>; Mon,  4 Oct 2021 19:49:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7BB1E421570
+	for <lists+kvm@lfdr.de>; Mon,  4 Oct 2021 19:49:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236031AbhJDRvG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Oct 2021 13:51:06 -0400
-Received: from mail.kernel.org ([198.145.29.99]:32910 "EHLO mail.kernel.org"
+        id S237763AbhJDRvI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Oct 2021 13:51:08 -0400
+Received: from mail.kernel.org ([198.145.29.99]:32922 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233928AbhJDRu4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S235334AbhJDRu4 (ORCPT <rfc822;kvm@vger.kernel.org>);
         Mon, 4 Oct 2021 13:50:56 -0400
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 7B85461244;
-        Mon,  4 Oct 2021 17:49:02 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 350BC6124D;
+        Mon,  4 Oct 2021 17:49:03 +0000 (UTC)
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <maz@kernel.org>)
-        id 1mXS5E-00EhBv-SD; Mon, 04 Oct 2021 18:49:00 +0100
+        id 1mXS5F-00EhBv-7V; Mon, 04 Oct 2021 18:49:01 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org
@@ -34,9 +34,9 @@ Cc:     will@kernel.org, qperret@google.com, dbrazdil@google.com,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         kernel-team@android.com
-Subject: [PATCH v2 05/16] KVM: arm64: Plumb MMIO checking into the fault handling
-Date:   Mon,  4 Oct 2021 18:48:38 +0100
-Message-Id: <20211004174849.2831548-6-maz@kernel.org>
+Subject: [PATCH v2 06/16] KVM: arm64: Force a full unmap on vpcu reinit
+Date:   Mon,  4 Oct 2021 18:48:39 +0100
+Message-Id: <20211004174849.2831548-7-maz@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20211004174849.2831548-1-maz@kernel.org>
 References: <20211004174849.2831548-1-maz@kernel.org>
@@ -50,57 +50,44 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Plumb the MMIO checking code into the MMIO fault handling code.
-Nothing allows a region to be registered yet, so there should be
-no funtional change either.
+As we now keep information in the S2PT, we must be careful not
+to keep it across a VM reboot, which could otherwise lead to
+interesting problems.
+
+Make sure that the S2 is completely discarded on reset of
+a vcpu, and remove the flag that enforces the MMIO check.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/mmio.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ arch/arm64/kvm/psci.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/arch/arm64/kvm/mmio.c b/arch/arm64/kvm/mmio.c
-index 3dd38a151d2a..dfa375823264 100644
---- a/arch/arm64/kvm/mmio.c
-+++ b/arch/arm64/kvm/mmio.c
-@@ -6,6 +6,7 @@
+diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
+index 74c47d420253..6c9cb041f764 100644
+--- a/arch/arm64/kvm/psci.c
++++ b/arch/arm64/kvm/psci.c
+@@ -12,6 +12,7 @@
  
- #include <linux/kvm_host.h>
+ #include <asm/cputype.h>
  #include <asm/kvm_emulate.h>
 +#include <asm/kvm_mmu.h>
- #include <trace/events/kvm.h>
  
- #include "trace.h"
-@@ -135,6 +136,13 @@ int io_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
- 	 * volunteered to do so, and bail out otherwise.
- 	 */
- 	if (!kvm_vcpu_dabt_isvalid(vcpu)) {
-+		/* With MMIO guard enabled, the guest should know better */
-+		if (test_bit(KVM_ARCH_FLAG_MMIO_GUARD,
-+			     &vcpu->kvm->arch.flags)) {
-+			kvm_inject_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
-+			return 1;
-+		}
-+
- 		if (test_bit(KVM_ARCH_FLAG_RETURN_NISV_IO_ABORT_TO_USER,
- 			     &vcpu->kvm->arch.flags)) {
- 			run->exit_reason = KVM_EXIT_ARM_NISV;
-@@ -156,6 +164,15 @@ int io_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
- 	len = kvm_vcpu_dabt_get_as(vcpu);
- 	rt = kvm_vcpu_dabt_get_rd(vcpu);
+ #include <kvm/arm_psci.h>
+ #include <kvm/arm_hypercalls.h>
+@@ -180,6 +181,13 @@ static void kvm_prepare_system_event(struct kvm_vcpu *vcpu, u32 type)
+ 		tmp->arch.power_off = true;
+ 	kvm_make_all_cpus_request(vcpu->kvm, KVM_REQ_SLEEP);
  
-+	/* Check failed? Return to the guest for debriefing... */
-+	if (!kvm_check_ioguard_page(vcpu, fault_ipa))
-+		return 1;
++	/*
++	 * If the MMIO guard was enabled, we pay the price of a full
++	 * unmap to get back to a sane state (and clear the flag).
++	 */
++	if (test_and_clear_bit(KVM_ARCH_FLAG_MMIO_GUARD, &vcpu->kvm->arch.flags))
++		stage2_unmap_vm(vcpu->kvm);
 +
-+	/* If we cross a page boundary, check that too... */
-+	if (((fault_ipa + len - 1) & PAGE_MASK) != (fault_ipa & PAGE_MASK) &&
-+	    !kvm_check_ioguard_page(vcpu, fault_ipa + len - 1))
-+		return 1;
-+
- 	if (is_write) {
- 		data = vcpu_data_guest_to_host(vcpu, vcpu_get_reg(vcpu, rt),
- 					       len);
+ 	memset(&vcpu->run->system_event, 0, sizeof(vcpu->run->system_event));
+ 	vcpu->run->system_event.type = type;
+ 	vcpu->run->exit_reason = KVM_EXIT_SYSTEM_EVENT;
 -- 
 2.30.2
 
