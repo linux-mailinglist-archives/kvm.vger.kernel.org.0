@@ -2,148 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C2165420B1B
-	for <lists+kvm@lfdr.de>; Mon,  4 Oct 2021 14:44:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 758B4420B28
+	for <lists+kvm@lfdr.de>; Mon,  4 Oct 2021 14:47:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233163AbhJDMqG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Oct 2021 08:46:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:28681 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231965AbhJDMqF (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 4 Oct 2021 08:46:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1633351456;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Uw5NpJXbzzDq6kJP5OT7G1gnqMoSZ/d9kINK/rCAzT8=;
-        b=BxHI6+wDN1wv6aCI0K67XaumqqvHCuCiQI4HsCcm72UdyKh0joKL4hFT/qv8VZd4hbByfB
-        /bnK0sqczZUu92lpURpxRDtl22AXmz+mrj7JBBvmh+BempPckx8AC7/EN8eOR/KRKoXoyB
-        mRaMhcmu5I9aidQnq+hocIcIcrs3mng=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-434-Y0qbzroBMMWkT3vwSppo1A-1; Mon, 04 Oct 2021 08:44:15 -0400
-X-MC-Unique: Y0qbzroBMMWkT3vwSppo1A-1
-Received: by mail-wr1-f70.google.com with SMTP id s18-20020adfbc12000000b00160b2d4d5ebso183976wrg.7
-        for <kvm@vger.kernel.org>; Mon, 04 Oct 2021 05:44:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Uw5NpJXbzzDq6kJP5OT7G1gnqMoSZ/d9kINK/rCAzT8=;
-        b=CtFzLO9do6uf802XDgFxEFrZrcQDy1pwIKS+GFLOxA6fhhBBUpzyWo+tRV7dzJJWve
-         Gj7iwbWU/8dheNQeP1pMAeUTTphsPg/DXIyfIrrPrhM2AiVXDxms25A0jgxtByFno6TA
-         HB1k0XNCBxIQo8FFg7eDrAAfDMp8yrm7VOC+VEFbysoIGijayBG7LmFD4HSOn7+xqwE4
-         s9iCZzwgpN0OzzWdnBEOHYccTI23ztdsCAHtc+twiSm9lQdwkteXqhXlxTdsq3jMfWka
-         dQPx5wj7Lkh5zhdddp5O12xPtCf10IIl2eu9KIkKHwlJMvdQLigwQrp3WSXltye91l+h
-         1Ujg==
-X-Gm-Message-State: AOAM533uM0Z8cSzPZ1vDCqYBXagKY9zwMWv6d+3paDuHrCIqqsluiHko
-        LKiwFqndMRc00uwqG+eRVN358ayfQzHkaD09KgJkhW7iRs3AmqUc4zxsCPsQq4dewNQIJ227I+X
-        ZLce12vez3wpJ
-X-Received: by 2002:a05:600c:a43:: with SMTP id c3mr1337365wmq.193.1633351454295;
-        Mon, 04 Oct 2021 05:44:14 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz4nEBKHflJAK2AmabY0s2VvyOBAWVL0rQ87qW9vo8k6xnnXuaoOWlGnMLJ2dMtwaNobKrbOA==
-X-Received: by 2002:a05:600c:a43:: with SMTP id c3mr1337349wmq.193.1633351454093;
-        Mon, 04 Oct 2021 05:44:14 -0700 (PDT)
-Received: from gator (nat-pool-brq-u.redhat.com. [213.175.37.12])
-        by smtp.gmail.com with ESMTPSA id d129sm17767301wmd.23.2021.10.04.05.44.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Oct 2021 05:44:13 -0700 (PDT)
-Date:   Mon, 4 Oct 2021 14:44:11 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Zixuan Wang <zixuanwang@google.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, marcorr@google.com,
-        baekhw@google.com, tmroeder@google.com, erdemaktas@google.com,
-        rientjes@google.com, seanjc@google.com, brijesh.singh@amd.com,
-        Thomas.Lendacky@amd.com, varad.gautam@suse.com, jroedel@suse.de,
-        bp@suse.de
-Subject: Re: [kvm-unit-tests PATCH v2 03/17] x86 UEFI: Copy code from GNU-EFI
-Message-ID: <20211004124411.nqikc4wyvpal73sh@gator>
-References: <20210827031222.2778522-1-zixuanwang@google.com>
- <20210827031222.2778522-4-zixuanwang@google.com>
+        id S233268AbhJDMtr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Oct 2021 08:49:47 -0400
+Received: from foss.arm.com ([217.140.110.172]:56046 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233151AbhJDMtq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Oct 2021 08:49:46 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B64B81FB;
+        Mon,  4 Oct 2021 05:47:57 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 12DA63F70D;
+        Mon,  4 Oct 2021 05:47:55 -0700 (PDT)
+Message-ID: <7b629634-0d0d-5601-3a64-c418ef2fc1e6@arm.com>
+Date:   Mon, 4 Oct 2021 13:49:31 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210827031222.2778522-4-zixuanwang@google.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.2
+Subject: Re: [PATCH 3/5] KVM: arm64: vgic-v3: Don't advertise
+ ICC_CTLR_EL1.SEIS
+Content-Language: en-US
+To:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc:     James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        kernel-team@android.com,
+        Alexandru Elisei <alexandru.elisei@arm.com>
+References: <20210924082542.2766170-1-maz@kernel.org>
+ <20210924082542.2766170-4-maz@kernel.org>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+In-Reply-To: <20210924082542.2766170-4-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 27, 2021 at 03:12:08AM +0000, Zixuan Wang wrote:
-> To build x86 test cases with UEFI, we need to borrow some source
-> code from GNU-EFI, which includes the initialization code and linker
-> scripts. This commit only copies the source code, without any
-> modification. These source code files are not used by KVM-Unit-Tests
-> in this commit.
-> 
-> The following source code is copied from GNU-EFI:
->    1. x86/efi/elf_x86_64_efi.lds
->    2. x86/efi/reloc_x86_64.c
->    3. x86/efi/crt0-efi-x86_64.S
-> 
-> We put these EFI-related files under a new dir `x86/efi` because:
->    1. EFI-related code is easy to find
->    2. EFI-related code is separated from the original code in `x86/`
->    3. EFI-related code can still reuse the Makefile and test case code
->       in its parent dir `x86/`
-> 
-> GNU-EFI repo and version:
->    GIT URL: https://git.code.sf.net/p/gnu-efi/code
->    Commit ID: 4fe83e102674
->    Website: https://sourceforge.net/p/gnu-efi/code/ci/4fe83e/tree/
-> 
-> Co-developed-by: Varad Gautam <varad.gautam@suse.com>
-> Signed-off-by: Varad Gautam <varad.gautam@suse.com>
-> Signed-off-by: Zixuan Wang <zixuanwang@google.com>
-> ---
->  x86/efi/README.md          |  25 ++++++++++
->  x86/efi/crt0-efi-x86_64.S  |  79 +++++++++++++++++++++++++++++
->  x86/efi/elf_x86_64_efi.lds |  77 ++++++++++++++++++++++++++++
->  x86/efi/reloc_x86_64.c     | 100 +++++++++++++++++++++++++++++++++++++
->  4 files changed, 281 insertions(+)
->  create mode 100644 x86/efi/README.md
->  create mode 100644 x86/efi/crt0-efi-x86_64.S
->  create mode 100644 x86/efi/elf_x86_64_efi.lds
->  create mode 100644 x86/efi/reloc_x86_64.c
-> 
-> diff --git a/x86/efi/README.md b/x86/efi/README.md
-> new file mode 100644
-> index 0000000..256ef8c
-> --- /dev/null
-> +++ b/x86/efi/README.md
-> @@ -0,0 +1,25 @@
-> +# EFI Startup Code and Linker Script
-> +
-> +This dir contains source code and linker script copied from
-> +[GNU-EFI](https://sourceforge.net/projects/gnu-efi/):
-> +   - crt0-efi-x86_64.S: startup code of an EFI application
-> +   - elf_x86_64_efi.lds: linker script to build an EFI application
-> +   - reloc_x86_64.c: position independent x86_64 ELF shared object relocator
-> +
-> +EFI application binaries should be relocatable as UEFI loads binaries to dynamic
-> +runtime addresses. To build such relocatable binaries, GNU-EFI utilizes the
-> +above-mentioned files in its build process:
-> +
-> +   1. build an ELF shared object and link it using linker script
-> +      `elf_x86_64_efi.lds` to organize the sections in a way UEFI recognizes
-> +   2. link the shared object with self-relocator `reloc_x86_64.c` that applies
-> +      dynamic relocations that may be present in the shared object
-> +   3. link the entry point code `crt0-efi-x86_64.S` that invokes self-relocator
-> +      and then jumps to EFI application's `efi_main()` function
-> +   4. convert the shared object to an EFI binary
-> +
-> +More details can be found in `GNU-EFI/README.gnuefi`, section "Building
-> +Relocatable Binaries".
-> +
-> +KVM-Unit-Tests follows a similar build process, but does not link with GNU-EFI
-> +library.
+Hi Marc,
 
-So, for AArch64, I also want to drop the gnu-efi dependency of my original
-PoC. My second PoC, which I haven't finished, took things a bit further
-than this does, though. I was integrating a PE/COFF header and linker
-script changes directly into the kvm-unit-tests code rather than copying
-these files over.
+On 9/24/21 09:25, Marc Zyngier wrote:
+> Since we are trapping all sysreg accesses when ICH_VTR_EL2.SEIS
+> is set, and that we never deliver an SError when emulating
+> any of the GICv3 sysregs, don't advertise ICC_CTLR_EL1.SEIS.
+
+Makes sense, we don't emulate it, so don't advertise it. Checked
+__vgic_v3_write_ctlr(), and we only allow the guest to modify EOI mode and which
+register is responsible for determining the binary point for the interrupt priority.
+
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
 
 Thanks,
-drew
 
+Alex
+
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/hyp/vgic-v3-sr.c | 2 --
+>  1 file changed, 2 deletions(-)
+>
+> diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+> index 39f8f7f9227c..b3b50de496a3 100644
+> --- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
+> +++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+> @@ -987,8 +987,6 @@ static void __vgic_v3_read_ctlr(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
+>  	val = ((vtr >> 29) & 7) << ICC_CTLR_EL1_PRI_BITS_SHIFT;
+>  	/* IDbits */
+>  	val |= ((vtr >> 23) & 7) << ICC_CTLR_EL1_ID_BITS_SHIFT;
+> -	/* SEIS */
+> -	val |= ((vtr >> 22) & 1) << ICC_CTLR_EL1_SEIS_SHIFT;
+>  	/* A3V */
+>  	val |= ((vtr >> 21) & 1) << ICC_CTLR_EL1_A3V_SHIFT;
+>  	/* EOImode */
