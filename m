@@ -2,77 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CE6994207E1
-	for <lists+kvm@lfdr.de>; Mon,  4 Oct 2021 11:08:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 29A00420837
+	for <lists+kvm@lfdr.de>; Mon,  4 Oct 2021 11:26:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231806AbhJDJKa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Oct 2021 05:10:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59468 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229716AbhJDJK3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Oct 2021 05:10:29 -0400
-Received: from mout-p-201.mailbox.org (mout-p-201.mailbox.org [IPv6:2001:67c:2050::465:201])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D68EC061745
-        for <kvm@vger.kernel.org>; Mon,  4 Oct 2021 02:08:40 -0700 (PDT)
-Received: from smtp202.mailbox.org (smtp202.mailbox.org [IPv6:2001:67c:2050:105:465:1:4:0])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mout-p-201.mailbox.org (Postfix) with ESMTPS id 4HNFJ50tk7zQjXt;
-        Mon,  4 Oct 2021 11:08:37 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=mailbox.org; h=
-        content-transfer-encoding:content-type:content-type:mime-version
-        :subject:subject:message-id:from:from:date:date:received; s=
-        mail20150812; t=1633338514; bh=iczBuNeKxMSt9GchG24tfrLadG0Q/+xNf
-        DfEbX6n980=; b=cqAxQN0K8afO8vrx1KoypomXNAmecmlCZz5f74/CifebVpgx8
-        WH6ibOkH18Giv4Hb6Oa4/e3WGpjLsCf88NgiVQrZP6DcTuJj2ZUXctTmRKZuDR7s
-        c5qeCcQvMHpAuRS+EBZ9/boSu3A7MM/XgxkP8q4fAvKVHV6quGiaQwZUQHLts7ne
-        CO2WKItUMU06tb7v6kaoOEhT2H4alOR+auWpvykzxyN1SuHUZLkNSCJUqvpa5eak
-        3Un8chZIzpfGXh/9LJHKuevaG+rqKPLTOk0e47mHkzpiMJ7RTsa2I/l+yQ7ozDJq
-        BozuRDB2ZUeuMwlkfxSLzzOyX/wj27Tf20J5Q==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-        t=1633338515;
+        id S231970AbhJDJ2D (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Oct 2021 05:28:03 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:46300 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231869AbhJDJ2D (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 4 Oct 2021 05:28:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1633339573;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=+t7IKBWZmILIRTmMocEZj/h9XzhfaLlZiTzEL88EPGM=;
-        b=WDwI3iPyyIWeaMkSL2N/7YBDrkaYWZ73qmZPlXcmuyDewWXtGSjry2WEBX0RZ40LVKlaj6
-        RNnLklgjUkMzeK8ub2oH668PxEQmPM93izJvdpLIX/atqfwarBFnPtPx2EauYnf8hgTPdR
-        Qc4MCvMpM3vpPjBVxGgYvG9gFuwqdqSr1KM+5HwuvU9sh8ccm/bf5D4p6vNSnFl4DGufFY
-        Gex2blTyLCRFpcpFArUfRTO1vFhjtk5uMGDZdheRGk318xQ56yHKflyujjxql6twnwCc9c
-        bQUk/8KRquqy0jcHQAfawPhDYq4wJS1/Toj9eRogVmL/QOK5pFwaCvZxcYcpvA==
-X-Virus-Scanned: amavisd-new at heinlein-support.de
-Date:   Mon, 4 Oct 2021 11:08:32 +0200 (CEST)
-From:   torvic9@mailbox.org
-To:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "seanjc@google.com" <seanjc@google.com>,
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=UpqA3RAtB68rUMSfW6XEZltEn9tatTT1LRY0PkKsI3I=;
+        b=YV+Bg/tVManfQo8vB1Al1sCz+wFfhncmYOlbWNBfWDG0qHUdJPTAEFZU68uHzECNYRKz0x
+        plvQAsHGozyOJFpCoafP/4YVbFgheGqhUqKDKdTje+jUxJd0Gkm91I7PZcYDGrPTRyTA5w
+        kPhIiwU6l6CFKi9IceQvz2Q9bG54D4I=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-288-bQQSu4snM_2AdhssoifUpQ-1; Mon, 04 Oct 2021 05:26:12 -0400
+X-MC-Unique: bQQSu4snM_2AdhssoifUpQ-1
+Received: by mail-ed1-f69.google.com with SMTP id 1-20020a508741000000b003da559ba1eeso16656050edv.13
+        for <kvm@vger.kernel.org>; Mon, 04 Oct 2021 02:26:12 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=UpqA3RAtB68rUMSfW6XEZltEn9tatTT1LRY0PkKsI3I=;
+        b=CnS0WA1xxLY4sKP7TcWVfKS3SDKXgAGPlYYXNNR9eIrZi/gAtkKprLOb1Uzs8XOUiq
+         AAdOkNCda4ghHwGB3CenVvKDj4C73/7E6+p9JeOxgEewaLDmyYVnr7yNsnVViHxMxK/u
+         gXzGWlt0CIbFSvUmqfm9hkWxz30JTzNSFDRGqyMvU5gnZskOrZXXfAi8/aqXwg9HlI/r
+         poXuyf2S+CUefRSBrgyLmGKheFKcYVsQefn05PzKBwGCe2WEZl57O4b9rHLyXmm+Akc/
+         /kGd/xWS29zjwFQYOKQH6Pgtej09oPVbdQqv+JsOmbPPhVUpHH2qTCl6AV2lBBjkpEue
+         xe1w==
+X-Gm-Message-State: AOAM531QmBOt43TiCTYnuPe4B/lHU1jLiPTFOMo22MteCPzoInNgaCGi
+        sEr0CUlnJ/a8aj8apon9JigFuXi4VHWuBnF5rYBpg4mTpvIryO42fLkLHIw0Mz3RMuJaRxvPfc4
+        b3v70Og23ZGzR
+X-Received: by 2002:a05:6402:203:: with SMTP id t3mr17170044edv.69.1633339571638;
+        Mon, 04 Oct 2021 02:26:11 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw47lRVXBkGbFFJrfvZQZTC8jubY5rVVRVe3osrFc1yxjdC7v8pzjWaCW/Gzd5a+bZ9PbBGDA==
+X-Received: by 2002:a05:6402:203:: with SMTP id t3mr17170024edv.69.1633339571429;
+        Mon, 04 Oct 2021 02:26:11 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
+        by smtp.gmail.com with ESMTPSA id jl12sm6092783ejc.120.2021.10.04.02.26.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 04 Oct 2021 02:26:10 -0700 (PDT)
+Message-ID: <b6abc5a3-39ea-b463-9df5-f50bdcb16d08@redhat.com>
+Date:   Mon, 4 Oct 2021 11:26:08 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [BUG] [5.15] Compilation error in arch/x86/kvm/mmu/spte.h with
+ clang-14
+Content-Language: en-US
+To:     torvic9@mailbox.org, "seanjc@google.com" <seanjc@google.com>,
         "vkuznets@redhat.com" <vkuznets@redhat.com>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>
 Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "tglx@linutronix.de" <tglx@linutronix.de>,
         "bp@alien8.de" <bp@alien8.de>
-Message-ID: <1446878298.170497.1633338512925@office.mailbox.org>
-Subject: [BUG] [5.15] Compilation error in arch/x86/kvm/mmu/spte.h with
- clang-14
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+References: <1446878298.170497.1633338512925@office.mailbox.org>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <1446878298.170497.1633338512925@office.mailbox.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Priority: 3
-Importance: Normal
-X-Rspamd-Queue-Id: 01A0C273
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-I encounter the following issue when compiling 5.15-rc4 with clang-14:
+On 04/10/21 11:08, torvic9@mailbox.org wrote:
+> I encounter the following issue when compiling 5.15-rc4 with clang-14:
+> 
+> In file included from arch/x86/kvm/mmu/mmu.c:27:
+> arch/x86/kvm/mmu/spte.h:318:9: error: use of bitwise '|' with boolean operands [-Werror,-Wbitwise-instead-of-logical]
+>          return __is_bad_mt_xwr(rsvd_check, spte) |
+>                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>                                                   ||
+> arch/x86/kvm/mmu/spte.h:318:9: note: cast one or both operands to int to silence this warning
 
-In file included from arch/x86/kvm/mmu/mmu.c:27:
-arch/x86/kvm/mmu/spte.h:318:9: error: use of bitwise '|' with boolean operands [-Werror,-Wbitwise-instead-of-logical]
-        return __is_bad_mt_xwr(rsvd_check, spte) |
-               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                                                 ||
-arch/x86/kvm/mmu/spte.h:318:9: note: cast one or both operands to int to silence this warning
+The warning is wrong, as mentioned in the line right above:
 
-(no issue with gcc-11)
+         /*
+          * Use a bitwise-OR instead of a logical-OR to aggregate the reserved
+          * bits and EPT's invalid memtype/XWR checks to avoid an extra Jcc
+          * (this is extremely unlikely to be short-circuited as true).
+          */
 
-Tor
+Paolo
+
