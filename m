@@ -2,117 +2,202 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 206BC4214E5
-	for <lists+kvm@lfdr.de>; Mon,  4 Oct 2021 19:12:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B3142421524
+	for <lists+kvm@lfdr.de>; Mon,  4 Oct 2021 19:27:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235271AbhJDROg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Oct 2021 13:14:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60608 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231216AbhJDROf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Oct 2021 13:14:35 -0400
-Received: from mail-oi1-x233.google.com (mail-oi1-x233.google.com [IPv6:2607:f8b0:4864:20::233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FFC0C061746
-        for <kvm@vger.kernel.org>; Mon,  4 Oct 2021 10:12:45 -0700 (PDT)
-Received: by mail-oi1-x233.google.com with SMTP id n64so22570694oih.2
-        for <kvm@vger.kernel.org>; Mon, 04 Oct 2021 10:12:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=a+ErGJ+VGql1p2hYj8IB8VzyrOn66LWzrHaFsKIvDKc=;
-        b=h3oETci+oft1UmX7a75PmczGicHfNM5s7F1GFBCDQAi2EkNVdjUq790hKUp30ANFFB
-         VyrGByJzeZyminQFTMyMDLeLWiLWn0YYTgy/Eu9n88lHJh1Fi/M1vBf4/4eVqSgZKDRy
-         ju5U30zZfx3TzeOig6VKJQYkuqmr6D2kRvJrrJ4wDzbUT/kgQ3q7E9lBVhpmjTwHuhF+
-         /xHIwFAh0IyB9k4+YRnCvq7uLa54RD6q1ZEZb9fBuRnaeorCLkgAi91kVZPSVVH1mj2q
-         Q7OyirHgV0SPFP3Nloc2CC8YfmIDiov3hLTpL77SAUKONdca4EAZznblaoem1xstXZxn
-         H8AA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=a+ErGJ+VGql1p2hYj8IB8VzyrOn66LWzrHaFsKIvDKc=;
-        b=Fo4uPEVdsYQLk6loubkKa79hC1TEiYThoFlkZs3zKQMlcH/dYnpL72NZdRMv3zUHqd
-         yb7EwHv1PcKZaj7j/YGkvzTDVqH2+eTX+uFEGmwhFp3DI52j+9McZIO3HPyRlt+00RKx
-         qXFHHZeudGZBokse3+qtQcEewhVf5SlIaeGg9lZzC/VG6OqN5VziYEhLObKcXWPlU6hY
-         XzLvGo0pe4VdPDaD2a8BCWMZqHuYOzTUirGB70ap08cQXaixE8Z7K67PmDG7n3U9SE1H
-         IqkYPnuxBcNMPuGWtRWkl8vhyDWn2QJIBPABDbW2zPgeB+zZ9hce8y+9isZmChFMXNOi
-         RYJQ==
-X-Gm-Message-State: AOAM533BXGJ9uv3ngTeuDxBqoJv4J6eUheUPqPCEISBJRxodDGE+cUUF
-        ltanw4r1Amd34aSsQ8mm/AlqPu0avH64Bs9bIjo2aruMSro=
-X-Google-Smtp-Source: ABdhPJzag2OrV2aOwtnwXxGEC4VTCSs3t51aHzUylqhKU0i/hVl2hLv/6niMCg7RcoueHw5ou6jKGxuaNmdDu8sY9jc=
-X-Received: by 2002:a05:6808:180a:: with SMTP id bh10mr14867864oib.6.1633367564474;
- Mon, 04 Oct 2021 10:12:44 -0700 (PDT)
-MIME-Version: 1.0
-References: <1446878298.170497.1633338512925@office.mailbox.org>
- <b6abc5a3-39ea-b463-9df5-f50bdcb16d08@redhat.com> <936688112.157288.1633339838738@office.mailbox.org>
- <c4773ecc-053f-9bc6-03af-5039397a4531@redhat.com> <CAKwvOd=rrM4fGdGMkD5+kdA49a6K+JcUiR4K2-go=MMt++ukPA@mail.gmail.com>
-In-Reply-To: <CAKwvOd=rrM4fGdGMkD5+kdA49a6K+JcUiR4K2-go=MMt++ukPA@mail.gmail.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Mon, 4 Oct 2021 10:12:33 -0700
-Message-ID: <CALMp9eRzadC50n=d=NFm7osVgKr+=UG7r2cWV2nOCfoPN41vvQ@mail.gmail.com>
-Subject: Re: [BUG] [5.15] Compilation error in arch/x86/kvm/mmu/spte.h with clang-14
-To:     Nick Desaulniers <ndesaulniers@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, torvic9@mailbox.org,
-        "seanjc@google.com" <seanjc@google.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "nathan@kernel.org" <nathan@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "bp@alien8.de" <bp@alien8.de>
-Content-Type: text/plain; charset="UTF-8"
+        id S234422AbhJDR3E (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Oct 2021 13:29:04 -0400
+Received: from mail.kernel.org ([198.145.29.99]:55690 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S234027AbhJDR3D (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Oct 2021 13:29:03 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 56E5161452;
+        Mon,  4 Oct 2021 17:27:14 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1mXRk8-00Eh0o-CV; Mon, 04 Oct 2021 18:27:12 +0100
+Date:   Mon, 04 Oct 2021 18:27:11 +0100
+Message-ID: <87tuhwr98w.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Fuad Tabba <tabba@google.com>
+Cc:     kvmarm@lists.cs.columbia.edu, will@kernel.org, james.morse@arm.com,
+        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
+        mark.rutland@arm.com, christoffer.dall@arm.com,
+        pbonzini@redhat.com, drjones@redhat.com, oupton@google.com,
+        qperret@google.com, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kernel-team@android.com
+Subject: Re: [PATCH v6 11/12] KVM: arm64: Trap access to pVM restricted features
+In-Reply-To: <20210922124704.600087-12-tabba@google.com>
+References: <20210922124704.600087-1-tabba@google.com>
+        <20210922124704.600087-12-tabba@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.cs.columbia.edu, will@kernel.org, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, mark.rutland@arm.com, christoffer.dall@arm.com, pbonzini@redhat.com, drjones@redhat.com, oupton@google.com, qperret@google.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 4, 2021 at 9:13 AM Nick Desaulniers <ndesaulniers@google.com> wrote:
->
-> On Mon, Oct 4, 2021 at 2:49 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
-> >
-> > On 04/10/21 11:30, torvic9@mailbox.org wrote:
-> > >
-> > >> Paolo Bonzini <pbonzini@redhat.com> hat am 04.10.2021 11:26 geschrieben:
-> > >>
-> > >>
-> > >> On 04/10/21 11:08, torvic9@mailbox.org wrote:
-> > >>> I encounter the following issue when compiling 5.15-rc4 with clang-14:
-> > >>>
-> > >>> In file included from arch/x86/kvm/mmu/mmu.c:27:
-> > >>> arch/x86/kvm/mmu/spte.h:318:9: error: use of bitwise '|' with boolean operands [-Werror,-Wbitwise-instead-of-logical]
-> > >>>           return __is_bad_mt_xwr(rsvd_check, spte) |
-> > >>>                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> > >>>                                                    ||
-> > >>> arch/x86/kvm/mmu/spte.h:318:9: note: cast one or both operands to int to silence this warning
-> > >>
-> > >> The warning is wrong, as mentioned in the line right above:
+Hi Fuad,
 
-Casting the bool to an int doesn't seem that onerous.
+On Wed, 22 Sep 2021 13:47:03 +0100,
+Fuad Tabba <tabba@google.com> wrote:
+> 
+> Trap accesses to restricted features for VMs running in protected
+> mode.
+> 
+> Access to feature registers are emulated, and only supported
+> features are exposed to protected VMs.
+> 
+> Accesses to restricted registers as well as restricted
+> instructions are trapped, and an undefined exception is injected
+> into the protected guests, i.e., with EC = 0x0 (unknown reason).
+> This EC is the one used, according to the Arm Architecture
+> Reference Manual, for unallocated or undefined system registers
+> or instructions.
+> 
+> Only affects the functionality of protected VMs. Otherwise,
+> should not affect non-protected VMs when KVM is running in
+> protected mode.
+> 
+> Signed-off-by: Fuad Tabba <tabba@google.com>
+> ---
+>  arch/arm64/kvm/hyp/nvhe/switch.c | 60 ++++++++++++++++++++++++++++++++
+>  1 file changed, 60 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+> index 49080c607838..2bf5952f651b 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/switch.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+> @@ -20,6 +20,7 @@
+>  #include <asm/kprobes.h>
+>  #include <asm/kvm_asm.h>
+>  #include <asm/kvm_emulate.h>
+> +#include <asm/kvm_fixed_config.h>
+>  #include <asm/kvm_hyp.h>
+>  #include <asm/kvm_mmu.h>
+>  #include <asm/fpsimd.h>
+> @@ -28,6 +29,7 @@
+>  #include <asm/thread_info.h>
+>  
+>  #include <nvhe/mem_protect.h>
+> +#include <nvhe/sys_regs.h>
+>  
+>  /* Non-VHE specific context */
+>  DEFINE_PER_CPU(struct kvm_host_data, kvm_host_data);
+> @@ -158,6 +160,49 @@ static void __pmu_switch_to_host(struct kvm_cpu_context *host_ctxt)
+>  		write_sysreg(pmu->events_host, pmcntenset_el0);
+>  }
+>  
+> +/**
+> + * Handler for protected VM restricted exceptions.
+> + *
+> + * Inject an undefined exception into the guest and return true to indicate that
+> + * the hypervisor has handled the exit, and control should go back to the guest.
+> + */
+> +static bool kvm_handle_pvm_restricted(struct kvm_vcpu *vcpu, u64 *exit_code)
+> +{
+> +	__inject_undef64(vcpu);
+> +	return true;
+> +}
+> +
+> +/**
+> + * Handler for protected VM MSR, MRS or System instruction execution in AArch64.
+> + *
+> + * Returns true if the hypervisor has handled the exit, and control should go
+> + * back to the guest, or false if it hasn't.
+> + */
+> +static bool kvm_handle_pvm_sys64(struct kvm_vcpu *vcpu, u64 *exit_code)
+> +{
+> +	if (kvm_handle_pvm_sysreg(vcpu, exit_code))
+> +		return true;
+> +	else
+> +		return kvm_hyp_handle_sysreg(vcpu, exit_code);
 
-> > > So it's an issue with clang-14 then?
-> > > (I add Nick and Nathan)
-> >
-> > My clang here doesn't have the option, so I'm going to ask---are you
-> > using W=1?  I can see why clang is warning for KVM's code, but in my
-> > opinion such a check should only be in -Wextra.
->
-> This is a newly added warning in top of tree clang.
->
-> >
-> > Paolo
-> >
-> > >>
-> > >>           /*
-> > >>            * Use a bitwise-OR instead of a logical-OR to aggregate the reserved
-> > >>            * bits and EPT's invalid memtype/XWR checks to avoid an extra Jcc
-> > >>            * (this is extremely unlikely to be short-circuited as true).
-> > >>            */
-> > >>
-> > >> Paolo
-> > >
-> >
->
->
-> --
-> Thanks,
-> ~Nick Desaulniers
+nit: drop the else.
+
+I wonder though: what if there is an overlap between between the pVM
+handling and the normal KVM stuff? Are we guaranteed that there is
+none?
+
+For example, ESR_ELx_EC_SYS64 is used when working around some bugs
+(see the TX2 TVM handling). What happens if you return early and don't
+let it happen? This has a huge potential for some bad breakage.
+
+> +}
+> +
+> +/**
+> + * Handler for protected floating-point and Advanced SIMD accesses.
+> + *
+> + * Returns true if the hypervisor has handled the exit, and control should go
+> + * back to the guest, or false if it hasn't.
+> + */
+> +static bool kvm_handle_pvm_fpsimd(struct kvm_vcpu *vcpu, u64 *exit_code)
+> +{
+> +	/* Linux guests assume support for floating-point and Advanced SIMD. */
+> +	BUILD_BUG_ON(!FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_FP),
+> +				PVM_ID_AA64PFR0_ALLOW));
+> +	BUILD_BUG_ON(!FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_ASIMD),
+> +				PVM_ID_AA64PFR0_ALLOW));
+> +
+> +	return kvm_hyp_handle_fpsimd(vcpu, exit_code);
+> +}
+> +
+>  static const exit_handler_fn hyp_exit_handlers[] = {
+>  	[0 ... ESR_ELx_EC_MAX]		= NULL,
+>  	[ESR_ELx_EC_CP15_32]		= kvm_hyp_handle_cp15,
+> @@ -170,8 +215,23 @@ static const exit_handler_fn hyp_exit_handlers[] = {
+>  	[ESR_ELx_EC_PAC]		= kvm_hyp_handle_ptrauth,
+>  };
+>  
+> +static const exit_handler_fn pvm_exit_handlers[] = {
+> +	[0 ... ESR_ELx_EC_MAX]		= NULL,
+> +	[ESR_ELx_EC_CP15_32]		= kvm_hyp_handle_cp15,
+> +	[ESR_ELx_EC_CP15_64]		= kvm_hyp_handle_cp15,
+
+Heads up, this one was bogus, and I removed it in my patches[1].
+
+But it really begs the question: given that you really don't want to
+handle any AArch32 for protected VMs, why handling anything at all the
+first place? You really should let the exit happen and let the outer
+run loop deal with it.
+
+> +	[ESR_ELx_EC_SYS64]		= kvm_handle_pvm_sys64,
+> +	[ESR_ELx_EC_SVE]		= kvm_handle_pvm_restricted,
+> +	[ESR_ELx_EC_FP_ASIMD]		= kvm_handle_pvm_fpsimd,
+> +	[ESR_ELx_EC_IABT_LOW]		= kvm_hyp_handle_iabt_low,
+> +	[ESR_ELx_EC_DABT_LOW]		= kvm_hyp_handle_dabt_low,
+> +	[ESR_ELx_EC_PAC]		= kvm_hyp_handle_ptrauth,
+> +};
+> +
+>  static const exit_handler_fn *kvm_get_exit_handler_array(struct kvm *kvm)
+>  {
+> +	if (unlikely(kvm_vm_is_protected(kvm)))
+> +		return pvm_exit_handlers;
+> +
+>  	return hyp_exit_handlers;
+>  }
+>  
+> -- 
+> 2.33.0.464.g1972c5931b-goog
+> 
+> 
+
+Thanks,
+
+	M.
+
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/commit/?h=kvm-arm64/early-ec-handlers&id=f84ff369795ed47f2cd5e556170166ee8b3a988f
+
+-- 
+Without deviation from the norm, progress is not possible.
