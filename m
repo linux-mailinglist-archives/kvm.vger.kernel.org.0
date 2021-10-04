@@ -2,215 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0273D421157
-	for <lists+kvm@lfdr.de>; Mon,  4 Oct 2021 16:30:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1EBBC421179
+	for <lists+kvm@lfdr.de>; Mon,  4 Oct 2021 16:33:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234072AbhJDOcN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Oct 2021 10:32:13 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:57402 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233516AbhJDOcL (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 4 Oct 2021 10:32:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1633357821;
+        id S234290AbhJDOf2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Oct 2021 10:35:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50226 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234490AbhJDOf0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Oct 2021 10:35:26 -0400
+Received: from mout-p-202.mailbox.org (mout-p-202.mailbox.org [IPv6:2001:67c:2050::465:202])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39B27C061745;
+        Mon,  4 Oct 2021 07:33:37 -0700 (PDT)
+Received: from smtp202.mailbox.org (smtp202.mailbox.org [IPv6:2001:67c:2050:105:465:1:4:0])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mout-p-202.mailbox.org (Postfix) with ESMTPS id 4HNNW32xxLzQkhP;
+        Mon,  4 Oct 2021 16:33:35 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=mailbox.org; h=
+        content-transfer-encoding:content-type:content-type:mime-version
+        :subject:subject:references:in-reply-to:message-id:from:from
+        :date:date:received; s=mail20150812; t=1633358011; bh=i464Ru14yK
+        p+tO7OJAFrwLQPSlMjtYA/mmJLgmITXH4=; b=OsmnW3zZynDb1Dgz8yOjPO8lYQ
+        NHLIkKDcdTUFZtwm0F+3KZA9Y2wIZMtW2rTawq+iEAy6MoOvCk56dZhIK1OXGqWG
+        D4jfqu41VLeOw4Eqi/32dr1C+n+xssb6C+3XtgAkcEsjNvgednC4/TEsqPWBWMXS
+        kTPFfQTtoEp5IIQuHOb6C3kERfslEEiYmfqpgjqzbwP3l21HzU3DBm6E0jO1oKga
+        PZfw1RSUVzhQ6qz7G42wDSuDLtaH2rJkNrJocUfZhfBDOAnybvziZUIcyTlKiCmT
+        ZVDS3QAaFZpvCAEZZyI0xS88niEVGXBcZdPvYwIGB+lVioJC8sH2vVwTyFWg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
+        t=1633358013;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=4VYFPa55D97zDtyLRl+yLgiIp27xlAa5QykhLUO/Whc=;
-        b=Ibl04MK1dg+rZR6Q4XNWPQZzokXaPh9HIvAFfdmYOhlu+bKYmt9Z531FzkXDY1wwKtFKOq
-        fHCcd7KK/wxOKEKEhQHIMg1eajGia1vEWL68QcYmAump1kaKXVDkD+vfJQfyj8fuQ5onzO
-        WnYsQLBGsaF0GNRz5kPezhunVLPpIvg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-270-Eg805yp2MUmJKwHZSsIvdg-1; Mon, 04 Oct 2021 10:30:19 -0400
-X-MC-Unique: Eg805yp2MUmJKwHZSsIvdg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8DDAB1966320;
-        Mon,  4 Oct 2021 14:30:17 +0000 (UTC)
-Received: from fuller.cnet (ovpn-112-2.gru2.redhat.com [10.97.112.2])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id DF29910016FB;
-        Mon,  4 Oct 2021 14:30:16 +0000 (UTC)
-Received: by fuller.cnet (Postfix, from userid 1000)
-        id EDC6B416CE5D; Mon,  4 Oct 2021 11:30:11 -0300 (-03)
-Date:   Mon, 4 Oct 2021 11:30:11 -0300
-From:   Marcelo Tosatti <mtosatti@redhat.com>
-To:     Oliver Upton <oupton@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu,
-        Sean Christopherson <seanjc@google.com>,
-        Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <Alexandru.Elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-arm-kernel@lists.infradead.org,
-        Andrew Jones <drjones@redhat.com>,
-        Will Deacon <will@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v8 7/7] KVM: x86: Expose TSC offset controls to userspace
-Message-ID: <20211004143011.GA72593@fuller.cnet>
-References: <20210916181538.968978-1-oupton@google.com>
- <20210916181538.968978-8-oupton@google.com>
- <20210930191416.GA19068@fuller.cnet>
- <48151d08-ee29-2b98-b6e1-f3c8a1ff26bc@redhat.com>
- <20211001103200.GA39746@fuller.cnet>
- <7901cb84-052d-92b6-1e6a-028396c2c691@redhat.com>
- <20211001191117.GA69579@fuller.cnet>
- <CAOQ_Qsj9ObSakmqgFQf598VscQWDh_Cq3WFqF7EpKqe2+RRgVg@mail.gmail.com>
+        bh=rmjeYd7vcU5PyUKxcIasco2LgsFeZ5uHoTR73KzRdkU=;
+        b=qosJzPDRamsy1m8+HMsW6BkZ002WDNwtFpshGAY6fIZfXAMg5LGsAUzcjcp5eAbue7dYjZ
+        eD6qv80iabD/DDtaD6HsI7UcJnNFxTCm43z2DaBVUzDsKtW54PZTS1nEwHoQlhBgc/bMAC
+        I2wHuzSH8qFgLbff4NcipABC0mOrnEQupb4hfAXsCTzKcDznnLnNQbvIQCbnNCHTv+GAvQ
+        7aNFJevKbmaz4vxdMOZQpr/Ue6Y7Fmzanll8X/QWv0TUnPEWN0XX6mO4Vz05WWVHJFpeqX
+        1SITC32l6/SRNQJcVhS81k+iz7b/GHGEJ29f/MXvfeHIbtPUCjMDxIGT1I2p6A==
+X-Virus-Scanned: amavisd-new at heinlein-support.de
+Date:   Mon, 4 Oct 2021 16:33:30 +0200 (CEST)
+From:   torvic9@mailbox.org
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "ndesaulniers@google.com" <ndesaulniers@google.com>,
+        "nathan@kernel.org" <nathan@kernel.org>
+Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "bp@alien8.de" <bp@alien8.de>
+Message-ID: <1033024644.226.1633358010150@office.mailbox.org>
+In-Reply-To: <1723492337.161319.1633342255263@office.mailbox.org>
+References: <1446878298.170497.1633338512925@office.mailbox.org>
+ <b6abc5a3-39ea-b463-9df5-f50bdcb16d08@redhat.com>
+ <936688112.157288.1633339838738@office.mailbox.org>
+ <c4773ecc-053f-9bc6-03af-5039397a4531@redhat.com>
+ <1723492337.161319.1633342255263@office.mailbox.org>
+Subject: Re: [BUG] [5.15] Compilation error in arch/x86/kvm/mmu/spte.h with
+ clang-14
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAOQ_Qsj9ObSakmqgFQf598VscQWDh_Cq3WFqF7EpKqe2+RRgVg@mail.gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Priority: 3
+Importance: Normal
+X-Rspamd-Queue-Id: C24A526A
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 01, 2021 at 12:33:28PM -0700, Oliver Upton wrote:
-> Marcelo,
-> 
-> On Fri, Oct 1, 2021 at 12:11 PM Marcelo Tosatti <mtosatti@redhat.com> wrote:
-> >
-> > On Fri, Oct 01, 2021 at 05:12:20PM +0200, Paolo Bonzini wrote:
-> > > On 01/10/21 12:32, Marcelo Tosatti wrote:
-> > > > > +1. Invoke the KVM_GET_CLOCK ioctl to record the host TSC (t_0), +
-> > > > > kvmclock nanoseconds (k_0), and realtime nanoseconds (r_0). + [...]
-> > > > >  +4. Invoke the KVM_SET_CLOCK ioctl, providing the kvmclock
-> > > > > nanoseconds +   (k_0) and realtime nanoseconds (r_0) in their
-> > > > > respective fields. +   Ensure that the KVM_CLOCK_REALTIME flag is
-> > > > > set in the provided +   structure. KVM will advance the VM's
-> > > > > kvmclock to account for elapsed +   time since recording the clock
-> > > > > values.
-> > > >
-> > > > You can't advance both kvmclock (kvmclock_offset variable) and the
-> > > > TSCs, which would be double counting.
-> > > >
-> > > > So you have to either add the elapsed realtime (1) between
-> > > > KVM_GET_CLOCK to kvmclock (which this patch is doing), or to the
-> > > > TSCs. If you do both, there is double counting. Am i missing
-> > > > something?
-> > >
-> > > Probably one of these two (but it's worth pointing out both of them):
-> > >
-> > > 1) the attribute that's introduced here *replaces*
-> > > KVM_SET_MSR(MSR_IA32_TSC), so the TSC is not added.
-> > >
-> > > 2) the adjustment formula later in the algorithm does not care about how
-> > > much time passed between step 1 and step 4.  It just takes two well
-> > > known (TSC, kvmclock) pairs, and uses them to ensure the guest TSC is
-> > > the same on the destination as if the guest was still running on the
-> > > source.  It is irrelevant that one of them is before migration and one
-> > > is after, all it matters is that one is on the source and one is on the
-> > > destination.
-> >
-> > OK, so it still relies on NTPd daemon to fix the CLOCK_REALTIME delay
-> > which is introduced during migration (which is what i would guess is
-> > the lower hanging fruit) (for guests using TSC).
-> 
-> The series gives userspace the ability to modify the guest's
-> perception of the TSC in whatever way it sees fit. The algorithm in
-> the documentation provides a suggestion to userspace on how to do
-> exactly that. I kept that advancement logic out of the kernel because
-> IMO it is an implementation detail: users have differing opinions on
-> how clocks should behave across a migration and KVM shouldn't have any
-> baked-in rules around it.
 
-Ok, was just trying to visualize how this would work with QEMU Linux guests.
+> torvic9@mailbox.org hat am 04.10.2021 12:10 geschrieben:
+> 
+>  
+> > Paolo Bonzini <pbonzini@redhat.com> hat am 04.10.2021 11:49 geschrieben:
+> > 
+> >  
+> > On 04/10/21 11:30, torvic9@mailbox.org wrote:
+> > > 
+> > >> Paolo Bonzini <pbonzini@redhat.com> hat am 04.10.2021 11:26 geschrieben:
+> > >>
+> > >>   
+> > >> On 04/10/21 11:08, torvic9@mailbox.org wrote:
+> > >>> I encounter the following issue when compiling 5.15-rc4 with clang-14:
+> > >>>
+> > >>> In file included from arch/x86/kvm/mmu/mmu.c:27:
+> > >>> arch/x86/kvm/mmu/spte.h:318:9: error: use of bitwise '|' with boolean operands [-Werror,-Wbitwise-instead-of-logical]
+> > >>>           return __is_bad_mt_xwr(rsvd_check, spte) |
+> > >>>                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> > >>>                                                    ||
+> > >>> arch/x86/kvm/mmu/spte.h:318:9: note: cast one or both operands to int to silence this warning
+> > >>
+> > >> The warning is wrong, as mentioned in the line right above:
+> > > 
+> > > So it's an issue with clang-14 then?
+> > > (I add Nick and Nathan)
+> > 
+> > My clang here doesn't have the option, so I'm going to ask---are you 
+> > using W=1?  I can see why clang is warning for KVM's code, but in my 
+> > opinion such a check should only be in -Wextra.
+> 
+> I don't use any options (not that I'm aware of).
+> Clang version 14.0.0 5f7a5353301b776ffb0e5fb048992898507bf7ee
+
+Probably the cause for this bug is this recent llvm commit:
+https://github.com/llvm/llvm-project/commit/f59cc9542bfb461d16ad12b2cc4be4abbfd9d96e
 
 > 
-> At the same time, userspace can choose to _not_ jump the TSC and use
-> the available interfaces to just migrate the existing state of the
-> TSCs.
-> 
-> When I had initially proposed this series upstream, Paolo astutely
-> pointed out that there was no good way to get a (CLOCK_REALTIME, TSC)
-> pairing, which is critical for the TSC advancement algorithm in the
-> documentation. Google's best way to get (CLOCK_REALTIME, TSC) exists
-> in userspace [1], hence the missing kvm clock changes. So, in all, the
-> spirit of the KVM clock changes is to provide missing UAPI around the
-> clock/TSC, with the side effect of changing the guest-visible value.
-> 
-> [1] https://cloud.google.com/spanner/docs/true-time-external-consistency
-> 
-> > My point was that, by advancing the _TSC value_ by:
-> >
-> > T0. stop guest vcpus    (source)
-> > T1. KVM_GET_CLOCK       (source)
-> > T2. KVM_SET_CLOCK       (destination)
-> > T3. Write guest TSCs    (destination)
-> > T4. resume guest        (destination)
-> >
-> > new_off_n = t_0 + off_n + (k_1 - k_0) * freq - t_1
-> >
-> > t_0:    host TSC at KVM_GET_CLOCK time.
-> > off_n:  TSC offset at vcpu-n (as long as no guest TSC writes are performed,
-> > TSC offset is fixed).
-> > ...
-> >
-> > +4. Invoke the KVM_SET_CLOCK ioctl, providing the kvmclock nanoseconds
-> > +   (k_0) and realtime nanoseconds (r_0) in their respective fields.
-> > +   Ensure that the KVM_CLOCK_REALTIME flag is set in the provided
-> > +   structure. KVM will advance the VM's kvmclock to account for elapsed
-> > +   time since recording the clock values.
-> >
-> > Only kvmclock is advanced (by passing r_0). But a guest might not use kvmclock
-> > (hopefully modern guests on modern hosts will use TSC clocksource,
-> > whose clock_gettime is faster... some people are using that already).
-> >
-> 
-> Hopefully the above explanation made it clearer how the TSCs are
-> supposed to get advanced, and why it isn't done in the kernel.
-> 
-> > At some point QEMU should enable invariant TSC flag by default?
-> >
-> > That said, the point is: why not advance the _TSC_ values
-> > (instead of kvmclock nanoseconds), as doing so would reduce
-> > the "the CLOCK_REALTIME delay which is introduced during migration"
-> > for both kvmclock users and modern tsc clocksource users.
-> >
-> > So yes, i also like this patchset, but would like it even more
-> > if it fixed the case above as well (and not sure whether adding
-> > the migration delta to KVMCLOCK makes it harder to fix TSC case
-> > later).
-> >
-> > > Perhaps we can add to step 6 something like:
+> > 
+> > Paolo
+> > 
+> > >>
+> > >>           /*
+> > >>            * Use a bitwise-OR instead of a logical-OR to aggregate the reserved
+> > >>            * bits and EPT's invalid memtype/XWR checks to avoid an extra Jcc
+> > >>            * (this is extremely unlikely to be short-circuited as true).
+> > >>            */
+> > >>
+> > >> Paolo
 > > >
-> > > > +6. Adjust the guest TSC offsets for every vCPU to account for (1)
-> > > > time +   elapsed since recording state and (2) difference in TSCs
-> > > > between the +   source and destination machine: + +   new_off_n = t_0
-> > > > + off_n + (k_1 - k_0) * freq - t_1 +
-> > >
-> > > "off + t - k * freq" is the guest TSC value corresponding to a time of 0
-> > > in kvmclock.  The above formula ensures that it is the same on the
-> > > destination as it was on the source.
-> > >
-> > > Also, the names are a bit hard to follow.  Perhaps
-> > >
-> > >       t_0             tsc_src
-> > >       t_1             tsc_dest
-> > >       k_0             guest_src
-> > >       k_1             guest_dest
-> > >       r_0             host_src
-> > >       off_n           ofs_src[i]
-> > >       new_off_n       ofs_dest[i]
-> > >
-> > > Paolo
-> > >
-> 
-> Yeah, sounds good to me. Shall I respin the whole series from what you
-> have in kvm/queue, or just send you the bits and pieces that ought to
-> be applied?
-> 
-> --
-> Thanks,
-> Oliver
-> 
-> 
-
