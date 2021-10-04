@@ -2,104 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8C77A42147A
-	for <lists+kvm@lfdr.de>; Mon,  4 Oct 2021 18:54:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 206BC4214E5
+	for <lists+kvm@lfdr.de>; Mon,  4 Oct 2021 19:12:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237561AbhJDQ4X (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Oct 2021 12:56:23 -0400
-Received: from mail.kernel.org ([198.145.29.99]:57784 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S237646AbhJDQ4V (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Oct 2021 12:56:21 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 9F74161381;
-        Mon,  4 Oct 2021 16:54:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1633366472;
-        bh=TvvpjQdHQdhLT/lXbu5+Haobdd8e9Zwi1ru4E+zI7wI=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=QQZNB2sOslZIecnGF+eD4IyTpxYTRbfRMbD/U+SeJqOti2xoV+DA9fdiH85bcAKH8
-         csiv9beEQIu/f491XDdtQY997mWjReJ+R3fljw63ThoJv9akyTW8La2NTc6DBr73RM
-         2HxaJBPuMr6CohDFSI82HV+kLgfqz/WEoiQHcC/4JRFmgt5CBh9Q4fUuPmI41IIwzI
-         /cYLvWNP8ONCt7I6nuip/mx4BNtptQN8LC6REzXgRcG0Jhvt+pp3hz2qU+1/C3mW/Q
-         E00wf2b8E+hgVsreo78g1LWRXUm3Z2VOd+7cH2K2mhAWCzfd+CpyolrB+nr9r4Hg18
-         eQTfUVg0BSBuA==
-Date:   Mon, 4 Oct 2021 09:54:32 -0700
-From:   "Darrick J. Wong" <djwong@kernel.org>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Stephen <stephenackerman16@gmail.com>, kvm@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: Re: kvm crash in 5.14.1?
-Message-ID: <20211004165432.GA24266@magnolia>
-References: <2b5ca6d3-fa7b-5e2f-c353-f07dcff993c1@gmail.com>
- <16c7a433-6e58-4213-bc00-5f6196fe22f5@gmail.com>
- <YVSEZTCbFZ+HD/f0@google.com>
- <20210930175957.GA10573@magnolia>
+        id S235271AbhJDROg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Oct 2021 13:14:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60608 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231216AbhJDROf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Oct 2021 13:14:35 -0400
+Received: from mail-oi1-x233.google.com (mail-oi1-x233.google.com [IPv6:2607:f8b0:4864:20::233])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FFC0C061746
+        for <kvm@vger.kernel.org>; Mon,  4 Oct 2021 10:12:45 -0700 (PDT)
+Received: by mail-oi1-x233.google.com with SMTP id n64so22570694oih.2
+        for <kvm@vger.kernel.org>; Mon, 04 Oct 2021 10:12:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=a+ErGJ+VGql1p2hYj8IB8VzyrOn66LWzrHaFsKIvDKc=;
+        b=h3oETci+oft1UmX7a75PmczGicHfNM5s7F1GFBCDQAi2EkNVdjUq790hKUp30ANFFB
+         VyrGByJzeZyminQFTMyMDLeLWiLWn0YYTgy/Eu9n88lHJh1Fi/M1vBf4/4eVqSgZKDRy
+         ju5U30zZfx3TzeOig6VKJQYkuqmr6D2kRvJrrJ4wDzbUT/kgQ3q7E9lBVhpmjTwHuhF+
+         /xHIwFAh0IyB9k4+YRnCvq7uLa54RD6q1ZEZb9fBuRnaeorCLkgAi91kVZPSVVH1mj2q
+         Q7OyirHgV0SPFP3Nloc2CC8YfmIDiov3hLTpL77SAUKONdca4EAZznblaoem1xstXZxn
+         H8AA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=a+ErGJ+VGql1p2hYj8IB8VzyrOn66LWzrHaFsKIvDKc=;
+        b=Fo4uPEVdsYQLk6loubkKa79hC1TEiYThoFlkZs3zKQMlcH/dYnpL72NZdRMv3zUHqd
+         yb7EwHv1PcKZaj7j/YGkvzTDVqH2+eTX+uFEGmwhFp3DI52j+9McZIO3HPyRlt+00RKx
+         qXFHHZeudGZBokse3+qtQcEewhVf5SlIaeGg9lZzC/VG6OqN5VziYEhLObKcXWPlU6hY
+         XzLvGo0pe4VdPDaD2a8BCWMZqHuYOzTUirGB70ap08cQXaixE8Z7K67PmDG7n3U9SE1H
+         IqkYPnuxBcNMPuGWtRWkl8vhyDWn2QJIBPABDbW2zPgeB+zZ9hce8y+9isZmChFMXNOi
+         RYJQ==
+X-Gm-Message-State: AOAM533BXGJ9uv3ngTeuDxBqoJv4J6eUheUPqPCEISBJRxodDGE+cUUF
+        ltanw4r1Amd34aSsQ8mm/AlqPu0avH64Bs9bIjo2aruMSro=
+X-Google-Smtp-Source: ABdhPJzag2OrV2aOwtnwXxGEC4VTCSs3t51aHzUylqhKU0i/hVl2hLv/6niMCg7RcoueHw5ou6jKGxuaNmdDu8sY9jc=
+X-Received: by 2002:a05:6808:180a:: with SMTP id bh10mr14867864oib.6.1633367564474;
+ Mon, 04 Oct 2021 10:12:44 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20210930175957.GA10573@magnolia>
+References: <1446878298.170497.1633338512925@office.mailbox.org>
+ <b6abc5a3-39ea-b463-9df5-f50bdcb16d08@redhat.com> <936688112.157288.1633339838738@office.mailbox.org>
+ <c4773ecc-053f-9bc6-03af-5039397a4531@redhat.com> <CAKwvOd=rrM4fGdGMkD5+kdA49a6K+JcUiR4K2-go=MMt++ukPA@mail.gmail.com>
+In-Reply-To: <CAKwvOd=rrM4fGdGMkD5+kdA49a6K+JcUiR4K2-go=MMt++ukPA@mail.gmail.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Mon, 4 Oct 2021 10:12:33 -0700
+Message-ID: <CALMp9eRzadC50n=d=NFm7osVgKr+=UG7r2cWV2nOCfoPN41vvQ@mail.gmail.com>
+Subject: Re: [BUG] [5.15] Compilation error in arch/x86/kvm/mmu/spte.h with clang-14
+To:     Nick Desaulniers <ndesaulniers@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, torvic9@mailbox.org,
+        "seanjc@google.com" <seanjc@google.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "nathan@kernel.org" <nathan@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "bp@alien8.de" <bp@alien8.de>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 30, 2021 at 10:59:57AM -0700, Darrick J. Wong wrote:
-> On Wed, Sep 29, 2021 at 03:21:09PM +0000, Sean Christopherson wrote:
-> > On Tue, Sep 28, 2021, Stephen wrote:
-> > > Hello,
-> > > 
-> > > I got this crash again on 5.14.7 in the early morning of the 27th.
-> > > Things hung up shortly after I'd gone to bed. Uptime was 1 day 9 hours 9
-> > > minutes.
-> > 
-> > ...
-> > 
-> > > BUG: kernel NULL pointer dereference, address: 0000000000000068
-> > > #PF: supervisor read access in kernel mode
-> > > #PF: error_code(0x0000) - not-present page
-> > > PGD 0 P4D 0
-> > > Oops: 0000 [#1] SMP NOPTI
-> > > CPU: 21 PID: 8494 Comm: CPU 7/KVM Tainted: G            E     5.14.7 #32
-> > > Hardware name: Gigabyte Technology Co., Ltd. X570 AORUS ELITE WIFI/X570
-> > > AORUS ELITE WIFI, BIOS F35 07/08/2021
-> > > RIP: 0010:internal_get_user_pages_fast+0x738/0xda0
-> > > Code: 84 24 a0 00 00 00 65 48 2b 04 25 28 00 00 00 0f 85 54 06 00 00 48
-> > > 81 c4 a8 00 00 00 44 89 e0 5b 5d 41 5c 41 5d 41 5e 41 5f c3 <48> 81 78
-> > > 68 a0 a3 >
-> > 
-> > I haven't reproduced the crash, but the code signature (CMP against an absolute
-> > address) is quite distinct, and is consistent across all three crashes.  I'm pretty
-> > sure the issue is that page_is_secretmem() doesn't check for a null page->mapping,
-> > e.g. if the page is truncated, which IIUC can happen in parallel since gup() doesn't
-> > hold the lock.
-> > 
-> > I think this should fix the problems?
-> > 
-> > diff --git a/include/linux/secretmem.h b/include/linux/secretmem.h
-> > index 21c3771e6a56..988528b5da43 100644
-> > --- a/include/linux/secretmem.h
-> > +++ b/include/linux/secretmem.h
-> > @@ -23,7 +23,7 @@ static inline bool page_is_secretmem(struct page *page)
-> >         mapping = (struct address_space *)
-> >                 ((unsigned long)page->mapping & ~PAGE_MAPPING_FLAGS);
-> > 
-> > -       if (mapping != page->mapping)
-> > +       if (!mapping || mapping != page->mapping)
-> 
-> I'll roll this out on my vm host and try to re-run the mass fuzztest
-> overnight, though IT claims they're going to kill power to the whole
-> datacenter until Monday(!)...
+On Mon, Oct 4, 2021 at 9:13 AM Nick Desaulniers <ndesaulniers@google.com> wrote:
+>
+> On Mon, Oct 4, 2021 at 2:49 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+> >
+> > On 04/10/21 11:30, torvic9@mailbox.org wrote:
+> > >
+> > >> Paolo Bonzini <pbonzini@redhat.com> hat am 04.10.2021 11:26 geschrieben:
+> > >>
+> > >>
+> > >> On 04/10/21 11:08, torvic9@mailbox.org wrote:
+> > >>> I encounter the following issue when compiling 5.15-rc4 with clang-14:
+> > >>>
+> > >>> In file included from arch/x86/kvm/mmu/mmu.c:27:
+> > >>> arch/x86/kvm/mmu/spte.h:318:9: error: use of bitwise '|' with boolean operands [-Werror,-Wbitwise-instead-of-logical]
+> > >>>           return __is_bad_mt_xwr(rsvd_check, spte) |
+> > >>>                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> > >>>                                                    ||
+> > >>> arch/x86/kvm/mmu/spte.h:318:9: note: cast one or both operands to int to silence this warning
+> > >>
+> > >> The warning is wrong, as mentioned in the line right above:
 
-...which they did, 30 minutes after I sent this email. :(
+Casting the bool to an int doesn't seem that onerous.
 
-I'll hopefully be able to report back to the list in a day or two.
-
---D
-
-> 
-> --D
-> 
-> >                 return false;
-> > 
-> >         return mapping->a_ops == &secretmem_aops;
+> > > So it's an issue with clang-14 then?
+> > > (I add Nick and Nathan)
+> >
+> > My clang here doesn't have the option, so I'm going to ask---are you
+> > using W=1?  I can see why clang is warning for KVM's code, but in my
+> > opinion such a check should only be in -Wextra.
+>
+> This is a newly added warning in top of tree clang.
+>
+> >
+> > Paolo
+> >
+> > >>
+> > >>           /*
+> > >>            * Use a bitwise-OR instead of a logical-OR to aggregate the reserved
+> > >>            * bits and EPT's invalid memtype/XWR checks to avoid an extra Jcc
+> > >>            * (this is extremely unlikely to be short-circuited as true).
+> > >>            */
+> > >>
+> > >> Paolo
+> > >
+> >
+>
+>
+> --
+> Thanks,
+> ~Nick Desaulniers
