@@ -2,144 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 87EC6420AD9
-	for <lists+kvm@lfdr.de>; Mon,  4 Oct 2021 14:23:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C2165420B1B
+	for <lists+kvm@lfdr.de>; Mon,  4 Oct 2021 14:44:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232925AbhJDMZf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Oct 2021 08:25:35 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:39589 "EHLO
+        id S233163AbhJDMqG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Oct 2021 08:46:06 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:28681 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230337AbhJDMZf (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 4 Oct 2021 08:25:35 -0400
+        by vger.kernel.org with ESMTP id S231965AbhJDMqF (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 4 Oct 2021 08:46:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1633350226;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
+        s=mimecast20190719; t=1633351456;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=Wl7ICQODkHW0YfDfZWHTQGFAOQQBlguFC3IFpZqYzao=;
-        b=FtUPZu3lbzrFI9E3Oe025T79RPLVjLgGbpLak0UG7zimfoKBxgzqnZcWtKFQ/uCVIyY99s
-        JvFhhP0aaAxdXCJuHnC3y1sHnSzOilf49pnwNg2+VhXseqQUHJEZ+YrSxCMxwAfSqTajUG
-        swUAhKGKY2CS7GfOwI8qkm0CjKX59I8=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-502-GxpYwCHZMbS0jqio7jIMnw-1; Mon, 04 Oct 2021 08:23:45 -0400
-X-MC-Unique: GxpYwCHZMbS0jqio7jIMnw-1
-Received: by mail-wm1-f72.google.com with SMTP id m9-20020a05600c4f4900b003057c761567so9908905wmq.1
-        for <kvm@vger.kernel.org>; Mon, 04 Oct 2021 05:23:44 -0700 (PDT)
+        bh=Uw5NpJXbzzDq6kJP5OT7G1gnqMoSZ/d9kINK/rCAzT8=;
+        b=BxHI6+wDN1wv6aCI0K67XaumqqvHCuCiQI4HsCcm72UdyKh0joKL4hFT/qv8VZd4hbByfB
+        /bnK0sqczZUu92lpURpxRDtl22AXmz+mrj7JBBvmh+BempPckx8AC7/EN8eOR/KRKoXoyB
+        mRaMhcmu5I9aidQnq+hocIcIcrs3mng=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-434-Y0qbzroBMMWkT3vwSppo1A-1; Mon, 04 Oct 2021 08:44:15 -0400
+X-MC-Unique: Y0qbzroBMMWkT3vwSppo1A-1
+Received: by mail-wr1-f70.google.com with SMTP id s18-20020adfbc12000000b00160b2d4d5ebso183976wrg.7
+        for <kvm@vger.kernel.org>; Mon, 04 Oct 2021 05:44:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:reply-to:subject:to:cc:references:from
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-transfer-encoding:content-language;
-        bh=Wl7ICQODkHW0YfDfZWHTQGFAOQQBlguFC3IFpZqYzao=;
-        b=rjtvaxJQUxmwD4ufPJlBkTcsyqGStgyDECCKOwoNGWtPC35aUnEoa3WRwqzOxSA+L+
-         1vbij1K6Ax/yMhqP/iBubSzUYHNktWSEzx8uADbrY6rffaCLQ7ep1gbngox7VkbnaaXb
-         vkFqpS8anGN5Raz8RqTaoFvNJVdd3xc6pxjnIfD/NsPozrclL7TMnSKq4YoVEp1QfUy6
-         H3/uqs2DHxrowxH/MGQB4E9rSMkJ8+YglVg42kKCkQCShQcmeqMFdniOJgV2SSJ36quM
-         kUfLtOE2ftSuRCZnMUMYoCQIMeC/fnjqLzaL7AmbHo5Gv3NY9iwIug2SfdNyBkpKoJOL
-         wAvw==
-X-Gm-Message-State: AOAM533QKWPsZ+jSWUru8fGHGh0MkHPccHf85/cf6j/AQnJR3yDdY4v1
-        u7R9UhqtgrvlPHGkFQheuHUxS2QfA0j+7PZj2x2ouy5e7hjTJN4NtMYT6F8qWgtQQG5aXUoVrfJ
-        fj9L707lu4r28
-X-Received: by 2002:a05:600c:aca:: with SMTP id c10mr18225412wmr.174.1633350223513;
-        Mon, 04 Oct 2021 05:23:43 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxitcIwPYb5MpA3gCLqjGct65p9PyV+TzRYqXfXifFRuJt7/5ttvdPSHfIcdPnoBpfMalndPA==
-X-Received: by 2002:a05:600c:aca:: with SMTP id c10mr18225400wmr.174.1633350223347;
-        Mon, 04 Oct 2021 05:23:43 -0700 (PDT)
-Received: from ?IPv6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id f19sm14674493wmf.11.2021.10.04.05.23.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 04 Oct 2021 05:23:42 -0700 (PDT)
-Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH v2 3/5] hw/arm/virt: Honor highmem setting when computing
- the memory map
-To:     Marc Zyngier <maz@kernel.org>, qemu-devel@nongnu.org
-Cc:     Andrew Jones <drjones@redhat.com>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        kernel-team@android.com
-References: <20211003164605.3116450-1-maz@kernel.org>
- <20211003164605.3116450-4-maz@kernel.org>
-From:   Eric Auger <eric.auger@redhat.com>
-Message-ID: <b36a602e-a8f4-c8ac-bd4b-95fd6d426736@redhat.com>
-Date:   Mon, 4 Oct 2021 14:23:41 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Uw5NpJXbzzDq6kJP5OT7G1gnqMoSZ/d9kINK/rCAzT8=;
+        b=CtFzLO9do6uf802XDgFxEFrZrcQDy1pwIKS+GFLOxA6fhhBBUpzyWo+tRV7dzJJWve
+         Gj7iwbWU/8dheNQeP1pMAeUTTphsPg/DXIyfIrrPrhM2AiVXDxms25A0jgxtByFno6TA
+         HB1k0XNCBxIQo8FFg7eDrAAfDMp8yrm7VOC+VEFbysoIGijayBG7LmFD4HSOn7+xqwE4
+         s9iCZzwgpN0OzzWdnBEOHYccTI23ztdsCAHtc+twiSm9lQdwkteXqhXlxTdsq3jMfWka
+         dQPx5wj7Lkh5zhdddp5O12xPtCf10IIl2eu9KIkKHwlJMvdQLigwQrp3WSXltye91l+h
+         1Ujg==
+X-Gm-Message-State: AOAM533uM0Z8cSzPZ1vDCqYBXagKY9zwMWv6d+3paDuHrCIqqsluiHko
+        LKiwFqndMRc00uwqG+eRVN358ayfQzHkaD09KgJkhW7iRs3AmqUc4zxsCPsQq4dewNQIJ227I+X
+        ZLce12vez3wpJ
+X-Received: by 2002:a05:600c:a43:: with SMTP id c3mr1337365wmq.193.1633351454295;
+        Mon, 04 Oct 2021 05:44:14 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz4nEBKHflJAK2AmabY0s2VvyOBAWVL0rQ87qW9vo8k6xnnXuaoOWlGnMLJ2dMtwaNobKrbOA==
+X-Received: by 2002:a05:600c:a43:: with SMTP id c3mr1337349wmq.193.1633351454093;
+        Mon, 04 Oct 2021 05:44:14 -0700 (PDT)
+Received: from gator (nat-pool-brq-u.redhat.com. [213.175.37.12])
+        by smtp.gmail.com with ESMTPSA id d129sm17767301wmd.23.2021.10.04.05.44.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Oct 2021 05:44:13 -0700 (PDT)
+Date:   Mon, 4 Oct 2021 14:44:11 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Zixuan Wang <zixuanwang@google.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, marcorr@google.com,
+        baekhw@google.com, tmroeder@google.com, erdemaktas@google.com,
+        rientjes@google.com, seanjc@google.com, brijesh.singh@amd.com,
+        Thomas.Lendacky@amd.com, varad.gautam@suse.com, jroedel@suse.de,
+        bp@suse.de
+Subject: Re: [kvm-unit-tests PATCH v2 03/17] x86 UEFI: Copy code from GNU-EFI
+Message-ID: <20211004124411.nqikc4wyvpal73sh@gator>
+References: <20210827031222.2778522-1-zixuanwang@google.com>
+ <20210827031222.2778522-4-zixuanwang@google.com>
 MIME-Version: 1.0
-In-Reply-To: <20211003164605.3116450-4-maz@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210827031222.2778522-4-zixuanwang@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
-
-On 10/3/21 6:46 PM, Marc Zyngier wrote:
-> Even when the VM is configured with highmem=off, the highest_gpa
-> field includes devices that are above the 4GiB limit.
-> Similarily, nothing seem to check that the memory is within
-> the limit set by the highmem=off option.
->
-> This leads to failures in virt_kvm_type() on systems that have
-> a crippled IPA range, as the reported IPA space is larger than
-> what it should be.
->
-> Instead, honor the user-specified limit to only use the devices
-> at the lowest end of the spectrum, and fail if we have memory
-> crossing the 4GiB limit.
->
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+On Fri, Aug 27, 2021 at 03:12:08AM +0000, Zixuan Wang wrote:
+> To build x86 test cases with UEFI, we need to borrow some source
+> code from GNU-EFI, which includes the initialization code and linker
+> scripts. This commit only copies the source code, without any
+> modification. These source code files are not used by KVM-Unit-Tests
+> in this commit.
+> 
+> The following source code is copied from GNU-EFI:
+>    1. x86/efi/elf_x86_64_efi.lds
+>    2. x86/efi/reloc_x86_64.c
+>    3. x86/efi/crt0-efi-x86_64.S
+> 
+> We put these EFI-related files under a new dir `x86/efi` because:
+>    1. EFI-related code is easy to find
+>    2. EFI-related code is separated from the original code in `x86/`
+>    3. EFI-related code can still reuse the Makefile and test case code
+>       in its parent dir `x86/`
+> 
+> GNU-EFI repo and version:
+>    GIT URL: https://git.code.sf.net/p/gnu-efi/code
+>    Commit ID: 4fe83e102674
+>    Website: https://sourceforge.net/p/gnu-efi/code/ci/4fe83e/tree/
+> 
+> Co-developed-by: Varad Gautam <varad.gautam@suse.com>
+> Signed-off-by: Varad Gautam <varad.gautam@suse.com>
+> Signed-off-by: Zixuan Wang <zixuanwang@google.com>
 > ---
->  hw/arm/virt.c | 9 ++++++++-
->  1 file changed, 8 insertions(+), 1 deletion(-)
->
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index bcf58f677d..9d2abdbd5f 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -1628,6 +1628,11 @@ static void virt_set_memmap(VirtMachineState *vms)
->          exit(EXIT_FAILURE);
->      }
->  
-> +    if (!vms->highmem &&
-> +        vms->memmap[VIRT_MEM].base + ms->maxram_size > 4 * GiB) {
-> +        error_report("highmem=off, but memory crosses the 4GiB limit\n");
-> +        exit(EXIT_FAILURE);
-> +    }
->      /*
->       * We compute the base of the high IO region depending on the
->       * amount of initial and device memory. The device memory start/size
-> @@ -1657,7 +1662,9 @@ static void virt_set_memmap(VirtMachineState *vms)
->          vms->memmap[i].size = size;
->          base += size;
->      }
-> -    vms->highest_gpa = base - 1;
-> +    vms->highest_gpa = (vms->highmem ?
-> +                        base :
-> +                        vms->memmap[VIRT_MEM].base + ms->maxram_size) - 1;
-I think I would have preferred to have
+>  x86/efi/README.md          |  25 ++++++++++
+>  x86/efi/crt0-efi-x86_64.S  |  79 +++++++++++++++++++++++++++++
+>  x86/efi/elf_x86_64_efi.lds |  77 ++++++++++++++++++++++++++++
+>  x86/efi/reloc_x86_64.c     | 100 +++++++++++++++++++++++++++++++++++++
+>  4 files changed, 281 insertions(+)
+>  create mode 100644 x86/efi/README.md
+>  create mode 100644 x86/efi/crt0-efi-x86_64.S
+>  create mode 100644 x86/efi/elf_x86_64_efi.lds
+>  create mode 100644 x86/efi/reloc_x86_64.c
+> 
+> diff --git a/x86/efi/README.md b/x86/efi/README.md
+> new file mode 100644
+> index 0000000..256ef8c
+> --- /dev/null
+> +++ b/x86/efi/README.md
+> @@ -0,0 +1,25 @@
+> +# EFI Startup Code and Linker Script
+> +
+> +This dir contains source code and linker script copied from
+> +[GNU-EFI](https://sourceforge.net/projects/gnu-efi/):
+> +   - crt0-efi-x86_64.S: startup code of an EFI application
+> +   - elf_x86_64_efi.lds: linker script to build an EFI application
+> +   - reloc_x86_64.c: position independent x86_64 ELF shared object relocator
+> +
+> +EFI application binaries should be relocatable as UEFI loads binaries to dynamic
+> +runtime addresses. To build such relocatable binaries, GNU-EFI utilizes the
+> +above-mentioned files in its build process:
+> +
+> +   1. build an ELF shared object and link it using linker script
+> +      `elf_x86_64_efi.lds` to organize the sections in a way UEFI recognizes
+> +   2. link the shared object with self-relocator `reloc_x86_64.c` that applies
+> +      dynamic relocations that may be present in the shared object
+> +   3. link the entry point code `crt0-efi-x86_64.S` that invokes self-relocator
+> +      and then jumps to EFI application's `efi_main()` function
+> +   4. convert the shared object to an EFI binary
+> +
+> +More details can be found in `GNU-EFI/README.gnuefi`, section "Building
+> +Relocatable Binaries".
+> +
+> +KVM-Unit-Tests follows a similar build process, but does not link with GNU-EFI
+> +library.
 
-if (vms->highmem) {
-   for (i = VIRT_LOWMEMMAP_LAST; i < ARRAY_SIZE(extended_memmap); i++) {
-        hwaddr size = extended_memmap[i].size;
+So, for AArch64, I also want to drop the gnu-efi dependency of my original
+PoC. My second PoC, which I haven't finished, took things a bit further
+than this does, though. I was integrating a PE/COFF header and linker
+script changes directly into the kvm-unit-tests code rather than copying
+these files over.
 
-        base = ROUND_UP(base, size);
-        vms->memmap[i].base = base;
-        vms->memmap[i].size = size;
-        base += size;
-    }
-}
-as it is useless to execute that code and create new memmap entries in
-case of !highmem.
-
-But nevertheless, this looks correct
-
-Eric
->      if (device_memory_size > 0) {
->          ms->device_memory = g_malloc0(sizeof(*ms->device_memory));
->          ms->device_memory->base = device_memory_base;
+Thanks,
+drew
 
