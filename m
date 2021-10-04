@@ -2,62 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6DB38420736
-	for <lists+kvm@lfdr.de>; Mon,  4 Oct 2021 10:19:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3104F42073E
+	for <lists+kvm@lfdr.de>; Mon,  4 Oct 2021 10:23:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231233AbhJDIV2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Oct 2021 04:21:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41338 "EHLO
+        id S231132AbhJDIZW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Oct 2021 04:25:22 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:25908 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231229AbhJDIVW (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 4 Oct 2021 04:21:22 -0400
+        by vger.kernel.org with ESMTP id S230238AbhJDIZT (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 4 Oct 2021 04:25:19 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1633335568;
+        s=mimecast20190719; t=1633335810;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=bN5QvHIJyGEQLQUq3qeSzwte5zqrib25h9U6MkoN11c=;
-        b=dFZCfJB1/vNKO6bnvZheP9Gnj3ql2C/3WkZJW4TVMUFoNLjjtN3MwE/8ERLdaTu5VYg2HV
-        yTvythpIUa/PPAkzX0YrW3mGoMPLnWgXJ3801GH6pxvCClnILRHCFgfXaQvcV9KJbsacZl
-        WZj1pPRElDVVLwc4GfcWJid62G0+dDk=
+        bh=PNL0p/IcbfpfIHVZTeeyrwcQJfydGzS91iuchDZcq4c=;
+        b=ePKes/e7AoT9GZduBrcjh2dpkCkm0HUnEgTwbF2xWVBSoXZl1xLb282S69/dw2HW4oSCML
+        zdeQBrojqd2Cn26WRkIUm7+Eb5AWIJz9Njk1o05mDF+f7m59G+GYV88WhNQgd8Mric8NY7
+        vmKwjZ/QMZq9n8GmTOt90sif6/LdJx8=
 Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
  [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-215-OLkLFwv7PtCtIlpmoF_goQ-1; Mon, 04 Oct 2021 04:19:25 -0400
-X-MC-Unique: OLkLFwv7PtCtIlpmoF_goQ-1
-Received: by mail-ed1-f71.google.com with SMTP id m20-20020aa7c2d4000000b003d1add00b8aso16465813edp.0
-        for <kvm@vger.kernel.org>; Mon, 04 Oct 2021 01:19:25 -0700 (PDT)
+ us-mta-116-AjG9bDDwNMeHCmKGrIyqLQ-1; Mon, 04 Oct 2021 04:23:29 -0400
+X-MC-Unique: AjG9bDDwNMeHCmKGrIyqLQ-1
+Received: by mail-ed1-f71.google.com with SMTP id t28-20020a508d5c000000b003dad7fc5caeso6496202edt.11
+        for <kvm@vger.kernel.org>; Mon, 04 Oct 2021 01:23:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=bN5QvHIJyGEQLQUq3qeSzwte5zqrib25h9U6MkoN11c=;
-        b=Co6c8lprDw6P944RahWAWEa6FTKrdAQRDjN7/fCDi54FUtP1NSJyZbMCK+wGaGmScf
-         KA1XdA9OQob5RQkem3vYyFeEC5HQ6gtOI2EtbUXAPNFV+07g8YF03x8Q8LgNny6TedPe
-         H9e/jKU4Q1MEaPILT5MkHa9xt6pMPq18fWPWf+S9qL+JfaJXqKzuMELnvnhyDpjB/E0b
-         aVDeISzBz1b6U+vV4oaoQPWmjiHaQtFqYD7WXPl6PxNfC+f96M40iqeL64ZQdesmSwtq
-         0FY7/6maDwQtVcfj5B2mZkjhpjLBCBnQnNCKzAmb+eJYKppo67tb697UBrrM2uM0uxFJ
-         5Z1g==
-X-Gm-Message-State: AOAM533Wml6bzVmm4VUlY51v+/nMsJPWuEO0ulODG6rvOe33+NaEMdho
-        hlz/Ass5HJhpvg8QmXb44vX4lLiJmBoFLCmvCCxp6CSiFe0fVFCovT1VatSHfJUT1xlcn9bh3Aq
-        f7JdvdS9MlcRY
-X-Received: by 2002:a05:6402:3133:: with SMTP id dd19mr16994647edb.172.1633335564509;
-        Mon, 04 Oct 2021 01:19:24 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzBhF4FwsUP4iOjbFWBnvAEoKJKpZZrsb6YyGy3NvjZ0mIJUpS1ews6+9+BjKYDpFDl1JzbGQ==
-X-Received: by 2002:a05:6402:3133:: with SMTP id dd19mr16994619edb.172.1633335564242;
-        Mon, 04 Oct 2021 01:19:24 -0700 (PDT)
+        bh=PNL0p/IcbfpfIHVZTeeyrwcQJfydGzS91iuchDZcq4c=;
+        b=3E4PitpgeiroJDySmVYtylIpn9K2vZclO0Y+VLCL/z7UOVv+AnbHjB9TGffPU3TCfk
+         Kz2kVacd1KGoRqSRe6bZGS10ovUSPXCfQh/FbEYILLUgtbwl+ZXuV9YOkEmWClK0BBNj
+         2K8V7cqPgonHF8hlbUXmdG6m8ke9NIgJMO1TzxV9wklgY5SpvYnt6ahX4pycBC1rudQI
+         6lCwq9KkYCCsHxgVnLmJxgLKrRNJpEITRY8/KVKbh0Oze3irte6rFboFPebvn7XVi0tV
+         oYqLHXZD5YN0t7ouNQHeBBYZ3El7VQASfPBz/2UBtSfO3VP5v3ia0S332YfwTIYEtpZQ
+         4f5w==
+X-Gm-Message-State: AOAM533zUQ/s4rzJLtiR9auut4qcb+vkhF8TbEdzEgdUUm9R7oo9uT8n
+        sKpahFSqGU4au6h1swOtwd5H1NElr0bSBvJitKbrSnmZystvMxTWE4QfNOaccQhSPua61oPnTbF
+        c+27Gd9TjxyI9
+X-Received: by 2002:a17:906:a08d:: with SMTP id q13mr15246975ejy.465.1633335808055;
+        Mon, 04 Oct 2021 01:23:28 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwZ0fYN3lmONz80EpgX+hD8OiLLPKVt+i7MlsXtnV8WtzTOcG0sbh83Y+6YYJTHqdfvWQEf8Q==
+X-Received: by 2002:a17:906:a08d:: with SMTP id q13mr15246953ejy.465.1633335807847;
+        Mon, 04 Oct 2021 01:23:27 -0700 (PDT)
 Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id d22sm6204775ejk.5.2021.10.04.01.19.17
+        by smtp.gmail.com with ESMTPSA id di4sm6842337edb.34.2021.10.04.01.23.26
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 04 Oct 2021 01:19:23 -0700 (PDT)
-Message-ID: <84e1213b-c6c0-85a4-0d3e-854cd3dc0fa0@redhat.com>
-Date:   Mon, 4 Oct 2021 10:19:12 +0200
+        Mon, 04 Oct 2021 01:23:27 -0700 (PDT)
+Message-ID: <86b19b44-a8e2-af97-2b96-8cc21ed1be34@redhat.com>
+Date:   Mon, 4 Oct 2021 10:23:26 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.1.0
-Subject: Re: [PATCH v3 13/22] target/i386/sev: Remove stubs by using code
- elision
+Subject: Re: [PATCH v3 14/22] target/i386/sev: Move
+ qmp_query_sev_attestation_report() to sev.c
 Content-Language: en-US
 To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
         qemu-devel@nongnu.org
@@ -69,9 +69,9 @@ Cc:     Brijesh Singh <brijesh.singh@amd.com>, kvm@vger.kernel.org,
         "Daniel P . Berrange" <berrange@redhat.com>,
         Eduardo Habkost <ehabkost@redhat.com>
 References: <20211002125317.3418648-1-philmd@redhat.com>
- <20211002125317.3418648-14-philmd@redhat.com>
+ <20211002125317.3418648-15-philmd@redhat.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20211002125317.3418648-14-philmd@redhat.com>
+In-Reply-To: <20211002125317.3418648-15-philmd@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -79,182 +79,120 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 02/10/21 14:53, Philippe Mathieu-Daudé wrote:
-> Only declare sev_enabled() and sev_es_enabled() when CONFIG_SEV is
-> set, to allow the compiler to elide unused code. Remove unnecessary
-> stubs.
+> Move qmp_query_sev_attestation_report() from monitor.c to sev.c
+> and make sev_get_attestation_report() static. We don't need the
+> stub anymore, remove it.
 > 
 > Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
->   include/sysemu/sev.h    | 14 +++++++++++++-
->   target/i386/sev_i386.h  |  3 ---
->   target/i386/cpu.c       | 16 +++++++++-------
->   target/i386/sev-stub.c  | 36 ------------------------------------
->   target/i386/meson.build |  2 +-
->   5 files changed, 23 insertions(+), 48 deletions(-)
->   delete mode 100644 target/i386/sev-stub.c
-> 
-> diff --git a/include/sysemu/sev.h b/include/sysemu/sev.h
-> index a329ed75c1c..f5c625bb3b3 100644
-> --- a/include/sysemu/sev.h
-> +++ b/include/sysemu/sev.h
-> @@ -14,9 +14,21 @@
->   #ifndef QEMU_SEV_H
->   #define QEMU_SEV_H
->   
-> -#include "sysemu/kvm.h"
-> +#ifndef CONFIG_USER_ONLY
-> +#include CONFIG_DEVICES /* CONFIG_SEV */
-> +#endif
->   
-> +#ifdef CONFIG_SEV
->   bool sev_enabled(void);
-> +bool sev_es_enabled(void);
-> +#else
-> +#define sev_enabled() 0
-> +#define sev_es_enabled() 0
-> +#endif
 
-This means that sev.h can only be included from target-specific files.
+This was done on purpose, but I have no objection to changing it this 
+way.  We might in fact remove the indirection for SGX as well, and/or 
+even move the implementation of the monitor commands from target/i386 to 
+hw/i386 (the monitor is sysemu-specific).
 
-An alternative could be:
-
-#ifdef NEED_CPU_H
-# include CONFIG_DEVICES
-#endif
-
-#if defined NEED_CPU_H && !defined CONFIG_SEV
-# define sev_enabled() 0
-# define sev_es_enabled() 0
-#else
-bool sev_enabled(void);
-bool sev_es_enabled(void);
-#endif
-
-... but in fact sysemu/sev.h _is_ only used from x86-specific files. So 
-should it be moved to include/hw/i386, and even merged with 
-target/i386/sev_i386.h?  Do we need two files?
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 
 Thanks,
 
 Paolo
 
-> +uint32_t sev_get_cbit_position(void);
-> +uint32_t sev_get_reduced_phys_bits(void);
-> +
->   int sev_kvm_init(ConfidentialGuestSupport *cgs, Error **errp);
->   
->   #endif
+>   target/i386/sev_i386.h        |  2 --
+>   target/i386/monitor.c         |  6 ------
+>   target/i386/sev-sysemu-stub.c |  7 ++++---
+>   target/i386/sev.c             | 12 ++++++++++--
+>   4 files changed, 14 insertions(+), 13 deletions(-)
+> 
 > diff --git a/target/i386/sev_i386.h b/target/i386/sev_i386.h
-> index 0798ab3519a..2d9a1a0112e 100644
+> index 2d9a1a0112e..5f367f78eb7 100644
 > --- a/target/i386/sev_i386.h
 > +++ b/target/i386/sev_i386.h
-> @@ -24,10 +24,7 @@
->   #define SEV_POLICY_DOMAIN       0x10
->   #define SEV_POLICY_SEV          0x20
->   
-> -extern bool sev_es_enabled(void);
+> @@ -27,8 +27,6 @@
 >   extern SevInfo *sev_get_info(void);
-> -extern uint32_t sev_get_cbit_position(void);
-> -extern uint32_t sev_get_reduced_phys_bits(void);
 >   extern char *sev_get_launch_measurement(void);
 >   extern SevCapability *sev_get_capabilities(Error **errp);
->   extern SevAttestationReport *
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index e169a01713d..27992bdc9f8 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -25,8 +25,8 @@
->   #include "tcg/helper-tcg.h"
->   #include "sysemu/reset.h"
->   #include "sysemu/hvf.h"
-> +#include "sysemu/sev.h"
->   #include "kvm/kvm_i386.h"
-> -#include "sev_i386.h"
+> -extern SevAttestationReport *
+> -sev_get_attestation_report(const char *mnonce, Error **errp);
+>   
+>   int sev_encrypt_flash(uint8_t *ptr, uint64_t len, Error **errp);
+>   int sev_inject_launch_secret(const char *hdr, const char *secret,
+> diff --git a/target/i386/monitor.c b/target/i386/monitor.c
+> index a9f85acd473..c05d70252a2 100644
+> --- a/target/i386/monitor.c
+> +++ b/target/i386/monitor.c
+> @@ -764,12 +764,6 @@ void qmp_sev_inject_launch_secret(const char *packet_hdr,
+>       sev_inject_launch_secret(packet_hdr, secret, gpa, errp);
+>   }
+>   
+> -SevAttestationReport *
+> -qmp_query_sev_attestation_report(const char *mnonce, Error **errp)
+> -{
+> -    return sev_get_attestation_report(mnonce, errp);
+> -}
+> -
+>   SGXInfo *qmp_query_sgx(Error **errp)
+>   {
+>       return sgx_get_info(errp);
+> diff --git a/target/i386/sev-sysemu-stub.c b/target/i386/sev-sysemu-stub.c
+> index d556b4f091f..813b9a6a03b 100644
+> --- a/target/i386/sev-sysemu-stub.c
+> +++ b/target/i386/sev-sysemu-stub.c
+> @@ -13,6 +13,7 @@
+>   
+>   #include "qemu/osdep.h"
+>   #include "qapi/qapi-commands-misc-target.h"
+> +#include "qapi/qmp/qerror.h"
 >   #include "qapi/error.h"
->   #include "qapi/qapi-visit-machine.h"
->   #include "qapi/qmp/qerror.h"
-> @@ -38,6 +38,7 @@
->   #include "exec/address-spaces.h"
->   #include "hw/boards.h"
->   #include "hw/i386/sgx-epc.h"
-> +#include "sev_i386.h"
->   #endif
+>   #include "sev_i386.h"
 >   
->   #include "disas/capstone.h"
-> @@ -5764,12 +5765,13 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
->           *edx = 0;
->           break;
->       case 0x8000001F:
-> -        *eax = sev_enabled() ? 0x2 : 0;
-> -        *eax |= sev_es_enabled() ? 0x8 : 0;
-> -        *ebx = sev_get_cbit_position();
-> -        *ebx |= sev_get_reduced_phys_bits() << 6;
-> -        *ecx = 0;
-> -        *edx = 0;
-> +        *eax = *ebx = *ecx = *edx = 0;
-> +        if (sev_enabled()) {
-> +            *eax = 0x2;
-> +            *eax |= sev_es_enabled() ? 0x8 : 0;
-> +            *ebx = sev_get_cbit_position();
-> +            *ebx |= sev_get_reduced_phys_bits() << 6;
-> +        }
->           break;
->       default:
->           /* reserved values: zero */
-> diff --git a/target/i386/sev-stub.c b/target/i386/sev-stub.c
-> deleted file mode 100644
-> index 8eae5d2fa8d..00000000000
-> --- a/target/i386/sev-stub.c
-> +++ /dev/null
-> @@ -1,36 +0,0 @@
-> -/*
-> - * QEMU SEV stub
-> - *
-> - * Copyright Advanced Micro Devices 2018
-> - *
-> - * Authors:
-> - *      Brijesh Singh <brijesh.singh@amd.com>
-> - *
-> - * This work is licensed under the terms of the GNU GPL, version 2 or later.
-> - * See the COPYING file in the top-level directory.
-> - *
-> - */
-> -
-> -#include "qemu/osdep.h"
-> -#include "qapi/error.h"
-> -#include "sev_i386.h"
-> -
-> -bool sev_enabled(void)
-> -{
-> -    return false;
-> -}
-> -
-> -uint32_t sev_get_cbit_position(void)
-> -{
-> -    return 0;
-> -}
-> -
-> -uint32_t sev_get_reduced_phys_bits(void)
-> -{
-> -    return 0;
-> -}
-> -
-> -bool sev_es_enabled(void)
-> -{
-> -    return false;
-> -}
-> diff --git a/target/i386/meson.build b/target/i386/meson.build
-> index a4f45c3ec1d..ae38dc95635 100644
-> --- a/target/i386/meson.build
-> +++ b/target/i386/meson.build
-> @@ -6,7 +6,7 @@
->     'xsave_helper.c',
->     'cpu-dump.c',
->   ))
-> -i386_ss.add(when: 'CONFIG_SEV', if_true: files('host-cpu.c'), if_false: files('sev-stub.c'))
-> +i386_ss.add(when: 'CONFIG_SEV', if_true: files('host-cpu.c'))
+> @@ -52,9 +53,9 @@ int sev_es_save_reset_vector(void *flash_ptr, uint64_t flash_size)
+>       g_assert_not_reached();
+>   }
 >   
->   # x86 cpu type
->   i386_ss.add(when: 'CONFIG_KVM', if_true: files('host-cpu.c'))
+> -SevAttestationReport *sev_get_attestation_report(const char *mnonce,
+> -                                                 Error **errp)
+> +SevAttestationReport *qmp_query_sev_attestation_report(const char *mnonce,
+> +                                                       Error **errp)
+>   {
+> -    error_setg(errp, "SEV is not available in this QEMU");
+> +    error_setg(errp, QERR_UNSUPPORTED);
+>       return NULL;
+>   }
+> diff --git a/target/i386/sev.c b/target/i386/sev.c
+> index aefbef4bb63..91a217bbb85 100644
+> --- a/target/i386/sev.c
+> +++ b/target/i386/sev.c
+> @@ -31,6 +31,8 @@
+>   #include "migration/blocker.h"
+>   #include "qom/object.h"
+>   #include "monitor/monitor.h"
+> +#include "qapi/qapi-commands-misc-target.h"
+> +#include "qapi/qmp/qerror.h"
+>   #include "exec/confidential-guest-support.h"
+>   #include "hw/i386/pc.h"
+>   
+> @@ -487,8 +489,8 @@ out:
+>       return cap;
+>   }
+>   
+> -SevAttestationReport *
+> -sev_get_attestation_report(const char *mnonce, Error **errp)
+> +static SevAttestationReport *sev_get_attestation_report(const char *mnonce,
+> +                                                        Error **errp)
+>   {
+>       struct kvm_sev_attestation_report input = {};
+>       SevAttestationReport *report = NULL;
+> @@ -549,6 +551,12 @@ sev_get_attestation_report(const char *mnonce, Error **errp)
+>       return report;
+>   }
+>   
+> +SevAttestationReport *qmp_query_sev_attestation_report(const char *mnonce,
+> +                                                       Error **errp)
+> +{
+> +    return sev_get_attestation_report(mnonce, errp);
+> +}
+> +
+>   static int
+>   sev_read_file_base64(const char *filename, guchar **data, gsize *len)
+>   {
 > 
 
