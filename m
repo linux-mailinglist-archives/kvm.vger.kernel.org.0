@@ -2,25 +2,25 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CB0B84215B0
-	for <lists+kvm@lfdr.de>; Mon,  4 Oct 2021 19:56:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E0EEA4215AC
+	for <lists+kvm@lfdr.de>; Mon,  4 Oct 2021 19:56:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235709AbhJDR6q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Oct 2021 13:58:46 -0400
-Received: from mail.kernel.org ([198.145.29.99]:36156 "EHLO mail.kernel.org"
+        id S235644AbhJDR6m (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Oct 2021 13:58:42 -0400
+Received: from mail.kernel.org ([198.145.29.99]:36098 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235624AbhJDR6l (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Oct 2021 13:58:41 -0400
+        id S235542AbhJDR6j (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Oct 2021 13:58:39 -0400
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id A2DCF6115C;
-        Mon,  4 Oct 2021 17:56:52 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 5AC1A61207;
+        Mon,  4 Oct 2021 17:56:50 +0000 (UTC)
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <maz@kernel.org>)
-        id 1mXS5H-00EhBv-45; Mon, 04 Oct 2021 18:49:03 +0100
+        id 1mXS5H-00EhBv-I3; Mon, 04 Oct 2021 18:49:03 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org
@@ -34,9 +34,9 @@ Cc:     will@kernel.org, qperret@google.com, dbrazdil@google.com,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         kernel-team@android.com
-Subject: [PATCH v2 11/16] firmware/smccc: Call arch-specific hook on discovering KVM services
-Date:   Mon,  4 Oct 2021 18:48:44 +0100
-Message-Id: <20211004174849.2831548-12-maz@kernel.org>
+Subject: [PATCH v2 12/16] mm/vmalloc: Add arch-specific callbacks to track io{remap,unmap} physical pages
+Date:   Mon,  4 Oct 2021 18:48:45 +0100
+Message-Id: <20211004174849.2831548-13-maz@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20211004174849.2831548-1-maz@kernel.org>
 References: <20211004174849.2831548-1-maz@kernel.org>
@@ -50,61 +50,90 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-arm64 will soon require its own callback to initialise services
-that are only availably on this architecture. Introduce a hook
-that can be overloaded by the architecture.
+Add a pair of hooks (ioremap_phys_range_hook/iounmap_phys_range_hook)
+that can be implemented by an architecture. Contrary to the existing
+arch_sync_kernel_mappings(), this one tracks things at the physical
+address level.
+
+This is specially useful in these virtualised environments where
+the guest has to tell the host whether (and how) it intends to use
+a MMIO device.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm/include/asm/hypervisor.h   | 1 +
- arch/arm64/include/asm/hypervisor.h | 1 +
- drivers/firmware/smccc/kvm_guest.c  | 4 ++++
- 3 files changed, 6 insertions(+)
+ include/linux/io.h |  2 ++
+ mm/Kconfig         |  5 +++++
+ mm/vmalloc.c       | 12 +++++++++++-
+ 3 files changed, 18 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm/include/asm/hypervisor.h b/arch/arm/include/asm/hypervisor.h
-index bd61502b9715..8133c8c81a35 100644
---- a/arch/arm/include/asm/hypervisor.h
-+++ b/arch/arm/include/asm/hypervisor.h
-@@ -6,5 +6,6 @@
+diff --git a/include/linux/io.h b/include/linux/io.h
+index 9595151d800d..84eac81e8834 100644
+--- a/include/linux/io.h
++++ b/include/linux/io.h
+@@ -21,6 +21,8 @@ void __ioread32_copy(void *to, const void __iomem *from, size_t count);
+ void __iowrite64_copy(void __iomem *to, const void *from, size_t count);
  
- void kvm_init_hyp_services(void);
- bool kvm_arm_hyp_service_available(u32 func_id);
-+void kvm_arm_init_hyp_services(void);
+ #ifdef CONFIG_MMU
++void ioremap_phys_range_hook(phys_addr_t phys_addr, size_t size, pgprot_t prot);
++void iounmap_phys_range_hook(phys_addr_t phys_addr, size_t size);
+ int ioremap_page_range(unsigned long addr, unsigned long end,
+ 		       phys_addr_t phys_addr, pgprot_t prot);
+ #else
+diff --git a/mm/Kconfig b/mm/Kconfig
+index d16ba9249bc5..a154803836b7 100644
+--- a/mm/Kconfig
++++ b/mm/Kconfig
+@@ -894,6 +894,11 @@ config IO_MAPPING
+ config SECRETMEM
+ 	def_bool ARCH_HAS_SET_DIRECT_MAP && !EMBEDDED
  
- #endif
-diff --git a/arch/arm64/include/asm/hypervisor.h b/arch/arm64/include/asm/hypervisor.h
-index 0ae427f352c8..8e77f411903f 100644
---- a/arch/arm64/include/asm/hypervisor.h
-+++ b/arch/arm64/include/asm/hypervisor.h
-@@ -6,5 +6,6 @@
- 
- void kvm_init_hyp_services(void);
- bool kvm_arm_hyp_service_available(u32 func_id);
-+void kvm_arm_init_hyp_services(void);
- 
- #endif
-diff --git a/drivers/firmware/smccc/kvm_guest.c b/drivers/firmware/smccc/kvm_guest.c
-index 2d3e866decaa..56169e73252a 100644
---- a/drivers/firmware/smccc/kvm_guest.c
-+++ b/drivers/firmware/smccc/kvm_guest.c
-@@ -9,6 +9,8 @@
- 
- #include <asm/hypervisor.h>
- 
-+void __weak kvm_arm_init_hyp_services(void) {}
++# Some architectures want callbacks for all IO mappings in order to
++# track the physical addresses that get used as devices.
++config ARCH_HAS_IOREMAP_PHYS_HOOKS
++	bool
 +
- static DECLARE_BITMAP(__kvm_arm_hyp_services, ARM_SMCCC_KVM_NUM_FUNCS) __ro_after_init = { };
+ source "mm/damon/Kconfig"
  
- void __init kvm_init_hyp_services(void)
-@@ -38,6 +40,8 @@ void __init kvm_init_hyp_services(void)
+ endmenu
+diff --git a/mm/vmalloc.c b/mm/vmalloc.c
+index d77830ff604c..babcf3a75502 100644
+--- a/mm/vmalloc.c
++++ b/mm/vmalloc.c
+@@ -38,6 +38,7 @@
+ #include <linux/pgtable.h>
+ #include <linux/uaccess.h>
+ #include <linux/hugetlb.h>
++#include <linux/io.h>
+ #include <asm/tlbflush.h>
+ #include <asm/shmparam.h>
  
- 	pr_info("hypervisor services detected (0x%08lx 0x%08lx 0x%08lx 0x%08lx)\n",
- 		 res.a3, res.a2, res.a1, res.a0);
+@@ -316,9 +317,14 @@ int ioremap_page_range(unsigned long addr, unsigned long end,
+ {
+ 	int err;
+ 
+-	err = vmap_range_noflush(addr, end, phys_addr, pgprot_nx(prot),
++	prot = pgprot_nx(prot);
++	err = vmap_range_noflush(addr, end, phys_addr, prot,
+ 				 ioremap_max_page_shift);
+ 	flush_cache_vmap(addr, end);
 +
-+	kvm_arm_init_hyp_services();
++	if (IS_ENABLED(CONFIG_ARCH_HAS_IOREMAP_PHYS_HOOKS) && !err)
++		ioremap_phys_range_hook(phys_addr, end - addr, prot);
++
+ 	return err;
  }
  
- bool kvm_arm_hyp_service_available(u32 func_id)
+@@ -2608,6 +2614,10 @@ static void __vunmap(const void *addr, int deallocate_pages)
+ 
+ 	kasan_poison_vmalloc(area->addr, get_vm_area_size(area));
+ 
++	if (IS_ENABLED(CONFIG_ARCH_HAS_IOREMAP_PHYS_HOOKS) &&
++	    area->flags & VM_IOREMAP)
++		iounmap_phys_range_hook(area->phys_addr, get_vm_area_size(area));
++
+ 	vm_remove_mappings(area, deallocate_pages);
+ 
+ 	if (deallocate_pages) {
 -- 
 2.30.2
 
