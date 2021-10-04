@@ -2,114 +2,208 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D6189420915
-	for <lists+kvm@lfdr.de>; Mon,  4 Oct 2021 12:11:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BE7A8420918
+	for <lists+kvm@lfdr.de>; Mon,  4 Oct 2021 12:11:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229760AbhJDKMu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Oct 2021 06:12:50 -0400
-Received: from mout-p-102.mailbox.org ([80.241.56.152]:60732 "EHLO
-        mout-p-102.mailbox.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230086AbhJDKMs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Oct 2021 06:12:48 -0400
-X-Greylist: delayed 3742 seconds by postgrey-1.27 at vger.kernel.org; Mon, 04 Oct 2021 06:12:48 EDT
-Received: from smtp2.mailbox.org (smtp2.mailbox.org [80.241.60.241])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mout-p-102.mailbox.org (Postfix) with ESMTPS id 4HNGh303SZzQkBK;
-        Mon,  4 Oct 2021 12:10:59 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=mailbox.org; h=
-        content-transfer-encoding:content-type:content-type:mime-version
-        :subject:subject:references:in-reply-to:message-id:from:from
-        :date:date:received; s=mail20150812; t=1633342256; bh=eS2EPe4eHl
-        2N1wDjzplFdaJCLfRzATCMbKor42NuLwQ=; b=E5gsHViEF9b6Qz9kxmyyixgv63
-        kgOfreOt975wyzF4qnLA2hTIqdcoBa6zprAKzC7UN8NqIyAveBotnzd+GFVX+PfP
-        VDd7q3wkmW+pvIaTlZJhU9asm/yJkqZSUJm7q/ii1UVv1gfA9wjvrSSYeF76j3s4
-        98tCJbElMG2Jw0Jq6IBILOrC1JOV1mJMMG0hCxM997GDW3JDayTrGSvITetvgTBa
-        trBUEvv5iPUe/kAa6CRzc4ZPyK352eHuMuXfNrP7dYRkVN2WZQat2OGb8yx8F1TP
-        3Hid3uLhVNoYn2lr/ZGbicG6EBqV8OuU8i+4Gkb4DFkCaKZYnYSofJaiwdgg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-        t=1633342257;
+        id S231847AbhJDKNF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Oct 2021 06:13:05 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:40073 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229545AbhJDKNE (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 4 Oct 2021 06:13:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1633342275;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=zP6aY9O1wW8f739eGeU+KeGXD/SGH19xgBt/Oo3Iwx8=;
-        b=X+A/g8xWEi631k+mYpNmmMPDPuTcV9ftD+BsgNIoMqmOSUSFoILCzqjftRpMzGneEQ8PjR
-        lL6UYvywXHAciMZ2qSJxr2p5Xzh1FRRo+wGdoPAeKB1Cqgpp6u0bLsxedHz4ZWvNNLp59U
-        hitOCjveWwngbocwdfcOUqmUQPBh2b1YmMXCd1QrVGh9KFPqX1mUwZfIaN2zjREwGnVR7J
-        jIJlZOJsfV7ZxItfzPC5ILIkWuLFcJA4/Fd9gtaxbWiuQYLAmG5tQK+/yzOH4BlNNlGsYo
-        z52jIWktVJuJkVKp+DiPIVtoSlWSfCqaqdOa0iIcxdRBBfIpInSo6aeg7kPKBQ==
-X-Virus-Scanned: amavisd-new at heinlein-support.de
-Date:   Mon, 4 Oct 2021 12:10:55 +0200 (CEST)
-From:   torvic9@mailbox.org
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        "seanjc@google.com" <seanjc@google.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "ndesaulniers@google.com" <ndesaulniers@google.com>,
-        "nathan@kernel.org" <nathan@kernel.org>
-Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "bp@alien8.de" <bp@alien8.de>
-Message-ID: <1723492337.161319.1633342255263@office.mailbox.org>
-In-Reply-To: <c4773ecc-053f-9bc6-03af-5039397a4531@redhat.com>
-References: <1446878298.170497.1633338512925@office.mailbox.org>
- <b6abc5a3-39ea-b463-9df5-f50bdcb16d08@redhat.com>
- <936688112.157288.1633339838738@office.mailbox.org>
- <c4773ecc-053f-9bc6-03af-5039397a4531@redhat.com>
-Subject: Re: [BUG] [5.15] Compilation error in arch/x86/kvm/mmu/spte.h with
- clang-14
+        bh=7vrwkiYNmH9gme5GZD+IE0TvO4gorlXeNfmKqQOUQ2A=;
+        b=TR2WaA+qUVsOG0nnh6lPkR7gdKo1UqNrrlO8AHalFwGjF3/0vWctP6omRxeNXnKzmor7k6
+        z1+ygRcHtgEiDTAo9PImbjk23z1FTH+6ptwhdIo5KGR+9dgUY5ql4Eem5usSUfTwkskoO/
+        Ek8B85W5S3ijyXvHMOxw3pYiOHYw0vw=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-362-fZ-s9k6vNjmVHeeniQWBAw-1; Mon, 04 Oct 2021 06:11:13 -0400
+X-MC-Unique: fZ-s9k6vNjmVHeeniQWBAw-1
+Received: by mail-wr1-f72.google.com with SMTP id c2-20020adfa302000000b0015e4260febdso4450164wrb.20
+        for <kvm@vger.kernel.org>; Mon, 04 Oct 2021 03:11:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=7vrwkiYNmH9gme5GZD+IE0TvO4gorlXeNfmKqQOUQ2A=;
+        b=XdDLYVWIneRs/H73YnCLq9TdW4/5q44/dReSlUStEmCKKBmJqPoEYR7eJWoCBuoHX3
+         QAt/TARu5Xyg5YT2EGBKoZSn8b+k7CIMLVGJJorWJfMMWHpuRcShlVbSRyqjdZgCANYR
+         KT8uixuT3POoCb7kuQ4VWOUEjpWYQqafTUAx3fpKJc3jYqK91/RgV0/VihLcZ7xy4rMu
+         fP1RNOe2TUpgz2ffSzX5FAZwRiWZCxjpOXOODLGAlIqHcGN/FSgE8TdUTSsk9hqC4Gzn
+         5UtPGHSA0OaVicDenorypoxPf0iVC2s1Jbk7B6wjzcphzMhNcnPWlUS9J2Jv8SakqOpt
+         6GWQ==
+X-Gm-Message-State: AOAM5334yLL5IICXVGVGitng1MUJ8iCid1NR5cdvPOUGUuCY++dUb3Sq
+        7d0OsZCbigfYHu/ta9xLLdJr68vlEiVv0NZHmSGfq3U68byff8aPd1d1gqRUHhydSpnJy/x1ets
+        H3ENs81yXYNsu
+X-Received: by 2002:adf:a30b:: with SMTP id c11mr12974074wrb.289.1633342272549;
+        Mon, 04 Oct 2021 03:11:12 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzq2FZ3CpAT5XH1tlJ1e5mgY4TiPIO/pbY6WYKk/ugWs9aFSuDXGQ1ktJJSgRf+gzBqButoyw==
+X-Received: by 2002:adf:a30b:: with SMTP id c11mr12974021wrb.289.1633342272059;
+        Mon, 04 Oct 2021 03:11:12 -0700 (PDT)
+Received: from gator (nat-pool-brq-u.redhat.com. [213.175.37.12])
+        by smtp.gmail.com with ESMTPSA id t11sm13810480wrz.65.2021.10.04.03.11.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Oct 2021 03:11:11 -0700 (PDT)
+Date:   Mon, 4 Oct 2021 12:11:10 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     qemu-devel@nongnu.org, Eric Auger <eric.auger@redhat.com>,
+        Peter Maydell <peter.maydell@linaro.org>,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        kernel-team@android.com
+Subject: Re: [PATCH v2 4/5] hw/arm/virt: Use the PA range to compute the
+ memory map
+Message-ID: <20211004101110.imtfcufnrdwhneev@gator>
+References: <20211003164605.3116450-1-maz@kernel.org>
+ <20211003164605.3116450-5-maz@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Priority: 3
-Importance: Normal
-X-Rspamd-Queue-Id: 02CE317FC
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211003164605.3116450-5-maz@kernel.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-> Paolo Bonzini <pbonzini@redhat.com> hat am 04.10.2021 11:49 geschrieben:
+On Sun, Oct 03, 2021 at 05:46:04PM +0100, Marc Zyngier wrote:
+> The highmem attribute is nothing but another way to express the
+> PA range of a VM. To support HW that has a smaller PA range then
+> what QEMU assumes, pass this PA range to the virt_set_memmap()
+> function, allowing it to correctly exclude highmem devices
+> if they are outside of the PA range.
 > 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  hw/arm/virt.c | 46 +++++++++++++++++++++++++++++++++++-----------
+>  1 file changed, 35 insertions(+), 11 deletions(-)
+> 
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index 9d2abdbd5f..a572e0c9d9 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -1610,10 +1610,10 @@ static uint64_t virt_cpu_mp_affinity(VirtMachineState *vms, int idx)
+>      return arm_cpu_mp_affinity(idx, clustersz);
+>  }
 >  
-> On 04/10/21 11:30, torvic9@mailbox.org wrote:
-> > 
-> >> Paolo Bonzini <pbonzini@redhat.com> hat am 04.10.2021 11:26 geschrieben:
-> >>
-> >>   
-> >> On 04/10/21 11:08, torvic9@mailbox.org wrote:
-> >>> I encounter the following issue when compiling 5.15-rc4 with clang-14:
-> >>>
-> >>> In file included from arch/x86/kvm/mmu/mmu.c:27:
-> >>> arch/x86/kvm/mmu/spte.h:318:9: error: use of bitwise '|' with boolean operands [-Werror,-Wbitwise-instead-of-logical]
-> >>>           return __is_bad_mt_xwr(rsvd_check, spte) |
-> >>>                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> >>>                                                    ||
-> >>> arch/x86/kvm/mmu/spte.h:318:9: note: cast one or both operands to int to silence this warning
-> >>
-> >> The warning is wrong, as mentioned in the line right above:
-> > 
-> > So it's an issue with clang-14 then?
-> > (I add Nick and Nathan)
-> 
-> My clang here doesn't have the option, so I'm going to ask---are you 
-> using W=1?  I can see why clang is warning for KVM's code, but in my 
-> opinion such a check should only be in -Wextra.
+> -static void virt_set_memmap(VirtMachineState *vms)
+> +static void virt_set_memmap(VirtMachineState *vms, int pa_bits)
+>  {
+>      MachineState *ms = MACHINE(vms);
+> -    hwaddr base, device_memory_base, device_memory_size;
+> +    hwaddr base, device_memory_base, device_memory_size, memtop;
+>      int i;
+>  
+>      vms->memmap = extended_memmap;
+> @@ -1628,9 +1628,12 @@ static void virt_set_memmap(VirtMachineState *vms)
+>          exit(EXIT_FAILURE);
+>      }
+>  
+> -    if (!vms->highmem &&
+> -        vms->memmap[VIRT_MEM].base + ms->maxram_size > 4 * GiB) {
+> -        error_report("highmem=off, but memory crosses the 4GiB limit\n");
+> +    if (!vms->highmem)
+> +	    pa_bits = 32;
+> +
+> +    if (vms->memmap[VIRT_MEM].base + ms->maxram_size > BIT_ULL(pa_bits)) {
+> +	    error_report("Addressing limited to %d bits, but memory exceeds it by %llu bytes\n",
+> +			 pa_bits, vms->memmap[VIRT_MEM].base + ms->maxram_size - BIT_ULL(pa_bits));
+>          exit(EXIT_FAILURE);
+>      }
+>      /*
+> @@ -1645,7 +1648,7 @@ static void virt_set_memmap(VirtMachineState *vms)
+>      device_memory_size = ms->maxram_size - ms->ram_size + ms->ram_slots * GiB;
+>  
+>      /* Base address of the high IO region */
+> -    base = device_memory_base + ROUND_UP(device_memory_size, GiB);
+> +    memtop = base = device_memory_base + ROUND_UP(device_memory_size, GiB);
+>      if (base < device_memory_base) {
+>          error_report("maxmem/slots too huge");
+>          exit(EXIT_FAILURE);
+> @@ -1662,9 +1665,17 @@ static void virt_set_memmap(VirtMachineState *vms)
+>          vms->memmap[i].size = size;
+>          base += size;
+>      }
+> -    vms->highest_gpa = (vms->highmem ?
+> -                        base :
+> -                        vms->memmap[VIRT_MEM].base + ms->maxram_size) - 1;
+> +
+> +    /*
+> +     * If base fits within pa_bits, all good. If it doesn't, limit it
+> +     * to the end of RAM, which is guaranteed to fit within pa_bits.
 
-I don't use any options (not that I'm aware of).
-Clang version 14.0.0 5f7a5353301b776ffb0e5fb048992898507bf7ee
+We tested that
 
+  vms->memmap[VIRT_MEM].base + ms->maxram_size
+
+fits within pa_bits, but here we're setting highest_gpa to
+
+  ROUND_UP(vms->memmap[VIRT_MEM].base + ms->ram_size, GiB) +
+  ROUND_UP(ms->maxram_size - ms->ram_size + ms->ram_slots * GiB, GiB)
+
+which will be larger. Shouldn't we test memtop instead to make this
+guarantee?
+
+
+> +     */
+> +    if (base <= BIT_ULL(pa_bits)) {
+> +        vms->highest_gpa = base -1;
+> +    } else {
+> +        vms->highest_gpa = memtop - 1;
+> +    }
+> +
+>      if (device_memory_size > 0) {
+>          ms->device_memory = g_malloc0(sizeof(*ms->device_memory));
+>          ms->device_memory->base = device_memory_base;
+> @@ -1860,7 +1871,20 @@ static void machvirt_init(MachineState *machine)
+>       * to create a VM with the right number of IPA bits.
+>       */
+>      if (!vms->memmap) {
+> -        virt_set_memmap(vms);
+> +        ARMCPU *armcpu = ARM_CPU(first_cpu);
+
+
+I think it's too early to use first_cpu here (although, I'll admit I'm
+always confused as to what gets initialized when...) Assuming we need to
+realize the cpus first, then we don't do that until a bit further down
+in this function. I wonder if it's possible to delay this memmap setup
+until after cpu realization. I see the memmap getting used prior when
+calculating virt_max_cpus, but that looks like it needs to be updated
+anyway to take highmem into account as to whether or not we should
+consider the high gicv3 redist region in the calculation.
+
+> +        int pa_bits;
+> +
+> +        if (object_property_get_bool(OBJECT(first_cpu), "aarch64", NULL)) {
+> +            pa_bits = arm_pamax(armcpu);
+> +        } else if (arm_feature(&armcpu->env, ARM_FEATURE_LPAE)) {
+> +            /* v7 with LPAE */
+> +            pa_bits = 40;
+> +        } else {
+> +            /* Anything else */
+> +            pa_bits = 32;
+> +        }
+> +
+> +        virt_set_memmap(vms, pa_bits);
+>      }
+>  
+>      /* We can probe only here because during property set
+> @@ -2596,7 +2620,7 @@ static int virt_kvm_type(MachineState *ms, const char *type_str)
+>      max_vm_pa_size = kvm_arm_get_max_vm_ipa_size(ms, &fixed_ipa);
+>  
+>      /* we freeze the memory map to compute the highest gpa */
+> -    virt_set_memmap(vms);
+> +    virt_set_memmap(vms, max_vm_pa_size);
+>  
+>      requested_pa_size = 64 - clz64(vms->highest_gpa);
+>  
+> -- 
+> 2.30.2
 > 
-> Paolo
-> 
-> >>
-> >>           /*
-> >>            * Use a bitwise-OR instead of a logical-OR to aggregate the reserved
-> >>            * bits and EPT's invalid memtype/XWR checks to avoid an extra Jcc
-> >>            * (this is extremely unlikely to be short-circuited as true).
-> >>            */
-> >>
-> >> Paolo
-> >
+
+Thanks,
+drew
+
