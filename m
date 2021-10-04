@@ -2,98 +2,265 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 00E3E421664
-	for <lists+kvm@lfdr.de>; Mon,  4 Oct 2021 20:27:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 799CD4218A1
+	for <lists+kvm@lfdr.de>; Mon,  4 Oct 2021 22:49:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238523AbhJDS26 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Oct 2021 14:28:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50490 "EHLO
+        id S232523AbhJDUvZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Oct 2021 16:51:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55490 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238421AbhJDS26 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Oct 2021 14:28:58 -0400
-Received: from mail-yb1-xb32.google.com (mail-yb1-xb32.google.com [IPv6:2607:f8b0:4864:20::b32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7D75C061746
-        for <kvm@vger.kernel.org>; Mon,  4 Oct 2021 11:27:08 -0700 (PDT)
-Received: by mail-yb1-xb32.google.com with SMTP id d131so22587785ybd.5
-        for <kvm@vger.kernel.org>; Mon, 04 Oct 2021 11:27:08 -0700 (PDT)
+        with ESMTP id S232452AbhJDUvY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Oct 2021 16:51:24 -0400
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9961C061745
+        for <kvm@vger.kernel.org>; Mon,  4 Oct 2021 13:49:34 -0700 (PDT)
+Received: by mail-pf1-x429.google.com with SMTP id m5so2808541pfk.7
+        for <kvm@vger.kernel.org>; Mon, 04 Oct 2021 13:49:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=PIqLRUwkpWrhqoIb+2LbHIi6YwYZzYCnePRyYQW7lLY=;
-        b=gjvD3+vx4+r4kREI+kJyLRqAt3T9ueCkkwyrIGXw4kVjsxk4B+g3/MppZhl7N6wTiV
-         PMJqtTnyCh8HPiYVaClZKX6vsiy/6Hky+sKMa3Lv0KbQMju9xs4Np2wLdKgAB0JjT9Od
-         WKQmaL+SK4LQ59q2qi8GLJ4pEsOTqRJWOl1nQNfc6qULxZIsXFlxrSF4fWxTsGlbaevw
-         2YN7Xw8DA2tlSfBVpAcffPslrlDJrVUOjvu3UqCLjaEuFPaWwtlUYBZRaMkFjY1QzZ/Z
-         uDOdzZ5anwcBpaqRWOz2jV0W6w/UdOifflY5/OMNNvn9JP/fumSBYvDtWLn74afG0khE
-         2vwg==
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=/qzUSRA6XTo0GMtb7un+pTYuy1m1b1K6vi0ODtTx75M=;
+        b=lxpBzEYV22c+lcoXKdAHyGcb9Ggg4wq8I/7by9t6XfcnQK3f4g2ghuVEu2Dw6cOQ9F
+         Ko56SNRh9qW6EdT0aDqJI+8QRAuYFVrN6eTJf7AHDe8akhjOXxTse+9OGdWHoauUBCCJ
+         M2ZxPBOllFVeRaFn1hqMpJhG1dkiMEadgPFzx6lIkBsq6X4VxNBObkSS8TbzbuGFUcjv
+         wF6Qna+Jkil6IfPliLhqNQWJ8xZvS5qZq2SOt+sY1TeizoDkgILZxMk76xUbX9LoktDD
+         9Osu/MdNioMRUPgbZ6eB08BBi7CRBol73woKJD2Q6HnnsATnjcdO/zDhZYisq8HnGzhX
+         ef8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=PIqLRUwkpWrhqoIb+2LbHIi6YwYZzYCnePRyYQW7lLY=;
-        b=48cyXpxiRhmjdixvfRyMLSKP8CbXSNsMfQmY90zPmUAMup0cD2SXsCU/L+imSnAWZG
-         heh5oBkcmdoP5Pxbb0fbIhN/dyCRFsXQwm2ZaZowVToY2dTOHiqX0Mb8WLSJwFBPGkOS
-         BaLOWx+EHjfAtiAySMyRxYcjAAW9mCKKDcs4x9hS3a6pSzueIoKB1cpQhb30Iszsjn4Q
-         ZgRFKSn2UT6BiTWR3nAtUv+S/ws89oNEjycMCLgSnEaiIafUev+wAaG/G7ftQjJf6SAo
-         N9++f2jNW1iLq94s6KFmdetYQ3NQIbYVw+YrKAjihfzjEwRpp37aPeMFK+dEK1beBaBb
-         p1tA==
-X-Gm-Message-State: AOAM530VCpnRpgtl84ZoPTrmZmwAM07qzXb6hUtN6ZmiD3yZcXOeUMI2
-        625OWJezTrXN/3/1G0xRa3IcXVzOoKiXbt3xBk+LGQ==
-X-Google-Smtp-Source: ABdhPJwQO8pJHFNb8p9v0Uv+zTJOyZYyUBFOwoiGCzuPT59UynGevvRHp+VVKupk5VUaX29Kw8b7Zy4woqEdE6YhWDI=
-X-Received: by 2002:a5b:283:: with SMTP id x3mr16689301ybl.439.1633372027973;
- Mon, 04 Oct 2021 11:27:07 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=/qzUSRA6XTo0GMtb7un+pTYuy1m1b1K6vi0ODtTx75M=;
+        b=IQG3GBTJV8F+N329ND7PLlZkqnYZBpywPqFIJh5P9MALP8HyBiGg4JBkscX0ddvzBe
+         sUcEVpodjXlL+vWPyloes9ffB4C7HZIdJQHxdIhH7v6kYwkKN+GKT4VN7T9l87LTN1pP
+         eUbilxh1X3gRb0tL8A2/JA+XcuZ1jS04GV/DxgllqR96RvB8b3GYrvTpDNzpEVpR/sw7
+         SmjG8tdcpHOV3xts4C+FAOcmw37reBq/yMRa3VjhX1dkbz3yfB/f5atjF/hGkF3iBVqY
+         8cZg6ZmDuja/Z0Knbih5+lWXiY66u0KcsyT+biORB9o7IBF4uYeEMCvVhT+e8UtMA/+5
+         P7+A==
+X-Gm-Message-State: AOAM530LaHe8GtYSz6ev6G1NMuuv3PfKbfSg+ya9J4DlcgWUXtdYWIH+
+        GAdjDAyaEBm59uz1MrSMiPnz5zslC1PU8A==
+X-Google-Smtp-Source: ABdhPJxg8a8FLyGwIl9x38sC7eRFnjGqQqf6AZHrl1FkjiT4diLNJgyiL0NS91HotfHRpqPFsfvDRw==
+X-Received: by 2002:a62:7f87:0:b0:444:b077:51ef with SMTP id a129-20020a627f87000000b00444b07751efmr26465749pfd.61.1633380573710;
+        Mon, 04 Oct 2021 13:49:33 -0700 (PDT)
+Received: from localhost.localdomain (netadmin.ucsd.edu. [137.110.160.224])
+        by smtp.gmail.com with ESMTPSA id o12sm13635063pjm.57.2021.10.04.13.49.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Oct 2021 13:49:33 -0700 (PDT)
+From:   Zixuan Wang <zxwang42@gmail.com>
+To:     kvm@vger.kernel.org, pbonzini@redhat.com, drjones@redhat.com
+Cc:     marcorr@google.com, baekhw@google.com, tmroeder@google.com,
+        erdemaktas@google.com, rientjes@google.com, seanjc@google.com,
+        brijesh.singh@amd.com, Thomas.Lendacky@amd.com,
+        varad.gautam@suse.com, jroedel@suse.de, bp@suse.de
+Subject: [kvm-unit-tests PATCH v3 00/17] x86_64 UEFI and AMD SEV/SEV-ES support
+Date:   Mon,  4 Oct 2021 13:49:14 -0700
+Message-Id: <20211004204931.1537823-1-zxwang42@gmail.com>
+X-Mailer: git-send-email 2.33.0
 MIME-Version: 1.0
-References: <20210914223114.435273-1-rananta@google.com> <20210914223114.435273-13-rananta@google.com>
- <ab2a7213-1857-6761-594d-958af864a23a@huawei.com>
-In-Reply-To: <ab2a7213-1857-6761-594d-958af864a23a@huawei.com>
-From:   Raghavendra Rao Ananta <rananta@google.com>
-Date:   Mon, 4 Oct 2021 11:26:57 -0700
-Message-ID: <CAJHc60yXKdCCpSejxwGpmqoTenm=3589+ahmzkLkSnmy89+YLQ@mail.gmail.com>
-Subject: Re: [PATCH v7 12/15] KVM: arm64: selftests: Add basic GICv3 support
-To:     Zenghui Yu <yuzenghui@huawei.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Andrew Jones <drjones@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
-        Peter Shier <pshier@google.com>, linux-kernel@vger.kernel.org,
-        Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 30, 2021 at 1:06 AM Zenghui Yu <yuzenghui@huawei.com> wrote:
->
-> On 2021/9/15 6:31, Raghavendra Rao Ananta wrote:
-> > +static inline void *gicr_base_gpa_cpu(void *redist_base, uint32_t cpu)
-> > +{
-> > +     /* Align all the redistributors sequentially */
-> > +     return redist_base + cpu * SZ_64K * 2;
-> > +}
-> > +
-> > +static void gicv3_cpu_init(unsigned int cpu, void *redist_base)
-> > +{
-> > +     void *sgi_base;
-> > +     unsigned int i;
-> > +     void *redist_base_cpu;
-> > +
-> > +     GUEST_ASSERT(cpu < gicv3_data.nr_cpus);
-> > +
-> > +     redist_base_cpu = gicr_base_gpa_cpu(redist_base, cpu);
->
-> This is not 'gpa' and I'd rather open-code it directly as there's
-> just a single caller.
->
-> Zenghui
+Hello,
 
-Thanks for catching this. I agree that mentioning 'gpa' oddballs this
-function, since it's called from a guest's point of view. If there are
-any other major changes in the series, I'll try to change this as
-well. Else, I will try to raise a separate patch to resolve this.
+This patch series updates the x86_64 KVM-Unit-Tests to run under UEFI
+and culminates in enabling AMD SEV/SEV-ES. The patches are organized as
+four parts.
+
+The first part (patch 1) refactors the current Multiboot start-up code
+by converting assembly data structures into C. This enables the
+follow-up UEFI patches to reuse these data structures without redefining
+or duplicating them in assembly.
+
+The second part (patches 2-3) copies code from Varad's patch set [1]
+that builds EFI stubs without depending on GNU-EFI. Part 3 and 4 are
+built on top of this part.
+
+The third part (patches 4-11) enables the x86_64 test cases to run
+under UEFI. In particular, these patches allow the x86_64 test cases to
+be built as EFI executables and take full control of the guest VM. The
+efi_main() function sets up the KVM-Unit-Tests framework to run under
+UEFI and then launches the test cases' main() functions. To date, we
+have 38/43 test cases running with UEFI using this approach.
+
+The fourth part of the series (patches 12-17) focuses on SEV. In
+particular, these patches introduce SEV/SEV-ES set up code into the EFI
+set up process, including checking if SEV is supported, setting c-bits
+for page table entries, and (notably) reusing the UEFI #VC handler so
+that the set up process does not need to re-implement it (a test case
+can always implement a new #VC handler and load it after set up is
+finished). Using this approach, we are able to launch the x86_64 test
+cases under SEV-ES and exercise KVM's VMGEXIT handler.
+
+Note, a previous feedback [3] indicated that long-term we'd like to
+instrument KVM-Unit-Tests with it's own #VC handler. However, we still
+believe that the current approach is good as an intermediate solution,
+because it unlocks a lot of testing and we do not expect that testing
+to be inherently tied to the UEFI's #VC handler. Rather, test cases
+should be tied to the underlying GHCB spec implemented by an
+arbitrary #VC handler.
+
+See the Part 1 to Part 4 summaries, below, for a high-level breakdown
+of how the patches are organized.
+
+Part 1 Summary:
+Commit 1 refactors boot-related data structures from assembly to C.
+
+Part 2 Summary:
+Commits 2-3 copy code from Varad's patch set [1] that implements
+EFI-related helper functions to replace the GNU-EFI library.
+
+Part 3 Summary:
+Commits 4-5 introduce support to build test cases with EFI support.
+
+Commits 6-10 set up KVM-Unit-Tests to run under UEFI. In doing so, these
+patches incrementally enable most existing x86_64 test cases to run
+under UEFI.
+
+Commit 11 fixes several test cases that fail to compile with EFI due
+to UEFI's position independent code (PIC) requirement.
+
+Part 4 Summary:
+Commits 12-13 introduce support for SEV by adding code to set the SEV
+c-bit in page table entries.
+
+Commits 14-16 introduce support for SEV-ES by reusing the UEFI #VC
+handler in KVM-Unit-Tests. They also fix GDT and IDT issues that occur
+when reusing UEFI functions in KVM-Unit-Tests.
+
+Commit 17 adds additional test cases for SEV-ES.
+
+Changes V2 -> V3:
+V3 Patch #  Changes
+----------  -------
+     01/17  (New patch) refactors assembly data structures in C
+     02/17  Adds a missing alignment attribute
+            Renames the file uefi.h to efi.h
+     03/17  Adds an SPDX header, fixes a comment style issue
+     06/17  Removes assembly data structure definitions
+     07/17  Removes assembly data structure definitions
+     12/17  Simplifies an if condition code
+     14/17  Simplifies an if condition code
+     15/17  Removes GDT copying for SEV-ES #VC handler
+
+Notes on page table set up code:
+Paolo suggested unifying  the page table definitions in cstart64.S and
+UEFI start-up code [5]. We tried but found it hard to implement due to
+the real/long mode issue: a page table set up function written in C is
+by default compiled to run in long mode. However, cstart64.S requires
+page table setup before entering long mode. Calling a long mode function
+from real/protected mode crashes the guest VM. Thus we chose not to
+implement this feature in this patch set. More details can be found in
+our off-list GitHub review [6].
+
+Changes V1 -> V2:
+1. Merge Varad's patches [1] as the foundation of our V2 patch set [4].
+2. Remove AMD SEV/SEV-ES config flags and macros (patches 11-17)
+3. Drop one commit 'x86 UEFI: Move setjmp.h out of desc.h' because we do
+not link GNU-EFI library.
+
+Notes on authorships and attributions:
+The first two commits are from Varad's patch set [1], so they are
+tagged as 'From:' and 'Signed-off-by:' Varad. Commits 3-7 are from our
+V1 patch set [2], and since Varad implemented similar code [1], these
+commits are tagged as 'Co-developed-by:' and 'Signed-off-by:' Varad.
+
+Notes on patch sets merging strategy:
+We understand that the current merging strategy (reorganizing and
+squeezing Varad's patches into two) reduces Varad's authorships, and we
+hope the additional attribution tags make up for it. We see another
+approach which is to build our patch set on top of Varad's original
+patch set, but this creates some noise in the final patch set, e.g.,
+x86/cstart64.S is modified in Varad's part and later reverted in our
+part as we implement start up code in C. For the sake of the clarity of
+the code history, we believe the current approach is the best effort so
+far, and we are open to all kinds of opinions.
+
+[1] https://lore.kernel.org/kvm/20210819113400.26516-1-varad.gautam@suse.com/
+[2] https://lore.kernel.org/kvm/20210818000905.1111226-1-zixuanwang@google.com/
+[3] https://lore.kernel.org/kvm/YSA%2FsYhGgMU72tn+@google.com/
+[4] https://lore.kernel.org/kvm/20210827031222.2778522-1-zixuanwang@google.com/
+[5] https://lore.kernel.org/kvm/3fd467ae-63c9-adba-9d29-09b8a7beb92d@redhat.com/
+[6] https://github.com/marc-orr/KVM-Unit-Tests-dev-fork/pull/1
 
 Regards,
-Raghavendra
+Zixuan Wang
+
+Varad Gautam (2):
+  x86 UEFI: Copy code from Linux
+  x86 UEFI: Implement UEFI function calls
+
+Zixuan Wang (15):
+  x86: Move IDT, GDT and TSS to desc.c
+  x86 UEFI: Copy code from GNU-EFI
+  x86 UEFI: Boot from UEFI
+  x86 UEFI: Load IDT after UEFI boot up
+  x86 UEFI: Load GDT and TSS after UEFI boot up
+  x86 UEFI: Set up memory allocator
+  x86 UEFI: Set up RSDP after UEFI boot up
+  x86 UEFI: Set up page tables
+  x86 UEFI: Convert x86 test cases to PIC
+  x86 AMD SEV: Initial support
+  x86 AMD SEV: Page table with c-bit
+  x86 AMD SEV-ES: Check SEV-ES status
+  x86 AMD SEV-ES: Copy UEFI #VC IDT entry
+  x86 AMD SEV-ES: Set up GHCB page
+  x86 AMD SEV-ES: Add test cases
+
+ .gitignore                 |   3 +
+ Makefile                   |  29 +-
+ README.md                  |   6 +
+ configure                  |   6 +
+ lib/efi.c                  | 118 ++++++++
+ lib/efi.h                  |  22 ++
+ lib/linux/efi.h            | 539 +++++++++++++++++++++++++++++++++++++
+ lib/x86/acpi.c             |  38 ++-
+ lib/x86/acpi.h             |  11 +
+ lib/x86/amd_sev.c          | 174 ++++++++++++
+ lib/x86/amd_sev.h          |  63 +++++
+ lib/x86/asm/page.h         |  28 +-
+ lib/x86/asm/setup.h        |  35 +++
+ lib/x86/desc.c             |  46 +++-
+ lib/x86/desc.h             |   6 +-
+ lib/x86/setup.c            | 246 +++++++++++++++++
+ lib/x86/usermode.c         |   3 +-
+ lib/x86/vm.c               |  18 +-
+ x86/Makefile.common        |  68 +++--
+ x86/Makefile.i386          |   5 +-
+ x86/Makefile.x86_64        |  58 ++--
+ x86/access.c               |   9 +-
+ x86/amd_sev.c              |  94 +++++++
+ x86/cet.c                  |   8 +-
+ x86/cstart64.S             |  77 +-----
+ x86/efi/README.md          |  63 +++++
+ x86/efi/crt0-efi-x86_64.S  |  79 ++++++
+ x86/efi/efistart64.S       |  77 ++++++
+ x86/efi/elf_x86_64_efi.lds |  81 ++++++
+ x86/efi/reloc_x86_64.c     |  96 +++++++
+ x86/efi/run                |  63 +++++
+ x86/emulator.c             |   5 +-
+ x86/eventinj.c             |   6 +-
+ x86/run                    |  16 +-
+ x86/smap.c                 |   8 +-
+ x86/umip.c                 |  10 +-
+ x86/vmx.c                  |   8 +-
+ 37 files changed, 2067 insertions(+), 155 deletions(-)
+ create mode 100644 lib/efi.c
+ create mode 100644 lib/efi.h
+ create mode 100644 lib/linux/efi.h
+ create mode 100644 lib/x86/amd_sev.c
+ create mode 100644 lib/x86/amd_sev.h
+ create mode 100644 lib/x86/asm/setup.h
+ create mode 100644 x86/amd_sev.c
+ create mode 100644 x86/efi/README.md
+ create mode 100644 x86/efi/crt0-efi-x86_64.S
+ create mode 100644 x86/efi/efistart64.S
+ create mode 100644 x86/efi/elf_x86_64_efi.lds
+ create mode 100644 x86/efi/reloc_x86_64.c
+ create mode 100755 x86/efi/run
+
+-- 
+2.33.0
+
