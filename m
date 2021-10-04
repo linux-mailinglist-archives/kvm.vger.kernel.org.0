@@ -2,243 +2,215 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 73133420F1B
-	for <lists+kvm@lfdr.de>; Mon,  4 Oct 2021 15:29:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0273D421157
+	for <lists+kvm@lfdr.de>; Mon,  4 Oct 2021 16:30:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236955AbhJDNbK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Oct 2021 09:31:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58840 "EHLO
+        id S234072AbhJDOcN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Oct 2021 10:32:13 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:57402 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236945AbhJDN3P (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 4 Oct 2021 09:29:15 -0400
+        by vger.kernel.org with ESMTP id S233516AbhJDOcL (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 4 Oct 2021 10:32:11 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1633354044;
+        s=mimecast20190719; t=1633357821;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=3wIeBAbZa+UudCtpRgxTIjdaXZdYNzzwzAilVSKwWm4=;
-        b=SA6W7j3OngE6LpEZI3Eat9tfdk81WkJQY6mAeASv3bPmZxOw9Mrxhg72TYcSwdeSVxD+Oq
-        /kKKrX5+F2+K/Fg/BcZt7tvYNG9fEGOfVwnQ4fQSOIv2RfbfUMj6TT6ibRMUUklzIIKjSx
-        tCq6I9+IIaND2kWA5dgtRIGcvB4DqX4=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-317-jC2b08XIOcWABcXKHgwIeQ-1; Mon, 04 Oct 2021 09:27:23 -0400
-X-MC-Unique: jC2b08XIOcWABcXKHgwIeQ-1
-Received: by mail-wm1-f70.google.com with SMTP id 75-20020a1c004e000000b00307b9b32cc9so5137333wma.1
-        for <kvm@vger.kernel.org>; Mon, 04 Oct 2021 06:27:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=3wIeBAbZa+UudCtpRgxTIjdaXZdYNzzwzAilVSKwWm4=;
-        b=7xRzEeLQLmxZiEhjDc6y95MKFTS8i87qFgk0WzXbWpgNM1exxSXoJRWtl6RLw3Nh9O
-         RmHVihnamsQi2yERj3sA/qDgx6MDJWVAqbFugoT1j0bAFpAn+8mALyqbRDtX8p0PVsn3
-         HhL+25fUsjYKNIB1H1j++5NEJslCAA+80mea+IUueUOGwlhyfuqW+9MNiOUqhxmPsSAg
-         FHH6vNZHWXVaMXXcfupQAEZmhnRkzw4lS0DtrvJNB8Q8LQVJ/fp0Mw7Kus6neWnunESh
-         k9mRqfz7LDHIKBk7fWso4Ye3+F1gkD5SHCiCN5P38o0ZiGxk0R0Ltr1OlqigSuxn2qip
-         ceAg==
-X-Gm-Message-State: AOAM530d03grn7B4/I/+eilHnSDM9Qnan8ci3vgyVa4tCYNdLySjLIDf
-        mwhyUJ8klOAGYSn8VfzRPuGXsKbLr9K5RZLbacYShAcRAS4xmrzbJjGWSVTXYombmqPC/PDGbfB
-        xIZsvY+f0g9Wu
-X-Received: by 2002:adf:b304:: with SMTP id j4mr14640449wrd.160.1633354042662;
-        Mon, 04 Oct 2021 06:27:22 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzn/mnWHiCImFvYw7s7SIgiUIDei7STTNKk1DBc5LTbD18UZOFQwGkVA2QocET1t6DzwmkDSg==
-X-Received: by 2002:adf:b304:: with SMTP id j4mr14640424wrd.160.1633354042436;
-        Mon, 04 Oct 2021 06:27:22 -0700 (PDT)
-Received: from gator (nat-pool-brq-u.redhat.com. [213.175.37.12])
-        by smtp.gmail.com with ESMTPSA id f123sm17070106wmf.30.2021.10.04.06.27.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Oct 2021 06:27:22 -0700 (PDT)
-Date:   Mon, 4 Oct 2021 15:27:20 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     zxwang42@gmail.com
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, marcorr@google.com,
-        baekhw@google.com, tmroeder@google.com, erdemaktas@google.com,
-        rientjes@google.com, seanjc@google.com, brijesh.singh@amd.com,
-        Thomas.Lendacky@amd.com, varad.gautam@suse.com, jroedel@suse.de,
-        bp@suse.de
-Subject: Re: [kvm-unit-tests PATCH v2 00/17] x86_64 UEFI and AMD SEV/SEV-ES
- support
-Message-ID: <20211004132720.i77d2knwl7gxi3mx@gator>
-References: <20210827031222.2778522-1-zixuanwang@google.com>
+        bh=4VYFPa55D97zDtyLRl+yLgiIp27xlAa5QykhLUO/Whc=;
+        b=Ibl04MK1dg+rZR6Q4XNWPQZzokXaPh9HIvAFfdmYOhlu+bKYmt9Z531FzkXDY1wwKtFKOq
+        fHCcd7KK/wxOKEKEhQHIMg1eajGia1vEWL68QcYmAump1kaKXVDkD+vfJQfyj8fuQ5onzO
+        WnYsQLBGsaF0GNRz5kPezhunVLPpIvg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-270-Eg805yp2MUmJKwHZSsIvdg-1; Mon, 04 Oct 2021 10:30:19 -0400
+X-MC-Unique: Eg805yp2MUmJKwHZSsIvdg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8DDAB1966320;
+        Mon,  4 Oct 2021 14:30:17 +0000 (UTC)
+Received: from fuller.cnet (ovpn-112-2.gru2.redhat.com [10.97.112.2])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id DF29910016FB;
+        Mon,  4 Oct 2021 14:30:16 +0000 (UTC)
+Received: by fuller.cnet (Postfix, from userid 1000)
+        id EDC6B416CE5D; Mon,  4 Oct 2021 11:30:11 -0300 (-03)
+Date:   Mon, 4 Oct 2021 11:30:11 -0300
+From:   Marcelo Tosatti <mtosatti@redhat.com>
+To:     Oliver Upton <oupton@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu,
+        Sean Christopherson <seanjc@google.com>,
+        Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <Alexandru.Elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-arm-kernel@lists.infradead.org,
+        Andrew Jones <drjones@redhat.com>,
+        Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH v8 7/7] KVM: x86: Expose TSC offset controls to userspace
+Message-ID: <20211004143011.GA72593@fuller.cnet>
+References: <20210916181538.968978-1-oupton@google.com>
+ <20210916181538.968978-8-oupton@google.com>
+ <20210930191416.GA19068@fuller.cnet>
+ <48151d08-ee29-2b98-b6e1-f3c8a1ff26bc@redhat.com>
+ <20211001103200.GA39746@fuller.cnet>
+ <7901cb84-052d-92b6-1e6a-028396c2c691@redhat.com>
+ <20211001191117.GA69579@fuller.cnet>
+ <CAOQ_Qsj9ObSakmqgFQf598VscQWDh_Cq3WFqF7EpKqe2+RRgVg@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210827031222.2778522-1-zixuanwang@google.com>
+In-Reply-To: <CAOQ_Qsj9ObSakmqgFQf598VscQWDh_Cq3WFqF7EpKqe2+RRgVg@mail.gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 27, 2021 at 03:12:05AM +0000, Zixuan Wang wrote:
-> Hello,
+On Fri, Oct 01, 2021 at 12:33:28PM -0700, Oliver Upton wrote:
+> Marcelo,
 > 
-> This patch series updates the x86_64 KVM-Unit-Tests to run under UEFI
-> and culminates in enabling AMD SEV/SEV-ES. The patches are organized as
-> three parts.
+> On Fri, Oct 1, 2021 at 12:11 PM Marcelo Tosatti <mtosatti@redhat.com> wrote:
+> >
+> > On Fri, Oct 01, 2021 at 05:12:20PM +0200, Paolo Bonzini wrote:
+> > > On 01/10/21 12:32, Marcelo Tosatti wrote:
+> > > > > +1. Invoke the KVM_GET_CLOCK ioctl to record the host TSC (t_0), +
+> > > > > kvmclock nanoseconds (k_0), and realtime nanoseconds (r_0). + [...]
+> > > > >  +4. Invoke the KVM_SET_CLOCK ioctl, providing the kvmclock
+> > > > > nanoseconds +   (k_0) and realtime nanoseconds (r_0) in their
+> > > > > respective fields. +   Ensure that the KVM_CLOCK_REALTIME flag is
+> > > > > set in the provided +   structure. KVM will advance the VM's
+> > > > > kvmclock to account for elapsed +   time since recording the clock
+> > > > > values.
+> > > >
+> > > > You can't advance both kvmclock (kvmclock_offset variable) and the
+> > > > TSCs, which would be double counting.
+> > > >
+> > > > So you have to either add the elapsed realtime (1) between
+> > > > KVM_GET_CLOCK to kvmclock (which this patch is doing), or to the
+> > > > TSCs. If you do both, there is double counting. Am i missing
+> > > > something?
+> > >
+> > > Probably one of these two (but it's worth pointing out both of them):
+> > >
+> > > 1) the attribute that's introduced here *replaces*
+> > > KVM_SET_MSR(MSR_IA32_TSC), so the TSC is not added.
+> > >
+> > > 2) the adjustment formula later in the algorithm does not care about how
+> > > much time passed between step 1 and step 4.  It just takes two well
+> > > known (TSC, kvmclock) pairs, and uses them to ensure the guest TSC is
+> > > the same on the destination as if the guest was still running on the
+> > > source.  It is irrelevant that one of them is before migration and one
+> > > is after, all it matters is that one is on the source and one is on the
+> > > destination.
+> >
+> > OK, so it still relies on NTPd daemon to fix the CLOCK_REALTIME delay
+> > which is introduced during migration (which is what i would guess is
+> > the lower hanging fruit) (for guests using TSC).
 > 
-> The first part (patches 1-2) copies code from Varad's patch set [1]
-> that builds EFI stubs without depending on GNU-EFI. Part 2 and 3 are
-> built on top of this part.
+> The series gives userspace the ability to modify the guest's
+> perception of the TSC in whatever way it sees fit. The algorithm in
+> the documentation provides a suggestion to userspace on how to do
+> exactly that. I kept that advancement logic out of the kernel because
+> IMO it is an implementation detail: users have differing opinions on
+> how clocks should behave across a migration and KVM shouldn't have any
+> baked-in rules around it.
+
+Ok, was just trying to visualize how this would work with QEMU Linux guests.
+
 > 
-> The second part (patches 3-10) enables the x86_64 test cases to run
-> under UEFI. In particular, these patches allow the x86_64 test cases to
-> be built as EFI executables and take full control of the guest VM. The
-> efi_main() function sets up the KVM-Unit-Tests framework to run under
-> UEFI and then launches the test cases' main() function. To date, we
-> have 38/43 test cases running with UEFI using this approach.
+> At the same time, userspace can choose to _not_ jump the TSC and use
+> the available interfaces to just migrate the existing state of the
+> TSCs.
 > 
-> The third part of the series (patches 11-17) focuses on SEV. In
-> particular, these patches introduce SEV/SEV-ES set up code into the EFI
-> set up process, including checking if SEV is supported, setting c-bits
-> for page table entries, and (notably) reusing the UEFI #VC handler so
-> that the set up process does not need to re-implement it (a test case
-> can always implement a new #VC handler and load it after set up is
-> finished). Using this approach, we are able to launch the x86_64 test
-> cases under SEV-ES and exercise KVM's VMGEXIT handler.
+> When I had initially proposed this series upstream, Paolo astutely
+> pointed out that there was no good way to get a (CLOCK_REALTIME, TSC)
+> pairing, which is critical for the TSC advancement algorithm in the
+> documentation. Google's best way to get (CLOCK_REALTIME, TSC) exists
+> in userspace [1], hence the missing kvm clock changes. So, in all, the
+> spirit of the KVM clock changes is to provide missing UAPI around the
+> clock/TSC, with the side effect of changing the guest-visible value.
 > 
-> Note, a previous feedback [3] indicated that long-term we'd like to
-> instrument KVM-Unit-Tests with it's own #VC handler. However, we still
-> believe that the current approach is good as an intermediate solution,
-> because it unlocks a lot of testing and we do not expect that testing
-> to be inherently tied to the UEFI's #VC handler. Rather, test cases
-> should be tied to the underlying GHCB spec implemented by an
-> arbitrary #VC handler.
+> [1] https://cloud.google.com/spanner/docs/true-time-external-consistency
 > 
-> See the Part 1 to Part 3 summaries, below, for a high-level breakdown
-> of how the patches are organized.
+> > My point was that, by advancing the _TSC value_ by:
+> >
+> > T0. stop guest vcpus    (source)
+> > T1. KVM_GET_CLOCK       (source)
+> > T2. KVM_SET_CLOCK       (destination)
+> > T3. Write guest TSCs    (destination)
+> > T4. resume guest        (destination)
+> >
+> > new_off_n = t_0 + off_n + (k_1 - k_0) * freq - t_1
+> >
+> > t_0:    host TSC at KVM_GET_CLOCK time.
+> > off_n:  TSC offset at vcpu-n (as long as no guest TSC writes are performed,
+> > TSC offset is fixed).
+> > ...
+> >
+> > +4. Invoke the KVM_SET_CLOCK ioctl, providing the kvmclock nanoseconds
+> > +   (k_0) and realtime nanoseconds (r_0) in their respective fields.
+> > +   Ensure that the KVM_CLOCK_REALTIME flag is set in the provided
+> > +   structure. KVM will advance the VM's kvmclock to account for elapsed
+> > +   time since recording the clock values.
+> >
+> > Only kvmclock is advanced (by passing r_0). But a guest might not use kvmclock
+> > (hopefully modern guests on modern hosts will use TSC clocksource,
+> > whose clock_gettime is faster... some people are using that already).
+> >
 > 
-> Part 1 Summary:
-> Commits 1-2 copy code from Varad's patch set [1] that implements
-> EFI-related helper functions to replace the GNU-EFI library.
+> Hopefully the above explanation made it clearer how the TSCs are
+> supposed to get advanced, and why it isn't done in the kernel.
 > 
-> Part 2 Summary:
-> Commits 3-4 introduce support to build test cases with EFI support.
+> > At some point QEMU should enable invariant TSC flag by default?
+> >
+> > That said, the point is: why not advance the _TSC_ values
+> > (instead of kvmclock nanoseconds), as doing so would reduce
+> > the "the CLOCK_REALTIME delay which is introduced during migration"
+> > for both kvmclock users and modern tsc clocksource users.
+> >
+> > So yes, i also like this patchset, but would like it even more
+> > if it fixed the case above as well (and not sure whether adding
+> > the migration delta to KVMCLOCK makes it harder to fix TSC case
+> > later).
+> >
+> > > Perhaps we can add to step 6 something like:
+> > >
+> > > > +6. Adjust the guest TSC offsets for every vCPU to account for (1)
+> > > > time +   elapsed since recording state and (2) difference in TSCs
+> > > > between the +   source and destination machine: + +   new_off_n = t_0
+> > > > + off_n + (k_1 - k_0) * freq - t_1 +
+> > >
+> > > "off + t - k * freq" is the guest TSC value corresponding to a time of 0
+> > > in kvmclock.  The above formula ensures that it is the same on the
+> > > destination as it was on the source.
+> > >
+> > > Also, the names are a bit hard to follow.  Perhaps
+> > >
+> > >       t_0             tsc_src
+> > >       t_1             tsc_dest
+> > >       k_0             guest_src
+> > >       k_1             guest_dest
+> > >       r_0             host_src
+> > >       off_n           ofs_src[i]
+> > >       new_off_n       ofs_dest[i]
+> > >
+> > > Paolo
+> > >
 > 
-> Commits 5-9 set up KVM-Unit-Tests to run under UEFI. In doing so, these
-> patches incrementally enable most existing x86_64 test cases to run
-> under UEFI.
-> 
-> Commit 10 fixes several test cases that fail to compile with EFI due
-> to UEFI's position independent code (PIC) requirement.
-> 
-> Part 3 Summary:
-> Commits 11-12 introduce support for SEV by adding code to set the SEV
-> c-bit in page table entries.
-> 
-> Commits 13-16 introduce support for SEV-ES by reusing the UEFI #VC
-> handler in KVM-Unit-Tests. They also fix GDT and IDT issues that occur
-> when reusing UEFI functions in KVM-Unit-Tests.
-> 
-> Commit 17 adds additional test cases for SEV-ES.
-> 
-> Changes in V2:
-> 1.Merge Varad's patch set [1] as the foundation of this V2 patch set.
-> 2.Remove AMD SEV/SEV-ES config flags and macros (patches 11-17)
-> 3.Drop one commit 'x86 UEFI: Move setjmp.h out of desc.h' because we do
-> not link GNU-EFI library.
-> 
-> Notes on authorships and attributions:
-> The first two commits are from Varad's patch set [1], so they are
-> tagged as 'From:' and 'Signed-off-by:' Varad. Commits 3-7 are from our
-> V1 patch set [2], and since Varad implemented similar code [1], these
-> commits are tagged as 'Co-developed-by:' and 'Signed-off-by:' Varad.
-> 
-> Notes on patch sets merging strategy:
-> We understand that the current merging strategy (reorganizing and
-> squeezing Varad's patches into two) reduces Varad's authorships, and we
-> hope the additional attribution tags make up for it. We see another
-> approach which is to build our patch set on top of Varad's original
-> patch set, but this creates some noise in the final patch set, e.g.,
-> x86/cstart64.S is modified in Varad's part and later reverted in our
-> part as we implement start up code in C. For the sake of the clarity of
-> the code history, we believe the current approach is the best effort so
-> far, and we are open to all kinds of opinions.
-> 
-> [1] https://lore.kernel.org/kvm/20210819113400.26516-1-varad.gautam@suse.com/
-> [2] https://lore.kernel.org/kvm/20210818000905.1111226-1-zixuanwang@google.com/
-> [3] https://lore.kernel.org/kvm/YSA%2FsYhGgMU72tn+@google.com/
-> 
-> Regards,
-> Zixuan Wang
-> 
-> Varad Gautam (2):
->   x86 UEFI: Copy code from Linux
->   x86 UEFI: Implement UEFI function calls
-> 
-> Zixuan Wang (15):
->   x86 UEFI: Copy code from GNU-EFI
->   x86 UEFI: Boot from UEFI
->   x86 UEFI: Load IDT after UEFI boot up
->   x86 UEFI: Load GDT and TSS after UEFI boot up
->   x86 UEFI: Set up memory allocator
->   x86 UEFI: Set up RSDP after UEFI boot up
->   x86 UEFI: Set up page tables
->   x86 UEFI: Convert x86 test cases to PIC
->   x86 AMD SEV: Initial support
->   x86 AMD SEV: Page table with c-bit
->   x86 AMD SEV-ES: Check SEV-ES status
->   x86 AMD SEV-ES: Load GDT with UEFI segments
->   x86 AMD SEV-ES: Copy UEFI #VC IDT entry
->   x86 AMD SEV-ES: Set up GHCB page
->   x86 AMD SEV-ES: Add test cases
-> 
->  .gitignore                 |   3 +
->  Makefile                   |  29 +-
->  README.md                  |   6 +
->  configure                  |   6 +
->  lib/efi.c                  | 117 ++++++++
->  lib/efi.h                  |  18 ++
->  lib/linux/uefi.h           | 539 +++++++++++++++++++++++++++++++++++++
->  lib/x86/acpi.c             |  38 ++-
->  lib/x86/acpi.h             |  11 +
->  lib/x86/amd_sev.c          | 214 +++++++++++++++
->  lib/x86/amd_sev.h          |  64 +++++
->  lib/x86/asm/page.h         |  28 +-
->  lib/x86/asm/setup.h        |  31 +++
->  lib/x86/setup.c            | 246 +++++++++++++++++
->  lib/x86/usermode.c         |   3 +-
->  lib/x86/vm.c               |  18 +-
->  x86/Makefile.common        |  68 +++--
->  x86/Makefile.i386          |   5 +-
->  x86/Makefile.x86_64        |  58 ++--
->  x86/access.c               |   9 +-
->  x86/amd_sev.c              |  94 +++++++
->  x86/cet.c                  |   8 +-
->  x86/efi/README.md          |  63 +++++
->  x86/efi/crt0-efi-x86_64.S  |  79 ++++++
->  x86/efi/efistart64.S       | 143 ++++++++++
->  x86/efi/elf_x86_64_efi.lds |  81 ++++++
->  x86/efi/reloc_x86_64.c     |  97 +++++++
->  x86/efi/run                |  63 +++++
->  x86/emulator.c             |   5 +-
->  x86/eventinj.c             |   6 +-
->  x86/run                    |  16 +-
->  x86/smap.c                 |   8 +-
->  x86/umip.c                 |  10 +-
->  33 files changed, 2110 insertions(+), 74 deletions(-)
->  create mode 100644 lib/efi.c
->  create mode 100644 lib/efi.h
->  create mode 100644 lib/linux/uefi.h
->  create mode 100644 lib/x86/amd_sev.c
->  create mode 100644 lib/x86/amd_sev.h
->  create mode 100644 lib/x86/asm/setup.h
->  create mode 100644 x86/amd_sev.c
->  create mode 100644 x86/efi/README.md
->  create mode 100644 x86/efi/crt0-efi-x86_64.S
->  create mode 100644 x86/efi/efistart64.S
->  create mode 100644 x86/efi/elf_x86_64_efi.lds
->  create mode 100644 x86/efi/reloc_x86_64.c
->  create mode 100755 x86/efi/run
+> Yeah, sounds good to me. Shall I respin the whole series from what you
+> have in kvm/queue, or just send you the bits and pieces that ought to
+> be applied?
 > 
 > --
-> 2.33.0.259.gc128427fd7-goog
->
-
-Hi Zixuan,
-
-If you still intend to work on this series, please send a new posting from
-your personal mail address to avoid mail bounces on reviews.
-
-Thanks,
-drew
+> Thanks,
+> Oliver
+> 
+> 
 
