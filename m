@@ -2,113 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7E3FA4208A7
-	for <lists+kvm@lfdr.de>; Mon,  4 Oct 2021 11:47:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A24CB4208BC
+	for <lists+kvm@lfdr.de>; Mon,  4 Oct 2021 11:49:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232216AbhJDJtH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Oct 2021 05:49:07 -0400
-Received: from mail.kernel.org ([198.145.29.99]:48696 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232117AbhJDJtH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Oct 2021 05:49:07 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 01FF961181;
-        Mon,  4 Oct 2021 09:47:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1633340838;
-        bh=15jCOMDdwQB2RNCaL6998lZwo66iTosw6ZnWJH00Jek=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Ec4+LOmcTTL235Vn9dCoKh3IS06X5E4ZY1Hyb9G0b+qKXsgU2/bfvIbEVQw8+qDvG
-         XLSs7INCzJdpsnmhIdQbYNn2NRAc3YdpRvUAKz7iSBUWiUQHp+KFsnZn9S3elRx4eq
-         ongA+o9P2UEbAbv/xubesUQkKyvL2qK6e2y0C/cL8M4USqfQ2g8vBGwg3A7sNHIYWL
-         QyhjBKWTC6FfKflWMsoQie4YzHoSIh13wNI9uA3nrA9to8LiZVHQsIgjELuD6GFM21
-         HgdzFaWJXXL6GW57E3rNsOZcAyCUd9beHfnGEWBnxN3Bsv1aCnNN91ezXJ7WDm+Y5S
-         jcpS2A0fgY7FQ==
-Date:   Mon, 4 Oct 2021 10:47:13 +0100
-From:   Will Deacon <will@kernel.org>
-To:     Vivek Kumar Gautam <vivek.gautam@arm.com>
-Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
-        julien.thierry.kdev@gmail.com, kvm@vger.kernel.org,
-        andre.przywara@arm.com, lorenzo.pieralisi@arm.com,
-        jean-philippe@linaro.org, eric.auger@redhat.com
-Subject: Re: [PATCH] vfio/pci: Add support for PCIe extended capabilities
-Message-ID: <20211004094713.GB27173@willie-the-truck>
-References: <20210810062514.18980-1-vivek.gautam@arm.com>
- <af1ae6fe-176b-8016-3815-faa9651b0aba@arm.com>
- <51cc78f5-6841-5e83-3b28-bef7fbf68937@arm.com>
- <ae4bdd18-29c8-5871-5242-95d5c5d8a6a6@arm.com>
- <867e8db7-c173-5ad2-dca4-69085c89d956@arm.com>
+        id S232619AbhJDJvV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Oct 2021 05:51:21 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32375 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232636AbhJDJvQ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 4 Oct 2021 05:51:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1633340966;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=EeuBT38IBksFVSzljiek+n7kBS7W4m7e8iDQ7I8r+Fk=;
+        b=U6+blaWRYH35thhyWvvl3WNDG3oRrYabqW2pQyO0nSPxIy0gL+eJKnj0lejBHpOFpau7Bs
+        LRvGh6iMR3IuEs1x217EMKFJ2CN1k48LiBQoEhKGSCGSQfbwA5uUYeKOiFYhD70Eh2tKcg
+        XxAJYoPepwuNI+lClNLm93wPBiwAKdU=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-533-56r2ochdOZqTlrEUvFmM_w-1; Mon, 04 Oct 2021 05:49:25 -0400
+X-MC-Unique: 56r2ochdOZqTlrEUvFmM_w-1
+Received: by mail-ed1-f71.google.com with SMTP id d11-20020a50cd4b000000b003da63711a8aso16566287edj.20
+        for <kvm@vger.kernel.org>; Mon, 04 Oct 2021 02:49:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=EeuBT38IBksFVSzljiek+n7kBS7W4m7e8iDQ7I8r+Fk=;
+        b=sk8eys9eC2YukDKZiHA8LosckzR0HsETNQOMswehO8mhpHzzjjAg0cwNl0fbEnG3qz
+         XbkqN32Jmj3LyPNSUTNJPveAvx1BJF+352nxFFFLxYOElzP84dblwEa4pJXWi3LwgATb
+         s6q7+QZEnHJtZdSKmoaptqqirIMx9VAUxY3cqwCBdLwz9Wym8j/g2udlhtaDw2NO1wNE
+         F0t/8b83EXFHF4umTlRmAlStIgu8BsuZdbrCx42HKMtOlBpaXcAyPFr5ofSlNaNHhOWq
+         o82iHQzRMymu91wSVn8GBhQYuvxbnLV3wNXz92LQxxYMNlk4K3fTxtyC+zydLwMhKCaW
+         gkLw==
+X-Gm-Message-State: AOAM532Sp9DxcoMdA9Pa7zN8Y2LCa2skXbPczlRm8bx1w3u7GhiaVfLn
+        i1+qft5W7Hgs+xxkmhVvB0PME1pgqP0FmPp6a/hvo8UihBHwIfxCv+rR8xhPLGfRunrDaIFqO3Y
+        7y+X8gZ0Em25e
+X-Received: by 2002:aa7:c988:: with SMTP id c8mr9031961edt.94.1633340961871;
+        Mon, 04 Oct 2021 02:49:21 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwq2Fiq+9N1f2ghwd9NRBIT8c/6Ka2pFtouf328fiO9vvxzvKrkxSCkkOQd2eKpTr+oE/1GGA==
+X-Received: by 2002:aa7:c988:: with SMTP id c8mr9031803edt.94.1633340959617;
+        Mon, 04 Oct 2021 02:49:19 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
+        by smtp.gmail.com with ESMTPSA id p8sm6233000ejo.2.2021.10.04.02.49.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 04 Oct 2021 02:49:19 -0700 (PDT)
+Message-ID: <c4773ecc-053f-9bc6-03af-5039397a4531@redhat.com>
+Date:   Mon, 4 Oct 2021 11:49:06 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <867e8db7-c173-5ad2-dca4-69085c89d956@arm.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [BUG] [5.15] Compilation error in arch/x86/kvm/mmu/spte.h with
+ clang-14
+Content-Language: en-US
+To:     torvic9@mailbox.org, "seanjc@google.com" <seanjc@google.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "ndesaulniers@google.com" <ndesaulniers@google.com>,
+        "nathan@kernel.org" <nathan@kernel.org>
+Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "bp@alien8.de" <bp@alien8.de>
+References: <1446878298.170497.1633338512925@office.mailbox.org>
+ <b6abc5a3-39ea-b463-9df5-f50bdcb16d08@redhat.com>
+ <936688112.157288.1633339838738@office.mailbox.org>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <936688112.157288.1633339838738@office.mailbox.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 08, 2021 at 03:02:20PM +0530, Vivek Kumar Gautam wrote:
-> On 9/3/21 8:45 PM, Alexandru Elisei wrote:
-> > On 9/2/21 11:48 AM, Vivek Kumar Gautam wrote:
-> > > On 9/2/21 3:29 PM, Alexandru Elisei wrote:
-> > I think I found the card that doesn't work when overwriting the extended device
-> > configuration space. I tried device assignment with a Realtek 8168 Gigabit
-> > Ethernet card on a Seattle machine, and the host freezes when I try to start a VM.
-> > Even after reset, the machine doesn't boot anymore and it gets stuck during the
-> > boot process at this message:
-> > 
-> > NewPackageList status: EFI_SUCCESS
-> > BDS.SignalConnectDriversEvent(feeb6d60)
-> > BDS.ConnectRootBridgeHandles(feeb6db0)
-> > 
-> > It doesn't go away no matter how many times I reset the machine, to get it booting
-> > again I have to pull the plug and plug it again. I tried assigning the device to a
-> > VM several times, and this happened every time. The card doesn't have the caps
-> > that you added, this is caused entirely by the config space write (tried it with
-> > only the config space change).
-> > 
-> > It could be a problem kvmtool, with Linux or with the machine, but this is the
-> > only machine where device assignment works and I would like to keep it working
-> > with this NIC.
+On 04/10/21 11:30, torvic9@mailbox.org wrote:
+> 
+>> Paolo Bonzini <pbonzini@redhat.com> hat am 04.10.2021 11:26 geschrieben:
+>>
+>>   
+>> On 04/10/21 11:08, torvic9@mailbox.org wrote:
+>>> I encounter the following issue when compiling 5.15-rc4 with clang-14:
+>>>
+>>> In file included from arch/x86/kvm/mmu/mmu.c:27:
+>>> arch/x86/kvm/mmu/spte.h:318:9: error: use of bitwise '|' with boolean operands [-Werror,-Wbitwise-instead-of-logical]
+>>>           return __is_bad_mt_xwr(rsvd_check, spte) |
+>>>                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>>>                                                    ||
+>>> arch/x86/kvm/mmu/spte.h:318:9: note: cast one or both operands to int to silence this warning
+>>
+>> The warning is wrong, as mentioned in the line right above:
+> 
+> So it's an issue with clang-14 then?
+> (I add Nick and Nathan)
 
-There is at least a problem with the machine/firmware if you can get it
-into this state.
+My clang here doesn't have the option, so I'm going to ask---are you 
+using W=1?  I can see why clang is warning for KVM's code, but in my 
+opinion such a check should only be in -Wextra.
 
-> Sorry for the delay in responding. I took sometime off work.
-> Sure, we will try to keep your machine working :)
-> 
-> > 
-> > One solution I see is to add a field to vfio_pci_device (something like has_pcie),
-> > and based on that, vfio_pci_fixup_cfg_space() could overwrite only the first 256
-> > bytes or the entire device configuration space.
-> 
-> Does the card support PCI extended caps (as seen from the PCI spec v5.0
-> section-7.5)?
-> If no, then I guess the check that I am planning to add - to check if
-> the device supports extended Caps - can help here. Since we would add
-> extended caps based on the mentioned check, it seems only valid to have
-> that check before overwriting the configuration space.
-> 
-> > 
-> > It's also not clear to me what you are trying to achieve with this patch. Is there
-> > a particular device that you want to get working? Or an entire class of devices
-> > which have those features? If it's the former, you could have the size of the
-> > config space write depend on the vendor + device id. If it's the latter, we could
-> > key the size of the config space write based on the presence of those particular
-> > PCIE caps and try and fix other devices if they break.
-> 
-> Absolutely, we can check for the presence of PCI extended capabilities
-> and based on that write the configuration space. If the device has issue
-> with only a specific extended capability we can try to fix that by
-> keying the DevID-VendorID pair? What do you think?
-> 
-> > 
-> > Will, Andre, do you see other solutions? Do you have a preference?
-> 
-> Will, Andre, please let me know as well if you have any preferences.
+Paolo
 
-If it's straightforward to keep this working on Seattle, then let's do it,
-but I don't think we should bend over backwards to support device assignment
-on a dead platform (and I say that as a regular user of one of these
-things!)
+>>
+>>           /*
+>>            * Use a bitwise-OR instead of a logical-OR to aggregate the reserved
+>>            * bits and EPT's invalid memtype/XWR checks to avoid an extra Jcc
+>>            * (this is extremely unlikely to be short-circuited as true).
+>>            */
+>>
+>> Paolo
+> 
 
-Will
