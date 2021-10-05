@@ -2,145 +2,228 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4DFD7422815
-	for <lists+kvm@lfdr.de>; Tue,  5 Oct 2021 15:38:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0ABBC42281A
+	for <lists+kvm@lfdr.de>; Tue,  5 Oct 2021 15:40:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234694AbhJENkI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Oct 2021 09:40:08 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58408 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233975AbhJENkH (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 5 Oct 2021 09:40:07 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 195DaPFw016050;
-        Tue, 5 Oct 2021 09:38:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=xDAZK6EDYXlGHLA5HvmL/HdVAlGDOo2EAebFz7+iOXY=;
- b=j0PPVSs1r12CxOzNzcEzH6w50YYR0H+9bmvSBZJ/M12voQAW8IB+UmgAl2CMWJHk8FA/
- 9NArxzKlSGV2gF6g4urjPeXGintEFCMYi1xszAwOsSm5T0TCuNTanKuqxeIp/ezQIBUu
- 6EAsgRT6nRgctfgjNxnuXEBxIM0Ifa1wsl3HBEf0BWtpTknMBBP6NRiztOadn4Cm6G6p
- 4xiNcVZRe4RHo0OU2FZe+kkIVTV1tEgBjn40gOiIJ5/o1i2og47uG3lU7CXLVlmLmd0i
- BzgUXPufX2iiEI8efH0/BKh7Uridkzky0oOisCXSNKLW/bg/iV6XMFY3lVMhV+yryvWN EQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3bgpbpj72d-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 05 Oct 2021 09:38:16 -0400
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 195DbefV023809;
-        Tue, 5 Oct 2021 09:38:16 -0400
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3bgpbpj718-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 05 Oct 2021 09:38:16 -0400
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 195DWcSZ001969;
-        Tue, 5 Oct 2021 13:38:13 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma04fra.de.ibm.com with ESMTP id 3bef2a0ruk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 05 Oct 2021 13:38:13 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 195Dc62E62390668
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 5 Oct 2021 13:38:06 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B0C68A4066;
-        Tue,  5 Oct 2021 13:38:06 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 03711A406D;
-        Tue,  5 Oct 2021 13:38:06 +0000 (GMT)
-Received: from li-43c5434c-23b8-11b2-a85c-c4958fb47a68.ibm.com (unknown [9.171.76.223])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue,  5 Oct 2021 13:38:05 +0000 (GMT)
-Subject: Re: [PATCH v5 02/14] KVM: s390: pv: avoid double free of sida page
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     cohuck@redhat.com, frankja@linux.ibm.com, thuth@redhat.com,
-        pasic@linux.ibm.com, david@redhat.com, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ulrich.Weigand@de.ibm.com
-References: <20210920132502.36111-1-imbrenda@linux.ibm.com>
- <20210920132502.36111-3-imbrenda@linux.ibm.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Message-ID: <1cd7259e-ab4c-1c3e-6846-e3c5ff26bda1@de.ibm.com>
-Date:   Tue, 5 Oct 2021 15:38:05 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+        id S234274AbhJENly (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Oct 2021 09:41:54 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36405 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233975AbhJENlx (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 5 Oct 2021 09:41:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1633441202;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=xkZ7lrOc52SpIlQsoFwfbYAFQ2eYBcXDLzHRnbVjlKk=;
+        b=XcZ4+rj2yAAOSyJlh8RlYvuPwOzds/sOj2M3yebzFbxNjYM9Fdh9eTS5QkRemdA+pfeW4s
+        pTYt0tq5Gz30kXNcp9KVoHsojjIk53IrEZ+scZgS5EuZ8Bsi8eKYP8qZ++hjxdGcUUQZOz
+        Gz6Rk3AQL6JsGA9g1OUGM9JJZg+aJ9s=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-239-D1j2PHx0Ms2LK1jzQhtuqg-1; Tue, 05 Oct 2021 09:40:01 -0400
+X-MC-Unique: D1j2PHx0Ms2LK1jzQhtuqg-1
+Received: by mail-ed1-f69.google.com with SMTP id 14-20020a508e4e000000b003d84544f33eso20699129edx.2
+        for <kvm@vger.kernel.org>; Tue, 05 Oct 2021 06:40:01 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=xkZ7lrOc52SpIlQsoFwfbYAFQ2eYBcXDLzHRnbVjlKk=;
+        b=766m0OaxMDE0Wbl9Fujp98w2rQ7VBPnncGloZkzwE2yHjM5fwT75Ao99BcBGD4Is46
+         90VmzS76EeL2GDrnZ3indnZEJkF+7HJ0z4ozbAVZ3EWTOePx3mSdy7BCaBYtCTH8jkn+
+         qEWGwIIUoFqPPQicAGDitmLPQ78/VOwrbDWuyot1iqW7UN3BsI7Y59X5M/Fpe3nqCtZS
+         ccOLYkFlJHGdTg8Az1ankoWs6/S1E615r9XEIK+U3JzIp2QWwYWLsWs0GjG7bIKJhXq6
+         SwkvpQE8edwZ/Yhn/FL5TypAStRP9GdFILyLa6uFM1BWtWrAEKVRZ5w4wif7ZA1y36le
+         1e2Q==
+X-Gm-Message-State: AOAM530T8PL3oA/I5vztOJIMUapjXOunNSI2A6rFAbNnEsnPcrklDcvE
+        MB7xicIi1pF9S7XGYQnpMfbWwL2Hy/g1dJ8NnjOGfsl1L0fO5dEdsdX2RI7Q+nowEOaruSpGI9o
+        KV0C3NjkKdnyT
+X-Received: by 2002:a17:906:12d8:: with SMTP id l24mr23896102ejb.126.1633441200328;
+        Tue, 05 Oct 2021 06:40:00 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz39b9xeb88B+Tq2u6NemnrgpudLSmPjVmR28IuPv0hGV6cYhkyqIPK48utmKUQViIcG4HDIg==
+X-Received: by 2002:a17:906:12d8:: with SMTP id l24mr23896080ejb.126.1633441200099;
+        Tue, 05 Oct 2021 06:40:00 -0700 (PDT)
+Received: from gator.home (cst2-174-28.cust.vodafone.cz. [31.30.174.28])
+        by smtp.gmail.com with ESMTPSA id w11sm2174150edl.87.2021.10.05.06.39.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Oct 2021 06:39:59 -0700 (PDT)
+Date:   Tue, 5 Oct 2021 15:39:57 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Oliver Upton <oupton@google.com>
+Cc:     kvmarm@lists.cs.columbia.edu, Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH v2 08/11] selftests: KVM: Create helper for making SMCCC
+ calls
+Message-ID: <20211005133957.q2a52s5mbthj6b4k@gator.home>
+References: <20210923191610.3814698-1-oupton@google.com>
+ <20210923191610.3814698-9-oupton@google.com>
 MIME-Version: 1.0
-In-Reply-To: <20210920132502.36111-3-imbrenda@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 3Mh7vKeMHyGk5-h_oEDqJIa_-Ddh-rFA
-X-Proofpoint-ORIG-GUID: GjNmMB0_x8_QXhJxxZTd3YjAhQUST0cF
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.391,FMLib:17.0.607.475
- definitions=2021-10-05_02,2021-10-04_01,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0 mlxscore=0
- malwarescore=0 impostorscore=0 spamscore=0 bulkscore=0 suspectscore=0
- adultscore=0 mlxlogscore=749 clxscore=1015 priorityscore=1501 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2109230001
- definitions=main-2110050080
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210923191610.3814698-9-oupton@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-Am 20.09.21 um 15:24 schrieb Claudio Imbrenda:
-> If kvm_s390_pv_destroy_cpu is called more than once, we risk calling
-> free_page on a random page, since the sidad field is aliased with the
-> gbea, which is not guaranteed to be zero.
+On Thu, Sep 23, 2021 at 07:16:07PM +0000, Oliver Upton wrote:
+> The PSCI and PV stolen time tests both need to make SMCCC calls within
+> the guest. Create a helper for making SMCCC calls and rework the
+> existing tests to use the library function.
 > 
-> This can happen, for example, if userspace calls the KVM_PV_DISABLE
-> IOCTL, and it fails, and then userspace calls the same IOCTL again.
-> This scenario is only possible if KVM has some serious bug or if the
-> hardware is broken.
-> 
-> The solution is to simply return successfully immediately if the vCPU
-> was already non secure.
-> 
-> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> Fixes: 19e1227768863a1469797c13ef8fea1af7beac2c ("KVM: S390: protvirt: Introduce instruction data area bounce buffer")
-
-makes sense.
-
-Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
-
+> Signed-off-by: Oliver Upton <oupton@google.com>
 > ---
->   arch/s390/kvm/pv.c | 19 +++++++++----------
->   1 file changed, 9 insertions(+), 10 deletions(-)
+>  .../testing/selftests/kvm/aarch64/psci_test.c | 25 ++++++-------------
+>  .../selftests/kvm/include/aarch64/processor.h | 22 ++++++++++++++++
+>  .../selftests/kvm/lib/aarch64/processor.c     | 25 +++++++++++++++++++
+>  tools/testing/selftests/kvm/steal_time.c      | 13 +++-------
+>  4 files changed, 58 insertions(+), 27 deletions(-)
 > 
-> diff --git a/arch/s390/kvm/pv.c b/arch/s390/kvm/pv.c
-> index c8841f476e91..0a854115100b 100644
-> --- a/arch/s390/kvm/pv.c
-> +++ b/arch/s390/kvm/pv.c
-> @@ -16,18 +16,17 @@
->   
->   int kvm_s390_pv_destroy_cpu(struct kvm_vcpu *vcpu, u16 *rc, u16 *rrc)
->   {
-> -	int cc = 0;
-> +	int cc;
->   
-> -	if (kvm_s390_pv_cpu_get_handle(vcpu)) {
-> -		cc = uv_cmd_nodata(kvm_s390_pv_cpu_get_handle(vcpu),
-> -				   UVC_CMD_DESTROY_SEC_CPU, rc, rrc);
-> +	if (!kvm_s390_pv_cpu_get_handle(vcpu))
-> +		return 0;
+> diff --git a/tools/testing/selftests/kvm/aarch64/psci_test.c b/tools/testing/selftests/kvm/aarch64/psci_test.c
+> index 018c269990e1..cebea7356e5a 100644
+> --- a/tools/testing/selftests/kvm/aarch64/psci_test.c
+> +++ b/tools/testing/selftests/kvm/aarch64/psci_test.c
+> @@ -26,32 +26,23 @@
+>  static uint64_t psci_cpu_on(uint64_t target_cpu, uint64_t entry_addr,
+>  			    uint64_t context_id)
+>  {
+> -	register uint64_t x0 asm("x0") = PSCI_0_2_FN64_CPU_ON;
+> -	register uint64_t x1 asm("x1") = target_cpu;
+> -	register uint64_t x2 asm("x2") = entry_addr;
+> -	register uint64_t x3 asm("x3") = context_id;
+> +	struct arm_smccc_res res;
+>  
+> -	asm("hvc #0"
+> -	    : "=r"(x0)
+> -	    : "r"(x0), "r"(x1), "r"(x2), "r"(x3)
+> -	    : "memory");
+> +	smccc_hvc(PSCI_0_2_FN64_CPU_ON, target_cpu, entry_addr, context_id,
+> +		  0, 0, 0, 0, &res);
+>  
+> -	return x0;
+> +	return res.a0;
+>  }
+>  
+>  static uint64_t psci_affinity_info(uint64_t target_affinity,
+>  				   uint64_t lowest_affinity_level)
+>  {
+> -	register uint64_t x0 asm("x0") = PSCI_0_2_FN64_AFFINITY_INFO;
+> -	register uint64_t x1 asm("x1") = target_affinity;
+> -	register uint64_t x2 asm("x2") = lowest_affinity_level;
+> +	struct arm_smccc_res res;
+>  
+> -	asm("hvc #0"
+> -	    : "=r"(x0)
+> -	    : "r"(x0), "r"(x1), "r"(x2)
+> -	    : "memory");
+> +	smccc_hvc(PSCI_0_2_FN64_AFFINITY_INFO, target_affinity, lowest_affinity_level,
+> +		  0, 0, 0, 0, 0, &res);
+>  
+> -	return x0;
+> +	return res.a0;
+>  }
+>  
+>  static void guest_main(uint64_t target_cpu)
+> diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
+> index c0273aefa63d..e6b7cb65d158 100644
+> --- a/tools/testing/selftests/kvm/include/aarch64/processor.h
+> +++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
+> @@ -132,4 +132,26 @@ void vm_install_sync_handler(struct kvm_vm *vm,
+>  
+>  #define isb()	asm volatile("isb" : : : "memory")
+>  
+> +/**
+> + * struct arm_smccc_res - Result from SMC/HVC call
+> + * @a0-a3 result values from registers 0 to 3
+> + */
+> +struct arm_smccc_res {
+> +	unsigned long a0;
+> +	unsigned long a1;
+> +	unsigned long a2;
+> +	unsigned long a3;
+> +};
 > +
-> +	cc = uv_cmd_nodata(kvm_s390_pv_cpu_get_handle(vcpu), UVC_CMD_DESTROY_SEC_CPU, rc, rrc);
+> +/**
+> + * smccc_hvc - Invoke a SMCCC function using the hvc conduit
+> + * @function_id: the SMCCC function to be called
+> + * @arg0-arg6: SMCCC function arguments, corresponding to registers x1-x7
+> + * @res: pointer to write the return values from registers x0-x3
+> + *
+> + */
+> +void smccc_hvc(uint32_t function_id, uint64_t arg0, uint64_t arg1,
+> +	       uint64_t arg2, uint64_t arg3, uint64_t arg4, uint64_t arg5,
+> +	       uint64_t arg6, struct arm_smccc_res *res);
 > +
-> +	KVM_UV_EVENT(vcpu->kvm, 3, "PROTVIRT DESTROY VCPU %d: rc %x rrc %x",
-> +		     vcpu->vcpu_id, *rc, *rrc);
-> +	WARN_ONCE(cc, "protvirt destroy cpu failed rc %x rrc %x", *rc, *rrc);
->   
-> -		KVM_UV_EVENT(vcpu->kvm, 3,
-> -			     "PROTVIRT DESTROY VCPU %d: rc %x rrc %x",
-> -			     vcpu->vcpu_id, *rc, *rrc);
-> -		WARN_ONCE(cc, "protvirt destroy cpu failed rc %x rrc %x",
-> -			  *rc, *rrc);
-> -	}
->   	/* Intended memory leak for something that should never happen. */
->   	if (!cc)
->   		free_pages(vcpu->arch.pv.stor_base,
-> 
+>  #endif /* SELFTEST_KVM_PROCESSOR_H */
+> diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+> index 632b74d6b3ca..f77430e2d688 100644
+> --- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+> @@ -426,3 +426,28 @@ void vm_install_exception_handler(struct kvm_vm *vm, int vector,
+>  	assert(vector < VECTOR_NUM);
+>  	handlers->exception_handlers[vector][0] = handler;
+>  }
+> +
+> +void smccc_hvc(uint32_t function_id, uint64_t arg0, uint64_t arg1,
+> +	       uint64_t arg2, uint64_t arg3, uint64_t arg4, uint64_t arg5,
+> +	       uint64_t arg6, struct arm_smccc_res *res)
+> +{
+> +	asm volatile("mov   w0, %w[function_id]\n"
+> +		     "mov   x1, %[arg0]\n"
+> +		     "mov   x2, %[arg1]\n"
+> +		     "mov   x3, %[arg2]\n"
+> +		     "mov   x4, %[arg3]\n"
+> +		     "mov   x5, %[arg4]\n"
+> +		     "mov   x6, %[arg5]\n"
+> +		     "mov   x7, %[arg6]\n"
+> +		     "hvc   #0\n"
+> +		     "mov   %[res0], x0\n"
+> +		     "mov   %[res1], x1\n"
+> +		     "mov   %[res2], x2\n"
+> +		     "mov   %[res3], x3\n"
+> +		     : [res0] "=r"(res->a0), [res1] "=r"(res->a1),
+> +		       [res2] "=r"(res->a2), [res3] "=r"(res->a3)
+> +		     : [function_id] "r"(function_id), [arg0] "r"(arg0),
+> +		       [arg1] "r"(arg1), [arg2] "r"(arg2), [arg3] "r"(arg3),
+> +		       [arg4] "r"(arg4), [arg5] "r"(arg5), [arg6] "r"(arg6)
+> +		     : "x0", "x1", "x2", "x3", "x4", "x5", "x6", "x7");
+> +}
+> diff --git a/tools/testing/selftests/kvm/steal_time.c b/tools/testing/selftests/kvm/steal_time.c
+> index ecec30865a74..5d52b82226c5 100644
+> --- a/tools/testing/selftests/kvm/steal_time.c
+> +++ b/tools/testing/selftests/kvm/steal_time.c
+> @@ -120,17 +120,10 @@ struct st_time {
+>  
+>  static int64_t smccc(uint32_t func, uint32_t arg)
+>  {
+> -	unsigned long ret;
+> +	struct arm_smccc_res res;
+>  
+> -	asm volatile(
+> -		"mov	x0, %1\n"
+> -		"mov	x1, %2\n"
+> -		"hvc	#0\n"
+> -		"mov	%0, x0\n"
+> -	: "=r" (ret) : "r" (func), "r" (arg) :
+> -	  "x0", "x1", "x2", "x3");
+> -
+> -	return ret;
+> +	smccc_hvc(func, arg, 0, 0, 0, 0, 0, 0, &res);
+> +	return res.a0;
+>  }
+>  
+>  static void check_status(struct st_time *st)
+> -- 
+> 2.33.0.685.g46640cef36-goog
+>
+
+Reviewed-by: Andrew Jones <drjones@redhat.com>
+
