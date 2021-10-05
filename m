@@ -2,94 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1FFC3422F82
-	for <lists+kvm@lfdr.de>; Tue,  5 Oct 2021 19:59:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 87F54422F84
+	for <lists+kvm@lfdr.de>; Tue,  5 Oct 2021 19:59:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234366AbhJESAy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Oct 2021 14:00:54 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:58511 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229626AbhJESAx (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 5 Oct 2021 14:00:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1633456740;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=nuw43x0U3vDkxdS/rYgw2/JnjgAfFVN927udMy2kobw=;
-        b=bSDbDlGJ54whMHQNgXKDXom2g8lMNZvVfS60gGNkS0toQNrZzunZDG3cyMtCM4H/BOf8xN
-        QlFhG1cCp/qGggkedAUWzFVLRQR8chwPO4gkqnGR5aZpAP7OcAOTmkE1I8rDeWcco1yL57
-        y9Efb3l7rqL8r1u7xk6Bo6jcF7L8V8Q=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-246-rWUJ-gcUPAW3O-sUhKoVOg-1; Tue, 05 Oct 2021 13:58:57 -0400
-X-MC-Unique: rWUJ-gcUPAW3O-sUhKoVOg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 42E18BAF81;
-        Tue,  5 Oct 2021 17:58:00 +0000 (UTC)
-Received: from fuller.cnet (ovpn-112-2.gru2.redhat.com [10.97.112.2])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 83EEA652AB;
-        Tue,  5 Oct 2021 17:57:51 +0000 (UTC)
-Received: by fuller.cnet (Postfix, from userid 1000)
-        id 88BD2416D862; Tue,  5 Oct 2021 14:57:47 -0300 (-03)
-Date:   Tue, 5 Oct 2021 14:57:47 -0300
-From:   Marcelo Tosatti <mtosatti@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Nitesh Narayan Lal <nitesh@redhat.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        seanjc@google.com, vkuznets@redhat.com, tglx@linutronix.de,
-        frederic@kernel.org, mingo@kernel.org, nilal@redhat.com,
-        Wanpeng Li <kernellwp@gmail.com>
-Subject: Re: [PATCH v1] KVM: isolation: retain initial mask for kthread VM
- worker
-Message-ID: <20211005175747.GA167517@fuller.cnet>
-References: <20211004222639.239209-1-nitesh@redhat.com>
- <e734691b-e9e1-10a0-88ee-73d8fceb50f9@redhat.com>
- <20211005105812.GA130626@fuller.cnet>
- <96f38a69-2ff8-a78c-a417-d32f1eb742be@redhat.com>
- <20211005132159.GA134926@fuller.cnet>
- <9c1fa821-2eaf-7709-7bd2-be83f92d2ee5@redhat.com>
+        id S234590AbhJESBL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Oct 2021 14:01:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38880 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232861AbhJESBL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Oct 2021 14:01:11 -0400
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9464C061749
+        for <kvm@vger.kernel.org>; Tue,  5 Oct 2021 10:59:20 -0700 (PDT)
+Received: by mail-pf1-x42e.google.com with SMTP id c29so224428pfp.2
+        for <kvm@vger.kernel.org>; Tue, 05 Oct 2021 10:59:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=FxQLMgGRO5NBtnXquaGOaBTErWmCv8I3xPuDWnsxNMk=;
+        b=F/KUJ9KxvEsNAjAVArIa0Y5aSmAOz+aJizqcj2pzEi4qJIqB2IFX721Kul6kz5kLAk
+         PjBMso41i9Y9+C/F9DiS0p0+oXBsCty3RDqZgqbbk7JhDkLpNWOLMaod+AkU5w9M+bQh
+         cSfoLqKsr8fsu/q1vGLM4OQ5i2bsABFIVw50jOA9V4SdE69T//VGievgTDNSkz6g2FW5
+         ywFBo7aaXTXuQ0enIhO0C0qldeh8b+ZZe9mX7VhIYvJ3wPlBe+8MO3iGtw7PPNpB941P
+         D8jfduAnnYVRFUx6RNBNINJHbqpFo28BSGzUxp9S1zGzPVklF+6nc0d5dIpaHnKuaJ4a
+         fduQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=FxQLMgGRO5NBtnXquaGOaBTErWmCv8I3xPuDWnsxNMk=;
+        b=EiZr3u1ahqaAwv8WVlwG1ErZyinl0MV2n+c4jG1SsIVb/yeVGo8sCBj4hYoB9927hl
+         J54trSQmTEaHwE39ukBPShSbJ+i5upXlog8Fy55KxgzF88t2xdhR/Slan/dswKQtrXE7
+         TiVlyCmFAJj8y4czAg3/S2ScTekDRA7vI4kut7vD6aGmlXOI4RmIe535OT5h9e69Wjwi
+         j4nIUP5Thhn5vzqCQEyfU2aURZ0qT0kitYbYzmvArTzBdRsHeNf+lsLNTocKm/iMih2U
+         Cc5cKZi5mPbaeiB7xM4dgmZPrmtyZNgS0vGClo6Z/eLYQpL80XECxJW/MHxkhpcUYtL1
+         9PGQ==
+X-Gm-Message-State: AOAM532HRI3oXK7FkYXmxrNWAbU7YD3mf0iQuIjUXR0DGe3fAWvFwr/p
+        bFQ9mYJnIVca0J4/3BtrjEVm+Q==
+X-Google-Smtp-Source: ABdhPJzvVlqiWZpWASSuAm/r4Q17GWyjK/l1ppJ7hO/LiK5cR5a8MOruJ6kp1JRzp7Z0vC/UvOK+HQ==
+X-Received: by 2002:aa7:96e3:0:b0:44c:83be:19bc with SMTP id i3-20020aa796e3000000b0044c83be19bcmr4103166pfq.37.1633456759988;
+        Tue, 05 Oct 2021 10:59:19 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id d9sm17876808pgn.64.2021.10.05.10.59.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Oct 2021 10:59:19 -0700 (PDT)
+Date:   Tue, 5 Oct 2021 17:59:16 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Jim Mattson <jmattson@google.com>
+Cc:     Robert Hoo <robert.hu@linux.intel.com>, pbonzini@redhat.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, joro@8bytes.org,
+        kvm@vger.kernel.org, yu.c.zhang@linux.intel.com
+Subject: Re: [PATCH v1 3/5] KVM: x86: nVMX: VMCS12 field's read/write
+ respects field existence bitmap
+Message-ID: <YVySdKOWTXqU4y3R@google.com>
+References: <YRvbvqhz6sknDEWe@google.com>
+ <b2bf00a6a8f3f88555bebf65b35579968ea45e2a.camel@linux.intel.com>
+ <YR2Tf9WPNEzrE7Xg@google.com>
+ <3ac79d874fb32c6472151cf879edfb2f1b646abf.camel@linux.intel.com>
+ <YS/lxNEKXLazkhc4@google.com>
+ <0b94844844521fc0446e3df0aa02d4df183f8107.camel@linux.intel.com>
+ <YTI7K9RozNIWXTyg@google.com>
+ <64aad01b6bffd70fa3170cf262fe5d7c66f6b2d4.camel@linux.intel.com>
+ <YVx6Oesi7X3jfnaM@google.com>
+ <CALMp9eRyhAygfh1piNEDE+WGVzK1cTWJJR1aC_zqn=c2fy+c-A@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <9c1fa821-2eaf-7709-7bd2-be83f92d2ee5@redhat.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <CALMp9eRyhAygfh1piNEDE+WGVzK1cTWJJR1aC_zqn=c2fy+c-A@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 05, 2021 at 07:15:43PM +0200, Paolo Bonzini wrote:
-> On 05/10/21 15:21, Marcelo Tosatti wrote:
-> > > The QEMU I/O thread is not hogging the CPU 100% of the time, and
-> > > therefore the nx-recovery thread should be able to run on that CPU.
-> > 
-> > 1) The cpumask of the parent thread is not inherited
-> > 
-> > 	set_cpus_allowed_ptr(task, housekeeping_cpumask(HK_FLAG_KTHREAD));
-> > 
-> > On __kthread_create_on_node should fail (because its cgroup, the one
-> > inherited from QEMU, contains only isolated CPUs).
-> > 
-> > (The QEMU I/O thread runs on an isolated CPU, and is moved by libvirt
-> > to HK-cgroup as mentioned before).
+On Tue, Oct 05, 2021, Jim Mattson wrote:
+> On Tue, Oct 5, 2021 at 9:16 AM Sean Christopherson <seanjc@google.com> wrote:
+> >
+> > On Tue, Sep 28, 2021, Robert Hoo wrote:
+> > > On Fri, 2021-09-03 at 15:11 +0000, Sean Christopherson wrote:
+> > >       You also said, "This is quite the complicated mess for
+> > > something I'm guessing no one actually cares about.  At what point do
+> > > we chalk this up as a virtualization hole and sweep it under the rug?"
+> > > -- I couldn't agree more.
+> >
+> > ...
+> >
+> > > So, Sean, can you help converge our discussion and settle next step?
+> >
+> > Any objection to simply keeping KVM's current behavior, i.e. sweeping this under
+> > the proverbial rug?
 > 
-> Ok, that's the part that I missed.  So the core issue is that libvirt moves
-> the I/O thread out of the isolated-CPU cgroup too late?  This in turn is
-> because libvirt gets access to the QEMU monitor too late (the KVM file
-> descriptor is created when QEMU processes the command line).
+> Adding 8 KiB per vCPU seems like no big deal to me, but, on the other
+> hand, Paolo recently argued that slightly less than 1 KiB per vCPU was
+> unreasonable for VM-exit statistics, so maybe I've got a warped
+> perspective. I'm all for pedantic adherence to the specification, but
+> I have to admit that no actual hypervisor is likely to care (or ever
+> will).
 
-Actually, what i wrote was incorrect: set_cpus_allowed_ptr should 
-succeed (kthread creation), but cgroup_attach_task_all will
-override the kthread mask with the cgroup mask
-(which contains isolated CPUs).
-
-Paolo: about your suggestion to use the same CPU for nx-recovery thread
-as the I/O thread one: I believe the cpumask of the userspace parent (QEMU I/O
-thread) is not inherited by the kernel thread.
-
-We will resend the patchset once more data to justify this is available
-(or will if an userspace solution is not possible).
-
+It's not just the memory, it's also the complexity, e.g. to get VMCS shadowing
+working correctly, both now and in the future.
