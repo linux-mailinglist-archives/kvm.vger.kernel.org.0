@@ -2,177 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 99371422A93
-	for <lists+kvm@lfdr.de>; Tue,  5 Oct 2021 16:14:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 00B64422AA3
+	for <lists+kvm@lfdr.de>; Tue,  5 Oct 2021 16:15:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236378AbhJEOPo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Oct 2021 10:15:44 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:19004 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236039AbhJEOOz (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 5 Oct 2021 10:14:55 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 195E8jw6014963;
-        Tue, 5 Oct 2021 10:13:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=ahhevMSQVbcaZDQFL9ujVBjSdb3OBb62fpPWDZp0cYA=;
- b=XzEsPyjyX29J7rfw7oaMocLCMNcL1T6vviEGBE/4gOPJj9/ySk0y04uf83o+/Xe4vhAF
- BjfaXqYCc+3DOlLySpuKCGO9RMq/Ntmb+Yk0gNwTRHD/uJ5+GkDb3yTlWTKgSxSNlV5e
- o80zmi6xUGOSKdgNDqp0Cj8FMwfhrHWgfQO/JHRbJiXOxvwPakBEYZ+CNaaOillHhS+l
- u7HJtYEvTAuMP0YH09AwfWg8F202UW9fT8BahPxLKWr8hMvzcUrBEMtbV6VM7RDH5v9o
- DIMB75Yooz8U6fLYU+mb/Y82X6pMB2RFLykkZWuD8Vs1tBUI8SgAL1XfUjW8juP5pNZL hg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3bgr7984gs-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 05 Oct 2021 10:13:04 -0400
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 195E9Cgh016045;
-        Tue, 5 Oct 2021 10:13:04 -0400
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3bgr7984fm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 05 Oct 2021 10:13:04 -0400
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 195ECkx5007665;
-        Tue, 5 Oct 2021 14:13:01 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma03fra.de.ibm.com with ESMTP id 3bef29h5tc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 05 Oct 2021 14:13:01 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 195ECvDU4653672
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 5 Oct 2021 14:12:57 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BF10B52054;
-        Tue,  5 Oct 2021 14:12:57 +0000 (GMT)
-Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.171.6.58])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 3D99B52065;
-        Tue,  5 Oct 2021 14:12:57 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v2 2/2] s390x: Add specification exception
- interception test
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-Cc:     Thomas Huth <thuth@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-References: <20211005091153.1863139-1-scgl@linux.ibm.com>
- <20211005091153.1863139-3-scgl@linux.ibm.com>
- <20211005150919.04425060@p-imbrenda>
-From:   Janis Schoetterl-Glausch <scgl@linux.vnet.ibm.com>
-Message-ID: <c4826f20-f501-4c51-1109-40692ce8b1c7@linux.vnet.ibm.com>
-Date:   Tue, 5 Oct 2021 16:12:56 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
-MIME-Version: 1.0
-In-Reply-To: <20211005150919.04425060@p-imbrenda>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: TEG-Q5tZKZbBgeLUdSbvITrRjUc2sXm8
-X-Proofpoint-ORIG-GUID: Ry59FPdwoD3ppGNQGWgPm4ACjFjwH7Kn
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.391,FMLib:17.0.607.475
- definitions=2021-10-05_02,2021-10-04_01,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxscore=0
- priorityscore=1501 lowpriorityscore=0 malwarescore=0 spamscore=0
- bulkscore=0 impostorscore=0 mlxlogscore=999 adultscore=0 phishscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2109230001 definitions=main-2110050084
+        id S235648AbhJEOQ7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Oct 2021 10:16:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40900 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235569AbhJEOQy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Oct 2021 10:16:54 -0400
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA2C2C0617BD
+        for <kvm@vger.kernel.org>; Tue,  5 Oct 2021 07:14:06 -0700 (PDT)
+Received: by mail-pg1-x54a.google.com with SMTP id p19-20020a634f53000000b002877a03b293so12503141pgl.10
+        for <kvm@vger.kernel.org>; Tue, 05 Oct 2021 07:14:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=SDsJgC6yRUYCiS38hXuTRfkxBXO2Typ8HW1RqnSDwgU=;
+        b=WeZkwfK6oBSxs/O/acgLPndgpCiFPCqd4RXHGlMyqTy0KCNAgjQIOFHL1HHsn5GKG8
+         F6L3/f5shsb/QdXjg22u39OY9tRhTOl6TgwBnJnWyzYPMdkxJrZn6r9zhXnamfzYF61U
+         k1bpJJkJ0IglQ0M93cIay60PqMgDxk0abkZLyqtBpAbTOsDKOFqgFBwDimxGj1qofayn
+         GHmYtuDVmc4jwjZDjmzkC22clpPR4u/mpOsOLZOvuDOG8fhiYSIXlGMZ3Z0afMpC3LXz
+         xS+g83DJUtbIyoDP13E/PXSakvBhBxbAYvrJxkMYnqbiI3nl0D45aU0K5tgAfMG4UhbT
+         0YtA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=SDsJgC6yRUYCiS38hXuTRfkxBXO2Typ8HW1RqnSDwgU=;
+        b=NL4FZ2S0+CzaNxIRc4nF15PoAHFd1rN1rlAI4FH2SaaEB+B7XRziEa/EEh0v+XR1uV
+         Wt06q4l/LdVAJ0EeJLqnwvh2vD6DPDrdrNER2lslTYZK6q9R1Vmoafi9FFjFmbEUS62H
+         87T8QiUwjdWgYyWcyaj8jh1UnYCBdTEmzNOPXDB2RU0wT/tLnw9/TrfnWKdD6C/p42Uq
+         HOKs0VE4vnapsMIihLQdg9/undC3hLYzW09N/cFSj5SjD96bebtxqiheBYtvs3fW0Odv
+         2uHyNGe60fTs6z3NJtl8tJJlM58YKu9HCZ12hb7Ptb23kGw2XvpNr70ZTLe0wJKFxrvj
+         NGgA==
+X-Gm-Message-State: AOAM531imJJpE1bHB/49POKWwBVkP2QHjNcjXKmVtKRjvxN7AiupHvzE
+        JW20RNHIMUMlqLbEsvFVy600lbS0y+sb3TmdyWUQx69pjgEHIu/BkrGeHmgFFVG7MoC8rof4UmE
+        7tK+KE5f87I1Elm9txv+GUjf1VWc04nVUcs9EOev7yiBDuAfAQbIJ1nngog==
+X-Google-Smtp-Source: ABdhPJxp3f2LEh/Ngwm+g/yVc6YFHOxhCbCFvf0n1krzrBVPEjf41LVRHVe2KU6kpU35sedmYiHallV2ULM=
+X-Received: from pgonda1.kir.corp.google.com ([2620:15c:29:204:225f:7216:6111:7f1c])
+ (user=pgonda job=sendgmr) by 2002:a17:90a:7892:: with SMTP id
+ x18mr4058151pjk.33.1633443246156; Tue, 05 Oct 2021 07:14:06 -0700 (PDT)
+Date:   Tue,  5 Oct 2021 07:13:53 -0700
+Message-Id: <20211005141357.2393627-1-pgonda@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.0.800.g4c38ced690-goog
+Subject: [PATCH 0/4 V9] Add AMD SEV and SEV-ES intra host migration support
+From:   Peter Gonda <pgonda@google.com>
+To:     kvm@vger.kernel.org
+Cc:     Peter Gonda <pgonda@google.com>, Marc Orr <marcorr@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        David Rientjes <rientjes@google.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/5/21 3:09 PM, Claudio Imbrenda wrote:
-> On Tue,  5 Oct 2021 11:11:53 +0200
-> Janis Schoetterl-Glausch <scgl@linux.ibm.com> wrote:
-> 
->> Check that specification exceptions cause intercepts when
->> specification exception interpretation is off.
->> Check that specification exceptions caused by program new PSWs
->> cause interceptions.
->> We cannot assert that non program new PSW specification exceptions
->> are interpreted because whether interpretation occurs or not is
->> configuration dependent.
->>
->> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
->> ---
->>  s390x/Makefile             |  2 +
->>  lib/s390x/sie.h            |  1 +
->>  s390x/snippets/c/spec_ex.c | 20 +++++++++
->>  s390x/spec_ex-sie.c        | 83 ++++++++++++++++++++++++++++++++++++++
->>  s390x/unittests.cfg        |  3 ++
->>  5 files changed, 109 insertions(+)
->>  create mode 100644 s390x/snippets/c/spec_ex.c
->>  create mode 100644 s390x/spec_ex-sie.c
->>
->> diff --git a/s390x/Makefile b/s390x/Makefile
->> index ef8041a..7198882 100644
->> --- a/s390x/Makefile
->> +++ b/s390x/Makefile
->> @@ -24,6 +24,7 @@ tests += $(TEST_DIR)/mvpg.elf
->>  tests += $(TEST_DIR)/uv-host.elf
->>  tests += $(TEST_DIR)/edat.elf
->>  tests += $(TEST_DIR)/mvpg-sie.elf
->> +tests += $(TEST_DIR)/spec_ex-sie.elf
->>  
->>  tests_binary = $(patsubst %.elf,%.bin,$(tests))
->>  ifneq ($(HOST_KEY_DOCUMENT),)
->> @@ -85,6 +86,7 @@ snippet_asmlib = $(SNIPPET_DIR)/c/cstart.o
->>  # perquisites (=guests) for the snippet hosts.
->>  # $(TEST_DIR)/<snippet-host>.elf: snippets = $(SNIPPET_DIR)/<c/asm>/<snippet>.gbin
->>  $(TEST_DIR)/mvpg-sie.elf: snippets = $(SNIPPET_DIR)/c/mvpg-snippet.gbin
->> +$(TEST_DIR)/spec_ex-sie.elf: snippets = $(SNIPPET_DIR)/c/spec_ex.gbin
->>  
->>  $(SNIPPET_DIR)/asm/%.gbin: $(SNIPPET_DIR)/asm/%.o $(FLATLIBS)
->>  	$(OBJCOPY) -O binary $(patsubst %.gbin,%.o,$@) $@
->> diff --git a/lib/s390x/sie.h b/lib/s390x/sie.h
->> index ca514ef..7ef7251 100644
->> --- a/lib/s390x/sie.h
->> +++ b/lib/s390x/sie.h
->> @@ -98,6 +98,7 @@ struct kvm_s390_sie_block {
->>  	uint8_t		fpf;			/* 0x0060 */
->>  #define ECB_GS		0x40
->>  #define ECB_TE		0x10
->> +#define ECB_SPECI	0x08
->>  #define ECB_SRSI	0x04
->>  #define ECB_HOSTPROTINT	0x02
->>  	uint8_t		ecb;			/* 0x0061 */
->> diff --git a/s390x/snippets/c/spec_ex.c b/s390x/snippets/c/spec_ex.c
->> new file mode 100644
->> index 0000000..bdba4f4
->> --- /dev/null
->> +++ b/s390x/snippets/c/spec_ex.c
->> @@ -0,0 +1,20 @@
->> +// SPDX-License-Identifier: GPL-2.0-only
->> +/*
->> + * © Copyright IBM Corp. 2021
->> + *
->> + * Snippet used by specification exception interception test.
->> + */
->> +#include <stdint.h>
->> +#include <asm/arch_def.h>
->> +
->> +__attribute__((section(".text"))) int main(void)
->> +{
->> +	struct lowcore *lowcore = (struct lowcore *) 0;
->> +	uint64_t bad_psw = 0;
->> +
->> +	/* PSW bit 12 has no name or meaning and must be 0 */
->> +	lowcore->pgm_new_psw.mask = 1UL << (63 - 12);
-> 
-> you can use the BIT or BIT_ULL macro
-> 
->> +	lowcore->pgm_new_psw.addr = 0xdeadbeee;
-> 
-> if the system is broken, it might actually jump at that address; in
-> that case, will the test fail?
+Intra host migration provides a low-cost mechanism for userspace VMM
+upgrades.  It is an alternative to traditional (i.e., remote) live
+migration. Whereas remote migration handles moving a guest to a new host,
+intra host migration only handles moving a guest to a new userspace VMM
+within a host.  This can be used to update, rollback, change flags of the
+VMM, etc. The lower cost compared to live migration comes from the fact
+that the guest's memory does not need to be copied between processes. A
+handle to the guest memory simply gets passed to the new VMM, this could
+be done via /dev/shm with share=on or similar feature.
 
-Broken how? If interpretation is overzealous the test might hang.
+The guest state can be transferred from an old VMM to a new VMM as follows:
+1. Export guest state from KVM to the old user-space VMM via a getter
+user-space/kernel API 2. Transfer guest state from old VMM to new VMM via
+IPC communication 3. Import guest state into KVM from the new user-space
+VMM via a setter user-space/kernel API VMMs by exporting from KVM using
+getters, sending that data to the new VMM, then setting it again in KVM.
 
-[...]
+In the common case for intra host migration, we can rely on the normal
+ioctls for passing data from one VMM to the next. SEV, SEV-ES, and other
+confidential compute environments make most of this information opaque, and
+render KVM ioctls such as "KVM_GET_REGS" irrelevant.  As a result, we need
+the ability to pass this opaque metadata from one VMM to the next. The
+easiest way to do this is to leave this data in the kernel, and transfer
+ownership of the metadata from one KVM VM (or vCPU) to the next. For
+example, we need to move the SEV enabled ASID, VMSAs, and GHCB metadata
+from one VMM to the next.  In general, we need to be able to hand off any
+data that would be unsafe/impossible for the kernel to hand directly to
+userspace (and cannot be reproduced using data that can be handed safely to
+userspace).
+
+V9
+ * Fix sev_lock_vcpus_for_migration from unlocking the vCPU mutex it
+   failed to unlock.
+
+V8
+ * Update to require that @dst is not SEV or SEV-ES enabled.
+ * Address selftest feedback.
+
+V7
+ * Address selftest feedback.
+
+V6
+ * Add selftest.
+
+V5:
+ * Fix up locking scheme
+ * Address marcorr@ comments.
+
+V4:
+ * Move to seanjc@'s suggestion of source VM FD based single ioctl design.
+
+v3:
+ * Fix memory leak found by dan.carpenter@
+
+v2:
+ * Added marcorr@ reviewed by tag
+ * Renamed function introduced in 1/3
+ * Edited with seanjc@'s review comments
+ ** Cleaned up WARN usage
+ ** Userspace makes random token now
+ * Edited with brijesh.singh@'s review comments
+ ** Checks for different LAUNCH_* states in send function
+
+v1: https://lore.kernel.org/kvm/20210621163118.1040170-1-pgonda@google.com/
+
+base-commit: 680c7e3be6a3
+
+Cc: Marc Orr <marcorr@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Sean Christopherson <seanjc@google.com>
+Cc: David Rientjes <rientjes@google.com>
+Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Cc: Brijesh Singh <brijesh.singh@amd.com>
+Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: Wanpeng Li <wanpengli@tencent.com>
+Cc: Jim Mattson <jmattson@google.com>
+Cc: Joerg Roedel <joro@8bytes.org>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: Borislav Petkov <bp@alien8.de>
+Cc: "H. Peter Anvin" <hpa@zytor.com>
+Cc: kvm@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+
+Peter Gonda (4):
+  KVM: SEV: Add support for SEV intra host migration
+  KVM: SEV: Add support for SEV-ES intra host migration
+  selftest: KVM: Add open sev dev helper
+  selftest: KVM: Add intra host migration tests
+
+ Documentation/virt/kvm/api.rst                |  15 ++
+ arch/x86/include/asm/kvm_host.h               |   1 +
+ arch/x86/kvm/svm/sev.c                        | 187 ++++++++++++++++
+ arch/x86/kvm/svm/svm.c                        |   1 +
+ arch/x86/kvm/svm/svm.h                        |   2 +
+ arch/x86/kvm/x86.c                            |   6 +
+ include/uapi/linux/kvm.h                      |   1 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../testing/selftests/kvm/include/kvm_util.h  |   1 +
+ .../selftests/kvm/include/x86_64/svm_util.h   |   2 +
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  24 ++-
+ tools/testing/selftests/kvm/lib/x86_64/svm.c  |  13 ++
+ .../selftests/kvm/x86_64/sev_vm_tests.c       | 203 ++++++++++++++++++
+ 13 files changed, 447 insertions(+), 10 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/sev_vm_tests.c
+
+-- 
+2.33.0.309.g3052b89438-goog
+
