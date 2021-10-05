@@ -2,134 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 76F2C421F82
-	for <lists+kvm@lfdr.de>; Tue,  5 Oct 2021 09:37:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A3E0F421FAD
+	for <lists+kvm@lfdr.de>; Tue,  5 Oct 2021 09:50:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232758AbhJEHjX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Oct 2021 03:39:23 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27977 "EHLO
+        id S232866AbhJEHwU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Oct 2021 03:52:20 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:22962 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232630AbhJEHjW (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 5 Oct 2021 03:39:22 -0400
+        by vger.kernel.org with ESMTP id S232778AbhJEHwT (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 5 Oct 2021 03:52:19 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1633419451;
+        s=mimecast20190719; t=1633420229;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=49p/2VYCpgzSUPriPCQYlTSgRQVf+nlRSvbtUTXuaMU=;
-        b=jNHVc24MffhkHR4hCdbJHxNNd9LKdZzB+yD21lNKp9vKhkNccJU1W+myNWZHgSL4D5kD7j
-        tEhI4fkFGWB5KxFHO1zC5YliGMegVZWuEB0dqDCaMDWbHAQXzyThb5uYZBZiSAAwOj/80P
-        BR7+JpBLH9GDy+w1rOYV6h8/0Aq9awo=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-399-9pBin32JMGagtqBLmZbJag-1; Tue, 05 Oct 2021 03:37:30 -0400
-X-MC-Unique: 9pBin32JMGagtqBLmZbJag-1
-Received: by mail-ed1-f71.google.com with SMTP id ec14-20020a0564020d4e00b003cf5630c190so19885994edb.3
-        for <kvm@vger.kernel.org>; Tue, 05 Oct 2021 00:37:30 -0700 (PDT)
+        bh=n6yrW50I8Ib+vVPSj2LLrvKy9ZTsmrO7LXIDVvpPep0=;
+        b=dY3eAsCaUXGdp0AJbYRd/peNbIqU7FfbVv5nn4orYhtdp8EfTI+PGl/bXLnW1qifsZ+85V
+        phuBRJwtGM4HkMePfhUGYY4DooJWuiEh8nFcSO5WiFJYR1q8VJ8ohB3U0b8x3Sj7wRGPts
+        nCQIpGGzlzsPENdmqBhafdgDpKSaxeA=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-402-I4QqjbojNsWxocI1KELIZQ-1; Tue, 05 Oct 2021 03:50:28 -0400
+X-MC-Unique: I4QqjbojNsWxocI1KELIZQ-1
+Received: by mail-ed1-f69.google.com with SMTP id z62-20020a509e44000000b003da839b9821so19739867ede.15
+        for <kvm@vger.kernel.org>; Tue, 05 Oct 2021 00:50:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=49p/2VYCpgzSUPriPCQYlTSgRQVf+nlRSvbtUTXuaMU=;
-        b=IcLEcjfpFL6rbEw7Thm2lg4CCj6LXiQ4prvaL0oEnnof6pjslRIlwdRuhorBKbWHWO
-         q4C6LBXjPzTxNpUtlJ/X7wPD9cX0TpOw8tzIZBAgDYngIT9WKOoZwEa4glM0izdv0Q0A
-         7oXwkn/YBL/vimcqAkbJtubElPrO5HuIM45/MeyBbTt3lfw0XAwG4uh3xA6YJsLL/GWW
-         sl0IbC1oOkvYIXgte7CXMufAY3VBoMnk0ZfmU69mFk/IGVHL6E1g8yc/4G8iUuRPl7Nb
-         PVfuAwT7tVl9VPw5eTCH3yUjNm1HJQhAiWb29R1Qj59VFSxrS85j4jEn9LLPHPfMFQ/C
-         KeVw==
-X-Gm-Message-State: AOAM531L7bISqzvcvYG08o0aEsG4Ps7Djm55D2aALGRX+39FFzBuybrm
-        HcsMRT70BxhJucIVZHKGdqqIlswiIlHva1Szn1M5E7li/IyxAGwACvPzjPuIorS8BU1cI+0x9we
-        j9Ijv4VZucfhp
-X-Received: by 2002:aa7:d78e:: with SMTP id s14mr23518884edq.171.1633419449697;
-        Tue, 05 Oct 2021 00:37:29 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyYKBVFrLpIIpPhu4m8RSBp05E7KVTz4BenJWgbIUX3s52OfAYe/V6Krl1NZzZwvRsRNqEHBQ==
-X-Received: by 2002:aa7:d78e:: with SMTP id s14mr23518858edq.171.1633419449429;
-        Tue, 05 Oct 2021 00:37:29 -0700 (PDT)
+        bh=n6yrW50I8Ib+vVPSj2LLrvKy9ZTsmrO7LXIDVvpPep0=;
+        b=qw8kx7rreJG42aRy08wPCpb9p93a+NLsGs9yENokFe1rskqBSxPmgIKIEL5gVbs1iX
+         jEs3rIEu+bvANlq9+lyYJOFyBtiuIdmjEkod4ZNKUJfeJHgPnRe1fBMK2scDtb1H0HPZ
+         s2XJ3XPc6wzEPRuMeO8nLmY80iUBGQhgAjVIjKT3wkVY3ulyzB1GJZiXh/DmP9zAGi70
+         UzZwWFKxnyL12uFUrxd99FTjHNM0bA52K86b59CmWpBdZ+iqNTlIgKUMTkhMwIWmqYZk
+         biWntMh1lpHpKaPJrPeJB5E2uKOv+wLuYRYIUmPXo5IZPbKqGhpkPLBQdbWgTn9vXsgA
+         J2GQ==
+X-Gm-Message-State: AOAM530uRfdVuimahHJ/4lX+cSu1nEXyWdK6V2nfswhYoipcyLAmA6Ib
+        QOnHlLdrCAqUgCv+UFaCI6iOF2Xe7jrE0wVLsHVrXvDlW+Es6C0MJ357MjAZ3XT+RkVnQS+CYks
+        mxrybb2zJ4znv
+X-Received: by 2002:a17:907:62a2:: with SMTP id nd34mr1617745ejc.356.1633420227090;
+        Tue, 05 Oct 2021 00:50:27 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxCwVBDEVlaMlT4cp6MTylyHDa5Eg1SqOfJofYuQRaxS4IL5HAFMPsCOKXyye6wxMwiyT4TmQ==
+X-Received: by 2002:a17:907:62a2:: with SMTP id nd34mr1617731ejc.356.1633420226861;
+        Tue, 05 Oct 2021 00:50:26 -0700 (PDT)
 Received: from [192.168.10.118] ([93.56.162.200])
-        by smtp.gmail.com with ESMTPSA id d10sm7349501eja.81.2021.10.05.00.37.27
+        by smtp.gmail.com with ESMTPSA id b2sm8399684edv.73.2021.10.05.00.50.25
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 05 Oct 2021 00:37:28 -0700 (PDT)
-Message-ID: <ea3a9bab-28f2-48e7-761e-b41d7bc7d0a5@redhat.com>
-Date:   Tue, 5 Oct 2021 09:37:27 +0200
+        Tue, 05 Oct 2021 00:50:26 -0700 (PDT)
+Message-ID: <a5a5812a-6501-ccce-5d42-18131cf26779@redhat.com>
+Date:   Tue, 5 Oct 2021 09:50:24 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.1.0
-Subject: Re: [PATCH v20 00/17] KVM RISC-V Support
+Subject: Re: [PATCH v10 10/28] x86/fpu/xstate: Update the XSTATE save function
+ to support dynamic states
 Content-Language: en-US
-To:     Palmer Dabbelt <palmerdabbelt@google.com>
-Cc:     Anup Patel <Anup.Patel@wdc.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        aou@eecs.berkeley.edu, graf@amazon.com,
-        Atish Patra <Atish.Patra@wdc.com>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>, anup@brainfault.org,
-        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
-References: <mhng-1bfcbce2-3da3-4490-bcc5-45173ad84285@palmerdabbelt-glaptop>
+To:     Thomas Gleixner <tglx@linutronix.de>,
+        "Chang S. Bae" <chang.seok.bae@intel.com>, bp@suse.de,
+        luto@kernel.org, mingo@kernel.org, x86@kernel.org
+Cc:     len.brown@intel.com, lenb@kernel.org, dave.hansen@intel.com,
+        thiago.macieira@intel.com, jing2.liu@intel.com,
+        ravi.v.shankar@intel.com, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+References: <87pmsnglkr.ffs@tglx>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <mhng-1bfcbce2-3da3-4490-bcc5-45173ad84285@palmerdabbelt-glaptop>
+In-Reply-To: <87pmsnglkr.ffs@tglx>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 04/10/21 20:01, Palmer Dabbelt wrote:
+On 02/10/21 23:31, Thomas Gleixner wrote:
+> You have two options:
 > 
-> Just to make sure we're on the same page here, I've got
+>    1) Always allocate the large buffer size which is required to
+>       accomodate all possible features.
 > 
->     commit 6c341a285912ddb2894ef793a58ad4f8462f26f4 (HEAD -> for-next)
->     Merge: 08da1608a1ca 3f2401f47d29
->     Author: Palmer Dabbelt <palmerdabbelt@google.com>
->     Date:   Mon Oct 4 10:12:44 2021 -0700
->         Merge tag 'for-riscv' of 
-> https://git.kernel.org/pub/scm/virt/kvm/kvm.git into for-next
->         H extension definitions, shared by the KVM and RISC-V trees.
->         * tag 'for-riscv' of 
-> ssh://gitolite.kernel.org/pub/scm/virt/kvm/kvm: (301 commits)
->           RISC-V: Add hypervisor extension related CSR defines
->           KVM: selftests: Ensure all migrations are performed when test 
-> is affined
->           KVM: x86: Swap order of CPUID entry "index" vs. "significant 
-> flag" checks
->           ptp: Fix ptp_kvm_getcrosststamp issue for x86 ptp_kvm
->           x86/kvmclock: Move this_cpu_pvti into kvmclock.h
->           KVM: s390: Function documentation fixes
->           selftests: KVM: Don't clobber XMM register when read
->           KVM: VMX: Fix a TSX_CTRL_CPUID_CLEAR field mask issue
->           selftests: KVM: Explicitly use movq to read xmm registers
->           selftests: KVM: Call ucall_init when setting up in rseq_test
->           KVM: Remove tlbs_dirty
->           KVM: X86: Synchronize the shadow pagetable before link it
->           KVM: X86: Fix missed remote tlb flush in rmap_write_protect()
->           KVM: x86: nSVM: don't copy virt_ext from vmcb12
->           KVM: x86: nSVM: test eax for 4K alignment for GP errata 
-> workaround
->           KVM: x86: selftests: test simultaneous uses of V_IRQ from L1 
-> and L0
->           KVM: x86: nSVM: restore int_vector in svm_clear_vintr
->           kvm: x86: Add AMD PMU MSRs to msrs_to_save_all[]
->           KVM: x86: nVMX: re-evaluate emulation_required on nested VM exit
->           KVM: x86: nVMX: don't fail nested VM entry on invalid guest 
-> state if !from_vmentry
->           ...
+>       Trivial, but waste of memory.
 > 
-> into 
-> ssh://git@gitolite.kernel.org/pub/scm/linux/kernel/git/palmer/linux.git 
-> for-next
-> (I know that's kind of a confusing name, but it's what I've been using 
-> as my short-term staging branch so I can do all my tests before saying 
-> "it's on for-next").
+>    2) Make the allocation dynamic which seems to be trivial to do in
+>       kvm_load_guest_fpu() at least for vcpu->user_fpu.
 > 
-> If that looks OK I can make it a touch more official by putting into the 
-> RISC-V tree.
+>       The vcpu->guest_fpu handling can probably be postponed to the
+>       point where AMX is actually exposed to guests, but it's probably
+>       not the worst idea to think about the implications now.
+> 
+> Paolo, any opinions?
 
-Yes.  All of the patches in there, except the last, are already in 
-Linus's tree.
+Unless we're missing something, dynamic allocation should not be hard to 
+do for both guest_fpu and user_fpu; either near the call sites of 
+kvm_save_current_fpu, or in the function itself.  Basically adding 
+something like
 
-Thank you,
+	struct kvm_fpu {
+		struct fpu *state;
+		unsigned size;
+	} user_fpu, guest_fpu;
+
+to struct kvm_vcpu.  Since the size can vary, it can be done simply with 
+kzalloc instead of the x86_fpu_cache that KVM has now.
+
+The only small complication is that kvm_save_current_fpu is called 
+within fpregs_lock; the allocation has to be outside so that you can use 
+GFP_KERNEL even on RT kernels.   If the code looks better with 
+fpregs_lock moved within kvm_save_current_fpu, go ahead and do it like that.
 
 Paolo
 
