@@ -2,112 +2,324 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 75FC942339C
-	for <lists+kvm@lfdr.de>; Wed,  6 Oct 2021 00:40:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A270342345D
+	for <lists+kvm@lfdr.de>; Wed,  6 Oct 2021 01:13:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236818AbhJEWmb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Oct 2021 18:42:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47636 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230113AbhJEWma (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 Oct 2021 18:42:30 -0400
-Received: from mail-ot1-x329.google.com (mail-ot1-x329.google.com [IPv6:2607:f8b0:4864:20::329])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8754DC061749
-        for <kvm@vger.kernel.org>; Tue,  5 Oct 2021 15:40:39 -0700 (PDT)
-Received: by mail-ot1-x329.google.com with SMTP id 66-20020a9d0548000000b0054e21cd00f4so657870otw.12
-        for <kvm@vger.kernel.org>; Tue, 05 Oct 2021 15:40:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=PV7cJ/hxhLd396eXQZjH9+vBEhfECef+V1xwYvjoe7w=;
-        b=gtCDdtbRgxQvORlfSsMbh39VpzD0nz5I4u9BvT73X5wiuDpHlpgWMuWmig2igaAdNq
-         YNtsqTE1PgiGBzBSEK65tFqy0zUqwihBRZFUpvrhIhICBsuW+idA7qrZU7qy+27KiED6
-         Ra17CtjdUBrZB3smTzuW9Dg4Xvl72fe07By7q4t9cy5WeBhqDzdbAsUvnECYXTiTbqkw
-         UJa8C31pSn0UYoI8/NZ0/unuNzdSoXQ4awn+jtmeUbo2mZX7ltBb5o01JkNsXNiENvRm
-         MVNmC46NV7wpixc4NV2fEb2/omrILP9vs3vIsTvV1Td4MP725CPMEfDfSXxwvkRemwxH
-         4yZg==
+        id S237053AbhJEXP1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Oct 2021 19:15:27 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:34429 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S236969AbhJEXPZ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 5 Oct 2021 19:15:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1633475612;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=zj1Pqa/nW4zCjDbiBULlfMptYD+zwkzqfmywnaZHqKA=;
+        b=eyCAwETYN9ppjFlGp7bD8BMdL2qqURmAw4gWC1z3XmzJvj13j+wkN4HcTE5dM04gpeXth6
+        9OX7faNeIz4lEUI8sQ0iA8L03AqEpEhWdf/3M9QDKdZzFfIzJJ9BwXI9KolfcMI5DvFm9L
+        3wBMu/AZRdQ5Lp7Tfsd0IJNapeYE2ew=
+Received: from mail-oi1-f198.google.com (mail-oi1-f198.google.com
+ [209.85.167.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-384-6eSfU8kUNiWB1qd3h2MsWg-1; Tue, 05 Oct 2021 19:13:29 -0400
+X-MC-Unique: 6eSfU8kUNiWB1qd3h2MsWg-1
+Received: by mail-oi1-f198.google.com with SMTP id m11-20020aca650b000000b0027625c6a441so569088oim.15
+        for <kvm@vger.kernel.org>; Tue, 05 Oct 2021 16:13:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=PV7cJ/hxhLd396eXQZjH9+vBEhfECef+V1xwYvjoe7w=;
-        b=d4kBb1Fyw6mTwf6Ls96Mgk7VLzShvNBPHvd6ZYvYLFj5SPWZZfiWiNVQw12/+yIHQJ
-         agq8f7tE5SKJlN4n4XhoqkH1GvOZn2072hEMMqGmg4DgLstF8Oq7p5/NdX1k5Rv9Z9rw
-         gnO7SIK1h449p7jeu2rEztR795jLy9wKbYkqMYNVK90I+6i/d2op9Bf7k+D/sv8R4Xrl
-         hFU3UB6iznfDCif03ViJgF1SsEdazKld9X8lc1tc0UAripoQcAIkouOusUZXLWhUKLIn
-         D8Tf0+5ppXZ5NlLt6pcnzT8JAXq6zkwot4nlrEIgcgGwLNHv/APlbIdIj23k1Bs4zceK
-         gLOQ==
-X-Gm-Message-State: AOAM53294RqHVjSAnN5pUz1umicrFLOHlchINF4b7/DQWwsmmAiH8arG
-        90t3hzT28L0qaBiIMaf92ufmbNIencv7uux99J1OJzXzaQE=
-X-Google-Smtp-Source: ABdhPJxNptgiYM8csaURKvTFVkdNqMyFdlgnAGmnxfBgjnAm3SFSv8iNznfcGt+JsN9ucZvy7aNM5Jjz9dio++z71gs=
-X-Received: by 2002:a05:6830:31a7:: with SMTP id q7mr16486682ots.39.1633473638520;
- Tue, 05 Oct 2021 15:40:38 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=zj1Pqa/nW4zCjDbiBULlfMptYD+zwkzqfmywnaZHqKA=;
+        b=8PJiPn1L3B49fMsvwOaqh1CJI0RjrKylO8LLZ7pnZ2tBVKX+FFfEpE98A49FYPuhNW
+         fBRXOO7JIdeswuiE7KZx+eNDboAOYXzrCbKa79/RPuw/AAxpBYyBsraqplL+6QdX7fRu
+         MDjlL++PC3TNvtdKfrj2dMseg4eahLq1O4fl5gy26Ep1uK46ONttieOxSf3DM1Ful3WU
+         n8VhYTFNdyXq5SvSfSIp/t0E4X5LFlm8usNmPUMYQGXhxGUkiC3pYAtgRzfb7bNlb56L
+         K6/HVgSN7l9AjUhmxsGbeVyq0n6KBkZitWWFhieQZIx/lg0B/agxLgL6mejpo/f/FLmv
+         eLJg==
+X-Gm-Message-State: AOAM530CsiOjF36K2tbrPcAw58nEaNMCFFQ7M0uxQH7yi6C4wmOleXPK
+        +TtSXjJFCXja2mx1kS2iDI7y7aqw8CHlNrsZ/PqNjl4FndXH7vAdil4kc30kSl0ii0mRmUmsKNS
+        7Or/q2EnNRc5R
+X-Received: by 2002:a9d:609a:: with SMTP id m26mr17156153otj.226.1633475608492;
+        Tue, 05 Oct 2021 16:13:28 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxnrBD3X8yCjj7mK0ad54Ro3UQYC86p0POKvspHM8DhJ0GW84v5/9RUjQihQJWQd/OQb4+tew==
+X-Received: by 2002:a9d:609a:: with SMTP id m26mr17156133otj.226.1633475608192;
+        Tue, 05 Oct 2021 16:13:28 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id c12sm3805488oos.16.2021.10.05.16.13.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Oct 2021 16:13:27 -0700 (PDT)
+Date:   Tue, 5 Oct 2021 17:13:26 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Matthew Ruffell <matthew.ruffell@canonical.com>
+Cc:     linux-pci@vger.kernel.org, lkml <linux-kernel@vger.kernel.org>,
+        kvm@vger.kernel.org, nathan.langford@xcelesunifiedtechnologies.com
+Subject: Re: [PROBLEM] Frequently get "irq 31: nobody cared" when passing
+ through 2x GPUs that share same pci switch via vfio
+Message-ID: <20211005171326.3f25a43a.alex.williamson@redhat.com>
+In-Reply-To: <2fadf33d-8487-94c2-4460-2a20fdb2ea12@canonical.com>
+References: <d4084296-9d36-64ec-8a79-77d82ac6d31c@canonical.com>
+        <20210914104301.48270518.alex.williamson@redhat.com>
+        <9e8d0e9e-1d94-35e8-be1f-cf66916c24b2@canonical.com>
+        <20210915103235.097202d2.alex.williamson@redhat.com>
+        <2fadf33d-8487-94c2-4460-2a20fdb2ea12@canonical.com>
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <YR2Tf9WPNEzrE7Xg@google.com> <3ac79d874fb32c6472151cf879edfb2f1b646abf.camel@linux.intel.com>
- <YS/lxNEKXLazkhc4@google.com> <0b94844844521fc0446e3df0aa02d4df183f8107.camel@linux.intel.com>
- <YTI7K9RozNIWXTyg@google.com> <64aad01b6bffd70fa3170cf262fe5d7c66f6b2d4.camel@linux.intel.com>
- <YVx6Oesi7X3jfnaM@google.com> <CALMp9eRyhAygfh1piNEDE+WGVzK1cTWJJR1aC_zqn=c2fy+c-A@mail.gmail.com>
- <YVySdKOWTXqU4y3R@google.com> <CALMp9eQvRYpZg+G7vMcaCq0HYPDfZVpPtDRO9bRa0w2fyyU9Og@mail.gmail.com>
- <YVy6gj2+XsghsP3j@google.com>
-In-Reply-To: <YVy6gj2+XsghsP3j@google.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Tue, 5 Oct 2021 15:40:27 -0700
-Message-ID: <CALMp9eT+uAvPv7LhJKrJGDN31-aVy6DYBrP+PUDiTk0zWuCX4g@mail.gmail.com>
-Subject: Re: [PATCH v1 3/5] KVM: x86: nVMX: VMCS12 field's read/write respects
- field existence bitmap
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Robert Hoo <robert.hu@linux.intel.com>, pbonzini@redhat.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, joro@8bytes.org,
-        kvm@vger.kernel.org, yu.c.zhang@linux.intel.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 5, 2021 at 1:50 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Tue, Oct 05, 2021, Jim Mattson wrote:
-> > On Tue, Oct 5, 2021 at 10:59 AM Sean Christopherson <seanjc@google.com> wrote:
-> > >
-> > > On Tue, Oct 05, 2021, Jim Mattson wrote:
-> > > > On Tue, Oct 5, 2021 at 9:16 AM Sean Christopherson <seanjc@google.com> wrote:
-> > > > >
-> > > > > On Tue, Sep 28, 2021, Robert Hoo wrote:
-> > > > > > On Fri, 2021-09-03 at 15:11 +0000, Sean Christopherson wrote:
-> > > > > >       You also said, "This is quite the complicated mess for
-> > > > > > something I'm guessing no one actually cares about.  At what point do
-> > > > > > we chalk this up as a virtualization hole and sweep it under the rug?"
-> > > > > > -- I couldn't agree more.
-> > > > >
-> > > > > ...
-> > > > >
-> > > > > > So, Sean, can you help converge our discussion and settle next step?
-> > > > >
-> > > > > Any objection to simply keeping KVM's current behavior, i.e. sweeping this under
-> > > > > the proverbial rug?
-> > > >
-> > > > Adding 8 KiB per vCPU seems like no big deal to me, but, on the other
-> > > > hand, Paolo recently argued that slightly less than 1 KiB per vCPU was
-> > > > unreasonable for VM-exit statistics, so maybe I've got a warped
-> > > > perspective. I'm all for pedantic adherence to the specification, but
-> > > > I have to admit that no actual hypervisor is likely to care (or ever
-> > > > will).
-> > >
-> > > It's not just the memory, it's also the complexity, e.g. to get VMCS shadowing
-> > > working correctly, both now and in the future.
-> >
-> > As far as CPU feature virtualization goes, this one doesn't seem that
-> > complex to me. It's not anywhere near as complex as virtualizing MTF,
-> > for instance, and KVM *claims* to do that! :-)
->
-> There aren't many things as complex as MTF.  But unlike MTF, this behavior doesn't
-> have a concrete use case to justify the risk vs. reward.  IMO the odds of us breaking
-> something in KVM for "normal" use cases are higher than the odds of an L1 VMM breaking
-> because a VMREAD/VMWRITE didn't fail when it technically should have failed.
+On Tue, 5 Oct 2021 18:02:24 +1300
+Matthew Ruffell <matthew.ruffell@canonical.com> wrote:
 
-Playing devil's advocate here, because I totally agree with you...
+> Hi Alex,
+> 
+> Have you had an opportunity to have a look at this a bit deeper?
+> 
+> On 16/09/21 4:32 am, Alex Williamson wrote:
+> > 
+> > Adding debugging to the vfio-pci interrupt handler, it's correctly
+> > deferring the interrupt as the GPU device is not identifying itself as
+> > the source of the interrupt via the status register.  In fact, setting
+> > the disable INTx bit in the GPU command register while the interrupt
+> > storm occurs does not stop the interrupts.
+> > 
+> > The interrupt storm does seem to be related to the bus resets, but I
+> > can't figure out yet how multiple devices per switch factors into the
+> > issue.  Serializing all bus resets via a mutex doesn't seem to change
+> > the behavior.
+> > 
+> > I'm still investigating, but if anyone knows how to get access to the
+> > Broadcom datasheet or errata for this switch, please let me know.  
+> 
+> We have managed to obtain a recent errata for this switch, and it 
+> doesn't
+>  mention any interrupt storms with nested switches. What would 
+> I be looking for
+>  in the errata? I cannot share our copy, sorry.
 
-Who's to say what's "normal"? It's a slippery slope when we start
-making personal value judgments about which parts of the architectural
-specification are important and which aren't.
+I dug back into this today and I'm thinking that it doesn't have
+anything to do with the PCIe switch hardware.  In my case, I believe
+the switch is mostly just imposing interrupt sharing between pairs of
+GPUs under the switches.  For example, in the case of the GRID K1, the
+1st & 3rd share an interrupt, as do the 2nd & 4th, so I believe I could
+get away with assigning one from each shared set together.
+
+The interrupt sharing is a problem because occasionally one of the GPUs
+will continuously stomp on the interrupt line while there's no handler
+configured, the other GPU replies "not me", and the kernel eventually
+squashes the line.
+
+In one case I see this happening when vfio-pci calls
+pci_free_irq_vectors() when we're tearing down the MSI interrupt.  This
+is the nastiest case because this function wants to clear DisINTx in
+pci_intx_for_msi(), where the free-irq-vectors function doesn't even
+return to vfio-pci code so that we could mask INTx before the interrupt
+storm does its thing.  I've got a workaround for this in the patch I'm
+playing with below, but it's exceptionally hacky.
+
+Another case I see is that DisINTx will be cleared while the device is
+still screaming on the interrupt line, but userspace doesn't yet have a
+handler setup.  I've had a notion that we need some sort of guard
+handler to protect the host from such situations, ie. a handler that
+only serves to squelch the device in cases where we could have a shared
+interrupt.  The patch below also includes swapping in this handler
+between userspace interrupt configurations.
+
+With both of these together, I'm so far able to prevent an interrupt
+storm for these cards.  I'd say the patch below is still extremely
+experimental, and I'm not sure how to get around the really hacky bit,
+but it would be interesting to see if it resolves the original issue.
+I've not yet tested this on a variety of devices, so YMMV.  Thanks,
+
+Alex
+
+(patch vs v5.14)
+
+diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+index 318864d52837..c8500fcda5b8 100644
+--- a/drivers/vfio/pci/vfio_pci.c
++++ b/drivers/vfio/pci/vfio_pci.c
+@@ -347,6 +347,7 @@ static int vfio_pci_enable(struct vfio_pci_device *vdev)
+ 			vdev->pci_2_3 = pci_intx_mask_supported(pdev);
+ 	}
+ 
++	vfio_intx_stub_init(vdev);
+ 	pci_read_config_word(pdev, PCI_COMMAND, &cmd);
+ 	if (vdev->pci_2_3 && (cmd & PCI_COMMAND_INTX_DISABLE)) {
+ 		cmd &= ~PCI_COMMAND_INTX_DISABLE;
+@@ -447,6 +448,14 @@ static void vfio_pci_disable(struct vfio_pci_device *vdev)
+ 		kfree(dummy_res);
+ 	}
+ 
++	/*
++	 * Set known command register state, disabling MSI/X (via busmaster)
++	 * and INTx directly.  At this point we can teardown the INTx stub
++	 * handler initialized from the SET_IRQS teardown above.
++	 */
++	pci_write_config_word(pdev, PCI_COMMAND, PCI_COMMAND_INTX_DISABLE);
++	vfio_intx_stub_exit(vdev);
++
+ 	vdev->needs_reset = true;
+ 
+ 	/*
+@@ -464,12 +473,6 @@ static void vfio_pci_disable(struct vfio_pci_device *vdev)
+ 		pci_save_state(pdev);
+ 	}
+ 
+-	/*
+-	 * Disable INTx and MSI, presumably to avoid spurious interrupts
+-	 * during reset.  Stolen from pci_reset_function()
+-	 */
+-	pci_write_config_word(pdev, PCI_COMMAND, PCI_COMMAND_INTX_DISABLE);
+-
+ 	/*
+ 	 * Try to get the locks ourselves to prevent a deadlock. The
+ 	 * success of this is dependent on being able to lock the device,
+diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
+index 869dce5f134d..31978c1b0103 100644
+--- a/drivers/vfio/pci/vfio_pci_intrs.c
++++ b/drivers/vfio/pci/vfio_pci_intrs.c
+@@ -139,6 +139,44 @@ static irqreturn_t vfio_intx_handler(int irq, void *dev_id)
+ 	return ret;
+ }
+ 
++static irqreturn_t vfio_intx_stub(int irq, void *dev_id)
++{
++	struct vfio_pci_device *vdev = dev_id;
++
++	if (pci_check_and_mask_intx(vdev->pdev))
++		return IRQ_HANDLED;
++
++	return IRQ_NONE;
++}
++
++void vfio_intx_stub_init(struct vfio_pci_device *vdev)
++{
++	char *name;
++
++	if (vdev->nointx || !vdev->pci_2_3 || !vdev->pdev->irq)
++		return;
++
++	name = kasprintf(GFP_KERNEL, "vfio-intx-stub(%s)",
++			 pci_name(vdev->pdev));
++	if (!name)
++		return;
++
++	if (request_irq(vdev->pdev->irq, vfio_intx_stub,
++			IRQF_SHARED, name, vdev))
++		kfree(name);
++
++	vdev->intx_stub = true;
++}
++
++void vfio_intx_stub_exit(struct vfio_pci_device *vdev)
++{
++	if (!vdev->intx_stub)
++		return;
++
++	kfree(free_irq(vdev->pdev->irq, vdev));
++	vdev->intx_stub = false;
++}
++
+ static int vfio_intx_enable(struct vfio_pci_device *vdev)
+ {
+ 	if (!is_irq_none(vdev))
+@@ -153,6 +191,8 @@ static int vfio_intx_enable(struct vfio_pci_device *vdev)
+ 
+ 	vdev->num_ctx = 1;
+ 
++	vfio_intx_stub_exit(vdev);
++
+ 	/*
+ 	 * If the virtual interrupt is masked, restore it.  Devices
+ 	 * supporting DisINTx can be masked at the hardware level
+@@ -231,6 +271,7 @@ static void vfio_intx_disable(struct vfio_pci_device *vdev)
+ 	vdev->irq_type = VFIO_PCI_NUM_IRQS;
+ 	vdev->num_ctx = 0;
+ 	kfree(vdev->ctx);
++	vfio_intx_stub_init(vdev);
+ }
+ 
+ /*
+@@ -258,6 +299,8 @@ static int vfio_msi_enable(struct vfio_pci_device *vdev, int nvec, bool msix)
+ 	if (!vdev->ctx)
+ 		return -ENOMEM;
+ 
++	vfio_intx_stub_exit(vdev);
++
+ 	/* return the number of supported vectors if we can't get all: */
+ 	cmd = vfio_pci_memory_lock_and_enable(vdev);
+ 	ret = pci_alloc_irq_vectors(pdev, 1, nvec, flag);
+@@ -266,6 +309,7 @@ static int vfio_msi_enable(struct vfio_pci_device *vdev, int nvec, bool msix)
+ 			pci_free_irq_vectors(pdev);
+ 		vfio_pci_memory_unlock_and_restore(vdev, cmd);
+ 		kfree(vdev->ctx);
++		vfio_intx_stub_init(vdev);
+ 		return ret;
+ 	}
+ 	vfio_pci_memory_unlock_and_restore(vdev, cmd);
+@@ -388,6 +432,7 @@ static int vfio_msi_set_block(struct vfio_pci_device *vdev, unsigned start,
+ static void vfio_msi_disable(struct vfio_pci_device *vdev, bool msix)
+ {
+ 	struct pci_dev *pdev = vdev->pdev;
++	pci_dev_flags_t dev_flags = pdev->dev_flags;
+ 	int i;
+ 	u16 cmd;
+ 
+@@ -399,19 +444,22 @@ static void vfio_msi_disable(struct vfio_pci_device *vdev, bool msix)
+ 	vfio_msi_set_block(vdev, 0, vdev->num_ctx, NULL, msix);
+ 
+ 	cmd = vfio_pci_memory_lock_and_enable(vdev);
+-	pci_free_irq_vectors(pdev);
+-	vfio_pci_memory_unlock_and_restore(vdev, cmd);
+-
+ 	/*
+-	 * Both disable paths above use pci_intx_for_msi() to clear DisINTx
+-	 * via their shutdown paths.  Restore for NoINTx devices.
++	 * XXX pci_intx_for_msi() will clear DisINTx, which can trigger an
++	 * INTx storm even before we return from pci_free_irq_vectors(), even
++	 * as we'll restore the previous command register immediately after.
++	 * Hack around it by masking in a dev_flag to prevent such behavior.
+ 	 */
+-	if (vdev->nointx)
+-		pci_intx(pdev, 0);
++	pdev->dev_flags |= PCI_DEV_FLAGS_MSI_INTX_DISABLE_BUG;
++	pci_free_irq_vectors(pdev);
++	pdev->dev_flags = dev_flags;
++
++	vfio_pci_memory_unlock_and_restore(vdev, cmd);
+ 
+ 	vdev->irq_type = VFIO_PCI_NUM_IRQS;
+ 	vdev->num_ctx = 0;
+ 	kfree(vdev->ctx);
++	vfio_intx_stub_init(vdev);
+ }
+ 
+ /*
+diff --git a/drivers/vfio/pci/vfio_pci_private.h b/drivers/vfio/pci/vfio_pci_private.h
+index 5a36272cecbf..709d497b528c 100644
+--- a/drivers/vfio/pci/vfio_pci_private.h
++++ b/drivers/vfio/pci/vfio_pci_private.h
+@@ -128,6 +128,7 @@ struct vfio_pci_device {
+ 	bool			needs_reset;
+ 	bool			nointx;
+ 	bool			needs_pm_restore;
++	bool			intx_stub;
+ 	struct pci_saved_state	*pci_saved_state;
+ 	struct pci_saved_state	*pm_save;
+ 	struct vfio_pci_reflck	*reflck;
+@@ -151,6 +152,9 @@ struct vfio_pci_device {
+ #define is_irq_none(vdev) (!(is_intx(vdev) || is_msi(vdev) || is_msix(vdev)))
+ #define irq_is(vdev, type) (vdev->irq_type == type)
+ 
++extern void vfio_intx_stub_init(struct vfio_pci_device *vdev);
++extern void vfio_intx_stub_exit(struct vfio_pci_device *vdev);
++
+ extern void vfio_pci_intx_mask(struct vfio_pci_device *vdev);
+ extern void vfio_pci_intx_unmask(struct vfio_pci_device *vdev);
+ 
+
