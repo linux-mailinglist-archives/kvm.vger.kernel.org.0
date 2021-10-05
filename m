@@ -2,910 +2,292 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CD970422E38
-	for <lists+kvm@lfdr.de>; Tue,  5 Oct 2021 18:44:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EA587422E46
+	for <lists+kvm@lfdr.de>; Tue,  5 Oct 2021 18:46:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235197AbhJEQq1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Oct 2021 12:46:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49752 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230445AbhJEQq0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 Oct 2021 12:46:26 -0400
-Received: from mail-oi1-x22f.google.com (mail-oi1-x22f.google.com [IPv6:2607:f8b0:4864:20::22f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4732C061749
-        for <kvm@vger.kernel.org>; Tue,  5 Oct 2021 09:44:35 -0700 (PDT)
-Received: by mail-oi1-x22f.google.com with SMTP id n63so57328oif.7
-        for <kvm@vger.kernel.org>; Tue, 05 Oct 2021 09:44:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=VfPaK2u7X6jgdQ7emoJDQz+g7NsnGXGWip34S5ul4SQ=;
-        b=fIir9M8w3vr7t2B06SopGl/qMZtUa0HTRe++lkLUBazog/a7sa8a1oNQDFEElc9Me3
-         k1Qu9gz6YXBbiS9a93ZXp7HE+MbdmiatOVSwdOiyQ/Np/3j14G/t8nKDj2MR3c9B8FkC
-         lnplP+S+WNsEDTTfeNxs33abgHw0FrU6RiIYSly2i66tBGKCFBK0xV/+lxBLGhyXdhHi
-         pn9t8FRMeP7oYwVtJ8qryFnEuT9LtYPGo7Ju/WWdSmfUUetijAftlsEHicJ3ThgwVpIU
-         raig0g9jlWMSBER/aeonYONUQIc39m+oXcdMoh8BF3dtVk1YVa17/piRJZoCPT/Jtdju
-         BSaQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=VfPaK2u7X6jgdQ7emoJDQz+g7NsnGXGWip34S5ul4SQ=;
-        b=zEh+Tli96nlsPee+eVnGXbbVnsY2YNX993LShBJUTpEb5vAgC69G/kXLbObhP48Ndv
-         wlzU70ebTG9pdYKzm0aCIFzQ1qvwZhH86Y2MMIRJ10USRpycrN3QMzbOPr4Ypmm1e7cR
-         ZMYGHoIg2wlyR7IT9uWYKRh9LykGg/Ku/aaW6z5IURaCJ+brh8y7DEXj5uGbzlt3360g
-         1F00Z+Brfr0QSYYwxyZ0PFsEQewgtvAmODV/3V0h3ZNuReM7i0TDF68eKJQYh1kBqErK
-         hSF8TpdnkvonHvao0Ja61/vJrBVswyKLawPr594NDSsr9vrYlt6ckUSJkJ2nkMT6MbBr
-         7O6Q==
-X-Gm-Message-State: AOAM5330nHP85UhaJAKvfNX2YIgD22NzpViiH1DYkPQDOMhAUdgoiQWj
-        gxM5IAwf4Lm8PqNJ6Sej0EwHQWub7PprFIRyOWpGFg==
-X-Google-Smtp-Source: ABdhPJw+usz/YeVXGiB+wu1OhcDELEvoRIa5bOKH+gYMf3kj1EeyAlxC4DZp3mHFJkRfVF1Mdea3G2JelZtcyQ1YQFU=
-X-Received: by 2002:a05:6808:1641:: with SMTP id az1mr3311023oib.67.1633452274536;
- Tue, 05 Oct 2021 09:44:34 -0700 (PDT)
+        id S236646AbhJEQsW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Oct 2021 12:48:22 -0400
+Received: from mout.kundenserver.de ([212.227.126.134]:33069 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235372AbhJEQsU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Oct 2021 12:48:20 -0400
+Received: from [192.168.100.1] ([82.142.3.114]) by mrelayeu.kundenserver.de
+ (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1Mgvan-1mzSpO3vO1-00hNKP; Tue, 05 Oct 2021 18:46:00 +0200
+Subject: Re: [PATCH v3] target/i386: Include 'hw/i386/apic.h' locally
+To:     "Michael S. Tsirkin" <mst@redhat.com>,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Cc:     Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+        qemu-trivial@nongnu.org,
+        Richard Henderson <richard.henderson@linaro.org>,
+        qemu-devel@nongnu.org, Cameron Esfahani <dirty@apple.com>,
+        Kamil Rytarowski <kamil@netbsd.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Reinoud Zandijk <reinoud@netbsd.org>,
+        Colin Xu <colin.xu@intel.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Roman Bolshakov <r.bolshakov@yadro.com>, haxm-team@intel.com,
+        Sunil Muthuswamy <sunilmut@microsoft.com>,
+        Wenchao Wang <wenchao.wang@intel.com>
+References: <20210929163124.2523413-1-f4bug@amsat.org>
+ <20211005105745-mutt-send-email-mst@kernel.org>
+From:   Laurent Vivier <laurent@vivier.eu>
+Message-ID: <fb4d7f19-8bb5-781d-4a41-9641625a2019@vivier.eu>
+Date:   Tue, 5 Oct 2021 18:45:56 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-References: <20210922124704.600087-1-tabba@google.com> <20210922124704.600087-9-tabba@google.com>
- <20211005085249.hywbc7wqggxdgw5u@gator.home>
-In-Reply-To: <20211005085249.hywbc7wqggxdgw5u@gator.home>
-From:   Fuad Tabba <tabba@google.com>
-Date:   Tue, 5 Oct 2021 17:43:58 +0100
-Message-ID: <CA+EHjTxFBBz71VjRyS5JTvVBXsVM_yJ_HZzsHbeaHC3xcF_dBA@mail.gmail.com>
-Subject: Re: [PATCH v6 08/12] KVM: arm64: Add handlers for protected VM System Registers
-To:     Andrew Jones <drjones@redhat.com>
-Cc:     kvmarm@lists.cs.columbia.edu, maz@kernel.org, will@kernel.org,
-        james.morse@arm.com, alexandru.elisei@arm.com,
-        suzuki.poulose@arm.com, mark.rutland@arm.com,
-        christoffer.dall@arm.com, pbonzini@redhat.com, oupton@google.com,
-        qperret@google.com, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kernel-team@android.com
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20211005105745-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:Fh7x502ZHzeM5nANZSLh8iW+6H7qUav5X6hW2rcbV6n2x/xBD2n
+ fJ0VhgdKzknLRvH9nRbWiDlENyC5aBF5LClx0+BxGkStOTk4p14lMWqllfm7nH7ENV4vlCM
+ t21kN0/JGSSUrLRygLUhe4iuMHSM0V6L39PaVWIGpowwD/U1r2xswHNsZwZw1PsQGsG36mM
+ q9VILcqmahY11V2EVabPQ==
+X-Spam-Flag: NO
+X-UI-Out-Filterresults: notjunk:1;V03:K0:gWfMJSm8NhA=:l8/Y6fPeHQhKTXxfljGzfy
+ kfXtEKKsKERmRbhadleijE6MViu+Vb8h/NKiiuspdHiTdaS8MgATrnjDrmp1vnO/R73NOS8fM
+ iwPoDrdeYYmxtcfgmRwsF9SywvRbiSAcBEvyl5LG3CYB7Y00txc0Zmllwy0FGTElTnB/58VfM
+ 4QfsO4ObTp6RqxrrhQK1azbM6Ww0bXT0m/5i/ToP0olqxsqSbZ7cCcFWcO6fb6Nav2C6mz6sc
+ GACG+U9oxj8WJOu2u7EGDgpBSfNqOAcAhyWitrm2JCZP2+7YdUoIk2ZsLdkVLzdtZ3N6RCeEF
+ y5mkcub5jzfb4Rl58pz/FLC6OY3BcqfGEIXNYsy/V1F/3AgjgS8jLIlk/ycrM0Tfvm118AL11
+ rV8W7BVIdwtPsDDdGBLic5i8fCO2KiILWCzPHhvw1lEXqWKzOsFoTidR2ps+TPBgz1nYLPAUH
+ Akjhaj+ayoPpotWCUkO+MqfBz3WAMFcyiNe0r+8WBP1udntczc6hcpvsmF/aHSFu5ruQjnb0X
+ tam6iOcpB4/p8rdOWOWDmSblT3gbNcaZlJMT1oiyZLUrLwdwss4zSaJl9xqE63X7X3roqFXfw
+ xM6+jZ1Cxqyl48B/Hkl0OpT9VbCfnYN2WJztcx4Z5a04H0ahJFbJb4pf/LarWCYsR7t4GscOC
+ xO9G/pjAVO+xuywbbqNFZLxNwwya3ZT4Ol74Rv3w0UhdL9MkeD2Ev6zZll3nKq0zw1LEdmcPN
+ MgFmWZewAf5RQCzruI4DasNqB0Ag7jzZoCsk2A==
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Drew,
+Le 05/10/2021 à 16:57, Michael S. Tsirkin a écrit :
+> On Wed, Sep 29, 2021 at 06:31:24PM +0200, Philippe Mathieu-Daudé wrote:
+>> Instead of including a sysemu-specific header in "cpu.h"
+>> (which is shared with user-mode emulations), include it
+>> locally when required.
+>>
+>> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> 
+> Acked-by: Michael S. Tsirkin <mst@redhat.com>
+> 
+> which tree? trivial I guess?
 
-On Tue, Oct 5, 2021 at 9:53 AM Andrew Jones <drjones@redhat.com> wrote:
->
-> On Wed, Sep 22, 2021 at 01:47:00PM +0100, Fuad Tabba wrote:
-> > Add system register handlers for protected VMs. These cover Sys64
-> > registers (including feature id registers), and debug.
-> >
-> > No functional change intended as these are not hooked in yet to
-> > the guest exit handlers introduced earlier. So when trapping is
-> > triggered, the exit handlers let the host handle it, as before.
-> >
-> > Signed-off-by: Fuad Tabba <tabba@google.com>
-> > ---
-> >  arch/arm64/include/asm/kvm_fixed_config.h  | 195 ++++++++
-> >  arch/arm64/include/asm/kvm_hyp.h           |   5 +
-> >  arch/arm64/kvm/arm.c                       |   5 +
-> >  arch/arm64/kvm/hyp/include/nvhe/sys_regs.h |  28 ++
-> >  arch/arm64/kvm/hyp/nvhe/Makefile           |   2 +-
-> >  arch/arm64/kvm/hyp/nvhe/sys_regs.c         | 492 +++++++++++++++++++++
-> >  6 files changed, 726 insertions(+), 1 deletion(-)
-> >  create mode 100644 arch/arm64/include/asm/kvm_fixed_config.h
-> >  create mode 100644 arch/arm64/kvm/hyp/include/nvhe/sys_regs.h
-> >  create mode 100644 arch/arm64/kvm/hyp/nvhe/sys_regs.c
-> >
-> > diff --git a/arch/arm64/include/asm/kvm_fixed_config.h b/arch/arm64/include/asm/kvm_fixed_config.h
-> > new file mode 100644
-> > index 000000000000..0ed06923f7e9
-> > --- /dev/null
-> > +++ b/arch/arm64/include/asm/kvm_fixed_config.h
-> > @@ -0,0 +1,195 @@
-> > +/* SPDX-License-Identifier: GPL-2.0-only */
-> > +/*
-> > + * Copyright (C) 2021 Google LLC
-> > + * Author: Fuad Tabba <tabba@google.com>
-> > + */
-> > +
-> > +#ifndef __ARM64_KVM_FIXED_CONFIG_H__
-> > +#define __ARM64_KVM_FIXED_CONFIG_H__
-> > +
-> > +#include <asm/sysreg.h>
-> > +
-> > +/*
-> > + * This file contains definitions for features to be allowed or restricted for
-> > + * guest virtual machines, depending on the mode KVM is running in and on the
-> > + * type of guest that is running.
-> > + *
-> > + * The ALLOW masks represent a bitmask of feature fields that are allowed
-> > + * without any restrictions as long as they are supported by the system.
-> > + *
-> > + * The RESTRICT_UNSIGNED masks, if present, represent unsigned fields for
-> > + * features that are restricted to support at most the specified feature.
-> > + *
-> > + * If a feature field is not present in either, than it is not supported.
-> > + *
-> > + * The approach taken for protected VMs is to allow features that are:
-> > + * - Needed by common Linux distributions (e.g., floating point)
-> > + * - Trivial to support, e.g., supporting the feature does not introduce or
-> > + * require tracking of additional state in KVM
-> > + * - Cannot be trapped or prevent the guest from using anyway
-> > + */
-> > +
-> > +/*
-> > + * Allow for protected VMs:
-> > + * - Floating-point and Advanced SIMD
-> > + * - Data Independent Timing
-> > + */
-> > +#define PVM_ID_AA64PFR0_ALLOW (\
-> > +     ARM64_FEATURE_MASK(ID_AA64PFR0_FP) | \
-> > +     ARM64_FEATURE_MASK(ID_AA64PFR0_ASIMD) | \
-> > +     ARM64_FEATURE_MASK(ID_AA64PFR0_DIT) \
-> > +     )
-> > +
-> > +/*
-> > + * Restrict to the following *unsigned* features for protected VMs:
-> > + * - AArch64 guests only (no support for AArch32 guests):
-> > + *   AArch32 adds complexity in trap handling, emulation, condition codes,
-> > + *   etc...
-> > + * - RAS (v1)
-> > + *   Supported by KVM
-> > + */
-> > +#define PVM_ID_AA64PFR0_RESTRICT_UNSIGNED (\
-> > +     FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL0), ID_AA64PFR0_ELx_64BIT_ONLY) | \
-> > +     FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1), ID_AA64PFR0_ELx_64BIT_ONLY) | \
-> > +     FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL2), ID_AA64PFR0_ELx_64BIT_ONLY) | \
-> > +     FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL3), ID_AA64PFR0_ELx_64BIT_ONLY) | \
-> > +     FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_RAS), ID_AA64PFR0_RAS_V1) \
-> > +     )
-> > +
-> > +/*
-> > + * Allow for protected VMs:
-> > + * - Branch Target Identification
-> > + * - Speculative Store Bypassing
-> > + */
-> > +#define PVM_ID_AA64PFR1_ALLOW (\
-> > +     ARM64_FEATURE_MASK(ID_AA64PFR1_BT) | \
-> > +     ARM64_FEATURE_MASK(ID_AA64PFR1_SSBS) \
-> > +     )
-> > +
-> > +/*
-> > + * Allow for protected VMs:
-> > + * - Mixed-endian
-> > + * - Distinction between Secure and Non-secure Memory
-> > + * - Mixed-endian at EL0 only
-> > + * - Non-context synchronizing exception entry and exit
-> > + */
-> > +#define PVM_ID_AA64MMFR0_ALLOW (\
-> > +     ARM64_FEATURE_MASK(ID_AA64MMFR0_BIGENDEL) | \
-> > +     ARM64_FEATURE_MASK(ID_AA64MMFR0_SNSMEM) | \
-> > +     ARM64_FEATURE_MASK(ID_AA64MMFR0_BIGENDEL0) | \
-> > +     ARM64_FEATURE_MASK(ID_AA64MMFR0_EXS) \
-> > +     )
-> > +
-> > +/*
-> > + * Restrict to the following *unsigned* features for protected VMs:
-> > + * - 40-bit IPA
-> > + * - 16-bit ASID
-> > + */
-> > +#define PVM_ID_AA64MMFR0_RESTRICT_UNSIGNED (\
-> > +     FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64MMFR0_PARANGE), ID_AA64MMFR0_PARANGE_40) | \
-> > +     FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64MMFR0_ASID), ID_AA64MMFR0_ASID_16) \
-> > +     )
-> > +
-> > +/*
-> > + * Allow for protected VMs:
-> > + * - Hardware translation table updates to Access flag and Dirty state
-> > + * - Number of VMID bits from CPU
-> > + * - Hierarchical Permission Disables
-> > + * - Privileged Access Never
-> > + * - SError interrupt exceptions from speculative reads
-> > + * - Enhanced Translation Synchronization
-> > + */
-> > +#define PVM_ID_AA64MMFR1_ALLOW (\
-> > +     ARM64_FEATURE_MASK(ID_AA64MMFR1_HADBS) | \
-> > +     ARM64_FEATURE_MASK(ID_AA64MMFR1_VMIDBITS) | \
-> > +     ARM64_FEATURE_MASK(ID_AA64MMFR1_HPD) | \
-> > +     ARM64_FEATURE_MASK(ID_AA64MMFR1_PAN) | \
-> > +     ARM64_FEATURE_MASK(ID_AA64MMFR1_SPECSEI) | \
-> > +     ARM64_FEATURE_MASK(ID_AA64MMFR1_ETS) \
-> > +     )
-> > +
-> > +/*
-> > + * Allow for protected VMs:
-> > + * - Common not Private translations
-> > + * - User Access Override
-> > + * - IESB bit in the SCTLR_ELx registers
-> > + * - Unaligned single-copy atomicity and atomic functions
-> > + * - ESR_ELx.EC value on an exception by read access to feature ID space
-> > + * - TTL field in address operations.
-> > + * - Break-before-make sequences when changing translation block size
-> > + * - E0PDx mechanism
-> > + */
-> > +#define PVM_ID_AA64MMFR2_ALLOW (\
-> > +     ARM64_FEATURE_MASK(ID_AA64MMFR2_CNP) | \
-> > +     ARM64_FEATURE_MASK(ID_AA64MMFR2_UAO) | \
-> > +     ARM64_FEATURE_MASK(ID_AA64MMFR2_IESB) | \
-> > +     ARM64_FEATURE_MASK(ID_AA64MMFR2_AT) | \
-> > +     ARM64_FEATURE_MASK(ID_AA64MMFR2_IDS) | \
-> > +     ARM64_FEATURE_MASK(ID_AA64MMFR2_TTL) | \
-> > +     ARM64_FEATURE_MASK(ID_AA64MMFR2_BBM) | \
-> > +     ARM64_FEATURE_MASK(ID_AA64MMFR2_E0PD) \
-> > +     )
-> > +
-> > +/*
-> > + * No support for Scalable Vectors for protected VMs:
-> > + *   Requires additional support from KVM, e.g., context-switching and
-> > + *   trapping at EL2
-> > + */
-> > +#define PVM_ID_AA64ZFR0_ALLOW (0ULL)
-> > +
-> > +/*
-> > + * No support for debug, including breakpoints, and watchpoints for protected
-> > + * VMs:
-> > + *   The Arm architecture mandates support for at least the Armv8 debug
-> > + *   architecture, which would include at least 2 hardware breakpoints and
-> > + *   watchpoints. Providing that support to protected guests adds
-> > + *   considerable state and complexity. Therefore, the reserved value of 0 is
-> > + *   used for debug-related fields.
-> > + */
-> > +#define PVM_ID_AA64DFR0_ALLOW (0ULL)
-> > +#define PVM_ID_AA64DFR1_ALLOW (0ULL)
-> > +
-> > +/*
-> > + * No support for implementation defined features.
-> > + */
-> > +#define PVM_ID_AA64AFR0_ALLOW (0ULL)
-> > +#define PVM_ID_AA64AFR1_ALLOW (0ULL)
-> > +
-> > +/*
-> > + * No restrictions on instructions implemented in AArch64.
-> > + */
-> > +#define PVM_ID_AA64ISAR0_ALLOW (\
-> > +     ARM64_FEATURE_MASK(ID_AA64ISAR0_AES) | \
-> > +     ARM64_FEATURE_MASK(ID_AA64ISAR0_SHA1) | \
-> > +     ARM64_FEATURE_MASK(ID_AA64ISAR0_SHA2) | \
-> > +     ARM64_FEATURE_MASK(ID_AA64ISAR0_CRC32) | \
-> > +     ARM64_FEATURE_MASK(ID_AA64ISAR0_ATOMICS) | \
-> > +     ARM64_FEATURE_MASK(ID_AA64ISAR0_RDM) | \
-> > +     ARM64_FEATURE_MASK(ID_AA64ISAR0_SHA3) | \
-> > +     ARM64_FEATURE_MASK(ID_AA64ISAR0_SM3) | \
-> > +     ARM64_FEATURE_MASK(ID_AA64ISAR0_SM4) | \
-> > +     ARM64_FEATURE_MASK(ID_AA64ISAR0_DP) | \
-> > +     ARM64_FEATURE_MASK(ID_AA64ISAR0_FHM) | \
-> > +     ARM64_FEATURE_MASK(ID_AA64ISAR0_TS) | \
-> > +     ARM64_FEATURE_MASK(ID_AA64ISAR0_TLB) | \
-> > +     ARM64_FEATURE_MASK(ID_AA64ISAR0_RNDR) \
-> > +     )
-> > +
-> > +#define PVM_ID_AA64ISAR1_ALLOW (\
-> > +     ARM64_FEATURE_MASK(ID_AA64ISAR1_DPB) | \
-> > +     ARM64_FEATURE_MASK(ID_AA64ISAR1_APA) | \
-> > +     ARM64_FEATURE_MASK(ID_AA64ISAR1_API) | \
-> > +     ARM64_FEATURE_MASK(ID_AA64ISAR1_JSCVT) | \
-> > +     ARM64_FEATURE_MASK(ID_AA64ISAR1_FCMA) | \
-> > +     ARM64_FEATURE_MASK(ID_AA64ISAR1_LRCPC) | \
-> > +     ARM64_FEATURE_MASK(ID_AA64ISAR1_GPA) | \
-> > +     ARM64_FEATURE_MASK(ID_AA64ISAR1_GPI) | \
-> > +     ARM64_FEATURE_MASK(ID_AA64ISAR1_FRINTTS) | \
-> > +     ARM64_FEATURE_MASK(ID_AA64ISAR1_SB) | \
-> > +     ARM64_FEATURE_MASK(ID_AA64ISAR1_SPECRES) | \
-> > +     ARM64_FEATURE_MASK(ID_AA64ISAR1_BF16) | \
-> > +     ARM64_FEATURE_MASK(ID_AA64ISAR1_DGH) | \
-> > +     ARM64_FEATURE_MASK(ID_AA64ISAR1_I8MM) \
-> > +     )
-> > +
-> > +#endif /* __ARM64_KVM_FIXED_CONFIG_H__ */
-> > diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-> > index 657d0c94cf82..5afd14ab15b9 100644
-> > --- a/arch/arm64/include/asm/kvm_hyp.h
-> > +++ b/arch/arm64/include/asm/kvm_hyp.h
-> > @@ -115,7 +115,12 @@ int __pkvm_init(phys_addr_t phys, unsigned long size, unsigned long nr_cpus,
-> >  void __noreturn __host_enter(struct kvm_cpu_context *host_ctxt);
-> >  #endif
-> >
-> > +extern u64 kvm_nvhe_sym(id_aa64pfr0_el1_sys_val);
-> > +extern u64 kvm_nvhe_sym(id_aa64pfr1_el1_sys_val);
-> > +extern u64 kvm_nvhe_sym(id_aa64isar0_el1_sys_val);
-> > +extern u64 kvm_nvhe_sym(id_aa64isar1_el1_sys_val);
-> >  extern u64 kvm_nvhe_sym(id_aa64mmfr0_el1_sys_val);
-> >  extern u64 kvm_nvhe_sym(id_aa64mmfr1_el1_sys_val);
-> > +extern u64 kvm_nvhe_sym(id_aa64mmfr2_el1_sys_val);
-> >
-> >  #endif /* __ARM64_KVM_HYP_H__ */
-> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > index fe102cd2e518..6aa7b0c5bf21 100644
-> > --- a/arch/arm64/kvm/arm.c
-> > +++ b/arch/arm64/kvm/arm.c
-> > @@ -1802,8 +1802,13 @@ static int kvm_hyp_init_protection(u32 hyp_va_bits)
-> >       void *addr = phys_to_virt(hyp_mem_base);
-> >       int ret;
-> >
-> > +     kvm_nvhe_sym(id_aa64pfr0_el1_sys_val) = read_sanitised_ftr_reg(SYS_ID_AA64PFR0_EL1);
-> > +     kvm_nvhe_sym(id_aa64pfr1_el1_sys_val) = read_sanitised_ftr_reg(SYS_ID_AA64PFR1_EL1);
-> > +     kvm_nvhe_sym(id_aa64isar0_el1_sys_val) = read_sanitised_ftr_reg(SYS_ID_AA64ISAR0_EL1);
-> > +     kvm_nvhe_sym(id_aa64isar1_el1_sys_val) = read_sanitised_ftr_reg(SYS_ID_AA64ISAR1_EL1);
-> >       kvm_nvhe_sym(id_aa64mmfr0_el1_sys_val) = read_sanitised_ftr_reg(SYS_ID_AA64MMFR0_EL1);
-> >       kvm_nvhe_sym(id_aa64mmfr1_el1_sys_val) = read_sanitised_ftr_reg(SYS_ID_AA64MMFR1_EL1);
-> > +     kvm_nvhe_sym(id_aa64mmfr2_el1_sys_val) = read_sanitised_ftr_reg(SYS_ID_AA64MMFR2_EL1);
-> >
-> >       ret = create_hyp_mappings(addr, addr + hyp_mem_size, PAGE_HYP);
-> >       if (ret)
-> > diff --git a/arch/arm64/kvm/hyp/include/nvhe/sys_regs.h b/arch/arm64/kvm/hyp/include/nvhe/sys_regs.h
-> > new file mode 100644
-> > index 000000000000..0865163d363c
-> > --- /dev/null
-> > +++ b/arch/arm64/kvm/hyp/include/nvhe/sys_regs.h
-> > @@ -0,0 +1,28 @@
-> > +/* SPDX-License-Identifier: GPL-2.0-only */
-> > +/*
-> > + * Copyright (C) 2021 Google LLC
-> > + * Author: Fuad Tabba <tabba@google.com>
-> > + */
-> > +
-> > +#ifndef __ARM64_KVM_NVHE_SYS_REGS_H__
-> > +#define __ARM64_KVM_NVHE_SYS_REGS_H__
-> > +
-> > +#include <asm/kvm_host.h>
-> > +
-> > +u64 get_pvm_id_aa64pfr0(const struct kvm_vcpu *vcpu);
-> > +u64 get_pvm_id_aa64pfr1(const struct kvm_vcpu *vcpu);
-> > +u64 get_pvm_id_aa64zfr0(const struct kvm_vcpu *vcpu);
-> > +u64 get_pvm_id_aa64dfr0(const struct kvm_vcpu *vcpu);
-> > +u64 get_pvm_id_aa64dfr1(const struct kvm_vcpu *vcpu);
-> > +u64 get_pvm_id_aa64afr0(const struct kvm_vcpu *vcpu);
-> > +u64 get_pvm_id_aa64afr1(const struct kvm_vcpu *vcpu);
-> > +u64 get_pvm_id_aa64isar0(const struct kvm_vcpu *vcpu);
-> > +u64 get_pvm_id_aa64isar1(const struct kvm_vcpu *vcpu);
-> > +u64 get_pvm_id_aa64mmfr0(const struct kvm_vcpu *vcpu);
-> > +u64 get_pvm_id_aa64mmfr1(const struct kvm_vcpu *vcpu);
-> > +u64 get_pvm_id_aa64mmfr2(const struct kvm_vcpu *vcpu);
-> > +
-> > +bool kvm_handle_pvm_sysreg(struct kvm_vcpu *vcpu, u64 *exit_code);
-> > +void __inject_undef64(struct kvm_vcpu *vcpu);
-> > +
-> > +#endif /* __ARM64_KVM_NVHE_SYS_REGS_H__ */
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
-> > index 8d741f71377f..0bbe37a18d5d 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/Makefile
-> > +++ b/arch/arm64/kvm/hyp/nvhe/Makefile
-> > @@ -14,7 +14,7 @@ lib-objs := $(addprefix ../../../lib/, $(lib-objs))
-> >
-> >  obj-y := timer-sr.o sysreg-sr.o debug-sr.o switch.o tlb.o hyp-init.o host.o \
-> >        hyp-main.o hyp-smp.o psci-relay.o early_alloc.o stub.o page_alloc.o \
-> > -      cache.o setup.o mm.o mem_protect.o
-> > +      cache.o setup.o mm.o mem_protect.o sys_regs.o
-> >  obj-y += ../vgic-v3-sr.o ../aarch32.o ../vgic-v2-cpuif-proxy.o ../entry.o \
-> >        ../fpsimd.o ../hyp-entry.o ../exception.o ../pgtable.o
-> >  obj-y += $(lib-objs)
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-> > new file mode 100644
-> > index 000000000000..ef8456c54b18
-> > --- /dev/null
-> > +++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-> > @@ -0,0 +1,492 @@
-> > +// SPDX-License-Identifier: GPL-2.0-only
-> > +/*
-> > + * Copyright (C) 2021 Google LLC
-> > + * Author: Fuad Tabba <tabba@google.com>
-> > + */
-> > +
-> > +#include <asm/kvm_asm.h>
-> > +#include <asm/kvm_fixed_config.h>
-> > +#include <asm/kvm_mmu.h>
-> > +
-> > +#include <hyp/adjust_pc.h>
-> > +
-> > +#include "../../sys_regs.h"
-> > +
-> > +/*
-> > + * Copies of the host's CPU features registers holding sanitized values at hyp.
-> > + */
-> > +u64 id_aa64pfr0_el1_sys_val;
-> > +u64 id_aa64pfr1_el1_sys_val;
-> > +u64 id_aa64isar0_el1_sys_val;
-> > +u64 id_aa64isar1_el1_sys_val;
-> > +u64 id_aa64mmfr2_el1_sys_val;
-> > +
-> > +static inline void inject_undef64(struct kvm_vcpu *vcpu)
-> > +{
-> > +     u32 esr = (ESR_ELx_EC_UNKNOWN << ESR_ELx_EC_SHIFT);
-> > +
-> > +     vcpu->arch.flags |= (KVM_ARM64_EXCEPT_AA64_EL1 |
-> > +                          KVM_ARM64_EXCEPT_AA64_ELx_SYNC |
-> > +                          KVM_ARM64_PENDING_EXCEPTION);
-> > +
-> > +     __kvm_adjust_pc(vcpu);
-> > +
-> > +     write_sysreg_el1(esr, SYS_ESR);
-> > +     write_sysreg_el1(read_sysreg_el2(SYS_ELR), SYS_ELR);
-> > +}
-> > +
-> > +/*
-> > + * Inject an unknown/undefined exception to an AArch64 guest while most of its
-> > + * sysregs are live.
-> > + */
-> > +void __inject_undef64(struct kvm_vcpu *vcpu)
-> > +{
-> > +     *vcpu_pc(vcpu) = read_sysreg_el2(SYS_ELR);
-> > +     *vcpu_cpsr(vcpu) = read_sysreg_el2(SYS_SPSR);
-> > +
-> > +     inject_undef64(vcpu);
-> > +
-> > +     write_sysreg_el2(*vcpu_pc(vcpu), SYS_ELR);
-> > +     write_sysreg_el2(*vcpu_cpsr(vcpu), SYS_SPSR);
-> > +}
-> > +
-> > +/*
-> > + * Accessor for undefined accesses.
-> > + */
-> > +static bool undef_access(struct kvm_vcpu *vcpu,
-> > +                      struct sys_reg_params *p,
-> > +                      const struct sys_reg_desc *r)
-> > +{
-> > +     __inject_undef64(vcpu);
-> > +     return false;
-> > +}
-> > +
-> > +/*
-> > + * Returns the restricted features values of the feature register based on the
-> > + * limitations in restrict_fields.
-> > + * A feature id field value of 0b0000 does not impose any restrictions.
-> > + * Note: Use only for unsigned feature field values.
-> > + */
-> > +static u64 get_restricted_features_unsigned(u64 sys_reg_val,
-> > +                                         u64 restrict_fields)
-> > +{
-> > +     u64 value = 0UL;
-> > +     u64 mask = GENMASK_ULL(ARM64_FEATURE_FIELD_BITS - 1, 0);
-> > +
-> > +     /*
-> > +      * According to the Arm Architecture Reference Manual, feature fields
-> > +      * use increasing values to indicate increases in functionality.
-> > +      * Iterate over the restricted feature fields and calculate the minimum
-> > +      * unsigned value between the one supported by the system, and what the
-> > +      * value is being restricted to.
-> > +      */
-> > +     while (sys_reg_val && restrict_fields) {
-> > +             value |= min(sys_reg_val & mask, restrict_fields & mask);
-> > +             sys_reg_val &= ~mask;
-> > +             restrict_fields &= ~mask;
-> > +             mask <<= ARM64_FEATURE_FIELD_BITS;
-> > +     }
-> > +
-> > +     return value;
-> > +}
-> > +
-> > +/*
-> > + * Functions that return the value of feature id registers for protected VMs
-> > + * based on allowed features, system features, and KVM support.
-> > + */
-> > +
-> > +u64 get_pvm_id_aa64pfr0(const struct kvm_vcpu *vcpu)
-> > +{
-> > +     const struct kvm *kvm = (const struct kvm *)kern_hyp_va(vcpu->kvm);
-> > +     u64 set_mask = 0;
-> > +     u64 allow_mask = PVM_ID_AA64PFR0_ALLOW;
-> > +
-> > +     if (!vcpu_has_sve(vcpu))
-> > +             allow_mask &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_SVE);
-> > +
-> > +     set_mask |= get_restricted_features_unsigned(id_aa64pfr0_el1_sys_val,
-> > +             PVM_ID_AA64PFR0_RESTRICT_UNSIGNED);
-> > +
-> > +     /* Spectre and Meltdown mitigation in KVM */
-> > +     set_mask |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_CSV2),
-> > +                            (u64)kvm->arch.pfr0_csv2);
-> > +     set_mask |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_CSV3),
-> > +                            (u64)kvm->arch.pfr0_csv3);
-> > +
-> > +     return (id_aa64pfr0_el1_sys_val & allow_mask) | set_mask;
-> > +}
-> > +
-> > +u64 get_pvm_id_aa64pfr1(const struct kvm_vcpu *vcpu)
-> > +{
-> > +     const struct kvm *kvm = (const struct kvm *)kern_hyp_va(vcpu->kvm);
-> > +     u64 allow_mask = PVM_ID_AA64PFR1_ALLOW;
-> > +
-> > +     if (!kvm_has_mte(kvm))
-> > +             allow_mask &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_MTE);
-> > +
-> > +     return id_aa64pfr1_el1_sys_val & allow_mask;
-> > +}
-> > +
-> > +u64 get_pvm_id_aa64zfr0(const struct kvm_vcpu *vcpu)
-> > +{
-> > +     /*
-> > +      * No support for Scalable Vectors, therefore, hyp has no sanitized
-> > +      * copy of the feature id register.
-> > +      */
-> > +     BUILD_BUG_ON(PVM_ID_AA64ZFR0_ALLOW != 0ULL);
-> > +     return 0;
-> > +}
-> > +
-> > +u64 get_pvm_id_aa64dfr0(const struct kvm_vcpu *vcpu)
-> > +{
-> > +     /*
-> > +      * No support for debug, including breakpoints, and watchpoints,
-> > +      * therefore, pKVM has no sanitized copy of the feature id register.
-> > +      */
-> > +     BUILD_BUG_ON(PVM_ID_AA64DFR0_ALLOW != 0ULL);
-> > +     return 0;
-> > +}
-> > +
-> > +u64 get_pvm_id_aa64dfr1(const struct kvm_vcpu *vcpu)
-> > +{
-> > +     /*
-> > +      * No support for debug, therefore, hyp has no sanitized copy of the
-> > +      * feature id register.
-> > +      */
-> > +     BUILD_BUG_ON(PVM_ID_AA64DFR1_ALLOW != 0ULL);
-> > +     return 0;
-> > +}
-> > +
-> > +u64 get_pvm_id_aa64afr0(const struct kvm_vcpu *vcpu)
-> > +{
-> > +     /*
-> > +      * No support for implementation defined features, therefore, hyp has no
-> > +      * sanitized copy of the feature id register.
-> > +      */
-> > +     BUILD_BUG_ON(PVM_ID_AA64AFR0_ALLOW != 0ULL);
-> > +     return 0;
-> > +}
-> > +
-> > +u64 get_pvm_id_aa64afr1(const struct kvm_vcpu *vcpu)
-> > +{
-> > +     /*
-> > +      * No support for implementation defined features, therefore, hyp has no
-> > +      * sanitized copy of the feature id register.
-> > +      */
-> > +     BUILD_BUG_ON(PVM_ID_AA64AFR1_ALLOW != 0ULL);
-> > +     return 0;
-> > +}
->
-> Reading the same function five times make me wonder if a generator macro
-> wouldn't be better for these.
+Yes, but for me the patch was not correct because there is no need to update target/i386/cpu-dump.c
+But perhaps I misunderstood the answer from Philippe?
 
-I think so too. I'll do that.
+Thanks
+Laurent
 
-> > +
-> > +u64 get_pvm_id_aa64isar0(const struct kvm_vcpu *vcpu)
-> > +{
-> > +     return id_aa64isar0_el1_sys_val & PVM_ID_AA64ISAR0_ALLOW;
-> > +}
-> > +
-> > +u64 get_pvm_id_aa64isar1(const struct kvm_vcpu *vcpu)
-> > +{
-> > +     u64 allow_mask = PVM_ID_AA64ISAR1_ALLOW;
-> > +
-> > +     if (!vcpu_has_ptrauth(vcpu))
-> > +             allow_mask &= ~(ARM64_FEATURE_MASK(ID_AA64ISAR1_APA) |
-> > +                             ARM64_FEATURE_MASK(ID_AA64ISAR1_API) |
-> > +                             ARM64_FEATURE_MASK(ID_AA64ISAR1_GPA) |
-> > +                             ARM64_FEATURE_MASK(ID_AA64ISAR1_GPI));
-> > +
-> > +     return id_aa64isar1_el1_sys_val & allow_mask;
-> > +}
-> > +
-> > +u64 get_pvm_id_aa64mmfr0(const struct kvm_vcpu *vcpu)
-> > +{
-> > +     u64 set_mask;
-> > +
-> > +     set_mask = get_restricted_features_unsigned(id_aa64mmfr0_el1_sys_val,
-> > +             PVM_ID_AA64MMFR0_RESTRICT_UNSIGNED);
-> > +
-> > +     return (id_aa64mmfr0_el1_sys_val & PVM_ID_AA64MMFR0_ALLOW) | set_mask;
-> > +}
-> > +
-> > +u64 get_pvm_id_aa64mmfr1(const struct kvm_vcpu *vcpu)
-> > +{
-> > +     return id_aa64mmfr1_el1_sys_val & PVM_ID_AA64MMFR1_ALLOW;
-> > +}
-> > +
-> > +u64 get_pvm_id_aa64mmfr2(const struct kvm_vcpu *vcpu)
-> > +{
-> > +     return id_aa64mmfr2_el1_sys_val & PVM_ID_AA64MMFR2_ALLOW;
-> > +}
-> > +
-> > +/* Read a sanitized cpufeature ID register by its sys_reg_desc. */
-> > +static u64 read_id_reg(const struct kvm_vcpu *vcpu,
-> > +                    struct sys_reg_desc const *r)
-> > +{
-> > +     u32 id = reg_to_encoding(r);
-> > +
-> > +     switch (id) {
-> > +     case SYS_ID_AA64PFR0_EL1:
-> > +             return get_pvm_id_aa64pfr0(vcpu);
-> > +     case SYS_ID_AA64PFR1_EL1:
-> > +             return get_pvm_id_aa64pfr1(vcpu);
-> > +     case SYS_ID_AA64ZFR0_EL1:
-> > +             return get_pvm_id_aa64zfr0(vcpu);
-> > +     case SYS_ID_AA64DFR0_EL1:
-> > +             return get_pvm_id_aa64dfr0(vcpu);
-> > +     case SYS_ID_AA64DFR1_EL1:
-> > +             return get_pvm_id_aa64dfr1(vcpu);
-> > +     case SYS_ID_AA64AFR0_EL1:
-> > +             return get_pvm_id_aa64afr0(vcpu);
-> > +     case SYS_ID_AA64AFR1_EL1:
-> > +             return get_pvm_id_aa64afr1(vcpu);
-> > +     case SYS_ID_AA64ISAR0_EL1:
-> > +             return get_pvm_id_aa64isar0(vcpu);
-> > +     case SYS_ID_AA64ISAR1_EL1:
-> > +             return get_pvm_id_aa64isar1(vcpu);
-> > +     case SYS_ID_AA64MMFR0_EL1:
-> > +             return get_pvm_id_aa64mmfr0(vcpu);
-> > +     case SYS_ID_AA64MMFR1_EL1:
-> > +             return get_pvm_id_aa64mmfr1(vcpu);
-> > +     case SYS_ID_AA64MMFR2_EL1:
-> > +             return get_pvm_id_aa64mmfr2(vcpu);
-> > +     default:
-> > +             /*
-> > +              * Should never happen because all cases are covered in
-> > +              * pvm_sys_reg_descs[] below.
->
-> I'd drop the 'below' word. It's not overly helpful and since code gets
-> moved it can go out of date.
+> 
+>> ---
+>>  target/i386/cpu.h                    | 4 ----
+>>  hw/i386/kvmvapic.c                   | 1 +
+>>  hw/i386/x86.c                        | 1 +
+>>  target/i386/cpu-dump.c               | 1 +
+>>  target/i386/cpu-sysemu.c             | 1 +
+>>  target/i386/cpu.c                    | 1 +
+>>  target/i386/gdbstub.c                | 4 ++++
+>>  target/i386/hax/hax-all.c            | 1 +
+>>  target/i386/helper.c                 | 1 +
+>>  target/i386/hvf/hvf.c                | 1 +
+>>  target/i386/hvf/x86_emu.c            | 1 +
+>>  target/i386/nvmm/nvmm-all.c          | 1 +
+>>  target/i386/tcg/sysemu/misc_helper.c | 1 +
+>>  target/i386/tcg/sysemu/seg_helper.c  | 1 +
+>>  target/i386/whpx/whpx-all.c          | 1 +
+>>  15 files changed, 17 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+>> index c2954c71ea0..4411718bb7a 100644
+>> --- a/target/i386/cpu.h
+>> +++ b/target/i386/cpu.h
+>> @@ -2045,10 +2045,6 @@ typedef X86CPU ArchCPU;
+>>  #include "exec/cpu-all.h"
+>>  #include "svm.h"
+>>  
+>> -#if !defined(CONFIG_USER_ONLY)
+>> -#include "hw/i386/apic.h"
+>> -#endif
+>> -
+>>  static inline void cpu_get_tb_cpu_state(CPUX86State *env, target_ulong *pc,
+>>                                          target_ulong *cs_base, uint32_t *flags)
+>>  {
+>> diff --git a/hw/i386/kvmvapic.c b/hw/i386/kvmvapic.c
+>> index 43f8a8f679e..7333818bdd1 100644
+>> --- a/hw/i386/kvmvapic.c
+>> +++ b/hw/i386/kvmvapic.c
+>> @@ -16,6 +16,7 @@
+>>  #include "sysemu/hw_accel.h"
+>>  #include "sysemu/kvm.h"
+>>  #include "sysemu/runstate.h"
+>> +#include "hw/i386/apic.h"
+>>  #include "hw/i386/apic_internal.h"
+>>  #include "hw/sysbus.h"
+>>  #include "hw/boards.h"
+>> diff --git a/hw/i386/x86.c b/hw/i386/x86.c
+>> index 00448ed55aa..e0218f8791f 100644
+>> --- a/hw/i386/x86.c
+>> +++ b/hw/i386/x86.c
+>> @@ -43,6 +43,7 @@
+>>  #include "target/i386/cpu.h"
+>>  #include "hw/i386/topology.h"
+>>  #include "hw/i386/fw_cfg.h"
+>> +#include "hw/i386/apic.h"
+>>  #include "hw/intc/i8259.h"
+>>  #include "hw/rtc/mc146818rtc.h"
+>>  
+>> diff --git a/target/i386/cpu-dump.c b/target/i386/cpu-dump.c
+>> index 02b635a52cf..0158fd2bf28 100644
+>> --- a/target/i386/cpu-dump.c
+>> +++ b/target/i386/cpu-dump.c
+>> @@ -22,6 +22,7 @@
+>>  #include "qemu/qemu-print.h"
+>>  #ifndef CONFIG_USER_ONLY
+>>  #include "hw/i386/apic_internal.h"
+>> +#include "hw/i386/apic.h"
+>>  #endif
+>>  
+>>  /***********************************************************/
+>> diff --git a/target/i386/cpu-sysemu.c b/target/i386/cpu-sysemu.c
+>> index 37b7c562f53..4e8a6973d08 100644
+>> --- a/target/i386/cpu-sysemu.c
+>> +++ b/target/i386/cpu-sysemu.c
+>> @@ -30,6 +30,7 @@
+>>  #include "hw/qdev-properties.h"
+>>  
+>>  #include "exec/address-spaces.h"
+>> +#include "hw/i386/apic.h"
+>>  #include "hw/i386/apic_internal.h"
+>>  
+>>  #include "cpu-internal.h"
+>> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+>> index 6b029f1bdf1..52422cbf21b 100644
+>> --- a/target/i386/cpu.c
+>> +++ b/target/i386/cpu.c
+>> @@ -33,6 +33,7 @@
+>>  #include "standard-headers/asm-x86/kvm_para.h"
+>>  #include "hw/qdev-properties.h"
+>>  #include "hw/i386/topology.h"
+>> +#include "hw/i386/apic.h"
+>>  #ifndef CONFIG_USER_ONLY
+>>  #include "exec/address-spaces.h"
+>>  #include "hw/boards.h"
+>> diff --git a/target/i386/gdbstub.c b/target/i386/gdbstub.c
+>> index 098a2ad15a9..5438229c1a9 100644
+>> --- a/target/i386/gdbstub.c
+>> +++ b/target/i386/gdbstub.c
+>> @@ -21,6 +21,10 @@
+>>  #include "cpu.h"
+>>  #include "exec/gdbstub.h"
+>>  
+>> +#ifndef CONFIG_USER_ONLY
+>> +#include "hw/i386/apic.h"
+>> +#endif
+>> +
+>>  #ifdef TARGET_X86_64
+>>  static const int gpr_map[16] = {
+>>      R_EAX, R_EBX, R_ECX, R_EDX, R_ESI, R_EDI, R_EBP, R_ESP,
+>> diff --git a/target/i386/hax/hax-all.c b/target/i386/hax/hax-all.c
+>> index bf65ed6fa92..cd89e3233a9 100644
+>> --- a/target/i386/hax/hax-all.c
+>> +++ b/target/i386/hax/hax-all.c
+>> @@ -32,6 +32,7 @@
+>>  #include "sysemu/reset.h"
+>>  #include "sysemu/runstate.h"
+>>  #include "hw/boards.h"
+>> +#include "hw/i386/apic.h"
+>>  
+>>  #include "hax-accel-ops.h"
+>>  
+>> diff --git a/target/i386/helper.c b/target/i386/helper.c
+>> index 533b29cb91b..874beda98ae 100644
+>> --- a/target/i386/helper.c
+>> +++ b/target/i386/helper.c
+>> @@ -26,6 +26,7 @@
+>>  #ifndef CONFIG_USER_ONLY
+>>  #include "sysemu/hw_accel.h"
+>>  #include "monitor/monitor.h"
+>> +#include "hw/i386/apic.h"
+>>  #endif
+>>  
+>>  void cpu_sync_bndcs_hflags(CPUX86State *env)
+>> diff --git a/target/i386/hvf/hvf.c b/target/i386/hvf/hvf.c
+>> index 4ba6e82fab3..50058a24f2a 100644
+>> --- a/target/i386/hvf/hvf.c
+>> +++ b/target/i386/hvf/hvf.c
+>> @@ -70,6 +70,7 @@
+>>  #include <sys/sysctl.h>
+>>  
+>>  #include "hw/i386/apic_internal.h"
+>> +#include "hw/i386/apic.h"
+>>  #include "qemu/main-loop.h"
+>>  #include "qemu/accel.h"
+>>  #include "target/i386/cpu.h"
+>> diff --git a/target/i386/hvf/x86_emu.c b/target/i386/hvf/x86_emu.c
+>> index 7c8203b21fb..fb3e88959d4 100644
+>> --- a/target/i386/hvf/x86_emu.c
+>> +++ b/target/i386/hvf/x86_emu.c
+>> @@ -45,6 +45,7 @@
+>>  #include "x86_flags.h"
+>>  #include "vmcs.h"
+>>  #include "vmx.h"
+>> +#include "hw/i386/apic.h"
+>>  
+>>  void hvf_handle_io(struct CPUState *cpu, uint16_t port, void *data,
+>>                     int direction, int size, uint32_t count);
+>> diff --git a/target/i386/nvmm/nvmm-all.c b/target/i386/nvmm/nvmm-all.c
+>> index a488b00e909..944bdb49663 100644
+>> --- a/target/i386/nvmm/nvmm-all.c
+>> +++ b/target/i386/nvmm/nvmm-all.c
+>> @@ -22,6 +22,7 @@
+>>  #include "qemu/queue.h"
+>>  #include "migration/blocker.h"
+>>  #include "strings.h"
+>> +#include "hw/i386/apic.h"
+>>  
+>>  #include "nvmm-accel-ops.h"
+>>  
+>> diff --git a/target/i386/tcg/sysemu/misc_helper.c b/target/i386/tcg/sysemu/misc_helper.c
+>> index 9ccaa054c4c..b1d3096e9c9 100644
+>> --- a/target/i386/tcg/sysemu/misc_helper.c
+>> +++ b/target/i386/tcg/sysemu/misc_helper.c
+>> @@ -24,6 +24,7 @@
+>>  #include "exec/cpu_ldst.h"
+>>  #include "exec/address-spaces.h"
+>>  #include "tcg/helper-tcg.h"
+>> +#include "hw/i386/apic.h"
+>>  
+>>  void helper_outb(CPUX86State *env, uint32_t port, uint32_t data)
+>>  {
+>> diff --git a/target/i386/tcg/sysemu/seg_helper.c b/target/i386/tcg/sysemu/seg_helper.c
+>> index bf3444c26b0..34f2c65d47f 100644
+>> --- a/target/i386/tcg/sysemu/seg_helper.c
+>> +++ b/target/i386/tcg/sysemu/seg_helper.c
+>> @@ -24,6 +24,7 @@
+>>  #include "exec/cpu_ldst.h"
+>>  #include "tcg/helper-tcg.h"
+>>  #include "../seg_helper.h"
+>> +#include "hw/i386/apic.h"
+>>  
+>>  #ifdef TARGET_X86_64
+>>  void helper_syscall(CPUX86State *env, int next_eip_addend)
+>> diff --git a/target/i386/whpx/whpx-all.c b/target/i386/whpx/whpx-all.c
+>> index 3e925b9da70..9ab844fd05d 100644
+>> --- a/target/i386/whpx/whpx-all.c
+>> +++ b/target/i386/whpx/whpx-all.c
+>> @@ -20,6 +20,7 @@
+>>  #include "qemu/main-loop.h"
+>>  #include "hw/boards.h"
+>>  #include "hw/i386/ioapic.h"
+>> +#include "hw/i386/apic.h"
+>>  #include "hw/i386/apic_internal.h"
+>>  #include "qemu/error-report.h"
+>>  #include "qapi/error.h"
+>> -- 
+>> 2.31.1
+> 
+> 
 
-Will fix.
-
-> > +              */
-> > +             WARN_ON(1);
->
-> The above cases could also be generated by a macro. And I wonder if we can
-> come up with something that makes sure these separate lists stay
-> consistent with macros and build bugs in order to better avoid these
-> "should never happen" situations.
-
-Which ties in to Marc's comment for this patch. I'll handle this.
-
-> > +             break;
-> > +     }
-> > +
-> > +     return 0;
-> > +}
-> > +
-> > +/*
-> > + * Accessor for AArch32 feature id registers.
-> > + *
-> > + * The value of these registers is "unknown" according to the spec if AArch32
-> > + * isn't supported.
-> > + */
-> > +static bool pvm_access_id_aarch32(struct kvm_vcpu *vcpu,
-> > +                               struct sys_reg_params *p,
-> > +                               const struct sys_reg_desc *r)
-> > +{
-> > +     if (p->is_write)
-> > +             return undef_access(vcpu, p, r);
-> > +
-> > +     /*
-> > +      * No support for AArch32 guests, therefore, pKVM has no sanitized copy
-> > +      * of AArch32 feature id registers.
-> > +      */
-> > +     BUILD_BUG_ON(FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1),
-> > +                  PVM_ID_AA64PFR0_RESTRICT_UNSIGNED) > ID_AA64PFR0_ELx_64BIT_ONLY);
-> > +
-> > +     /* Use 0 for architecturally "unknown" values. */
-> > +     p->regval = 0;
-> > +     return true;
-> > +}
-> > +
-> > +/*
-> > + * Accessor for AArch64 feature id registers.
-> > + *
-> > + * If access is allowed, set the regval to the protected VM's view of the
-> > + * register and return true.
-> > + * Otherwise, inject an undefined exception and return false.
-> > + */
-> > +static bool pvm_access_id_aarch64(struct kvm_vcpu *vcpu,
-> > +                               struct sys_reg_params *p,
-> > +                               const struct sys_reg_desc *r)
-> > +{
-> > +     if (p->is_write)
-> > +             return undef_access(vcpu, p, r);
-> > +
-> > +     p->regval = read_id_reg(vcpu, r);
-> > +     return true;
-> > +}
-> > +
-> > +/* Mark the specified system register as an AArch32 feature id register. */
-> > +#define AARCH32(REG) { SYS_DESC(REG), .access = pvm_access_id_aarch32 }
-> > +
-> > +/* Mark the specified system register as an AArch64 feature id register. */
-> > +#define AARCH64(REG) { SYS_DESC(REG), .access = pvm_access_id_aarch64 }
-> > +
-> > +/* Mark the specified system register as not being handled in hyp. */
-> > +#define HOST_HANDLED(REG) { SYS_DESC(REG), .access = NULL }
-> > +
-> > +/*
-> > + * Architected system registers.
-> > + * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
-> > + *
-> > + * NOTE: Anything not explicitly listed here is *restricted by default*, i.e.,
-> > + * it will lead to injecting an exception into the guest.
-> > + */
-> > +static const struct sys_reg_desc pvm_sys_reg_descs[] = {
-> > +     /* Cache maintenance by set/way operations are restricted. */
-> > +
-> > +     /* Debug and Trace Registers are restricted. */
-> > +
-> > +     /* AArch64 mappings of the AArch32 ID registers */
-> > +     /* CRm=1 */
-> > +     AARCH32(SYS_ID_PFR0_EL1),
-> > +     AARCH32(SYS_ID_PFR1_EL1),
-> > +     AARCH32(SYS_ID_DFR0_EL1),
-> > +     AARCH32(SYS_ID_AFR0_EL1),
-> > +     AARCH32(SYS_ID_MMFR0_EL1),
-> > +     AARCH32(SYS_ID_MMFR1_EL1),
-> > +     AARCH32(SYS_ID_MMFR2_EL1),
-> > +     AARCH32(SYS_ID_MMFR3_EL1),
-> > +
-> > +     /* CRm=2 */
-> > +     AARCH32(SYS_ID_ISAR0_EL1),
-> > +     AARCH32(SYS_ID_ISAR1_EL1),
-> > +     AARCH32(SYS_ID_ISAR2_EL1),
-> > +     AARCH32(SYS_ID_ISAR3_EL1),
-> > +     AARCH32(SYS_ID_ISAR4_EL1),
-> > +     AARCH32(SYS_ID_ISAR5_EL1),
-> > +     AARCH32(SYS_ID_MMFR4_EL1),
-> > +     AARCH32(SYS_ID_ISAR6_EL1),
-> > +
-> > +     /* CRm=3 */
-> > +     AARCH32(SYS_MVFR0_EL1),
-> > +     AARCH32(SYS_MVFR1_EL1),
-> > +     AARCH32(SYS_MVFR2_EL1),
-> > +     AARCH32(SYS_ID_PFR2_EL1),
-> > +     AARCH32(SYS_ID_DFR1_EL1),
-> > +     AARCH32(SYS_ID_MMFR5_EL1),
-> > +
-> > +     /* AArch64 ID registers */
-> > +     /* CRm=4 */
-> > +     AARCH64(SYS_ID_AA64PFR0_EL1),
-> > +     AARCH64(SYS_ID_AA64PFR1_EL1),
-> > +     AARCH64(SYS_ID_AA64ZFR0_EL1),
-> > +     AARCH64(SYS_ID_AA64DFR0_EL1),
-> > +     AARCH64(SYS_ID_AA64DFR1_EL1),
-> > +     AARCH64(SYS_ID_AA64AFR0_EL1),
-> > +     AARCH64(SYS_ID_AA64AFR1_EL1),
-> > +     AARCH64(SYS_ID_AA64ISAR0_EL1),
-> > +     AARCH64(SYS_ID_AA64ISAR1_EL1),
-> > +     AARCH64(SYS_ID_AA64MMFR0_EL1),
-> > +     AARCH64(SYS_ID_AA64MMFR1_EL1),
-> > +     AARCH64(SYS_ID_AA64MMFR2_EL1),
-> > +
-> > +     HOST_HANDLED(SYS_SCTLR_EL1),
-> > +     HOST_HANDLED(SYS_ACTLR_EL1),
-> > +     HOST_HANDLED(SYS_CPACR_EL1),
-> > +
-> > +     HOST_HANDLED(SYS_RGSR_EL1),
-> > +     HOST_HANDLED(SYS_GCR_EL1),
-> > +
-> > +     /* Scalable Vector Registers are restricted. */
-> > +
-> > +     HOST_HANDLED(SYS_TTBR0_EL1),
-> > +     HOST_HANDLED(SYS_TTBR1_EL1),
-> > +     HOST_HANDLED(SYS_TCR_EL1),
-> > +
-> > +     HOST_HANDLED(SYS_APIAKEYLO_EL1),
-> > +     HOST_HANDLED(SYS_APIAKEYHI_EL1),
-> > +     HOST_HANDLED(SYS_APIBKEYLO_EL1),
-> > +     HOST_HANDLED(SYS_APIBKEYHI_EL1),
-> > +     HOST_HANDLED(SYS_APDAKEYLO_EL1),
-> > +     HOST_HANDLED(SYS_APDAKEYHI_EL1),
-> > +     HOST_HANDLED(SYS_APDBKEYLO_EL1),
-> > +     HOST_HANDLED(SYS_APDBKEYHI_EL1),
-> > +     HOST_HANDLED(SYS_APGAKEYLO_EL1),
-> > +     HOST_HANDLED(SYS_APGAKEYHI_EL1),
-> > +
-> > +     HOST_HANDLED(SYS_AFSR0_EL1),
-> > +     HOST_HANDLED(SYS_AFSR1_EL1),
-> > +     HOST_HANDLED(SYS_ESR_EL1),
-> > +
-> > +     HOST_HANDLED(SYS_ERRIDR_EL1),
-> > +     HOST_HANDLED(SYS_ERRSELR_EL1),
-> > +     HOST_HANDLED(SYS_ERXFR_EL1),
-> > +     HOST_HANDLED(SYS_ERXCTLR_EL1),
-> > +     HOST_HANDLED(SYS_ERXSTATUS_EL1),
-> > +     HOST_HANDLED(SYS_ERXADDR_EL1),
-> > +     HOST_HANDLED(SYS_ERXMISC0_EL1),
-> > +     HOST_HANDLED(SYS_ERXMISC1_EL1),
-> > +
-> > +     HOST_HANDLED(SYS_TFSR_EL1),
-> > +     HOST_HANDLED(SYS_TFSRE0_EL1),
-> > +
-> > +     HOST_HANDLED(SYS_FAR_EL1),
-> > +     HOST_HANDLED(SYS_PAR_EL1),
-> > +
-> > +     /* Performance Monitoring Registers are restricted. */
-> > +
-> > +     HOST_HANDLED(SYS_MAIR_EL1),
-> > +     HOST_HANDLED(SYS_AMAIR_EL1),
-> > +
-> > +     /* Limited Ordering Regions Registers are restricted. */
-> > +
-> > +     HOST_HANDLED(SYS_VBAR_EL1),
-> > +     HOST_HANDLED(SYS_DISR_EL1),
-> > +
-> > +     /* GIC CPU Interface registers are restricted. */
-> > +
-> > +     HOST_HANDLED(SYS_CONTEXTIDR_EL1),
-> > +     HOST_HANDLED(SYS_TPIDR_EL1),
-> > +
-> > +     HOST_HANDLED(SYS_SCXTNUM_EL1),
-> > +
-> > +     HOST_HANDLED(SYS_CNTKCTL_EL1),
-> > +
-> > +     HOST_HANDLED(SYS_CCSIDR_EL1),
-> > +     HOST_HANDLED(SYS_CLIDR_EL1),
-> > +     HOST_HANDLED(SYS_CSSELR_EL1),
-> > +     HOST_HANDLED(SYS_CTR_EL0),
-> > +
-> > +     /* Performance Monitoring Registers are restricted. */
-> > +
-> > +     HOST_HANDLED(SYS_TPIDR_EL0),
-> > +     HOST_HANDLED(SYS_TPIDRRO_EL0),
-> > +
-> > +     HOST_HANDLED(SYS_SCXTNUM_EL0),
-> > +
-> > +     /* Activity Monitoring Registers are restricted. */
-> > +
-> > +     HOST_HANDLED(SYS_CNTP_TVAL_EL0),
-> > +     HOST_HANDLED(SYS_CNTP_CTL_EL0),
-> > +     HOST_HANDLED(SYS_CNTP_CVAL_EL0),
-> > +
-> > +     /* Performance Monitoring Registers are restricted. */
-> > +
-> > +     HOST_HANDLED(SYS_DACR32_EL2),
-> > +     HOST_HANDLED(SYS_IFSR32_EL2),
-> > +     HOST_HANDLED(SYS_FPEXC32_EL2),
-> > +};
-> > +
-> > +/*
-> > + * Handler for protected VM MSR, MRS or System instruction execution.
-> > + *
-> > + * Returns true if the hypervisor has handled the exit, and control should go
-> > + * back to the guest, or false if it hasn't, to be handled by the host.
-> > + */
-> > +bool kvm_handle_pvm_sysreg(struct kvm_vcpu *vcpu, u64 *exit_code)
-> > +{
-> > +     const struct sys_reg_desc *r;
-> > +     struct sys_reg_params params;
-> > +     unsigned long esr = kvm_vcpu_get_esr(vcpu);
-> > +     int Rt = kvm_vcpu_sys_get_rt(vcpu);
-> > +
-> > +     params = esr_sys64_to_params(esr);
-> > +     params.regval = vcpu_get_reg(vcpu, Rt);
-> > +
-> > +     r = find_reg(&params, pvm_sys_reg_descs, ARRAY_SIZE(pvm_sys_reg_descs));
-> > +
-> > +     /* Undefined access (RESTRICTED). */
-> > +     if (r == NULL) {
-> > +             __inject_undef64(vcpu);
-> > +             return true;
-> > +     }
-> > +
-> > +     /* Handled by the host (HOST_HANDLED) */
-> > +     if (r->access == NULL)
-> > +             return false;
-> > +
-> > +     /* Handled by hyp: skip instruction if instructed to do so. */
-> > +     if (r->access(vcpu, &params, r))
-> > +             __kvm_skip_instr(vcpu);
-> > +
-> > +     if (!params.is_write)
-> > +             vcpu_set_reg(vcpu, Rt, params.regval);
-> > +
-> > +     return true;
-> > +}
-> > --
-> > 2.33.0.464.g1972c5931b-goog
-> >
->
-> Other than the nits and suggestion to try and build in some register list
-> consistency checks, this looks good to me. I don't know what pKVM
-> should / should not expose, but I like the approach this takes, so,
-> FWIW,
->
-> Reviewed-by: Andrew Jones <drjones@redhat.com>
-
-Thank you,
-/fuad
-
-> Thanks,
-> drew
->
-> --
-> To unsubscribe from this group and stop receiving emails from it, send an email to kernel-team+unsubscribe@android.com.
->
