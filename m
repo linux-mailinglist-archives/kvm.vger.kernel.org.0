@@ -2,113 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 78BF5423258
-	for <lists+kvm@lfdr.de>; Tue,  5 Oct 2021 22:50:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D8B6F423265
+	for <lists+kvm@lfdr.de>; Tue,  5 Oct 2021 22:52:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235845AbhJEUwH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Oct 2021 16:52:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50530 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229920AbhJEUwG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 Oct 2021 16:52:06 -0400
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83986C061749
-        for <kvm@vger.kernel.org>; Tue,  5 Oct 2021 13:50:15 -0700 (PDT)
-Received: by mail-pl1-x635.google.com with SMTP id w11so231322plz.13
-        for <kvm@vger.kernel.org>; Tue, 05 Oct 2021 13:50:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=ufDynw4w9jyskv/P+HbPa9cXwzI1YknB6kHVhHr9BcA=;
-        b=ZWil7ceXnpZ+DmjivDzOEafE2JD5EeD+5HFPPT/JyujSL7n+m1Tp3bUJ0oK8uD+Eus
-         MS69xg+3ic7saoEA8J/XQdhDNQfL9lsyBzwZ85V/Gj2XuuHeLKZ2WgYFWPtZmneU7bf5
-         hIncfqontJdsy24RauTotr5yc4vLRJAaAbjLik9Qa3qbi4z+p4TgYot/7aM3nDdCd504
-         muk0mqKohgCEa3sm/RTWm57TdQA9s6iz5+aFu/RskPK99ae+Bd/JAJKuMwMSYrFqHrJv
-         hMl/sMvBE/S00BNmXG3eEZN64k9Nro16KWOlwBuaaRF9P3Hwi68gm9Te2o1polpCcmeU
-         gvsA==
+        id S235679AbhJEUys (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Oct 2021 16:54:48 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:47849 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230019AbhJEUyq (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 5 Oct 2021 16:54:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1633467175;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ZXo9Quk6Y4H0fsDPUHzerD1eOvkjUACN8PkdHlibKSQ=;
+        b=ZlAxyYhsQkqUL8IYbuzo7H4So7R+Ky8FCdRqUkvpyCBBNKegxCqo+e5EXaVnUb+eByFPcv
+        p34IMEvDPMutBJL74zkprb9gRo6cIxYz7fhJ18A6Qu4n0IaH4v6TlthAGJtasvIlUAbQYd
+        SoP5DHCbefMnGXZNaJxFQvnJ4sBLLdc=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-282-gQkBnbk9NKOHCwf_tZfCwQ-1; Tue, 05 Oct 2021 16:52:52 -0400
+X-MC-Unique: gQkBnbk9NKOHCwf_tZfCwQ-1
+Received: by mail-ed1-f69.google.com with SMTP id r21-20020a50c015000000b003db1c08edd3so445337edb.15
+        for <kvm@vger.kernel.org>; Tue, 05 Oct 2021 13:52:51 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=ufDynw4w9jyskv/P+HbPa9cXwzI1YknB6kHVhHr9BcA=;
-        b=UIGpR74Dr3swOkgkZ9XeoszDCYILyf2mIdyZbousFPz91D/WPTeBnLA9+NxlDFDVPW
-         Z10443gfsqic7g5gLQVve1NpabvmLsmtqNaFHfzfpF7zAB3agixe36TBVrrQZMTt+a6a
-         PKDAeUnS/P+YSfct7UuIKVcqmWN9bkeeoc+fsBduSsaB1CeephGPUIMXXol9gkQT6SeQ
-         J5hXM5oMEpyQzxzokDOVfMVPWfWE+S2AVBVCRLjn0MaJ9z7vT9V5C1PlyjXHpko6jLgt
-         AUZoFvZkAjuik1aPijTnOGjFGktpKOhJDspErh4zf9GgwqtBVBYX1OA1OO0fSsPTQqLo
-         1tmQ==
-X-Gm-Message-State: AOAM532R8yja9zGNjFV+tlRMXz5afZPEDRNd80g/wyZQYjLnoZKfRP4a
-        LTllOT8C+1XjBAM2QyrG39giFQ==
-X-Google-Smtp-Source: ABdhPJxQqHmZCBy0xRrqRwn66T8/aCk72AIJ61vDGCVP8vzG48JUja0UbgSO1Wn77hEt+EH2sB8B2A==
-X-Received: by 2002:a17:90a:5a86:: with SMTP id n6mr6293342pji.3.1633467014750;
-        Tue, 05 Oct 2021 13:50:14 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id g19sm2975497pjl.25.2021.10.05.13.50.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Oct 2021 13:50:14 -0700 (PDT)
-Date:   Tue, 5 Oct 2021 20:50:10 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Robert Hoo <robert.hu@linux.intel.com>, pbonzini@redhat.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, joro@8bytes.org,
-        kvm@vger.kernel.org, yu.c.zhang@linux.intel.com
-Subject: Re: [PATCH v1 3/5] KVM: x86: nVMX: VMCS12 field's read/write
- respects field existence bitmap
-Message-ID: <YVy6gj2+XsghsP3j@google.com>
-References: <YR2Tf9WPNEzrE7Xg@google.com>
- <3ac79d874fb32c6472151cf879edfb2f1b646abf.camel@linux.intel.com>
- <YS/lxNEKXLazkhc4@google.com>
- <0b94844844521fc0446e3df0aa02d4df183f8107.camel@linux.intel.com>
- <YTI7K9RozNIWXTyg@google.com>
- <64aad01b6bffd70fa3170cf262fe5d7c66f6b2d4.camel@linux.intel.com>
- <YVx6Oesi7X3jfnaM@google.com>
- <CALMp9eRyhAygfh1piNEDE+WGVzK1cTWJJR1aC_zqn=c2fy+c-A@mail.gmail.com>
- <YVySdKOWTXqU4y3R@google.com>
- <CALMp9eQvRYpZg+G7vMcaCq0HYPDfZVpPtDRO9bRa0w2fyyU9Og@mail.gmail.com>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=ZXo9Quk6Y4H0fsDPUHzerD1eOvkjUACN8PkdHlibKSQ=;
+        b=L5ZcIQAqPsnR8GaGqKGBd4NPXI5oOi60CkqeFrCS9lcDSLRsmGtshd2L0T/f7iqZgb
+         yTQn5+QnqhH6Bv/XVpxDLHuWGdG4TmoY+imTztmZQEmWq2L2SN1h24qLOUvrFZgtImgw
+         S66w75TTkyIGEYyKuqu2OuGm1dfspi0qL1tz7AaLWwUFIaEI1XFaQGawhEtilvmiTZE6
+         lCD07JyCCldQto6u+vrJTA0MFHEOb44R7Vfhj6QmmGgdBzs3EZZ14y6rr2N8u5XR+VzO
+         REto35aACDK86ep6VursgZJDtljgqMjgtK1uDj3Fq2J6Zaw4GkZ3H0TPJ3kr6ZCkrapF
+         joCg==
+X-Gm-Message-State: AOAM533mVxTFtn1aOHL6sJcbLNF6KCZoCW/rbaXSfMzaK5HHXpgK/p4a
+        /U9IccEQ6zq7i/Wm2W6luB9zqzIKXDt57fFdqBOYIMNPvB06AJXEbjim82feyVpWfmizkg2Gldo
+        ZNsMyIy0QiZR1
+X-Received: by 2002:a17:906:d182:: with SMTP id c2mr27048685ejz.47.1633467170985;
+        Tue, 05 Oct 2021 13:52:50 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzS04pr73Ai2y9+5IP0WTOsQuT9DuyYh0xBiqeTFvHj3RCq/Wp2hs521FyPkADYGpY/sYu0lg==
+X-Received: by 2002:a17:906:d182:: with SMTP id c2mr27048663ejz.47.1633467170772;
+        Tue, 05 Oct 2021 13:52:50 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
+        by smtp.gmail.com with ESMTPSA id n6sm9243298eds.10.2021.10.05.13.52.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 05 Oct 2021 13:52:50 -0700 (PDT)
+Message-ID: <54360564-57e4-60de-60be-13177448ebc5@redhat.com>
+Date:   Tue, 5 Oct 2021 22:52:48 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CALMp9eQvRYpZg+G7vMcaCq0HYPDfZVpPtDRO9bRa0w2fyyU9Og@mail.gmail.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [PATCH][next] KVM: x86: Fix allocation sizeof argument
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Colin King <colin.king@canonical.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        David Stevens <stevensd@chromium.org>, kvm@vger.kernel.org,
+        kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20211001110106.15056-1-colin.king@canonical.com>
+ <YVxyNgyyxA7EnvJb@google.com>
+ <ebd506ba-05cc-99d7-ece5-34bd67fc2430@redhat.com>
+ <YVyRnV9cMLzazBx6@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <YVyRnV9cMLzazBx6@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 05, 2021, Jim Mattson wrote:
-> On Tue, Oct 5, 2021 at 10:59 AM Sean Christopherson <seanjc@google.com> wrote:
-> >
-> > On Tue, Oct 05, 2021, Jim Mattson wrote:
-> > > On Tue, Oct 5, 2021 at 9:16 AM Sean Christopherson <seanjc@google.com> wrote:
-> > > >
-> > > > On Tue, Sep 28, 2021, Robert Hoo wrote:
-> > > > > On Fri, 2021-09-03 at 15:11 +0000, Sean Christopherson wrote:
-> > > > >       You also said, "This is quite the complicated mess for
-> > > > > something I'm guessing no one actually cares about.  At what point do
-> > > > > we chalk this up as a virtualization hole and sweep it under the rug?"
-> > > > > -- I couldn't agree more.
-> > > >
-> > > > ...
-> > > >
-> > > > > So, Sean, can you help converge our discussion and settle next step?
-> > > >
-> > > > Any objection to simply keeping KVM's current behavior, i.e. sweeping this under
-> > > > the proverbial rug?
-> > >
-> > > Adding 8 KiB per vCPU seems like no big deal to me, but, on the other
-> > > hand, Paolo recently argued that slightly less than 1 KiB per vCPU was
-> > > unreasonable for VM-exit statistics, so maybe I've got a warped
-> > > perspective. I'm all for pedantic adherence to the specification, but
-> > > I have to admit that no actual hypervisor is likely to care (or ever
-> > > will).
-> >
-> > It's not just the memory, it's also the complexity, e.g. to get VMCS shadowing
-> > working correctly, both now and in the future.
-> 
-> As far as CPU feature virtualization goes, this one doesn't seem that
-> complex to me. It's not anywhere near as complex as virtualizing MTF,
-> for instance, and KVM *claims* to do that! :-)
+On 05/10/21 19:55, Sean Christopherson wrote:
+>   I wasn't suggesting a full revert,
+> rather a "drop and pretend it never got applied", with a plan to apply a new
+> version instead of fixing up the current code.
 
-There aren't many things as complex as MTF.  But unlike MTF, this behavior doesn't
-have a concrete use case to justify the risk vs. reward.  IMO the odds of us breaking
-something in KVM for "normal" use cases are higher than the odds of an L1 VMM breaking
-because a VMREAD/VMWRITE didn't fail when it technically should have failed.
+Considering that there are issues in the rmaps as well, I'd rather fix 
+both the right way.
+
+Paolo
+
