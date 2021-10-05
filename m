@@ -2,170 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 70BA0421D18
-	for <lists+kvm@lfdr.de>; Tue,  5 Oct 2021 06:02:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5B32D421D2E
+	for <lists+kvm@lfdr.de>; Tue,  5 Oct 2021 06:18:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230403AbhJEEDw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Oct 2021 00:03:52 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:28812 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229780AbhJEEDt (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 5 Oct 2021 00:03:49 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1633406518;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=DlPXPp7f/SqcU484a3jYLDZk6nPasGsDeSJIwRqsrqA=;
-        b=dtLUYsnBMEdt4sstoqDXO1PJCuSs3Jr3SwGzdOyMpg8KoL40XrriQaPNT46b8rr50NRXdC
-        whFWgI9dE6gTimo8C0+HPsSbSK3UwyuHFH1Bo1RzHPrMHth9YonLytKaNV9uOCP0OGfZpr
-        a0ukUOPvjg7csAkiFdOzUc7ymQ/G5ZI=
-Received: from mail-ot1-f69.google.com (mail-ot1-f69.google.com
- [209.85.210.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-354-fACls_YBNsC9MdWAPsiB4g-1; Tue, 05 Oct 2021 00:01:57 -0400
-X-MC-Unique: fACls_YBNsC9MdWAPsiB4g-1
-Received: by mail-ot1-f69.google.com with SMTP id l32-20020a9d1ca0000000b00546e6ec87afso13629097ota.11
-        for <kvm@vger.kernel.org>; Mon, 04 Oct 2021 21:01:57 -0700 (PDT)
+        id S230495AbhJEETu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Oct 2021 00:19:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43608 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229780AbhJEETt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Oct 2021 00:19:49 -0400
+Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5006C061745
+        for <kvm@vger.kernel.org>; Mon,  4 Oct 2021 21:17:58 -0700 (PDT)
+Received: by mail-wm1-x330.google.com with SMTP id g198-20020a1c20cf000000b0030d60cd7fd6so1845543wmg.0
+        for <kvm@vger.kernel.org>; Mon, 04 Oct 2021 21:17:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=ldiVl+t8mgo2eZZ+0dm/iKZs4c1YMS7niH0Ehzbu8P8=;
+        b=mX/8MC1Z3q3+b/sqPIhdbqw5uqfmCrcEs76Vjy7QBZIqM4i8XiMoDonzMYsjNwBqRt
+         MGCYZ+fOYXV0G2moWo6M81hLOqmdevrjwPTpPyw+lK/Rh34oGoJJ9IegpWjjKulNDfHb
+         WxuRkFNzvP2V/gkY44cMNb3kUdQ7YbSURd0WyE3zqiFfVXRrD+5Bc3xRH/MLglpHdXaz
+         TvDRVp+86tw3nVv7ORBVioPtWWrLnhnOsDSFK8bOlI1oPoMOPr8E1a5/YqUQFKkuFDxr
+         pGiEvKmc/WdqOUrqd09M198BYxvYOQQ8uAOdp/tG7x2ffa1USwtXa6mp2UGGs8tI1ubN
+         /e7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=DlPXPp7f/SqcU484a3jYLDZk6nPasGsDeSJIwRqsrqA=;
-        b=s2p2GLZ1GtBPH9gtKHJJFBAUUsrNhVhqD7YaT7cuwa8c1AHFHaEWgeW8ZLWe9vkSmI
-         k7Fd4tXpcqf/KWYZNE4wIZ9KA0xQwitDGJPsu0azgNs/qZGBtxXzWewDxU2EWkh2hqzH
-         ZGpXvIEHCBzmsbnXn1pKqntOsl3uln111fShwlL8wVDWgckIiRAMVbeI8K3K4fX30EPA
-         Vulsx8wDDL7kiaz7y+ze9pt2BIk465fiyyPt8KBdMR7wbSxPZQiOojTRqImyXM062PRa
-         vOA2FZ5ex6kgwLDJ0ShVqF0txAp1tv28D6na8m1qbCpBrDwlhDf85PahnjozY7yep1jU
-         t/OQ==
-X-Gm-Message-State: AOAM53162meFP0DveGupavIGdh40YDQG2/3GnHpbD15SjSeVOV02fzSU
-        +tU+Mf0DInA238vsIGx5BIVjeLwBHvXoV+V0M3FwoE3rgp2D51KgwDWgfyikIko+mNhp0KNT0bQ
-        Ll7P5XubRs0V1
-X-Received: by 2002:aca:2802:: with SMTP id 2mr670393oix.105.1633406516358;
-        Mon, 04 Oct 2021 21:01:56 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx9/Hn5QcBWSIopkft/013m2god4FuRDb/u46D8iabRt1d0BdIgXJgRK2aDba5c7B5ovQOfdA==
-X-Received: by 2002:aca:2802:: with SMTP id 2mr670382oix.105.1633406516201;
-        Mon, 04 Oct 2021 21:01:56 -0700 (PDT)
-Received: from redhat.com ([198.99.80.109])
-        by smtp.gmail.com with ESMTPSA id b19sm3317114otk.75.2021.10.04.21.01.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Oct 2021 21:01:55 -0700 (PDT)
-Date:   Mon, 4 Oct 2021 22:01:54 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
-        "Tian, Kevin" <kevin.tian@intel.com>, Liu Yi L <yi.l.liu@intel.com>
-Subject: Re: [PATCH 3/5] vfio: Don't leak a group reference if the group
- already exists
-Message-ID: <20211004220154.519181c6.alex.williamson@redhat.com>
-In-Reply-To: <20211004223641.GO964074@nvidia.com>
-References: <0-v1-fba989159158+2f9b-vfio_group_cdev_jgg@nvidia.com>
-        <3-v1-fba989159158+2f9b-vfio_group_cdev_jgg@nvidia.com>
-        <20211004162543.0fff3a96.alex.williamson@redhat.com>
-        <20211004223641.GO964074@nvidia.com>
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=ldiVl+t8mgo2eZZ+0dm/iKZs4c1YMS7niH0Ehzbu8P8=;
+        b=ZyBcjJaaX2+Fx39CKaiTR13TRFt1pzg71puI9IKpJblxvEHkn1rtGaM+TqTGxPAXaK
+         b6Ihnanjv13vJIQ3EFPdgwYT0cws6qjYPzqQ4iEsgyfAD4alo9izINHU2P4dJKO6wcAE
+         52PQlVt4I6Xuy53egXP/62KG99DSy2mzxGzfY7Zz2DzfLGqzC8RZ4x6GFQ6bBDfGJrt8
+         e/UityXMsECQc3cE3FsHQOQHgGL1IG2PzjG9ffSH1jx2c9MEiQxZGkYZIpQ1+Kkj/Rgr
+         dH0JiQwicT18KS6hN7y4IHGsS/v5RCF1kNagYvl17wL7nu/bC9pEFWjRM+vkJlPJ+s/L
+         tKKA==
+X-Gm-Message-State: AOAM530yE15fArEOfM3p1/CKY+jh9xWBRue4gKsX7/0eu0Ubokt3qyOR
+        Rgtij0wz28G1bAPmzOI62SVjsILis7fOUidp7Z5Vxw==
+X-Google-Smtp-Source: ABdhPJxkt8JmT/tN0OuEY7Eksq2Rbz+Wp8NmhOJfBsAYhp7hTnL8enb3dC/AOksH5NkA9S8xaMNtWDScMwV5ajpKJeA=
+X-Received: by 2002:a7b:cb04:: with SMTP id u4mr986462wmj.176.1633407477436;
+ Mon, 04 Oct 2021 21:17:57 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20210927114016.1089328-1-anup.patel@wdc.com> <5cadb0b3-5e8f-110b-c6ed-4adaea033e58@redhat.com>
+In-Reply-To: <5cadb0b3-5e8f-110b-c6ed-4adaea033e58@redhat.com>
+From:   Anup Patel <anup@brainfault.org>
+Date:   Tue, 5 Oct 2021 09:47:46 +0530
+Message-ID: <CAAhSdy2b-xHSQYhypo9=87mrf82B3Faficc6utW6E6XcYqV=JQ@mail.gmail.com>
+Subject: Re: [PATCH v20 00/17] KVM RISC-V Support
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Anup Patel <anup.patel@wdc.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Palmer Dabbelt <palmerdabbelt@google.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Alexander Graf <graf@amazon.com>,
+        Atish Patra <atish.patra@wdc.com>,
+        Alistair Francis <Alistair.Francis@wdc.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        KVM General <kvm@vger.kernel.org>,
+        kvm-riscv@lists.infradead.org,
+        linux-riscv <linux-riscv@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org List" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 4 Oct 2021 19:36:41 -0300
-Jason Gunthorpe <jgg@nvidia.com> wrote:
+On Mon, Oct 4, 2021 at 2:28 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 27/09/21 13:39, Anup Patel wrote:
+> > This series adds initial KVM RISC-V support. Currently, we are able to boot
+> > Linux on RV64/RV32 Guest with multiple VCPUs.
+> >
+> > Key aspects of KVM RISC-V added by this series are:
+> > 1. No RISC-V specific KVM IOCTL
+> > 2. Loadable KVM RISC-V module supported
+> > 3. Minimal possible KVM world-switch which touches only GPRs and few CSRs
+> > 4. Both RV64 and RV32 host supported
+> > 5. Full Guest/VM switch is done via vcpu_get/vcpu_put infrastructure
+> > 6. KVM ONE_REG interface for VCPU register access from user-space
+> > 7. PLIC emulation is done in user-space
+> > 8. Timer and IPI emuation is done in-kernel
+> > 9. Both Sv39x4 and Sv48x4 supported for RV64 host
+> > 10. MMU notifiers supported
+> > 11. Generic dirtylog supported
+> > 12. FP lazy save/restore supported
+> > 13. SBI v0.1 emulation for KVM Guest available
+> > 14. Forward unhandled SBI calls to KVM userspace
+> > 15. Hugepage support for Guest/VM
+> > 16. IOEVENTFD support for Vhost
+> >
+> > Here's a brief TODO list which we will work upon after this series:
+> > 1. KVM unit test support
+> > 2. KVM selftest support
+> > 3. SBI v0.3 emulation in-kernel
+> > 4. In-kernel PMU virtualization
+> > 5. In-kernel AIA irqchip support
+> > 6. Nested virtualizaiton
+> > 7. ..... and more .....
+>
+> Looks good, I prepared a tag "for-riscv" at
+> https://git.kernel.org/pub/scm/virt/kvm/kvm.git.  Palmer can pull it and
+> you can use it to send me a pull request.
 
-> On Mon, Oct 04, 2021 at 04:25:43PM -0600, Alex Williamson wrote:
-> > On Fri,  1 Oct 2021 20:22:22 -0300
-> > Jason Gunthorpe <jgg@nvidia.com> wrote:
-> >   
-> > > If vfio_create_group() searches the group list and returns an already
-> > > existing group it does not put back the iommu_group reference that the
-> > > caller passed in.
-> > > 
-> > > Change the semantic of vfio_create_group() to not move the reference in
-> > > from the caller, but instead obtain a new reference inside and leave the
-> > > caller's reference alone. The two callers must now call iommu_group_put().
-> > > 
-> > > This is an unlikely race as the only caller that could hit it has already
-> > > searched the group list before attempting to create the group.
-> > > 
-> > > Fixes: cba3345cc494 ("vfio: VFIO core")
-> > > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> > >  drivers/vfio/vfio.c | 18 +++++++++---------
-> > >  1 file changed, 9 insertions(+), 9 deletions(-)
-> > > 
-> > > diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
-> > > index 1cb12033b02240..bf233943dc992f 100644
-> > > +++ b/drivers/vfio/vfio.c
-> > > @@ -338,6 +338,7 @@ static void vfio_group_unlock_and_free(struct vfio_group *group)
-> > >  		list_del(&unbound->unbound_next);
-> > >  		kfree(unbound);
-> > >  	}
-> > > +	iommu_group_put(group->iommu_group);
-> > >  	kfree(group);
-> > >  }
-> > >  
-> > > @@ -389,6 +390,8 @@ static struct vfio_group *vfio_create_group(struct iommu_group *iommu_group,
-> > >  	atomic_set(&group->opened, 0);
-> > >  	init_waitqueue_head(&group->container_q);
-> > >  	group->iommu_group = iommu_group;
-> > > +	/* put in vfio_group_unlock_and_free() */
-> > > +	iommu_group_ref_get(iommu_group);  
-> 
->       ^^^^^^^^^^^^^^^^^
-> 
-> > >  	group->type = type;
-> > >  	BLOCKING_INIT_NOTIFIER_HEAD(&group->notifier);
-> > >  
-> > > @@ -396,8 +399,8 @@ static struct vfio_group *vfio_create_group(struct iommu_group *iommu_group,
-> > >  
-> > >  	ret = iommu_group_register_notifier(iommu_group, &group->nb);
-> > >  	if (ret) {
-> > > -		kfree(group);
-> > > -		return ERR_PTR(ret);
-> > > +		group = ERR_PTR(ret);
-> > > +		goto err_put_group;
-> > >  	}
-> > >  
-> > >  	mutex_lock(&vfio.group_lock);
-> > > @@ -432,6 +435,9 @@ static struct vfio_group *vfio_create_group(struct iommu_group *iommu_group,
-> > >  
-> > >  	mutex_unlock(&vfio.group_lock);
-> > >  
-> > > +err_put_group:
-> > > +	iommu_group_put(iommu_group);
-> > > +	kfree(group);  
-> > 
-> > ????
-> > 
-> > In the non-error path we're releasing the caller's reference which is
-> > now their responsibility to release,  
-> 
-> This release is paried with the get in the same function added one
-> hunk above
+Sure, I have prepared PR for the remaining 16 patches based on the
+PATCH1 commit in the KVM tree.
 
-Note that this is the common exit path until the last patch in the
-series pulls returning the successfully created/found group above the
-error condition exit paths.  As it stands, this patch unconditionally
-releases the reference it claims to newly create.  Thanks,
+I will send PR today or tomorrow.
 
-Alex
- 
-> > but in any case we're freeing the object that we return?  That
-> > can't be right.  
-> 
-> Yes, that is a rebasing mistake pulling this back from the last patch
-> that had a "return ret" here, thanks
-> 
-> > > @@ -776,10 +780,6 @@ static struct vfio_group *vfio_group_find_or_alloc(struct device *dev)
-> > >  
-> > >  	/* a newly created vfio_group keeps the reference. */  
-> > 
-> > This comment is now incorrect.  Thanks,  
-> 
-> Indeed
-> 
-> Jason
-> 
+>
+> I look forward to the test support. :)  Would be nice to have selftest
+> support already in 5.16, since there are a few arch-independent
+> selftests that cover the hairy parts of the MMU.
 
+I will try my best to send basic kvm-selftest support sooner (preferably
+for 5.16).
+
+Regards,
+Anup
