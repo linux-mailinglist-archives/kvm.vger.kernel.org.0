@@ -2,107 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0A0CB422EA3
-	for <lists+kvm@lfdr.de>; Tue,  5 Oct 2021 19:00:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 79ED8422EE0
+	for <lists+kvm@lfdr.de>; Tue,  5 Oct 2021 19:15:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236618AbhJERBy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Oct 2021 13:01:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53544 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235716AbhJERBx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 Oct 2021 13:01:53 -0400
-Received: from mail-oo1-xc29.google.com (mail-oo1-xc29.google.com [IPv6:2607:f8b0:4864:20::c29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E91C8C06174E;
-        Tue,  5 Oct 2021 10:00:02 -0700 (PDT)
-Received: by mail-oo1-xc29.google.com with SMTP id j11-20020a4a92cb000000b002902ae8cb10so6605438ooh.7;
-        Tue, 05 Oct 2021 10:00:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=DcyLwF4zH8J97zpkynsCYmFmCV6WVI4TTXZkDMBOtnY=;
-        b=ikfc0vKFXbP7XSoq7rvoFQIdTaQyIR5vB/o3yZc9AuiSiGozChnEPrwW9AMlw5CSmE
-         1KKcQKUoxp9ErPQAlRPBMw4bgiwGnI/fVRtCaxhFW+eWp2AFVUFylwsgFSIv4CKmXUoW
-         VxdH2MwQpas5Y+Ebl9pYUac+t9I720vnZCXhovoAGYkYyTLK8P8PMMq/Pl0Bl8JD4zmK
-         +fZRwM6keE3M21v1QD1pDRy+03kLWZDxQGVCQIkBQojTI5nx/iWwewL3abcc6Xu0bipc
-         9BpmsUNtWxels676SA7QAz/Oklc6LtAPKimn8Y9XdpqvvYcAIRfh5sCAk49TMEQAIf0R
-         RRjw==
+        id S236710AbhJERRo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Oct 2021 13:17:44 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47998 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S236696AbhJERRl (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 5 Oct 2021 13:17:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1633454150;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=SqMOCWm0rmfs9tFcXMth2/WPo3/ZpdQDJCYD1hfrOb8=;
+        b=iXTUvEqrykrwDqv36YMfWmYtATJjBmYeCwjZTyF3fHSgrSTho/6KyxHCGJL6BKu/8Y5/yb
+        2z86iPel8qVk/rQ3B6MaSeR0pKhbp5bJEVwLB98NW9cCpJPLC29R5Q0dR4kvNBA7oKjGgC
+        4K1E5qj8tvoF/gMHSo3BwkHYDh44QIo=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-475-u9jJRmmmMX2WxP3kh08DPw-1; Tue, 05 Oct 2021 13:15:48 -0400
+X-MC-Unique: u9jJRmmmMX2WxP3kh08DPw-1
+Received: by mail-ed1-f72.google.com with SMTP id y15-20020a50ce0f000000b003dab997cf7dso17784244edi.9
+        for <kvm@vger.kernel.org>; Tue, 05 Oct 2021 10:15:48 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=DcyLwF4zH8J97zpkynsCYmFmCV6WVI4TTXZkDMBOtnY=;
-        b=ZB2NiMBOe647Fs4+3GtGuVIhCUceU8YsftEFYyKYbCbZCzcYdWy7x6nVzqMj8vDk50
-         qiEHMlnXmvx7eUT0o6gWOJ1eZ0429Osr0iilxvejZGHmMoEn2N8gkG2NCV1ejCcGNyiH
-         UnkUIllwclfhdVn+LJ+oaPqM6HCPs1+r5OhiSojOTrIhy6NQEfgkBWDZcuwagz3UrDuY
-         2Bk7heiHWIFV+Fcm8FSUgaR+0IiZ1/mUjGan3azyG+MCpymYtbA78zvZc9Ld4ua3XjKu
-         20jO7XMKgRQGqRZsOchVuY5pjcJeQ/TAasmur1400mm9uUPQMXAgnrXdvrQ48GddZbAl
-         FW/Q==
-X-Gm-Message-State: AOAM531JJGRZl9inR6WMU5Pd0SIXCLdRotvHY+Uep9t6QpkwiRqldf6t
-        a1bgHqP2h+iAd+7n86pGNWIPAy1rxTL4KuM9aVF4ZMhOSF2Rmg==
-X-Google-Smtp-Source: ABdhPJwvj4f8rwQJUYfN/kdxeSj7EoRN+5D6fGKYNpGULSiHlIotDI2s/k1pIK+TIq/QCPRfI4Os/AWBxTMjrVU4R2c=
-X-Received: by 2002:a05:6820:358:: with SMTP id m24mr14428902ooe.34.1633453201846;
- Tue, 05 Oct 2021 10:00:01 -0700 (PDT)
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=SqMOCWm0rmfs9tFcXMth2/WPo3/ZpdQDJCYD1hfrOb8=;
+        b=FmUdkQbUf7IDsV2id3JOljmhV2tl1buqFJml+Lc4c4J2s901pggmAbvrEsgyNQq7LP
+         WP2S33EbG/yW82E0YG/rQqcf1086P1GMsuYfYIBvT98eYwSIQ7YZCjF56G8X6t8wdPma
+         rBYRFMvLuGUy5dmA1ydnitV+0tZ1vGN0ajvlfBHzVCiUzWndWVCZjUfnOm/Jpcet6Lt+
+         jgkguQv5Y1J/UL8FK1/y5y/6+RQ42wFQ66hJtGIVkdO0TOD4JCNvU4pLoMzXVkxhm4wF
+         t33Er15X78hlQjviwL/ME1LagmPMzypvLblyW7x5LMIn413/jR5Lhc9ecdwNhIFT0u3Y
+         H39w==
+X-Gm-Message-State: AOAM5339qI0T1OKF9LVr1QNCq/IsOdofDH6Yn/MWkog8Pf4vomRUfGSQ
+        RXOz6HMNdxOgoPuli2h7GVnavubWvl3CQO+LdjKD2BTQLuaYodCJuk+89RkZkgj0HjfWICbeZkX
+        gjN8sGkT10m8q
+X-Received: by 2002:a17:906:660b:: with SMTP id b11mr25952280ejp.427.1633454147711;
+        Tue, 05 Oct 2021 10:15:47 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz/XaDhlbNvacD57xV4blEW+j/Z0hYH1wET78/YBCPs2M990/p9GqNkNMKhkvTs0As+b95XiQ==
+X-Received: by 2002:a17:906:660b:: with SMTP id b11mr25952254ejp.427.1633454147509;
+        Tue, 05 Oct 2021 10:15:47 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id e7sm297875edz.95.2021.10.05.10.15.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 05 Oct 2021 10:15:46 -0700 (PDT)
+Message-ID: <9c1fa821-2eaf-7709-7bd2-be83f92d2ee5@redhat.com>
+Date:   Tue, 5 Oct 2021 19:15:43 +0200
 MIME-Version: 1.0
-From:   Ajay Garg <ajaygargnsit@gmail.com>
-Date:   Tue, 5 Oct 2021 22:29:50 +0530
-Message-ID: <CAHP4M8UD0HnGCrR=8YFTYSehd968w4bgi_R4F0gzOUCm1veHsQ@mail.gmail.com>
-Subject: Fitment/Use of IOMMU in KVM world when using PCI-devices
-To:     kvm@vger.kernel.org, linux-pci@vger.kernel.org,
-        iommu@lists.linux-foundation.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [PATCH v1] KVM: isolation: retain initial mask for kthread VM
+ worker
+Content-Language: en-US
+To:     Marcelo Tosatti <mtosatti@redhat.com>
+Cc:     Nitesh Narayan Lal <nitesh@redhat.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        seanjc@google.com, vkuznets@redhat.com, tglx@linutronix.de,
+        frederic@kernel.org, mingo@kernel.org, nilal@redhat.com,
+        Wanpeng Li <kernellwp@gmail.com>
+References: <20211004222639.239209-1-nitesh@redhat.com>
+ <e734691b-e9e1-10a0-88ee-73d8fceb50f9@redhat.com>
+ <20211005105812.GA130626@fuller.cnet>
+ <96f38a69-2ff8-a78c-a417-d32f1eb742be@redhat.com>
+ <20211005132159.GA134926@fuller.cnet>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20211005132159.GA134926@fuller.cnet>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi All.
+On 05/10/21 15:21, Marcelo Tosatti wrote:
+>> The QEMU I/O thread is not hogging the CPU 100% of the time, and
+>> therefore the nx-recovery thread should be able to run on that CPU.
+> 
+> 1) The cpumask of the parent thread is not inherited
+> 
+> 	set_cpus_allowed_ptr(task, housekeeping_cpumask(HK_FLAG_KTHREAD));
+> 
+> On __kthread_create_on_node should fail (because its cgroup, the one
+> inherited from QEMU, contains only isolated CPUs).
+> 
+> (The QEMU I/O thread runs on an isolated CPU, and is moved by libvirt
+> to HK-cgroup as mentioned before).
 
-I have been learning about a lot of inter-related things, kindly
-correct me if I am wrong anywhere.
-Till now, following have been broad observations :
+Ok, that's the part that I missed.  So the core issue is that libvirt 
+moves the I/O thread out of the isolated-CPU cgroup too late?  This in 
+turn is because libvirt gets access to the QEMU monitor too late (the 
+KVM file descriptor is created when QEMU processes the command line).
 
-a)
-If we have IOMMU disabled on the host, things work fine in general on
-a guest. But we cannot a attach a pci-device (physically attached to
-host) to a guest.
+Paolo
 
-b)
-If we have IOMMU enabled on the host, we can attach a pci-device
-(physically attached to a host) to a guest.
-
-
-
-
-Going through the literature on the internet, it looks that we have
-two modes supported by KVM / QEMU :
-
-1.
-Conventional shadow-mapping, which works in the most general case, for
-GVA => GPA => HVA => HPA translations.
-
-2.
-EPT/NPT shadow-mapping, which works only if hardware-virtualization is
-supported. As usual, the main purpose is to setup GVA => GPA => HVA =>
-HPA translations.
-
-
-In all the literature that mentioned the above modes, there were roles
-of software-assisted MMU page-tables (at host-OS / guest-OS / kvm /
-qemu).
-The only mention of the IOMMU was with regard to pci-devices, to
-maintain security and not letting guest-OSes create havoc on a
-pci-device.
-
-
-
-
-
-So, is the role of IOMMU to provide security/containership only?
-In other words, if security was not a concern, would it still have
-been possible to attach pci-devices on the guest-devices without
-needing to enable the iommu?
-
-
-Will be grateful to get pointers.
-
-
-Thanks and Regards,
-Ajay
