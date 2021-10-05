@@ -2,239 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F1673421F5B
-	for <lists+kvm@lfdr.de>; Tue,  5 Oct 2021 09:21:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 76F2C421F82
+	for <lists+kvm@lfdr.de>; Tue,  5 Oct 2021 09:37:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232717AbhJEHXK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Oct 2021 03:23:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56586 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232730AbhJEHXI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 Oct 2021 03:23:08 -0400
-Received: from mail-oi1-x231.google.com (mail-oi1-x231.google.com [IPv6:2607:f8b0:4864:20::231])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE252C061745
-        for <kvm@vger.kernel.org>; Tue,  5 Oct 2021 00:21:18 -0700 (PDT)
-Received: by mail-oi1-x231.google.com with SMTP id s24so25005164oij.8
-        for <kvm@vger.kernel.org>; Tue, 05 Oct 2021 00:21:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=t50iClouvR5wNCpxVuPLY/4woxgBaeq2YJxilfcBxqQ=;
-        b=J+94v5pHqshDYiJxv8ZiKIUzq3WoDzxQ6USi+tcv2o8XFm3vczBmpRbsSeFYCnJifN
-         odYbvqEwPcw/FPG1AFa9lzP83y7WHTj44NOsOKcvDNOrt2eCJoT2mBTa5fSD6OywWwkC
-         BLd7H+8rRl2+Lwb/+0bqWau6yYX/qXemovS3VeePF1IlgOw3eT/n5V6CRfkBKxWwDH33
-         xjAQEJ8nofWJ/EhrEhdWzEWOmkshYoBVfFgwubbO+qfY472Fn1Tyjq55esDuKfg2RSYF
-         eNPLDGRBuL7G2AIaQ5t8esAthukpMn5VdNjxBaRw4SCuYZB0dtrvgP3p/lfO7xDze8VS
-         4Z1g==
+        id S232758AbhJEHjX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Oct 2021 03:39:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27977 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232630AbhJEHjW (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 5 Oct 2021 03:39:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1633419451;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=49p/2VYCpgzSUPriPCQYlTSgRQVf+nlRSvbtUTXuaMU=;
+        b=jNHVc24MffhkHR4hCdbJHxNNd9LKdZzB+yD21lNKp9vKhkNccJU1W+myNWZHgSL4D5kD7j
+        tEhI4fkFGWB5KxFHO1zC5YliGMegVZWuEB0dqDCaMDWbHAQXzyThb5uYZBZiSAAwOj/80P
+        BR7+JpBLH9GDy+w1rOYV6h8/0Aq9awo=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-399-9pBin32JMGagtqBLmZbJag-1; Tue, 05 Oct 2021 03:37:30 -0400
+X-MC-Unique: 9pBin32JMGagtqBLmZbJag-1
+Received: by mail-ed1-f71.google.com with SMTP id ec14-20020a0564020d4e00b003cf5630c190so19885994edb.3
+        for <kvm@vger.kernel.org>; Tue, 05 Oct 2021 00:37:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=t50iClouvR5wNCpxVuPLY/4woxgBaeq2YJxilfcBxqQ=;
-        b=LEqrXQlx8RflfO511+q+po9cUiZ2psiDK3Bie6sKT+YBC2FRCAptRt//kHbI2IiawP
-         zQ87kX4jetWZdRDjEvS3nH1r+NTYfHwuuCb7sKtP6BAWOaLM9qfIz9x6jB5sCZi8bzrO
-         2Wwxm+h17A/hRHQYw95pat84uhCENnfhZfCarCIBs0uEf0sDa+Cr/R1vUZqf8co9RJzw
-         tAN8tYAghsCcUcycBbjmC/sV5zHtuOqmRfZQgQPlmAXTfbI+BCbg4/uQzOODRe436fW8
-         nHU9b72vHCv8vgwRQ7hhjbGglIccPQMd21WvzrDWFVqYTD3TL6YR8DL2jUjBcSXx80wq
-         Iw9g==
-X-Gm-Message-State: AOAM530yptOzkcABxVmCAmrSOscOPGHOE1TFECkuKe49iFz8ci5wC23t
-        jjxkpZWGV1bazIoy+etP0HR7urhcp7tVyf/ff6CG8g==
-X-Google-Smtp-Source: ABdhPJxEaJp7LF/gYfQZpn3JIvXZDIElO6AVcWj+FJM4+9kwneOgxH1YTpeV0ZXlGKdCSSn4gfibW+UcW15ckdXKP6o=
-X-Received: by 2002:a05:6808:1641:: with SMTP id az1mr1237774oib.67.1633418477949;
- Tue, 05 Oct 2021 00:21:17 -0700 (PDT)
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=49p/2VYCpgzSUPriPCQYlTSgRQVf+nlRSvbtUTXuaMU=;
+        b=IcLEcjfpFL6rbEw7Thm2lg4CCj6LXiQ4prvaL0oEnnof6pjslRIlwdRuhorBKbWHWO
+         q4C6LBXjPzTxNpUtlJ/X7wPD9cX0TpOw8tzIZBAgDYngIT9WKOoZwEa4glM0izdv0Q0A
+         7oXwkn/YBL/vimcqAkbJtubElPrO5HuIM45/MeyBbTt3lfw0XAwG4uh3xA6YJsLL/GWW
+         sl0IbC1oOkvYIXgte7CXMufAY3VBoMnk0ZfmU69mFk/IGVHL6E1g8yc/4G8iUuRPl7Nb
+         PVfuAwT7tVl9VPw5eTCH3yUjNm1HJQhAiWb29R1Qj59VFSxrS85j4jEn9LLPHPfMFQ/C
+         KeVw==
+X-Gm-Message-State: AOAM531L7bISqzvcvYG08o0aEsG4Ps7Djm55D2aALGRX+39FFzBuybrm
+        HcsMRT70BxhJucIVZHKGdqqIlswiIlHva1Szn1M5E7li/IyxAGwACvPzjPuIorS8BU1cI+0x9we
+        j9Ijv4VZucfhp
+X-Received: by 2002:aa7:d78e:: with SMTP id s14mr23518884edq.171.1633419449697;
+        Tue, 05 Oct 2021 00:37:29 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyYKBVFrLpIIpPhu4m8RSBp05E7KVTz4BenJWgbIUX3s52OfAYe/V6Krl1NZzZwvRsRNqEHBQ==
+X-Received: by 2002:aa7:d78e:: with SMTP id s14mr23518858edq.171.1633419449429;
+        Tue, 05 Oct 2021 00:37:29 -0700 (PDT)
+Received: from [192.168.10.118] ([93.56.162.200])
+        by smtp.gmail.com with ESMTPSA id d10sm7349501eja.81.2021.10.05.00.37.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 05 Oct 2021 00:37:28 -0700 (PDT)
+Message-ID: <ea3a9bab-28f2-48e7-761e-b41d7bc7d0a5@redhat.com>
+Date:   Tue, 5 Oct 2021 09:37:27 +0200
 MIME-Version: 1.0
-References: <20210922124704.600087-1-tabba@google.com> <20210922124704.600087-12-tabba@google.com>
- <87tuhwr98w.wl-maz@kernel.org>
-In-Reply-To: <87tuhwr98w.wl-maz@kernel.org>
-From:   Fuad Tabba <tabba@google.com>
-Date:   Tue, 5 Oct 2021 08:20:41 +0100
-Message-ID: <CA+EHjTxH4MhqrO1G_YmYSEwLceG6xxMe4SSRbSHVtmXSSSpy4A@mail.gmail.com>
-Subject: Re: [PATCH v6 11/12] KVM: arm64: Trap access to pVM restricted features
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvmarm@lists.cs.columbia.edu, will@kernel.org, james.morse@arm.com,
-        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
-        mark.rutland@arm.com, christoffer.dall@arm.com,
-        pbonzini@redhat.com, drjones@redhat.com, oupton@google.com,
-        qperret@google.com, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kernel-team@android.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [PATCH v20 00/17] KVM RISC-V Support
+Content-Language: en-US
+To:     Palmer Dabbelt <palmerdabbelt@google.com>
+Cc:     Anup Patel <Anup.Patel@wdc.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        aou@eecs.berkeley.edu, graf@amazon.com,
+        Atish Patra <Atish.Patra@wdc.com>,
+        Alistair Francis <Alistair.Francis@wdc.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>, anup@brainfault.org,
+        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <mhng-1bfcbce2-3da3-4490-bcc5-45173ad84285@palmerdabbelt-glaptop>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <mhng-1bfcbce2-3da3-4490-bcc5-45173ad84285@palmerdabbelt-glaptop>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+On 04/10/21 20:01, Palmer Dabbelt wrote:
+> 
+> Just to make sure we're on the same page here, I've got
+> 
+>     commit 6c341a285912ddb2894ef793a58ad4f8462f26f4 (HEAD -> for-next)
+>     Merge: 08da1608a1ca 3f2401f47d29
+>     Author: Palmer Dabbelt <palmerdabbelt@google.com>
+>     Date:   Mon Oct 4 10:12:44 2021 -0700
+>         Merge tag 'for-riscv' of 
+> https://git.kernel.org/pub/scm/virt/kvm/kvm.git into for-next
+>         H extension definitions, shared by the KVM and RISC-V trees.
+>         * tag 'for-riscv' of 
+> ssh://gitolite.kernel.org/pub/scm/virt/kvm/kvm: (301 commits)
+>           RISC-V: Add hypervisor extension related CSR defines
+>           KVM: selftests: Ensure all migrations are performed when test 
+> is affined
+>           KVM: x86: Swap order of CPUID entry "index" vs. "significant 
+> flag" checks
+>           ptp: Fix ptp_kvm_getcrosststamp issue for x86 ptp_kvm
+>           x86/kvmclock: Move this_cpu_pvti into kvmclock.h
+>           KVM: s390: Function documentation fixes
+>           selftests: KVM: Don't clobber XMM register when read
+>           KVM: VMX: Fix a TSX_CTRL_CPUID_CLEAR field mask issue
+>           selftests: KVM: Explicitly use movq to read xmm registers
+>           selftests: KVM: Call ucall_init when setting up in rseq_test
+>           KVM: Remove tlbs_dirty
+>           KVM: X86: Synchronize the shadow pagetable before link it
+>           KVM: X86: Fix missed remote tlb flush in rmap_write_protect()
+>           KVM: x86: nSVM: don't copy virt_ext from vmcb12
+>           KVM: x86: nSVM: test eax for 4K alignment for GP errata 
+> workaround
+>           KVM: x86: selftests: test simultaneous uses of V_IRQ from L1 
+> and L0
+>           KVM: x86: nSVM: restore int_vector in svm_clear_vintr
+>           kvm: x86: Add AMD PMU MSRs to msrs_to_save_all[]
+>           KVM: x86: nVMX: re-evaluate emulation_required on nested VM exit
+>           KVM: x86: nVMX: don't fail nested VM entry on invalid guest 
+> state if !from_vmentry
+>           ...
+> 
+> into 
+> ssh://git@gitolite.kernel.org/pub/scm/linux/kernel/git/palmer/linux.git 
+> for-next
+> (I know that's kind of a confusing name, but it's what I've been using 
+> as my short-term staging branch so I can do all my tests before saying 
+> "it's on for-next").
+> 
+> If that looks OK I can make it a touch more official by putting into the 
+> RISC-V tree.
 
-On Mon, Oct 4, 2021 at 6:27 PM Marc Zyngier <maz@kernel.org> wrote:
->
-> Hi Fuad,
->
-> On Wed, 22 Sep 2021 13:47:03 +0100,
-> Fuad Tabba <tabba@google.com> wrote:
-> >
-> > Trap accesses to restricted features for VMs running in protected
-> > mode.
-> >
-> > Access to feature registers are emulated, and only supported
-> > features are exposed to protected VMs.
-> >
-> > Accesses to restricted registers as well as restricted
-> > instructions are trapped, and an undefined exception is injected
-> > into the protected guests, i.e., with EC = 0x0 (unknown reason).
-> > This EC is the one used, according to the Arm Architecture
-> > Reference Manual, for unallocated or undefined system registers
-> > or instructions.
-> >
-> > Only affects the functionality of protected VMs. Otherwise,
-> > should not affect non-protected VMs when KVM is running in
-> > protected mode.
-> >
-> > Signed-off-by: Fuad Tabba <tabba@google.com>
-> > ---
-> >  arch/arm64/kvm/hyp/nvhe/switch.c | 60 ++++++++++++++++++++++++++++++++
-> >  1 file changed, 60 insertions(+)
-> >
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-> > index 49080c607838..2bf5952f651b 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/switch.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-> > @@ -20,6 +20,7 @@
-> >  #include <asm/kprobes.h>
-> >  #include <asm/kvm_asm.h>
-> >  #include <asm/kvm_emulate.h>
-> > +#include <asm/kvm_fixed_config.h>
-> >  #include <asm/kvm_hyp.h>
-> >  #include <asm/kvm_mmu.h>
-> >  #include <asm/fpsimd.h>
-> > @@ -28,6 +29,7 @@
-> >  #include <asm/thread_info.h>
-> >
-> >  #include <nvhe/mem_protect.h>
-> > +#include <nvhe/sys_regs.h>
-> >
-> >  /* Non-VHE specific context */
-> >  DEFINE_PER_CPU(struct kvm_host_data, kvm_host_data);
-> > @@ -158,6 +160,49 @@ static void __pmu_switch_to_host(struct kvm_cpu_context *host_ctxt)
-> >               write_sysreg(pmu->events_host, pmcntenset_el0);
-> >  }
-> >
-> > +/**
-> > + * Handler for protected VM restricted exceptions.
-> > + *
-> > + * Inject an undefined exception into the guest and return true to indicate that
-> > + * the hypervisor has handled the exit, and control should go back to the guest.
-> > + */
-> > +static bool kvm_handle_pvm_restricted(struct kvm_vcpu *vcpu, u64 *exit_code)
-> > +{
-> > +     __inject_undef64(vcpu);
-> > +     return true;
-> > +}
-> > +
-> > +/**
-> > + * Handler for protected VM MSR, MRS or System instruction execution in AArch64.
-> > + *
-> > + * Returns true if the hypervisor has handled the exit, and control should go
-> > + * back to the guest, or false if it hasn't.
-> > + */
-> > +static bool kvm_handle_pvm_sys64(struct kvm_vcpu *vcpu, u64 *exit_code)
-> > +{
-> > +     if (kvm_handle_pvm_sysreg(vcpu, exit_code))
-> > +             return true;
-> > +     else
-> > +             return kvm_hyp_handle_sysreg(vcpu, exit_code);
->
-> nit: drop the else.
+Yes.  All of the patches in there, except the last, are already in 
+Linus's tree.
 
-Will do.
+Thank you,
 
-> I wonder though: what if there is an overlap between between the pVM
-> handling and the normal KVM stuff? Are we guaranteed that there is
-> none?
->
-> For example, ESR_ELx_EC_SYS64 is used when working around some bugs
-> (see the TX2 TVM handling). What happens if you return early and don't
-> let it happen? This has a huge potential for some bad breakage.
+Paolo
 
-This is a tough one. Especially because it's dealing with bugs, there
-is no guarantee really. I think that for the TVM handling there is no
-overlap and the TVM handling code in kvm_hyp_handle_sysreg() will be
-invoked. However, workarounds could always be added, and if that
-happens, we need to make sure that they're on all paths. One solution
-is to make sure that such code is in a common function called by both
-paths. Not sure how we could enforce that other than by documenting
-it.
-
-What do you think?
-
-> > +}
-> > +
-> > +/**
-> > + * Handler for protected floating-point and Advanced SIMD accesses.
-> > + *
-> > + * Returns true if the hypervisor has handled the exit, and control should go
-> > + * back to the guest, or false if it hasn't.
-> > + */
-> > +static bool kvm_handle_pvm_fpsimd(struct kvm_vcpu *vcpu, u64 *exit_code)
-> > +{
-> > +     /* Linux guests assume support for floating-point and Advanced SIMD. */
-> > +     BUILD_BUG_ON(!FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_FP),
-> > +                             PVM_ID_AA64PFR0_ALLOW));
-> > +     BUILD_BUG_ON(!FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_ASIMD),
-> > +                             PVM_ID_AA64PFR0_ALLOW));
-> > +
-> > +     return kvm_hyp_handle_fpsimd(vcpu, exit_code);
-> > +}
-> > +
-> >  static const exit_handler_fn hyp_exit_handlers[] = {
-> >       [0 ... ESR_ELx_EC_MAX]          = NULL,
-> >       [ESR_ELx_EC_CP15_32]            = kvm_hyp_handle_cp15,
-> > @@ -170,8 +215,23 @@ static const exit_handler_fn hyp_exit_handlers[] = {
-> >       [ESR_ELx_EC_PAC]                = kvm_hyp_handle_ptrauth,
-> >  };
-> >
-> > +static const exit_handler_fn pvm_exit_handlers[] = {
-> > +     [0 ... ESR_ELx_EC_MAX]          = NULL,
-> > +     [ESR_ELx_EC_CP15_32]            = kvm_hyp_handle_cp15,
-> > +     [ESR_ELx_EC_CP15_64]            = kvm_hyp_handle_cp15,
->
-> Heads up, this one was bogus, and I removed it in my patches[1].
->
-> But it really begs the question: given that you really don't want to
-> handle any AArch32 for protected VMs, why handling anything at all the
-> first place? You really should let the exit happen and let the outer
-> run loop deal with it.
-
-Good point. Will fix this.
-
-Cheers,
-/fuad
-
-> > +     [ESR_ELx_EC_SYS64]              = kvm_handle_pvm_sys64,
-> > +     [ESR_ELx_EC_SVE]                = kvm_handle_pvm_restricted,
-> > +     [ESR_ELx_EC_FP_ASIMD]           = kvm_handle_pvm_fpsimd,
-> > +     [ESR_ELx_EC_IABT_LOW]           = kvm_hyp_handle_iabt_low,
-> > +     [ESR_ELx_EC_DABT_LOW]           = kvm_hyp_handle_dabt_low,
-> > +     [ESR_ELx_EC_PAC]                = kvm_hyp_handle_ptrauth,
-> > +};
-> > +
-> >  static const exit_handler_fn *kvm_get_exit_handler_array(struct kvm *kvm)
-> >  {
-> > +     if (unlikely(kvm_vm_is_protected(kvm)))
-> > +             return pvm_exit_handlers;
-> > +
-> >       return hyp_exit_handlers;
-> >  }
-> >
-> > --
-> > 2.33.0.464.g1972c5931b-goog
-> >
-> >
->
-> Thanks,
->
->         M.
->
-> [1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/commit/?h=kvm-arm64/early-ec-handlers&id=f84ff369795ed47f2cd5e556170166ee8b3a988f
->
-> --
-> Without deviation from the norm, progress is not possible.
