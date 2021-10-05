@@ -2,176 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 03BC34223FD
-	for <lists+kvm@lfdr.de>; Tue,  5 Oct 2021 12:58:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 27F6F4224C9
+	for <lists+kvm@lfdr.de>; Tue,  5 Oct 2021 13:14:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234020AbhJELAM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Oct 2021 07:00:12 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:38216 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233672AbhJELAL (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 5 Oct 2021 07:00:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1633431500;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ut8PpYxDYU3fYKnKki/cVS6jUVTnoqzGtGuHNfj9bQ8=;
-        b=FSq/4nM57tvM0tj60vdZ078y/ZZmZjQ7iTaAwbjcNIUpgMC/G83kTWE/pQCC6O0HTAU/Fk
-        hbawP+y6fhlC3tfFQcq58VSyo4nOzOjbYQcTeoM9mF+ZJfs+Rm7wtk8rQrRzTbggcCvSLQ
-        oN7DB/AQy723Wbp5WxpUHhKb8WpdSF4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-596-3qFPprxJOWCB924yXGoXLg-1; Tue, 05 Oct 2021 06:58:19 -0400
-X-MC-Unique: 3qFPprxJOWCB924yXGoXLg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 45F04362FB;
-        Tue,  5 Oct 2021 10:58:18 +0000 (UTC)
-Received: from fuller.cnet (ovpn-112-2.gru2.redhat.com [10.97.112.2])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id BF3C460843;
-        Tue,  5 Oct 2021 10:58:17 +0000 (UTC)
-Received: by fuller.cnet (Postfix, from userid 1000)
-        id C9604416D862; Tue,  5 Oct 2021 07:58:12 -0300 (-03)
-Date:   Tue, 5 Oct 2021 07:58:12 -0300
-From:   Marcelo Tosatti <mtosatti@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Nitesh Narayan Lal <nitesh@redhat.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        seanjc@google.com, vkuznets@redhat.com, tglx@linutronix.de,
-        frederic@kernel.org, mingo@kernel.org, nilal@redhat.com,
-        Wanpeng Li <kernellwp@gmail.com>
-Subject: Re: [PATCH v1] KVM: isolation: retain initial mask for kthread VM
- worker
-Message-ID: <20211005105812.GA130626@fuller.cnet>
-References: <20211004222639.239209-1-nitesh@redhat.com>
- <e734691b-e9e1-10a0-88ee-73d8fceb50f9@redhat.com>
+        id S234354AbhJELQO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Oct 2021 07:16:14 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:7998 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S234343AbhJELQN (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 5 Oct 2021 07:16:13 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 195BBx2d011453;
+        Tue, 5 Oct 2021 07:14:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=vCjJ2YrlkR9bjpLgeUhEuc8Gnba+/UctVQLQu2d6i0A=;
+ b=SjNvgV5ceAh6rv5j9OQtzB9PdLtVJOiOEoSvtyMDUAqDb8x8d0rnfJNM64NuT/KIwuo5
+ sfiQu/iiOBKtCFCx6ASVUUXK/fg1MTZHxw/Ii04wno2mI+xS8rB6IjdesucBhEmUc2DQ
+ NpAu0guJZKUQn4+BGiRJZlftssPfHR+wmvDzEBdnDlAebPhDaA4Kqk1dk858bjHfnOUa
+ btzRbGsh8quFNA+7eKw0Fz2WD00+1i9Yz0krNeOI4WAXo0f+KuxN6if9wLLr9QMCNPRU
+ xdS22DAjTolmEhUmxGGregoaN9fHGc8IROgYKAl4sm4aSNON58NfMn5Kuqmo2sPHU1dJ oQ== 
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3bgnm9814y-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 05 Oct 2021 07:14:22 -0400
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 195BCWcD006329;
+        Tue, 5 Oct 2021 11:14:21 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma06ams.nl.ibm.com with ESMTP id 3beepjhh8p-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 05 Oct 2021 11:14:20 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 195BEHgE40108452
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 5 Oct 2021 11:14:17 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 55DA911C07B;
+        Tue,  5 Oct 2021 11:14:17 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1CFEA11C07A;
+        Tue,  5 Oct 2021 11:14:17 +0000 (GMT)
+Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.171.51.33])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue,  5 Oct 2021 11:14:17 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH v2 1/5] [kvm-unit-tests PATCH v2 0/5] Add
+ specification exception tests
+To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
+References: <20211005090921.1816373-1-scgl@linux.ibm.com>
+ <20211005090921.1816373-2-scgl@linux.ibm.com>
+From:   Janis Schoetterl-Glausch <scgl@linux.vnet.ibm.com>
+Message-ID: <a06c6df1-3da1-da43-3549-18f3abe6020d@linux.vnet.ibm.com>
+Date:   Tue, 5 Oct 2021 13:14:16 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 MIME-Version: 1.0
+In-Reply-To: <20211005090921.1816373-2-scgl@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <e734691b-e9e1-10a0-88ee-73d8fceb50f9@redhat.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: _06z9OJd2X7vRndOZz-zu9pOS9eiLELn
+X-Proofpoint-ORIG-GUID: _06z9OJd2X7vRndOZz-zu9pOS9eiLELn
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.391,FMLib:17.0.607.475
+ definitions=2021-10-04_05,2021-10-04_01,2020-04-07_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ clxscore=1011 impostorscore=0 mlxlogscore=999 bulkscore=0 phishscore=0
+ suspectscore=0 mlxscore=0 spamscore=0 malwarescore=0 adultscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2109230001 definitions=main-2110050065
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paolo,
-
-On Tue, Oct 05, 2021 at 11:38:29AM +0200, Paolo Bonzini wrote:
-> [+Wanpeng]
-> 
-> On 05/10/21 00:26, Nitesh Narayan Lal wrote:
-> > From: Marcelo Tosatti <mtosatti@redhat.com>
-> > 
-> > kvm_vm_worker_thread() creates a kthread VM worker and migrates it
-> > to the parent cgroup using cgroup_attach_task_all() based on its
-> > effective cpumask.
-> > 
-> > In an environment that is booted with the nohz_full kernel option, cgroup's
-> > effective cpumask can also include CPUs running in nohz_full mode. These
-> > CPUs often run SCHED_FIFO tasks which may result in the starvation of the
-> > VM worker if it has been migrated to one of these CPUs.
-> 
-> There are other effects of cgroups (e.g. memory accounting) than just the
-> cpumask; for v1 you could just skip the cpuset, but if
-> cgroup_attach_task_all is ever ported to v2's cgroup_attach_task, we will
-> not be able to separate the cpuset cgroup from the others.
-
-cgroup_attach_task_all does use cgroup_attach_task on linux-2.6.git...
-It would be good to have this working on both cgroup-v1 and cgroup-v2.
-
-Is kvm-nx-hpage using significant amounts of memory?
-
-> Why doesn't the scheduler move the task to a CPU that is not being hogged by
-> vCPU SCHED_FIFO tasks?  
-
-Because cpuset placement is enforced:
-
-CPUSET(7)                            Linux Programmer's Manual                           CPUSET(7)
-
-       Cpusets are integrated with the sched_setaffinity(2) scheduling affinity mechanism and  the
-       mbind(2)  and set_mempolicy(2) memory-placement mechanisms in the kernel.  Neither of these
-       mechanisms let a process make use of a CPU or memory node  that  is  not  allowed  by  that
-       process's  cpuset.   If  changes  to a process's cpuset placement conflict with these other
-       mechanisms, then cpuset placement is enforced even if it means overriding these other mech‐
-       anisms.   The kernel accomplishes this overriding by silently restricting the CPUs and mem‐
-       ory nodes requested by these other mechanisms to those allowed by  the  invoking  process's
-       cpuset.   This  can  result in these other calls returning an error, if for example, such a
-       call ends up requesting an empty set of  CPUs  or  memory  nodes,  after  that  request  is
-       restricted to the invoking process's cpuset.
+Oops, forgot to Cc the lists on the cover letter, see below.
 
 
-> The parent cgroup should always have one for
-> userspace's own housekeeping.
-> 
-> As an aside, if we decide that KVM's worker threads count as housekeeping,
-> you'd still want to bind the kthread to the housekeeping CPUs(*).
+Test that specification exceptions cause the correct interruption code
+during both normal and transactional execution.
 
-This is being done automatically by HK_FLAG_KTHREAD (see
-kernel/thread.c).
+The last three patches are cosmetic only and could be dropped.
 
-> 
-> Paolo
-> 
-> (*) switching from kthread_run to kthread_create+kthread_bind_mask
-> 
-> > Since unbounded kernel threads allowed CPU mask already respects nohz_full
-> > CPUs at the time of their setup (because of 9cc5b8656892: "isolcpus: Affine
-> > unbound kernel threads to housekeeping cpus"), retain the initial CPU mask
-> > for the kthread by stopping its migration to the parent cgroup's effective
-> > CPUs.
-> > 
-> > Signed-off-by: Marcelo Tosatti <mtosatti@redhat.com>
-> > Signed-off-by: Nitesh Narayan Lal <nitesh@redhat.com>
-> > ---
-> >   virt/kvm/kvm_main.c | 20 +++++++++++++++-----
-> >   1 file changed, 15 insertions(+), 5 deletions(-)
-> > 
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > index 7851f3a1b5f7..87bc193fd020 100644
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> > @@ -56,6 +56,7 @@
-> >   #include <asm/processor.h>
-> >   #include <asm/ioctl.h>
-> >   #include <linux/uaccess.h>
-> > +#include <linux/sched/isolation.h>
-> >   #include "coalesced_mmio.h"
-> >   #include "async_pf.h"
-> > @@ -5634,11 +5635,20 @@ static int kvm_vm_worker_thread(void *context)
-> >   	if (err)
-> >   		goto init_complete;
-> > -	err = cgroup_attach_task_all(init_context->parent, current);
-> > -	if (err) {
-> > -		kvm_err("%s: cgroup_attach_task_all failed with err %d\n",
-> > -			__func__, err);
-> > -		goto init_complete;
-> > +	/*
-> > +	 * For nohz_full enabled environments, don't migrate the worker thread
-> > +	 * to parent cgroup as its effective mask may have a CPU running in
-> > +	 * nohz_full mode. nohz_full CPUs often run SCHED_FIFO task which could
-> > +	 * result in starvation of the worker thread if it is pinned on the same
-> > +	 * CPU.
-> > +	 */
+Unrelated: There should not be * in the file patterns in MAINTAINERS,
+should there?
 
-Actually, we don't want the kthread in the isolated CPUs (irrespective
-of nohz_full=, starvation, or anything). Its just about
-"don't run a kernel thread on isolated CPUs".
+v1 -> v2
+	Add license and test description
+	Split test patch into normal test and transactional execution test
+	Add comments to
+		invalid PSW fixup function
+		with_transaction
+	Rename some variables/functions
+	Pass mask as single parameter to asm
+	Get rid of report_info_if macro
+	Introduce report_pass/fail and use them
 
-> > +	if (!housekeeping_enabled(HK_FLAG_KTHREAD)) {
-> > +		err = cgroup_attach_task_all(init_context->parent, current);
-> > +		if (err) {
-> > +			kvm_err("%s: cgroup_attach_task_all failed with err %d\n",
-> > +				__func__, err);
-> > +			goto init_complete;
-> > +		}
-> >   	}
-> >   	set_user_nice(current, task_nice(init_context->parent));
-> > 
-> 
-> 
+Janis Schoetterl-Glausch (5):
+  s390x: Add specification exception test
+  s390x: Test specification exceptions during transaction
+  lib: Introduce report_pass and report_fail
+  Use report_fail(...) instead of report(0/false, ...)
+  Use report_pass(...) instead of report(1/true, ...)
+
+ s390x/Makefile           |   1 +
+ lib/s390x/asm/arch_def.h |   1 +
+ lib/libcflat.h           |   6 +-
+ lib/report.c             |  20 ++-
+ lib/s390x/css_lib.c      |  30 ++--
+ x86/vmx.h                |  31 ++--
+ arm/psci.c               |   2 +-
+ arm/timer.c              |   2 +-
+ s390x/css.c              |  22 +--
+ s390x/diag288.c          |   2 +-
+ s390x/selftest.c         |   2 +-
+ s390x/smp.c              |  16 +-
+ s390x/spec_ex.c          | 345 +++++++++++++++++++++++++++++++++++++++
+ x86/asyncpf.c            |  11 +-
+ x86/emulator.c           |   2 +-
+ x86/hyperv_stimer.c      |  24 ++-
+ x86/hyperv_synic.c       |   2 +-
+ x86/svm_tests.c          | 180 ++++++++++----------
+ x86/syscall.c            |   2 +-
+ x86/taskswitch2.c        |   2 +-
+ x86/tsc_adjust.c         |   2 +-
+ x86/vmx.c                |  23 ++-
+ x86/vmx_tests.c          | 172 ++++++++++---------
+ s390x/unittests.cfg      |   3 +
+ 24 files changed, 630 insertions(+), 273 deletions(-)
+ create mode 100644 s390x/spec_ex.c
+
+base-commit: fe26131eec769cef7ad7e2e1e4e192aa0bdb2bba
+-- 
+2.31.1
 
