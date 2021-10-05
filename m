@@ -2,142 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E796F422C4B
-	for <lists+kvm@lfdr.de>; Tue,  5 Oct 2021 17:22:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A4FDE422CA3
+	for <lists+kvm@lfdr.de>; Tue,  5 Oct 2021 17:37:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235148AbhJEPYf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Oct 2021 11:24:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58094 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231513AbhJEPYe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 Oct 2021 11:24:34 -0400
-Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6887C061749
-        for <kvm@vger.kernel.org>; Tue,  5 Oct 2021 08:22:43 -0700 (PDT)
-Received: by mail-pg1-x52c.google.com with SMTP id 133so20112207pgb.1
-        for <kvm@vger.kernel.org>; Tue, 05 Oct 2021 08:22:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=jsoEJt9R8crAH2RcsfBnQLCdcmXo4iVFPCHH8skN9hQ=;
-        b=Ed27JI5WdcMBjzCmHglgYbPkFapHRW8VivzST0erYb/L/PV6Fx0rpTBNDt1223jRVb
-         eQ5IVgSRDi5VCqGDiJM5A7rbcPMvwg6w1jg0wDhDNxogy7g8tXHb5gAQu3MkQZ4aTk9Q
-         D+35shvAdiTeBDH9W72MNR7F3tUnMUT8t+zTm8lCHdonVdqfrCyFpDQ97vP6AwGRNn/X
-         GOqBrTVYIjZiBhdOV7etEqYr4+lx5qlCy7z4mzvugVDQwWWAnXWWM9Dac9u4kMeqF4o0
-         q66/1KN+gVVuBQ71H+9jz7Qi8kNlcIq5g+ueK+T83d6rxeradLUvtNWie9PUJyUcAjyk
-         VesA==
+        id S235789AbhJEPjf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Oct 2021 11:39:35 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54992 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233975AbhJEPjc (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 5 Oct 2021 11:39:32 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1633448261;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=g8VaQsv47xGVpNOlqz6W/3BMiLvJlFlGBCWNXnGhzpc=;
+        b=OSnc3tGHmU1Y94wT5+2Fd0B0erDNm+MfhVbuwHzAm2bd8lo1uGiT9eOfJ5BR356ltipo78
+        aiP62tKWnf80OeFP/E/CK1gCSWXaNH9Ugf7I7KRff1zrkb4CC4EO9aNKWm3Nwn/dUFhODd
+        dHcP90st3ozWoGAP6LXlW1Y/mgUASCY=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-461-yuQa-uVAPoqAq9eHJCaBuQ-1; Tue, 05 Oct 2021 11:37:38 -0400
+X-MC-Unique: yuQa-uVAPoqAq9eHJCaBuQ-1
+Received: by mail-wm1-f70.google.com with SMTP id 3-20020a05600c22c300b0030d6a6a28f8so1196038wmg.5
+        for <kvm@vger.kernel.org>; Tue, 05 Oct 2021 08:37:38 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=jsoEJt9R8crAH2RcsfBnQLCdcmXo4iVFPCHH8skN9hQ=;
-        b=Hi7CUDBy7GKODqUNE5YVHPB7vl8uDT0ePfVMJ64W3z8nso5/ONLB6KWXvpk0vyHZK+
-         alLqEjKAbTZOlE00UT/t0aWmpzq/E6EqgN+IKoZCSqDua0QcfUOG5V2vOo7Bp+Hnd1z8
-         SYNA2kRE+h649rmgiETCglq+rtqG/rI1D5ykuGeOjC+FDm3ttVeKBMaOuoZv9vDPo5D1
-         CVbMGWQ/mJyInmvyOqyaLY+aEfb1s7kD562Fvt70DuHUBsB77Aw8qbnbVI/3UyK98psH
-         P1zQ29/ePYV9EByzCMadjtAo9yWkG8r056E3jsmzy8jnjztf4x+hqRSJmO+T0gkBeG+n
-         9XaA==
-X-Gm-Message-State: AOAM5306zSlIKsrU8b3xhpMaGLIXYmF+JzCsAPH+yNFSIhmZ6tKhpwSC
-        POe596pe9Ur0EAU2NMdQxk0ugA==
-X-Google-Smtp-Source: ABdhPJyd+BrY951cMRvWU+Hdnw02yUD1081dLTCog2uFgukEdDRDWflW+t6MGsO3nWUcqCgRuybMcw==
-X-Received: by 2002:a62:b50d:0:b0:44b:b81f:a956 with SMTP id y13-20020a62b50d000000b0044bb81fa956mr30655368pfe.27.1633447363159;
-        Tue, 05 Oct 2021 08:22:43 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id z2sm6907837pfe.210.2021.10.05.08.22.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Oct 2021 08:22:42 -0700 (PDT)
-Date:   Tue, 5 Oct 2021 15:22:39 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Oliver Upton <oupton@google.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-arm-kernel@lists.infradead.org,
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=g8VaQsv47xGVpNOlqz6W/3BMiLvJlFlGBCWNXnGhzpc=;
+        b=qgG8P1P1NTIkL0HuF/X7tFvzfmfdlq90G9Byd6BVdgbpiSUgJi5/JlxpKR/GlJ8CTJ
+         IHFHTaP0rM7SjQMQysWIVrzWV+SCp+fMua/oabstJDL5Jzafs1EcUlxpLgja71SZkPI+
+         g8+3KmJp78JQj5ZvoJhfWst8XV5TTmTeEFU0cpew4zKPtwMNchlTItIq03pRNCmH1lDf
+         aWkMrtht57FJeuQB5wIOzxfM9aPpGtXmKdMF3tdS6AL72mq+Gc0xLPPLksSbVjsvZK6s
+         Sxu/8xIY+YAa3t5rj8BiZuFJrohyj/ixMcQbGM9kR42WjEC+JWSr4UpzQJyEff2jimdP
+         5UFQ==
+X-Gm-Message-State: AOAM531kw58ZnypvuyJP0qC5Ju2jl1n6MNeovJpiyh5WgzC/nlJJGdZc
+        XhHl9pvCuihFcJovCp4KDlgaL1hrwQjRiI3bPU2+aG1+uZZtyKNfLBnya06SBQXGMB2pnKLKYq6
+        DyGI13+T+WTQE
+X-Received: by 2002:a05:600c:288:: with SMTP id 8mr4208680wmk.172.1633448257674;
+        Tue, 05 Oct 2021 08:37:37 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwGIBdCendc78IIq3oVK8zaOmi7VNd1+Th3HZcWbj0tcqdqRU7djnn+V2pkLvsYwDZTZmSOXw==
+X-Received: by 2002:a05:600c:288:: with SMTP id 8mr4208665wmk.172.1633448257534;
+        Tue, 05 Oct 2021 08:37:37 -0700 (PDT)
+Received: from thuth.remote.csb (p549bb2bd.dip0.t-ipconnect.de. [84.155.178.189])
+        by smtp.gmail.com with ESMTPSA id l21sm2237622wmh.31.2021.10.05.08.37.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 05 Oct 2021 08:37:37 -0700 (PDT)
+Subject: Re: [kvm-unit-tests PATCH v2 4/5] Use report_fail(...) instead of
+ report(0/false, ...)
+To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
         Andrew Jones <drjones@redhat.com>,
-        Will Deacon <will@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v8 7/7] KVM: x86: Expose TSC offset controls to userspace
-Message-ID: <YVxtvx3IJ5g1SG+x@google.com>
-References: <20210916181538.968978-1-oupton@google.com>
- <20210916181538.968978-8-oupton@google.com>
+        Janosch Frank <frankja@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, linux-s390@vger.kernel.org
+References: <20211005090921.1816373-1-scgl@linux.ibm.com>
+ <20211005090921.1816373-5-scgl@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+Message-ID: <f8bbb6e4-da89-59a3-1826-d87979177f1c@redhat.com>
+Date:   Tue, 5 Oct 2021 17:37:35 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20210916181538.968978-8-oupton@google.com>
+In-Reply-To: <20211005090921.1816373-5-scgl@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 16, 2021, Oliver Upton wrote:
-> +static int kvm_arch_tsc_get_attr(struct kvm_vcpu *vcpu,
-> +				 struct kvm_device_attr *attr)
-> +{
-> +	u64 __user *uaddr = (u64 __user *)attr->addr;
+On 05/10/2021 11.09, Janis Schoetterl-Glausch wrote:
+> Whitespace is kept consistent with the rest of the file.
+> 
+> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+> ---
+>   lib/s390x/css_lib.c |  30 ++++----
+>   x86/vmx.h           |  25 ++++---
+>   arm/psci.c          |   2 +-
+>   arm/timer.c         |   2 +-
+>   s390x/css.c         |  18 ++---
+>   s390x/spec_ex.c     |   7 +-
+>   x86/asyncpf.c       |   4 +-
+>   x86/hyperv_stimer.c |   6 +-
+>   x86/hyperv_synic.c  |   2 +-
+>   x86/svm_tests.c     | 163 ++++++++++++++++++++++----------------------
+>   x86/vmx.c           |  17 +++--
+>   x86/vmx_tests.c     | 136 ++++++++++++++++++------------------
+>   12 files changed, 200 insertions(+), 212 deletions(-)
 
-...
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
-> +static int kvm_arch_tsc_set_attr(struct kvm_vcpu *vcpu,
-> +				 struct kvm_device_attr *attr)
-> +{
-> +	u64 __user *uaddr = (u64 __user *)attr->addr;
-
-These casts break 32-bit builds because of truncating attr->addr from 64-bit int
-to a 32-bit pointer.  The address should also be checked to verify bits 63:32 are
-not set on 32-bit kernels.
-
-arch/x86/kvm/x86.c: In function ‘kvm_arch_tsc_get_attr’:
-arch/x86/kvm/x86.c:4947:22: error: cast to pointer from integer of different size [-Werror=int-to-pointer-cast]
- 4947 |  u64 __user *uaddr = (u64 __user *)attr->addr;
-      |                      ^
-arch/x86/kvm/x86.c: In function ‘kvm_arch_tsc_set_attr’:
-arch/x86/kvm/x86.c:4967:22: error: cast to pointer from integer of different size [-Werror=int-to-pointer-cast]
- 4967 |  u64 __user *uaddr = (u64 __user *)attr->addr;
-      |                      ^
-
-
-Not sure if there's a more elegant approach than casts galore?
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 8e5e462ffd65..3930e5dcdf0e 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -4944,9 +4944,12 @@ static int kvm_arch_tsc_has_attr(struct kvm_vcpu *vcpu,
- static int kvm_arch_tsc_get_attr(struct kvm_vcpu *vcpu,
-                                 struct kvm_device_attr *attr)
- {
--       u64 __user *uaddr = (u64 __user *)attr->addr;
-+       u64 __user *uaddr = (u64 __user *)(unsigned long)attr->addr;
-        int r;
-
-+       if ((u64)(unsigned long)uaddr != attr->addr)
-+               return -EFAULT;
-+
-        switch (attr->attr) {
-        case KVM_VCPU_TSC_OFFSET:
-                r = -EFAULT;
-@@ -4964,10 +4967,13 @@ static int kvm_arch_tsc_get_attr(struct kvm_vcpu *vcpu,
- static int kvm_arch_tsc_set_attr(struct kvm_vcpu *vcpu,
-                                 struct kvm_device_attr *attr)
- {
--       u64 __user *uaddr = (u64 __user *)attr->addr;
-+       u64 __user *uaddr = (u64 __user *)(unsigned long)attr->addr;
-        struct kvm *kvm = vcpu->kvm;
-        int r;
-
-+       if ((u64)(unsigned long)uaddr != attr->addr)
-+               return -EFAULT;
-+
-        switch (attr->attr) {
-        case KVM_VCPU_TSC_OFFSET: {
-                u64 offset, tsc, ns;
