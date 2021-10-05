@@ -2,140 +2,174 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 25E2242218D
-	for <lists+kvm@lfdr.de>; Tue,  5 Oct 2021 11:01:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6EC6F4221A6
+	for <lists+kvm@lfdr.de>; Tue,  5 Oct 2021 11:05:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232773AbhJEJC6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Oct 2021 05:02:58 -0400
-Received: from mga05.intel.com ([192.55.52.43]:7352 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232478AbhJEJC5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 Oct 2021 05:02:57 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10127"; a="311900605"
-X-IronPort-AV: E=Sophos;i="5.85,348,1624345200"; 
-   d="scan'208";a="311900605"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Oct 2021 02:01:07 -0700
-X-IronPort-AV: E=Sophos;i="5.85,348,1624345200"; 
-   d="scan'208";a="477590236"
-Received: from gionascu-mobl2.ger.corp.intel.com (HELO localhost) ([10.249.40.237])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Oct 2021 02:01:02 -0700
-From:   Jani Nikula <jani.nikula@linux.intel.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     kernel test robot <lkp@intel.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        "llvm\@lists.linux.dev" <llvm@lists.linux.dev>,
-        "kbuild-all\@lists.01.org" <kbuild-all@lists.01.org>,
-        "kvm\@vger.kernel.org" <kvm@vger.kernel.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        intel-gfx@lists.freedesktop.org
-Subject: Re: [vfio:next 33/38] drivers/gpu/drm/i915/i915_pci.c:975:2: warning: missing field 'override_only' initializer
-In-Reply-To: <20211001115137.GJ964074@nvidia.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
-References: <20210827153409.GV1721383@nvidia.com> <878rzdt3a3.fsf@intel.com> <20211001115137.GJ964074@nvidia.com>
-Date:   Tue, 05 Oct 2021 12:00:59 +0300
-Message-ID: <87fstf26d0.fsf@intel.com>
+        id S232884AbhJEJHg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Oct 2021 05:07:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52918 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232478AbhJEJHf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Oct 2021 05:07:35 -0400
+Received: from mail-oi1-x230.google.com (mail-oi1-x230.google.com [IPv6:2607:f8b0:4864:20::230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71D4AC061745
+        for <kvm@vger.kernel.org>; Tue,  5 Oct 2021 02:05:45 -0700 (PDT)
+Received: by mail-oi1-x230.google.com with SMTP id w190so222567oif.5
+        for <kvm@vger.kernel.org>; Tue, 05 Oct 2021 02:05:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=ZM3Zs1hD0IvxW0NEoOVRpgIBxIg0g/Aefp92Tu/RS14=;
+        b=DGxWG2YlpVunKcb7OQr0SKzOX9CTc0PhPEnwq/MUvowulZ084/74w+yMqV8HfUqupl
+         Z8i6/b71iIdwf+SVw4wxivnoh5EpKdwJEDO7eb4Wp1Zv8utuUQc65OrqfF+TcYSt6Gwy
+         3SF4c04jFlYufVJ3N3z1MG3Beo6zWubWbiNzAncDftNled8YOM767waM69j1UDGGuy6L
+         1+/BL38Q7i0U/Y3mY4Allok0YDrxxDrc8oBAuit2EmoDXcENtSNL5/iGh18RsDGpzjHt
+         iAoM9jSihkQLb79YcfOmYUZ06/jPuKCqzVhfEUK3YihTHoRGo4Jf5lxo5CX9KoWqXb2/
+         qvWQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=ZM3Zs1hD0IvxW0NEoOVRpgIBxIg0g/Aefp92Tu/RS14=;
+        b=sczYBnuB121eOEB4BFLOHxeEMOa+S0jzdalzZ9eDUtwHcnrMRIV0fdzmdJgIN3F0Tg
+         3ZoJgcZxOeMT2tjpdOmfEVhq4yZ78jxIMd3MdSH9I25I2GzJ21GW9Af6wTUDiBJPZOlv
+         8FMU3NjIxmrcj+W1IB0o1z11eWveIAkVmv3VhAVuVBUSnGPdjk85nbGax6LybLwkle+X
+         FTak1KXspETNbB5b9M8QCyOX4wbYXIhomiW45JXcdABdFVhDSesazsVWPyxzV9yWuqc+
+         plQXHQmOaA6tyKPophe21Jyv9EOOnVCBV8T3834xyaHk/nOKgGbbMiWUnNIdr3tbd3Uw
+         9C7w==
+X-Gm-Message-State: AOAM532zqRjA5gNp+GYkB5V/dOMipj0Wqb8mYZIIjfyNzKtHLx0A9mbc
+        0y9TSiZ75slb9nYC1zKj2ulZ/mpvyMQJuBxaOUyT0A==
+X-Google-Smtp-Source: ABdhPJz67hcp3PPxwZdQScqsFRDex6KiMAh2iDnZJJt+LUbAzcOQmphJP5sqXjayKo9PJSWuAvxT7mO1+VdmpRsxF9Q=
+X-Received: by 2002:aca:604:: with SMTP id 4mr1531266oig.8.1633424744609; Tue,
+ 05 Oct 2021 02:05:44 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20210922124704.600087-1-tabba@google.com> <20210922124704.600087-13-tabba@google.com>
+ <87sfxfrh6k.wl-maz@kernel.org>
+In-Reply-To: <87sfxfrh6k.wl-maz@kernel.org>
+From:   Fuad Tabba <tabba@google.com>
+Date:   Tue, 5 Oct 2021 10:05:08 +0100
+Message-ID: <CA+EHjTyYz4Hf6-awZTLinWxkr3N_j9K-m7TEe=EKCFUuQL_mYA@mail.gmail.com>
+Subject: Re: [PATCH v6 12/12] KVM: arm64: Handle protected guests at 32 bits
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvmarm@lists.cs.columbia.edu, will@kernel.org, james.morse@arm.com,
+        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
+        mark.rutland@arm.com, christoffer.dall@arm.com,
+        pbonzini@redhat.com, drjones@redhat.com, oupton@google.com,
+        qperret@google.com, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kernel-team@android.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 01 Oct 2021, Jason Gunthorpe <jgg@nvidia.com> wrote:
-> On Fri, Oct 01, 2021 at 02:04:04PM +0300, Jani Nikula wrote:
->> On Fri, 27 Aug 2021, Jason Gunthorpe <jgg@nvidia.com> wrote:
->> > On Fri, Aug 27, 2021 at 03:12:36PM +0000, kernel test robot wrote:
->> >> tree:   https://github.com/awilliam/linux-vfio.git next
->> >> head:   ea870730d83fc13a5fa2bd0e175176d7ac8a400a
->> >> commit: 343b7258687ecfbb363bfda8833a7cf641aac524 [33/38] PCI: Add 'override_only' field to struct pci_device_id
->> >> config: i386-randconfig-a004-20210827 (attached as .config)
->> >> compiler: clang version 14.0.0 (https://github.com/llvm/llvm-project 1076082a0d97bd5c16a25ee7cf3dbb6ee4b5a9fe)
->> >> reproduce (this is a W=1 build):
->> >>         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
->> >>         chmod +x ~/bin/make.cross
->> >>         # https://github.com/awilliam/linux-vfio/commit/343b7258687ecfbb363bfda8833a7cf641aac524
->> >>         git remote add vfio https://github.com/awilliam/linux-vfio.git
->> >>         git fetch --no-tags vfio next
->> >>         git checkout 343b7258687ecfbb363bfda8833a7cf641aac524
->> >>         # save the attached .config to linux build tree
->> >>         COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross ARCH=i386 
->> >> 
->> >> If you fix the issue, kindly add following tag as appropriate
->> >> Reported-by: kernel test robot <lkp@intel.com>
->> >
->> > Ugh, this is due to this code:
->> >
->> > #define INTEL_VGA_DEVICE(id, info) {		\
->> > 	0x8086,	id,				\
->> > 	~0, ~0,					\
->> > 	0x030000, 0xff0000,			\
->> > 	(unsigned long) info }
->> >
->> > #define INTEL_QUANTA_VGA_DEVICE(info) {		\
->> > 	0x8086,	0x16a,				\
->> > 	0x152d,	0x8990,				\
->> > 	0x030000, 0xff0000,			\
->> > 	(unsigned long) info }
->> >
->> >
->> > Which really should be using the normal pattern for defining these
->> > structs:
->> >
->> > #define PCI_DEVICE_CLASS(dev_class,dev_class_mask) \
->> >         .class = (dev_class), .class_mask = (dev_class_mask), \
->> >         .vendor = PCI_ANY_ID, .device = PCI_ANY_ID, \
->> >         .subvendor = PCI_ANY_ID, .subdevice = PCI_ANY_ID
->> >
->> > The warning is also not a real issue, just clang being overzealous.
->> 
->> Stumbled upon this old report, sorry for the delayed response.
->> 
->> The reason it's not using designated initializers is that the same file
->> gets synced to some userspace projects (at least libdrm and
->> igt-gpu-tools) which use the macros to initialize slightly different
->> structs. For example, igt uses struct pci_id_match from libpciaccess-dev
->> (/usr/include/pciaccess.h) and can't easily adapt to different member
->> names.
+Hi Marc,
+
+On Tue, Oct 5, 2021 at 9:48 AM Marc Zyngier <maz@kernel.org> wrote:
 >
-> Do it like this:
+> On Wed, 22 Sep 2021 13:47:04 +0100,
+> Fuad Tabba <tabba@google.com> wrote:
+> >
+> > Protected KVM does not support protected AArch32 guests. However,
+> > it is possible for the guest to force run AArch32, potentially
+> > causing problems. Add an extra check so that if the hypervisor
+> > catches the guest doing that, it can prevent the guest from
+> > running again by resetting vcpu->arch.target and returning
+> > ARM_EXCEPTION_IL.
+> >
+> > If this were to happen, The VMM can try and fix it by re-
+> > initializing the vcpu with KVM_ARM_VCPU_INIT, however, this is
+> > likely not possible for protected VMs.
+> >
+> > Adapted from commit 22f553842b14 ("KVM: arm64: Handle Asymmetric
+> > AArch32 systems")
+> >
+> > Signed-off-by: Fuad Tabba <tabba@google.com>
+> > ---
+> >  arch/arm64/kvm/hyp/nvhe/switch.c | 40 ++++++++++++++++++++++++++++++++
+> >  1 file changed, 40 insertions(+)
+> >
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+> > index 2bf5952f651b..d66226e49013 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/switch.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+> > @@ -235,6 +235,43 @@ static const exit_handler_fn *kvm_get_exit_handler_array(struct kvm *kvm)
+> >       return hyp_exit_handlers;
+> >  }
+> >
+> > +/*
+> > + * Some guests (e.g., protected VMs) might not be allowed to run in AArch32.
+> > + * The ARMv8 architecture does not give the hypervisor a mechanism to prevent a
+> > + * guest from dropping to AArch32 EL0 if implemented by the CPU. If the
+> > + * hypervisor spots a guest in such a state ensure it is handled, and don't
+> > + * trust the host to spot or fix it.  The check below is based on the one in
+> > + * kvm_arch_vcpu_ioctl_run().
+> > + *
+> > + * Returns false if the guest ran in AArch32 when it shouldn't have, and
+> > + * thus should exit to the host, or true if a the guest run loop can continue.
+> > + */
+> > +static bool handle_aarch32_guest(struct kvm_vcpu *vcpu, u64 *exit_code)
+> > +{
+> > +     struct kvm *kvm = (struct kvm *) kern_hyp_va(vcpu->kvm);
 >
+> There is no need for an extra cast. kern_hyp_va() already provides a
+> cast to the type of the parameter.
+
+Will drop it.
+
+> > +     bool is_aarch32_allowed =
+> > +             FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_EL0),
+> > +                       get_pvm_id_aa64pfr0(vcpu)) >=
+> > +                             ID_AA64PFR0_ELx_32BIT_64BIT;
+> > +
+> > +
+> > +     if (kvm_vm_is_protected(kvm) &&
+> > +         vcpu_mode_is_32bit(vcpu) &&
+> > +         !is_aarch32_allowed) {
 >
-> #ifdef __KERNEL__
-> #define INTEL_VGA_DEVICE(..)
-> #endif
+> Do we really need to go through this is_aarch32_allowed check?
+> Protected VMs don't have AArch32, and we don't have the infrastructure
+> to handle 32bit at all. For non-protected VMs, we already have what we
+> need at EL1. So the extra check only adds complexity.
+
+No. I could change it to a build-time assertion just to make sure that
+AArch32 is not allowed instead.
+
+Thanks,
+/fuad
+
+> > +             /*
+> > +              * As we have caught the guest red-handed, decide that it isn't
+> > +              * fit for purpose anymore by making the vcpu invalid. The VMM
+> > +              * can try and fix it by re-initializing the vcpu with
+> > +              * KVM_ARM_VCPU_INIT, however, this is likely not possible for
+> > +              * protected VMs.
+> > +              */
+> > +             vcpu->arch.target = -1;
+> > +             *exit_code = ARM_EXCEPTION_IL;
+> > +             return false;
+> > +     }
+> > +
+> > +     return true;
+> > +}
+> > +
+> >  /* Switch to the guest for legacy non-VHE systems */
+> >  int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+> >  {
+> > @@ -297,6 +334,9 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+> >               /* Jump in the fire! */
+> >               exit_code = __guest_enter(vcpu);
+> >
+> > +             if (unlikely(!handle_aarch32_guest(vcpu, &exit_code)))
+> > +                     break;
+> > +
+> >               /* And we're baaack! */
+> >       } while (fixup_guest_exit(vcpu, &exit_code));
+> >
 >
+> Thanks,
 >
-> And userspace does
+>         M.
 >
-> #define INTEL_VGA_DEVICE(..)
-> #include <foo.h>
-
-Sure.
-
->> Anyway, we've got
->> 
->> subdir-ccflags-y += $(call cc-disable-warning, missing-field-initializers)
->> subdir-ccflags-y += $(call cc-disable-warning, initializer-overrides)
->> 
->> in drivers/gpu/drm/i915/Makefile, so I wonder why they're not respected.
->
-> Disabling kernel warnings because some userspace wants to copy a
-> kernel header is horrific, don't do that.
-
-We've disabled some warnings because those lines are preceded by
-
-subdir-ccflags-y := -Wall -Wextra
-
-enabling more warnings than the kernel build generally does.
-
-
-BR,
-Jani.
-
-
-
--- 
-Jani Nikula, Intel Open Source Graphics Center
+> --
+> Without deviation from the norm, progress is not possible.
