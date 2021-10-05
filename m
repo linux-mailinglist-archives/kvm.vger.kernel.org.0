@@ -2,89 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EA8EB422F3C
-	for <lists+kvm@lfdr.de>; Tue,  5 Oct 2021 19:32:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 13707422F72
+	for <lists+kvm@lfdr.de>; Tue,  5 Oct 2021 19:55:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234366AbhJERek (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Oct 2021 13:34:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32918 "EHLO
+        id S234201AbhJER5l (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Oct 2021 13:57:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38054 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231858AbhJERei (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 Oct 2021 13:34:38 -0400
-Received: from mail-ot1-x331.google.com (mail-ot1-x331.google.com [IPv6:2607:f8b0:4864:20::331])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD2A8C061749
-        for <kvm@vger.kernel.org>; Tue,  5 Oct 2021 10:32:47 -0700 (PDT)
-Received: by mail-ot1-x331.google.com with SMTP id c26-20020a056830349a00b0054d96d25c1eso26807201otu.9
-        for <kvm@vger.kernel.org>; Tue, 05 Oct 2021 10:32:47 -0700 (PDT)
+        with ESMTP id S229796AbhJER5i (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Oct 2021 13:57:38 -0400
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FD2BC061749
+        for <kvm@vger.kernel.org>; Tue,  5 Oct 2021 10:55:47 -0700 (PDT)
+Received: by mail-pj1-x1031.google.com with SMTP id on6so189449pjb.5
+        for <kvm@vger.kernel.org>; Tue, 05 Oct 2021 10:55:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Mh3wEsS3oUGUjXPVcgwj7eWBIpN7QtfE09QQA3WRYfc=;
-        b=TK4DPSLIC7KYaXbQg+WO/d90o0peCqUpLQEry75amXFSA4WpPwKDMSo8bI7rBrXfph
-         xQe1ddFG+rzgPu3cEgwPy0+Pat7htTUpulMYPdvimTtMUljp84sqQ5sSah7p/PGVmHr/
-         cZcoweILgM5ccHdSuY9x7fEWIR235oNW4hg/QK6hnrsbe3wZ6E4bjWNfcjO83D+9PdGv
-         4zX8uJ8bqCMVRnAOvZW4A6qiTuMV8Tu3tfOzkuR+BAiVm1rewREdRohXzjB52SdJIHy+
-         dfV0I2wow9Sz40dg/IvHSk+z8ujyd/Yn6p2elKyFlCs97eNhCFCSXuQZHFo68y7bZZD6
-         zKFw==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=QQVAxhOUBeupXyB4EccZXaFK5tXREsXGl1r0zXiqsCM=;
+        b=ofAokO2OZsXlhzGoZ3a202kn6+z2RQt+4hVQpaOdm+1eH9TyFsuOGifa2YdXtPmM06
+         kSwBnaJgCtgliFYpsBe4/4Ks4fNcF2MPuCsAg8SLp/+JcXuRK2jvJ19uJNFmYHqJAfpD
+         +BW6DmOd88ni7op25i+Oh4dH0N1p+atl3Zoyi9Ms8ZXfan0BVpba9MUlJec6v24yMwDp
+         m/mhREXcLYZmO5Qwxz/RNEPeDciAUKpj4PgL5J37gy45Pnat7GtpZzg7GlC6GkbXZ4LC
+         pMxCpBKdY+qv6SKX64hoWWYwDp7RSfWlnkmKqqC0uncJeU8ZUmWYGt/SWUhqQizU0vp+
+         0nmA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Mh3wEsS3oUGUjXPVcgwj7eWBIpN7QtfE09QQA3WRYfc=;
-        b=MljitgSL3QMrqUuGWYKawRqLHiZpBGzZxQ/Xr5f0xo64FzmkVuQPqZC/nyOxeWeJ0n
-         QD7tiHCz72c67jhtb/KZjvCPW5EydlQ8KDOcpKejgJk+nlKV1ccdiOnvVcw8oytEiQN+
-         9g0IWlXb54y9Yed8yaB+RS9ZEOHMaOH6HB6T6MLCLbFxM62nC+WOECKAvdeEj1+ZvCxQ
-         FvWIadVdRDR7MuYDQIO0otzD0MZJPkRi+NpF+hlc2VUgZRdsOe8eX/fjwWZ2/ThsXgqY
-         i6bU+iPLLZ/ciRJBoXyZNaLckfTUakoNMADTv9KSxBpVWSldqBGnSLGPoMZ7TPGZ4vvD
-         MlVg==
-X-Gm-Message-State: AOAM531+ifVYCVWSNcVCxHo2HmwqlUSZzw0LjerDyxedi9BCUpJ0ZQc3
-        DovsUl9LHQm3zQXeF6lFoRNV9jur0TLbhoLZJy324A==
-X-Google-Smtp-Source: ABdhPJw0FMI+8CYoPcZPce9O7l/OgCe23L/DDRyhVoFuX2OPf+/OvptcPO4fH9fpmNJFarCUUh0YL59Oc2KzWIekVfI=
-X-Received: by 2002:a05:6830:31a7:: with SMTP id q7mr15328381ots.39.1633455166829;
- Tue, 05 Oct 2021 10:32:46 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=QQVAxhOUBeupXyB4EccZXaFK5tXREsXGl1r0zXiqsCM=;
+        b=5OojK2xWX8OV7vzQusfj6cMRMgl6fzTWOKDBAaCY7drxxvSmoe5FT5ScapzM2BS1ql
+         g+s2rZBaFVgUxHKcDIf7DKFOhFIAB+HeLPn/RtxbSKL2Of7nsUtTQiSDb/51mosSLzk2
+         c1jxy6q1xFDQ6OaNPgIBUiDMgukvqxzz4WpIcP6t4QqKwQHH46jDpDi0HjnqlDdCVSjp
+         mEjjX6UTavkTEnwPfE6Y0PofLovJE9gCVZF59EmuzDSdkNIJ1Dt0JlKDqIrZ1S6oEEl8
+         2emgBwj0TbUZI/+DS39so83bpzWuucDjFFroIedOZAjLz6wofc4dfyEVJTnnWjzkG43d
+         kdLA==
+X-Gm-Message-State: AOAM531wIThz7l7hj8VYE+pMElNL7iBCjZdPYOR2CvHyfGtMDa4HVS/C
+        EUohbKIHqYbQZzG1sTOhs/hBIA==
+X-Google-Smtp-Source: ABdhPJzTYVGXDbvz383qSuFMoIlsiaI4Wf5MgnbJFt4d1EgGHIJa8eFD34m2K3sarZE5PY+A5lKpyQ==
+X-Received: by 2002:a17:90a:bb13:: with SMTP id u19mr5429052pjr.42.1633456546715;
+        Tue, 05 Oct 2021 10:55:46 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id s14sm3660433pfg.50.2021.10.05.10.55.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Oct 2021 10:55:46 -0700 (PDT)
+Date:   Tue, 5 Oct 2021 17:55:41 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Colin King <colin.king@canonical.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        David Stevens <stevensd@chromium.org>, kvm@vger.kernel.org,
+        kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH][next] KVM: x86: Fix allocation sizeof argument
+Message-ID: <YVyRnV9cMLzazBx6@google.com>
+References: <20211001110106.15056-1-colin.king@canonical.com>
+ <YVxyNgyyxA7EnvJb@google.com>
+ <ebd506ba-05cc-99d7-ece5-34bd67fc2430@redhat.com>
 MIME-Version: 1.0
-References: <1629192673-9911-1-git-send-email-robert.hu@linux.intel.com>
- <1629192673-9911-4-git-send-email-robert.hu@linux.intel.com>
- <YRvbvqhz6sknDEWe@google.com> <b2bf00a6a8f3f88555bebf65b35579968ea45e2a.camel@linux.intel.com>
- <YR2Tf9WPNEzrE7Xg@google.com> <3ac79d874fb32c6472151cf879edfb2f1b646abf.camel@linux.intel.com>
- <YS/lxNEKXLazkhc4@google.com> <0b94844844521fc0446e3df0aa02d4df183f8107.camel@linux.intel.com>
- <YTI7K9RozNIWXTyg@google.com> <64aad01b6bffd70fa3170cf262fe5d7c66f6b2d4.camel@linux.intel.com>
- <YVx6Oesi7X3jfnaM@google.com>
-In-Reply-To: <YVx6Oesi7X3jfnaM@google.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Tue, 5 Oct 2021 10:32:35 -0700
-Message-ID: <CALMp9eRyhAygfh1piNEDE+WGVzK1cTWJJR1aC_zqn=c2fy+c-A@mail.gmail.com>
-Subject: Re: [PATCH v1 3/5] KVM: x86: nVMX: VMCS12 field's read/write respects
- field existence bitmap
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Robert Hoo <robert.hu@linux.intel.com>, pbonzini@redhat.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, joro@8bytes.org,
-        kvm@vger.kernel.org, yu.c.zhang@linux.intel.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ebd506ba-05cc-99d7-ece5-34bd67fc2430@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 5, 2021 at 9:16 AM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Tue, Sep 28, 2021, Robert Hoo wrote:
-> > On Fri, 2021-09-03 at 15:11 +0000, Sean Christopherson wrote:
-> >       You also said, "This is quite the complicated mess for
-> > something I'm guessing no one actually cares about.  At what point do
-> > we chalk this up as a virtualization hole and sweep it under the rug?"
-> > -- I couldn't agree more.
->
-> ...
->
-> > So, Sean, can you help converge our discussion and settle next step?
->
-> Any objection to simply keeping KVM's current behavior, i.e. sweeping this under
-> the proverbial rug?
+On Tue, Oct 05, 2021, Paolo Bonzini wrote:
+> On 05/10/21 17:41, Sean Christopherson wrote:
+> > >   			if (*gfn_track == NULL) {
+> > >   				mutex_unlock(&kvm->slots_arch_lock);
+> > Hrm, this fails to free the gfn_track allocations for previous memslots.  The
+> > on-demand rmaps code has the exact same bug (it frees rmaps for previous lpages
+> > in the_current_  slot, but does not free previous slots).
+> 
+> That's not a huge deal because the syscall is failing.  So as long as it's
+> not leaked forever, it's okay.  The problem is the
+> WARN_ON(slot->arch.rmap[i]), or the missing check in
+> kvm_page_track_enable_mmu_write_tracking, but that's easily fixed.  I'd even
+> remove the call to memslot_rmaps_free.
 
-Adding 8 KiB per vCPU seems like no big deal to me, but, on the other
-hand, Paolo recently argued that slightly less than 1 KiB per vCPU was
-unreasonable for VM-exit statistics, so maybe I've got a warped
-perspective. I'm all for pedantic adherence to the specification, but
-I have to admit that no actual hypervisor is likely to care (or ever
-will).
+It can be leaked forever though, e.g. if userspace invokes KVM_RUN over and over
+on -ENOMEM.  That would trigger the WARN_ON(slot->arch.rmap[i]) and leak the
+previous allocation.  I think it would be safe to change that WARN_ON to a
+check-and-continue, i.e. to preserve the previous allocation
+
+> > And having two separate flows (and flags) for rmaps vs. gfn_track is pointless,
+> > and means we have to maintain two near-identical copies of non-obvious code.
+> 
+> I was thinking the separate flow (not so much the flag) is needed because,
+> if KVMGT is enabled, gfn_track is allocated unconditionally. rmaps are added
+> on top of that if shadow paging is enabled; but
+> kvm_page_track_create_memslot will have already created the counter,
+> including the one for KVM_PAGE_TRACK_WRITE.
+> 
+> But looking at the code again, I guess you could call
+> kvm_page_track_enable_mmu_write_tracking inside alloc_all_memslots_rmaps
+> (with a little bit of renaming), and with that the flag would go away.
+
+Yes, and reuse the control flow, which is what I really care about since that's
+the part that both features get wrong.
+ 
+> I'll take a look tomorrow, but I'd rather avoid reverting the patch.
+
+I can poke at it too if you don't have time.  I wasn't suggesting a full revert,
+rather a "drop and pretend it never got applied", with a plan to apply a new
+version instead of fixing up the current code.
