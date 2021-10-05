@@ -2,213 +2,298 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7370C422B89
-	for <lists+kvm@lfdr.de>; Tue,  5 Oct 2021 16:54:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E57CA422B99
+	for <lists+kvm@lfdr.de>; Tue,  5 Oct 2021 16:58:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233821AbhJEO4I (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Oct 2021 10:56:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51264 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229626AbhJEO4H (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 Oct 2021 10:56:07 -0400
-Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D51AFC061749
-        for <kvm@vger.kernel.org>; Tue,  5 Oct 2021 07:54:16 -0700 (PDT)
-Received: by mail-lf1-x130.google.com with SMTP id y23so48031831lfb.0
-        for <kvm@vger.kernel.org>; Tue, 05 Oct 2021 07:54:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=oeEs3eMOlEupf6UUcoQibPqVHwuKrUKDBy8LbYPEqoA=;
-        b=aAdD3HDLKufLpxvfw0oGt+CD/52iSjYVFKTbMfXrcgeIWKy/ANG/EOvtDTstbiZjUD
-         vHOWVCtkQiIVyOCjDOLKNQ9WRTDkTnW7pDJ8UuAmqg1CHUT16Xsmu0KoHfWZFvM+iuzN
-         t8K7TSc5VrhuLZ76BwUsl54GmSEKEY3JVH/dze9QJSUviRrlxt4XKyzW4xsXjhqlT0Rf
-         goG9zd8VWIGLcYdzg9gN7j2qPqssd5HfnKCj5jgv3HBDeA/+PE928o1AOtWyRAnCwxDZ
-         nK/seETkoeRizucnfoDV+m96VScxwz1vVpiW3ajBDelpeQrufEGwu0B8DV5DL4ToNRzx
-         yBeg==
+        id S233705AbhJEO75 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Oct 2021 10:59:57 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:21916 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231226AbhJEO74 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 5 Oct 2021 10:59:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1633445885;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=rEZND+uRQZ2jXkjYnNViAUBIpQ2vwZb0Yzke1gX91No=;
+        b=Qua6q2AeHZKqGBlNmdk9JhS2ba3TMGDxgj1DZJmuyZBbnTwrzhUuc3+sYrmszuXpMe9gHz
+        f5Vtc9U+NbTy37ZLyxVZK3tbaL8a3c5NO+DQgw9h8SwpshLR5gZETVRZ+ts+N++YY3X6p8
+        MnuXYj74ETqRq1/c8GMHca4Ww1y99Ao=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-506-MY7G4zQiNu-RJ5qwO8cOwQ-1; Tue, 05 Oct 2021 10:58:04 -0400
+X-MC-Unique: MY7G4zQiNu-RJ5qwO8cOwQ-1
+Received: by mail-ed1-f71.google.com with SMTP id u17-20020a50d511000000b003daa3828c13so20868682edi.12
+        for <kvm@vger.kernel.org>; Tue, 05 Oct 2021 07:58:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=oeEs3eMOlEupf6UUcoQibPqVHwuKrUKDBy8LbYPEqoA=;
-        b=ypztME/ktT+ugTT1KFFKxWLml86FqRP6FJog8FIP9Wv1wEiFnzk+D3MqgQ0cKQSBnA
-         utPql2+UR+pb2faNAmoRG84LtAGs1mvRlC3jk9zsNPJZ+pF925AH5ecTFK2ql/QmI5Db
-         4jrlhNDsPxGGl+40pk6Z5/jeY71ggdpg2rIKDVlZKCo7xAMHV+LOT62Cmuhay+QFideX
-         y17VIQB+ysCZ7IL61wdfghe2HbmUNgdqJLijKHtR8Rcm6aqRSCIPTbEBsV7vWpev3+Cl
-         +XyDYOUJ+cmwAUM+Tw80V7Ze3j9qdScvy4JfrJGyCjuHS2RDsAPj4c3hd0nJcaxI0Jil
-         fttg==
-X-Gm-Message-State: AOAM531OHwXGsOP5UIjAufN+28iA7x7q0pURqLDCmA40UQ4yI5BX8Xnr
-        fuCPhKqtT1szMqt+fVxgmWhXUZrui7h/Z13KD4/zbw==
-X-Google-Smtp-Source: ABdhPJyMTR6su6M9JlR0TJe8fr8yMC+jDLWW2Ybj4JUSc+O7b6KU84U7G8Up+QrZwUDi/aCBdOK6JBGjZtL/iGUTRlg=
-X-Received: by 2002:ac2:4217:: with SMTP id y23mr3879463lfh.361.1633445653503;
- Tue, 05 Oct 2021 07:54:13 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=rEZND+uRQZ2jXkjYnNViAUBIpQ2vwZb0Yzke1gX91No=;
+        b=L7Zr0AM0sGMccB7vnVhgXioRismHXIj31RaxBtdnQOAIK/xmHIPUbEIMEThY+sL1tt
+         15+bDeb4yvVf7S9z0y7CE/nPrIEZsULJlQloCX5PzUlbperbRt9LrNNM7HafI7j+I4r7
+         EzvwJetxidMypbixZn8gAV6HjfKYmEs9NfjWPR7pqXi+19n7U+7fCGRM9FM3S6Hb7Dvn
+         rNBzEQ+YWZ2cWREO4ZViaw6ydSaMLC2gqQDdLsyus8ju/B2tX4iG78u5U6SjKNyqboC7
+         NlO1Sg/+dtuXVjn3ZyYH02ZEUTpJ7PR7Tjhwtk0I2eH5ABgLLgsqzaqjyOc7vBmOnLOl
+         r8+g==
+X-Gm-Message-State: AOAM533SJab2cnnozSCiYigRRkeAsgrvF8gw0AGLT+/ywBrZJiQmci1v
+        ohCwFJ9wRmaCYg4ECLIE8kOnzl6lTsvFBfrI20HLalvkUe6e/6M7dfT4MYiPiwRT+JTqNOJEADP
+        w03uNK8bGKH9E
+X-Received: by 2002:a17:906:1ec9:: with SMTP id m9mr26468870ejj.115.1633445882851;
+        Tue, 05 Oct 2021 07:58:02 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw2T3tBg98Roz+xgsbi5xVB5eSSYIFuiFIiONsYzlt7erGJu72m+ky0H9IKIL97a2uxUqtXqA==
+X-Received: by 2002:a17:906:1ec9:: with SMTP id m9mr26468850ejj.115.1633445882649;
+        Tue, 05 Oct 2021 07:58:02 -0700 (PDT)
+Received: from redhat.com ([2.55.147.134])
+        by smtp.gmail.com with ESMTPSA id m9sm8256357edl.66.2021.10.05.07.57.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Oct 2021 07:58:02 -0700 (PDT)
+Date:   Tue, 5 Oct 2021 10:57:57 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc:     qemu-devel@nongnu.org, haxm-team@intel.com,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Reinoud Zandijk <reinoud@netbsd.org>, qemu-trivial@nongnu.org,
+        Sunil Muthuswamy <sunilmut@microsoft.com>,
+        Colin Xu <colin.xu@intel.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Kamil Rytarowski <kamil@netbsd.org>,
+        Wenchao Wang <wenchao.wang@intel.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Roman Bolshakov <r.bolshakov@yadro.com>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Cameron Esfahani <dirty@apple.com>
+Subject: Re: [PATCH v3] target/i386: Include 'hw/i386/apic.h' locally
+Message-ID: <20211005105745-mutt-send-email-mst@kernel.org>
+References: <20210929163124.2523413-1-f4bug@amsat.org>
 MIME-Version: 1.0
-References: <20210923191610.3814698-1-oupton@google.com> <20210923191610.3814698-11-oupton@google.com>
- <20211005134539.s7kzhqlg2pykfcam@gator.home>
-In-Reply-To: <20211005134539.s7kzhqlg2pykfcam@gator.home>
-From:   Oliver Upton <oupton@google.com>
-Date:   Tue, 5 Oct 2021 07:54:01 -0700
-Message-ID: <CAOQ_QsjQ28b8OXLR1o8QD=M8dsBKtPLyB-QRyd=D1UVMGy6o0w@mail.gmail.com>
-Subject: Re: [PATCH v2 10/11] selftests: KVM: Refactor psci_test to make it
- amenable to new tests
-To:     Andrew Jones <drjones@redhat.com>
-Cc:     kvmarm@lists.cs.columbia.edu, Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <Alexandru.Elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>,
-        kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210929163124.2523413-1-f4bug@amsat.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Drew,
+On Wed, Sep 29, 2021 at 06:31:24PM +0200, Philippe Mathieu-Daudé wrote:
+> Instead of including a sysemu-specific header in "cpu.h"
+> (which is shared with user-mode emulations), include it
+> locally when required.
+> 
+> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-On Tue, Oct 5, 2021 at 6:45 AM Andrew Jones <drjones@redhat.com> wrote:
->
-> On Thu, Sep 23, 2021 at 07:16:09PM +0000, Oliver Upton wrote:
-> > Split up the current test into several helpers that will be useful to
-> > subsequent test cases added to the PSCI test suite.
-> >
-> > Signed-off-by: Oliver Upton <oupton@google.com>
-> > ---
-> >  .../testing/selftests/kvm/aarch64/psci_test.c | 68 ++++++++++++-------
-> >  1 file changed, 45 insertions(+), 23 deletions(-)
-> >
-> > diff --git a/tools/testing/selftests/kvm/aarch64/psci_test.c b/tools/testing/selftests/kvm/aarch64/psci_test.c
-> > index 8d043e12b137..90312be335da 100644
-> > --- a/tools/testing/selftests/kvm/aarch64/psci_test.c
-> > +++ b/tools/testing/selftests/kvm/aarch64/psci_test.c
-> > @@ -45,7 +45,7 @@ static uint64_t psci_affinity_info(uint64_t target_affinity,
-> >       return res.a0;
-> >  }
-> >
-> > -static void guest_main(uint64_t target_cpu)
-> > +static void guest_test_cpu_on(uint64_t target_cpu)
-> >  {
-> >       GUEST_ASSERT(!psci_cpu_on(target_cpu, CPU_ON_ENTRY_ADDR, CPU_ON_CONTEXT_ID));
-> >       uint64_t target_state;
-> > @@ -69,12 +69,10 @@ static void vcpu_power_off(struct kvm_vm *vm, uint32_t vcpuid)
-> >       vcpu_set_mp_state(vm, vcpuid, &mp_state);
-> >  }
-> >
-> > -int main(void)
-> > +static struct kvm_vm *setup_vm(void *guest_code)
-> >  {
-> > -     uint64_t target_mpidr, obs_pc, obs_x0;
-> >       struct kvm_vcpu_init init;
-> >       struct kvm_vm *vm;
-> > -     struct ucall uc;
-> >
-> >       vm = vm_create(VM_MODE_DEFAULT, DEFAULT_GUEST_PHY_PAGES, O_RDWR);
-> >       kvm_vm_elf_load(vm, program_invocation_name);
-> > @@ -83,31 +81,28 @@ int main(void)
-> >       vm_ioctl(vm, KVM_ARM_PREFERRED_TARGET, &init);
-> >       init.features[0] |= (1 << KVM_ARM_VCPU_PSCI_0_2);
-> >
-> > -     aarch64_vcpu_add_default(vm, VCPU_ID_SOURCE, &init, guest_main);
-> > -     aarch64_vcpu_add_default(vm, VCPU_ID_TARGET, &init, guest_main);
-> > +     aarch64_vcpu_add_default(vm, VCPU_ID_SOURCE, &init, guest_code);
-> > +     aarch64_vcpu_add_default(vm, VCPU_ID_TARGET, &init, guest_code);
-> >
-> > -     /*
-> > -      * make sure the target is already off when executing the test.
-> > -      */
-> > -     vcpu_power_off(vm, VCPU_ID_TARGET);
-> > +     return vm;
-> > +}
-> >
-> > -     get_reg(vm, VCPU_ID_TARGET, ARM64_SYS_REG(MPIDR_EL1), &target_mpidr);
-> > -     vcpu_args_set(vm, VCPU_ID_SOURCE, 1, target_mpidr & MPIDR_HWID_BITMASK);
-> > -     vcpu_run(vm, VCPU_ID_SOURCE);
-> > +static void enter_guest(struct kvm_vm *vm, uint32_t vcpuid)
-> > +{
-> > +     struct ucall uc;
-> >
-> > -     switch (get_ucall(vm, VCPU_ID_SOURCE, &uc)) {
-> > -     case UCALL_DONE:
-> > -             break;
-> > -     case UCALL_ABORT:
-> > +     vcpu_run(vm, vcpuid);
-> > +     if (get_ucall(vm, vcpuid, &uc) == UCALL_ABORT)
-> >               TEST_FAIL("%s at %s:%ld", (const char *)uc.args[0], __FILE__,
-> >                         uc.args[1]);
-> > -             break;
-> > -     default:
-> > -             TEST_FAIL("Unhandled ucall: %lu", uc.cmd);
-> > -     }
-> > +}
-> >
-> > -     get_reg(vm, VCPU_ID_TARGET, ARM64_CORE_REG(regs.pc), &obs_pc);
-> > -     get_reg(vm, VCPU_ID_TARGET, ARM64_CORE_REG(regs.regs[0]), &obs_x0);
-> > +static void assert_vcpu_reset(struct kvm_vm *vm, uint32_t vcpuid)
-> > +{
-> > +     uint64_t obs_pc, obs_x0;
-> > +
-> > +     get_reg(vm, vcpuid, ARM64_CORE_REG(regs.pc), &obs_pc);
-> > +     get_reg(vm, vcpuid, ARM64_CORE_REG(regs.regs[0]), &obs_x0);
-> >
-> >       TEST_ASSERT(obs_pc == CPU_ON_ENTRY_ADDR,
-> >                   "unexpected target cpu pc: %lx (expected: %lx)",
-> > @@ -115,7 +110,34 @@ int main(void)
-> >       TEST_ASSERT(obs_x0 == CPU_ON_CONTEXT_ID,
-> >                   "unexpected target context id: %lx (expected: %lx)",
-> >                   obs_x0, CPU_ON_CONTEXT_ID);
-> > +}
-> >
-> > +static void host_test_cpu_on(void)
-> > +{
-> > +     uint64_t target_mpidr;
-> > +     struct kvm_vm *vm;
-> > +     struct ucall uc;
-> > +
-> > +     vm = setup_vm(guest_test_cpu_on);
-> > +
-> > +     /*
-> > +      * make sure the target is already off when executing the test.
-> > +      */
-> > +     vcpu_power_off(vm, VCPU_ID_TARGET);
-> > +
-> > +     get_reg(vm, VCPU_ID_TARGET, ARM64_SYS_REG(MPIDR_EL1), &target_mpidr);
-> > +     vcpu_args_set(vm, VCPU_ID_SOURCE, 1, target_mpidr & MPIDR_HWID_BITMASK);
-> > +     enter_guest(vm, VCPU_ID_SOURCE);
-> > +
-> > +     if (get_ucall(vm, VCPU_ID_SOURCE, &uc) != UCALL_DONE)
-> > +             TEST_FAIL("Unhandled ucall: %lu", uc.cmd);
-> > +
-> > +     assert_vcpu_reset(vm, VCPU_ID_TARGET);
-> >       kvm_vm_free(vm);
-> > +}
-> > +
-> > +int main(void)
-> > +{
-> > +     host_test_cpu_on();
-> >       return 0;
-> >  }
-> > --
-> > 2.33.0.685.g46640cef36-goog
-> >
->
-> Hard to read diff, but I think the refactoring comes out right.
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
 
-Yeah, this one's nasty, sorry about that. Thanks for parsing it out, heh.
+which tree? trivial I guess?
 
-> Please do this refactoring before adding the new test in the next revision, though.
->
+> ---
+>  target/i386/cpu.h                    | 4 ----
+>  hw/i386/kvmvapic.c                   | 1 +
+>  hw/i386/x86.c                        | 1 +
+>  target/i386/cpu-dump.c               | 1 +
+>  target/i386/cpu-sysemu.c             | 1 +
+>  target/i386/cpu.c                    | 1 +
+>  target/i386/gdbstub.c                | 4 ++++
+>  target/i386/hax/hax-all.c            | 1 +
+>  target/i386/helper.c                 | 1 +
+>  target/i386/hvf/hvf.c                | 1 +
+>  target/i386/hvf/x86_emu.c            | 1 +
+>  target/i386/nvmm/nvmm-all.c          | 1 +
+>  target/i386/tcg/sysemu/misc_helper.c | 1 +
+>  target/i386/tcg/sysemu/seg_helper.c  | 1 +
+>  target/i386/whpx/whpx-all.c          | 1 +
+>  15 files changed, 17 insertions(+), 4 deletions(-)
+> 
+> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+> index c2954c71ea0..4411718bb7a 100644
+> --- a/target/i386/cpu.h
+> +++ b/target/i386/cpu.h
+> @@ -2045,10 +2045,6 @@ typedef X86CPU ArchCPU;
+>  #include "exec/cpu-all.h"
+>  #include "svm.h"
+>  
+> -#if !defined(CONFIG_USER_ONLY)
+> -#include "hw/i386/apic.h"
+> -#endif
+> -
+>  static inline void cpu_get_tb_cpu_state(CPUX86State *env, target_ulong *pc,
+>                                          target_ulong *cs_base, uint32_t *flags)
+>  {
+> diff --git a/hw/i386/kvmvapic.c b/hw/i386/kvmvapic.c
+> index 43f8a8f679e..7333818bdd1 100644
+> --- a/hw/i386/kvmvapic.c
+> +++ b/hw/i386/kvmvapic.c
+> @@ -16,6 +16,7 @@
+>  #include "sysemu/hw_accel.h"
+>  #include "sysemu/kvm.h"
+>  #include "sysemu/runstate.h"
+> +#include "hw/i386/apic.h"
+>  #include "hw/i386/apic_internal.h"
+>  #include "hw/sysbus.h"
+>  #include "hw/boards.h"
+> diff --git a/hw/i386/x86.c b/hw/i386/x86.c
+> index 00448ed55aa..e0218f8791f 100644
+> --- a/hw/i386/x86.c
+> +++ b/hw/i386/x86.c
+> @@ -43,6 +43,7 @@
+>  #include "target/i386/cpu.h"
+>  #include "hw/i386/topology.h"
+>  #include "hw/i386/fw_cfg.h"
+> +#include "hw/i386/apic.h"
+>  #include "hw/intc/i8259.h"
+>  #include "hw/rtc/mc146818rtc.h"
+>  
+> diff --git a/target/i386/cpu-dump.c b/target/i386/cpu-dump.c
+> index 02b635a52cf..0158fd2bf28 100644
+> --- a/target/i386/cpu-dump.c
+> +++ b/target/i386/cpu-dump.c
+> @@ -22,6 +22,7 @@
+>  #include "qemu/qemu-print.h"
+>  #ifndef CONFIG_USER_ONLY
+>  #include "hw/i386/apic_internal.h"
+> +#include "hw/i386/apic.h"
+>  #endif
+>  
+>  /***********************************************************/
+> diff --git a/target/i386/cpu-sysemu.c b/target/i386/cpu-sysemu.c
+> index 37b7c562f53..4e8a6973d08 100644
+> --- a/target/i386/cpu-sysemu.c
+> +++ b/target/i386/cpu-sysemu.c
+> @@ -30,6 +30,7 @@
+>  #include "hw/qdev-properties.h"
+>  
+>  #include "exec/address-spaces.h"
+> +#include "hw/i386/apic.h"
+>  #include "hw/i386/apic_internal.h"
+>  
+>  #include "cpu-internal.h"
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 6b029f1bdf1..52422cbf21b 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -33,6 +33,7 @@
+>  #include "standard-headers/asm-x86/kvm_para.h"
+>  #include "hw/qdev-properties.h"
+>  #include "hw/i386/topology.h"
+> +#include "hw/i386/apic.h"
+>  #ifndef CONFIG_USER_ONLY
+>  #include "exec/address-spaces.h"
+>  #include "hw/boards.h"
+> diff --git a/target/i386/gdbstub.c b/target/i386/gdbstub.c
+> index 098a2ad15a9..5438229c1a9 100644
+> --- a/target/i386/gdbstub.c
+> +++ b/target/i386/gdbstub.c
+> @@ -21,6 +21,10 @@
+>  #include "cpu.h"
+>  #include "exec/gdbstub.h"
+>  
+> +#ifndef CONFIG_USER_ONLY
+> +#include "hw/i386/apic.h"
+> +#endif
+> +
+>  #ifdef TARGET_X86_64
+>  static const int gpr_map[16] = {
+>      R_EAX, R_EBX, R_ECX, R_EDX, R_ESI, R_EDI, R_EBP, R_ESP,
+> diff --git a/target/i386/hax/hax-all.c b/target/i386/hax/hax-all.c
+> index bf65ed6fa92..cd89e3233a9 100644
+> --- a/target/i386/hax/hax-all.c
+> +++ b/target/i386/hax/hax-all.c
+> @@ -32,6 +32,7 @@
+>  #include "sysemu/reset.h"
+>  #include "sysemu/runstate.h"
+>  #include "hw/boards.h"
+> +#include "hw/i386/apic.h"
+>  
+>  #include "hax-accel-ops.h"
+>  
+> diff --git a/target/i386/helper.c b/target/i386/helper.c
+> index 533b29cb91b..874beda98ae 100644
+> --- a/target/i386/helper.c
+> +++ b/target/i386/helper.c
+> @@ -26,6 +26,7 @@
+>  #ifndef CONFIG_USER_ONLY
+>  #include "sysemu/hw_accel.h"
+>  #include "monitor/monitor.h"
+> +#include "hw/i386/apic.h"
+>  #endif
+>  
+>  void cpu_sync_bndcs_hflags(CPUX86State *env)
+> diff --git a/target/i386/hvf/hvf.c b/target/i386/hvf/hvf.c
+> index 4ba6e82fab3..50058a24f2a 100644
+> --- a/target/i386/hvf/hvf.c
+> +++ b/target/i386/hvf/hvf.c
+> @@ -70,6 +70,7 @@
+>  #include <sys/sysctl.h>
+>  
+>  #include "hw/i386/apic_internal.h"
+> +#include "hw/i386/apic.h"
+>  #include "qemu/main-loop.h"
+>  #include "qemu/accel.h"
+>  #include "target/i386/cpu.h"
+> diff --git a/target/i386/hvf/x86_emu.c b/target/i386/hvf/x86_emu.c
+> index 7c8203b21fb..fb3e88959d4 100644
+> --- a/target/i386/hvf/x86_emu.c
+> +++ b/target/i386/hvf/x86_emu.c
+> @@ -45,6 +45,7 @@
+>  #include "x86_flags.h"
+>  #include "vmcs.h"
+>  #include "vmx.h"
+> +#include "hw/i386/apic.h"
+>  
+>  void hvf_handle_io(struct CPUState *cpu, uint16_t port, void *data,
+>                     int direction, int size, uint32_t count);
+> diff --git a/target/i386/nvmm/nvmm-all.c b/target/i386/nvmm/nvmm-all.c
+> index a488b00e909..944bdb49663 100644
+> --- a/target/i386/nvmm/nvmm-all.c
+> +++ b/target/i386/nvmm/nvmm-all.c
+> @@ -22,6 +22,7 @@
+>  #include "qemu/queue.h"
+>  #include "migration/blocker.h"
+>  #include "strings.h"
+> +#include "hw/i386/apic.h"
+>  
+>  #include "nvmm-accel-ops.h"
+>  
+> diff --git a/target/i386/tcg/sysemu/misc_helper.c b/target/i386/tcg/sysemu/misc_helper.c
+> index 9ccaa054c4c..b1d3096e9c9 100644
+> --- a/target/i386/tcg/sysemu/misc_helper.c
+> +++ b/target/i386/tcg/sysemu/misc_helper.c
+> @@ -24,6 +24,7 @@
+>  #include "exec/cpu_ldst.h"
+>  #include "exec/address-spaces.h"
+>  #include "tcg/helper-tcg.h"
+> +#include "hw/i386/apic.h"
+>  
+>  void helper_outb(CPUX86State *env, uint32_t port, uint32_t data)
+>  {
+> diff --git a/target/i386/tcg/sysemu/seg_helper.c b/target/i386/tcg/sysemu/seg_helper.c
+> index bf3444c26b0..34f2c65d47f 100644
+> --- a/target/i386/tcg/sysemu/seg_helper.c
+> +++ b/target/i386/tcg/sysemu/seg_helper.c
+> @@ -24,6 +24,7 @@
+>  #include "exec/cpu_ldst.h"
+>  #include "tcg/helper-tcg.h"
+>  #include "../seg_helper.h"
+> +#include "hw/i386/apic.h"
+>  
+>  #ifdef TARGET_X86_64
+>  void helper_syscall(CPUX86State *env, int next_eip_addend)
+> diff --git a/target/i386/whpx/whpx-all.c b/target/i386/whpx/whpx-all.c
+> index 3e925b9da70..9ab844fd05d 100644
+> --- a/target/i386/whpx/whpx-all.c
+> +++ b/target/i386/whpx/whpx-all.c
+> @@ -20,6 +20,7 @@
+>  #include "qemu/main-loop.h"
+>  #include "hw/boards.h"
+>  #include "hw/i386/ioapic.h"
+> +#include "hw/i386/apic.h"
+>  #include "hw/i386/apic_internal.h"
+>  #include "qemu/error-report.h"
+>  #include "qapi/error.h"
+> -- 
+> 2.31.1
 
-This is 10/11 in the series, and the test is 11/11. I'm not seeing any
-context belonging to the last patch, but perhaps I'm missing something
-obvious.
-
-> Reviewed-by: Andrew Jones <drjones@redhat.com>
-
-Thanks!
-
---
-Best,
-Oliver
