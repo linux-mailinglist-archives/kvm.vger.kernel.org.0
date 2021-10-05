@@ -2,125 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2EFBB42280B
-	for <lists+kvm@lfdr.de>; Tue,  5 Oct 2021 15:36:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4DFD7422815
+	for <lists+kvm@lfdr.de>; Tue,  5 Oct 2021 15:38:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234170AbhJENiY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Oct 2021 09:38:24 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32471 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234551AbhJENiY (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 5 Oct 2021 09:38:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1633440993;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=spGyJ7Cf8vpJUL593O/kfEmvQHi4gSPemua27E8EnhM=;
-        b=jIlr5zym47dNFdKccke7al8tgSLQJaYdHHZsbj5EIZRicCcJifnA+x3sT4kBYleYFEmSDR
-        lRLMGF4j2K2oZML4UIjsxbkyfYqXdYUANvoDPh/WIFia4WrkbNtNFxrQ9hrJ7aEnt4vvCe
-        xqUUsbiXyemWjoc7MG3o7b1WlvLXJaA=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-221-eD4Icf6LN2qQ8LJVU8ERQw-1; Tue, 05 Oct 2021 09:36:32 -0400
-X-MC-Unique: eD4Icf6LN2qQ8LJVU8ERQw-1
-Received: by mail-ed1-f70.google.com with SMTP id 2-20020a508e02000000b003d871759f5dso20645575edw.10
-        for <kvm@vger.kernel.org>; Tue, 05 Oct 2021 06:36:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=spGyJ7Cf8vpJUL593O/kfEmvQHi4gSPemua27E8EnhM=;
-        b=IxmwziIyd8ic9XN32PNEmz0LgHnGNttffmBkrtAUdZcOHk/8eb7w4jC5kCCuavcWXP
-         KfSLvXyEu30HR0A0buzmtS6mIjLv0a/mWZhUTi6nlOfklFvl2EvVk9ybr4ehtM/CMCGy
-         W+AmGUEN5q/QBYeBQ5kEocacswVNsRHtOF/uK/rGJz8WoHdD2u8282HXSlZ17Y++/CYq
-         Z8ijbSEvS3xQj7dPgCLZB2DB3DvVBPbO2RRrTxINM4YHNqVeHd2Z/xSX0HnccjA99z+v
-         oPZZO3ZlXXQFjq4Y5k4spSNr8UOLd6A9f5fIzK9Ra9gdBadnJzjBsdUgfsnbZ96l4HO7
-         uiLg==
-X-Gm-Message-State: AOAM530idL+toa5oJKDxw+ofYvnmbGQWSzVzSh22dFvFRP3Hj9Bm1xPs
-        q+0Is+aDRBB/e7hetZKuUZ2pPeFfO3FXH6PXd6Tmw11CJNF9JkLVakMOVL3VIA135ry7+Y0rmlg
-        u+k+QLLpjKJS/
-X-Received: by 2002:a50:e188:: with SMTP id k8mr27017969edl.119.1633440990815;
-        Tue, 05 Oct 2021 06:36:30 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwJVRETLF6a+xnd6Ktl0miKR+7KUXqOoxbXOa/2YXRrb3ceS8NbWdz2P9tIxcjJczoiyT/ukQ==
-X-Received: by 2002:a50:e188:: with SMTP id k8mr27017950edl.119.1633440990695;
-        Tue, 05 Oct 2021 06:36:30 -0700 (PDT)
-Received: from gator.home (cst2-174-28.cust.vodafone.cz. [31.30.174.28])
-        by smtp.gmail.com with ESMTPSA id u16sm2811733edy.55.2021.10.05.06.36.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Oct 2021 06:36:30 -0700 (PDT)
-Date:   Tue, 5 Oct 2021 15:36:28 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Oliver Upton <oupton@google.com>
-Cc:     kvmarm@lists.cs.columbia.edu, Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH v2 07/11] selftests: KVM: Rename psci_cpu_on_test to
- psci_test
-Message-ID: <20211005133628.xzyftohm2xekaukq@gator.home>
-References: <20210923191610.3814698-1-oupton@google.com>
- <20210923191610.3814698-8-oupton@google.com>
+        id S234694AbhJENkI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Oct 2021 09:40:08 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58408 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233975AbhJENkH (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 5 Oct 2021 09:40:07 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 195DaPFw016050;
+        Tue, 5 Oct 2021 09:38:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=xDAZK6EDYXlGHLA5HvmL/HdVAlGDOo2EAebFz7+iOXY=;
+ b=j0PPVSs1r12CxOzNzcEzH6w50YYR0H+9bmvSBZJ/M12voQAW8IB+UmgAl2CMWJHk8FA/
+ 9NArxzKlSGV2gF6g4urjPeXGintEFCMYi1xszAwOsSm5T0TCuNTanKuqxeIp/ezQIBUu
+ 6EAsgRT6nRgctfgjNxnuXEBxIM0Ifa1wsl3HBEf0BWtpTknMBBP6NRiztOadn4Cm6G6p
+ 4xiNcVZRe4RHo0OU2FZe+kkIVTV1tEgBjn40gOiIJ5/o1i2og47uG3lU7CXLVlmLmd0i
+ BzgUXPufX2iiEI8efH0/BKh7Uridkzky0oOisCXSNKLW/bg/iV6XMFY3lVMhV+yryvWN EQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3bgpbpj72d-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 05 Oct 2021 09:38:16 -0400
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 195DbefV023809;
+        Tue, 5 Oct 2021 09:38:16 -0400
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3bgpbpj718-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 05 Oct 2021 09:38:16 -0400
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 195DWcSZ001969;
+        Tue, 5 Oct 2021 13:38:13 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma04fra.de.ibm.com with ESMTP id 3bef2a0ruk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 05 Oct 2021 13:38:13 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 195Dc62E62390668
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 5 Oct 2021 13:38:06 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B0C68A4066;
+        Tue,  5 Oct 2021 13:38:06 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 03711A406D;
+        Tue,  5 Oct 2021 13:38:06 +0000 (GMT)
+Received: from li-43c5434c-23b8-11b2-a85c-c4958fb47a68.ibm.com (unknown [9.171.76.223])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue,  5 Oct 2021 13:38:05 +0000 (GMT)
+Subject: Re: [PATCH v5 02/14] KVM: s390: pv: avoid double free of sida page
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     cohuck@redhat.com, frankja@linux.ibm.com, thuth@redhat.com,
+        pasic@linux.ibm.com, david@redhat.com, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Ulrich.Weigand@de.ibm.com
+References: <20210920132502.36111-1-imbrenda@linux.ibm.com>
+ <20210920132502.36111-3-imbrenda@linux.ibm.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Message-ID: <1cd7259e-ab4c-1c3e-6846-e3c5ff26bda1@de.ibm.com>
+Date:   Tue, 5 Oct 2021 15:38:05 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210923191610.3814698-8-oupton@google.com>
+In-Reply-To: <20210920132502.36111-3-imbrenda@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 3Mh7vKeMHyGk5-h_oEDqJIa_-Ddh-rFA
+X-Proofpoint-ORIG-GUID: GjNmMB0_x8_QXhJxxZTd3YjAhQUST0cF
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.391,FMLib:17.0.607.475
+ definitions=2021-10-05_02,2021-10-04_01,2020-04-07_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0 mlxscore=0
+ malwarescore=0 impostorscore=0 spamscore=0 bulkscore=0 suspectscore=0
+ adultscore=0 mlxlogscore=749 clxscore=1015 priorityscore=1501 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2109230001
+ definitions=main-2110050080
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 23, 2021 at 07:16:06PM +0000, Oliver Upton wrote:
-> There are other interactions with PSCI worth testing; rename the PSCI
-> test to make it more generic.
+
+Am 20.09.21 um 15:24 schrieb Claudio Imbrenda:
+> If kvm_s390_pv_destroy_cpu is called more than once, we risk calling
+> free_page on a random page, since the sidad field is aliased with the
+> gbea, which is not guaranteed to be zero.
 > 
-> No functional change intended.
+> This can happen, for example, if userspace calls the KVM_PV_DISABLE
+> IOCTL, and it fails, and then userspace calls the same IOCTL again.
+> This scenario is only possible if KVM has some serious bug or if the
+> hardware is broken.
 > 
-> Signed-off-by: Oliver Upton <oupton@google.com>
+> The solution is to simply return successfully immediately if the vCPU
+> was already non secure.
+> 
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> Fixes: 19e1227768863a1469797c13ef8fea1af7beac2c ("KVM: S390: protvirt: Introduce instruction data area bounce buffer")
+
+makes sense.
+
+Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+
 > ---
->  tools/testing/selftests/kvm/.gitignore                          | 2 +-
->  tools/testing/selftests/kvm/Makefile                            | 2 +-
->  .../selftests/kvm/aarch64/{psci_cpu_on_test.c => psci_test.c}   | 0
->  3 files changed, 2 insertions(+), 2 deletions(-)
->  rename tools/testing/selftests/kvm/aarch64/{psci_cpu_on_test.c => psci_test.c} (100%)
+>   arch/s390/kvm/pv.c | 19 +++++++++----------
+>   1 file changed, 9 insertions(+), 10 deletions(-)
 > 
-> diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-> index 98053d3afbda..a11b89be744b 100644
-> --- a/tools/testing/selftests/kvm/.gitignore
-> +++ b/tools/testing/selftests/kvm/.gitignore
-> @@ -1,7 +1,7 @@
->  # SPDX-License-Identifier: GPL-2.0-only
->  /aarch64/debug-exceptions
->  /aarch64/get-reg-list
-> -/aarch64/psci_cpu_on_test
-> +/aarch64/psci_test
->  /aarch64/vgic_init
->  /s390x/memop
->  /s390x/resets
-> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> index 5d05801ab816..6907ee8f3239 100644
-> --- a/tools/testing/selftests/kvm/Makefile
-> +++ b/tools/testing/selftests/kvm/Makefile
-> @@ -86,7 +86,7 @@ TEST_GEN_PROGS_x86_64 += kvm_binary_stats_test
->  
->  TEST_GEN_PROGS_aarch64 += aarch64/debug-exceptions
->  TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list
-> -TEST_GEN_PROGS_aarch64 += aarch64/psci_cpu_on_test
-> +TEST_GEN_PROGS_aarch64 += aarch64/psci_test
->  TEST_GEN_PROGS_aarch64 += aarch64/vgic_init
->  TEST_GEN_PROGS_aarch64 += demand_paging_test
->  TEST_GEN_PROGS_aarch64 += dirty_log_test
-> diff --git a/tools/testing/selftests/kvm/aarch64/psci_cpu_on_test.c b/tools/testing/selftests/kvm/aarch64/psci_test.c
-> similarity index 100%
-> rename from tools/testing/selftests/kvm/aarch64/psci_cpu_on_test.c
-> rename to tools/testing/selftests/kvm/aarch64/psci_test.c
-> -- 
-> 2.33.0.685.g46640cef36-goog
->
-
-Reviewed-by: Andrew Jones <drjones@redhat.com>
-
+> diff --git a/arch/s390/kvm/pv.c b/arch/s390/kvm/pv.c
+> index c8841f476e91..0a854115100b 100644
+> --- a/arch/s390/kvm/pv.c
+> +++ b/arch/s390/kvm/pv.c
+> @@ -16,18 +16,17 @@
+>   
+>   int kvm_s390_pv_destroy_cpu(struct kvm_vcpu *vcpu, u16 *rc, u16 *rrc)
+>   {
+> -	int cc = 0;
+> +	int cc;
+>   
+> -	if (kvm_s390_pv_cpu_get_handle(vcpu)) {
+> -		cc = uv_cmd_nodata(kvm_s390_pv_cpu_get_handle(vcpu),
+> -				   UVC_CMD_DESTROY_SEC_CPU, rc, rrc);
+> +	if (!kvm_s390_pv_cpu_get_handle(vcpu))
+> +		return 0;
+> +
+> +	cc = uv_cmd_nodata(kvm_s390_pv_cpu_get_handle(vcpu), UVC_CMD_DESTROY_SEC_CPU, rc, rrc);
+> +
+> +	KVM_UV_EVENT(vcpu->kvm, 3, "PROTVIRT DESTROY VCPU %d: rc %x rrc %x",
+> +		     vcpu->vcpu_id, *rc, *rrc);
+> +	WARN_ONCE(cc, "protvirt destroy cpu failed rc %x rrc %x", *rc, *rrc);
+>   
+> -		KVM_UV_EVENT(vcpu->kvm, 3,
+> -			     "PROTVIRT DESTROY VCPU %d: rc %x rrc %x",
+> -			     vcpu->vcpu_id, *rc, *rrc);
+> -		WARN_ONCE(cc, "protvirt destroy cpu failed rc %x rrc %x",
+> -			  *rc, *rrc);
+> -	}
+>   	/* Intended memory leak for something that should never happen. */
+>   	if (!cc)
+>   		free_pages(vcpu->arch.pv.stor_base,
+> 
