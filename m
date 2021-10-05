@@ -2,308 +2,213 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 96B3A422B7F
-	for <lists+kvm@lfdr.de>; Tue,  5 Oct 2021 16:51:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7370C422B89
+	for <lists+kvm@lfdr.de>; Tue,  5 Oct 2021 16:54:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234944AbhJEOxA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Oct 2021 10:53:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:37236 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235075AbhJEOw7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 5 Oct 2021 10:52:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1633445467;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=LeZOuNsJ3uAWKW2DCApxQKRjJkRW8EI0ErFrrAz4siU=;
-        b=V9LhmKf+KD0O0qN4ZWaoYmKZhfLPhgrGKNyLBXg5HIoE7puRScL2dG9qQXUnsBdpY1GcQS
-        hssovL3QtzIvZrh7M33p6EtnW0z8M1Ian6NgAm573t4b3MgQAle1AswHlFrQHDjr6aYh9L
-        FDLzaTfsWX6uWikRMAtsdqTtwMXnMS0=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-409-ZGuAtvg-PZWcQ2r0Vws4YQ-1; Tue, 05 Oct 2021 10:51:06 -0400
-X-MC-Unique: ZGuAtvg-PZWcQ2r0Vws4YQ-1
-Received: by mail-wr1-f71.google.com with SMTP id r21-20020adfa155000000b001608162e16dso5248786wrr.15
-        for <kvm@vger.kernel.org>; Tue, 05 Oct 2021 07:51:06 -0700 (PDT)
+        id S233821AbhJEO4I (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Oct 2021 10:56:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51264 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229626AbhJEO4H (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Oct 2021 10:56:07 -0400
+Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D51AFC061749
+        for <kvm@vger.kernel.org>; Tue,  5 Oct 2021 07:54:16 -0700 (PDT)
+Received: by mail-lf1-x130.google.com with SMTP id y23so48031831lfb.0
+        for <kvm@vger.kernel.org>; Tue, 05 Oct 2021 07:54:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=oeEs3eMOlEupf6UUcoQibPqVHwuKrUKDBy8LbYPEqoA=;
+        b=aAdD3HDLKufLpxvfw0oGt+CD/52iSjYVFKTbMfXrcgeIWKy/ANG/EOvtDTstbiZjUD
+         vHOWVCtkQiIVyOCjDOLKNQ9WRTDkTnW7pDJ8UuAmqg1CHUT16Xsmu0KoHfWZFvM+iuzN
+         t8K7TSc5VrhuLZ76BwUsl54GmSEKEY3JVH/dze9QJSUviRrlxt4XKyzW4xsXjhqlT0Rf
+         goG9zd8VWIGLcYdzg9gN7j2qPqssd5HfnKCj5jgv3HBDeA/+PE928o1AOtWyRAnCwxDZ
+         nK/seETkoeRizucnfoDV+m96VScxwz1vVpiW3ajBDelpeQrufEGwu0B8DV5DL4ToNRzx
+         yBeg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=LeZOuNsJ3uAWKW2DCApxQKRjJkRW8EI0ErFrrAz4siU=;
-        b=DeQ9adA4DTD6LS26pFUUMX8WLur3cjHAEs/2o/pvtTTSjEclxFFepO+AaR30LRvocR
-         MZ5mA1OHQQp10CDDRB/NCejkW7lFJ53L8lfidsLZeMTi9OzrF6qiXSnFCsGPFPHKLR2P
-         BLOswW2DyVprHh1X5oN2TTef47BKRmmoONoD0zXrUWMRQvF3ZcMHTa7JAlTaO+gUvXcS
-         L6TRWLRQACeXNZlC6eZQQHNBNl/ZZoSPSe5HoaaVks8uSxuuq10Ie+3iUBtUwphIczGD
-         0ND/6M7eSC6UsfL47/PSZ3c5UJwVkKfEQV4UiAPgEKckwzfFTTq7E+EayoWHtboFskeV
-         2k7g==
-X-Gm-Message-State: AOAM5336nO8xtXL3LnCBm9culnmjbrZfL4DMczmZMw6tXabe0QMYdH33
-        hkFpEA9ianNwrGhyjKqDGjM4xueuSqxn+YAASRl+sfw0+hOgLDZWiLQf151S89wnsGcDqR4c7ta
-        q5ZkwIMb+Ojuq
-X-Received: by 2002:adf:c992:: with SMTP id f18mr694328wrh.138.1633445465313;
-        Tue, 05 Oct 2021 07:51:05 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwcZ/iAQRs08uIODgdMGgm4VcTrOEqpbIC7mrsVnM3/t3b4y3eBNB69rtsbR6diKodOC/MJtQ==
-X-Received: by 2002:adf:c992:: with SMTP id f18mr694290wrh.138.1633445465023;
-        Tue, 05 Oct 2021 07:51:05 -0700 (PDT)
-Received: from thuth.remote.csb (p549bb2bd.dip0.t-ipconnect.de. [84.155.178.189])
-        by smtp.gmail.com with ESMTPSA id z1sm14138897wrt.41.2021.10.05.07.51.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 05 Oct 2021 07:51:04 -0700 (PDT)
-To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-References: <20211005090921.1816373-1-scgl@linux.ibm.com>
- <20211005090921.1816373-2-scgl@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH v2 1/5] s390x: Add specification exception
- test
-Message-ID: <f21d1d6e-41bd-cab2-d427-f79b734c433c@redhat.com>
-Date:   Tue, 5 Oct 2021 16:51:03 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=oeEs3eMOlEupf6UUcoQibPqVHwuKrUKDBy8LbYPEqoA=;
+        b=ypztME/ktT+ugTT1KFFKxWLml86FqRP6FJog8FIP9Wv1wEiFnzk+D3MqgQ0cKQSBnA
+         utPql2+UR+pb2faNAmoRG84LtAGs1mvRlC3jk9zsNPJZ+pF925AH5ecTFK2ql/QmI5Db
+         4jrlhNDsPxGGl+40pk6Z5/jeY71ggdpg2rIKDVlZKCo7xAMHV+LOT62Cmuhay+QFideX
+         y17VIQB+ysCZ7IL61wdfghe2HbmUNgdqJLijKHtR8Rcm6aqRSCIPTbEBsV7vWpev3+Cl
+         +XyDYOUJ+cmwAUM+Tw80V7Ze3j9qdScvy4JfrJGyCjuHS2RDsAPj4c3hd0nJcaxI0Jil
+         fttg==
+X-Gm-Message-State: AOAM531OHwXGsOP5UIjAufN+28iA7x7q0pURqLDCmA40UQ4yI5BX8Xnr
+        fuCPhKqtT1szMqt+fVxgmWhXUZrui7h/Z13KD4/zbw==
+X-Google-Smtp-Source: ABdhPJyMTR6su6M9JlR0TJe8fr8yMC+jDLWW2Ybj4JUSc+O7b6KU84U7G8Up+QrZwUDi/aCBdOK6JBGjZtL/iGUTRlg=
+X-Received: by 2002:ac2:4217:: with SMTP id y23mr3879463lfh.361.1633445653503;
+ Tue, 05 Oct 2021 07:54:13 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20211005090921.1816373-2-scgl@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <20210923191610.3814698-1-oupton@google.com> <20210923191610.3814698-11-oupton@google.com>
+ <20211005134539.s7kzhqlg2pykfcam@gator.home>
+In-Reply-To: <20211005134539.s7kzhqlg2pykfcam@gator.home>
+From:   Oliver Upton <oupton@google.com>
+Date:   Tue, 5 Oct 2021 07:54:01 -0700
+Message-ID: <CAOQ_QsjQ28b8OXLR1o8QD=M8dsBKtPLyB-QRyd=D1UVMGy6o0w@mail.gmail.com>
+Subject: Re: [PATCH v2 10/11] selftests: KVM: Refactor psci_test to make it
+ amenable to new tests
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     kvmarm@lists.cs.columbia.edu, Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <Alexandru.Elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>,
+        kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05/10/2021 11.09, Janis Schoetterl-Glausch wrote:
-> Generate specification exceptions and check that they occur.
-> With the iterations argument one can check if specification
-> exception interpretation occurs, e.g. by using a high value and
-> checking that the debugfs counters are substantially lower.
-> The argument is also useful for estimating the performance benefit
-> of interpretation.
-> 
-> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-> ---
->   s390x/Makefile      |   1 +
->   s390x/spec_ex.c     | 182 ++++++++++++++++++++++++++++++++++++++++++++
->   s390x/unittests.cfg |   3 +
->   3 files changed, 186 insertions(+)
->   create mode 100644 s390x/spec_ex.c
-> 
-> diff --git a/s390x/Makefile b/s390x/Makefile
-> index ef8041a..57d7c9e 100644
-> --- a/s390x/Makefile
-> +++ b/s390x/Makefile
-> @@ -24,6 +24,7 @@ tests += $(TEST_DIR)/mvpg.elf
->   tests += $(TEST_DIR)/uv-host.elf
->   tests += $(TEST_DIR)/edat.elf
->   tests += $(TEST_DIR)/mvpg-sie.elf
-> +tests += $(TEST_DIR)/spec_ex.elf
->   
->   tests_binary = $(patsubst %.elf,%.bin,$(tests))
->   ifneq ($(HOST_KEY_DOCUMENT),)
-> diff --git a/s390x/spec_ex.c b/s390x/spec_ex.c
-> new file mode 100644
-> index 0000000..dd0ee53
-> --- /dev/null
-> +++ b/s390x/spec_ex.c
-> @@ -0,0 +1,182 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * © Copyright IBM Corp. 2021
+Hi Drew,
 
-Could we please avoid non-ASCII characters in source code if possible? ... 
-it's maybe best if you do the Copyright line similar to the other *.c files 
-from IBM that are already in the repository.
+On Tue, Oct 5, 2021 at 6:45 AM Andrew Jones <drjones@redhat.com> wrote:
+>
+> On Thu, Sep 23, 2021 at 07:16:09PM +0000, Oliver Upton wrote:
+> > Split up the current test into several helpers that will be useful to
+> > subsequent test cases added to the PSCI test suite.
+> >
+> > Signed-off-by: Oliver Upton <oupton@google.com>
+> > ---
+> >  .../testing/selftests/kvm/aarch64/psci_test.c | 68 ++++++++++++-------
+> >  1 file changed, 45 insertions(+), 23 deletions(-)
+> >
+> > diff --git a/tools/testing/selftests/kvm/aarch64/psci_test.c b/tools/testing/selftests/kvm/aarch64/psci_test.c
+> > index 8d043e12b137..90312be335da 100644
+> > --- a/tools/testing/selftests/kvm/aarch64/psci_test.c
+> > +++ b/tools/testing/selftests/kvm/aarch64/psci_test.c
+> > @@ -45,7 +45,7 @@ static uint64_t psci_affinity_info(uint64_t target_affinity,
+> >       return res.a0;
+> >  }
+> >
+> > -static void guest_main(uint64_t target_cpu)
+> > +static void guest_test_cpu_on(uint64_t target_cpu)
+> >  {
+> >       GUEST_ASSERT(!psci_cpu_on(target_cpu, CPU_ON_ENTRY_ADDR, CPU_ON_CONTEXT_ID));
+> >       uint64_t target_state;
+> > @@ -69,12 +69,10 @@ static void vcpu_power_off(struct kvm_vm *vm, uint32_t vcpuid)
+> >       vcpu_set_mp_state(vm, vcpuid, &mp_state);
+> >  }
+> >
+> > -int main(void)
+> > +static struct kvm_vm *setup_vm(void *guest_code)
+> >  {
+> > -     uint64_t target_mpidr, obs_pc, obs_x0;
+> >       struct kvm_vcpu_init init;
+> >       struct kvm_vm *vm;
+> > -     struct ucall uc;
+> >
+> >       vm = vm_create(VM_MODE_DEFAULT, DEFAULT_GUEST_PHY_PAGES, O_RDWR);
+> >       kvm_vm_elf_load(vm, program_invocation_name);
+> > @@ -83,31 +81,28 @@ int main(void)
+> >       vm_ioctl(vm, KVM_ARM_PREFERRED_TARGET, &init);
+> >       init.features[0] |= (1 << KVM_ARM_VCPU_PSCI_0_2);
+> >
+> > -     aarch64_vcpu_add_default(vm, VCPU_ID_SOURCE, &init, guest_main);
+> > -     aarch64_vcpu_add_default(vm, VCPU_ID_TARGET, &init, guest_main);
+> > +     aarch64_vcpu_add_default(vm, VCPU_ID_SOURCE, &init, guest_code);
+> > +     aarch64_vcpu_add_default(vm, VCPU_ID_TARGET, &init, guest_code);
+> >
+> > -     /*
+> > -      * make sure the target is already off when executing the test.
+> > -      */
+> > -     vcpu_power_off(vm, VCPU_ID_TARGET);
+> > +     return vm;
+> > +}
+> >
+> > -     get_reg(vm, VCPU_ID_TARGET, ARM64_SYS_REG(MPIDR_EL1), &target_mpidr);
+> > -     vcpu_args_set(vm, VCPU_ID_SOURCE, 1, target_mpidr & MPIDR_HWID_BITMASK);
+> > -     vcpu_run(vm, VCPU_ID_SOURCE);
+> > +static void enter_guest(struct kvm_vm *vm, uint32_t vcpuid)
+> > +{
+> > +     struct ucall uc;
+> >
+> > -     switch (get_ucall(vm, VCPU_ID_SOURCE, &uc)) {
+> > -     case UCALL_DONE:
+> > -             break;
+> > -     case UCALL_ABORT:
+> > +     vcpu_run(vm, vcpuid);
+> > +     if (get_ucall(vm, vcpuid, &uc) == UCALL_ABORT)
+> >               TEST_FAIL("%s at %s:%ld", (const char *)uc.args[0], __FILE__,
+> >                         uc.args[1]);
+> > -             break;
+> > -     default:
+> > -             TEST_FAIL("Unhandled ucall: %lu", uc.cmd);
+> > -     }
+> > +}
+> >
+> > -     get_reg(vm, VCPU_ID_TARGET, ARM64_CORE_REG(regs.pc), &obs_pc);
+> > -     get_reg(vm, VCPU_ID_TARGET, ARM64_CORE_REG(regs.regs[0]), &obs_x0);
+> > +static void assert_vcpu_reset(struct kvm_vm *vm, uint32_t vcpuid)
+> > +{
+> > +     uint64_t obs_pc, obs_x0;
+> > +
+> > +     get_reg(vm, vcpuid, ARM64_CORE_REG(regs.pc), &obs_pc);
+> > +     get_reg(vm, vcpuid, ARM64_CORE_REG(regs.regs[0]), &obs_x0);
+> >
+> >       TEST_ASSERT(obs_pc == CPU_ON_ENTRY_ADDR,
+> >                   "unexpected target cpu pc: %lx (expected: %lx)",
+> > @@ -115,7 +110,34 @@ int main(void)
+> >       TEST_ASSERT(obs_x0 == CPU_ON_CONTEXT_ID,
+> >                   "unexpected target context id: %lx (expected: %lx)",
+> >                   obs_x0, CPU_ON_CONTEXT_ID);
+> > +}
+> >
+> > +static void host_test_cpu_on(void)
+> > +{
+> > +     uint64_t target_mpidr;
+> > +     struct kvm_vm *vm;
+> > +     struct ucall uc;
+> > +
+> > +     vm = setup_vm(guest_test_cpu_on);
+> > +
+> > +     /*
+> > +      * make sure the target is already off when executing the test.
+> > +      */
+> > +     vcpu_power_off(vm, VCPU_ID_TARGET);
+> > +
+> > +     get_reg(vm, VCPU_ID_TARGET, ARM64_SYS_REG(MPIDR_EL1), &target_mpidr);
+> > +     vcpu_args_set(vm, VCPU_ID_SOURCE, 1, target_mpidr & MPIDR_HWID_BITMASK);
+> > +     enter_guest(vm, VCPU_ID_SOURCE);
+> > +
+> > +     if (get_ucall(vm, VCPU_ID_SOURCE, &uc) != UCALL_DONE)
+> > +             TEST_FAIL("Unhandled ucall: %lu", uc.cmd);
+> > +
+> > +     assert_vcpu_reset(vm, VCPU_ID_TARGET);
+> >       kvm_vm_free(vm);
+> > +}
+> > +
+> > +int main(void)
+> > +{
+> > +     host_test_cpu_on();
+> >       return 0;
+> >  }
+> > --
+> > 2.33.0.685.g46640cef36-goog
+> >
+>
+> Hard to read diff, but I think the refactoring comes out right.
 
-> + * Specification exception test.
-> + * Tests that specification exceptions occur when expected.
-> + */
-> +#include <stdlib.h>
-> +#include <libcflat.h>
-> +#include <asm/interrupt.h>
-> +#include <asm/facility.h>
-> +
-> +static struct lowcore *lc = (struct lowcore *) 0;
-> +
-> +static bool expect_invalid_psw;
-> +static struct psw expected_psw;
-> +static struct psw fixup_psw;
-> +
-> +/* The standard program exception handler cannot deal with invalid old PSWs,
-> + * especially not invalid instruction addresses, as in that case one cannot
-> + * find the instruction following the faulting one from the old PSW.
-> + * The PSW to return to is set by load_psw.
-> + */
-> +static void fixup_invalid_psw(void)
-> +{
-> +	if (expect_invalid_psw) {
-> +		report(expected_psw.mask == lc->pgm_old_psw.mask
-> +		       && expected_psw.addr == lc->pgm_old_psw.addr,
-> +		       "Invalid program new PSW as expected");
-> +		expect_invalid_psw = false;
-> +	}
-> +	lc->pgm_old_psw = fixup_psw;
-> +}
-> +
-> +static void load_psw(struct psw psw)
-> +{
-> +	uint64_t r0 = 0, r1 = 0;
-> +
-> +	asm volatile (
-> +		"	epsw	%0,%1\n"
-> +		"	st	%0,%[mask]\n"
-> +		"	st	%1,4+%[mask]\n"
-> +		"	larl	%0,nop%=\n"
-> +		"	stg	%0,%[addr]\n"
-> +		"	lpswe	%[psw]\n"
-> +		"nop%=:	nop\n"
-> +		: "+&r"(r0), "+&a"(r1), [mask] "=&R"(fixup_psw.mask),
-> +		  [addr] "=&R"(fixup_psw.addr)
+Yeah, this one's nasty, sorry about that. Thanks for parsing it out, heh.
 
-stg uses long displacement, so maybe the constraint should rather be "T" 
-instead?
+> Please do this refactoring before adding the new test in the next revision, though.
+>
 
-> +		: [psw] "Q"(psw)
-> +		: "cc", "memory"
-> +	);
-> +}
-> +
-> +static void psw_bit_12_is_1(void)
-> +{
-> +	expected_psw.mask = 0x0008000000000000;
-> +	expected_psw.addr = 0x00000000deadbeee;
-> +	expect_invalid_psw = true;
-> +	load_psw(expected_psw);
-> +}
-> +
-> +static void bad_alignment(void)
-> +{
-> +	uint32_t words[5] = {0, 0, 0};
-> +	uint32_t (*bad_aligned)[4];
-> +
-> +	register uint64_t r1 asm("6");
-> +	register uint64_t r2 asm("7");
-> +	if (((uintptr_t)&words[0]) & 0xf)
-> +		bad_aligned = (uint32_t (*)[4])&words[0];
-> +	else
-> +		bad_aligned = (uint32_t (*)[4])&words[1];
-> +	asm volatile ("lpq %0,%2"
-> +		      : "=r"(r1), "=r"(r2)
-> +		      : "T"(*bad_aligned)
-> +	);
-> +}
-> +
-> +static void not_even(void)
-> +{
-> +	uint64_t quad[2];
-> +
-> +	register uint64_t r1 asm("7");
-> +	register uint64_t r2 asm("8");
-> +	asm volatile (".insn	rxy,0xe3000000008f,%0,%2" //lpq %0,%2
-> +		      : "=r"(r1), "=r"(r2)
-> +		      : "T"(quad)
-> +	);
-> +}
-> +
-> +struct spec_ex_trigger {
-> +	const char *name;
-> +	void (*func)(void);
-> +	void (*fixup)(void);
-> +};
-> +
-> +static const struct spec_ex_trigger spec_ex_triggers[] = {
-> +	{ "psw_bit_12_is_1", &psw_bit_12_is_1, &fixup_invalid_psw},
-> +	{ "bad_alignment", &bad_alignment, NULL},
-> +	{ "not_even", &not_even, NULL},
-> +	{ NULL, NULL, NULL},
-> +};
-> +
-> +struct args {
-> +	uint64_t iterations;
-> +};
-> +
-> +static void test_spec_ex(struct args *args,
-> +			 const struct spec_ex_trigger *trigger)
-> +{
-> +	uint16_t expected_pgm = PGM_INT_CODE_SPECIFICATION;
-> +	uint16_t pgm;
-> +	unsigned int i;
-> +
-> +	for (i = 0; i < args->iterations; i++) {
-> +		expect_pgm_int();
-> +		register_pgm_cleanup_func(trigger->fixup);
-> +		trigger->func();
-> +		register_pgm_cleanup_func(NULL);
-> +		pgm = clear_pgm_int();
-> +		if (pgm != expected_pgm) {
-> +			report(0,
-> +			       "Program interrupt: expected(%d) == received(%d)",
-> +			       expected_pgm,
-> +			       pgm);
-> +			return;
-> +		}
-> +	}
-> +	report(1,
-> +	       "Program interrupt: always expected(%d) == received(%d)",
-> +	       expected_pgm,
-> +	       expected_pgm);
-> +}
-> +
-> +static struct args parse_args(int argc, char **argv)
-> +{
-> +	struct args args = {
-> +		.iterations = 1,
-> +	};
-> +	unsigned int i;
-> +	long arg;
-> +	bool no_arg;
-> +	char *end;
-> +
-> +	for (i = 1; i < argc; i++) {
-> +		no_arg = true;
-> +		if (i < argc - 1) {
-> +			no_arg = *argv[i+1] == '\0';
-> +			arg = strtol(argv[i+1], &end, 10);
+This is 10/11 in the series, and the test is 11/11. I'm not seeing any
+context belonging to the last patch, but perhaps I'm missing something
+obvious.
 
-Nit: It's more common to use spaces around the "+" (i.e. "i + 1")
+> Reviewed-by: Andrew Jones <drjones@redhat.com>
 
-> +			no_arg |= *end != '\0';
-> +			no_arg |= arg < 0;
-> +		}
-> +
-> +		if (!strcmp("--iterations", argv[i])) {
-> +			if (no_arg)
-> +				report_abort("--iterations needs a positive parameter");
-> +			args.iterations = arg;
-> +			++i;
-> +		} else {
-> +			report_abort("Unsupported parameter '%s'",
-> +				     argv[i]);
-> +		}
-> +	}
-> +	return args;
-> +}
-> +
-> +int main(int argc, char **argv)
-> +{
-> +	unsigned int i;
-> +
-> +	struct args args = parse_args(argc, argv);
-> +
-> +	report_prefix_push("specification exception");
-> +	for (i = 0; spec_ex_triggers[i].name; i++) {
-> +		report_prefix_push(spec_ex_triggers[i].name);
-> +		test_spec_ex(&args, &spec_ex_triggers[i]);
-> +		report_prefix_pop();
-> +	}
-> +	report_prefix_pop();
-> +
-> +	return report_summary();
-> +}
+Thanks!
 
-Apart from the nits, this looks fine to me.
-
-  Thomas
-
+--
+Best,
+Oliver
