@@ -2,62 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A8F71422AAA
-	for <lists+kvm@lfdr.de>; Tue,  5 Oct 2021 16:15:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1DF54422AAB
+	for <lists+kvm@lfdr.de>; Tue,  5 Oct 2021 16:15:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236286AbhJEORE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Oct 2021 10:17:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40916 "EHLO
+        id S235307AbhJEORG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Oct 2021 10:17:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40940 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235796AbhJEOQ4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 Oct 2021 10:16:56 -0400
-Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D36FDC0612E4
-        for <kvm@vger.kernel.org>; Tue,  5 Oct 2021 07:14:10 -0700 (PDT)
-Received: by mail-pf1-x44a.google.com with SMTP id t4-20020a62ea04000000b0044b333f5d1bso11117211pfh.20
-        for <kvm@vger.kernel.org>; Tue, 05 Oct 2021 07:14:10 -0700 (PDT)
+        with ESMTP id S235421AbhJEOQ6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Oct 2021 10:16:58 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0395AC0612A3
+        for <kvm@vger.kernel.org>; Tue,  5 Oct 2021 07:14:13 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id i21-20020a253b15000000b005b9c0fbba45so11139298yba.20
+        for <kvm@vger.kernel.org>; Tue, 05 Oct 2021 07:14:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=+f6h/X5NIPeStfEfpLAEhC/0Xz4xmxvZvD1XBnS1esg=;
-        b=Gxcp9Gzwc/lNaty7s6TDJEDgZ65H1sDm8BcZowlpWcMDIpeGcvJv0a8TQYbF7rXkKw
-         Kk9khZ3ADiEuzh9XJLf6RCJrkLDfuOohH1mDhYmKDLm29n23mFPlIuLeSqUhVloklvES
-         zsQC0YPpy5fi2EaZAcCs7/+HAhOK79tDnw0KeJHUAk3sxUySvQHZ85znucUs9A23+wNP
-         iak/Kw+HVyJgHgds9TNyAFHAXFj+NP4+FzrEmSjG0alX6zRMoMFgtI3AntJOGVhcbNeu
-         LwPwarui/C1iA+3pIYndxKeDgGhCNoM7mrLw1wURntRx2x5aXXzqQXJjc18QMwezdCQB
-         gj3Q==
+        bh=L0F0DtkdIIrbs8f7DAXmFKruhVt9GF1SIWpOBzoL0lA=;
+        b=enoXjhm8FV8eYVvHHIqW1l2YQ4FkRKbHUMo2M2/ikjHiI84dsyYHfDoI5+nOBJYzKZ
+         WrGW50vemb6hntMAQfOirRtxZwA8w6Y7zPBINqK47RDHWLmJXbnEMSdURS3rgH2juLEf
+         MI7YkVIGi4Z4EuSTb6IkUcwqEtkpawnx3bchGaUkZ3WiglFW3FDD6360mIBTvNuJrSSb
+         7Wq6n/towapHS7032Ucumk/8Qf2bBGulN+JvilxNT9zT5I2bcwhxDtFsJ6FKBB8UZoMT
+         6s7M3xVe0RbO8OCoATx5+MoY7XGCsSSWHyN9DXoysencDUsrUgGQB0yORoydZVu89C8w
+         w21A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=+f6h/X5NIPeStfEfpLAEhC/0Xz4xmxvZvD1XBnS1esg=;
-        b=wf28sqEDwvPEvMT+6649MpSr8FGFZjWGkv4XFOapTJoF5kgRG/N5kTk1MqBPjgIY7/
-         1tqxDtKcVQLt8ZkNW55lFj5zo84TsSz6iXTP4ZQLTQVrhMntz51Y5K+uk+e89pnrN/IT
-         xT6uSIz/yGR2YR86Rf7BaFvwfkuvwchSEterN+7Q99OaEzvMGOJwq7qXISsDijS5u4/2
-         zhxM2LJouMlTdYpOe8n4QHahNHDCTx2KDu4G8BfqMec4R0CijswlyfUjNq+u5ObkklU2
-         ffQ2w5VTVIExBiA1UUFfYJFHwE4XaxlBTMrye35sUAu5LjnvqrbzTAJuF0j1ZMU8FwBB
-         7y8g==
-X-Gm-Message-State: AOAM530C+3RGYokwG5gqy5G9K6kehOaugaI+78gVB4jSSI7Tb42eosLC
-        AF8oLRurGUOQ7KPJd3NwVhTgGihxQROW3cZWpqL8QoSPAak7GpK7kT8mGFlpWpSNOzIPImIHEf1
-        osQvdRMIUEc2U3Qh2mjrMEoyA+x3bovvWJo7D90ZLVvGwxR10IRuwn4aHog==
-X-Google-Smtp-Source: ABdhPJxDXErdRZQa2QB8UPrMEyZ1lrAwikd4GlvsAsCthyJfdpiy5SSEH/ULjZ+EDQ0QgbPvKs7WzcdT5ko=
+        bh=L0F0DtkdIIrbs8f7DAXmFKruhVt9GF1SIWpOBzoL0lA=;
+        b=irg0FdAJOLpR48CnsnswuqvTlkCl59ChdHcTT3CBFhlz9wjvv+3PWLu3E3TInXxpaF
+         AzVhEIKGnurcGprtEizNl8jOoAxCPmvIPJv+MQzRQ1YRVWdJIbsWWBqQOgxo+xJ1l/z/
+         FjOTiYP0XFva6K+Nmla80ZEqm2mGt/7wlxJQxdCr1h6Mm1PW7RcHeQTqsn9kOnNG+3dU
+         AbihBeJgqF9b8x3KeGIdriTCSNNSQMBtcVqVUIV5W1wIVbq/P9pdcNKFGzcuuT3M5u6+
+         8vFCQyeG5vXs12ZPTo7Ut4avKhSbdghkOUpuVBc1aiPEJtAfOPCdysko07EqIGESw4RG
+         Q8Jg==
+X-Gm-Message-State: AOAM533e0sK1ogkk9ZQ7hHcoKL0fZ9HtSuve9Nw/S/Zk8NIKIXfwg6BU
+        X/LTXQ2SEY0Yg/NoVM432GZSrLpCyKbR5eVI1du3bzzpbYh9rLoOiqxb2m+BTdyCiilO73GQ7KZ
+        iDC5qxKrudRqhqLInTTu9lZ8i5gDFE6qynn2HI+VgLipmse6MOXlaeMGTmg==
+X-Google-Smtp-Source: ABdhPJwdZLTb4dD44FIpStZdluAYYFEIGjipl50EkD6h+SzduEAT8p9G8XOL8D1aeuIcBR22fel86jUFvBk=
 X-Received: from pgonda1.kir.corp.google.com ([2620:15c:29:204:225f:7216:6111:7f1c])
- (user=pgonda job=sendgmr) by 2002:a17:902:d718:b0:13d:e2ec:1741 with SMTP id
- w24-20020a170902d71800b0013de2ec1741mr5445631ply.38.1633443250229; Tue, 05
- Oct 2021 07:14:10 -0700 (PDT)
-Date:   Tue,  5 Oct 2021 07:13:55 -0700
+ (user=pgonda job=sendgmr) by 2002:a25:4788:: with SMTP id u130mr21060260yba.489.1633443252162;
+ Tue, 05 Oct 2021 07:14:12 -0700 (PDT)
+Date:   Tue,  5 Oct 2021 07:13:56 -0700
 In-Reply-To: <20211005141357.2393627-1-pgonda@google.com>
-Message-Id: <20211005141357.2393627-3-pgonda@google.com>
+Message-Id: <20211005141357.2393627-4-pgonda@google.com>
 Mime-Version: 1.0
 References: <20211005141357.2393627-1-pgonda@google.com>
 X-Mailer: git-send-email 2.33.0.800.g4c38ced690-goog
-Subject: [PATCH 2/4 V9] KVM: SEV: Add support for SEV-ES intra host migration
+Subject: [PATCH 3/4 V9] selftest: KVM: Add open sev dev helper
 From:   Peter Gonda <pgonda@google.com>
 To:     kvm@vger.kernel.org
-Cc:     Peter Gonda <pgonda@google.com>, Marc Orr <marcorr@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+Cc:     Peter Gonda <pgonda@google.com>,
         Sean Christopherson <seanjc@google.com>,
+        Marc Orr <marcorr@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         David Rientjes <rientjes@google.com>,
         "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
         Brijesh Singh <brijesh.singh@amd.com>,
@@ -73,11 +73,11 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-For SEV-ES to work with intra host migration the VMSAs, GHCB metadata,
-and other SEV-ES info needs to be preserved along with the guest's
-memory.
+Refactors out open path support from open_kvm_dev_path_or_exit() and
+adds new helper for SEV device path.
 
 Signed-off-by: Peter Gonda <pgonda@google.com>
+Suggested-by: Sean Christopherson <seanjc@google.com>
 Reviewed-by: Marc Orr <marcorr@google.com>
 Cc: Marc Orr <marcorr@google.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>
@@ -96,87 +96,105 @@ Cc: "H. Peter Anvin" <hpa@zytor.com>
 Cc: kvm@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org
 ---
- arch/x86/kvm/svm/sev.c | 53 +++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 52 insertions(+), 1 deletion(-)
+ .../testing/selftests/kvm/include/kvm_util.h  |  1 +
+ .../selftests/kvm/include/x86_64/svm_util.h   |  2 ++
+ tools/testing/selftests/kvm/lib/kvm_util.c    | 24 +++++++++++--------
+ tools/testing/selftests/kvm/lib/x86_64/svm.c  | 13 ++++++++++
+ 4 files changed, 30 insertions(+), 10 deletions(-)
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 6fc1935b52ea..321b55654f36 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -1576,6 +1576,51 @@ static void sev_migrate_from(struct kvm_sev_info *dst,
- 	list_replace_init(&src->regions_list, &dst->regions_list);
+diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+index 010b59b13917..368e88305046 100644
+--- a/tools/testing/selftests/kvm/include/kvm_util.h
++++ b/tools/testing/selftests/kvm/include/kvm_util.h
+@@ -80,6 +80,7 @@ struct vm_guest_mode_params {
+ };
+ extern const struct vm_guest_mode_params vm_guest_mode_params[];
+ 
++int open_path_or_exit(const char *path, int flags);
+ int open_kvm_dev_path_or_exit(void);
+ int kvm_check_cap(long cap);
+ int vm_enable_cap(struct kvm_vm *vm, struct kvm_enable_cap *cap);
+diff --git a/tools/testing/selftests/kvm/include/x86_64/svm_util.h b/tools/testing/selftests/kvm/include/x86_64/svm_util.h
+index b7531c83b8ae..587fbe408b99 100644
+--- a/tools/testing/selftests/kvm/include/x86_64/svm_util.h
++++ b/tools/testing/selftests/kvm/include/x86_64/svm_util.h
+@@ -46,4 +46,6 @@ static inline bool cpu_has_svm(void)
+ 	return ecx & CPUID_SVM;
  }
  
-+static int sev_es_migrate_from(struct kvm *dst, struct kvm *src)
++int open_sev_dev_path_or_exit(void);
++
+ #endif /* SELFTEST_KVM_SVM_UTILS_H */
+diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+index 10a8ed691c66..06a6c04010fb 100644
+--- a/tools/testing/selftests/kvm/lib/kvm_util.c
++++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+@@ -31,6 +31,19 @@ static void *align(void *x, size_t size)
+ 	return (void *) (((size_t) x + mask) & ~mask);
+ }
+ 
++int open_path_or_exit(const char *path, int flags)
 +{
-+	int i;
-+	struct kvm_vcpu *dst_vcpu, *src_vcpu;
-+	struct vcpu_svm *dst_svm, *src_svm;
++	int fd;
 +
-+	if (atomic_read(&src->online_vcpus) != atomic_read(&dst->online_vcpus))
-+		return -EINVAL;
-+
-+	kvm_for_each_vcpu(i, src_vcpu, src) {
-+		if (!src_vcpu->arch.guest_state_protected)
-+			return -EINVAL;
++	fd = open(path, flags);
++	if (fd < 0) {
++		print_skip("%s not available (errno: %d)", path, errno);
++		exit(KSFT_SKIP);
 +	}
 +
-+	kvm_for_each_vcpu(i, src_vcpu, src) {
-+		src_svm = to_svm(src_vcpu);
-+		dst_vcpu = dst->vcpus[i];
-+		dst_vcpu = kvm_get_vcpu(dst, i);
-+		dst_svm = to_svm(dst_vcpu);
-+
-+		/*
-+		 * Transfer VMSA and GHCB state to the destination.  Nullify and
-+		 * clear source fields as appropriate, the state now belongs to
-+		 * the destination.
-+		 */
-+		dst_vcpu->vcpu_id = src_vcpu->vcpu_id;
-+		dst_svm->vmsa = src_svm->vmsa;
-+		src_svm->vmsa = NULL;
-+		dst_svm->ghcb = src_svm->ghcb;
-+		src_svm->ghcb = NULL;
-+		dst_svm->vmcb->control.ghcb_gpa = src_svm->vmcb->control.ghcb_gpa;
-+		dst_svm->ghcb_sa = src_svm->ghcb_sa;
-+		src_svm->ghcb_sa = NULL;
-+		dst_svm->ghcb_sa_len = src_svm->ghcb_sa_len;
-+		src_svm->ghcb_sa_len = 0;
-+		dst_svm->ghcb_sa_sync = src_svm->ghcb_sa_sync;
-+		src_svm->ghcb_sa_sync = false;
-+		dst_svm->ghcb_sa_free = src_svm->ghcb_sa_free;
-+		src_svm->ghcb_sa_free = false;
-+	}
-+	to_kvm_svm(src)->sev_info.es_active = false;
-+
-+	return 0;
++	return fd;
 +}
 +
- int svm_vm_migrate_from(struct kvm *kvm, unsigned int source_fd)
+ /*
+  * Open KVM_DEV_PATH if available, otherwise exit the entire program.
+  *
+@@ -42,16 +55,7 @@ static void *align(void *x, size_t size)
+  */
+ static int _open_kvm_dev_path_or_exit(int flags)
  {
- 	struct kvm_sev_info *dst_sev = &to_kvm_svm(kvm)->sev_info;
-@@ -1604,7 +1649,7 @@ int svm_vm_migrate_from(struct kvm *kvm, unsigned int source_fd)
- 	if (ret)
- 		goto out_fput;
+-	int fd;
+-
+-	fd = open(KVM_DEV_PATH, flags);
+-	if (fd < 0) {
+-		print_skip("%s not available, is KVM loaded? (errno: %d)",
+-			   KVM_DEV_PATH, errno);
+-		exit(KSFT_SKIP);
+-	}
+-
+-	return fd;
++	return open_path_or_exit(KVM_DEV_PATH, flags);
+ }
  
--	if (!sev_guest(source_kvm) || sev_es_guest(source_kvm)) {
-+	if (!sev_guest(source_kvm)) {
- 		ret = -EINVAL;
- 		goto out_source;
- 	}
-@@ -1615,6 +1660,12 @@ int svm_vm_migrate_from(struct kvm *kvm, unsigned int source_fd)
- 	if (ret)
- 		goto out_source_vcpu;
+ int open_kvm_dev_path_or_exit(void)
+diff --git a/tools/testing/selftests/kvm/lib/x86_64/svm.c b/tools/testing/selftests/kvm/lib/x86_64/svm.c
+index 2ac98d70d02b..14a8618efa9c 100644
+--- a/tools/testing/selftests/kvm/lib/x86_64/svm.c
++++ b/tools/testing/selftests/kvm/lib/x86_64/svm.c
+@@ -13,6 +13,8 @@
+ #include "processor.h"
+ #include "svm_util.h"
  
-+	if (sev_es_guest(source_kvm)) {
-+		ret = sev_es_migrate_from(kvm, source_kvm);
-+		if (ret)
-+			goto out_source_vcpu;
-+	}
++#define SEV_DEV_PATH "/dev/sev"
 +
- 	sev_migrate_from(dst_sev, &to_kvm_svm(source_kvm)->sev_info);
- 	kvm_for_each_vcpu (i, vcpu, source_kvm) {
- 		kvm_vcpu_reset(vcpu, /* init_event= */ false);
+ struct gpr64_regs guest_regs;
+ u64 rflags;
+ 
+@@ -160,3 +162,14 @@ void nested_svm_check_supported(void)
+ 		exit(KSFT_SKIP);
+ 	}
+ }
++
++/*
++ * Open SEV_DEV_PATH if available, otherwise exit the entire program.
++ *
++ * Return:
++ *   The opened file descriptor of /dev/sev.
++ */
++int open_sev_dev_path_or_exit(void)
++{
++	return open_path_or_exit(SEV_DEV_PATH, 0);
++}
 -- 
 2.33.0.309.g3052b89438-goog
 
