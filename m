@@ -2,138 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 56D4D421BCB
-	for <lists+kvm@lfdr.de>; Tue,  5 Oct 2021 03:19:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 26773421D17
+	for <lists+kvm@lfdr.de>; Tue,  5 Oct 2021 06:02:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231363AbhJEBVc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Oct 2021 21:21:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60138 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231311AbhJEBVb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Oct 2021 21:21:31 -0400
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 635EBC061753
-        for <kvm@vger.kernel.org>; Mon,  4 Oct 2021 18:19:41 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id l12-20020a170903120c00b0013eb930584fso812200plh.22
-        for <kvm@vger.kernel.org>; Mon, 04 Oct 2021 18:19:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=ebBYyYb0auVU2YwhpjKMMCWgRzY2PJI9/2w5/quPrGs=;
-        b=nnff9YiUi6n1ZXyRJwhfFa6RWAeI0wcpnPssLqmBzAlrRBcjFTQuzDYAjwhxx0tlOq
-         e+S5uaB88ivXuMxCX8mLqcIxGLvJF0V0OgaJn+sutt6n3gSl0AMpkFhY5mvQYmX5ew+D
-         WI5qVOypc6GBHMoJ6nmlJlq3ZzygfPXlMg/tlTJA1W3D9pghl6JYJB8QCS8actNnmxEH
-         gpEXsFZyynm2ozl0zbOPO6kP0yJ+/Dd4eq1ppv3Z4wAoJhWULYv6Ab7hmS6ncnX9p3JE
-         ETbTYxijY0mT28Xuh1/n2HOfAvYiMaaq70PB0zVzfsXQ57Q6XK+yfungcx56nOHn9I0/
-         XKTg==
+        id S230097AbhJEEDv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Oct 2021 00:03:51 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45155 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229446AbhJEEDt (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 5 Oct 2021 00:03:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1633406516;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=rAlBxwIUNGacBEXdDV9GXGeuPCJIcVqETjMpaX52Dew=;
+        b=TtdrWXAgaYSnE4AvfjwJU1pEe80+a0wPFLnWo+R9UIZkTJotRDtgUabMxLk7dJAZzdTlSw
+        kNeD7R1iv3wJj6XMeXnXy1/rfSagUMN6RAFCrDwsVAdOdOqYnpHb+D24SjDQbOrE7+Q0uf
+        W90bLLbFR7LiePtO9xSIxP8hf4mCevo=
+Received: from mail-oi1-f197.google.com (mail-oi1-f197.google.com
+ [209.85.167.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-125-jOheKkC8Ns-gQ_h95Ys9yg-1; Tue, 05 Oct 2021 00:01:55 -0400
+X-MC-Unique: jOheKkC8Ns-gQ_h95Ys9yg-1
+Received: by mail-oi1-f197.google.com with SMTP id l3-20020aca1903000000b002765b39fad3so9712258oii.3
+        for <kvm@vger.kernel.org>; Mon, 04 Oct 2021 21:01:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=ebBYyYb0auVU2YwhpjKMMCWgRzY2PJI9/2w5/quPrGs=;
-        b=giAvg4XdFDx1OfK4ovUFnXuTFn8KIFLFHA7h5ur12WRsObiD2iXr534IgNruTFwKvg
-         UR2m6m+D9Jpw7wR2dVg/GEwxKtS/7BSHhZnzc+1xhVctE/h3iBiv3bi+K7mwSInU5jy0
-         QCLyKbQREYDeq4IZShJo1O3G7v0TheCk4C1kyA9XuXeUqXa7zIJACc/NLaJ/n7NtQzYy
-         1bzrHLWcPxN35QuuTfBaKIu7N5USOtTrp74b/AAuBls43UEfBEpgrWdYZZ0GJu7aKjVz
-         mAOFpHRQapskWKDdvPeQm4OXKfkafdDwoam06pOwYzr0DaxpDbGIzcREIIaW0GcuLzwV
-         ak1Q==
-X-Gm-Message-State: AOAM532WtLR1lrmYJkrmuMnyzXtxPc4++uutFvbAAbbCNfYJNPUZXdR2
-        mLmXWFuN6olAOl0//2xgjtyU9pEw4o6+RfnyARArvALdvEmpvyy0xVijBRSX3S3DS4AiRpXWeAR
-        4Sy5wL+5iBRssfgTlwMwI4uR43+By9mm+yjOlZG+dKsEmvX8OLHPMiJjJkY9OPeg=
-X-Google-Smtp-Source: ABdhPJxSvUsBKjgUTRIyeKoK/lGVqGBvu8uO5Dr1jcgTFqQndyorWtPI9bFQSzNvrMxfbls15hUJ0mio4/S5Vg==
-X-Received: from ricarkol2.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:62fe])
- (user=ricarkol job=sendgmr) by 2002:a17:902:7e88:b0:13e:91ec:4114 with SMTP
- id z8-20020a1709027e8800b0013e91ec4114mr2606928pla.30.1633396780779; Mon, 04
- Oct 2021 18:19:40 -0700 (PDT)
-Date:   Mon,  4 Oct 2021 18:19:21 -0700
-In-Reply-To: <20211005011921.437353-1-ricarkol@google.com>
-Message-Id: <20211005011921.437353-12-ricarkol@google.com>
-Mime-Version: 1.0
-References: <20211005011921.437353-1-ricarkol@google.com>
-X-Mailer: git-send-email 2.33.0.800.g4c38ced690-goog
-Subject: [PATCH v4 11/11] KVM: arm64: selftests: Add init ITS device test
-From:   Ricardo Koller <ricarkol@google.com>
-To:     kvm@vger.kernel.org, maz@kernel.org, kvmarm@lists.cs.columbia.edu,
-        drjones@redhat.com, eric.auger@redhat.com, alexandru.elisei@arm.com
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, oupton@google.com,
-        james.morse@arm.com, suzuki.poulose@arm.com, shuah@kernel.org,
-        jingzhangos@google.com, pshier@google.com, rananta@google.com,
-        reijiw@google.com, Ricardo Koller <ricarkol@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=rAlBxwIUNGacBEXdDV9GXGeuPCJIcVqETjMpaX52Dew=;
+        b=lq2RJWKvVrMxpvtX0zpmEpiQBK2jVCvVBUwOEUgtgJ7M6ExBKW06S4CP1TyLvoNK7T
+         hjrHWbyPazDVuaiU6mvNuZ5XeZ8iY3QtIVzG2WFpAtwNVz0Qo8mfroCVFeddNldSs8x2
+         Io5mfKAMej7pCeYW9hpn3u+ahjreB40xMJ4wcbdL7Jl0AdeqF/ttn3lrqlK7IAKZNnZB
+         sujwsETTICCThA2n7cL6Q5/tyJL0VWcErHjPPUfnJKMzgfsrrYO8fff7RHUn5f6GitSm
+         Ono8WNGq+8lUPkGLESCJfv29EdL5y2DWLFFrqT6b+QvMVK21JTdOzwreZGz58hSxSHTE
+         eMdg==
+X-Gm-Message-State: AOAM530wAXZI/5az+ilDKsB6kOyZ+lMPijnMZPiyEJPx1FmGs3uqdhid
+        IFZYy+HxEDSqxThW9ISYnL8n/Xyc8l6fMGU10pEQO+SzB8GwE26BT2ZchZbjaW7fsLJIUSkjdd7
+        PvgxQWV5Lj3r0
+X-Received: by 2002:a05:6830:24a3:: with SMTP id v3mr12966906ots.74.1633406514349;
+        Mon, 04 Oct 2021 21:01:54 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy3IL2w2Op7aF1DEP5Onl25iIYT7CgqJ7HTmxCGC+tuFNpmlLKrPPa232h/HH2bKwiB8hmv4Q==
+X-Received: by 2002:a05:6830:24a3:: with SMTP id v3mr12966889ots.74.1633406514107;
+        Mon, 04 Oct 2021 21:01:54 -0700 (PDT)
+Received: from redhat.com ([198.99.80.109])
+        by smtp.gmail.com with ESMTPSA id bj33sm3351380oib.31.2021.10.04.21.01.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Oct 2021 21:01:53 -0700 (PDT)
+Date:   Mon, 4 Oct 2021 22:01:52 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>,
+        "Tian, Kevin" <kevin.tian@intel.com>, Liu Yi L <yi.l.liu@intel.com>
+Subject: Re: [PATCH 1/5] vfio: Delete vfio_get/put_group from
+ vfio_iommu_group_notifier()
+Message-ID: <20211004220152.306c73d2.alex.williamson@redhat.com>
+In-Reply-To: <20211004223431.GN964074@nvidia.com>
+References: <0-v1-fba989159158+2f9b-vfio_group_cdev_jgg@nvidia.com>
+        <1-v1-fba989159158+2f9b-vfio_group_cdev_jgg@nvidia.com>
+        <20211004162532.3b59ed06.alex.williamson@redhat.com>
+        <20211004223431.GN964074@nvidia.com>
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add some ITS device init tests: general KVM device tests (address not
-defined already, address aligned) and tests for the ITS region being
-within the addressable IPA range.
+On Mon, 4 Oct 2021 19:34:31 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-Signed-off-by: Ricardo Koller <ricarkol@google.com>
----
- .../testing/selftests/kvm/aarch64/vgic_init.c | 42 +++++++++++++++++++
- 1 file changed, 42 insertions(+)
+> On Mon, Oct 04, 2021 at 04:25:32PM -0600, Alex Williamson wrote:
+> > On Fri,  1 Oct 2021 20:22:20 -0300
+> > Jason Gunthorpe <jgg@nvidia.com> wrote:
+> >   
+> > > iommu_group_register_notifier()/iommu_group_unregister_notifier() are
+> > > built using a blocking_notifier_chain which integrates a rwsem. The
+> > > notifier function cannot be running outside its registration.
+> > > 
+> > > When considering how the notifier function interacts with create/destroy
+> > > of the group there are two fringe cases, the notifier starts before
+> > > list_add(&vfio.group_list) and the notifier runs after the kref
+> > > becomes 0.
+> > > 
+> > > Prior to vfio_create_group() unlocking and returning we have
+> > >    container_users == 0
+> > >    device_list == empty
+> > > And this cannot change until the mutex is unlocked.
+> > > 
+> > > After the kref goes to zero we must also have
+> > >    container_users == 0
+> > >    device_list == empty
+> > > 
+> > > Both are required because they are balanced operations and a 0 kref means
+> > > some caller became unbalanced. Add the missing assertion that
+> > > container_users must be zero as well.
+> > > 
+> > > These two facts are important because when checking each operation we see:
+> > > 
+> > > - IOMMU_GROUP_NOTIFY_ADD_DEVICE
+> > >    Empty device_list avoids the WARN_ON in vfio_group_nb_add_dev()
+> > >    0 container_users ends the call
+> > > - IOMMU_GROUP_NOTIFY_BOUND_DRIVER
+> > >    0 container_users ends the call
+> > > 
+> > > Finally, we have IOMMU_GROUP_NOTIFY_UNBOUND_DRIVER, which only deletes
+> > > items from the unbound list. During creation this list is empty, during
+> > > kref == 0 nothing can read this list, and it will be freed soon.
+> > > 
+> > > Since the vfio_group_release() doesn't hold the appropriate lock to
+> > > manipulate the unbound_list and could race with the notifier, move the
+> > > cleanup to directly before the kfree.
+> > > 
+> > > This allows deleting all of the deferred group put code.
+> > > 
+> > > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> > >  drivers/vfio/vfio.c | 89 +++++----------------------------------------
+> > >  1 file changed, 9 insertions(+), 80 deletions(-)
+> > > 
+> > > diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
+> > > index 08b27b64f0f935..32a53cb3598524 100644
+> > > +++ b/drivers/vfio/vfio.c
+> > > @@ -324,12 +324,20 @@ static void vfio_container_put(struct vfio_container *container)
+> > >  
+> > >  static void vfio_group_unlock_and_free(struct vfio_group *group)
+> > >  {
+> > > +	struct vfio_unbound_dev *unbound, *tmp;
+> > > +
+> > >  	mutex_unlock(&vfio.group_lock);
+> > >  	/*
+> > >  	 * Unregister outside of lock.  A spurious callback is harmless now
+> > >  	 * that the group is no longer in vfio.group_list.
+> > >  	 */  
+> > 
+> > This comment is indirectly referencing the vfio_group_try_get() in the
+> > notifier callback, but as you describe in the commit log, it's actually
+> > the container_users value that prevents this from racing group release
+> > now.  Otherwise, tricky but looks good.  Thanks,  
+> 
+> Do you think the comment should be deleted in this commit? I think I
+> got it later on..
 
-diff --git a/tools/testing/selftests/kvm/aarch64/vgic_init.c b/tools/testing/selftests/kvm/aarch64/vgic_init.c
-index 80be1940d2ad..c563489ff760 100644
---- a/tools/testing/selftests/kvm/aarch64/vgic_init.c
-+++ b/tools/testing/selftests/kvm/aarch64/vgic_init.c
-@@ -598,6 +598,47 @@ static void test_v3_redist_ipa_range_check_at_vcpu_run(void)
- 	vm_gic_destroy(&v);
- }
- 
-+static void test_v3_its_region(void)
-+{
-+	struct vm_gic v;
-+	uint64_t addr;
-+	int its_fd, ret;
-+
-+	v = vm_gic_create_with_vcpus(KVM_DEV_TYPE_ARM_VGIC_V3, NR_VCPUS);
-+	its_fd = kvm_create_device(v.vm, KVM_DEV_TYPE_ARM_VGIC_ITS, false);
-+
-+	addr = 0x401000;
-+	ret = _kvm_device_access(its_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
-+			  KVM_VGIC_ITS_ADDR_TYPE, &addr, true);
-+	TEST_ASSERT(ret && errno == EINVAL,
-+		"ITS region with misaligned address");
-+
-+	addr = max_phys_size;
-+	ret = _kvm_device_access(its_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
-+			  KVM_VGIC_ITS_ADDR_TYPE, &addr, true);
-+	TEST_ASSERT(ret && errno == E2BIG,
-+		"register ITS region with base address beyond IPA range");
-+
-+	addr = max_phys_size - 0x10000;
-+	ret = _kvm_device_access(its_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
-+			  KVM_VGIC_ITS_ADDR_TYPE, &addr, true);
-+	TEST_ASSERT(ret && errno == E2BIG,
-+		"Half of ITS region is beyond IPA range");
-+
-+	/* This one succeeds setting the ITS base */
-+	addr = 0x400000;
-+	kvm_device_access(its_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
-+			  KVM_VGIC_ITS_ADDR_TYPE, &addr, true);
-+
-+	addr = 0x300000;
-+	ret = _kvm_device_access(its_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
-+			  KVM_VGIC_ITS_ADDR_TYPE, &addr, true);
-+	TEST_ASSERT(ret && errno == EEXIST, "ITS base set again");
-+
-+	close(its_fd);
-+	vm_gic_destroy(&v);
-+}
-+
- /*
-  * Returns 0 if it's possible to create GIC device of a given type (V2 or V3).
-  */
-@@ -650,6 +691,7 @@ void run_tests(uint32_t gic_dev_type)
- 		test_v3_last_bit_redist_regions();
- 		test_v3_last_bit_single_rdist();
- 		test_v3_redist_ipa_range_check_at_vcpu_run();
-+		test_v3_its_region();
- 	}
- }
- 
--- 
-2.33.0.800.g4c38ced690-goog
+I think the commit log argument is that notifies racing the group
+release are harmless so long as the container is unused, and releasing
+a group with active container users would be unbalanced, which
+justifies the WARN_ON added here.  This comment does get removed in the
+final patch, but maybe that logic can be noted in a comment by the new
+sanity test.  Thanks,
+
+Alex
 
