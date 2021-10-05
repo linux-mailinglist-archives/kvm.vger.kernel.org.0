@@ -2,130 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6788E4229B6
-	for <lists+kvm@lfdr.de>; Tue,  5 Oct 2021 15:58:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 99371422A93
+	for <lists+kvm@lfdr.de>; Tue,  5 Oct 2021 16:14:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235841AbhJEOAR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Oct 2021 10:00:17 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43626 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S234103AbhJEN6p (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 5 Oct 2021 09:58:45 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 195DVftk022947;
-        Tue, 5 Oct 2021 09:56:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
+        id S236378AbhJEOPo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Oct 2021 10:15:44 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:19004 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S236039AbhJEOOz (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 5 Oct 2021 10:14:55 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 195E8jw6014963;
+        Tue, 5 Oct 2021 10:13:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
  content-type : content-transfer-encoding; s=pp1;
- bh=VTtlgsNmQNfVbCribX7K82dr36qHKdQGSjUKZQ6a30w=;
- b=SPM6nSC/1nBPZxkpPveEKuCAt6PG5ntXdQCfgPHu68YsWTGe7VyxJDBDyh3Vy9NnEvR+
- mzlXBIThiSmQpnSv7okDr/GWTUEmLSKmx3qdNTlyG9RO1Y/WuSljk1yYg8fNDprhyqHC
- t4u/yu1wAIuTAoPSyUDUVmJqb7esUMywiphsi44apNILZkOl3SqnB33WNvUWE1HLylaL
- hf656eaFEuSDDQ0ZdmhSc1B8SEnFsLpCaEZremV5dFRiCqijNEkXglTR25qziWNioDKw
- 08pE+gnUB2sB2dAmVsm11jnOm5jBQuPb762YiduCJ1mj414ILUfD8hTkwL1pvtJyPSiU xg== 
+ bh=ahhevMSQVbcaZDQFL9ujVBjSdb3OBb62fpPWDZp0cYA=;
+ b=XzEsPyjyX29J7rfw7oaMocLCMNcL1T6vviEGBE/4gOPJj9/ySk0y04uf83o+/Xe4vhAF
+ BjfaXqYCc+3DOlLySpuKCGO9RMq/Ntmb+Yk0gNwTRHD/uJ5+GkDb3yTlWTKgSxSNlV5e
+ o80zmi6xUGOSKdgNDqp0Cj8FMwfhrHWgfQO/JHRbJiXOxvwPakBEYZ+CNaaOillHhS+l
+ u7HJtYEvTAuMP0YH09AwfWg8F202UW9fT8BahPxLKWr8hMvzcUrBEMtbV6VM7RDH5v9o
+ DIMB75Yooz8U6fLYU+mb/Y82X6pMB2RFLykkZWuD8Vs1tBUI8SgAL1XfUjW8juP5pNZL hg== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3bgqnxrt3k-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3bgr7984gs-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 05 Oct 2021 09:56:53 -0400
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 195DWVLu027089;
-        Tue, 5 Oct 2021 09:56:53 -0400
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3bgqnxrt24-1
+        Tue, 05 Oct 2021 10:13:04 -0400
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 195E9Cgh016045;
+        Tue, 5 Oct 2021 10:13:04 -0400
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3bgr7984fm-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 05 Oct 2021 09:56:53 -0400
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 195Dm5h1002783;
-        Tue, 5 Oct 2021 13:56:50 GMT
+        Tue, 05 Oct 2021 10:13:04 -0400
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 195ECkx5007665;
+        Tue, 5 Oct 2021 14:13:01 GMT
 Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma05fra.de.ibm.com with ESMTP id 3bef29s0wy-1
+        by ppma03fra.de.ibm.com with ESMTP id 3bef29h5tc-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 05 Oct 2021 13:56:50 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 195Dukpc40567100
+        Tue, 05 Oct 2021 14:13:01 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 195ECvDU4653672
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 5 Oct 2021 13:56:46 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9800FA4060;
-        Tue,  5 Oct 2021 13:56:46 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 33108A4066;
-        Tue,  5 Oct 2021 13:56:46 +0000 (GMT)
-Received: from [9.145.45.132] (unknown [9.145.45.132])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue,  5 Oct 2021 13:56:46 +0000 (GMT)
-Message-ID: <9962f5a8-2fe9-fe61-73e3-f9bdbed102f4@linux.ibm.com>
-Date:   Tue, 5 Oct 2021 15:56:45 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [kvm-unit-tests PATCH v2 1/2] s390x: Remove assert from
- arch_def.h
-Content-Language: en-US
-To:     Janis Schoetterl-Glausch <scgl@linux.vnet.ibm.com>,
-        Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        Thomas Huth <thuth@redhat.com>
-Cc:     Pierre Morel <pmorel@linux.ibm.com>,
+        Tue, 5 Oct 2021 14:12:57 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BF10B52054;
+        Tue,  5 Oct 2021 14:12:57 +0000 (GMT)
+Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.171.6.58])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 3D99B52065;
+        Tue,  5 Oct 2021 14:12:57 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH v2 2/2] s390x: Add specification exception
+ interception test
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+Cc:     Thomas Huth <thuth@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
         Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
         David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
         linux-s390@vger.kernel.org
 References: <20211005091153.1863139-1-scgl@linux.ibm.com>
- <20211005091153.1863139-2-scgl@linux.ibm.com>
- <0ab2acc7-47da-59fc-c959-1d61417ca181@linux.ibm.com>
- <dd2b1cd2-6d97-0d3a-8db2-f33dcc35f226@linux.vnet.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-In-Reply-To: <dd2b1cd2-6d97-0d3a-8db2-f33dcc35f226@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
+ <20211005091153.1863139-3-scgl@linux.ibm.com>
+ <20211005150919.04425060@p-imbrenda>
+From:   Janis Schoetterl-Glausch <scgl@linux.vnet.ibm.com>
+Message-ID: <c4826f20-f501-4c51-1109-40692ce8b1c7@linux.vnet.ibm.com>
+Date:   Tue, 5 Oct 2021 16:12:56 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
+MIME-Version: 1.0
+In-Reply-To: <20211005150919.04425060@p-imbrenda>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 9LVQq6fz4stGlL8iXhwY2VJxpx6rOnaV
-X-Proofpoint-ORIG-GUID: 5NklmgYOOCaa73evt7QkVxlhbJe3MJcX
+X-Proofpoint-GUID: TEG-Q5tZKZbBgeLUdSbvITrRjUc2sXm8
+X-Proofpoint-ORIG-GUID: Ry59FPdwoD3ppGNQGWgPm4ACjFjwH7Kn
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.391,FMLib:17.0.607.475
  definitions=2021-10-05_02,2021-10-04_01,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxlogscore=999
- lowpriorityscore=0 bulkscore=0 mlxscore=0 malwarescore=0
- priorityscore=1501 impostorscore=0 clxscore=1015 suspectscore=0
- adultscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2109230001 definitions=main-2110050080
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxscore=0
+ priorityscore=1501 lowpriorityscore=0 malwarescore=0 spamscore=0
+ bulkscore=0 impostorscore=0 mlxlogscore=999 adultscore=0 phishscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2109230001 definitions=main-2110050084
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T24gMTAvNS8yMSAxNTo1MSwgSmFuaXMgU2Nob2V0dGVybC1HbGF1c2NoIHdyb3RlOg0KPiBP
-biAxMC81LzIxIDI6NTEgUE0sIEphbm9zY2ggRnJhbmsgd3JvdGU6DQo+PiBPbiAxMC81LzIx
-IDExOjExLCBKYW5pcyBTY2hvZXR0ZXJsLUdsYXVzY2ggd3JvdGU6DQo+Pj4gRG8gbm90IHVz
-ZSBhc3NlcnRzIGluIGFyY2hfZGVmLmggc28gaXQgY2FuIGJlIGluY2x1ZGVkIGJ5IHNuaXBw
-ZXRzLg0KPj4+IFRoZSBjYWxsZXIgaW4gc3RzaS5jIGRvZXMgbm90IG5lZWQgdG8gYmUgYWRq
-dXN0ZWQsIHJldHVybmluZyAtMSBjYXVzZXMNCj4+PiB0aGUgdGVzdCB0byBmYWlsLg0KPj4+
-DQo+Pj4gU2lnbmVkLW9mZi1ieTogSmFuaXMgU2Nob2V0dGVybC1HbGF1c2NoIDxzY2dsQGxp
-bnV4LmlibS5jb20+DQo+Pg0KPj4gQSBmZXcgZGF5cyBhZ28gSSBoYWQgYSBtaW51dGUgdG8g
-aW52ZXN0aWdhdGUgd2hhdCBuZWVkZWQgdG8gYmUgYWRkZWQgdG8gYmUgYWJsZSB0byBsaW5r
-IHRoZSBsaWJjZmxhdC4gRm9ydHVuYXRlbHkgaXQgd2Fzbid0IGEgbG90IGFuZCBJJ2xsIHRy
-eSB0byBwb3N0IGl0IHRoaXMgd2VlayBzbyB0aGlzIHBhdGNoIGNhbiBob3BlZnVsbHkgYmUg
-ZHJvcHBlZC4NCj4gDQo+IE9uZSBjb3VsZCBhcmd1ZSB0aGF0IGNjIGJlaW5nICE9IDAgaXMg
-cGFydCBvZiB0aGUgdGVzdCBhbmQgc28gc2hvdWxkIGdvIHRocm91Z2ggcmVwb3J0KCkgYW5k
-IG5vdCBhc3NlcnQoKS4NCj4gV2hpY2ggaGFwcGVucyBuYXR1cmFsbHksIHNpbmNlIHRoZSBj
-YWxsZXIgd2lsbCBsaWtlbHkgY29tcGFyZSBpdCB0byBzb21lIHBvc2l0aXZlIGV4cGVjdGVk
-IHZhbHVlLg0KDQpZZXMsIEkgY2FuIGFsc28gbGl2ZSB3aXRoIHRoYXQgaWYgeW91IGNoYW5n
-ZSB0aGUgY29tbWl0IG1lc3NhZ2UgdGhlbiA6KQ0KDQo+Pg0KPj4+IC0tLQ0KPj4+ICDCoCBs
-aWIvczM5MHgvYXNtL2FyY2hfZGVmLmggfCA1ICsrKy0tDQo+Pj4gIMKgIDEgZmlsZSBjaGFu
-Z2VkLCAzIGluc2VydGlvbnMoKyksIDIgZGVsZXRpb25zKC0pDQo+Pj4NCj4+PiBkaWZmIC0t
-Z2l0IGEvbGliL3MzOTB4L2FzbS9hcmNoX2RlZi5oIGIvbGliL3MzOTB4L2FzbS9hcmNoX2Rl
-Zi5oDQo+Pj4gaW5kZXggMzAyZWYxZi4uNDE2N2UyYiAxMDA2NDQNCj4+PiAtLS0gYS9saWIv
-czM5MHgvYXNtL2FyY2hfZGVmLmgNCj4+PiArKysgYi9saWIvczM5MHgvYXNtL2FyY2hfZGVm
-LmgNCj4+PiBAQCAtMzM0LDcgKzMzNCw3IEBAIHN0YXRpYyBpbmxpbmUgaW50IHN0c2kodm9p
-ZCAqYWRkciwgaW50IGZjLCBpbnQgc2VsMSwgaW50IHNlbDIpDQo+Pj4gIMKgwqDCoMKgwqAg
-cmV0dXJuIGNjOw0KPj4+ICDCoCB9DQo+Pj4gIMKgIC1zdGF0aWMgaW5saW5lIHVuc2lnbmVk
-IGxvbmcgc3RzaV9nZXRfZmModm9pZCkNCj4+PiArc3RhdGljIGlubGluZSBpbnQgc3RzaV9n
-ZXRfZmModm9pZCkNCj4+PiAgwqAgew0KPj4+ICDCoMKgwqDCoMKgIHJlZ2lzdGVyIHVuc2ln
-bmVkIGxvbmcgcjAgYXNtKCIwIikgPSAwOw0KPj4+ICDCoMKgwqDCoMKgIHJlZ2lzdGVyIHVu
-c2lnbmVkIGxvbmcgcjEgYXNtKCIxIikgPSAwOw0KPj4+IEBAIC0zNDYsNyArMzQ2LDggQEAg
-c3RhdGljIGlubGluZSB1bnNpZ25lZCBsb25nIHN0c2lfZ2V0X2ZjKHZvaWQpDQo+Pj4gIMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgOiAiK2QiIChyMCksIFtjY10gIj1kIiAoY2Mp
-DQo+Pj4gIMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgOiAiZCIgKHIxKQ0KPj4+ICDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIDogImNjIiwgIm1lbW9yeSIpOw0KPj4+IC3C
-oMKgwqAgYXNzZXJ0KCFjYyk7DQo+Pj4gK8KgwqDCoCBpZiAoY2MgIT0gMCkNCj4+PiArwqDC
-oMKgwqDCoMKgwqAgcmV0dXJuIC0xOw0KPj4+ICDCoMKgwqDCoMKgIHJldHVybiByMCA+PiAy
-ODsNCj4+PiAgwqAgfQ0KPj4+ICAgDQo+Pg0KPiANCg0K
+On 10/5/21 3:09 PM, Claudio Imbrenda wrote:
+> On Tue,  5 Oct 2021 11:11:53 +0200
+> Janis Schoetterl-Glausch <scgl@linux.ibm.com> wrote:
+> 
+>> Check that specification exceptions cause intercepts when
+>> specification exception interpretation is off.
+>> Check that specification exceptions caused by program new PSWs
+>> cause interceptions.
+>> We cannot assert that non program new PSW specification exceptions
+>> are interpreted because whether interpretation occurs or not is
+>> configuration dependent.
+>>
+>> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+>> ---
+>>  s390x/Makefile             |  2 +
+>>  lib/s390x/sie.h            |  1 +
+>>  s390x/snippets/c/spec_ex.c | 20 +++++++++
+>>  s390x/spec_ex-sie.c        | 83 ++++++++++++++++++++++++++++++++++++++
+>>  s390x/unittests.cfg        |  3 ++
+>>  5 files changed, 109 insertions(+)
+>>  create mode 100644 s390x/snippets/c/spec_ex.c
+>>  create mode 100644 s390x/spec_ex-sie.c
+>>
+>> diff --git a/s390x/Makefile b/s390x/Makefile
+>> index ef8041a..7198882 100644
+>> --- a/s390x/Makefile
+>> +++ b/s390x/Makefile
+>> @@ -24,6 +24,7 @@ tests += $(TEST_DIR)/mvpg.elf
+>>  tests += $(TEST_DIR)/uv-host.elf
+>>  tests += $(TEST_DIR)/edat.elf
+>>  tests += $(TEST_DIR)/mvpg-sie.elf
+>> +tests += $(TEST_DIR)/spec_ex-sie.elf
+>>  
+>>  tests_binary = $(patsubst %.elf,%.bin,$(tests))
+>>  ifneq ($(HOST_KEY_DOCUMENT),)
+>> @@ -85,6 +86,7 @@ snippet_asmlib = $(SNIPPET_DIR)/c/cstart.o
+>>  # perquisites (=guests) for the snippet hosts.
+>>  # $(TEST_DIR)/<snippet-host>.elf: snippets = $(SNIPPET_DIR)/<c/asm>/<snippet>.gbin
+>>  $(TEST_DIR)/mvpg-sie.elf: snippets = $(SNIPPET_DIR)/c/mvpg-snippet.gbin
+>> +$(TEST_DIR)/spec_ex-sie.elf: snippets = $(SNIPPET_DIR)/c/spec_ex.gbin
+>>  
+>>  $(SNIPPET_DIR)/asm/%.gbin: $(SNIPPET_DIR)/asm/%.o $(FLATLIBS)
+>>  	$(OBJCOPY) -O binary $(patsubst %.gbin,%.o,$@) $@
+>> diff --git a/lib/s390x/sie.h b/lib/s390x/sie.h
+>> index ca514ef..7ef7251 100644
+>> --- a/lib/s390x/sie.h
+>> +++ b/lib/s390x/sie.h
+>> @@ -98,6 +98,7 @@ struct kvm_s390_sie_block {
+>>  	uint8_t		fpf;			/* 0x0060 */
+>>  #define ECB_GS		0x40
+>>  #define ECB_TE		0x10
+>> +#define ECB_SPECI	0x08
+>>  #define ECB_SRSI	0x04
+>>  #define ECB_HOSTPROTINT	0x02
+>>  	uint8_t		ecb;			/* 0x0061 */
+>> diff --git a/s390x/snippets/c/spec_ex.c b/s390x/snippets/c/spec_ex.c
+>> new file mode 100644
+>> index 0000000..bdba4f4
+>> --- /dev/null
+>> +++ b/s390x/snippets/c/spec_ex.c
+>> @@ -0,0 +1,20 @@
+>> +// SPDX-License-Identifier: GPL-2.0-only
+>> +/*
+>> + * © Copyright IBM Corp. 2021
+>> + *
+>> + * Snippet used by specification exception interception test.
+>> + */
+>> +#include <stdint.h>
+>> +#include <asm/arch_def.h>
+>> +
+>> +__attribute__((section(".text"))) int main(void)
+>> +{
+>> +	struct lowcore *lowcore = (struct lowcore *) 0;
+>> +	uint64_t bad_psw = 0;
+>> +
+>> +	/* PSW bit 12 has no name or meaning and must be 0 */
+>> +	lowcore->pgm_new_psw.mask = 1UL << (63 - 12);
+> 
+> you can use the BIT or BIT_ULL macro
+> 
+>> +	lowcore->pgm_new_psw.addr = 0xdeadbeee;
+> 
+> if the system is broken, it might actually jump at that address; in
+> that case, will the test fail?
+
+Broken how? If interpretation is overzealous the test might hang.
+
+[...]
