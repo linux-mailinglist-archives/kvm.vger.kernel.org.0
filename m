@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 75334421BC8
-	for <lists+kvm@lfdr.de>; Tue,  5 Oct 2021 03:19:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 56D4D421BCB
+	for <lists+kvm@lfdr.de>; Tue,  5 Oct 2021 03:19:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231297AbhJEBVa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Oct 2021 21:21:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60128 "EHLO
+        id S231363AbhJEBVc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Oct 2021 21:21:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60138 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231229AbhJEBV3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Oct 2021 21:21:29 -0400
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E725DC061745
-        for <kvm@vger.kernel.org>; Mon,  4 Oct 2021 18:19:39 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id p19-20020a634f53000000b002877a03b293so11560853pgl.10
-        for <kvm@vger.kernel.org>; Mon, 04 Oct 2021 18:19:39 -0700 (PDT)
+        with ESMTP id S231311AbhJEBVb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Oct 2021 21:21:31 -0400
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 635EBC061753
+        for <kvm@vger.kernel.org>; Mon,  4 Oct 2021 18:19:41 -0700 (PDT)
+Received: by mail-pl1-x64a.google.com with SMTP id l12-20020a170903120c00b0013eb930584fso812200plh.22
+        for <kvm@vger.kernel.org>; Mon, 04 Oct 2021 18:19:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=LALo9JihRPRBkG1fYYMRtr74GhwkziudPmPUGtI9Fw4=;
-        b=hLp0tj96F1OWP6HZwu3DGIrMazfL6bcOfnvTYKxYCIBaSh7ob8veeFJ1cVziBgXiNu
-         bqDrG6sf6VCe/KsbjSR1p681zdh/F+klgPr6dB1bTJk/a4PtAI6cijGq+E9agkE4aFia
-         Cz7Eh7XfwNv1k3E3mcPqWnhYUmyBjKyzPC1NH5IRoVCNFnkLS09HpMcftjRF+Yi8698c
-         YrHRxITfEQOixXsbTKe7pNCA/4goHDQf2kL5LCTSXPQKvj61JXw5DWKR+L4y0qXYfaoL
-         qk6JF+TDk4oO40MLI0Zjx2Ls1zHqiuP21PrRPIgk/+99jerLdZ4m2+nKG/47fiu8X3t3
-         C0Pg==
+        bh=ebBYyYb0auVU2YwhpjKMMCWgRzY2PJI9/2w5/quPrGs=;
+        b=nnff9YiUi6n1ZXyRJwhfFa6RWAeI0wcpnPssLqmBzAlrRBcjFTQuzDYAjwhxx0tlOq
+         e+S5uaB88ivXuMxCX8mLqcIxGLvJF0V0OgaJn+sutt6n3gSl0AMpkFhY5mvQYmX5ew+D
+         WI5qVOypc6GBHMoJ6nmlJlq3ZzygfPXlMg/tlTJA1W3D9pghl6JYJB8QCS8actNnmxEH
+         gpEXsFZyynm2ozl0zbOPO6kP0yJ+/Dd4eq1ppv3Z4wAoJhWULYv6Ab7hmS6ncnX9p3JE
+         ETbTYxijY0mT28Xuh1/n2HOfAvYiMaaq70PB0zVzfsXQ57Q6XK+yfungcx56nOHn9I0/
+         XKTg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=LALo9JihRPRBkG1fYYMRtr74GhwkziudPmPUGtI9Fw4=;
-        b=xdWxiWYrf14fK8cpjT6lFx7lltk9KrJQ1Pzp5w+Wt87f8W+fDetC0qq8PI1MOoheQ/
-         pICUKu/xstV98oLfO0tOPC0uTOg2Yncn3riKsC/R+PlDp3R0kN82VcgPYHBLB/roL/bC
-         d56nNYukrxQnIiPrQnJ7tutblISFs6GoMTHew9N4+iegybZl47LOC2+FbiqSIUUabr1O
-         plMZnjQaoZnNtKbbVSdt/fqoGWJY/upYEj0ABai6ZvG3ztcDIboUuVMVnZaHIJjstb3A
-         nFtKKBtaVCWDT1CgV+US5YDc+4p0cfSK8W3V75D+g9/McD9uTHfpLYjgeF1fD377xVcT
-         VQWQ==
-X-Gm-Message-State: AOAM530rqDY/XPQFsK5AoxeM6w5sdnPWzoMV+TirXTy+4DsZEacE7aiF
-        a6jNErWKxJSWqpH8c7GKRulYyZoe3R0dItqE7sVvFgZ3F8vuWAYA8dYfNswfZqlJASDN4yQVWgR
-        fOkN7Cocl2HkH13x4vFh1s4WPIKp8Pdl7S2Gi7oKUh28VZlwjFDhkMHrci4UIJWE=
-X-Google-Smtp-Source: ABdhPJzUUkZEXh0YtKOvuw4kldQta6Fk0jXOVYU6rXgMHyhp34IKvaz+CMANxBajmBBPTWnz+esVVsUyc0CDoQ==
+        bh=ebBYyYb0auVU2YwhpjKMMCWgRzY2PJI9/2w5/quPrGs=;
+        b=giAvg4XdFDx1OfK4ovUFnXuTFn8KIFLFHA7h5ur12WRsObiD2iXr534IgNruTFwKvg
+         UR2m6m+D9Jpw7wR2dVg/GEwxKtS/7BSHhZnzc+1xhVctE/h3iBiv3bi+K7mwSInU5jy0
+         QCLyKbQREYDeq4IZShJo1O3G7v0TheCk4C1kyA9XuXeUqXa7zIJACc/NLaJ/n7NtQzYy
+         1bzrHLWcPxN35QuuTfBaKIu7N5USOtTrp74b/AAuBls43UEfBEpgrWdYZZ0GJu7aKjVz
+         mAOFpHRQapskWKDdvPeQm4OXKfkafdDwoam06pOwYzr0DaxpDbGIzcREIIaW0GcuLzwV
+         ak1Q==
+X-Gm-Message-State: AOAM532WtLR1lrmYJkrmuMnyzXtxPc4++uutFvbAAbbCNfYJNPUZXdR2
+        mLmXWFuN6olAOl0//2xgjtyU9pEw4o6+RfnyARArvALdvEmpvyy0xVijBRSX3S3DS4AiRpXWeAR
+        4Sy5wL+5iBRssfgTlwMwI4uR43+By9mm+yjOlZG+dKsEmvX8OLHPMiJjJkY9OPeg=
+X-Google-Smtp-Source: ABdhPJxSvUsBKjgUTRIyeKoK/lGVqGBvu8uO5Dr1jcgTFqQndyorWtPI9bFQSzNvrMxfbls15hUJ0mio4/S5Vg==
 X-Received: from ricarkol2.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:62fe])
- (user=ricarkol job=sendgmr) by 2002:a17:90b:1804:: with SMTP id
- lw4mr383225pjb.174.1633396779303; Mon, 04 Oct 2021 18:19:39 -0700 (PDT)
-Date:   Mon,  4 Oct 2021 18:19:20 -0700
+ (user=ricarkol job=sendgmr) by 2002:a17:902:7e88:b0:13e:91ec:4114 with SMTP
+ id z8-20020a1709027e8800b0013e91ec4114mr2606928pla.30.1633396780779; Mon, 04
+ Oct 2021 18:19:40 -0700 (PDT)
+Date:   Mon,  4 Oct 2021 18:19:21 -0700
 In-Reply-To: <20211005011921.437353-1-ricarkol@google.com>
-Message-Id: <20211005011921.437353-11-ricarkol@google.com>
+Message-Id: <20211005011921.437353-12-ricarkol@google.com>
 Mime-Version: 1.0
 References: <20211005011921.437353-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.33.0.800.g4c38ced690-goog
-Subject: [PATCH v4 10/11] KVM: arm64: selftests: Add test for legacy GICv3
- REDIST base partially above IPA range
+Subject: [PATCH v4 11/11] KVM: arm64: selftests: Add init ITS device test
 From:   Ricardo Koller <ricarkol@google.com>
 To:     kvm@vger.kernel.org, maz@kernel.org, kvmarm@lists.cs.columbia.edu,
         drjones@redhat.com, eric.auger@redhat.com, alexandru.elisei@arm.com
@@ -65,71 +65,72 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a new test into vgic_init which checks that the first vcpu fails to
-run if there is not sufficient REDIST space below the addressable IPA
-range.  This only applies to the KVM_VGIC_V3_ADDR_TYPE_REDIST legacy API
-as the required REDIST space is not know when setting the DIST region.
+Add some ITS device init tests: general KVM device tests (address not
+defined already, address aligned) and tests for the ITS region being
+within the addressable IPA range.
 
-Note that using the REDIST_REGION API results in a different check at
-first vcpu run: that the number of redist regions is enough for all
-vcpus. And there is already a test for that case in, the first step of
-test_v3_new_redist_regions.
-
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Ricardo Koller <ricarkol@google.com>
 ---
- .../testing/selftests/kvm/aarch64/vgic_init.c | 34 +++++++++++++++++++
- 1 file changed, 34 insertions(+)
+ .../testing/selftests/kvm/aarch64/vgic_init.c | 42 +++++++++++++++++++
+ 1 file changed, 42 insertions(+)
 
 diff --git a/tools/testing/selftests/kvm/aarch64/vgic_init.c b/tools/testing/selftests/kvm/aarch64/vgic_init.c
-index eadd448b3a96..80be1940d2ad 100644
+index 80be1940d2ad..c563489ff760 100644
 --- a/tools/testing/selftests/kvm/aarch64/vgic_init.c
 +++ b/tools/testing/selftests/kvm/aarch64/vgic_init.c
-@@ -565,6 +565,39 @@ static void test_v3_last_bit_single_rdist(void)
+@@ -598,6 +598,47 @@ static void test_v3_redist_ipa_range_check_at_vcpu_run(void)
  	vm_gic_destroy(&v);
  }
  
-+/* Uses the legacy REDIST region API. */
-+static void test_v3_redist_ipa_range_check_at_vcpu_run(void)
++static void test_v3_its_region(void)
 +{
 +	struct vm_gic v;
-+	int ret, i;
 +	uint64_t addr;
++	int its_fd, ret;
 +
-+	v = vm_gic_create_with_vcpus(KVM_DEV_TYPE_ARM_VGIC_V3, 1);
++	v = vm_gic_create_with_vcpus(KVM_DEV_TYPE_ARM_VGIC_V3, NR_VCPUS);
++	its_fd = kvm_create_device(v.vm, KVM_DEV_TYPE_ARM_VGIC_ITS, false);
 +
-+	/* Set space for 3 redists, we have 1 vcpu, so this succeeds. */
-+	addr = max_phys_size - (3 * 2 * 0x10000);
-+	kvm_device_access(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
-+				 KVM_VGIC_V3_ADDR_TYPE_REDIST, &addr, true);
-+
-+	addr = 0x00000;
-+	kvm_device_access(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
-+			KVM_VGIC_V3_ADDR_TYPE_DIST, &addr, true);
-+
-+	/* Add the rest of the VCPUs */
-+	for (i = 1; i < NR_VCPUS; ++i)
-+		vm_vcpu_add_default(v.vm, i, guest_code);
-+
-+	kvm_device_access(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
-+			  KVM_DEV_ARM_VGIC_CTRL_INIT, NULL, true);
-+
-+	/* Attempt to run a vcpu without enough redist space. */
-+	ret = run_vcpu(v.vm, 2);
++	addr = 0x401000;
++	ret = _kvm_device_access(its_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
++			  KVM_VGIC_ITS_ADDR_TYPE, &addr, true);
 +	TEST_ASSERT(ret && errno == EINVAL,
-+		"redist base+size above PA range detected on 1st vcpu run");
++		"ITS region with misaligned address");
 +
++	addr = max_phys_size;
++	ret = _kvm_device_access(its_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
++			  KVM_VGIC_ITS_ADDR_TYPE, &addr, true);
++	TEST_ASSERT(ret && errno == E2BIG,
++		"register ITS region with base address beyond IPA range");
++
++	addr = max_phys_size - 0x10000;
++	ret = _kvm_device_access(its_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
++			  KVM_VGIC_ITS_ADDR_TYPE, &addr, true);
++	TEST_ASSERT(ret && errno == E2BIG,
++		"Half of ITS region is beyond IPA range");
++
++	/* This one succeeds setting the ITS base */
++	addr = 0x400000;
++	kvm_device_access(its_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
++			  KVM_VGIC_ITS_ADDR_TYPE, &addr, true);
++
++	addr = 0x300000;
++	ret = _kvm_device_access(its_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
++			  KVM_VGIC_ITS_ADDR_TYPE, &addr, true);
++	TEST_ASSERT(ret && errno == EEXIST, "ITS base set again");
++
++	close(its_fd);
 +	vm_gic_destroy(&v);
 +}
 +
  /*
   * Returns 0 if it's possible to create GIC device of a given type (V2 or V3).
   */
-@@ -616,6 +649,7 @@ void run_tests(uint32_t gic_dev_type)
- 		test_v3_typer_accesses();
+@@ -650,6 +691,7 @@ void run_tests(uint32_t gic_dev_type)
  		test_v3_last_bit_redist_regions();
  		test_v3_last_bit_single_rdist();
-+		test_v3_redist_ipa_range_check_at_vcpu_run();
+ 		test_v3_redist_ipa_range_check_at_vcpu_run();
++		test_v3_its_region();
  	}
  }
  
