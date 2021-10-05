@@ -2,237 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A32FD423084
-	for <lists+kvm@lfdr.de>; Tue,  5 Oct 2021 21:05:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 04FF04230C0
+	for <lists+kvm@lfdr.de>; Tue,  5 Oct 2021 21:27:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232861AbhJETHc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Oct 2021 15:07:32 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:28872 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229684AbhJETHb (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 5 Oct 2021 15:07:31 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1633460740;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Dl3aTJvWqGu6seveycGfN6caamqhyrUPV6cp3PR6dwA=;
-        b=X4WXoYUgxZDIFZc0LT2ztx3ga9cWoetRanYI0F8r366HE0yRy065p8iP9YcmLQMpCht1Gd
-        P86InLm1qYiI2v5s1PcCJgdZFtuAayGhGKbLJvTIJfKIUsw3aYs9ecvWUDteMB4pIzZXc3
-        M8gD96VpJcQOpek9n6/eQXo5lbfVfHI=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-490-UwAqCXXJObmOpSHPm4Hd7w-1; Tue, 05 Oct 2021 15:05:39 -0400
-X-MC-Unique: UwAqCXXJObmOpSHPm4Hd7w-1
-Received: by mail-ed1-f71.google.com with SMTP id k10-20020a508aca000000b003dad77857f7so120146edk.22
-        for <kvm@vger.kernel.org>; Tue, 05 Oct 2021 12:05:39 -0700 (PDT)
+        id S234762AbhJET3O (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Oct 2021 15:29:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59066 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229671AbhJET3N (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Oct 2021 15:29:13 -0400
+Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E557AC061749
+        for <kvm@vger.kernel.org>; Tue,  5 Oct 2021 12:27:22 -0700 (PDT)
+Received: by mail-wr1-x435.google.com with SMTP id t8so981585wri.1
+        for <kvm@vger.kernel.org>; Tue, 05 Oct 2021 12:27:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=sender:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=gjGbZQFATwhF+BES3nhgMC8T008nZ3OInRqvg+24qlo=;
+        b=UrohL+upv4vlrkwkvaFauYBW9yeI+t5LBdA74nxK6EUFBjQFfxSjZESHmsOL9VLdQQ
+         m9syZF7vkkjdVm/nDeF/BYFoXmCpb1sMrewykOtb/hEFj29x4/Kg2VMLREKcpAHYTn1C
+         74avyLnpMeYxn0pNnZD6ffe71lVglJSgko83XgSyKjJAD4Ycl3ysLSiNEOvqh6JIMZh/
+         FZhEHGg+lieSd4QLk3BGoHv3u/H2U2F2NQXLaiaqdIf+Bk4iYz0di7QqP8GemttuUgi5
+         KcMMNOVowG5GuyXgbmmPs6JVTYqcPZg8JClLX58HPyuXDSYm2+v1nlMlrscpSL7VcPMP
+         9ngw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Dl3aTJvWqGu6seveycGfN6caamqhyrUPV6cp3PR6dwA=;
-        b=klrj42RUXHq/+XgK9jZve5CZMHiNSTb0PKWGAT5MGK75vl6tL+60dDo5gfSYhqQNPy
-         Y4DqzybFw800B+IGK+FsT1LwPIU58Zi1ZAkbeQLaLScxQptjjdR0SpAT90XmlfFHF51M
-         IEcXV5dsfBhBM7stpSjuoG6aGh8TUvwnyN1w5B5Iz4AW0BwlT5F+sjAO3j3kRz2Xuwe2
-         oR0R5+mcK7s4rceaLMSo/OK5gSkRWqPWBALPtqkQ6To4lS+GNECCRCr114AduXePpPdp
-         petYmtTPKTwZorXRkP/b6JqPO/hZFEBuVmPizbmgE8/OfJuSflKiIr6TVtcxuP0+kn4e
-         bJzw==
-X-Gm-Message-State: AOAM53035h1MoJkUJbPg498M0mAJ1Dk+kSelNa1LHTg1nBkRX6yU0UBN
-        3tLyrxumF/cSVBW6hC1S5DsvWbTfb9wetTYfeGL+SwhUY6CowncVKwPsSjKlqPWxZYF7kc2+n9r
-        TM/YMi64B3BjJ
-X-Received: by 2002:a17:907:3e03:: with SMTP id hp3mr26025552ejc.183.1633460738380;
-        Tue, 05 Oct 2021 12:05:38 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyF8eNT+AVYZrVXza6mM5jC46JOKIEFUXE9ObrEwpUyLiPwySHkyfYF0utBleIoX6+4pNLMYw==
-X-Received: by 2002:a17:907:3e03:: with SMTP id hp3mr26025507ejc.183.1633460738047;
-        Tue, 05 Oct 2021 12:05:38 -0700 (PDT)
-Received: from gator.home (cst2-174-28.cust.vodafone.cz. [31.30.174.28])
-        by smtp.gmail.com with ESMTPSA id z8sm8114401ejd.94.2021.10.05.12.05.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Oct 2021 12:05:37 -0700 (PDT)
-Date:   Tue, 5 Oct 2021 21:05:35 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Oliver Upton <oupton@google.com>
-Cc:     kvmarm@lists.cs.columbia.edu, Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <Alexandru.Elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH v2 10/11] selftests: KVM: Refactor psci_test to make it
- amenable to new tests
-Message-ID: <20211005190535.mxk6do6sbpf4j2c7@gator.home>
-References: <20210923191610.3814698-1-oupton@google.com>
- <20210923191610.3814698-11-oupton@google.com>
- <20211005134539.s7kzhqlg2pykfcam@gator.home>
- <CAOQ_QsjQ28b8OXLR1o8QD=M8dsBKtPLyB-QRyd=D1UVMGy6o0w@mail.gmail.com>
+        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
+         :subject:content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=gjGbZQFATwhF+BES3nhgMC8T008nZ3OInRqvg+24qlo=;
+        b=3Uo5Z0UbI+z3p1qidIm7+L43DOE07kIRooeE+jKtwI/VGReWQ7N5KIh4fjsqg+AvTA
+         RxAoolnue1r4IYaevOOELe3/QCLL+UqWurzYrVnKBdN+MkeJrqbyGAlQM8m4+ong5N9b
+         PpplEmo/VlTSChnJWSi3EuA5R2DPsBK5JCjF316z25BfoJlovq0fi+mgWOPd1Jp9EKHN
+         mATQlwe9WLX0JwiyVyRMy1GcHoK5+WY4JW9OIb6sn9IAoZg0cBAxrLtNK9gJcEe8iKxj
+         nJGcoHd16ds1Hg38J9mdaSGK0qDaYIjYLMWSWXdE8E75kWxi9Ixqbjw26aK4UsXNvmr4
+         Z2jQ==
+X-Gm-Message-State: AOAM531lqH4ry2LBDznaSEnCF4msE3N3WCQoZ8YR2IJvGiuObwEyKNLi
+        oyWTSBT+8R8oX/oWnT5iluI=
+X-Google-Smtp-Source: ABdhPJxGvGzHYlon9ExqeHoSmKdWMwW1h9D3Y2v58vJK0sc8Pe5g8O3IcFEmry7YN9RlXZA+NbsL0A==
+X-Received: by 2002:a1c:4484:: with SMTP id r126mr5381571wma.150.1633462041536;
+        Tue, 05 Oct 2021 12:27:21 -0700 (PDT)
+Received: from [192.168.1.36] (118.red-83-35-24.dynamicip.rima-tde.net. [83.35.24.118])
+        by smtp.gmail.com with ESMTPSA id p18sm7312497wrt.96.2021.10.05.12.27.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 05 Oct 2021 12:27:20 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= 
+        <philippe.mathieu.daude@gmail.com>
+Message-ID: <79bc4067-1ed0-0b06-e847-2875c75ffb9f@amsat.org>
+Date:   Tue, 5 Oct 2021 21:27:18 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAOQ_QsjQ28b8OXLR1o8QD=M8dsBKtPLyB-QRyd=D1UVMGy6o0w@mail.gmail.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [PATCH v3] target/i386: Include 'hw/i386/apic.h' locally
+Content-Language: en-US
+To:     Laurent Vivier <laurent@vivier.eu>,
+        "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+        qemu-trivial@nongnu.org, haxm-team@intel.com,
+        Richard Henderson <richard.henderson@linaro.org>,
+        qemu-devel@nongnu.org, Cameron Esfahani <dirty@apple.com>,
+        Kamil Rytarowski <kamil@netbsd.org>,
+        Reinoud Zandijk <reinoud@netbsd.org>,
+        Colin Xu <colin.xu@intel.com>,
+        Roman Bolshakov <r.bolshakov@yadro.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sunil Muthuswamy <sunilmut@microsoft.com>,
+        Wenchao Wang <wenchao.wang@intel.com>
+References: <20210929163124.2523413-1-f4bug@amsat.org>
+ <20211005105745-mutt-send-email-mst@kernel.org>
+ <fb4d7f19-8bb5-781d-4a41-9641625a2019@vivier.eu>
+From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+In-Reply-To: <fb4d7f19-8bb5-781d-4a41-9641625a2019@vivier.eu>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 05, 2021 at 07:54:01AM -0700, Oliver Upton wrote:
-> Hi Drew,
+On 10/5/21 18:45, Laurent Vivier wrote:
+> Le 05/10/2021 à 16:57, Michael S. Tsirkin a écrit :
+>> On Wed, Sep 29, 2021 at 06:31:24PM +0200, Philippe Mathieu-Daudé wrote:
+>>> Instead of including a sysemu-specific header in "cpu.h"
+>>> (which is shared with user-mode emulations), include it
+>>> locally when required.
+>>>
+>>> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+>>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>>
+>> Acked-by: Michael S. Tsirkin <mst@redhat.com>
+>>
+>> which tree? trivial I guess?
 > 
-> On Tue, Oct 5, 2021 at 6:45 AM Andrew Jones <drjones@redhat.com> wrote:
-> >
-> > On Thu, Sep 23, 2021 at 07:16:09PM +0000, Oliver Upton wrote:
-> > > Split up the current test into several helpers that will be useful to
-> > > subsequent test cases added to the PSCI test suite.
-> > >
-> > > Signed-off-by: Oliver Upton <oupton@google.com>
-> > > ---
-> > >  .../testing/selftests/kvm/aarch64/psci_test.c | 68 ++++++++++++-------
-> > >  1 file changed, 45 insertions(+), 23 deletions(-)
-> > >
-> > > diff --git a/tools/testing/selftests/kvm/aarch64/psci_test.c b/tools/testing/selftests/kvm/aarch64/psci_test.c
-> > > index 8d043e12b137..90312be335da 100644
-> > > --- a/tools/testing/selftests/kvm/aarch64/psci_test.c
-> > > +++ b/tools/testing/selftests/kvm/aarch64/psci_test.c
-> > > @@ -45,7 +45,7 @@ static uint64_t psci_affinity_info(uint64_t target_affinity,
-> > >       return res.a0;
-> > >  }
-> > >
-> > > -static void guest_main(uint64_t target_cpu)
-> > > +static void guest_test_cpu_on(uint64_t target_cpu)
-> > >  {
-> > >       GUEST_ASSERT(!psci_cpu_on(target_cpu, CPU_ON_ENTRY_ADDR, CPU_ON_CONTEXT_ID));
-> > >       uint64_t target_state;
-> > > @@ -69,12 +69,10 @@ static void vcpu_power_off(struct kvm_vm *vm, uint32_t vcpuid)
-> > >       vcpu_set_mp_state(vm, vcpuid, &mp_state);
-> > >  }
+> Yes, but for me the patch was not correct because there is no need to update target/i386/cpu-dump.c
+> But perhaps I misunderstood the answer from Philippe?
 
-Context from last patch.
-
-> > >
-> > > -int main(void)
-> > > +static struct kvm_vm *setup_vm(void *guest_code)
-> > >  {
-> > > -     uint64_t target_mpidr, obs_pc, obs_x0;
-> > >       struct kvm_vcpu_init init;
-> > >       struct kvm_vm *vm;
-> > > -     struct ucall uc;
-> > >
-> > >       vm = vm_create(VM_MODE_DEFAULT, DEFAULT_GUEST_PHY_PAGES, O_RDWR);
-> > >       kvm_vm_elf_load(vm, program_invocation_name);
-> > > @@ -83,31 +81,28 @@ int main(void)
-> > >       vm_ioctl(vm, KVM_ARM_PREFERRED_TARGET, &init);
-> > >       init.features[0] |= (1 << KVM_ARM_VCPU_PSCI_0_2);
-> > >
-> > > -     aarch64_vcpu_add_default(vm, VCPU_ID_SOURCE, &init, guest_main);
-> > > -     aarch64_vcpu_add_default(vm, VCPU_ID_TARGET, &init, guest_main);
-> > > +     aarch64_vcpu_add_default(vm, VCPU_ID_SOURCE, &init, guest_code);
-> > > +     aarch64_vcpu_add_default(vm, VCPU_ID_TARGET, &init, guest_code);
-
-Context from last patch.
-
-> > >
-> > > -     /*
-> > > -      * make sure the target is already off when executing the test.
-> > > -      */
-> > > -     vcpu_power_off(vm, VCPU_ID_TARGET);
-> > > +     return vm;
-> > > +}
-> > >
-> > > -     get_reg(vm, VCPU_ID_TARGET, ARM64_SYS_REG(MPIDR_EL1), &target_mpidr);
-> > > -     vcpu_args_set(vm, VCPU_ID_SOURCE, 1, target_mpidr & MPIDR_HWID_BITMASK);
-> > > -     vcpu_run(vm, VCPU_ID_SOURCE);
-> > > +static void enter_guest(struct kvm_vm *vm, uint32_t vcpuid)
-> > > +{
-> > > +     struct ucall uc;
-> > >
-> > > -     switch (get_ucall(vm, VCPU_ID_SOURCE, &uc)) {
-> > > -     case UCALL_DONE:
-> > > -             break;
-> > > -     case UCALL_ABORT:
-> > > +     vcpu_run(vm, vcpuid);
-> > > +     if (get_ucall(vm, vcpuid, &uc) == UCALL_ABORT)
-> > >               TEST_FAIL("%s at %s:%ld", (const char *)uc.args[0], __FILE__,
-> > >                         uc.args[1]);
-> > > -             break;
-> > > -     default:
-> > > -             TEST_FAIL("Unhandled ucall: %lu", uc.cmd);
-> > > -     }
-> > > +}
-> > >
-> > > -     get_reg(vm, VCPU_ID_TARGET, ARM64_CORE_REG(regs.pc), &obs_pc);
-> > > -     get_reg(vm, VCPU_ID_TARGET, ARM64_CORE_REG(regs.regs[0]), &obs_x0);
-> > > +static void assert_vcpu_reset(struct kvm_vm *vm, uint32_t vcpuid)
-> > > +{
-> > > +     uint64_t obs_pc, obs_x0;
-> > > +
-> > > +     get_reg(vm, vcpuid, ARM64_CORE_REG(regs.pc), &obs_pc);
-> > > +     get_reg(vm, vcpuid, ARM64_CORE_REG(regs.regs[0]), &obs_x0);
-> > >
-> > >       TEST_ASSERT(obs_pc == CPU_ON_ENTRY_ADDR,
-> > >                   "unexpected target cpu pc: %lx (expected: %lx)",
-> > > @@ -115,7 +110,34 @@ int main(void)
-> > >       TEST_ASSERT(obs_x0 == CPU_ON_CONTEXT_ID,
-> > >                   "unexpected target context id: %lx (expected: %lx)",
-> > >                   obs_x0, CPU_ON_CONTEXT_ID);
-> > > +}
-> > >
-> > > +static void host_test_cpu_on(void)
-> > > +{
-> > > +     uint64_t target_mpidr;
-> > > +     struct kvm_vm *vm;
-> > > +     struct ucall uc;
-> > > +
-> > > +     vm = setup_vm(guest_test_cpu_on);
-> > > +
-> > > +     /*
-> > > +      * make sure the target is already off when executing the test.
-> > > +      */
-> > > +     vcpu_power_off(vm, VCPU_ID_TARGET);
-> > > +
-> > > +     get_reg(vm, VCPU_ID_TARGET, ARM64_SYS_REG(MPIDR_EL1), &target_mpidr);
-> > > +     vcpu_args_set(vm, VCPU_ID_SOURCE, 1, target_mpidr & MPIDR_HWID_BITMASK);
-> > > +     enter_guest(vm, VCPU_ID_SOURCE);
-> > > +
-> > > +     if (get_ucall(vm, VCPU_ID_SOURCE, &uc) != UCALL_DONE)
-> > > +             TEST_FAIL("Unhandled ucall: %lu", uc.cmd);
-> > > +
-> > > +     assert_vcpu_reset(vm, VCPU_ID_TARGET);
-> > >       kvm_vm_free(vm);
-> > > +}
-> > > +
-> > > +int main(void)
-> > > +{
-> > > +     host_test_cpu_on();
-> > >       return 0;
-> > >  }
-> > > --
-> > > 2.33.0.685.g46640cef36-goog
-> > >
-> >
-> > Hard to read diff, but I think the refactoring comes out right.
-> 
-> Yeah, this one's nasty, sorry about that. Thanks for parsing it out, heh.
-> 
-> > Please do this refactoring before adding the new test in the next revision, though.
-> >
-> 
-> This is 10/11 in the series, and the test is 11/11. I'm not seeing any
-> context belonging to the last patch, but perhaps I'm missing something
-> obvious.
-
-It's not much, but nicer to have none.
-
-Thanks,
-drew
-
-> 
-> > Reviewed-by: Andrew Jones <drjones@redhat.com>
-> 
-> Thanks!
-> 
-> --
-> Best,
-> Oliver
-> 
-
+You understood correctly, this series requires a respin.
