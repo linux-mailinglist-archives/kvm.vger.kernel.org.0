@@ -2,298 +2,352 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E57CA422B99
-	for <lists+kvm@lfdr.de>; Tue,  5 Oct 2021 16:58:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4D05E422BB8
+	for <lists+kvm@lfdr.de>; Tue,  5 Oct 2021 17:01:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233705AbhJEO75 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Oct 2021 10:59:57 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:21916 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231226AbhJEO74 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 5 Oct 2021 10:59:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1633445885;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=rEZND+uRQZ2jXkjYnNViAUBIpQ2vwZb0Yzke1gX91No=;
-        b=Qua6q2AeHZKqGBlNmdk9JhS2ba3TMGDxgj1DZJmuyZBbnTwrzhUuc3+sYrmszuXpMe9gHz
-        f5Vtc9U+NbTy37ZLyxVZK3tbaL8a3c5NO+DQgw9h8SwpshLR5gZETVRZ+ts+N++YY3X6p8
-        MnuXYj74ETqRq1/c8GMHca4Ww1y99Ao=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-506-MY7G4zQiNu-RJ5qwO8cOwQ-1; Tue, 05 Oct 2021 10:58:04 -0400
-X-MC-Unique: MY7G4zQiNu-RJ5qwO8cOwQ-1
-Received: by mail-ed1-f71.google.com with SMTP id u17-20020a50d511000000b003daa3828c13so20868682edi.12
-        for <kvm@vger.kernel.org>; Tue, 05 Oct 2021 07:58:03 -0700 (PDT)
+        id S231226AbhJEPD1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Oct 2021 11:03:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52932 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229488AbhJEPD1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Oct 2021 11:03:27 -0400
+Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14E9AC061749
+        for <kvm@vger.kernel.org>; Tue,  5 Oct 2021 08:01:36 -0700 (PDT)
+Received: by mail-lf1-x134.google.com with SMTP id u18so87782093lfd.12
+        for <kvm@vger.kernel.org>; Tue, 05 Oct 2021 08:01:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=42G3scgpWAbOtgxef+InMFnEa34BVWcCFN53mKIikV0=;
+        b=HaQ73Zp2P266ypuNKElq+jGbVlRIzMQ71XS7qQ2exXnMK2YWPRGvke9i4gh75sOsHE
+         AaUeLPa93afxOCNwDZ4rZXLseWBCcrIfDV+lcMPL8MqJOAs+FWh2d7is2HYq78mBQQgY
+         ZsYMsSpe8OkVrFv2+9XCEJSlWRawQCTaHtx3wCgLF/QdyXZ8UIbGcWs6yj/t+XvrMku9
+         N7Q4tFJpL31ePVP6Ed4OYRuJ0y7Yai1ntz96WQrNjMKAqmokUP+uPW//gqWd7n6iNAgs
+         srNj0nk5DBhe5iGveSfa7mXy7iSJxoZ7n5flMapZuomGAFyxyG0oTyLq+ZCevbABcV4Y
+         K3EQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=rEZND+uRQZ2jXkjYnNViAUBIpQ2vwZb0Yzke1gX91No=;
-        b=L7Zr0AM0sGMccB7vnVhgXioRismHXIj31RaxBtdnQOAIK/xmHIPUbEIMEThY+sL1tt
-         15+bDeb4yvVf7S9z0y7CE/nPrIEZsULJlQloCX5PzUlbperbRt9LrNNM7HafI7j+I4r7
-         EzvwJetxidMypbixZn8gAV6HjfKYmEs9NfjWPR7pqXi+19n7U+7fCGRM9FM3S6Hb7Dvn
-         rNBzEQ+YWZ2cWREO4ZViaw6ydSaMLC2gqQDdLsyus8ju/B2tX4iG78u5U6SjKNyqboC7
-         NlO1Sg/+dtuXVjn3ZyYH02ZEUTpJ7PR7Tjhwtk0I2eH5ABgLLgsqzaqjyOc7vBmOnLOl
-         r8+g==
-X-Gm-Message-State: AOAM533SJab2cnnozSCiYigRRkeAsgrvF8gw0AGLT+/ywBrZJiQmci1v
-        ohCwFJ9wRmaCYg4ECLIE8kOnzl6lTsvFBfrI20HLalvkUe6e/6M7dfT4MYiPiwRT+JTqNOJEADP
-        w03uNK8bGKH9E
-X-Received: by 2002:a17:906:1ec9:: with SMTP id m9mr26468870ejj.115.1633445882851;
-        Tue, 05 Oct 2021 07:58:02 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw2T3tBg98Roz+xgsbi5xVB5eSSYIFuiFIiONsYzlt7erGJu72m+ky0H9IKIL97a2uxUqtXqA==
-X-Received: by 2002:a17:906:1ec9:: with SMTP id m9mr26468850ejj.115.1633445882649;
-        Tue, 05 Oct 2021 07:58:02 -0700 (PDT)
-Received: from redhat.com ([2.55.147.134])
-        by smtp.gmail.com with ESMTPSA id m9sm8256357edl.66.2021.10.05.07.57.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Oct 2021 07:58:02 -0700 (PDT)
-Date:   Tue, 5 Oct 2021 10:57:57 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc:     qemu-devel@nongnu.org, haxm-team@intel.com,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Reinoud Zandijk <reinoud@netbsd.org>, qemu-trivial@nongnu.org,
-        Sunil Muthuswamy <sunilmut@microsoft.com>,
-        Colin Xu <colin.xu@intel.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Kamil Rytarowski <kamil@netbsd.org>,
-        Wenchao Wang <wenchao.wang@intel.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Roman Bolshakov <r.bolshakov@yadro.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Cameron Esfahani <dirty@apple.com>
-Subject: Re: [PATCH v3] target/i386: Include 'hw/i386/apic.h' locally
-Message-ID: <20211005105745-mutt-send-email-mst@kernel.org>
-References: <20210929163124.2523413-1-f4bug@amsat.org>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=42G3scgpWAbOtgxef+InMFnEa34BVWcCFN53mKIikV0=;
+        b=8Cmjv0wCe5Qp5nGu9evtaRDEBQ+PfxpFEBKNSsF4b9DYrlVxMMrQ0oUWV79GCBK6X1
+         VuRUBMWUlW9s2j3+BFA9FwFymXP9/j6z0ks1865cCEGjdkpgLf5a4cOYOB+0BkPN5Yyt
+         nVpNfAHLvKuH5LN0HX1GnSeB9Z+Uv1q6vLaDZRb8L31h4zQzugskkpDeXi1htCoNWU6E
+         d7XWpJ0LdsuJK9tdWnhfGVmgeiNiOwPUPpUzxiYRPXN0aPuBJ1M8YbnnsBtXWnV2qjhX
+         pXCh4viK2AZUDp5enfrwFQ/aDztLhJA8ZhO9d6hzZSLOT0pDeh7JJoMO+56jFj6/7HZF
+         mp/A==
+X-Gm-Message-State: AOAM533cI3vLVKrIk24Hofq7fqpe8bsBaxUVFfj+eiox1CyL7X6ziY3G
+        ERz+GYH7g7UWbzsvj1vTVsfubj5nXR9RbWy1JwBKJw==
+X-Google-Smtp-Source: ABdhPJwfIVQtcMQUnNx8RT4h/VH+mgd9JIEGGedHljgEqbQmJLD/tT2gzhFnJVT7XW0mk42MFtXlb2TKsV03h7OLuhU=
+X-Received: by 2002:a2e:8787:: with SMTP id n7mr21556614lji.278.1633446087421;
+ Tue, 05 Oct 2021 08:01:27 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20210929163124.2523413-1-f4bug@amsat.org>
+References: <20210820155918.7518-1-brijesh.singh@amd.com> <20210820155918.7518-26-brijesh.singh@amd.com>
+ <CAMkAt6qsZNJPM97Y6_8b7QmLv=n0MaDs7hThi3thFEee4P10pA@mail.gmail.com> <e5a47417-2f2e-7055-71ad-850b509f3876@amd.com>
+In-Reply-To: <e5a47417-2f2e-7055-71ad-850b509f3876@amd.com>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Tue, 5 Oct 2021 09:01:15 -0600
+Message-ID: <CAMkAt6pJQmgzbpfxbXF_aJobszG8OU=rfVw8Xk9SMqC6050G6g@mail.gmail.com>
+Subject: Re: [PATCH Part2 v5 25/45] KVM: SVM: Add KVM_SEV_SNP_LAUNCH_UPDATE command
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>, linux-coco@lists.linux.dev,
+        linux-mm@kvack.org, linux-crypto@vger.kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        Marc Orr <marcorr@google.com>,
+        sathyanarayanan.kuppuswamy@linux.intel.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 29, 2021 at 06:31:24PM +0200, Philippe Mathieu-Daudé wrote:
-> Instead of including a sysemu-specific header in "cpu.h"
-> (which is shared with user-mode emulations), include it
-> locally when required.
-> 
-> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+On Mon, Sep 27, 2021 at 1:33 PM Brijesh Singh <brijesh.singh@amd.com> wrote:
+>
+>
+>
+> On 9/27/21 11:43 AM, Peter Gonda wrote:
+> ...
+> >>
+> >> +static bool is_hva_registered(struct kvm *kvm, hva_t hva, size_t len)
+> >> +{
+> >> +       struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> >> +       struct list_head *head = &sev->regions_list;
+> >> +       struct enc_region *i;
+> >> +
+> >> +       lockdep_assert_held(&kvm->lock);
+> >> +
+> >> +       list_for_each_entry(i, head, list) {
+> >> +               u64 start = i->uaddr;
+> >> +               u64 end = start + i->size;
+> >> +
+> >> +               if (start <= hva && end >= (hva + len))
+> >> +                       return true;
+> >> +       }
+> >> +
+> >> +       return false;
+> >> +}
+> >
+> > Internally we actually register the guest memory in chunks for various
+> > reasons. So for our largest SEV VM we have 768 1 GB entries in
+> > |sev->regions_list|. This was OK before because no look ups were done.
+> > Now that we are performing a look ups a linked list with linear time
+> > lookups seems not ideal, could we switch the back data structure here
+> > to something more conducive too fast lookups?
+> >> +
+>
+> Interesting, for qemu we had very few number of regions so there was no
+> strong reason for me to think something otherwise. Do you have any
+> preference on what data structure you will use ?
 
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
+Chatted offline. I think this is fine for now, we won't want to use
+our userspace demand pinning with SNP yet.
 
-which tree? trivial I guess?
+>
+> >> +static int snp_launch_update(struct kvm *kvm, struct kvm_sev_cmd *argp)
+> >> +{
+> >> +       struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> >> +       struct sev_data_snp_launch_update data = {0};
+> >> +       struct kvm_sev_snp_launch_update params;
+> >> +       unsigned long npages, pfn, n = 0;
+> >
+> > Could we have a slightly more descriptive name for |n|? nprivate
+> > maybe? Also why not zero in the loop below?
+> >
+>
+> Sure, I will pick a better name and no need to zero above. I will fix it.
+>
+> > for (i = 0, n = 0; i < npages; ++i)
+> >
+> >> +       int *error = &argp->error;
+> >> +       struct page **inpages;
+> >> +       int ret, i, level;
+> >
+> > Should |i| be an unsigned long since it can is tracked in a for loop
+> > with "i < npages" npages being an unsigned long? (|n| too)
+> >
+>
+> Noted.
+>
+> >> +       u64 gfn;
+> >> +
+> >> +       if (!sev_snp_guest(kvm))
+> >> +               return -ENOTTY;
+> >> +
+> >> +       if (!sev->snp_context)
+> >> +               return -EINVAL;
+> >> +
+> >> +       if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data, sizeof(params)))
+> >> +               return -EFAULT;
+> >> +
+> >> +       /* Verify that the specified address range is registered. */
+> >> +       if (!is_hva_registered(kvm, params.uaddr, params.len))
+> >> +               return -EINVAL;
+> >> +
+> >> +       /*
+> >> +        * The userspace memory is already locked so technically we don't
+> >> +        * need to lock it again. Later part of the function needs to know
+> >> +        * pfn so call the sev_pin_memory() so that we can get the list of
+> >> +        * pages to iterate through.
+> >> +        */
+> >> +       inpages = sev_pin_memory(kvm, params.uaddr, params.len, &npages, 1);
+> >> +       if (!inpages)
+> >> +               return -ENOMEM;
+> >> +
+> >> +       /*
+> >> +        * Verify that all the pages are marked shared in the RMP table before
+> >> +        * going further. This is avoid the cases where the userspace may try
+> >
+> > This is *too* avoid cases...
+> >
+> Noted
+>
+> >> +        * updating the same page twice.
+> >> +        */
+> >> +       for (i = 0; i < npages; i++) {
+> >> +               if (snp_lookup_rmpentry(page_to_pfn(inpages[i]), &level) != 0) {
+> >> +                       sev_unpin_memory(kvm, inpages, npages);
+> >> +                       return -EFAULT;
+> >> +               }
+> >> +       }
+> >> +
+> >> +       gfn = params.start_gfn;
+> >> +       level = PG_LEVEL_4K;
+> >> +       data.gctx_paddr = __psp_pa(sev->snp_context);
+> >> +
+> >> +       for (i = 0; i < npages; i++) {
+> >> +               pfn = page_to_pfn(inpages[i]);
+> >> +
+> >> +               ret = rmp_make_private(pfn, gfn << PAGE_SHIFT, level, sev_get_asid(kvm), true);
+> >> +               if (ret) {
+> >> +                       ret = -EFAULT;
+> >> +                       goto e_unpin;
+> >> +               }
+> >> +
+> >> +               n++;
+> >> +               data.address = __sme_page_pa(inpages[i]);
+> >> +               data.page_size = X86_TO_RMP_PG_LEVEL(level);
+> >> +               data.page_type = params.page_type;
+> >> +               data.vmpl3_perms = params.vmpl3_perms;
+> >> +               data.vmpl2_perms = params.vmpl2_perms;
+> >> +               data.vmpl1_perms = params.vmpl1_perms;
+> >> +               ret = __sev_issue_cmd(argp->sev_fd, SEV_CMD_SNP_LAUNCH_UPDATE, &data, error);
+> >> +               if (ret) {
+> >> +                       /*
+> >> +                        * If the command failed then need to reclaim the page.
+> >> +                        */
+> >> +                       snp_page_reclaim(pfn);
+> >> +                       goto e_unpin;
+> >> +               }
+> >
+> > Hmm if this call fails after the first iteration of this loop it will
+> > lead to a hard to reproduce LaunchDigest right? Say if we are
+> > SnpLaunchUpdating just 2 pages A and B. If we first call this ioctl
+> > and A is SNP_LAUNCH_UPDATED'd but B fails, we then make A shared again
+> > in the RMP. So we must call the ioctl with 2 pages again, after fixing
+> > the issue with page B. Now the Launch digest has something like
+> > Hash(A) then HASH(A & B) right (overly simplified) so A will be
+> > included twice right? I am not sure if anything better can be done
+> > here but might be worth documenting IIUC.
+> >
+>
+> I can add a comment in documentation that if a LAUNCH_UPDATE fails then
+> user need to destroy the existing context and start from the beginning.
+> I am not sure if we want to support the partial update cases. But in
+> case we have two choices a) decommission the context on failure or b)
+> add a new command to destroy the existing context.
+>
 
-> ---
->  target/i386/cpu.h                    | 4 ----
->  hw/i386/kvmvapic.c                   | 1 +
->  hw/i386/x86.c                        | 1 +
->  target/i386/cpu-dump.c               | 1 +
->  target/i386/cpu-sysemu.c             | 1 +
->  target/i386/cpu.c                    | 1 +
->  target/i386/gdbstub.c                | 4 ++++
->  target/i386/hax/hax-all.c            | 1 +
->  target/i386/helper.c                 | 1 +
->  target/i386/hvf/hvf.c                | 1 +
->  target/i386/hvf/x86_emu.c            | 1 +
->  target/i386/nvmm/nvmm-all.c          | 1 +
->  target/i386/tcg/sysemu/misc_helper.c | 1 +
->  target/i386/tcg/sysemu/seg_helper.c  | 1 +
->  target/i386/whpx/whpx-all.c          | 1 +
->  15 files changed, 17 insertions(+), 4 deletions(-)
-> 
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index c2954c71ea0..4411718bb7a 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -2045,10 +2045,6 @@ typedef X86CPU ArchCPU;
->  #include "exec/cpu-all.h"
->  #include "svm.h"
->  
-> -#if !defined(CONFIG_USER_ONLY)
-> -#include "hw/i386/apic.h"
-> -#endif
-> -
->  static inline void cpu_get_tb_cpu_state(CPUX86State *env, target_ulong *pc,
->                                          target_ulong *cs_base, uint32_t *flags)
->  {
-> diff --git a/hw/i386/kvmvapic.c b/hw/i386/kvmvapic.c
-> index 43f8a8f679e..7333818bdd1 100644
-> --- a/hw/i386/kvmvapic.c
-> +++ b/hw/i386/kvmvapic.c
-> @@ -16,6 +16,7 @@
->  #include "sysemu/hw_accel.h"
->  #include "sysemu/kvm.h"
->  #include "sysemu/runstate.h"
-> +#include "hw/i386/apic.h"
->  #include "hw/i386/apic_internal.h"
->  #include "hw/sysbus.h"
->  #include "hw/boards.h"
-> diff --git a/hw/i386/x86.c b/hw/i386/x86.c
-> index 00448ed55aa..e0218f8791f 100644
-> --- a/hw/i386/x86.c
-> +++ b/hw/i386/x86.c
-> @@ -43,6 +43,7 @@
->  #include "target/i386/cpu.h"
->  #include "hw/i386/topology.h"
->  #include "hw/i386/fw_cfg.h"
-> +#include "hw/i386/apic.h"
->  #include "hw/intc/i8259.h"
->  #include "hw/rtc/mc146818rtc.h"
->  
-> diff --git a/target/i386/cpu-dump.c b/target/i386/cpu-dump.c
-> index 02b635a52cf..0158fd2bf28 100644
-> --- a/target/i386/cpu-dump.c
-> +++ b/target/i386/cpu-dump.c
-> @@ -22,6 +22,7 @@
->  #include "qemu/qemu-print.h"
->  #ifndef CONFIG_USER_ONLY
->  #include "hw/i386/apic_internal.h"
-> +#include "hw/i386/apic.h"
->  #endif
->  
->  /***********************************************************/
-> diff --git a/target/i386/cpu-sysemu.c b/target/i386/cpu-sysemu.c
-> index 37b7c562f53..4e8a6973d08 100644
-> --- a/target/i386/cpu-sysemu.c
-> +++ b/target/i386/cpu-sysemu.c
-> @@ -30,6 +30,7 @@
->  #include "hw/qdev-properties.h"
->  
->  #include "exec/address-spaces.h"
-> +#include "hw/i386/apic.h"
->  #include "hw/i386/apic_internal.h"
->  
->  #include "cpu-internal.h"
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 6b029f1bdf1..52422cbf21b 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -33,6 +33,7 @@
->  #include "standard-headers/asm-x86/kvm_para.h"
->  #include "hw/qdev-properties.h"
->  #include "hw/i386/topology.h"
-> +#include "hw/i386/apic.h"
->  #ifndef CONFIG_USER_ONLY
->  #include "exec/address-spaces.h"
->  #include "hw/boards.h"
-> diff --git a/target/i386/gdbstub.c b/target/i386/gdbstub.c
-> index 098a2ad15a9..5438229c1a9 100644
-> --- a/target/i386/gdbstub.c
-> +++ b/target/i386/gdbstub.c
-> @@ -21,6 +21,10 @@
->  #include "cpu.h"
->  #include "exec/gdbstub.h"
->  
-> +#ifndef CONFIG_USER_ONLY
-> +#include "hw/i386/apic.h"
-> +#endif
-> +
->  #ifdef TARGET_X86_64
->  static const int gpr_map[16] = {
->      R_EAX, R_EBX, R_ECX, R_EDX, R_ESI, R_EDI, R_EBP, R_ESP,
-> diff --git a/target/i386/hax/hax-all.c b/target/i386/hax/hax-all.c
-> index bf65ed6fa92..cd89e3233a9 100644
-> --- a/target/i386/hax/hax-all.c
-> +++ b/target/i386/hax/hax-all.c
-> @@ -32,6 +32,7 @@
->  #include "sysemu/reset.h"
->  #include "sysemu/runstate.h"
->  #include "hw/boards.h"
-> +#include "hw/i386/apic.h"
->  
->  #include "hax-accel-ops.h"
->  
-> diff --git a/target/i386/helper.c b/target/i386/helper.c
-> index 533b29cb91b..874beda98ae 100644
-> --- a/target/i386/helper.c
-> +++ b/target/i386/helper.c
-> @@ -26,6 +26,7 @@
->  #ifndef CONFIG_USER_ONLY
->  #include "sysemu/hw_accel.h"
->  #include "monitor/monitor.h"
-> +#include "hw/i386/apic.h"
->  #endif
->  
->  void cpu_sync_bndcs_hflags(CPUX86State *env)
-> diff --git a/target/i386/hvf/hvf.c b/target/i386/hvf/hvf.c
-> index 4ba6e82fab3..50058a24f2a 100644
-> --- a/target/i386/hvf/hvf.c
-> +++ b/target/i386/hvf/hvf.c
-> @@ -70,6 +70,7 @@
->  #include <sys/sysctl.h>
->  
->  #include "hw/i386/apic_internal.h"
-> +#include "hw/i386/apic.h"
->  #include "qemu/main-loop.h"
->  #include "qemu/accel.h"
->  #include "target/i386/cpu.h"
-> diff --git a/target/i386/hvf/x86_emu.c b/target/i386/hvf/x86_emu.c
-> index 7c8203b21fb..fb3e88959d4 100644
-> --- a/target/i386/hvf/x86_emu.c
-> +++ b/target/i386/hvf/x86_emu.c
-> @@ -45,6 +45,7 @@
->  #include "x86_flags.h"
->  #include "vmcs.h"
->  #include "vmx.h"
-> +#include "hw/i386/apic.h"
->  
->  void hvf_handle_io(struct CPUState *cpu, uint16_t port, void *data,
->                     int direction, int size, uint32_t count);
-> diff --git a/target/i386/nvmm/nvmm-all.c b/target/i386/nvmm/nvmm-all.c
-> index a488b00e909..944bdb49663 100644
-> --- a/target/i386/nvmm/nvmm-all.c
-> +++ b/target/i386/nvmm/nvmm-all.c
-> @@ -22,6 +22,7 @@
->  #include "qemu/queue.h"
->  #include "migration/blocker.h"
->  #include "strings.h"
-> +#include "hw/i386/apic.h"
->  
->  #include "nvmm-accel-ops.h"
->  
-> diff --git a/target/i386/tcg/sysemu/misc_helper.c b/target/i386/tcg/sysemu/misc_helper.c
-> index 9ccaa054c4c..b1d3096e9c9 100644
-> --- a/target/i386/tcg/sysemu/misc_helper.c
-> +++ b/target/i386/tcg/sysemu/misc_helper.c
-> @@ -24,6 +24,7 @@
->  #include "exec/cpu_ldst.h"
->  #include "exec/address-spaces.h"
->  #include "tcg/helper-tcg.h"
-> +#include "hw/i386/apic.h"
->  
->  void helper_outb(CPUX86State *env, uint32_t port, uint32_t data)
->  {
-> diff --git a/target/i386/tcg/sysemu/seg_helper.c b/target/i386/tcg/sysemu/seg_helper.c
-> index bf3444c26b0..34f2c65d47f 100644
-> --- a/target/i386/tcg/sysemu/seg_helper.c
-> +++ b/target/i386/tcg/sysemu/seg_helper.c
-> @@ -24,6 +24,7 @@
->  #include "exec/cpu_ldst.h"
->  #include "tcg/helper-tcg.h"
->  #include "../seg_helper.h"
-> +#include "hw/i386/apic.h"
->  
->  #ifdef TARGET_X86_64
->  void helper_syscall(CPUX86State *env, int next_eip_addend)
-> diff --git a/target/i386/whpx/whpx-all.c b/target/i386/whpx/whpx-all.c
-> index 3e925b9da70..9ab844fd05d 100644
-> --- a/target/i386/whpx/whpx-all.c
-> +++ b/target/i386/whpx/whpx-all.c
-> @@ -20,6 +20,7 @@
->  #include "qemu/main-loop.h"
->  #include "hw/boards.h"
->  #include "hw/i386/ioapic.h"
-> +#include "hw/i386/apic.h"
->  #include "hw/i386/apic_internal.h"
->  #include "qemu/error-report.h"
->  #include "qapi/error.h"
-> -- 
-> 2.31.1
+Agreed supporting the partial update case seems very tricky.
 
+>
+> >> +
+> >> +               gfn++;
+> >> +       }
+> >> +
+> >> +e_unpin:
+> >> +       /* Content of memory is updated, mark pages dirty */
+> >> +       for (i = 0; i < n; i++) {
+> >> +               set_page_dirty_lock(inpages[i]);
+> >> +               mark_page_accessed(inpages[i]);
+> >> +
+> >> +               /*
+> >> +                * If its an error, then update RMP entry to change page ownership
+> >> +                * to the hypervisor.
+> >> +                */
+> >> +               if (ret)
+> >> +                       host_rmp_make_shared(pfn, level, true);
+> >> +       }
+> >> +
+> >> +       /* Unlock the user pages */
+> >> +       sev_unpin_memory(kvm, inpages, npages);
+> >> +
+> >> +       return ret;
+> >> +}
+> >> +
+> >>   int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
+> >>   {
+> >>          struct kvm_sev_cmd sev_cmd;
+> >> @@ -1712,6 +1873,9 @@ int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
+> >>          case KVM_SEV_SNP_LAUNCH_START:
+> >>                  r = snp_launch_start(kvm, &sev_cmd);
+> >>                  break;
+> >> +       case KVM_SEV_SNP_LAUNCH_UPDATE:
+> >> +               r = snp_launch_update(kvm, &sev_cmd);
+> >> +               break;
+> >>          default:
+> >>                  r = -EINVAL;
+> >>                  goto out;
+> >> @@ -1794,6 +1958,29 @@ find_enc_region(struct kvm *kvm, struct kvm_enc_region *range)
+> >>   static void __unregister_enc_region_locked(struct kvm *kvm,
+> >>                                             struct enc_region *region)
+> >>   {
+> >> +       unsigned long i, pfn;
+> >> +       int level;
+> >> +
+> >> +       /*
+> >> +        * The guest memory pages are assigned in the RMP table. Unassign it
+> >> +        * before releasing the memory.
+> >> +        */
+> >> +       if (sev_snp_guest(kvm)) {
+> >> +               for (i = 0; i < region->npages; i++) {
+> >> +                       pfn = page_to_pfn(region->pages[i]);
+> >> +
+> >> +                       if (!snp_lookup_rmpentry(pfn, &level))
+> >> +                               continue;
+> >> +
+> >> +                       cond_resched();
+> >> +
+> >> +                       if (level > PG_LEVEL_4K)
+> >> +                               pfn &= ~(KVM_PAGES_PER_HPAGE(PG_LEVEL_2M) - 1);
+> >> +
+> >> +                       host_rmp_make_shared(pfn, level, true);
+> >> +               }
+> >> +       }
+> >> +
+> >>          sev_unpin_memory(kvm, region->pages, region->npages);
+> >>          list_del(&region->list);
+> >>          kfree(region);
+> >> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> >> index e6416e58cd9a..0681be4bdfdf 100644
+> >> --- a/include/uapi/linux/kvm.h
+> >> +++ b/include/uapi/linux/kvm.h
+> >> @@ -1715,6 +1715,7 @@ enum sev_cmd_id {
+> >>          /* SNP specific commands */
+> >>          KVM_SEV_SNP_INIT,
+> >>          KVM_SEV_SNP_LAUNCH_START,
+> >> +       KVM_SEV_SNP_LAUNCH_UPDATE,
+> >>
+> >>          KVM_SEV_NR_MAX,
+> >>   };
+> >> @@ -1831,6 +1832,24 @@ struct kvm_sev_snp_launch_start {
+> >>          __u8 pad[6];
+> >>   };
+> >>
+> >> +#define KVM_SEV_SNP_PAGE_TYPE_NORMAL           0x1
+> >> +#define KVM_SEV_SNP_PAGE_TYPE_VMSA             0x2
+> >> +#define KVM_SEV_SNP_PAGE_TYPE_ZERO             0x3
+> >> +#define KVM_SEV_SNP_PAGE_TYPE_UNMEASURED       0x4
+> >> +#define KVM_SEV_SNP_PAGE_TYPE_SECRETS          0x5
+> >> +#define KVM_SEV_SNP_PAGE_TYPE_CPUID            0x6
+> >> +
+> >> +struct kvm_sev_snp_launch_update {
+> >> +       __u64 start_gfn;
+> >> +       __u64 uaddr;
+> >> +       __u32 len;
+> >> +       __u8 imi_page;
+> >> +       __u8 page_type;
+> >> +       __u8 vmpl3_perms;
+> >> +       __u8 vmpl2_perms;
+> >> +       __u8 vmpl1_perms;
+> >> +};
+> >> +
+> >>   #define KVM_DEV_ASSIGN_ENABLE_IOMMU    (1 << 0)
+> >>   #define KVM_DEV_ASSIGN_PCI_2_3         (1 << 1)
+> >>   #define KVM_DEV_ASSIGN_MASK_INTX       (1 << 2)
+> >> --
+> >> 2.17.1
+> >>
+> >>
