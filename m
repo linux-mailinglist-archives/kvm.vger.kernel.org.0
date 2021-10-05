@@ -2,81 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9A4CA4220A7
-	for <lists+kvm@lfdr.de>; Tue,  5 Oct 2021 10:25:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9EE16422117
+	for <lists+kvm@lfdr.de>; Tue,  5 Oct 2021 10:48:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232658AbhJEI1h (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Oct 2021 04:27:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:57844 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230286AbhJEI1g (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 5 Oct 2021 04:27:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1633422345;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=klLTM38m8AVOZiQC2QI4nrkV4JPwL7t0pdo1OBretqQ=;
-        b=hqi3C3AP3rcJYHcVDVfZ9cgRdykOLVMF2ESo5yeDt1PJtLvwXZMh7U/1X/QG1li9ZtXH1l
-        sy1ON9V4aoiClOfjRQFZiyoeTArl4CCilr06I4U3t6Sy8CemL13xhT8rcQ7CYARy3/bhMW
-        REnjsGqNu9z7NQKdqiQKtoHTCx+3+TY=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-27-5mJ4VyEbNkiubTgX3SLRIA-1; Tue, 05 Oct 2021 04:25:44 -0400
-X-MC-Unique: 5mJ4VyEbNkiubTgX3SLRIA-1
-Received: by mail-ed1-f69.google.com with SMTP id w6-20020a50d786000000b003dabc563406so15497901edi.17
-        for <kvm@vger.kernel.org>; Tue, 05 Oct 2021 01:25:44 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=klLTM38m8AVOZiQC2QI4nrkV4JPwL7t0pdo1OBretqQ=;
-        b=vnpEj9d115SupP83aAJTUGN3bQs5p994BHgLCbSbxPcgWQ6HKtCoazlBVep9dKQ9g/
-         4v5T6gwPEkGKn5+lUFf/SiH3D0VOS8c5bgQA1GBu6U3iPqJfxw2G3DSrf2xsUuuID40a
-         F1UmGhpxZxJxbMbHfDHzFd7FgeqA2wmppootB/X57hz6vtvMSKlThHo6a0Xh4oWRtPfd
-         hrofbIHX62KjfELqb4YVwt5jqXikvqDa6uQChnKctOijEKOj2Tl3lUOYmU1mE5WlPjtZ
-         Af0DQmDStJ2+odXM/LGoYL1+0yrFLmueVBGBmrBPSAA6ZxO5zmHywvV5gCOiDzCmMnoB
-         uoCw==
-X-Gm-Message-State: AOAM532iv8lFnKDgvSD1rTSdYyTUk+pzLGZwOMXRXUjq7mVRZhtE61ob
-        JX+29BH8NolJyN3EdVL4x2uc6uxPEGcs/vhAj+HlM7z3Qsf+OC05/7gRjXkxJeauLgH47Iw2du3
-        0gz+g/rV1R0bD
-X-Received: by 2002:aa7:cb8a:: with SMTP id r10mr24610031edt.237.1633422343347;
-        Tue, 05 Oct 2021 01:25:43 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwt1VKhq/RBXzX5ipjFdmZ4SJ96APOZh3Kl36oSEowMgWp+YD2AB6TtkzyVRAn0of8NmaYlxw==
-X-Received: by 2002:aa7:cb8a:: with SMTP id r10mr24610005edt.237.1633422343111;
-        Tue, 05 Oct 2021 01:25:43 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.gmail.com with ESMTPSA id kw10sm7412696ejc.71.2021.10.05.01.25.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 05 Oct 2021 01:25:42 -0700 (PDT)
-Message-ID: <82568eff-1eff-5e63-4264-ef0c25f79fc3@redhat.com>
-Date:   Tue, 5 Oct 2021 10:25:41 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [GIT PULL] KVM/riscv for 5.16
-Content-Language: en-US
-To:     Anup Patel <anup@brainfault.org>
-Cc:     Palmer Dabbelt <palmer@dabbelt.com>,
-        Palmer Dabbelt <palmerdabbelt@google.com>,
-        KVM General <kvm@vger.kernel.org>,
-        kvm-riscv@lists.infradead.org,
-        linux-riscv <linux-riscv@lists.infradead.org>
-References: <CAAhSdy37xNOs3udMe4GuLJ3=huKD1bsHEO_RfUPvuMiVw56GCQ@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <CAAhSdy37xNOs3udMe4GuLJ3=huKD1bsHEO_RfUPvuMiVw56GCQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        id S232511AbhJEIt4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Oct 2021 04:49:56 -0400
+Received: from mail.kernel.org ([198.145.29.99]:54136 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230526AbhJEItz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Oct 2021 04:49:55 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 91C806120F;
+        Tue,  5 Oct 2021 08:48:05 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1mXg7H-00EpOY-I9; Tue, 05 Oct 2021 09:48:03 +0100
+Date:   Tue, 05 Oct 2021 09:48:03 +0100
+Message-ID: <87sfxfrh6k.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Fuad Tabba <tabba@google.com>
+Cc:     kvmarm@lists.cs.columbia.edu, will@kernel.org, james.morse@arm.com,
+        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
+        mark.rutland@arm.com, christoffer.dall@arm.com,
+        pbonzini@redhat.com, drjones@redhat.com, oupton@google.com,
+        qperret@google.com, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kernel-team@android.com
+Subject: Re: [PATCH v6 12/12] KVM: arm64: Handle protected guests at 32 bits
+In-Reply-To: <20210922124704.600087-13-tabba@google.com>
+References: <20210922124704.600087-1-tabba@google.com>
+        <20210922124704.600087-13-tabba@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.cs.columbia.edu, will@kernel.org, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, mark.rutland@arm.com, christoffer.dall@arm.com, pbonzini@redhat.com, drjones@redhat.com, oupton@google.com, qperret@google.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05/10/21 09:55, Anup Patel wrote:
->    git://github.com/kvm-riscv/linux.git tags/kvm-riscv-5.16-1
+On Wed, 22 Sep 2021 13:47:04 +0100,
+Fuad Tabba <tabba@google.com> wrote:
+> 
+> Protected KVM does not support protected AArch32 guests. However,
+> it is possible for the guest to force run AArch32, potentially
+> causing problems. Add an extra check so that if the hypervisor
+> catches the guest doing that, it can prevent the guest from
+> running again by resetting vcpu->arch.target and returning
+> ARM_EXCEPTION_IL.
+> 
+> If this were to happen, The VMM can try and fix it by re-
+> initializing the vcpu with KVM_ARM_VCPU_INIT, however, this is
+> likely not possible for protected VMs.
+> 
+> Adapted from commit 22f553842b14 ("KVM: arm64: Handle Asymmetric
+> AArch32 systems")
+> 
+> Signed-off-by: Fuad Tabba <tabba@google.com>
+> ---
+>  arch/arm64/kvm/hyp/nvhe/switch.c | 40 ++++++++++++++++++++++++++++++++
+>  1 file changed, 40 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+> index 2bf5952f651b..d66226e49013 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/switch.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+> @@ -235,6 +235,43 @@ static const exit_handler_fn *kvm_get_exit_handler_array(struct kvm *kvm)
+>  	return hyp_exit_handlers;
+>  }
+>  
+> +/*
+> + * Some guests (e.g., protected VMs) might not be allowed to run in AArch32.
+> + * The ARMv8 architecture does not give the hypervisor a mechanism to prevent a
+> + * guest from dropping to AArch32 EL0 if implemented by the CPU. If the
+> + * hypervisor spots a guest in such a state ensure it is handled, and don't
+> + * trust the host to spot or fix it.  The check below is based on the one in
+> + * kvm_arch_vcpu_ioctl_run().
+> + *
+> + * Returns false if the guest ran in AArch32 when it shouldn't have, and
+> + * thus should exit to the host, or true if a the guest run loop can continue.
+> + */
+> +static bool handle_aarch32_guest(struct kvm_vcpu *vcpu, u64 *exit_code)
+> +{
+> +	struct kvm *kvm = (struct kvm *) kern_hyp_va(vcpu->kvm);
 
-Pulled, thanks!
+There is no need for an extra cast. kern_hyp_va() already provides a
+cast to the type of the parameter.
 
-Paolo
+> +	bool is_aarch32_allowed =
+> +		FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_EL0),
+> +			  get_pvm_id_aa64pfr0(vcpu)) >=
+> +				ID_AA64PFR0_ELx_32BIT_64BIT;
+> +
+> +
+> +	if (kvm_vm_is_protected(kvm) &&
+> +	    vcpu_mode_is_32bit(vcpu) &&
+> +	    !is_aarch32_allowed) {
 
+Do we really need to go through this is_aarch32_allowed check?
+Protected VMs don't have AArch32, and we don't have the infrastructure
+to handle 32bit at all. For non-protected VMs, we already have what we
+need at EL1. So the extra check only adds complexity.
+
+> +		/*
+> +		 * As we have caught the guest red-handed, decide that it isn't
+> +		 * fit for purpose anymore by making the vcpu invalid. The VMM
+> +		 * can try and fix it by re-initializing the vcpu with
+> +		 * KVM_ARM_VCPU_INIT, however, this is likely not possible for
+> +		 * protected VMs.
+> +		 */
+> +		vcpu->arch.target = -1;
+> +		*exit_code = ARM_EXCEPTION_IL;
+> +		return false;
+> +	}
+> +
+> +	return true;
+> +}
+> +
+>  /* Switch to the guest for legacy non-VHE systems */
+>  int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+>  {
+> @@ -297,6 +334,9 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+>  		/* Jump in the fire! */
+>  		exit_code = __guest_enter(vcpu);
+>  
+> +		if (unlikely(!handle_aarch32_guest(vcpu, &exit_code)))
+> +			break;
+> +
+>  		/* And we're baaack! */
+>  	} while (fixup_guest_exit(vcpu, &exit_code));
+>  
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
