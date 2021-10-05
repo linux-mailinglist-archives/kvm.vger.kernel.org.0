@@ -2,113 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 51184421E82
-	for <lists+kvm@lfdr.de>; Tue,  5 Oct 2021 07:58:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 965B5421E98
+	for <lists+kvm@lfdr.de>; Tue,  5 Oct 2021 08:02:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232245AbhJEGA3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Oct 2021 02:00:29 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29382 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231142AbhJEGA2 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 5 Oct 2021 02:00:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1633413517;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=HsMAFeG6+BJulfWL44xpPhDecEuG0faLg66D1hhuZ0c=;
-        b=Nd1pIl38x8Sj8Apdv2yd9SlFADceknMTHhK9rQZBwPLYZuw5SIs/GDz8ws6HgzFr3+kudo
-        1axrmAIaa+9tyIz5tCUAQ7yt4UXxowXficJonE+/5ZXrPHhHZHv36m1N7MoaIiS+tq4036
-        uAMRnDgFgfI2ttg3PP2ax6XOt5Kyo48=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-77-h3f9l-U9Nk6FjyajoLWyXg-1; Tue, 05 Oct 2021 01:58:36 -0400
-X-MC-Unique: h3f9l-U9Nk6FjyajoLWyXg-1
-Received: by mail-ed1-f72.google.com with SMTP id k10-20020a508aca000000b003dad77857f7so3636985edk.22
-        for <kvm@vger.kernel.org>; Mon, 04 Oct 2021 22:58:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=HsMAFeG6+BJulfWL44xpPhDecEuG0faLg66D1hhuZ0c=;
-        b=uMQDUj6trUX2bvOFf0WSJI9teh8OLGpVfhh7pmuYy86E6+eEjHhC28JsIf7mPDeN9/
-         p2gFFopj+xlfZfnEfhEa1euUdQk14WXwcqCywEsJOtS3d1/JmWXqcwsnJlpSqbloOpjm
-         Fl4PDTAZnZQ7jlA2720/kozmN9zbz+QuBuwyE/+CAXp+rCzGqin76xgjTuJ/K/Wv/NUh
-         EU1LfmE7d8Jqu7be7hfS2qEYoMqnRpOdCgU6mPM+iDZgTUToYY6HGEEKPDhOPe8gC6Dn
-         C+cP/XrGVZcvOw7OP5i7oxcpiAtSdT9yOf0mMjjzyCp5MGOVwHSUBM/569ZIUT6adc9h
-         0bJQ==
-X-Gm-Message-State: AOAM5318svov4kKiaSmGVU5hJqPLLhZRNsbtFwXihTxpWVvndQGiPhUs
-        fayJypi3sL1dc9mocEfCL/lIomnJl4qINHWvqxgb1LJGLEOGF04DoV5gW/MGAA/tZP/jv6+Q0y3
-        fRqIsvO0pIrrA
-X-Received: by 2002:a17:907:7844:: with SMTP id lb4mr23265042ejc.381.1633413515272;
-        Mon, 04 Oct 2021 22:58:35 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJye3pNQbAcI3j6rYSGRP8RP4yVgS+GebagBzOCq7nmMGcStdNi0mOi44z/h1JII6r8RiIAwYA==
-X-Received: by 2002:a17:907:7844:: with SMTP id lb4mr23265030ejc.381.1633413515120;
-        Mon, 04 Oct 2021 22:58:35 -0700 (PDT)
-Received: from gator.home (cst2-174-28.cust.vodafone.cz. [31.30.174.28])
-        by smtp.gmail.com with ESMTPSA id y3sm9257316eda.9.2021.10.04.22.58.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Oct 2021 22:58:34 -0700 (PDT)
-Date:   Tue, 5 Oct 2021 07:58:32 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Zixuan Wang <zxwang42@gmail.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Marc Orr <marcorr@google.com>,
-        "Hyunwook (Wooky) Baek" <baekhw@google.com>,
-        Tom Roeder <tmroeder@google.com>, erdemaktas@google.com,
-        rientjes@google.com, seanjc@google.com, brijesh.singh@amd.com,
-        Thomas.Lendacky@amd.com, varad.gautam@suse.com, jroedel@suse.de,
-        bp@suse.de
-Subject: Re: [kvm-unit-tests PATCH v2 03/17] x86 UEFI: Copy code from GNU-EFI
-Message-ID: <20211005055832.psdm4mha22n336pv@gator.home>
-References: <20210827031222.2778522-1-zixuanwang@google.com>
- <20210827031222.2778522-4-zixuanwang@google.com>
- <20211004124411.nqikc4wyvpal73sh@gator>
- <CAEDJ5ZR63OzHG+_Yz5vNxSUYUwUAqsMgfz9TJnUnENiVTZa01Q@mail.gmail.com>
+        id S232134AbhJEGEW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Oct 2021 02:04:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38780 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231597AbhJEGET (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Oct 2021 02:04:19 -0400
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [IPv6:2404:9400:2:0:216:3eff:fee2:21ea])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3838C061745;
+        Mon,  4 Oct 2021 23:02:29 -0700 (PDT)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4HNn6Z0Lw4z4xbT;
+        Tue,  5 Oct 2021 17:02:14 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+        s=201702; t=1633413746;
+        bh=NxMykwAtSBGQYw1NN1b8tuLk3z/eu8KgxmvlevpwR08=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=AuN21dHC9+MvuIwLhRD96bDPhCznYUF4mW6sVZScbRUzl9khYXUvaDeVKY7j3EpSi
+         SxLzKS1Bs4wrte7aWbXpZFWoemH0PNGO4D37mni3TZjB1HF9v41Jp65nKUZ8k7EWb7
+         1WS06ttvm7jDrexi/wdAcBbdmsaNmdqfqkCfLltRleNNHw6/4tsoys9pHDR4kMpQ3X
+         hiZ975kZUM946XlJkVfu3fcj8ixvWtI9+4vCQ14o+3BoPZXOQo2KwupnUaz3BSOQLv
+         PP+voIhGccH2rnqTb4t4QCc3N3EFgiuOYx9ydItftfDiXwetSYPCE98mkJ03f/99MZ
+         0OvLwF5mq8Z4Q==
+Date:   Tue, 5 Oct 2021 17:02:13 +1100
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Yury Norov <yury.norov@gmail.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-mmc@vger.kernel.org, linux-perf-users@vger.kernel.org,
+        kvm@vger.kernel.org,
+        "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+        Alexander Lobakin <alobakin@pm.me>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Alexey Klimov <aklimov@redhat.com>,
+        Andrea Merello <andrea.merello@gmail.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Arnaldo Carvalho de Melo <acme@redhat.com>,
+        Arnd Bergmann <arnd@arndb.de>, Ben Gardon <bgardon@google.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Brian Cain <bcain@codeaurora.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Christoph Lameter <cl@linux.com>,
+        Daniel Bristot de Oliveira <bristot@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Dennis Zhou <dennis@kernel.org>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Ian Rogers <irogers@google.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Jakub Kicinski <kuba@kernel.org>, Jiri Olsa <jolsa@redhat.com>,
+        Joe Perches <joe@perches.com>, Jonas Bonn <jonas@southpole.se>,
+        Leo Yan <leo.yan@linaro.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Xu <peterx@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Petr Mladek <pmladek@suse.com>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Rich Felker <dalias@libc.org>,
+        Samuel Mendoza-Jonas <sam@mendozajonas.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Tejun Heo <tj@kernel.org>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Will Deacon <will@kernel.org>,
+        Wolfram Sang <wsa+renesas@sang-engineering.com>,
+        Yoshinori Sato <ysato@users.sourceforge.jp>
+Subject: Re: [PATCH RESEND 3 00/16] Bitmap patches for 5.15
+Message-ID: <20211005170213.6e4ca629@canb.auug.org.au>
+In-Reply-To: <20211005054059.475634-1-yury.norov@gmail.com>
+References: <20211005054059.475634-1-yury.norov@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAEDJ5ZR63OzHG+_Yz5vNxSUYUwUAqsMgfz9TJnUnENiVTZa01Q@mail.gmail.com>
+Content-Type: multipart/signed; boundary="Sig_/UQDD3e=d/fr65N4eQ6HWDaN";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 04, 2021 at 03:09:23PM -0700, Zixuan Wang wrote:
-> On Mon, Oct 4, 2021 at 5:46 AM Andrew Jones <drjones@redhat.com> wrote:
-> >
-> > On Fri, Aug 27, 2021 at 03:12:08AM +0000, Zixuan Wang wrote:
-> > > +More details can be found in `GNU-EFI/README.gnuefi`, section "Building
-> > > +Relocatable Binaries".
-> > > +
-> > > +KVM-Unit-Tests follows a similar build process, but does not link with GNU-EFI
-> > > +library.
-> >
-> > So, for AArch64, I also want to drop the gnu-efi dependency of my original
-> > PoC. My second PoC, which I haven't finished, took things a bit further
-> > than this does, though. I was integrating a PE/COFF header and linker
-> > script changes directly into the kvm-unit-tests code rather than copying
-> > these files over.
-> >
-> > Thanks,
-> > drew
-> >
-> 
-> This approach sounds really interesting. Is there a public repo for
-> this new PoC?
+--Sig_/UQDD3e=d/fr65N4eQ6HWDaN
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Not yet, but reviewing this series has inspired me to reprioritize that
-work. I'll try to get it dusted off, improved, and published somewhere.
+Hi Yury,
 
-> 
-> I think the self-relocation code is the most important one in this
-> patch. If we can avoid or rewrite the self-relocation process, then we
-> can pretty much avoid copying GNU-EFI files.
+On Mon,  4 Oct 2021 22:40:43 -0700 Yury Norov <yury.norov@gmail.com> wrote:
+>
+> Please pull this bitmap series. The git tree is here:
+>         https://github.com/norov/linux/tree/bitmap-master-5.15
 
-Yup. AArch64 already has a simple relocator (only does R_AARCH64_RELATIVE)
-in cstart64.S::start. I also wrote a R_PPC_RELATIVE relocator for ppc in
-C, see powerpc/reloc64.c. But, if the gnu-efi one is better for x86, then
-I don't see much problem in importing it.
+Actually branch bitmap-master-5.15 of https://github.com/norov/linux.git
 
-Thanks,
-drew
+I would prefer a more generic branch name (unless this is a short term
+tree - since I will fetch it every day until you tell me to stop)
 
+Added to linux-next from today.
+
+Thanks for adding your subsystem tree as a participant of linux-next.  As
+you may know, this is not a judgement of your code.  The purpose of
+linux-next is for integration testing and to lower the impact of
+conflicts between subsystems in the next merge window.=20
+
+You will need to ensure that the patches/commits in your tree/series have
+been:
+     * submitted under GPL v2 (or later) and include the Contributor's
+        Signed-off-by,
+     * posted to the relevant mailing list,
+     * reviewed by you (or another maintainer of your subsystem tree),
+     * successfully unit tested, and=20
+     * destined for the current or next Linux merge window.
+
+Basically, this should be just what you would send to Linus (or ask him
+to fetch).  It is allowed to be rebased if you deem it necessary.
+
+--=20
+Cheers,
+Stephen Rothwell=20
+sfr@canb.auug.org.au
+
+--Sig_/UQDD3e=d/fr65N4eQ6HWDaN
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmFb6mUACgkQAVBC80lX
+0Gxbewf/Ww/E+XPHdQ1mp59XC0GkoUKOxCBfGR1vs7uFtk/jjJjQgZczaO5K0V8B
+5AV4HEuVQrACgBuuHnKuciVhbzgu5zwK6AitIcZTU904LwEr+mUZuhKteKdGMzlp
+fIWXLaQEDg3eHhTk3IYFiCJK/xQqU4TxVD4vCCGveKRh2C603nww/En/sYfFrmOk
+1ofCL8wN1uxqI+rsm21e2cXvb4IlMto5uimejQmP55fyX9zsdZ95ZUHg3jLb4sy3
+JAP298Vgeqhv3ynmkjYzYilP4TC0psiyQMGvwuzlFMN/qaywyQ1OeKYCm0ymgAXr
+lnHzfD2RdD0mlcaxkqWAWThdw6GFag==
+=qIlm
+-----END PGP SIGNATURE-----
+
+--Sig_/UQDD3e=d/fr65N4eQ6HWDaN--
