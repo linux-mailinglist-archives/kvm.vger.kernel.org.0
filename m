@@ -2,39 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C4188423C59
-	for <lists+kvm@lfdr.de>; Wed,  6 Oct 2021 13:13:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BA281423C46
+	for <lists+kvm@lfdr.de>; Wed,  6 Oct 2021 13:13:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238636AbhJFLP2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Oct 2021 07:15:28 -0400
-Received: from mail.kernel.org ([198.145.29.99]:38500 "EHLO mail.kernel.org"
+        id S238368AbhJFLOy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Oct 2021 07:14:54 -0400
+Received: from mail.kernel.org ([198.145.29.99]:38624 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S238488AbhJFLOs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Oct 2021 07:14:48 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 3C24F611C0;
-        Wed,  6 Oct 2021 11:12:55 +0000 (UTC)
+        id S238225AbhJFLOx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Oct 2021 07:14:53 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id D67A461151;
+        Wed,  6 Oct 2021 11:13:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1633518776;
-        bh=8coLEvTXL4KXNpwhCxiSBgpeX6FK61LziPauTfQSalU=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=RVjO2h7ihgvGOPs+XM54UkWnXyb++kD2Y2iQhB631zwcq16YD6lCMeBKzJzNjIe0D
-         7IhMuDFSwAUbpKzzWI0ldte9A3MBZz37e37mrNVObAaW96tKmZp+oCjsMmsyhBS+br
-         gBxSx61qlzG2aUVUqKWoJdW5j/DhDN96x9aD2bd5vsYnXPNrMMxG+qF4Jv5lQpVlnh
-         n38IVEN8IhafXeGUniTqDgcWEwXehTzyb9BWEu6yDkLH2k2POdrV9hhkn0nzk3PvuO
-         EsASQTZNgbFuCW54pRIKhaxmx6CyXxxHrYAtHBU5Jqgsz+g8q+ruLQZKMsAb+kFFbQ
-         Ip1wBavrEV1iw==
+        s=k20201202; t=1633518781;
+        bh=Sp+Y7RJuSk8xCBLGtsWJEjs3MWqFXgXB4aPr4V2Z/c8=;
+        h=From:To:Cc:Subject:Date:From;
+        b=JQjffBj9qYdgKi8P2NTvxDj2KMaTbUwk77hwHFqRDq/oq5FBsHpkd6RfdmSjxCyvt
+         smIAPRvl18FwWJLDeRf/eYJqHe6FZd3j+RqYB8r1rbuMj2zXuvqWAG32XundZkuiuL
+         ddwDPSnL2KE1psjvS5iSrqREHJHfaYT+TxeyABwZPNpVJ7OMinNIbwSVVpUQ6y9w4K
+         aLlBN/5Ch/I1iOPctSrUt4ATkbwvqE6lKP3i1knZ3W7cNp0TN+EXXw0fsYRH6oWxBs
+         3QJ57M5imxQiLGBveJ3FADcu/vukmgb65DoBbPLzSGptUjQFZuPeNuerUzK5yL60cS
+         Q6J7evOJHXqug==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Fares Mehanna <faresx@amazon.de>,
+Cc:     Haimin Zhang <tcs_kernel@tencent.com>,
+        TCS Robot <tcs_robot@tencent.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Sasha Levin <sashal@kernel.org>, tglx@linutronix.de,
         mingo@redhat.com, bp@alien8.de, x86@kernel.org, kvm@vger.kernel.org
-Subject: [PATCH MANUALSEL 5.4 3/4] kvm: x86: Add AMD PMU MSRs to msrs_to_save_all[]
-Date:   Wed,  6 Oct 2021 07:12:49 -0400
-Message-Id: <20211006111250.264294-3-sashal@kernel.org>
+Subject: [PATCH MANUALSEL 4.19 1/2] KVM: x86: Handle SRCU initialization failure during page track init
+Date:   Wed,  6 Oct 2021 07:12:58 -0400
+Message-Id: <20211006111259.264427-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20211006111250.264294-1-sashal@kernel.org>
-References: <20211006111250.264294-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -43,43 +42,87 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Fares Mehanna <faresx@amazon.de>
+From: Haimin Zhang <tcs_kernel@tencent.com>
 
-[ Upstream commit e1fc1553cd78292ab3521c94c9dd6e3e70e606a1 ]
+[ Upstream commit eb7511bf9182292ef1df1082d23039e856d1ddfb ]
 
-Intel PMU MSRs is in msrs_to_save_all[], so add AMD PMU MSRs to have a
-consistent behavior between Intel and AMD when using KVM_GET_MSRS,
-KVM_SET_MSRS or KVM_GET_MSR_INDEX_LIST.
+Check the return of init_srcu_struct(), which can fail due to OOM, when
+initializing the page track mechanism.  Lack of checking leads to a NULL
+pointer deref found by a modified syzkaller.
 
-We have to add legacy and new MSRs to handle guests running without
-X86_FEATURE_PERFCTR_CORE.
-
-Signed-off-by: Fares Mehanna <faresx@amazon.de>
-Message-Id: <20210915133951.22389-1-faresx@amazon.de>
+Reported-by: TCS Robot <tcs_robot@tencent.com>
+Signed-off-by: Haimin Zhang <tcs_kernel@tencent.com>
+Message-Id: <1630636626-12262-1-git-send-email-tcs_kernel@tencent.com>
+[Move the call towards the beginning of kvm_arch_init_vm. - Paolo]
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- arch/x86/kvm/x86.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ arch/x86/include/asm/kvm_page_track.h | 2 +-
+ arch/x86/kvm/page_track.c             | 4 ++--
+ arch/x86/kvm/x86.c                    | 7 ++++++-
+ 3 files changed, 9 insertions(+), 4 deletions(-)
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 69e286edb2c9..4948bf36bd0a 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -1239,6 +1239,13 @@ static const u32 msrs_to_save_all[] = {
- 	MSR_ARCH_PERFMON_EVENTSEL0 + 12, MSR_ARCH_PERFMON_EVENTSEL0 + 13,
- 	MSR_ARCH_PERFMON_EVENTSEL0 + 14, MSR_ARCH_PERFMON_EVENTSEL0 + 15,
- 	MSR_ARCH_PERFMON_EVENTSEL0 + 16, MSR_ARCH_PERFMON_EVENTSEL0 + 17,
-+
-+	MSR_K7_EVNTSEL0, MSR_K7_EVNTSEL1, MSR_K7_EVNTSEL2, MSR_K7_EVNTSEL3,
-+	MSR_K7_PERFCTR0, MSR_K7_PERFCTR1, MSR_K7_PERFCTR2, MSR_K7_PERFCTR3,
-+	MSR_F15H_PERF_CTL0, MSR_F15H_PERF_CTL1, MSR_F15H_PERF_CTL2,
-+	MSR_F15H_PERF_CTL3, MSR_F15H_PERF_CTL4, MSR_F15H_PERF_CTL5,
-+	MSR_F15H_PERF_CTR0, MSR_F15H_PERF_CTR1, MSR_F15H_PERF_CTR2,
-+	MSR_F15H_PERF_CTR3, MSR_F15H_PERF_CTR4, MSR_F15H_PERF_CTR5,
+diff --git a/arch/x86/include/asm/kvm_page_track.h b/arch/x86/include/asm/kvm_page_track.h
+index 172f9749dbb2..5986bd4aacd6 100644
+--- a/arch/x86/include/asm/kvm_page_track.h
++++ b/arch/x86/include/asm/kvm_page_track.h
+@@ -46,7 +46,7 @@ struct kvm_page_track_notifier_node {
+ 			    struct kvm_page_track_notifier_node *node);
  };
  
- static u32 msrs_to_save[ARRAY_SIZE(msrs_to_save_all)];
+-void kvm_page_track_init(struct kvm *kvm);
++int kvm_page_track_init(struct kvm *kvm);
+ void kvm_page_track_cleanup(struct kvm *kvm);
+ 
+ void kvm_page_track_free_memslot(struct kvm_memory_slot *free,
+diff --git a/arch/x86/kvm/page_track.c b/arch/x86/kvm/page_track.c
+index 3052a59a3065..1f6b0d9b0c85 100644
+--- a/arch/x86/kvm/page_track.c
++++ b/arch/x86/kvm/page_track.c
+@@ -169,13 +169,13 @@ void kvm_page_track_cleanup(struct kvm *kvm)
+ 	cleanup_srcu_struct(&head->track_srcu);
+ }
+ 
+-void kvm_page_track_init(struct kvm *kvm)
++int kvm_page_track_init(struct kvm *kvm)
+ {
+ 	struct kvm_page_track_notifier_head *head;
+ 
+ 	head = &kvm->arch.track_notifier_head;
+-	init_srcu_struct(&head->track_srcu);
+ 	INIT_HLIST_HEAD(&head->track_notifier_list);
++	return init_srcu_struct(&head->track_srcu);
+ }
+ 
+ /*
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 417abc9ba1ad..70cb18f89029 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -9039,9 +9039,15 @@ void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu)
+ 
+ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+ {
++	int ret;
++
+ 	if (type)
+ 		return -EINVAL;
+ 
++	ret = kvm_page_track_init(kvm);
++	if (ret)
++		return ret;
++
+ 	INIT_HLIST_HEAD(&kvm->arch.mask_notifier_list);
+ 	INIT_LIST_HEAD(&kvm->arch.active_mmu_pages);
+ 	INIT_LIST_HEAD(&kvm->arch.zapped_obsolete_pages);
+@@ -9068,7 +9074,6 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+ 	INIT_DELAYED_WORK(&kvm->arch.kvmclock_sync_work, kvmclock_sync_fn);
+ 
+ 	kvm_hv_init_vm(kvm);
+-	kvm_page_track_init(kvm);
+ 	kvm_mmu_init_vm(kvm);
+ 
+ 	if (kvm_x86_ops->vm_init)
 -- 
 2.33.0
 
