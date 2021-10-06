@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2C1B9423B3D
-	for <lists+kvm@lfdr.de>; Wed,  6 Oct 2021 12:07:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 00727423B45
+	for <lists+kvm@lfdr.de>; Wed,  6 Oct 2021 12:12:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237884AbhJFKJo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Oct 2021 06:09:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:46290 "EHLO
+        id S237822AbhJFKOd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Oct 2021 06:14:33 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:36466 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237836AbhJFKJn (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 6 Oct 2021 06:09:43 -0400
+        by vger.kernel.org with ESMTP id S229874AbhJFKOc (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 6 Oct 2021 06:14:32 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1633514871;
+        s=mimecast20190719; t=1633515160;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=yj+1mrM82BCTz7uj5sLU3T9p8kSl41YyFNyCTwKFhxk=;
-        b=VSp1A35uImG32Itgm5IjpIFPsnGn3HYnDpc2+fP8H/JZ2YEh+99DkEgEHKeLD+hN2IlJCm
-        kBfT3wVhNpOWAvNpfTZNPgPC0kxbZ4U+XIhVmsADUP0yu5S8UcAj/grY28u6NUmOuaMgqz
-        rqgnO0P+yGmMOpHOJ1o6gGD3ZdpoYzw=
+        bh=LVKa10Ka2NztPVFkO4ojxiDXv4AaKaB2OGd/MiltWxs=;
+        b=iIt7xfFNL85JkdpX2+jI11LvWjjk2w4CqdRiBxm5iQoLMAG+7hoYRex0DXuuuMecVjiyRk
+        91hLcoawYtPHWwAGVvbkpNtQk62aabJOB8GKlIGeRjlbTciiQxVdUQZlwdKJrxVGTZWesf
+        TvCgMCcHaI8bZbWEXC8W+oDYmmweWjQ=
 Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
  [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-254-NAmpp8PvMzy6wQewk5XN5A-1; Wed, 06 Oct 2021 06:07:50 -0400
-X-MC-Unique: NAmpp8PvMzy6wQewk5XN5A-1
-Received: by mail-ed1-f71.google.com with SMTP id bo2-20020a0564020b2200b003db3540f206so1936603edb.23
-        for <kvm@vger.kernel.org>; Wed, 06 Oct 2021 03:07:50 -0700 (PDT)
+ us-mta-164-chdFz7vLMYiDf5W_etXr2w-1; Wed, 06 Oct 2021 06:12:39 -0400
+X-MC-Unique: chdFz7vLMYiDf5W_etXr2w-1
+Received: by mail-ed1-f71.google.com with SMTP id w6-20020a50d786000000b003dabc563406so2129947edi.17
+        for <kvm@vger.kernel.org>; Wed, 06 Oct 2021 03:12:39 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=yj+1mrM82BCTz7uj5sLU3T9p8kSl41YyFNyCTwKFhxk=;
-        b=WV92OfxwR0M30B5mkZh3uTB7iai74atdstnK9AQL7ibWwSPGi7qguZkf+rHyCk3AZx
-         QoyZp9ncSx8fShRgkTOowzw9MQpp5W2O8svDtM3QFWX55wM2D/6LZh8YvaM+UyuQii69
-         K5j1JCFqai+8HMB7M83+bKB6WkFa32B8ubtge3oguA1j+el8rIaQD6AYOcwIZ5ZxI+Tf
-         SclBg6iibjNkA/cp9wRlC8gUCkN4bJieMRlKg8XPXnElatsoOMEydgnAAYlnKtbE4CRx
-         TX7IM2mWBtyVMO2BV6bDh5NvPWCKHyb21ne2oqzZrEqaMbcwi5rIMYgAqqBOpJ7z1IZY
-         39tA==
-X-Gm-Message-State: AOAM530PUesvZJvFs71FDmkKNNF7HzXVfqAyHfLGfNugqra7o0xnhWGc
-        P3IPYWPoWdSUu4HovgoeGhGjB/fl4bIxSqXkHcICloTkEV+Ogf1p/eO0Us7zUkvyD6Y4mfdEPBw
-        kRU8YCFWocdP6
-X-Received: by 2002:a50:d511:: with SMTP id u17mr31603368edi.105.1633514869401;
-        Wed, 06 Oct 2021 03:07:49 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzVmH7htpm8XyEWwBpvpkOQHw+beXuhBecIj3zIjideTBPR95+pQCNRZBlwYFeSmOAe5zzIbg==
-X-Received: by 2002:a50:d511:: with SMTP id u17mr31603347edi.105.1633514869251;
-        Wed, 06 Oct 2021 03:07:49 -0700 (PDT)
+        bh=LVKa10Ka2NztPVFkO4ojxiDXv4AaKaB2OGd/MiltWxs=;
+        b=zwfoqli2y2kzBjrsM+4BKDJV/wvJu1GO3kElhen+d2y7tUzlvKzLw+wJEF+aQSbYIK
+         uIIKoMSG/XOS6aelnkUw/LRlFq3UV5dKyGumkd/ocOccM4DTeNeKCwd6RajPvN2jLhqX
+         1tQr8MAybWAwu5bO+lQZ2xDFgo/U2eZ6vyincwhrNkLRkIAgtsM6ZNIr/+oQNSBUxskW
+         9Cp58ZbJTxf1ouXP57wDKgP4KjP5qlhA5M6BuK16pNA6ce/DRlxoluRAami5KPKoGe5K
+         36dEMBNzT4j5tCTC9Po/YLfwakmpsS3kTdUgDHrgEG4ZcNtfWbIveaMr0Y39M/leLlJ0
+         HBzA==
+X-Gm-Message-State: AOAM533ln4tOd0j9jxU4P7BVDsxvKzso1/y4zBmIoDPgVXKV0WUZJz2V
+        byNRAIQkrtOQo+UNBgqNWD7uWpRNqk/tT3q/Xu1DKZoNiFe2WKOojYIUygkjyBN1P9HpVPDKwPx
+        O+xZOAuzv7WtD
+X-Received: by 2002:a17:907:785a:: with SMTP id lb26mr30740271ejc.77.1633515158421;
+        Wed, 06 Oct 2021 03:12:38 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyqZuM9LLB357DG8BTmc0wddDVHkGSLTZqlWFSDFmapsNWHXkLzwSDxzDoCFY/er6q5YbEReQ==
+X-Received: by 2002:a17:907:785a:: with SMTP id lb26mr30740256ejc.77.1633515158261;
+        Wed, 06 Oct 2021 03:12:38 -0700 (PDT)
 Received: from gator.home (cst2-174-28.cust.vodafone.cz. [31.30.174.28])
-        by smtp.gmail.com with ESMTPSA id e7sm8111509edv.39.2021.10.06.03.07.48
+        by smtp.gmail.com with ESMTPSA id lb12sm8932498ejc.28.2021.10.06.03.12.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Oct 2021 03:07:49 -0700 (PDT)
-Date:   Wed, 6 Oct 2021 12:07:47 +0200
+        Wed, 06 Oct 2021 03:12:37 -0700 (PDT)
+Date:   Wed, 6 Oct 2021 12:12:36 +0200
 From:   Andrew Jones <drjones@redhat.com>
 To:     Ricardo Koller <ricarkol@google.com>
 Cc:     kvm@vger.kernel.org, maz@kernel.org, kvmarm@lists.cs.columbia.edu,
@@ -58,40 +58,35 @@ Cc:     kvm@vger.kernel.org, maz@kernel.org, kvmarm@lists.cs.columbia.edu,
         james.morse@arm.com, suzuki.poulose@arm.com, shuah@kernel.org,
         jingzhangos@google.com, pshier@google.com, rananta@google.com,
         reijiw@google.com
-Subject: Re: [PATCH v4 09/11] KVM: arm64: selftests: Add tests for GIC
- redist/cpuif partially above IPA range
-Message-ID: <20211006100747.vlyrxk6s2j73blpl@gator.home>
+Subject: Re: [PATCH v4 10/11] KVM: arm64: selftests: Add test for legacy
+ GICv3 REDIST base partially above IPA range
+Message-ID: <20211006101236.5hqyaqbf2km2vqfh@gator.home>
 References: <20211005011921.437353-1-ricarkol@google.com>
- <20211005011921.437353-10-ricarkol@google.com>
+ <20211005011921.437353-11-ricarkol@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211005011921.437353-10-ricarkol@google.com>
+In-Reply-To: <20211005011921.437353-11-ricarkol@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 04, 2021 at 06:19:19PM -0700, Ricardo Koller wrote:
-> Add tests for checking that KVM returns the right error when trying to
-> set GICv2 CPU interfaces or GICv3 Redistributors partially above the
-> addressable IPA range. Also tighten the IPA range by replacing
-> KVM_CAP_ARM_VM_IPA_SIZE with the IPA range currently configured for the
-> guest (i.e., the default).
-
-This tightening can even be considered a fix for the original tests,
-since it looks like the objective of them was to check the boundary.
-
+On Mon, Oct 04, 2021 at 06:19:20PM -0700, Ricardo Koller wrote:
+> Add a new test into vgic_init which checks that the first vcpu fails to
+> run if there is not sufficient REDIST space below the addressable IPA
+> range.  This only applies to the KVM_VGIC_V3_ADDR_TYPE_REDIST legacy API
+> as the required REDIST space is not know when setting the DIST region.
 > 
-> The check for the GICv3 redistributor created using the REDIST legacy
-> API is not sufficient as this new test only checks the check done using
-> vcpus already created when setting the base. The next commit will add
-> the missing test which verifies that the KVM check is done at first vcpu
-> run.
+> Note that using the REDIST_REGION API results in a different check at
+> first vcpu run: that the number of redist regions is enough for all
+> vcpus. And there is already a test for that case in, the first step of
+> test_v3_new_redist_regions.
 > 
+> Reviewed-by: Eric Auger <eric.auger@redhat.com>
 > Signed-off-by: Ricardo Koller <ricarkol@google.com>
 > ---
->  .../testing/selftests/kvm/aarch64/vgic_init.c | 38 +++++++++++++------
->  1 file changed, 26 insertions(+), 12 deletions(-)
+>  .../testing/selftests/kvm/aarch64/vgic_init.c | 34 +++++++++++++++++++
+>  1 file changed, 34 insertions(+)
 >
 
 Reviewed-by: Andrew Jones <drjones@redhat.com>
