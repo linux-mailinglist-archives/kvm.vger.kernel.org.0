@@ -2,71 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4B998423F6F
-	for <lists+kvm@lfdr.de>; Wed,  6 Oct 2021 15:36:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 838A3423F77
+	for <lists+kvm@lfdr.de>; Wed,  6 Oct 2021 15:36:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238320AbhJFNiF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Oct 2021 09:38:05 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24135 "EHLO
+        id S238845AbhJFNi2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Oct 2021 09:38:28 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:50555 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S238635AbhJFNiE (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 6 Oct 2021 09:38:04 -0400
+        by vger.kernel.org with ESMTP id S238754AbhJFNiY (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 6 Oct 2021 09:38:24 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1633527371;
+        s=mimecast20190719; t=1633527391;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=aV5/M3LfS5R3mNSscT7B+Fc+NyevBjVnAj1L+poz5Kg=;
-        b=aLbag6K5XXj4DiWdZsRaT5iGDIrCQwcy0Vlk7UdpBBtxmRx5GDDJYF+ywWgGgUEUWQLc7P
-        1AFJVvxihXCl0qsl9avalab+tKMwNx3XZrav1lTEeqc8bBuTHzDDA/n3LxGcMx+lLYhp7+
-        s9LyiRMEOsccGbwgxY9+9IJbeh+OsTQ=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-553-VNzAUXFlPuG9HiSjp_M17Q-1; Wed, 06 Oct 2021 09:36:10 -0400
-X-MC-Unique: VNzAUXFlPuG9HiSjp_M17Q-1
-Received: by mail-ed1-f70.google.com with SMTP id c7-20020a05640227c700b003d27f41f1d4so2630067ede.16
-        for <kvm@vger.kernel.org>; Wed, 06 Oct 2021 06:36:10 -0700 (PDT)
+        bh=u/piGMVcmtfQU410RPWuDNLfDkB4Ox9Tyhdds4zXiGs=;
+        b=e9SqbkpKbs7uqZNOWcO3eXFxlML1RH9pkkmSrTstf7EXfp1jbTvVAsWTtLrh1xFRkO6BhI
+        lDs3u5OjFmFW7D1s2hDq0b33Rn9JMJpPhXRzt+aSnQEqCEQVAIPLB0Zzy7XFWUlJF7mjKP
+        B6GvIbk1wj4At//X5ONfuGCnF9WNS5I=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-258-FoooeJwmMzuYvjQxe7aSnw-1; Wed, 06 Oct 2021 09:36:20 -0400
+X-MC-Unique: FoooeJwmMzuYvjQxe7aSnw-1
+Received: by mail-ed1-f72.google.com with SMTP id u23-20020a50a417000000b003db23c7e5e2so2677704edb.8
+        for <kvm@vger.kernel.org>; Wed, 06 Oct 2021 06:36:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=aV5/M3LfS5R3mNSscT7B+Fc+NyevBjVnAj1L+poz5Kg=;
-        b=j7t+u+SFllGZ9+iHF6wN/Lj2yXZ6OTZRZfOrk8SWLb7yri0fQ6dNdNMVfHsWBS4TYT
-         tDHqRqGQpXzXmcL7/0PU9jGDUS0XnRrI9zvL1rG6Azp2hfZZY5YAIS7gh5115WfrUOuO
-         H4cCSigg3KqWvCsJ66XfpLdDmoN32Dg9MstnD8CQ0TpMzRgoH2ZqSj6ukSdlbjuFT9/M
-         7XaCRGE0aXvJVSDtmBBg341dSeIT30JSnG02o4MkimXD7k9fY6aCToW4dB3l2Lal7pq4
-         CYyMffrDtol91uvtNH8ic8KkY5QaVwaH8fSSrlrIREYbkz/IrnADn5lCxjMcQHQZZySg
-         asAg==
-X-Gm-Message-State: AOAM531QIdGh9L7g98TB2cM40n0huQB/DgWBFYEpuK1lAXXCzawqjCjA
-        yoRRxuDu5oBAskmc4yoy2MT1JPLXCwxg1P4nWVN/v7WXvFDmzpW56Z+hMhbOa1xN/6CeN2kUSgO
-        KOuTUZORpKrcb
-X-Received: by 2002:a05:6402:16d8:: with SMTP id r24mr33636250edx.47.1633527369591;
-        Wed, 06 Oct 2021 06:36:09 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyVXfuOd+xQWGsYnhOhtgE1uQwa79FmNxhWDKJNzrRuUzwCuHLFmVX/uuMgR+qwPriOvBf3WQ==
-X-Received: by 2002:a05:6402:16d8:: with SMTP id r24mr33636219edx.47.1633527369392;
-        Wed, 06 Oct 2021 06:36:09 -0700 (PDT)
+        bh=u/piGMVcmtfQU410RPWuDNLfDkB4Ox9Tyhdds4zXiGs=;
+        b=BjKRg/GIpz4NKsmmZjfkLp1Po4SQX3Cwi/rRPiCpkYTa4wWsU+9ZvUJ7NNXezkwdNO
+         tbZRnY1wshz2bXa41rtBWA5c/inCNIIND/mgIYOLtE0rcj8KKBPOUPJ5gAZuxH9NJWeI
+         dev0KXYWT2gdCccEYs3yeRNybZf9xsAN4VOH6o9+4GLRWEBBjZx8+8HCq1bhtmRdotp4
+         IAK4U+PRCnYvIBxMJpBmEfPo3A1lixF3tJcSbiFDXkj/0WLGkJLBnKfSOrthyUSzglU2
+         xe5ULIpLim2ucDeI/SazE5YwBvz6eWFhOE824ym6O+JKZlKbRyf4QtNueGgxnlu81RDN
+         61Bg==
+X-Gm-Message-State: AOAM533oP1BjJBG8g4Bp247VLlJtvoFTEyE19Qxb2cgEV046DdWI9xz+
+        vljwlGW3PQKTCBo02hlbPvrGSPF5KTprbvmVAbHa5+XXLsOY449BVRw4uVlhwzlyk3bpIyYuFNS
+        JT0NL7420gXOC
+X-Received: by 2002:aa7:d5cd:: with SMTP id d13mr30216041eds.232.1633527379434;
+        Wed, 06 Oct 2021 06:36:19 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwHZgwmbw5yaPBNCqM31MvnEW6sUbXSRH0z3uAhPPHeOJiVcbVeK/3vI44F2LwrPoIKi3mW8A==
+X-Received: by 2002:aa7:d5cd:: with SMTP id d13mr30216018eds.232.1633527379258;
+        Wed, 06 Oct 2021 06:36:19 -0700 (PDT)
 Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.gmail.com with ESMTPSA id g2sm10075960edp.74.2021.10.06.06.36.06
+        by smtp.gmail.com with ESMTPSA id j3sm4693182ejy.65.2021.10.06.06.36.17
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 06 Oct 2021 06:36:08 -0700 (PDT)
-Message-ID: <a37798f3-708a-049d-34dc-0d0d23bc499a@redhat.com>
-Date:   Wed, 6 Oct 2021 15:36:04 +0200
+        Wed, 06 Oct 2021 06:36:18 -0700 (PDT)
+Message-ID: <61759137-0182-8eed-6413-80a8fc82c6e8@redhat.com>
+Date:   Wed, 6 Oct 2021 15:36:15 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.1.0
-Subject: Re: [PATCH MANUALSEL 5.14 6/9] KVM: x86: nVMX: don't fail nested VM
- entry on invalid guest state if !from_vmentry
+Subject: Re: [PATCH MANUALSEL 5.14 1/9] selftests: KVM: Align SMCCC call with
+ the spec in steal_time
 Content-Language: en-US
 To:     Sasha Levin <sashal@kernel.org>, linux-kernel@vger.kernel.org,
         stable@vger.kernel.org
-Cc:     Maxim Levitsky <mlevitsk@redhat.com>, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, x86@kernel.org, kvm@vger.kernel.org
+Cc:     Oliver Upton <oupton@google.com>,
+        Andrew Jones <drjones@redhat.com>, shuah@kernel.org,
+        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
 References: <20211006133021.271905-1-sashal@kernel.org>
- <20211006133021.271905-6-sashal@kernel.org>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20211006133021.271905-6-sashal@kernel.org>
+In-Reply-To: <20211006133021.271905-1-sashal@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
@@ -74,64 +74,48 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 06/10/21 15:30, Sasha Levin wrote:
-> From: Maxim Levitsky <mlevitsk@redhat.com>
+> From: Oliver Upton <oupton@google.com>
 > 
-> [ Upstream commit c8607e4a086fae05efe5bffb47c5199c65e7216e ]
+> [ Upstream commit 01f91acb55be7aac3950b89c458bcea9ef6e4f49 ]
 > 
-> It is possible that when non root mode is entered via special entry
-> (!from_vmentry), that is from SMM or from loading the nested state,
-> the L2 state could be invalid in regard to non unrestricted guest mode,
-> but later it can become valid.
+> The SMC64 calling convention passes a function identifier in w0 and its
+> parameters in x1-x17. Given this, there are two deviations in the
+> SMC64 call performed by the steal_time test: the function identifier is
+> assigned to a 64 bit register and the parameter is only 32 bits wide.
 > 
-> (for example when RSM emulation restores segment registers from SMRAM)
+> Align the call with the SMCCC by using a 32 bit register to handle the
+> function identifier and increasing the parameter width to 64 bits.
 > 
-> Thus delay the check to VM entry, where we will check this and fail.
-> 
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> Message-Id: <20210913140954.165665-7-mlevitsk@redhat.com>
+> Suggested-by: Andrew Jones <drjones@redhat.com>
+> Signed-off-by: Oliver Upton <oupton@google.com>
+> Reviewed-by: Andrew Jones <drjones@redhat.com>
+> Message-Id: <20210921171121.2148982-3-oupton@google.com>
 > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > Signed-off-by: Sasha Levin <sashal@kernel.org>
 > ---
->   arch/x86/kvm/vmx/nested.c | 7 ++++++-
->   arch/x86/kvm/vmx/vmx.c    | 5 ++++-
->   2 files changed, 10 insertions(+), 2 deletions(-)
+>   tools/testing/selftests/kvm/steal_time.c | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index ac1803dac435..2e8a46f9f552 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -2576,8 +2576,13 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
->   	 * Guest state is invalid and unrestricted guest is disabled,
->   	 * which means L1 attempted VMEntry to L2 with invalid state.
->   	 * Fail the VMEntry.
-> +	 *
-> +	 * However when force loading the guest state (SMM exit or
-> +	 * loading nested state after migration, it is possible to
-> +	 * have invalid guest state now, which will be later fixed by
-> +	 * restoring L2 register state
->   	 */
-> -	if (CC(!vmx_guest_state_valid(vcpu))) {
-> +	if (CC(from_vmentry && !vmx_guest_state_valid(vcpu))) {
->   		*entry_failure_code = ENTRY_FAIL_DEFAULT;
->   		return -EINVAL;
->   	}
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 339116ff236f..974029917713 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -6613,7 +6613,10 @@ static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
->   	 * consistency check VM-Exit due to invalid guest state and bail.
->   	 */
->   	if (unlikely(vmx->emulation_required)) {
-> -		vmx->fail = 0;
-> +
-> +		/* We don't emulate invalid state of a nested guest */
-> +		vmx->fail = is_guest_mode(vcpu);
-> +
->   		vmx->exit_reason.full = EXIT_REASON_INVALID_STATE;
->   		vmx->exit_reason.failed_vmentry = 1;
->   		kvm_register_mark_available(vcpu, VCPU_EXREG_EXIT_INFO_1);
+> diff --git a/tools/testing/selftests/kvm/steal_time.c b/tools/testing/selftests/kvm/steal_time.c
+> index ecec30865a74..aafaa8e38b7c 100644
+> --- a/tools/testing/selftests/kvm/steal_time.c
+> +++ b/tools/testing/selftests/kvm/steal_time.c
+> @@ -118,12 +118,12 @@ struct st_time {
+>   	uint64_t st_time;
+>   };
+>   
+> -static int64_t smccc(uint32_t func, uint32_t arg)
+> +static int64_t smccc(uint32_t func, uint64_t arg)
+>   {
+>   	unsigned long ret;
+>   
+>   	asm volatile(
+> -		"mov	x0, %1\n"
+> +		"mov	w0, %w1\n"
+>   		"mov	x1, %2\n"
+>   		"hvc	#0\n"
+>   		"mov	%0, x0\n"
 > 
 
-NACK (depends on patch 5)
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 
