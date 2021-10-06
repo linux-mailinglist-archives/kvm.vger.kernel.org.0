@@ -2,123 +2,205 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 27688424579
-	for <lists+kvm@lfdr.de>; Wed,  6 Oct 2021 19:58:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7FD7042464A
+	for <lists+kvm@lfdr.de>; Wed,  6 Oct 2021 20:55:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229496AbhJFSAS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Oct 2021 14:00:18 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42068 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S229565AbhJFSAQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 6 Oct 2021 14:00:16 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 196HbBS7011936;
-        Wed, 6 Oct 2021 13:58:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=ZxUfO62xDqeqzPRMt/URL0wliv8TA0IjPFK7/jjl8G4=;
- b=XpGk2EkBhZMmd4tX5BvcYrCSnrs10/sUW6jvU6r9MdfvK9ae87M4X1Wy9yOoxKGDSziJ
- eft4wkRsKZBD33bQG8e2ot9f6LizkrtETz7Tr5vF9aH45fKf3KzyvItdZzRYtUU0sbHg
- t7VUcc+KGBA0Uh9JuzR5iqpY1B+9pYFvjZG50LwMX3aB7K/H1spakdPq5ZthRUgRHQSN
- QCKbIp2DsUaSXkUNgZ6sJgfX86K3TqKosVSOGD7JVwnJHmwR+IjztW/9mwtLxDDCF9O3
- bs9GlCzw7k3gCugKsnN9vQwfdMVPtuaz00xm6qNrRl9TcX7yJjzNJCZsQpwQbkZxTuGV jA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3bhcscpun6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 06 Oct 2021 13:58:23 -0400
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 196HpwMB028807;
-        Wed, 6 Oct 2021 13:58:23 -0400
-Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com [169.47.144.26])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3bhcscpumx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 06 Oct 2021 13:58:23 -0400
-Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
-        by ppma04wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 196HwI9S019364;
-        Wed, 6 Oct 2021 17:58:22 GMT
-Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com [9.57.198.28])
-        by ppma04wdc.us.ibm.com with ESMTP id 3bef2bresn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 06 Oct 2021 17:58:22 +0000
-Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com [9.57.199.110])
-        by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 196HwLg433685882
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 6 Oct 2021 17:58:21 GMT
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 959CAAE071;
-        Wed,  6 Oct 2021 17:58:21 +0000 (GMT)
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 441EFAE064;
-        Wed,  6 Oct 2021 17:58:20 +0000 (GMT)
-Received: from li-c92d2ccc-254b-11b2-a85c-a700b5bfb098.ibm.com (unknown [9.211.96.29])
-        by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTP;
-        Wed,  6 Oct 2021 17:58:20 +0000 (GMT)
-Subject: Re: [PATCH 2/2] vfio-ccw: step down as maintainer
-To:     Eric Farman <farman@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, kvm@vger.kernel.org
-References: <20211006160120.217636-1-cohuck@redhat.com>
- <20211006160120.217636-3-cohuck@redhat.com>
- <6649c066e16bced2786306c401f14113b4699d1f.camel@linux.ibm.com>
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-Message-ID: <a4391757-bbb6-7f70-8dfa-a572024918b2@linux.ibm.com>
-Date:   Wed, 6 Oct 2021 13:58:19 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+        id S231807AbhJFS5T (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Oct 2021 14:57:19 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21229 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229992AbhJFS5S (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 6 Oct 2021 14:57:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1633546525;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=r1gZM96b2xz48C06LwSaVoqZU1gvrxyhuPbUEE/1+tM=;
+        b=TzE1IuuhpP5VQYVxK3nmjtomR21Dy5bwbVGJLcET1wtMLqFd8fhu67+KPJ2RkUEUR9zemO
+        c3MLw7AI1zYZUON/HzOJBee9RRM8LHnaQ4HzAiawk1qmFt5r8jKqdozm4XPPu/6KYMEQla
+        4GccmP6kMdQIcifmPOJX/loyJFCZcoc=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-257-9oOrUtdDNiSReJ42leLBSw-1; Wed, 06 Oct 2021 14:55:24 -0400
+X-MC-Unique: 9oOrUtdDNiSReJ42leLBSw-1
+Received: by mail-wr1-f70.google.com with SMTP id p12-20020adfc38c000000b00160d6a7e293so301751wrf.18
+        for <kvm@vger.kernel.org>; Wed, 06 Oct 2021 11:55:23 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=r1gZM96b2xz48C06LwSaVoqZU1gvrxyhuPbUEE/1+tM=;
+        b=xPU1sGywPww2mGZPBQWx5LQ5DbkkdWX7EatH+eYqCscbghv+/+yUqKDalMjmuDNBBS
+         wYK1xCUVTU/DZW/btZ9Mz6tFPPJ0x7SPSeaETL+LsTfJGr8SNVF2IOeuXwR3cZuCKg92
+         ZdNGTrUJ0CBrbwh6xfzuUEuty1SOZHAba8eaBZ1pAU6Xz4H242Yj1mbUwydmKnRR73rw
+         HgBBSkBPwErann0SibcYXB/6YMWJ6lFlJLhChaPPtz4G786ULLS1HDc4aNba4sSaNobw
+         9aj9kFapk9Cl8a8y27TR3rvu0H/589qKyTvhqTX/doQuISR8hN//7vD1VkApb6vxcFq/
+         yfCw==
+X-Gm-Message-State: AOAM5329/1YuBy4mRhGeqBf7TzwQ69YerzsVuI2hIBrpqui63NrrrObW
+        BXMGrpxhWojl+Kx1n6cZYO79cOCqzKg51wkVvZlHjDPHNmjX9SdbXSLslDJ2ESRqCBRN/UcDnOX
+        wlEkZmct5Cuni
+X-Received: by 2002:adf:9bce:: with SMTP id e14mr23888557wrc.353.1633546522829;
+        Wed, 06 Oct 2021 11:55:22 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxHnltUNfLVZWqKyfI3bMZQ5zkeCMf1ojmcmQjBGmOFQL1VDF7IL12AYR16Mkfl0HlhB6EMvw==
+X-Received: by 2002:adf:9bce:: with SMTP id e14mr23888526wrc.353.1633546522586;
+        Wed, 06 Oct 2021 11:55:22 -0700 (PDT)
+Received: from [192.168.1.36] (118.red-83-35-24.dynamicip.rima-tde.net. [83.35.24.118])
+        by smtp.gmail.com with ESMTPSA id l17sm21817239wrx.24.2021.10.06.11.55.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 06 Oct 2021 11:55:22 -0700 (PDT)
+Message-ID: <6a6629d7-2441-1711-d181-8b2b2127dd21@redhat.com>
+Date:   Wed, 6 Oct 2021 20:55:21 +0200
 MIME-Version: 1.0
-In-Reply-To: <6649c066e16bced2786306c401f14113b4699d1f.camel@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [PATCH v3 13/22] target/i386/sev: Remove stubs by using code
+ elision
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: TeHjC1Bi7yeVS29BLa_Xh0Aeu58g5zD1
-X-Proofpoint-GUID: 8xuowOrMnRy7nGL4WnJHUSJ6zhcQ8Cxu
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.391,FMLib:17.0.607.475
- definitions=2021-10-06_04,2021-10-06_01,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 spamscore=0
- clxscore=1011 phishscore=0 mlxlogscore=999 priorityscore=1501
- lowpriorityscore=0 adultscore=0 bulkscore=0 malwarescore=0 impostorscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2109230001 definitions=main-2110060110
+To:     Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc:     Brijesh Singh <brijesh.singh@amd.com>, kvm@vger.kernel.org,
+        Sergio Lopez <slp@redhat.com>,
+        James Bottomley <jejb@linux.ibm.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        "Daniel P . Berrange" <berrange@redhat.com>,
+        Eduardo Habkost <ehabkost@redhat.com>
+References: <20211002125317.3418648-1-philmd@redhat.com>
+ <20211002125317.3418648-14-philmd@redhat.com>
+ <84e1213b-c6c0-85a4-0d3e-854cd3dc0fa0@redhat.com>
+From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+In-Reply-To: <84e1213b-c6c0-85a4-0d3e-854cd3dc0fa0@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/6/21 1:56 PM, Eric Farman wrote:
-> On Wed, 2021-10-06 at 18:01 +0200, Cornelia Huck wrote:
->> I currently don't have time to act as vfio-ccw maintainer
->> anymore, but I trust that I leave it in capable hands.
+On 10/4/21 10:19, Paolo Bonzini wrote:
+> On 02/10/21 14:53, Philippe Mathieu-Daudé wrote:
+>> Only declare sev_enabled() and sev_es_enabled() when CONFIG_SEV is
+>> set, to allow the compiler to elide unused code. Remove unnecessary
+>> stubs.
 >>
->> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> 
-> My immense thanks Conny, and with a bittersweet:
-> 
-> Acked-by: Eric Farman <farman@linux.ibm.com>
-> 
-
-+1, thanks Conny!
-
-Acked-by: Matthew Rosato <mjrosato@linux.ibm.com>
-
+>> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 >> ---
->>   MAINTAINERS | 1 -
->>   1 file changed, 1 deletion(-)
+>>   include/sysemu/sev.h    | 14 +++++++++++++-
+>>   target/i386/sev_i386.h  |  3 ---
+>>   target/i386/cpu.c       | 16 +++++++++-------
+>>   target/i386/sev-stub.c  | 36 ------------------------------------
+>>   target/i386/meson.build |  2 +-
+>>   5 files changed, 23 insertions(+), 48 deletions(-)
+>>   delete mode 100644 target/i386/sev-stub.c
 >>
->> diff --git a/MAINTAINERS b/MAINTAINERS
->> index 0149e1a3e65e..92db89512678 100644
->> --- a/MAINTAINERS
->> +++ b/MAINTAINERS
->> @@ -16374,7 +16374,6 @@ F:	drivers/s390/crypto/vfio_ap_ops.c
->>   F:	drivers/s390/crypto/vfio_ap_private.h
->>   
->>   S390 VFIO-CCW DRIVER
->> -M:	Cornelia Huck <cohuck@redhat.com>
->>   M:	Eric Farman <farman@linux.ibm.com>
->>   M:	Matthew Rosato <mjrosato@linux.ibm.com>
->>   R:	Halil Pasic <pasic@linux.ibm.com>
+>> diff --git a/include/sysemu/sev.h b/include/sysemu/sev.h
+>> index a329ed75c1c..f5c625bb3b3 100644
+>> --- a/include/sysemu/sev.h
+>> +++ b/include/sysemu/sev.h
+>> @@ -14,9 +14,21 @@
+>>   #ifndef QEMU_SEV_H
+>>   #define QEMU_SEV_H
+>>   -#include "sysemu/kvm.h"
+>> +#ifndef CONFIG_USER_ONLY
+>> +#include CONFIG_DEVICES /* CONFIG_SEV */
+>> +#endif
+>>   +#ifdef CONFIG_SEV
+>>   bool sev_enabled(void);
+>> +bool sev_es_enabled(void);
+>> +#else
+>> +#define sev_enabled() 0
+>> +#define sev_es_enabled() 0
+>> +#endif
 > 
+> This means that sev.h can only be included from target-specific files.
+> 
+> An alternative could be:
+> 
+> #ifdef NEED_CPU_H
+> # include CONFIG_DEVICES
+
+<command-line>: fatal error: x86_64-linux-user-config-devices.h: No such
+file or directory
+
+> #endif
+> 
+> #if defined NEED_CPU_H && !defined CONFIG_SEV
+> # define sev_enabled() 0
+> # define sev_es_enabled() 0
+> #else
+> bool sev_enabled(void);
+> bool sev_es_enabled(void);
+> #endif
+> 
+> ... but in fact sysemu/sev.h _is_ only used from x86-specific files. So
+> should it be moved to include/hw/i386, and even merged with
+> target/i386/sev_i386.h?  Do we need two files?
+
+No clue, I don't think we need. Brijesh?
+
+> 
+> Thanks,
+> 
+> Paolo
+> 
+>> +uint32_t sev_get_cbit_position(void);
+>> +uint32_t sev_get_reduced_phys_bits(void);
+>> +
+>>   int sev_kvm_init(ConfidentialGuestSupport *cgs, Error **errp);
+>>     #endif
+>> diff --git a/target/i386/sev_i386.h b/target/i386/sev_i386.h
+>> index 0798ab3519a..2d9a1a0112e 100644
+>> --- a/target/i386/sev_i386.h
+>> +++ b/target/i386/sev_i386.h
+>> @@ -24,10 +24,7 @@
+>>   #define SEV_POLICY_DOMAIN       0x10
+>>   #define SEV_POLICY_SEV          0x20
+>>   -extern bool sev_es_enabled(void);
+>>   extern SevInfo *sev_get_info(void);
+>> -extern uint32_t sev_get_cbit_position(void);
+>> -extern uint32_t sev_get_reduced_phys_bits(void);
+>>   extern char *sev_get_launch_measurement(void);
+>>   extern SevCapability *sev_get_capabilities(Error **errp);
+>>   extern SevAttestationReport *
+>> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+>> index e169a01713d..27992bdc9f8 100644
+>> --- a/target/i386/cpu.c
+>> +++ b/target/i386/cpu.c
+>> @@ -25,8 +25,8 @@
+>>   #include "tcg/helper-tcg.h"
+>>   #include "sysemu/reset.h"
+>>   #include "sysemu/hvf.h"
+>> +#include "sysemu/sev.h"
+>>   #include "kvm/kvm_i386.h"
+>> -#include "sev_i386.h"
+>>   #include "qapi/error.h"
+>>   #include "qapi/qapi-visit-machine.h"
+>>   #include "qapi/qmp/qerror.h"
+>> @@ -38,6 +38,7 @@
+>>   #include "exec/address-spaces.h"
+>>   #include "hw/boards.h"
+>>   #include "hw/i386/sgx-epc.h"
+>> +#include "sev_i386.h"
+>>   #endif
+>>     #include "disas/capstone.h"
+>> @@ -5764,12 +5765,13 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t
+>> index, uint32_t count,
+>>           *edx = 0;
+>>           break;
+>>       case 0x8000001F:
+>> -        *eax = sev_enabled() ? 0x2 : 0;
+>> -        *eax |= sev_es_enabled() ? 0x8 : 0;
+>> -        *ebx = sev_get_cbit_position();
+>> -        *ebx |= sev_get_reduced_phys_bits() << 6;
+>> -        *ecx = 0;
+>> -        *edx = 0;
+>> +        *eax = *ebx = *ecx = *edx = 0;
+>> +        if (sev_enabled()) {
+>> +            *eax = 0x2;
+>> +            *eax |= sev_es_enabled() ? 0x8 : 0;
+>> +            *ebx = sev_get_cbit_position();
+>> +            *ebx |= sev_get_reduced_phys_bits() << 6;
+>> +        }
+>>           break;
 
