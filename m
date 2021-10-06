@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3161E4240F4
-	for <lists+kvm@lfdr.de>; Wed,  6 Oct 2021 17:11:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3A7724240F6
+	for <lists+kvm@lfdr.de>; Wed,  6 Oct 2021 17:11:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239204AbhJFPNc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Oct 2021 11:13:32 -0400
-Received: from foss.arm.com ([217.140.110.172]:35736 "EHLO foss.arm.com"
+        id S239198AbhJFPNi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Oct 2021 11:13:38 -0400
+Received: from foss.arm.com ([217.140.110.172]:35778 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S239159AbhJFPNY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Oct 2021 11:13:24 -0400
+        id S239000AbhJFPNh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Oct 2021 11:13:37 -0400
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 066A16D;
-        Wed,  6 Oct 2021 08:11:32 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 693586D;
+        Wed,  6 Oct 2021 08:11:45 -0700 (PDT)
 Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3B68C3F66F;
-        Wed,  6 Oct 2021 08:11:31 -0700 (PDT)
-Date:   Wed, 6 Oct 2021 16:11:28 +0100
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B89AF3F66F;
+        Wed,  6 Oct 2021 08:11:44 -0700 (PDT)
+Date:   Wed, 6 Oct 2021 16:11:42 +0100
 From:   Andre Przywara <andre.przywara@arm.com>
 To:     Alexandru Elisei <alexandru.elisei@arm.com>
 Cc:     will@kernel.org, julien.thierry.kdev@gmail.com,
         kvm@vger.kernel.org, jean-philippe@linaro.org
-Subject: Re: [PATCH v1 kvmtool 6/7] vfio/pci: Print an error when offset is
- outside of the MSIX table or PBA
-Message-ID: <20211006161128.4855aafa@donnerap.cambridge.arm.com>
-In-Reply-To: <20210913154413.14322-7-alexandru.elisei@arm.com>
+Subject: Re: [PATCH v1 kvmtool 7/7] vfio/pci: Align MSIX Table and PBA size
+ allocation to 64k
+Message-ID: <20211006161142.36b5fa41@donnerap.cambridge.arm.com>
+In-Reply-To: <20210913154413.14322-8-alexandru.elisei@arm.com>
 References: <20210913154413.14322-1-alexandru.elisei@arm.com>
-        <20210913154413.14322-7-alexandru.elisei@arm.com>
+        <20210913154413.14322-8-alexandru.elisei@arm.com>
 Organization: ARM
 X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
 MIME-Version: 1.0
@@ -37,51 +37,59 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 13 Sep 2021 16:44:12 +0100
+On Mon, 13 Sep 2021 16:44:13 +0100
 Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 
-> Now that we keep track of the real size of MSIX table and PBA, print an
-> error when the guest tries to write to an offset which is not inside the
-> correct regions.
+Hi,
 
-What is the actual purpose of this message? Is there anything the user can
-do about it? Shouldn't we either abort the guest or inject an error
-condition back into KVM or the guest instead?
+> When allocating MMIO space for the MSI-X table, kvmtool rounds the
+> allocation to the host's page size to make it as easy as possible for the
+> guest to map the table to a page, if it wants to (and doesn't do BAR
+> reassignment, like the x86 architecture for example). However, the host's
+> page size can differ from the guest's, for example, if the host is compiled
+> with 4k pages and the guest is using 64k pages.
+> 
+> To make sure the allocation is always aligned to a guest's page size, round
+> it up to the maximum page size, which is 64k. Do the same for the pending
+> bit array if it lives in its own BAR.
+
+The idea of that looks alright on the first glance, but isn't needed for
+x86, right? So should this be using an arch-specific MAX_PAGE_SIZE instead?
 
 Cheers,
 Andre
 
-> 
 > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 > ---
->  vfio/pci.c | 9 +++++++++
->  1 file changed, 9 insertions(+)
+>  vfio/pci.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
 > 
 > diff --git a/vfio/pci.c b/vfio/pci.c
-> index 7781868..a6d0408 100644
+> index a6d0408..7e258a4 100644
 > --- a/vfio/pci.c
 > +++ b/vfio/pci.c
-> @@ -249,6 +249,11 @@ static void vfio_pci_msix_pba_access(struct kvm_cpu
-> *vcpu, u64 addr, u8 *data, u64 offset = addr - pba->guest_phys_addr;
->  	struct vfio_device *vdev = container_of(pdev, struct
-> vfio_device, pci); 
-> +	if (offset >= pba->size) {
-> +		vfio_dev_err(vdev, "access outside of the MSIX PBA");
-> +		return;
-> +	}
+> @@ -1,3 +1,5 @@
+> +#include "linux/sizes.h"
 > +
->  	if (is_write)
->  		return;
+>  #include "kvm/irq.h"
+>  #include "kvm/kvm.h"
+>  #include "kvm/kvm-cpu.h"
+> @@ -929,7 +931,7 @@ static int vfio_pci_create_msix_table(struct kvm
+> *kvm, struct vfio_device *vdev) if (!info.size)
+>  		return -EINVAL;
 >  
-> @@ -269,6 +274,10 @@ static void vfio_pci_msix_table_access(struct
-> kvm_cpu *vcpu, u64 addr, u8 *data, struct vfio_device *vdev =
-> container_of(pdev, struct vfio_device, pci); 
->  	u64 offset = addr - pdev->msix_table.guest_phys_addr;
-> +	if (offset >= pdev->msix_table.size) {
-> +		vfio_dev_err(vdev, "access outside of the MSI-X table");
-> +		return;
-> +	}
+> -	map_size = ALIGN(info.size, PAGE_SIZE);
+> +	map_size = ALIGN(info.size, SZ_64K);
+>  	table->guest_phys_addr = pci_get_mmio_block(map_size);
+>  	if (!table->guest_phys_addr) {
+>  		pr_err("cannot allocate MMIO space");
+> @@ -960,7 +962,7 @@ static int vfio_pci_create_msix_table(struct kvm
+> *kvm, struct vfio_device *vdev) if (!info.size)
+>  			return -EINVAL;
 >  
->  	size_t vector = offset / PCI_MSIX_ENTRY_SIZE;
->  	off_t field = offset % PCI_MSIX_ENTRY_SIZE;
+> -		map_size = ALIGN(info.size, PAGE_SIZE);
+> +		map_size = ALIGN(info.size, SZ_64K);
+>  		pba->guest_phys_addr = pci_get_mmio_block(map_size);
+>  		if (!pba->guest_phys_addr) {
+>  			pr_err("cannot allocate MMIO space");
 
