@@ -2,20 +2,20 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ACA0F4244E0
-	for <lists+kvm@lfdr.de>; Wed,  6 Oct 2021 19:41:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 02D4842448D
+	for <lists+kvm@lfdr.de>; Wed,  6 Oct 2021 19:40:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239525AbhJFRnY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Oct 2021 13:43:24 -0400
-Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:53720 "EHLO
+        id S239176AbhJFRmh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Oct 2021 13:42:37 -0400
+Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:53562 "EHLO
         mx01.bbu.dsd.mx.bitdefender.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S239331AbhJFRml (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 6 Oct 2021 13:42:41 -0400
+        by vger.kernel.org with ESMTP id S237771AbhJFRme (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 6 Oct 2021 13:42:34 -0400
 Received: from smtp.bitdefender.com (smtp01.buh.bitdefender.com [10.17.80.75])
-        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id A14503082886;
-        Wed,  6 Oct 2021 20:31:21 +0300 (EEST)
+        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id 06D0130828B1;
+        Wed,  6 Oct 2021 20:31:22 +0300 (EEST)
 Received: from localhost (unknown [91.199.104.28])
-        by smtp.bitdefender.com (Postfix) with ESMTPSA id 8655B3064495;
+        by smtp.bitdefender.com (Postfix) with ESMTPSA id E23E73064495;
         Wed,  6 Oct 2021 20:31:21 +0300 (EEST)
 X-Is-Junk-Enabled: fGZTSsP0qEJE2AIKtlSuFiRRwg9xyHmJ
 From:   =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
@@ -31,9 +31,9 @@ Cc:     virtualization@lists.linux-foundation.org,
         Tamas K Lengyel <tamas@tklengyel.com>,
         =?UTF-8?q?Nicu=C8=99or=20C=C3=AE=C8=9Bu?= <nicu.citu@icloud.com>,
         =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
-Subject: [PATCH v12 66/77] KVM: introspection: add KVMI_VCPU_EVENT_DESCRIPTOR
-Date:   Wed,  6 Oct 2021 20:31:02 +0300
-Message-Id: <20211006173113.26445-67-alazar@bitdefender.com>
+Subject: [PATCH v12 67/77] KVM: introspection: restore the state of descriptor-table register interception on unhook
+Date:   Wed,  6 Oct 2021 20:31:03 +0300
+Message-Id: <20211006173113.26445-68-alazar@bitdefender.com>
 In-Reply-To: <20211006173113.26445-1-alazar@bitdefender.com>
 References: <20211006173113.26445-1-alazar@bitdefender.com>
 MIME-Version: 1.0
@@ -45,472 +45,153 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Nicușor Cîțu <nicu.citu@icloud.com>
 
-This event is sent when IDTR, GDTR, LDTR or TR are accessed.
-
-These could be used to implement a tiny agent which runs in the context
-of an introspected guest and uses virtualized exceptions (#VE) and
-alternate EPT views (VMFUNC #0) to filter converted VMEXITS. The events
-of interested will be suppressed (after some appropriate guest-side
-handling) while the rest will be sent to the introspector via a VMCALL.
+This commit also ensures that the introspection tool and the userspace
+do not disable each other the descriptor-table access VM-exit.
 
 Signed-off-by: Nicușor Cîțu <nicu.citu@icloud.com>
-Co-developed-by: Adalbert Lazăr <alazar@bitdefender.com>
 Signed-off-by: Adalbert Lazăr <alazar@bitdefender.com>
 ---
- Documentation/virt/kvm/kvmi.rst               | 43 +++++++++++
- arch/x86/include/asm/kvmi_host.h              |  3 +
- arch/x86/include/uapi/asm/kvmi.h              | 13 ++++
- arch/x86/kvm/kvmi.c                           | 58 ++++++++++++++
- arch/x86/kvm/kvmi.h                           |  1 +
- arch/x86/kvm/kvmi_msg.c                       | 19 +++++
- arch/x86/kvm/svm/svm.c                        | 35 +++++++++
- arch/x86/kvm/vmx/vmx.c                        | 21 ++++++
- include/uapi/linux/kvmi.h                     |  1 +
- .../testing/selftests/kvm/x86_64/kvmi_test.c  | 75 +++++++++++++++++++
- 10 files changed, 269 insertions(+)
+ arch/x86/include/asm/kvmi_host.h |  4 +++
+ arch/x86/kvm/kvmi.c              | 45 ++++++++++++++++++++++++++++++++
+ arch/x86/kvm/svm/svm.c           |  3 +++
+ arch/x86/kvm/vmx/vmx.c           |  3 +++
+ 4 files changed, 55 insertions(+)
 
-diff --git a/Documentation/virt/kvm/kvmi.rst b/Documentation/virt/kvm/kvmi.rst
-index d60a69e00e0f..e24a93e93fe8 100644
---- a/Documentation/virt/kvm/kvmi.rst
-+++ b/Documentation/virt/kvm/kvmi.rst
-@@ -540,6 +540,7 @@ the following events::
- 
- 	KVMI_VCPU_EVENT_BREAKPOINT
- 	KVMI_VCPU_EVENT_CR
-+	KVMI_VCPU_EVENT_DESCRIPTOR
- 	KVMI_VCPU_EVENT_HYPERCALL
- 	KVMI_VCPU_EVENT_XSETBV
- 
-@@ -563,6 +564,8 @@ the *KVMI_VM_CONTROL_EVENTS* command.
- * -KVM_EINVAL - the event ID is unknown (use *KVMI_VM_CHECK_EVENT* first)
- * -KVM_EPERM - the access is disallowed (use *KVMI_VM_CHECK_EVENT* first)
- * -KVM_EAGAIN - the selected vCPU can't be introspected yet
-+* -KVM_EOPNOTSUPP - the event can't be intercepted in the current setup
-+                    (e.g. KVMI_VCPU_EVENT_DESCRIPTOR with AMD)
- * -KVM_EBUSY - the event can't be intercepted right now
-                (e.g. KVMI_VCPU_EVENT_BREAKPOINT if the #BP event
-                 is already intercepted by userspace)
-@@ -1198,3 +1201,43 @@ to be changed and the introspection has been enabled for this event
- ``kvmi_vcpu_event`` (with the vCPU state), the extended control register
- number (``xcr``), the old value (``old_value``) and the new value
- (``new_value``) are sent to the introspection tool.
-+
-+8. KVMI_VCPU_EVENT_DESCRIPTOR
-+-----------------------------
-+
-+:Architectures: x86
-+:Versions: >= 1
-+:Actions: CONTINUE, RETRY, CRASH
-+:Parameters:
-+
-+::
-+
-+	struct kvmi_vcpu_event;
-+	struct kvmi_vcpu_event_descriptor {
-+		__u8 descriptor;
-+		__u8 write;
-+		__u8 padding[6];
-+	};
-+
-+:Returns:
-+
-+::
-+
-+	struct kvmi_vcpu_hdr;
-+	struct kvmi_vcpu_event_reply;
-+
-+This event is sent when a descriptor table register is accessed and the
-+introspection has been enabled for this event (see **KVMI_VCPU_CONTROL_EVENTS**).
-+
-+``kvmi_vcpu_event`` (with the vCPU state), the descriptor-table register
-+(``descriptor``) and the access type (``write``) are sent to the
-+introspection tool.
-+
-+``descriptor`` can be one of::
-+
-+	KVMI_DESC_IDTR
-+	KVMI_DESC_GDTR
-+	KVMI_DESC_LDTR
-+	KVMI_DESC_TR
-+
-+``write`` is 1 if the descriptor was written, 0 otherwise.
 diff --git a/arch/x86/include/asm/kvmi_host.h b/arch/x86/include/asm/kvmi_host.h
-index d66349208a6b..a24ba87036f7 100644
+index a24ba87036f7..a872277eba67 100644
 --- a/arch/x86/include/asm/kvmi_host.h
 +++ b/arch/x86/include/asm/kvmi_host.h
-@@ -48,6 +48,7 @@ bool kvmi_monitor_cr3w_intercept(struct kvm_vcpu *vcpu, bool enable);
+@@ -17,6 +17,7 @@ struct kvmi_interception {
+ 	bool restore_interception;
+ 	struct kvmi_monitor_interception breakpoint;
+ 	struct kvmi_monitor_interception cr3w;
++	struct kvmi_monitor_interception descriptor;
+ };
+ 
+ struct kvm_vcpu_arch_introspection {
+@@ -48,6 +49,7 @@ bool kvmi_monitor_cr3w_intercept(struct kvm_vcpu *vcpu, bool enable);
  void kvmi_enter_guest(struct kvm_vcpu *vcpu);
  void kvmi_xsetbv_event(struct kvm_vcpu *vcpu, u8 xcr,
  		       u64 old_value, u64 new_value);
-+bool kvmi_descriptor_event(struct kvm_vcpu *vcpu, u8 descriptor, bool write);
++bool kvmi_monitor_desc_intercept(struct kvm_vcpu *vcpu, bool enable);
+ bool kvmi_descriptor_event(struct kvm_vcpu *vcpu, u8 descriptor, bool write);
  
  #else /* CONFIG_KVM_INTROSPECTION */
- 
-@@ -63,6 +64,8 @@ static inline bool kvmi_monitor_cr3w_intercept(struct kvm_vcpu *vcpu,
+@@ -64,6 +66,8 @@ static inline bool kvmi_monitor_cr3w_intercept(struct kvm_vcpu *vcpu,
  static inline void kvmi_enter_guest(struct kvm_vcpu *vcpu) { }
  static inline void kvmi_xsetbv_event(struct kvm_vcpu *vcpu, u8 xcr,
  					u64 old_value, u64 new_value) { }
-+static inline bool kvmi_descriptor_event(struct kvm_vcpu *vcpu, u8 descriptor,
-+					 bool write) { return true; }
++static inline bool kvmi_monitor_desc_intercept(struct kvm_vcpu *vcpu,
++					       bool enable) { return false; }
+ static inline bool kvmi_descriptor_event(struct kvm_vcpu *vcpu, u8 descriptor,
+ 					 bool write) { return true; }
  
- #endif /* CONFIG_KVM_INTROSPECTION */
- 
-diff --git a/arch/x86/include/uapi/asm/kvmi.h b/arch/x86/include/uapi/asm/kvmi.h
-index 7b93450d0d62..9c608ef5daa3 100644
---- a/arch/x86/include/uapi/asm/kvmi.h
-+++ b/arch/x86/include/uapi/asm/kvmi.h
-@@ -128,4 +128,17 @@ struct kvmi_vcpu_get_mtrr_type_reply {
- 	__u8 padding[7];
- };
- 
-+enum {
-+	KVMI_DESC_IDTR = 1,
-+	KVMI_DESC_GDTR = 2,
-+	KVMI_DESC_LDTR = 3,
-+	KVMI_DESC_TR   = 4,
-+};
-+
-+struct kvmi_vcpu_event_descriptor {
-+	__u8 descriptor;
-+	__u8 write;
-+	__u8 padding[6];
-+};
-+
- #endif /* _UAPI_ASM_X86_KVMI_H */
 diff --git a/arch/x86/kvm/kvmi.c b/arch/x86/kvm/kvmi.c
-index d34f5f03a56f..cf7167366214 100644
+index cf7167366214..c0c38e6478cb 100644
 --- a/arch/x86/kvm/kvmi.c
 +++ b/arch/x86/kvm/kvmi.c
-@@ -15,6 +15,7 @@ void kvmi_arch_init_vcpu_events_mask(unsigned long *supported)
- 	set_bit(KVMI_VCPU_EVENT_BREAKPOINT, supported);
- 	set_bit(KVMI_VCPU_EVENT_CR, supported);
- 	set_bit(KVMI_VCPU_EVENT_HYPERCALL, supported);
-+	set_bit(KVMI_VCPU_EVENT_DESCRIPTOR, supported);
- 	set_bit(KVMI_VCPU_EVENT_TRAP, supported);
- 	set_bit(KVMI_VCPU_EVENT_XSETBV, supported);
- }
-@@ -285,6 +286,21 @@ static void kvmi_arch_disable_cr3w_intercept(struct kvm_vcpu *vcpu)
+@@ -286,12 +286,52 @@ static void kvmi_arch_disable_cr3w_intercept(struct kvm_vcpu *vcpu)
  	vcpu->arch.kvmi->cr3w.kvm_intercepted = false;
  }
  
-+static int kvmi_control_desc_intercept(struct kvm_vcpu *vcpu, bool enable)
++/*
++ * Returns true if one side (kvm or kvmi) tries to disable the descriptor
++ * interception while the other side is still tracking it.
++ */
++bool kvmi_monitor_desc_intercept(struct kvm_vcpu *vcpu, bool enable)
 +{
-+	if (!static_call(kvm_x86_desc_ctrl_supported)())
-+		return -KVM_EOPNOTSUPP;
++	struct kvmi_interception *arch_vcpui = READ_ONCE(vcpu->arch.kvmi);
 +
-+	static_call(kvm_x86_control_desc_intercept)(vcpu, enable);
-+
-+	return 0;
++	return (arch_vcpui && arch_vcpui->descriptor.monitor_fct(vcpu, enable));
 +}
++EXPORT_SYMBOL(kvmi_monitor_desc_intercept);
 +
-+static void kvmi_arch_disable_desc_intercept(struct kvm_vcpu *vcpu)
++static bool monitor_desc_fct_kvmi(struct kvm_vcpu *vcpu, bool enable)
 +{
-+	kvmi_control_desc_intercept(vcpu, false);
-+}
++	vcpu->arch.kvmi->descriptor.kvmi_intercepted = enable;
 +
- int kvmi_arch_cmd_control_intercept(struct kvm_vcpu *vcpu,
- 				    unsigned int event_id, bool enable)
- {
-@@ -294,6 +310,9 @@ int kvmi_arch_cmd_control_intercept(struct kvm_vcpu *vcpu,
- 	case KVMI_VCPU_EVENT_BREAKPOINT:
- 		err = kvmi_control_bp_intercept(vcpu, enable);
- 		break;
-+	case KVMI_VCPU_EVENT_DESCRIPTOR:
-+		err = kvmi_control_desc_intercept(vcpu, enable);
-+		break;
- 	default:
- 		break;
- 	}
-@@ -325,6 +344,7 @@ static void kvmi_arch_restore_interception(struct kvm_vcpu *vcpu)
- {
- 	kvmi_arch_disable_bp_intercept(vcpu);
- 	kvmi_arch_disable_cr3w_intercept(vcpu);
-+	kvmi_arch_disable_desc_intercept(vcpu);
- }
- 
- bool kvmi_arch_clean_up_interception(struct kvm_vcpu *vcpu)
-@@ -597,3 +617,41 @@ void kvmi_xsetbv_event(struct kvm_vcpu *vcpu, u8 xcr,
- 
- 	kvmi_put(vcpu->kvm);
- }
-+
-+static bool __kvmi_descriptor_event(struct kvm_vcpu *vcpu, u8 descriptor,
-+				    bool write)
-+{
-+	bool ret = false;
-+	u32 action;
-+
-+	action = kvmi_msg_send_vcpu_descriptor(vcpu, descriptor, write);
-+	switch (action) {
-+	case KVMI_EVENT_ACTION_CONTINUE:
-+		ret = true;
-+		break;
-+	case KVMI_EVENT_ACTION_RETRY:
-+		break;
-+	default:
-+		kvmi_handle_common_event_actions(vcpu, action);
-+	}
-+
-+	return ret;
-+}
-+
-+bool kvmi_descriptor_event(struct kvm_vcpu *vcpu, u8 descriptor, bool write)
-+{
-+	struct kvm_introspection *kvmi;
-+	bool ret = true;
-+
-+	kvmi = kvmi_get(vcpu->kvm);
-+	if (!kvmi)
++	if (enable)
++		vcpu->arch.kvmi->descriptor.kvm_intercepted =
++			static_call(kvm_x86_desc_intercepted)(vcpu);
++	else if (vcpu->arch.kvmi->descriptor.kvm_intercepted)
 +		return true;
 +
-+	if (is_vcpu_event_enabled(vcpu, KVMI_VCPU_EVENT_DESCRIPTOR))
-+		ret = __kvmi_descriptor_event(vcpu, descriptor, write);
-+
-+	kvmi_put(vcpu->kvm);
-+
-+	return ret;
++	return false;
 +}
-+EXPORT_SYMBOL(kvmi_descriptor_event);
-diff --git a/arch/x86/kvm/kvmi.h b/arch/x86/kvm/kvmi.h
-index 43bc956d740c..92422e2e57cf 100644
---- a/arch/x86/kvm/kvmi.h
-+++ b/arch/x86/kvm/kvmi.h
-@@ -16,5 +16,6 @@ u32 kvmi_msg_send_vcpu_cr(struct kvm_vcpu *vcpu, u32 cr, u64 old_value,
- u32 kvmi_msg_send_vcpu_trap(struct kvm_vcpu *vcpu);
- u32 kvmi_msg_send_vcpu_xsetbv(struct kvm_vcpu *vcpu, u8 xcr,
- 			      u64 old_value, u64 new_value);
-+u32 kvmi_msg_send_vcpu_descriptor(struct kvm_vcpu *vcpu, u8 desc, bool write);
- 
- #endif
-diff --git a/arch/x86/kvm/kvmi_msg.c b/arch/x86/kvm/kvmi_msg.c
-index c890c2396fbc..b74df3fc832d 100644
---- a/arch/x86/kvm/kvmi_msg.c
-+++ b/arch/x86/kvm/kvmi_msg.c
-@@ -330,3 +330,22 @@ u32 kvmi_msg_send_vcpu_xsetbv(struct kvm_vcpu *vcpu, u8 xcr,
- 
- 	return action;
- }
 +
-+u32 kvmi_msg_send_vcpu_descriptor(struct kvm_vcpu *vcpu, u8 desc, bool write)
++static bool monitor_desc_fct_kvm(struct kvm_vcpu *vcpu, bool enable)
 +{
-+	struct kvmi_vcpu_event_descriptor e;
-+	u32 action;
-+	int err;
++	if (!vcpu->arch.kvmi->descriptor.kvmi_intercepted)
++		return false;
 +
-+	memset(&e, 0, sizeof(e));
-+	e.descriptor = desc;
-+	e.write = write ? 1 : 0;
++	vcpu->arch.kvmi->descriptor.kvm_intercepted = enable;
 +
-+	err = kvmi_send_vcpu_event(vcpu, KVMI_VCPU_EVENT_DESCRIPTOR,
-+				   &e, sizeof(e), NULL, 0, &action);
-+	if (err)
-+		action = KVMI_EVENT_ACTION_CONTINUE;
++	if (!enable)
++		return true;
 +
-+	return action;
-+
++	return false;
 +}
++
+ static int kvmi_control_desc_intercept(struct kvm_vcpu *vcpu, bool enable)
+ {
+ 	if (!static_call(kvm_x86_desc_ctrl_supported)())
+ 		return -KVM_EOPNOTSUPP;
+ 
++	vcpu->arch.kvmi->descriptor.monitor_fct = monitor_desc_fct_kvmi;
+ 	static_call(kvm_x86_control_desc_intercept)(vcpu, enable);
++	vcpu->arch.kvmi->descriptor.monitor_fct = monitor_desc_fct_kvm;
+ 
+ 	return 0;
+ }
+@@ -299,6 +339,9 @@ static int kvmi_control_desc_intercept(struct kvm_vcpu *vcpu, bool enable)
+ static void kvmi_arch_disable_desc_intercept(struct kvm_vcpu *vcpu)
+ {
+ 	kvmi_control_desc_intercept(vcpu, false);
++
++	vcpu->arch.kvmi->descriptor.kvmi_intercepted = false;
++	vcpu->arch.kvmi->descriptor.kvm_intercepted = false;
+ }
+ 
+ int kvmi_arch_cmd_control_intercept(struct kvm_vcpu *vcpu,
+@@ -370,11 +413,13 @@ bool kvmi_arch_vcpu_alloc_interception(struct kvm_vcpu *vcpu)
+ 
+ 	arch_vcpui->breakpoint.monitor_fct = monitor_bp_fct_kvm;
+ 	arch_vcpui->cr3w.monitor_fct = monitor_cr3w_fct_kvm;
++	arch_vcpui->descriptor.monitor_fct = monitor_desc_fct_kvm;
+ 
+ 	/*
+ 	 * paired with:
+ 	 *  - kvmi_monitor_bp_intercept()
+ 	 *  - kvmi_monitor_cr3w_intercept()
++	 *  - kvmi_monitor_desc_intercept()
+ 	 */
+ 	smp_wmb();
+ 	WRITE_ONCE(vcpu->arch.kvmi, arch_vcpui);
 diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 7353996907d3..98b4909254a0 100644
+index 98b4909254a0..d3d061615536 100644
 --- a/arch/x86/kvm/svm/svm.c
 +++ b/arch/x86/kvm/svm/svm.c
-@@ -2642,6 +2642,41 @@ static int emulate_on_interception(struct kvm_vcpu *vcpu)
- 
- static int descriptor_access_interception(struct kvm_vcpu *vcpu)
+@@ -1820,6 +1820,9 @@ static void svm_control_desc_intercept(struct kvm_vcpu *vcpu, bool enable)
  {
-+	struct vcpu_svm *svm = to_svm(vcpu);
-+
-+#ifdef CONFIG_KVM_INTROSPECTION
-+	struct vmcb_control_area *c = &svm->vmcb->control;
-+	bool cont;
-+
-+	switch (c->exit_code) {
-+	case SVM_EXIT_IDTR_READ:
-+	case SVM_EXIT_IDTR_WRITE:
-+		cont = kvmi_descriptor_event(vcpu, KVMI_DESC_IDTR,
-+				      c->exit_code == SVM_EXIT_IDTR_WRITE);
-+		break;
-+	case SVM_EXIT_GDTR_READ:
-+	case SVM_EXIT_GDTR_WRITE:
-+		cont = kvmi_descriptor_event(vcpu, KVMI_DESC_GDTR,
-+				      c->exit_code == SVM_EXIT_GDTR_WRITE);
-+		break;
-+	case SVM_EXIT_LDTR_READ:
-+	case SVM_EXIT_LDTR_WRITE:
-+		cont = kvmi_descriptor_event(vcpu, KVMI_DESC_LDTR,
-+				      c->exit_code == SVM_EXIT_LDTR_WRITE);
-+		break;
-+	case SVM_EXIT_TR_READ:
-+	case SVM_EXIT_TR_WRITE:
-+		cont = kvmi_descriptor_event(vcpu, KVMI_DESC_TR,
-+				      c->exit_code == SVM_EXIT_TR_WRITE);
-+		break;
-+	default:
-+		cont = true;
-+		break;
-+	}
-+	if (!cont)
-+		return 1;
-+#endif /* CONFIG_KVM_INTROSPECTION */
-+
- 	return kvm_emulate_instruction(vcpu, 0);
- }
+ 	struct vcpu_svm *svm = to_svm(vcpu);
  
++	if (kvmi_monitor_desc_intercept(vcpu, enable))
++		return;
++
+ 	if (enable) {
+ 		svm_set_intercept(svm, INTERCEPT_STORE_IDTR);
+ 		svm_set_intercept(svm, INTERCEPT_STORE_GDTR);
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index c268194cee84..58a753b1ba41 100644
+index 58a753b1ba41..964840430537 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -5068,7 +5068,28 @@ static int handle_set_cr4(struct kvm_vcpu *vcpu, unsigned long val)
- 
- static int handle_desc(struct kvm_vcpu *vcpu)
+@@ -3170,6 +3170,9 @@ static void vmx_control_desc_intercept(struct kvm_vcpu *vcpu, bool enable)
  {
-+#ifdef CONFIG_KVM_INTROSPECTION
-+	u32 vmx_instruction_info = vmcs_read32(VMX_INSTRUCTION_INFO);
-+	u8 store = (vmx_instruction_info >> 29) & 0x1;
-+	u8 descriptor = 0;
-+
-+	if (to_vmx(vcpu)->exit_reason.basic == EXIT_REASON_GDTR_IDTR) {
-+		if ((vmx_instruction_info >> 28) & 0x1)
-+			descriptor = KVMI_DESC_IDTR;
-+		else
-+			descriptor = KVMI_DESC_GDTR;
-+	} else {
-+		if ((vmx_instruction_info >> 28) & 0x1)
-+			descriptor = KVMI_DESC_TR;
-+		else
-+			descriptor = KVMI_DESC_LDTR;
-+	}
-+
-+	if (!kvmi_descriptor_event(vcpu, descriptor, store))
-+		return 1;
-+#else
- 	WARN_ON(!(vcpu->arch.cr4 & X86_CR4_UMIP));
-+#endif /* CONFIG_KVM_INTROSPECTION */
- 	return kvm_emulate_instruction(vcpu, 0);
- }
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
  
-diff --git a/include/uapi/linux/kvmi.h b/include/uapi/linux/kvmi.h
-index a48cf2c1f9a7..aa257b011ff1 100644
---- a/include/uapi/linux/kvmi.h
-+++ b/include/uapi/linux/kvmi.h
-@@ -67,6 +67,7 @@ enum {
- 	KVMI_VCPU_EVENT_CR         = KVMI_VCPU_EVENT_ID(3),
- 	KVMI_VCPU_EVENT_TRAP       = KVMI_VCPU_EVENT_ID(4),
- 	KVMI_VCPU_EVENT_XSETBV     = KVMI_VCPU_EVENT_ID(5),
-+	KVMI_VCPU_EVENT_DESCRIPTOR = KVMI_VCPU_EVENT_ID(6),
- 
- 	KVMI_NEXT_VCPU_EVENT
- };
-diff --git a/tools/testing/selftests/kvm/x86_64/kvmi_test.c b/tools/testing/selftests/kvm/x86_64/kvmi_test.c
-index 231d574ed592..c1ce163bc3c4 100644
---- a/tools/testing/selftests/kvm/x86_64/kvmi_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/kvmi_test.c
-@@ -58,6 +58,7 @@ enum {
- 	GUEST_TEST_NOOP = 0,
- 	GUEST_TEST_BP,
- 	GUEST_TEST_CR,
-+	GUEST_TEST_DESCRIPTOR,
- 	GUEST_TEST_HYPERCALL,
- 	GUEST_TEST_XSETBV,
- };
-@@ -87,6 +88,14 @@ static void guest_cr_test(void)
- 	set_cr4(get_cr4() | X86_CR4_OSXSAVE);
- }
- 
-+static void guest_descriptor_test(void)
-+{
-+	void *ptr;
++	if (kvmi_monitor_desc_intercept(vcpu, enable))
++		return;
 +
-+	asm volatile("sgdt %0" :: "m"(ptr));
-+	asm volatile("lgdt %0" :: "m"(ptr));
-+}
-+
- static void guest_hypercall_test(void)
- {
- 	asm volatile("mov $34, %rax");
-@@ -146,6 +155,9 @@ static void guest_code(void)
- 		case GUEST_TEST_CR:
- 			guest_cr_test();
- 			break;
-+		case GUEST_TEST_DESCRIPTOR:
-+			guest_descriptor_test();
-+			break;
- 		case GUEST_TEST_HYPERCALL:
- 			guest_hypercall_test();
- 			break;
-@@ -1494,6 +1506,68 @@ static void test_cmd_vcpu_get_mtrr_type(struct kvm_vm *vm)
- 	pr_debug("mtrr_type: gpa 0x%lx type 0x%x\n", test_gpa, rpl.type);
- }
- 
-+static void test_desc_read_access(__u16 event_id)
-+{
-+	struct kvmi_msg_hdr hdr;
-+	struct {
-+		struct vcpu_event vcpu_ev;
-+		struct kvmi_vcpu_event_descriptor desc;
-+	} ev;
-+	struct vcpu_reply rpl = {};
-+
-+	receive_vcpu_event(&hdr, &ev.vcpu_ev, sizeof(ev), event_id);
-+
-+	pr_debug("Descriptor event (read), descriptor %u, write %u\n",
-+		 ev.desc.descriptor, ev.desc.write);
-+
-+	TEST_ASSERT(ev.desc.write == 0,
-+		"Received a write descriptor access\n");
-+
-+	reply_to_event(&hdr, &ev.vcpu_ev, KVMI_EVENT_ACTION_CONTINUE,
-+			&rpl, sizeof(rpl));
-+}
-+
-+static void test_desc_write_access(__u16 event_id)
-+{
-+	struct kvmi_msg_hdr hdr;
-+	struct {
-+		struct vcpu_event vcpu_ev;
-+		struct kvmi_vcpu_event_descriptor desc;
-+	} ev;
-+	struct vcpu_reply rpl = {};
-+
-+	receive_vcpu_event(&hdr, &ev.vcpu_ev, sizeof(ev), event_id);
-+
-+	pr_debug("Descriptor event (write), descriptor %u, write %u\n",
-+		ev.desc.descriptor, ev.desc.write);
-+
-+	TEST_ASSERT(ev.desc.write == 1,
-+		"Received a read descriptor access\n");
-+
-+	reply_to_event(&hdr, &ev.vcpu_ev, KVMI_EVENT_ACTION_CONTINUE,
-+			&rpl, sizeof(rpl));
-+}
-+
-+static void test_event_descriptor(struct kvm_vm *vm)
-+{
-+	struct vcpu_worker_data data = {
-+		.vm = vm,
-+		.vcpu_id = VCPU_ID,
-+		.test_id = GUEST_TEST_DESCRIPTOR,
-+	};
-+	__u16 event_id = KVMI_VCPU_EVENT_DESCRIPTOR;
-+	pthread_t vcpu_thread;
-+
-+	enable_vcpu_event(vm, event_id);
-+	vcpu_thread = start_vcpu_worker(&data);
-+
-+	test_desc_read_access(event_id);
-+	test_desc_write_access(event_id);
-+
-+	wait_vcpu_worker(vcpu_thread);
-+	disable_vcpu_event(vm, event_id);
-+}
-+
- static void test_introspection(struct kvm_vm *vm)
- {
- 	srandom(time(0));
-@@ -1523,6 +1597,7 @@ static void test_introspection(struct kvm_vm *vm)
- 	test_cmd_vcpu_get_xcr(vm);
- 	test_cmd_vcpu_xsave(vm);
- 	test_cmd_vcpu_get_mtrr_type(vm);
-+	test_event_descriptor(vm);
- 
- 	unhook_introspection(vm);
- }
+ 	if (enable)
+ 		secondary_exec_controls_setbit(vmx, SECONDARY_EXEC_DESC);
+ 	else
