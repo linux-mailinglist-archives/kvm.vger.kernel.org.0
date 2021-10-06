@@ -2,20 +2,20 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7CDB14244D4
-	for <lists+kvm@lfdr.de>; Wed,  6 Oct 2021 19:41:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4BE3D42448E
+	for <lists+kvm@lfdr.de>; Wed,  6 Oct 2021 19:40:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239654AbhJFRnI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Oct 2021 13:43:08 -0400
-Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:53746 "EHLO
+        id S239315AbhJFRmi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Oct 2021 13:42:38 -0400
+Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:53558 "EHLO
         mx01.bbu.dsd.mx.bitdefender.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S238955AbhJFRmj (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 6 Oct 2021 13:42:39 -0400
+        by vger.kernel.org with ESMTP id S237826AbhJFRme (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 6 Oct 2021 13:42:34 -0400
 Received: from smtp.bitdefender.com (smtp01.buh.bitdefender.com [10.17.80.75])
-        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id 9450D305CD21;
-        Wed,  6 Oct 2021 20:30:53 +0300 (EEST)
+        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id 07AA1307C930;
+        Wed,  6 Oct 2021 20:30:54 +0300 (EEST)
 Received: from localhost (unknown [91.199.104.28])
-        by smtp.bitdefender.com (Postfix) with ESMTPSA id 7C7E33064495;
+        by smtp.bitdefender.com (Postfix) with ESMTPSA id DF7FD3064495;
         Wed,  6 Oct 2021 20:30:53 +0300 (EEST)
 X-Is-Junk-Enabled: fGZTSsP0qEJE2AIKtlSuFiRRwg9xyHmJ
 From:   =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
@@ -29,10 +29,11 @@ Cc:     virtualization@lists.linux-foundation.org,
         Joerg Roedel <joro@8bytes.org>,
         Mathieu Tarral <mathieu.tarral@protonmail.com>,
         Tamas K Lengyel <tamas@tklengyel.com>,
+        =?UTF-8?q?Mihai=20Don=C8=9Bu?= <mdontu@bitdefender.com>,
         =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
-Subject: [PATCH v12 02/77] KVM: add kvm_vcpu_kick_and_wait()
-Date:   Wed,  6 Oct 2021 20:29:58 +0300
-Message-Id: <20211006173113.26445-3-alazar@bitdefender.com>
+Subject: [PATCH v12 03/77] KVM: x86: add kvm_arch_vcpu_get_regs() and kvm_arch_vcpu_get_sregs()
+Date:   Wed,  6 Oct 2021 20:29:59 +0300
+Message-Id: <20211006173113.26445-4-alazar@bitdefender.com>
 In-Reply-To: <20211006173113.26445-1-alazar@bitdefender.com>
 References: <20211006173113.26445-1-alazar@bitdefender.com>
 MIME-Version: 1.0
@@ -42,65 +43,61 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This function is needed for the KVMI_VM_PAUSE_VCPU command, which sets
-the introspection request flag, kicks the vCPU out of guest and returns
-a success error code (0). The vCPU will send the KVMI_VCPU_EVENT_PAUSE
-event as soon as possible. Once the introspection tool receives the event,
-it knows that the vCPU doesn't run guest code and can handle introspection
-commands (until the reply for the pause event is sent).
+From: Mihai Donțu <mdontu@bitdefender.com>
 
-To implement the "pause VM" command, the introspection tool will send
-a KVMI_VM_PAUSE_VCPU command for every vCPU. To know when the VM is
-paused, userspace has to receive and "parse" all events. For example,
-with a 4 vCPU VM, if "pause VM" was sent by userspace while handling
-an event from vCPU0 and at the same time a new vCPU was hot-plugged
-(which could send another event for vCPU4), the "pause VM" command has
-to receive and check all events until it gets the pause events for vCPU1,
-vCPU2 and vCPU3 before returning to the upper layer.
+These functions are used by the VM introspection code
+(for the KVMI_VCPU_GET_REGISTERS command and all events sending the vCPU
+registers to the introspection tool).
 
-In order to make it easier for userspace to implement the "pause VM"
-command, KVMI_VM_PAUSE_VCPU has an optional 'wait' parameter. If this is
-set, kvm_vcpu_kick_and_wait() will be used instead of kvm_vcpu_kick().
-Once a sequence of KVMI_VM_PAUSE_VCPU commands with the 'wait' flag set
-is handled, the introspection tool can consider the VM paused, without
-the need to wait and check events.
-
+Signed-off-by: Mihai Donțu <mdontu@bitdefender.com>
 Signed-off-by: Adalbert Lazăr <alazar@bitdefender.com>
 ---
- include/linux/kvm_host.h |  1 +
- virt/kvm/kvm_main.c      | 10 ++++++++++
- 2 files changed, 11 insertions(+)
+ arch/x86/kvm/x86.c       | 10 ++++++++++
+ include/linux/kvm_host.h |  3 +++
+ 2 files changed, 13 insertions(+)
 
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index db7fa1398f0d..f7d09757b85f 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -10073,6 +10073,11 @@ int kvm_arch_vcpu_ioctl_get_regs(struct kvm_vcpu *vcpu, struct kvm_regs *regs)
+ 	return 0;
+ }
+ 
++void kvm_arch_vcpu_get_regs(struct kvm_vcpu *vcpu, struct kvm_regs *regs)
++{
++	__get_regs(vcpu, regs);
++}
++
+ static void __set_regs(struct kvm_vcpu *vcpu, struct kvm_regs *regs)
+ {
+ 	vcpu->arch.emulate_regs_need_sync_from_vcpu = true;
+@@ -10195,6 +10200,11 @@ int kvm_arch_vcpu_ioctl_get_sregs(struct kvm_vcpu *vcpu,
+ 	return 0;
+ }
+ 
++void kvm_arch_vcpu_get_sregs(struct kvm_vcpu *vcpu, struct kvm_sregs *sregs)
++{
++	__get_sregs(vcpu, sregs);
++}
++
+ int kvm_arch_vcpu_ioctl_get_mpstate(struct kvm_vcpu *vcpu,
+ 				    struct kvm_mp_state *mp_state)
+ {
 diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 60a35d9fe259..6795ea7e357d 100644
+index 6795ea7e357d..7bc45e1879db 100644
 --- a/include/linux/kvm_host.h
 +++ b/include/linux/kvm_host.h
-@@ -970,6 +970,7 @@ void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu);
- void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu);
- bool kvm_vcpu_wake_up(struct kvm_vcpu *vcpu);
- void kvm_vcpu_kick(struct kvm_vcpu *vcpu);
-+void kvm_vcpu_kick_and_wait(struct kvm_vcpu *vcpu);
- int kvm_vcpu_yield_to(struct kvm_vcpu *target);
- void kvm_vcpu_on_spin(struct kvm_vcpu *vcpu, bool usermode_vcpu_not_eligible);
+@@ -1026,9 +1026,12 @@ int kvm_arch_vcpu_ioctl_translate(struct kvm_vcpu *vcpu,
+ 				    struct kvm_translation *tr);
  
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 3f6d450355f0..85f2dd8a79d1 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -3343,6 +3343,16 @@ void kvm_vcpu_kick(struct kvm_vcpu *vcpu)
- EXPORT_SYMBOL_GPL(kvm_vcpu_kick);
- #endif /* !CONFIG_S390 */
- 
-+void kvm_vcpu_kick_and_wait(struct kvm_vcpu *vcpu)
-+{
-+	if (kvm_vcpu_wake_up(vcpu))
-+		return;
-+
-+	if (kvm_request_needs_ipi(vcpu, KVM_REQUEST_WAIT))
-+		smp_call_function_single(vcpu->cpu, ack_flush, NULL, 1);
-+}
-+EXPORT_SYMBOL_GPL(kvm_vcpu_kick_and_wait);
-+
- int kvm_vcpu_yield_to(struct kvm_vcpu *target)
- {
- 	struct pid *pid;
+ int kvm_arch_vcpu_ioctl_get_regs(struct kvm_vcpu *vcpu, struct kvm_regs *regs);
++void kvm_arch_vcpu_get_regs(struct kvm_vcpu *vcpu, struct kvm_regs *regs);
+ int kvm_arch_vcpu_ioctl_set_regs(struct kvm_vcpu *vcpu, struct kvm_regs *regs);
+ int kvm_arch_vcpu_ioctl_get_sregs(struct kvm_vcpu *vcpu,
+ 				  struct kvm_sregs *sregs);
++void kvm_arch_vcpu_get_sregs(struct kvm_vcpu *vcpu,
++				  struct kvm_sregs *sregs);
+ int kvm_arch_vcpu_ioctl_set_sregs(struct kvm_vcpu *vcpu,
+ 				  struct kvm_sregs *sregs);
+ int kvm_arch_vcpu_ioctl_get_mpstate(struct kvm_vcpu *vcpu,
