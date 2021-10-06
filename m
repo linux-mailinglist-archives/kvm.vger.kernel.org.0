@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 78DFB423B6F
-	for <lists+kvm@lfdr.de>; Wed,  6 Oct 2021 12:24:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 39E00423BA1
+	for <lists+kvm@lfdr.de>; Wed,  6 Oct 2021 12:41:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238067AbhJFK0s (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Oct 2021 06:26:48 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46150 "EHLO
+        id S238115AbhJFKn2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Oct 2021 06:43:28 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29719 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237836AbhJFK0s (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 6 Oct 2021 06:26:48 -0400
+        by vger.kernel.org with ESMTP id S237836AbhJFKn1 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 6 Oct 2021 06:43:27 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1633515895;
+        s=mimecast20190719; t=1633516894;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=MmWiCgB8uSNl6DOPQQvudamwXwcTydeBRX/uLyQwgQA=;
-        b=Ps6uFmceHlYkWsq0hQtEbRVq6i+J46HWCTYaWHNhJ+iF3NyDOPJ7ehcwq/arrsgjhcMgM9
-        e16iV6dXwrs/dtDnreU+ODnXYiZRk64PJDQYYQ+/YQQlbsrtGVldmWzY1KAoj7KHu7erWK
-        17Und4MWUuM3bavHCvfTIe1VoYEcfxY=
+        bh=pSbAB1FpLz0EqbTVsytH0ZxguGzlBKGJojYvPvVsolc=;
+        b=SZDT8TQ8wOLcNtrH4GrAht9hhAQ3vICyF3WqYrn/h0ko6RaLZKW7UivZDXK+rKvxuG9Q/O
+        fOZqOgqVLW4P3ukvaalimJ89dEuDn8tl90DF8OVYsO7mM+k4V6Pylo7MCgzV/d3oF9zMqU
+        kCZfmW4V4HuUYS1ZigN5LlYKFlmtVL0=
 Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
  [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-285-1qr4DPUbPDi_iyZFNeCQ-A-1; Wed, 06 Oct 2021 06:24:54 -0400
-X-MC-Unique: 1qr4DPUbPDi_iyZFNeCQ-A-1
-Received: by mail-ed1-f69.google.com with SMTP id p20-20020a50cd94000000b003db23619472so2165139edi.19
-        for <kvm@vger.kernel.org>; Wed, 06 Oct 2021 03:24:54 -0700 (PDT)
+ us-mta-417-3DDy3ETgMzuCf17wFqlXUQ-1; Wed, 06 Oct 2021 06:41:33 -0400
+X-MC-Unique: 3DDy3ETgMzuCf17wFqlXUQ-1
+Received: by mail-ed1-f69.google.com with SMTP id 2-20020a508e02000000b003d871759f5dso2227017edw.10
+        for <kvm@vger.kernel.org>; Wed, 06 Oct 2021 03:41:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=MmWiCgB8uSNl6DOPQQvudamwXwcTydeBRX/uLyQwgQA=;
-        b=0/gpfyZ4BK/90YYinhnGMrOzKUipWNAtk3c83IxMpbnxgrJwFcgVH6Q/a2JVQa0X2w
-         j6Gz4PjRH2O8/qrHdMfeI0inPvlWU9o0hXjMGTvqednrrfDlgdewpaT2AsFQ7a/6eSCR
-         oKdCQkRco2VchKN01wP2TKdbnt4QszJdb0sTHFNRcY0Oxi23F/+PapQp3GK2Fys7tYIZ
-         r4WsqG1J4NtFRkLgT8rVwsy0at19Zmed7fAiVLkksOu2xnbVCKSC9uMD2scqjd0V1cT/
-         krpdiIB9bs0/taUonmaXlm8XBNBy0MOVEm24a72GgDY/57EhlQOsOHeTc4LEDDs36Yy/
-         JoIw==
-X-Gm-Message-State: AOAM532AAgmGrNDA9+tHyjduXZWYmyKg24yrOwLHfZF6pIVbdstCkB+H
-        TQiBt5MEe+7F8LNkWmUlhFf4l2S28h4EGvGFiInhNMzNTOxf8TYZLEbxZ2BXnMw8rfzzgQa5SaK
-        oBatJbZVKufT2
-X-Received: by 2002:a17:906:7ac4:: with SMTP id k4mr32292464ejo.430.1633515893289;
-        Wed, 06 Oct 2021 03:24:53 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy0zZ6sW7WDT3oke9j4TDRc16AgVPN/PNWxEB0jdSUXa+T95wQObvHtsiMesHktZL1B3vMLxQ==
-X-Received: by 2002:a17:906:7ac4:: with SMTP id k4mr32292427ejo.430.1633515893066;
-        Wed, 06 Oct 2021 03:24:53 -0700 (PDT)
+        bh=pSbAB1FpLz0EqbTVsytH0ZxguGzlBKGJojYvPvVsolc=;
+        b=HsyXhPY1Xpg6GcrQHSIOz/PpRq5epMun/AyIN4rAWZltRhART6YTlE6sdFQFx3GKVH
+         ct4blojP5tVeyccy78HDV7hvihKez54yDY5BlmmLm7ziHfR7qb2kr7S2MwPIzlEmOBMk
+         lUV1uA5cfz5qSjc2LuSxkTQOUfcrJYPXRlaBy7LOjY/2tBZPTtiKSwaAURIoCtR+IZUG
+         KmYh/yilI1NljcUDdc/iootGW4gT4wThr4wWWnhmvtW8jeO1Js64TqxBHiks1NdSbLfo
+         b4AtShyGEbtDfqVTTVOWaCMbIPewe0paAOho53zh9aYad8ZDcTbVJwKNv2VWL0ylvdSq
+         uUXg==
+X-Gm-Message-State: AOAM531cviOAL2qvkAszPx4cYtSTEMEmxiu3Q5ypZdgw3GlCVWDo2Xp/
+        HpsT4w6k/7gU2VhtfgMGGjPJFKl1Qxvbpt4rxLfPhbvMpmaKzrsgVl9mumAVW0zGBAh5DaiTB9n
+        Yv6tRnZQItApH
+X-Received: by 2002:a05:6402:1259:: with SMTP id l25mr9211089edw.344.1633516891971;
+        Wed, 06 Oct 2021 03:41:31 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxsOxOanoU2WsmUTn0+TJD/8wKuiodjYexDFyKIk7g9DkrwyVhAlxgYFvN9xA5V8tJSD+COsA==
+X-Received: by 2002:a05:6402:1259:: with SMTP id l25mr9211064edw.344.1633516891776;
+        Wed, 06 Oct 2021 03:41:31 -0700 (PDT)
 Received: from gator.home (cst2-174-28.cust.vodafone.cz. [31.30.174.28])
-        by smtp.gmail.com with ESMTPSA id m13sm3872442eda.41.2021.10.06.03.24.52
+        by smtp.gmail.com with ESMTPSA id q18sm8991596ejc.84.2021.10.06.03.41.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Oct 2021 03:24:52 -0700 (PDT)
-Date:   Wed, 6 Oct 2021 12:24:50 +0200
+        Wed, 06 Oct 2021 03:41:31 -0700 (PDT)
+Date:   Wed, 6 Oct 2021 12:41:29 +0200
 From:   Andrew Jones <drjones@redhat.com>
 To:     Marc Zyngier <maz@kernel.org>
 Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
@@ -63,116 +63,77 @@ Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         kernel-team@android.com
-Subject: Re: [PATCH v2 01/16] KVM: arm64: Generalise VM features into a set
- of flags
-Message-ID: <20211006102450.4fkn46yqfbbh7i6y@gator.home>
+Subject: Re: [PATCH v2 02/16] KVM: arm64: Check for PTE valitity when
+ checking for executable/cacheable
+Message-ID: <20211006104129.s5az46tpny2csfge@gator.home>
 References: <20211004174849.2831548-1-maz@kernel.org>
- <20211004174849.2831548-2-maz@kernel.org>
+ <20211004174849.2831548-3-maz@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211004174849.2831548-2-maz@kernel.org>
+In-Reply-To: <20211004174849.2831548-3-maz@kernel.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 04, 2021 at 06:48:34PM +0100, Marc Zyngier wrote:
-> We currently deal with a set of booleans for VM features,
-> while they could be better represented as set of flags
-> contained in an unsigned long, similarily to what we are
-> doing on the CPU side.
+
+Hi Marc,
+
+sed s/valitity/validity/ <<<"$SUBJECT"
+
+On Mon, Oct 04, 2021 at 06:48:35PM +0100, Marc Zyngier wrote:
+> Don't blindly assume that the PTE is valid when checking whether
+> it describes an executable or cacheable mapping.
 > 
+> This makes sure that we don't issue CMOs for invalid mappings.
+> 
+> Suggested-by: Will Deacon <will@kernel.org>
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
->  arch/arm64/include/asm/kvm_host.h | 12 +++++++-----
->  arch/arm64/kvm/arm.c              |  5 +++--
->  arch/arm64/kvm/mmio.c             |  3 ++-
->  3 files changed, 12 insertions(+), 8 deletions(-)
+>  arch/arm64/kvm/hyp/pgtable.c | 9 ++++-----
+>  1 file changed, 4 insertions(+), 5 deletions(-)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index f8be56d5342b..f63ca8fb4e58 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -122,7 +122,10 @@ struct kvm_arch {
->  	 * should) opt in to this feature if KVM_CAP_ARM_NISV_TO_USER is
->  	 * supported.
->  	 */
-> -	bool return_nisv_io_abort_to_user;
-> +#define KVM_ARCH_FLAG_RETURN_NISV_IO_ABORT_TO_USER	0
-> +	/* Memory Tagging Extension enabled for the guest */
-> +#define KVM_ARCH_FLAG_MTE_ENABLED			1
-> +	unsigned long flags;
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index f8ceebe4982e..6bbfd952f0c5 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -638,12 +638,12 @@ static void stage2_put_pte(kvm_pte_t *ptep, struct kvm_s2_mmu *mmu, u64 addr,
+>  static bool stage2_pte_cacheable(struct kvm_pgtable *pgt, kvm_pte_t pte)
+>  {
+>  	u64 memattr = pte & KVM_PTE_LEAF_ATTR_LO_S2_MEMATTR;
+> -	return memattr == KVM_S2_MEMATTR(pgt, NORMAL);
+> +	return kvm_pte_valid(pte) && memattr == KVM_S2_MEMATTR(pgt, NORMAL);
+>  }
 >  
->  	/*
->  	 * VM-wide PMU filter, implemented as a bitmap and big enough for
-> @@ -133,9 +136,6 @@ struct kvm_arch {
+>  static bool stage2_pte_executable(kvm_pte_t pte)
+>  {
+> -	return !(pte & KVM_PTE_LEAF_ATTR_HI_S2_XN);
+> +	return kvm_pte_valid(pte) && !(pte & KVM_PTE_LEAF_ATTR_HI_S2_XN);
+>  }
 >  
->  	u8 pfr0_csv2;
->  	u8 pfr0_csv3;
+>  static bool stage2_leaf_mapping_allowed(u64 addr, u64 end, u32 level,
+> @@ -688,8 +688,7 @@ static int stage2_map_walker_try_leaf(u64 addr, u64 end, u32 level,
+>  	/* Perform CMOs before installation of the guest stage-2 PTE */
+>  	if (mm_ops->dcache_clean_inval_poc && stage2_pte_cacheable(pgt, new))
+>  		mm_ops->dcache_clean_inval_poc(kvm_pte_follow(new, mm_ops),
+> -						granule);
 > -
-> -	/* Memory Tagging Extension enabled for the guest */
-> -	bool mte_enabled;
->  };
+> +					       granule);
+>  	if (mm_ops->icache_inval_pou && stage2_pte_executable(new))
+>  		mm_ops->icache_inval_pou(kvm_pte_follow(new, mm_ops), granule);
 >  
->  struct kvm_vcpu_fault_info {
-> @@ -786,7 +786,9 @@ bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu);
->  #define kvm_arm_vcpu_sve_finalized(vcpu) \
->  	((vcpu)->arch.flags & KVM_ARM64_VCPU_SVE_FINALIZED)
+> @@ -1091,7 +1090,7 @@ static int stage2_flush_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+>  	kvm_pte_t pte = *ptep;
+>  	kvm_pte_t *pte_follow;
 >  
-> -#define kvm_has_mte(kvm) (system_supports_mte() && (kvm)->arch.mte_enabled)
-> +#define kvm_has_mte(kvm)					\
-> +	(system_supports_mte() &&				\
-> +	 test_bit(KVM_ARCH_FLAG_MTE_ENABLED, &(kvm)->arch.flags))
->  #define kvm_vcpu_has_pmu(vcpu)					\
->  	(test_bit(KVM_ARM_VCPU_PMU_V3, (vcpu)->arch.features))
+> -	if (!kvm_pte_valid(pte) || !stage2_pte_cacheable(pgt, pte))
+> +	if (!stage2_pte_cacheable(pgt, pte))
+>  		return 0;
 >  
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index fe102cd2e518..ed9c89ec0b4f 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -89,7 +89,8 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
->  	switch (cap->cap) {
->  	case KVM_CAP_ARM_NISV_TO_USER:
->  		r = 0;
-> -		kvm->arch.return_nisv_io_abort_to_user = true;
-> +		set_bit(KVM_ARCH_FLAG_RETURN_NISV_IO_ABORT_TO_USER,
-> +			&kvm->arch.flags);
->  		break;
->  	case KVM_CAP_ARM_MTE:
->  		mutex_lock(&kvm->lock);
-> @@ -97,7 +98,7 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
->  			r = -EINVAL;
->  		} else {
->  			r = 0;
-> -			kvm->arch.mte_enabled = true;
-> +			set_bit(KVM_ARCH_FLAG_MTE_ENABLED, &kvm->arch.flags);
->  		}
->  		mutex_unlock(&kvm->lock);
->  		break;
-> diff --git a/arch/arm64/kvm/mmio.c b/arch/arm64/kvm/mmio.c
-> index 3e2d8ba11a02..3dd38a151d2a 100644
-> --- a/arch/arm64/kvm/mmio.c
-> +++ b/arch/arm64/kvm/mmio.c
-> @@ -135,7 +135,8 @@ int io_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
->  	 * volunteered to do so, and bail out otherwise.
->  	 */
->  	if (!kvm_vcpu_dabt_isvalid(vcpu)) {
-> -		if (vcpu->kvm->arch.return_nisv_io_abort_to_user) {
-> +		if (test_bit(KVM_ARCH_FLAG_RETURN_NISV_IO_ABORT_TO_USER,
-> +			     &vcpu->kvm->arch.flags)) {
->  			run->exit_reason = KVM_EXIT_ARM_NISV;
->  			run->arm_nisv.esr_iss = kvm_vcpu_dabt_iss_nisv_sanitized(vcpu);
->  			run->arm_nisv.fault_ipa = fault_ipa;
+>  	pte_follow = kvm_pte_follow(pte, mm_ops);
 > -- 
 > 2.30.2
 > 
 
-Maybe a kvm_arm_has_feature(struct kvm *kvm) helper would be nice to avoid
-all the &vcpu->kvm->arch.flags types of references getting scattered
-around.
-
 Reviewed-by: Andrew Jones <drjones@redhat.com>
-
-Thanks,
-drew
 
