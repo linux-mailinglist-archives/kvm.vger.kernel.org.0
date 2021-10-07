@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B9FAB4257A6
-	for <lists+kvm@lfdr.de>; Thu,  7 Oct 2021 18:18:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0E8354257A7
+	for <lists+kvm@lfdr.de>; Thu,  7 Oct 2021 18:18:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242557AbhJGQUW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Oct 2021 12:20:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:47911 "EHLO
+        id S242686AbhJGQUX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Oct 2021 12:20:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40170 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S242564AbhJGQUQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 7 Oct 2021 12:20:16 -0400
+        by vger.kernel.org with ESMTP id S242674AbhJGQUT (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 7 Oct 2021 12:20:19 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1633623502;
+        s=mimecast20190719; t=1633623504;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=89V0d1PNFsuCxWRiRzeXMO8a63XAoQ+evMckrwIv15E=;
-        b=doJKWHxlsHoFHCvTZBelpzN/1HLGAbDslcafQOa9xZWDsmne52dWUXf+xO9dCCe1Kvy9lr
-        hSW9MtvP7/PIkBOg7ke3wsRgzbLqOT9PaAJGyVI2+pegUMWsmO4pjHU1Pz5EnxHXq/Zb2e
-        Y//z79eYypM8LVOyt6k0g2+WvRI46uE=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-586-T6KpgNB2OduG_RRlMMJ9lA-1; Thu, 07 Oct 2021 12:18:19 -0400
-X-MC-Unique: T6KpgNB2OduG_RRlMMJ9lA-1
-Received: by mail-wr1-f69.google.com with SMTP id d13-20020adf9b8d000000b00160a94c235aso5130684wrc.2
-        for <kvm@vger.kernel.org>; Thu, 07 Oct 2021 09:18:19 -0700 (PDT)
+        bh=NtntxYjzk/c/tBnUjs6wx6H836yPN9/32v9yVgz+JmI=;
+        b=FsqE1z/m7PMEfBN255eqYB8KlyiNOl/4D2a9X/BISqxAHLUpCv8Uyl/vKjPuzMEragJi5z
+        vr4qZb0g1oEnqxRuyTT8WWhofCJ4UXd81mWE16JCVYB7DMGPIsW+XyWXTIXIquJhsckazJ
+        gjg99St7DsxybhtUfxyhtE07/imhh9o=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-433-DA9W6y3FPaaYz-J378-CgA-1; Thu, 07 Oct 2021 12:18:23 -0400
+X-MC-Unique: DA9W6y3FPaaYz-J378-CgA-1
+Received: by mail-wr1-f71.google.com with SMTP id l9-20020adfc789000000b00160111fd4e8so5142939wrg.17
+        for <kvm@vger.kernel.org>; Thu, 07 Oct 2021 09:18:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=89V0d1PNFsuCxWRiRzeXMO8a63XAoQ+evMckrwIv15E=;
-        b=dKCCEtyPHD7dynKlA1floyW/FC6qdAJAzbCmOP3mtsjWj6fc3RnO1SZ2Z/A1Gk9TrH
-         4ONlwU1mATl6oR7YKtUtJEXqWC4ELiz9lgDqZwjxt0lyynOfDAexLx1rL3ITLFsWp2IZ
-         hRX77fMJ8DCQ+HG5C5ibbBsT9MmyyUB+LTdUO/+W08pkZQcRXslXewLEjALViUwezXzK
-         9GXlbZkLmcOvG7vKFbUko/Es0JlqzQIKySKNzl0YSThfM3v3MwXgeizSAc5fogYxNxoj
-         SCK0NDaMe9rQc6uVuouJjRFfsgw5XBlTVU3YlNeM5e6ZKnToav7FJETnMjFfHGImGBdg
-         Jt6A==
-X-Gm-Message-State: AOAM531uCvDR2zemImvrQhFI3Skz+JuTwoVSedDycQZzvf06BzUZd/Sz
-        VyVNXriDb0dvw+fi+DDwqsOiKVb4yAQgTrCBNd411x7bxBYePoJD00zpSx0fyH+GmqvWIGH9J4u
-        1rCHDJ60gn+wO
-X-Received: by 2002:a1c:2:: with SMTP id 2mr17491478wma.87.1633623498401;
-        Thu, 07 Oct 2021 09:18:18 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJybbjnGgx9aPwaHiTsiUUeAUcDEXJV3VetZXPeXIxDRjX+nW5gqW/S5HCcW3+GX4C5xkS0GDg==
-X-Received: by 2002:a1c:2:: with SMTP id 2mr17491444wma.87.1633623498131;
-        Thu, 07 Oct 2021 09:18:18 -0700 (PDT)
+        bh=NtntxYjzk/c/tBnUjs6wx6H836yPN9/32v9yVgz+JmI=;
+        b=eAVo5wuvtMCWWBUTiEQ2n2nsVr0oLerCi4//V7ONJaMZ0nSjLWohjASbkL7PBgNKKG
+         obHa2vmJqFRF6L0W0qlKf5Xj9VB3qaDFzTLTOoYUmcO0XwNCuXkMZzhJjKzQTB5MQDID
+         kVMNPTdXJb2luZBhq6lrXU+newg+5L4NsYqKe2wX5kyb7dugBAFnp/k3LWUYuqEPQeOz
+         W/Y6obO9t8ZIC5dEBOuZyNQ4Ybe+3uIaR6+TLLen8VzqhpLq/sWzhO+5DY1AgT9UHCeq
+         omE4NPYDYVqIlxCaxfwK09+5AALUrXCG0DMprgHSK4qgareU75KDKBjOqQS9LtUAuRLQ
+         UX2w==
+X-Gm-Message-State: AOAM5323Fg6uYg26GittRTQHmXC+44RNSsmDP1HrAHSI2/7ibFU2qjHD
+        xY0I3MAHMfHFgpIB/OR9CJjYUMDpwEVWB2rU0sRjvjBzTcJRg3bbXqa+vGityEZmRO66GOZO31H
+        UHJCgdii7nRWn
+X-Received: by 2002:a05:600c:2057:: with SMTP id p23mr5628890wmg.67.1633623502741;
+        Thu, 07 Oct 2021 09:18:22 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzbpkjWZoIcEo8CCNOMP08Kf3tAZlemKrKuxafvy6AWFRjok6953SFiC/moJkDRbEWcDARxSQ==
+X-Received: by 2002:a05:600c:2057:: with SMTP id p23mr5628876wmg.67.1633623502591;
+        Thu, 07 Oct 2021 09:18:22 -0700 (PDT)
 Received: from x1w.redhat.com (118.red-83-35-24.dynamicip.rima-tde.net. [83.35.24.118])
-        by smtp.gmail.com with ESMTPSA id c5sm9181006wml.9.2021.10.07.09.18.17
+        by smtp.gmail.com with ESMTPSA id v10sm93782wri.29.2021.10.07.09.18.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Oct 2021 09:18:17 -0700 (PDT)
+        Thu, 07 Oct 2021 09:18:22 -0700 (PDT)
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To:     qemu-devel@nongnu.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -61,9 +61,9 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Sergio Lopez <slp@redhat.com>,
         Dov Murik <dovmurik@linux.ibm.com>,
         =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: [PATCH v4 13/23] target/i386/sev: Restrict SEV to system emulation
-Date:   Thu,  7 Oct 2021 18:17:06 +0200
-Message-Id: <20211007161716.453984-14-philmd@redhat.com>
+Subject: [PATCH v4 14/23] target/i386/sev: Rename sev_i386.h -> sev.h
+Date:   Thu,  7 Oct 2021 18:17:07 +0200
+Message-Id: <20211007161716.453984-15-philmd@redhat.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20211007161716.453984-1-philmd@redhat.com>
 References: <20211007161716.453984-1-philmd@redhat.com>
@@ -74,176 +74,122 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-SEV is irrelevant on user emulation, so restrict it to sysemu.
-Some stubs are still required because used in cpu.c by
-x86_register_cpudef_types(), so move the sysemu specific stubs
-to sev-sysemu-stub.c instead. This will allow us to simplify
-monitor.c (which is not available in user emulation) in the
-next commit.
+SEV is a x86 specific feature, and the "sev_i386.h" header
+is already in target/i386/. Rename it as "sev.h" to simplify.
 
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+Patch created mechanically using:
+
+  $ git mv target/i386/sev_i386.h target/i386/sev.h
+  $ sed -i s/sev_i386.h/sev.h/ $(git grep -l sev_i386.h)
+
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- target/i386/sev-stub.c        | 43 -------------------------
- target/i386/sev-sysemu-stub.c | 60 +++++++++++++++++++++++++++++++++++
- target/i386/meson.build       |  4 ++-
- 3 files changed, 63 insertions(+), 44 deletions(-)
- create mode 100644 target/i386/sev-sysemu-stub.c
+ target/i386/{sev_i386.h => sev.h} | 0
+ hw/i386/x86.c                     | 2 +-
+ target/i386/cpu.c                 | 2 +-
+ target/i386/kvm/kvm.c             | 2 +-
+ target/i386/monitor.c             | 2 +-
+ target/i386/sev-stub.c            | 2 +-
+ target/i386/sev-sysemu-stub.c     | 2 +-
+ target/i386/sev.c                 | 2 +-
+ 8 files changed, 7 insertions(+), 7 deletions(-)
+ rename target/i386/{sev_i386.h => sev.h} (100%)
 
+diff --git a/target/i386/sev_i386.h b/target/i386/sev.h
+similarity index 100%
+rename from target/i386/sev_i386.h
+rename to target/i386/sev.h
+diff --git a/hw/i386/x86.c b/hw/i386/x86.c
+index 0c7c054e3a0..76de7e2265e 100644
+--- a/hw/i386/x86.c
++++ b/hw/i386/x86.c
+@@ -47,7 +47,7 @@
+ #include "hw/i386/fw_cfg.h"
+ #include "hw/intc/i8259.h"
+ #include "hw/rtc/mc146818rtc.h"
+-#include "target/i386/sev_i386.h"
++#include "target/i386/sev.h"
+ 
+ #include "hw/acpi/cpu_hotplug.h"
+ #include "hw/irq.h"
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index b54b98551e9..8289dc87bd5 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -26,7 +26,7 @@
+ #include "sysemu/reset.h"
+ #include "sysemu/hvf.h"
+ #include "kvm/kvm_i386.h"
+-#include "sev_i386.h"
++#include "sev.h"
+ #include "qapi/error.h"
+ #include "qapi/qapi-visit-machine.h"
+ #include "qapi/qmp/qerror.h"
+diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+index f25837f63f4..a5f6ff63c81 100644
+--- a/target/i386/kvm/kvm.c
++++ b/target/i386/kvm/kvm.c
+@@ -28,7 +28,7 @@
+ #include "sysemu/kvm_int.h"
+ #include "sysemu/runstate.h"
+ #include "kvm_i386.h"
+-#include "sev_i386.h"
++#include "sev.h"
+ #include "hyperv.h"
+ #include "hyperv-proto.h"
+ 
+diff --git a/target/i386/monitor.c b/target/i386/monitor.c
+index ea836678f51..109e4e61c0a 100644
+--- a/target/i386/monitor.c
++++ b/target/i386/monitor.c
+@@ -32,7 +32,7 @@
+ #include "sysemu/kvm.h"
+ #include "sysemu/sev.h"
+ #include "qapi/error.h"
+-#include "sev_i386.h"
++#include "sev.h"
+ #include "qapi/qapi-commands-misc-target.h"
+ #include "qapi/qapi-commands-misc.h"
+ #include "hw/i386/pc.h"
 diff --git a/target/i386/sev-stub.c b/target/i386/sev-stub.c
-index 55f1ec74196..170e9f50fee 100644
+index 170e9f50fee..7e8b6f9a259 100644
 --- a/target/i386/sev-stub.c
 +++ b/target/i386/sev-stub.c
-@@ -15,11 +15,6 @@
- #include "qapi/error.h"
- #include "sev_i386.h"
+@@ -13,7 +13,7 @@
  
--SevInfo *sev_get_info(void)
--{
--    return NULL;
--}
--
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+-#include "sev_i386.h"
++#include "sev.h"
+ 
  bool sev_enabled(void)
  {
-     return false;
-@@ -35,49 +30,11 @@ uint32_t sev_get_reduced_phys_bits(void)
-     return 0;
- }
- 
--char *sev_get_launch_measurement(void)
--{
--    return NULL;
--}
--
--SevCapability *sev_get_capabilities(Error **errp)
--{
--    error_setg(errp, "SEV is not available in this QEMU");
--    return NULL;
--}
--
--int sev_inject_launch_secret(const char *hdr, const char *secret,
--                             uint64_t gpa, Error **errp)
--{
--    return 1;
--}
--
--int sev_encrypt_flash(uint8_t *ptr, uint64_t len, Error **errp)
--{
--    g_assert_not_reached();
--}
--
- bool sev_es_enabled(void)
- {
-     return false;
- }
- 
--void sev_es_set_reset_vector(CPUState *cpu)
--{
--}
--
--int sev_es_save_reset_vector(void *flash_ptr, uint64_t flash_size)
--{
--    g_assert_not_reached();
--}
--
--SevAttestationReport *
--sev_get_attestation_report(const char *mnonce, Error **errp)
--{
--    error_setg(errp, "SEV is not available in this QEMU");
--    return NULL;
--}
--
- bool sev_add_kernel_loader_hashes(SevKernelLoaderContext *ctx, Error **errp)
- {
-     g_assert_not_reached();
 diff --git a/target/i386/sev-sysemu-stub.c b/target/i386/sev-sysemu-stub.c
-new file mode 100644
-index 00000000000..d556b4f091f
---- /dev/null
+index d556b4f091f..8082781febf 100644
+--- a/target/i386/sev-sysemu-stub.c
 +++ b/target/i386/sev-sysemu-stub.c
-@@ -0,0 +1,60 @@
-+/*
-+ * QEMU SEV system stub
-+ *
-+ * Copyright Advanced Micro Devices 2018
-+ *
-+ * Authors:
-+ *      Brijesh Singh <brijesh.singh@amd.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qapi/qapi-commands-misc-target.h"
-+#include "qapi/error.h"
-+#include "sev_i386.h"
-+
-+SevInfo *sev_get_info(void)
-+{
-+    return NULL;
-+}
-+
-+char *sev_get_launch_measurement(void)
-+{
-+    return NULL;
-+}
-+
-+SevCapability *sev_get_capabilities(Error **errp)
-+{
-+    error_setg(errp, "SEV is not available in this QEMU");
-+    return NULL;
-+}
-+
-+int sev_inject_launch_secret(const char *hdr, const char *secret,
-+                             uint64_t gpa, Error **errp)
-+{
-+    return 1;
-+}
-+
-+int sev_encrypt_flash(uint8_t *ptr, uint64_t len, Error **errp)
-+{
-+    g_assert_not_reached();
-+}
-+
-+void sev_es_set_reset_vector(CPUState *cpu)
-+{
-+}
-+
-+int sev_es_save_reset_vector(void *flash_ptr, uint64_t flash_size)
-+{
-+    g_assert_not_reached();
-+}
-+
-+SevAttestationReport *sev_get_attestation_report(const char *mnonce,
-+                                                 Error **errp)
-+{
-+    error_setg(errp, "SEV is not available in this QEMU");
-+    return NULL;
-+}
-diff --git a/target/i386/meson.build b/target/i386/meson.build
-index dac19ec00d4..a4f45c3ec1d 100644
---- a/target/i386/meson.build
-+++ b/target/i386/meson.build
-@@ -6,7 +6,7 @@
-   'xsave_helper.c',
-   'cpu-dump.c',
- ))
--i386_ss.add(when: 'CONFIG_SEV', if_true: files('host-cpu.c', 'sev.c'), if_false: files('sev-stub.c'))
-+i386_ss.add(when: 'CONFIG_SEV', if_true: files('host-cpu.c'), if_false: files('sev-stub.c'))
+@@ -14,7 +14,7 @@
+ #include "qemu/osdep.h"
+ #include "qapi/qapi-commands-misc-target.h"
+ #include "qapi/error.h"
+-#include "sev_i386.h"
++#include "sev.h"
  
- # x86 cpu type
- i386_ss.add(when: 'CONFIG_KVM', if_true: files('host-cpu.c'))
-@@ -20,6 +20,8 @@
-   'monitor.c',
-   'cpu-sysemu.c',
- ))
-+i386_softmmu_ss.add(when: 'CONFIG_SEV', if_true: files('sev.c'), if_false: files('sev-sysemu-stub.c'))
-+
- i386_user_ss = ss.source_set()
- 
- subdir('kvm')
+ SevInfo *sev_get_info(void)
+ {
+diff --git a/target/i386/sev.c b/target/i386/sev.c
+index 5cbbcf0bb93..e43bbf3a17d 100644
+--- a/target/i386/sev.c
++++ b/target/i386/sev.c
+@@ -25,7 +25,7 @@
+ #include "qemu/uuid.h"
+ #include "crypto/hash.h"
+ #include "sysemu/kvm.h"
+-#include "sev_i386.h"
++#include "sev.h"
+ #include "sysemu/sysemu.h"
+ #include "sysemu/runstate.h"
+ #include "trace.h"
 -- 
 2.31.1
 
