@@ -2,157 +2,218 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E851F4258B8
-	for <lists+kvm@lfdr.de>; Thu,  7 Oct 2021 19:00:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 414554258EA
+	for <lists+kvm@lfdr.de>; Thu,  7 Oct 2021 19:07:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243041AbhJGRCG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Oct 2021 13:02:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35178 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242937AbhJGRCB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Oct 2021 13:02:01 -0400
-Received: from mail-qt1-x82d.google.com (mail-qt1-x82d.google.com [IPv6:2607:f8b0:4864:20::82d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8C49C061760
-        for <kvm@vger.kernel.org>; Thu,  7 Oct 2021 09:59:34 -0700 (PDT)
-Received: by mail-qt1-x82d.google.com with SMTP id l13so6843732qtv.3
-        for <kvm@vger.kernel.org>; Thu, 07 Oct 2021 09:59:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=yStGYIpZvygpVOizwmrRBKxJSbCuOoEwX5b/Zb25tt0=;
-        b=mppNOVAEN+ki/T08o63WMJV4P8udEmtmkGOlQa6mcKWowODcCyB3XLnyzMlrqUi1Xt
-         wI5mcrEfQgBS+oGPU0FZqxVZwv1pUgMA+7RUVAVU2d+8TzfnfzZQIZtxJh39WKdtcldj
-         Knt//D+OuRT2vJoa9q9ajNmswldyLCfxFDP+dd+PID4/BFfOvM70p/DLM9Ue3wAs/k+b
-         D8BcOwYQoTXdBHESPulEEW54QXng020cd88Q70TiLf4EESkmarwkLX4bds7s5k9kpbYd
-         LOerYpEUJPxMKvXsHykqqKe/fw58OaS1iRAfvMpAHR4rwb/lfsX9NzgcnLw6uPeJCqkB
-         crOg==
+        id S242991AbhJGRJ1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Oct 2021 13:09:27 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50978 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S243008AbhJGRJZ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 7 Oct 2021 13:09:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1633626450;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=vOgstVP39uHiVDCQR89rxdsZ+CifSHj0dsIBU9buRTQ=;
+        b=FJoSqka7d5ewF8oqsQjpbe+GEX5djrdM+nu2IwZ98tL30sRrDAZRrIX+jkHOoTW6vmjg/7
+        IZfFyp++FFKB7cR+KYdIg4M3sK3ewoBt5/BubrBCMZdx0EgfuSGH0Ozc31ZoWvLY5aDydf
+        8y7ECSt9clow/Y5eY8yiIBmGibBpjqA=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-409-k1LSDWMoPTSACxITZpAgtw-1; Thu, 07 Oct 2021 13:07:27 -0400
+X-MC-Unique: k1LSDWMoPTSACxITZpAgtw-1
+Received: by mail-wr1-f71.google.com with SMTP id r16-20020adfb1d0000000b00160bf8972ceso5220153wra.13
+        for <kvm@vger.kernel.org>; Thu, 07 Oct 2021 10:07:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=yStGYIpZvygpVOizwmrRBKxJSbCuOoEwX5b/Zb25tt0=;
-        b=G/WBo4lMTJoDQMpQjopBrcVU3F0VUugRg/LwmDPHkk8SNFpqIWWhS4RR0C7zHf8NQi
-         8sDMpD6AVCdSC5ckC4r3oGtWA7ab9UgQd75k5UtIDDXKFcxEUSNX8ewMEiES4SRRis7O
-         WZ2+Ma/Oita47fL+OfvFwjKAQyvfaf7kIe8WV/JGbbrL7UIXdhsixOXfXjPjJpInYd/g
-         5QsLOYG+xwNtdB/pD6o66bJW1InJsQnBvowqRP7sja9dDmGz0Fu9Lh7Sq5tqL+TqZd8C
-         ZT6GoezMwPitQ0ykcDYhgAnt/PEQcwZr2e6oGEWngpkwfI7lK+jLxH4u7dITED4aKJQQ
-         AauA==
-X-Gm-Message-State: AOAM530Qtt5Hi/2+cLbaJGQYB13/z+UKINdKBc4R8lN7zI+r/BjMRNcm
-        kT7olkSlGz+F9WsNwsDd+c+b82D8bSGjqFgRjucdfw==
-X-Google-Smtp-Source: ABdhPJxTAXIl5n2x/wQHnws8o08Z9GMfP8GXDvCZvrxTPvhcRyUVX7c5KZ+qz0KRjOEopqc7sNJRocOee/a0NptbvdQ=
-X-Received: by 2002:a05:622a:4d4:: with SMTP id q20mr6376969qtx.57.1633625973690;
- Thu, 07 Oct 2021 09:59:33 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to:user-agent;
+        bh=vOgstVP39uHiVDCQR89rxdsZ+CifSHj0dsIBU9buRTQ=;
+        b=B0AcxQlD29In87Tp+wtOC/EHpCRVnWugSezfb/CWRDoXJSj37rl1XRGq0xrrk/T4f7
+         U4QN/xdvggWf+/XxvMLiwMvqUCEwzYg7DoLdiRdBW48ctUrUFCrOFF+QYdYhpa0/sgzU
+         F7EaFOarwvOuS7dfLfALveJj1KPOm2nYmef/MYTbOaT4nSdA2rcDOQ6VvGr9BBXatfOH
+         bnrq9j6BZEo4apSY6RncNHBvEVcM2WF3HtjvV0vlmDxIkoUN4Z/4a2/gzwpFdwhq7Kei
+         D4dt2YAKaZsVfpoHlMWTqqA/lERNFFzJ39PMntO+LwJQeMi4mhi/HwThYm3Adqbzl1QI
+         Gv8g==
+X-Gm-Message-State: AOAM533/53T2IZTvz1RUBH3wYlTInJ8WKvW6WSTTxI1Mfe5mov2vlhSs
+        Opm9BriZqVJDMTmU3Pouy5wbzbYiQwqrBqlOPDCnIZtn57wFihKsBd+YV2A7aG+0CMpYpagPsIW
+        oDmBJIMj5N19W
+X-Received: by 2002:a7b:c938:: with SMTP id h24mr1926238wml.41.1633626446521;
+        Thu, 07 Oct 2021 10:07:26 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzWSShfdNN8yjaqlu9CM3I5d6ybN282swEBN8GRzgPQr9NREZ3fM9Dj+K7NhC3x2wqV8P3ZjQ==
+X-Received: by 2002:a7b:c938:: with SMTP id h24mr1926216wml.41.1633626446354;
+        Thu, 07 Oct 2021 10:07:26 -0700 (PDT)
+Received: from work-vm (cpc109025-salf6-2-0-cust480.10-2.cable.virginm.net. [82.30.61.225])
+        by smtp.gmail.com with ESMTPSA id e1sm212129wru.26.2021.10.07.10.07.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Oct 2021 10:07:25 -0700 (PDT)
+Date:   Thu, 7 Oct 2021 18:07:23 +0100
+From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To:     Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Cc:     qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        James Bottomley <jejb@linux.ibm.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Dov Murik <dovmurik@linux.ibm.com>
+Subject: Re: [PATCH v4 16/23] target/i386/sev: Remove stubs by using code
+ elision
+Message-ID: <YV8pS2D8e14qmFBq@work-vm>
+References: <20211007161716.453984-1-philmd@redhat.com>
+ <20211007161716.453984-17-philmd@redhat.com>
 MIME-Version: 1.0
-References: <20211001170553.3062988-1-maz@kernel.org>
-In-Reply-To: <20211001170553.3062988-1-maz@kernel.org>
-From:   Andrew Scull <ascull@google.com>
-Date:   Thu, 7 Oct 2021 17:59:22 +0100
-Message-ID: <CADcWuH0S2-WVN073VkZ1tTf76xemKsbZyjNyC1hBjY+n09dZWQ@mail.gmail.com>
-Subject: Re: [PATCH v2] KVM: arm64: Allow KVM to be disabled from the command line
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        kernel-team@android.com, David Brazdil <dbrazdil@google.com>,
-        Will Deacon <will@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20211007161716.453984-17-philmd@redhat.com>
+User-Agent: Mutt/2.0.7 (2021-05-04)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Reviewed-by: Andrew Scull <ascull@google.com>
+* Philippe Mathieu-Daudé (philmd@redhat.com) wrote:
+> Only declare sev_enabled() and sev_es_enabled() when CONFIG_SEV is
+> set, to allow the compiler to elide unused code. Remove unnecessary
+> stubs.
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
+What makes it allowed to *rely* on the compiler eliding calls?
 
-On Fri, 1 Oct 2021 at 18:06, Marc Zyngier <maz@kernel.org> wrote:
->
-> Although KVM can be compiled out of the kernel, it cannot be disabled
-> at runtime. Allow this possibility by introducing a new mode that
-> will prevent KVM from initialising.
->
-> This is useful in the (limited) circumstances where you don't want
-> KVM to be available (what is wrong with you?), or when you want
-> to install another hypervisor instead (good luck with that).
->
-> Reviewed-by: David Brazdil <dbrazdil@google.com>
-> Acked-by: Will Deacon <will@kernel.org>
-> Acked-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+Dave
+
 > ---
->
-> Notes:
->     v2: Dropped the id_aa64mmfr1_vh=0 setting so that KVM can be disabled
->         and yet stay in VHE mode on platforms that require it.
->         I kept the AB/RB's, but please shout if you disagree!
->
->  Documentation/admin-guide/kernel-parameters.txt |  2 ++
->  arch/arm64/include/asm/kvm_host.h               |  1 +
->  arch/arm64/kvm/arm.c                            | 14 +++++++++++++-
->  3 files changed, 16 insertions(+), 1 deletion(-)
->
-> diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-> index 91ba391f9b32..f268731a3d4d 100644
-> --- a/Documentation/admin-guide/kernel-parameters.txt
-> +++ b/Documentation/admin-guide/kernel-parameters.txt
-> @@ -2365,6 +2365,8 @@
->         kvm-arm.mode=
->                         [KVM,ARM] Select one of KVM/arm64's modes of operation.
->
-> +                       none: Forcefully disable KVM.
+>  target/i386/sev.h       | 14 ++++++++++++--
+>  target/i386/cpu.c       | 13 +++++++------
+>  target/i386/sev-stub.c  | 41 -----------------------------------------
+>  target/i386/meson.build |  2 +-
+>  4 files changed, 20 insertions(+), 50 deletions(-)
+>  delete mode 100644 target/i386/sev-stub.c
+> 
+> diff --git a/target/i386/sev.h b/target/i386/sev.h
+> index c96072bf78d..d9548e3e642 100644
+> --- a/target/i386/sev.h
+> +++ b/target/i386/sev.h
+> @@ -14,6 +14,10 @@
+>  #ifndef QEMU_SEV_I386_H
+>  #define QEMU_SEV_I386_H
+>  
+> +#ifndef CONFIG_USER_ONLY
+> +#include CONFIG_DEVICES /* CONFIG_SEV */
+> +#endif
 > +
->                         nvhe: Standard nVHE-based mode, without support for
->                               protected guests.
->
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index f8be56d5342b..019490c67976 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -58,6 +58,7 @@
->  enum kvm_mode {
->         KVM_MODE_DEFAULT,
->         KVM_MODE_PROTECTED,
-> +       KVM_MODE_NONE,
->  };
->  enum kvm_mode kvm_get_mode(void);
->
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index fe102cd2e518..658171231af9 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -2064,6 +2064,11 @@ int kvm_arch_init(void *opaque)
->                 return -ENODEV;
->         }
->
-> +       if (kvm_get_mode() == KVM_MODE_NONE) {
-> +               kvm_info("KVM disabled from command line\n");
-> +               return -ENODEV;
-> +       }
+>  #include "exec/confidential-guest-support.h"
+>  #include "qapi/qapi-types-misc-target.h"
+>  
+> @@ -35,8 +39,14 @@ typedef struct SevKernelLoaderContext {
+>      size_t cmdline_size;
+>  } SevKernelLoaderContext;
+>  
+> -bool sev_enabled(void);
+> -extern bool sev_es_enabled(void);
+> +#ifdef CONFIG_SEV
+> + bool sev_enabled(void);
+> +bool sev_es_enabled(void);
+> +#else
+> +#define sev_enabled() 0
+> +#define sev_es_enabled() 0
+> +#endif
 > +
->         in_hyp_mode = is_kernel_in_hyp_mode();
->
->         if (cpus_have_final_cap(ARM64_WORKAROUND_DEVICE_LOAD_ACQUIRE) ||
-> @@ -2137,8 +2142,15 @@ static int __init early_kvm_mode_cfg(char *arg)
->                 return 0;
->         }
->
-> -       if (strcmp(arg, "nvhe") == 0 && !WARN_ON(is_kernel_in_hyp_mode()))
-> +       if (strcmp(arg, "nvhe") == 0 && !WARN_ON(is_kernel_in_hyp_mode())) {
-> +               kvm_mode = KVM_MODE_DEFAULT;
->                 return 0;
-> +       }
-> +
-> +       if (strcmp(arg, "none") == 0) {
-> +               kvm_mode = KVM_MODE_NONE;
-> +               return 0;
-> +       }
->
->         return -EINVAL;
->  }
-> --
-> 2.30.2
->
-> --
-> To unsubscribe from this group and stop receiving emails from it, send an email to kernel-team+unsubscribe@android.com.
->
+>  extern SevInfo *sev_get_info(void);
+>  extern uint32_t sev_get_cbit_position(void);
+>  extern uint32_t sev_get_reduced_phys_bits(void);
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 8289dc87bd5..fc3ed80ef1e 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -5764,12 +5764,13 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+>          *edx = 0;
+>          break;
+>      case 0x8000001F:
+> -        *eax = sev_enabled() ? 0x2 : 0;
+> -        *eax |= sev_es_enabled() ? 0x8 : 0;
+> -        *ebx = sev_get_cbit_position();
+> -        *ebx |= sev_get_reduced_phys_bits() << 6;
+> -        *ecx = 0;
+> -        *edx = 0;
+> +        *eax = *ebx = *ecx = *edx = 0;
+> +        if (sev_enabled()) {
+> +            *eax = 0x2;
+> +            *eax |= sev_es_enabled() ? 0x8 : 0;
+> +            *ebx = sev_get_cbit_position();
+> +            *ebx |= sev_get_reduced_phys_bits() << 6;
+> +        }
+>          break;
+>      default:
+>          /* reserved values: zero */
+> diff --git a/target/i386/sev-stub.c b/target/i386/sev-stub.c
+> deleted file mode 100644
+> index 7e8b6f9a259..00000000000
+> --- a/target/i386/sev-stub.c
+> +++ /dev/null
+> @@ -1,41 +0,0 @@
+> -/*
+> - * QEMU SEV stub
+> - *
+> - * Copyright Advanced Micro Devices 2018
+> - *
+> - * Authors:
+> - *      Brijesh Singh <brijesh.singh@amd.com>
+> - *
+> - * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> - * See the COPYING file in the top-level directory.
+> - *
+> - */
+> -
+> -#include "qemu/osdep.h"
+> -#include "qapi/error.h"
+> -#include "sev.h"
+> -
+> -bool sev_enabled(void)
+> -{
+> -    return false;
+> -}
+> -
+> -uint32_t sev_get_cbit_position(void)
+> -{
+> -    return 0;
+> -}
+> -
+> -uint32_t sev_get_reduced_phys_bits(void)
+> -{
+> -    return 0;
+> -}
+> -
+> -bool sev_es_enabled(void)
+> -{
+> -    return false;
+> -}
+> -
+> -bool sev_add_kernel_loader_hashes(SevKernelLoaderContext *ctx, Error **errp)
+> -{
+> -    g_assert_not_reached();
+> -}
+> diff --git a/target/i386/meson.build b/target/i386/meson.build
+> index a4f45c3ec1d..ae38dc95635 100644
+> --- a/target/i386/meson.build
+> +++ b/target/i386/meson.build
+> @@ -6,7 +6,7 @@
+>    'xsave_helper.c',
+>    'cpu-dump.c',
+>  ))
+> -i386_ss.add(when: 'CONFIG_SEV', if_true: files('host-cpu.c'), if_false: files('sev-stub.c'))
+> +i386_ss.add(when: 'CONFIG_SEV', if_true: files('host-cpu.c'))
+>  
+>  # x86 cpu type
+>  i386_ss.add(when: 'CONFIG_KVM', if_true: files('host-cpu.c'))
+> -- 
+> 2.31.1
+> 
+-- 
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
