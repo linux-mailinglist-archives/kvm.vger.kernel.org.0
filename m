@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B996D42558D
-	for <lists+kvm@lfdr.de>; Thu,  7 Oct 2021 16:39:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C38F04255B2
+	for <lists+kvm@lfdr.de>; Thu,  7 Oct 2021 16:42:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242118AbhJGOkw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Oct 2021 10:40:52 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:49966 "EHLO
+        id S242177AbhJGOoS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Oct 2021 10:44:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36027 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233341AbhJGOku (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 7 Oct 2021 10:40:50 -0400
+        by vger.kernel.org with ESMTP id S242135AbhJGOoR (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 7 Oct 2021 10:44:17 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1633617536;
+        s=mimecast20190719; t=1633617743;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=NGm1yWS8geF2sO0H/4Ce/J+RgIXVQpoAvhPhIp+yNF0=;
-        b=iY/EjFClUtHIbvmZ42U6+VdHEwF/PvLHqAepZ6uQnuVcBejROEMDJLAf6dHZi/L86tE5OZ
-        cnNwN1gBkLPAgRVGG0CBnuaxsBEEpuxJ/qbKwujNBvVc7qVxTBFFEAsC4MepIWDcKU0iP2
-        69dwGYMBH49pRLGprdLxoYeDYRfRaAw=
+        bh=xazcSRU4hXAvOQ5GWPa9VCWbDLefBI+rO4m0xJqTNOQ=;
+        b=hV1HPtjtkojabHHXhunC3eBMvDVxTmiMdurx0TUGJLAaeA0NWzfceAUFpBzVw4l+apDB59
+        NaaBZnxiUo3nWQS/Sp0OSbRFlta2byRPLXwJiq7p68Kmc+qO7gARy0KWXa1T0WRh01Woxy
+        90+RvphJoo67EbRBbRn2gdadqHX+yR0=
 Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
  [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-564-3h8SW1FoPwWGFMFr7uuINw-1; Thu, 07 Oct 2021 10:38:55 -0400
-X-MC-Unique: 3h8SW1FoPwWGFMFr7uuINw-1
-Received: by mail-wr1-f70.google.com with SMTP id k16-20020a5d6290000000b00160753b430fso4896049wru.11
-        for <kvm@vger.kernel.org>; Thu, 07 Oct 2021 07:38:55 -0700 (PDT)
+ us-mta-103-NT6656ZCPBac4gLNhh8-cw-1; Thu, 07 Oct 2021 10:42:22 -0400
+X-MC-Unique: NT6656ZCPBac4gLNhh8-cw-1
+Received: by mail-wr1-f70.google.com with SMTP id k16-20020a5d6290000000b00160753b430fso4904787wru.11
+        for <kvm@vger.kernel.org>; Thu, 07 Oct 2021 07:42:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=NGm1yWS8geF2sO0H/4Ce/J+RgIXVQpoAvhPhIp+yNF0=;
-        b=u41LK9X5mLFZhy4gCZGJZhxS3NHdRVdOIamj0hO17C+cUVldKtvsOuNPJvgA8G9J2k
-         2It7GzxVaf/0tNfb/CsnK1lUP+7sEhzlK5TrDIGsnZror1IwdTt002ayiQXQvjTdzfub
-         Ws1loNSswWykMnFHHtPRmh/XlIgLhohR+zHHXCRRpQNAuEBwXXC89/i3OLxCTE/IocRC
-         D4naIUqX2vrQbX1aTA8hcKblh8Q/fgsKNAK+KDkUHKeyVyuCqgqkTAAwq9sd9f09Mrl/
-         2OaDRaVuNwrwj9P33KmQ8pYF2rlMnFv0KV/faCbZG5DsiJUYItqCZ6rG93qEAgQMGVdW
-         xYkQ==
-X-Gm-Message-State: AOAM532o2gHsloiWv3Zh3IcwrVhkwzd58hcwnqsv8BDD8Vuuf4tnbW+K
-        I50ti+b6uS9TXOoq0pZiykLsiRd7eMeVN7WdtFQtj5cGwzgM0Eoa7FztV7dJ+y2+ju4fQ/zsYWO
-        iFvs0o91NSPEC
-X-Received: by 2002:adf:bb09:: with SMTP id r9mr6004145wrg.238.1633617534446;
-        Thu, 07 Oct 2021 07:38:54 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxO9BCo0zdcmxbDxAudW4jdTSomLkbbEHDoD+axd3gGY/vYr4NNhmBMpyQQvOrtL3YclzCczw==
-X-Received: by 2002:adf:bb09:: with SMTP id r9mr6004113wrg.238.1633617534208;
-        Thu, 07 Oct 2021 07:38:54 -0700 (PDT)
+        bh=xazcSRU4hXAvOQ5GWPa9VCWbDLefBI+rO4m0xJqTNOQ=;
+        b=8SO3o7vC9kLkyE6pkPdJEMlvxtSc4UoZR2xrggtAocKKhjSneSOQ0LGD+Tmz1u9wQM
+         9kngdMCMdy/MgKdBlkRCtwIcpoL6Z+3cmqGXA/ajWhX0I0KxYpBz6omOKLVUHm94+gN/
+         5B7ksGn4Q4OHZM9B6SjGHKFYJbqP57ZR2Xn2QaczSLgIbCgEZcLX1PEhPEOfm55+1EhU
+         TESjMfUEmUKMLcx0APc8taAFKU8JU8oibaJHuhfspxMBd2C6CKZB1VcYJU0j2vJ4DXmC
+         5X4c6KMBRkf6pqZoR/F1i3OwWybeZnrCnKY/HlOVJxFz6eGnPyAocW6cNbNhTFuD3Is2
+         GYwQ==
+X-Gm-Message-State: AOAM533EQGTlL8nLUbhaa2dZmdBEBlMWpiKLQWoOf2SA4I6JjcyDMctO
+        ZdqwCjaz5HkvQ6q3Xe5pzGXTg6w3q5wMUTEN/QFnI6Z/xn0qIgOIuCYXYv20Y8ap0X6qL7/HIxF
+        SbzU8MPvbAcmO
+X-Received: by 2002:a1c:a914:: with SMTP id s20mr5090569wme.6.1633617741257;
+        Thu, 07 Oct 2021 07:42:21 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwmbskMeR1xk9N+RgV327boeCxt5BJetcoJmu76NCY9APJsJpEu2sTGpBXGDLxTNSiHEwr3Vg==
+X-Received: by 2002:a1c:a914:: with SMTP id s20mr5090538wme.6.1633617741066;
+        Thu, 07 Oct 2021 07:42:21 -0700 (PDT)
 Received: from gator (nat-pool-brq-u.redhat.com. [213.175.37.12])
-        by smtp.gmail.com with ESMTPSA id a2sm9231329wrv.15.2021.10.07.07.38.53
+        by smtp.gmail.com with ESMTPSA id c132sm9169302wma.22.2021.10.07.07.42.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Oct 2021 07:38:53 -0700 (PDT)
-Date:   Thu, 7 Oct 2021 16:38:52 +0200
+        Thu, 07 Oct 2021 07:42:18 -0700 (PDT)
+Date:   Thu, 7 Oct 2021 16:42:14 +0200
 From:   Andrew Jones <drjones@redhat.com>
 To:     Marc Zyngier <maz@kernel.org>
 Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
@@ -65,7 +65,7 @@ Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kernel-team@android.com
 Subject: Re: [PATCH v2 10/16] KVM: arm64: Add some documentation for the MMIO
  guard feature
-Message-ID: <20211007143852.pyae42sbovi4vk23@gator>
+Message-ID: <20211007144214.pti5b2wjio6wneye@gator>
 References: <20211004174849.2831548-1-maz@kernel.org>
  <20211004174849.2831548-11-maz@kernel.org>
 MIME-Version: 1.0
@@ -160,7 +160,14 @@ On Mon, Oct 04, 2021 at 06:48:43PM +0100, Marc Zyngier wrote:
 > +                      (uint64)    Index in the MAIR_EL1 register
 > +		                  providing the memory attribute that
 > +				  is used by the guest (r2)
-    ^^ some tabs got in here
+
+Already gave my r-b for this document, but after double checking I see
+that this r2 argument doesn't appeared used by the implementation
+yet. Is this left over from an older design or reserved for later use?
+
+Thanks,
+drew
+
 
 > +    Return Values:    (int64)     NOT_SUPPORTED(-1) on error, or
 > +                                  RET_SUCCESS(0) (r0)
@@ -179,12 +186,5 @@ On Mon, Oct 04, 2021 at 06:48:43PM +0100, Marc Zyngier wrote:
 > +    ==============    ========    ======================================
 > -- 
 > 2.30.2
->
-
-Otherwise,
-
-Reviewed-by: Andrew Jones <drjones@redhat.com>
-
-Thanks,
-drew 
+> 
 
