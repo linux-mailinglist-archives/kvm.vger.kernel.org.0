@@ -2,154 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4FE31425CA4
-	for <lists+kvm@lfdr.de>; Thu,  7 Oct 2021 21:51:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D6C1442604D
+	for <lists+kvm@lfdr.de>; Fri,  8 Oct 2021 01:16:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241640AbhJGTxt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Oct 2021 15:53:49 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:24699 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S241268AbhJGTxs (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 7 Oct 2021 15:53:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1633636313;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=rSJdnQLBRJZqIYEQXaJkFdiNc92DNWtdQnJhG+HrODQ=;
-        b=AeJmiweUz++zP05g2aLKvEtoz4mOzMRdkDNk45zUxvmaZWqtiK2Xh9Ic1/sbErk31xbiQB
-        dFPmXEDW8ow3Bk/Qlij3toWdusEVv8uas2YdPAgMYiqvSXUrOWFhj86+7Ysc2kUouU5GNX
-        wfiiRRzwfITFCGfPBiwYhoC0fyNgSSI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-572-8-O3j7ivNHG0-_TYdbmp9A-1; Thu, 07 Oct 2021 15:51:51 -0400
-X-MC-Unique: 8-O3j7ivNHG0-_TYdbmp9A-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 231E21922964;
-        Thu,  7 Oct 2021 19:51:50 +0000 (UTC)
-Received: from redhat.com (ovpn-113-216.phx2.redhat.com [10.3.113.216])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1124210016FF;
-        Thu,  7 Oct 2021 19:51:12 +0000 (UTC)
-Date:   Thu, 7 Oct 2021 14:51:10 -0500
-From:   Eric Blake <eblake@redhat.com>
-To:     Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Cc:     qemu-devel@nongnu.org, Brijesh Singh <brijesh.singh@amd.com>,
-        Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Sergio Lopez <slp@redhat.com>,
-        James Bottomley <jejb@linux.ibm.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v4 16/23] target/i386/sev: Remove stubs by using code
- elision
-Message-ID: <20211007195110.tmsawi5vt3vnoo6t@redhat.com>
-References: <20211007161716.453984-1-philmd@redhat.com>
- <20211007161716.453984-17-philmd@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20211007161716.453984-17-philmd@redhat.com>
-User-Agent: NeoMutt/20210205-818-e2615c
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+        id S233231AbhJGXSp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Oct 2021 19:18:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38526 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232458AbhJGXSo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Oct 2021 19:18:44 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C9D3C061755
+        for <kvm@vger.kernel.org>; Thu,  7 Oct 2021 16:16:50 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id s66-20020a252c45000000b005ba35261459so9435848ybs.7
+        for <kvm@vger.kernel.org>; Thu, 07 Oct 2021 16:16:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc
+         :content-transfer-encoding;
+        bh=ywF2/rgM1bhy2sAaNDgCO3TYtTem4+JSfSFNkboo73g=;
+        b=Nl2uaV7VRRjEOm/tpJ9KZVG7uSLYTfk8nEgePBQYBAjZk1f3EiWye9NDSWsSw7PtOE
+         y91pUjSmvUwIhExZXsJnE2C3nHeRgeyoMJmuOxe8hK81N5hP+os1RkjJP704V7nSMlDV
+         KYSJQNXlZrmU4J3O4GXkEcmdApLX640FSxzOSpNBfucZUFQn645ex3fSQSF0y6jZg9YU
+         v0/K4HlgzySOEYa7YUtzKPeoV0EqUuuEY6R9QO8I13kD9lsVeXHiRCSeHZ0xzT1F0uzB
+         yzqzb1lMFJqmVu3knJes7mA5BxrrZblOg4zDOqNOkVGvROtrc2G76S8j0nX6S2Cv9HEK
+         fi1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc:content-transfer-encoding;
+        bh=ywF2/rgM1bhy2sAaNDgCO3TYtTem4+JSfSFNkboo73g=;
+        b=xhn5nlTnMIzZduozRE0Vrr5X47JUZXIUIoKAz0R58kzVZmRjhdXrkY8M5SgfFDzBNl
+         F2vuWQLhePvzi+7wytynuAwO9NGgPzJsxa0FTf4qdWztrPdftZHs9JRjSFp/rvFdGevw
+         Bx/7qRsfl5wTgBbI8VtA9mseY5baS3aJcOw4JQSWVavZxkPxA/W7TPCBcBZ/Ernhw7V6
+         eJQHvVqCx3ogbluoxWgEjfjNSUDI7XkRqHchG2YmGx0vzrM7bB1zxfZN59GhiprkStZd
+         EGTDhkRKHcHTF5nPL57LbwW8+KJQFIIqMGrRlgm/KQpt6RHjcuLR6S1pg/2WRQsTjgR0
+         w11g==
+X-Gm-Message-State: AOAM532mit3Fp9oqaJzO6g0k3FYFMhfDPqT41QqJlqMNJJNFhisjzgmC
+        rLa1kdce3YGO4iar7nVBfxR6MK9NEus=
+X-Google-Smtp-Source: ABdhPJwFiYLQxeDfIfgpJxmittGB2vzEHNxXIQU0imnuo3OfNnGuEIqL7ToIQUEBA1Eq40kG7OqhCwhiSN4=
+X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:90:200:2783:a5c0:45f5:b0ed])
+ (user=seanjc job=sendgmr) by 2002:a25:6150:: with SMTP id v77mr7923658ybb.530.1633648609838;
+ Thu, 07 Oct 2021 16:16:49 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Thu,  7 Oct 2021 16:16:47 -0700
+Message-Id: <20211007231647.3553604-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.0.882.g93a45727a2-goog
+Subject: [PATCH] KVM: x86: Account for 32-bit kernels when handling address in
+ TSC attrs
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Oliver Upton <oupton@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 07, 2021 at 06:17:09PM +0200, Philippe Mathieu-Daudé wrote:
-> Only declare sev_enabled() and sev_es_enabled() when CONFIG_SEV is
-> set, to allow the compiler to elide unused code. Remove unnecessary
-> stubs.
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
->  target/i386/sev.h       | 14 ++++++++++++--
->  target/i386/cpu.c       | 13 +++++++------
->  target/i386/sev-stub.c  | 41 -----------------------------------------
->  target/i386/meson.build |  2 +-
->  4 files changed, 20 insertions(+), 50 deletions(-)
->  delete mode 100644 target/i386/sev-stub.c
-> 
-> diff --git a/target/i386/sev.h b/target/i386/sev.h
-> index c96072bf78d..d9548e3e642 100644
-> --- a/target/i386/sev.h
-> +++ b/target/i386/sev.h
-> @@ -14,6 +14,10 @@
->  #ifndef QEMU_SEV_I386_H
->  #define QEMU_SEV_I386_H
->  
-> +#ifndef CONFIG_USER_ONLY
-> +#include CONFIG_DEVICES /* CONFIG_SEV */
-> +#endif
-> +
->  #include "exec/confidential-guest-support.h"
->  #include "qapi/qapi-types-misc-target.h"
->  
-> @@ -35,8 +39,14 @@ typedef struct SevKernelLoaderContext {
->      size_t cmdline_size;
->  } SevKernelLoaderContext;
->  
-> -bool sev_enabled(void);
-> -extern bool sev_es_enabled(void);
-> +#ifdef CONFIG_SEV
-> + bool sev_enabled(void);
-> +bool sev_es_enabled(void);
-> +#else
+When handling TSC attributes, cast the userspace provided virtual address
+to an unsigned long before casting it to a pointer to fix warnings on
+32-bit kernels due to casting a 64-bit integer to a 32-bit pointer.
 
-Is that leading space on the sev_enabled() line intentional?
+Add a check that the truncated address matches the original address, e.g.
+to prevent userspace specifying garbage in bits 63:32.
 
-> +#define sev_enabled() 0
-> +#define sev_es_enabled() 0
-> +#endif
-> +
+  arch/x86/kvm/x86.c: In function =E2=80=98kvm_arch_tsc_get_attr=E2=80=99:
+  arch/x86/kvm/x86.c:4947:22: error: cast to pointer from integer of differ=
+ent size
+   4947 |  u64 __user *uaddr =3D (u64 __user *)attr->addr;
+        |                      ^
+  arch/x86/kvm/x86.c: In function =E2=80=98kvm_arch_tsc_set_attr=E2=80=99:
+  arch/x86/kvm/x86.c:4967:22: error: cast to pointer from integer of differ=
+ent size
+   4967 |  u64 __user *uaddr =3D (u64 __user *)attr->addr;
+        |                      ^
 
-This allows an optimizing compiler to elide code, but does not require
-that the elision worked. The real test is whether there is a link
-error when functions that are only called inside what we hope is
-elided have no stub.
+Cc: Oliver Upton <oupton@google.com>
+Fixes: 469fde25e680 ("KVM: x86: Expose TSC offset controls to userspace")
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/x86.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
->  extern SevInfo *sev_get_info(void);
->  extern uint32_t sev_get_cbit_position(void);
->  extern uint32_t sev_get_reduced_phys_bits(void);
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 8289dc87bd5..fc3ed80ef1e 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -5764,12 +5764,13 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
->          *edx = 0;
->          break;
->      case 0x8000001F:
-> -        *eax = sev_enabled() ? 0x2 : 0;
-> -        *eax |= sev_es_enabled() ? 0x8 : 0;
-> -        *ebx = sev_get_cbit_position();
-> -        *ebx |= sev_get_reduced_phys_bits() << 6;
-> -        *ecx = 0;
-> -        *edx = 0;
-> +        *eax = *ebx = *ecx = *edx = 0;
-> +        if (sev_enabled()) {
-> +            *eax = 0x2;
-> +            *eax |= sev_es_enabled() ? 0x8 : 0;
-> +            *ebx = sev_get_cbit_position();
-> +            *ebx |= sev_get_reduced_phys_bits() << 6;
-> +        }
-
-As long as this compiles in all of our configurations, then the
-compiler really has elided the calls and we can get rid of the stub.
-But that's merely because we're relying on our particular gcc or clang
-compiler behavior, and NOT because it is standardized behavior.  On
-the other hand, I doubt either compiler would break this assumption,
-as it is probably used in lots of places, even if it is not portable.
-
-Since you asked for my opinion, I'm okay giving:
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 196ac33ef958..4a52a08707de 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -4944,9 +4944,12 @@ static int kvm_arch_tsc_has_attr(struct kvm_vcpu *vc=
+pu,
+ static int kvm_arch_tsc_get_attr(struct kvm_vcpu *vcpu,
+ 				 struct kvm_device_attr *attr)
+ {
+-	u64 __user *uaddr =3D (u64 __user *)attr->addr;
++	u64 __user *uaddr =3D (u64 __user *)(unsigned long)attr->addr;
+ 	int r;
+=20
++	if ((u64)(unsigned long)uaddr !=3D attr->addr)
++		return -EFAULT;
++
+ 	switch (attr->attr) {
+ 	case KVM_VCPU_TSC_OFFSET:
+ 		r =3D -EFAULT;
+@@ -4964,10 +4967,13 @@ static int kvm_arch_tsc_get_attr(struct kvm_vcpu *v=
+cpu,
+ static int kvm_arch_tsc_set_attr(struct kvm_vcpu *vcpu,
+ 				 struct kvm_device_attr *attr)
+ {
+-	u64 __user *uaddr =3D (u64 __user *)attr->addr;
++	u64 __user *uaddr =3D (u64 __user *)(unsigned long)attr->addr;
+ 	struct kvm *kvm =3D vcpu->kvm;
+ 	int r;
+=20
++	if ((u64)(unsigned long)uaddr !=3D attr->addr)
++		return -EFAULT;
++
+ 	switch (attr->attr) {
+ 	case KVM_VCPU_TSC_OFFSET: {
+ 		u64 offset, tsc, ns;
+--=20
+2.33.0.882.g93a45727a2-goog
 
