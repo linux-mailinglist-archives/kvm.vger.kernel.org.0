@@ -2,104 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 13060424FA5
-	for <lists+kvm@lfdr.de>; Thu,  7 Oct 2021 11:02:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9569E424FA8
+	for <lists+kvm@lfdr.de>; Thu,  7 Oct 2021 11:04:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240349AbhJGJEp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Oct 2021 05:04:45 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37122 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S231661AbhJGJEo (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 7 Oct 2021 05:04:44 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1978JRww030896;
-        Thu, 7 Oct 2021 05:02:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=LIZcQMu5pkYTo0z3ZSJZyeHC2PaNP/F1G1nPx99qJt0=;
- b=Fwuuiul8Cycu++v9j2zGO7dBIKK78HjMQBL5xhhZ3bWN16+yP8swimOf5k/adntXS1Yl
- Vjik7LvQBAZFidiwzjgv6Vy4a7S82poqJRHkWNMSyylWHuJUjypi8oeVhG4aWDaMkUFM
- iWiZR0UvUO/J1o8RrXsBsJmxPt+14HUN7DbAXdGCcXx931PSQNbnp+CH7oT3WGAYQxOT
- mEqHiQLvGiSGyxlT8jw+yv01xdB+OgMekS23OPYuhX2qKfIu0eGkn4SyO5nVskC+KYA8
- Hel3Z8yP+CGwpBmz4UJDylK2ywugs6Hviehdo9A+3WP6An3oUk+LyiuHm9JMrC1/zV5n RQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3bhcsd7g1r-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 07 Oct 2021 05:02:50 -0400
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1977r8Ni031669;
-        Thu, 7 Oct 2021 05:02:47 -0400
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3bhcsd7g12-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 07 Oct 2021 05:02:47 -0400
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 19791vvc003407;
-        Thu, 7 Oct 2021 09:02:45 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma01fra.de.ibm.com with ESMTP id 3bef2aaser-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 07 Oct 2021 09:02:44 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1978vJ7D54722924
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 7 Oct 2021 08:57:19 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3A5884C046;
-        Thu,  7 Oct 2021 09:02:40 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6DC884C05A;
-        Thu,  7 Oct 2021 09:02:39 +0000 (GMT)
-Received: from li-43c5434c-23b8-11b2-a85c-c4958fb47a68.ibm.com (unknown [9.171.7.98])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu,  7 Oct 2021 09:02:39 +0000 (GMT)
-Subject: Re: [PATCH 0/2] s390: downsize my responsibilities
-To:     Cornelia Huck <cohuck@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, kvm@vger.kernel.org,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>
-References: <20211006160120.217636-1-cohuck@redhat.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Message-ID: <9dc7d312-5541-60bb-5d8a-3b0dfd594cae@de.ibm.com>
-Date:   Thu, 7 Oct 2021 11:02:38 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+        id S240355AbhJGJFy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Oct 2021 05:05:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36710 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231661AbhJGJFx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Oct 2021 05:05:53 -0400
+Received: from mail-oi1-x22a.google.com (mail-oi1-x22a.google.com [IPv6:2607:f8b0:4864:20::22a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12835C061746;
+        Thu,  7 Oct 2021 02:04:00 -0700 (PDT)
+Received: by mail-oi1-x22a.google.com with SMTP id t4so6265102oie.5;
+        Thu, 07 Oct 2021 02:04:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=PAvueer9aMZMZvA0DKMfvJRj/glamcb5kqpTYRoRQhY=;
+        b=lKlD+hr2jcOq+xfOQL+fH4N6Vj8osuEH96ZjBU2A2Kp7fJ7UZ3v8O/r2eeUhQkbxuW
+         L0rg32EiIiAjO4rVIxjlpqlt6GKkq1d+szlwe5+cAEqI2w/zczgy9JzsCkXeBOlowsr7
+         +8ypz2VNgviy+g/rz8kH8GrRf3eiuxkYnVi+pgEFh+TupL7v0jfwoIpcFWgy0MZYKRN9
+         UA/GgRT/lE8se0E429zsIz1I+SAMp8ibWIOltL4tRg5hcBSZvohZK3o1XzuHQC0RogRQ
+         CMo6T6um/QxBRpaWkNetoxN6mTxbGdeEn/dyAJ+vsowiYg1FmAdgf7Vykvifx92JjKwY
+         Jruw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=PAvueer9aMZMZvA0DKMfvJRj/glamcb5kqpTYRoRQhY=;
+        b=to7NV04iVabcbFoR89ngPcxdLpcOS1rJDYnFFzFJzJ9BF+l0WvmPEnHgDjQZXaOk4Z
+         7xm/N9wij8KwHXM9l1ZKuh0WrdxUnIdI96pLbmUAm91UYWsuh6X80PnCF0IwzNg2dkNU
+         J+XQUVJZBslYaJzCnz67PYcGZ7MIC18eKkNBrqE0f8z0Z87KmE/IKwb132xyN8ziLXQ6
+         61EU8X8lcBlZ6pLMRVChbc8BSYPcotV+pH1frsrZIjavSu0F2binNHkT6qA+1/gX47wn
+         0YDKcLLD85KHnivkWyRaf3U9+jnko8JyoTWsI4Koroev+ZOpRexoBTv6X9xw36fIhngU
+         cIpQ==
+X-Gm-Message-State: AOAM530TTbwczQYWZ0lHO3/2dGgnWMSsFXFD+MPDGlQXXj4ONe7u7A3k
+        kImJacW0SGEVkRTuiXnc7U4rZSPZGW5rOd1Ulek=
+X-Google-Smtp-Source: ABdhPJy2GrEsiJAKuVqIdJoO4A3ktMZrrc6cWXQ/zErXZkYIiF2eZA4ONUe7M1MJoqWmNIU8yzCFCf3lCmZX5W+8RvA=
+X-Received: by 2002:a05:6808:1211:: with SMTP id a17mr2142069oil.91.1633597439475;
+ Thu, 07 Oct 2021 02:03:59 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20211006160120.217636-1-cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: XSPr6kLZ9lVDqtz-9YEisqGJ0kLv_qS_
-X-Proofpoint-GUID: q-ZtNZ3PpbRV0ov9HlYsyWN09KwdrQbg
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.391,FMLib:17.0.607.475
- definitions=2021-10-06_04,2021-10-07_01,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 spamscore=0
- clxscore=1015 phishscore=0 mlxlogscore=850 priorityscore=1501
- lowpriorityscore=0 adultscore=0 bulkscore=0 malwarescore=0 impostorscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2109230001 definitions=main-2110070063
+References: <20211002124012.18186-1-ajaygargnsit@gmail.com>
+ <b9afdade-b121-cc9e-ce85-6e4ff3724ed9@linux.intel.com> <CAHP4M8Us753hAeoXL7E-4d29rD9+FzUwAqU6gKNmgd8G0CaQQw@mail.gmail.com>
+ <20211004163146.6b34936b.alex.williamson@redhat.com>
+In-Reply-To: <20211004163146.6b34936b.alex.williamson@redhat.com>
+From:   Ajay Garg <ajaygargnsit@gmail.com>
+Date:   Thu, 7 Oct 2021 14:33:47 +0530
+Message-ID: <CAHP4M8UeGRSqHBV+wDPZ=TMYzio0wYzHPzq2Y+JCY0uzZgBkmA@mail.gmail.com>
+Subject: Re: [PATCH] iommu: intel: remove flooding of non-error logs, when
+ new-DMA-PTE is the same as old-DMA-PTE.
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Lu Baolu <baolu.lu@linux.intel.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Am 06.10.21 um 18:01 schrieb Cornelia Huck:
-> I currently don't have as much time to work on s390 things
-> anymore, so let's adjust some of my entries.
-> 
-> Cornelia Huck (2):
->    KVM: s390: remove myself as reviewer
->    vfio-ccw: step down as maintainer
-> 
->   MAINTAINERS | 2 --
->   1 file changed, 2 deletions(-)
+Thanks Alex for the reply.
 
-Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
 
-Thank you for your work. Both patches applied. Will likely go via the s390 tree.
+Lu, Alex :
 
+I got my diagnosis regarding the host-driver wrong, my apologies.
+There is no issue with the pci-device's host-driver (confirmed by
+preventing the loading of host-driver at host-bootup). Thus, nothing
+to be fixed at the host-driver side.
+
+Rather seems some dma mapping/unmapping inconsistency is happening,
+when kvm/qemu boots up with the pci-device attached to the guest.
+
+I put up debug-logs in "vfio_iommu_type1_ioctl" method in
+"vfio_iommu_type1.c" (on the host-machine).
+When the guest boots up, repeated DMA-mappings are observed for the
+same address as per the host-machine's logs (without a corresponding
+DMA-unmapping first) :
+
+##########################################################################################
+ajay@ajay-Latitude-E6320:~$ tail -f /var/log/syslog | grep "ajay: "
+Oct  7 14:12:32 ajay-Latitude-E6320 kernel: [  146.202297] ajay:
+_MAP_DMA for [0x7ffe724a8670] status [0]
+Oct  7 14:12:32 ajay-Latitude-E6320 kernel: [  146.583179] ajay:
+_MAP_DMA for [0x7ffe724a8670] status [0]
+Oct  7 14:12:32 ajay-Latitude-E6320 kernel: [  146.583253] ajay:
+_MAP_DMA for [0x7ffe724a8670] status [0]
+Oct  7 14:12:36 ajay-Latitude-E6320 kernel: [  150.105584] ajay:
+_MAP_DMA for [0x7ffe724a8670] status [0]
+Oct  7 14:13:07 ajay-Latitude-E6320 kernel: [  180.986499] ajay:
+_UNMAP_DMA for [0x7ffe724a9840] status [0]
+Oct  7 14:13:07 ajay-Latitude-E6320 kernel: [  180.986559] ajay:
+_MAP_DMA for [0x7ffe724a97d0] status [0]
+Oct  7 14:13:07 ajay-Latitude-E6320 kernel: [  180.986638] ajay:
+_MAP_DMA for [0x7ffe724a97d0] status [0]
+Oct  7 14:13:07 ajay-Latitude-E6320 kernel: [  181.087359] ajay:
+_MAP_DMA for [0x7ffe724a97d0] status [0]
+Oct  7 14:13:13 ajay-Latitude-E6320 kernel: [  187.271232] ajay:
+_UNMAP_DMA for [0x7fde7b7fcfa0] status [0]
+Oct  7 14:13:13 ajay-Latitude-E6320 kernel: [  187.271320] ajay:
+_UNMAP_DMA for [0x7fde7b7fcfa0] status [0]
+....
+##########################################################################################
+
+
+I'll try and backtrack to the userspace process that is sending these ioctls.
+
+
+Thanks and Regards,
+Ajay
+
+
+
+
+
+
+On Tue, Oct 5, 2021 at 4:01 AM Alex Williamson
+<alex.williamson@redhat.com> wrote:
+>
+> On Sat, 2 Oct 2021 22:48:24 +0530
+> Ajay Garg <ajaygargnsit@gmail.com> wrote:
+>
+> > Thanks Lu for the reply.
+> >
+> > >
+> > > Isn't the domain should be switched from a default domain to an
+> > > unmanaged domain when the device is assigned to the guest?
+> > >
+> > > Even you want to r-setup the same mappings, you need to un-map all
+> > > existing mappings, right?
+> > >
+> >
+> > Hmm, I guess that's a (design) decision the KVM/QEMU/VFIO communities
+> > need to take.
+> > May be the patch could suppress the flooding till then?
+>
+> No, this is wrong.  The pte values should not exist, it doesn't matter
+> that they're the same.  Is the host driver failing to remove mappings
+> and somehow they persist in the new vfio owned domain?  There's
+> definitely a bug beyond logging going on here.  Thanks,
+>
+> Alex
+>
