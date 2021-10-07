@@ -2,117 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 59C24425048
-	for <lists+kvm@lfdr.de>; Thu,  7 Oct 2021 11:44:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6DAC4425050
+	for <lists+kvm@lfdr.de>; Thu,  7 Oct 2021 11:48:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234934AbhJGJqK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Oct 2021 05:46:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:49305 "EHLO
+        id S240615AbhJGJu1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Oct 2021 05:50:27 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34796 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230389AbhJGJqJ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 7 Oct 2021 05:46:09 -0400
+        by vger.kernel.org with ESMTP id S240569AbhJGJu0 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 7 Oct 2021 05:50:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1633599856;
+        s=mimecast20190719; t=1633600112;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=VplPmaU1StyYkGRWpkJjJq1VIPPWnfQsc4epwDxxEuo=;
-        b=CK31Y+DPTbZFhLDHAS9FjiXwDK5MQd7yPg2gqRsapKKhdbJqJs8QuLxYS4hIvm8/1g9mrF
-        2vNxRpFZyQxgXjuN9sS81kONz0NmllAD7bVx268ygrbqgw064yVQkA9aKUbUB8xS2x1rNk
-        8Zj6lXHuYcGJ5k9th+09a8q2TdrTPT8=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-61-iqx7ov2NOZuTrsqjsFfoAQ-1; Thu, 07 Oct 2021 05:44:13 -0400
-X-MC-Unique: iqx7ov2NOZuTrsqjsFfoAQ-1
-Received: by mail-wr1-f70.google.com with SMTP id k2-20020adfc702000000b0016006b2da9bso4218043wrg.1
-        for <kvm@vger.kernel.org>; Thu, 07 Oct 2021 02:44:12 -0700 (PDT)
+        bh=cunxVlt1Iz78RvNACgdXp2hdZjh6Rnqc8OiDeqi0Afw=;
+        b=bFsb46AWFwkqAVQTOJDLQD0lOtdy+Ph9N4KxNjV1XXsybTH0pBhXEn67Ca/w3VjnyVdcgP
+        sc8dY1SuYBi7NsZnGgd9U70GSPQCdBlFYsMCwC1Y6rnk9fG2oNHbSRjuthGW9vtDV30/zj
+        zMiQwJ6X9IGooXoLfGdbZv22kso1vYY=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-363-LqgQv3KwOKCBijiin21TeQ-1; Thu, 07 Oct 2021 05:48:31 -0400
+X-MC-Unique: LqgQv3KwOKCBijiin21TeQ-1
+Received: by mail-wr1-f71.google.com with SMTP id l9-20020adfc789000000b00160111fd4e8so4246492wrg.17
+        for <kvm@vger.kernel.org>; Thu, 07 Oct 2021 02:48:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=VplPmaU1StyYkGRWpkJjJq1VIPPWnfQsc4epwDxxEuo=;
-        b=F8Vx439AknCEKgn1/u93QcXIcSz1tU7s8tcjoktRTE/Y3P/LNoyMSpWts05yNUIm9t
-         I6Ag08Np2Lz76V+tKpNn2HpeBoyTzOzHlih6je3sNe+DNCLDV+3ROALKBTNGtbeTsuLI
-         Wap2QRO4W0Dt5R/4AevAbEuuGsiL+kqje85elGMI70kREjoyLUh4vrTo+KUTKRmmZNCD
-         NlHKSGfGLtQ6i/UONuhQcsZkoVy8BMzrldFxfuQY3ML8acqmi4IqDV0wdjC57arRwmRh
-         +d6l6a8VgMUzW7LNjhCAPE/hrU8zFLZJ7V7HadhHjJsMifYIK7M8Rh6gHqyP/pGkkkBu
-         T82A==
-X-Gm-Message-State: AOAM532zx+69gzP/BGTCt04lIbR4UqN2IH1FzGl0XSGlvc1BZqaWM0RL
-        /UDrdaFBoeKyohZ07D25VR+8kuHDLpLA0JWepcijdpN3nmYy1oHdW/b8M65TMNC9lcPNSPRCYry
-        xe0X9Bh0KVscN
-X-Received: by 2002:a5d:64e2:: with SMTP id g2mr4122486wri.323.1633599851969;
-        Thu, 07 Oct 2021 02:44:11 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwEDcmyCCv6xjzDl/4mg+qgjtqTYB/OD3bV0KHCrlyvddXBUAlb0Yt/JRJesHR+wS+XbBcS/A==
-X-Received: by 2002:a5d:64e2:: with SMTP id g2mr4122457wri.323.1633599851746;
-        Thu, 07 Oct 2021 02:44:11 -0700 (PDT)
-Received: from thuth.remote.csb (nat-pool-str-t.redhat.com. [149.14.88.106])
-        by smtp.gmail.com with ESMTPSA id q3sm7526264wmc.25.2021.10.07.02.44.10
+        bh=cunxVlt1Iz78RvNACgdXp2hdZjh6Rnqc8OiDeqi0Afw=;
+        b=V3O3Ozqj793dO711Bl0+vyJCF1/0+wWZEC77FzlCA2dZCmmlNSkvgM4omLJRuL+XAh
+         2itFSn42DafLU+Nfme8FjBOZrStQ5WLlVkWlnwa6+aq+dSn2++v5LvrbNchZPh00sQKD
+         RG1mVtkFXFQGXxfMrntz4uBRCZx9kYUILnDcfOMI6eEc/FaR/q+uBxsUkBjjfqZrJrqa
+         PgHDTZTZ13pUXanrmbzjGZRmg1ZBb8dfdNiMk2k4E8NMkvk/2zWzKZHJXNtk9eQyAH0C
+         P3ivzYrPp4zrC1fG1eeTlijNEiXA0ZHDTgc9JNiUUDl+lF1kZVZIQss0gwLTawdKfaCZ
+         UChQ==
+X-Gm-Message-State: AOAM530okOLLvKi+/CYeTCL5N+8YK3LHKmi7uWjLDMSyHoQyYGrOuqHl
+        zw9ndLxZ9aaZi3yljXleDI+yZr9+JFvf8fZVKYUkcxstPy4lNOIQmi+6DohENI02rooWcBqF6NP
+        +mJB3gx9e1vSV
+X-Received: by 2002:a1c:4444:: with SMTP id r65mr3526101wma.174.1633600110090;
+        Thu, 07 Oct 2021 02:48:30 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzwsVfvrhysFLOExPEjTS7BRJA24jJc7VIGiVRn1DmleziljtHhswe3AgPTDfsV2RczVf9BdQ==
+X-Received: by 2002:a1c:4444:: with SMTP id r65mr3526088wma.174.1633600109941;
+        Thu, 07 Oct 2021 02:48:29 -0700 (PDT)
+Received: from [192.168.1.36] (118.red-83-35-24.dynamicip.rima-tde.net. [83.35.24.118])
+        by smtp.gmail.com with ESMTPSA id y15sm17040052wrp.44.2021.10.07.02.48.29
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 07 Oct 2021 02:44:11 -0700 (PDT)
-Subject: Re: [kvm-unit-tests PATCH v3 9/9] s390x: snippets: Define all things
- that are needed to link the lib
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
-        david@redhat.com, seiden@linux.ibm.com, scgl@linux.ibm.com
-References: <20211007085027.13050-1-frankja@linux.ibm.com>
- <20211007085027.13050-10-frankja@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-Message-ID: <c3bed287-5c4c-a54b-4276-391c6cdb37f4@redhat.com>
-Date:   Thu, 7 Oct 2021 11:44:10 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+        Thu, 07 Oct 2021 02:48:29 -0700 (PDT)
+Message-ID: <6cbbe28f-29a6-7e7d-a2df-334a47752470@redhat.com>
+Date:   Thu, 7 Oct 2021 11:48:28 +0200
 MIME-Version: 1.0
-In-Reply-To: <20211007085027.13050-10-frankja@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [PATCH v3 14/22] target/i386/sev: Move
+ qmp_query_sev_attestation_report() to sev.c
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+To:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc:     qemu-devel@nongnu.org, Dov Murik <dovmurik@linux.ibm.com>,
+        Sergio Lopez <slp@redhat.com>, kvm@vger.kernel.org,
+        James Bottomley <jejb@linux.ibm.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        "Daniel P . Berrange" <berrange@redhat.com>
+References: <20211002125317.3418648-1-philmd@redhat.com>
+ <20211002125317.3418648-15-philmd@redhat.com> <YVrP9sGcUNuRuXm6@work-vm>
+From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+In-Reply-To: <YVrP9sGcUNuRuXm6@work-vm>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 07/10/2021 10.50, Janosch Frank wrote:
-> Let's just define all of the needed things so we can link libcflat.
-> 
-> A significant portion of the lib won't work, like printing and
-> allocation but we can still use things like memset() which already
-> improves our lives significantly.
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
->   s390x/snippets/c/cstart.S | 14 ++++++++++++++
->   1 file changed, 14 insertions(+)
-> 
-> diff --git a/s390x/snippets/c/cstart.S b/s390x/snippets/c/cstart.S
-> index 031a6b83..2d397669 100644
-> --- a/s390x/snippets/c/cstart.S
-> +++ b/s390x/snippets/c/cstart.S
-> @@ -20,6 +20,20 @@ start:
->   	lghi	%r15, stackptr
->   	sam64
->   	brasl	%r14, main
-> +/*
-> + * Defining things that the linker needs to link in libcflat and make
-> + * them result in sigp stop if called.
-> + */
-> +.globl sie_exit
-> +.globl sie_entry
-> +.globl smp_cpu_setup_state
-> +.globl ipl_args
-> +.globl auxinfo
-> +sie_exit:
-> +sie_entry:
-> +smp_cpu_setup_state:
-> +ipl_args:
-> +auxinfo:
+On 10/4/21 11:57, Dr. David Alan Gilbert wrote:
+> * Philippe Mathieu-Daudé (philmd@redhat.com) wrote:
+>> Move qmp_query_sev_attestation_report() from monitor.c to sev.c
+>> and make sev_get_attestation_report() static. We don't need the
+>> stub anymore, remove it.
+>>
+>> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>> ---
+>>  target/i386/sev_i386.h        |  2 --
+>>  target/i386/monitor.c         |  6 ------
+>>  target/i386/sev-sysemu-stub.c |  7 ++++---
+>>  target/i386/sev.c             | 12 ++++++++++--
+>>  4 files changed, 14 insertions(+), 13 deletions(-)
 
-I think this likely could be done in a somewhat nicer way, e.g. by moving 
-mem_init() and sclp_memory_setup() into a separate .c file in the lib, and 
-by moving expect_pgm_int(), fixup_pgm_int() and friends into another 
-separate .c file, too, so that we e.g. do not need to link against the code 
-that uses sie_entry and sie_exit ... but that's a major rework on its own, 
-so for the time being:
+>> -SevAttestationReport *sev_get_attestation_report(const char *mnonce,
+>> -                                                 Error **errp)
+>> +SevAttestationReport *qmp_query_sev_attestation_report(const char *mnonce,
+>> +                                                       Error **errp)
+>>  {
+>> -    error_setg(errp, "SEV is not available in this QEMU");
+>> +    error_setg(errp, QERR_UNSUPPORTED);
+> 
+> I did like that message making it clear the reason it was unsupported
+> was this build, rather than lack of host support or not enabling it.
 
-Acked-by: Thomas Huth <thuth@redhat.com>
+Yep, no reason to change it, besides, QERR_UNSUPPORTED is deprecated
+since 2015! (commit 4629ed1e989):
+
+/*
+ * These macros will go away, please don't use in new code, and do not
+ * add new ones!
+ */
+
+I suppose this is a rebase mistake, thanks for catching it!
+
+Phil.
 
