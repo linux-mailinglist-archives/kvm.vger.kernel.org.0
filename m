@@ -2,166 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2A5C64252F2
-	for <lists+kvm@lfdr.de>; Thu,  7 Oct 2021 14:25:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EAD224254AB
+	for <lists+kvm@lfdr.de>; Thu,  7 Oct 2021 15:49:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241308AbhJGM12 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Oct 2021 08:27:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:37302 "EHLO
+        id S241797AbhJGNv0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Oct 2021 09:51:26 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24633 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S241197AbhJGM12 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 7 Oct 2021 08:27:28 -0400
+        by vger.kernel.org with ESMTP id S241801AbhJGNvW (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 7 Oct 2021 09:51:22 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1633609534;
+        s=mimecast20190719; t=1633614568;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=wPzCUic6CYIMy5ARHGSfae0aVwrn1CpgSsq1foikCFo=;
-        b=Ip64Ea21sg8e/3GjPft2cUL/siACw0CiSMNuAc9Mmh+0lYZcoXKOrZbSLKsJiUwohn/Ic/
-        G8I+n1Zx8hGeTxy8Z8fBSmQqntpovbrS+tn/0uPv/mGa5BQKQoxH9W67ty2LG5/B2WpnvK
-        qyvPueEXytAZbxAZBu51vZXJH6BnmUQ=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-461-xLTmpATrPPGGvDnlwnSPPw-1; Thu, 07 Oct 2021 08:25:33 -0400
-X-MC-Unique: xLTmpATrPPGGvDnlwnSPPw-1
-Received: by mail-wr1-f69.google.com with SMTP id s18-20020adfbc12000000b00160b2d4d5ebso4577914wrg.7
-        for <kvm@vger.kernel.org>; Thu, 07 Oct 2021 05:25:33 -0700 (PDT)
+        bh=YV63mS4RpYRoGQSZMwqbE1CRZKLm8qRI0uKOruLtURg=;
+        b=i81V86cXVmYstB2kUR6CDyvShggvjV+7y5CE6LT9OIcmWvuTDK99twXtdTY6o7oYef704f
+        MXD7s+eTSe3DahlsMXm7UoqsZd7BlODiWOzYPlba5Rm1r4gJO2/8PsXTYjSbOmGevmZu0j
+        /Gv5mvJ8LRa2UGqM5SnJgimlvqfmH+A=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-595-DoCVwvs7NwGMAay1iKxrHw-1; Thu, 07 Oct 2021 09:49:27 -0400
+X-MC-Unique: DoCVwvs7NwGMAay1iKxrHw-1
+Received: by mail-qt1-f200.google.com with SMTP id 13-20020ac8560d000000b0029f69548889so5226313qtr.3
+        for <kvm@vger.kernel.org>; Thu, 07 Oct 2021 06:49:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=wPzCUic6CYIMy5ARHGSfae0aVwrn1CpgSsq1foikCFo=;
-        b=Ltd61WTk5SKTyC/CE4jDAHNaHOHyE2Lt730PB+i4qK2n50wiaqoSeW4+BEhZNP8y8Y
-         3NaLgF1j5Ov4paIT2lYTs/aMw5wEiEumKSCqDexUBsqSjavDZK7q05yKJWk+ksSLFiH7
-         xjS/DwMaJfRrRGDwGqHTefe4RkSrf/RJeez5JSNghnC8JDLmWpfRBdZkZa4fgMyK2XGt
-         bU2FpEcf5V1pgFLvsu9jeEHtKsXCsKipYOuaY1V2fZe25QCMZ1Pyq3qAt4YXQ0z/mOxm
-         r5sfYWhwvYLbJ3VAqPKa/zq4s3AmbsmfAqxWFN2YP/rI1oGFRAUaVeb8BTVc+vDWxTDA
-         1/lQ==
-X-Gm-Message-State: AOAM532tO8JCduVelRlE3kWvHS1DMF/vl3eFMmCA1toJ987wo5Su+bAN
-        qmgEK0w0DmxDVtzvDmyeuunpbHC6ajZ0IliBtqTSo8vA5EspkmAfPJiWRvYYOELCOjCkidj+zTr
-        5r0Bi2laplcRU
-X-Received: by 2002:adf:a413:: with SMTP id d19mr5034975wra.246.1633609532109;
-        Thu, 07 Oct 2021 05:25:32 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwhng+oeuXPF66rcVW/Ky2EelAOIslOG8kX+JhVf4qUHjTpWyaYVL3GY9nKDyOtcqagNm5w0g==
-X-Received: by 2002:adf:a413:: with SMTP id d19mr5034951wra.246.1633609531928;
-        Thu, 07 Oct 2021 05:25:31 -0700 (PDT)
-Received: from work-vm (cpc109025-salf6-2-0-cust480.10-2.cable.virginm.net. [82.30.61.225])
-        by smtp.gmail.com with ESMTPSA id q3sm5544623wmf.11.2021.10.07.05.25.30
+         :mime-version:content-disposition:in-reply-to;
+        bh=YV63mS4RpYRoGQSZMwqbE1CRZKLm8qRI0uKOruLtURg=;
+        b=CqLcdMV58OQA502BLSpTaktkDNBi6EV3wKBFUUKx9auQMFuTR5YjFOoyW7s6SdhC7R
+         YWG3Gpsg6qV+SZ/SoLQdkrAis3tGIwaRpDED3d0nFOmOoSlh64VQBE+Z7TUm/PfbU4iJ
+         nKz/u76itlF1HoCUvpwk2PMjZMGXeswC2vxgYlLQG/bUMGM5pGjfkvYXeiWLQOO9kzCh
+         OC2mBOykxfDIdnD3hS9SpDKZOHu4QbwilmkKinp0JYMbDAOUUvt7tqg7HlK/ecyUioJJ
+         n8kmFD6VDCQMQtx3zefbQ/vdV7D+yOtzEubmG8L0/08xbIZTzm9PZVlAi67VZpD1YdGI
+         Ym3Q==
+X-Gm-Message-State: AOAM532hMnpEM99JQBXia/StjQz7L+tNf+XhVmYy9caRfBLzRsovISG0
+        K8nwBN1nPWbbfb6NCIrovNcV43ypXtbi/ncUdYkFWqDYFoFHs8nkjSJzLt91+oGSfd/nI/Gwe8V
+        8zqVfbfc/nkmz
+X-Received: by 2002:a05:6214:a4d:: with SMTP id ee13mr4121157qvb.6.1633614567253;
+        Thu, 07 Oct 2021 06:49:27 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzfq2RpXF9UQXSj5gVtwkRFV+YzKin4ZaeJ2Zs5710CY4R+6CVe48FzPtRwNTqzbSzHN22NJA==
+X-Received: by 2002:a05:6214:a4d:: with SMTP id ee13mr4121130qvb.6.1633614567050;
+        Thu, 07 Oct 2021 06:49:27 -0700 (PDT)
+Received: from gator (nat-pool-brq-u.redhat.com. [213.175.37.12])
+        by smtp.gmail.com with ESMTPSA id n123sm633770qke.36.2021.10.07.06.49.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Oct 2021 05:25:31 -0700 (PDT)
-Date:   Thu, 7 Oct 2021 13:25:28 +0100
-From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To:     Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Sergio Lopez <slp@redhat.com>,
-        Brijesh Singh <brijesh.singh@amd.com>, kvm@vger.kernel.org,
-        Connor Kuehl <ckuehl@redhat.com>,
-        James Bottomley <jejb@linux.ibm.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        "Daniel P . Berrange" <berrange@redhat.com>,
-        Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
-Subject: Re: [PATCH v3 05/22] target/i386/monitor: Return QMP error when SEV
- is disabled in build
-Message-ID: <YV7nOJolgSSIX5Wf@work-vm>
-References: <20211002125317.3418648-1-philmd@redhat.com>
- <20211002125317.3418648-6-philmd@redhat.com>
- <bef20bd5-7760-3fc7-9914-1eddca800825@redhat.com>
- <8f12bc3e-53aa-c946-bb06-f7d08721b243@redhat.com>
+        Thu, 07 Oct 2021 06:49:26 -0700 (PDT)
+Date:   Thu, 7 Oct 2021 15:49:22 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org, will@kernel.org,
+        qperret@google.com, dbrazdil@google.com,
+        Steven Price <steven.price@arm.com>,
+        Fuad Tabba <tabba@google.com>,
+        Srivatsa Vaddagiri <vatsa@codeaurora.org>,
+        Shanker R Donthineni <sdonthineni@nvidia.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        kernel-team@android.com
+Subject: Re: [PATCH v2 06/16] KVM: arm64: Force a full unmap on vpcu reinit
+Message-ID: <20211007134922.sg3b3egpwc2izbi2@gator>
+References: <20211004174849.2831548-1-maz@kernel.org>
+ <20211004174849.2831548-7-maz@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <8f12bc3e-53aa-c946-bb06-f7d08721b243@redhat.com>
-User-Agent: Mutt/2.0.7 (2021-05-04)
+In-Reply-To: <20211004174849.2831548-7-maz@kernel.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-* Philippe Mathieu-Daudé (philmd@redhat.com) wrote:
-> On 10/4/21 10:11, Paolo Bonzini wrote:
-> > On 02/10/21 14:53, Philippe Mathieu-Daudé wrote:
-> >> If the management layer tries to inject a secret, it gets an empty
-> >> response in case the binary built without SEV:
-> >>
-> >>    { "execute": "sev-inject-launch-secret",
-> >>      "arguments": { "packet-header": "mypkt", "secret": "mypass",
-> >> "gpa": 4294959104 }
-> >>    }
-> >>    {
-> >>        "return": {
-> >>        }
-> >>    }
-> >>
-> >> Make it clearer by returning an error, mentioning the feature is
-> >> disabled:
-> >>
-> >>    { "execute": "sev-inject-launch-secret",
-> >>      "arguments": { "packet-header": "mypkt", "secret": "mypass",
-> >> "gpa": 4294959104 }
-> >>    }
-> >>    {
-> >>        "error": {
-> >>            "class": "GenericError",
-> >>            "desc": "this feature or command is not currently supported"
-> >>        }
-> >>    }
-> >>
-> >> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> >> Reviewed-by: Connor Kuehl <ckuehl@redhat.com>
-> >> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> >> ---
-> >>   target/i386/monitor.c | 5 +++++
-> >>   1 file changed, 5 insertions(+)
-> >>
-> >> diff --git a/target/i386/monitor.c b/target/i386/monitor.c
-> >> index 196c1c9e77f..a9f85acd473 100644
-> >> --- a/target/i386/monitor.c
-> >> +++ b/target/i386/monitor.c
-> >> @@ -28,6 +28,7 @@
-> >>   #include "monitor/hmp-target.h"
-> >>   #include "monitor/hmp.h"
-> >>   #include "qapi/qmp/qdict.h"
-> >> +#include "qapi/qmp/qerror.h"
-> >>   #include "sysemu/kvm.h"
-> >>   #include "sysemu/sev.h"
-> >>   #include "qapi/error.h"
-> >> @@ -743,6 +744,10 @@ void qmp_sev_inject_launch_secret(const char
-> >> *packet_hdr,
-> >>                                     bool has_gpa, uint64_t gpa,
-> >>                                     Error **errp)
-> >>   {
-> >> +    if (!sev_enabled()) {
-> >> +        error_setg(errp, QERR_UNSUPPORTED);
-> >> +        return;
-> >> +    }
-> >>       if (!has_gpa) {
-> >>           uint8_t *data;
-> >>           struct sev_secret_area *area;
-> >>
-> > 
-> > This should be done in the sev_inject_launch_secret stub instead, I
-> > think.  Or if you do it here, you can remove the "if (!sev_guest)"
-> > conditional in the non-stub version.
+On Mon, Oct 04, 2021 at 06:48:39PM +0100, Marc Zyngier wrote:
+> As we now keep information in the S2PT, we must be careful not
+> to keep it across a VM reboot, which could otherwise lead to
+> interesting problems.
 > 
-> This part is not related to SEV builtin; what we want to avoid here
-> is management layer to try to inject secret while the guest hasn't
-> been started with SEV (IOW 'no memory encryption requested for KVM).
+> Make sure that the S2 is completely discarded on reset of
+> a vcpu, and remove the flag that enforces the MMIO check.
 > 
-> Maybe this error message is more explicit?
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/psci.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
 > 
->   error_setg(errp, "Guest is not using memory encryption");
-> 
-> Or:
-> 
->   error_setg(errp, "Guest is not using SEV");
+> diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
+> index 74c47d420253..6c9cb041f764 100644
+> --- a/arch/arm64/kvm/psci.c
+> +++ b/arch/arm64/kvm/psci.c
+> @@ -12,6 +12,7 @@
+>  
+>  #include <asm/cputype.h>
+>  #include <asm/kvm_emulate.h>
+> +#include <asm/kvm_mmu.h>
+>  
+>  #include <kvm/arm_psci.h>
+>  #include <kvm/arm_hypercalls.h>
+> @@ -180,6 +181,13 @@ static void kvm_prepare_system_event(struct kvm_vcpu *vcpu, u32 type)
+>  		tmp->arch.power_off = true;
+>  	kvm_make_all_cpus_request(vcpu->kvm, KVM_REQ_SLEEP);
+>  
+> +	/*
+> +	 * If the MMIO guard was enabled, we pay the price of a full
+> +	 * unmap to get back to a sane state (and clear the flag).
+> +	 */
+> +	if (test_and_clear_bit(KVM_ARCH_FLAG_MMIO_GUARD, &vcpu->kvm->arch.flags))
+> +		stage2_unmap_vm(vcpu->kvm);
+> +
+>  	memset(&vcpu->run->system_event, 0, sizeof(vcpu->run->system_event));
+>  	vcpu->run->system_event.type = type;
+>  	vcpu->run->exit_reason = KVM_EXIT_SYSTEM_EVENT;
+> -- 
+> 2.30.2
+>
 
-This is better; there's a separate feature called memory encryption, so
-we don't want to confuse things.
-
-Dave
-
-> 
--- 
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 
