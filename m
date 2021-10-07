@@ -2,95 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 799BC4259BE
-	for <lists+kvm@lfdr.de>; Thu,  7 Oct 2021 19:47:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0EBE7425ACF
+	for <lists+kvm@lfdr.de>; Thu,  7 Oct 2021 20:32:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242977AbhJGRtm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Oct 2021 13:49:42 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59799 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S241738AbhJGRtl (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 7 Oct 2021 13:49:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1633628866;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=zMIgq/shF4zYaj1gUby36uqdLSqQ0DPEM64q06xf0oM=;
-        b=VLyYn/prYDV98BIXWh3m31tZa0WcmpVkIxx0AGuUVC/mR/Y2/2JLSb7hoHjd/Ju0KtcknE
-        7YdrzGpNA74Fg7VSaYO92+jhiqhfXdpD0zPZsmbnEteKufHhSGpXbhGIlqQuWMif4qjb+h
-        8E1b8hw/9LjrILhoVR18ELRbZ5OoLoU=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-157-nimx9f4QNICrbVBxgc1Lgg-1; Thu, 07 Oct 2021 13:47:45 -0400
-X-MC-Unique: nimx9f4QNICrbVBxgc1Lgg-1
-Received: by mail-wr1-f72.google.com with SMTP id k2-20020adfc702000000b0016006b2da9bso5298103wrg.1
-        for <kvm@vger.kernel.org>; Thu, 07 Oct 2021 10:47:45 -0700 (PDT)
+        id S243676AbhJGSe2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Oct 2021 14:34:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58112 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233598AbhJGSe1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Oct 2021 14:34:27 -0400
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDEDBC061570
+        for <kvm@vger.kernel.org>; Thu,  7 Oct 2021 11:32:33 -0700 (PDT)
+Received: by mail-pj1-x1049.google.com with SMTP id b11-20020a17090aa58b00b0019c8bfd57b8so3590387pjq.1
+        for <kvm@vger.kernel.org>; Thu, 07 Oct 2021 11:32:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=i6OEbiI8nlcVRWyoELZ1THHrO3woPs2C0f6nWf9PSk4=;
+        b=mXR5zPdcv4MXtkg2imDp3q7q0/bEztvEq0fsPXhM84SSV5Us+5vTx3owGhop+XvCbs
+         LhxEoD/DAKQznwMtjJqVH2eOGgyFwRbXkZO9um0j11iMwdAb4UV+7XHsj/rddZqkEmtw
+         ZWcSJmaPT2/kXZb5cSiwitT7zOnBabZeIiQrjUlWvHmm1wz3yi3b0Ju46pc96bEZTt6l
+         ekrL+dGlxbYrHSOCmUqQLb8CLB4q87NB7vm+fYd08OqbV952AP8bq26ZMaIMedtJ3zgx
+         PHLzk/O20mxGbtOxtlEVlYEabRFzmWyuvVj2WePmgI9DNQsGaNgvukCY7PhCbwHgKC5p
+         wCfw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=zMIgq/shF4zYaj1gUby36uqdLSqQ0DPEM64q06xf0oM=;
-        b=xBb3OfsgORNSIxdcMuhGIIp9vsXBjGFnoVmja87QUHAbany/sHa7LZHtf3fgqarZNz
-         LmojqOX+tgBzGZeAIvGf1ChF3wKBHOCr39KHP4qo1JRcMsdaIPyy6no8JZg33Pe/MzKr
-         hl4tzuXSQr4cGQeZhWU6z8NhBYhex0Mmv3PNDJstnR3nupyzlroKiWDX/IclSeKJJtRK
-         278Jo0zInM1GVLDlnvpRQxFwGMq67V0N301nOp4wWpoUlDM+Iq0RyJL7Cj7J6AczsOAV
-         iTeyJTWqT+L51WRMouULNBwgEbxOzCqTuXeJQgfhCP5OUqQT9B6Yq5pTMfNekltaN0xu
-         loLg==
-X-Gm-Message-State: AOAM531EA3kp3HOf7lVBOssgXxcwQolrhKVLcaRp0zVnsJKZTVK7UP8C
-        a7fqtu5nvHInhkiC5CkqFdZGB9po9R3mE0dj+CnzgkZIfweizqjn451d8cnQZTbIavGFbgkU8vE
-        VdkNoAAQsC/1R
-X-Received: by 2002:adf:97d0:: with SMTP id t16mr6921555wrb.124.1633628864696;
-        Thu, 07 Oct 2021 10:47:44 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxVQLk62OBdz/FxDWWdF4DHH5+h/b3zennVSvs4B8TXw3JIJsMFZYSDdaYmn9xuR8+I3uSEKA==
-X-Received: by 2002:adf:97d0:: with SMTP id t16mr6921533wrb.124.1633628864451;
-        Thu, 07 Oct 2021 10:47:44 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id h18sm84173wmq.23.2021.10.07.10.47.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 07 Oct 2021 10:47:43 -0700 (PDT)
-Message-ID: <81bfc7de-2b9e-f210-0073-b31535d7b302@redhat.com>
-Date:   Thu, 7 Oct 2021 19:47:42 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [PATCH MANUALSEL 5.14 4/9] KVM: x86: reset pdptrs_from_userspace
- when exiting smm
-Content-Language: en-US
-To:     Naresh Kamboju <naresh.kamboju@linaro.org>
-Cc:     Sasha Levin <sashal@kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        linux-stable <stable@vger.kernel.org>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        X86 ML <x86@kernel.org>, kvm list <kvm@vger.kernel.org>
-References: <20211006133021.271905-1-sashal@kernel.org>
- <20211006133021.271905-4-sashal@kernel.org>
- <e5b8a6d4-6d5c-ada9-bb36-7ed3c8b7d637@redhat.com>
- <CA+G9fYt6J2UTgC8Ths11xHefj6qYOqS0JMfSMoHYwvMy3NzxWQ@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <CA+G9fYt6J2UTgC8Ths11xHefj6qYOqS0JMfSMoHYwvMy3NzxWQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=i6OEbiI8nlcVRWyoELZ1THHrO3woPs2C0f6nWf9PSk4=;
+        b=CkKI8nhuK1n+kLHss7NMwWdgHLr1MJ/3NrM78HNFk7ivIALiLaGmpVlKIbvwWEUWwQ
+         dzi8ZkaWpzjAZ5UoCQgE1Nw3H5NdVMoPZuHMdJCZ+k0dobgTEX6mcbAVl1JTfyoDQo1/
+         I9Q677WuEEytBMKbzhMRuMmqNw1cgZlPoedLCB0Q9v+iJdUm1ZyuGxSkBakVv7MHTHr7
+         AVxZm9N4KnFHWQoNqjC0At8ZV36Qcn/WUhl2pFNNnicAE0eNckjEeGKITLtTrcDXr908
+         klUK2vaCAR9YQg7y9wMCEugHeaPRYJU2eoApn5v4QvPfpYo/8m4JbxBcrlh+KAQM966x
+         z+MQ==
+X-Gm-Message-State: AOAM533Dbm5yy6P/uKWqB3QmNSlq1pEmYNSE6RWjDawx6AYuOy6B3FXs
+        7sbMcaIJRtocJtpfZR10KzJtWJRqYkwlseGHjfot10UpE/kfPODUXmTGGEciQiIZerl4j8XzoIH
+        Bn19mLgJCNANXV7nPhVmvqNvjjMK+Vd1g2BjsYbXQbQyN6eKRAnZE4EIyYUPeSRY=
+X-Google-Smtp-Source: ABdhPJy7oKg9elfYErbsHYmLS4lp7sNHRNhyxdLMfpQzT1qM4Nmm6PELIP83922J96gkNI0XU07DH5zFMHLEEg==
+X-Received: from ricarkol2.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:62fe])
+ (user=ricarkol job=sendgmr) by 2002:a17:902:e544:b0:13e:e863:6cd2 with SMTP
+ id n4-20020a170902e54400b0013ee8636cd2mr5171887plf.41.1633631553089; Thu, 07
+ Oct 2021 11:32:33 -0700 (PDT)
+Date:   Thu,  7 Oct 2021 11:32:30 -0700
+Message-Id: <20211007183230.2637929-1-ricarkol@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.0.882.g93a45727a2-goog
+Subject: [kvm-unit-tests PATCH] arm64: Add mmio_addr arg to arm/micro-bench
+From:   Ricardo Koller <ricarkol@google.com>
+To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Ricardo Koller <ricarkol@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 07/10/21 17:23, Naresh Kamboju wrote:
-> Is this expected to be in stable-rc 5.10 and below ?
-> Because it is breaking the builds on queue/5.10, queue/5.4 and older branches.
-> 
-> arch/x86/kvm/x86.c: In function 'kvm_smm_changed':
-> arch/x86/kvm/x86.c:6612:27: error: 'struct kvm_vcpu_arch' has no
-> member named 'pdptrs_from_userspace'
->   6612 |                 vcpu->arch.pdptrs_from_userspace = false;
->        |                           ^
-> make[3]: *** [scripts/Makefile.build:262: arch/x86/kvm/x86.o] Error 1
+Add a command line arg to arm/micro-bench to set the mmio_addr to other
+values besides the default QEMU one. Default to the QEMU value if no arg
+is passed. Also, the <NUM> in mmio_addr=<NUM> can't be a hex.
 
-No, it was added in 5.14.
+Signed-off-by: Ricardo Koller <ricarkol@google.com>
+---
+ arm/micro-bench.c | 33 +++++++++++++++++++++++++++------
+ 1 file changed, 27 insertions(+), 6 deletions(-)
 
-Paolo
+diff --git a/arm/micro-bench.c b/arm/micro-bench.c
+index 8e1d4ab..2c08813 100644
+--- a/arm/micro-bench.c
++++ b/arm/micro-bench.c
+@@ -19,16 +19,19 @@
+  * This work is licensed under the terms of the GNU LGPL, version 2.
+  */
+ #include <libcflat.h>
++#include <util.h>
+ #include <asm/gic.h>
+ #include <asm/gic-v3-its.h>
+ #include <asm/timer.h>
+ 
+-#define NS_5_SECONDS (5 * 1000 * 1000 * 1000UL)
++#define NS_5_SECONDS		(5 * 1000 * 1000 * 1000UL)
++#define QEMU_MMIO_ADDR		0x0a000008
+ 
+ static u32 cntfrq;
+ 
+ static volatile bool irq_ready, irq_received;
+ static int nr_ipi_received;
++static unsigned long mmio_addr = QEMU_MMIO_ADDR;
+ 
+ static void *vgic_dist_base;
+ static void (*write_eoir)(u32 irqstat);
+@@ -278,12 +281,10 @@ static void *userspace_emulated_addr;
+ static bool mmio_read_user_prep(void)
+ {
+ 	/*
+-	 * FIXME: Read device-id in virtio mmio here in order to
+-	 * force an exit to userspace. This address needs to be
+-	 * updated in the future if any relevant changes in QEMU
+-	 * test-dev are made.
++	 * Read device-id in virtio mmio here in order to
++	 * force an exit to userspace.
+ 	 */
+-	userspace_emulated_addr = (void*)ioremap(0x0a000008, sizeof(u32));
++	userspace_emulated_addr = (void *)ioremap(mmio_addr, sizeof(u32));
+ 	return true;
+ }
+ 
+@@ -378,10 +379,30 @@ static void loop_test(struct exit_test *test)
+ 		test->name, total_ns.ns, total_ns.ns_frac, avg_ns.ns, avg_ns.ns_frac);
+ }
+ 
++static void parse_args(int argc, char **argv)
++{
++	int i, len;
++	long val;
++
++	for (i = 0; i < argc; ++i) {
++		len = parse_keyval(argv[i], &val);
++		if (len == -1)
++			continue;
++
++		argv[i][len] = '\0';
++		if (strcmp(argv[i], "mmio-addr") == 0) {
++			mmio_addr = val;
++			report_info("found mmio_addr=0x%lx", mmio_addr);
++		}
++	}
++}
++
+ int main(int argc, char **argv)
+ {
+ 	int i;
+ 
++	parse_args(argc, argv);
++
+ 	if (!test_init())
+ 		return 1;
+ 
+-- 
+2.33.0.882.g93a45727a2-goog
 
