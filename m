@@ -2,159 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9C63842567B
-	for <lists+kvm@lfdr.de>; Thu,  7 Oct 2021 17:18:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 73260425684
+	for <lists+kvm@lfdr.de>; Thu,  7 Oct 2021 17:24:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233448AbhJGPUD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Oct 2021 11:20:03 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:28282 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232940AbhJGPUB (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 7 Oct 2021 11:20:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1633619887;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=A6vtXIkicFt7VVQ5NHVntrnPXhTSxCgEIYm8aJeHGxA=;
-        b=bUeQnNJik1s3/d8p6LQEot5eTbcdeC7big9mwPxGHlMBRqxIJ9tM/c2dL//K+ToTtcra/x
-        egRUSAf8mLgEg6zsOUJiR8Jn+Tp06YdPngf4+Zr5Mai/TQsgqOTlMfB/SxZ7EH6UJgMxGO
-        d0tDWXQwvYRNFz3QR3IuD6utx7Fsaw0=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-406-fLyH7mr5NGGxq6aEkdJKKQ-1; Thu, 07 Oct 2021 11:18:06 -0400
-X-MC-Unique: fLyH7mr5NGGxq6aEkdJKKQ-1
-Received: by mail-wr1-f70.google.com with SMTP id p12-20020adfc38c000000b00160d6a7e293so2493286wrf.18
-        for <kvm@vger.kernel.org>; Thu, 07 Oct 2021 08:18:06 -0700 (PDT)
+        id S232593AbhJGPZy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Oct 2021 11:25:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40614 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230410AbhJGPZx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Oct 2021 11:25:53 -0400
+Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97362C061570
+        for <kvm@vger.kernel.org>; Thu,  7 Oct 2021 08:23:59 -0700 (PDT)
+Received: by mail-ed1-x533.google.com with SMTP id v18so24752946edc.11
+        for <kvm@vger.kernel.org>; Thu, 07 Oct 2021 08:23:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=gHDuZTlGc2rJpzUr8UKQVYIrwD7USNVlq1NIiYVhYfw=;
+        b=mDcKpPSJ2ovp2qaHHZZU+Pv3JPFKAItNwoNirvaUfu8rWw/zVQviJym/hwXiOsuqsm
+         3yizOVJfWskSZ2toc+lfAaqMilOE0Fbwgh8nrgOPQPHz97sYE736T26FDoc25wGrOVh8
+         yI/fjTOuVRiSpi8ptiMixbpo4Kr5EpGwqsI5fZkHjp/YqKziz3pwgNlvDGC1xWjZ8oa0
+         aDB4HFQTQTXZ/6mREfakyGUvahUpBsGZHO3Dz9YgHPXXQczs12xYghxq08P3cWkNTYwM
+         lfPGBnsnXHcbiBfAp/tj6BYC6C0qy1AAb9uv4BfWiYgBGnTWIhlPIKBILpkZhjXiwgEb
+         FVwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=A6vtXIkicFt7VVQ5NHVntrnPXhTSxCgEIYm8aJeHGxA=;
-        b=TFEZ2elMDbhmqTj22BJ1zJ3/0sHVWfqHtPnrl/BoNB8j+052lwpwl61SRIzDWzEuE7
-         M6h0AUpRBEiBK48VLTq86rrWvSQ5Go4jnS4s3VJaxdKN9KPUzBIujLmWADKRgprTlYcX
-         p5vduMlergpPRe6UnDl2Vsq7oJ6wtCS4mNbXZskpRUQ8n2UQlO9HQ8E37KhnfSOZVxKH
-         IKvR7/KwoQXar/Wo5VTkuLNlg5whUzZstqyqap4QTlPwkFNiC+O326R18pmMo3PN82Z8
-         iT3CxQhtJ9143FnPMv4m3tEYEb4xP6Kz9bHE8m3wXng/glJd6NGm0VCbGJPiM+1V7Vxs
-         Ngug==
-X-Gm-Message-State: AOAM530eEqtYW+3aqNkXb3hntJU4CYeg0/R6gItnSln6q/LqFiJXqKC6
-        eU9Qp57zc2KQJ0ZAv6Jz2ubOh7rrv4Z5TAlGDwLGKiroiPog4pGyXXj1bVde54ZJ88W2FHor+bG
-        NP42vssOam8h0
-X-Received: by 2002:a5d:59ad:: with SMTP id p13mr6208234wrr.253.1633619885122;
-        Thu, 07 Oct 2021 08:18:05 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy1chPAauVcmvAUGIu2PpmeGC1NzHHEZTsM8AxFTeGNU0jLdg6eBriMmhAOBKsfKtxtw9g1Zw==
-X-Received: by 2002:a5d:59ad:: with SMTP id p13mr6208209wrr.253.1633619884958;
-        Thu, 07 Oct 2021 08:18:04 -0700 (PDT)
-Received: from [192.168.1.36] (118.red-83-35-24.dynamicip.rima-tde.net. [83.35.24.118])
-        by smtp.gmail.com with ESMTPSA id n15sm25386369wrg.58.2021.10.07.08.18.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 07 Oct 2021 08:18:04 -0700 (PDT)
-Message-ID: <9f36432b-b1b7-139e-085d-c8af430772fc@redhat.com>
-Date:   Thu, 7 Oct 2021 17:18:03 +0200
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=gHDuZTlGc2rJpzUr8UKQVYIrwD7USNVlq1NIiYVhYfw=;
+        b=5DVmIl8VSVgrVDLfnJe67To1n5v4Vq8vgNhtvm49YmkUz3UjJegZG2yFqd4EUUu9fq
+         I8GRfY5Gdv5x+CJ7GfRBOtqR21mnprqbqHFBB4Szw/OjvWvWJEhGR+Cp3dNwu9U9VIBG
+         qNPEo6sBbgwBjI1urKf2c1dYSQDfd2itW0AdpZKhE7CUi4Exh08NC0p4ZwT3B3E0GPeB
+         kFdPd5J5UBXKdx54SoJ9KY+FL1ZBNCWOU6GmlWAUb/m3MgVxwy/jzfVrONAbil24HkyK
+         27P+DP8lL3LmKngfB88K1dHth2tgknfqjeG0XNSuaZnCP3lRA+C9bnMiwZzRxqGM8lIw
+         WjDw==
+X-Gm-Message-State: AOAM533y6nA3hQ+h1ouh1TxUxOl5r8Ad4sP/VtFD1Exa//WADP6vGZtW
+        j09kP1TMtLroYV4iNRVEaHOzNV7MsblyjezBIvtlVQ==
+X-Google-Smtp-Source: ABdhPJx8vDuz/FGDo+aeQxqTan7AcX4TUsajCf+a5kwlMl4oEVNWaMtznfPqVcaPbNQcX0D7KEHMZ9ZmfOq4Ji/etl4=
+X-Received: by 2002:a17:906:c302:: with SMTP id s2mr2419953ejz.499.1633620237988;
+ Thu, 07 Oct 2021 08:23:57 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [PATCH v3 19/22] monitor: Restrict 'info sev' to x86 targets
-Content-Language: en-US
-To:     Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc:     Brijesh Singh <brijesh.singh@amd.com>, kvm@vger.kernel.org,
-        Sergio Lopez <slp@redhat.com>,
-        James Bottomley <jejb@linux.ibm.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        "Daniel P . Berrange" <berrange@redhat.com>,
-        Eduardo Habkost <ehabkost@redhat.com>
-References: <20211002125317.3418648-1-philmd@redhat.com>
- <20211002125317.3418648-20-philmd@redhat.com>
- <5c1652ac-8a71-8d23-ed31-b84ce07596e8@redhat.com>
-From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-In-Reply-To: <5c1652ac-8a71-8d23-ed31-b84ce07596e8@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20211006133021.271905-1-sashal@kernel.org> <20211006133021.271905-4-sashal@kernel.org>
+ <e5b8a6d4-6d5c-ada9-bb36-7ed3c8b7d637@redhat.com>
+In-Reply-To: <e5b8a6d4-6d5c-ada9-bb36-7ed3c8b7d637@redhat.com>
+From:   Naresh Kamboju <naresh.kamboju@linaro.org>
+Date:   Thu, 7 Oct 2021 20:53:46 +0530
+Message-ID: <CA+G9fYt6J2UTgC8Ths11xHefj6qYOqS0JMfSMoHYwvMy3NzxWQ@mail.gmail.com>
+Subject: Re: [PATCH MANUALSEL 5.14 4/9] KVM: x86: reset pdptrs_from_userspace
+ when exiting smm
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sasha Levin <sashal@kernel.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        linux-stable <stable@vger.kernel.org>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        X86 ML <x86@kernel.org>, kvm list <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/4/21 10:26, Paolo Bonzini wrote:
-> On 02/10/21 14:53, Philippe Mathieu-Daudé wrote:
->> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->> ---
->>   include/monitor/hmp-target.h  | 1 +
->>   include/monitor/hmp.h         | 1 -
->>   target/i386/sev-sysemu-stub.c | 2 +-
->>   target/i386/sev.c             | 2 +-
->>   4 files changed, 3 insertions(+), 3 deletions(-)
->>
->> diff --git a/include/monitor/hmp-target.h b/include/monitor/hmp-target.h
->> index dc53add7eef..96956d0fc41 100644
->> --- a/include/monitor/hmp-target.h
->> +++ b/include/monitor/hmp-target.h
->> @@ -49,6 +49,7 @@ void hmp_info_tlb(Monitor *mon, const QDict *qdict);
->>   void hmp_mce(Monitor *mon, const QDict *qdict);
->>   void hmp_info_local_apic(Monitor *mon, const QDict *qdict);
->>   void hmp_info_io_apic(Monitor *mon, const QDict *qdict);
->> +void hmp_info_sev(Monitor *mon, const QDict *qdict);
->>   void hmp_info_sgx(Monitor *mon, const QDict *qdict);
->>     #endif /* MONITOR_HMP_TARGET_H */
->> diff --git a/include/monitor/hmp.h b/include/monitor/hmp.h
->> index 3baa1058e2c..6bc27639e01 100644
->> --- a/include/monitor/hmp.h
->> +++ b/include/monitor/hmp.h
->> @@ -124,7 +124,6 @@ void hmp_info_ramblock(Monitor *mon, const QDict
->> *qdict);
->>   void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict);
->>   void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
->>   void hmp_info_memory_size_summary(Monitor *mon, const QDict *qdict);
->> -void hmp_info_sev(Monitor *mon, const QDict *qdict);
->>   void hmp_info_replay(Monitor *mon, const QDict *qdict);
->>   void hmp_replay_break(Monitor *mon, const QDict *qdict);
->>   void hmp_replay_delete_break(Monitor *mon, const QDict *qdict);
->> diff --git a/target/i386/sev-sysemu-stub.c
->> b/target/i386/sev-sysemu-stub.c
->> index 1836b32e4fc..b2a4033a030 100644
->> --- a/target/i386/sev-sysemu-stub.c
->> +++ b/target/i386/sev-sysemu-stub.c
->> @@ -13,7 +13,7 @@
->>     #include "qemu/osdep.h"
->>   #include "monitor/monitor.h"
->> -#include "monitor/hmp.h"
->> +#include "monitor/hmp-target.h"
->>   #include "qapi/qapi-commands-misc-target.h"
->>   #include "qapi/qmp/qerror.h"
->>   #include "qapi/error.h"
->> diff --git a/target/i386/sev.c b/target/i386/sev.c
->> index 7caaa117ff7..c6d8fc52eb2 100644
->> --- a/target/i386/sev.c
->> +++ b/target/i386/sev.c
->> @@ -32,7 +32,7 @@
->>   #include "migration/blocker.h"
->>   #include "qom/object.h"
->>   #include "monitor/monitor.h"
->> -#include "monitor/hmp.h"
->> +#include "monitor/hmp-target.h"
->>   #include "qapi/qapi-commands-misc-target.h"
->>   #include "qapi/qmp/qerror.h"
->>   #include "exec/confidential-guest-support.h"
->>
-> 
-> 
-> This is only a cleanup, isn't it?  The #ifdef is already in
-> hmp-commands-info.hx.
+On Wed, 6 Oct 2021 at 19:06, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 06/10/21 15:30, Sasha Levin wrote:
+> > From: Maxim Levitsky <mlevitsk@redhat.com>
+> >
+> > [ Upstream commit 37687c403a641f251cb2ef2e7830b88aa0647ba9 ]
+> >
+> > When exiting SMM, pdpts are loaded again from the guest memory.
+> >
+> > This fixes a theoretical bug, when exit from SMM triggers entry to the
+> > nested guest which re-uses some of the migration
+> > code which uses this flag as a workaround for a legacy userspace.
+> >
+> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > Message-Id: <20210913140954.165665-4-mlevitsk@redhat.com>
+> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> > Signed-off-by: Sasha Levin <sashal@kernel.org>
+> > ---
+> >   arch/x86/kvm/x86.c | 7 +++++++
+> >   1 file changed, 7 insertions(+)
+> >
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index b3f855d48f72..1e7d629bbf36 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -7659,6 +7659,13 @@ static void kvm_smm_changed(struct kvm_vcpu *vcpu, bool entering_smm)
+> >
+> >               /* Process a latched INIT or SMI, if any.  */
+> >               kvm_make_request(KVM_REQ_EVENT, vcpu);
+> > +
+> > +             /*
+> > +              * Even if KVM_SET_SREGS2 loaded PDPTRs out of band,
+> > +              * on SMM exit we still need to reload them from
+> > +              * guest memory
+> > +              */
+> > +             vcpu->arch.pdptrs_from_userspace = false;
+> >       }
+> >
+> >       kvm_mmu_reset_context(vcpu);
+> >
+>
+> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 
-IIUC the prototype is exposed to all targets, while with
-this patch, only to the files including "monitor/hmp-target.h".
+Is this expected to be in stable-rc 5.10 and below ?
+Because it is breaking the builds on queue/5.10, queue/5.4 and older branches.
 
-You are right the command is only added for TARGET_I386 in
-hmp-commands-info.hx.
+arch/x86/kvm/x86.c: In function 'kvm_smm_changed':
+arch/x86/kvm/x86.c:6612:27: error: 'struct kvm_vcpu_arch' has no
+member named 'pdptrs_from_userspace'
+ 6612 |                 vcpu->arch.pdptrs_from_userspace = false;
+      |                           ^
+make[3]: *** [scripts/Makefile.build:262: arch/x86/kvm/x86.o] Error 1
 
-> 
-> Anyway,
-> 
-> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-> 
-> but please adjust the commit message in v4.
+ref:
+https://gitlab.com/Linaro/lkft/mirrors/stable/linux-stable-rc-queues/-/jobs/1658987088#L443
 
-OK, thanks.
-
+- Naresh
