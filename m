@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 93E734257A2
+	by mail.lfdr.de (Postfix) with ESMTP id DD8854257A3
 	for <lists+kvm@lfdr.de>; Thu,  7 Oct 2021 18:18:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242132AbhJGQUF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Oct 2021 12:20:05 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:58566 "EHLO
+        id S242405AbhJGQUG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Oct 2021 12:20:06 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50036 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231366AbhJGQUE (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 7 Oct 2021 12:20:04 -0400
+        by vger.kernel.org with ESMTP id S233603AbhJGQUF (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 7 Oct 2021 12:20:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1633623490;
+        s=mimecast20190719; t=1633623491;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Yu0i8hmAoNBqKA56xVa0FWOHuPb3wa3Ay0pPJ2J6oOs=;
-        b=GVt1yT+itLUmXxIN/pgJBMpMb0IN2dtm9beZrzcogT0AVKh3mcNZb6eSPkJjf3kftFx2f7
-        mnqbiWB9Ka1bcTcYO/kRS+wigslP2ATitcb4NVAf0B7TYnt0AheuHCeH45TitDwDd2112Q
-        JtX6bNywe9B0bZEs/lEe28hryPJFUus=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-160-W0whaxK4PreHXOS1UI9kAw-1; Thu, 07 Oct 2021 12:18:05 -0400
-X-MC-Unique: W0whaxK4PreHXOS1UI9kAw-1
-Received: by mail-wr1-f72.google.com with SMTP id l6-20020adfa386000000b00160c4c1866eso5121300wrb.4
-        for <kvm@vger.kernel.org>; Thu, 07 Oct 2021 09:18:05 -0700 (PDT)
+        bh=yEEZxUHWCMFJAaUbuJlVLcx9kbNHe4+tPDUcbMRvNgA=;
+        b=ZWQ7+o1lGbSwBWqFWf52qCtfSgT8OT3ouAIOkA9Z9CG7WTKEqJj1iHFr7vVeajDAz1U1ci
+        ezmZg1HH+Izah2fyIBaMJg9uxanE31o+x0xfX+C70nO/YAHVsLf6cI12bqyRhnsHQMvXMw
+        OLdUAB72XIr1Ue900g6tovvZJ1x966U=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-343-I4IoJpXdOfq2BRXeUmQU-A-1; Thu, 07 Oct 2021 12:18:10 -0400
+X-MC-Unique: I4IoJpXdOfq2BRXeUmQU-A-1
+Received: by mail-wr1-f70.google.com with SMTP id k2-20020adfc702000000b0016006b2da9bso5115691wrg.1
+        for <kvm@vger.kernel.org>; Thu, 07 Oct 2021 09:18:10 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=Yu0i8hmAoNBqKA56xVa0FWOHuPb3wa3Ay0pPJ2J6oOs=;
-        b=2Zoz8IIBUdpcfLM0yy3ezrDYtGtOb7fLOHDTMwSJeS9TiF13P08jCTP0TOU8bc9WGo
-         P70JffNehWfmOr6oztvSXaylYNvrQ5TbCpCaLxmwoH+clSewcrTkoWk3Nu18N1mpFGJF
-         6RgSbX0oJEo9vsdtYmowdvhBbfLH0b+gZYxy9t32NsUI18Kg22EXlcBMZT09yN0yr1D6
-         upZ+beLe7JNtVhUP3T9H6YQKMJZdFXNmq95fmRNp7X75YJtZSd5gry49Oecd3ihqCBVw
-         g+GFNg/GexGpcKTf7y5ZDelKYicGxCPF4yTy6NOjMfAq7bmAEKh8kjYiVOppMO6o1eQt
-         hZbw==
-X-Gm-Message-State: AOAM531itCi/Dsa5hnZ32jlyRGMeY0hrki2PwdraQAJG8/RJjWwZ+iRy
-        OaQpdDBF9vG0amWCm15IiQk5Q+aqnvbC6jZ1b7bky9Mu0jzskknp7ejTv/+VEtYG2MC+5sq9rsQ
-        YwhWDzgwKxs83
-X-Received: by 2002:adf:bb08:: with SMTP id r8mr6741284wrg.247.1633623484640;
-        Thu, 07 Oct 2021 09:18:04 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz1j54x6mkDDT5G+p886ML0TNkhiqQSJ77tctklrBToCqo96VSPVZB4HfWC67SFWx8EPKXHSw==
-X-Received: by 2002:adf:bb08:: with SMTP id r8mr6741267wrg.247.1633623484503;
-        Thu, 07 Oct 2021 09:18:04 -0700 (PDT)
+        bh=yEEZxUHWCMFJAaUbuJlVLcx9kbNHe4+tPDUcbMRvNgA=;
+        b=kFfvNf73ZJfS19lvgh3j6oI6vovd7k2NefieSp+11cHo9B2zYPdQDYWlwQkqFlFSHw
+         4/qfqQWOKbSCx5u2Ahk/9DZ22aJR+0q0iy54e9l6jsN/rxpsap03HxUatu/aZcFukKml
+         fbYeIx3l69/XNxqnbgYmvxciyzFB3Bcvjz6l6s4W/mQ0y8+I6j8bGhvXHKBOUUNDAGet
+         32+dtXaLmhao9XLgU8MvuzFgOx+sGDsEWbq+ecIVkvfLXWnwt0tnbclvo84YbkAIb5HN
+         8dmDhfLI1YCF18DSqN+2FwnVK1ym1ETyrdvQdycDG12EWONipDmEYwLtEnU5h6RqUNPV
+         /6SQ==
+X-Gm-Message-State: AOAM530RPd4qXde0FSrxXWMNsfMmtMn9/mGrG8Imxh9/dZiFbpHwi15E
+        wNpkN0mnlrmu3IGdjg9mx1z3I7LER2F6rpuucYfUdG3GGYHrveO7TmfW7ObuM42SBobA/S5dTXo
+        bnFwDhM0lXYRn
+X-Received: by 2002:a1c:e90a:: with SMTP id q10mr5781384wmc.108.1633623489196;
+        Thu, 07 Oct 2021 09:18:09 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxyp5Icsi0NLMXs/baHrjAWHmxKv/JAM8Pc+VahgSSp1ZOQcJVEBNNgny0Hxow6Cf8o/4Ee8g==
+X-Received: by 2002:a1c:e90a:: with SMTP id q10mr5781363wmc.108.1633623489052;
+        Thu, 07 Oct 2021 09:18:09 -0700 (PDT)
 Received: from x1w.redhat.com (118.red-83-35-24.dynamicip.rima-tde.net. [83.35.24.118])
-        by smtp.gmail.com with ESMTPSA id u1sm8426658wmc.29.2021.10.07.09.18.03
+        by smtp.gmail.com with ESMTPSA id y23sm1025623wmj.42.2021.10.07.09.18.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Oct 2021 09:18:04 -0700 (PDT)
+        Thu, 07 Oct 2021 09:18:08 -0700 (PDT)
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To:     qemu-devel@nongnu.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -60,11 +60,11 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Brijesh Singh <brijesh.singh@amd.com>,
         Sergio Lopez <slp@redhat.com>,
         Dov Murik <dovmurik@linux.ibm.com>,
-        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-        Connor Kuehl <ckuehl@redhat.com>
-Subject: [PATCH v4 10/23] target/i386/sev: Mark unreachable code with g_assert_not_reached()
-Date:   Thu,  7 Oct 2021 18:17:03 +0200
-Message-Id: <20211007161716.453984-11-philmd@redhat.com>
+        Connor Kuehl <ckuehl@redhat.com>,
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: [PATCH v4 11/23] target/i386/sev: sev_get_attestation_report use g_autofree
+Date:   Thu,  7 Oct 2021 18:17:04 +0200
+Message-Id: <20211007161716.453984-12-philmd@redhat.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20211007161716.453984-1-philmd@redhat.com>
 References: <20211007161716.453984-1-philmd@redhat.com>
@@ -75,41 +75,70 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The unique sev_encrypt_flash() invocation (in pc_system_flash_map)
-is protected by the "if (sev_enabled())" check, so is not
-reacheable.
-Replace the abort() call in sev_es_save_reset_vector() by
-g_assert_not_reached() which meaning is clearer.
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
+Removes a whole bunch of g_free's and a goto.
+
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Reviewed-by: Connor Kuehl <ckuehl@redhat.com>
+Reviewed-by: Brijesh Singh <brijesh.singh@amd.com>
+Message-Id: <20210603113017.34922-1-dgilbert@redhat.com>
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- target/i386/sev-stub.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ target/i386/sev.c | 11 +++--------
+ 1 file changed, 3 insertions(+), 8 deletions(-)
 
-diff --git a/target/i386/sev-stub.c b/target/i386/sev-stub.c
-index 20b1e18ec1b..55f1ec74196 100644
---- a/target/i386/sev-stub.c
-+++ b/target/i386/sev-stub.c
-@@ -54,7 +54,7 @@ int sev_inject_launch_secret(const char *hdr, const char *secret,
+diff --git a/target/i386/sev.c b/target/i386/sev.c
+index 9e3f2ec8dd3..3a30ba6d94a 100644
+--- a/target/i386/sev.c
++++ b/target/i386/sev.c
+@@ -521,8 +521,8 @@ sev_get_attestation_report(const char *mnonce, Error **errp)
+     struct kvm_sev_attestation_report input = {};
+     SevAttestationReport *report = NULL;
+     SevGuestState *sev = sev_guest;
+-    guchar *data;
+-    guchar *buf;
++    g_autofree guchar *data = NULL;
++    g_autofree guchar *buf = NULL;
+     gsize len;
+     int err = 0, ret;
  
- int sev_encrypt_flash(uint8_t *ptr, uint64_t len, Error **errp)
- {
--    return 0;
-+    g_assert_not_reached();
+@@ -542,7 +542,6 @@ sev_get_attestation_report(const char *mnonce, Error **errp)
+     if (len != sizeof(input.mnonce)) {
+         error_setg(errp, "SEV: mnonce must be %zu bytes (got %" G_GSIZE_FORMAT ")",
+                 sizeof(input.mnonce), len);
+-        g_free(buf);
+         return NULL;
+     }
+ 
+@@ -554,7 +553,6 @@ sev_get_attestation_report(const char *mnonce, Error **errp)
+             error_setg(errp, "SEV: Failed to query the attestation report"
+                              " length ret=%d fw_err=%d (%s)",
+                        ret, err, fw_error_to_str(err));
+-            g_free(buf);
+             return NULL;
+         }
+     }
+@@ -569,7 +567,7 @@ sev_get_attestation_report(const char *mnonce, Error **errp)
+     if (ret) {
+         error_setg_errno(errp, errno, "SEV: Failed to get attestation report"
+                 " ret=%d fw_err=%d (%s)", ret, err, fw_error_to_str(err));
+-        goto e_free_data;
++        return NULL;
+     }
+ 
+     report = g_new0(SevAttestationReport, 1);
+@@ -577,9 +575,6 @@ sev_get_attestation_report(const char *mnonce, Error **errp)
+ 
+     trace_kvm_sev_attestation_report(mnonce, report->data);
+ 
+-e_free_data:
+-    g_free(data);
+-    g_free(buf);
+     return report;
  }
  
- bool sev_es_enabled(void)
-@@ -68,7 +68,7 @@ void sev_es_set_reset_vector(CPUState *cpu)
- 
- int sev_es_save_reset_vector(void *flash_ptr, uint64_t flash_size)
- {
--    abort();
-+    g_assert_not_reached();
- }
- 
- SevAttestationReport *
 -- 
 2.31.1
 
