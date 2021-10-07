@@ -2,136 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0549B424B9A
-	for <lists+kvm@lfdr.de>; Thu,  7 Oct 2021 03:23:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 95DAE424D6A
+	for <lists+kvm@lfdr.de>; Thu,  7 Oct 2021 08:50:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232182AbhJGBZQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Oct 2021 21:25:16 -0400
-Received: from gandalf.ozlabs.org ([150.107.74.76]:51283 "EHLO
-        gandalf.ozlabs.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230300AbhJGBZM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Oct 2021 21:25:12 -0400
-Received: by gandalf.ozlabs.org (Postfix, from userid 1007)
-        id 4HPtqp36Vbz4xbG; Thu,  7 Oct 2021 12:23:18 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gibson.dropbear.id.au; s=201602; t=1633569798;
-        bh=qstVtDT91XWliCaW5kitB3WljFF05mjQismqLt2KJ+A=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=n70FR0j9KTEGEzxwCxf2JDFXaUu8zShyp+4N0lscr1waf+K/ZgaxwyX9ZowdEeqyT
-         93j/gp22nAcMRYODT0LPRwZZf8hod6y0LuY2l71D1O/R3Do5F53fEXCE37Ph8arTyB
-         8uacyxaJkPxNRjhkPqJtBB70Xzz+taoWwt0m2ERk=
-Date:   Thu, 7 Oct 2021 12:23:13 +1100
-From:   David Gibson <david@gibson.dropbear.id.au>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Liu Yi L <yi.l.liu@intel.com>, alex.williamson@redhat.com,
-        hch@lst.de, jasowang@redhat.com, joro@8bytes.org,
-        jean-philippe@linaro.org, kevin.tian@intel.com, parav@mellanox.com,
-        lkml@metux.net, pbonzini@redhat.com, lushenming@huawei.com,
-        eric.auger@redhat.com, corbet@lwn.net, ashok.raj@intel.com,
-        yi.l.liu@linux.intel.com, jun.j.tian@intel.com, hao.wu@intel.com,
-        dave.jiang@intel.com, jacob.jun.pan@linux.intel.com,
-        kwankhede@nvidia.com, robin.murphy@arm.com, kvm@vger.kernel.org,
-        iommu@lists.linux-foundation.org, dwmw2@infradead.org,
-        linux-kernel@vger.kernel.org, baolu.lu@linux.intel.com,
-        nicolinc@nvidia.com
-Subject: Re: [RFC 07/20] iommu/iommufd: Add iommufd_[un]bind_device()
-Message-ID: <YV5MAdzR6c2knowf@yekko>
-References: <20210919063848.1476776-1-yi.l.liu@intel.com>
- <20210919063848.1476776-8-yi.l.liu@intel.com>
- <YVP44v4FVYJBSEEF@yekko>
- <20210929122457.GP964074@nvidia.com>
- <YVUqpff7DUtTLYKx@yekko>
- <20211001124322.GN964074@nvidia.com>
+        id S233489AbhJGGwG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Oct 2021 02:52:06 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40513 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231279AbhJGGwG (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 7 Oct 2021 02:52:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1633589412;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=gR2IuP1xBNRrFxO5rgcYezdc7GQgLXrw0dvVXdXEOfw=;
+        b=YHVJtODcGOMHceWdGyRlQz2quMJ9kgXmJ49ZCtGOz2XFWXYmT7gaa+GrXOQaqnRSGPI/fY
+        s9jaFa2xA74I0GY/MnjpfnhcUdReshEaEeC2c3bQfibKMhbdy8xH8fqH1KGR5EaktacBSg
+        P293khEuALJJqW66YYJn9VntTLTdGJI=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-405-FqdktL9FOFClfloRf0pA8g-1; Thu, 07 Oct 2021 02:50:11 -0400
+X-MC-Unique: FqdktL9FOFClfloRf0pA8g-1
+Received: by mail-wr1-f72.google.com with SMTP id l9-20020adfc789000000b00160111fd4e8so3874629wrg.17
+        for <kvm@vger.kernel.org>; Wed, 06 Oct 2021 23:50:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=gR2IuP1xBNRrFxO5rgcYezdc7GQgLXrw0dvVXdXEOfw=;
+        b=0rcfuato6nATbmgk/TIyGgn8nzZIbYDrfkCxGVP/wjQyUuBhpqwUSubBmGNygXU1iW
+         9Flx4Tm8RfgO/gGJIL0NFOS6BXnRgrxF/L0yxjo4tFrZLU1YLv9SM+CzPmcMahEXnK59
+         /HIV1eRyf1iMoFjm1c+syUIe9qnLtcav7ymKnTHvXpRCZkjqZC1+9Fb60zEvhya+gvUf
+         5Dq0NiNMFgVDJQq0HgGjpIPkUZMTl7M6Cb0ydbCGZ0oIErzkMnZGHR35Q7zzjwuoSHvI
+         xbZfN6oOKAgSx8oxM1p+o1tE+QizTTX14e5qVtKipd3QaQEwqBFqrq+RB8RHDObOZBxl
+         VVlw==
+X-Gm-Message-State: AOAM533tdAUJOOHSADPhN1x6fHLEOhZ7ukYEtlOY+6DuNxo+SfcL++8U
+        diPlAqEKFcwkJo9saFyJNTNQ2a3PiFEfiKWEn0GGrjc47ijSV8gG9TCRa+daAkla8QTDF9qTpy2
+        kggJg6hd0UeRW
+X-Received: by 2002:a1c:35c7:: with SMTP id c190mr14465354wma.57.1633589410170;
+        Wed, 06 Oct 2021 23:50:10 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxOuotUHTyBwzACujoGsab4OKfZgTHAnsCxJt/5wgt430jvUDzX9d4Oglqagdduip5iSkLI0w==
+X-Received: by 2002:a1c:35c7:: with SMTP id c190mr14465339wma.57.1633589409957;
+        Wed, 06 Oct 2021 23:50:09 -0700 (PDT)
+Received: from thuth.remote.csb (nat-pool-str-t.redhat.com. [149.14.88.106])
+        by smtp.gmail.com with ESMTPSA id k8sm597084wmr.32.2021.10.06.23.50.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 06 Oct 2021 23:50:09 -0700 (PDT)
+Subject: Re: [kvm-unit-tests PATCH v2 5/5] Use report_pass(...) instead of
+ report(1/true, ...)
+To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+References: <20211005090921.1816373-1-scgl@linux.ibm.com>
+ <20211005090921.1816373-6-scgl@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+Message-ID: <f4617a8a-d274-c6ae-d395-73cdba19663c@redhat.com>
+Date:   Thu, 7 Oct 2021 08:50:08 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="KDKmP08LDN9ERU6o"
-Content-Disposition: inline
-In-Reply-To: <20211001124322.GN964074@nvidia.com>
+In-Reply-To: <20211005090921.1816373-6-scgl@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 05/10/2021 11.09, Janis Schoetterl-Glausch wrote:
+> Whitespace is kept consistent with the rest of the file.
+> 
+> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+> ---
+>   s390x/css.c         |  4 ++--
+>   s390x/diag288.c     |  2 +-
+>   s390x/selftest.c    |  2 +-
+>   s390x/smp.c         | 16 ++++++++--------
+>   s390x/spec_ex.c     |  7 +++----
+>   x86/asyncpf.c       |  7 +++----
+>   x86/emulator.c      |  2 +-
+>   x86/hyperv_stimer.c | 18 ++++++++----------
+>   x86/svm_tests.c     | 17 ++++++++---------
+>   x86/syscall.c       |  2 +-
+>   x86/taskswitch2.c   |  2 +-
+>   x86/tsc_adjust.c    |  2 +-
+>   x86/vmx.c           |  6 +++---
+>   x86/vmx_tests.c     | 36 ++++++++++++++++++------------------
+>   14 files changed, 59 insertions(+), 64 deletions(-)
+> 
+> diff --git a/s390x/css.c b/s390x/css.c
+> index dcb4d70..881206b 100644
+> --- a/s390x/css.c
+> +++ b/s390x/css.c
+> @@ -31,7 +31,7 @@ static void test_enumerate(void)
+>   {
+>   	test_device_sid = css_enumerate();
+>   	if (test_device_sid & SCHID_ONE) {
+> -		report(1, "Schid of first I/O device: 0x%08x", test_device_sid);
+> +		report_pass("Schid of first I/O device: 0x%08x", test_device_sid);
+>   		return;
+>   	}
+...
 
---KDKmP08LDN9ERU6o
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Thanks, I've applied patches 3 - 5 now to the repository, since there were 
+no objections and they are independent from your spec_ex work. (Dropped the 
+hunk to spec_ex.c here of course, so please integrate that in the next 
+version of that patch directly instead).
 
-On Fri, Oct 01, 2021 at 09:43:22AM -0300, Jason Gunthorpe wrote:
-> On Thu, Sep 30, 2021 at 01:10:29PM +1000, David Gibson wrote:
-> > On Wed, Sep 29, 2021 at 09:24:57AM -0300, Jason Gunthorpe wrote:
-> > > On Wed, Sep 29, 2021 at 03:25:54PM +1000, David Gibson wrote:
-> > >=20
-> > > > > +struct iommufd_device {
-> > > > > +	unsigned int id;
-> > > > > +	struct iommufd_ctx *ictx;
-> > > > > +	struct device *dev; /* always be the physical device */
-> > > > > +	u64 dev_cookie;
-> > > >=20
-> > > > Why do you need both an 'id' and a 'dev_cookie'?  Since they're both
-> > > > unique, couldn't you just use the cookie directly as the index into
-> > > > the xarray?
-> > >=20
-> > > ID is the kernel value in the xarray - xarray is much more efficient &
-> > > safe with small kernel controlled values.
-> > >=20
-> > > dev_cookie is a user assigned value that may not be unique. It's
-> > > purpose is to allow userspace to receive and event and go back to its
-> > > structure. Most likely userspace will store a pointer here, but it is
-> > > also possible userspace could not use it.
-> > >=20
-> > > It is a pretty normal pattern
-> >=20
-> > Hm, ok.  Could you point me at an example?
->=20
-> For instance user_data vs fd in io_uring
-
-Ok, but one of those is an fd, which is an existing type of handle.
-Here we're introducing two different unique handles that aren't an
-existing kernel concept.
-
-> RDMA has many similar examples.
->=20
-> More or less anytime you want to allow the kernel to async retun some
-> information providing a 64 bit user_data lets userspace have an easier
-> time to deal with it.
-
-I absolutely see the need for user_data.  What I'm questioning is
-having two different, user-visible unique handles, neither of which is
-an fd.
+  Thomas
 
 
-That said... is there any strong reason why user_data needs to be
-unique?  I can imagine userspace applications where you don't care
-which device the notification is coming from - or at least don't care
-down to the same granularity that /dev/iommu is using.  In which case
-having the kernel provided unique handle and the
-not-necessarily-unique user_data would make perfect sense.
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---KDKmP08LDN9ERU6o
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAmFeTAAACgkQbDjKyiDZ
-s5IHfA//dHZrmxuC2Eg7GpSZRzPqLOFtDPTlZ/fOS0A3Ww2bU6S+CuugltvCz+U2
-KZ65d6W7oAiRDmaxTdPARsY/JsYFSu+jGnVfYI4ZUf/N6v0NIInS5L5z31og1nhu
-VYPLtYEPenL5Ikj/e3Ul9E6l5AqLcRqRw/j5G83ygQB3Wk93LdeF/p8wdEvEt599
-U5V8JbGKUYzBySYD4+m6EhhYpAEagGRRltJE10AZm4WB9w6KbjkrQryg7zSfbbEo
-ulwVrlY/IBzHmbBi82IQOiXFIZkdbvuigelt34UPdMSVj50Wmo4t/bxyTbRGk9O8
-YMGa0Y5l0bH6gtl1M/e9Gq3rEwGrjSP/GyvLCZSv1D3nAti/WK7INv9NVEz1E74O
-frugTJBSsodRVz31hMt+WDT5NTTv+F+xQjEnFZTcCeogHvDissXh2wnhUXSi5kQq
-g8GcJfG621SrtvulFlFIhjgtXqxPzRJm+uXWTI5ESCA7+3g79Pr5kKo9UTiRK1c1
-HtB8mM70Hp+vOmWSZ5D3wYZX4ImXpcWdHk0y0c1O0QQVmFF07iyqjVXu+A6r/A5y
-ly8PwxvM0gnM7Ewuz37YXpGTgeiCTVaUVPITz09GN1mMqYa2V0l1X3q/G5iwb/g8
-0SqR8HFGjS87nbngGm/vjD/AscCOHePTMrFQvN/GFytfMWdJO3c=
-=VYju
------END PGP SIGNATURE-----
-
---KDKmP08LDN9ERU6o--
