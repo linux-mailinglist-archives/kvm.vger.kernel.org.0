@@ -2,120 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B2FE8424E19
-	for <lists+kvm@lfdr.de>; Thu,  7 Oct 2021 09:31:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C38A1424ECE
+	for <lists+kvm@lfdr.de>; Thu,  7 Oct 2021 10:11:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240386AbhJGHdK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Oct 2021 03:33:10 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36434 "EHLO
+        id S240568AbhJGINg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Oct 2021 04:13:36 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:10596 "EHLO
         mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232512AbhJGHdI (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 7 Oct 2021 03:33:08 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1975cJFa030078;
-        Thu, 7 Oct 2021 03:31:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
+        by vger.kernel.org with ESMTP id S240683AbhJGINb (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 7 Oct 2021 04:13:31 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 19786sTk023512;
+        Thu, 7 Oct 2021 04:11:37 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
  content-type : content-transfer-encoding; s=pp1;
- bh=B0qkFTd6g4Std0IKONpDuBg40uOotITlTj7dqZmFdYA=;
- b=SqM/+1CfhM6XTE0OZ+yLWEpWrB75+nK8JCHr3jtG3JDEZRwI9BkmF4a5Xb7ZXBEsOzdf
- Xfjjt8+66vA2e4eBCJPdIjKoAfSKLQRDRwpg60mc4OZT+ENjM3PJOWRHeJsoJq0nSX1R
- ftZkLUcv4SEOTbk4O1sfs/PZr3dqy1Dt7WBxL5Ma8AnDq1HeZqKOKMsBtF5ylBZ9CGre
- mmBilRkhcMePTJr5Q44s1a5BfLgHM6ntkoGMb2vthZp/AN3cVaR1F9xGMDKtd6N71KCr
- 51qjXIe/IPStJDxL0EwXbTlvniYemBusYPC+S5/T6X/vGEwZVX+XyLThHDPBOeNSQvhr lA== 
+ bh=wUB73T+zYzrnkbl5Lx/k7P7qiOPwXNst9sf3CL79GHQ=;
+ b=mNxqPLQv4g5sv7sWRGTqZNZnfOs7U67YQzPXrXP4SiLCu8h4/bvw5QOtC47ZeWx+qsCl
+ iLOh3jSiPGAeWJ2yMDHBGckaFe180YoAJdehhXvuMW6C+nmYnq+4JV8JRht+y4uqJsku
+ DetoTJMTDUGuW8Ktcj7TKfD7jnnES76BB4x9rJnzUH8/CK+YzmjC/6KjIGy1NIC/Spdd
+ KrFGCfPMVrtKm+Vx6BJmnvn0SL/icC+0sQfuZCuVpITJTj593EwKnwNoCgVIVvZlwEJU
+ nsoHf/BPdsOuq7AGs8zT8Kg7OAcXIkOHvD/PMdmVENNI1TXgcU37afN1gfnWORQDgjsL +A== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3bhgqj6cvd-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3bhksy2yma-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 07 Oct 2021 03:31:13 -0400
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1976ZOih016809;
-        Thu, 7 Oct 2021 03:31:13 -0400
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3bhgqj6cut-1
+        Thu, 07 Oct 2021 04:11:36 -0400
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 197876er027927;
+        Thu, 7 Oct 2021 04:11:36 -0400
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3bhksy2ykv-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 07 Oct 2021 03:31:13 -0400
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1977INUx032572;
-        Thu, 7 Oct 2021 07:31:11 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma05fra.de.ibm.com with ESMTP id 3bef2a9tnq-1
+        Thu, 07 Oct 2021 04:11:36 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 19787MOu003623;
+        Thu, 7 Oct 2021 08:11:34 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma03ams.nl.ibm.com with ESMTP id 3bef2anh2x-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 07 Oct 2021 07:31:11 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1977V8NB62783862
+        Thu, 07 Oct 2021 08:11:34 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1978658s40698334
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 7 Oct 2021 07:31:08 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 65E03A408E;
-        Thu,  7 Oct 2021 07:31:08 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id F3759A4082;
-        Thu,  7 Oct 2021 07:31:07 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.145.0.155])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu,  7 Oct 2021 07:31:07 +0000 (GMT)
-Date:   Thu, 7 Oct 2021 09:31:05 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Thomas Huth <thuth@redhat.com>
-Cc:     kvm@vger.kernel.org, Janosch Frank <frankja@linux.ibm.com>,
-        linux-s390@vger.kernel.org, David Hildenbrand <david@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH] s390x/mvpg-sie: Remove unused variable
-Message-ID: <20211007093105.1a2515a9@p-imbrenda>
-In-Reply-To: <20211007072136.768459-1-thuth@redhat.com>
-References: <20211007072136.768459-1-thuth@redhat.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        Thu, 7 Oct 2021 08:06:05 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2FFE811C050;
+        Thu,  7 Oct 2021 08:11:26 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C547111C04A;
+        Thu,  7 Oct 2021 08:11:25 +0000 (GMT)
+Received: from [9.145.66.140] (unknown [9.145.66.140])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu,  7 Oct 2021 08:11:25 +0000 (GMT)
+Message-ID: <32b11bd4-66b6-1020-c1c6-717862a348d0@linux.ibm.com>
+Date:   Thu, 7 Oct 2021 10:11:25 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [PATCH 1/2] KVM: s390: remove myself as reviewer
+Content-Language: en-US
+To:     Cornelia Huck <cohuck@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, kvm@vger.kernel.org
+References: <20211006160120.217636-1-cohuck@redhat.com>
+ <20211006160120.217636-2-cohuck@redhat.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+In-Reply-To: <20211006160120.217636-2-cohuck@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: uq_n96lgltQfXuK8I79wdbOxBkgqSlNl
-X-Proofpoint-ORIG-GUID: 4thShTug2aKddah5KUDVbOrJ5aiuSlNj
+X-Proofpoint-GUID: qqJV-Jay_p8hKJwmvIfHz0YeKoXs0Ldo
+X-Proofpoint-ORIG-GUID: IE8OHe9wFhNUpMRVe_kG40S3lEEJlwNY
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.391,FMLib:17.0.607.475
  definitions=2021-10-06_04,2021-10-07_01,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxscore=0
- lowpriorityscore=0 bulkscore=0 spamscore=0 priorityscore=1501
- impostorscore=0 suspectscore=0 adultscore=0 mlxlogscore=999 phishscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2109230001 definitions=main-2110070050
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxlogscore=999
+ priorityscore=1501 malwarescore=0 suspectscore=0 mlxscore=0 spamscore=0
+ clxscore=1015 bulkscore=0 adultscore=0 lowpriorityscore=0 impostorscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2109230001
+ definitions=main-2110070054
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu,  7 Oct 2021 09:21:36 +0200
-Thomas Huth <thuth@redhat.com> wrote:
-
-> The guest_instr variable is not used, which was likely a
-> copy-n-paste issue from the s390x/sie.c test.
+On 10/6/21 18:01, Cornelia Huck wrote:
+> I currently don't have time anymore to review KVM/s390
+> code.
 > 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Acked-by: Janosch Frank <frankja@linux.ibm.com>
+
+And for a second time:
+Thank you for your work!
 
 > ---
->  s390x/mvpg-sie.c | 3 ---
->  1 file changed, 3 deletions(-)
+>   MAINTAINERS | 1 -
+>   1 file changed, 1 deletion(-)
 > 
-> diff --git a/s390x/mvpg-sie.c b/s390x/mvpg-sie.c
-> index ccc273b..5adcec1 100644
-> --- a/s390x/mvpg-sie.c
-> +++ b/s390x/mvpg-sie.c
-> @@ -21,7 +21,6 @@
->  #include <sie.h>
->  
->  static u8 *guest;
-> -static u8 *guest_instr;
->  static struct vm vm;
->  
->  static uint8_t *src;
-> @@ -94,8 +93,6 @@ static void setup_guest(void)
->  
->  	/* Allocate 1MB as guest memory */
->  	guest = alloc_pages(8);
-> -	/* The first two pages are the lowcore */
-> -	guest_instr = guest + PAGE_SIZE * 2;
->  
->  	sie_guest_create(&vm, (uint64_t)guest, HPAGE_SIZE);
->  
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index abdcbcfef73d..0149e1a3e65e 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -10275,7 +10275,6 @@ KERNEL VIRTUAL MACHINE for s390 (KVM/s390)
+>   M:	Christian Borntraeger <borntraeger@de.ibm.com>
+>   M:	Janosch Frank <frankja@linux.ibm.com>
+>   R:	David Hildenbrand <david@redhat.com>
+> -R:	Cornelia Huck <cohuck@redhat.com>
+>   R:	Claudio Imbrenda <imbrenda@linux.ibm.com>
+>   L:	kvm@vger.kernel.org
+>   S:	Supported
+> 
 
