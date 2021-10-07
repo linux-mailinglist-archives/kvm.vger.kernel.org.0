@@ -2,120 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 95DAE424D6A
-	for <lists+kvm@lfdr.de>; Thu,  7 Oct 2021 08:50:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3A6CC424D9A
+	for <lists+kvm@lfdr.de>; Thu,  7 Oct 2021 08:59:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233489AbhJGGwG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Oct 2021 02:52:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40513 "EHLO
+        id S240178AbhJGHB1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Oct 2021 03:01:27 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38311 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231279AbhJGGwG (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 7 Oct 2021 02:52:06 -0400
+        by vger.kernel.org with ESMTP id S233511AbhJGHB0 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 7 Oct 2021 03:01:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1633589412;
+        s=mimecast20190719; t=1633589972;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=gR2IuP1xBNRrFxO5rgcYezdc7GQgLXrw0dvVXdXEOfw=;
-        b=YHVJtODcGOMHceWdGyRlQz2quMJ9kgXmJ49ZCtGOz2XFWXYmT7gaa+GrXOQaqnRSGPI/fY
-        s9jaFa2xA74I0GY/MnjpfnhcUdReshEaEeC2c3bQfibKMhbdy8xH8fqH1KGR5EaktacBSg
-        P293khEuALJJqW66YYJn9VntTLTdGJI=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-405-FqdktL9FOFClfloRf0pA8g-1; Thu, 07 Oct 2021 02:50:11 -0400
-X-MC-Unique: FqdktL9FOFClfloRf0pA8g-1
-Received: by mail-wr1-f72.google.com with SMTP id l9-20020adfc789000000b00160111fd4e8so3874629wrg.17
-        for <kvm@vger.kernel.org>; Wed, 06 Oct 2021 23:50:11 -0700 (PDT)
+        bh=r5cjrtzAUfTFfn+XpMPFhZ+gWkuj4D+fj6EkUQIpFkA=;
+        b=BHbwVFUNRbV7NvhEB8xN217d3wy53XGpBpXX/0Epo/vUNRpGn+iWzsQHcybre38dUr/Kkh
+        oHXssekPAR57QJ5uius9DxptT85WzsSlZlul3kbCq26I0C6r6v+b6Im7G8iA+esk/Mo1hs
+        283FsYrz9OYEG7wRFtx3CWJ64Nye50c=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-223-AFK1qroqNK6FbRicr-cmrQ-1; Thu, 07 Oct 2021 02:59:31 -0400
+X-MC-Unique: AFK1qroqNK6FbRicr-cmrQ-1
+Received: by mail-ed1-f72.google.com with SMTP id c7-20020a05640227c700b003d27f41f1d4so4923212ede.16
+        for <kvm@vger.kernel.org>; Wed, 06 Oct 2021 23:59:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=gR2IuP1xBNRrFxO5rgcYezdc7GQgLXrw0dvVXdXEOfw=;
-        b=0rcfuato6nATbmgk/TIyGgn8nzZIbYDrfkCxGVP/wjQyUuBhpqwUSubBmGNygXU1iW
-         9Flx4Tm8RfgO/gGJIL0NFOS6BXnRgrxF/L0yxjo4tFrZLU1YLv9SM+CzPmcMahEXnK59
-         /HIV1eRyf1iMoFjm1c+syUIe9qnLtcav7ymKnTHvXpRCZkjqZC1+9Fb60zEvhya+gvUf
-         5Dq0NiNMFgVDJQq0HgGjpIPkUZMTl7M6Cb0ydbCGZ0oIErzkMnZGHR35Q7zzjwuoSHvI
-         xbZfN6oOKAgSx8oxM1p+o1tE+QizTTX14e5qVtKipd3QaQEwqBFqrq+RB8RHDObOZBxl
-         VVlw==
-X-Gm-Message-State: AOAM533tdAUJOOHSADPhN1x6fHLEOhZ7ukYEtlOY+6DuNxo+SfcL++8U
-        diPlAqEKFcwkJo9saFyJNTNQ2a3PiFEfiKWEn0GGrjc47ijSV8gG9TCRa+daAkla8QTDF9qTpy2
-        kggJg6hd0UeRW
-X-Received: by 2002:a1c:35c7:: with SMTP id c190mr14465354wma.57.1633589410170;
-        Wed, 06 Oct 2021 23:50:10 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxOuotUHTyBwzACujoGsab4OKfZgTHAnsCxJt/5wgt430jvUDzX9d4Oglqagdduip5iSkLI0w==
-X-Received: by 2002:a1c:35c7:: with SMTP id c190mr14465339wma.57.1633589409957;
-        Wed, 06 Oct 2021 23:50:09 -0700 (PDT)
-Received: from thuth.remote.csb (nat-pool-str-t.redhat.com. [149.14.88.106])
-        by smtp.gmail.com with ESMTPSA id k8sm597084wmr.32.2021.10.06.23.50.08
+        bh=r5cjrtzAUfTFfn+XpMPFhZ+gWkuj4D+fj6EkUQIpFkA=;
+        b=lIjQk1NcX2kC1ZJ9P4WF7tv9BrvQX5Rtg8dOX+41yl2b9SuI+HtzPHgP8wTaibkG+K
+         RSH95OD3j+Q1RSIujk79nt5wHFSgDvOPwWESQ0efeZWZKrYmL4B7v7UwlgBhqO0PCSL3
+         xFFZjJ93Oc5wKUTXiZehcldZNowaMDcdFY4EVNF7NO9Hs+ahxH1r8iHCJ0fByjZlfC9b
+         gEl1g4rhDy32uNlHXzr+LfEsV+WZl6mwCu7AOuX6lr6PCKvfvwQjCmRlmy7tYBU3PIzV
+         rgigmhxqaGsMY1B5BngTQ8sr6V2M9rTevNsP9XkCevpLM4sm+nvP2PCl9hGZMe7ekgbM
+         27mw==
+X-Gm-Message-State: AOAM533RIbEmgoBc1DQMJljMheVI6Ou8uVvrMXv6+2p2N6Jyh3dEwM3N
+        Rd/3jRA3jPLcerksyI5d8chlSXHxVRQFowS9BOoWzR0SQZwsfYd8JtdyUdDaR7Silg8A/J/2V9W
+        cefhUGof8cnRW
+X-Received: by 2002:a05:6402:42d6:: with SMTP id i22mr1064351edc.54.1633589970205;
+        Wed, 06 Oct 2021 23:59:30 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwsntpiI6uV8FdxmpZafdNUy/Hfb4zkESAWYNpyyJsdSRNJGc1JGMIgKJzRTW9DrB7PyWuUGg==
+X-Received: by 2002:a05:6402:42d6:: with SMTP id i22mr1064336edc.54.1633589970018;
+        Wed, 06 Oct 2021 23:59:30 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id og39sm3195811ejc.93.2021.10.06.23.59.28
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 06 Oct 2021 23:50:09 -0700 (PDT)
-Subject: Re: [kvm-unit-tests PATCH v2 5/5] Use report_pass(...) instead of
- report(1/true, ...)
-To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-References: <20211005090921.1816373-1-scgl@linux.ibm.com>
- <20211005090921.1816373-6-scgl@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-Message-ID: <f4617a8a-d274-c6ae-d395-73cdba19663c@redhat.com>
-Date:   Thu, 7 Oct 2021 08:50:08 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+        Wed, 06 Oct 2021 23:59:29 -0700 (PDT)
+Message-ID: <42039591-c445-9298-607a-76efe875eb53@redhat.com>
+Date:   Thu, 7 Oct 2021 08:59:28 +0200
 MIME-Version: 1.0
-In-Reply-To: <20211005090921.1816373-6-scgl@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [GIT PULL] KVM/riscv for 5.16
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+To:     Palmer Dabbelt <palmerdabbelt@google.com>
+Cc:     anup@brainfault.org, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org
+References: <mhng-03b25a51-3491-4bb7-9e17-1b32fc97b7ff@palmerdabbelt-glaptop>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <mhng-03b25a51-3491-4bb7-9e17-1b32fc97b7ff@palmerdabbelt-glaptop>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05/10/2021 11.09, Janis Schoetterl-Glausch wrote:
-> Whitespace is kept consistent with the rest of the file.
+On 06/10/21 18:42, Palmer Dabbelt wrote:
+> On Tue, 05 Oct 2021 01:25:41 PDT (-0700), pbonzini@redhat.com wrote:
+>> On 05/10/21 09:55, Anup Patel wrote:
+>>>    git://github.com/kvm-riscv/linux.git tags/kvm-riscv-5.16-1
+>>
+>> Pulled, thanks!
 > 
-> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-> ---
->   s390x/css.c         |  4 ++--
->   s390x/diag288.c     |  2 +-
->   s390x/selftest.c    |  2 +-
->   s390x/smp.c         | 16 ++++++++--------
->   s390x/spec_ex.c     |  7 +++----
->   x86/asyncpf.c       |  7 +++----
->   x86/emulator.c      |  2 +-
->   x86/hyperv_stimer.c | 18 ++++++++----------
->   x86/svm_tests.c     | 17 ++++++++---------
->   x86/syscall.c       |  2 +-
->   x86/taskswitch2.c   |  2 +-
->   x86/tsc_adjust.c    |  2 +-
->   x86/vmx.c           |  6 +++---
->   x86/vmx_tests.c     | 36 ++++++++++++++++++------------------
->   14 files changed, 59 insertions(+), 64 deletions(-)
+> Thanks!
 > 
-> diff --git a/s390x/css.c b/s390x/css.c
-> index dcb4d70..881206b 100644
-> --- a/s390x/css.c
-> +++ b/s390x/css.c
-> @@ -31,7 +31,7 @@ static void test_enumerate(void)
->   {
->   	test_device_sid = css_enumerate();
->   	if (test_device_sid & SCHID_ONE) {
-> -		report(1, "Schid of first I/O device: 0x%08x", test_device_sid);
-> +		report_pass("Schid of first I/O device: 0x%08x", test_device_sid);
->   		return;
->   	}
-...
+> IIUC how this generally works is that you pull these KVM-specific patch 
+> sets and I don't, which means they'll get tested on my end as they loop 
+> back through linux-next.  I'm fine with however this usually works, just 
+> trying to make sure we're on the same page as this is my first time 
+> being this close to another tree.
 
-Thanks, I've applied patches 3 - 5 now to the repository, since there were 
-no objections and they are independent from your spec_ex work. (Dropped the 
-hunk to spec_ex.c here of course, so please integrate that in the next 
-version of that patch directly instead).
+Generally speaking, Anup as the maintainer is responsible for things not 
+breaking.  I do a cross-compile to check against changes to KVM common 
+code in virt/kvm, but otherwise just take his tree and send it out to 
+Linus.  Once selftests are in, I will also be able to run them under 
+QEMU, again to check that changes to virt/kvm/ do not break RISC-V.
 
-  Thomas
-
+Paolo
 
