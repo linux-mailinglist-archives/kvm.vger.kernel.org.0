@@ -2,110 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 85E53425715
-	for <lists+kvm@lfdr.de>; Thu,  7 Oct 2021 17:52:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4080B425795
+	for <lists+kvm@lfdr.de>; Thu,  7 Oct 2021 18:17:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241951AbhJGPyr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Oct 2021 11:54:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28394 "EHLO
+        id S242652AbhJGQTX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Oct 2021 12:19:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26903 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233416AbhJGPyr (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 7 Oct 2021 11:54:47 -0400
+        by vger.kernel.org with ESMTP id S241736AbhJGQTR (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 7 Oct 2021 12:19:17 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1633621973;
+        s=mimecast20190719; t=1633623443;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=mki5wTjxXGr+IGNPFHM4xHf+VH4JglD76WJd/mMOISs=;
-        b=ZW4NS9yiYE4RatWENqfxdIrdexBE5IuyMYLpDtyjwrKc9vRjnSADKsPFvzAA5DAQGjnXeH
-        FtUYzyh0WKIuTO9Bnw8ZDq8ORN8pZc1SRkc5QSVFV538/KEo6dBG2x/FzbujCfFklzDG0r
-        RpD512sTJRv9mGDWMOpr1c4lRR/OI0s=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-441-hpjD-BWHPcOFHnMPqUKaEA-1; Thu, 07 Oct 2021 11:52:52 -0400
-X-MC-Unique: hpjD-BWHPcOFHnMPqUKaEA-1
-Received: by mail-wr1-f71.google.com with SMTP id k16-20020a5d6290000000b00160753b430fso5085075wru.11
-        for <kvm@vger.kernel.org>; Thu, 07 Oct 2021 08:52:51 -0700 (PDT)
+         content-transfer-encoding:content-transfer-encoding;
+        bh=p6fHLDVl0Cbua1Rf17vUj4XEPtHLVrJLYw1HhEkRr54=;
+        b=Ox+tsblBpS5icZDt5IcxPvVGiVFxd8hvTqvbS3uaN+gV9qEv4fU51pvKH9Bh6+VuplCAUz
+        ufav65Yx+Q1D9j+zVjmlj4O5F6gLJZN7iLcXWjCKlVqNWtHFM/JWIPS2zhWD275CMBoN9w
+        ozoeUBFQ2BduKxPz6ftMbLQMVaBVYwg=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-461-kGJ3MscRNIGp4JVSfiBC9g-1; Thu, 07 Oct 2021 12:17:22 -0400
+X-MC-Unique: kGJ3MscRNIGp4JVSfiBC9g-1
+Received: by mail-wr1-f70.google.com with SMTP id h11-20020adfa4cb000000b00160c791a550so4941522wrb.6
+        for <kvm@vger.kernel.org>; Thu, 07 Oct 2021 09:17:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=mki5wTjxXGr+IGNPFHM4xHf+VH4JglD76WJd/mMOISs=;
-        b=IDUZq2KFazYVRmaSiIdzFWluwDkexOVMi9P0TQrORgqwS5uVHh7ab4WcPmQDs2gkns
-         oHEcV3u2JNVgjYLo3MqgWsYH/bpQ2VqOKh/dagFzTDrtZfF2Bw4sX7q+6+saJm0J740n
-         L5whnXtXbAT89M29YPPbEQsbIWjynck9bZgSUF/W/z9+U7y6JfuvMGqQJpU0eFbmeAtV
-         h9s3n3H4EwmF9K64zlQO9IH1iOvNNSXEai7/ZkHUSZeHqZ/WZxxnSzuX7yKOUZHRXoTZ
-         KNw4a44VL5afzHqvWTrxBV1BQ62ZkDMslpoUlxXOUjq0OZbBbRLxyjtQ+N5uBn8dmXsT
-         /2Ww==
-X-Gm-Message-State: AOAM531d5IMkOAPm5Onkj91ujEwxBNUtC3oECMTuGI+HGh0IQ9Fyz20V
-        Vq2jqJf5fXpE/xZOptgrMj9j7cE5iHsRVa2HZ8TvDhptD1elR/tDNNcaGS5n6KwvgtiOzKUniM7
-        Kc4Knmssv/SYL
-X-Received: by 2002:adf:9b97:: with SMTP id d23mr6386626wrc.53.1633621970951;
-        Thu, 07 Oct 2021 08:52:50 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxxS9zzcdO8gEa8I10rZOiZ3zEoCv1L5U3v+lF61OvcEjd+iZrkvzPdw2F8ibmZvXvAL8shTg==
-X-Received: by 2002:adf:9b97:: with SMTP id d23mr6386598wrc.53.1633621970756;
-        Thu, 07 Oct 2021 08:52:50 -0700 (PDT)
-Received: from gator (nat-pool-brq-u.redhat.com. [213.175.37.12])
-        by smtp.gmail.com with ESMTPSA id i92sm13012wri.28.2021.10.07.08.52.49
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=p6fHLDVl0Cbua1Rf17vUj4XEPtHLVrJLYw1HhEkRr54=;
+        b=uEhLV9IOXWcC66KGiiYbpfrB/v3Nh/UZSSbTNpWVb7xHWvAPVpSwNThPI9f7CiqQEq
+         Xo1UjrbHcMxmyjFlzK6Iz7/ONztzTRep+kYK0pfQNlarmpQUiVrb5MsiWoYFbXZsgDk5
+         0FtqcvTfHHmDBGGVtcNsCKZt0NU18EJLse4g83+1hL985vrFfAJomB6+uY0IwmjCANCY
+         UqBjpJg/WWnpso3PwITm4PCcMg5U2gLKOufwOT0eImSaR2j2eTkL/E2+ZERA2ybkr5pL
+         ipQAicwgQpMOLOM5DwrZ/YSeEQLfRoh6uLrDY1CTY/w0mnC12TQ7l0PgMbQRwAI0GVVf
+         P+kQ==
+X-Gm-Message-State: AOAM533BHTd2wVJnf5qOK+1PHc9SUjzM/vWaQUmQnGUEGEUBt9p/SsUC
+        L7KAz14wyGgStwSI4sNX+qYO+7VjsCKbv1/bnAC7HP9sXL9DBh2jgD4g9yxlD0VgAl9vT5W0ed4
+        LSlDwgDUxUmCl
+X-Received: by 2002:a5d:4481:: with SMTP id j1mr6733753wrq.6.1633623438538;
+        Thu, 07 Oct 2021 09:17:18 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz2EmrFsCPnCn7w8xn3CHIU49Oj94zA0/VNeS7NO/gGdXhjH6plu98/nw1ribtc2xuIOoff5g==
+X-Received: by 2002:a5d:4481:: with SMTP id j1mr6733725wrq.6.1633623438347;
+        Thu, 07 Oct 2021 09:17:18 -0700 (PDT)
+Received: from x1w.redhat.com (118.red-83-35-24.dynamicip.rima-tde.net. [83.35.24.118])
+        by smtp.gmail.com with ESMTPSA id 189sm10243854wmz.27.2021.10.07.09.17.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Oct 2021 08:52:50 -0700 (PDT)
-Date:   Thu, 7 Oct 2021 17:52:48 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org, will@kernel.org,
-        qperret@google.com, dbrazdil@google.com,
-        Steven Price <steven.price@arm.com>,
-        Fuad Tabba <tabba@google.com>,
-        Srivatsa Vaddagiri <vatsa@codeaurora.org>,
-        Shanker R Donthineni <sdonthineni@nvidia.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        kernel-team@android.com
-Subject: Re: [PATCH v2 00/16]  KVM: arm64: MMIO guard PV services
-Message-ID: <20211007155248.ejwclkwnnsaunmc6@gator>
-References: <20211004174849.2831548-1-maz@kernel.org>
+        Thu, 07 Oct 2021 09:17:17 -0700 (PDT)
+From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To:     qemu-devel@nongnu.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        James Bottomley <jejb@linux.ibm.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: [PATCH v4 00/23] target/i386/sev: Housekeeping SEV + measured Linux SEV guest
+Date:   Thu,  7 Oct 2021 18:16:53 +0200
+Message-Id: <20211007161716.453984-1-philmd@redhat.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211004174849.2831548-1-maz@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 04, 2021 at 06:48:33PM +0100, Marc Zyngier wrote:
-> This is the second version of this series initially posted at [1] that
-> aims at letting a guest express what it considers as MMIO, and only
-> let this through to userspace. Together with the guest memory made
-> (mostly) inaccessible to the host kernel and userspace, this allows an
-> implementation of a hardened IO subsystem.
-> 
-> A lot has been fixed/revamped/improved since the initial posting,
-> although I am still not pleased with the ioremap plugging on the guest
-> side. I'll take any idea to get rid of it!
->
-
-Pros/cons of the hooks
-
-Pros:
- 1) VM only needs to have a kernel that supports the feature (and a
-    kernel command line that enables it)
- 2) All the ioremapped MMIO ranges are permitted immediately, rather than
-    deferring until some other event (which would probably be too late in
-    many cases)
-
-Cons:
- 1) Having to have hooks, which is never pretty
- 2) Adding the hypcalls to each ioremap, which adds some overhead
- 3) Having to reference count all the mappings, which adds even more overhead
- 4) Not giving the owner of the VM control over what MMIO is permitted
-    (Well, maybe the VM owner just needs to blacklist drivers for anything
-     that it doesn't want.)
-
-I don't think any of the Con's are too bad and probably Pro-2 more or less
-makes the hooks a necessity.
-
-Thanks,
-drew
+Missing review:=0D
+  0005-target-i386-sev-Prefix-QMP-errors-with-SEV.patch=0D
+  0012-target-i386-sev-Use-g_autofree-in-sev_launch_get_mea.patch=0D
+  0014-target-i386-sev-Rename-sev_i386.h-sev.h.patch=0D
+  0016-target-i386-sev-Remove-stubs-by-using-code-elision.patch=0D
+  0023-MAINTAINERS-Cover-SEV-related-files-with-X86-KVM-sec.patch=0D
+=0D
+Hi,=0D
+=0D
+While testing James & Dov patch:=0D
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg810571.html=0D
+I wasted some time trying to figure out how OVMF was supposed to=0D
+behave until realizing the binary I was using was built without SEV=0D
+support... Then wrote this series to help other developers to not=0D
+hit the same problem.=0D
+=0D
+Since v3:=0D
+- Rebased ('Measured Linux SEV guest' from Dov [1] merged)=0D
+- Addressed Paolo & David review comments=0D
+=0D
+Since v2:=0D
+- Rebased on top of SGX=0D
+- Addressed review comments from Markus / David=0D
+- Included/rebased 'Measured Linux SEV guest' from Dov [1]=0D
+- Added orphean MAINTAINERS section=0D
+=0D
+[1] https://lore.kernel.org/qemu-devel/20210825073538.959525-1-dovmurik@lin=
+ux.ibm.com/=0D
+=0D
+Supersedes: <20210616204328.2611406-1-philmd@redhat.com>=0D
+=0D
+Dr. David Alan Gilbert (1):=0D
+  target/i386/sev: sev_get_attestation_report use g_autofree=0D
+=0D
+Philippe Mathieu-Daud=C3=A9 (22):=0D
+  qapi/misc-target: Wrap long 'SEV Attestation Report' long lines=0D
+  qapi/misc-target: Group SEV QAPI definitions=0D
+  target/i386/kvm: Introduce i386_softmmu_kvm Meson source set=0D
+  target/i386/kvm: Restrict SEV stubs to x86 architecture=0D
+  target/i386/sev: Prefix QMP errors with 'SEV'=0D
+  target/i386/monitor: Return QMP error when SEV is not enabled for=0D
+    guest=0D
+  target/i386/cpu: Add missing 'qapi/error.h' header=0D
+  target/i386/sev_i386.h: Remove unused headers=0D
+  target/i386/sev: Remove sev_get_me_mask()=0D
+  target/i386/sev: Mark unreachable code with g_assert_not_reached()=0D
+  target/i386/sev: Use g_autofree in sev_launch_get_measure()=0D
+  target/i386/sev: Restrict SEV to system emulation=0D
+  target/i386/sev: Rename sev_i386.h -> sev.h=0D
+  target/i386/sev: Declare system-specific functions in 'sev.h'=0D
+  target/i386/sev: Remove stubs by using code elision=0D
+  target/i386/sev: Move qmp_query_sev_attestation_report() to sev.c=0D
+  target/i386/sev: Move qmp_sev_inject_launch_secret() to sev.c=0D
+  target/i386/sev: Move qmp_query_sev_capabilities() to sev.c=0D
+  target/i386/sev: Move qmp_query_sev_launch_measure() to sev.c=0D
+  target/i386/sev: Move qmp_query_sev() & hmp_info_sev() to sev.c=0D
+  monitor: Reduce hmp_info_sev() declaration=0D
+  MAINTAINERS: Cover SEV-related files with X86/KVM section=0D
+=0D
+ qapi/misc-target.json                 |  77 ++++++------=0D
+ include/monitor/hmp-target.h          |   1 +=0D
+ include/monitor/hmp.h                 |   1 -=0D
+ include/sysemu/sev.h                  |  28 -----=0D
+ target/i386/{sev_i386.h =3D> sev.h}     |  35 ++++--=0D
+ hw/i386/pc_sysfw.c                    |   2 +-=0D
+ hw/i386/x86.c                         |   2 +-=0D
+ target/i386/cpu.c                     |  16 +--=0D
+ target/i386/kvm/kvm.c                 |   3 +-=0D
+ {accel =3D> target/i386}/kvm/sev-stub.c |   2 +-=0D
+ target/i386/monitor.c                 |  92 +--------------=0D
+ target/i386/sev-stub.c                |  88 --------------=0D
+ target/i386/sev-sysemu-stub.c         |  70 +++++++++++=0D
+ target/i386/sev.c                     | 164 +++++++++++++++++++-------=0D
+ MAINTAINERS                           |   2 +=0D
+ accel/kvm/meson.build                 |   1 -=0D
+ target/i386/kvm/meson.build           |   8 +-=0D
+ target/i386/meson.build               |   4 +-=0D
+ 18 files changed, 279 insertions(+), 317 deletions(-)=0D
+ delete mode 100644 include/sysemu/sev.h=0D
+ rename target/i386/{sev_i386.h =3D> sev.h} (62%)=0D
+ rename {accel =3D> target/i386}/kvm/sev-stub.c (94%)=0D
+ delete mode 100644 target/i386/sev-stub.c=0D
+ create mode 100644 target/i386/sev-sysemu-stub.c=0D
+=0D
+-- =0D
+2.31.1=0D
+=0D
 
