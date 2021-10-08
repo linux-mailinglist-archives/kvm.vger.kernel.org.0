@@ -2,192 +2,182 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1FB97426D30
-	for <lists+kvm@lfdr.de>; Fri,  8 Oct 2021 17:02:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BB26F426D45
+	for <lists+kvm@lfdr.de>; Fri,  8 Oct 2021 17:09:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242862AbhJHPEG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Oct 2021 11:04:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54622 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242765AbhJHPEE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Oct 2021 11:04:04 -0400
-Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5906AC061755
-        for <kvm@vger.kernel.org>; Fri,  8 Oct 2021 08:02:09 -0700 (PDT)
-Received: by mail-pg1-x52c.google.com with SMTP id 75so3371526pga.3
-        for <kvm@vger.kernel.org>; Fri, 08 Oct 2021 08:02:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=b5kFCA4Sqv5n1pkMZ9QWFD00Hw1HCcSsDCNRLCbAoi4=;
-        b=O09XgIIyJxGU1JScsnBpGbcucFHriU2sIXhS13J3MwOvptL4vOdqESyqdeY4KUw7c2
-         MMCAZGmdxruj+jlMyfWBWm2YDYx8R9Hq8C0VwUIt6fJ0LWv8SEPYp6XUH55p2Tiynufm
-         NG/krSNN0zkCIlY2oykqsGdbvuogk+N5ah4Xb8MYlcaP1H/EL/UiPVyTKBf3KJnJbzUy
-         PHCKWLsQpiMUE0wtFC19oWJJqWG8h1sUD+INjQfl2RUgKACZaws64IoZjqGWbnr1cQDh
-         RkHcZv+50y80LGArbSBEY/dBemW55lPLyJ8jFMHzApxIiVKSYjMT+wPs/+1RYTXpW7Z/
-         PeQA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=b5kFCA4Sqv5n1pkMZ9QWFD00Hw1HCcSsDCNRLCbAoi4=;
-        b=hYdWzbePKi3gQkyctxd+lkjl6orf2fvzjMPNaKuGxE0pp1lMzQpvgpv1BdzJeB7H+F
-         81XrQjzDSPt0hi25W2/4G/mdxkCd0JTcpL1RUyRO11Sr4HxApVeHJv4397oP0YFz7JwW
-         VYVkiLrwmTNf/l0qRvLHhkLT18DFEQehmgVtOApIyitXcARqTli5zgfV4iBkVuxEQgLm
-         A5e0FuCH6s9Ej8GcD+GKKcLrCS2msRT7b3YosISJmVn9VNbgtv7KBC7Pv4O89LwD/BOV
-         Snnori3jb2O78J3CAvpnxJ/YGtItmL1Wr/gtZQ1gtXmMRV043uKwzS/YKSu4k6wx2fz9
-         YTsw==
-X-Gm-Message-State: AOAM530Xjcj0rWhIT5xBG00OnJMCpS9gsyasJWKI7BLpUggvnDHO1z7w
-        x0XQHIyv12je/4jnGwo/l0GEgw==
-X-Google-Smtp-Source: ABdhPJzQztT1vkshWbvA2jei1IGYww+ulxT3Z83ojh7KiFGMvo+cG5AF5glXll1PBSYxOr4R5LyFrQ==
-X-Received: by 2002:a63:e10d:: with SMTP id z13mr5055836pgh.375.1633705328605;
-        Fri, 08 Oct 2021 08:02:08 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id e8sm3167677pfn.45.2021.10.08.08.02.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Oct 2021 08:02:08 -0700 (PDT)
-Date:   Fri, 8 Oct 2021 15:02:04 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Atish Patra <atish.patra@wdc.com>
-Cc:     linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Anup Patel <anup.patel@wdc.com>,
-        Kefeng Wang <wangkefeng.wang@huawei.com>,
-        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
-        linux-riscv@lists.infradead.org,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Vincent Chen <vincent.chen@sifive.com>
-Subject: Re: [PATCH v3 5/5] RISC-V: Add SBI HSM extension in KVM
-Message-ID: <YWBdbCNQdikbhhBq@google.com>
-References: <20211008032036.2201971-1-atish.patra@wdc.com>
- <20211008032036.2201971-6-atish.patra@wdc.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211008032036.2201971-6-atish.patra@wdc.com>
+        id S242910AbhJHPLU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Oct 2021 11:11:20 -0400
+Received: from mga07.intel.com ([134.134.136.100]:43723 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S242732AbhJHPLQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Oct 2021 11:11:16 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10130"; a="290022015"
+X-IronPort-AV: E=Sophos;i="5.85,358,1624345200"; 
+   d="scan'208";a="290022015"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Oct 2021 08:09:19 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.85,358,1624345200"; 
+   d="scan'208";a="523009981"
+Received: from sqa-gate.sh.intel.com (HELO robert-ivt.tsp.org) ([10.239.48.212])
+  by orsmga001.jf.intel.com with ESMTP; 08 Oct 2021 08:09:16 -0700
+Message-ID: <85da4484902e5a4b1be645669c95dba7934d98b5.camel@linux.intel.com>
+Subject: Re: [PATCH v1 3/5] KVM: x86: nVMX: VMCS12 field's read/write
+ respects field existence bitmap
+From:   Robert Hoo <robert.hu@linux.intel.com>
+To:     Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Jim Mattson <jmattson@google.com>
+Cc:     pbonzini@redhat.com, vkuznets@redhat.com, wanpengli@tencent.com,
+        joro@8bytes.org, kvm@vger.kernel.org
+Date:   Fri, 08 Oct 2021 23:09:15 +0800
+In-Reply-To: <20211008082302.txckaasmsystigeu@linux.intel.com>
+References: <0b94844844521fc0446e3df0aa02d4df183f8107.camel@linux.intel.com>
+         <YTI7K9RozNIWXTyg@google.com>
+         <64aad01b6bffd70fa3170cf262fe5d7c66f6b2d4.camel@linux.intel.com>
+         <YVx6Oesi7X3jfnaM@google.com>
+         <CALMp9eRyhAygfh1piNEDE+WGVzK1cTWJJR1aC_zqn=c2fy+c-A@mail.gmail.com>
+         <YVySdKOWTXqU4y3R@google.com>
+         <CALMp9eQvRYpZg+G7vMcaCq0HYPDfZVpPtDRO9bRa0w2fyyU9Og@mail.gmail.com>
+         <YVy6gj2+XsghsP3j@google.com>
+         <CALMp9eT+uAvPv7LhJKrJGDN31-aVy6DYBrP+PUDiTk0zWuCX4g@mail.gmail.com>
+         <YVzeJ59/yCpqgTX2@google.com>
+         <20211008082302.txckaasmsystigeu@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-8.el7) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 07, 2021, Atish Patra wrote:
-> SBI HSM extension allows OS to start/stop harts any time. It also allows
-> diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-> index c44cabce7dd8..278b4d643e1b 100644
-> --- a/arch/riscv/kvm/vcpu.c
-> +++ b/arch/riscv/kvm/vcpu.c
-> @@ -133,6 +133,13 @@ static void kvm_riscv_reset_vcpu(struct kvm_vcpu *vcpu)
->  	struct kvm_vcpu_csr *reset_csr = &vcpu->arch.guest_reset_csr;
->  	struct kvm_cpu_context *cntx = &vcpu->arch.guest_context;
->  	struct kvm_cpu_context *reset_cntx = &vcpu->arch.guest_reset_context;
-> +	bool loaded;
-> +
-> +	/* Disable preemption to avoid race with preempt notifiers */
+On Fri, 2021-10-08 at 16:23 +0800, Yu Zhang wrote:
+> On Tue, Oct 05, 2021 at 11:22:15PM +0000, Sean Christopherson wrote:
+> > On Tue, Oct 05, 2021, Jim Mattson wrote:
+> > > On Tue, Oct 5, 2021 at 1:50 PM Sean Christopherson <
+> > > seanjc@google.com> wrote:
+> > > > 
+> > > > On Tue, Oct 05, 2021, Jim Mattson wrote:
+> > > > > On Tue, Oct 5, 2021 at 10:59 AM Sean Christopherson <
+> > > > > seanjc@google.com> wrote:
+> > > > > > 
+> > > > > > On Tue, Oct 05, 2021, Jim Mattson wrote:
+> > > > > > > On Tue, Oct 5, 2021 at 9:16 AM Sean Christopherson <
+> > > > > > > seanjc@google.com> wrote:
+> > > > > > > > 
+> > > > > > > > On Tue, Sep 28, 2021, Robert Hoo wrote:
+> > > > > > > > > On Fri, 2021-09-03 at 15:11 +0000, Sean
+> > > > > > > > > Christopherson wrote:
+> > > > > > > > >       You also said, "This is quite the complicated
+> > > > > > > > > mess for
+> > > > > > > > > something I'm guessing no one actually cares
+> > > > > > > > > about.  At what point do
+> > > > > > > > > we chalk this up as a virtualization hole and sweep
+> > > > > > > > > it under the rug?"
+> > > > > > > > > -- I couldn't agree more.
+> > > > > > > > 
+> > > > > > > > ...
+> > > > > > > > 
+> > > > > > > > > So, Sean, can you help converge our discussion and
+> > > > > > > > > settle next step?
+> > > > > > > > 
+> > > > > > > > Any objection to simply keeping KVM's current behavior,
+> > > > > > > > i.e. sweeping this under
+> > > > > > > > the proverbial rug?
+> > > > > > > 
+> > > > > > > Adding 8 KiB per vCPU seems like no big deal to me, but,
+> > > > > > > on the other
+> > > > > > > hand, Paolo recently argued that slightly less than 1 KiB
+> > > > > > > per vCPU was
+> > > > > > > unreasonable for VM-exit statistics, so maybe I've got a
+> > > > > > > warped
+> > > > > > > perspective. I'm all for pedantic adherence to the
+> > > > > > > specification, but
+> > > > > > > I have to admit that no actual hypervisor is likely to
+> > > > > > > care (or ever
+> > > > > > > will).
+> > > > > > 
+> > > > > > It's not just the memory, it's also the complexity, e.g. to
+> > > > > > get VMCS shadowing
+> > > > > > working correctly, both now and in the future.
+> > > > > 
+> > > > > As far as CPU feature virtualization goes, this one doesn't
+> > > > > seem that
+> > > > > complex to me. It's not anywhere near as complex as
+> > > > > virtualizing MTF,
+> > > > > for instance, and KVM *claims* to do that! :-)
+> > > > 
+> > > > There aren't many things as complex as MTF.  But unlike MTF,
+> > > > this behavior doesn't
+> > > > have a concrete use case to justify the risk vs. reward.  IMO
+> > > > the odds of us breaking
+> > > > something in KVM for "normal" use cases are higher than the
+> > > > odds of an L1 VMM breaking
+> > > > because a VMREAD/VMWRITE didn't fail when it technically should
+> > > > have failed.
+> > > 
+> > > Playing devil's advocate here, because I totally agree with
+> > > you...
+> > > 
+> > > Who's to say what's "normal"? It's a slippery slope when we start
+> > > making personal value judgments about which parts of the
+> > > architectural
+> > > specification are important and which aren't.
+> > 
+> > I agree, but in a very similar case Intel chose to take an erratum
+> > instead of
+> > fixing what was in all likelihood a microcode bug, i.e. could have
+> > been patched
+> > in the field.  So it's not _just_ personal value judgment, though
+> > it's definitely
+> > that too :-)
+> > 
+> > I'm not saying I'd actively oppose support for strict
+> > VMREAD/VMWRITE adherence
+> > to the vCPU model, but I'm also not going to advise anyone to go
+> > spend their time
+> > implementing a non-trivial fix for behavior that, AFAIK, doesn't
+> > adversely affect
+> > any real world use cases.
+> > 
+> 
+> Thank you all for the discussion, Sean & Jim.
+> 
+> Could we draw a conclusion to just keep KVM as it is now? If yes, how
+> about we
+> depricate the check against max index value from
+> MSR_IA32_VMX_VMCS_ENUM in vmx.c 
+> of the kvm-unit-test?
+> 
+> After all, we have not witnessed any real system doing so.
+> 
+> E.g.,
+> 
+> diff --git a/x86/vmx.c b/x86/vmx.c
+> index f0b853a..63623e5 100644
+> --- a/x86/vmx.c
+> +++ b/x86/vmx.c
+> @@ -380,8 +380,7 @@ static void test_vmwrite_vmread(void)
+>         vmcs_enum_max = (rdmsr(MSR_IA32_VMX_VMCS_ENUM) &
+> VMCS_FIELD_INDEX_MASK)
+>                         >> VMCS_FIELD_INDEX_SHIFT;
+>         max_index = find_vmcs_max_index();
+> -       report(vmcs_enum_max == max_index,
+> -              "VMX_VMCS_ENUM.MAX_INDEX expected: %x, actual: %x",
+> +       printf("VMX_VMCS_ENUM.MAX_INDEX expected: %x, actual: %x",
+>                max_index, vmcs_enum_max);
+> 
+>         assert(!vmcs_clear(vmcs));
+> 
+> B.R.
+> Yu
 
-Stating what the code literally does is not a helpful comment, as it doesn't
-help the reader understand _why_ preemption needs to be disabled.
+I think this patch series has its value of fixing the be-forced hard-
+code VMX_VMCS_ENUM.
+My understanding of Sean's "simply keeping KVM's current behavior, i.e.
+sweeping this under the proverbial rug", is about vmcs shadowing will
+fail some VMCS field validation. Of course, this in turn will fail some
+case of this KVM unit test case (theoretically), though we haven't met
+yet.
 
-> +	preempt_disable();
-> +	loaded = (vcpu->cpu != -1);
-> +	if (loaded)
-> +		kvm_arch_vcpu_put(vcpu);
 
-Oof.  Looks like this pattern was taken from arm64.  Is there really no better
-approach to handling this?  I don't see anything in kvm_riscv_reset_vcpu() that
-will obviously break if the vCPU is loaded.  If the goal is purely to effect a
-CSR reset via kvm_arch_vcpu_load(), then why not just factor out a helper to do
-exactly that?
-
->  
->  	memcpy(csr, reset_csr, sizeof(*csr));
->  
-> @@ -144,6 +151,11 @@ static void kvm_riscv_reset_vcpu(struct kvm_vcpu *vcpu)
->  
->  	WRITE_ONCE(vcpu->arch.irqs_pending, 0);
->  	WRITE_ONCE(vcpu->arch.irqs_pending_mask, 0);
-> +
-> +	/* Reset the guest CSRs for hotplug usecase */
-> +	if (loaded)
-> +		kvm_arch_vcpu_load(vcpu, smp_processor_id());
-
-If the preempt shenanigans really have to stay, at least use get_cpu()/put_cpu().
-
-> +	preempt_enable();
->  }
->  
->  int kvm_arch_vcpu_precreate(struct kvm *kvm, unsigned int id)
-> @@ -180,6 +192,13 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
->  
->  void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu)
->  {
-> +	/**
-> +	 * vcpu with id 0 is the designated boot cpu.
-> +	 * Keep all vcpus with non-zero cpu id in power-off state so that they
-> +	 * can brought to online using SBI HSM extension.
-> +	 */
-> +	if (vcpu->vcpu_idx != 0)
-> +		kvm_riscv_vcpu_power_off(vcpu);
-
-Why do this in postcreate?
-
->  }
->  
->  void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
-> diff --git a/arch/riscv/kvm/vcpu_sbi.c b/arch/riscv/kvm/vcpu_sbi.c
-> index dadee5e61a46..db54ef21168b 100644
-
-...
-
-> +static int kvm_sbi_hsm_vcpu_start(struct kvm_vcpu *vcpu)
-> +{
-> +	struct kvm_cpu_context *reset_cntx;
-> +	struct kvm_cpu_context *cp = &vcpu->arch.guest_context;
-> +	struct kvm_vcpu *target_vcpu;
-> +	unsigned long target_vcpuid = cp->a0;
-> +
-> +	target_vcpu = kvm_get_vcpu_by_id(vcpu->kvm, target_vcpuid);
-> +	if (!target_vcpu)
-> +		return -EINVAL;
-> +	if (!target_vcpu->arch.power_off)
-> +		return -EALREADY;
-> +
-> +	reset_cntx = &target_vcpu->arch.guest_reset_context;
-> +	/* start address */
-> +	reset_cntx->sepc = cp->a1;
-> +	/* target vcpu id to start */
-> +	reset_cntx->a0 = target_vcpuid;
-> +	/* private data passed from kernel */
-> +	reset_cntx->a1 = cp->a2;
-> +	kvm_make_request(KVM_REQ_VCPU_RESET, target_vcpu);
-> +
-> +	/* Make sure that the reset request is enqueued before power on */
-> +	smp_wmb();
-
-What does this pair with?  I suspect nothing, because AFAICT the code was taken
-from arm64.
-
-arm64 has the smp_wmb() in kvm_psci_vcpu_on() to ensure that the vCPU sees the
-request if the vCPU sees the change in vcpu->arch.power_off, and so has a
-smp_rmb() in kvm_reset_vcpu().
-
-Side topic, how much of arm64 and RISC-V is this similar?  Would it make sense
-to find some way for them to share code?
-
-> +	kvm_riscv_vcpu_power_on(target_vcpu);
-> +
-> +	return 0;
-> +}
-> +
-> +static int kvm_sbi_hsm_vcpu_stop(struct kvm_vcpu *vcpu)
-> +{
-> +	if ((!vcpu) || (vcpu->arch.power_off))
-
-Too many parentheses, and the NULL vCPU check is unnecessary.
-
-> +		return -EINVAL;
-> +
-> +	kvm_riscv_vcpu_power_off(vcpu);
-> +
-> +	return 0;
-> +}
-> +
