@@ -2,148 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A4A3142724D
-	for <lists+kvm@lfdr.de>; Fri,  8 Oct 2021 22:31:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 962DE427301
+	for <lists+kvm@lfdr.de>; Fri,  8 Oct 2021 23:24:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242602AbhJHUdd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Oct 2021 16:33:33 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34336 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S231684AbhJHUd1 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 8 Oct 2021 16:33:27 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 198KRTLT019995;
-        Fri, 8 Oct 2021 16:31:31 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=UA6q3jUaNN7g2IM6Ia2YJ9iu6qE7Ksg5WFSf4U8H6eo=;
- b=gTnko5evMKG4WAL7PiensrABoec1sJ2YOcjytmgPB+28UPGig9wVGbdR1JXn/81NN3L+
- +oa8EKxUQ9qhOQou4OJThPfzBgPNiC+kAAW4wWfZfLscE4k4NbCoZijiuu4uqVNKDnyn
- E0Cs76DxTwuAr2RxPNOebKb+eyd02YVZ5SIPPIg0kXytFtMIX+rqz0RB4PIApGSUstHm
- Yf1H3RHJQjArRzaH3+qdHbYuZuKDQBxo8IpL4WBrSZiGnYuwQtvbHzgLGieRF3WhjegL
- XFUIQvAgMm2bqKbEaRE0zrSYvMBPMnyM6i2r0PNJtTMCfjAybHnQhPVDbcnzvlMQbXFg 7g== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3bjueat6xn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 08 Oct 2021 16:31:31 -0400
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 198KTxS4000869;
-        Fri, 8 Oct 2021 16:31:31 -0400
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3bjueat6wx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 08 Oct 2021 16:31:30 -0400
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 198KMZRk014291;
-        Fri, 8 Oct 2021 20:31:29 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma03ams.nl.ibm.com with ESMTP id 3bef2b5j13-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 08 Oct 2021 20:31:29 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 198KVPiJ28639504
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 8 Oct 2021 20:31:25 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3559C4C052;
-        Fri,  8 Oct 2021 20:31:25 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1E4574C040;
-        Fri,  8 Oct 2021 20:31:25 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Fri,  8 Oct 2021 20:31:25 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 4958)
-        id 466A6E03A2; Fri,  8 Oct 2021 22:31:24 +0200 (CEST)
-From:   Eric Farman <farman@linux.ibm.com>
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Jason Herne <jjherne@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        Eric Farman <farman@linux.ibm.com>
-Subject: [RFC PATCH v1 6/6] KVM: s390: Add a routine for setting userspace CPU state
-Date:   Fri,  8 Oct 2021 22:31:12 +0200
-Message-Id: <20211008203112.1979843-7-farman@linux.ibm.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20211008203112.1979843-1-farman@linux.ibm.com>
-References: <20211008203112.1979843-1-farman@linux.ibm.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: Uchr0fwuZmDTZDLpefSf0seXm2BBWvMA
-X-Proofpoint-ORIG-GUID: QHRRlztsJ1iFFasi_pL--QSZp1WwomxH
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.391,FMLib:17.0.607.475
- definitions=2021-10-08_06,2021-10-07_02,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 suspectscore=0
- mlxlogscore=990 mlxscore=0 phishscore=0 malwarescore=0 spamscore=0
- impostorscore=0 adultscore=0 bulkscore=0 lowpriorityscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2109230001 definitions=main-2110080112
+        id S243439AbhJHV0w (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Oct 2021 17:26:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58896 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S243433AbhJHV0w (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Oct 2021 17:26:52 -0400
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6ABB5C061570
+        for <kvm@vger.kernel.org>; Fri,  8 Oct 2021 14:24:56 -0700 (PDT)
+Received: by mail-pj1-x1049.google.com with SMTP id 41-20020a17090a0fac00b00195a5a61ab8so6373959pjz.3
+        for <kvm@vger.kernel.org>; Fri, 08 Oct 2021 14:24:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=Ma1G3yGfaQwfzT4pbSLujND+YT1njLJT4i1NWl2m96k=;
+        b=YpdwbxBSlHG2gZaIJ7ZyLLppum7LpYnksIfaL1nL1ztYmaJP9z7r6h1Jwoy/nZKyoE
+         K0pvNtpfrm7ufN+YHhE3LjMx/2grUdWvvj6bYqGsncamqbldJqoycM6PPNVcS/pN61jE
+         3TeX/UGcdXiJEcjUTN0pGE1IEfhiYnkA5HsXeCdPBHB2dUvaU928vdLZ/+JfzizKyqKk
+         rlRGUf4En3q+9wv7A31D5QMeRaZRwd6Q6YQrQRVWf1DJyMYWi4bvc7sijA0X3LbtEwxg
+         kO3VRqlpiswMdZjJAheGH6x4xtkdwjJojsKa3HFkUuaBPHg2KEMa0F/QXEO3tNruvD8g
+         s2sA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=Ma1G3yGfaQwfzT4pbSLujND+YT1njLJT4i1NWl2m96k=;
+        b=8Imrc2S9SaaEkDXd6NpgJJThMMe7sx6RZZL19uEw6NgDEOKWKwh9O0+N+36uvqoTnL
+         ouACOLyHNcwc/TCAiI+4FsQB1m0sx9tnAP7Vejz2y8f0YmDGrx4t+oDrHWXp8Ug5AA1u
+         MUmY2IhpKWwXqR9WsUlseExjFd7JN+DQ9cZH5RGzA3jVIaSEnKSSa7lrCk03vaDLjEt0
+         2foGYBJjzNT9GeB/f40kS/Af/HldbxlIVI4tbT4TsW9/VywgiQBX4pfVXC6zrVCX39DN
+         o1Ri1s8O1M7muuozU9oHQaQ4VyQGBhbfaduhWiyags1jcneqWTdkW7/Wz77N0WWCVEJd
+         Z0fw==
+X-Gm-Message-State: AOAM533sL8ne0H0YW0b+10b+GCeIciYJVUr4P4WMXqOL5einmfCSK4rc
+        jA6Bki7EEVs9uoRT9TVCQ86AzD+T5c2XUa/i8QUFmR/tOWKsQzY1HGwuUJfgl6KZYp0rirR9W1Y
+        /L6sC7b/DPEjM36ZN2OQTuADHc0Yp+D6zl0HKSRQ/6uaIUh8as52VL0kaB8311rM=
+X-Google-Smtp-Source: ABdhPJz0kzEDmGHP0GCMC0gqYcmwmyOccAe2JAyUdO4mkMAFc5scMGA1f2yryNQ3uCYB4y6MBZ1Aypq7nlA0Kg==
+X-Received: from tortoise.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1a0d])
+ (user=jmattson job=sendgmr) by 2002:a17:902:a38b:b0:13d:9c41:92ec with SMTP
+ id x11-20020a170902a38b00b0013d9c4192ecmr11787785pla.39.1633728295821; Fri,
+ 08 Oct 2021 14:24:55 -0700 (PDT)
+Date:   Fri,  8 Oct 2021 14:24:44 -0700
+Message-Id: <20211008212447.2055660-1-jmattson@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.0.882.g93a45727a2-goog
+Subject: [kvm-unit-tests PATCH 0/3] Regression test for L1 LDTR persistence bug
+From:   Jim Mattson <jmattson@google.com>
+To:     kvm@vger.kernel.org
+Cc:     Jim Mattson <jmattson@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This capability exists, but we don't record anything when userspace
-enables it. Let's refactor that code so that a note can be made in
-the debug logs that it was enabled.
+In Linux commit afc8de0118be ("KVM: nVMX: Set LDTR to its
+architecturally defined value on nested VM-Exit"), Sean suggested that
+this bug was likely benign, but it turns out that--for us, at
+least--it can result in live migration failures. On restore, we call
+KVM_SET_SREGS before KVM_SET_NESTED_STATE, so when L2 is active at the
+time of save/restore, the target vmcs01 is temporarily populated with
+L2 values. Hence, the LDTR visible to L1 after the next emulated
+VM-exit is L2's, rather than its own.
 
-Signed-off-by: Eric Farman <farman@linux.ibm.com>
----
- arch/s390/kvm/kvm-s390.c | 6 +++---
- arch/s390/kvm/kvm-s390.h | 9 +++++++++
- 2 files changed, 12 insertions(+), 3 deletions(-)
+This issue is significant enough that it warrants a regression
+test. Unfortunately, at the moment, the best we can do is check for
+the LDTR persistence bug. I'd like to be able to trigger a
+save/restore from within the L2 guest, but AFAICT, there's no way to
+do that under qemu. Does anyone want to implement a qemu ISA test
+device that triggers a save/restore when its configured I/O port is
+written to?
 
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index 33d71fa42d68..48ac0bd05bee 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -2487,8 +2487,8 @@ long kvm_arch_vm_ioctl(struct file *filp,
- 	case KVM_S390_PV_COMMAND: {
- 		struct kvm_pv_cmd args;
- 
--		/* protvirt means user sigp */
--		kvm->arch.user_cpu_state_ctrl = 1;
-+		/* protvirt means user cpu state */
-+		kvm_s390_set_user_cpu_state_ctrl(kvm);
- 		r = 0;
- 		if (!is_prot_virt_host()) {
- 			r = -EINVAL;
-@@ -3801,7 +3801,7 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
- 	vcpu_load(vcpu);
- 
- 	/* user space knows about this interface - let it control the state */
--	vcpu->kvm->arch.user_cpu_state_ctrl = 1;
-+	kvm_s390_set_user_cpu_state_ctrl(vcpu->kvm);
- 
- 	switch (mp_state->mp_state) {
- 	case KVM_MP_STATE_STOPPED:
-diff --git a/arch/s390/kvm/kvm-s390.h b/arch/s390/kvm/kvm-s390.h
-index 57c5e9369d65..36f4d585513c 100644
---- a/arch/s390/kvm/kvm-s390.h
-+++ b/arch/s390/kvm/kvm-s390.h
-@@ -208,6 +208,15 @@ static inline int kvm_s390_user_cpu_state_ctrl(struct kvm *kvm)
- 	return kvm->arch.user_cpu_state_ctrl != 0;
- }
- 
-+static inline void kvm_s390_set_user_cpu_state_ctrl(struct kvm *kvm)
-+{
-+	if (kvm->arch.user_cpu_state_ctrl)
-+		return;
-+
-+	VM_EVENT(kvm, 3, "%s", "ENABLE: Userspace CPU state control");
-+	kvm->arch.user_cpu_state_ctrl = 1;
-+}
-+
- /* implemented in pv.c */
- int kvm_s390_pv_destroy_cpu(struct kvm_vcpu *vcpu, u16 *rc, u16 *rrc);
- int kvm_s390_pv_create_cpu(struct kvm_vcpu *vcpu, u16 *rc, u16 *rrc);
+Jim Mattson (3):
+  x86: Fix operand size for lldt
+  x86: Make set_gdt_entry usable in 64-bit mode
+  x86: Add a regression test for L1 LDTR persistence bug
+
+ lib/x86/desc.c      | 41 +++++++++++++++++++++++++++++++----------
+ lib/x86/desc.h      |  3 ++-
+ lib/x86/processor.h |  2 +-
+ x86/cstart64.S      |  1 +
+ x86/vmx_tests.c     | 39 +++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 74 insertions(+), 12 deletions(-)
+
 -- 
-2.25.1
+2.33.0.882.g93a45727a2-goog
 
