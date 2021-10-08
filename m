@@ -2,150 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DF922426529
-	for <lists+kvm@lfdr.de>; Fri,  8 Oct 2021 09:20:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E0A0A426533
+	for <lists+kvm@lfdr.de>; Fri,  8 Oct 2021 09:25:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231938AbhJHHWQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Oct 2021 03:22:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:57574 "EHLO
+        id S229693AbhJHH1e (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Oct 2021 03:27:34 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51668 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229490AbhJHHWP (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 8 Oct 2021 03:22:15 -0400
+        by vger.kernel.org with ESMTP id S232454AbhJHH1b (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 8 Oct 2021 03:27:31 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1633677620;
+        s=mimecast20190719; t=1633677936;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=rqC/5VAETazVyO6TNWaj66dbCj9XhYnOIWIpjNlIq7I=;
-        b=PkwXAOFuWPZN1/WdCUN+IpGjA+9xfFo6yDQHrSgUrX6lLKHvxxahTx/EmKebRUN16+5x3J
-        wKEpBEFi2KJjVh4DrMSyQFm1N+iIjFN4tu8hTO8cA/3qA/aq+XCkCrqefRW3Sn5uhRU1bV
-        IkGHcT1DW2k6HsCWPeK1hiURmzrm1DA=
+        bh=wrRRjHrMBPuEyYQ9nABVBskOpOCiCccfhJMKB+/G8Zw=;
+        b=Rbrg2MAE8Gh56SqG7CgVbecWbILF3t7z4PuCCz/buxH+zunqtVEVAZgoUy26B6JxTsXuMg
+        5K7bab8TXx8pvb4Vlc3m9TrgVn6m7BtG+YixDCVIvQ4ulspse97pXTqiY/9bsAU95O+tQw
+        SCNe3UVjyftDEogKPaeMlKSpfMb1s8w=
 Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
  [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-556-jPwwUFETNweeqehq9ZtaEg-1; Fri, 08 Oct 2021 03:20:07 -0400
-X-MC-Unique: jPwwUFETNweeqehq9ZtaEg-1
-Received: by mail-wr1-f71.google.com with SMTP id c2-20020adfa302000000b0015e4260febdso6539719wrb.20
-        for <kvm@vger.kernel.org>; Fri, 08 Oct 2021 00:20:07 -0700 (PDT)
+ us-mta-177-nrDJ7GNFM06NbR2nFBMkEg-1; Fri, 08 Oct 2021 03:25:35 -0400
+X-MC-Unique: nrDJ7GNFM06NbR2nFBMkEg-1
+Received: by mail-wr1-f71.google.com with SMTP id 75-20020adf82d1000000b00160cbb0f800so5812372wrc.22
+        for <kvm@vger.kernel.org>; Fri, 08 Oct 2021 00:25:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=rqC/5VAETazVyO6TNWaj66dbCj9XhYnOIWIpjNlIq7I=;
-        b=wa3oRCweKwUYu+CYNNyIRd/ETIzZ9E7+Xq0NsLvW5mUo8X0mv8Kp03LbqFbsub4Aq2
-         JsZdbGoqplag+yc8A1ncgAAmEaU1hceKd6J+Hzjh+MGAl2PCuqex7gcWcV4jG8d4GRnV
-         aUPMaawEp1aFNEZNR5NJN6JLE/j8Y4K6y9ThT8N43siSIiNexe9X9gbgSMggbQatDliY
-         RnahtOHECE0gWsxnQcl82bZiqYowtWTCmb4BWc2nHzMaI3TiuYM8/yByJHGA3V98TmgT
-         ThnLyaUtCiMwDp9Iq64E6Tl1MBxaBZ4l1FJQfBJtC4EyuuVHFzaxM8rBeR4t4UiGG0e/
-         waMw==
-X-Gm-Message-State: AOAM533Lym3gqvZ+icXFkRPIIno1fGOQmjTf1QqPHcwFKrZAiV4+TRpi
-        jguZvjbZ9mC0gVyxtOT2/eB5Vp3pjSvZZeL+l+xWfroG+L32ZmPxJYh83U+Od1n97SPUHXsFmqW
-        iZqRpPV6gyEM+
-X-Received: by 2002:adf:f6c1:: with SMTP id y1mr1986258wrp.172.1633677606418;
-        Fri, 08 Oct 2021 00:20:06 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx4jKSzfJVv6uoe0EHSmIxunSNd3S9zw3RdZ2AEWUZlmf9vr6835IAXGnldZEevqkJ0p6mUjA==
-X-Received: by 2002:adf:f6c1:: with SMTP id y1mr1986237wrp.172.1633677606223;
-        Fri, 08 Oct 2021 00:20:06 -0700 (PDT)
-Received: from thuth.remote.csb (nat-pool-str-t.redhat.com. [149.14.88.106])
-        by smtp.gmail.com with ESMTPSA id b19sm9105609wmb.1.2021.10.08.00.20.05
+        bh=wrRRjHrMBPuEyYQ9nABVBskOpOCiCccfhJMKB+/G8Zw=;
+        b=Zq0qYeptxWkaCxneOqmncJwRXWF1le48vHWvhpv785A/HVefOsRAPMSANVUYebbMtc
+         84Vif4oOxNmh7hfcCAk8YU5IHvR75vVYLiK4gupNvWdj7sMnPeE0JFNS6PGAGHyU8u+2
+         7Tj59y7SSIaw+oCeiDfeMi1bfbzxdkAAKkwGcOcbEzkaEjXvE62YsuIG0qpZ9eVqBL/t
+         pGMoFvGKBbRcKJW2sCPyxIvKAR5a+bWBKhIDQVz/WRkcYkJky17WUSlAVPe1DGjD3sjj
+         r6B8wOiLmxzHUVk2ksvsVwgS+8+5GKIyanh4B76Eo2Pl1C0iG78vrnzqzeeiwvCZfOAd
+         SgkQ==
+X-Gm-Message-State: AOAM531S84zGDGFbgupekWWYa/XSMp1ac9i71W5oaCNVNpdgjrwmeckx
+        7mOsMhMuhgcNqyAI4aWLZJsC0VCo8UQ7UC0ZWn+qqSNb06MKjeTNO10g2VHO7/8wXyP+vcE4Nh+
+        PPRZHsBIu0vfR
+X-Received: by 2002:a05:600c:4f42:: with SMTP id m2mr1623946wmq.151.1633677934627;
+        Fri, 08 Oct 2021 00:25:34 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJx459d2wlytshtk9NfSLWJYxGFmOB+upXoDoldpSkMwornUH6TcLSGnAaLaf9rS4XzkmXVfxw==
+X-Received: by 2002:a05:600c:4f42:: with SMTP id m2mr1623928wmq.151.1633677934392;
+        Fri, 08 Oct 2021 00:25:34 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id k9sm1554498wrz.22.2021.10.08.00.25.11
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 08 Oct 2021 00:20:05 -0700 (PDT)
-Subject: Re: [kvm-unit-tests PATCH v3 9/9] s390x: snippets: Define all things
- that are needed to link the lib
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
-        david@redhat.com, seiden@linux.ibm.com, scgl@linux.ibm.com
-References: <20211007085027.13050-1-frankja@linux.ibm.com>
- <20211007085027.13050-10-frankja@linux.ibm.com>
- <c3bed287-5c4c-a54b-4276-391c6cdb37f4@redhat.com>
- <8c1cac56-3f4b-5f00-4e62-d14aebbb537d@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-Message-ID: <bf94d76c-ee23-465e-1c2a-8c4ee1b006f7@redhat.com>
-Date:   Fri, 8 Oct 2021 09:20:04 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+        Fri, 08 Oct 2021 00:25:33 -0700 (PDT)
+Message-ID: <1616f9d2-5530-1266-6734-b5d64cb20658@redhat.com>
+Date:   Fri, 8 Oct 2021 09:24:58 +0200
 MIME-Version: 1.0
-In-Reply-To: <8c1cac56-3f4b-5f00-4e62-d14aebbb537d@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [PATCH v3 1/5] RISC-V: Mark the existing SBI v0.1 implementation
+ as legacy
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+To:     Atish Patra <atish.patra@wdc.com>, linux-kernel@vger.kernel.org
+Cc:     Anup Patel <anup.patel@wdc.com>,
+        Kefeng Wang <wangkefeng.wang@huawei.com>,
+        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
+        linux-riscv@lists.infradead.org,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Vincent Chen <vincent.chen@sifive.com>
+References: <20211008032036.2201971-1-atish.patra@wdc.com>
+ <20211008032036.2201971-2-atish.patra@wdc.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20211008032036.2201971-2-atish.patra@wdc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 07/10/2021 12.44, Janosch Frank wrote:
-> On 10/7/21 11:44, Thomas Huth wrote:
->> On 07/10/2021 10.50, Janosch Frank wrote:
->>> Let's just define all of the needed things so we can link libcflat.
->>>
->>> A significant portion of the lib won't work, like printing and
->>> allocation but we can still use things like memset() which already
->>> improves our lives significantly.
->>>
->>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->>> ---
->>>    s390x/snippets/c/cstart.S | 14 ++++++++++++++
->>>    1 file changed, 14 insertions(+)
->>>
->>> diff --git a/s390x/snippets/c/cstart.S b/s390x/snippets/c/cstart.S
->>> index 031a6b83..2d397669 100644
->>> --- a/s390x/snippets/c/cstart.S
->>> +++ b/s390x/snippets/c/cstart.S
->>> @@ -20,6 +20,20 @@ start:
->>>        lghi    %r15, stackptr
->>>        sam64
->>>        brasl    %r14, main
->>> +/*
->>> + * Defining things that the linker needs to link in libcflat and make
->>> + * them result in sigp stop if called.
->>> + */
->>> +.globl sie_exit
->>> +.globl sie_entry
->>> +.globl smp_cpu_setup_state
->>> +.globl ipl_args
->>> +.globl auxinfo
->>> +sie_exit:
->>> +sie_entry:
->>> +smp_cpu_setup_state:
->>> +ipl_args:
->>> +auxinfo:
->>
->> I think this likely could be done in a somewhat nicer way, e.g. by moving
+On 08/10/21 05:20, Atish Patra wrote:
+> The existing SBI specification impelementation follows v0.1 or legacy
+> specification. The latest specification known as v0.2 allows more
+> scalability and performance improvements.
 > 
-> Definitely, as I said, it's a simple fix
+> Rename the existing implementation as legacy and provide a way to allow
+> future extensions.
+> 
+> Signed-off-by: Atish Patra<atish.patra@wdc.com>
+> ---
+>   arch/riscv/include/asm/kvm_vcpu_sbi.h |  29 +++++
+>   arch/riscv/kvm/vcpu_sbi.c             | 149 ++++++++++++++++++++------
+>   2 files changed, 148 insertions(+), 30 deletions(-)
+>   create mode 100644 arch/riscv/include/asm/kvm_vcpu_sbi.h
 
-Alternatively, something like this might work, too:
+It's bikeshedding I know, but still: every time somebody calls something 
+"legacy", a kitten dies.  Please use kvm_sbi_ext_0_1_handler and 
+vcpu_sbi_ext_0_1.
 
-diff --git a/s390x/Makefile b/s390x/Makefile
---- a/s390x/Makefile
-+++ b/s390x/Makefile
-@@ -80,7 +80,7 @@ asmlib = $(TEST_DIR)/cstart64.o $(TEST_DIR)/cpu.o
-  FLATLIBS = $(libcflat)
-  
-  SNIPPET_DIR = $(TEST_DIR)/snippets
--snippet_asmlib = $(SNIPPET_DIR)/c/cstart.o
-+snippet_asmlib = $(SNIPPET_DIR)/c/cstart.o lib/auxinfo.o
-  
-  # perquisites (=guests) for the snippet hosts.
-  # $(TEST_DIR)/<snippet-host>.elf: snippets = $(SNIPPET_DIR)/<c/asm>/<snippet>.gbin
-diff --git a/s390x/snippets/c/cstart.S b/s390x/snippets/c/cstart.S
---- a/s390x/snippets/c/cstart.S
-+++ b/s390x/snippets/c/cstart.S
-@@ -21,5 +21,9 @@ start:
-         sam64
-         brasl   %r14, main
-         /* For now let's only use cpu 0 in snippets so this will always work. */
-+.global puts
-+.global exit
-+puts:
-+exit:
-         xgr     %r0, %r0
-         sigp    %r2, %r0, SIGP_STOP
-
-I think that's more clear this way, since we're fencing the
-functions that caused the dependencies to the other functions
-from your patch. What do you think?
-
-  Thomas
+Paolo
 
