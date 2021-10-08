@@ -2,137 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 86A924265D8
-	for <lists+kvm@lfdr.de>; Fri,  8 Oct 2021 10:23:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AF6F94265E8
+	for <lists+kvm@lfdr.de>; Fri,  8 Oct 2021 10:29:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233951AbhJHIY7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Oct 2021 04:24:59 -0400
-Received: from mga02.intel.com ([134.134.136.20]:36355 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233518AbhJHIY6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Oct 2021 04:24:58 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10130"; a="213603531"
-X-IronPort-AV: E=Sophos;i="5.85,357,1624345200"; 
-   d="scan'208";a="213603531"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Oct 2021 01:23:03 -0700
-X-IronPort-AV: E=Sophos;i="5.85,357,1624345200"; 
-   d="scan'208";a="489370029"
-Received: from lifanlin-mobl1.ccr.corp.intel.com (HELO localhost) ([10.255.31.40])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Oct 2021 01:22:59 -0700
-Date:   Fri, 8 Oct 2021 16:23:02 +0800
-From:   Yu Zhang <yu.c.zhang@linux.intel.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Jim Mattson <jmattson@google.com>
-Cc:     Robert Hoo <robert.hu@linux.intel.com>, pbonzini@redhat.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, joro@8bytes.org,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH v1 3/5] KVM: x86: nVMX: VMCS12 field's read/write
- respects field existence bitmap
-Message-ID: <20211008082302.txckaasmsystigeu@linux.intel.com>
-References: <0b94844844521fc0446e3df0aa02d4df183f8107.camel@linux.intel.com>
- <YTI7K9RozNIWXTyg@google.com>
- <64aad01b6bffd70fa3170cf262fe5d7c66f6b2d4.camel@linux.intel.com>
- <YVx6Oesi7X3jfnaM@google.com>
- <CALMp9eRyhAygfh1piNEDE+WGVzK1cTWJJR1aC_zqn=c2fy+c-A@mail.gmail.com>
- <YVySdKOWTXqU4y3R@google.com>
- <CALMp9eQvRYpZg+G7vMcaCq0HYPDfZVpPtDRO9bRa0w2fyyU9Og@mail.gmail.com>
- <YVy6gj2+XsghsP3j@google.com>
- <CALMp9eT+uAvPv7LhJKrJGDN31-aVy6DYBrP+PUDiTk0zWuCX4g@mail.gmail.com>
- <YVzeJ59/yCpqgTX2@google.com>
+        id S233716AbhJHIa6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Oct 2021 04:30:58 -0400
+Received: from mout.kundenserver.de ([212.227.17.10]:34665 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229868AbhJHIa5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Oct 2021 04:30:57 -0400
+Received: from mail-wr1-f52.google.com ([209.85.221.52]) by
+ mrelayeu.kundenserver.de (mreue107 [213.165.67.113]) with ESMTPSA (Nemesis)
+ id 1MkIAB-1n1oXt0bs1-00kjtT; Fri, 08 Oct 2021 10:29:00 +0200
+Received: by mail-wr1-f52.google.com with SMTP id r18so27281932wrg.6;
+        Fri, 08 Oct 2021 01:29:00 -0700 (PDT)
+X-Gm-Message-State: AOAM533Y+2nbKM6SJgkqoDRu8UwCxIdncqlCHuI/0AmT11OcJ38kt8/u
+        EYGODxaB51+iDNR22GENxxzX9xa7Q0rRT7609tI=
+X-Google-Smtp-Source: ABdhPJyBXhX12PpUH/38oXcC7qr2BYBPWQ5taeWZl0TIvVnaFmovsl1ju5x37gj8x61HAzSl9KvyaqVJ+2IwzjjJtjY=
+X-Received: by 2002:adf:a3da:: with SMTP id m26mr2249533wrb.336.1633681739740;
+ Fri, 08 Oct 2021 01:28:59 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YVzeJ59/yCpqgTX2@google.com>
-User-Agent: NeoMutt/20171215
+References: <20211008131649.01295541@canb.auug.org.au>
+In-Reply-To: <20211008131649.01295541@canb.auug.org.au>
+From:   Arnd Bergmann <arnd@arndb.de>
+Date:   Fri, 8 Oct 2021 10:28:43 +0200
+X-Gmail-Original-Message-ID: <CAK8P3a2h=DS=-xKc059YQg=K400kRUHHpJ=xyDPRW40D3ZsaTQ@mail.gmail.com>
+Message-ID: <CAK8P3a2h=DS=-xKc059YQg=K400kRUHHpJ=xyDPRW40D3ZsaTQ@mail.gmail.com>
+Subject: Re: linux-next: manual merge of the kvm tree with the asm-generic tree
+To:     Stephen Rothwell <sfr@canb.auug.org.au>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>, Anup Patel <anup.patel@wdc.com>,
+        Anup Patel <anup@brainfault.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Provags-ID: V03:K1:cO3gUc9t+xVLt/YFmZBBzbXujU8kFS4KLvTC3xr9KctFGUjmdlX
+ uLgIppT/EbulXUlhANavFjfJyWl5Ypqf+XvvqqslpH497JiCNYrRTvGirWpbLSWk2MdkpZL
+ qdMlPnolh5d1YE0kSFO4Tk6VpsM7Hzo5nKaV/bJWzloGWTRlLEMYwrGhp3Oa1RLO7t+ea5Y
+ WPQViijWrH5UDhlA/AZNg==
+X-Spam-Flag: NO
+X-UI-Out-Filterresults: notjunk:1;V03:K0:MqdWWM9NNSg=:1rqzRRiSLLV6wRpRhTbrQn
+ TAMADRrVJPUvSszf4zzk+hyzrJAR72mvTXR7pL8M3twTWcxMqEtTKObGBt2jYSQrk8nvPmXfB
+ DQi+/oriT1O+VXJcuCwFCDe/pPqHXS3XzKgPlpey+ufFWLLVObpa8iO4ne+jPnI1FShjrDHtc
+ 70AaQP+TugLbpQoNyKCMMyNzAb3pMQ54e/Cm+l1lN7gYlzLFOyyJqvwn3jL3mMJBaWYAFwqnF
+ odJBXVtIMz2pneGllEuvW3NsWIb+svOx44QkP+i+3BE24aBM4GiriKtlrN7srTWeZsrvsNcq9
+ 8zdXXrqLgwp8+iCTkRLEpYZJ3DRTKNtL6OoAmzVgilChi4TvtU3AZIFOM7tJ/pX3BHvTBq2vf
+ amVUJKd4VVAJ4wGFi22RAsV4TsMcEF8eKc1sCE8K1tIGcJqY2x27GwrAvJaEwNL4f1gcxXiDC
+ aG0oIUz5eF9bVWX+XflwZuvXyOdUXYqcAuY7N9nArwpBsNqMbjwxz586Xt/jE91cbtcLAnRkb
+ WBQd0n4sEh8rXKecxBbHgjLn7DDQP+/kABxA1nDsaU6pVFukUUOwy4rsmna6brl5nh1uOa5uQ
+ RKKk1C0LaFQSt9aTeEEq11gllDfcw4WKBG5vsdf20ekpWd50hLIsdN1RAgUyWVNxmnUYOynn+
+ QSh/R7MQjWOB3lsc8BKVGaDlThR4G6rC4II3860w4+PSlI6KMVGmUOLW5ptpYhFzH09NiiKAs
+ 5FgbJMzs2If2Czl3bwNygJq7kNqvbtOz7dX6P6+a/gmnGElS6lB1tQwRzu5Q40G+NkiPjm+6l
+ FLRa4j9pUea/VsZQ3x76+POnWyFCbYvm1oylp1LSK4wwHmuONBRJAdIeW7flLNYXusZ/hV1at
+ U8w6Xa5IBJfbJIPFxWjw==
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 05, 2021 at 11:22:15PM +0000, Sean Christopherson wrote:
-> On Tue, Oct 05, 2021, Jim Mattson wrote:
-> > On Tue, Oct 5, 2021 at 1:50 PM Sean Christopherson <seanjc@google.com> wrote:
-> > >
-> > > On Tue, Oct 05, 2021, Jim Mattson wrote:
-> > > > On Tue, Oct 5, 2021 at 10:59 AM Sean Christopherson <seanjc@google.com> wrote:
-> > > > >
-> > > > > On Tue, Oct 05, 2021, Jim Mattson wrote:
-> > > > > > On Tue, Oct 5, 2021 at 9:16 AM Sean Christopherson <seanjc@google.com> wrote:
-> > > > > > >
-> > > > > > > On Tue, Sep 28, 2021, Robert Hoo wrote:
-> > > > > > > > On Fri, 2021-09-03 at 15:11 +0000, Sean Christopherson wrote:
-> > > > > > > >       You also said, "This is quite the complicated mess for
-> > > > > > > > something I'm guessing no one actually cares about.  At what point do
-> > > > > > > > we chalk this up as a virtualization hole and sweep it under the rug?"
-> > > > > > > > -- I couldn't agree more.
-> > > > > > >
-> > > > > > > ...
-> > > > > > >
-> > > > > > > > So, Sean, can you help converge our discussion and settle next step?
-> > > > > > >
-> > > > > > > Any objection to simply keeping KVM's current behavior, i.e. sweeping this under
-> > > > > > > the proverbial rug?
-> > > > > >
-> > > > > > Adding 8 KiB per vCPU seems like no big deal to me, but, on the other
-> > > > > > hand, Paolo recently argued that slightly less than 1 KiB per vCPU was
-> > > > > > unreasonable for VM-exit statistics, so maybe I've got a warped
-> > > > > > perspective. I'm all for pedantic adherence to the specification, but
-> > > > > > I have to admit that no actual hypervisor is likely to care (or ever
-> > > > > > will).
-> > > > >
-> > > > > It's not just the memory, it's also the complexity, e.g. to get VMCS shadowing
-> > > > > working correctly, both now and in the future.
-> > > >
-> > > > As far as CPU feature virtualization goes, this one doesn't seem that
-> > > > complex to me. It's not anywhere near as complex as virtualizing MTF,
-> > > > for instance, and KVM *claims* to do that! :-)
-> > >
-> > > There aren't many things as complex as MTF.  But unlike MTF, this behavior doesn't
-> > > have a concrete use case to justify the risk vs. reward.  IMO the odds of us breaking
-> > > something in KVM for "normal" use cases are higher than the odds of an L1 VMM breaking
-> > > because a VMREAD/VMWRITE didn't fail when it technically should have failed.
-> > 
-> > Playing devil's advocate here, because I totally agree with you...
-> > 
-> > Who's to say what's "normal"? It's a slippery slope when we start
-> > making personal value judgments about which parts of the architectural
-> > specification are important and which aren't.
-> 
-> I agree, but in a very similar case Intel chose to take an erratum instead of
-> fixing what was in all likelihood a microcode bug, i.e. could have been patched
-> in the field.  So it's not _just_ personal value judgment, though it's definitely
-> that too :-)
-> 
-> I'm not saying I'd actively oppose support for strict VMREAD/VMWRITE adherence
-> to the vCPU model, but I'm also not going to advise anyone to go spend their time
-> implementing a non-trivial fix for behavior that, AFAIK, doesn't adversely affect
-> any real world use cases.
-> 
+On Fri, Oct 8, 2021 at 4:17 AM Stephen Rothwell <sfr@canb.auug.org.au> wrote:
+>
+> Hi all,
+>
+> Today's linux-next merge of the kvm tree got a conflict in:
+>
+>   arch/riscv/Kconfig
+>
+> between commit:
+>
+>   b63dc8f2b02c ("firmware: include drivers/firmware/Kconfig unconditionally")
+>
+> from the asm-generic tree and commit:
+>
+>   99cdc6c18c2d ("RISC-V: Add initial skeletal KVM support")
+>
+> from the kvm tree.
+>
+> I fixed it up (see below) and can carry the fix as necessary. This
+> is now fixed as far as linux-next is concerned, but any non trivial
+> conflicts should be mentioned to your upstream maintainer when your tree
+> is submitted for merging.  You may also want to consider cooperating
+> with the maintainer of the conflicting tree to minimise any particularly
+> complex conflicts.
 
-Thank you all for the discussion, Sean & Jim.
+Looks good, thanks!
 
-Could we draw a conclusion to just keep KVM as it is now? If yes, how about we
-depricate the check against max index value from MSR_IA32_VMX_VMCS_ENUM in vmx.c 
-of the kvm-unit-test?
+I'm planning to send the commit in the asm-generic tree to mainline
+today, so it will then be a conflict against 5.15.
 
-After all, we have not witnessed any real system doing so.
-
-E.g.,
-
-diff --git a/x86/vmx.c b/x86/vmx.c
-index f0b853a..63623e5 100644
---- a/x86/vmx.c
-+++ b/x86/vmx.c
-@@ -380,8 +380,7 @@ static void test_vmwrite_vmread(void)
-        vmcs_enum_max = (rdmsr(MSR_IA32_VMX_VMCS_ENUM) & VMCS_FIELD_INDEX_MASK)
-                        >> VMCS_FIELD_INDEX_SHIFT;
-        max_index = find_vmcs_max_index();
--       report(vmcs_enum_max == max_index,
--              "VMX_VMCS_ENUM.MAX_INDEX expected: %x, actual: %x",
-+       printf("VMX_VMCS_ENUM.MAX_INDEX expected: %x, actual: %x",
-               max_index, vmcs_enum_max);
-
-        assert(!vmcs_clear(vmcs));
-
-B.R.
-Yu
+       Arnd
