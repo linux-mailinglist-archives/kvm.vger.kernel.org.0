@@ -2,59 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5B5B942724C
-	for <lists+kvm@lfdr.de>; Fri,  8 Oct 2021 22:31:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 98FB142724A
+	for <lists+kvm@lfdr.de>; Fri,  8 Oct 2021 22:31:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242508AbhJHUdc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Oct 2021 16:33:32 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:15384 "EHLO
+        id S242304AbhJHUdb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Oct 2021 16:33:31 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:31660 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231676AbhJHUd1 (ORCPT
+        by vger.kernel.org with ESMTP id S231727AbhJHUd1 (ORCPT
         <rfc822;kvm@vger.kernel.org>); Fri, 8 Oct 2021 16:33:27 -0400
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 198KRHCA022477;
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 198KRLKm005256;
         Fri, 8 Oct 2021 16:31:31 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=2nXIb1u4kqUeETeWflUlMEE7hZXglSDxhoEGVS8xNdQ=;
- b=n1icevd2190cYy7RyOQxq+gjGME3RQuZlChrbdj7CritlwdL14LlASY9s0cUDW9cTNdY
- kWHoPIMElTIcasMR0ie7wkXlQLXQvNjxDT47KbNyr9deVTRAQH88gwd9VVlPdRpqGKz2
- lfQOfWQfUf7TBpVp4WcwME28eeNh2CyfxWwUxTXQWSf7OWIOcTgfg0rZ09Dlolym4eOm
- xjFyZmbK1exSxLmkZ6uRlW+fiiqnvK3QNHct+UNlS34bIY5nRSfgQcgulEMirs8hX/Kc
- MD8zV1AJMpPghBmUoUA/hSW4HalhxNd6vrbhfRtS3kQm9kcb4I+i++nyW3QPtnnPmkZr Tg== 
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=pp1;
+ bh=uHpyvHqjwJ8IYZVsiMIsYPtYhbbZRSqkxRJzIWRN7vU=;
+ b=NWAB1ghH9vf5tsfGqnH+PdokC1FDc/kVbD2BD4RSdxQhbzySQnNAO+kzVCMtJvPq590R
+ RqWH9tO3Wyu6rFW6dcs3y0DiRrv6ruN+OrjZ6LKuUzqKZDQokqXlz7zGhb1e/cK+zwOy
+ Pjt6X+3PiAJRtDYEwrPkEF6K3wGA4/v33XUabwpYTAjuzEtTTlkNg4tjtcHf/5chwPen
+ xoNjtVscAr5bt3qqAcH6yHHy81lapa1MK858JFpR1zqvEPR3oWAVBW8zSoQDS2F9zJAB
+ pveGgi1oh1t8TCxWfZEEGG+Zl1/x3fYkhvSlOg1UVeV8KXuLv6g89XyzVJQExZ/xjPyQ lw== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3bjvtd0cew-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3bjvcagwec-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Fri, 08 Oct 2021 16:31:31 -0400
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 198KTEfR030371;
-        Fri, 8 Oct 2021 16:31:30 -0400
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3bjvtd0ce8-1
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 198KRI8r005205;
+        Fri, 8 Oct 2021 16:31:31 -0400
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3bjvcagwdr-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Fri, 08 Oct 2021 16:31:30 -0400
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 198KMZW9007062;
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 198KMqCf004726;
         Fri, 8 Oct 2021 20:31:28 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma04fra.de.ibm.com with ESMTP id 3bef2b194r-1
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma06fra.de.ibm.com with ESMTP id 3beepkhfbw-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Fri, 08 Oct 2021 20:31:28 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 198KVOWw23331190
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 198KVO2Q60228044
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 8 Oct 2021 20:31:25 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CC462A405E;
-        Fri,  8 Oct 2021 20:31:24 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B4434A4057;
+        Fri, 8 Oct 2021 20:31:24 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A85F752065;
         Fri,  8 Oct 2021 20:31:24 +0000 (GMT)
 Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTPS id 9C0DE5205A;
         Fri,  8 Oct 2021 20:31:24 +0000 (GMT)
 Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 4958)
-        id 37CCFE0291; Fri,  8 Oct 2021 22:31:24 +0200 (CEST)
+        id 3A08DE032A; Fri,  8 Oct 2021 22:31:24 +0200 (CEST)
 From:   Eric Farman <farman@linux.ibm.com>
 To:     Christian Borntraeger <borntraeger@de.ibm.com>,
         Janosch Frank <frankja@linux.ibm.com>,
@@ -66,59 +64,83 @@ To:     Christian Borntraeger <borntraeger@de.ibm.com>,
         Jason Herne <jjherne@linux.ibm.com>
 Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
         Eric Farman <farman@linux.ibm.com>
-Subject: [RFC PATCH v1 0/6] Improvements to SIGP handling [KVM]
-Date:   Fri,  8 Oct 2021 22:31:06 +0200
-Message-Id: <20211008203112.1979843-1-farman@linux.ibm.com>
+Subject: [RFC PATCH v1 1/6] KVM: s390: Simplify SIGP Set Arch handling
+Date:   Fri,  8 Oct 2021 22:31:07 +0200
+Message-Id: <20211008203112.1979843-2-farman@linux.ibm.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20211008203112.1979843-1-farman@linux.ibm.com>
+References: <20211008203112.1979843-1-farman@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: MQPAnh8QzpziDzpFoClm2B7SGideyjbk
-X-Proofpoint-GUID: -Fi84ocyextRGjmg0EQyBJPyDa79Cclp
+X-Proofpoint-ORIG-GUID: pYCpqghDSiebbWvHwvSlz1HiJFrX53wf
+X-Proofpoint-GUID: KfGNC0xgXfGoH2QjCzMICnGE90cVJD-e
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.391,FMLib:17.0.607.475
  definitions=2021-10-08_06,2021-10-07_02,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 lowpriorityscore=0
- suspectscore=0 impostorscore=0 phishscore=0 bulkscore=0 malwarescore=0
- spamscore=0 adultscore=0 mlxlogscore=999 priorityscore=1501 clxscore=1015
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2109230001
- definitions=main-2110080112
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 spamscore=0
+ priorityscore=1501 mlxlogscore=999 adultscore=0 malwarescore=0
+ suspectscore=0 bulkscore=0 phishscore=0 impostorscore=0 clxscore=1015
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2109230001 definitions=main-2110080112
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-I'm cleaning up some of the SIGP code in KVM and QEMU,
-and would like to propose the following changes.
+The Principles of Operations describe the various reasons that
+each individual SIGP orders might be rejected, and the status
+bit that are set for each condition.
 
-Patch 1 is interesting and could use some discussion, in that
-CZAM cannot be disabled with QEMU (it is present in the earliest
-CPU models) but the CPU model interface _could_ allow userspace
-to leave it out. On the other (other?) hand, since we are always
-in z/Architecture, that wouldn't make much sense as there would
-probably be some other interesting side effects.
+For example, for the Set Architecture order, it states:
 
-Patch 6 isn't required, but as I was looking at the intersection
-of KVM capabilities S390_USER_SIGP and MP_STATE for this,
-I thought some footprints could be useful.
+  "If it is not true that all other CPUs in the configu-
+   ration are in the stopped or check-stop state, ...
+   bit 54 (incorrect state) ... is set to one."
 
-There is no dependency on QEMU code, however another series of
-patches for QEMU will follow.
+However, it also states:
 
-Eric Farman (6):
-  KVM: s390: Simplify SIGP Set Arch handling
-  KVM: s390: Reject SIGP when destination CPU is busy
-  KVM: s390: Simplify SIGP Restart
-  KVM: s390: Restart IRQ should also block SIGP
-  KVM: s390: Give BUSY to SIGP SENSE during Restart
-  KVM: s390: Add a routine for setting userspace CPU state
+  "... if the CZAM facility is installed, ...
+   bit 55 (invalid parameter) ... is set to one."
 
- arch/s390/include/asm/kvm_host.h |  1 +
- arch/s390/kvm/interrupt.c        |  7 +++
- arch/s390/kvm/kvm-s390.c         |  7 +--
- arch/s390/kvm/kvm-s390.h         | 10 ++++
- arch/s390/kvm/sigp.c             | 86 +++++++++++++++++++++++---------
- 5 files changed, 85 insertions(+), 26 deletions(-)
+Since the Configuration-z/Architecture-Architectural Mode (CZAM)
+facility is unconditionally presented, there is no need to examine
+each VCPU to determine if it is started/stopped. It can simply be
+rejected outright with the Invalid Parameter bit.
 
+Fixes: b697e435aeee ("KVM: s390: Support Configuration z/Architecture Mode")
+Signed-off-by: Eric Farman <farman@linux.ibm.com>
+---
+ arch/s390/kvm/sigp.c | 14 +-------------
+ 1 file changed, 1 insertion(+), 13 deletions(-)
+
+diff --git a/arch/s390/kvm/sigp.c b/arch/s390/kvm/sigp.c
+index 683036c1c92a..cf4de80bd541 100644
+--- a/arch/s390/kvm/sigp.c
++++ b/arch/s390/kvm/sigp.c
+@@ -151,22 +151,10 @@ static int __sigp_stop_and_store_status(struct kvm_vcpu *vcpu,
+ static int __sigp_set_arch(struct kvm_vcpu *vcpu, u32 parameter,
+ 			   u64 *status_reg)
+ {
+-	unsigned int i;
+-	struct kvm_vcpu *v;
+-	bool all_stopped = true;
+-
+-	kvm_for_each_vcpu(i, v, vcpu->kvm) {
+-		if (v == vcpu)
+-			continue;
+-		if (!is_vcpu_stopped(v))
+-			all_stopped = false;
+-	}
+-
+ 	*status_reg &= 0xffffffff00000000UL;
+ 
+ 	/* Reject set arch order, with czam we're always in z/Arch mode. */
+-	*status_reg |= (all_stopped ? SIGP_STATUS_INVALID_PARAMETER :
+-					SIGP_STATUS_INCORRECT_STATE);
++	*status_reg |= SIGP_STATUS_INVALID_PARAMETER;
+ 	return SIGP_CC_STATUS_STORED;
+ }
+ 
 -- 
 2.25.1
 
