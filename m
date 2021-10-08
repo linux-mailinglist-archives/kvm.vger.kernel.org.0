@@ -2,226 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1F2FD4270F5
-	for <lists+kvm@lfdr.de>; Fri,  8 Oct 2021 20:50:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 608F4427126
+	for <lists+kvm@lfdr.de>; Fri,  8 Oct 2021 21:03:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231372AbhJHSwO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Oct 2021 14:52:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51052 "EHLO
+        id S231342AbhJHTFY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Oct 2021 15:05:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54152 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231246AbhJHSwN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Oct 2021 14:52:13 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05C1DC061570
-        for <kvm@vger.kernel.org>; Fri,  8 Oct 2021 11:50:18 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id k23so8298363pji.0
-        for <kvm@vger.kernel.org>; Fri, 08 Oct 2021 11:50:18 -0700 (PDT)
+        with ESMTP id S231433AbhJHTFU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Oct 2021 15:05:20 -0400
+Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2D7BC061755
+        for <kvm@vger.kernel.org>; Fri,  8 Oct 2021 12:03:23 -0700 (PDT)
+Received: by mail-pg1-x52d.google.com with SMTP id h3so3974745pgb.7
+        for <kvm@vger.kernel.org>; Fri, 08 Oct 2021 12:03:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=0fpHrUPXlOA4fBSknvP83s+OLuwQQT7fukcrA9l/60o=;
-        b=pBP5kSzEBUhhSjI4s+hr9Flwb4xtySPHX5jFps9CWgUlGPl5w2y0lvmbFzLUdoJW9F
-         MxQ10BUoxO6yfwBAhfDJsBMXAvqBaRd8eV4m1+5G582aRqO/6N5xKQF1qvhK4JuklmKd
-         TQgeYC3O8NF8VB6OIMHVNz0F/IiG/2HOIc7sgJA5xEnPnMy8dI3KRczGUffc1H8v+P3U
-         Q+JTY32OQppDwXVR2PX3mQBMqcw9CBCSgB2jRDViWrvRcKubrLAZY3n6g4w29KNwESgF
-         C6C2nH2NwwRke34cu2BjPgpKQKBs9QJPw0vlPd0WD4ibt82EiVjlQpcetxMdCTa61MCx
-         9DTQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=oNdarxBooEw49lOrQDkWJsFHINdfUOwPGFjoZVjB6JY=;
+        b=pQhiuqG89VNlkxT+bp9+XkUj5SluTR0+dU5Tlv/iOpIybqiv8V8QlMI1pDRCQShvCq
+         G9ElIfSbhg3lI1aYL+P0EnfXW7RQURDWe7xnFZh1MKB1i4Wlg1a3AozYscpHyMSl5VwR
+         /IWtHCq/nU+jqunOf/uLQxwosX+Dso6VQMvkgYPf0c3Njy1NZOK2s/dDo+xvqnJDOLhM
+         9MPhHHVKvxQxn1f8pDHK94wp3ZF1xN4jKOraQ0wGsENrZfy3Q/PKCKuQRhqyi/2YHEej
+         owVO7hTd9YkzgB/ZC6Oj1ZidJuKwIxX4QQth2tOh5uz9gq7A8LE7v5Tme86rj0/Ygcwl
+         d9Uw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=0fpHrUPXlOA4fBSknvP83s+OLuwQQT7fukcrA9l/60o=;
-        b=kKw5nfmb8neSjQW4vwUnrABN1vfC84DHHDUxEqx7Ic5Bcl47u+wFTlH8cwW4ImcaD1
-         V/N6ZDrSV2/Fv2wxCZ3/2aC07WKWFWPJz6C6MhZXDLjMSjlsT09589TL8pzbvkrc0H1w
-         N/HSrLEorxN0FEIGfEXxPjfzBYDpxHBG9ZzMZd5KNqtfOVKELmbZraiLCaox7kuhrR1N
-         xhV8iZ9QS+ra+x9fpylLqSTYGV/ErY9+XbwD4GIPIgsxaFyRp7Ng/0WAdVOKRmoJrVrY
-         D+k0HVAJ1Cxoy9sQAfFr8eCM46K8FlV5hG8u8G1ohU7PpPRwP1YQV6T4PWWyE2MTOa+W
-         k0+A==
-X-Gm-Message-State: AOAM5332C9nkFuHa0Pvq7khTMiioGrNgx4wjUchXnaHkf0CfvVS/rPMl
-        DTQPhhVNVHXYWBO7cdVDI6j5hg==
-X-Google-Smtp-Source: ABdhPJyZJQOigiD5cwSMloJzspRTxApaIoBEilWJec15yjnQOhJRK5gGmYJsCizDmTe7k2omgRk7LQ==
-X-Received: by 2002:a17:90a:353:: with SMTP id 19mr13618303pjf.83.1633719017269;
-        Fri, 08 Oct 2021 11:50:17 -0700 (PDT)
-Received: from google.com (150.12.83.34.bc.googleusercontent.com. [34.83.12.150])
-        by smtp.gmail.com with ESMTPSA id a17sm99835pfd.54.2021.10.08.11.50.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Oct 2021 11:50:16 -0700 (PDT)
-Date:   Fri, 8 Oct 2021 11:50:13 -0700
-From:   Ricardo Koller <ricarkol@google.com>
-To:     Andrew Jones <drjones@redhat.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH] arm64: Add mmio_addr arg to
- arm/micro-bench
-Message-ID: <YWCS5QB6QFeYeiJg@google.com>
-References: <20211007183230.2637929-1-ricarkol@google.com>
- <20211008062855.3g34sxevl6w3gn6h@gator.home>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=oNdarxBooEw49lOrQDkWJsFHINdfUOwPGFjoZVjB6JY=;
+        b=P9JzFB7FenArK2EUaWpEbWNhh6itQGkWDDA94zbO1oFF9ErtroidoQXmW8kBmgNgd9
+         scSF1j00IAnilmbJTzqQ7B1LwDU0C32vZlM/PYYRvs75dDGN0ZxXW1GPwzSxQ6pqds8J
+         Vcd+XGGiaJlRvlROQliPV0ZhoMcBPBt+Tz+SyxwGtpyBrBlDwz3gVNya0SZlG10XlHah
+         HV53qfAvPmaDUznj6UmUj6iGwto4E+T8LyIfqoWnXBENOL7/3GkU/P6OmCPcfJ/wHdMt
+         YsCvhNqwqjom7uLcMU2RXv8fa1cyLqilNIa1dXxXHma/W+RvybhU/Wr2ALVMEG4AYdHY
+         ZBSA==
+X-Gm-Message-State: AOAM530d0KAzmoL+h7HHII8KiWMZuMOBQSC5pJY7AbKKx00qSkDPPoAp
+        KLukBsaTpkHdUii1IVYnAVkQMafNASNkuBahP1kQiQ==
+X-Google-Smtp-Source: ABdhPJyuf8H30MNhst+1XUSSr6oT+IFsy1XY5RoBYommFm/Ep8eGVuIKC5U90xi2YVmbf9YmaKH0m9RTObE/yDJpkHI=
+X-Received: by 2002:a05:6a00:1586:b0:447:b30c:4a65 with SMTP id
+ u6-20020a056a00158600b00447b30c4a65mr11858150pfk.0.1633719803151; Fri, 08 Oct
+ 2021 12:03:23 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211008062855.3g34sxevl6w3gn6h@gator.home>
+References: <20211005234459.430873-1-michael.roth@amd.com> <20211006203617.13045-1-michael.roth@amd.com>
+In-Reply-To: <20211006203617.13045-1-michael.roth@amd.com>
+From:   Nathan Tempelman <natet@google.com>
+Date:   Fri, 8 Oct 2021 12:03:12 -0700
+Message-ID: <CAKiEG5rPhDgsVPcZV=DrjJNPk6qy9yVC1ZDdxo6VajnUgp3iRg@mail.gmail.com>
+Subject: Re: [RFC 04/16] KVM: selftests: set CPUID before setting sregs in
+ vcpu creation
+To:     Michael Roth <michael.roth@amd.com>
+Cc:     linux-kselftest@vger.kernel.org, kvm <kvm@vger.kernel.org>,
+        linux-kernel@vger.kernel.org, x86@kernel.org,
+        Marc Orr <marcorr@google.com>,
+        Steve Rutherford <srutherford@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Mingwei Zhang <mizhang@google.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Varad Gautam <varad.gautam@suse.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        Ricardo Koller <ricarkol@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H . Peter Anvin" <hpa@zytor.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 08, 2021 at 08:28:55AM +0200, Andrew Jones wrote:
-> On Thu, Oct 07, 2021 at 11:32:30AM -0700, Ricardo Koller wrote:
-> > Add a command line arg to arm/micro-bench to set the mmio_addr to other
-> > values besides the default QEMU one. Default to the QEMU value if no arg
-> > is passed. Also, the <NUM> in mmio_addr=<NUM> can't be a hex.
-> 
-> I'll send this patch
-> 
-> diff --git a/lib/util.c b/lib/util.c
-> index a90554138952..682ca2db09e6 100644
-> --- a/lib/util.c
-> +++ b/lib/util.c
-> @@ -4,6 +4,7 @@
->   * This work is licensed under the terms of the GNU LGPL, version 2.
->   */
->  #include <libcflat.h>
-> +#include <stdlib.h>
->  #include "util.h"
->  
->  int parse_keyval(char *s, long *val)
-> @@ -14,6 +15,6 @@ int parse_keyval(char *s, long *val)
->         if (!p)
->                 return -1;
->  
-> -       *val = atol(p+1);
-> +       *val = strtol(p+1, NULL, 0);
->         return p - s;
+On Wed, Oct 6, 2021 at 1:39 PM Michael Roth <michael.roth@amd.com> wrote:
+>
+> Recent kernels have checks to ensure the GPA values in special-purpose
+> registers like CR3 are within the maximum physical address range and
+> don't overlap with anything in the upper/reserved range. In the case of
+> SEV kselftest guests booting directly into 64-bit mode, CR3 needs to be
+> initialized to the GPA of the page table root, with the encryption bit
+> set. The kernel accounts for this encryption bit by removing it from
+> reserved bit range when the guest advertises the bit position via
+> KVM_SET_CPUID*, but kselftests currently call KVM_SET_SREGS as part of
+> vm_vcpu_add_default(), *prior* to vCPU creation, so there's no
+> opportunity to call KVM_SET_CPUID* in advance. As a result,
+> KVM_SET_SREGS will return an error in these cases.
+>
+> Address this by moving vcpu_set_cpuid() (which calls KVM_SET_CPUID*)
+> ahead of vcpu_setup() (which calls KVM_SET_SREGS).
+>
+> While there, address a typo in the assertion that triggers when
+> KVM_SET_SREGS fails.
+>
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Michael Roth <michael.roth@amd.com>
+> ---
+>  tools/testing/selftests/kvm/lib/kvm_util.c         | 2 +-
+>  tools/testing/selftests/kvm/lib/x86_64/processor.c | 4 +---
+>  2 files changed, 2 insertions(+), 4 deletions(-)
+>
+> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> index ef88fdc7e46b..646cffd86d09 100644
+> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> @@ -1906,7 +1906,7 @@ void vcpu_sregs_get(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_sregs *sregs)
+>  void vcpu_sregs_set(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_sregs *sregs)
+>  {
+>         int ret = _vcpu_sregs_set(vm, vcpuid, sregs);
+> -       TEST_ASSERT(ret == 0, "KVM_RUN IOCTL failed, "
+> +       TEST_ASSERT(ret == 0, "KVM_SET_SREGS IOCTL failed, "
+>                 "rc: %i errno: %i", ret, errno);
 >  }
-> 
-> 
-> which ought to improve that.
-> 
-
-Nice! thanks, just sent a V2 that uses it.
-
-> > 
-> > Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> > ---
-> >  arm/micro-bench.c | 33 +++++++++++++++++++++++++++------
-> >  1 file changed, 27 insertions(+), 6 deletions(-)
-> > 
-> > diff --git a/arm/micro-bench.c b/arm/micro-bench.c
-> > index 8e1d4ab..2c08813 100644
-> > --- a/arm/micro-bench.c
-> > +++ b/arm/micro-bench.c
-> > @@ -19,16 +19,19 @@
-> >   * This work is licensed under the terms of the GNU LGPL, version 2.
-> >   */
-> >  #include <libcflat.h>
-> > +#include <util.h>
-> >  #include <asm/gic.h>
-> >  #include <asm/gic-v3-its.h>
-> >  #include <asm/timer.h>
-> >  
-> > -#define NS_5_SECONDS (5 * 1000 * 1000 * 1000UL)
-> > +#define NS_5_SECONDS		(5 * 1000 * 1000 * 1000UL)
-> > +#define QEMU_MMIO_ADDR		0x0a000008
-> >  
-> >  static u32 cntfrq;
-> >  
-> >  static volatile bool irq_ready, irq_received;
-> >  static int nr_ipi_received;
-> > +static unsigned long mmio_addr = QEMU_MMIO_ADDR;
-> >  
-> >  static void *vgic_dist_base;
-> >  static void (*write_eoir)(u32 irqstat);
-> > @@ -278,12 +281,10 @@ static void *userspace_emulated_addr;
-> >  static bool mmio_read_user_prep(void)
-> >  {
-> >  	/*
-> > -	 * FIXME: Read device-id in virtio mmio here in order to
-> > -	 * force an exit to userspace. This address needs to be
-> > -	 * updated in the future if any relevant changes in QEMU
-> > -	 * test-dev are made.
-> 
-> I think the FIXME is still relavent, even with the user given control over
-> the address. The FIXME text could be improved though, because it's not
-> clear what it's trying to say, which is
-> 
+>
+> diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> index 0bbd88fe1127..1ab4c20f5d12 100644
+> --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> @@ -660,6 +660,7 @@ void vm_vcpu_add_default(struct kvm_vm *vm, uint32_t vcpuid, void *guest_code)
+>
+>         /* Create VCPU */
+>         vm_vcpu_add(vm, vcpuid);
+> +       vcpu_set_cpuid(vm, vcpuid, kvm_get_supported_cpuid());
+>         vcpu_setup(vm, vcpuid);
+>
+>         /* Setup guest general purpose registers */
+> @@ -672,9 +673,6 @@ void vm_vcpu_add_default(struct kvm_vm *vm, uint32_t vcpuid, void *guest_code)
+>         /* Setup the MP state */
+>         mp_state.mp_state = 0;
+>         vcpu_set_mp_state(vm, vcpuid, &mp_state);
+> -
+> -       /* Setup supported CPUIDs */
+> -       vcpu_set_cpuid(vm, vcpuid, kvm_get_supported_cpuid());
+>  }
+>
 >  /*
->   * FIXME: We need an MMIO address that we can safely read to test
->   * exits to userspace. Ideally, the test-dev would provide us this
->   * address (and one we could write to too), but until it does we
->   * use a virtio-mmio transport address. FIXME2: We should be getting
->   * this address (and the future test-dev address) from the devicetree,
->   * but so far we lazily hardcode it.
->   */
+> --
+> 2.25.1
 >
 
-ACK
-
-> > +	 * Read device-id in virtio mmio here in order to
-> > +	 * force an exit to userspace.
-> >  	 */
-> > -	userspace_emulated_addr = (void*)ioremap(0x0a000008, sizeof(u32));
-> > +	userspace_emulated_addr = (void *)ioremap(mmio_addr, sizeof(u32));
-> >  	return true;
-> >  }
-> >  
-> > @@ -378,10 +379,30 @@ static void loop_test(struct exit_test *test)
-> >  		test->name, total_ns.ns, total_ns.ns_frac, avg_ns.ns, avg_ns.ns_frac);
-> >  }
-> >  
-> > +static void parse_args(int argc, char **argv)
-> > +{
-> > +	int i, len;
-> > +	long val;
-> > +
-> > +	for (i = 0; i < argc; ++i) {
->                  ^ should be 1, since we know argv[0] is prognam
-> 
-
-ACK
-
-> > +		len = parse_keyval(argv[i], &val);
-> > +		if (len == -1)
-> > +			continue;
-> > +
-> > +		argv[i][len] = '\0';
-> 
-> Not nice to write to the global args, especially when we're not yet sure
-> if this arg is the one we care about.
-> 
-
-ACK, fixing that.
-
-> > +		if (strcmp(argv[i], "mmio-addr") == 0) {
-> 
-> Can use strncmp to avoid the not nice args write,
-> 
->  strncmp(argv[i], "mmio-addr", len)
-> 
-
-ACK, will use strncmp instead.
-
-> > +			mmio_addr = val;
-> > +			report_info("found mmio_addr=0x%lx", mmio_addr);
-> > +		}
-> > +	}
-> > +}
-> > +
-> >  int main(int argc, char **argv)
-> >  {
-> >  	int i;
-> >  
-> > +	parse_args(argc, argv);
-> > +
-> >  	if (!test_init())
-> >  		return 1;
-> >  
-> > -- 
-> > 2.33.0.882.g93a45727a2-goog
-> >
-> 
-> Thanks,
-> drew 
-> 
-
-Thanks,
-Ricardo
+Good catch.
+Reviewed-by: Nathan Tempelman <natet@google.com>
