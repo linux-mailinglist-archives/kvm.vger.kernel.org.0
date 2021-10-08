@@ -2,305 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D9A5242609D
-	for <lists+kvm@lfdr.de>; Fri,  8 Oct 2021 01:39:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 029DB426261
+	for <lists+kvm@lfdr.de>; Fri,  8 Oct 2021 04:16:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242140AbhJGXiO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Oct 2021 19:38:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42592 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242781AbhJGXh4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Oct 2021 19:37:56 -0400
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF0D4C0613EE
-        for <kvm@vger.kernel.org>; Thu,  7 Oct 2021 16:35:23 -0700 (PDT)
-Received: by mail-pg1-x549.google.com with SMTP id 1-20020a630e41000000b002528846c9f2so579203pgo.12
-        for <kvm@vger.kernel.org>; Thu, 07 Oct 2021 16:35:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=eHWmwL/DdyUes1cHwvQEsD28E8ip/Y4KwKGrDHcA804=;
-        b=GM0m7+E0VNGzbrc5pxJMbf1durKLRA8Y5N0Bzcu2SBWiEps3zwM/BBFF/W+nceQB+q
-         basLN4ax9bOBrjbrNilou1jshsUoqDA/LYJMiS8Z1BfQl/R4im5dytZiUIQbJkY5t+ev
-         xZxu4jLHdqUmWvdQfqR7LIOZ0D9/khwutmcqg1Yps2Px0xTy6qTSyiBlDj06XyCK/HrR
-         xy414nG63WpuaSZUFLLo0dpZvSL8L6HiTdFWroVTEWgithKOD0VXo+6VF+UGAKYSObkC
-         7rhtqLwweVfip0Is/7LhgtzynhwyIX1a/yuSsaIB3BQ5ZnBkP97E7w5bnKCH+xvTJc73
-         t6yw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=eHWmwL/DdyUes1cHwvQEsD28E8ip/Y4KwKGrDHcA804=;
-        b=VzgUs//9z09PLwbhERt/n5QiCDQedSLg0sbUKWxJ6hGXvu4yVPmxxPvAINhwQmtOIi
-         DmO3nSKyJUwBLOcDJsKl6ASUAHDoYO2x1yvciUJ3HSKSwBU2E72TijOHLSJc/pPQfTW2
-         D66DWvSh6t7krxnJl2pMRVoDgNur75DJ7RRbr/NkPiSLQTegVD3nIEwGkBdmbh17GITF
-         OP66gnxwncOcwMQYNppSjZgnYnhF6T9a2Mf9HA1UKcuWAm1+274lIWLQiRzjexresXvD
-         5EWS/2EGDBUsTe4NUcudYXW288hQ+xlcEdFjEpl9TAqZz5rBI0EwzuOxfMsIwTpQa3Ve
-         qIOw==
-X-Gm-Message-State: AOAM532i3i+FU0yMOUQNcjH8mgndC/sZO7Rkk2KJN8xSPKGClipjvI4H
-        oEM3KCFmtWMwY0wmNkaK+56RH3VTzua0
-X-Google-Smtp-Source: ABdhPJya7wHmSzDAkPeQZPGH6y7bHL4W+57qAOc5GKUf8g8bb6ZIYHwjPwQ0n4Op+YXyw8+5O2zSGlsxvvqz
-X-Received: from rananta-virt.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1bcc])
- (user=rananta job=sendgmr) by 2002:a17:90a:3ee4:: with SMTP id
- k91mr179113pjc.1.1633649722638; Thu, 07 Oct 2021 16:35:22 -0700 (PDT)
-Date:   Thu,  7 Oct 2021 23:34:39 +0000
-In-Reply-To: <20211007233439.1826892-1-rananta@google.com>
-Message-Id: <20211007233439.1826892-16-rananta@google.com>
-Mime-Version: 1.0
-References: <20211007233439.1826892-1-rananta@google.com>
-X-Mailer: git-send-email 2.33.0.882.g93a45727a2-goog
-Subject: [PATCH v8 15/15] KVM: arm64: selftests: arch_timer: Support vCPU migration
-From:   Raghavendra Rao Ananta <rananta@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Andrew Jones <drjones@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc:     Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        id S235472AbhJHCSu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Oct 2021 22:18:50 -0400
+Received: from gandalf.ozlabs.org ([150.107.74.76]:57447 "EHLO
+        gandalf.ozlabs.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235226AbhJHCSt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Oct 2021 22:18:49 -0400
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4HQWz73wKXz4xR9;
+        Fri,  8 Oct 2021 13:16:51 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+        s=201702; t=1633659413;
+        bh=uAe3s4KDKeCI/VJ+ZcImRCB5utSt3BzwG7fBnqux3zo=;
+        h=Date:From:To:Cc:Subject:From;
+        b=lpNJi70m5v3oaQ94bBe4gUri1NVBnNIc3InT94xaBfH+pMEPviCe3p04LoC7yaVEl
+         d4s42ZLfpbTSiDYPKp8/PbRAj+8DjBXTaS86w7XN2SWEU73HeYWckuWAg54J+pOKJf
+         FUWhv2+oR7yWpwX3beUkDdWmPIjuz73rarBT3jbM83/gKZ9gOpHRyz/Fcm4WUFEnkT
+         OoKH2cLRoVQ3dQqBoHEuZAEwd+d7JmztK3wM4CSgDt+lrs6iOap+120ll0+v7T6mc2
+         ZOkjJVz8RJyNpsLfx5acu8B+54AFqPlYQaF09RZUDvUNzr7xvClJv+700PV5NtmSxx
+         KExgesRfsV/kg==
+Date:   Fri, 8 Oct 2021 13:16:49 +1100
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>
+Cc:     Anup Patel <anup.patel@wdc.com>, Anup Patel <anup@brainfault.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>
+Subject: linux-next: manual merge of the kvm tree with the asm-generic tree
+Message-ID: <20211008131649.01295541@canb.auug.org.au>
+MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="Sig_/D3b0zr0YQsB_VDXEC_sjald";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Since the timer stack (hardware and KVM) is per-CPU, there
-are potential chances for races to occur when the scheduler
-decides to migrate a vCPU thread to a different physical CPU.
-Hence, include an option to stress-test this part as well by
-forcing the vCPUs to migrate across physical CPUs in the
-system at a particular rate.
+--Sig_/D3b0zr0YQsB_VDXEC_sjald
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Originally, the bug for the fix with commit 3134cc8beb69d0d
-("KVM: arm64: vgic: Resample HW pending state on deactivation")
-was discovered using arch_timer test with vCPU migrations and
-can be easily reproduced.
+Hi all,
 
-Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-Reviewed-by: Andrew Jones <drjones@redhat.com>
----
- .../selftests/kvm/aarch64/arch_timer.c        | 115 +++++++++++++++++-
- 1 file changed, 114 insertions(+), 1 deletion(-)
+Today's linux-next merge of the kvm tree got a conflict in:
 
-diff --git a/tools/testing/selftests/kvm/aarch64/arch_timer.c b/tools/testing/selftests/kvm/aarch64/arch_timer.c
-index 3b6ea6a462f4..bf6a45b0b8dc 100644
---- a/tools/testing/selftests/kvm/aarch64/arch_timer.c
-+++ b/tools/testing/selftests/kvm/aarch64/arch_timer.c
-@@ -14,6 +14,8 @@
-  *
-  * The test provides command-line options to configure the timer's
-  * period (-p), number of vCPUs (-n), and iterations per stage (-i).
-+ * To stress-test the timer stack even more, an option to migrate the
-+ * vCPUs across pCPUs (-m), at a particular rate, is also provided.
-  *
-  * Copyright (c) 2021, Google LLC.
-  */
-@@ -24,6 +26,8 @@
- #include <pthread.h>
- #include <linux/kvm.h>
- #include <linux/sizes.h>
-+#include <linux/bitmap.h>
-+#include <sys/sysinfo.h>
- 
- #include "kvm_util.h"
- #include "processor.h"
-@@ -36,17 +40,20 @@
- #define NR_TEST_ITERS_DEF		5
- #define TIMER_TEST_PERIOD_MS_DEF	10
- #define TIMER_TEST_ERR_MARGIN_US	100
-+#define TIMER_TEST_MIGRATION_FREQ_MS	2
- 
- struct test_args {
- 	int nr_vcpus;
- 	int nr_iter;
- 	int timer_period_ms;
-+	int migration_freq_ms;
- };
- 
- static struct test_args test_args = {
- 	.nr_vcpus = NR_VCPUS_DEF,
- 	.nr_iter = NR_TEST_ITERS_DEF,
- 	.timer_period_ms = TIMER_TEST_PERIOD_MS_DEF,
-+	.migration_freq_ms = TIMER_TEST_MIGRATION_FREQ_MS,
- };
- 
- #define msecs_to_usecs(msec)		((msec) * 1000LL)
-@@ -80,6 +87,9 @@ static struct test_vcpu_shared_data vcpu_shared_data[KVM_MAX_VCPUS];
- 
- static int vtimer_irq, ptimer_irq;
- 
-+static unsigned long *vcpu_done_map;
-+static pthread_mutex_t vcpu_done_map_lock;
-+
- static void
- guest_configure_timer_action(struct test_vcpu_shared_data *shared_data)
- {
-@@ -215,6 +225,11 @@ static void *test_vcpu_run(void *arg)
- 
- 	vcpu_run(vm, vcpuid);
- 
-+	/* Currently, any exit from guest is an indication of completion */
-+	pthread_mutex_lock(&vcpu_done_map_lock);
-+	set_bit(vcpuid, vcpu_done_map);
-+	pthread_mutex_unlock(&vcpu_done_map_lock);
-+
- 	switch (get_ucall(vm, vcpuid, &uc)) {
- 	case UCALL_SYNC:
- 	case UCALL_DONE:
-@@ -233,9 +248,78 @@ static void *test_vcpu_run(void *arg)
- 	return NULL;
- }
- 
-+static uint32_t test_get_pcpu(void)
-+{
-+	uint32_t pcpu;
-+	unsigned int nproc_conf;
-+	cpu_set_t online_cpuset;
-+
-+	nproc_conf = get_nprocs_conf();
-+	sched_getaffinity(0, sizeof(cpu_set_t), &online_cpuset);
-+
-+	/* Randomly find an available pCPU to place a vCPU on */
-+	do {
-+		pcpu = rand() % nproc_conf;
-+	} while (!CPU_ISSET(pcpu, &online_cpuset));
-+
-+	return pcpu;
-+}
-+
-+static int test_migrate_vcpu(struct test_vcpu *vcpu)
-+{
-+	int ret;
-+	cpu_set_t cpuset;
-+	uint32_t new_pcpu = test_get_pcpu();
-+
-+	CPU_ZERO(&cpuset);
-+	CPU_SET(new_pcpu, &cpuset);
-+
-+	pr_debug("Migrating vCPU: %u to pCPU: %u\n", vcpu->vcpuid, new_pcpu);
-+
-+	ret = pthread_setaffinity_np(vcpu->pt_vcpu_run,
-+					sizeof(cpuset), &cpuset);
-+
-+	/* Allow the error where the vCPU thread is already finished */
-+	TEST_ASSERT(ret == 0 || ret == ESRCH,
-+			"Failed to migrate the vCPU:%u to pCPU: %u; ret: %d\n",
-+			vcpu->vcpuid, new_pcpu, ret);
-+
-+	return ret;
-+}
-+
-+static void *test_vcpu_migration(void *arg)
-+{
-+	unsigned int i, n_done;
-+	bool vcpu_done;
-+
-+	do {
-+		usleep(msecs_to_usecs(test_args.migration_freq_ms));
-+
-+		for (n_done = 0, i = 0; i < test_args.nr_vcpus; i++) {
-+			pthread_mutex_lock(&vcpu_done_map_lock);
-+			vcpu_done = test_bit(i, vcpu_done_map);
-+			pthread_mutex_unlock(&vcpu_done_map_lock);
-+
-+			if (vcpu_done) {
-+				n_done++;
-+				continue;
-+			}
-+
-+			test_migrate_vcpu(&test_vcpu[i]);
-+		}
-+	} while (test_args.nr_vcpus != n_done);
-+
-+	return NULL;
-+}
-+
- static void test_run(struct kvm_vm *vm)
- {
- 	int i, ret;
-+	pthread_t pt_vcpu_migration;
-+
-+	pthread_mutex_init(&vcpu_done_map_lock, NULL);
-+	vcpu_done_map = bitmap_zalloc(test_args.nr_vcpus);
-+	TEST_ASSERT(vcpu_done_map, "Failed to allocate vcpu done bitmap\n");
- 
- 	for (i = 0; i < test_args.nr_vcpus; i++) {
- 		ret = pthread_create(&test_vcpu[i].pt_vcpu_run, NULL,
-@@ -243,8 +327,23 @@ static void test_run(struct kvm_vm *vm)
- 		TEST_ASSERT(!ret, "Failed to create vCPU-%d pthread\n", i);
- 	}
- 
-+	/* Spawn a thread to control the vCPU migrations */
-+	if (test_args.migration_freq_ms) {
-+		srand(time(NULL));
-+
-+		ret = pthread_create(&pt_vcpu_migration, NULL,
-+					test_vcpu_migration, NULL);
-+		TEST_ASSERT(!ret, "Failed to create the migration pthread\n");
-+	}
-+
-+
- 	for (i = 0; i < test_args.nr_vcpus; i++)
- 		pthread_join(test_vcpu[i].pt_vcpu_run, NULL);
-+
-+	if (test_args.migration_freq_ms)
-+		pthread_join(pt_vcpu_migration, NULL);
-+
-+	bitmap_free(vcpu_done_map);
- }
- 
- static void test_init_timer_irq(struct kvm_vm *vm)
-@@ -301,6 +400,8 @@ static void test_print_help(char *name)
- 		NR_TEST_ITERS_DEF);
- 	pr_info("\t-p: Periodicity (in ms) of the guest timer (default: %u)\n",
- 		TIMER_TEST_PERIOD_MS_DEF);
-+	pr_info("\t-m: Frequency (in ms) of vCPUs to migrate to different pCPU. 0 to turn off (default: %u)\n",
-+		TIMER_TEST_MIGRATION_FREQ_MS);
- 	pr_info("\t-h: print this help screen\n");
- }
- 
-@@ -308,7 +409,7 @@ static bool parse_args(int argc, char *argv[])
- {
- 	int opt;
- 
--	while ((opt = getopt(argc, argv, "hn:i:p:")) != -1) {
-+	while ((opt = getopt(argc, argv, "hn:i:p:m:")) != -1) {
- 		switch (opt) {
- 		case 'n':
- 			test_args.nr_vcpus = atoi(optarg);
-@@ -335,6 +436,13 @@ static bool parse_args(int argc, char *argv[])
- 				goto err;
- 			}
- 			break;
-+		case 'm':
-+			test_args.migration_freq_ms = atoi(optarg);
-+			if (test_args.migration_freq_ms < 0) {
-+				pr_info("0 or positive value needed for -m\n");
-+				goto err;
-+			}
-+			break;
- 		case 'h':
- 		default:
- 			goto err;
-@@ -358,6 +466,11 @@ int main(int argc, char *argv[])
- 	if (!parse_args(argc, argv))
- 		exit(KSFT_SKIP);
- 
-+	if (test_args.migration_freq_ms && get_nprocs() < 2) {
-+		print_skip("At least two physical CPUs needed for vCPU migration");
-+		exit(KSFT_SKIP);
-+	}
-+
- 	vm = test_vm_create();
- 	test_run(vm);
- 	kvm_vm_free(vm);
--- 
-2.33.0.882.g93a45727a2-goog
+  arch/riscv/Kconfig
 
+between commit:
+
+  b63dc8f2b02c ("firmware: include drivers/firmware/Kconfig unconditionally=
+")
+
+from the asm-generic tree and commit:
+
+  99cdc6c18c2d ("RISC-V: Add initial skeletal KVM support")
+
+from the kvm tree.
+
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+diff --cc arch/riscv/Kconfig
+index 0050a2adf67b,f5fe8a7f0e24..000000000000
+--- a/arch/riscv/Kconfig
++++ b/arch/riscv/Kconfig
+@@@ -562,3 -561,6 +562,5 @@@ menu "Power management options
+  source "kernel/power/Kconfig"
+ =20
+  endmenu
++=20
++ source "arch/riscv/kvm/Kconfig"
+ -source "drivers/firmware/Kconfig"
+
+--Sig_/D3b0zr0YQsB_VDXEC_sjald
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmFfqhEACgkQAVBC80lX
+0Gzx+gf+Iw2ih1KkdkXJG4AtUQBO3xyL5Xv+2Q8oE4TVE+THHcTgIFgMLPGcmLm6
+g+fP7VQyI0sqVqc6Wr8kANKjANugSMRbXSnO02SUkjHIPa+A6z0TzMDvqAljMkQ+
+rhqsKRyYfiXFM0i/23p9aqw+yMygZ9ZfIsCrXPrR5esJDvK7vvizNe1mTwW1IzZ0
+NUZ/LkSpZcHl/6bgONVuj/cFlnuOYHoCz7ee13OvTb6s7YG1ppYQXoyN9J5uNZS7
+Odp5cISSG9AdDUUEf59Hws8U4Q1eHLqembj9uyvIqdAbQ52dEff00FRvbTusZp+4
+/LuviG1Peq9o2bdpmkU5LMX58eCFyg==
+=0cut
+-----END PGP SIGNATURE-----
+
+--Sig_/D3b0zr0YQsB_VDXEC_sjald--
