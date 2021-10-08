@@ -2,146 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 608F4427126
-	for <lists+kvm@lfdr.de>; Fri,  8 Oct 2021 21:03:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A55EC42716E
+	for <lists+kvm@lfdr.de>; Fri,  8 Oct 2021 21:30:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231342AbhJHTFY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Oct 2021 15:05:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54152 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231433AbhJHTFU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Oct 2021 15:05:20 -0400
-Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2D7BC061755
-        for <kvm@vger.kernel.org>; Fri,  8 Oct 2021 12:03:23 -0700 (PDT)
-Received: by mail-pg1-x52d.google.com with SMTP id h3so3974745pgb.7
-        for <kvm@vger.kernel.org>; Fri, 08 Oct 2021 12:03:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=oNdarxBooEw49lOrQDkWJsFHINdfUOwPGFjoZVjB6JY=;
-        b=pQhiuqG89VNlkxT+bp9+XkUj5SluTR0+dU5Tlv/iOpIybqiv8V8QlMI1pDRCQShvCq
-         G9ElIfSbhg3lI1aYL+P0EnfXW7RQURDWe7xnFZh1MKB1i4Wlg1a3AozYscpHyMSl5VwR
-         /IWtHCq/nU+jqunOf/uLQxwosX+Dso6VQMvkgYPf0c3Njy1NZOK2s/dDo+xvqnJDOLhM
-         9MPhHHVKvxQxn1f8pDHK94wp3ZF1xN4jKOraQ0wGsENrZfy3Q/PKCKuQRhqyi/2YHEej
-         owVO7hTd9YkzgB/ZC6Oj1ZidJuKwIxX4QQth2tOh5uz9gq7A8LE7v5Tme86rj0/Ygcwl
-         d9Uw==
+        id S231455AbhJHTcZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Oct 2021 15:32:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24160 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231316AbhJHTcY (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 8 Oct 2021 15:32:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1633721428;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=GZ3e60eb6DlJByLWoWmwQIIU3x4CCDxVSy6/c14Fz78=;
+        b=PuMFP1+BvTf3rQMSj23qS6HohRUOvLpPVOZ4ddqTM+cRT4TG8h9fW59M64LRxZycwNoh00
+        AfDTwBRAXJZHO/7+ukCBlKJds0yxepnKPuwu5g+eIdQMoNDLB63suSAbAI9wmmCr8fUABK
+        kd0LCWfnzvuCi1A+RMeVwy12iH2C/ZU=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-589-a_MKOPGiN2uyEApQhbnuQw-1; Fri, 08 Oct 2021 15:30:02 -0400
+X-MC-Unique: a_MKOPGiN2uyEApQhbnuQw-1
+Received: by mail-wr1-f69.google.com with SMTP id y12-20020a056000168c00b00160da4de2c7so4978408wrd.5
+        for <kvm@vger.kernel.org>; Fri, 08 Oct 2021 12:30:02 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=oNdarxBooEw49lOrQDkWJsFHINdfUOwPGFjoZVjB6JY=;
-        b=P9JzFB7FenArK2EUaWpEbWNhh6itQGkWDDA94zbO1oFF9ErtroidoQXmW8kBmgNgd9
-         scSF1j00IAnilmbJTzqQ7B1LwDU0C32vZlM/PYYRvs75dDGN0ZxXW1GPwzSxQ6pqds8J
-         Vcd+XGGiaJlRvlROQliPV0ZhoMcBPBt+Tz+SyxwGtpyBrBlDwz3gVNya0SZlG10XlHah
-         HV53qfAvPmaDUznj6UmUj6iGwto4E+T8LyIfqoWnXBENOL7/3GkU/P6OmCPcfJ/wHdMt
-         YsCvhNqwqjom7uLcMU2RXv8fa1cyLqilNIa1dXxXHma/W+RvybhU/Wr2ALVMEG4AYdHY
-         ZBSA==
-X-Gm-Message-State: AOAM530d0KAzmoL+h7HHII8KiWMZuMOBQSC5pJY7AbKKx00qSkDPPoAp
-        KLukBsaTpkHdUii1IVYnAVkQMafNASNkuBahP1kQiQ==
-X-Google-Smtp-Source: ABdhPJyuf8H30MNhst+1XUSSr6oT+IFsy1XY5RoBYommFm/Ep8eGVuIKC5U90xi2YVmbf9YmaKH0m9RTObE/yDJpkHI=
-X-Received: by 2002:a05:6a00:1586:b0:447:b30c:4a65 with SMTP id
- u6-20020a056a00158600b00447b30c4a65mr11858150pfk.0.1633719803151; Fri, 08 Oct
- 2021 12:03:23 -0700 (PDT)
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=GZ3e60eb6DlJByLWoWmwQIIU3x4CCDxVSy6/c14Fz78=;
+        b=byPzWOu41cSwjjPxJlFUM792S0XKUulgDuBNVZySswDYKh5fz3kov3IL5i40Xz5/iL
+         x1EhnFu1cHiuqcxgdrDBSJjRH22G2xx6bbqgZjjiZcdDNkY2fSZ3DaXjSp3LSRpSlrvu
+         8mQRYx21D8CQhBXaVyGxOXW3bPMC2iTieqmMep4hepB9y3fTZg2qZC8JEtIyduC57gRL
+         5NX20j05aRLW7D4eO+rTxlshLyG2mxk3TQPlCkNJ9HDrBQfSpXhuEA+iU9s2lRIFrpvT
+         HW9IJsF5DhpnE5e0HF5CQGQlnMUSKP8QQV+ADOsqBHpa75vlFWe1MhNfL9PQvmgQHY7A
+         0mrw==
+X-Gm-Message-State: AOAM5336i5Ywa2tBR1WNaaXWIR7Dh4v3HjFKkBXtd76YbKJAPGOnC2GP
+        kZQD1chBUSSsclMxecK5Ek8JD0yfQyZeHoU47rzIHRa5kiaPB7OebzB6Itm4XT9DzMHIyRz6qYF
+        McMeOlxQ4z9gn
+X-Received: by 2002:adf:8b9a:: with SMTP id o26mr6559685wra.109.1633721401628;
+        Fri, 08 Oct 2021 12:30:01 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJydOdniTQkK5EUFQQSup3n6LHAyboyuNYyQ6hqQCCBJUXmBhFUwwAkDBIJEZ4ws+2QeVFwntQ==
+X-Received: by 2002:adf:8b9a:: with SMTP id o26mr6559662wra.109.1633721401363;
+        Fri, 08 Oct 2021 12:30:01 -0700 (PDT)
+Received: from [192.168.100.42] ([82.142.3.114])
+        by smtp.gmail.com with ESMTPSA id e5sm243617wrd.1.2021.10.08.12.30.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 08 Oct 2021 12:30:00 -0700 (PDT)
+Message-ID: <f3677533-0ede-c0a2-8507-38925ca7f10d@redhat.com>
+Date:   Fri, 8 Oct 2021 21:29:59 +0200
 MIME-Version: 1.0
-References: <20211005234459.430873-1-michael.roth@amd.com> <20211006203617.13045-1-michael.roth@amd.com>
-In-Reply-To: <20211006203617.13045-1-michael.roth@amd.com>
-From:   Nathan Tempelman <natet@google.com>
-Date:   Fri, 8 Oct 2021 12:03:12 -0700
-Message-ID: <CAKiEG5rPhDgsVPcZV=DrjJNPk6qy9yVC1ZDdxo6VajnUgp3iRg@mail.gmail.com>
-Subject: Re: [RFC 04/16] KVM: selftests: set CPUID before setting sregs in
- vcpu creation
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     linux-kselftest@vger.kernel.org, kvm <kvm@vger.kernel.org>,
-        linux-kernel@vger.kernel.org, x86@kernel.org,
-        Marc Orr <marcorr@google.com>,
-        Steve Rutherford <srutherford@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Mingwei Zhang <mizhang@google.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Varad Gautam <varad.gautam@suse.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Ricardo Koller <ricarkol@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H . Peter Anvin" <hpa@zytor.com>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [PATCH kvm-unit-tests] parse_keyval: Allow hex vals
+Content-Language: en-US
+To:     Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org
+Cc:     thuth@redhat.com, ricarkol@google.com
+References: <20211008070309.84205-1-drjones@redhat.com>
+From:   Laurent Vivier <lvivier@redhat.com>
+In-Reply-To: <20211008070309.84205-1-drjones@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 6, 2021 at 1:39 PM Michael Roth <michael.roth@amd.com> wrote:
->
-> Recent kernels have checks to ensure the GPA values in special-purpose
-> registers like CR3 are within the maximum physical address range and
-> don't overlap with anything in the upper/reserved range. In the case of
-> SEV kselftest guests booting directly into 64-bit mode, CR3 needs to be
-> initialized to the GPA of the page table root, with the encryption bit
-> set. The kernel accounts for this encryption bit by removing it from
-> reserved bit range when the guest advertises the bit position via
-> KVM_SET_CPUID*, but kselftests currently call KVM_SET_SREGS as part of
-> vm_vcpu_add_default(), *prior* to vCPU creation, so there's no
-> opportunity to call KVM_SET_CPUID* in advance. As a result,
-> KVM_SET_SREGS will return an error in these cases.
->
-> Address this by moving vcpu_set_cpuid() (which calls KVM_SET_CPUID*)
-> ahead of vcpu_setup() (which calls KVM_SET_SREGS).
->
-> While there, address a typo in the assertion that triggers when
-> KVM_SET_SREGS fails.
->
-> Suggested-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
+On 08/10/2021 09:03, Andrew Jones wrote:
+> When parse_keyval was first written we didn't yet have strtol.
+> Now we do, let's give users more flexibility.
+> 
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
 > ---
->  tools/testing/selftests/kvm/lib/kvm_util.c         | 2 +-
->  tools/testing/selftests/kvm/lib/x86_64/processor.c | 4 +---
->  2 files changed, 2 insertions(+), 4 deletions(-)
->
-> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> index ef88fdc7e46b..646cffd86d09 100644
-> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> @@ -1906,7 +1906,7 @@ void vcpu_sregs_get(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_sregs *sregs)
->  void vcpu_sregs_set(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_sregs *sregs)
->  {
->         int ret = _vcpu_sregs_set(vm, vcpuid, sregs);
-> -       TEST_ASSERT(ret == 0, "KVM_RUN IOCTL failed, "
-> +       TEST_ASSERT(ret == 0, "KVM_SET_SREGS IOCTL failed, "
->                 "rc: %i errno: %i", ret, errno);
->  }
->
-> diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> index 0bbd88fe1127..1ab4c20f5d12 100644
-> --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> @@ -660,6 +660,7 @@ void vm_vcpu_add_default(struct kvm_vm *vm, uint32_t vcpuid, void *guest_code)
->
->         /* Create VCPU */
->         vm_vcpu_add(vm, vcpuid);
-> +       vcpu_set_cpuid(vm, vcpuid, kvm_get_supported_cpuid());
->         vcpu_setup(vm, vcpuid);
->
->         /* Setup guest general purpose registers */
-> @@ -672,9 +673,6 @@ void vm_vcpu_add_default(struct kvm_vm *vm, uint32_t vcpuid, void *guest_code)
->         /* Setup the MP state */
->         mp_state.mp_state = 0;
->         vcpu_set_mp_state(vm, vcpuid, &mp_state);
-> -
-> -       /* Setup supported CPUIDs */
-> -       vcpu_set_cpuid(vm, vcpuid, kvm_get_supported_cpuid());
->  }
->
->  /*
-> --
-> 2.25.1
->
+>   lib/util.c | 3 ++-
+>   1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/lib/util.c b/lib/util.c
+> index a90554138952..682ca2db09e6 100644
+> --- a/lib/util.c
+> +++ b/lib/util.c
+> @@ -4,6 +4,7 @@
+>    * This work is licensed under the terms of the GNU LGPL, version 2.
+>    */
+>   #include <libcflat.h>
+> +#include <stdlib.h>
+>   #include "util.h"
+>   
+>   int parse_keyval(char *s, long *val)
+> @@ -14,6 +15,6 @@ int parse_keyval(char *s, long *val)
+>   	if (!p)
+>   		return -1;
+>   
+> -	*val = atol(p+1);
+> +	*val = strtol(p+1, NULL, 0);
+>   	return p - s;
+>   }
+> 
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
 
-Good catch.
-Reviewed-by: Nathan Tempelman <natet@google.com>
