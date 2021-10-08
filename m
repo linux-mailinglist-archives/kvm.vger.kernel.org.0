@@ -2,189 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ADE16426E06
-	for <lists+kvm@lfdr.de>; Fri,  8 Oct 2021 17:46:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 31EC9426E30
+	for <lists+kvm@lfdr.de>; Fri,  8 Oct 2021 17:58:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243123AbhJHPsw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Oct 2021 11:48:52 -0400
-Received: from mail-bn8nam12on2044.outbound.protection.outlook.com ([40.107.237.44]:33387
-        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S243073AbhJHPst (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Oct 2021 11:48:49 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=iXUZxnBf71QKW7AMgdj1ls4RCJ8Cg8lXqTo1zakPsltiH60nyKK8X4KMkTccX6c2kFVoSZnEcLZOsBDXtaQHtwxAMo+FgMsCbPTdrOuDNcDxgGvnbm7BVnCzrB2EaM1S/o2ccNRlJ5AS7f1gqhzDlbH/Zmn9C0pIa64+y6VRrSkqF9PGOveysgNrvTHcx3kWNwPc6UoBaII9uy3OuQ7DXNgQSj1N64Q/22HakXu9BTy8axIVBiQoUpMeOe3Tvwq4n1drDLvo1QVTs3w+pj3cTiSz790+pxcP1kvz+ny2Bw/i2Gd79BdgSVHQwCZhfgC9Z7gEZU7Ng0xg1mL2GlzYgw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=GgDmcdgz4VZE6hThyp/Yd28EgOnuOqLEzYXjG5zi61s=;
- b=TgiUd9xgCGqkKXbyM24JPF1XRbEFN2sgfmO/XqsFbPfLqPOnzKwExEUljLT+6QCQVPmeQ6ckf0oBslZlY1HwfU8b52CO+O96vRlWRj7Zu6R+4dTFXuok2107IAfSqm5z7oRXJ2J8nkgrTGRGZBQd9wGQR6UezhfRhZYq4EqXVhK0y7/QcApsKwGOXr0AKZiz+Zx2H+BpYZCIzx3TsLTSFnDD8CGfbX0ya0wPiPZAt1e5CQi+WVDyqSJqZkLLfPsSZvyzlZ0xMfJVIRUf7ZTcK3BwKHfL4GL0h8caLn1E2iwsI4F5BNvk081DnO7VQCbwKj0z++PnYYw69t+Jg2Z7OA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=GgDmcdgz4VZE6hThyp/Yd28EgOnuOqLEzYXjG5zi61s=;
- b=pNvhpbxf5tjnim9Uvd5NFzPCknrXyxdNm48fg+V1fuo5f1GwSXPH6xyob3d/2iyxHLfJ2RdAaX0y1hl876VhH75kWgqNRdw5pVlQQfyZiGt7SnQpOXZYJeK9OM/tKMN4RqGTJ2Hu7m5jPFSlyGihj9beD8mC7rZy0oXjo/esNwM=
-Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
- by SN1PR12MB2448.namprd12.prod.outlook.com (2603:10b6:802:28::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4587.18; Fri, 8 Oct
- 2021 15:46:50 +0000
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::78b7:7336:d363:9be3]) by SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::78b7:7336:d363:9be3%6]) with mapi id 15.20.4587.022; Fri, 8 Oct 2021
- 15:46:50 +0000
-Cc:     brijesh.singh@amd.com, kvm@vger.kernel.org,
-        Sergio Lopez <slp@redhat.com>,
-        James Bottomley <jejb@linux.ibm.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        "Daniel P . Berrange" <berrange@redhat.com>,
-        Eduardo Habkost <ehabkost@redhat.com>
-Subject: Re: [PATCH v3 13/22] target/i386/sev: Remove stubs by using code
- elision
-To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-References: <20211002125317.3418648-1-philmd@redhat.com>
- <20211002125317.3418648-14-philmd@redhat.com>
- <84e1213b-c6c0-85a4-0d3e-854cd3dc0fa0@redhat.com>
- <6a6629d7-2441-1711-d181-8b2b2127dd21@redhat.com>
-From:   Brijesh Singh <brijesh.singh@amd.com>
-Message-ID: <bdd96643-45f4-e00e-17ad-16be6ad160f7@amd.com>
-Date:   Fri, 8 Oct 2021 10:46:48 -0500
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.14.0
-In-Reply-To: <6a6629d7-2441-1711-d181-8b2b2127dd21@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-ClientProxiedBy: SA9P221CA0027.NAMP221.PROD.OUTLOOK.COM
- (2603:10b6:806:25::32) To SN6PR12MB2718.namprd12.prod.outlook.com
- (2603:10b6:805:6f::22)
-MIME-Version: 1.0
-Received: from Brijeshs-MacBook-Pro.local (165.204.77.11) by SA9P221CA0027.NAMP221.PROD.OUTLOOK.COM (2603:10b6:806:25::32) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4587.18 via Frontend Transport; Fri, 8 Oct 2021 15:46:49 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 08a8ace3-059d-431c-acc6-08d98a72d821
-X-MS-TrafficTypeDiagnostic: SN1PR12MB2448:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SN1PR12MB2448565296D48E82B1FBEABAE5B29@SN1PR12MB2448.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: PpDnKWqn/vixftadbg57UhTj6WIcREIoJSMLI82G1b8UZ2gPZkYc/pS2IyvtvI2f4T8FAOuzv07FVXi+WoIs59xtlVfWidENlueNNA8tVS0UUkOOEPqvcrZR1eabNLNjL38mQnEA0JVGriKrlhBVv++GkL3hZga2yZITn/HgqYf32sBzkRrCz8qMQxiBb1PZhnetOYcOoVSTg7EYVoSOs2S8BLzNjbWraZMq4/qIAnSHn6w2TlH7wraWVWp9LzdBak6DzAF5+IqgZ/7as+/3FRN4VVYMkMO00hpSbhB2xM8hVu2RC1t9iz7/mWOlUCosMDiAgtXi9dcBbmkzcnKuVgE/BLID8fJMykuna/K6A3cJ7XHPCZCM2TbUwC22u7Noa+paNHOauCuo7GSTx2I7QWIZM0bo+uJU3gcP7R9sZw9wNsqQiyWo05s0wVOnKUnOzZeCMTKzB2iBo64mfMRgisPV1A9R3aExxenSSkvj1EYL+xZ3r1TXhtC3vG/yJZMDN9WaT3zXVthJnh0VpNfN04zLWbGPt8Csg7zD3QeXzxANDZHYc19insyCGKT0CdkD+UyDolhDmz/jqD/jhSjl4YVH4hbIV8YzHbaZvLSUuPzPOVmUPof8lz6DYF9wckJChvcqv2mb7sDAmJFWx3N5K5cmmGemUTYXGlN4VjQCUH6dt2/JiaVDdWxVVzcTKUSYAt69AkA2n9kpOmIQtmf/IgRHpf0xzb+JhhuxkYfWCT2fjMC7ZhbYSyLklqOGepze
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(8936002)(110136005)(54906003)(31686004)(7416002)(6506007)(66946007)(53546011)(44832011)(66556008)(86362001)(66476007)(31696002)(316002)(2616005)(956004)(26005)(186003)(83380400001)(38100700002)(8676002)(6486002)(2906002)(5660300002)(6512007)(36756003)(4326008)(508600001)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?SU1LbE92WlVtaEFmemQ0eU8rLzhCckR5Wll0VUFzcDNETlczcDJwK0QrRDBi?=
- =?utf-8?B?M25FdzVCNzdFWCsvdnZRUHNTUzBoWHU0U1czNXdUb1pFbTBncVFDakN6TzBD?=
- =?utf-8?B?eG1Wb2s2NnZzZmUzbnFkc2pyMHRDcXBSK0EzUGRJWkY5MWhFUkc4ejBncGow?=
- =?utf-8?B?djFnTllFaHQvR2ZZR2gwcytXWVREc0dvZHFjdFVEY0tWelU4OURZR0IrVGRh?=
- =?utf-8?B?djVadFFIQldveGd2eWRjcHRndTdVaHk1S09VZVlGSEs2VDNudWQraEo4NXlR?=
- =?utf-8?B?OUxTcUJuM0FmbTNZSmE0T1EydS83SnRNWjNES20yVXhPbkZPMmJicUtZUVY5?=
- =?utf-8?B?dE8rNWNCWHFpd0MxNWpHeVp4UnJWS3ZhRG9xb2FjS1hxWWtKZy9waThpL3Fh?=
- =?utf-8?B?bzROMjlteEdhZUFYRHZQYmY2NEFZcTY4UjI5WU41bDg1TUZYU3ZYWmJZbDE5?=
- =?utf-8?B?UFI4OWk4TUxkTXY3Q1pPVmRvTWtxYmEvcEoxNVFrVGt6bUtTY2plR2RqUzdv?=
- =?utf-8?B?T3d6a3RjT2diUVlkSmQ5SVRZOXMyOFRtZ2VTL045TmNsYy9XTXBwcjZEbEJO?=
- =?utf-8?B?K0VkOURHYVRHcGlMSVNZbHRKSFRYNVVXb1g3N0pBbjVORjN6UnhueHRzZ1hK?=
- =?utf-8?B?N2xxMGhXaXlGZ095ek1JbXFOOUNhSUVkcU9jNzR1QnZrU1NpUmZqd2NEemdQ?=
- =?utf-8?B?QWlVREdhOTA4M2N0TUl0QUUyczkvSkJZbXgrRHd4SjJMM0V3ZGN4aTJadVZR?=
- =?utf-8?B?cXdVZ08xemVOTEhoaFVZWUtHb3NYNHZEeWFMMkgzeXB6T3lNRjVFSnlOaEha?=
- =?utf-8?B?N0orSDlsYVhEZzhjcFNGRktnMmwxbUhRZ1FPMnVzVFNLTHd4eG5Hb0Y4MHhI?=
- =?utf-8?B?Q25UWEE0S3dxMnBlMTBhdjVIL3VZamppNEhCNk9SY3RMQUZlWjJJUnRlaW5M?=
- =?utf-8?B?VXIxckFvTWkrVTdOMjE0Mi9xaEEwUzhZRU5HRkN0NVRxUW13VGVkL1NkamFD?=
- =?utf-8?B?NG84UDlyZjlEakZJejY2QTYvR1NiSUJ2dlJ0SGhhS0hCdnUzMng3NHNyVk1M?=
- =?utf-8?B?SzYvM1JyMXlFalB6K3hKQTBwNm9iREtGTHlnYVZHRFg4ZWJTSGtqQVBFR0tv?=
- =?utf-8?B?MGJPV1dhVUNrTENDZ3BZWXFaYjA3cWVqSkd3dTE3Q2VVK0pmK3VudzZMRmpK?=
- =?utf-8?B?bGJqVTRnb2QrakRKdXhpQTR6OUY4Q2JsVVhiN0FRaXdSdElYY3FvRmp4MDVD?=
- =?utf-8?B?NVY5RWdqQkpvbHIyb2hOQ1dwYnJMM3FnYVN4cDUzNTdQRVVzSHE1ZERrWWh6?=
- =?utf-8?B?NUREajlLdndHbjBCVHhMcmJXbmJwbXVzcWk2QzJhUU1yU3JlamtkQ1BxM3kx?=
- =?utf-8?B?bHdsK2RzY1V2UFZETXpKOFFETVdXVnpIY1ZFeDYxUW9YT0dUT3M2VVZNd1ZT?=
- =?utf-8?B?M1NEbFpYcjFETjdTa3ZpTUcyaTZBT3l5RWlWeWpnTStGUVdNcUsyenN5c0hM?=
- =?utf-8?B?NmVRN1haWkN2VlAwZW93Y3RZdzRsYTVpcUI0aWZyRkttaXFJZXdrekk3c3Rz?=
- =?utf-8?B?UFJ0YkRQb1RaSGhxeFhKMHVjZ3Y4ODc4NkdkeFQxczlCcXZsQVJTVzdnT2sx?=
- =?utf-8?B?NkFlQlRkM2ZJYnNVeXR1ZDgxL2dsdnNITFEzYUh0RzJGTTYvdkFKT3hqT3hD?=
- =?utf-8?B?WFV3OVhvL1FscG1UK1ZEZlBzakxCNXFxMjVUOGd4bGlucW51Y0c2bmRyeGtu?=
- =?utf-8?Q?fvO+IDtV8kUQnId2Ka8FeOWPoBviMSiY3BD0P+s?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 08a8ace3-059d-431c-acc6-08d98a72d821
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Oct 2021 15:46:50.8705
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: bXrGxVkq2GMRQITU7slGB7DoOMf3iLHup3b+6TBmAzIrWSOSav8gdRBJbm2Xa1GqY+Y3P79oien7kzgA5giJDQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2448
+        id S243111AbhJHQAb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Oct 2021 12:00:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39600 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230365AbhJHQAa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Oct 2021 12:00:30 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F66BC061570
+        for <kvm@vger.kernel.org>; Fri,  8 Oct 2021 08:58:35 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 124-20020a251182000000b005a027223ed9so12966015ybr.13
+        for <kvm@vger.kernel.org>; Fri, 08 Oct 2021 08:58:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=OhGTFF+wvS+RHrDxBXMcls6M7hE9mvNcy5n5nxdlojY=;
+        b=UhDbVer3yTzCQuEnCVNCCwOJxroBSjeGrerPZQUnL9cSLTLWZM3WcLmHKtjpnB9H42
+         4+MLmNwhYgZLSfRYqHvwMdpkPmhxPa0wHy03c+jxdQpFlGn/qfuRE6+r+AXnoqOj8+4e
+         vbW8EjUhfr23GdmxGkqXMAEdxEylEw/4lSVq9KsaNs9IFfJyBemq5uVCgHnZHwwIlrgR
+         3dR7J6sZkD7Dryb1tIb+9atF3DgzOcXpejRI2P/LT4BP/ftKIDUkkxMrp1QsH2aVR5c3
+         qf+KjTx6Is/FLnOUPigUaJyHzddnzRFVNxlidDe4gzrGvYWQEs5u/MYkOCax/EABYnHo
+         7pKw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=OhGTFF+wvS+RHrDxBXMcls6M7hE9mvNcy5n5nxdlojY=;
+        b=s3JEYYppGmYUDQJGXS74RnGFnGQObDbO+13GmDoUkpd3dli35ASMiCPq8k0zuiyelQ
+         aHHmKzoztERfOavAxgVG48/N2TsCaX68tTauCk7ardAKv3Lf7MXBCA/+Q/BMT8JUPKhn
+         2W+KYdRaZWUJBeEdg1wGgGTaHv+jo7oIbSiJNRIIbHQuKeJYo9PapHLicUYrVqptuXcc
+         isbcaKkLU5kwMbWb6saH57KWwszCsSntu3i+RaXqqHCkb7yR1gE2wK3wHR/ODhg6KDkA
+         XnyHbGCkBxpZVbNX/ugGIsBBZbyAUjKNz198pdKHvjEFbrjh0NH5PVLQBZbCtA6mU1zV
+         7BVA==
+X-Gm-Message-State: AOAM531zyBvf6G8DyVmIuS7nZzuMkGrS5x//PMxLP9/VLn0dJFLzNBJe
+        5nYVQ2L8j4WyH8Vv3PYxD5fD2fV64A==
+X-Google-Smtp-Source: ABdhPJwSkEhANAXQ5JCD2NdWSpZq4SqWrw57ULj9YsrCO0+8ltUiACfmbzS/Tq1J1B3VPevPEONoAIAjbA==
+X-Received: from tabba.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:482])
+ (user=tabba job=sendgmr) by 2002:a25:6e06:: with SMTP id j6mr4604257ybc.311.1633708714429;
+ Fri, 08 Oct 2021 08:58:34 -0700 (PDT)
+Date:   Fri,  8 Oct 2021 16:58:21 +0100
+Message-Id: <20211008155832.1415010-1-tabba@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.0.882.g93a45727a2-goog
+Subject: [PATCH v7 00/11] KVM: arm64: Fixed features for protected VMs
+From:   Fuad Tabba <tabba@google.com>
+To:     kvmarm@lists.cs.columbia.edu
+Cc:     maz@kernel.org, will@kernel.org, james.morse@arm.com,
+        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
+        mark.rutland@arm.com, christoffer.dall@arm.com,
+        pbonzini@redhat.com, drjones@redhat.com, oupton@google.com,
+        qperret@google.com, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kernel-team@android.com,
+        tabba@google.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi,
 
-On 10/6/21 11:55 AM, Philippe Mathieu-Daudé wrote:
-> On 10/4/21 10:19, Paolo Bonzini wrote:
->> On 02/10/21 14:53, Philippe Mathieu-Daudé wrote:
->>> Only declare sev_enabled() and sev_es_enabled() when CONFIG_SEV is
->>> set, to allow the compiler to elide unused code. Remove unnecessary
->>> stubs.
->>>
->>> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->>> ---
->>>   include/sysemu/sev.h    | 14 +++++++++++++-
->>>   target/i386/sev_i386.h  |  3 ---
->>>   target/i386/cpu.c       | 16 +++++++++-------
->>>   target/i386/sev-stub.c  | 36 ------------------------------------
->>>   target/i386/meson.build |  2 +-
->>>   5 files changed, 23 insertions(+), 48 deletions(-)
->>>   delete mode 100644 target/i386/sev-stub.c
->>>
->>> diff --git a/include/sysemu/sev.h b/include/sysemu/sev.h
->>> index a329ed75c1c..f5c625bb3b3 100644
->>> --- a/include/sysemu/sev.h
->>> +++ b/include/sysemu/sev.h
->>> @@ -14,9 +14,21 @@
->>>   #ifndef QEMU_SEV_H
->>>   #define QEMU_SEV_H
->>>   -#include "sysemu/kvm.h"
->>> +#ifndef CONFIG_USER_ONLY
->>> +#include CONFIG_DEVICES /* CONFIG_SEV */
->>> +#endif
->>>   +#ifdef CONFIG_SEV
->>>   bool sev_enabled(void);
->>> +bool sev_es_enabled(void);
->>> +#else
->>> +#define sev_enabled() 0
->>> +#define sev_es_enabled() 0
->>> +#endif
->> This means that sev.h can only be included from target-specific files.
->>
->> An alternative could be:
->>
->> #ifdef NEED_CPU_H
->> # include CONFIG_DEVICES
-> <command-line>: fatal error: x86_64-linux-user-config-devices.h: No such
-> file or directory
->
->> #endif
->>
->> #if defined NEED_CPU_H && !defined CONFIG_SEV
->> # define sev_enabled() 0
->> # define sev_es_enabled() 0
->> #else
->> bool sev_enabled(void);
->> bool sev_es_enabled(void);
->> #endif
->>
->> ... but in fact sysemu/sev.h _is_ only used from x86-specific files. So
->> should it be moved to include/hw/i386, and even merged with
->> target/i386/sev_i386.h?  Do we need two files?
-> No clue, I don't think we need. Brijesh?
+Changes since v6 [1]:
+- Rebase on 5.15-rc4
+- Include Marc's updated early exception handlers in the series
+- Refactoring and fixes (Drew, Marc)
+
+This patch series adds support for restricting CPU features for protected VMs
+in KVM (pKVM). For more background, please refer to the previous series [2].
+
+This series is based on 5.15-rc4. You can find the applied series here [3].
+
+Cheers,
+/fuad
+
+[1] https://lore.kernel.org/kvmarm/20210922124704.600087-1-tabba@google.com/
+
+[2] https://lore.kernel.org/kvmarm/20210827101609.2808181-1-tabba@google.com/
+
+[3] https://android-kvm.googlesource.com/linux/+/refs/heads/tabba/el2_fixed_feature_v7
+
+Fuad Tabba (8):
+  KVM: arm64: Pass struct kvm to per-EC handlers
+  KVM: arm64: Add missing field descriptor for MDCR_EL2
+  KVM: arm64: Simplify masking out MTE in feature id reg
+  KVM: arm64: Add handlers for protected VM System Registers
+  KVM: arm64: Initialize trap registers for protected VMs
+  KVM: arm64: Move sanitized copies of CPU features
+  KVM: arm64: Trap access to pVM restricted features
+  KVM: arm64: Handle protected guests at 32 bits
+
+Marc Zyngier (3):
+  KVM: arm64: Move __get_fault_info() and co into their own include file
+  KVM: arm64: Don't include switch.h into nvhe/kvm-main.c
+  KVM: arm64: Move early handlers to per-EC handlers
+
+ arch/arm64/include/asm/kvm_arm.h              |   1 +
+ arch/arm64/include/asm/kvm_asm.h              |   1 +
+ arch/arm64/include/asm/kvm_fixed_config.h     | 195 +++++++
+ arch/arm64/include/asm/kvm_host.h             |   2 +
+ arch/arm64/include/asm/kvm_hyp.h              |   5 +
+ arch/arm64/kvm/arm.c                          |  13 +
+ arch/arm64/kvm/hyp/include/hyp/fault.h        |  75 +++
+ arch/arm64/kvm/hyp/include/hyp/switch.h       | 221 ++++----
+ arch/arm64/kvm/hyp/include/nvhe/sys_regs.h    |  29 +
+ .../arm64/kvm/hyp/include/nvhe/trap_handler.h |   2 +
+ arch/arm64/kvm/hyp/nvhe/Makefile              |   2 +-
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c            |  11 +-
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c         |   8 +-
+ arch/arm64/kvm/hyp/nvhe/pkvm.c                | 185 +++++++
+ arch/arm64/kvm/hyp/nvhe/setup.c               |   3 +
+ arch/arm64/kvm/hyp/nvhe/switch.c              | 108 ++++
+ arch/arm64/kvm/hyp/nvhe/sys_regs.c            | 498 ++++++++++++++++++
+ arch/arm64/kvm/hyp/vhe/switch.c               |  16 +
+ arch/arm64/kvm/sys_regs.c                     |  10 +-
+ 19 files changed, 1240 insertions(+), 145 deletions(-)
+ create mode 100644 arch/arm64/include/asm/kvm_fixed_config.h
+ create mode 100644 arch/arm64/kvm/hyp/include/hyp/fault.h
+ create mode 100644 arch/arm64/kvm/hyp/include/nvhe/sys_regs.h
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/pkvm.c
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/sys_regs.c
 
 
-Sorry for the late reply, we do not need two files and it can be easily
-merged.
+base-commit: 1da38549dd64c7f5dd22427f12dfa8db3d8a722b
+-- 
+2.33.0.882.g93a45727a2-goog
 
-thanks
