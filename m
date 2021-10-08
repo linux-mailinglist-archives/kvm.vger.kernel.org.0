@@ -2,111 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6864842684E
-	for <lists+kvm@lfdr.de>; Fri,  8 Oct 2021 12:52:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 76A4C42686A
+	for <lists+kvm@lfdr.de>; Fri,  8 Oct 2021 13:02:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239954AbhJHKyq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Oct 2021 06:54:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:27056 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230042AbhJHKyp (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 8 Oct 2021 06:54:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1633690370;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=bXeqaJQRHIjGRFMe5JQ357RA8p6YK7boOm1VSZD5rnM=;
-        b=KH7WQFZ4TR5wPOQJQZYVEKLIpSOiz3Ha9KwW0hiFA25EYouO7br+2dVu5EiYS5KpHBusza
-        gSGzgqp2hIFDLvaSBpIkR3eeRBzsenqC/7cnW+4iTQT/cupAs9KnuOv2OwxDKP9mlQYL2g
-        OSf4CNgB6fbPKCHjrKjbKmOrqGbO7vo=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-468-PUiAiDHFOO2tioza04746Q-1; Fri, 08 Oct 2021 06:52:49 -0400
-X-MC-Unique: PUiAiDHFOO2tioza04746Q-1
-Received: by mail-wr1-f71.google.com with SMTP id c4-20020a5d6cc4000000b00160edc8bb28so1203939wrc.9
-        for <kvm@vger.kernel.org>; Fri, 08 Oct 2021 03:52:49 -0700 (PDT)
+        id S240151AbhJHLEh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Oct 2021 07:04:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56164 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239954AbhJHLEg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Oct 2021 07:04:36 -0400
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3166AC061570;
+        Fri,  8 Oct 2021 04:02:41 -0700 (PDT)
+Received: by mail-pf1-x430.google.com with SMTP id c29so7925823pfp.2;
+        Fri, 08 Oct 2021 04:02:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=subject:to:cc:references:from:organization:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=HZ0UMHO87j49x91nYlKX9DeZFDQ7q4eqUqMnNd1895o=;
+        b=bqNMT1tzwQQv0g1Ep650XhgHiUPuWSF0XuYonaB74NJrJnKZEwpv11Ju+huP+rrdGq
+         dzlqQnxZH+d6UR0UmnLomIdAOOGHbtqztn0N7LNJGLKsHt0mY3Y2SCZ32ZLyfXU0Hqs4
+         n6ycqJYLdovK22FL1DBUAo1AXLXwbzOpaQzWW9nDKpl+/MGGKqPQrvAnxXMg602p5uHs
+         NvprEZC/WHDteeUhJh2bO1ftlpWJRUkQR/JwXiREgjnn4ddoKqpaU79FVJ5BECoLYj1d
+         rDsF5y211e0LRiUuEV1bpN0tgyU1RG4QCbu36QUnHjWe8Q6dKupYqWz/C5sIkxq7XjsI
+         0ahw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=bXeqaJQRHIjGRFMe5JQ357RA8p6YK7boOm1VSZD5rnM=;
-        b=NIwLLKYDaILfK34uI+i79I4lR8smB4FJkPM+yKfS6t3h3aPcuQxoXRus9Knj8THdLJ
-         GabRq0wddu6AaCSLLoFeMPkhHYjVrKRzQB8NuL4Lo73M5hKba4T9nrK6Js97P/2rMAfL
-         nnyoyQChDTyii2ycZwie/akAYXO9kLXUy+MUGZGOAJOCAN6VAtOMZ3fxA+Y+ZXBM1flz
-         SB5wlnjVWQpTQD/A5SN95sRV01sS2I9q28jzeY9HmIdeZgnshMA9XxuFH9tNX8CuBkuI
-         DLkhWiZ6beJP3hBHH8yp3orBM58GYQhmkqYVEU2fGeWwf7X5Z/5dyRHk3+KgzVtz4+hK
-         g0lg==
-X-Gm-Message-State: AOAM531pStDAaUmOw7E4qY+0b/rhOTQRsLub5O+MMzpT6WtMgXYziAgw
-        TehjLegjO0yp/7crXXrVgoN3VE2E9vtzdTLvfKWH3TwxUm4+LSKGnyupGKOI4fkJ2dFy5v0mLkV
-        2RGYylPY/OlZl
-X-Received: by 2002:a5d:47cd:: with SMTP id o13mr3165139wrc.85.1633690368296;
-        Fri, 08 Oct 2021 03:52:48 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx95/KS3DNJ5vz5xhS/EN/yS2kB8/wbXBtifrJL81st7o9TE+bwlPVJ+PXLSKHW5fXBOiyYkw==
-X-Received: by 2002:a5d:47cd:: with SMTP id o13mr3165124wrc.85.1633690368144;
-        Fri, 08 Oct 2021 03:52:48 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id e1sm2228739wru.26.2021.10.08.03.52.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Oct 2021 03:52:47 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Wanpeng Li <kernellwp@gmail.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
+        h=x-gm-message-state:subject:to:cc:references:from:organization
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=HZ0UMHO87j49x91nYlKX9DeZFDQ7q4eqUqMnNd1895o=;
+        b=RF693BTv7SuOZm/mo9BlQD16TGh91FyZf3Z/R9G27zIRSCcWLfHQZGMIejgQjaW/7r
+         /BDzHpygnKdiM9eTzMmegftk4Qqab2B0SnYoff9LAxXtU27tqzcuvYeRKFCZRoygk0mb
+         smXksI6AzIwA4dQ4fSsAjkrmo2VNFw311WDNAFyS9kAA3ZmRkDeRcTZTIuc8mOcm2qFZ
+         TbeZbelw20S2DmQR0p7PwXslz7IrpdNT/LiqYisKJx6EB0fRNkSazboN4+sDFlFABwvM
+         l4g/4ZpdjF1raJ4LyGXCCeHdd4maeQFBoqNlmPgt9iTZULyLXLkJm+yhFCE6R9mnBbRO
+         Sy1w==
+X-Gm-Message-State: AOAM531PltEsgx+zcaCB+fDE7Nlo3O0pm5ItVFpgaelUrtTPnZgsKh4U
+        gu78xT0cEVXiG+PINK514so=
+X-Google-Smtp-Source: ABdhPJy4iAY5CM/1Kdeb/0UKFrsJpAYaAdRPrWuxU8iJsRE8CVZDpw6RHlQJLdDXa/nh8OcrxvPyBQ==
+X-Received: by 2002:a62:1786:0:b0:445:1a9c:952a with SMTP id 128-20020a621786000000b004451a9c952amr9828321pfx.39.1633690960659;
+        Fri, 08 Oct 2021 04:02:40 -0700 (PDT)
+Received: from Likes-MacBook-Pro.local ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id x21sm2336927pfa.186.2021.10.08.04.02.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 08 Oct 2021 04:02:40 -0700 (PDT)
+Subject: Re: [PATCH 2/3] KVM: vPMU: Fill get_msr MSR_CORE_PERF_GLOBAL_OVF_CTRL
+ w/ 0
+To:     Wanpeng Li <kernellwp@gmail.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: Re: [PATCH 3/3] KVM: LAPIC: Optimize PMI delivering overhead
-In-Reply-To: <1633687054-18865-3-git-send-email-wanpengli@tencent.com>
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Andi Kleen <ak@linux.intel.com>
 References: <1633687054-18865-1-git-send-email-wanpengli@tencent.com>
- <1633687054-18865-3-git-send-email-wanpengli@tencent.com>
-Date:   Fri, 08 Oct 2021 12:52:46 +0200
-Message-ID: <87ily73i0x.fsf@vitty.brq.redhat.com>
+ <1633687054-18865-2-git-send-email-wanpengli@tencent.com>
+From:   Like Xu <like.xu.linux@gmail.com>
+Organization: Tencent
+Message-ID: <58d59149-669f-7990-4f68-05b32ed693b5@gmail.com>
+Date:   Fri, 8 Oct 2021 19:02:31 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.14.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <1633687054-18865-2-git-send-email-wanpengli@tencent.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Wanpeng Li <kernellwp@gmail.com> writes:
+cc Andi,
 
+On 8/10/2021 5:57 pm, Wanpeng Li wrote:
 > From: Wanpeng Li <wanpengli@tencent.com>
->
-> The overhead of kvm_vcpu_kick() is huge since expensive rcu/memory
-> barrier etc operations in rcuwait_wake_up(). It is worse when local 
-> delivery since the vCPU is scheduled and we still suffer from this. 
-> We can observe 12us+ for kvm_vcpu_kick() in kvm_pmu_deliver_pmi() 
-> path by ftrace before the patch and 6us+ after the optimization. 
->
+> 
+> SDM section 18.2.3 mentioned that:
+> 
+>    "IA32_PERF_GLOBAL_OVF_CTL MSR allows software to clear overflow indicator(s) of
+>     any general-purpose or fixed-function counters via a single WRMSR."
+> 
+> It is R/W mentioned by SDM, we read this msr on bare-metal during perf testing,
+> the value is always 0 for CLX/SKX boxes on hands. Let's fill get_msr
+> MSR_CORE_PERF_GLOBAL_OVF_CTRL w/ 0 as hardware behavior.
+> 
 > Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
 > ---
->  arch/x86/kvm/lapic.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index 76fb00921203..ec6997187c6d 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -1120,7 +1120,8 @@ static int __apic_accept_irq(struct kvm_lapic *apic, int delivery_mode,
->  	case APIC_DM_NMI:
->  		result = 1;
->  		kvm_inject_nmi(vcpu);
-> -		kvm_vcpu_kick(vcpu);
-> +		if (vcpu != kvm_get_running_vcpu())
-> +			kvm_vcpu_kick(vcpu);
+> Btw, xen also fills get_msr MSR_CORE_PERF_GLOBAL_OVF_CTRL 0.
+> 
+>   arch/x86/kvm/vmx/pmu_intel.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+> index 10cc4f65c4ef..47260a8563f9 100644
+> --- a/arch/x86/kvm/vmx/pmu_intel.c
+> +++ b/arch/x86/kvm/vmx/pmu_intel.c
+> @@ -365,7 +365,7 @@ static int intel_pmu_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>   		msr_info->data = pmu->global_ctrl;
+>   		return 0;
+>   	case MSR_CORE_PERF_GLOBAL_OVF_CTRL:
+> -		msr_info->data = pmu->global_ovf_ctrl;
+> +		msr_info->data = 0;
 
-Out of curiosity,
+Tested-by: Like Xu <likexu@tencent.com>
 
-can this be converted into a generic optimization for kvm_vcpu_kick()
-instead? I.e. if kvm_vcpu_kick() is called for the currently running
-vCPU, there's almost nothing to do, especially when we already have a
-request pending, right? (I didn't put too much though to it)
+Further, better to drop 'u64 global_ovf_ctrl' directly.
 
->  		break;
->  
->  	case APIC_DM_INIT:
-
--- 
-Vitaly
-
+>   		return 0;
+>   	default:
+>   		if ((pmc = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0)) ||
+> 
