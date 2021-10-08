@@ -2,182 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BB26F426D45
-	for <lists+kvm@lfdr.de>; Fri,  8 Oct 2021 17:09:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BBB74426D67
+	for <lists+kvm@lfdr.de>; Fri,  8 Oct 2021 17:20:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242910AbhJHPLU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Oct 2021 11:11:20 -0400
-Received: from mga07.intel.com ([134.134.136.100]:43723 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S242732AbhJHPLQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Oct 2021 11:11:16 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10130"; a="290022015"
-X-IronPort-AV: E=Sophos;i="5.85,358,1624345200"; 
-   d="scan'208";a="290022015"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Oct 2021 08:09:19 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.85,358,1624345200"; 
-   d="scan'208";a="523009981"
-Received: from sqa-gate.sh.intel.com (HELO robert-ivt.tsp.org) ([10.239.48.212])
-  by orsmga001.jf.intel.com with ESMTP; 08 Oct 2021 08:09:16 -0700
-Message-ID: <85da4484902e5a4b1be645669c95dba7934d98b5.camel@linux.intel.com>
-Subject: Re: [PATCH v1 3/5] KVM: x86: nVMX: VMCS12 field's read/write
- respects field existence bitmap
-From:   Robert Hoo <robert.hu@linux.intel.com>
-To:     Yu Zhang <yu.c.zhang@linux.intel.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Jim Mattson <jmattson@google.com>
-Cc:     pbonzini@redhat.com, vkuznets@redhat.com, wanpengli@tencent.com,
-        joro@8bytes.org, kvm@vger.kernel.org
-Date:   Fri, 08 Oct 2021 23:09:15 +0800
-In-Reply-To: <20211008082302.txckaasmsystigeu@linux.intel.com>
-References: <0b94844844521fc0446e3df0aa02d4df183f8107.camel@linux.intel.com>
-         <YTI7K9RozNIWXTyg@google.com>
-         <64aad01b6bffd70fa3170cf262fe5d7c66f6b2d4.camel@linux.intel.com>
-         <YVx6Oesi7X3jfnaM@google.com>
-         <CALMp9eRyhAygfh1piNEDE+WGVzK1cTWJJR1aC_zqn=c2fy+c-A@mail.gmail.com>
-         <YVySdKOWTXqU4y3R@google.com>
-         <CALMp9eQvRYpZg+G7vMcaCq0HYPDfZVpPtDRO9bRa0w2fyyU9Og@mail.gmail.com>
-         <YVy6gj2+XsghsP3j@google.com>
-         <CALMp9eT+uAvPv7LhJKrJGDN31-aVy6DYBrP+PUDiTk0zWuCX4g@mail.gmail.com>
-         <YVzeJ59/yCpqgTX2@google.com>
-         <20211008082302.txckaasmsystigeu@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-8.el7) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+        id S242927AbhJHPWK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Oct 2021 11:22:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58732 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S242929AbhJHPWI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Oct 2021 11:22:08 -0400
+Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEB7AC061764
+        for <kvm@vger.kernel.org>; Fri,  8 Oct 2021 08:20:12 -0700 (PDT)
+Received: by mail-pg1-x52b.google.com with SMTP id s11so3399160pgr.11
+        for <kvm@vger.kernel.org>; Fri, 08 Oct 2021 08:20:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=+DwJxNDoJtDhvq9ZSDg0PQGL/oNqmKyqA/s5QHM/KJw=;
+        b=rn5k8n+EcdDIkAXU59D+iKtUjlDA3/0rzhyW1NFD5GsqO06gFaIUNF2+jI3ZfKWzjo
+         4yP9WaUypIi52a5e+6yueKr+WvdWFwup4Kjga/xfJ2KxTKLhxxdBWouUTH1O+U79JhAe
+         kZjNQrshsd0zSogjVXiyn9ZkAAa41zo0sluHzSfrzMGbwuqXSjN2+8Zl9lBGU+SKH5y9
+         jaPUUzbRqeSAPKL4h00gXuoYrAbVqqfJ/5zTAYQLdMNBdWo4TydPYpCO3b0NvYVzwCLR
+         c+xHZdC6qBhFp4tias4VLCO/eWXG7rU43EDAgT/46JA2eEIUQbDBepqFq8BFssJ3ngce
+         0iRA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=+DwJxNDoJtDhvq9ZSDg0PQGL/oNqmKyqA/s5QHM/KJw=;
+        b=ao0KsMjT7p8q82Vc+jV+CZcuKa+MLYRZvlNf2ZC+Yrj4v+4B8xZiMol+9LtmOBCjOl
+         LnR7KWFhWUpVcO+Yp6ilT/wmC8hnGQmWYs40YM/gk0LDx1YWe86fsGVZDaguWEgAAFD4
+         lKtmedlL/PbnE8YU3ZjwT9epek4Lnp0B8Dqck2JhLbgJ/t5TcGwsGjFWxtZvyMse0rez
+         fzdyHAVLhAGeSenDcRgC2GvN3AwnaqZRYU7LHHcfdEbFL6y7WKhxpEoM1QEOGctXV9Zw
+         35H6bkhUuPl37z0nvAzKCNOghh2Ynz+GeoDA5bbOrvoQQ1tCetNwkGWshiKlVeKO76xX
+         wgrA==
+X-Gm-Message-State: AOAM533fc33/dfSk+FbCNtuDq137SnZUgiDM3GCV6XZGlKDwzTcO0JVB
+        80WtMT3P4jSQgRJjZMoQw3DLvg==
+X-Google-Smtp-Source: ABdhPJw7IVhwXTlHF/c6N5zkruLir69z9rKpzJ8TK/3w33V/kw79EeM1kE/lWVxR+jaRI+62Jfgs4Q==
+X-Received: by 2002:a65:688d:: with SMTP id e13mr5061431pgt.428.1633706411969;
+        Fri, 08 Oct 2021 08:20:11 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id r14sm3118866pgf.49.2021.10.08.08.20.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 Oct 2021 08:20:11 -0700 (PDT)
+Date:   Fri, 8 Oct 2021 15:20:07 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Wanpeng Li <kernellwp@gmail.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Subject: Re: [PATCH 1/3] KVM: emulate: #GP when emulating rdpmc if CR0.PE is 1
+Message-ID: <YWBhpzsBxe16z+L1@google.com>
+References: <1633687054-18865-1-git-send-email-wanpengli@tencent.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1633687054-18865-1-git-send-email-wanpengli@tencent.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2021-10-08 at 16:23 +0800, Yu Zhang wrote:
-> On Tue, Oct 05, 2021 at 11:22:15PM +0000, Sean Christopherson wrote:
-> > On Tue, Oct 05, 2021, Jim Mattson wrote:
-> > > On Tue, Oct 5, 2021 at 1:50 PM Sean Christopherson <
-> > > seanjc@google.com> wrote:
-> > > > 
-> > > > On Tue, Oct 05, 2021, Jim Mattson wrote:
-> > > > > On Tue, Oct 5, 2021 at 10:59 AM Sean Christopherson <
-> > > > > seanjc@google.com> wrote:
-> > > > > > 
-> > > > > > On Tue, Oct 05, 2021, Jim Mattson wrote:
-> > > > > > > On Tue, Oct 5, 2021 at 9:16 AM Sean Christopherson <
-> > > > > > > seanjc@google.com> wrote:
-> > > > > > > > 
-> > > > > > > > On Tue, Sep 28, 2021, Robert Hoo wrote:
-> > > > > > > > > On Fri, 2021-09-03 at 15:11 +0000, Sean
-> > > > > > > > > Christopherson wrote:
-> > > > > > > > >       You also said, "This is quite the complicated
-> > > > > > > > > mess for
-> > > > > > > > > something I'm guessing no one actually cares
-> > > > > > > > > about.  At what point do
-> > > > > > > > > we chalk this up as a virtualization hole and sweep
-> > > > > > > > > it under the rug?"
-> > > > > > > > > -- I couldn't agree more.
-> > > > > > > > 
-> > > > > > > > ...
-> > > > > > > > 
-> > > > > > > > > So, Sean, can you help converge our discussion and
-> > > > > > > > > settle next step?
-> > > > > > > > 
-> > > > > > > > Any objection to simply keeping KVM's current behavior,
-> > > > > > > > i.e. sweeping this under
-> > > > > > > > the proverbial rug?
-> > > > > > > 
-> > > > > > > Adding 8 KiB per vCPU seems like no big deal to me, but,
-> > > > > > > on the other
-> > > > > > > hand, Paolo recently argued that slightly less than 1 KiB
-> > > > > > > per vCPU was
-> > > > > > > unreasonable for VM-exit statistics, so maybe I've got a
-> > > > > > > warped
-> > > > > > > perspective. I'm all for pedantic adherence to the
-> > > > > > > specification, but
-> > > > > > > I have to admit that no actual hypervisor is likely to
-> > > > > > > care (or ever
-> > > > > > > will).
-> > > > > > 
-> > > > > > It's not just the memory, it's also the complexity, e.g. to
-> > > > > > get VMCS shadowing
-> > > > > > working correctly, both now and in the future.
-> > > > > 
-> > > > > As far as CPU feature virtualization goes, this one doesn't
-> > > > > seem that
-> > > > > complex to me. It's not anywhere near as complex as
-> > > > > virtualizing MTF,
-> > > > > for instance, and KVM *claims* to do that! :-)
-> > > > 
-> > > > There aren't many things as complex as MTF.  But unlike MTF,
-> > > > this behavior doesn't
-> > > > have a concrete use case to justify the risk vs. reward.  IMO
-> > > > the odds of us breaking
-> > > > something in KVM for "normal" use cases are higher than the
-> > > > odds of an L1 VMM breaking
-> > > > because a VMREAD/VMWRITE didn't fail when it technically should
-> > > > have failed.
-> > > 
-> > > Playing devil's advocate here, because I totally agree with
-> > > you...
-> > > 
-> > > Who's to say what's "normal"? It's a slippery slope when we start
-> > > making personal value judgments about which parts of the
-> > > architectural
-> > > specification are important and which aren't.
-> > 
-> > I agree, but in a very similar case Intel chose to take an erratum
-> > instead of
-> > fixing what was in all likelihood a microcode bug, i.e. could have
-> > been patched
-> > in the field.  So it's not _just_ personal value judgment, though
-> > it's definitely
-> > that too :-)
-> > 
-> > I'm not saying I'd actively oppose support for strict
-> > VMREAD/VMWRITE adherence
-> > to the vCPU model, but I'm also not going to advise anyone to go
-> > spend their time
-> > implementing a non-trivial fix for behavior that, AFAIK, doesn't
-> > adversely affect
-> > any real world use cases.
-> > 
-> 
-> Thank you all for the discussion, Sean & Jim.
-> 
-> Could we draw a conclusion to just keep KVM as it is now? If yes, how
-> about we
-> depricate the check against max index value from
-> MSR_IA32_VMX_VMCS_ENUM in vmx.c 
-> of the kvm-unit-test?
-> 
-> After all, we have not witnessed any real system doing so.
-> 
-> E.g.,
-> 
-> diff --git a/x86/vmx.c b/x86/vmx.c
-> index f0b853a..63623e5 100644
-> --- a/x86/vmx.c
-> +++ b/x86/vmx.c
-> @@ -380,8 +380,7 @@ static void test_vmwrite_vmread(void)
->         vmcs_enum_max = (rdmsr(MSR_IA32_VMX_VMCS_ENUM) &
-> VMCS_FIELD_INDEX_MASK)
->                         >> VMCS_FIELD_INDEX_SHIFT;
->         max_index = find_vmcs_max_index();
-> -       report(vmcs_enum_max == max_index,
-> -              "VMX_VMCS_ENUM.MAX_INDEX expected: %x, actual: %x",
-> +       printf("VMX_VMCS_ENUM.MAX_INDEX expected: %x, actual: %x",
->                max_index, vmcs_enum_max);
-> 
->         assert(!vmcs_clear(vmcs));
-> 
-> B.R.
-> Yu
+The shortlog makes it sound like "inject a #GP if CR0.PE=1", i.e. unconditionally
+inject #GP for RDMPC in protected mode.  Maybe "Don't inject #GP when emulating
+RDMPC if CR0.PE=0"?
 
-I think this patch series has its value of fixing the be-forced hard-
-code VMX_VMCS_ENUM.
-My understanding of Sean's "simply keeping KVM's current behavior, i.e.
-sweeping this under the proverbial rug", is about vmcs shadowing will
-fail some VMCS field validation. Of course, this in turn will fail some
-case of this KVM unit test case (theoretically), though we haven't met
-yet.
+On Fri, Oct 08, 2021, Wanpeng Li wrote:
+> From: Wanpeng Li <wanpengli@tencent.com>
+> 
+> SDM mentioned that, RDPMC: 
+> 
+>   IF (((CR4.PCE = 1) or (CPL = 0) or (CR0.PE = 0)) and (ECX indicates a supported counter)) 
+>       THEN
+>           EAX := counter[31:0];
+>           EDX := ZeroExtend(counter[MSCB:32]);
+>       ELSE (* ECX is not valid or CR4.PCE is 0 and CPL is 1, 2, or 3 and CR0.PE is 1 *)
+>           #GP(0); 
+>   FI;
+> 
+> Let's add the CR0.PE is 1 checking to rdpmc emulate.
+> 
+> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+> ---
+>  arch/x86/kvm/emulate.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+> index 9a144ca8e146..ab7ec569e8c9 100644
+> --- a/arch/x86/kvm/emulate.c
+> +++ b/arch/x86/kvm/emulate.c
+> @@ -4213,6 +4213,7 @@ static int check_rdtsc(struct x86_emulate_ctxt *ctxt)
+>  static int check_rdpmc(struct x86_emulate_ctxt *ctxt)
+>  {
+>  	u64 cr4 = ctxt->ops->get_cr(ctxt, 4);
+> +	u64 cr0 = ctxt->ops->get_cr(ctxt, 0);
+>  	u64 rcx = reg_read(ctxt, VCPU_REGS_RCX);
+>  
+>  	/*
+> @@ -4222,7 +4223,7 @@ static int check_rdpmc(struct x86_emulate_ctxt *ctxt)
+>  	if (enable_vmware_backdoor && is_vmware_backdoor_pmc(rcx))
+>  		return X86EMUL_CONTINUE;
+>  
+> -	if ((!(cr4 & X86_CR4_PCE) && ctxt->ops->cpl(ctxt)) ||
+> +	if ((!(cr4 & X86_CR4_PCE) && ctxt->ops->cpl(ctxt) && (cr0 & X86_CR0_PE)) ||
 
+I don't think it's possible for CPL to be >0 if CR0.PE=0, e.g. we could probably
+WARN in the #GP path.  Realistically it doesn't add value though, so maybe just
+add a blurb in the changelog saying this isn't strictly necessary?
 
+>  	    ctxt->ops->check_pmc(ctxt, rcx))
+>  		return emulate_gp(ctxt, 0);
+>  
+> -- 
+> 2.25.1
+> 
