@@ -2,58 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8FC2642784B
-	for <lists+kvm@lfdr.de>; Sat,  9 Oct 2021 11:09:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A833B427853
+	for <lists+kvm@lfdr.de>; Sat,  9 Oct 2021 11:14:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244330AbhJIJLt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 9 Oct 2021 05:11:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44672 "EHLO
+        id S231698AbhJIJQO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 9 Oct 2021 05:16:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45748 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244391AbhJIJLs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 9 Oct 2021 05:11:48 -0400
-Received: from mail-oi1-x233.google.com (mail-oi1-x233.google.com [IPv6:2607:f8b0:4864:20::233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2742EC061570;
-        Sat,  9 Oct 2021 02:09:52 -0700 (PDT)
-Received: by mail-oi1-x233.google.com with SMTP id o4so16923978oia.10;
-        Sat, 09 Oct 2021 02:09:52 -0700 (PDT)
+        with ESMTP id S230455AbhJIJQN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 9 Oct 2021 05:16:13 -0400
+Received: from mail-oi1-x232.google.com (mail-oi1-x232.google.com [IPv6:2607:f8b0:4864:20::232])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38B99C061570;
+        Sat,  9 Oct 2021 02:14:17 -0700 (PDT)
+Received: by mail-oi1-x232.google.com with SMTP id 24so17095541oix.0;
+        Sat, 09 Oct 2021 02:14:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=AWlcECk9c8kTLFlOaur0Gv/up7C1gqtDcFwTvhK0BeA=;
-        b=KwAoNEoTFSpQKQOOFUHUWTkAupifyh7qUracxaMSYWXDUXSqYgPWEoQPBQX8tZAxQs
-         esUitSL1AtnlTcDoIDAb02RgcJz7R87UvUoaJsQi4Rq01BxC0/5bSahrc/Cpt0RPzD1H
-         eg+G1ixQI/sfJNPbt7dIK7F0EygOCPKY+NOgJ7KwJpJtxf6p0d6zvXELxlBRNiEqDLqP
-         4MjsTXbnaR+LNOO3c7/EX/pHYvWmbIcZ04+/c0yqLABZcFEycUoK6G2t8e/9HrhkqOO7
-         iilKGZtMlcN3Q7SXv2s6vLQRYmiWGLAP+ovj+D07FmiTULjIzxCR/fhGilxfYtsPOFB5
-         Gwvg==
+        bh=MHz+fLkq0sPp6F+6xlYzKWQ6Hgd1dcKc+eCm2j1oBAM=;
+        b=LlJTUeM3tz8zBMSDxBtJdys+DPI7z7uVXdrAAvfxCS/HO90vN97DhEVebwNZZYazFQ
+         yqIXb0fLTfqzjgdzs7fKtqzXccix8ZOBEyLzKfY/hvT57ydUSH5tbuHJvoHjDjmaLvZ6
+         TI3nn/K65oEChEm0J14oDzex9sAHQ7xY79aU7pdwydkyYgO8ziPh8xaFozD4vItc8Fku
+         Q/h0MSyRo/Hc/grVLdqPNeAoCHlTnQjT1qhVIGL/ZSUjIj34hc99zKAdx8wCNcIBg+LD
+         +z1RsfgqKOKBe/UzrCiKWwyv+pnsfdnzLb1fE4ne1lnP1vachTvl3ejujScrgkigpbRI
+         2M8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=AWlcECk9c8kTLFlOaur0Gv/up7C1gqtDcFwTvhK0BeA=;
-        b=xQnt4bypdIIOn088nchFHqM8oH7a1dowK4Puzb7b/uaa6LJd44eQ8X5G+YC/J6l6H2
-         Dgjc5pyyNMtjVrFdP9qcQcbcBeueSn2qY6PC3+lPtN1Kw39PhVv/GnDfskurnC0Ascjr
-         UZJY4SRDzkQ8/dEyTdM00J+W93k71yuqJLkTsXOq7P4EgMjNbva1R4NrJgYCcYoWDYxY
-         3ZWrgguWUSLQqXUC3Yqrgu+Um1nJ5k1fyc3Xhk3d3UDW8oOG2DTlVGjBbH7toasQ7nMO
-         q5VvRysO6afFv18GloIXmBcDzoSYOnX2ylktDP9/DPhjpTEYqSt9BQdsvXnKtBrJzBCl
-         9XwQ==
-X-Gm-Message-State: AOAM530IM+J5/7Bj0IryDbkO4TSKP/ESGgBv7AuQF+pl3V39vlJrEZ4L
-        b30QUJHGvg4C/3GwbnTHO37+uUvZBMZW8xQGuPPR/Sbd3p0=
-X-Google-Smtp-Source: ABdhPJy1cTcnxG2cj5lcXuYwRgsCHfdXC2i41qpIW+3g0k40YSdGg/dGvGGn+nl+zoKwgPaPfPK43olDv5Q/kLfitDo=
-X-Received: by 2002:a05:6808:1148:: with SMTP id u8mr11082381oiu.33.1633770591589;
- Sat, 09 Oct 2021 02:09:51 -0700 (PDT)
+        bh=MHz+fLkq0sPp6F+6xlYzKWQ6Hgd1dcKc+eCm2j1oBAM=;
+        b=yMiTfjGIbZNelAViZfDYGgSLxMT7egPKTTq2idbplYbOeGF67uZFIFEgT1/F8NpkSh
+         FQzU3ktxS2hd8MFs8p0gI5ShPCDUtTwp8nWFcT+moGO0vFXk4copR4Ua2adxC9t5Xxpm
+         LdJfV8Qw3Kdc5pSLYdBxXN5zbSLn2WqTeeX37TSAexSEF5UAZNkXmBb3a9Hd3y0lj8Xi
+         eeS9xHQpLwvJvOyo8rW6M9Q3+J9ji3mSZnhyBZQZQdx+B31w6gQ/NzME4Llwd53+lSi9
+         Tkn7ZASMSK+WMXbo9H9det0I1b8gclMtr4w4dMra8/lHBrx80gs9lZ1lxC5nLWZgoAU4
+         DCyg==
+X-Gm-Message-State: AOAM533gn1DXBVbjYf5kVnrzAbbruJh3xlBWpmNenJHb+3ejJjJd+g5i
+        HydB/Nfu3JioZ10UWfack/naP/LF6fB9VHeVRdQ=
+X-Google-Smtp-Source: ABdhPJxvCeZUVnWEZeKcA3Hequb2mutBsquMD43Fn51l8katMgFyhwtwbhe2hVUhDluo2RGgUSPEsWdC2+l1mjR97gc=
+X-Received: by 2002:aca:4587:: with SMTP id s129mr19335653oia.5.1633770856604;
+ Sat, 09 Oct 2021 02:14:16 -0700 (PDT)
 MIME-Version: 1.0
-References: <1633687054-18865-1-git-send-email-wanpengli@tencent.com> <YWBhpzsBxe16z+L1@google.com>
-In-Reply-To: <YWBhpzsBxe16z+L1@google.com>
+References: <1633687054-18865-1-git-send-email-wanpengli@tencent.com>
+ <1633687054-18865-3-git-send-email-wanpengli@tencent.com> <87ily73i0x.fsf@vitty.brq.redhat.com>
+ <CANRm+Cy=bb_iap6JKsux7ekmo6Td0FXqwpuVdgPSC8u8b2wFNA@mail.gmail.com> <YWBq56G/ZrsytEP7@google.com>
+In-Reply-To: <YWBq56G/ZrsytEP7@google.com>
 From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Sat, 9 Oct 2021 17:09:40 +0800
-Message-ID: <CANRm+CxCLjts0EPORmQvkiggujN_bRf_rL0LvVq8homLoVS6Og@mail.gmail.com>
-Subject: Re: [PATCH 1/3] KVM: emulate: #GP when emulating rdpmc if CR0.PE is 1
+Date:   Sat, 9 Oct 2021 17:14:05 +0800
+Message-ID: <CANRm+Czj4Kv56HcX2vYu6mMa6o6xrMrCKmZ8x=rp-apLrrGHZQ@mail.gmail.com>
+Subject: Re: [PATCH 3/3] KVM: LAPIC: Optimize PMI delivering overhead
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>
@@ -62,58 +64,77 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 8 Oct 2021 at 23:20, Sean Christopherson <seanjc@google.com> wrote:
+On Fri, 8 Oct 2021 at 23:59, Sean Christopherson <seanjc@google.com> wrote:
 >
-> The shortlog makes it sound like "inject a #GP if CR0.PE=1", i.e. unconditionally
-> inject #GP for RDMPC in protected mode.  Maybe "Don't inject #GP when emulating
-> RDMPC if CR0.PE=0"?
->
-
-Agreed.
-
 > On Fri, Oct 08, 2021, Wanpeng Li wrote:
-> > From: Wanpeng Li <wanpengli@tencent.com>
-> >
-> > SDM mentioned that, RDPMC:
-> >
-> >   IF (((CR4.PCE = 1) or (CPL = 0) or (CR0.PE = 0)) and (ECX indicates a supported counter))
-> >       THEN
-> >           EAX := counter[31:0];
-> >           EDX := ZeroExtend(counter[MSCB:32]);
-> >       ELSE (* ECX is not valid or CR4.PCE is 0 and CPL is 1, 2, or 3 and CR0.PE is 1 *)
-> >           #GP(0);
-> >   FI;
-> >
-> > Let's add the CR0.PE is 1 checking to rdpmc emulate.
-> >
-> > Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> > ---
-> >  arch/x86/kvm/emulate.c | 3 ++-
-> >  1 file changed, 2 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-> > index 9a144ca8e146..ab7ec569e8c9 100644
-> > --- a/arch/x86/kvm/emulate.c
-> > +++ b/arch/x86/kvm/emulate.c
-> > @@ -4213,6 +4213,7 @@ static int check_rdtsc(struct x86_emulate_ctxt *ctxt)
-> >  static int check_rdpmc(struct x86_emulate_ctxt *ctxt)
-> >  {
-> >       u64 cr4 = ctxt->ops->get_cr(ctxt, 4);
-> > +     u64 cr0 = ctxt->ops->get_cr(ctxt, 0);
-> >       u64 rcx = reg_read(ctxt, VCPU_REGS_RCX);
-> >
-> >       /*
-> > @@ -4222,7 +4223,7 @@ static int check_rdpmc(struct x86_emulate_ctxt *ctxt)
-> >       if (enable_vmware_backdoor && is_vmware_backdoor_pmc(rcx))
-> >               return X86EMUL_CONTINUE;
-> >
-> > -     if ((!(cr4 & X86_CR4_PCE) && ctxt->ops->cpl(ctxt)) ||
-> > +     if ((!(cr4 & X86_CR4_PCE) && ctxt->ops->cpl(ctxt) && (cr0 & X86_CR0_PE)) ||
+> > On Fri, 8 Oct 2021 at 18:52, Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
+> > >
+> > > Wanpeng Li <kernellwp@gmail.com> writes:
+> > >
+> > > > From: Wanpeng Li <wanpengli@tencent.com>
+> > > >
+> > > > The overhead of kvm_vcpu_kick() is huge since expensive rcu/memory
+> > > > barrier etc operations in rcuwait_wake_up(). It is worse when local
 >
-> I don't think it's possible for CPL to be >0 if CR0.PE=0, e.g. we could probably
-> WARN in the #GP path.  Realistically it doesn't add value though, so maybe just
-> add a blurb in the changelog saying this isn't strictly necessary?
+> Memory barriers on x86 are just compiler barriers.  The only meaningful overhead
+> is the locked transaction in rcu_read_lock() => preempt_disable().  I suspect the
+> performance benefit from this patch comes either comes from avoiding a second
+> lock when disabling preemption again for get_cpu(), or by avoiding the cmpxchg()
+> in kvm_vcpu_exiting_guest_mode().
+>
+> > > > delivery since the vCPU is scheduled and we still suffer from this.
+> > > > We can observe 12us+ for kvm_vcpu_kick() in kvm_pmu_deliver_pmi()
+> > > > path by ftrace before the patch and 6us+ after the optimization.
+>
+> Those numbers seem off, I wouldn't expect a few locks to take 6us.
 
-Do it in v2.
+Maybe the ftrace introduces more overhead.
+
+>
+> > > > Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+> > > > ---
+> > > >  arch/x86/kvm/lapic.c | 3 ++-
+> > > >  1 file changed, 2 insertions(+), 1 deletion(-)
+> > > >
+> > > > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> > > > index 76fb00921203..ec6997187c6d 100644
+> > > > --- a/arch/x86/kvm/lapic.c
+> > > > +++ b/arch/x86/kvm/lapic.c
+> > > > @@ -1120,7 +1120,8 @@ static int __apic_accept_irq(struct kvm_lapic *apic, int delivery_mode,
+> > > >       case APIC_DM_NMI:
+> > > >               result = 1;
+> > > >               kvm_inject_nmi(vcpu);
+> > > > -             kvm_vcpu_kick(vcpu);
+> > > > +             if (vcpu != kvm_get_running_vcpu())
+> > > > +                     kvm_vcpu_kick(vcpu);
+> > >
+> > > Out of curiosity,
+> > >
+> > > can this be converted into a generic optimization for kvm_vcpu_kick()
+> > > instead? I.e. if kvm_vcpu_kick() is called for the currently running
+> > > vCPU, there's almost nothing to do, especially when we already have a
+> > > request pending, right? (I didn't put too much though to it)
+> >
+> > I thought about it before, I will do it in the next version since you
+> > also vote for it. :)
+>
+> Adding a kvm_get_running_vcpu() check before kvm_vcpu_wake_up() in kvm_vcpu_kick()
+> is not functionally correct as it's possible to reach kvm_cpu_kick() from (soft)
+> IRQ context, e.g. hrtimer => apic_timer_expired() and pi_wakeup_handler().  If
+> the kick occurs after prepare_to_rcuwait() and the final kvm_vcpu_check_block(),
+> but before the vCPU is scheduled out, then the kvm_vcpu_wake_up() is required to
+> wake the vCPU, even if it is the current running vCPU.
+
+Good point.
+
+>
+> The extra check might also degrade performance for many cases since the full kick
+> path would need to disable preemption three times, though if the overhead is from
+> x86's cmpxchg() then it's a moot point.
+>
+> I think we'd want something like this to avoid extra preempt_disable() as well
+> as the cmpxchg() when @vcpu is the running vCPU.
+
+Do it in v2, thanks for the suggestion.
 
     Wanpeng
