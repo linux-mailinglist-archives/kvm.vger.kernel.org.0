@@ -2,49 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D22F427845
-	for <lists+kvm@lfdr.de>; Sat,  9 Oct 2021 11:09:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5F0E5427847
+	for <lists+kvm@lfdr.de>; Sat,  9 Oct 2021 11:09:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232912AbhJIJLm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 9 Oct 2021 05:11:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44632 "EHLO
+        id S244317AbhJIJLo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 9 Oct 2021 05:11:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44640 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229995AbhJIJLk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 9 Oct 2021 05:11:40 -0400
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18D6DC061570;
-        Sat,  9 Oct 2021 02:09:44 -0700 (PDT)
-Received: by mail-pl1-x631.google.com with SMTP id 21so1515973plo.13;
-        Sat, 09 Oct 2021 02:09:44 -0700 (PDT)
+        with ESMTP id S244305AbhJIJLn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 9 Oct 2021 05:11:43 -0400
+Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A64DAC061570;
+        Sat,  9 Oct 2021 02:09:46 -0700 (PDT)
+Received: by mail-pj1-x102c.google.com with SMTP id ls18so9344660pjb.3;
+        Sat, 09 Oct 2021 02:09:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id;
-        bh=M1+1Yip8GFzyYIhL8WE/3+73lyzOVhHwNfK4uPgNVUA=;
-        b=TxSfJMqva34WyinV6SrFZjI5WJv0mm07cxZh6lItXh62PrHp4Bkd98w8qgxkp+rjbG
-         HYRbyRgaJhwbNknvStXuWi1LiAzfeCL79jsYMS8idExfOSZuGhCWBgzxK2fEqJi3WLmS
-         uwr9/WTrtCwB6tszb4RsLpi9Wq+4pwkGY9pASkRbGJiKbwMBkmT2VWa7UYSouOXDvBo4
-         5wLAy4i7jN0q315/BmUWl07SWi6OO7VmVAOmuk8Mr/CmTZExrQFAulRzxCZiLvAa2xyr
-         W57aXDUYj/9q3b1QXDaRGNGj1iLHftBuwujKOLkzzJP66QLIKc18VBGqlUT35xtQut3y
-         0LoQ==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=wuqphgKvr5OKJUpCclpJueDTJYxdQ5QHiNBmL1E9oj4=;
+        b=e549eoABPAYOULGwuz5cXPZ8pUpri7ZPQiMo/32Ts16+KXghaviDkl/05Lq0j9onmm
+         HtORzXLjbS7JQwJ7B+/KJbyU24I1NJox0LLNe/1U/mlFUTQylIf2lPyxLXK1umXk1eCP
+         jomZeTVU/u4tZYJgAvfJcnVAFL+ttS+TkvvEqdkX/8Xvp7BiigByJNqVWG4rVsp+Cqn/
+         8/VhjN99qEZNqwK9ez6lBXYR42OyM9n/u56QSwI0V+PKLrZ/cU7jUu6Ey+Bpvb1iZrA+
+         KO7upaTvdZe9rpDm9tn4bbJ/IK4Wd0eibOdz3GGTCdtlBI8Lu8CAV2LF62cGpEaNq3CB
+         NErg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=M1+1Yip8GFzyYIhL8WE/3+73lyzOVhHwNfK4uPgNVUA=;
-        b=cdxnXG2dFEVZ3y0hlNh/tqOzB/DEGZ/HlBGUefEPkDMQnV8H35FKw07Nxs1N+OH+xR
-         xj70oe8RzzOn4jrskWM/fJ8HuTRdsVGHS3XzdqWer6qa6RAiqrOI7PhE0UTnTqoY0lFC
-         OFp3y1NtYBwIZB8e4fJFQIw+RzJHTYC7zXMtKnRRH2K1kJVgpnK8LiiYcQCfKAE436N+
-         0WGZfYQH2TruvJJFhnCzLtrpqLkZr5RZhnYKRDcR6AUbnmBhXVtW1Cd1d3ZmFjzPlq+R
-         hjFI8w+B0mnbGQHYbyyflgTZ68P/S8dsBfnNfXGmfAZjdRtLn0GHxwGSADowZWaTHlY5
-         aFkg==
-X-Gm-Message-State: AOAM530g0/smLwdSuO5PNrpUyZWVzJa4v41L/kvQwwFyEnPFY2QjLGsv
-        3bNazWc4h4vhMRDQ8gnxD+sqtOG5xKe7hg==
-X-Google-Smtp-Source: ABdhPJyXHBkNsEKax9+c6M7O7P32Le6wJOSQyZb+99ByoVuaqqf2Uj+vgntwbdGdKhQMza9tc2lVaA==
-X-Received: by 2002:a17:90a:1a06:: with SMTP id 6mr17862330pjk.150.1633770583346;
-        Sat, 09 Oct 2021 02:09:43 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=wuqphgKvr5OKJUpCclpJueDTJYxdQ5QHiNBmL1E9oj4=;
+        b=JNvjRz73zLGKfZF6pYQ4dsF8TpHuAof7cbZqdrRmKM0A9qnEJSdScb8XrbGhvAyMtA
+         qDhh6gZxMDH11nXWrlPRCSqbFwsHiJuWVsD53GdL/0lxb3/KCV0W9TZvMrN6a0/Otvgo
+         p1sGRL567SdEFRDcyrABHt0kbTW4ZwrSiVIw6ZKa0+yPGWl/XlRXqPG44tVrcj08iab+
+         Sjlex//z6RNGBWyEIwAi+CO9XWhPjDe6THzUnBKJkvarGL+t4TyUCNLnElOAFxHPJkpy
+         ptpcujZNeAqs0m9mzgBwwIiiiiiUmvC1JghexU/wGIKr5Wtb5JM77nCedkMKzTnyacFB
+         ooRA==
+X-Gm-Message-State: AOAM5300kojXVdc93l8ydU7rLjwJMzNbCVGOolblEWz/YWO9P9OCNWry
+        5S0jx6dyhTGbu42gFKYot8xkTJJ4H28GDw==
+X-Google-Smtp-Source: ABdhPJzGRfiHAAak1Nm3nyjyGOuhSPnoY4eVJXfgeoMzXVoNt3eLBi192f3jpWB/begGfykx14NyJg==
+X-Received: by 2002:a17:90b:248:: with SMTP id fz8mr8349986pjb.157.1633770585982;
+        Sat, 09 Oct 2021 02:09:45 -0700 (PDT)
 Received: from localhost.localdomain ([203.205.141.112])
-        by smtp.googlemail.com with ESMTPSA id u2sm13607217pji.30.2021.10.09.02.09.40
+        by smtp.googlemail.com with ESMTPSA id u2sm13607217pji.30.2021.10.09.02.09.43
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 09 Oct 2021 02:09:43 -0700 (PDT)
+        Sat, 09 Oct 2021 02:09:45 -0700 (PDT)
 From:   Wanpeng Li <kernellwp@gmail.com>
 X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
@@ -54,58 +55,81 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>
-Subject: [PATCH v2 1/3] KVM: emulate: Don't inject #GP when emulating RDMPC if CR0.PE=0
-Date:   Sat,  9 Oct 2021 02:08:50 -0700
-Message-Id: <1633770532-23664-1-git-send-email-wanpengli@tencent.com>
+Subject: [PATCH v2 2/3] KVM: vPMU: Fill get_msr MSR_CORE_PERF_GLOBAL_OVF_CTRL w/ 0
+Date:   Sat,  9 Oct 2021 02:08:51 -0700
+Message-Id: <1633770532-23664-2-git-send-email-wanpengli@tencent.com>
 X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1633770532-23664-1-git-send-email-wanpengli@tencent.com>
+References: <1633770532-23664-1-git-send-email-wanpengli@tencent.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 From: Wanpeng Li <wanpengli@tencent.com>
 
-DM mentioned that, RDPMC: 
+SDM section 18.2.3 mentioned that:
 
-  IF (((CR4.PCE = 1) or (CPL = 0) or (CR0.PE = 0)) and (ECX indicates a supported counter)) 
-      THEN
-          EAX := counter[31:0];
-          EDX := ZeroExtend(counter[MSCB:32]);
-      ELSE (* ECX is not valid or CR4.PCE is 0 and CPL is 1, 2, or 3 and CR0.PE is 1 *)
-          #GP(0); 
-  FI;
+  "IA32_PERF_GLOBAL_OVF_CTL MSR allows software to clear overflow indicator(s) of 
+   any general-purpose or fixed-function counters via a single WRMSR."
 
-Let's add the CR0.PE is 1 checking to rdpmc emulate, though this isn't
-strictly necessary since it's impossible for CPL to be >0 if CR0.PE=0.
+It is R/W mentioned by SDM, we read this msr on bare-metal during perf testing, 
+the value is always 0 for ICX/SKX boxes on hands. Let's fill get_msr
+MSR_CORE_PERF_GLOBAL_OVF_CTRL w/ 0 as hardware behavior and drop
+global_ovf_ctrl variable.
 
+Tested-by: Like Xu <likexu@tencent.com>
 Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
 ---
 v1 -> v2:
- * update patch description
+ * drop 'u64 global_ovf_ctrl' directly
 
- arch/x86/kvm/emulate.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ arch/x86/include/asm/kvm_host.h | 1 -
+ arch/x86/kvm/vmx/pmu_intel.c    | 6 ++----
+ 2 files changed, 2 insertions(+), 5 deletions(-)
 
-diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-index 9a144ca8e146..ab7ec569e8c9 100644
---- a/arch/x86/kvm/emulate.c
-+++ b/arch/x86/kvm/emulate.c
-@@ -4213,6 +4213,7 @@ static int check_rdtsc(struct x86_emulate_ctxt *ctxt)
- static int check_rdpmc(struct x86_emulate_ctxt *ctxt)
- {
- 	u64 cr4 = ctxt->ops->get_cr(ctxt, 4);
-+	u64 cr0 = ctxt->ops->get_cr(ctxt, 0);
- 	u64 rcx = reg_read(ctxt, VCPU_REGS_RCX);
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index f8f48a7ec577..7aaac918e992 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -499,7 +499,6 @@ struct kvm_pmu {
+ 	u64 fixed_ctr_ctrl;
+ 	u64 global_ctrl;
+ 	u64 global_status;
+-	u64 global_ovf_ctrl;
+ 	u64 counter_bitmask[2];
+ 	u64 global_ctrl_mask;
+ 	u64 global_ovf_ctrl_mask;
+diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+index 10cc4f65c4ef..b8e0d21b7c8a 100644
+--- a/arch/x86/kvm/vmx/pmu_intel.c
++++ b/arch/x86/kvm/vmx/pmu_intel.c
+@@ -365,7 +365,7 @@ static int intel_pmu_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		msr_info->data = pmu->global_ctrl;
+ 		return 0;
+ 	case MSR_CORE_PERF_GLOBAL_OVF_CTRL:
+-		msr_info->data = pmu->global_ovf_ctrl;
++		msr_info->data = 0;
+ 		return 0;
+ 	default:
+ 		if ((pmc = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0)) ||
+@@ -423,7 +423,6 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		if (!(data & pmu->global_ovf_ctrl_mask)) {
+ 			if (!msr_info->host_initiated)
+ 				pmu->global_status &= ~data;
+-			pmu->global_ovf_ctrl = data;
+ 			return 0;
+ 		}
+ 		break;
+@@ -588,8 +587,7 @@ static void intel_pmu_reset(struct kvm_vcpu *vcpu)
+ 		pmc->counter = 0;
+ 	}
  
- 	/*
-@@ -4222,7 +4223,7 @@ static int check_rdpmc(struct x86_emulate_ctxt *ctxt)
- 	if (enable_vmware_backdoor && is_vmware_backdoor_pmc(rcx))
- 		return X86EMUL_CONTINUE;
+-	pmu->fixed_ctr_ctrl = pmu->global_ctrl = pmu->global_status =
+-		pmu->global_ovf_ctrl = 0;
++	pmu->fixed_ctr_ctrl = pmu->global_ctrl = pmu->global_status = 0;
  
--	if ((!(cr4 & X86_CR4_PCE) && ctxt->ops->cpl(ctxt)) ||
-+	if ((!(cr4 & X86_CR4_PCE) && ctxt->ops->cpl(ctxt) && (cr0 & X86_CR0_PE)) ||
- 	    ctxt->ops->check_pmc(ctxt, rcx))
- 		return emulate_gp(ctxt, 0);
- 
+ 	intel_pmu_release_guest_lbr_event(vcpu);
+ }
 -- 
 2.25.1
 
