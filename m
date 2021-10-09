@@ -2,57 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8650A42765D
-	for <lists+kvm@lfdr.de>; Sat,  9 Oct 2021 04:16:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E68F4427664
+	for <lists+kvm@lfdr.de>; Sat,  9 Oct 2021 04:17:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244607AbhJICSt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Oct 2021 22:18:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38318 "EHLO
+        id S244445AbhJICTB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Oct 2021 22:19:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38342 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244151AbhJICSQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Oct 2021 22:18:16 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A328C061367
-        for <kvm@vger.kernel.org>; Fri,  8 Oct 2021 19:14:13 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id x15-20020a056902102f00b005ba71cd7dbfso4955201ybt.8
-        for <kvm@vger.kernel.org>; Fri, 08 Oct 2021 19:14:13 -0700 (PDT)
+        with ESMTP id S244791AbhJICS0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Oct 2021 22:18:26 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16232C06136C
+        for <kvm@vger.kernel.org>; Fri,  8 Oct 2021 19:14:16 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 124-20020a251182000000b005a027223ed9so14954443ybr.13
+        for <kvm@vger.kernel.org>; Fri, 08 Oct 2021 19:14:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=EO1DdjrhtpmWzjh1EvgBT+lYKJFtXbnNZvFnyTdrLr4=;
-        b=SgQ6bc6sO/D2BDTT6qtx0WAi/ReMNLqD/ixklFc6XJsme6RvEAyibaoCcZ+6xQ5OkI
-         ktC+f/9gaqy4GxqOHggOKkREje58nPcOr+Pu+vPxOlkYQMNw78hFOqCmgpg1tqeYBceP
-         M02XL4PQM1TiYW71SKXsn2Ur2YlXd0iyCAEhOd4fAvr/JazoIpUsKNmjyf0Ni6JCCcKO
-         7pxB0Pn+7ZUH5KunCEUOb6F/O+SJ9Gms308Iz4L/bVBrKppOYhyW2loCqRXdzIS5KBo7
-         R+hLo/RYtlg4VS+ZdP6EH23BDWdpgqinGPjzLjDVYfoK7og0eyFX+gDYPLeJnrZbmP2N
-         MJcw==
+        bh=arn3QPCgnyUFm933bKAVezCVOZbbelZBmIXo+qC2e8A=;
+        b=NtPYwcGbvpEj33H6dO4R06ZYuMzbhT6h0eIqZuweV7aMaBu2ziVhVO1A4hvx1Ji+cJ
+         AgBswGASBvOOoqfVomcOIh0ZHzT1TTJGiHOj+f9sG0AHf/oLjXD6wESX8+v32PdOteOa
+         Um62Ru9fWxykQr9ABqAFcipBm+RpHdgIuHU223YquxiOdzQoVkuGxBvdcP5VBkicu3AZ
+         7D33zGISGwBLVxXqbiciqkiZPHhXqAM+wIJ5+lE6usO+uyYWHzNCW7B+8JGqSh7ZVhy8
+         98+aZ7uc55HORI0YCY76gBC/GAModfD4T1dB+U6UYKL4eI/B9TJb0ULscUkUAonJPfYH
+         rgYw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=EO1DdjrhtpmWzjh1EvgBT+lYKJFtXbnNZvFnyTdrLr4=;
-        b=vBXETyHZyNPSmGl3Ba5r61ha8EFBwso4fUF471yNU4iicgLFSmucasS3vLUo93o7FP
-         sx1FeR6itDtvYeQNvDqWpQSDbvRF4jUvRwDwu+XwTyTgeTzOXzWxr1LTc3knp/2lhJ2m
-         Ga1fZHzLFBOO/FWMOQAqTBrqZ1845v3C04/Bg0IDD4e0bLT4nEW9I5FD2Ohj7ktbxS/L
-         D4twqk290sRJEFBqEXOFPDXO3CHA1xWsg4OxgSoQmgi9BLqTd6TwZWpKVsHbdPFWCl+g
-         FCKNkxjhvamFbO88y0gG3OWg/lAM2H3JV+rqWDENBTNiS/lFqOaaHXsHJUVifBDJy/E1
-         1r4g==
-X-Gm-Message-State: AOAM532G9MTFtyEUucRXEuyyCK8cnlUApkGpDt2/x4bu0nNEMSUSIMlE
-        KDXig4sSvRdcczeNUsLs1DVe+iFUCpU=
-X-Google-Smtp-Source: ABdhPJxzzIeOZb6NcqAHHKw15hpgOp6kx7Tgw+3WfUCiAT/0ER9Qq3B+94h2kbS9kEsVCOMb8KmVqa9KyAg=
+        bh=arn3QPCgnyUFm933bKAVezCVOZbbelZBmIXo+qC2e8A=;
+        b=FFjzAFRMzd9NBzaQpfArVpr6EIBHODCioZBGJgNIAsKQ0p//ZnJxHIBbj1wt0kkYLi
+         qzjIso1iyUWnCc2nN6oLr91AXOp92q7e71KzodNZ3M/PWCwIDhTz2ZnbtQ21YVqkltHY
+         g+RGucJEB6VbdrwQ7tkaJBJNZwjwumjZs7cSCSGDbPr49mKmasXU0MQY4NZhUXnS0fEx
+         Gn21ytyo8DTjfE46tXI7K/fGtC3UA2d+b2NQzZUVJKI/LOZun5473ujhTzjkw4vdiM82
+         zFb1CbBpluC61QKiDLU/DXgilPP98rxb/T3aE0fL/e5sTPdU30YfyJ22WZdqQlz7etDb
+         p4ZQ==
+X-Gm-Message-State: AOAM531KQzB9IDB0Qgr9+IgEp4hjj49wifvCsLvOg2t/fmpz8TDKr+8h
+        9ZnsyUYhHHJZSJALmx3jD/EypzOCGWE=
+X-Google-Smtp-Source: ABdhPJy4qaQ6tIlL2MtP2ahqc06PNWeBv+SOp3R/dcvT+HOsJqGH8QolDswjaKj42MJ7Ncoy+lBhrp1sp74=
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:90:200:e39b:6333:b001:cb])
- (user=seanjc job=sendgmr) by 2002:a25:22d7:: with SMTP id i206mr7801852ybi.355.1633745652715;
- Fri, 08 Oct 2021 19:14:12 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a25:2a0f:: with SMTP id q15mr7479663ybq.448.1633745655314;
+ Fri, 08 Oct 2021 19:14:15 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri,  8 Oct 2021 19:12:30 -0700
+Date:   Fri,  8 Oct 2021 19:12:31 -0700
 In-Reply-To: <20211009021236.4122790-1-seanjc@google.com>
-Message-Id: <20211009021236.4122790-38-seanjc@google.com>
+Message-Id: <20211009021236.4122790-39-seanjc@google.com>
 Mime-Version: 1.0
 References: <20211009021236.4122790-1-seanjc@google.com>
 X-Mailer: git-send-email 2.33.0.882.g93a45727a2-goog
-Subject: [PATCH v2 37/43] KVM: SVM: Unconditionally mark AVIC as running on
- vCPU load (with APICv)
+Subject: [PATCH v2 38/43] KVM: Drop defunct kvm_arch_vcpu_(un)blocking() hooks
 From:   Sean Christopherson <seanjc@google.com>
 To:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
         Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
@@ -88,153 +87,159 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Always mark the AVIC as "running" on vCPU load when the AVIC is enabled and
-drop the vcpu_blocking/unblocking hooks that toggle "running".  There is no
-harm in keeping the flag set for a wee bit longer when a vCPU is blocking,
-i.e. between the start of blocking and being scheduled out.  At worst, an
-agent in the host will unnecessarily signal the doorbell, but that's
-already the status quo in KVM as the "running" flag is set the entire time
-a vCPU is loaded, not just when it's actively running the guest.
+Remove kvm_arch_vcpu_(un)blocking() now that all implementations are nops.
 
-In addition to simplifying the code, keeping the "running" flag set longer
-can reduce the number of VM-Exits due to incomplete IPI delivery.
+No functional change intended.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/svm/avic.c | 53 +++++++++++++----------------------------
- arch/x86/kvm/svm/svm.c  |  8 -------
- arch/x86/kvm/svm/svm.h  |  3 ---
- 3 files changed, 17 insertions(+), 47 deletions(-)
+ arch/arm64/kvm/arm.c                | 10 ----------
+ arch/mips/include/asm/kvm_host.h    |  2 --
+ arch/powerpc/include/asm/kvm_host.h |  2 --
+ arch/s390/include/asm/kvm_host.h    |  2 --
+ arch/x86/include/asm/kvm-x86-ops.h  |  2 --
+ arch/x86/include/asm/kvm_host.h     | 13 -------------
+ include/linux/kvm_host.h            |  2 --
+ virt/kvm/kvm_main.c                 |  4 ----
+ 8 files changed, 37 deletions(-)
 
-diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-index b43b05610ade..213f5223f63e 100644
---- a/arch/x86/kvm/svm/avic.c
-+++ b/arch/x86/kvm/svm/avic.c
-@@ -967,6 +967,15 @@ void avic_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 	int h_physical_id = kvm_cpu_get_apicid(cpu);
- 	struct vcpu_svm *svm = to_svm(vcpu);
- 
-+	/* TODO: Document why the unblocking path checks for updates. */
-+	if (kvm_vcpu_is_blocking(vcpu) &&
-+	    kvm_check_request(KVM_REQ_APICV_UPDATE, vcpu)) {
-+		kvm_vcpu_update_apicv(vcpu);
-+
-+		if (!kvm_vcpu_apicv_active(vcpu))
-+			return;
-+	}
-+
- 	/*
- 	 * Since the host physical APIC id is 8 bits,
- 	 * we can support host APIC ID upto 255.
-@@ -974,19 +983,21 @@ void avic_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 	if (WARN_ON(h_physical_id > AVIC_PHYSICAL_ID_ENTRY_HOST_PHYSICAL_ID_MASK))
- 		return;
- 
-+	/*
-+	 * Unconditionally mark the AVIC as "running", even if the vCPU is in
-+	 * kvm_vcpu_block().  kvm_vcpu_check_block() will detect pending IRQs
-+	 * and bail out of the block loop, and if not, avic_vcpu_put() will
-+	 * set the AVIC back to "not running" when the vCPU is scheduled out.
-+	 */
- 	entry = READ_ONCE(*(svm->avic_physical_id_cache));
- 	WARN_ON(entry & AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK);
- 
- 	entry &= ~AVIC_PHYSICAL_ID_ENTRY_HOST_PHYSICAL_ID_MASK;
- 	entry |= (h_physical_id & AVIC_PHYSICAL_ID_ENTRY_HOST_PHYSICAL_ID_MASK);
--
--	entry &= ~AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK;
--	if (svm->avic_is_running)
--		entry |= AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK;
-+	entry |= AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK;
- 
- 	WRITE_ONCE(*(svm->avic_physical_id_cache), entry);
--	avic_update_iommu_vcpu_affinity(vcpu, h_physical_id,
--					svm->avic_is_running);
-+	avic_update_iommu_vcpu_affinity(vcpu, h_physical_id, true);
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 9ff0e85a9f16..444d6f5a980a 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -357,16 +357,6 @@ int kvm_cpu_has_pending_timer(struct kvm_vcpu *vcpu)
+ 	return kvm_timer_is_pending(vcpu);
  }
  
- void avic_vcpu_put(struct kvm_vcpu *vcpu)
-@@ -1001,33 +1012,3 @@ void avic_vcpu_put(struct kvm_vcpu *vcpu)
- 	entry &= ~AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK;
- 	WRITE_ONCE(*(svm->avic_physical_id_cache), entry);
+-void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu)
+-{
+-
+-}
+-
+-void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu)
+-{
+-
+-}
+-
+ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ {
+ 	struct kvm_s2_mmu *mmu;
+diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm/kvm_host.h
+index 72b90d45a46e..28110f71089b 100644
+--- a/arch/mips/include/asm/kvm_host.h
++++ b/arch/mips/include/asm/kvm_host.h
+@@ -895,8 +895,6 @@ static inline void kvm_arch_free_memslot(struct kvm *kvm,
+ 					 struct kvm_memory_slot *slot) {}
+ static inline void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen) {}
+ static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
+-static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu) {}
+-static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
+ 
+ #define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLB
+ int kvm_arch_flush_remote_tlb(struct kvm *kvm);
+diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
+index 4a195c161592..0dfee6866541 100644
+--- a/arch/powerpc/include/asm/kvm_host.h
++++ b/arch/powerpc/include/asm/kvm_host.h
+@@ -863,7 +863,5 @@ static inline void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen) {}
+ static inline void kvm_arch_flush_shadow_all(struct kvm *kvm) {}
+ static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
+ static inline void kvm_arch_exit(void) {}
+-static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu) {}
+-static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
+ 
+ #endif /* __POWERPC_KVM_HOST_H__ */
+diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+index a22c9266ea05..25ed4ec66f4a 100644
+--- a/arch/s390/include/asm/kvm_host.h
++++ b/arch/s390/include/asm/kvm_host.h
+@@ -1007,7 +1007,5 @@ static inline void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen) {}
+ static inline void kvm_arch_flush_shadow_all(struct kvm *kvm) {}
+ static inline void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
+ 		struct kvm_memory_slot *slot) {}
+-static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu) {}
+-static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
+ 
+ #endif
+diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+index c2b007171abd..f2c38acdcad6 100644
+--- a/arch/x86/include/asm/kvm-x86-ops.h
++++ b/arch/x86/include/asm/kvm-x86-ops.h
+@@ -96,8 +96,6 @@ KVM_X86_OP(handle_exit_irqoff)
+ KVM_X86_OP_NULL(request_immediate_exit)
+ KVM_X86_OP(sched_in)
+ KVM_X86_OP_NULL(update_cpu_dirty_logging)
+-KVM_X86_OP_NULL(vcpu_blocking)
+-KVM_X86_OP_NULL(vcpu_unblocking)
+ KVM_X86_OP_NULL(update_pi_irte)
+ KVM_X86_OP_NULL(start_assignment)
+ KVM_X86_OP_NULL(apicv_post_state_restore)
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 76a8dddc1a48..bebd42926321 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1445,9 +1445,6 @@ struct kvm_x86_ops {
+ 	const struct kvm_pmu_ops *pmu_ops;
+ 	const struct kvm_x86_nested_ops *nested_ops;
+ 
+-	void (*vcpu_blocking)(struct kvm_vcpu *vcpu);
+-	void (*vcpu_unblocking)(struct kvm_vcpu *vcpu);
+-
+ 	int (*update_pi_irte)(struct kvm *kvm, unsigned int host_irq,
+ 			      uint32_t guest_irq, bool set);
+ 	void (*start_assignment)(struct kvm *kvm);
+@@ -1904,16 +1901,6 @@ static inline bool kvm_irq_is_postable(struct kvm_lapic_irq *irq)
+ 		irq->delivery_mode == APIC_DM_LOWEST);
  }
--
--/*
-- * This function is called during VCPU halt/unhalt.
-- */
--static void avic_set_running(struct kvm_vcpu *vcpu, bool is_run)
+ 
+-static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu)
 -{
--	struct vcpu_svm *svm = to_svm(vcpu);
--
--	svm->avic_is_running = is_run;
--
--	if (!kvm_vcpu_apicv_active(vcpu))
--		return;
--
--	if (is_run)
--		avic_vcpu_load(vcpu, vcpu->cpu);
--	else
--		avic_vcpu_put(vcpu);
+-	static_call_cond(kvm_x86_vcpu_blocking)(vcpu);
 -}
 -
--void svm_vcpu_blocking(struct kvm_vcpu *vcpu)
+-static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu)
 -{
--	avic_set_running(vcpu, false);
+-	static_call_cond(kvm_x86_vcpu_unblocking)(vcpu);
 -}
 -
--void svm_vcpu_unblocking(struct kvm_vcpu *vcpu)
--{
--	if (kvm_check_request(KVM_REQ_APICV_UPDATE, vcpu))
--		kvm_vcpu_update_apicv(vcpu);
--	avic_set_running(vcpu, true);
--}
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 89077160d463..a1ca5707f2c8 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -1433,12 +1433,6 @@ static int svm_create_vcpu(struct kvm_vcpu *vcpu)
- 	if (err)
- 		goto error_free_vmsa_page;
+ static inline int kvm_cpu_get_apicid(int mps_cpu)
+ {
+ #ifdef CONFIG_X86_LOCAL_APIC
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index c5961a361c73..6a84b020daa6 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -966,8 +966,6 @@ void kvm_sigset_deactivate(struct kvm_vcpu *vcpu);
  
--	/* We initialize this flag to true to make sure that the is_running
--	 * bit would be set the first time the vcpu is loaded.
--	 */
--	if (irqchip_in_kernel(vcpu->kvm) && kvm_apicv_activated(vcpu->kvm))
--		svm->avic_is_running = true;
+ void kvm_vcpu_halt(struct kvm_vcpu *vcpu);
+ bool kvm_vcpu_block(struct kvm_vcpu *vcpu);
+-void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu);
+-void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu);
+ bool kvm_vcpu_wake_up(struct kvm_vcpu *vcpu);
+ void kvm_vcpu_kick(struct kvm_vcpu *vcpu);
+ int kvm_vcpu_yield_to(struct kvm_vcpu *target);
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index c1850b60f38b..96de905e26e4 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -3210,8 +3210,6 @@ bool kvm_vcpu_block(struct kvm_vcpu *vcpu)
+ 
+ 	vcpu->stat.generic.blocking = 1;
+ 
+-	kvm_arch_vcpu_blocking(vcpu);
 -
- 	svm->msrpm = svm_vcpu_alloc_msrpm();
- 	if (!svm->msrpm) {
- 		err = -ENOMEM;
-@@ -4597,8 +4591,6 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
- 	.prepare_guest_switch = svm_prepare_guest_switch,
- 	.vcpu_load = svm_vcpu_load,
- 	.vcpu_put = svm_vcpu_put,
--	.vcpu_blocking = svm_vcpu_blocking,
--	.vcpu_unblocking = svm_vcpu_unblocking,
+ 	prepare_to_rcuwait(wait);
+ 	for (;;) {
+ 		set_current_state(TASK_INTERRUPTIBLE);
+@@ -3224,8 +3222,6 @@ bool kvm_vcpu_block(struct kvm_vcpu *vcpu)
+ 	}
+ 	finish_rcuwait(wait);
  
- 	.update_exception_bitmap = svm_update_exception_bitmap,
- 	.get_msr_feature = svm_get_msr_feature,
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 7f5b01bbee29..652d71acfb6c 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -169,7 +169,6 @@ struct vcpu_svm {
- 	u32 dfr_reg;
- 	struct page *avic_backing_page;
- 	u64 *avic_physical_id_cache;
--	bool avic_is_running;
+-	kvm_arch_vcpu_unblocking(vcpu);
+-
+ 	vcpu->stat.generic.blocking = 0;
  
- 	/*
- 	 * Per-vcpu list of struct amd_svm_iommu_ir:
-@@ -529,8 +528,6 @@ int svm_deliver_avic_intr(struct kvm_vcpu *vcpu, int vec);
- bool svm_dy_apicv_has_pending_interrupt(struct kvm_vcpu *vcpu);
- int svm_update_pi_irte(struct kvm *kvm, unsigned int host_irq,
- 		       uint32_t guest_irq, bool set);
--void svm_vcpu_blocking(struct kvm_vcpu *vcpu);
--void svm_vcpu_unblocking(struct kvm_vcpu *vcpu);
- 
- /* sev.c */
- 
+ 	return waited;
 -- 
 2.33.0.882.g93a45727a2-goog
 
