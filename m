@@ -2,56 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1F9EB42761D
-	for <lists+kvm@lfdr.de>; Sat,  9 Oct 2021 04:16:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C9E03427622
+	for <lists+kvm@lfdr.de>; Sat,  9 Oct 2021 04:16:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244638AbhJICQa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Oct 2021 22:16:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38376 "EHLO
+        id S244399AbhJICQl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Oct 2021 22:16:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38348 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244546AbhJICP4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Oct 2021 22:15:56 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E255C061778
-        for <kvm@vger.kernel.org>; Fri,  8 Oct 2021 19:13:34 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id b5-20020a251b05000000b005b575f23711so15169947ybb.4
-        for <kvm@vger.kernel.org>; Fri, 08 Oct 2021 19:13:34 -0700 (PDT)
+        with ESMTP id S244507AbhJICQO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Oct 2021 22:16:14 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C23DFC06177E
+        for <kvm@vger.kernel.org>; Fri,  8 Oct 2021 19:13:36 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id p8-20020a056902114800b005bad2571fbeso3624566ybu.23
+        for <kvm@vger.kernel.org>; Fri, 08 Oct 2021 19:13:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=pLGnZNeCj1eofs1Tna8HvgfHGGH+OqNXhSkcDhwkBIw=;
-        b=VRo08TCu54WXCeWvaUHt/sk2e0vGE+t23O2jGFtKJrC8szlW29PyUVg9qa1gFeA7l/
-         xEskdCWXRSlglDPxzwJpI+hnS34D4TzLDKLZZJDH+vXneZUjJrJ2p6jMQ4+6yNusBF7P
-         6CJ8/rSwneH/NW0dEbzJkjR/ZnaiFW04wA6ydEJsYBVq9hwfsxkAk8UtewwAEpUXkOH2
-         gElF5Vx854/uDHSVGxe/9WkMnKTFMH6pK6EPC77dq53/WUYVeZkuMvVYcngIplHzpqzD
-         mk15NWKmGwkAbgPYO3UA0b2d7qx8J738ZHLocYz+9s5CV0wLJv0e5T4wx+Q9y63P5xIW
-         pwMQ==
+        bh=SdOYPzkyfZrBWx1GJeur2Vwb7zEvl7JYNbVbQ0SB2Gg=;
+        b=aUvGN/4AFgJcKIBF9LBWgDwhCHQZYEJ03JrconxIXHeAq0mSobvx5eFsN2IhEk7hMF
+         07jWDFM9e+ezgnVy0PqTHsU8wjkF0Sq/uHjyc0w84aIFVqAcJRuuc8LQH3WxNpDQiA8J
+         1gOwXo6k1Mjhlm2dzNYz4rr2omGOTIv9FMsD0TA3lqfU/1iEz7W8Tub84Aqukc87X1xM
+         piXJImDfP3oyBzKVi6TuZiCoM21cARPSFti7XJOcRw2PuPbisGedjpLV+YL9vQi2purC
+         N3om2H5mKJxeus7ZcbgIF+EPMNOHqwS7dYW8kbDAw9PWlIpsbYSk0g7cYENwS5oOjCiw
+         mX3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=pLGnZNeCj1eofs1Tna8HvgfHGGH+OqNXhSkcDhwkBIw=;
-        b=j+CsN4S/EGRJ1QxCG3t6TUM96VKXfuQPhtJg9HuZI/IjUI+aLgGy3en7MhJSAqepgk
-         cz5DoWA7/ZxVwLXR58bzet3x2ImWoCHu+gHUevQ87wkXPX8J0flOPN6+W+VnyawnmaiW
-         +0xXhXFYbJ409DGVBozN1pHD60v5sK+VTQznfwFTGYj+jiuFgdLd2/cV5+1kk8ORF5gZ
-         WAbCZ+sqwS5rdc8rnMu46fRxcR1xa6HmETeq06E1GoZk6An2MyQ6/RBUqEqLoOjCeTU4
-         tLwDOdfQZZ/hm9Ohkypd4wdmATHcwmDWnI0P4vwZOLbpp3MUxlUWn/oKXZd/vZXBlmWj
-         QeAg==
-X-Gm-Message-State: AOAM533wswcPf9bG6Y1TSS9b51C3HneZrk9ax1VsapYY3NROVSfffiC2
-        mNFWXjC6h1ZsaqWntd8qDlnq08kwr1g=
-X-Google-Smtp-Source: ABdhPJz4iSAfPQRljp1PNlRsP2+bvwjiNJU4qxRXVZchtwSA9sdFFYFZ7ZvHA8l7ONDMJR0uzV+kR3cYKVg=
+        bh=SdOYPzkyfZrBWx1GJeur2Vwb7zEvl7JYNbVbQ0SB2Gg=;
+        b=xqvO/NmRZVLzQmzuDy71YW8DcRUeY7WyiK6dFUFKaiYUPWr+dSWSGwkjfZPoz46kSK
+         tb8gh9QGeEIAM7l//cfLQ820rYK1J3TfEY8DpdAUe8qzbBIapCrKHvRcSZkrSGuaitad
+         eyaX75ynnccIl7WDJ42SwvtRHTLL2HF/dEX0HGcZsuHE9enoP4ggZG1CqYG6QKsxGqp6
+         zDsUEMwKlSdBAlQX+I7zWQEPhf14LVi13uxOq3znYdqUQkks7wLeL5Gdp6SrBAm/zwfG
+         c6VKBp1iicJkeKCyZ4Z1gokFydKfjs6D5bt3M4t5gx4llNFclpF9FJgw3Lfsx6uP0+UG
+         +s8Q==
+X-Gm-Message-State: AOAM533p+m78B7Nyu3vB+O6LoXQ/uIujgSkHJYYGS0Z8474YA3mfw0u4
+        YQe/OdXNAbe5HHJtmzdnk7GLGJVzfJM=
+X-Google-Smtp-Source: ABdhPJxYoBKdyJNsrFu59iAPxlEnyIVO9cffUZpeFin68SfrlNt2dK+2hwMzncpFoR3FTBopTnOtfheDhwY=
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:90:200:e39b:6333:b001:cb])
- (user=seanjc job=sendgmr) by 2002:a25:1b86:: with SMTP id b128mr7765690ybb.20.1633745613685;
- Fri, 08 Oct 2021 19:13:33 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a25:6e06:: with SMTP id j6mr7636609ybc.311.1633745615988;
+ Fri, 08 Oct 2021 19:13:35 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri,  8 Oct 2021 19:12:14 -0700
+Date:   Fri,  8 Oct 2021 19:12:15 -0700
 In-Reply-To: <20211009021236.4122790-1-seanjc@google.com>
-Message-Id: <20211009021236.4122790-22-seanjc@google.com>
+Message-Id: <20211009021236.4122790-23-seanjc@google.com>
 Mime-Version: 1.0
 References: <20211009021236.4122790-1-seanjc@google.com>
 X-Mailer: git-send-email 2.33.0.882.g93a45727a2-goog
-Subject: [PATCH v2 21/43] KVM: VMX: Clean up PI pre/post-block WARNs
+Subject: [PATCH v2 22/43] KVM: VMX: Drop unnecessary PI logic to handle
+ impossible conditions
 From:   Sean Christopherson <seanjc@google.com>
 To:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
         Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
@@ -87,56 +88,61 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Move the WARN sanity checks out of the PI descriptor update loop so as
-not to spam the kernel log if the condition is violated and the update
-takes multiple attempts due to another writer.  This also eliminates a
-few extra uops from the retry path.
+Drop sanity checks on the validity of the previous pCPU when handling
+vCPU block/unlock for posted interrupts.  Barring a code bug or memory
+corruption, the sanity checks will never fire, and any code bug that does
+trip the WARN is all but guaranteed to completely break posted interrupts,
+i.e. should never get anywhere near production.
 
-Technically not checking every attempt could mean KVM will now fail to
-WARN in a scenario that would have failed before, but any such failure
-would be inherently racy as some other agent (CPU or device) would have
-to concurrent modify the PI descriptor.
+This is the first of several steps toward eliminating kvm_vcpu.pre_cpu.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/vmx/posted_intr.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ arch/x86/kvm/vmx/posted_intr.c | 24 ++++++++++--------------
+ 1 file changed, 10 insertions(+), 14 deletions(-)
 
 diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
-index 351666c41bbc..67cbe6ab8f66 100644
+index 67cbe6ab8f66..6c2110d91b06 100644
 --- a/arch/x86/kvm/vmx/posted_intr.c
 +++ b/arch/x86/kvm/vmx/posted_intr.c
-@@ -100,10 +100,11 @@ static void __pi_post_block(struct kvm_vcpu *vcpu)
- 	struct pi_desc old, new;
- 	unsigned int dest;
+@@ -118,12 +118,10 @@ static void __pi_post_block(struct kvm_vcpu *vcpu)
+ 	} while (cmpxchg64(&pi_desc->control, old.control,
+ 			   new.control) != old.control);
  
-+	WARN(pi_desc->nv != POSTED_INTR_WAKEUP_VECTOR,
-+	     "Wakeup handler not enabled while the vCPU was blocking");
+-	if (!WARN_ON_ONCE(vcpu->pre_pcpu == -1)) {
+-		spin_lock(&per_cpu(blocked_vcpu_on_cpu_lock, vcpu->pre_pcpu));
+-		list_del(&vcpu->blocked_vcpu_list);
+-		spin_unlock(&per_cpu(blocked_vcpu_on_cpu_lock, vcpu->pre_pcpu));
+-		vcpu->pre_pcpu = -1;
+-	}
++	spin_lock(&per_cpu(blocked_vcpu_on_cpu_lock, vcpu->pre_pcpu));
++	list_del(&vcpu->blocked_vcpu_list);
++	spin_unlock(&per_cpu(blocked_vcpu_on_cpu_lock, vcpu->pre_pcpu));
++	vcpu->pre_pcpu = -1;
+ }
+ 
+ /*
+@@ -153,14 +151,12 @@ int pi_pre_block(struct kvm_vcpu *vcpu)
+ 
+ 	WARN_ON(irqs_disabled());
+ 	local_irq_disable();
+-	if (!WARN_ON_ONCE(vcpu->pre_pcpu != -1)) {
+-		vcpu->pre_pcpu = vcpu->cpu;
+-		spin_lock(&per_cpu(blocked_vcpu_on_cpu_lock, vcpu->pre_pcpu));
+-		list_add_tail(&vcpu->blocked_vcpu_list,
+-			      &per_cpu(blocked_vcpu_on_cpu,
+-				       vcpu->pre_pcpu));
+-		spin_unlock(&per_cpu(blocked_vcpu_on_cpu_lock, vcpu->pre_pcpu));
+-	}
 +
- 	do {
- 		old.control = new.control = pi_desc->control;
--		WARN(old.nv != POSTED_INTR_WAKEUP_VECTOR,
--		     "Wakeup handler not enabled while the VCPU is blocked\n");
++	vcpu->pre_pcpu = vcpu->cpu;
++	spin_lock(&per_cpu(blocked_vcpu_on_cpu_lock, vcpu->pre_pcpu));
++	list_add_tail(&vcpu->blocked_vcpu_list,
++		      &per_cpu(blocked_vcpu_on_cpu, vcpu->pre_pcpu));
++	spin_unlock(&per_cpu(blocked_vcpu_on_cpu_lock, vcpu->pre_pcpu));
  
- 		dest = cpu_physical_id(vcpu->cpu);
- 
-@@ -161,13 +162,12 @@ int pi_pre_block(struct kvm_vcpu *vcpu)
- 		spin_unlock(&per_cpu(blocked_vcpu_on_cpu_lock, vcpu->pre_pcpu));
- 	}
- 
-+	WARN(pi_desc->sn == 1,
-+	     "Posted Interrupt Suppress Notification set before blocking");
-+
- 	do {
- 		old.control = new.control = pi_desc->control;
- 
--		WARN((pi_desc->sn == 1),
--		     "Warning: SN field of posted-interrupts "
--		     "is set before blocking\n");
--
- 		/*
- 		 * Since vCPU can be preempted during this process,
- 		 * vcpu->cpu could be different with pre_pcpu, we
+ 	WARN(pi_desc->sn == 1,
+ 	     "Posted Interrupt Suppress Notification set before blocking");
 -- 
 2.33.0.882.g93a45727a2-goog
 
