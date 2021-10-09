@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1E92F427489
+	by mail.lfdr.de (Postfix) with ESMTP id 7993242748A
 	for <lists+kvm@lfdr.de>; Sat,  9 Oct 2021 02:11:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243997AbhJIANM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Oct 2021 20:13:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39638 "EHLO
+        id S244003AbhJIANO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Oct 2021 20:13:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39648 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243974AbhJIANJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Oct 2021 20:13:09 -0400
-Received: from mail-qv1-xf4a.google.com (mail-qv1-xf4a.google.com [IPv6:2607:f8b0:4864:20::f4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF352C061755
-        for <kvm@vger.kernel.org>; Fri,  8 Oct 2021 17:11:13 -0700 (PDT)
-Received: by mail-qv1-xf4a.google.com with SMTP id u9-20020a0cf889000000b003834c01c6e8so2913141qvn.4
-        for <kvm@vger.kernel.org>; Fri, 08 Oct 2021 17:11:13 -0700 (PDT)
+        with ESMTP id S243989AbhJIANL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Oct 2021 20:13:11 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0128EC061755
+        for <kvm@vger.kernel.org>; Fri,  8 Oct 2021 17:11:16 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id v203-20020a25c5d4000000b005bb21580411so2035045ybe.19
+        for <kvm@vger.kernel.org>; Fri, 08 Oct 2021 17:11:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=Jpbo+B/GhwXgwxD1by7/DXTldt+Mb436guJudBghH8A=;
-        b=C8410r5ajEijJDUgktftizTQ2SFhw825HDX8x4RMiSyJDTLrbUC7tx9Q5aLXxnfm+l
-         msNYG80c9PcM3gKhl5ayhrxTDm/3M4hf2CsQEC3juu0lxJSF0Ue+Rm4r8fMraYSSms/Y
-         fQnnhcjtr/0tpVg3bED+ZM8BxcEi1ABpHyVhOriyWd9gCz6BTZ91pHwVk16b4mrfhhgq
-         hgeK8F3oD17jRUT0OBQyJZ/mg3oJECgTeCUvLAOZ09BvqGNgkvwOdrSr9k4M0H6e2qNQ
-         hsxK11/1GniyFj+JsUSswG4Vxcz1wDQJsfBct0fZaG0Wk+CDfjyspOgs4mZVrFZLJaKy
-         ppJg==
+        bh=bAloFfewj/zQRYhL5ulk5e0QyHM9EAunSNgXmDCR8AM=;
+        b=ST0iL+WBV2iExe7rpojaTs4LjOuY0fc83FuN072lnEaXnt15bunbZZxjQIpMpHk9Az
+         pADA8vjy5X05YVjPEyR2dJhczHcLph93LPTl/FDMc5XqqvXOu0+emZe6f+l6d/0qE8eD
+         YXCwVZPS1e3ImmfezavyIEMi22XQV8lCVEV0cvoFpHRpFjnKqRGsRxobytIg6KWRRaAo
+         9LCpz+qqDho/SaSTJ0fvl8nx5o51AstfZiaWitJT5cVihQ4ZWmNvMwcYFPXxCWKw9xqs
+         9t5joeDe09xEjni5/DNRH/qv0/YdtycZ2Qcm5Q0IIisvoZM6jRESnhO56J0slezWX3Yq
+         X33Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=Jpbo+B/GhwXgwxD1by7/DXTldt+Mb436guJudBghH8A=;
-        b=z+ZhmfIeluyAZ7vvxnBwa0Z46LrBMkJNsxUlySMND/4/IAo6g1bH0U2x776GdxdT37
-         KGFZv/BwsgV0X2h+4cjM39lXXjH1p3twalhqBGxulA0rZ/Rg28YkGakSnPfZK+k00OTP
-         Ta+nWIPTUA+1G9ac7nRKvtRs+3vmmIN7plbknloOnzs8LL3h8rlxuS34XlJwI4GWOQp4
-         2MVuh4WpA5war0x4boK4agAsolPGD1v98PZhPT6mnCem81vxf/C28hXukLf6mHGvKFuy
-         OThMhdPo8DLh6ztGwdn2fMvpjjrXwpOVLNQH6Tyb9Huo+uim1oHAiAMuV/CPfxCiRXVB
-         lKQg==
-X-Gm-Message-State: AOAM532kGHuyyCsS05v65IpoMLF1dgeDuU+PSTkA8dLJeWO1XL7HfVtd
-        A+zmXwU+Sg6nzU76PDPFskUpFjtLJ/c=
-X-Google-Smtp-Source: ABdhPJwi03qK1ZV9VOpWwjVXNzCrboIXvkE07AK1H+8yFhag5kzKnREdL38PD0yNe4Pzbm7Qg5F6nGLc5oU=
+        bh=bAloFfewj/zQRYhL5ulk5e0QyHM9EAunSNgXmDCR8AM=;
+        b=PESsivRUM53WQxmADrWomXWARcd3rNqDeFArlJ4+MWbg0zqrDT7rfQ30IvMSVoPURE
+         HMM990gW5W+tw+0s0HHkjeVdpZDeZvkm6IdZ0phWnNTGelrQiwlIhJz46W67OB52xgiu
+         11CPoviVXc6EyBko5XT5fco58Ed+gRRHsQCHPpI+/VBeo/YsPQ9Nqsp4iMzHbrS9i3nl
+         mVo43fdAvuvBjOkxSOdoU7jJx59LNZ6wNurYM5MJ9Hr0KBkeQ9tj0f1sRY0zJrD6dvMv
+         YuZqHjE3wrH8WpqW0EZv+1oB6Ywa2lLkypgstvZ74RaKy8uam1NhqyM443IgImIdlE+s
+         xLYA==
+X-Gm-Message-State: AOAM531Bh8CpI1nm+jaAqQvCdSoGMe7AiwymxEinqng5AwcOhcH2XuQi
+        +litt9LuBcD53NbwW6j34vrRwd6yxrM=
+X-Google-Smtp-Source: ABdhPJzaXyLqc9LGIGZZ0X+2cVMG5q4bA4joIE0G1sjVHAYtPKe19e3qhXZKrHz4zpJSfPstsB49oxJ0V/4=
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:90:200:e39b:6333:b001:cb])
- (user=seanjc job=sendgmr) by 2002:ac8:430e:: with SMTP id z14mr1441247qtm.208.1633738272984;
- Fri, 08 Oct 2021 17:11:12 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a25:6115:: with SMTP id v21mr6954932ybb.462.1633738275190;
+ Fri, 08 Oct 2021 17:11:15 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri,  8 Oct 2021 17:11:04 -0700
+Date:   Fri,  8 Oct 2021 17:11:05 -0700
 In-Reply-To: <20211009001107.3936588-1-seanjc@google.com>
-Message-Id: <20211009001107.3936588-2-seanjc@google.com>
+Message-Id: <20211009001107.3936588-3-seanjc@google.com>
 Mime-Version: 1.0
 References: <20211009001107.3936588-1-seanjc@google.com>
 X-Mailer: git-send-email 2.33.0.882.g93a45727a2-goog
-Subject: [PATCH 1/4] x86/irq: Ensure PI wakeup handler is unregistered before
- module unload
+Subject: [PATCH 2/4] KVM: VMX: Unregister posted interrupt wakeup handler on
+ hardware unsetup
 From:   Sean Christopherson <seanjc@google.com>
 To:     Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
@@ -69,30 +69,48 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a synchronize_rcu() after setting the posted interrupt wakeup handler
-to ensure all readers, i.e. in-flight IRQ handlers, see the new handler
-before returning to the caller.  If the caller is an exiting module and
-is unregistering its handler, failure to wait could result in the IRQ
-handler jumping into an unloaded module.
+Unregister KVM's posted interrupt wakeup handler during unsetup so that a
+spurious interrupt that arrives after kvm_intel.ko is unloaded doesn't
+call into freed memory.
 
-Fixes: f6b3c72c2366 ("x86/irq: Define a global vector for VT-d Posted-Interrupts")
+Fixes: bf9f6ac8d749 ("KVM: Update Posted-Interrupts Descriptor when vCPU is blocked")
 Cc: stable@vger.kernel.org
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kernel/irq.c | 1 +
- 1 file changed, 1 insertion(+)
+ arch/x86/kvm/vmx/vmx.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kernel/irq.c b/arch/x86/kernel/irq.c
-index e28f6a5d14f1..20773d315308 100644
---- a/arch/x86/kernel/irq.c
-+++ b/arch/x86/kernel/irq.c
-@@ -293,6 +293,7 @@ void kvm_set_posted_intr_wakeup_handler(void (*handler)(void))
- 		kvm_posted_intr_wakeup_handler = handler;
- 	else
- 		kvm_posted_intr_wakeup_handler = dummy_handler;
-+	synchronize_rcu();
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 1c8b2b6e7ed9..bfdcdb399212 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -7553,6 +7553,8 @@ static void vmx_migrate_timers(struct kvm_vcpu *vcpu)
+ 
+ static void hardware_unsetup(void)
+ {
++	kvm_set_posted_intr_wakeup_handler(NULL);
++
+ 	if (nested)
+ 		nested_vmx_hardware_unsetup();
+ 
+@@ -7881,8 +7883,6 @@ static __init int hardware_setup(void)
+ 		vmx_x86_ops.request_immediate_exit = __kvm_request_immediate_exit;
+ 	}
+ 
+-	kvm_set_posted_intr_wakeup_handler(pi_wakeup_handler);
+-
+ 	kvm_mce_cap_supported |= MCG_LMCE_P;
+ 
+ 	if (pt_mode != PT_MODE_SYSTEM && pt_mode != PT_MODE_HOST_GUEST)
+@@ -7906,6 +7906,9 @@ static __init int hardware_setup(void)
+ 	r = alloc_kvm_area();
+ 	if (r)
+ 		nested_vmx_hardware_unsetup();
++
++	kvm_set_posted_intr_wakeup_handler(pi_wakeup_handler);
++
+ 	return r;
  }
- EXPORT_SYMBOL_GPL(kvm_set_posted_intr_wakeup_handler);
  
 -- 
 2.33.0.882.g93a45727a2-goog
