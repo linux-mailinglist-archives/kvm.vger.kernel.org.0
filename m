@@ -2,121 +2,223 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A61EF427467
-	for <lists+kvm@lfdr.de>; Sat,  9 Oct 2021 01:54:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D8B36427480
+	for <lists+kvm@lfdr.de>; Sat,  9 Oct 2021 02:05:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243850AbhJHX4e (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Oct 2021 19:56:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35938 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243798AbhJHX4d (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Oct 2021 19:56:33 -0400
-Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BB8AC061755
-        for <kvm@vger.kernel.org>; Fri,  8 Oct 2021 16:54:38 -0700 (PDT)
-Received: by mail-pf1-x430.google.com with SMTP id q19so8954952pfl.4
-        for <kvm@vger.kernel.org>; Fri, 08 Oct 2021 16:54:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=PmBMkf/9MZygw8Ouxh+j3hhE+5/43pTB38Kda0mWNWk=;
-        b=Q8+7oCfDRKyVdU+VWTY4DGVlelzEpUO576a488pAZuBDyvKQ2jt66NRvKJ2w/7C/OU
-         7eYMe4aQa6LzT+CJ5azuMdAf8HlGeJPYlZxe2cHRHvovOiqXGen5NBxB2UciexWuKAAM
-         7YzG8hOfoF5vttQ8N9pXyHBIOsrZVqrwMTO0Te3GQyWDTaDL5n7FuVufW1Zp6KDueQjD
-         kVXea3sEewOg6KkQVGQDiDImLphgkIkPJpKFqM6Dt6riFthcuPkxDfDdPBSGfR/j7dwj
-         hqL5Mwok31auNybg9V/xQ17BAMtG5322AUhMxs3ZE0l/JjgDqwbxGW/DDMS82YgE0g9L
-         0UWg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=PmBMkf/9MZygw8Ouxh+j3hhE+5/43pTB38Kda0mWNWk=;
-        b=XZ8a4+Y/Z4gYcqslLBVeGU9lYh+GDvXF/4KHuWNLOBsb1C6yKuUjzN3QBI5r5YeM2r
-         WVhrKHs2Vw09MdSkQdZ5egPsKyTDc4jKFDLkjMk6Rl89O6Rf0BqYbTkiSqxIKcdG1ysr
-         aA0a2qs6RhyMkySktDjrqI66sCt5GJqbX0V7qD46sEhvPpZhv7+Elab8NXAg/xMyhbyo
-         xKm4zbKjk5Gp9EttoYUGkahwGTgJumWLcr/nErMVUtb4oPbNNCq77sRs8KsyS+Hc7pPX
-         32jVbwTth/xjTWDac1aSBYCSmVP13SD/Aen8ZkP570Y22c27hqP6eZU9lww+mzXahiaX
-         IB+g==
-X-Gm-Message-State: AOAM532owXveUU110AX7dGsUX8mjufZBZp48fNY/JCIVxwuBP0zZASTQ
-        NggRtStM8nswHUzsNgJHL0zRPQ==
-X-Google-Smtp-Source: ABdhPJzTO5dzrqoKxYIAgLORXxVoCs/hswW5V+qdRbtzVa1AywA2Mc6hF2P8Y2NMkbNFKLtRna+ilw==
-X-Received: by 2002:a05:6a00:1a02:b0:446:d18c:8e7e with SMTP id g2-20020a056a001a0200b00446d18c8e7emr12873540pfv.46.1633737277253;
-        Fri, 08 Oct 2021 16:54:37 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id p21sm12455665pjo.26.2021.10.08.16.54.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Oct 2021 16:54:36 -0700 (PDT)
-Date:   Fri, 8 Oct 2021 23:54:33 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 3/4] KVM: nVMX: Track whether changes in L0 require
- MSR bitmap for L2 to be rebuilt
-Message-ID: <YWDaOf/10znebx5S@google.com>
-References: <20211004161029.641155-1-vkuznets@redhat.com>
- <20211004161029.641155-4-vkuznets@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211004161029.641155-4-vkuznets@redhat.com>
+        id S243952AbhJIAHQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Oct 2021 20:07:16 -0400
+Received: from mga02.intel.com ([134.134.136.20]:49683 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S243818AbhJIAHP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Oct 2021 20:07:15 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10131"; a="213754040"
+X-IronPort-AV: E=Sophos;i="5.85,358,1624345200"; 
+   d="scan'208";a="213754040"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Oct 2021 17:05:19 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.85,358,1624345200"; 
+   d="scan'208";a="440100891"
+Received: from sqa-gate.sh.intel.com (HELO robert-ivt.tsp.org) ([10.239.48.212])
+  by orsmga006.jf.intel.com with ESMTP; 08 Oct 2021 17:05:17 -0700
+Message-ID: <3360abf3841a5d3234ac5983dd2df62b24e5fc47.camel@linux.intel.com>
+Subject: Re: [PATCH v1 3/5] KVM: x86: nVMX: VMCS12 field's read/write
+ respects field existence bitmap
+From:   Robert Hoo <robert.hu@linux.intel.com>
+To:     Jim Mattson <jmattson@google.com>
+Cc:     Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Sean Christopherson <seanjc@google.com>, pbonzini@redhat.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, joro@8bytes.org,
+        kvm@vger.kernel.org
+Date:   Sat, 09 Oct 2021 08:05:16 +0800
+In-Reply-To: <CALMp9eTSkK2+-W8AVRdYv3MEsMKj-Xc2-v7DsavJRh5FLsVuCQ@mail.gmail.com>
+References: <0b94844844521fc0446e3df0aa02d4df183f8107.camel@linux.intel.com>
+         <YTI7K9RozNIWXTyg@google.com>
+         <64aad01b6bffd70fa3170cf262fe5d7c66f6b2d4.camel@linux.intel.com>
+         <YVx6Oesi7X3jfnaM@google.com>
+         <CALMp9eRyhAygfh1piNEDE+WGVzK1cTWJJR1aC_zqn=c2fy+c-A@mail.gmail.com>
+         <YVySdKOWTXqU4y3R@google.com>
+         <CALMp9eQvRYpZg+G7vMcaCq0HYPDfZVpPtDRO9bRa0w2fyyU9Og@mail.gmail.com>
+         <YVy6gj2+XsghsP3j@google.com>
+         <CALMp9eT+uAvPv7LhJKrJGDN31-aVy6DYBrP+PUDiTk0zWuCX4g@mail.gmail.com>
+         <YVzeJ59/yCpqgTX2@google.com>
+         <20211008082302.txckaasmsystigeu@linux.intel.com>
+         <85da4484902e5a4b1be645669c95dba7934d98b5.camel@linux.intel.com>
+         <CALMp9eTSkK2+-W8AVRdYv3MEsMKj-Xc2-v7DsavJRh5FLsVuCQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-8.el7) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 04, 2021, Vitaly Kuznetsov wrote:
-> Introduce a flag to keep track of whether MSR bitmap for L2 needs to be
-> rebuilt due to changes in MSR bitmap for L1 or switching to a different
-> L2. This information will be used for Enlightened MSR Bitmap feature for
-> Hyper-V guests.
+On Fri, 2021-10-08 at 16:49 -0700, Jim Mattson wrote:
+> We have some internal patches for virtualizing VMCS shadowing which
+> may break if there is a guest VMCS field with index greater than
+> VMX_VMCS_ENUM.MAX_INDEX. I plan to upstream them soon.
+
+OK, thanks for letting us know.:-)
 > 
-> Note, setting msr_bitmap_changed to 'true' from set_current_vmptr() is
-> not really needed for Enlightened MSR Bitmap as the feature can only
-> be used in conjunction with Enlightened VMCS but let's keep tracking
-> information complete, it's cheap and in the future similar PV feature can
-> easily be implemented for KVM on KVM too.
-> 
-> No functional change intended.
-> 
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> ---
+> On Fri, Oct 8, 2021 at 8:09 AM Robert Hoo <robert.hu@linux.intel.com>
+> wrote:
+> > 
+> > On Fri, 2021-10-08 at 16:23 +0800, Yu Zhang wrote:
+> > > On Tue, Oct 05, 2021 at 11:22:15PM +0000, Sean Christopherson
+> > > wrote:
+> > > > On Tue, Oct 05, 2021, Jim Mattson wrote:
+> > > > > On Tue, Oct 5, 2021 at 1:50 PM Sean Christopherson <
+> > > > > seanjc@google.com> wrote:
+> > > > > > 
+> > > > > > On Tue, Oct 05, 2021, Jim Mattson wrote:
+> > > > > > > On Tue, Oct 5, 2021 at 10:59 AM Sean Christopherson <
+> > > > > > > seanjc@google.com> wrote:
+> > > > > > > > 
+> > > > > > > > On Tue, Oct 05, 2021, Jim Mattson wrote:
+> > > > > > > > > On Tue, Oct 5, 2021 at 9:16 AM Sean Christopherson <
+> > > > > > > > > seanjc@google.com> wrote:
+> > > > > > > > > > 
+> > > > > > > > > > On Tue, Sep 28, 2021, Robert Hoo wrote:
+> > > > > > > > > > > On Fri, 2021-09-03 at 15:11 +0000, Sean
+> > > > > > > > > > > Christopherson wrote:
+> > > > > > > > > > >       You also said, "This is quite the
+> > > > > > > > > > > complicated
+> > > > > > > > > > > mess for
+> > > > > > > > > > > something I'm guessing no one actually cares
+> > > > > > > > > > > about.  At what point do
+> > > > > > > > > > > we chalk this up as a virtualization hole and
+> > > > > > > > > > > sweep
+> > > > > > > > > > > it under the rug?"
+> > > > > > > > > > > -- I couldn't agree more.
+> > > > > > > > > > 
+> > > > > > > > > > ...
+> > > > > > > > > > 
+> > > > > > > > > > > So, Sean, can you help converge our discussion
+> > > > > > > > > > > and
+> > > > > > > > > > > settle next step?
+> > > > > > > > > > 
+> > > > > > > > > > Any objection to simply keeping KVM's current
+> > > > > > > > > > behavior,
+> > > > > > > > > > i.e. sweeping this under
+> > > > > > > > > > the proverbial rug?
+> > > > > > > > > 
+> > > > > > > > > Adding 8 KiB per vCPU seems like no big deal to me,
+> > > > > > > > > but,
+> > > > > > > > > on the other
+> > > > > > > > > hand, Paolo recently argued that slightly less than 1
+> > > > > > > > > KiB
+> > > > > > > > > per vCPU was
+> > > > > > > > > unreasonable for VM-exit statistics, so maybe I've
+> > > > > > > > > got a
+> > > > > > > > > warped
+> > > > > > > > > perspective. I'm all for pedantic adherence to the
+> > > > > > > > > specification, but
+> > > > > > > > > I have to admit that no actual hypervisor is likely
+> > > > > > > > > to
+> > > > > > > > > care (or ever
+> > > > > > > > > will).
+> > > > > > > > 
+> > > > > > > > It's not just the memory, it's also the complexity,
+> > > > > > > > e.g. to
+> > > > > > > > get VMCS shadowing
+> > > > > > > > working correctly, both now and in the future.
+> > > > > > > 
+> > > > > > > As far as CPU feature virtualization goes, this one
+> > > > > > > doesn't
+> > > > > > > seem that
+> > > > > > > complex to me. It's not anywhere near as complex as
+> > > > > > > virtualizing MTF,
+> > > > > > > for instance, and KVM *claims* to do that! :-)
+> > > > > > 
+> > > > > > There aren't many things as complex as MTF.  But unlike
+> > > > > > MTF,
+> > > > > > this behavior doesn't
+> > > > > > have a concrete use case to justify the risk vs.
+> > > > > > reward.  IMO
+> > > > > > the odds of us breaking
+> > > > > > something in KVM for "normal" use cases are higher than the
+> > > > > > odds of an L1 VMM breaking
+> > > > > > because a VMREAD/VMWRITE didn't fail when it technically
+> > > > > > should
+> > > > > > have failed.
+> > > > > 
+> > > > > Playing devil's advocate here, because I totally agree with
+> > > > > you...
+> > > > > 
+> > > > > Who's to say what's "normal"? It's a slippery slope when we
+> > > > > start
+> > > > > making personal value judgments about which parts of the
+> > > > > architectural
+> > > > > specification are important and which aren't.
+> > > > 
+> > > > I agree, but in a very similar case Intel chose to take an
+> > > > erratum
+> > > > instead of
+> > > > fixing what was in all likelihood a microcode bug, i.e. could
+> > > > have
+> > > > been patched
+> > > > in the field.  So it's not _just_ personal value judgment,
+> > > > though
+> > > > it's definitely
+> > > > that too :-)
+> > > > 
+> > > > I'm not saying I'd actively oppose support for strict
+> > > > VMREAD/VMWRITE adherence
+> > > > to the vCPU model, but I'm also not going to advise anyone to
+> > > > go
+> > > > spend their time
+> > > > implementing a non-trivial fix for behavior that, AFAIK,
+> > > > doesn't
+> > > > adversely affect
+> > > > any real world use cases.
+> > > > 
+> > > 
+> > > Thank you all for the discussion, Sean & Jim.
+> > > 
+> > > Could we draw a conclusion to just keep KVM as it is now? If yes,
+> > > how
+> > > about we
+> > > depricate the check against max index value from
+> > > MSR_IA32_VMX_VMCS_ENUM in vmx.c
+> > > of the kvm-unit-test?
+> > > 
+> > > After all, we have not witnessed any real system doing so.
+> > > 
+> > > E.g.,
+> > > 
+> > > diff --git a/x86/vmx.c b/x86/vmx.c
+> > > index f0b853a..63623e5 100644
+> > > --- a/x86/vmx.c
+> > > +++ b/x86/vmx.c
+> > > @@ -380,8 +380,7 @@ static void test_vmwrite_vmread(void)
+> > >         vmcs_enum_max = (rdmsr(MSR_IA32_VMX_VMCS_ENUM) &
+> > > VMCS_FIELD_INDEX_MASK)
+> > >                         >> VMCS_FIELD_INDEX_SHIFT;
+> > >         max_index = find_vmcs_max_index();
+> > > -       report(vmcs_enum_max == max_index,
+> > > -              "VMX_VMCS_ENUM.MAX_INDEX expected: %x, actual:
+> > > %x",
+> > > +       printf("VMX_VMCS_ENUM.MAX_INDEX expected: %x, actual:
+> > > %x",
+> > >                max_index, vmcs_enum_max);
+> > > 
+> > >         assert(!vmcs_clear(vmcs));
+> > > 
+> > > B.R.
+> > > Yu
+> > 
+> > I think this patch series has its value of fixing the be-forced
+> > hard-
+> > code VMX_VMCS_ENUM.
+> > My understanding of Sean's "simply keeping KVM's current behavior,
+> > i.e.
+> > sweeping this under the proverbial rug", is about vmcs shadowing
+> > will
+> > fail some VMCS field validation. Of course, this in turn will fail
+> > some
+> > case of this KVM unit test case (theoretically), though we haven't
+> > met
+> > yet.
+> > 
+> > 
 
-...
-
->  void vmx_disable_intercept_for_msr(struct kvm_vcpu *vcpu, u32 msr, int type)
-> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-> index 592217fd7d92..eb7a1697bec2 100644
-> --- a/arch/x86/kvm/vmx/vmx.h
-> +++ b/arch/x86/kvm/vmx/vmx.h
-> @@ -148,6 +148,12 @@ struct nested_vmx {
->  	bool need_vmcs12_to_shadow_sync;
->  	bool dirty_vmcs12;
->  
-> +	/*
-> +	 * Indicates whether MSR bitmap for L2 needs to be rebuilt due to
-> +	 * changes in MSR bitmap for L1 or switching to a different L2.
-> +	 */
-> +	bool msr_bitmap_changed;
-
-This is misleading, and arguably wrong.  It's only accurate when used in conjuction
-with a paravirt L1 that states if a VMCS has a dirty MSR bitmap.  E.g. this flag
-will be wrong if L1 changes the address of the bitmap in the VMCS, and it's
-obviously wrong if L1 changes the MSR bitmap itself.
-
-The changelog kind of covers that, but those details will be completely lost to
-readers of the code.
-
-Would it be illegal from KVM to simply clear the CLEAN bit in the eVMCS at the
-appropriate points?
-
-> +
->  	/*
->  	 * Indicates lazily loaded guest state has not yet been decached from
->  	 * vmcs02.
-> -- 
-> 2.31.1
-> 
