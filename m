@@ -2,56 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E68F4427664
-	for <lists+kvm@lfdr.de>; Sat,  9 Oct 2021 04:17:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A88BE427666
+	for <lists+kvm@lfdr.de>; Sat,  9 Oct 2021 04:17:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244445AbhJICTB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Oct 2021 22:19:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38342 "EHLO
+        id S244754AbhJICTH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Oct 2021 22:19:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38368 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244791AbhJICS0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Oct 2021 22:18:26 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16232C06136C
-        for <kvm@vger.kernel.org>; Fri,  8 Oct 2021 19:14:16 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 124-20020a251182000000b005a027223ed9so14954443ybr.13
-        for <kvm@vger.kernel.org>; Fri, 08 Oct 2021 19:14:16 -0700 (PDT)
+        with ESMTP id S244824AbhJICSb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Oct 2021 22:18:31 -0400
+Received: from mail-qv1-xf4a.google.com (mail-qv1-xf4a.google.com [IPv6:2607:f8b0:4864:20::f4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CB73C06136F
+        for <kvm@vger.kernel.org>; Fri,  8 Oct 2021 19:14:18 -0700 (PDT)
+Received: by mail-qv1-xf4a.google.com with SMTP id o90-20020a0c85e3000000b0038310a20003so10373419qva.1
+        for <kvm@vger.kernel.org>; Fri, 08 Oct 2021 19:14:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=arn3QPCgnyUFm933bKAVezCVOZbbelZBmIXo+qC2e8A=;
-        b=NtPYwcGbvpEj33H6dO4R06ZYuMzbhT6h0eIqZuweV7aMaBu2ziVhVO1A4hvx1Ji+cJ
-         AgBswGASBvOOoqfVomcOIh0ZHzT1TTJGiHOj+f9sG0AHf/oLjXD6wESX8+v32PdOteOa
-         Um62Ru9fWxykQr9ABqAFcipBm+RpHdgIuHU223YquxiOdzQoVkuGxBvdcP5VBkicu3AZ
-         7D33zGISGwBLVxXqbiciqkiZPHhXqAM+wIJ5+lE6usO+uyYWHzNCW7B+8JGqSh7ZVhy8
-         98+aZ7uc55HORI0YCY76gBC/GAModfD4T1dB+U6UYKL4eI/B9TJb0ULscUkUAonJPfYH
-         rgYw==
+        bh=60FaGe3jHfzi2vANN4FyfF/i5oEKd4JaFx8/SVEFBNk=;
+        b=Z1P8991nqO/keHHcPNDLRVMsJotsLW7zCMS8prAeIixKQ9mUd7DFllwUbuaHgVSrWZ
+         FkvVrJgBJx0hc4CnzRBKZSR1hitB3Pk7jqHRDt0WmtqyCKKVVvm7gD0Q9FoIUaVCRIyp
+         YiCXIJxWnPrhfp4kvu9z8/hF1gQOGdE7O7cz6QeTcYuVmieoH7ELJCd7UMv/HDJr1lHI
+         JdSdjZZTm0cDCLqT8cUYvWrMLcAK8JU652nI2ulS+DYSnd22rQAqVDPjiZw3qVcCjDi0
+         GqTi9TAncXe+Iuc9CVjDDeSGYGD369tFbR8wEt1kGo66QnpkLVtv3NIEb5UQVw6604Ie
+         3W8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=arn3QPCgnyUFm933bKAVezCVOZbbelZBmIXo+qC2e8A=;
-        b=FFjzAFRMzd9NBzaQpfArVpr6EIBHODCioZBGJgNIAsKQ0p//ZnJxHIBbj1wt0kkYLi
-         qzjIso1iyUWnCc2nN6oLr91AXOp92q7e71KzodNZ3M/PWCwIDhTz2ZnbtQ21YVqkltHY
-         g+RGucJEB6VbdrwQ7tkaJBJNZwjwumjZs7cSCSGDbPr49mKmasXU0MQY4NZhUXnS0fEx
-         Gn21ytyo8DTjfE46tXI7K/fGtC3UA2d+b2NQzZUVJKI/LOZun5473ujhTzjkw4vdiM82
-         zFb1CbBpluC61QKiDLU/DXgilPP98rxb/T3aE0fL/e5sTPdU30YfyJ22WZdqQlz7etDb
-         p4ZQ==
-X-Gm-Message-State: AOAM531KQzB9IDB0Qgr9+IgEp4hjj49wifvCsLvOg2t/fmpz8TDKr+8h
-        9ZnsyUYhHHJZSJALmx3jD/EypzOCGWE=
-X-Google-Smtp-Source: ABdhPJy4qaQ6tIlL2MtP2ahqc06PNWeBv+SOp3R/dcvT+HOsJqGH8QolDswjaKj42MJ7Ncoy+lBhrp1sp74=
+        bh=60FaGe3jHfzi2vANN4FyfF/i5oEKd4JaFx8/SVEFBNk=;
+        b=A0Uziv53mfE/HwxzjyTp/OjXi0+Xv3K+cM6mi3XBlIe1ql3Mfdhn+6SVxlW0Y5E2xg
+         D273vRtVmCq3lKNE7e5eAoGi314enUWID/9LqvHKZZzfeZH4GCg7LXQ9WBOae6xtmr5R
+         7l5QkELIvngdMu7y+Qj+KpglLcSpkRBx7yT60iKwert1GcqbGzkMEYxrjKs6mLAmiuxS
+         WqeAeIWx5q/4cVDkTKYH+O6fOJdMZPzNvKZPEyFSrneIgNdtnbp+2owAQ1SFGEzHMKqr
+         mplnQW1Xif5yYeVezJKGhznqfP1KbUvdMKniVHEkkEBH/rKSgLvXccOIHA4Tf3nM4oMu
+         f4Cg==
+X-Gm-Message-State: AOAM531TgqKONmeItAKqKXKUOy+7r528fLcm5MmVIoZTmBcxeQY5OexF
+        wbDHz/dCx0+mt2sVFiItejU7Dajjhfs=
+X-Google-Smtp-Source: ABdhPJzz4hkmJ133tsw9efdKVMZh6wi7X37BBmBb9YEFsyE1x8BdZiU7lUBQl0qiUIYV4wWlbCGAte9NXc4=
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:90:200:e39b:6333:b001:cb])
- (user=seanjc job=sendgmr) by 2002:a25:2a0f:: with SMTP id q15mr7479663ybq.448.1633745655314;
- Fri, 08 Oct 2021 19:14:15 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:ac8:42da:: with SMTP id g26mr1839130qtm.368.1633745657436;
+ Fri, 08 Oct 2021 19:14:17 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri,  8 Oct 2021 19:12:31 -0700
+Date:   Fri,  8 Oct 2021 19:12:32 -0700
 In-Reply-To: <20211009021236.4122790-1-seanjc@google.com>
-Message-Id: <20211009021236.4122790-39-seanjc@google.com>
+Message-Id: <20211009021236.4122790-40-seanjc@google.com>
 Mime-Version: 1.0
 References: <20211009021236.4122790-1-seanjc@google.com>
 X-Mailer: git-send-email 2.33.0.882.g93a45727a2-goog
-Subject: [PATCH v2 38/43] KVM: Drop defunct kvm_arch_vcpu_(un)blocking() hooks
+Subject: [PATCH v2 39/43] KVM: VMX: Don't do full kick when triggering posted
+ interrupt "fails"
 From:   Sean Christopherson <seanjc@google.com>
 To:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
         Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
@@ -87,159 +88,78 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Remove kvm_arch_vcpu_(un)blocking() now that all implementations are nops.
+Replace the full "kick" with just the "wake" in the fallback path when
+triggering a virtual interrupt via a posted interrupt fails because the
+guest is not IN_GUEST_MODE.  If the guest transitions into guest mode
+between the check and the kick, then it's guaranteed to see the pending
+interrupt as KVM syncs the PIR to IRR (and onto GUEST_RVI) after setting
+IN_GUEST_MODE.  Kicking the guest in this case is nothing more than an
+unnecessary VM-Exit (and host IRQ).
 
-No functional change intended.
+Opportunistically update comments to explain the various ordering rules
+and barriers at play.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/arm64/kvm/arm.c                | 10 ----------
- arch/mips/include/asm/kvm_host.h    |  2 --
- arch/powerpc/include/asm/kvm_host.h |  2 --
- arch/s390/include/asm/kvm_host.h    |  2 --
- arch/x86/include/asm/kvm-x86-ops.h  |  2 --
- arch/x86/include/asm/kvm_host.h     | 13 -------------
- include/linux/kvm_host.h            |  2 --
- virt/kvm/kvm_main.c                 |  4 ----
- 8 files changed, 37 deletions(-)
+ arch/x86/kvm/vmx/vmx.c | 16 ++++++++++++++--
+ arch/x86/kvm/x86.c     |  5 +++--
+ 2 files changed, 17 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 9ff0e85a9f16..444d6f5a980a 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -357,16 +357,6 @@ int kvm_cpu_has_pending_timer(struct kvm_vcpu *vcpu)
- 	return kvm_timer_is_pending(vcpu);
- }
- 
--void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu)
--{
--
--}
--
--void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu)
--{
--
--}
--
- void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- {
- 	struct kvm_s2_mmu *mmu;
-diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm/kvm_host.h
-index 72b90d45a46e..28110f71089b 100644
---- a/arch/mips/include/asm/kvm_host.h
-+++ b/arch/mips/include/asm/kvm_host.h
-@@ -895,8 +895,6 @@ static inline void kvm_arch_free_memslot(struct kvm *kvm,
- 					 struct kvm_memory_slot *slot) {}
- static inline void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen) {}
- static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
--static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu) {}
--static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
- 
- #define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLB
- int kvm_arch_flush_remote_tlb(struct kvm *kvm);
-diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
-index 4a195c161592..0dfee6866541 100644
---- a/arch/powerpc/include/asm/kvm_host.h
-+++ b/arch/powerpc/include/asm/kvm_host.h
-@@ -863,7 +863,5 @@ static inline void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen) {}
- static inline void kvm_arch_flush_shadow_all(struct kvm *kvm) {}
- static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
- static inline void kvm_arch_exit(void) {}
--static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu) {}
--static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
- 
- #endif /* __POWERPC_KVM_HOST_H__ */
-diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
-index a22c9266ea05..25ed4ec66f4a 100644
---- a/arch/s390/include/asm/kvm_host.h
-+++ b/arch/s390/include/asm/kvm_host.h
-@@ -1007,7 +1007,5 @@ static inline void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen) {}
- static inline void kvm_arch_flush_shadow_all(struct kvm *kvm) {}
- static inline void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
- 		struct kvm_memory_slot *slot) {}
--static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu) {}
--static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
- 
- #endif
-diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-index c2b007171abd..f2c38acdcad6 100644
---- a/arch/x86/include/asm/kvm-x86-ops.h
-+++ b/arch/x86/include/asm/kvm-x86-ops.h
-@@ -96,8 +96,6 @@ KVM_X86_OP(handle_exit_irqoff)
- KVM_X86_OP_NULL(request_immediate_exit)
- KVM_X86_OP(sched_in)
- KVM_X86_OP_NULL(update_cpu_dirty_logging)
--KVM_X86_OP_NULL(vcpu_blocking)
--KVM_X86_OP_NULL(vcpu_unblocking)
- KVM_X86_OP_NULL(update_pi_irte)
- KVM_X86_OP_NULL(start_assignment)
- KVM_X86_OP_NULL(apicv_post_state_restore)
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 76a8dddc1a48..bebd42926321 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1445,9 +1445,6 @@ struct kvm_x86_ops {
- 	const struct kvm_pmu_ops *pmu_ops;
- 	const struct kvm_x86_nested_ops *nested_ops;
- 
--	void (*vcpu_blocking)(struct kvm_vcpu *vcpu);
--	void (*vcpu_unblocking)(struct kvm_vcpu *vcpu);
--
- 	int (*update_pi_irte)(struct kvm *kvm, unsigned int host_irq,
- 			      uint32_t guest_irq, bool set);
- 	void (*start_assignment)(struct kvm *kvm);
-@@ -1904,16 +1901,6 @@ static inline bool kvm_irq_is_postable(struct kvm_lapic_irq *irq)
- 		irq->delivery_mode == APIC_DM_LOWEST);
- }
- 
--static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu)
--{
--	static_call_cond(kvm_x86_vcpu_blocking)(vcpu);
--}
--
--static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu)
--{
--	static_call_cond(kvm_x86_vcpu_unblocking)(vcpu);
--}
--
- static inline int kvm_cpu_get_apicid(int mps_cpu)
- {
- #ifdef CONFIG_X86_LOCAL_APIC
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index c5961a361c73..6a84b020daa6 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -966,8 +966,6 @@ void kvm_sigset_deactivate(struct kvm_vcpu *vcpu);
- 
- void kvm_vcpu_halt(struct kvm_vcpu *vcpu);
- bool kvm_vcpu_block(struct kvm_vcpu *vcpu);
--void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu);
--void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu);
- bool kvm_vcpu_wake_up(struct kvm_vcpu *vcpu);
- void kvm_vcpu_kick(struct kvm_vcpu *vcpu);
- int kvm_vcpu_yield_to(struct kvm_vcpu *target);
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index c1850b60f38b..96de905e26e4 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -3210,8 +3210,6 @@ bool kvm_vcpu_block(struct kvm_vcpu *vcpu)
- 
- 	vcpu->stat.generic.blocking = 1;
- 
--	kvm_arch_vcpu_blocking(vcpu);
--
- 	prepare_to_rcuwait(wait);
- 	for (;;) {
- 		set_current_state(TASK_INTERRUPTIBLE);
-@@ -3224,8 +3222,6 @@ bool kvm_vcpu_block(struct kvm_vcpu *vcpu)
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 13e732a818f3..44d760dde0f9 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -3978,10 +3978,16 @@ static int vmx_deliver_nested_posted_interrupt(struct kvm_vcpu *vcpu,
+ 		 * we will accomplish it in the next vmentry.
+ 		 */
+ 		vmx->nested.pi_pending = true;
++		/*
++		 * The smp_wmb() in kvm_make_request() pairs with the smp_mb_*()
++		 * after setting vcpu->mode in vcpu_enter_guest(), thus the vCPU
++		 * is guaranteed to see the event request if triggering a posted
++		 * interrupt "fails" because vcpu->mode != IN_GUEST_MODE.
++		 */
+ 		kvm_make_request(KVM_REQ_EVENT, vcpu);
+ 		/* the PIR and ON have been set by L1. */
+ 		if (!kvm_vcpu_trigger_posted_interrupt(vcpu, true))
+-			kvm_vcpu_kick(vcpu);
++			kvm_vcpu_wake_up(vcpu);
+ 		return 0;
  	}
- 	finish_rcuwait(wait);
+ 	return -1;
+@@ -4012,9 +4018,15 @@ static int vmx_deliver_posted_interrupt(struct kvm_vcpu *vcpu, int vector)
+ 	if (pi_test_and_set_on(&vmx->pi_desc))
+ 		return 0;
  
--	kvm_arch_vcpu_unblocking(vcpu);
--
- 	vcpu->stat.generic.blocking = 0;
++	/*
++	 * The implied barrier in pi_test_and_set_on() pairs with the smp_mb_*()
++	 * after setting vcpu->mode in vcpu_enter_guest(), thus the vCPU is
++	 * guaranteed to see PID.ON=1 and sync the PIR to IRR if triggering a
++	 * posted interrupt "fails" because vcpu->mode != IN_GUEST_MODE.
++	 */
+ 	if (vcpu != kvm_get_running_vcpu() &&
+ 	    !kvm_vcpu_trigger_posted_interrupt(vcpu, false))
+-		kvm_vcpu_kick(vcpu);
++		kvm_vcpu_wake_up(vcpu);
  
- 	return waited;
+ 	return 0;
+ }
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 9643f23c28c7..274d295cabfb 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -9752,8 +9752,9 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+ 	smp_mb__after_srcu_read_unlock();
+ 
+ 	/*
+-	 * This handles the case where a posted interrupt was
+-	 * notified with kvm_vcpu_kick.
++	 * Process pending posted interrupts to handle the case where the
++	 * notification IRQ arrived in the host, or was never sent (because the
++	 * target vCPU wasn't running).
+ 	 */
+ 	if (kvm_lapic_enabled(vcpu) && vcpu->arch.apicv_active)
+ 		static_call(kvm_x86_sync_pir_to_irr)(vcpu);
 -- 
 2.33.0.882.g93a45727a2-goog
 
