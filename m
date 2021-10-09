@@ -2,85 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 952DF427C99
-	for <lists+kvm@lfdr.de>; Sat,  9 Oct 2021 20:17:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9C4A8427CE7
+	for <lists+kvm@lfdr.de>; Sat,  9 Oct 2021 21:00:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230167AbhJISTq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 9 Oct 2021 14:19:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53456 "EHLO
+        id S229783AbhJITCk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 9 Oct 2021 15:02:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34752 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230032AbhJISTp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 9 Oct 2021 14:19:45 -0400
-Received: from mail-il1-x134.google.com (mail-il1-x134.google.com [IPv6:2607:f8b0:4864:20::134])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A7EAC061762
-        for <kvm@vger.kernel.org>; Sat,  9 Oct 2021 11:17:48 -0700 (PDT)
-Received: by mail-il1-x134.google.com with SMTP id d11so13554487ilc.8
-        for <kvm@vger.kernel.org>; Sat, 09 Oct 2021 11:17:48 -0700 (PDT)
+        with ESMTP id S229558AbhJITCj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 9 Oct 2021 15:02:39 -0400
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45109C061570;
+        Sat,  9 Oct 2021 12:00:42 -0700 (PDT)
+Received: by mail-pl1-x62d.google.com with SMTP id c4so8390881pls.6;
+        Sat, 09 Oct 2021 12:00:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:reply-to:from:date:message-id:subject:to;
-        bh=uBupTRvdbvrPYWfcioDH+Rupm0D6631B5wClCxA7h5s=;
-        b=VsIRkK1A2ncOzz8Wg87HvQAYGTH0+Q2uCpNOB58Vr8TiZCEbGawMjza09jhM3UTA00
-         GYDxjWUMNbgbCY+MMa2qWoGQ0+Wat2Z6xak6i8Spp7vE2Wkn4NoI7C++4tldL8GwLRqW
-         fkQJV+Z5o4sMJlCFam9zW57TmYcwcEze68WNpLpvLybf4aJ4B5BYo0Z52I4WKnQaC1Uk
-         vRCJAHB4gcrrlEvJg5TV/QCpr0K98wKry9uasUjKXEMMXYN4j9iC7plbPWPzXAZmtyoa
-         zKAqZvnIBaFLVfLzEE4W0T7E8FaLPQybdR34emlMut0figHD199sxF4orasHsfjlpkaZ
-         DAPA==
+        h=message-id:date:mime-version:user-agent:to:cc:references:subject
+         :content-language:from:in-reply-to:content-transfer-encoding;
+        bh=bS2bR0CXSicuV2aM5v6KwZZeq8U6dqh7iUxRbGos/p0=;
+        b=m6+x2wnzXlgttMLCDxBvcPT2Ve0X/Isef92WdrFP9ig9aQQZM+xPcp34iz2L06NNyi
+         wNSxQ6E4UM1+VOqFY2MjBvdC+k5AG8TFEs6x9voQ45DTuxnwTRbsuIW9MZ84uzVb0isf
+         O1JRIMA0NizMQ0dWAN7HTDL1aNMp/h3sLS/DGw6v/XeksZM/RSYmzRiYs5PoGeiLlnoj
+         SxZpIu1cqPDoXW8SubV1ZM7+yTx5qe1Ld1lbTo+Aa9TVaUPrpESYlGXNvo3y6ilgqcka
+         wi3cNiUxgivSlgPugHvb4Oaw7uj8e31ZnDogGyUUTNyd0ygnYzdGQd+qQnS8IFSpm7NX
+         NDJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to;
-        bh=uBupTRvdbvrPYWfcioDH+Rupm0D6631B5wClCxA7h5s=;
-        b=RG3hqAMAjG2BpgQOCigG3DY9kepvlfkcH4mA75dMUTcI3ZNQlVmDBzvA4ZyVA3wKbr
-         YcPldf7o08ekob9El4vHzUpIvkKQVwSiAJ20gvEeGDoWItjJVkFa9asxd5zov5dHzbqJ
-         kXQBpgbaT2HCf7IWA6hT/7evsrpjui8cxl1bcR2P82aflB5ESlx2qU6C19x5AU95hIJy
-         7hafpRWEsy4Ml1jvaPvGBLU5C1qTZ8NTaW2F14QQ/XTK47O3jM0crvhfB6P3ttYwY8JQ
-         TMt6QdTb8vWIdb4bINW3zJYVeHDoqjMBxhwhpNJVgjiGycxjoIQmPp5mwF74UMSsXrUs
-         hS9A==
-X-Gm-Message-State: AOAM532PcBeKOYFJS7HUIX5qk0fi19lHm2QPUE+ohYF/n+OIdhV3hFNZ
-        nQi5RsHCHOxH/dOmnk3xssCW4iVY451vYfC6Fw==
-X-Google-Smtp-Source: ABdhPJy5LY2n+vMWNXRe4EOn7XHYUW9oPhypLVh6S9JoH0c5tAIhmjD7f8cA4quazIofemDOBThAB7AtMhtX8sEQ73M=
-X-Received: by 2002:a05:6e02:214b:: with SMTP id d11mr12768397ilv.305.1633803467994;
- Sat, 09 Oct 2021 11:17:47 -0700 (PDT)
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:to:cc
+         :references:subject:content-language:from:in-reply-to
+         :content-transfer-encoding;
+        bh=bS2bR0CXSicuV2aM5v6KwZZeq8U6dqh7iUxRbGos/p0=;
+        b=xwik0L0pl1AMd7A0qWmnpuNntWqZ1LW6G/i8MbBeayZC4rfcWnYRt/Nc960c502F/O
+         lU9EevXzT/DVNwF02J/HIR487yT9XKJ+Xc1y/Om/N7175lUr2QRNu0Mc7ufv02Vyn0z0
+         S62OanQ3QQ+vOZwp42oVB65zOqXTb6YhcgheDUgDK6CpSPGdnrF6HEI9H3pByJt+oyPu
+         0QmK9WDwwy7NxA/dJ10QVrHrsLzARj+M2mGT7x+dhiCCjfg7a7rNglcfITQD9q/V1NLK
+         pmyyBNC/GoMz0FRA7V343RpqiWv1LVjOXDQ+mSxlVEYogoo5ukvfOq/YyNFdSHZpEzq2
+         qggA==
+X-Gm-Message-State: AOAM530us5QLaU+Owy+2GZFWFJDvDc1ljMvLHnFfBeoJDmRcwwMlJB9A
+        0OJrL06+Tqla//gFsl4FhoOUeDzz38+k9A==
+X-Google-Smtp-Source: ABdhPJwatbU2329z5mWgUCbedRLHbOqzc+vTZGkQ2HrOVmpuhNkWV0Gmd/j0coeUjQMdWjOxqLn84A==
+X-Received: by 2002:a17:90b:3b85:: with SMTP id pc5mr19844660pjb.74.1633806041781;
+        Sat, 09 Oct 2021 12:00:41 -0700 (PDT)
+Received: from [10.25.172.11] ([156.146.48.160])
+        by smtp.gmail.com with ESMTPSA id d18sm3411118pgk.24.2021.10.09.12.00.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 09 Oct 2021 12:00:41 -0700 (PDT)
+Message-ID: <2cd8af17-8631-44b5-8580-371527beeb38@gmail.com>
+Date:   Sat, 9 Oct 2021 12:00:39 -0700
 MIME-Version: 1.0
-Received: by 2002:ac0:fd2c:0:0:0:0:0 with HTTP; Sat, 9 Oct 2021 11:17:47 -0700 (PDT)
-Reply-To: jennehkandeh@yahoo.com
-From:   Jenneh Kandeh <mmamieshimirah@gmail.com>
-Date:   Sat, 9 Oct 2021 11:17:47 -0700
-Message-ID: <CAEQZFm17B79adqzjq8FQ2PTUPayEymySpLX5NAeay=GqMqp7Qw@mail.gmail.com>
-Subject: Re: Regarding Of My Late Father's Fund $10,200,000
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.2
+To:     stephenackerman16@gmail.com
+Cc:     djwong@kernel.org, kvm@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, seanjc@google.com
+References: <85e40141-3c17-1dff-1ed0-b016c5d778b6@gmail.com>
+Subject: Re: kvm crash in 5.14.1?
+Content-Language: en-US
+From:   Stephen <stephenackerman16@gmail.com>
+In-Reply-To: <85e40141-3c17-1dff-1ed0-b016c5d778b6@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-dear,
+ > I'll try to report back if I see a crash; or in roughly a week if the 
+system seems to have stabilized.
 
-I got your contact through the internet due to serious searching for a
-reliable personality.  I am Jenneh Kandeh from FreeTown Capital of
-Sierra Leone. Time of opposed to the government of President Ahmad
-Tejan Kebbah the ex-leader.
+Just wanted to provide a follow-up here and say that I've run on both 
+v5.14.8 and v5.14.9 with this patch and everything seems to be good; no 
+further crashes or problems.
 
-Since 21st November, 2005 But I am current residing in Porto-Novo
-Benin due to war of my country, my mother killed on 04/01/2002 for
-Sierra Leone civilian war my father decided to change another
-residence country with me because I am only child for my family bad
-news that my father passed away on 25/11/2018.
+Thank you,
+     Stephen
 
-During the war, My father made a lot of money through the illegal
-sales of Diamonds. To the tune of $10,200,000. This money is currently
-and secretly kept in ECOWAS security company here in Benin, but
-because of the political turmoil which still exists here in Africa, I
-can not invest the money by myself, hence am soliciting your help to
-help me take these funds into your custody and also advise me on how
-to invest it.
-
-And I want to add here that if agreed 35% of the total worth of the
-fund will be yours minus your total expenses incurred during the
-clearing of the fund in
-Porto Novo Benin that 35% is a $3,570,000 I would like to invest on
-heavy duty agricultural equipment and earth moving machines to enable
-me go into a full scale mechanized farming.
-
-While l wait to hear from you soon, my warm regards to you and your family
