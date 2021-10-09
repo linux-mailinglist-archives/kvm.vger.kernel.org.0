@@ -2,115 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5B5F3427676
-	for <lists+kvm@lfdr.de>; Sat,  9 Oct 2021 04:17:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E34954277F6
+	for <lists+kvm@lfdr.de>; Sat,  9 Oct 2021 09:51:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244803AbhJICTh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Oct 2021 22:19:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38312 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244651AbhJICTJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Oct 2021 22:19:09 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34120C0612F2
-        for <kvm@vger.kernel.org>; Fri,  8 Oct 2021 19:14:28 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id z2-20020a254c02000000b005b68ef4fe24so15044501yba.11
-        for <kvm@vger.kernel.org>; Fri, 08 Oct 2021 19:14:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=reply-to:date:in-reply-to:message-id:mime-version:references
-         :subject:from:to:cc;
-        bh=DNh7SHjv27CkTpVQ6UDQfpazfFfU/7m49a7OyCmxJ04=;
-        b=OmBEyvgBxrWmm+DnEXtUY5SGJEDJ8rfSRexcZ/sLohcuuuU8wRBxtkVvWgAcEXTtDu
-         CSHWkz3NrHAP8CQWDZPjwrNyXQv8t3ZVqtgnkJTeroV4I4ofTpUhF08tAgeFlhHpdjz5
-         DSzs4995JQ4bvC8+hT2zhEZx03XMTSTWwaAlUhES+GMR0I/ltEGK03OtIT6xjHVnTBjL
-         MK1iAMhumx1HDCHEN7Q0/UoppdBB6U1GwAdJ4EO2l1vq2DEjW94MHM8qR3/RmALo617b
-         gz6KYIdYwOM9rgqP7AeVSQ/Il0lIODnMHAbfZnMNEpK7JCaMpNzkLfJZPqdAxx+LfqzC
-         +uFQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:reply-to:date:in-reply-to:message-id
-         :mime-version:references:subject:from:to:cc;
-        bh=DNh7SHjv27CkTpVQ6UDQfpazfFfU/7m49a7OyCmxJ04=;
-        b=ArBl7ukVEw2rOTNPx0yXycZi2miInOPFNen6rJJd+C3zIT87eezrO1O6Jr6tAyUNr9
-         rVgBOtVGxNs/b+IcTFscR0nGoPxaudT7zQvtGoQUgDfRJYoU/tGKSPbEzNw9qu4XE2ZE
-         D6XfjbwJWxZMtLQqUk4HJc6KSeBWZWjXZAP8KuA9dcVBULj6COycdoll9vUsgWQX7g8r
-         RK2DRGeNGr5G6NEyd/Ku0qEaqSOCM3hCfzwNSoKfxKC5+qStdI5jM2IQGOZsyiLpn5Wi
-         VEyQZHstJgQUzdkU4/5/rdMXkZ+AmJdGdVpBUyUfyezmQKSJK68PUcCYzxKlL9IMLGBM
-         TYkQ==
-X-Gm-Message-State: AOAM533wV5QO2P8/SZBuzbc3Rzp4W3X/pFr48E/Wp7JDJQcBf6X3C6EI
-        VALKMbtdYjc/sqPOp9fKL9bCmqlcGlg=
-X-Google-Smtp-Source: ABdhPJwFBTWTsWfiioDi0mhoc4HC7I+aMeFu459xFpIEzn2YdCstAMDsfKMjJFSfY3skCf0Gp9GZ4fuQR4M=
-X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:90:200:e39b:6333:b001:cb])
- (user=seanjc job=sendgmr) by 2002:a25:77d6:: with SMTP id s205mr6993283ybc.529.1633745667357;
- Fri, 08 Oct 2021 19:14:27 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri,  8 Oct 2021 19:12:36 -0700
-In-Reply-To: <20211009021236.4122790-1-seanjc@google.com>
-Message-Id: <20211009021236.4122790-44-seanjc@google.com>
-Mime-Version: 1.0
-References: <20211009021236.4122790-1-seanjc@google.com>
-X-Mailer: git-send-email 2.33.0.882.g93a45727a2-goog
-Subject: [PATCH v2 43/43] KVM: VMX: Don't do full kick when handling posted
- interrupt wakeup
-From:   Sean Christopherson <seanjc@google.com>
-To:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Anup Patel <anup.patel@wdc.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Atish Patra <atish.patra@wdc.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Sean Christopherson <seanjc@google.com>,
+        id S229927AbhJIHw7 convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Sat, 9 Oct 2021 03:52:59 -0400
+Received: from mga02.intel.com ([134.134.136.20]:64852 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229683AbhJIHw6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 9 Oct 2021 03:52:58 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10131"; a="213786643"
+X-IronPort-AV: E=Sophos;i="5.85,360,1624345200"; 
+   d="scan'208";a="213786643"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Oct 2021 00:51:01 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.85,360,1624345200"; 
+   d="scan'208";a="440881816"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orsmga003.jf.intel.com with ESMTP; 09 Oct 2021 00:51:00 -0700
+Received: from shsmsx602.ccr.corp.intel.com (10.109.6.142) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2242.12; Sat, 9 Oct 2021 00:50:59 -0700
+Received: from shsmsx601.ccr.corp.intel.com (10.109.6.141) by
+ SHSMSX602.ccr.corp.intel.com (10.109.6.142) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2242.12; Sat, 9 Oct 2021 15:50:58 +0800
+Received: from shsmsx601.ccr.corp.intel.com ([10.109.6.141]) by
+ SHSMSX601.ccr.corp.intel.com ([10.109.6.141]) with mapi id 15.01.2242.012;
+ Sat, 9 Oct 2021 15:50:57 +0800
+From:   "Wang, Wei W" <wei.w.wang@intel.com>
+To:     "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H . Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        David Matlack <dmatlack@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Jing Zhang <jingzhangos@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        "erdemaktas@google.com" <erdemaktas@google.com>,
+        "Connor Kuehl" <ckuehl@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+CC:     "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Kai Huang <kai.huang@linux.intel.com>,
+        "Li, Xiaoyao" <xiaoyao.li@intel.com>
+Subject: RE: [RFC PATCH v2 07/69] KVM: TDX: define and export helper functions
+ for KVM TDX support
+Thread-Topic: [RFC PATCH v2 07/69] KVM: TDX: define and export helper
+ functions for KVM TDX support
+Thread-Index: AQHXb45gwUyUjxU7oUmevY7jRUUgu6vK2P1A
+Date:   Sat, 9 Oct 2021 07:50:57 +0000
+Message-ID: <bd974cdc810443748d8e4e3c7d1677a5@intel.com>
+References: <cover.1625186503.git.isaku.yamahata@intel.com>
+ <4fe4ce4faf5ad117f81d411deb00ef3b9657c842.1625186503.git.isaku.yamahata@intel.com>
+In-Reply-To: <4fe4ce4faf5ad117f81d411deb00ef3b9657c842.1625186503.git.isaku.yamahata@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-reaction: no-action
+dlp-version: 11.6.200.16
+x-originating-ip: [10.239.127.36]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When waking vCPUs in the posted interrupt wakeup handling, do exactly
-that and no more.  There is no need to kick the vCPU as the wakeup
-handler just need to get the vCPU task running, and if it's in the guest
-then it's definitely running.
+On Saturday, July 3, 2021 6:04 AM, Isaku Yamahata wrote:
+> Subject: [RFC PATCH v2 07/69] KVM: TDX: define and export helper functions
+> for KVM TDX support
+> +/*
+> + * Setup one-cpu-per-pkg array to do package-scoped SEAMCALLs. The
+> +array is
+> + * only necessary if there are multiple packages.
+> + */
+> +int __init init_package_masters(void)
+> +{
+> +	int cpu, pkg, nr_filled, nr_pkgs;
+> +
+> +	nr_pkgs = topology_max_packages();
+> +	if (nr_pkgs == 1)
+> +		return 0;
+> +
+> +	tdx_package_masters = kcalloc(nr_pkgs, sizeof(int), GFP_KERNEL);
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/vmx/posted_intr.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
-index f1bcf8c32b6d..06eb9c950760 100644
---- a/arch/x86/kvm/vmx/posted_intr.c
-+++ b/arch/x86/kvm/vmx/posted_intr.c
-@@ -192,7 +192,7 @@ void pi_wakeup_handler(void)
- 			    pi_wakeup_list) {
- 
- 		if (pi_test_on(&vmx->pi_desc))
--			kvm_vcpu_kick(&vmx->vcpu);
-+			kvm_vcpu_wake_up(&vmx->vcpu);
- 	}
- 	spin_unlock(&per_cpu(wakeup_vcpus_on_cpu_lock, cpu));
- }
--- 
-2.33.0.882.g93a45727a2-goog
+Where is the corresponding kfree() invoked? (except the one invoked on error conditions below)
 
+
+> +	if (!tdx_package_masters)
+> +		return -ENOMEM;
+> +
+> +	memset(tdx_package_masters, -1, nr_pkgs * sizeof(int));
+> +
+> +	nr_filled = 0;
+> +	for_each_online_cpu(cpu) {
+> +		pkg = topology_physical_package_id(cpu);
+> +		if (tdx_package_masters[pkg] >= 0)
+> +			continue;
+> +
+> +		tdx_package_masters[pkg] = cpu;
+> +		if (++nr_filled == topology_max_packages())
+> +			break;
+> +	}
+> +
+> +	if (WARN_ON(nr_filled != topology_max_packages())) {
+> +		kfree(tdx_package_masters);
+> +		return -EIO;
+> +	}
+
+Best,
+Wei
