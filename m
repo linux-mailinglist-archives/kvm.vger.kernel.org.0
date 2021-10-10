@@ -2,79 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9C4A8427CE7
-	for <lists+kvm@lfdr.de>; Sat,  9 Oct 2021 21:00:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 97209427F4F
+	for <lists+kvm@lfdr.de>; Sun, 10 Oct 2021 08:16:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229783AbhJITCk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 9 Oct 2021 15:02:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34752 "EHLO
+        id S230369AbhJJGSC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 10 Oct 2021 02:18:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39202 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229558AbhJITCj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 9 Oct 2021 15:02:39 -0400
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45109C061570;
-        Sat,  9 Oct 2021 12:00:42 -0700 (PDT)
-Received: by mail-pl1-x62d.google.com with SMTP id c4so8390881pls.6;
-        Sat, 09 Oct 2021 12:00:42 -0700 (PDT)
+        with ESMTP id S230237AbhJJGSB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 10 Oct 2021 02:18:01 -0400
+Received: from mail-oi1-x232.google.com (mail-oi1-x232.google.com [IPv6:2607:f8b0:4864:20::232])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1680C061570;
+        Sat,  9 Oct 2021 23:16:03 -0700 (PDT)
+Received: by mail-oi1-x232.google.com with SMTP id u69so7352330oie.3;
+        Sat, 09 Oct 2021 23:16:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:to:cc:references:subject
-         :content-language:from:in-reply-to:content-transfer-encoding;
-        bh=bS2bR0CXSicuV2aM5v6KwZZeq8U6dqh7iUxRbGos/p0=;
-        b=m6+x2wnzXlgttMLCDxBvcPT2Ve0X/Isef92WdrFP9ig9aQQZM+xPcp34iz2L06NNyi
-         wNSxQ6E4UM1+VOqFY2MjBvdC+k5AG8TFEs6x9voQ45DTuxnwTRbsuIW9MZ84uzVb0isf
-         O1JRIMA0NizMQ0dWAN7HTDL1aNMp/h3sLS/DGw6v/XeksZM/RSYmzRiYs5PoGeiLlnoj
-         SxZpIu1cqPDoXW8SubV1ZM7+yTx5qe1Ld1lbTo+Aa9TVaUPrpESYlGXNvo3y6ilgqcka
-         wi3cNiUxgivSlgPugHvb4Oaw7uj8e31ZnDogGyUUTNyd0ygnYzdGQd+qQnS8IFSpm7NX
-         NDJQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=daGz2AT73lBTk8Kwa51aEbShQGQTIG56i4A/DTDNGls=;
+        b=NkoxlVp2Rqq5UujnoattJyVeQp2F1MUegHUfmIvgsFN+40WFpv4prdvKoA04A1n/ey
+         XQb/slzFfy1RUGI+/YACt7ZzVratNKCbKVJEBK96IYTK5JhkIo+lv5Lfj0nBdLKaU6Dx
+         71pwMD0x5iFlsDujAyRGEEuf1CcGjEQdjnICWDjuNpQRTWGh7WtJYoJGC0BTJnREsErB
+         iwqZGoTezVVCXv5sB/zQGIbhX3vMTLm2/OS5BvJxlp4AuW7Am/D2L5dZ+phOebm9nfl/
+         InGp4ths5vXQhdStstgiMRDXXS+WTMq4/Mu7QpLjSH4oVQLLNPi7b8FpCn+aizM2PzOA
+         pj3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:to:cc
-         :references:subject:content-language:from:in-reply-to
-         :content-transfer-encoding;
-        bh=bS2bR0CXSicuV2aM5v6KwZZeq8U6dqh7iUxRbGos/p0=;
-        b=xwik0L0pl1AMd7A0qWmnpuNntWqZ1LW6G/i8MbBeayZC4rfcWnYRt/Nc960c502F/O
-         lU9EevXzT/DVNwF02J/HIR487yT9XKJ+Xc1y/Om/N7175lUr2QRNu0Mc7ufv02Vyn0z0
-         S62OanQ3QQ+vOZwp42oVB65zOqXTb6YhcgheDUgDK6CpSPGdnrF6HEI9H3pByJt+oyPu
-         0QmK9WDwwy7NxA/dJ10QVrHrsLzARj+M2mGT7x+dhiCCjfg7a7rNglcfITQD9q/V1NLK
-         pmyyBNC/GoMz0FRA7V343RpqiWv1LVjOXDQ+mSxlVEYogoo5ukvfOq/YyNFdSHZpEzq2
-         qggA==
-X-Gm-Message-State: AOAM530us5QLaU+Owy+2GZFWFJDvDc1ljMvLHnFfBeoJDmRcwwMlJB9A
-        0OJrL06+Tqla//gFsl4FhoOUeDzz38+k9A==
-X-Google-Smtp-Source: ABdhPJwatbU2329z5mWgUCbedRLHbOqzc+vTZGkQ2HrOVmpuhNkWV0Gmd/j0coeUjQMdWjOxqLn84A==
-X-Received: by 2002:a17:90b:3b85:: with SMTP id pc5mr19844660pjb.74.1633806041781;
-        Sat, 09 Oct 2021 12:00:41 -0700 (PDT)
-Received: from [10.25.172.11] ([156.146.48.160])
-        by smtp.gmail.com with ESMTPSA id d18sm3411118pgk.24.2021.10.09.12.00.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 09 Oct 2021 12:00:41 -0700 (PDT)
-Message-ID: <2cd8af17-8631-44b5-8580-371527beeb38@gmail.com>
-Date:   Sat, 9 Oct 2021 12:00:39 -0700
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=daGz2AT73lBTk8Kwa51aEbShQGQTIG56i4A/DTDNGls=;
+        b=SlNcYHfV2/54pbGfoOeb6vWBHLby1968AA4oyPxq/+DO265OKnbytqlu3HWZ4sDf7W
+         6sARpMZ1QjitgvBWPaMYcxG2UHF+RAwrvE7hHFBuhEV8qO7OH8VnMtC/CzThbgqgV7Hi
+         SBdSYY+x6KdJomyoAaPN/h2JWTKDNVp2Y5U0fTfzBZnUpCNbyOcedA78MZ2JM8lznPDt
+         Au4t2cjXnlU0aT/JsFCa+8vxr2U3tO1qMS1ZuhZl/mRftoVa0vY38Av4ocWV5bILLDGh
+         UWpFazp3vY5EdJqBZBw3zKpiuTLvA65JbWhJP6F3Ex+txyGsgsuPZWT+AMswvPnUZgJr
+         mgTw==
+X-Gm-Message-State: AOAM530Hx0Ia7xeRLOnfOHYrkYLM/unhDQUAeA5jBusWMhnuUNvjRNIE
+        WCJ4T+TfH+nYk3kVo4k9Lv5MUwB1Awg+9wzglxk=
+X-Google-Smtp-Source: ABdhPJyox2l8PWkPoFePfCgzA59pr9CmTFfHHRqaIWZGx+rM7po4EY/EvcI/dNlmGXfXn73zQ+sECUXJg+jObwtS4HY=
+X-Received: by 2002:a05:6808:1912:: with SMTP id bf18mr14334736oib.118.1633846562381;
+ Sat, 09 Oct 2021 23:16:02 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.2
-To:     stephenackerman16@gmail.com
-Cc:     djwong@kernel.org, kvm@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, seanjc@google.com
-References: <85e40141-3c17-1dff-1ed0-b016c5d778b6@gmail.com>
-Subject: Re: kvm crash in 5.14.1?
-Content-Language: en-US
-From:   Stephen <stephenackerman16@gmail.com>
-In-Reply-To: <85e40141-3c17-1dff-1ed0-b016c5d778b6@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20211002124012.18186-1-ajaygargnsit@gmail.com>
+ <b9afdade-b121-cc9e-ce85-6e4ff3724ed9@linux.intel.com> <CAHP4M8Us753hAeoXL7E-4d29rD9+FzUwAqU6gKNmgd8G0CaQQw@mail.gmail.com>
+ <20211004163146.6b34936b.alex.williamson@redhat.com> <CAHP4M8UeGRSqHBV+wDPZ=TMYzio0wYzHPzq2Y+JCY0uzZgBkmA@mail.gmail.com>
+In-Reply-To: <CAHP4M8UeGRSqHBV+wDPZ=TMYzio0wYzHPzq2Y+JCY0uzZgBkmA@mail.gmail.com>
+From:   Ajay Garg <ajaygargnsit@gmail.com>
+Date:   Sun, 10 Oct 2021 11:45:50 +0530
+Message-ID: <CAHP4M8UD-k76cg0JmeZAwaWh1deSP82RCE=VC1zHQEYQmX6N9A@mail.gmail.com>
+Subject: Re: [PATCH] iommu: intel: remove flooding of non-error logs, when
+ new-DMA-PTE is the same as old-DMA-PTE.
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Lu Baolu <baolu.lu@linux.intel.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
- > I'll try to report back if I see a crash; or in roughly a week if the 
-system seems to have stabilized.
+> I'll try and backtrack to the userspace process that is sending these ioctls.
+>
 
-Just wanted to provide a follow-up here and say that I've run on both 
-v5.14.8 and v5.14.9 with this patch and everything seems to be good; no 
-further crashes or problems.
+The userspace process is qemu.
 
-Thank you,
-     Stephen
+I compiled qemu from latest source, installed via "sudo make install"
+on host-machine, rebooted the host-machine, and booted up the
+guest-machine on the host-machine. Now, no kernel-flooding is seen on
+the host-machine.
 
+For me, the issue is thus closed-invalid; admins may take the
+necessary action to officially mark ;)
+
+
+Thanks and Regards,
+Ajay
