@@ -2,40 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C9E3F42815B
-	for <lists+kvm@lfdr.de>; Sun, 10 Oct 2021 14:47:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E014428160
+	for <lists+kvm@lfdr.de>; Sun, 10 Oct 2021 14:49:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232300AbhJJMtO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 10 Oct 2021 08:49:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33129 "EHLO
+        id S232517AbhJJMvR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 10 Oct 2021 08:51:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31513 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231842AbhJJMtO (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 10 Oct 2021 08:49:14 -0400
+        by vger.kernel.org with ESMTP id S232394AbhJJMvR (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 10 Oct 2021 08:51:17 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1633870035;
+        s=mimecast20190719; t=1633870158;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=YkLueNpEbRl5qinSVfMvo4zcnNOyRMqcIvp24LoixTE=;
-        b=POX/S62VhBjqLSwiPdWNPe/fV6Ej/lmQRZJO5eeTTM2RiBeVgIHDDMX8kOt1dTNsl69Bk4
-        //F1fDl27whrhvQ0OgKDZTvMRmwB34pyYFoztFntryUlvMlj7uoIC2z4ytmwKx7NriGeHi
-        tgrzr9w7e1na8IZMEV1XlpostS2ldaQ=
+        bh=7Y/TIz/D1FsczMFThsSjVSnZBgVqamwGlHoXoCLNHrg=;
+        b=iqTi+/nsiGi30qe7ijBTRqpOkCK6AMfnwbXgT360i+Hk5ChvvOHaPruka5CgW2eKXXmlay
+        tmIgGOlG75kV49HEdURcX3X+SwKTVx7tub61YRpff/sBs6gSMMGe4YuQQKmGrveg8ImO44
+        YLksbBhJ4uE2WRZUuOyp9UnSpNtqPp0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-429-VtjM5XUUNC6BHo1qC-oBHA-1; Sun, 10 Oct 2021 08:47:10 -0400
-X-MC-Unique: VtjM5XUUNC6BHo1qC-oBHA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+ us-mta-569-szayFxYCP_STVqW4nNq72g-1; Sun, 10 Oct 2021 08:49:15 -0400
+X-MC-Unique: szayFxYCP_STVqW4nNq72g-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C02941006AA3;
-        Sun, 10 Oct 2021 12:47:08 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D7D1481426E;
+        Sun, 10 Oct 2021 12:49:13 +0000 (UTC)
 Received: from starship (unknown [10.35.206.50])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id AA60757CA0;
-        Sun, 10 Oct 2021 12:47:05 +0000 (UTC)
-Message-ID: <eecb66f6a0829b5f81b11e69537d943280b5719c.camel@redhat.com>
-Subject: Re: [PATCH 1/2] KVM: x86/mmu: Use vCPU's APICv status when handling
- APIC_ACCESS memslot
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 8F14F26E40;
+        Sun, 10 Oct 2021 12:49:11 +0000 (UTC)
+Message-ID: <c446956c622d5f6561f5248c7f686033ffc2ee69.camel@redhat.com>
+Subject: Re: [PATCH 2/2] KVM: x86: Simplify APICv update request logic
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -44,90 +43,103 @@ Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Date:   Sun, 10 Oct 2021 15:47:04 +0300
-In-Reply-To: <20211009010135.4031460-2-seanjc@google.com>
+Date:   Sun, 10 Oct 2021 15:49:10 +0300
+In-Reply-To: <20211009010135.4031460-3-seanjc@google.com>
 References: <20211009010135.4031460-1-seanjc@google.com>
-         <20211009010135.4031460-2-seanjc@google.com>
+         <20211009010135.4031460-3-seanjc@google.com>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Fri, 2021-10-08 at 18:01 -0700, Sean Christopherson wrote:
-> Query the vCPU's APICv status, not the overall VM's status, when handling
-> a page fault that hit the APIC Access Page memslot.  If an APICv status
-> update is pending, using the VM's status is non-deterministic as the
-> initiating vCPU may or may not have updated overall VM's status.  E.g. if
-> a vCPU hits an APIC Access page fault with APICv disabled and a different
-> vCPU is simultaneously performing an APICv update, the page fault handler
-> will incorrectly skip the special APIC access page MMIO handling.
-> 
-> Using the vCPU's status in the page fault handler is correct regardless
-> of any pending APICv updates, as the vCPU's status is accurate with
-> respect to the last VM-Enter, and thus reflects the context in which the
-> page fault occurred.
+> Drop confusing and flawed code that intentionally sets that per-VM APICv
+> inhibit mask after sending KVM_REQ_APICV_UPDATE to all vCPUs.  The code
+> is confusing because it's not obvious that there's no race between a CPU
+> seeing the request and consuming the new mask.  The code works only
+> because the request handling path takes the same lock, i.e. responding
+> vCPUs will be blocked until the full update completes.
 
-Actually I don't think that this patch is correct, and the current code is correct.
+Actually this code is here on purpose:
 
-- The page fault can happen if one of the following is true:
+While it is true that the main reader of apicv_inhibit_reasons (KVM_REQ_APICV_UPDATE handler)
+does take the kvm->arch.apicv_update_lock lock, so it will see the correct value
+regardless of this patch, the reason why this code first raises the KVM_REQ_APICV_UPDATE
+and only then updates the arch.apicv_inhibit_reasons is that I put a warning into svm_vcpu_run
+which checks that per cpu AVIC inhibit state matches the global AVIC inhibit state.
 
-	- AVIC is currently inhibited.
-	
-	- AVIC is currently inhibited but is in the process of being uninhibited.
+That warning proved to be very useful to ensure that AVIC inhibit works correctly.
 
-	- AVIC is not inhibited but has never been accessed by a VCPU after it was uninihibited.
+If this patch is applied, the warning can no longer work reliably unless
+it takes the apicv_update_lock which will have a performance hit.
 
-	This will *usually* cause this code to populate the corresponding SPTE entry and re-enter the guest which 
-	  will make the AVIC work on instruction re-execution without a page fault.
-
-        It depends if the page fault code sees new or old value of the global inhibition state, which is not possible
-	to avoid, as the page fault can happen anytime.
-
-        If the code doesn't populate the SPTE entry, the access will be emulated (which is correct too, and next access
-	will page fault again and that fault will re-install the SPTE.
-
-
-Note that AVIC's SPTE is *VM global*, just like all other SPTEs.
-
-- The decision is here to poplute the SPTE and retry or just emulate the APIC read/write without populating it.
-
-  Since AVIC read/writes the same apic register page, reading it now, or populating the SPTE, enabling AVIC and letting the AVIC read/write it should read/write the same values.
-
-  Thus the real decision here is if to populate the SPTE or not.
-
-- If AVIC is currently inhibited on this VCPU, but global AVIC inhibit is already OFF, we do want
-  to populute the SPTE, and prior to guest entry we will update the vCPU inhibit state to disable inhibition on this VCPU.
-
-So its the global AVIC inhibit state, is what is correct to use for this decision IMHO.
+The reason is that if we just update apicv_inhibit_reasons, we can race
+with vCPU which is about to re-enter the guest mode and trigger this warning.
 
 Best regards,
 	Maxim Levitsky
 
-
+> 
+> The concept is flawed because ordering the mask update after the request
+> can't be relied upon for correct behavior.  The only guarantee provided
+> by kvm_make_all_cpus_request() is that all vCPUs exited the guest.  It
+> does not guarantee all vCPUs are waiting on the lock.  E.g. a VCPU could
+> be in the process of handling an emulated MMIO APIC access page fault
+> that occurred before the APICv update was initiated, and thus toggling
+> and reading the per-VM field would be racy.  If correctness matters, KVM
+> either needs to use the per-vCPU status (if appropriate), take the lock,
+> or have some other mechanism that guarantees the per-VM status is correct.
 > 
 > Cc: Maxim Levitsky <mlevitsk@redhat.com>
-> Fixes: 9cc13d60ba6b ("KVM: x86/mmu: allow APICv memslot to be enabled but invisible")
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
->  arch/x86/kvm/mmu/mmu.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  arch/x86/kvm/x86.c | 16 +++++++---------
+>  1 file changed, 7 insertions(+), 9 deletions(-)
 > 
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 24a9f4c3f5e7..d36e205b90a5 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -3853,7 +3853,7 @@ static bool kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
->  		 * when the AVIC is re-enabled.
->  		 */
->  		if (slot && slot->id == APIC_ACCESS_PAGE_PRIVATE_MEMSLOT &&
-> -		    !kvm_apicv_activated(vcpu->kvm)) {
-> +		    !kvm_vcpu_apicv_active(vcpu)) {
->  			*r = RET_PF_EMULATE;
->  			return true;
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 4a52a08707de..960c2d196843 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -9431,29 +9431,27 @@ EXPORT_SYMBOL_GPL(kvm_vcpu_update_apicv);
+>  
+>  void __kvm_request_apicv_update(struct kvm *kvm, bool activate, ulong bit)
+>  {
+> -	unsigned long old, new;
+> +	unsigned long old;
+>  
+>  	if (!kvm_x86_ops.check_apicv_inhibit_reasons ||
+>  	    !static_call(kvm_x86_check_apicv_inhibit_reasons)(bit))
+>  		return;
+>  
+> -	old = new = kvm->arch.apicv_inhibit_reasons;
+> +	old = kvm->arch.apicv_inhibit_reasons;
+>  
+>  	if (activate)
+> -		__clear_bit(bit, &new);
+> +		__clear_bit(bit, &kvm->arch.apicv_inhibit_reasons);
+>  	else
+> -		__set_bit(bit, &new);
+> +		__set_bit(bit, &kvm->arch.apicv_inhibit_reasons);
+>  
+> -	if (!!old != !!new) {
+> +	if (!!old != !!kvm->arch.apicv_inhibit_reasons) {
+>  		trace_kvm_apicv_update_request(activate, bit);
+>  		kvm_make_all_cpus_request(kvm, KVM_REQ_APICV_UPDATE);
+> -		kvm->arch.apicv_inhibit_reasons = new;
+> -		if (new) {
+> +		if (kvm->arch.apicv_inhibit_reasons) {
+>  			unsigned long gfn = gpa_to_gfn(APIC_DEFAULT_PHYS_BASE);
+>  			kvm_zap_gfn_range(kvm, gfn, gfn+1);
 >  		}
+> -	} else
+> -		kvm->arch.apicv_inhibit_reasons = new;
+> +	}
+>  }
+>  EXPORT_SYMBOL_GPL(__kvm_request_apicv_update);
+>  
 
 
