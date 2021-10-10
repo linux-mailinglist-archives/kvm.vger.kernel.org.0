@@ -2,140 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 36AAC428218
-	for <lists+kvm@lfdr.de>; Sun, 10 Oct 2021 16:57:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C17BE428223
+	for <lists+kvm@lfdr.de>; Sun, 10 Oct 2021 17:09:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232795AbhJJO7E (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 10 Oct 2021 10:59:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40464 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232898AbhJJO7C (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 10 Oct 2021 10:59:02 -0400
-Received: from mail-wr1-x44a.google.com (mail-wr1-x44a.google.com [IPv6:2a00:1450:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC8EBC061765
-        for <kvm@vger.kernel.org>; Sun, 10 Oct 2021 07:57:03 -0700 (PDT)
-Received: by mail-wr1-x44a.google.com with SMTP id s18-20020adfbc12000000b00160b2d4d5ebso11240434wrg.7
-        for <kvm@vger.kernel.org>; Sun, 10 Oct 2021 07:57:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=iqD8cN6+ivvU4iBUA/M2YmIiCTZR+r/k27SL/Wa8sLA=;
-        b=JkgJ+h41AKcXBuaovTWMlreIJ+wWWz1N/aBu0BO5M72w0oNjaRLkJrDNzotUdn/cAl
-         8V0kCzynY0RgN3gUXiAsrXTF12s5FUwCJv61wp5QlFM/7X6VZq/tY1NvR8uoj+9fo9Ym
-         7vPCYdWzErC0kuZq5TZIdeJbxbV40zYLjZtiSUy4lypwjGLcGau9crjYDf9BRADzTpTZ
-         n+zk2/h+o+mh7FD/bI5uhzB6WIcx2Sc1u1PBsnXUEofKb4LqVZZ/fC+Muxuqk5SAWYL3
-         41MZUM3T4o5KzVp3yLBM/1yaS5F2JAy+xsaYDgTmeK6+uPiiOkdClq7fwMb4xh8jUPXb
-         q5kA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=iqD8cN6+ivvU4iBUA/M2YmIiCTZR+r/k27SL/Wa8sLA=;
-        b=ESVoRgje8r+Mq69GkEKVmTs6v08EjzeHNgoajCHYSNsIVkmYTn4zW1wrgwDHnNmFji
-         QYqmzh5w40RhBxEYAfo3zcbkl2xJ6Sq7/hBvRPSatGrduvnWTUfh0+5PAYAQq6bmrO2d
-         XuQeAH0HuNuyLp2frCAnjTQ1csbia3HtZHIReOW7JzfHj7XG5zbFoauk7NP3rLcQEjbl
-         FqkN+2jiNRcMMFre4+NGhiTHurzkR3xd83z71nvAtA9PVNQgVF5QUMkaEog6qPXayt2p
-         cJ4qf9BYgwZ4BGQD+Y2RVExlmHdI7WvvMbM7DDOAn0ux/JuqfHCjTXCUszKK/FshgH2z
-         SjJg==
-X-Gm-Message-State: AOAM532GqzyRz2CT4uoAcDDmpUfyQ9sPY/Fp7YUVFMbj+jB8KUi6IQRU
-        6nPvU1QwBw7MXxHPq98IAeL9yMTjlg==
-X-Google-Smtp-Source: ABdhPJzyzsbX9XBEOAzHExe8EnKvXmroPP9Ti8Of4mQOVfNcYEGFyNpZFTG+S7YxvTtrVrz7uUxNbXVbqw==
-X-Received: from tabba.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:482])
- (user=tabba job=sendgmr) by 2002:a1c:1941:: with SMTP id 62mr7793689wmz.131.1633877822472;
- Sun, 10 Oct 2021 07:57:02 -0700 (PDT)
-Date:   Sun, 10 Oct 2021 15:56:36 +0100
-In-Reply-To: <20211010145636.1950948-1-tabba@google.com>
-Message-Id: <20211010145636.1950948-12-tabba@google.com>
-Mime-Version: 1.0
-References: <20211010145636.1950948-1-tabba@google.com>
-X-Mailer: git-send-email 2.33.0.882.g93a45727a2-goog
-Subject: [PATCH v8 11/11] KVM: arm64: Handle protected guests at 32 bits
-From:   Fuad Tabba <tabba@google.com>
-To:     kvmarm@lists.cs.columbia.edu
-Cc:     maz@kernel.org, will@kernel.org, james.morse@arm.com,
-        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
-        mark.rutland@arm.com, christoffer.dall@arm.com,
-        pbonzini@redhat.com, drjones@redhat.com, oupton@google.com,
-        qperret@google.com, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kernel-team@android.com,
-        tabba@google.com
-Content-Type: text/plain; charset="UTF-8"
+        id S232658AbhJJPLX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 10 Oct 2021 11:11:23 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47280 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231842AbhJJPLX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 10 Oct 2021 11:11:23 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id AD94760ED4;
+        Sun, 10 Oct 2021 15:09:24 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1mZaS2-00FrmD-Eu; Sun, 10 Oct 2021 16:09:22 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org
+Cc:     James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Joey Gouly <joey.gouly@arm.com>, kernel-team@android.com
+Subject: [PATCH v2 0/5] KVM: arm64: Assorted vgic-v3 fixes
+Date:   Sun, 10 Oct 2021 16:09:05 +0100
+Message-Id: <20211010150910.2911495-1-maz@kernel.org>
+X-Mailer: git-send-email 2.30.2
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, eric.auger@redhat.com, joey.gouly@arm.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Protected KVM does not support protected AArch32 guests. However,
-it is possible for the guest to force run AArch32, potentially
-causing problems. Add an extra check so that if the hypervisor
-catches the guest doing that, it can prevent the guest from
-running again by resetting vcpu->arch.target and returning
-ARM_EXCEPTION_IL.
+Here's a bunch of vgic-v3 fixes I have been sitting on for some
+time. None of them are critical, though some are rather entertaining.
 
-If this were to happen, The VMM can try and fix it by re-
-initializing the vcpu with KVM_ARM_VCPU_INIT, however, this is
-likely not possible for protected VMs.
+The first one is a leftover from the initial Apple-M1 enablement,
+which doesn't advertise the GIC support via ID_AA64PFR0_EL1 (which is
+expected, as it only has half a GIC...). We address it by forcefully
+advertising the feature if the guest has a GICv3.
 
-Adapted from commit 22f553842b14 ("KVM: arm64: Handle Asymmetric
-AArch32 systems")
+The second patch is really fun, and shows how things can go wrong when
+they are badly specified. The gist of it is that on systems that
+advertise ICH_VTR_EL2.SEIS, we need to fallback to the full GICv3
+cpuif emulation. The third patch is an good optimisation on the
+previous one, and the fourth a direct consequence of the whole thing.
 
-Signed-off-by: Fuad Tabba <tabba@google.com>
----
- arch/arm64/kvm/hyp/nvhe/switch.c | 34 ++++++++++++++++++++++++++++++++
- 1 file changed, 34 insertions(+)
+The last patch are more of a harmless oddity: virtual LPIs happen to
+have an active state buried into the pseudocode (and only there). Fun!
+Nothing goes wrong with that, but we need to align the emulation to
+match the pseudocode.
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-index 2c72c31e516e..f25b6353a598 100644
---- a/arch/arm64/kvm/hyp/nvhe/switch.c
-+++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-@@ -232,6 +232,37 @@ static const exit_handler_fn *kvm_get_exit_handler_array(struct kvm *kvm)
- 	return hyp_exit_handlers;
- }
- 
-+/*
-+ * Some guests (e.g., protected VMs) are not be allowed to run in AArch32.
-+ * The ARMv8 architecture does not give the hypervisor a mechanism to prevent a
-+ * guest from dropping to AArch32 EL0 if implemented by the CPU. If the
-+ * hypervisor spots a guest in such a state ensure it is handled, and don't
-+ * trust the host to spot or fix it.  The check below is based on the one in
-+ * kvm_arch_vcpu_ioctl_run().
-+ *
-+ * Returns false if the guest ran in AArch32 when it shouldn't have, and
-+ * thus should exit to the host, or true if a the guest run loop can continue.
-+ */
-+static bool handle_aarch32_guest(struct kvm_vcpu *vcpu, u64 *exit_code)
-+{
-+	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
-+
-+	if (kvm_vm_is_protected(kvm) && vcpu_mode_is_32bit(vcpu)) {
-+		/*
-+		 * As we have caught the guest red-handed, decide that it isn't
-+		 * fit for purpose anymore by making the vcpu invalid. The VMM
-+		 * can try and fix it by re-initializing the vcpu with
-+		 * KVM_ARM_VCPU_INIT, however, this is likely not possible for
-+		 * protected VMs.
-+		 */
-+		vcpu->arch.target = -1;
-+		*exit_code = ARM_EXCEPTION_IL;
-+		return false;
-+	}
-+
-+	return true;
-+}
-+
- /* Switch to the guest for legacy non-VHE systems */
- int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
- {
-@@ -294,6 +325,9 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
- 		/* Jump in the fire! */
- 		exit_code = __guest_enter(vcpu);
- 
-+		if (unlikely(!handle_aarch32_guest(vcpu, &exit_code)))
-+			break;
-+
- 		/* And we're baaack! */
- 	} while (fixup_guest_exit(vcpu, &exit_code));
- 
+All of this is only targeting 5.16, and I don't plan to backport any
+of it.
+
+* From v1 [1]:
+
+  - Dropped the patch that tried to optimise what to do with an active
+    LPI. There is unfortunately a bad corner case in the pseudocode
+    that prevents it. Oh well.
+    
+  - Added an extra patch to help in the case where ICH_HCR_EL2.TDS is
+    supported, and that we can use that instead of ICH_HCR_EL2.TC to
+    trap only ICC_DIR_EL1. Given the performance improvement, it was
+    too hard to ignore it.
+
+[1] https://lore.kernel.org/r/20210924082542.2766170-1-maz@kernel.org
+
+Marc Zyngier (5):
+  KVM: arm64: Force ID_AA64PFR0_EL1.GIC=1 when exposing a virtual GICv3
+  KVM: arm64: vgic-v3: Work around GICv3 locally generated SErrors
+  KVM: arm64: vgic-v3: Reduce common group trapping to ICV_DIR_EL1 when
+    possible
+  KVM: arm64: vgic-v3: Don't advertise ICC_CTLR_EL1.SEIS
+  KVM: arm64: vgic-v3: Align emulated cpuif LPI state machine with the
+    pseudocode
+
+ arch/arm64/include/asm/sysreg.h |  3 +++
+ arch/arm64/kvm/hyp/vgic-v3-sr.c | 22 ++++++++--------------
+ arch/arm64/kvm/sys_regs.c       |  5 +++++
+ arch/arm64/kvm/vgic/vgic-v3.c   | 21 ++++++++++++++++++---
+ 4 files changed, 34 insertions(+), 17 deletions(-)
+
 -- 
-2.33.0.882.g93a45727a2-goog
+2.30.2
 
