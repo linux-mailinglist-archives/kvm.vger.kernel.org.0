@@ -2,105 +2,184 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5E8C8428229
-	for <lists+kvm@lfdr.de>; Sun, 10 Oct 2021 17:09:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BE4F74282C4
+	for <lists+kvm@lfdr.de>; Sun, 10 Oct 2021 19:52:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232813AbhJJPL1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 10 Oct 2021 11:11:27 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47392 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231842AbhJJPLY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 10 Oct 2021 11:11:24 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id CC75C610D1;
-        Sun, 10 Oct 2021 15:09:25 +0000 (UTC)
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <maz@kernel.org>)
-        id 1mZaS4-00FrmD-22; Sun, 10 Oct 2021 16:09:24 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org
-Cc:     James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Joey Gouly <joey.gouly@arm.com>, kernel-team@android.com
-Subject: [PATCH v2 5/5] KVM: arm64: vgic-v3: Align emulated cpuif LPI state machine with the pseudocode
-Date:   Sun, 10 Oct 2021 16:09:10 +0100
-Message-Id: <20211010150910.2911495-6-maz@kernel.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20211010150910.2911495-1-maz@kernel.org>
-References: <20211010150910.2911495-1-maz@kernel.org>
+        id S232238AbhJJRyL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 10 Oct 2021 13:54:11 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:19354 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231396AbhJJRyK (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 10 Oct 2021 13:54:10 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 19AGfxpt018676;
+        Sun, 10 Oct 2021 13:51:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=8fajRAyLezHmCj5tnyq6jjoYckaHOnt9JulikSV16CQ=;
+ b=p4+ivKM1gAEjETiBx+Ee0HBzE8i3PqQg2hBYA97Vxj+ZAW9H7UQu5fs184XNnaPUZzlX
+ J8BNWXxknJB0kmcB9gP5+kAqccFZcDMgLyaMW/Gv3Nc+tpBcNSxoQkYUQjKOd9A+AMNu
+ XlF2Fok+DLqer9S64tnQKRVnetmxvE98H1HWpMFAGnuv/n/c+I9f+le2gaerQmXxAZ0O
+ acP9+8MTwYDZA7XYfUn1vKwOKFAuE1AxzRaLEmbw26toZuVN3MCZ/VrPOwxHYy1dQk7Z
+ qDIlto7o91RwLpI3X1Dupoe5pVnQAlXh+4nLD/UjBxIPEPn6/DfSYlYH/KvzL4YcqC+d Tw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3bm3wvrqay-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sun, 10 Oct 2021 13:51:30 -0400
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 19AHpTbY009651;
+        Sun, 10 Oct 2021 13:51:30 -0400
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3bm3wvrqaq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sun, 10 Oct 2021 13:51:29 -0400
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+        by ppma04dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 19AHmBCX013224;
+        Sun, 10 Oct 2021 17:51:28 GMT
+Received: from b03cxnp08028.gho.boulder.ibm.com (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
+        by ppma04dal.us.ibm.com with ESMTP id 3bkeq5ca5d-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sun, 10 Oct 2021 17:51:28 +0000
+Received: from b03ledav002.gho.boulder.ibm.com (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
+        by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 19AHpQ2V36241806
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sun, 10 Oct 2021 17:51:26 GMT
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A5DFB136051;
+        Sun, 10 Oct 2021 17:51:26 +0000 (GMT)
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CEE1B13604F;
+        Sun, 10 Oct 2021 17:51:18 +0000 (GMT)
+Received: from [9.65.95.104] (unknown [9.65.95.104])
+        by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Sun, 10 Oct 2021 17:51:18 +0000 (GMT)
+Subject: Re: [PATCH v6 40/42] virt: Add SEV-SNP guest driver
+To:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com,
+        Dov Murik <dovmurik@linux.ibm.com>
+References: <20211008180453.462291-1-brijesh.singh@amd.com>
+ <20211008180453.462291-41-brijesh.singh@amd.com>
+From:   Dov Murik <dovmurik@linux.ibm.com>
+Message-ID: <b79cfdfa-6482-70ab-3520-f76387fe4c27@linux.ibm.com>
+Date:   Sun, 10 Oct 2021 20:51:17 +0300
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, eric.auger@redhat.com, joey.gouly@arm.com, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+In-Reply-To: <20211008180453.462291-41-brijesh.singh@amd.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: YBeyMoQMMm3SJoHLC39vmKofxUAJszj-
+X-Proofpoint-GUID: g_DMRlUvvUHE91j4L2Jc4IcxKCn7QVsi
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.391,FMLib:17.0.607.475
+ definitions=2021-10-10_05,2021-10-07_02,2020-04-07_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 suspectscore=0
+ malwarescore=0 impostorscore=0 mlxlogscore=999 lowpriorityscore=0
+ adultscore=0 spamscore=0 bulkscore=0 mlxscore=0 priorityscore=1501
+ clxscore=1011 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2109230001 definitions=main-2110100120
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Having realised that a virtual LPI does transition through an active
-state that does not exist on bare metal, align the CPU interface
-emulation with the behaviour specified in the architecture pseudocode.
+Hi Brijesh,
 
-The LPIs now transition to active on IAR read, and to inactive on
-EOI write. Special care is taken not to increment the EOIcount for
-an LPI that isn't present in the LRs.
+On 08/10/2021 21:04, Brijesh Singh wrote:
+> SEV-SNP specification provides the guest a mechanisum to communicate with
+> the PSP without risk from a malicious hypervisor who wishes to read, alter,
+> drop or replay the messages sent. The driver uses snp_issue_guest_request()
+> to issue GHCB SNP_GUEST_REQUEST or SNP_EXT_GUEST_REQUEST NAE events to
+> submit the request to PSP.
+> 
+> The PSP requires that all communication should be encrypted using key
+> specified through the platform_data.
+> 
+> The userspace can use SNP_GET_REPORT ioctl() to query the guest
+> attestation report.
+> 
+> See SEV-SNP spec section Guest Messages for more details.
+> 
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+>  Documentation/virt/coco/sevguest.rst  |  77 ++++
+>  drivers/virt/Kconfig                  |   3 +
+>  drivers/virt/Makefile                 |   1 +
+>  drivers/virt/coco/sevguest/Kconfig    |   9 +
+>  drivers/virt/coco/sevguest/Makefile   |   2 +
+>  drivers/virt/coco/sevguest/sevguest.c | 561 ++++++++++++++++++++++++++
+>  drivers/virt/coco/sevguest/sevguest.h |  98 +++++
+>  include/uapi/linux/sev-guest.h        |  44 ++
+>  8 files changed, 795 insertions(+)
+>  create mode 100644 Documentation/virt/coco/sevguest.rst
+>  create mode 100644 drivers/virt/coco/sevguest/Kconfig
+>  create mode 100644 drivers/virt/coco/sevguest/Makefile
+>  create mode 100644 drivers/virt/coco/sevguest/sevguest.c
+>  create mode 100644 drivers/virt/coco/sevguest/sevguest.h
+>  create mode 100644 include/uapi/linux/sev-guest.h
+> 
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/hyp/vgic-v3-sr.c | 20 ++++++++------------
- 1 file changed, 8 insertions(+), 12 deletions(-)
+[...]
 
-diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-index b3b50de496a3..20db2f281cf2 100644
---- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
-+++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-@@ -695,9 +695,7 @@ static void __vgic_v3_read_iar(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
- 		goto spurious;
- 
- 	lr_val &= ~ICH_LR_STATE;
--	/* No active state for LPIs */
--	if ((lr_val & ICH_LR_VIRTUAL_ID_MASK) <= VGIC_MAX_SPI)
--		lr_val |= ICH_LR_ACTIVE_BIT;
-+	lr_val |= ICH_LR_ACTIVE_BIT;
- 	__gic_v3_set_lr(lr_val, lr);
- 	__vgic_v3_set_active_priority(lr_prio, vmcr, grp);
- 	vcpu_set_reg(vcpu, rt, lr_val & ICH_LR_VIRTUAL_ID_MASK);
-@@ -764,20 +762,18 @@ static void __vgic_v3_write_eoir(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
- 	/* Drop priority in any case */
- 	act_prio = __vgic_v3_clear_highest_active_priority();
- 
--	/* If EOIing an LPI, no deactivate to be performed */
--	if (vid >= VGIC_MIN_LPI)
--		return;
--
--	/* EOImode == 1, nothing to be done here */
--	if (vmcr & ICH_VMCR_EOIM_MASK)
--		return;
--
- 	lr = __vgic_v3_find_active_lr(vcpu, vid, &lr_val);
- 	if (lr == -1) {
--		__vgic_v3_bump_eoicount();
-+		/* Do not bump EOIcount for LPIs that aren't in the LRs */
-+		if (!(vid >= VGIC_MIN_LPI))
-+			__vgic_v3_bump_eoicount();
- 		return;
- 	}
- 
-+	/* EOImode == 1 and not an LPI, nothing to be done here */
-+	if ((vmcr & ICH_VMCR_EOIM_MASK) && !(vid >= VGIC_MIN_LPI))
-+		return;
-+
- 	lr_prio = (lr_val & ICH_LR_PRIORITY_MASK) >> ICH_LR_PRIORITY_SHIFT;
- 
- 	/* If priorities or group do not match, the guest has fscked-up. */
--- 
-2.30.2
 
+> +
+> +static u8 *get_vmpck(int id, struct snp_secrets_page_layout *layout, u32 **seqno)
+> +{
+> +	u8 *key = NULL;
+> +
+> +	switch (id) {
+> +	case 0:
+> +		*seqno = &layout->os_area.msg_seqno_0;
+> +		key = layout->vmpck0;
+> +		break;
+> +	case 1:
+> +		*seqno = &layout->os_area.msg_seqno_1;
+> +		key = layout->vmpck1;
+> +		break;
+> +	case 2:
+> +		*seqno = &layout->os_area.msg_seqno_2;
+> +		key = layout->vmpck2;
+> +		break;
+> +	case 3:
+> +		*seqno = &layout->os_area.msg_seqno_3;
+> +		key = layout->vmpck3;
+> +		break;
+> +	default:
+> +		break;
+> +	}
+> +
+> +	return NULL;
+
+This should be 'return key', right?
+
+-Dov
+
+> +}
+> +
