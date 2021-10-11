@@ -2,223 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 068DC42878D
-	for <lists+kvm@lfdr.de>; Mon, 11 Oct 2021 09:20:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 889CB4286B8
+	for <lists+kvm@lfdr.de>; Mon, 11 Oct 2021 08:19:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234437AbhJKHV5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Oct 2021 03:21:57 -0400
-Received: from gandalf.ozlabs.org ([150.107.74.76]:47227 "EHLO
-        gandalf.ozlabs.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234366AbhJKHVz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Oct 2021 03:21:55 -0400
-Received: by gandalf.ozlabs.org (Postfix, from userid 1007)
-        id 4HSVYP2hG1z4xqR; Mon, 11 Oct 2021 18:19:53 +1100 (AEDT)
+        id S234095AbhJKGVq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Oct 2021 02:21:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44014 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233802AbhJKGVp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Oct 2021 02:21:45 -0400
+Received: from mail-oi1-x231.google.com (mail-oi1-x231.google.com [IPv6:2607:f8b0:4864:20::231])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3901C061570;
+        Sun, 10 Oct 2021 23:19:45 -0700 (PDT)
+Received: by mail-oi1-x231.google.com with SMTP id e63so2684942oif.8;
+        Sun, 10 Oct 2021 23:19:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gibson.dropbear.id.au; s=201602; t=1633936793;
-        bh=3FgvzcR2Ck1W6d0Aewjatt+OQuD0wH338SDHjs7yENI=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=e+iSlv4nV8sXmsdj+hxaDI9V9ScTpiNerEpS+OlmGVfe1XZ8IaXC23leE83FWUGwE
-         qy0QVufZS589IZKMu/Gel6uJN8Y1IUPiSeQfoH33wT+OcGKC7cbUV0MaftJkRQDGfZ
-         iJQwN/IJ4lEoi3cPnSonXAsh5fO6wgIxkmTdc02w=
-Date:   Mon, 11 Oct 2021 17:02:01 +1100
-From:   David Gibson <david@gibson.dropbear.id.au>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Liu Yi L <yi.l.liu@intel.com>, alex.williamson@redhat.com,
-        hch@lst.de, jasowang@redhat.com, joro@8bytes.org,
-        jean-philippe@linaro.org, kevin.tian@intel.com, parav@mellanox.com,
-        lkml@metux.net, pbonzini@redhat.com, lushenming@huawei.com,
-        eric.auger@redhat.com, corbet@lwn.net, ashok.raj@intel.com,
-        yi.l.liu@linux.intel.com, jun.j.tian@intel.com, hao.wu@intel.com,
-        dave.jiang@intel.com, jacob.jun.pan@linux.intel.com,
-        kwankhede@nvidia.com, robin.murphy@arm.com, kvm@vger.kernel.org,
-        iommu@lists.linux-foundation.org, dwmw2@infradead.org,
-        linux-kernel@vger.kernel.org, baolu.lu@linux.intel.com,
-        nicolinc@nvidia.com
-Subject: Re: [RFC 11/20] iommu/iommufd: Add IOMMU_IOASID_ALLOC/FREE
-Message-ID: <YWPTWdHhoI4k0Ksc@yekko>
-References: <20210919063848.1476776-1-yi.l.liu@intel.com>
- <20210919063848.1476776-12-yi.l.liu@intel.com>
- <20210921174438.GW327412@nvidia.com>
- <YVanJqG2pt6g+ROL@yekko>
- <20211001122225.GK964074@nvidia.com>
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=NQrmWWl63A33R8Wd94dEHY3g+CGyCI+tb3fF7nKj8Tk=;
+        b=Qr6rXhVxFmYhsK8m4vTD/HFq5b9rd47q4NAYOYhjdVQNA8cQrFbwvZp3iL3nB7Brir
+         4fx5ahVzODwaRFvhWN0Nl5VnyQ+5/W16F98AdIFeCrSyPX+6/MosKvLbRaDFVAhPEKsm
+         tjtUheEKRh7wNasOZIMdAhpkBjsaGmyOW8nrm7BMFd+1awDUYWD97reFJ8UrV15rd+E8
+         j4Owtm7OF/39OTog+A+t2JruMREZSDTRJ7qhPgaY60yjXFcOJMZdC+OboDtlyXLBfI67
+         aure4EGxvPLok7eHkLVaA1M1J0Dai7Y8hLzUspPsYKUnQszLklVDipUNuIlyEHZWCMA2
+         5X1g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=NQrmWWl63A33R8Wd94dEHY3g+CGyCI+tb3fF7nKj8Tk=;
+        b=X5zL/P4QgQi8dDvEc4NgoFzD4IdrlBw7Cl9zORZIvyJH/kNVe24uYa6r8LdexVMpSy
+         8+PU66i8RjSUuiXdGE0nOdOaKKjgBlUMY2+6UUvrhFbwiODvxohM7l46ViDssE1ijGT6
+         +IxOZoA+1xp1zruXXHunPlZRYSmSD/sqGL5QJ90B5q+mYNzMV1XWkQ2W0t5r6/ZSbLo0
+         9kl59fTr6NJGyIoRXsWO0otoR/RHIe2wVy8nQqSofixAGsfrL0/uQpNaQXxo6/DIaWvb
+         zabIwirwGkMpGZwMiPNzI1SP/dGlQvtf1Pgidb+yh4Qlr6gbvDYcf1YOdmNAlMdrXigm
+         VEWA==
+X-Gm-Message-State: AOAM530t76T28BFlKK8zMTwkDFGqtObDJPvctaXiB00pEE1KfwgL1PEv
+        99BrB0jMp8e8JzNzkrI0kILnWAn61uXz5mssnGM=
+X-Google-Smtp-Source: ABdhPJwpC0UYINOki3htK4lif6uPz1mOCm8+UV47WtM2pOR+74uBDeBfpzt/VFYoVXyDSYXd6Us5FtsJmWt3/Ym5bxU=
+X-Received: by 2002:a05:6808:1211:: with SMTP id a17mr16766331oil.91.1633933185323;
+ Sun, 10 Oct 2021 23:19:45 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="c4FY1X0lv1C6vj9E"
-Content-Disposition: inline
-In-Reply-To: <20211001122225.GK964074@nvidia.com>
+References: <20211002124012.18186-1-ajaygargnsit@gmail.com>
+ <b9afdade-b121-cc9e-ce85-6e4ff3724ed9@linux.intel.com> <CAHP4M8Us753hAeoXL7E-4d29rD9+FzUwAqU6gKNmgd8G0CaQQw@mail.gmail.com>
+ <20211004163146.6b34936b.alex.williamson@redhat.com> <CAHP4M8UeGRSqHBV+wDPZ=TMYzio0wYzHPzq2Y+JCY0uzZgBkmA@mail.gmail.com>
+ <CAHP4M8UD-k76cg0JmeZAwaWh1deSP82RCE=VC1zHQEYQmX6N9A@mail.gmail.com>
+In-Reply-To: <CAHP4M8UD-k76cg0JmeZAwaWh1deSP82RCE=VC1zHQEYQmX6N9A@mail.gmail.com>
+From:   Ajay Garg <ajaygargnsit@gmail.com>
+Date:   Mon, 11 Oct 2021 11:49:33 +0530
+Message-ID: <CAHP4M8VPem7xEtx3vQPm3bzCQif7JZFiXgiUGZVErTt5vhOF8A@mail.gmail.com>
+Subject: Re: [PATCH] iommu: intel: remove flooding of non-error logs, when
+ new-DMA-PTE is the same as old-DMA-PTE.
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Lu Baolu <baolu.lu@linux.intel.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+The flooding was seen today again, after I booted the host-machine in
+the morning.
+Need to look what the heck is going on ...
 
---c4FY1X0lv1C6vj9E
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, Oct 01, 2021 at 09:22:25AM -0300, Jason Gunthorpe wrote:
-> On Fri, Oct 01, 2021 at 04:13:58PM +1000, David Gibson wrote:
-> > On Tue, Sep 21, 2021 at 02:44:38PM -0300, Jason Gunthorpe wrote:
-> > > On Sun, Sep 19, 2021 at 02:38:39PM +0800, Liu Yi L wrote:
-> > > > This patch adds IOASID allocation/free interface per iommufd. When
-> > > > allocating an IOASID, userspace is expected to specify the type and
-> > > > format information for the target I/O page table.
-> > > >=20
-> > > > This RFC supports only one type (IOMMU_IOASID_TYPE_KERNEL_TYPE1V2),
-> > > > implying a kernel-managed I/O page table with vfio type1v2 mapping
-> > > > semantics. For this type the user should specify the addr_width of
-> > > > the I/O address space and whether the I/O page table is created in
-> > > > an iommu enfore_snoop format. enforce_snoop must be true at this po=
-int,
-> > > > as the false setting requires additional contract with KVM on handl=
-ing
-> > > > WBINVD emulation, which can be added later.
-> > > >=20
-> > > > Userspace is expected to call IOMMU_CHECK_EXTENSION (see next patch)
-> > > > for what formats can be specified when allocating an IOASID.
-> > > >=20
-> > > > Open:
-> > > > - Devices on PPC platform currently use a different iommu driver in=
- vfio.
-> > > >   Per previous discussion they can also use vfio type1v2 as long as=
- there
-> > > >   is a way to claim a specific iova range from a system-wide addres=
-s space.
-> > > >   This requirement doesn't sound PPC specific, as addr_width for pc=
-i devices
-> > > >   can be also represented by a range [0, 2^addr_width-1]. This RFC =
-hasn't
-> > > >   adopted this design yet. We hope to have formal alignment in v1 d=
-iscussion
-> > > >   and then decide how to incorporate it in v2.
-> > >=20
-> > > I think the request was to include a start/end IO address hint when
-> > > creating the ios. When the kernel creates it then it can return the
-> > > actual geometry including any holes via a query.
-> >=20
-> > So part of the point of specifying start/end addresses is that
-> > explicitly querying holes shouldn't be necessary: if the requested
-> > range crosses a hole, it should fail.  If you didn't really need all
-> > that range, you shouldn't have asked for it.
-> >=20
-> > Which means these aren't really "hints" but optionally supplied
-> > constraints.
->=20
-> We have to be very careful here, there are two very different use
-> cases. When we are talking about the generic API I am mostly
-> interested to see that applications like DPDK can use this API and be
-> portable to any IOMMU HW the kernel supports. I view the fact that
-> there is VFIO PPC specific code in DPDK as a failing of the kernel to
-> provide a HW abstraction.
-
-I would agree.  At the time we were making this, we thought there were
-irreconcilable differences between what could be done with the x86 vs
-ppc IOMMUs.  Turns out we just didn't think it through hard enough to
-find a common model.
-
-> This means we cannot define an input that has a magic HW specific
-> value.
-
-I'm not entirely sure what you mean by that.
-
-> DPDK can never provide that portably. Thus all these kinds of
-> inputs in the generic API need to be hints, if they exist at all.
-
-I don't follow your reasoning.  First, note that in qemu these valus
-are *target* hardware specific, not *host* hardware specific.  If
-those requests aren't honoured, qemu cannot faithfully emulate the
-target hardware and has to fail.  That's what I mean when I say this
-is not a constraint, not a hint.
-
-But when I say the constraint is optional, I mean that things which
-don't have that requirement - like DPDK - shouldn't apply the
-constraint.
-
-> As 'address space size hint'/'address space start hint' is both
-> generic, useful, and providable by DPDK I think it is OK.
-
-Size is certainly providable, and probably useful.  For DPDK, I don't
-think start is useful.
-
-> PPC can use
-> it to pick which of the two page table formats to use for this IOAS if
-> it wants.
-
-Clarification: it's not that each window has a specific page table
-format.  The two windows are independent of each other, which means
-you can separately select the page table format for each one (although
-the 32-bit one generally won't be big enough that there's any point
-selecting something other than a 1-level TCE table).  When I say
-format here, I basically mean number of levels and size of each level
-- the IOPTE (a.k.a. TCE) format is the same in each case.
-
-> The second use case is when we have a userspace driver for a specific
-> HW IOMMU. Eg a vIOMMU in qemu doing specific PPC/ARM/x86 acceleration.
-> We can look here for things to make general, but I would expect a
-> fairly high bar. Instead, I would rather see the userspace driver
-> communicate with the kernel driver in its own private language, so
-> that the entire functionality of the unique HW can be used.
-
-I don't think we actually need to do this.  Or rather, we might want
-to do this for maximum performance in some cases, but I think we can
-have something that at least usually works without having explicit
-host =3D=3D target logic for each case.  I believe this can work (at least
-when using kernel managed IO page tables) in a lot of cases even with
-a different vIOMMU from the host IOMMU.
-
-e.g. suppose the host is some x86 (or arm, or whatever) machine with
-an IOMMU capable of translating any address from 0..2^60, with maybe
-the exception of an IO hole somewhere between 2GiB and 4GiB.
-
-qemu wants to emulate a PAPR vIOMMU, so it says (via interfaces yet to
-be determined) that it needs an IOAS where things can be mapped in the
-range 0..2GiB (for the 32-bit window) and 2^59..2^59+1TiB (for the
-64-bit window).
-
-Ideally the host /dev/iommu will say "ok!", since both those ranges
-are within the 0..2^60 translated range of the host IOMMU, and don't
-touch the IO hole.  When the guest calls the IO mapping hypercalls,
-qemu translates those into DMA_MAP operations, and since they're all
-within the previously verified windows, they should work fine.
-
-> So, when it comes to providing exact ranges as an input parameter we
-> have to decide if that is done as some additional general data, or if
-> it should be part of a IOAS_FORMAT_KERNEL_PPC. In this case I suggest
-> the guiding factor should be if every single IOMMU implementation can
-> be updated to support the value.
-
-No, I don't think that needs to be a condition.  I think it's
-perfectly reasonable for a constraint to be given, and for the host
-IOMMU to just say "no, I can't do that".  But that does mean that each
-of these values has to have an explicit way of userspace specifying "I
-don't care", so that the kernel will select a suitable value for those
-instead - that's what DPDK or other userspace would use nearly all the
-time.
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---c4FY1X0lv1C6vj9E
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAmFj01YACgkQbDjKyiDZ
-s5LivQ//QuYS8q96WD/zaOZ9PRmjMCgR+dYJG7ktIUwBHYmFv8mldxWKiOWOh+N2
-0IdBTHH2CeHlyajmhiNzJNRgWI671zsUnlyPw6qZMGVmGKzrhzI7fwFcVq45TNf0
-5qfh4qc6avuFqMgOoJlqHHgn4+JJ9PUQC9p9lLjvYQfYMEwJ8TnIMpHs+rJsGI7b
-VrnpBO9bo9TQPNm9TcBc35zXGt0FeZX6IBCxtctYSGTjZ73JIWet42XhEzR7BV2o
-ZSeP6QOzXHOBtNbN0HSX0XQ5NDUmEGhaL2hPfMx+dn74M3f/1atVkXdFwrKExGTi
-VJl8hFvt612Ixv57sa98dKmy0BC+cab+xxhgdifhWULZLFNLlBPyCT/bfXuC8JEB
-vS9v+yU8fsObQt/X5hP85uwnqwijJemcROJ4XwIkskiyDXzRfPppZu1+Xr3mKS1E
-Lb0qCKTIu7l7VUyVKEHNBl53vcOmEawFMeusjW8HssyZMMnwR3OwsDhHTKLZqdYa
-fE05SdgHOYlZWIQBjLk2gJ4Nsw2GBRG9Arw/6GZVFpjvn0UNnsYiHrxR9RnwZwBd
-qU9vFtRUh54IkMln8yIYjbQ2ZnOIXGsXKwItzvq7B1ejp4cV+jYOyKtfYAzKLk3G
-Qq9Njo2JNGF8hQ1FWiNAbykETfcEUtdbADvNqlOBduPAkCXfWEI=
-=MZfA
------END PGP SIGNATURE-----
-
---c4FY1X0lv1C6vj9E--
+On Sun, Oct 10, 2021 at 11:45 AM Ajay Garg <ajaygargnsit@gmail.com> wrote:
+>
+> > I'll try and backtrack to the userspace process that is sending these ioctls.
+> >
+>
+> The userspace process is qemu.
+>
+> I compiled qemu from latest source, installed via "sudo make install"
+> on host-machine, rebooted the host-machine, and booted up the
+> guest-machine on the host-machine. Now, no kernel-flooding is seen on
+> the host-machine.
+>
+> For me, the issue is thus closed-invalid; admins may take the
+> necessary action to officially mark ;)
+>
+>
+> Thanks and Regards,
+> Ajay
