@@ -2,60 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 00B72428803
-	for <lists+kvm@lfdr.de>; Mon, 11 Oct 2021 09:45:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1D20242880C
+	for <lists+kvm@lfdr.de>; Mon, 11 Oct 2021 09:47:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234580AbhJKHrL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Oct 2021 03:47:11 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:46907 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234494AbhJKHrK (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 11 Oct 2021 03:47:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1633938310;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=LSuc4UVJmiHSzAiziKZ1KJ+0nObIwFoDvepNLe3NpSw=;
-        b=Jg9T50qPI8ir7dUSh5VJrM6xUR9GZtAXH8e7FPMW4sPCjpAUv+cf9mf9f6D4tW9/2cYwGy
-        o3PGqMNQOYIEFknNdETsrO6nMWsoxaKrA55dpi7rWoPLyZ4fnI6HiBQkOIMBsU6DHMY9L9
-        C4YjYIJ4As0HcudtyDBDm8Sc/RLeCcs=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-196-eujRnzqsOaiLaTWY0lLzRg-1; Mon, 11 Oct 2021 03:45:08 -0400
-X-MC-Unique: eujRnzqsOaiLaTWY0lLzRg-1
-Received: by mail-wr1-f70.google.com with SMTP id j19-20020adfb313000000b00160a9de13b3so12572707wrd.8
-        for <kvm@vger.kernel.org>; Mon, 11 Oct 2021 00:45:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:organization
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=LSuc4UVJmiHSzAiziKZ1KJ+0nObIwFoDvepNLe3NpSw=;
-        b=V59e8f97fCBU6G1sFsy8d+6U2EkfqeDH2RZnjn0HltRPNnMjctywdNdO5wUqwMJEEy
-         373e4kk0sUfcjWenFWquQ0J9oHbb3sheMhId5QyQXoxf5wYdGSQHwir+VZOVE6nz2oXz
-         nS8l3GQDXVaYTDL9srcRZHc75LGop2EsZhTKEjVnGS77azOWXYIch9gC3QgpXfyufK6i
-         zZQ/H059fE0i+iw0+OrGsAn2pLwq1zkcpIlxElEzmUQ6nMt+XkOrSJFlRPTonr0mvEa6
-         xYl7KwGUsrvhJmaWz9UxXbxb/eSdEf5nrIl/jmoDYIg4LiCJLKM02OXiT9KCfs1v8K79
-         gajA==
-X-Gm-Message-State: AOAM532j/0CAMQkXxJ5VXqbgcamK5d0nR0Ihiboah4+Iwl19tfGfCMNJ
-        FQjXqkRUd3keZoQeJYjkTd3ocYUBNXAKdNtYppaIaB22Svb7Ats/GKBHHJifF8EBi9y/asLKmVk
-        7tlaMLJqIWmf+
-X-Received: by 2002:a7b:c193:: with SMTP id y19mr16530338wmi.125.1633938307724;
-        Mon, 11 Oct 2021 00:45:07 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwEXteg820Qpm2pfAUuKRxfpLikImqdkOGT+Q3tHDW6PBFaytT3M1sCv60MWzuhDbyX4uY+3g==
-X-Received: by 2002:a7b:c193:: with SMTP id y19mr16530313wmi.125.1633938307467;
-        Mon, 11 Oct 2021 00:45:07 -0700 (PDT)
-Received: from [192.168.3.132] (p5b0c64ba.dip0.t-ipconnect.de. [91.12.100.186])
-        by smtp.gmail.com with ESMTPSA id f15sm3877814wrt.38.2021.10.11.00.45.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 11 Oct 2021 00:45:07 -0700 (PDT)
-Subject: Re: [RFC PATCH v1 6/6] KVM: s390: Add a routine for setting userspace
- CPU state
+        id S234129AbhJKHtQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Oct 2021 03:49:16 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:24434 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234614AbhJKHr0 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 11 Oct 2021 03:47:26 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 19B7igUQ001218;
+        Mon, 11 Oct 2021 03:45:26 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=wGbAZLDJuOeViUEXUxsTVmOiu5tbptaYkZ/g6dyXDCE=;
+ b=L5ldyRnNu4ikaxlz9fhOfL3G2fN9efyHRM1mCU9rUMPmUIJ7/avQj4lapwQVUvjJuDGj
+ tTh3q7GJH+RKUlG2C3rZ1+bpHQ1fdG7fROtRQaUarUpleXtVpV8QAtVXwahthHkBSkpb
+ vrxe8lQYjl7IGJcKnxoeVdHcHq12wkr2sVL8GU0pj2yTEpykiuDUtkttlswJLVAJi675
+ HQ519C3JVK8nmYGJwyufcx/RkBEBVvBjTB+Myfds1CQ24YNZLNQMzGwbxYo0UI3sSMFd
+ zJc8LalsmF+nKa36g3gfU6MBsh8+kSmFzMTEfRejz35/jj2Z4HR5+knmX0OTTVVCDFhb 0w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3bmefb369v-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 11 Oct 2021 03:45:26 -0400
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 19B7SuRE010047;
+        Mon, 11 Oct 2021 03:45:26 -0400
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3bmefb3696-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 11 Oct 2021 03:45:26 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 19B7hKsf019781;
+        Mon, 11 Oct 2021 07:45:23 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma03ams.nl.ibm.com with ESMTP id 3bk2q9342t-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 11 Oct 2021 07:45:23 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 19B7dg2w46989768
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 11 Oct 2021 07:39:42 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7D444AE079;
+        Mon, 11 Oct 2021 07:45:15 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EB86DAE05D;
+        Mon, 11 Oct 2021 07:45:11 +0000 (GMT)
+Received: from li-43c5434c-23b8-11b2-a85c-c4958fb47a68.ibm.com (unknown [9.171.26.102])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 11 Oct 2021 07:45:11 +0000 (GMT)
+Subject: Re: [RFC PATCH v1 3/6] KVM: s390: Simplify SIGP Restart
 To:     Eric Farman <farman@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
         Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
         Cornelia Huck <cohuck@redhat.com>,
         Claudio Imbrenda <imbrenda@linux.ibm.com>,
         Heiko Carstens <hca@linux.ibm.com>,
@@ -63,83 +65,68 @@ To:     Eric Farman <farman@linux.ibm.com>,
         Jason Herne <jjherne@linux.ibm.com>
 Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
 References: <20211008203112.1979843-1-farman@linux.ibm.com>
- <20211008203112.1979843-7-farman@linux.ibm.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-Message-ID: <e3f86c1e-8c92-3c67-2312-70ca152b45df@redhat.com>
-Date:   Mon, 11 Oct 2021 09:45:06 +0200
+ <20211008203112.1979843-4-farman@linux.ibm.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Message-ID: <e3b874c1-e220-5e23-bd67-ed08c261e425@de.ibm.com>
+Date:   Mon, 11 Oct 2021 09:45:10 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+ Thunderbird/78.14.0
 MIME-Version: 1.0
-In-Reply-To: <20211008203112.1979843-7-farman@linux.ibm.com>
+In-Reply-To: <20211008203112.1979843-4-farman@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 3L5lYjzGzFK-9vVcb-G_2Yx58waaSrAg
+X-Proofpoint-ORIG-GUID: 52cF3X1Nxv2Lgqsl_YiHgTO3jXcCkFpm
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.391,FMLib:17.0.607.475
+ definitions=2021-10-11_02,2021-10-07_02,2020-04-07_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ lowpriorityscore=0 phishscore=0 adultscore=0 clxscore=1015 spamscore=0
+ impostorscore=0 bulkscore=0 mlxlogscore=950 suspectscore=0
+ priorityscore=1501 mlxscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2109230001 definitions=main-2110110043
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 08.10.21 22:31, Eric Farman wrote:
-> This capability exists, but we don't record anything when userspace
-> enables it. Let's refactor that code so that a note can be made in
-> the debug logs that it was enabled.
+
+
+Am 08.10.21 um 22:31 schrieb Eric Farman:
+> Now that we check for the STOP IRQ injection at the top of the SIGP
+> handler (before the userspace/kernelspace check), we don't need to do
+> it down here for the Restart order.
 > 
 > Signed-off-by: Eric Farman <farman@linux.ibm.com>
 > ---
->   arch/s390/kvm/kvm-s390.c | 6 +++---
->   arch/s390/kvm/kvm-s390.h | 9 +++++++++
->   2 files changed, 12 insertions(+), 3 deletions(-)
+>   arch/s390/kvm/sigp.c | 11 +----------
+>   1 file changed, 1 insertion(+), 10 deletions(-)
 > 
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index 33d71fa42d68..48ac0bd05bee 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -2487,8 +2487,8 @@ long kvm_arch_vm_ioctl(struct file *filp,
->   	case KVM_S390_PV_COMMAND: {
->   		struct kvm_pv_cmd args;
->   
-> -		/* protvirt means user sigp */
-> -		kvm->arch.user_cpu_state_ctrl = 1;
-> +		/* protvirt means user cpu state */
-> +		kvm_s390_set_user_cpu_state_ctrl(kvm);
->   		r = 0;
->   		if (!is_prot_virt_host()) {
->   			r = -EINVAL;
-> @@ -3801,7 +3801,7 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
->   	vcpu_load(vcpu);
->   
->   	/* user space knows about this interface - let it control the state */
-> -	vcpu->kvm->arch.user_cpu_state_ctrl = 1;
-> +	kvm_s390_set_user_cpu_state_ctrl(vcpu->kvm);
->   
->   	switch (mp_state->mp_state) {
->   	case KVM_MP_STATE_STOPPED:
-> diff --git a/arch/s390/kvm/kvm-s390.h b/arch/s390/kvm/kvm-s390.h
-> index 57c5e9369d65..36f4d585513c 100644
-> --- a/arch/s390/kvm/kvm-s390.h
-> +++ b/arch/s390/kvm/kvm-s390.h
-> @@ -208,6 +208,15 @@ static inline int kvm_s390_user_cpu_state_ctrl(struct kvm *kvm)
->   	return kvm->arch.user_cpu_state_ctrl != 0;
+> diff --git a/arch/s390/kvm/sigp.c b/arch/s390/kvm/sigp.c
+> index 6ca01bbc72cf..0c08927ca7c9 100644
+> --- a/arch/s390/kvm/sigp.c
+> +++ b/arch/s390/kvm/sigp.c
+> @@ -240,17 +240,8 @@ static int __sigp_sense_running(struct kvm_vcpu *vcpu,
+>   static int __prepare_sigp_re_start(struct kvm_vcpu *vcpu,
+>   				   struct kvm_vcpu *dst_vcpu, u8 order_code)
+>   {
+> -	struct kvm_s390_local_interrupt *li = &dst_vcpu->arch.local_int;
+>   	/* handle (RE)START in user space */
+> -	int rc = -EOPNOTSUPP;
+> -
+> -	/* make sure we don't race with STOP irq injection */
+> -	spin_lock(&li->lock);
+> -	if (kvm_s390_is_stop_irq_pending(dst_vcpu))
+> -		rc = SIGP_CC_BUSY;
+> -	spin_unlock(&li->lock);
+> -
+> -	return rc;
+> +	return -EOPNOTSUPP;
 >   }
 >   
-> +static inline void kvm_s390_set_user_cpu_state_ctrl(struct kvm *kvm)
-> +{
-> +	if (kvm->arch.user_cpu_state_ctrl)
-> +		return;
-> +
-> +	VM_EVENT(kvm, 3, "%s", "ENABLE: Userspace CPU state control");
-> +	kvm->arch.user_cpu_state_ctrl = 1;
-> +}
-> +
->   /* implemented in pv.c */
->   int kvm_s390_pv_destroy_cpu(struct kvm_vcpu *vcpu, u16 *rc, u16 *rrc);
->   int kvm_s390_pv_create_cpu(struct kvm_vcpu *vcpu, u16 *rc, u16 *rrc);
+>   static int __prepare_sigp_cpu_reset(struct kvm_vcpu *vcpu,
 > 
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
-
--- 
-Thanks,
-
-David / dhildenb
-
+@thuth?
+Question is, does it make sense to merge patch 2 and 3 to make things more obvious?
