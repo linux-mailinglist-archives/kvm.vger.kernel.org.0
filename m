@@ -2,63 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 916354287FE
-	for <lists+kvm@lfdr.de>; Mon, 11 Oct 2021 09:43:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 00B72428803
+	for <lists+kvm@lfdr.de>; Mon, 11 Oct 2021 09:45:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234570AbhJKHpc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Oct 2021 03:45:32 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:17434 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234580AbhJKHp2 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 11 Oct 2021 03:45:28 -0400
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 19B6aRpL028804;
-        Mon, 11 Oct 2021 03:43:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=eazA3nNV2QLHTEDgmq6pOe51oMfoJt60vLTixnbcM6I=;
- b=jN3SqKWnL6JxAa+nzwIK2joQGlHAT3Z2coCZzjUH02ZdoktOVC5mzkakphU+BYV8RIMa
- ZhgdO4jLpMb9nivduoL55n5s5p7DzJSV8/715bSTXHd+tgI1omw/nYLFL2nzVfi8E3CS
- gGe3LaENrUH8hh1MYZQ5fBZ2d2FGPro4RdP9SmeqUBX7VLkaFkcKKGu/L7x5uTK+x8IG
- /znEpIYysx+VDI0RWPdJV42OCScQyMNOpxFO0V1QWmOKzLaT6JgRMRnznc646MU3fbW6
- H9j7zAtC7w08jB3QhhT/7JivMSIG46Gw2UaKqRz6iJJztsgpoJIVWaPOlh+vPTMpsFZP 5A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3bmagr71wj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 11 Oct 2021 03:43:26 -0400
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 19B7PYOw023481;
-        Mon, 11 Oct 2021 03:43:26 -0400
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3bmagr71w3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 11 Oct 2021 03:43:26 -0400
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 19B7gcA4023146;
-        Mon, 11 Oct 2021 07:43:23 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma05fra.de.ibm.com with ESMTP id 3bk2q9a1yv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 11 Oct 2021 07:43:23 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 19B7bhra39911684
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 11 Oct 2021 07:37:43 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1E48CAE05D;
-        Mon, 11 Oct 2021 07:43:16 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 706C5AE061;
-        Mon, 11 Oct 2021 07:43:12 +0000 (GMT)
-Received: from li-43c5434c-23b8-11b2-a85c-c4958fb47a68.ibm.com (unknown [9.171.26.102])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 11 Oct 2021 07:43:12 +0000 (GMT)
-Subject: Re: [RFC PATCH v1 2/6] KVM: s390: Reject SIGP when destination CPU is
- busy
-To:     Thomas Huth <thuth@redhat.com>, Eric Farman <farman@linux.ibm.com>,
+        id S234580AbhJKHrL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Oct 2021 03:47:11 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:46907 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234494AbhJKHrK (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 11 Oct 2021 03:47:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1633938310;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=LSuc4UVJmiHSzAiziKZ1KJ+0nObIwFoDvepNLe3NpSw=;
+        b=Jg9T50qPI8ir7dUSh5VJrM6xUR9GZtAXH8e7FPMW4sPCjpAUv+cf9mf9f6D4tW9/2cYwGy
+        o3PGqMNQOYIEFknNdETsrO6nMWsoxaKrA55dpi7rWoPLyZ4fnI6HiBQkOIMBsU6DHMY9L9
+        C4YjYIJ4As0HcudtyDBDm8Sc/RLeCcs=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-196-eujRnzqsOaiLaTWY0lLzRg-1; Mon, 11 Oct 2021 03:45:08 -0400
+X-MC-Unique: eujRnzqsOaiLaTWY0lLzRg-1
+Received: by mail-wr1-f70.google.com with SMTP id j19-20020adfb313000000b00160a9de13b3so12572707wrd.8
+        for <kvm@vger.kernel.org>; Mon, 11 Oct 2021 00:45:08 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:cc:references:from:organization
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=LSuc4UVJmiHSzAiziKZ1KJ+0nObIwFoDvepNLe3NpSw=;
+        b=V59e8f97fCBU6G1sFsy8d+6U2EkfqeDH2RZnjn0HltRPNnMjctywdNdO5wUqwMJEEy
+         373e4kk0sUfcjWenFWquQ0J9oHbb3sheMhId5QyQXoxf5wYdGSQHwir+VZOVE6nz2oXz
+         nS8l3GQDXVaYTDL9srcRZHc75LGop2EsZhTKEjVnGS77azOWXYIch9gC3QgpXfyufK6i
+         zZQ/H059fE0i+iw0+OrGsAn2pLwq1zkcpIlxElEzmUQ6nMt+XkOrSJFlRPTonr0mvEa6
+         xYl7KwGUsrvhJmaWz9UxXbxb/eSdEf5nrIl/jmoDYIg4LiCJLKM02OXiT9KCfs1v8K79
+         gajA==
+X-Gm-Message-State: AOAM532j/0CAMQkXxJ5VXqbgcamK5d0nR0Ihiboah4+Iwl19tfGfCMNJ
+        FQjXqkRUd3keZoQeJYjkTd3ocYUBNXAKdNtYppaIaB22Svb7Ats/GKBHHJifF8EBi9y/asLKmVk
+        7tlaMLJqIWmf+
+X-Received: by 2002:a7b:c193:: with SMTP id y19mr16530338wmi.125.1633938307724;
+        Mon, 11 Oct 2021 00:45:07 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwEXteg820Qpm2pfAUuKRxfpLikImqdkOGT+Q3tHDW6PBFaytT3M1sCv60MWzuhDbyX4uY+3g==
+X-Received: by 2002:a7b:c193:: with SMTP id y19mr16530313wmi.125.1633938307467;
+        Mon, 11 Oct 2021 00:45:07 -0700 (PDT)
+Received: from [192.168.3.132] (p5b0c64ba.dip0.t-ipconnect.de. [91.12.100.186])
+        by smtp.gmail.com with ESMTPSA id f15sm3877814wrt.38.2021.10.11.00.45.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 11 Oct 2021 00:45:07 -0700 (PDT)
+Subject: Re: [RFC PATCH v1 6/6] KVM: s390: Add a routine for setting userspace
+ CPU state
+To:     Eric Farman <farman@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
         Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
         Cornelia Huck <cohuck@redhat.com>,
         Claudio Imbrenda <imbrenda@linux.ibm.com>,
         Heiko Carstens <hca@linux.ibm.com>,
@@ -66,110 +63,83 @@ To:     Thomas Huth <thuth@redhat.com>, Eric Farman <farman@linux.ibm.com>,
         Jason Herne <jjherne@linux.ibm.com>
 Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
 References: <20211008203112.1979843-1-farman@linux.ibm.com>
- <20211008203112.1979843-3-farman@linux.ibm.com>
- <4c6c0b14-e148-9000-c581-db14d2ea555e@redhat.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Message-ID: <8d8012a8-6ea5-6e0e-19c4-d9c64e785222@de.ibm.com>
-Date:   Mon, 11 Oct 2021 09:43:10 +0200
+ <20211008203112.1979843-7-farman@linux.ibm.com>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat
+Message-ID: <e3f86c1e-8c92-3c67-2312-70ca152b45df@redhat.com>
+Date:   Mon, 11 Oct 2021 09:45:06 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <4c6c0b14-e148-9000-c581-db14d2ea555e@redhat.com>
+In-Reply-To: <20211008203112.1979843-7-farman@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 67m0beFZ_gcVSHOrpBcGpGBj-EemF3W_
-X-Proofpoint-ORIG-GUID: n4qucRlh-utsawycDEfQGQlQRg2KJcri
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.391,FMLib:17.0.607.475
- definitions=2021-10-11_02,2021-10-07_02,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 spamscore=0
- lowpriorityscore=0 impostorscore=0 bulkscore=0 adultscore=0 mlxscore=0
- priorityscore=1501 clxscore=1015 malwarescore=0 suspectscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2109230001 definitions=main-2110110043
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Am 11.10.21 um 09:27 schrieb Thomas Huth:
-> On 08/10/2021 22.31, Eric Farman wrote:
->> With KVM_CAP_USER_SIGP enabled, most orders are handled by userspace.
->> However, some orders (such as STOP or STOP AND STORE STATUS) end up
->> injecting work back into the kernel. Userspace itself should (and QEMU
->> does) look for this conflict, and reject additional (non-reset) orders
->> until this work completes.
->>
->> But there's no need to delay that. If the kernel knows about the STOP
->> IRQ that is in process, the newly-requested SIGP order can be rejected
->> with a BUSY condition right up front.
->>
->> Signed-off-by: Eric Farman <farman@linux.ibm.com>
->> Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
->> ---
->>   arch/s390/kvm/sigp.c | 43 +++++++++++++++++++++++++++++++++++++++++++
->>   1 file changed, 43 insertions(+)
->>
->> diff --git a/arch/s390/kvm/sigp.c b/arch/s390/kvm/sigp.c
->> index cf4de80bd541..6ca01bbc72cf 100644
->> --- a/arch/s390/kvm/sigp.c
->> +++ b/arch/s390/kvm/sigp.c
->> @@ -394,6 +394,45 @@ static int handle_sigp_order_in_user_space(struct kvm_vcpu *vcpu, u8 order_code,
->>       return 1;
->>   }
->> +static int handle_sigp_order_is_blocked(struct kvm_vcpu *vcpu, u8 order_code,
->> +                    u16 cpu_addr)
->> +{
->> +    struct kvm_vcpu *dst_vcpu = kvm_get_vcpu_by_id(vcpu->kvm, cpu_addr);
->> +    int rc = 0;
->> +
->> +    /*
->> +     * SIGP orders directed at invalid vcpus are not blocking,
->> +     * and should not return busy here. The code that handles
->> +     * the actual SIGP order will generate the "not operational"
->> +     * response for such a vcpu.
->> +     */
->> +    if (!dst_vcpu)
->> +        return 0;
->> +
->> +    /*
->> +     * SIGP orders that process a flavor of reset would not be
->> +     * blocked through another SIGP on the destination CPU.
->> +     */
->> +    if (order_code == SIGP_CPU_RESET ||
->> +        order_code == SIGP_INITIAL_CPU_RESET)
->> +        return 0;
->> +
->> +    /*
->> +     * Any other SIGP order could race with an existing SIGP order
->> +     * on the destination CPU, and thus encounter a busy condition
->> +     * on the CPU processing the SIGP order. Reject the order at
->> +     * this point, rather than racing with the STOP IRQ injection.
->> +     */
->> +    spin_lock(&dst_vcpu->arch.local_int.lock);
->> +    if (kvm_s390_is_stop_irq_pending(dst_vcpu)) {
->> +        kvm_s390_set_psw_cc(vcpu, SIGP_CC_BUSY);
->> +        rc = 1;
->> +    }
->> +    spin_unlock(&dst_vcpu->arch.local_int.lock);
->> +
->> +    return rc;
->> +}
->> +
->>   int kvm_s390_handle_sigp(struct kvm_vcpu *vcpu)
->>   {
->>       int r1 = (vcpu->arch.sie_block->ipa & 0x00f0) >> 4;
->> @@ -408,6 +447,10 @@ int kvm_s390_handle_sigp(struct kvm_vcpu *vcpu)
->>           return kvm_s390_inject_program_int(vcpu, PGM_PRIVILEGED_OP);
->>       order_code = kvm_s390_get_base_disp_rs(vcpu, NULL);
->> +
->> +    if (handle_sigp_order_is_blocked(vcpu, order_code, cpu_addr))
->> +        return 0;
->> +
->>       if (handle_sigp_order_in_user_space(vcpu, order_code, cpu_addr))
->>           return -EOPNOTSUPP;
+On 08.10.21 22:31, Eric Farman wrote:
+> This capability exists, but we don't record anything when userspace
+> enables it. Let's refactor that code so that a note can be made in
+> the debug logs that it was enabled.
 > 
-> We've been bitten quite a bit of times in the past already by doing too much control logic in the kernel instead of doing it in QEMU, where we should have a more complete view of the state ... so I'm feeling quite a bit uneasy of adding this in front of the "return -EOPNOTSUPP" here ... Did you see any performance issues that would justify this change?
+> Signed-off-by: Eric Farman <farman@linux.ibm.com>
+> ---
+>   arch/s390/kvm/kvm-s390.c | 6 +++---
+>   arch/s390/kvm/kvm-s390.h | 9 +++++++++
+>   2 files changed, 12 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index 33d71fa42d68..48ac0bd05bee 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -2487,8 +2487,8 @@ long kvm_arch_vm_ioctl(struct file *filp,
+>   	case KVM_S390_PV_COMMAND: {
+>   		struct kvm_pv_cmd args;
+>   
+> -		/* protvirt means user sigp */
+> -		kvm->arch.user_cpu_state_ctrl = 1;
+> +		/* protvirt means user cpu state */
+> +		kvm_s390_set_user_cpu_state_ctrl(kvm);
+>   		r = 0;
+>   		if (!is_prot_virt_host()) {
+>   			r = -EINVAL;
+> @@ -3801,7 +3801,7 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
+>   	vcpu_load(vcpu);
+>   
+>   	/* user space knows about this interface - let it control the state */
+> -	vcpu->kvm->arch.user_cpu_state_ctrl = 1;
+> +	kvm_s390_set_user_cpu_state_ctrl(vcpu->kvm);
+>   
+>   	switch (mp_state->mp_state) {
+>   	case KVM_MP_STATE_STOPPED:
+> diff --git a/arch/s390/kvm/kvm-s390.h b/arch/s390/kvm/kvm-s390.h
+> index 57c5e9369d65..36f4d585513c 100644
+> --- a/arch/s390/kvm/kvm-s390.h
+> +++ b/arch/s390/kvm/kvm-s390.h
+> @@ -208,6 +208,15 @@ static inline int kvm_s390_user_cpu_state_ctrl(struct kvm *kvm)
+>   	return kvm->arch.user_cpu_state_ctrl != 0;
+>   }
+>   
+> +static inline void kvm_s390_set_user_cpu_state_ctrl(struct kvm *kvm)
+> +{
+> +	if (kvm->arch.user_cpu_state_ctrl)
+> +		return;
+> +
+> +	VM_EVENT(kvm, 3, "%s", "ENABLE: Userspace CPU state control");
+> +	kvm->arch.user_cpu_state_ctrl = 1;
+> +}
+> +
+>   /* implemented in pv.c */
+>   int kvm_s390_pv_destroy_cpu(struct kvm_vcpu *vcpu, u16 *rc, u16 *rrc);
+>   int kvm_s390_pv_create_cpu(struct kvm_vcpu *vcpu, u16 *rc, u16 *rrc);
+> 
 
-It does at least handle this case for simple userspaces without KVM_CAP_S390_USER_SIGP .
+Reviewed-by: David Hildenbrand <david@redhat.com>
+
+-- 
+Thanks,
+
+David / dhildenb
+
