@@ -2,130 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0734A4292E2
-	for <lists+kvm@lfdr.de>; Mon, 11 Oct 2021 17:14:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B383F429374
+	for <lists+kvm@lfdr.de>; Mon, 11 Oct 2021 17:33:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233669AbhJKPQF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Oct 2021 11:16:05 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:36767 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231839AbhJKPQE (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 11 Oct 2021 11:16:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1633965243;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=JzSZRIiW+aXjnRDBWbHKvvrzYi/BoJ6tma0KiYAtr+s=;
-        b=SDxbyLXQnllzm4U5ocvSr37ZPc8r3EU4qNYnoyJcjpB4GRap3UxMtyWWh3K22lFY7v/lhC
-        J6I4/1hB+flZ7jyvMQAcz9lwnfp7mf2Bj7VfArDUulafvafJAgD9UIhhilb7ozrvebLm4R
-        dvTRfihSb55mW5mKlUjeqGDa4tipxXc=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-498-hABjS1nqMiW3OKWKXcmiNA-1; Mon, 11 Oct 2021 11:14:02 -0400
-X-MC-Unique: hABjS1nqMiW3OKWKXcmiNA-1
-Received: by mail-wr1-f70.google.com with SMTP id r25-20020adfab59000000b001609ddd5579so13533739wrc.21
-        for <kvm@vger.kernel.org>; Mon, 11 Oct 2021 08:14:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=JzSZRIiW+aXjnRDBWbHKvvrzYi/BoJ6tma0KiYAtr+s=;
-        b=zCKJsl03cH3F41k9QXjwi/72GvOqrXJm5/qaMP1Rx67o9FuHxxIVD/XgCHIu4/gpLf
-         Ecez6cDn0OfBvMtxWQ+p3KRK0quIKGNZl2NSMEfAM/i9kYaMeLfQnt9LpAwdo0xBabvn
-         uhGM3F4mNwumpVIXhp7zFegN2FFUAil1WzbIzGd9bWzj+Lximng3PmoGfL5M78//8RHI
-         FdXaADKbshE3cd6RuqxX9AR6OdKnGPWD5EmrkCEuAn+NOOrvDefOFm/dd2fJ2YMNe5Gb
-         xMA7UlFGPj1WI1Q3N2pzZuOINpUItCnpiG3xaR/kUrHy/i08u1wFyBTpmMG7cPLJooL4
-         8qCQ==
-X-Gm-Message-State: AOAM533j3WGh9F+Ma8XkutSRStFLpHhmdiUfL+pTJdYHSQPjxtY2/Mnr
-        RdcESq2Ydwh3a9VUxJE2qN7vB/jRDzepZfbR8Io0iqLiR0oTeSJiqelA6EV++6bjPOeZ3QgxBlP
-        7Axa4cyiNtv6G
-X-Received: by 2002:adf:a31d:: with SMTP id c29mr24729865wrb.381.1633965241396;
-        Mon, 11 Oct 2021 08:14:01 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyT1w9tE08j6c6gdbrJzeNwlidfRMe/kQM/9ddAAAg0M+wpzHCkafgPVlinl4sjFJeJoSwBhg==
-X-Received: by 2002:adf:a31d:: with SMTP id c29mr24729841wrb.381.1633965241174;
-        Mon, 11 Oct 2021 08:14:01 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id v4sm11244822wmh.23.2021.10.11.08.14.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Oct 2021 08:14:00 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+        id S239197AbhJKPfi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Oct 2021 11:35:38 -0400
+Received: from mail.kernel.org ([198.145.29.99]:54654 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233815AbhJKPff (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Oct 2021 11:35:35 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 3481760C49;
+        Mon, 11 Oct 2021 15:33:35 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1mZxIy-00G3oP-Qe; Mon, 11 Oct 2021 16:33:33 +0100
+Date:   Mon, 11 Oct 2021 16:33:31 +0100
+Message-ID: <87lf2zpodw.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+Cc:     Peter Zijlstra <peterz@infradead.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Will Deacon <will@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Guo Ren <guoren@kernel.org>, Nick Hu <nickhu@andestech.com>,
+        Greentime Hu <green.hu@gmail.com>,
+        Vincent Chen <deanbo422@gmail.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Juergen Gross <jgross@suse.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Jiri Olsa <jolsa@redhat.com>,
+        Namhyung Kim <namhyung@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 3/4] KVM: nVMX: Track whether changes in L0 require
- MSR bitmap for L2 to be rebuilt
-In-Reply-To: <YWDaOf/10znebx5S@google.com>
-References: <20211004161029.641155-1-vkuznets@redhat.com>
- <20211004161029.641155-4-vkuznets@redhat.com>
- <YWDaOf/10znebx5S@google.com>
-Date:   Mon, 11 Oct 2021 17:13:59 +0200
-Message-ID: <87zgrfzj9k.fsf@vitty.brq.redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+        Joerg Roedel <joro@8bytes.org>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        linux-arm-kernel@lists.infradead.org,
+        linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, linux-csky@vger.kernel.org,
+        linux-riscv@lists.infradead.org, kvm@vger.kernel.org,
+        xen-devel@lists.xenproject.org,
+        Artem Kashkanov <artem.kashkanov@intel.com>,
+        Like Xu <like.xu.linux@gmail.com>,
+        Zhu Lingshan <lingshan.zhu@intel.com>
+Subject: Re: [PATCH v3 12/16] KVM: Move x86's perf guest info callbacks to generic KVM
+In-Reply-To: <YWROQSGPuPf3wfC9@google.com>
+References: <20210922000533.713300-1-seanjc@google.com>
+        <20210922000533.713300-13-seanjc@google.com>
+        <87wnmjq4y3.wl-maz@kernel.org>
+        <YWROQSGPuPf3wfC9@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: seanjc@google.com, peterz@infradead.org, mingo@redhat.com, acme@kernel.org, will@kernel.org, mark.rutland@arm.com, guoren@kernel.org, nickhu@andestech.com, green.hu@gmail.com, deanbo422@gmail.com, paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, pbonzini@redhat.com, boris.ostrovsky@oracle.com, jgross@suse.com, alexander.shishkin@linux.intel.com, jolsa@redhat.com, namhyung@kernel.org, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org, sstabellini@kernel.org, linux-arm-kernel@lists.infradead.org, linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-csky@vger.kernel.org, linux-riscv@lists.infradead.org, kvm@vger.kernel.org, xen-devel@lists.xenproject.org, artem.kashkanov@intel.com, like.xu.linux@gmail.com, lingshan.zhu@intel.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <seanjc@google.com> writes:
+On Mon, 11 Oct 2021 15:46:25 +0100,
+Sean Christopherson <seanjc@google.com> wrote:
+> 
+> On Mon, Oct 11, 2021, Marc Zyngier wrote:
+> > On Wed, 22 Sep 2021 01:05:29 +0100, Sean Christopherson <seanjc@google.com> wrote:
+> > > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > > index ed940aec89e0..828b6eaa2c56 100644
+> > > --- a/arch/arm64/include/asm/kvm_host.h
+> > > +++ b/arch/arm64/include/asm/kvm_host.h
+> > > @@ -673,6 +673,14 @@ int io_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa);
+> > >  void kvm_perf_init(void);
+> > >  void kvm_perf_teardown(void);
+> > >  
+> > > +#ifdef CONFIG_GUEST_PERF_EVENTS
+> > > +static inline bool kvm_arch_pmi_in_guest(struct kvm_vcpu *vcpu)
+> > 
+> > Pardon my x86 ignorance, what is PMI? PMU Interrupt?
+> 
+> Ya, Performance Monitoring Interrupt.  I didn't realize the term wasn't
+> common perf terminology.  Maybe kvm_arch_perf_events_in_guest() to be
+> less x86-centric?
 
-> On Mon, Oct 04, 2021, Vitaly Kuznetsov wrote:
->> Introduce a flag to keep track of whether MSR bitmap for L2 needs to be
->> rebuilt due to changes in MSR bitmap for L1 or switching to a different
->> L2. This information will be used for Enlightened MSR Bitmap feature for
->> Hyper-V guests.
->> 
->> Note, setting msr_bitmap_changed to 'true' from set_current_vmptr() is
->> not really needed for Enlightened MSR Bitmap as the feature can only
->> be used in conjunction with Enlightened VMCS but let's keep tracking
->> information complete, it's cheap and in the future similar PV feature can
->> easily be implemented for KVM on KVM too.
->> 
->> No functional change intended.
->> 
->> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
->> ---
->
-> ...
->
->>  void vmx_disable_intercept_for_msr(struct kvm_vcpu *vcpu, u32 msr, int type)
->> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
->> index 592217fd7d92..eb7a1697bec2 100644
->> --- a/arch/x86/kvm/vmx/vmx.h
->> +++ b/arch/x86/kvm/vmx/vmx.h
->> @@ -148,6 +148,12 @@ struct nested_vmx {
->>  	bool need_vmcs12_to_shadow_sync;
->>  	bool dirty_vmcs12;
->>  
->> +	/*
->> +	 * Indicates whether MSR bitmap for L2 needs to be rebuilt due to
->> +	 * changes in MSR bitmap for L1 or switching to a different L2.
->> +	 */
->> +	bool msr_bitmap_changed;
->
-> This is misleading, and arguably wrong.  It's only accurate when used in conjuction
-> with a paravirt L1 that states if a VMCS has a dirty MSR bitmap.  E.g. this flag
-> will be wrong if L1 changes the address of the bitmap in the VMCS, and it's
-> obviously wrong if L1 changes the MSR bitmap itself.
->
-> The changelog kind of covers that, but those details will be completely lost to
-> readers of the code.
+Up to you. I would be happy with just a comment.
 
-Would it help if we rename 'msr_bitmap_changed' to something?
+> 
+> > > +{
+> > > +	/* Any callback while a vCPU is loaded is considered to be in guest. */
+> > > +	return !!vcpu;
+> > > +}
+> > > +#endif
+> > 
+> > Do you really need this #ifdef?
+> 
+> Nope, should compile fine without it, though simply dropping the #ifdef
+> would make make the semantics of the function wrong, even if nothing
+> consumes it.  Tweak it to use IS_ENABLED()?
+> 
+> 	return IS_ENABLED(CONFIG_GUEST_PERF_EVENTS) && !!vcpu;
 
->
-> Would it be illegal from KVM to simply clear the CLEAN bit in the eVMCS at the
-> appropriate points?
+LGTM.
 
-It would probably be OK to do that while we're in L2, however, in case
-we're running L1 things can get messy. E.g. MSR-bitmap for L1 is changed
-and we clear the clean bit in the currently mapped eVMCS for L2. Later,
-before L1 runs L2, it sets the bit back again indicating 'no changes in
-MSR-bitmap-12' and we (erroneously) skip updating MSR-Bitmap-02.
+	M.
 
 -- 
-Vitaly
-
+Without deviation from the norm, progress is not possible.
