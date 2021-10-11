@@ -2,126 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 34E3F42942A
-	for <lists+kvm@lfdr.de>; Mon, 11 Oct 2021 18:08:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 51AC84294B4
+	for <lists+kvm@lfdr.de>; Mon, 11 Oct 2021 18:44:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233398AbhJKQKt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Oct 2021 12:10:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39954 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230152AbhJKQKs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Oct 2021 12:10:48 -0400
-Received: from mail-yb1-xb2d.google.com (mail-yb1-xb2d.google.com [IPv6:2607:f8b0:4864:20::b2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38D82C061570
-        for <kvm@vger.kernel.org>; Mon, 11 Oct 2021 09:08:48 -0700 (PDT)
-Received: by mail-yb1-xb2d.google.com with SMTP id h2so40050806ybi.13
-        for <kvm@vger.kernel.org>; Mon, 11 Oct 2021 09:08:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=R1IZZmHpZJEGprcsYAoU/nu0GgHlWLkOakQbKNK/k+g=;
-        b=mlNCnyY4+Gk9mJudvL1KHNimChN7ceAZU9hjGcP5sZ7iTcoagcnLWxwUeYVNAyM+vp
-         p/piW8IlvILBF5cUKYWqNUaWI66sa3uFU9Naizabxy2GVKcfUqgGMfsuB1mgpZel2lo+
-         szN7rwYLncZl2e/VXu26Ms3xhLiS8ymdIKMG9t1YfF2F5bxGN/wcMZRdt+brJj568bcP
-         qH5wo6vjFzazyqt79hptbGV3TRra5D1HsJN1T6gSj3jv9NoaVr4pjCXprrPHV4KVI9vf
-         6yWPNM6BteQ3qVlijR70EhltzdADxwVmmDrTEcyaCdTtckBo3z5eSUX84kL88do0j+sH
-         WNYA==
+        id S231560AbhJKQq1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Oct 2021 12:46:27 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:29761 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229544AbhJKQqZ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 11 Oct 2021 12:46:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1633970664;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=v5eQ2fdMZRopXBrJf5sFBVPsk6Ix/lYtLMtjFnBm+68=;
+        b=KZUYjgjYEPFEq2CLQxRc5Q7lPEbPCfDEh/N4tcEr7Y7IVHgHozWwAWEERgClDkXo1FFG1o
+        zNeZM1u1XBb9I25+2AOsMH9X7543gf+oZgLt84dNAzzld3+KTSC8ArqgKgfVY2qMdO30lI
+        QtsgSPXNYVZgfAjPsI9TmJVoyFM5Pgw=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-414-1bu2nOTlPc6ggicf7Hiwfw-1; Mon, 11 Oct 2021 12:44:23 -0400
+X-MC-Unique: 1bu2nOTlPc6ggicf7Hiwfw-1
+Received: by mail-wr1-f69.google.com with SMTP id l6-20020adfa386000000b00160c4c1866eso13743052wrb.4
+        for <kvm@vger.kernel.org>; Mon, 11 Oct 2021 09:44:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=R1IZZmHpZJEGprcsYAoU/nu0GgHlWLkOakQbKNK/k+g=;
-        b=3fTe/TZXfFAqPBIQ8LCSNWN37G1n6/7HnNjfYwjKvzAlPrzPkfVvYWFkBp4Z328gZl
-         xYzB/OEd1VbIVS0a4txFdNi1Mn3s1I5Y8D99KiDypCOeoDztQLE5jLUDJ1FtwEw0fsCK
-         s7MUocQWu8HT7YiCcaydU3TBcZx4nwq5Q+rZtlO7Qls2EYfLXioP1zxFow7KpGjoWFWc
-         uad++BtMWmHM3sCI/TFYTWrxvR0XxM4KuBouVC4XYHro3SqgAeU6iyKahLKULs4zUzrx
-         lyJNm4SD8QgGxvWV/dpJJVFaOKgUW2SnSKOjbEvgfxGBZMZc8cT5cgQRFhcC5whfoXP2
-         grjg==
-X-Gm-Message-State: AOAM533iFA87+2RiBzpG5X/h/spIa4YTcsR8FcfRhvtxPKAF6xJTwoOK
-        xWFve8m8Jo7Pj2B+Mcg3jUGFX+PN8rkBnwVxBGVfYg==
-X-Google-Smtp-Source: ABdhPJxoWeF/9UsD/zG3Z5AIQx5G4xvBwCI4PzBsciydwuujm6dRP5CD4YLqtZKa5iw/bktpgnu/NNxz4ay1XCAt02I=
-X-Received: by 2002:a25:2f8e:: with SMTP id v136mr22214178ybv.350.1633968527209;
- Mon, 11 Oct 2021 09:08:47 -0700 (PDT)
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=v5eQ2fdMZRopXBrJf5sFBVPsk6Ix/lYtLMtjFnBm+68=;
+        b=3zgylXLeBFruIdSedyUyawoB6vcQi8wg3EMCDGPQEcrbW4MUV4qLu7tsISSEx17/ic
+         +w6y5oqDRbvzG6JAVutFgWc3JUMhW/M+FJaGXPz9ELXyUnRmtBmvNWCjt9lfDU2Tnmk4
+         jVcbO+La51OPQskptd7tRurvjuQzDv84zzZJn5ehYAJPL+g8vnfelwJHAugnsQ5gV1lN
+         uD3iyj/9h+ZTnTOqDvgYS9y4ybD5bILQEMKsPswVm5lmso0BIIehSYU4poXAOfSEzV3X
+         Ukv/GoATCxAkYu5Fw9rljLTJ9ZBjsG9CvNnV723yp4iHCo0C1enuIqP+/Ib4RTF16HHL
+         Swtg==
+X-Gm-Message-State: AOAM5321r0fzE2V0l+IH+MSCD+r7GGwE+SYyIgFdYr9Hf/dV5JbCLfRk
+        TjTRA43oOullZ6POdAuVSMjYX0aCWD+TTGV+8vRx9QuwTB21vXlzfjDLu/RjIEJIPwW38Zl0WaN
+        e/ujeZzp/TdS4
+X-Received: by 2002:a7b:cf06:: with SMTP id l6mr5575wmg.129.1633970661893;
+        Mon, 11 Oct 2021 09:44:21 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzkNV6u5+zpDaiAm71jlzVLgMlxlreNuF/u2+P+xbwTXuHkkQCV+OrxvNWndTmUCXbtqs4IEw==
+X-Received: by 2002:a7b:cf06:: with SMTP id l6mr5550wmg.129.1633970661692;
+        Mon, 11 Oct 2021 09:44:21 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
+        by smtp.gmail.com with ESMTPSA id w8sm5647263wrr.47.2021.10.11.09.44.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 11 Oct 2021 09:44:20 -0700 (PDT)
+Message-ID: <a2142175-c0f3-c511-4a55-ad22fb732af0@redhat.com>
+Date:   Mon, 11 Oct 2021 18:44:19 +0200
 MIME-Version: 1.0
-References: <20211007233439.1826892-1-rananta@google.com> <20211007233439.1826892-4-rananta@google.com>
- <87y270ou3y.wl-maz@kernel.org>
-In-Reply-To: <87y270ou3y.wl-maz@kernel.org>
-From:   Raghavendra Rao Ananta <rananta@google.com>
-Date:   Mon, 11 Oct 2021 09:08:36 -0700
-Message-ID: <CAJHc60w1JVHH0SGq8WiebbRNQKeZzavdO6S701yTjmmA=NHqHg@mail.gmail.com>
-Subject: Re: [PATCH v8 03/15] KVM: arm64: selftests: Use read/write
- definitions from sysreg.h
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Andrew Jones <drjones@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [PATCH v2 3/4] KVM: nVMX: Track whether changes in L0 require MSR
+ bitmap for L2 to be rebuilt
+Content-Language: en-US
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        linux-kernel@vger.kernel.org
+References: <20211004161029.641155-1-vkuznets@redhat.com>
+ <20211004161029.641155-4-vkuznets@redhat.com> <YWDaOf/10znebx5S@google.com>
+ <87zgrfzj9k.fsf@vitty.brq.redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <87zgrfzj9k.fsf@vitty.brq.redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+On 11/10/21 17:13, Vitaly Kuznetsov wrote:
+>>
+>> The changelog kind of covers that, but those details will be completely lost to
+>> readers of the code.
+> Would it help if we rename 'msr_bitmap_changed' to something?
 
-On Mon, Oct 11, 2021 at 1:15 AM Marc Zyngier <maz@kernel.org> wrote:
->
-> Hi Raghavendra,
->
-> On Fri, 08 Oct 2021 00:34:27 +0100,
-> Raghavendra Rao Ananta <rananta@google.com> wrote:
-> >
-> > Make use of the register read/write definitions from
-> > sysreg.h, instead of the existing definitions. A syntax
-> > correction is needed for the files that use write_sysreg()
-> > to make it compliant with the new (kernel's) syntax.
-> >
-> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> > Reviewed-by: Oliver Upton <oupton@google.com>
-> > Reviewed-by: Andrew Jones <drjones@redhat.com>
-> > ---
-> >  .../selftests/kvm/aarch64/debug-exceptions.c  | 28 +++++++++----------
-> >  .../selftests/kvm/include/aarch64/processor.h | 13 +--------
-> >  2 files changed, 15 insertions(+), 26 deletions(-)
-> >
-> > diff --git a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
-> > index e5e6c92b60da..11fd23e21cb4 100644
-> > --- a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
-> > +++ b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
-> > @@ -34,16 +34,16 @@ static void reset_debug_state(void)
-> >  {
-> >       asm volatile("msr daifset, #8");
-> >
-> > -     write_sysreg(osdlr_el1, 0);
-> > -     write_sysreg(oslar_el1, 0);
-> > +     write_sysreg(0, osdlr_el1);
-> > +     write_sysreg(0, oslar_el1);
->
-> The previous patch has obviously introduced significant breakage which
-> this patch is now fixing. In the interval, the build is broken, which
-> isn't great.
->
-> You can either rework this series to work around the issue, or I can
-> squash patches #2 and #3 together.
+Yeah, what about 'msr_bitmap_force_recalc'?
 
-Thanks. I didn't realize this. I'm fine with you squashing the patches
-together (I guess I would do the same).
+Paolo
 
-Regards,
-Raghavendra
->
-> Thanks,
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
