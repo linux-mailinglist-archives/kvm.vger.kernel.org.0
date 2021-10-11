@@ -2,106 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4524942961C
-	for <lists+kvm@lfdr.de>; Mon, 11 Oct 2021 19:55:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 98F29429629
+	for <lists+kvm@lfdr.de>; Mon, 11 Oct 2021 19:57:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234071AbhJKR5q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Oct 2021 13:57:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36326 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233886AbhJKR5q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Oct 2021 13:57:46 -0400
-Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B33CEC061570
-        for <kvm@vger.kernel.org>; Mon, 11 Oct 2021 10:55:45 -0700 (PDT)
-Received: by mail-pf1-x433.google.com with SMTP id h125so5507119pfe.0
-        for <kvm@vger.kernel.org>; Mon, 11 Oct 2021 10:55:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=nXSnf3uwD4BHjHwEieIvu9mOpU3k2AcxP4+SqJSLu9c=;
-        b=AkFrlihMIQ1QhP32hDNyZ0SP9eoy01+WG69np5nepFAlfbJERvWyNzKf05ONRSwds/
-         7ESdHVOcMj+nRP+Th1Wdvpu/n+RA/p4OYSiHsOi9ollU7UqGfYS4vjWpPhBQOsklnWM/
-         3+scu56T9DeK4rkl2cNozpQy7XemQzR0JroU6NG0Jxf2yRJwkfY4Xeaun7MyKHalGbrq
-         TvU4C7HxC7ZcG7qi+8NmWnU7ovCf8Y+pYnuCFRQGQHAVB/QGxxx2WTcoUoIEakKDRVn8
-         vbxqmF7nQM4kOjt8CYylsSiZx0079hF1Ej2txzjLVoLUISUghgBXhxRH0v0euu2zihkr
-         QHoA==
+        id S231528AbhJKR7M (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Oct 2021 13:59:12 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:31231 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234155AbhJKR7K (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 11 Oct 2021 13:59:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1633975029;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=E/5bZi3m0cV+//b6WevzGww5yl4Hu1ZXn87oh0/epQQ=;
+        b=EevKQSNf96ISHOlmcUf1SbSXtdpyOsqajDFKR3gTniXersfp1w0DrigW+7sl5M9I4oSWi2
+        QpGy2dt+LNt1lhuyP2J6TK23R9xC8+hPINg4IiDdAXjUIg67ubeg9VjU9ZYDWxQLoTLhRY
+        qMHxEwucLLWH2BK7ubPvNLDv0g0HRVY=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-25-Pg66ExTOOaS396zpV6KKCw-1; Mon, 11 Oct 2021 13:57:06 -0400
+X-MC-Unique: Pg66ExTOOaS396zpV6KKCw-1
+Received: by mail-wr1-f70.google.com with SMTP id s18-20020adfbc12000000b00160b2d4d5ebso13935618wrg.7
+        for <kvm@vger.kernel.org>; Mon, 11 Oct 2021 10:57:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=nXSnf3uwD4BHjHwEieIvu9mOpU3k2AcxP4+SqJSLu9c=;
-        b=sKpmB0Z3OmXVdiDsQfYOxSrx11a813QKNFYQL4VLQX96xoNaPfXkoEBV0ch+IZhlf0
-         vrGWE1Ev+FOp1yozIxVvFAaR29KbsUA210JH8ZcUD96LIqWajNlu7QTZz0mmGRAv4SJu
-         +kvnZgjPK4eq2gVWdy7qbc7cVYNO8o97DX6hhAxqWjHW+EQVuUzvvsjD3AoEA1LD6Z0N
-         hGXLgSTiDNlng4GQTw5zC+6vtQULIEfTBwQD5WRCHDcNH8OTITmt0x4pvJMVUqiuW4tv
-         VoV0rAqEyJuB6MbsszCsk1dh1qsBlBAHM/smeiv1PeBNwZIiTXw7lE/XJKv++af47vYw
-         Fb8Q==
-X-Gm-Message-State: AOAM5307DWzLNNxIB8gsi9P1IWyDaPKL4S/y/quiTVxDr4IxEV1sjG6y
-        Nj+V9+w/iaHsemOQDLlrYYdAcg==
-X-Google-Smtp-Source: ABdhPJyILzC3JCIB1eIqwxmSw/iHOyiFDOmr2MJm/zr7SIquK4zRGR3RwJXRdAHbbQcQ5X5CsKEWRQ==
-X-Received: by 2002:aa7:83d9:0:b0:44c:915b:8268 with SMTP id j25-20020aa783d9000000b0044c915b8268mr27513339pfn.43.1633974944994;
-        Mon, 11 Oct 2021 10:55:44 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id c142sm3654255pfb.9.2021.10.11.10.55.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Oct 2021 10:55:44 -0700 (PDT)
-Date:   Mon, 11 Oct 2021 17:55:40 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] KVM: x86: Simplify APICv update request logic
-Message-ID: <YWR6nJLdR21CbGtz@google.com>
-References: <20211009010135.4031460-1-seanjc@google.com>
- <20211009010135.4031460-3-seanjc@google.com>
- <c446956c622d5f6561f5248c7f686033ffc2ee69.camel@redhat.com>
+        h=x-gm-message-state:subject:to:cc:references:from:organization
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=E/5bZi3m0cV+//b6WevzGww5yl4Hu1ZXn87oh0/epQQ=;
+        b=AdcFve5WK8fz5I/lf5s78dP2UmRAEhOtkR/1lMxFA+rcHbiW0QYEKT1eQ9ZjZgfCXN
+         O4IHYmuE5aR3MwS4ju51jnjTJ0f4ZCU9TkLQQWW3g11xtSjx99DcGl8FeBBoLH+5zvi3
+         KHhywik08FgvcCAAkGWVpvc49AyRWJpEKlULYFSsPdT1NIdHe2XWg/ZJQ0YANx31XxvH
+         q9J6+3FFP2dvbBo3ysHve/cIrN4eV3k65GSfG1fYpcfjd8+MEQON2fLLmOKmrUWug/99
+         RHtTPG5WLH+J/4faMsmf/8zL/AA9B8Ayq/wULHY07edcbZvPdEbcygQaLuMneeYuFV8E
+         jo+A==
+X-Gm-Message-State: AOAM532d/VkqSyRO3Bvzemf650Rax6960xhn0I9QRYhvflKLnt0f3C26
+        CeqgDI8lvjyFB79ibDVOu7smdQ4pTqMkDlx10tlfNAKwiqZ2HNASlzEy1NlFbmEmD1nG+Gnt2NA
+        R0h+y1/2jUtYG
+X-Received: by 2002:adf:fb0a:: with SMTP id c10mr27836998wrr.354.1633975025004;
+        Mon, 11 Oct 2021 10:57:05 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzKGGwyIKO0k01yOuR3wlxMM05AG04P32tsZWeSIbZoC0xX0DuRbe/iFHxbaDWGM6c3TDR0dg==
+X-Received: by 2002:adf:fb0a:: with SMTP id c10mr27836982wrr.354.1633975024834;
+        Mon, 11 Oct 2021 10:57:04 -0700 (PDT)
+Received: from [192.168.3.132] (p5b0c64ba.dip0.t-ipconnect.de. [91.12.100.186])
+        by smtp.gmail.com with ESMTPSA id d8sm8372925wrz.84.2021.10.11.10.57.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 11 Oct 2021 10:57:04 -0700 (PDT)
+Subject: Re: [RFC PATCH v1 1/6] KVM: s390: Simplify SIGP Set Arch handling
+To:     Eric Farman <farman@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Jason Herne <jjherne@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
+References: <20211008203112.1979843-1-farman@linux.ibm.com>
+ <20211008203112.1979843-2-farman@linux.ibm.com>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat
+Message-ID: <de4726aa-aa72-7e17-8bc6-9d42ca6125a8@redhat.com>
+Date:   Mon, 11 Oct 2021 19:57:03 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c446956c622d5f6561f5248c7f686033ffc2ee69.camel@redhat.com>
+In-Reply-To: <20211008203112.1979843-2-farman@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Oct 10, 2021, Maxim Levitsky wrote:
-> On Fri, 2021-10-08 at 18:01 -0700, Sean Christopherson wrote:
-> > Drop confusing and flawed code that intentionally sets that per-VM APICv
-> > inhibit mask after sending KVM_REQ_APICV_UPDATE to all vCPUs.  The code
-> > is confusing because it's not obvious that there's no race between a CPU
-> > seeing the request and consuming the new mask.  The code works only
-> > because the request handling path takes the same lock, i.e. responding
-> > vCPUs will be blocked until the full update completes.
+On 08.10.21 22:31, Eric Farman wrote:
+> The Principles of Operations describe the various reasons that
+> each individual SIGP orders might be rejected, and the status
+> bit that are set for each condition.
 > 
-> Actually this code is here on purpose:
->
-> While it is true that the main reader of apicv_inhibit_reasons (KVM_REQ_APICV_UPDATE handler)
-> does take the kvm->arch.apicv_update_lock lock, so it will see the correct value
-> regardless of this patch, the reason why this code first raises the KVM_REQ_APICV_UPDATE
-> and only then updates the arch.apicv_inhibit_reasons is that I put a warning into svm_vcpu_run
-> which checks that per cpu AVIC inhibit state matches the global AVIC inhibit state.
+> For example, for the Set Architecture order, it states:
 > 
-> That warning proved to be very useful to ensure that AVIC inhibit works correctly.
+>    "If it is not true that all other CPUs in the configu-
+>     ration are in the stopped or check-stop state, ...
+>     bit 54 (incorrect state) ... is set to one."
 > 
-> If this patch is applied, the warning can no longer work reliably unless
-> it takes the apicv_update_lock which will have a performance hit.
+> However, it also states:
 > 
-> The reason is that if we just update apicv_inhibit_reasons, we can race
-> with vCPU which is about to re-enter the guest mode and trigger this warning.
+>    "... if the CZAM facility is installed, ...
+>     bit 55 (invalid parameter) ... is set to one."
+> 
+> Since the Configuration-z/Architecture-Architectural Mode (CZAM)
+> facility is unconditionally presented, there is no need to examine
+> each VCPU to determine if it is started/stopped. It can simply be
+> rejected outright with the Invalid Parameter bit.
+> 
+> Fixes: b697e435aeee ("KVM: s390: Support Configuration z/Architecture Mode")
+> Signed-off-by: Eric Farman <farman@linux.ibm.com>
+> ---
+>   arch/s390/kvm/sigp.c | 14 +-------------
+>   1 file changed, 1 insertion(+), 13 deletions(-)
+> 
+> diff --git a/arch/s390/kvm/sigp.c b/arch/s390/kvm/sigp.c
+> index 683036c1c92a..cf4de80bd541 100644
+> --- a/arch/s390/kvm/sigp.c
+> +++ b/arch/s390/kvm/sigp.c
+> @@ -151,22 +151,10 @@ static int __sigp_stop_and_store_status(struct kvm_vcpu *vcpu,
+>   static int __sigp_set_arch(struct kvm_vcpu *vcpu, u32 parameter,
+>   			   u64 *status_reg)
+>   {
+> -	unsigned int i;
+> -	struct kvm_vcpu *v;
+> -	bool all_stopped = true;
+> -
+> -	kvm_for_each_vcpu(i, v, vcpu->kvm) {
+> -		if (v == vcpu)
+> -			continue;
+> -		if (!is_vcpu_stopped(v))
+> -			all_stopped = false;
+> -	}
+> -
+>   	*status_reg &= 0xffffffff00000000UL;
+>   
+>   	/* Reject set arch order, with czam we're always in z/Arch mode. */
+> -	*status_reg |= (all_stopped ? SIGP_STATUS_INVALID_PARAMETER :
+> -					SIGP_STATUS_INCORRECT_STATE);
+> +	*status_reg |= SIGP_STATUS_INVALID_PARAMETER;
+>   	return SIGP_CC_STATUS_STORED;
+>   }
+>   
+> 
 
-Ah, and it relies on kvm_make_all_cpus_request() to wait for vCPUs to ack the
-IRQ before updating apicv_inhibit_reasons, and then relies on kvm_vcpu_update_apicv()
-to stall on acquiring apicv_update_lock() so that the vCPU can't redo svm_vcpu_run()
-without seeing the new inhibit state.
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
-I'll drop this patch and send one to add comments, there are a lot of subtle/hidden
-dependencies here.  Setting the inhibit _after_ the request in particular needs a
-comment as it goes directly against the behavior of pretty much every other request
-flow.
+-- 
+Thanks,
 
-Thanks!
+David / dhildenb
+
