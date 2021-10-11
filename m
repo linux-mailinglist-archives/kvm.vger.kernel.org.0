@@ -2,87 +2,165 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 889CB4286B8
-	for <lists+kvm@lfdr.de>; Mon, 11 Oct 2021 08:19:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 03ECE4286D6
+	for <lists+kvm@lfdr.de>; Mon, 11 Oct 2021 08:29:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234095AbhJKGVq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Oct 2021 02:21:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44014 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233802AbhJKGVp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Oct 2021 02:21:45 -0400
-Received: from mail-oi1-x231.google.com (mail-oi1-x231.google.com [IPv6:2607:f8b0:4864:20::231])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3901C061570;
-        Sun, 10 Oct 2021 23:19:45 -0700 (PDT)
-Received: by mail-oi1-x231.google.com with SMTP id e63so2684942oif.8;
-        Sun, 10 Oct 2021 23:19:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=NQrmWWl63A33R8Wd94dEHY3g+CGyCI+tb3fF7nKj8Tk=;
-        b=Qr6rXhVxFmYhsK8m4vTD/HFq5b9rd47q4NAYOYhjdVQNA8cQrFbwvZp3iL3nB7Brir
-         4fx5ahVzODwaRFvhWN0Nl5VnyQ+5/W16F98AdIFeCrSyPX+6/MosKvLbRaDFVAhPEKsm
-         tjtUheEKRh7wNasOZIMdAhpkBjsaGmyOW8nrm7BMFd+1awDUYWD97reFJ8UrV15rd+E8
-         j4Owtm7OF/39OTog+A+t2JruMREZSDTRJ7qhPgaY60yjXFcOJMZdC+OboDtlyXLBfI67
-         aure4EGxvPLok7eHkLVaA1M1J0Dai7Y8hLzUspPsYKUnQszLklVDipUNuIlyEHZWCMA2
-         5X1g==
+        id S234171AbhJKGbd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Oct 2021 02:31:33 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26443 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234192AbhJKGbb (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 11 Oct 2021 02:31:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1633933771;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=KEdFLRNz/Q/R/jANyrfs68VmplqYNMsovniI6reLjIY=;
+        b=fyl6uq6C0FbaIs378mQx2jtLmOTjZq78InOlMXKavvKLdJTxwhuFoFb9/xTqMbWCOf6Fvd
+        Ocn80somEcvu8yppumnujgWT2NgyqU67/PRGkrzIPpJaGGU0AJ8uDSOV0eI+h9kzNGWV6z
+        /AMO/7EymRjNpwBaej0R/IZVvkpJPWE=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-475-LN8mIuwfPXih_rEstfSlsw-1; Mon, 11 Oct 2021 02:29:29 -0400
+X-MC-Unique: LN8mIuwfPXih_rEstfSlsw-1
+Received: by mail-wr1-f71.google.com with SMTP id r21-20020adfa155000000b001608162e16dso12369819wrr.15
+        for <kvm@vger.kernel.org>; Sun, 10 Oct 2021 23:29:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=NQrmWWl63A33R8Wd94dEHY3g+CGyCI+tb3fF7nKj8Tk=;
-        b=X5zL/P4QgQi8dDvEc4NgoFzD4IdrlBw7Cl9zORZIvyJH/kNVe24uYa6r8LdexVMpSy
-         8+PU66i8RjSUuiXdGE0nOdOaKKjgBlUMY2+6UUvrhFbwiODvxohM7l46ViDssE1ijGT6
-         +IxOZoA+1xp1zruXXHunPlZRYSmSD/sqGL5QJ90B5q+mYNzMV1XWkQ2W0t5r6/ZSbLo0
-         9kl59fTr6NJGyIoRXsWO0otoR/RHIe2wVy8nQqSofixAGsfrL0/uQpNaQXxo6/DIaWvb
-         zabIwirwGkMpGZwMiPNzI1SP/dGlQvtf1Pgidb+yh4Qlr6gbvDYcf1YOdmNAlMdrXigm
-         VEWA==
-X-Gm-Message-State: AOAM530t76T28BFlKK8zMTwkDFGqtObDJPvctaXiB00pEE1KfwgL1PEv
-        99BrB0jMp8e8JzNzkrI0kILnWAn61uXz5mssnGM=
-X-Google-Smtp-Source: ABdhPJwpC0UYINOki3htK4lif6uPz1mOCm8+UV47WtM2pOR+74uBDeBfpzt/VFYoVXyDSYXd6Us5FtsJmWt3/Ym5bxU=
-X-Received: by 2002:a05:6808:1211:: with SMTP id a17mr16766331oil.91.1633933185323;
- Sun, 10 Oct 2021 23:19:45 -0700 (PDT)
+        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=KEdFLRNz/Q/R/jANyrfs68VmplqYNMsovniI6reLjIY=;
+        b=OwltzcAU/XCgGaZf+JVI52TQzQqj49RG3a8NhmjVsfXQj0nPD9zOkhAAYZJO73V/jD
+         z9y/Dx5KAQcCTkXhc3pTd3dwPT/4fdku3XcuFw6m3I0IXYvmgEC5TICQl6mjQiv/hJQQ
+         nGncZ4PhLQfvVnn9xJztui0ufSZTQIpLs1TpTQSmQ1jfLqz6MA/3u6jez2ftjOyg1yld
+         dAZIZVDcNIxU/9fGWijtv3j9Gi6i6fYe2FunKVMiJi82P4JEwevGnkszH/9hEq7k+Lfd
+         3ur72Y0pMzI8Eey2H/TJuXHA8NY+QHPX3u57SH04aQI4kLm1On7oAYEQB7aEDhjj1cMs
+         cSmQ==
+X-Gm-Message-State: AOAM532sVOUPFlj6DJ5OXkEfo3VCuSxhMYJ4c1rDMmabSFVD6JKOQlEZ
+        qG7BpyAenasTV7mZAXx+YhXKv/mCZyOybSOuJMsUgVBOapq2g4PWAL6J3U4TgQiNLVc6fILDnmk
+        O4GvM4YtTyXkW
+X-Received: by 2002:a1c:2543:: with SMTP id l64mr19176095wml.9.1633933768644;
+        Sun, 10 Oct 2021 23:29:28 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy1o7EGjT31kVHA/qKateCR84NvgSWBjsArIHFhQbAyjn6eefrBnaIrBJXOScMkAYhaC113hQ==
+X-Received: by 2002:a1c:2543:: with SMTP id l64mr19176073wml.9.1633933768358;
+        Sun, 10 Oct 2021 23:29:28 -0700 (PDT)
+Received: from thuth.remote.csb (nat-pool-str-t.redhat.com. [149.14.88.106])
+        by smtp.gmail.com with ESMTPSA id f184sm6694880wmf.22.2021.10.10.23.29.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 10 Oct 2021 23:29:27 -0700 (PDT)
+To:     Eric Farman <farman@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Jason Herne <jjherne@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
+References: <20211008203112.1979843-1-farman@linux.ibm.com>
+ <20211008203112.1979843-2-farman@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+Subject: Re: [RFC PATCH v1 1/6] KVM: s390: Simplify SIGP Set Arch handling
+Message-ID: <912906c5-5932-c6d5-76c7-0751412c1344@redhat.com>
+Date:   Mon, 11 Oct 2021 08:29:26 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-References: <20211002124012.18186-1-ajaygargnsit@gmail.com>
- <b9afdade-b121-cc9e-ce85-6e4ff3724ed9@linux.intel.com> <CAHP4M8Us753hAeoXL7E-4d29rD9+FzUwAqU6gKNmgd8G0CaQQw@mail.gmail.com>
- <20211004163146.6b34936b.alex.williamson@redhat.com> <CAHP4M8UeGRSqHBV+wDPZ=TMYzio0wYzHPzq2Y+JCY0uzZgBkmA@mail.gmail.com>
- <CAHP4M8UD-k76cg0JmeZAwaWh1deSP82RCE=VC1zHQEYQmX6N9A@mail.gmail.com>
-In-Reply-To: <CAHP4M8UD-k76cg0JmeZAwaWh1deSP82RCE=VC1zHQEYQmX6N9A@mail.gmail.com>
-From:   Ajay Garg <ajaygargnsit@gmail.com>
-Date:   Mon, 11 Oct 2021 11:49:33 +0530
-Message-ID: <CAHP4M8VPem7xEtx3vQPm3bzCQif7JZFiXgiUGZVErTt5vhOF8A@mail.gmail.com>
-Subject: Re: [PATCH] iommu: intel: remove flooding of non-error logs, when
- new-DMA-PTE is the same as old-DMA-PTE.
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Lu Baolu <baolu.lu@linux.intel.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20211008203112.1979843-2-farman@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The flooding was seen today again, after I booted the host-machine in
-the morning.
-Need to look what the heck is going on ...
+On 08/10/2021 22.31, Eric Farman wrote:
+> The Principles of Operations describe the various reasons that
+> each individual SIGP orders might be rejected, and the status
+> bit that are set for each condition.
+> 
+> For example, for the Set Architecture order, it states:
+> 
+>    "If it is not true that all other CPUs in the configu-
+>     ration are in the stopped or check-stop state, ...
+>     bit 54 (incorrect state) ... is set to one."
+> 
+> However, it also states:
+> 
+>    "... if the CZAM facility is installed, ...
+>     bit 55 (invalid parameter) ... is set to one."
+> 
+> Since the Configuration-z/Architecture-Architectural Mode (CZAM)
+> facility is unconditionally presented, there is no need to examine
+> each VCPU to determine if it is started/stopped. It can simply be
+> rejected outright with the Invalid Parameter bit.
+> 
+> Fixes: b697e435aeee ("KVM: s390: Support Configuration z/Architecture Mode")
+> Signed-off-by: Eric Farman <farman@linux.ibm.com>
+> ---
+>   arch/s390/kvm/sigp.c | 14 +-------------
+>   1 file changed, 1 insertion(+), 13 deletions(-)
+> 
+> diff --git a/arch/s390/kvm/sigp.c b/arch/s390/kvm/sigp.c
+> index 683036c1c92a..cf4de80bd541 100644
+> --- a/arch/s390/kvm/sigp.c
+> +++ b/arch/s390/kvm/sigp.c
+> @@ -151,22 +151,10 @@ static int __sigp_stop_and_store_status(struct kvm_vcpu *vcpu,
+>   static int __sigp_set_arch(struct kvm_vcpu *vcpu, u32 parameter,
+>   			   u64 *status_reg)
+>   {
+> -	unsigned int i;
+> -	struct kvm_vcpu *v;
+> -	bool all_stopped = true;
+> -
+> -	kvm_for_each_vcpu(i, v, vcpu->kvm) {
+> -		if (v == vcpu)
+> -			continue;
+> -		if (!is_vcpu_stopped(v))
+> -			all_stopped = false;
+> -	}
+> -
+>   	*status_reg &= 0xffffffff00000000UL;
+>   
+>   	/* Reject set arch order, with czam we're always in z/Arch mode. */
+> -	*status_reg |= (all_stopped ? SIGP_STATUS_INVALID_PARAMETER :
+> -					SIGP_STATUS_INCORRECT_STATE);
+> +	*status_reg |= SIGP_STATUS_INVALID_PARAMETER;
+>   	return SIGP_CC_STATUS_STORED;
+>   }
 
-On Sun, Oct 10, 2021 at 11:45 AM Ajay Garg <ajaygargnsit@gmail.com> wrote:
->
-> > I'll try and backtrack to the userspace process that is sending these ioctls.
-> >
->
-> The userspace process is qemu.
->
-> I compiled qemu from latest source, installed via "sudo make install"
-> on host-machine, rebooted the host-machine, and booted up the
-> guest-machine on the host-machine. Now, no kernel-flooding is seen on
-> the host-machine.
->
-> For me, the issue is thus closed-invalid; admins may take the
-> necessary action to officially mark ;)
->
->
-> Thanks and Regards,
-> Ajay
+I was initially a little bit torn by this modification, since, as you 
+already mentioned, it could theoretically be possible that a userspace (like 
+an older version of QEMU) does not use CZAM bit yet. But then I read an 
+older version of the PoP which does not feature CZAM yet, and it reads:
+
+"The set-architecture order is completed as follows:
+• If the code in the parameter register is not 0, 1, or
+   2, or if the CPU is already in the architectural
+   mode specified by the code, the order is not
+   accepted. Instead, bit 55 (invalid parameter) of
+   the general register designated by the R 1 field of
+   the SIGNAL PROCESSOR instruction is set to
+   one, and condition code 1 is set.
+• If it is not true that all other CPUs in the configu-
+   ration are in the stopped or check-stop state, the
+   order is not accepted. Instead, bit 54 (incorrect
+   state) of the general register designated by the
+   R 1 field of the SIGNAL PROCESSOR instruction
+   is set to one, and condition code 1 is set.
+• The architectural mode of all CPUs in the config-
+   uration is set as specified by the code.
+   ..."
+
+So to me this sounds like "invalid parameter" has a higher priority than 
+"incorrect state" anyway, so we likely never
+should have reported here "incorrect state"...?
+
+Thus, I think it's the right way to go now:
+
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+
