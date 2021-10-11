@@ -2,98 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E39814288D1
-	for <lists+kvm@lfdr.de>; Mon, 11 Oct 2021 10:32:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 97B59428909
+	for <lists+kvm@lfdr.de>; Mon, 11 Oct 2021 10:43:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235045AbhJKIe4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Oct 2021 04:34:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46400 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234971AbhJKIez (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Oct 2021 04:34:55 -0400
-Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB372C061570
-        for <kvm@vger.kernel.org>; Mon, 11 Oct 2021 01:32:55 -0700 (PDT)
-Received: by mail-ed1-x52b.google.com with SMTP id a25so48791152edx.8
-        for <kvm@vger.kernel.org>; Mon, 11 Oct 2021 01:32:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=rOXsNrzY60uI0pgR5Z0rE9TCYzMRKq69zTlRtW3ar3Q=;
-        b=5Txo6x8f7LWi46N7oevu7OqzhT5gQ6mWAJ0kCcEy7l0G5xbs0/cfrXAFjSgzZW7poC
-         xPNpiPAMkDYw0WvSsXVOvtyfVRobeTrXmvFg+uCwQqOajlSd1qQJbdrxrr30tJD8WYNL
-         gd5tFDjPHyLI/HMIO/XjNa6hVC7rA3LaTPW7sShkm5p/y9/uYxFEGp6eWDNRnNTKPbXy
-         x/Xd7D+s4rmvMvZapMyOK/wVnge1mfOlD5mjse2c/uCU1FsiiL/9+qrjcvLQqdciyqZs
-         dk8UVLQRqC8Smgr/o8QSlb9aCgudkRHkkcM6DRh9XLsiCfV2YkpY1ruVRqXnlW2INYt3
-         A+Pg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=rOXsNrzY60uI0pgR5Z0rE9TCYzMRKq69zTlRtW3ar3Q=;
-        b=VnKm56Jl8HsNUc3uSyvvzQXo0zYwdGcpgC6XidU9j+0jY947KUdk3PsCMeMEkE9TAZ
-         8MbFlGuDeD5Gp6kyEtn7cXpRQejD6cll0sp8pn4Ssg7ZrAz78pi9PNyfRH+QdT79k++b
-         K7NYLnPqZw19Fip94wFoBu0NueHvKUIWqabQU3ulkQayonSCV8r7hCMRHaxRG2/wp2YE
-         RnwHB89l4FguudAuzQYGpRDf1ZSFyB6s+2TrlgW6gCKdx/sSgPmCTjEhqEBXF0ffN30F
-         RbzZAZMDrcSDp+xclTkCpgJiI4SDCXl5m38THH2/KfFTBHBcnqVbnNzTe8rGbhvVEjVZ
-         T8Vg==
-X-Gm-Message-State: AOAM533OHmIROgTowhTx9O3b0dfyYJUE8TRi6Xa9H0mwJpAV0INYZjra
-        DfihaToM/Z49/fmRE+jNwcByiTwe0uIZa4kf69fP
-X-Google-Smtp-Source: ABdhPJw0UGeuT5H5fcyL/6kzs+woGkopnu5gM0tI+8BJ6+813tHOWdOiXRVmSnyFXI6wzyWYaRuttbrMNqUffSWsei8=
-X-Received: by 2002:a50:d88b:: with SMTP id p11mr39341822edj.287.1633941174303;
- Mon, 11 Oct 2021 01:32:54 -0700 (PDT)
+        id S235245AbhJKIpm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Oct 2021 04:45:42 -0400
+Received: from mail.kernel.org ([198.145.29.99]:56368 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S234936AbhJKIpm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Oct 2021 04:45:42 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id A87B760EE3;
+        Mon, 11 Oct 2021 08:43:42 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1mZquK-00Fxvk-E6; Mon, 11 Oct 2021 09:43:40 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     eric.auger@redhat.com, kvm@vger.kernel.org, drjones@redhat.com,
+        alexandru.elisei@arm.com, kvmarm@lists.cs.columbia.edu,
+        Ricardo Koller <ricarkol@google.com>
+Cc:     pshier@google.com, jingzhangos@google.com, rananta@google.com,
+        reijiw@google.com, shuah@kernel.org, suzuki.poulose@arm.com,
+        james.morse@arm.com, Paolo Bonzini <pbonzini@redhat.com>,
+        oupton@google.com
+Subject: Re: [PATCH v4 00/11] KVM: arm64: vgic: Missing checks for REDIST/CPU and ITS regions above the VM IPA size
+Date:   Mon, 11 Oct 2021 09:43:33 +0100
+Message-Id: <163394180347.585098.13155475812069497023.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20211005011921.437353-1-ricarkol@google.com>
+References: <20211005011921.437353-1-ricarkol@google.com>
 MIME-Version: 1.0
-References: <20210831103634.33-1-xieyongji@bytedance.com> <6163E8A1.8080901@huawei.com>
- <CACycT3tBCdqPfLCTX4-ZDSos_hYPyBQu0xRHRu=ksaFk0k7_hA@mail.gmail.com>
-In-Reply-To: <CACycT3tBCdqPfLCTX4-ZDSos_hYPyBQu0xRHRu=ksaFk0k7_hA@mail.gmail.com>
-From:   Yongji Xie <xieyongji@bytedance.com>
-Date:   Mon, 11 Oct 2021 16:32:43 +0800
-Message-ID: <CACycT3tZbWpHg5D4rQqpSd3Yxz6zFCsUj+R=AGH0JRw0gEBNyg@mail.gmail.com>
-Subject: Re: [PATCH v13 00/13] Introduce VDUSE - vDPA Device in Userspace
-To:     Liuxiangdong <liuxiangdong5@huawei.com>
-Cc:     "Fangyi (Eric)" <eric.fangyi@huawei.com>, yebiaoxiang@huawei.com,
-        x86@kernel.org, kvm <kvm@vger.kernel.org>,
-        linux-fsdevel@vger.kernel.org,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: eric.auger@redhat.com, kvm@vger.kernel.org, drjones@redhat.com, alexandru.elisei@arm.com, kvmarm@lists.cs.columbia.edu, ricarkol@google.com, pshier@google.com, jingzhangos@google.com, rananta@google.com, reijiw@google.com, shuah@kernel.org, suzuki.poulose@arm.com, james.morse@arm.com, pbonzini@redhat.com, oupton@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 11, 2021 at 4:31 PM Yongji Xie <xieyongji@bytedance.com> wrote:
->
-> Hi Xiaodong,
->
-> On Mon, Oct 11, 2021 at 3:32 PM Liuxiangdong <liuxiangdong5@huawei.com> wrote:
-> >
-> > Hi, Yongji.
-> >
-> > I tried vduse with null-blk:
-> >
-> >    $ qemu-storage-daemon \
-> >        --chardev socket,id=charmonitor,path=/tmp/qmp.sock,server,nowait \
-> >        --monitor chardev=charmonitor \
-> >        --blockdev
-> > driver=host_device,cache.direct=on,aio=native,filename=/dev/nullb0,node-name=disk0
-> > \
-> >        --export
-> > type=vduse-blk,id=test,node-name=disk0,writable=on,name=vduse-null,num-queues=16,queue-size=128
-> >
-> > The qemu-storage-daemon is yours
-> > (https://github.com/bytedance/qemu/tree/vduse)
-> >
-> > And then, how can we use this vduse-null (dev/vduse/vduse-null) in vm(QEMU)?
-> >
->
-> Then we need to attach this device to vdpa bus via vdpa tool [1]:
->
-> # vdpa dev add vduse-null mgmtdev vduse
->
+On Mon, 4 Oct 2021 18:19:10 -0700, Ricardo Koller wrote:
+> KVM doesn't check for redist, CPU interface, and ITS regions that extend
+> partially above the guest addressable IPA range (phys_size).  This can happen
+> when using the V[2|3]_ADDR_TYPE_CPU, ADDR_TYPE_REDIST[_REGION], or
+> ITS_ADDR_TYPE attributes to set a new region that extends partially above
+> phys_size (with the base below phys_size).  The issue is that vcpus can
+> potentially run into a situation where some redistributors are addressable and
+> others are not, or just the first half of the ITS is addressable.
+> 
+> [...]
 
-It should be:
+Applied to next, thanks!
 
-# vdpa dev add name vduse-null mgmtdev vduse
+[01/11] kvm: arm64: vgic: Introduce vgic_check_iorange
+        commit: f25c5e4dafd859b941a4654cbab9eb83ff994bcd
+[02/11] KVM: arm64: vgic-v3: Check redist region is not above the VM IPA size
+        commit: 4612d98f58c73ad63928200fd332f75c8e524dae
+[03/11] KVM: arm64: vgic-v2: Check cpu interface region is not above the VM IPA size
+        commit: c56a87da0a7fa14180082249ac954c7ebc9e74e1
+[04/11] KVM: arm64: vgic-v3: Check ITS region is not above the VM IPA size
+        commit: 2ec02f6c64f043a249850c835ca7975c3a155d8b
+[05/11] KVM: arm64: vgic: Drop vgic_check_ioaddr()
+        commit: 96e903896969679104c7fef2c776ed1b5b09584f
+[06/11] KVM: arm64: selftests: Make vgic_init gic version agnostic
+        commit: 3f4db37e203b0562d9ebae575af13ea159fbd077
+[07/11] KVM: arm64: selftests: Make vgic_init/vm_gic_create version agnostic
+        commit: 46fb941bc04d3541776c09c2bf641e7f34e62a01
+[08/11] KVM: arm64: selftests: Add some tests for GICv2 in vgic_init
+        commit: c44df5f9ff31daaa72b3a673422d5cca03a1fd02
+[09/11] KVM: arm64: selftests: Add tests for GIC redist/cpuif partially above IPA range
+        commit: 2dcd9aa1c3a5d3c90047d67efd08f0518f915449
+[10/11] KVM: arm64: selftests: Add test for legacy GICv3 REDIST base partially above IPA range
+        commit: 1883458638979531fc4fcbc26d15fec3e51e1734
+[11/11] KVM: arm64: selftests: Add init ITS device test
+        commit: 3e197f17b23ba7c1a3c7cb1d27f7494444aa42e3
 
-Thanks,
-Yongji
+Cheers,
+
+	M.
+-- 
+Without deviation from the norm, progress is not possible.
+
+
