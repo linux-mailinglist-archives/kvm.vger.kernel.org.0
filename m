@@ -2,80 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E682D428B5B
-	for <lists+kvm@lfdr.de>; Mon, 11 Oct 2021 12:56:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 86949428BE6
+	for <lists+kvm@lfdr.de>; Mon, 11 Oct 2021 13:24:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236092AbhJKK6E (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Oct 2021 06:58:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51476 "EHLO
+        id S236226AbhJKL0w (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Oct 2021 07:26:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58028 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236064AbhJKK6C (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Oct 2021 06:58:02 -0400
-Received: from mail-wr1-x443.google.com (mail-wr1-x443.google.com [IPv6:2a00:1450:4864:20::443])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E567EC061769
-        for <kvm@vger.kernel.org>; Mon, 11 Oct 2021 03:56:01 -0700 (PDT)
-Received: by mail-wr1-x443.google.com with SMTP id r7so54819347wrc.10
-        for <kvm@vger.kernel.org>; Mon, 11 Oct 2021 03:56:01 -0700 (PDT)
+        with ESMTP id S236223AbhJKL0w (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Oct 2021 07:26:52 -0400
+Received: from mail-yb1-xb2a.google.com (mail-yb1-xb2a.google.com [IPv6:2607:f8b0:4864:20::b2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4050DC061570
+        for <kvm@vger.kernel.org>; Mon, 11 Oct 2021 04:24:52 -0700 (PDT)
+Received: by mail-yb1-xb2a.google.com with SMTP id w10so38210732ybt.4
+        for <kvm@vger.kernel.org>; Mon, 11 Oct 2021 04:24:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:reply-to:from:date:message-id:subject:to;
-        bh=DOxN63QWnl4dBNWQl+LufsBrewR+8VuPJnGph7ijSeE=;
-        b=km/+rwE10MGCG3K0BNjxD+A2l394aMlSCDFqBEiDyrs45mObKwVEkOccUp5BPFftJU
-         5cB06txNzUPVxcrxQnkqMq9zaxAqQeR9eoa3+7DqnAg3rX7wMze/dloERdrhczopiGET
-         PvxtLks7kWCMKTs5Q8Mmq12LwUKUT5cPH1x1mszpEwl0kuXWAYNTl0kX4+cL3oWAj8+a
-         6an2wLimFEmscCT9jtQf7FGYav0q/UTa6GRCeFihab7mYp8KZTVzyAi9ONxHllw1wfay
-         OSS3CoE7RnQ2PFKTnc/5Yya8gHnSshWvMzermo1msudbBS7MTk09iY8fA6ci8A/KmFSk
-         +E4A==
+        h=mime-version:sender:from:date:message-id:subject:to;
+        bh=EggiArwUHdzlhhZ9X3Lz0fb6bTSzjLRY73Yy7pjfbDw=;
+        b=K2FEb0SAz/XV2uQ8UskzN2LVTL1Jq4YNfZA1j7qY9E8Kkx16SvbwzHJ5RAzqdtz/cQ
+         tgPhFhI8HLDjv8WT/uGSgRrAZdFshoA/o7iGW0VOQGgBKzPQvww1lfd66Pn3W4Ubi4uv
+         3n7BUaQ5T02e5JmYERWi3gegOGmJj9DOdNljB1q//aflfJ8Iy3iMJAy7oH0nr6PXT2Nu
+         Bd4535ZmciONvIjymV7N+8L5+C8agROg21vrfPegcZeB6nRfxtNoybcC8Eko7hOHq+yM
+         6rR3vNeQCxq5ngUJKHDGJAR72Dziwmi1LYplHhF+hoxy0dccD3bgMGLKmBmiEF9ukJ/V
+         fykw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to;
-        bh=DOxN63QWnl4dBNWQl+LufsBrewR+8VuPJnGph7ijSeE=;
-        b=Hc/HIoLTQVSJr1MOkz9ZGa15V8PX9jf/ImnNM0ul344UnM4YLplKwwe2Ar/2QcfzKD
-         9Qei8GJhiiVFCPxMSqOQxWsvYlol9swueQGmH/CxHlYlcz2mAI82g9145HeKCL/7Blv0
-         oj55NbozkpwH7bJYIRKm8+sON1sRTGx47hUi4vz9NqcrPiOG3wgdSEzzczqgZq0hGlXf
-         bmmz45w4qt/3qsJD9trn7hOWhwfU8TdkF/r9FVec19tToge83jZrjQdFLjukt+WU2Muk
-         vknUCOGJIbNftH35kVzTAP7oZOU8zwpTJNmknfJ0gDSgIpB5/C8Fxb3kI5jkORU2IgXd
-         SwaA==
-X-Gm-Message-State: AOAM530vmMmbfXLyB5G9nmyPmf2ltleMTDgthg5TlP1XVPakmGxZfFRm
-        i39k1V36v7Ya93Rp+aHxpZ9l5+ql1IB+R1ZdtoY=
-X-Google-Smtp-Source: ABdhPJxWYMUVxuj7Tly9azrkWxEMXzTPZAklmoVIH4V2ykknMMiBN9imOFz2zTqxux/zk/7pzvFSRlX+C6mfjc7ADy4=
-X-Received: by 2002:adf:8b9a:: with SMTP id o26mr24377548wra.109.1633949760323;
- Mon, 11 Oct 2021 03:56:00 -0700 (PDT)
+        h=x-gm-message-state:mime-version:sender:from:date:message-id:subject
+         :to;
+        bh=EggiArwUHdzlhhZ9X3Lz0fb6bTSzjLRY73Yy7pjfbDw=;
+        b=Ymv3C9HL2exkCiEwTcsoU0+uWwkCzfFh41ZJdd6L4iUQfL4A7zYecrz0mjNrAqKk/0
+         BLh/bNiJqLgWF9pheh/xJSnWrXULiIrxkM3wxr1XZurrrEt1SiYSlPhkZomwqjlV0o8n
+         xRh9lcY4SKsO89JehKm0O4G+sJSjgcdcvAIQAk/DqJliWGPwSFDSlC7Imufjg8tfi1jl
+         B8mOYRQhwhzNEExcAmJlU7UMyZatSEsPSuGSN048Q3Pj3sfXrI8LSbIcjA8lpPrbDTmf
+         slFtr1j3bAN+KBwF8ITtcR5kDMkTA/zDbtevY8McXmodqR4LmSl3e+jQaeWfgAT5zjO/
+         68Iw==
+X-Gm-Message-State: AOAM530KBvejdOs1OyRhdlZ6vGd6/D5sMmKprAVD4qXgrtRWxUp7aVbX
+        WafV5r++gtBMxNskgVEzJGn5XJYZe8U91BCg9rU=
+X-Google-Smtp-Source: ABdhPJy3BJ3zByQbt+eb1K48tkFE5z+E50QCVrntnim/6eCbMzkCUgctM0YrBAxJ5foiW6Pvpd6wFeKJpkkOwtmHUf4=
+X-Received: by 2002:a25:5545:: with SMTP id j66mr19883648ybb.288.1633951490618;
+ Mon, 11 Oct 2021 04:24:50 -0700 (PDT)
 MIME-Version: 1.0
-Received: by 2002:adf:dd8c:0:0:0:0:0 with HTTP; Mon, 11 Oct 2021 03:55:59
+Sender: mrrnra.kabore@gmail.com
+Received: by 2002:a05:7000:a1c2:0:0:0:0 with HTTP; Mon, 11 Oct 2021 04:24:49
  -0700 (PDT)
-Reply-To: ramcharan9910@outlook.com
-From:   "Cr.David Ramcharan" <convy0101@gmail.com>
-Date:   Mon, 11 Oct 2021 03:55:59 -0700
-Message-ID: <CADDRs95718H=K3tUjphEHH_C96xYhoJw7jeCMpt_FfZZjhEXrA@mail.gmail.com>
-Subject: Thank You
+From:   Anderson Thereza <anderson.thereza24@gmail.com>
+Date:   Mon, 11 Oct 2021 04:24:49 -0700
+X-Google-Sender-Auth: IPX-NKCH3a3W2vjQuLOeWPvxtzw
+Message-ID: <CAObd1cr-xvwN24VOUHh2-BUfW+A1VeLZfuwK4fJiR7P7y4qYNw@mail.gmail.com>
+Subject: Re: Greetings My Dear,
 To:     undisclosed-recipients:;
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Please I am writing to notify you again on my intention to list your
-name as a beneficiary to the total sum of GBP6.350 million (Six
-million, Three hundred and fifty thousand British Pounds Sterlings) in
-the intent of the deceased (name now withheld since this is my second
-letter to you).
+Greetings,
 
-I contacted you because you bear the surname identity and therefore
-can present you as the beneficiary to inherit the account proceeds of
-the deceased since there is no written "WILL" or trace to the deceased
-family relatives. My aim is to present you to my Bank Authorities as
-the Next of Kin to our deceased client. I will guide you all through
-the Claim procedure by providing all relevant Information and guiding
-you in your decisions and response to the Bank Management. All the
-papers will be processed after your acceptance.
+I sent this mail praying it will find you in a good condition, since I
+myself am in a very critical health condition in which I sleep every
+night without knowing if I may be alive to see the next day. I am
+Mrs.Theresa Anderson, a widow suffering from a long time illness. I
+have some funds I inherited from my late husband, the sum of
+($11,000,000.00, Eleven Million Dollars) my Doctor told me recently
+that I have serious sickness which is a cancer problem. What disturbs
+me most is my stroke sickness. Having known my condition, I decided to
+donate this fund to a good person that will utilize it the way I am
+going to instruct herein. I need a very honest God.
 
-In your acceptance of this deal, I request that you kindly forward to
-me your letter of acceptance; your current telephone and fax numbers
-,age, occupational status and a forwarding address to enable me submit
-to the Bank Management the details as the Next of Kin to their
-deceased customer. Reply strictly through: ramcharancrdavid@gmail.com
+fearing a person who can claim this money and use it for Charity
+works, for orphanages, widows and also build schools for less
+privileges that will be named after my late husband if possible and to
+promote the word of God and the effort that the house of God is
+maintained. I do not want a situation where this money will be used in
+an ungodly manner. That's why I' making this decision. I'm not afraid
+of death so I know where I'm going. I accept this decision because I
+do not have any child who will inherit this money after I die. Please
+I want your sincere and urgent answer to know if you will be able to
+execute this project, and I will give you more information on how the
+fund will be transferred to your bank account. I am waiting for your
+reply.
 
-Yours faithfully,
-Cr.David Ramcharan
+May God Bless you,
+Mrs.Theresa Anderson.
