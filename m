@@ -2,163 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A3C4842986C
-	for <lists+kvm@lfdr.de>; Mon, 11 Oct 2021 22:51:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BE9F942989B
+	for <lists+kvm@lfdr.de>; Mon, 11 Oct 2021 23:07:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235087AbhJKUxd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Oct 2021 16:53:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47674 "EHLO
+        id S235135AbhJKVJU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Oct 2021 17:09:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51180 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234728AbhJKUxc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Oct 2021 16:53:32 -0400
-Received: from mail-oo1-xc31.google.com (mail-oo1-xc31.google.com [IPv6:2607:f8b0:4864:20::c31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5361CC06161C
-        for <kvm@vger.kernel.org>; Mon, 11 Oct 2021 13:51:32 -0700 (PDT)
-Received: by mail-oo1-xc31.google.com with SMTP id w9-20020a4adec9000000b002b696945457so5259569oou.10
-        for <kvm@vger.kernel.org>; Mon, 11 Oct 2021 13:51:32 -0700 (PDT)
+        with ESMTP id S230299AbhJKVJT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Oct 2021 17:09:19 -0400
+Received: from mail-io1-xd30.google.com (mail-io1-xd30.google.com [IPv6:2607:f8b0:4864:20::d30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35748C061570
+        for <kvm@vger.kernel.org>; Mon, 11 Oct 2021 14:07:19 -0700 (PDT)
+Received: by mail-io1-xd30.google.com with SMTP id i189so13621369ioa.1
+        for <kvm@vger.kernel.org>; Mon, 11 Oct 2021 14:07:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=Rn09d7caDfoCbeJ1oRsOFnGTsCgujh7Av70+yx/v1WI=;
-        b=IhgME2s1Lw/QYpkgDbnn0nQRygV74w2OrP3PH3TYuBCg5K7lDyq+RPZFd5OHiv1V7V
-         8AA/50E48T7mbhSgUMuJJoS0KhXDLPE25pT7MaZa0XrNES4VnIrnJkm1PBnZoqN5c5oN
-         y7KQsN/gc8JMyXx1PfrSnVTOojAy/Sj8mDvNWSCBYszrVFy51N0aC06AldZ+sp7Z5DyE
-         AihXd3C9TVowWnZIZgFSAYYwhxeP9BCj1LkhPnScdFS++vXtYNzuym4C2zCr0ofa6+M9
-         yRz2bHqAzt+9hpTvtXU9ZmDntB20zhqFBhfbllc6GgUOSv0qPIKJ9ymCZXuMbiqBxxfv
-         FrOQ==
+        bh=NXJkhPO8JlVoNXyrvPyexOdkensEvhVOevutI0g6qPw=;
+        b=moM1ePaYrIf+Unmm9Wh3ZHkd9LVplgg+1h1XWHIi8Gkg0nQNPW5QSluo1g3pJaJBuD
+         pGhfcARAmwJDROx0RohyWSojRcAc4CFOZ62m5Gd9N2kbh2ogx5y2KI1AsPMBoGT2xlVQ
+         lEpqvqcQgbYA/AHm9+KVtMMGtW6vpwDMOSP+mryE/3eSyqLOFzz+WdALlO0hoEOfwApX
+         rUWGy0f2u3wnVPJNWLUDriVEangoYFU5Kmjs8NYmPIHI+n8PTV2nftWuZqA2eqU4uLg+
+         nQo2pdCTSPbvGORKNWQpCdA9O6hi2obJAxkqc7QTgHA2/WtW3SCPc5Z/j0+F/VNpIoRh
+         Z9dA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=Rn09d7caDfoCbeJ1oRsOFnGTsCgujh7Av70+yx/v1WI=;
-        b=hspkgaZMccm8Lwv+0CLzTpjgBShaHXqPGTUzGz3QxJ9KoHl8B+3TtRILl2qPG7eZK8
-         fAvVqpk4Jnsq9AFJVwYH4BAQRUBfqi5jAfP3YSBFo0O7AXcrJFtkYCbNkdYKSvVGicWL
-         deW6gQbOs8QWPPe9TQjCZP+TmwzSfPP6r/MO4w6ja6sDMLkLHJoKsWHRniCUkQh08yZ4
-         LS/b4z5jgcV3lQGYmXJA4f2UH+VwoTAmfPs+9fdKGi0d9IRi4pow8g/VmKwqkeNLULcU
-         F/jr78EWztQskK4pDEtAQ/zlQVzvutOWPgJKWk/BKbMpkKJ/fqmpeSKuy62wkQyIQLDU
-         6VtA==
-X-Gm-Message-State: AOAM5315K1ail/AkviUA9Uilwn5xvX/W3q3ILI2BcFRV9Ugi6AZwHJ3v
-        EPlmvV5ja47gCfT9nfVQfVyC0qp00+RiFeKyN0FQYA==
-X-Google-Smtp-Source: ABdhPJw1SEPgrTzAzcFlHjeqFH5OMD09k/R0xvA4RipgQ0bJP5ZZLoKzkZzlFuqKK6OL8cCzwu0pdBUZIQ7SHYC9q+I=
-X-Received: by 2002:a4a:c993:: with SMTP id u19mr2904192ooq.31.1633985491354;
- Mon, 11 Oct 2021 13:51:31 -0700 (PDT)
+        bh=NXJkhPO8JlVoNXyrvPyexOdkensEvhVOevutI0g6qPw=;
+        b=11zgmZRn6CxpeYrbWSsx84IHWuVecb9TC6WLsnui3AsMl4b9xlOBymdcWHxsKC6cRY
+         TrotWWgU5M82IOb6X7rUcjtH2BPDAqLpOGRBmWg1dxWQjOMyG+OmAyKi7V48xjrU5b+/
+         bOnhVANUqttgzwCMBoNl4KbK3fxxJvQnrczEFxFbEndcMOc2qZ5tIvJwuj3DodsUb9p9
+         jOPQ5Yz+mjFZ71vfLx4XWF0EhvrCcrPDCQyUZkY8I8XkK2xTZHsXX6jvzmvxmu/s3SvV
+         Hkt57Km9yqgIrU9XmFB+WNBG8PR1vUl/bPCZwrZo8yk/md0WkERJL9QgVzNC4b5d9bHz
+         32RA==
+X-Gm-Message-State: AOAM5337L0pOtJFPGmtejuiJ9z6S0NN17/QN43FoA9A+iFpGXtop3mOx
+        0IiDHyzNdCBki1OUmAtpcKQGgU2CvYGHNNQvNc/K1LkMqhE=
+X-Google-Smtp-Source: ABdhPJxx7sos4yk50Gq7m6MUrwUq3E/0CA2W1mAjAd36TdEvboyiiZpPko5AFdSLOZzKG9AVS0rG+8be5plzwDdSQbA=
+X-Received: by 2002:a02:6048:: with SMTP id d8mr20009260jaf.61.1633986438412;
+ Mon, 11 Oct 2021 14:07:18 -0700 (PDT)
 MIME-Version: 1.0
-References: <20211011194615.2955791-1-vipinsh@google.com> <YWSdTpkzNt3nppBc@google.com>
-In-Reply-To: <YWSdTpkzNt3nppBc@google.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Mon, 11 Oct 2021 13:51:20 -0700
-Message-ID: <CALMp9eRzPXg2WS6-Yy6U90+B8wXm=zhVSkmAym4Y924m7FM-7g@mail.gmail.com>
-Subject: Re: [PATCH] KVM: VMX: Add a wrapper for reading INVPCID/INVEPT/INVVPID
- type
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Vipin Sharma <vipinsh@google.com>, pbonzini@redhat.com,
-        dmatlack@google.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
+References: <20211011204418.162846-1-dmatlack@google.com>
+In-Reply-To: <20211011204418.162846-1-dmatlack@google.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Mon, 11 Oct 2021 14:07:07 -0700
+Message-ID: <CANgfPd9R5kv-URf2huH8NBmggrh_1wfa+ap=1QRWN4YdJHCXEQ@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86/mmu: Rename slot_handle_leaf to slot_handle_level_4k
+To:     David Matlack <dmatlack@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Sean Christopherson <seanjc@google.com>,
+        Junaid Shahid <junaids@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 11, 2021 at 1:23 PM Sean Christopherson <seanjc@google.com> wrote:
+On Mon, Oct 11, 2021 at 1:44 PM David Matlack <dmatlack@google.com> wrote:
 >
-> On Mon, Oct 11, 2021, Vipin Sharma wrote:
-> > Add a common helper function to read invalidation type specified by a
-> > trapped INVPCID/INVEPT/INVVPID instruction.
-> >
-> > Add a symbol constant for max INVPCID type.
-> >
-> > No functional change intended.
-> >
-> > Signed-off-by: Vipin Sharma <vipinsh@google.com>
-> > ---
-> >  arch/x86/include/asm/invpcid.h |  1 +
-> >  arch/x86/kvm/vmx/nested.c      |  4 ++--
-> >  arch/x86/kvm/vmx/vmx.c         |  4 ++--
-> >  arch/x86/kvm/vmx/vmx.h         | 12 ++++++++++++
-> >  4 files changed, 17 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/arch/x86/include/asm/invpcid.h b/arch/x86/include/asm/invpcid.h
-> > index 734482afbf81..b5ac26784c1b 100644
-> > --- a/arch/x86/include/asm/invpcid.h
-> > +++ b/arch/x86/include/asm/invpcid.h
-> > @@ -21,6 +21,7 @@ static inline void __invpcid(unsigned long pcid, unsigned long addr,
-> >  #define INVPCID_TYPE_SINGLE_CTXT     1
-> >  #define INVPCID_TYPE_ALL_INCL_GLOBAL 2
-> >  #define INVPCID_TYPE_ALL_NON_GLOBAL  3
-> > +#define INVPCID_TYPE_MAX             3
+> slot_handle_leaf is a misnomer because it only operates on 4K SPTEs
+> whereas "leaf" is used to describe any valid terminal SPTE (4K or
+> large page). Rename slot_handle_leaf to slot_handle_level_4k to
+> avoid confusion.
 >
-> ...
+> Making this change makes it more obvious there is a benign discrepency
+> between the legacy MMU and the TDP MMU when it comes to dirty logging.
+> The legacy MMU only operates on 4K SPTEs when zapping for collapsing
+> and when clearing D-bits. The TDP MMU, on the other hand, operates on
+> SPTEs on all levels. The TDP MMU behavior is technically overkill but
+> not incorrect. So opportunistically add comments to explain the
+> difference.
+
+Note that at least in the zapping case when disabling dirty logging,
+the TDP MMU will still only zap pages if they're mapped smaller than
+the highest granularity they could be. As a result it uses a slower
+check, but shouldn't be doing many (if any) extra zaps.
+
 >
-> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > index 1c8b2b6e7ed9..77f72a41dde3 100644
-> > --- a/arch/x86/kvm/vmx/vmx.c
-> > +++ b/arch/x86/kvm/vmx/vmx.c
-> > @@ -5502,9 +5502,9 @@ static int handle_invpcid(struct kvm_vcpu *vcpu)
-> >       }
-> >
-> >       vmx_instruction_info = vmcs_read32(VMX_INSTRUCTION_INFO);
-> > -     type = kvm_register_read(vcpu, (vmx_instruction_info >> 28) & 0xf);
-> > +     type = vmx_read_invalidation_type(vcpu, vmx_instruction_info);
+> Signed-off-by: David Matlack <dmatlack@google.com>
+
+Reviewed-by: Ben Gardon <bgardon@google.com>
+
+> ---
+>  arch/x86/kvm/mmu/mmu.c | 18 +++++++++++++-----
+>  1 file changed, 13 insertions(+), 5 deletions(-)
 >
-> I would prefer to keep the register read visibile in this code so that it's
-> obvious what exactly is being read.  With this approach, it's not clear that KVM
-> is reading a GPR vs. VMCS vs. simply extracting "type" from "vmx_instruction_info".
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 24a9f4c3f5e7..f00644e79ef5 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -5382,8 +5382,8 @@ slot_handle_level(struct kvm *kvm, const struct kvm_memory_slot *memslot,
+>  }
 >
-> And it's not just the INV* instruction, VMREAD and VMWRITE use the same encoding.
+>  static __always_inline bool
+> -slot_handle_leaf(struct kvm *kvm, const struct kvm_memory_slot *memslot,
+> -                slot_level_handler fn, bool flush_on_yield)
+> +slot_handle_level_4k(struct kvm *kvm, const struct kvm_memory_slot *memslot,
+> +                    slot_level_handler fn, bool flush_on_yield)
+>  {
+>         return slot_handle_level(kvm, memslot, fn, PG_LEVEL_4K,
+>                                  PG_LEVEL_4K, flush_on_yield);
+> @@ -5772,7 +5772,12 @@ void kvm_mmu_zap_collapsible_sptes(struct kvm *kvm,
 >
-> The hardest part is coming up with a name :-)  Maybe do the usually-ill-advised
-> approach of following the SDM verbatim?  Reg2 is common to all flavors, so this?
+>         if (kvm_memslots_have_rmaps(kvm)) {
+>                 write_lock(&kvm->mmu_lock);
+> -               flush = slot_handle_leaf(kvm, slot, kvm_mmu_zap_collapsible_spte, true);
+> +               /*
+> +                * Strictly speaking only 4k SPTEs need to be zapped because
+> +                * KVM never creates intermediate 2m mappings when performing
+> +                * dirty logging.
+> +                */
+> +               flush = slot_handle_level_4k(kvm, slot, kvm_mmu_zap_collapsible_spte, true);
+>                 if (flush)
+>                         kvm_arch_flush_remote_tlbs_memslot(kvm, slot);
+>                 write_unlock(&kvm->mmu_lock);
+> @@ -5809,8 +5814,11 @@ void kvm_mmu_slot_leaf_clear_dirty(struct kvm *kvm,
 >
->         gpr_index = vmx_get_instr_info_reg2(vmx_instruction_info);
->         type = kvm_register_read(vcpu, gpr_index);
->
-> >
-> > -     if (type > 3) {
-> > +     if (type > INVPCID_TYPE_MAX) {
->
-> Hrm, I don't love this because it's not auto-updating in the unlikely chance that
-> a new type is added.  I definitely don't like open coding '3' either.  What about
-> going with a verbose option of
->
->         if (type != INVPCID_TYPE_INDIV_ADDR &&
->             type != INVPCID_TYPE_SINGLE_CTXT &&
->             type != INVPCID_TYPE_ALL_INCL_GLOBAL &&
->             type != INVPCID_TYPE_ALL_NON_GLOBAL) {
->                 kvm_inject_gp(vcpu, 0);
->                 return 1;
+>         if (kvm_memslots_have_rmaps(kvm)) {
+>                 write_lock(&kvm->mmu_lock);
+> -               flush = slot_handle_leaf(kvm, memslot, __rmap_clear_dirty,
+> -                                        false);
+> +               /*
+> +                * Strictly speaking only 4k SPTEs need to be cleared because
+> +                * KVM always performs dirty logging at a 4k granularity.
+> +                */
+> +               flush = slot_handle_level_4k(kvm, memslot, __rmap_clear_dirty, false);
+>                 write_unlock(&kvm->mmu_lock);
 >         }
-
-Better, perhaps, to introduce a new function, valid_invpcid_type(),
-and squirrel away the ugliness there?
-
-> It's kind of gross, but gcc10 is smart enought to coalesce those all into a single
-> CMP <reg>, 3; JA <#GP>, i.e. the resulting binary is identical.
 >
-> >               kvm_inject_gp(vcpu, 0);
-> >               return 1;
-> >       }
-> > diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-> > index 592217fd7d92..eeafcce57df7 100644
-> > --- a/arch/x86/kvm/vmx/vmx.h
-> > +++ b/arch/x86/kvm/vmx/vmx.h
-> > @@ -522,4 +522,16 @@ static inline bool vmx_guest_state_valid(struct kvm_vcpu *vcpu)
-> >
-> >  void dump_vmcs(struct kvm_vcpu *vcpu);
-> >
-> > +/*
-> > + * When handling a VM-exit for one of INVPCID, INVEPT or INVVPID, read the type
-> > + * of invalidation specified by the instruction.
-> > + */
-> > +static inline unsigned long vmx_read_invalidation_type(struct kvm_vcpu *vcpu,
-> > +                                                    u32 vmx_instr_info)
-> > +{
-> > +     u32 vmx_instr_reg2 = (vmx_instr_info >> 28) & 0xf;
-> > +
-> > +     return kvm_register_read(vcpu, vmx_instr_reg2);
-> > +}
-> > +
-> >  #endif /* __KVM_X86_VMX_H */
-> > --
-> > 2.33.0.882.g93a45727a2-goog
-> >
+> --
+> 2.33.0.882.g93a45727a2-goog
+>
