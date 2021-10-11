@@ -2,123 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B383F429374
-	for <lists+kvm@lfdr.de>; Mon, 11 Oct 2021 17:33:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C773242941F
+	for <lists+kvm@lfdr.de>; Mon, 11 Oct 2021 18:04:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239197AbhJKPfi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Oct 2021 11:35:38 -0400
-Received: from mail.kernel.org ([198.145.29.99]:54654 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233815AbhJKPff (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Oct 2021 11:35:35 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S231672AbhJKQGi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Oct 2021 12:06:38 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:20026 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231197AbhJKQGh (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 11 Oct 2021 12:06:37 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1633968276;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=VE5d3qtVIgtuQN+sYrF0cciRxqV/T6DzbUq3njMBHRM=;
+        b=CX3A1B+TAaZNtT3btixP7+Q88DoSWvw1k72TlahDHtUW38t97Av2tYLZK9D1o0Ki7QnG38
+        a+XZ8unuLRdQ3t8WNfi6FbT5OxWAZRxaYvZ6hbltrXYqW004InB/+zriydAP7uiYX3moWD
+        LEtXlggYC6SpH2HyScJo8LQkXZi9ROg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-191-KyYlGzIfMn2nw3jZ5Kjr8w-1; Mon, 11 Oct 2021 12:04:35 -0400
+X-MC-Unique: KyYlGzIfMn2nw3jZ5Kjr8w-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 3481760C49;
-        Mon, 11 Oct 2021 15:33:35 +0000 (UTC)
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <maz@kernel.org>)
-        id 1mZxIy-00G3oP-Qe; Mon, 11 Oct 2021 16:33:33 +0100
-Date:   Mon, 11 Oct 2021 16:33:31 +0100
-Message-ID: <87lf2zpodw.wl-maz@kernel.org>
-From:   Marc Zyngier <maz@kernel.org>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Peter Zijlstra <peterz@infradead.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Will Deacon <will@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Guo Ren <guoren@kernel.org>, Nick Hu <nickhu@andestech.com>,
-        Greentime Hu <green.hu@gmail.com>,
-        Vincent Chen <deanbo422@gmail.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Juergen Gross <jgross@suse.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@redhat.com>,
-        Namhyung Kim <namhyung@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        linux-arm-kernel@lists.infradead.org,
-        linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, linux-csky@vger.kernel.org,
-        linux-riscv@lists.infradead.org, kvm@vger.kernel.org,
-        xen-devel@lists.xenproject.org,
-        Artem Kashkanov <artem.kashkanov@intel.com>,
-        Like Xu <like.xu.linux@gmail.com>,
-        Zhu Lingshan <lingshan.zhu@intel.com>
-Subject: Re: [PATCH v3 12/16] KVM: Move x86's perf guest info callbacks to generic KVM
-In-Reply-To: <YWROQSGPuPf3wfC9@google.com>
-References: <20210922000533.713300-1-seanjc@google.com>
-        <20210922000533.713300-13-seanjc@google.com>
-        <87wnmjq4y3.wl-maz@kernel.org>
-        <YWROQSGPuPf3wfC9@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: seanjc@google.com, peterz@infradead.org, mingo@redhat.com, acme@kernel.org, will@kernel.org, mark.rutland@arm.com, guoren@kernel.org, nickhu@andestech.com, green.hu@gmail.com, deanbo422@gmail.com, paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, pbonzini@redhat.com, boris.ostrovsky@oracle.com, jgross@suse.com, alexander.shishkin@linux.intel.com, jolsa@redhat.com, namhyung@kernel.org, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org, sstabellini@kernel.org, linux-arm-kernel@lists.infradead.org, linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-csky@vger.kernel.org, linux-riscv@lists.infradead.org, kvm@vger.kernel.org, xen-devel@lists.xenproject.org, artem.kashkanov@intel.com, like.xu.linux@gmail.com, lingshan.zhu@intel.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6EB3319253C0
+        for <kvm@vger.kernel.org>; Mon, 11 Oct 2021 16:04:34 +0000 (UTC)
+Received: from gator.redhat.com (unknown [10.40.192.24])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0B93810023AE;
+        Mon, 11 Oct 2021 16:04:21 +0000 (UTC)
+From:   Andrew Jones <drjones@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     eric.auger@redhat.com
+Subject: [PATCH kvm-unit-tests] arm64: gic-v3: Avoid NULL dereferences
+Date:   Mon, 11 Oct 2021 18:04:20 +0200
+Message-Id: <20211011160420.26785-1-drjones@redhat.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 11 Oct 2021 15:46:25 +0100,
-Sean Christopherson <seanjc@google.com> wrote:
-> 
-> On Mon, Oct 11, 2021, Marc Zyngier wrote:
-> > On Wed, 22 Sep 2021 01:05:29 +0100, Sean Christopherson <seanjc@google.com> wrote:
-> > > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > > index ed940aec89e0..828b6eaa2c56 100644
-> > > --- a/arch/arm64/include/asm/kvm_host.h
-> > > +++ b/arch/arm64/include/asm/kvm_host.h
-> > > @@ -673,6 +673,14 @@ int io_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa);
-> > >  void kvm_perf_init(void);
-> > >  void kvm_perf_teardown(void);
-> > >  
-> > > +#ifdef CONFIG_GUEST_PERF_EVENTS
-> > > +static inline bool kvm_arch_pmi_in_guest(struct kvm_vcpu *vcpu)
-> > 
-> > Pardon my x86 ignorance, what is PMI? PMU Interrupt?
-> 
-> Ya, Performance Monitoring Interrupt.  I didn't realize the term wasn't
-> common perf terminology.  Maybe kvm_arch_perf_events_in_guest() to be
-> less x86-centric?
+LPI allocation requires that the redistributors are configured first.
+It's unlikely that offline cpus have had their redistributors
+configured, so filter them out right away. Also, assert on any cpu,
+not just the calling cpu, in gicv3_lpi_alloc_tables() when we detect
+a unit test failed to follow instructions. Improve the assert with a
+hint message while we're at it.
 
-Up to you. I would be happy with just a comment.
+Cc: Eric Auger <eric.auger@redhat.com>
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+---
+ lib/arm/gic-v3.c       | 6 +++---
+ lib/arm64/gic-v3-its.c | 2 +-
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-> 
-> > > +{
-> > > +	/* Any callback while a vCPU is loaded is considered to be in guest. */
-> > > +	return !!vcpu;
-> > > +}
-> > > +#endif
-> > 
-> > Do you really need this #ifdef?
-> 
-> Nope, should compile fine without it, though simply dropping the #ifdef
-> would make make the semantics of the function wrong, even if nothing
-> consumes it.  Tweak it to use IS_ENABLED()?
-> 
-> 	return IS_ENABLED(CONFIG_GUEST_PERF_EVENTS) && !!vcpu;
-
-LGTM.
-
-	M.
-
+diff --git a/lib/arm/gic-v3.c b/lib/arm/gic-v3.c
+index 2c067e4e9ba2..2f7870ab28bf 100644
+--- a/lib/arm/gic-v3.c
++++ b/lib/arm/gic-v3.c
+@@ -171,17 +171,17 @@ void gicv3_lpi_alloc_tables(void)
+ 	u64 prop_val;
+ 	int cpu;
+ 
+-	assert(gicv3_redist_base());
+-
+ 	gicv3_data.lpi_prop = alloc_pages(order);
+ 
+ 	/* ID bits = 13, ie. up to 14b LPI INTID */
+ 	prop_val = (u64)(virt_to_phys(gicv3_data.lpi_prop)) | 13;
+ 
+-	for_each_present_cpu(cpu) {
++	for_each_online_cpu(cpu) {
+ 		u64 pend_val;
+ 		void *ptr;
+ 
++		assert_msg(gicv3_data.redist_base[cpu], "Redistributor for cpu%d not initialized. "
++							"Did cpu%d enable the GIC?", cpu, cpu);
+ 		ptr = gicv3_data.redist_base[cpu];
+ 
+ 		writeq(prop_val, ptr + GICR_PROPBASER);
+diff --git a/lib/arm64/gic-v3-its.c b/lib/arm64/gic-v3-its.c
+index c22bda3a8ba2..2c69cfda0963 100644
+--- a/lib/arm64/gic-v3-its.c
++++ b/lib/arm64/gic-v3-its.c
+@@ -104,7 +104,7 @@ void its_enable_defaults(void)
+ 	/* Allocate LPI config and pending tables */
+ 	gicv3_lpi_alloc_tables();
+ 
+-	for_each_present_cpu(cpu)
++	for_each_online_cpu(cpu)
+ 		gicv3_lpi_rdist_enable(cpu);
+ 
+ 	writel(GITS_CTLR_ENABLE, its_data.base + GITS_CTLR);
 -- 
-Without deviation from the norm, progress is not possible.
+2.31.1
+
