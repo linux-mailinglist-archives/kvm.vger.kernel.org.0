@@ -2,82 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 35EDF42995A
-	for <lists+kvm@lfdr.de>; Tue, 12 Oct 2021 00:12:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0FA1C429961
+	for <lists+kvm@lfdr.de>; Tue, 12 Oct 2021 00:19:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235486AbhJKWOQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Oct 2021 18:14:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37386 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235477AbhJKWOO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Oct 2021 18:14:14 -0400
-Received: from mail-ot1-x32a.google.com (mail-ot1-x32a.google.com [IPv6:2607:f8b0:4864:20::32a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07956C061570
-        for <kvm@vger.kernel.org>; Mon, 11 Oct 2021 15:12:14 -0700 (PDT)
-Received: by mail-ot1-x32a.google.com with SMTP id k2-20020a056830168200b0054e523d242aso13936105otr.6
-        for <kvm@vger.kernel.org>; Mon, 11 Oct 2021 15:12:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=BfsWRyXcZk7G+Q/kIv7Szt5lWpWrjTVAwzYCkOvVQCU=;
-        b=RBMonhbWbjB/OijxcZmqUKWO8OC5i8vs4gFK1WnlO+WsPwPZTWi7T2OQ4zHIGLwFy/
-         YwPMBu4nQqX66EiA9eAzfrprNtIYQFO0BCRidl393RM5yZbUWEtoKyQjKRu03CY8Z4bi
-         sS5cxYI8inEf8n5TqfJpsVqi8FzlWtu2eY81TKtlRfWPq3Oz1P0p5SGulp3tUFtlNoId
-         l9hjODmO+RWzpD+oZATB88EzuRwOGNehfri2Loj/++X0SytjvbB6n+wEioU1tHY++7lb
-         fkQe5wRFTnoaxWcLxjqZXQ4IcoD6HNP6ZVq/lzVsNqsAW3c+R4RG71hLLuKmd6KTkRXV
-         Iiaw==
+        id S235496AbhJKWVZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Oct 2021 18:21:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:29022 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235457AbhJKWVY (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 11 Oct 2021 18:21:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1633990763;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=aeXcIsOyNcWtQCi9/bt2+iuYkngLdU5FSyhdmH84bAc=;
+        b=ZwewXx7O2Z9uvl4BA/C7r9KNDIFCSpgMsY0UPJPa9t/+dyXdnmwXyMMRlJekfQYakkFSO3
+        pj/chPxBq1BlUGz3f/yoCJiJ7IuHFNBvCkiX4Jxb5vHeu7lhZJ8N/8I5d8mPCKkoSOvPoU
+        aZPMAkT7TlJoMt+E/1nGeEqP2EuZ5zc=
+Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com
+ [209.85.210.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-376-10xxH490N-6Ir7RNFX3MdA-1; Mon, 11 Oct 2021 18:19:22 -0400
+X-MC-Unique: 10xxH490N-6Ir7RNFX3MdA-1
+Received: by mail-ot1-f71.google.com with SMTP id l17-20020a9d7351000000b0054e7cd8a64dso2732549otk.4
+        for <kvm@vger.kernel.org>; Mon, 11 Oct 2021 15:19:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=BfsWRyXcZk7G+Q/kIv7Szt5lWpWrjTVAwzYCkOvVQCU=;
-        b=W6XSjpOiNpvxt4dv7vjw3IOmOEEeQQehOWqw4nUJlvXUYTn7l3xtKMPouEpiU00wwL
-         45rreyqLZK0X2ZBUuirEq/e/YtcIY4zM9yL5RRVeRmNV/EakVV4FGfJEIuu5d+b0etnI
-         5ECWdlobePSBiYqLXNPcs8QWTc0WpzTGGcIH2LNxdXdomfGK7HMs5uL13gz+BvMOgTXN
-         T90GNK/KVJA/wdjzi+drJc+pZNzeGKGoHSi4HuzG38l01gJRvkwyv3Uw7nBYpnpEZq+p
-         o5U9E5LntHuIC85v7JFdzS42PFdy1059/a1O8ZZO7QhBeA55dohMNOLeuqN0FvzM64yO
-         Kc3Q==
-X-Gm-Message-State: AOAM532iX14kh4FqV6HF2WHSTiULPsqcfpyXPFQvNyNMmuolpjIoPePl
-        2Z7R3YHBQ0JeQMtmzjvVngHSRbuOBDJ5HrzOMN77A2BVl7s=
-X-Google-Smtp-Source: ABdhPJxIibC0W5HdxRUGA+uqH9+Sv8l/3yl49/hjGVpBYEpckN00uYZ0gnwF/EgL7v0QYVsD2q535Cc+rV3Bi2fYWVU=
-X-Received: by 2002:a9d:7114:: with SMTP id n20mr14140935otj.25.1633990333043;
- Mon, 11 Oct 2021 15:12:13 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=aeXcIsOyNcWtQCi9/bt2+iuYkngLdU5FSyhdmH84bAc=;
+        b=X0QTPgN4o+viKqJNr/hVSjEykhlvJBwVZqJ70UJjh9dbOtx/7Z9xa+zPWihuqs3sxH
+         qxN4hUZ1pvJyMvj8TEuFeXeJKFaf7tp/amFJR6Trca2x1fnh2ITN74OTTxqh7RrtdnCC
+         BXm3Dkg4zLea+OO2locLXYB5GV11RlnSH5uqNIp4wO0U/d9/v+CjCNAFwDyVG9vJcelI
+         VvqK8X4OFipbLjmqkYeQvhfTaqhP1Wpx4WapXgTEJVBxJpCXSwHEZyGGsj1voysfPnXy
+         1EhjJJTJUi810spfJJ6qnFnZMKW3RCAWO/lCutyBmV9dK85a9AyrpK9ar9yoBLBh1wiV
+         avfQ==
+X-Gm-Message-State: AOAM5325USRNZVSh6MebDQlOsB+kbhmBtFdLd8GoSyhVg4hW+j1y5CNa
+        d0xkynFZglv01OupQwmawluVkXVFj/+BZdQzYDouSd/9SYyz/OtsbOVIX2P/2j895dXvuhC9row
+        eJhnBvq9yu8yR
+X-Received: by 2002:aca:b10b:: with SMTP id a11mr1156556oif.177.1633990760636;
+        Mon, 11 Oct 2021 15:19:20 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyBgW1M4fQn8z4GIqtMKYD0bAdAahgMyBSniuW90BuiIK088EO9nAEjLcW3ZN8rRzTgzgejrg==
+X-Received: by 2002:aca:b10b:: with SMTP id a11mr1156481oif.177.1633990758983;
+        Mon, 11 Oct 2021 15:19:18 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id i15sm1981679otu.67.2021.10.11.15.19.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Oct 2021 15:19:18 -0700 (PDT)
+Date:   Mon, 11 Oct 2021 16:19:16 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Laurentiu Tudor <laurentiu.tudor@nxp.com>
+Cc:     Diana Craciun <diana.craciun@oss.nxp.com>,
+        linux-kernel@vger.kernel.org, gregkh@linuxfoundation.org,
+        kvm@vger.kernel.org, Li Yang <leoyang.li@nxp.com>,
+        linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v2 2/2] vfio/fsl-mc: Add per device reset support
+Message-ID: <20211011161916.6a3aace0.alex.williamson@redhat.com>
+In-Reply-To: <e356b582-7911-6c8e-3201-dbfdbd3e3b1d@nxp.com>
+References: <20210922110530.24736-1-diana.craciun@oss.nxp.com>
+        <20210922110530.24736-2-diana.craciun@oss.nxp.com>
+        <e356b582-7911-6c8e-3201-dbfdbd3e3b1d@nxp.com>
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <20211011182853.978640-1-venkateshs@chromium.org> <YWSxIbjY6j5x4dyP@google.com>
-In-Reply-To: <YWSxIbjY6j5x4dyP@google.com>
-From:   Marc Orr <marcorr@google.com>
-Date:   Mon, 11 Oct 2021 15:12:02 -0700
-Message-ID: <CAA03e5F0VxoB4YVz=E4R4CrTkXPh2ncPRceETJQAZ2cwhe_i3g@mail.gmail.com>
-Subject: Re: [PATCH] kvm: Inject #GP on invalid writes to x2APIC registers
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Venkatesh Srinivas <venkateshs@chromium.org>,
-        kvm list <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> >  arch/x86/kvm/lapic.c | 9 +++++++--
-> >  1 file changed, 7 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> > index 76fb00921203..96e300acf70a 100644
-> > --- a/arch/x86/kvm/lapic.c
-> > +++ b/arch/x86/kvm/lapic.c
-> > @@ -2126,13 +2126,15 @@ int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
-> >                       ret = 1;
-> >               break;
-> >
-> > -     case APIC_SELF_IPI:
-> > -             if (apic_x2apic_mode(apic)) {
-> > +     case APIC_SELF_IPI: {
->
-> Braces on the case statement are unnecessary (and confusing).
+On Tue, 28 Sep 2021 16:55:06 +0300
+Laurentiu Tudor <laurentiu.tudor@nxp.com> wrote:
 
-I guess the original patch defined an intermediate case-local var. I
-agree, the case braces can be removed in this version.
+> On 9/22/2021 2:05 PM, Diana Craciun wrote:
+> > Currently when a fsl-mc device is reset, the entire DPRC container
+> > is reset which is very inefficient because the devices within a
+> > container will be reset multiple times.
+> > Add support for individually resetting a device.
+> > 
+> > Signed-off-by: Diana Craciun <diana.craciun@oss.nxp.com>
+> > ---  
+> 
+> Reviewed-by: Laurentiu Tudor <laurentiu.tudor@nxp.com>
 
-Also, thanks for upstreaming this, Venkatesh! I read through Sean's
-feedback, and it is all fine with me.
+Applied both to vfio next branch for v5.16, with Laurentiu's R-b added
+here.  Thanks,
+
+Alex
+
