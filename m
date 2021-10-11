@@ -2,162 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 29E8A428E24
-	for <lists+kvm@lfdr.de>; Mon, 11 Oct 2021 15:36:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 80EA54291DE
+	for <lists+kvm@lfdr.de>; Mon, 11 Oct 2021 16:32:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236972AbhJKNip (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Oct 2021 09:38:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60046 "EHLO
+        id S237250AbhJKOeB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Oct 2021 10:34:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43910 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237048AbhJKNin (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Oct 2021 09:38:43 -0400
-Received: from mail-oi1-x229.google.com (mail-oi1-x229.google.com [IPv6:2607:f8b0:4864:20::229])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10FAEC061745
-        for <kvm@vger.kernel.org>; Mon, 11 Oct 2021 06:36:44 -0700 (PDT)
-Received: by mail-oi1-x229.google.com with SMTP id q129so3940209oib.0
-        for <kvm@vger.kernel.org>; Mon, 11 Oct 2021 06:36:44 -0700 (PDT)
+        with ESMTP id S242322AbhJKOdv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Oct 2021 10:33:51 -0400
+Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BA28C0613DF
+        for <kvm@vger.kernel.org>; Mon, 11 Oct 2021 07:27:18 -0700 (PDT)
+Received: by mail-pg1-x52f.google.com with SMTP id s11so10964066pgr.11
+        for <kvm@vger.kernel.org>; Mon, 11 Oct 2021 07:27:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=/JNfG7kesfRccmBVAhgQG5AruC/McrlnRGzPRsyxeyM=;
-        b=NifGimNaB2ZW4w+nudH3Crr3IAjX+qDkvy69+ohEL27gn2rQ2wjsXz1N232aoWVZxx
-         ipJe3zMObIHGcqEGDwPBNxIdci8gIDofGP+QoyDXYTLNXOTWawZ1/PlCTKG3ngJpo7EO
-         oLLKgBt0JFyU86cgQGcqG0nxjkhmnhbOqUl1ok+B3oH88pcem65YTGdQ6TumCIHEcKH1
-         VJ3XSGwVybDV+ASkqVpmhLFyVwFVlZu6OoFq9m27Vy+uHD7enH7QOt5wC9NnLBtUXtWs
-         2uFLlGCV04JFgFcjG6ysHt15JS9u7jH2fAiJsQZVEKJc/UdbdptpFmhMZY3j7SwKOe0/
-         WzvA==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=tbf5GCA+ODjS2j5L/SUM7NgsKD1MXeVm9DtdN1uNmRY=;
+        b=ABPfom5jLrBcTPsIgrbeLq6+c13HG0lLLusqKXB3RBQOIRKYfQKPCzP25DiqiI/xpP
+         xUPc3kK9u4aXk6OhdLaunZgyUVpcPzMvKVjy4MKZtOxY+g3odGWYAT6EesqQWzmmg+ri
+         u0DLvrwoPYazyoN7e7o9ADhge0gL3RyAdvtW94MfBvE8XZxD1sC3ucvXH3tW3/Bu+I+B
+         Z4Wxi2SZZSSdaPhCxIPaEOk/2JROOjDizzjjUMRM+20tZ8iT08I5xq9+R8Wa0UudIvye
+         YEXbe+t2ff1NZnbhvtz5o1RM+2kg7G/1/rhUcK7fD2tnnH61OHTVzBgM06aJtrHapzbG
+         XrpA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=/JNfG7kesfRccmBVAhgQG5AruC/McrlnRGzPRsyxeyM=;
-        b=voZECkIww/l1931AEOXTSC8vbVAZUm0Tg/x5mEe0W3MknSXR90F+0rt8G6eu9EZrzo
-         iXGShxq8Q4A23Pe9ttDDJYRs5+67R9EZXSAJUyECsVZI3pqKUanSOBxTllR0c4vcPkyj
-         eDkfn6pN1qEIB7Vwuv6v6CQNfZptPdKHXwpQ5f2cpPdwjLpMtfpvLib3nOBpc62POSrU
-         tB9sGtNC/kuwSnbnNmfkGjWEUcMEWSeCYX0veeFjRIIcjFQnI85mbxXMJJjNunc3He8o
-         74+JSY+57VNCuLn9XffU5NXzvRbXT5kTUvq6P3jRYhWpXYtzi0xRQl3eJzJvWjZCU8eD
-         wGpQ==
-X-Gm-Message-State: AOAM530+3ZbK/kVt8U2ETtHNmQ2cNm6G8xP3C8+EK9+vi9VnIki4bPF4
-        R9lqHABoqPja8DJeSc8kVhjvkiQJgMBxQXZVyuQgQQ==
-X-Google-Smtp-Source: ABdhPJxSU1RD8HB9ikjK3AC6DC3JCIDrsYxB9kWDH3QApKuFfDrikxmBHv7urC3iR+Spt9gzOmk7NSFXmKQug5Q3HIc=
-X-Received: by 2002:aca:c0c4:: with SMTP id q187mr14780782oif.96.1633959403235;
- Mon, 11 Oct 2021 06:36:43 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=tbf5GCA+ODjS2j5L/SUM7NgsKD1MXeVm9DtdN1uNmRY=;
+        b=FSIpT6XMhrDwP/uN4agjSty6JcV8IqDXjDRJ88OCabLlxLWstwN2SOCklnTXMokWKI
+         h6acT06mvwcjLw/vqAda0yxq1Eje2kZYjmzXcB8i2LawiLjd8KVt7lq7FrXX2EPLwGEJ
+         KtwuWQQBZjevIxdWYNIjo/idetHHRMmLU9q28fO9aWvxhEt1GQvHfetJV6jaHG9Ni+0t
+         Cty3TESsi0Br+IHRpvuPb+ikw6cBMxSKVgoq8DLUp2yYTylx/IrZ8oMJtmVUCn6rLP/f
+         SRIzRor7jqg0Z5k0HHfqF2FbM+SGikDYxa6GlA9zLGpznwsP/3E+42Jpwgm5Fiwtr5H0
+         Y+Mw==
+X-Gm-Message-State: AOAM5330e+IM1tDSBdy5FjYkmASWsQ1JK8dGQRjsh3p9tKmzyqBH/QoI
+        QgRnevcOw0yCkYqM7JVIdVzGUg==
+X-Google-Smtp-Source: ABdhPJyRKhv3Thu3gd3ZdCh6lmbkSOvEdSSuG9PXLL3cEdrNtkoUgEQeUXODrrBqlEV9ULdqDGBTmw==
+X-Received: by 2002:a63:c:: with SMTP id 12mr18621798pga.477.1633962437528;
+        Mon, 11 Oct 2021 07:27:17 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id q18sm9055024pfj.46.2021.10.11.07.27.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Oct 2021 07:27:16 -0700 (PDT)
+Date:   Mon, 11 Oct 2021 14:27:13 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/2] KVM: x86: Fix and cleanup for recent AVIC changes
+Message-ID: <YWRJwZF1toUuyBdC@google.com>
+References: <20211009010135.4031460-1-seanjc@google.com>
+ <9e9e91149ab4fa114543b69eaf493f84d2f33ce2.camel@redhat.com>
 MIME-Version: 1.0
-References: <20211010145636.1950948-1-tabba@google.com> <20211010145636.1950948-12-tabba@google.com>
- <87o87vpuze.wl-maz@kernel.org>
-In-Reply-To: <87o87vpuze.wl-maz@kernel.org>
-From:   Fuad Tabba <tabba@google.com>
-Date:   Mon, 11 Oct 2021 14:36:06 +0100
-Message-ID: <CA+EHjTxKn7Ff7zOCnoVR+L-qKg7OE81EerkO-SgcXVUZxJjbug@mail.gmail.com>
-Subject: Re: [PATCH v8 11/11] KVM: arm64: Handle protected guests at 32 bits
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvmarm@lists.cs.columbia.edu, will@kernel.org, james.morse@arm.com,
-        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
-        mark.rutland@arm.com, christoffer.dall@arm.com,
-        pbonzini@redhat.com, drjones@redhat.com, oupton@google.com,
-        qperret@google.com, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kernel-team@android.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9e9e91149ab4fa114543b69eaf493f84d2f33ce2.camel@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+On Sun, Oct 10, 2021, Maxim Levitsky wrote:
+> On Fri, 2021-10-08 at 18:01 -0700, Sean Christopherson wrote:
+> > Belated "code review" for Maxim's recent series to rework the AVIC inhibit
+> > code.  Using the global APICv status in the page fault path is wrong as
+> > the correct status is always the vCPU's, since that status is accurate
+> > with respect to the time of the page fault.  In a similar vein, the code
+> > to change the inhibit can be cleaned up since KVM can't rely on ordering
+> > between the update and the request for anything except consumers of the
+> > request.
+> > 
+> > Sean Christopherson (2):
+> >   KVM: x86/mmu: Use vCPU's APICv status when handling APIC_ACCESS
+> >     memslot
+> >   KVM: x86: Simplify APICv update request logic
+> > 
+> >  arch/x86/kvm/mmu/mmu.c |  2 +-
+> >  arch/x86/kvm/x86.c     | 16 +++++++---------
+> >  2 files changed, 8 insertions(+), 10 deletions(-)
+> > 
+> 
+> Are you sure about it? Let me explain how the algorithm works:
+> 
+> - kvm_request_apicv_update:
+> 
+> 	- take kvm->arch.apicv_update_lock
+> 
+> 	- if inhibition state doesn't really change (kvm->arch.apicv_inhibit_reasons still zero or non zero)
+> 		- update kvm->arch.apicv_inhibit_reasons
+> 		- release the lock
+> 
+> 	- raise KVM_REQ_APICV_UPDATE
+> 		* since kvm->arch.apicv_update_lock is taken, all vCPUs will be
+> 		kicked out of guest mode and will be either doing someing in
+> 		the KVM (like page fault) or stuck on trying to process that
+> 		request the important thing is that no vCPU will be able to get
+> 		back to the guest mode.
+> 
+> 	- update the kvm->arch.apicv_inhibit_reasons
+> 		* since we hold vm->arch.apicv_update_lock vcpus can't see the new value
 
-On Mon, Oct 11, 2021 at 2:11 PM Marc Zyngier <maz@kernel.org> wrote:
->
-> On Sun, 10 Oct 2021 15:56:36 +0100,
-> Fuad Tabba <tabba@google.com> wrote:
-> >
-> > Protected KVM does not support protected AArch32 guests. However,
-> > it is possible for the guest to force run AArch32, potentially
-> > causing problems. Add an extra check so that if the hypervisor
-> > catches the guest doing that, it can prevent the guest from
-> > running again by resetting vcpu->arch.target and returning
-> > ARM_EXCEPTION_IL.
-> >
-> > If this were to happen, The VMM can try and fix it by re-
-> > initializing the vcpu with KVM_ARM_VCPU_INIT, however, this is
-> > likely not possible for protected VMs.
-> >
-> > Adapted from commit 22f553842b14 ("KVM: arm64: Handle Asymmetric
-> > AArch32 systems")
-> >
-> > Signed-off-by: Fuad Tabba <tabba@google.com>
-> > ---
-> >  arch/arm64/kvm/hyp/nvhe/switch.c | 34 ++++++++++++++++++++++++++++++++
-> >  1 file changed, 34 insertions(+)
-> >
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-> > index 2c72c31e516e..f25b6353a598 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/switch.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-> > @@ -232,6 +232,37 @@ static const exit_handler_fn *kvm_get_exit_handler_array(struct kvm *kvm)
-> >       return hyp_exit_handlers;
-> >  }
-> >
-> > +/*
-> > + * Some guests (e.g., protected VMs) are not be allowed to run in AArch32.
-> > + * The ARMv8 architecture does not give the hypervisor a mechanism to prevent a
-> > + * guest from dropping to AArch32 EL0 if implemented by the CPU. If the
-> > + * hypervisor spots a guest in such a state ensure it is handled, and don't
-> > + * trust the host to spot or fix it.  The check below is based on the one in
-> > + * kvm_arch_vcpu_ioctl_run().
-> > + *
-> > + * Returns false if the guest ran in AArch32 when it shouldn't have, and
-> > + * thus should exit to the host, or true if a the guest run loop can continue.
-> > + */
-> > +static bool handle_aarch32_guest(struct kvm_vcpu *vcpu, u64 *exit_code)
-> > +{
-> > +     struct kvm *kvm = kern_hyp_va(vcpu->kvm);
-> > +
-> > +     if (kvm_vm_is_protected(kvm) && vcpu_mode_is_32bit(vcpu)) {
-> > +             /*
-> > +              * As we have caught the guest red-handed, decide that it isn't
-> > +              * fit for purpose anymore by making the vcpu invalid. The VMM
-> > +              * can try and fix it by re-initializing the vcpu with
-> > +              * KVM_ARM_VCPU_INIT, however, this is likely not possible for
-> > +              * protected VMs.
-> > +              */
-> > +             vcpu->arch.target = -1;
-> > +             *exit_code = ARM_EXCEPTION_IL;
->
-> Aren't we losing a potential SError here, which the original commit
-> doesn't need to handle? I'd expect something like:
->
->                 *exit_code &= BIT(ARM_EXIT_WITH_SERROR_BIT);
->                 *exit_code |= ARM_EXCEPTION_IL;
+This assertion is incorrect, kvm_apicv_activated() is not guarded by the lock.
 
-Yes, you're right. That would ensure the SError is preserved.
+> 	- update the SPTE that covers the APIC's mmio window:
 
-Thanks,
-/fuad
+This won't affect in-flight page faults.
 
 
-> > +             return false;
-> > +     }
-> > +
-> > +     return true;
-> > +}
-> > +
-> >  /* Switch to the guest for legacy non-VHE systems */
-> >  int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
-> >  {
-> > @@ -294,6 +325,9 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
-> >               /* Jump in the fire! */
-> >               exit_code = __guest_enter(vcpu);
-> >
-> > +             if (unlikely(!handle_aarch32_guest(vcpu, &exit_code)))
-> > +                     break;
-> > +
-> >               /* And we're baaack! */
-> >       } while (fixup_guest_exit(vcpu, &exit_code));
-> >
->
-> Thanks,
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
+   vCPU0                               vCPU1
+   =====                               =====
+   Disabled APICv
+   #NPT                                Acquire apicv_update_lock
+                                       Re-enable APICv
+   kvm_apicv_activated() == false
+   incorrectly handle as regular MMIO
+                                       zap APIC pages
+   MMIO cache has bad entry
