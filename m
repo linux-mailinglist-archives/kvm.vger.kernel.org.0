@@ -2,60 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 042A342AB10
-	for <lists+kvm@lfdr.de>; Tue, 12 Oct 2021 19:46:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8A56642AB17
+	for <lists+kvm@lfdr.de>; Tue, 12 Oct 2021 19:47:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232387AbhJLRsS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Oct 2021 13:48:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48962 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229495AbhJLRsR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Oct 2021 13:48:17 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BF92C061570;
-        Tue, 12 Oct 2021 10:46:15 -0700 (PDT)
-Received: from zn.tnic (p200300ec2f19420044c1262ed1e42b8c.dip0.t-ipconnect.de [IPv6:2003:ec:2f19:4200:44c1:262e:d1e4:2b8c])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 06B2D1EC047E;
-        Tue, 12 Oct 2021 19:46:14 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1634060774;
+        id S232876AbhJLRtS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Oct 2021 13:49:18 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:57340 "EHLO
+        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229810AbhJLRtO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Oct 2021 13:49:14 -0400
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1634060831;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=x5jmEYoOWbIrx2JArtKtCDt/YV7kBkWkVjZ7M0GZpRo=;
-        b=OMOnnbtzuMLuJy+sTPLw5T/gkqxM0OExXMmNLgTnv+3n3CltiX/gh3PQ+vONw0Deppiuee
-        XOmDKN5BSv8UvEw2+hNL51feihcbSn7VnV5twVArLFycT40m0xjFCePNKH6x0TsX1RGMSm
-        hkucMlo9uP6TNx8Xu3erbkt1SP636m0=
-Date:   Tue, 12 Oct 2021 19:46:11 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Thomas Gleixner <tglx@linutronix.de>
-Cc:     LKML <linux-kernel@vger.kernel.org>, x86@kernel.org,
-        "Chang S. Bae" <chang.seok.bae@intel.com>,
+         in-reply-to:in-reply-to:references:references;
+        bh=9Pt0nUixj+nNGzPG7e+TJ6uIXoIYUMGSVKNi17eRKbU=;
+        b=tFzEvHitcwTLlWKDxYNIuNC2NG99XNXXnwpic6ifCYx2HJd64cfAgvBcRSqChheQb0wecu
+        rK56LYUTOZp1ceKWLPwfnaB5D1o+NifL3YxioGrAuq1WqZF1vvEiGptP39pNaUZw+POSyf
+        mErEPf9xCfqvrNimQjmYgyLGhyTlhgmpURtzhKIVaxtbpsPAgFFi0gjwtuYEqFcRXiyMj8
+        I/769am+eNY8Ec0H2Ziyr94AVn6JnwjyMScfrs6pSwQYVTBM+hlBSmro1qMHxlKXxD1Z9m
+        apN4mrDt2vrYooqJDNbIvIzHcUMFoB6p94+3VvWB1eJyNHao/4E237Udi0htnw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1634060831;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=9Pt0nUixj+nNGzPG7e+TJ6uIXoIYUMGSVKNi17eRKbU=;
+        b=Kca+CCZFIKulP5gI2x6P7YmS/Yj/Uhqeo7yZPuyM5J4iowUEAyTXut5KqBrejOhI0brdGh
+        Vjwc8ozmGoRnZ9DQ==
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        LKML <linux-kernel@vger.kernel.org>
+Cc:     x86@kernel.org, "Chang S. Bae" <chang.seok.bae@intel.com>,
         Dave Hansen <dave.hansen@linux.intel.com>,
         Arjan van de Ven <arjan@linux.intel.com>,
-        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [patch 26/31] x86/fpu: Move fpstate functions to api.h
-Message-ID: <YWXJ41WPh6udVXmE@zn.tnic>
+        kvm@vger.kernel.org
+Subject: Re: [patch 16/31] x86/fpu: Replace KVMs homebrewn FPU copy to user
+In-Reply-To: <0d222978-014a-cdcb-f8aa-5b3179cb0809@redhat.com>
 References: <20211011215813.558681373@linutronix.de>
- <20211011223611.846280577@linutronix.de>
+ <20211011223611.249593446@linutronix.de>
+ <0d222978-014a-cdcb-f8aa-5b3179cb0809@redhat.com>
+Date:   Tue, 12 Oct 2021 19:47:10 +0200
+Message-ID: <87fst6b0f5.ffs@tglx>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20211011223611.846280577@linutronix.de>
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 12, 2021 at 02:00:37AM +0200, Thomas Gleixner wrote:
-> Move function declarations which need to be globaly available to api.h
-> where they belong.
+On Tue, Oct 12 2021 at 19:36, Paolo Bonzini wrote:
+> On 12/10/21 02:00, Thomas Gleixner wrote:
+>> 
+>> -	if (boot_cpu_has(X86_FEATURE_XSAVE)) {
+>> -		memset(guest_xsave, 0, sizeof(struct kvm_xsave));
+>> -		fill_xsave((u8 *) guest_xsave->region, vcpu);
+>> -	} else {
+>> -		memcpy(guest_xsave->region,
+>> -			&vcpu->arch.guest_fpu->state.fxsave,
+>> -			sizeof(struct fxregs_state));
+>> -		*(u64 *)&guest_xsave->region[XSAVE_HDR_OFFSET / sizeof(u32)] =
+>> -			XFEATURE_MASK_FPSSE;
+>> -	}
+>
+> After the patch, this final assignment is not done in the else case:
 
-"globally"
+Doh.
 
--- 
-Regards/Gruss,
-    Boris.
+>> +
+>> +	if (cpu_feature_enabled(X86_FEATURE_XSAVE)) {
+>> +		__copy_xstate_to_uabi_buf(mb, &kstate->xsave, pkru,
+>> +					  XSTATE_COPY_XSAVE);
+>> +	} else {
+>> +		memcpy(&ustate->fxsave, &kstate->fxsave, sizeof(ustate->fxsave));
+>> +	}
+>> +}
+>
+> This leaves the xstate_bv set to 0 instead of XFEATURE_MASK_FPSSE. 
+> Resuming a VM then fails if you save on a non-XSAVE machine and restore 
+> it on an XSAVE machine.
 
-https://people.kernel.org/tglx/notes-about-netiquette
+Yup.
+
+> The memset(guest_xsave, 0, sizeof(struct kvm_xsave)) also is not 
+> reproduced, you can make it unconditional for simplicity; this is not a 
+> fast path.
+
+Duh, I should have mentioned that in the changelog. The buffer is
+allocated with kzalloc() soe the memset is redundant, right?
+
+Thanks,
+
+        tglx
