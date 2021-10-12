@@ -2,165 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D4B0142AD90
-	for <lists+kvm@lfdr.de>; Tue, 12 Oct 2021 22:05:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ED1A942AE00
+	for <lists+kvm@lfdr.de>; Tue, 12 Oct 2021 22:38:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234176AbhJLUHX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Oct 2021 16:07:23 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:41426 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232419AbhJLUHW (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 12 Oct 2021 16:07:22 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634069120;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Izu+rZ+bydrqP5Ea4+zsV5r5PHcw8FRNGYQmKnuuTsQ=;
-        b=RbbToqrfyUeON8SKlTAPt5Q8YYlt9w/S6//AUZVaWlkfrIy2ZX2jsotLEQggd2R1YMuY2X
-        jjdUMUDB6ZdsiwwcRl3L341ZTVwFtiwyUarXXsQ8vqKW4FpCLV0uFhf9bVxkzq0LOD2320
-        9QL/0g6S7lMgU6M9lIp+wDN5enoMs8c=
-Received: from mail-oo1-f71.google.com (mail-oo1-f71.google.com
- [209.85.161.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-204-gcP9jpICOm6hzbOMvN-nmw-1; Tue, 12 Oct 2021 16:05:19 -0400
-X-MC-Unique: gcP9jpICOm6hzbOMvN-nmw-1
-Received: by mail-oo1-f71.google.com with SMTP id z20-20020a4a3054000000b002b69c1d4346so137842ooz.21
-        for <kvm@vger.kernel.org>; Tue, 12 Oct 2021 13:05:19 -0700 (PDT)
+        id S232986AbhJLUkc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Oct 2021 16:40:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60384 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234541AbhJLUka (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Oct 2021 16:40:30 -0400
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B92E4C061746
+        for <kvm@vger.kernel.org>; Tue, 12 Oct 2021 13:38:28 -0700 (PDT)
+Received: by mail-pl1-x62a.google.com with SMTP id f21so336707plb.3
+        for <kvm@vger.kernel.org>; Tue, 12 Oct 2021 13:38:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=iQnV3pt8J3jb8XA6czy73gblHf036TthPcOfsFMgiAY=;
+        b=VmKr4djT+eqIEmZtZWL/uW23lpthSKvp46povfujuU5koUN0k2iuu4zk8fTFWoyLek
+         xpw22TK1jbHQL8sXVE0iUIVhrmJXLIOIbJJUuuiR8cb//6SfE3loeS+snUlzKo8i0C5H
+         IyQ8c7mPWtWrvZexQJZrYG/+7szuXLBwrSBcc5dKOOSk4tFaHzrBU5p6nRxiqKt4YzzY
+         WA/tWjRyZ/wTkg8ElxFt5drpv2naK6CTtp2EEHUkArCNVvzfyqHWzfu3HG8fAY6QFaYG
+         IO9caj2gd1uNngxOa2QmiBaQ8Wske7hixXerdAZj+iv4tLnKqK0vy9fjkfMHzAV/Brly
+         sRHQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=Izu+rZ+bydrqP5Ea4+zsV5r5PHcw8FRNGYQmKnuuTsQ=;
-        b=phSuZ3gJdpUd8uIVB8uMrkbdJo0MP+lu6yId91qw6WxIjDSQCGaD8lxqZMSM0ERzu1
-         Si/EqhZ+NZPBPd8W6aZGYgNmHww1917PvH0PK1azTX0ykJXbkaXuE9NowYjoaK4IsDvI
-         QhMdXU61xv00fWm8xxML7YQq2VB1Du/EdvigRXDA8kYSXkGeuDBqOSy8COPkMXT1G6p9
-         6bjE+JtYnX+3apaYe0J/IHAIyjKlrlFCQg4OYrgqZtfST1krA3ZGBFokDilbTrGtyDdK
-         E9KdwR8+9R+/NgYSE38+SnuwnPcbdS5pYD2cqVWxq+Qd4d4aJjbRSmHnmIle9f8AWEKu
-         6d7Q==
-X-Gm-Message-State: AOAM532vmsEGvpWPUzD5KN7d1xx1mD7ObmbZoleXvogY0AQHCKiZJq2t
-        caSKALdJBKcHL64rESpnla1duBOuy4PkWcPF+SfZ2NgM8gaT4+PXC+L1YUAsBvC0KUfr8JWQMs9
-        23C4bNTS6xOeh
-X-Received: by 2002:a9d:1b7:: with SMTP id e52mr23201512ote.352.1634069118749;
-        Tue, 12 Oct 2021 13:05:18 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJypL1uduEwPyz5IFlx9E/9+AA+30xBIuVrw1wb7qiXdQjSf3ur9Ov2wqqb1YqMhwczA/WtR2w==
-X-Received: by 2002:a9d:1b7:: with SMTP id e52mr23201490ote.352.1634069118419;
-        Tue, 12 Oct 2021 13:05:18 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id s18sm2135912otd.55.2021.10.12.13.05.17
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=iQnV3pt8J3jb8XA6czy73gblHf036TthPcOfsFMgiAY=;
+        b=xLYcNExsxA0W0uKORyeFNG14h40JlnVw1AH5np00RwC2gNMKJ56eLOFsetV64xP7T6
+         0R2Ry3PId2kKXDCmqSlE23DDKUl0ilZ8xZesvRMo0a2Cpr/6Aqtwwuo11/QoBMQZ6Kfo
+         7Whzk0ZM4Fh76mp0tfRIobrZ+97+DpUjslaf8mobgBlUqRDYzqY9aKRWI/Gwl588/vVr
+         KZRW8kON8mcUZsMIm/ZqpIUQ+3Tp7OJdhcVh4r9vvNsmMr6Ug77/L1NoPzHKCIUAlk7k
+         Sr1zGp1s3URlL9ozybDvr+ZAbaVjhhVDmNn9SdHLq+UsLVva1lvfPW6ySB6zFVfkTemH
+         S/CQ==
+X-Gm-Message-State: AOAM531v58aYPlFcGfYTJdK8+fbCZqm6URG3qguOiokcWyVCGtiF4S7U
+        2x5CdU21exeGGCQoVAQD4vNp3w==
+X-Google-Smtp-Source: ABdhPJwYuhpc+lnXyndFKFciOEGuFZvuJcxPeEVd9f4TxExIiDdwxtqOt5MEIvEjc6zXAi/TKh1zKw==
+X-Received: by 2002:a17:90a:7d11:: with SMTP id g17mr8685244pjl.150.1634071108038;
+        Tue, 12 Oct 2021 13:38:28 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id oj1sm3997435pjb.49.2021.10.12.13.38.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Oct 2021 13:05:18 -0700 (PDT)
-Date:   Tue, 12 Oct 2021 14:05:16 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Matthew Ruffell <matthew.ruffell@canonical.com>
-Cc:     linux-pci@vger.kernel.org, lkml <linux-kernel@vger.kernel.org>,
-        kvm@vger.kernel.org, nathan.langford@xcelesunifiedtechnologies.com
-Subject: Re: [PROBLEM] Frequently get "irq 31: nobody cared" when passing
- through 2x GPUs that share same pci switch via vfio
-Message-ID: <20211012140516.6838248b.alex.williamson@redhat.com>
-In-Reply-To: <CAKAwkKtJQ1mE3=iaDA1B_Dkn1+ZbN0jTSWrQon0=SAszRv5xFw@mail.gmail.com>
-References: <d4084296-9d36-64ec-8a79-77d82ac6d31c@canonical.com>
-        <20210914104301.48270518.alex.williamson@redhat.com>
-        <9e8d0e9e-1d94-35e8-be1f-cf66916c24b2@canonical.com>
-        <20210915103235.097202d2.alex.williamson@redhat.com>
-        <2fadf33d-8487-94c2-4460-2a20fdb2ea12@canonical.com>
-        <20211005171326.3f25a43a.alex.williamson@redhat.com>
-        <CAKAwkKtJQ1mE3=iaDA1B_Dkn1+ZbN0jTSWrQon0=SAszRv5xFw@mail.gmail.com>
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        Tue, 12 Oct 2021 13:38:27 -0700 (PDT)
+Date:   Tue, 12 Oct 2021 20:38:23 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH Part2 v5 20/45] KVM: SVM: Provide the Hypervisor Feature
+ support VMGEXIT
+Message-ID: <YWXyP9E228aQSB5j@google.com>
+References: <20210820155918.7518-1-brijesh.singh@amd.com>
+ <20210820155918.7518-21-brijesh.singh@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210820155918.7518-21-brijesh.singh@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 12 Oct 2021 17:58:07 +1300
-Matthew Ruffell <matthew.ruffell@canonical.com> wrote:
-
-> Hi Alex,
+On Fri, Aug 20, 2021, Brijesh Singh wrote:
+> Version 2 of the GHCB specification introduced advertisement of features
+> that are supported by the Hypervisor.
 > 
-> On Wed, Oct 6, 2021 at 12:13 PM Alex Williamson
-> <alex.williamson@redhat.com> wrote:
-> > With both of these together, I'm so far able to prevent an interrupt
-> > storm for these cards.  I'd say the patch below is still extremely
-> > experimental, and I'm not sure how to get around the really hacky bit,
-> > but it would be interesting to see if it resolves the original issue.
-> > I've not yet tested this on a variety of devices, so YMMV.  Thanks,  
+> Now that KVM supports version 2 of the GHCB specification, bump the
+> maximum supported protocol version.
 > 
-> Thank you very much for your analysis and for the experimental patch, and we
-> have excellent news to report.
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+>  arch/x86/include/asm/sev-common.h |  2 ++
+>  arch/x86/kvm/svm/sev.c            | 14 ++++++++++++++
+>  arch/x86/kvm/svm/svm.h            |  3 ++-
+>  3 files changed, 18 insertions(+), 1 deletion(-)
 > 
-> I sent Nathan a test kernel built on 5.14.0, and he has been running the
-> reproducer for a few days now.
-> 
-> Nathan writes:
-> 
-> > I've been testing heavily with the reproducer for a few days using all 8 GPUs
-> > and with the MSI fix for the audio devices in the guest disabled, i.e. a pretty
-> > much worst case scenario. As a control with kernel 5.14 (unpatched), the system
-> > locked up in 2,2,6,1, and 4 VM reset iterations, all in less than 10 minutes
-> > each time. With the patched kernel I'm currently at 1226 iterations running for
-> > 2 days 10 hours with no failures. This is excellent. FYI, I have disabled the
-> > dyndbg setting.  
-> 
-> The system is stable, and your patch sounds very promising.
+> diff --git a/arch/x86/include/asm/sev-common.h b/arch/x86/include/asm/sev-common.h
+> index d70a19000953..779c7e8f836c 100644
+> --- a/arch/x86/include/asm/sev-common.h
+> +++ b/arch/x86/include/asm/sev-common.h
+> @@ -97,6 +97,8 @@ enum psc_op {
+>  /* GHCB Hypervisor Feature Request/Response */
+>  #define GHCB_MSR_HV_FT_REQ		0x080
+>  #define GHCB_MSR_HV_FT_RESP		0x081
+> +#define GHCB_MSR_HV_FT_POS		12
+> +#define GHCB_MSR_HV_FT_MASK		GENMASK_ULL(51, 0)
+>  #define GHCB_MSR_HV_FT_RESP_VAL(v)			\
+>  	/* GHCBData[63:12] */				\
+>  	(((u64)(v) & GENMASK_ULL(63, 12)) >> 12)
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 0ca5b5b9aeef..1644da5fc93f 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -2184,6 +2184,7 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
+>  	case SVM_VMGEXIT_AP_HLT_LOOP:
+>  	case SVM_VMGEXIT_AP_JUMP_TABLE:
+>  	case SVM_VMGEXIT_UNSUPPORTED_EVENT:
+> +	case SVM_VMGEXIT_HV_FEATURES:
+>  		break;
+>  	default:
+>  		goto vmgexit_err;
+> @@ -2438,6 +2439,13 @@ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
+>  				  GHCB_MSR_INFO_MASK,
+>  				  GHCB_MSR_INFO_POS);
+>  		break;
+> +	case GHCB_MSR_HV_FT_REQ: {
 
-Great, I also ran a VM reboot loop for several days with all 6 GPUs
-assigned, no interrupt issues.
+Unnecessary braces.
 
-> Nathan does have a small side effect to report:
-> 
-> > The only thing close to an issue that I have is that I still get frequent
-> > "irq 112: nobody cared" and "Disabling IRQ #112" errors. They just no longer
-> > lockup the system. If I watch the reproducer time between VM resets, I've
-> > noticed that it takes longer for the VM to startup after one of these
-> > "nobody cared" errors, and thus it takes longer until I can reset the VM again.
-> > I believe slow guest behavior in this disabled IRQ scenario is expected though?  
-> 
-> Full dmesg:
-> https://paste.ubuntu.com/p/hz8WdPZmNZ/
-> 
-> I had a look at all the lspci Nathan has provided me in the past, but 112 isn't
-> listed. I will ask Nathan for a fresh lspci so we can see what device it is.
-> The interesting thing is that we still hit __report_bad_irq() for 112 when we
-> have previously disabled it, typically after 1000+ seconds has gone by.
+> +		set_ghcb_msr_bits(svm, GHCB_HV_FT_SUPPORTED,
+> +				  GHCB_MSR_HV_FT_MASK, GHCB_MSR_HV_FT_POS);
+> +		set_ghcb_msr_bits(svm, GHCB_MSR_HV_FT_RESP,
+> +				  GHCB_MSR_INFO_MASK, GHCB_MSR_INFO_POS);
+> +		break;
+> +	}
+>  	case GHCB_MSR_TERM_REQ: {
+>  		u64 reason_set, reason_code;
+>  
+> @@ -2553,6 +2561,12 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
+>  		ret = 1;
+>  		break;
+>  	}
+> +	case SVM_VMGEXIT_HV_FEATURES: {
 
-The device might need to be operating in INTx mode, or at least had
-been at some point, to get the register filled.  It's essentially just
-a scratch register on the card that gets filled when the interrupt is
-configured.
+Same here.
 
-Each time we register a new handler for the irq the masking due to
-spurious interrupt will be removed, but if it's actually causing the VM
-boot to take longer that suggests to me that the guest driver is
-stalled, perhaps because it's expecting an interrupt that's now masked
-in the host.  This could also be caused by a device that gets
-incorrectly probed for PCI-2.3 compliant interrupt masking.  For
-probing we can really only test that we have the ability to set the
-DisINTx bit, we can only hope that the hardware folks also properly
-implemented the INTx status bit to indicate the device is signaling
-INTx.  We should really figure out which device this is so that we can
-focus on whether it's another shared interrupt issue or something
-specific to the device.
-
-I'm also confused why this doesn't trigger the same panic/kexec as we
-were seeing with the other interrupt lines.  Are there some downstream
-patches or configs missing here that would promote these to more fatal
-errors?
-
-> We think your patch fixes the interrupt storm issues. We are happy to continue
-> testing for as much as you need, and we are happy to test any followup patch
-> revisions.
-> 
-> Is there anything you can do to feel more comfortable about the
-> PCI_DEV_FLAGS_MSI_INTX_DISABLE_BUG dev flag hack? While it works, I can see why
-> you might not want to land it in mainline.
-
-Yeah, it's a huge hack.  I wonder if we could look at the interrupt
-status and conditional'ize clearing DisINTx based on lack of a pending
-interrupt.  It seems somewhat reasonable not to clear the bit masking
-the interrupt if we know it's pending and know there's no handler for
-it.  I'll try to check if that's possible.  Thanks,
-
-Alex
-
+> +		ghcb_set_sw_exit_info_2(ghcb, GHCB_HV_FT_SUPPORTED);
+> +
+> +		ret = 1;
+> +		break;
+> +	}
+>  	case SVM_VMGEXIT_UNSUPPORTED_EVENT:
+>  		vcpu_unimpl(vcpu,
+>  			    "vmgexit: unsupported event - exit_info_1=%#llx, exit_info_2=%#llx\n",
