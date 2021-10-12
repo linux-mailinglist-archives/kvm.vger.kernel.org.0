@@ -2,127 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5A3DA429A28
-	for <lists+kvm@lfdr.de>; Tue, 12 Oct 2021 02:07:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1AB6E429A61
+	for <lists+kvm@lfdr.de>; Tue, 12 Oct 2021 02:21:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236216AbhJLAJP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Oct 2021 20:09:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34042 "EHLO
+        id S234188AbhJLAXw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Oct 2021 20:23:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37576 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234873AbhJLAI3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Oct 2021 20:08:29 -0400
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E2A0C061749;
-        Mon, 11 Oct 2021 17:06:29 -0700 (PDT)
-Message-ID: <20211011223612.145363780@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1633997185;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         references:references; bh=+DDPznsqgrt6mGetm00zwJ7IWc7hobGjiUCJd9lybJk=;
-        b=fS7P9nLP5NEzaJTFb/loVeS8dt+CcQRX4IyxpRXrPJhbIK7WJPbkYsPGrfB8faiGevEHg3
-        /3dt2XlavVuoO2ADZPvyyzepeBRS9tCwzbmD/KdZJSVuJFf/t9LAfBZkl4ATzk+puTKij4
-        zXjKBClMHCC346oXHU2agFmB+fti3HiSRwg488YwfjD3d7jP5+bLHh6R7jj5dpg0GsC+VS
-        Ma95grsxmSmlEI59eHdU1BvUI/JoqDFnq339ZtUEyJC2cN5vBV3NQrD2nJQeihxZQTuErK
-        CJnnpcy+qI4bderRSIIaKAssymZUFrwIz+zJ4bINOmENeo8GuK46wmSByMCWSw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1633997185;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         references:references; bh=+DDPznsqgrt6mGetm00zwJ7IWc7hobGjiUCJd9lybJk=;
-        b=TfTcEaElMUW4s8tDhEa+hGdo/bV/oRUEEmqy/t+jcwY8ZEuKAkbo1PvAmMLFd+2eZbWrlW
-        24tx2i2YnhmaOCBQ==
-From:   Thomas Gleixner <tglx@linutronix.de>
-To:     LKML <linux-kernel@vger.kernel.org>
-Cc:     x86@kernel.org, "Chang S. Bae" <chang.seok.bae@intel.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Arjan van de Ven <arjan@linux.intel.com>,
-        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Subject: [patch 31/31] x86/fpu: Provide a proper function for ex_handler_fprestore()
-References: <20211011215813.558681373@linutronix.de>
+        with ESMTP id S233311AbhJLAXv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Oct 2021 20:23:51 -0400
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EC81C06161C
+        for <kvm@vger.kernel.org>; Mon, 11 Oct 2021 17:21:50 -0700 (PDT)
+Received: by mail-pf1-x430.google.com with SMTP id y7so6583751pfg.8
+        for <kvm@vger.kernel.org>; Mon, 11 Oct 2021 17:21:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=n459MQOlWwd6ptzNZBJzvaoErNGrU6E1S82qnsrtuLg=;
+        b=Q8ahDM2cS8ZsSkgGOs8wn39AcY2HNyWksVxrM/UkiiMS+yzKKVYPKksTHvqam8QNCR
+         2H1kE+SBXF9XUPDBTKDs1K7oSZqoK7I2IawyOb7FOgwkCPDX360v/mmuz5ak1Wbtta9A
+         N1M31XGdDVw6z7dN9N3IuIgPQDDbhqewOOqZc3xjDkH1RmF60P+K0qg8z4wdvt3II+xC
+         YNR3ONvv6Br16Kp25cDzfcuRZOL1FHMv6EI5XmQLH2ZQWeVEgT7PJmCj9Z2Qh8h7DlME
+         lAYEbUxYzso4t14GwetkL7h0t8H2vbI7jwxR7ko2UOVjUfmMjSf4JP4M5R6wQhUYrtIv
+         z/bQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=n459MQOlWwd6ptzNZBJzvaoErNGrU6E1S82qnsrtuLg=;
+        b=gCbPShqH+MtBWICStDhCmuvVNVdCjqV7U470uiieo//nysw1y5D9Rx9nOY4nieBpdQ
+         A61vdN6Cwzje4yH/hiNCdSz2O5mqpVTbr6dWldPs0q0wwdfay1PzkCQoVAQQIyhXOmoJ
+         8sMBFw4H7eh3Se/vC5oJtqzh9ff2Bu3SqFDTkbvpOAxEd1mUz7cIZVqmEd1rzo/vCxNU
+         aPDWxK9rg/wyGAb8Vi0x5VEIURbf3GWRp78Wr64rPuz9IHohQll07cktc5jTqRcAV2O7
+         CCnr755BeY59Kd4zMhvX5fndb4wv4f2JGBHZEnSf2V71kywPG2V/WQu8fqFPzqu4n4JO
+         aQqg==
+X-Gm-Message-State: AOAM531J7sh41zRPVZFPTRwO+d5btmEMlGfQam1V9Ghr5lErlBxt1l1A
+        JNtyEgFvzpJsRPE3EBuE6DgBDA==
+X-Google-Smtp-Source: ABdhPJy2L2VgOs2YW1MTifaPx+BYcn3AzPzFFDo67xDEIdnNEoumVjuITkFIccRaC0dy1uuNFPxIjw==
+X-Received: by 2002:aa7:94a8:0:b0:44c:f3e0:81fb with SMTP id a8-20020aa794a8000000b0044cf3e081fbmr16029819pfl.6.1633998109653;
+        Mon, 11 Oct 2021 17:21:49 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id x35sm10054611pfh.52.2021.10.11.17.21.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Oct 2021 17:21:49 -0700 (PDT)
+Date:   Tue, 12 Oct 2021 00:21:45 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Borislav Petkov <bp@alien8.de>, Bandan Das <bsd@redhat.com>,
+        open list <linux-kernel@vger.kernel.org>,
+        Joerg Roedel <joro@8bytes.org>, Ingo Molnar <mingo@redhat.com>,
+        Wei Huang <wei.huang2@amd.com>,
+        "open list:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Jim Mattson <jmattson@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Wanpeng Li <wanpengli@tencent.com>
+Subject: Re: [PATCH 07/14] KVM: x86: SVM: add warning for CVE-2021-3656
+Message-ID: <YWTVGaX4V1eR6k0k@google.com>
+References: <20210914154825.104886-1-mlevitsk@redhat.com>
+ <20210914154825.104886-8-mlevitsk@redhat.com>
+ <f0c0e659-23a8-59ab-edf8-5b380d723493@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Date:   Tue, 12 Oct 2021 02:00:45 +0200 (CEST)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f0c0e659-23a8-59ab-edf8-5b380d723493@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-To make upcoming changes for support of dynamically enabled features
-simpler, provide a proper function for the exception handler which removes
-exposure of FPU internals.
+On Thu, Sep 23, 2021, Paolo Bonzini wrote:
+> On 14/09/21 17:48, Maxim Levitsky wrote:
+> > Just in case, add a warning ensuring that on guest entry,
+> > either both VMLOAD and VMSAVE intercept is enabled or
+> > vVMLOAD/VMSAVE is enabled.
+> > 
+> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > ---
+> >   arch/x86/kvm/svm/svm.c | 6 ++++++
+> >   1 file changed, 6 insertions(+)
+> > 
+> > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> > index 861ac9f74331..deeebd05f682 100644
+> > --- a/arch/x86/kvm/svm/svm.c
+> > +++ b/arch/x86/kvm/svm/svm.c
+> > @@ -3784,6 +3784,12 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu)
+> >   	WARN_ON_ONCE(kvm_apicv_activated(vcpu->kvm) != kvm_vcpu_apicv_active(vcpu));
+> > +	/* Check that CVE-2021-3656 can't happen again */
+> > +	if (!svm_is_intercept(svm, INTERCEPT_VMSAVE) ||
+> > +	    !svm_is_intercept(svm, INTERCEPT_VMSAVE))
+> > +		WARN_ON(!(svm->vmcb->control.virt_ext &
+> > +			  VIRTUAL_VMLOAD_VMSAVE_ENABLE_MASK));
+> > +
+> >   	sync_lapic_to_cr8(vcpu);
+> >   	if (unlikely(svm->asid != svm->vmcb->control.asid)) {
+> > 
+> 
+> While it's nice to be "proactive", this does adds some extra work. Maybe it
+> should be under CONFIG_DEBUG_KERNEL.  It could be useful to make it into its
+> own function so we can add similar intercept invariants in the same place.
 
-Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
----
- arch/x86/include/asm/fpu/api.h |    4 +---
- arch/x86/kernel/fpu/core.c     |    5 +++++
- arch/x86/kernel/fpu/internal.h |    2 ++
- arch/x86/mm/extable.c          |    5 ++---
- 4 files changed, 10 insertions(+), 6 deletions(-)
+I don't know that DEBUG_KERNEL will guard much, DEBUG_KERNEL=y is very common,
+e.g. it's on by default in the x86 defconfigs.  I too agree it's nice to be
+proactive, but this isn't that different than say failing to intercept CR3 loads
+when shadow paging is enabled.
 
---- a/arch/x86/include/asm/fpu/api.h
-+++ b/arch/x86/include/asm/fpu/api.h
-@@ -113,6 +113,7 @@ static inline void update_pasid(void) {
- /* Trap handling */
- extern int  fpu__exception_code(struct fpu *fpu, int trap_nr);
- extern void fpu_sync_fpstate(struct fpu *fpu);
-+extern void fpu_reset_from_exception_fixup(void);
- 
- /* Boot, hotplug and resume */
- extern void fpu__init_cpu(void);
-@@ -129,9 +130,6 @@ static inline void fpstate_init_soft(str
- /* State tracking */
- DECLARE_PER_CPU(struct fpu *, fpu_fpregs_owner_ctx);
- 
--/* FPSTATE */
--extern union fpregs_state init_fpstate;
--
- /* FPSTATE related functions which are exported to KVM */
- extern void fpu_init_fpstate_user(struct fpu *fpu);
- 
---- a/arch/x86/kernel/fpu/core.c
-+++ b/arch/x86/kernel/fpu/core.c
-@@ -155,6 +155,11 @@ void restore_fpregs_from_fpstate(union f
- 	}
- }
- 
-+void fpu_reset_from_exception_fixup(void)
-+{
-+	restore_fpregs_from_fpstate(&init_fpstate, xfeatures_mask_fpstate());
-+}
-+
- #if IS_ENABLED(CONFIG_KVM)
- void fpu_swap_kvm_fpu(struct fpu *save, struct fpu *rstor, u64 restore_mask)
- {
---- a/arch/x86/kernel/fpu/internal.h
-+++ b/arch/x86/kernel/fpu/internal.h
-@@ -2,6 +2,8 @@
- #ifndef __X86_KERNEL_FPU_INTERNAL_H
- #define __X86_KERNEL_FPU_INTERNAL_H
- 
-+extern union fpregs_state init_fpstate;
-+
- /* CPU feature check wrappers */
- static __always_inline __pure bool use_xsave(void)
- {
---- a/arch/x86/mm/extable.c
-+++ b/arch/x86/mm/extable.c
-@@ -4,8 +4,7 @@
- #include <linux/sched/debug.h>
- #include <xen/xen.h>
- 
--#include <asm/fpu/signal.h>
--#include <asm/fpu/xstate.h>
-+#include <asm/fpu/api.h>
- #include <asm/sev.h>
- #include <asm/traps.h>
- #include <asm/kdebug.h>
-@@ -48,7 +47,7 @@ static bool ex_handler_fprestore(const s
- 	WARN_ONCE(1, "Bad FPU state detected at %pB, reinitializing FPU registers.",
- 		  (void *)instruction_pointer(regs));
- 
--	restore_fpregs_from_fpstate(&init_fpstate, xfeatures_mask_fpstate());
-+	fpu_reset_from_exception_fixup();
- 	return true;
- }
- 
-
+If we go down the path of effectively auditing KVM invariants, I'd rather we
+commit fully and (a) add a dedicated Kconfig that is highly unlikely to be turned
+on by accident and (b) audit a large number of invariants.
