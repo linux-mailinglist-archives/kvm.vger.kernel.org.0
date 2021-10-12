@@ -2,97 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EDD8542AB0B
-	for <lists+kvm@lfdr.de>; Tue, 12 Oct 2021 19:43:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 042A342AB10
+	for <lists+kvm@lfdr.de>; Tue, 12 Oct 2021 19:46:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232898AbhJLRpv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Oct 2021 13:45:51 -0400
-Received: from mail.kernel.org ([198.145.29.99]:57370 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229495AbhJLRpt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Oct 2021 13:45:49 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id D3765610C9;
-        Tue, 12 Oct 2021 17:43:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1634060627;
-        bh=yASkbNro1ryeq/Pn5XosEpr1G6AfQVBAJaOgTM+0Dn0=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=nz7y5KBa+PIOjnf5zHSt/7PGOM48ZmDjlnwWT9m2ouhxtKrJ84S0Wh8DsGCa7rmrC
-         9P8kBS0340MOfHilxFpHcIlMaTcbwJXSty5L+mw6BcL+2kAwSDOMaDandi3ZSHzO26
-         wo5dTwKEtu7oNAub5pDl6PGH8gXPJegDOw6Xa+i8rLzIFcVtDmTK32UdlxWdukRcmj
-         3T1nGlnvUSWWU9Jmk/bbQkFnIMuDeFVXOMsoL7cjXfhr9BFvUR4GfxEywd4cmruKwX
-         CPnpklYmzy3pIhsO+jOnA6y2CnllPJs2HpVKIdK/zKoBGw9Mv1J5G18afcm1DYFhtG
-         jlK4slA0UQqnA==
-Message-ID: <9dbc9cedd6b49eb5c5078dd776aed808534534ec.camel@kernel.org>
-Subject: Re: [PATCH v2 2/2] x86: sgx_vepc: implement SGX_IOC_VEPC_REMOVE
- ioctl
-From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     dave.hansen@linux.intel.com, seanjc@google.com, x86@kernel.org,
-        yang.zhong@intel.com
-Date:   Tue, 12 Oct 2021 20:43:44 +0300
-In-Reply-To: <22c1c59f-9b7c-69fa-eff3-1670b94c77af@redhat.com>
-References: <20211012105708.2070480-1-pbonzini@redhat.com>
-         <20211012105708.2070480-3-pbonzini@redhat.com>
-         <644db39e4c995e1966b6dbc42af16684e8420785.camel@kernel.org>
-         <22c1c59f-9b7c-69fa-eff3-1670b94c77af@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.40.0-1 
+        id S232387AbhJLRsS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Oct 2021 13:48:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48962 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229495AbhJLRsR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Oct 2021 13:48:17 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BF92C061570;
+        Tue, 12 Oct 2021 10:46:15 -0700 (PDT)
+Received: from zn.tnic (p200300ec2f19420044c1262ed1e42b8c.dip0.t-ipconnect.de [IPv6:2003:ec:2f19:4200:44c1:262e:d1e4:2b8c])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 06B2D1EC047E;
+        Tue, 12 Oct 2021 19:46:14 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1634060774;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=x5jmEYoOWbIrx2JArtKtCDt/YV7kBkWkVjZ7M0GZpRo=;
+        b=OMOnnbtzuMLuJy+sTPLw5T/gkqxM0OExXMmNLgTnv+3n3CltiX/gh3PQ+vONw0Deppiuee
+        XOmDKN5BSv8UvEw2+hNL51feihcbSn7VnV5twVArLFycT40m0xjFCePNKH6x0TsX1RGMSm
+        hkucMlo9uP6TNx8Xu3erbkt1SP636m0=
+Date:   Tue, 12 Oct 2021 19:46:11 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Thomas Gleixner <tglx@linutronix.de>
+Cc:     LKML <linux-kernel@vger.kernel.org>, x86@kernel.org,
+        "Chang S. Bae" <chang.seok.bae@intel.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Arjan van de Ven <arjan@linux.intel.com>,
+        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [patch 26/31] x86/fpu: Move fpstate functions to api.h
+Message-ID: <YWXJ41WPh6udVXmE@zn.tnic>
+References: <20211011215813.558681373@linutronix.de>
+ <20211011223611.846280577@linutronix.de>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20211011223611.846280577@linutronix.de>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2021-10-12 at 19:03 +0200, Paolo Bonzini wrote:
-> On 12/10/21 18:57, Jarkko Sakkinen wrote:
-> > > +
-> > > =C2=A0=C2=A0static const struct file_operations sgx_vepc_fops =3D {
-> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.owner=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=3D THIS_MODULE,
-> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.open=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=3D sgx_vepc_open,
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.unlocked_ioctl=C2=A0=3D s=
-gx_vepc_ioctl,
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.compat_ioctl=C2=A0=C2=A0=
-=C2=A0=3D sgx_vepc_ioctl,
-> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.release=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=3D sgx_vepc_release,
-> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.mmap=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=3D sgx_vepc_mmap,
-> > > =C2=A0=C2=A0};
-> > I went through this a few times, the code change is sound and
-> > reasoning makes sense in the commit message.
-> >=20
-> > The only thing that I think that is IMHO lacking is a simple
-> > kselftest. I think a trivial test for SGX_IOC_VEP_REMOVE_ALL
-> > would do.
->=20
-> Yeah, a trivial test wouldn't cover a lot; it would be much better to at=
-=20
-> least set up a SECS, and check that the first call returns 1 and the=20
-> second returns 0.=C2=A0 There is no existing test for /dev/sgx_vepc at al=
-l.
->=20
-> Right now I'm relying on Yang for testing this in QEMU, but I'll look=20
-> into adding a selftest that does the full setup and runs an enclave in a=
-=20
-> guest.
+On Tue, Oct 12, 2021 at 02:00:37AM +0200, Thomas Gleixner wrote:
+> Move function declarations which need to be globaly available to api.h
+> where they belong.
 
-This having a regression would not working would not cause that much collat=
-eral
-damage, especially since it would be probably quickly noticed by someone, s=
-o I
-think that this is not absolutely mandatory. So you can ignore kselftest pa=
-rt,
-and thus
+"globally"
 
-Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
+-- 
+Regards/Gruss,
+    Boris.
 
-Thank you, this work helps me a lot, given that my SGX testing is based aro=
-und
-using QEMU ATM.
-
-/Jarkko
-
+https://people.kernel.org/tglx/notes-about-netiquette
