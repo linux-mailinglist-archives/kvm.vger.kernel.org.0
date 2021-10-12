@@ -2,143 +2,185 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 999AE42AE1D
-	for <lists+kvm@lfdr.de>; Tue, 12 Oct 2021 22:44:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BFC6D42AE26
+	for <lists+kvm@lfdr.de>; Tue, 12 Oct 2021 22:49:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234118AbhJLUqy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Oct 2021 16:46:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33670 "EHLO
+        id S235056AbhJLUvK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Oct 2021 16:51:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34668 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234486AbhJLUqx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Oct 2021 16:46:53 -0400
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5311EC061745
-        for <kvm@vger.kernel.org>; Tue, 12 Oct 2021 13:44:51 -0700 (PDT)
-Received: by mail-pl1-x634.google.com with SMTP id l6so326868plh.9
-        for <kvm@vger.kernel.org>; Tue, 12 Oct 2021 13:44:51 -0700 (PDT)
+        with ESMTP id S230467AbhJLUvF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Oct 2021 16:51:05 -0400
+Received: from mail-qk1-x74a.google.com (mail-qk1-x74a.google.com [IPv6:2607:f8b0:4864:20::74a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94271C061745
+        for <kvm@vger.kernel.org>; Tue, 12 Oct 2021 13:49:03 -0700 (PDT)
+Received: by mail-qk1-x74a.google.com with SMTP id s20-20020a05620a0bd400b0045e893f2ed8so228562qki.11
+        for <kvm@vger.kernel.org>; Tue, 12 Oct 2021 13:49:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=8ViV5/pFsBw3tEZCSEbQNY/kwVRna/LjOJ8u3cbMomY=;
-        b=IfAyv/ESGEJl3OXMAEkUu+1eEAYJA1DTprmw/n6iHXk1vORtYBH6NWmjsICnrglySW
-         u7p6FjmJtFivP7gXm0vB/abB4I9+1WFQe5HLQ7V6ApO4BHTChuG7TZwTup3PbhpP8ORf
-         s7pIkXdxhoHubE0p2y27bbwtAdXnhW7ucmiFnOoUJVSXDtwTQssYCtr0rcS6WZ0ZELOv
-         nzEycl41/WtD5NbUjilm5cJSac15mm8pJixeptm3CRTrdN+dtG/LP7GPimIBGI0IfkHa
-         y8ld4AZNzIcxoppNzAgiSpotsMxXw8q20/UigY5MJ624DjAJsU+N/ypOQ4SWeJaHz8u0
-         pl/Q==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=teEEhVWJN+Qa6H6Qk1wKq131PVGwnj7NNqky10GsyoI=;
+        b=OiGTRrzaxSz0x5HSUuTg4hDTD/OeCBAaD/mWV8UZ8XyjJG/gdgfKyZcn0SQPwisM+h
+         fXqoflM2sv0pCaZUKFh6qXeNq3Vd+aNA3I0J0Q2TL1yC4iw4fc25ZGn1XbPKhRO9rKLV
+         eLlEt/S+g02f1ZSqsow1cq5Ce6FY2ZhJzliLWojrXbuSpDTC7Y/AAlvthgYohIzgl7X3
+         KR4tLcEk8wR1f+i93CD2P3zvLCZhqQGopG9tAh/QCC78f2zvgC0nWq3+WTQZ5OpxY5LS
+         cctPwwBnkZ+h0SJW5XJWeYRFEcD1IPUnuuToF19ElOm8dOhe/7me0v5RLB267vWGMCf6
+         pJpA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=8ViV5/pFsBw3tEZCSEbQNY/kwVRna/LjOJ8u3cbMomY=;
-        b=5Dbb184UWD7rKhvXH9WlhCDaXQhzlncxfhgZZD7N66ncUKlBbuXCHMTySLN67Hpjcd
-         azibVY5OVWiaVz30SG7xGX+BUo+cESU8i79g7isZZAKBz7zDOQOs5WOyK4879uiGOYjH
-         nxj7fEf8OYqd8iEx/r8KlwViWtoJZnXhb6Vn3KaEKuLSB77Vhvdq2JLQ3hlAIKQNXT+E
-         twqN/cj0zziTNo5nrmKlhRhskSw3tiYLDon4eHyayWG5zVGNUUAFBgWp7OF5DXAU6SO6
-         MNEJWyIjhmT687fe0DNCIcZGQVrC/7SKePKwT05AVuoUB+6AuFcdg6q+d72+VhRARmbF
-         IF1A==
-X-Gm-Message-State: AOAM532HHIj8RuVOrx/227YJ/P6xfQ5O54Wyu13J5AsJ7uLBatrX8Ldv
-        J5YQhYbF+cRamQ1ET5rA7/P5mg==
-X-Google-Smtp-Source: ABdhPJxwGw5yVkX9qLympbpNPYa4ihCOPDnJEFbWRsVu8t6dvIwYQRRToQPlei3MyDTRcSYspl6LPA==
-X-Received: by 2002:a17:903:2303:b0:13f:e63:e27d with SMTP id d3-20020a170903230300b0013f0e63e27dmr28278411plh.84.1634071490561;
-        Tue, 12 Oct 2021 13:44:50 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id w17sm10177165pff.191.2021.10.12.13.44.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Oct 2021 13:44:49 -0700 (PDT)
-Date:   Tue, 12 Oct 2021 20:44:46 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=teEEhVWJN+Qa6H6Qk1wKq131PVGwnj7NNqky10GsyoI=;
+        b=Oe0W6Wn6NB9d6A+xpgfawnRMzoV0Etg2vnaKpBMHmoNbChv3tfqe7rvxwiSpgo86A5
+         1K3+fny1+ka8S7uNP/hD1d0hhZfvnQh1lFWh4fWpyIprlB4Cb5Xftyz6IFBjH4Mxo682
+         0g9Ytj/fVNWIwvcLDfe03Xn2wUMfQyW2gDtv0vtV19EONATUcxd4KDcLqLU/KSi1zJ1n
+         Rfg4q0p94SFyG63HV8EITJ9jNtQDf5oTkmUupgETvcRmQESOA7l9R5vAM5F1Ibm2uq67
+         D0+Y+KseeOYkOfg7NBcKyyN3sFN/z4Nv4I3iSsB87b9sohEaG/EIjGr4jfdXV2daoV0X
+         Dwqg==
+X-Gm-Message-State: AOAM530366F3tVfFKbdWIRYbMmAsBaXLrmztxPAtqqP3uW37tqRCrK4J
+        VPAkBTLslaho3TQmRV3itBFGrKpgmPAjSc5vGQPED/rDXGChPxcKJzS4GE3lCxp0sp+bJznjwTS
+        rUeR/Mm3+epPXnprwuqN66UjbHEhC5t5Bk+K9uZ8you4zvJZeEwetki9a1Q==
+X-Google-Smtp-Source: ABdhPJxFeI5OJl1z1+FmDrAXsT2HYKR4TceIvtLx4TbVTlU8OdQG/KZr0T4g+ZTxK0Y9ntVAQXi3xx+NCTw=
+X-Received: from pgonda1.kir.corp.google.com ([2620:15c:29:204:bab5:e2c:2623:d2f8])
+ (user=pgonda job=sendgmr) by 2002:ac8:5e14:: with SMTP id h20mr24196018qtx.364.1634071742702;
+ Tue, 12 Oct 2021 13:49:02 -0700 (PDT)
+Date:   Tue, 12 Oct 2021 13:48:53 -0700
+Message-Id: <20211012204858.3614961-1-pgonda@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.0.882.g93a45727a2-goog
+Subject: [PATCH 0/5 V10] Add AMD SEV and SEV-ES intra host migration support
+From:   Peter Gonda <pgonda@google.com>
+To:     kvm@vger.kernel.org
+Cc:     Peter Gonda <pgonda@google.com>, Marc Orr <marcorr@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        David Rientjes <rientjes@google.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH Part2 v5 21/45] KVM: SVM: Make AVIC backing, VMSA and
- VMCB memory allocation SNP safe
-Message-ID: <YWXzvhuE9/iCcqxZ@google.com>
-References: <20210820155918.7518-1-brijesh.singh@amd.com>
- <20210820155918.7518-22-brijesh.singh@amd.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210820155918.7518-22-brijesh.singh@amd.com>
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 20, 2021, Brijesh Singh wrote:
-> Implement a workaround for an SNP erratum where the CPU will incorrectly
-> signal an RMP violation #PF if a hugepage (2mb or 1gb) collides with the
-> RMP entry of a VMCB, VMSA or AVIC backing page.
+Intra host migration provides a low-cost mechanism for userspace VMM
+upgrades.  It is an alternative to traditional (i.e., remote) live
+migration. Whereas remote migration handles moving a guest to a new host,
+intra host migration only handles moving a guest to a new userspace VMM
+within a host.  This can be used to update, rollback, change flags of the
+VMM, etc. The lower cost compared to live migration comes from the fact
+that the guest's memory does not need to be copied between processes. A
+handle to the guest memory simply gets passed to the new VMM, this could
+be done via /dev/shm with share=on or similar feature.
 
-...
+The guest state can be transferred from an old VMM to a new VMM as follows:
+1. Export guest state from KVM to the old user-space VMM via a getter
+user-space/kernel API 2. Transfer guest state from old VMM to new VMM via
+IPC communication 3. Import guest state into KVM from the new user-space
+VMM via a setter user-space/kernel API VMMs by exporting from KVM using
+getters, sending that data to the new VMM, then setting it again in KVM.
 
-> @@ -4539,6 +4539,16 @@ static int svm_vm_init(struct kvm *kvm)
->  	return 0;
->  }
->  
-> +static void *svm_alloc_apic_backing_page(struct kvm_vcpu *vcpu)
-> +{
-> +	struct page *page = snp_safe_alloc_page(vcpu);
-> +
-> +	if (!page)
-> +		return NULL;
-> +
-> +	return page_address(page);
-> +}
-> +
->  static struct kvm_x86_ops svm_x86_ops __initdata = {
->  	.hardware_unsetup = svm_hardware_teardown,
->  	.hardware_enable = svm_hardware_enable,
-> @@ -4667,6 +4677,8 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
->  	.complete_emulated_msr = svm_complete_emulated_msr,
->  
->  	.vcpu_deliver_sipi_vector = svm_vcpu_deliver_sipi_vector,
-> +
-> +	.alloc_apic_backing_page = svm_alloc_apic_backing_page,
+In the common case for intra host migration, we can rely on the normal
+ioctls for passing data from one VMM to the next. SEV, SEV-ES, and other
+confidential compute environments make most of this information opaque, and
+render KVM ioctls such as "KVM_GET_REGS" irrelevant.  As a result, we need
+the ability to pass this opaque metadata from one VMM to the next. The
+easiest way to do this is to leave this data in the kernel, and transfer
+ownership of the metadata from one KVM VM (or vCPU) to the next. For
+example, we need to move the SEV enabled ASID, VMSAs, and GHCB metadata
+from one VMM to the next.  In general, we need to be able to hand off any
+data that would be unsafe/impossible for the kernel to hand directly to
+userspace (and cannot be reproduced using data that can be handed safely to
+userspace).
 
-IMO, this should be guarded by a module param or X86_BUG_* to make it clear that
-this is a bug and not working as intended.
+V10
+ * Add new starting patch to refactor all SEV-ES related vCPU data into
+   for easier copying.
 
-And doesn't the APIC page need these shenanigans iff AVIC is enabled? (the module
-param, not necessarily in the VM)
+V9
+ * Fix sev_lock_vcpus_for_migration from unlocking the vCPU mutex it
+   failed to unlock.
 
->  };
->  
->  static struct kvm_x86_init_ops svm_init_ops __initdata = {
-> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-> index d1f1512a4b47..e40800e9c998 100644
-> --- a/arch/x86/kvm/svm/svm.h
-> +++ b/arch/x86/kvm/svm/svm.h
-> @@ -575,6 +575,7 @@ void sev_es_create_vcpu(struct vcpu_svm *svm);
->  void sev_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector);
->  void sev_es_prepare_guest_switch(struct vcpu_svm *svm, unsigned int cpu);
->  void sev_es_unmap_ghcb(struct vcpu_svm *svm);
-> +struct page *snp_safe_alloc_page(struct kvm_vcpu *vcpu);
->  
->  /* vmenter.S */
->  
-> -- 
-> 2.17.1
-> 
+V8
+ * Update to require that @dst is not SEV or SEV-ES enabled.
+ * Address selftest feedback.
+
+V7
+ * Address selftest feedback.
+
+V6
+ * Add selftest.
+
+V5:
+ * Fix up locking scheme
+ * Address marcorr@ comments.
+
+V4:
+ * Move to seanjc@'s suggestion of source VM FD based single ioctl design.
+
+v3:
+ * Fix memory leak found by dan.carpenter@
+
+v2:
+ * Added marcorr@ reviewed by tag
+ * Renamed function introduced in 1/3
+ * Edited with seanjc@'s review comments
+ ** Cleaned up WARN usage
+ ** Userspace makes random token now
+ * Edited with brijesh.singh@'s review comments
+ ** Checks for different LAUNCH_* states in send function
+
+v1: https://lore.kernel.org/kvm/20210621163118.1040170-1-pgonda@google.com/
+
+base-commit: 2acbc5c9a0ec
+
+Cc: Marc Orr <marcorr@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Sean Christopherson <seanjc@google.com>
+Cc: David Rientjes <rientjes@google.com>
+Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Cc: Brijesh Singh <brijesh.singh@amd.com>
+Cc: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: Wanpeng Li <wanpengli@tencent.com>
+Cc: Jim Mattson <jmattson@google.com>
+Cc: Joerg Roedel <joro@8bytes.org>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: Borislav Petkov <bp@alien8.de>
+Cc: "H. Peter Anvin" <hpa@zytor.com>
+Cc: kvm@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+
+Peter Gonda (5):
+  Refactor out sev_es_state struct
+  KVM: SEV: Add support for SEV intra host migration
+  KVM: SEV: Add support for SEV-ES intra host migration
+  selftest: KVM: Add open sev dev helper
+  selftest: KVM: Add intra host migration tests
+
+ Documentation/virt/kvm/api.rst                |  15 +
+ arch/x86/include/asm/kvm_host.h               |   1 +
+ arch/x86/kvm/svm/sev.c                        | 264 +++++++++++++++---
+ arch/x86/kvm/svm/svm.c                        |   9 +-
+ arch/x86/kvm/svm/svm.h                        |  28 +-
+ arch/x86/kvm/x86.c                            |   6 +
+ include/uapi/linux/kvm.h                      |   1 +
+ tools/testing/selftests/kvm/Makefile          |   3 +-
+ .../testing/selftests/kvm/include/kvm_util.h  |   1 +
+ .../selftests/kvm/include/x86_64/svm_util.h   |   2 +
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  24 +-
+ tools/testing/selftests/kvm/lib/x86_64/svm.c  |  13 +
+ .../selftests/kvm/x86_64/sev_vm_tests.c       | 203 ++++++++++++++
+ 13 files changed, 504 insertions(+), 66 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/sev_vm_tests.c
+
+-- 
+2.33.0.882.g93a45727a2-goog
+
