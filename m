@@ -2,82 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CCE34429A18
-	for <lists+kvm@lfdr.de>; Tue, 12 Oct 2021 02:07:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 89C94429A35
+	for <lists+kvm@lfdr.de>; Tue, 12 Oct 2021 02:07:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235779AbhJLAIk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Oct 2021 20:08:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34036 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234728AbhJLAI3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Oct 2021 20:08:29 -0400
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E374DC061570;
-        Mon, 11 Oct 2021 17:06:28 -0700 (PDT)
-Message-ID: <20211011223610.463067287@linutronix.de>
+        id S236282AbhJLAJf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Oct 2021 20:09:35 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:51396 "EHLO
+        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231886AbhJLAIZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Oct 2021 20:08:25 -0400
+Message-ID: <20211011223610.524176686@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1633997184;
+        s=2020; t=1633997182;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         references:references; bh=30YG7qzJGGvYFzVQYDpeQaqJ24jssBdyvBLYMB+8pqE=;
-        b=tuFoHc3CvB604KyPYb91G6msQbCntsX7/nKZGfcSk3TbmtEcYMHNvkLl33cxBTca+SkZhU
-        YCce9McsVBVGsVVaWxzUElKrLb60jdjigFG/L3bjszALXVF60Rv3Q2mvips6/+/Hk1zqb9
-        YJG+uv727y/wnlPrPjirS4itCZ22oDXHUIVPz4D/NLTklsARdOWRlekoyXQ573Nr+QUWmS
-        qy7Lz8pYp/6wxYfRgEHAwMIvIto5GiDxJ1bLgDbQiu9eNoUBr7ZUSpzbr+S5DisQafZiRj
-        8kN5LnoarjkHaJxNqYvwm7IAfy91zYrVVGmi79LGGGIGa8KLQSvrMUhNR8dZRw==
+         references:references; bh=Az4teqBX37vif9hCrLNnZFZ28q4lgGFyyPMu6OSHNTs=;
+        b=YYTQ0Nc1wQpJQxX5p8jGnIK1+jgqsu6Zc5pexORO+BSfUT7jwVS/6YL7tlAdItV67pOd91
+        lkV3BlabkL1+VWUoebgKGJTWXYlEgbnq+K0wH+gHQReQSq/kzdoramTTv8vYVwXCWTalQa
+        040xb4KYGYxkOHHnp3FXJ2NdB5g0EXc9KCbHoXXJ4wccz0yZzzC97nuZJQ6Td9cbi3JKG7
+        tTEPk2954FEGedATF3ut8LroesSwTYSzMtNUrdQZZYKwI+PggxP4eL4RHFJhazq+m8hEVQ
+        flmexavRBeoBZYlFE4XtjkQlfSabSc+as/56NuCLU7S/IAvgSJA+Nn3skk79dA==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1633997184;
+        s=2020e; t=1633997182;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         references:references; bh=30YG7qzJGGvYFzVQYDpeQaqJ24jssBdyvBLYMB+8pqE=;
-        b=PGDHmx21mQhHnTYI4anE8NXeZGRymNWzg33VgmGjKiYZAanhOWnoEHJBnNgkoCYzmXq6Rx
-        O3Eys41Wscfg07AQ==
+         references:references; bh=Az4teqBX37vif9hCrLNnZFZ28q4lgGFyyPMu6OSHNTs=;
+        b=jTftb3uApnXxQgYi1tryhvrgcEUsZxXp1Yba96DLlfeLAUGcEI3FNupn/U0qGFq1RX/7QX
+        7REdTx33R9e6BeBw==
 From:   Thomas Gleixner <tglx@linutronix.de>
 To:     LKML <linux-kernel@vger.kernel.org>
 Cc:     x86@kernel.org, "Chang S. Bae" <chang.seok.bae@intel.com>,
         Dave Hansen <dave.hansen@linux.intel.com>,
         Arjan van de Ven <arjan@linux.intel.com>,
         kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Subject: [patch 03/31] x86/pkru: Remove useless include
+Subject: [patch 04/31] x86/fpu: Restrict xsaves()/xrstors() to independent states
 References: <20211011215813.558681373@linutronix.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Date:   Tue, 12 Oct 2021 02:00:02 +0200 (CEST)
+Date:   Tue, 12 Oct 2021 02:00:04 +0200 (CEST)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PKRU code does not need anything from fpu headers. Include cpufeature.h
-instead and fixup the resulting fallout in perf.
+These interfaces are really only valid for features which are independently
+managed and not part of the task context state for various reasons.
 
-This is a preparation for FPU changes in order to prevent recursive include
-hell.
+Tighten the checks and adjust the misleading comments.
 
 Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
 ---
- arch/x86/events/perf_event.h |    1 +
- arch/x86/include/asm/pkru.h  |    2 +-
- 2 files changed, 2 insertions(+), 1 deletion(-)
+ arch/x86/kernel/fpu/xstate.c |   14 ++++----------
+ 1 file changed, 4 insertions(+), 10 deletions(-)
 
---- a/arch/x86/events/perf_event.h
-+++ b/arch/x86/events/perf_event.h
-@@ -14,6 +14,7 @@
+--- a/arch/x86/kernel/fpu/xstate.c
++++ b/arch/x86/kernel/fpu/xstate.c
+@@ -1182,13 +1182,9 @@ static bool validate_xsaves_xrstors(u64
+ 	if (WARN_ON_FPU(!cpu_feature_enabled(X86_FEATURE_XSAVES)))
+ 		return false;
+ 	/*
+-	 * Validate that this is either a task->fpstate related component
+-	 * subset or an independent one.
++	 * Validate that this is a independent compoment.
+ 	 */
+-	if (mask & xfeatures_mask_independent())
+-		xchk = ~xfeatures_mask_independent();
+-	else
+-		xchk = ~xfeatures_mask_all;
++	xchk = ~xfeatures_mask_independent();
  
- #include <linux/perf_event.h>
- 
-+#include <asm/fpu/xstate.h>
- #include <asm/intel_ds.h>
- #include <asm/cpu.h>
- 
---- a/arch/x86/include/asm/pkru.h
-+++ b/arch/x86/include/asm/pkru.h
-@@ -2,7 +2,7 @@
- #ifndef _ASM_X86_PKRU_H
- #define _ASM_X86_PKRU_H
- 
--#include <asm/fpu/xstate.h>
-+#include <asm/cpufeature.h>
- 
- #define PKRU_AD_BIT 0x1
- #define PKRU_WD_BIT 0x2
+ 	if (WARN_ON_ONCE(!mask || mask & xchk))
+ 		return false;
+@@ -1206,8 +1202,7 @@ static bool validate_xsaves_xrstors(u64
+  * buffer should be zeroed otherwise a consecutive XRSTORS from that buffer
+  * can #GP.
+  *
+- * The feature mask must either be a subset of the independent features or
+- * a subset of the task->fpstate related features.
++ * The feature mask must be a subset of the independent features
+  */
+ void xsaves(struct xregs_state *xstate, u64 mask)
+ {
+@@ -1231,8 +1226,7 @@ void xsaves(struct xregs_state *xstate,
+  * Proper usage is to restore the state which was saved with
+  * xsaves() into @xstate.
+  *
+- * The feature mask must either be a subset of the independent features or
+- * a subset of the task->fpstate related features.
++ * The feature mask must be a subset of the independent features
+  */
+ void xrstors(struct xregs_state *xstate, u64 mask)
+ {
 
