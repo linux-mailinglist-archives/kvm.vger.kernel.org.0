@@ -2,142 +2,217 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 19D7342A9E0
-	for <lists+kvm@lfdr.de>; Tue, 12 Oct 2021 18:46:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D9FB842A9F9
+	for <lists+kvm@lfdr.de>; Tue, 12 Oct 2021 18:51:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232072AbhJLQsM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Oct 2021 12:48:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34458 "EHLO
+        id S231682AbhJLQxD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Oct 2021 12:53:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35762 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231994AbhJLQsL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Oct 2021 12:48:11 -0400
-Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EC62C061570
-        for <kvm@vger.kernel.org>; Tue, 12 Oct 2021 09:46:09 -0700 (PDT)
-Received: by mail-pf1-x42c.google.com with SMTP id c29so76821pfp.2
-        for <kvm@vger.kernel.org>; Tue, 12 Oct 2021 09:46:09 -0700 (PDT)
+        with ESMTP id S231735AbhJLQw5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Oct 2021 12:52:57 -0400
+Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3367AC061746
+        for <kvm@vger.kernel.org>; Tue, 12 Oct 2021 09:50:55 -0700 (PDT)
+Received: by mail-lf1-x12c.google.com with SMTP id r19so87367829lfe.10
+        for <kvm@vger.kernel.org>; Tue, 12 Oct 2021 09:50:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=WxtJ6kTMjB335FQT7eQ0eT+70TQDiMjlEAzZlxMqe30=;
-        b=bKOflXsLFzC3VU2LBpYLCOQSqWZeASP6ZYpwtMXyXCQ24DvBTaHGYfF64wgjZDKsla
-         LpPBv3FFCMFYsmS+evB4X2EmqUiQKWI7oaGecXjhcm4t10DJpJr2vmOVqhi9jQY9eJXi
-         9a6BmBu4332+d7Ju7hIbBp1ZnLa2LGcKGoTyDvfvwICGsr9y4cx2bX3A4DiwdeDSleK6
-         ADuM4LSQ5VFYhTx9WO6iia8tKPWVl1qqkwJiMW8Bt/75nqycZwR4exTh/O2RXjV8cMPx
-         kBII7YI8Dhm4R3Hr2cD4FnOV4Ddw1flpexyUS8KyOwUiN8m8eaoqUtQ2eqAhi9HeeGkk
-         8HoQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=HXB7pq6VEUj8hxAFp1wWH0HcYGQ43G7lLPeeJ7mMODg=;
+        b=qMyN2kuRAR8/b61nBYxlai/y5zhTPNYGYI5pokwNJupaFCQHgeTZug5eGhtgzpvxdi
+         hCEQSkXye10IsuHbo6/vc/0sfEtJFkAsHrxa5na2TzV1rrGmVvuiOkqTulzBA1aVD1Qw
+         nqfVej6T3hSdhTVenZqFlGwJLSc+N1OAfO6P2oBAYUJ5C2OTWwLvaZ3pGKaEgdZ8DsMk
+         P6tHTzZMOm7n7/1hLByRhwqP6Bn6j6m9DC/WhPEF+PATF0J3l1FvU+QwU1XaqJHqSrDW
+         Hfu6cqaCFWCM08slvQEEigCwglxJqlkpigGtEJXs1m1hQe4kfkKxDyLRf6C2ZabDIb9c
+         ZsoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=WxtJ6kTMjB335FQT7eQ0eT+70TQDiMjlEAzZlxMqe30=;
-        b=yhTwzbRudH9KoQnYDqSprfpjGcaoCZcq5T7wU3hX2ALjfKpjgX6i+FhWnKN2b9XC6A
-         tE+sf4J/wMtUTGXVys/xLslUWIOpAlhf05cTZ3vZ9tAiRoNbcqAP3pec1AnwyBBWUSMs
-         rEABAzsxH8sMCR25KTuJMenZN3BxWkWxGdL0MrpViKElKBFlLyaU7vYpvwEIvk+EA4p2
-         xlwAKyoLdmHAtTS/rjOD97HtKDURsagaOpw65X+ikwko1DkWHcYNB+e6/0zoRXviqylS
-         ykbKZuf0cqXDUKv4U6NFp6VgSJPIztW4/E+rSIWTPDlbyv2SbaLhbzQmn8ZmueACF8L0
-         BhKg==
-X-Gm-Message-State: AOAM532LHOMxj/KppzAfYn2w1PqfTkXLm29CGupgJgnpko0c12hQ3lgn
-        mx11KdnMys3ZcYqvMFvzUi394g==
-X-Google-Smtp-Source: ABdhPJwqjQYiIu9GVaeWoRMdEp/IOLk9KZQUl3zIehqyu0N4NWB1pHgyw7wIiEOvLESAmyrDCLnUww==
-X-Received: by 2002:a63:564a:: with SMTP id g10mr23601412pgm.199.1634057168886;
-        Tue, 12 Oct 2021 09:46:08 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id z19sm11467471pfj.156.2021.10.12.09.46.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Oct 2021 09:46:08 -0700 (PDT)
-Date:   Tue, 12 Oct 2021 16:46:04 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Atish Patra <Atish.Patra@wdc.com>
-Cc:     "kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>,
-        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
-        "vincent.chen@sifive.com" <vincent.chen@sifive.com>,
-        Anup Patel <Anup.Patel@wdc.com>,
-        "paul.walmsley@sifive.com" <paul.walmsley@sifive.com>,
-        "palmer@dabbelt.com" <palmer@dabbelt.com>,
-        "wangkefeng.wang@huawei.com" <wangkefeng.wang@huawei.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v3 5/5] RISC-V: Add SBI HSM extension in KVM
-Message-ID: <YWW7zGWUpqXLXE/4@google.com>
-References: <20211008032036.2201971-1-atish.patra@wdc.com>
- <20211008032036.2201971-6-atish.patra@wdc.com>
- <YWBdbCNQdikbhhBq@google.com>
- <0383b5cacb25e9dc293d891284df9f4cbc06ee3a.camel@wdc.com>
- <YWRLBknWXjzPnF1w@google.com>
- <a762f0263090d7e818e58873d63139d7b6829d87.camel@wdc.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=HXB7pq6VEUj8hxAFp1wWH0HcYGQ43G7lLPeeJ7mMODg=;
+        b=5Q+EOpE0BWVT/YZpKKAXswZrSehPAvG20iutnAIJOnO8H040EkpjTRXgKEv9IO+VPy
+         k5N9CcYkjJc1wKzQ5yd1HTMRY6OVyVU8wHPeUk7t3sMHY+KaMDpZbD6jjdLxuMANb9UB
+         NMrsX4HO8eR0wUxELg/9gnxZuqaQwWf9sXyPl1++yjZP+mbcA7YZCyAkJJS6sZp2bsA/
+         Jr5PeBpWvk6Nqgc9oZq7lZtY8QoZstz7LLkDQAj4uWNMomLsY5TlZEH7Oi0ZQPGCQjdd
+         gypX/WEt/GzIisXqse2XQylhMLEazMqA21hQl53Uj2OSDqvHwtwI4MShiAE9SBrIZRuL
+         sevA==
+X-Gm-Message-State: AOAM533zU3XaqBRXigBiacTG9+2a4vmvxs9LOClrUgU+TN4Rl8+3mSLW
+        BKeGBmpbVN4J937tUYnBf70tM6djIlmDFOGBq14S1w==
+X-Google-Smtp-Source: ABdhPJwWQLl4ltH8rAZrzzqG8B8i7VNzN/0vHCSMf8t5s88yo7nWOqGyVHQXfqtovpVFQYCo5iMwh/2kr8ApnffK130=
+X-Received: by 2002:a2e:461a:: with SMTP id t26mr31245857lja.198.1634057452993;
+ Tue, 12 Oct 2021 09:50:52 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <a762f0263090d7e818e58873d63139d7b6829d87.camel@wdc.com>
+References: <20211012091430.1754492-1-senozhatsky@chromium.org>
+In-Reply-To: <20211012091430.1754492-1-senozhatsky@chromium.org>
+From:   David Matlack <dmatlack@google.com>
+Date:   Tue, 12 Oct 2021 09:50:26 -0700
+Message-ID: <CALzav=dYeCs=ieC2p074J4KVyFpRsxRVa5ZQuST--2GOVJm7Kw@mail.gmail.com>
+Subject: Re: [PATCH] KVM: MMU: make PTE_PREFETCH_NUM tunable
+To:     Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Suleiman Souhlal <suleiman@google.com>,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 11, 2021, Atish Patra wrote:
-> On Mon, 2021-10-11 at 14:32 +0000, Sean Christopherson wrote:
-> > On Mon, Oct 11, 2021, Atish Patra wrote:
-> > > On Fri, 2021-10-08 at 15:02 +0000, Sean Christopherson wrote:
-> > > > On Thu, Oct 07, 2021, Atish Patra wrote:
-> > > > > +       preempt_disable();
-> > > > > +       loaded = (vcpu->cpu != -1);
-> > > > > +       if (loaded)
-> > > > > +               kvm_arch_vcpu_put(vcpu);
-> > > > 
-> > > > Oof.  Looks like this pattern was taken from arm64. 
-> > > 
-> > > Yes. This part is similar to arm64 because the same race condition
-> > > can
-> > > happen in riscv due to save/restore of CSRs during reset.
-> > > 
-> > > 
-> > > > Is there really no better approach to handling this?  I don't see
-> > > > anything  in kvm_riscv_reset_vcpu() that will obviously break if the
-> > > > vCPU is  loaded.  If the goal is purely to effect a CSR reset via
-> > > > kvm_arch_vcpu_load(), then why not just factor out a helper to do
-> > > > exactly that?
-> > 
-> > What about the question here?
-> 
-> Are you suggesting to factor the csr reset part to a different function?
+On Tue, Oct 12, 2021 at 2:16 AM Sergey Senozhatsky
+<senozhatsky@chromium.org> wrote:
+>
+> Turn PTE_PREFETCH_NUM into a module parameter, so that it
+> can be tuned per-VM.
 
-More or less.  I'm mostly asking why putting the vCPU is necessary.
+Module parameters do not allow tuning per VM, they effect every VM on
+the machine.
 
-> > > > >  void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu)
-> > > > >  {
-> > > > > +       /**
-> > > > > +        * vcpu with id 0 is the designated boot cpu.
-> > > > > +        * Keep all vcpus with non-zero cpu id in power-off
-> > > > > state
-> > > > > so that they
-> > > > > +        * can brought to online using SBI HSM extension.
-> > > > > +        */
-> > > > > +       if (vcpu->vcpu_idx != 0)
-> > > > > +               kvm_riscv_vcpu_power_off(vcpu);
-> > > > 
-> > > > Why do this in postcreate?
-> > > > 
-> > > 
-> > > Because we need to absolutely sure that the vcpu is created. It is
-> > > cleaner in this way rather than doing this here at the end of
-> > > kvm_arch_vcpu_create. create_vcpu can also fail after
-> > > kvm_arch_vcpu_create returns.
-> > 
-> > But kvm_riscv_vcpu_power_off() doesn't doesn't anything outside of the
-> > vCPU.  It clears vcpu->arch.power_off, makes a request, and kicks the
-> > vCPU.  None of that has side effects to anything else in KVM.  If the vCPU
-> > isn't created successfully, it gets deleted and nothing ever sees that
-> > state change.
-> 
-> I am assuming that you are suggesting to add this logic at the end of
-> the kvm_arch_vcpu_create() instead of kvm_arch_vcpu_postcreate().
-> 
-> vcpu_idx is assigned after kvm_arch_vcpu_create() returns in the
-> kvm_vm_ioctl_create_vcpu. kvm_arch_vcpu_postcreate() is the arch hookup
-> after vcpu_idx is assigned.
+If you want per-VM tuning you could introduce a VM ioctl.
 
-Ah, it's the consumption of vcpu->vcpu_idx that's problematic.  Thanks!
+>
+> - /sys/module/kvm/parameters/pte_prefetch_num 8
+>
+>              VM-EXIT    Samples  Samples%     Time%    Min Time    Max Time         Avg time
+>
+>        EPT_VIOLATION     760998    54.85%     7.23%      0.92us  31765.89us      7.78us ( +-   1.46% )
+>            MSR_WRITE     170599    12.30%     0.53%      0.60us   3334.13us      2.52us ( +-   0.86% )
+>   EXTERNAL_INTERRUPT     159510    11.50%     1.65%      0.49us  43705.81us      8.45us ( +-   7.54% )
+> [..]
+>
+> Total Samples:1387305, Total events handled time:81900258.99us.
+>
+> - /sys/module/kvm/parameters/pte_prefetch_num 16
+>
+>              VM-EXIT    Samples  Samples%     Time%    Min Time    Max Time         Avg time
+>
+>        EPT_VIOLATION     658064    52.58%     7.04%      0.91us  17022.84us      8.34us ( +-   1.52% )
+>            MSR_WRITE     163776    13.09%     0.54%      0.56us   5192.10us      2.57us ( +-   1.25% )
+>   EXTERNAL_INTERRUPT     144588    11.55%     1.62%      0.48us  97410.16us      8.75us ( +-  11.44% )
+> [..]
+>
+> Total Samples:1251546, Total events handled time:77956187.56us.
+>
+> Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+> ---
+>  arch/x86/kvm/mmu/mmu.c | 31 ++++++++++++++++++++++---------
+
+Please also update the shadow paging prefetching code in
+arch/x86/kvm/mmu/paging_tmpl.h, unless there is a good reason to
+diverge.
+
+>  1 file changed, 22 insertions(+), 9 deletions(-)
+>
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 24a9f4c3f5e7..0ab4490674ec 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -115,6 +115,8 @@ module_param(dbg, bool, 0644);
+>  #endif
+>
+>  #define PTE_PREFETCH_NUM               8
+> +static uint __read_mostly pte_prefetch_num = PTE_PREFETCH_NUM;
+> +module_param(pte_prefetch_num, uint, 0644);
+>
+>  #define PT32_LEVEL_BITS 10
+>
+> @@ -732,7 +734,7 @@ static int mmu_topup_memory_caches(struct kvm_vcpu *vcpu, bool maybe_indirect)
+>
+>         /* 1 rmap, 1 parent PTE per level, and the prefetched rmaps. */
+>         r = kvm_mmu_topup_memory_cache(&vcpu->arch.mmu_pte_list_desc_cache,
+> -                                      1 + PT64_ROOT_MAX_LEVEL + PTE_PREFETCH_NUM);
+> +                                      1 + PT64_ROOT_MAX_LEVEL + pte_prefetch_num);
+
+There is a sampling problem. What happens if the user changes
+pte_prefetch_num while a fault is being handled?
+
+>         if (r)
+>                 return r;
+>         r = kvm_mmu_topup_memory_cache(&vcpu->arch.mmu_shadow_page_cache,
+> @@ -2753,20 +2755,29 @@ static int direct_pte_prefetch_many(struct kvm_vcpu *vcpu,
+>                                     struct kvm_mmu_page *sp,
+>                                     u64 *start, u64 *end)
+>  {
+> -       struct page *pages[PTE_PREFETCH_NUM];
+> +       struct page **pages;
+>         struct kvm_memory_slot *slot;
+>         unsigned int access = sp->role.access;
+>         int i, ret;
+>         gfn_t gfn;
+>
+> +       pages = kmalloc_array(pte_prefetch_num, sizeof(struct page *),
+> +                             GFP_KERNEL);
+
+This code runs with the MMU lock held. From
+https://www.kernel.org/doc/html/latest/core-api/memory-allocation.html:
+
+    Note, that using GFP_KERNEL implies GFP_RECLAIM, which means
+    that direct reclaim may be triggered under memory pressure; the calling
+    context must be allowed to sleep.
+
+In general we avoid doing any dynamic memory allocation while the MMU
+lock is held. That's why the memory caches exist. You can avoid
+allocating under a lock by allocating the prefetch array when the vCPU
+is first initialized. This would also solve the module parameter
+sampling problem because you can read it once and store it in struct
+kvm_vcpu.
+
+> +       if (!pages)
+> +               return -1;
+> +
+>         gfn = kvm_mmu_page_get_gfn(sp, start - sp->spt);
+>         slot = gfn_to_memslot_dirty_bitmap(vcpu, gfn, access & ACC_WRITE_MASK);
+> -       if (!slot)
+> -               return -1;
+> +       if (!slot) {
+> +               ret = -1;
+> +               goto out;
+> +       }
+>
+>         ret = gfn_to_page_many_atomic(slot, gfn, pages, end - start);
+> -       if (ret <= 0)
+> -               return -1;
+> +       if (ret <= 0) {
+> +               ret = -1;
+> +               goto out;
+> +       }
+>
+>         for (i = 0; i < ret; i++, gfn++, start++) {
+>                 mmu_set_spte(vcpu, slot, start, access, gfn,
+> @@ -2774,7 +2785,9 @@ static int direct_pte_prefetch_many(struct kvm_vcpu *vcpu,
+>                 put_page(pages[i]);
+>         }
+>
+> -       return 0;
+> +out:
+> +       kfree(pages);
+> +       return ret;
+>  }
+>
+>  static void __direct_pte_prefetch(struct kvm_vcpu *vcpu,
+> @@ -2785,10 +2798,10 @@ static void __direct_pte_prefetch(struct kvm_vcpu *vcpu,
+>
+>         WARN_ON(!sp->role.direct);
+>
+> -       i = (sptep - sp->spt) & ~(PTE_PREFETCH_NUM - 1);
+> +       i = (sptep - sp->spt) & ~(pte_prefetch_num - 1);
+
+This code assumes pte_prefetch_num is a power of 2, which is now no
+longer guaranteed to be true.
+
+>         spte = sp->spt + i;
+>
+> -       for (i = 0; i < PTE_PREFETCH_NUM; i++, spte++) {
+> +       for (i = 0; i < pte_prefetch_num; i++, spte++) {
+>                 if (is_shadow_present_pte(*spte) || spte == sptep) {
+>                         if (!start)
+>                                 continue;
+> --
+> 2.33.0.882.g93a45727a2-goog
+>
