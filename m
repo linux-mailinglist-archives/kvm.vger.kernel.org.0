@@ -2,205 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6E31842A677
-	for <lists+kvm@lfdr.de>; Tue, 12 Oct 2021 15:52:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C3E4B42A6A9
+	for <lists+kvm@lfdr.de>; Tue, 12 Oct 2021 16:02:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237033AbhJLNyT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Oct 2021 09:54:19 -0400
-Received: from foss.arm.com ([217.140.110.172]:43620 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236783AbhJLNyS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Oct 2021 09:54:18 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EC380ED1;
-        Tue, 12 Oct 2021 06:52:16 -0700 (PDT)
-Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2B72E3F66F;
-        Tue, 12 Oct 2021 06:52:16 -0700 (PDT)
-Date:   Tue, 12 Oct 2021 14:52:13 +0100
-From:   Andre Przywara <andre.przywara@arm.com>
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     will@kernel.org, julien.thierry.kdev@gmail.com,
-        kvm@vger.kernel.org, jean-philippe@linaro.org
-Subject: Re: [PATCH v2 kvmtool 7/7] vfio/pci: Align MSIX Table and PBA size
- to guest maximum page size
-Message-ID: <20211012145213.742ab0fe@donnerap.cambridge.arm.com>
-In-Reply-To: <20211012132510.42134-8-alexandru.elisei@arm.com>
-References: <20211012132510.42134-1-alexandru.elisei@arm.com>
-        <20211012132510.42134-8-alexandru.elisei@arm.com>
-Organization: ARM
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
+        id S236953AbhJLOEh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Oct 2021 10:04:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53566 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230195AbhJLOEg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Oct 2021 10:04:36 -0400
+Received: from mail-ot1-x32b.google.com (mail-ot1-x32b.google.com [IPv6:2607:f8b0:4864:20::32b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C287CC061570;
+        Tue, 12 Oct 2021 07:02:34 -0700 (PDT)
+Received: by mail-ot1-x32b.google.com with SMTP id s18-20020a0568301e1200b0054e77a16651so9255436otr.7;
+        Tue, 12 Oct 2021 07:02:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=2Q0Hb9oHK4KcWY8R31erb4VAXs7l6Pn0D6RYKuAbMqo=;
+        b=Yq0ybx5oUO6KRl2BgdyTUebTMHE0V1N6SUlOeLzmooYLbULfQ5zR20IIY87NnYijQh
+         X5EqrMG7H0ofNUv6kbg1+DfDEBeQr+h4fZX7umN12dSHqHbgLcDiJBXbA9gFGY3ZD9s/
+         JAhYNYBygHFReTI2G1t3CqAbsy4WMjGQQ6IkftLfOOYT5Wcq6mXFhczS+NuXJH8SZqiM
+         gyNOefmWCD19W3LLPgZl0A+ya1Mn9YvSVRAA5aphUWTgIKFiURHSZ+Lx95W/ACie4pP+
+         91Bm8NyOFOZNQX7gSNNWShqXCKWRfB12NaxsTeySZCzgNwwelb1mj4hZNk7AX7BYxe0g
+         TrBw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=2Q0Hb9oHK4KcWY8R31erb4VAXs7l6Pn0D6RYKuAbMqo=;
+        b=kAEDP50CjGWzPGgpVXBdyX7XKwQtaRAG1+TTM+cBhsS116+DNpfx3gb9ZpjiMJgOmL
+         +zipwq0gZJoFUGeBzfoyTasVGUl4XIVfyCrnG2dh3doaz/VgENP1BlBMrZ0JMBJ5Tqmz
+         Rq2VXyy0mhFYMV63DzVpkqxFwNyluQGutc90dUWylgMe1Sqz3/ugrSrTZ9/VdFwY1w59
+         d7sUCPbXC//WCE/qrgN660o13K9QA12dcrBgLqEjglnuTt7AdjVTVnYWz8ufNE7b2kxN
+         VDtt+ZBaE3Dk8Eo9MF2LFOrvE2bCneNYrpfpdb6R0bJ7BjII3ERA4/Iq0t6X/07b/A2u
+         5Nww==
+X-Gm-Message-State: AOAM533guAteQWt+wtfLJ6Fs8l2Hd1z1OHcdkpwI4pc2Hqh2C+vZIsQc
+        w5J8tHnnqtElMChJd00x/tRUCO6sTIshgoUWT38B2eK/MsJ5VA==
+X-Google-Smtp-Source: ABdhPJzCeultU29FTm/JBZilW5VAVm32j0fgdcu8Mvi1xP1XUxDRD2qYdD/eLWbeM65K6kc+s7uW063PChXvmPzgNW0=
+X-Received: by 2002:a05:6830:1653:: with SMTP id h19mr27310330otr.162.1634047354154;
+ Tue, 12 Oct 2021 07:02:34 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20211002124012.18186-1-ajaygargnsit@gmail.com>
+ <b9afdade-b121-cc9e-ce85-6e4ff3724ed9@linux.intel.com> <CAHP4M8Us753hAeoXL7E-4d29rD9+FzUwAqU6gKNmgd8G0CaQQw@mail.gmail.com>
+ <20211004163146.6b34936b.alex.williamson@redhat.com> <CAHP4M8UeGRSqHBV+wDPZ=TMYzio0wYzHPzq2Y+JCY0uzZgBkmA@mail.gmail.com>
+ <CAHP4M8UD-k76cg0JmeZAwaWh1deSP82RCE=VC1zHQEYQmX6N9A@mail.gmail.com>
+ <CAHP4M8VPem7xEtx3vQPm3bzCQif7JZFiXgiUGZVErTt5vhOF8A@mail.gmail.com>
+ <20211011085247.7f887b12.alex.williamson@redhat.com> <CAHP4M8UmnBH58H3qqba1p3kyEiPUk9xTp063yJr8RFduUNjgbg@mail.gmail.com>
+In-Reply-To: <CAHP4M8UmnBH58H3qqba1p3kyEiPUk9xTp063yJr8RFduUNjgbg@mail.gmail.com>
+From:   Ajay Garg <ajaygargnsit@gmail.com>
+Date:   Tue, 12 Oct 2021 19:32:21 +0530
+Message-ID: <CAHP4M8Wyh92T3KBkpknkY+3gnN_ir-dfnLLf=D3_yUN0jj6Qxw@mail.gmail.com>
+Subject: Re: [PATCH] iommu: intel: remove flooding of non-error logs, when
+ new-DMA-PTE is the same as old-DMA-PTE.
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Lu Baolu <baolu.lu@linux.intel.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 12 Oct 2021 14:25:10 +0100
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+Hi Alex, Lu.
 
-> When allocating MMIO space for the MSI-X table, kvmtool rounds the
-> allocation to the host's page size to make it as easy as possible for the
-> guest to map the table to a page, if it wants to (and doesn't do BAR
-> reassignment, like the x86 architecture for example). However, the host's
-> page size can differ from the guest's on architectures which support
-> multiple page sizes. For example, arm64 supports three different page size,
-> and it is possible for the host to be using 4k pages, while the guest is
-> using 64k pages.
-> 
-> To make sure the allocation is always aligned to a guest's page size, round
-> it up to the maximum architectural page size. Do the same for the pending
-> bit array if it lives in its own BAR.
-> 
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+Posted v2 patch, as per
+https://lists.linuxfoundation.org/pipermail/iommu/2021-October/059955.html
 
-Thanks for adding MAX_PAGE_SIZE, looks alright now.
 
-Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+Kindly review, and let's continue on that thread now.
 
-Cheers,
-Andre
 
-> ---
->  arm/aarch32/include/kvm/kvm-arch.h | 4 ++++
->  arm/aarch64/include/kvm/kvm-arch.h | 4 ++++
->  mips/include/kvm/kvm-arch.h        | 3 +++
->  powerpc/include/kvm/kvm-arch.h     | 3 +++
->  vfio/pci.c                         | 6 ++++--
->  x86/include/kvm/kvm-arch.h         | 3 +++
->  6 files changed, 21 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arm/aarch32/include/kvm/kvm-arch.h b/arm/aarch32/include/kvm/kvm-arch.h
-> index a772bb1..bee2fc2 100644
-> --- a/arm/aarch32/include/kvm/kvm-arch.h
-> +++ b/arm/aarch32/include/kvm/kvm-arch.h
-> @@ -1,10 +1,14 @@
->  #ifndef KVM__KVM_ARCH_H
->  #define KVM__KVM_ARCH_H
->  
-> +#include <linux/sizes.h>
-> +
->  #define kvm__arch_get_kern_offset(...)	0x8000
->  
->  #define ARM_MAX_MEMORY(...)	ARM_LOMAP_MAX_MEMORY
->  
-> +#define MAX_PAGE_SIZE	SZ_4K
-> +
->  #include "arm-common/kvm-arch.h"
->  
->  #endif /* KVM__KVM_ARCH_H */
-> diff --git a/arm/aarch64/include/kvm/kvm-arch.h b/arm/aarch64/include/kvm/kvm-arch.h
-> index 159567b..5e5ee41 100644
-> --- a/arm/aarch64/include/kvm/kvm-arch.h
-> +++ b/arm/aarch64/include/kvm/kvm-arch.h
-> @@ -1,6 +1,8 @@
->  #ifndef KVM__KVM_ARCH_H
->  #define KVM__KVM_ARCH_H
->  
-> +#include <linux/sizes.h>
-> +
->  struct kvm;
->  unsigned long long kvm__arch_get_kern_offset(struct kvm *kvm, int fd);
->  int kvm__arch_get_ipa_limit(struct kvm *kvm);
-> @@ -21,6 +23,8 @@ int kvm__arch_get_ipa_limit(struct kvm *kvm);
->  	max_ram;							\
->  })
->  
-> +#define MAX_PAGE_SIZE	SZ_64K
-> +
->  #include "arm-common/kvm-arch.h"
->  
->  #endif /* KVM__KVM_ARCH_H */
-> diff --git a/mips/include/kvm/kvm-arch.h b/mips/include/kvm/kvm-arch.h
-> index fdc09d8..e2f048a 100644
-> --- a/mips/include/kvm/kvm-arch.h
-> +++ b/mips/include/kvm/kvm-arch.h
-> @@ -1,6 +1,7 @@
->  #ifndef KVM__KVM_ARCH_H
->  #define KVM__KVM_ARCH_H
->  
-> +#include <linux/sizes.h>
->  
->  /*
->   * Guest memory map is:
-> @@ -36,6 +37,8 @@
->  
->  #define VIRTIO_DEFAULT_TRANS(kvm)	VIRTIO_PCI
->  
-> +#define MAX_PAGE_SIZE		SZ_64K
-> +
->  #include <stdbool.h>
->  
->  #include "linux/types.h"
-> diff --git a/powerpc/include/kvm/kvm-arch.h b/powerpc/include/kvm/kvm-arch.h
-> index 26d440b..8eeca50 100644
-> --- a/powerpc/include/kvm/kvm-arch.h
-> +++ b/powerpc/include/kvm/kvm-arch.h
-> @@ -13,6 +13,7 @@
->  
->  #include <stdbool.h>
->  #include <linux/types.h>
-> +#include <linux/sizes.h>
->  #include <time.h>
->  
->  /*
-> @@ -48,6 +49,8 @@
->  
->  #define KVM_IOEVENTFD_HAS_PIO		0
->  
-> +#define MAX_PAGE_SIZE			SZ_256K
-> +
->  #define VIRTIO_DEFAULT_TRANS(kvm)	VIRTIO_PCI
->  
->  struct spapr_phb;
-> diff --git a/vfio/pci.c b/vfio/pci.c
-> index a08352d..78f5ca5 100644
-> --- a/vfio/pci.c
-> +++ b/vfio/pci.c
-> @@ -1,3 +1,5 @@
-> +#include "linux/sizes.h"
-> +
->  #include "kvm/irq.h"
->  #include "kvm/kvm.h"
->  #include "kvm/kvm-cpu.h"
-> @@ -926,7 +928,7 @@ static int vfio_pci_create_msix_table(struct kvm *kvm, struct vfio_device *vdev)
->  	if (!info.size)
->  		return -EINVAL;
->  
-> -	map_size = ALIGN(info.size, PAGE_SIZE);
-> +	map_size = ALIGN(info.size, MAX_PAGE_SIZE);
->  	table->guest_phys_addr = pci_get_mmio_block(map_size);
->  	if (!table->guest_phys_addr) {
->  		pr_err("cannot allocate MMIO space");
-> @@ -958,7 +960,7 @@ static int vfio_pci_create_msix_table(struct kvm *kvm, struct vfio_device *vdev)
->  		if (!info.size)
->  			return -EINVAL;
->  
-> -		map_size = ALIGN(info.size, PAGE_SIZE);
-> +		map_size = ALIGN(info.size, MAX_PAGE_SIZE);
->  		pba->guest_phys_addr = pci_get_mmio_block(map_size);
->  		if (!pba->guest_phys_addr) {
->  			pr_err("cannot allocate MMIO space");
-> diff --git a/x86/include/kvm/kvm-arch.h b/x86/include/kvm/kvm-arch.h
-> index 85cd336..d8a7312 100644
-> --- a/x86/include/kvm/kvm-arch.h
-> +++ b/x86/include/kvm/kvm-arch.h
-> @@ -5,6 +5,7 @@
->  
->  #include <stdbool.h>
->  #include <linux/types.h>
-> +#include <linux/sizes.h>
->  #include <time.h>
->  
->  /*
-> @@ -30,6 +31,8 @@
->  
->  #define KVM_IOEVENTFD_HAS_PIO	1
->  
-> +#define MAX_PAGE_SIZE		SZ_4K
-> +
->  #define VIRTIO_DEFAULT_TRANS(kvm)	VIRTIO_PCI
->  
->  struct kvm_arch {
+Thanks and Regards,
+Ajay
 
+On Mon, Oct 11, 2021 at 11:43 PM Ajay Garg <ajaygargnsit@gmail.com> wrote:
+>
+> Thanks Alex for your time.
+>
+> I think I may have found the issue. Right now, when doing a
+> dma-unmapping, we do a "soft-unmapping" only, as the pte-values
+> themselves are not cleared in the unlinked pagetable-frame.
+>
+> I have made the (simple) changes, and things are looking good as of
+> now (almost an hour now).
+> However, this time I will give it a day ;)
+>
+> If there is not a single-flooding observed in the next 24 hours, I
+> would float the v2 patch for review.
+>
+>
+> Thanks again for your time and patience.
+>
+>
+> Thanks and Regards,
+> Ajay
+>
+>
+> >
+> > Even this QEMU explanation doesn't make a lot of sense, vfio tracks
+> > userspace mappings and will return an -EEXIST error for duplicate or
+> > overlapping IOVA entries.  We expect to have an entirely empty IOMMU
+> > domain when a device is assigned, but it seems the only way userspace
+> > can trigger duplicate PTEs would be if mappings already exist, or we
+> > have a bug somewhere.
+> >
+> > If the most recent instance is purely on bare metal, then it seems the
+> > host itself has conflicting mappings.  I can only speculate with the
+> > limited data presented, but I'm suspicious there's something happening
+> > with RMRRs here (but that should also entirely preclude assignment).
+> > dmesg, lspci -vvv, and VM configuration would be useful.  Thanks,
+> >
+> > Alex
+> >
