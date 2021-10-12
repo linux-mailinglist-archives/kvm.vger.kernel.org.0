@@ -2,159 +2,163 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 51FD642A3CB
-	for <lists+kvm@lfdr.de>; Tue, 12 Oct 2021 14:05:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B628F42A46E
+	for <lists+kvm@lfdr.de>; Tue, 12 Oct 2021 14:31:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236345AbhJLMHK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Oct 2021 08:07:10 -0400
-Received: from mail-mw2nam10on2087.outbound.protection.outlook.com ([40.107.94.87]:50368
-        "EHLO NAM10-MW2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S233045AbhJLMHJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Oct 2021 08:07:09 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cPISxM4VBniBWHrL2HWvtQRpGA0AbuWA7650PyXg+VviaCgTgl4zqNIW4gAcvPf03uhITjgO+eIKpmu45XRwKPuC6DMD5WKWouVRpSphqjUAimDiOCnGhghjemysdefXO3Was40RoKUDbguMWwf8LoN1HRVzG20CwiD0CjJz1gbu84nKQVizgO296Agvkadv+gcElYrh81aamV86/V1hXFG0yRU2xED3TAZaUQqfXvQ3iYW0J4XjtoBbZIVp/5mcMEo6sGDEghWlZOr1M0dEZdxCPN1w0xRAskeTKDEBacyihYokUUnTQNQ2LteS/1XldinwPggmoFIJvOF2yI+Xcw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=8ujlSrQgGnSdH+p896qPdUuJ2fQ8zIltb3LNEgcJg0I=;
- b=EaM9t3kqoGuzoJbTolcat0UUnKPlLMB8O5VYytnZgfH4q6RXRC/L9gcscVnC1BESrkCXfSNz23yaeOWOwGPFUfEywqmB1F1iA8asnL5cIQj2/tszXHOeCipA3ye9letNObfLBtR7c8tmQCSx1TIr6n6cekFf5TkYQm6BwDmq/0Xbxw5HO2ZCKc6R1aLSGr7wER2q6KuC86Gy8mP91riweo/oEm+bBwwoq7MF7nbO34dVkIc5nTVj0PiXrl1mmScPO7Pa6G22MBCM7XfGRBx5dSVeZxfh14sDm/33TA0TVP0YdeV7h/m3OthOstBxCWYYdVltUeco/t2bC9JEGC89Mg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8ujlSrQgGnSdH+p896qPdUuJ2fQ8zIltb3LNEgcJg0I=;
- b=DzQ8dIqRvjVfkL6JqbmeioEn00oqXJr/kPgVELorlJ5fXkqLr/xWcsxuKJgzZOfXLb10vG04tMZ8TTPOFO+EHITVzd9mHrOShOXniAJ0MOmI6pvZWvungAMxz8+h3nDV6O4oq7YWMEZlXLTMU6P+AvZSGGYiaCgEIsuTqDoFu1Ct4aLd1pYB+MGDry1NwM0sq5nV7qnyMnm2xdh4dZIRyGKgzBkwMgMTyz/tYUn9YWpr/TgrFinypurhR2VTuIMV1JdfZNYl+zRQ+Gc9PpV5y0c19mtKeuvPqokg/RB2n/TZ8Ma91VQ5EUfSKX8UOKON6iW28ViMmBYMHsB4gW+xsg==
-Authentication-Results: intel.com; dkim=none (message not signed)
- header.d=none;intel.com; dmarc=none action=none header.from=nvidia.com;
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
- by BL1PR12MB5378.namprd12.prod.outlook.com (2603:10b6:208:31d::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4587.19; Tue, 12 Oct
- 2021 12:05:06 +0000
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::e8af:232:915e:2f95]) by BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::e8af:232:915e:2f95%6]) with mapi id 15.20.4608.014; Tue, 12 Oct 2021
- 12:05:06 +0000
-Date:   Tue, 12 Oct 2021 09:05:05 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        "Liu, Yi L" <yi.l.liu@intel.com>
-Subject: Re: [PATCH 5/5] vfio: Use cdev_device_add() instead of
- device_create()
-Message-ID: <20211012120505.GT2744544@nvidia.com>
-References: <0-v1-fba989159158+2f9b-vfio_group_cdev_jgg@nvidia.com>
- <5-v1-fba989159158+2f9b-vfio_group_cdev_jgg@nvidia.com>
- <BN9PR11MB5433538884DA4EB3B5BF89628CB69@BN9PR11MB5433.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BN9PR11MB5433538884DA4EB3B5BF89628CB69@BN9PR11MB5433.namprd11.prod.outlook.com>
-X-ClientProxiedBy: MN2PR22CA0017.namprd22.prod.outlook.com
- (2603:10b6:208:238::22) To BL0PR12MB5506.namprd12.prod.outlook.com
- (2603:10b6:208:1cb::22)
+        id S236281AbhJLMde (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Oct 2021 08:33:34 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:32350 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S236346AbhJLMd0 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 12 Oct 2021 08:33:26 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 19CAnGwf013182;
+        Tue, 12 Oct 2021 08:31:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=NGL6uHWcC/qeuSR1nITAcLMws/D4n1oX/88GgyPHGmA=;
+ b=Q5i6fvQHi4LemB7VEPAWBcXTlbNAaSpJ+smMK6Te2ea2aER/2MYsIsxVJ3SQ5WQQ5IWh
+ WoQyx7+6COCyZIhjyt7Ts/4kDs+MJxe+PAKfE1UIgU3dOLk3YYc8f7cvN404XhQx6/8G
+ T3r5lUrpVfLEaghCkAOoh/75JLMKgc8dMeYHQixQ5PX+MCG4zQx7jNUFzFOck9aZYijO
+ bDXk+hllQW5rvqnRNwE4bGoE478aLG8eRlZjQb01SiRxDs6bpLX/w4ACDbYX/8Ae07xX
+ 3cKUsO1G268nO6CKrko7lqiQJUgfCFgJooZI9qFSC7YybQOwt2p8VGSFLwYPWHBLF9v6 7A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3bn66qnxe8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 12 Oct 2021 08:31:24 -0400
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 19CCHV9C024781;
+        Tue, 12 Oct 2021 08:31:23 -0400
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3bn66qnxd3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 12 Oct 2021 08:31:23 -0400
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 19CCDNrH015897;
+        Tue, 12 Oct 2021 12:31:21 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma04ams.nl.ibm.com with ESMTP id 3bk2qa0cm1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 12 Oct 2021 12:31:21 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 19CCPQcc45744540
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 12 Oct 2021 12:25:26 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DD253AE06C;
+        Tue, 12 Oct 2021 12:31:01 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5C96DAE068;
+        Tue, 12 Oct 2021 12:31:01 +0000 (GMT)
+Received: from [9.145.51.19] (unknown [9.145.51.19])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 12 Oct 2021 12:31:01 +0000 (GMT)
+Message-ID: <e18fb171-726e-dc28-7a09-3c110bb97ff8@linux.ibm.com>
+Date:   Tue, 12 Oct 2021 14:31:00 +0200
 MIME-Version: 1.0
-Received: from mlx.ziepe.ca (142.162.113.129) by MN2PR22CA0017.namprd22.prod.outlook.com (2603:10b6:208:238::22) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4587.18 via Frontend Transport; Tue, 12 Oct 2021 12:05:06 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1maGWn-00DtrJ-3J; Tue, 12 Oct 2021 09:05:05 -0300
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: e0bf8797-8231-4eac-cba3-08d98d7887cb
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5378:
-X-Microsoft-Antispam-PRVS: <BL1PR12MB53788850087FA5B8C2B66263C2B69@BL1PR12MB5378.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:6430;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: oL/bQD0XltZkl+Heir0jddD1usN9jxiuP8wqp5aASokc7Y1+56bmB3wUo/JuwrESqgiX0GfTdDy/KW9qGK/OKDnCJDFRmBjgaVE3MEuG+KCRgsMQgkaVcjPTGtj6cV2AuQW1QfQlwbFmQLiRz51HSIYiFeoZrlkGZOKZVe3ToryMhapYZ88TN3zoL456jQWFSLIKoimu9fxpMF+lhJ/jvLzJafl82hI9yyTo+hQaawiqsLeEaLEn5vdeRwiG/E67YPh30pKfxC4Ehcu4JcC1PnHnlG1eL0JEd1CZ3LLyOp9BoBfis+KkNraMtCGJ+F2YD/ksUUTb3HHniBBRyI4smqSDf/BsREMD1buwRuk+2s9GNT9eOToQH5GuldvnUQJsx7NO02nysoPVtuOLBkIwn1d5PXKlq0sEuWtJ7osD0toIStsQaHyQjBgQntAIDrmlsoUSxb3CAv82LCyN1ROXdlChtDr3BSgYPR//zmuutBDF6Fv1iFtfsdsW1AL+MXRXM88Eeb28632lIrOJRop18xsE0uWc0pm+t5FNVhwO3lDxThA7Gcgy5/ZmmsqYawEjnZ/nOdpd4oJD1b46++nP88k0N9BpM1jcQbZJZlNTTsBNUJZAJyrAfI8vHTZLdrgOW9P4JOHCrJEn7xBboDudew==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(26005)(33656002)(6916009)(316002)(186003)(5660300002)(9786002)(8676002)(38100700002)(9746002)(54906003)(2906002)(83380400001)(508600001)(36756003)(86362001)(2616005)(1076003)(4326008)(8936002)(426003)(66946007)(66476007)(66556008);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?FI2+dykixcMZIKmspiVOPWyvH6RY2rcIk7bnmpOyuQQ/AZ82G/ffWAYAIBgg?=
- =?us-ascii?Q?J6gb1aUBfkAG5Vx+pPdYqrN/7sEQOdSQLKoXc1PfrLR2vcXczgct/Ro9Xbjo?=
- =?us-ascii?Q?Q38SJQpLHurBIszZV62I75JlG0P2RLIpF0q1YrRgR3YPkgd4KXcKdDzh4dFl?=
- =?us-ascii?Q?JLvJ5bVJsKrGK0S2RQRaG1uou0NYigUo93G2iR6MOZedSNt9Pp3dzEAsuN8B?=
- =?us-ascii?Q?Ab70cntXYj7ghCVBWveIV7pRBG+CUqylceryU3yazTY7kngo88F9kOZS+8cF?=
- =?us-ascii?Q?HILKh1lseNR/0ejejCyzhcab2rdJVEhHhN9cx/YwC6AzmuCkoFPxxO0TnuO+?=
- =?us-ascii?Q?+fJdhHkmSFTSyp+jg8IwWqKI6YII7ZOwuPe+TARCfAnk857xYQgSNG6HpmHD?=
- =?us-ascii?Q?DBtfuNxJ4DtZ+BWY7+eaM3NBpa+4nSI7GUH1iHnPt/FRbznuTmuoGb5rGC3C?=
- =?us-ascii?Q?vaUxMLgB9uYSb2Q1lIJF/Zf3sJCqAOgokJtZ4aXcXb1dcqD8qSDn8C/muqEW?=
- =?us-ascii?Q?K9HmHi8zhGonOFB1nmENYfqyBIo0VpjB+5qu36UhwTsL1uMr/yggZwgARk+L?=
- =?us-ascii?Q?9aT1GFcplmoMTt65IMAPCMQiwr3WJZXsn3g3lwzBoMgTYn086U29pF+7uQh8?=
- =?us-ascii?Q?Smlh/ZdGlsklCybunDynjxoTllA4x7D76OpfEwGO8Qf8HMzricqUt295sc+X?=
- =?us-ascii?Q?qK6EpOPS79JbTFfD/JzEydmejsRx6hIfa/YN937p66V0QIBRzqiF+Ca6Mqx+?=
- =?us-ascii?Q?pN6UAtUBJ+RXX9OltpZBcRESKp1buM98II0yjhPCzZGFlGYcJiPpTYgNoJYi?=
- =?us-ascii?Q?bVEzriIQZtSl8lB5r9FBCQpkKtUNSOLDqsjvf1m9lsinjjI22NbIhJe4kjc/?=
- =?us-ascii?Q?9PyPJVtHOIaDEhK0NrUxua3k89S65PeBC1LTubSK816BxrgmLaT2uDRf8H9m?=
- =?us-ascii?Q?oofd8wDBCH7kc4hhq7HtADzTv77zKymMsSDBEBRTPFzSkOHMJw5GkKyhnMhz?=
- =?us-ascii?Q?on/KyB1X/XND+fTa4QBTfbHSKMlPe4Mop7dDV2CaFAzx3ReB5vwMKKLmf5oO?=
- =?us-ascii?Q?UFb2/NBJqrE3qqJhVXozpiKJnOBL7Z4h7Wd6X0jDFVsazFQVHf4asuEThf7v?=
- =?us-ascii?Q?xmoiXilb5qfm1e7jHoinHAqDHIxQPdT0tTRTg+kWmrVQwFfXOmhWx9ZdtePS?=
- =?us-ascii?Q?bBXRzg5sHg7Aw5hr3FL4eF9Ne6cd5wc/YJbd9N9Wn9Gf7b9QuoAs/iukRU2Y?=
- =?us-ascii?Q?jfNfkVj/4P3Q8rvdEDNmoIrGQ+Z843OonVoLBybbjKyScyZEqHOtE1dpsCOn?=
- =?us-ascii?Q?fwomNMwI31wY7bbYLCn410pQ?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e0bf8797-8231-4eac-cba3-08d98d7887cb
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Oct 2021 12:05:06.5588
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: THdcCfP4WorpnB0cnfREphO8lKrdP8MTGGLTj10nkPgGTgxDFD7tn5hv3g6SHA+z
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5378
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [PATCH v5 08/14] KVM: s390: pv: handle secure storage exceptions
+ for normal guests
+Content-Language: en-US
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, cohuck@redhat.com, borntraeger@de.ibm.com,
+        thuth@redhat.com, pasic@linux.ibm.com, david@redhat.com,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Ulrich.Weigand@de.ibm.com
+References: <20210920132502.36111-1-imbrenda@linux.ibm.com>
+ <20210920132502.36111-9-imbrenda@linux.ibm.com>
+ <f442a49f-dbc4-5c38-ffa1-6b17742592c3@linux.ibm.com>
+ <20211012103550.501857f5@p-imbrenda>
+From:   Janosch Frank <frankja@linux.ibm.com>
+In-Reply-To: <20211012103550.501857f5@p-imbrenda>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: MKPzYILyVDBdDYwg7M7oY0AHhr8jawDl
+X-Proofpoint-GUID: QFIgnLzIa6ncCera3gjj78_TO1pb7O-h
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
+ definitions=2021-10-12_03,2021-10-12_01,2020-04-07_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ spamscore=0 impostorscore=0 suspectscore=0 bulkscore=0 phishscore=0
+ clxscore=1015 mlxlogscore=912 priorityscore=1501 mlxscore=0 adultscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2109230001 definitions=main-2110120073
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 12, 2021 at 08:33:49AM +0000, Tian, Kevin wrote:
-> > From: Jason Gunthorpe <jgg@nvidia.com>
-> > Sent: Saturday, October 2, 2021 7:22 AM
-> >
-> [...]
->  
-> > +static void vfio_group_release(struct device *dev)
-> >  {
-> > -	struct vfio_group *group, *existing_group;
-> > -	struct device *dev;
-> > -	int ret, minor;
-> > +	struct vfio_group *group = container_of(dev, struct vfio_group, dev);
-> > +	struct vfio_unbound_dev *unbound, *tmp;
-> > +
-> > +	list_for_each_entry_safe(unbound, tmp,
-> > +				 &group->unbound_list, unbound_next) {
-> > +		list_del(&unbound->unbound_next);
-> > +		kfree(unbound);
-> > +	}
+On 10/12/21 10:35, Claudio Imbrenda wrote:
+> On Tue, 12 Oct 2021 10:16:26 +0200
+> Janosch Frank <frankja@linux.ibm.com> wrote:
 > 
-> move to vfio_group_put()? this is not paired with vfio_group_alloc()...
-
-Lists are tricky for pairing analysis, the vfio_group_alloc() creates
-an empty list and release restores the list to empty.
-
-> >  static int vfio_group_fops_open(struct inode *inode, struct file *filep)
-> >  {
-> > -	struct vfio_group *group;
-> > +	struct vfio_group *group =
-> > +		container_of(inode->i_cdev, struct vfio_group, cdev);
-> >  	int opened;
+>> On 9/20/21 15:24, Claudio Imbrenda wrote:
+>>> With upcoming patches, normal guests might touch secure pages.
+>>>
+>>> This patch extends the existing exception handler to convert the pages
+>>> to non secure also when the exception is triggered by a normal guest.
+>>>
+>>> This can happen for example when a secure guest reboots; the first
+>>> stage of a secure guest is non secure, and in general a secure guest
+>>> can reboot into non-secure mode.
+>>>
+>>> If the secure memory of the previous boot has not been cleared up
+>>> completely yet, a non-secure guest might touch secure memory, which
+>>> will need to be handled properly.
+>>>
+>>> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+>>> ---
+>>>    arch/s390/mm/fault.c | 10 +++++++++-
+>>>    1 file changed, 9 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/arch/s390/mm/fault.c b/arch/s390/mm/fault.c
+>>> index eb68b4f36927..74784581f42d 100644
+>>> --- a/arch/s390/mm/fault.c
+>>> +++ b/arch/s390/mm/fault.c
+>>> @@ -767,6 +767,7 @@ void do_secure_storage_access(struct pt_regs *regs)
+>>>    	struct vm_area_struct *vma;
+>>>    	struct mm_struct *mm;
+>>>    	struct page *page;
+>>> +	struct gmap *gmap;
+>>>    	int rc;
+>>>    
+>>>    	/*
+>>> @@ -796,6 +797,14 @@ void do_secure_storage_access(struct pt_regs *regs)
+>>>    	}
+>>>    
+>>>    	switch (get_fault_type(regs)) {
+>>> +	case GMAP_FAULT:
+>>> +		gmap = (struct gmap *)S390_lowcore.gmap;
+>>> +		addr = __gmap_translate(gmap, addr);
+>>> +		if (IS_ERR_VALUE(addr)) {
+>>> +			do_fault_error(regs, VM_ACCESS_FLAGS, VM_FAULT_BADMAP);
+>>> +			break;
+>>> +		}
+>>> +		fallthrough;
+>>
+>> This would trigger an export and not a destroy, right?
 > 
-> A curiosity question. According to cdev_device_del() any cdev already
-> open will remain with their fops callable. 
+> correct. but this would only happen for leftover secure pages touched
+> by non-secure guests, before the background thread could clean them up.
 
-Correct
+I.e. we don't expect to need the destroy speed boost?
 
-> What prevents vfio_group from being released after cdev_device_del()
-> has been called? Is it because cdev open will hold a reference to
-> device thus put_device() will not hit zero in vfio_group_put()?
+> 
+>>
+>>>    	case USER_FAULT:
+>>>    		mm = current->mm;
+>>>    		mmap_read_lock(mm);
+>>> @@ -824,7 +833,6 @@ void do_secure_storage_access(struct pt_regs *regs)
+>>>    		if (rc)
+>>>    			BUG();
+>>>    		break;
+>>> -	case GMAP_FAULT:
+>>>    	default:
+>>>    		do_fault_error(regs, VM_READ | VM_WRITE, VM_FAULT_BADMAP);
+>>>    		WARN_ON_ONCE(1);
+>>>    
+>>
+> 
 
-Yes, that is right. The extra reference is hidden deep inside the FS
-code and is actually a reference on the cdev struct, which in turn
-holds a kobject parent reference on the struct device. It is
-complicated under the covers, but from an API perspective if a struct
-file exists then so does the vfio_group.
-
-Jason
