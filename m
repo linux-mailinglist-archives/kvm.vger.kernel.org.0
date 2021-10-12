@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 18BFD42A676
-	for <lists+kvm@lfdr.de>; Tue, 12 Oct 2021 15:52:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E31842A677
+	for <lists+kvm@lfdr.de>; Tue, 12 Oct 2021 15:52:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237008AbhJLNyI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Oct 2021 09:54:08 -0400
-Received: from foss.arm.com ([217.140.110.172]:43596 "EHLO foss.arm.com"
+        id S237033AbhJLNyT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Oct 2021 09:54:19 -0400
+Received: from foss.arm.com ([217.140.110.172]:43620 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236783AbhJLNyH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Oct 2021 09:54:07 -0400
+        id S236783AbhJLNyS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Oct 2021 09:54:18 -0400
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 63FD7ED1;
-        Tue, 12 Oct 2021 06:52:05 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EC380ED1;
+        Tue, 12 Oct 2021 06:52:16 -0700 (PDT)
 Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B092A3F66F;
-        Tue, 12 Oct 2021 06:52:04 -0700 (PDT)
-Date:   Tue, 12 Oct 2021 14:52:02 +0100
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2B72E3F66F;
+        Tue, 12 Oct 2021 06:52:16 -0700 (PDT)
+Date:   Tue, 12 Oct 2021 14:52:13 +0100
 From:   Andre Przywara <andre.przywara@arm.com>
 To:     Alexandru Elisei <alexandru.elisei@arm.com>
 Cc:     will@kernel.org, julien.thierry.kdev@gmail.com,
         kvm@vger.kernel.org, jean-philippe@linaro.org
-Subject: Re: [PATCH v2 kvmtool 5/7] vfio/pci: Rework MSIX table and PBA
- physical size allocation
-Message-ID: <20211012145202.63d27698@donnerap.cambridge.arm.com>
-In-Reply-To: <20211012132510.42134-6-alexandru.elisei@arm.com>
+Subject: Re: [PATCH v2 kvmtool 7/7] vfio/pci: Align MSIX Table and PBA size
+ to guest maximum page size
+Message-ID: <20211012145213.742ab0fe@donnerap.cambridge.arm.com>
+In-Reply-To: <20211012132510.42134-8-alexandru.elisei@arm.com>
 References: <20211012132510.42134-1-alexandru.elisei@arm.com>
-        <20211012132510.42134-6-alexandru.elisei@arm.com>
+        <20211012132510.42134-8-alexandru.elisei@arm.com>
 Organization: ARM
 X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
 MIME-Version: 1.0
@@ -37,27 +37,25 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 12 Oct 2021 14:25:08 +0100
+On Tue, 12 Oct 2021 14:25:10 +0100
 Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 
-> When creating the MSIX table and PBA, kvmtool rounds up the table and
-> pending bit array sizes to the host's page size. Unfortunately, when doing
-> that, it doesn't take into account that the new size can exceed the device
-> BAR size, leading to hard to diagnose errors for certain configurations.
+> When allocating MMIO space for the MSI-X table, kvmtool rounds the
+> allocation to the host's page size to make it as easy as possible for the
+> guest to map the table to a page, if it wants to (and doesn't do BAR
+> reassignment, like the x86 architecture for example). However, the host's
+> page size can differ from the guest's on architectures which support
+> multiple page sizes. For example, arm64 supports three different page size,
+> and it is possible for the host to be using 4k pages, while the guest is
+> using 64k pages.
 > 
-> [ ...]
-
-> Fix this by aligning the table and PBA size to 8 bytes to allow for
-> qword accesses, like PCI 3.0 mandates.
+> To make sure the allocation is always aligned to a guest's page size, round
+> it up to the maximum architectural page size. Do the same for the pending
+> bit array if it lives in its own BAR.
 > 
-> For the sake of simplicity, the PBA offset in a BAR, in case of a shared
-> BAR, is kept the same as the offset of the physical device. One hopes that
-> the device respects the recommendations set forth in PCI LOCAL BUS
-> SPECIFICATION, REV. 3.0, section "MSI-X Capability and Table Structures"
-
-Thanks for the changes!
-
 > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+
+Thanks for adding MAX_PAGE_SIZE, looks alright now.
 
 Reviewed-by: Andre Przywara <andre.przywara@arm.com>
 
@@ -65,134 +63,144 @@ Cheers,
 Andre
 
 > ---
->  include/kvm/vfio.h |  1 +
->  vfio/pci.c         | 69 +++++++++++++++++++++++++++-------------------
->  2 files changed, 42 insertions(+), 28 deletions(-)
+>  arm/aarch32/include/kvm/kvm-arch.h | 4 ++++
+>  arm/aarch64/include/kvm/kvm-arch.h | 4 ++++
+>  mips/include/kvm/kvm-arch.h        | 3 +++
+>  powerpc/include/kvm/kvm-arch.h     | 3 +++
+>  vfio/pci.c                         | 6 ++++--
+>  x86/include/kvm/kvm-arch.h         | 3 +++
+>  6 files changed, 21 insertions(+), 2 deletions(-)
 > 
-> diff --git a/include/kvm/vfio.h b/include/kvm/vfio.h
-> index 8cdf04f..764ab9b 100644
-> --- a/include/kvm/vfio.h
-> +++ b/include/kvm/vfio.h
-> @@ -50,6 +50,7 @@ struct vfio_pci_msix_pba {
->  	size_t				size;
->  	off_t				fd_offset; /* in VFIO device fd */
->  	unsigned int			bar;
-> +	u32				bar_offset; /* in the shared BAR */
->  	u32				guest_phys_addr;
->  };
+> diff --git a/arm/aarch32/include/kvm/kvm-arch.h b/arm/aarch32/include/kvm/kvm-arch.h
+> index a772bb1..bee2fc2 100644
+> --- a/arm/aarch32/include/kvm/kvm-arch.h
+> +++ b/arm/aarch32/include/kvm/kvm-arch.h
+> @@ -1,10 +1,14 @@
+>  #ifndef KVM__KVM_ARCH_H
+>  #define KVM__KVM_ARCH_H
 >  
+> +#include <linux/sizes.h>
+> +
+>  #define kvm__arch_get_kern_offset(...)	0x8000
+>  
+>  #define ARM_MAX_MEMORY(...)	ARM_LOMAP_MAX_MEMORY
+>  
+> +#define MAX_PAGE_SIZE	SZ_4K
+> +
+>  #include "arm-common/kvm-arch.h"
+>  
+>  #endif /* KVM__KVM_ARCH_H */
+> diff --git a/arm/aarch64/include/kvm/kvm-arch.h b/arm/aarch64/include/kvm/kvm-arch.h
+> index 159567b..5e5ee41 100644
+> --- a/arm/aarch64/include/kvm/kvm-arch.h
+> +++ b/arm/aarch64/include/kvm/kvm-arch.h
+> @@ -1,6 +1,8 @@
+>  #ifndef KVM__KVM_ARCH_H
+>  #define KVM__KVM_ARCH_H
+>  
+> +#include <linux/sizes.h>
+> +
+>  struct kvm;
+>  unsigned long long kvm__arch_get_kern_offset(struct kvm *kvm, int fd);
+>  int kvm__arch_get_ipa_limit(struct kvm *kvm);
+> @@ -21,6 +23,8 @@ int kvm__arch_get_ipa_limit(struct kvm *kvm);
+>  	max_ram;							\
+>  })
+>  
+> +#define MAX_PAGE_SIZE	SZ_64K
+> +
+>  #include "arm-common/kvm-arch.h"
+>  
+>  #endif /* KVM__KVM_ARCH_H */
+> diff --git a/mips/include/kvm/kvm-arch.h b/mips/include/kvm/kvm-arch.h
+> index fdc09d8..e2f048a 100644
+> --- a/mips/include/kvm/kvm-arch.h
+> +++ b/mips/include/kvm/kvm-arch.h
+> @@ -1,6 +1,7 @@
+>  #ifndef KVM__KVM_ARCH_H
+>  #define KVM__KVM_ARCH_H
+>  
+> +#include <linux/sizes.h>
+>  
+>  /*
+>   * Guest memory map is:
+> @@ -36,6 +37,8 @@
+>  
+>  #define VIRTIO_DEFAULT_TRANS(kvm)	VIRTIO_PCI
+>  
+> +#define MAX_PAGE_SIZE		SZ_64K
+> +
+>  #include <stdbool.h>
+>  
+>  #include "linux/types.h"
+> diff --git a/powerpc/include/kvm/kvm-arch.h b/powerpc/include/kvm/kvm-arch.h
+> index 26d440b..8eeca50 100644
+> --- a/powerpc/include/kvm/kvm-arch.h
+> +++ b/powerpc/include/kvm/kvm-arch.h
+> @@ -13,6 +13,7 @@
+>  
+>  #include <stdbool.h>
+>  #include <linux/types.h>
+> +#include <linux/sizes.h>
+>  #include <time.h>
+>  
+>  /*
+> @@ -48,6 +49,8 @@
+>  
+>  #define KVM_IOEVENTFD_HAS_PIO		0
+>  
+> +#define MAX_PAGE_SIZE			SZ_256K
+> +
+>  #define VIRTIO_DEFAULT_TRANS(kvm)	VIRTIO_PCI
+>  
+>  struct spapr_phb;
 > diff --git a/vfio/pci.c b/vfio/pci.c
-> index cc18311..582aedd 100644
+> index a08352d..78f5ca5 100644
 > --- a/vfio/pci.c
 > +++ b/vfio/pci.c
-> @@ -502,7 +502,7 @@ static int vfio_pci_bar_activate(struct kvm *kvm,
->  
->  	if (has_msix && (u32)bar_num == pba->bar) {
->  		if (pba->bar == table->bar)
-> -			pba->guest_phys_addr = table->guest_phys_addr + table->size;
-> +			pba->guest_phys_addr = table->guest_phys_addr + pba->bar_offset;
->  		else
->  			pba->guest_phys_addr = region->guest_phys_addr;
->  		ret = kvm__register_mmio(kvm, pba->guest_phys_addr,
-> @@ -815,15 +815,21 @@ static int vfio_pci_fixup_cfg_space(struct vfio_device *vdev)
->  	if (msix) {
->  		/* Add a shortcut to the PBA region for the MMIO handler */
->  		int pba_index = VFIO_PCI_BAR0_REGION_INDEX + pdev->msix_pba.bar;
-> +		u32 pba_bar_offset = msix->pba_offset & PCI_MSIX_PBA_OFFSET;
+> @@ -1,3 +1,5 @@
+> +#include "linux/sizes.h"
 > +
->  		pdev->msix_pba.fd_offset = vdev->regions[pba_index].info.offset +
-> -					   (msix->pba_offset & PCI_MSIX_PBA_OFFSET);
-> +					   pba_bar_offset;
->  
->  		/* Tidy up the capability */
->  		msix->table_offset &= PCI_MSIX_TABLE_BIR;
-> -		msix->pba_offset &= PCI_MSIX_PBA_BIR;
-> -		if (pdev->msix_table.bar == pdev->msix_pba.bar)
-> -			msix->pba_offset |= pdev->msix_table.size &
-> -					    PCI_MSIX_PBA_OFFSET;
-> +		if (pdev->msix_table.bar == pdev->msix_pba.bar) {
-> +			/* Keep the same offset as the MSIX cap. */
-> +			pdev->msix_pba.bar_offset = pba_bar_offset;
-> +		} else {
-> +			/* PBA is at the start of the BAR. */
-> +			msix->pba_offset &= PCI_MSIX_PBA_BIR;
-> +			pdev->msix_pba.bar_offset = 0;
-> +		}
->  	}
->  
->  	/* Install our fake Configuration Space */
-> @@ -892,12 +898,11 @@ static int vfio_pci_create_msix_table(struct kvm *kvm, struct vfio_device *vdev)
->  	table->bar = msix->table_offset & PCI_MSIX_TABLE_BIR;
->  	pba->bar = msix->pba_offset & PCI_MSIX_TABLE_BIR;
->  
-> -	/*
-> -	 * KVM needs memory regions to be multiple of and aligned on PAGE_SIZE.
-> -	 */
->  	nr_entries = (msix->ctrl & PCI_MSIX_FLAGS_QSIZE) + 1;
-> -	table->size = ALIGN(nr_entries * PCI_MSIX_ENTRY_SIZE, PAGE_SIZE);
-> -	pba->size = ALIGN(DIV_ROUND_UP(nr_entries, 64), PAGE_SIZE);
-> +
-> +	/* MSIX table and PBA must support QWORD accesses. */
-> +	table->size = ALIGN(nr_entries * PCI_MSIX_ENTRY_SIZE, 8);
-> +	pba->size = ALIGN(DIV_ROUND_UP(nr_entries, 64), 8);
->  
->  	entries = calloc(nr_entries, sizeof(struct vfio_pci_msi_entry));
->  	if (!entries)
-> @@ -911,23 +916,8 @@ static int vfio_pci_create_msix_table(struct kvm *kvm, struct vfio_device *vdev)
->  		return ret;
+>  #include "kvm/irq.h"
+>  #include "kvm/kvm.h"
+>  #include "kvm/kvm-cpu.h"
+> @@ -926,7 +928,7 @@ static int vfio_pci_create_msix_table(struct kvm *kvm, struct vfio_device *vdev)
 >  	if (!info.size)
 >  		return -EINVAL;
-> -	map_size = info.size;
-> -
-> -	if (table->bar != pba->bar) {
-> -		ret = vfio_pci_get_region_info(vdev, pba->bar, &info);
-> -		if (ret)
-> -			return ret;
-> -		if (!info.size)
-> -			return -EINVAL;
-> -		map_size += info.size;
-> -	}
 >  
-> -	/*
-> -	 * To ease MSI-X cap configuration in case they share the same BAR,
-> -	 * collapse table and pending array. The size of the BAR regions must be
-> -	 * powers of two.
-> -	 */
-> -	map_size = ALIGN(map_size, PAGE_SIZE);
-> +	map_size = ALIGN(info.size, PAGE_SIZE);
+> -	map_size = ALIGN(info.size, PAGE_SIZE);
+> +	map_size = ALIGN(info.size, MAX_PAGE_SIZE);
 >  	table->guest_phys_addr = pci_get_mmio_block(map_size);
 >  	if (!table->guest_phys_addr) {
 >  		pr_err("cannot allocate MMIO space");
-> @@ -943,7 +933,30 @@ static int vfio_pci_create_msix_table(struct kvm *kvm, struct vfio_device *vdev)
->  	 * between MSI-X table and PBA. For the sake of isolation, create a
->  	 * virtual PBA.
->  	 */
-> -	pba->guest_phys_addr = table->guest_phys_addr + table->size;
-> +	if (table->bar == pba->bar) {
-> +		u32 pba_bar_offset = msix->pba_offset & PCI_MSIX_PBA_OFFSET;
-> +
-> +		/* Sanity checks. */
-> +		if (table->size > pba_bar_offset)
-> +			die("MSIX table overlaps with PBA");
-> +		if (pba_bar_offset + pba->size > info.size)
-> +			die("PBA exceeds the size of the region");
-> +		pba->guest_phys_addr = table->guest_phys_addr + pba_bar_offset;
-> +	} else {
-> +		ret = vfio_pci_get_region_info(vdev, pba->bar, &info);
-> +		if (ret)
-> +			return ret;
-> +		if (!info.size)
-> +			return -EINVAL;
-> +
-> +		map_size = ALIGN(info.size, PAGE_SIZE);
-> +		pba->guest_phys_addr = pci_get_mmio_block(map_size);
-> +		if (!pba->guest_phys_addr) {
-> +			pr_err("cannot allocate MMIO space");
-> +			ret = -ENOMEM;
-> +			goto out_free;
-> +		}
-> +	}
+> @@ -958,7 +960,7 @@ static int vfio_pci_create_msix_table(struct kvm *kvm, struct vfio_device *vdev)
+>  		if (!info.size)
+>  			return -EINVAL;
 >  
->  	pdev->msix.entries = entries;
->  	pdev->msix.nr_entries = nr_entries;
+> -		map_size = ALIGN(info.size, PAGE_SIZE);
+> +		map_size = ALIGN(info.size, MAX_PAGE_SIZE);
+>  		pba->guest_phys_addr = pci_get_mmio_block(map_size);
+>  		if (!pba->guest_phys_addr) {
+>  			pr_err("cannot allocate MMIO space");
+> diff --git a/x86/include/kvm/kvm-arch.h b/x86/include/kvm/kvm-arch.h
+> index 85cd336..d8a7312 100644
+> --- a/x86/include/kvm/kvm-arch.h
+> +++ b/x86/include/kvm/kvm-arch.h
+> @@ -5,6 +5,7 @@
+>  
+>  #include <stdbool.h>
+>  #include <linux/types.h>
+> +#include <linux/sizes.h>
+>  #include <time.h>
+>  
+>  /*
+> @@ -30,6 +31,8 @@
+>  
+>  #define KVM_IOEVENTFD_HAS_PIO	1
+>  
+> +#define MAX_PAGE_SIZE		SZ_4K
+> +
+>  #define VIRTIO_DEFAULT_TRANS(kvm)	VIRTIO_PCI
+>  
+>  struct kvm_arch {
 
