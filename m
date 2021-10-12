@@ -2,109 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0F5EF42AAE6
-	for <lists+kvm@lfdr.de>; Tue, 12 Oct 2021 19:37:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EDD8542AB0B
+	for <lists+kvm@lfdr.de>; Tue, 12 Oct 2021 19:43:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232404AbhJLRjG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Oct 2021 13:39:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:57093 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229495AbhJLRjF (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 12 Oct 2021 13:39:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634060223;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=AOJ17ZDdGPcPHBUfbfFgaoz9bH3Zt0ZWlSO0prGEojs=;
-        b=CJk2TeWIZa0vOYqm/KJio/lpqXMT0WNDoX1ZYqMRioKLHxMAjbD9Y5EMkrR7ck+2xEJh4r
-        hSgh3stsvXB29z8dOFg6FHkB9GkiIUZUUHRgPe0ijPMlfUHKAHCnHVk20DuEdWPbZ+mxZl
-        JyEdhjwvFjCdJij+21BZRBIjA66MAyY=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-418-Ml7gsUP6M5SssjeasdpKRA-1; Tue, 12 Oct 2021 13:37:01 -0400
-X-MC-Unique: Ml7gsUP6M5SssjeasdpKRA-1
-Received: by mail-wr1-f69.google.com with SMTP id f1-20020a5d64c1000000b001611832aefeso3688684wri.17
-        for <kvm@vger.kernel.org>; Tue, 12 Oct 2021 10:37:01 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=AOJ17ZDdGPcPHBUfbfFgaoz9bH3Zt0ZWlSO0prGEojs=;
-        b=nhQUs/QqgJXJSRWAliS51H7bOn3i+S3qjI/EXtt1sYip0sxkQ/sLpAFrATfTz7UVUF
-         euOjI35hSaHH82zx8Uu2TmGXF9bzCQbG4sr0B/G9JkyIkf/jPeqH4MvkQvr9OMW8u9nw
-         22MlLjIf8DgmZ1XBn4/OFapiFOx9TBiwvY1Q3JigW5r459Dj1CP+st1t0RWDSjHMP45o
-         upNPE0R1fbkFrLr2zIcmqZULZ2P3TdqBukg6pazFIPRDCZQaawZH5ruaewTFtqrFnUV4
-         lvcjn6Jq8SfST7jQMieOSZrVUVQsKf2eVbfYjMuQ7Zs1Fh2YHpP5a9oCbb1NdLURjoBl
-         JHOw==
-X-Gm-Message-State: AOAM533l1PvyEKczvXjYQD5afNI8KfYO4WsDXmtO9w7T+q0st+Y3MqdF
-        ryf7h67ftJIo4Al1NxXBullbQaUt7+taEjFRfGu5A9yg3SfwH2xNtGqQpf2jb7JcCr1uxpuicZJ
-        ngdIBoXBjZoRj
-X-Received: by 2002:a05:6000:1684:: with SMTP id y4mr33729286wrd.252.1634060220547;
-        Tue, 12 Oct 2021 10:37:00 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzDEtaocwpe6emZXum3WToMWnLvX4o39ZILRi/f2mlvfjYpIs9xpZ1Gf/fxa19BtopOGMi0Rg==
-X-Received: by 2002:a05:6000:1684:: with SMTP id y4mr33729260wrd.252.1634060220328;
-        Tue, 12 Oct 2021 10:37:00 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id p17sm11148863wro.34.2021.10.12.10.36.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 12 Oct 2021 10:36:59 -0700 (PDT)
-Message-ID: <0d222978-014a-cdcb-f8aa-5b3179cb0809@redhat.com>
-Date:   Tue, 12 Oct 2021 19:36:56 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [patch 16/31] x86/fpu: Replace KVMs homebrewn FPU copy to user
-Content-Language: en-US
-To:     Thomas Gleixner <tglx@linutronix.de>,
-        LKML <linux-kernel@vger.kernel.org>
-Cc:     x86@kernel.org, "Chang S. Bae" <chang.seok.bae@intel.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Arjan van de Ven <arjan@linux.intel.com>,
+        id S232898AbhJLRpv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Oct 2021 13:45:51 -0400
+Received: from mail.kernel.org ([198.145.29.99]:57370 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229495AbhJLRpt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Oct 2021 13:45:49 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id D3765610C9;
+        Tue, 12 Oct 2021 17:43:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1634060627;
+        bh=yASkbNro1ryeq/Pn5XosEpr1G6AfQVBAJaOgTM+0Dn0=;
+        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+        b=nz7y5KBa+PIOjnf5zHSt/7PGOM48ZmDjlnwWT9m2ouhxtKrJ84S0Wh8DsGCa7rmrC
+         9P8kBS0340MOfHilxFpHcIlMaTcbwJXSty5L+mw6BcL+2kAwSDOMaDandi3ZSHzO26
+         wo5dTwKEtu7oNAub5pDl6PGH8gXPJegDOw6Xa+i8rLzIFcVtDmTK32UdlxWdukRcmj
+         3T1nGlnvUSWWU9Jmk/bbQkFnIMuDeFVXOMsoL7cjXfhr9BFvUR4GfxEywd4cmruKwX
+         CPnpklYmzy3pIhsO+jOnA6y2CnllPJs2HpVKIdK/zKoBGw9Mv1J5G18afcm1DYFhtG
+         jlK4slA0UQqnA==
+Message-ID: <9dbc9cedd6b49eb5c5078dd776aed808534534ec.camel@kernel.org>
+Subject: Re: [PATCH v2 2/2] x86: sgx_vepc: implement SGX_IOC_VEPC_REMOVE
+ ioctl
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org
-References: <20211011215813.558681373@linutronix.de>
- <20211011223611.249593446@linutronix.de>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20211011223611.249593446@linutronix.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Cc:     dave.hansen@linux.intel.com, seanjc@google.com, x86@kernel.org,
+        yang.zhong@intel.com
+Date:   Tue, 12 Oct 2021 20:43:44 +0300
+In-Reply-To: <22c1c59f-9b7c-69fa-eff3-1670b94c77af@redhat.com>
+References: <20211012105708.2070480-1-pbonzini@redhat.com>
+         <20211012105708.2070480-3-pbonzini@redhat.com>
+         <644db39e4c995e1966b6dbc42af16684e8420785.camel@kernel.org>
+         <22c1c59f-9b7c-69fa-eff3-1670b94c77af@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.40.0-1 
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/10/21 02:00, Thomas Gleixner wrote:
-> 
-> -	if (boot_cpu_has(X86_FEATURE_XSAVE)) {
-> -		memset(guest_xsave, 0, sizeof(struct kvm_xsave));
-> -		fill_xsave((u8 *) guest_xsave->region, vcpu);
-> -	} else {
-> -		memcpy(guest_xsave->region,
-> -			&vcpu->arch.guest_fpu->state.fxsave,
-> -			sizeof(struct fxregs_state));
-> -		*(u64 *)&guest_xsave->region[XSAVE_HDR_OFFSET / sizeof(u32)] =
-> -			XFEATURE_MASK_FPSSE;
-> -	}
+On Tue, 2021-10-12 at 19:03 +0200, Paolo Bonzini wrote:
+> On 12/10/21 18:57, Jarkko Sakkinen wrote:
+> > > +
+> > > =C2=A0=C2=A0static const struct file_operations sgx_vepc_fops =3D {
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.owner=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=3D THIS_MODULE,
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.open=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=3D sgx_vepc_open,
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.unlocked_ioctl=C2=A0=3D s=
+gx_vepc_ioctl,
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.compat_ioctl=C2=A0=C2=A0=
+=C2=A0=3D sgx_vepc_ioctl,
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.release=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=3D sgx_vepc_release,
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.mmap=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=3D sgx_vepc_mmap,
+> > > =C2=A0=C2=A0};
+> > I went through this a few times, the code change is sound and
+> > reasoning makes sense in the commit message.
+> >=20
+> > The only thing that I think that is IMHO lacking is a simple
+> > kselftest. I think a trivial test for SGX_IOC_VEP_REMOVE_ALL
+> > would do.
+>=20
+> Yeah, a trivial test wouldn't cover a lot; it would be much better to at=
+=20
+> least set up a SECS, and check that the first call returns 1 and the=20
+> second returns 0.=C2=A0 There is no existing test for /dev/sgx_vepc at al=
+l.
+>=20
+> Right now I'm relying on Yang for testing this in QEMU, but I'll look=20
+> into adding a selftest that does the full setup and runs an enclave in a=
+=20
+> guest.
 
-After the patch, this final assignment is not done in the else case:
+This having a regression would not working would not cause that much collat=
+eral
+damage, especially since it would be probably quickly noticed by someone, s=
+o I
+think that this is not absolutely mandatory. So you can ignore kselftest pa=
+rt,
+and thus
 
-> +
-> +	if (cpu_feature_enabled(X86_FEATURE_XSAVE)) {
-> +		__copy_xstate_to_uabi_buf(mb, &kstate->xsave, pkru,
-> +					  XSTATE_COPY_XSAVE);
-> +	} else {
-> +		memcpy(&ustate->fxsave, &kstate->fxsave, sizeof(ustate->fxsave));
-> +	}
-> +}
+Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
 
-This leaves the xstate_bv set to 0 instead of XFEATURE_MASK_FPSSE. 
-Resuming a VM then fails if you save on a non-XSAVE machine and restore 
-it on an XSAVE machine.
+Thank you, this work helps me a lot, given that my SGX testing is based aro=
+und
+using QEMU ATM.
 
-The memset(guest_xsave, 0, sizeof(struct kvm_xsave)) also is not 
-reproduced, you can make it unconditional for simplicity; this is not a 
-fast path.
-
-Paolo
+/Jarkko
 
