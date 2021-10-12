@@ -2,65 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 312B6429A14
-	for <lists+kvm@lfdr.de>; Tue, 12 Oct 2021 02:07:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 07AC1429A24
+	for <lists+kvm@lfdr.de>; Tue, 12 Oct 2021 02:07:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235433AbhJLAIh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Oct 2021 20:08:37 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:51392 "EHLO
+        id S236027AbhJLAI4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Oct 2021 20:08:56 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:51368 "EHLO
         galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231747AbhJLAIZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Oct 2021 20:08:25 -0400
-Message-ID: <20211011223611.964445769@linutronix.de>
+        with ESMTP id S231368AbhJLAI3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Oct 2021 20:08:29 -0400
+Message-ID: <20211011223612.026348843@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1633997182;
+        s=2020; t=1633997186;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         references:references; bh=y4+0Q5/F0AE4WZ3PGBK1rdQuc9zuwv3SlxUifq1uq3o=;
-        b=gL/gE4YAnBkOWsWtPdfJ3DaBnmv8141V7E1hQjPWdPZhdcgK/7S9vAaaHvBo22XWZzKP0o
-        4ImcBIKM/UsSJCdqyhZY9rVFcmCULAAjO9v0kqdt2eivdx5pz8DrwArr581jQqoa5XIqaQ
-        JkEZuuiYqYTXitHVjDxeaRqwaa3ffJU2R3lRNdO2QazVBjdkGnqAKvaCmpqdKp010qTAAy
-        86EIXNmpQ6k3kOeI8OvBbiwBcP0mb1JnHFHDacgBoM0eYV9s50TCnwLCSqn6mysIfHlrkM
-        bIRev8lrhbd6EhWx7wIiAjqhHHLjyerPFs+x63GG+CgB3VTgQbLrkhtFX8/HQw==
+         references:references; bh=F7eBvI4wTZKF2FFjAfkIvrpU/tpV4FMMwx2h4uht6Zc=;
+        b=3eE9DPHOI4bp04QMFmVoutVBNMKOWdxSBAZIUnagLsSIMcUHw0zov41ft5Q7P+/N8tI+KH
+        ph+o0+DSnGjyTMx+QWbbUD+3ccla4Fj+qjgY8O+WBPZP/NNByS1xYC8gl8c7EPMz+Icgmu
+        OpOsGbQv7q4THZVORHL97dIz+yVxp4F8R//pnv0Z2taSsg8c2RtFtVLyDMx2QlzSva5n7B
+        Ky+hWGH4MfWizbvHYU5gAd3A/DfI91mUf2GMWSbq/Ua1BXE5guKPcTU1rdVJ/JLXF19fft
+        ziz3CKbgfCridTbTywHZpOBSSu6IShAU+NFhO+tndlwq/0ysd5/jwcfNDDwXFw==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1633997182;
+        s=2020e; t=1633997186;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         references:references; bh=y4+0Q5/F0AE4WZ3PGBK1rdQuc9zuwv3SlxUifq1uq3o=;
-        b=Vfc+fqaR41EyJ0Xi1smC7n+B7aYqVUBvpFoMuSxcWD1pA01J2cB1J6kbGsbebUA0ux409F
-        MkP3srusPcdUIRBg==
+         references:references; bh=F7eBvI4wTZKF2FFjAfkIvrpU/tpV4FMMwx2h4uht6Zc=;
+        b=iAwcRI4xeQdK58PpCVHvfYfPI4Ig/nJKd4/K/DDTCa1eA+/fvOP9IeDFHm0v0UIj7lOzBq
+        95W5zrvTL97M3zCg==
 From:   Thomas Gleixner <tglx@linutronix.de>
 To:     LKML <linux-kernel@vger.kernel.org>
 Cc:     x86@kernel.org, "Chang S. Bae" <chang.seok.bae@intel.com>,
         Dave Hansen <dave.hansen@linux.intel.com>,
         Arjan van de Ven <arjan@linux.intel.com>,
         kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Subject: [patch 28/31] x86/sev: Include fpu/xcr.h
+Subject: [patch 29/31] x86/fpu: Mop up the internal.h leftovers
 References: <20211011215813.558681373@linutronix.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Date:   Tue, 12 Oct 2021 02:00:41 +0200 (CEST)
+Date:   Tue, 12 Oct 2021 02:00:42 +0200 (CEST)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Include the header which only provides the XRC accessors. That's all what
-is needed here.
+Move the global interfaces to api.h and the rest into the core.
 
 Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
 ---
- arch/x86/kernel/sev.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/x86/include/asm/fpu/api.h      |   10 ++++++++++
+ arch/x86/include/asm/fpu/internal.h |   18 ------------------
+ arch/x86/kernel/fpu/init.c          |    1 +
+ arch/x86/kernel/fpu/xstate.h        |    3 +++
+ 4 files changed, 14 insertions(+), 18 deletions(-)
 
---- a/arch/x86/kernel/sev.c
-+++ b/arch/x86/kernel/sev.c
-@@ -23,7 +23,7 @@
- #include <asm/stacktrace.h>
- #include <asm/sev.h>
- #include <asm/insn-eval.h>
--#include <asm/fpu/internal.h>
-+#include <asm/fpu/xcr.h>
- #include <asm/processor.h>
- #include <asm/realmode.h>
- #include <asm/traps.h>
+--- a/arch/x86/include/asm/fpu/api.h
++++ b/arch/x86/include/asm/fpu/api.h
+@@ -110,6 +110,16 @@ extern int cpu_has_xfeatures(u64 xfeatur
+ 
+ static inline void update_pasid(void) { }
+ 
++/* Trap handling */
++extern int  fpu__exception_code(struct fpu *fpu, int trap_nr);
++extern void fpu_sync_fpstate(struct fpu *fpu);
++
++/* Boot, hotplug and resume */
++extern void fpu__init_cpu(void);
++extern void fpu__init_system(struct cpuinfo_x86 *c);
++extern void fpu__init_check_bugs(void);
++extern void fpu__resume_cpu(void);
++
+ #ifdef CONFIG_MATH_EMULATION
+ extern void fpstate_init_soft(struct swregs_state *soft);
+ #else
+--- a/arch/x86/include/asm/fpu/internal.h
++++ b/arch/x86/include/asm/fpu/internal.h
+@@ -23,22 +23,4 @@
+ #include <asm/cpufeature.h>
+ #include <asm/trace/fpu.h>
+ 
+-/*
+- * High level FPU state handling functions:
+- */
+-extern void fpu__clear_user_states(struct fpu *fpu);
+-extern int  fpu__exception_code(struct fpu *fpu, int trap_nr);
+-
+-extern void fpu_sync_fpstate(struct fpu *fpu);
+-
+-/*
+- * Boot time FPU initialization functions:
+- */
+-extern void fpu__init_cpu(void);
+-extern void fpu__init_system_xstate(void);
+-extern void fpu__init_cpu_xstate(void);
+-extern void fpu__init_system(struct cpuinfo_x86 *c);
+-extern void fpu__init_check_bugs(void);
+-extern void fpu__resume_cpu(void);
+-
+ #endif /* _ASM_X86_FPU_INTERNAL_H */
+--- a/arch/x86/kernel/fpu/init.c
++++ b/arch/x86/kernel/fpu/init.c
+@@ -12,6 +12,7 @@
+ 
+ #include "internal.h"
+ #include "legacy.h"
++#include "xstate.h"
+ 
+ /*
+  * Initialize the registers found in all CPUs, CR0 and CR4:
+--- a/arch/x86/kernel/fpu/xstate.h
++++ b/arch/x86/kernel/fpu/xstate.h
+@@ -18,6 +18,9 @@ static inline void xstate_init_xcomp_bv(
+ extern void __copy_xstate_to_uabi_buf(struct membuf to, struct xregs_state *xsave,
+ 				      u32 pkru_val, enum xstate_copy_mode copy_mode);
+ 
++extern void fpu__init_cpu_xstate(void);
++extern void fpu__init_system_xstate(void);
++
+ /* XSAVE/XRSTOR wrapper functions */
+ 
+ #ifdef CONFIG_X86_64
 
