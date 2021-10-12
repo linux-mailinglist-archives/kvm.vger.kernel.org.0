@@ -2,71 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D488D42AE35
-	for <lists+kvm@lfdr.de>; Tue, 12 Oct 2021 22:52:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D66D842AE88
+	for <lists+kvm@lfdr.de>; Tue, 12 Oct 2021 23:14:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234947AbhJLUyD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Oct 2021 16:54:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35440 "EHLO
+        id S233221AbhJLVQ1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Oct 2021 17:16:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40484 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230467AbhJLUyC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Oct 2021 16:54:02 -0400
-Received: from mail-ot1-x329.google.com (mail-ot1-x329.google.com [IPv6:2607:f8b0:4864:20::329])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74DDBC061570
-        for <kvm@vger.kernel.org>; Tue, 12 Oct 2021 13:52:00 -0700 (PDT)
-Received: by mail-ot1-x329.google.com with SMTP id w10-20020a056830280a00b0054e4e6c85a6so937562otu.5
-        for <kvm@vger.kernel.org>; Tue, 12 Oct 2021 13:52:00 -0700 (PDT)
+        with ESMTP id S232797AbhJLVQZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Oct 2021 17:16:25 -0400
+Received: from mail-oi1-x22b.google.com (mail-oi1-x22b.google.com [IPv6:2607:f8b0:4864:20::22b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C35B7C061570
+        for <kvm@vger.kernel.org>; Tue, 12 Oct 2021 14:14:23 -0700 (PDT)
+Received: by mail-oi1-x22b.google.com with SMTP id z126so978808oiz.12
+        for <kvm@vger.kernel.org>; Tue, 12 Oct 2021 14:14:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:reply-to:from:date:message-id:subject:to;
-        bh=9YFj2llOeTltFFERuQkud+3GhYyjlg2vFqi03Sd0ueo=;
-        b=ioHUuiAUu54W27wTBwzrk3MmjEW+z5yQCUFi1C3UKvDzquKK50DjA9UosmsX+YTNNY
-         FjKcVo26L1uAAto7qnTcm71GiFkNWwdqETDacB/lhhOvAp9kUggJFZt+5Ayy2m8nDJii
-         UmfEjTpJLxByE8oJ9GQmrxalhygHUnBN2L9F+JrnSwLi+XLJ/UvEWIwaaqeMNrliPafT
-         6ZAEGWKFDc+nIaMvmkPkWaPHO8jPbeQi85vxOoCr2QPSfcO6e5EE40sHO1Aw++MMatAH
-         QT50vQjWapwBUWfQK183h9nwMQO6j0cDJrhMuTFxCp8KIsi5zDK1bsmVMGHfrD8yjr2h
-         LO3w==
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=19GxIsR+j41et34QE0NnjcKf9ZQPSWYggmI9gWAvZGo=;
+        b=sql8+y9ENjfsJ05F7DhDvrBXawLyrxY00O/LH5CZ2TspLqHujYoBJI6lb7kKcKjgub
+         znDYUpIU12H3PL59n3YyjbFs0CtJhS4LbJlJ5r9BkdceKmYQU4Kuqvepkijdm0P1OVPS
+         JK05GvKxj0dwNjZ9a8bho7JDgmqIyWvy62z+gEbQwFKObRhZ5+rcr/ebLjQFrjtU3ttr
+         GCv2MsPnqFdbUFtrhE0P6zmTQO1We1dQEGtpDsFeBE37cPhQ2UHCHEMuBe+zpIoIsxh7
+         Qsj7E5rNJDfBR+KJaRs3vDWX2XEtsLefXtQxHepoW4sUdUWNDwp77KUxbn/vIZgq8fty
+         TTxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to;
-        bh=9YFj2llOeTltFFERuQkud+3GhYyjlg2vFqi03Sd0ueo=;
-        b=3e2KcRx/s311c3cpWZTIFtfYN6kbYZIW1z+St1Pubzsr/Bnv8iZSUYJTxZ+K/0HDej
-         XPUaO/TegdiYi766oAraY1e9oWLCkzhKZVuAOmKJ5i+JEYREyhFg+MFEB0oTGnZJN8S/
-         D2lRr1fbCq3HqtLzXiwv4ML1gto1HeV+ik3n4g1qNgDfIiOIo+wGA30JZvVTimerONve
-         OaGelpmReFeXSGpjmxkmcPzoZU1Ncc1zuG+uz93ws/7inCS2GVMbx8ifHXjRyyNoZWdk
-         eGbJ+SURI2Au0hBxP3K9BAJ2dOJn+rv0SqV7f/+xWG5PPr1uhCVNAaHoaYFmkG1du1JV
-         /e7Q==
-X-Gm-Message-State: AOAM5335Qn1cmQMbLWTZRafl2GC95ADWv6aiXib/OtMORrScc3m6dRB2
-        p33PHbF5Ymm0jDYj48ScuNwYgVWDVqAj9Fd1ARo=
-X-Google-Smtp-Source: ABdhPJy9ggOz8vb3XWAl1tpZUPMi65MmuLQikVId5O3XaBGNoQLhc8qyxnloeXxeuZct1EKOUsFk0n9Tv16eCj2JYz4=
-X-Received: by 2002:a9d:1b41:: with SMTP id l59mr28179359otl.283.1634071919824;
- Tue, 12 Oct 2021 13:51:59 -0700 (PDT)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=19GxIsR+j41et34QE0NnjcKf9ZQPSWYggmI9gWAvZGo=;
+        b=jvKzYs6sZe3t82VOU13JIwJ3XbxH+SkpBwrkDNcYIkv54PGm7gKAP2vFHeg33OFHTD
+         n51Yik2Z/hArTS/+Yv/A1KtO31kfgWcaKkUpj3n4sFcT6R1VbF1ILSspMYTIxJgryjYP
+         Nnt3DWfrrP2UjCjBU23HRCofqWf23Duj3EBnigoP+yfKSk8FFE8WvJFHci+bNNe3UxrF
+         7NiyDsjIvCQgdbFzZAy7cVDp4i6JfMgUrBK0s66cpOaQyDx85XQ9bh8uwuvFVFTuYeMD
+         fvUVGBP1+JXAiTlV4iIlwKldINzb7W44yjv+9TCL6Mw4Pv1IXYNsRJxUpdOzylXtpVrh
+         MSCg==
+X-Gm-Message-State: AOAM530i1mjiAV05ACjOZPhslR6wGV4uvfL6HQREwcrIsLLv3dGLTa1P
+        UzaeonLY+1XN+ygJWorDwT2gn5eGsHnHIJWKV0KwaA==
+X-Google-Smtp-Source: ABdhPJwNK5w+d5svxsHAm2PvqGvJvZTSgZXwvVs6TWtD2ierds0TtTagKISxCYK7OlGmcfUJVgv5ZoF1pkcQUTdHQco=
+X-Received: by 2002:aca:b886:: with SMTP id i128mr5171854oif.2.1634073262936;
+ Tue, 12 Oct 2021 14:14:22 -0700 (PDT)
 MIME-Version: 1.0
-Received: by 2002:a4a:d281:0:0:0:0:0 with HTTP; Tue, 12 Oct 2021 13:51:59
- -0700 (PDT)
-Reply-To: mrsbillchantal801@gmail.com
-From:   "Mrs.chanta" <moris9974@gmail.com>
-Date:   Tue, 12 Oct 2021 22:51:59 +0200
-Message-ID: <CAKjm6rZwGM1VQJXa5kxfC7DE85y7zcytVhxcQtc0vm-1A7CbhQ@mail.gmail.com>
-Subject: Dear Friend
-To:     undisclosed-recipients:;
+References: <20211012174026.147040-1-krish.sadhukhan@oracle.com>
+In-Reply-To: <20211012174026.147040-1-krish.sadhukhan@oracle.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Tue, 12 Oct 2021 14:14:11 -0700
+Message-ID: <CALMp9eTaGfDyHn2i=fT51_GtmLmF6cXa6h1Wb_s-f=8Me1wFtA@mail.gmail.com>
+Subject: Re: [PATCH] KVM: selftests: Rename vm_open() to __vm_create()
+To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-hello....
+On Tue, Oct 12, 2021 at 1:43 PM Krish Sadhukhan
+<krish.sadhukhan@oracle.com> wrote:
+>
+> vm_open() actually creates the VM by opening the KVM device and calling
+> KVM_CREATE_VM ioctl, so it is semantically more correct to call it
+> __vm_create().
 
-You have been compensated with the sum of 6.2  million dollars in this
-united
-
-nation the payment will be issue into atm visa  card and send
-to you from the santander
-
-bank we need your address and your
-Whatsapp number
-
-
-
-Thanks  mrs bill chantal
+I see no problem with the current semantics, since the KVM_CREATE_VM
+ioctl *opens* a new VM file descriptor.
