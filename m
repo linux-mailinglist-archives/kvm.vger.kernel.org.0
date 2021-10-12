@@ -2,114 +2,172 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EE872429A2A
-	for <lists+kvm@lfdr.de>; Tue, 12 Oct 2021 02:07:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B2EEC429A23
+	for <lists+kvm@lfdr.de>; Tue, 12 Oct 2021 02:07:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234085AbhJLAJS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Oct 2021 20:09:18 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:51508 "EHLO
+        id S236009AbhJLAIz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Oct 2021 20:08:55 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:51544 "EHLO
         galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232938AbhJLAI3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S233455AbhJLAI3 (ORCPT <rfc822;kvm@vger.kernel.org>);
         Mon, 11 Oct 2021 20:08:29 -0400
-Message-ID: <20211011223611.846280577@linutronix.de>
+Message-ID: <20211011223611.905227254@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1633997183;
+        s=2020; t=1633997185;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         references:references; bh=oEva5V/97ct5UQuKFK5IGfaw1DZ+FmPxcrD1r2aiDpI=;
-        b=QZjdLY8tNuG5aFmEWSAS8f3n3JjHZn38ppgbMPIZQmyYPeGQI6K81JqY6DRVVZgh/7ywTn
-        MliNBa8jWkllkYmFfoFsNdZgLLz5tdD2pBagevl1Xux5fNBkg6xRxl65UPXv8caSetPE/8
-        SD0Xqwf9Nk99C0NfLapt9ofWT2IVqJN0JszLGlv8UVheUQKNa2v0k5TUCrMiTWGtjwrp7O
-        c7S0dU2Jp1lVFTzgI5/OX2rq1nggyntW5m1uFSK0ENguq6GmPedJ3N5C5fR4EQz2xHm2uX
-        GAdCeQvnrx5rUqbut+sS5Hf29if3lIGeU9lHiCfQLYuFVGz7TIxM48/gj+IroA==
+         references:references; bh=BHEwndCCeICn4y0xsJCnPp3PZLShkZDVpkgf+lOaHZA=;
+        b=HczKWxcGHiQq8dfAk6o4PbxVoeIJiNwxZ4+jKfQRQdSgFGkQ+9IPG/rFPlkjX8HPKQDAU/
+        61Rl5jJnmnPTNXWZVNpWk1PmZ6L/rBPx1rnTXlfHx27V1pD8h4hdLrIGbZo+qUsyZX+sqA
+        wscTITRXXa+ft9ML7roxkFSY7R0FMilIfKI9z+IgkLRybAY3WcjZ0tgEkxB40s7sUTypvw
+        NrPgl1d61XBThdTXJqyZ4SbIPLzi8/7jpPROtDkrRrM+OycNUdoDXtB8xlxIzojl6nCZyz
+        90cnR6j7B0G6uBRylpNo/+EoG9924kNVqaIZKyaM+HlaFhO3PO5JfmiJ1jKQFw==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1633997183;
+        s=2020e; t=1633997185;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         references:references; bh=oEva5V/97ct5UQuKFK5IGfaw1DZ+FmPxcrD1r2aiDpI=;
-        b=+UsevrxoWqKsvWh7t443jgIl5arzLF/LCHtZx7iHX1w2+Tzax2kKgnLwzRRHxmYfc6Oaww
-        O5PalNHNi1nxpkDQ==
+         references:references; bh=BHEwndCCeICn4y0xsJCnPp3PZLShkZDVpkgf+lOaHZA=;
+        b=P+AuLL4f6EreRiFb22KLo5UeviCaAisyFupMC3Q4HMvTwPiKwbKAEwlc1gH/jES+jGAWT9
+        FJAvKEq/bJBg6kBQ==
 From:   Thomas Gleixner <tglx@linutronix.de>
 To:     LKML <linux-kernel@vger.kernel.org>
 Cc:     x86@kernel.org, "Chang S. Bae" <chang.seok.bae@intel.com>,
         Dave Hansen <dave.hansen@linux.intel.com>,
         Arjan van de Ven <arjan@linux.intel.com>,
         kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Subject: [patch 26/31] x86/fpu: Move fpstate functions to api.h
+Subject: [patch 27/31] x86/fpu: Remove internal.h dependency from fpu/signal.h
 References: <20211011215813.558681373@linutronix.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Date:   Tue, 12 Oct 2021 02:00:37 +0200 (CEST)
+Date:   Tue, 12 Oct 2021 02:00:39 +0200 (CEST)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Move function declarations which need to be globaly available to api.h
-where they belong.
+In order to remove internal.h make signal.h independent of it.
 
 Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
 ---
- arch/x86/include/asm/fpu/api.h      |    9 +++++++++
- arch/x86/include/asm/fpu/internal.h |    9 ---------
- arch/x86/kernel/fpu/internal.h      |    3 +++
- arch/x86/math-emu/fpu_entry.c       |    2 +-
- 4 files changed, 13 insertions(+), 10 deletions(-)
+ arch/x86/ia32/ia32_signal.c         |    1 -
+ arch/x86/include/asm/fpu/api.h      |    3 +++
+ arch/x86/include/asm/fpu/internal.h |    7 -------
+ arch/x86/include/asm/fpu/signal.h   |   13 +++++++++++++
+ arch/x86/kernel/fpu/signal.c        |    1 -
+ arch/x86/kernel/ptrace.c            |    1 -
+ arch/x86/kernel/signal.c            |    1 -
+ arch/x86/mm/extable.c               |    3 ++-
+ 8 files changed, 18 insertions(+), 12 deletions(-)
 
+--- a/arch/x86/ia32/ia32_signal.c
++++ b/arch/x86/ia32/ia32_signal.c
+@@ -24,7 +24,6 @@
+ #include <linux/syscalls.h>
+ #include <asm/ucontext.h>
+ #include <linux/uaccess.h>
+-#include <asm/fpu/internal.h>
+ #include <asm/fpu/signal.h>
+ #include <asm/ptrace.h>
+ #include <asm/ia32_unistd.h>
 --- a/arch/x86/include/asm/fpu/api.h
 +++ b/arch/x86/include/asm/fpu/api.h
-@@ -110,6 +110,15 @@ extern int cpu_has_xfeatures(u64 xfeatur
+@@ -116,6 +116,9 @@ extern void fpstate_init_soft(struct swr
+ static inline void fpstate_init_soft(struct swregs_state *soft) {}
+ #endif
  
- static inline void update_pasid(void) { }
- 
-+#ifdef CONFIG_MATH_EMULATION
-+extern void fpstate_init_soft(struct swregs_state *soft);
-+#else
-+static inline void fpstate_init_soft(struct swregs_state *soft) {}
-+#endif
++/* State tracking */
++DECLARE_PER_CPU(struct fpu *, fpu_fpregs_owner_ctx);
 +
-+/* FPSTATE */
-+extern union fpregs_state init_fpstate;
-+
- /* FPSTATE related functions which are exported to KVM */
- extern void fpu_init_fpstate_user(struct fpu *fpu);
+ /* FPSTATE */
+ extern union fpregs_state init_fpstate;
  
 --- a/arch/x86/include/asm/fpu/internal.h
 +++ b/arch/x86/include/asm/fpu/internal.h
-@@ -42,15 +42,6 @@ extern void fpu__init_system(struct cpui
+@@ -26,7 +26,6 @@
+ /*
+  * High level FPU state handling functions:
+  */
+-extern bool fpu__restore_sig(void __user *buf, int ia32_frame);
+ extern void fpu__clear_user_states(struct fpu *fpu);
+ extern int  fpu__exception_code(struct fpu *fpu, int trap_nr);
+ 
+@@ -42,10 +41,4 @@ extern void fpu__init_system(struct cpui
  extern void fpu__init_check_bugs(void);
  extern void fpu__resume_cpu(void);
  
--extern union fpregs_state init_fpstate;
--extern void fpstate_init_user(union fpregs_state *state);
+-extern void restore_fpregs_from_fpstate(union fpregs_state *fpstate, u64 mask);
 -
--#ifdef CONFIG_MATH_EMULATION
--extern void fpstate_init_soft(struct swregs_state *soft);
--#else
--static inline void fpstate_init_soft(struct swregs_state *soft) {}
--#endif
+-extern bool copy_fpstate_to_sigframe(void __user *buf, void __user *fp, int size);
 -
- extern void restore_fpregs_from_fpstate(union fpregs_state *fpstate, u64 mask);
+-DECLARE_PER_CPU(struct fpu *, fpu_fpregs_owner_ctx);
+-
+ #endif /* _ASM_X86_FPU_INTERNAL_H */
+--- a/arch/x86/include/asm/fpu/signal.h
++++ b/arch/x86/include/asm/fpu/signal.h
+@@ -5,6 +5,11 @@
+ #ifndef _ASM_X86_FPU_SIGNAL_H
+ #define _ASM_X86_FPU_SIGNAL_H
  
- extern bool copy_fpstate_to_sigframe(void __user *buf, void __user *fp, int size);
---- a/arch/x86/kernel/fpu/internal.h
-+++ b/arch/x86/kernel/fpu/internal.h
-@@ -22,4 +22,7 @@ static __always_inline __pure bool use_f
- /* Init functions */
- extern void fpu__init_prepare_fx_sw_frame(void);
- 
-+/* Used in init.c */
-+extern void fpstate_init_user(union fpregs_state *state);
++#include <linux/compat.h>
++#include <linux/user.h>
 +
- #endif
---- a/arch/x86/math-emu/fpu_entry.c
-+++ b/arch/x86/math-emu/fpu_entry.c
-@@ -31,7 +31,7 @@
- #include <linux/uaccess.h>
- #include <asm/traps.h>
- #include <asm/user.h>
--#include <asm/fpu/internal.h>
-+#include <asm/fpu/api.h>
++#include <asm/fpu/types.h>
++
+ #ifdef CONFIG_X86_64
+ # include <uapi/asm/sigcontext.h>
+ # include <asm/user32.h>
+@@ -31,4 +36,12 @@ fpu__alloc_mathframe(unsigned long sp, i
  
- #include "fpu_system.h"
- #include "fpu_emu.h"
+ unsigned long fpu__get_fpstate_size(void);
+ 
++extern bool copy_fpstate_to_sigframe(void __user *buf, void __user *fp, int size);
++extern void fpu__clear_user_states(struct fpu *fpu);
++extern bool fpu__restore_sig(void __user *buf, int ia32_frame);
++
++extern void restore_fpregs_from_fpstate(union fpregs_state *fpstate, u64 mask);
++
++extern bool copy_fpstate_to_sigframe(void __user *buf, void __user *fp, int size);
++
+ #endif /* _ASM_X86_FPU_SIGNAL_H */
+--- a/arch/x86/kernel/fpu/signal.c
++++ b/arch/x86/kernel/fpu/signal.c
+@@ -7,7 +7,6 @@
+ #include <linux/cpu.h>
+ #include <linux/pagemap.h>
+ 
+-#include <asm/fpu/internal.h>
+ #include <asm/fpu/signal.h>
+ #include <asm/fpu/regset.h>
+ #include <asm/fpu/xstate.h>
+--- a/arch/x86/kernel/ptrace.c
++++ b/arch/x86/kernel/ptrace.c
+@@ -29,7 +29,6 @@
+ 
+ #include <linux/uaccess.h>
+ #include <asm/processor.h>
+-#include <asm/fpu/internal.h>
+ #include <asm/fpu/signal.h>
+ #include <asm/fpu/regset.h>
+ #include <asm/debugreg.h>
+--- a/arch/x86/kernel/signal.c
++++ b/arch/x86/kernel/signal.c
+@@ -30,7 +30,6 @@
+ 
+ #include <asm/processor.h>
+ #include <asm/ucontext.h>
+-#include <asm/fpu/internal.h>
+ #include <asm/fpu/signal.h>
+ #include <asm/vdso.h>
+ #include <asm/mce.h>
+--- a/arch/x86/mm/extable.c
++++ b/arch/x86/mm/extable.c
+@@ -4,7 +4,8 @@
+ #include <linux/sched/debug.h>
+ #include <xen/xen.h>
+ 
+-#include <asm/fpu/internal.h>
++#include <asm/fpu/signal.h>
++#include <asm/fpu/xstate.h>
+ #include <asm/sev.h>
+ #include <asm/traps.h>
+ #include <asm/kdebug.h>
 
