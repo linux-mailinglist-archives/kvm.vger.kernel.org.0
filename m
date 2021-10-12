@@ -2,270 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5F2B2429A0F
-	for <lists+kvm@lfdr.de>; Tue, 12 Oct 2021 02:06:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 171D6429A16
+	for <lists+kvm@lfdr.de>; Tue, 12 Oct 2021 02:07:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233936AbhJLAI3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Oct 2021 20:08:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33996 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230351AbhJLAIX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Oct 2021 20:08:23 -0400
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12F03C061570;
-        Mon, 11 Oct 2021 17:06:22 -0700 (PDT)
-Message-ID: <20211011223611.727493295@linutronix.de>
+        id S235697AbhJLAIj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Oct 2021 20:08:39 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:51368 "EHLO
+        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231565AbhJLAIY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Oct 2021 20:08:24 -0400
+Message-ID: <20211011223611.787198449@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1633997180;
+        s=2020; t=1633997182;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         references:references; bh=1r7yu5vPXy5SyZnbjR2SneOXObpzizgNxt6TRa0bb3Y=;
-        b=EsJpGlx7k28MLM28soBIOU/nF1Pxbxe/6ynmcrKN6410Gy4yVh4a6npib47T8BHXIFvpU9
-        dKPXFUBpxxL/r130VnY6cRgFm3grdNXYihQlWqUXD81VNWe1K4hP6kMefy3wQdviICExXV
-        iKovkRazh3xRi+nhSdW1Bi0wzNjPOS6COKxBmxOdHdoYWRne/nEbaNuhl6icTuv1yIwv1k
-        bt24pSCJNvfBQlcdY5eLCYCoJPnNkl7smgH3QlX4SO0z/PpyIgMDbmZDaZLTiMNAgUrT3k
-        CqMbykhWN041EiOsT4EI2rnaUiGnFQDvm+AZIu+dd7Eiqh0QVa4U18+h2x7wrQ==
+         references:references; bh=bRtRVFO/Qk9SnYYppFE5b04AKhvpImwNUBtl9GhSMVg=;
+        b=gHrmNgi5IG/m3Y5i56g570joBTJp8ga7dJ9Rt8KNv/hw5z7AfF+cs/CyUHRTxVOtOMSEJ6
+        EP+yqjeaozNiX5pStTjY92XhXNc0lHvwSUGhjwJMBYYG2Y2Acnlof2stV1g/80KZCTkTcd
+        hz7OwWOrwkCotUYh89RuVMzvV4XCd5n/fq6e4+qn6NZVMOFePwE7h8pfrwaF65bA+LNEYg
+        CvHN2GQQ9NdQu52Hxd2VgVxBVig5+PAdX4o0dQckK0b3e95gvKmztbk/P1TLDxPnhgL0oZ
+        O4EwoMnLa7i4x+2HNnhkaeD8jfyx2lJzKpa+M/ekPleSAv2fYBlS28J2aF25sQ==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1633997180;
+        s=2020e; t=1633997182;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         references:references; bh=1r7yu5vPXy5SyZnbjR2SneOXObpzizgNxt6TRa0bb3Y=;
-        b=xZJFmxLS5rl/XeCZBMM8bDZ/qHCiB6opt8STgu04uh8Hnb8uu7y1qbwXeJITxaOoTIFdhM
-        dHGMcHQOXo46YkCQ==
+         references:references; bh=bRtRVFO/Qk9SnYYppFE5b04AKhvpImwNUBtl9GhSMVg=;
+        b=m7v2hdlyCl1AbGvAAySMBN34qNqhT9bb5FU3tczmOj4rYmmj4+00X1Sx5MEW5+ubmemQQn
+        1YZNmm2kviAXDEDw==
 From:   Thomas Gleixner <tglx@linutronix.de>
 To:     LKML <linux-kernel@vger.kernel.org>
 Cc:     x86@kernel.org, "Chang S. Bae" <chang.seok.bae@intel.com>,
         Dave Hansen <dave.hansen@linux.intel.com>,
         Arjan van de Ven <arjan@linux.intel.com>,
         kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Subject: [patch 24/31] x86/fpu: Move fpregs_restore_userregs() to core
+Subject: [patch 25/31] x86/fpu: Move mxcsr related code to core
 References: <20211011215813.558681373@linutronix.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Date:   Tue, 12 Oct 2021 02:00:34 +0200 (CEST)
+Date:   Tue, 12 Oct 2021 02:00:36 +0200 (CEST)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Only used core internaly.
+No need to expose that to code which only needs the XCR0 accessors.
 
 Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
 ---
- arch/x86/include/asm/fpu/internal.h |   83 -----------------------------------
- arch/x86/kernel/fpu/context.h       |   85 ++++++++++++++++++++++++++++++++++++
- arch/x86/kernel/fpu/core.c          |    1 
- arch/x86/kernel/fpu/regset.c        |    1 
- arch/x86/kernel/fpu/signal.c        |    1 
- 5 files changed, 88 insertions(+), 83 deletions(-)
+ arch/x86/include/asm/fpu/xcr.h |   11 -----------
+ arch/x86/kernel/fpu/init.c     |    1 +
+ arch/x86/kernel/fpu/legacy.h   |    7 +++++++
+ arch/x86/kernel/fpu/regset.c   |    1 +
+ arch/x86/kernel/fpu/xstate.c   |    3 ++-
+ arch/x86/kvm/svm/sev.c         |    2 +-
+ 6 files changed, 12 insertions(+), 13 deletions(-)
 
---- a/arch/x86/include/asm/fpu/internal.h
-+++ b/arch/x86/include/asm/fpu/internal.h
-@@ -55,89 +55,6 @@ extern void restore_fpregs_from_fpstate(
- 
- extern bool copy_fpstate_to_sigframe(void __user *buf, void __user *fp, int size);
- 
--/*
-- * FPU context switch related helper methods:
-- */
--
- DECLARE_PER_CPU(struct fpu *, fpu_fpregs_owner_ctx);
+--- a/arch/x86/include/asm/fpu/xcr.h
++++ b/arch/x86/include/asm/fpu/xcr.h
+@@ -2,17 +2,6 @@
+ #ifndef _ASM_X86_FPU_XCR_H
+ #define _ASM_X86_FPU_XCR_H
  
 -/*
-- * The in-register FPU state for an FPU context on a CPU is assumed to be
-- * valid if the fpu->last_cpu matches the CPU, and the fpu_fpregs_owner_ctx
-- * matches the FPU.
-- *
-- * If the FPU register state is valid, the kernel can skip restoring the
-- * FPU state from memory.
-- *
-- * Any code that clobbers the FPU registers or updates the in-memory
-- * FPU state for a task MUST let the rest of the kernel know that the
-- * FPU registers are no longer valid for this task.
-- *
-- * Either one of these invalidation functions is enough. Invalidate
-- * a resource you control: CPU if using the CPU for something else
-- * (with preemption disabled), FPU for the current task, or a task that
-- * is prevented from running by the current task.
+- * MXCSR and XCR definitions:
 - */
--static inline void __cpu_invalidate_fpregs_state(void)
+-
+-static inline void ldmxcsr(u32 mxcsr)
 -{
--	__this_cpu_write(fpu_fpregs_owner_ctx, NULL);
+-	asm volatile("ldmxcsr %0" :: "m" (mxcsr));
 -}
 -
--static inline void __fpu_invalidate_fpregs_state(struct fpu *fpu)
--{
--	fpu->last_cpu = -1;
--}
+-extern unsigned int mxcsr_feature_mask;
 -
--static inline int fpregs_state_valid(struct fpu *fpu, unsigned int cpu)
--{
--	return fpu == this_cpu_read(fpu_fpregs_owner_ctx) && cpu == fpu->last_cpu;
--}
--
--/*
-- * These generally need preemption protection to work,
-- * do try to avoid using these on their own:
-- */
--static inline void fpregs_deactivate(struct fpu *fpu)
--{
--	this_cpu_write(fpu_fpregs_owner_ctx, NULL);
--	trace_x86_fpu_regs_deactivated(fpu);
--}
--
--static inline void fpregs_activate(struct fpu *fpu)
--{
--	this_cpu_write(fpu_fpregs_owner_ctx, fpu);
--	trace_x86_fpu_regs_activated(fpu);
--}
--
--/* Internal helper for switch_fpu_return() and signal frame setup */
--static inline void fpregs_restore_userregs(void)
--{
--	struct fpu *fpu = &current->thread.fpu;
--	int cpu = smp_processor_id();
--
--	if (WARN_ON_ONCE(current->flags & PF_KTHREAD))
--		return;
--
--	if (!fpregs_state_valid(fpu, cpu)) {
--		u64 mask;
--
--		/*
--		 * This restores _all_ xstate which has not been
--		 * established yet.
--		 *
--		 * If PKRU is enabled, then the PKRU value is already
--		 * correct because it was either set in switch_to() or in
--		 * flush_thread(). So it is excluded because it might be
--		 * not up to date in current->thread.fpu.xsave state.
--		 */
--		mask = xfeatures_mask_restore_user() |
--			xfeatures_mask_supervisor();
--		restore_fpregs_from_fpstate(&fpu->state, mask);
--
--		fpregs_activate(fpu);
--		fpu->last_cpu = cpu;
--	}
--	clear_thread_flag(TIF_NEED_FPU_LOAD);
--}
--
- #endif /* _ASM_X86_FPU_INTERNAL_H */
---- /dev/null
-+++ b/arch/x86/kernel/fpu/context.h
-@@ -0,0 +1,85 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef __X86_KERNEL_FPU_CONTEXT_H
-+#define __X86_KERNEL_FPU_CONTEXT_H
-+
-+#include <asm/fpu/xstate.h>
-+#include <asm/trace/fpu.h>
-+
-+/* Functions related to FPU context tracking */
-+
-+/*
-+ * The in-register FPU state for an FPU context on a CPU is assumed to be
-+ * valid if the fpu->last_cpu matches the CPU, and the fpu_fpregs_owner_ctx
-+ * matches the FPU.
-+ *
-+ * If the FPU register state is valid, the kernel can skip restoring the
-+ * FPU state from memory.
-+ *
-+ * Any code that clobbers the FPU registers or updates the in-memory
-+ * FPU state for a task MUST let the rest of the kernel know that the
-+ * FPU registers are no longer valid for this task.
-+ *
-+ * Either one of these invalidation functions is enough. Invalidate
-+ * a resource you control: CPU if using the CPU for something else
-+ * (with preemption disabled), FPU for the current task, or a task that
-+ * is prevented from running by the current task.
-+ */
-+static inline void __cpu_invalidate_fpregs_state(void)
-+{
-+	__this_cpu_write(fpu_fpregs_owner_ctx, NULL);
-+}
-+
-+static inline void __fpu_invalidate_fpregs_state(struct fpu *fpu)
-+{
-+	fpu->last_cpu = -1;
-+}
-+
-+static inline int fpregs_state_valid(struct fpu *fpu, unsigned int cpu)
-+{
-+	return fpu == this_cpu_read(fpu_fpregs_owner_ctx) && cpu == fpu->last_cpu;
-+}
-+
-+static inline void fpregs_deactivate(struct fpu *fpu)
-+{
-+	__this_cpu_write(fpu_fpregs_owner_ctx, NULL);
-+	trace_x86_fpu_regs_deactivated(fpu);
-+}
-+
-+static inline void fpregs_activate(struct fpu *fpu)
-+{
-+	__this_cpu_write(fpu_fpregs_owner_ctx, fpu);
-+	trace_x86_fpu_regs_activated(fpu);
-+}
-+
-+/* Internal helper for switch_fpu_return() and signal frame setup */
-+static inline void fpregs_restore_userregs(void)
-+{
-+	struct fpu *fpu = &current->thread.fpu;
-+	int cpu = smp_processor_id();
-+
-+	if (WARN_ON_ONCE(current->flags & PF_KTHREAD))
-+		return;
-+
-+	if (!fpregs_state_valid(fpu, cpu)) {
-+		u64 mask;
-+
-+		/*
-+		 * This restores _all_ xstate which has not been
-+		 * established yet.
-+		 *
-+		 * If PKRU is enabled, then the PKRU value is already
-+		 * correct because it was either set in switch_to() or in
-+		 * flush_thread(). So it is excluded because it might be
-+		 * not up to date in current->thread.fpu.xsave state.
-+		 */
-+		mask = xfeatures_mask_restore_user() |
-+			xfeatures_mask_supervisor();
-+		restore_fpregs_from_fpstate(&fpu->state, mask);
-+
-+		fpregs_activate(fpu);
-+		fpu->last_cpu = cpu;
-+	}
-+	clear_thread_flag(TIF_NEED_FPU_LOAD);
-+}
-+
-+#endif
---- a/arch/x86/kernel/fpu/core.c
-+++ b/arch/x86/kernel/fpu/core.c
-@@ -17,6 +17,7 @@
- #include <linux/hardirq.h>
- #include <linux/pkeys.h>
+ #define XCR_XFEATURE_ENABLED_MASK	0x00000000
  
-+#include "context.h"
+ static inline u64 xgetbv(u32 index)
+--- a/arch/x86/kernel/fpu/init.c
++++ b/arch/x86/kernel/fpu/init.c
+@@ -11,6 +11,7 @@
+ #include <linux/init.h>
+ 
  #include "internal.h"
- #include "legacy.h"
- #include "xstate.h"
---- a/arch/x86/kernel/fpu/regset.c
-+++ b/arch/x86/kernel/fpu/regset.c
-@@ -10,6 +10,7 @@
- #include <asm/fpu/regset.h>
- #include <asm/fpu/xstate.h>
- 
-+#include "context.h"
- #include "internal.h"
++#include "legacy.h"
  
  /*
---- a/arch/x86/kernel/fpu/signal.c
-+++ b/arch/x86/kernel/fpu/signal.c
-@@ -16,6 +16,7 @@
- #include <asm/trapnr.h>
- #include <asm/trace/fpu.h>
+  * Initialize the registers found in all CPUs, CR0 and CR4:
+--- a/arch/x86/kernel/fpu/legacy.h
++++ b/arch/x86/kernel/fpu/legacy.h
+@@ -4,6 +4,13 @@
  
-+#include "context.h"
+ #include <asm/fpu/types.h>
+ 
++extern unsigned int mxcsr_feature_mask;
++
++static inline void ldmxcsr(u32 mxcsr)
++{
++	asm volatile("ldmxcsr %0" :: "m" (mxcsr));
++}
++
+ /*
+  * Returns 0 on success or the trap number when the operation raises an
+  * exception.
+--- a/arch/x86/kernel/fpu/regset.c
++++ b/arch/x86/kernel/fpu/regset.c
+@@ -12,6 +12,7 @@
+ 
+ #include "context.h"
  #include "internal.h"
- #include "legacy.h"
- #include "xstate.h"
++#include "legacy.h"
+ 
+ /*
+  * The xstateregs_active() routine is the same as the regset_fpregs_active() routine,
+--- a/arch/x86/kernel/fpu/xstate.c
++++ b/arch/x86/kernel/fpu/xstate.c
+@@ -14,8 +14,9 @@
+ 
+ #include <asm/fpu/api.h>
+ #include <asm/fpu/internal.h>
+-#include <asm/fpu/signal.h>
+ #include <asm/fpu/regset.h>
++#include <asm/fpu/signal.h>
++#include <asm/fpu/xcr.h>
+ 
+ #include <asm/tlbflush.h>
+ 
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -17,10 +17,10 @@
+ #include <linux/misc_cgroup.h>
+ #include <linux/processor.h>
+ #include <linux/trace_events.h>
+-#include <asm/fpu/internal.h>
+ 
+ #include <asm/pkru.h>
+ #include <asm/trapnr.h>
++#include <asm/fpu/xcr.h>
+ 
+ #include "x86.h"
+ #include "svm.h"
 
