@@ -2,55 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CAABC429C81
-	for <lists+kvm@lfdr.de>; Tue, 12 Oct 2021 06:36:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CD8E9429C83
+	for <lists+kvm@lfdr.de>; Tue, 12 Oct 2021 06:36:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232404AbhJLEi1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Oct 2021 00:38:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37154 "EHLO
+        id S232401AbhJLEi2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Oct 2021 00:38:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37164 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232401AbhJLEi0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Oct 2021 00:38:26 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 893A8C06161C
-        for <kvm@vger.kernel.org>; Mon, 11 Oct 2021 21:36:25 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id s6-20020a254506000000b005b6b6434cd6so25796217yba.9
-        for <kvm@vger.kernel.org>; Mon, 11 Oct 2021 21:36:25 -0700 (PDT)
+        with ESMTP id S232419AbhJLEi1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Oct 2021 00:38:27 -0400
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9BA1C06161C
+        for <kvm@vger.kernel.org>; Mon, 11 Oct 2021 21:36:26 -0700 (PDT)
+Received: by mail-pj1-x1049.google.com with SMTP id my5-20020a17090b4c8500b001a0bf4025c1so88973pjb.8
+        for <kvm@vger.kernel.org>; Mon, 11 Oct 2021 21:36:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=yO1PAz+jT8UeVSC81HcgY5AK6Wp3sOfwLOCbdKGHTBw=;
-        b=BNMh2xxk+NtYYpDrk/F6E2XihCZLns3ZajqJY9EWMKkEcI1BQYLEMvy1PTCRgIY3oK
-         WGGj1bhWXocOkgj3HLp2GsnRL41t5Rb9bsolj9QGpfKQ27poteViLTX0mbXXaIH77PWQ
-         WtsXuG/mciEBgqSyGF6MIR3h59oj02cOW2YYFL+LGTNxlOP47DdEpb1KWzMSO423eo5Q
-         YTxBOw/oKjUS+lMstg8DVrUBxkmUHnmMSntWxhL07jYhaJwPn6OXc7G6KLJJphJub6Pr
-         WAHY2oZdrrr27gEWVh3JWA9v3wJFm7ako3ckNcQP3XNa9Bh3rAv+JX+cgjPeBxQ9uM2s
-         0DyA==
+        bh=N5SZSA+fUqRTbjo35OUmhwDTNPioIOsC+zg6mLlAOeI=;
+        b=Frtj842iBGMNrPh6OG3pi0Ms5HCdrLoaoymnVC+SUwO8+nKGBSOJVdpZwwm/QTQbF8
+         OTYgVScpMIOT0ud7g2c8hytKJ2CjSjDz8M4XdeW7TJqSm2DEPdgyODcnwhB2ODPv6mBy
+         aCnGplUEJ7fzS1cDJvyDiowSxXzf1dgt50MFJ/Uk5H21JMyKTRiuLsErBtQwO2+JItNz
+         iBxKlc8wMy4/NwvNuNqhflcxOhfd2YbyIgr5mN/ngArSdHJllHqhq/3p1yIaKfs1EZGh
+         Cvc+6I1dKsoE3RBupUrn125tyGYruhnhJUP/+o/18uTjunuMSuy2ARiKdbaEzViiwxtU
+         j8Tw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=yO1PAz+jT8UeVSC81HcgY5AK6Wp3sOfwLOCbdKGHTBw=;
-        b=hVdqX9bl/uBw8z8I9UaqGHZqPYlVj7I6t9VNXkR+wMAbpQced9zd5ONry1QBOg7kqv
-         O/T1FaSCoDLD1rA7WTDFe+drHUvwcSE8sCDbQ17V9O2lTjTGoX8jGLLtz8H82M8bY9sf
-         ZZFuj8ZROhYCHosVl5//3xwOgrO+98VV/funL8XgJ4fKAd02us3KcgOH2gxwQbZK5t1X
-         eNkDGxmoljOswdvkYEI9Iyvcyq5Vxj1fzKoDqcnkg2AQVniy5RQSka4Aaz8H+JoNN1Q5
-         qrSNjb9sH8Yp3bQQsLGSnbfUs7ltazBMLlLh5x3fiZM5nqyn+ruJaFroogILkNDd6h+p
-         Sw6w==
-X-Gm-Message-State: AOAM533jm2CSozMkoIQBqIUSmYwBwKJIF2P5u3EWAwxN35RZ1AfVLvCq
-        oQD80qkZ+c9Kg3z6C/F5DStOSU8uQ0U=
-X-Google-Smtp-Source: ABdhPJxyJgraJ5AwHDPgzY9D+WbTlXuTeuy8jGj0LsPS3K2cu1koz8V6Ofx9NP2uOkX2rIeFqYI8ykM2HaI=
+        bh=N5SZSA+fUqRTbjo35OUmhwDTNPioIOsC+zg6mLlAOeI=;
+        b=TBml0uj5if1QHJwO8nh+V56DyVwbV3uuIC20ODA4Rx7wHtsdvAbzUPozwhuXM72lJ2
+         vrfHYKZHz25yrtzycfKWZcx7Wr0qcXk0UrPXFEcRwcRMt/YSpi8XPfuV2Otwzhg8iLZV
+         Vc5884c+R2q7tuMCaioGOEZCSBRqcUREyAHbrF0Z6l2dDiPdknhYlB4dtYK5vdmF81ic
+         N7EyUFXNGDbVDQCgtLXCefKMK+7MAgcq9ZD2hwagEgaEZ51GRmStaZJLIEM2B0uMqRWn
+         9lAb/HMnZq/ir7IVN9/75P2eZqHLINY4gxifO95uuNHw9pL7dASfI+cnd8rr2eyM4qOs
+         gNPQ==
+X-Gm-Message-State: AOAM530gWQwh2g7dfxHNL8qbuf0QVFa29wRz0imvdzV05+0lfMi4bpEs
+        mbaRpF6I+zQifa88MR6HFO2QkgoDpI0=
+X-Google-Smtp-Source: ABdhPJxq/Mk4VVM9slvxTOJugnOnUA71qyKTuAL0h3f8/ueBhLbCcxivpgKtoQVfP4/2KUnvpPsw8Foxo9o=
 X-Received: from reiji-vws.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:15a3])
- (user=reijiw job=sendgmr) by 2002:a25:517:: with SMTP id 23mr26194996ybf.496.1634013384822;
- Mon, 11 Oct 2021 21:36:24 -0700 (PDT)
-Date:   Mon, 11 Oct 2021 21:35:14 -0700
+ (user=reijiw job=sendgmr) by 2002:a62:60c7:0:b0:40a:4bd7:752c with SMTP id
+ u190-20020a6260c7000000b0040a4bd7752cmr29343562pfb.52.1634013386318; Mon, 11
+ Oct 2021 21:36:26 -0700 (PDT)
+Date:   Mon, 11 Oct 2021 21:35:15 -0700
 In-Reply-To: <20211012043535.500493-1-reijiw@google.com>
-Message-Id: <20211012043535.500493-5-reijiw@google.com>
+Message-Id: <20211012043535.500493-6-reijiw@google.com>
 Mime-Version: 1.0
 References: <20211012043535.500493-1-reijiw@google.com>
 X-Mailer: git-send-email 2.33.0.882.g93a45727a2-goog
-Subject: [RFC PATCH 04/25] KVM: arm64: Introduce struct id_reg_info
+Subject: [RFC PATCH 05/25] KVM: arm64: Keep consistency of ID registers
+ between vCPUs
 From:   Reiji Watanabe <reijiw@google.com>
 To:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu
 Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
@@ -72,209 +74,100 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch lays the groundwork to make ID registers writable.
+All vCPUs that are owned by a VM must have the same values of ID
+registers.
 
-Introduce struct id_reg_info for an ID register to manage the
-register specific control of its value for the guest.
-It is used to do register specific initialization, validation
-of the ID register and etc.  Not all ID registers must have
-the id_reg_info. ID registers that don't have the id_reg_info
-are handled in a common way that is applied to all other
-ID registers.
+Return an error at the very first KVM_RUN for a vCPU if the vCPU has
+different values in any ID registers from any other vCPUs that have
+already started KVM_RUN once.  Also, return an error if userspace
+tries to change a value of ID register for a vCPU that already
+started KVM_RUN once.
 
-At present, changing an ID register from userspace is allowed only
-if the ID register has the id_reg_info, but that will be changed
-by the following patches.
-
-No ID register has the structure yet and the following patches
-will add the id_reg_info for some ID registers.
+Changing ID register is still not allowed at present though.
 
 Signed-off-by: Reiji Watanabe <reijiw@google.com>
 ---
- arch/arm64/kvm/sys_regs.c | 120 +++++++++++++++++++++++++++++++++++---
- 1 file changed, 111 insertions(+), 9 deletions(-)
+ arch/arm64/include/asm/kvm_host.h |  2 ++
+ arch/arm64/kvm/arm.c              |  3 +++
+ arch/arm64/kvm/sys_regs.c         | 31 +++++++++++++++++++++++++++++++
+ 3 files changed, 36 insertions(+)
 
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 0cd351099adf..69af669308b0 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -745,6 +745,8 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
+ long kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
+ 				struct kvm_arm_copy_mte_tags *copy_tags);
+ 
++int kvm_id_regs_consistency_check(const struct kvm_vcpu *vcpu);
++
+ /* Guest/host FPSIMD coordination helpers */
+ int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu);
+ void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu);
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index fe102cd2e518..45ca72a37872 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -620,6 +620,9 @@ static int kvm_vcpu_first_run_init(struct kvm_vcpu *vcpu)
+ 
+ 	ret = kvm_arm_pmu_v3_enable(vcpu);
+ 
++	if (kvm_id_regs_consistency_check(vcpu))
++		return -EPERM;
++
+ 	return ret;
+ }
+ 
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 72ca518e7944..8a0b88f9a975 100644
+index 8a0b88f9a975..2fe3121d50ca 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -263,6 +263,76 @@ static bool trap_raz_wi(struct kvm_vcpu *vcpu,
- 		return read_zero(vcpu, p);
- }
- 
-+struct id_reg_info {
-+	u32	sys_reg;	/* Register ID */
-+	u64	sys_val;	/* Sanitized system value */
-+
-+	/*
-+	 * Limit value of the register for a vcpu. The value is sys_val
-+	 * with bits cleared for unsupported features for the guest.
-+	 */
-+	u64	vcpu_limit_val;
-+
-+	/* Bits that are not validated when userspace sets the register. */
-+	u64	ignore_mask;
-+
-+	/* Initialization function of the id_reg_info */
-+	void (*init)(struct id_reg_info *id_reg);
-+
-+	/* Register specific validation function */
-+	int (*validate)(struct kvm_vcpu *vcpu, u64 val);
-+
-+	/* Return the reset value of the register for the vCPU */
-+	u64 (*get_reset_val)(struct kvm_vcpu *vcpu, struct id_reg_info *id_reg);
-+};
-+
-+static void id_reg_info_init(struct id_reg_info *id_reg)
-+{
-+	id_reg->sys_val = read_sanitised_ftr_reg(id_reg->sys_reg);
-+	id_reg->vcpu_limit_val = id_reg->sys_val;
-+}
-+
-+/*
-+ * An ID register that needs special handling to control the value for the
-+ * guest must have its own id_reg_info in id_reg_info_table.
-+ * (i.e. the reset value is different from the host's sanitized value,
-+ * the value is affected by opt-in features, some fields needs specific
-+ * validation, etc.)
-+ */
-+#define	GET_ID_REG_INFO(id)	(id_reg_info_table[IDREG_IDX(id)])
-+static struct id_reg_info *id_reg_info_table[KVM_ARM_ID_REG_MAX_NUM] = {};
-+
-+static int validate_id_reg(struct kvm_vcpu *vcpu,
-+			   const struct sys_reg_desc *rd, u64 val)
-+{
-+	u32 id = reg_to_encoding(rd);
-+	const struct id_reg_info *id_reg = GET_ID_REG_INFO(id);
-+	u64 limit;
-+	u64 check_val = val;
-+	int err;
-+
-+	if (id_reg) {
-+		/*
-+		 * Clear bits with ignore_mask, which we don't want
-+		 * arm64_check_features to check.
-+		 */
-+		check_val &= ~id_reg->ignore_mask;
-+		limit = id_reg->vcpu_limit_val;
-+	} else
-+		limit = read_sanitised_ftr_reg(id);
-+
-+	/* Check if the value indicates any feature that is not in the limit. */
-+	err = arm64_check_features(id, check_val, limit);
-+	if (err)
-+		return err;
-+
-+	if (id_reg && id_reg->validate)
-+		/* Run the ID register specific validity check. */
-+		err = id_reg->validate(vcpu, val);
-+
-+	return err;
-+}
-+
- /*
-  * ARMv8.1 mandates at least a trivial LORegion implementation, where all the
-  * RW registers are RES0 (which we can implement as RAZ/WI). On an ARMv8.0
-@@ -1176,11 +1246,19 @@ static unsigned int sve_visibility(const struct kvm_vcpu *vcpu,
- static void reset_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd)
- {
- 	u32 id = reg_to_encoding(rd);
-+	struct id_reg_info *id_reg;
-+	u64 val;
- 
- 	if (vcpu_has_reset_once(vcpu))
- 		return;
- 
--	__vcpu_sys_reg(vcpu, IDREG_SYS_IDX(id)) = read_sanitised_ftr_reg(id);
-+	id_reg = GET_ID_REG_INFO(id);
-+	if (id_reg && id_reg->get_reset_val)
-+		val = id_reg->get_reset_val(vcpu, id_reg);
-+	else
-+		val = read_sanitised_ftr_reg(id);
-+
-+	__vcpu_sys_reg(vcpu, IDREG_SYS_IDX(id)) = val;
- }
- 
- static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
-@@ -1225,11 +1303,7 @@ static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
- 	return 0;
- }
- 
--/*
-- * cpufeature ID register user accessors
-- *
-- * We don't allow the effective value to be changed.
-- */
-+/* cpufeature ID register user accessors */
- static int __get_id_reg(const struct kvm_vcpu *vcpu,
- 			const struct sys_reg_desc *rd, void __user *uaddr,
- 			bool raz)
-@@ -1240,11 +1314,12 @@ static int __get_id_reg(const struct kvm_vcpu *vcpu,
- 	return reg_to_user(uaddr, &val, id);
- }
- 
--static int __set_id_reg(const struct kvm_vcpu *vcpu,
-+static int __set_id_reg(struct kvm_vcpu *vcpu,
- 			const struct sys_reg_desc *rd, void __user *uaddr,
- 			bool raz)
- {
- 	const u64 id = sys_reg_to_index(rd);
-+	u32 encoding = reg_to_encoding(rd);
- 	int err;
- 	u64 val;
- 
-@@ -1252,10 +1327,18 @@ static int __set_id_reg(const struct kvm_vcpu *vcpu,
- 	if (err)
- 		return err;
- 
--	/* This is what we mean by invariant: you can't change it. */
--	if (val != read_id_reg(vcpu, rd, raz))
-+	/* Don't allow to change the reg unless the reg has id_reg_info */
-+	if (val != read_id_reg(vcpu, rd, raz) && !GET_ID_REG_INFO(encoding))
+@@ -1331,6 +1331,10 @@ static int __set_id_reg(struct kvm_vcpu *vcpu,
+ 	if (val != read_id_reg(vcpu, rd, raz) && !GET_ID_REG_INFO(encoding))
  		return -EINVAL;
  
-+	if (raz)
-+		return (val == 0) ? 0 : -EINVAL;
++	/* Don't allow to change the reg after the first KVM_RUN. */
++	if (vcpu->arch.has_run_once)
++		return -EINVAL;
 +
-+	err = validate_id_reg(vcpu, rd, val);
-+	if (err)
-+		return err;
-+
-+	__vcpu_sys_reg(vcpu, IDREG_SYS_IDX(encoding)) = val;
- 	return 0;
- }
+ 	if (raz)
+ 		return (val == 0) ? 0 : -EINVAL;
  
-@@ -2818,6 +2901,23 @@ int kvm_arm_copy_sys_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
+@@ -2901,6 +2905,33 @@ int kvm_arm_copy_sys_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
  	return write_demux_regids(uindices);
  }
  
-+static void id_reg_info_init_all(void)
++int kvm_id_regs_consistency_check(const struct kvm_vcpu *vcpu)
 +{
 +	int i;
-+	struct id_reg_info *id_reg;
++	const struct kvm_vcpu *t_vcpu;
 +
-+	for (i = 0; i < ARRAY_SIZE(id_reg_info_table); i++) {
-+		id_reg = (struct id_reg_info *)id_reg_info_table[i];
-+		if (!id_reg)
++	/*
++	 * Make sure vcpu->arch.has_run_once is visible for others so that
++	 * ID regs' consistency between two vCPUs is checked by either one
++	 * at least.
++	 */
++	smp_mb();
++	WARN_ON(!vcpu->arch.has_run_once);
++
++	kvm_for_each_vcpu(i, t_vcpu, vcpu->kvm) {
++		if (!t_vcpu->arch.has_run_once)
++			/* ID regs still could be updated. */
 +			continue;
 +
-+		if (id_reg->init)
-+			id_reg->init(id_reg);
-+		else
-+			id_reg_info_init(id_reg);
++		if (memcmp(&__vcpu_sys_reg(vcpu, ID_REG_BASE),
++			   &__vcpu_sys_reg(t_vcpu, ID_REG_BASE),
++			   sizeof(__vcpu_sys_reg(vcpu, ID_REG_BASE)) *
++					KVM_ARM_ID_REG_MAX_NUM))
++			return -EINVAL;
 +	}
++	return 0;
 +}
 +
- void kvm_sys_reg_table_init(void)
+ static void id_reg_info_init_all(void)
  {
- 	unsigned int i;
-@@ -2852,4 +2952,6 @@ void kvm_sys_reg_table_init(void)
- 			break;
- 	/* Clear all higher bits. */
- 	cache_levels &= (1 << (i*3))-1;
-+
-+	id_reg_info_init_all();
- }
+ 	int i;
 -- 
 2.33.0.882.g93a45727a2-goog
 
