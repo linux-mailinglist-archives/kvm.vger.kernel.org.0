@@ -2,288 +2,175 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F32C542AE94
-	for <lists+kvm@lfdr.de>; Tue, 12 Oct 2021 23:15:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BEB0A42AECF
+	for <lists+kvm@lfdr.de>; Tue, 12 Oct 2021 23:24:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235382AbhJLVR2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Oct 2021 17:17:28 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:58420 "EHLO
-        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235355AbhJLVR1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Oct 2021 17:17:27 -0400
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1634073324;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=qGhYUU4PHqVJauASorElxOKLAG5bEMxQ+CpOTI3+RsI=;
-        b=fKNggHZvcGPtxJAtQCJ3dnoyzVtmBN4tahLERFruoxNxJqFesIEai5rSFGMehdRfUTZXJe
-        +Fql1tijZKw84/0EbNtqfytwBIt3vqrQ4aPnM9U0zXqq12LDjMOG/uJ6/wmZRtSU3QaTCu
-        S81pWa/oiXzOnU0lI0THFU98kfl6HJ0tTSR9VcfCIwACSyCIdaYS7RZoDjyIHXRG92TNaI
-        HMU29wND8i1dkUBXLKodvxuk9c9blCHxypi2uuku2Z9aLsLt19syrOOkzX+8VfIYsqH9HB
-        hvItk5Rf1vf4CsKwLYU28QU+GVS0aGO4XpEuNqifCSTtUT5dj7oHmS3Lap8idA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1634073324;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=qGhYUU4PHqVJauASorElxOKLAG5bEMxQ+CpOTI3+RsI=;
-        b=LS1QIsnFHEksYaCDDOZ2hvkYxuf+hk5dtjmY+d/Co7upain9ujGe/P/wWhKT2cRdy5a9R5
-        esPpTsRV6cUxQ1DQ==
-To:     LKML <linux-kernel@vger.kernel.org>
-Cc:     x86@kernel.org, "Chang S. Bae" <chang.seok.bae@intel.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Arjan van de Ven <arjan@linux.intel.com>,
-        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [patch 00/31] x86/fpu: Preparatory cleanups for AMX support
- (part 1)
-In-Reply-To: <20211011215813.558681373@linutronix.de>
-References: <20211011215813.558681373@linutronix.de>
-Date:   Tue, 12 Oct 2021 23:15:23 +0200
-Message-ID: <87o87u9c7o.ffs@tglx>
-MIME-Version: 1.0
-Content-Type: text/plain
+        id S235439AbhJLV0K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Oct 2021 17:26:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42782 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233978AbhJLV0J (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Oct 2021 17:26:09 -0400
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 939A5C061746
+        for <kvm@vger.kernel.org>; Tue, 12 Oct 2021 14:24:07 -0700 (PDT)
+Received: by mail-pj1-x1049.google.com with SMTP id nv1-20020a17090b1b4100b001a04861d474so473130pjb.5
+        for <kvm@vger.kernel.org>; Tue, 12 Oct 2021 14:24:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=Fk9Xc4yx4FRlEZPM/PxyifjRQnzIl7D2v+UAZuEFymU=;
+        b=ovnmzoXtj8x1i1N6aZPMYIJZELeMQteZJSdDAGmHK8ZPk4g7b05jLa5tBwSIx18WuZ
+         zglO/Dz81lWJ96COiEvtD5+NZn3fdrAsVU7TxKUemIgm3SwKEKUyorHGP9Hi5UMmWSXM
+         lBpT944rENO6kBF3LtXfLTZ+BZ/+eFKyeAfx62UJ1fYSCgl7VmSY5JQgbPGuA9FoGLqS
+         yaYRNl83UNtnVnp4j/V9TLfRTtee+gF+N6Mb+kX9Rz+nPJEUiGmXQ/YfIJM/vz9gCVi0
+         KabBrdesb9BolJmfBg7kG29UDQ4q9dVxPBRWU0oFHUVItlje5oWEyIgBa3h5CV3iSQAD
+         /8TA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=Fk9Xc4yx4FRlEZPM/PxyifjRQnzIl7D2v+UAZuEFymU=;
+        b=dzV2k+w+xk4S25PppM+nMhLENuskl3Op/3QhZzoo1E9Q5p7w8zLaXiwo2hjFMlozY4
+         oiStvvhiUJJgr0ALWFMvbPZnTBUBXJl+EwSC0vMx+5j660AJA9miG/KtYrJw6zS33aVL
+         1cwrOI/Nbi/YKagPSwlzC1WlGVA4LY3CnJDIsk+KvslvkyVD3eRIsx3O6xReeKsux2pn
+         ZTwKPg9n0+harTmUNHjk3u95IyGBifl30ntn7yk4j9eaI+TwPJiLgUN1M103M7FBBV/F
+         zvooRN6pGwy5U2IlSwXwpCcLtYE3KFwgoKLGbXur+HfJZXIY+sdHdfEg2m/tnjqJxAlX
+         W8LA==
+X-Gm-Message-State: AOAM532NlPUioV+QiRW7e8Xo/jNIjCpR4PA1L4pGnY7q6lq3rvW9geWX
+        6DAh4kuvpoOMKte7//LrDi1fOmu4BtPY1HGC3rOnxCFnFqruVT4q+mbF3twLzc9VtEn30WzBF1m
+        wMSxR9fPohB0tFMaTZd8DBLsaxJHx0dcONw5HWD2jPL4VpnYSJ0ytHlKpSw==
+X-Google-Smtp-Source: ABdhPJzUNd6X3fnJWFIj5LQq1wrKz7v+Lf0DkrpQJ5NNth+0+4D6rrh+G2utbI850CfwvWb4yY4GMuqYDAk=
+X-Received: from pgonda1.kir.corp.google.com ([2620:15c:29:204:bab5:e2c:2623:d2f8])
+ (user=pgonda job=sendgmr) by 2002:aa7:92d0:0:b0:44c:ab24:cce7 with SMTP id
+ k16-20020aa792d0000000b0044cab24cce7mr33818605pfa.6.1634073846954; Tue, 12
+ Oct 2021 14:24:06 -0700 (PDT)
+Date:   Tue, 12 Oct 2021 14:24:03 -0700
+Message-Id: <20211012212403.3863482-1-pgonda@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.0.882.g93a45727a2-goog
+Subject: [PATCH V3] KVM: SEV: Acquire vcpu mutex when updating VMSA
+From:   Peter Gonda <pgonda@google.com>
+To:     kvm@vger.kernel.org
+Cc:     Peter Gonda <pgonda@google.com>, Marc Orr <marcorr@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Brijesh Singh <brijesh.singh@amd.com>, stable@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 12 2021 at 01:59, Thomas Gleixner wrote:
->
-> The current series (#1) is based on:
->
->    git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git x86/fpu
->
-> and also available from git:
->
->    git://git.kernel.org/pub/scm/linux/kernel/git/tglx/devel.git x86/fpu-1
+Adds vcpu mutex guard to the VMSA updating code. Refactors out
+__sev_launch_update_vmsa() function to deal with per vCPU parts
+of sev_launch_update_vmsa().
 
-I've updated the git branch with the review comments which came in today
-addressed.
+Fixes: ad73109ae7ec ("KVM: SVM: Provide support to launch and run an SEV-ES guest")
 
-The full stack is rebased on top of that along with a few other fixes.
-
-The delta patch to the current part-1 series is below.
-
-I'm going to wait a bit before sending out a V2 to give people time to
-react. Though I'm planning to send out part-2 based on the current state
-soonish.
-
-Thanks,
-
-        tglx
+Signed-off-by: Peter Gonda <pgonda@google.com>
+Cc: Marc Orr <marcorr@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Sean Christopherson <seanjc@google.com>
+Cc: Brijesh Singh <brijesh.singh@amd.com>
+Cc: kvm@vger.kernel.org
+Cc: stable@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
 ---
-diff --git a/arch/x86/include/asm/fpu/api.h b/arch/x86/include/asm/fpu/api.h
-index 4cf54d8ce17d..5ac5e4596b53 100644
---- a/arch/x86/include/asm/fpu/api.h
-+++ b/arch/x86/include/asm/fpu/api.h
-@@ -130,13 +130,13 @@ static inline void fpstate_init_soft(struct swregs_state *soft) {}
- /* State tracking */
- DECLARE_PER_CPU(struct fpu *, fpu_fpregs_owner_ctx);
- 
--/* FPSTATE related functions which are exported to KVM */
-+/* fpstate-related functions which are exported to KVM */
- extern void fpu_init_fpstate_user(struct fpu *fpu);
- 
- /* KVM specific functions */
- extern void fpu_swap_kvm_fpu(struct fpu *save, struct fpu *rstor, u64 restore_mask);
- 
--extern int fpu_copy_kvm_uabi_to_vcpu(struct fpu *fpu, const void *buf, u64 xcr0, u32 *pkru);
--extern void fpu_copy_vcpu_to_kvm_uabi(struct fpu *fpu, void *buf, unsigned int size, u32 pkru);
-+extern int fpu_copy_kvm_uabi_to_fpstate(struct fpu *fpu, const void *buf, u64 xcr0, u32 *pkru);
-+extern void fpu_copy_fpstate_to_kvm_uabi(struct fpu *fpu, void *buf, unsigned int size, u32 pkru);
- 
- #endif /* _ASM_X86_FPU_API_H */
-diff --git a/arch/x86/include/asm/fpu/sched.h b/arch/x86/include/asm/fpu/sched.h
-index 99a8820e8cc4..cdb78d590c86 100644
---- a/arch/x86/include/asm/fpu/sched.h
-+++ b/arch/x86/include/asm/fpu/sched.h
-@@ -11,7 +11,7 @@
- 
- extern void save_fpregs_to_fpstate(struct fpu *fpu);
- extern void fpu__drop(struct fpu *fpu);
--extern int  fpu_clone(struct task_struct *dst, unsigned long clone_flags);
-+extern int  fpu_clone(struct task_struct *dst);
- extern void fpu_flush_thread(void);
- 
- /*
-diff --git a/arch/x86/kernel/fpu/core.c b/arch/x86/kernel/fpu/core.c
-index 1c5e753ba3f1..ac540a7d410e 100644
---- a/arch/x86/kernel/fpu/core.c
-+++ b/arch/x86/kernel/fpu/core.c
-@@ -184,7 +184,7 @@ void fpu_swap_kvm_fpu(struct fpu *save, struct fpu *rstor, u64 restore_mask)
- }
- EXPORT_SYMBOL_GPL(fpu_swap_kvm_fpu);
- 
--void fpu_copy_vcpu_to_kvm_uabi(struct fpu *fpu, void *buf,
-+void fpu_copy_fpstate_to_kvm_uabi(struct fpu *fpu, void *buf,
- 			       unsigned int size, u32 pkru)
- {
- 	union fpregs_state *kstate = &fpu->state;
-@@ -196,12 +196,14 @@ void fpu_copy_vcpu_to_kvm_uabi(struct fpu *fpu, void *buf,
- 					  XSTATE_COPY_XSAVE);
- 	} else {
- 		memcpy(&ustate->fxsave, &kstate->fxsave, sizeof(ustate->fxsave));
-+		/* Make it restorable on a XSAVE enabled host */
-+		ustate->xsave.header.xfeatures = XFEATURE_MASK_FPSSE;
- 	}
- }
--EXPORT_SYMBOL_GPL(fpu_copy_vcpu_to_kvm_uabi);
-+EXPORT_SYMBOL_GPL(fpu_copy_fpstate_to_kvm_uabi);
- 
--int fpu_copy_kvm_uabi_to_vcpu(struct fpu *fpu, const void *buf, u64 xcr0,
--			      u32 *vpkru)
-+int fpu_copy_kvm_uabi_to_fpstate(struct fpu *fpu, const void *buf, u64 xcr0,
-+				 u32 *vpkru)
- {
- 	union fpregs_state *kstate = &fpu->state;
- 	const union fpregs_state *ustate = buf;
-@@ -234,7 +236,7 @@ int fpu_copy_kvm_uabi_to_vcpu(struct fpu *fpu, const void *buf, u64 xcr0,
- 	xstate_init_xcomp_bv(&kstate->xsave, xfeatures_mask_uabi());
+V3
+ *  Fixes bug with missing 'guest_state_protected = true' after
+    refactor.
+
+V2
+ * Refactor per vcpu work to separate function.
+ * Remove check to skip already initialized VMSAs.
+ * Removed vmsa struct zeroing.
+
+---
+ arch/x86/kvm/svm/sev.c | 56 +++++++++++++++++++++++++-----------------
+ 1 file changed, 34 insertions(+), 22 deletions(-)
+
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 75e0b21ad07c..f192a6897c68 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -595,43 +595,55 @@ static int sev_es_sync_vmsa(struct vcpu_svm *svm)
  	return 0;
  }
--EXPORT_SYMBOL_GPL(fpu_copy_kvm_uabi_to_vcpu);
-+EXPORT_SYMBOL_GPL(fpu_copy_kvm_uabi_to_fpstate);
- #endif /* CONFIG_KVM */
  
- void kernel_fpu_begin_mask(unsigned int kfpu_mask)
-@@ -344,7 +346,7 @@ EXPORT_SYMBOL_GPL(fpu_init_fpstate_user);
- #endif
- 
- /* Clone current's FPU state on fork */
--int fpu_clone(struct task_struct *dst, unsigned long clone_flags)
-+int fpu_clone(struct task_struct *dst)
+-static int sev_launch_update_vmsa(struct kvm *kvm, struct kvm_sev_cmd *argp)
++static int __sev_launch_update_vmsa(struct kvm *kvm, struct kvm_vcpu *vcpu,
++				    int *error)
  {
- 	struct fpu *src_fpu = &current->thread.fpu;
- 	struct fpu *dst_fpu = &dst->thread.fpu;
-@@ -363,11 +365,9 @@ int fpu_clone(struct task_struct *dst, unsigned long clone_flags)
- 
- 	/*
- 	 * No FPU state inheritance for kernel threads and IO
--	 * worker threads. Neither CLONE_THREAD needs a copy
--	 * of the FPU state.
-+	 * worker threads.
- 	 */
--	if (clone_flags & CLONE_THREAD ||
--	    dst->flags & (PF_KTHREAD | PF_IO_WORKER)) {
-+	if (dst->flags & (PF_KTHREAD | PF_IO_WORKER)) {
- 		/* Clear out the minimal state */
- 		memcpy(&dst_fpu->state, &init_fpstate,
- 		       init_fpstate_copy_size());
-diff --git a/arch/x86/kernel/fpu/xstate.c b/arch/x86/kernel/fpu/xstate.c
-index 6e729060beb3..b022df95a302 100644
---- a/arch/x86/kernel/fpu/xstate.c
-+++ b/arch/x86/kernel/fpu/xstate.c
-@@ -1195,15 +1195,13 @@ int copy_sigframe_from_user_to_xstate(struct xregs_state *xsave,
- 	return copy_uabi_to_xstate(xsave, NULL, ubuf);
- }
- 
--static bool validate_xsaves_xrstors(u64 mask)
-+static bool validate_independent_components(u64 mask)
- {
- 	u64 xchk;
- 
- 	if (WARN_ON_FPU(!cpu_feature_enabled(X86_FEATURE_XSAVES)))
- 		return false;
--	/*
--	 * Validate that this is a independent compoment.
--	 */
+-	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+ 	struct sev_data_launch_update_vmsa vmsa;
++	struct vcpu_svm *svm = to_svm(vcpu);
++	int ret;
 +
- 	xchk = ~xfeatures_mask_independent();
++	/* Perform some pre-encryption checks against the VMSA */
++	ret = sev_es_sync_vmsa(svm);
++	if (ret)
++		return ret;
++
++	/*
++	 * The LAUNCH_UPDATE_VMSA command will perform in-place encryption of
++	 * the VMSA memory content (i.e it will write the same memory region
++	 * with the guest's key), so invalidate it first.
++	 */
++	clflush_cache_range(svm->vmsa, PAGE_SIZE);
++
++	vmsa.reserved = 0;
++	vmsa.handle = to_kvm_svm(kvm)->sev_info.handle;
++	vmsa.address = __sme_pa(svm->vmsa);
++	vmsa.len = PAGE_SIZE;
++	ret = sev_issue_cmd(kvm, SEV_CMD_LAUNCH_UPDATE_VMSA, &vmsa, error);
++	if (ret)
++	  return ret;
++
++	vcpu->arch.guest_state_protected = true;
++	return 0;
++}
++
++static int sev_launch_update_vmsa(struct kvm *kvm, struct kvm_sev_cmd *argp)
++{
+ 	struct kvm_vcpu *vcpu;
+ 	int i, ret;
  
- 	if (WARN_ON_ONCE(!mask || mask & xchk))
-@@ -1222,13 +1220,13 @@ static bool validate_xsaves_xrstors(u64 mask)
-  * buffer should be zeroed otherwise a consecutive XRSTORS from that buffer
-  * can #GP.
-  *
-- * The feature mask must be a subset of the independent features
-+ * The feature mask must be a subset of the independent features.
-  */
- void xsaves(struct xregs_state *xstate, u64 mask)
- {
- 	int err;
+ 	if (!sev_es_guest(kvm))
+ 		return -ENOTTY;
  
--	if (!validate_xsaves_xrstors(mask))
-+	if (!validate_independent_components(mask))
- 		return;
+-	vmsa.reserved = 0;
+-
+ 	kvm_for_each_vcpu(i, vcpu, kvm) {
+-		struct vcpu_svm *svm = to_svm(vcpu);
+-
+-		/* Perform some pre-encryption checks against the VMSA */
+-		ret = sev_es_sync_vmsa(svm);
++		ret = mutex_lock_killable(&vcpu->mutex);
+ 		if (ret)
+ 			return ret;
  
- 	XSTATE_OP(XSAVES, xstate, (u32)mask, (u32)(mask >> 32), err);
-@@ -1246,13 +1244,13 @@ void xsaves(struct xregs_state *xstate, u64 mask)
-  * Proper usage is to restore the state which was saved with
-  * xsaves() into @xstate.
-  *
-- * The feature mask must be a subset of the independent features
-+ * The feature mask must be a subset of the independent features.
-  */
- void xrstors(struct xregs_state *xstate, u64 mask)
- {
- 	int err;
+-		/*
+-		 * The LAUNCH_UPDATE_VMSA command will perform in-place
+-		 * encryption of the VMSA memory content (i.e it will write
+-		 * the same memory region with the guest's key), so invalidate
+-		 * it first.
+-		 */
+-		clflush_cache_range(svm->vmsa, PAGE_SIZE);
++		ret = __sev_launch_update_vmsa(kvm, vcpu, &argp->error);
  
--	if (!validate_xsaves_xrstors(mask))
-+	if (!validate_independent_components(mask))
- 		return;
+-		vmsa.handle = sev->handle;
+-		vmsa.address = __sme_pa(svm->vmsa);
+-		vmsa.len = PAGE_SIZE;
+-		ret = sev_issue_cmd(kvm, SEV_CMD_LAUNCH_UPDATE_VMSA, &vmsa,
+-				    &argp->error);
++		mutex_unlock(&vcpu->mutex);
+ 		if (ret)
+ 			return ret;
+-
+-		svm->vcpu.arch.guest_state_protected = true;
+ 	}
  
- 	XSTATE_OP(XRSTORS, xstate, (u32)mask, (u32)(mask >> 32), err);
-diff --git a/arch/x86/kernel/process.c b/arch/x86/kernel/process.c
-index 83a34fd828d5..5cd82082353e 100644
---- a/arch/x86/kernel/process.c
-+++ b/arch/x86/kernel/process.c
-@@ -154,7 +154,7 @@ int copy_thread(unsigned long clone_flags, unsigned long sp, unsigned long arg,
- 	frame->flags = X86_EFLAGS_FIXED;
- #endif
- 
--	fpu_clone(p, clone_flags);
-+	fpu_clone(p);
- 
- 	/* Kernel thread ? */
- 	if (unlikely(p->flags & PF_KTHREAD)) {
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index ac02945756ec..f7826148edc9 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -4701,9 +4701,9 @@ static void kvm_vcpu_ioctl_x86_get_xsave(struct kvm_vcpu *vcpu,
- 	if (!vcpu->arch.guest_fpu)
- 		return;
- 
--	fpu_copy_vcpu_to_kvm_uabi(vcpu->arch.guest_fpu, guest_xsave->region,
--				  sizeof(guest_xsave->region),
--				  vcpu->arch.pkru);
-+	fpu_copy_fpstate_to_kvm_uabi(vcpu->arch.guest_fpu, guest_xsave->region,
-+				     sizeof(guest_xsave->region),
-+				     vcpu->arch.pkru);
- }
- 
- static int kvm_vcpu_ioctl_x86_set_xsave(struct kvm_vcpu *vcpu,
-@@ -4712,9 +4712,9 @@ static int kvm_vcpu_ioctl_x86_set_xsave(struct kvm_vcpu *vcpu,
- 	if (!vcpu->arch.guest_fpu)
- 		return 0;
- 
--	return fpu_copy_kvm_uabi_to_vcpu(vcpu->arch.guest_fpu,
--					 guest_xsave->region,
--					 supported_xcr0, &vcpu->arch.pkru);
-+	return fpu_copy_kvm_uabi_to_fpstate(vcpu->arch.guest_fpu,
-+					    guest_xsave->region,
-+					    supported_xcr0, &vcpu->arch.pkru);
- }
- 
- static void kvm_vcpu_ioctl_x86_get_xcrs(struct kvm_vcpu *vcpu,
-@@ -9787,8 +9787,8 @@ static int complete_emulated_mmio(struct kvm_vcpu *vcpu)
- static void kvm_load_guest_fpu(struct kvm_vcpu *vcpu)
- {
- 	/*
--	 * Guest with protected state have guest_fpu == NULL which makes
--	 * the swap only safe the host state. Exclude PKRU from restore as
-+	 * Guests with protected state have guest_fpu == NULL which makes
-+	 * the swap only save the host state. Exclude PKRU from restore as
- 	 * it is restored separately in kvm_x86_ops.run().
- 	 */
- 	fpu_swap_kvm_fpu(vcpu->arch.user_fpu, vcpu->arch.guest_fpu,
-@@ -9800,7 +9800,7 @@ static void kvm_load_guest_fpu(struct kvm_vcpu *vcpu)
- static void kvm_put_guest_fpu(struct kvm_vcpu *vcpu)
- {
- 	/*
--	 * Guest with protected state have guest_fpu == NULL which makes
-+	 * Guests with protected state have guest_fpu == NULL which makes
- 	 * swap only restore the host state.
- 	 */
- 	fpu_swap_kvm_fpu(vcpu->arch.guest_fpu, vcpu->arch.user_fpu, ~0ULL);
+ 	return 0;
+-- 
+2.33.0.882.g93a45727a2-goog
+
