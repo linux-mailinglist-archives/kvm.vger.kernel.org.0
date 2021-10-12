@@ -2,179 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6432D42AC4C
-	for <lists+kvm@lfdr.de>; Tue, 12 Oct 2021 20:52:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0242442AC65
+	for <lists+kvm@lfdr.de>; Tue, 12 Oct 2021 20:52:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235155AbhJLSq4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Oct 2021 14:46:56 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:57634 "EHLO
-        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234995AbhJLSqz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Oct 2021 14:46:55 -0400
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1634064033;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=KW+IJ7OIyygtO/OUib0E/8GQRDwfz133sFxAz7WGAxc=;
-        b=if4AgnZt3vh78PzErZ4D+P8AL4EAGFPgHqgITlTOjCtWExcVjyr+WRGutjEkhGdAXGI3Tf
-        8bEBavF4jCqR92er3KEb/7PR2JGmzw08HTtArGN92IcY6YL9SspWR1FSeWWYKAOoSgq3n/
-        B+rdjCvnVfjy3FbKkzohq9r8ONHxRFKo00fcuLeNlFbxeirt085rcheR4Czi1nPKYGrTYw
-        NvtDZB/JQ26kslfqDrVp5pIWf/fnUFCVJ+NjFOGATbTCznkiEaI/8/wxuNGvT4vbRqDl0B
-        Dx68Uwly/S5e6/4G0q7WeY6B+IrBbLld+JdO8KyWv6UWmNWnpXWlLt9bA1kpzw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1634064033;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=KW+IJ7OIyygtO/OUib0E/8GQRDwfz133sFxAz7WGAxc=;
-        b=Kd4INlPzpimcW+3qnVdzxma4uFCdRF49G8PXqO/bBZxtq+FMdI0w2Q1OxHLA2OBChJNnI3
-        5w81b0QJQyGwkkBw==
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>
-Cc:     x86@kernel.org, "Chang S. Bae" <chang.seok.bae@intel.com>,
+        id S235534AbhJLSur (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Oct 2021 14:50:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35082 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235549AbhJLSui (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Oct 2021 14:50:38 -0400
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C2F3C061745
+        for <kvm@vger.kernel.org>; Tue, 12 Oct 2021 11:48:34 -0700 (PDT)
+Received: by mail-pj1-x102f.google.com with SMTP id pf6-20020a17090b1d8600b0019fa884ab85so2577650pjb.5
+        for <kvm@vger.kernel.org>; Tue, 12 Oct 2021 11:48:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=DfbFY8+dvVdayrpl/HC8aWmEL5nQTdONvOQ8G8k3sdI=;
+        b=btrJZ/IPtSJJEbgCzV6kLMKqVSQRPFad9W9idPv/BiZkJlo6bd8G81Kds8V+qlts68
+         3bQnjkeOOxKIBW56arcH1rokJD7Au9TeVsJ8TJ+Z5zeMOmbsetfD1dwwfcHcz6Ypn0kq
+         hM+nYHme6i+QiLuXnZc+fGlxFT9/zcx8u8iqhQ/6sSEjE12Dj53FwHia2CePuYV1/jkO
+         faSxpMuKmvLzs/e1NY8UN9zkG/5P75+JRJbV8MPR8oi6a1W0SYyP6vgly4sUvh4UQEoP
+         yGCsAs4zCy+iTJ0jhrZEFAcP5DBJ4XPOou6hakCEZOKj2fxsyuBfwVLPCkTnrkbgSqTq
+         H41g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=DfbFY8+dvVdayrpl/HC8aWmEL5nQTdONvOQ8G8k3sdI=;
+        b=vs3hSrdXT9eHqZ99bkMNQ0aTPSY3n4JcOoFM4+0QeNpX5MsBp9I7tkn3u4PI6Mb7DN
+         LwpTqmxgSIw4fmytBQgyM0TwLFP4/353uljZHYTXb1826jdxUKSnX2mqYBlhYLWg65fE
+         MlYcxGpX1SPnC0chdH3dKNWVAysKojGohT0BClZeASZEpZoyII8WSZScUnzvoU/DzLMz
+         8CUJmwUKdY/KqkgVfReji3eIoy3/sdGUAoRse8u8TSPd7sZC87fGGnzwYGIXPBq1CwYV
+         5EojxDmEluBzKBTsQ3aqTcVmfo1GU9QLjrkIDScGPhVi5ul6C0c8TFG+CXM+X6nDJEB/
+         cUtQ==
+X-Gm-Message-State: AOAM532JicHhZQU/tGdhfYa9OBxfT847Z9IDSdcQ322mZxNInGvwz9WS
+        1IYyAcucOqSoNnyInB/7eY8kYw==
+X-Google-Smtp-Source: ABdhPJw+X5MZoBakEaHZNsLbsAa4QxFgESLNxqGtJNcguDnKmi32hzC66ItirwvCxHpvHxMp0faMyQ==
+X-Received: by 2002:a17:902:a710:b029:12b:9b9f:c461 with SMTP id w16-20020a170902a710b029012b9b9fc461mr31769695plq.59.1634064422208;
+        Tue, 12 Oct 2021 11:47:02 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id w2sm11975808pfq.207.2021.10.12.11.47.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Oct 2021 11:47:01 -0700 (PDT)
+Date:   Tue, 12 Oct 2021 18:46:57 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
         Dave Hansen <dave.hansen@linux.intel.com>,
-        Arjan van de Ven <arjan@linux.intel.com>,
-        kvm@vger.kernel.org
-Subject: [patch V2 16/31] x86/fpu: Replace KVMs home brewed FPU copy to user
-In-Reply-To: <87fst6b0f5.ffs@tglx>
-References: <20211011215813.558681373@linutronix.de>
- <20211011223611.249593446@linutronix.de>
- <0d222978-014a-cdcb-f8aa-5b3179cb0809@redhat.com> <87fst6b0f5.ffs@tglx>
-Date:   Tue, 12 Oct 2021 20:40:32 +0200
-Message-ID: <87zgre9jdr.ffs@tglx>
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH Part2 v5 26/45] KVM: SVM: Mark the private vma unmerable
+ for SEV-SNP guests
+Message-ID: <YWXYIWuK2T8Kejng@google.com>
+References: <20210820155918.7518-1-brijesh.singh@amd.com>
+ <20210820155918.7518-27-brijesh.singh@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210820155918.7518-27-brijesh.singh@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Similar to the copy from user function the FPU core has this already
-implemented with all bells and whistles.
+On Fri, Aug 20, 2021, Brijesh Singh wrote:
+> When SEV-SNP is enabled, the guest private pages are added in the RMP
+> table; while adding the pages, the rmp_make_private() unmaps the pages
+> from the direct map. If KSM attempts to access those unmapped pages then
+> it will trigger #PF (page-not-present).
+> 
+> Encrypted guest pages cannot be shared between the process, so an
+> userspace should not mark the region mergeable but to be safe, mark the
+> process vma unmerable before adding the pages in the RMP table.
 
-Get rid of the duplicated code and use the core functionality.
+To be safe from what?  Does the !PRESENT #PF crash the kernel?
 
-The memset(0) of the buffer is not required as it is already allocated
-with kzalloc() at the call site.
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+>  arch/x86/kvm/svm/sev.c | 32 ++++++++++++++++++++++++++++++++
+>  1 file changed, 32 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 4b126598b7aa..dcef0ae5f8e4 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -18,11 +18,13 @@
+>  #include <linux/processor.h>
+>  #include <linux/trace_events.h>
+>  #include <linux/sev.h>
+> +#include <linux/ksm.h>
+>  #include <asm/fpu/internal.h>
+>  
+>  #include <asm/pkru.h>
+>  #include <asm/trapnr.h>
+>  #include <asm/sev.h>
+> +#include <asm/mman.h>
+>  
+>  #include "x86.h"
+>  #include "svm.h"
+> @@ -1683,6 +1685,30 @@ static bool is_hva_registered(struct kvm *kvm, hva_t hva, size_t len)
+>  	return false;
+>  }
+>  
+> +static int snp_mark_unmergable(struct kvm *kvm, u64 start, u64 size)
+> +{
+> +	struct vm_area_struct *vma;
+> +	u64 end = start + size;
+> +	int ret;
+> +
+> +	do {
+> +		vma = find_vma_intersection(kvm->mm, start, end);
+> +		if (!vma) {
+> +			ret = -EINVAL;
+> +			break;
+> +		}
+> +
+> +		ret = ksm_madvise(vma, vma->vm_start, vma->vm_end,
+> +				  MADV_UNMERGEABLE, &vma->vm_flags);
+> +		if (ret)
+> +			break;
+> +
+> +		start = vma->vm_end;
+> +	} while (end > vma->vm_end);
+> +
+> +	return ret;
+> +}
+> +
+>  static int snp_launch_update(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  {
+>  	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> @@ -1707,6 +1733,12 @@ static int snp_launch_update(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  	if (!is_hva_registered(kvm, params.uaddr, params.len))
+>  		return -EINVAL;
+>  
+> +	mmap_write_lock(kvm->mm);
+> +	ret = snp_mark_unmergable(kvm, params.uaddr, params.len);
+> +	mmap_write_unlock(kvm->mm);
 
-Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
-Cc: kvm@vger.kernel.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>
----
-V2: Add the missing xsave header assignment in the !XSAVE path
-    and explain the memset(0) removal in the changelog - Paolo
-    Rename the function and fix subject - Borislav
----
- arch/x86/include/asm/fpu/api.h |    1 
- arch/x86/kernel/fpu/core.c     |   18 +++++++++++++
- arch/x86/kvm/x86.c             |   56 ++---------------------------------------
- 3 files changed, 22 insertions(+), 53 deletions(-)
+This does not, and practically speaking cannot, work.  There are multiple TOCTOU
+bugs, here and in __snp_handle_page_state_change().  Userspace can madvise() the
+range at any later point, munmap()/mmap() the entire range, mess with the memslots
+in the PSC case, and so on and so forth.  Relying on MADV_UNMERGEABLE for functional
+correctness simply cannot work in KVM, barring mmu_notifier and a big pile of code.
 
---- a/arch/x86/include/asm/fpu/api.h
-+++ b/arch/x86/include/asm/fpu/api.h
-@@ -117,5 +117,6 @@ extern void fpu_init_fpstate_user(struct
- extern void fpu_swap_kvm_fpu(struct fpu *save, struct fpu *rstor, u64 restore_mask);
- 
- extern int fpu_copy_kvm_uabi_to_fpstate(struct fpu *fpu, const void *buf, u64 xcr0, u32 *pkru);
-+extern void fpu_copy_fpstate_to_kvm_uabi(struct fpu *fpu, void *buf, unsigned int size, u32 pkru);
- 
- #endif /* _ASM_X86_FPU_API_H */
---- a/arch/x86/kernel/fpu/core.c
-+++ b/arch/x86/kernel/fpu/core.c
-@@ -175,6 +175,24 @@ void fpu_swap_kvm_fpu(struct fpu *save,
- }
- EXPORT_SYMBOL_GPL(fpu_swap_kvm_fpu);
- 
-+void fpu_copy_fpstate_to_kvm_uabi(struct fpu *fpu, void *buf,
-+			       unsigned int size, u32 pkru)
-+{
-+	union fpregs_state *kstate = &fpu->state;
-+	union fpregs_state *ustate = buf;
-+	struct membuf mb = { .p = buf, .left = size };
-+
-+	if (cpu_feature_enabled(X86_FEATURE_XSAVE)) {
-+		__copy_xstate_to_uabi_buf(mb, &kstate->xsave, pkru,
-+					  XSTATE_COPY_XSAVE);
-+	} else {
-+		memcpy(&ustate->fxsave, &kstate->fxsave, sizeof(ustate->fxsave));
-+		/* Make it restorable on a XSAVE enabled host */
-+		ustate->xsave.header.xfeatures = XFEATURE_MASK_FPSSE;
-+	}
-+}
-+EXPORT_SYMBOL_GPL(fpu_copy_fpstate_to_kvm_uabi);
-+
- int fpu_copy_kvm_uabi_to_fpstate(struct fpu *fpu, const void *buf, u64 xcr0,
- 				 u32 *vpkru)
- {
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -4695,65 +4695,15 @@ static int kvm_vcpu_ioctl_x86_set_debugr
- 	return 0;
- }
- 
--static void fill_xsave(u8 *dest, struct kvm_vcpu *vcpu)
--{
--	struct xregs_state *xsave = &vcpu->arch.guest_fpu->state.xsave;
--	u64 xstate_bv = xsave->header.xfeatures;
--	u64 valid;
--
--	/*
--	 * Copy legacy XSAVE area, to avoid complications with CPUID
--	 * leaves 0 and 1 in the loop below.
--	 */
--	memcpy(dest, xsave, XSAVE_HDR_OFFSET);
--
--	/* Set XSTATE_BV */
--	xstate_bv &= vcpu->arch.guest_supported_xcr0 | XFEATURE_MASK_FPSSE;
--	*(u64 *)(dest + XSAVE_HDR_OFFSET) = xstate_bv;
--
--	/*
--	 * Copy each region from the possibly compacted offset to the
--	 * non-compacted offset.
--	 */
--	valid = xstate_bv & ~XFEATURE_MASK_FPSSE;
--	while (valid) {
--		u32 size, offset, ecx, edx;
--		u64 xfeature_mask = valid & -valid;
--		int xfeature_nr = fls64(xfeature_mask) - 1;
--		void *src;
--
--		cpuid_count(XSTATE_CPUID, xfeature_nr,
--			    &size, &offset, &ecx, &edx);
--
--		if (xfeature_nr == XFEATURE_PKRU) {
--			memcpy(dest + offset, &vcpu->arch.pkru,
--			       sizeof(vcpu->arch.pkru));
--		} else {
--			src = get_xsave_addr(xsave, xfeature_nr);
--			if (src)
--				memcpy(dest + offset, src, size);
--		}
--
--		valid -= xfeature_mask;
--	}
--}
--
- static void kvm_vcpu_ioctl_x86_get_xsave(struct kvm_vcpu *vcpu,
- 					 struct kvm_xsave *guest_xsave)
- {
- 	if (!vcpu->arch.guest_fpu)
- 		return;
- 
--	if (boot_cpu_has(X86_FEATURE_XSAVE)) {
--		memset(guest_xsave, 0, sizeof(struct kvm_xsave));
--		fill_xsave((u8 *) guest_xsave->region, vcpu);
--	} else {
--		memcpy(guest_xsave->region,
--			&vcpu->arch.guest_fpu->state.fxsave,
--			sizeof(struct fxregs_state));
--		*(u64 *)&guest_xsave->region[XSAVE_HDR_OFFSET / sizeof(u32)] =
--			XFEATURE_MASK_FPSSE;
--	}
-+	fpu_copy_fpstate_to_kvm_uabi(vcpu->arch.guest_fpu, guest_xsave->region,
-+				     sizeof(guest_xsave->region),
-+				     vcpu->arch.pkru);
- }
- 
- static int kvm_vcpu_ioctl_x86_set_xsave(struct kvm_vcpu *vcpu,
+> +	if (ret)
+> +		return -EFAULT;
+> +
+>  	/*
+>  	 * The userspace memory is already locked so technically we don't
+>  	 * need to lock it again. Later part of the function needs to know
+> -- 
+> 2.17.1
+> 
