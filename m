@@ -2,206 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1330F42C6A4
-	for <lists+kvm@lfdr.de>; Wed, 13 Oct 2021 18:44:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4E99242C6E8
+	for <lists+kvm@lfdr.de>; Wed, 13 Oct 2021 18:56:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233947AbhJMQqN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Oct 2021 12:46:13 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:20166 "EHLO
+        id S237886AbhJMQ6a (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Oct 2021 12:58:30 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:32255 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230216AbhJMQqM (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 13 Oct 2021 12:46:12 -0400
+        by vger.kernel.org with ESMTP id S237619AbhJMQ6Z (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 13 Oct 2021 12:58:25 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634143449;
+        s=mimecast20190719; t=1634144182;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=j4IIg+iC2kFSzqeje9srAKgG1bZMm2bxB3b31Ksk9Zs=;
-        b=ebm1ARhldmpHRt8Eewvs4JnlyOnEuf8zI7B6hDmZchcoErMFuHt2RxfMI5r8G6BvET1nbi
-        DixQYgq330r8QTd15IjwuSKAnsKetsFPZL9P7RibvablpVic1MMoUdEXeuzPQ69vkgFwdw
-        PeplknbHuKKOziXVoHkzHFb7K4WJYfc=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-143-FlBJDxJFOTSjeAfw7IKYYQ-1; Wed, 13 Oct 2021 12:44:07 -0400
-X-MC-Unique: FlBJDxJFOTSjeAfw7IKYYQ-1
-Received: by mail-ed1-f69.google.com with SMTP id x5-20020a50f185000000b003db0f796903so2757762edl.18
-        for <kvm@vger.kernel.org>; Wed, 13 Oct 2021 09:44:07 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=j4IIg+iC2kFSzqeje9srAKgG1bZMm2bxB3b31Ksk9Zs=;
-        b=Ic5F02m6bldlaFp85Az62Xmx3cGd7m2pcMe6l9azSkNTHEConScSFVEuWMkmLtQdPn
-         bj27KgZF6pN327YfzEGWMeW2r7qAlhqSo6cspCJ2OWJSf8lmRhiZ+ZYo5XZ7f0KTM0XQ
-         OhwjhZRnx0BoNddrWTzPMNhswt6eta8p9Mx+92j0g7ZpQGxnc0LbWUJHBzLsb+5LgbII
-         YmjgTtWAq0+7scO95fzKyhOvXp1zhMdvPYOYr+dFlCVcPs11ueDPMGR+PG20CIw9h/dZ
-         2Jts/B5eff5tX1/1kHQEmxtY9wS3TLNFN7ifvfOkQtIMS8A16DWxkngImFrXgy030Sex
-         6SsQ==
-X-Gm-Message-State: AOAM530S6ywqelLj11/Jf8aG36AzKLlAcGKFVbyCZ9VUDA+mwCDHleCS
-        BHPD5JKjtvNu4yxsIjlIk4I+0Rwj+gIi5ZE31uRJiDqkju/4RJDMRlFWSXQFVghuFeIK96AZcoO
-        fFfSX0NOhrGP4
-X-Received: by 2002:a05:6402:1296:: with SMTP id w22mr623428edv.390.1634143446616;
-        Wed, 13 Oct 2021 09:44:06 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy0UO0MdgebdD4c/liKR2jNzt2HwnrR66up5T8uzX5U3JU7IgbPC1jZcdNx3CWaLh1bCRrf6Q==
-X-Received: by 2002:a05:6402:1296:: with SMTP id w22mr623403edv.390.1634143446403;
-        Wed, 13 Oct 2021 09:44:06 -0700 (PDT)
-Received: from gator.home (cst2-174-28.cust.vodafone.cz. [31.30.174.28])
-        by smtp.gmail.com with ESMTPSA id k3sm87780ejk.7.2021.10.13.09.44.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Oct 2021 09:44:06 -0700 (PDT)
-Date:   Wed, 13 Oct 2021 18:44:04 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     ahmeddan@amazon.com
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, nikos.nikoleris@arm.com,
-        graf@amazon.com
-Subject: Re: [kvm-unit-tests PATCH v2 1/3] lib/string: Add stroull and strtoll
-Message-ID: <20211013164404.p67oye265bj5ucwm@gator.home>
-References: <08d356da-17ce-d380-1fc9-18ba7ec67020@amazon.com>
- <20210927153028.27680-1-ahmeddan@amazon.com>
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=KTXsB7y98qjD44G3XE71PU+BjMImn/7agIimOiEWzwY=;
+        b=NSa5YJTbI9rMwVVkvpczLGOoPEn0MwxqP5rbT2Qpk57odmOc23sRjMAxii94GH2DR21hcB
+        xUn92gQd8sgY99M+KJnWvYLABtzJKe3PU+qr7MKgeE388pkOehFoGX51x1CWHyIjCqi9zf
+        fBlqwe4k3S+i84NyA2Nq9F7gYO05Ui0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-344-N_dHGBNIN4qREs7u67X3nw-1; Wed, 13 Oct 2021 12:56:18 -0400
+X-MC-Unique: N_dHGBNIN4qREs7u67X3nw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7AE04801FCE;
+        Wed, 13 Oct 2021 16:56:17 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0CC715DA60;
+        Wed, 13 Oct 2021 16:56:16 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     fwilhelm@google.com, seanjc@google.com, oupton@google.com
+Subject: [PATCH 0/8] KVM: SEV-ES: fixes for string I/O emulation
+Date:   Wed, 13 Oct 2021 12:56:08 -0400
+Message-Id: <20211013165616.19846-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210927153028.27680-1-ahmeddan@amazon.com>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 27, 2021 at 03:30:26PM +0000, ahmeddan@amazon.com wrote:
-> From: Daniele Ahmed <ahmeddan@amazon.com>
-> 
-> Add the two functions strtoull and strtoll.
-> This is in preparation for an update
-> in x86/msr.c to write 64b values
-> that are given as inputs as strings by
-> a user.
-> 
-> Signed-off-by: Daniele Ahmed <ahmeddan@amazon.com>
-> ---
->  lib/stdlib.h |  2 ++
->  lib/string.c | 74 ++++++++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 76 insertions(+)
-> 
-> diff --git a/lib/stdlib.h b/lib/stdlib.h
-> index 33c00e8..48e10f0 100644
-> --- a/lib/stdlib.h
-> +++ b/lib/stdlib.h
-> @@ -9,5 +9,7 @@
->  
->  long int strtol(const char *nptr, char **endptr, int base);
->  unsigned long int strtoul(const char *nptr, char **endptr, int base);
-> +long long int strtoll(const char *nptr, char **endptr, int base);
-> +unsigned long long strtoull(const char *nptr, char **endptr, int base);
->  
->  #endif /* _STDLIB_H_ */
-> diff --git a/lib/string.c b/lib/string.c
-> index ffc7c7e..dacd927 100644
-> --- a/lib/string.c
-> +++ b/lib/string.c
-> @@ -242,6 +242,80 @@ unsigned long int strtoul(const char *nptr, char **endptr, int base)
->      return __strtol(nptr, endptr, base, false);
->  }
->  
-> +static unsigned long long __strtoll(const char *nptr, char **endptr,
-> +                              int base, bool is_signed) {
-> +    unsigned long long acc = 0;
-> +    const char *s = nptr;
-> +    int neg, c;
-> +
-> +    assert(base == 0 || (base >= 2 && base <= 36));
-> +
-> +    while (isspace(*s))
-> +        s++;
-> +
-> +    if (*s == '-') {
-> +        neg = 1;
-> +        s++;
-> +    } else {
-> +        neg = 0;
-> +        if (*s == '+')
-> +            s++;
-> +    }
-> +
-> +    if (base == 0 || base == 16) {
-> +        if (*s == '0') {
-> +            s++;
-> +            if (*s == 'x' || *s == 'X') {
-> +                 s++;
-> +                 base = 16;
-> +            } else if (base == 0)
-> +                 base = 8;
-> +        } else if (base == 0)
-> +            base = 10;
-> +    }
-> +
-> +    while (*s) {
-> +        if (*s >= '0' && *s < '0' + base && *s <= '9')
-> +            c = *s - '0';
-> +        else if (*s >= 'a' && *s < 'a' + base - 10)
-> +            c = *s - 'a' + 10;
-> +        else if (*s >= 'A' && *s < 'A' + base - 10)
-> +            c = *s - 'A' + 10;
-> +        else
-> +            break;
-> +
-> +        if (is_signed) {
-> +            long long sacc = (long long)acc;
-> +            assert(!check_mul_overflow(sacc, base));
-> +            assert(!check_add_overflow(sacc * base, c));
-> +        } else {
-> +            assert(!check_mul_overflow(acc, base));
-> +            assert(!check_add_overflow(acc * base, c));
-> +        }
-> +
-> +        acc = acc * base + c;
-> +        s++;
-> +    }
-> +
-> +    if (neg)
-> +        acc = -acc;
-> +
-> +    if (endptr)
-> +        *endptr = (char *)s;
-> +
-> +    return acc;
-> +}
-> +
-> +long long int strtoll(const char *nptr, char **endptr, int base)
-> +{
-> +    return __strtoll(nptr, endptr, base, true);
-> +}
-> +
-> +unsigned long long int strtoull(const char *nptr, char **endptr, int base)
-> +{
-> +    return __strtoll(nptr, endptr, base, false);
-> +}
-> +
->  long atol(const char *ptr)
->  {
->      return strtol(ptr, NULL, 10);
-> -- 
-> 2.32.0
-> 
->
+This series, namely patches 1 and 8, fix two bugs in string I/O
+emulation for SEV-ES:
 
-Hi Daniele,
+- first, the length is completely off for "rep ins" and "rep outs"
+  operation of size > 1.  After setup_vmgexit_scratch, svm->ghcb_sa_len
+  is in bytes, but kvm_sev_es_string_io expects the number of PIO
+  operations.
 
-I just sent an alternative to this patch which doesn't requiring
-duplicating as much code.
+- second, the size of the GHCB buffer can exceed the size of
+  vcpu->arch.pio_data.  If that happens, we need to go over the GHCB
+  buffer in multiple passes.
 
-Thanks,
-drew
+The second bug was reported by Felix Wilhelm.  The first was found by
+me by code inspection; on one hand it seems *too* egregious so I'll be
+gladly proven wrong on this, on the other hand... I know I'm bad at code
+review, but not _that_ bad.
 
- 
-> 
-> 
-> Amazon Development Center Germany GmbH
-> Krausenstr. 38
-> 10117 Berlin
-> Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
-> Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
-> Sitz: Berlin
-> Ust-ID: DE 289 237 879
-> 
-> 
-> 
+Patches 2 to 7 are a bunch of cleanups to emulator_pio_in and
+emulator_pio_in_out, so that the final SEV code is a little easier
+to reason on.  Just a little, no big promises.
+
+Tested by booting a SEV-ES guest and with "regular" kvm-unit-tests.
+For SEV-ES I also bounded the limit to 12 bytes, and checked in the
+resulting trace that both the read and write paths were hit when
+booting a guest.
+
+Paolo
+
+
+Paolo Bonzini (8):
+  KVM: SEV-ES: fix length of string I/O
+  KVM: SEV-ES: rename guest_ins_data to sev_pio_data
+  KVM: x86: leave vcpu->arch.pio.count alone in emulator_pio_in_out
+  KVM: SEV-ES: clean up kvm_sev_es_ins/outs
+  KVM: x86: split the two parts of emulator_pio_in
+  KVM: x86: remove unnecessary arguments from complete_emulator_pio_in
+  KVM: SEV-ES: keep INS functions together
+  KVM: SEV-ES: go over the sev_pio_data buffer in multiple passes if
+    needed
+
+ arch/x86/include/asm/kvm_host.h |   3 +-
+ arch/x86/kvm/svm/sev.c          |   2 +-
+ arch/x86/kvm/x86.c              | 136 +++++++++++++++++++++-----------
+ 3 files changed, 95 insertions(+), 46 deletions(-)
+
+-- 
+2.27.0
 
