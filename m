@@ -2,135 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0E5AA42C2F6
-	for <lists+kvm@lfdr.de>; Wed, 13 Oct 2021 16:23:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 690DB42C304
+	for <lists+kvm@lfdr.de>; Wed, 13 Oct 2021 16:24:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237349AbhJMOZg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Oct 2021 10:25:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22177 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235662AbhJMOZW (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 13 Oct 2021 10:25:22 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634134996;
+        id S236976AbhJMO0c (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Oct 2021 10:26:32 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:35146 "EHLO
+        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232589AbhJMO0b (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Oct 2021 10:26:31 -0400
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1634135067;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=r38G9fXSz1gZxTBHa3haVyUnXwAZMkRJLctO7+C27Jo=;
-        b=RfVDMTFNMzAJ52Izu2CtHQGNCB8EcRb0m6oIHzQLhve6wcRwRYiPrYlnzyVM7CS8t9YXSy
-        NjvPKLilcB5uMMjym8st+Vycf1NJV0G0GBE+/a9rV9SPOUhxQ1t6WZ4Yhp/o+7NIqJjRvc
-        85WwNIudhQOwsvUZ4aNDf+dG6Kn9RZ0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-245-l_bcEE84M96PVx31HSpdrA-1; Wed, 13 Oct 2021 10:23:13 -0400
-X-MC-Unique: l_bcEE84M96PVx31HSpdrA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DA14910A8E01;
-        Wed, 13 Oct 2021 14:23:11 +0000 (UTC)
-Received: from vitty.brq.redhat.com (unknown [10.40.193.50])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C526857CA5;
-        Wed, 13 Oct 2021 14:23:09 +0000 (UTC)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v3 4/4] KVM: nVMX: Implement Enlightened MSR Bitmap feature
-Date:   Wed, 13 Oct 2021 16:22:58 +0200
-Message-Id: <20211013142258.1738415-5-vkuznets@redhat.com>
-In-Reply-To: <20211013142258.1738415-1-vkuznets@redhat.com>
-References: <20211013142258.1738415-1-vkuznets@redhat.com>
+        bh=7nVZGBCeuindwKm9eXa4HWiuVLAO3Utl4ky+RFG0dug=;
+        b=aiZKgw7mnAIdEVEqdRTLyH/4mddDXeHSivtaNj8XXbmeRAtG8esEBBBm/BQNJwg0ahagxa
+        sFx1ynBMku/YHRYrpjAk7klrcbsrSEx0vir3dS8iKNj+Aoik/ARbVtKNOYDXvrAG0g+R5R
+        hYccq7Em5ereAEA9ONQT39Y02XeNaZ/uzWEGdoWPpFFcO5hpyeVIWih8G0/Kohp1/Yupd2
+        5OFW62xjhhyukAuS/QNUeqo+NxW01E5dVyshJd4FgnO0rF72K6Zhz84GhvtzGlXkLz+6Ka
+        aHaugf1nWhMv6qC8hi7Rs5xCur1F88xTiIPV3tfXmwWhnxcJ1GvhoR4w6cD+NA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1634135067;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=7nVZGBCeuindwKm9eXa4HWiuVLAO3Utl4ky+RFG0dug=;
+        b=8q2eYQd6ckfL6+RDB/3XOTz/iUl+8MtbNZl2ez1dS28Z4mdTArkP2ci186WOGQeCrlFdQb
+        6Xdx8KNh/qmS+yDw==
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        "Liu, Jing2" <jing2.liu@intel.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Cc:     the arch/x86 maintainers <x86@kernel.org>,
+        "Bae, Chang Seok" <chang.seok.bae@intel.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Arjan van de Ven <arjan@linux.intel.com>,
+        kvm list <kvm@vger.kernel.org>,
+        "Nakajima, Jun" <jun.nakajima@intel.com>,
+        Jing Liu <jing2.liu@linux.intel.com>,
+        Sean Christopherson <seanjc@google.com>
+Subject: Re: [patch 13/31] x86/fpu: Move KVMs FPU swapping to FPU core
+In-Reply-To: <87y26x811c.ffs@tglx>
+References: <20211011215813.558681373@linutronix.de>
+ <20211011223611.069324121@linutronix.de>
+ <8a5762ab-18d5-56f8-78a6-c722a2f387c5@redhat.com>
+ <BYAPR11MB3256B39E2A34A09FF64ECC5BA9B79@BYAPR11MB3256.namprd11.prod.outlook.com>
+ <0962c143-2ff9-f157-d258-d16659818e80@redhat.com>
+ <BYAPR11MB325676AAA8A0785AF992A2B9A9B79@BYAPR11MB3256.namprd11.prod.outlook.com>
+ <da47ba42-b61e-d236-2c1c-9c5504e48091@redhat.com>
+ <d673e736-0a72-4549-816d-b755227ea797@www.fastmail.com>
+ <df3af1c2-fe93-ea21-56e5-4d70d08e55f2@redhat.com> <87y26x811c.ffs@tglx>
+Date:   Wed, 13 Oct 2021 16:24:27 +0200
+Message-ID: <87v92180kk.ffs@tglx>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Updating MSR bitmap for L2 is not cheap and rearly needed. TLFS for Hyper-V
-offers 'Enlightened MSR Bitmap' feature which allows L1 hypervisor to
-inform L0 when it changes MSR bitmap, this eliminates the need to examine
-L1's MSR bitmap for L2 every time when 'real' MSR bitmap for L2 gets
-constructed.
+On Wed, Oct 13 2021 at 16:14, Thomas Gleixner wrote:
 
-Use 'vmx->nested.msr_bitmap_changed' flag to implement the feature.
+> On Wed, Oct 13 2021 at 14:26, Paolo Bonzini wrote:
+>
+>> On 13/10/21 12:14, Andy Lutomirski wrote:
+>>>> I think it's simpler to always wait for #NM, it will only happen
+>>>> once per vCPU.  In other words, even if the guest clears XFD before
+>>>> it generates #NM, the guest_fpu's XFD remains nonzero and an #NM
+>>>> vmexit is possible.  After #NM the guest_fpu's XFD is zero; then
+>>>> passthrough can happen and the #NM vmexit trap can be disabled.
+>>>
+>>> This will stop being at all optimal when Intel inevitably adds
+>>> another feature that uses XFD.  In the potentially infinite window in
+>>> which the guest manages XFD and #NM on behalf of its userspace and
+>>> when the guest allocates the other hypothetical feature, all the #NMs
+>>> will have to be trapped by KVM.
+>>
+>> The reason is that it's quite common to simply let the guest see all 
+>> CPUID bits that KVM knows about.
+>
+> On fleets the cpu features exposed to guests matter a lot to ensure
+> migratability and I would be surprised when such a feature would just
+> be universally available to anyone.
 
-Note, KVM already uses 'Enlightened MSR bitmap' feature when it runs as a
-nested hypervisor on top of Hyper-V. The newly introduced feature is going
-to be used by Hyper-V guests on KVM.
+As a VM customer you get charged for RAM, CPUs, storage and whatever
+extra features you need. So why would AMX be any different?
 
-When the feature is enabled for Win10+WSL2, it shaves off around 700 CPU
-cycles from a nested vmexit cost (tight cpuid loop test).
+So far Intel ignored the fact that these accelerators are managed
+resources even if they are accessible via instructions and do not
+require to open(/dev/magic_accelerator). But that's just wrong and XFD
+should already have happened with AVX512.
 
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
- arch/x86/kvm/hyperv.c     |  2 ++
- arch/x86/kvm/vmx/nested.c | 20 ++++++++++++++++++--
- 2 files changed, 20 insertions(+), 2 deletions(-)
+Trying to expose AMX unconditionally is just wrong and overengineered
+and proliferating the mess we already have to suffer from.
 
-diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-index 6f11cda2bfa4..a00de1dbec57 100644
---- a/arch/x86/kvm/hyperv.c
-+++ b/arch/x86/kvm/hyperv.c
-@@ -2516,6 +2516,8 @@ int kvm_get_hv_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid2 *cpuid,
- 
- 		case HYPERV_CPUID_NESTED_FEATURES:
- 			ent->eax = evmcs_ver;
-+			if (evmcs_ver)
-+				ent->eax |= HV_X64_NESTED_MSR_BITMAP;
- 
- 			break;
- 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index bf4fa63ed371..7cd0c20d4557 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -608,15 +608,30 @@ static inline bool nested_vmx_prepare_msr_bitmap(struct kvm_vcpu *vcpu,
- 						 struct vmcs12 *vmcs12)
- {
- 	int msr;
-+	struct vcpu_vmx *vmx = to_vmx(vcpu);
- 	unsigned long *msr_bitmap_l1;
--	unsigned long *msr_bitmap_l0 = to_vmx(vcpu)->nested.vmcs02.msr_bitmap;
--	struct kvm_host_map *map = &to_vmx(vcpu)->nested.msr_bitmap_map;
-+	unsigned long *msr_bitmap_l0 = vmx->nested.vmcs02.msr_bitmap;
-+	struct hv_enlightened_vmcs *evmcs = vmx->nested.hv_evmcs;
-+	struct kvm_host_map *map = &vmx->nested.msr_bitmap_map;
- 
- 	/* Nothing to do if the MSR bitmap is not in use.  */
- 	if (!cpu_has_vmx_msr_bitmap() ||
- 	    !nested_cpu_has(vmcs12, CPU_BASED_USE_MSR_BITMAPS))
- 		return false;
- 
-+	/*
-+	 * MSR bitmap update can be skipped when:
-+	 * - MSR bitmap for L1 hasn't changed.
-+	 * - Nested hypervisor (L1) is attempting to launch the same L2 as
-+	 *   before.
-+	 * - Nested hypervisor (L1) has enabled 'Enlightened MSR Bitmap' feature
-+	 *   and tells KVM (L0) there were no changes in MSR bitmap for L2.
-+	 */
-+	if (!vmx->nested.msr_bitmap_force_recalc && evmcs &&
-+	    evmcs->hv_enlightenments_control.msr_bitmap &&
-+	    evmcs->hv_clean_fields & HV_VMX_ENLIGHTENED_CLEAN_FIELD_MSR_BITMAP)
-+		goto out_clear_msr_bitmap_force_recalc;
-+
- 	if (kvm_vcpu_map(vcpu, gpa_to_gfn(vmcs12->msr_bitmap), map))
- 		return false;
- 
-@@ -700,6 +715,7 @@ static inline bool nested_vmx_prepare_msr_bitmap(struct kvm_vcpu *vcpu,
- 
- 	kvm_vcpu_unmap(vcpu, &to_vmx(vcpu)->nested.msr_bitmap_map, false);
- 
-+out_clear_msr_bitmap_force_recalc:
- 	vmx->nested.msr_bitmap_force_recalc = false;
- 
- 	return true;
--- 
-2.31.1
+As I said in the other mail. QEMU has to get permissions to use AMX
+first and not doing it by circumventing the permission part via a KVM
+hack.
+
+Thanks,
+
+        tglx
+
+
 
