@@ -2,126 +2,188 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5A04D42C143
-	for <lists+kvm@lfdr.de>; Wed, 13 Oct 2021 15:21:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1EABE42C1CE
+	for <lists+kvm@lfdr.de>; Wed, 13 Oct 2021 15:54:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233969AbhJMNXZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Oct 2021 09:23:25 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:32642 "EHLO
+        id S233241AbhJMN4X (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Oct 2021 09:56:23 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:28380 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229535AbhJMNXY (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 13 Oct 2021 09:23:24 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 19DD1PaN003559;
-        Wed, 13 Oct 2021 09:21:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=nJbQ5F+J67KJscNa8cetmNNRiv/rN9eSUYvHsX7DVr4=;
- b=mvhfu62g0XFBqHVE5GlN2qjRrJreYWG/Y/IiakSScLO6nLZqF+XcAcr40pGCMtCl8wiq
- gNbnm5APO7wqgmGEN99R0cP33Hkdighmo+HA5YtKL7bxAdwkf9ajFGG4T7jrrPYeNVgL
- PqoQkEe7jA8ix/xUbDROnLwgS3ZAbFZgOpLuYKzt0HrjpwhvP7n9tc1QnFKFGUhfHjQy
- oeT8OLpXadHiZGXjf8cHCq/b37UEqGpMeeCpb8qJiTWx4G8qXJwyG+RyIjKLsIEzQeCO
- RX8ivSxBvYKls70TTnU4RGKACoTOE0SvtsiGNT/WlhY2raxudmqxq8F2DTyG7FQMpHHg dw== 
+        by vger.kernel.org with ESMTP id S229611AbhJMN4W (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 13 Oct 2021 09:56:22 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 19DCqNHS021869;
+        Wed, 13 Oct 2021 09:54:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ mime-version : content-transfer-encoding; s=pp1;
+ bh=xefFNKbYo1VWj3k5fBMZrLG2hOezTFbJhLRUFRuTxq0=;
+ b=QZmkMBbyrMRc7prNGRczBEWHl0huOV4XqTgxvjv1vptFv5djt+c8CFMk6a2+MByFepGi
+ m+QBGsMUOX1YKaxizk+EE3gRzV2sl1jiN4c6vyPn5PLOWPQmw6Wqw9z1V6R5gvVJ+Py3
+ 4hL1A/DTYPtDnDOc9iAVNW+wmx4dAyX1T3cHmjcUlFNU2+ZM+cCPrerE29VsYRU+2os3
+ jDQeCCI4nyocBFNg79hjvqUXxzuk1vO+XOHzsQRaKympUWN3yQXW0UjAK6GjveMSQ00t
+ vJOZ88xNu4DE2PcJX6szuHVTRylSF7vb91Qsb3+Jphdu1BeCLyaxHAZRfmpPqQwKOOWk lg== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3bnmn9psmp-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3bnr79kmje-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 13 Oct 2021 09:21:21 -0400
-Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 19DCxFnf024722;
-        Wed, 13 Oct 2021 09:21:20 -0400
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3bnmn9psks-1
+        Wed, 13 Oct 2021 09:54:18 -0400
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 19DDgnFk031969;
+        Wed, 13 Oct 2021 09:54:18 -0400
+Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3bnr79kmhx-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 13 Oct 2021 09:21:20 -0400
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 19DDI0fg023061;
-        Wed, 13 Oct 2021 13:21:18 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma06ams.nl.ibm.com with ESMTP id 3bk2bjk9ap-1
+        Wed, 13 Oct 2021 09:54:18 -0400
+Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
+        by ppma05wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 19DDlUWC027964;
+        Wed, 13 Oct 2021 13:54:17 GMT
+Received: from b03cxnp08027.gho.boulder.ibm.com (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
+        by ppma05wdc.us.ibm.com with ESMTP id 3bk2qbsb7y-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 13 Oct 2021 13:21:17 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 19DDL17Y57737700
+        Wed, 13 Oct 2021 13:54:16 +0000
+Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
+        by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 19DDsFSj12583410
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 13 Oct 2021 13:21:01 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3E2504C052;
-        Wed, 13 Oct 2021 13:21:01 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CD0A64C04E;
-        Wed, 13 Oct 2021 13:21:00 +0000 (GMT)
-Received: from [9.145.94.172] (unknown [9.145.94.172])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 13 Oct 2021 13:21:00 +0000 (GMT)
-Message-ID: <076683e7-ebe2-87b4-132a-357c748f7ff7@linux.ibm.com>
-Date:   Wed, 13 Oct 2021 15:21:00 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [kvm-unit-tests PATCH 2/2] lib: s390x: snippet.h: Add a few
- constants that will make our life easier
-Content-Language: en-US
-To:     Janis Schoetterl-Glausch <scgl@linux.vnet.ibm.com>,
-        kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
-        david@redhat.com, thuth@redhat.com, seiden@linux.ibm.com
-References: <20211013102722.17160-1-frankja@linux.ibm.com>
- <20211013102722.17160-3-frankja@linux.ibm.com>
- <9a59c435-f717-784f-48c0-13ff9c3f0251@linux.vnet.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-In-Reply-To: <9a59c435-f717-784f-48c0-13ff9c3f0251@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        Wed, 13 Oct 2021 13:54:15 GMT
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6802E78067;
+        Wed, 13 Oct 2021 13:54:15 +0000 (GMT)
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5661F78070;
+        Wed, 13 Oct 2021 13:54:14 +0000 (GMT)
+Received: from farman-thinkpad-t470p (unknown [9.211.134.52])
+        by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Wed, 13 Oct 2021 13:54:14 +0000 (GMT)
+Message-ID: <3daa6f7de62fa9dd7a8fc781eabbde002e4729f5.camel@linux.ibm.com>
+Subject: Re: [RFC PATCH v1 3/6] KVM: s390: Simplify SIGP Restart
+From:   Eric Farman <farman@linux.ibm.com>
+To:     Thomas Huth <thuth@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Jason Herne <jjherne@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
+Date:   Wed, 13 Oct 2021 09:54:13 -0400
+In-Reply-To: <d30c2f8b-73f1-5639-dbb4-2e70b5982c62@redhat.com>
+References: <20211008203112.1979843-1-farman@linux.ibm.com>
+         <20211008203112.1979843-4-farman@linux.ibm.com>
+         <e3b874c1-e220-5e23-bd67-ed08c261e425@de.ibm.com>
+         <518fea79-1579-ee4a-c09b-ae4e70e32d96@redhat.com>
+         <0e4bb561170a287cea4124e9da56dfc4bd4a0eab.camel@linux.ibm.com>
+         <d30c2f8b-73f1-5639-dbb4-2e70b5982c62@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-16.el8) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: Kf27p2f644oprauZFKh_2WXzDdO9NOgL
-X-Proofpoint-ORIG-GUID: SAontQTOd70_KjjxCBg8E2HBUFW-vr78
+X-Proofpoint-GUID: h5kbbUUaj_cI-uiIAsVsBuOdTuGrck9Z
+X-Proofpoint-ORIG-GUID: AzcyiCvWOB23ZqcwddIGhmSMCjJsJAvW
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
  definitions=2021-10-13_05,2021-10-13_02,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 clxscore=1015
- impostorscore=0 mlxlogscore=999 spamscore=0 malwarescore=0
- lowpriorityscore=0 adultscore=0 phishscore=0 priorityscore=1501 mlxscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2109230001 definitions=main-2110130088
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
+ lowpriorityscore=0 mlxlogscore=999 malwarescore=0 adultscore=0
+ suspectscore=0 bulkscore=0 spamscore=0 phishscore=0 mlxscore=0
+ priorityscore=1501 impostorscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2109230001 definitions=main-2110130092
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/13/21 15:15, Janis Schoetterl-Glausch wrote:
-> On 10/13/21 12:27 PM, Janosch Frank wrote:
->> The variable names for the snippet objects are of gigantic length so
->> let's define a few macros to make them easier to read.
->>
->> Also add a standard PSW which should be used to start the snippet.
->>
->> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->> ---
->>   lib/s390x/snippet.h | 40 ++++++++++++++++++++++++++++++++++++++++
->>   s390x/mvpg-sie.c    | 13 ++++++-------
->>   2 files changed, 46 insertions(+), 7 deletions(-)
->>   create mode 100644 lib/s390x/snippet.h
->>
->> diff --git a/lib/s390x/snippet.h b/lib/s390x/snippet.h
->> new file mode 100644
->> index 00000000..9ead4fe3
->> --- /dev/null
->> +++ b/lib/s390x/snippet.h
->> @@ -0,0 +1,40 @@
->> +/* SPDX-License-Identifier: GPL-2.0-only */
->> +/*
->> + * Snippet definitions
->> + *
->> + * Copyright IBM, Corp. 2021
->                     ^
-> That comma should not be there.
+On Wed, 2021-10-13 at 07:54 +0200, Thomas Huth wrote:
+> On 12/10/2021 17.31, Eric Farman wrote:
+> > On Tue, 2021-10-12 at 17:23 +0200, Thomas Huth wrote:
+> > > On 11/10/2021 09.45, Christian Borntraeger wrote:
+> > > > Am 08.10.21 um 22:31 schrieb Eric Farman:
+> > > > > Now that we check for the STOP IRQ injection at the top of
+> > > > > the
+> > > > > SIGP
+> > > > > handler (before the userspace/kernelspace check), we don't
+> > > > > need
+> > > > > to do
+> > > > > it down here for the Restart order.
+> > > > > 
+> > > > > Signed-off-by: Eric Farman <farman@linux.ibm.com>
+> > > > > ---
+> > > > >    arch/s390/kvm/sigp.c | 11 +----------
+> > > > >    1 file changed, 1 insertion(+), 10 deletions(-)
+> > > > > 
+> > > > > diff --git a/arch/s390/kvm/sigp.c b/arch/s390/kvm/sigp.c
+> > > > > index 6ca01bbc72cf..0c08927ca7c9 100644
+> > > > > --- a/arch/s390/kvm/sigp.c
+> > > > > +++ b/arch/s390/kvm/sigp.c
+> > > > > @@ -240,17 +240,8 @@ static int __sigp_sense_running(struct
+> > > > > kvm_vcpu *vcpu,
+> > > > >    static int __prepare_sigp_re_start(struct kvm_vcpu *vcpu,
+> > > > >                       struct kvm_vcpu *dst_vcpu, u8
+> > > > > order_code)
+> > > > >    {
+> > > > > -    struct kvm_s390_local_interrupt *li = &dst_vcpu-
+> > > > > > arch.local_int;
+> > > > >        /* handle (RE)START in user space */
+> > > > > -    int rc = -EOPNOTSUPP;
+> > > > > -
+> > > > > -    /* make sure we don't race with STOP irq injection */
+> > > > > -    spin_lock(&li->lock);
+> > > > > -    if (kvm_s390_is_stop_irq_pending(dst_vcpu))
+> > > > > -        rc = SIGP_CC_BUSY;
+> > > > > -    spin_unlock(&li->lock);
+> > > > > -
+> > > > > -    return rc;
+> > > > > +    return -EOPNOTSUPP;
+> > > > >    }
+> > > > >    static int __prepare_sigp_cpu_reset(struct kvm_vcpu *vcpu,
+> > > > > 
+> > > > 
+> > > > @thuth?
+> > > > Question is, does it make sense to merge patch 2 and 3 to make
+> > > > things more
+> > > > obvious?
+> > > 
+> > > Maybe.
+> > > 
+> > > Anyway: Would it make sense to remove __prepare_sigp_re_start()
+> > > completely
+> > > now and let __prepare_sigp_unknown() set the return code in the
+> > > "default:" case?
+> > 
+> > We could, but that would affect the SIGP START case which also uses
+> > the
+> > re_start routine. And if we're going down that path, we could
+> > remove
+> > (INITIAL) CPU RESET handled in __prepare_sigp_cpu_reset, which does
+> > the
+> > same thing (nothing). Not sure it buys us much, other than losing
+> > the
+> > details in the different counters of which SIGP orders are
+> > processed.
+> 
+> Ok, we likely shouldn't change the way of counting the SIGPs here...
+> So what about removing the almost empty function and simply do the
+> "rc = 
+> -EOPNOTSUPP" right in the handle_sigp_dst() function? That's still
+> the 
+> easiest way to read the code, I think. 
 
-Right, copied that over from css.h.
-Fixed that and wrote a reminder to fix sclp.h and css.h in v2
+Hrm, that might be better. I've almost got the IOCTL stuff in a
+reasonable place for a discussion, will see about such cleanups at the
+end of that (new) series.
 
->> + * Author: Janosch Frank <frankja@linux.ibm.com>
->> + */
->> +
-> [...]
+> And we should do the same with the 
+> __prepare_sigp_cpu_reset() function (in a separate patch). Just my
+> 0.02 € of 
+> course.
+
+I appreciate it. Though I still don't have an easy way to use the €
+coins I have in a drawer over here. ;-)
+
+Eric
+
+> 
+>   Thomas
 > 
 
