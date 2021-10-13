@@ -2,157 +2,173 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F22DC42C4D6
-	for <lists+kvm@lfdr.de>; Wed, 13 Oct 2021 17:33:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 60CD442C527
+	for <lists+kvm@lfdr.de>; Wed, 13 Oct 2021 17:47:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232609AbhJMPfy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Oct 2021 11:35:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36978 "EHLO
+        id S229653AbhJMPtN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Oct 2021 11:49:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39858 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229514AbhJMPfx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Oct 2021 11:35:53 -0400
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 756B2C061570
-        for <kvm@vger.kernel.org>; Wed, 13 Oct 2021 08:33:50 -0700 (PDT)
-Received: by mail-pl1-x631.google.com with SMTP id g5so2095756plg.1
-        for <kvm@vger.kernel.org>; Wed, 13 Oct 2021 08:33:50 -0700 (PDT)
+        with ESMTP id S234611AbhJMPsO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Oct 2021 11:48:14 -0400
+Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBB47C061768
+        for <kvm@vger.kernel.org>; Wed, 13 Oct 2021 08:46:10 -0700 (PDT)
+Received: by mail-pg1-x536.google.com with SMTP id g184so2710328pgc.6
+        for <kvm@vger.kernel.org>; Wed, 13 Oct 2021 08:46:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
+        d=linaro.org; s=google;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=w0OXKQO+EQQ/M5woV3NPH/hGk7JVf61CPOh6HhRk/m8=;
-        b=sk1tTuqj/MCxcwKyXEpXPEoUQXTOIfjFXKFpcEO7e7km7L0f2uVxpAarDVbOFcPfZj
-         AaOMeRbp4pC54f9RoxLmNi9V7CBYoBY1iyg9go/NhpUX6rxl/Bs7DQywRj7z7CNV4Icw
-         phkGQth0VbP/e+oGfy5k2wyLOkQ9uo0cMwFuFcLpp+k+5Vt7Gp8qhcspnfT7fKxbSBfc
-         yBkDFK92khyeeiGtbaLySGhojmyIoZHyBZz+pNPbLCghA75QCxHiZCuPcWG8zASdpSLp
-         wkXrG5gjIQ8mY7pZDUe6GW6iu8tNFQyciIXy/X8jRSaEZUUlBRse1lVXJXHUtz1AIKN8
-         gdzw==
+        bh=5P0ocxXM0vPODGkh8na4Mfy39/EYyFv4GMRrvhNNOUo=;
+        b=gfAizaxTiwRe31oPHuSEfCuoU3UyNzjvSGFjRtR0+20ybGnOJHR2SNvIUYXuMY2xpD
+         gjbOwicFvptk+HxbA9gztDS/NFb/B9PCmms4ywTb+W6ZfybGlSGnqIF9BrEyW3lnzugF
+         1xOsRizGgXSxqW3rE2o7H3pOyE6LnVUrXJS6JM8CS2LKu70yomZ+jIXvV9GC/9hEoAdh
+         pZgLdZj46NdkkNldf1y6Zal4VF0OHZO5HByoWBC8S5+MsG5/UJx0h6V+EfRdjNyAV2md
+         QHEhpyLmWUQN/xdLKYedMbdiT11toyum2MbaAnr8R6GfEwVc/Pi4akUF4ElQql0esd+K
+         tzhQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=w0OXKQO+EQQ/M5woV3NPH/hGk7JVf61CPOh6HhRk/m8=;
-        b=LTDX6nX/IuMRGk+1dD0XUURwZpridot3JJnZkg8a7BJvxLMQtc6kIpF1zcikxyVC90
-         aUvuWil8k0LNFRa07j2bpJktVwBWAsVb9S1F50wS79JvTB1szmKKwYbFJg542idX/MMM
-         4Gmg5NNiWQojQ0CIMJg/7SVCAckeiVhiiT7EK4Su/e6f6l3T/mMZJJ+V3hSyrwPN9lE7
-         BnbAERj4mQPVoisKnQpIyK4rjCf8CDMdKF1MhZns9XWX6JCMDXbmtXa4/ldXtB/5TkKq
-         U65edEkUNoJsfqe8enHjPeimtS2e7YX1DmN90lUbwydcwGMPCWgpB6U59MgLxTwlAS2e
-         ZI9g==
-X-Gm-Message-State: AOAM533zaxcyg9Mwv1K7isObMKVV9hrHU2dcJ7i/i7znV3HsGnywyaK7
-        oRcYRcT6yF3rr6TXtJcTeR00/w==
-X-Google-Smtp-Source: ABdhPJyIpI8yklVSJGPLmwLeEm7VlfgHbKcdMxX12nXi3LKT7tczNU8dmkCQdhnCU2lfWOgycwTuYQ==
-X-Received: by 2002:a17:90b:4f4b:: with SMTP id pj11mr98367pjb.4.1634139229516;
-        Wed, 13 Oct 2021 08:33:49 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id x35sm17301351pfh.52.2021.10.13.08.33.48
+        bh=5P0ocxXM0vPODGkh8na4Mfy39/EYyFv4GMRrvhNNOUo=;
+        b=w8I4lbOjdyzaMGH1Wbx26rS1BN2lI7O/1ahornpyeuLb1KqRxNkk3Id05B/4fPwQBm
+         HtOfxxK7OVK+0msbyozFD2+lFcC6d3SS1JcqMmESS3ZYWIvs8GJlkVNT+v0fe25PxPQl
+         Vey/rw1SusZqoL5r3Js0YFn0b4n75y6GwHtmCxnn71k1R0Z2HLYxzhFB0d5Cw/9AhHdz
+         4/7riaT/mRoN9z/LXQ4+n28TRwVRj1ounO+zp8Xb4HK36vBGvOvqRhpOMizKlFuGGtpD
+         iLDgHjsJn77uRUKe5w3djbtrtCyl2bN5v8WTYt7yqAvTv1IOnZtoEBnAq3JBvLboliC/
+         ewZQ==
+X-Gm-Message-State: AOAM53056nsj+avzr/gbxqoqzO1VabJsj9cnvoJEEuxkm2Y6/Z0q8+KS
+        iWewoDrxeLoZTw3uycGd8QpVSw==
+X-Google-Smtp-Source: ABdhPJxOS97EPwZsGm56NgXmycC48sC/ZWo8Q8DTT9IZBXIVEcdfskLSNijWrQkjT1bVWFJiZLyKew==
+X-Received: by 2002:aa7:949c:0:b0:44c:a0df:2c7f with SMTP id z28-20020aa7949c000000b0044ca0df2c7fmr128668pfk.34.1634139970091;
+        Wed, 13 Oct 2021 08:46:10 -0700 (PDT)
+Received: from p14s (S0106889e681aac74.cg.shawcable.net. [68.147.0.187])
+        by smtp.gmail.com with ESMTPSA id x27sm2452841pfo.90.2021.10.13.08.46.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Oct 2021 08:33:48 -0700 (PDT)
-Date:   Wed, 13 Oct 2021 15:33:44 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Wed, 13 Oct 2021 08:46:09 -0700 (PDT)
+Date:   Wed, 13 Oct 2021 09:46:04 -0600
+From:   Mathieu Poirier <mathieu.poirier@linaro.org>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, Jeff Dike <jdike@addtoit.com>,
+        Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        Jason Wang <jasowang@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH Part2 v5 26/45] KVM: SVM: Mark the private vma unmerable
- for SEV-SNP guests
-Message-ID: <YWb8WG6Ravbs1nbx@google.com>
-References: <20210820155918.7518-1-brijesh.singh@amd.com>
- <20210820155918.7518-27-brijesh.singh@amd.com>
- <YWXYIWuK2T8Kejng@google.com>
- <2a8bf18e-1413-f884-15c4-0927f34ee3b9@amd.com>
- <YWbufTl2CKwJ2uzw@google.com>
- <5eb61b30-e889-2299-678f-4edeada46c2d@amd.com>
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Gonglei <arei.gonglei@huawei.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        Cristian Marussi <cristian.marussi@arm.com>,
+        "Enrico Weigelt, metux IT consult" <info@metux.net>,
+        Viresh Kumar <vireshk@kernel.org>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Bartosz Golaszewski <brgl@bgdev.pl>,
+        David Airlie <airlied@linux.ie>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        Daniel Vetter <daniel@ffwll.ch>, Jie Deng <jie.deng@intel.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Kalle Valo <kvalo@codeaurora.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Vishal Verma <vishal.l.verma@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        David Hildenbrand <david@redhat.com>,
+        Vivek Goyal <vgoyal@redhat.com>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        Eric Van Hensbergen <ericvh@gmail.com>,
+        Latchesar Ionkov <lucho@ionkov.net>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Anton Yakovlev <anton.yakovlev@opensynergy.com>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Takashi Iwai <tiwai@suse.com>, linux-um@lists.infradead.org,
+        virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linux-i2c@vger.kernel.org, iommu@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
+        nvdimm@lists.linux.dev, linux-remoteproc@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        v9fs-developer@lists.sourceforge.net, kvm@vger.kernel.org,
+        alsa-devel@alsa-project.org
+Subject: Re: [PATCH RFC] virtio: wrap config->reset calls
+Message-ID: <20211013154604.GB4135908@p14s>
+References: <20211013105226.20225-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <5eb61b30-e889-2299-678f-4edeada46c2d@amd.com>
+In-Reply-To: <20211013105226.20225-1-mst@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 13, 2021, Brijesh Singh wrote:
+On Wed, Oct 13, 2021 at 06:55:31AM -0400, Michael S. Tsirkin wrote:
+> This will enable cleanups down the road.
+> The idea is to disable cbs, then add "flush_queued_cbs" callback
+> as a parameter, this way drivers can flush any work
+> queued after callbacks have been disabled.
 > 
-> On 10/13/21 7:34 AM, Sean Christopherson wrote:
-> > On Wed, Oct 13, 2021, Brijesh Singh wrote:
-> >> On 10/12/21 11:46 AM, Sean Christopherson wrote:
-> >>> On Fri, Aug 20, 2021, Brijesh Singh wrote:
-> >>>> When SEV-SNP is enabled, the guest private pages are added in the RMP
-> >>>> table; while adding the pages, the rmp_make_private() unmaps the pages
-> >>>> from the direct map. If KSM attempts to access those unmapped pages then
-> >>>> it will trigger #PF (page-not-present).
-> >>>>
-> >>>> Encrypted guest pages cannot be shared between the process, so an
-> >>>> userspace should not mark the region mergeable but to be safe, mark the
-> >>>> process vma unmerable before adding the pages in the RMP table.
-> >>> To be safe from what?  Does the !PRESENT #PF crash the kernel?
-> >> Yes, kernel crashes when KSM attempts to access to an unmaped pfn.
-> > Is this problem unique to nuking the direct map (patch 05), 
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+>  arch/um/drivers/virt-pci.c                 | 2 +-
+>  drivers/block/virtio_blk.c                 | 4 ++--
+>  drivers/bluetooth/virtio_bt.c              | 2 +-
+>  drivers/char/hw_random/virtio-rng.c        | 2 +-
+>  drivers/char/virtio_console.c              | 4 ++--
+>  drivers/crypto/virtio/virtio_crypto_core.c | 8 ++++----
+>  drivers/firmware/arm_scmi/virtio.c         | 2 +-
+>  drivers/gpio/gpio-virtio.c                 | 2 +-
+>  drivers/gpu/drm/virtio/virtgpu_kms.c       | 2 +-
+>  drivers/i2c/busses/i2c-virtio.c            | 2 +-
+>  drivers/iommu/virtio-iommu.c               | 2 +-
+>  drivers/net/caif/caif_virtio.c             | 2 +-
+>  drivers/net/virtio_net.c                   | 4 ++--
+>  drivers/net/wireless/mac80211_hwsim.c      | 2 +-
+>  drivers/nvdimm/virtio_pmem.c               | 2 +-
+>  drivers/rpmsg/virtio_rpmsg_bus.c           | 2 +-
+>  drivers/scsi/virtio_scsi.c                 | 2 +-
+>  drivers/virtio/virtio.c                    | 5 +++++
+>  drivers/virtio/virtio_balloon.c            | 2 +-
+>  drivers/virtio/virtio_input.c              | 2 +-
+>  drivers/virtio/virtio_mem.c                | 2 +-
+>  fs/fuse/virtio_fs.c                        | 4 ++--
+>  include/linux/virtio.h                     | 1 +
+>  net/9p/trans_virtio.c                      | 2 +-
+>  net/vmw_vsock/virtio_transport.c           | 4 ++--
+>  sound/virtio/virtio_card.c                 | 4 ++--
+>  26 files changed, 39 insertions(+), 33 deletions(-)
 > 
-> Yes. This problem didn't exist in previous series because we were not
-> nuking the page from direct map and KSM was able to read the memory just
-> fine. Now with the page removed from the direct map causes #PF
-> (not-present).
-
-Hrm, so regardless of what manipulations are done to the direct map, any errant
-write to guest private memory via the direct map would be fatal to the kernel.
-That's both mildly terrifying and oddly encouraging, as it means silent guest data
-corruption is no longer a thing, at least for private memory.
-
-One concrete takeaway for me is that "silently" nuking the direct map on RMP
-assignment is not an option.  Nuking the direct map if the kernel has a way to
-determine that the backing store is for guest private memory is perfectly ok,
-but pulling the rug out so to speak is setting us up for maintenance hell.
-
-> > or would it also be a problem (in the form of an RMP violation) if the
-> > direct map were demoted to 4k pages?
-> >  
+>  static struct virtio_driver virtio_pmem_driver = {
+> diff --git a/drivers/rpmsg/virtio_rpmsg_bus.c b/drivers/rpmsg/virtio_rpmsg_bus.c
+> index 8e49a3bacfc7..6a11952822df 100644
+> --- a/drivers/rpmsg/virtio_rpmsg_bus.c
+> +++ b/drivers/rpmsg/virtio_rpmsg_bus.c
+> @@ -1015,7 +1015,7 @@ static void rpmsg_remove(struct virtio_device *vdev)
+>  	size_t total_buf_space = vrp->num_bufs * vrp->buf_size;
+>  	int ret;
+>  
+> -	vdev->config->reset(vdev);
+> +	virtio_reset_device(vdev);
 > 
-> No, this problem does happen due to the demotion. In previous series, we
-> were demoting the pages to 4k and everyone was happy (including ksm). In
-> the case of ksm, the page will *never* be merged because ciphertext for
-> two private pages will never be the same. Removing the pages from direct
-> map certainly brings additional complexity in the KVM and other places
-> in the kernel. From architecture point of view, there is actually no
-> need to mark the page *not present* in the direct map. I believe in TDX
-> that is must but for the SEV-SNP its not required at all.
 
-Nuking the direct map is not strictly required for TDX either, as reads do not
-compromise the integrity of the memory, i.e. don't poison memory and lead to
-#MC.  Like SNP, writes via the direct map would be fatal.
+Reviewed-by: Mathieu Poirier <mathieu.poirier@linaro.org>
 
-The issue with TDX that is not shared by SNP is that writes through _user_ mappings
-can be fatal the system.  With SNP, those generate RMP violations, but because they
-are "just" page faults, the normal uaccess machinery happily eats them and SIGBUSes
-the VMM.
-
-> A hypervisor can read the guest private pages just fine, only the write will
-> cause an RMP fault.
-
-Well, for some definitions of "read".  I'm kinda joking, kinda serious.  KSM may
-"work" when it reads garbage, but the same is likely not true for other kernel
-code that wanders into guest private memory.  Ideally, the kernel would provide
-a mechanism to _prevent_ any such reads/writes, and violations would be treated
-as kernel bugs.  Given that SEV has been successfully deployed, the probability
-of lurking bugs is quite low, but I still dislike the idea of latent bugs going
-unnoticed or manifesting in weird ways.
+>  	ret = device_for_each_child(&vdev->dev, NULL, rpmsg_remove_device);
+>  	if (ret)
