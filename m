@@ -2,156 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B6A8042C828
-	for <lists+kvm@lfdr.de>; Wed, 13 Oct 2021 19:57:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C3D842C854
+	for <lists+kvm@lfdr.de>; Wed, 13 Oct 2021 20:06:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238230AbhJMR7d (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Oct 2021 13:59:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42472 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230404AbhJMR7a (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Oct 2021 13:59:30 -0400
-Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 984F3C061749
-        for <kvm@vger.kernel.org>; Wed, 13 Oct 2021 10:57:25 -0700 (PDT)
-Received: by mail-pg1-x52a.google.com with SMTP id q5so3068262pgr.7
-        for <kvm@vger.kernel.org>; Wed, 13 Oct 2021 10:57:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=nYRMF9NLZlIYvCMUzNz88c0C/LYzcmp0YC6IScl8K1M=;
-        b=NgG+UbKFXQEeJU+vxIERcV8ISM8vK2GCSApZ6LVvO8Ca4vuob2erFTer8Pjy+LmOlx
-         oQNqfc4GDoSc8kBYl2UQuoJCdCPDunS7oChSW89ZvBC0D5H5CPPmiL+ueA8J+Mm8lR4T
-         hJJlty1d2LjuoUIDYuT/iG0qDt97u16L7UQrJg/LobgP9fw0Bk0K06xWDbzC+nFmvUR9
-         e05rVnnoZXh6SEoemSALmKQmezFDLIf1O9MDVP1nYpxigjBeIyWXGs/Fr4gJGcrY3APT
-         lQZGOxPee5B/4281bZcijDSsReBobfryrTBKyzHczFPs3pwj76Rw2G3+tM++U5ijVdOF
-         hMgw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=nYRMF9NLZlIYvCMUzNz88c0C/LYzcmp0YC6IScl8K1M=;
-        b=0zyQ2vq3aakYKGCMBDhMu8UMC14Sqf7Fb3NXHqIQ12fpC/ODjhJgH8us/lXdeH0k6o
-         MYlUYzgr9X3RQxbrHwHLHJPZDyaByMjU4GBnMIG65axw2DYb+l5s0lHipSKo049zCLNp
-         0cszQpb+4L32GJ+tabYh0i4FmsQQUbvc/1fJfwRmMYisBDdeQLkKgcEUtu59Poxxa3i0
-         gKJCWA5Q+Jc7ObywNsfkgko/6Exfin2vdDhoV6Y8JBcA/yRzwZgtmuEDM71HG1WENJOO
-         5GTt+Rok7n0QJ4NNh84X5wX1N0O7k+V5Bv+fIOVtF8O3so5bCC+iLZMLlkgzWQkovAV2
-         A90Q==
-X-Gm-Message-State: AOAM530yDyLheS3lS9TgkTzzSKwZikPToRqSvM2HGPFnxHHNZr8Dev3x
-        6rYIlsN411ynF41EjuKxixO4zQ==
-X-Google-Smtp-Source: ABdhPJyMiVGmUTYUtcdh7bcTvHq4WhqYjQCakcIXj/dCcEixSLcina/nmF5U4pACwtO5b1z16bv7/Q==
-X-Received: by 2002:a05:6a00:1344:b0:44c:4cd7:4d4b with SMTP id k4-20020a056a00134400b0044c4cd74d4bmr795524pfu.50.1634147844761;
-        Wed, 13 Oct 2021 10:57:24 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id z24sm180698pgu.54.2021.10.13.10.57.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Oct 2021 10:57:24 -0700 (PDT)
-Date:   Wed, 13 Oct 2021 17:57:20 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH Part2 v5 41/45] KVM: SVM: Add support to handle the RMP
- nested page fault
-Message-ID: <YWceAL4v+zcJFrhU@google.com>
-References: <20210820155918.7518-1-brijesh.singh@amd.com>
- <20210820155918.7518-42-brijesh.singh@amd.com>
-MIME-Version: 1.0
+        id S238339AbhJMSJA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Oct 2021 14:09:00 -0400
+Received: from mail-dm6nam11on2044.outbound.protection.outlook.com ([40.107.223.44]:17760
+        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S229814AbhJMSI7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Oct 2021 14:08:59 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=miWZhCNAKQGYkEDU0yVrZkUYNA4mhfI1ALiPwK7yNGrHHvxSYyARHv21NIzi2ZTdU/4vKOBkQXvxKdXtZnCeTjQHvgOfijG77efY6DkOwYmyEqqAjZIK1J0rx3qLZVBmK/QS7Sonmn49OxjW3ybw+KDO+ao/uZvXmkVK96CLseuUqypf2rplsbevgh8FEWgA1EPGS86lnsBhZSHfUfELTvOWNZOyEXAuIdDL9qlXVzvnkhvu2olojzcqLel7Q06oeOC0jhsIJxC0bJljcDptqAyUx+XGS6tgsT6AeXSuZB0YyTu9qqln4SRJ/eNwsEXiwd74rNidkmEefwBQRTcCdw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=J6yOPD5MSOO5uGJ0sLl/wr/y0gfSWT6BMuq1oZERb/M=;
+ b=PNhyV1t/Rq/Sem6awmWSRylpqzc88fJ0onXVa5njKA6f5OsJwo9nJPWXrFny1NSFr3ceRIwmOmoBn9wshAZS7Ri7TxybLIMVH54xjJaO76GFJeonphhY0bY3DT18ZD3CTwEdfEh9p/Bflp0KMcsJH/oPbVlQ6EkGcL2jDg2sYsoFFwrI/2NhbuxYJZWGVEnNgWn1pYkdZcsijxyVMVJiQfAacccSfSySF9algs3AnVLxjYWh28p6LKbpjAHftWEvFl5SK7+YIiCH+tQitsAmA5yUMOsN99oAEjux8pr/drxqLMYfamElNSi2mcrZrg/eY/hE2VBBPSi7z1WAjxbWXg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=J6yOPD5MSOO5uGJ0sLl/wr/y0gfSWT6BMuq1oZERb/M=;
+ b=DryNIiLD/YcRVbfBqjmpJHD13iVqO0IZcdr7hr7HZ3V8mNvJourA51xkJNQ3OPhyLvQFSjKyFQgwzOg9AbSLscTWYg6hLc60UTzn3ngFvLWA/AcrZXvHzSRXMhhJ0eW7BvKcyqEYhKVsaKxgE0flXAlnG9r2rKgVGH/wfNxgg6BnLYjOjxmnyad4kwerYNYY+QRKAjnB7fypM+cKVgijxi7DD/S2BxS1fCepE0Iw/6v22lorDpAeHC2E/5LAHaNto6Mwl45R8lvPeR85Z7TT9XZlfk/E+58KNB+p8YEdVPCHYN1oDXPTDRLhC77gqAzBU2V78jle7ivQCgkHSsT9wg==
+Authentication-Results: nvidia.com; dkim=none (message not signed)
+ header.d=none;nvidia.com; dmarc=none action=none header.from=nvidia.com;
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
+ by BL1PR12MB5239.namprd12.prod.outlook.com (2603:10b6:208:315::24) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4608.16; Wed, 13 Oct
+ 2021 18:06:52 +0000
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::e8af:232:915e:2f95]) by BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::e8af:232:915e:2f95%6]) with mapi id 15.20.4608.016; Wed, 13 Oct 2021
+ 18:06:52 +0000
+Date:   Wed, 13 Oct 2021 15:06:51 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Yishai Hadas <yishaih@nvidia.com>
+Cc:     alex.williamson@redhat.com, bhelgaas@google.com, saeedm@nvidia.com,
+        linux-pci@vger.kernel.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, kuba@kernel.org, leonro@nvidia.com,
+        kwankhede@nvidia.com, mgurtovoy@nvidia.com, maorg@nvidia.com
+Subject: Re: [PATCH V1 mlx5-next 13/13] vfio/mlx5: Trap device RESET and
+ update state accordingly
+Message-ID: <20211013180651.GM2744544@nvidia.com>
+References: <20211013094707.163054-1-yishaih@nvidia.com>
+ <20211013094707.163054-14-yishaih@nvidia.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210820155918.7518-42-brijesh.singh@amd.com>
+In-Reply-To: <20211013094707.163054-14-yishaih@nvidia.com>
+X-ClientProxiedBy: MN2PR05CA0047.namprd05.prod.outlook.com
+ (2603:10b6:208:236::16) To BL0PR12MB5506.namprd12.prod.outlook.com
+ (2603:10b6:208:1cb::22)
+MIME-Version: 1.0
+Received: from mlx.ziepe.ca (142.162.113.129) by MN2PR05CA0047.namprd05.prod.outlook.com (2603:10b6:208:236::16) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4628.8 via Frontend Transport; Wed, 13 Oct 2021 18:06:52 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1maieR-00EcUG-Fb; Wed, 13 Oct 2021 15:06:51 -0300
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 4883f0db-9364-4c38-d748-08d98e743be4
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5239:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <BL1PR12MB5239BCBDF5642C0E37342D34C2B79@BL1PR12MB5239.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:1775;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: E/H9HZqWh7RYFtIJ5H+y4kDi6B4HlaNZKMz01nxp4q1+g+FPtOzy22lD5W5OV1bwQPjmHKV7VaA3U/XWUoAhZkF2JDkdQBWaeAt0F4KGM5zi6OEJxqLjCS0ucev/chHPbjN53/1bXwqJifaxCwjbkkSjPB2bpflNt4oGALv/M2BP3rpZBwOCyBRlWhSbITOCr3I4FE5yZSQ7aTwfhdaMTD6pKgUHfZAj+pZ7jV0aqcKyJoGOoVTXP862fnfr0nGA40M0O0HBaSaNETBzi6Ae2nJSuIVJZfMgqXxx8wGk27T9dTNkV/vxrOkPyOTpTm9QvxWr4uq7dTUvfYN5DVOnUsWp+oOPbWMdkiic8pQFi5OQeBJiyySfaiw+0g5uUaINLhUwwaPDtWzH+bhbxEAtwuCMlf7q9LXFzGruLaxArirWB1HMESCU7gB6dwgSpmKFJSK+7qfrpqtLFMF27XTTr7hi8SJ2NtzTcKHEqFwhYjJYnfotPY5wFrPgfyTm6vrO4Wyf3IfBHVBEYN86obQTVvsNpqZpyJwn6nWB5AoJgHNWAyEBfg/QF1Nbf4O4+8VN54fuhj7YS2jSkZ7wJLB3IQskJ6xd9curE74JpiR98CeXp5IJjXGezIG7DK5X2/T0WFZZiiQJc15jhHZMWCL+uA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(107886003)(26005)(37006003)(8936002)(33656002)(9786002)(9746002)(2616005)(1076003)(4744005)(86362001)(186003)(316002)(6636002)(36756003)(15650500001)(508600001)(66476007)(66946007)(38100700002)(66556008)(8676002)(4326008)(6862004)(5660300002)(2906002)(426003)(83380400001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?xZMYHJ41tWNz4AynwzwT/3JRnktL9Crzz/oNittcESBJdAw2CVCiIsuD1UMb?=
+ =?us-ascii?Q?EQ3txFQzMpy0JU5csvV57Ct0b3af2UBTA5OAtaFDYJjeY+HDKhMW+4VcXWJ8?=
+ =?us-ascii?Q?vA5DmowLHltUdtSzLlBoW/tgMINvc70gMUsRoT8QEFCqLnTR58VKfVN+4PF8?=
+ =?us-ascii?Q?HznGUYrKd5qkvnpG4p5Anowabsmc5f7exzzyev8siB8jTS7hKaHBTV69f0iR?=
+ =?us-ascii?Q?UtxlEwpBVDV7bVvzAtrwzE372MXgocKgurinTF9xIKlAQ+E+IhA+OEIfmtEu?=
+ =?us-ascii?Q?AoxIB5PV2JKy1+KdAx3YDqC/yYjKjbaBVUNoAkUMYmXuYiMKdwHDm8Z5pK04?=
+ =?us-ascii?Q?PT3YsqEzxciMJo21NtLQa636bManw/sQ5OfeG/XEhOnm3dBmAxlcibWo2Gwy?=
+ =?us-ascii?Q?PQhT/l3+gwZ9UvlUAqk/702RkdgB5g99lut918xhoEro64er3+uTGuzRN6Yx?=
+ =?us-ascii?Q?RFP0ydF5DaOPcTuLg4ElRFdxbFPB8y8jb5yiqlzJ1tMg/M/im1BIfHvafsUT?=
+ =?us-ascii?Q?0AR+E8u9Iz7mufORLt/3zy8WMBQ97iVLZMYsBENS9UfqnoWFQRF2iP6RLsmt?=
+ =?us-ascii?Q?Xksp0HepwNO9aO+9I22GoIl82ufcOowp5Ajiz/Z64t4X+0KZIpAMghtrw9Xu?=
+ =?us-ascii?Q?CSR3D/BF/6XplSZCAfolxZb5nkZ2wEVOtl2d40NuvJQBb+V/6sI4cQ84/V3G?=
+ =?us-ascii?Q?aq6ukKsU5COnZRTiqS3bREHgVJsIbEC9d8eVKo+t4kWJKFI+R23G7VS2BWdv?=
+ =?us-ascii?Q?rNYGkVp8lDezAM3j+klctVfyyifkCCjBovw4LExcvDL1qrOc/elec4FCrOO1?=
+ =?us-ascii?Q?preOJce5B41JifvCPL5pdmcjs2MNyrHYCVlNPVAkd0rn2Xx6Y0XdjT51Mkon?=
+ =?us-ascii?Q?ZOeo1tVoMAeHDnSMEgXv4UTyPqBOTz3ngC09p/z2WGaayU9eT6j+1G+Pbbak?=
+ =?us-ascii?Q?L4tyEE1PoTlvT3+1q7/mu1WawBydsfNZszJm8gOMfjjz9O+96qB2Cad0sK3b?=
+ =?us-ascii?Q?shaol4H1IPxMdBxgHU79oupRhJJInRmaWeYHAUUDb+mWdWdEXWseMZ01fSmj?=
+ =?us-ascii?Q?dY+DU3oCHXRJFs66QXYuKSkc8T2Am023WbP+ZYbBN4vfamiM/4hBz8TqMq/t?=
+ =?us-ascii?Q?LlrHLXXbbQ04BJgRgpdp85IaaIc+ohyyDP1ZzrU9c+66OpSkcx2S9f7AyQ5Q?=
+ =?us-ascii?Q?2eu+v+MMvRXyGGY/qS8BHHzZPBWKHacseNMtEVGV5JPqwwoHlw9tgudphXt+?=
+ =?us-ascii?Q?1t0QhCtCphuzg4tLAKvmPld62ietJUd1DRVoIYrOGXGXWf2LAIdl7i9LpiTS?=
+ =?us-ascii?Q?ZslcmbUVkp47hqvRKAz4mIeDSrUi0RwRSVlSn+BDGVogbw=3D=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4883f0db-9364-4c38-d748-08d98e743be4
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Oct 2021 18:06:52.3512
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: nWpcrWM34DbcoN0qVAAuLMW7ANAuRNGkVGogOzidXiXSOQTqrhlh4QCyoTeiwttL
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5239
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 20, 2021, Brijesh Singh wrote:
-> When SEV-SNP is enabled in the guest, the hardware places restrictions on
-> all memory accesses based on the contents of the RMP table. When hardware
-> encounters RMP check failure caused by the guest memory access it raises
-> the #NPF. The error code contains additional information on the access
-> type. See the APM volume 2 for additional information.
+On Wed, Oct 13, 2021 at 12:47:07PM +0300, Yishai Hadas wrote:
+> Trap device RESET and update state accordingly, it's done by registering
+> the matching callbacks.
 > 
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> ---
->  arch/x86/kvm/svm/sev.c | 76 ++++++++++++++++++++++++++++++++++++++++++
->  arch/x86/kvm/svm/svm.c | 14 +++++---
->  arch/x86/kvm/svm/svm.h |  1 +
->  3 files changed, 87 insertions(+), 4 deletions(-)
+> Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
+> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+>  drivers/vfio/pci/mlx5/main.c | 17 ++++++++++++++++-
+>  1 file changed, 16 insertions(+), 1 deletion(-)
 > 
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 65b578463271..712e8907bc39 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -3651,3 +3651,79 @@ void sev_post_unmap_gfn(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn, int token)
+> diff --git a/drivers/vfio/pci/mlx5/main.c b/drivers/vfio/pci/mlx5/main.c
+> index e36302b444a6..8fe44ed13552 100644
+> +++ b/drivers/vfio/pci/mlx5/main.c
+> @@ -613,6 +613,19 @@ static const struct vfio_device_ops mlx5vf_pci_ops = {
+>  	.match = vfio_pci_core_match,
+>  };
 >  
->  	srcu_read_unlock(&sev->psc_srcu, token);
->  }
-> +
-> +void handle_rmp_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code)
+> +static void mlx5vf_reset_done(struct vfio_pci_core_device *core_vdev)
 > +{
-> +	int rmp_level, npt_level, rc, assigned;
-
-Really silly nit: can you use 'r' or 'ret' instead of 'rc'?  Outside of the
-emulator, which should never be the gold standard for code ;-), 'rc' isn't used
-in x86 KVM.
-
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 3784d389247b..3ba62f21b113 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -1933,15 +1933,21 @@ static int pf_interception(struct kvm_vcpu *vcpu)
->  static int npf_interception(struct kvm_vcpu *vcpu)
->  {
->  	struct vcpu_svm *svm = to_svm(vcpu);
-> +	int rc;
->  
->  	u64 fault_address = svm->vmcb->control.exit_info_2;
->  	u64 error_code = svm->vmcb->control.exit_info_1;
->  
->  	trace_kvm_page_fault(fault_address, error_code);
-> -	return kvm_mmu_page_fault(vcpu, fault_address, error_code,
-> -			static_cpu_has(X86_FEATURE_DECODEASSISTS) ?
-> -			svm->vmcb->control.insn_bytes : NULL,
-> -			svm->vmcb->control.insn_len);
-> +	rc = kvm_mmu_page_fault(vcpu, fault_address, error_code,
-> +				static_cpu_has(X86_FEATURE_DECODEASSISTS) ?
-> +				svm->vmcb->control.insn_bytes : NULL,
-> +				svm->vmcb->control.insn_len);
+> +	struct mlx5vf_pci_core_device *mvdev = container_of(
+> +			core_vdev, struct mlx5vf_pci_core_device,
+> +			core_device);
 > +
-> +	if (error_code & PFERR_GUEST_RMP_MASK)
+> +	mvdev->vmig.vfio_dev_state = VFIO_DEVICE_STATE_RUNNING;
 
-Don't think it will matter in the end, but shouldn't this consult 'rc' before
-diving into RMP handling?
+This should hold the state mutex too
 
-> +		handle_rmp_page_fault(vcpu, fault_address, error_code);
-
-Similar to my comments on the PSC patches, I think this is backwards.  The MMU
-should provide the control logic to convert between private and shared, and vendor
-code should only get involved when there are side effects from the conversion.
-
-Once I've made a dent in my review backlog, I'll fiddle with this and some of the
-other MMU interactions, and hopefully come up with a workable sketch for the MMU
-stuff.  Yell at me if you haven't gotten an update by Wednesday or so.
+Jason
