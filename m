@@ -2,138 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8B9ED42C42E
-	for <lists+kvm@lfdr.de>; Wed, 13 Oct 2021 16:56:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A234442C431
+	for <lists+kvm@lfdr.de>; Wed, 13 Oct 2021 16:56:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237966AbhJMO6J (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Oct 2021 10:58:09 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:35396 "EHLO
+        id S238590AbhJMO6N (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Oct 2021 10:58:13 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:35424 "EHLO
         galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238168AbhJMO5v (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Oct 2021 10:57:51 -0400
-Message-ID: <20211013145322.921388806@linutronix.de>
+        with ESMTP id S237413AbhJMO5w (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Oct 2021 10:57:52 -0400
+Message-ID: <20211013145322.973518954@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1634136947;
+        s=2020; t=1634136948;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         references:references; bh=wypfrIc22n4P4BWKy9qrRd+6CEMC66XrchNc4B3EwM0=;
-        b=Nzf2emAetc3c+xVxxJ2N3JfaDbZ1FBxkTHjpZAQLmG5VmF3p2+wM7IE8Sd07KRek4qGGK9
-        XjeHIyqjPJs0d4pXPLJmhnS1b0b0ACpx6t/ZrX4cMaS4Dxp3F2PZ1G64fuJdsgOsVRicTI
-        SwIWkUOFZ9P/7Iz7EocGjF78Dv+GMOQ2MRGcpdhW9ik93HGTG2WUjd7JZyJY1VAxohSHSc
-        VggVuJDuJpk/uQv3kq0HFFNfgy7UUowI80ZOeCr4ba2w9OaSIyMjBbnRBCw/Uvr25f8O2a
-        rt4ewTKa/jEk6CIBwFRFnNpaPobOE8hdA7Qysv4F+K/h1osevx4vJvybmB7g/Q==
+         references:references; bh=0Q+9WUCgebhBn6q9AbgpLS1YKzFFGoHVdAWxJSIgEHM=;
+        b=zDplXaNvJYF/IEJmvHvQwnvYSfHZgzZ3KgWeSp7JoFFUGGKKmRy29fQgM8MRI0Pk7mKKq6
+        kJKTzfqL184zKng6zcMpD1UPnmOwPexndBgNuh7fGYyhUZzxEWaVH6VrqZlAkcNBJoC5jD
+        dLE4+gsW+j8ZOPj4Vim75pGLc4hLZaXywYYkmdvBeegkCZg4EH0+wpa4oMopcBoeq+CAJ4
+        k/5uQfGFcAe4kgSKkdS3nHa+FIvZN/CGh2HljpgqdzHoT6B5ROIw6N/lN1QTPwxaJ4iQ9+
+        1PRAUI0hsLCR4sRFp+ysEZD3WPvn/73ys20+RMIu2MzWQPEYwExIW1vhOfncPQ==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1634136947;
+        s=2020e; t=1634136948;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         references:references; bh=wypfrIc22n4P4BWKy9qrRd+6CEMC66XrchNc4B3EwM0=;
-        b=wL2JS7qWGZgsgDWRvqXqnUHVnFJdDmMnp7/QzGOTk+G0KIjSW/YW9SaiC35pgoElbbhGcZ
-        IENnL4Y9cAG8wABA==
+         references:references; bh=0Q+9WUCgebhBn6q9AbgpLS1YKzFFGoHVdAWxJSIgEHM=;
+        b=UODfQDhDAiVFz5uXhUpQ+rdAXzapQdjqAKZGmyuiNTs18pf3c8n4o+6NoE+iBcI2KLLFr+
+        cR0AhvQO8eUWezAg==
 From:   Thomas Gleixner <tglx@linutronix.de>
 To:     LKML <linux-kernel@vger.kernel.org>
 Cc:     x86@kernel.org, "Chang S. Bae" <chang.seok.bae@intel.com>,
         Dave Hansen <dave.hansen@linux.intel.com>,
         Arjan van de Ven <arjan@linux.intel.com>,
         kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Subject: [patch 14/21] x86/fpu: Add size and mask information to fpstate
+Subject: [patch 15/21] x86/fpu: Use fpstate::size
 References: <20211013142847.120153383@linutronix.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Date:   Wed, 13 Oct 2021 16:55:46 +0200 (CEST)
+Date:   Wed, 13 Oct 2021 16:55:48 +0200 (CEST)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add state size and feature mask information to the fpstate container. This
-will be used for runtime checks with the upcoming support for dynamically
-enabled features and dynamically sized buffers. That avoids conditionals
-all over the place as the required information is accessible for both
-default and extended buffers.
+Make use of fpstate::size in various places which require the buffer size
+information for sanity checks or memcpy() sizing.
 
 Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
 ---
- arch/x86/include/asm/fpu/types.h |   12 ++++++++++++
- arch/x86/kernel/fpu/core.c       |    6 ++++++
- arch/x86/kernel/fpu/init.c       |    9 +++++++++
- arch/x86/kernel/fpu/xstate.c     |    3 +++
- 4 files changed, 30 insertions(+)
+ arch/x86/kernel/fpu/core.c   |   13 ++++++-------
+ arch/x86/kernel/fpu/signal.c |    7 +++----
+ 2 files changed, 9 insertions(+), 11 deletions(-)
 
---- a/arch/x86/include/asm/fpu/types.h
-+++ b/arch/x86/include/asm/fpu/types.h
-@@ -310,6 +310,18 @@ union fpregs_state {
- };
- 
- struct fpstate {
-+	/* @kernel_size: The size of the kernel register image */
-+	unsigned int		size;
-+
-+	/* @user_size: The size in non-compacted UABI format */
-+	unsigned int		user_size;
-+
-+	/* @xfeatures:		xfeatures for which the storage is sized */
-+	u64			xfeatures;
-+
-+	/* @user_xfeatures:	xfeatures valid in UABI buffers */
-+	u64			user_xfeatures;
-+
- 	/* @regs: The register state union for all supported formats */
- 	union fpregs_state		regs;
- 
 --- a/arch/x86/kernel/fpu/core.c
 +++ b/arch/x86/kernel/fpu/core.c
-@@ -342,6 +342,12 @@ void fpstate_reset(struct fpu *fpu)
- {
- 	/* Set the fpstate pointer to the default fpstate */
- 	fpu->fpstate = &fpu->__fpstate;
-+
-+	/* Initialize sizes and feature masks */
-+	fpu->fpstate->size		= fpu_kernel_xstate_size;
-+	fpu->fpstate->user_size		= fpu_user_xstate_size;
-+	fpu->fpstate->xfeatures		= xfeatures_mask_all;
-+	fpu->fpstate->user_xfeatures	= xfeatures_mask_uabi();
- }
+@@ -166,13 +166,12 @@ void fpu_swap_kvm_fpu(struct fpu *save,
+ 	fpregs_lock();
  
- #if IS_ENABLED(CONFIG_KVM)
---- a/arch/x86/kernel/fpu/init.c
-+++ b/arch/x86/kernel/fpu/init.c
-@@ -212,6 +212,14 @@ static void __init fpu__init_system_xsta
+ 	if (save) {
+-		if (test_thread_flag(TIF_NEED_FPU_LOAD)) {
+-			memcpy(&save->fpstate->regs,
+-			       &current->thread.fpu.fpstate->regs,
+-			       fpu_kernel_xstate_size);
+-		} else {
++		struct fpstate *fpcur = current->thread.fpu.fpstate;
++
++		if (test_thread_flag(TIF_NEED_FPU_LOAD))
++			memcpy(&save->fpstate->regs, &fpcur->regs, fpcur->size);
++		else
+ 			save_fpregs_to_fpstate(save);
+-		}
  	}
  
- 	fpu_user_xstate_size = fpu_kernel_xstate_size;
-+	fpstate_reset(&current->thread.fpu);
-+}
-+
-+static void __init fpu__init_init_fpstate(void)
-+{
-+	/* Bring init_fpstate size and features up to date */
-+	init_fpstate.size		= fpu_kernel_xstate_size;
-+	init_fpstate.xfeatures		= xfeatures_mask_all;
- }
+ 	if (rstor) {
+@@ -398,7 +397,7 @@ int fpu_clone(struct task_struct *dst)
+ 	fpregs_lock();
+ 	if (test_thread_flag(TIF_NEED_FPU_LOAD)) {
+ 		memcpy(&dst_fpu->fpstate->regs, &src_fpu->fpstate->regs,
+-		       fpu_kernel_xstate_size);
++		       dst_fpu->fpstate->size);
+ 	} else {
+ 		save_fpregs_to_fpstate(dst_fpu);
+ 	}
+--- a/arch/x86/kernel/fpu/signal.c
++++ b/arch/x86/kernel/fpu/signal.c
+@@ -313,15 +313,13 @@ static bool restore_fpregs_from_user(voi
+ static bool __fpu_restore_sig(void __user *buf, void __user *buf_fx,
+ 			      bool ia32_fxstate)
+ {
+-	int state_size = fpu_kernel_xstate_size;
+ 	struct task_struct *tsk = current;
+ 	struct fpu *fpu = &tsk->thread.fpu;
+ 	struct user_i387_ia32_struct env;
++	bool success, fx_only = false;
+ 	union fpregs_state *fpregs;
++	unsigned int state_size;
+ 	u64 user_xfeatures = 0;
+-	bool fx_only = false;
+-	bool success;
+-
  
- /*
-@@ -233,4 +241,5 @@ void __init fpu__init_system(struct cpui
- 	fpu__init_system_xstate_size_legacy();
- 	fpu__init_system_xstate();
- 	fpu__init_task_struct_size();
-+	fpu__init_init_fpstate();
- }
---- a/arch/x86/kernel/fpu/xstate.c
-+++ b/arch/x86/kernel/fpu/xstate.c
-@@ -720,6 +720,7 @@ static void __init fpu__init_disable_sys
- 	xfeatures_mask_all = 0;
- 	cr4_clear_bits(X86_CR4_OSXSAVE);
- 	setup_clear_cpu_cap(X86_FEATURE_XSAVE);
-+	fpstate_reset(&current->thread.fpu);
- }
+ 	if (use_xsave()) {
+ 		struct _fpx_sw_bytes fx_sw_user;
+@@ -334,6 +332,7 @@ static bool __fpu_restore_sig(void __use
+ 		user_xfeatures = fx_sw_user.xfeatures;
+ 	} else {
+ 		user_xfeatures = XFEATURE_MASK_FPSSE;
++		state_size = fpu->fpstate->size;
+ 	}
  
- /*
-@@ -792,6 +793,8 @@ void __init fpu__init_system_xstate(void
- 	if (err)
- 		goto out_disable;
- 
-+	fpstate_reset(&current->thread.fpu);
-+
- 	/*
- 	 * Update info used for ptrace frames; use standard-format size and no
- 	 * supervisor xstates:
+ 	if (likely(!ia32_fxstate)) {
 
