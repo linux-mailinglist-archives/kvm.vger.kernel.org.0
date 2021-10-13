@@ -2,152 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7B52742C439
-	for <lists+kvm@lfdr.de>; Wed, 13 Oct 2021 16:56:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BEE8C42C447
+	for <lists+kvm@lfdr.de>; Wed, 13 Oct 2021 16:58:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238354AbhJMO6a (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Oct 2021 10:58:30 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:35462 "EHLO
-        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238334AbhJMO6B (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Oct 2021 10:58:01 -0400
-Message-ID: <20211013145323.285696382@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1634136957;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         references:references; bh=1C1rPf7NVgZwm5o/B8NVWJ5bZQaS4NDUuXblws5cGwI=;
-        b=XeyxWzpHFDA/b/D67cS7bRkWvUMmTjWBvMb/xZnANmZkbvV9f+ouwfIPQ2MYHbKCNXhU8J
-        pZg3H0QdNHLMJHjAcSdQ2teC5Bebb5sX5qgnjeTEeV3JkexpD0Qf1ttux2ej9a1P/TaXFh
-        8q5Y0ZGGsgQioSUDnebplK6eBljV8hfDey7506Rn/CEk6FU7iTI2ERFRnsvRuy6AR1Bqr4
-        EjlaYhu96f52cvJy0I7cXCe03PWNZNZEw1Qt7GyZA9MVdSVKR9vjthfY2iPOeefOTwJgsW
-        jqTeebKyxTQmvbWYh/j8khisRqD6x8uuCJD10O5Jxz4VQ1omQL5qLa4jyavIVQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1634136957;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         references:references; bh=1C1rPf7NVgZwm5o/B8NVWJ5bZQaS4NDUuXblws5cGwI=;
-        b=5kar4zVy3b4jB631a4qzi5gxpLOb5cTnhqB9perPNiQEQ+a5h5A2BhK3qUXtNZ0xQkDIdB
-        OkYXpQtixoF/9JDQ==
-From:   Thomas Gleixner <tglx@linutronix.de>
-To:     LKML <linux-kernel@vger.kernel.org>
-Cc:     x86@kernel.org, "Chang S. Bae" <chang.seok.bae@intel.com>,
+        id S237470AbhJMPAe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Oct 2021 11:00:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56338 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237931AbhJMPA0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Oct 2021 11:00:26 -0400
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFBB0C0613F0
+        for <kvm@vger.kernel.org>; Wed, 13 Oct 2021 07:57:26 -0700 (PDT)
+Received: by mail-pl1-x62d.google.com with SMTP id l6so1977815plh.9
+        for <kvm@vger.kernel.org>; Wed, 13 Oct 2021 07:57:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=uDYijPr0Yh2iWrykg/fgeR/p6benxlh+9aTXBd8BpcE=;
+        b=Ewin6Nh1ACTbNkr1rqmz4UrYtZseZlwquysPfl7+mjcL5lj1bIpCP/WSrMM9vJO+cu
+         xrHOBubB4TaSxkRl6Zepq++NXNgX42LPrx4YjBDfrZB/cVz6cG/6Qw7gL1pM92dmemNb
+         HEjHdzSSTA4q6CMVdPKCG7ezPzOEYYok/NFTrUiG+tJvwWaP6IyH7qSfbMNUX1itPT2a
+         vlm5Wy4OBOJvp9GrvG13f5Yoeqh0XeEUOpFQWsBbaDca+TURLj5yctViM1GSMN7sZtom
+         YfkwD0EpIwdxO46OCaoOFWk44v7//t9PunuIwcf9MgPo5xuL8/EGCuDZZyvxdTMB0ghf
+         9Ayw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=uDYijPr0Yh2iWrykg/fgeR/p6benxlh+9aTXBd8BpcE=;
+        b=VmFn2P7wwUXR/TSgBGx6vN0OyXDnj9fiCznKjiP8od+ZYlxRG6jFYmwcz+j8UZeHr1
+         ppcx5nzUc36+Zs1XYjO7YtU5Ejuz2VwQo8uflVlUTddIPRizYDwRcdhy30WFbzuQADmp
+         KYPxlb9q3ToPZA2ErrXftdhc6/1hEPEu+w8DkQ2+36XE4eWHr098aTDwbdJGbrbkwXTO
+         hG7aR9j5wFHXIS4A+7nzxvGaoyB5nj7SOXWYC/KUWLMtVzsjfxBltM6ev+F0uv5ZZA6D
+         FtYtqLUCcSa1xNeSIY2sDM4ds0lJW0JqKdDfL9AXQx3STNzOKhKGTKii3sw+m8mowsrI
+         aXXQ==
+X-Gm-Message-State: AOAM5314T9RD2sMaoUPWd2QVe3gasbx/+Sf/8eRpQqywFPR9s4PJV4vt
+        7HCAMppmAt2cWYc/jLn8uAEfRQ==
+X-Google-Smtp-Source: ABdhPJzeuUeO0jTkof/GqyMsBMDNyN3NpY7hogLcEpA27/uxAGnEK7i4RrxYWRE8Q4gySw5dA35SQw==
+X-Received: by 2002:a17:90b:1645:: with SMTP id il5mr13877422pjb.158.1634137045914;
+        Wed, 13 Oct 2021 07:57:25 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id u24sm14136669pfm.81.2021.10.13.07.57.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Oct 2021 07:57:25 -0700 (PDT)
+Date:   Wed, 13 Oct 2021 14:57:21 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Borislav Petkov <bp@alien8.de>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        LKML <linux-kernel@vger.kernel.org>, x86@kernel.org,
+        "Chang S. Bae" <chang.seok.bae@intel.com>,
         Dave Hansen <dave.hansen@linux.intel.com>,
         Arjan van de Ven <arjan@linux.intel.com>,
         kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Subject: [patch 21/21] x86/fpu/signal: Use fpstate for size and features
-References: <20211013142847.120153383@linutronix.de>
+Subject: Re: [patch 14/31] x86/fpu: Replace KVMs homebrewn FPU copy from user
+Message-ID: <YWbz0ayrpoxbBo5U@google.com>
+References: <20211011215813.558681373@linutronix.de>
+ <20211011223611.129308001@linutronix.de>
+ <YWW/PEQyQAwS9/qv@zn.tnic>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Date:   Wed, 13 Oct 2021 16:55:57 +0200 (CEST)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YWW/PEQyQAwS9/qv@zn.tnic>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-For dynamically enabled features it's required to get the features which
-are enabled for that context when restoring from sigframe.
+On Tue, Oct 12, 2021, Borislav Petkov wrote:
+> On Tue, Oct 12, 2021 at 02:00:19AM +0200, Thomas Gleixner wrote:
+> > --- a/arch/x86/include/asm/fpu/api.h
+> > +++ b/arch/x86/include/asm/fpu/api.h
+> > @@ -116,4 +116,7 @@ extern void fpu_init_fpstate_user(struct
+> >  /* KVM specific functions */
+> >  extern void fpu_swap_kvm_fpu(struct fpu *save, struct fpu *rstor, u64 restore_mask);
+> >  
+> > +struct kvm_vcpu;
+> > +extern int fpu_copy_kvm_uabi_to_vcpu(struct fpu *fpu, const void *buf, u64 xcr0, u32 *pkru);
+> > +
+> >  #endif /* _ASM_X86_FPU_API_H */
+> > --- a/arch/x86/kernel/fpu/core.c
+> > +++ b/arch/x86/kernel/fpu/core.c
+> > @@ -174,7 +174,43 @@ void fpu_swap_kvm_fpu(struct fpu *save,
+> >  	fpregs_unlock();
+> >  }
+> >  EXPORT_SYMBOL_GPL(fpu_swap_kvm_fpu);
+> > -#endif
+> > +
+> > +int fpu_copy_kvm_uabi_to_vcpu(struct fpu *fpu, const void *buf, u64 xcr0,
+> > +			      u32 *vpkru)
+> 
+> Right, except that there's no @vcpu in the args of that function. I
+> guess you could call it
+> 
+> fpu_copy_kvm_uabi_to_buf()
+> 
+> and that @buf can be
+> 
+> vcpu->arch.guest_fpu
 
-The same applies for all signal frame size calculations.
+But the existing @buf is the userspace pointer, which semantically makes sense
+because the userspace pointer is the "buffer" and the destination @fpu (and @prku)
+is vCPU state, not a buffer.
 
-Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
----
- arch/x86/kernel/fpu/signal.c |   31 +++++++++++++++++++------------
- 1 file changed, 19 insertions(+), 12 deletions(-)
+That said, I also struggled with the lack of @vcpu.  What about prepending vcpu_
+to fpu and to pkru?  E.g.
 
---- a/arch/x86/kernel/fpu/signal.c
-+++ b/arch/x86/kernel/fpu/signal.c
-@@ -41,7 +41,7 @@ static inline bool check_xstate_in_sigfr
- 	/* Check for the first magic field and other error scenarios. */
- 	if (fx_sw->magic1 != FP_XSTATE_MAGIC1 ||
- 	    fx_sw->xstate_size < min_xstate_size ||
--	    fx_sw->xstate_size > fpu_user_xstate_size ||
-+	    fx_sw->xstate_size > current->thread.fpu.fpstate->user_size ||
- 	    fx_sw->xstate_size > fx_sw->extended_size)
- 		goto setfx;
- 
-@@ -230,11 +230,11 @@ bool copy_fpstate_to_sigframe(void __use
- 	return true;
- }
- 
--static int __restore_fpregs_from_user(void __user *buf, u64 xrestore,
--				      bool fx_only)
-+static int __restore_fpregs_from_user(void __user *buf, u64 ufeatures,
-+				      u64 xrestore, bool fx_only)
- {
- 	if (use_xsave()) {
--		u64 init_bv = xfeatures_mask_uabi() & ~xrestore;
-+		u64 init_bv = ufeatures & ~xrestore;
- 		int ret;
- 
- 		if (likely(!fx_only))
-@@ -265,7 +265,8 @@ static bool restore_fpregs_from_user(voi
- retry:
- 	fpregs_lock();
- 	pagefault_disable();
--	ret = __restore_fpregs_from_user(buf, xrestore, fx_only);
-+	ret = __restore_fpregs_from_user(buf, fpu->fpstate->user_xfeatures,
-+					 xrestore, fx_only);
- 	pagefault_enable();
- 
- 	if (unlikely(ret)) {
-@@ -425,10 +426,11 @@ static bool __fpu_restore_sig(void __use
- 	return success;
- }
- 
--static inline int xstate_sigframe_size(void)
-+static inline unsigned int xstate_sigframe_size(struct fpstate *fpstate)
- {
--	return use_xsave() ? fpu_user_xstate_size + FP_XSTATE_MAGIC2_SIZE :
--			fpu_user_xstate_size;
-+	unsigned int size = fpstate->user_size;
-+
-+	return use_xsave() ? size + FP_XSTATE_MAGIC2_SIZE : size;
- }
- 
- /*
-@@ -436,17 +438,19 @@ static inline int xstate_sigframe_size(v
-  */
- bool fpu__restore_sig(void __user *buf, int ia32_frame)
- {
--	unsigned int size = xstate_sigframe_size();
- 	struct fpu *fpu = &current->thread.fpu;
- 	void __user *buf_fx = buf;
- 	bool ia32_fxstate = false;
- 	bool success = false;
-+	unsigned int size;
- 
- 	if (unlikely(!buf)) {
- 		fpu__clear_user_states(fpu);
- 		return true;
- 	}
- 
-+	size = xstate_sigframe_size(fpu->fpstate);
-+
- 	ia32_frame &= (IS_ENABLED(CONFIG_X86_32) ||
- 		       IS_ENABLED(CONFIG_IA32_EMULATION));
- 
-@@ -481,7 +485,7 @@ unsigned long
- fpu__alloc_mathframe(unsigned long sp, int ia32_frame,
- 		     unsigned long *buf_fx, unsigned long *size)
- {
--	unsigned long frame_size = xstate_sigframe_size();
-+	unsigned long frame_size = xstate_sigframe_size(current->thread.fpu.fpstate);
- 
- 	*buf_fx = sp = round_down(sp - frame_size, 64);
- 	if (ia32_frame && use_fxsr()) {
-@@ -494,9 +498,12 @@ fpu__alloc_mathframe(unsigned long sp, i
- 	return sp;
- }
- 
--unsigned long fpu__get_fpstate_size(void)
-+unsigned long __init fpu__get_fpstate_size(void)
- {
--	unsigned long ret = xstate_sigframe_size();
-+	unsigned long ret = fpu_user_xstate_size;
-+
-+	if (use_xsave())
-+		ret += FP_XSTATE_MAGIC2_SIZE;
- 
- 	/*
- 	 * This space is needed on (most) 32-bit kernels, or when a 32-bit
-
+  int fpu_copy_kvm_uabi_to_vcpu(struct fpu *vcpu_fpu, const void *buf, u64 xcr0,
+  				u32 *vcpu_pkru)
