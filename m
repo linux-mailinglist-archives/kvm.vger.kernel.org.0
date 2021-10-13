@@ -2,115 +2,229 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0048342BCEC
-	for <lists+kvm@lfdr.de>; Wed, 13 Oct 2021 12:36:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C693142BCDD
+	for <lists+kvm@lfdr.de>; Wed, 13 Oct 2021 12:34:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232260AbhJMKiY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Oct 2021 06:38:24 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:56038 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229711AbhJMKiX (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 13 Oct 2021 06:38:23 -0400
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 19D9Hdwq023947;
-        Wed, 13 Oct 2021 06:36:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=3dv+nI4cVM2cDTN+xOP9NOBj5m+MfJ0LJkWBEis7Nbc=;
- b=iF1QTfZeiO4ZjVQhplXRC/55+6XMPlL0LA77hqXu9+Ylu6MT5as5kaW2vr9rrpjzh5yC
- U8xFY+0nBO16VweWSKSjxHGkfAOoyKYDc2DE8gbVbYoJdqKdDcgunnp88ssF+RDM/svS
- dE+4guHDrQuKnj4AuLiy++ls+L+BxqFtIoqyppdBNRWh7KcW7ulfe/ISLGo0hEchwisq
- /ZiVwjnAwnr7A/3tXGrY6GL1r4hE4tuRdXuhMznTssBttC7CKn5XU7byhD5ntOEuPEBn
- c06NNxHFjNJcabHTxBPldLVB33yqK5CdNi6S8szG7x4icyIVuJ21XZfbXKF4EPw/puIK XA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3bnpw70svr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 13 Oct 2021 06:36:20 -0400
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 19DAE7QW011060;
-        Wed, 13 Oct 2021 06:36:20 -0400
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3bnpw70sv8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 13 Oct 2021 06:36:20 -0400
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 19DAaC68018721;
-        Wed, 13 Oct 2021 10:36:17 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma06ams.nl.ibm.com with ESMTP id 3bk2bjhu5u-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 13 Oct 2021 10:36:17 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 19DAUTrw51708364
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 13 Oct 2021 10:30:29 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 84DFE11C069;
-        Wed, 13 Oct 2021 10:36:07 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CB9E211C071;
-        Wed, 13 Oct 2021 10:36:06 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.145.0.81])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 13 Oct 2021 10:36:06 +0000 (GMT)
-Date:   Wed, 13 Oct 2021 12:32:00 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, david@redhat.com,
-        thuth@redhat.com, seiden@linux.ibm.com
-Subject: Re: [kvm-unit-tests PATCH 1/2] lib: s390x: Fix PSW constant
-Message-ID: <20211013123200.19c55ea0@p-imbrenda>
-In-Reply-To: <20211013102722.17160-2-frankja@linux.ibm.com>
-References: <20211013102722.17160-1-frankja@linux.ibm.com>
-        <20211013102722.17160-2-frankja@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        id S231755AbhJMKgB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Oct 2021 06:36:01 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:37891 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229495AbhJMKf6 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 13 Oct 2021 06:35:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1634121234;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=pzLsV5yTu/utMelbzLwI9yEtwyuVG0oIoHRj6CowHME=;
+        b=cXLrIWvFp1Lrt8w1l4hrkBi19wXfK3KvshDfW9nLBemQvO+T+qJ6XwilDAMZVrlimUzCCS
+        I16m1/3PTYMIcnhYDIIIKb3c4ROaFFaZV0D5Q1EByEwCMIInF1scFCVPffvWxWLQPPwx5q
+        ANsBqKplFz4wq/VyDvsSQn8f3/tjFsE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-484-RHOIo6ZIOHyoQCpu12yIkQ-1; Wed, 13 Oct 2021 06:33:51 -0400
+X-MC-Unique: RHOIo6ZIOHyoQCpu12yIkQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4C8AE801AA7;
+        Wed, 13 Oct 2021 10:33:50 +0000 (UTC)
+Received: from t480s.redhat.com (unknown [10.39.194.27])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1F4FC5D9D5;
+        Wed, 13 Oct 2021 10:33:30 +0000 (UTC)
+From:   David Hildenbrand <david@redhat.com>
+To:     qemu-devel@nongnu.org
+Cc:     David Hildenbrand <david@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        Ani Sinha <ani@anisinha.ca>, Peter Xu <peterx@redhat.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+        kvm@vger.kernel.org
+Subject: [PATCH RFC 00/15] virtio-mem: Expose device memory via separate memslots
+Date:   Wed, 13 Oct 2021 12:33:15 +0200
+Message-Id: <20211013103330.26869-1-david@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 9f7NJMbl69UEumKVCU9MkCKzJSvZBCb5
-X-Proofpoint-GUID: msGbpa8nG6Y4udeCmjb5tX_5tHGcBUMr
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
- definitions=2021-10-13_03,2021-10-13_01,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 mlxscore=0
- malwarescore=0 mlxlogscore=999 clxscore=1015 phishscore=0 suspectscore=0
- bulkscore=0 lowpriorityscore=0 priorityscore=1501 impostorscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2109230001 definitions=main-2110130071
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 13 Oct 2021 10:27:21 +0000
-Janosch Frank <frankja@linux.ibm.com> wrote:
+Based-on: 20211011175346.15499-1-david@redhat.com
 
-> Somehow the ";" got into that patch and now complicates compilation.
-> Let's remove it and put the constant in braces.
+A virtio-mem device is represented by a single large RAM memory region
+backed by a single large mmap.
 
-ouch
+Right now, we map that complete memory region into guest physical addres
+space, resulting in a very large memory mapping, KVM memory slot, ...
+although only a small amount of memory might actually be exposed to the VM.
 
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+For example, when starting a VM with a 1 TiB virtio-mem device that only
+exposes little device memory (e.g., 1 GiB) towards the VM initialliy,
+in order to hotplug more memory later, we waste a lot of memory on metadata
+for KVM memory slots (> 2 GiB!) and accompanied bitmaps. Although some
+optimizations in KVM are being worked on to reduce this metadata overhead
+on x86-64 in some cases, it remains a problem with nested VMs and there are
+other reasons why we would want to reduce the total memory slot to a
+reasonable minimum.
 
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
->  lib/s390x/asm/arch_def.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
-> index b34aa792..40626d72 100644
-> --- a/lib/s390x/asm/arch_def.h
-> +++ b/lib/s390x/asm/arch_def.h
-> @@ -53,7 +53,7 @@ struct psw {
->  #define PSW_MASK_PSTATE			0x0001000000000000UL
->  #define PSW_MASK_EA			0x0000000100000000UL
->  #define PSW_MASK_BA			0x0000000080000000UL
-> -#define PSW_MASK_64			PSW_MASK_BA | PSW_MASK_EA;
-> +#define PSW_MASK_64			(PSW_MASK_BA | PSW_MASK_EA)
->  
->  #define CTL0_LOW_ADDR_PROT		(63 - 35)
->  #define CTL0_EDAT			(63 - 40)
+We want to:
+a) Reduce the metadata overhead, including bitmap sizes inside KVM but also
+   inside QEMU KVM code where possible.
+b) Not always expose all device-memory to the VM, to reduce the attack
+   surface of malicious VMs without using userfaultfd.
+
+So instead, expose the RAM memory region not by a single large mapping
+(consuming one memslot) but instead by multiple mappings, each consuming
+one memslot. To do that, we divide the RAM memory region via aliases into
+separate parts and only map the aliases into a device container we actually
+need. We have to make sure that QEMU won't silently merge the memory
+sections corresponding to the aliases (and thereby also memslots),
+otherwise we lose atomic updates with KVM and vhost-user, which we deeply
+care about when adding/removing memory. Further, to get memslot accounting
+right, such merging is better avoided.
+
+Within the memslots, virtio-mem can (un)plug memory in smaller granularity
+dynamically. So memslots are a pure optimization to tackle a) and b) above.
+
+Memslots are right now mapped once they fall into the usable device region
+(which grows/shrinks on demand right now either when requesting to
+ hotplug more memory or during/after reboots). In the future, with
+VIRTIO_MEM_F_UNPLUGGED_INACCESSIBLE, we'll be able to (un)map aliases even
+more dynamically when (un)plugging device blocks.
+
+
+Adding a 500GiB virtio-mem device and not hotplugging any memory results in:
+    0000000140000000-000001047fffffff (prio 0, i/o): device-memory
+      0000000140000000-0000007e3fffffff (prio 0, i/o): virtio-mem-memslots
+
+Requesting the VM to consume 2 GiB results in (note: the usable region size
+is bigger than 2 GiB, so 3 * 1 GiB memslots are required):
+    0000000140000000-000001047fffffff (prio 0, i/o): device-memory
+      0000000140000000-0000007e3fffffff (prio 0, i/o): virtio-mem-memslots
+        0000000140000000-000000017fffffff (prio 0, ram): alias virtio-mem-memslot-0 @mem0 0000000000000000-000000003fffffff
+        0000000180000000-00000001bfffffff (prio 0, ram): alias virtio-mem-memslot-1 @mem0 0000000040000000-000000007fffffff
+        00000001c0000000-00000001ffffffff (prio 0, ram): alias virtio-mem-memslot-2 @mem0 0000000080000000-00000000bfffffff
+
+Requesting the VM to consume 20 GiB results in:
+    0000000140000000-000001047fffffff (prio 0, i/o): device-memory
+      0000000140000000-0000007e3fffffff (prio 0, i/o): virtio-mem-memslots
+        0000000140000000-000000017fffffff (prio 0, ram): alias virtio-mem-memslot-0 @mem0 0000000000000000-000000003fffffff
+        0000000180000000-00000001bfffffff (prio 0, ram): alias virtio-mem-memslot-1 @mem0 0000000040000000-000000007fffffff
+        00000001c0000000-00000001ffffffff (prio 0, ram): alias virtio-mem-memslot-2 @mem0 0000000080000000-00000000bfffffff
+        0000000200000000-000000023fffffff (prio 0, ram): alias virtio-mem-memslot-3 @mem0 00000000c0000000-00000000ffffffff
+        0000000240000000-000000027fffffff (prio 0, ram): alias virtio-mem-memslot-4 @mem0 0000000100000000-000000013fffffff
+        0000000280000000-00000002bfffffff (prio 0, ram): alias virtio-mem-memslot-5 @mem0 0000000140000000-000000017fffffff
+        00000002c0000000-00000002ffffffff (prio 0, ram): alias virtio-mem-memslot-6 @mem0 0000000180000000-00000001bfffffff
+        0000000300000000-000000033fffffff (prio 0, ram): alias virtio-mem-memslot-7 @mem0 00000001c0000000-00000001ffffffff
+        0000000340000000-000000037fffffff (prio 0, ram): alias virtio-mem-memslot-8 @mem0 0000000200000000-000000023fffffff
+        0000000380000000-00000003bfffffff (prio 0, ram): alias virtio-mem-memslot-9 @mem0 0000000240000000-000000027fffffff
+        00000003c0000000-00000003ffffffff (prio 0, ram): alias virtio-mem-memslot-10 @mem0 0000000280000000-00000002bfffffff
+        0000000400000000-000000043fffffff (prio 0, ram): alias virtio-mem-memslot-11 @mem0 00000002c0000000-00000002ffffffff
+        0000000440000000-000000047fffffff (prio 0, ram): alias virtio-mem-memslot-12 @mem0 0000000300000000-000000033fffffff
+        0000000480000000-00000004bfffffff (prio 0, ram): alias virtio-mem-memslot-13 @mem0 0000000340000000-000000037fffffff
+        00000004c0000000-00000004ffffffff (prio 0, ram): alias virtio-mem-memslot-14 @mem0 0000000380000000-00000003bfffffff
+        0000000500000000-000000053fffffff (prio 0, ram): alias virtio-mem-memslot-15 @mem0 00000003c0000000-00000003ffffffff
+        0000000540000000-000000057fffffff (prio 0, ram): alias virtio-mem-memslot-16 @mem0 0000000400000000-000000043fffffff
+        0000000580000000-00000005bfffffff (prio 0, ram): alias virtio-mem-memslot-17 @mem0 0000000440000000-000000047fffffff
+        00000005c0000000-00000005ffffffff (prio 0, ram): alias virtio-mem-memslot-18 @mem0 0000000480000000-00000004bfffffff
+        0000000600000000-000000063fffffff (prio 0, ram): alias virtio-mem-memslot-19 @mem0 00000004c0000000-00000004ffffffff
+        0000000640000000-000000067fffffff (prio 0, ram): alias virtio-mem-memslot-20 @mem0 0000000500000000-000000053fffffff
+
+Requesting the VM to consume 5 GiB and rebooting (note: usable region size
+will change during reboots) results in:
+    0000000140000000-000001047fffffff (prio 0, i/o): device-memory
+      0000000140000000-0000007e3fffffff (prio 0, i/o): virtio-mem-memslots
+        0000000140000000-000000017fffffff (prio 0, ram): alias virtio-mem-memslot-0 @mem0 0000000000000000-000000003fffffff
+        0000000180000000-00000001bfffffff (prio 0, ram): alias virtio-mem-memslot-1 @mem0 0000000040000000-000000007fffffff
+        00000001c0000000-00000001ffffffff (prio 0, ram): alias virtio-mem-memslot-2 @mem0 0000000080000000-00000000bfffffff
+        0000000200000000-000000023fffffff (prio 0, ram): alias virtio-mem-memslot-3 @mem0 00000000c0000000-00000000ffffffff
+        0000000240000000-000000027fffffff (prio 0, ram): alias virtio-mem-memslot-4 @mem0 0000000100000000-000000013fffffff
+        0000000280000000-00000002bfffffff (prio 0, ram): alias virtio-mem-memslot-5 @mem0 0000000140000000-000000017fffffff
+
+
+In addition to other factors, we limit the number of memslots to 1024 per
+devices and the size of one memslot to at least 1 GiB. So only a 1 TiB
+virtio-mem device could consume 1024 memslots in the "worst" case. To
+calculate a memslot limit for a device, we use a heuristic based on all
+available memslots for memory devices and the percentage of
+"device size":"total memory device area size". Users can further limit
+the maximum number of memslots that will be used by a device by setting
+the "max-memslots" property. It's expected to be set to "0" (auto) in most
+setups.
+
+In recent setups (e.g., KVM with ~32k memslots, vhost-user with ~4k
+memslots after this series), we'll get the biggest benefit. In special
+setups (e.g., older KVM, vhost kernel with 64 memslots), we'll get some
+benefit -- the individual memslots will be bigger.
+
+Future work:
+- vhost-user and libvhost-user optimizations for handling more memslots
+  more efficiently.
+
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>
+Cc: Ani Sinha <ani@anisinha.ca>
+Cc: Peter Xu <peterx@redhat.com>
+Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>
+Cc: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Cc: kvm@vger.kernel.org
+
+David Hildenbrand (15):
+  memory: Drop mapping check from
+    memory_region_get_ram_discard_manager()
+  kvm: Return number of free memslots
+  vhost: Return number of free memslots
+  memory: Allow for marking memory region aliases unmergeable
+  vhost: Don't merge unmergeable memory sections
+  memory-device: Move memory_device_check_addable() directly into
+    memory_device_pre_plug()
+  memory-device: Generalize memory_device_used_region_size()
+  memory-device: Support memory devices that consume a variable number
+    of memslots
+  vhost: Respect reserved memslots for memory devices when realizing a
+    vhost device
+  virtio-mem: Set the RamDiscardManager for the RAM memory region
+    earlier
+  virtio-mem: Fix typo in virito_mem_intersect_memory_section() function
+    name
+  virtio-mem: Expose device memory via separate memslots
+  vhost-user: Increase VHOST_USER_MAX_RAM_SLOTS to 496 with
+    CONFIG_VIRTIO_MEM
+  libvhost-user: Increase VHOST_USER_MAX_RAM_SLOTS to 4096
+  virtio-mem: Set "max-memslots" to 0 (auto) for the 6.2 machine
+
+ accel/kvm/kvm-all.c                       |  24 ++-
+ accel/stubs/kvm-stub.c                    |   4 +-
+ hw/core/machine.c                         |   1 +
+ hw/mem/memory-device.c                    | 167 +++++++++++++++---
+ hw/virtio/vhost-stub.c                    |   2 +-
+ hw/virtio/vhost-user.c                    |   7 +-
+ hw/virtio/vhost.c                         |  17 +-
+ hw/virtio/virtio-mem-pci.c                |  22 +++
+ hw/virtio/virtio-mem.c                    | 202 ++++++++++++++++++++--
+ include/exec/memory.h                     |  23 +++
+ include/hw/mem/memory-device.h            |  32 ++++
+ include/hw/virtio/vhost.h                 |   2 +-
+ include/hw/virtio/virtio-mem.h            |  29 +++-
+ include/sysemu/kvm.h                      |   2 +-
+ softmmu/memory.c                          |  35 +++-
+ stubs/qmp_memory_device.c                 |   5 +
+ subprojects/libvhost-user/libvhost-user.h |   7 +-
+ 17 files changed, 499 insertions(+), 82 deletions(-)
+
+-- 
+2.31.1
 
