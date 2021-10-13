@@ -2,88 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3691442C28B
-	for <lists+kvm@lfdr.de>; Wed, 13 Oct 2021 16:14:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9D1FA42C2A4
+	for <lists+kvm@lfdr.de>; Wed, 13 Oct 2021 16:15:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231664AbhJMOQ3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Oct 2021 10:16:29 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:35096 "EHLO
-        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232784AbhJMOQ2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Oct 2021 10:16:28 -0400
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1634134464;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=oTULMduNNUBrYE2pUBH5u5ARaYINOjFVTdI34T1eb3w=;
-        b=U7tiF4hLEGfKi3fOAjcBdVos9ec6UuI9Jg1E1PRm8Xu51xvTy3j9C3hkjs7+Wk7vDald/f
-        /YXRdsKf7L5AX6T2EGwBQ/I9hgArd7sNNVsGGHxlnLjw2ZZop17Ef1g6Dy2W30/F34/FkF
-        NUMHWp3xEsVuwucFWsUiCO38MtM+/yM53LKjKnM/GUkg9kW0xOd+wKI4+3zC/WzveZrCP5
-        fv9yGAA6hLA6nAMki1p5WYnN2cJRqx9KS7+Q3JYcCUSlBZjXGnMxzfrJhw806cr59HUKzc
-        EVz6X2BVhjKolr3ukXqMydTN5qdNSbfM8Pb/c/vJ6PDri/eQF2iFoSiCro8KIQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1634134464;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=oTULMduNNUBrYE2pUBH5u5ARaYINOjFVTdI34T1eb3w=;
-        b=c1rS5cpGrwEOwvQfezQhulwWW6u/9mRr8ABGmsQd6kapBvkiI7D5DxTLo/uHxUarSGapcz
-        VsU/6K+zuq7HlPBA==
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        "Liu, Jing2" <jing2.liu@intel.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Cc:     the arch/x86 maintainers <x86@kernel.org>,
-        "Bae, Chang Seok" <chang.seok.bae@intel.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Arjan van de Ven <arjan@linux.intel.com>,
-        kvm list <kvm@vger.kernel.org>,
-        "Nakajima, Jun" <jun.nakajima@intel.com>,
-        Jing Liu <jing2.liu@linux.intel.com>,
-        Sean Christopherson <seanjc@google.com>
-Subject: Re: [patch 13/31] x86/fpu: Move KVMs FPU swapping to FPU core
-In-Reply-To: <df3af1c2-fe93-ea21-56e5-4d70d08e55f2@redhat.com>
-References: <20211011215813.558681373@linutronix.de>
- <20211011223611.069324121@linutronix.de>
- <8a5762ab-18d5-56f8-78a6-c722a2f387c5@redhat.com>
- <BYAPR11MB3256B39E2A34A09FF64ECC5BA9B79@BYAPR11MB3256.namprd11.prod.outlook.com>
- <0962c143-2ff9-f157-d258-d16659818e80@redhat.com>
- <BYAPR11MB325676AAA8A0785AF992A2B9A9B79@BYAPR11MB3256.namprd11.prod.outlook.com>
- <da47ba42-b61e-d236-2c1c-9c5504e48091@redhat.com>
- <d673e736-0a72-4549-816d-b755227ea797@www.fastmail.com>
- <df3af1c2-fe93-ea21-56e5-4d70d08e55f2@redhat.com>
-Date:   Wed, 13 Oct 2021 16:14:23 +0200
-Message-ID: <87y26x811c.ffs@tglx>
+        id S235884AbhJMORW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Oct 2021 10:17:22 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37692 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S236499AbhJMORU (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 13 Oct 2021 10:17:20 -0400
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 19DCfDGr008993;
+        Wed, 13 Oct 2021 10:15:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : from : to : cc : references : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=927uTHklffc9dfdHbdG9ELcykUv/pH6sdbKZxfLYaq4=;
+ b=r7Ff4icN74LG46HQg/xRf7N9UdYoZmUzCSN0uyUbPmnxA2SggKVT32MojQ/+q8/+QPTm
+ IeyDTvZAExnNgj5UkLBdprIOucxkPcrB8r+xKR1FgomiJHx0nvIyisGyIRtoUVUfxsir
+ 9fa1dMkuktydMOfJXcJI9CXMvyefaxF02NBKl5IrCuqceQjGs1zwFCGFnBqRheiYTCxD
+ 2/VxjrJ9TO0GcnuiFG5foxLTjl1nx+l6/VY//XXxwNc2eCzmU4eNw282NjQxDiGlfEzC
+ r7OwgPRcPla+B7/k5Mvoh1RwgnMcrEGsLKgxURZi3jZyUZkW+1SlsUGJNIdqLCadoBjv iA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3bnpf3dwpu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 13 Oct 2021 10:15:16 -0400
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 19DDikg6008975;
+        Wed, 13 Oct 2021 10:15:15 -0400
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3bnpf3dwnv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 13 Oct 2021 10:15:15 -0400
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 19DEDVHf026977;
+        Wed, 13 Oct 2021 14:15:14 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma04ams.nl.ibm.com with ESMTP id 3bk2qabkp4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 13 Oct 2021 14:15:13 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 19DE9NQd58655222
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 13 Oct 2021 14:09:23 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1EAF04C05A;
+        Wed, 13 Oct 2021 14:15:01 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9251C4C058;
+        Wed, 13 Oct 2021 14:15:00 +0000 (GMT)
+Received: from [9.145.94.172] (unknown [9.145.94.172])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 13 Oct 2021 14:15:00 +0000 (GMT)
+Message-ID: <0d7bd4a7-48df-b515-f7c0-9248ba20e154@linux.ibm.com>
+Date:   Wed, 13 Oct 2021 16:14:59 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [kvm-unit-tests PATCH v3 4/9] lib: s390x: uv: Add UVC_ERR_DEBUG
+ switch
+Content-Language: en-US
+From:   Janosch Frank <frankja@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
+        david@redhat.com, thuth@redhat.com, seiden@linux.ibm.com,
+        scgl@linux.ibm.com
+References: <20211007085027.13050-1-frankja@linux.ibm.com>
+ <20211007085027.13050-5-frankja@linux.ibm.com>
+In-Reply-To: <20211007085027.13050-5-frankja@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: J5tjhsoj_tSMBMN33O0xSVrJZhIMn3u0
+X-Proofpoint-ORIG-GUID: e-IROQ979PRd_BhevQTyUyk3hKSMdCdS
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
+ definitions=2021-10-13_05,2021-10-13_02,2020-04-07_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ priorityscore=1501 clxscore=1015 lowpriorityscore=0 mlxscore=0
+ phishscore=0 adultscore=0 bulkscore=0 suspectscore=0 malwarescore=0
+ spamscore=0 mlxlogscore=999 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2109230001 definitions=main-2110130096
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 13 2021 at 14:26, Paolo Bonzini wrote:
+On 10/7/21 10:50, Janosch Frank wrote:
+> Every time something goes wrong in a way we don't expect, we need to
+> add debug prints to some UVC to get the unexpected return code.
+> 
+> Let's just put the printing behind a macro so we can enable it if
+> needed via a simple switch.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> ---
+>   lib/s390x/asm/uv.h | 12 ++++++++++++
+>   1 file changed, 12 insertions(+)
+> 
+> diff --git a/lib/s390x/asm/uv.h b/lib/s390x/asm/uv.h
+> index 2f099553..16db086d 100644
+> --- a/lib/s390x/asm/uv.h
+> +++ b/lib/s390x/asm/uv.h
+> @@ -12,6 +12,11 @@
+>   #ifndef _ASMS390X_UV_H_
+>   #define _ASMS390X_UV_H_
+>   
+> +/* Enables printing of command code and return codes for failed UVCs */
+> +#ifndef UVC_ERR_DEBUG
+> +#define UVC_ERR_DEBUG	0
+> +#endif
+> +
+>   #define UVC_RC_EXECUTED		0x0001
+>   #define UVC_RC_INV_CMD		0x0002
+>   #define UVC_RC_INV_STATE	0x0003
+> @@ -194,6 +199,13 @@ static inline int uv_call_once(unsigned long r1, unsigned long r2)
+>   		: [cc] "=d" (cc)
+>   		: [r1] "a" (r1), [r2] "a" (r2)
+>   		: "memory", "cc");
+> +
+> +	if (UVC_ERR_DEBUG && cc)
 
-> On 13/10/21 12:14, Andy Lutomirski wrote:
->>> I think it's simpler to always wait for #NM, it will only happen
->>> once per vCPU.  In other words, even if the guest clears XFD before
->>> it generates #NM, the guest_fpu's XFD remains nonzero and an #NM
->>> vmexit is possible.  After #NM the guest_fpu's XFD is zero; then
->>> passthrough can happen and the #NM vmexit trap can be disabled.
->>
->> This will stop being at all optimal when Intel inevitably adds
->> another feature that uses XFD.  In the potentially infinite window in
->> which the guest manages XFD and #NM on behalf of its userspace and
->> when the guest allocates the other hypothetical feature, all the #NMs
->> will have to be trapped by KVM.
->
-> The reason is that it's quite common to simply let the guest see all 
-> CPUID bits that KVM knows about.
+That needs to check cc == 1...
 
-On fleets the cpu features exposed to guests matter a lot to ensure
-migratability and I would be surprised when such a feature would just
-be universally available to anyone.
+> +		printf("UV call error: call %x rc %x rrc %x\n",
+> +		       ((struct uv_cb_header *)r2)->cmd,
+> +		       ((struct uv_cb_header *)r2)->rc,
+> +		       ((struct uv_cb_header *)r2)->rrc);
+> +
+>   	return cc;
+>   }
+>   
+> 
 
-Thanks,
-
-        tglx
