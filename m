@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C2ADF42CAC4
-	for <lists+kvm@lfdr.de>; Wed, 13 Oct 2021 22:16:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CD5E642CCB3
+	for <lists+kvm@lfdr.de>; Wed, 13 Oct 2021 23:20:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229767AbhJMUS6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Oct 2021 16:18:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46528 "EHLO
+        id S230207AbhJMVWT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Oct 2021 17:22:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60910 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229675AbhJMUS5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Oct 2021 16:18:57 -0400
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68D84C061749
-        for <kvm@vger.kernel.org>; Wed, 13 Oct 2021 13:16:54 -0700 (PDT)
-Received: by mail-pf1-x435.google.com with SMTP id o133so3459762pfg.7
-        for <kvm@vger.kernel.org>; Wed, 13 Oct 2021 13:16:54 -0700 (PDT)
+        with ESMTP id S230134AbhJMVWS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Oct 2021 17:22:18 -0400
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 196ACC061746
+        for <kvm@vger.kernel.org>; Wed, 13 Oct 2021 14:20:15 -0700 (PDT)
+Received: by mail-pj1-x1034.google.com with SMTP id q10-20020a17090a1b0a00b001a076a59640so4344359pjq.0
+        for <kvm@vger.kernel.org>; Wed, 13 Oct 2021 14:20:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=5yhRH7ZIJi4Rd6WTmMMqH8HhEZQLNXc5e/9FRtAhMOI=;
-        b=RPhDaWnpurS4y7tVtRZqV2m7TT/CvyExa80zu6eKOfi+Uxq6OHkuPWKuzBu6usovry
-         1r5rS6U2o3QdPYKrrldUS3PG46VJM5XJ2jtd33eGezktpZLITFB62sVzB1xF+QWmQaYs
-         4lw6stQbe55qE7qBX+H95iI+3MJ7iWrKq5aThQoS+CDOFbq9aHteipRRBoAwV4uM/anD
-         EZ86zFuK/mnrh84e5NkEyIliobHoUE58WGdSy5se484Rd0wh2bLKfWmvsE6lHQ/99GMd
-         jfvaDnPWztORPtxmDG6KJGEGfMa2WvnYpQvEZrq/5p6G0eQupghkiidJ69V+q6DshQJJ
-         eHpQ==
+        bh=RGN5XybAu/ZhV4g4WKdQdjzcI3C7PMTK/Om4cnVrUpo=;
+        b=URyt4OiWOZC9rK5oCCWsfUHOqUulNfj8PNGEdBZtuq6KCLHghJJH1K2XFPqHe+8A7y
+         56MHd6S8jFcLp7x91lXskW43i/kaf10KdqkU+LjqEdBmY1cKnBADOUyg4E/e4bVlRSQp
+         sXUn2UHFAJtGCxOdV+33RGRos4gvcpAsM+/EJTmf+5mshqUfa6AWpZCOYewLATdcJgXI
+         TxHeqzIogq3Ec9tg0+7AUlZcDaZe7URCgnMuLvWHocz/izBx/kV3wTyYKYYLhxcPOZto
+         2M98Jb9p2C4x5nYV+q1yvkyuEtlMcPzrwMzIvIq0Trd1MB/16Mx/Re0M5DPMChi+vAnM
+         rtUw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=5yhRH7ZIJi4Rd6WTmMMqH8HhEZQLNXc5e/9FRtAhMOI=;
-        b=pH0WRqGMD/8qfU7BVVutwUgkhJDFY4Y8FTn89c2ZXT22GNapg/QCSMbSl17ZyB+4qW
-         0lu/COxwuCw3KpGW+hfJi4g4poMTAhNDgCRyfns0S2RCqFFHP2n4zxiULrfHVxCI/mJO
-         48WcxifTVxggGKyoUafs0mSv0EZFSjB5O7Ro1Ag+nrbJWw9jctEXCwXWVvYy+dqsshhD
-         Lj7Ok+tDwYSAaxYh4SoexTKypPUd7cl9lZiGWMzK6p71tH+HZacTucEeT6K/5ROEX9F8
-         RZnRkpuSVnSwshUhpR+qLRiKc2HW0SZeaMFx07ji1oCNjwg/In3O2zDlyFQ56Pdz73h/
-         1n/g==
-X-Gm-Message-State: AOAM532k8b69i3kHMu/vhk/q+mt9MBxlWo7aeismglu+Ra13npM2zKi/
-        B3aqeKJplVOExOh/fq1z9Vx2xA==
-X-Google-Smtp-Source: ABdhPJydTqRd+TbelV+KMJzjHnbhI2cqYnqRbRh8getW270LAhsuC1uWiMUAmXUve3gaAGCtai4VyQ==
-X-Received: by 2002:a63:7c5b:: with SMTP id l27mr393227pgn.227.1634156213632;
-        Wed, 13 Oct 2021 13:16:53 -0700 (PDT)
+        bh=RGN5XybAu/ZhV4g4WKdQdjzcI3C7PMTK/Om4cnVrUpo=;
+        b=2RQMDzxrR83tB8FzGL5jsj4uZsHYdbUXZdl9OXIB8C436b/uTqLYvw5NUWkfyl/a/t
+         l9kz1KgM1pujohU375749CERTzfikSAXLFBp+GRl65VtljkXnNRHAgQylPX/8AIHb7Uu
+         pNRkb8jNHGytDrVC6x/wKvrsQaqycbhk52WynK/kNn4Gx0faB/jv1o20hpfPJpyQqrjs
+         MjibrJxQOjcE342kpB5MrhtlZhbkpWwf3Nw2D5xIrspxudjbE5J/WAoQzSKCmIHiUAu0
+         VyY/b36W3u6THVayGCCOxD2IEZ/ohN3wIqCRh+sBGlXWn6DFcJFrpZyFOSH2pYlNTjeL
+         wAxQ==
+X-Gm-Message-State: AOAM533IWndVQLANp8fclWVK4Ili6GSHh4Bf/NzxZXTIc/QITRarSibO
+        FYy2T5yMftrl0otvwjS3IeYVnA==
+X-Google-Smtp-Source: ABdhPJychxbBPRopo44Q5l2xzCuClhpOoVGj+sul7kS1bgtgKxWbFsqery8BnwMw41xY+QTD3uOz7w==
+X-Received: by 2002:a17:90b:30d6:: with SMTP id hi22mr16321219pjb.4.1634160014413;
+        Wed, 13 Oct 2021 14:20:14 -0700 (PDT)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id y3sm334520pjg.7.2021.10.13.13.16.52
+        by smtp.gmail.com with ESMTPSA id u12sm414951pgi.21.2021.10.13.14.20.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Oct 2021 13:16:53 -0700 (PDT)
-Date:   Wed, 13 Oct 2021 20:16:49 +0000
+        Wed, 13 Oct 2021 14:20:13 -0700 (PDT)
+Date:   Wed, 13 Oct 2021 21:20:10 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Brijesh Singh <brijesh.singh@amd.com>
 Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
@@ -74,43 +74,27 @@ Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         "Kirill A . Shutemov" <kirill@shutemov.name>,
         Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
         marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH Part2 v5 39/45] KVM: SVM: Introduce ops for the post gfn
- map and unmap
-Message-ID: <YWc+sRwHxEmcZZxB@google.com>
+Subject: Re: [PATCH Part2 v5 34/45] KVM: SVM: Do not use long-lived GHCB map
+ while setting scratch area
+Message-ID: <YWdNisk78f5BVNv3@google.com>
 References: <20210820155918.7518-1-brijesh.singh@amd.com>
- <20210820155918.7518-40-brijesh.singh@amd.com>
- <YWYm/Gw8PbaAKBF0@google.com>
+ <20210820155918.7518-35-brijesh.singh@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YWYm/Gw8PbaAKBF0@google.com>
+In-Reply-To: <20210820155918.7518-35-brijesh.singh@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 13, 2021, Sean Christopherson wrote:
-> On Fri, Aug 20, 2021, Brijesh Singh wrote:
-> > When SEV-SNP is enabled in the guest VM, the guest memory pages can
-> > either be a private or shared. A write from the hypervisor goes through
-> > the RMP checks. If hardware sees that hypervisor is attempting to write
-> > to a guest private page, then it triggers an RMP violation #PF.
-> > 
-> > To avoid the RMP violation, add post_{map,unmap}_gfn() ops that can be
-> > used to verify that its safe to map a given guest page. Use the SRCU to
-> > protect against the page state change for existing mapped pages.
-> 
-> SRCU isn't protecting anything.  The synchronize_srcu_expedited() in the PSC code
-> forces it to wait for existing maps to go away, but it doesn't prevent new maps
-> from being created while the actual RMP updates are in-flight.  Most telling is
-> that the RMP updates happen _after_ the synchronize_srcu_expedited() call.
+On Fri, Aug 20, 2021, Brijesh Singh wrote:
+> The setup_vmgexit_scratch() function may rely on a long-lived GHCB
+> mapping if the GHCB shared buffer area was used for the scratch area.
+> In preparation for eliminating the long-lived GHCB mapping, always
+> allocate a buffer for the scratch area so it can be accessed without
+> the GHCB mapping.
 
-Argh, another goof on my part.  Rereading prior feedback, I see that I loosely
-suggested SRCU as a possible solution.  That was a bad, bad suggestion.  I think
-(hope) I made it offhand without really thinking it through.  SRCU can't work in
-this case, because the whole premise of Read-Copy-Update is that there can be
-multiple copies of the data.  That simply can't be true for the RMP as hardware
-operates on a single table.
-
-In the future, please don't hesitate to push back on and/or question suggestions,
-especially those that are made without concrete examples, i.e. are likely off the
-cuff.  My goal isn't to set you up for failure :-/
+Would it make sense to post this patch and the next (Remove the long-lived GHCB
+host map) in a separate mini-series?  It's needed for SNP, but AFAICT there's
+nothing that depends on SNP.  Getting this merged ahead of time would reduce the
+size of the SNP series by a smidge.
