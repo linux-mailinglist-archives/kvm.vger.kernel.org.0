@@ -2,216 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9803442B455
-	for <lists+kvm@lfdr.de>; Wed, 13 Oct 2021 06:48:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4C2B142B46B
+	for <lists+kvm@lfdr.de>; Wed, 13 Oct 2021 07:11:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232068AbhJMEue (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Oct 2021 00:50:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56464 "EHLO
+        id S229603AbhJMFNL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Oct 2021 01:13:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33096 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231635AbhJMEud (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Oct 2021 00:50:33 -0400
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF3E3C061570
-        for <kvm@vger.kernel.org>; Tue, 12 Oct 2021 21:48:29 -0700 (PDT)
-Received: by mail-pj1-x102f.google.com with SMTP id ls18-20020a17090b351200b001a00250584aso3462395pjb.4
-        for <kvm@vger.kernel.org>; Tue, 12 Oct 2021 21:48:29 -0700 (PDT)
+        with ESMTP id S230126AbhJMFNI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Oct 2021 01:13:08 -0400
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C2EBC061570
+        for <kvm@vger.kernel.org>; Tue, 12 Oct 2021 22:11:05 -0700 (PDT)
+Received: by mail-pj1-x1033.google.com with SMTP id oa4so1283941pjb.2
+        for <kvm@vger.kernel.org>; Tue, 12 Oct 2021 22:11:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=6UiNjqdn6cQd+ZVgitW5U2ThWAYr+h/7ydwszKNRfeQ=;
-        b=nzwS/la0l10TdQDUpS6EfK4tSOxmnO6gZczOW3XJ5ZU1nIPUAxwDNnB2z9hTGuVAMd
-         mgb1tQ19a6Q+2r5XVqtEliz2FNtZ0rqo+33A4Ivl95sb7AGy+SkTWs65NeWFnsFeMGwQ
-         Gm+fc045nNg6NXAFk81MgVtH5UXeBCqAChSCDJ7lgTot5LlSBW+ltZlSzumx/ddgxa00
-         WETV2eyglYrzjiruF6nPlraZeEumFm71fFy7p4X0qJiFUwjZi6k+fsDlxaW6m5bVCs7Q
-         uUOYlSZB4EzY6iUs0q82EBZOJP/57C1a05fC+DqTMLuOaApLNQJcSnSdg/hb/YuIyv7x
-         7oYQ==
+        bh=P8gf7IINw+jRwIt3X6fN4SZBz4OTW9W5HW6/ZYA0ZrQ=;
+        b=OJnnPOpYu7eJYXwdgr0zRBsIp/7JCoJdWnLex1e+Nc59Ox3JrNo/ipy44NWbdZ1Wij
+         cYg9Oe3IdKwjLZ3ccjWj/lfARUHUDGXHYczC1qcS8GhYxeGqNfAmOiqjRGIpNbWEKXa2
+         Qi9tEO86QIO9mq7K47Docwc+8w/vFa49WJ0i3X1YPZ8DwOrxIaJOvQhs4oTCjIw7XhMs
+         85rNypB1vqioXE/4YRebipGjt4G4OJKFB3ozkhVDBnROsdS2D888AzkaK6wai/y9wcPK
+         fKZlh7cJKDfsqEQisJ01cAjq66cHlSWqDJ4/mRmAC2HTJLmfX15DM2CV03Md2tO4vBCx
+         h8Xg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=6UiNjqdn6cQd+ZVgitW5U2ThWAYr+h/7ydwszKNRfeQ=;
-        b=XnLwCnigguTbzdONYXrpdc0CXF4/vLGbU+xOms7un0Xz7lp9dVXBh6SoopvdOnDqLo
-         LNsKnKQlKMxhg72M39mFdvP1BmuV+Eox6SXZTAlhsGmbqQeKCIP8Ef4EUIQikSXsH0YC
-         SLMhH1tkAl2rnzA5NjSFvEnZzXb6oxTyULnsoZVA8eUbCppfOehLNlEZcaSYOC9tRl7S
-         MRFVCvxgiP8iwr2xGIZ9F/ZqvKDxWtZrCdiDGWY6O+oceVBhZX/M4zvtJRRdTpg8YEOL
-         dqhqBWJ/WYYfdhY0nLrsHCrEFejbdyCJPClKRZvuFV8CPRoylT9jNTfKHrcYxksW2v/i
-         Kleg==
-X-Gm-Message-State: AOAM530qOuYuoM5PPoUy4HwfTLPtWG7A52LqZTvV3DptRMcKX/T+1r+a
-        oS/Q+XNP/jQsH2i1aJLzndSqaUTdLORR2LsEyfNUhg==
-X-Google-Smtp-Source: ABdhPJzQV44ZsRub96kp2SNXYmhtc2cOENMwhtRPwrRAakcpX1FISHL38AgFunXCxStCzrda6gvZVrPojmYrDWvjo7Y=
-X-Received: by 2002:a17:90b:38c3:: with SMTP id nn3mr11214221pjb.110.1634100509147;
- Tue, 12 Oct 2021 21:48:29 -0700 (PDT)
+        bh=P8gf7IINw+jRwIt3X6fN4SZBz4OTW9W5HW6/ZYA0ZrQ=;
+        b=SeCC/a15jKA372+Qk0FqdoxS60FsNKHNWeWPsHMJ6fax5NVYdGCXqrQgPwV4cCmZY4
+         Qw9Lt2R02V5E+OjMJB6E96SGaWF08jLL4uzwv+U2R+6FJb90Hq8einR/pD3kpb4bSYQ2
+         4Ln1YBMGSZo7/A+7Qk3rj7bVuTFzgPHZSUXPiPKyEfZpC59DvaWPAi+DaNxjUoN22iSE
+         ec9C92QqIdfeIZAliN7AMbPuhJn7DSMQ9Gn4LG+exMhelRU+/oudjlgLY/bjL4V6WoFz
+         tTKHP4iV474extpe0cfTJIjEmRfzUg2PLx2ilJ+G1drzHB9jm3dknQooc4lmnq3srmvx
+         hL1g==
+X-Gm-Message-State: AOAM532oOOw1GDDFjCxkR5Cy/1MKfurXRLtjfqB93v3lxEw9kD/DN5eg
+        M2xsjPTVyZ20k92kdZqSPPBbudBxPD3NBsTLTf0QiA==
+X-Google-Smtp-Source: ABdhPJzuE5GfZRyptpvG0d49NR7yBY6nXSth0Pf0CO5A5fn5OISFtomB4UlZSF8y0nx09KKkz3b+VnV54dmuG26Efq8=
+X-Received: by 2002:a17:902:c402:b0:13f:1c07:5a25 with SMTP id
+ k2-20020a170902c40200b0013f1c075a25mr24520082plk.38.1634101864597; Tue, 12
+ Oct 2021 22:11:04 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210923191610.3814698-1-oupton@google.com> <20210923191610.3814698-4-oupton@google.com>
- <CAAeT=FxXsJdnrQCr4m-LcADr=WX5pKEa2OdeTf3bRGM08iC3Uw@mail.gmail.com>
- <CAOQ_QshHDWWEw5BEu-uudFttP1pfJcKuQ-0D_xAkoHJRqYLq8Q@mail.gmail.com>
- <20211005133335.y4k5qv7d3g74nnzx@gator.home> <CAOQ_QsgwK=qyeaUtNJeZ1OWQwaFUAQcy6uopnDuyDA3Qyt7gmw@mail.gmail.com>
- <20211005190153.dc2befzcisvznxq5@gator.home>
-In-Reply-To: <20211005190153.dc2befzcisvznxq5@gator.home>
+References: <20210916181510.963449-1-oupton@google.com> <20210916181510.963449-6-oupton@google.com>
+In-Reply-To: <20210916181510.963449-6-oupton@google.com>
 From:   Reiji Watanabe <reijiw@google.com>
-Date:   Tue, 12 Oct 2021 21:48:13 -0700
-Message-ID: <CAAeT=FyA8uFK5WyK-_9-V93TzSLEhgmS6nRDg-i=ot1jLy+6bA@mail.gmail.com>
-Subject: Re: [PATCH v2 03/11] KVM: arm64: Encapsulate reset request logic in a
- helper function
-To:     Andrew Jones <drjones@redhat.com>
-Cc:     Oliver Upton <oupton@google.com>, kvmarm@lists.cs.columbia.edu,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <Alexandru.Elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
+Date:   Tue, 12 Oct 2021 22:10:48 -0700
+Message-ID: <CAAeT=Fwuy2TT75KmBMgHXkxt++BAc30EUaybkU_V-zix+2Q9zw@mail.gmail.com>
+Subject: Re: [PATCH v8 5/8] arm64: cpufeature: Enumerate support for FEAT_ECV
+ >= 0x2
+To:     Oliver Upton <oupton@google.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
         Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>,
-        kvm@vger.kernel.org
+        Sean Christopherson <seanjc@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        linux-arm-kernel@lists.infradead.org,
+        Jim Mattson <jmattson@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 5, 2021 at 12:02 PM Andrew Jones <drjones@redhat.com> wrote:
+On Thu, Sep 16, 2021 at 11:15 AM Oliver Upton <oupton@google.com> wrote:
 >
-> On Tue, Oct 05, 2021 at 08:05:02AM -0700, Oliver Upton wrote:
-> > Hi folks,
-> >
-> > On Tue, Oct 5, 2021 at 6:33 AM Andrew Jones <drjones@redhat.com> wrote:
-> > >
-> > > On Fri, Oct 01, 2021 at 09:10:14AM -0700, Oliver Upton wrote:
-> > > > On Thu, Sep 30, 2021 at 11:05 PM Reiji Watanabe <reijiw@google.com> wrote:
-> > > > >
-> > > > > On Thu, Sep 23, 2021 at 12:16 PM Oliver Upton <oupton@google.com> wrote:
-> > > > > >
-> > > > > > In its implementation of the PSCI function, KVM needs to request that a
-> > > > > > target vCPU resets before its next entry into the guest. Wrap the logic
-> > > > > > for requesting a reset in a function for later use by other implemented
-> > > > > > PSCI calls.
-> > > > > >
-> > > > > > No functional change intended.
-> > > > > >
-> > > > > > Signed-off-by: Oliver Upton <oupton@google.com>
-> > > > > > ---
-> > > > > >  arch/arm64/kvm/psci.c | 59 +++++++++++++++++++++++++------------------
-> > > > > >  1 file changed, 35 insertions(+), 24 deletions(-)
-> > > > > >
-> > > > > > diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
-> > > > > > index 310b9cb2b32b..bb59b692998b 100644
-> > > > > > --- a/arch/arm64/kvm/psci.c
-> > > > > > +++ b/arch/arm64/kvm/psci.c
-> > > > > > @@ -64,9 +64,40 @@ static inline bool kvm_psci_valid_affinity(unsigned long affinity)
-> > > > > >         return !(affinity & ~MPIDR_HWID_BITMASK);
-> > > > > >  }
-> > > > > >
-> > > > > > -static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
-> > > > > > +static void kvm_psci_vcpu_request_reset(struct kvm_vcpu *vcpu,
-> > > > > > +                                       unsigned long entry_addr,
-> > > > > > +                                       unsigned long context_id,
-> > > > > > +                                       bool big_endian)
-> > > > > >  {
-> > > > > >         struct vcpu_reset_state *reset_state;
-> > > > > > +
-> > > > > > +       lockdep_assert_held(&vcpu->kvm->lock);
-> > > > > > +
-> > > > > > +       reset_state = &vcpu->arch.reset_state;
-> > > > > > +       reset_state->pc = entry_addr;
-> > > > > > +
-> > > > > > +       /* Propagate caller endianness */
-> > > > > > +       reset_state->be = big_endian;
-> > > > > > +
-> > > > > > +       /*
-> > > > > > +        * NOTE: We always update r0 (or x0) because for PSCI v0.1
-> > > > > > +        * the general purpose registers are undefined upon CPU_ON.
-> > > > > > +        */
-> > > > > > +       reset_state->r0 = context_id;
-> > > > > > +
-> > > > > > +       WRITE_ONCE(reset_state->reset, true);
-> > > > > > +       kvm_make_request(KVM_REQ_VCPU_RESET, vcpu);
-> > > > > > +
-> > > > > > +       /*
-> > > > > > +        * Make sure the reset request is observed if the change to
-> > > > > > +        * power_state is observed.
-> > > > > > +        */
-> > > > > > +       smp_wmb();
-> > > > > > +       vcpu->arch.power_off = false;
-> > > > > > +}
-> > > > > > +
-> > > > > > +static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
-> > > > > > +{
-> > > > > >         struct kvm *kvm = source_vcpu->kvm;
-> > > > > >         struct kvm_vcpu *vcpu = NULL;
-> > > > > >         unsigned long cpu_id;
-> > > > > > @@ -90,29 +121,9 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
-> > > > > >                         return PSCI_RET_INVALID_PARAMS;
-> > > > > >         }
-> > > > > >
-> > > > > > -       reset_state = &vcpu->arch.reset_state;
-> > > > > > -
-> > > > > > -       reset_state->pc = smccc_get_arg2(source_vcpu);
-> > > > > > -
-> > > > > > -       /* Propagate caller endianness */
-> > > > > > -       reset_state->be = kvm_vcpu_is_be(source_vcpu);
-> > > > > > -
-> > > > > > -       /*
-> > > > > > -        * NOTE: We always update r0 (or x0) because for PSCI v0.1
-> > > > > > -        * the general purpose registers are undefined upon CPU_ON.
-> > > > > > -        */
-> > > > > > -       reset_state->r0 = smccc_get_arg3(source_vcpu);
-> > > > > > -
-> > > > > > -       WRITE_ONCE(reset_state->reset, true);
-> > > > > > -       kvm_make_request(KVM_REQ_VCPU_RESET, vcpu);
-> > > > > > -
-> > > > > > -       /*
-> > > > > > -        * Make sure the reset request is observed if the change to
-> > > > > > -        * power_state is observed.
-> > > > > > -        */
-> > > > > > -       smp_wmb();
-> > > > > > -
-> > > > > > -       vcpu->arch.power_off = false;
-> > > > > > +       kvm_psci_vcpu_request_reset(vcpu, smccc_get_arg2(source_vcpu),
-> > > > > > +                                   smccc_get_arg3(source_vcpu),
-> > > > > > +                                   kvm_vcpu_is_be(source_vcpu));
-> > > > > >         kvm_vcpu_wake_up(vcpu);
-> > > > > >
-> > > > > >         return PSCI_RET_SUCCESS;
-> > > > > > --
-> > > > > > 2.33.0.685.g46640cef36-goog
-> > > > >
-> > > > > Reviewed-by: Reiji Watanabe <reijiw@google.com>
-> > > > >
-> > > > > Not directly related to the patch, but the (original) code doesn't
-> > > > > do any sanity checking for the entry address although the PSCI spec says:
-> > > > >
-> > > > > "INVALID_ADDRESS is returned when the entry point address is known
-> > > > > by the implementation to be invalid, because it is in a range that
-> > > > > is known not to be available to the caller."
-> > > >
-> > > > Right, I had noticed the same but was a tad too lazy to address in
-> > > > this series :) Thanks for the review, Reji!
-> > > >
-> > >
-> > > KVM doesn't reserve any subrange within [0 - max_ipa), afaik. So all
-> > > we need to do is check 'entry_addr < max_ipa', right?
-> > >
-> >
-> > We could be a bit more pedantic and check if the IPA exists in a
-> > memory slot, seems like kvm_vcpu_is_visible_gfn() should do the trick.
-> >
-> > Thoughts?
+> Introduce a new cpucap to indicate if the system supports full enhanced
+> counter virtualization (i.e. ID_AA64MMFR0_EL1.ECV>=0x2).
 >
-> Are we sure that all emulated devices, nvram, etc. will always use a
-> memslot for regions that contain executable code? If there's any doubt,
-> then we can't be sure about non-memslot regions within the max_ipa range.
-> That'd be up to userspace.
+> Signed-off-by: Oliver Upton <oupton@google.com>
+> ---
+>  arch/arm64/include/asm/sysreg.h |  1 +
+>  arch/arm64/kernel/cpufeature.c  | 10 ++++++++++
+>  arch/arm64/tools/cpucaps        |  1 +
+>  3 files changed, 12 insertions(+)
+>
+> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> index b268082d67ed..3fa6b091384d 100644
+> --- a/arch/arm64/include/asm/sysreg.h
+> +++ b/arch/arm64/include/asm/sysreg.h
+> @@ -849,6 +849,7 @@
+>  #define ID_AA64MMFR0_ASID_8            0x0
+>  #define ID_AA64MMFR0_ASID_16           0x2
+>
+> +#define ID_AA64MMFR0_ECV_PHYS          0x2
+>  #define ID_AA64MMFR0_TGRAN4_NI                 0xf
+>  #define ID_AA64MMFR0_TGRAN4_SUPPORTED_MIN      0x0
+>  #define ID_AA64MMFR0_TGRAN4_SUPPORTED_MAX      0x7
+> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+> index f8a3067d10c6..2f5042bb107c 100644
+> --- a/arch/arm64/kernel/cpufeature.c
+> +++ b/arch/arm64/kernel/cpufeature.c
+> @@ -2328,6 +2328,16 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+>                 .matches = has_cpuid_feature,
+>                 .min_field_value = 1,
+>         },
+> +       {
+> +               .desc = "Enhanced Counter Virtualization (Physical)",
+> +               .capability = ARM64_HAS_ECV2,
+> +               .type = ARM64_CPUCAP_SYSTEM_FEATURE,
+> +               .sys_reg = SYS_ID_AA64MMFR0_EL1,
+> +               .sign = FTR_UNSIGNED,
+> +               .field_pos = ID_AA64MMFR0_ECV_SHIFT,
+> +               .matches = has_cpuid_feature,
+> +               .min_field_value = ID_AA64MMFR0_ECV_PHYS,
+> +       },
+>         {},
+>  };
+>
+> diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
+> index 49305c2e6dfd..f73a30d5fb1c 100644
+> --- a/arch/arm64/tools/cpucaps
+> +++ b/arch/arm64/tools/cpucaps
+> @@ -18,6 +18,7 @@ HAS_CRC32
+>  HAS_DCPODP
+>  HAS_DCPOP
+>  HAS_E0PD
+> +HAS_ECV2
+>  HAS_EPAN
+>  HAS_GENERIC_AUTH
+>  HAS_GENERIC_AUTH_ARCH
+> --
 
-I'm sorry for the late response.
-IMHO, I would prefer Andrew's suggestion (check with the max_ipa).
+Reviewed-by: Reiji Watanabe <reijiw@google.com>
 
-It looks like instructions must always be in memslot for KVM/ARM looking
-at the current implementation (especially kvm_handle_guest_abort()).
-But, it doesn't necessarily mean the address is not invalid for the
-guest (could be valid for load/store) and it might be changed in
-the future.
-
+Personally, I would prefer a more descriptive name (e.g. ECV_PHYS)
+rather than ECV2 though.
 
 Thanks,
 Reiji
