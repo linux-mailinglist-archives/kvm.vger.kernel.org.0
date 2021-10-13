@@ -2,190 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C05D142BFAB
-	for <lists+kvm@lfdr.de>; Wed, 13 Oct 2021 14:18:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9A67742BFE4
+	for <lists+kvm@lfdr.de>; Wed, 13 Oct 2021 14:26:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232491AbhJMMUK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Oct 2021 08:20:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25299 "EHLO
+        id S232260AbhJMM2a (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Oct 2021 08:28:30 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50663 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231294AbhJMMUJ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 13 Oct 2021 08:20:09 -0400
+        by vger.kernel.org with ESMTP id S230196AbhJMM23 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 13 Oct 2021 08:28:29 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634127483;
+        s=mimecast20190719; t=1634127985;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=8uA+gFhUzMMrb5D5fxARTwQwcT+AEfWKWkQ0ooGMKj8=;
-        b=gcZphIhv1SUibhOpSsOSgz4m0cbJvHyEtd0kwtKyNGk7PlE0SU+JPX+FUmjzkGHkvuPJuI
-        RYeShTXWeJ1jx+SFek2K1Tc6X4vwuEpu4Q3Rv6491+05hOgYMfee2etkukNn00qGLGJeMY
-        ljgHBxDZGBTUGlUD8++dZn6sdjVlaG0=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-355-OMAhpDhEMM-TsRrAWk-3ow-1; Wed, 13 Oct 2021 08:18:02 -0400
-X-MC-Unique: OMAhpDhEMM-TsRrAWk-3ow-1
-Received: by mail-wr1-f72.google.com with SMTP id v15-20020adfa1cf000000b00160940b17a2so1795806wrv.19
-        for <kvm@vger.kernel.org>; Wed, 13 Oct 2021 05:18:02 -0700 (PDT)
+        bh=2Dqo/N7vzZrZZut/dmL8suAY/OFRSZSIXFt0zXfL1xY=;
+        b=KV+txcrzdVb2ij6aUO59Texkdwv1RTnKXpo1vWEZcSV4nzie3inWsI2b+gqn/a+AHcTyBb
+        weBKxLlsVwUGFE4ZjkoOmd/WpR8byb3gq7DdUuseNL5y8vOIGBHhD2CSFOL4nHmloW/bBv
+        eH4o3R+HDcbZjeo2C5WTI370hGVk6a8=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-489-WngXyu9NMO-o_KSwEdOVuA-1; Wed, 13 Oct 2021 08:26:24 -0400
+X-MC-Unique: WngXyu9NMO-o_KSwEdOVuA-1
+Received: by mail-ed1-f69.google.com with SMTP id r11-20020aa7cfcb000000b003d4fbd652b9so2044639edy.14
+        for <kvm@vger.kernel.org>; Wed, 13 Oct 2021 05:26:24 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=8uA+gFhUzMMrb5D5fxARTwQwcT+AEfWKWkQ0ooGMKj8=;
-        b=n0JvGWMBNeEP023DeEvM0t5+G4bElLBClQvonN441kLPjwayXVEAHXIU+qyQfFQ8Tz
-         gDla8hQjhv7COdZiNnAtfCXtfObK363nNHWBhapQkeeekS+SQBBA9mnUK6j+C9CGXe36
-         imgB4FlAmL0KkOddb5eyA4efHcLcq+XI91mdj8t4Bsz4ElFlqnZF31rl8zn7txT6nGHx
-         akCkS332AwL4NJbWOiuawt2zSXe4aZt+dYI1sILfjDp/T4BpftvjmaxAA+EbC/4abU3h
-         /YEADgrR4JkbVuV5QSghwggl6qY+fO1k5MAwA+7QMWAvczR304bK0U5vWLPPP8M6xAur
-         sSiw==
-X-Gm-Message-State: AOAM530dKXAuQJMZ6ZqESvA/PMQvhzsEC1Htnt9qXKj8R/XTYukxc6Vr
-        7rSx3CgIEg8YlMAwKbMMHxxR5ru5B/RICPIZM+yzlBo073Sh3ZEQFDxTeObkdyu7IZd9Tg84WUx
-        WA2o/geB9pUa7
-X-Received: by 2002:a7b:c30c:: with SMTP id k12mr12535247wmj.38.1634127481383;
-        Wed, 13 Oct 2021 05:18:01 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwFEzPqFQ+1qHznC4euH1QtbfXrvr/+t46tCqHwjpC6aqk2B2gJ30j5Cm2I+Hz0oA4zGN44UQ==
-X-Received: by 2002:a7b:c30c:: with SMTP id k12mr12535146wmj.38.1634127481076;
-        Wed, 13 Oct 2021 05:18:01 -0700 (PDT)
-Received: from redhat.com ([2.55.30.112])
-        by smtp.gmail.com with ESMTPSA id z1sm4104369wrt.94.2021.10.13.05.17.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Oct 2021 05:18:00 -0700 (PDT)
-Date:   Wed, 13 Oct 2021 08:17:49 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     David Hildenbrand <david@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, Jeff Dike <jdike@addtoit.com>,
-        Richard Weinberger <richard@nod.at>,
-        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Gonglei <arei.gonglei@huawei.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Sudeep Holla <sudeep.holla@arm.com>,
-        Cristian Marussi <cristian.marussi@arm.com>,
-        "Enrico Weigelt, metux IT consult" <info@metux.net>,
-        Viresh Kumar <vireshk@kernel.org>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Bartosz Golaszewski <brgl@bgdev.pl>,
-        David Airlie <airlied@linux.ie>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        Daniel Vetter <daniel@ffwll.ch>, Jie Deng <jie.deng@intel.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        Kalle Valo <kvalo@codeaurora.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Vishal Verma <vishal.l.verma@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Ohad Ben-Cohen <ohad@wizery.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Vivek Goyal <vgoyal@redhat.com>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        Eric Van Hensbergen <ericvh@gmail.com>,
-        Latchesar Ionkov <lucho@ionkov.net>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Anton Yakovlev <anton.yakovlev@opensynergy.com>,
-        Jaroslav Kysela <perex@perex.cz>,
-        Takashi Iwai <tiwai@suse.com>, linux-um@lists.infradead.org,
-        virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        linux-i2c@vger.kernel.org, iommu@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
-        nvdimm@lists.linux.dev, linux-remoteproc@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        v9fs-developer@lists.sourceforge.net, kvm@vger.kernel.org,
-        alsa-devel@alsa-project.org
-Subject: Re: [PATCH RFC] virtio: wrap config->reset calls
-Message-ID: <20211013081632-mutt-send-email-mst@kernel.org>
-References: <20211013105226.20225-1-mst@redhat.com>
- <2060bd96-5884-a1b5-9f29-7fe670dc088d@redhat.com>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=2Dqo/N7vzZrZZut/dmL8suAY/OFRSZSIXFt0zXfL1xY=;
+        b=Ee4a0jnViV6IUVIJusa808z/1bhqOaE5hMQmfZUNf5K11ehwC7HFNPCP8v/77MMGi2
+         H96UNc2BJfbWVLvZPmj+DTaFYFnuMM3lRQJ1lhImj4UHf0xpYHI7MQH36kc2AoFT3STu
+         iN64AVsnqu8M6ZWTOmyErReGMX9fAl8YpRhVwe8Kmlb8DDxx9Espuvd1KUMuHDTk07hO
+         Wn2w27h6MhVrsD7y2mKy93suXI9HzQQ3HhdEwPeInOol+/ingj8u0jBhrZHAn34DI/hw
+         /VYADGX4MGMmXHJqiU93VYfvKJcg34JPziw9kN+SbeTNZjS0efsaEZj462vLGtv2w1up
+         rHgw==
+X-Gm-Message-State: AOAM530BAhHs0jasl7WD5Gmq57nDU8RCYavdF3DVPRPBiw6h8DWVIMYE
+        bQ2iioHeLCc2Vxp7fvfpdNDKlOedEugSdX1vt2ONBWwLa6n/irubLiJgqYoFu/w5SZa4hlzSGR/
+        PeYeVWEMjwVn/
+X-Received: by 2002:a17:906:c7c1:: with SMTP id dc1mr41624366ejb.6.1634127983445;
+        Wed, 13 Oct 2021 05:26:23 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw+P5oSU5cLTLhqxDdez4dZhwJUIZbRtZ6U7YF8t/g6Ybvq5lbXJGfItLqFi3yQHvG7UiWhdQ==
+X-Received: by 2002:a17:906:c7c1:: with SMTP id dc1mr41624338ejb.6.1634127983236;
+        Wed, 13 Oct 2021 05:26:23 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id z8sm6683870ejd.94.2021.10.13.05.26.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 13 Oct 2021 05:26:21 -0700 (PDT)
+Message-ID: <df3af1c2-fe93-ea21-56e5-4d70d08e55f2@redhat.com>
+Date:   Wed, 13 Oct 2021 14:26:20 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2060bd96-5884-a1b5-9f29-7fe670dc088d@redhat.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [patch 13/31] x86/fpu: Move KVMs FPU swapping to FPU core
+Content-Language: en-US
+To:     Andy Lutomirski <luto@kernel.org>,
+        "Liu, Jing2" <jing2.liu@intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Cc:     the arch/x86 maintainers <x86@kernel.org>,
+        "Bae, Chang Seok" <chang.seok.bae@intel.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Arjan van de Ven <arjan@linux.intel.com>,
+        kvm list <kvm@vger.kernel.org>,
+        "Nakajima, Jun" <jun.nakajima@intel.com>,
+        Jing Liu <jing2.liu@linux.intel.com>,
+        Sean Christopherson <seanjc@google.com>
+References: <20211011215813.558681373@linutronix.de>
+ <20211011223611.069324121@linutronix.de>
+ <8a5762ab-18d5-56f8-78a6-c722a2f387c5@redhat.com>
+ <BYAPR11MB3256B39E2A34A09FF64ECC5BA9B79@BYAPR11MB3256.namprd11.prod.outlook.com>
+ <0962c143-2ff9-f157-d258-d16659818e80@redhat.com>
+ <BYAPR11MB325676AAA8A0785AF992A2B9A9B79@BYAPR11MB3256.namprd11.prod.outlook.com>
+ <da47ba42-b61e-d236-2c1c-9c5504e48091@redhat.com>
+ <d673e736-0a72-4549-816d-b755227ea797@www.fastmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <d673e736-0a72-4549-816d-b755227ea797@www.fastmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 13, 2021 at 01:03:46PM +0200, David Hildenbrand wrote:
-> On 13.10.21 12:55, Michael S. Tsirkin wrote:
-> > This will enable cleanups down the road.
-> > The idea is to disable cbs, then add "flush_queued_cbs" callback
-> > as a parameter, this way drivers can flush any work
-> > queued after callbacks have been disabled.
-> > 
-> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> > ---
-> >   arch/um/drivers/virt-pci.c                 | 2 +-
-> >   drivers/block/virtio_blk.c                 | 4 ++--
-> >   drivers/bluetooth/virtio_bt.c              | 2 +-
-> >   drivers/char/hw_random/virtio-rng.c        | 2 +-
-> >   drivers/char/virtio_console.c              | 4 ++--
-> >   drivers/crypto/virtio/virtio_crypto_core.c | 8 ++++----
-> >   drivers/firmware/arm_scmi/virtio.c         | 2 +-
-> >   drivers/gpio/gpio-virtio.c                 | 2 +-
-> >   drivers/gpu/drm/virtio/virtgpu_kms.c       | 2 +-
-> >   drivers/i2c/busses/i2c-virtio.c            | 2 +-
-> >   drivers/iommu/virtio-iommu.c               | 2 +-
-> >   drivers/net/caif/caif_virtio.c             | 2 +-
-> >   drivers/net/virtio_net.c                   | 4 ++--
-> >   drivers/net/wireless/mac80211_hwsim.c      | 2 +-
-> >   drivers/nvdimm/virtio_pmem.c               | 2 +-
-> >   drivers/rpmsg/virtio_rpmsg_bus.c           | 2 +-
-> >   drivers/scsi/virtio_scsi.c                 | 2 +-
-> >   drivers/virtio/virtio.c                    | 5 +++++
-> >   drivers/virtio/virtio_balloon.c            | 2 +-
-> >   drivers/virtio/virtio_input.c              | 2 +-
-> >   drivers/virtio/virtio_mem.c                | 2 +-
-> >   fs/fuse/virtio_fs.c                        | 4 ++--
-> >   include/linux/virtio.h                     | 1 +
-> >   net/9p/trans_virtio.c                      | 2 +-
-> >   net/vmw_vsock/virtio_transport.c           | 4 ++--
-> >   sound/virtio/virtio_card.c                 | 4 ++--
-> >   26 files changed, 39 insertions(+), 33 deletions(-)
-> > 
-> > diff --git a/arch/um/drivers/virt-pci.c b/arch/um/drivers/virt-pci.c
-> > index c08066633023..22c4d87c9c15 100644
-> > --- a/arch/um/drivers/virt-pci.c
-> > +++ b/arch/um/drivers/virt-pci.c
-> > @@ -616,7 +616,7 @@ static void um_pci_virtio_remove(struct virtio_device *vdev)
-> >   	int i;
-> >           /* Stop all virtqueues */
-> > -        vdev->config->reset(vdev);
-> > +        virtio_reset_device(vdev);
-> >           vdev->config->del_vqs(vdev);
-> 
-> Nit: virtio_device_reset()?
-> 
-> Because I see:
-> 
-> int virtio_device_freeze(struct virtio_device *dev);
-> int virtio_device_restore(struct virtio_device *dev);
-> void virtio_device_ready(struct virtio_device *dev)
-> 
-> But well, there is:
-> void virtio_break_device(struct virtio_device *dev);
+On 13/10/21 12:14, Andy Lutomirski wrote:
+>> I think it's simpler to always wait for #NM, it will only happen
+>> once per vCPU.  In other words, even if the guest clears XFD before
+>> it generates #NM, the guest_fpu's XFD remains nonzero and an #NM
+>> vmexit is possible.  After #NM the guest_fpu's XFD is zero; then
+>> passthrough can happen and the #NM vmexit trap can be disabled.
+>
+> This will stop being at all optimal when Intel inevitably adds
+> another feature that uses XFD.  In the potentially infinite window in
+> which the guest manages XFD and #NM on behalf of its userspace and
+> when the guest allocates the other hypothetical feature, all the #NMs
+> will have to be trapped by KVM.
 
-Exactly. I don't know what's best, so I opted for plain english :)
+The reason is that it's quite common to simply let the guest see all 
+CPUID bits that KVM knows about.  But it's not unlikely that most guests 
+will not ever use any XFD feature, and therefore will not ever see an 
+#NM.  I wouldn't have any problem with allocating _all_ of the dynamic 
+state space on the first #NM.
 
+Thinking more about it, #NM only has to be trapped if XCR0 enables a 
+dynamic feature.  In other words, the guest value of XFD can be limited 
+to (host_XFD|guest_XFD) & guest_XCR0.  This avoids that KVM 
+unnecessarily traps for old guests that use CR0.TS.
 
-> -- 
-> Thanks,
+Paolo
+
+> Is it really worthwhile for KVM to use XFD at all instead of
+> preallocating the state and being done with it?  KVM would still have
+> to avoid data loss if the guest sets XFD with non-init state, but #NM
+> could always pass through.
 > 
-> David / dhildenb
 
