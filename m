@@ -2,173 +2,223 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 60CD442C527
-	for <lists+kvm@lfdr.de>; Wed, 13 Oct 2021 17:47:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4059242C55D
+	for <lists+kvm@lfdr.de>; Wed, 13 Oct 2021 17:54:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229653AbhJMPtN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Oct 2021 11:49:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39858 "EHLO
+        id S229915AbhJMP4n (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Oct 2021 11:56:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41868 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234611AbhJMPsO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Oct 2021 11:48:14 -0400
-Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBB47C061768
-        for <kvm@vger.kernel.org>; Wed, 13 Oct 2021 08:46:10 -0700 (PDT)
-Received: by mail-pg1-x536.google.com with SMTP id g184so2710328pgc.6
-        for <kvm@vger.kernel.org>; Wed, 13 Oct 2021 08:46:10 -0700 (PDT)
+        with ESMTP id S229794AbhJMP4m (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Oct 2021 11:56:42 -0400
+Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 237D6C061570
+        for <kvm@vger.kernel.org>; Wed, 13 Oct 2021 08:54:39 -0700 (PDT)
+Received: by mail-wr1-x42b.google.com with SMTP id i12so9932105wrb.7
+        for <kvm@vger.kernel.org>; Wed, 13 Oct 2021 08:54:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=5P0ocxXM0vPODGkh8na4Mfy39/EYyFv4GMRrvhNNOUo=;
-        b=gfAizaxTiwRe31oPHuSEfCuoU3UyNzjvSGFjRtR0+20ybGnOJHR2SNvIUYXuMY2xpD
-         gjbOwicFvptk+HxbA9gztDS/NFb/B9PCmms4ywTb+W6ZfybGlSGnqIF9BrEyW3lnzugF
-         1xOsRizGgXSxqW3rE2o7H3pOyE6LnVUrXJS6JM8CS2LKu70yomZ+jIXvV9GC/9hEoAdh
-         pZgLdZj46NdkkNldf1y6Zal4VF0OHZO5HByoWBC8S5+MsG5/UJx0h6V+EfRdjNyAV2md
-         QHEhpyLmWUQN/xdLKYedMbdiT11toyum2MbaAnr8R6GfEwVc/Pi4akUF4ElQql0esd+K
-         tzhQ==
+        h=references:user-agent:from:to:cc:subject:date:in-reply-to
+         :message-id:mime-version:content-transfer-encoding;
+        bh=IvDHoUY9BhQi17U9WJUxDlLZ06cpo7RQiFC67gyrf3I=;
+        b=T669phQQTQBH1RJdj0YpseAIcFoqIw0PY4zI8V6Ys2ncFxIxeqRv9MGnrLumVV3/OD
+         lK9jxwVDBusbhu/aecEkF2SfqZ8P0vCfMdN+1d1W23jXAhvUSSmkBiFweQns4ldsJPVZ
+         9W8VjCOkVoB4Kmsk/yj4R6F2dvuvl0JFMhT+q92f+dadDiizqYSc9DToUIjhWUKMac75
+         vJUT35FIi5EmzFhclzxCBtbILEPGzzpScxsv9i2DGQqyQWDJCp/smc0HF9PQj7/aBt3b
+         MNTScr65hOfyZrBbsbKGPEMwfcpdASPXribp/1vW2coXdiKcJWMSmwmakhTbA55vMCK/
+         5xaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=5P0ocxXM0vPODGkh8na4Mfy39/EYyFv4GMRrvhNNOUo=;
-        b=w8I4lbOjdyzaMGH1Wbx26rS1BN2lI7O/1ahornpyeuLb1KqRxNkk3Id05B/4fPwQBm
-         HtOfxxK7OVK+0msbyozFD2+lFcC6d3SS1JcqMmESS3ZYWIvs8GJlkVNT+v0fe25PxPQl
-         Vey/rw1SusZqoL5r3Js0YFn0b4n75y6GwHtmCxnn71k1R0Z2HLYxzhFB0d5Cw/9AhHdz
-         4/7riaT/mRoN9z/LXQ4+n28TRwVRj1ounO+zp8Xb4HK36vBGvOvqRhpOMizKlFuGGtpD
-         iLDgHjsJn77uRUKe5w3djbtrtCyl2bN5v8WTYt7yqAvTv1IOnZtoEBnAq3JBvLboliC/
-         ewZQ==
-X-Gm-Message-State: AOAM53056nsj+avzr/gbxqoqzO1VabJsj9cnvoJEEuxkm2Y6/Z0q8+KS
-        iWewoDrxeLoZTw3uycGd8QpVSw==
-X-Google-Smtp-Source: ABdhPJxOS97EPwZsGm56NgXmycC48sC/ZWo8Q8DTT9IZBXIVEcdfskLSNijWrQkjT1bVWFJiZLyKew==
-X-Received: by 2002:aa7:949c:0:b0:44c:a0df:2c7f with SMTP id z28-20020aa7949c000000b0044ca0df2c7fmr128668pfk.34.1634139970091;
-        Wed, 13 Oct 2021 08:46:10 -0700 (PDT)
-Received: from p14s (S0106889e681aac74.cg.shawcable.net. [68.147.0.187])
-        by smtp.gmail.com with ESMTPSA id x27sm2452841pfo.90.2021.10.13.08.46.06
+        h=x-gm-message-state:references:user-agent:from:to:cc:subject:date
+         :in-reply-to:message-id:mime-version:content-transfer-encoding;
+        bh=IvDHoUY9BhQi17U9WJUxDlLZ06cpo7RQiFC67gyrf3I=;
+        b=Zr8X3EaqDdRHJ0T3dYFdPx/SOYsM+bNgci87FhA3zS/2dKXsSVWiwTorOilIwCNvXg
+         33UbRFnRmv2GfqtHTWidQX95qKuPP7D9hGuULn23aTwTpWpbjs86qEQJBOkGk8+WPuwS
+         CYSnj6HORRrrDzNWbwZbWT1X3bb/yf8xaUcaT2GZamj8Rg6q6jgYkIi2UtmWcXJXQ0L5
+         9pfFmhFe6q04f1ER8DnA1UcwtKBRKAQ86nLjNqrM/woS85GPrPNSXXOuoebKQt1FT4rK
+         NsUv4rsXYAfChj6FQKXIcbYEhRDDkfghbMEQYCNLVDyXXcM7oJh7tcIYuoU7EyGer1QZ
+         /o4A==
+X-Gm-Message-State: AOAM532vSvwR+SSbwNhzKNb5NlTi9Q5VoQray0MSYpvLFMjIfvZi3257
+        A9kYm2+iTfE4OFdx6QjUi9l1Jg==
+X-Google-Smtp-Source: ABdhPJyCDBkH+27Z3bSZRNojps5faKc3fRCQiqD1B/nADTxMyAINih0lJ3CWCGAwX7XTNLM5Vh3rYQ==
+X-Received: by 2002:adf:a152:: with SMTP id r18mr41747437wrr.317.1634140477645;
+        Wed, 13 Oct 2021 08:54:37 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+        by smtp.gmail.com with ESMTPSA id u5sm5462093wmm.39.2021.10.13.08.54.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Oct 2021 08:46:09 -0700 (PDT)
-Date:   Wed, 13 Oct 2021 09:46:04 -0600
-From:   Mathieu Poirier <mathieu.poirier@linaro.org>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, Jeff Dike <jdike@addtoit.com>,
-        Richard Weinberger <richard@nod.at>,
-        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-        Jason Wang <jasowang@redhat.com>,
+        Wed, 13 Oct 2021 08:54:36 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+        by zen.linaroharston (Postfix) with ESMTP id 1FBF61FF96;
+        Wed, 13 Oct 2021 16:54:36 +0100 (BST)
+References: <20210914155214.105415-1-mlevitsk@redhat.com>
+ <20210914155214.105415-3-mlevitsk@redhat.com>
+User-agent: mu4e 1.7.0; emacs 28.0.60
+From:   Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     qemu-devel@nongnu.org, Marcelo Tosatti <mtosatti@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Gonglei <arei.gonglei@huawei.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Sudeep Holla <sudeep.holla@arm.com>,
-        Cristian Marussi <cristian.marussi@arm.com>,
-        "Enrico Weigelt, metux IT consult" <info@metux.net>,
-        Viresh Kumar <vireshk@kernel.org>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Bartosz Golaszewski <brgl@bgdev.pl>,
-        David Airlie <airlied@linux.ie>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        Daniel Vetter <daniel@ffwll.ch>, Jie Deng <jie.deng@intel.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        Kalle Valo <kvalo@codeaurora.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Vishal Verma <vishal.l.verma@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Ohad Ben-Cohen <ohad@wizery.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        David Hildenbrand <david@redhat.com>,
-        Vivek Goyal <vgoyal@redhat.com>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        Eric Van Hensbergen <ericvh@gmail.com>,
-        Latchesar Ionkov <lucho@ionkov.net>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Anton Yakovlev <anton.yakovlev@opensynergy.com>,
-        Jaroslav Kysela <perex@perex.cz>,
-        Takashi Iwai <tiwai@suse.com>, linux-um@lists.infradead.org,
-        virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        linux-i2c@vger.kernel.org, iommu@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
-        nvdimm@lists.linux.dev, linux-remoteproc@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        v9fs-developer@lists.sourceforge.net, kvm@vger.kernel.org,
-        alsa-devel@alsa-project.org
-Subject: Re: [PATCH RFC] virtio: wrap config->reset calls
-Message-ID: <20211013154604.GB4135908@p14s>
-References: <20211013105226.20225-1-mst@redhat.com>
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH 2/3] gdbstub: implement NOIRQ support for single step on
+ KVM
+Date:   Wed, 13 Oct 2021 16:50:39 +0100
+In-reply-to: <20210914155214.105415-3-mlevitsk@redhat.com>
+Message-ID: <87v920vs1v.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211013105226.20225-1-mst@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 13, 2021 at 06:55:31AM -0400, Michael S. Tsirkin wrote:
-> This will enable cleanups down the road.
-> The idea is to disable cbs, then add "flush_queued_cbs" callback
-> as a parameter, this way drivers can flush any work
-> queued after callbacks have been disabled.
-> 
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+
+Maxim Levitsky <mlevitsk@redhat.com> writes:
+
+> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 > ---
->  arch/um/drivers/virt-pci.c                 | 2 +-
->  drivers/block/virtio_blk.c                 | 4 ++--
->  drivers/bluetooth/virtio_bt.c              | 2 +-
->  drivers/char/hw_random/virtio-rng.c        | 2 +-
->  drivers/char/virtio_console.c              | 4 ++--
->  drivers/crypto/virtio/virtio_crypto_core.c | 8 ++++----
->  drivers/firmware/arm_scmi/virtio.c         | 2 +-
->  drivers/gpio/gpio-virtio.c                 | 2 +-
->  drivers/gpu/drm/virtio/virtgpu_kms.c       | 2 +-
->  drivers/i2c/busses/i2c-virtio.c            | 2 +-
->  drivers/iommu/virtio-iommu.c               | 2 +-
->  drivers/net/caif/caif_virtio.c             | 2 +-
->  drivers/net/virtio_net.c                   | 4 ++--
->  drivers/net/wireless/mac80211_hwsim.c      | 2 +-
->  drivers/nvdimm/virtio_pmem.c               | 2 +-
->  drivers/rpmsg/virtio_rpmsg_bus.c           | 2 +-
->  drivers/scsi/virtio_scsi.c                 | 2 +-
->  drivers/virtio/virtio.c                    | 5 +++++
->  drivers/virtio/virtio_balloon.c            | 2 +-
->  drivers/virtio/virtio_input.c              | 2 +-
->  drivers/virtio/virtio_mem.c                | 2 +-
->  fs/fuse/virtio_fs.c                        | 4 ++--
->  include/linux/virtio.h                     | 1 +
->  net/9p/trans_virtio.c                      | 2 +-
->  net/vmw_vsock/virtio_transport.c           | 4 ++--
->  sound/virtio/virtio_card.c                 | 4 ++--
->  26 files changed, 39 insertions(+), 33 deletions(-)
-> 
->  static struct virtio_driver virtio_pmem_driver = {
-> diff --git a/drivers/rpmsg/virtio_rpmsg_bus.c b/drivers/rpmsg/virtio_rpmsg_bus.c
-> index 8e49a3bacfc7..6a11952822df 100644
-> --- a/drivers/rpmsg/virtio_rpmsg_bus.c
-> +++ b/drivers/rpmsg/virtio_rpmsg_bus.c
-> @@ -1015,7 +1015,7 @@ static void rpmsg_remove(struct virtio_device *vdev)
->  	size_t total_buf_space = vrp->num_bufs * vrp->buf_size;
->  	int ret;
->  
-> -	vdev->config->reset(vdev);
-> +	virtio_reset_device(vdev);
-> 
+>  accel/kvm/kvm-all.c  | 25 ++++++++++++++++++
+>  gdbstub.c            | 60 ++++++++++++++++++++++++++++++++++++--------
+>  include/sysemu/kvm.h | 13 ++++++++++
+>  3 files changed, 88 insertions(+), 10 deletions(-)
+>
+> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+> index 6b187e9c96..e141260796 100644
+> --- a/accel/kvm/kvm-all.c
+> +++ b/accel/kvm/kvm-all.c
+> @@ -169,6 +169,8 @@ bool kvm_vm_attributes_allowed;
+>  bool kvm_direct_msi_allowed;
+>  bool kvm_ioeventfd_any_length_allowed;
+>  bool kvm_msi_use_devid;
+> +bool kvm_has_guest_debug;
+> +int kvm_sstep_flags;
+>  static bool kvm_immediate_exit;
+>  static hwaddr kvm_max_slot_size =3D ~0;
+>=20=20
+> @@ -2559,6 +2561,25 @@ static int kvm_init(MachineState *ms)
+>      kvm_sregs2 =3D
+>          (kvm_check_extension(s, KVM_CAP_SREGS2) > 0);
+>=20=20
+> +    kvm_has_guest_debug =3D
+> +        (kvm_check_extension(s, KVM_CAP_SET_GUEST_DEBUG) > 0);
+> +
+> +    kvm_sstep_flags =3D 0;
+> +
+> +    if (kvm_has_guest_debug) {
+> +        /* Assume that single stepping is supported */
+> +        kvm_sstep_flags =3D SSTEP_ENABLE;
+> +
+> +        int guest_debug_flags =3D
+> +            kvm_check_extension(s, KVM_CAP_SET_GUEST_DEBUG2);
+> +
+> +        if (guest_debug_flags > 0) {
+> +            if (guest_debug_flags & KVM_GUESTDBG_BLOCKIRQ) {
+> +                kvm_sstep_flags |=3D SSTEP_NOIRQ;
+> +            }
+> +        }
+> +    }
+> +
+>      kvm_state =3D s;
+>=20=20
+>      ret =3D kvm_arch_init(ms, s);
+> @@ -3188,6 +3209,10 @@ int kvm_update_guest_debug(CPUState *cpu, unsigned=
+ long reinject_trap)
+>=20=20
+>      if (cpu->singlestep_enabled) {
+>          data.dbg.control |=3D KVM_GUESTDBG_ENABLE | KVM_GUESTDBG_SINGLES=
+TEP;
+> +
+> +        if (cpu->singlestep_enabled & SSTEP_NOIRQ) {
+> +            data.dbg.control |=3D KVM_GUESTDBG_BLOCKIRQ;
+> +        }
+>      }
+>      kvm_arch_update_guest_debug(cpu, &data.dbg);
+>=20=20
+> diff --git a/gdbstub.c b/gdbstub.c
+> index 5d8e6ae3cd..48bb803bae 100644
+> --- a/gdbstub.c
+> +++ b/gdbstub.c
+> @@ -368,12 +368,11 @@ typedef struct GDBState {
+>      gdb_syscall_complete_cb current_syscall_cb;
+>      GString *str_buf;
+>      GByteArray *mem_buf;
+> +    int sstep_flags;
+> +    int supported_sstep_flags;
+>  } GDBState;
+>=20=20
+> -/* By default use no IRQs and no timers while single stepping so as to
+> - * make single stepping like an ICE HW step.
+> - */
+> -static int sstep_flags =3D SSTEP_ENABLE|SSTEP_NOIRQ|SSTEP_NOTIMER;
+> +static GDBState gdbserver_state;
+>=20=20
+>  /* Retrieves flags for single step mode. */
+>  static int get_sstep_flags(void)
+> @@ -385,11 +384,10 @@ static int get_sstep_flags(void)
+>      if (replay_mode !=3D REPLAY_MODE_NONE) {
+>          return SSTEP_ENABLE;
+>      } else {
+> -        return sstep_flags;
+> +        return gdbserver_state.sstep_flags;
+>      }
+>  }
+>=20=20
+> -static GDBState gdbserver_state;
+>=20=20
+>  static void init_gdbserver_state(void)
+>  {
+> @@ -399,6 +397,23 @@ static void init_gdbserver_state(void)
+>      gdbserver_state.str_buf =3D g_string_new(NULL);
+>      gdbserver_state.mem_buf =3D g_byte_array_sized_new(MAX_PACKET_LENGTH=
+);
+>      gdbserver_state.last_packet =3D g_byte_array_sized_new(MAX_PACKET_LE=
+NGTH + 4);
+> +
+> +
+> +    if (kvm_enabled()) {
+> +        gdbserver_state.supported_sstep_flags =3D kvm_get_supported_sste=
+p_flags();
+> +    } else {
+> +        gdbserver_state.supported_sstep_flags =3D
+> +            SSTEP_ENABLE | SSTEP_NOIRQ | SSTEP_NOTIMER;
+> +    }
 
-Reviewed-by: Mathieu Poirier <mathieu.poirier@linaro.org>
+This fails to build:
 
->  	ret = device_for_each_child(&vdev->dev, NULL, rpmsg_remove_device);
->  	if (ret)
+o -c ../../gdbstub.c
+../../gdbstub.c: In function =E2=80=98init_gdbserver_state=E2=80=99:
+../../gdbstub.c:403:49: error: implicit declaration of function =E2=80=98kv=
+m_get_supported_sstep_flags=E2=80=99 [-Werror=3Dimplicit-function-declarati=
+on]
+  403 |         gdbserver_state.supported_sstep_flags =3D kvm_get_supported=
+_sstep_flags();
+      |                                                 ^~~~~~~~~~~~~~~~~~~=
+~~~~~~~~~~
+../../gdbstub.c:403:49: error: nested extern declaration of =E2=80=98kvm_ge=
+t_supported_sstep_flags=E2=80=99 [-Werror=3Dnested-externs]
+../../gdbstub.c: In function =E2=80=98gdbserver_start=E2=80=99:
+../../gdbstub.c:3531:27: error: implicit declaration of function =E2=80=98k=
+vm_supports_guest_debug=E2=80=99; did you mean =E2=80=98kvm_update_guest_de=
+bug=E2=80=99? [-Werror=3Dimplicit-function-declaration]
+ 3531 |     if (kvm_enabled() && !kvm_supports_guest_debug()) {
+      |                           ^~~~~~~~~~~~~~~~~~~~~~~~
+      |                           kvm_update_guest_debug
+../../gdbstub.c:3531:27: error: nested extern declaration of =E2=80=98kvm_s=
+upports_guest_debug=E2=80=99 [-Werror=3Dnested-externs]
+cc1: all warnings being treated as errors
+
+In fact looking back I can see I mentioned this last time:
+
+  Subject: Re: [PATCH 2/2] gdbstub: implement NOIRQ support for single step=
+ on
+   KVM, when kvm's KVM_GUESTDBG_BLOCKIRQ debug flag is supported.
+  Date: Mon, 19 Apr 2021 17:29:25 +0100
+  In-reply-to: <20210401144152.1031282-3-mlevitsk@redhat.com>
+  Message-ID: <871rb69qqk.fsf@linaro.org>
+
+Please in future could you include a revision number for your spin and
+mention bellow the --- what changes have been made since the last
+posting.
+
+
+--=20
+Alex Benn=C3=A9e
