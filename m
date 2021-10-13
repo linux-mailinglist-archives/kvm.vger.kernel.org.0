@@ -2,81 +2,190 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A92CE42BFED
-	for <lists+kvm@lfdr.de>; Wed, 13 Oct 2021 14:26:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C05D142BFAB
+	for <lists+kvm@lfdr.de>; Wed, 13 Oct 2021 14:18:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233226AbhJMM25 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Oct 2021 08:28:57 -0400
-Received: from mail.kernel.org ([198.145.29.99]:35440 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233251AbhJMM2x (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Oct 2021 08:28:53 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id B990161151;
-        Wed, 13 Oct 2021 12:26:50 +0000 (UTC)
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <maz@kernel.org>)
-        id 1maczJ-00GTgY-EP; Wed, 13 Oct 2021 13:04:01 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org
-Cc:     will@kernel.org, james.morse@arm.com, alexandru.elisei@arm.com,
-        suzuki.poulose@arm.com, mark.rutland@arm.com, pbonzini@redhat.com,
-        drjones@redhat.com, oupton@google.com, qperret@google.com,
-        kernel-team@android.com, tabba@google.com
-Subject: [PATCH v9 22/22] KVM: arm64: pkvm: Give priority to standard traps over pvm handling
-Date:   Wed, 13 Oct 2021 13:03:46 +0100
-Message-Id: <20211013120346.2926621-12-maz@kernel.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20211013120346.2926621-1-maz@kernel.org>
-References: <20211010145636.1950948-12-tabba@google.com>
- <20211013120346.2926621-1-maz@kernel.org>
+        id S232491AbhJMMUK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Oct 2021 08:20:10 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25299 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231294AbhJMMUJ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 13 Oct 2021 08:20:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1634127483;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=8uA+gFhUzMMrb5D5fxARTwQwcT+AEfWKWkQ0ooGMKj8=;
+        b=gcZphIhv1SUibhOpSsOSgz4m0cbJvHyEtd0kwtKyNGk7PlE0SU+JPX+FUmjzkGHkvuPJuI
+        RYeShTXWeJ1jx+SFek2K1Tc6X4vwuEpu4Q3Rv6491+05hOgYMfee2etkukNn00qGLGJeMY
+        ljgHBxDZGBTUGlUD8++dZn6sdjVlaG0=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-355-OMAhpDhEMM-TsRrAWk-3ow-1; Wed, 13 Oct 2021 08:18:02 -0400
+X-MC-Unique: OMAhpDhEMM-TsRrAWk-3ow-1
+Received: by mail-wr1-f72.google.com with SMTP id v15-20020adfa1cf000000b00160940b17a2so1795806wrv.19
+        for <kvm@vger.kernel.org>; Wed, 13 Oct 2021 05:18:02 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=8uA+gFhUzMMrb5D5fxARTwQwcT+AEfWKWkQ0ooGMKj8=;
+        b=n0JvGWMBNeEP023DeEvM0t5+G4bElLBClQvonN441kLPjwayXVEAHXIU+qyQfFQ8Tz
+         gDla8hQjhv7COdZiNnAtfCXtfObK363nNHWBhapQkeeekS+SQBBA9mnUK6j+C9CGXe36
+         imgB4FlAmL0KkOddb5eyA4efHcLcq+XI91mdj8t4Bsz4ElFlqnZF31rl8zn7txT6nGHx
+         akCkS332AwL4NJbWOiuawt2zSXe4aZt+dYI1sILfjDp/T4BpftvjmaxAA+EbC/4abU3h
+         /YEADgrR4JkbVuV5QSghwggl6qY+fO1k5MAwA+7QMWAvczR304bK0U5vWLPPP8M6xAur
+         sSiw==
+X-Gm-Message-State: AOAM530dKXAuQJMZ6ZqESvA/PMQvhzsEC1Htnt9qXKj8R/XTYukxc6Vr
+        7rSx3CgIEg8YlMAwKbMMHxxR5ru5B/RICPIZM+yzlBo073Sh3ZEQFDxTeObkdyu7IZd9Tg84WUx
+        WA2o/geB9pUa7
+X-Received: by 2002:a7b:c30c:: with SMTP id k12mr12535247wmj.38.1634127481383;
+        Wed, 13 Oct 2021 05:18:01 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwFEzPqFQ+1qHznC4euH1QtbfXrvr/+t46tCqHwjpC6aqk2B2gJ30j5Cm2I+Hz0oA4zGN44UQ==
+X-Received: by 2002:a7b:c30c:: with SMTP id k12mr12535146wmj.38.1634127481076;
+        Wed, 13 Oct 2021 05:18:01 -0700 (PDT)
+Received: from redhat.com ([2.55.30.112])
+        by smtp.gmail.com with ESMTPSA id z1sm4104369wrt.94.2021.10.13.05.17.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Oct 2021 05:18:00 -0700 (PDT)
+Date:   Wed, 13 Oct 2021 08:17:49 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     David Hildenbrand <david@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, Jeff Dike <jdike@addtoit.com>,
+        Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Gonglei <arei.gonglei@huawei.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        Cristian Marussi <cristian.marussi@arm.com>,
+        "Enrico Weigelt, metux IT consult" <info@metux.net>,
+        Viresh Kumar <vireshk@kernel.org>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Bartosz Golaszewski <brgl@bgdev.pl>,
+        David Airlie <airlied@linux.ie>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        Daniel Vetter <daniel@ffwll.ch>, Jie Deng <jie.deng@intel.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Kalle Valo <kvalo@codeaurora.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Vishal Verma <vishal.l.verma@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Vivek Goyal <vgoyal@redhat.com>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        Eric Van Hensbergen <ericvh@gmail.com>,
+        Latchesar Ionkov <lucho@ionkov.net>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Anton Yakovlev <anton.yakovlev@opensynergy.com>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Takashi Iwai <tiwai@suse.com>, linux-um@lists.infradead.org,
+        virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linux-i2c@vger.kernel.org, iommu@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
+        nvdimm@lists.linux.dev, linux-remoteproc@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        v9fs-developer@lists.sourceforge.net, kvm@vger.kernel.org,
+        alsa-devel@alsa-project.org
+Subject: Re: [PATCH RFC] virtio: wrap config->reset calls
+Message-ID: <20211013081632-mutt-send-email-mst@kernel.org>
+References: <20211013105226.20225-1-mst@redhat.com>
+ <2060bd96-5884-a1b5-9f29-7fe670dc088d@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, will@kernel.org, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, mark.rutland@arm.com, pbonzini@redhat.com, drjones@redhat.com, oupton@google.com, qperret@google.com, kernel-team@android.com, tabba@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2060bd96-5884-a1b5-9f29-7fe670dc088d@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Checking for pvm handling first means that we cannot handle ptrauth
-traps or apply any of the workarounds (GICv3 or TX2 #219).
+On Wed, Oct 13, 2021 at 01:03:46PM +0200, David Hildenbrand wrote:
+> On 13.10.21 12:55, Michael S. Tsirkin wrote:
+> > This will enable cleanups down the road.
+> > The idea is to disable cbs, then add "flush_queued_cbs" callback
+> > as a parameter, this way drivers can flush any work
+> > queued after callbacks have been disabled.
+> > 
+> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > ---
+> >   arch/um/drivers/virt-pci.c                 | 2 +-
+> >   drivers/block/virtio_blk.c                 | 4 ++--
+> >   drivers/bluetooth/virtio_bt.c              | 2 +-
+> >   drivers/char/hw_random/virtio-rng.c        | 2 +-
+> >   drivers/char/virtio_console.c              | 4 ++--
+> >   drivers/crypto/virtio/virtio_crypto_core.c | 8 ++++----
+> >   drivers/firmware/arm_scmi/virtio.c         | 2 +-
+> >   drivers/gpio/gpio-virtio.c                 | 2 +-
+> >   drivers/gpu/drm/virtio/virtgpu_kms.c       | 2 +-
+> >   drivers/i2c/busses/i2c-virtio.c            | 2 +-
+> >   drivers/iommu/virtio-iommu.c               | 2 +-
+> >   drivers/net/caif/caif_virtio.c             | 2 +-
+> >   drivers/net/virtio_net.c                   | 4 ++--
+> >   drivers/net/wireless/mac80211_hwsim.c      | 2 +-
+> >   drivers/nvdimm/virtio_pmem.c               | 2 +-
+> >   drivers/rpmsg/virtio_rpmsg_bus.c           | 2 +-
+> >   drivers/scsi/virtio_scsi.c                 | 2 +-
+> >   drivers/virtio/virtio.c                    | 5 +++++
+> >   drivers/virtio/virtio_balloon.c            | 2 +-
+> >   drivers/virtio/virtio_input.c              | 2 +-
+> >   drivers/virtio/virtio_mem.c                | 2 +-
+> >   fs/fuse/virtio_fs.c                        | 4 ++--
+> >   include/linux/virtio.h                     | 1 +
+> >   net/9p/trans_virtio.c                      | 2 +-
+> >   net/vmw_vsock/virtio_transport.c           | 4 ++--
+> >   sound/virtio/virtio_card.c                 | 4 ++--
+> >   26 files changed, 39 insertions(+), 33 deletions(-)
+> > 
+> > diff --git a/arch/um/drivers/virt-pci.c b/arch/um/drivers/virt-pci.c
+> > index c08066633023..22c4d87c9c15 100644
+> > --- a/arch/um/drivers/virt-pci.c
+> > +++ b/arch/um/drivers/virt-pci.c
+> > @@ -616,7 +616,7 @@ static void um_pci_virtio_remove(struct virtio_device *vdev)
+> >   	int i;
+> >           /* Stop all virtqueues */
+> > -        vdev->config->reset(vdev);
+> > +        virtio_reset_device(vdev);
+> >           vdev->config->del_vqs(vdev);
+> 
+> Nit: virtio_device_reset()?
+> 
+> Because I see:
+> 
+> int virtio_device_freeze(struct virtio_device *dev);
+> int virtio_device_restore(struct virtio_device *dev);
+> void virtio_device_ready(struct virtio_device *dev)
+> 
+> But well, there is:
+> void virtio_break_device(struct virtio_device *dev);
 
-Flip the order around.
+Exactly. I don't know what's best, so I opted for plain english :)
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/hyp/nvhe/switch.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-index 50c7d48e0fa0..c0e3fed26d93 100644
---- a/arch/arm64/kvm/hyp/nvhe/switch.c
-+++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-@@ -167,10 +167,13 @@ static void __pmu_switch_to_host(struct kvm_cpu_context *host_ctxt)
-  */
- static bool kvm_handle_pvm_sys64(struct kvm_vcpu *vcpu, u64 *exit_code)
- {
--	if (kvm_handle_pvm_sysreg(vcpu, exit_code))
--		return true;
--
--	return kvm_hyp_handle_sysreg(vcpu, exit_code);
-+	/*
-+	 * Make sure we handle the exit for workarounds and ptrauth
-+	 * before the pKVM handling, as the latter could decide to
-+	 * UNDEF.
-+	 */
-+	return (kvm_hyp_handle_sysreg(vcpu, exit_code) ||
-+		kvm_handle_pvm_sysreg(vcpu, exit_code));
- }
- 
- /**
--- 
-2.30.2
+> -- 
+> Thanks,
+> 
+> David / dhildenb
 
