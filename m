@@ -2,202 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 084E442C5A1
-	for <lists+kvm@lfdr.de>; Wed, 13 Oct 2021 18:00:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2F5BF42C5C2
+	for <lists+kvm@lfdr.de>; Wed, 13 Oct 2021 18:04:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237313AbhJMQCT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Oct 2021 12:02:19 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21684 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233774AbhJMQCQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 13 Oct 2021 12:02:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634140813;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=QCm5dOclxo0psHU4qKEkJZZeOXU3321uNZD2ahb33xs=;
-        b=TlPQJenvwZEtq5dKkASIXiz6MP99fBUdNGgB1mNpDXqVxGO8yg43/S/6HJpB7sjULPmNWS
-        G+8XIURHuHaw4tTkH+3bXCO01x4eZyVlp3I4+GjZFh2aueWisK5ZCXwoPiVZOK5ekHwJpi
-        tgq124FAMxcZ0WLP4fyOVlCETLNYnpM=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-147-XYDeJFA3PBuWo2Eat5qsEA-1; Wed, 13 Oct 2021 12:00:06 -0400
-X-MC-Unique: XYDeJFA3PBuWo2Eat5qsEA-1
-Received: by mail-wr1-f72.google.com with SMTP id a15-20020a056000188f00b00161068d8461so2361883wri.11
-        for <kvm@vger.kernel.org>; Wed, 13 Oct 2021 09:00:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:organization:in-reply-to
-         :content-transfer-encoding;
-        bh=QCm5dOclxo0psHU4qKEkJZZeOXU3321uNZD2ahb33xs=;
-        b=AN5IviatbypN6dVhKS1tGLGFYApX3HaruK3bQtOEt9Xhs8p+Opopiam/yjhUtMq7kc
-         AYIAL+W29hYI81XOsRB5tBZXop9HDZnVPXAZxGhWjBrL9o4iPTDD/H/C0T7UmGw3bE7Y
-         R5IdS6h9j1lr2b60pIIVewctwefV6EsRcb5Qcj9p5tf3c3ydjlFUPh4vRsCB1DFjHh8B
-         nVAmAe6wM2PlwFt2awJAtduQ16MIV/9O4EaPJi11sN/UbFuxVqebqoM9dlVGDElu1R3P
-         chQeonht6r/VoqFg+7G3JAn3vT5XknqXHYV01l8cIakmj+2/QqThwBwuA/2m8OnLsfCx
-         LQ0g==
-X-Gm-Message-State: AOAM530DVt29ENIVeoRMAaqKAsIrjTkoyZ1WuzyG9XTmPSn9GFAutRP4
-        /OpWcrMyx7hn/Ctwqe37hLvsgodw0S0pmb5CQHiBK8AdGF9eF5hrwA7MjCbUWTU/CCtN0Z6hHBe
-        YErML6S7Llmol
-X-Received: by 2002:adf:dc0d:: with SMTP id t13mr9710wri.158.1634140805626;
-        Wed, 13 Oct 2021 09:00:05 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyItkbAA3kGIqmmHgTgrrpf9fCG54WlJV2+wdefB9WU28Q546eZydpGXWHl2Ou3h6lUqYc/hA==
-X-Received: by 2002:adf:dc0d:: with SMTP id t13mr9603wri.158.1634140805309;
-        Wed, 13 Oct 2021 09:00:05 -0700 (PDT)
-Received: from [192.168.3.132] (p5b0c6774.dip0.t-ipconnect.de. [91.12.103.116])
-        by smtp.gmail.com with ESMTPSA id n17sm6521wrq.11.2021.10.13.09.00.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Oct 2021 09:00:04 -0700 (PDT)
-Message-ID: <cf511a7f-531f-4555-d7b4-cb171a615fdd@redhat.com>
-Date:   Wed, 13 Oct 2021 18:00:01 +0200
+        id S236087AbhJMQGR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Oct 2021 12:06:17 -0400
+Received: from verein.lst.de ([213.95.11.211]:46410 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229653AbhJMQGQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Oct 2021 12:06:16 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id F3EBF68B05; Wed, 13 Oct 2021 18:04:10 +0200 (CEST)
+Date:   Wed, 13 Oct 2021 18:04:10 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>,
+        "Tian, Kevin" <kevin.tian@intel.com>, Liu Yi L <yi.l.liu@intel.com>
+Subject: Re: [PATCH v2 1/5] vfio: Delete vfio_get/put_group from
+ vfio_iommu_group_notifier()
+Message-ID: <20211013160410.GA1327@lst.de>
+References: <0-v2-fd9627d27b2b+26c-vfio_group_cdev_jgg@nvidia.com> <1-v2-fd9627d27b2b+26c-vfio_group_cdev_jgg@nvidia.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [PATCH RFC] virtio: wrap config->reset calls
-Content-Language: en-US
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, Jeff Dike <jdike@addtoit.com>,
-        Richard Weinberger <richard@nod.at>,
-        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Gonglei <arei.gonglei@huawei.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Sudeep Holla <sudeep.holla@arm.com>,
-        Cristian Marussi <cristian.marussi@arm.com>,
-        "Enrico Weigelt, metux IT consult" <info@metux.net>,
-        Viresh Kumar <vireshk@kernel.org>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Bartosz Golaszewski <brgl@bgdev.pl>,
-        David Airlie <airlied@linux.ie>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        Daniel Vetter <daniel@ffwll.ch>, Jie Deng <jie.deng@intel.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        Kalle Valo <kvalo@codeaurora.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Vishal Verma <vishal.l.verma@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Ohad Ben-Cohen <ohad@wizery.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Vivek Goyal <vgoyal@redhat.com>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        Eric Van Hensbergen <ericvh@gmail.com>,
-        Latchesar Ionkov <lucho@ionkov.net>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Anton Yakovlev <anton.yakovlev@opensynergy.com>,
-        Jaroslav Kysela <perex@perex.cz>,
-        Takashi Iwai <tiwai@suse.com>, linux-um@lists.infradead.org,
-        virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        linux-i2c@vger.kernel.org, iommu@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
-        nvdimm@lists.linux.dev, linux-remoteproc@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        v9fs-developer@lists.sourceforge.net, kvm@vger.kernel.org,
-        alsa-devel@alsa-project.org
-References: <20211013105226.20225-1-mst@redhat.com>
- <2060bd96-5884-a1b5-9f29-7fe670dc088d@redhat.com>
- <20211013081632-mutt-send-email-mst@kernel.org>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-In-Reply-To: <20211013081632-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1-v2-fd9627d27b2b+26c-vfio_group_cdev_jgg@nvidia.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 13.10.21 14:17, Michael S. Tsirkin wrote:
-> On Wed, Oct 13, 2021 at 01:03:46PM +0200, David Hildenbrand wrote:
->> On 13.10.21 12:55, Michael S. Tsirkin wrote:
->>> This will enable cleanups down the road.
->>> The idea is to disable cbs, then add "flush_queued_cbs" callback
->>> as a parameter, this way drivers can flush any work
->>> queued after callbacks have been disabled.
->>>
->>> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->>> ---
->>>   arch/um/drivers/virt-pci.c                 | 2 +-
->>>   drivers/block/virtio_blk.c                 | 4 ++--
->>>   drivers/bluetooth/virtio_bt.c              | 2 +-
->>>   drivers/char/hw_random/virtio-rng.c        | 2 +-
->>>   drivers/char/virtio_console.c              | 4 ++--
->>>   drivers/crypto/virtio/virtio_crypto_core.c | 8 ++++----
->>>   drivers/firmware/arm_scmi/virtio.c         | 2 +-
->>>   drivers/gpio/gpio-virtio.c                 | 2 +-
->>>   drivers/gpu/drm/virtio/virtgpu_kms.c       | 2 +-
->>>   drivers/i2c/busses/i2c-virtio.c            | 2 +-
->>>   drivers/iommu/virtio-iommu.c               | 2 +-
->>>   drivers/net/caif/caif_virtio.c             | 2 +-
->>>   drivers/net/virtio_net.c                   | 4 ++--
->>>   drivers/net/wireless/mac80211_hwsim.c      | 2 +-
->>>   drivers/nvdimm/virtio_pmem.c               | 2 +-
->>>   drivers/rpmsg/virtio_rpmsg_bus.c           | 2 +-
->>>   drivers/scsi/virtio_scsi.c                 | 2 +-
->>>   drivers/virtio/virtio.c                    | 5 +++++
->>>   drivers/virtio/virtio_balloon.c            | 2 +-
->>>   drivers/virtio/virtio_input.c              | 2 +-
->>>   drivers/virtio/virtio_mem.c                | 2 +-
->>>   fs/fuse/virtio_fs.c                        | 4 ++--
->>>   include/linux/virtio.h                     | 1 +
->>>   net/9p/trans_virtio.c                      | 2 +-
->>>   net/vmw_vsock/virtio_transport.c           | 4 ++--
->>>   sound/virtio/virtio_card.c                 | 4 ++--
->>>   26 files changed, 39 insertions(+), 33 deletions(-)
->>>
->>> diff --git a/arch/um/drivers/virt-pci.c b/arch/um/drivers/virt-pci.c
->>> index c08066633023..22c4d87c9c15 100644
->>> --- a/arch/um/drivers/virt-pci.c
->>> +++ b/arch/um/drivers/virt-pci.c
->>> @@ -616,7 +616,7 @@ static void um_pci_virtio_remove(struct virtio_device *vdev)
->>>   	int i;
->>>           /* Stop all virtqueues */
->>> -        vdev->config->reset(vdev);
->>> +        virtio_reset_device(vdev);
->>>           vdev->config->del_vqs(vdev);
->>
->> Nit: virtio_device_reset()?
->>
->> Because I see:
->>
->> int virtio_device_freeze(struct virtio_device *dev);
->> int virtio_device_restore(struct virtio_device *dev);
->> void virtio_device_ready(struct virtio_device *dev)
->>
->> But well, there is:
->> void virtio_break_device(struct virtio_device *dev);
-> 
-> Exactly. I don't know what's best, so I opted for plain english :)
+Looks good,
 
-Fair enough, LGTM
-
-Reviewed-by: David Hildenbrand <david@redhat.com>
-
-
--- 
-Thanks,
-
-David / dhildenb
-
+Reviewed-by: Christoph Hellwig <hch@lst.de>
