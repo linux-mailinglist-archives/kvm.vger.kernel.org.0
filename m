@@ -2,126 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A543D42C093
-	for <lists+kvm@lfdr.de>; Wed, 13 Oct 2021 14:51:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 349E842C123
+	for <lists+kvm@lfdr.de>; Wed, 13 Oct 2021 15:16:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231644AbhJMMxm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Oct 2021 08:53:42 -0400
-Received: from mga07.intel.com ([134.134.136.100]:43600 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229535AbhJMMxm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Oct 2021 08:53:42 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10135"; a="290908193"
-X-IronPort-AV: E=Sophos;i="5.85,370,1624345200"; 
-   d="scan'208";a="290908193"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Oct 2021 05:51:38 -0700
-X-IronPort-AV: E=Sophos;i="5.85,370,1624345200"; 
-   d="scan'208";a="491444349"
-Received: from duan-client-optiplex-7080.bj.intel.com ([10.238.156.101])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Oct 2021 05:51:37 -0700
-From:   Zhenzhong Duan <zhenzhong.duan@intel.com>
-To:     kvm@vger.kernel.org
-Cc:     jan.kiszka@siemens.com, Zhenzhong Duan <zhenzhong.duan@intel.com>
-Subject: [kvm-unit-tests PATCH] nVMX: Fix wrong setting on HOST_BASE_TR and GUEST_BASE_TR
-Date:   Wed, 13 Oct 2021 20:52:28 +0800
-Message-Id: <20211013125228.423038-1-zhenzhong.duan@intel.com>
-X-Mailer: git-send-email 2.25.1
+        id S231312AbhJMNSN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Oct 2021 09:18:13 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:15162 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229535AbhJMNSJ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 13 Oct 2021 09:18:09 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 19DCXuIf024131;
+        Wed, 13 Oct 2021 09:16:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=GcTzPEjVthaOBkN0QWAtOMQZHkKyYA4Y7FpIYjFqGFU=;
+ b=jOwElk5XGlVtsDwhfFKHnaWlc+y+E8+qpevz1Wh5QxLbboSG7qO62VXVwuxAvxPrRwvb
+ 070dZ/6iYDTQkWtkXUQSBedP1AmvOEYxM39DWxpIaxn7BYJYG5b3nBJpdnSFzmpopEBf
+ WCTrEOekufDT49C0jF+gVFAD1oiFLq7+Z1/1o9PhSDgCXQHEJBghIc/ju5gYsW307UIp
+ VwkAc/CEwTfYbupsoqyUXzWjhOPelScYAMoqDep8kG1WxPVf6IO5CdJkDXb8vmrC4lT6
+ RE1s9UjrnWGQUSxIN83WPeESK3/FanOMRNr3zuTZ4c6oIe89Aj2McMCnt8bAvNnrETCt Hw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3bnqmpbada-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 13 Oct 2021 09:16:06 -0400
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 19DCwjEx012016;
+        Wed, 13 Oct 2021 09:16:06 -0400
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3bnqmpbacj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 13 Oct 2021 09:16:06 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 19DDDR6A020712;
+        Wed, 13 Oct 2021 13:16:04 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma03ams.nl.ibm.com with ESMTP id 3bk2q9u3a4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 13 Oct 2021 13:16:03 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 19DDADVc55443910
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 13 Oct 2021 13:10:13 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 65FFFA4080;
+        Wed, 13 Oct 2021 13:15:48 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 847D7A4072;
+        Wed, 13 Oct 2021 13:15:44 +0000 (GMT)
+Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.171.37.114])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 13 Oct 2021 13:15:43 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH 2/2] lib: s390x: snippet.h: Add a few
+ constants that will make our life easier
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
+        david@redhat.com, thuth@redhat.com, seiden@linux.ibm.com
+References: <20211013102722.17160-1-frankja@linux.ibm.com>
+ <20211013102722.17160-3-frankja@linux.ibm.com>
+From:   Janis Schoetterl-Glausch <scgl@linux.vnet.ibm.com>
+Message-ID: <9a59c435-f717-784f-48c0-13ff9c3f0251@linux.vnet.ibm.com>
+Date:   Wed, 13 Oct 2021 15:15:41 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20211013102722.17160-3-frankja@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 64S-Y0YAg9Gxy5Cdg0T4tn7Ggf7_GObk
+X-Proofpoint-ORIG-GUID: BGcHWSIBD7ATqZ04AtZufOzGbMW9UEBs
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
+ definitions=2021-10-13_05,2021-10-13_02,2020-04-07_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
+ priorityscore=1501 bulkscore=0 impostorscore=0 lowpriorityscore=0
+ phishscore=0 clxscore=1015 mlxscore=0 adultscore=0 spamscore=0
+ suspectscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2109230001 definitions=main-2110130088
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-tss_descr was mapped to descriptor table pointer but in fact it
-should be a gdt entry.
-
-Add two helper functions to pick base and limit from gdt 64bit
-entry and assign to HOST_BASE_TR, GUEST_BASE_TR and GUEST_LIMIT_TR.
-
-Signed-off-by: Zhenzhong Duan <zhenzhong.duan@intel.com>
----
- lib/x86/desc.h |  2 ++
- lib/x86/desc.c | 12 ++++++++++++
- x86/vmx.c      |  8 ++++----
- 3 files changed, 18 insertions(+), 4 deletions(-)
-
-diff --git a/lib/x86/desc.h b/lib/x86/desc.h
-index a6ffb38..cb71046 100644
---- a/lib/x86/desc.h
-+++ b/lib/x86/desc.h
-@@ -209,6 +209,8 @@ void set_intr_task_gate(int vec, void *fn);
- void setup_tss32(void);
- #else
- extern tss64_t tss;
-+u64 get_gdt_entry_64_base(struct segment_desc64 *entry);
-+u64 get_gdt_entry_64_limit(struct segment_desc64 *entry);
- #endif
- 
- unsigned exception_vector(void);
-diff --git a/lib/x86/desc.c b/lib/x86/desc.c
-index e7378c1..5482366 100644
---- a/lib/x86/desc.c
-+++ b/lib/x86/desc.c
-@@ -376,6 +376,18 @@ void setup_alt_stack(void)
- {
- 	tss.ist1 = (u64)intr_alt_stack + 4096;
- }
-+u64 get_gdt_entry_64_base(struct segment_desc64 *entry)
-+{
-+	return ((uint64_t) entry->base1 |
-+			((uint64_t) entry->base2 << 16) |
-+			((uint64_t) entry->base3 << 24) |
-+			((uint64_t) entry->base4 << 32));
-+}
-+u64 get_gdt_entry_64_limit(struct segment_desc64 *entry)
-+{
-+	return ((uint64_t) entry->limit1 |
-+			((uint64_t) entry->limit << 16));
-+}
- #endif
- 
- static bool exception;
-diff --git a/x86/vmx.c b/x86/vmx.c
-index 20dc677..2d87d88 100644
---- a/x86/vmx.c
-+++ b/x86/vmx.c
-@@ -75,7 +75,7 @@ union vmx_ept_vpid  ept_vpid;
- 
- extern struct descriptor_table_ptr gdt64_desc;
- extern struct descriptor_table_ptr idt_descr;
--extern struct descriptor_table_ptr tss_descr;
-+extern struct segment_desc64 tss_descr;
- extern void *vmx_return;
- extern void *entry_sysenter;
- extern void *guest_entry;
-@@ -1275,7 +1275,7 @@ static void init_vmcs_host(void)
- 	vmcs_write(HOST_SEL_FS, KERNEL_DS);
- 	vmcs_write(HOST_SEL_GS, KERNEL_DS);
- 	vmcs_write(HOST_SEL_TR, TSS_MAIN);
--	vmcs_write(HOST_BASE_TR, tss_descr.base);
-+	vmcs_write(HOST_BASE_TR, get_gdt_entry_64_base(&tss_descr));
- 	vmcs_write(HOST_BASE_GDTR, gdt64_desc.base);
- 	vmcs_write(HOST_BASE_IDTR, idt_descr.base);
- 	vmcs_write(HOST_BASE_FS, 0);
-@@ -1331,7 +1331,7 @@ static void init_vmcs_guest(void)
- 	vmcs_write(GUEST_BASE_DS, 0);
- 	vmcs_write(GUEST_BASE_FS, 0);
- 	vmcs_write(GUEST_BASE_GS, 0);
--	vmcs_write(GUEST_BASE_TR, tss_descr.base);
-+	vmcs_write(GUEST_BASE_TR, get_gdt_entry_64_base(&tss_descr));
- 	vmcs_write(GUEST_BASE_LDTR, 0);
- 
- 	vmcs_write(GUEST_LIMIT_CS, 0xFFFFFFFF);
-@@ -1341,7 +1341,7 @@ static void init_vmcs_guest(void)
- 	vmcs_write(GUEST_LIMIT_FS, 0xFFFFFFFF);
- 	vmcs_write(GUEST_LIMIT_GS, 0xFFFFFFFF);
- 	vmcs_write(GUEST_LIMIT_LDTR, 0xffff);
--	vmcs_write(GUEST_LIMIT_TR, tss_descr.limit);
-+	vmcs_write(GUEST_LIMIT_TR, get_gdt_entry_64_limit(&tss_descr));
- 
- 	vmcs_write(GUEST_AR_CS, 0xa09b);
- 	vmcs_write(GUEST_AR_DS, 0xc093);
--- 
-2.25.1
+On 10/13/21 12:27 PM, Janosch Frank wrote:
+> The variable names for the snippet objects are of gigantic length so
+> let's define a few macros to make them easier to read.
+> 
+> Also add a standard PSW which should be used to start the snippet.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+>  lib/s390x/snippet.h | 40 ++++++++++++++++++++++++++++++++++++++++
+>  s390x/mvpg-sie.c    | 13 ++++++-------
+>  2 files changed, 46 insertions(+), 7 deletions(-)
+>  create mode 100644 lib/s390x/snippet.h
+> 
+> diff --git a/lib/s390x/snippet.h b/lib/s390x/snippet.h
+> new file mode 100644
+> index 00000000..9ead4fe3
+> --- /dev/null
+> +++ b/lib/s390x/snippet.h
+> @@ -0,0 +1,40 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * Snippet definitions
+> + *
+> + * Copyright IBM, Corp. 2021
+                   ^
+That comma should not be there.
+> + * Author: Janosch Frank <frankja@linux.ibm.com>
+> + */
+> +
+[...]
 
