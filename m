@@ -2,137 +2,268 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8C3D842C854
-	for <lists+kvm@lfdr.de>; Wed, 13 Oct 2021 20:06:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 53EB042C864
+	for <lists+kvm@lfdr.de>; Wed, 13 Oct 2021 20:10:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238339AbhJMSJA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Oct 2021 14:09:00 -0400
-Received: from mail-dm6nam11on2044.outbound.protection.outlook.com ([40.107.223.44]:17760
-        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
+        id S238474AbhJMSMx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Oct 2021 14:12:53 -0400
+Received: from mail-bn8nam11on2040.outbound.protection.outlook.com ([40.107.236.40]:42593
+        "EHLO NAM11-BN8-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S229814AbhJMSI7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Oct 2021 14:08:59 -0400
+        id S238374AbhJMSMw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Oct 2021 14:12:52 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=miWZhCNAKQGYkEDU0yVrZkUYNA4mhfI1ALiPwK7yNGrHHvxSYyARHv21NIzi2ZTdU/4vKOBkQXvxKdXtZnCeTjQHvgOfijG77efY6DkOwYmyEqqAjZIK1J0rx3qLZVBmK/QS7Sonmn49OxjW3ybw+KDO+ao/uZvXmkVK96CLseuUqypf2rplsbevgh8FEWgA1EPGS86lnsBhZSHfUfELTvOWNZOyEXAuIdDL9qlXVzvnkhvu2olojzcqLel7Q06oeOC0jhsIJxC0bJljcDptqAyUx+XGS6tgsT6AeXSuZB0YyTu9qqln4SRJ/eNwsEXiwd74rNidkmEefwBQRTcCdw==
+ b=IXqVTxxLYj5cw0VSiass6IBiyU0v7uPp/rU2oQmmtq6FFvYzol5g20o2BoG8gpR9hEmql7xRr0mhGl2VwpcI9BfrWjYvcbIoGYgy0zikMN6mBPoEZmpgf1ceFC2M67Y3AsacIlTxUgom0st6Ea0+YqfvufJgNU20a0SF9JLq1n6n60p0QVJRQsm+BxkT9WQMO7UTOzMJRlakwLIXk3GR3yav6KG9wdsuQ7OcXV7TkRl0Cmn6hLVZgvcxCBP/sBfqDME7LeGM4nWibyWY5NO69U8krxfQHETLawHXxY0du6xXK/G/CGAalKx6bgAqnINrE/NB6V4m2AMiNM8WKun+ZA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=J6yOPD5MSOO5uGJ0sLl/wr/y0gfSWT6BMuq1oZERb/M=;
- b=PNhyV1t/Rq/Sem6awmWSRylpqzc88fJ0onXVa5njKA6f5OsJwo9nJPWXrFny1NSFr3ceRIwmOmoBn9wshAZS7Ri7TxybLIMVH54xjJaO76GFJeonphhY0bY3DT18ZD3CTwEdfEh9p/Bflp0KMcsJH/oPbVlQ6EkGcL2jDg2sYsoFFwrI/2NhbuxYJZWGVEnNgWn1pYkdZcsijxyVMVJiQfAacccSfSySF9algs3AnVLxjYWh28p6LKbpjAHftWEvFl5SK7+YIiCH+tQitsAmA5yUMOsN99oAEjux8pr/drxqLMYfamElNSi2mcrZrg/eY/hE2VBBPSi7z1WAjxbWXg==
+ bh=8eCH34C9A+yTV/Z+cdqYl73So6NX7lTiYV2JWEAlwDw=;
+ b=VHP8ziiMfYdBofhoGf4c+mvqDKnjHbQ3wAEyoFPhP7CI4noBu4A/7t5f4N9KQJzOIZgGlbaVUOBH340FlZEnsUX6vJP1KCziQbgzBSSEulhG8uBgCpZPPNvyLDv4Jo5YpG/9kIZogBiJcNeWqaaKAvpbNLUvpNwdvz87qkrEK1cDmVk7iZUR7V8ePFwFQ8rw6ATVYUUPTeLg2pHlG29OzJI9HGV6hKMuZYtRk9GN8V5s5vJ7sX/OOeSri++zDwkNnEU+EiOtsww2n1v5NyL47nKnauII7qbCp87Ju6wK5R38SccIbWD4C5sE/b6ZWzdDLPwB0hMoZJTgz43LsHoVwg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=J6yOPD5MSOO5uGJ0sLl/wr/y0gfSWT6BMuq1oZERb/M=;
- b=DryNIiLD/YcRVbfBqjmpJHD13iVqO0IZcdr7hr7HZ3V8mNvJourA51xkJNQ3OPhyLvQFSjKyFQgwzOg9AbSLscTWYg6hLc60UTzn3ngFvLWA/AcrZXvHzSRXMhhJ0eW7BvKcyqEYhKVsaKxgE0flXAlnG9r2rKgVGH/wfNxgg6BnLYjOjxmnyad4kwerYNYY+QRKAjnB7fypM+cKVgijxi7DD/S2BxS1fCepE0Iw/6v22lorDpAeHC2E/5LAHaNto6Mwl45R8lvPeR85Z7TT9XZlfk/E+58KNB+p8YEdVPCHYN1oDXPTDRLhC77gqAzBU2V78jle7ivQCgkHSsT9wg==
-Authentication-Results: nvidia.com; dkim=none (message not signed)
- header.d=none;nvidia.com; dmarc=none action=none header.from=nvidia.com;
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
- by BL1PR12MB5239.namprd12.prod.outlook.com (2603:10b6:208:315::24) with
+ bh=8eCH34C9A+yTV/Z+cdqYl73So6NX7lTiYV2JWEAlwDw=;
+ b=FK+hG1V2pitDE5jQ3/1rxb+qP8MHJ1wb27Aon9UDAfC0gERJiUPiS+4k4SZb4+pZK2M2L/+XXZyjGXaoibz90m2gHj6gFVKtUcLp9ggKNTO1L1NuXeWh/K/oM0MMi3nls2pC9uxziSPnszlBB+acVyKLcSTdqz9nyPXPiBADecY=
+Authentication-Results: linux.intel.com; dkim=none (message not signed)
+ header.d=none;linux.intel.com; dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
+ by SN6PR12MB4670.namprd12.prod.outlook.com (2603:10b6:805:11::22) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4608.16; Wed, 13 Oct
- 2021 18:06:52 +0000
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::e8af:232:915e:2f95]) by BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::e8af:232:915e:2f95%6]) with mapi id 15.20.4608.016; Wed, 13 Oct 2021
- 18:06:52 +0000
-Date:   Wed, 13 Oct 2021 15:06:51 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Yishai Hadas <yishaih@nvidia.com>
-Cc:     alex.williamson@redhat.com, bhelgaas@google.com, saeedm@nvidia.com,
-        linux-pci@vger.kernel.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, kuba@kernel.org, leonro@nvidia.com,
-        kwankhede@nvidia.com, mgurtovoy@nvidia.com, maorg@nvidia.com
-Subject: Re: [PATCH V1 mlx5-next 13/13] vfio/mlx5: Trap device RESET and
- update state accordingly
-Message-ID: <20211013180651.GM2744544@nvidia.com>
-References: <20211013094707.163054-1-yishaih@nvidia.com>
- <20211013094707.163054-14-yishaih@nvidia.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211013094707.163054-14-yishaih@nvidia.com>
-X-ClientProxiedBy: MN2PR05CA0047.namprd05.prod.outlook.com
- (2603:10b6:208:236::16) To BL0PR12MB5506.namprd12.prod.outlook.com
- (2603:10b6:208:1cb::22)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4608.15; Wed, 13 Oct
+ 2021 18:10:45 +0000
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::78b7:7336:d363:9be3]) by SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::78b7:7336:d363:9be3%6]) with mapi id 15.20.4587.026; Wed, 13 Oct 2021
+ 18:10:45 +0000
+Cc:     brijesh.singh@amd.com, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH Part2 v5 39/45] KVM: SVM: Introduce ops for the post gfn
+ map and unmap
+To:     Sean Christopherson <seanjc@google.com>
+References: <20210820155918.7518-1-brijesh.singh@amd.com>
+ <20210820155918.7518-40-brijesh.singh@amd.com> <YWYm/Gw8PbaAKBF0@google.com>
+From:   Brijesh Singh <brijesh.singh@amd.com>
+Message-ID: <94128da2-c9f7-d990-2508-5a56f6cf16e7@amd.com>
+Date:   Wed, 13 Oct 2021 13:10:38 -0500
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.14.0
+In-Reply-To: <YWYm/Gw8PbaAKBF0@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-ClientProxiedBy: SA0PR13CA0010.namprd13.prod.outlook.com
+ (2603:10b6:806:130::15) To SN6PR12MB2718.namprd12.prod.outlook.com
+ (2603:10b6:805:6f::22)
 MIME-Version: 1.0
-Received: from mlx.ziepe.ca (142.162.113.129) by MN2PR05CA0047.namprd05.prod.outlook.com (2603:10b6:208:236::16) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4628.8 via Frontend Transport; Wed, 13 Oct 2021 18:06:52 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1maieR-00EcUG-Fb; Wed, 13 Oct 2021 15:06:51 -0300
+Received: from Brijeshs-MacBook-Pro.local (165.204.77.11) by SA0PR13CA0010.namprd13.prod.outlook.com (2603:10b6:806:130::15) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4608.7 via Frontend Transport; Wed, 13 Oct 2021 18:10:40 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 4883f0db-9364-4c38-d748-08d98e743be4
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5239:
+X-MS-Office365-Filtering-Correlation-Id: 0c0baeb1-6a65-4f7b-88db-08d98e74c5fa
+X-MS-TrafficTypeDiagnostic: SN6PR12MB4670:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <BL1PR12MB5239BCBDF5642C0E37342D34C2B79@BL1PR12MB5239.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:1775;
+X-Microsoft-Antispam-PRVS: <SN6PR12MB4670DBA6DF06123A970E8220E5B79@SN6PR12MB4670.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: E/H9HZqWh7RYFtIJ5H+y4kDi6B4HlaNZKMz01nxp4q1+g+FPtOzy22lD5W5OV1bwQPjmHKV7VaA3U/XWUoAhZkF2JDkdQBWaeAt0F4KGM5zi6OEJxqLjCS0ucev/chHPbjN53/1bXwqJifaxCwjbkkSjPB2bpflNt4oGALv/M2BP3rpZBwOCyBRlWhSbITOCr3I4FE5yZSQ7aTwfhdaMTD6pKgUHfZAj+pZ7jV0aqcKyJoGOoVTXP862fnfr0nGA40M0O0HBaSaNETBzi6Ae2nJSuIVJZfMgqXxx8wGk27T9dTNkV/vxrOkPyOTpTm9QvxWr4uq7dTUvfYN5DVOnUsWp+oOPbWMdkiic8pQFi5OQeBJiyySfaiw+0g5uUaINLhUwwaPDtWzH+bhbxEAtwuCMlf7q9LXFzGruLaxArirWB1HMESCU7gB6dwgSpmKFJSK+7qfrpqtLFMF27XTTr7hi8SJ2NtzTcKHEqFwhYjJYnfotPY5wFrPgfyTm6vrO4Wyf3IfBHVBEYN86obQTVvsNpqZpyJwn6nWB5AoJgHNWAyEBfg/QF1Nbf4O4+8VN54fuhj7YS2jSkZ7wJLB3IQskJ6xd9curE74JpiR98CeXp5IJjXGezIG7DK5X2/T0WFZZiiQJc15jhHZMWCL+uA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(107886003)(26005)(37006003)(8936002)(33656002)(9786002)(9746002)(2616005)(1076003)(4744005)(86362001)(186003)(316002)(6636002)(36756003)(15650500001)(508600001)(66476007)(66946007)(38100700002)(66556008)(8676002)(4326008)(6862004)(5660300002)(2906002)(426003)(83380400001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: +sWknjZbel65NDunT6t/DYFHS0WNThQYtNAMoSa68bEoxk5G6gBqPhiQdOBFgz3BlOZLuwq3v8GjnYwK/aHWDHlvy48vYrhyc0byzv515LxNnIcswCnVt9uuT/vIdq2EkUNOC8irTR8Ueyh2ipK6lmE8Of4B6Nx2SKGH6drkGAaff7CzoI657QZsRdLSbHbxTnol9kHu0Ki+2wM0hSwOatoyjBXBqz6ezyxH3EZRd9p6n9tfCQcm1yeTTucFvd2oxcAYLbvFhm7kvCX/5jHBKy9C2dWSVIqOYHv7KIuYIh3RNBUfa48XxNCDP+phkoq4LEg4qm9BCf3ofLG9BJmt4MBS5vSWy2LlxVmbP14PlMjhQjKS23P6fde7Q5uaZMZN/IvQjA3b0YeR8p3kf2DWdcHjBbGaizsAIhSHiszia9BqM7zJcgEj0O90xeCUWblLFb+KGbpfzvw5VCzo470K0MVveX3rGbElL/hl2acQfUyS8DKeNJBOAdAGtqThyBgtIM/1j/r60aDMpvr2S48+2AslfD1n1w9M+ou3yOcARM/AwrWwuJfkIXjuxz0W9DWkE4aYfr4qof0U9w6mp72S31lFTxsd8bnCFOSQW1IO+KO9qhVU0OjWe+wFa7BG9eMUdJRSS0JzE6bX5S1VvCeW1eCf9bpcGS4nbYGsKnI+u6V4akypf12tyLorBxt3QNdpGEygJReLFeZZy6nxLtnHo5lpPIphZHtAon/JqObHJeN0RScKIGjyQoyN12suZFOuKpivl5I+j/O4ohkBfmggFYcvR2xtCiUW5tNDwK3By2zzloxMa1qDx//qgO0t1J3z1IDuxAs0mI/8M/4ZRuoQkA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(186003)(7406005)(508600001)(6486002)(2906002)(6512007)(7416002)(316002)(31686004)(956004)(6916009)(44832011)(6506007)(4326008)(31696002)(2616005)(53546011)(36756003)(26005)(86362001)(5660300002)(45080400002)(66476007)(66946007)(66556008)(54906003)(38100700002)(966005)(8676002)(83380400001)(8936002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?xZMYHJ41tWNz4AynwzwT/3JRnktL9Crzz/oNittcESBJdAw2CVCiIsuD1UMb?=
- =?us-ascii?Q?EQ3txFQzMpy0JU5csvV57Ct0b3af2UBTA5OAtaFDYJjeY+HDKhMW+4VcXWJ8?=
- =?us-ascii?Q?vA5DmowLHltUdtSzLlBoW/tgMINvc70gMUsRoT8QEFCqLnTR58VKfVN+4PF8?=
- =?us-ascii?Q?HznGUYrKd5qkvnpG4p5Anowabsmc5f7exzzyev8siB8jTS7hKaHBTV69f0iR?=
- =?us-ascii?Q?UtxlEwpBVDV7bVvzAtrwzE372MXgocKgurinTF9xIKlAQ+E+IhA+OEIfmtEu?=
- =?us-ascii?Q?AoxIB5PV2JKy1+KdAx3YDqC/yYjKjbaBVUNoAkUMYmXuYiMKdwHDm8Z5pK04?=
- =?us-ascii?Q?PT3YsqEzxciMJo21NtLQa636bManw/sQ5OfeG/XEhOnm3dBmAxlcibWo2Gwy?=
- =?us-ascii?Q?PQhT/l3+gwZ9UvlUAqk/702RkdgB5g99lut918xhoEro64er3+uTGuzRN6Yx?=
- =?us-ascii?Q?RFP0ydF5DaOPcTuLg4ElRFdxbFPB8y8jb5yiqlzJ1tMg/M/im1BIfHvafsUT?=
- =?us-ascii?Q?0AR+E8u9Iz7mufORLt/3zy8WMBQ97iVLZMYsBENS9UfqnoWFQRF2iP6RLsmt?=
- =?us-ascii?Q?Xksp0HepwNO9aO+9I22GoIl82ufcOowp5Ajiz/Z64t4X+0KZIpAMghtrw9Xu?=
- =?us-ascii?Q?CSR3D/BF/6XplSZCAfolxZb5nkZ2wEVOtl2d40NuvJQBb+V/6sI4cQ84/V3G?=
- =?us-ascii?Q?aq6ukKsU5COnZRTiqS3bREHgVJsIbEC9d8eVKo+t4kWJKFI+R23G7VS2BWdv?=
- =?us-ascii?Q?rNYGkVp8lDezAM3j+klctVfyyifkCCjBovw4LExcvDL1qrOc/elec4FCrOO1?=
- =?us-ascii?Q?preOJce5B41JifvCPL5pdmcjs2MNyrHYCVlNPVAkd0rn2Xx6Y0XdjT51Mkon?=
- =?us-ascii?Q?ZOeo1tVoMAeHDnSMEgXv4UTyPqBOTz3ngC09p/z2WGaayU9eT6j+1G+Pbbak?=
- =?us-ascii?Q?L4tyEE1PoTlvT3+1q7/mu1WawBydsfNZszJm8gOMfjjz9O+96qB2Cad0sK3b?=
- =?us-ascii?Q?shaol4H1IPxMdBxgHU79oupRhJJInRmaWeYHAUUDb+mWdWdEXWseMZ01fSmj?=
- =?us-ascii?Q?dY+DU3oCHXRJFs66QXYuKSkc8T2Am023WbP+ZYbBN4vfamiM/4hBz8TqMq/t?=
- =?us-ascii?Q?LlrHLXXbbQ04BJgRgpdp85IaaIc+ohyyDP1ZzrU9c+66OpSkcx2S9f7AyQ5Q?=
- =?us-ascii?Q?2eu+v+MMvRXyGGY/qS8BHHzZPBWKHacseNMtEVGV5JPqwwoHlw9tgudphXt+?=
- =?us-ascii?Q?1t0QhCtCphuzg4tLAKvmPld62ietJUd1DRVoIYrOGXGXWf2LAIdl7i9LpiTS?=
- =?us-ascii?Q?ZslcmbUVkp47hqvRKAz4mIeDSrUi0RwRSVlSn+BDGVogbw=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4883f0db-9364-4c38-d748-08d98e743be4
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?V1YxYVBjcDRvV1huNjlOY0F5V0FOM2VXaENrK1dwMi85cjVEZ1VERExEdlVh?=
+ =?utf-8?B?MndnbDcySlM2aWlNZDlkWGVUcVl0dmEvS2lzZU0zS2o3K2hIaXR6Qi9qL1JZ?=
+ =?utf-8?B?MFlSZkx4amIrN0ZQZjZaN3RDTjVoN2Uwc2NpYWVzcjNQTldMbHVaZlJ3aFVI?=
+ =?utf-8?B?OFBVa3FzczV5NXJyYWk2QUpvNjhpbWxvWllTT1pZVXJJdlg2bjd4ZXBhTUpQ?=
+ =?utf-8?B?emR0Y2M5RnNFeG1sMGpHRUJaOEVFNGdleXV0YjJ2UVIxMUhTV3BjazVidHBV?=
+ =?utf-8?B?MmF1UWMvUXZhb21PMDlRWnFqT1ZrSlA3N05QWGoxdzJVZE9sU1NVNFpVTmhN?=
+ =?utf-8?B?a2J5VmpaSHlDaUVvQXJRM3Z3NGtTRkFkSWExMk5DVThGM2tjcWx1VGZZNDRK?=
+ =?utf-8?B?ZVUrM2UxUGFYNkxTSHNaWlQxL0UrSkJxeXQrdjhLUVBycU9YTVJnWFNuemRU?=
+ =?utf-8?B?ejg1WkdQTFh1dThTWC9pMHgrcDJ0SUNPTWEvRHl3UDRnQ3kzQlJCaW1weHlF?=
+ =?utf-8?B?UjFvdHUrRTN5VXMybkExVkZNMmlPWXNITjJ2Q3FDaHVCUzUyK0gzb0xWbmZR?=
+ =?utf-8?B?OVZaRVBsMDR0MVZyRDRxNjVCRUxCNmswREJPQkpnYTRjS2V2RjY5NnNTNDl0?=
+ =?utf-8?B?TzFnMG9FVTdsd3JmeTZVNjZubnpieHorcXV2b1lMVWtxVmd6K1RyNnlBN29n?=
+ =?utf-8?B?RWZ6elk1R2VyVFUyUHRtWHhLcklMQmcrSGl1NkJSTGhPU0pGb2UzRlpvMnFZ?=
+ =?utf-8?B?T0pSQ0R6QmUyaWhFMkNmYWU3SUo0V3BuOUc4TXN2WFhvd3BTK0phRklNME1m?=
+ =?utf-8?B?QU0rYzVBWCtQR1dwNnBSK2RFY0lrdU9uT3NBbkVSNjJ6YjNQQ3Nkd2tsdjZv?=
+ =?utf-8?B?ejltdGdzeUE0ODJqTzZmSlI0ZnkvdHgxcXBScHFrTHFJWjJEL3VsVFhhQlU5?=
+ =?utf-8?B?T01LRWVWZTRNZkNmbVdwaWFzbE5vRVNqRVIzOHVwWnRJMlQ1cTRqNGlKZjNr?=
+ =?utf-8?B?bzdXT0VrSGVNeTlHenFlZ1ZuaU41SG5rWVdDa2lNa3ZQVlU1UXhtb2todmtG?=
+ =?utf-8?B?Y0ZtSGp4cVNBTTZvdlBrN2p5b2FrbWpTYm1NWHpDSGwxSUdLMGNEZGFUcElC?=
+ =?utf-8?B?SnJyMlo4ZGdWT2VFMG5GUktNaDM2c3ExNjNxUHZhL2ptcUpvWlhtTi9OVUQr?=
+ =?utf-8?B?K0J0RE56M09CV3BBR3ZHNVY3c3hpcnpTWDJSeUpLZk5vUWdXVkQ4QTRlU2c2?=
+ =?utf-8?B?Y2lFeVoyNkFXbnZKUnd1NUd6QVQ1SU1SYkFZZjFNckRvckRIa3Uxc2tPbzU1?=
+ =?utf-8?B?MnNDZlFNNmZsL3B6T09QTU0weWtNQUQxbE80ODhkYnBFZCs1NENOeVVoMlQr?=
+ =?utf-8?B?THlGcmR0bE9ZcEUrRUNVdWJreGYyRlJuVjFHWWJzSUlJMFEvMmlqeWowZkZq?=
+ =?utf-8?B?M0VGYzl1K1FKNnRWK1FUUmhoWGZZcDNmYlloU3pDdWRuY1JlMTlwQWFaQmtF?=
+ =?utf-8?B?RnRpMEtINWIveEt1aFNvOTd0eG82UnliSDhmdkxDV1ZJQWV3K0Q0Y1o3aGtz?=
+ =?utf-8?B?ZVRxV3pqK3FiTC9GR2NnRlhRYWg4cXJYZUdOWXozMVNTZ2FiTlZWWm53SFdy?=
+ =?utf-8?B?QnVaRmNRSlYzNHRjbVBSYjc3b0pFaVZoc2o1MHM2Y0NCTURYR3UzSEdvOW1S?=
+ =?utf-8?B?cGR2dWN4TWtaOC9zU255TTF2MnhEWWJMRHdmTkhPK05zWElrL1VNTXA2SEFJ?=
+ =?utf-8?Q?x7VKRZpb7heyVGgPhrs7hY0GO7npnlIV/OrJIyw?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0c0baeb1-6a65-4f7b-88db-08d98e74c5fa
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Oct 2021 18:06:52.3512
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Oct 2021 18:10:45.0550
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: nWpcrWM34DbcoN0qVAAuLMW7ANAuRNGkVGogOzidXiXSOQTqrhlh4QCyoTeiwttL
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5239
+X-MS-Exchange-CrossTenant-UserPrincipalName: hC/UgjgOdl/7dDtX4poGntB7DWyFYTyK6No749FMpbtFC8vJZ9UTkGl5GLnRedBoMV1x67NrLVSWqbY4ws5FfA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR12MB4670
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 13, 2021 at 12:47:07PM +0300, Yishai Hadas wrote:
-> Trap device RESET and update state accordingly, it's done by registering
-> the matching callbacks.
-> 
-> Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
-> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
->  drivers/vfio/pci/mlx5/main.c | 17 ++++++++++++++++-
->  1 file changed, 16 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/vfio/pci/mlx5/main.c b/drivers/vfio/pci/mlx5/main.c
-> index e36302b444a6..8fe44ed13552 100644
-> +++ b/drivers/vfio/pci/mlx5/main.c
-> @@ -613,6 +613,19 @@ static const struct vfio_device_ops mlx5vf_pci_ops = {
->  	.match = vfio_pci_core_match,
->  };
->  
-> +static void mlx5vf_reset_done(struct vfio_pci_core_device *core_vdev)
-> +{
-> +	struct mlx5vf_pci_core_device *mvdev = container_of(
-> +			core_vdev, struct mlx5vf_pci_core_device,
-> +			core_device);
-> +
-> +	mvdev->vmig.vfio_dev_state = VFIO_DEVICE_STATE_RUNNING;
 
-This should hold the state mutex too
+On 10/12/21 5:23 PM, Sean Christopherson wrote:
+> On Fri, Aug 20, 2021, Brijesh Singh wrote:
+>> When SEV-SNP is enabled in the guest VM, the guest memory pages can
+>> either be a private or shared. A write from the hypervisor goes through
+>> the RMP checks. If hardware sees that hypervisor is attempting to write
+>> to a guest private page, then it triggers an RMP violation #PF.
+>>
+>> To avoid the RMP violation, add post_{map,unmap}_gfn() ops that can be
+>> used to verify that its safe to map a given guest page. Use the SRCU to
+>> protect against the page state change for existing mapped pages.
+> SRCU isn't protecting anything.  The synchronize_srcu_expedited() in the PSC code
+> forces it to wait for existing maps to go away, but it doesn't prevent new maps
+> from being created while the actual RMP updates are in-flight.  Most telling is
+> that the RMP updates happen _after_ the synchronize_srcu_expedited() call.
+>
+> This also doesn't handle kvm_{read,write}_guest_cached().
 
-Jason
+Hmm, I thought the kvm_{read_write}_guest_cached() uses the
+copy_{to,from}_user(). Writing to the private will cause a #PF and will
+fail the copy_to_user(). Am I missing something?
+
+
+>
+> I can't help but note that the private memslots idea[*] would handle this gracefully,
+> e.g. the memslot lookup would fail, and any change in private memslots would
+> invalidate the cache due to a generation mismatch.
+>
+> KSM is another mess that would Just Work.
+>
+> I'm not saying that SNP should be blocked on support for unmapping guest private
+> memory, but I do think we should strongly consider focusing on that effort rather
+> than trying to fix things piecemeal throughout KVM.  I don't think it's too absurd
+> to say that it might actually be faster overall.  And I 100% think that having a
+> cohesive design and uABI for SNP and TDX would be hugely beneficial to KVM.
+>
+> [*] https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Flkml.kernel.org%2Fr%2F20210824005248.200037-1-seanjc%40google.com&amp;data=04%7C01%7Cbrijesh.singh%40amd.com%7Cd1717d511a1f473cedc408d98ddfb027%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637696814148744591%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C1000&amp;sdata=3LF77%2BcqmpUdiP6YAk7LpImisBzjRGUzdI3raqjJxl0%3D&amp;reserved=0
+>
+>> +int sev_post_map_gfn(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn, int *token)
+>> +{
+>> +	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+>> +	int level;
+>> +
+>> +	if (!sev_snp_guest(kvm))
+>> +		return 0;
+>> +
+>> +	*token = srcu_read_lock(&sev->psc_srcu);
+>> +
+>> +	/* If pfn is not added as private then fail */
+> This comment and the pr_err() are backwards, and confused the heck out of me.
+> snp_lookup_rmpentry() returns '1' if the pfn is assigned, a.k.a. private.  That
+> means this code throws an error if the page is private, i.e. requires the page
+> to be shared.  Which makes sense given the use cases, it's just incredibly
+> confusing.
+Actually I followed your recommendation from the previous feedback that
+snp_lookup_rmpentry() should return 1 for the assigned page, 0 for the
+shared and -negative for invalid. I can clarify it here  again.
+>
+>> +	if (snp_lookup_rmpentry(pfn, &level) == 1) {
+> Any reason not to provide e.g. rmp_is_shared() and rmp_is_private() so that
+> callers don't have to care as much about the return values?  The -errno/0/1
+> semantics are all but guarantee to bite us in the rear at some point.
+
+If we look at the previous series, I had a macro rmp_is_assigned() for
+exactly the same purpose but the feedback was to drop those macros and
+return the state indirectly through the snp_lookup_rmpentry(). I can
+certainly add a helper rmp_is_{shared,private}() if it makes code more
+readable.
+
+
+> Actually, peeking at other patches, I think it already has.  This usage in
+> __unregister_enc_region_locked() is wrong:
+>
+> 	/*
+> 	 * The guest memory pages are assigned in the RMP table. Unassign it
+> 	 * before releasing the memory.
+> 	 */
+> 	if (sev_snp_guest(kvm)) {
+> 		for (i = 0; i < region->npages; i++) {
+> 			pfn = page_to_pfn(region->pages[i]);
+>
+> 			if (!snp_lookup_rmpentry(pfn, &level))  <-- attempts make_shared() on non-existent entry
+> 				continue;
+>
+> 			cond_resched();
+>
+> 			if (level > PG_LEVEL_4K)
+> 				pfn &= ~(KVM_PAGES_PER_HPAGE(PG_LEVEL_2M) - 1);
+>
+> 			host_rmp_make_shared(pfn, level, true);
+> 		}
+> 	}
+>
+>
+>> +		srcu_read_unlock(&sev->psc_srcu, *token);
+>> +		pr_err_ratelimited("failed to map private gfn 0x%llx pfn 0x%llx\n", gfn, pfn);
+>> +		return -EBUSY;
+>> +	}
+>> +
+>> +	return 0;
+>> +}
+>>  static struct kvm_x86_init_ops svm_init_ops __initdata = {
+>> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+>> index d10f7166b39d..ff91184f9b4a 100644
+>> --- a/arch/x86/kvm/svm/svm.h
+>> +++ b/arch/x86/kvm/svm/svm.h
+>> @@ -76,16 +76,22 @@ struct kvm_sev_info {
+>>  	bool active;		/* SEV enabled guest */
+>>  	bool es_active;		/* SEV-ES enabled guest */
+>>  	bool snp_active;	/* SEV-SNP enabled guest */
+>> +
+>>  	unsigned int asid;	/* ASID used for this guest */
+>>  	unsigned int handle;	/* SEV firmware handle */
+>>  	int fd;			/* SEV device fd */
+>> +
+>>  	unsigned long pages_locked; /* Number of pages locked */
+>>  	struct list_head regions_list;  /* List of registered regions */
+>> +
+>>  	u64 ap_jump_table;	/* SEV-ES AP Jump Table address */
+>> +
+>>  	struct kvm *enc_context_owner; /* Owner of copied encryption context */
+>>  	struct misc_cg *misc_cg; /* For misc cgroup accounting */
+>> +
+> Unrelated whitespace changes.
+>
+>>  	u64 snp_init_flags;
+>>  	void *snp_context;      /* SNP guest context page */
+>> +	struct srcu_struct psc_srcu;
+>>  };
