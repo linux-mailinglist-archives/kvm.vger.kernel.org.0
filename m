@@ -2,78 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 40CCD42C419
+	by mail.lfdr.de (Postfix) with ESMTP id DD5F142C41B
 	for <lists+kvm@lfdr.de>; Wed, 13 Oct 2021 16:55:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237860AbhJMO5k (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Oct 2021 10:57:40 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:35376 "EHLO
+        id S238019AbhJMO5p (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Oct 2021 10:57:45 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:35396 "EHLO
         galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237377AbhJMO5h (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Oct 2021 10:57:37 -0400
-Message-ID: <20211013145322.451439983@linutronix.de>
+        with ESMTP id S237654AbhJMO5j (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Oct 2021 10:57:39 -0400
+Message-ID: <20211013145322.503327333@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1634136933;
+        s=2020; t=1634136935;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         references:references; bh=oSFTRrG1M7hlRW5/Fmh7mVM82LlOghgD5/z1wLXfyOM=;
-        b=ZaGT+Hg9QfbmHBPeWzQMFLdrI1a+5uSiAbB5/FrcLRmsJiVaCEEVGJX2DzV+HD5KRRTnJN
-        tqfWgCYbs7PTp5/yb3tVd6Nj8sDK+5UXPZX0efWcqNAZ0B13Fks2Czv0KQA9bYn+PjAgsr
-        3nvBH4u+AVyXSfUIohWnKRjF+9Qv2v0Bpd3VsvHWZuPhu54TG3C8FshpGRdpNWuh35a4vL
-        blWoNLX1sui18YQANwmLgxYE457V6VsZbuAxzUQwc21EaS5kK9mqRMagA7igC+Wnameban
-        lVQNdWXfNcAOo1Bt06+spfii/OH6lr+EqW9f1agjdOx7tyxySFGgHFXRgbWEkQ==
+         references:references; bh=AMd0kJ1rCstUZs3aFFlbnYg4MBXkNT2VAG/LpBOLZqI=;
+        b=uF3QNt9/6PFjzPUgh6ntRsDKFMDRftqBqtXaBiadHuX6cNB7SH/CjK7ySxAjGdJf3rnKvf
+        o0MO35ItnMVHoN1hJPJpbnTDIvP0NyMmoraBZIG+VyFI6mA7OFHkcgHKfCa+USnwJytDux
+        tgmRmKdo0iUH9lH5QTnOSODxKAfhZamiNGx3kM1lMjhuRhZVWCSyzbYlcGmEbp7EFaemew
+        yuDZWRcIIsGDlkiXTrJWvaigdGQNd0CPeOQ7OncHAos/wCW+zOOpqsjRKjJX6fNvgsxXLk
+        u927yqJoFQWHmEs/yp82be6s4iEmlc1sgAcSSLcjD0gDYluiK/FiDZuEdliQdQ==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1634136933;
+        s=2020e; t=1634136935;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         references:references; bh=oSFTRrG1M7hlRW5/Fmh7mVM82LlOghgD5/z1wLXfyOM=;
-        b=21leFw/TEhfyMBih/O5xKvcojw1jvXiPXaAoXUR7jQncYVLmZQ+KZiXKF/DjQv+NPNVi48
-        4tAudzovnQgBV7BA==
+         references:references; bh=AMd0kJ1rCstUZs3aFFlbnYg4MBXkNT2VAG/LpBOLZqI=;
+        b=TEwdsL+cA/6XLn4GefYluLNy0pG7Lwlbp3v+65UiW3cVaYpgt/9PnjEgLa0TIzUUyc+StH
+        5tlkCS5nwKVV/mAw==
 From:   Thomas Gleixner <tglx@linutronix.de>
 To:     LKML <linux-kernel@vger.kernel.org>
 Cc:     x86@kernel.org, "Chang S. Bae" <chang.seok.bae@intel.com>,
         Dave Hansen <dave.hansen@linux.intel.com>,
         Arjan van de Ven <arjan@linux.intel.com>,
         kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Subject: [patch 05/21] x86/KVM: Convert to fpstate
+Subject: [patch 06/21] x86/fpu: Convert tracing to fpstate
 References: <20211013142847.120153383@linutronix.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Date:   Wed, 13 Oct 2021 16:55:33 +0200 (CEST)
+Date:   Wed, 13 Oct 2021 16:55:34 +0200 (CEST)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Convert KVM code to the new register storage mechanism in preparation for
-dynamically sized buffers.
+Convert FPU tracing code to the new register storage mechanism in
+preparation for dynamically sized buffers.
 
 No functional change.
 
 Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org
 ---
- arch/x86/kvm/x86.c |    4 ++--
+ arch/x86/include/asm/trace/fpu.h |    4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -10389,7 +10389,7 @@ int kvm_arch_vcpu_ioctl_get_fpu(struct k
- 
- 	vcpu_load(vcpu);
- 
--	fxsave = &vcpu->arch.guest_fpu->state.fxsave;
-+	fxsave = &vcpu->arch.guest_fpu->fpstate->regs.fxsave;
- 	memcpy(fpu->fpr, fxsave->st_space, 128);
- 	fpu->fcw = fxsave->cwd;
- 	fpu->fsw = fxsave->swd;
-@@ -10412,7 +10412,7 @@ int kvm_arch_vcpu_ioctl_set_fpu(struct k
- 
- 	vcpu_load(vcpu);
- 
--	fxsave = &vcpu->arch.guest_fpu->state.fxsave;
-+	fxsave = &vcpu->arch.guest_fpu->fpstate->regs.fxsave;
- 
- 	memcpy(fxsave->st_space, fpu->fpr, 128);
- 	fxsave->cwd = fpu->fcw;
+--- a/arch/x86/include/asm/trace/fpu.h
++++ b/arch/x86/include/asm/trace/fpu.h
+@@ -22,8 +22,8 @@ DECLARE_EVENT_CLASS(x86_fpu,
+ 		__entry->fpu		= fpu;
+ 		__entry->load_fpu	= test_thread_flag(TIF_NEED_FPU_LOAD);
+ 		if (boot_cpu_has(X86_FEATURE_OSXSAVE)) {
+-			__entry->xfeatures = fpu->state.xsave.header.xfeatures;
+-			__entry->xcomp_bv  = fpu->state.xsave.header.xcomp_bv;
++			__entry->xfeatures = fpu->fpstate->regs.xsave.header.xfeatures;
++			__entry->xcomp_bv  = fpu->fpstate->regs.xsave.header.xcomp_bv;
+ 		}
+ 	),
+ 	TP_printk("x86/fpu: %p load: %d xfeatures: %llx xcomp_bv: %llx",
 
