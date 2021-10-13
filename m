@@ -2,147 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4728942BC16
-	for <lists+kvm@lfdr.de>; Wed, 13 Oct 2021 11:49:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 11D7E42BC23
+	for <lists+kvm@lfdr.de>; Wed, 13 Oct 2021 11:51:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239284AbhJMJvy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Oct 2021 05:51:54 -0400
-Received: from mail-mw2nam10on2053.outbound.protection.outlook.com ([40.107.94.53]:48001
-        "EHLO NAM10-MW2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S239276AbhJMJvM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Oct 2021 05:51:12 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=KxTFhrKZeNySGFtQk93SFCil8VqccG0uWcXs+4LKRpczGoE7VDfjIlF6+PLG0Rqw/FEItH5mNfaG5r5ZpJFyD1WvEYa/fWmdSO14uQbOCPcMKbA8DQTeqAuTE04syMu7QLgCDTDsnP1thgenTzoAApFwX8sBgOLgcaJUAoR88xfYLQ0PnUyMzO3h411aHayUDTHcGfsWcW6Ofv7GoPyqas1/9VCsw6uknRakLXQHYhhDsPBrZ9VWqXSXnxtnsFt/OpIQu6hCyrN6xWVne3glIgPBDnoeljl2nda6Sq1mmXCEOMHaF15TrcgjGxopQwUnmv3ItCvpcVUD8OkdOS6PcA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=nKZ06M5DEgvv5Hcnlj5KjV4W4F5oErEUIFUptUE7ncA=;
- b=Ds+S4eciEF5P0AjQFB+3pZ64apkiPsjP6rOOvYPV1hAZUwjhP22YBwq5AC4U/hA1jmHpJ4nvvcDYpzPWuVYU30tG7YVuQ6jTzBegOR9lehmPviFP5n3VZ5cQpAWNqd81raVUVGzXyl6MXI/H/N4y5sr82+h4aZT6uQ5QWrWk8kOIzGYjx4jqvvNq6pVxkyzHMXFHbFM8rWA3NUIntI+IAEywyLxbV1b3JIY4e/7G40pIT6IZnGc4spbYu73+fzlZJydQgje628c3ftG5RuDCPerWpjAgUUgYHn9FZKpVKvijvUGhLlabb2Hn70jYBqJtCZFsMTgQbzR2Dfv6ZsHoTQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.112.32) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=nvidia.com; dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=nKZ06M5DEgvv5Hcnlj5KjV4W4F5oErEUIFUptUE7ncA=;
- b=JrU6SCNlLAijcrMN/eb2eoqeDIaHB09T6MNVuG1IXKJQ8sf806nFUhzlzYEkzxuHL18/5MCy+BFGod239G0XTVnr1/Hqfuhk1GdOp4B0zjpH+wGvxEKWc0kMyUs+cDwNhwwvnIXfKIRFznTKM9cr/iPBmTRRb+YdPDSlntXKSfh4p9mJ/SS18pIqmLYVKqSJ+ycCenEcwPmOStGTzu2PyemvAoVAOD1vv5GFuL2Yi5atm0fMkaVuFCOPOV8xHN8JwGrlFq8bTneMQYgT9HXLRPcjb5Zi7XEHweX89tvbHNGLhL45CX/FZfJBWDOk5fNOesaWlN/zSyBRtuKfQuQbBQ==
-Received: from BN1PR10CA0015.namprd10.prod.outlook.com (2603:10b6:408:e0::20)
- by BYAPR12MB2856.namprd12.prod.outlook.com (2603:10b6:a03:136::29) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4608.16; Wed, 13 Oct
- 2021 09:49:07 +0000
-Received: from BN8NAM11FT057.eop-nam11.prod.protection.outlook.com
- (2603:10b6:408:e0:cafe::8a) by BN1PR10CA0015.outlook.office365.com
- (2603:10b6:408:e0::20) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4587.25 via Frontend
- Transport; Wed, 13 Oct 2021 09:49:07 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.32)
- smtp.mailfrom=nvidia.com; redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.112.32 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.112.32; helo=mail.nvidia.com;
-Received: from mail.nvidia.com (216.228.112.32) by
- BN8NAM11FT057.mail.protection.outlook.com (10.13.177.49) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.4608.15 via Frontend Transport; Wed, 13 Oct 2021 09:49:07 +0000
-Received: from HQMAIL105.nvidia.com (172.20.187.12) by HQMAIL109.nvidia.com
- (172.20.187.15) with Microsoft SMTP Server (TLS) id 15.0.1497.18; Wed, 13 Oct
- 2021 02:49:06 -0700
-Received: from HQMAIL111.nvidia.com (172.20.187.18) by HQMAIL105.nvidia.com
- (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1497.18; Wed, 13 Oct
- 2021 09:49:06 +0000
-Received: from vdi.nvidia.com (172.20.187.6) by mail.nvidia.com
- (172.20.187.18) with Microsoft SMTP Server id 15.0.1497.18 via Frontend
- Transport; Wed, 13 Oct 2021 09:49:03 +0000
-From:   Yishai Hadas <yishaih@nvidia.com>
-To:     <alex.williamson@redhat.com>, <bhelgaas@google.com>,
-        <jgg@nvidia.com>, <saeedm@nvidia.com>
-CC:     <linux-pci@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <kuba@kernel.org>, <leonro@nvidia.com>,
-        <kwankhede@nvidia.com>, <mgurtovoy@nvidia.com>,
-        <yishaih@nvidia.com>, <maorg@nvidia.com>
-Subject: [PATCH V1 mlx5-next 13/13] vfio/mlx5: Trap device RESET and update state accordingly
-Date:   Wed, 13 Oct 2021 12:47:07 +0300
-Message-ID: <20211013094707.163054-14-yishaih@nvidia.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20211013094707.163054-1-yishaih@nvidia.com>
-References: <20211013094707.163054-1-yishaih@nvidia.com>
+        id S238420AbhJMJxn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Oct 2021 05:53:43 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:20378 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235811AbhJMJxm (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 13 Oct 2021 05:53:42 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 19D9ihfO024150;
+        Wed, 13 Oct 2021 05:51:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=+oG/8O+ugu5JTXXvVXXOgkY3pIiMCq+tFTKQSSsHBIU=;
+ b=eHIgLOCjmPfuSTs8/bEQhKaTZyd3yZxQ5iHUSDf6R6YqmtK7FRi6TIrNvtL034i/xY+Q
+ H516LxPjKf10pJPNQG1cDhPD4TKu3++svjnztj+zyq1W+SaY0NuDqfunqZeOnWKRejIR
+ eulg/hit4OutljK8n9feBp107M/jCoySiVFomGzN2MzUW3E1VMRxycIXKKurSE8EzZKZ
+ glarZo4FgyKba2G2nBUiBegvQp6xWEkKLezmHDceWvPTODp8pL4BK+25Mj1lK+ZhW7Dx
+ SZPTWlBRjrjW/w+XAXzFDSv0WCihCu8U5+6JwmQR501uqr5iCkbcunxWDEOgQ9dyooYk 1Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3bnqmp6y78-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 13 Oct 2021 05:51:39 -0400
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 19D9TgRK011210;
+        Wed, 13 Oct 2021 05:51:38 -0400
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3bnqmp6y6f-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 13 Oct 2021 05:51:38 -0400
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 19D9lvMD016226;
+        Wed, 13 Oct 2021 09:51:36 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma06ams.nl.ibm.com with ESMTP id 3bk2bjhf5s-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 13 Oct 2021 09:51:35 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 19D9jpha61407616
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 13 Oct 2021 09:45:51 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 924844C05C;
+        Wed, 13 Oct 2021 09:51:28 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 461FB4C058;
+        Wed, 13 Oct 2021 09:51:28 +0000 (GMT)
+Received: from [9.145.94.172] (unknown [9.145.94.172])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 13 Oct 2021 09:51:28 +0000 (GMT)
+Message-ID: <4bb5ae96-2a01-c151-c1d9-9efedd2960f0@linux.ibm.com>
+Date:   Wed, 13 Oct 2021 11:51:27 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 81131ce4-bd74-413e-d1d1-08d98e2eb34e
-X-MS-TrafficTypeDiagnostic: BYAPR12MB2856:
-X-Microsoft-Antispam-PRVS: <BYAPR12MB28567F51ED26E86485E72E93C3B79@BYAPR12MB2856.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:883;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: EWHUVaRj5D6uMMWJo3p/mDDuLzzdRu0/tJaCSbYemmN10Ya/+ZI38c3YYGPV1+oxOfwlxDFTuiYuU65rvgbzz/WyizPWFh4n+LthESannaQU/ZKCRbR9vCMPUskXhXq1r3DBSBpuEWCnorwQeH6ExY6rd9DMdDTu6jp331bCVPqZnPyhXuNZ2zGw0BQLQE9fpbgLpR+1A4Wq3eWrJmCpIZr0eYczWay+20G0ir0vdLyQ0YzfR+9WVcC3u8Rs2EJxx3EGb+MWg/M2OZJDDEuQSVKYkA2Pmk4pD5HV/CAiyabO0rn6rS68uUPTjySKgRwJ9LGwF+5KqOgNpiT1MfKXXrK3wi+GloryXcgKvVcYAcmS3efBwlYInnepX5Qakqr6T+sIUtOcVahZEzOZH/ymCHmn5hdIQTXVAiB1X0KmWYBNFL/7GRUQeXx7Jp9Fe9nalSGXj7vVKj7ClCS3w+HuEKSjrstnH6agZet1AyjeZ9KSdKU+S7g51mPI0Ajs6sB6pLNbsF6CjtUv+cA6niigkRHPvvv0NGYqxyJqRbOur6UVfFFK/BpBXMicfqscENE7+wP2Y0yx7YBf/dmODVmzez5hkrs2S+iyxCCPVTOnAvsRIFciVXsYs6ovqpZ0vXB0raw2kHhmWN9+boQhH/7zlHxbS6Q5h+/2RgjOeITduEKwvWUNjBbKdi/hfHCXgLx1RtbrvslooSFHjDMve09WCA==
-X-Forefront-Antispam-Report: CIP:216.228.112.32;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid01.nvidia.com;CAT:NONE;SFS:(4636009)(36840700001)(46966006)(70206006)(36756003)(82310400003)(508600001)(8936002)(316002)(2906002)(36860700001)(2616005)(7696005)(8676002)(426003)(110136005)(4326008)(54906003)(6636002)(70586007)(5660300002)(83380400001)(86362001)(1076003)(26005)(356005)(7636003)(336012)(186003)(15650500001)(47076005)(107886003);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Oct 2021 09:49:07.5776
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 81131ce4-bd74-413e-d1d1-08d98e2eb34e
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.32];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT057.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR12MB2856
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [kvm-unit-tests PATCH] s390x/snippets: Define all things that are
+ needed to link the libc
+Content-Language: en-US
+To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>
+References: <20211008092649.959956-1-thuth@redhat.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+In-Reply-To: <20211008092649.959956-1-thuth@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: yHSCv12_KVM3O7A5EoHcnJAwMmtT9LIZ
+X-Proofpoint-ORIG-GUID: 5YNktcl0yN-qDKVDj2AEeo6sPKglNr2T
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
+ definitions=2021-10-13_03,2021-10-13_01,2020-04-07_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
+ priorityscore=1501 bulkscore=0 impostorscore=0 lowpriorityscore=0
+ phishscore=0 clxscore=1015 mlxscore=0 adultscore=0 spamscore=0
+ suspectscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2109230001 definitions=main-2110130064
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Trap device RESET and update state accordingly, it's done by registering
-the matching callbacks.
+On 10/8/21 11:26, Thomas Huth wrote:
+> In the long run, we want to use parts of the libc like memset() etc.,
+> too. However, to be able to link it correctly, we have to provide
+> some stub functions like puts() and exit() to avoid that too much
+> other stuff from the lib folder gets pulled into the binaries, which
+> we cannot provide in the snippets (like the sclp support).
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 
-Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
-Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
----
- drivers/vfio/pci/mlx5/main.c | 17 ++++++++++++++++-
- 1 file changed, 16 insertions(+), 1 deletion(-)
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+Thanks, picked!
 
-diff --git a/drivers/vfio/pci/mlx5/main.c b/drivers/vfio/pci/mlx5/main.c
-index e36302b444a6..8fe44ed13552 100644
---- a/drivers/vfio/pci/mlx5/main.c
-+++ b/drivers/vfio/pci/mlx5/main.c
-@@ -613,6 +613,19 @@ static const struct vfio_device_ops mlx5vf_pci_ops = {
- 	.match = vfio_pci_core_match,
- };
- 
-+static void mlx5vf_reset_done(struct vfio_pci_core_device *core_vdev)
-+{
-+	struct mlx5vf_pci_core_device *mvdev = container_of(
-+			core_vdev, struct mlx5vf_pci_core_device,
-+			core_device);
-+
-+	mvdev->vmig.vfio_dev_state = VFIO_DEVICE_STATE_RUNNING;
-+}
-+
-+static const struct vfio_pci_core_device_ops mlx5vf_pci_core_ops = {
-+	.reset_done = mlx5vf_reset_done,
-+};
-+
- static int mlx5vf_pci_probe(struct pci_dev *pdev,
- 			    const struct pci_device_id *id)
- {
-@@ -629,8 +642,10 @@ static int mlx5vf_pci_probe(struct pci_dev *pdev,
- 			mlx5_vf_get_core_dev(pdev);
- 
- 		if (mdev) {
--			if (MLX5_CAP_GEN(mdev, migration))
-+			if (MLX5_CAP_GEN(mdev, migration)) {
- 				mvdev->migrate_cap = 1;
-+				mvdev->core_device.ops = &mlx5vf_pci_core_ops;
-+			}
- 			mlx5_vf_put_core_dev(mdev);
- 		}
- 	}
--- 
-2.18.1
+> ---
+>   s390x/Makefile            |  2 +-
+>   s390x/snippets/c/cstart.S | 11 +++++++++++
+>   2 files changed, 12 insertions(+), 1 deletion(-)
+> 
+> diff --git a/s390x/Makefile b/s390x/Makefile
+> index ef8041a..b2a7c1f 100644
+> --- a/s390x/Makefile
+> +++ b/s390x/Makefile
+> @@ -80,7 +80,7 @@ asmlib = $(TEST_DIR)/cstart64.o $(TEST_DIR)/cpu.o
+>   FLATLIBS = $(libcflat)
+>   
+>   SNIPPET_DIR = $(TEST_DIR)/snippets
+> -snippet_asmlib = $(SNIPPET_DIR)/c/cstart.o
+> +snippet_asmlib = $(SNIPPET_DIR)/c/cstart.o lib/auxinfo.o
+>   
+>   # perquisites (=guests) for the snippet hosts.
+>   # $(TEST_DIR)/<snippet-host>.elf: snippets = $(SNIPPET_DIR)/<c/asm>/<snippet>.gbin
+> diff --git a/s390x/snippets/c/cstart.S b/s390x/snippets/c/cstart.S
+> index a175480..1862703 100644
+> --- a/s390x/snippets/c/cstart.S
+> +++ b/s390x/snippets/c/cstart.S
+> @@ -20,6 +20,17 @@ start:
+>   	lghi	%r15, 0x4000 - 160
+>   	sam64
+>   	brasl	%r14, main
+> +	/*
+> +	 * If main() returns, we stop the CPU with the code below. We also
+> +	 * route some functions that are required by the libc (but not usable
+> +	 * from snippets) to the CPU stop code below, so that snippets can
+> +	 * still be linked against the libc code (to use non-related functions
+> +	 * like memset() etc.)
+> +	 */
+> +.global puts
+> +.global exit
+> +puts:
+> +exit:
+>   	/* For now let's only use cpu 0 in snippets so this will always work. */
+>   	xgr	%r0, %r0
+>   	sigp    %r2, %r0, SIGP_STOP
+> 
 
