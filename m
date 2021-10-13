@@ -2,215 +2,580 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7DA0B42BD3B
-	for <lists+kvm@lfdr.de>; Wed, 13 Oct 2021 12:39:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1532442BDF5
+	for <lists+kvm@lfdr.de>; Wed, 13 Oct 2021 12:55:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229667AbhJMKlS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Oct 2021 06:41:18 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45230 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229516AbhJMKlR (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 13 Oct 2021 06:41:17 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 19DA0bAG022180;
-        Wed, 13 Oct 2021 06:39:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=J4MxnS8InZKcZ1OFq0Imth5gt8E2J7+SFOjHNCCTnSA=;
- b=Pp1pPjg8cf8b/7t5e3PLHkhsSaXfGNrugOoSkGzJtZAoTQZAJBiJM1nB9wJTa7+cuX+G
- 7b70PmXGHQGadyz0aKdzfb+h4I49QEvuEHYao2RXE1iuQ80yUQ6W51As07VCb4yuMPTk
- 5L/lziyQqRre4QR6ntUV/AlW/O3nBqQpkRYfIHJlMuCJmZJ6IFJOq9Lli7YpyloD0uBD
- pZN7+1BysEysyKCkKyTXgg97XMx5giiJxerONkrz9KYJ7Dn/gzjNdicHFxAUqSvQZ209
- xbMHjViTwtPyD1uzmmzD3Vu/tTRlwododHMtpJfK8kLT6LMWtO76rDWr8nma6FyTNSiI Vg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3bns3f6497-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 13 Oct 2021 06:39:13 -0400
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 19DAFQtS017409;
-        Wed, 13 Oct 2021 06:39:13 -0400
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3bns3f648t-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 13 Oct 2021 06:39:13 -0400
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 19DAaAXU018700;
-        Wed, 13 Oct 2021 10:39:11 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma06ams.nl.ibm.com with ESMTP id 3bk2bjhusp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 13 Oct 2021 10:39:11 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 19DAd0jX3801850
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 13 Oct 2021 10:39:00 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 231314C07C;
-        Wed, 13 Oct 2021 10:39:00 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B82634C070;
-        Wed, 13 Oct 2021 10:38:59 +0000 (GMT)
-Received: from [9.145.94.172] (unknown [9.145.94.172])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 13 Oct 2021 10:38:59 +0000 (GMT)
-Message-ID: <29d260f4-217f-2f37-d734-fa9765db95d9@linux.ibm.com>
-Date:   Wed, 13 Oct 2021 12:38:58 +0200
+        id S230453AbhJMK55 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Oct 2021 06:57:57 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32567 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230414AbhJMK5x (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 13 Oct 2021 06:57:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1634122547;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+        bh=HOHQBuq5n1jvyoAk83wUOf4Uik9+loiLDFU1S+KWwJc=;
+        b=hDXn7dxErfsJ78eTjG/oMzThekAKgQJxUOkc5wdvzCDwMoLXJt3M+kxyQNo/vCa/erVbtQ
+        f/9XKDhIar/nWgux7Y7nWlHZO685W4Ej/WgTh9rLjCy+PuJvwKktCv6CIhpgpoG4Jb4YrW
+        3jCTB8zZvOmWxzibSNqIjJRbUMJnGQY=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-525-D9mf6C6cOaGKJnflYSCPoQ-1; Wed, 13 Oct 2021 06:55:46 -0400
+X-MC-Unique: D9mf6C6cOaGKJnflYSCPoQ-1
+Received: by mail-wr1-f72.google.com with SMTP id c4-20020a5d6cc4000000b00160edc8bb28so1659529wrc.9
+        for <kvm@vger.kernel.org>; Wed, 13 Oct 2021 03:55:46 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+         :content-disposition;
+        bh=HOHQBuq5n1jvyoAk83wUOf4Uik9+loiLDFU1S+KWwJc=;
+        b=3z7DlPCjIw2u+ezZC/kXWp4hXg4uaw5Qv6rxcAjKni0jb67QRnXsK3Np+rS0NRLVHg
+         JxvnLEhTSg7prYZ4YGZ+U2gmrMp+KWUxFHX2ajMI0uFdH6Jyelknbqu2K4ffvnBSmMMf
+         dabvdROlRjd3Jyu2qukPYbmq7l37oNP2CnSTXlt72tSRpVxR4mQicdZyteSdHKZvSxii
+         dKt5IJXnYc0OqqT9/dPMEK5lWrWcmFU+EGcUem+YOIM/NDGtThIVmn1QtS1iirmIg5wW
+         9IWeMjxgvbj/j/nWZF2oPzsM7lAigbVdNglqZ6hceTZwTEczWthClOKDfT4cHYaTHs6f
+         0G6Q==
+X-Gm-Message-State: AOAM531mKUQtE/dmYiYcdKNZaY9vWl3pQZrOrePJS4qzEm+agc0PQQdj
+        8Gkx8Ay+TgP+em7DdgUdmduFdA4/UXemxdXuUKgGIHdrMHzhsMznEkYjo6DqtawGhKmn92GygpE
+        e7bvaxOSwERfV
+X-Received: by 2002:a1c:f216:: with SMTP id s22mr12239229wmc.27.1634122544829;
+        Wed, 13 Oct 2021 03:55:44 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxIFKVzN3wSeM2Mpi+3ebMvrIe+xpiLg9sofnH/e5wmfza96yWoV1W27PJsbS9IH10+WwuJlw==
+X-Received: by 2002:a1c:f216:: with SMTP id s22mr12239123wmc.27.1634122544323;
+        Wed, 13 Oct 2021 03:55:44 -0700 (PDT)
+Received: from redhat.com ([2.55.30.112])
+        by smtp.gmail.com with ESMTPSA id a81sm5721952wmd.30.2021.10.13.03.55.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Oct 2021 03:55:42 -0700 (PDT)
+Date:   Wed, 13 Oct 2021 06:55:31 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     Jeff Dike <jdike@addtoit.com>, Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Gonglei <arei.gonglei@huawei.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        Cristian Marussi <cristian.marussi@arm.com>,
+        "Enrico Weigelt, metux IT consult" <info@metux.net>,
+        Viresh Kumar <vireshk@kernel.org>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Bartosz Golaszewski <brgl@bgdev.pl>,
+        David Airlie <airlied@linux.ie>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        Daniel Vetter <daniel@ffwll.ch>, Jie Deng <jie.deng@intel.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Kalle Valo <kvalo@codeaurora.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Vishal Verma <vishal.l.verma@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        David Hildenbrand <david@redhat.com>,
+        Vivek Goyal <vgoyal@redhat.com>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        Eric Van Hensbergen <ericvh@gmail.com>,
+        Latchesar Ionkov <lucho@ionkov.net>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Anton Yakovlev <anton.yakovlev@opensynergy.com>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Takashi Iwai <tiwai@suse.com>, linux-um@lists.infradead.org,
+        virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linux-i2c@vger.kernel.org, iommu@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
+        nvdimm@lists.linux.dev, linux-remoteproc@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        v9fs-developer@lists.sourceforge.net, kvm@vger.kernel.org,
+        alsa-devel@alsa-project.org
+Subject: [PATCH RFC] virtio: wrap config->reset calls
+Message-ID: <20211013105226.20225-1-mst@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [kvm-unit-tests PATCH 2/2] lib: s390x: snippet.h: Add a few
- constants that will make our life easier
-Content-Language: en-US
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, david@redhat.com,
-        thuth@redhat.com, seiden@linux.ibm.com
-References: <20211013102722.17160-1-frankja@linux.ibm.com>
- <20211013102722.17160-3-frankja@linux.ibm.com>
- <20211013123558.40433784@p-imbrenda>
-From:   Janosch Frank <frankja@linux.ibm.com>
-In-Reply-To: <20211013123558.40433784@p-imbrenda>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: o_0Yuoa-Zb8sgEBft8Y8hxxwJN_UnqLf
-X-Proofpoint-ORIG-GUID: kGDTE9HxryUrcA2MUNVv_PLSI9XJ4hIV
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
- definitions=2021-10-13_03,2021-10-13_01,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- lowpriorityscore=0 suspectscore=0 priorityscore=1501 mlxscore=0
- mlxlogscore=999 spamscore=0 bulkscore=0 phishscore=0 adultscore=0
- clxscore=1015 impostorscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2109230001 definitions=main-2110130071
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
+X-Mutt-Fcc: =sent
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/13/21 12:35, Claudio Imbrenda wrote:
-> On Wed, 13 Oct 2021 10:27:22 +0000
-> Janosch Frank <frankja@linux.ibm.com> wrote:
-> 
->> The variable names for the snippet objects are of gigantic length so
->> let's define a few macros to make them easier to read.
->>
->> Also add a standard PSW which should be used to start the snippet.
->>
->> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->> ---
->>   lib/s390x/snippet.h | 40 ++++++++++++++++++++++++++++++++++++++++
->>   s390x/mvpg-sie.c    | 13 ++++++-------
->>   2 files changed, 46 insertions(+), 7 deletions(-)
->>   create mode 100644 lib/s390x/snippet.h
->>
->> diff --git a/lib/s390x/snippet.h b/lib/s390x/snippet.h
->> new file mode 100644
->> index 00000000..9ead4fe3
->> --- /dev/null
->> +++ b/lib/s390x/snippet.h
->> @@ -0,0 +1,40 @@
->> +/* SPDX-License-Identifier: GPL-2.0-only */
->> +/*
->> + * Snippet definitions
->> + *
->> + * Copyright IBM, Corp. 2021
->> + * Author: Janosch Frank <frankja@linux.ibm.com>
->> + */
->> +
->> +#ifndef _S390X_SNIPPET_H_
->> +#define _S390X_SNIPPET_H_
->> +
->> +/* This macro cuts down the length of the pointers to snippets */
->> +#define SNIPPET_NAME_START(type, file) \
->> +	_binary_s390x_snippets_##type##_##file##_gbin_start
->> +#define SNIPPET_NAME_END(type, file) \
->> +	_binary_s390x_snippets_##type##_##file##_gbin_end
->> +
->> +/* Returns the length of the snippet */
->> +#define SNIPPET_LEN(type, file) \
->> +	(uintptr_t)SNIPPET_NAME_END(type, file) - (uintptr_t)SNIPPET_NAME_START(type, file)
-> 
-> parentheses around the expansion:
-> 	((uintptr_t)SNIPPET_NAME_END(type, file) - (uintptr_t)SNIPPET_NAME_START(type, file))
-> 
+This will enable cleanups down the road.
+The idea is to disable cbs, then add "flush_queued_cbs" callback
+as a parameter, this way drivers can flush any work
+queued after callbacks have been disabled.
 
-Will do
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ arch/um/drivers/virt-pci.c                 | 2 +-
+ drivers/block/virtio_blk.c                 | 4 ++--
+ drivers/bluetooth/virtio_bt.c              | 2 +-
+ drivers/char/hw_random/virtio-rng.c        | 2 +-
+ drivers/char/virtio_console.c              | 4 ++--
+ drivers/crypto/virtio/virtio_crypto_core.c | 8 ++++----
+ drivers/firmware/arm_scmi/virtio.c         | 2 +-
+ drivers/gpio/gpio-virtio.c                 | 2 +-
+ drivers/gpu/drm/virtio/virtgpu_kms.c       | 2 +-
+ drivers/i2c/busses/i2c-virtio.c            | 2 +-
+ drivers/iommu/virtio-iommu.c               | 2 +-
+ drivers/net/caif/caif_virtio.c             | 2 +-
+ drivers/net/virtio_net.c                   | 4 ++--
+ drivers/net/wireless/mac80211_hwsim.c      | 2 +-
+ drivers/nvdimm/virtio_pmem.c               | 2 +-
+ drivers/rpmsg/virtio_rpmsg_bus.c           | 2 +-
+ drivers/scsi/virtio_scsi.c                 | 2 +-
+ drivers/virtio/virtio.c                    | 5 +++++
+ drivers/virtio/virtio_balloon.c            | 2 +-
+ drivers/virtio/virtio_input.c              | 2 +-
+ drivers/virtio/virtio_mem.c                | 2 +-
+ fs/fuse/virtio_fs.c                        | 4 ++--
+ include/linux/virtio.h                     | 1 +
+ net/9p/trans_virtio.c                      | 2 +-
+ net/vmw_vsock/virtio_transport.c           | 4 ++--
+ sound/virtio/virtio_card.c                 | 4 ++--
+ 26 files changed, 39 insertions(+), 33 deletions(-)
 
->> +
->> +/*
->> + * C snippet instructions start at 0x4000 due to the prefix and the
->> + * stack being before that.
->> + */
->> +#define SNIPPET_C_ENTRY_ADDR 0x4000
->> +/* ASM snippets only have the prefix and hence start at 0x2000 */
-> 
-> wouldn't it be possible to make both start at the same address?
-> would make everything easier.
-
-Sure, for the ASM snippets the entry address only depends on where you 
-copy them if I'm not mistaken.
-
-> 
-> ASM snippets would have a couple of unused pages, but who cares?
-> 
->> +#define SNIPPET_ASM_ENTRY_ADDR 0x2000
->> +
->> +/* Standard entry PSWs for snippets which can simply be copied into the guest PSW */
->> +static const struct psw snippet_c_psw = {
->> +	.mask = PSW_MASK_64,
->> +	.addr = SNIPPET_C_ENTRY_ADDR,
->> +};
->> +
->> +static const struct psw snippet_asm_psw = {
->> +	.mask = PSW_MASK_64,
->> +	.addr = SNIPPET_ASM_ENTRY_ADDR,
->> +};
->> +#endif
->> diff --git a/s390x/mvpg-sie.c b/s390x/mvpg-sie.c
->> index 5adcec1e..46170d02 100644
->> --- a/s390x/mvpg-sie.c
->> +++ b/s390x/mvpg-sie.c
->> @@ -19,6 +19,7 @@
->>   #include <vm.h>
->>   #include <sclp.h>
->>   #include <sie.h>
->> +#include <snippet.h>
->>   
->>   static u8 *guest;
->>   static struct vm vm;
->> @@ -27,8 +28,8 @@ static uint8_t *src;
->>   static uint8_t *dst;
->>   static uint8_t *cmp;
->>   
->> -extern const char _binary_s390x_snippets_c_mvpg_snippet_gbin_start[];
->> -extern const char _binary_s390x_snippets_c_mvpg_snippet_gbin_end[];
->> +extern const char SNIPPET_NAME_START(c, mvpg_snippet)[];
->> +extern const char SNIPPET_NAME_END(c, mvpg_snippet)[];
->>   int binary_size;
->>   
->>   static void test_mvpg_pei(void)
->> @@ -77,10 +78,9 @@ static void test_mvpg_pei(void)
->>   
->>   static void test_mvpg(void)
->>   {
->> -	int binary_size = ((uintptr_t)_binary_s390x_snippets_c_mvpg_snippet_gbin_end -
->> -			   (uintptr_t)_binary_s390x_snippets_c_mvpg_snippet_gbin_start);
->> +	int binary_size = SNIPPET_LEN(c, mvpg_snippet);
->>   
->> -	memcpy(guest, _binary_s390x_snippets_c_mvpg_snippet_gbin_start, binary_size);
->> +	memcpy(guest, SNIPPET_NAME_START(c, mvpg_snippet), binary_size);
->>   	memset(src, 0x42, PAGE_SIZE);
->>   	memset(dst, 0x43, PAGE_SIZE);
->>   	sie(&vm);
->> @@ -96,8 +96,7 @@ static void setup_guest(void)
->>   
->>   	sie_guest_create(&vm, (uint64_t)guest, HPAGE_SIZE);
->>   
->> -	vm.sblk->gpsw.addr = PAGE_SIZE * 4;
->> -	vm.sblk->gpsw.mask = PSW_MASK_64;
->> +	vm.sblk->gpsw = snippet_c_psw;
->>   	vm.sblk->ictl = ICTL_OPEREXC | ICTL_PINT;
->>   	/* Enable MVPG interpretation as we want to test KVM and not ourselves */
->>   	vm.sblk->eca = ECA_MVPGI;
-> 
+diff --git a/arch/um/drivers/virt-pci.c b/arch/um/drivers/virt-pci.c
+index c08066633023..22c4d87c9c15 100644
+--- a/arch/um/drivers/virt-pci.c
++++ b/arch/um/drivers/virt-pci.c
+@@ -616,7 +616,7 @@ static void um_pci_virtio_remove(struct virtio_device *vdev)
+ 	int i;
+ 
+         /* Stop all virtqueues */
+-        vdev->config->reset(vdev);
++        virtio_reset_device(vdev);
+         vdev->config->del_vqs(vdev);
+ 
+ 	device_set_wakeup_enable(&vdev->dev, false);
+diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+index 303caf2d17d0..83d0af3fbf30 100644
+--- a/drivers/block/virtio_blk.c
++++ b/drivers/block/virtio_blk.c
+@@ -910,7 +910,7 @@ static void virtblk_remove(struct virtio_device *vdev)
+ 	mutex_lock(&vblk->vdev_mutex);
+ 
+ 	/* Stop all the virtqueues. */
+-	vdev->config->reset(vdev);
++	virtio_reset_device(vdev);
+ 
+ 	/* Virtqueues are stopped, nothing can use vblk->vdev anymore. */
+ 	vblk->vdev = NULL;
+@@ -929,7 +929,7 @@ static int virtblk_freeze(struct virtio_device *vdev)
+ 	struct virtio_blk *vblk = vdev->priv;
+ 
+ 	/* Ensure we don't receive any more interrupts */
+-	vdev->config->reset(vdev);
++	virtio_reset_device(vdev);
+ 
+ 	/* Make sure no work handler is accessing the device. */
+ 	flush_work(&vblk->config_work);
+diff --git a/drivers/bluetooth/virtio_bt.c b/drivers/bluetooth/virtio_bt.c
+index 57908ce4fae8..24a9258962fa 100644
+--- a/drivers/bluetooth/virtio_bt.c
++++ b/drivers/bluetooth/virtio_bt.c
+@@ -364,7 +364,7 @@ static void virtbt_remove(struct virtio_device *vdev)
+ 	struct hci_dev *hdev = vbt->hdev;
+ 
+ 	hci_unregister_dev(hdev);
+-	vdev->config->reset(vdev);
++	virtio_reset_device(vdev);
+ 
+ 	hci_free_dev(hdev);
+ 	vbt->hdev = NULL;
+diff --git a/drivers/char/hw_random/virtio-rng.c b/drivers/char/hw_random/virtio-rng.c
+index a90001e02bf7..95980489514b 100644
+--- a/drivers/char/hw_random/virtio-rng.c
++++ b/drivers/char/hw_random/virtio-rng.c
+@@ -134,7 +134,7 @@ static void remove_common(struct virtio_device *vdev)
+ 	vi->hwrng_removed = true;
+ 	vi->data_avail = 0;
+ 	complete(&vi->have_data);
+-	vdev->config->reset(vdev);
++	virtio_reset_device(vdev);
+ 	vi->busy = false;
+ 	if (vi->hwrng_register_done)
+ 		hwrng_unregister(&vi->hwrng);
+diff --git a/drivers/char/virtio_console.c b/drivers/char/virtio_console.c
+index 7eaf303a7a86..08bbd693436f 100644
+--- a/drivers/char/virtio_console.c
++++ b/drivers/char/virtio_console.c
+@@ -1957,7 +1957,7 @@ static void virtcons_remove(struct virtio_device *vdev)
+ 	spin_unlock_irq(&pdrvdata_lock);
+ 
+ 	/* Disable interrupts for vqs */
+-	vdev->config->reset(vdev);
++	virtio_reset_device(vdev);
+ 	/* Finish up work that's lined up */
+ 	if (use_multiport(portdev))
+ 		cancel_work_sync(&portdev->control_work);
+@@ -2139,7 +2139,7 @@ static int virtcons_freeze(struct virtio_device *vdev)
+ 
+ 	portdev = vdev->priv;
+ 
+-	vdev->config->reset(vdev);
++	virtio_reset_device(vdev);
+ 
+ 	if (use_multiport(portdev))
+ 		virtqueue_disable_cb(portdev->c_ivq);
+diff --git a/drivers/crypto/virtio/virtio_crypto_core.c b/drivers/crypto/virtio/virtio_crypto_core.c
+index e2375d992308..8e977b7627cb 100644
+--- a/drivers/crypto/virtio/virtio_crypto_core.c
++++ b/drivers/crypto/virtio/virtio_crypto_core.c
+@@ -404,7 +404,7 @@ static int virtcrypto_probe(struct virtio_device *vdev)
+ free_engines:
+ 	virtcrypto_clear_crypto_engines(vcrypto);
+ free_vqs:
+-	vcrypto->vdev->config->reset(vdev);
++	virtio_reset_device(vdev);
+ 	virtcrypto_del_vqs(vcrypto);
+ free_dev:
+ 	virtcrypto_devmgr_rm_dev(vcrypto);
+@@ -436,7 +436,7 @@ static void virtcrypto_remove(struct virtio_device *vdev)
+ 
+ 	if (virtcrypto_dev_started(vcrypto))
+ 		virtcrypto_dev_stop(vcrypto);
+-	vdev->config->reset(vdev);
++	virtio_reset_device(vdev);
+ 	virtcrypto_free_unused_reqs(vcrypto);
+ 	virtcrypto_clear_crypto_engines(vcrypto);
+ 	virtcrypto_del_vqs(vcrypto);
+@@ -456,7 +456,7 @@ static int virtcrypto_freeze(struct virtio_device *vdev)
+ {
+ 	struct virtio_crypto *vcrypto = vdev->priv;
+ 
+-	vdev->config->reset(vdev);
++	virtio_reset_device(vdev);
+ 	virtcrypto_free_unused_reqs(vcrypto);
+ 	if (virtcrypto_dev_started(vcrypto))
+ 		virtcrypto_dev_stop(vcrypto);
+@@ -492,7 +492,7 @@ static int virtcrypto_restore(struct virtio_device *vdev)
+ free_engines:
+ 	virtcrypto_clear_crypto_engines(vcrypto);
+ free_vqs:
+-	vcrypto->vdev->config->reset(vdev);
++	virtio_reset_device(vdev);
+ 	virtcrypto_del_vqs(vcrypto);
+ 	return err;
+ }
+diff --git a/drivers/firmware/arm_scmi/virtio.c b/drivers/firmware/arm_scmi/virtio.c
+index 11e8efb71375..6b8d93fe8848 100644
+--- a/drivers/firmware/arm_scmi/virtio.c
++++ b/drivers/firmware/arm_scmi/virtio.c
+@@ -452,7 +452,7 @@ static void scmi_vio_remove(struct virtio_device *vdev)
+ 	 * outstanding message on any vqueue to be ignored by complete_cb: now
+ 	 * we can just stop processing buffers and destroy the vqueues.
+ 	 */
+-	vdev->config->reset(vdev);
++	virtio_reset_device(vdev);
+ 	vdev->config->del_vqs(vdev);
+ 	/* Ensure scmi_vdev is visible as NULL */
+ 	smp_store_mb(scmi_vdev, NULL);
+diff --git a/drivers/gpio/gpio-virtio.c b/drivers/gpio/gpio-virtio.c
+index d24f1c9264bc..5029f01966f4 100644
+--- a/drivers/gpio/gpio-virtio.c
++++ b/drivers/gpio/gpio-virtio.c
+@@ -203,7 +203,7 @@ static void virtio_gpio_request_vq(struct virtqueue *vq)
+ 
+ static void virtio_gpio_free_vqs(struct virtio_device *vdev)
+ {
+-	vdev->config->reset(vdev);
++	virtio_reset_device(vdev);
+ 	vdev->config->del_vqs(vdev);
+ }
+ 
+diff --git a/drivers/gpu/drm/virtio/virtgpu_kms.c b/drivers/gpu/drm/virtio/virtgpu_kms.c
+index f3379059f324..6aa605b8d3a1 100644
+--- a/drivers/gpu/drm/virtio/virtgpu_kms.c
++++ b/drivers/gpu/drm/virtio/virtgpu_kms.c
+@@ -257,7 +257,7 @@ void virtio_gpu_deinit(struct drm_device *dev)
+ 	flush_work(&vgdev->ctrlq.dequeue_work);
+ 	flush_work(&vgdev->cursorq.dequeue_work);
+ 	flush_work(&vgdev->config_changed_work);
+-	vgdev->vdev->config->reset(vgdev->vdev);
++	virtio_reset_device(vgdev->vdev);
+ 	vgdev->vdev->config->del_vqs(vgdev->vdev);
+ }
+ 
+diff --git a/drivers/i2c/busses/i2c-virtio.c b/drivers/i2c/busses/i2c-virtio.c
+index f10a603b13fb..eb3261ac64dc 100644
+--- a/drivers/i2c/busses/i2c-virtio.c
++++ b/drivers/i2c/busses/i2c-virtio.c
+@@ -177,7 +177,7 @@ static int virtio_i2c_xfer(struct i2c_adapter *adap, struct i2c_msg *msgs,
+ 
+ static void virtio_i2c_del_vqs(struct virtio_device *vdev)
+ {
+-	vdev->config->reset(vdev);
++	virtio_reset_device(vdev);
+ 	vdev->config->del_vqs(vdev);
+ }
+ 
+diff --git a/drivers/iommu/virtio-iommu.c b/drivers/iommu/virtio-iommu.c
+index 80930ce04a16..1d4e1e7cf175 100644
+--- a/drivers/iommu/virtio-iommu.c
++++ b/drivers/iommu/virtio-iommu.c
+@@ -1115,7 +1115,7 @@ static void viommu_remove(struct virtio_device *vdev)
+ 	iommu_device_unregister(&viommu->iommu);
+ 
+ 	/* Stop all virtqueues */
+-	vdev->config->reset(vdev);
++	virtio_reset_device(vdev);
+ 	vdev->config->del_vqs(vdev);
+ 
+ 	dev_info(&vdev->dev, "device removed\n");
+diff --git a/drivers/net/caif/caif_virtio.c b/drivers/net/caif/caif_virtio.c
+index 91230894692d..444ef6a342f6 100644
+--- a/drivers/net/caif/caif_virtio.c
++++ b/drivers/net/caif/caif_virtio.c
+@@ -754,7 +754,7 @@ static void cfv_remove(struct virtio_device *vdev)
+ 	debugfs_remove_recursive(cfv->debugfs);
+ 
+ 	vringh_kiov_cleanup(&cfv->ctx.riov);
+-	vdev->config->reset(vdev);
++	virtio_reset_device(vdev);
+ 	vdev->vringh_config->del_vrhs(cfv->vdev);
+ 	cfv->vr_rx = NULL;
+ 	vdev->config->del_vqs(cfv->vdev);
+diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+index 79bd2585ec6b..8c10fcad73a4 100644
+--- a/drivers/net/virtio_net.c
++++ b/drivers/net/virtio_net.c
+@@ -3274,7 +3274,7 @@ static int virtnet_probe(struct virtio_device *vdev)
+ 	return 0;
+ 
+ free_unregister_netdev:
+-	vi->vdev->config->reset(vdev);
++	virtio_reset_device(vdev);
+ 
+ 	unregister_netdev(dev);
+ free_failover:
+@@ -3290,7 +3290,7 @@ static int virtnet_probe(struct virtio_device *vdev)
+ 
+ static void remove_vq_common(struct virtnet_info *vi)
+ {
+-	vi->vdev->config->reset(vi->vdev);
++	virtio_reset_device(vi->vdev);
+ 
+ 	/* Free unused buffers in both send and recv, if any. */
+ 	free_unused_bufs(vi);
+diff --git a/drivers/net/wireless/mac80211_hwsim.c b/drivers/net/wireless/mac80211_hwsim.c
+index 0adae76eb8df..9ee430c1d4a2 100644
+--- a/drivers/net/wireless/mac80211_hwsim.c
++++ b/drivers/net/wireless/mac80211_hwsim.c
+@@ -4369,7 +4369,7 @@ static void remove_vqs(struct virtio_device *vdev)
+ {
+ 	int i;
+ 
+-	vdev->config->reset(vdev);
++	virtio_reset_device(vdev);
+ 
+ 	for (i = 0; i < ARRAY_SIZE(hwsim_vqs); i++) {
+ 		struct virtqueue *vq = hwsim_vqs[i];
+diff --git a/drivers/nvdimm/virtio_pmem.c b/drivers/nvdimm/virtio_pmem.c
+index 726c7354d465..995b6cdc67ed 100644
+--- a/drivers/nvdimm/virtio_pmem.c
++++ b/drivers/nvdimm/virtio_pmem.c
+@@ -105,7 +105,7 @@ static void virtio_pmem_remove(struct virtio_device *vdev)
+ 
+ 	nvdimm_bus_unregister(nvdimm_bus);
+ 	vdev->config->del_vqs(vdev);
+-	vdev->config->reset(vdev);
++	virtio_reset_device(vdev);
+ }
+ 
+ static struct virtio_driver virtio_pmem_driver = {
+diff --git a/drivers/rpmsg/virtio_rpmsg_bus.c b/drivers/rpmsg/virtio_rpmsg_bus.c
+index 8e49a3bacfc7..6a11952822df 100644
+--- a/drivers/rpmsg/virtio_rpmsg_bus.c
++++ b/drivers/rpmsg/virtio_rpmsg_bus.c
+@@ -1015,7 +1015,7 @@ static void rpmsg_remove(struct virtio_device *vdev)
+ 	size_t total_buf_space = vrp->num_bufs * vrp->buf_size;
+ 	int ret;
+ 
+-	vdev->config->reset(vdev);
++	virtio_reset_device(vdev);
+ 
+ 	ret = device_for_each_child(&vdev->dev, NULL, rpmsg_remove_device);
+ 	if (ret)
+diff --git a/drivers/scsi/virtio_scsi.c b/drivers/scsi/virtio_scsi.c
+index 07d0250f17c3..f2502a8a5213 100644
+--- a/drivers/scsi/virtio_scsi.c
++++ b/drivers/scsi/virtio_scsi.c
+@@ -778,7 +778,7 @@ static void virtscsi_init_vq(struct virtio_scsi_vq *virtscsi_vq,
+ static void virtscsi_remove_vqs(struct virtio_device *vdev)
+ {
+ 	/* Stop all the virtqueues. */
+-	vdev->config->reset(vdev);
++	virtio_reset_device(vdev);
+ 	vdev->config->del_vqs(vdev);
+ }
+ 
+diff --git a/drivers/virtio/virtio.c b/drivers/virtio/virtio.c
+index 0a5b54034d4b..a67dd0eca578 100644
+--- a/drivers/virtio/virtio.c
++++ b/drivers/virtio/virtio.c
+@@ -204,6 +204,11 @@ int virtio_finalize_features(struct virtio_device *dev)
+ }
+ EXPORT_SYMBOL_GPL(virtio_finalize_features);
+ 
++static void virtio_reset_device(struct virtio_device *dev)
++{
++	dev->config->reset(dev);
++}
++
+ static int virtio_dev_probe(struct device *_d)
+ {
+ 	int err, i;
+diff --git a/drivers/virtio/virtio_balloon.c b/drivers/virtio/virtio_balloon.c
+index c22ff0117b46..f4c34a2a6b8e 100644
+--- a/drivers/virtio/virtio_balloon.c
++++ b/drivers/virtio/virtio_balloon.c
+@@ -1056,7 +1056,7 @@ static void remove_common(struct virtio_balloon *vb)
+ 		return_free_pages_to_mm(vb, ULONG_MAX);
+ 
+ 	/* Now we reset the device so we can clean up the queues. */
+-	vb->vdev->config->reset(vb->vdev);
++	virtio_reset_device(vb->vdev);
+ 
+ 	vb->vdev->config->del_vqs(vb->vdev);
+ }
+diff --git a/drivers/virtio/virtio_input.c b/drivers/virtio/virtio_input.c
+index ce51ae165943..3aa46703872d 100644
+--- a/drivers/virtio/virtio_input.c
++++ b/drivers/virtio/virtio_input.c
+@@ -347,7 +347,7 @@ static void virtinput_remove(struct virtio_device *vdev)
+ 	spin_unlock_irqrestore(&vi->lock, flags);
+ 
+ 	input_unregister_device(vi->idev);
+-	vdev->config->reset(vdev);
++	virtio_reset_device(vdev);
+ 	while ((buf = virtqueue_detach_unused_buf(vi->sts)) != NULL)
+ 		kfree(buf);
+ 	vdev->config->del_vqs(vdev);
+diff --git a/drivers/virtio/virtio_mem.c b/drivers/virtio/virtio_mem.c
+index bef8ad6bf466..3bab0a625a4b 100644
+--- a/drivers/virtio/virtio_mem.c
++++ b/drivers/virtio/virtio_mem.c
+@@ -2722,7 +2722,7 @@ static void virtio_mem_remove(struct virtio_device *vdev)
+ 	}
+ 
+ 	/* reset the device and cleanup the queues */
+-	vdev->config->reset(vdev);
++	virtio_reset_device(vdev);
+ 	vdev->config->del_vqs(vdev);
+ 
+ 	kfree(vm);
+diff --git a/fs/fuse/virtio_fs.c b/fs/fuse/virtio_fs.c
+index 0ad89c6629d7..27c3b74070a2 100644
+--- a/fs/fuse/virtio_fs.c
++++ b/fs/fuse/virtio_fs.c
+@@ -895,7 +895,7 @@ static int virtio_fs_probe(struct virtio_device *vdev)
+ 	return 0;
+ 
+ out_vqs:
+-	vdev->config->reset(vdev);
++	virtio_reset_device(vdev);
+ 	virtio_fs_cleanup_vqs(vdev, fs);
+ 	kfree(fs->vqs);
+ 
+@@ -927,7 +927,7 @@ static void virtio_fs_remove(struct virtio_device *vdev)
+ 	list_del_init(&fs->list);
+ 	virtio_fs_stop_all_queues(fs);
+ 	virtio_fs_drain_all_queues_locked(fs);
+-	vdev->config->reset(vdev);
++	virtio_reset_device(vdev);
+ 	virtio_fs_cleanup_vqs(vdev, fs);
+ 
+ 	vdev->priv = NULL;
+diff --git a/include/linux/virtio.h b/include/linux/virtio.h
+index 41edbc01ffa4..72292a62cd90 100644
+--- a/include/linux/virtio.h
++++ b/include/linux/virtio.h
+@@ -138,6 +138,7 @@ int virtio_finalize_features(struct virtio_device *dev);
+ int virtio_device_freeze(struct virtio_device *dev);
+ int virtio_device_restore(struct virtio_device *dev);
+ #endif
++void virtio_reset_device(struct virtio_device *dev);
+ 
+ size_t virtio_max_dma_size(struct virtio_device *vdev);
+ 
+diff --git a/net/9p/trans_virtio.c b/net/9p/trans_virtio.c
+index 490a4c900339..19c69821dd04 100644
+--- a/net/9p/trans_virtio.c
++++ b/net/9p/trans_virtio.c
+@@ -721,7 +721,7 @@ static void p9_virtio_remove(struct virtio_device *vdev)
+ 
+ 	mutex_unlock(&virtio_9p_lock);
+ 
+-	vdev->config->reset(vdev);
++	virtio_reset_device(vdev);
+ 	vdev->config->del_vqs(vdev);
+ 
+ 	sysfs_remove_file(&(vdev->dev.kobj), &dev_attr_mount_tag.attr);
+diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+index 4f7c99dfd16c..fb3302fff627 100644
+--- a/net/vmw_vsock/virtio_transport.c
++++ b/net/vmw_vsock/virtio_transport.c
+@@ -665,7 +665,7 @@ static void virtio_vsock_remove(struct virtio_device *vdev)
+ 	vsock_for_each_connected_socket(virtio_vsock_reset_sock);
+ 
+ 	/* Stop all work handlers to make sure no one is accessing the device,
+-	 * so we can safely call vdev->config->reset().
++	 * so we can safely call virtio_reset_device().
+ 	 */
+ 	mutex_lock(&vsock->rx_lock);
+ 	vsock->rx_run = false;
+@@ -682,7 +682,7 @@ static void virtio_vsock_remove(struct virtio_device *vdev)
+ 	/* Flush all device writes and interrupts, device will not use any
+ 	 * more buffers.
+ 	 */
+-	vdev->config->reset(vdev);
++	virtio_reset_device(vdev);
+ 
+ 	mutex_lock(&vsock->rx_lock);
+ 	while ((pkt = virtqueue_detach_unused_buf(vsock->vqs[VSOCK_VQ_RX])))
+diff --git a/sound/virtio/virtio_card.c b/sound/virtio/virtio_card.c
+index 150ab3e37013..e2847c040f75 100644
+--- a/sound/virtio/virtio_card.c
++++ b/sound/virtio/virtio_card.c
+@@ -350,7 +350,7 @@ static void virtsnd_remove(struct virtio_device *vdev)
+ 		snd_card_free(snd->card);
+ 
+ 	vdev->config->del_vqs(vdev);
+-	vdev->config->reset(vdev);
++	virtio_reset_device(vdev);
+ 
+ 	for (i = 0; snd->substreams && i < snd->nsubstreams; ++i) {
+ 		struct virtio_pcm_substream *vss = &snd->substreams[i];
+@@ -379,7 +379,7 @@ static int virtsnd_freeze(struct virtio_device *vdev)
+ 	virtsnd_ctl_msg_cancel_all(snd);
+ 
+ 	vdev->config->del_vqs(vdev);
+-	vdev->config->reset(vdev);
++	virtio_reset_device(vdev);
+ 
+ 	for (i = 0; i < snd->nsubstreams; ++i)
+ 		cancel_work_sync(&snd->substreams[i].elapsed_period);
+-- 
+MST
 
