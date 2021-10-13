@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0984742BC02
-	for <lists+kvm@lfdr.de>; Wed, 13 Oct 2021 11:49:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 80DA442BC06
+	for <lists+kvm@lfdr.de>; Wed, 13 Oct 2021 11:49:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239236AbhJMJu5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Oct 2021 05:50:57 -0400
-Received: from mail-bn8nam11on2040.outbound.protection.outlook.com ([40.107.236.40]:22625
-        "EHLO NAM11-BN8-obe.outbound.protection.outlook.com"
+        id S239295AbhJMJvT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Oct 2021 05:51:19 -0400
+Received: from mail-mw2nam08on2048.outbound.protection.outlook.com ([40.107.101.48]:62144
+        "EHLO NAM04-MW2-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S238054AbhJMJuw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Oct 2021 05:50:52 -0400
+        id S239226AbhJMJuz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Oct 2021 05:50:55 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=HlWVxy9vArmiSzag5pQPEU6sACLAiid9Kiyopapik48SdSA2eWI/yDeg4yGaC3BPvJ3F2ophMoxEribtjF7MiSoGmwN1NcAKoD7p+vZ2VLY95RXvO3tKG08O4XtIms1xxz2ZL54mQRhXcuVhn2TZe1FRhrlsc5KvAOJnXESSLaUzrnyB3y83kT7ACaYe7gL/WspN235zryFzkFg5amvCDIe2AUoOOqtAIutKHj9jbYVulu22XhSXQYMr+pdwcc/NFxBu+/aUXQhit1JYOGyhA4BAGUWFH17fji7tCDiVyfhpyiUHtuISQH8v4IdB59UAhG4EzDqWcrWSzQm6mg32Vg==
+ b=gWNddMr4S+BvcU0KV1mbTNGK0smTw/CSOyLNc5Rb9UTCJujv6t/jO36Xsqqey6YsUF8cWHvpTUn5t0g0b+TPYFsDxt61a5S+auaIFWsUrfrBhQI5+n6j3YAVXyievJkIsg7DXaGJ23YVF4pvvY8+uuEUHR4RAgBTvUrJV+bjVqzlE8/JB0x1+RiS90sa/3p+eMizzoID/hwrM/+qc9Bsw+0TLQ0QUYPhz4ANk15KEnyOwVHdlni75Fj7CkGLi/WZUw19wEKaFpCOCcOV11peip/XOYGNWz7Eh2muyWE5ww7k1bnFYHIBluI6JsGR4m7qLWyx9u1PKxInOyN4eO1n4g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=7NbaxVIHev3mJq8019+LcbPy1A6au682iKmTvV+19xA=;
- b=MGuE8H3e/q0D5ifxgjrMNNvxnQYTiTyotO4bFoFAwM4N6yhjuljLQExNaRYJ/NhtEIeKxj8xd8jUWk8x8BRvPg6JZvxP7IJQMyBlXJAxvTDjoLCNMMDQAyxdGMcH9gZfEG/P80KiaznR5dm8aOvex9luZCiPCXYjsjx5++YhvkSiOTm88XB+XJ8LW0QhXJ0KltpX5RTefBDP0/Ueae9VYl/RYLQpUS4PumouJYmLO4X08qWO2Mj4A8AhgZzFI7Yt7UNB6hdnfOT1TYs4P12FRSdve1+IOd5vbY3DE7Z7WkjkagJCh3DQ+LjEBkTLFvdsx+eAMTi1svJ43V7meA0JrQ==
+ bh=DOcFU6eSD++XS6aHs3kXEvGIdsHFeir924wVdQSptkg=;
+ b=OiPWjAKxzai4Hlb9v8nWKeVhB5nmqwZIOTE8MOgSVARTmgnrmQ4ry1PwkvtO21SVfoEB+7cOyDqYKkodSSwMxBVnYjP9BqF4ThI+1ciGcswTbq6aTOS1Vzi0DuzuE+G6VytL0G73Kqx52ct+hJS1FBE/424Angtb65HL5XoW4clJUaZrWlhZp/qST5XfnFdGpFsRktojVEay3IYN4Wj/w9KSAVejLdNmaR0ZmP0Io5jDl0gEnhxdXY/izHpUWrTUUrWxzAcrDuRLuE0zLv8TIkYcVbNzwEBm07O+r95wMn1kSsGe0VpiPbMdG8AbaKKKEkwd2i2R5qVE+IHpPJb8Ew==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.112.36) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ 216.228.112.32) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=nvidia.com; dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=7NbaxVIHev3mJq8019+LcbPy1A6au682iKmTvV+19xA=;
- b=lfP0tK7BD+uKtG/QilruHKmNHJKxy3yQ3Es3wB4fw+5JCCShn5RoJbVjJAif+NgxFBGmNIbZ2d/sNgdt0uXSagZWpyVQkq+BsZehnuDGuf5XDSrcID+L6Icv3vn/BLeDgKDzKqsG7JdI3eLOqMVJQyW8JS5CElhgsl8pAUQSflzsF0gcO6nfDULM10B9NnXYgetr8FV9Ppbej1Z5R/9R0g6ssLGGBR7dagXDy+jx5FMfcuPiKfMVzXpJ+M76bRhjh9zpLyy4ODQ+XVjbMOG/7A59DJeye0DWRoroA9+T+ik1ezPjn2OU65hcM6X8UoUjR8d6cyYbi8jfEkBQQ6FDfw==
-Received: from MW4PR03CA0226.namprd03.prod.outlook.com (2603:10b6:303:b9::21)
- by BN9PR12MB5177.namprd12.prod.outlook.com (2603:10b6:408:11a::19) with
+ bh=DOcFU6eSD++XS6aHs3kXEvGIdsHFeir924wVdQSptkg=;
+ b=Z0bE2BR4eKugUGLi0tFkNVGh+zBWwOGev129IKBx84AYSQpXygnEI8GHpjewq0AFBgkxJSGkQP+uF7KCDKJJQ46wAyNJv1mQJiwXO2dQk/FW930buQygK1DY1ax3AtPFsKkggTR/TPx3huE+qcEksPTsD+cf02xD3RbYkTAfzGwHv9BsZQU4HBDe1bpSsLDAakr/Z05hb0STUY9Ud4F9qxAoe0Jf7Fq7Q6Nhp8Q7ALOcKLVrfzgbaZjC6qHi4KCbTo/cYyg0uVY6nkFZjSdfYecWlAHE142l3mIZ+g7QF6HkI60NCmbPsIcWbsFWl5d6jKqGBTuiHzduRgxaNEPw9A==
+Received: from BN9PR03CA0478.namprd03.prod.outlook.com (2603:10b6:408:139::33)
+ by MW2PR12MB2474.namprd12.prod.outlook.com (2603:10b6:907:9::13) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4587.20; Wed, 13 Oct
- 2021 09:48:47 +0000
-Received: from CO1NAM11FT057.eop-nam11.prod.protection.outlook.com
- (2603:10b6:303:b9:cafe::c3) by MW4PR03CA0226.outlook.office365.com
- (2603:10b6:303:b9::21) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4608.15 via Frontend
- Transport; Wed, 13 Oct 2021 09:48:47 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.36)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4587.25; Wed, 13 Oct
+ 2021 09:48:51 +0000
+Received: from BN8NAM11FT041.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:408:139:cafe::73) by BN9PR03CA0478.outlook.office365.com
+ (2603:10b6:408:139::33) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4587.25 via Frontend
+ Transport; Wed, 13 Oct 2021 09:48:51 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.32)
  smtp.mailfrom=nvidia.com; vger.kernel.org; dkim=none (message not signed)
  header.d=none;vger.kernel.org; dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.112.36 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.112.36; helo=mail.nvidia.com;
-Received: from mail.nvidia.com (216.228.112.36) by
- CO1NAM11FT057.mail.protection.outlook.com (10.13.174.205) with Microsoft SMTP
+ 216.228.112.32 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.112.32; helo=mail.nvidia.com;
+Received: from mail.nvidia.com (216.228.112.32) by
+ BN8NAM11FT041.mail.protection.outlook.com (10.13.177.18) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.4608.15 via Frontend Transport; Wed, 13 Oct 2021 09:48:47 +0000
-Received: from HQMAIL111.nvidia.com (172.20.187.18) by HQMAIL101.nvidia.com
- (172.20.187.10) with Microsoft SMTP Server (TLS) id 15.0.1497.18; Wed, 13 Oct
- 2021 09:48:46 +0000
+ 15.20.4608.15 via Frontend Transport; Wed, 13 Oct 2021 09:48:50 +0000
+Received: from HQMAIL111.nvidia.com (172.20.187.18) by HQMAIL109.nvidia.com
+ (172.20.187.15) with Microsoft SMTP Server (TLS) id 15.0.1497.18; Wed, 13 Oct
+ 2021 02:48:49 -0700
 Received: from vdi.nvidia.com (172.20.187.6) by mail.nvidia.com
  (172.20.187.18) with Microsoft SMTP Server id 15.0.1497.18 via Frontend
- Transport; Wed, 13 Oct 2021 09:48:43 +0000
+ Transport; Wed, 13 Oct 2021 09:48:46 +0000
 From:   Yishai Hadas <yishaih@nvidia.com>
 To:     <alex.williamson@redhat.com>, <bhelgaas@google.com>,
         <jgg@nvidia.com>, <saeedm@nvidia.com>
@@ -61,9 +61,9 @@ CC:     <linux-pci@vger.kernel.org>, <kvm@vger.kernel.org>,
         <netdev@vger.kernel.org>, <kuba@kernel.org>, <leonro@nvidia.com>,
         <kwankhede@nvidia.com>, <mgurtovoy@nvidia.com>,
         <yishaih@nvidia.com>, <maorg@nvidia.com>
-Subject: [PATCH V1 mlx5-next 07/13] vfio: Add 'invalid' state definitions
-Date:   Wed, 13 Oct 2021 12:47:01 +0300
-Message-ID: <20211013094707.163054-8-yishaih@nvidia.com>
+Subject: [PATCH V1 mlx5-next 08/13] vfio/pci_core: Make the region->release() function optional
+Date:   Wed, 13 Oct 2021 12:47:02 +0300
+Message-ID: <20211013094707.163054-9-yishaih@nvidia.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20211013094707.163054-1-yishaih@nvidia.com>
 References: <20211013094707.163054-1-yishaih@nvidia.com>
@@ -72,79 +72,56 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 2d31da9e-ed47-4c70-9427-08d98e2ea70b
-X-MS-TrafficTypeDiagnostic: BN9PR12MB5177:
-X-Microsoft-Antispam-PRVS: <BN9PR12MB5177887828418DAF57CEB3C9C3B79@BN9PR12MB5177.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:4502;
+X-MS-Office365-Filtering-Correlation-Id: 0f4491e2-2970-4796-6f6b-08d98e2ea96a
+X-MS-TrafficTypeDiagnostic: MW2PR12MB2474:
+X-Microsoft-Antispam-PRVS: <MW2PR12MB2474072D38BDBD4C96EE6B79C3B79@MW2PR12MB2474.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Lk/jgtiFQ9i8VQnvYzoHW46gHuTUixLYK6aJcrUs1YYcFb/59xvAhA97JWB+sM29nehuNq5PeSsPaEvaS0cpjcuTmc+wVwyqxfxdKnktvn2E7acjGfA5kUJsIhhhZ21YxqhUJfKOfNgy6XAgC7dQTpYMrTb0vLzy9JIG8rcpwMokz87Zy2/W6mJBfX4ZS0r3PmfNAyizZfIyTNkwhBS3YG9gPHmHs4JO88Sx5VaFJZiJ3rf0gy5JOF9dr2akXZigkw09/c7Wvr/rSyO1af+m5YqAoGLTzoyhDdLv8H+1/LO6/ynADnGIVvrUZPw2c89n9IkKJsIfIJR34jL5X9p5Ykz6jEIaoaUs+ojwQR1yDLIt6LQZR3rxUFnBpduEuPiTgtY5IJWtpfHTy73gIfDQL9ZzAEWro1ciR5HTDPlNsFDHyZpRXNXbTpu47YKmBtxYjUyRjEbCJDvZ1tgygxql9os4L5T+DN3VxSdCS0H1rMenP39+1jP1IRjQvEwP3sR4TfHnSiS512xQR2FPTKnY48mlSEMf60K4yURJtWGTf5dIWMj9uiFzRTaEDbQXguczAEQ+0QcV0+wRrBBcTUzRWJ+dRUNZv9Ok/0cbDQCUfPBFMxZCulykVfc+ehluBCrR8ndZihCqWRBwJ17zgK7uoQjLWAPyJqNGQIBpd9OekFMgCDTIssqRBeFOOayopWqGmM8mAXpbqcFwgg2btow5Kg==
-X-Forefront-Antispam-Report: CIP:216.228.112.36;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid05.nvidia.com;CAT:NONE;SFS:(4636009)(46966006)(36840700001)(4326008)(356005)(7696005)(70586007)(2906002)(2616005)(36756003)(26005)(6636002)(70206006)(47076005)(54906003)(8936002)(1076003)(36860700001)(82310400003)(316002)(110136005)(107886003)(186003)(83380400001)(508600001)(86362001)(426003)(336012)(8676002)(5660300002)(7636003)(6666004);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: VUvdaRh1lo9iawjO2tdE8Q0kt5IIO9mVxxY8836DA7d5750GEc2qj2dofvFNkfTRIlO+lty+c5EO6i6t8DEZkQoD4XoC0Sa5IFqY0F5B6eQI55YQwjWVnVGrVSrCzuhfUXGge/jzekRVxs4fS+VTD/i1Z/dRNEMFEL/vDlgQYaKtVj/Hhu5dfhft/lOPkzzZMZWi9XBZIZ2+A9ktqHGeSagQrcNzVaKYhb/pXSW2VoBZZM353sY+awv1trlaR9f8ytDn0zmLbLqzfLAJiTTjQ0M/m1I3yJ1qHHxDtUFsqhS0U5HIsUNpxBubF4VsVKNttTiHwO9JrplGASWHg0PG8tmofOxjVboaTtJVopEEQxPGW2Wwxj//jvNCknArWsfyMWabs6SoBHG7HHuU4s+VtAbyRLcdzz6mdouVe9k6BKSHyjsyEKwYIUh3Z9GE2PsrhPFlj1thv7uWHkbGhp4qCCh2NMp/qrtzr9m7Ki89oyJmRlRGC4jkAalYe5IAHxaX2lylwrXLH5+8EsyMLf8BVGTuFqlfeLWHIJEYinG7BC1E3rwmX94AS4x9pB79ImPPcxaaIqOejIFisSsQeVS7uCilSqEKHVdsfC1/2d3I0w20O0cycmqJK8ha1q6CYs1RUneis9IAo1XWaD1XremoIgLfZB/C1IwV6ylj/aj+OErwWo+sttoHol35g1fhj4JSvUePtarwbsaISNMrSyEmLg==
+X-Forefront-Antispam-Report: CIP:216.228.112.32;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid01.nvidia.com;CAT:NONE;SFS:(4636009)(36840700001)(46966006)(186003)(2906002)(5660300002)(8676002)(70586007)(110136005)(316002)(86362001)(83380400001)(6666004)(54906003)(107886003)(1076003)(8936002)(36860700001)(82310400003)(336012)(356005)(70206006)(47076005)(6636002)(7696005)(426003)(36756003)(26005)(7636003)(508600001)(4326008)(2616005);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Oct 2021 09:48:47.0730
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Oct 2021 09:48:50.9861
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2d31da9e-ed47-4c70-9427-08d98e2ea70b
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0f4491e2-2970-4796-6f6b-08d98e2ea96a
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.36];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT057.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.32];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT041.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR12MB5177
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW2PR12MB2474
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add 'invalid' state definition to be used by drivers to set/check
-invalid state.
+Make the region->release() function optional as in some cases there is
+nothing to do by driver as part of it.
 
-In addition dropped the non complied macro VFIO_DEVICE_STATE_SET_ERROR
-(i.e SATE instead of STATE) which seems unusable.
+This is needed for coming patch from this series once we add
+mlx5_vfio_pci driver to support live migration but we don't need a
+migration release function.
 
-Fixes: a8a24f3f6e38 ("vfio: UAPI for migration interface for device state")
 Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
 Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
 ---
- include/linux/vfio.h      | 5 +++++
- include/uapi/linux/vfio.h | 4 +---
- 2 files changed, 6 insertions(+), 3 deletions(-)
+ drivers/vfio/pci/vfio_pci_core.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/include/linux/vfio.h b/include/linux/vfio.h
-index b53a9557884a..6a8cf6637333 100644
---- a/include/linux/vfio.h
-+++ b/include/linux/vfio.h
-@@ -252,4 +252,9 @@ extern int vfio_virqfd_enable(void *opaque,
- 			      void *data, struct virqfd **pvirqfd, int fd);
- extern void vfio_virqfd_disable(struct virqfd **pvirqfd);
+diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+index a03b5a99c2da..e581a327f90d 100644
+--- a/drivers/vfio/pci/vfio_pci_core.c
++++ b/drivers/vfio/pci/vfio_pci_core.c
+@@ -341,7 +341,8 @@ void vfio_pci_core_disable(struct vfio_pci_core_device *vdev)
+ 	vdev->virq_disabled = false;
  
-+static inline bool vfio_is_state_invalid(u32 state)
-+{
-+	return state >= VFIO_DEVICE_STATE_INVALID;
-+}
-+
- #endif /* VFIO_H */
-diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-index ef33ea002b0b..7f8fdada5eb3 100644
---- a/include/uapi/linux/vfio.h
-+++ b/include/uapi/linux/vfio.h
-@@ -609,6 +609,7 @@ struct vfio_device_migration_info {
- #define VFIO_DEVICE_STATE_RUNNING   (1 << 0)
- #define VFIO_DEVICE_STATE_SAVING    (1 << 1)
- #define VFIO_DEVICE_STATE_RESUMING  (1 << 2)
-+#define VFIO_DEVICE_STATE_INVALID   (VFIO_DEVICE_STATE_RESUMING + 1)
- #define VFIO_DEVICE_STATE_MASK      (VFIO_DEVICE_STATE_RUNNING | \
- 				     VFIO_DEVICE_STATE_SAVING |  \
- 				     VFIO_DEVICE_STATE_RESUMING)
-@@ -621,9 +622,6 @@ struct vfio_device_migration_info {
- 	((state & VFIO_DEVICE_STATE_MASK) == (VFIO_DEVICE_STATE_SAVING | \
- 					      VFIO_DEVICE_STATE_RESUMING))
+ 	for (i = 0; i < vdev->num_regions; i++)
+-		vdev->region[i].ops->release(vdev, &vdev->region[i]);
++		if (vdev->region[i].ops->release)
++			vdev->region[i].ops->release(vdev, &vdev->region[i]);
  
--#define VFIO_DEVICE_STATE_SET_ERROR(state) \
--	((state & ~VFIO_DEVICE_STATE_MASK) | VFIO_DEVICE_SATE_SAVING | \
--					     VFIO_DEVICE_STATE_RESUMING)
- 
- 	__u32 reserved;
- 	__u64 pending_bytes;
+ 	vdev->num_regions = 0;
+ 	kfree(vdev->region);
 -- 
 2.18.1
 
