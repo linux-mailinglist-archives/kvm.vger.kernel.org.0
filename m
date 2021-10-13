@@ -2,134 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4C2B142B46B
-	for <lists+kvm@lfdr.de>; Wed, 13 Oct 2021 07:11:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BE04142B57E
+	for <lists+kvm@lfdr.de>; Wed, 13 Oct 2021 07:34:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229603AbhJMFNL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Oct 2021 01:13:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33096 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230126AbhJMFNI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Oct 2021 01:13:08 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C2EBC061570
-        for <kvm@vger.kernel.org>; Tue, 12 Oct 2021 22:11:05 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id oa4so1283941pjb.2
-        for <kvm@vger.kernel.org>; Tue, 12 Oct 2021 22:11:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=P8gf7IINw+jRwIt3X6fN4SZBz4OTW9W5HW6/ZYA0ZrQ=;
-        b=OJnnPOpYu7eJYXwdgr0zRBsIp/7JCoJdWnLex1e+Nc59Ox3JrNo/ipy44NWbdZ1Wij
-         cYg9Oe3IdKwjLZ3ccjWj/lfARUHUDGXHYczC1qcS8GhYxeGqNfAmOiqjRGIpNbWEKXa2
-         Qi9tEO86QIO9mq7K47Docwc+8w/vFa49WJ0i3X1YPZ8DwOrxIaJOvQhs4oTCjIw7XhMs
-         85rNypB1vqioXE/4YRebipGjt4G4OJKFB3ozkhVDBnROsdS2D888AzkaK6wai/y9wcPK
-         fKZlh7cJKDfsqEQisJ01cAjq66cHlSWqDJ4/mRmAC2HTJLmfX15DM2CV03Md2tO4vBCx
-         h8Xg==
+        id S237761AbhJMFgy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Oct 2021 01:36:54 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:24934 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S237732AbhJMFgx (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 13 Oct 2021 01:36:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1634103290;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=s9r2xR2EqP/t5FLsHTwtUUvaANXfO/gylgaJSKQRa+8=;
+        b=cC7tbFd7PNvNQr1A6a5BiGKY3zDjKuUc1EfbzRZH00ckwDhcjEaZjfIZsTcLeCOBWg8DNJ
+        hj9t0eLr4q2MpVl+FlF/sjCn7Le+Eg1SP50GdRDuFriCM7JF82q0rqLrm/XFoHnWFN5vtx
+        xqrKu3Zsjomn5c27AswLlTxnI6X1wyo=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-446-cHr5ZxsIPM-KnUNOiFzgxA-1; Wed, 13 Oct 2021 01:34:47 -0400
+X-MC-Unique: cHr5ZxsIPM-KnUNOiFzgxA-1
+Received: by mail-ed1-f70.google.com with SMTP id cy14-20020a0564021c8e00b003db8c9a6e30so1235357edb.1
+        for <kvm@vger.kernel.org>; Tue, 12 Oct 2021 22:34:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=P8gf7IINw+jRwIt3X6fN4SZBz4OTW9W5HW6/ZYA0ZrQ=;
-        b=SeCC/a15jKA372+Qk0FqdoxS60FsNKHNWeWPsHMJ6fax5NVYdGCXqrQgPwV4cCmZY4
-         Qw9Lt2R02V5E+OjMJB6E96SGaWF08jLL4uzwv+U2R+6FJb90Hq8einR/pD3kpb4bSYQ2
-         4Ln1YBMGSZo7/A+7Qk3rj7bVuTFzgPHZSUXPiPKyEfZpC59DvaWPAi+DaNxjUoN22iSE
-         ec9C92QqIdfeIZAliN7AMbPuhJn7DSMQ9Gn4LG+exMhelRU+/oudjlgLY/bjL4V6WoFz
-         tTKHP4iV474extpe0cfTJIjEmRfzUg2PLx2ilJ+G1drzHB9jm3dknQooc4lmnq3srmvx
-         hL1g==
-X-Gm-Message-State: AOAM532oOOw1GDDFjCxkR5Cy/1MKfurXRLtjfqB93v3lxEw9kD/DN5eg
-        M2xsjPTVyZ20k92kdZqSPPBbudBxPD3NBsTLTf0QiA==
-X-Google-Smtp-Source: ABdhPJzuE5GfZRyptpvG0d49NR7yBY6nXSth0Pf0CO5A5fn5OISFtomB4UlZSF8y0nx09KKkz3b+VnV54dmuG26Efq8=
-X-Received: by 2002:a17:902:c402:b0:13f:1c07:5a25 with SMTP id
- k2-20020a170902c40200b0013f1c075a25mr24520082plk.38.1634101864597; Tue, 12
- Oct 2021 22:11:04 -0700 (PDT)
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=s9r2xR2EqP/t5FLsHTwtUUvaANXfO/gylgaJSKQRa+8=;
+        b=zSSV6cS3ENEKppa88JC/gXLUNqjp0vKxccqQyzPEECG6jFfaIOnHiG7tQ0/vkQ4OpI
+         MqvNhUhJAvSNp0vxMK3l7/g0z3L/0LZZ+ZldPesvKjZyOVlKsI4yZKFhTCkEN2vHQAcs
+         BujGEBlBhIBupe9yGm2+uKXYIyuo9+tISq4pJGXooFbD11tB0X8PVUR0iU7NgtbLCxHU
+         gUWQnswHlZpcFMR1UxnMNxdQzTyZ/r7m/ZP2ylDTY9tA4pwjxLLsd7PJfcFCjJ6TelvO
+         3qFK09nUiRLWu5dAm15dXaTd7CC5QpXZa1PTqOG78J8U7lGhyPczxpCunJRzOjKLJ4Nr
+         uo3g==
+X-Gm-Message-State: AOAM533tKUdPtRoCba30vY1LvMBbAApBdc9G6GCz638twCOvCpXpxS+r
+        cEXjiXXXUAAjv4NhwsR87ckg02V3DmzRHdnIs71ru3xzroAVwBQnCiT/fAIxluij92EWecTo71l
+        wdOhzwPCXKjl8
+X-Received: by 2002:a05:6402:2684:: with SMTP id w4mr6554721edd.108.1634103286330;
+        Tue, 12 Oct 2021 22:34:46 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxvbp0lfx3vs0ck1sseLJlqp7mWqgndzQU8vzGaHBI2q4E7j80ZWXtMNpOrO5LTzF7xq9/gig==
+X-Received: by 2002:a05:6402:2684:: with SMTP id w4mr6554698edd.108.1634103286140;
+        Tue, 12 Oct 2021 22:34:46 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id x26sm1916924ejf.103.2021.10.12.22.34.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 12 Oct 2021 22:34:45 -0700 (PDT)
+Message-ID: <cc8893f1-df60-2155-d3b6-f889bc1c2201@redhat.com>
+Date:   Wed, 13 Oct 2021 07:34:43 +0200
 MIME-Version: 1.0
-References: <20210916181510.963449-1-oupton@google.com> <20210916181510.963449-6-oupton@google.com>
-In-Reply-To: <20210916181510.963449-6-oupton@google.com>
-From:   Reiji Watanabe <reijiw@google.com>
-Date:   Tue, 12 Oct 2021 22:10:48 -0700
-Message-ID: <CAAeT=Fwuy2TT75KmBMgHXkxt++BAc30EUaybkU_V-zix+2Q9zw@mail.gmail.com>
-Subject: Re: [PATCH v8 5/8] arm64: cpufeature: Enumerate support for FEAT_ECV
- >= 0x2
-To:     Oliver Upton <oupton@google.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-        Peter Shier <pshier@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        linux-arm-kernel@lists.infradead.org,
-        Jim Mattson <jmattson@google.com>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [patch 16/31] x86/fpu: Replace KVMs homebrewn FPU copy to user
+Content-Language: en-US
+To:     Thomas Gleixner <tglx@linutronix.de>,
+        LKML <linux-kernel@vger.kernel.org>
+Cc:     x86@kernel.org, "Chang S. Bae" <chang.seok.bae@intel.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Arjan van de Ven <arjan@linux.intel.com>,
+        kvm@vger.kernel.org
+References: <20211011215813.558681373@linutronix.de>
+ <20211011223611.249593446@linutronix.de>
+ <0d222978-014a-cdcb-f8aa-5b3179cb0809@redhat.com> <87fst6b0f5.ffs@tglx>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <87fst6b0f5.ffs@tglx>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 16, 2021 at 11:15 AM Oliver Upton <oupton@google.com> wrote:
->
-> Introduce a new cpucap to indicate if the system supports full enhanced
-> counter virtualization (i.e. ID_AA64MMFR0_EL1.ECV>=0x2).
->
-> Signed-off-by: Oliver Upton <oupton@google.com>
-> ---
->  arch/arm64/include/asm/sysreg.h |  1 +
->  arch/arm64/kernel/cpufeature.c  | 10 ++++++++++
->  arch/arm64/tools/cpucaps        |  1 +
->  3 files changed, 12 insertions(+)
->
-> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> index b268082d67ed..3fa6b091384d 100644
-> --- a/arch/arm64/include/asm/sysreg.h
-> +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -849,6 +849,7 @@
->  #define ID_AA64MMFR0_ASID_8            0x0
->  #define ID_AA64MMFR0_ASID_16           0x2
->
-> +#define ID_AA64MMFR0_ECV_PHYS          0x2
->  #define ID_AA64MMFR0_TGRAN4_NI                 0xf
->  #define ID_AA64MMFR0_TGRAN4_SUPPORTED_MIN      0x0
->  #define ID_AA64MMFR0_TGRAN4_SUPPORTED_MAX      0x7
-> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-> index f8a3067d10c6..2f5042bb107c 100644
-> --- a/arch/arm64/kernel/cpufeature.c
-> +++ b/arch/arm64/kernel/cpufeature.c
-> @@ -2328,6 +2328,16 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
->                 .matches = has_cpuid_feature,
->                 .min_field_value = 1,
->         },
-> +       {
-> +               .desc = "Enhanced Counter Virtualization (Physical)",
-> +               .capability = ARM64_HAS_ECV2,
-> +               .type = ARM64_CPUCAP_SYSTEM_FEATURE,
-> +               .sys_reg = SYS_ID_AA64MMFR0_EL1,
-> +               .sign = FTR_UNSIGNED,
-> +               .field_pos = ID_AA64MMFR0_ECV_SHIFT,
-> +               .matches = has_cpuid_feature,
-> +               .min_field_value = ID_AA64MMFR0_ECV_PHYS,
-> +       },
->         {},
->  };
->
-> diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
-> index 49305c2e6dfd..f73a30d5fb1c 100644
-> --- a/arch/arm64/tools/cpucaps
-> +++ b/arch/arm64/tools/cpucaps
-> @@ -18,6 +18,7 @@ HAS_CRC32
->  HAS_DCPODP
->  HAS_DCPOP
->  HAS_E0PD
-> +HAS_ECV2
->  HAS_EPAN
->  HAS_GENERIC_AUTH
->  HAS_GENERIC_AUTH_ARCH
-> --
+On 12/10/21 19:47, Thomas Gleixner wrote:
+>> The memset(guest_xsave, 0, sizeof(struct kvm_xsave)) also is not
+>> reproduced, you can make it unconditional for simplicity; this is not a
+>> fast path.
+> Duh, I should have mentioned that in the changelog. The buffer is
+> allocated with kzalloc() soe the memset is redundant, right?
 
-Reviewed-by: Reiji Watanabe <reijiw@google.com>
+Yes, I always confuse the __user pointers with the temporary ones that 
+are allocated in the callers.
 
-Personally, I would prefer a more descriptive name (e.g. ECV_PHYS)
-rather than ECV2 though.
+Paolo
 
-Thanks,
-Reiji
