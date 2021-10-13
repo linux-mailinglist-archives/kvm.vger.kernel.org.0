@@ -2,197 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D36D742C6F3
-	for <lists+kvm@lfdr.de>; Wed, 13 Oct 2021 18:56:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AED6042C728
+	for <lists+kvm@lfdr.de>; Wed, 13 Oct 2021 19:04:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237985AbhJMQ6k (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Oct 2021 12:58:40 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:25308 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237789AbhJMQ6c (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 13 Oct 2021 12:58:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634144188;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=OQc5t39oYfKEqQbzvm+Biugqq6bcM4boL4RoaIoHD1Y=;
-        b=PeIITYqcVPSbsV8xiT14ECiJsZwqAMJVKAAORNcX558L0mHvf+kVk2F/4ybu4iINqkpvXU
-        wHSKEGhncmJAqkk2S1JbrlWpHaEsZ9pMwo/W/YI+XkLC4EvCT2Ad9YVhrjKFjhr4aWROVC
-        g7pgdN3pmaxe5DIjRdQbDIH76i+Zk2s=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-538-u2ouWplOOjK_H_t0WEoH1w-1; Wed, 13 Oct 2021 12:56:23 -0400
-X-MC-Unique: u2ouWplOOjK_H_t0WEoH1w-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 75263801AA7;
-        Wed, 13 Oct 2021 16:56:22 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id EBAC95DA60;
-        Wed, 13 Oct 2021 16:56:21 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     fwilhelm@google.com, seanjc@google.com, oupton@google.com,
-        stable@vger.kernel.org
-Subject: [PATCH 8/8] KVM: SEV-ES: go over the sev_pio_data buffer in multiple passes if needed
-Date:   Wed, 13 Oct 2021 12:56:16 -0400
-Message-Id: <20211013165616.19846-9-pbonzini@redhat.com>
-In-Reply-To: <20211013165616.19846-1-pbonzini@redhat.com>
-References: <20211013165616.19846-1-pbonzini@redhat.com>
+        id S236309AbhJMRGP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Oct 2021 13:06:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58348 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229989AbhJMRGP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Oct 2021 13:06:15 -0400
+Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3B1FC061746
+        for <kvm@vger.kernel.org>; Wed, 13 Oct 2021 10:04:11 -0700 (PDT)
+Received: by mail-pg1-x52d.google.com with SMTP id 133so2963291pgb.1
+        for <kvm@vger.kernel.org>; Wed, 13 Oct 2021 10:04:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=Qs+5DwWD1Rx+vv/W6o07LrnjErzTT76oQHuQLcyI2hw=;
+        b=iyi+jmtEHIugaiDUUT/ucFx2GgoKITe+iiAKP+UeA2kIYn5Oc7iTNmdlUPuAYBXHMg
+         4MLWuzuM3NM9E/XDdI5IuqfCDOcalnolG6fHKtDPlXZ8Jr6+9XOFp293MZv1NgS6A/f0
+         zc02ms2LlZqelekf9K2K6ljGwUddKjxNnQggwQObUWxssXgDrH8JaVVk2pz40U6x+dYp
+         lz3vMXh62wXBRKV7LVxhSV7ojsMuIsJZ6y+S/8cVa8Wgb9Q7PD0wPtaEO9BDYRDOXzDf
+         lgMuF5UjeQkAqK91hdmmxLDRcOnVfze/5wOnvYQ3hxxE/PXEzriR+C244xVX7fATAJtr
+         /41w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Qs+5DwWD1Rx+vv/W6o07LrnjErzTT76oQHuQLcyI2hw=;
+        b=gIv+F3XothfFnsH+uUc1jK4l2WahRR1/o1tB7wUvOjpGoYDDUuVzS1v+4EhDzokH3y
+         WyFfhpF2qlq8tTCJNCIzpS7kaIrAFX4vmtNUFCLxV3wImbyYqDauwTYkFgDdngOtKJ1/
+         o0yxriv0TIhpcmWUsK4hjWuHIqAhtUkd39JEfSRI939XbRVVHyNJrjXXhiuxqx7+TkOf
+         4OajC7WMPoe7A8/jUBQCyfPxZ8+JrTvplI1OuYUH/fzUViQ0Zk1nvtUH6llZdGY01wNZ
+         F/VY9BY/Lyr1Yx2eAdNYm1jXZR7PaatSBhvKP6UwL6J7jmaq1h4MPGZYhOgAvkYJmF2Z
+         h+7A==
+X-Gm-Message-State: AOAM533BfJV55keqkjFFeeD/8SUur+bUJwcSW0fAmtgugBacq9PeY+OX
+        t7G5oeNJer9v2mHkaS6X9zFgPw==
+X-Google-Smtp-Source: ABdhPJxkQD+smtf/Sn/mUPp5u5h2BWQFhYFmVSmny/8OgT4A9WVg/lMu0U4st4H9LAK0FzKnJt5kJA==
+X-Received: by 2002:a63:1950:: with SMTP id 16mr253698pgz.346.1634144651005;
+        Wed, 13 Oct 2021 10:04:11 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id t14sm6393455pjl.10.2021.10.13.10.04.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Oct 2021 10:04:10 -0700 (PDT)
+Date:   Wed, 13 Oct 2021 17:04:06 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH Part2 v5 37/45] KVM: SVM: Add support to handle MSR based
+ Page State Change VMGEXIT
+Message-ID: <YWcRhrxLUXfHRig7@google.com>
+References: <20210820155918.7518-1-brijesh.singh@amd.com>
+ <20210820155918.7518-38-brijesh.singh@amd.com>
+ <YWYCrQX4ZzwUVZCe@google.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YWYCrQX4ZzwUVZCe@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The PIO scratch buffer is larger than a single page, and therefore
-it is not possible to copy it in a single step to vcpu->arch/pio_data.
-Bound each call to emulator_pio_in/out to a single page; keep
-track of how many I/O operations are left in vcpu->arch.sev_pio_count,
-so that the operation can be restarted in the complete_userspace_io
-callback.
+On Tue, Oct 12, 2021, Sean Christopherson wrote:
+> If we are unable to root cause and fix the bug, I think a viable workaround would
+> be to clear the hardware present bit in unrelated SPTEs, but keep the SPTEs
+> themselves.  The idea mostly the same as the ZAPPED_PRIVATE concept from the initial
+> TDX RFC.  MMU notifier invalidations, memslot removal, RMP restoration, etc... would
+> all continue to work since the SPTEs is still there, and KVM's page fault handler
+> could audit any "blocked" SPTE when it's refaulted (I'm pretty sure it'd be
+> impossible for the PFN to change, since any PFN change would require a memslot
+> update or mmu_notifier invalidation).
+> 
+> The downside to that approach is that it would require walking all SPTEs to do a
+> memslot deletion, i.e. we'd lose the "fast zap" behavior.  If that's a performance
+> issue, the behavior could be opt-in (but not for SNP/TDX).
 
-For OUT, this means that the previous kvm_sev_es_outs implementation
-becomes an iterator of the loop, and we can consume the sev_pio_data
-buffer before leaving to userspace.
-
-For IN, instead, consuming the buffer and decreasing sev_pio_count
-is always done in the complete_userspace_io callback, because that
-is when the memcpy is done into sev_pio_data.
-
-Cc: stable@vger.kernel.org
-Fixes: 7ed9abfe8e9f ("KVM: SVM: Support string IO operations for an SEV-ES guest")
-Reported-by: Felix Wilhelm <fwilhelm@google.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/include/asm/kvm_host.h |  1 +
- arch/x86/kvm/x86.c              | 73 +++++++++++++++++++++++++--------
- 2 files changed, 57 insertions(+), 17 deletions(-)
-
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 6bed6c416c6c..5a0298aa56ba 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -703,6 +703,7 @@ struct kvm_vcpu_arch {
- 	struct kvm_pio_request pio;
- 	void *pio_data;
- 	void *sev_pio_data;
-+	unsigned sev_pio_count;
- 
- 	u8 event_exit_inst_len;
- 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index a485e185ad00..09c1e64495d3 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -12378,38 +12378,76 @@ int kvm_sev_es_mmio_read(struct kvm_vcpu *vcpu, gpa_t gpa, unsigned int bytes,
- EXPORT_SYMBOL_GPL(kvm_sev_es_mmio_read);
- 
- static int kvm_sev_es_outs(struct kvm_vcpu *vcpu, unsigned int size,
--			   unsigned int port, unsigned int count)
-+			   unsigned int port);
-+
-+static int complete_sev_es_emulated_outs(struct kvm_vcpu *vcpu)
- {
--	int ret = emulator_pio_out(vcpu, size, port,
--				   vcpu->arch.sev_pio_data, count);
-+	vcpu->arch.pio.count = 0;
-+	if (vcpu->arch.sev_pio_count)
-+		return kvm_sev_es_outs(vcpu,
-+				       vcpu->arch.pio.size,
-+				       vcpu->arch.pio.port);
-+	return 1;
-+}
-+
-+static int kvm_sev_es_outs(struct kvm_vcpu *vcpu, unsigned int size,
-+			   unsigned int port)
-+{
-+	for (;;) {
-+		unsigned int count =
-+			min_t(unsigned int, PAGE_SIZE / size, vcpu->arch.sev_pio_count);
-+		int ret = emulator_pio_out(vcpu, size, port, vcpu->arch.sev_pio_data, count);
-+
-+		/* memcpy done already by emulator_pio_out.  */
-+		vcpu->arch.sev_pio_count -= count;
-+		vcpu->arch.sev_pio_data += count * vcpu->arch.pio.size;
-+		if (!ret)
-+			break;
- 
--	if (ret) {
- 		/* Emulation done by the kernel.  */
--		return ret;
-+		vcpu->arch.pio.count = 0;
-+		if (!vcpu->arch.sev_pio_count)
-+			return 1;
- 	}
- 
--	vcpu->arch.pio.count = 0;
-+	vcpu->arch.complete_userspace_io = complete_sev_es_emulated_outs;
- 	return 0;
- }
- 
--static int complete_sev_es_emulated_ins(struct kvm_vcpu *vcpu)
-+static int kvm_sev_es_ins(struct kvm_vcpu *vcpu, unsigned int size,
-+			  unsigned int port);
-+
-+static void __complete_sev_es_emulated_ins(struct kvm_vcpu *vcpu)
- {
--	memcpy(vcpu->arch.sev_pio_data, vcpu->arch.pio_data,
--	       vcpu->arch.pio.count * vcpu->arch.pio.size);
--	vcpu->arch.pio.count = 0;
-+	unsigned count = vcpu->arch.pio.count;
-+	complete_emulator_pio_in(vcpu, vcpu->arch.sev_pio_data);
-+	vcpu->arch.sev_pio_count -= count;
-+	vcpu->arch.sev_pio_data += count * vcpu->arch.pio.size;
-+}
- 
-+static int complete_sev_es_emulated_ins(struct kvm_vcpu *vcpu)
-+{
-+	__complete_sev_es_emulated_ins(vcpu);
-+	if (vcpu->arch.sev_pio_count)
-+		return kvm_sev_es_ins(vcpu,
-+				      vcpu->arch.pio.size,
-+				      vcpu->arch.pio.port);
- 	return 1;
- }
- 
- static int kvm_sev_es_ins(struct kvm_vcpu *vcpu, unsigned int size,
--			  unsigned int port, unsigned int count)
-+			  unsigned int port)
- {
--	int ret = emulator_pio_in(vcpu, size, port,
--				  vcpu->arch.sev_pio_data, count);
-+	for (;;) {
-+		unsigned int count =
-+			min_t(unsigned int, PAGE_SIZE / size, vcpu->arch.sev_pio_count);
-+		if (!__emulator_pio_in(vcpu, size, port, count))
-+			break;
- 
--	if (ret) {
- 		/* Emulation done by the kernel.  */
--		return ret;
-+		__complete_sev_es_emulated_ins(vcpu);
-+		if (!vcpu->arch.sev_pio_count)
-+			return 1;
- 	}
- 
- 	vcpu->arch.complete_userspace_io = complete_sev_es_emulated_ins;
-@@ -12421,8 +12459,9 @@ int kvm_sev_es_string_io(struct kvm_vcpu *vcpu, unsigned int size,
- 			 int in)
- {
- 	vcpu->arch.sev_pio_data = data;
--	return in ? kvm_sev_es_ins(vcpu, size, port, count)
--		  : kvm_sev_es_outs(vcpu, size, port, count);
-+	vcpu->arch.sev_pio_count = count;
-+	return in ? kvm_sev_es_ins(vcpu, size, port)
-+		  : kvm_sev_es_outs(vcpu, size, port);
- }
- EXPORT_SYMBOL_GPL(kvm_sev_es_string_io);
- 
--- 
-2.27.0
-
+Another option if we introduce private memslots is to preserve private memslots
+on unrelated deletions.  The argument being that (a) private memslots are a new
+feature so there's no prior uABI to break, and (b) if not zapping private memslot
+SPTEs in response to the guest remapping a BAR somehow breaks GPU pass-through,
+then the bug is all but guaranteed to be somewhere besides KVM's memslot logic.
