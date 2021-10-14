@@ -2,126 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1148342D9D8
-	for <lists+kvm@lfdr.de>; Thu, 14 Oct 2021 15:10:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8ADC342DA20
+	for <lists+kvm@lfdr.de>; Thu, 14 Oct 2021 15:17:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231355AbhJNNMy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Oct 2021 09:12:54 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:6926 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230010AbhJNNMx (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 14 Oct 2021 09:12:53 -0400
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 19ED9Gka021652;
-        Thu, 14 Oct 2021 09:10:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=WThqPwMP2OLhr33ez5Gp6Jyfx+8H4EiSb+D3oodMMf4=;
- b=rTaPoERli98kn3TRxuQ4AihNbZxJQ4zSb3mRqw6hNZjHLKN1ecmVEki7M9iq0JKxZU/e
- zm4OpS1IUGF1ZeU8nP9pmRhssIuOLn2ORGvlN2M9H0NUvqedwaI3ya9VtXBfSxRIPXjd
- 3uDTebB0i+DHkRTLKz4dQuD5aS3N/zuFWKyu9K2OL7LfksainLIW+W5532WK8qG+N2nt
- 8ouChVv0BHn5qO5kXM4a77DKAvXSS5JqO5NVVcnJ4AcGw4YbIJlEqSrtqglysjgcQYxb
- uuo5hy7xwyLWdGgYeBQe01jKNtWSKKjSm9ape4aeVMkpi5FLhT667AND2mgNqIn8N2OV qg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3bnpf49rr2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 14 Oct 2021 09:10:48 -0400
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 19ECqJlj040792;
-        Thu, 14 Oct 2021 09:10:48 -0400
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3bnpf49rpx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 14 Oct 2021 09:10:47 -0400
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 19ED1WCV029176;
-        Thu, 14 Oct 2021 13:10:45 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma03ams.nl.ibm.com with ESMTP id 3bk2qa5et1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 14 Oct 2021 13:10:45 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 19EDAg2147317416
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 14 Oct 2021 13:10:42 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 41E4F42049;
-        Thu, 14 Oct 2021 13:10:42 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id F346F4203F;
-        Thu, 14 Oct 2021 13:10:41 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.145.15.174])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 14 Oct 2021 13:10:41 +0000 (GMT)
-Date:   Thu, 14 Oct 2021 15:10:14 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, david@redhat.com,
-        thuth@redhat.com, seiden@linux.ibm.com
-Subject: Re: [kvm-unit-tests PATCH v2 3/3] lib: s390x: Fix copyright message
-Message-ID: <20211014151014.583ad407@p-imbrenda>
-In-Reply-To: <20211014125107.2877-4-frankja@linux.ibm.com>
-References: <20211014125107.2877-1-frankja@linux.ibm.com>
-        <20211014125107.2877-4-frankja@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        id S230137AbhJNNT5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Oct 2021 09:19:57 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:42046 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229637AbhJNNT5 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 14 Oct 2021 09:19:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1634217472;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=+NM1i2J1rp8JeWkPr4/uwbyR3ctjMXN7223LR2qKUpY=;
+        b=jOBc7kDMC3XONRCkXvLLok77PrQOPx0xr0POMbNdFRsPyW63NXLp0IaJG1woFKfDPvwTBW
+        Wxv2puZ0LBUEkmHMfzvDjOTGv/CwaolzU1LRiPYspYoJEaBCq9/uchS4X+dbN4LgZdYZg/
+        RCvcUIGYENzLesjw3pZMObox/AULeSY=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-428-x7pB5mEOMS6fSaA_Dp-DCA-1; Thu, 14 Oct 2021 09:17:50 -0400
+X-MC-Unique: x7pB5mEOMS6fSaA_Dp-DCA-1
+Received: by mail-wr1-f72.google.com with SMTP id k2-20020adfc702000000b0016006b2da9bso4552266wrg.1
+        for <kvm@vger.kernel.org>; Thu, 14 Oct 2021 06:17:50 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent
+         :content-language:to:cc:references:from:organization:subject
+         :in-reply-to:content-transfer-encoding;
+        bh=+NM1i2J1rp8JeWkPr4/uwbyR3ctjMXN7223LR2qKUpY=;
+        b=rfGdtGFmLl6QqCGmSYx8QrI5L4n64wKuOaaNoQKj/Yi3h807lACKiRL38XwAPWCSYd
+         g9B6WtgbNXlQGa0VkGis6wFaTRYfHrU3W8YF5VNkx5/9KmWuQsHbJNrgKSqrs9gJyTVJ
+         whP8DfBtnNGtwOPeI7jaGnJGk3xQNp7Iw2A0IGNIj/1SIvW/6a0POsNJ9xW6psSlaJ6d
+         OgxX8VBOAKpTHFM3cxHw2BYfJhTZ0ZzCdRnYQTDuVjRJdE+2EsFaVLCdBcHOZa3sQR8Q
+         pY1HU5JQz4LXrjlSAMjDa9VppX5xTdY1GlpE0ckUZK/CPFAU8M62Ni7cfxbltKX6fw/M
+         idcQ==
+X-Gm-Message-State: AOAM531nE0RLBpkpYNQ8/Fv6NESuVTKiLpxkphuBnSazfeho726n3gPS
+        ziDRRBEV8BYZIhdeImRGNQ3Wml2NhRrfqlTG4xim3N845jsP2dxzudBaHa7MeO5da/AiozI/csU
+        Mi2+x3EZUnW3r
+X-Received: by 2002:adf:bc4a:: with SMTP id a10mr6666734wrh.131.1634217469621;
+        Thu, 14 Oct 2021 06:17:49 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz2BfYIGMw79FwUmfGlEluL+KqUBa1b2ecvJGEpX5k+JnUg3VeJnT6NiIpjp/IKGNNy7P2dmg==
+X-Received: by 2002:adf:bc4a:: with SMTP id a10mr6666700wrh.131.1634217469359;
+        Thu, 14 Oct 2021 06:17:49 -0700 (PDT)
+Received: from [192.168.3.132] (p5b0c694e.dip0.t-ipconnect.de. [91.12.105.78])
+        by smtp.gmail.com with ESMTPSA id l2sm2353420wrw.42.2021.10.14.06.17.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 14 Oct 2021 06:17:48 -0700 (PDT)
+Message-ID: <83270a38-a179-b2c5-9bab-7dd614dc07d6@redhat.com>
+Date:   Thu, 14 Oct 2021 15:17:47 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Content-Language: en-US
+To:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc:     qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        Ani Sinha <ani@anisinha.ca>, Peter Xu <peterx@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+        kvm@vger.kernel.org
+References: <20211013103330.26869-1-david@redhat.com>
+ <20211013103330.26869-13-david@redhat.com> <YWgYdWXsiI2mcfak@work-vm>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat
+Subject: Re: [PATCH RFC 12/15] virtio-mem: Expose device memory via separate
+ memslots
+In-Reply-To: <YWgYdWXsiI2mcfak@work-vm>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: rpW2vVlXDmNFnTyZ9WnB35ioK5Yndm0n
-X-Proofpoint-ORIG-GUID: 56hkh3IJcviI4E3RN62yUIgIqVzBeTio
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
- definitions=2021-10-14_07,2021-10-14_02,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- priorityscore=1501 clxscore=1015 lowpriorityscore=0 mlxscore=0
- phishscore=0 adultscore=0 bulkscore=0 suspectscore=0 malwarescore=0
- spamscore=0 mlxlogscore=999 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2109230001 definitions=main-2110140084
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 14 Oct 2021 12:51:07 +0000
-Janosch Frank <frankja@linux.ibm.com> wrote:
-
-> The comma makes no sense, so let's remove it.
+On 14.10.21 13:45, Dr. David Alan Gilbert wrote:
+> * David Hildenbrand (david@redhat.com) wrote:
+>> KVM nowadays supports a lot of memslots. We want to exploit that in
+>> virtio-mem, exposing device memory via separate memslots to the guest
+>> on demand, essentially reducing the total size of KVM slots
+>> significantly (and thereby metadata in KVM and in QEMU for KVM memory
+>> slots) especially when exposing initially only a small amount of memory
+>> via a virtio-mem device to the guest, to hotplug more later. Further,
+>> not always exposing the full device memory region to the guest reduces
+>> the attack surface in many setups without requiring other mechanisms
+>> like uffd for protection of unplugged memory.
+>>
+>> So split the original RAM region via memory region aliases into separate
+>> chunks (ending up as individual memslots), and dynamically map the
+>> required chunks (falling into the usable region) into the container.
+>>
+>> For now, we always map the memslots covered by the usable region. In the
+>> future, with VIRTIO_MEM_F_UNPLUGGED_INACCESSIBLE, we'll be able to map
+>> memslots on actual demand and optimize further.
+>>
+>> Users can specify via the "max-memslots" property how much memslots the
+>> virtio-mem device is allowed to use at max. "0" translates to "auto, no
+>> limit" and is determinded automatically using a heuristic. When a maximum
+>> (> 1) is specified, that auto-determined value is capped. The parameter
+>> doesn't have to be migrated and can differ between source and destination.
+>> The only reason the parameter exists is not make some corner case setups
+>> (multiple large virtio-mem devices assigned to a single virtual NUMA node
+>>  with only very limited available memslots, hotplug of vhost devices) work.
+>> The parameter will be set to be "0" as default soon, whereby it will remain
+>> to be "1" for compat machines.
+>>
+>> The properties "memslots" and "used-memslots" are read-only.
+>>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
 > 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> I think you need to move this patch after the vhost-user patches so that
+> you don't break a bisect including vhost-user.
 
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+As the default is set to 1 and is set to 0 ("auto") in the last patch in
+this series, there should be (almost) no difference regarding vhost-user.
 
-> ---
->  lib/s390x/css.h  | 2 +-
->  lib/s390x/sclp.h | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
 > 
-> diff --git a/lib/s390x/css.h b/lib/s390x/css.h
-> index d644971f..0db8a281 100644
-> --- a/lib/s390x/css.h
-> +++ b/lib/s390x/css.h
-> @@ -2,7 +2,7 @@
->  /*
->   * CSS definitions
->   *
-> - * Copyright IBM, Corp. 2020
-> + * Copyright IBM Corp. 2020
->   * Author: Pierre Morel <pmorel@linux.ibm.com>
->   */
->  
-> diff --git a/lib/s390x/sclp.h b/lib/s390x/sclp.h
-> index 28e526e2..61e9cf51 100644
-> --- a/lib/s390x/sclp.h
-> +++ b/lib/s390x/sclp.h
-> @@ -6,7 +6,7 @@
->   * Copyright (c) 2013 Alexander Graf <agraf@suse.de>
->   *
->   * and based on the file include/hw/s390x/sclp.h from QEMU
-> - * Copyright IBM, Corp. 2012
-> + * Copyright IBM Corp. 2012
->   * Author: Christian Borntraeger <borntraeger@de.ibm.com>
->   */
->  
+> But I do worry about the effect on vhost-user:
+
+The 4096 limit was certainly more "let's make it extreme so we raise
+some eyebrows and we can talk about the implications". I'd be perfectly
+happy with 256 or better 512. Anything that's bigger than 32 in case of
+virtiofsd :)
+
+>   a) What about external programs like dpdk?
+
+At least initially virtio-mem won't apply to dpdk and similar workloads
+(RT). For example, virtio-mem is incompatible with mlock. So I think the
+most important use case to optimize for is virtio-mem+virtiofsd
+(especially kata).
+
+>   b) I worry if you end up with a LOT of slots you end up with a lot of
+> mmap's and fd's in vhost-user; I'm not quite sure what all the effects
+> of that will be.
+
+At least for virtio-mem, there will be a small number of fd's, as many
+memslots share the same fd, so with virtio-mem it's not an issue.
+
+#VMAs is indeed worth discussing. Usually we can have up to 64k VMAs in
+a process. The downside of having many is some reduce pagefault
+performance. It really also depends on the target application. Maybe
+there should be some libvhost-user toggle, where the application can opt
+in to allow more?
+
+-- 
+Thanks,
+
+David / dhildenb
 
