@@ -2,71 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9391C42D691
-	for <lists+kvm@lfdr.de>; Thu, 14 Oct 2021 11:56:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CB63642D698
+	for <lists+kvm@lfdr.de>; Thu, 14 Oct 2021 11:58:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230051AbhJNJ6T (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Oct 2021 05:58:19 -0400
-Received: from smtp-fw-6001.amazon.com ([52.95.48.154]:13179 "EHLO
-        smtp-fw-6001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229468AbhJNJ6T (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Oct 2021 05:58:19 -0400
+        id S230126AbhJNKA0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Oct 2021 06:00:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34004 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229468AbhJNKAY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Oct 2021 06:00:24 -0400
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D2C7C061570;
+        Thu, 14 Oct 2021 02:58:19 -0700 (PDT)
+Received: by mail-pj1-x1035.google.com with SMTP id qe4-20020a17090b4f8400b0019f663cfcd1so6529945pjb.1;
+        Thu, 14 Oct 2021 02:58:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
-  t=1634205375; x=1665741375;
-  h=from:to:cc:date:message-id:references:in-reply-to:
-   content-id:mime-version:content-transfer-encoding:subject;
-  bh=jGmCXTHuOsw/NHSSCpZiNiTeddtQHn4Cy25sokT1ceg=;
-  b=X5jrEinzmv0330xg2+iqdmHclI4ryP2D04nDucpC8Bz9Wtf6F6qKX0/Y
-   1Ge/ccaHNdxaWwpmBUy9xsSOn1AfuB3nQsmdIi9aj2MvRrKm1kvJjthOD
-   3cIVZeWYsfMLD5V4vlNgseBXVPdXRsdoQjejSBskzGiu8lEBz6Nz317qH
-   w=;
-X-IronPort-AV: E=Sophos;i="5.85,372,1624320000"; 
-   d="scan'208";a="149132923"
-Subject: Re: [PATCH kvm-unit-tests 1/2] compiler.h: Fix typos in mul and sub overflow
- checks
-Thread-Topic: [PATCH kvm-unit-tests 1/2] compiler.h: Fix typos in mul and sub overflow
- checks
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-iad-1e-0bfdb89e.us-east-1.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-6001.iad6.amazon.com with ESMTP; 14 Oct 2021 09:56:06 +0000
-Received: from EX13D24EUA003.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
-        by email-inbound-relay-iad-1e-0bfdb89e.us-east-1.amazon.com (Postfix) with ESMTPS id D3936E0239;
-        Thu, 14 Oct 2021 09:56:04 +0000 (UTC)
-Received: from EX13D24EUA001.ant.amazon.com (10.43.165.233) by
- EX13D24EUA003.ant.amazon.com (10.43.165.211) with Microsoft SMTP Server (TLS)
- id 15.0.1497.23; Thu, 14 Oct 2021 09:56:04 +0000
-Received: from EX13D24EUA001.ant.amazon.com ([10.43.165.233]) by
- EX13D24EUA001.ant.amazon.com ([10.43.165.233]) with mapi id 15.00.1497.023;
- Thu, 14 Oct 2021 09:56:04 +0000
-From:   "Ahmed, Daniele" <ahmeddan@amazon.de>
-To:     Andrew Jones <drjones@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-CC:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "thuth@redhat.com" <thuth@redhat.com>
-Thread-Index: AQHXwFGNhPbfZVYhGEapHgQlWKjhD6vSZEmA
-Date:   Thu, 14 Oct 2021 09:56:04 +0000
-Message-ID: <82FB120B-824C-4F35-98CB-65964F6C4C5C@amazon.com>
-References: <20211013164259.88281-1-drjones@redhat.com>
- <20211013164259.88281-2-drjones@redhat.com>
-In-Reply-To: <20211013164259.88281-2-drjones@redhat.com>
-Accept-Language: en-US
-Content-Language: en-GB
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.43.164.96]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <11869295A996C84797812C5A435E8FBA@amazon.com>
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=G4rIb7beJwQqUdF+ZBNJoTZ2AvHg1kCA9YpDdPt+250=;
+        b=qTgsgp7JXouqeXF5dWuhL4S6rIr8gnsnjU2RvvoTCZkUazqASzivyt7xhwJ4pYdtUI
+         gDU+sCGxn4po6o6D73N6VgbqNDpy+ZIVcz8Yf8ODdVzLrznEqHzDWdxiwWOaPvVVB4hz
+         ZjyYLcGuxVqbAl1XJ5kOHADIJYtpf1yHRbwjd6/0PESNIDyU6qykUd6TIMsh2IYATrDW
+         f8nsZCGvms3GhnZERoa3vaydWepnqU3ryonss8DNWa9LXxa5VqMTLBtjOUxbUyAiVgEj
+         OHodqrpBORUqkMJHgXupRfZHazA6ggCpVM9Chwrt1rEXl1U+q6V5aDPWXzoG/GAwCLf5
+         j0vg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=G4rIb7beJwQqUdF+ZBNJoTZ2AvHg1kCA9YpDdPt+250=;
+        b=BYe9eL215n9443xxgu9XE6lnEVKt6m3SC6JsOz+nxC5pnbheJUA/CZBNjPZXJ233Q8
+         GRUEpNf79+YdYPSCU8Kp/jjdLWXNi/Nshaxts/J4g282XmjEomfciEsrWQuJW7s7t+B4
+         +QiCzlv4Nf/reYw/ihQF1J1frDHdDIrqn/GGQdB+lTufS23bHTQUrO9P18+YjJXyrxvK
+         Q9Rk3NseymK5FBDYwB6mRIs2mPQON1dYLq9KNFNxv5JMhur2vsDUdoFURuHfO6zxQGHx
+         bC3nj+S8s5aLRBOEK37yt/Wzoa4kO8NUd4DjYV/6EwzrVN4Mu0AujTtVbQ3AkVsy7w9X
+         cSCw==
+X-Gm-Message-State: AOAM533l9JKhZ97wiYP6FXzgde9dHnZf4bA6b6T+MOrXGT67Qvc99dVB
+        kdokLXM0aW6y20Eg09t5d6XJ8O2X+cFu3g==
+X-Google-Smtp-Source: ABdhPJybauUsRb6kcRpIweDhwUczxKkSy9GOsnk8QIcNBgG0KtwOGGPIusMCSU+GGv22Q6g7y+LJIA==
+X-Received: by 2002:a17:90a:f013:: with SMTP id bt19mr17067122pjb.82.1634205499115;
+        Thu, 14 Oct 2021 02:58:19 -0700 (PDT)
+Received: from localhost.localdomain (5e.8a.38a9.ip4.static.sl-reverse.com. [169.56.138.94])
+        by smtp.gmail.com with ESMTPSA id k127sm2080664pfd.1.2021.10.14.02.58.16
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 14 Oct 2021 02:58:18 -0700 (PDT)
+From:   Zhenguo Yao <yaozhenguo1@gmail.com>
+To:     bhelgaas@google.com, alex.williamson@redhat.com
+Cc:     cohuck@redhat.com, jgg@ziepe.ca, mgurtovoy@nvidia.com,
+        yishaih@nvidia.com, kvm@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yaozhenguo@jd.com,
+        Zhenguo Yao <yaozhenguo1@gmail.com>
+Subject: [PATCH v1 0/2] Add ablility of VFIO driver to ignore reset when device don't need it  
+Date:   Thu, 14 Oct 2021 17:57:46 +0800
+Message-Id: <20211014095748.84604-1-yaozhenguo1@gmail.com>
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-UmV2aWV3ZWQtYnk6IERhbmllbGUgQWhtZWQgPGFobWVkZGFuQGFtYXpvbi5jb20+DQoNCgoKCkFt
-YXpvbiBEZXZlbG9wbWVudCBDZW50ZXIgR2VybWFueSBHbWJICktyYXVzZW5zdHIuIDM4CjEwMTE3
-IEJlcmxpbgpHZXNjaGFlZnRzZnVlaHJ1bmc6IENocmlzdGlhbiBTY2hsYWVnZXIsIEpvbmF0aGFu
-IFdlaXNzCkVpbmdldHJhZ2VuIGFtIEFtdHNnZXJpY2h0IENoYXJsb3R0ZW5idXJnIHVudGVyIEhS
-QiAxNDkxNzMgQgpTaXR6OiBCZXJsaW4KVXN0LUlEOiBERSAyODkgMjM3IDg3OQoKCg==
+In some scenarios, vfio device can't do any reset in initialization
+process. For example: Nvswitch and GPU A100 working in Shared NVSwitch
+Virtualization Model. In such mode, there are two type VMs: service
+VM and Guest VM. The GPU devices are initialized in the following steps:
+
+1. Service VM boot up. GPUs and Nvswitchs are passthrough to service VM.
+Nvidia driver and manager software will do some settings in service VM.
+
+2. The selected GPUs are unpluged from service VM.
+
+3. Guest VM boots up with the selected GPUs passthrough.
+
+The selected GPUs can't do any reset in step3, or they will be initialized
+failed in Guest VM.
+
+This patchset add a PCI sysfs interface:ignore_reset which drivers can
+use it to control whether to do PCI reset or not. For example: In Shared
+NVSwitch Virtualization Model. Hypervisor can disable PCI reset by setting
+ignore_reset to 1 before Gust VM booting up.
+
+Zhenguo Yao (2):
+  PCI: Add ignore_reset sysfs interface to control whether do device
+    reset in PCI drivers
+  vfio-pci: Don't do device reset when ignore_reset is setting
+
+ drivers/pci/pci-sysfs.c          | 25 +++++++++++++++++
+ drivers/vfio/pci/vfio_pci_core.c | 48 ++++++++++++++++++++------------
+ include/linux/pci.h              |  1 +
+ 3 files changed, 56 insertions(+), 18 deletions(-)
+
+-- 
+2.27.0
 
