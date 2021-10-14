@@ -2,204 +2,176 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 62F6142DC0C
-	for <lists+kvm@lfdr.de>; Thu, 14 Oct 2021 16:52:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 646E542DD24
+	for <lists+kvm@lfdr.de>; Thu, 14 Oct 2021 17:02:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231824AbhJNOyQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Oct 2021 10:54:16 -0400
-Received: from mail-dm6nam08on2065.outbound.protection.outlook.com ([40.107.102.65]:33536
-        "EHLO NAM04-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S230359AbhJNOyQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Oct 2021 10:54:16 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=nHJl6t9ZgHXMF96IyacTE3V3/tnct+yOWmmDsIX+o5VuSAu7uFsVD8S5TPNMuPOqvjIz5DucBS/UOx+Yj1IxvVmfsYXijXF4zdwwTVRQX9Np12WETqrfFMEcDJ+TL+Jadtlm0qlW3O7bFieo7qLtlPOliLZ7u+a6zhbudXfk6wXE8LWojeqJVmrpKvwiKj9407pvhaJ+DEaGIBCrFBGMzDCg54s6YAzFKFFC1cAIoSHOOAHRxA0Pqnop1tDa6oLXjNTkj8UCmQkG2AH/3GZfq0rRPf5KLbPn/0X6j2c3Or+5RXZ8LjKbwJQZVkPkkYKm8nx3OF4s/p5LxcXJ8nMEdA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=5qJja2o5VMWdBf5VyZNtZK0pZipkZWr+6j0WTjTehhs=;
- b=O6fiRz3hEd8I/CR0SqOzrUsGf2V9QnqTSG++rX/KmqMo+jKBNWOslsNs8HEdDftCnjP5axl0xjbcrP9i3gLuBiDvfTkRVwczWzuATuUsQqi0G80SJRi4TkcGiGHntEjBn90kgZMMNLmF/NSv+QLfyuOft1KbwK7GKtHQD7+V3vZtHbvNe7/ZmpeCJO8z1/x86hN2FjfchT43575Ob9xrkOdlhpOMkr3ymQ+0W0iI3PG7bQR9vM8asqyHhdheZVGldJs8wde8GB+FyOEKp6JyiE1PSL8CzjZvPFlTrpQSOC7kRflAw7AJIufPedr6uIRZqTL7LH2Ao7g+DiFarVQTzw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5qJja2o5VMWdBf5VyZNtZK0pZipkZWr+6j0WTjTehhs=;
- b=fEN5iEC4TJ7iPXkGYNq9VEqXqYpd1J5EJTg/v039XBELzdLInFg67qaOYsGbXt/BXw9oVYhLjATMM2IF5wImD0TVurE3wnU/10f+K5F86y4KBWT81jahKUtlcMBpfmUgvrIOcauygMx4RpDTufK7vMwCq3VY+Qs2pwZRZ3frkN1qS//eJwe5Go/3tG9xl+Z0cE7jvNdGBz1jzQBAuPficbNIaQdcNuGNNLG9mqrtQ0u78yNeqYQAeX9WTvL/cDGdQUWkzWx4UHLGnXzkBxyHKN13CTIyXn8IVQakqPwHx7VZF7429qQD6yrthagJCf54Xe4KyY9BIC3lRDe76/Q3qQ==
-Authentication-Results: gibson.dropbear.id.au; dkim=none (message not signed)
- header.d=none;gibson.dropbear.id.au; dmarc=none action=none
- header.from=nvidia.com;
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
- by BL0PR12MB5507.namprd12.prod.outlook.com (2603:10b6:208:1c4::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4608.14; Thu, 14 Oct
- 2021 14:52:09 +0000
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::e8af:232:915e:2f95]) by BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::e8af:232:915e:2f95%6]) with mapi id 15.20.4608.017; Thu, 14 Oct 2021
- 14:52:09 +0000
-Date:   Thu, 14 Oct 2021 11:52:08 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     David Gibson <david@gibson.dropbear.id.au>
-Cc:     Liu Yi L <yi.l.liu@intel.com>, alex.williamson@redhat.com,
-        hch@lst.de, jasowang@redhat.com, joro@8bytes.org,
-        jean-philippe@linaro.org, kevin.tian@intel.com, parav@mellanox.com,
-        lkml@metux.net, pbonzini@redhat.com, lushenming@huawei.com,
-        eric.auger@redhat.com, corbet@lwn.net, ashok.raj@intel.com,
-        yi.l.liu@linux.intel.com, jun.j.tian@intel.com, hao.wu@intel.com,
-        dave.jiang@intel.com, jacob.jun.pan@linux.intel.com,
-        kwankhede@nvidia.com, robin.murphy@arm.com, kvm@vger.kernel.org,
-        iommu@lists.linux-foundation.org, dwmw2@infradead.org,
-        linux-kernel@vger.kernel.org, baolu.lu@linux.intel.com,
-        nicolinc@nvidia.com
-Subject: Re: [RFC 11/20] iommu/iommufd: Add IOMMU_IOASID_ALLOC/FREE
-Message-ID: <20211014145208.GR2744544@nvidia.com>
-References: <20210919063848.1476776-1-yi.l.liu@intel.com>
- <20210919063848.1476776-12-yi.l.liu@intel.com>
- <20210921174438.GW327412@nvidia.com>
- <YVanJqG2pt6g+ROL@yekko>
- <20211001122225.GK964074@nvidia.com>
- <YWPTWdHhoI4k0Ksc@yekko>
- <20211011184914.GQ2744544@nvidia.com>
- <YWe3zS4lIn8cj6su@yekko>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YWe3zS4lIn8cj6su@yekko>
-X-ClientProxiedBy: BL1PR13CA0286.namprd13.prod.outlook.com
- (2603:10b6:208:2bc::21) To BL0PR12MB5506.namprd12.prod.outlook.com
- (2603:10b6:208:1cb::22)
+        id S233639AbhJNPEm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Oct 2021 11:04:42 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48086 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233454AbhJNPDS (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 14 Oct 2021 11:03:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1634223672;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=BV6Kd3R3Kt6LrQLx9d+NO1qhe9aTARiaeLS4GPhJYpo=;
+        b=ZRA1X0JP2s4Mqz9B9V8gmq3eWE39E+3H7fKk1SxmAXID1ceUkfF0rb9kT1Y88WqbvQD1P3
+        bkhNwOSyYy3Eo5sADA2KH5QPPFNbfPuzxs3HPaQW0Y28/pveeMv46Xi7Fs6nh9EwOATLMD
+        R3WD+84NR2bjj8j5IQCfQDJOvGekMNE=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-173-5SJuEnBWO_e7d8AF7Kbfhg-1; Thu, 14 Oct 2021 11:01:11 -0400
+X-MC-Unique: 5SJuEnBWO_e7d8AF7Kbfhg-1
+Received: by mail-ed1-f71.google.com with SMTP id f4-20020a50e084000000b003db585bc274so5386950edl.17
+        for <kvm@vger.kernel.org>; Thu, 14 Oct 2021 08:01:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=BV6Kd3R3Kt6LrQLx9d+NO1qhe9aTARiaeLS4GPhJYpo=;
+        b=tpsVp7qn4eYSIpdYGNWTlNDpc61nmKhKnYx+SAWG7C/Xfs+LwsA8dN6RPqYm3I9sgH
+         t2f8YD3qg0iO1QUxw8ZN2yvs2uY7LFF/FFjSR1Nkdpwv8shuj0D9PUZPtvXAEKaDrHqw
+         74ezHyj7urwawO9xsihzAolwQEmGHD+3+IGl1qY46icPZfUlPsRuit3BbHW00tfRoQxk
+         9hdCfO+SP/iNHzAHqypPdzXefsVa6XWRm3GF3LtVqSDDSba/CUre96Si5k9RSgEM29as
+         hngS+e9iijJ9o3A1sxhSyH2UDwc3ev6w6gXmJjLLmk9aCDVL+NK1CguajJR6Rn/f4fxl
+         jpaQ==
+X-Gm-Message-State: AOAM530pWnOcLNMj1O2p5nGeA9zvlF57/7G+oKUiglBeA7QLtdcZtww3
+        qUKqt46Ogp7prHdLMWL2/QnHb5XOU7AaTi5KWmFWQRYzL6pCqTjYN8kCt0wR9pjmT/6YS7prr0R
+        Vi7t8bIP7VndP
+X-Received: by 2002:a50:998c:: with SMTP id m12mr3780756edb.19.1634223669427;
+        Thu, 14 Oct 2021 08:01:09 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy/kumyD1nCd6HHxZ5qlo0XqFX2FzJz/D5ZoqyFmP6ecJh0K9W8g1aRg2kwr1pTZGSQtBhffg==
+X-Received: by 2002:a50:998c:: with SMTP id m12mr3780721edb.19.1634223669117;
+        Thu, 14 Oct 2021 08:01:09 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id kw10sm2221355ejc.71.2021.10.14.08.01.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 14 Oct 2021 08:01:08 -0700 (PDT)
+Message-ID: <3997787e-402d-4b2b-0f90-4a672c77703f@redhat.com>
+Date:   Thu, 14 Oct 2021 17:01:07 +0200
 MIME-Version: 1.0
-Received: from mlx.ziepe.ca (142.162.113.129) by BL1PR13CA0286.namprd13.prod.outlook.com (2603:10b6:208:2bc::21) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4628.8 via Frontend Transport; Thu, 14 Oct 2021 14:52:09 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1mb25Y-00EwsF-Fl; Thu, 14 Oct 2021 11:52:08 -0300
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: bd6c44a2-ed30-4e26-65a8-08d98f2232d1
-X-MS-TrafficTypeDiagnostic: BL0PR12MB5507:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <BL0PR12MB550735A0AC4D9BF9160004FEC2B89@BL0PR12MB5507.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Z7slMshjxkbPXcFYOty4epdkLeCuey2yysWMVBZAaqoEjOXyU3aWH9a9l1y6pyKRfny4dvkB4A/OynY+haXP2nsIAt2ArrZkiqPh+355bBNRD9TWGH+yNesCt+gnxUkBadli6jo7FeQTbQ6ZE9uW0J3K7sYRMpjwsVoa8PLSFYiq42gGjj/2Fm3Pv68p8eKnlr4AbotdMH7ZpPLy9hrWqbXKkwEhgltG+EzS4m5iHjsQi+Kh4iVdPMZtgEuP25q3Jq7DC8pc3VLPO0sGzhWYniu8vajb20axRDvtIp979X+7mDERB2WA+lmUNZH9UNzNOTAoO1WyHMqVwWb6mf/eV3JPRVSeT8LZYcLzWzytnNwJioip2er5A+848HCCgkI7pSHxwfb1A5wZv+Mt1LHO4wFk1qkhS7W6s90HxQ2TIxubChU38M0xhzQcwWZoiWbud3ihcrRxwAinom1F62LQJytlUEWCqna0ZKd6kStLi9I9FMbA/aHmwpXHADo3rokGF3069tXwtiZgcsUxHkoklnVCY52j2XCZh+T+94WOQOyDVOvFrFy5Xp3w3Oefd5Ww6XZv3TYdlVC7kBT2emv1r8bZxTmm405FlGmyuoDAfJygIL02ucxeLNlgaOS+LGxW+gRTnQrJeH6OzgS3yHa836uNW7XEdq5b1Xedvr63iJL5E8N0SdxNIf/Zcy4CK5AN
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(5660300002)(2906002)(9746002)(2616005)(26005)(9786002)(508600001)(316002)(186003)(8936002)(8676002)(6916009)(38100700002)(426003)(7416002)(4326008)(66946007)(33656002)(83380400001)(66476007)(1076003)(66556008)(107886003)(86362001)(36756003)(84603001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?ZLUhbxa/ovyAmEzuzw+b5zJhIRm20c/Dm9Ca9Sahzl6ybOzxfH00P4bEPmsd?=
- =?us-ascii?Q?kZBya6vxVwr6G8vJ42bkzW6nOHJolbxhH1Lz4ll+rjiY060yhQK4egIEyH9K?=
- =?us-ascii?Q?rpuwledZFOIVbPqF3kZ3qwF8aRBT2xc9BAFIWqT6//67RPA5syZa+z7DTiHc?=
- =?us-ascii?Q?0c2A74/2i/C8tA1Sn2Xfrp8HOWoCzXQ0Rt+dc+FBohDZTwOBxj743sRLlQBV?=
- =?us-ascii?Q?nyj8UCu4LVnNRKfQKIYxu7ki1+Tj9IVRoBUnC/y3VXbUJohz4hDr2kaChGGb?=
- =?us-ascii?Q?R5Bo3zbCRj+6ScQWddk/Oe48VJzr+FikVPgMa4BYHEf/VkE+McPsmXNzmIRf?=
- =?us-ascii?Q?XTpkWybHrFz6wc4IRvNG/tzL/yL2uYx13SIOrArMhEtO3rab2oiBgYhIkjoc?=
- =?us-ascii?Q?0SfyV7fmN/uWNR+WfBai7X3aQp4VRrCkY8TZrpu9C6QJkdXavQpZv+RQmKyh?=
- =?us-ascii?Q?Djtzv5FzH4aCD7d7YZ5ZPxv6IdlGfhbGPPJ28LseSx/3ahVZaQiFYayFboml?=
- =?us-ascii?Q?gb4lWQ15RV32Wy+tuY48TsWaQC6CicPeLvZPEfoi1IJRqNSmJJGbgrBHm9hk?=
- =?us-ascii?Q?++RrczPy7tkxooYbUjI9P45tbk8hZROHuxcsjHSwdO+FVYEH+LPTK4MwOAmq?=
- =?us-ascii?Q?hCdNgX79aS7LlYvYWDeQi2gYoA+1H8kCOidXeB4uksojEadjNWvIa7fFwh9R?=
- =?us-ascii?Q?kQwLTqUfH+OHpyjxu8syp9O/+cvwLdgOjzeChxMLecN7uZEa8+K5S/KL0zf1?=
- =?us-ascii?Q?DHbpSb8oCgQ5Ry37bL+/huxm/Ea7NaTmIX+AFnfrv5HqE+y50IAAIgcR2fBW?=
- =?us-ascii?Q?hmwgz/AsZnbRMX3PJWvY3th5W//oJFehNgQaQ3f7qKgLq7A7MIT1GoK1FGJU?=
- =?us-ascii?Q?9YlTpACnWVrAD9MDKjjX+WbcqBnJRBU/iifP977n7Vzntzn2USvyAh6TfxTd?=
- =?us-ascii?Q?vH130XiccZxpG6YnNKfm2boyscozqA6cSRw0xVoSE7Onp0N7cyMno54YyIbT?=
- =?us-ascii?Q?oYvBZDJamBWyyNRvyzKq9EZ2/1ACVnY7+0RzrEir20cU6uOlLKx5aYjiMlZU?=
- =?us-ascii?Q?mDr34yXij2wIOM96DlqBYXB3bmWCwE5rTvr7iKbD0Bcsn67WGkNyQP1wHHK2?=
- =?us-ascii?Q?6b8GVs1nu6vR8uqhLnCiFypFG2Kda8LfodGWGzbLejgWpJVJO/48+if0VUql?=
- =?us-ascii?Q?Hk7PZ8WW4wVY/5/mGXk5AUc5wvLDSKg/EdsSAaO+bflN9YQIk7owe66Jsa5z?=
- =?us-ascii?Q?Sq6I0zoOItjjeqYGP3nsx0rHWbcg+DatwF0/50tTLTeroCqb0snM4TrEHcGo?=
- =?us-ascii?Q?zlh+4ogJfcZEMzmL5IFQeDvm?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bd6c44a2-ed30-4e26-65a8-08d98f2232d1
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Oct 2021 14:52:09.6249
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: FqiAIJ8eTJkjVu7lVxHKgK3WldzhbYa7an/m2Adi2vA9JOxSw9YhiR/MWLGd/CDB
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR12MB5507
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [patch 13/31] x86/fpu: Move KVMs FPU swapping to FPU core
+Content-Language: en-US
+To:     Thomas Gleixner <tglx@linutronix.de>,
+        "Liu, Jing2" <jing2.liu@intel.com>,
+        LKML <linux-kernel@vger.kernel.org>
+Cc:     "x86@kernel.org" <x86@kernel.org>,
+        "Bae, Chang Seok" <chang.seok.bae@intel.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Arjan van de Ven <arjan@linux.intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Nakajima, Jun" <jun.nakajima@intel.com>,
+        Jing Liu <jing2.liu@linux.intel.com>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "Cooper, Andrew" <andrew.cooper3@citrix.com>
+References: <871r4p9fyh.ffs@tglx>
+ <ec9c761d-4b5c-71e2-c1fc-d256b6b78c04@redhat.com>
+ <BL0PR11MB3252511FC48E43484DE79A3CA9B89@BL0PR11MB3252.namprd11.prod.outlook.com>
+ <6bbc5184-a675-1937-eb98-639906a9cf15@redhat.com> <87wnmf66m5.ffs@tglx>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <87wnmf66m5.ffs@tglx>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 14, 2021 at 03:53:33PM +1100, David Gibson wrote:
-
-> > My feeling is that qemu should be dealing with the host != target
-> > case, not the kernel.
-> > 
-> > The kernel's job should be to expose the IOMMU HW it has, with all
-> > features accessible, to userspace.
+On 14/10/21 16:09, Thomas Gleixner wrote:
+> On Thu, Oct 14 2021 at 11:01, Paolo Bonzini wrote:
+>> On 14/10/21 10:02, Liu, Jing2 wrote:
+>> Based on the input from Andy and Thomas, the new way would be like this:
+>>
+>> 1) host_fpu must always be checked for reallocation in
+>> kvm_load_guest_fpu (or in the FPU functions that it calls, that depends
+>> on the rest of Thomas's patches).  That's because arch_prctl can enable
+>> AMX for QEMU at any point after KVM_CREATE_VCPU.
 > 
-> See... to me this is contrary to the point we agreed on above.
+> No.
+> 
+>     1) QEMU starts
+>     2) QEMU requests permissions via prctl()
+>     3) QEMU creates vCPU threads
+> 
+> Doing it the other way around makes no sense at all and wont work.
 
-I'm not thinking of these as exclusive ideas.
+Sure, but KVM needs to do something that makes sense even for userspaces 
+that are not QEMU.
 
-The IOCTL interface in iommu can quite happily expose:
- Create IOAS generically
- Manipulate IOAS generically
- Create IOAS with IOMMU driver specific attributes
- HW specific Manipulate IOAS
+For example, there could be a program that uses AMX *itself* and does 
+not expose it to the guest.  In that case, the arch_prctl can come at 
+the point AMX is needed, which can be after the program creates vCPU 
+threads.  That's for host_fpu.
 
-IOCTL commands all together.
+For the guest_fpu, I agree that the arch_prctl must come before creating 
+vCPUs.
 
-So long as everything is focused on a generic in-kernel IOAS object it
-is fine to have multiple ways in the uAPI to create and manipulate the
-objects.
+>> 2) every use of vcpu->arch.guest_supported_xcr0 is changed to only
+>> include those dynamic-feature bits that were enabled via arch_prctl.
+>> That is, something like:
+>>
+>> static u64 kvm_guest_supported_cr0(struct kvm_vcpu *vcpu)
+>> {
+>> 	return vcpu->arch.guest_supported_xcr0 &
+>> 		(~xfeatures_mask_user_dynamic | \
+>> 		 current->thread.fpu.dynamic_state_perm);
+> 
+> Bah. You can't get enough from poking in internals, right?
+> 
+> vcpu_create()
+> 
+>    fpu_init_fpstate_user(guest_fpu, supported_xcr0)
+> 
+> That will (it does not today) do:
+> 
+>       guest_fpu::__state_perm = supported_xcr0 & xstate_get_group_perm();
+> 
+> The you have the information you need right in the guest FPU.
 
-When I speak about a generic interface I mean "Create IOAS
-generically" - ie a set of IOCTLs that work on most IOMMU HW and can
-be relied upon by things like DPDK/etc to always work and be portable.
-This is why I like "hints" to provide some limited widely applicable
-micro-optimization.
+Good, I wasn't aware of the APIs that will be there.
 
-When I said "expose the IOMMU HW it has with all features accessible"
-I mean also providing "Create IOAS with IOMMU driver specific
-attributes".
+>> int kvm_alloc_fpu_dynamic_features(struct kvm_vcpu *vcpu)
+>> {
+>> 	u64 allowed_dynamic = current->thread.fpu.dynamic_state_perm;
+> 
+> That's not a valid assumption.
+> 
+>> 	u64 enabled_dynamic =
+>> 		vcpu->arch.xcr0 & xfeatures_mask_user_dynamic;
+>>
+>> 	/* All dynamic features have to be arch_prctl'd first.  */
+>> 	WARN_ON_ONCE(enabled_dynamic & ~allowed_dynamic);
+>>
+>> 	if (!vcpu->arch.xfd_passthrough) {
+>> 		/* All dynamic states will #NM?  Wait and see.  */
+>> 		if ((enabled_dynamic & ~vcpu->arch.xfd) == 0)
+>> 			return 0;
+>>
+>> 		kvm_x86_ops.enable_xfd_passthrough(vcpu);
+>> 	}
+>>
+>> 	/* current->thread.fpu was already handled by arch_prctl.  */
+> 
+> No. current->thread.fpu has the default buffer unless QEMU used AMX or
+> something forced it to allocate a larger buffer.
+> 
+>> 	return fpu_alloc_features(vcpu->guest_fpu,
+>> 		vcpu->guest_fpu.dynamic_state_perm | enabled_dynamic);
+> 
+> This unconditionally calls into that allocation for every XCR0/XFD
+> trap ?
 
-These other IOCTLs would allow the IOMMU driver to expose every
-configuration knob its HW has, in a natural HW centric language.
-There is no pretense of genericness here, no crazy foo=A, foo=B hidden
-device specific interface.
+Calls into the function, but doesn't necessarily allocate anything. 
+What you wrote below looks correct to me, thanks.
 
-Think of it as a high level/low level interface to the same thing.
+Paolo
 
-> Those are certainly wrong, but they came about explicitly by *not*
-> being generic rather than by being too generic.  So I'm really
-> confused aso to what you're arguing for / against.
+> Also you really should not wait until _all_ dynamic states are cleared
+> in guest XFD.  Because a guest which has bit 18 and 19 available but only > uses one of them is going to trap on every other context switch due to
+> XFD writes.
 
-IMHO it is not having a PPC specific interface that was the problem,
-it was making the PPC specific interface exclusive to the type 1
-interface. If type 1 continued to work on PPC then DPDK/etc would
-never learned PPC specific code.
-
-For iommufd with the high/low interface each IOMMU HW should ask basic
-questions:
-
- - What should the generic high level interface do on this HW?
-   For instance what should 'Create IOAS generically' do for PPC?
-   It should not fail, it should create *something*
-   What is the best thing for DPDK?
-   I guess the 64 bit window is most broadly useful.
-
- - How to accurately describe the HW in terms of standard IOAS objects
-   and where to put HW specific structs to support this.
-
-   This is where PPC would decide how best to expose a control over
-   its low/high window (eg 1,2,3 IOAS). Whatever the IOMMU driver
-   wants, so long as it fits into the kernel IOAS model facing the
-   connected device driver.
-
-QEMU would have IOMMU userspace drivers. One would be the "generic
-driver" using only the high level generic interface. It should work as
-best it can on all HW devices. This is the fallback path you talked
-of.
-
-QEMU would also have HW specific IOMMU userspace drivers that know how
-to operate the exact HW. eg these drivers would know how to use
-userspace page tables, how to form IOPTEs and how to access the
-special features.
-
-This is how QEMU could use an optimzed path with nested page tables,
-for instance.
-
-Jason
