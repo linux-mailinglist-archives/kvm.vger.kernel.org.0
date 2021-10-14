@@ -2,214 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6B2B142E46F
-	for <lists+kvm@lfdr.de>; Fri, 15 Oct 2021 00:51:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 41DDC42E497
+	for <lists+kvm@lfdr.de>; Fri, 15 Oct 2021 01:09:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233994AbhJNWyA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Oct 2021 18:54:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41390 "EHLO
+        id S234330AbhJNXLg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Oct 2021 19:11:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45260 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229818AbhJNWyA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Oct 2021 18:54:00 -0400
+        with ESMTP id S233935AbhJNXLf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Oct 2021 19:11:35 -0400
 Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C5A9C061570;
-        Thu, 14 Oct 2021 15:51:54 -0700 (PDT)
-From:   Thomas Gleixner <tglx@linutronix.de>
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5893EC061570;
+        Thu, 14 Oct 2021 16:09:30 -0700 (PDT)
+Message-ID: <20211014225711.615197738@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1634251911;
+        s=2020; t=1634252968;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=FLoVNNtNPo6mitkB/AzeAHhgIos4G1PL9ZbWqs9uwB4=;
-        b=M2Qb+coA4tC6FDgliQJrP+id0TrTKs+XwCG38q94p9mGBfglKhGxLap28KS70GNdgUBLKc
-        39K9StYGC/2aAiw6dp2tPwIH7mFgPfjC1Qui0z/LY03MRxm1SeA3kD0svdPjrcTtuY8sl3
-        CK2OUKd6pna60Wu8oxCissnfBM01Epc1wIOrL3L7L2NKwMydGfbMqA3F9VMBnrl5yZEAVF
-        wRPDJRNBn8lj/MK5RiVIzfQeBflNZEzsnTwmCQlmiVDBFKU9KFGcpC7A2gg05u0iOKtDRe
-        Mk8Xda2y8HLDlLV0piTm/JXfFSrTL9HHLFEeeAt34MI32q0dXpPuB0FZQAVuJw==
+         content-transfer-encoding:content-transfer-encoding;
+        bh=OkoUtOJd/aTHZHuNnWnOItMShi3nftzEZspViJwU7EM=;
+        b=JOPZZogESlhc3o4Yacvp4X5NSplyd5QQXgtEZtU01sLH1Qk5K6ZPQHimgpashJDxt7EmW7
+        NrHouuaW2oDXGOYTMoPfnVmSFxiPoYFJ/5BhWDgZnWgf7DCL6ytb8wKlLE2AKPKsi1HwIh
+        iyk4nlupzA8w0b9bmsGEv2beFneVeAQxq72FBTPg6h8h2t1mdgriOV6ykrD3lQIaKYh9+e
+        BLLkGooCl1jVD1ETK+QWYWoLLTdTP8yNX7TkLo2bdh+wBkaHIYi7eLSYqPEvsl61t4y0WG
+        4CiUcWqX3d+PdGPgeOviRAS19gwKuW6TDbwe+qC7fxeA+z+G8zs8noaH3xR3aQ==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1634251911;
+        s=2020e; t=1634252968;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=FLoVNNtNPo6mitkB/AzeAHhgIos4G1PL9ZbWqs9uwB4=;
-        b=8O8sCvM5P2b942gVQkyqux5BTAhLHulOLRPnLQjT/Veg+nhYgMLVRdezjKI8uWNuSeJ36K
-        Kc3y3lsvnbXKwtCg==
+         content-transfer-encoding:content-transfer-encoding;
+        bh=OkoUtOJd/aTHZHuNnWnOItMShi3nftzEZspViJwU7EM=;
+        b=LzSKepaH6yWXdGw/ulcToZXR+ucNX43cZ3HjqDaRaE+lJfhNY2qU4SCwTk6GtEaDiCZFun
+        CFbgGBPQs+3j8ABQ==
+From:   Thomas Gleixner <tglx@linutronix.de>
 To:     LKML <linux-kernel@vger.kernel.org>
 Cc:     x86@kernel.org, "Chang S. Bae" <chang.seok.bae@intel.com>,
         Dave Hansen <dave.hansen@linux.intel.com>,
         Arjan van de Ven <arjan@linux.intel.com>,
         kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Subject: [patch V2 21/21] x86/fpu/signal: Use fpstate for size and features
-In-Reply-To: <20211013145323.285696382@linutronix.de>
-References: <20211013142847.120153383@linutronix.de>
- <20211013145323.285696382@linutronix.de>
-Date:   Fri, 15 Oct 2021 00:51:51 +0200
-Message-ID: <87ilxz5iew.ffs@tglx>
+Subject: [patch 0/8] x86/fpu: Consolidate the size and feature information (part 3)
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Date:   Fri, 15 Oct 2021 01:09:28 +0200 (CEST)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-For dynamically enabled features it's required to get the features which
-are enabled for that context when restoring from sigframe.
-
-The same applies for all signal frame size calculations.
-
-Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
----
-V2: Added a missing conversion and folded back a conversion which
-    was hidden in part 3
----
- arch/x86/kernel/fpu/signal.c |   44 ++++++++++++++++++++++++++-----------------
- 1 file changed, 27 insertions(+), 17 deletions(-)
-
---- a/arch/x86/kernel/fpu/signal.c
-+++ b/arch/x86/kernel/fpu/signal.c
-@@ -41,7 +41,7 @@ static inline bool check_xstate_in_sigfr
- 	/* Check for the first magic field and other error scenarios. */
- 	if (fx_sw->magic1 != FP_XSTATE_MAGIC1 ||
- 	    fx_sw->xstate_size < min_xstate_size ||
--	    fx_sw->xstate_size > fpu_user_xstate_size ||
-+	    fx_sw->xstate_size > current->thread.fpu.fpstate->user_size ||
- 	    fx_sw->xstate_size > fx_sw->extended_size)
- 		goto setfx;
- 
-@@ -98,7 +98,8 @@ static inline bool save_fsave_header(str
- 	return true;
- }
- 
--static inline bool save_xstate_epilog(void __user *buf, int ia32_frame)
-+static inline bool save_xstate_epilog(void __user *buf, int ia32_frame,
-+				      unsigned int usize)
- {
- 	struct xregs_state __user *x = buf;
- 	struct _fpx_sw_bytes *sw_bytes;
-@@ -113,7 +114,7 @@ static inline bool save_xstate_epilog(vo
- 		return !err;
- 
- 	err |= __put_user(FP_XSTATE_MAGIC2,
--			  (__u32 __user *)(buf + fpu_user_xstate_size));
-+			  (__u32 __user *)(buf + usize));
- 
- 	/*
- 	 * Read the xfeatures which we copied (directly from the cpu or
-@@ -171,6 +172,7 @@ static inline int copy_fpregs_to_sigfram
- bool copy_fpstate_to_sigframe(void __user *buf, void __user *buf_fx, int size)
- {
- 	struct task_struct *tsk = current;
-+	struct fpstate *fpstate = tsk->thread.fpu.fpstate;
- 	int ia32_fxstate = (buf != buf_fx);
- 	int ret;
- 
-@@ -215,7 +217,7 @@ bool copy_fpstate_to_sigframe(void __use
- 	fpregs_unlock();
- 
- 	if (ret) {
--		if (!__clear_user(buf_fx, fpu_user_xstate_size))
-+		if (!__clear_user(buf_fx, fpstate->user_size))
- 			goto retry;
- 		return false;
- 	}
-@@ -224,17 +226,18 @@ bool copy_fpstate_to_sigframe(void __use
- 	if ((ia32_fxstate || !use_fxsr()) && !save_fsave_header(tsk, buf))
- 		return false;
- 
--	if (use_fxsr() && !save_xstate_epilog(buf_fx, ia32_fxstate))
-+	if (use_fxsr() &&
-+	    !save_xstate_epilog(buf_fx, ia32_fxstate, fpstate->user_size))
- 		return false;
- 
- 	return true;
- }
- 
--static int __restore_fpregs_from_user(void __user *buf, u64 xrestore,
--				      bool fx_only)
-+static int __restore_fpregs_from_user(void __user *buf, u64 ufeatures,
-+				      u64 xrestore, bool fx_only)
- {
- 	if (use_xsave()) {
--		u64 init_bv = xfeatures_mask_uabi() & ~xrestore;
-+		u64 init_bv = ufeatures & ~xrestore;
- 		int ret;
- 
- 		if (likely(!fx_only))
-@@ -265,7 +268,8 @@ static bool restore_fpregs_from_user(voi
- retry:
- 	fpregs_lock();
- 	pagefault_disable();
--	ret = __restore_fpregs_from_user(buf, xrestore, fx_only);
-+	ret = __restore_fpregs_from_user(buf, fpu->fpstate->user_xfeatures,
-+					 xrestore, fx_only);
- 	pagefault_enable();
- 
- 	if (unlikely(ret)) {
-@@ -332,7 +336,7 @@ static bool __fpu_restore_sig(void __use
- 		user_xfeatures = fx_sw_user.xfeatures;
- 	} else {
- 		user_xfeatures = XFEATURE_MASK_FPSSE;
--		state_size = fpu->fpstate->size;
-+		state_size = fpu->fpstate->user_size;
- 	}
- 
- 	if (likely(!ia32_fxstate)) {
-@@ -425,10 +429,11 @@ static bool __fpu_restore_sig(void __use
- 	return success;
- }
- 
--static inline int xstate_sigframe_size(void)
-+static inline unsigned int xstate_sigframe_size(struct fpstate *fpstate)
- {
--	return use_xsave() ? fpu_user_xstate_size + FP_XSTATE_MAGIC2_SIZE :
--			fpu_user_xstate_size;
-+	unsigned int size = fpstate->user_size;
-+
-+	return use_xsave() ? size + FP_XSTATE_MAGIC2_SIZE : size;
- }
- 
- /*
-@@ -436,17 +441,19 @@ static inline int xstate_sigframe_size(v
-  */
- bool fpu__restore_sig(void __user *buf, int ia32_frame)
- {
--	unsigned int size = xstate_sigframe_size();
- 	struct fpu *fpu = &current->thread.fpu;
- 	void __user *buf_fx = buf;
- 	bool ia32_fxstate = false;
- 	bool success = false;
-+	unsigned int size;
- 
- 	if (unlikely(!buf)) {
- 		fpu__clear_user_states(fpu);
- 		return true;
- 	}
- 
-+	size = xstate_sigframe_size(fpu->fpstate);
-+
- 	ia32_frame &= (IS_ENABLED(CONFIG_X86_32) ||
- 		       IS_ENABLED(CONFIG_IA32_EMULATION));
- 
-@@ -481,7 +488,7 @@ unsigned long
- fpu__alloc_mathframe(unsigned long sp, int ia32_frame,
- 		     unsigned long *buf_fx, unsigned long *size)
- {
--	unsigned long frame_size = xstate_sigframe_size();
-+	unsigned long frame_size = xstate_sigframe_size(current->thread.fpu.fpstate);
- 
- 	*buf_fx = sp = round_down(sp - frame_size, 64);
- 	if (ia32_frame && use_fxsr()) {
-@@ -494,9 +501,12 @@ fpu__alloc_mathframe(unsigned long sp, i
- 	return sp;
- }
- 
--unsigned long fpu__get_fpstate_size(void)
-+unsigned long __init fpu__get_fpstate_size(void)
- {
--	unsigned long ret = xstate_sigframe_size();
-+	unsigned long ret = fpu_user_xstate_size;
-+
-+	if (use_xsave())
-+		ret += FP_XSTATE_MAGIC2_SIZE;
- 
- 	/*
- 	 * This space is needed on (most) 32-bit kernels, or when a 32-bit
+VGhpcyBpcyB0aGUgdGhpcmQgcGFydCBvZiB0aGUgZWZmb3J0IHRvIHN1cHBvcnQgQU1YLiBUaGUg
+c2Vjb25kIHBhcnQgY2FuIGJlCmZvdW5kIGhlcmU6CgogICAgIGh0dHBzOi8vbG9yZS5rZXJuZWwu
+b3JnL3IvMjAyMTEwMTMxNDI4NDcuMTIwMTUzMzgzQGxpbnV0cm9uaXguZGUKCldpdGggQU1YIHRo
+ZSBGUFUgcmVnaXN0ZXIgc3RhdGUgYnVmZmVyIHdoaWNoIGlzIHBhcnQgb2YKdGFza19zdHJ1Y3Q6
+OnRocmVhZDo6ZnB1IGlzIG5vdCBnb2luZyB0byBiZSBleHRlbmRlZCB1bmNvbmRpdGlvbmFsbHkg
+Zm9yCmFsbCB0YXNrcyBvbiBhbiBBTVggZW5hYmxlZCBzeXN0ZW0gYXMgdGhhdCB3b3VsZCB3YXN0
+ZSBtaW5pbXVtIDhLIHBlciB0YXNrLgoKQU1YIHByb3ZpZGVzIGEgbWVjaGFuaXNtIHRvIHRyYXAg
+b24gZmlyc3QgdXNlLiBUaGF0IHRyYXAgd2lsbCBiZSB1dGlsaXplZAp0byBhbGxvY2F0ZSBhIGxh
+cmdlciByZWdpc3RlciBzdGF0ZSBidWZmZXIgd2hlbiB0aGUgdGFzayAocHJvY2VzcykgaGFzCnBl
+cm1pc3Npb25zIHRvIHVzZSBpdC4gVGhlIGRlZmF1bHQgYnVmZmVyIHRhc2tfc3RydWN0IHdpbGwg
+b25seSBjYXJyeQpzdGF0ZXMgdXAgdG8gQVZYNTEyLgoKVGhpcyBuZWVkcyBtb3JlIGluZm9ybWF0
+aW9uIHRoYW4gd2hhdCBpcyBwcm92aWRlZCBub3cgd2l0aCB2YXJpb3VzCnZhcmlhYmxlcy4gCgpU
+aGUgb3JpZ2luYWwgYXBwcm9hY2ggd2FzIHRvIGp1c3QgYWRkIG1vcmUgdmFyaWFibGVzLCBidXQg
+aXQncyBzaW1wbGVyIHRvCnN0aWNrIHRoaXMgaW50byBkYXRhIHN0cnVjdHVyZXMuIAoKVGhlIGN1
+cnJlbnQgc2VyaWVzOgoKIC0gY3JlYXRlcyBhIGRhdGEgc3RydWN0dXJlIHdoaWNoIGNhcnJpZXMg
+dGhlIG5lY2Vzc2FyeSBpbmZvcm1hdGlvbjoKICAgZGVmYXVsdCBhbmQgbWF4aW11bSBmZWF0dXJl
+cyBhbmQgc2l6ZXMuCgogLSBpbnN0YW50aWF0ZXMgYW5kIGluaXRpYWxpemVzIG9uZSBmb3Iga2Vy
+bmVsIGluZm9ybWF0aW9uIGFuZCBvbmUgZm9yIHVzZXIKICAgc3BhY2UKCiAtIGNvbnZlcnRzIGFs
+bCB1c2VycyBvZiB0aGUgb2xkIHZhcmlhYmxlcwoKIC0gcmVtb3ZlcyB0aGUgbm93IHVudXNlZCBv
+bGQgdmFyaWFibGVzCgpJdCdzIGEgc3RyYWlnaHQgZm9yd2FyZCBjb252ZXJzaW9uIHdoaWNoIHNo
+b3VsZCBub3QgaW50cm9kdWNlIGFueQpmdW5jdGlvbmFsIGNoYW5nZXMuCgpUaGlzIHNlcmllcyBp
+cyBiYXNlZCBvbjoKCiAgIGdpdDovL2dpdC5rZXJuZWwub3JnL3B1Yi9zY20vbGludXgva2VybmVs
+L2dpdC90Z2x4L2RldmVsLmdpdCB4ODYvZnB1LTIKCmFuZCBhbHNvIGF2YWlsYWJsZSBmcm9tIGdp
+dDoKCiAgIGdpdDovL2dpdC5rZXJuZWwub3JnL3B1Yi9zY20vbGludXgva2VybmVsL2dpdC90Z2x4
+L2RldmVsLmdpdCB4ODYvZnB1LTMKClRoZSBmdWxsIHNlcmllcyB3aXRoIHBhcnQgNCBvbiB0b3Ag
+aXMgYXZhaWxhYmxlIGhlcmU6CgogICBnaXQ6Ly9naXQua2VybmVsLm9yZy9wdWIvc2NtL2xpbnV4
+L2tlcm5lbC9naXQvdGdseC9kZXZlbC5naXQgeDg2L2ZwdQoKVGhhbmtzLAoKCXRnbHgKLS0tCiBp
+bmNsdWRlL2FzbS9mcHUvdHlwZXMuaCAgfCAgIDM5ICsrKysrKysrKysKIGluY2x1ZGUvYXNtL2Zw
+dS94c3RhdGUuaCB8ICAgNDcgKy0tLS0tLS0tLS0tCiBrZXJuZWwvZnB1L2NvbnRleHQuaCAgICAg
+fCAgICA2IC0KIGtlcm5lbC9mcHUvY29yZS5jICAgICAgICB8ICAgMzcgKysrKysrKy0tLQoga2Vy
+bmVsL2ZwdS9pbml0LmMgICAgICAgIHwgICA0NiArKysrKy0tLS0tLS0KIGtlcm5lbC9mcHUvaW50
+ZXJuYWwuaCAgICB8ICAgIDIgCiBrZXJuZWwvZnB1L3JlZ3NldC5jICAgICAgfCAgICAyIAoga2Vy
+bmVsL2ZwdS9zaWduYWwuYyAgICAgIHwgICAxMSArLQoga2VybmVsL2ZwdS94c3RhdGUuYyAgICAg
+IHwgIDE3MyArKysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQog
+a2VybmVsL2ZwdS94c3RhdGUuaCAgICAgIHwgICAxNSArKystCiAxMCBmaWxlcyBjaGFuZ2VkLCAy
+MDUgaW5zZXJ0aW9ucygrKSwgMTczIGRlbGV0aW9ucygtKQoKCg==
