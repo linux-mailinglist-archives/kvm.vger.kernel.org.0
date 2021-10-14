@@ -2,107 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9ED6942E30E
-	for <lists+kvm@lfdr.de>; Thu, 14 Oct 2021 23:04:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 63EE642E403
+	for <lists+kvm@lfdr.de>; Fri, 15 Oct 2021 00:10:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232171AbhJNVHC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Oct 2021 17:07:02 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:29219 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231134AbhJNVHB (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 14 Oct 2021 17:07:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634245495;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=MQBCABj4UeApXkMaCL6n9c35UutDuFqeQw/+Jz4vJPE=;
-        b=gBxdkK2/6WWqO2GbqoEX5F1zufEayzTr68vRgbEeA1jSuyTRYn26CgAOgKoEI18JyfiBhc
-        Rq5BJR2HdPWi15Tc00NggJ2Cy2ZV80onkt6q3hIsoXgQ+XzXjtyojMEyxQmBJYUZfafYNt
-        vaPJ/4Hcu4N4D+C7jOivDOGesmWRcQI=
-Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com
- [209.85.161.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-552-pa2Mo-w7NyyXB4NhlAdXEg-1; Thu, 14 Oct 2021 17:04:54 -0400
-X-MC-Unique: pa2Mo-w7NyyXB4NhlAdXEg-1
-Received: by mail-oo1-f69.google.com with SMTP id u18-20020a4a6c52000000b002b6eeeabd60so3198320oof.16
-        for <kvm@vger.kernel.org>; Thu, 14 Oct 2021 14:04:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=MQBCABj4UeApXkMaCL6n9c35UutDuFqeQw/+Jz4vJPE=;
-        b=zw+uiJrtZ91ZPu3/R4xz1MnO6kXvnklP336VFvs3C5fd2NgMuya9pt3wrHobw72yv1
-         9dTWAiBb6Bb55txqdl1l5pGz/jRP9BJyLGGJ6b6GL9Ij+KdEuWjxbnLrcBPsXYa/Tqxy
-         snoCUIRsAbnU3j5pkae6ov6obxx8KHX29kBNDO3vpoOnn6CiAhTTugW3zmbM88iVc6+w
-         uNP1o5HcBorHdTbBWOKYsLSLPqcPW1Lw86qyPAbE525O+W9h5y9h+wBKP+m+TLeBLm39
-         cpjgb+58msjAJiOcjiN3aEoPhMfIKu6rYK7BJVLSDkzkby9r2iMVr1kwsBV1DPSigS59
-         654A==
-X-Gm-Message-State: AOAM5336mhdHX3cymhC2gaIb5dQhKI79CIQU3v5hgL2nZ49zXooDN+nk
-        at7USghdKnFBOcGRxkpflyedcX12uqC7nvzLAJHQRMtk2VRqCEpe/okgG6xHBGBfYqAIrMLonor
-        CgfBeJ1HP8TdK
-X-Received: by 2002:a05:6830:239b:: with SMTP id l27mr4580699ots.115.1634245493472;
-        Thu, 14 Oct 2021 14:04:53 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwYHQg39fPptbDX7EXrpmjwTVYPpbg64YhA5AVhXzeLlu9PrVeXrT04mlYra7hKQ0IwFqxDIQ==
-X-Received: by 2002:a05:6830:239b:: with SMTP id l27mr4580670ots.115.1634245493180;
-        Thu, 14 Oct 2021 14:04:53 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id l7sm646023oog.22.2021.10.14.14.04.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Oct 2021 14:04:52 -0700 (PDT)
-Date:   Thu, 14 Oct 2021 15:04:50 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Cornelia Huck <cohuck@redhat.com>,
-        kvm@vger.kernel.org, "Tian, Kevin" <kevin.tian@intel.com>,
-        Liu Yi L <yi.l.liu@intel.com>
-Subject: Re: [PATCH v2 5/5] vfio: Use cdev_device_add() instead of
- device_create()
-Message-ID: <20211014150450.6d97b416.alex.williamson@redhat.com>
-In-Reply-To: <20211013174251.GK2744544@nvidia.com>
-References: <0-v2-fd9627d27b2b+26c-vfio_group_cdev_jgg@nvidia.com>
-        <5-v2-fd9627d27b2b+26c-vfio_group_cdev_jgg@nvidia.com>
-        <20211013170847.GA2954@lst.de>
-        <20211013174251.GK2744544@nvidia.com>
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        id S234186AbhJNWMv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Oct 2021 18:12:51 -0400
+Received: from mga14.intel.com ([192.55.52.115]:33529 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229829AbhJNWMu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Oct 2021 18:12:50 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10137"; a="228082380"
+X-IronPort-AV: E=Sophos;i="5.85,374,1624345200"; 
+   d="scan'208";a="228082380"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Oct 2021 15:10:44 -0700
+X-IronPort-AV: E=Sophos;i="5.85,374,1624345200"; 
+   d="scan'208";a="571558879"
+Received: from chendan-mobl.amr.corp.intel.com (HELO [10.251.17.229]) ([10.251.17.229])
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Oct 2021 15:10:43 -0700
+Subject: Re: [PATCH v2 1/2] x86: sgx_vepc: extract sgx_vepc_remove_page
+To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     dave.hansen@linux.intel.com, seanjc@google.com, x86@kernel.org,
+        yang.zhong@intel.com, jarkko@kernel.org
+References: <20211012105708.2070480-1-pbonzini@redhat.com>
+ <20211012105708.2070480-2-pbonzini@redhat.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+ z5cecg==
+Message-ID: <7a019b7b-ce01-7835-f6e6-a03fc294c10f@intel.com>
+Date:   Thu, 14 Oct 2021 15:10:38 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20211012105708.2070480-2-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 13 Oct 2021 14:42:51 -0300
-Jason Gunthorpe <jgg@nvidia.com> wrote:
-
-> On Wed, Oct 13, 2021 at 07:08:47PM +0200, Christoph Hellwig wrote:
-> > > +/* returns true if the get was obtained */
-> > > +static bool vfio_group_try_get(struct vfio_group *group)
-> > >  {
-> > > +	return refcount_inc_not_zero(&group->users);
-> > >  }  
-> > 
-> > Do we even need this helper?  Just open coding the refcount_inc_not_zero
-> > would seem easier to read to me, and there is just a single caller
-> > anyway.  
+On 10/12/21 3:57 AM, Paolo Bonzini wrote:
+> For bare-metal SGX on real hardware, the hardware provides guarantees
+> SGX state at reboot.  For instance, all pages start out uninitialized.
+> The vepc driver provides a similar guarantee today for freshly-opened
+> vepc instances, but guests such as Windows expect all pages to be in
+> uninitialized state on startup, including after every guest reboot.
 > 
-> No we don't, I added it only to have symmetry with the
-> vfio_group_put() naming.
+> One way to do this is to simply close and reopen the /dev/sgx_vepc file
+> descriptor and re-mmap the virtual EPC.  However, this is problematic
+> because it prevents sandboxing the userspace (for example forbidding
+> open() after the guest starts; this is doable with heavy use of SCM_RIGHTS
+> file descriptor passing).
 > 
-> Alex, what is your taste here?
+> In order to implement this, we will need a ioctl that performs
+> EREMOVE on all pages mapped by a /dev/sgx_vepc file descriptor:
+> other possibilities, such as closing and reopening the device,
+> are racy.
+> 
+> Start the implementation by creating a separate function with just
+> the __eremove wrapper.
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-I like the symmetry, but afaict this use of inc_not_zero is
-specifically to cover the gap where vfio_group_fops_open() could race
-vfio_group_put, right?  All the use cases of vfio_group_get() guarantee
-that the group->users refcount is >0 based on either the fact that it's
-found under the vfio.group_lock or the that call is based on an existing
-open group.
-
-If that's true, then this helper function seems like it invites
-confusion and misuse more so than providing symmetry.  Open coding with
-a comment explaining the vfio_group_get() calling requirements and
-noting the race this inc_not_zero usage solves seems like the better
-option to me.  Thanks,
-
-Alex
-
+Reviewed-by: Dave Hansen <dave.hansen@linux.intel.com>
