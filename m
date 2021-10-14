@@ -2,302 +2,191 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5C02442D5A0
-	for <lists+kvm@lfdr.de>; Thu, 14 Oct 2021 11:04:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F238842D5AC
+	for <lists+kvm@lfdr.de>; Thu, 14 Oct 2021 11:08:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230026AbhJNJG0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Oct 2021 05:06:26 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34185 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230094AbhJNJGV (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 14 Oct 2021 05:06:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634202256;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ArdfMWNbuG02n1OQKPEk6jS02d/uCbdT+PSDgFpbJqI=;
-        b=PnKbrHFCe5oJP0MoegCR/l+Agbzcv7SlMVLHjkkQIiNrhuLWzMOoCvYQhaJ3/3WLnJ0K4c
-        X0L+SgZIJfdF9++/XnVEte3mOqT+MXS085CW0vMXs2Is5xv90jnqQLkHgt/3CD/gRxvHOf
-        E5TpjDrbBD7ImRkoJ0eguknk21O+nQU=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-247-Rla0I2qgN-iiNCKhj6zL6A-1; Thu, 14 Oct 2021 05:04:15 -0400
-X-MC-Unique: Rla0I2qgN-iiNCKhj6zL6A-1
-Received: by mail-ed1-f72.google.com with SMTP id l22-20020aa7c316000000b003dbbced0731so4632607edq.6
-        for <kvm@vger.kernel.org>; Thu, 14 Oct 2021 02:04:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=ArdfMWNbuG02n1OQKPEk6jS02d/uCbdT+PSDgFpbJqI=;
-        b=Zo2k+9ttnRtke9kyRcGyBcYH+/Emwdyfq9yPMFTGbakaDK0wmtIfEv7WLVixd/fBBQ
-         2KHW1/2HvPR3IZr/cUWGyOXkw/L2STcidf1hCplcIyUUM39gjooHFe2LeZF7XMR2InSq
-         P43G/wImQi+LPFuRwYhpBcGaCwINLSJXNAsMMTdncJA+DpmI7hujEBMg7p8lRTmrVWvf
-         UzloDwbXcyCecPFQzquGM2HLJD51FLQtwzMhDUBB9rqaz8GluKaHrSydkireRmNyodDH
-         7WcI6QQnCG2zqdEH7AEkRainge1Ycf7ULYBWY1D+SFc6z/u72OvQamZ93V73DDU4ocrR
-         4v3g==
-X-Gm-Message-State: AOAM533rb/eRZl79BpuWWseokWp/K24438KZK6IDKlsZn2XSxbvCHRKT
-        iu1T1/iMxSj3JF6MG0MnAhOekK4PShFa2uljL79x08JG1oT6T0Ez65CHQu/2zvvxrAA36U88Jf+
-        C3oCWYnEa9+5a
-X-Received: by 2002:a17:906:480a:: with SMTP id w10mr2449897ejq.262.1634202254384;
-        Thu, 14 Oct 2021 02:04:14 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx51QMjFB9Vzo1OSOWMnnTw0zDmc+1WIxFwXo1jS+FtYBu1RisLoBxSR9VmCwx+bPBhBVyTMQ==
-X-Received: by 2002:a17:906:480a:: with SMTP id w10mr2449861ejq.262.1634202254160;
-        Thu, 14 Oct 2021 02:04:14 -0700 (PDT)
-Received: from gator.home (cst2-174-28.cust.vodafone.cz. [31.30.174.28])
-        by smtp.gmail.com with ESMTPSA id ke12sm1431541ejc.32.2021.10.14.02.04.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Oct 2021 02:04:13 -0700 (PDT)
-Date:   Thu, 14 Oct 2021 11:04:11 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, will@kernel.org,
-        james.morse@arm.com, alexandru.elisei@arm.com,
-        suzuki.poulose@arm.com, mark.rutland@arm.com, pbonzini@redhat.com,
-        oupton@google.com, qperret@google.com, kernel-team@android.com,
-        tabba@google.com
-Subject: Re: [PATCH v9 13/22] KVM: arm64: pkvm: Use a single function to
- expose all id-regs
-Message-ID: <20211014090411.dk2whm76hwsems6j@gator.home>
-References: <20211010145636.1950948-12-tabba@google.com>
- <20211013120346.2926621-1-maz@kernel.org>
- <20211013120346.2926621-3-maz@kernel.org>
+        id S229984AbhJNJKp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Oct 2021 05:10:45 -0400
+Received: from mail-mw2nam12on2064.outbound.protection.outlook.com ([40.107.244.64]:43991
+        "EHLO NAM12-MW2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S229551AbhJNJKo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Oct 2021 05:10:44 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Za7iuN60Pv5h7ln8/ym7G1RVT8rDQkpLam+EyV+Q97tvENGQ5AJUw55lE5B8nl3kSZ2gzSc04qDbT1TmVJwfZLQVwd8X1/JOzPYUv+o16h+q69dE08voUgM8zyb2hM9oTG9WVd79bC/TYyegw2Yns5aOwpv5qZyb9W/yDHnC77SfqdbaLClNHSF/z8CSCK0N3NhKViOoAA09RIp9xLo6kMjAunOwflOXMLaxEggZMJ6Oo6IDFY5V9c6qd2C+hhY5AXSdNXMqFV8G4zLR5K6O6Fh/8DkmrWsyvX2SfWpE3jrJBCFT8N5cvh0QrvHQS5SWWkliCBMHGmXQunAodlIxHA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=LJy7VKXgtgD3G2QDSXPpk4vWJnG3p/DKX0If/EhyGyE=;
+ b=m0/OfHsuSIJnIP2MzAIxtDCFVkQnoxL+mCB8UyLfSd+nYqvcHKRKw5a9sB9KnoEBi3BW2APtwl6HLblEDuRZqk2fptmDd3Ieu8eRyI2/jeHOF3NqXpRpIx1VPjUthwJHvd0erHwwZoHcVU6TIc6ob5sBtk8L3PMKCs62q/CvM6MOrgbL52P3DKuwfksPAAYWuRY0ooHXLxMElWV0XIIiSXilmVsFExDDch0SWPMdoF2k7NgTJghpS09/0tLUQUDYdNSCwusUYTWFLc6r99WdE1FViO7np0TNkSyqTCCr8zGuoTgKK1umh95DQajmT8ik9HwDo9gnMQO7Q/cK7vgRSQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.112.34) smtp.rcpttodomain=google.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=nvidia.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=LJy7VKXgtgD3G2QDSXPpk4vWJnG3p/DKX0If/EhyGyE=;
+ b=Cx4jZhKnA2S4rtkLWng1VGnZiAdirf9OswhEmtLVrOQuwjto+8Uu+C4b9Obidlj6T7Y9NgK/1invJxSkEEi+LgAd3tN2XrBc523ohubbW9YiKsnXhfC5PX0PRgwZQZV0Gm4pZeAUbRjAWuGLHCnYWW5IjD13kDm8VNuksHeuIMmeD2TkutZ6hoWMFxIdg2Ax+tQA1cSX4HSNBf5vr0z6oKdnKVScn2X1wrSuRyfzfSr7hggLJigfkck34nIGtvnN4Kprb3VT8AAmiBoUtGpwK0OHkGrfLJOvic2+5uJsIt/qW9QGLcvXY4YX5TjDQlES3r1W0l/T5XJ7hak2fTZwjQ==
+Received: from MW4PR03CA0077.namprd03.prod.outlook.com (2603:10b6:303:b6::22)
+ by CH2PR12MB3688.namprd12.prod.outlook.com (2603:10b6:610:28::33) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4608.16; Thu, 14 Oct
+ 2021 09:08:38 +0000
+Received: from CO1NAM11FT066.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:303:b6:cafe::11) by MW4PR03CA0077.outlook.office365.com
+ (2603:10b6:303:b6::22) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4608.14 via Frontend
+ Transport; Thu, 14 Oct 2021 09:08:37 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.34)
+ smtp.mailfrom=nvidia.com; google.com; dkim=none (message not signed)
+ header.d=none;google.com; dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.112.34 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.112.34; helo=mail.nvidia.com;
+Received: from mail.nvidia.com (216.228.112.34) by
+ CO1NAM11FT066.mail.protection.outlook.com (10.13.175.18) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.4608.15 via Frontend Transport; Thu, 14 Oct 2021 09:08:37 +0000
+Received: from [172.27.11.74] (172.20.187.6) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.18; Thu, 14 Oct
+ 2021 09:08:31 +0000
+Subject: Re: [PATCH V1 mlx5-next 01/13] PCI/IOV: Provide internal VF index
+To:     Bjorn Helgaas <helgaas@kernel.org>
+CC:     <alex.williamson@redhat.com>, <bhelgaas@google.com>,
+        <jgg@nvidia.com>, <saeedm@nvidia.com>, <linux-pci@vger.kernel.org>,
+        <kvm@vger.kernel.org>, <netdev@vger.kernel.org>, <kuba@kernel.org>,
+        <leonro@nvidia.com>, <kwankhede@nvidia.com>,
+        <mgurtovoy@nvidia.com>, <maorg@nvidia.com>
+References: <20211013181426.GA1906116@bhelgaas>
+From:   Yishai Hadas <yishaih@nvidia.com>
+Message-ID: <68d1d356-3a3e-7254-6127-297fc48cf197@nvidia.com>
+Date:   Thu, 14 Oct 2021 12:08:28 +0300
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211013120346.2926621-3-maz@kernel.org>
+In-Reply-To: <20211013181426.GA1906116@bhelgaas>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Originating-IP: [172.20.187.6]
+X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: aa27df6f-7034-4f29-9612-08d98ef2353f
+X-MS-TrafficTypeDiagnostic: CH2PR12MB3688:
+X-Microsoft-Antispam-PRVS: <CH2PR12MB3688B683DE3512EE6D4731FBC3B89@CH2PR12MB3688.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: kWKHOs3iGcC/N7uyeGgWiC9Eu1fAGEso30wqoeXm9TEjFW6lOQ+iI0qPPkdqv+4iKIIpRMoy/Gnc1GufyxabN6JlfiWB6+jfQ+iT0TgCrHjGX9f5OppN/wt9vCmcltUxwHa73QXSYJUamDtkjsbX1EGdubGOKXbOMkHw2dNZJk+8+C5o7XsY3VRC9+rZNH229+1YPnaizS5Ff0ndYZrvpuzu3qSB6Z+OJVnh1qQGS/trwD/y+C31RvofdsElW/yN/rPr47ydRAYX31sekDXbZO5KRLCZ+iioOF/s06HCAzSBOp1M9X8Bk5o1cf9fv3LULUrNLzpf30Dwp5N2vM7IvcAfArpaz+uXpH8x7TVdxeumH7Qtdwq8Jz6wABLaYN+fsEZu/PTTx3cScDiO+TIQ0oPKXeVKPCJL8GuxECAHKgUfKtgS978iVEfLTITHpd7JUfxfIqOzQy76BL+1D1CG15kzyjQCqqrPQSul3ZU3hOsTuouNcr28WCidiOF7BDIb3mrHodEJwWBq0e0yUHP8LfY/nYvrTXOHjAfqcrMam+aQSnXa0f03NA4lJYiLAmJFi+8xxxT0MNNKQHcb/NLQeI6A8OTPtrE5ywzfggczgqXe1EyUlmnWUFkgjlRpOgC7xcVsl7ydVw+oD4Sl9G4+Yar+8dRzBcEA8Xwn4zUFg61kUdWzc7vT/KaMx4UHlWtq7Kq7BlMwmjp/XsNjyA6evjplsx647tFvbgKk9B0F5DMM7kQRId80xZXUxrCEuHR8NeQ9OZUU+HUKxelOty7t52JSb3gC9Zrhn1iwLyWgW6TPV3V7rn8tf716TbhIjwoy
+X-Forefront-Antispam-Report: CIP:216.228.112.34;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid03.nvidia.com;CAT:NONE;SFS:(4636009)(36840700001)(46966006)(2616005)(4326008)(53546011)(26005)(426003)(6916009)(336012)(47076005)(966005)(31696002)(8936002)(508600001)(82310400003)(83380400001)(70586007)(70206006)(8676002)(36756003)(6666004)(54906003)(5660300002)(2906002)(316002)(86362001)(36860700001)(186003)(16526019)(107886003)(31686004)(16576012)(7636003)(356005)(43740500002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Oct 2021 09:08:37.5132
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: aa27df6f-7034-4f29-9612-08d98ef2353f
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.34];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT066.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB3688
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 13, 2021 at 01:03:37PM +0100, Marc Zyngier wrote:
-> Rather than exposing a whole set of helper functions to retrieve
-> individual ID registers, use the existing decoding tree and expose
-> a single helper instead.
-> 
-> This allow a number of functions to be made static, and we now
-> have a single entry point to maintain.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/hyp/include/nvhe/sys_regs.h | 14 +-------
->  arch/arm64/kvm/hyp/nvhe/pkvm.c             | 10 +++---
->  arch/arm64/kvm/hyp/nvhe/sys_regs.c         | 37 ++++++++++++----------
->  3 files changed, 26 insertions(+), 35 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/hyp/include/nvhe/sys_regs.h b/arch/arm64/kvm/hyp/include/nvhe/sys_regs.h
-> index 3288128738aa..8adc13227b1a 100644
-> --- a/arch/arm64/kvm/hyp/include/nvhe/sys_regs.h
-> +++ b/arch/arm64/kvm/hyp/include/nvhe/sys_regs.h
-> @@ -9,19 +9,7 @@
->  
->  #include <asm/kvm_host.h>
->  
-> -u64 get_pvm_id_aa64pfr0(const struct kvm_vcpu *vcpu);
-> -u64 get_pvm_id_aa64pfr1(const struct kvm_vcpu *vcpu);
-> -u64 get_pvm_id_aa64zfr0(const struct kvm_vcpu *vcpu);
-> -u64 get_pvm_id_aa64dfr0(const struct kvm_vcpu *vcpu);
-> -u64 get_pvm_id_aa64dfr1(const struct kvm_vcpu *vcpu);
-> -u64 get_pvm_id_aa64afr0(const struct kvm_vcpu *vcpu);
-> -u64 get_pvm_id_aa64afr1(const struct kvm_vcpu *vcpu);
-> -u64 get_pvm_id_aa64isar0(const struct kvm_vcpu *vcpu);
-> -u64 get_pvm_id_aa64isar1(const struct kvm_vcpu *vcpu);
-> -u64 get_pvm_id_aa64mmfr0(const struct kvm_vcpu *vcpu);
-> -u64 get_pvm_id_aa64mmfr1(const struct kvm_vcpu *vcpu);
-> -u64 get_pvm_id_aa64mmfr2(const struct kvm_vcpu *vcpu);
-
-This is nice.
-
-> -
-> +u64 pvm_read_id_reg(const struct kvm_vcpu *vcpu, u32 id);
->  bool kvm_handle_pvm_sysreg(struct kvm_vcpu *vcpu, u64 *exit_code);
->  int kvm_check_pvm_sysreg_table(void);
->  void inject_undef64(struct kvm_vcpu *vcpu);
-> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> index 633547cc1033..62377fa8a4cb 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> @@ -15,7 +15,7 @@
->   */
->  static void pvm_init_traps_aa64pfr0(struct kvm_vcpu *vcpu)
->  {
-> -	const u64 feature_ids = get_pvm_id_aa64pfr0(vcpu);
-> +	const u64 feature_ids = pvm_read_id_reg(vcpu, SYS_ID_AA64PFR0_EL1);
->  	u64 hcr_set = HCR_RW;
->  	u64 hcr_clear = 0;
->  	u64 cptr_set = 0;
-> @@ -62,7 +62,7 @@ static void pvm_init_traps_aa64pfr0(struct kvm_vcpu *vcpu)
->   */
->  static void pvm_init_traps_aa64pfr1(struct kvm_vcpu *vcpu)
->  {
-> -	const u64 feature_ids = get_pvm_id_aa64pfr1(vcpu);
-> +	const u64 feature_ids = pvm_read_id_reg(vcpu, SYS_ID_AA64PFR1_EL1);
->  	u64 hcr_set = 0;
->  	u64 hcr_clear = 0;
->  
-> @@ -81,7 +81,7 @@ static void pvm_init_traps_aa64pfr1(struct kvm_vcpu *vcpu)
->   */
->  static void pvm_init_traps_aa64dfr0(struct kvm_vcpu *vcpu)
->  {
-> -	const u64 feature_ids = get_pvm_id_aa64dfr0(vcpu);
-> +	const u64 feature_ids = pvm_read_id_reg(vcpu, SYS_ID_AA64DFR0_EL1);
->  	u64 mdcr_set = 0;
->  	u64 mdcr_clear = 0;
->  	u64 cptr_set = 0;
-> @@ -125,7 +125,7 @@ static void pvm_init_traps_aa64dfr0(struct kvm_vcpu *vcpu)
->   */
->  static void pvm_init_traps_aa64mmfr0(struct kvm_vcpu *vcpu)
->  {
-> -	const u64 feature_ids = get_pvm_id_aa64mmfr0(vcpu);
-> +	const u64 feature_ids = pvm_read_id_reg(vcpu, SYS_ID_AA64MMFR0_EL1);
->  	u64 mdcr_set = 0;
->  
->  	/* Trap Debug Communications Channel registers */
-> @@ -140,7 +140,7 @@ static void pvm_init_traps_aa64mmfr0(struct kvm_vcpu *vcpu)
->   */
->  static void pvm_init_traps_aa64mmfr1(struct kvm_vcpu *vcpu)
->  {
-> -	const u64 feature_ids = get_pvm_id_aa64mmfr1(vcpu);
-> +	const u64 feature_ids = pvm_read_id_reg(vcpu, SYS_ID_AA64MMFR1_EL1);
->  	u64 hcr_set = 0;
->  
->  	/* Trap LOR */
-> diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-> index 6bde2dc5205c..f125d6a52880 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-> @@ -82,7 +82,7 @@ static u64 get_restricted_features_unsigned(u64 sys_reg_val,
->   * based on allowed features, system features, and KVM support.
->   */
->  
-> -u64 get_pvm_id_aa64pfr0(const struct kvm_vcpu *vcpu)
-> +static u64 get_pvm_id_aa64pfr0(const struct kvm_vcpu *vcpu)
->  {
->  	const struct kvm *kvm = (const struct kvm *)kern_hyp_va(vcpu->kvm);
->  	u64 set_mask = 0;
-> @@ -103,7 +103,7 @@ u64 get_pvm_id_aa64pfr0(const struct kvm_vcpu *vcpu)
->  	return (id_aa64pfr0_el1_sys_val & allow_mask) | set_mask;
->  }
->  
-> -u64 get_pvm_id_aa64pfr1(const struct kvm_vcpu *vcpu)
-> +static u64 get_pvm_id_aa64pfr1(const struct kvm_vcpu *vcpu)
->  {
->  	const struct kvm *kvm = (const struct kvm *)kern_hyp_va(vcpu->kvm);
->  	u64 allow_mask = PVM_ID_AA64PFR1_ALLOW;
-> @@ -114,7 +114,7 @@ u64 get_pvm_id_aa64pfr1(const struct kvm_vcpu *vcpu)
->  	return id_aa64pfr1_el1_sys_val & allow_mask;
->  }
->  
-> -u64 get_pvm_id_aa64zfr0(const struct kvm_vcpu *vcpu)
-> +static u64 get_pvm_id_aa64zfr0(const struct kvm_vcpu *vcpu)
->  {
->  	/*
->  	 * No support for Scalable Vectors, therefore, hyp has no sanitized
-> @@ -124,7 +124,7 @@ u64 get_pvm_id_aa64zfr0(const struct kvm_vcpu *vcpu)
->  	return 0;
->  }
->  
-> -u64 get_pvm_id_aa64dfr0(const struct kvm_vcpu *vcpu)
-> +static u64 get_pvm_id_aa64dfr0(const struct kvm_vcpu *vcpu)
->  {
->  	/*
->  	 * No support for debug, including breakpoints, and watchpoints,
-> @@ -134,7 +134,7 @@ u64 get_pvm_id_aa64dfr0(const struct kvm_vcpu *vcpu)
->  	return 0;
->  }
->  
-> -u64 get_pvm_id_aa64dfr1(const struct kvm_vcpu *vcpu)
-> +static u64 get_pvm_id_aa64dfr1(const struct kvm_vcpu *vcpu)
->  {
->  	/*
->  	 * No support for debug, therefore, hyp has no sanitized copy of the
-> @@ -144,7 +144,7 @@ u64 get_pvm_id_aa64dfr1(const struct kvm_vcpu *vcpu)
->  	return 0;
->  }
->  
-> -u64 get_pvm_id_aa64afr0(const struct kvm_vcpu *vcpu)
-> +static u64 get_pvm_id_aa64afr0(const struct kvm_vcpu *vcpu)
->  {
->  	/*
->  	 * No support for implementation defined features, therefore, hyp has no
-> @@ -154,7 +154,7 @@ u64 get_pvm_id_aa64afr0(const struct kvm_vcpu *vcpu)
->  	return 0;
->  }
->  
-> -u64 get_pvm_id_aa64afr1(const struct kvm_vcpu *vcpu)
-> +static u64 get_pvm_id_aa64afr1(const struct kvm_vcpu *vcpu)
->  {
->  	/*
->  	 * No support for implementation defined features, therefore, hyp has no
-> @@ -164,12 +164,12 @@ u64 get_pvm_id_aa64afr1(const struct kvm_vcpu *vcpu)
->  	return 0;
->  }
->  
-> -u64 get_pvm_id_aa64isar0(const struct kvm_vcpu *vcpu)
-> +static u64 get_pvm_id_aa64isar0(const struct kvm_vcpu *vcpu)
->  {
->  	return id_aa64isar0_el1_sys_val & PVM_ID_AA64ISAR0_ALLOW;
->  }
->  
-> -u64 get_pvm_id_aa64isar1(const struct kvm_vcpu *vcpu)
-> +static u64 get_pvm_id_aa64isar1(const struct kvm_vcpu *vcpu)
->  {
->  	u64 allow_mask = PVM_ID_AA64ISAR1_ALLOW;
->  
-> @@ -182,7 +182,7 @@ u64 get_pvm_id_aa64isar1(const struct kvm_vcpu *vcpu)
->  	return id_aa64isar1_el1_sys_val & allow_mask;
->  }
->  
-> -u64 get_pvm_id_aa64mmfr0(const struct kvm_vcpu *vcpu)
-> +static u64 get_pvm_id_aa64mmfr0(const struct kvm_vcpu *vcpu)
->  {
->  	u64 set_mask;
->  
-> @@ -192,22 +192,19 @@ u64 get_pvm_id_aa64mmfr0(const struct kvm_vcpu *vcpu)
->  	return (id_aa64mmfr0_el1_sys_val & PVM_ID_AA64MMFR0_ALLOW) | set_mask;
->  }
->  
-> -u64 get_pvm_id_aa64mmfr1(const struct kvm_vcpu *vcpu)
-> +static u64 get_pvm_id_aa64mmfr1(const struct kvm_vcpu *vcpu)
->  {
->  	return id_aa64mmfr1_el1_sys_val & PVM_ID_AA64MMFR1_ALLOW;
->  }
->  
-> -u64 get_pvm_id_aa64mmfr2(const struct kvm_vcpu *vcpu)
-> +static u64 get_pvm_id_aa64mmfr2(const struct kvm_vcpu *vcpu)
->  {
->  	return id_aa64mmfr2_el1_sys_val & PVM_ID_AA64MMFR2_ALLOW;
->  }
->  
-> -/* Read a sanitized cpufeature ID register by its sys_reg_desc. */
-> -static u64 read_id_reg(const struct kvm_vcpu *vcpu,
-> -		       struct sys_reg_desc const *r)
-> +/* Read a sanitized cpufeature ID register by its encoding */
-> +u64 pvm_read_id_reg(const struct kvm_vcpu *vcpu, u32 id)
->  {
-> -	u32 id = reg_to_encoding(r);
-> -
->  	switch (id) {
->  	case SYS_ID_AA64PFR0_EL1:
->  		return get_pvm_id_aa64pfr0(vcpu);
-> @@ -245,6 +242,12 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
->  	return 0;
->  }
->  
-> +static u64 read_id_reg(const struct kvm_vcpu *vcpu,
-> +		       struct sys_reg_desc const *r)
-> +{
-> +	return pvm_read_id_reg(vcpu, reg_to_encoding(r));
-> +}
-> +
->  /*
->   * Accessor for AArch32 feature id registers.
->   *
-> -- 
-> 2.30.2
+On 10/13/2021 9:14 PM, Bjorn Helgaas wrote:
+> On Wed, Oct 13, 2021 at 12:46:55PM +0300, Yishai Hadas wrote:
+>> From: Jason Gunthorpe <jgg@nvidia.com>
+>>
+>> The PCI core uses the VF index internally, often called the vf_id,
+>> during the setup of the VF, eg pci_iov_add_virtfn().
+>>
+>> This index is needed for device drivers that implement live migration
+>> for their internal operations that configure/control their VFs.
+>>
+>> Specifically, mlx5_vfio_pci driver that is introduced in coming patches
+>> from this series needs it and not the bus/device/function which is
+>> exposed today.
+>>
+>> Add pci_iov_vf_id() which computes the vf_id by reversing the math that
+>> was used to create the bus/device/function.
+>>
+>> Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
+>> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+>> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> I already acked this:
 >
+>    https://lore.kernel.org/r/20210922215930.GA231505@bhelgaas
+>
+> Saves me time if you carry the ack so I don't have to look at this
+> again.  But since I *am* looking at it again, I think it's nice if the
+> subject line includes the actual interface you're adding, e.g.,
+>
+>    PCI/IOV: Add pci_iov_vf_id() to get VF index
 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+
+Sure, will change as part of V2 and add your Acked-by.
+
+>> ---
+>>   drivers/pci/iov.c   | 14 ++++++++++++++
+>>   include/linux/pci.h |  8 +++++++-
+>>   2 files changed, 21 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/pci/iov.c b/drivers/pci/iov.c
+>> index dafdc652fcd0..e7751fa3fe0b 100644
+>> --- a/drivers/pci/iov.c
+>> +++ b/drivers/pci/iov.c
+>> @@ -33,6 +33,20 @@ int pci_iov_virtfn_devfn(struct pci_dev *dev, int vf_id)
+>>   }
+>>   EXPORT_SYMBOL_GPL(pci_iov_virtfn_devfn);
+>>   
+>> +int pci_iov_vf_id(struct pci_dev *dev)
+>> +{
+>> +	struct pci_dev *pf;
+>> +
+>> +	if (!dev->is_virtfn)
+>> +		return -EINVAL;
+>> +
+>> +	pf = pci_physfn(dev);
+>> +	return (((dev->bus->number << 8) + dev->devfn) -
+>> +		((pf->bus->number << 8) + pf->devfn + pf->sriov->offset)) /
+>> +	       pf->sriov->stride;
+>> +}
+>> +EXPORT_SYMBOL_GPL(pci_iov_vf_id);
+>> +
+>>   /*
+>>    * Per SR-IOV spec sec 3.3.10 and 3.3.11, First VF Offset and VF Stride may
+>>    * change when NumVFs changes.
+>> diff --git a/include/linux/pci.h b/include/linux/pci.h
+>> index cd8aa6fce204..2337512e67f0 100644
+>> --- a/include/linux/pci.h
+>> +++ b/include/linux/pci.h
+>> @@ -2153,7 +2153,7 @@ void __iomem *pci_ioremap_wc_bar(struct pci_dev *pdev, int bar);
+>>   #ifdef CONFIG_PCI_IOV
+>>   int pci_iov_virtfn_bus(struct pci_dev *dev, int id);
+>>   int pci_iov_virtfn_devfn(struct pci_dev *dev, int id);
+>> -
+>> +int pci_iov_vf_id(struct pci_dev *dev);
+>>   int pci_enable_sriov(struct pci_dev *dev, int nr_virtfn);
+>>   void pci_disable_sriov(struct pci_dev *dev);
+>>   
+>> @@ -2181,6 +2181,12 @@ static inline int pci_iov_virtfn_devfn(struct pci_dev *dev, int id)
+>>   {
+>>   	return -ENOSYS;
+>>   }
+>> +
+>> +static inline int pci_iov_vf_id(struct pci_dev *dev)
+>> +{
+>> +	return -ENOSYS;
+>> +}
+>> +
+>>   static inline int pci_enable_sriov(struct pci_dev *dev, int nr_virtfn)
+>>   { return -ENODEV; }
+>>   
+>> -- 
+>> 2.18.1
+>>
 
