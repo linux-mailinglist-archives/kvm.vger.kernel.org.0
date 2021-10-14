@@ -2,96 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2461242E2E1
-	for <lists+kvm@lfdr.de>; Thu, 14 Oct 2021 22:50:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9ED6942E30E
+	for <lists+kvm@lfdr.de>; Thu, 14 Oct 2021 23:04:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231583AbhJNUw4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Oct 2021 16:52:56 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23357 "EHLO
+        id S232171AbhJNVHC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Oct 2021 17:07:02 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:29219 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230525AbhJNUwz (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 14 Oct 2021 16:52:55 -0400
+        by vger.kernel.org with ESMTP id S231134AbhJNVHB (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 14 Oct 2021 17:07:01 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634244650;
+        s=mimecast20190719; t=1634245495;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=sypR1zkCMni3m2sdFQ3BSQIDoKFbj8FkIME4KbCvGjw=;
-        b=Lbb7o2HzS0ccFdG0tIWW6o6pHki3clrSzkzi3kNpyucVJE3FssQhwce2PDsyMz3zg0GL0v
-        HncDS0fE56tDKZE3cJU1hQjv+uPwij+3RMRsOSR0eOncooeCnnaYhfRYAfk9W1g5AHcpYp
-        zzE1qNKYXtcokZfRohYt3sOF2xjC2+E=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-203--P4znZ1YP56UOMWlO7-Q2g-1; Thu, 14 Oct 2021 16:50:49 -0400
-X-MC-Unique: -P4znZ1YP56UOMWlO7-Q2g-1
-Received: by mail-ed1-f69.google.com with SMTP id c8-20020a50d648000000b003daa53c7518so6236837edj.21
-        for <kvm@vger.kernel.org>; Thu, 14 Oct 2021 13:50:48 -0700 (PDT)
+        bh=MQBCABj4UeApXkMaCL6n9c35UutDuFqeQw/+Jz4vJPE=;
+        b=gBxdkK2/6WWqO2GbqoEX5F1zufEayzTr68vRgbEeA1jSuyTRYn26CgAOgKoEI18JyfiBhc
+        Rq5BJR2HdPWi15Tc00NggJ2Cy2ZV80onkt6q3hIsoXgQ+XzXjtyojMEyxQmBJYUZfafYNt
+        vaPJ/4Hcu4N4D+C7jOivDOGesmWRcQI=
+Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com
+ [209.85.161.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-552-pa2Mo-w7NyyXB4NhlAdXEg-1; Thu, 14 Oct 2021 17:04:54 -0400
+X-MC-Unique: pa2Mo-w7NyyXB4NhlAdXEg-1
+Received: by mail-oo1-f69.google.com with SMTP id u18-20020a4a6c52000000b002b6eeeabd60so3198320oof.16
+        for <kvm@vger.kernel.org>; Thu, 14 Oct 2021 14:04:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=sypR1zkCMni3m2sdFQ3BSQIDoKFbj8FkIME4KbCvGjw=;
-        b=SgKKNPnFl7sHJuUBMbl8NUfNcY39JEjOsA5Tjr3UjXP5RXZp4479Ie/aF06vpiZzHm
-         kv6wEajGDdnLByaMK4tWyNEawb5ob5A0AREXqLPUrrdgf3H41pgYt1JhIR75NsvBua75
-         EWWA/73R5rfTb7n34aWIfhCF5UdgLvkIiIpXEY9BNGSvH9xFsv77VD730wz8TRZpb6E9
-         gG707lCSCxkuMmNIM8LzCiIeYF7ukjUYO/XZqDhN6gz4N4khNmjgtIC2Xk17Wa03s8WU
-         CNCzHJPIztOkCFM/uzdkdyL9lWPP46jfLLWTP+LzHgTJBOwEZb+Sak1im93bAdpV8oE3
-         IifA==
-X-Gm-Message-State: AOAM530ox0dXRnT3JpUbNPppQnOv+VurqjEqrCVsQosw1NbXdmceZ+0e
-        2V/kLyDJ/Z1kfzjpt26XwywPZMA6A8LzY872mYFF/pFUYtBHX2dV5dIvbP5ciduTYCzlcXpebWv
-        BwkJqEqvmIloS
-X-Received: by 2002:a17:906:16d0:: with SMTP id t16mr1604025ejd.199.1634244648002;
-        Thu, 14 Oct 2021 13:50:48 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwJsui/zLztmaCtq7PZZAnYLvjtuLTIY7DyTbjU6/j2AfstfTpweChWvh8P8EnNk983+ht2hw==
-X-Received: by 2002:a17:906:16d0:: with SMTP id t16mr1603992ejd.199.1634244647742;
-        Thu, 14 Oct 2021 13:50:47 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.gmail.com with ESMTPSA id s24sm3044871edy.38.2021.10.14.13.50.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 14 Oct 2021 13:50:47 -0700 (PDT)
-Message-ID: <fb1da4d3-9e3e-4604-2f30-30292f9d13aa@redhat.com>
-Date:   Thu, 14 Oct 2021 22:50:45 +0200
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=MQBCABj4UeApXkMaCL6n9c35UutDuFqeQw/+Jz4vJPE=;
+        b=zw+uiJrtZ91ZPu3/R4xz1MnO6kXvnklP336VFvs3C5fd2NgMuya9pt3wrHobw72yv1
+         9dTWAiBb6Bb55txqdl1l5pGz/jRP9BJyLGGJ6b6GL9Ij+KdEuWjxbnLrcBPsXYa/Tqxy
+         snoCUIRsAbnU3j5pkae6ov6obxx8KHX29kBNDO3vpoOnn6CiAhTTugW3zmbM88iVc6+w
+         uNP1o5HcBorHdTbBWOKYsLSLPqcPW1Lw86qyPAbE525O+W9h5y9h+wBKP+m+TLeBLm39
+         cpjgb+58msjAJiOcjiN3aEoPhMfIKu6rYK7BJVLSDkzkby9r2iMVr1kwsBV1DPSigS59
+         654A==
+X-Gm-Message-State: AOAM5336mhdHX3cymhC2gaIb5dQhKI79CIQU3v5hgL2nZ49zXooDN+nk
+        at7USghdKnFBOcGRxkpflyedcX12uqC7nvzLAJHQRMtk2VRqCEpe/okgG6xHBGBfYqAIrMLonor
+        CgfBeJ1HP8TdK
+X-Received: by 2002:a05:6830:239b:: with SMTP id l27mr4580699ots.115.1634245493472;
+        Thu, 14 Oct 2021 14:04:53 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwYHQg39fPptbDX7EXrpmjwTVYPpbg64YhA5AVhXzeLlu9PrVeXrT04mlYra7hKQ0IwFqxDIQ==
+X-Received: by 2002:a05:6830:239b:: with SMTP id l27mr4580670ots.115.1634245493180;
+        Thu, 14 Oct 2021 14:04:53 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id l7sm646023oog.22.2021.10.14.14.04.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Oct 2021 14:04:52 -0700 (PDT)
+Date:   Thu, 14 Oct 2021 15:04:50 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Cornelia Huck <cohuck@redhat.com>,
+        kvm@vger.kernel.org, "Tian, Kevin" <kevin.tian@intel.com>,
+        Liu Yi L <yi.l.liu@intel.com>
+Subject: Re: [PATCH v2 5/5] vfio: Use cdev_device_add() instead of
+ device_create()
+Message-ID: <20211014150450.6d97b416.alex.williamson@redhat.com>
+In-Reply-To: <20211013174251.GK2744544@nvidia.com>
+References: <0-v2-fd9627d27b2b+26c-vfio_group_cdev_jgg@nvidia.com>
+        <5-v2-fd9627d27b2b+26c-vfio_group_cdev_jgg@nvidia.com>
+        <20211013170847.GA2954@lst.de>
+        <20211013174251.GK2744544@nvidia.com>
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [BUG] [5.15] Compilation error in arch/x86/kvm/mmu/spte.h with
- clang-14
-Content-Language: en-US
-To:     Nick Desaulniers <ndesaulniers@google.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Nathan Chancellor <nathan@kernel.org>,
-        Jim Mattson <jmattson@google.com>, torvic9@mailbox.org,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "bp@alien8.de" <bp@alien8.de>
-References: <1446878298.170497.1633338512925@office.mailbox.org>
- <b6abc5a3-39ea-b463-9df5-f50bdcb16d08@redhat.com>
- <936688112.157288.1633339838738@office.mailbox.org>
- <c4773ecc-053f-9bc6-03af-5039397a4531@redhat.com>
- <CAKwvOd=rrM4fGdGMkD5+kdA49a6K+JcUiR4K2-go=MMt++ukPA@mail.gmail.com>
- <CALMp9eRzadC50n=d=NFm7osVgKr+=UG7r2cWV2nOCfoPN41vvQ@mail.gmail.com>
- <YWht7v/1RuAiHIvC@archlinux-ax161> <YWh3iBoitI9UNmqV@google.com>
- <CAKwvOdkC7ydAWs+nB3cxEOrbb7uEjiyBWg1nOOBtKqaCh3zhBg@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <CAKwvOdkC7ydAWs+nB3cxEOrbb7uEjiyBWg1nOOBtKqaCh3zhBg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 14/10/21 21:06, Nick Desaulniers wrote:
->> If we want to fix this, my vote is for casting to an int and updating the comment
+On Wed, 13 Oct 2021 14:42:51 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
+
+> On Wed, Oct 13, 2021 at 07:08:47PM +0200, Christoph Hellwig wrote:
+> > > +/* returns true if the get was obtained */
+> > > +static bool vfio_group_try_get(struct vfio_group *group)
+> > >  {
+> > > +	return refcount_inc_not_zero(&group->users);
+> > >  }  
+> > 
+> > Do we even need this helper?  Just open coding the refcount_inc_not_zero
+> > would seem easier to read to me, and there is just a single caller
+> > anyway.  
 > 
-> At the least, I think bitwise operations should only be performed on
-> unsigned types.
+> No we don't, I added it only to have symmetry with the
+> vfio_group_put() naming.
+> 
+> Alex, what is your taste here?
 
-This is not a bitwise operation, it's a non-short-circuiting boolean 
-operation.  I'll apply Jim's suggestion.
+I like the symmetry, but afaict this use of inc_not_zero is
+specifically to cover the gap where vfio_group_fops_open() could race
+vfio_group_put, right?  All the use cases of vfio_group_get() guarantee
+that the group->users refcount is >0 based on either the fact that it's
+found under the vfio.group_lock or the that call is based on an existing
+open group.
 
-Paolo
+If that's true, then this helper function seems like it invites
+confusion and misuse more so than providing symmetry.  Open coding with
+a comment explaining the vfio_group_get() calling requirements and
+noting the race this inc_not_zero usage solves seems like the better
+option to me.  Thanks,
+
+Alex
 
