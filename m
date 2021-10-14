@@ -2,191 +2,245 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F238842D5AC
-	for <lists+kvm@lfdr.de>; Thu, 14 Oct 2021 11:08:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D496942D5BF
+	for <lists+kvm@lfdr.de>; Thu, 14 Oct 2021 11:12:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229984AbhJNJKp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Oct 2021 05:10:45 -0400
-Received: from mail-mw2nam12on2064.outbound.protection.outlook.com ([40.107.244.64]:43991
-        "EHLO NAM12-MW2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S229551AbhJNJKo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Oct 2021 05:10:44 -0400
+        id S229997AbhJNJOK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Oct 2021 05:14:10 -0400
+Received: from mga12.intel.com ([192.55.52.136]:27960 "EHLO mga12.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229551AbhJNJOJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Oct 2021 05:14:09 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10136"; a="207751748"
+X-IronPort-AV: E=Sophos;i="5.85,372,1624345200"; 
+   d="scan'208";a="207751748"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Oct 2021 02:12:04 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.85,372,1624345200"; 
+   d="scan'208";a="487261679"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by fmsmga007.fm.intel.com with ESMTP; 14 Oct 2021 02:12:04 -0700
+Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2242.12; Thu, 14 Oct 2021 02:12:04 -0700
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2242.12 via Frontend Transport; Thu, 14 Oct 2021 02:12:03 -0700
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.169)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2242.12; Thu, 14 Oct 2021 02:12:03 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Za7iuN60Pv5h7ln8/ym7G1RVT8rDQkpLam+EyV+Q97tvENGQ5AJUw55lE5B8nl3kSZ2gzSc04qDbT1TmVJwfZLQVwd8X1/JOzPYUv+o16h+q69dE08voUgM8zyb2hM9oTG9WVd79bC/TYyegw2Yns5aOwpv5qZyb9W/yDHnC77SfqdbaLClNHSF/z8CSCK0N3NhKViOoAA09RIp9xLo6kMjAunOwflOXMLaxEggZMJ6Oo6IDFY5V9c6qd2C+hhY5AXSdNXMqFV8G4zLR5K6O6Fh/8DkmrWsyvX2SfWpE3jrJBCFT8N5cvh0QrvHQS5SWWkliCBMHGmXQunAodlIxHA==
+ b=dUYfw38Dju3bnBnshp3D/+rC0zAketCGplTMRcHixaKVKNWYSPm5/zwfSDza8+Cuqq3be1yh3X1JBRsEc4zE72kUmj1xHXZTB7dW4Nysy6RSi4HFbuwPpuNpGsXCCwUIhAlxlJthI9MVO7zkTKteHHlDISGqVCAZDTQQjoLGjs3/Ob+LcjhYU4el5m0pBwdHA9g7OlrVKNf5XXmEbq1S/9ddGiK8KK7kMM8I0hg+9O3oz9ns386g7jspZbrNZ4v9ycbJIuPQrVZU2z9KOzWu1xXE8tzwG3MD7xPHnm74fFmkK2nVhrVrri4HP0GsNWhJ2iBk9BYyTIGe+JLGck+I3g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=LJy7VKXgtgD3G2QDSXPpk4vWJnG3p/DKX0If/EhyGyE=;
- b=m0/OfHsuSIJnIP2MzAIxtDCFVkQnoxL+mCB8UyLfSd+nYqvcHKRKw5a9sB9KnoEBi3BW2APtwl6HLblEDuRZqk2fptmDd3Ieu8eRyI2/jeHOF3NqXpRpIx1VPjUthwJHvd0erHwwZoHcVU6TIc6ob5sBtk8L3PMKCs62q/CvM6MOrgbL52P3DKuwfksPAAYWuRY0ooHXLxMElWV0XIIiSXilmVsFExDDch0SWPMdoF2k7NgTJghpS09/0tLUQUDYdNSCwusUYTWFLc6r99WdE1FViO7np0TNkSyqTCCr8zGuoTgKK1umh95DQajmT8ik9HwDo9gnMQO7Q/cK7vgRSQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.112.34) smtp.rcpttodomain=google.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=nvidia.com; dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
+ bh=7D8hEONag4p/GSTF8IRi6eV8gUqtCJzFtMjmyi3AsWI=;
+ b=i5SY7se6AHQMBYnKLLw+DP9aZ48Yxi1QE43hGESMFXv4Ke8qp/52Wuy1PoNGnwiQJ6vsd6t1XWY1taT29R/V5phF4lQUYYiqVee5W5NjPjxfgOVMpDbHJLkanmk+YVT4wgZ2dovoZJckk4yphnI1DT17P5yxo6Q0u47FkbvJYAnkePOWcXSX+aE7pzOVL0u2OQywIra3vpnamLNWbvMC18M4iUJT4wZ8Fkusu3IZKl1awqgMVMMMSTX+4ftn5s7WPw3bfA7W3apn37rY6BezWE68qoBUkd60YuF68PUoIo4etNlkTTYQ+B3AsUwvE/OEKwQOg/CR7ubhGtQbzoZ6uA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
+ s=selector2-intel-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LJy7VKXgtgD3G2QDSXPpk4vWJnG3p/DKX0If/EhyGyE=;
- b=Cx4jZhKnA2S4rtkLWng1VGnZiAdirf9OswhEmtLVrOQuwjto+8Uu+C4b9Obidlj6T7Y9NgK/1invJxSkEEi+LgAd3tN2XrBc523ohubbW9YiKsnXhfC5PX0PRgwZQZV0Gm4pZeAUbRjAWuGLHCnYWW5IjD13kDm8VNuksHeuIMmeD2TkutZ6hoWMFxIdg2Ax+tQA1cSX4HSNBf5vr0z6oKdnKVScn2X1wrSuRyfzfSr7hggLJigfkck34nIGtvnN4Kprb3VT8AAmiBoUtGpwK0OHkGrfLJOvic2+5uJsIt/qW9QGLcvXY4YX5TjDQlES3r1W0l/T5XJ7hak2fTZwjQ==
-Received: from MW4PR03CA0077.namprd03.prod.outlook.com (2603:10b6:303:b6::22)
- by CH2PR12MB3688.namprd12.prod.outlook.com (2603:10b6:610:28::33) with
+ bh=7D8hEONag4p/GSTF8IRi6eV8gUqtCJzFtMjmyi3AsWI=;
+ b=tKekq5/nexHue9wPz/X+gBH0Zc/sqyJq70Cx0iAAm0niGwmdpf9E1Mer0SzfN/8qlGr01mXJ2aw9pqRSmm4OrIHbcts7o/sOVaN352lz9AqjbhtdX0CD+56AEajNy0eIziNG/PLoVA7+bWpTMIUpg58+aYB7RZf5SUap8WJtEOA=
+Received: from BN9PR11MB5433.namprd11.prod.outlook.com (2603:10b6:408:11e::13)
+ by BN6PR11MB4098.namprd11.prod.outlook.com (2603:10b6:405:7f::36) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4608.16; Thu, 14 Oct
- 2021 09:08:38 +0000
-Received: from CO1NAM11FT066.eop-nam11.prod.protection.outlook.com
- (2603:10b6:303:b6:cafe::11) by MW4PR03CA0077.outlook.office365.com
- (2603:10b6:303:b6::22) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4608.14 via Frontend
- Transport; Thu, 14 Oct 2021 09:08:37 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.34)
- smtp.mailfrom=nvidia.com; google.com; dkim=none (message not signed)
- header.d=none;google.com; dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.112.34 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.112.34; helo=mail.nvidia.com;
-Received: from mail.nvidia.com (216.228.112.34) by
- CO1NAM11FT066.mail.protection.outlook.com (10.13.175.18) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.4608.15 via Frontend Transport; Thu, 14 Oct 2021 09:08:37 +0000
-Received: from [172.27.11.74] (172.20.187.6) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.18; Thu, 14 Oct
- 2021 09:08:31 +0000
-Subject: Re: [PATCH V1 mlx5-next 01/13] PCI/IOV: Provide internal VF index
-To:     Bjorn Helgaas <helgaas@kernel.org>
-CC:     <alex.williamson@redhat.com>, <bhelgaas@google.com>,
-        <jgg@nvidia.com>, <saeedm@nvidia.com>, <linux-pci@vger.kernel.org>,
-        <kvm@vger.kernel.org>, <netdev@vger.kernel.org>, <kuba@kernel.org>,
-        <leonro@nvidia.com>, <kwankhede@nvidia.com>,
-        <mgurtovoy@nvidia.com>, <maorg@nvidia.com>
-References: <20211013181426.GA1906116@bhelgaas>
-From:   Yishai Hadas <yishaih@nvidia.com>
-Message-ID: <68d1d356-3a3e-7254-6127-297fc48cf197@nvidia.com>
-Date:   Thu, 14 Oct 2021 12:08:28 +0300
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
-MIME-Version: 1.0
-In-Reply-To: <20211013181426.GA1906116@bhelgaas>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4587.19; Thu, 14 Oct
+ 2021 09:11:58 +0000
+Received: from BN9PR11MB5433.namprd11.prod.outlook.com
+ ([fe80::ddb7:fa7f:2cc:45df]) by BN9PR11MB5433.namprd11.prod.outlook.com
+ ([fe80::ddb7:fa7f:2cc:45df%8]) with mapi id 15.20.4608.016; Thu, 14 Oct 2021
+ 09:11:58 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+CC:     Alex Williamson <alex.williamson@redhat.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>, "hch@lst.de" <hch@lst.de>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+        "parav@mellanox.com" <parav@mellanox.com>,
+        "lkml@metux.net" <lkml@metux.net>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "lushenming@huawei.com" <lushenming@huawei.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "corbet@lwn.net" <corbet@lwn.net>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "yi.l.liu@linux.intel.com" <yi.l.liu@linux.intel.com>,
+        "Tian, Jun J" <jun.j.tian@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "dwmw2@infradead.org" <dwmw2@infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
+        "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>
+Subject: RE: [RFC 10/20] iommu/iommufd: Add IOMMU_DEVICE_GET_INFO
+Thread-Topic: [RFC 10/20] iommu/iommufd: Add IOMMU_DEVICE_GET_INFO
+Thread-Index: AQHXrSGNbNtRgavabUSKJjvt8l12BauwlhaAgAAouwCAACufAIAAEL4QgACKr4CACtdfoIAA3DaAgBUX8GA=
+Date:   Thu, 14 Oct 2021 09:11:58 +0000
+Message-ID: <BN9PR11MB5433530032DC8400B71FCB788CB89@BN9PR11MB5433.namprd11.prod.outlook.com>
+References: <20210919063848.1476776-1-yi.l.liu@intel.com>
+ <20210919063848.1476776-11-yi.l.liu@intel.com>
+ <20210922152407.1bfa6ff7.alex.williamson@redhat.com>
+ <20210922234954.GB964074@nvidia.com>
+ <BN9PR11MB5433409DF766AAEF1BB2CF258CA39@BN9PR11MB5433.namprd11.prod.outlook.com>
+ <BN9PR11MB54333BDB1E58387FD9999DF18CA39@BN9PR11MB5433.namprd11.prod.outlook.com>
+ <20210923114219.GG964074@nvidia.com>
+ <BN9PR11MB5433519229319BA951CA97638CAA9@BN9PR11MB5433.namprd11.prod.outlook.com>
+ <20210930222355.GH964074@nvidia.com>
+In-Reply-To: <20210930222355.GH964074@nvidia.com>
+Accept-Language: en-US
 Content-Language: en-US
-X-Originating-IP: [172.20.187.6]
-X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
- HQMAIL107.nvidia.com (172.20.187.13)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: aa27df6f-7034-4f29-9612-08d98ef2353f
-X-MS-TrafficTypeDiagnostic: CH2PR12MB3688:
-X-Microsoft-Antispam-PRVS: <CH2PR12MB3688B683DE3512EE6D4731FBC3B89@CH2PR12MB3688.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: kWKHOs3iGcC/N7uyeGgWiC9Eu1fAGEso30wqoeXm9TEjFW6lOQ+iI0qPPkdqv+4iKIIpRMoy/Gnc1GufyxabN6JlfiWB6+jfQ+iT0TgCrHjGX9f5OppN/wt9vCmcltUxwHa73QXSYJUamDtkjsbX1EGdubGOKXbOMkHw2dNZJk+8+C5o7XsY3VRC9+rZNH229+1YPnaizS5Ff0ndYZrvpuzu3qSB6Z+OJVnh1qQGS/trwD/y+C31RvofdsElW/yN/rPr47ydRAYX31sekDXbZO5KRLCZ+iioOF/s06HCAzSBOp1M9X8Bk5o1cf9fv3LULUrNLzpf30Dwp5N2vM7IvcAfArpaz+uXpH8x7TVdxeumH7Qtdwq8Jz6wABLaYN+fsEZu/PTTx3cScDiO+TIQ0oPKXeVKPCJL8GuxECAHKgUfKtgS978iVEfLTITHpd7JUfxfIqOzQy76BL+1D1CG15kzyjQCqqrPQSul3ZU3hOsTuouNcr28WCidiOF7BDIb3mrHodEJwWBq0e0yUHP8LfY/nYvrTXOHjAfqcrMam+aQSnXa0f03NA4lJYiLAmJFi+8xxxT0MNNKQHcb/NLQeI6A8OTPtrE5ywzfggczgqXe1EyUlmnWUFkgjlRpOgC7xcVsl7ydVw+oD4Sl9G4+Yar+8dRzBcEA8Xwn4zUFg61kUdWzc7vT/KaMx4UHlWtq7Kq7BlMwmjp/XsNjyA6evjplsx647tFvbgKk9B0F5DMM7kQRId80xZXUxrCEuHR8NeQ9OZUU+HUKxelOty7t52JSb3gC9Zrhn1iwLyWgW6TPV3V7rn8tf716TbhIjwoy
-X-Forefront-Antispam-Report: CIP:216.228.112.34;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid03.nvidia.com;CAT:NONE;SFS:(4636009)(36840700001)(46966006)(2616005)(4326008)(53546011)(26005)(426003)(6916009)(336012)(47076005)(966005)(31696002)(8936002)(508600001)(82310400003)(83380400001)(70586007)(70206006)(8676002)(36756003)(6666004)(54906003)(5660300002)(2906002)(316002)(86362001)(36860700001)(186003)(16526019)(107886003)(31686004)(16576012)(7636003)(356005)(43740500002);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Oct 2021 09:08:37.5132
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: nvidia.com; dkim=none (message not signed)
+ header.d=none;nvidia.com; dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 10e0c449-8fb3-45ec-fd18-08d98ef2ad11
+x-ms-traffictypediagnostic: BN6PR11MB4098:
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <BN6PR11MB4098D8A1C2CAF9C0E4C1BF658CB89@BN6PR11MB4098.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: bMrdHY6K7HzfsHBSejP3mL7/P9ksubnGnahtdjB1516/L/8z+pi0iU8pZmPHeujSuWln25hSjvf900UnExsKE56K6i6PNQt/qFbFT41IVJMEoQzbFSxC44SgfqcQPGFkytnMPUJzyL8pGee9Ibc+ee05NBAY1gkqCvMYMzxrvhv/BinocUhAAcpXR/H/hPGFoVe/dHkkYsJNbpyzMT3FcEV6YBOHypkdHcNRl8D69RpqlE82O5FG98z/5BTB2crsIxRIuf3k9SjbhgtVoYc2jik994N0NpnMmNFM+pdmjSRXFhwXS9WIEer3rzBpWkD390S5RPhZQzDnOU8Wsxy/Aryxx2EMdabgujeoZghSuqiHYrRXCHmVEyTEHQDsW0qUK8e9DG6pXOnXYOUW5GpY/U8XZIMwRPWi8eO5edGdmGYQmFSPbmzT2DkEcpzJO8j8xJ0noTmMsonm16sO1mWPtDWAeE0xFZCUVoh/duHvk1X/y1J43JMvgrl7BemElpLqFGHZY/S7ItZ2eXDK4NSrAByu8cyHA7k93MklzfPKdLP56gmZ+/azznR+nhv4OTaWPJSKl1MqgRM4DQbNm/46LaIxYoXwxJvT1x5erHBiGKcGJUPE7sgNDOC9xRPk1c0GzTDCf4MbLaGrlATyl50kggfN7Y3iWYVxLt8T+roqp8eQvvfxvu7H62iHpVhegXsIM+k1/olRIMFwxmi+DhLiOg==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5433.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(86362001)(26005)(5660300002)(7416002)(66946007)(76116006)(64756008)(66556008)(8676002)(122000001)(38100700002)(4326008)(66446008)(71200400001)(83380400001)(186003)(66476007)(54906003)(8936002)(33656002)(38070700005)(316002)(52536014)(6506007)(55016002)(508600001)(9686003)(6916009)(2906002)(7696005)(82960400001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?ZrxYpPMbk7jjYlRoQsa7jEg2oly+MH3YIXsg4H6i5o2knwCpKVuQc9NZ9a89?=
+ =?us-ascii?Q?iU/Bk7LCXK3tEBIkk9059gqvbZtgI6unaaD/AFnaL5tTuZVnmf9JaqX/0oFI?=
+ =?us-ascii?Q?Lkk6c4AnB1mfDd3Js50zTweSj+FVFFeFdWwhSGvFD7woiM9CegqLwWJoJYgy?=
+ =?us-ascii?Q?WXvGDdwoI1/r67gErJDBzXP72ukrGkoR5D9iCIhABoY0iUWSa/rntVH6D2c0?=
+ =?us-ascii?Q?WM8iI74dG9kPPfjBUP5m9TEqVUB5TLMHh8TM8Ul0LMttmWQLoUBdqopyNI5+?=
+ =?us-ascii?Q?wX3kVVoIQjMIho74t4JPmjtClwinAGdHVoQxo8d+WSZZbr3PHjrU7c1NlGnj?=
+ =?us-ascii?Q?X6Bw86qgXIlGkOOd0mRJqE4gaazQ6LJTGlJuTuL+AdWJyixpTk1XE9eSCVJG?=
+ =?us-ascii?Q?tW32bNJ3TfsqoH0bJjl64Wp55Z8JaNEj3Nw18pz6LaYdcq9yQnX0D1KJG/5k?=
+ =?us-ascii?Q?CoC1n+3FG36f+BwIF5jcBBVg/fQ4+o3SNMAhCw32MLR65yCqouvHzOLVR2qE?=
+ =?us-ascii?Q?9jimbtk0kt6zulfZakcIYJBl1qRADeQxqI/4QidTa1WjQjUVqSC94PlPzi22?=
+ =?us-ascii?Q?It9bU7oqj8QknBpNxIsSI7FbbRPTEZW518dsXb2y0pbiItgK/oFTGr8DEc3L?=
+ =?us-ascii?Q?icYNbqiMSm/kWROWVKoriT29gxwsEMF9Q/AT+YFB0/Xfg0y5XqSeQaWgYKzA?=
+ =?us-ascii?Q?N7YUlYToxs/cqW4q+RiIJm4QeZoRsc0kjcgRamZG9XCqQjGyDyN64Nl2CKQ7?=
+ =?us-ascii?Q?/877ix2swqK65+8BvuKjiBYgJjxvEqb04AREbNZHrjowPSzwwwvgw8TMyDME?=
+ =?us-ascii?Q?kTcTA1nTJ3Dcp+FwYORnN77qvuDB44e928R91w+6chFjlZ+4ZU/6DH5QzP21?=
+ =?us-ascii?Q?gtOVJthq50eXIXd3zQnqL2U7LSogsFAmOCEqau0brDRDKg+KDLxWjh8NK5a1?=
+ =?us-ascii?Q?DVKFWor0PkHnnB8drjNfbmYa6BUzzlQ8KG9LIxgJrKlLkL6caEKHLbChOS1B?=
+ =?us-ascii?Q?1dPBWYiwimyAPYUP+YL2VYMzKquHeZu6y5aZk0knWkG3uNiWSAlK6JDZcvoR?=
+ =?us-ascii?Q?1Y7DgtTPrccK+WGavUCCn8BGEHWztQ8HIj/X8aqhHiRAFAkRHrwCB9ztI7FN?=
+ =?us-ascii?Q?sCBZkmygB0Y74q6kuXyDkkB+a6B3WEqTY2ypS7aAHmpyERTLZvrNrgamUUvl?=
+ =?us-ascii?Q?l/cFV3zWY/Txp12pApqlBJR+SiIxLmlYSs4WCabITTCBUT9rymSD48BHTPnd?=
+ =?us-ascii?Q?U6Bi/wDQqSAbo1/24RXISbp5YwbJHnYdFi2qgj7pbQPKLrod/sy6aAYwazPs?=
+ =?us-ascii?Q?+UcWG+nf9mgGr5oo7AaSgfHN?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5433.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 10e0c449-8fb3-45ec-fd18-08d98ef2ad11
+X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Oct 2021 09:11:58.5158
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: aa27df6f-7034-4f29-9612-08d98ef2353f
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.34];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT066.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB3688
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: qSXYe5elpSpGoMtF5pUJBgg2WThqWiDwVYF+k0kzgrc1uuka34KhFhDodfh/ltu/UXcyxiBwukROvxztEN0pFw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR11MB4098
+X-OriginatorOrg: intel.com
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/13/2021 9:14 PM, Bjorn Helgaas wrote:
-> On Wed, Oct 13, 2021 at 12:46:55PM +0300, Yishai Hadas wrote:
->> From: Jason Gunthorpe <jgg@nvidia.com>
->>
->> The PCI core uses the VF index internally, often called the vf_id,
->> during the setup of the VF, eg pci_iov_add_virtfn().
->>
->> This index is needed for device drivers that implement live migration
->> for their internal operations that configure/control their VFs.
->>
->> Specifically, mlx5_vfio_pci driver that is introduced in coming patches
->> from this series needs it and not the bus/device/function which is
->> exposed today.
->>
->> Add pci_iov_vf_id() which computes the vf_id by reversing the math that
->> was used to create the bus/device/function.
->>
->> Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
->> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
->> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-> I already acked this:
->
->    https://lore.kernel.org/r/20210922215930.GA231505@bhelgaas
->
-> Saves me time if you carry the ack so I don't have to look at this
-> again.  But since I *am* looking at it again, I think it's nice if the
-> subject line includes the actual interface you're adding, e.g.,
->
->    PCI/IOV: Add pci_iov_vf_id() to get VF index
+> From: Jason Gunthorpe <jgg@nvidia.com>
+> Sent: Friday, October 1, 2021 6:24 AM
+>=20
+> On Thu, Sep 30, 2021 at 09:35:45AM +0000, Tian, Kevin wrote:
+>=20
+> > > The Intel functional issue is that Intel blocks the cache maintaince
+> > > ops from the VM and the VM has no way to self-discover that the cache
+> > > maintaince ops don't work.
+> >
+> > the VM doesn't need to know whether the maintenance ops
+> > actually works.
+>=20
+> Which is the whole problem.
+>=20
+> Intel has a design where the device driver tells the device to issue
+> non-cachable TLPs.
+>=20
+> The driver is supposed to know if it can issue the cache maintaince
+> instructions - if it can then it should ask the device to issue
+> no-snoop TLPs.
+>=20
+> For instance the same PCI driver on non-x86 should never ask the
+> device to issue no-snoop TLPs because it has no idea how to restore
+> cache coherence on eg ARM.
+>=20
+> Do you see the issue? This configuration where the hypervisor silently
+> make wbsync a NOP breaks the x86 architecture because the guest has no
+> idea it can no longer use no-snoop features.
 
+Thanks for explanation. But I still have one puzzle about the 'break'
+part.
 
-Sure, will change as part of V2 and add your Acked-by.
+If hypervisor makes wbinvd a NOP then it will also set enforce_snoop
+bit in PTE to convert non-snoop packet to snoop. No function in the guest
+is broken, just the performance may lag.
 
->> ---
->>   drivers/pci/iov.c   | 14 ++++++++++++++
->>   include/linux/pci.h |  8 +++++++-
->>   2 files changed, 21 insertions(+), 1 deletion(-)
->>
->> diff --git a/drivers/pci/iov.c b/drivers/pci/iov.c
->> index dafdc652fcd0..e7751fa3fe0b 100644
->> --- a/drivers/pci/iov.c
->> +++ b/drivers/pci/iov.c
->> @@ -33,6 +33,20 @@ int pci_iov_virtfn_devfn(struct pci_dev *dev, int vf_id)
->>   }
->>   EXPORT_SYMBOL_GPL(pci_iov_virtfn_devfn);
->>   
->> +int pci_iov_vf_id(struct pci_dev *dev)
->> +{
->> +	struct pci_dev *pf;
->> +
->> +	if (!dev->is_virtfn)
->> +		return -EINVAL;
->> +
->> +	pf = pci_physfn(dev);
->> +	return (((dev->bus->number << 8) + dev->devfn) -
->> +		((pf->bus->number << 8) + pf->devfn + pf->sriov->offset)) /
->> +	       pf->sriov->stride;
->> +}
->> +EXPORT_SYMBOL_GPL(pci_iov_vf_id);
->> +
->>   /*
->>    * Per SR-IOV spec sec 3.3.10 and 3.3.11, First VF Offset and VF Stride may
->>    * change when NumVFs changes.
->> diff --git a/include/linux/pci.h b/include/linux/pci.h
->> index cd8aa6fce204..2337512e67f0 100644
->> --- a/include/linux/pci.h
->> +++ b/include/linux/pci.h
->> @@ -2153,7 +2153,7 @@ void __iomem *pci_ioremap_wc_bar(struct pci_dev *pdev, int bar);
->>   #ifdef CONFIG_PCI_IOV
->>   int pci_iov_virtfn_bus(struct pci_dev *dev, int id);
->>   int pci_iov_virtfn_devfn(struct pci_dev *dev, int id);
->> -
->> +int pci_iov_vf_id(struct pci_dev *dev);
->>   int pci_enable_sriov(struct pci_dev *dev, int nr_virtfn);
->>   void pci_disable_sriov(struct pci_dev *dev);
->>   
->> @@ -2181,6 +2181,12 @@ static inline int pci_iov_virtfn_devfn(struct pci_dev *dev, int id)
->>   {
->>   	return -ENOSYS;
->>   }
->> +
->> +static inline int pci_iov_vf_id(struct pci_dev *dev)
->> +{
->> +	return -ENOSYS;
->> +}
->> +
->>   static inline int pci_enable_sriov(struct pci_dev *dev, int nr_virtfn)
->>   { return -ENODEV; }
->>   
->> -- 
->> 2.18.1
->>
+If performance matters then hypervisor configures IOMMU to allow
+non-snoop packet and then emulate wbinvd properly.
 
+The contract between vfio and kvm is to convey above requirement
+on how wbinvd is handled.
+
+But in both cases cache maintenance instructions are available from=20
+guest p.o.v and no coherency semantics would be violated.
+
+>=20
+> Using the IOMMU to forcibly prevent the device from issuing no-snoop
+> makes this whole issue of the broken wbsync moot.
+
+it's not prevent issuing. Instead, IOMMU converts non-snoop request
+to snoop.
+
+>=20
+> It is important to be really clear on what this is about - this is not
+> some idealized nice iommu feature - it is working around alot of
+> backwards compatability baggage that is probably completely unique to
+> x86.
+>=20
+> > > Other arches don't seem to have this specific problem...
+> >
+> > I think the key is whether other archs allow driver to decide DMA
+> > coherency and indirectly the underlying I/O page table format.
+> > If yes, then I don't see a reason why such decision should not be
+> > given to userspace for passthrough case.
+>=20
+> The choice all comes down to if the other arches have cache
+> maintenance instructions in the VM that *don't work*
+>=20
+
+Looks vfio always sets IOMMU_CACHE on all platforms as long as
+iommu supports it (true on all platforms except intel iommu which
+is dedicated for GPU):
+
+vfio_iommu_type1_attach_group()
+{
+	...
+	if (iommu_capable(bus, IOMMU_CAP_CACHE_COHERENCY))
+		domain->prot |=3D IOMMU_CACHE;
+	...
+}
+
+Should above be set according to whether a device is coherent?
+
+Thanks
+Kevin
