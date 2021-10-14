@@ -2,116 +2,214 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5064F42E40B
-	for <lists+kvm@lfdr.de>; Fri, 15 Oct 2021 00:15:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6B2B142E46F
+	for <lists+kvm@lfdr.de>; Fri, 15 Oct 2021 00:51:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234191AbhJNWRE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Oct 2021 18:17:04 -0400
-Received: from mga07.intel.com ([134.134.136.100]:44605 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229829AbhJNWRD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Oct 2021 18:17:03 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10137"; a="291285154"
-X-IronPort-AV: E=Sophos;i="5.85,374,1624345200"; 
-   d="scan'208";a="291285154"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Oct 2021 15:14:34 -0700
-X-IronPort-AV: E=Sophos;i="5.85,374,1624345200"; 
-   d="scan'208";a="571559835"
-Received: from chendan-mobl.amr.corp.intel.com (HELO [10.251.17.229]) ([10.251.17.229])
-  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Oct 2021 15:14:33 -0700
-Subject: Re: [PATCH v2 2/2] x86: sgx_vepc: implement SGX_IOC_VEPC_REMOVE ioctl
-To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     dave.hansen@linux.intel.com, seanjc@google.com, x86@kernel.org,
-        yang.zhong@intel.com, jarkko@kernel.org
-References: <20211012105708.2070480-1-pbonzini@redhat.com>
- <20211012105708.2070480-3-pbonzini@redhat.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
- z5cecg==
-Message-ID: <a6f18a62-4e3e-b641-5ef9-4ada9eccd74d@intel.com>
-Date:   Thu, 14 Oct 2021 15:14:33 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S233994AbhJNWyA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Oct 2021 18:54:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41390 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229818AbhJNWyA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Oct 2021 18:54:00 -0400
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C5A9C061570;
+        Thu, 14 Oct 2021 15:51:54 -0700 (PDT)
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1634251911;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=FLoVNNtNPo6mitkB/AzeAHhgIos4G1PL9ZbWqs9uwB4=;
+        b=M2Qb+coA4tC6FDgliQJrP+id0TrTKs+XwCG38q94p9mGBfglKhGxLap28KS70GNdgUBLKc
+        39K9StYGC/2aAiw6dp2tPwIH7mFgPfjC1Qui0z/LY03MRxm1SeA3kD0svdPjrcTtuY8sl3
+        CK2OUKd6pna60Wu8oxCissnfBM01Epc1wIOrL3L7L2NKwMydGfbMqA3F9VMBnrl5yZEAVF
+        wRPDJRNBn8lj/MK5RiVIzfQeBflNZEzsnTwmCQlmiVDBFKU9KFGcpC7A2gg05u0iOKtDRe
+        Mk8Xda2y8HLDlLV0piTm/JXfFSrTL9HHLFEeeAt34MI32q0dXpPuB0FZQAVuJw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1634251911;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=FLoVNNtNPo6mitkB/AzeAHhgIos4G1PL9ZbWqs9uwB4=;
+        b=8O8sCvM5P2b942gVQkyqux5BTAhLHulOLRPnLQjT/Veg+nhYgMLVRdezjKI8uWNuSeJ36K
+        Kc3y3lsvnbXKwtCg==
+To:     LKML <linux-kernel@vger.kernel.org>
+Cc:     x86@kernel.org, "Chang S. Bae" <chang.seok.bae@intel.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Arjan van de Ven <arjan@linux.intel.com>,
+        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Subject: [patch V2 21/21] x86/fpu/signal: Use fpstate for size and features
+In-Reply-To: <20211013145323.285696382@linutronix.de>
+References: <20211013142847.120153383@linutronix.de>
+ <20211013145323.285696382@linutronix.de>
+Date:   Fri, 15 Oct 2021 00:51:51 +0200
+Message-ID: <87ilxz5iew.ffs@tglx>
 MIME-Version: 1.0
-In-Reply-To: <20211012105708.2070480-3-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/12/21 3:57 AM, Paolo Bonzini wrote:
-> For bare-metal SGX on real hardware, the hardware provides guarantees
-> SGX state at reboot.  For instance, all pages start out uninitialized.
-> The vepc driver provides a similar guarantee today for freshly-opened
-> vepc instances, but guests such as Windows expect all pages to be in
-> uninitialized state on startup, including after every guest reboot.
-> 
-> Some userspace implementations of virtual SGX would rather avoid having
-> to close and reopen the /dev/sgx_vepc file descriptor and re-mmap the
-> virtual EPC.  For example, they could sandbox themselves after the guest
-> starts and forbid further calls to open(), in order to mitigate exploits
-> from untrusted guests.
-> 
-> Therefore, add a ioctl that does this with EREMOVE.  Userspace can
-> invoke the ioctl to bring its vEPC pages back to uninitialized state.
-> There is a possibility that some pages fail to be removed if they are
-> SECS pages, and the child and SECS pages could be in separate vEPC
-> regions.  Therefore, the ioctl returns the number of EREMOVE failures,
-> telling userspace to try the ioctl again after it's done with all
-> vEPC regions.  A more verbose description of the correct usage and
-> the possible error conditions is documented in sgx.rst.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+For dynamically enabled features it's required to get the features which
+are enabled for that context when restoring from sigframe.
 
-The new approach and revised changelogs look fine to me:
+The same applies for all signal frame size calculations.
 
-Reviewed-by: Dave Hansen <dave.hansen@linux.intel.com>
+Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+---
+V2: Added a missing conversion and folded back a conversion which
+    was hidden in part 3
+---
+ arch/x86/kernel/fpu/signal.c |   44 ++++++++++++++++++++++++++-----------------
+ 1 file changed, 27 insertions(+), 17 deletions(-)
 
-Like Jarkko mentioned, it would be _nice_ to have some self-contained
-selftests around this.  Would it be a pain to rig something up in
-selftests/kvm that at least trivially poked at /dev/sgx_vepc?
+--- a/arch/x86/kernel/fpu/signal.c
++++ b/arch/x86/kernel/fpu/signal.c
+@@ -41,7 +41,7 @@ static inline bool check_xstate_in_sigfr
+ 	/* Check for the first magic field and other error scenarios. */
+ 	if (fx_sw->magic1 != FP_XSTATE_MAGIC1 ||
+ 	    fx_sw->xstate_size < min_xstate_size ||
+-	    fx_sw->xstate_size > fpu_user_xstate_size ||
++	    fx_sw->xstate_size > current->thread.fpu.fpstate->user_size ||
+ 	    fx_sw->xstate_size > fx_sw->extended_size)
+ 		goto setfx;
+ 
+@@ -98,7 +98,8 @@ static inline bool save_fsave_header(str
+ 	return true;
+ }
+ 
+-static inline bool save_xstate_epilog(void __user *buf, int ia32_frame)
++static inline bool save_xstate_epilog(void __user *buf, int ia32_frame,
++				      unsigned int usize)
+ {
+ 	struct xregs_state __user *x = buf;
+ 	struct _fpx_sw_bytes *sw_bytes;
+@@ -113,7 +114,7 @@ static inline bool save_xstate_epilog(vo
+ 		return !err;
+ 
+ 	err |= __put_user(FP_XSTATE_MAGIC2,
+-			  (__u32 __user *)(buf + fpu_user_xstate_size));
++			  (__u32 __user *)(buf + usize));
+ 
+ 	/*
+ 	 * Read the xfeatures which we copied (directly from the cpu or
+@@ -171,6 +172,7 @@ static inline int copy_fpregs_to_sigfram
+ bool copy_fpstate_to_sigframe(void __user *buf, void __user *buf_fx, int size)
+ {
+ 	struct task_struct *tsk = current;
++	struct fpstate *fpstate = tsk->thread.fpu.fpstate;
+ 	int ia32_fxstate = (buf != buf_fx);
+ 	int ret;
+ 
+@@ -215,7 +217,7 @@ bool copy_fpstate_to_sigframe(void __use
+ 	fpregs_unlock();
+ 
+ 	if (ret) {
+-		if (!__clear_user(buf_fx, fpu_user_xstate_size))
++		if (!__clear_user(buf_fx, fpstate->user_size))
+ 			goto retry;
+ 		return false;
+ 	}
+@@ -224,17 +226,18 @@ bool copy_fpstate_to_sigframe(void __use
+ 	if ((ia32_fxstate || !use_fxsr()) && !save_fsave_header(tsk, buf))
+ 		return false;
+ 
+-	if (use_fxsr() && !save_xstate_epilog(buf_fx, ia32_fxstate))
++	if (use_fxsr() &&
++	    !save_xstate_epilog(buf_fx, ia32_fxstate, fpstate->user_size))
+ 		return false;
+ 
+ 	return true;
+ }
+ 
+-static int __restore_fpregs_from_user(void __user *buf, u64 xrestore,
+-				      bool fx_only)
++static int __restore_fpregs_from_user(void __user *buf, u64 ufeatures,
++				      u64 xrestore, bool fx_only)
+ {
+ 	if (use_xsave()) {
+-		u64 init_bv = xfeatures_mask_uabi() & ~xrestore;
++		u64 init_bv = ufeatures & ~xrestore;
+ 		int ret;
+ 
+ 		if (likely(!fx_only))
+@@ -265,7 +268,8 @@ static bool restore_fpregs_from_user(voi
+ retry:
+ 	fpregs_lock();
+ 	pagefault_disable();
+-	ret = __restore_fpregs_from_user(buf, xrestore, fx_only);
++	ret = __restore_fpregs_from_user(buf, fpu->fpstate->user_xfeatures,
++					 xrestore, fx_only);
+ 	pagefault_enable();
+ 
+ 	if (unlikely(ret)) {
+@@ -332,7 +336,7 @@ static bool __fpu_restore_sig(void __use
+ 		user_xfeatures = fx_sw_user.xfeatures;
+ 	} else {
+ 		user_xfeatures = XFEATURE_MASK_FPSSE;
+-		state_size = fpu->fpstate->size;
++		state_size = fpu->fpstate->user_size;
+ 	}
+ 
+ 	if (likely(!ia32_fxstate)) {
+@@ -425,10 +429,11 @@ static bool __fpu_restore_sig(void __use
+ 	return success;
+ }
+ 
+-static inline int xstate_sigframe_size(void)
++static inline unsigned int xstate_sigframe_size(struct fpstate *fpstate)
+ {
+-	return use_xsave() ? fpu_user_xstate_size + FP_XSTATE_MAGIC2_SIZE :
+-			fpu_user_xstate_size;
++	unsigned int size = fpstate->user_size;
++
++	return use_xsave() ? size + FP_XSTATE_MAGIC2_SIZE : size;
+ }
+ 
+ /*
+@@ -436,17 +441,19 @@ static inline int xstate_sigframe_size(v
+  */
+ bool fpu__restore_sig(void __user *buf, int ia32_frame)
+ {
+-	unsigned int size = xstate_sigframe_size();
+ 	struct fpu *fpu = &current->thread.fpu;
+ 	void __user *buf_fx = buf;
+ 	bool ia32_fxstate = false;
+ 	bool success = false;
++	unsigned int size;
+ 
+ 	if (unlikely(!buf)) {
+ 		fpu__clear_user_states(fpu);
+ 		return true;
+ 	}
+ 
++	size = xstate_sigframe_size(fpu->fpstate);
++
+ 	ia32_frame &= (IS_ENABLED(CONFIG_X86_32) ||
+ 		       IS_ENABLED(CONFIG_IA32_EMULATION));
+ 
+@@ -481,7 +488,7 @@ unsigned long
+ fpu__alloc_mathframe(unsigned long sp, int ia32_frame,
+ 		     unsigned long *buf_fx, unsigned long *size)
+ {
+-	unsigned long frame_size = xstate_sigframe_size();
++	unsigned long frame_size = xstate_sigframe_size(current->thread.fpu.fpstate);
+ 
+ 	*buf_fx = sp = round_down(sp - frame_size, 64);
+ 	if (ia32_frame && use_fxsr()) {
+@@ -494,9 +501,12 @@ fpu__alloc_mathframe(unsigned long sp, i
+ 	return sp;
+ }
+ 
+-unsigned long fpu__get_fpstate_size(void)
++unsigned long __init fpu__get_fpstate_size(void)
+ {
+-	unsigned long ret = xstate_sigframe_size();
++	unsigned long ret = fpu_user_xstate_size;
++
++	if (use_xsave())
++		ret += FP_XSTATE_MAGIC2_SIZE;
+ 
+ 	/*
+ 	 * This space is needed on (most) 32-bit kernels, or when a 32-bit
