@@ -2,132 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5343142D53C
-	for <lists+kvm@lfdr.de>; Thu, 14 Oct 2021 10:36:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E90142D59B
+	for <lists+kvm@lfdr.de>; Thu, 14 Oct 2021 11:01:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230174AbhJNIip (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Oct 2021 04:38:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43662 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230198AbhJNIij (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Oct 2021 04:38:39 -0400
-Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB3CAC061769
-        for <kvm@vger.kernel.org>; Thu, 14 Oct 2021 01:36:34 -0700 (PDT)
-Received: by mail-wr1-x42a.google.com with SMTP id o20so16990948wro.3
-        for <kvm@vger.kernel.org>; Thu, 14 Oct 2021 01:36:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=cfakvhen/wxw5fHdRu0DEuLT5DMfJlXe2a/johLjqxo=;
-        b=h40uJnzRy4bIKfqfvwm3i/kik60+Kgx2sfXbHxmv0MsZax7HkeDmryc9yctryM7xlU
-         37bg2VuoZWdH4kTXGosC95Fa3QYJayYirIbI/UeFVNH/Nzn2/7/VodB6g1hiMuG9zp+p
-         egl0Br7pM5vnKxSuUDa7BUq17cmPH9MsIYOosVtDeEDQMUaCZ6h+AWD2esXOH1LRk+zZ
-         X2uV1Nn3ulaudun/4f5AT6jS5oilV0myDq9ozSQAqUnytF1YgcEInQmj+cCLjl5OgT5o
-         004n5bwSXge4iP3a4skCS8avlQccw5QvPN8BVpAjam8zZmlkvShcDVpQvgmxjplGDMKz
-         pkRQ==
+        id S230090AbhJNJDl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Oct 2021 05:03:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:51127 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230018AbhJNJDk (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 14 Oct 2021 05:03:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1634202095;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=CodgdchH6jCzV7Xh4eUIWCnAZ5H+/ONb08evZGYFxDo=;
+        b=fyt1acTHIjEAIN+/StRW8sOCuyKPlUgPJl26NaZWCIrbmKmorue37QmToOcrcVptJn+0DR
+        MT5z65GTpLx1pYrR5cvMvg0Kr9Fn/qWV6uaWkCvmqeKWnsKf79gBq75UeNQVgAb+UMRSwm
+        QECG0m3i9Y/d2BrO26tbJHLKWU9TlXI=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-484-yCxwhollMvSPA0Z4U9RIDw-1; Thu, 14 Oct 2021 05:01:33 -0400
+X-MC-Unique: yCxwhollMvSPA0Z4U9RIDw-1
+Received: by mail-wr1-f70.google.com with SMTP id f1-20020a5d64c1000000b001611832aefeso4019913wri.17
+        for <kvm@vger.kernel.org>; Thu, 14 Oct 2021 02:01:33 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=cfakvhen/wxw5fHdRu0DEuLT5DMfJlXe2a/johLjqxo=;
-        b=ebPVGX9IR1WYey2fF7yrQzI+fbe8+b8TSf5qTY8v3GgapV1ksqrBcDufazpIG2YQGc
-         J9hPMx6p1S32lvFPuWL0ig6Z0xD36/3P9Lla4BSZBrEURoZeIhBXl/yE2ZPA1mknQXc4
-         p6XJDiIuh6OSOHPG3GmNPfYouWbETiHQSPVQHR3ZfMFq3+ysH38O0maKgEt4LTLCEzLu
-         lk3n2YVDfEWboyLCZo75FeQzTp0cxplMq5FUFt/aojGaYo6yph+T1ovCFCtxV06tTzl3
-         BEu3LnzgYS4ia35P14RFWrb5++juV4lkYf4CHeHV77yK7swkFTobjI8ljGHkWohtgclM
-         /suA==
-X-Gm-Message-State: AOAM532NK3ovS17IR39M2Xg3swcY/i9RgvI16B4yBsQVcLcSfelOIFed
-        EV2ZggAlagw3xPTrq82rpBVDDg==
-X-Google-Smtp-Source: ABdhPJzpVg8OIER+zTALG2ilasSHxD7bC/dTlVAeWBUDgRwrRvN9DCthCd2lRX0ZyZDpw2FTk6Hq6g==
-X-Received: by 2002:a5d:59a9:: with SMTP id p9mr5151873wrr.386.1634200593067;
-        Thu, 14 Oct 2021 01:36:33 -0700 (PDT)
-Received: from myrica (cpc92880-cmbg19-2-0-cust679.5-4.cable.virginm.net. [82.27.106.168])
-        by smtp.gmail.com with ESMTPSA id r4sm2299114wrz.58.2021.10.14.01.36.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Oct 2021 01:36:32 -0700 (PDT)
-Date:   Thu, 14 Oct 2021 09:36:09 +0100
-From:   Jean-Philippe Brucker <jean-philippe@linaro.org>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, Jeff Dike <jdike@addtoit.com>,
-        Richard Weinberger <richard@nod.at>,
-        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Gonglei <arei.gonglei@huawei.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Sudeep Holla <sudeep.holla@arm.com>,
-        Cristian Marussi <cristian.marussi@arm.com>,
-        "Enrico Weigelt, metux IT consult" <info@metux.net>,
-        Viresh Kumar <vireshk@kernel.org>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Bartosz Golaszewski <brgl@bgdev.pl>,
-        David Airlie <airlied@linux.ie>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        Daniel Vetter <daniel@ffwll.ch>, Jie Deng <jie.deng@intel.com>,
-        Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        Kalle Valo <kvalo@codeaurora.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Vishal Verma <vishal.l.verma@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Ohad Ben-Cohen <ohad@wizery.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        David Hildenbrand <david@redhat.com>,
-        Vivek Goyal <vgoyal@redhat.com>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        Eric Van Hensbergen <ericvh@gmail.com>,
-        Latchesar Ionkov <lucho@ionkov.net>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Anton Yakovlev <anton.yakovlev@opensynergy.com>,
-        Jaroslav Kysela <perex@perex.cz>,
-        Takashi Iwai <tiwai@suse.com>, linux-um@lists.infradead.org,
-        virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        linux-i2c@vger.kernel.org, iommu@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
-        nvdimm@lists.linux.dev, linux-remoteproc@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        v9fs-developer@lists.sourceforge.net, kvm@vger.kernel.org,
-        alsa-devel@alsa-project.org
-Subject: Re: [PATCH RFC] virtio: wrap config->reset calls
-Message-ID: <YWfr+Z0wgpQ48yC5@myrica>
-References: <20211013105226.20225-1-mst@redhat.com>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=CodgdchH6jCzV7Xh4eUIWCnAZ5H+/ONb08evZGYFxDo=;
+        b=fIRxQIYQL5bjLjyktyq0dzEzL/ACOG6tl8Lpkx3xfS6pjeI573iD7qiNy7QUxWs1HI
+         3RtlW3vRawwEwyl6IsisTGOrne+euZNCrFGwo+a7fZxSzp29NvN4IE79kkSxet9C7xU1
+         bLsJX/j3xyKvp1g6LoI47D63kBmHevjF2Huo2sKL1e70TtyYjxgZxOIo3yHjjBRHpDWI
+         0f+1qscdMDYWWxKOSjTb2oSb+WYh3Rm1vtW6Ikj+d7vT0clbvsiWa0BPvXinz6jEgFiN
+         CatLWTnS/434LQwWiA9tME9TIMvcwYeCxU/e8qcDnD1UKmFx030UCm3HYAK3c+cRU4sF
+         zonw==
+X-Gm-Message-State: AOAM531IUs1ZmuX4pZuxBdaPas/MqNWdYzjHK6XGTpymgUZGMhEyYxp/
+        ftDL0lpaqagsynEYA/nlZ9ExAO2HIFdpwZnw61521jrgbLtHrAPt2uyU53LGzN2WRcc6ZtE/mZE
+        6Ajqy9/GFOh84
+X-Received: by 2002:a5d:6d81:: with SMTP id l1mr5186138wrs.110.1634202092582;
+        Thu, 14 Oct 2021 02:01:32 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwm4mnKXmfpkUwNgvbwdjAarrLFRYIjyZcB0VxUDAECzZ5uqGAQuUi40Tao/ndBhbR3+6SAcw==
+X-Received: by 2002:a5d:6d81:: with SMTP id l1mr5186104wrs.110.1634202092288;
+        Thu, 14 Oct 2021 02:01:32 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
+        by smtp.gmail.com with ESMTPSA id f3sm7325221wmb.12.2021.10.14.02.01.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 14 Oct 2021 02:01:31 -0700 (PDT)
+Message-ID: <6bbc5184-a675-1937-eb98-639906a9cf15@redhat.com>
+Date:   Thu, 14 Oct 2021 11:01:11 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211013105226.20225-1-mst@redhat.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [patch 13/31] x86/fpu: Move KVMs FPU swapping to FPU core
+Content-Language: en-US
+To:     "Liu, Jing2" <jing2.liu@intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        LKML <linux-kernel@vger.kernel.org>
+Cc:     "x86@kernel.org" <x86@kernel.org>,
+        "Bae, Chang Seok" <chang.seok.bae@intel.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Arjan van de Ven <arjan@linux.intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Nakajima, Jun" <jun.nakajima@intel.com>,
+        Jing Liu <jing2.liu@linux.intel.com>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "Cooper, Andrew" <andrew.cooper3@citrix.com>
+References: <871r4p9fyh.ffs@tglx>
+ <ec9c761d-4b5c-71e2-c1fc-d256b6b78c04@redhat.com>
+ <BL0PR11MB3252511FC48E43484DE79A3CA9B89@BL0PR11MB3252.namprd11.prod.outlook.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <BL0PR11MB3252511FC48E43484DE79A3CA9B89@BL0PR11MB3252.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 13, 2021 at 06:55:31AM -0400, Michael S. Tsirkin wrote:
-> This will enable cleanups down the road.
-> The idea is to disable cbs, then add "flush_queued_cbs" callback
-> as a parameter, this way drivers can flush any work
-> queued after callbacks have been disabled.
+On 14/10/21 10:02, Liu, Jing2 wrote:
+>> In principle I don't like it very much; it would be nicer to say "you
+>> enable it for QEMU itself via arch_prctl(ARCH_SET_STATE_ENABLE), and for
+>> the guests via ioctl(KVM_SET_CPUID2)".  But I can see why you want to
+>> keep things simple, so it's not a strong objection at all.
 > 
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> ---
+> Does this mean that KVM allocate 3 buffers via
+> 1) Qemu's request, instead of via 2) guest XCR0 trap?
 
->  drivers/iommu/virtio-iommu.c               | 2 +-
+Based on the input from Andy and Thomas, the new way would be like this:
 
-Reviewed-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
+1) host_fpu must always be checked for reallocation in 
+kvm_load_guest_fpu (or in the FPU functions that it calls, that depends 
+on the rest of Thomas's patches).  That's because arch_prctl can enable 
+AMX for QEMU at any point after KVM_CREATE_VCPU.
+
+2) every use of vcpu->arch.guest_supported_xcr0 is changed to only 
+include those dynamic-feature bits that were enabled via arch_prctl.
+That is, something like:
+
+static u64 kvm_guest_supported_cr0(struct kvm_vcpu *vcpu)
+{
+	return vcpu->arch.guest_supported_xcr0 &
+		(~xfeatures_mask_user_dynamic | \
+		 current->thread.fpu.dynamic_state_perm);
+}
+
+3) Even with passthrough disabled, the guest can run with XFD set to 
+vcpu->arch.guest_xfd (and likewise for XFD_ERR) which is much simpler 
+than trapping #NM.  The traps for writing XCR0 and XFD are used to 
+allocate dynamic state for guest_fpu, and start the passthrough of XFD 
+and XFD_ERR.  What we need is:
+
+- if a dynamic state has XCR0[n]=0, bit n will never be set in XFD_ERR 
+and the state will never be dirtied by the guest.
+
+- if a dynamic state has XCR0[n]=1, but all enabled dynamic states have 
+XFD[n]=1, the guest is not able to dirty any dynamic XSAVE state, 
+because they all have either XCR0[n]=0 or XFD[n]=1.  An attempt to do so 
+will cause an #NM trap and set the bit in XFD_ERR.
+
+- if a dynamic state has XCR0[n]=1 and XFD[n]=0, the state for bit n is 
+allocated in guest_fpu, and it can also disable the vmexits for XFD and 
+XFD_ERR.
+
+Therefore:
+
+- if passthrough is disabled, the XCR0 and XFD write traps can check 
+guest_xcr0 & ~guest_xfd.  If it includes a dynamic state bit, dynamic 
+state is allocated for all bits enabled in guest_xcr0 and passthrough is 
+started; this should happen shortly after the guest gets its first #NM 
+trap for AMX.
+
+- if passthrough is enabled, the XCR0 write trap must still ensure that 
+dynamic state is allocated for all bits enabled in guest_xcr0.
+
+So something like this pseudocode is called by both XCR0 and XFD writes:
+
+int kvm_alloc_fpu_dynamic_features(struct kvm_vcpu *vcpu)
+{
+	u64 allowed_dynamic = current->thread.fpu.dynamic_state_perm;
+	u64 enabled_dynamic =
+		vcpu->arch.xcr0 & xfeatures_mask_user_dynamic;
+
+	/* All dynamic features have to be arch_prctl'd first.  */
+	WARN_ON_ONCE(enabled_dynamic & ~allowed_dynamic);
+
+	if (!vcpu->arch.xfd_passthrough) {
+		/* All dynamic states will #NM?  Wait and see.  */
+		if ((enabled_dynamic & ~vcpu->arch.xfd) == 0)
+			return 0;
+
+		kvm_x86_ops.enable_xfd_passthrough(vcpu);
+	}
+
+	/* current->thread.fpu was already handled by arch_prctl.  */
+	return fpu_alloc_features(vcpu->guest_fpu,
+		vcpu->guest_fpu.dynamic_state_perm | enabled_dynamic);
+}
+
+Paolo
+
