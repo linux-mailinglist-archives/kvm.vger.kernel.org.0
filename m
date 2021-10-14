@@ -2,35 +2,35 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4E51942DB24
-	for <lists+kvm@lfdr.de>; Thu, 14 Oct 2021 16:09:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A296A42DB69
+	for <lists+kvm@lfdr.de>; Thu, 14 Oct 2021 16:23:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231744AbhJNOLO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Oct 2021 10:11:14 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:42840 "EHLO
+        id S231839AbhJNOZl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Oct 2021 10:25:41 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:42922 "EHLO
         galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230177AbhJNOLN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Oct 2021 10:11:13 -0400
+        with ESMTP id S230030AbhJNOZl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Oct 2021 10:25:41 -0400
 From:   Thomas Gleixner <tglx@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1634220546;
+        s=2020; t=1634221415;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=K+Z9xcyAhlGhiE9Ys3ZMpsS6I+8zaTKKFDoB018524Q=;
-        b=k+j8vzoYgb9TasLzlp1gxnwy27KKqytkbbQk3yS3iea+SH8k4GVs4e7JadVcy7bpdzp56O
-        yR+YWd3wuismwBBDIeqA/IdvT9ddoXweCn8TBwvutTh3chQHsvgng4pkTnkXcrIj09l1Dk
-        YQ+yeUGReSjo39ocKrT6hQMKIgVBvUnrBiy/WSiB+fZrpLZaxjqkGiU9xwEYbgiGeADmJ8
-        JS0qoLlYd4m24wSnsM9Oixhu2vP0Stzc1SVNIPz6wWgxCcIkBG14YhU2KLD2MZg0vH4SSD
-        qpxiG15zDJ8AphXsuGt+Zf+joZoOfXzq9svbLHa9VlG+mXMLceYy/GRFDne66Q==
+        bh=J704+ZpmNiG6G+UV4gpbHRzSAjI0YA9l6NLka/xr/hM=;
+        b=4XDFt/meAmEBqm2bXsSOvDvyeCn7FSTkyTiJP66ZC7rw4BltuOrBvoYSkya9pThKCN7S0Q
+        wUTx/D3oknBz3lXPGIrx6EcIro1ftGRrLmXT8y0JOZ8VxNM/GBGr2JOybwG32kBoB8ejUK
+        brf2Dmzo+n5A9YZzYksICGsf4fScM5MU9z8rr8cZZP91SjbW8bWSPFdfiS/4IuQKLLs7oo
+        tEKtDgTwer/rEFF4WSkjwlHo04Uo32icxKy7gwVbnGElsmyyTFt6eHIcym81Xbi90Q8AF/
+        RuWtmtqkCkjRPClhuORlNsFvcGunfLB3OfVj9phCO56UgPkvbzYXUU3vyO6PWg==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1634220546;
+        s=2020e; t=1634221415;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=K+Z9xcyAhlGhiE9Ys3ZMpsS6I+8zaTKKFDoB018524Q=;
-        b=KN60iuzhEc02Xp90DjyYuXWP5nfYxfwmaELt+nfeHAbY0dksjM/SdXcytd4cTcbtSVz5SZ
-        YTxYUd+Pnv1ITdDA==
+        bh=J704+ZpmNiG6G+UV4gpbHRzSAjI0YA9l6NLka/xr/hM=;
+        b=1JT1nsyY6wMrFXLqEVVa6oy17JxPi1RepbaCts8WFUOt/rePuWTvfp7zPLQ+tw1YVmFEaK
+        1DSVP9v4mKpc7BCQ==
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         "Liu, Jing2" <jing2.liu@intel.com>,
         LKML <linux-kernel@vger.kernel.org>
@@ -42,116 +42,59 @@ Cc:     "x86@kernel.org" <x86@kernel.org>,
         "Nakajima, Jun" <jun.nakajima@intel.com>,
         Jing Liu <jing2.liu@linux.intel.com>,
         "seanjc@google.com" <seanjc@google.com>,
-        "Cooper, Andrew" <andrew.cooper3@citrix.com>
+        Andrew Cooper <andrew.cooper3@citrix.com>
 Subject: Re: [patch 13/31] x86/fpu: Move KVMs FPU swapping to FPU core
-In-Reply-To: <6bbc5184-a675-1937-eb98-639906a9cf15@redhat.com>
+In-Reply-To: <0a5aa9d3-e0d4-266e-5e25-021a5ea9c611@redhat.com>
 References: <871r4p9fyh.ffs@tglx>
- <ec9c761d-4b5c-71e2-c1fc-d256b6b78c04@redhat.com>
- <BL0PR11MB3252511FC48E43484DE79A3CA9B89@BL0PR11MB3252.namprd11.prod.outlook.com>
- <6bbc5184-a675-1937-eb98-639906a9cf15@redhat.com>
-Date:   Thu, 14 Oct 2021 16:09:06 +0200
-Message-ID: <87wnmf66m5.ffs@tglx>
+ <ec9c761d-4b5c-71e2-c1fc-d256b6b78c04@redhat.com> <875ytz7q2u.ffs@tglx>
+ <0a5aa9d3-e0d4-266e-5e25-021a5ea9c611@redhat.com>
+Date:   Thu, 14 Oct 2021 16:23:34 +0200
+Message-ID: <87tuhj65y1.ffs@tglx>
 MIME-Version: 1.0
 Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 14 2021 at 11:01, Paolo Bonzini wrote:
-> On 14/10/21 10:02, Liu, Jing2 wrote:
-> Based on the input from Andy and Thomas, the new way would be like this:
+On Thu, Oct 14 2021 at 14:26, Paolo Bonzini wrote:
+> On 14/10/21 14:23, Thomas Gleixner wrote:
+>>> In principle I don't like it very much; it would be nicer to say "you
+>>> enable it for QEMU itself via arch_prctl(ARCH_SET_STATE_ENABLE), and for
+>>> the guests via ioctl(KVM_SET_CPUID2)".  But I can see why you want to
+>>> keep things simple, so it's not a strong objection at all.
+>> Errm.
+>> 
+>>     qemu()
+>>       read_config()
+>>       if (dynamic_features_passthrough())
+>> 	request_permission(feature)             <- prctl(ARCH_SET_STATE_ENABLE)
+>> 
+>>       create_vcpu_threads()
+>>         ....
+>> 
+>>         vcpu_thread()
+>> 	 kvm_ioctl(ENABLE_DYN_FEATURE, feature) <- KVM ioctl
+>> 
+>> That's what I lined out, right?
+>> 
 >
-> 1) host_fpu must always be checked for reallocation in 
-> kvm_load_guest_fpu (or in the FPU functions that it calls, that depends 
-> on the rest of Thomas's patches).  That's because arch_prctl can enable 
-> AMX for QEMU at any point after KVM_CREATE_VCPU.
+> I meant prctl for QEMU-in-user-mode vs. ioctl QEMU-in-guest-mode (i.e. 
+> no prctl if only the guest uses it).  But anyway it's just abstract 
+> "beauty", let's stick to simple. :)
 
-No.
+It's not about simple. It's about correctness in the first place.
 
-   1) QEMU starts
-   2) QEMU requests permissions via prctl()
-   3) QEMU creates vCPU threads
+The prctl() is process wide and grants permission. If that permission is
+not granted, e.g. by a seccomp rule, then the vCPU threads cannot use it
+either. We are _not_ making exceptions for KVM just because it's KVM.
 
-Doing it the other way around makes no sense at all and wont work.
+Trying to pretend that the usermode thread does not need it is just
+illusion. The kernel representation of that very usermode vCPU thread must
+have a large fpstate. It still can have XFD set, but that's a detail.
 
-> 2) every use of vcpu->arch.guest_supported_xcr0 is changed to only 
-> include those dynamic-feature bits that were enabled via arch_prctl.
-> That is, something like:
->
-> static u64 kvm_guest_supported_cr0(struct kvm_vcpu *vcpu)
-> {
-> 	return vcpu->arch.guest_supported_xcr0 &
-> 		(~xfeatures_mask_user_dynamic | \
-> 		 current->thread.fpu.dynamic_state_perm);
-
-Bah. You can't get enough from poking in internals, right?
-
-vcpu_create()
-
-  fpu_init_fpstate_user(guest_fpu, supported_xcr0)
-
-That will (it does not today) do:
-
-     guest_fpu::__state_perm = supported_xcr0 & xstate_get_group_perm();
-
-for you. Once.
-
-The you have the information you need right in the guest FPU.
-
-See?
-
-> So something like this pseudocode is called by both XCR0 and XFD writes:
->
-> int kvm_alloc_fpu_dynamic_features(struct kvm_vcpu *vcpu)
-> {
-> 	u64 allowed_dynamic = current->thread.fpu.dynamic_state_perm;
-
-That's not a valid assumption.
-
-> 	u64 enabled_dynamic =
-> 		vcpu->arch.xcr0 & xfeatures_mask_user_dynamic;
->
-> 	/* All dynamic features have to be arch_prctl'd first.  */
-> 	WARN_ON_ONCE(enabled_dynamic & ~allowed_dynamic);
->
-> 	if (!vcpu->arch.xfd_passthrough) {
-> 		/* All dynamic states will #NM?  Wait and see.  */
-> 		if ((enabled_dynamic & ~vcpu->arch.xfd) == 0)
-> 			return 0;
->
-> 		kvm_x86_ops.enable_xfd_passthrough(vcpu);
-> 	}
->
-> 	/* current->thread.fpu was already handled by arch_prctl.  */
-
-No. current->thread.fpu has the default buffer unless QEMU used AMX or
-something forced it to allocate a larger buffer.
-
-> 	return fpu_alloc_features(vcpu->guest_fpu,
-> 		vcpu->guest_fpu.dynamic_state_perm | enabled_dynamic);
-
-This unconditionally calls into that allocation for every XCR0/XFD
-trap ?
-
-> }
-
-Also you really should not wait until _all_ dynamic states are cleared
-in guest XFD. Because a guest which has bit 18 and 19 available but only
-uses one of them is going to trap on every other context switch due to
-XFD writes.
-
-So you check for
-
-   (guest_xfd & guest_perm) != guest_perm)
-
-and
-
-   (guest_xr0 & guest_perm) != 0
-
-If both are true, then you reallocate the buffers for _all_ permitted
-states _and_ set XFD to pass through.
+So what you are trying to sell me has nothing to do with beauty at all
+except when your definition of beauty originates from a tunnel of horrors.
 
 Thanks,
 
         tglx
-
