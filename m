@@ -2,69 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 33C1442D65A
-	for <lists+kvm@lfdr.de>; Thu, 14 Oct 2021 11:45:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0901442D65B
+	for <lists+kvm@lfdr.de>; Thu, 14 Oct 2021 11:46:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230010AbhJNJsB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Oct 2021 05:48:01 -0400
-Received: from smtp-fw-33001.amazon.com ([207.171.190.10]:52772 "EHLO
-        smtp-fw-33001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229912AbhJNJsA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Oct 2021 05:48:00 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
-  t=1634204757; x=1665740757;
-  h=from:to:cc:date:message-id:references:in-reply-to:
-   content-id:mime-version:content-transfer-encoding:subject;
-  bh=rIdv63TLR2at0MciWz9Xu0SIXfMqrbe2EBqkrri9S/k=;
-  b=aPGD/x5UdwEyOEg5Zya2CyD6MRfWAJqN3XOy9gAxwvQnWUMKwglM47zg
-   bGk8F/bUz+psN/CRmahkmUryN8Zs+QapN6l9z5HR7ucZqXCMAFg4gwim3
-   ujxqyXp37FejW5wxAWC2QplCmhj6rNCQPZl5cYlQLS7KaXiXMWSx8k89I
-   E=;
-X-IronPort-AV: E=Sophos;i="5.85,372,1624320000"; 
-   d="scan'208";a="153487891"
-Subject: Re: [PATCH kvm-unit-tests 2/2] lib: Introduce strtoll/strtoull
-Thread-Topic: [PATCH kvm-unit-tests 2/2] lib: Introduce strtoll/strtoull
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-pdx-2a-6435a935.us-west-2.amazon.com) ([10.43.8.2])
-  by smtp-border-fw-33001.sea14.amazon.com with ESMTP; 14 Oct 2021 09:45:48 +0000
-Received: from EX13D24EUA001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
-        by email-inbound-relay-pdx-2a-6435a935.us-west-2.amazon.com (Postfix) with ESMTPS id 5EE28420DC;
-        Thu, 14 Oct 2021 09:45:47 +0000 (UTC)
-Received: from EX13D24EUA001.ant.amazon.com (10.43.165.233) by
- EX13D24EUA001.ant.amazon.com (10.43.165.233) with Microsoft SMTP Server (TLS)
- id 15.0.1497.23; Thu, 14 Oct 2021 09:45:46 +0000
-Received: from EX13D24EUA001.ant.amazon.com ([10.43.165.233]) by
- EX13D24EUA001.ant.amazon.com ([10.43.165.233]) with mapi id 15.00.1497.023;
- Thu, 14 Oct 2021 09:45:46 +0000
-From:   "Ahmed, Daniele" <ahmeddan@amazon.de>
-To:     Andrew Jones <drjones@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-CC:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "thuth@redhat.com" <thuth@redhat.com>
-Thread-Index: AQHXwFGZF7D9MspgNk6J6Qy76CiuHKvSYWiA
-Date:   Thu, 14 Oct 2021 09:45:46 +0000
-Message-ID: <C2234EFB-E423-4DB4-AB74-F1F20889DE79@amazon.com>
-References: <20211013164259.88281-1-drjones@redhat.com>
- <20211013164259.88281-3-drjones@redhat.com>
-In-Reply-To: <20211013164259.88281-3-drjones@redhat.com>
-Accept-Language: en-US
-Content-Language: en-GB
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.43.164.96]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <EE800814EBD091478A60B3B3764E67E1@amazon.com>
+        id S230030AbhJNJsX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Oct 2021 05:48:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:27658 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229468AbhJNJsW (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 14 Oct 2021 05:48:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1634204778;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=PylHmPl0SG/ZoxPAA6fPJqlLgNo18jKHe8Um3g+bA5Y=;
+        b=Jw+7hI0VfBJUApq+wgMA5l82brcHp+UQWS2IpZNI8WWw2nbB8SYOqRJqwmntipP7bioaRP
+        aNpYUSS5S6GEGu/NEFhZTfcXh2Br2sAls1jcG9MTeJ+YmJPUQI8GHtrXWpvfXP4nf4ksUF
+        TsYHGbMCjEvxpkFJN9bESZWJcY8Uw6A=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-178-mcEX2gOONDWF_Bbk6fQCkw-1; Thu, 14 Oct 2021 05:46:16 -0400
+X-MC-Unique: mcEX2gOONDWF_Bbk6fQCkw-1
+Received: by mail-ed1-f71.google.com with SMTP id d11-20020a50cd4b000000b003da63711a8aso4640523edj.20
+        for <kvm@vger.kernel.org>; Thu, 14 Oct 2021 02:46:16 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=PylHmPl0SG/ZoxPAA6fPJqlLgNo18jKHe8Um3g+bA5Y=;
+        b=rPPaNTVOvcCxMZVaNc8uyX1EkxKzL/3/ELKvEjW5jgAW+b7VowgDfcLiCQBP4HI8jW
+         EIDRabPcV+CJQThFtKaxDJX2KZNsMgEGEAyj+izCo1uUGk3gW56hEk7guFRG7YidiRjh
+         40t6c6V0/RKGdk3cmAtsCyzFN3UNHpUadTkx2OPjPbZFpZUkdoEXLqKgcVa4eLMEhtYR
+         TPLo33RA5jagGVrefndyhXwwtzfe+9/Ujs4/MhQpQsEKgSOQ53PQYevt12EGdawkJIQj
+         OEBgN6nk6UzRKSHE6XkhGt7X0iI5G938DFQR8vSSFvEmM0efKI7Oe48FoqHz59KSrKQ6
+         Uj9g==
+X-Gm-Message-State: AOAM5309D0L6T5m7psXYbcVb8ctrfpNSiRqdkqrm+dH3jsV+toXes9xR
+        jFVPYX1iCQC3YYwSSon/99jbT01RKHcGB5OMaQiTfnvOocHLuYlIBNtn7OHo/leZuy/jucgy7sh
+        2OHzxd0cDgh9g
+X-Received: by 2002:a17:906:3542:: with SMTP id s2mr2593133eja.379.1634204775414;
+        Thu, 14 Oct 2021 02:46:15 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzOgCLWmlm5MOCVVA6YxDujZIjE3h0etTvc1U7zsLegPhP22dW9U+g1/6pZq5RjKKaGxfKpFA==
+X-Received: by 2002:a17:906:3542:: with SMTP id s2mr2593114eja.379.1634204775260;
+        Thu, 14 Oct 2021 02:46:15 -0700 (PDT)
+Received: from gator.home (cst2-174-28.cust.vodafone.cz. [31.30.174.28])
+        by smtp.gmail.com with ESMTPSA id oz11sm1440208ejc.72.2021.10.14.02.46.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Oct 2021 02:46:14 -0700 (PDT)
+Date:   Thu, 14 Oct 2021 11:46:13 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, will@kernel.org,
+        james.morse@arm.com, alexandru.elisei@arm.com,
+        suzuki.poulose@arm.com, mark.rutland@arm.com, pbonzini@redhat.com,
+        oupton@google.com, qperret@google.com, kernel-team@android.com,
+        tabba@google.com
+Subject: Re: [PATCH v9 17/22] KVM: arm64: pkvm: Handle GICv3 traps as required
+Message-ID: <20211014094613.tnx4xwyqrxj4jmnq@gator.home>
+References: <20211010145636.1950948-12-tabba@google.com>
+ <20211013120346.2926621-1-maz@kernel.org>
+ <20211013120346.2926621-7-maz@kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211013120346.2926621-7-maz@kernel.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-DQoNClJldmlld2VkLWJ5OiBEYW5pZWxlIEFobWVkIDxhaG1lZGRhbkBhbWF6b24uY29tPg0KDQoK
-CgpBbWF6b24gRGV2ZWxvcG1lbnQgQ2VudGVyIEdlcm1hbnkgR21iSApLcmF1c2Vuc3RyLiAzOAox
-MDExNyBCZXJsaW4KR2VzY2hhZWZ0c2Z1ZWhydW5nOiBDaHJpc3RpYW4gU2NobGFlZ2VyLCBKb25h
-dGhhbiBXZWlzcwpFaW5nZXRyYWdlbiBhbSBBbXRzZ2VyaWNodCBDaGFybG90dGVuYnVyZyB1bnRl
-ciBIUkIgMTQ5MTczIEIKU2l0ejogQmVybGluClVzdC1JRDogREUgMjg5IDIzNyA4NzkKCgo=
+On Wed, Oct 13, 2021 at 01:03:41PM +0100, Marc Zyngier wrote:
+> Forward accesses to the ICV_*SGI*_EL1 registers to EL1, and
+> emulate ICV_SRE_EL1 by returning a fixed value.
+> 
+> This should be enough to support GICv3 in a protected guest.
+
+Out of curiosity, has the RVIC work / plans been dropped?
+
+Thanks,
+drew
 
