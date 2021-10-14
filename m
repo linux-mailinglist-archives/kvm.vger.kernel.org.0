@@ -2,155 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F073542D249
-	for <lists+kvm@lfdr.de>; Thu, 14 Oct 2021 08:22:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7C7C142D240
+	for <lists+kvm@lfdr.de>; Thu, 14 Oct 2021 08:22:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229904AbhJNGYm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Oct 2021 02:24:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40556 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229646AbhJNGYj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Oct 2021 02:24:39 -0400
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [IPv6:2404:9400:2:0:216:3eff:fee2:21ea])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23FD5C061570;
-        Wed, 13 Oct 2021 23:22:35 -0700 (PDT)
+        id S229802AbhJNGYk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Oct 2021 02:24:40 -0400
+Received: from gandalf.ozlabs.org ([150.107.74.76]:56251 "EHLO
+        gandalf.ozlabs.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229457AbhJNGYh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Oct 2021 02:24:37 -0400
 Received: by gandalf.ozlabs.org (Postfix, from userid 1007)
-        id 4HVK7r1x5mz4xbY; Thu, 14 Oct 2021 17:22:32 +1100 (AEDT)
+        id 4HVK7r23g8z4xbX; Thu, 14 Oct 2021 17:22:32 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gibson.dropbear.id.au; s=201602; t=1634192552;
-        bh=0uuzJ2RbbBNLtnJGxkiiKbw1slhnlGlCFfoDr9/tkG8=;
+        bh=ZjbiQlJIXJMoYEFn9YS8ZY2I4WMOysFPmdFgHdCC4bk=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ajOeafBBMsDsL8D38GZaOWZA1yfZvnBkUfC8QlOIfR/6BjvGh+7Mp2Zx+FhLuI3Xs
-         1Gq0RGkpfsfxNa3dhwc7gkM2sIjZJnKQ0KVupY2z6tdoBcXbpyzPah4RJ0ehuIKoJn
-         +EWXGJP23F7UEogrsymqzG4hF8yQs38UooYaMgSw=
-Date:   Thu, 14 Oct 2021 15:33:21 +1100
-From:   "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "hch@lst.de" <hch@lst.de>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        "parav@mellanox.com" <parav@mellanox.com>,
-        "lkml@metux.net" <lkml@metux.net>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "lushenming@huawei.com" <lushenming@huawei.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "corbet@lwn.net" <corbet@lwn.net>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "yi.l.liu@linux.intel.com" <yi.l.liu@linux.intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "dwmw2@infradead.org" <dwmw2@infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>
+        b=Bnu5pnv1agQiV9iOQmNVRreuQOZUbrPFJUc9qZoDrD5bci44q3xFm0xecwh6tepQU
+         z0PRsRWB5HYaSr4KQx5u3QLB4/Krs5lFuLYwboFRxudY8MxVGd11wkcFEiYqUYo+gu
+         YyWs+sArvD4TvxUdsbQ4i5V8rGgNNrz1ojnYLPx0=
+Date:   Thu, 14 Oct 2021 15:38:37 +1100
+From:   David Gibson <david@gibson.dropbear.id.au>
+To:     Jean-Philippe Brucker <jean-philippe@linaro.org>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>, Liu Yi L <yi.l.liu@intel.com>,
+        alex.williamson@redhat.com, hch@lst.de, jasowang@redhat.com,
+        joro@8bytes.org, kevin.tian@intel.com, parav@mellanox.com,
+        lkml@metux.net, pbonzini@redhat.com, lushenming@huawei.com,
+        eric.auger@redhat.com, corbet@lwn.net, ashok.raj@intel.com,
+        yi.l.liu@linux.intel.com, jun.j.tian@intel.com, hao.wu@intel.com,
+        dave.jiang@intel.com, jacob.jun.pan@linux.intel.com,
+        kwankhede@nvidia.com, robin.murphy@arm.com, kvm@vger.kernel.org,
+        iommu@lists.linux-foundation.org, dwmw2@infradead.org,
+        linux-kernel@vger.kernel.org, baolu.lu@linux.intel.com,
+        nicolinc@nvidia.com
 Subject: Re: [RFC 11/20] iommu/iommufd: Add IOMMU_IOASID_ALLOC/FREE
-Message-ID: <YWezEY+CJBRY7uLj@yekko>
-References: <20210919063848.1476776-12-yi.l.liu@intel.com>
+Message-ID: <YWe0TXqEm6uWH695@yekko>
+References: <20210919063848.1476776-1-yi.l.liu@intel.com>
+ <20210919063848.1476776-12-yi.l.liu@intel.com>
  <20210921174438.GW327412@nvidia.com>
- <BN9PR11MB543362CEBDAD02DA9F06D8ED8CA29@BN9PR11MB5433.namprd11.prod.outlook.com>
- <20210922140911.GT327412@nvidia.com>
- <YVaoamAaqayk1Hja@yekko>
- <20211001122505.GL964074@nvidia.com>
- <YVfeUkW7PWQeYFJQ@yekko>
- <20211002122542.GW964074@nvidia.com>
- <YWPNoknkNW55KQM4@yekko>
- <20211011171748.GA92207@nvidia.com>
+ <YVanJqG2pt6g+ROL@yekko>
+ <20211001122225.GK964074@nvidia.com>
+ <YWPTWdHhoI4k0Ksc@yekko>
+ <YWP6tblC2+/2RQtN@myrica>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="fwwIMpD4bMVv6jlq"
+        protocol="application/pgp-signature"; boundary="6dLb7we/5OKQdVbz"
 Content-Disposition: inline
-In-Reply-To: <20211011171748.GA92207@nvidia.com>
+In-Reply-To: <YWP6tblC2+/2RQtN@myrica>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---fwwIMpD4bMVv6jlq
+--6dLb7we/5OKQdVbz
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Oct 11, 2021 at 02:17:48PM -0300, Jason Gunthorpe wrote:
-> On Mon, Oct 11, 2021 at 04:37:38PM +1100, david@gibson.dropbear.id.au wro=
-te:
-> > > PASID support will already require that a device can be multi-bound to
-> > > many IOAS's, couldn't PPC do the same with the windows?
+On Mon, Oct 11, 2021 at 09:49:57AM +0100, Jean-Philippe Brucker wrote:
+> On Mon, Oct 11, 2021 at 05:02:01PM +1100, David Gibson wrote:
+> > qemu wants to emulate a PAPR vIOMMU, so it says (via interfaces yet to
+> > be determined) that it needs an IOAS where things can be mapped in the
+> > range 0..2GiB (for the 32-bit window) and 2^59..2^59+1TiB (for the
+> > 64-bit window).
 > >=20
-> > I don't see how that would make sense.  The device has no awareness of
-> > multiple windows the way it does of PASIDs.  It just sends
-> > transactions over the bus with the IOVAs it's told.  If those IOVAs
-> > lie within one of the windows, the IOMMU picks them up and translates
-> > them.  If they don't, it doesn't.
+> > Ideally the host /dev/iommu will say "ok!", since both those ranges
+> > are within the 0..2^60 translated range of the host IOMMU, and don't
+> > touch the IO hole.  When the guest calls the IO mapping hypercalls,
+> > qemu translates those into DMA_MAP operations, and since they're all
+> > within the previously verified windows, they should work fine.
 >=20
-> To my mind that address centric routing is awareness.
+> Seems like we don't need the negotiation part?  The host kernel
+> communicates available IOVA ranges to userspace including holes (patch
+> 17), and userspace can check that the ranges it needs are within the IOVA
+> space boundaries. That part is necessary for DPDK as well since it needs
+> to know about holes in the IOVA space where DMA wouldn't work as expected
+> (MSI doorbells for example). And there already is a negotiation happening,
+> when the host kernel rejects MAP ioctl outside the advertised area.
 
-I don't really understand that position.  A PASID capable device has
-to be built to be PASID capable, and will generally have registers
-into which you store PASIDs to use.
+The problem with the approach where the kernel advertises and
+userspace selects based on that, is that it locks us into a specific
+representation of what's possible.  If we get new hardware with new
+weird constraints that can't be expressed with the representation we
+chose, we're kind of out of stuffed.  Userspace will have to change to
+accomodate the new extension and have any chance of working on the new
+hardware.
 
-Any 64-bit DMA capable device can use the POWER IOMMU just fine - it's
-up to the driver to program it with addresses that will be translated
-(and in Linux the driver will get those from the DMA subsystem).
-
-> If the HW can attach multiple non-overlapping IOAS's to the same
-> device then the HW is routing to the correct IOAS by using the address
-> bits. This is not much different from the prior discussion we had
-> where we were thinking of the PASID as an 80 bit address
-
-Ah... that might be a workable approach.  And it even helps me get my
-head around multiple attachment which I was struggling with before.
-
-So, the rule would be that you can attach multiple IOASes to a device,
-as long as none of them overlap.  The non-overlapping could be because
-each IOAS covers a disjoint address range, or it could be because
-there's some attached information - such as a PASID - to disambiguate.
-
-What remains a question is where the disambiguating information comes
-=66rom in each case: does it come from properties of the IOAS,
-propertues of the device, or from extra parameters supplied at attach
-time.  IIUC, the current draft suggests it always comes at attach time
-for the PASID information.  Obviously the more consistency we can have
-here the better.
-
-
-I can also see an additional problem in implementation, once we start
-looking at hot-adding devices to existing address spaces.  Suppose our
-software (maybe qemu) wants to set up a single DMA view for a bunch of
-devices, that has such a split window.  It can set up IOASes easily
-enough for the two windows, then it needs to attach them.  Presumbly,
-it attaches them one at a time, which means that each device (or
-group) goes through an interim state where it's attached to one, but
-not the other.  That can probably be achieved by using an extra IOMMU
-domain (or the local equivalent) in the hardware for that interim
-state.  However it means we have to repeatedly create and destroy that
-extra domain for each device after the first we add, rather than
-simply adding each device to the domain which has both windows.
-
-[I think this doesn't arise on POWER when running under PowerVM.  That
- has no concept like IOMMU domains, and instead the mapping is always
- done per "partitionable endpoint" (PE), essentially a group.  That
- means it's just a question of whether we mirror mappings on both
- windows into a given PE or just those from one IOAS.  It's not an
- unreasonable extension/combination of existing hardware quirks to
- consider, though]
-
-> The fact the PPC HW actually has multiple page table roots and those
-> roots even have different page tables layouts while still connected to
-> the same device suggests this is not even an unnatural modelling
-> approach...
->=20
-> Jason =20
->=20
->=20
+With the model where userspace requests, and the kernel acks or nacks,
+we can still support existing userspace if the only things it requests
+can still be accomodated in the new constraints.  That's pretty likely
+if the majority of userspaces request very simple things (say a single
+IOVA block where it doesn't care about the base address).
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -158,24 +99,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---fwwIMpD4bMVv6jlq
+--6dLb7we/5OKQdVbz
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAmFnsw8ACgkQbDjKyiDZ
-s5LGWA//UT6CCRBCEjcWZoC6JNlcnPfdnmk/n0SO78Xp3HNDFlS8Tw+wFLyNACbS
-qZKqLiD0g5PjKhwN3QYknqaYzo9dX4yy6VYWyMpcBwz3djrbRoBE7DSX3/u5mt0x
-GVMkXmKpQijPoVWJIX4ggS5ID6UHfeYFThZxHpYFCu0AykTMAVH/cJPRsxBHIkAx
-1cPDVvS+fmd7H5DJ7D0nYlihlsf2xTg+rWhP9U5EXwlEpr1bncYBa1kvKk6FEQH6
-QkTRLPZj5+OdTd8leASuOmBRopk6a11jRiM3CCe5ctOWd2ojYUqt4n707KEoTYA9
-bPck1CQPb+tpnQaSLz6nR+EG4E4si0r+VPdvsVpGEb0kXeDdSYIfoLQRtasa5LIn
-vLcJTjW+dUXXcJOAZ8Wz1sHvXh8YCPYT6NEpbJunjVTqSyUb1MzBd4uHbF4w2r9E
-6ED8DzbuLR/cewlLwfNggIoQxQNtvRCrOSvzvAm8l/CED3T8UfsXhCGzgOVO+Y2y
-PxcT4YqDi5OMHbMyAtEx6hN5qpUtXAz1ld3UcBXKQY5lcoq14SqyWGyKthRwYzuP
-5A5Ip7at8lsj6jw+u7bNTLBfUBdaT4EvkDxWEaXX+aMvTMJ/57gsqgnTG5YGAbCJ
-e4J+N/hNXUourFkWsOfjZlGcNobH0Jo8SpXCE5/EMhkpAvJrQu0=
-=vnWt
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAmFntE0ACgkQbDjKyiDZ
+s5IfiQ//ZhlukeW5UG20W/811MuwXc1bzTOsyL5lBR7JUPze3jwwNHOyDcVvG3bE
+lcVXb6jOX3m4jdp1CARvSYiuLHRHbr3yXhz5e1Kzl8lYrGz2OCK99Aa4IVZsWe0W
+vg8BORYBNzKhtbLXjYyYG00UPYpTqd3fsMc5HZOmhl4KDKFnMhxk093OcveJAyEz
+U7QNQU9t5aCmGYesbGeFpLHjAMUVbxp2fPDmqwazo2BmJX7QMYO7S5/99cwC+uJ2
+huezzVUkGRzRX8M1Vn+7SXX/VEZS+Qxg4hvMtHuyEMpft0ECzF+8RsTY2pX0RkUP
+fox84HDo/JvRQFbP61C3bIz5PIHbZ5/MFpJ2UJ0ispkm/30v0hM4AcKTDYOMy1fi
+pPd3lZoOvTWOfLX5GHYdDAONCt+4vOE868LJHIblRGGmnwZ6Z4M/5oJlgWBSkpzb
+czVxyIPADRLUWtaTkLTuWmhyw6aGWMCmqSWJRQQ2y62vQScLQFEq3ReXpwq/tu4U
+WRczYt41+LxQaRTySLmmNQq08/caNf/z6CpkvmD6Nm69isY1HpJaDyS4oymffvjW
+tgNeITcmxVFvTD4G5qFVar6qZHOlIXYB0PPbOm3z31bxgKGJXvo4CFw5g0KTS2IC
+keIgE7F4OQDg8CVFU4SwJwWMiSCS2cUrqT58Km8XGq2eZxDSwjg=
+=0DMk
 -----END PGP SIGNATURE-----
 
---fwwIMpD4bMVv6jlq--
+--6dLb7we/5OKQdVbz--
