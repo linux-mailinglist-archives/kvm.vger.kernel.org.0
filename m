@@ -2,33 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D8BD42E5F4
-	for <lists+kvm@lfdr.de>; Fri, 15 Oct 2021 03:18:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2AB3B42E5F7
+	for <lists+kvm@lfdr.de>; Fri, 15 Oct 2021 03:18:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231394AbhJOBTZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Oct 2021 21:19:25 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:46584 "EHLO
+        id S234898AbhJOBT2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Oct 2021 21:19:28 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:46590 "EHLO
         galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234898AbhJOBSj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Oct 2021 21:18:39 -0400
-Message-ID: <20211015011539.740012411@linutronix.de>
+        with ESMTP id S234900AbhJOBSk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Oct 2021 21:18:40 -0400
+Message-ID: <20211015011539.792363754@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1634260592;
+        s=2020; t=1634260594;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         references:references; bh=K1kVt48y5cwbSkcpNYxYQMCbOR59BkxrewWCF+G1Xvo=;
-        b=g2CpoeImdKTInzgSVFX8GXWXSh0upwKRKOGP0Uyb/z7q9GJaapEOpWNGJ++VtEFtqNUIrr
-        5Lw1A1XHNo54/secSjRw9PvVkndcn3w0GwLrOYDGlXuP4rB8QCPTnFHFfDNOSGPzWXqisG
-        tv7X/K7uTo+cGgCLb/+Cg4E0080ONqvPq5L5EVguUzn6xZGOojYq+PHzEKzipJ44pWPZJT
-        kxfZhDRv82GUDMeclK/cW4XIB+414ZCzhbyIIlHpC+NQHDiE1aMQuPuW9GOWt7VDtJflQv
-        oncyV3hmwMsYnGwEy/nqpKQ9txioIi7G0fWXHsk+Q3SB7VlfeyPgO6/pEnoFAQ==
+         references:references; bh=naosO9hQ1o99O1ACUu2/9fKYBwND95hze68DMEXuWms=;
+        b=fNam2hCirHA1yhViuZ6D7YsmS6ZY5LGS/eDPXatTdZ6bX18PAF6QRteae6QVhugkadgKAP
+        D+zOpXkeUlqFxOIEafQzdwPCGR4cdMx8sGmlRnC/+Bw0tJMFLPJrbQnkteGbPVT5s+prt2
+        DVRxC64nIGHn/iKc82Gpz4EYHfCSFgZYCWZqYINSdKByRsEQPWyD8dkywUeq3d0MJ81r+1
+        8dQBKdfitS9eFb6Ar67/AVS2whygkR2ndo3iXbWdVVftOxRs30dmLMY4miKo6dK8cd30Ox
+        MPUM2B8KQAwBAdI4jL+VCXS4TSNhXb67EBA/EWJQP3owGTy8gvLNkvZKw/rPaw==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1634260592;
+        s=2020e; t=1634260594;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         references:references; bh=K1kVt48y5cwbSkcpNYxYQMCbOR59BkxrewWCF+G1Xvo=;
-        b=5bNYA6weSFa+S84SalQOf+L8nvkJkmZkhPo5mz5b+vNaM9EfvXeujcMcccWGnVQdx2ZzrV
-        9l/zWCZ34dUy1mCg==
+         references:references; bh=naosO9hQ1o99O1ACUu2/9fKYBwND95hze68DMEXuWms=;
+        b=RGUhHCaqqM5uU3xWk+CYjmkQaIddYbUphS+AXwTiNK0r6J1J371dlgdVb9Mfyjgoz8v4iS
+        kvj3Md9ckwDtuiBw==
 From:   Thomas Gleixner <tglx@linutronix.de>
 To:     LKML <linux-kernel@vger.kernel.org>
 Cc:     x86@kernel.org, "Chang S. Bae" <chang.seok.bae@intel.com>,
@@ -38,121 +38,91 @@ Cc:     x86@kernel.org, "Chang S. Bae" <chang.seok.bae@intel.com>,
         "Liu, Jing2" <jing2.liu@intel.com>,
         Sean Christopherson <seanjc@google.com>,
         Xiaoyao Li <xiaoyao.li@intel.com>
-Subject: [patch V2 24/30] x86/fpu: Move mxcsr related code to core
+Subject: [patch V2 25/30] x86/fpu: Move fpstate functions to api.h
 References: <20211015011411.304289784@linutronix.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Date:   Fri, 15 Oct 2021 03:16:31 +0200 (CEST)
+Date:   Fri, 15 Oct 2021 03:16:33 +0200 (CEST)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-No need to expose that to code which only needs the XCR0 accessors.
+Move function declarations which need to be globally available to api.h
+where they belong.
 
 Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
-
 ---
- arch/x86/include/asm/fpu/xcr.h | 11 -----------
- arch/x86/kernel/fpu/init.c     |  1 +
- arch/x86/kernel/fpu/legacy.h   |  7 +++++++
- arch/x86/kernel/fpu/regset.c   |  1 +
- arch/x86/kernel/fpu/xstate.c   |  3 ++-
- arch/x86/kvm/svm/sev.c         |  2 +-
- 6 files changed, 12 insertions(+), 13 deletions(-)
+V2: Fix changelog typo - Boris
 ---
-diff --git a/arch/x86/include/asm/fpu/xcr.h b/arch/x86/include/asm/fpu/xcr.h
-index 1c7ab8d95da5..79f95d3787e2 100644
---- a/arch/x86/include/asm/fpu/xcr.h
-+++ b/arch/x86/include/asm/fpu/xcr.h
-@@ -2,17 +2,6 @@
- #ifndef _ASM_X86_FPU_XCR_H
- #define _ASM_X86_FPU_XCR_H
+ arch/x86/include/asm/fpu/api.h      |  9 +++++++++
+ arch/x86/include/asm/fpu/internal.h |  9 ---------
+ arch/x86/kernel/fpu/internal.h      |  3 +++
+ arch/x86/math-emu/fpu_entry.c       |  2 +-
+ 4 files changed, 13 insertions(+), 10 deletions(-)
+---
+diff --git a/arch/x86/include/asm/fpu/api.h b/arch/x86/include/asm/fpu/api.h
+index c6f3d1add32f..ed0e2baa3f4b 100644
+--- a/arch/x86/include/asm/fpu/api.h
++++ b/arch/x86/include/asm/fpu/api.h
+@@ -110,6 +110,15 @@ extern int cpu_has_xfeatures(u64 xfeatures_mask, const char **feature_name);
  
--/*
-- * MXCSR and XCR definitions:
-- */
--
--static inline void ldmxcsr(u32 mxcsr)
--{
--	asm volatile("ldmxcsr %0" :: "m" (mxcsr));
--}
--
--extern unsigned int mxcsr_feature_mask;
--
- #define XCR_XFEATURE_ENABLED_MASK	0x00000000
+ static inline void update_pasid(void) { }
  
- static inline u64 xgetbv(u32 index)
-diff --git a/arch/x86/kernel/fpu/init.c b/arch/x86/kernel/fpu/init.c
-index 24873dfe2dba..e77084a6ae7c 100644
---- a/arch/x86/kernel/fpu/init.c
-+++ b/arch/x86/kernel/fpu/init.c
-@@ -11,6 +11,7 @@
- #include <linux/init.h>
- 
- #include "internal.h"
-+#include "legacy.h"
- 
- /*
-  * Initialize the registers found in all CPUs, CR0 and CR4:
-diff --git a/arch/x86/kernel/fpu/legacy.h b/arch/x86/kernel/fpu/legacy.h
-index 2ff36b0f79e9..17c26b164c63 100644
---- a/arch/x86/kernel/fpu/legacy.h
-+++ b/arch/x86/kernel/fpu/legacy.h
-@@ -4,6 +4,13 @@
- 
- #include <asm/fpu/types.h>
- 
-+extern unsigned int mxcsr_feature_mask;
++#ifdef CONFIG_MATH_EMULATION
++extern void fpstate_init_soft(struct swregs_state *soft);
++#else
++static inline void fpstate_init_soft(struct swregs_state *soft) {}
++#endif
 +
-+static inline void ldmxcsr(u32 mxcsr)
-+{
-+	asm volatile("ldmxcsr %0" :: "m" (mxcsr));
-+}
++/* fpstate */
++extern union fpregs_state init_fpstate;
 +
- /*
-  * Returns 0 on success or the trap number when the operation raises an
-  * exception.
-diff --git a/arch/x86/kernel/fpu/regset.c b/arch/x86/kernel/fpu/regset.c
-index a40150e350b6..3d8ed45da166 100644
---- a/arch/x86/kernel/fpu/regset.c
-+++ b/arch/x86/kernel/fpu/regset.c
-@@ -12,6 +12,7 @@
+ /* fpstate-related functions which are exported to KVM */
+ extern void fpu_init_fpstate_user(struct fpu *fpu);
  
- #include "context.h"
- #include "internal.h"
-+#include "legacy.h"
+diff --git a/arch/x86/include/asm/fpu/internal.h b/arch/x86/include/asm/fpu/internal.h
+index 74b7cc3d2e77..d8bb49134ebb 100644
+--- a/arch/x86/include/asm/fpu/internal.h
++++ b/arch/x86/include/asm/fpu/internal.h
+@@ -42,15 +42,6 @@ extern void fpu__init_system(struct cpuinfo_x86 *c);
+ extern void fpu__init_check_bugs(void);
+ extern void fpu__resume_cpu(void);
  
- /*
-  * The xstateregs_active() routine is the same as the regset_fpregs_active() routine,
-diff --git a/arch/x86/kernel/fpu/xstate.c b/arch/x86/kernel/fpu/xstate.c
-index 246a7fea06b1..f0305b2b227f 100644
---- a/arch/x86/kernel/fpu/xstate.c
-+++ b/arch/x86/kernel/fpu/xstate.c
-@@ -14,8 +14,9 @@
+-extern union fpregs_state init_fpstate;
+-extern void fpstate_init_user(union fpregs_state *state);
+-
+-#ifdef CONFIG_MATH_EMULATION
+-extern void fpstate_init_soft(struct swregs_state *soft);
+-#else
+-static inline void fpstate_init_soft(struct swregs_state *soft) {}
+-#endif
+-
+ extern void restore_fpregs_from_fpstate(union fpregs_state *fpstate, u64 mask);
  
- #include <asm/fpu/api.h>
- #include <asm/fpu/internal.h>
--#include <asm/fpu/signal.h>
- #include <asm/fpu/regset.h>
-+#include <asm/fpu/signal.h>
-+#include <asm/fpu/xcr.h>
+ extern bool copy_fpstate_to_sigframe(void __user *buf, void __user *fp, int size);
+diff --git a/arch/x86/kernel/fpu/internal.h b/arch/x86/kernel/fpu/internal.h
+index 5ddc09e03c2a..bd7f813242dd 100644
+--- a/arch/x86/kernel/fpu/internal.h
++++ b/arch/x86/kernel/fpu/internal.h
+@@ -22,4 +22,7 @@ static __always_inline __pure bool use_fxsr(void)
+ /* Init functions */
+ extern void fpu__init_prepare_fx_sw_frame(void);
  
- #include <asm/tlbflush.h>
- 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 75e0b21ad07c..e153f3907507 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -17,10 +17,10 @@
- #include <linux/misc_cgroup.h>
- #include <linux/processor.h>
- #include <linux/trace_events.h>
++/* Used in init.c */
++extern void fpstate_init_user(union fpregs_state *state);
++
+ #endif
+diff --git a/arch/x86/math-emu/fpu_entry.c b/arch/x86/math-emu/fpu_entry.c
+index 8679a9d6c47f..50195e249753 100644
+--- a/arch/x86/math-emu/fpu_entry.c
++++ b/arch/x86/math-emu/fpu_entry.c
+@@ -31,7 +31,7 @@
+ #include <linux/uaccess.h>
+ #include <asm/traps.h>
+ #include <asm/user.h>
 -#include <asm/fpu/internal.h>
++#include <asm/fpu/api.h>
  
- #include <asm/pkru.h>
- #include <asm/trapnr.h>
-+#include <asm/fpu/xcr.h>
- 
- #include "x86.h"
- #include "svm.h"
+ #include "fpu_system.h"
+ #include "fpu_emu.h"
 
