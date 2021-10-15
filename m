@@ -2,109 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 85A7442FA3D
-	for <lists+kvm@lfdr.de>; Fri, 15 Oct 2021 19:28:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C698D42FA57
+	for <lists+kvm@lfdr.de>; Fri, 15 Oct 2021 19:34:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234748AbhJORaZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Oct 2021 13:30:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41594 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234680AbhJORaW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Oct 2021 13:30:22 -0400
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70C9DC061764
-        for <kvm@vger.kernel.org>; Fri, 15 Oct 2021 10:28:14 -0700 (PDT)
-Received: by mail-pj1-x102f.google.com with SMTP id ls18-20020a17090b351200b001a00250584aso9805065pjb.4
-        for <kvm@vger.kernel.org>; Fri, 15 Oct 2021 10:28:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=DP6t/NXe90slXcP72oHx/RcWeNEoJHh1SU/+94tdSzU=;
-        b=Rsq3M9IMqXWvFbQX4QPOwwS2GyHkNiaDKcXMCoIIDcUpfFRjPkpPagnj8H7RM71dvS
-         B/WyJMpAXqYJH0QspZ4spN/eMlP660dhZXJZ82wIznR4E3UHwWn3BGv8zj2ShH9v+Jvx
-         nA4HntP1f2Q6X4bvioWI/O++E9+cdXbpdf17ocQHFXttf0HMB7mB71nWHMuCnjZj/snR
-         ObWYV+kfnUlM9Pja8m3xvmkxYfK0Agb+IHxkN8iU/4aHnZWYTP1DiN6Cx7R6cmtMIior
-         2rv8DMeqhKfApBP2mzIqzyj/7m9yPudqNWIsRQ5wSm5w3a7oss+jdvkN4sSzn/++bMmq
-         EwgA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=DP6t/NXe90slXcP72oHx/RcWeNEoJHh1SU/+94tdSzU=;
-        b=5DwjuiPC+SqTA3uBnbOWku/DfBKJJ/p2cI5KnwsVibAtOy8U90YCjpPrdUJKoEAKOZ
-         iwAHJAIpVBta+2iTFr60QgaNmtGHgfHZRA7Jxl3CQSLjWvQt2yMlH9KhiW6Yq0rWEUlX
-         5kBHOivSMOOuggao28AMyppLpEOEtgMcnOSaIRxk5vPKVnXXhgTV6dp/HdrC9D9GZcmS
-         wQZ2LJQEMHXfX6T1d+hzSFvSMuimZGe9uWDP1smiqmmQV96Sjrw+HzLBkA0firVh+WG3
-         mBQumppk7u2hZ1llHELGpprlk0oNfZ0zkTsi6W8ZI7Ys0hhpR2F+///fTJtLKaP/o2Rp
-         YKHw==
-X-Gm-Message-State: AOAM532wWNGJbTBTIn7Azjx8HKYFJUBmm6unZ5MSvEg9OpzZnzV0QZST
-        fQI9K0NzX5oggFS//WrSoqhUfQ==
-X-Google-Smtp-Source: ABdhPJzzdKd8TVQsTd0uv0BYhv6ultDEDftxJbAg01g5dSdgsQ5uIIUiG18b1X8cn3FJ4SWeSN+roA==
-X-Received: by 2002:a17:902:9a83:b0:13e:5b1e:aa40 with SMTP id w3-20020a1709029a8300b0013e5b1eaa40mr12278810plp.41.1634318893792;
-        Fri, 15 Oct 2021 10:28:13 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id p18sm5107067pgk.28.2021.10.15.10.28.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Oct 2021 10:28:13 -0700 (PDT)
-Date:   Fri, 15 Oct 2021 17:28:09 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        syzbot+e0de2333cbf95ea473e8@syzkaller.appspotmail.com
-Subject: Re: [PATCH] KVM: replace large kvmalloc allocation with vmalloc
-Message-ID: <YWm6KcNvaHDMhfsG@google.com>
-References: <20211015165519.135670-1-pbonzini@redhat.com>
+        id S238017AbhJORhB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Oct 2021 13:37:01 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:33441 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S237952AbhJORhA (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 15 Oct 2021 13:37:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1634319293;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=euq4VRje+bc25YaKTdy9SOHAdj/WCUtkFXn5dQ91v3U=;
+        b=bW5LMDavjvT2KyTAyBVDpRyyjeO5Z3MvLeoW/hrtqP9OSB4mYd7sykKqUON/tiEM5CJjgZ
+        UMM/U0I7OgjZvanRxbsZddiyCQC/u8FWSLAc+dpJQBpwarcQFIvjuS8+c8SF8I4Sn1Qjqa
+        j4gQjGVph7oNKi/0tHVkU45s10LQBLs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-480-wcyL3WIvPWqzIe-gKNhHBQ-1; Fri, 15 Oct 2021 13:34:49 -0400
+X-MC-Unique: wcyL3WIvPWqzIe-gKNhHBQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ABF1418414A1;
+        Fri, 15 Oct 2021 17:34:48 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 55A725DA61;
+        Fri, 15 Oct 2021 17:34:48 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Peter Gonda <pgonda@google.com>
+Subject: [PATCH] KVM: SEV-ES: Set guest_state_protected after VMSA update
+Date:   Fri, 15 Oct 2021 13:34:48 -0400
+Message-Id: <20211015173448.144114-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211015165519.135670-1-pbonzini@redhat.com>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 15, 2021, Paolo Bonzini wrote:
-> diff --git a/arch/x86/kvm/mmu/page_track.c b/arch/x86/kvm/mmu/page_track.c
-> index 21427e84a82e..0d9842472288 100644
-> --- a/arch/x86/kvm/mmu/page_track.c
-> +++ b/arch/x86/kvm/mmu/page_track.c
-> @@ -36,8 +36,7 @@ int kvm_page_track_create_memslot(struct kvm_memory_slot *slot,
->  
->  	for (i = 0; i < KVM_PAGE_TRACK_MAX; i++) {
->  		slot->arch.gfn_track[i] =
-> -			kvcalloc(npages, sizeof(*slot->arch.gfn_track[i]),
-> -				 GFP_KERNEL_ACCOUNT);
-> +			vcalloc(npages, sizeof(*slot->arch.gfn_track[i]));
+From: Peter Gonda <pgonda@google.com>
 
-This loses the memcg accounting, which is somewhat important for the theoretical
-4MiB allocations :-)
+The refactoring in commit bb18a6777465 ("KVM: SEV: Acquire
+vcpu mutex when updating VMSA") left behind the assignment to
+svm->vcpu.arch.guest_state_protected; add it back.
 
-Maybe split out the introduction of vcalloc() to a separate patch (or two) and
-introduce additional helpers to allow passing in gfp_t to e.g. __vzalloc()?
+Signed-off-by: Peter Gonda <pgonda@google.com>
+[Delta between v2 and v3 of Peter's patch, which had already been
+ committed; the commit message is my own. - Paolo]
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/x86/kvm/svm/sev.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
->  		if (!slot->arch.gfn_track[i])
->  			goto track_free;
->  	}
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index aabd3a2ec1bc..07f5760ea30c 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -11394,7 +11394,7 @@ static int memslot_rmap_alloc(struct kvm_memory_slot *slot,
->  
->  		WARN_ON(slot->arch.rmap[i]);
->  
-> -		slot->arch.rmap[i] = kvcalloc(lpages, sz, GFP_KERNEL_ACCOUNT);
-> +		slot->arch.rmap[i] = vcalloc(lpages, sz);
->  		if (!slot->arch.rmap[i]) {
->  			memslot_rmap_free(slot);
->  			return -ENOMEM;
-> @@ -11475,7 +11475,7 @@ static int kvm_alloc_memslot_metadata(struct kvm *kvm,
->  
->  		lpages = __kvm_mmu_slot_lpages(slot, npages, level);
->  
-> -		linfo = kvcalloc(lpages, sizeof(*linfo), GFP_KERNEL_ACCOUNT);
-> +		linfo = vcalloc(lpages, sizeof(*linfo));
->  		if (!linfo)
->  			goto out_free;
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index e672493b5d8d..0d21d59936e5 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -618,7 +618,12 @@ static int __sev_launch_update_vmsa(struct kvm *kvm, struct kvm_vcpu *vcpu,
+ 	vmsa.handle = to_kvm_svm(kvm)->sev_info.handle;
+ 	vmsa.address = __sme_pa(svm->vmsa);
+ 	vmsa.len = PAGE_SIZE;
+-	return sev_issue_cmd(kvm, SEV_CMD_LAUNCH_UPDATE_VMSA, &vmsa, error);
++	ret = sev_issue_cmd(kvm, SEV_CMD_LAUNCH_UPDATE_VMSA, &vmsa, error);
++	if (ret)
++	  return ret;
++
++	vcpu->arch.guest_state_protected = true;
++	return 0;
+ }
+ 
+ static int sev_launch_update_vmsa(struct kvm *kvm, struct kvm_sev_cmd *argp)
+-- 
+2.27.0
 
-All of the associated free paths should be converted to vfree().
