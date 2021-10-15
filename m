@@ -2,148 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0C86C42EDCA
-	for <lists+kvm@lfdr.de>; Fri, 15 Oct 2021 11:36:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0953042EE22
+	for <lists+kvm@lfdr.de>; Fri, 15 Oct 2021 11:49:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237475AbhJOJie (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Oct 2021 05:38:34 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:48800 "EHLO
-        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236690AbhJOJic (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Oct 2021 05:38:32 -0400
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1634290585;
+        id S232557AbhJOJvM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Oct 2021 05:51:12 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50419 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230080AbhJOJvL (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 15 Oct 2021 05:51:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1634291345;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=qMD82jDLRghwt3jUSaceVpHhA/FFqOYNqRPnvzBrsR0=;
-        b=kdiS5uUNNb8ErRkx2YhowReaY5Jp8AFcpGiQnPNF8HccAObqB7VCQE6/lFH+0Egnhn4cVJ
-        3KuuY+YGtm7LURfj6QEVDA2prln1fjXD6Wqs6T6/roFhR9ipLXqbUjR4nxrYBIB72RRBCU
-        GL7uTzEa1vWgaOmPqsvqXw0wEnTMUqYYxh1EoV2hbOjy7s7hTTPYGmjWkhRezP0kbmbSms
-        JzVWmATTUc1TcLssZIGwkoYg5K9eEX8UQClQn6RhgxOLat5Mq3KjRPsnQFMqtB+ubcqXzE
-        GQRjEDbPAYKA8jk1b3CQDJfnS9+BWW2hXrMbAjOeN65puzY9PIS6kTCF9NTa5Q==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1634290585;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=qMD82jDLRghwt3jUSaceVpHhA/FFqOYNqRPnvzBrsR0=;
-        b=jiZNgPmBgqXDEeIgVyWjulnz0GG8uTrrHzpws/Cp0A+R+UbmdoMtf/pkEEGC3bRfOvLnh0
-        FKAGiFL1KEGM+2Bg==
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        "Liu, Jing2" <jing2.liu@intel.com>,
-        LKML <linux-kernel@vger.kernel.org>
-Cc:     "x86@kernel.org" <x86@kernel.org>,
-        "Bae, Chang Seok" <chang.seok.bae@intel.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Arjan van de Ven <arjan@linux.intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Nakajima, Jun" <jun.nakajima@intel.com>,
-        Jing Liu <jing2.liu@linux.intel.com>,
-        "seanjc@google.com" <seanjc@google.com>,
-        "Cooper, Andrew" <andrew.cooper3@citrix.com>
-Subject: Re: [patch 13/31] x86/fpu: Move KVMs FPU swapping to FPU core
-In-Reply-To: <87lf2v5shb.ffs@tglx>
-References: <871r4p9fyh.ffs@tglx>
- <ec9c761d-4b5c-71e2-c1fc-d256b6b78c04@redhat.com>
- <BL0PR11MB3252511FC48E43484DE79A3CA9B89@BL0PR11MB3252.namprd11.prod.outlook.com>
- <6bbc5184-a675-1937-eb98-639906a9cf15@redhat.com> <87wnmf66m5.ffs@tglx>
- <3997787e-402d-4b2b-0f90-4a672c77703f@redhat.com> <87lf2v5shb.ffs@tglx>
-Date:   Fri, 15 Oct 2021 11:36:25 +0200
-Message-ID: <87a6ja6352.ffs@tglx>
+        bh=TSbEB3BwDLmVM1HNWqG2yqBKy93uV1whZ1iCqAbBG74=;
+        b=OioLzsLrcgrvP2xvbyPotSpHDR5+WAjBIMwOpaLekDfN6NGtYXYSF6cCGIiFGZnT7KoO2D
+        1mD+hRmbNKf5bU6jdgKVrYyxPSRF8N216cJjqcssX+OZ0+dX3/vyIOQ1gb+SKB17Iq6NSb
+        8DmaFxS1lafCAfmzyqUHs9yI5gMznyg=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-587-ep2Us_0XPxa824MJQAmHdg-1; Fri, 15 Oct 2021 05:49:03 -0400
+X-MC-Unique: ep2Us_0XPxa824MJQAmHdg-1
+Received: by mail-wr1-f72.google.com with SMTP id d13-20020adf9b8d000000b00160a94c235aso5762608wrc.2
+        for <kvm@vger.kernel.org>; Fri, 15 Oct 2021 02:49:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=TSbEB3BwDLmVM1HNWqG2yqBKy93uV1whZ1iCqAbBG74=;
+        b=BOlhbCDyHaN0DzF6ULrV4m8wOFtnj5FzTyK91IBweG44xkvB5M0fffkuXyx2tNQ9n/
+         aCCDN5p1dBlZrbh54pywOpefMnGVT1Cv+P7/LdoAxbh0d7AMLAFCH3GxY0M5JzFepM9k
+         jTDzwDn7diVqIVzxVgoYzug9a9QhVU+UCXWWWMa6NBmeizZRpXxFvdYmBx2cydcqIUAC
+         EyhBIFBKihYeVRkARMt2AkVRQmPOTY6IT/g4JLUpKUJkTm7JVfSOphNAT1NNg/nrImZ8
+         A5E7E+GeybicjZ/xb/HfonAl41wqlY0JHDZS2AMm9KPblVMbXvND7r288o/HTmgm71jG
+         eACg==
+X-Gm-Message-State: AOAM533Msqad6L/x/ON3HRL5xcVABNGjd4PLlosQSTO8Vxji0CTQ689w
+        YRYy3Daph70/cpwPvo1o2KP5bHracuxrdC6B2GbYHrK9LugFY90hdW134rixo+ZbQ61+q8QEA0l
+        EHucwWD/jey5M
+X-Received: by 2002:a05:600c:19cd:: with SMTP id u13mr24821932wmq.148.1634291342646;
+        Fri, 15 Oct 2021 02:49:02 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz/ogUflpwRDRS8wet8Xt6zPTdVYv1xkvcDCuaGAdghDK+81/p8M1BGu38LZ6JUi9aJYEj8Iw==
+X-Received: by 2002:a05:600c:19cd:: with SMTP id u13mr24821913wmq.148.1634291342470;
+        Fri, 15 Oct 2021 02:49:02 -0700 (PDT)
+Received: from gator (nat-pool-brq-u.redhat.com. [213.175.37.12])
+        by smtp.gmail.com with ESMTPSA id a127sm9710231wme.40.2021.10.15.02.49.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 15 Oct 2021 02:49:02 -0700 (PDT)
+Date:   Fri, 15 Oct 2021 11:49:00 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        Will Deacon <will@kernel.org>, kernel-team@android.com
+Subject: Re: [PATCH 0/5] KVM: arm64: Reorganise vcpu first run
+Message-ID: <20211015094900.pl2gyysitpnszojy@gator>
+References: <20211015090822.2994920-1-maz@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211015090822.2994920-1-maz@kernel.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo,
+On Fri, Oct 15, 2021 at 10:08:17AM +0100, Marc Zyngier wrote:
+> KVM/arm64 relies heavily on a bunch of things to be done on the first
+> run of the vcpu. We also do a bunch of things on PID change. It turns
+> out that these two things are pretty similar (the first PID change is
+> also the first run).
+> 
+> This small series aims at simplifying all that, and to get rid of the
+> vcpu->arch.has_run_once state.
+> 
+> Marc Zyngier (5):
+>   KVM: arm64: Move SVE state mapping at HYP to finalize-time
+>   KVM: arm64: Move kvm_arch_vcpu_run_pid_change() out of line
+>   KVM: arm64: Merge kvm_arch_vcpu_run_pid_change() and
+>     kvm_vcpu_first_run_init()
+>   KVM: arm64: Restructure the point where has_run_once is advertised
 
-On Thu, Oct 14 2021 at 21:14, Thomas Gleixner wrote:
-> On Thu, Oct 14 2021 at 17:01, Paolo Bonzini wrote:
->>> vcpu_create()
->>> 
->>>    fpu_init_fpstate_user(guest_fpu, supported_xcr0)
->>> 
->>> That will (it does not today) do:
->>> 
->>>       guest_fpu::__state_perm = supported_xcr0 & xstate_get_group_perm();
->>> 
->>> The you have the information you need right in the guest FPU.
->>
->> Good, I wasn't aware of the APIs that will be there.
+Maybe do the restructuring before the merging in order to avoid the
+potential for bizarre states?
+
+>   KVM: arm64: Drop vcpu->arch.has_run_once for vcpu->pid
+> 
+>  arch/arm64/include/asm/kvm_host.h | 12 +++------
+>  arch/arm64/kvm/arm.c              | 43 ++++++++++++++++++-------------
+>  arch/arm64/kvm/fpsimd.c           | 11 --------
+>  arch/arm64/kvm/reset.c            | 11 +++++++-
+>  arch/arm64/kvm/vgic/vgic-init.c   |  2 +-
+>  5 files changed, 39 insertions(+), 40 deletions(-)
+> 
+> -- 
+> 2.30.2
+> 
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
 >
-> Me neither, but that's a pretty obvious consequence of the work I'm
-> doing for AMX. So I made it up for you. :)
 
-let me make some more up for you!
+For the series
 
-If you carefully look at part 2 of the rework, then you might notice
-that there is a fundamental change which allows to do a real
-simplification for KVM FPU handling:
-
-   current->thread.fpu.fpstate
-
-is now a pointer. So you can spare one FPU allocation because we can now
-do:
-
-fpu_attach_guest_fpu(supported_xcr0)
-{
-        guest_fpstate = alloc_fpstate(supported_xcr0);
-        fpu_init_fpstate_user(guest_fpstate, supported_xcr0);
-        current->thread.fpu.guest_fpstate = guest_fpstate;
-}
-
-fpu_swap_kvm_fpu() becomes in the first step:
-
-fpu_swap_kvm_fpu(bool enter_guest)
-{
-        safe_fpregs_to_fpstate(current->thread.fpu.fpstate);
-
-        swap(current->thread.fpu.fpstate, current->thread.fpu.guest_fpstate);
-
-        restore_fpregs_from_fpstate(current->thread.fpu.fpstate);
-}
-
-@enter guest will allow to do some sanity checks
-
-In a second step:
-
-fpu_swap_kvm_fpu(bool enter_guest, u64 guest_needs_features)
-{
-        possibly_reallocate(enter_guest, guest_needs_features);
-        safe_fpregs_to_fpstate(current->thread.fpu.fpstate);
-
-        swap(current->thread.fpu.fpstate, current->thread.fpu.guest_fpstate);
-
-        restore_fpregs_from_fpstate(current->thread.fpu.fpstate);
-        possibly_reallocate(enter_guest, guest_needs_features);
-}
-
-@guest_needs_features is the information which you gather via guest XCR0
-and guest XFD.
-
-So fpu_swap_kvm_fpu() is going to be the place where reallocation happens
-and that's good enough for both cases:
-
-vcpu_run()
-
-     fpu_swap_kvm_fpu(); <- 1
-
-     while (...)
-           vmenter();
-
-     fpu_swap_kvm_fpu(); <- 2
-
-#1 QEMU user space used feature and has already large fpstate
-
-#2 Guest requires feature but has not used it yet (XCR0/XFD trapping)
-
-See?
-
-It's not only correct, it's also simple and truly beautiful.
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 
 Thanks,
+drew
 
-        tglx
