@@ -2,162 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 433E442F6FD
-	for <lists+kvm@lfdr.de>; Fri, 15 Oct 2021 17:24:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 14C3842F76D
+	for <lists+kvm@lfdr.de>; Fri, 15 Oct 2021 17:53:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240952AbhJOP0k (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Oct 2021 11:26:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40514 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233156AbhJOP0j (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Oct 2021 11:26:39 -0400
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7546BC061762
-        for <kvm@vger.kernel.org>; Fri, 15 Oct 2021 08:24:33 -0700 (PDT)
-Received: by mail-pj1-x1034.google.com with SMTP id q10-20020a17090a1b0a00b001a076a59640so7505290pjq.0
-        for <kvm@vger.kernel.org>; Fri, 15 Oct 2021 08:24:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=2el1wBIdx4TGzNhRzDaHytILcWWNyw9UG65A/X8JUoo=;
-        b=LQOmtUysXNdUFpPqglFGKKKwQob2Rat45tHAcSJKy0TLMsP9H8XRmO6T21biFNGGqM
-         a5BFGyuHTLifN8s0J4bSUK4avhEzf6rhR80ETykDpNi33QwXENV3lV2l60FvoflpDLj8
-         vHu36ZXSH+tU+G+ecbghNbeaCKd+dKNLpbdZ+qKtOTe0qHRHHWSIwmuKw8vQCJLFxTL9
-         9exyCrGWss+LKmVNWf6KV91JZIi8MQXdIzwsWwc9EAf18jvtRs2K5fs1Dt+3rj6JQ1vB
-         31jOeUdbkMlThbKRXipy4RJ3RFLWwITGDXo9h52JLZXJpzo/jg4Ry82ouEHQ4tDVFA9c
-         2D3Q==
+        id S241067AbhJOP4A (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Oct 2021 11:56:00 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40962 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S241061AbhJOPz7 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 15 Oct 2021 11:55:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1634313232;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=L1ebZTRDtvYaS1oh3yKgiezKno+o3JSTu41X1RB0t/A=;
+        b=cu7BI9A5vWyZRjdJASq863DU8d79ttspJP1n36PLI/QQ3jI0vyN4NBPMyDp17yDN1x7y1h
+        fr3+eAjbLBzk9x998o9yguUYV1tcD6WpLiKpnGfEO4dOS3SlJXal0pNg5VoiG/Ed3h/7tM
+        7nLDWOkpNkPmn0+olgo+lQijBMVgpm8=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-179-EkqPMo9JNBGgY4qIbbkwlQ-1; Fri, 15 Oct 2021 11:53:51 -0400
+X-MC-Unique: EkqPMo9JNBGgY4qIbbkwlQ-1
+Received: by mail-ed1-f71.google.com with SMTP id u23-20020a50a417000000b003db23c7e5e2so8647046edb.8
+        for <kvm@vger.kernel.org>; Fri, 15 Oct 2021 08:53:50 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=2el1wBIdx4TGzNhRzDaHytILcWWNyw9UG65A/X8JUoo=;
-        b=10yUP7TXJ+Uc/o2xxJVSzESuU72OWjcIPn15KTxKvlfX3NKRreYv9cRnHQX3yOnPcj
-         ctRj8KmFf1gOOz6kLx3Xzh2xYWBt5TkFaaPIy0o/20GBeVSc2M4ffy3c3hFBf/8ACUgF
-         HxOTIbT8uQr9JGCcXjFE9k/dyOXFhpqirskld+EuEfvOVb2cBP99wbahMYe9e/eQRNSo
-         qFnN3UZsbKrQ2Ref+9/IX1VEYM2wybH7Obn51Ywhe2wQrGl1AF38bemN93OhQCOIIXgK
-         DQGAnMddyg/UqWqtM8k03on/8dQ9JZgnVQPjynNp5WQXEfFAWLoo1GvjxFc8HwKSJsTQ
-         iVLw==
-X-Gm-Message-State: AOAM531QRdVO0wauF7C6e1W7XMaea4Y76SI7xsrW1zYqBVMGTLvBUuwo
-        K8cp40V6/4hYVA4uLLYSHIt9yg==
-X-Google-Smtp-Source: ABdhPJwDCyeHqh5AWou0vyYclGHKCsH03HM8KWthWDRZEkbLQMPNiHKRLeJR+JBGwagC3Z5W3mszlQ==
-X-Received: by 2002:a17:90a:b706:: with SMTP id l6mr28465203pjr.200.1634311472685;
-        Fri, 15 Oct 2021 08:24:32 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id x7sm5292267pfj.28.2021.10.15.08.24.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Oct 2021 08:24:32 -0700 (PDT)
-Date:   Fri, 15 Oct 2021 15:24:28 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        David Matlack <dmatlack@google.com>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH RFC] KVM: SVM: reduce guest MAXPHYADDR by one in case
- C-bit is a physical bit
-Message-ID: <YWmdLPsa6qccxtEa@google.com>
-References: <20211015150524.2030966-1-vkuznets@redhat.com>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=L1ebZTRDtvYaS1oh3yKgiezKno+o3JSTu41X1RB0t/A=;
+        b=B46HopFvVTY2SPqN4Tu06RM3bjF7KzL+ReR4Qz8kq4AJmpHgYI5SDAi1B/QBasW/uQ
+         OP4TMTZoemvywEwzjqVsOAYBQFQRwNC8gaCcxSiPfDNZ3BMa8TGmI8xk6eXkBlYPWCmH
+         EvKRIK47QXT53KrAd2oY3t3yfDKiaeWBP1qplhYts3xHMi3vikdfNzc/Ch+Wh57djU4e
+         4+OAlcPj92Vo5/hWaydQduDHl8jEdVp4PqIj2ZRaWW8noCnt3L65OSFfXlazs3Aiaj5O
+         Wj4C/aXCTF1XsxJctZTkzWK2n9ctdatQfGwkrE8iWlfvbab78jvdzgkEvRdUfGsHtM8L
+         eJaw==
+X-Gm-Message-State: AOAM531gBIvDkxxRz2Rq/t5jL7917dOvXyAng8lQJgBfu1fUhXdDVe2H
+        K/tk2/oNLnBUfkRAKmpMXrc+YQpFeUDD1DaMyJpmrYIg9rM+uAlmvObnlJ8FJ1yrgQrvfdajaVe
+        DXHUwqRF5sayV
+X-Received: by 2002:a17:906:b782:: with SMTP id dt2mr8125145ejb.310.1634313229575;
+        Fri, 15 Oct 2021 08:53:49 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy62GL1pasUanwiI/flEzTGOV8RVWPvZh1VUyETyszJmioLKXqT8Zc+p5y0zX8PPTgQkB7DfQ==
+X-Received: by 2002:a17:906:b782:: with SMTP id dt2mr8125105ejb.310.1634313229351;
+        Fri, 15 Oct 2021 08:53:49 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id b2sm4510545ejj.124.2021.10.15.08.53.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 15 Oct 2021 08:53:48 -0700 (PDT)
+Message-ID: <689cf4f5-6004-de51-f5ca-9a7acee37499@redhat.com>
+Date:   Fri, 15 Oct 2021 17:53:47 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211015150524.2030966-1-vkuznets@redhat.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [patch 13/31] x86/fpu: Move KVMs FPU swapping to FPU core
+Content-Language: en-US
+To:     "Liu, Jing2" <jing2.liu@intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        LKML <linux-kernel@vger.kernel.org>
+Cc:     "x86@kernel.org" <x86@kernel.org>,
+        "Bae, Chang Seok" <chang.seok.bae@intel.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Arjan van de Ven <arjan@linux.intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Nakajima, Jun" <jun.nakajima@intel.com>,
+        Jing Liu <jing2.liu@linux.intel.com>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "Cooper, Andrew" <andrew.cooper3@citrix.com>
+References: <871r4p9fyh.ffs@tglx>
+ <ec9c761d-4b5c-71e2-c1fc-d256b6b78c04@redhat.com>
+ <BL0PR11MB3252511FC48E43484DE79A3CA9B89@BL0PR11MB3252.namprd11.prod.outlook.com>
+ <6bbc5184-a675-1937-eb98-639906a9cf15@redhat.com> <87wnmf66m5.ffs@tglx>
+ <3997787e-402d-4b2b-0f90-4a672c77703f@redhat.com> <87lf2v5shb.ffs@tglx>
+ <87a6ja6352.ffs@tglx>
+ <BYAPR11MB3256B3120DEB5FE0DD53B5B9A9B99@BYAPR11MB3256.namprd11.prod.outlook.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <BYAPR11MB3256B3120DEB5FE0DD53B5B9A9B99@BYAPR11MB3256.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 15, 2021, Vitaly Kuznetsov wrote:
-> Several selftests (memslot_modification_stress_test, kvm_page_table_test,
-> dirty_log_perf_test,.. ) which rely on vm_get_max_gfn() started to fail
-> since commit ef4c9f4f65462 ("KVM: selftests: Fix 32-bit truncation of
-> vm_get_max_gfn()") on AMD EPYC 7401P:
-> 
->  ./tools/testing/selftests/kvm/demand_paging_test
->  Testing guest mode: PA-bits:ANY, VA-bits:48,  4K pages
->  guest physical test memory offset: 0xffffbffff000
+On 15/10/21 16:24, Liu, Jing2 wrote:
+>> fpu_swap_kvm_fpu(bool enter_guest, u64 guest_needs_features) {
+>>          possibly_reallocate(enter_guest, guest_needs_features);
+> When KVM traps guest wrmsr XFD in #NM, I think KVM need allocate
+> fpstate buffer for full features.
 
-This look a lot like the signature I remember from the original bug[1].  I assume
-you're hitting the magic HyperTransport region[2].  I thought that was fixed, but
-the hack-a-fix for selftests never got applied[3].
+You mean XCR0 and XFD (not XFD in #NM), but yeah at the point of 
+fpu_swap_kvm_fpu we are in atomic context.
 
-[1] https://lore.kernel.org/lkml/20210623230552.4027702-4-seanjc@google.com/
-[2] https://lkml.kernel.org/r/7e3a90c0-75a1-b8fe-dbcf-bda16502ace9@amd.com
-[3] https://lkml.kernel.org/r/20210805105423.412878-1-pbonzini@redhat.com
+Still, for now the first pass of AMX implementation doesn't need to do 
+anything but swap the pointers, and it can simply allocate the full 
+buffer at vCPU creation.
 
->  Finished creating vCPUs and starting uffd threads
->  Started all vCPUs
->  ==== Test Assertion Failure ====
->    demand_paging_test.c:63: false
->    pid=47131 tid=47134 errno=0 - Success
->       1	0x000000000040281b: vcpu_worker at demand_paging_test.c:63
->       2	0x00007fb36716e431: ?? ??:0
->       3	0x00007fb36709c912: ?? ??:0
->    Invalid guest sync status: exit_reason=SHUTDOWN
-> 
-> The commit, however, seems to be correct, it just revealed an already
-> present issue. AMD CPUs which support SEV may have a reduced physical
-> address space, e.g. on AMD EPYC 7401P I see:
-> 
->  Address sizes:  43 bits physical, 48 bits virtual
-> 
-> The guest physical address space, however, is not reduced as stated in
-> commit e39f00f60ebd ("KVM: x86: Use kernel's x86_phys_bits to handle
-> reduced MAXPHYADDR"). This seems to be almost correct, however, APM has one
-> more clause (15.34.6):
-> 
->   Note that because guest physical addresses are always translated through
->   the nested page tables, the size of the guest physical address space is
->   not impacted by any physical address space reduction indicated in CPUID
->   8000_001F[EBX]. If the C-bit is a physical address bit however, the guest
->   physical address space is effectively reduced by 1 bit.
-> 
-> Implement the reduction.
-> 
-> Fixes: e39f00f60ebd (KVM: x86: Use kernel's x86_phys_bits to handle reduced MAXPHYADDR)
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> ---
-> - RFC: I may have misdiagnosed the problem as I didn't dig to where exactly
->  the guest crashes.
-> ---
->  arch/x86/kvm/cpuid.c | 13 ++++++++++---
->  1 file changed, 10 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index 751aa85a3001..04ae280a0b66 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -923,13 +923,20 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
->  		 *
->  		 * If TDP is enabled but an explicit guest MAXPHYADDR is not
->  		 * provided, use the raw bare metal MAXPHYADDR as reductions to
-> -		 * the HPAs do not affect GPAs.
-> +		 * the HPAs do not affect GPAs. The value, however, has to be
-> +		 * reduced by 1 in case C-bit is a physical bit (APM section
-> +		 * 15.34.6).
->  		 */
-> -		if (!tdp_enabled)
-> +		if (!tdp_enabled) {
->  			g_phys_as = boot_cpu_data.x86_phys_bits;
-> -		else if (!g_phys_as)
-> +		} else if (!g_phys_as) {
->  			g_phys_as = phys_as;
->  
-> +			if (kvm_cpu_cap_has(X86_FEATURE_SEV) &&
-> +			    (cpuid_ebx(0x8000001f) & 0x3f) < g_phys_as)
-> +				g_phys_as -= 1;
+Paolo
 
-This is incorrect, non-SEV guests do not see a reduced address space.  See Tom's
-explanation[*]
+> Because in next vmexit, guest might have dynamic state and KVM
+> can be preempted before running fpu_swap_kvm_fpu().
+> Thus, here the current->thread.fpu.fpstate already has enough space
+> for saving guest.
 
-[*] https://lkml.kernel.org/r/324a95ee-b962-acdf-9bd7-b8b23b9fb991@amd.com
-
-> +		}
-> +
->  		entry->eax = g_phys_as | (virt_as << 8);
->  		entry->edx = 0;
->  		cpuid_entry_override(entry, CPUID_8000_0008_EBX);
-> -- 
-> 2.31.1
-> 
