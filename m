@@ -2,33 +2,36 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5CF6542E5CD
-	for <lists+kvm@lfdr.de>; Fri, 15 Oct 2021 03:16:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2821642E5CF
+	for <lists+kvm@lfdr.de>; Fri, 15 Oct 2021 03:16:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232328AbhJOBSF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S232444AbhJOBSH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Oct 2021 21:18:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45096 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232345AbhJOBSF (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 14 Oct 2021 21:18:05 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:46316 "EHLO
-        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232107AbhJOBSD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Oct 2021 21:18:03 -0400
-Message-ID: <20211015011538.493570236@linutronix.de>
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9AB1FC061570;
+        Thu, 14 Oct 2021 18:15:59 -0700 (PDT)
+Message-ID: <20211015011538.551522694@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1634260556;
+        s=2020; t=1634260558;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         references:references; bh=820daWr24eERPD7yq1vPcOq80bu7Gqh2gnJkboAilY8=;
-        b=z53ZadhVh8vsDDvHU5A/i/6fuZtxC7hf31elMkx2NVRaAhIjJw2q67Mnhzs6olSug/YRL5
-        FQ3+cIofFgLm9hx4FcEDAjX6kD+ECW4cf2tdyw1osGpw8QIjBy5PNCYmf0xaC3gP9K2K0Q
-        S7C3xhtlf4DQeBCO35jEu/WGLIBqAqgan+aOzSh75BsdIBrITAN8KMFPSgK5HO7vHAXfPu
-        /L4TzBHDG4lI9v0ek22wdfekcT+iAFa9okU7GzA4iyK7Cyk/UUQhbndl1kXaU6qTv+g+x6
-        atf13KrdqHRIrO3FoB7GKfBtbZHwW05oTqUsEGcE00jB8kVT+ixPfabl+XxkOg==
+         references:references; bh=+MrVSk/2pciJ3iChH2fVF59RQ2MRpjf0vm2riZZbUpw=;
+        b=MXB83Z3K+K9pR4xdFQsZTDqe17dya/qIry7s151HSJRy/+9yNIFDQEq3c2GK4NkbPtofVl
+        IlEHLAbBFl9+qyfWf/512xLCp4/ChoN4eRrmvaBc0+pSiYiEpybNdyU8kZklxkbMdss6yx
+        WZkrfJMQ1tDgH5byLctRaRw7hPmd9vhwocqeLYS18D9OKyNqV3RUZFH4xZpv3Zz3zr2UX/
+        sq7AD+OyAWkOQjZvYgRq9FvLLVecjEojizqXlugh63Bz/KOsaZ9Y4WjmgpvYpqQJ5PwVjU
+        TnaGrZpVqDdRJQD9AeQqU+zB9YXAuARK4OSKI5lmnuk+w6fW7dE8uaFhbQai7Q==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1634260556;
+        s=2020e; t=1634260558;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         references:references; bh=820daWr24eERPD7yq1vPcOq80bu7Gqh2gnJkboAilY8=;
-        b=AEPRVCARSRQzAN3pwy/nwh0mp2LFcKPazkvR5+9t3z2g5d5RMpUPFY2HmCOwHNyh2retB9
-        bJFuvfjZ0pq4AtCg==
+         references:references; bh=+MrVSk/2pciJ3iChH2fVF59RQ2MRpjf0vm2riZZbUpw=;
+        b=5k3nH9qdwbC9lGFKIKwV45Ges8DtCgWK+z265NNrxBRdamTyjw05NqOg9j3PFcI5xQVh3J
+        iyv9KRHi17gGCjCg==
 From:   Thomas Gleixner <tglx@linutronix.de>
 To:     LKML <linux-kernel@vger.kernel.org>
 Cc:     x86@kernel.org, "Chang S. Bae" <chang.seok.bae@intel.com>,
@@ -38,55 +41,51 @@ Cc:     x86@kernel.org, "Chang S. Bae" <chang.seok.bae@intel.com>,
         "Liu, Jing2" <jing2.liu@intel.com>,
         Sean Christopherson <seanjc@google.com>,
         Xiaoyao Li <xiaoyao.li@intel.com>
-Subject: [patch V2 02/30] x86/fpu: Update stale comments
+Subject: [patch V2 03/30] x86/pkru: Remove useless include
 References: <20211015011411.304289784@linutronix.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Date:   Fri, 15 Oct 2021 03:15:56 +0200 (CEST)
+Date:   Fri, 15 Oct 2021 03:15:57 +0200 (CEST)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-copy_fpstate_to_sigframe() does not have a slow path anymore. Neither does
-the !ia32 restore in __fpu_restore_sig().
+PKRU code does not need anything from fpu headers. Include cpufeature.h
+instead and fixup the resulting fallout in perf.
 
-Update the comments accordingly.
+This is a preparation for FPU changes in order to prevent recursive include
+hell.
 
 Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
 
 ---
- arch/x86/kernel/fpu/signal.c | 13 +++----------
- 1 file changed, 3 insertions(+), 10 deletions(-)
+ arch/x86/events/perf_event.h | 1 +
+ arch/x86/include/asm/pkru.h  | 2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 ---
-diff --git a/arch/x86/kernel/fpu/signal.c b/arch/x86/kernel/fpu/signal.c
-index 37dbfed29d75..64f0d4eda0b0 100644
---- a/arch/x86/kernel/fpu/signal.c
-+++ b/arch/x86/kernel/fpu/signal.c
-@@ -155,10 +155,8 @@ static inline int copy_fpregs_to_sigframe(struct xregs_state __user *buf)
-  *	buf == buf_fx for 64-bit frames and 32-bit fsave frame.
-  *	buf != buf_fx for 32-bit frames with fxstate.
-  *
-- * Try to save it directly to the user frame with disabled page fault handler.
-- * If this fails then do the slow path where the FPU state is first saved to
-- * task's fpu->state and then copy it to the user frame pointed to by the
-- * aligned pointer 'buf_fx'.
-+ * Save it directly to the user frame with disabled page fault handler. If
-+ * that faults, try to clear the frame which handles the page fault.
-  *
-  * If this is a 32-bit frame with fxstate, put a fsave header before
-  * the aligned state at 'buf_fx'.
-@@ -334,12 +332,7 @@ static bool __fpu_restore_sig(void __user *buf, void __user *buf_fx,
- 	}
+diff --git a/arch/x86/events/perf_event.h b/arch/x86/events/perf_event.h
+index e3ac05c97b5e..134c08df7340 100644
+--- a/arch/x86/events/perf_event.h
++++ b/arch/x86/events/perf_event.h
+@@ -14,6 +14,7 @@
  
- 	if (likely(!ia32_fxstate)) {
--		/*
--		 * Attempt to restore the FPU registers directly from user
--		 * memory. For that to succeed, the user access cannot cause page
--		 * faults. If it does, fall back to the slow path below, going
--		 * through the kernel buffer with the enabled pagefault handler.
--		 */
-+		/* Restore the FPU registers directly from user memory. */
- 		return restore_fpregs_from_user(buf_fx, user_xfeatures, fx_only,
- 						state_size);
- 	}
+ #include <linux/perf_event.h>
+ 
++#include <asm/fpu/xstate.h>
+ #include <asm/intel_ds.h>
+ #include <asm/cpu.h>
+ 
+diff --git a/arch/x86/include/asm/pkru.h b/arch/x86/include/asm/pkru.h
+index ccc539faa5bb..4cd49afa0ca4 100644
+--- a/arch/x86/include/asm/pkru.h
++++ b/arch/x86/include/asm/pkru.h
+@@ -2,7 +2,7 @@
+ #ifndef _ASM_X86_PKRU_H
+ #define _ASM_X86_PKRU_H
+ 
+-#include <asm/fpu/xstate.h>
++#include <asm/cpufeature.h>
+ 
+ #define PKRU_AD_BIT 0x1
+ #define PKRU_WD_BIT 0x2
 
