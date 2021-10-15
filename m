@@ -2,114 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D900542F634
-	for <lists+kvm@lfdr.de>; Fri, 15 Oct 2021 16:49:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CEC6F42F687
+	for <lists+kvm@lfdr.de>; Fri, 15 Oct 2021 17:05:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235948AbhJOOvv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Oct 2021 10:51:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60410 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232019AbhJOOvv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Oct 2021 10:51:51 -0400
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3C06C061570
-        for <kvm@vger.kernel.org>; Fri, 15 Oct 2021 07:49:44 -0700 (PDT)
-Received: by mail-pl1-x62b.google.com with SMTP id 21so6521836plo.13
-        for <kvm@vger.kernel.org>; Fri, 15 Oct 2021 07:49:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=VJdMGjbx+3L428UO0IwtH/tbfc+Utizl22DCtmWyKDk=;
-        b=lU5uT0W0cipNBgwqEncLpZ7gpU3p9jTwA8teGqDXcu7iMwc8GNd89GWwZkcgWcYY6I
-         qHMR614dwitbhzRvtA9cDh9Bs+E7ewY+LKU8DG5ZfOZt11nhRBehM4FneputcsSPeg7N
-         Ow07oNjRTWRAAf30NS5ne7TzdNA0/6Ztih1P75EOm9mTb2rpUQWRZp0aE7xmfDUyM2PW
-         jNMqGfvbXQeHauq/Ur3u5mBsrASjqARiTd10jwI7T6cXDOr6+GJjolkTcabqcS5DwRCZ
-         CwSJ6QpObhpWuTzEn8Ly4GlbB+pdbnv1cEu62KI0kJOdC3NCOtK3Do24hQmr5taEpbOs
-         E2WA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=VJdMGjbx+3L428UO0IwtH/tbfc+Utizl22DCtmWyKDk=;
-        b=X6G7d0hGC44hZ6LB4ZpsrbvmedkmLU5b7CyBvDbpWO0akkFuOL+SHkTNkW1A2JOIMv
-         XpV/sI8D5tpqC09S9FCUUUoGWCU4vwlt1xTzCgZSWuUj6JA8AykomdQFih19W8VMTn7V
-         ufHr2Xgi7EkBn5AyU7pszi5VMJa8HByaJnOTch3K0SqC4IcyGsB62j14HtjWZ+bFGDXw
-         BduiTkVavyG7EtCunriEzCmdcJ4ZMNU7fDJHYe4aJtHgc2S3YNBa6qiUWFNfwDYzRRN8
-         csNB54JknZ5TePjk4CgmKPOivLxAVl/u8gohg3k2yoyK+6WdBrsqmPMf2mxUifp4VGb3
-         k0Ag==
-X-Gm-Message-State: AOAM531mClhUZiIfPdVrIWPNpz8kkMjZjtKz2LKwKEchzq0LX5gYwt8z
-        AsfHHnYrueoO4N3s3u+Ju6LKwQ==
-X-Google-Smtp-Source: ABdhPJy/EMS1oyN12Sv9vAKIsXKkPGNKfiRdwMj8GDcwM8ly7Rfwf/UNDDlarFpC/WAe3AF6WVvJdA==
-X-Received: by 2002:a17:903:2451:b0:13f:297b:829e with SMTP id l17-20020a170903245100b0013f297b829emr11476004pls.45.1634309384122;
-        Fri, 15 Oct 2021 07:49:44 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id q14sm11650491pjm.17.2021.10.15.07.49.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Oct 2021 07:49:43 -0700 (PDT)
-Date:   Fri, 15 Oct 2021 14:49:39 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Yang Weijiang <weijiang.yang@intel.com>, pbonzini@redhat.com,
-        jmattson@google.com, vkuznets@redhat.com, wei.w.wang@intel.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v8 15/15] KVM: x86/cpuid: Advise Arch LBR feature in CPUID
-Message-ID: <YWmVA3FQoGcprtlp@google.com>
-References: <1629791777-16430-1-git-send-email-weijiang.yang@intel.com>
- <1629791777-16430-16-git-send-email-weijiang.yang@intel.com>
- <YWjE0iQ6fDdJpDfT@google.com>
- <20211015012821.GA29942@intel.com>
- <dfe0dee9-905a-9296-4a5b-e88eb9e942a1@gmail.com>
+        id S237222AbhJOPHl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Oct 2021 11:07:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:26735 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S236064AbhJOPHk (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 15 Oct 2021 11:07:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1634310334;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=UfQ0LrN6xpoaV3mY9Eud18l2Ja+hZhU4wb39sPJMTdc=;
+        b=aZJOM0Ymu0UkEbnm38b2HPLVcUgzFYzD25/bKERyoc90izLu2MqiUB5FIdDjEMh1aXeUG6
+        soWRKG2e94+CH0i7ZF9ykwJAxOmx2yj8D59lfDzQ7ca1Wc82/gMXrew73s9cSj0moXkFr8
+        5opGUCjXv6x4iv3Jy/acxtu7QwSZBNs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-36-EmXBQodWPnG2JXnGC71XrQ-1; Fri, 15 Oct 2021 11:05:30 -0400
+X-MC-Unique: EmXBQodWPnG2JXnGC71XrQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5E2561006AA2;
+        Fri, 15 Oct 2021 15:05:28 +0000 (UTC)
+Received: from vitty.brq.redhat.com (unknown [10.40.195.155])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DE15F2C175;
+        Fri, 15 Oct 2021 15:05:25 +0000 (UTC)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        David Matlack <dmatlack@google.com>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH RFC] KVM: SVM: reduce guest MAXPHYADDR by one in case C-bit is a physical bit
+Date:   Fri, 15 Oct 2021 17:05:24 +0200
+Message-Id: <20211015150524.2030966-1-vkuznets@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <dfe0dee9-905a-9296-4a5b-e88eb9e942a1@gmail.com>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 15, 2021, Like Xu wrote:
-> On 15/10/2021 9:28 am, Yang Weijiang wrote:
-> > On Fri, Oct 15, 2021 at 12:01:22AM +0000, Sean Christopherson wrote:
-> > > s/Advise/Advertise
-> > > 
-> > > On Tue, Aug 24, 2021, Yang Weijiang wrote:
-> > > > Add Arch LBR feature bit in CPU cap-mask to expose the feature.
-> > > > Only max LBR depth is supported for guest, and it's consistent
-> > > > with host Arch LBR settings.
-> > > > 
-> > > > Co-developed-by: Like Xu <like.xu@linux.intel.com>
-> > > > Signed-off-by: Like Xu <like.xu@linux.intel.com>
-> > > > Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
-> > > > ---
-> > > >   arch/x86/kvm/cpuid.c | 33 ++++++++++++++++++++++++++++++++-
-> > > >   1 file changed, 32 insertions(+), 1 deletion(-)
-> > > > 
-> > > > diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> > > > index 03025eea1524..d98ebefd5d72 100644
-> > > > --- a/arch/x86/kvm/cpuid.c
-> > > > +++ b/arch/x86/kvm/cpuid.c
-> > > > @@ -88,6 +88,16 @@ static int kvm_check_cpuid(struct kvm_cpuid_entry2 *entries, int nent)
-> > > >   		if (vaddr_bits != 48 && vaddr_bits != 57 && vaddr_bits != 0)
-> > > >   			return -EINVAL;
-> > > >   	}
-> > > > +	best = cpuid_entry2_find(entries, nent, 0x1c, 0);
-> > > > +	if (best) {
-> > > > +		unsigned int eax, ebx, ecx, edx;
-> > > > +
-> > > > +		/* Reject user-space CPUID if depth is different from host's.*/
-> > > 
-> > > Why disallow this?  I don't see why it would be illegal for userspace to specify
-> > > fewer LBRs,
-> 
-> The emulation of guest LBR *depends* on the host LBR driver to save/restore
-> LBRs entries (which are pass-through to the guest and store the guest branch
-> instructions rips actually).
-> 
-> Currently, the host side does not support the use of different lbr depths on
-> the same host to customize this part of the overhead. The host perf LBR
-> driver assumes that the lbr depths of different tasks on different cpu's are
-> the same and are the maximum value.
+Several selftests (memslot_modification_stress_test, kvm_page_table_test,
+dirty_log_perf_test,.. ) which rely on vm_get_max_gfn() started to fail
+since commit ef4c9f4f65462 ("KVM: selftests: Fix 32-bit truncation of
+vm_get_max_gfn()") on AMD EPYC 7401P:
 
-Yes, I assumed as much, but saving/restoring MSRs that the guest does not have
-access to is not a functional issue, just a waste of cycles.
+ ./tools/testing/selftests/kvm/demand_paging_test
+ Testing guest mode: PA-bits:ANY, VA-bits:48,  4K pages
+ guest physical test memory offset: 0xffffbffff000
+ Finished creating vCPUs and starting uffd threads
+ Started all vCPUs
+ ==== Test Assertion Failure ====
+   demand_paging_test.c:63: false
+   pid=47131 tid=47134 errno=0 - Success
+      1	0x000000000040281b: vcpu_worker at demand_paging_test.c:63
+      2	0x00007fb36716e431: ?? ??:0
+      3	0x00007fb36709c912: ?? ??:0
+   Invalid guest sync status: exit_reason=SHUTDOWN
+
+The commit, however, seems to be correct, it just revealed an already
+present issue. AMD CPUs which support SEV may have a reduced physical
+address space, e.g. on AMD EPYC 7401P I see:
+
+ Address sizes:  43 bits physical, 48 bits virtual
+
+The guest physical address space, however, is not reduced as stated in
+commit e39f00f60ebd ("KVM: x86: Use kernel's x86_phys_bits to handle
+reduced MAXPHYADDR"). This seems to be almost correct, however, APM has one
+more clause (15.34.6):
+
+  Note that because guest physical addresses are always translated through
+  the nested page tables, the size of the guest physical address space is
+  not impacted by any physical address space reduction indicated in CPUID
+  8000_001F[EBX]. If the C-bit is a physical address bit however, the guest
+  physical address space is effectively reduced by 1 bit.
+
+Implement the reduction.
+
+Fixes: e39f00f60ebd (KVM: x86: Use kernel's x86_phys_bits to handle reduced MAXPHYADDR)
+Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+---
+- RFC: I may have misdiagnosed the problem as I didn't dig to where exactly
+ the guest crashes.
+---
+ arch/x86/kvm/cpuid.c | 13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
+
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 751aa85a3001..04ae280a0b66 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -923,13 +923,20 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+ 		 *
+ 		 * If TDP is enabled but an explicit guest MAXPHYADDR is not
+ 		 * provided, use the raw bare metal MAXPHYADDR as reductions to
+-		 * the HPAs do not affect GPAs.
++		 * the HPAs do not affect GPAs. The value, however, has to be
++		 * reduced by 1 in case C-bit is a physical bit (APM section
++		 * 15.34.6).
+ 		 */
+-		if (!tdp_enabled)
++		if (!tdp_enabled) {
+ 			g_phys_as = boot_cpu_data.x86_phys_bits;
+-		else if (!g_phys_as)
++		} else if (!g_phys_as) {
+ 			g_phys_as = phys_as;
+ 
++			if (kvm_cpu_cap_has(X86_FEATURE_SEV) &&
++			    (cpuid_ebx(0x8000001f) & 0x3f) < g_phys_as)
++				g_phys_as -= 1;
++		}
++
+ 		entry->eax = g_phys_as | (virt_as << 8);
+ 		entry->edx = 0;
+ 		cpuid_entry_override(entry, CPUID_8000_0008_EBX);
+-- 
+2.31.1
+
