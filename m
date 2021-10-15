@@ -2,82 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 35D9E42ECAC
-	for <lists+kvm@lfdr.de>; Fri, 15 Oct 2021 10:43:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6540942ECB1
+	for <lists+kvm@lfdr.de>; Fri, 15 Oct 2021 10:43:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234755AbhJOIpS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Oct 2021 04:45:18 -0400
-Received: from mail.kernel.org ([198.145.29.99]:40302 "EHLO mail.kernel.org"
+        id S235813AbhJOIpu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Oct 2021 04:45:50 -0400
+Received: from mga18.intel.com ([134.134.136.126]:15959 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229667AbhJOIpR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Oct 2021 04:45:17 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id E42AF60FC3;
-        Fri, 15 Oct 2021 08:43:11 +0000 (UTC)
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <maz@kernel.org>)
-        id 1mbIo1-00GuxM-R3; Fri, 15 Oct 2021 09:43:09 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Quentin Perret <qperret@google.com>, Will Deacon <will@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, kernel-team@android.com
-Subject: [GIT PULL] KVM/arm64 fixes for 5.15, take #2
-Date:   Fri, 15 Oct 2021 09:42:45 +0100
-Message-Id: <20211015084245.2994276-1-maz@kernel.org>
-X-Mailer: git-send-email 2.30.2
+        id S229667AbhJOIpu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Oct 2021 04:45:50 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10137"; a="214813451"
+X-IronPort-AV: E=Sophos;i="5.85,375,1624345200"; 
+   d="scan'208";a="214813451"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Oct 2021 01:43:44 -0700
+X-IronPort-AV: E=Sophos;i="5.85,375,1624345200"; 
+   d="scan'208";a="442457306"
+Received: from xiaoyaol-mobl.ccr.corp.intel.com (HELO [10.239.13.123]) ([10.239.13.123])
+  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Oct 2021 01:43:42 -0700
+Message-ID: <11416416-8fc8-f4db-71d6-5205f3b7515e@intel.com>
+Date:   Fri, 15 Oct 2021 16:43:40 +0800
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Firefox/91.0 Thunderbird/91.2.0
+Subject: Re: [PATCH v2] KVM: VMX: Remove redundant handling of bus lock vmexit
+Content-Language: en-US
+To:     Hao Xiang <hao.xiang@linux.alibaba.com>, kvm@vger.kernel.org
+Cc:     shannon.zhao@linux.alibaba.com, pbonzini@redhat.com,
+        linux-kernel@vger.kernel.org, seanjc@google.com
+References: <1634270265-99421-1-git-send-email-hao.xiang@linux.alibaba.com>
+ <5eb45c93-38aa-cea8-a5c8-cf786c193342@intel.com>
+ <8cda9b23-9985-5b59-5d9b-eee4f798fb38@linux.alibaba.com>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <8cda9b23-9985-5b59-5d9b-eee4f798fb38@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, qperret@google.com, will@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paolo,
+On 10/15/2021 3:28 PM, Hao Xiang wrote:
+> 
+> 
+> On 2021/10/15 14:46, Xiaoyao Li wrote:
+>> On 10/15/2021 11:57 AM, Hao Xiang wrote:
+>>> Hardware may or may not set exit_reason.bus_lock_detected on BUS_LOCK
+>>> VM-Exits. Dealing with KVM_RUN_X86_BUS_LOCK in handle_bus_lock_vmexit
+>>> could be redundant when exit_reason.basic is EXIT_REASON_BUS_LOCK.
+>>>
+>>> We can remove redundant handling of bus lock vmexit. Force Setting
+>>> exit_reason.bus_lock_detected in handle_bus_lock_vmexit(), and deal with
+>>> KVM_RUN_X86_BUS_LOCK only in vmx_handle_exit().
+>>>
+>>> Suggested-by: Sean Christopherson <seanjc@google.com>
+>>> Signed-off-by: Hao Xiang <hao.xiang@linux.alibaba.com>
+>>> ---
+>>> v1 -> v2: a little modifications of comments
+>>>
+>>>   arch/x86/kvm/vmx/vmx.c | 15 +++++++++------
+>>>   1 file changed, 9 insertions(+), 6 deletions(-)
+>>>
+>>> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+>>> index 116b089..22be02e 100644
+>>> --- a/arch/x86/kvm/vmx/vmx.c
+>>> +++ b/arch/x86/kvm/vmx/vmx.c
+>>> @@ -5562,9 +5562,13 @@ static int handle_encls(struct kvm_vcpu *vcpu)
+>>>   static int handle_bus_lock_vmexit(struct kvm_vcpu *vcpu)
+>>>   {
+>>> -    vcpu->run->exit_reason = KVM_EXIT_X86_BUS_LOCK;
+>>> -    vcpu->run->flags |= KVM_RUN_X86_BUS_LOCK;
+>>> -    return 0;
+>>> +    /*
+>>> +     * Hardware may or may not set the BUS_LOCK_DETECTED flag on 
+>>> BUS_LOCK
+>>> +     * VM-Exits, force setting the flag 
+>>
+>>>          so that the logic in vmx_handle_exit()
+>>> +     * doesn't have to handle the flag and the basic exit reason.
+>>
+>> The code itself looks good.
+>>
+>> But the comment is partly incorrect. Now we rely only on the 
+>> bus_lock_detected flag so vmx_handle_exit() must check the flag.
+>> Thank you for you advice. Is the following comment ok?
+> /*
+>   * Hardware may or may not set the BUS_LOCK_DETECTED flag on BUS_LOCK
+>   * VM-Exits. Forcely set the flag here, then check the flag in
+>   * vmx_handle_exit() and handle the bus lock vmexit if the flag is
+>   * set.
+>   */
 
-Another couple of fixes for KVM/arm64: a fix for a stage-2 refcounting
-issue, and an error handling howler affecting MTE, all thanks to Quentin.
+(I'm not sure if forcely is a valid word)
 
-Please pull,
+how about
 
-	M.
+/*
+  * Hardware may or may not set the BUS_LOCK_DETECTED flag on BUS_LOCK
+  * VM Exit. Unconditionally set the flag here and leave the handling to
+  * vmx_handle_exit().
+  */
 
-The following changes since commit e840f42a49925707fca90e6c7a4095118fdb8c4d:
+>>> +     */
+>>> +    to_vmx(vcpu)->exit_reason.bus_lock_detected = true;
+>>> +    return 1;
+>>>   }
+>>>   /*
+>>> @@ -6051,9 +6055,8 @@ static int vmx_handle_exit(struct kvm_vcpu 
+>>> *vcpu, fastpath_t exit_fastpath)
+>>>       int ret = __vmx_handle_exit(vcpu, exit_fastpath);
+>>>       /*
+>>> -     * Even when current exit reason is handled by KVM internally, we
+>>> -     * still need to exit to user space when bus lock detected to 
+>>> inform
+>>> -     * that there is a bus lock in guest.
+>>> +     * Exit to user space when bus lock detected to inform that 
+>>> there is
+>>> +     * a bus lock in guest.
+>>>        */
+>>>       if (to_vmx(vcpu)->exit_reason.bus_lock_detected) {
+>>>           if (ret > 0)
+>>>
 
-  KVM: arm64: Fix PMU probe ordering (2021-09-20 12:43:34 +0100)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-5.15-2
-
-for you to fetch changes up to 6e6a8ef088e1222cb1250942f51ad9c1ab219ab2:
-
-  KVM: arm64: Release mmap_lock when using VM_SHARED with MTE (2021-10-05 13:22:45 +0100)
-
-----------------------------------------------------------------
-KVM/arm64 fixes for 5.15, take #2
-
-- Properly refcount pages used as a concatenated stage-2 PGD
-- Fix missing unlock when detecting the use of MTE+VM_SHARED
-
-----------------------------------------------------------------
-Quentin Perret (3):
-      KVM: arm64: Fix host stage-2 PGD refcount
-      KVM: arm64: Report corrupted refcount at EL2
-      KVM: arm64: Release mmap_lock when using VM_SHARED with MTE
-
- arch/arm64/kvm/hyp/include/nvhe/gfp.h |  1 +
- arch/arm64/kvm/hyp/nvhe/mem_protect.c | 13 ++++++++++++-
- arch/arm64/kvm/hyp/nvhe/page_alloc.c  | 15 +++++++++++++++
- arch/arm64/kvm/mmu.c                  |  6 ++++--
- 4 files changed, 32 insertions(+), 3 deletions(-)
