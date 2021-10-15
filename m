@@ -2,70 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6873B42ED55
-	for <lists+kvm@lfdr.de>; Fri, 15 Oct 2021 11:13:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 487B142ED5C
+	for <lists+kvm@lfdr.de>; Fri, 15 Oct 2021 11:16:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236982AbhJOJP5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Oct 2021 05:15:57 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47856 "EHLO
+        id S236917AbhJOJSF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Oct 2021 05:18:05 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:49266 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231273AbhJOJP4 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 15 Oct 2021 05:15:56 -0400
+        by vger.kernel.org with ESMTP id S231273AbhJOJSD (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 15 Oct 2021 05:18:03 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634289230;
+        s=mimecast20190719; t=1634289356;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=im3jtM7QDycEHpy2D3uf5n3ALksflmwMlePPaUbujbk=;
-        b=L9PF2uNQkdQ9XUk18J64cX8Js6ePsUyCTaLQqJFjP3s4fNqyzy3JiOAxkYu/5grRiyX+MO
-        EC8HAW4Yduiu9A4OP3OPwoRI2ZZnN0GhDMswDn9GJ+9SlFUard+wAzGpoo7+k0iICPfpzM
-        w5hMJQnNcCOXhRMyUeuf/qHithR98HU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-521-xISD9qBQO7q6uPg6Tz_ZMg-1; Fri, 15 Oct 2021 05:13:48 -0400
-X-MC-Unique: xISD9qBQO7q6uPg6Tz_ZMg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7FE7D1015DA0
-        for <kvm@vger.kernel.org>; Fri, 15 Oct 2021 09:13:47 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4CFAD1981F
-        for <kvm@vger.kernel.org>; Fri, 15 Oct 2021 09:13:47 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     kvm@vger.kernel.org
-Subject: [PATCH kvm-unit-tests] vmx: remove duplicate tests from vmx test suites
-Date:   Fri, 15 Oct 2021 05:13:46 -0400
-Message-Id: <20211015091346.69579-1-pbonzini@redhat.com>
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=JPdfqYpVJTpSV3zcaKTmg6HAS+Qkr1yg2VBtw7dThqY=;
+        b=f2eNxyot4WlW0/ADq2bNdxil3//ygnj5JKTDtS4qq1cXLOqRhuKFO1r3fTzcHuOClwl4EQ
+        RSNyb/BpfugwKDJr3DROkcwIgd1JdSkU8XNKEYwWTEn2sBANdJyGQrpxUkCOHZWXNsJhh5
+        i6z2gcBeHNQRaZfoffqaqw6qG7XIDV8=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-556-G_PjPewuMe-1KnuEI6-tpA-1; Fri, 15 Oct 2021 05:15:54 -0400
+X-MC-Unique: G_PjPewuMe-1KnuEI6-tpA-1
+Received: by mail-ed1-f69.google.com with SMTP id d3-20020a056402516300b003db863a248eso7640218ede.16
+        for <kvm@vger.kernel.org>; Fri, 15 Oct 2021 02:15:54 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=JPdfqYpVJTpSV3zcaKTmg6HAS+Qkr1yg2VBtw7dThqY=;
+        b=qvpiU2zkmnt43zJY+g4b514O+pfsgouOvDC+A23s5Vvt/9o+j5QhjrFP5P/qIGf7qq
+         kMt4ZeHo1GWIPUNQaAGaXAyMyPbY+jgXhdK99+kb/MjDm8gAol2zGTW+hAdJ7qA8V+4V
+         o5BXwrc1Lx2N8S2fX4BwGDaeVR19coLHjGjnVBEHj3c3XKfcC4aHdTK2LX30n0vzp/bf
+         7eXQHcfJI5nvibCSjAe5S9LES0iCYuMi4HJ1MY8AtHWuh7xF5tQT2/bSwKlh4e0717nG
+         OYxZoGgHhOoKoqoJlhLpkpIjlE1GgGzkycdZxQjVQ/35qidHBG0fWeG+YwGwJtXlATwy
+         EcmQ==
+X-Gm-Message-State: AOAM5315mO2avSaJ1cw4kXYrVSGj1DhI8v+HdL6sTqWFyEdJccTaXMB2
+        zXJ5sGaXPLRvXcPI8exx94FuY6K2AgsBBt11crVSpn41u+GYF9t9WaMvtg5yqoqECkdC/CxugQD
+        4Gf0zTreVEVNy
+X-Received: by 2002:a17:906:1d41:: with SMTP id o1mr5569554ejh.232.1634289353319;
+        Fri, 15 Oct 2021 02:15:53 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwWyhfyUXYkyfnfUQLbXJPqle1FQunwcWC6vB+gCzlyjQO16OoHAs+zTih1U0abnsVaCdlfyg==
+X-Received: by 2002:a17:906:1d41:: with SMTP id o1mr5569531ejh.232.1634289353134;
+        Fri, 15 Oct 2021 02:15:53 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id l13sm4092543eds.92.2021.10.15.02.15.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 15 Oct 2021 02:15:52 -0700 (PDT)
+Message-ID: <18309f23-9257-94f1-77d9-96c098ffa460@redhat.com>
+Date:   Fri, 15 Oct 2021 11:15:46 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [PATCH kvm-unit-tests 0/2] Introduce strtoll/strtoull
+Content-Language: en-US
+To:     Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org
+Cc:     thuth@redhat.com, ahmeddan@amazon.com
+References: <20211013164259.88281-1-drjones@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20211013164259.88281-1-drjones@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The apic_reg_virt_test and virt_x2apic_mode_test tests are already run
-separately by the "vmx_apicv_test" suite, remove them from the main
-suite "vmx".
+On 13/10/21 18:42, Andrew Jones wrote:
+> A recent posting by Daniele Ahmed inspired me to write a patch adding
+> strtoll/strtoull. While doing that I noticed check_mul_overflow wasn't
+> working and found copy+paste errors with it and check_sub_overflow.
+> 
+> Andrew Jones (2):
+>    compiler.h: Fix typos in mul and sub overflow checks
+>    lib: Introduce strtoll/strtoull
+> 
+>   lib/linux/compiler.h |  4 ++--
+>   lib/stdlib.h         |  2 ++
+>   lib/string.c         | 51 ++++++++++++++++++++++++++++++++------------
+>   3 files changed, 41 insertions(+), 16 deletions(-)
+> 
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- x86/unittests.cfg | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Queued, thanks.
 
-diff --git a/x86/unittests.cfg b/x86/unittests.cfg
-index d5efab0..3000e53 100644
---- a/x86/unittests.cfg
-+++ b/x86/unittests.cfg
-@@ -280,7 +280,7 @@ arch = i386
- 
- [vmx]
- file = vmx.flat
--extra_params = -cpu max,+vmx -append "-exit_monitor_from_l2_test -ept_access* -vmx_smp* -vmx_vmcs_shadow_test -atomic_switch_overflow_msrs_test -vmx_init_signal_test -vmx_apic_passthrough_tpr_threshold_test"
-+extra_params = -cpu max,+vmx -append "-exit_monitor_from_l2_test -ept_access* -vmx_smp* -vmx_vmcs_shadow_test -atomic_switch_overflow_msrs_test -vmx_init_signal_test -vmx_apic_passthrough_tpr_threshold_test -apic_reg_virt_test -virt_x2apic_mode_test"
- arch = x86_64
- groups = vmx
- 
--- 
-2.27.0
+Paolo
 
