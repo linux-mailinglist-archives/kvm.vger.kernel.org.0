@@ -2,92 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3674E42F841
-	for <lists+kvm@lfdr.de>; Fri, 15 Oct 2021 18:32:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AB88D42F859
+	for <lists+kvm@lfdr.de>; Fri, 15 Oct 2021 18:36:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235873AbhJOQe6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Oct 2021 12:34:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56220 "EHLO
+        id S241465AbhJOQio (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Oct 2021 12:38:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57172 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235807AbhJOQei (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Oct 2021 12:34:38 -0400
-Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0EACC061768;
-        Fri, 15 Oct 2021 09:32:31 -0700 (PDT)
-Received: by mail-pf1-x433.google.com with SMTP id f11so4918639pfc.12;
-        Fri, 15 Oct 2021 09:32:31 -0700 (PDT)
+        with ESMTP id S236993AbhJOQic (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Oct 2021 12:38:32 -0400
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C71EC061769
+        for <kvm@vger.kernel.org>; Fri, 15 Oct 2021 09:36:21 -0700 (PDT)
+Received: by mail-pj1-x1030.google.com with SMTP id g13-20020a17090a3c8d00b00196286963b9so9716909pjc.3
+        for <kvm@vger.kernel.org>; Fri, 15 Oct 2021 09:36:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=ZwuGqL3+ELdyo3s+0IX7nYDyy8R+3UhnzhnMIc+LF1s=;
-        b=QP3pvvCLobAXk04nn3CngQjQxqSziImBzJlivyb4zOimnog3M+t5RtaIZ01eeaNldz
-         BqwtPvoq3tmB3Geoew/+SWVUlj4VgkxNW6Ru5mVruEl/vr4TQs6GQNb4kOVqovNUbAIS
-         Av1ynEbJp6WXzumm2UH88GsDNCTPJ/S3SbrGhN2NTla1/ZdkZKHRuGx3XyTVfK+jXW+2
-         46sspANUx7Bzlif9XVAzDAgbUuSKxfFW+nioP75dEBZ75xtcd0yBntimkZLjXh/a7NWJ
-         AFxrbSoetbONBKgsHumyd3v7Sheho2HAKjVfnOpkuXDlry6zKWyn9zb01aNjJ1uGcoDY
-         HL9g==
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=bNuTjMh21ZDjBhYohz0NUqfViUN9CkYGywP8rKjYXXQ=;
+        b=srByqXdaiZB1vx5JOLc2pqo7KYtDXrCyqsP9LUwM20nGG0hXX+GFBs3ibK3fZ2+6P6
+         qkv3rQS+7lMejdN0xsWovm8h2tnF/wQVk60r80WOndc1nvVXg/cq4T07kzO7WKFO/nyq
+         E+FOY4FM0BCjaO4JJFS1JH6Cxkeo88jB5KiZ9YRzmPkoSMC6dHtC6Qifd6gVxOg907B8
+         y5Sirgcz+UMrlKro0+KDG6EnNIKzRUr51p9o7mAC4bR1oVMgr9kxYiFcGg97gdZ+NJu0
+         bpeZB7b1gMSFDXypYVAjTMprbxvmAw8h9M2ECooguHaKT6gEfWBpnrKZNjT7XfGzpyKd
+         ZeXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=ZwuGqL3+ELdyo3s+0IX7nYDyy8R+3UhnzhnMIc+LF1s=;
-        b=5lkHppt+nEsyAlKYFPBGtqccKg9h5LZzXyMEDqKrpLx70+JLZF7GPgR4lUhgTQIqBE
-         rGowstiwfFw1hnkL4QYMXOCrwK+ZEwv3z9Banabb7J17cAnZ1a0dwm8TBDh4pLkYZI8y
-         nG8an7FDiafgi1jKAR6DmLygZO+xW4StjPxw2nJS+BogStMD9fkfSgUVSj2LaTdQjrKu
-         tnFtOug+xuETox1g8JLDyYw9qXCUY+TOFv9KdWi9x6NJzMGiAE6uypeG9bp2joghI9p0
-         Tm3DpBKWDk4NQ99cXlVXHwDA4l++upBEc0Z5MqQQ4RGNNDSG8f7/agJBMCGXN6628Es9
-         0wqQ==
-X-Gm-Message-State: AOAM530cfAw8N24I8HbFJ2DMFJXD8o87lFrMwVQ+0CrGRB7myuZ8uplu
-        yNGgX+edkBIvh5JxYb/+o4D2+FrWZqd72g==
-X-Google-Smtp-Source: ABdhPJzBDOFDLTJVfpSYt84djhXPr0PLOBTMkk8smstBEMcue+uONrG7Y0MDCQoJmhREQtEHP4stng==
-X-Received: by 2002:a63:8f5c:: with SMTP id r28mr9742417pgn.70.1634315550931;
-        Fri, 15 Oct 2021 09:32:30 -0700 (PDT)
-Received: from laptop.hsd1.wa.comcast.net ([2601:600:8500:5f14:d627:c51e:516e:a105])
-        by smtp.gmail.com with ESMTPSA id p16sm5818137pfh.97.2021.10.15.09.32.29
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=bNuTjMh21ZDjBhYohz0NUqfViUN9CkYGywP8rKjYXXQ=;
+        b=bqu9VNhtfwVSfxbS2Nyzi3TkfmbTqa0n41KKmpd1HFGwkwRs0NvhykGWFtMxmxkwGe
+         VtSu7+EqN9zN6gPdSTyXPXkI6ubTYKVLCFf+0V+pwnOvm6AamlTshTT216OAk15HfwKS
+         g23BrH2EZQQuYdq9D+zjMoZj5++RonYY0Z8YRoKdvmYdZmfx1K+6AEhoKHvZgdvZZn2a
+         ch8+TGXae+adTT4MBFKzgifTanHHxyVCp42+wjRsKXazchnZ0LwB66T447XXIQajtheP
+         Ua6IStCSzZ0uWR+2a8WWHHOvNivG/DS3pR5orHPVxEURaHcaY1YlCcXvPkloTIsE793E
+         TVEQ==
+X-Gm-Message-State: AOAM532JcJnNSf/2gF/JkemE8J2XKtX44yfi17iKwg+JvWydhgiZQPJD
+        Z3NQbS/Zyy9bK2STNnO/u576VQ==
+X-Google-Smtp-Source: ABdhPJzHa77Mqwcb/UXTiiWN+F7q/weAnzXN+ZDwNq5zIfaSRjShl+af95vFZNzbpUq3Twu/Aujk5g==
+X-Received: by 2002:a17:90a:191a:: with SMTP id 26mr15092301pjg.79.1634315780283;
+        Fri, 15 Oct 2021 09:36:20 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id a3sm6094427pfv.174.2021.10.15.09.36.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Oct 2021 09:32:30 -0700 (PDT)
-From:   Andrei Vagin <avagin@gmail.com>
-To:     linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org
-Cc:     Andrei Vagin <avagin@gmail.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>
-Subject: [PATCH] KVM: x86/mmu: kvm_faultin_pfn has to return false if pfh is returned
-Date:   Fri, 15 Oct 2021 09:32:21 -0700
-Message-Id: <20211015163221.472508-1-avagin@gmail.com>
-X-Mailer: git-send-email 2.31.1
+        Fri, 15 Oct 2021 09:36:18 -0700 (PDT)
+Date:   Fri, 15 Oct 2021 16:36:12 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Maxim Levitsky <mlevitsk@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/2] KVM: x86: Fix and cleanup for recent AVIC changes
+Message-ID: <YWmt/A4pemf2050j@google.com>
+References: <20211009010135.4031460-1-seanjc@google.com>
+ <9e9e91149ab4fa114543b69eaf493f84d2f33ce2.camel@redhat.com>
+ <YWRJwZF1toUuyBdC@google.com>
+ <YWRtHmAUaKcbWEzH@google.com>
+ <ebf038b7b242dd19aba1e4adb6f4ef2701c53748.camel@redhat.com>
+ <YWmpKTk/7MOCzm15@google.com>
+ <5faa7e49-9eb6-a075-982a-aa7947a5a3d6@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5faa7e49-9eb6-a075-982a-aa7947a5a3d6@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This looks like a typo in 8f32d5e563cb. This change didn't intend to do
-any functional changes.
+On Fri, Oct 15, 2021, Paolo Bonzini wrote:
+> On 15/10/21 18:15, Sean Christopherson wrote:
+> > > 
+> > >                                          - now vCPU1 finally starts running the page fault code.
+> > > 
+> > >                                          - vCPU1 AVIC is still enabled
+> > >                                            (because vCPU1 never handled KVM_REQ_APICV_UPDATE),
+> > >                                            so the page fault code will populate the SPTE.
+> > But vCPU1 won't install the SPTE if it loses the race to acquire mmu_lock, because
+> > kvm_zap_gfn_range() bumps the notifier sequence and so vCPU1 will retry the fault.
+> > If vCPU1 wins the race, i.e. sees the same sequence number, then the zap is
+> > guaranteed to find the newly-installed SPTE.
+> > 
+> > And IMO, retrying is the desired behavior.  Installing a SPTE based on the global
+> > state works, but it's all kinds of weird to knowingly take an action the directly
+> > contradicts the current vCPU state.
+> 
+> I think both of you are correct. :)
+> 
+> Installing a SPTE based on global state is weird because this is a vCPU
+> action; installing it based on vCPU state is weird because it is knowingly
+> out of date.
 
-The problem was caught by gVisor tests.
+If that's the argument, then kvm_faultin_page() should explicitly check for a
+pending KVM_REQ_APICV_UPDATE, because I would then argue that contuining on when
+KVM _knows_ its new SPTE will either get zapped (page fault wins the race) or
+will get rejected (kvm_zap_gfn_range() wins the race) is just as wrong.  The SPTE
+_cannot_ be used even if the page fault wins the race, becuase all vCPUs need to
+process KVM_REQ_APICV_UPDATE and thus will be blocked until the initiating vCPU
+zaps the range and drops the APICv lock.
 
-Fixes: 8f32d5e563cb ("KVM: x86/mmu: allow kvm_faultin_pfn to return page fault handling code")
-Cc: Maxim Levitsky <mlevitsk@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Andrei Vagin <avagin@gmail.com>
----
- arch/x86/kvm/mmu/mmu.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+And I personally do _not_ want to add a check for the request because it implies
+the check is sufficient, which it is not, because the page fault doesn't yet hold
+mmu_lock.
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 1a64ba5b9437..5dce77b45476 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3956,7 +3956,7 @@ static bool kvm_faultin_pfn(struct kvm_vcpu *vcpu, bool prefault, gfn_t gfn,
- 
- 	*pfn = __gfn_to_pfn_memslot(slot, gfn, false, NULL,
- 				    write, writable, hva);
--
-+	return false;
- out_retry:
- 	*r = RET_PF_RETRY;
- 	return true;
--- 
-2.31.1
-
+Since all answers are some form of wrong, IMO we should at least be coherent with
+respect to the original page fault.
