@@ -2,184 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8FAB642EF63
-	for <lists+kvm@lfdr.de>; Fri, 15 Oct 2021 13:10:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C27342EF81
+	for <lists+kvm@lfdr.de>; Fri, 15 Oct 2021 13:17:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238311AbhJOLMG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Oct 2021 07:12:06 -0400
-Received: from mail-bn8nam08on2042.outbound.protection.outlook.com ([40.107.100.42]:12096
-        "EHLO NAM04-BN8-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S238226AbhJOLMF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Oct 2021 07:12:05 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=S1IG8E0ngL6Ucz65w1r77O5hbC4svrkTg7jah5Wi08NUN5+XwIea3d/KbEISj8AvYdxLliD11ZnqvOZuUnC9I4d9QfnNrXtJofW5PkN2mhkFz85GlGkSrBHxUWse0ktftaUa58/b94Bq1pgqy48wZdDDcBRx0yjiEdSQMkgkfGhEJfQclf+iXySDtxtEAXi0RQ0KQmuzk4dMtFLTOtLiUW+tAkyKDN6kOXL7Rt3bh9/+U4qejdDJ4aULM03owNsKgTYCcTZAp9xS/6nOKegRJ+6Pv6593AG2Va5D0zZCQnqx165j4LTW31HTJT/X2RUrQ+1wxFR/cF270TQ+B3Qwug==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3EBmH5lH1HnWWgV0JHgltQzlBgJXyy+1NgHhW7vBDYc=;
- b=HfA/9xy0xA2yi7AAfMH4DuAPTQ2lHTuvP8w9AmCUJf45oqzWhC2Vuz/FTkjpzv4KqEVdhqAzAt9hhs0/kpbjs6KibUais9iD43sjZGTR5P3gxe1Whxiae8mgJIJvYHBcOA9b94EH6Fd6luEKq5Ew80ZLZUSgR90I2/B/8/2j0yF1Zl1Sgy3LyRg7XdvyPEO1ae9CSuVczkojkO+I0mUt+jlJWWZB8NLkJjAMW8ZkC8YL44sEg/tGvsKMklwjtFaxq4LUy4cRPvgvh+NCCoJJ1rI7NU5Q7qWK/foCoyEPc+NHuKuU7zlg2Pof7sw7qcaB3C5/4ZfSKd9/hRvCcTv3Jw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3EBmH5lH1HnWWgV0JHgltQzlBgJXyy+1NgHhW7vBDYc=;
- b=png8NIecrLuSZHtp83fm6ymLdoMo/vgD+/vaq6bpXvwOswtYjqpHhFgLdJ9GfdUsmT5rDBfPGVPq50z/s8H8BEw2EPGSKdVkVkWLp+Q3YO65DrRm4dcopQ5bc4XbgUnAWCOTYEUHzRoRktbt794NqDWsGakQDEMcrku6eI1ufWLXW8LI2hWSZNEh6pWo4/xoMnhyq8jE4CMx6NA939/WQlPsXVGhq2psGqW0EQoCrd5wOhKvafA8Ukst1zEGtxLeK4veZLjo9/HDrHiKlciG5EgFrHZFro5A9W+s38vzlncaE3RLVUQL/LOHiIMdsGio56jT2+YsmnnFZK+IKTtm3g==
-Authentication-Results: intel.com; dkim=none (message not signed)
- header.d=none;intel.com; dmarc=none action=none header.from=nvidia.com;
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
- by BL1PR12MB5080.namprd12.prod.outlook.com (2603:10b6:208:30a::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4608.16; Fri, 15 Oct
- 2021 11:09:57 +0000
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::e8af:232:915e:2f95]) by BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::e8af:232:915e:2f95%6]) with mapi id 15.20.4608.017; Fri, 15 Oct 2021
- 11:09:57 +0000
-Date:   Fri, 15 Oct 2021 08:09:56 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     Lu Baolu <baolu.lu@linux.intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "hch@lst.de" <hch@lst.de>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        "parav@mellanox.com" <parav@mellanox.com>,
-        "lkml@metux.net" <lkml@metux.net>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "lushenming@huawei.com" <lushenming@huawei.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "corbet@lwn.net" <corbet@lwn.net>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "yi.l.liu@linux.intel.com" <yi.l.liu@linux.intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "dwmw2@infradead.org" <dwmw2@infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>
-Subject: Re: [RFC 06/20] iommu: Add iommu_device_init[exit]_user_dma
- interfaces
-Message-ID: <20211015110956.GC2744544@nvidia.com>
-References: <20210922123931.GI327412@nvidia.com>
- <BN9PR11MB5433CE19425E85E7F52093278CA79@BN9PR11MB5433.namprd11.prod.outlook.com>
- <20210927150928.GA1517957@nvidia.com>
- <BN9PR11MB54337B7F65B98C2335B806938CA89@BN9PR11MB5433.namprd11.prod.outlook.com>
- <20210928115751.GK964074@nvidia.com>
- <9a314095-3db9-30fc-2ed9-4e46d385036d@linux.intel.com>
- <20210928140712.GL964074@nvidia.com>
- <BN9PR11MB5433B8CB2F1EA1A2D06586588CA99@BN9PR11MB5433.namprd11.prod.outlook.com>
- <20210929125902.GU964074@nvidia.com>
- <BN9PR11MB5433C616093C8DDA5A859C2F8CB99@BN9PR11MB5433.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BN9PR11MB5433C616093C8DDA5A859C2F8CB99@BN9PR11MB5433.namprd11.prod.outlook.com>
-X-ClientProxiedBy: BL1P221CA0024.NAMP221.PROD.OUTLOOK.COM
- (2603:10b6:208:2c5::31) To BL0PR12MB5506.namprd12.prod.outlook.com
- (2603:10b6:208:1cb::22)
+        id S238411AbhJOLTe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Oct 2021 07:19:34 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50423 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230434AbhJOLTd (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 15 Oct 2021 07:19:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1634296645;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=PLWLkBQXMNGKBODhUxl5sJuJicKkC9lyNhKYr16226Q=;
+        b=Blx0XZ2/Eu6mtYzHD4XwLS+3MU7ALmWpOsWbn0cCsPAX156hC4jV6l6PUfzwX0wUJOGFD3
+        1PZ1whGz6Pg9CEzR9EUVg5Oqg5Z+szPCjHmfHyBq1BWS9oVFMXOmt7te1QCz24DbtXyqG0
+        PD79Tg2mCqVX15wx9ViZ0FOs9OhFsy0=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-325-la4B2sawPrm89_xf5P3PDw-1; Fri, 15 Oct 2021 07:17:24 -0400
+X-MC-Unique: la4B2sawPrm89_xf5P3PDw-1
+Received: by mail-ed1-f72.google.com with SMTP id u23-20020a50a417000000b003db23c7e5e2so7937086edb.8
+        for <kvm@vger.kernel.org>; Fri, 15 Oct 2021 04:17:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=PLWLkBQXMNGKBODhUxl5sJuJicKkC9lyNhKYr16226Q=;
+        b=fWDLs0AnB/NqpF2N1oFuNofcAEUWTL+R9KJosDFhq9PT/NHjTFduDEqFilynsSRR8A
+         uADdzrtKjpNICubPOOLOHcSzBDrhpUF8UX7ki2DTWSti7sL5rq+2V6xH2HK78RlavJ1G
+         2wVLKwiwh26ZtgCVhJf8Oc1Dc9FwcVPsm6iwWd9pGKXlT9uY1lTWXPUXrfiskj3E5JG4
+         4ETARcAO8UrEgxBb9jKIbnbOdmf1OjaoOwNid7qrJ/satMYmR21VeyzilT+YkvRZE1e7
+         30KgVu4iqY99Gqq8FJcA2tX/xGXG5NbRfKSZc4O0ebYEOCNds4gDWWHLdAO8VNX1iz2Z
+         Upug==
+X-Gm-Message-State: AOAM532q5Nt69pj8QYaaf/9FY7dsjvoWLa2bwRIEoCOBirfiUjzGKu+d
+        UBAcub8KmyvoPHDZ7o2oaeXP2QGAmR8UnYdD/WEn5mo3hs+O0tNsNaDXvlKcljEs0riaCAETa1P
+        DpL3sxXw9trJV
+X-Received: by 2002:a17:906:bb0c:: with SMTP id jz12mr6007741ejb.455.1634296643042;
+        Fri, 15 Oct 2021 04:17:23 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzOEb5DQCjpld1lFtUIdW1j1M8acmXn5+T7Dk5kQK54CbcN1RiZW1b2pTtQEIQrCR7zp8jcUg==
+X-Received: by 2002:a17:906:bb0c:: with SMTP id jz12mr6007728ejb.455.1634296642862;
+        Fri, 15 Oct 2021 04:17:22 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id z19sm3957128ejp.97.2021.10.15.04.17.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 15 Oct 2021 04:17:22 -0700 (PDT)
+Message-ID: <37923aa8-8d86-4409-7689-3fbf8ce8ae4f@redhat.com>
+Date:   Fri, 15 Oct 2021 13:17:20 +0200
 MIME-Version: 1.0
-Received: from mlx.ziepe.ca (142.162.113.129) by BL1P221CA0024.NAMP221.PROD.OUTLOOK.COM (2603:10b6:208:2c5::31) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4608.15 via Frontend Transport; Fri, 15 Oct 2021 11:09:57 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1mbL64-00FHpX-CK; Fri, 15 Oct 2021 08:09:56 -0300
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 390adfe9-b67f-4ecd-2571-08d98fcc529b
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5080:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <BL1PR12MB508097B2FB074B5319552952C2B99@BL1PR12MB5080.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: wodUmSHv/eyBNM5btm1LLqc5Qli1q5dw5Ps5UsSgJ2s31AoSnTZ/G0phV5Z5cGITs0u6xcozBRAEX5grLx3D5zIXPg8EGfmnsGtz8C4IQPRfYwdhz/y52It6OWp1ZQD91pE9PXvDKEwiKg8YCZVT5k+L//chexgTVd2Vglf4ftHrr9hYDa9E7xydIiKv4V8U3+nroI2LNAsgA9NDwI6NWJkHb6OHOlOvN385NbyJ7agnY592/ZSzsNeDfILeqdsgP32DrheAmOiOvMOBmWaii4lgR6HoLAfLiWUSCDCWTLMkcXYH/y/iK7Ao3gGf2pWy5S+OB0ffndWMAK2hljWrWlgZA/h3lbE5V1YaVcd272pRmbZZpHnEUoXVomvZgxtF+0ltnFsgLqRc1SmFiv9e7fMxWMesFKHQNZ35Ift0BU2ITbYDruvHrrALMivF6vc9w6rqDSp6wxYk2EnPtbio/Us1YKImdDuD6h2Ayt0RfVcEU8sqSI0QkW23M9XJjreMXgZ0ydwnYZluTBg6Jvc320HO2Fx6doWfyeF7uLgp/ItWcrar1BHaFRkOp5CG95RfQIyXh7tdI8S9jdrs6p2MfGvgM1E8X58C3cig+1A3zs9tP5SCVrdUkRC2czI+493XRpIlj/ByEWnSOV45wi8vOQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(83380400001)(6916009)(9746002)(2906002)(9786002)(316002)(36756003)(38100700002)(54906003)(86362001)(33656002)(508600001)(426003)(66556008)(7416002)(1076003)(107886003)(8936002)(5660300002)(186003)(66946007)(8676002)(26005)(66476007)(2616005)(4326008);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?qub00jUJUs6zng9TKGjf4NT9VS50jbM97Osf/NC2ab2HsKawsnv5NjiwMXJk?=
- =?us-ascii?Q?tDnAHouVzc+DAe61gYJtrokxJBvHhqiKnATnj0dFsp97XFtKVKePqmHsffGm?=
- =?us-ascii?Q?CHpxFGCh0JNCdRhKhm0rblxUV6b7iRF1b5ANOL5K3Dv/PgJZDXYqSwA3rVZW?=
- =?us-ascii?Q?BZieAGbQLrO+f2Rv8MGiy0yGMrL18w3TGU2BANODNEy5erg8nPj3fHec7pUM?=
- =?us-ascii?Q?I2QA5cwFzozKwL7FD7tIFgduqDFgNuv73+b8ZoMLssCMvdaAXooq0EoPWM+R?=
- =?us-ascii?Q?E3Z2JcUrL9SobXyeGMyfu0IKcrqk9vtS8HHA9Zz93ZZ28ixVaxesu9Oqup/l?=
- =?us-ascii?Q?IGdSv39ib07YAmccjzZbfWb8pYKVZduRKaRuAwDwlts1Uicn6guwXVI2hPq7?=
- =?us-ascii?Q?LhwcQsCymhRvPoeVL8E7hvc0ZYDLFev5bY3IVfaScDkfm3iXR9s+DTrPiKwC?=
- =?us-ascii?Q?BIDa/lO8JNz1BJFrFo2N/Vk9WCS3TOMZp8pRIxwAI1OcCZgznXj0A/SgW7Ls?=
- =?us-ascii?Q?3FN6o+Wi4g9t0wX63AWnOZUApbzKdkFfFmM2f5OsSQSRYYV6pBac1PYq6EhE?=
- =?us-ascii?Q?IGFENI590pTzyD98LKDgZGuahWbogCvc9OfVb4nQm42/07olIVJahNQjvYBG?=
- =?us-ascii?Q?ho+9fBC7O4WTOpRhYl5yOREdMk+0W2HINj7J2DhXc4z4xmrnuIK4jJGZy0DK?=
- =?us-ascii?Q?CttfzIJVG1g2K+ItNf9+vhEnCMWqhZFMCw2t8WASZB6NwDzj7eR50eJYWIwf?=
- =?us-ascii?Q?KYVpGCH3YITBpLm8wmwJCoAdfpo4YmFsZZYnVcueDqZxALhD/Zp80Yq1P7N6?=
- =?us-ascii?Q?xI4pv5T900mbwWE3TCewdnOy21YwlasCZEZw0M64mlGDJvK0ntpncwXC6r8g?=
- =?us-ascii?Q?Z1DCuS9AfCFZr36ncHECk8ZsClj2o+CbSnMvhMInk6ntCw/qV07OgVAG7dGK?=
- =?us-ascii?Q?FWiWnnjgS1/wg92e9YgSEvQsxE/bFqyn6TpQ2JFdj88TOQGLMyI9e3GeOFan?=
- =?us-ascii?Q?UQa40/0V/I5lXGt/Jk41CNxDQzkdglJfNckGw7oI958381ilaGpzNTiF+OUO?=
- =?us-ascii?Q?76r20DcxoifXxq+yFubiNCBNFF0mc4lkAr38DT4K1uuJMdSynM131/y9V2T8?=
- =?us-ascii?Q?CQSKHX8tna5hUbNYuj7iIqaZ2snqyoyFO3mhv/1AI+rjciD43+pMm7HE1nNb?=
- =?us-ascii?Q?ZqsXDSIJj823pnvVRS0hmeqpzXN2Lb4TpQwV37mHC9ecwKta6/BjZdnaXfMs?=
- =?us-ascii?Q?oXfNcZEG3pgM3LVfAfPuzQJQbX304+99VFCxtQaK1CzfUznFYLXmycvqJNZi?=
- =?us-ascii?Q?Oy7hz85wLhQnRD8+yizuuEia?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 390adfe9-b67f-4ecd-2571-08d98fcc529b
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Oct 2021 11:09:57.4094
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 2I7or5PWkoOAXbQvCwn9d2OYV6LDbgP0T1XdB6c0IZEGTf2twLjWvx1PdYHFaJwK
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5080
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [patch 13/31] x86/fpu: Move KVMs FPU swapping to FPU core
+Content-Language: en-US
+To:     Thomas Gleixner <tglx@linutronix.de>,
+        "Liu, Jing2" <jing2.liu@intel.com>,
+        LKML <linux-kernel@vger.kernel.org>
+Cc:     "x86@kernel.org" <x86@kernel.org>,
+        "Bae, Chang Seok" <chang.seok.bae@intel.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Arjan van de Ven <arjan@linux.intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Nakajima, Jun" <jun.nakajima@intel.com>,
+        Jing Liu <jing2.liu@linux.intel.com>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "Cooper, Andrew" <andrew.cooper3@citrix.com>
+References: <871r4p9fyh.ffs@tglx>
+ <ec9c761d-4b5c-71e2-c1fc-d256b6b78c04@redhat.com>
+ <BL0PR11MB3252511FC48E43484DE79A3CA9B89@BL0PR11MB3252.namprd11.prod.outlook.com>
+ <6bbc5184-a675-1937-eb98-639906a9cf15@redhat.com> <87wnmf66m5.ffs@tglx>
+ <3997787e-402d-4b2b-0f90-4a672c77703f@redhat.com>
+ <BYAPR11MB3256D90BEEDE57988CA39705A9B99@BYAPR11MB3256.namprd11.prod.outlook.com>
+ <877dee5zpf.ffs@tglx>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <877dee5zpf.ffs@tglx>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 15, 2021 at 01:29:16AM +0000, Tian, Kevin wrote:
-> Hi, Jason,
+On 15/10/21 12:50, Thomas Gleixner wrote:
+> That might be matching the KVM expectations, but it's not going to
+> happen.
 > 
-> > From: Jason Gunthorpe <jgg@nvidia.com>
-> > Sent: Wednesday, September 29, 2021 8:59 PM
-> > 
-> > On Wed, Sep 29, 2021 at 12:38:35AM +0000, Tian, Kevin wrote:
-> > 
-> > > /* If set the driver must call iommu_XX as the first action in probe() or
-> > >   * before it attempts to do DMA
-> > >   */
-> > >  bool suppress_dma_owner:1;
-> > 
-> > It is not "attempts to do DMA" but more "operates the physical device
-> > in any away"
-> > 
-> > Not having ownership means another entity could be using user space
-> > DMA to manipulate the device state and attack the integrity of the
-> > kernel's programming of the device.
-> > 
+> KVM already violates all well known rules of encapsulation and just
+> fiddles in the guts of FPU mechanism, duplicates code in buggy ways.
 > 
-> Does suppress_kernel_dma sounds better than suppress_dma_owner?
-> We found the latter causing some confusion when doing internal
-> code review. Somehow this flag represents "don't claim the kernel dma
-> ownership during driver binding". suppress_dma_owner sounds the
-> entire ownership is disabled...
+> This has to stop now!
 
-If in doubt make it
+FWIW, I totally agree about that.  Over the years we've gotten more 
+well-thought hooks in the kernel for KVM and less hacks, and I'll only 
+be happy if that extends to the FPU code which I'm quite wary of 
+touching.  Most of it has been unchanged since Ingo's last rewrite.
 
-suppress_iommu_whatever_the_api_is_that_isn't_called
+Paolo
 
-> Another thing is about DMA_OWNER_SHARED, which is set to indicate 
-> no dma at all. Thinking more we feel that this flag is meaningless. Its
-> sole purpose is to show compatibility to any USER/KERNEL ownership, 
-> and essentially the same semantics as a device which is not bound to
-> any driver. So we plan to remove it then pci-stub just needs one line 
-> change to set the suppress flag. But want to check with you first in case
-> any oversight.
+> You are free to ignore me, but all you are going to achieve is to delay
+> AMX integration further. Seriously, I'm not even going to reply to
+> anything which is not based on the above approach.
 
-It sounds reasonable, but also makes it much harder to find the few
-places that have this special relationship - ie we can't grep for
-DMA_OWNER_SHARED anymore.
-
-Jason
