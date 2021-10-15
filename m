@@ -2,143 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3984942F861
-	for <lists+kvm@lfdr.de>; Fri, 15 Oct 2021 18:38:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 844BC42F864
+	for <lists+kvm@lfdr.de>; Fri, 15 Oct 2021 18:38:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241469AbhJOQk0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Oct 2021 12:40:26 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50126 "EHLO
+        id S241483AbhJOQkq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Oct 2021 12:40:46 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:37069 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237274AbhJOQk0 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 15 Oct 2021 12:40:26 -0400
+        by vger.kernel.org with ESMTP id S241353AbhJOQkp (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 15 Oct 2021 12:40:45 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634315899;
+        s=mimecast20190719; t=1634315919;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=OL1xVkJ1GZ3Vp5ZR2VEcp/JIFWoJLAIj138sahWf0nI=;
-        b=NOpGfMXRuFgdOyETbQos7lxomZy5caANyRh3AwP6wyg8ZX49FVWEHouoFESn+1ZvJJRW0B
-        ACF66jgHu3nRsn9zgqudeO5Ki5AalzcSCLxsMJ4JY1CmCRuhX903fzGQjqkVyZ0IqORPne
-        IHMCE72aMQItwED2qWVao3zePgVQiEQ=
-Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com
- [209.85.161.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-427-uZqhRi8cOnir4zv_gSp-iA-1; Fri, 15 Oct 2021 12:38:18 -0400
-X-MC-Unique: uZqhRi8cOnir4zv_gSp-iA-1
-Received: by mail-oo1-f70.google.com with SMTP id z16-20020a4a9c90000000b002b7120ac127so4383203ooj.1
-        for <kvm@vger.kernel.org>; Fri, 15 Oct 2021 09:38:18 -0700 (PDT)
+        bh=W+JqviQuWVY3ulWMWJXRdbCnoHN/gayuuY0QwVqhW2A=;
+        b=VyBXC3z/LEpd8zkQdjuimXVn/hESKfHgHKJ8T4mB0NcGnht/giaGRL8w1CdeY+pxBKwEAc
+        EOhOwgmixJb4nMZKO0cjb6aVj89OV0fryLOwRUKD2BufuQE7+/X1CH091xGo99BF8vPYll
+        1ojkUDU3VuLRXuHdNJoZWlesC0gMhts=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-157-4whm9vL3MRmDnBdq_ixI9A-1; Fri, 15 Oct 2021 12:38:37 -0400
+X-MC-Unique: 4whm9vL3MRmDnBdq_ixI9A-1
+Received: by mail-ed1-f69.google.com with SMTP id h19-20020aa7de13000000b003db6ad5245bso8781227edv.9
+        for <kvm@vger.kernel.org>; Fri, 15 Oct 2021 09:38:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=OL1xVkJ1GZ3Vp5ZR2VEcp/JIFWoJLAIj138sahWf0nI=;
-        b=TzYXLMQbgMOp9EkxYZFPeGiYvSGVlSQu3Ub7dAYLjbjEYi02+bhmQ2REOepxbr/7gM
-         HvSVhXYWjhYvAKxcA9du9wmsVjZHGCKYbZ4laLaQ8ZA2QUIsCqk8qrabVMLRdUL500Jy
-         XsOthHBNFHww2ohiABGD/lBh1YL0YIgs9OvsHshGafpemeFNDI/wqefUA9qkZrBP7lxD
-         wcWd8eXAnKlM7/n/RKeP+lFDxFo256ZT32HnH3V/12hU/2TAiKj/hcNXYcD2cfJ9QBIC
-         Bc4xOQ3kiHaLSHOQuXKBW0ncKLgu+nH7rRYz9T0/AMzZNGaOCjuBHF8D/GROkjgARUen
-         gnqA==
-X-Gm-Message-State: AOAM530fJ2sLH8vtTNWIgb5dwqbiulE77MBJdgG+F6ibEmTOBz6uAxdt
-        ovWmSfFn80lXRCz8UnWPO/NASZ2cTS4rl2ApgksknEGs8yj6XneJfR7oVC34VsiB2kEYQZU04iR
-        n74ahKad14Z/k
-X-Received: by 2002:a4a:adca:: with SMTP id t10mr9780937oon.19.1634315897611;
-        Fri, 15 Oct 2021 09:38:17 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy07XqbfRReKgHIu02thE2BC8q9a60k39yM0PD78yJmMQBceFMI+pcgwV8uY+kr3MAVEOqLnA==
-X-Received: by 2002:a4a:adca:: with SMTP id t10mr9780920oon.19.1634315897403;
-        Fri, 15 Oct 2021 09:38:17 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id a10sm1334513otb.7.2021.10.15.09.38.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Oct 2021 09:38:17 -0700 (PDT)
-Date:   Fri, 15 Oct 2021 10:38:15 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Yishai Hadas <yishaih@nvidia.com>
-Cc:     <bhelgaas@google.com>, <jgg@nvidia.com>, <saeedm@nvidia.com>,
-        <linux-pci@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <kuba@kernel.org>, <leonro@nvidia.com>,
-        <kwankhede@nvidia.com>, <mgurtovoy@nvidia.com>, <maorg@nvidia.com>
-Subject: Re: [PATCH V1 mlx5-next 07/13] vfio: Add 'invalid' state
- definitions
-Message-ID: <20211015103815.4b165d43.alex.williamson@redhat.com>
-In-Reply-To: <20211013094707.163054-8-yishaih@nvidia.com>
-References: <20211013094707.163054-1-yishaih@nvidia.com>
-        <20211013094707.163054-8-yishaih@nvidia.com>
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=W+JqviQuWVY3ulWMWJXRdbCnoHN/gayuuY0QwVqhW2A=;
+        b=sX3RCLfIYz1AAAnESmYrqUewbBi0p5ZlmSjEwMClrmHOQRHjzlvafk5jpj7VAv6Qnl
+         SK32TX//zEGXlgkrpNnyR+uF9TAGbjwbMIG6ezKeSVgwEGj87r7zweYA+qXKvfBHt3T1
+         c2Usew9ByxaX6pDaCRx7jiJLDHUa/ONQWNpnKUDVQbcu1UBfGn1v8ZepaIBulPnznNvT
+         S6TRagTeZfUAMQFDndqo91YfIZbvQ+Fr7O4R88hq0j1dI8+dlXZbxNN4FvqnfSWlLahQ
+         JWvjncxTaKbj9bE9KAjRfVIFDDhfT+0Qy5Al+E3C5Sz/Cs9TgoW/r5cfef6fKpWWrjK8
+         XVCg==
+X-Gm-Message-State: AOAM532woBO9OMNP70v5IZdiLkUyRxMGS/+5Q2xntaHUiyPjYy3wn4Ns
+        o+SCpfa41RA7+s5He8zHWfITH1j7Y/6Uz9KyIgSYeywkuIsv3rgrgu2tLb9f8+bII12gtiSBX55
+        bsHBD9qsKYUQ7
+X-Received: by 2002:a05:6402:35c4:: with SMTP id z4mr19081847edc.197.1634315916507;
+        Fri, 15 Oct 2021 09:38:36 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwXq1W7nRWzxXD4T+kiVhPYm+fR2898QxM51fTb2lV2WUQp3anWpD0MaL5Cwj1xWCg3Tlfsfw==
+X-Received: by 2002:a05:6402:35c4:: with SMTP id z4mr19081813edc.197.1634315916272;
+        Fri, 15 Oct 2021 09:38:36 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id h11sm4539594eji.96.2021.10.15.09.38.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 15 Oct 2021 09:38:35 -0700 (PDT)
+Message-ID: <a9af711a-5ce0-3143-3f84-79026be30cef@redhat.com>
+Date:   Fri, 15 Oct 2021 18:38:34 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [PATCH] KVM: x86/mmu: kvm_faultin_pfn has to return false if pfh
+ is returned
+Content-Language: en-US
+To:     Andrei Vagin <avagin@gmail.com>, linux-kernel@vger.kernel.org,
+        Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org
+Cc:     Maxim Levitsky <mlevitsk@redhat.com>
+References: <20211015163221.472508-1-avagin@gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20211015163221.472508-1-avagin@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 13 Oct 2021 12:47:01 +0300
-Yishai Hadas <yishaih@nvidia.com> wrote:
-
-> Add 'invalid' state definition to be used by drivers to set/check
-> invalid state.
+On 15/10/21 18:32, Andrei Vagin wrote:
+> This looks like a typo in 8f32d5e563cb. This change didn't intend to do
+> any functional changes.
 > 
-> In addition dropped the non complied macro VFIO_DEVICE_STATE_SET_ERROR
-> (i.e SATE instead of STATE) which seems unusable.
-
-s/non complied/non-compiled/
-
-We can certainly assume it's unused based on the typo, but removing it
-or fixing it should be a separate patch.
-
-> Fixes: a8a24f3f6e38 ("vfio: UAPI for migration interface for device state")
-> Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
-> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> The problem was caught by gVisor tests.
+> 
+> Fixes: 8f32d5e563cb ("KVM: x86/mmu: allow kvm_faultin_pfn to return page fault handling code")
+> Cc: Maxim Levitsky <mlevitsk@redhat.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Andrei Vagin <avagin@gmail.com>
 > ---
->  include/linux/vfio.h      | 5 +++++
->  include/uapi/linux/vfio.h | 4 +---
->  2 files changed, 6 insertions(+), 3 deletions(-)
+>   arch/x86/kvm/mmu/mmu.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
-> index b53a9557884a..6a8cf6637333 100644
-> --- a/include/linux/vfio.h
-> +++ b/include/linux/vfio.h
-> @@ -252,4 +252,9 @@ extern int vfio_virqfd_enable(void *opaque,
->  			      void *data, struct virqfd **pvirqfd, int fd);
->  extern void vfio_virqfd_disable(struct virqfd **pvirqfd);
->  
-> +static inline bool vfio_is_state_invalid(u32 state)
-> +{
-> +	return state >= VFIO_DEVICE_STATE_INVALID;
-> +}
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 1a64ba5b9437..5dce77b45476 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -3956,7 +3956,7 @@ static bool kvm_faultin_pfn(struct kvm_vcpu *vcpu, bool prefault, gfn_t gfn,
+>   
+>   	*pfn = __gfn_to_pfn_memslot(slot, gfn, false, NULL,
+>   				    write, writable, hva);
+> -
+> +	return false;
+>   out_retry:
+>   	*r = RET_PF_RETRY;
+>   	return true;
+> 
 
+Ouch! Queued, thanks.
 
-Redundant, we already have !VFIO_DEVICE_STATE_VALID(state)
-
-> +
->  #endif /* VFIO_H */
-> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> index ef33ea002b0b..7f8fdada5eb3 100644
-> --- a/include/uapi/linux/vfio.h
-> +++ b/include/uapi/linux/vfio.h
-> @@ -609,6 +609,7 @@ struct vfio_device_migration_info {
->  #define VFIO_DEVICE_STATE_RUNNING   (1 << 0)
->  #define VFIO_DEVICE_STATE_SAVING    (1 << 1)
->  #define VFIO_DEVICE_STATE_RESUMING  (1 << 2)
-> +#define VFIO_DEVICE_STATE_INVALID   (VFIO_DEVICE_STATE_RESUMING + 1)
-
-Nak, device_state is not an enum, this is only one of the states we
-currently define as invalid and usage such as the inline above ignores
-the device state mask below, which induces future limits on how we can
-expand the device_state field.  Thanks,
-
-Alex
-
->  #define VFIO_DEVICE_STATE_MASK      (VFIO_DEVICE_STATE_RUNNING | \
->  				     VFIO_DEVICE_STATE_SAVING |  \
->  				     VFIO_DEVICE_STATE_RESUMING)
-> @@ -621,9 +622,6 @@ struct vfio_device_migration_info {
->  	((state & VFIO_DEVICE_STATE_MASK) == (VFIO_DEVICE_STATE_SAVING | \
->  					      VFIO_DEVICE_STATE_RESUMING))
->  
-> -#define VFIO_DEVICE_STATE_SET_ERROR(state) \
-> -	((state & ~VFIO_DEVICE_STATE_MASK) | VFIO_DEVICE_SATE_SAVING | \
-> -					     VFIO_DEVICE_STATE_RESUMING)
->  
->  	__u32 reserved;
->  	__u64 pending_bytes;
+Paolo
 
