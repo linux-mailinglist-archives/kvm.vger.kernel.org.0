@@ -2,96 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6616142FA85
-	for <lists+kvm@lfdr.de>; Fri, 15 Oct 2021 19:48:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5C6A742FA8D
+	for <lists+kvm@lfdr.de>; Fri, 15 Oct 2021 19:50:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242196AbhJORuX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Oct 2021 13:50:23 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60609 "EHLO
+        id S242292AbhJORxA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Oct 2021 13:53:00 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33455 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S242259AbhJORuS (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 15 Oct 2021 13:50:18 -0400
+        by vger.kernel.org with ESMTP id S242259AbhJORxA (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 15 Oct 2021 13:53:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634320091;
+        s=mimecast20190719; t=1634320252;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=8Zx3QxbiVEuPANTUXByKBFYol9oS003tMx/6Xs2/A9c=;
-        b=FAbD7sPN5gUj94l6iK7E7Ajv6X7zMMrYmHwkhGgAeizgLeBO26kaMcESnY6utzMhyOxjDJ
-        zkY3p0s20flVn9vgbvUUUI5Q5polL61cDN+7kGLeco6XApeE2xNvsKtHjJKK89ivbRew6n
-        Perx4RcxLeT5ChNL4UQkGVwmCxYxh1I=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-179-u91_vnPBP3-cmyKLLSGgJg-1; Fri, 15 Oct 2021 13:48:09 -0400
-X-MC-Unique: u91_vnPBP3-cmyKLLSGgJg-1
-Received: by mail-ed1-f70.google.com with SMTP id h19-20020aa7de13000000b003db6ad5245bso8959823edv.9
-        for <kvm@vger.kernel.org>; Fri, 15 Oct 2021 10:48:09 -0700 (PDT)
+        bh=TsfQJ+QgzOOfLaCjggWbwpgeV1kvleQ7Jz1X1qSYym0=;
+        b=ipwJ0Bw8psiGycU073lzpwndueh1f/QoxWl6/DRnB/Tz0nx8KaX/6WTDXpKgZ1yk/PqVMW
+        AgHWeRkTPlOlQXDr+Mregtzk1PH1QwM72EwsCeuLq7S7GHAVmGS95CnhXHio4aKILXV6N/
+        1bhZ+EeGuc1i6Ai1556kAdx/L5csX2w=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-267-vce06O-YNjiVM871oyGUXw-1; Fri, 15 Oct 2021 13:50:50 -0400
+X-MC-Unique: vce06O-YNjiVM871oyGUXw-1
+Received: by mail-ed1-f72.google.com with SMTP id l22-20020aa7c316000000b003dbbced0731so8943994edq.6
+        for <kvm@vger.kernel.org>; Fri, 15 Oct 2021 10:50:49 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=8Zx3QxbiVEuPANTUXByKBFYol9oS003tMx/6Xs2/A9c=;
-        b=d/XCQhjRNTY9ZCm5qpsVq9Y1apjthFGiM7pVH44soe9HilLZrvtQeFGU2XT+VJoN8S
-         FgI5BmRHrW6UpNlEi3f8CV0GOKTSUSKyLhNxGRmPaX1kPprINL2CqBAZC2oB0YvTVP/F
-         SXYtHI6UMJEHOkXCOD5OH68KDIvxxI9IwGKNSQ9dNVxb7GOWLNNQmUd8Rqj0ro8mXWLo
-         nRGv0/k/On/E8zf996rxcARRLN5TJ1De8sScdikGDNbNLNpSq8DVKa9rgvNCz7m1nPI4
-         Fzf8Dmt4hbcJBlkMBQC/O934VliywPbudV+uh4nRRqGb1Yf2aoAR8cCPsYg5UlnicVUe
-         /Qog==
-X-Gm-Message-State: AOAM530RW9W36uYa9q7EWpaK9s2IVv2XhFufFz+Mi6gmRCpzbg/EL72f
-        hjCp486pdeU+m+6B6a93xVAf2UaIUV2Hse9zeHAg1YX6eYtFUnHTh7G3Ow+AsRdDbQirzBHo+/L
-        YqUkFXcOdUlLq
-X-Received: by 2002:a17:906:af49:: with SMTP id ly9mr8398344ejb.479.1634320088532;
-        Fri, 15 Oct 2021 10:48:08 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxxN8zHTsa2avoK79t+VzDxFG17YeNaDYgRUaBIbvox/PBiiKKv/pjM+2il7eq6d78TEsKK1A==
-X-Received: by 2002:a17:906:af49:: with SMTP id ly9mr8398318ejb.479.1634320088336;
-        Fri, 15 Oct 2021 10:48:08 -0700 (PDT)
+        bh=TsfQJ+QgzOOfLaCjggWbwpgeV1kvleQ7Jz1X1qSYym0=;
+        b=ULOWcjHhow7tRF0srv/DOnHdoVBv/d5sOm3GtwAmw3w1zNj9QniIWqDKlgCsZngK6t
+         Aut+B6+7aAPqfK85Z4sjBva8YHgOer+SW66E9gWYjAHTAeknjFqdJvBx85QqauFuOhIB
+         9UNFS2TtTYcvqh/af4rwQXDeVfBKYjB0nTYon4WSI4bWT/MBhizilFZXALIq5ZJ8jM10
+         cYFEXLJF1W8KllOi5DJ/zTqJUFKmJVN9BX9x7js2mrgEIB+8SQDB7n7RVfGxPou84kkZ
+         goETTHKcxoW9iUsZ/MXih9d7GleC9ByIdk7q557qZRaQd8upuPMBQ/Z8K/iTfmYyZFsi
+         Vn6g==
+X-Gm-Message-State: AOAM533OKR+OjPMD7b77awT/PGT52ByTgg/vsVTqenbVTL7kfckgu7Hy
+        4KefQTT6tzYp9SUZfrVC/eZGodMYp736GRgqWqAjODdF3ZC4kuxlIRRioZvzFN0Rsnqt9vEqdCu
+        8oJKQBQID/yNt
+X-Received: by 2002:a17:906:abd3:: with SMTP id kq19mr8652272ejb.285.1634320248918;
+        Fri, 15 Oct 2021 10:50:48 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwlvUF01PAH9b4uRCsZicwTcvW53v52vttAUA9z7TDvslDRI455Y9rszntyFoG5LxAZ43rs5w==
+X-Received: by 2002:a17:906:abd3:: with SMTP id kq19mr8652246ejb.285.1634320248691;
+        Fri, 15 Oct 2021 10:50:48 -0700 (PDT)
 Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id t19sm4729162ejb.115.2021.10.15.10.48.06
+        by smtp.gmail.com with ESMTPSA id y21sm4572949ejk.30.2021.10.15.10.50.44
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 15 Oct 2021 10:48:07 -0700 (PDT)
-Message-ID: <163c7948-f41d-986d-871b-9689995ba282@redhat.com>
-Date:   Fri, 15 Oct 2021 19:48:05 +0200
+        Fri, 15 Oct 2021 10:50:48 -0700 (PDT)
+Message-ID: <b148def5-9d34-bfa7-db6e-afaf11728639@redhat.com>
+Date:   Fri, 15 Oct 2021 19:50:40 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.1.0
-Subject: Re: [PATCH] KVM: replace large kvmalloc allocation with vmalloc
+Subject: Re: [PATCH 0/2] KVM: x86: Fix and cleanup for recent AVIC changes
 Content-Language: en-US
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        syzbot+e0de2333cbf95ea473e8@syzkaller.appspotmail.com
-References: <20211015165519.135670-1-pbonzini@redhat.com>
- <YWm6KcNvaHDMhfsG@google.com>
+Cc:     Maxim Levitsky <mlevitsk@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20211009010135.4031460-1-seanjc@google.com>
+ <9e9e91149ab4fa114543b69eaf493f84d2f33ce2.camel@redhat.com>
+ <YWRJwZF1toUuyBdC@google.com> <YWRtHmAUaKcbWEzH@google.com>
+ <ebf038b7b242dd19aba1e4adb6f4ef2701c53748.camel@redhat.com>
+ <YWmpKTk/7MOCzm15@google.com>
+ <5faa7e49-9eb6-a075-982a-aa7947a5a3d6@redhat.com>
+ <YWmt/A4pemf2050j@google.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <YWm6KcNvaHDMhfsG@google.com>
+In-Reply-To: <YWmt/A4pemf2050j@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 15/10/21 19:28, Sean Christopherson wrote:
->>   	for (i = 0; i < KVM_PAGE_TRACK_MAX; i++) {
->>   		slot->arch.gfn_track[i] =
->> -			kvcalloc(npages, sizeof(*slot->arch.gfn_track[i]),
->> -				 GFP_KERNEL_ACCOUNT);
->> +			vcalloc(npages, sizeof(*slot->arch.gfn_track[i]));
-> This loses the memcg accounting, which is somewhat important for the theoretical
-> 4MiB allocations:-)
+On 15/10/21 18:36, Sean Christopherson wrote:
+>> Installing a SPTE based on global state is weird because this is a vCPU
+>> action; installing it based on vCPU state is weird because it is knowingly
+>> out of date.
+> If that's the argument, then kvm_faultin_page() should explicitly check for a
+> pending KVM_REQ_APICV_UPDATE, because I would then argue that contuining on when
+> KVM_knows_  its new SPTE will either get zapped (page fault wins the race) or
+> will get rejected (kvm_zap_gfn_range() wins the race) is just as wrong.  The SPTE
+> _cannot_  be used even if the page fault wins the race, becuase all vCPUs need to
+> process KVM_REQ_APICV_UPDATE and thus will be blocked until the initiating vCPU
+> zaps the range and drops the APICv lock.
 
-True, and in fact 4 MiB is not so theoretical.
+Right, that was my counter-argument - no need to check for the request 
+because the request "synchronizes" with the actual use of the PTE, via 
+kvm_make_all_cpus_request + kvm_zap_gfn_range.
 
-> Maybe split out the introduction of vcalloc() to a separate patch (or two) and
-> introduce additional helpers to allow passing in gfp_t to e.g. __vzalloc()?
+> And I personally do_not_  want to add a check for the request because it implies
+> the check is sufficient, which it is not, because the page fault doesn't yet hold
+> mmu_lock.
 
-Yes, this is what actually slowed me down this week.This is the bare 
-minimum that I can send to Linus right now to avoid the WARN.
+Of course, that would be even worse.
 
-I have patches to clean all of this up, but they will have to go throw 
-Andrew Morton; he will decide whether to throw them in 5.15 or go 
-through stable, but anyway 5.16.1 or .2 should have the accounting back 
-at most.
+> Since all answers are some form of wrong, IMO we should at least be coherent with
+> respect to the original page fault.
+
+Okay, you win if you send a patch with a comment. :)
 
 Paolo
 
