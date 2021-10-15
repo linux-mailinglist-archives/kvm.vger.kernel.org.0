@@ -2,111 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AB88D42F859
-	for <lists+kvm@lfdr.de>; Fri, 15 Oct 2021 18:36:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7ED3C42F85E
+	for <lists+kvm@lfdr.de>; Fri, 15 Oct 2021 18:37:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241465AbhJOQio (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Oct 2021 12:38:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57172 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236993AbhJOQic (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Oct 2021 12:38:32 -0400
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C71EC061769
-        for <kvm@vger.kernel.org>; Fri, 15 Oct 2021 09:36:21 -0700 (PDT)
-Received: by mail-pj1-x1030.google.com with SMTP id g13-20020a17090a3c8d00b00196286963b9so9716909pjc.3
-        for <kvm@vger.kernel.org>; Fri, 15 Oct 2021 09:36:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=bNuTjMh21ZDjBhYohz0NUqfViUN9CkYGywP8rKjYXXQ=;
-        b=srByqXdaiZB1vx5JOLc2pqo7KYtDXrCyqsP9LUwM20nGG0hXX+GFBs3ibK3fZ2+6P6
-         qkv3rQS+7lMejdN0xsWovm8h2tnF/wQVk60r80WOndc1nvVXg/cq4T07kzO7WKFO/nyq
-         E+FOY4FM0BCjaO4JJFS1JH6Cxkeo88jB5KiZ9YRzmPkoSMC6dHtC6Qifd6gVxOg907B8
-         y5Sirgcz+UMrlKro0+KDG6EnNIKzRUr51p9o7mAC4bR1oVMgr9kxYiFcGg97gdZ+NJu0
-         bpeZB7b1gMSFDXypYVAjTMprbxvmAw8h9M2ECooguHaKT6gEfWBpnrKZNjT7XfGzpyKd
-         ZeXQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=bNuTjMh21ZDjBhYohz0NUqfViUN9CkYGywP8rKjYXXQ=;
-        b=bqu9VNhtfwVSfxbS2Nyzi3TkfmbTqa0n41KKmpd1HFGwkwRs0NvhykGWFtMxmxkwGe
-         VtSu7+EqN9zN6gPdSTyXPXkI6ubTYKVLCFf+0V+pwnOvm6AamlTshTT216OAk15HfwKS
-         g23BrH2EZQQuYdq9D+zjMoZj5++RonYY0Z8YRoKdvmYdZmfx1K+6AEhoKHvZgdvZZn2a
-         ch8+TGXae+adTT4MBFKzgifTanHHxyVCp42+wjRsKXazchnZ0LwB66T447XXIQajtheP
-         Ua6IStCSzZ0uWR+2a8WWHHOvNivG/DS3pR5orHPVxEURaHcaY1YlCcXvPkloTIsE793E
-         TVEQ==
-X-Gm-Message-State: AOAM532JcJnNSf/2gF/JkemE8J2XKtX44yfi17iKwg+JvWydhgiZQPJD
-        Z3NQbS/Zyy9bK2STNnO/u576VQ==
-X-Google-Smtp-Source: ABdhPJzHa77Mqwcb/UXTiiWN+F7q/weAnzXN+ZDwNq5zIfaSRjShl+af95vFZNzbpUq3Twu/Aujk5g==
-X-Received: by 2002:a17:90a:191a:: with SMTP id 26mr15092301pjg.79.1634315780283;
-        Fri, 15 Oct 2021 09:36:20 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id a3sm6094427pfv.174.2021.10.15.09.36.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Oct 2021 09:36:18 -0700 (PDT)
-Date:   Fri, 15 Oct 2021 16:36:12 +0000
-From:   Sean Christopherson <seanjc@google.com>
+        id S241381AbhJOQj2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Oct 2021 12:39:28 -0400
+Received: from mail.kernel.org ([198.145.29.99]:56086 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S237264AbhJOQj1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Oct 2021 12:39:27 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 6E79760C41;
+        Fri, 15 Oct 2021 16:37:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1634315840;
+        bh=8LWLtU5MsDMIiCJt5B3N0eQ4f38xv5T64z+uouIjPqo=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=RuOWNW/9d/yILeOIudf6QnHudofjEwQbNvu+151t5rDkfsJZZP6Wa5K73Rj1uKFMl
+         E6P0fObOfJeqdQOmNeXW52J1Cv5UIfJmAp/03B6jddkWmb+Zn0VhJjU/frzRVNIJ6I
+         kB6FgdMo2poNmz93dlPi6LTyHxfdloclo2wgtp42/6jgT9oNpw/jD+IZMDqyVOconN
+         AkFz8AdFTMi9yjvUw489D7OFO1wo2qC6UMZxUiBnpHRguS067sQFnmKVHYq2Ii9j8C
+         SQb87pemf6gAoQLsvp3aGYYI4r0gBuHZdVMT0+1nTqFj36csFLDK0gKrRISwwbkT0Z
+         LY7Vos8Ac1cwg==
+Date:   Fri, 15 Oct 2021 09:37:16 -0700
+From:   Nathan Chancellor <nathan@kernel.org>
 To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Maxim Levitsky <mlevitsk@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/2] KVM: x86: Fix and cleanup for recent AVIC changes
-Message-ID: <YWmt/A4pemf2050j@google.com>
-References: <20211009010135.4031460-1-seanjc@google.com>
- <9e9e91149ab4fa114543b69eaf493f84d2f33ce2.camel@redhat.com>
- <YWRJwZF1toUuyBdC@google.com>
- <YWRtHmAUaKcbWEzH@google.com>
- <ebf038b7b242dd19aba1e4adb6f4ef2701c53748.camel@redhat.com>
- <YWmpKTk/7MOCzm15@google.com>
- <5faa7e49-9eb6-a075-982a-aa7947a5a3d6@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        seanjc@google.com, torvic9@mailbox.org,
+        Jim Mattson <jmattson@google.com>, llvm@lists.linux.dev
+Subject: Re: [PATCH] KVM: x86: avoid warning with -Wbitwise-instead-of-logical
+Message-ID: <YWmuPOB6/rXWqXBH@archlinux-ax161>
+References: <20211015085148.67943-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <5faa7e49-9eb6-a075-982a-aa7947a5a3d6@redhat.com>
+In-Reply-To: <20211015085148.67943-1-pbonzini@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 15, 2021, Paolo Bonzini wrote:
-> On 15/10/21 18:15, Sean Christopherson wrote:
-> > > 
-> > >                                          - now vCPU1 finally starts running the page fault code.
-> > > 
-> > >                                          - vCPU1 AVIC is still enabled
-> > >                                            (because vCPU1 never handled KVM_REQ_APICV_UPDATE),
-> > >                                            so the page fault code will populate the SPTE.
-> > But vCPU1 won't install the SPTE if it loses the race to acquire mmu_lock, because
-> > kvm_zap_gfn_range() bumps the notifier sequence and so vCPU1 will retry the fault.
-> > If vCPU1 wins the race, i.e. sees the same sequence number, then the zap is
-> > guaranteed to find the newly-installed SPTE.
-> > 
-> > And IMO, retrying is the desired behavior.  Installing a SPTE based on the global
-> > state works, but it's all kinds of weird to knowingly take an action the directly
-> > contradicts the current vCPU state.
+On Fri, Oct 15, 2021 at 04:51:48AM -0400, Paolo Bonzini wrote:
+> This is a new warning in clang top-of-tree (will be clang 14):
 > 
-> I think both of you are correct. :)
+> In file included from arch/x86/kvm/mmu/mmu.c:27:
+> arch/x86/kvm/mmu/spte.h:318:9: error: use of bitwise '|' with boolean operands [-Werror,-Wbitwise-instead-of-logical]
+>         return __is_bad_mt_xwr(rsvd_check, spte) |
+>                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>                                                  ||
+> arch/x86/kvm/mmu/spte.h:318:9: note: cast one or both operands to int to silence this warning
 > 
-> Installing a SPTE based on global state is weird because this is a vCPU
-> action; installing it based on vCPU state is weird because it is knowingly
-> out of date.
+> Reported-by: torvic9@mailbox.org
+> Suggested-by: Jim Mattson <jmattson@google.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-If that's the argument, then kvm_faultin_page() should explicitly check for a
-pending KVM_REQ_APICV_UPDATE, because I would then argue that contuining on when
-KVM _knows_ its new SPTE will either get zapped (page fault wins the race) or
-will get rejected (kvm_zap_gfn_range() wins the race) is just as wrong.  The SPTE
-_cannot_ be used even if the page fault wins the race, becuase all vCPUs need to
-process KVM_REQ_APICV_UPDATE and thus will be blocked until the initiating vCPU
-zaps the range and drops the APICv lock.
+Reviewed-by: Nathan Chancellor <nathan@kernel.org>
 
-And I personally do _not_ want to add a check for the request because it implies
-the check is sufficient, which it is not, because the page fault doesn't yet hold
-mmu_lock.
-
-Since all answers are some form of wrong, IMO we should at least be coherent with
-respect to the original page fault.
+> ---
+>  arch/x86/kvm/mmu/spte.h | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
+> index eb7b227fc6cf..32bc7268c9ea 100644
+> --- a/arch/x86/kvm/mmu/spte.h
+> +++ b/arch/x86/kvm/mmu/spte.h
+> @@ -314,9 +314,12 @@ static __always_inline bool is_rsvd_spte(struct rsvd_bits_validate *rsvd_check,
+>  	 * Use a bitwise-OR instead of a logical-OR to aggregate the reserved
+>  	 * bits and EPT's invalid memtype/XWR checks to avoid an extra Jcc
+>  	 * (this is extremely unlikely to be short-circuited as true).
+> +	 *
+> +	 * (int) avoids clang's "use of bitwise '|' with boolean operands"
+> +	 * warning.
+>  	 */
+> -	return __is_bad_mt_xwr(rsvd_check, spte) |
+> -	       __is_rsvd_bits_set(rsvd_check, spte, level);
+> +	return (int)__is_bad_mt_xwr(rsvd_check, spte) |
+> +	       (int)__is_rsvd_bits_set(rsvd_check, spte, level);
+>  }
+>  
+>  static inline bool spte_can_locklessly_be_made_writable(u64 spte)
+> -- 
+> 2.27.0
+> 
+> 
