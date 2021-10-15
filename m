@@ -2,110 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5C6A742FA8D
-	for <lists+kvm@lfdr.de>; Fri, 15 Oct 2021 19:50:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0624A42FAA5
+	for <lists+kvm@lfdr.de>; Fri, 15 Oct 2021 19:59:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242292AbhJORxA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Oct 2021 13:53:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33455 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S242259AbhJORxA (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 15 Oct 2021 13:53:00 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634320252;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=TsfQJ+QgzOOfLaCjggWbwpgeV1kvleQ7Jz1X1qSYym0=;
-        b=ipwJ0Bw8psiGycU073lzpwndueh1f/QoxWl6/DRnB/Tz0nx8KaX/6WTDXpKgZ1yk/PqVMW
-        AgHWeRkTPlOlQXDr+Mregtzk1PH1QwM72EwsCeuLq7S7GHAVmGS95CnhXHio4aKILXV6N/
-        1bhZ+EeGuc1i6Ai1556kAdx/L5csX2w=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-267-vce06O-YNjiVM871oyGUXw-1; Fri, 15 Oct 2021 13:50:50 -0400
-X-MC-Unique: vce06O-YNjiVM871oyGUXw-1
-Received: by mail-ed1-f72.google.com with SMTP id l22-20020aa7c316000000b003dbbced0731so8943994edq.6
-        for <kvm@vger.kernel.org>; Fri, 15 Oct 2021 10:50:49 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=TsfQJ+QgzOOfLaCjggWbwpgeV1kvleQ7Jz1X1qSYym0=;
-        b=ULOWcjHhow7tRF0srv/DOnHdoVBv/d5sOm3GtwAmw3w1zNj9QniIWqDKlgCsZngK6t
-         Aut+B6+7aAPqfK85Z4sjBva8YHgOer+SW66E9gWYjAHTAeknjFqdJvBx85QqauFuOhIB
-         9UNFS2TtTYcvqh/af4rwQXDeVfBKYjB0nTYon4WSI4bWT/MBhizilFZXALIq5ZJ8jM10
-         cYFEXLJF1W8KllOi5DJ/zTqJUFKmJVN9BX9x7js2mrgEIB+8SQDB7n7RVfGxPou84kkZ
-         goETTHKcxoW9iUsZ/MXih9d7GleC9ByIdk7q557qZRaQd8upuPMBQ/Z8K/iTfmYyZFsi
-         Vn6g==
-X-Gm-Message-State: AOAM533OKR+OjPMD7b77awT/PGT52ByTgg/vsVTqenbVTL7kfckgu7Hy
-        4KefQTT6tzYp9SUZfrVC/eZGodMYp736GRgqWqAjODdF3ZC4kuxlIRRioZvzFN0Rsnqt9vEqdCu
-        8oJKQBQID/yNt
-X-Received: by 2002:a17:906:abd3:: with SMTP id kq19mr8652272ejb.285.1634320248918;
-        Fri, 15 Oct 2021 10:50:48 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwlvUF01PAH9b4uRCsZicwTcvW53v52vttAUA9z7TDvslDRI455Y9rszntyFoG5LxAZ43rs5w==
-X-Received: by 2002:a17:906:abd3:: with SMTP id kq19mr8652246ejb.285.1634320248691;
-        Fri, 15 Oct 2021 10:50:48 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id y21sm4572949ejk.30.2021.10.15.10.50.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 15 Oct 2021 10:50:48 -0700 (PDT)
-Message-ID: <b148def5-9d34-bfa7-db6e-afaf11728639@redhat.com>
-Date:   Fri, 15 Oct 2021 19:50:40 +0200
+        id S242341AbhJOSBb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Oct 2021 14:01:31 -0400
+Received: from mail.kernel.org ([198.145.29.99]:58466 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S242221AbhJOSBa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Oct 2021 14:01:30 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPS id CB33761245
+        for <kvm@vger.kernel.org>; Fri, 15 Oct 2021 17:59:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1634320763;
+        bh=rqJwjStj3Llv3b1CVZ50i28VkN69PORzKd8jXr84l2I=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=mfNAinZbnZ2A3mjyzi5tgR7XR3LeM1SlFZ717MY5PdRjf5Ch8f4mtnmWS5qT07tPb
+         uTSJkpv8dUVnQtDdSCeaTuYZVsj1aO6b/+tjRPZGb2Tag1uI8X2YN/5mB3muzxr1gF
+         Nd/Sk5PoiKeiD9IMX5oUse4kcYT1mzvVBkwKlJ8XheecseXkny9xJJt6TzIwAgvLZR
+         jZ2fd6NkS2C+flx03Q36ZC//ALHD2Bdjbup1ZQCzcaV5JFHeeLcQcuRpyAAPgG93jA
+         34SvT9GiO53+AlpkTVSezLHt9ct7ZPrwFpFNcxwHDo6f51Uv3yy0HXukhk9dWyWVsl
+         jwF12sJFBYxfA==
+Received: by pdx-korg-bugzilla-2.web.codeaurora.org (Postfix, from userid 48)
+        id C85A460EE6; Fri, 15 Oct 2021 17:59:23 +0000 (UTC)
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     kvm@vger.kernel.org
+Subject: [Bug 110441] KVM guests randomly get I/O errors on VirtIO based
+ devices
+Date:   Fri, 15 Oct 2021 17:59:23 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: ucelsanicin@yahoo.com
+X-Bugzilla-Status: RESOLVED
+X-Bugzilla-Resolution: INVALID
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-110441-28872-ISMFAFhvKH@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-110441-28872@https.bugzilla.kernel.org/>
+References: <bug-110441-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [PATCH 0/2] KVM: x86: Fix and cleanup for recent AVIC changes
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Maxim Levitsky <mlevitsk@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20211009010135.4031460-1-seanjc@google.com>
- <9e9e91149ab4fa114543b69eaf493f84d2f33ce2.camel@redhat.com>
- <YWRJwZF1toUuyBdC@google.com> <YWRtHmAUaKcbWEzH@google.com>
- <ebf038b7b242dd19aba1e4adb6f4ef2701c53748.camel@redhat.com>
- <YWmpKTk/7MOCzm15@google.com>
- <5faa7e49-9eb6-a075-982a-aa7947a5a3d6@redhat.com>
- <YWmt/A4pemf2050j@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <YWmt/A4pemf2050j@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 15/10/21 18:36, Sean Christopherson wrote:
->> Installing a SPTE based on global state is weird because this is a vCPU
->> action; installing it based on vCPU state is weird because it is knowingly
->> out of date.
-> If that's the argument, then kvm_faultin_page() should explicitly check for a
-> pending KVM_REQ_APICV_UPDATE, because I would then argue that contuining on when
-> KVM_knows_  its new SPTE will either get zapped (page fault wins the race) or
-> will get rejected (kvm_zap_gfn_range() wins the race) is just as wrong.  The SPTE
-> _cannot_  be used even if the page fault wins the race, becuase all vCPUs need to
-> process KVM_REQ_APICV_UPDATE and thus will be blocked until the initiating vCPU
-> zaps the range and drops the APICv lock.
+https://bugzilla.kernel.org/show_bug.cgi?id=3D110441
 
-Right, that was my counter-argument - no need to check for the request 
-because the request "synchronizes" with the actual use of the PTE, via 
-kvm_make_all_cpus_request + kvm_zap_gfn_range.
+Ahmed Sayeed (ucelsanicin@yahoo.com) changed:
 
-> And I personally do_not_  want to add a check for the request because it implies
-> the check is sufficient, which it is not, because the page fault doesn't yet hold
-> mmu_lock.
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |ucelsanicin@yahoo.com
 
-Of course, that would be even worse.
+--- Comment #3 from Ahmed Sayeed (ucelsanicin@yahoo.com) ---
+ake: Entering directory '/home/Christian/binutils-gdb/cygwin-obj/gdb'
+  CXXLD  gdb.exe  http://www.compilatori.com/computers/smartphones/
+cp-support.o: in function `gdb_demangle(char const*, int)':
+http://www.acpirateradio.co.uk/services/ios15/
+/home/Christian/binutils-gdb/cygwin-obj/gdb/../../gdb/cp-support.c:1619:(.t=
+ext+0x5502):
+http://www.logoarts.co.uk/property/lidar-sensor/ relocation truncated to fi=
+t:
+R_X86_64_PC32 against undefined symbol
+http://www.slipstone.co.uk/property/hp-of-cars/ `TLS init function for
+thread_local_segv_handler'
+/home/Christian/binutils-gdb/cygwin-obj/gdb/../../gdb/cp-support.c:1619:(.t=
+ext+0x551b):
+http://embermanchester.uk/property/chat-themes/  relocation truncated to fi=
+t:
+R_X86_64_PC32 against undefined symbol `TLS init function for
+thread_local_segv_handler'
+collect2: error: ld returned 1 exit status
+http://connstr.net/property/mars-researches/
+make: *** [Makefile:1881: gdb.exe] Error 1
+make: Leaving directory '/home/Christian/binutils-gdb/cygwin-obj/gdb'
+http://joerg.li/services/kia-rio-price/
 
-> Since all answers are some form of wrong, IMO we should at least be coherent with
-> respect to the original page fault.
+$ g++ -v
+Using built-in specs. http://www.jopspeech.com/technology/thunderbolt-4/
+COLLECT_GCC=3Dg++
+COLLECT_LTO_WRAPPER=3D/usr/lib/gcc/x86_64-pc-cygwin/10/lto-wrapper.exe
+Target: x86_64-pc-cygwin http://www.wearelondonmade.com/tech/driving-assist=
+ant/=20
+Configured with: /mnt/share/cygpkgs/gcc/gcc.x86_64/src/gcc-10.2.0/configure
+--srcdir=3D/mnt/share/cygpkgs/gcc/gcc.x86_64/src/gcc-10.2.0 --prefix=3D/usr
+--exec-prefix=3D/usr --localstatedir=3D/var --sysconfdir=3D/etc
+--docdir=3D/usr/share/doc/gcc --
+https://waytowhatsnext.com/computers/discord-and-steam/
+htmldir=3D/usr/share/doc/gcc/html -C --build=3Dx86_64-pc-cygwin
+--host=3Dx86_64-pc-cygwin --target=3Dx86_64-pc-cygwin --without-libiconv-pr=
+efix
+--without-libintl-prefix --
+http://www.iu-bloomington.com/property/properties-in-turkey/
+libexecdir=3D/usr/lib --with-gcc-major-version-only --enable-shared
+--enable-shared-libgcc --enable-static --enable-version-specific-runtime-li=
+bs
+--enable-bootstrap --enable-__cxa_atexit --with-dwarf2
+https://komiya-dental.com/sports/telegram/ --with-tune=3Dgeneric
+--enable-languages=3Dc,c++,fortran,lto,objc,obj-c++ --enable-graphite
+--enable-threads=3Dposix --enable-libatomic --enable-libgomp --enable-libqu=
+admath
+http://www-look-4.com/health/winter-sickness/ --enable-libquadmath-support
+--disable-libssp --enable-libada --disable-symvers --with-gnu-ld --with-gnu=
+-as
+--with-cloog-include=3D/usr/include/cloog-isl --without-libiconv-prefix
+--without-libintl-prefix --with-system-zlib
+https://www.webb-dev.co.uk/sports/gym-during-covid/ --enable-linker-build-id
+--with-default-libstdcxx-abi=3Dgcc4-compatible --enable-libstdcxx-filesyste=
+m-ts
+Thread model: posix
+Supported LTO compression algorithms: zlib zstd
+gcc version 10.2.0 (GCC)
 
-Okay, you win if you send a patch with a comment. :)
+--=20
+You may reply to this email to add a comment.
 
-Paolo
-
+You are receiving this mail because:
+You are watching the assignee of the bug.=
