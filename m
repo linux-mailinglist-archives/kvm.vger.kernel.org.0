@@ -2,132 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E490742FC9E
-	for <lists+kvm@lfdr.de>; Fri, 15 Oct 2021 21:55:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 56F6C42FCB1
+	for <lists+kvm@lfdr.de>; Fri, 15 Oct 2021 22:00:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242888AbhJOT5t (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Oct 2021 15:57:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46944 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242891AbhJOT5p (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Oct 2021 15:57:45 -0400
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D63A4C061767
-        for <kvm@vger.kernel.org>; Fri, 15 Oct 2021 12:55:38 -0700 (PDT)
-Received: by mail-pg1-x549.google.com with SMTP id t75-20020a63784e000000b002993a9284b0so5549619pgc.11
-        for <kvm@vger.kernel.org>; Fri, 15 Oct 2021 12:55:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=0gFWOxjXB0c1Q+Iin2AdfFN/hNj8vdZaeYPqs1MYJFM=;
-        b=DgL3RlfCbekkTBwYgZbDMrMomstvCBRCNdOfenjBUmrVUcjnURtj7CUPv8GSzJLkKV
-         As2JgZxfO0H6fJ4QYysNThuZ8d0y4mDUq0UA4kpE6kNzOVEcjPkTBGjFzqdLjPIF0elz
-         sFGRnaGBeqR5Eun75Q4fa8KxWOokO7vUH98mzePNdBSlVZh+ef6XMvPr+rVEWNdc7kuK
-         rPP06BEwi8Yx9Y1mtJefnNNma5wuZFMg31Qv2/2Fuov4gA6Gi3g9IlHnkdqTB6OwCOz1
-         YPP8K/rO4ckphFt2O0tleoq4oBj8LFLZb4belOgN46nCqvD5G8JpJbswAGK15xTniojv
-         /4XQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=0gFWOxjXB0c1Q+Iin2AdfFN/hNj8vdZaeYPqs1MYJFM=;
-        b=H6jsCT7FQUunbxAIzvE/bXBTaV3cWfctrbhV1lRMpersaA16hXNsXmnbEfRzn5goTK
-         4Yoc51qiwmGauMVnaXjZcBo5RK6E62KJ4SEgMTuunpVEJ66k0q4ih4oDrE4/wggXBOuK
-         /ZD1oWi05e579f6S205igomM6NgY75EV1izwJCEmhAsqj5bz1GMi4cNt5E6aMXCv2klc
-         doKrnEOmm6EfF+3b2YAELD+4WEDtoJcdTxhkDIqJNiHs5sSwNI2hTKChKkz8q232ZFbb
-         3ZfgUD+mO4xVjdR2yC8Pxo5Jk2jZrfcElDs4cqm78UVwGpZV3RD5jlglbM7rbCQQeiUj
-         c29A==
-X-Gm-Message-State: AOAM530BnNFNfihftm3lzKGeK5hQxtDEupFWl8wE6tdWkqO+tGVSEKuO
-        HRfUNZPMEy+aouByRHlYb8i4FlJOV45o3NigM9hp66omryGHjcRwHMncNHoHeOvJMgNCgBqg+FA
-        aMLcBCltRflaNOVtXzvdP+SsR8SIqMKcoPFP/sUn7pt9HPqTxpyb5Y9FcIXK+1Ro=
-X-Google-Smtp-Source: ABdhPJyvnRQ/HfZyPNBrat7GEkWvAtGioWVmDrRzxHEBBRYsqehP6RgzsFnAy9bzsGLdalg6fhHEhMSGp9bGnA==
-X-Received: from tortoise.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1a0d])
- (user=jmattson job=sendgmr) by 2002:a05:6a00:1346:b0:44d:242a:8151 with SMTP
- id k6-20020a056a00134600b0044d242a8151mr13510744pfu.62.1634327738178; Fri, 15
- Oct 2021 12:55:38 -0700 (PDT)
-Date:   Fri, 15 Oct 2021 12:55:30 -0700
-In-Reply-To: <20211015195530.301237-1-jmattson@google.com>
-Message-Id: <20211015195530.301237-4-jmattson@google.com>
-Mime-Version: 1.0
-References: <20211015195530.301237-1-jmattson@google.com>
-X-Mailer: git-send-email 2.33.0.1079.g6e70778dc9-goog
-Subject: [kvm-unit-tests PATCH v2 3/3] x86: Add a regression test for L1 LDTR
- persistence bug
-From:   Jim Mattson <jmattson@google.com>
-To:     kvm@vger.kernel.org, pbonzini@redhat.com
-Cc:     Jim Mattson <jmattson@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S242919AbhJOUBt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Oct 2021 16:01:49 -0400
+Received: from mail-co1nam11on2055.outbound.protection.outlook.com ([40.107.220.55]:3494
+        "EHLO NAM11-CO1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S242867AbhJOUBq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Oct 2021 16:01:46 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Osnn38fcwXdf0cv8/9mNvA+VNtbSJSXc+5csa6blk0TCZ3Au3g1GZWXKHrQe4evk7q+RbG+rqYBqGPJ0S+CR3fs4qIBn62U4yLPE3iS/6s+AFz9Yf1B4zCs8u/c8xVGLsQlfP7VA+tdsYIfSyl/IcXFAW3YOHnh1yKBiT+v4fyzBmFcyIUnVjWSL/LjwuW557DfTvqCNj6GgnYBbiu8ybJAaa/dOuj667WmNxdNHHoVnsChVEQDGVnlxmx89ModOoQiAN/NslX2A7ercqKiikLTBEzlxs7sSG2a5m6Q+o6f/HljG3aUxxtKcD6kd/FdAf0Q9Tm9p55MQ7fjWohmUOA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=lCHo0Mf4t7HUiemJNhHUfLAeH41+rJ8ovFq84qdtxfk=;
+ b=edum6S2+MrAzyQ6yyEvciuTVUmXLGCRSWDX7/aCQ06lTmyMjmoZDyXB7mxnm1M/Zo/7/djJDO8hE/xn9PFCjDwjakPlYsmM3LL6upCw5rbtYtdpZNF9LMZcLQsPAMRQxKtxhWFr17Cw+jn6kSSdqmUHowOqDatNiynJeireApiN7uU9E80hh1FTzEIK28JfGhaRRT2QP1ZW9fI0BO/uGtbsv1GFtJUooBIKp7UHBR405MryLZyjwKGDAcDQQgNtWjn7kQ8a/MLvss8ThhoLO4kCZRYW3w9q533io2Dn0f2ZgFiNQOklRWlETEiGPkIa2hXwag1+j3yPhX37y4Hyk6Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=lCHo0Mf4t7HUiemJNhHUfLAeH41+rJ8ovFq84qdtxfk=;
+ b=W8t3BhYu8RNFu45WOpXrBa+/WwzdWaxdFoQObXc2FdzV920xuUl5xrATU/K3irjCVyTGPh6w+EbPE2HiQtplyI3Sx4BYODBkMt7epHNrbRjy4+DYBzgi7SXpWCS7czPzoEXQikqL0s9kpourpJC6KivC7fFisWFac/vUZU1zq+w0120CR9n+oJ7jYTSQHahgi0kUb7ntvkvj7vE9Jjs3+qZCl7E3ExGrd2rsDBmex6rU8OC73F7kl/gQ/5WHT116YdFxNAZUQM0t/+c0oROITJnVqz+5QI4/9NQThXKjiA2mV5P+OumAzhIwDZiTPhMVL719Nm3trIOZsXoMg5FIGQ==
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=nvidia.com;
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
+ by BL1PR12MB5363.namprd12.prod.outlook.com (2603:10b6:208:317::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4608.17; Fri, 15 Oct
+ 2021 19:59:38 +0000
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::e8af:232:915e:2f95]) by BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::e8af:232:915e:2f95%6]) with mapi id 15.20.4608.017; Fri, 15 Oct 2021
+ 19:59:38 +0000
+Date:   Fri, 15 Oct 2021 16:59:37 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Yishai Hadas <yishaih@nvidia.com>, bhelgaas@google.com,
+        saeedm@nvidia.com, linux-pci@vger.kernel.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, kuba@kernel.org, leonro@nvidia.com,
+        kwankhede@nvidia.com, mgurtovoy@nvidia.com, maorg@nvidia.com
+Subject: Re: [PATCH V1 mlx5-next 11/13] vfio/mlx5: Implement vfio_pci driver
+ for mlx5 devices
+Message-ID: <20211015195937.GF2744544@nvidia.com>
+References: <20211013094707.163054-1-yishaih@nvidia.com>
+ <20211013094707.163054-12-yishaih@nvidia.com>
+ <20211015134820.603c45d0.alex.williamson@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211015134820.603c45d0.alex.williamson@redhat.com>
+X-ClientProxiedBy: BL1P223CA0017.NAMP223.PROD.OUTLOOK.COM
+ (2603:10b6:208:2c4::22) To BL0PR12MB5506.namprd12.prod.outlook.com
+ (2603:10b6:208:1cb::22)
+MIME-Version: 1.0
+Received: from mlx.ziepe.ca (142.162.113.129) by BL1P223CA0017.NAMP223.PROD.OUTLOOK.COM (2603:10b6:208:2c4::22) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4608.15 via Frontend Transport; Fri, 15 Oct 2021 19:59:38 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1mbTMf-00FTJe-7p; Fri, 15 Oct 2021 16:59:37 -0300
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 25cdc98c-1dfa-40e5-157e-08d99016517a
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5363:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <BL1PR12MB536364ACA786DCD5A78D0053C2B99@BL1PR12MB5363.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: cE33LyU5kpVk3TXJVYMuVsLvCmu0xVpjJvSwDyUpQwzPVMIbvzntlx48AT1qBP2ChTv1G0CdI0K0QBljgktHtvRpVtRtlZQFYfU87XG7vWqrakvQG7SHGpKp7Dkj7BxGtNzD8Ru2E53fhE/t7bHvHw8ldVdcY1I2U7N+G1R3j1AJ+0ymgKYX+X8ixg3QH+8vzgxCp7skZOWr7c11VYSdNYF/7AXplaekgLsMHoHxdrG4rRJ6o7H54TM4nLwHUCfb8dK92051r951qKemQ5hkHIhdwU5w8SSps+y7KTKQAr0U62vj+9mb3BXMnNQh2wtP1raGuNJC5xRqss1al/hhewQjIqLBxcPWLRV7HsaziOB82n8Hr7ddCU4dkSMOLUyBRtHCsxgVXujQh989AUkm2/k7U27G5FU6i/sWh5yA/S+CIXcj1Bcp2VFNBd1RTP/u5NQc0JQrx0DsDru8/28hT+AX4I6KEh0topnizqC3H7ymIpc0lDW/4sTtKa8OM8ApaJSuZDsuv7AF1vrnmyUKGkoOBCZC+1vV01Bk8ifbjESSAvDDvhlWvXWEvxQ/0aNUmxsR9fSYHb58AeOlaN0uFWuRYDD/AyjXM9ekunjAcxEEVe17vRR9ypNGl+/xU0JYNWs1sblKX5NRoLHQbXUx6A==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(38100700002)(186003)(8676002)(26005)(86362001)(107886003)(9786002)(2906002)(9746002)(36756003)(5660300002)(66476007)(4326008)(2616005)(66946007)(66556008)(8936002)(316002)(6916009)(1076003)(508600001)(426003)(33656002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?o32JoXDfV9SWsJEtqs/mJWorXzCPL4hth8cu8DbrTI91r8nPEYg9wK5TKs0M?=
+ =?us-ascii?Q?ZAU0C/+9wcXOzve4uSMUgQX8wSbfeEVV8nG25C6QIUQsH7AhtfJxElPbCsgw?=
+ =?us-ascii?Q?zGD/S0ce3GbLH8mWHspvJHMMTOgUP3pallU9UvMb/e3W21SMnmvaGsO1wmxT?=
+ =?us-ascii?Q?QWke811HsRTOIzfR7urZfDhbFlmkuf0YTYe72nF3iiZ1Dh+vVmMWXw0MW0gm?=
+ =?us-ascii?Q?JsIsNambH25XhlNSfmV+nBHpgtXoEPtHzmi+CUc4mxR2+n6zHVZyAmKXm9j7?=
+ =?us-ascii?Q?IS23pjifKne10KfRUQzixQ18fff9V3hJA5ZTcu4jmncFG6FmctlwbAKruKgB?=
+ =?us-ascii?Q?QdKC9OgAguZloyOc/Ie+qaPB8W01Oz3o1h7jFUEzC/6e86ijGGUV8dP28aCz?=
+ =?us-ascii?Q?AE/QibRqDEUVAfFnoCWzEEztylPvwLU/JMpXJpl3xwIkNPEjrTgMj5ys/ecK?=
+ =?us-ascii?Q?xR1FPxMhcldAxukq27ZEfbf+PVFrR5uI6DuUAWU4g8qIsUWva1plxeqXvVJ1?=
+ =?us-ascii?Q?Q8/ti60IEQ2UCz6qmWRERvlQP/LmkRzcZdCwGEuStxYW0FgjlgUW7Zsgy7Ty?=
+ =?us-ascii?Q?/45AFc9SkmCiBoMmWtzzTezNLD9q97iMjulpO1mssf/yXTsMu19oM5WgnFEu?=
+ =?us-ascii?Q?NKbmqhFD0A33z0s46EAM6jzFZVOYiU9jvXFayeqVdT3p+nVS0w9zxZaDWe9G?=
+ =?us-ascii?Q?Ao/6C0FdQkHXy7hfGNXhfB5oTi6rRf+uIpkj3ldNLRVxiXpdmWIE0Bxm1TVN?=
+ =?us-ascii?Q?0wUEhQR20DNDheoMPIy2ARdXlmGolTKJi/2XQPYsdQ9d7k/UCsp9PKZakY4+?=
+ =?us-ascii?Q?IDG0/Yr+YQBjP0unTJsxqhBEN6vs0CQg2Yv0jeXgYWepJ69WQVEvldjtxCjI?=
+ =?us-ascii?Q?VfiNwlNE8jvrtC0tEfjO0QEl2NPkIKSbkylaI/LklCA7nDWq9eiLp9BjQDh2?=
+ =?us-ascii?Q?LnR35HEuodi9qQLP5s85xxoKRwrlxYsN2xjy7SkcM3Qdl4Oe4KyEGQyJ0L4S?=
+ =?us-ascii?Q?QkPO+a5S83NZx6r+LuI1bBV9vXKePZJzwRSrghLyrTrt2YDfV/64n6ktj4o0?=
+ =?us-ascii?Q?yfib9nQZgdEPbF8/7S9xGDgcS5GXyKm4ou6uBgC+5Hk2Z8CUA7vDQDIskTWT?=
+ =?us-ascii?Q?s7JKgnCFgdHECak2kMe3QPIRcZsbjbAMR8L98RRUoTh/MeN+FRzvzNRc3N/L?=
+ =?us-ascii?Q?12fSYVI1QGuX49PgoJAjgAL9ghFx+BwjSIdh3oE/fcWQP9Pp2R57ehjMemfj?=
+ =?us-ascii?Q?mMgqijGaRTgB9mDQaBNvQ8R3Qgr2i/NQJoCdzOw4cPu+/IlflbfLwJrAGC0p?=
+ =?us-ascii?Q?INgqINwoiirVRU5Cva3mS8rF?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 25cdc98c-1dfa-40e5-157e-08d99016517a
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Oct 2021 19:59:38.2780
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: gBg5FBEtYcS88+L67pmJ9d47kzjtRiiV7Bu2wUqu9IrB15h7/gdPWCV/wYJcVkM3
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5363
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a regression test for Linux commit afc8de0118be ("KVM: nVMX: Set
-LDTR to its architecturally defined value on nested VM-Exit"). L1's
-LDTR should be 0 after an emulated VM-exit from L2.
+On Fri, Oct 15, 2021 at 01:48:20PM -0600, Alex Williamson wrote:
+> > +static int mlx5vf_pci_set_device_state(struct mlx5vf_pci_core_device *mvdev,
+> > +				       u32 state)
+> > +{
+> > +	struct mlx5vf_pci_migration_info *vmig = &mvdev->vmig;
+> > +	u32 old_state = vmig->vfio_dev_state;
+> > +	int ret = 0;
+> > +
+> > +	if (vfio_is_state_invalid(state) || vfio_is_state_invalid(old_state))
+> > +		return -EINVAL;
+> 
+> if (!VFIO_DEVICE_STATE_VALID(old_state) || !VFIO_DEVICE_STATE_VALID(state))
 
-Signed-off-by: Jim Mattson <jmattson@google.com>
----
- x86/vmx_tests.c | 39 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 39 insertions(+)
+AFAICT this macro doesn't do what is needed, eg
 
-diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-index 3b97cfa6ed10..6093a90fd4ac 100644
---- a/x86/vmx_tests.c
-+++ b/x86/vmx_tests.c
-@@ -8363,6 +8363,44 @@ static void vmentry_movss_shadow_test(void)
- 	vmcs_write(GUEST_RFLAGS, X86_EFLAGS_FIXED);
- }
- 
-+static void vmx_ldtr_test_guest(void)
-+{
-+	u16 ldtr = sldt();
-+
-+	report(ldtr == NP_SEL, "Expected %x for L2 LDTR selector (got %x)",
-+	       NP_SEL, ldtr);
-+}
-+
-+/*
-+ * Ensure that the L1 LDTR is set to 0 on VM-exit.
-+ */
-+static void vmx_ldtr_test(void)
-+{
-+	const u8 ldt_ar = 0x82; /* Present LDT */
-+	u16 sel = FIRST_SPARE_SEL;
-+
-+	/* Set up a non-zero L1 LDTR prior to VM-entry. */
-+	set_gdt_entry(sel, 0, 0, ldt_ar, 0);
-+	lldt(sel);
-+
-+	test_set_guest(vmx_ldtr_test_guest);
-+	/*
-+	 * Set up a different LDTR for L2. The actual GDT contents are
-+	 * irrelevant, since we stuff the hidden descriptor state
-+	 * straight into the VMCS rather than reading it from the GDT.
-+	 */
-+	vmcs_write(GUEST_SEL_LDTR, NP_SEL);
-+	vmcs_write(GUEST_AR_LDTR, ldt_ar);
-+	enter_guest();
-+
-+	/*
-+	 * VM-exit should clear LDTR (and make it unusable, but we
-+	 * won't verify that here).
-+	 */
-+	sel = sldt();
-+	report(!sel, "Expected 0 for L1 LDTR selector (got %x)", sel);
-+}
-+
- static void vmx_single_vmcall_guest(void)
- {
- 	vmcall();
-@@ -10724,6 +10762,7 @@ struct vmx_test vmx_tests[] = {
- 	/* VMCS Shadowing tests */
- 	TEST(vmx_vmcs_shadow_test),
- 	/* Regression tests */
-+	TEST(vmx_ldtr_test),
- 	TEST(vmx_cr_load_test),
- 	TEST(vmx_cr4_osxsave_test),
- 	TEST(vmx_nm_test),
--- 
-2.33.0.1079.g6e70778dc9-goog
+VFIO_DEVICE_STATE_VALID(0xF000) == true
 
+What Yishai implemented is at least functionally correct - states this
+driver does not support are rejected.
+
+> > +	/* Running switches off */
+> > +	if ((old_state & VFIO_DEVICE_STATE_RUNNING) !=
+> > +	    (state & VFIO_DEVICE_STATE_RUNNING) &&
+> 
+> ((old_state ^ state) & VFIO_DEVICE_STATE_RUNNING) ?
+
+It is not functionally the same, xor only tells if the bit changed, it
+doesn't tell what the current value is, and this needs to know that it
+changed to 1
+
+> > +	    (old_state & VFIO_DEVICE_STATE_RUNNING)) {
+> > +		ret = mlx5vf_pci_quiesce_device(mvdev);
+> > +		if (ret)
+> > +			return ret;
+> > +		ret = mlx5vf_pci_freeze_device(mvdev);
+> > +		if (ret) {
+> > +			vmig->vfio_dev_state = VFIO_DEVICE_STATE_INVALID;
+> 
+> 
+> No, the invalid states are specifically unreachable, the uAPI defines
+> the error state for this purpose.
+
+Indeed
+
+> The states noted as invalid in the
+> uAPI should be considered reserved at this point.  If only there was a
+> macro to set an error state... ;)
+
+It should just assign a constant value, there is only one error state.
+
+Jason
