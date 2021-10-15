@@ -2,169 +2,221 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 65DB642FCE8
-	for <lists+kvm@lfdr.de>; Fri, 15 Oct 2021 22:16:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2DD7442FCEB
+	for <lists+kvm@lfdr.de>; Fri, 15 Oct 2021 22:18:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242937AbhJOUTE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Oct 2021 16:19:04 -0400
-Received: from mail-mw2nam12on2077.outbound.protection.outlook.com ([40.107.244.77]:52128
-        "EHLO NAM12-MW2-obe.outbound.protection.outlook.com"
+        id S238559AbhJOUUe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Oct 2021 16:20:34 -0400
+Received: from mail-dm6nam12on2051.outbound.protection.outlook.com ([40.107.243.51]:23649
+        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S242982AbhJOUTD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Oct 2021 16:19:03 -0400
+        id S234408AbhJOUUd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Oct 2021 16:20:33 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=YaS9a4faCjJdaX6R/euAYgl27CollGQjerpPBgsT06kTDLovvFQe1SxLqs0WWCey0bpR1/H0lOYd89B4jKbFqvGjSrt3O10JwTYxTGpVQwOjnzRqophML89Tivjx5onJO+2i/xqrORDtV2t7h8RDcrvJ1IWotJ6j+rT6Mnk/xOzhVSmq3R64C6oqA3u0NowwwxXsWMYFtDaJ+YE+2Nm8sue/pyOmLcHD5Ty3RfwHaoOzB/EsDusOEwaMWXP5umKgD7N3xcO+HuXcuS1dG5RQHUmzyGmgiDgZk9gfSvtt4x5biT5syQyO4AxIV/21fBXkqAheJRghfgvghEbiFyKbgg==
+ b=PMugwG4TE7aNk2NlT5tyxWFSnNj45m5a+VqdYbD1rPXjGGg6DbG+TWl4oOigpX6hy8IoIy/+G7HXRNDZWt9xqa/+cqGtsZqJJq1zyhiddu9d/cdvX95go+fhTwJYrBP/7eDysbtZJiVX68j0r5ejhAXqRdgEfdj0QFKUpOm5Zyl5m80B/QpZDEHBIYqcfZ1UsonJBqKK/DDD5n52ySgpoVRre1Nzx/XS9ZczjK5zg/bXPQmIk8BcFeITFhQ+q/xkSrhrqt64NPYXez86xAh/++zo5geGEiDL79GiUWWP6bD9K0aHzb50SJP9yCFUGhAYrCyWO8bthyoVMAaN68DvTw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=a74e9vDuyMopsus0C//13ZIYldxfzgTNcHefTnn+2Tk=;
- b=L1j/H/yQOWE8wlYaJc2jvmKA0/kq67EdQZXLPDRHWkSqUCg09d9y2vY9ahwsT1gIa+yYlwMuxJN4tIshL36WCGOb9czN6QqdHD9Lqb40dxqxX107p1mWl75L5bYw4QGn07bXBWZnngXY3YMNEIub4Bllwo2Cvq5HBpeqChOSfdoqZSVdDyCvTpeNaYBOqBEIBHAL1ibbuChnfkgs4yUyJ2gy0/Az0uxuicbuPhWsmILJItqCqZLrwjDYcQ8rXVFpi1lVZxTUyHtp3yKK0RQzrwk0paon57VuntR0eOpWsmwbcZ0QiSK+XPFvGAPYAmmVtdJG3qG1o3PHN/8kvLF5fQ==
+ bh=lgaUzbm5yjU/YABuMFY3LciYctTg7ZStrCZVNelewE0=;
+ b=Fc8g/nUa9e4GCdmKCqpFmBrelED67bQZ4xO25uiqBtfKlJauAMTqbrkF/sowm8UnWiXcJ73vtdxy5PiiPwY9Sk5WF2zOSo7xHy4Ni5eC5x1amX2LPDa7uWvbgjM94ry0ELleMCUEp/byLMVmbs9VI53jEe+I4B1ovyxiVSIeaMVqR9U0kk/dMpq3kjTMUXkVOgqR2q/ml7bfNhKrH94UMweUE9DRp7e3eL+R6D+kRQwy7ChlBQqBEPyxBl09xfpqSoVlQM66lJcZDTfCvfS4gBImwc01e5SaAJg+fWuPF9yxuzjDsBkwibX2eGPZbCV8vomn1CFVPwXfxJNBgi0vMA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=a74e9vDuyMopsus0C//13ZIYldxfzgTNcHefTnn+2Tk=;
- b=sb/OmF2jYKSroBjcy5w/+51qf2joHKaPpr5H+g9qVFfN9khbR/gl1yKfgAqjCKvr4tT3y4TQS6xi/WR4mysmX9wopL3XWxLBPCM2qVKyR5LZv0FycU+Iw/blnhvP6rG2YESGDGTCetX82Z+UqpIuWBvK31wzhNEuvHkcnZEk/pthnOOwg9825ByCKAHU67rdLo+CuSnBif2LtI8zaYt7OxQnaNbFnoSy/vRSoCBf4PoS+CXkKRvtaqZgg0faef3XshNKIcd3299PmDbn/TXVRnVb4DWp4Sdlt9VYCagWqktDLrpvS9WPNaaj9dgpz07foDQ2hz1AoUIj7Ws6T5JQ6g==
-Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=nvidia.com;
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
- by BL0PR12MB5507.namprd12.prod.outlook.com (2603:10b6:208:1c4::20) with
+ bh=lgaUzbm5yjU/YABuMFY3LciYctTg7ZStrCZVNelewE0=;
+ b=P/KjNCBjMGgIHFDPnP4yKUfsDGuOqrkwf/PFW4jueNhR2LhtHo2l4PhoNqojrgsJSQccwEaFJSTNJPam1f6ZlORBAuDspgwqlpwWrYX1AUT6CnHbbE1X366S5YX5//Y4MJ7Inb5pd49/EwvMTEiOb2DVOdV1ZuuqhRoShCdpui0=
+Authentication-Results: google.com; dkim=none (message not signed)
+ header.d=none;google.com; dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
+ by SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4608.14; Fri, 15 Oct
- 2021 20:16:55 +0000
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::e8af:232:915e:2f95]) by BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::e8af:232:915e:2f95%6]) with mapi id 15.20.4608.017; Fri, 15 Oct 2021
- 20:16:55 +0000
-Date:   Fri, 15 Oct 2021 17:16:54 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Yishai Hadas <yishaih@nvidia.com>, bhelgaas@google.com,
-        saeedm@nvidia.com, linux-pci@vger.kernel.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, kuba@kernel.org, leonro@nvidia.com,
-        kwankhede@nvidia.com, mgurtovoy@nvidia.com, maorg@nvidia.com
-Subject: Re: [PATCH V1 mlx5-next 11/13] vfio/mlx5: Implement vfio_pci driver
- for mlx5 devices
-Message-ID: <20211015201654.GH2744544@nvidia.com>
-References: <20211013094707.163054-1-yishaih@nvidia.com>
- <20211013094707.163054-12-yishaih@nvidia.com>
- <20211015134820.603c45d0.alex.williamson@redhat.com>
- <20211015195937.GF2744544@nvidia.com>
- <20211015141201.617049e9.alex.williamson@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211015141201.617049e9.alex.williamson@redhat.com>
-X-ClientProxiedBy: BL1PR13CA0119.namprd13.prod.outlook.com
- (2603:10b6:208:2b9::34) To BL0PR12MB5506.namprd12.prod.outlook.com
- (2603:10b6:208:1cb::22)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4587.22; Fri, 15 Oct
+ 2021 20:18:22 +0000
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::78b7:7336:d363:9be3]) by SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::78b7:7336:d363:9be3%6]) with mapi id 15.20.4587.032; Fri, 15 Oct 2021
+ 20:18:22 +0000
+Message-ID: <3fc1b403-73a1-cf2e-2990-66d2c1ecdfa3@amd.com>
+Date:   Fri, 15 Oct 2021 15:18:19 -0500
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.2.0
+Cc:     brijesh.singh@amd.com, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH Part2 v5 05/45] x86/sev: Add helper functions for
+ RMPUPDATE and PSMASH instruction
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+References: <20210820155918.7518-1-brijesh.singh@amd.com>
+ <20210820155918.7518-6-brijesh.singh@amd.com> <YWnC++azH3xXrMm6@google.com>
+From:   Brijesh Singh <brijesh.singh@amd.com>
+In-Reply-To: <YWnC++azH3xXrMm6@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SN4PR0501CA0140.namprd05.prod.outlook.com
+ (2603:10b6:803:2c::18) To SN6PR12MB2718.namprd12.prod.outlook.com
+ (2603:10b6:805:6f::22)
 MIME-Version: 1.0
-Received: from mlx.ziepe.ca (142.162.113.129) by BL1PR13CA0119.namprd13.prod.outlook.com (2603:10b6:208:2b9::34) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4628.10 via Frontend Transport; Fri, 15 Oct 2021 20:16:54 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1mbTdO-00FTce-Aa; Fri, 15 Oct 2021 17:16:54 -0300
+Received: from [10.0.0.5] (70.112.153.56) by SN4PR0501CA0140.namprd05.prod.outlook.com (2603:10b6:803:2c::18) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4628.8 via Frontend Transport; Fri, 15 Oct 2021 20:18:20 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 039a99db-8ef9-45b4-2ee9-08d99018bb8d
-X-MS-TrafficTypeDiagnostic: BL0PR12MB5507:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <BL0PR12MB5507F255112E0D9EF4B3CA63C2B99@BL0PR12MB5507.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:4941;
+X-MS-Office365-Filtering-Correlation-Id: 1c4fc950-7fa6-4082-5637-08d99018efa9
+X-MS-TrafficTypeDiagnostic: SN6PR12MB2718:
+X-Microsoft-Antispam-PRVS: <SN6PR12MB2718A13DB2DAD2C839C96951E5B99@SN6PR12MB2718.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: avj3qIvmvr/SqmRhgkRuCzzgGOQxUbcoIy9HvLc4RhCLM4jHM0OszEGdFBaaJySZoB7ZWNm2Lnygw9hxIpdJfsQu/xgCTI8h+QEz3+GRuEcvD5hTHQ3nzCNw9dX/lzF8x73GpC+5jsIkvlHeB6hb1wqlbsxMH51T1/FcDWZEY4rIo3BllYJ0LPO1U2rruUz4fPvh4jiSOT4f6OGc9JXUhwVaXvo+418u6gIwCoKtq0oWGe0T1XzYCWROGEwMuIT0zjfMQFumJfCC/QR+QPmLVUXu+ebkI3ZV4bBZ5QeOs/+1MVwICl05OBabdM7nfPGNTsbCVwcgnwHGx7Q3jtA6eJ/JYnz43+qeQgorl/zIKdLtWAG7opKtpHefDUFZLMVrlZ/xf3sn/GjYXMmHLHmoLh3bSbut0de2gVMjhm2Vyq3guq8hAaPd5XYBAzAAjp+ZcF6++KvhSFMguHh/+fPRhQAC0+ohEOS8PHzX98g1iwvJVxnteaL0r9O0+36/vLVstLmFkc0ailPYWHw2Wnok1zFFvOKDkImyIhx9CLCBPoi6r+8iJmFP6uYwSpmuB/aRcAzJnLakdL0rkUfjqisJCV3mykXKZTEGQ7PLprjr9saPD1z312nCj66KAh7C3Wcyit0UTwIk/Q2K4X10WcZd5w==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(4326008)(426003)(66476007)(2616005)(1076003)(66556008)(66946007)(6916009)(508600001)(107886003)(316002)(33656002)(8936002)(9786002)(26005)(186003)(2906002)(86362001)(5660300002)(8676002)(36756003)(9746002)(38100700002);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: lGxuF9ReK275sH946uvMYwfEnZG34io/LMHq2aDiTFIvY1hhTzYl7xkJkdXkm9OtXDxLkjzDt8ksJkKD9PiCRxKeAuODY2MHJaRLL0YK5ugqAburRm6jcj1bL5ig8bEwLux5vBzUAjlvlRbJOGomyMXUPlCCf1/TQWizcKZWIjreT2RyBdC7U31odeL2+wH57u8YCi5wm/vtaPf08DawX2olz66pakwvzKmdmKvRxYuhyQB+2pYA+MHlEvl+eam2dM5EyFNyNnngm5aYBYj4/fF93/AeEvmfG5jwYdDBOYYosap4TZuHgtAR5OSKqojoISk+OOgCt2G3AJ443alW4PlqAPoyGFJmIMweI+fQCYnceYBA8LK13inJcp/pPIrg8KLi5DGlDnSBXAQ/0frnyTVaOQZyJ+csxukBOo8YzkHKbEno6JIWpL1/FRPxgPf4cIMH1p81VIZk40oFIJir+KjqwQabafLWUq/gKm2mYgDlL2EsGcy75QZ9EOGDwQz+p/TTnfAelF7nJjMeHLtzXOs38a8nt6OQ93f0Z1yId9cd8eC4yVsmDii5NMRFwtTEyLHwgvSiQoK8IutsXZh7xkobLZ/yJRFDdtOwYKqy6WvM4tcill+dC/SCmKQ/wS77ptVBbpeErCiKBYqBNF5yB6H7X5PIBo01S1to5qQYeLghnAPfOlWTR6TRr4sMUOsK6HO9XmPj8cGV8go/JxRsbiZ3mG1evcIjpE23FzSSJ6zX4RlS+gHBMdSJtVD4lumGwZmS96zK2UHse3erg7vO4Q==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(44832011)(83380400001)(86362001)(54906003)(8936002)(31696002)(38100700002)(508600001)(36756003)(31686004)(66946007)(53546011)(66556008)(66476007)(4326008)(6916009)(956004)(186003)(26005)(8676002)(5660300002)(7406005)(7416002)(2616005)(6486002)(316002)(2906002)(16576012)(43740500002)(45980500001)(309714004);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?fu3A4ujYnK3uj9eGH9PZDwbXzPv+7dPDmCCTN0Zjn4PUhoM+XVTmmphYw9UY?=
- =?us-ascii?Q?7du4v3b4bNG96r0QuK9pk1CFM8kiucnPWmlYhO7S4nKBHR507ySiL+i73MhH?=
- =?us-ascii?Q?BrOjnVlhxMcx6tUmGBDkypfovcWdOjFooGXmm+h/UxhNxEjsNG/f0FuQkUsu?=
- =?us-ascii?Q?L10W/2X0ia5EzzTpl4Ef0C5fGHm15GJ4ZYcfgpU5H5as6KLMFyGd8kRT6gJV?=
- =?us-ascii?Q?EV19Z63KcQz8bSCAn0NrfTPsN1N2LLkk6Yaq63zdgq0HRBOLp9LhRpoTWMPh?=
- =?us-ascii?Q?AVOYNXWb2NtC8VrqMukauh2RBW6xIlV3YH3ejYwpq5GHMzbqYXUEzr4FKIKo?=
- =?us-ascii?Q?G+0LTwejHi1q1RdJ7Ccz0vrqjwj0plr/jO+rmm/VDsqY3kAN4tZlqyfD7oEU?=
- =?us-ascii?Q?oPaWjRBTsWhVGgdcPZN5QhBLRbUdkL/DB+go0sWyD7VqaVS9i7OAxIkK9SWc?=
- =?us-ascii?Q?COdNF1LBJQPavfXx+3T2IAXhsZqMsXnVgjhMo8e9t9otP/sQx4xKXCemo8Gg?=
- =?us-ascii?Q?89xztDXI8XRkHt5ZgfFE822WI1YpFTaZ1vFVjwIC2t2pKtqLnOYtlbUoaq+f?=
- =?us-ascii?Q?4kyF9heSCCsktZZ5by3TZXbuuFKROGJTtWyTEXInpBqQDU8tmts22RYUYJM/?=
- =?us-ascii?Q?+Y0xRnV1sjEK89u6ztP+ivq4K8ljgG2Dw+Wde/jZG2pA1ivgOhzdYa3jxg9R?=
- =?us-ascii?Q?7mbfrRTrfat996/A5uxfLAUL7HGBvfyl9Qnw/oOlY9sgwbHmkqhixjdLC1v+?=
- =?us-ascii?Q?FRIVLP/HVANsrab0BDw7mlnYCWhQCcp+/gDLHvD/tFddankYFpbAB1rJygnw?=
- =?us-ascii?Q?vdz7kJI+VhQW5X+ALm4U/oo3/19Ss0kmdVs8zLq5h+JSa9rsg5KpsZdbQ2yD?=
- =?us-ascii?Q?vsCG/H6oqkDo+dtuq6af+UfyPwzYSS0DUhQ+2pl0YVlbto+N26Ep8FfTbFNK?=
- =?us-ascii?Q?TAjEOyfg/TUDpwJtUMjbE+QGHYy6TQfYJoIcDby3KmavWMAgZAxxOre2uPiG?=
- =?us-ascii?Q?vfvK5S2kvZASNVXKEUbDbnZx0IV2qPOoqYSH6s6AZLgltVZ8q54hPAMVhIUL?=
- =?us-ascii?Q?REVQPYaVHVIN/L8+W/8oA9RlqFYFBlNV+bCXtIa9z5lb8fjFrCJ7fZ5YQfKF?=
- =?us-ascii?Q?bdFbgKftYxDnRheCCGd7/2bJaujueUizKRJDNtKIRil1fn2YvRGvMRuTR3Pz?=
- =?us-ascii?Q?Sggv5IQML70cZWw0eLHhIBu8/BvbzuOUFIrTS93IFmJkk4W7J7XVf3wPHoPk?=
- =?us-ascii?Q?SclHKhFLLrB7iZlE3nZ2rBr0rBRlSnKz24T9iDlSLBHipx1Elcv4Zby0ZKRA?=
- =?us-ascii?Q?7WysTE0w9qXQSlZeuhqOfRmL?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 039a99db-8ef9-45b4-2ee9-08d99018bb8d
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?V0ZHeDRNQ01SMTRYckVEaUM2SEpwbXUya3VyYklFMkRBUkswSVFWSlFYMXcr?=
+ =?utf-8?B?bFBzTDZOMFFBdmpDeEFTWC9UYjU0RHRUMmFVYzdERytGSlpPSnRhajRxN2NN?=
+ =?utf-8?B?R1lKZTllYlY4NXI1bWNKNjNjNnFFWUpVdW5yV1pwcTdhbUN1OWRFV2lyNXY0?=
+ =?utf-8?B?akdEZjRzZ1pTTjd3a2xFdDBqQVIvejNHeXZ4dnZ3SDhqZFl6QmZVZ25YRlNa?=
+ =?utf-8?B?Uml4NjJkcUpZN0lqeFdlWjRLWXZ6SzJwSGVqSzdpbUdrL2hQNUx4bnBNSDg5?=
+ =?utf-8?B?ZFdZL0p1S04zQ3NDVkhrR2F6cVEwMVVKM3lJK0tkQlZ6Qld2WGl3SFJXV2RN?=
+ =?utf-8?B?aDYxVWFJcWhzbDJ0RG9QR3UvRDR5NUQ1V2NFK2ErTlBreUlKMlF2cmhoRjlF?=
+ =?utf-8?B?bDY0a0s1b3Z0a1Nld2ZBUDhVN0RXRC9tcHF4akZUeWUwV1g5bEpCRE0wSVhY?=
+ =?utf-8?B?MXcyT05rSU54T2wzaXZvYkxTSUJDWlVCRUUwdTdRRy9YZFdadVFtL2xuTzh6?=
+ =?utf-8?B?d3c2dnNWMXU3a3BaWmtQa3Y4QTRsT0xpNG94T3FibGtQYVI5czIyS1ptczVi?=
+ =?utf-8?B?V3NlaDJpcmlqS0orK2IvR0d1b1pVVElYcXV6ajd6YVF6SjE4RXNKUVJUMCty?=
+ =?utf-8?B?WXRXbnBjQnlIRzUvOTU1YnZ2V253RjE2UE9rRnlYUE9qMkFyQ0dEeGxxdm5p?=
+ =?utf-8?B?VFNJaTNTUnp0amkzVmhPTlZ2RzhwNXNORlFtV2VZWGFMa2VhNlVTYW5oemhv?=
+ =?utf-8?B?UjZZT2w4WmF3amJGSkxZemZYUFJmTjY0Ykt3aExmNnZNL21oRjJpVmpaQW9V?=
+ =?utf-8?B?UERmVjUwdXBHcnAyMHlhRzUyRWdkcXJ6QlJjS1FTVmw1WDVCb0NRZWg4MUlu?=
+ =?utf-8?B?dnUyTVE0ak9seVhIQnhOV1pFYkdsVzNTTUFhVERxSGdrMFlQRXBZa3VnNE5o?=
+ =?utf-8?B?SktkM21aRE5FY0x6YnBtRUd5WWVuTS9vazBJU3RBVWRPTUVvbEUyV1VYdnAr?=
+ =?utf-8?B?S0JiZkFVaFd3WGM5YStoS01UeGNOTUtsbFN4S2tLUk9zSDZ2SmZsUHViVG9z?=
+ =?utf-8?B?NVU0OXNIak9KMUZiSHIwcG9KSHZpNVgxaDZ1bktPSnp1cXYvTVBsQmFDUW1i?=
+ =?utf-8?B?cG96K0ppSWtOZ1R3bXJoUGhiOEw0Z0JKNVZZeXFuKzZsYVEvdEwxRkFRekdX?=
+ =?utf-8?B?eHpvMUpmamc3dW5vcXU4Q0UwOHRPejBwWXNNdUtqd3BYWEU4ZTJaQThabmZG?=
+ =?utf-8?B?bXIwQ1FuU0VEVlJNOC9JRkpnWXZaL3NtbStMZStyOFk5ZkVMWGdEWERTVkp4?=
+ =?utf-8?B?MlNqUklYaXY5b3Z1aXZlaUNZTXduSGg2dGhkMmhzUmY2MENoK2RFSUxxZUZx?=
+ =?utf-8?B?VmRoTUx6OG5VNVB5citBMWFUdGN1UW9YK2FhNjl4aldscXRrbUw2czdGZUdp?=
+ =?utf-8?B?OXV3UEd6MGswbGNYV2JLMStralhuNnBCMXU0R2xaeTQzR0x6T0crTmJhWEJv?=
+ =?utf-8?B?Zkx5eVM1ZUovMnNwdmZFeXlSWXVNcFZSWXlOdHhoYjIvZ1NoUkFYRVBWb1ZZ?=
+ =?utf-8?B?RkRIYnp3UGU2UTJmYjZWbWZOQWpHaWxPcFBTYkZPZVIzTi90NS84M0NHcXdE?=
+ =?utf-8?B?dVBQQWpYRGlWVmw3Nlo5SXZ2T0lvYnNHOG95RVRaS3J3c3N6blBLZks2cUVm?=
+ =?utf-8?B?cWRJZGRSdFNOQjZYbytSUDY5NE16MTM0ZFFnS2RpbWVGWkNQbXQ1Y3gzMmNK?=
+ =?utf-8?Q?G0JQjBRGR05t6IC9umip5nDeMSp0pBj2eBHLZBt?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1c4fc950-7fa6-4082-5637-08d99018efa9
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Oct 2021 20:16:55.1007
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Oct 2021 20:18:22.6781
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: gGP0T1NPgjMvOpGCUGMx2V8d9VXTfaXiBFJJMHnsM6JSaxET9YARUdr/NL+tf3Ms
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR12MB5507
+X-MS-Exchange-CrossTenant-UserPrincipalName: q7TKxFlk6AbzFsRG56Pd0o7MfYgcA5wMsaOBBzxa91afOmbvKwFty0NAWtMUQRhjoPxyNArS53dYfy8USZvw+A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR12MB2718
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 15, 2021 at 02:12:01PM -0600, Alex Williamson wrote:
-> On Fri, 15 Oct 2021 16:59:37 -0300
-> Jason Gunthorpe <jgg@nvidia.com> wrote:
-> 
-> > On Fri, Oct 15, 2021 at 01:48:20PM -0600, Alex Williamson wrote:
-> > > > +static int mlx5vf_pci_set_device_state(struct mlx5vf_pci_core_device *mvdev,
-> > > > +				       u32 state)
-> > > > +{
-> > > > +	struct mlx5vf_pci_migration_info *vmig = &mvdev->vmig;
-> > > > +	u32 old_state = vmig->vfio_dev_state;
-> > > > +	int ret = 0;
-> > > > +
-> > > > +	if (vfio_is_state_invalid(state) || vfio_is_state_invalid(old_state))
-> > > > +		return -EINVAL;  
-> > > 
-> > > if (!VFIO_DEVICE_STATE_VALID(old_state) || !VFIO_DEVICE_STATE_VALID(state))  
-> > 
-> > AFAICT this macro doesn't do what is needed, eg
-> > 
-> > VFIO_DEVICE_STATE_VALID(0xF000) == true
-> > 
-> > What Yishai implemented is at least functionally correct - states this
-> > driver does not support are rejected.
-> 
-> 
-> if (!VFIO_DEVICE_STATE_VALID(old_state) || !VFIO_DEVICE_STATE_VALID(state)) || (state & ~VFIO_DEVICE_STATE_MASK))
-> 
-> old_state is controlled by the driver and can never have random bits
-> set, user state should be sanitized to prevent setting undefined bits.
 
-In that instance let's just write
+On 10/15/21 1:05 PM, Sean Christopherson wrote:
+> On Fri, Aug 20, 2021, Brijesh Singh wrote:
+>> diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
+>> index f383d2a89263..8627c49666c9 100644
+>> --- a/arch/x86/kernel/sev.c
+>> +++ b/arch/x86/kernel/sev.c
+>> @@ -2419,3 +2419,75 @@ int snp_lookup_rmpentry(u64 pfn, int *level)
+>>  	return !!rmpentry_assigned(e);
+>>  }
+>>  EXPORT_SYMBOL_GPL(snp_lookup_rmpentry);
+>> +
+>> +int psmash(u64 pfn)
+>> +{
+>> +	unsigned long paddr = pfn << PAGE_SHIFT;
+> Probably better to use __pfn_to_phys()?
 
-old_state != VFIO_DEVICE_STATE_ERROR
+Sure, I can use that instead of direct shift.
 
-?
 
-I'm happy to see some device specific mask selecting the bits it
-supports.
+>
+>> +	int ret;
+>> +
+>> +	if (!pfn_valid(pfn))
+>> +		return -EINVAL;
+>> +
+>> +	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
+> Shouldn't this be a WARN_ON_ONCE()?
 
-> > > > +	/* Running switches off */
-> > > > +	if ((old_state & VFIO_DEVICE_STATE_RUNNING) !=
-> > > > +	    (state & VFIO_DEVICE_STATE_RUNNING) &&  
-> > > 
-> > > ((old_state ^ state) & VFIO_DEVICE_STATE_RUNNING) ?  
-> > 
-> > It is not functionally the same, xor only tells if the bit changed, it
-> > doesn't tell what the current value is, and this needs to know that it
-> > changed to 1
-> 
-> That's why I inserted my comment after the "it changed" test and not
-> after the "and the old old value was..." test below.
+Since some of these function are called while handling the PSC so I
+tried to avoid using the WARN -- mainly because if the warn_on_panic=1
+is set on the host then it will result in the kernel panic.
 
-Oh, I see, it was not clear to me
+>
+>> +		return -ENXIO;
+>> +
+>> +	/* Binutils version 2.36 supports the PSMASH mnemonic. */
+>> +	asm volatile(".byte 0xF3, 0x0F, 0x01, 0xFF"
+>> +		      : "=a"(ret)
+>> +		      : "a"(paddr)
+>> +		      : "memory", "cc");
+>> +
+>> +	return ret;
+> I don't like returning the raw result from hardware; it's mostly works because
+> hardware also uses '0' for success, but it will cause confusion should hardware
+> ever set bit 31.  There are also failures that likely should never happen unless
+> there's a kernel bug, e.g. I suspect we can do:
+>
+> 	if (WARN_ON_ONCE(ret == FAIL_INPUT))
+> 		return -EINVAL;
+> 	if (WARN_ON_ONCE(ret == FAIL_PERMISSION))
+> 		return -EPERM;
+> 	
+> 	....
+>
+> or if all errors are "impossible"
+>
+> 	if (WARN_ON_ONCE(ret))
+> 		return snp_error_code_to_errno(ret);
+>
+> FAIL_INUSE and FAIL_OVERLAP also need further discussion.  It's not clear to me
+> that two well-behaved callers can't encounter collisions due to the 2mb <=> 4kb
+> interactions.  If collisions between well-behaved callers are possible, then this
+> helper likely needs some form of serialization.  Either, the concurrency rules
+> for RMP access need explicit and lengthy documentation.
 
-Thanks,
-Jason
+I don't think we need to serialize the calls. The hardware acquires the
+lock before changing the RMP table, and if another processor tries to
+access the same RMP table entry, the hardware will return FAIL_INUSE or
+#NPF. The FAIL_INUSE will happen on the RMPUPDATE, whereas the #NPF will
+occur if the guest attempts to modify the RMP entry (such as using the
+RMPADJUST).
+
+As per the FAIL_OVERLAP is concerns, it's the case where the guest is
+asking to create an invalid situation and hardware detects it.  In other
+words, it is a guest bug. e.g., the guest issued a PSC to add a page as
+2MB and then asked to add the same page (or one of subpage) as a 4K.
+Hardware sees the overlap condition and fails to change the state on the
+second request.
+
+
+thanks
+
