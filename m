@@ -2,106 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 14C3842F76D
-	for <lists+kvm@lfdr.de>; Fri, 15 Oct 2021 17:53:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0248A42F776
+	for <lists+kvm@lfdr.de>; Fri, 15 Oct 2021 17:57:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241067AbhJOP4A (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Oct 2021 11:56:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40962 "EHLO
+        id S241075AbhJOP7t (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Oct 2021 11:59:49 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:59350 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S241061AbhJOPz7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 15 Oct 2021 11:55:59 -0400
+        by vger.kernel.org with ESMTP id S233464AbhJOP7s (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 15 Oct 2021 11:59:48 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634313232;
+        s=mimecast20190719; t=1634313461;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=L1ebZTRDtvYaS1oh3yKgiezKno+o3JSTu41X1RB0t/A=;
-        b=cu7BI9A5vWyZRjdJASq863DU8d79ttspJP1n36PLI/QQ3jI0vyN4NBPMyDp17yDN1x7y1h
-        fr3+eAjbLBzk9x998o9yguUYV1tcD6WpLiKpnGfEO4dOS3SlJXal0pNg5VoiG/Ed3h/7tM
-        7nLDWOkpNkPmn0+olgo+lQijBMVgpm8=
+        bh=gMrSHmEHXqrRGcdLpv53RMkgGFyce3geioBHOKMdLVU=;
+        b=F3ePTPVGbEiANsD+0GzZJVj36jqsZJAnmk8+T0j7wEnH5B4DNGZVeSM09c6rz8vqimchdd
+        fKLZABxe4+iKugOerykwaDFsRYx1yjmh0zXP+tD02iraD64kPAeIaJOQCOSnYb60yv7s9r
+        Xjbs4ll9B0wIbWk7wb/ePUjIuTc5DTc=
 Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
  [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-179-EkqPMo9JNBGgY4qIbbkwlQ-1; Fri, 15 Oct 2021 11:53:51 -0400
-X-MC-Unique: EkqPMo9JNBGgY4qIbbkwlQ-1
-Received: by mail-ed1-f71.google.com with SMTP id u23-20020a50a417000000b003db23c7e5e2so8647046edb.8
-        for <kvm@vger.kernel.org>; Fri, 15 Oct 2021 08:53:50 -0700 (PDT)
+ us-mta-592-5xhJ-DEQN3iXqWVQFgvMFA-1; Fri, 15 Oct 2021 11:57:40 -0400
+X-MC-Unique: 5xhJ-DEQN3iXqWVQFgvMFA-1
+Received: by mail-ed1-f71.google.com with SMTP id c30-20020a50f61e000000b003daf3955d5aso8653296edn.4
+        for <kvm@vger.kernel.org>; Fri, 15 Oct 2021 08:57:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
+         :content-language:to:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=L1ebZTRDtvYaS1oh3yKgiezKno+o3JSTu41X1RB0t/A=;
-        b=B46HopFvVTY2SPqN4Tu06RM3bjF7KzL+ReR4Qz8kq4AJmpHgYI5SDAi1B/QBasW/uQ
-         OP4TMTZoemvywEwzjqVsOAYBQFQRwNC8gaCcxSiPfDNZ3BMa8TGmI8xk6eXkBlYPWCmH
-         EvKRIK47QXT53KrAd2oY3t3yfDKiaeWBP1qplhYts3xHMi3vikdfNzc/Ch+Wh57djU4e
-         4+OAlcPj92Vo5/hWaydQduDHl8jEdVp4PqIj2ZRaWW8noCnt3L65OSFfXlazs3Aiaj5O
-         Wj4C/aXCTF1XsxJctZTkzWK2n9ctdatQfGwkrE8iWlfvbab78jvdzgkEvRdUfGsHtM8L
-         eJaw==
-X-Gm-Message-State: AOAM531gBIvDkxxRz2Rq/t5jL7917dOvXyAng8lQJgBfu1fUhXdDVe2H
-        K/tk2/oNLnBUfkRAKmpMXrc+YQpFeUDD1DaMyJpmrYIg9rM+uAlmvObnlJ8FJ1yrgQrvfdajaVe
-        DXHUwqRF5sayV
-X-Received: by 2002:a17:906:b782:: with SMTP id dt2mr8125145ejb.310.1634313229575;
-        Fri, 15 Oct 2021 08:53:49 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy62GL1pasUanwiI/flEzTGOV8RVWPvZh1VUyETyszJmioLKXqT8Zc+p5y0zX8PPTgQkB7DfQ==
-X-Received: by 2002:a17:906:b782:: with SMTP id dt2mr8125105ejb.310.1634313229351;
-        Fri, 15 Oct 2021 08:53:49 -0700 (PDT)
+        bh=gMrSHmEHXqrRGcdLpv53RMkgGFyce3geioBHOKMdLVU=;
+        b=eXFOSA8E3Ko3hl9KzT10PQF3DUeqmHBXh/cqV6ENbtwIRT/PzY9s+Q0tQvF07wDBUx
+         TXs5ULRgdoWaX1xs+dkP7dTS2YFUXFiNF60IqcYFB8Dca/10Dtx6qcBufDyyqMU92O8W
+         jq4GdOpiRMxlFCym4pgwCNQAxhdpbv673RzxuLHIXrF7wDLH2T+wAhESPtIRl7/Q5q9m
+         UTpANF8CMEEz7bjToSSrZWNLcWRjaOrWvjszPjtgeW13SO82kzqA81G2b5n0kPLX9oii
+         ZrRUbaF68W/7jVZzq5sGO+ibgf5zP/zjR+/umrXYC+YiCDgX+mD29ZbyV/JNX7IHRL1f
+         OSCQ==
+X-Gm-Message-State: AOAM531DI+Pn7uDIVRFOLsQ9DOPTVcYcL5Fy/ZtD+bXnHxmohLLO7stl
+        doaCKHDQ5Db8QRGT+LkZ1BKiAuQ73LrOIJazuR5JGM6EV2VLiyHSuBF6bYDWDnLvGdmURizdkMt
+        CytVwVyeRexsT
+X-Received: by 2002:a05:6402:11cf:: with SMTP id j15mr18697653edw.232.1634313459167;
+        Fri, 15 Oct 2021 08:57:39 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzvIgegLc+Pa9JmmQ+SCnKAcCqmOldCrjxzYzqYzfWuYz81NbG9P5QZ7zDZdNIFVvpDV8on8A==
+X-Received: by 2002:a05:6402:11cf:: with SMTP id j15mr18697630edw.232.1634313458925;
+        Fri, 15 Oct 2021 08:57:38 -0700 (PDT)
 Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id b2sm4510545ejj.124.2021.10.15.08.53.48
+        by smtp.gmail.com with ESMTPSA id m6sm4685848ejl.42.2021.10.15.08.57.37
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 15 Oct 2021 08:53:48 -0700 (PDT)
-Message-ID: <689cf4f5-6004-de51-f5ca-9a7acee37499@redhat.com>
-Date:   Fri, 15 Oct 2021 17:53:47 +0200
+        Fri, 15 Oct 2021 08:57:38 -0700 (PDT)
+Message-ID: <8df06ec3-85a7-caae-04dc-6096de632e6f@redhat.com>
+Date:   Fri, 15 Oct 2021 17:57:37 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.1.0
-Subject: Re: [patch 13/31] x86/fpu: Move KVMs FPU swapping to FPU core
+Subject: Re: [kvm-unit-tests PATCH v2 3/3] x86/msr.c generalize to any input
+ msr
 Content-Language: en-US
-To:     "Liu, Jing2" <jing2.liu@intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        LKML <linux-kernel@vger.kernel.org>
-Cc:     "x86@kernel.org" <x86@kernel.org>,
-        "Bae, Chang Seok" <chang.seok.bae@intel.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Arjan van de Ven <arjan@linux.intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Nakajima, Jun" <jun.nakajima@intel.com>,
-        Jing Liu <jing2.liu@linux.intel.com>,
-        "seanjc@google.com" <seanjc@google.com>,
-        "Cooper, Andrew" <andrew.cooper3@citrix.com>
-References: <871r4p9fyh.ffs@tglx>
- <ec9c761d-4b5c-71e2-c1fc-d256b6b78c04@redhat.com>
- <BL0PR11MB3252511FC48E43484DE79A3CA9B89@BL0PR11MB3252.namprd11.prod.outlook.com>
- <6bbc5184-a675-1937-eb98-639906a9cf15@redhat.com> <87wnmf66m5.ffs@tglx>
- <3997787e-402d-4b2b-0f90-4a672c77703f@redhat.com> <87lf2v5shb.ffs@tglx>
- <87a6ja6352.ffs@tglx>
- <BYAPR11MB3256B3120DEB5FE0DD53B5B9A9B99@BYAPR11MB3256.namprd11.prod.outlook.com>
+To:     ahmeddan@amazon.com, kvm@vger.kernel.org, nikos.nikoleris@arm.com,
+        drjones@redhat.com, graf@amazon.com
+References: <08d356da-17ce-d380-1fc9-18ba7ec67020@amazon.com>
+ <20210927153028.27680-1-ahmeddan@amazon.com>
+ <20210927153028.27680-3-ahmeddan@amazon.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <BYAPR11MB3256B3120DEB5FE0DD53B5B9A9B99@BYAPR11MB3256.namprd11.prod.outlook.com>
+In-Reply-To: <20210927153028.27680-3-ahmeddan@amazon.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 15/10/21 16:24, Liu, Jing2 wrote:
->> fpu_swap_kvm_fpu(bool enter_guest, u64 guest_needs_features) {
->>          possibly_reallocate(enter_guest, guest_needs_features);
-> When KVM traps guest wrmsr XFD in #NM, I think KVM need allocate
-> fpstate buffer for full features.
+On 27/09/21 17:30, ahmeddan@amazon.com wrote:
+> From: Daniele Ahmed <ahmeddan@amazon.com>
+> 
+> If an MSR description is provided as input by the user,
+> run the test against that MSR. This allows the user to
+> run tests on custom MSR's.
+> 
+> Otherwise run all default tests.
+> 
+> This is to validate custom MSR handling in user space
+> with an easy-to-use tool. This kvm-unit-test submodule
+> is a perfect fit. I'm extending it with a mode that
+> takes an MSR index and a value to test arbitrary MSR accesses.
+> 
+> Signed-off-by: Daniele Ahmed <ahmeddan@amazon.com>
 
-You mean XCR0 and XFD (not XFD in #NM), but yeah at the point of 
-fpu_swap_kvm_fpu we are in atomic context.
-
-Still, for now the first pass of AMX implementation doesn't need to do 
-anything but swap the pointers, and it can simply allocate the full 
-buffer at vCPU creation.
+Queued, thanks.  I removed the "64-bit only" functionality because, for 
+manual invocation, you can just not run the test when running on 32-bit 
+targets.
 
 Paolo
 
-> Because in next vmexit, guest might have dynamic state and KVM
-> can be preempted before running fpu_swap_kvm_fpu().
-> Thus, here the current->thread.fpu.fpstate already has enough space
-> for saving guest.
+> ---
+>   x86/msr.c | 29 +++++++++++++++++++++++++++--
+>   1 file changed, 27 insertions(+), 2 deletions(-)
+> 
+> diff --git a/x86/msr.c b/x86/msr.c
+> index 8931f59..1a2d791 100644
+> --- a/x86/msr.c
+> +++ b/x86/msr.c
+> @@ -3,6 +3,17 @@
+>   #include "libcflat.h"
+>   #include "processor.h"
+>   #include "msr.h"
+> +#include <stdlib.h>
+> +
+> +/**
+> + * This test allows two modes:
+> + * 1. Default: the `msr_info' array contains the default test configurations
+> + * 2. Custom: by providing command line arguments it is possible to test any MSR and value
+> + *	Parameters order:
+> + *		1. msr index as a base 16 number
+> + *		2. value as a base 16 number
+> + *		3. "0" if the msr is available only in 64b hosts, any other string otherwise
+> + */
+>   
+>   struct msr_info {
+>   	int index;
+> @@ -100,8 +111,22 @@ int main(int ac, char **av)
+>   	bool is_64bit_host = this_cpu_has(X86_FEATURE_LM);
+>   	int i;
+>   
+> -	for (i = 0 ; i < ARRAY_SIZE(msr_info); i++) {
+> -		test_msr(&msr_info[i], is_64bit_host);
+> +	if (ac == 4) {
+> +		char msr_name[16];
+> +		int index = strtoul(av[1], NULL, 0x10);
+> +		snprintf(msr_name, sizeof(msr_name), "MSR:0x%x", index);
+> +
+> +		struct msr_info msr = {
+> +			.index = index,
+> +			.name = msr_name,
+> +			.is_64bit_only = !strcmp(av[3], "0"),
+> +			.value = strtoull(av[2], NULL, 0x10)
+> +		};
+> +		test_msr(&msr, is_64bit_host);
+> +	} else {
+> +		for (i = 0 ; i < ARRAY_SIZE(msr_info); i++) {
+> +			test_msr(&msr_info[i], is_64bit_host);
+> +		}
+>   	}
+>   
+>   	return report_summary();
+> 
 
