@@ -2,33 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2659042E5DC
+	by mail.lfdr.de (Postfix) with ESMTP id BC94142E5DE
 	for <lists+kvm@lfdr.de>; Fri, 15 Oct 2021 03:16:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234739AbhJOBS0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Oct 2021 21:18:26 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:46394 "EHLO
+        id S234856AbhJOBS3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Oct 2021 21:18:29 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:46408 "EHLO
         galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234717AbhJOBSP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Oct 2021 21:18:15 -0400
-Message-ID: <20211015011538.897664678@linutronix.de>
+        with ESMTP id S233665AbhJOBSQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Oct 2021 21:18:16 -0400
+Message-ID: <20211015011538.958107505@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1634260568;
+        s=2020; t=1634260569;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         references:references; bh=9mP6eQkXKYOSl75/3hJBuuCyR+HyUFavq+clkqMZqqQ=;
-        b=Z9S7hBzZjC1ZW6j2qBaNa/11Ee0Kvjra2L43wxgCIPqGvUZlboKMz3gYkx6mNeS7KIuaKs
-        E1yBrkmpVcgaLaM/yC0TxjYSck5AK7HPbcMg7brGFY4HueI4n61M28cIQFbBgdVx4ICCoi
-        iE4Ukqw3OP8pZxjM/nQ0KtJMcZNC4w49WCsDl4De8vwlmqxJ5MCFj9P89WzpuQeopIHRcA
-        L9RQJ+TAVLcNeCeyonn9t5MLgIA/t28SzPj5cz58TPSnbZzaTPtzsN2VIlEp9Q0xY1Tra6
-        ekJ9C9Mfaa930xtQXExlTwNB6XKLJ2cqZC5kHUZDBlJ9gaTJ/YStxN3D6IT0nw==
+         references:references; bh=XXUejelorOMNKR3ap34rldZ7qd2OZMr2QmuOlk+A2D4=;
+        b=BFrN+4JCDCbOhtdf1+IGbi9Mm/Gm5oN9UdBMIJP2KEJ/Jt3T2pFZ6I6FM1qIRa5lezUs64
+        +hHk2XYjiHNmJT1GXUr+B2LXkc32eKMi6+IDOKc99HXUoKj0AnTcuM94tx+29HqodJw8a5
+        1YLJseyfZlVbBYQlwgXUDFnqiEaILKyQrwROhE9bwXdmw06V1sM3YQG/LA9UolZEat52WC
+        VePLh625I8UTjPb0rv1JFN96jJuq/h1GL/mLvSVjKaZFF17+WcBX3bHl8Ge8oD4z/HBW1q
+        vLqAqBFBYwQ5074O9BVXA1yaR1nAKdsgNyRHD+BTWElKLHk+ONGCxp15g3MFtw==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1634260568;
+        s=2020e; t=1634260569;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         references:references; bh=9mP6eQkXKYOSl75/3hJBuuCyR+HyUFavq+clkqMZqqQ=;
-        b=XU4b8NrsvZnO7ohwIWu8kEBzsl+iFS0csTDXAHNt3EwsS6KfmuEhyAzI224RJbRlXBtEmB
-        xv1Lw1YjXpbFsmBg==
+         references:references; bh=XXUejelorOMNKR3ap34rldZ7qd2OZMr2QmuOlk+A2D4=;
+        b=eYAFVa3kJuo/hMbF9eQ3EvpXXtxLKZtvX2YnD2N/W84AKOagRn/FdBX17bsyARqxj4bdZZ
+        OZP1uDDBwTMLgUAw==
 From:   Thomas Gleixner <tglx@linutronix.de>
 To:     LKML <linux-kernel@vger.kernel.org>
 Cc:     x86@kernel.org, "Chang S. Bae" <chang.seok.bae@intel.com>,
@@ -38,215 +38,162 @@ Cc:     x86@kernel.org, "Chang S. Bae" <chang.seok.bae@intel.com>,
         "Liu, Jing2" <jing2.liu@intel.com>,
         Sean Christopherson <seanjc@google.com>,
         Xiaoyao Li <xiaoyao.li@intel.com>
-Subject: [patch V2 09/30] x86/fpu: Cleanup xstate xcomp_bv initialization
+Subject: [patch V2 10/30] x86/fpu/xstate: Provide and use for_each_xfeature()
 References: <20211015011411.304289784@linutronix.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Date:   Fri, 15 Oct 2021 03:16:07 +0200 (CEST)
+Date:   Fri, 15 Oct 2021 03:16:09 +0200 (CEST)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-No point in having this duplicated all over the place with needlessly
-different defines.
+These loops evaluating xfeature bits are really hard to read. Create an
+iterator and use for_each_set_bit_from() inside which already does the right
+thing.
 
-Provide a proper initialization function which initializes user buffers
-properly and make KVM use it.
+No functional changes.
 
 Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
-
 ---
- arch/x86/include/asm/fpu/internal.h |  4 +++-
- arch/x86/kernel/fpu/core.c          | 35 +++++++++++++++++++----------------
- arch/x86/kernel/fpu/init.c          |  6 +++---
- arch/x86/kernel/fpu/xstate.c        |  8 +++-----
- arch/x86/kernel/fpu/xstate.h        | 18 ++++++++++++++++++
- arch/x86/kvm/x86.c                  | 11 +++--------
- 6 files changed, 49 insertions(+), 33 deletions(-)
- create mode 100644 arch/x86/kernel/fpu/xstate.h
+V2: Update changelog - Boris
 ---
-diff --git a/arch/x86/include/asm/fpu/internal.h b/arch/x86/include/asm/fpu/internal.h
-index 1503750534f7..df57f1af3a4c 100644
---- a/arch/x86/include/asm/fpu/internal.h
-+++ b/arch/x86/include/asm/fpu/internal.h
-@@ -80,7 +80,9 @@ static __always_inline __pure bool use_fxsr(void)
+ arch/x86/kernel/fpu/xstate.c | 56 ++++++++++++++++++---------------------------
+ 1 file changed, 23 insertions(+), 33 deletions(-)
+---
+diff --git a/arch/x86/kernel/fpu/xstate.c b/arch/x86/kernel/fpu/xstate.c
+index 259951d1eec5..a2bdc0cf8687 100644
+--- a/arch/x86/kernel/fpu/xstate.c
++++ b/arch/x86/kernel/fpu/xstate.c
+@@ -4,6 +4,7 @@
+  *
+  * Author: Suresh Siddha <suresh.b.siddha@intel.com>
+  */
++#include <linux/bitops.h>
+ #include <linux/compat.h>
+ #include <linux/cpu.h>
+ #include <linux/mman.h>
+@@ -20,6 +21,10 @@
  
- extern union fpregs_state init_fpstate;
+ #include "xstate.h"
  
--extern void fpstate_init(union fpregs_state *state);
-+extern void fpstate_init_user(union fpregs_state *state);
-+extern void fpu_init_fpstate_user(struct fpu *fpu);
++#define for_each_extended_xfeature(bit, mask)				\
++	(bit) = FIRST_EXTENDED_XFEATURE;				\
++	for_each_set_bit_from(bit, (unsigned long *)&(mask), 8 * sizeof(mask))
 +
- #ifdef CONFIG_MATH_EMULATION
- extern void fpstate_init_soft(struct swregs_state *soft);
- #else
-diff --git a/arch/x86/kernel/fpu/core.c b/arch/x86/kernel/fpu/core.c
-index 9a6b195a8a00..0789f0c3dca9 100644
---- a/arch/x86/kernel/fpu/core.c
-+++ b/arch/x86/kernel/fpu/core.c
-@@ -16,6 +16,8 @@
- #include <linux/hardirq.h>
- #include <linux/pkeys.h>
+ /*
+  * Although we spell it out in here, the Processor Trace
+  * xfeature is completely unused.  We use other mechanisms
+@@ -184,10 +189,7 @@ static void __init setup_xstate_features(void)
+ 	xstate_sizes[XFEATURE_SSE]	= sizeof_field(struct fxregs_state,
+ 						       xmm_space);
  
-+#include "xstate.h"
-+
- #define CREATE_TRACE_POINTS
- #include <asm/trace/fpu.h>
- 
-@@ -203,15 +205,6 @@ void fpu_sync_fpstate(struct fpu *fpu)
- 	fpregs_unlock();
- }
- 
--static inline void fpstate_init_xstate(struct xregs_state *xsave)
--{
--	/*
--	 * XRSTORS requires these bits set in xcomp_bv, or it will
--	 * trigger #GP:
--	 */
--	xsave->header.xcomp_bv = XCOMP_BV_COMPACTED_FORMAT | xfeatures_mask_all;
--}
+-	for (i = FIRST_EXTENDED_XFEATURE; i < XFEATURE_MAX; i++) {
+-		if (!xfeature_enabled(i))
+-			continue;
 -
- static inline unsigned int init_fpstate_copy_size(void)
- {
- 	if (!use_xsave())
-@@ -238,23 +231,33 @@ static inline void fpstate_init_fstate(struct fregs_state *fp)
- 	fp->fos = 0xffff0000u;
- }
++	for_each_extended_xfeature(i, xfeatures_mask_all) {
+ 		cpuid_count(XSTATE_CPUID, i, &eax, &ebx, &ecx, &edx);
  
--void fpstate_init(union fpregs_state *state)
-+/*
-+ * Used in two places:
-+ * 1) Early boot to setup init_fpstate for non XSAVE systems
-+ * 2) fpu_init_fpstate_user() which is invoked from KVM
-+ */
-+void fpstate_init_user(union fpregs_state *state)
- {
--	if (!static_cpu_has(X86_FEATURE_FPU)) {
-+	if (!cpu_feature_enabled(X86_FEATURE_FPU)) {
- 		fpstate_init_soft(&state->soft);
+ 		xstate_sizes[i] = eax;
+@@ -291,20 +293,15 @@ static void __init setup_xstate_comp_offsets(void)
+ 	xstate_comp_offsets[XFEATURE_SSE] = offsetof(struct fxregs_state,
+ 						     xmm_space);
+ 
+-	if (!boot_cpu_has(X86_FEATURE_XSAVES)) {
+-		for (i = FIRST_EXTENDED_XFEATURE; i < XFEATURE_MAX; i++) {
+-			if (xfeature_enabled(i))
+-				xstate_comp_offsets[i] = xstate_offsets[i];
+-		}
++	if (!cpu_feature_enabled(X86_FEATURE_XSAVES)) {
++		for_each_extended_xfeature(i, xfeatures_mask_all)
++			xstate_comp_offsets[i] = xstate_offsets[i];
  		return;
  	}
  
--	memset(state, 0, fpu_kernel_xstate_size);
-+	xstate_init_xcomp_bv(&state->xsave, xfeatures_mask_uabi());
+ 	next_offset = FXSAVE_SIZE + XSAVE_HDR_SIZE;
  
--	if (static_cpu_has(X86_FEATURE_XSAVES))
--		fpstate_init_xstate(&state->xsave);
--	if (static_cpu_has(X86_FEATURE_FXSR))
-+	if (cpu_feature_enabled(X86_FEATURE_FXSR))
- 		fpstate_init_fxstate(&state->fxsave);
- 	else
- 		fpstate_init_fstate(&state->fsave);
- }
--EXPORT_SYMBOL_GPL(fpstate_init);
-+
-+#if IS_ENABLED(CONFIG_KVM)
-+void fpu_init_fpstate_user(struct fpu *fpu)
-+{
-+	fpstate_init_user(&fpu->state);
-+}
-+EXPORT_SYMBOL_GPL(fpu_init_fpstate_user);
-+#endif
- 
- /* Clone current's FPU state on fork */
- int fpu_clone(struct task_struct *dst)
-diff --git a/arch/x86/kernel/fpu/init.c b/arch/x86/kernel/fpu/init.c
-index 86bc9759fc8b..37f872630a0e 100644
---- a/arch/x86/kernel/fpu/init.c
-+++ b/arch/x86/kernel/fpu/init.c
-@@ -121,10 +121,10 @@ static void __init fpu__init_system_mxcsr(void)
- static void __init fpu__init_system_generic(void)
- {
- 	/*
--	 * Set up the legacy init FPU context. (xstate init might overwrite this
--	 * with a more modern format, if the CPU supports it.)
-+	 * Set up the legacy init FPU context. Will be updated when the
-+	 * CPU supports XSAVE[S].
- 	 */
--	fpstate_init(&init_fpstate);
-+	fpstate_init_user(&init_fpstate);
- 
- 	fpu__init_system_mxcsr();
- }
-diff --git a/arch/x86/kernel/fpu/xstate.c b/arch/x86/kernel/fpu/xstate.c
-index d6b5f2266143..259951d1eec5 100644
---- a/arch/x86/kernel/fpu/xstate.c
-+++ b/arch/x86/kernel/fpu/xstate.c
-@@ -15,10 +15,10 @@
- #include <asm/fpu/internal.h>
- #include <asm/fpu/signal.h>
- #include <asm/fpu/regset.h>
--#include <asm/fpu/xstate.h>
- 
- #include <asm/tlbflush.h>
--#include <asm/cpufeature.h>
-+
-+#include "xstate.h"
- 
- /*
-  * Although we spell it out in here, the Processor Trace
-@@ -389,9 +389,7 @@ static void __init setup_init_fpu_buf(void)
- 	setup_xstate_features();
- 	print_xstate_features();
- 
--	if (boot_cpu_has(X86_FEATURE_XSAVES))
--		init_fpstate.xsave.header.xcomp_bv = XCOMP_BV_COMPACTED_FORMAT |
--						     xfeatures_mask_all;
-+	xstate_init_xcomp_bv(&init_fpstate.xsave, xfeatures_mask_all);
- 
- 	/*
- 	 * Init all the features state with header.xfeatures being 0x0
-diff --git a/arch/x86/kernel/fpu/xstate.h b/arch/x86/kernel/fpu/xstate.h
-new file mode 100644
-index 000000000000..0789a04ee705
---- /dev/null
-+++ b/arch/x86/kernel/fpu/xstate.h
-@@ -0,0 +1,18 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef __X86_KERNEL_FPU_XSTATE_H
-+#define __X86_KERNEL_FPU_XSTATE_H
-+
-+#include <asm/cpufeature.h>
-+#include <asm/fpu/xstate.h>
-+
-+static inline void xstate_init_xcomp_bv(struct xregs_state *xsave, u64 mask)
-+{
-+	/*
-+	 * XRSTORS requires these bits set in xcomp_bv, or it will
-+	 * trigger #GP:
-+	 */
-+	if (cpu_feature_enabled(X86_FEATURE_XSAVES))
-+		xsave->header.xcomp_bv = mask | XCOMP_BV_COMPACTED_FORMAT;
-+}
-+
-+#endif
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 28ef14155726..743f522ed293 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -10612,14 +10612,6 @@ static int sync_regs(struct kvm_vcpu *vcpu)
- 
- static void fx_init(struct kvm_vcpu *vcpu)
- {
--	if (!vcpu->arch.guest_fpu)
--		return;
+-	for (i = FIRST_EXTENDED_XFEATURE; i < XFEATURE_MAX; i++) {
+-		if (!xfeature_enabled(i))
+-			continue;
 -
--	fpstate_init(&vcpu->arch.guest_fpu->state);
--	if (boot_cpu_has(X86_FEATURE_XSAVES))
--		vcpu->arch.guest_fpu->state.xsave.header.xcomp_bv =
--			host_xcr0 | XSTATE_COMPACTION_ENABLED;
--
- 	/*
- 	 * Ensure guest xcr0 is valid for loading
- 	 */
-@@ -10704,6 +10696,9 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
- 		pr_err("kvm: failed to allocate vcpu's fpu\n");
- 		goto free_user_fpu;
++	for_each_extended_xfeature(i, xfeatures_mask_all) {
+ 		if (xfeature_is_aligned(i))
+ 			next_offset = ALIGN(next_offset, 64);
+ 
+@@ -328,8 +325,8 @@ static void __init setup_supervisor_only_offsets(void)
+ 
+ 	next_offset = FXSAVE_SIZE + XSAVE_HDR_SIZE;
+ 
+-	for (i = FIRST_EXTENDED_XFEATURE; i < XFEATURE_MAX; i++) {
+-		if (!xfeature_enabled(i) || !xfeature_is_supervisor(i))
++	for_each_extended_xfeature(i, xfeatures_mask_all) {
++		if (!xfeature_is_supervisor(i))
+ 			continue;
+ 
+ 		if (xfeature_is_aligned(i))
+@@ -347,9 +344,7 @@ static void __init print_xstate_offset_size(void)
+ {
+ 	int i;
+ 
+-	for (i = FIRST_EXTENDED_XFEATURE; i < XFEATURE_MAX; i++) {
+-		if (!xfeature_enabled(i))
+-			continue;
++	for_each_extended_xfeature(i, xfeatures_mask_all) {
+ 		pr_info("x86/fpu: xstate_offset[%d]: %4d, xstate_sizes[%d]: %4d\n",
+ 			 i, xstate_comp_offsets[i], i, xstate_sizes[i]);
  	}
-+
-+	fpu_init_fpstate_user(vcpu->arch.user_fpu);
-+	fpu_init_fpstate_user(vcpu->arch.guest_fpu);
- 	fx_init(vcpu);
+@@ -554,10 +549,7 @@ static void do_extra_xstate_size_checks(void)
+ 	int paranoid_xstate_size = FXSAVE_SIZE + XSAVE_HDR_SIZE;
+ 	int i;
  
- 	vcpu->arch.maxphyaddr = cpuid_query_maxphyaddr(vcpu);
+-	for (i = FIRST_EXTENDED_XFEATURE; i < XFEATURE_MAX; i++) {
+-		if (!xfeature_enabled(i))
+-			continue;
+-
++	for_each_extended_xfeature(i, xfeatures_mask_all) {
+ 		check_xstate_against_struct(i);
+ 		/*
+ 		 * Supervisor state components can be managed only by
+@@ -586,7 +578,6 @@ static void do_extra_xstate_size_checks(void)
+ 	XSTATE_WARN_ON(paranoid_xstate_size != fpu_kernel_xstate_size);
+ }
+ 
+-
+ /*
+  * Get total size of enabled xstates in XCR0 | IA32_XSS.
+  *
+@@ -969,6 +960,7 @@ void copy_xstate_to_uabi_buf(struct membuf to, struct task_struct *tsk,
+ 	struct xregs_state *xinit = &init_fpstate.xsave;
+ 	struct xstate_header header;
+ 	unsigned int zerofrom;
++	u64 mask;
+ 	int i;
+ 
+ 	memset(&header, 0, sizeof(header));
+@@ -1022,17 +1014,15 @@ void copy_xstate_to_uabi_buf(struct membuf to, struct task_struct *tsk,
+ 
+ 	zerofrom = offsetof(struct xregs_state, extended_state_area);
+ 
+-	for (i = FIRST_EXTENDED_XFEATURE; i < XFEATURE_MAX; i++) {
+-		/*
+-		 * The ptrace buffer is in non-compacted XSAVE format.
+-		 * In non-compacted format disabled features still occupy
+-		 * state space, but there is no state to copy from in the
+-		 * compacted init_fpstate. The gap tracking will zero this
+-		 * later.
+-		 */
+-		if (!(xfeatures_mask_uabi() & BIT_ULL(i)))
+-			continue;
++	/*
++	 * The ptrace buffer is in non-compacted XSAVE format.  In
++	 * non-compacted format disabled features still occupy state space,
++	 * but there is no state to copy from in the compacted
++	 * init_fpstate. The gap tracking will zero these states.
++	 */
++	mask = xfeatures_mask_uabi();
+ 
++	for_each_extended_xfeature(i, mask) {
+ 		/*
+ 		 * If there was a feature or alignment gap, zero the space
+ 		 * in the destination buffer.
 
