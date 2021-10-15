@@ -2,140 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D3BF642E611
-	for <lists+kvm@lfdr.de>; Fri, 15 Oct 2021 03:18:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 31DAA42E5C4
+	for <lists+kvm@lfdr.de>; Fri, 15 Oct 2021 03:14:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234765AbhJOBUr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Oct 2021 21:20:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45194 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233864AbhJOBUC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Oct 2021 21:20:02 -0400
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12AA8C061798;
-        Thu, 14 Oct 2021 18:16:43 -0700 (PDT)
-Message-ID: <20211015011540.053515012@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1634260601;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         references:references; bh=TMwU8z8/LQBoAYmC9g7bu6xynGD7UrpwsBXR7iUeNYg=;
-        b=IZRHjyDDLGucPzxkcSjlaLcrM0hXSfsMMZH6nGNrBoLiUO38oO4YxFVd7FgvZUWCUkSTkj
-        H0sgl2wXuE5QcwyrGX6UKbKaZbH+25G9E3ixXHtlHR2DqWqT5/ZaPmNUPCw8FK6eWbZk3Z
-        Cwkyoa7ZE7jpQH+bf8+JNsfZLAjluiSqHCc3p+p6rAyrdSNe4cnJsMgA4206EKw0syogoi
-        TInB8C9b54x4BV86Bs82yKoJzkh5VxVjPJlTSSHci96ai9v76nZJBeeJIVTN23Xz55uuxY
-        AFWvFA5fGEQXxj01CoQHZ7RzknjWsEW8MIhdkGyj4qw4i5lJyZOCDnW11725AA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1634260601;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         references:references; bh=TMwU8z8/LQBoAYmC9g7bu6xynGD7UrpwsBXR7iUeNYg=;
-        b=l6rmTHz2EtlpCgyHhW5lMfDtFMBVI3KWBzlOBYX/EaQBbN/edXu4el9+hJ5DaVq8jLuk+z
-        +At4PAhbsNd8ANDA==
-From:   Thomas Gleixner <tglx@linutronix.de>
-To:     LKML <linux-kernel@vger.kernel.org>
-Cc:     x86@kernel.org, "Chang S. Bae" <chang.seok.bae@intel.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Arjan van de Ven <arjan@linux.intel.com>,
-        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        "Liu, Jing2" <jing2.liu@intel.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Xiaoyao Li <xiaoyao.li@intel.com>
-Subject: [patch V2 30/30] x86/fpu: Provide a proper function for
- ex_handler_fprestore()
-References: <20211015011411.304289784@linutronix.de>
+        id S231781AbhJOBQ2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Oct 2021 21:16:28 -0400
+Received: from mga02.intel.com ([134.134.136.20]:23823 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229959AbhJOBQ2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Oct 2021 21:16:28 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10137"; a="214988210"
+X-IronPort-AV: E=Sophos;i="5.85,374,1624345200"; 
+   d="scan'208";a="214988210"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Oct 2021 18:14:22 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.85,374,1624345200"; 
+   d="scan'208";a="660202696"
+Received: from michael-optiplex-9020.sh.intel.com (HELO localhost) ([10.239.159.182])
+  by orsmga005.jf.intel.com with ESMTP; 14 Oct 2021 18:14:20 -0700
+Date:   Fri, 15 Oct 2021 09:28:21 +0800
+From:   Yang Weijiang <weijiang.yang@intel.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Yang Weijiang <weijiang.yang@intel.com>, pbonzini@redhat.com,
+        jmattson@google.com, like.xu.linux@gmail.com, vkuznets@redhat.com,
+        wei.w.wang@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v8 15/15] KVM: x86/cpuid: Advise Arch LBR feature in CPUID
+Message-ID: <20211015012821.GA29942@intel.com>
+References: <1629791777-16430-1-git-send-email-weijiang.yang@intel.com>
+ <1629791777-16430-16-git-send-email-weijiang.yang@intel.com>
+ <YWjE0iQ6fDdJpDfT@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Date:   Fri, 15 Oct 2021 03:16:41 +0200 (CEST)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YWjE0iQ6fDdJpDfT@google.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-To make upcoming changes for support of dynamically enabled features
-simpler, provide a proper function for the exception handler which removes
-exposure of FPU internals.
+On Fri, Oct 15, 2021 at 12:01:22AM +0000, Sean Christopherson wrote:
+> s/Advise/Advertise
+> 
+> On Tue, Aug 24, 2021, Yang Weijiang wrote:
+> > Add Arch LBR feature bit in CPU cap-mask to expose the feature.
+> > Only max LBR depth is supported for guest, and it's consistent
+> > with host Arch LBR settings.
+> > 
+> > Co-developed-by: Like Xu <like.xu@linux.intel.com>
+> > Signed-off-by: Like Xu <like.xu@linux.intel.com>
+> > Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+> > ---
+> >  arch/x86/kvm/cpuid.c | 33 ++++++++++++++++++++++++++++++++-
+> >  1 file changed, 32 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> > index 03025eea1524..d98ebefd5d72 100644
+> > --- a/arch/x86/kvm/cpuid.c
+> > +++ b/arch/x86/kvm/cpuid.c
+> > @@ -88,6 +88,16 @@ static int kvm_check_cpuid(struct kvm_cpuid_entry2 *entries, int nent)
+> >  		if (vaddr_bits != 48 && vaddr_bits != 57 && vaddr_bits != 0)
+> >  			return -EINVAL;
+> >  	}
+> > +	best = cpuid_entry2_find(entries, nent, 0x1c, 0);
+> > +	if (best) {
+> > +		unsigned int eax, ebx, ecx, edx;
+> > +
+> > +		/* Reject user-space CPUID if depth is different from host's.*/
+> 
+> Why disallow this?  I don't see why it would be illegal for userspace to specify
+> fewer LBRs, and KVM should darn well verify that any MSRs it's exposing to the
+> guest actually exist.
+Hi, Sean,
+Thanks for the comments!
+The treatment for LBR depth is a bit special, only the host value can be
+supported now, i.e., 32. If userspace set the value other that 32, would like
+to notify it as early as possible.
+Do you want to remove the check here and correct the invalid setting silently when
+guest is querying CPUID?
 
-Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
-
----
- arch/x86/include/asm/fpu/api.h | 4 +---
- arch/x86/kernel/fpu/core.c     | 5 +++++
- arch/x86/kernel/fpu/internal.h | 2 ++
- arch/x86/mm/extable.c          | 5 ++---
- 4 files changed, 10 insertions(+), 6 deletions(-)
----
-diff --git a/arch/x86/include/asm/fpu/api.h b/arch/x86/include/asm/fpu/api.h
-index b68d8ce599e4..5ac5e4596b53 100644
---- a/arch/x86/include/asm/fpu/api.h
-+++ b/arch/x86/include/asm/fpu/api.h
-@@ -113,6 +113,7 @@ static inline void update_pasid(void) { }
- /* Trap handling */
- extern int  fpu__exception_code(struct fpu *fpu, int trap_nr);
- extern void fpu_sync_fpstate(struct fpu *fpu);
-+extern void fpu_reset_from_exception_fixup(void);
- 
- /* Boot, hotplug and resume */
- extern void fpu__init_cpu(void);
-@@ -129,9 +130,6 @@ static inline void fpstate_init_soft(struct swregs_state *soft) {}
- /* State tracking */
- DECLARE_PER_CPU(struct fpu *, fpu_fpregs_owner_ctx);
- 
--/* fpstate */
--extern union fpregs_state init_fpstate;
--
- /* fpstate-related functions which are exported to KVM */
- extern void fpu_init_fpstate_user(struct fpu *fpu);
- 
-diff --git a/arch/x86/kernel/fpu/core.c b/arch/x86/kernel/fpu/core.c
-index c6d7a47b1b26..ac540a7d410e 100644
---- a/arch/x86/kernel/fpu/core.c
-+++ b/arch/x86/kernel/fpu/core.c
-@@ -155,6 +155,11 @@ void restore_fpregs_from_fpstate(union fpregs_state *fpstate, u64 mask)
- 	}
- }
- 
-+void fpu_reset_from_exception_fixup(void)
-+{
-+	restore_fpregs_from_fpstate(&init_fpstate, xfeatures_mask_fpstate());
-+}
-+
- #if IS_ENABLED(CONFIG_KVM)
- void fpu_swap_kvm_fpu(struct fpu *save, struct fpu *rstor, u64 restore_mask)
- {
-diff --git a/arch/x86/kernel/fpu/internal.h b/arch/x86/kernel/fpu/internal.h
-index bd7f813242dd..479f2db6e160 100644
---- a/arch/x86/kernel/fpu/internal.h
-+++ b/arch/x86/kernel/fpu/internal.h
-@@ -2,6 +2,8 @@
- #ifndef __X86_KERNEL_FPU_INTERNAL_H
- #define __X86_KERNEL_FPU_INTERNAL_H
- 
-+extern union fpregs_state init_fpstate;
-+
- /* CPU feature check wrappers */
- static __always_inline __pure bool use_xsave(void)
- {
-diff --git a/arch/x86/mm/extable.c b/arch/x86/mm/extable.c
-index 79c2e30d93ae..5cd2a88930a9 100644
---- a/arch/x86/mm/extable.c
-+++ b/arch/x86/mm/extable.c
-@@ -4,8 +4,7 @@
- #include <linux/sched/debug.h>
- #include <xen/xen.h>
- 
--#include <asm/fpu/signal.h>
--#include <asm/fpu/xstate.h>
-+#include <asm/fpu/api.h>
- #include <asm/sev.h>
- #include <asm/traps.h>
- #include <asm/kdebug.h>
-@@ -48,7 +47,7 @@ static bool ex_handler_fprestore(const struct exception_table_entry *fixup,
- 	WARN_ONCE(1, "Bad FPU state detected at %pB, reinitializing FPU registers.",
- 		  (void *)instruction_pointer(regs));
- 
--	restore_fpregs_from_fpstate(&init_fpstate, xfeatures_mask_fpstate());
-+	fpu_reset_from_exception_fixup();
- 	return true;
- }
- 
-
+> 
+> > +		cpuid_count(0x1c, 0, &eax, &ebx, &ecx, &edx);
+> > +
+> > +		if ((best->eax & 0xff) != BIT(fls(eax & 0xff) - 1))
+> > +			return -EINVAL;
+> > +	}
+> >  
+> >  	return 0;
+> >  }
