@@ -2,36 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DDB6642E5EB
-	for <lists+kvm@lfdr.de>; Fri, 15 Oct 2021 03:17:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 750B242E5E6
+	for <lists+kvm@lfdr.de>; Fri, 15 Oct 2021 03:17:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234744AbhJOBTC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Oct 2021 21:19:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45146 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234870AbhJOBSa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Oct 2021 21:18:30 -0400
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D52BEC061760;
-        Thu, 14 Oct 2021 18:16:18 -0700 (PDT)
-Message-ID: <20211015011539.244101845@linutronix.de>
+        id S234679AbhJOBS5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Oct 2021 21:18:57 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:46486 "EHLO
+        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234828AbhJOBSZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Oct 2021 21:18:25 -0400
+Message-ID: <20211015011539.296435736@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1634260577;
+        s=2020; t=1634260579;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         references:references; bh=DlvKqi0jmCE/KH+PUdpmqLIW5TpRgR26D2pqirU4Qm4=;
-        b=goG7LKJk/nOsHyLLiWtn/5g2lKZZzKdP4EWYg9YgCZs8Bu7cEnJ3+Ys9gDVMMBlgoc7Ud9
-        rE5CNO7TUtCzbHUv4o9HWh5hArj+01pTi/FGodhmCrg2X/Cnrru0QzxxaCMYJAD17B6vid
-        g09iOUtHgzG6MfCjp7bJoA8uNLH1aIZaLi8jLPRe++ZnPlGJAMlH0dwm/kaJKsm2gEQ/KO
-        ME51MK/gGqJL9BEEQ8B0hNd7DjVzNxyhmGCjKqM2RSfPyKSEsPe2UyX2h+77kICCp83n8P
-        3SDduJ3nUhRo46ceP7/sJeaHui40CbkWsZEJwQv9IbkbDdJY1tfUxZJD0608yQ==
+         references:references; bh=zdW2877c8QrzBJVc70/FSm1yd0CzzH/G41JEp9X+xGc=;
+        b=f96R+daJK0xsP8Msl6ECe0LcEVSRjlCOnATpoMhB1P+AoDbxwAr0rxxs67XoKVG8BjrGiE
+        BXuGRxVzptTJbP+bw+6AHxdfoTkVboDY5+myu1zAa5y5/Pe5V+AoCRMxYpKIlj1FpHSlbZ
+        zXuPva3jwn6JGRpHaVFVOXwuSeGSLs1pByzjSI23wnGVU/rrMfoMg9CMvfR43hX27obnGc
+        G4AM7g3x+9cZ/GRlqzVYJrL2ZQ6sU6G+L3Dm2W4BKEIrpdAsO6Nfy1HvVAMBQUqXqE3RwE
+        K7u7qwF9upm4waZuTE2XZfHrgs7jxvHNv+1LAZcCkoKdCLQYkFD3y8yYcEFO2A==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1634260577;
+        s=2020e; t=1634260579;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         references:references; bh=DlvKqi0jmCE/KH+PUdpmqLIW5TpRgR26D2pqirU4Qm4=;
-        b=TmJDR9JpvyidIUNlECYuVs5IZtWTaWZRIlAqMbB8M4litWm7ED8Ev9jlkb+uRoi5Ch88hF
-        AIfOaEltVG4q2sDA==
+         references:references; bh=zdW2877c8QrzBJVc70/FSm1yd0CzzH/G41JEp9X+xGc=;
+        b=m0N8F+OJ9dTeTSj74mAzfHXQVgRw8dFqWbmVjE2BP+l7W1hCXjxhVyZWLXITvlYki6Mszt
+        v8Q1KjZDTJGXcRBg==
 From:   Thomas Gleixner <tglx@linutronix.de>
 To:     LKML <linux-kernel@vger.kernel.org>
 Cc:     x86@kernel.org, "Chang S. Bae" <chang.seok.bae@intel.com>,
@@ -41,137 +38,83 @@ Cc:     x86@kernel.org, "Chang S. Bae" <chang.seok.bae@intel.com>,
         "Liu, Jing2" <jing2.liu@intel.com>,
         Sean Christopherson <seanjc@google.com>,
         Xiaoyao Li <xiaoyao.li@intel.com>
-Subject: [patch V2 15/30] x86/fpu: Replace KVMs home brewed FPU copy to user
+Subject: [patch V2 16/30] x86/fpu: Mark fpu__init_prepare_fx_sw_frame() as __init
 References: <20211015011411.304289784@linutronix.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Date:   Fri, 15 Oct 2021 03:16:17 +0200 (CEST)
+Date:   Fri, 15 Oct 2021 03:16:18 +0200 (CEST)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Similar to the copy from user function the FPU core has this already
-implemented with all bells and whistles.
-
-Get rid of the duplicated code and use the core functionality.
+No need to keep it around.
 
 Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org
 ---
-V2: Fix the non xsave path - Paolo
-    Fix changelog, comments and function name - Boris, Paolo, Sean
+ arch/x86/include/asm/fpu/signal.h | 2 --
+ arch/x86/kernel/fpu/internal.h    | 8 ++++++++
+ arch/x86/kernel/fpu/signal.c      | 4 +++-
+ arch/x86/kernel/fpu/xstate.c      | 1 +
+ 4 files changed, 12 insertions(+), 3 deletions(-)
+ create mode 100644 arch/x86/kernel/fpu/internal.h
 ---
- arch/x86/include/asm/fpu/api.h |    1 
- arch/x86/kernel/fpu/core.c     |   18 +++++++++++++
- arch/x86/kvm/x86.c             |   56 ++---------------------------------------
- 3 files changed, 22 insertions(+), 53 deletions(-)
----
---- a/arch/x86/include/asm/fpu/api.h
-+++ b/arch/x86/include/asm/fpu/api.h
-@@ -117,5 +117,6 @@ extern void fpu_init_fpstate_user(struct
- extern void fpu_swap_kvm_fpu(struct fpu *save, struct fpu *rstor, u64 restore_mask);
+diff --git a/arch/x86/include/asm/fpu/signal.h b/arch/x86/include/asm/fpu/signal.h
+index 8b6631dffefd..04868a76239a 100644
+--- a/arch/x86/include/asm/fpu/signal.h
++++ b/arch/x86/include/asm/fpu/signal.h
+@@ -31,6 +31,4 @@ fpu__alloc_mathframe(unsigned long sp, int ia32_frame,
  
- extern int fpu_copy_kvm_uabi_to_fpstate(struct fpu *fpu, const void *buf, u64 xcr0, u32 *pkru);
-+extern void fpu_copy_fpstate_to_kvm_uabi(struct fpu *fpu, void *buf, unsigned int size, u32 pkru);
+ unsigned long fpu__get_fpstate_size(void);
  
- #endif /* _ASM_X86_FPU_API_H */
---- a/arch/x86/kernel/fpu/core.c
-+++ b/arch/x86/kernel/fpu/core.c
-@@ -175,6 +175,24 @@ void fpu_swap_kvm_fpu(struct fpu *save,
- }
- EXPORT_SYMBOL_GPL(fpu_swap_kvm_fpu);
- 
-+void fpu_copy_fpstate_to_kvm_uabi(struct fpu *fpu, void *buf,
-+			       unsigned int size, u32 pkru)
-+{
-+	union fpregs_state *kstate = &fpu->state;
-+	union fpregs_state *ustate = buf;
-+	struct membuf mb = { .p = buf, .left = size };
+-extern void fpu__init_prepare_fx_sw_frame(void);
+-
+ #endif /* _ASM_X86_FPU_SIGNAL_H */
+diff --git a/arch/x86/kernel/fpu/internal.h b/arch/x86/kernel/fpu/internal.h
+new file mode 100644
+index 000000000000..036f84c236dd
+--- /dev/null
++++ b/arch/x86/kernel/fpu/internal.h
+@@ -0,0 +1,8 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef __X86_KERNEL_FPU_INTERNAL_H
++#define __X86_KERNEL_FPU_INTERNAL_H
 +
-+	if (cpu_feature_enabled(X86_FEATURE_XSAVE)) {
-+		__copy_xstate_to_uabi_buf(mb, &kstate->xsave, pkru,
-+					  XSTATE_COPY_XSAVE);
-+	} else {
-+		memcpy(&ustate->fxsave, &kstate->fxsave, sizeof(ustate->fxsave));
-+		/* Make it restorable on a XSAVE enabled host */
-+		ustate->xsave.header.xfeatures = XFEATURE_MASK_FPSSE;
-+	}
-+}
-+EXPORT_SYMBOL_GPL(fpu_copy_fpstate_to_kvm_uabi);
++/* Init functions */
++extern void fpu__init_prepare_fx_sw_frame(void);
 +
- int fpu_copy_kvm_uabi_to_fpstate(struct fpu *fpu, const void *buf, u64 xcr0,
- 				 u32 *vpkru)
++#endif
+diff --git a/arch/x86/kernel/fpu/signal.c b/arch/x86/kernel/fpu/signal.c
+index 64f0d4eda0b0..404bbb4a0f60 100644
+--- a/arch/x86/kernel/fpu/signal.c
++++ b/arch/x86/kernel/fpu/signal.c
+@@ -16,6 +16,8 @@
+ #include <asm/trapnr.h>
+ #include <asm/trace/fpu.h>
+ 
++#include "internal.h"
++
+ static struct _fpx_sw_bytes fx_sw_reserved __ro_after_init;
+ static struct _fpx_sw_bytes fx_sw_reserved_ia32 __ro_after_init;
+ 
+@@ -514,7 +516,7 @@ unsigned long fpu__get_fpstate_size(void)
+  * This will be saved when ever the FP and extended state context is
+  * saved on the user stack during the signal handler delivery to the user.
+  */
+-void fpu__init_prepare_fx_sw_frame(void)
++void __init fpu__init_prepare_fx_sw_frame(void)
  {
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -4695,65 +4695,15 @@ static int kvm_vcpu_ioctl_x86_set_debugr
- 	return 0;
- }
+ 	int size = fpu_user_xstate_size + FP_XSTATE_MAGIC2_SIZE;
  
--static void fill_xsave(u8 *dest, struct kvm_vcpu *vcpu)
--{
--	struct xregs_state *xsave = &vcpu->arch.guest_fpu->state.xsave;
--	u64 xstate_bv = xsave->header.xfeatures;
--	u64 valid;
--
--	/*
--	 * Copy legacy XSAVE area, to avoid complications with CPUID
--	 * leaves 0 and 1 in the loop below.
--	 */
--	memcpy(dest, xsave, XSAVE_HDR_OFFSET);
--
--	/* Set XSTATE_BV */
--	xstate_bv &= vcpu->arch.guest_supported_xcr0 | XFEATURE_MASK_FPSSE;
--	*(u64 *)(dest + XSAVE_HDR_OFFSET) = xstate_bv;
--
--	/*
--	 * Copy each region from the possibly compacted offset to the
--	 * non-compacted offset.
--	 */
--	valid = xstate_bv & ~XFEATURE_MASK_FPSSE;
--	while (valid) {
--		u32 size, offset, ecx, edx;
--		u64 xfeature_mask = valid & -valid;
--		int xfeature_nr = fls64(xfeature_mask) - 1;
--		void *src;
--
--		cpuid_count(XSTATE_CPUID, xfeature_nr,
--			    &size, &offset, &ecx, &edx);
--
--		if (xfeature_nr == XFEATURE_PKRU) {
--			memcpy(dest + offset, &vcpu->arch.pkru,
--			       sizeof(vcpu->arch.pkru));
--		} else {
--			src = get_xsave_addr(xsave, xfeature_nr);
--			if (src)
--				memcpy(dest + offset, src, size);
--		}
--
--		valid -= xfeature_mask;
--	}
--}
--
- static void kvm_vcpu_ioctl_x86_get_xsave(struct kvm_vcpu *vcpu,
- 					 struct kvm_xsave *guest_xsave)
- {
- 	if (!vcpu->arch.guest_fpu)
- 		return;
+diff --git a/arch/x86/kernel/fpu/xstate.c b/arch/x86/kernel/fpu/xstate.c
+index b2537a8203ee..1f5a66a38671 100644
+--- a/arch/x86/kernel/fpu/xstate.c
++++ b/arch/x86/kernel/fpu/xstate.c
+@@ -19,6 +19,7 @@
  
--	if (boot_cpu_has(X86_FEATURE_XSAVE)) {
--		memset(guest_xsave, 0, sizeof(struct kvm_xsave));
--		fill_xsave((u8 *) guest_xsave->region, vcpu);
--	} else {
--		memcpy(guest_xsave->region,
--			&vcpu->arch.guest_fpu->state.fxsave,
--			sizeof(struct fxregs_state));
--		*(u64 *)&guest_xsave->region[XSAVE_HDR_OFFSET / sizeof(u32)] =
--			XFEATURE_MASK_FPSSE;
--	}
-+	fpu_copy_fpstate_to_kvm_uabi(vcpu->arch.guest_fpu, guest_xsave->region,
-+				     sizeof(guest_xsave->region),
-+				     vcpu->arch.pkru);
- }
+ #include <asm/tlbflush.h>
  
- static int kvm_vcpu_ioctl_x86_set_xsave(struct kvm_vcpu *vcpu,
++#include "internal.h"
+ #include "xstate.h"
+ 
+ #define for_each_extended_xfeature(bit, mask)				\
 
