@@ -2,36 +2,36 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BE31B42E5E7
-	for <lists+kvm@lfdr.de>; Fri, 15 Oct 2021 03:17:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DDB6642E5EB
+	for <lists+kvm@lfdr.de>; Fri, 15 Oct 2021 03:17:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234733AbhJOBS6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Oct 2021 21:18:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45230 "EHLO
+        id S234744AbhJOBTC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Oct 2021 21:19:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45146 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234738AbhJOBSZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Oct 2021 21:18:25 -0400
+        with ESMTP id S234870AbhJOBSa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Oct 2021 21:18:30 -0400
 Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43D1BC061779;
-        Thu, 14 Oct 2021 18:16:17 -0700 (PDT)
-Message-ID: <20211015011539.191902137@linutronix.de>
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D52BEC061760;
+        Thu, 14 Oct 2021 18:16:18 -0700 (PDT)
+Message-ID: <20211015011539.244101845@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1634260575;
+        s=2020; t=1634260577;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         references:references; bh=LZ4s65C2Wf05ubve26y4ecylgzNISNCMKFTBqqOPuVM=;
-        b=jBLoYWz0Kyuf9IQvDQi7QlQNLA4f/z1vivHCdA1xMoNCqXnUE/s5H3RtU7zXcQx4JpLtYk
-        njY8yfWKNieAhOxdoHazuFgAtBGKwdXqEXxBfJQ9W8yGrXIFeL9IVSi44LnHS+MVACWoa3
-        QSa+LOTYF9DcjYMti1GdABavOxGHq9IC/SSODsLFJ/V5tZOySpb8F4/Qk1d4HsHhNDHi+N
-        X9KUQXhbVntKTRMOgZWtH2CdDsi2a/JtdwvXhTXtstfnE1Txo1KMqqws520k5sgVk7qtSD
-        7u/6ElE6Ay+CmWhQEW+Sq66XHwUbja61j8t0Xap5sOUsiZot4cmOeL8+3ltZgA==
+         references:references; bh=DlvKqi0jmCE/KH+PUdpmqLIW5TpRgR26D2pqirU4Qm4=;
+        b=goG7LKJk/nOsHyLLiWtn/5g2lKZZzKdP4EWYg9YgCZs8Bu7cEnJ3+Ys9gDVMMBlgoc7Ud9
+        rE5CNO7TUtCzbHUv4o9HWh5hArj+01pTi/FGodhmCrg2X/Cnrru0QzxxaCMYJAD17B6vid
+        g09iOUtHgzG6MfCjp7bJoA8uNLH1aIZaLi8jLPRe++ZnPlGJAMlH0dwm/kaJKsm2gEQ/KO
+        ME51MK/gGqJL9BEEQ8B0hNd7DjVzNxyhmGCjKqM2RSfPyKSEsPe2UyX2h+77kICCp83n8P
+        3SDduJ3nUhRo46ceP7/sJeaHui40CbkWsZEJwQv9IbkbDdJY1tfUxZJD0608yQ==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1634260575;
+        s=2020e; t=1634260577;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         references:references; bh=LZ4s65C2Wf05ubve26y4ecylgzNISNCMKFTBqqOPuVM=;
-        b=Uou+9QaIU4ceAj51/cc5oSHG4o5f3dBbT1Fc3obyXD10jBQMC22MYVUnCc877HU1+5K6g+
-        x81Fng+eLbVDECAA==
+         references:references; bh=DlvKqi0jmCE/KH+PUdpmqLIW5TpRgR26D2pqirU4Qm4=;
+        b=TmJDR9JpvyidIUNlECYuVs5IZtWTaWZRIlAqMbB8M4litWm7ED8Ev9jlkb+uRoi5Ch88hF
+        AIfOaEltVG4q2sDA==
 From:   Thomas Gleixner <tglx@linutronix.de>
 To:     LKML <linux-kernel@vger.kernel.org>
 Cc:     x86@kernel.org, "Chang S. Bae" <chang.seok.bae@intel.com>,
@@ -41,107 +41,137 @@ Cc:     x86@kernel.org, "Chang S. Bae" <chang.seok.bae@intel.com>,
         "Liu, Jing2" <jing2.liu@intel.com>,
         Sean Christopherson <seanjc@google.com>,
         Xiaoyao Li <xiaoyao.li@intel.com>
-Subject: [patch V2 14/30] x86/fpu: Rework copy_xstate_to_uabi_buf()
+Subject: [patch V2 15/30] x86/fpu: Replace KVMs home brewed FPU copy to user
 References: <20211015011411.304289784@linutronix.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Date:   Fri, 15 Oct 2021 03:16:15 +0200 (CEST)
+Date:   Fri, 15 Oct 2021 03:16:17 +0200 (CEST)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Prepare for replacing the KVM copy xstate to user function by extending
-copy_xstate_to_uabi_buf() with a pkru argument which allows the caller to
-hand in the pkru value, which is required for KVM because the guest PKRU is
-not accessible via current. Fixup all callsites accordingly.
+Similar to the copy from user function the FPU core has this already
+implemented with all bells and whistles.
+
+Get rid of the duplicated code and use the core functionality.
 
 Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
-
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org
 ---
- arch/x86/kernel/fpu/xstate.c | 34 ++++++++++++++++++++++++++--------
- arch/x86/kernel/fpu/xstate.h |  3 +++
- 2 files changed, 29 insertions(+), 8 deletions(-)
+V2: Fix the non xsave path - Paolo
+    Fix changelog, comments and function name - Boris, Paolo, Sean
 ---
-diff --git a/arch/x86/kernel/fpu/xstate.c b/arch/x86/kernel/fpu/xstate.c
-index eeeb807b9717..b2537a8203ee 100644
---- a/arch/x86/kernel/fpu/xstate.c
-+++ b/arch/x86/kernel/fpu/xstate.c
-@@ -940,9 +940,10 @@ static void copy_feature(bool from_xstate, struct membuf *to, void *xstate,
- }
+ arch/x86/include/asm/fpu/api.h |    1 
+ arch/x86/kernel/fpu/core.c     |   18 +++++++++++++
+ arch/x86/kvm/x86.c             |   56 ++---------------------------------------
+ 3 files changed, 22 insertions(+), 53 deletions(-)
+---
+--- a/arch/x86/include/asm/fpu/api.h
++++ b/arch/x86/include/asm/fpu/api.h
+@@ -117,5 +117,6 @@ extern void fpu_init_fpstate_user(struct
+ extern void fpu_swap_kvm_fpu(struct fpu *save, struct fpu *rstor, u64 restore_mask);
  
- /**
-- * copy_xstate_to_uabi_buf - Copy kernel saved xstate to a UABI buffer
-+ * __copy_xstate_to_uabi_buf - Copy kernel saved xstate to a UABI buffer
-  * @to:		membuf descriptor
-- * @tsk:	The task from which to copy the saved xstate
-+ * @xsave:	The xsave from which to copy
-+ * @pkru_val:	The PKRU value to store in the PKRU component
-  * @copy_mode:	The requested copy mode
-  *
-  * Converts from kernel XSAVE or XSAVES compacted format to UABI conforming
-@@ -951,11 +952,10 @@ static void copy_feature(bool from_xstate, struct membuf *to, void *xstate,
-  *
-  * It supports partial copy but @to.pos always starts from zero.
-  */
--void copy_xstate_to_uabi_buf(struct membuf to, struct task_struct *tsk,
--			     enum xstate_copy_mode copy_mode)
-+void __copy_xstate_to_uabi_buf(struct membuf to, struct xregs_state *xsave,
-+			       u32 pkru_val, enum xstate_copy_mode copy_mode)
- {
- 	const unsigned int off_mxcsr = offsetof(struct fxregs_state, mxcsr);
--	struct xregs_state *xsave = &tsk->thread.fpu.state.xsave;
- 	struct xregs_state *xinit = &init_fpstate.xsave;
- 	struct xstate_header header;
- 	unsigned int zerofrom;
-@@ -1033,10 +1033,9 @@ void copy_xstate_to_uabi_buf(struct membuf to, struct task_struct *tsk,
- 			struct pkru_state pkru = {0};
- 			/*
- 			 * PKRU is not necessarily up to date in the
--			 * thread's XSAVE buffer.  Fill this part from the
--			 * per-thread storage.
-+			 * XSAVE buffer. Use the provided value.
- 			 */
--			pkru.pkru = tsk->thread.pkru;
-+			pkru.pkru = pkru_val;
- 			membuf_write(&to, &pkru, sizeof(pkru));
- 		} else {
- 			copy_feature(header.xfeatures & BIT_ULL(i), &to,
-@@ -1056,6 +1055,25 @@ void copy_xstate_to_uabi_buf(struct membuf to, struct task_struct *tsk,
- 		membuf_zero(&to, to.left);
- }
+ extern int fpu_copy_kvm_uabi_to_fpstate(struct fpu *fpu, const void *buf, u64 xcr0, u32 *pkru);
++extern void fpu_copy_fpstate_to_kvm_uabi(struct fpu *fpu, void *buf, unsigned int size, u32 pkru);
  
-+/**
-+ * copy_xstate_to_uabi_buf - Copy kernel saved xstate to a UABI buffer
-+ * @to:		membuf descriptor
-+ * @tsk:	The task from which to copy the saved xstate
-+ * @copy_mode:	The requested copy mode
-+ *
-+ * Converts from kernel XSAVE or XSAVES compacted format to UABI conforming
-+ * format, i.e. from the kernel internal hardware dependent storage format
-+ * to the requested @mode. UABI XSTATE is always uncompacted!
-+ *
-+ * It supports partial copy but @to.pos always starts from zero.
-+ */
-+void copy_xstate_to_uabi_buf(struct membuf to, struct task_struct *tsk,
-+			     enum xstate_copy_mode copy_mode)
+ #endif /* _ASM_X86_FPU_API_H */
+--- a/arch/x86/kernel/fpu/core.c
++++ b/arch/x86/kernel/fpu/core.c
+@@ -175,6 +175,24 @@ void fpu_swap_kvm_fpu(struct fpu *save,
+ }
+ EXPORT_SYMBOL_GPL(fpu_swap_kvm_fpu);
+ 
++void fpu_copy_fpstate_to_kvm_uabi(struct fpu *fpu, void *buf,
++			       unsigned int size, u32 pkru)
 +{
-+	__copy_xstate_to_uabi_buf(to, &tsk->thread.fpu.state.xsave,
-+				  tsk->thread.pkru, copy_mode);
-+}
++	union fpregs_state *kstate = &fpu->state;
++	union fpregs_state *ustate = buf;
++	struct membuf mb = { .p = buf, .left = size };
 +
- static int copy_from_buffer(void *dst, unsigned int offset, unsigned int size,
- 			    const void *kbuf, const void __user *ubuf)
++	if (cpu_feature_enabled(X86_FEATURE_XSAVE)) {
++		__copy_xstate_to_uabi_buf(mb, &kstate->xsave, pkru,
++					  XSTATE_COPY_XSAVE);
++	} else {
++		memcpy(&ustate->fxsave, &kstate->fxsave, sizeof(ustate->fxsave));
++		/* Make it restorable on a XSAVE enabled host */
++		ustate->xsave.header.xfeatures = XFEATURE_MASK_FPSSE;
++	}
++}
++EXPORT_SYMBOL_GPL(fpu_copy_fpstate_to_kvm_uabi);
++
+ int fpu_copy_kvm_uabi_to_fpstate(struct fpu *fpu, const void *buf, u64 xcr0,
+ 				 u32 *vpkru)
  {
-diff --git a/arch/x86/kernel/fpu/xstate.h b/arch/x86/kernel/fpu/xstate.h
-index 0789a04ee705..81f4202781ac 100644
---- a/arch/x86/kernel/fpu/xstate.h
-+++ b/arch/x86/kernel/fpu/xstate.h
-@@ -15,4 +15,7 @@ static inline void xstate_init_xcomp_bv(struct xregs_state *xsave, u64 mask)
- 		xsave->header.xcomp_bv = mask | XCOMP_BV_COMPACTED_FORMAT;
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -4695,65 +4695,15 @@ static int kvm_vcpu_ioctl_x86_set_debugr
+ 	return 0;
  }
  
-+extern void __copy_xstate_to_uabi_buf(struct membuf to, struct xregs_state *xsave,
-+				      u32 pkru_val, enum xstate_copy_mode copy_mode);
-+
- #endif
+-static void fill_xsave(u8 *dest, struct kvm_vcpu *vcpu)
+-{
+-	struct xregs_state *xsave = &vcpu->arch.guest_fpu->state.xsave;
+-	u64 xstate_bv = xsave->header.xfeatures;
+-	u64 valid;
+-
+-	/*
+-	 * Copy legacy XSAVE area, to avoid complications with CPUID
+-	 * leaves 0 and 1 in the loop below.
+-	 */
+-	memcpy(dest, xsave, XSAVE_HDR_OFFSET);
+-
+-	/* Set XSTATE_BV */
+-	xstate_bv &= vcpu->arch.guest_supported_xcr0 | XFEATURE_MASK_FPSSE;
+-	*(u64 *)(dest + XSAVE_HDR_OFFSET) = xstate_bv;
+-
+-	/*
+-	 * Copy each region from the possibly compacted offset to the
+-	 * non-compacted offset.
+-	 */
+-	valid = xstate_bv & ~XFEATURE_MASK_FPSSE;
+-	while (valid) {
+-		u32 size, offset, ecx, edx;
+-		u64 xfeature_mask = valid & -valid;
+-		int xfeature_nr = fls64(xfeature_mask) - 1;
+-		void *src;
+-
+-		cpuid_count(XSTATE_CPUID, xfeature_nr,
+-			    &size, &offset, &ecx, &edx);
+-
+-		if (xfeature_nr == XFEATURE_PKRU) {
+-			memcpy(dest + offset, &vcpu->arch.pkru,
+-			       sizeof(vcpu->arch.pkru));
+-		} else {
+-			src = get_xsave_addr(xsave, xfeature_nr);
+-			if (src)
+-				memcpy(dest + offset, src, size);
+-		}
+-
+-		valid -= xfeature_mask;
+-	}
+-}
+-
+ static void kvm_vcpu_ioctl_x86_get_xsave(struct kvm_vcpu *vcpu,
+ 					 struct kvm_xsave *guest_xsave)
+ {
+ 	if (!vcpu->arch.guest_fpu)
+ 		return;
+ 
+-	if (boot_cpu_has(X86_FEATURE_XSAVE)) {
+-		memset(guest_xsave, 0, sizeof(struct kvm_xsave));
+-		fill_xsave((u8 *) guest_xsave->region, vcpu);
+-	} else {
+-		memcpy(guest_xsave->region,
+-			&vcpu->arch.guest_fpu->state.fxsave,
+-			sizeof(struct fxregs_state));
+-		*(u64 *)&guest_xsave->region[XSAVE_HDR_OFFSET / sizeof(u32)] =
+-			XFEATURE_MASK_FPSSE;
+-	}
++	fpu_copy_fpstate_to_kvm_uabi(vcpu->arch.guest_fpu, guest_xsave->region,
++				     sizeof(guest_xsave->region),
++				     vcpu->arch.pkru);
+ }
+ 
+ static int kvm_vcpu_ioctl_x86_set_xsave(struct kvm_vcpu *vcpu,
 
