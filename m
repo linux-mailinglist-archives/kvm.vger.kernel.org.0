@@ -2,140 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 250AD42ED40
-	for <lists+kvm@lfdr.de>; Fri, 15 Oct 2021 11:10:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6873B42ED55
+	for <lists+kvm@lfdr.de>; Fri, 15 Oct 2021 11:13:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236886AbhJOJMY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Oct 2021 05:12:24 -0400
-Received: from mail.kernel.org ([198.145.29.99]:59202 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236907AbhJOJMV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Oct 2021 05:12:21 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S236982AbhJOJP5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Oct 2021 05:15:57 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47856 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231273AbhJOJP4 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 15 Oct 2021 05:15:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1634289230;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=im3jtM7QDycEHpy2D3uf5n3ALksflmwMlePPaUbujbk=;
+        b=L9PF2uNQkdQ9XUk18J64cX8Js6ePsUyCTaLQqJFjP3s4fNqyzy3JiOAxkYu/5grRiyX+MO
+        EC8HAW4Yduiu9A4OP3OPwoRI2ZZnN0GhDMswDn9GJ+9SlFUard+wAzGpoo7+k0iICPfpzM
+        w5hMJQnNcCOXhRMyUeuf/qHithR98HU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-521-xISD9qBQO7q6uPg6Tz_ZMg-1; Fri, 15 Oct 2021 05:13:48 -0400
+X-MC-Unique: xISD9qBQO7q6uPg6Tz_ZMg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 89686611ED;
-        Fri, 15 Oct 2021 09:10:15 +0000 (UTC)
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <maz@kernel.org>)
-        id 1mbJED-00GvHX-JT; Fri, 15 Oct 2021 10:10:13 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org
-Cc:     James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Quentin Perret <qperret@google.com>,
-        Will Deacon <will@kernel.org>, kernel-team@android.com
-Subject: [PATCH 5/5] KVM: arm64: Drop vcpu->arch.has_run_once for vcpu->pid
-Date:   Fri, 15 Oct 2021 10:08:22 +0100
-Message-Id: <20211015090822.2994920-6-maz@kernel.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20211015090822.2994920-1-maz@kernel.org>
-References: <20211015090822.2994920-1-maz@kernel.org>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7FE7D1015DA0
+        for <kvm@vger.kernel.org>; Fri, 15 Oct 2021 09:13:47 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4CFAD1981F
+        for <kvm@vger.kernel.org>; Fri, 15 Oct 2021 09:13:47 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     kvm@vger.kernel.org
+Subject: [PATCH kvm-unit-tests] vmx: remove duplicate tests from vmx test suites
+Date:   Fri, 15 Oct 2021 05:13:46 -0400
+Message-Id: <20211015091346.69579-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, qperret@google.com, will@kernel.org, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-With the transition to kvm_arch_vcpu_run_pid_change() to handle
-the "run once" activities, it becomes obvious that has_run_once
-is now an exact shadow of vcpu->pid.
+The apic_reg_virt_test and virt_x2apic_mode_test tests are already run
+separately by the "vmx_apicv_test" suite, remove them from the main
+suite "vmx".
 
-Replace vcpu->arch.has_run_once with a new vcpu_has_run_once()
-helper that directly checks for vcpu->pid, and get rid of the
-now unused field.
-
-Signed-off-by: Marc Zyngier <maz@kernel.org>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/arm64/include/asm/kvm_host.h | 5 ++---
- arch/arm64/kvm/arm.c              | 8 +++-----
- arch/arm64/kvm/vgic/vgic-init.c   | 2 +-
- 3 files changed, 6 insertions(+), 9 deletions(-)
+ x86/unittests.cfg | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index d7107d627c54..e0de761ecbf2 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -366,9 +366,6 @@ struct kvm_vcpu_arch {
- 	int target;
- 	DECLARE_BITMAP(features, KVM_VCPU_MAX_FEATURES);
+diff --git a/x86/unittests.cfg b/x86/unittests.cfg
+index d5efab0..3000e53 100644
+--- a/x86/unittests.cfg
++++ b/x86/unittests.cfg
+@@ -280,7 +280,7 @@ arch = i386
  
--	/* Detect first run of a vcpu */
--	bool has_run_once;
--
- 	/* Virtual SError ESR to restore when HCR_EL2.VSE is set */
- 	u64 vsesr_el2;
+ [vmx]
+ file = vmx.flat
+-extra_params = -cpu max,+vmx -append "-exit_monitor_from_l2_test -ept_access* -vmx_smp* -vmx_vmcs_shadow_test -atomic_switch_overflow_msrs_test -vmx_init_signal_test -vmx_apic_passthrough_tpr_threshold_test"
++extra_params = -cpu max,+vmx -append "-exit_monitor_from_l2_test -ept_access* -vmx_smp* -vmx_vmcs_shadow_test -atomic_switch_overflow_msrs_test -vmx_init_signal_test -vmx_apic_passthrough_tpr_threshold_test -apic_reg_virt_test -virt_x2apic_mode_test"
+ arch = x86_64
+ groups = vmx
  
-@@ -605,6 +602,8 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
- void kvm_arm_halt_guest(struct kvm *kvm);
- void kvm_arm_resume_guest(struct kvm *kvm);
- 
-+#define vcpu_has_run_once(vcpu)	!!rcu_access_pointer((vcpu)->pid)
-+
- #ifndef __KVM_NVHE_HYPERVISOR__
- #define kvm_call_hyp_nvhe(f, ...)						\
- 	({								\
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 5bcdf8073854..ebcb1adf80fb 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -350,7 +350,7 @@ void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu)
- 
- void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
- {
--	if (vcpu->arch.has_run_once && unlikely(!irqchip_in_kernel(vcpu->kvm)))
-+	if (vcpu_has_run_once(vcpu) && unlikely(!irqchip_in_kernel(vcpu->kvm)))
- 		static_branch_dec(&userspace_irqchip_in_use);
- 
- 	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_page_cache);
-@@ -600,7 +600,7 @@ int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
- 	if (ret)
- 		return ret;
- 
--	if (likely(vcpu->arch.has_run_once))
-+	if (likely(vcpu_has_run_once(vcpu)))
- 		return 0;
- 
- 	kvm_arm_vcpu_init_debug(vcpu);
-@@ -631,8 +631,6 @@ int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
- 		static_branch_inc(&userspace_irqchip_in_use);
- 	}
- 
--	vcpu->arch.has_run_once = true;
--
- 	return ret;
- }
- 
-@@ -1123,7 +1121,7 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
- 	 * need to invalidate the I-cache though, as FWB does *not*
- 	 * imply CTR_EL0.DIC.
- 	 */
--	if (vcpu->arch.has_run_once) {
-+	if (vcpu_has_run_once(vcpu)) {
- 		if (!cpus_have_final_cap(ARM64_HAS_STAGE2_FWB))
- 			stage2_unmap_vm(vcpu->kvm);
- 		else
-diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-index 340c51d87677..8d89ca15f613 100644
---- a/arch/arm64/kvm/vgic/vgic-init.c
-+++ b/arch/arm64/kvm/vgic/vgic-init.c
-@@ -91,7 +91,7 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
- 		return ret;
- 
- 	kvm_for_each_vcpu(i, vcpu, kvm) {
--		if (vcpu->arch.has_run_once)
-+		if (vcpu_has_run_once(vcpu))
- 			goto out_unlock;
- 	}
- 	ret = 0;
 -- 
-2.30.2
+2.27.0
 
