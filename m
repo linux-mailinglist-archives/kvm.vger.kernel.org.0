@@ -2,47 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6541F4300A5
-	for <lists+kvm@lfdr.de>; Sat, 16 Oct 2021 08:43:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 38DE84300AE
+	for <lists+kvm@lfdr.de>; Sat, 16 Oct 2021 08:51:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239982AbhJPGpR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 16 Oct 2021 02:45:17 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:57848 "EHLO
+        id S240533AbhJPGxs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 16 Oct 2021 02:53:48 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58496 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234161AbhJPGpQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sat, 16 Oct 2021 02:45:16 -0400
+        by vger.kernel.org with ESMTP id S236583AbhJPGxp (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 16 Oct 2021 02:53:45 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634366588;
+        s=mimecast20190719; t=1634367096;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding;
         bh=H9PD86CwR5nYqF03lqODYpfsY+K3xeFojmjQDbxQ8bg=;
-        b=jUa9tBy+7/OoXgMwI5XGuQ9fBigZpOb22ZX+lQJSBZUJ71EsF9CiE77q80WuZ2d6obGcNz
-        ivtIsNlzy/xSYnfP742Kbm7Sk2TuNTGjAIvQNDzuv5/vHbTIXj0ak6PCDGo7Fw9+/Ky0KU
-        HHDEDf1EGgjJVWkjumX732kdWbpGZn0=
+        b=QOUGzDmml9hTRd+E8X7uWSJiepw339w7g9rxkfXSs+j4EY9BvXxuSXgAQLC/VgsC9igjzk
+        znudfVVy+DBW/jHYBIykxJn/R3y1jcEVnE7tDSdfe07iKua2GUMgzNCaugmzNvaRkffEew
+        2Vk0LHHY1T30fNGYZLY3c1921B9ilb0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-7-uyRxubjWMUqS6LZC3DClnw-1; Sat, 16 Oct 2021 02:43:05 -0400
-X-MC-Unique: uyRxubjWMUqS6LZC3DClnw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+ us-mta-553-0_gGCPVpNsOtAw8zTIaEjA-1; Sat, 16 Oct 2021 02:51:33 -0400
+X-MC-Unique: 0_gGCPVpNsOtAw8zTIaEjA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D6449362F8;
-        Sat, 16 Oct 2021 06:43:03 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1D9CB362F8;
+        Sat, 16 Oct 2021 06:51:32 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A1ACB5D6D7;
-        Sat, 16 Oct 2021 06:43:02 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 444755DA61;
+        Sat, 16 Oct 2021 06:51:31 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     torvalds@linux-foundation.org, kvm@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org, seanjc@google.com,
         Willy Tarreau <w@1wt.eu>, Kees Cook <keescook@chromium.org>,
         syzbot+e0de2333cbf95ea473e8@syzkaller.appspotmail.com
 Subject: [PATCH] mm: allow huge kvmalloc() calls if they're accounted to memcg
-Date:   Sat, 16 Oct 2021 02:43:02 -0400
-Message-Id: <20211016064302.165220-1-pbonzini@redhat.com>
+Date:   Sat, 16 Oct 2021 02:51:30 -0400
+Message-Id: <20211016065130.166128-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
