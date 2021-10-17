@@ -2,109 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 79EA24309DD
-	for <lists+kvm@lfdr.de>; Sun, 17 Oct 2021 16:49:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 57D74430AFE
+	for <lists+kvm@lfdr.de>; Sun, 17 Oct 2021 19:03:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343886AbhJQOvR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 17 Oct 2021 10:51:17 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:44125 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S238007AbhJQOvQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 17 Oct 2021 10:51:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634482146;
+        id S1344303AbhJQRF0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 17 Oct 2021 13:05:26 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:33388 "EHLO
+        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229565AbhJQRFZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 17 Oct 2021 13:05:25 -0400
+Message-ID: <20211017151447.829495362@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1634490192;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-        bh=Ip6ZgePH8xwpK2sHmkpaBxfB7ZKPtwdcnXkOJDJISgI=;
-        b=YFWxJ3HRMfFiZkEBYmkUiDf7hTAIiD7VzyXTE8szJXDPl80boNFLdDBmUv80YNO+k43qFA
-        TvacWhTNv0A97FRAqSqecJJ05UM7+CCryQdY8GIJe3fMPB5woOXgUm40HafkqTwDBfn3go
-        x7yJTHzKQTVRvjgEbJDQlykpZWllXII=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-480-tzT97R6SO9eFswNBVNdNwg-1; Sun, 17 Oct 2021 10:49:05 -0400
-X-MC-Unique: tzT97R6SO9eFswNBVNdNwg-1
-Received: by mail-wm1-f69.google.com with SMTP id o196-20020a1ca5cd000000b0030dc197412aso2310836wme.0
-        for <kvm@vger.kernel.org>; Sun, 17 Oct 2021 07:49:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition;
-        bh=Ip6ZgePH8xwpK2sHmkpaBxfB7ZKPtwdcnXkOJDJISgI=;
-        b=ZR14o9EOViEpi2Hb7Qhd66Zx+S7fd60cBDYxsY6N9loLKIyMVaEFDYBgOt1oX7NSWG
-         rzOyc7GHshi3h1nMFl/2O/UaWp6/yuDp+wYn9Mb5PZYE+pqNV4S7mZ41vdiVtPnMOAEm
-         pM79K3aKI05moHO5hxnrOgHtPlqB7MN4NXuz12nzPXRHewU56fP7S3elW7QxxbiZcJ+f
-         E0KtOj6IqwvghA9+RXbidHtJNiSZmpPRbNe0dp+V+uBBD91ywTUNv0gQ//yKGyA2mNmL
-         BpAVqOGxVI9Rzt4oeK13+fY9auQ5jt13gW7vKWtGkC12AbvpYoatCCQX62FNSL8V7Ur7
-         X46Q==
-X-Gm-Message-State: AOAM530QxiXbFViRLh7CzaMzGiyzAawQjlP3mi/PGOZlzVVKHolm5QZi
-        +pRw5Auj+S3ATWtGIM6K1sztNOnjlo1GjGwJ8ETCYJ5h5tA8bimksN0W5cKfFkDhgu4Q3I3HFkr
-        8oUedQvA/Wpl0
-X-Received: by 2002:a05:6000:1683:: with SMTP id y3mr15124353wrd.314.1634482144583;
-        Sun, 17 Oct 2021 07:49:04 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyFBg10YCOIJdS2cG0k9v/rSms6MDVN0cXyAC9SocqmtQ9OZq/KfKELZOAfWYN7H7AEZxW3lg==
-X-Received: by 2002:a05:6000:1683:: with SMTP id y3mr15124332wrd.314.1634482144347;
-        Sun, 17 Oct 2021 07:49:04 -0700 (PDT)
-Received: from redhat.com ([2.55.147.75])
-        by smtp.gmail.com with ESMTPSA id a2sm11630293wrq.9.2021.10.17.07.49.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 17 Oct 2021 07:49:03 -0700 (PDT)
-Date:   Sun, 17 Oct 2021 10:49:00 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        corbet@lwn.net, jasowang@redhat.com, linux-doc@vger.kernel.org,
-        lulu@redhat.com, markver@us.ibm.com, mst@redhat.com,
-        pasic@linux.ibm.com, rdunlap@infradead.org, stable@vger.kernel.org,
-        wuzongyong@linux.alibaba.com, xieyongji@bytedance.com
-Subject: [GIT PULL] virtio,vdpa: fixes
-Message-ID: <20211017104900-mutt-send-email-mst@kernel.org>
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=aZ3sxqmD6RAQ9ctUnJs4ASYjd0+zZLz5efI/2VlHMX4=;
+        b=N2M5sFkB/bp1P5+BoivbWpr/0yTg/aossEy1KRjBoLEpBfhaAjqrmJiVf1GdhqSCu8vMh4
+        6CWRjbXIlLW05Sf5xbpd1d1+BcIxEz2ILASptSJxbL6I0H2wJzNnaDXyBRRypNnaJj/uSx
+        uJsrYt2u9q4J5bciSYfN62mRXCF86HgYUaJY3GBEj5cc4gVKOLVvN5A/op3ZztkoiAORTW
+        oBes1EUw+NfIyqtl5ORvbpzbaP+XCQduPPHwXN2qCdHnnUpwRX2eBBGHpfgOGrQDYR8ZnR
+        rZbwvQbeieJL6P9llrR/7bq5g6/eGXJbEHdP24cEoNw+Zg3Yx3Phkk9RYAp7vw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1634490192;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=aZ3sxqmD6RAQ9ctUnJs4ASYjd0+zZLz5efI/2VlHMX4=;
+        b=WHnlM8vgwmIJc+EdU7fl+eoNw3DR6UJ7IzZTBrnP1dGBJtfXv2Vkahnga0RTaxtjhq5q1u
+        c7VSklZYYowMtXCQ==
+From:   Thomas Gleixner <tglx@linutronix.de>
+To:     LKML <linux-kernel@vger.kernel.org>
+Cc:     x86@kernel.org, "Liu, Jing2" <jing2.liu@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Bae, Chang Seok" <chang.seok.bae@intel.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Arjan van de Ven <arjan@linux.intel.com>,
+        kvm@vger.kernel.org, "Nakajima, Jun" <jun.nakajima@intel.com>,
+        Sean Christopherson <seanjc@google.com>
+Subject: [patch 0/4] x86/fpu/kvm: Sanitize the FPU guest/user handling
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mutt-Fcc: =sent
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Date:   Sun, 17 Oct 2021 19:03:11 +0200 (CEST)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The following changes since commit be9c6bad9b46451ba5bb8d366c51e2475f374981:
-
-  vdpa: potential uninitialized return in vhost_vdpa_va_map() (2021-09-14 18:10:43 -0400)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
-
-for you to fetch changes up to bcef9356fc2e1302daf373c83c826aa27954d128:
-
-  vhost-vdpa: Fix the wrong input in config_cb (2021-10-13 08:42:07 -0400)
-
-----------------------------------------------------------------
-virtio,vdpa: fixes
-
-Fixes up some issues in rc5.
-
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-
-----------------------------------------------------------------
-Cindy Lu (1):
-      vhost-vdpa: Fix the wrong input in config_cb
-
-Halil Pasic (1):
-      virtio: write back F_VERSION_1 before validate
-
-Michael S. Tsirkin (1):
-      Revert "virtio-blk: Add validation for block size in config space"
-
-Randy Dunlap (1):
-      VDUSE: fix documentation underline warning
-
-Wu Zongyong (1):
-      vhost_vdpa: unset vq irq before freeing irq
-
- Documentation/userspace-api/vduse.rst |  2 +-
- drivers/block/virtio_blk.c            | 37 ++++++-----------------------------
- drivers/vhost/vdpa.c                  | 10 +++++-----
- drivers/virtio/virtio.c               | 11 +++++++++++
- 4 files changed, 23 insertions(+), 37 deletions(-)
-
+Q3VycmVudGx5IEtWTSBhbGxvY2F0ZXMgdHdvIEZQVSBzdHJ1Y3RzIHdoaWNoIGFyZSB1c2VkIGZv
+ciBzYXZpbmcgdGhlIHVzZXIKc3RhdGUgb2YgdGhlIHZDUFUgdGhyZWFkIGFuZCByZXN0b3Jpbmcg
+dGhlIGd1ZXN0IHN0YXRlIHdoZW4gZW50ZXJpbmcKdmNwdV9ydW4oKSBhbmQgZG9pbmcgdGhlIHJl
+dmVyc2Ugb3BlcmF0aW9uIGJlZm9yZSBsZWF2aW5nIHZjcHVfcnVuKCkuCgpXaXRoIHRoZSBuZXcg
+ZnBzdGF0ZSBtZWNoYW5pc20gdGhpcyBjYW4gYmUgcmVkdWNlZCB0byBvbmUgZXh0cmEgYnVmZmVy
+IGJ5CnN3YXBwaW5nIHRoZSBmcHN0YXRlIHBvaW50ZXIgaW4gY3VycmVudDo6dGhyZWFkOjpmcHUu
+IFRoaXMgbWFrZXMgYWxzbyB0aGUKdXBjb21pbmcgc3VwcG9ydCBmb3IgQU1YIGFuZCBYRkQgc2lt
+cGxlciBiZWNhdXNlIHRoZW4gZnBzdGF0ZSBpbmZvcm1hdGlvbgooZmVhdHVyZXMsIHNpemVzLCB4
+ZmQpIGFyZSBhbHdheXMgY29uc2lzdGVudCBhbmQgaXQgZG9lcyBub3QgcmVxdWlyZSBhbnkKbmFz
+dHkgd29ya2Fyb3VuZHMuCgpUaGUgZm9sbG93aW5nIHNlcmllcyBjbGVhbnMgdGhhdCB1cCBhbmQg
+cmVwbGFjZXMgdGhlIGN1cnJlbnQgc2NoZW1lIHdpdGggYQpzaW5nbGUgZ3Vlc3Qgc3RhdGUgd2hp
+Y2ggaXMgc3dpdGNoZWQgaW4gd2hlbiBlbnRlcmluZyB2Y3B1X3J1bigpIGFuZApzd2l0Y2hlZCBv
+dXQgYmVmb3JlIGxlYXZpbmcgaXQuCgpUaGUgcmV3b3JrIGlzIHZhbHVhYmxlIGV2ZW4gd2l0aG91
+dCBBTVgvWEZEIGJlY2F1c2UgaXQgY29uc3VtZXMgbGVzcyBtZW1vcnkKYW5kIHdoZW4gc3dhcHBp
+bmcgdGhlIGZwc3RhdGVzIHRoZXJlIGlzIG5vIG1lbW9yeSBjb3B5IHJlcXVpcmVkIHdoZW4KVElG
+X05FRURfTE9BRF9GUFUgaXMgc2V0IG9uIHRoZSBnb2luZyBvdXQgZnBzdGF0ZS4KClRoZSBzZXJp
+ZXMgaXMgYmFzZWQgb246CgogIGdpdDovL2dpdC5rZXJuZWwub3JnL3B1Yi9zY20vbGludXgva2Vy
+bmVsL2dpdC90Z2x4L2RldmVsLmdpdCB4ODYvZnB1LTMKCmFuZCBpcyBub3cgcGFydCBvZiB0aGUg
+ZnVsbCBBTVggc2VyaWVzOgoKICBnaXQ6Ly9naXQua2VybmVsLm9yZy9wdWIvc2NtL2xpbnV4L2tl
+cm5lbC9naXQvdGdseC9kZXZlbC5naXQgeDg2L2ZwdQoKT24gdG9wIG9mIHRoYXQgSSd2ZSBpbnRl
+Z3JhdGVkIHRoZSBLVk0gcmVhbGxvY2F0aW9uIG1lY2hhbmlzbSBpbnRvOgoKICBnaXQ6Ly9naXQu
+a2VybmVsLm9yZy9wdWIvc2NtL2xpbnV4L2tlcm5lbC9naXQvdGdseC9kZXZlbC5naXQgeDg2L2Zw
+dS1rdm0KClRoZSBsYXR0ZXIgYnVpbGRzLCBib290cyBhbmQgcnVucyBLVk0gZ3Vlc3RzLCBidXQg
+dGhhdCByZWFsbG9jYXRpb24KZnVuY3Rpb25hbGl0eSBpcyBvYnZpb3VzbHkgY29tcGxldGVseSB1
+bnRlc3RlZC4gSSB3YW50IHRvIHNoYXJlIHRoaXMgd2l0aApLVk0gZm9sa3Mgc28gdGhleSBjYW4g
+c3RhcnQgdG8gbG9vayBob3cgdG8gaW50ZWdyYXRlIHRoZWlyIFhGRC9YQ1IwIGFuZApyZWFsbG9j
+YXRpb24gc2NoZW1lIGFzIGRpc2N1c3NlZCBhbmQgb3V0bGluZWQgaGVyZToKCiAgIGh0dHBzOi8v
+bG9yZS5rZXJuZWwub3JnL3IvODdtdG45M3U1OC5mZnNAdGdseAoKYW5kIHRoZSByZWxhdGVkIHRo
+cmVhZC4gSXQncyBhIHRpbnkgaW5jcmVtZW50YWwgdXBkYXRlIG9uIHRvcCBvZiB4ODYvZnB1ICg2
+CmZpbGVzIGNoYW5nZWQsIDE4MyBpbnNlcnRpb25zKCspLCAzNiBkZWxldGlvbnMoLSkpIHdoaWNo
+IHJldXNlcyB0aGUgaG9zdApzaWRlIG1lY2hhbmlzbXMuCgpUaGFua3MsCgoJdGdseAotLS0KIGlu
+Y2x1ZGUvYXNtL2ZwdS9hcGkuaCAgIHwgICAxOSArKysrKystLQogaW5jbHVkZS9hc20vZnB1L3R5
+cGVzLmggfCAgIDQ0ICsrKysrKysrKysrKysrKysrKy0KIGluY2x1ZGUvYXNtL2t2bV9ob3N0Lmgg
+IHwgICAgNyAtLS0KIGtlcm5lbC9mcHUvY29yZS5jICAgICAgIHwgIDExMCArKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKystLS0tLS0tLS0tLS0tLS0KIGt2bS9zdm0vc3ZtLmMgICAgICAg
+ICAgIHwgICAgNyArLS0KIGt2bS94ODYuYyAgICAgICAgICAgICAgIHwgICA4OCArKysrKysrKysr
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQogNiBmaWxlcyBjaGFuZ2VkLCAxNjUgaW5zZXJ0
+aW9ucygrKSwgMTEwIGRlbGV0aW9ucygtKQoKCg==
