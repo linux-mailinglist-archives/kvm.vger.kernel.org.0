@@ -2,130 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 16497430B06
-	for <lists+kvm@lfdr.de>; Sun, 17 Oct 2021 19:03:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EF3DC430CD3
+	for <lists+kvm@lfdr.de>; Mon, 18 Oct 2021 01:06:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344391AbhJQRFo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 17 Oct 2021 13:05:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44662 "EHLO
+        id S1344756AbhJQXIz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 17 Oct 2021 19:08:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38666 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344340AbhJQRFc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 17 Oct 2021 13:05:32 -0400
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC7D6C06161C;
-        Sun, 17 Oct 2021 10:03:22 -0700 (PDT)
-Message-ID: <20211017152048.726038584@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1634490199;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         references:references; bh=aHWXrxAAqFdnNUVjMAZJd7nF6eNjzsty49yxP1lnWL4=;
-        b=BXQTb/URty11XKDlTMPmGPMX/xT5uyr0QZtzQSX9ecg/718GLsRM523Ovfu/v10VSNHlA0
-        ziXzKwjneX33lTWtmvCaZHzfRUes+at448L4K3jPAFLGgd+wAfdVnMAcM2aJz8CItlz61O
-        mqw7VC/x0kf9mZ+spXqR+t1XuFblgRsKdmVh+eTSJtgPu3aeGHf//WqIvD4KRW03Uj/eK/
-        NSLYt0c6mgikwaUcHWG58XtJo1LccQQsbfMzGeReYdozhQGHym+dSsB9OyqSV2hDYW+jCP
-        InUrk0hdTM2m7eHtd8jLK+dmjf5Gq8DkB+FOTn2rLqRYhv4IFw/1a/bKPULjng==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1634490199;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         references:references; bh=aHWXrxAAqFdnNUVjMAZJd7nF6eNjzsty49yxP1lnWL4=;
-        b=WxUCi+DhQ7vev8oFfE+Cq0puViSCljF/COTrEX1ffezZ/GL1snTQuvvkf7By+EG1lIkRUd
-        p7yO+3mqW9d0qOBA==
-From:   Thomas Gleixner <tglx@linutronix.de>
-To:     LKML <linux-kernel@vger.kernel.org>
-Cc:     x86@kernel.org, "Liu, Jing2" <jing2.liu@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Bae, Chang Seok" <chang.seok.bae@intel.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Arjan van de Ven <arjan@linux.intel.com>,
-        kvm@vger.kernel.org, "Nakajima, Jun" <jun.nakajima@intel.com>,
-        Sean Christopherson <seanjc@google.com>
-Subject: [patch 4/4] x86/fpu: Remove old KVM FPU interface
-References: <20211017151447.829495362@linutronix.de>
+        with ESMTP id S233442AbhJQXIy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 17 Oct 2021 19:08:54 -0400
+Received: from mail-lj1-x244.google.com (mail-lj1-x244.google.com [IPv6:2a00:1450:4864:20::244])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67B5BC06161C
+        for <kvm@vger.kernel.org>; Sun, 17 Oct 2021 16:06:44 -0700 (PDT)
+Received: by mail-lj1-x244.google.com with SMTP id u5so194969ljo.8
+        for <kvm@vger.kernel.org>; Sun, 17 Oct 2021 16:06:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:sender:from:date:message-id:subject:to;
+        bh=YZi3r71biaNtmB94UtAaTyqPDywjGTIYNFSxHSRWkd4=;
+        b=Hq9mIkGWzT5VSDVpgDinGbUVFGxrne3vUo77LAa7SPnzwhyMWuNrjXcVKmMSsToZwr
+         wG3Df74aYHoeJhVdDfQQGfqx1UxbvfL4tIlwmPXNtt50SQr4Ez0x5PU+1VuoRac+kIue
+         g1msv+mF0Vc9qgYAdYGXipIm5vYjVrnJhiwgYPqupVK4L2VB9gs0vqWFV/Fi54jc77NV
+         D28sxxTvUSR4iROncK0BaHaMDwP6GwmXYfb03SnceCxEOz+iqc79NMbt8dT5CiJUV8GI
+         G9SD4AoOqvsiv7pxNRQam9F8BDrcblup3Gct0qaaOQoIJlm1+1I220F7XBh8s7U5Eoe1
+         HfHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:sender:from:date:message-id:subject
+         :to;
+        bh=YZi3r71biaNtmB94UtAaTyqPDywjGTIYNFSxHSRWkd4=;
+        b=Whsj/BOtMrwazDx+JWe1qHfvNtI/jVTBeq/FEFijkk46pgiDlwIYq9F0ywYRoREzC1
+         3hsAkdTb9HjQACt8KC0Z/owXvogldhe1IPy+2HLWgGJLim/J5/16X/NpNY+5J8xfAMed
+         X5Qzw5fdQ57pO3hV9fvcCumv28Nb4ngB73c83LyKrjq7RYX+XJacfQfx7d81khbvL56I
+         d3ZFlybW2BqAa5JWOZaA+x8a+WaG68Tb5rPP8Zid7OEq3zr6vieXBo/GkWgzXTz9vwiu
+         1GvpWjZIhoBmt+vUa7z3+Cn6W04QYQAOSZVcdExMba0A7K/rgAFb0QqSkxAKj0O0fb5J
+         kHhw==
+X-Gm-Message-State: AOAM530bPLXgAuRNnxDqGMyELQ+33CetopI+1FojR3DVLydsB9gsxQ1e
+        kY3+L3EqXFWXyzjYbVbgnlv3cph8X4YnFRWPUt4=
+X-Google-Smtp-Source: ABdhPJz+iCmoe622WGnIHuIwzaBeIWiUv2RelgqaA6QqkLFkEtUH3DhQFSGNZYNpHCbMxW8uf4RPy5assxHIxLUKrQw=
+X-Received: by 2002:a2e:99cf:: with SMTP id l15mr28539493ljj.117.1634512002453;
+ Sun, 17 Oct 2021 16:06:42 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Date:   Sun, 17 Oct 2021 19:03:19 +0200 (CEST)
+Sender: elisabethj451@gmail.com
+Received: by 2002:a2e:590:0:0:0:0:0 with HTTP; Sun, 17 Oct 2021 16:06:41 -0700 (PDT)
+From:   Anderson Thereza <anderson.thereza24@gmail.com>
+Date:   Sun, 17 Oct 2021 16:06:41 -0700
+X-Google-Sender-Auth: D_WJz8Q_74Y_krX2KPQ3MeJ4Wzg
+Message-ID: <CAP7Jaw614zmxEwCQY+OZZ87fbaKc+8v1ptvhrAzceFMnuvi0JA@mail.gmail.com>
+Subject: Re: Greetings My Dear,
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-No more users.
+Greetings,
 
-Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+I sent this mail praying it will find you in a good condition, since I
+myself am in a very critical health condition in which I sleep every
+night without knowing if I may be alive to see the next day. I am
+Mrs.Anderson Theresa, a widow suffering from a long time illness. I
+have some funds I inherited from my late husband, the sum of
+($11,000,000.00, Eleven Million Dollars) my Doctor told me recently
+that I have serious sickness which is a cancer problem. What disturbs
+me most is my stroke sickness. Having known my condition, I decided to
+donate this fund to a good person that will utilize it the way I am
+going to instruct herein. I need a very honest God.
 
----
- arch/x86/include/asm/fpu/api.h |  2 --
- arch/x86/kernel/fpu/core.c     | 32 --------------------------------
- 2 files changed, 34 deletions(-)
----
-diff --git a/arch/x86/include/asm/fpu/api.h b/arch/x86/include/asm/fpu/api.h
-index 239909a95368..286a66ff0bd1 100644
---- a/arch/x86/include/asm/fpu/api.h
-+++ b/arch/x86/include/asm/fpu/api.h
-@@ -131,14 +131,12 @@ static inline void fpstate_init_soft(struct swregs_state *soft) {}
- DECLARE_PER_CPU(struct fpu *, fpu_fpregs_owner_ctx);
- 
- /* fpstate-related functions which are exported to KVM */
--extern void fpu_init_fpstate_user(struct fpu *fpu);
- extern void fpstate_clear_xstate_component(struct fpstate *fps, unsigned int xfeature);
- 
- /* KVM specific functions */
- extern bool fpu_alloc_guest_fpstate(struct fpu_guest *gfpu);
- extern void fpu_free_guest_fpstate(struct fpu_guest *gfpu);
- extern int fpu_swap_kvm_fpstate(struct fpu_guest *gfpu, bool enter_guest, u64 restore_mask);
--extern void fpu_swap_kvm_fpu(struct fpu *save, struct fpu *rstor, u64 restore_mask);
- 
- extern void fpu_copy_guest_fpstate_to_uabi(struct fpu_guest *gfpu, void *buf, unsigned int size, u32 pkru);
- extern int fpu_copy_uabi_to_guest_fpstate(struct fpu_guest *gfpu, const void *buf, u64 xcr0, u32 *vpkru);
-diff --git a/arch/x86/kernel/fpu/core.c b/arch/x86/kernel/fpu/core.c
-index 60681dc8a725..4b09f0f70082 100644
---- a/arch/x86/kernel/fpu/core.c
-+++ b/arch/x86/kernel/fpu/core.c
-@@ -248,29 +248,6 @@ int fpu_swap_kvm_fpstate(struct fpu_guest *guest_fpu, bool enter_guest,
- }
- EXPORT_SYMBOL_GPL(fpu_swap_kvm_fpstate);
- 
--void fpu_swap_kvm_fpu(struct fpu *save, struct fpu *rstor, u64 restore_mask)
--{
--	fpregs_lock();
--
--	if (save) {
--		struct fpstate *fpcur = current->thread.fpu.fpstate;
--
--		if (test_thread_flag(TIF_NEED_FPU_LOAD))
--			memcpy(&save->fpstate->regs, &fpcur->regs, fpcur->size);
--		else
--			save_fpregs_to_fpstate(save);
--	}
--
--	if (rstor) {
--		restore_mask &= XFEATURE_MASK_FPSTATE;
--		restore_fpregs_from_fpstate(rstor->fpstate, restore_mask);
--	}
--
--	fpregs_mark_activate();
--	fpregs_unlock();
--}
--EXPORT_SYMBOL_GPL(fpu_swap_kvm_fpu);
--
- void fpu_copy_guest_fpstate_to_uabi(struct fpu_guest *gfpu, void *buf,
- 				    unsigned int size, u32 pkru)
- {
-@@ -440,15 +417,6 @@ void fpstate_reset(struct fpu *fpu)
- 	__fpstate_reset(fpu->fpstate);
- }
- 
--#if IS_ENABLED(CONFIG_KVM)
--void fpu_init_fpstate_user(struct fpu *fpu)
--{
--	fpstate_reset(fpu);
--	fpstate_init_user(fpu->fpstate);
--}
--EXPORT_SYMBOL_GPL(fpu_init_fpstate_user);
--#endif
--
- /* Clone current's FPU state on fork */
- int fpu_clone(struct task_struct *dst)
- {
+fearing a person who can claim this money and use it for Charity
+works, for orphanages, widows and also build schools for less
+privileges that will be named after my late husband if possible and to
+promote the word of God and the effort that the house of God is
+maintained. I do not want a situation where this money will be used in
+an ungodly manner. That's why I' making this decision. I'm not afraid
+of death so I know where I'm going. I accept this decision because I
+do not have any child who will inherit this money after I die. Please
+I want your sincere and urgent answer to know if you will be able to
+execute this project, and I will give you more information on how the
+fund will be transferred to your bank account. I am waiting for your
+reply.
 
+May God Bless you,
+Mrs.Anderson Theresa.
