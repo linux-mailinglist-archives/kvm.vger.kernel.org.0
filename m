@@ -2,175 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5F96D430721
-	for <lists+kvm@lfdr.de>; Sun, 17 Oct 2021 09:54:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 385D64307BF
+	for <lists+kvm@lfdr.de>; Sun, 17 Oct 2021 12:11:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241481AbhJQH4i (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 17 Oct 2021 03:56:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:54695 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234234AbhJQH4h (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 17 Oct 2021 03:56:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634457267;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=+0osY3/SAm8vFbOEyznQ3BBtqYdhl6eYu7QQs/YzIGE=;
-        b=bhtjJvOCBwpW4PmCSKdCGOupZZ9Nb/GVVIshEkwd7zm2ToQK2dWEoUEXOcdgSgKq8Y82GU
-        wtRbUPbG9VkRLQJYWidNif3U2REMf+7rKk3ISPLbu5uj0mYY+zMxCWBLJ9dYJOjcYmek0Q
-        H+2umQ2qGL2hThiIiP7eCYqJSNfhbaY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-354-lYQW2WO-P8Cx1coOwejEIA-1; Sun, 17 Oct 2021 03:54:22 -0400
-X-MC-Unique: lYQW2WO-P8Cx1coOwejEIA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S241737AbhJQKNr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 17 Oct 2021 06:13:47 -0400
+Received: from mail.kernel.org ([198.145.29.99]:41832 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S234709AbhJQKNq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 17 Oct 2021 06:13:46 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 03F3B800685;
-        Sun, 17 Oct 2021 07:54:21 +0000 (UTC)
-Received: from starship (unknown [10.40.192.246])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2F78F5C1C5;
-        Sun, 17 Oct 2021 07:54:17 +0000 (UTC)
-Message-ID: <eaddf15f13aa688c03d53831c2309a60957bb7f4.camel@redhat.com>
-Subject: Re: [PATCH RFC] KVM: SVM: reduce guest MAXPHYADDR by one in case
- C-bit is a physical bit
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        David Matlack <dmatlack@google.com>,
-        linux-kernel@vger.kernel.org
-Date:   Sun, 17 Oct 2021 10:54:16 +0300
-In-Reply-To: <YWmdLPsa6qccxtEa@google.com>
-References: <20211015150524.2030966-1-vkuznets@redhat.com>
-         <YWmdLPsa6qccxtEa@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        by mail.kernel.org (Postfix) with ESMTPSA id 64660603E7;
+        Sun, 17 Oct 2021 10:11:37 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1mc38h-00HJ9I-1p; Sun, 17 Oct 2021 11:11:35 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        Marc Zyngier <maz@kernel.org>,
+        linux-arm-kernel@lists.infradead.org
+Cc:     James Morse <james.morse@arm.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Joey Gouly <joey.gouly@arm.com>, kernel-team@android.com
+Subject: Re: [PATCH v2 0/5] KVM: arm64: Assorted vgic-v3 fixes
+Date:   Sun, 17 Oct 2021 11:11:32 +0100
+Message-Id: <163446547856.1611056.6126339357800795046.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20211010150910.2911495-1-maz@kernel.org>
+References: <20211010150910.2911495-1-maz@kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, maz@kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, eric.auger@redhat.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, joey.gouly@arm.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2021-10-15 at 15:24 +0000, Sean Christopherson wrote:
-> On Fri, Oct 15, 2021, Vitaly Kuznetsov wrote:
-> > Several selftests (memslot_modification_stress_test, kvm_page_table_test,
-> > dirty_log_perf_test,.. ) which rely on vm_get_max_gfn() started to fail
-> > since commit ef4c9f4f65462 ("KVM: selftests: Fix 32-bit truncation of
-> > vm_get_max_gfn()") on AMD EPYC 7401P:
-> > 
-> >  ./tools/testing/selftests/kvm/demand_paging_test
-> >  Testing guest mode: PA-bits:ANY, VA-bits:48,  4K pages
-> >  guest physical test memory offset: 0xffffbffff000
+On Sun, 10 Oct 2021 16:09:05 +0100, Marc Zyngier wrote:
+> Here's a bunch of vgic-v3 fixes I have been sitting on for some
+> time. None of them are critical, though some are rather entertaining.
 > 
-> This look a lot like the signature I remember from the original bug[1].  I assume
-> you're hitting the magic HyperTransport region[2].  I thought that was fixed, but
-> the hack-a-fix for selftests never got applied[3].
-
-Hi Vitaly and everyone!
-
-You are the 3rd person to suffer from this issue :-( Sean Christopherson was first, I was second.
-
-I reported this, then I think we found out that it is not the HyperTransport region after all,
-and I think that the whole thing lost in 'trying to get answers from AMD'.
-
-https://lore.kernel.org/lkml/ac72b77c-f633-923b-8019-69347db706be@redhat.com/
-
-
-I'll say, a hack to reduce it by 1 bit is still better that failing tests,
-at least until AMD explains to us, about what is going on.
-
-Sorry that you had to debug this.
-
-Best regards,
-	Maxim Levitsky 
-
-
+> The first one is a leftover from the initial Apple-M1 enablement,
+> which doesn't advertise the GIC support via ID_AA64PFR0_EL1 (which is
+> expected, as it only has half a GIC...). We address it by forcefully
+> advertising the feature if the guest has a GICv3.
 > 
-> [1] https://lore.kernel.org/lkml/20210623230552.4027702-4-seanjc@google.com/
-> [2] https://lkml.kernel.org/r/7e3a90c0-75a1-b8fe-dbcf-bda16502ace9@amd.com
-> [3] https://lkml.kernel.org/r/20210805105423.412878-1-pbonzini@redhat.com
-> 
-> >  Finished creating vCPUs and starting uffd threads
-> >  Started all vCPUs
-> >  ==== Test Assertion Failure ====
-> >    demand_paging_test.c:63: false
-> >    pid=47131 tid=47134 errno=0 - Success
-> >       1	0x000000000040281b: vcpu_worker at demand_paging_test.c:63
-> >       2	0x00007fb36716e431: ?? ??:0
-> >       3	0x00007fb36709c912: ?? ??:0
-> >    Invalid guest sync status: exit_reason=SHUTDOWN
-> > 
-> > The commit, however, seems to be correct, it just revealed an already
-> > present issue. AMD CPUs which support SEV may have a reduced physical
-> > address space, e.g. on AMD EPYC 7401P I see:
-> > 
-> >  Address sizes:  43 bits physical, 48 bits virtual
-> > 
-> > The guest physical address space, however, is not reduced as stated in
-> > commit e39f00f60ebd ("KVM: x86: Use kernel's x86_phys_bits to handle
-> > reduced MAXPHYADDR"). This seems to be almost correct, however, APM has one
-> > more clause (15.34.6):
-> > 
-> >   Note that because guest physical addresses are always translated through
-> >   the nested page tables, the size of the guest physical address space is
-> >   not impacted by any physical address space reduction indicated in CPUID
-> >   8000_001F[EBX]. If the C-bit is a physical address bit however, the guest
-> >   physical address space is effectively reduced by 1 bit.
-> > 
-> > Implement the reduction.
-> > 
-> > Fixes: e39f00f60ebd (KVM: x86: Use kernel's x86_phys_bits to handle reduced MAXPHYADDR)
-> > Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> > ---
-> > - RFC: I may have misdiagnosed the problem as I didn't dig to where exactly
-> >  the guest crashes.
-> > ---
-> >  arch/x86/kvm/cpuid.c | 13 ++++++++++---
-> >  1 file changed, 10 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> > index 751aa85a3001..04ae280a0b66 100644
-> > --- a/arch/x86/kvm/cpuid.c
-> > +++ b/arch/x86/kvm/cpuid.c
-> > @@ -923,13 +923,20 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
-> >  		 *
-> >  		 * If TDP is enabled but an explicit guest MAXPHYADDR is not
-> >  		 * provided, use the raw bare metal MAXPHYADDR as reductions to
-> > -		 * the HPAs do not affect GPAs.
-> > +		 * the HPAs do not affect GPAs. The value, however, has to be
-> > +		 * reduced by 1 in case C-bit is a physical bit (APM section
-> > +		 * 15.34.6).
-> >  		 */
-> > -		if (!tdp_enabled)
-> > +		if (!tdp_enabled) {
-> >  			g_phys_as = boot_cpu_data.x86_phys_bits;
-> > -		else if (!g_phys_as)
-> > +		} else if (!g_phys_as) {
-> >  			g_phys_as = phys_as;
-> >  
-> > +			if (kvm_cpu_cap_has(X86_FEATURE_SEV) &&
-> > +			    (cpuid_ebx(0x8000001f) & 0x3f) < g_phys_as)
-> > +				g_phys_as -= 1;
-> 
-> This is incorrect, non-SEV guests do not see a reduced address space.  See Tom's
-> explanation[*]
-> 
-> [*] https://lkml.kernel.org/r/324a95ee-b962-acdf-9bd7-b8b23b9fb991@amd.com
-> 
-> > +		}
-> > +
-> >  		entry->eax = g_phys_as | (virt_as << 8);
-> >  		entry->edx = 0;
-> >  		cpuid_entry_override(entry, CPUID_8000_0008_EBX);
-> > -- 
-> > 2.31.1
-> > 
+> [...]
+
+Applied to next, thanks!
+
+[1/5] KVM: arm64: Force ID_AA64PFR0_EL1.GIC=1 when exposing a virtual GICv3
+      commit: 562e530fd7707aad7fed953692d1835612238966
+[2/5] KVM: arm64: vgic-v3: Work around GICv3 locally generated SErrors
+      commit: df652bcf1136db7f16e486a204ba4b4fc4181759
+[3/5] KVM: arm64: vgic-v3: Reduce common group trapping to ICV_DIR_EL1 when possible
+      commit: 0924729b21bffdd0e13f29ea6256d299fc807cff
+[4/5] KVM: arm64: vgic-v3: Don't advertise ICC_CTLR_EL1.SEIS
+      commit: f87ab682722299cddf8cf5f7bc17053d70300ee0
+[5/5] KVM: arm64: vgic-v3: Align emulated cpuif LPI state machine with the pseudocode
+      commit: 9d449c71bd8f74282e84213c8f0b8328293ab0a7
+
+Cheers,
+
+	M.
+-- 
+Without deviation from the norm, progress is not possible.
 
 
