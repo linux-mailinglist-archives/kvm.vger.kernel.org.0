@@ -2,23 +2,23 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6EE86430969
-	for <lists+kvm@lfdr.de>; Sun, 17 Oct 2021 15:43:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 77805430998
+	for <lists+kvm@lfdr.de>; Sun, 17 Oct 2021 16:03:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343751AbhJQNpi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 17 Oct 2021 09:45:38 -0400
-Received: from mail-dm6nam12on2069.outbound.protection.outlook.com ([40.107.243.69]:55681
-        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
+        id S236919AbhJQOFv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 17 Oct 2021 10:05:51 -0400
+Received: from mail-bn8nam12on2058.outbound.protection.outlook.com ([40.107.237.58]:48096
+        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S237604AbhJQNph (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 17 Oct 2021 09:45:37 -0400
+        id S236660AbhJQOFu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 17 Oct 2021 10:05:50 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=oKyjMn/yJYzoeofutWZOiyhYSZeKmC4ZC5UvggRja26HpuMKggAUihlOFjhPTKlIWWANWpFvPgiPdxsN4P9oYe4Bsxiisv/Fs+KxS19Fvg9D5WBPPSf4Pv/Tgw2GvAD+IqgeLexpmewfo5AwwjP6B4txuahl6LPIHQNX7q7tYTYtz/mP+y+3aW/mtCwuwER0+tl64zm/efy5nPqlpUiGndrnaqOKHUd0MwBHkshWJ7rGdfPQwmiJSylp1u3MNhgW0Z8IIRLPZ1sif9y8L6zDC0h1MQMPYUse65MVnGn6DnnIIYIMQaQVH4nMXSucdbE9NJlBEUACVchqshgcPpYb1g==
+ b=Z2eIvAraXDNGfZyYn2Kd+TzzISuZA+SzI1xAiZ82heO075ivg6ZR2xJtWddOQG+Dgx78hwmXiVaqJdM86S4UKgHBinnpmZvLiuThR3LjmBl64YvXYlAapQVyX1mN9bFc5Dy4bbOZ13JDcEQkovfPnJXDfEl/LPb9rR8JyX7QWtdqICc31FVes2GqkGj91TphS4zXXcd+Xx/1eiDyFVrP/EVigDQ6gC35h/5aem9j05CxxNwC35+0LQ/AAE4KoWpxdYAc6BO7xEI9DSuvg7+2zyjDTZmXjwlY7TUO7cTAy4Ft9hVNqIAoCmPbu8zJjl/ypjer6QmMCboPgDkhGKM63Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=TzMGmPlqgqVkIOv0sWJGJAWcKBy69bzFCnQv5lzMcNk=;
- b=njN9RFDKafJnaX8mSDomNM5kDn5fwyWGO5gWc8ffNza6eQpE4R2pRoRRBAlck0oYMHQdDdADv/N+cnTFFrIuA+6nd714nIba4u3SYKoFebGnXgpbDgsn8e884fSfn1C7S254OwHavpxEtHJR0k+vLdov2t3owV7qp42+nmjFGEgN1YAgjhws1WXXk5OzJFnv7+P6DwKyPbpxSj9Da7Zjcik55oIzDLi5zJ0qhFcqgLf3LNIJagxm47p1VDGpFekANA39IgA+td5U2mddUz2IcSwmTkxpMrTid3AejEJgi9lClbQkFDH45JTZYNTgfuxDYY/a4JetFuQrYsRnOQ+DSA==
+ bh=JtzHTYhxnAjoMRKJmluol4sZLre5eOr47424RX1pQvQ=;
+ b=atzkvK4jONwGICm9t3rGbRBtLP4IMz9SZ5NuUrBk0oTsTJMA25AQMUUALm0GKz5vQ+TAbMB9L3RJHX9xnfwnzGuR2OX8+IIzCct79cFA7nuRWkIDKduKMzFph8Y4yADBpM5BQcY3w3tMF7fgM+Z/hScZRQOTUCvMonoYtZ8gVu6lHUGKRpugaRZj1BRyQLEHz1+44+2NX4VfX5fL1Rdorqgazj2q/NBQ9kMx06889riwnq3FGbzbLvsFT+7iZFY9gauROb6Y5x3CM0L/uf0pE2vgbxvUxyT4tQWNxVFrOdoBeBEoNxWo0loQXAb88gVb4zg5jAO/LzL3sw9yMUg4xQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  216.228.112.34) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
@@ -26,18 +26,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TzMGmPlqgqVkIOv0sWJGJAWcKBy69bzFCnQv5lzMcNk=;
- b=ViPPcnqo3950RyR3ACxpKkV9kb+f2y6H+AKk5MnXYJ5Sl78+bSDvdEFiU3wpIb4K0OFpkDtahrCfEf4jwH3HtwrVAJv0Cu99Y5rPJXMQSwWJe9vYl7hbFfN0j52rBG01fMXr3Aeh0/Ql94X0v4wwPzqg8WeFBdNwVo3Z5Bv/nVEmV0e5/Y8WiK4//dp++c+dm6zFCevDSYPE02o6dcvaKIWMyCX3ylw7hkLT9c/JcTfpT3yEqzKxquvaccBtWf89k1eRCaTMBGcT6QMg4IwGLbH+YLWzXcaRACY7E9tPyMR3J8BuxkffQ4XlB8hOeQslxR4gZaL8kbLTguUVZWUTgQ==
-Received: from DM6PR11CA0068.namprd11.prod.outlook.com (2603:10b6:5:14c::45)
- by CH2PR12MB4922.namprd12.prod.outlook.com (2603:10b6:610:65::22) with
+ bh=JtzHTYhxnAjoMRKJmluol4sZLre5eOr47424RX1pQvQ=;
+ b=OTs963BNhE04g5AFZxdixNqUysDkQ0T2Swor+va09c2BkAxdo+LAEztMv9hSMs3d7b1q+mBONhYtGmUNnoX3NhwDXEVZF9HjwT91aQ+v8c61JhCG7tmF/cYYjh48+/pZjYBL4+pubdIsqRb2Dlgw4rgijoSUOjyj2Hs8zwHLE8jpnzTIvxy62oZBynxuBZbgTwE3aEWBNaX9l4Na3sYRfN1BzyWGUtYUQWKxPpwSQ1SMkDhhoBHJXhLYaE1UTGoJl4bUWPg3STLcjKICBGXe7YDPK+yM0/EJVUeLoFXFQ0bufhLyy1OERRy4bcKCr8JO5ZaYagLXvTmeg1vvq4lI5Q==
+Received: from DM5PR06CA0052.namprd06.prod.outlook.com (2603:10b6:3:37::14) by
+ BYAPR12MB3173.namprd12.prod.outlook.com (2603:10b6:a03:13d::26) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4608.16; Sun, 17 Oct
- 2021 13:43:26 +0000
-Received: from DM6NAM11FT027.eop-nam11.prod.protection.outlook.com
- (2603:10b6:5:14c:cafe::88) by DM6PR11CA0068.outlook.office365.com
- (2603:10b6:5:14c::45) with Microsoft SMTP Server (version=TLS1_2,
+ 2021 14:03:36 +0000
+Received: from DM6NAM11FT055.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:3:37:cafe::b1) by DM5PR06CA0052.outlook.office365.com
+ (2603:10b6:3:37::14) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4608.14 via Frontend
- Transport; Sun, 17 Oct 2021 13:43:26 +0000
+ Transport; Sun, 17 Oct 2021 14:03:36 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.34)
  smtp.mailfrom=nvidia.com; vger.kernel.org; dkim=none (message not signed)
  header.d=none;vger.kernel.org; dmarc=pass action=none header.from=nvidia.com;
@@ -45,151 +45,138 @@ Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
  216.228.112.34 as permitted sender) receiver=protection.outlook.com;
  client-ip=216.228.112.34; helo=mail.nvidia.com;
 Received: from mail.nvidia.com (216.228.112.34) by
- DM6NAM11FT027.mail.protection.outlook.com (10.13.172.205) with Microsoft SMTP
+ DM6NAM11FT055.mail.protection.outlook.com (10.13.173.103) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.4608.15 via Frontend Transport; Sun, 17 Oct 2021 13:43:25 +0000
+ 15.20.4608.15 via Frontend Transport; Sun, 17 Oct 2021 14:03:36 +0000
 Received: from [172.27.13.186] (172.20.187.6) by HQMAIL107.nvidia.com
  (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.18; Sun, 17 Oct
- 2021 13:43:21 +0000
-Subject: Re: [PATCH V1 mlx5-next 04/13] PCI/IOV: Allow SRIOV VF drivers to
- reach the drvdata of a PF
-To:     Alex Williamson <alex.williamson@redhat.com>, <bhelgaas@google.com>
-CC:     <jgg@nvidia.com>, <saeedm@nvidia.com>, <linux-pci@vger.kernel.org>,
-        <kvm@vger.kernel.org>, <netdev@vger.kernel.org>, <kuba@kernel.org>,
-        <leonro@nvidia.com>, <kwankhede@nvidia.com>,
-        <mgurtovoy@nvidia.com>, <maorg@nvidia.com>
+ 2021 14:03:33 +0000
+Subject: Re: [PATCH V1 mlx5-next 11/13] vfio/mlx5: Implement vfio_pci driver
+ for mlx5 devices
+To:     Alex Williamson <alex.williamson@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>
+CC:     <bhelgaas@google.com>, <saeedm@nvidia.com>,
+        <linux-pci@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <kuba@kernel.org>, <leonro@nvidia.com>,
+        <kwankhede@nvidia.com>, <mgurtovoy@nvidia.com>, <maorg@nvidia.com>
 References: <20211013094707.163054-1-yishaih@nvidia.com>
- <20211013094707.163054-5-yishaih@nvidia.com>
- <20211014161150.38e3d8aa.alex.williamson@redhat.com>
+ <20211013094707.163054-12-yishaih@nvidia.com>
+ <20211015134820.603c45d0.alex.williamson@redhat.com>
+ <20211015195937.GF2744544@nvidia.com>
+ <20211015141201.617049e9.alex.williamson@redhat.com>
+ <20211015201654.GH2744544@nvidia.com>
+ <20211015145921.0abf7cb0.alex.williamson@redhat.com>
 From:   Yishai Hadas <yishaih@nvidia.com>
-Message-ID: <0b3d2152-d925-4bca-bd81-447c186b4b41@nvidia.com>
-Date:   Sun, 17 Oct 2021 16:43:17 +0300
+Message-ID: <6608853f-7426-7b79-da1a-29c8fcc6ffc3@nvidia.com>
+Date:   Sun, 17 Oct 2021 17:03:28 +0300
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
  Thunderbird/78.13.0
 MIME-Version: 1.0
-In-Reply-To: <20211014161150.38e3d8aa.alex.williamson@redhat.com>
+In-Reply-To: <20211015145921.0abf7cb0.alex.williamson@redhat.com>
 Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
 X-Originating-IP: [172.20.187.6]
-X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
+X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
  HQMAIL107.nvidia.com (172.20.187.13)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: ed102ceb-a940-4cfc-450c-08d991741846
-X-MS-TrafficTypeDiagnostic: CH2PR12MB4922:
-X-Microsoft-Antispam-PRVS: <CH2PR12MB4922DC636C79ABD28A7DEA40C3BB9@CH2PR12MB4922.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
+X-MS-Office365-Filtering-Correlation-Id: 8acd979f-a4cc-4b8d-2b44-08d99176ea03
+X-MS-TrafficTypeDiagnostic: BYAPR12MB3173:
+X-Microsoft-Antispam-PRVS: <BYAPR12MB3173656DA1CCCA971C886C65C3BB9@BYAPR12MB3173.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:3044;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: SqCwuz17hUfWfCEybVLApPHpbqTHkupCsftngg/P2f83uOdC+GMl6dL+DGMdbK8Y1kTrVAZAd5hgkhx7b+6pBJiZPtJjW24JG5B6tpjzgaTQt+kwWwp4U4J5vd1AhdYPzYBWgiWn8tRq4UGnrO15hvq0aAox6TA0L9XOxZ3dvi/XRRaaHyxoURxekR7xPIGoiAeEYIaPL72cegiUfDOJFQZG87Oop07hiwzXdM6N4LTFO1ZOuCItEG+x+bSqAdamsZ1IfsBikyIEle/lOapLnTpZa89JkJdxSLL1nSDO8HBJKv4HzKV7pDd37v/n680KlQw6+h2AbmUG6PUhgXHt2MXfTIREU0/G/0rZIY3ul7FoR49sIg6EXTz/OblEoTjB8Cy50/tElptiPO2hf66afD89rov9LT00QqZh2cGq+QJlfbz780KFcjkLuoHHNcIYmSR94wmWMcnAaksNo9aY/L+9wwX0CaitV5LRVer+tkFuDP1Hi32M1TBXDgLK421wBSDwE1EbpxPIxFKjsuzn/BWfNTW4jpPWs+RAAhrgTw4TqXzLCtrPpOOew4UB1YNd1nB4jzUwVt611twm233bzrvlo07tMyPymVYYbVemytn9MFE7wDiMrZj2ksxGVSEJoOq8MfAeAf5ZlbBHZiQf4aMdhNWxjAnNiwuMxO8appJ5E1F5ZycOrxbabJSHVy+Srzo7PLYBYM1EyqUCtoBrzJmtZV1TV27DHcc8Uo4K4Ys=
-X-Forefront-Antispam-Report: CIP:216.228.112.34;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid03.nvidia.com;CAT:NONE;SFS:(4636009)(46966006)(36840700001)(2616005)(426003)(16576012)(70206006)(70586007)(86362001)(47076005)(107886003)(36756003)(110136005)(82310400003)(83380400001)(336012)(8676002)(8936002)(508600001)(54906003)(2906002)(356005)(4326008)(5660300002)(7636003)(31686004)(6666004)(186003)(16526019)(36860700001)(26005)(316002)(53546011)(31696002)(43740500002);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: P7yGWSi2I5vqIkPIxifAIGo9Gb7Au4ehiaJ6ZAaRBs17DVFHIvlBP2mgSqT5cOqHP2xtCTMJ5wTgHdfrloUk9FwmBIWu5N12SWNgl9NbosNszsQfKvLqB1L3qRF0P3e3Vp/N7YCijJAtyq/8/fHUFrEIB9ioqAHjNaKfpCMdj6DZuHRlhhY3s12FXLz82FKYYGEaSNGyy1HhAEBNloHVFOCF4YYGzP9Zf/E6G+bBg5Dy8XJplc1mm2zevaoZUbVc6Ujkz6VrFTil3IS6sshxSmDZKOv4SMq8YgTZt5tvJTR0GQ/HldzkdL+YAxbPu2xL9klRTOW1fZKTV9dkTR9UbR2GDmAWwBNmWJBNOtOc3Uh5THTodzwateSkvZTfW+6aQ2shTra+aSfM/G8R2vvXOuIkjsmVU2jjViBgr46J76JoZC2XRtYZ5//5laJvQyF9zgnUKwyqhadRobg9eLrOeeVDEZlkUVZuiBGrqF1xIjZXEhKXO5Kb5Jz60okPL6XUwgxZ5UNqv7oeE4ywJmRdwj10wUb0tN7/V23ZvJt2Y8JmI3ue6dfiEZbzJnrsfWuyXfvR8gn44d3bYPYYV8Z+hCNN+9jksUr9oGB3kFnHQ5XZY5WM0V6lmrCoUBRGOd5gNSCfFElK5EufGd78O+/qEFCt9gOTO2y+07siqxsTgO/eu1AewtFVtWQe0zvH/qYP7E33hvNXddieQqDHATdzJYm1ATH+q4Ng0kE6zRd6jMg=
+X-Forefront-Antispam-Report: CIP:216.228.112.34;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid03.nvidia.com;CAT:NONE;SFS:(4636009)(46966006)(36840700001)(70206006)(316002)(70586007)(16576012)(31696002)(36906005)(36860700001)(4326008)(5660300002)(54906003)(2906002)(508600001)(31686004)(47076005)(110136005)(26005)(16526019)(186003)(53546011)(7636003)(82310400003)(6636002)(356005)(107886003)(8936002)(6666004)(2616005)(86362001)(36756003)(426003)(336012)(8676002)(43740500002);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Oct 2021 13:43:25.7628
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Oct 2021 14:03:36.6861
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: ed102ceb-a940-4cfc-450c-08d991741846
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8acd979f-a4cc-4b8d-2b44-08d99176ea03
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.34];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT027.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT055.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4922
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR12MB3173
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/15/2021 1:11 AM, Alex Williamson wrote:
-> On Wed, 13 Oct 2021 12:46:58 +0300
-> Yishai Hadas <yishaih@nvidia.com> wrote:
+On 10/15/2021 11:59 PM, Alex Williamson wrote:
+> On Fri, 15 Oct 2021 17:16:54 -0300
+> Jason Gunthorpe <jgg@nvidia.com> wrote:
 >
->> From: Jason Gunthorpe <jgg@nvidia.com>
+>> On Fri, Oct 15, 2021 at 02:12:01PM -0600, Alex Williamson wrote:
+>>> On Fri, 15 Oct 2021 16:59:37 -0300
+>>> Jason Gunthorpe <jgg@nvidia.com> wrote:
+>>>    
+>>>> On Fri, Oct 15, 2021 at 01:48:20PM -0600, Alex Williamson wrote:
+>>>>>> +static int mlx5vf_pci_set_device_state(struct mlx5vf_pci_core_device *mvdev,
+>>>>>> +				       u32 state)
+>>>>>> +{
+>>>>>> +	struct mlx5vf_pci_migration_info *vmig = &mvdev->vmig;
+>>>>>> +	u32 old_state = vmig->vfio_dev_state;
+>>>>>> +	int ret = 0;
+>>>>>> +
+>>>>>> +	if (vfio_is_state_invalid(state) || vfio_is_state_invalid(old_state))
+>>>>>> +		return -EINVAL;
+>>>>> if (!VFIO_DEVICE_STATE_VALID(old_state) || !VFIO_DEVICE_STATE_VALID(state))
+>>>> AFAICT this macro doesn't do what is needed, eg
+>>>>
+>>>> VFIO_DEVICE_STATE_VALID(0xF000) == true
+>>>>
+>>>> What Yishai implemented is at least functionally correct - states this
+>>>> driver does not support are rejected.
+>>>
+>>> if (!VFIO_DEVICE_STATE_VALID(old_state) || !VFIO_DEVICE_STATE_VALID(state)) || (state & ~VFIO_DEVICE_STATE_MASK))
+>>>
+>>> old_state is controlled by the driver and can never have random bits
+>>> set, user state should be sanitized to prevent setting undefined bits.
+>> In that instance let's just write
 >>
->> There are some cases where a SRIOV VF driver will need to reach into and
->> interact with the PF driver. This requires accessing the drvdata of the PF.
+>> old_state != VFIO_DEVICE_STATE_ERROR
 >>
->> Provide a function pci_iov_get_pf_drvdata() to return this PF drvdata in a
->> safe way. Normally accessing a drvdata of a foreign struct device would be
->> done using the device_lock() to protect against device driver
->> probe()/remove() races.
->>
->> However, due to the design of pci_enable_sriov() this will result in a
->> ABBA deadlock on the device_lock as the PF's device_lock is held during PF
->> sriov_configure() while calling pci_enable_sriov() which in turn holds the
->> VF's device_lock while calling VF probe(), and similarly for remove.
->>
->> This means the VF driver can never obtain the PF's device_lock.
->>
->> Instead use the implicit locking created by pci_enable/disable_sriov(). A
->> VF driver can access its PF drvdata only while its own driver is attached,
->> and the PF driver can control access to its own drvdata based on when it
->> calls pci_enable/disable_sriov().
->>
->> To use this API the PF driver will setup the PF drvdata in the probe()
->> function. pci_enable_sriov() is only called from sriov_configure() which
->> cannot happen until probe() completes, ensuring no VF races with drvdata
->> setup.
->>
->> For removal, the PF driver must call pci_disable_sriov() in its remove
->> function before destroying any of the drvdata. This ensures that all VF
->> drivers are unbound before returning, fencing concurrent access to the
->> drvdata.
->>
->> The introduction of a new function to do this access makes clear the
->> special locking scheme and the documents the requirements on the PF/VF
->> drivers using this.
->>
->> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
->> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
->> Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
->> ---
->>   drivers/pci/iov.c   | 29 +++++++++++++++++++++++++++++
->>   include/linux/pci.h |  7 +++++++
->>   2 files changed, 36 insertions(+)
->>
->> diff --git a/drivers/pci/iov.c b/drivers/pci/iov.c
->> index e7751fa3fe0b..ca696730f761 100644
->> --- a/drivers/pci/iov.c
->> +++ b/drivers/pci/iov.c
->> @@ -47,6 +47,35 @@ int pci_iov_vf_id(struct pci_dev *dev)
->>   }
->>   EXPORT_SYMBOL_GPL(pci_iov_vf_id);
->>   
->> +/**
->> + * pci_iov_get_pf_drvdata - Return the drvdata of a PF
->> + * @dev - VF pci_dev
->> + * @pf_driver - Device driver required to own the PF
->> + *
->> + * This must be called from a context that ensures that a VF driver is attached.
->> + * The value returned is invalid once the VF driver completes its remove()
->> + * callback.
->> + *
->> + * Locking is achieved by the driver core. A VF driver cannot be probed until
->> + * pci_enable_sriov() is called and pci_disable_sriov() does not return until
->> + * all VF drivers have completed their remove().
->> + *
->> + * The PF driver must call pci_disable_sriov() before it begins to destroy the
->> + * drvdata.
->> + */
->> +void *pci_iov_get_pf_drvdata(struct pci_dev *dev, struct pci_driver *pf_driver)
->> +{
->> +	struct pci_dev *pf_dev;
->> +
->> +	if (dev->is_physfn)
->> +		return ERR_PTR(-EINVAL);
-> I think we're trying to make this only accessible to VFs, so shouldn't
-> we test (!dev->is_virtfn)?  is_physfn will be zero for either a PF with
-> failed SR-IOV configuration or for a non-SR-IOV device afaict.  Thanks,
->
-> Alex
->
+>> ?
+> Not quite, the user can't set either of the other invalid states
+> either.
 
-Yes, this should be accessible only for VFs.
 
-We can go with your suggestion to explicitly check (!dev->is_virtfn) as 
-this seems cleaner and safer as you mentioned.
+OK so let's go with below as you suggested.
+if (!VFIO_DEVICE_STATE_VALID(old_state) ||
+      !VFIO_DEVICE_STATE_VALID(state) ||
+       (state & ~VFIO_DEVICE_STATE_MASK))
+            return -EINVAL;
 
-We already got ACK on this patch from Bjorn but as your suggestion seems 
-straight forward I may put the Acked-by as part of V2 in any case.
+As was suggested to have some new const for ERROR STATE and use it in 
+drivers when state gets into error I may come in V2 with the below extra 
+patch.
+
+Any comments on ?
+
+commit cc7cb23773c70b998aaee5bfc2434da86c80b600
+Author: Yishai Hadas <yishaih@nvidia.com>
+Date:   Sun Oct 17 11:34:06 2021 +0300
+
+     Vfio: Add a const value for VFIO_DEVICE_STATE_ERROR
+
+     Add a const value for VFIO_DEVICE_STATE_ERROR to be used by drivers to
+     set an error state.
+
+     Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
+
+diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+index b53a9557884a..37376dadca5a 100644
+--- a/include/linux/vfio.h
++++ b/include/linux/vfio.h
+@@ -15,6 +15,8 @@
+  #include <linux/poll.h>
+  #include <uapi/linux/vfio.h>
+
++static const int VFIO_DEVICE_STATE_ERROR = VFIO_DEVICE_STATE_SAVING |
++ VFIO_DEVICE_STATE_RESUMING;
+
 
 Yishai
+
