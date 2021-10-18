@@ -2,80 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1141C432685
-	for <lists+kvm@lfdr.de>; Mon, 18 Oct 2021 20:36:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 71E5843269B
+	for <lists+kvm@lfdr.de>; Mon, 18 Oct 2021 20:39:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232871AbhJRSi1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Oct 2021 14:38:27 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:33731 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232992AbhJRSiY (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 18 Oct 2021 14:38:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634582172;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=fNnXaAF3agw8VaX480AMuK94cWpmSSUZAApFuOi+wRA=;
-        b=RS0OUA9lYjj+RCY9oY8T7ZCSHvPuhz3PTAZ5A7LjChqOi+yXF1HbERddQe3z4aCjYBrDND
-        8YWc2lWCauBUdFi1OK3KBhC1kg3DxaM/j7PW2ULEpvPC5trGs2MXWIK3qD7YgOOzM/f3Rs
-        MIpTplH6FT35pvRRpJe0vxTNRuBOUnc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-602-b7gh9ljzOIeX8FgktKivmw-1; Mon, 18 Oct 2021 14:36:10 -0400
-X-MC-Unique: b7gh9ljzOIeX8FgktKivmw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7B85919200C2;
-        Mon, 18 Oct 2021 18:36:09 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2A1C717F72;
-        Mon, 18 Oct 2021 18:36:09 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     torvic9@mailbox.org
-Subject: [PATCH v2] KVM: x86: avoid warning with -Wbitwise-instead-of-logical
-Date:   Mon, 18 Oct 2021 14:36:08 -0400
-Message-Id: <20211018183608.589083-1-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+        id S233084AbhJRSlr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Oct 2021 14:41:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50650 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232025AbhJRSlq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Oct 2021 14:41:46 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83F68C061765
+        for <kvm@vger.kernel.org>; Mon, 18 Oct 2021 11:39:35 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id q193-20020a252aca000000b005ba63482993so21354184ybq.0
+        for <kvm@vger.kernel.org>; Mon, 18 Oct 2021 11:39:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=zbKObNCCx6Q849wRiTACIU3Nwa3Q1mgOx/AJ885YK1U=;
+        b=ewnQxOzspq4HJZkbUCTWWYQdweGuzAhI5JHMsXpCoZj05ESDZ7iITh+cIkry7MjI9p
+         EDD8TwKyiCnbI4soPO6u4m/OJG1OJH4lPI88t5uwWda2SQ5tBoQ8DFIN3PrrMeLXELQT
+         nUSbvwDXy59AQmX3Jmfv3PgURppSN0gxG6iKqvnEHiVqKCo4wqY9bKkfJCoI4r+xjTX/
+         1cr3/sCj24xKwRbBb+F+rEjXtzwgHykrpFfm+KyN31CcVZpCoM/vi8kbgihQsRclAJWW
+         EmcS1EVhAF88XNLrLyNsYRhYYssctMQZx5YPbOg7PozThheX2RTY1ygZ3xuGBA7N83od
+         uf+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=zbKObNCCx6Q849wRiTACIU3Nwa3Q1mgOx/AJ885YK1U=;
+        b=s2EhBpiD9Hl629MVk3FQiVBxrorWggbBBPm9IT/tdfmR4mcUV3fAlvYzwozGc0r0k/
+         IFSwwdAD5waGf6PZefPRULkcZusao6ofjhkYFrTZR4XSCe3O1WecCZrchJVtgMK9IibI
+         fRFB+swt/RUIIOlToMOV73sq94cJJStuZweCLq0Y1TdnPxWz0Vhl7IX2jJkdGXMYpiKI
+         x2Q4Vtg0QerFoPrQXy/wZLPDoFRUTOUyUUfQiIAoJaGG5oqsOCVjeXZi+rr+9rhXSo6p
+         Yin/D7n+FGtSllLvwdBai6aZ+Whi5/Vix+72r9AlmqtVbW/5uBYAMG6/qdo3uK0NLghl
+         na+Q==
+X-Gm-Message-State: AOAM531WNejcgTGgHoU0C1cDEN/BlaCfh2A5tvF4PdmNxavBJG0E2shb
+        NpRJcvijt7fhh+0kpnINMZBF4KOHy9o=
+X-Google-Smtp-Source: ABdhPJyDgwDxy5D7Ckq87cNIAuO17yslQzxiYDHjImsqSs59s61FEnK23VRpyDxW4BDFfAz3MNr+uWNDB6k=
+X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:90:200:ae71:c4e5:5609:3546])
+ (user=seanjc job=sendgmr) by 2002:a25:d084:: with SMTP id h126mr30637770ybg.80.1634582374776;
+ Mon, 18 Oct 2021 11:39:34 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Mon, 18 Oct 2021 11:39:27 -0700
+Message-Id: <20211018183929.897461-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.0.1079.g6e70778dc9-goog
+Subject: [PATCH 0/2] KVM: x86: Enhance vendor module error messages
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Paul Menzel <pmenzel@molgen.mpg.de>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is a new warning in clang top-of-tree (will be clang 14):
+Paul Menzel encountered the bad userspace behavior of spamming KVM module
+loading on all CPUs, which was mitigated by commit ef935c25fd64 ("kvm: x86:
+Limit the number of "kvm: disabled by bios" messages"), except this time
+userspace is extra "clever" and spams both kvm_intel and kvm_amd.  Because
+the "already loaded the other module" message isn't ratelimited, the bogus
+module load managed to spam the kernel log.
 
-In file included from arch/x86/kvm/mmu/mmu.c:27:
-arch/x86/kvm/mmu/spte.h:318:9: error: use of bitwise '|' with boolean operands [-Werror,-Wbitwise-instead-of-logical]
-        return __is_bad_mt_xwr(rsvd_check, spte) |
-               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                                                 ||
-arch/x86/kvm/mmu/spte.h:318:9: note: cast one or both operands to int to silence this warning
+Patch 1 addresses another suggestion from Paul by incorporating the vendor
+module name into the error messages.
 
-The code is fine, but change it anyway to shut up this clever clogs
-of a compiler.
+Patch 2 addresses the original report by prioritizing the hardware/bios
+support messages over the "already loaded" error.  In additional to
+reducing spam, doing so also ensures consistent messaging if a vendor
+module isn't supported regardless of what other modules may be loaded.
 
-Reported-by: torvic9@mailbox.org
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/kvm/mmu/spte.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+[*] https://lkml.kernel.org/r/20210818114956.7171-1-pmenzel@molgen.mpg.de
 
-diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
-index 7c0b09461349..66782e796c0a 100644
---- a/arch/x86/kvm/mmu/spte.h
-+++ b/arch/x86/kvm/mmu/spte.h
-@@ -315,7 +315,7 @@ static __always_inline bool is_rsvd_spte(struct rsvd_bits_validate *rsvd_check,
- 	 * bits and EPT's invalid memtype/XWR checks to avoid an extra Jcc
- 	 * (this is extremely unlikely to be short-circuited as true).
- 	 */
--	return __is_bad_mt_xwr(rsvd_check, spte) |
-+	return __is_bad_mt_xwr(rsvd_check, spte) ||
- 	       __is_rsvd_bits_set(rsvd_check, spte, level);
- }
- 
+Sean Christopherson (2):
+  KVM: x86: Add vendor name to kvm_x86_ops, use it for error messages
+  KVM: x86: Defer "already loaded" check until after basic support
+    checks
+
+ arch/x86/include/asm/kvm_host.h |  2 ++
+ arch/x86/kvm/svm/svm.c          |  2 ++
+ arch/x86/kvm/vmx/vmx.c          |  2 ++
+ arch/x86/kvm/x86.c              | 17 +++++++++--------
+ 4 files changed, 15 insertions(+), 8 deletions(-)
+
 -- 
-2.27.0
+2.33.0.1079.g6e70778dc9-goog
 
