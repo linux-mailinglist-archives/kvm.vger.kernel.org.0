@@ -2,116 +2,199 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D2853431933
-	for <lists+kvm@lfdr.de>; Mon, 18 Oct 2021 14:34:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 55FA543197C
+	for <lists+kvm@lfdr.de>; Mon, 18 Oct 2021 14:41:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231625AbhJRMgq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Oct 2021 08:36:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50034 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231617AbhJRMgm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Oct 2021 08:36:42 -0400
-Received: from mail-ot1-x329.google.com (mail-ot1-x329.google.com [IPv6:2607:f8b0:4864:20::329])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84940C06161C
-        for <kvm@vger.kernel.org>; Mon, 18 Oct 2021 05:34:31 -0700 (PDT)
-Received: by mail-ot1-x329.google.com with SMTP id v2-20020a05683018c200b0054e3acddd91so1282616ote.8
-        for <kvm@vger.kernel.org>; Mon, 18 Oct 2021 05:34:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=1pbSkqWxiSZgJ8e5OjIcgFH/1bBQSml1rT02P7vRiI8=;
-        b=Mgez5oeoSkR2Rfz90An/K8bMShcEt62O9xMJHG2RoiYEVmzfIBQxHJ4d5vdTZ6v31H
-         L0IT059zRHYOmef8sJmO1oflziQY7bbPRfhrja6d7dtbka+dM6x6L8/4FQOfHwB26wdv
-         kY7Gh2SM5lI9RuTLn0YbJB9veeZN+M3KRADX5Yv1nSFP5i99IGPTCpAC5P0T7Wt9HtuN
-         uNmuTJkg4ag9DNYfCqh9pbvTVWwOx6ZiLp1tKrtkJs3JcmYE6DxAi+M/E8NdiyFFVRwY
-         LXRR+V84Bqp2JG2NInoUALz+Q5xh7vVpNXCVVZpk8JAD8PYdsSzJUQfE30kYhpzXQ/Lm
-         ne3A==
+        id S231718AbhJRMn0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Oct 2021 08:43:26 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:47514 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229519AbhJRMnZ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 18 Oct 2021 08:43:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1634560874;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=5qFf3VI73kFQn2LyVeKguZB9EmFNL0jwRXY2EkA/dfI=;
+        b=ZAJTeI9qLUl4jiGo2UbJOu0mqbJpkwSKGvrsifINCDQwG2eNHXLAvhFdAWpx6V97Hde+Hm
+        tPmLJbE7AYAfLxJrII6I+10w8/LjjUv1BTqr8O5PBLsx8kRWJUiEZbZWHy5G7OLd13+Ogq
+        upUWG4zRh/b9krSGDsOlX/17zWTC2Os=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-392-lsV-GSIuPneZIR5QnD-T2w-1; Mon, 18 Oct 2021 08:41:13 -0400
+X-MC-Unique: lsV-GSIuPneZIR5QnD-T2w-1
+Received: by mail-wr1-f71.google.com with SMTP id c4-20020a5d6cc4000000b00160edc8bb28so8812436wrc.9
+        for <kvm@vger.kernel.org>; Mon, 18 Oct 2021 05:41:13 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=1pbSkqWxiSZgJ8e5OjIcgFH/1bBQSml1rT02P7vRiI8=;
-        b=RAHHZN8poPN9TmXqHfDHQC0PRWUVWLWrHtfuuuE6kQj5v8XQHD4ah0s1LTjysW+qJ8
-         p8lAQxm8azoJNjmL//hTo/BkZkvcmrV8HSQOkWowSlJxvLUWrTfyfBGfOG6cwm5HIU43
-         DPkFADUHZ+s+bYLWZ4I8zSjiMZTaafThSnh/n0BrX9MoqOer4Pe7g1eCWX4kqXnnm6+/
-         7rXO6xe4bI275Z2iF3x3KSgER+jT4wp6btPuP4zhy3IUzpPVPDJZODmelLerpOWqCG8f
-         O7mveUyYuXO3bwqILYK//Fs4MlMMy97t0DJook52cLNVYmd9k0O6RXcum5NZtPevCC/Y
-         e3lw==
-X-Gm-Message-State: AOAM533dgdM2+OIsH+8UekJRS3wKAkeEv5F27gzIl9ary9yRobb8Dlbk
-        De+NlyZQgPvIGRvc8F4cb0qw3/CNLbbIsRneYXryRg==
-X-Google-Smtp-Source: ABdhPJwmLCo4x7wGytVHP4ezHwU7qhNTDaKBXu8Z84dYPzNngqLyw3XKmfneyTsFw7kja67groR2U7W6EsbitXQCZTU=
-X-Received: by 2002:a05:6830:210c:: with SMTP id i12mr21214780otc.102.1634560470718;
- Mon, 18 Oct 2021 05:34:30 -0700 (PDT)
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=5qFf3VI73kFQn2LyVeKguZB9EmFNL0jwRXY2EkA/dfI=;
+        b=qJjaxLWZu4XjhCjk5Vh/t7DGI57qpeEDRBoFMQ6zpqmlogSESrTDD69ZyTENBGNoPI
+         lpafrsnvKBGAfhw9dixRnGS69htePDA5P9Ngnw1aOVxVjQHDi54kDVqwynOvMi3GhSVW
+         jW/LSqkM/1/bm31TAz/24mjcg1fviBmQ2f3iys0urb/n1aZgO+XupG6OyP+k/kviHVDp
+         1hktGMCTbuuyVH8K2T2L2i8pZd7QoOI5vioXWN2pu3ebR0BYJOeSaCW5FhyEZDAY20aG
+         P8GKaL9EnTwWaLbvBD5NZdt/V7CNE1lV3LkfCDlYpO+7NUcv6UOmxSh8HRAfTn9rycbD
+         ipbw==
+X-Gm-Message-State: AOAM532ETzImzog2lwInNtbIYsqoZ3rEtJeSKhn0SGCUUqHN15C/oiLo
+        UgskrL+7Zp3PtP8tlTnwc5p9CW1wmyztpCyfBL9WAJBNLPeHxNm9K3jWHBy5y7jWu5/9NnCKntF
+        YVFYmMUVL0hEl
+X-Received: by 2002:a05:600c:a43:: with SMTP id c3mr42805782wmq.193.1634560872116;
+        Mon, 18 Oct 2021 05:41:12 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxFLqBqHNsYgatjWEsa5xVYt5GS/KiY7e5BxQadmhOhAsag56flHd3brWoTaEUsc1nq4hHk5Q==
+X-Received: by 2002:a05:600c:a43:: with SMTP id c3mr42805742wmq.193.1634560871742;
+        Mon, 18 Oct 2021 05:41:11 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id k10sm12346384wrh.64.2021.10.18.05.41.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 18 Oct 2021 05:41:10 -0700 (PDT)
+Message-ID: <fb05e1cf-e847-11cf-c01e-fc07202229ad@redhat.com>
+Date:   Mon, 18 Oct 2021 14:41:09 +0200
 MIME-Version: 1.0
-References: <20211010145636.1950948-12-tabba@google.com> <20211013120346.2926621-1-maz@kernel.org>
- <CA+EHjTxBW2fzSk5wMLceRwExqJwXGTtrK1GZ2L6J-Oh9VCDJJg@mail.gmail.com> <20211018104505.52jvpuhxkbstzerg@gator.home>
-In-Reply-To: <20211018104505.52jvpuhxkbstzerg@gator.home>
-From:   Fuad Tabba <tabba@google.com>
-Date:   Mon, 18 Oct 2021 13:33:54 +0100
-Message-ID: <CA+EHjTyDMMMp_jzdfL-OUoBv0YU8pbxMnCu4vErVCex7wHa6bw@mail.gmail.com>
-Subject: Re: [PATCH v9 00/22] KVM: arm64: Fixed features for protected VMs
-To:     Andrew Jones <drjones@redhat.com>
-Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        will@kernel.org, james.morse@arm.com, alexandru.elisei@arm.com,
-        suzuki.poulose@arm.com, mark.rutland@arm.com, pbonzini@redhat.com,
-        oupton@google.com, qperret@google.com, kernel-team@android.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [PATCH v2 3/7] KVM: VMX: Rename pt_desc.addr_range to
+ pt_desc.nr_addr_range
+Content-Language: en-US
+To:     Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20210827070249.924633-1-xiaoyao.li@intel.com>
+ <20210827070249.924633-4-xiaoyao.li@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20210827070249.924633-4-xiaoyao.li@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+On 27/08/21 09:02, Xiaoyao Li wrote:
+> To better self explain the meaning of this field.
+> 
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 
-On Mon, Oct 18, 2021 at 11:45 AM Andrew Jones <drjones@redhat.com> wrote:
->
-> On Mon, Oct 18, 2021 at 10:51:54AM +0100, Fuad Tabba wrote:
-> > Hi Marc,
-> >
-> > On Wed, Oct 13, 2021 at 1:04 PM Marc Zyngier <maz@kernel.org> wrote:
-> > >
-> > > This is an update on Fuad's series[1].
-> > >
-> > > Instead of going going back and forth over a series that has seen a
-> > > fair few versions, I've opted for simply writing a set of fixes on
-> > > top, hopefully greatly simplifying the handling of most registers, and
-> > > moving things around to suit my own taste (just because I can).
-> > >
-> > > I won't be reposting the initial 11 patches, which is why this series
-> > > in is reply to patch 11.
-> >
-> > Thanks for this series. I've reviewed, built it, and tested it with a
-> > dummy protected VM (since we don't have proper protected VMs yet),
-> > which initializes some of the relevant protected VMs metadata as well
-> > as its control registers. So fwiw:
-> >
-> > Reviewed-by: Fuad Tabba <tabba@google.com>
-> >
-> > And to whatever extent possible at this stage:
-> > Tested-by: Fuad Tabba <tabba@google.com>
-> >
->
-> Hi Fuad,
->
-> Out of curiosity, when testing pKVM, what VMM do you use? Also, can you
-> describe what a "dummy pVM" is? Is it a just pVM which is not actually
-> protected? How similar is a pVM to a typical VIRTIO-using VM? Actually,
-> maybe I should just ask if there are instructions for playing with pKVM
-> somewhere that I could get a pointer to.
+Let's use num_addr_ranges to map the PT_CAP constant.
 
-Considering the WIP state of pKVM, my setup is hacky and not that
-stable. I use QEMU, along with Will'ls pKVM user ABI patches [*] and a
-couple of hacks added on top to run a normal VM with the protected
-codepath applied to it, to be able to do some testing and sanity
-checking. There isn't really any proper way of playing with protected
-VMs yet.
+Paolo
 
-Thanks,
-/fuad
+>   arch/x86/kvm/vmx/vmx.c | 26 +++++++++++++-------------
+>   arch/x86/kvm/vmx/vmx.h |  2 +-
+>   2 files changed, 14 insertions(+), 14 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 96a2df65678f..c54b99cec0e6 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -1059,8 +1059,8 @@ static void pt_guest_enter(struct vcpu_vmx *vmx)
+>   	rdmsrl(MSR_IA32_RTIT_CTL, vmx->pt_desc.host.ctl);
+>   	if (vmx->pt_desc.guest.ctl & RTIT_CTL_TRACEEN) {
+>   		wrmsrl(MSR_IA32_RTIT_CTL, 0);
+> -		pt_save_msr(&vmx->pt_desc.host, vmx->pt_desc.addr_range);
+> -		pt_load_msr(&vmx->pt_desc.guest, vmx->pt_desc.addr_range);
+> +		pt_save_msr(&vmx->pt_desc.host, vmx->pt_desc.nr_addr_ranges);
+> +		pt_load_msr(&vmx->pt_desc.guest, vmx->pt_desc.nr_addr_ranges);
+>   	}
+>   }
+>   
+> @@ -1070,8 +1070,8 @@ static void pt_guest_exit(struct vcpu_vmx *vmx)
+>   		return;
+>   
+>   	if (vmx->pt_desc.guest.ctl & RTIT_CTL_TRACEEN) {
+> -		pt_save_msr(&vmx->pt_desc.guest, vmx->pt_desc.addr_range);
+> -		pt_load_msr(&vmx->pt_desc.host, vmx->pt_desc.addr_range);
+> +		pt_save_msr(&vmx->pt_desc.guest, vmx->pt_desc.nr_addr_ranges);
+> +		pt_load_msr(&vmx->pt_desc.host, vmx->pt_desc.nr_addr_ranges);
+>   	}
+>   
+>   	/*
+> @@ -1460,16 +1460,16 @@ static int vmx_rtit_ctl_check(struct kvm_vcpu *vcpu, u64 data)
+>   	 * cause a #GP fault.
+>   	 */
+>   	value = (data & RTIT_CTL_ADDR0) >> RTIT_CTL_ADDR0_OFFSET;
+> -	if ((value && (vmx->pt_desc.addr_range < 1)) || (value > 2))
+> +	if ((value && (vmx->pt_desc.nr_addr_ranges < 1)) || (value > 2))
+>   		return 1;
+>   	value = (data & RTIT_CTL_ADDR1) >> RTIT_CTL_ADDR1_OFFSET;
+> -	if ((value && (vmx->pt_desc.addr_range < 2)) || (value > 2))
+> +	if ((value && (vmx->pt_desc.nr_addr_ranges < 2)) || (value > 2))
+>   		return 1;
+>   	value = (data & RTIT_CTL_ADDR2) >> RTIT_CTL_ADDR2_OFFSET;
+> -	if ((value && (vmx->pt_desc.addr_range < 3)) || (value > 2))
+> +	if ((value && (vmx->pt_desc.nr_addr_ranges < 3)) || (value > 2))
+>   		return 1;
+>   	value = (data & RTIT_CTL_ADDR3) >> RTIT_CTL_ADDR3_OFFSET;
+> -	if ((value && (vmx->pt_desc.addr_range < 4)) || (value > 2))
+> +	if ((value && (vmx->pt_desc.nr_addr_ranges < 4)) || (value > 2))
+>   		return 1;
+>   
+>   	return 0;
+> @@ -1889,7 +1889,7 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>   	case MSR_IA32_RTIT_ADDR0_A ... MSR_IA32_RTIT_ADDR3_B:
+>   		index = msr_info->index - MSR_IA32_RTIT_ADDR0_A;
+>   		if (!vmx_pt_mode_is_host_guest() ||
+> -		    (index >= 2 * vmx->pt_desc.addr_range))
+> +		    (index >= 2 * vmx->pt_desc.nr_addr_ranges))
+>   			return 1;
+>   		if (index % 2)
+>   			msr_info->data = vmx->pt_desc.guest.addr_b[index / 2];
+> @@ -2204,7 +2204,7 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>   		if (!pt_can_write_msr(vmx))
+>   			return 1;
+>   		index = msr_info->index - MSR_IA32_RTIT_ADDR0_A;
+> -		if (index >= 2 * vmx->pt_desc.addr_range)
+> +		if (index >= 2 * vmx->pt_desc.nr_addr_ranges)
+>   			return 1;
+>   		if (is_noncanonical_address(data, vcpu))
+>   			return 1;
+> @@ -3880,7 +3880,7 @@ void pt_update_intercept_for_msr(struct kvm_vcpu *vcpu)
+>   	vmx_set_intercept_for_msr(vcpu, MSR_IA32_RTIT_OUTPUT_BASE, MSR_TYPE_RW, flag);
+>   	vmx_set_intercept_for_msr(vcpu, MSR_IA32_RTIT_OUTPUT_MASK, MSR_TYPE_RW, flag);
+>   	vmx_set_intercept_for_msr(vcpu, MSR_IA32_RTIT_CR3_MATCH, MSR_TYPE_RW, flag);
+> -	for (i = 0; i < vmx->pt_desc.addr_range; i++) {
+> +	for (i = 0; i < vmx->pt_desc.nr_addr_ranges; i++) {
+>   		vmx_set_intercept_for_msr(vcpu, MSR_IA32_RTIT_ADDR0_A + i * 2, MSR_TYPE_RW, flag);
+>   		vmx_set_intercept_for_msr(vcpu, MSR_IA32_RTIT_ADDR0_B + i * 2, MSR_TYPE_RW, flag);
+>   	}
+> @@ -7113,7 +7113,7 @@ static void update_intel_pt_cfg(struct kvm_vcpu *vcpu)
+>   	}
+>   
+>   	/* Get the number of configurable Address Ranges for filtering */
+> -	vmx->pt_desc.addr_range = intel_pt_validate_cap(vmx->pt_desc.caps,
+> +	vmx->pt_desc.nr_addr_ranges = intel_pt_validate_cap(vmx->pt_desc.caps,
+>   						PT_CAP_num_address_ranges);
+>   
+>   	/* Initialize and clear the no dependency bits */
+> @@ -7161,7 +7161,7 @@ static void update_intel_pt_cfg(struct kvm_vcpu *vcpu)
+>   		vmx->pt_desc.ctl_bitmask &= ~RTIT_CTL_FABRIC_EN;
+>   
+>   	/* unmask address range configure area */
+> -	for (i = 0; i < vmx->pt_desc.addr_range; i++)
+> +	for (i = 0; i < vmx->pt_desc.nr_addr_ranges; i++)
+>   		vmx->pt_desc.ctl_bitmask &= ~(0xfULL << (32 + i * 4));
+>   }
+>   
+> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+> index 4858c5fd95f2..f48eafbbed0e 100644
+> --- a/arch/x86/kvm/vmx/vmx.h
+> +++ b/arch/x86/kvm/vmx/vmx.h
+> @@ -62,7 +62,7 @@ struct pt_ctx {
+>   
+>   struct pt_desc {
+>   	u64 ctl_bitmask;
+> -	u32 addr_range;
+> +	u32 nr_addr_ranges;
+>   	u32 caps[PT_CPUID_REGS_NUM * PT_CPUID_LEAVES];
+>   	struct pt_ctx host;
+>   	struct pt_ctx guest;
+> 
 
-[*] https://lore.kernel.org/kvmarm/20210603183347.1695-1-will@kernel.org/
 
-> Thanks,
-> drew
->
