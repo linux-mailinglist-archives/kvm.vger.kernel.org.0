@@ -2,136 +2,195 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0401F431FA8
-	for <lists+kvm@lfdr.de>; Mon, 18 Oct 2021 16:29:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AEDB9431FBB
+	for <lists+kvm@lfdr.de>; Mon, 18 Oct 2021 16:31:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232263AbhJRObz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Oct 2021 10:31:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48364 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232260AbhJRObj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Oct 2021 10:31:39 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CFADC06176D;
-        Mon, 18 Oct 2021 07:29:09 -0700 (PDT)
-Received: from zn.tnic (p200300ec2f085700a5f06031787ecc0a.dip0.t-ipconnect.de [IPv6:2003:ec:2f08:5700:a5f0:6031:787e:cc0a])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id D2FC91EC04C2;
-        Mon, 18 Oct 2021 16:29:07 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1634567347;
+        id S231997AbhJROc6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Oct 2021 10:32:58 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53491 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230344AbhJROc5 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 18 Oct 2021 10:32:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1634567446;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=c9xEu9dyx4wrnGD++qak7Rf0JfD9ujFQ9E5yOZB19Q0=;
-        b=aKWwYTlr9cCQu7ia5dZP/kuxrxzN93CyPBgOxttie/QBj3Td/GyHk64AiEAbXaIbAsIGqx
-        BgGTrkPaemD3IjwBuWI2GydbibFzG2kuXi6yqjHnJLtsSpqF8n17AX6r45/y+wPNjuoNcV
-        Bkj7MRJet38z0l3P6cMLUbOfmJ1xF50=
-Date:   Mon, 18 Oct 2021 16:29:07 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+         in-reply-to:in-reply-to:references:references;
+        bh=16lgWy6r2ijeFvmyYBWNBFj6OUleKDb2cTJh8BDi66E=;
+        b=SGFXuGrTTxzQ86NL2hRGT/ETTz3DcqLVY1sye/vp6GW0yScUOWF7/5/0cx072ssdoHipWN
+        GNoohbn7IZnzImk1V+o5eG5eagu1U28MSLeOQpLxEHKdMJCH5+/Hk6OBOogMeUHh4cFLTH
+        4NSUP4sY/IRXyTSgs8xcrYjNWjO6iHk=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-525-mN5a_xx1N8yi28qR-kgt9Q-1; Mon, 18 Oct 2021 10:30:44 -0400
+X-MC-Unique: mN5a_xx1N8yi28qR-kgt9Q-1
+Received: by mail-ed1-f70.google.com with SMTP id u17-20020a50d511000000b003daa3828c13so14530834edi.12
+        for <kvm@vger.kernel.org>; Mon, 18 Oct 2021 07:30:44 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=16lgWy6r2ijeFvmyYBWNBFj6OUleKDb2cTJh8BDi66E=;
+        b=htLkuuNMLKHSe/46w73bYW1c6og91lcF/M3RbYNmZJcavMu1xi22APjf1goc0ZVJLg
+         yamB/28dxKoQNlvWJKzQbuskuwTRqkOlIC8rYIHWTizXwQvcyXwyym+KLeAU6Q4IxMOp
+         zzqGOw+Mqzu9rKYcNJmJKhjSOcsx8GC56eL1ys6dtBGjMQVynVrL5QnO8rfBgqeW3o1W
+         yR6aCN/GKieG+eJ3g2CW1WChrceU/aR9Ptbq6DCE/S0kJXurV+QFZmtd7Tgo7Gw2uW4U
+         vKgW/XdXZRE8lFYdzCCpvNpJ/i7RHjyFkNn7VyhDq5ftMkeyMBBiQuB/pLoXFi3iCcDA
+         6Raw==
+X-Gm-Message-State: AOAM530r1ghVf7LG6OO6BWlf45EcU37L2fy4l/kmkAMWCRuHt5TCWYKS
+        OAkfQ0YqorUisoY6wJDq14xtZecjP+5P2NdGyujSpC59PMz82eF8sSH9iXJiXDFxZER4XNZ0JWI
+        h6qu+FeMMB202
+X-Received: by 2002:aa7:cd8b:: with SMTP id x11mr45193824edv.384.1634567443444;
+        Mon, 18 Oct 2021 07:30:43 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzOPhN4B7GDbBSZ7+1OX/c4MoxhYUWo11/O3rb3LVvmuMXMvo3tDY2r0PmKoGrxiNYc9rNOlg==
+X-Received: by 2002:aa7:cd8b:: with SMTP id x11mr45193777edv.384.1634567443091;
+        Mon, 18 Oct 2021 07:30:43 -0700 (PDT)
+Received: from gator.home (cst2-174-2.cust.vodafone.cz. [31.30.174.2])
+        by smtp.gmail.com with ESMTPSA id jg21sm5789033ejc.14.2021.10.18.07.30.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 Oct 2021 07:30:42 -0700 (PDT)
+Date:   Mon, 18 Oct 2021 16:30:40 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Reiji Watanabe <reijiw@google.com>
+Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH v6 08/42] x86/sev-es: initialize sev_status/features
- within #VC handler
-Message-ID: <YW2EsxcqBucuyoal@zn.tnic>
-References: <20211008180453.462291-1-brijesh.singh@amd.com>
- <20211008180453.462291-9-brijesh.singh@amd.com>
+        Will Deacon <will@kernel.org>,
+        Peng Liang <liangpeng10@huawei.com>,
+        Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>
+Subject: Re: [RFC PATCH 02/25] KVM: arm64: Save ID registers' sanitized value
+ per vCPU
+Message-ID: <20211018143040.nhkv67cxni6ind6k@gator.home>
+References: <20211012043535.500493-1-reijiw@google.com>
+ <20211012043535.500493-3-reijiw@google.com>
+ <20211015130918.ezlygga73doepbw6@gator>
+ <CAAeT=Fx9zUet2HvFe8dwhXjyozuggn+qcQBoyb_8hUGJNKFNTQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211008180453.462291-9-brijesh.singh@amd.com>
+In-Reply-To: <CAAeT=Fx9zUet2HvFe8dwhXjyozuggn+qcQBoyb_8hUGJNKFNTQ@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 08, 2021 at 01:04:19PM -0500, Brijesh Singh wrote:
-> From: Michael Roth <michael.roth@amd.com>
+On Sat, Oct 16, 2021 at 05:42:59PM -0700, Reiji Watanabe wrote:
+> On Fri, Oct 15, 2021 at 6:09 AM Andrew Jones <drjones@redhat.com> wrote:
+> >
+> > On Mon, Oct 11, 2021 at 09:35:12PM -0700, Reiji Watanabe wrote:
+> > > Extend sys_regs[] of kvm_cpu_context for ID registers and save ID
+> > > registers' sanitized value in the array for the vCPU at the first
+> > > vCPU reset. Use the saved ones when ID registers are read by
+> > > userspace (via KVM_GET_ONE_REG) or the guest.
+> > >
+> > > Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> > > ---
+> > >  arch/arm64/include/asm/kvm_host.h | 10 ++++++++++
+> > >  arch/arm64/kvm/sys_regs.c         | 26 ++++++++++++++++++--------
+> > >  2 files changed, 28 insertions(+), 8 deletions(-)
+> > >
+> > > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > > index 9b5e7a3b6011..0cd351099adf 100644
+> > > --- a/arch/arm64/include/asm/kvm_host.h
+> > > +++ b/arch/arm64/include/asm/kvm_host.h
+> > > @@ -145,6 +145,14 @@ struct kvm_vcpu_fault_info {
+> > >       u64 disr_el1;           /* Deferred [SError] Status Register */
+> > >  };
+> > >
+> > > +/*
+> > > + * (Op0, Op1, CRn, CRm, Op2) of ID registers is (3, 0, 0, crm, op2),
+> > > + * where 0<=crm<8, 0<=op2<8.
+> >
+> > crm is 4 bits, so this should be 0 <= crm < 16 and...
+> >
+> > > + */
+> > > +#define KVM_ARM_ID_REG_MAX_NUM 64
+> >
+> > ...this should be 128. Or am I missing something?
 > 
-> Generally access to MSR_AMD64_SEV is only safe if the 0x8000001F CPUID
-> leaf indicates SEV support. With SEV-SNP, CPUID responses from the
-> hypervisor are not considered trustworthy, particularly for 0x8000001F.
-> SEV-SNP provides a firmware-validated CPUID table to use as an
-> alternative, but prior to checking MSR_AMD64_SEV there are no
-> guarantees that this is even an SEV-SNP guest.
+> Registers with (3, 0, 0, 0<=crm<8, op2) are defined/allocated including
+> reserved (RAZ) ones (please see Table D12-2 in ARM DDI 0487G.b),
+> and the code supports those only for now.
 > 
-> Rather than relying on these CPUID values early on, allow SEV-ES and
-> SEV-SNP guests to instead use a cpuid instruction to trigger a #VC and
-> have it cache MSR_AMD64_SEV in sev_status, since it is known to be safe
-> to access MSR_AMD64_SEV if a #VC has triggered.
+> I understand that registers with crm >= 8 could be defined in the future
+> (I'm not so sure if they will be really ID registers though),
+> but then we can include them later as needed.
+
+Oh, I see. Thanks. Looking at the table I see CRm=0,op2={1,2,3,4,7} are
+also missing, but it certainly doesn't matter that we allocate a few
+unused entries, especially since we also allocate entries for all the
+RAZ ones.
+
 > 
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> ---
->  arch/x86/kernel/sev-shared.c | 14 ++++++++++++++
->  1 file changed, 14 insertions(+)
+> > > +#define IDREG_IDX(id)                ((sys_reg_CRm(id) << 3) | sys_reg_Op2(id))
+> > > +#define IDREG_SYS_IDX(id)    (ID_REG_BASE + IDREG_IDX(id))
+> > > +
+> > >  enum vcpu_sysreg {
+> > >       __INVALID_SYSREG__,   /* 0 is reserved as an invalid value */
+> > >       MPIDR_EL1,      /* MultiProcessor Affinity Register */
+> > > @@ -209,6 +217,8 @@ enum vcpu_sysreg {
+> > >       CNTP_CVAL_EL0,
+> > >       CNTP_CTL_EL0,
+> > >
+> > > +     ID_REG_BASE,
+> > > +     ID_REG_END = ID_REG_BASE + KVM_ARM_ID_REG_MAX_NUM - 1,
+> > >       /* Memory Tagging Extension registers */
+> > >       RGSR_EL1,       /* Random Allocation Tag Seed Register */
+> > >       GCR_EL1,        /* Tag Control Register */
+> > > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > > index 1d46e185f31e..72ca518e7944 100644
+> > > --- a/arch/arm64/kvm/sys_regs.c
+> > > +++ b/arch/arm64/kvm/sys_regs.c
+> > > @@ -273,7 +273,7 @@ static bool trap_loregion(struct kvm_vcpu *vcpu,
+> > >                         struct sys_reg_params *p,
+> > >                         const struct sys_reg_desc *r)
+> > >  {
+> > > -     u64 val = read_sanitised_ftr_reg(SYS_ID_AA64MMFR1_EL1);
+> > > +     u64 val = __vcpu_sys_reg(vcpu, IDREG_SYS_IDX(SYS_ID_AA64MMFR1_EL1));
+> > >       u32 sr = reg_to_encoding(r);
+> > >
+> > >       if (!(val & (0xfUL << ID_AA64MMFR1_LOR_SHIFT))) {
+> > > @@ -1059,12 +1059,11 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
+> > >       return true;
+> > >  }
+> > >
+> > > -/* Read a sanitised cpufeature ID register by sys_reg_desc */
+> > >  static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+> > >               struct sys_reg_desc const *r, bool raz)
+> > >  {
+> > >       u32 id = reg_to_encoding(r);
+> > > -     u64 val = raz ? 0 : read_sanitised_ftr_reg(id);
+> > > +     u64 val = raz ? 0 : __vcpu_sys_reg(vcpu, IDREG_SYS_IDX(id));
+> > >
+> > >       switch (id) {
+> > >       case SYS_ID_AA64PFR0_EL1:
+> > > @@ -1174,6 +1173,16 @@ static unsigned int sve_visibility(const struct kvm_vcpu *vcpu,
+> > >       return REG_HIDDEN;
+> > >  }
+> > >
+> > > +static void reset_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd)
+> >
+> > Since not all ID registers will use this, then maybe name it
+> > reset_sanitised_id_reg?
 > 
-> diff --git a/arch/x86/kernel/sev-shared.c b/arch/x86/kernel/sev-shared.c
-> index 8ee27d07c1cd..2796c524d174 100644
-> --- a/arch/x86/kernel/sev-shared.c
-> +++ b/arch/x86/kernel/sev-shared.c
-> @@ -191,6 +191,20 @@ void __init do_vc_no_ghcb(struct pt_regs *regs, unsigned long exit_code)
->  	if (exit_code != SVM_EXIT_CPUID)
->  		goto fail;
->  
-> +	/*
-> +	 * A #VC implies that either SEV-ES or SEV-SNP are enabled, so the SEV
-> +	 * MSR is also available. Go ahead and initialize sev_status here to
-> +	 * allow SEV features to be checked without relying solely on the SEV
-> +	 * cpuid bit to indicate whether it is safe to do so.
-> +	 */
-> +	if (!sev_status) {
-> +		unsigned long lo, hi;
-> +
-> +		asm volatile("rdmsr" : "=a" (lo), "=d" (hi)
-> +				     : "c" (MSR_AMD64_SEV));
-> +		sev_status = (hi << 32) | lo;
-> +	}
-> +
->  	sev_es_wr_ghcb_msr(GHCB_CPUID_REQ(fn, GHCB_CPUID_REQ_EAX));
->  	VMGEXIT();
->  	val = sev_es_rd_ghcb_msr();
-> -- 
+> Thank you for the suggestion.
+> 
+> I named it 'reset_id_reg' according to the naming conventions of
+> set_id_reg, get_id_reg, and access_id_reg which are used for the same
+> set of ID registers (ID_SANITISED ones) as reset_id_reg.
+> I would think it's better to use consistent names for all of them.
+> So, I am a bit reluctant to change only the name of reset_id_reg.
+> 
+> What do you think about the names of those other three functions ?
 
-Ok, you guys are killing me. ;-\
+I think I like the shorter names, so please disregard my suggestion.
 
-How is bolting some pretty much unrelated code into the early #VC
-handler not a hack? Do you not see it?
+Thanks,
+drew
 
-So sme_enable() is reading MSR_AMD64_SEV and setting up everything
-there, including sev_status. If a SNP guest does not trust CPUID, why
-can't you attempt to read that MSR there, even if CPUID has lied to the
-guest?
-
-And not just slap it somewhere just because it works?
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
