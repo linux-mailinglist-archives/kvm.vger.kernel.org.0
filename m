@@ -2,158 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6062F431362
-	for <lists+kvm@lfdr.de>; Mon, 18 Oct 2021 11:24:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1088F4313D5
+	for <lists+kvm@lfdr.de>; Mon, 18 Oct 2021 11:52:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231536AbhJRJ0f (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Oct 2021 05:26:35 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29792 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231411AbhJRJ02 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 18 Oct 2021 05:26:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634549057;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=tcERYHsACD8OiG9LERSlpQxmHuHdSGg0GMtHO86OE84=;
-        b=AyGrhM8i9mDj3QLHcrg+gTGbyI6PHy3rsEeHVq8VDXGYGu8MKhRpG6G4e1za8iIahRJSem
-        WZmylplqll/25D0gmJhQS0Y2i2mkaAL1YV71IMKQo2F3fi0MVrkyLsHjuswYn6C8NVbQj/
-        LN7ep9+EZV6FqsxRENUTaW6PrU91h+U=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-555-x9Paz0YGN6y0YAKkE6BDAg-1; Mon, 18 Oct 2021 05:24:15 -0400
-X-MC-Unique: x9Paz0YGN6y0YAKkE6BDAg-1
-Received: by mail-ed1-f70.google.com with SMTP id r11-20020aa7cfcb000000b003d4fbd652b9so13768054edy.14
-        for <kvm@vger.kernel.org>; Mon, 18 Oct 2021 02:24:15 -0700 (PDT)
+        id S229611AbhJRJym (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Oct 2021 05:54:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40226 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229548AbhJRJyl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Oct 2021 05:54:41 -0400
+Received: from mail-ot1-x334.google.com (mail-ot1-x334.google.com [IPv6:2607:f8b0:4864:20::334])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4C3AC06161C
+        for <kvm@vger.kernel.org>; Mon, 18 Oct 2021 02:52:30 -0700 (PDT)
+Received: by mail-ot1-x334.google.com with SMTP id s18-20020a0568301e1200b0054e77a16651so2560281otr.7
+        for <kvm@vger.kernel.org>; Mon, 18 Oct 2021 02:52:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=hIvrEUDH4eO0WYJ4PqJYB49yqlYXOG/SemvYMWXPzyU=;
+        b=HIxagS8WVeBE+G0ajyTJaAZdzxBaPmgZ+XMi01ATbiVxu+clkd0Bz18OdiZgOtmSD7
+         cHkARs/25XkG6o5e2c5DYFpyeaqzpJ3hll/HXce3Zu+fzjAeDhEViSGG4n5NSu4VHpAK
+         kS41yZx1OWhbnZ1oGLTCOZHDQ00vJhfZHwHWhRMjo3YFLUJEM24PXUzLAX6KNtWcIPKg
+         B1VtBf8zTh4/BhuO5HZvNuApQUkbwcU+Ue+KFPtlZw9GlLYGan4W2ve8Ba/SPRQx8JG7
+         caFgv+79cmRM2Pn7v2/wVRS7kEIEvYZ52lrDPI49WkHCp7njfE0tuIJeypQH+BR57BrF
+         JN1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=tcERYHsACD8OiG9LERSlpQxmHuHdSGg0GMtHO86OE84=;
-        b=ykRSZYVoA8diTwNzD8KxQAu+9D/lx6PpKKZr/mBGwX1wscnsacaXFYKFsSGrPhcgTx
-         giHdxycrL6m8Owx9FNRPQfF4fCEyAksBDICP5R0BBUHZeKlMC5AwbousBEbzJ96//1jT
-         8QXGySPXhBPw1f5wPM5V9+xu0gSAQCAUgfF08VHx398XLXI9SBdpmQgKZpH89TORvgyI
-         v+xWRav6+XKhiQCYBE1Tws0zHvNIK8wYsATWVJxPDTog6yIr+b7sEui6O7YqNcg3y/N2
-         Q8rjpyx8vQf08W9Z5eXdqG5F8jo68PLeYiaD/+/S5JksjB+lCJp+280A9w5TmpheonMy
-         qyGg==
-X-Gm-Message-State: AOAM530YLDuaPJkQSjo7CCzDths8rdZhRYcIm3qQveYA4X+9krFTCoB9
-        XoizOQ4+FPieMYaA4LMDcxg2z2gu4bwS9IUTsne+OJwbeNqE0Hc2ipY+dR/31rLdHc3Iw/Tja5i
-        1cqh2dAp6LFrn
-X-Received: by 2002:a50:9d8e:: with SMTP id w14mr42193560ede.74.1634549054610;
-        Mon, 18 Oct 2021 02:24:14 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxUJYrHxvUXjdPELjIDpPtrZ181C1I4vTJbRWD4jS3vqGv74zCzzGw5AmjDAdcPLpxevcG2mg==
-X-Received: by 2002:a50:9d8e:: with SMTP id w14mr42193472ede.74.1634549054384;
-        Mon, 18 Oct 2021 02:24:14 -0700 (PDT)
-Received: from steredhat (host-79-34-250-211.business.telecomitalia.it. [79.34.250.211])
-        by smtp.gmail.com with ESMTPSA id lm14sm8629911ejb.24.2021.10.18.02.24.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Oct 2021 02:24:13 -0700 (PDT)
-Date:   Mon, 18 Oct 2021 11:24:10 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, Jeff Dike <jdike@addtoit.com>,
-        Richard Weinberger <richard@nod.at>,
-        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Gonglei <arei.gonglei@huawei.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Sudeep Holla <sudeep.holla@arm.com>,
-        Cristian Marussi <cristian.marussi@arm.com>,
-        "Enrico Weigelt, metux IT consult" <info@metux.net>,
-        Viresh Kumar <vireshk@kernel.org>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Bartosz Golaszewski <brgl@bgdev.pl>,
-        David Airlie <airlied@linux.ie>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        Daniel Vetter <daniel@ffwll.ch>, Jie Deng <jie.deng@intel.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        Kalle Valo <kvalo@codeaurora.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Vishal Verma <vishal.l.verma@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Ohad Ben-Cohen <ohad@wizery.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        David Hildenbrand <david@redhat.com>,
-        Vivek Goyal <vgoyal@redhat.com>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        Eric Van Hensbergen <ericvh@gmail.com>,
-        Latchesar Ionkov <lucho@ionkov.net>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Anton Yakovlev <anton.yakovlev@opensynergy.com>,
-        Jaroslav Kysela <perex@perex.cz>,
-        Takashi Iwai <tiwai@suse.com>, linux-um@lists.infradead.org,
-        virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        linux-i2c@vger.kernel.org, iommu@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
-        nvdimm@lists.linux.dev, linux-remoteproc@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        v9fs-developer@lists.sourceforge.net, kvm@vger.kernel.org,
-        alsa-devel@alsa-project.org
-Subject: Re: [PATCH RFC] virtio: wrap config->reset calls
-Message-ID: <20211018092410.t5hilzz7kbto2mhy@steredhat>
-References: <20211013105226.20225-1-mst@redhat.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=hIvrEUDH4eO0WYJ4PqJYB49yqlYXOG/SemvYMWXPzyU=;
+        b=p064eVPT0XGO0DEHhEqts+GBB+akpC1bW1zxjCx2IH4CXKUGYUHBFEKGycOarNz3f2
+         hc8PAb4r10UJdzly3WVAR2wfNpE8cljXni8IOYns2JLqZQi97/3yEcGDEkm4vTVpCAaz
+         Q67Vd/y1bpO7+dGttTvdcAW3FTCJ03Ss/VRscElTzJ5zgdEYfo4Rzy0lpxlys0fiWmCF
+         ay51OxoTBvZ0gE26xl6emu9gkPKz+NKQn+qPheJOH5R9xKaKklEa9Uk/UQlBiMVBicCS
+         sEDmiqIICx+tu19aZkSa5CMz5xvT4ZM06T1wR4xyxzxixx3lT0TIxTTbi55bYw5q5IA+
+         d7sg==
+X-Gm-Message-State: AOAM531+U16b/fYmZQHT+FCYhlcu6yZ3LCIymzEw5HDsYKB223nTWxRt
+        SwEl1/AoPWTyo2T3ZC8ItnjF/H7Abp9XjxqtT4t9wA==
+X-Google-Smtp-Source: ABdhPJzWZHsVsaIL9xeEZSzoCxSaBPHvIjAdCQFyH94KbtFqpNnFfKiOBxLaRi9JpKRLWzlcKnSs/4ctWMJp6q2c9Cg=
+X-Received: by 2002:a05:6830:210c:: with SMTP id i12mr20576774otc.102.1634550749852;
+ Mon, 18 Oct 2021 02:52:29 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20211013105226.20225-1-mst@redhat.com>
+References: <20211010145636.1950948-12-tabba@google.com> <20211013120346.2926621-1-maz@kernel.org>
+In-Reply-To: <20211013120346.2926621-1-maz@kernel.org>
+From:   Fuad Tabba <tabba@google.com>
+Date:   Mon, 18 Oct 2021 10:51:54 +0100
+Message-ID: <CA+EHjTxBW2fzSk5wMLceRwExqJwXGTtrK1GZ2L6J-Oh9VCDJJg@mail.gmail.com>
+Subject: Re: [PATCH v9 00/22] KVM: arm64: Fixed features for protected VMs
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, will@kernel.org,
+        james.morse@arm.com, alexandru.elisei@arm.com,
+        suzuki.poulose@arm.com, mark.rutland@arm.com, pbonzini@redhat.com,
+        drjones@redhat.com, oupton@google.com, qperret@google.com,
+        kernel-team@android.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 13, 2021 at 06:55:31AM -0400, Michael S. Tsirkin wrote:
->This will enable cleanups down the road.
->The idea is to disable cbs, then add "flush_queued_cbs" callback
->as a parameter, this way drivers can flush any work
->queued after callbacks have been disabled.
+Hi Marc,
+
+On Wed, Oct 13, 2021 at 1:04 PM Marc Zyngier <maz@kernel.org> wrote:
 >
->Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->---
-> arch/um/drivers/virt-pci.c                 | 2 +-
-> drivers/block/virtio_blk.c                 | 4 ++--
-> drivers/bluetooth/virtio_bt.c              | 2 +-
-> drivers/char/hw_random/virtio-rng.c        | 2 +-
-> drivers/char/virtio_console.c              | 4 ++--
-> drivers/crypto/virtio/virtio_crypto_core.c | 8 ++++----
-> drivers/firmware/arm_scmi/virtio.c         | 2 +-
-> drivers/gpio/gpio-virtio.c                 | 2 +-
-> drivers/gpu/drm/virtio/virtgpu_kms.c       | 2 +-
-> drivers/i2c/busses/i2c-virtio.c            | 2 +-
-> drivers/iommu/virtio-iommu.c               | 2 +-
-> drivers/net/caif/caif_virtio.c             | 2 +-
-> drivers/net/virtio_net.c                   | 4 ++--
-> drivers/net/wireless/mac80211_hwsim.c      | 2 +-
-> drivers/nvdimm/virtio_pmem.c               | 2 +-
-> drivers/rpmsg/virtio_rpmsg_bus.c           | 2 +-
-> drivers/scsi/virtio_scsi.c                 | 2 +-
-> drivers/virtio/virtio.c                    | 5 +++++
-> drivers/virtio/virtio_balloon.c            | 2 +-
-> drivers/virtio/virtio_input.c              | 2 +-
-> drivers/virtio/virtio_mem.c                | 2 +-
-> fs/fuse/virtio_fs.c                        | 4 ++--
-> include/linux/virtio.h                     | 1 +
-> net/9p/trans_virtio.c                      | 2 +-
-> net/vmw_vsock/virtio_transport.c           | 4 ++--
+> This is an update on Fuad's series[1].
+>
+> Instead of going going back and forth over a series that has seen a
+> fair few versions, I've opted for simply writing a set of fixes on
+> top, hopefully greatly simplifying the handling of most registers, and
+> moving things around to suit my own taste (just because I can).
+>
+> I won't be reposting the initial 11 patches, which is why this series
+> in is reply to patch 11.
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+Thanks for this series. I've reviewed, built it, and tested it with a
+dummy protected VM (since we don't have proper protected VMs yet),
+which initializes some of the relevant protected VMs metadata as well
+as its control registers. So fwiw:
 
+Reviewed-by: Fuad Tabba <tabba@google.com>
+
+And to whatever extent possible at this stage:
+Tested-by: Fuad Tabba <tabba@google.com>
+
+Cheers,
+/fuad
+
+
+
+
+
+> Thanks,
+>
+>         M.
+>
+> [1] https://lore.kernel.org/r/20211010145636.1950948-1-tabba@google.com
+>
+> Fuad Tabba (8):
+>   KVM: arm64: Pass struct kvm to per-EC handlers
+>   KVM: arm64: Add missing field descriptor for MDCR_EL2
+>   KVM: arm64: Simplify masking out MTE in feature id reg
+>   KVM: arm64: Add handlers for protected VM System Registers
+>   KVM: arm64: Initialize trap registers for protected VMs
+>   KVM: arm64: Move sanitized copies of CPU features
+>   KVM: arm64: Trap access to pVM restricted features
+>   KVM: arm64: Handle protected guests at 32 bits
+>
+> Marc Zyngier (14):
+>   KVM: arm64: Move __get_fault_info() and co into their own include file
+>   KVM: arm64: Don't include switch.h into nvhe/kvm-main.c
+>   KVM: arm64: Move early handlers to per-EC handlers
+>   KVM: arm64: Fix early exit ptrauth handling
+>   KVM: arm64: pkvm: Use a single function to expose all id-regs
+>   KVM: arm64: pkvm: Make the ERR/ERX*_EL1 registers RAZ/WI
+>   KVM: arm64: pkvm: Drop AArch32-specific registers
+>   KVM: arm64: pkvm: Drop sysregs that should never be routed to the host
+>   KVM: arm64: pkvm: Handle GICv3 traps as required
+>   KVM: arm64: pkvm: Preserve pending SError on exit from AArch32
+>   KVM: arm64: pkvm: Consolidate include files
+>   KVM: arm64: pkvm: Move kvm_handle_pvm_restricted around
+>   KVM: arm64: pkvm: Pass vpcu instead of kvm to
+>     kvm_get_exit_handler_array()
+>   KVM: arm64: pkvm: Give priority to standard traps over pvm handling
+>
+>  arch/arm64/include/asm/kvm_arm.h              |   1 +
+>  arch/arm64/include/asm/kvm_asm.h              |   1 +
+>  arch/arm64/include/asm/kvm_host.h             |   2 +
+>  arch/arm64/include/asm/kvm_hyp.h              |   5 +
+>  arch/arm64/kvm/arm.c                          |  13 +
+>  arch/arm64/kvm/hyp/include/hyp/fault.h        |  75 +++
+>  arch/arm64/kvm/hyp/include/hyp/switch.h       | 235 ++++-----
+>  .../arm64/kvm/hyp/include/nvhe/fixed_config.h | 200 +++++++
+>  .../arm64/kvm/hyp/include/nvhe/trap_handler.h |   2 +
+>  arch/arm64/kvm/hyp/nvhe/Makefile              |   2 +-
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c            |  11 +-
+>  arch/arm64/kvm/hyp/nvhe/mem_protect.c         |   8 +-
+>  arch/arm64/kvm/hyp/nvhe/pkvm.c                | 185 +++++++
+>  arch/arm64/kvm/hyp/nvhe/setup.c               |   3 +
+>  arch/arm64/kvm/hyp/nvhe/switch.c              |  99 ++++
+>  arch/arm64/kvm/hyp/nvhe/sys_regs.c            | 487 ++++++++++++++++++
+>  arch/arm64/kvm/hyp/vhe/switch.c               |  16 +
+>  arch/arm64/kvm/sys_regs.c                     |  10 +-
+>  18 files changed, 1200 insertions(+), 155 deletions(-)
+>  create mode 100644 arch/arm64/kvm/hyp/include/hyp/fault.h
+>  create mode 100644 arch/arm64/kvm/hyp/include/nvhe/fixed_config.h
+>  create mode 100644 arch/arm64/kvm/hyp/nvhe/pkvm.c
+>  create mode 100644 arch/arm64/kvm/hyp/nvhe/sys_regs.c
+>
+> --
+> 2.30.2
+>
