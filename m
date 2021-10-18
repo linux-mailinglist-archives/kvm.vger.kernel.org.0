@@ -2,95 +2,163 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 780EA4322CA
-	for <lists+kvm@lfdr.de>; Mon, 18 Oct 2021 17:24:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BAFF34322E1
+	for <lists+kvm@lfdr.de>; Mon, 18 Oct 2021 17:31:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232056AbhJRP0m (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Oct 2021 11:26:42 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:24807 "EHLO
+        id S232968AbhJRPdh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Oct 2021 11:33:37 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:30462 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230154AbhJRP0l (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 18 Oct 2021 11:26:41 -0400
+        by vger.kernel.org with ESMTP id S232536AbhJRPdg (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 18 Oct 2021 11:33:36 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634570670;
+        s=mimecast20190719; t=1634571084;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Bzbj7/WHYC4aB2F27o/m+i0nHnYIjq7dD2pHXdTaMVg=;
-        b=eRmDzagghKnV7YLzaT7nZ39QOiwSs72AB/8i8WG+FTrDWZjWN8/WLHbM78XLIJi+6L3CoP
-        //XdbbutAFb7aqSiX/KY1nO62gVhqfVyy5TJWeuNbQN4mHllHN8mRaQV3UAYDsQU6ZIcRp
-        Zize30I/ArqT4trHTpmEi4APHQ907Aw=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-5-6gQVfpFOMOmOfzTi5a0Ovg-1; Mon, 18 Oct 2021 11:24:29 -0400
-X-MC-Unique: 6gQVfpFOMOmOfzTi5a0Ovg-1
-Received: by mail-wr1-f71.google.com with SMTP id l6-20020adfa386000000b00160c4c1866eso8975131wrb.4
-        for <kvm@vger.kernel.org>; Mon, 18 Oct 2021 08:24:28 -0700 (PDT)
+        bh=Ne8DI/NRxXDYaAM8+GTuj10+3BGyAct9HYev71SXL4k=;
+        b=E+If0KOZdIoLzrhzTybd+vXX7nkDOCKG7k+flwxaOjOocqtLOprZhZN3m39IpPh5QGbNX0
+        VqlIYgaed+G3ooPzgpW7XDJ4qI7J4oQzya8+yDZtMLKZS/B1Ej/ibzJP5Njo0O0nmGi/k9
+        VI6NdrytH+6O+hveO12VcN67Qn5dtd4=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-358-lUO9WOYDNCGkVQJITjZyDg-1; Mon, 18 Oct 2021 11:31:22 -0400
+X-MC-Unique: lUO9WOYDNCGkVQJITjZyDg-1
+Received: by mail-ed1-f70.google.com with SMTP id r11-20020aa7cfcb000000b003d4fbd652b9so14702070edy.14
+        for <kvm@vger.kernel.org>; Mon, 18 Oct 2021 08:31:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=Bzbj7/WHYC4aB2F27o/m+i0nHnYIjq7dD2pHXdTaMVg=;
-        b=IkxdK0N5N9OoQnxuQXuPc6o0WeUhi9b55LMjVTd3ocYlh3gPqE2QybJjmroZpAZUhw
-         rOHKRCUT8FAg6+x9ieWZyJzLjPoiSWDB6hdM8vnPQUS0XA0bMCxip4CXUhWdD0A2INKQ
-         y0/o3IO//GJwkI1tZC7FT7lCs4oOFXuImYljJnVttbOwJOTbbOwGFIPVeCILDgIil4ja
-         kIL8sQz7T6k2NYaV1pkvbThRrzVQhBHHwPFIsshTnBFaxKZeQ9aJLB6fJ7lrBjVbf/FT
-         kYV7pRVSHiThxAP8UDE/Dg4fIlcP2JJTKjv2RhduUyuSKA9gDDYIBid3ftjkQLa1Dro0
-         Sp/g==
-X-Gm-Message-State: AOAM530HJG2Z4ccDqDu3IHv1crla4QLbjIJExP7DKOvzkmpRu5fPBWr1
-        zc7N+Aro4JIq7hJJ3JXnHtWWuhe8g350xl7JsL0VQ2JNQIsZD60DZ8Ee2jGRs5KeN5C3fNHXTnF
-        ZgkwskgL6F80X
-X-Received: by 2002:a1c:808e:: with SMTP id b136mr44520170wmd.178.1634570667843;
-        Mon, 18 Oct 2021 08:24:27 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyLex9V8Y/SK54b7T17izOSoWI76LpQ8IvrCdfTvZy/V3PEmQpxz2kOC0Cxvfq99dNSrkmsEg==
-X-Received: by 2002:a1c:808e:: with SMTP id b136mr44520151wmd.178.1634570667666;
-        Mon, 18 Oct 2021 08:24:27 -0700 (PDT)
+        bh=Ne8DI/NRxXDYaAM8+GTuj10+3BGyAct9HYev71SXL4k=;
+        b=xdLgt/2pDBhPlz1pVSn5I75UY58oWcG0dw1/y23NeXFo8ndNppUaSPkXjSnL6qJr/m
+         VPt8ruAwP8IVZaf5nBg8y1209itYj9gOR6B0lRNOXRLuuKua+hGcZaEJcNK+mvv28obK
+         Q0J73so2ucZExIJk/2KyE9e/2PXrZQ2ibmqtdY9T5rhoVPJo2LKGGfVqluHbXLHbkWWJ
+         1wi2d8UH4+fu/yYO8NTfzaE/O3TDbMEnglLzxlspSne/QuVKnzr6aWbeVvQQubFG/7b5
+         D68yFulzljt+NbxeSJSoh8k0Im7xOM7lPuIA2866+D4hgzFXaJuzqQKA5kC2EijcXGVc
+         xBQw==
+X-Gm-Message-State: AOAM5316HUU6qc+2KpxKXjez5tob0c3TFpN8MVQuvTgiogkBPqCoJjtn
+        SObdeAdLZtllBbbE0IWn8CgYtKkBcUv42jom+Kv7p5SOlH4ZLoUe6kQBUi3KrWwryAQfa7PWsdK
+        leHItuuEOtpbM
+X-Received: by 2002:aa7:d915:: with SMTP id a21mr45430233edr.218.1634571081243;
+        Mon, 18 Oct 2021 08:31:21 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyI0LnIJekMPtl2hYdLY4mO/L9Z/KNQKpKWoXba6yA7fHIjy2LF65EhSw9ySFwG+0YVwU1Qfw==
+X-Received: by 2002:aa7:d915:: with SMTP id a21mr45430206edr.218.1634571081044;
+        Mon, 18 Oct 2021 08:31:21 -0700 (PDT)
 Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id d1sm14562212wrr.72.2021.10.18.08.24.26
+        by smtp.gmail.com with ESMTPSA id b2sm9889278edv.73.2021.10.18.08.31.19
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 Oct 2021 08:24:26 -0700 (PDT)
-Message-ID: <59ccbca6-72ed-7c9f-8569-233627a399d0@redhat.com>
-Date:   Mon, 18 Oct 2021 17:24:25 +0200
+        Mon, 18 Oct 2021 08:31:20 -0700 (PDT)
+Message-ID: <b6e339d6-009c-5523-5376-576eeeef3121@redhat.com>
+Date:   Mon, 18 Oct 2021 17:31:19 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.1.0
-Subject: Re: [PATCH] mm: allow huge kvmalloc() calls if they're accounted to
- memcg
+Subject: Re: [kvm-unit-tests GIT PULL 00/17] s390x update 2021-10-18
 Content-Language: en-US
-To:     Kees Cook <keescook@chromium.org>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        KVM list <kvm@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Willy Tarreau <w@1wt.eu>,
-        syzbot+e0de2333cbf95ea473e8@syzkaller.appspotmail.com
-References: <20211016064302.165220-1-pbonzini@redhat.com>
- <CAHk-=wijGo_yd7GiTMcgR+gv0ESRykwnOn+XHCEvs3xW3x6dCg@mail.gmail.com>
- <510287f2-84ae-b1d2-13b5-22e847284588@redhat.com>
- <CAHk-=whZ+iCW5yMc3zuTpZrZzjb082xtVyzk3rV+S0SUNrtAAw@mail.gmail.com>
- <10e3d402-017e-1a0d-b6c7-112117067b03@redhat.com>
- <202110180817.A2C3AE34@keescook>
+To:     Janosch Frank <frankja@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, david@redhat.com, borntraeger@de.ibm.com,
+        linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
+        thuth@redhat.com
+References: <20211018122635.53614-1-frankja@linux.ibm.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <202110180817.A2C3AE34@keescook>
+In-Reply-To: <20211018122635.53614-1-frankja@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 18/10/21 17:19, Kees Cook wrote:
-> Ah, so memcg wasn't doing sanity checks?
+On 18/10/21 14:26, Janosch Frank wrote:
+> Dear Paolo,
 > 
-> Is there a cheap way to resolve the question "does this much memory
-> exist"? The "__" versions end up lacking context for why they're "__"
-> versions. I.e. do we want something more descriptive, like
-> __huge_kvmalloc_node() or __unbounded_kvmalloc_node()?
+> please merge or pull the following changes:
+>         * Skey addressing exception test (David)
+>         * sthyi reg 2 + 1 check (Janosch)
+>         * General cleanup (Thomas, Janosch & Janis)
+>         * Snippet cleanup (Thomas & Janosch)
+> 
+> MERGE:
+> https://gitlab.com/kvm-unit-tests/kvm-unit-tests/-/merge_requests/18
+> 
+> PIPELINE:
+> https://gitlab.com/frankja/kvm-unit-tests/-/pipelines/390243055
+> 
+> The pipeline fails because the new SKEY checks fail without a QEMU fix
+> which is not yet in the CI's QEMU version. I've already contacted
+> Thomas about this.
+> 
+> PULL:
+> The following changes since commit b4667f4ca26aea926a2ddecfcb5669e0e4e7cbf4:
+> 
+>    arm64: gic-v3: Avoid NULL dereferences (2021-10-12 09:33:49 +0200)
+> 
+> are available in the Git repository at:
+> 
+>    https://gitlab.com/frankja/kvm-unit-tests.git s390x-pull-2021-10-18
+> 
+> for you to fetch changes up to a2b44f223e7655155ff926eea60eb40e0b4d14f5:
+> 
+>    lib: s390x: Fix copyright message (2021-10-18 09:31:39 +0000)
+> 
+> ----------------------------------------------------------------
+> 
+> David Hildenbrand (1):
+>    s390x: skey: Test for ADDRESSING exceptions
+> 
+> Janis Schoetterl-Glausch (1):
+>    lib: s390x: Add access key argument to tprot
+> 
+> Janosch Frank (13):
+>    s390x: uv-host: Explain why we set up the home space and remove the
+>      space change
+>    lib: s390x: Control register constant cleanup
+>    lib: s390x: Print addressing related exception information
+>    s390x: uv: Tolerate 0x100 query return code
+>    s390x: uv-host: Fence a destroy cpu test on z15
+>    lib: s390x: uv: Fix share return value and print
+>    lib: s390x: uv: Add UVC_ERR_DEBUG switch
+>    lib: s390x: Print PGM code as hex
+>    s390x: Add sthyi cc==0 r2+1 verification
+>    s390x: snippets: Set stackptr and stacktop in cstart.S
+>    lib: s390x: Fix PSW constant
+>    lib: s390x: snippet.h: Add a few constants that will make our life
+>      easier
+>    lib: s390x: Fix copyright message
+> 
+> Thomas Huth (2):
+>    s390x: mvpg-sie: Remove unused variable
+>    s390x: snippets: Define all things that are needed to link the libc
+> 
+>   lib/s390x/asm/arch_def.h  | 55 +++++++++++++++++-----------
+>   lib/s390x/asm/mem.h       | 12 +++++++
+>   lib/s390x/asm/uv.h        | 21 ++++++-----
+>   lib/s390x/css.h           |  2 +-
+>   lib/s390x/fault.c         | 76 +++++++++++++++++++++++++++++++++++++++
+>   lib/s390x/fault.h         | 44 +++++++++++++++++++++++
+>   lib/s390x/interrupt.c     | 29 +++++++++++++--
+>   lib/s390x/sclp.c          |  2 +-
+>   lib/s390x/sclp.h          |  2 +-
+>   lib/s390x/smp.c           |  3 +-
+>   lib/s390x/snippet.h       | 34 ++++++++++++++++++
+>   s390x/Makefile            |  3 +-
+>   s390x/mvpg-sie.c          | 16 ++++-----
+>   s390x/skey.c              | 28 +++++++++++++++
+>   s390x/skrf.c              |  6 ++--
+>   s390x/snippets/c/cstart.S | 13 ++++++-
+>   s390x/snippets/c/flat.lds |  2 ++
+>   s390x/sthyi.c             | 21 ++++++-----
+>   s390x/uv-guest.c          |  4 ++-
+>   s390x/uv-host.c           | 30 ++++++++++------
+>   20 files changed, 333 insertions(+), 70 deletions(-)
+>   create mode 100644 lib/s390x/fault.c
+>   create mode 100644 lib/s390x/fault.h
+>   create mode 100644 lib/s390x/snippet.h
+> 
 
-No problem with that, I think "unbounded" is descriptive enough that we 
-can remove the __ too.  So that would be kvmalloc_node_unbounded / 
-kvmalloc_array_unbounded / kvcallc_unbounded?
+Merged, thanks.
 
 Paolo
 
