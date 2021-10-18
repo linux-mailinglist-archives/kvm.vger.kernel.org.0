@@ -2,102 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 89B4E432658
-	for <lists+kvm@lfdr.de>; Mon, 18 Oct 2021 20:29:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C975C432672
+	for <lists+kvm@lfdr.de>; Mon, 18 Oct 2021 20:34:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232025AbhJRSba (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Oct 2021 14:31:30 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26816 "EHLO
+        id S232831AbhJRSgN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Oct 2021 14:36:13 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41626 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231215AbhJRSb2 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 18 Oct 2021 14:31:28 -0400
+        by vger.kernel.org with ESMTP id S229696AbhJRSgM (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 18 Oct 2021 14:36:12 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634581757;
+        s=mimecast20190719; t=1634582040;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=+zrJzRq36uZrK1pQoD4cVchCz3CVWNsoHXcKclsvSjE=;
-        b=Lbw9f1E0GpfUKbsvYq+QGLeWydsaSH1YhK9/rDdkGXJqcmlEBpMASzcuS946G0eS6oIzcD
-        2+8069uH+BFy93kHCPzfRnfo500bxwNZwWQLX5w/coOE1t7NkYNUF/4zVYxumXl31vqqu4
-        Kknhi8ue1tzCZ53nru8+Kxr1x+q3djw=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-477-enzkncDMMb6YQyjZuMY0aA-1; Mon, 18 Oct 2021 14:29:15 -0400
-X-MC-Unique: enzkncDMMb6YQyjZuMY0aA-1
-Received: by mail-ed1-f71.google.com with SMTP id l22-20020aa7c316000000b003dbbced0731so15199963edq.6
-        for <kvm@vger.kernel.org>; Mon, 18 Oct 2021 11:29:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=+zrJzRq36uZrK1pQoD4cVchCz3CVWNsoHXcKclsvSjE=;
-        b=7BrRLWhpTQ30fyd+J86gZeC2syfYNutc5HPQKBFcJG+u0GWqWoBtcRUx+vQwwQBozx
-         g23nBtWDSRSR61ozKhvmayea2DH5QJEZWJRfeCUqSMnXYTDqIvwWl8n/4dPQ06tWczP6
-         CvfTRZxGk611v40+aZlRfCxRyVZaaEV1NJApZzhGk1EA68wNBh2CbSe9bRGMhvDoXMyn
-         naDNSHrTFUFvFdFdctRYDhlOKQDirzfbUTQVpVJn2phC5CNtPw6DfQh0kUAUYGlwt4GA
-         gTgNeiR6nnywEgIbkNvg8aMr+oNaL1UiHi662VODHv5KmFqGc6/Ep9nBnBcUZgXeur0y
-         JT1Q==
-X-Gm-Message-State: AOAM530KBdNuLimmpW18p1dStCWGmoOpBh+UV/GTl7I/vSQJ3MNZF5u1
-        50cKDH2HqXaSpBPhMgTojuOEuhNIN8WcKQCxLrSjLH10/HeHjtt2tw15SunpGzjb9cAjKtFp++7
-        fl/be825NGQhW
-X-Received: by 2002:aa7:cb10:: with SMTP id s16mr49380883edt.311.1634581754592;
-        Mon, 18 Oct 2021 11:29:14 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy/L8ULpPs3NPQuxX00gJmUT3pfBNY82BNyjykCPa2tBJ4Vti+M0Cbd2x62rSJlw3P2Odb9eA==
-X-Received: by 2002:aa7:cb10:: with SMTP id s16mr49380870edt.311.1634581754432;
-        Mon, 18 Oct 2021 11:29:14 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id a13sm9116280ejx.39.2021.10.18.11.29.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 Oct 2021 11:29:13 -0700 (PDT)
-Message-ID: <93d4156f-4d81-da15-b93e-79f3ec9bebdb@redhat.com>
-Date:   Mon, 18 Oct 2021 20:29:12 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [GIT PULL] KVM fixes for Linux 5.15-rc7
-Content-Language: en-US
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     Jim Mattson <jmattson@google.com>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>
-References: <20211018174137.579907-1-pbonzini@redhat.com>
- <CAHk-=wg0+bWDKfApDHVR70hsaRA_7bEZfG1XtN2DxZGo+np9Ug@mail.gmail.com>
- <daba6b06-66cb-6564-b7b0-26cb994a07cd@redhat.com>
- <CAHk-=wgScNWP7Ohh5eEKgcs3NLp9GZOoQ6Z-Kz0aByRtHoJSrw@mail.gmail.com>
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=OSygEczErC91lPb9+ylTpKzIGZjPehE9TLoLjeOo4oc=;
+        b=DUwkuQYD9BwiohN9mTeYCTE0Xb3EjeypFHy1b8jizx1Z34SNnrrUhkNQykE22JqLx45LeP
+        qbunAJsyrxf7lb5IRsFEvNZQSM4KGFDEIpjsaWlZ8Q3K+GPibNeKrjINcs1CJwlbjvIAhD
+        iJQZtW55trT78w0iS5NSlTNKjf8p7Qc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-311-rLOD-y0-MHKaXupbUOb-jw-1; Mon, 18 Oct 2021 14:33:57 -0400
+X-MC-Unique: rLOD-y0-MHKaXupbUOb-jw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F42028042E1;
+        Mon, 18 Oct 2021 18:33:55 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A2D5E5BB06;
+        Mon, 18 Oct 2021 18:33:55 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <CAHk-=wgScNWP7Ohh5eEKgcs3NLp9GZOoQ6Z-Kz0aByRtHoJSrw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+To:     torvalds@linux-foundation.org
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: [GIT PULL] KVM fixes for Linus 5.15-rc7, take 2
+Date:   Mon, 18 Oct 2021 14:33:55 -0400
+Message-Id: <20211018183355.588382-1-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 18/10/21 20:15, Linus Torvalds wrote:
->>           * Use a bitwise-OR instead of a logical-OR to aggregate the reserved
->>           * bits and EPT's invalid memtype/XWR checks to avoid an extra Jcc
->>           * (this is extremely unlikely to be short-circuited as true).
-> That makes very little sense.
-> 
-> It seems to be avoiding a 'jcc' and replace it with a 'setcc' and an
-> 'or'. Which is likely both bigger and slower.
+Linus,
 
-The compiler knows that the setcc is unnecessary, because a!=0|b!=0 is 
-the same as (a|b)!=0.
+The following changes since commit 7b0035eaa7dab9fd33d6658ad6a755024bdce26c:
 
-> If the jcc were unpredictable, maybe that would be one thing. But at
-> least from a quick look, that doesn't even seem likely
-> 
->   The other use of that function has a "WARN_ONCE()" on it, so
-> presumably it normally doesn't ever trigger either of the boolean
-> conditions.
+  KVM: selftests: Ensure all migrations are performed when test is affined (2021-09-30 04:25:57 -0400)
 
-Yes, and that was why it used a "|".
+are available in the Git repository at:
 
-Anyway, not worth arguing for or against; I'll just change it to logical OR.
+  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+
+for you to fetch changes up to 9f1ee7b169afbd10c3ad254220d1b37beb5798aa:
+
+  KVM: SEV-ES: reduce ghcb_sa_len to 32 bits (2021-10-18 14:07:19 -0400)
+
+----------------------------------------------------------------
+Tools:
+* kvm_stat: do not show halt_wait_ns since it is not a cumulative statistic
+
+x86:
+* clean ups and fixes for bus lock vmexit and lazy allocation of rmaps
+* two fixes for SEV-ES (one more coming as soon as I get reviews)
+* fix for static_key underflow
+
+ARM:
+* Properly refcount pages used as a concatenated stage-2 PGD
+* Fix missing unlock when detecting the use of MTE+VM_SHARED
+
+----------------------------------------------------------------
+
+I left out the two problematic patches.
 
 Paolo
+
+
+Christian Borntraeger (1):
+      KVM: kvm_stat: do not show halt_wait_ns
+
+Hao Xiang (1):
+      KVM: VMX: Remove redundant handling of bus lock vmexit
+
+Janosch Frank (1):
+      KVM: s390: Function documentation fixes
+
+Paolo Bonzini (5):
+      Merge tag 'kvm-s390-master-5.15-1' of git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux into kvm-master
+      KVM: SEV-ES: fix length of string I/O
+      Merge tag 'kvmarm-fixes-5.15-2' of git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into HEAD
+      KVM: X86: fix lazy allocation of rmaps
+      KVM: SEV-ES: reduce ghcb_sa_len to 32 bits
+
+Peter Gonda (1):
+      KVM: SEV-ES: Set guest_state_protected after VMSA update
+
+Quentin Perret (3):
+      KVM: arm64: Fix host stage-2 PGD refcount
+      KVM: arm64: Report corrupted refcount at EL2
+      KVM: arm64: Release mmap_lock when using VM_SHARED with MTE
+
+Sean Christopherson (2):
+      Revert "KVM: x86: Open code necessary bits of kvm_lapic_set_base() at vCPU RESET"
+      KVM: x86: WARN if APIC HW/SW disable static keys are non-zero on unload
+
+ arch/arm64/kvm/hyp/include/nvhe/gfp.h |  1 +
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c | 13 ++++++++++++-
+ arch/arm64/kvm/hyp/nvhe/page_alloc.c  | 15 +++++++++++++++
+ arch/arm64/kvm/mmu.c                  |  6 ++++--
+ arch/s390/kvm/gaccess.c               | 12 ++++++++++++
+ arch/s390/kvm/intercept.c             |  4 +++-
+ arch/x86/kvm/lapic.c                  | 20 +++++++++++++-------
+ arch/x86/kvm/svm/sev.c                |  9 +++++++--
+ arch/x86/kvm/svm/svm.h                |  2 +-
+ arch/x86/kvm/vmx/vmx.c                | 15 +++++++++------
+ arch/x86/kvm/x86.c                    |  3 ++-
+ tools/kvm/kvm_stat/kvm_stat           |  2 +-
+ 12 files changed, 80 insertions(+), 22 deletions(-)
 
