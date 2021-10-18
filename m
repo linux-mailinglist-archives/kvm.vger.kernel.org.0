@@ -2,222 +2,181 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 995BF4317EE
-	for <lists+kvm@lfdr.de>; Mon, 18 Oct 2021 13:48:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2A090431823
+	for <lists+kvm@lfdr.de>; Mon, 18 Oct 2021 13:51:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230434AbhJRLuN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Oct 2021 07:50:13 -0400
-Received: from de-smtp-delivery-102.mimecast.com ([194.104.109.102]:50152 "EHLO
-        de-smtp-delivery-102.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231836AbhJRLuD (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 18 Oct 2021 07:50:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=mimecast20200619;
-        t=1634557670;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=qzWTeJY2Ls402jqJATNhZb2nZj0Jlch56uYSWcc+gE0=;
-        b=joqmW8uIad/JoxVJH98dhpOc1FOCPPGMGwkQHJCGwfJw71u7eeyyJM8RxAKUvqRdiU5sr9
-        SxKfLh5SxvqAH+JFYAr8XkJR1c78PZFxA8YoZNyKxtf8+/TNNVYbGQWnZdH+AmdXNepdIe
-        T2OXrDEgJvQpusvm8NVqkhxnUhHqNec=
-Received: from EUR05-VI1-obe.outbound.protection.outlook.com
- (mail-vi1eur05lp2176.outbound.protection.outlook.com [104.47.17.176])
- (Using TLS) by relay.mimecast.com with ESMTP id
- de-mta-31-3QhFs-rnMBiPsgJP5ySJNA-1; Mon, 18 Oct 2021 13:47:49 +0200
-X-MC-Unique: 3QhFs-rnMBiPsgJP5ySJNA-1
+        id S231609AbhJRLxW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Oct 2021 07:53:22 -0400
+Received: from mail-bn7nam10on2085.outbound.protection.outlook.com ([40.107.92.85]:16821
+        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S229569AbhJRLxV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Oct 2021 07:53:21 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=hSbNJrHdtHXOPwuQZjlE4KMQjyMkw9Ex2dvKYuEgviIc4f4bmsZc0iW8EkyrW22hlturqvKR3AYn3hFyWwbHa6LGJ0baG0DJ0eHxK1TYyoMVRDrqEzeoLFJwSwLV29U0a2jSsrbm2SODwr1iVJ4lJFdu4vPn37lqS3WygAuLt1eWmfaDQA4GV+SllwBGj2H4795zI8CXpCgeQju99iQ9F7ANjz2bxYU/MnerOLCy6inzTPmzim4qCIpixGtpOHTgFDXxD89MOvRjuhoDXuPAsubW0FbHUBMVuHd6iLqVN2PWFQho3b3HZ5SEGdGjR1LZQzc9uuLMOUuwBZRQKNpnIQ==
+ b=EMAfjh1Ot/SuDQMh9L0YOAu5VvM2t2ZKDEK+IvXw06rEZX2IUgkL5cfgBaBVZZdA4vkSXayOQurtuIaXnXl3XstqFZ2MZ8tou8UzrETpNEccCc1S8J121XVaZiFixXymuDFEwb3GWaLRI722tTv5UTRu2qp5Fv2kycGXXVIuHM0eXdOau3DMHG/LXonDF9HteT+bzPFwCNA5yhP6+UHvnvsio1WteUVuVK9MO+sOf/LpyBBifw/G1zJBU7nDL+EohD44AKbDZWaHokkOBmJWd3cH7JqQPMOnlNzgN7wG1HtQXjMqI71WE2mt87pPkpn1XAaF4RA2Ym8rHYKsNMFbyA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=qzWTeJY2Ls402jqJATNhZb2nZj0Jlch56uYSWcc+gE0=;
- b=XSqgvxeGyGHXt/pca2Z1mUxjYvcY/gSZhukcEP43WHeDC85jfgXvgVvHdi8A9aJZ+xMqtAX0mkingf77Pgx27Tl2PEhN/UEUDrYZyR+kOX3u0Qzckb0cBymNz2mb1YzkKuUTH8auySUaKFM68gxRjCpTcykJ9PpmWPO0rIccFqwFeD/swMBbORi5d2NqQZDX9pLnPtRgVLUoEEdYvKF1SaPl+lnFznoFCgBRM/2o5b2gQd8XJY+C5EGy65dzXpXogcCxSYIPn4L94hw6VeFPEw7ejz/mwRl6tzGtDe/LYnSyo/fULP3kxel6y9FmpVEpFc+H45zu4pTT3am4Zqnnmw==
+ bh=l1aKkvd4m1RF/M8NQ6yZqzophLFrD1SUrHetj0Ib9T8=;
+ b=Qfb4TsxEaB50uI3plWPRPXjG3gA7kyhG8zf2zX4sjpqmSpTas7pQYTnpKQ7bnf4FU+sWvS6ftQBgc6g0HESipOsE1JjzmfIUGRNfYDO0G2FZ/ShMvBa/7AM1crw5JHa9Ylpy2aowsVnTvl9iiBHuibAlS28iOHyXi1DW1ezm3m0Jms03UIQltfUMwZ81xH6CDNvne5pYDvZ0wcTAKukC/bKQJ6+J/1Wb5eWJtLBIMHdH+2z6XpSh2XIqVbMDaA9Tv6QZkgltB91Q5V+a5sXeWY+UKD+09Do4Q67tGyV8Nrh1jCZ3eE/KZOWT+J9DSCOfCGoBB5A0zGP6sKmBJEBl/Q==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
- dkim=pass header.d=suse.com; arc=none
-Authentication-Results: suse.de; dkim=none (message not signed)
- header.d=none;suse.de; dmarc=none action=none header.from=suse.com;
-Received: from AM0PR04MB5650.eurprd04.prod.outlook.com (2603:10a6:208:128::18)
- by AM8PR04MB7825.eurprd04.prod.outlook.com (2603:10a6:20b:24f::14) with
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=l1aKkvd4m1RF/M8NQ6yZqzophLFrD1SUrHetj0Ib9T8=;
+ b=TJdFadyb3Q2S9Tgw7jTvypQtEzPMqZfNIL98Z5xUBF0NRjRZS3Z2lagR2EX6eRpHcyfxNtsqYlrge4ZE+mroEUwDahdHj1ag0jMcF9nz5n8WUe7BLD1BUysXIkZIGJYZCojDEmBJm24IOzc7GrdHK7G+gz6Y0HCayrMuaW8Zb0Gp0G73wY4SmrfpWkKwAEsgNbJrjan2EXfIqyTbnNxpVgiU9fCIToUCT369UZoKWxhPwA60eko74jjzGjS1mdeOhwpPgvqWrmlp9sRSHC3xw+QSomf4BWHyaa4DrAfblIZpbv9ETw/+pcnE6ERnNIx9l0aGDkaO+CJ7uz4WkSXeKQ==
+Authentication-Results: nvidia.com; dkim=none (message not signed)
+ header.d=none;nvidia.com; dmarc=none action=none header.from=nvidia.com;
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
+ by BL1PR12MB5080.namprd12.prod.outlook.com (2603:10b6:208:30a::6) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4608.15; Mon, 18 Oct
- 2021 11:47:48 +0000
-Received: from AM0PR04MB5650.eurprd04.prod.outlook.com
- ([fe80::80b4:c12e:2fb5:8b30]) by AM0PR04MB5650.eurprd04.prod.outlook.com
- ([fe80::80b4:c12e:2fb5:8b30%3]) with mapi id 15.20.4608.018; Mon, 18 Oct 2021
- 11:47:47 +0000
-Subject: Re: [kvm-unit-tests PATCH v3 17/17] x86 AMD SEV-ES: Add test cases
-To:     Zixuan Wang <zxwang42@gmail.com>, kvm@vger.kernel.org,
-        pbonzini@redhat.com, drjones@redhat.com
-Cc:     marcorr@google.com, baekhw@google.com, tmroeder@google.com,
-        erdemaktas@google.com, rientjes@google.com, seanjc@google.com,
-        brijesh.singh@amd.com, Thomas.Lendacky@amd.com, jroedel@suse.de,
-        bp@suse.de
-References: <20211004204931.1537823-1-zxwang42@gmail.com>
- <20211004204931.1537823-18-zxwang42@gmail.com>
-From:   Varad Gautam <varad.gautam@suse.com>
-Message-ID: <6a5a16f7-c350-a48d-c5e7-352455b57c09@suse.com>
-Date:   Mon, 18 Oct 2021 13:47:45 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
-In-Reply-To: <20211004204931.1537823-18-zxwang42@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AM6P192CA0023.EURP192.PROD.OUTLOOK.COM
- (2603:10a6:209:83::36) To AM0PR04MB5650.eurprd04.prod.outlook.com
- (2603:10a6:208:128::18)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4608.16; Mon, 18 Oct
+ 2021 11:51:08 +0000
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::e8af:232:915e:2f95]) by BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::e8af:232:915e:2f95%6]) with mapi id 15.20.4608.018; Mon, 18 Oct 2021
+ 11:51:08 +0000
+Date:   Mon, 18 Oct 2021 08:51:07 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Yishai Hadas <yishaih@nvidia.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>, bhelgaas@google.com,
+        saeedm@nvidia.com, linux-pci@vger.kernel.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, kuba@kernel.org, leonro@nvidia.com,
+        kwankhede@nvidia.com, mgurtovoy@nvidia.com, maorg@nvidia.com
+Subject: Re: [PATCH V1 mlx5-next 11/13] vfio/mlx5: Implement vfio_pci driver
+ for mlx5 devices
+Message-ID: <20211018115107.GM2744544@nvidia.com>
+References: <20211013094707.163054-1-yishaih@nvidia.com>
+ <20211013094707.163054-12-yishaih@nvidia.com>
+ <20211015134820.603c45d0.alex.williamson@redhat.com>
+ <20211015195937.GF2744544@nvidia.com>
+ <20211015141201.617049e9.alex.williamson@redhat.com>
+ <20211015201654.GH2744544@nvidia.com>
+ <20211015145921.0abf7cb0.alex.williamson@redhat.com>
+ <6608853f-7426-7b79-da1a-29c8fcc6ffc3@nvidia.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6608853f-7426-7b79-da1a-29c8fcc6ffc3@nvidia.com>
+X-ClientProxiedBy: MN2PR15CA0011.namprd15.prod.outlook.com
+ (2603:10b6:208:1b4::24) To BL0PR12MB5506.namprd12.prod.outlook.com
+ (2603:10b6:208:1cb::22)
 MIME-Version: 1.0
-Received: from [192.168.77.116] (95.90.166.134) by AM6P192CA0023.EURP192.PROD.OUTLOOK.COM (2603:10a6:209:83::36) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4608.16 via Frontend Transport; Mon, 18 Oct 2021 11:47:47 +0000
+Received: from mlx.ziepe.ca (142.162.113.129) by MN2PR15CA0011.namprd15.prod.outlook.com (2603:10b6:208:1b4::24) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4608.15 via Frontend Transport; Mon, 18 Oct 2021 11:51:08 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1mcRAZ-00GFJi-7o; Mon, 18 Oct 2021 08:51:07 -0300
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 8170501e-b3c5-4593-5064-08d9922d1b16
-X-MS-TrafficTypeDiagnostic: AM8PR04MB7825:
-X-Microsoft-Antispam-PRVS: <AM8PR04MB782582473CC1714A5E2E2876E0BC9@AM8PR04MB7825.eurprd04.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Office365-Filtering-Correlation-Id: e7b18491-b35e-465d-0df3-08d9922d92de
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5080:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <BL1PR12MB50807F27176CEF9A8520EA32C2BC9@BL1PR12MB5080.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: mCcSSHvw9d387YMY0pBgqJ+DEl3LMS+vEhcd1FbtNgdnJGI4CpGPdO/HoWP9hfEkGLvPcbGUYq36o9sJJREqrFROWWFCgEsroDItHbpsBBNGpVrgVGIxK/X0WANFvCfcaQnDqE+Nv/SgqhBSo4DruOJi0RhxiQdC7P/OzIme8s8EmqMvQtw2UnPm3RgjrSHk1vZRCixUzJueBv0kEcFfrlwipra038DakSJ9MoUL4VMmjU/Rb2h4Rc5Kz+qNQ8a10QOHr3+ZMa3E9ZTf1qC8irOJ6gYqKg0aZeR8DmtIKKHSAvNXFesjLEXanVJIHtzEsUHeUQjw3xxRl4qi5RZQBzcKTMqviSDEuHbmrU2NVRyB9A9+2COfI20AC2xvtcRcWJtHrCuQ4C5Qrvmp3pqM23zMgHnbQQ4dDhKjLWkGhnz9UNrri+48V0EtiBhk6NhyvM8HJbEC8wQ8CP6zJ0b1INkhKGd1dOKupIojnSYCCZKaVFMRiucL0i2RdROeuo5lbtKuT4/zbXrYOahQY4pw4iEN4Dj8ADk4hVpzXyvMERQgWs44BkkQ5A27uYUQ2zIFwulsMmKuH4+zerC17IKHDTBiIRYj+vV1qFgclNtNAPBQw1D2PNMz/m6FDvZ0krkAJNmQlZo5B61wWjootTdXgQWoTjrI0nZjtIoK9zc0loq+G4mlH2LeFruMPJuHAoGJVHa8j16Ro+nuqPK7adl8HD5XnNX62BxId4diz0faBUI=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB5650.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(4326008)(2906002)(316002)(2616005)(83380400001)(7416002)(186003)(8676002)(44832011)(26005)(16576012)(5660300002)(508600001)(8936002)(66556008)(66476007)(6486002)(86362001)(66946007)(36756003)(31686004)(31696002)(956004)(53546011)(38100700002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: ACOw/G6/CD5s850dDHeGqK7NgX6LikhKVynHBtWU5VGwJxyzYSKO23gJ9duOEl+5GP+A/FrLeEqzDSsu2QmnpMMkjSZIp5JurX8zSRdIoMhtRA3Q8vwJLRPXLLhreXem7c7FLvVu/kn9Df+axpTtQ7FeX13py7n/r4ps8a0FAHXVntp4JPEKTba6T9H48WKn+CD14sqYO+DHR1cgFCh8tTd46r2Otb60gImDAlsj3ZQSU231qlTG1BZ2oS1P/hhPSiQQMIbWcQSn//bdGxrkcwa/a4grOjR4x4Wf0sC6ZiGmptU+xCAfAAf+2PZpnBo0tlxwsmf5dq5EwuWzEBbm1J/XJBXyYm7Gx9LkvPRIqSqbglh2T550CuazUf2ivXTCkj9RIsYm1jH0+s/mmIuBBZ81wqZ1q4296cCQ9H7uwuxQMaVRRUayHH4bISostOU1/WkdxkNg9yWZKXCuOV+phkFDNrifGIKCDJ7BDFcdKNEI9q3hbuc0ClY8Ue+VlcHW15WrVDL9xDImM17ftIwZZTCRNls7earTOM095OOq1L/nywozpVj90gvct42Bn2IPxZbhagu6q+2+1Z7hluz2z2oboqjA9YhdTQt0HWQMo0L9Cc7F9wG0cmCiVJfL5UHRbez8kgqOa31hBN4oB5qTig==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(66946007)(66476007)(66556008)(2616005)(107886003)(6862004)(508600001)(33656002)(9786002)(6636002)(5660300002)(426003)(2906002)(316002)(26005)(38100700002)(36756003)(186003)(37006003)(9746002)(4326008)(1076003)(53546011)(86362001)(8936002)(8676002);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TFE4Z3h4dFNHMUwvR3ZpUVdIV1drWmxDT1hqamFaeFdtRGFKaU96Z3g1dnJx?=
- =?utf-8?B?cFQrRmxlVkZIbWdWRTQrcjdzeGhQREhVNEt2QXp6dTRSTWl5NUJMUEE2LzRY?=
- =?utf-8?B?RnFWTXZIS05ramx1QnBwelNBVnNtSzBNV0JHUUhuZ1Z2dVBFYkxjdi91NTVW?=
- =?utf-8?B?STZuZjRJUWplbVFOVE40Si9Yb2dGVnB0WWxFblF1SmZJYUhNVW9qUFY0TFNw?=
- =?utf-8?B?OEI4MzlaMVpUUExzVCtwZG5oUXIvaTJQMWtaZlhBUUpseFdvbHljeGtqU2Iv?=
- =?utf-8?B?VVZEbHpvRDdwLytYVzVYYUtuRzFidDBSa3BFNFM2Z2k5QzdSUm5QVGQvNWcv?=
- =?utf-8?B?a0JlcjRHckdZQ212QTVySDFpYnRISnBraUpYTkY0WGVqVENqZUxURzBvMmk2?=
- =?utf-8?B?ekJoaVBnSURxUVpVOGNkMHpEZHdEdFdtNlY1bjJhN2VUZWlNV2ZIWXRvQ3NQ?=
- =?utf-8?B?K2oxbnNSaE1IY29VT3dtV2pRVzZSZlRCR043SE9yRnVoZkMvQnA4aHhpMndo?=
- =?utf-8?B?VE1wekJqQzA3b0lkNXR4SHFGd2wzN3ZueEM5c1NPK1B0Unl6MWRMcWs0UEk0?=
- =?utf-8?B?L0taRnlmejhqYy91cXhrVk5mTzh4bitMREVJVjd0UnB4UzNFUHVDakhOcWZO?=
- =?utf-8?B?WFZ1UUxQdVM2TEtVVG1pSHMzNWlqQ0RVS0dZVDAxMjE5SlFubEZFa0xHemkr?=
- =?utf-8?B?Wlk4OTBtMEdRcG80UnhwVmUwZUUvUmttaTUydDl2Q25qYnQyVjRGSmpqbVI0?=
- =?utf-8?B?SWVnc3RBeWJ4R210c1orRzl3NkNsdk45QW1jeFgwMFBsK09KOWxLcklUVFJ1?=
- =?utf-8?B?WXBMSWJNdEZWbmRVKzV5Vll2OHRqOVJ3aXdPSVVNV2svdWd1WkdPalhnQ05t?=
- =?utf-8?B?NklGczhNa0pXcE1RR1FhZ1pxVi9WY0JQTmdGZWYvMEgwc0RmR3d4M3hUSG4w?=
- =?utf-8?B?LzV5ZEVBZDdWNE1TTnQvZ09KZ1c4OS92bEdqcEY1WWdxMUZSL0kyZjBxa2dS?=
- =?utf-8?B?YXgwVzlUT0gzcHROYmp6a3RSc2FObWtGM1dkZ01Rc3hWdHJWT1huWHlLRStW?=
- =?utf-8?B?VGJFMFFUeXhuMkUyTWk1QWJISkxGVUs5TlpweW9mV0ZyenRXR2p2RnRhdzE5?=
- =?utf-8?B?MXJwcktDbmxwamhiWnpMQndrTmgrc0taaDVoMTU0K3VBS05RQW0xNStwbzRs?=
- =?utf-8?B?V09JUW1xWGJPbXd4WDgyQkh6Sy82anZ3NVgvNTREOFBqZEhPWnYwbERlMk5Z?=
- =?utf-8?B?Z04vUHQvMGRiNnZGNjh1SGFtTjdUNTl5cVREUzg3N3FTTUx3OUY1VUZYc09C?=
- =?utf-8?B?cStIRWhpWDVrRjhsalpsbU5ycWRKdnVKWXVnazhKUFIrR0E1dTNRODlGMGpK?=
- =?utf-8?B?dnp5UjdGMWlBUHZqcEZrYVFVZ0k5aEgvRDZtdDMwcGpFdFhINXNJVlBVZlMz?=
- =?utf-8?B?OVRzRU5CcytpOU8vakpqQjNqMGpFYjE4OG5LeWZWK0E2eUhMUUM0UzNRYkd1?=
- =?utf-8?B?blFnWk1zNng4RnVCVUViVk9qWk1oNFZzb2FoZ29majRDbVJYNFNIQm9sM1Rt?=
- =?utf-8?B?aEV2YjRSMjlwMWJGaTNwOGhuVWNZMHhvN1dnYm5COFlxR2hEemc5bDBRTkxN?=
- =?utf-8?B?a0hsS2Y4YndCVTJQZ1hCUWNzSEtoaW5CcTlybmlUV1M3NWNFZXFGN1llekE1?=
- =?utf-8?B?TXk1azZseXhGTm5ScDhHRDl4WXYwVDVsclRMbE9XM0d0blIvcHBkTk14dzhS?=
- =?utf-8?Q?o6p8ZgzBny0bTcVAwGB4aslkGIRb6cgxdyjuKP2?=
-X-OriginatorOrg: suse.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8170501e-b3c5-4593-5064-08d9922d1b16
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB5650.eurprd04.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?n9NIR19rGQVU5vOtlhgOkWLvm6qRBCo7M1fs34P6ZCQZdfIBkdjvP2striYr?=
+ =?us-ascii?Q?zrWDRgYRwJAnfUKAGiVYc/Jp7Eyc1wAMztXEEKjV84ZetL4KXUNuL3Ilv7ua?=
+ =?us-ascii?Q?fkFpfDQyNktf9tvmO5SIipVWI1dWxboN/zXrHR1AAtIiTlg5tVmSqaf1XerW?=
+ =?us-ascii?Q?+JyHt2VsNnblDQWQWRNsxzYjbkf5l3wea4XjSNdWMOtSLnUXmH8DTsQICpZy?=
+ =?us-ascii?Q?w1C3RPz4phtlqof0XQj2a3RzlZgaba3Ceykd4SCjuMZ2Iw8UVWkGk1DXotdF?=
+ =?us-ascii?Q?O8lFnND4H2aZZox7EArf+rJBllKntSzWbA9SceTKfyMNtmy5m8uImh5BBoAs?=
+ =?us-ascii?Q?9t79vcYjw0k2q9jlpTQNYN+g8nT06s2mDEPl5laSTx6a6SSAiDqspyExgH7D?=
+ =?us-ascii?Q?QtHNwtu+1XsHR3q3yBMYla/1bX9pHqbUh0H60FRpdAK+37FMTcjzJIYPw2zH?=
+ =?us-ascii?Q?VnOkYeBNmhmMyVX0FaDvEgMPyokS51LDgxbJz+8bx7G/bgfwjENiL2fsARWE?=
+ =?us-ascii?Q?LSC8HKqFFZGoe6F5TgstOYtx0TnYKPYCVKg4GqFriFVQOjwccBWwh8EJjGsE?=
+ =?us-ascii?Q?EUARgJ7MggH8lxf1RRGD3GXjo/setNJGt48el9OvJCU8Ib1xalws+675kl/r?=
+ =?us-ascii?Q?+M5nhrqbA9jLUtmnH3qAThimc8zYdZeiEw6y28dZu4VH8HstQ/6h8GTwFFZ/?=
+ =?us-ascii?Q?xLyQk1rfptvSnuhlMwuHbTuAmZ4tTB8YFZJaLqT59EBGkfVFhD+5k3PKg/3g?=
+ =?us-ascii?Q?OJIdUbxqBsHfJbKRqFS50AdxJXGT+NFNzJ0Ak4bR0VsY7/KEHHHziiGuJoME?=
+ =?us-ascii?Q?qr60HPjJqEUV4igzSPGrA1orJp2SPidYk8alNuDIvzjN6QfGVASkAVaaz1NB?=
+ =?us-ascii?Q?Xkh6X5AT//Vo6tZ546pKAREtPD8ZY9/jRNejLNut6Io7Y0ud/ybqv8VYtqKR?=
+ =?us-ascii?Q?xZXjDghDKiPWxzBEF0IZPArFy2Tbq2+JwirpDkcIq8BOPwJGuuB2KqwE1Ny1?=
+ =?us-ascii?Q?fzpdS4aDtPN53xUkJu5PFEesdIkljoIesUmLNz9LU96kBwLisEI5T2+Pzu4k?=
+ =?us-ascii?Q?2Sbb+vqgzYcdHxHQElhCWWVOpNbx7wKAAWKHGBsO3lF/AT97cYnVNROq9jDm?=
+ =?us-ascii?Q?4IpU9i4YLolZiPKxIztlJUlJf+7j68H87Wv7WavTPNQHQ9D8PWbV6Y6I4Z3j?=
+ =?us-ascii?Q?ikoqdAQhBGbuXvKKjFKHKAaq88UFyrjyEG6C+0djVSh+CmYbv1d7qpAWaR8C?=
+ =?us-ascii?Q?LCBi86ndKV/9SAQU+wDr5N4GQ8lg7S/QYXO1d+obM7JJBGuRTOL8JZiJKNij?=
+ =?us-ascii?Q?jji7gZ6puh6/1sXqjuYislco?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e7b18491-b35e-465d-0df3-08d9922d92de
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Oct 2021 11:47:47.6356
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Oct 2021 11:51:08.6667
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ZjAd0eyjER1KrJo7DvyzpEWVIgGdxUmKVGXW9iNgKMgZG/fgWzM0Vp2KYQp/jFiEPTPB8zPU7QHJW+ZSD0g2aw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM8PR04MB7825
+X-MS-Exchange-CrossTenant-UserPrincipalName: hOhkfY349nl2OmsvvxcJK3wbz/mScre6Nkk7ia8lUrbzaFDnFqAOSH+CFrHK+lio
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5080
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Zixuan,
-
-On 10/4/21 10:49 PM, Zixuan Wang wrote:
-> From: Zixuan Wang <zixuanwang@google.com>
+On Sun, Oct 17, 2021 at 05:03:28PM +0300, Yishai Hadas wrote:
+> On 10/15/2021 11:59 PM, Alex Williamson wrote:
+> > On Fri, 15 Oct 2021 17:16:54 -0300
+> > Jason Gunthorpe <jgg@nvidia.com> wrote:
+> > 
+> > > On Fri, Oct 15, 2021 at 02:12:01PM -0600, Alex Williamson wrote:
+> > > > On Fri, 15 Oct 2021 16:59:37 -0300
+> > > > Jason Gunthorpe <jgg@nvidia.com> wrote:
+> > > > > On Fri, Oct 15, 2021 at 01:48:20PM -0600, Alex Williamson wrote:
+> > > > > > > +static int mlx5vf_pci_set_device_state(struct mlx5vf_pci_core_device *mvdev,
+> > > > > > > +				       u32 state)
+> > > > > > > +{
+> > > > > > > +	struct mlx5vf_pci_migration_info *vmig = &mvdev->vmig;
+> > > > > > > +	u32 old_state = vmig->vfio_dev_state;
+> > > > > > > +	int ret = 0;
+> > > > > > > +
+> > > > > > > +	if (vfio_is_state_invalid(state) || vfio_is_state_invalid(old_state))
+> > > > > > > +		return -EINVAL;
+> > > > > > if (!VFIO_DEVICE_STATE_VALID(old_state) || !VFIO_DEVICE_STATE_VALID(state))
+> > > > > AFAICT this macro doesn't do what is needed, eg
+> > > > > 
+> > > > > VFIO_DEVICE_STATE_VALID(0xF000) == true
+> > > > > 
+> > > > > What Yishai implemented is at least functionally correct - states this
+> > > > > driver does not support are rejected.
+> > > > 
+> > > > if (!VFIO_DEVICE_STATE_VALID(old_state) || !VFIO_DEVICE_STATE_VALID(state)) || (state & ~VFIO_DEVICE_STATE_MASK))
+> > > > 
+> > > > old_state is controlled by the driver and can never have random bits
+> > > > set, user state should be sanitized to prevent setting undefined bits.
+> > > In that instance let's just write
+> > > 
+> > > old_state != VFIO_DEVICE_STATE_ERROR
+> > > 
+> > > ?
+> > Not quite, the user can't set either of the other invalid states
+> > either.
 > 
-> SEV-ES introduces #VC handler for guest/host communications, e.g.,
-> accessing MSR, executing CPUID. This commit provides test cases to check
-> if SEV-ES is enabled and if rdmsr/wrmsr are handled correctly in SEV-ES.
 > 
-> Signed-off-by: Zixuan Wang <zixuanwang@google.com>
-> ---
->  x86/amd_sev.c | 30 ++++++++++++++++++++++++++++++
->  1 file changed, 30 insertions(+)
+> OK so let's go with below as you suggested.
+> if (!VFIO_DEVICE_STATE_VALID(old_state) ||
+>      !VFIO_DEVICE_STATE_VALID(state) ||
+>       (state & ~VFIO_DEVICE_STATE_MASK))
+>            return -EINVAL;
+
+This is my preference:
+
+if (vmig->vfio_dev_state != VFIO_DEVICE_STATE_ERROR ||
+    !vfio_device_state_valid(state) ||
+    (state & !MLX5VF_SUPPORTED_DEVICE_STATES))
+
+
+> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+> index b53a9557884a..37376dadca5a 100644
+> +++ b/include/linux/vfio.h
+> @@ -15,6 +15,8 @@
+>  #include <linux/poll.h>
+>  #include <uapi/linux/vfio.h>
 > 
-> diff --git a/x86/amd_sev.c b/x86/amd_sev.c
-> index a07a48f..21a491c 100644
-> --- a/x86/amd_sev.c
-> +++ b/x86/amd_sev.c
-> @@ -13,6 +13,7 @@
->  #include "libcflat.h"
->  #include "x86/processor.h"
->  #include "x86/amd_sev.h"
-> +#include "msr.h"
->  
->  #define EXIT_SUCCESS 0
->  #define EXIT_FAILURE 1
-> @@ -55,10 +56,39 @@ static int test_sev_activation(void)
->  	return EXIT_SUCCESS;
->  }
->  
-> +static int test_sev_es_activation(void)
-> +{
-> +	if (!(rdmsr(MSR_SEV_STATUS) & SEV_ES_ENABLED_MASK)) {
-> +		return EXIT_FAILURE;
-> +	}
-> +
-> +	return EXIT_SUCCESS;
-> +}
-> +
-> +static int test_sev_es_msr(void)
-> +{
-> +	/*
-> +	 * With SEV-ES, rdmsr/wrmsr trigger #VC exception. If #VC is handled
-> +	 * correctly, rdmsr/wrmsr should work like without SEV-ES and not crash
-> +	 * the guest VM.
-> +	 */
-> +	u64 val = 0x1234;
-> +	wrmsr(MSR_TSC_AUX, val);
-> +	if(val != rdmsr(MSR_TSC_AUX)) {
-> +		return EXIT_FAILURE;
+> +static const int VFIO_DEVICE_STATE_ERROR = VFIO_DEVICE_STATE_SAVING |
+> + VFIO_DEVICE_STATE_RESUMING;
 
-See note below.
+Do not put static variables in header files
 
-> +	}
-> +
-> +	return EXIT_SUCCESS;
-> +}
-> +
->  int main(void)
->  {
->  	int rtn;
->  	rtn = test_sev_activation();
->  	report(rtn == EXIT_SUCCESS, "SEV activation test.");
-> +	rtn = test_sev_es_activation();
-> +	report(rtn == EXIT_SUCCESS, "SEV-ES activation test.");
-> +	rtn = test_sev_es_msr();
-
-There is nothing SEV-ES specific about this function, it only wraps
-rdmsr/wrmsr, which are supposed to generate #VC exceptions on SEV-ES.
-Since the same scenario can be covered by running the msr testcase
-as a SEV-ES guest and observing if it crashes, does testing
-rdmsr/wrmsr one more time here gain us any new information?
-
-Also, the function gets called from main() even if
-test_sev_es_activation() failed or SEV-ES was inactive.
-
-Note: More broadly, what are you looking to test for here?
-1. wrmsr/rdmsr correctness (rdmsr reads what wrmsr wrote)? or,
-2. A #VC exception not causing a guest crash on SEV-ES?
-
-If you are looking to test 1., I suggest letting it be covered by
-the generic testcases for msr.
-
-If you are looking to test 2., perhaps a better test is to trigger
-all scenarios that would cause a #VC exception (eg. test_sev_es_vc_exit)
-and check that a SEV-ES guest survives.
-
-Regards,
-Varad
-
-> +	report(rtn == EXIT_SUCCESS, "SEV-ES MSR test.");
->  	return report_summary();
->  }
-> 
-
+Jason
