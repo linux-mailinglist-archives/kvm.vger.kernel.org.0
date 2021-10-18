@@ -2,108 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EB4E4431660
-	for <lists+kvm@lfdr.de>; Mon, 18 Oct 2021 12:45:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 015C4431682
+	for <lists+kvm@lfdr.de>; Mon, 18 Oct 2021 12:52:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229901AbhJRKrW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Oct 2021 06:47:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21216 "EHLO
+        id S229901AbhJRKyq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Oct 2021 06:54:46 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:40117 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229519AbhJRKrV (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 18 Oct 2021 06:47:21 -0400
+        by vger.kernel.org with ESMTP id S229491AbhJRKyp (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 18 Oct 2021 06:54:45 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634553910;
+        s=mimecast20190719; t=1634554354;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=1uyCEHCiTKNcqpUO1aFErGSv7mBpXKpc6cxyusKebck=;
-        b=VDwMAlHPj1TREGSw72d4kTXjfN2/5GmI34suUagaQBI0tLgcwhnP4WVpVwVjBYz6rl4YdE
-        z7nVKQUrIRG9/WUw+vTH/CuR6X6/FDPO1RqxlFxrNeCfWN6E2ubAxqFR/9VUYfwbHLvh6F
-        wGI97KZKDVCIZuAOiZ9WdY0vKGZ5TBc=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-113-XJBqRd8lNvCB--96gauK5w-1; Mon, 18 Oct 2021 06:45:09 -0400
-X-MC-Unique: XJBqRd8lNvCB--96gauK5w-1
-Received: by mail-ed1-f70.google.com with SMTP id e14-20020a056402088e00b003db6ebb9526so13898436edy.22
-        for <kvm@vger.kernel.org>; Mon, 18 Oct 2021 03:45:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=1uyCEHCiTKNcqpUO1aFErGSv7mBpXKpc6cxyusKebck=;
-        b=aiUwYOlvp3Q6E234ZEuTrxcxIlyTq9HbXMI2Z3gsNLYwEv92IN1qe1ZLTVF2AOMeVs
-         ATIkGTG2jrbvmiB8aG+amog47COcBbUHnymnKOSQ5NxlrruvdjmTz47DNayjL0jVVpIb
-         +oVmD8NGJZfC3bZq2cfZYerRmUzGXNocxK55etD7F7VyhQ6tkjqCMRCiDfNjLp4pThei
-         e0Dbsjbj/KMQMvALro6NpCJK+j0NXZTzGqgUi5+XYuhintgveOoEZOfQ0DFD04WuxI0u
-         5Ag5DV5W1G72QWXCRNCEdOgEGM/p3tAsP/GHdMitvAIiaRsuviQgldzxVf0b/qZIZV7R
-         LOjA==
-X-Gm-Message-State: AOAM5300qUYKOAP5dhaz/+ho3pxXjQ+Dhrln4LPtigc2bH4St8bSooOZ
-        I7CgM8QpQ+Yk2bLW6pn2ZOehRhVo2g+L+BeCOGze1LsHid0gfpawZlrgxo3rgL2ZRZBahG26E8f
-        t+S95w8QbIsxQ
-X-Received: by 2002:a17:906:2606:: with SMTP id h6mr29039225ejc.301.1634553907940;
-        Mon, 18 Oct 2021 03:45:07 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz0/tbTFUMN7jqyIWaGL6Z8CJvBwotkH9WB6m3QCyklG9WBS81dg1B+4X6yxbU7dGtDKT0pcQ==
-X-Received: by 2002:a17:906:2606:: with SMTP id h6mr29039202ejc.301.1634553907748;
-        Mon, 18 Oct 2021 03:45:07 -0700 (PDT)
-Received: from gator.home (cst2-174-2.cust.vodafone.cz. [31.30.174.2])
-        by smtp.gmail.com with ESMTPSA id v13sm10285018edl.69.2021.10.18.03.45.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Oct 2021 03:45:07 -0700 (PDT)
-Date:   Mon, 18 Oct 2021 12:45:05 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Fuad Tabba <tabba@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        will@kernel.org, james.morse@arm.com, alexandru.elisei@arm.com,
-        suzuki.poulose@arm.com, mark.rutland@arm.com, pbonzini@redhat.com,
-        oupton@google.com, qperret@google.com, kernel-team@android.com
-Subject: Re: [PATCH v9 00/22] KVM: arm64: Fixed features for protected VMs
-Message-ID: <20211018104505.52jvpuhxkbstzerg@gator.home>
-References: <20211010145636.1950948-12-tabba@google.com>
- <20211013120346.2926621-1-maz@kernel.org>
- <CA+EHjTxBW2fzSk5wMLceRwExqJwXGTtrK1GZ2L6J-Oh9VCDJJg@mail.gmail.com>
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=mxMuVhTXpiGknTe7DXuPL8kxDD5PjBKCi+ZHV2Oflr0=;
+        b=UWPLmJVG3JM5xM31XJv8309mD5MLXMhY79wMCSj2CF+mhUIRpqk4M8t8UsLBdtxOqiWtBC
+        7L58hlsy6SaYdp96pzRrZ1SsQ/WwnhWoqOMp2hcYmf4ubgNfnRQshd+XN6E/TbnQsQUbeq
+        t/9Otn94z/FrkkwSfnBGvwbf6LEXk84=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-500-AfcqGGkAMveA0_IaFPmhWg-1; Mon, 18 Oct 2021 06:52:33 -0400
+X-MC-Unique: AfcqGGkAMveA0_IaFPmhWg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1F5F8801FCE;
+        Mon, 18 Oct 2021 10:52:32 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9E6F55DF35;
+        Mon, 18 Oct 2021 10:52:31 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     stable@vger.kernel.org, Naresh Kamboju <naresh.kamboju@linaro.org>
+Subject: [PATCH] KVM: SEV-ES: reduce ghcb_sa_len to 32 bits
+Date:   Mon, 18 Oct 2021 06:52:31 -0400
+Message-Id: <20211018105231.517041-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CA+EHjTxBW2fzSk5wMLceRwExqJwXGTtrK1GZ2L6J-Oh9VCDJJg@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 18, 2021 at 10:51:54AM +0100, Fuad Tabba wrote:
-> Hi Marc,
-> 
-> On Wed, Oct 13, 2021 at 1:04 PM Marc Zyngier <maz@kernel.org> wrote:
-> >
-> > This is an update on Fuad's series[1].
-> >
-> > Instead of going going back and forth over a series that has seen a
-> > fair few versions, I've opted for simply writing a set of fixes on
-> > top, hopefully greatly simplifying the handling of most registers, and
-> > moving things around to suit my own taste (just because I can).
-> >
-> > I won't be reposting the initial 11 patches, which is why this series
-> > in is reply to patch 11.
-> 
-> Thanks for this series. I've reviewed, built it, and tested it with a
-> dummy protected VM (since we don't have proper protected VMs yet),
-> which initializes some of the relevant protected VMs metadata as well
-> as its control registers. So fwiw:
-> 
-> Reviewed-by: Fuad Tabba <tabba@google.com>
-> 
-> And to whatever extent possible at this stage:
-> Tested-by: Fuad Tabba <tabba@google.com>
->
+The size of the GHCB scratch area is limited to 16 KiB (GHCB_SCRATCH_AREA_LIMIT),
+so there is no need for it to be a u64.  This fixes a build error on 32-bit
+systems:
 
-Hi Fuad,
+i686-linux-gnu-ld: arch/x86/kvm/svm/sev.o: in function `sev_es_string_io:
+sev.c:(.text+0x110f): undefined reference to `__udivdi3'
 
-Out of curiosity, when testing pKVM, what VMM do you use? Also, can you
-describe what a "dummy pVM" is? Is it a just pVM which is not actually
-protected? How similar is a pVM to a typical VIRTIO-using VM? Actually,
-maybe I should just ask if there are instructions for playing with pKVM
-somewhere that I could get a pointer to.
+Cc: stable@vger.kernel.org
+Fixes: 019057bd73d1 ("KVM: SEV-ES: fix length of string I/O")
+Reported-by: Naresh Kamboju <naresh.kamboju@linaro.org>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/x86/kvm/svm/svm.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Thanks,
-drew
+diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+index 128a54b1fbf1..5d30db599e10 100644
+--- a/arch/x86/kvm/svm/svm.h
++++ b/arch/x86/kvm/svm/svm.h
+@@ -191,7 +191,7 @@ struct vcpu_svm {
+ 
+ 	/* SEV-ES scratch area support */
+ 	void *ghcb_sa;
+-	u64 ghcb_sa_len;
++	u32 ghcb_sa_len;
+ 	bool ghcb_sa_sync;
+ 	bool ghcb_sa_free;
+ 
+-- 
+2.27.0
 
