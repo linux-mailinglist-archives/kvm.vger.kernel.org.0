@@ -2,98 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B88E14326EF
-	for <lists+kvm@lfdr.de>; Mon, 18 Oct 2021 20:55:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 082484326FB
+	for <lists+kvm@lfdr.de>; Mon, 18 Oct 2021 20:58:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233612AbhJRS5t (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Oct 2021 14:57:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54298 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233238AbhJRS5m (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Oct 2021 14:57:42 -0400
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA9D3C06161C
-        for <kvm@vger.kernel.org>; Mon, 18 Oct 2021 11:55:30 -0700 (PDT)
-Received: by mail-pj1-x1035.google.com with SMTP id om14so12847264pjb.5
-        for <kvm@vger.kernel.org>; Mon, 18 Oct 2021 11:55:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=rTz4/jSlZyWfMiUVRUtwP9A0tGQp4FA6poWnsUXfMHA=;
-        b=CEhc+C5496SCcB7LYMGxZjGtaERzZ4R2ccnZHKvtXOyopB5S+0HHTYdOo+tWIIg2iT
-         NN1xps6KFuH5RyJbGEsIJfYD2HW3tPYgd6UbvQNZwFIgV9vfAP8GwQYAbQg/2wV6qCzk
-         XWOO105ohb0X6U0o8aLOKMmbzYwx8ftO9RNh/xI2N+q0LCr5MPw0KSDBAz9aDIBfr0Fl
-         8qmBWSo0o0KFCvChhU6hUTA4dyQ9+xuxqWzXDcGt0z5vYxkETtSjfGqbwH79DOAo8FhJ
-         vc9/kYMLFJ+s3XM+kW/7KvcB99e9vw8CB8QYEqtBvE2aTBmv0RlYzYhvXZTNgXTvOfW8
-         rvLg==
+        id S233108AbhJRTAZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Oct 2021 15:00:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:39369 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232650AbhJRTAZ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 18 Oct 2021 15:00:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1634583493;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=YPCBK4+qqhN59Q6AXab9sUjlmniUhlFiGiZrEdBuk6s=;
+        b=JgSfjavM+lQ+BK0DZmqJAWa382fTICfypWPKH35yF3B1Dgt9/ixHmXvrzjiN0J4gqiILXq
+        EH7+ND4f3+0Wn8rpkDwjOUpNYcSi0f0IQbCO35BKcSUQu1TnkZoCmgSJobPiLFktWYCtGs
+        +gefR6YKm8UhQjEXGwjy4+q1TZ4nOmE=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-364-nXs3TInJOUu0is0nT8yK3A-1; Mon, 18 Oct 2021 14:58:12 -0400
+X-MC-Unique: nXs3TInJOUu0is0nT8yK3A-1
+Received: by mail-ed1-f72.google.com with SMTP id h19-20020aa7de13000000b003db6ad5245bso15325887edv.9
+        for <kvm@vger.kernel.org>; Mon, 18 Oct 2021 11:58:11 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=rTz4/jSlZyWfMiUVRUtwP9A0tGQp4FA6poWnsUXfMHA=;
-        b=wfO+r6WKLy0JoB5BwI5c9yvUyF0LjWTgf4ndayo+a9CvVJNXxZmql+i3ELZwXhKflS
-         yM7ppVtjGMMSUGJAMll1ha1mOXFOBdgK1eckCnb9F5bEBqMHYao73P0RQt2fs0deUWMx
-         00lRPOFSttOwiOMgNy8i4YA0Nka80McF5pjRCWYpZ5PCxKS252/povRhg86/DrkVQWQr
-         VWGa+uc2Mzf7rIrY+PV9Y1Q5hMsw9xjdblYXzdD25aCrDFqjqX+1km5sCrGXHGz6xB6u
-         V1NtpiEkSAPV1WoC2zlfqYLu+qD1GLj/0/4RpVrOvz0MXvs9LeK1uDqguXNoGFiKbuAw
-         Ur2Q==
-X-Gm-Message-State: AOAM530OzQVPdQzPdmXFw150spC9P2gH3ySofezv+MHxqxfgRxyevFoK
-        6mmBxMjgayDWghjBIp7F6BpbheBoWS1vew==
-X-Google-Smtp-Source: ABdhPJwJQJu627dlVrOH5wynQWLhuXR+WqwkeeMR7RP5+UOted17dBdV92yQ+rWtCJjxbvlXaC1ZbQ==
-X-Received: by 2002:a17:90a:f0d6:: with SMTP id fa22mr759328pjb.53.1634583330198;
-        Mon, 18 Oct 2021 11:55:30 -0700 (PDT)
-Received: from ?IPv6:2601:646:8200:baf:7db8:b64e:3a03:8df? ([2601:646:8200:baf:7db8:b64e:3a03:8df])
-        by smtp.gmail.com with ESMTPSA id b130sm14468948pfb.9.2021.10.18.11.55.29
+        bh=YPCBK4+qqhN59Q6AXab9sUjlmniUhlFiGiZrEdBuk6s=;
+        b=Tzw2NZx6KyKSP2MB8WvYnPQnCzx8vf7aYwH9A2MmaEz1EeMapeW+Z0h/mLiZFF4b6O
+         AW/H1GAywf6TPrgmLoF8shxRZ5HTbPZDP3mqChn+iXjnpxzm3K7Iuu2rscJp79MVISz7
+         jQbnnO3i3MOskZAHIL/bUAmPdnFTrHyzygryy2pwA6G05aUxR1bDjLmBVo/P6b8ERrR1
+         d/ZoxCGH0X2VWj6zm3mYR0ecL0eYQrJS4i3IZyfDEEM7+zeB61d4je6VoIXmpKNKRVFx
+         J0Rp+GSgtzG6GeS0SrHoW2EY+a02ZsGLWLa/YBsB8C72xo1XZFn7VHYoMS/S5Q3XC5oI
+         m5bA==
+X-Gm-Message-State: AOAM532uOPX6j2yc9sC83G10hibbPmRx+Kwn5zgiNH7pHu2DxPDU1sVT
+        ZlB01GlQzhDG/Vhw0B/8LaXo/uAjgV/1DpLFR2CLWjj1KW1+Ck2HXUHMHMJbDo2YAeyzi80xpFb
+        WE7JFezxna8YC
+X-Received: by 2002:a05:6402:2022:: with SMTP id ay2mr48453439edb.344.1634583490631;
+        Mon, 18 Oct 2021 11:58:10 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwGzK2DGqC5lNBWwnAI2+ei1GtdSNm5wkCuN7xuHyVhKJiiPol/b31DZz0l2mHQvwfG1aPAMQ==
+X-Received: by 2002:a05:6402:2022:: with SMTP id ay2mr48453414edb.344.1634583490469;
+        Mon, 18 Oct 2021 11:58:10 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id y21sm9192732ejk.30.2021.10.18.11.58.09
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 Oct 2021 11:55:29 -0700 (PDT)
-Subject: Re: [PATCH] kvm: x86: mmu: Make NX huge page recovery period
- configurable
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc:     jmattson@google.com, seanjc@google.com, bgardon@google.com,
-        dmatlack@google.com
-References: <20211016005052.3820023-1-junaids@google.com>
- <f513e90b-8eed-53ef-6c80-e588f1260e18@redhat.com>
-From:   Junaid Shahid <junaids@google.com>
-Message-ID: <0a192000-23bf-2021-1714-96fc7104ad95@google.com>
-Date:   Mon, 18 Oct 2021 11:55:28 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+        Mon, 18 Oct 2021 11:58:09 -0700 (PDT)
+Message-ID: <77444c94-e88a-ab96-cbea-674375ddee5c@redhat.com>
+Date:   Mon, 18 Oct 2021 20:58:07 +0200
 MIME-Version: 1.0
-In-Reply-To: <f513e90b-8eed-53ef-6c80-e588f1260e18@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [PATCH] KVM: cleanup allocation of rmaps and page tracking data
 Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        David Stevens <stevensd@chromium.org>
+References: <20211018175333.582417-1-pbonzini@redhat.com>
+ <YW25ZiTE1N6xS4FN@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <YW25ZiTE1N6xS4FN@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/16/21 12:00 AM, Paolo Bonzini wrote:
-> On 16/10/21 02:50, Junaid Shahid wrote:
->> Currently, the NX huge page recovery thread wakes up every minute and
->> zaps 1/nx_huge_pages_recovery_ratio of the total number of split NX
->> huge pages at a time. This is intended to ensure that only a
->> relatively small number of pages get zapped at a time. But for very
->> large VMs (or more specifically, VMs with a large number of
->> executable pages), a period of 1 minute could still result in this
->> number being too high (unless the ratio is changed significantly,
->> but that can result in split pages lingering on for too long).
->>
->> This change makes the period configurable instead of fixing it at
->> 1 minute (though that is still kept as the default). Users of
->> large VMs can then adjust both the ratio and the period together to
->> reduce the number of pages zapped at one time while still
->> maintaining the same overall duration for cycling through the
->> entire list (e.g. the period could be set to 1 second and the ratio
->> to 3600 to maintain the overall cycling period of 1 hour).
+On 18/10/21 20:13, Sean Christopherson wrote:
+>> Co-developed-by: Sean Christopherson<seanjc@google.com>
+> Checkpatch will complain about a lack of
 > 
-> The patch itself looks good, but perhaps the default (corresponding to a period of 0) could be 3600000 / ratio, so that it's enough to adjust the ratio?
+> 	Signed-off-by: Sean Christopherson<seanjc@google.com>
 > 
-> Paolo
+>> Signed-off-by: Paolo Bonzini<pbonzini@redhat.com>
+>> ---
+> ...
 > 
+>> +	bool shadow_root_alloced;
+> Maybe "allocated" instead of "alloced"?
 
-Sure, that sounds good. I'll send an updated version.
+Sounds good.
 
-Thanks,
-Junaid
+Paolo
+
