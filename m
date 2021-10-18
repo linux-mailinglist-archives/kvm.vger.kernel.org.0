@@ -2,90 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 63EC4432623
-	for <lists+kvm@lfdr.de>; Mon, 18 Oct 2021 20:14:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8FA29432627
+	for <lists+kvm@lfdr.de>; Mon, 18 Oct 2021 20:15:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232157AbhJRSQP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Oct 2021 14:16:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44728 "EHLO
+        id S231739AbhJRSRn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Oct 2021 14:17:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45054 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231918AbhJRSQO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Oct 2021 14:16:14 -0400
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF5D9C061745
-        for <kvm@vger.kernel.org>; Mon, 18 Oct 2021 11:14:02 -0700 (PDT)
-Received: by mail-pl1-x633.google.com with SMTP id i5so5601520pla.5
-        for <kvm@vger.kernel.org>; Mon, 18 Oct 2021 11:14:02 -0700 (PDT)
+        with ESMTP id S231398AbhJRSRj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Oct 2021 14:17:39 -0400
+Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 836F1C06161C
+        for <kvm@vger.kernel.org>; Mon, 18 Oct 2021 11:15:27 -0700 (PDT)
+Received: by mail-lf1-x129.google.com with SMTP id u21so1581722lff.8
+        for <kvm@vger.kernel.org>; Mon, 18 Oct 2021 11:15:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=rECEro2baLj28FSIARXDaUkJhvRjUYb9oi+C1vxDjLo=;
-        b=ZPAAz3A6icCyKCw14of499s/0spphqJ/ZWgJwfcRlvd1YpuGt9dv/+LiPGJ3aUGt5k
-         vsg8ZYbBy6vKpCEVJzyFe4zXgXmf9i2aIkh4AxCr8KvKBzX3q44m0xa7/Ky7gzmtFQSB
-         LjCoZkxHQGwgLXCul1rpyttz1uGBm7xwA5Dn+LqLUZ++MgZ99fe/f08zORHFvlsYsmN/
-         qAJj7rucZF08y20Q/uqNJX09z+jaNu2znWMBuYAc6BiIikLuiKMUFkitT3O0+tHxwOUh
-         fAtYP+tIiS0M+5LDZU8q0dDFZWSX7msC1IW13qEF9d+vkPCgAPQlludDHGu5cFhG3fh8
-         +Otw==
+        d=linux-foundation.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=ERwIJtrAxSKFmtkdla8UNA3CjrOGMlzFelchQeuneqM=;
+        b=PvFPrrHqhzLoQwugLC06OkLKAETokHq2kcRDQ2GRnjTqhztE5NwcSpFrcIF1QGvRzN
+         QojzqkjCeMTtNbkax3976xxSB8xyWgHS1GjolB/a485xoNKOFy1jFgjouwfTYFpKqT2N
+         56iFCafGyQxy4KrnM4lYvzC1ppazomKTmc7pc=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=rECEro2baLj28FSIARXDaUkJhvRjUYb9oi+C1vxDjLo=;
-        b=IEd783At38wEASx5iwHxQ8WheXn7QP6jDIxd096hrOWbn+XDMC+x8opoygNtUPQUU8
-         kQdiKTjYrda5+r4WuQCn0jNzsIAK9djV7Tsi9CS1XPtSAA7r3uJtFOFtlVgqiEKQ/rK0
-         Zj1hG4zmE74gSUOehpDtTGk/FD8Bf17Wnw17+ncMmYUp6cZAFLzl0/qcNKVWF3tJHlZk
-         YhpsYuNbfS+dEbTVITcqhJjCdjmZRDNXoRCo3IhvKXlrOg6fApzu4hH+zbF1dmUVp5z2
-         3Uo7CliW50PtOu0OhRRmWFu2emd6r3uxybo3dK9MyHCF6N9qpZ287cbO9sYb2CzyMX4e
-         jMwQ==
-X-Gm-Message-State: AOAM533o+otGvIXrTAB0WpYOpKO1LxxyRDV6NO9nDub/jll70fZ8HXuq
-        xT/uvrCI/XfgI53ZXwxNAcEVxQ==
-X-Google-Smtp-Source: ABdhPJyfVUsmm094Q3ucqV7kDuWKir2JuRbECVohe1J75tjn9kE/pODxyxISBUCQtmGEf8ALRTQmnQ==
-X-Received: by 2002:a17:90b:4a47:: with SMTP id lb7mr515308pjb.192.1634580842194;
-        Mon, 18 Oct 2021 11:14:02 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id m28sm13860556pgl.9.2021.10.18.11.14.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Oct 2021 11:14:01 -0700 (PDT)
-Date:   Mon, 18 Oct 2021 18:13:58 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        David Stevens <stevensd@chromium.org>
-Subject: Re: [PATCH] KVM: cleanup allocation of rmaps and page tracking data
-Message-ID: <YW25ZiTE1N6xS4FN@google.com>
-References: <20211018175333.582417-1-pbonzini@redhat.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=ERwIJtrAxSKFmtkdla8UNA3CjrOGMlzFelchQeuneqM=;
+        b=TZ0hOk/Hvj9q4a0gzlId7buQjg+t48AGzYY0GDZgTFkhXd1Sg0tK7NmDupfTa4IQRq
+         Q8xCtvBwcudy4Hex+iCyq8KW90gkFiDoTfXYin1Dw9Qz+fObSewymVoF9lE2N+df5sVe
+         6N4W3Rmjcs9GO2h9kFmjT3U1srr0pQqypT0HAcA74IFGMUU4J8J+zdQyDV69l1753VKq
+         11xjJbpkn4PfJLCHlT5owFjhS6/V4I1/8XUd4olzrCfvzFMzTL602FxW5yXGIAVUve7/
+         4Aw/hnLwdi2D42dDwV9NMi1vKDeXASCzYuwyJ5ZDByWodiAorc3yNzCdxS9ccHfk0dyq
+         ayZg==
+X-Gm-Message-State: AOAM531SGJbc36NMAcgZ698JhocxAjHIcvE+SGVUGSgqNc3qKSHYr4nx
+        BF2ZObfdqB2fjD6zqN7P8pZ7DgZpQo/oz2H5
+X-Google-Smtp-Source: ABdhPJx0ZGZHSpPVekfuG5BNvL6SxaaOHarKT2B+S7VHej/0s96YwC/JtDt/45P9Op0MEe7j8Op2AA==
+X-Received: by 2002:a05:6512:3f8b:: with SMTP id x11mr1251814lfa.536.1634580925609;
+        Mon, 18 Oct 2021 11:15:25 -0700 (PDT)
+Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com. [209.85.208.174])
+        by smtp.gmail.com with ESMTPSA id h4sm1460924lft.184.2021.10.18.11.15.22
+        for <kvm@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 18 Oct 2021 11:15:23 -0700 (PDT)
+Received: by mail-lj1-f174.google.com with SMTP id o26so1360614ljj.2
+        for <kvm@vger.kernel.org>; Mon, 18 Oct 2021 11:15:22 -0700 (PDT)
+X-Received: by 2002:a2e:a407:: with SMTP id p7mr1465932ljn.68.1634580921681;
+ Mon, 18 Oct 2021 11:15:21 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211018175333.582417-1-pbonzini@redhat.com>
+References: <20211018174137.579907-1-pbonzini@redhat.com> <CAHk-=wg0+bWDKfApDHVR70hsaRA_7bEZfG1XtN2DxZGo+np9Ug@mail.gmail.com>
+ <daba6b06-66cb-6564-b7b0-26cb994a07cd@redhat.com>
+In-Reply-To: <daba6b06-66cb-6564-b7b0-26cb994a07cd@redhat.com>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Mon, 18 Oct 2021 08:15:05 -1000
+X-Gmail-Original-Message-ID: <CAHk-=wgScNWP7Ohh5eEKgcs3NLp9GZOoQ6Z-Kz0aByRtHoJSrw@mail.gmail.com>
+Message-ID: <CAHk-=wgScNWP7Ohh5eEKgcs3NLp9GZOoQ6Z-Kz0aByRtHoJSrw@mail.gmail.com>
+Subject: Re: [GIT PULL] KVM fixes for Linux 5.15-rc7
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Jim Mattson <jmattson@google.com>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 18, 2021, Paolo Bonzini wrote:
-> From: David Stevens <stevensd@chromium.org>
-> 
-> Unify the flags for rmaps and page tracking data, using a
-> single flag in struct kvm_arch and a single loop to go
-> over all the address spaces and memslots.  This avoids
-> code duplication between alloc_all_memslots_rmaps and
-> kvm_page_track_enable_mmu_write_tracking.
-> 
-> Signed-off-by: David Stevens <stevensd@chromium.org>
-> [This patch is the delta between David's v2 and v3, with conflicts
->  fixed and my own commit message. - Paolo]
-> Co-developed-by: Sean Christopherson <seanjc@google.com>
+On Mon, Oct 18, 2021 at 8:03 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> The code is not wrong, there is a comment explaining it:
+>
+>          * Use a bitwise-OR instead of a logical-OR to aggregate the reserved
+>          * bits and EPT's invalid memtype/XWR checks to avoid an extra Jcc
+>          * (this is extremely unlikely to be short-circuited as true).
 
-Checkpatch will complain about a lack of 
+That makes very little sense.
 
-	Signed-off-by: Sean Christopherson <seanjc@google.com>
+It seems to be avoiding a 'jcc' and replace it with a 'setcc' and an
+'or'. Which is likely both bigger and slower.
 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
+If the jcc were unpredictable, maybe that would be one thing. But at
+least from a quick look, that doesn't even seem likely
 
-...
+ The other use of that function has a "WARN_ONCE()" on it, so
+presumably it normally doesn't ever trigger either of the boolean
+conditions.
 
-> +	bool shadow_root_alloced;
+Very strange code.
 
-Maybe "allocated" instead of "alloced"?
+                    Linus
