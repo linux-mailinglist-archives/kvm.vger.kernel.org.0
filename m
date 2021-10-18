@@ -2,89 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 082484326FB
-	for <lists+kvm@lfdr.de>; Mon, 18 Oct 2021 20:58:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 43877432767
+	for <lists+kvm@lfdr.de>; Mon, 18 Oct 2021 21:18:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233108AbhJRTAZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Oct 2021 15:00:25 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:39369 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232650AbhJRTAZ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 18 Oct 2021 15:00:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634583493;
+        id S232769AbhJRTU1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Oct 2021 15:20:27 -0400
+Received: from mail.skyhub.de ([5.9.137.197]:36098 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230159AbhJRTU0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Oct 2021 15:20:26 -0400
+Received: from zn.tnic (p200300ec2f085700af6a7a3215758573.dip0.t-ipconnect.de [IPv6:2003:ec:2f08:5700:af6a:7a32:1575:8573])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id CA2981EC04A9;
+        Mon, 18 Oct 2021 21:18:13 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1634584693;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=YPCBK4+qqhN59Q6AXab9sUjlmniUhlFiGiZrEdBuk6s=;
-        b=JgSfjavM+lQ+BK0DZmqJAWa382fTICfypWPKH35yF3B1Dgt9/ixHmXvrzjiN0J4gqiILXq
-        EH7+ND4f3+0Wn8rpkDwjOUpNYcSi0f0IQbCO35BKcSUQu1TnkZoCmgSJobPiLFktWYCtGs
-        +gefR6YKm8UhQjEXGwjy4+q1TZ4nOmE=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-364-nXs3TInJOUu0is0nT8yK3A-1; Mon, 18 Oct 2021 14:58:12 -0400
-X-MC-Unique: nXs3TInJOUu0is0nT8yK3A-1
-Received: by mail-ed1-f72.google.com with SMTP id h19-20020aa7de13000000b003db6ad5245bso15325887edv.9
-        for <kvm@vger.kernel.org>; Mon, 18 Oct 2021 11:58:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=YPCBK4+qqhN59Q6AXab9sUjlmniUhlFiGiZrEdBuk6s=;
-        b=Tzw2NZx6KyKSP2MB8WvYnPQnCzx8vf7aYwH9A2MmaEz1EeMapeW+Z0h/mLiZFF4b6O
-         AW/H1GAywf6TPrgmLoF8shxRZ5HTbPZDP3mqChn+iXjnpxzm3K7Iuu2rscJp79MVISz7
-         jQbnnO3i3MOskZAHIL/bUAmPdnFTrHyzygryy2pwA6G05aUxR1bDjLmBVo/P6b8ERrR1
-         d/ZoxCGH0X2VWj6zm3mYR0ecL0eYQrJS4i3IZyfDEEM7+zeB61d4je6VoIXmpKNKRVFx
-         J0Rp+GSgtzG6GeS0SrHoW2EY+a02ZsGLWLa/YBsB8C72xo1XZFn7VHYoMS/S5Q3XC5oI
-         m5bA==
-X-Gm-Message-State: AOAM532uOPX6j2yc9sC83G10hibbPmRx+Kwn5zgiNH7pHu2DxPDU1sVT
-        ZlB01GlQzhDG/Vhw0B/8LaXo/uAjgV/1DpLFR2CLWjj1KW1+Ck2HXUHMHMJbDo2YAeyzi80xpFb
-        WE7JFezxna8YC
-X-Received: by 2002:a05:6402:2022:: with SMTP id ay2mr48453439edb.344.1634583490631;
-        Mon, 18 Oct 2021 11:58:10 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwGzK2DGqC5lNBWwnAI2+ei1GtdSNm5wkCuN7xuHyVhKJiiPol/b31DZz0l2mHQvwfG1aPAMQ==
-X-Received: by 2002:a05:6402:2022:: with SMTP id ay2mr48453414edb.344.1634583490469;
-        Mon, 18 Oct 2021 11:58:10 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id y21sm9192732ejk.30.2021.10.18.11.58.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 Oct 2021 11:58:09 -0700 (PDT)
-Message-ID: <77444c94-e88a-ab96-cbea-674375ddee5c@redhat.com>
-Date:   Mon, 18 Oct 2021 20:58:07 +0200
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=H0D9fMYiemWaywKhrFeRx22doUmAUI5poz1BHecVEck=;
+        b=aaPBSilQLVoxx5ZYTymlL1LpcFbbTPdvT1VQjLz4BWf9YVHrCwCMueZkzHVjXeysrg0/eo
+        EpZ0n8bosyKFGw3HgTiyge1sVQRj2H/scBFwyVzUsSGSBApNBZPU/wVXSMAAfNGzdpIW8A
+        e30476Q54MX2AXNg4o+ioUpfa98cro8=
+Date:   Mon, 18 Oct 2021 21:18:13 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Michael Roth <michael.roth@amd.com>
+Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH v6 08/42] x86/sev-es: initialize sev_status/features
+ within #VC handler
+Message-ID: <YW3IdfMs61191qnU@zn.tnic>
+References: <20211008180453.462291-1-brijesh.singh@amd.com>
+ <20211008180453.462291-9-brijesh.singh@amd.com>
+ <YW2EsxcqBucuyoal@zn.tnic>
+ <20211018184003.3ob2uxcpd2rpee3s@amd.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [PATCH] KVM: cleanup allocation of rmaps and page tracking data
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        David Stevens <stevensd@chromium.org>
-References: <20211018175333.582417-1-pbonzini@redhat.com>
- <YW25ZiTE1N6xS4FN@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <YW25ZiTE1N6xS4FN@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20211018184003.3ob2uxcpd2rpee3s@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 18/10/21 20:13, Sean Christopherson wrote:
->> Co-developed-by: Sean Christopherson<seanjc@google.com>
-> Checkpatch will complain about a lack of
+On Mon, Oct 18, 2021 at 01:40:03PM -0500, Michael Roth wrote:
+> If CPUID has lied, that would result in a #GP, rather than a controlled
+> termination in the various checkers/callers. The latter is easier to
+> debug.
 > 
-> 	Signed-off-by: Sean Christopherson<seanjc@google.com>
-> 
->> Signed-off-by: Paolo Bonzini<pbonzini@redhat.com>
->> ---
-> ...
-> 
->> +	bool shadow_root_alloced;
-> Maybe "allocated" instead of "alloced"?
+> Additionally, #VC is arguably a better indicator of SEV MSR availability
+> for SEV-ES/SEV-SNP guests, since it is only generated by ES/SNP hardware
+> and doesn't rely directly on hypervisor/EFI-provided CPUID values. It
+> doesn't work for SEV guests, but I don't think it's a bad idea to allow
+> SEV-ES/SEV-SNP guests to initialize sev_status in #VC handler to make
+> use of the added assurance.
 
-Sounds good.
+Ok, let's take a step back and analyze what we're trying to solve first.
+So I'm looking at sme_enable():
 
-Paolo
+1. Code checks SME/SEV support leaf. HV lies and says there's none. So
+guest doesn't boot encrypted. Oh well, not a big deal, the cloud vendor
+won't be able to give confidentiality to its users => users go away or
+do unencrypted like now.
 
+Problem is solved by political and economical pressure.
+
+2. Check SEV and SME bit. HV lies here. Oh well, same as the above.
+
+3. HV lies about 1. and 2. but says that SME/SEV is supported.
+
+Guest attempts to read the MSR Guest explodes due to the #GP. The same
+political/economical pressure thing happens.
+
+If the MSR is really there, we've landed at the place where we read the
+SEV MSR. Moment of truth - SEV/SNP guests have a communication protocol
+which is independent from the HV and all good.
+
+Now, which case am I missing here which justifies the need to do those
+acrobatics of causing #VCs just to detect the SEV MSR?
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
