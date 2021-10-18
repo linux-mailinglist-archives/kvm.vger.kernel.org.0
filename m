@@ -2,219 +2,201 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0C823431A65
-	for <lists+kvm@lfdr.de>; Mon, 18 Oct 2021 15:08:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 745ED431AC1
+	for <lists+kvm@lfdr.de>; Mon, 18 Oct 2021 15:26:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231503AbhJRNKx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Oct 2021 09:10:53 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:56247 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229833AbhJRNKw (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 18 Oct 2021 09:10:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634562520;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=56IuT+PdlkvXl/kACCVdLw1HVql/ugf55gkE2tIkTMM=;
-        b=QJDcrA4DTImTt0JH0AzDzH07BDRd1u0eaz+TCzVWydWrMjFDqr8ie0wANFQR+ShrQk79by
-        GAudN0nStck2HzbW2y1yIME6nsLQzcpYjl/0dm5VwmV1Kn2bX60fDuO2g3fb1bxKl7fs/t
-        pn1u4RTGOtDFTmYe18TG6Fth6Nv9eYI=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-466-9o_JmyMlPTawRvx9ODT99w-1; Mon, 18 Oct 2021 09:08:39 -0400
-X-MC-Unique: 9o_JmyMlPTawRvx9ODT99w-1
-Received: by mail-wr1-f70.google.com with SMTP id r16-20020adfb1d0000000b00160bf8972ceso8822763wra.13
-        for <kvm@vger.kernel.org>; Mon, 18 Oct 2021 06:08:39 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=56IuT+PdlkvXl/kACCVdLw1HVql/ugf55gkE2tIkTMM=;
-        b=0VIeQenFDRGNDZ8rvcHan4jj1jSZblOm/HOW1suOaqMxqqiuykqRKlDCLKo/2+G8rL
-         ANZWsRhqNmZ4dvp1dN4dmYYXV9Zq6xFmN53IXucZnjV6UkevcvZRw2A8IhQ6t77go2rJ
-         l2jg4vFt285h9pMva8Nz0ogKcg2gDfBDEEGd//wtZ0DaaeNObhKOUtlLJK2AogtNp7YL
-         VnVkOJFYQG0KJ+DC9KLsI/1aaf72KLn1Kn9TUKNuMRs8wayQmoY+VdIokwOIiPF+gk13
-         trxnrumSNGgAeqBSKQcRZGGAaBFtJ5vkMlW+f6pU4o/Ax4ijvsZ6ln2/NeTpn07z186S
-         chhg==
-X-Gm-Message-State: AOAM5310cl0ZKqEdzMc97bxt//Tl53zoAuBj6/3RW1fJLVNOxj2O3RY+
-        DHCRnAW/DKXiazf4vI0ouJJRTeXE99Jg+ySdFWqwgQYrnJhlAUFHyNUTE7P5EwyEgKiZxRO5n6z
-        +dblQWAS3h1fw
-X-Received: by 2002:a1c:e906:: with SMTP id q6mr44687531wmc.126.1634562518312;
-        Mon, 18 Oct 2021 06:08:38 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw7/6iHH2zKO8aeTMZ8TeUVukVlFcvS0CWBtbTcyYUWYiT+En4lXXHYBvpw9GD3DaLEfTDzbw==
-X-Received: by 2002:a1c:e906:: with SMTP id q6mr44687461wmc.126.1634562517850;
-        Mon, 18 Oct 2021 06:08:37 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id v191sm12513939wme.36.2021.10.18.06.08.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 Oct 2021 06:08:36 -0700 (PDT)
-Message-ID: <50b4c1f0-be96-c1b5-aab1-69f4f61ec43f@redhat.com>
-Date:   Mon, 18 Oct 2021 15:08:35 +0200
+        id S231908AbhJRN3G (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Oct 2021 09:29:06 -0400
+Received: from mail-mw2nam12on2059.outbound.protection.outlook.com ([40.107.244.59]:51777
+        "EHLO NAM12-MW2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S231548AbhJRN2h (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Oct 2021 09:28:37 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=J/TLvzLz9MaITQhhN27KsRT39jTjEuoeNTjnmwMledNNCJG34vAkQPdWnwYLCUWdWwFsCGPfVXlk3pPbdTmgg5X9dPo1eylivCnEZ8uTG+DAopOMVdiQuS8kEoKTUfxvOXrGxgQ3iP+8UXjKIG4XaVx9QhCaUMRoeFoP0ND2/Y/NlFuQHwiNHeEADDGIHfkQ3li3mSlGySHjypBwgKlp52z89HYooXTHnJ+CBuzauYtl1p0wsSvyaRS8L+4T0K43BIgAiLlfksFZ7H2kfhvFq6EGB9CK67ojOg37MUryPt9EqgXOp+jdtL1bcNm5vgShE+npD63ye/VpV/+ouwAfsA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=2EG3922+/l+1A7ZAMw1FN4JECWOzmSFWYJ6qfvb0cCg=;
+ b=ZD603vC+Qe7XbnevuA8G8r2wU2mdZfAG/Zi7nW5JgjYFTZA9yJqzxkxlu2giWDX2TnIw0/rCiFNxmsaeqG1Gav2fXaccAOeVWubh7dRZRbWk3VB7nWUjhRLD5QUNC9dfecpmL9zzWHvkVvdgXZ6ap/CLv4ydxNUViEge8mExQ+HvWdHqOkCoZARLXaaQEV0Q5tp+b89S7AkwqKOYUaoSyQoQkMK7XLWBA+nd+CIPoeZyRM+mUSqvbDUzkY9r2ySJ8LDGcDZdRG5rc7JLiy0oUt61FMT0+7oU6mJXryeuQbCGv3HiR++L9F4orlSfaKymrRWaioXLNZ2xArk476FUfg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.112.34) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=nvidia.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=2EG3922+/l+1A7ZAMw1FN4JECWOzmSFWYJ6qfvb0cCg=;
+ b=qEdnIdxauC7Ba8Zv+jU0qeDWXhMW8Ux3xTm7Qc/EFL3H7pm1VZI6tJ/4lQ/kobt8n78RX7FLDkK6MasDK8qf3LsU1G+1HKHBPFSzwWXph+3v3R92J0SH7k8FVcZGlJXJTqB6dV+gbcTA9G5dvfLGjKNg+0ONhR+4SqqJHWnK8i3L0u63ymXIJuEbIk2LjJn76tzTkkc4uZk6ehUMkJ9TKRft2JNduLaxN/W3tm6FPxYiRdbaLhpYG4zW1i1nrevvtA2Uf3WYpDldm7RKWf8lMIyo76RCsZmgLAG0yVHpx69O5nQ13Iy6EV1Gpk1lGJmO90XUP+YA29odyX6KU7kzNg==
+Received: from DM6PR08CA0054.namprd08.prod.outlook.com (2603:10b6:5:1e0::28)
+ by DM5PR1201MB0027.namprd12.prod.outlook.com (2603:10b6:4:59::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4608.17; Mon, 18 Oct
+ 2021 13:26:24 +0000
+Received: from DM6NAM11FT026.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:5:1e0:cafe::2e) by DM6PR08CA0054.outlook.office365.com
+ (2603:10b6:5:1e0::28) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4608.14 via Frontend
+ Transport; Mon, 18 Oct 2021 13:26:24 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.34)
+ smtp.mailfrom=nvidia.com; vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.112.34 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.112.34; helo=mail.nvidia.com;
+Received: from mail.nvidia.com (216.228.112.34) by
+ DM6NAM11FT026.mail.protection.outlook.com (10.13.172.161) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.4608.15 via Frontend Transport; Mon, 18 Oct 2021 13:26:24 +0000
+Received: from [172.27.14.240] (172.20.187.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.18; Mon, 18 Oct
+ 2021 13:26:19 +0000
+Subject: Re: [PATCH V1 mlx5-next 11/13] vfio/mlx5: Implement vfio_pci driver
+ for mlx5 devices
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        Alex Williamson <alex.williamson@redhat.com>
+CC:     <bhelgaas@google.com>, <saeedm@nvidia.com>,
+        <linux-pci@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <kuba@kernel.org>, <leonro@nvidia.com>,
+        <kwankhede@nvidia.com>, <mgurtovoy@nvidia.com>, <maorg@nvidia.com>
+References: <20211013094707.163054-1-yishaih@nvidia.com>
+ <20211013094707.163054-12-yishaih@nvidia.com>
+ <20211015134820.603c45d0.alex.williamson@redhat.com>
+ <20211015195937.GF2744544@nvidia.com>
+ <20211015141201.617049e9.alex.williamson@redhat.com>
+ <20211015201654.GH2744544@nvidia.com>
+ <20211015145921.0abf7cb0.alex.williamson@redhat.com>
+ <6608853f-7426-7b79-da1a-29c8fcc6ffc3@nvidia.com>
+ <20211018115107.GM2744544@nvidia.com>
+From:   Yishai Hadas <yishaih@nvidia.com>
+Message-ID: <c27a775f-f003-b652-ea80-f6ea988c0e78@nvidia.com>
+Date:   Mon, 18 Oct 2021 16:26:16 +0300
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [PATCH v2 7/7] KVM: VMX: Only context switch some PT MSRs when
- they exist
+In-Reply-To: <20211018115107.GM2744544@nvidia.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-To:     Xiaoyao Li <xiaoyao.li@intel.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20210827070249.924633-1-xiaoyao.li@intel.com>
- <20210827070249.924633-8-xiaoyao.li@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20210827070249.924633-8-xiaoyao.li@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-Originating-IP: [172.20.187.5]
+X-ClientProxiedBy: HQMAIL111.nvidia.com (172.20.187.18) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 29cf26ba-2ac7-4922-616c-08d9923ae1e4
+X-MS-TrafficTypeDiagnostic: DM5PR1201MB0027:
+X-Microsoft-Antispam-PRVS: <DM5PR1201MB002762D7E15152942D2EB939C3BC9@DM5PR1201MB0027.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: qrOMt+v6mlq5juOHN48SjnZK3O1msnNxGO76XJHRN4Y3lxAM8iUqXEABrXgJREyNsX7rE/2Ldz9to4wXW0VsTbgSQpdtjnC6PnyW9b7IqCOSRiVdRP3pSd9ZA4tT9znueTaHwoMXlP6nM5w2pvHctGk2jXvaAa5KnDvSrkqzi/o8XpxL6NK+G4rfeKcoSOhbfuOsb7E5ziIAZ4bHltfE2FL7QgEEzo4lgofRVa3j7YJksl2HQbu+VROzsv2J/8MecqqW4zh9gFBpjqQ2yTaTC0NYBS4kl7DMUOxPNcDqbghDtkla9w6CtojYKa49hQhmxxMBKCJIM12WHSqQ5RRF8TktpN+YdDnMSx9ikWE8Cjv+JD3/V18zSJxneHv96Bl0TsFIfYPZ8IiCGSw4EERrw9IOFfDd5EK/KTRf+x5K9ebVw46mWitluChziFlZZqs166dRYzYmyUCMMA+6wAg0lYsR0888PgzWQ5khoEt9rgIY4OkB8N2EXgPvWd+E8r+3O7JuAtz5Q7KbNSPHuxk3LUu9UupCR/EpVgTf7FnpuZkeOUvYuZ5DBMm4VBCSq2T3oR3LrEpPerORmAwboE4TuF/UPwC+b5hpGg2LEDo6zpbrTjhm/HmhDVdjYgc83z51yN4OWvBx3fWhjWV/YcwGRKtapq7jmHuq4qXUjAhasc5sw9xPtHzpasrqB/HSq7lIYICgNFlSKpi1EVaynDbQwlGCWj7lC2cFOBxAJUiZ1dE=
+X-Forefront-Antispam-Report: CIP:216.228.112.34;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid03.nvidia.com;CAT:NONE;SFS:(4636009)(36840700001)(46966006)(356005)(8936002)(70206006)(426003)(86362001)(336012)(2616005)(70586007)(8676002)(36756003)(47076005)(26005)(110136005)(16576012)(5660300002)(31686004)(82310400003)(6666004)(2906002)(508600001)(4326008)(316002)(53546011)(54906003)(7636003)(36860700001)(186003)(16526019)(31696002)(107886003)(43740500002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Oct 2021 13:26:24.4201
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 29cf26ba-2ac7-4922-616c-08d9923ae1e4
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.34];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT026.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR1201MB0027
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 27/08/21 09:02, Xiaoyao Li wrote:
-> The enumeration of Intel PT feature doesn't guarantee the existence of
-> MSR_IA32_RTIT_OUTPUT_BASE, MSR_IA32_RTIT_OUTPUT_MASK and
-> MSR_IA32_RTIT_CR3_MATCH. They need to be detected from CPUID 0x14 PT
-> leaves.
-> 
-> Detect the existence of them in hardware_setup() and only context switch
-> them when they exist. Otherwise it will cause #GP when access them.
+On 10/18/2021 2:51 PM, Jason Gunthorpe wrote:
+> On Sun, Oct 17, 2021 at 05:03:28PM +0300, Yishai Hadas wrote:
+>> On 10/15/2021 11:59 PM, Alex Williamson wrote:
+>>> On Fri, 15 Oct 2021 17:16:54 -0300
+>>> Jason Gunthorpe <jgg@nvidia.com> wrote:
+>>>
+>>>> On Fri, Oct 15, 2021 at 02:12:01PM -0600, Alex Williamson wrote:
+>>>>> On Fri, 15 Oct 2021 16:59:37 -0300
+>>>>> Jason Gunthorpe <jgg@nvidia.com> wrote:
+>>>>>> On Fri, Oct 15, 2021 at 01:48:20PM -0600, Alex Williamson wrote:
+>>>>>>>> +static int mlx5vf_pci_set_device_state(struct mlx5vf_pci_core_device *mvdev,
+>>>>>>>> +				       u32 state)
+>>>>>>>> +{
+>>>>>>>> +	struct mlx5vf_pci_migration_info *vmig = &mvdev->vmig;
+>>>>>>>> +	u32 old_state = vmig->vfio_dev_state;
+>>>>>>>> +	int ret = 0;
+>>>>>>>> +
+>>>>>>>> +	if (vfio_is_state_invalid(state) || vfio_is_state_invalid(old_state))
+>>>>>>>> +		return -EINVAL;
+>>>>>>> if (!VFIO_DEVICE_STATE_VALID(old_state) || !VFIO_DEVICE_STATE_VALID(state))
+>>>>>> AFAICT this macro doesn't do what is needed, eg
+>>>>>>
+>>>>>> VFIO_DEVICE_STATE_VALID(0xF000) == true
+>>>>>>
+>>>>>> What Yishai implemented is at least functionally correct - states this
+>>>>>> driver does not support are rejected.
+>>>>> if (!VFIO_DEVICE_STATE_VALID(old_state) || !VFIO_DEVICE_STATE_VALID(state)) || (state & ~VFIO_DEVICE_STATE_MASK))
+>>>>>
+>>>>> old_state is controlled by the driver and can never have random bits
+>>>>> set, user state should be sanitized to prevent setting undefined bits.
+>>>> In that instance let's just write
+>>>>
+>>>> old_state != VFIO_DEVICE_STATE_ERROR
+>>>>
+>>>> ?
+>>> Not quite, the user can't set either of the other invalid states
+>>> either.
+>>
+>> OK so let's go with below as you suggested.
+>> if (!VFIO_DEVICE_STATE_VALID(old_state) ||
+>>       !VFIO_DEVICE_STATE_VALID(state) ||
+>>        (state & ~VFIO_DEVICE_STATE_MASK))
+>>             
+> This is my preference:
+>
+> if (vmig->vfio_dev_state != VFIO_DEVICE_STATE_ERROR ||
+>      !vfio_device_state_valid(state) ||
+>      (state & !MLX5VF_SUPPORTED_DEVICE_STATES))
+>
 
-If intel_pt_validate_hw_cap is not fast enough, it should be optimized.
-Something like this:
+OK, let's go with this approach which enforces what the driver supports 
+as well.
 
-diff --git a/arch/x86/events/intel/pt.c b/arch/x86/events/intel/pt.c
-index 7f406c14715f..9c7167dcb719 100644
---- a/arch/x86/events/intel/pt.c
-+++ b/arch/x86/events/intel/pt.c
-@@ -41,13 +41,15 @@ static struct pt_pmu pt_pmu;
-   * permitted values for certain bit fields).
-   */
-  #define PT_CAP(_n, _l, _r, _m)						\
--	[PT_CAP_ ## _n] = { .name = __stringify(_n), .leaf = _l,	\
--			    .reg = _r, .mask = _m }
-+	[PT_CAP_ ## _n] = { .name = __stringify(_n),			\
-+			    .index = _l * PT_CPUID_REGS_NUM + _r,	\
-+			    .shift = __CONSTANT_FFS_32(_m),		\
-+			    .mask = _m }
-  
-  static struct pt_cap_desc {
-  	const char	*name;
--	u32		leaf;
--	u8		reg;
-+	u16		index;
-+	u8		shift;
-  	u32		mask;
-  } pt_caps[] = {
-  	PT_CAP(max_subleaf,		0, CPUID_EAX, 0xffffffff),
-@@ -71,10 +73,8 @@ static struct pt_cap_desc {
-  u32 intel_pt_validate_cap(u32 *caps, enum pt_capabilities capability)
-  {
-  	struct pt_cap_desc *cd = &pt_caps[capability];
--	u32 c = caps[cd->leaf * PT_CPUID_REGS_NUM + cd->reg];
--	unsigned int shift = __ffs(cd->mask);
-  
--	return (c & cd->mask) >> shift;
-+	return (caps[cd->index] & cd->mask) >> cd->shift;
-  }
-  EXPORT_SYMBOL_GPL(intel_pt_validate_cap);
-  
-diff --git a/include/linux/bitops.h b/include/linux/bitops.h
-index 5e62e2383b7f..b4ee28d91b77 100644
---- a/include/linux/bitops.h
-+++ b/include/linux/bitops.h
-@@ -211,6 +211,17 @@ static inline int get_count_order_long(unsigned long l)
-  	return (int)fls_long(--l);
-  }
-  
-+#define __CONSTANT_FFS_2(w) \
-+	(((w) & 1) == 0)
-+#define __CONSTANT_FFS_4(w) \
-+	(((w) & 0x3) == 0 ? 2 + __CONSTANT_FFS_2((w) >> 2) : __CONSTANT_FFS_2((w)))
-+#define __CONSTANT_FFS_8(w) \
-+	(((w) & 0xf) == 0 ? 4 + __CONSTANT_FFS_4((w) >> 4) : __CONSTANT_FFS_4((w)))
-+#define __CONSTANT_FFS_16(w) \
-+	(((w) & 0xff) == 0 ? 8 + __CONSTANT_FFS_8((w) >> 8) : __CONSTANT_FFS_8((w)))
-+#define __CONSTANT_FFS_32(w) \
-+	(((w) & 0xffff) == 0 ? 16 + __CONSTANT_FFS_16((w) >> 16) : __CONSTANT_FFS_16((w)))
-+
-  /**
-   * __ffs64 - find first set bit in a 64 bit word
-   * @word: The 64 bit word
+We may have the below post making it accurate and complete.
 
+enum {
+     MLX5VF_SUPPORTED_DEVICE_STATES = VFIO_DEVICE_STATE_RUNNING |
+                                      VFIO_DEVICE_STATE_SAVING |
+                                      VFIO_DEVICE_STATE_RESUMING,
+};
 
-Paolo
+if (old_state == VFIO_DEVICE_STATE_ERROR ||
+     !vfio_device_state_valid(state) ||
+     (state & ~MLX5VF_SUPPORTED_DEVICE_STATES))
+           return -EINVAL;
 
-> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> ---
->   arch/x86/kvm/vmx/vmx.c | 28 +++++++++++++++++++++-------
->   1 file changed, 21 insertions(+), 7 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 394ef4732838..6819fc470072 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -204,6 +204,9 @@ module_param(ple_window_max, uint, 0444);
->   int __read_mostly pt_mode = PT_MODE_SYSTEM;
->   module_param(pt_mode, int, S_IRUGO);
->   
-> +static bool has_msr_rtit_cr3_match;
-> +static bool has_msr_rtit_output_x;
-> +
->   static DEFINE_STATIC_KEY_FALSE(vmx_l1d_should_flush);
->   static DEFINE_STATIC_KEY_FALSE(vmx_l1d_flush_cond);
->   static DEFINE_MUTEX(vmx_l1d_flush_mutex);
-> @@ -1035,9 +1038,12 @@ static inline void pt_load_msr(struct pt_ctx *ctx, u32 addr_range)
->   	u32 i;
->   
->   	wrmsrl(MSR_IA32_RTIT_STATUS, ctx->status);
-> -	wrmsrl(MSR_IA32_RTIT_OUTPUT_BASE, ctx->output_base);
-> -	wrmsrl(MSR_IA32_RTIT_OUTPUT_MASK, ctx->output_mask);
-> -	wrmsrl(MSR_IA32_RTIT_CR3_MATCH, ctx->cr3_match);
-> +	if (has_msr_rtit_output_x) {
-> +		wrmsrl(MSR_IA32_RTIT_OUTPUT_BASE, ctx->output_base);
-> +		wrmsrl(MSR_IA32_RTIT_OUTPUT_MASK, ctx->output_mask);
-> +	}
-> +	if (has_msr_rtit_cr3_match)
-> +		wrmsrl(MSR_IA32_RTIT_CR3_MATCH, ctx->cr3_match);
->   	for (i = 0; i < addr_range; i++) {
->   		wrmsrl(MSR_IA32_RTIT_ADDR0_A + i * 2, ctx->addr_a[i]);
->   		wrmsrl(MSR_IA32_RTIT_ADDR0_B + i * 2, ctx->addr_b[i]);
-> @@ -1049,9 +1055,12 @@ static inline void pt_save_msr(struct pt_ctx *ctx, u32 addr_range)
->   	u32 i;
->   
->   	rdmsrl(MSR_IA32_RTIT_STATUS, ctx->status);
-> -	rdmsrl(MSR_IA32_RTIT_OUTPUT_BASE, ctx->output_base);
-> -	rdmsrl(MSR_IA32_RTIT_OUTPUT_MASK, ctx->output_mask);
-> -	rdmsrl(MSR_IA32_RTIT_CR3_MATCH, ctx->cr3_match);
-> +	if (has_msr_rtit_output_x) {
-> +		rdmsrl(MSR_IA32_RTIT_OUTPUT_BASE, ctx->output_base);
-> +		rdmsrl(MSR_IA32_RTIT_OUTPUT_MASK, ctx->output_mask);
-> +	}
-> +	if (has_msr_rtit_cr3_match)
-> +		rdmsrl(MSR_IA32_RTIT_CR3_MATCH, ctx->cr3_match);
->   	for (i = 0; i < addr_range; i++) {
->   		rdmsrl(MSR_IA32_RTIT_ADDR0_A + i * 2, ctx->addr_a[i]);
->   		rdmsrl(MSR_IA32_RTIT_ADDR0_B + i * 2, ctx->addr_b[i]);
-> @@ -7883,8 +7892,13 @@ static __init int hardware_setup(void)
->   
->   	if (pt_mode != PT_MODE_SYSTEM && pt_mode != PT_MODE_HOST_GUEST)
->   		return -EINVAL;
-> -	if (!enable_ept || !cpu_has_vmx_intel_pt())
-> +	if (!enable_ept || !cpu_has_vmx_intel_pt()) {
->   		pt_mode = PT_MODE_SYSTEM;
-> +	} else if (boot_cpu_has(X86_FEATURE_INTEL_PT)) {
-> +		has_msr_rtit_cr3_match = intel_pt_validate_hw_cap(PT_CAP_cr3_filtering);
-> +		has_msr_rtit_output_x = intel_pt_validate_hw_cap(PT_CAP_topa_output) ||
-> +					intel_pt_validate_hw_cap(PT_CAP_single_range_output);
-> +	}
->   
->   	setup_default_sgx_lepubkeyhash();
->   
-> 
+>> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+>> index b53a9557884a..37376dadca5a 100644
+>> +++ b/include/linux/vfio.h
+>> @@ -15,6 +15,8 @@
+>>   #include <linux/poll.h>
+>>   #include <uapi/linux/vfio.h>
+>>
+>> +static const int VFIO_DEVICE_STATE_ERROR = VFIO_DEVICE_STATE_SAVING |
+>> + VFIO_DEVICE_STATE_RESUMING;
+> Do not put static variables in header files
+>
+> Jason
+
+OK, we can come with an enum instead.
+
+enum {
+
+VFIO_DEVICE_STATE_ERROR = VFIO_DEVICE_STATE_SAVING | VFIO_DEVICE_STATE_RESUMING,
+
+};
+
+Alex,
+
+Do you prefer to  put it under include/uapi/vfio.h or that it can go 
+under inlcude/linux/vfio.h for internal drivers usage ?
+
+Yishai
 
