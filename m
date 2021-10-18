@@ -2,124 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0636B4325BD
-	for <lists+kvm@lfdr.de>; Mon, 18 Oct 2021 19:57:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ABA814325E0
+	for <lists+kvm@lfdr.de>; Mon, 18 Oct 2021 20:03:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231772AbhJRSAJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Oct 2021 14:00:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40984 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231318AbhJRSAI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Oct 2021 14:00:08 -0400
-Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5448C06161C
-        for <kvm@vger.kernel.org>; Mon, 18 Oct 2021 10:57:56 -0700 (PDT)
-Received: by mail-lj1-x232.google.com with SMTP id l5so1189280lja.13
-        for <kvm@vger.kernel.org>; Mon, 18 Oct 2021 10:57:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=enwUwHCvAXH97heRPPUL44a0hk47wLy74P2gCbKr6NU=;
-        b=Bmhkl7KfEzX5Uq7jl7xfID7BkPuhl5sDEzqgBuDyAA02Gi/wM31V/IBFmwWEhFVK00
-         68fN8uBsbkAmuwdDzeJIHGrtcQU5Nczhzxw6O9q3mu+Ng5DdUUy45mnW2E4EbGSm/8r+
-         yeCCr++Yidmwd9CEfrt+AyM0xc4yHQvyDl6dk=
+        id S231946AbhJRSFo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Oct 2021 14:05:44 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:36721 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230057AbhJRSFn (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 18 Oct 2021 14:05:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1634580212;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Thk5OLmfXHPG36uriH+bJ4mfoOC1g+fEVpm4vF4ZgqU=;
+        b=QRSYwKTGmfu66YSnK3dUiybIYVSl5eYuQcjb5xFBjQf5E6DgKJlIW6VKnQYpvpSeMWS0Ze
+        Xy0uQjfLgNt5JVusPPmZz6lcGEQszmJHbXc8V6XBFFCHqQqpLcHJ3pDc52CNzOQN8rJw7p
+        J18ECwrKUh+eYECfyoRhWzqUrkBoLg0=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-63-E4QdgPieMV6ULUyNXanwdw-1; Mon, 18 Oct 2021 14:03:30 -0400
+X-MC-Unique: E4QdgPieMV6ULUyNXanwdw-1
+Received: by mail-wm1-f71.google.com with SMTP id d7-20020a1c7307000000b0030d6982305bso307wmb.5
+        for <kvm@vger.kernel.org>; Mon, 18 Oct 2021 11:03:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=enwUwHCvAXH97heRPPUL44a0hk47wLy74P2gCbKr6NU=;
-        b=wiSlK+3naByYiQa3DHKF+dcCzrZN4ANFGfRQd9dm0ywzKN5NrRvMQGA1RsCVKTc+qz
-         Sg3bfKLvGGPdLLOEIoxWjRRtU6afAIIGJDq+x+pgDVHfRIRwNqWlQB6UAacj73ul5Y6m
-         cwSbvXbbHOlq+tURxiroMojoXH0y1RwiCIMA/DyHYmAKkK4eXm5vqWKslQYDrx6VZaMs
-         VZEgzBo2+5IV1PvT6JS/YYK9iZd84TXt0KA/qUNrk/A04ucaJm7mHWN+DcOppUBFZZcv
-         RFi9uIJqE1j2DnZF9CdiNE8esZ3Osq3Oq/+961/5O168Py2YKiIVhH9F+FiZU50IincS
-         GMmg==
-X-Gm-Message-State: AOAM533+A5ReA/vzwBubCW60D41aJslomGa/3ist8Sn5zScxhlND0z2b
-        D77TLPB55OuPxo2b2h7CbvCDWhEilnS1dxwM
-X-Google-Smtp-Source: ABdhPJyzHyO7KkQ4FFDG9Wz1A4oZZoE2ccxV0/1cNI1IMjDsQeyKhEiR1ktLTR8jdI9MAm3vmKDqZQ==
-X-Received: by 2002:a2e:9dc2:: with SMTP id x2mr1231475ljj.253.1634579874846;
-        Mon, 18 Oct 2021 10:57:54 -0700 (PDT)
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com. [209.85.167.47])
-        by smtp.gmail.com with ESMTPSA id o15sm213229ljm.139.2021.10.18.10.57.52
-        for <kvm@vger.kernel.org>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=Thk5OLmfXHPG36uriH+bJ4mfoOC1g+fEVpm4vF4ZgqU=;
+        b=w8prAYV28vStXbfose71xlri/OdmBa5lhZf5F5RoHKsXPnQIZ1l/IdgwozXhL+Ut9e
+         OggzCyLep5vtsfT0f0sb6CjkJqmQrHb4Vhm4prL8W8E/VaIXhk9tU0qBK54W4m4ud+fs
+         IlCEaKQeXIK6EuuUTFWvtzS7YgAJwSSQpQCPmB7ZvThOWdJTu6jOb1IjBpBFtlpC+Nty
+         1/n97UD3Kw3m7Bnkk8HbVecOv2BLUxJU4HTPfu2PgkGsGo/n9jD+wdcQ/brfAXfakZ3l
+         JWCc/eyPg30QEx993ljzDJl7IjPhFuPMqbhHoRnl9w1YsChepNTcR6vcanXiKKifq11a
+         3xQQ==
+X-Gm-Message-State: AOAM533H+8sKtY91pgX+j5uMToUHl3u5gPwXv3eSCRXtzy5q61mMO3zY
+        HlE/Cjf1A0lmbNrBZDaeuTor/j5+cjc6jnxYC7kRMbkjJJyek45dAL6AgPCkYcjY5xeeMDU7b4X
+        oHt3TYqaGHta7
+X-Received: by 2002:a7b:c938:: with SMTP id h24mr448801wml.126.1634580209485;
+        Mon, 18 Oct 2021 11:03:29 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxt8pjbMny9KaboDlf2A1tikNoWTJAds3ojSlzH86ZUnKOetCEzouUbLBa+VQi7kCuubJGBaQ==
+X-Received: by 2002:a7b:c938:: with SMTP id h24mr448766wml.126.1634580209232;
+        Mon, 18 Oct 2021 11:03:29 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id b3sm13341298wrp.52.2021.10.18.11.03.27
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 Oct 2021 10:57:52 -0700 (PDT)
-Received: by mail-lf1-f47.google.com with SMTP id p16so1535555lfa.2
-        for <kvm@vger.kernel.org>; Mon, 18 Oct 2021 10:57:52 -0700 (PDT)
-X-Received: by 2002:a05:6512:2248:: with SMTP id i8mr1099221lfu.655.1634579872363;
- Mon, 18 Oct 2021 10:57:52 -0700 (PDT)
+        Mon, 18 Oct 2021 11:03:28 -0700 (PDT)
+Message-ID: <daba6b06-66cb-6564-b7b0-26cb994a07cd@redhat.com>
+Date:   Mon, 18 Oct 2021 20:03:24 +0200
 MIME-Version: 1.0
-References: <20211018174137.579907-1-pbonzini@redhat.com>
-In-Reply-To: <20211018174137.579907-1-pbonzini@redhat.com>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Mon, 18 Oct 2021 07:57:36 -1000
-X-Gmail-Original-Message-ID: <CAHk-=wg0+bWDKfApDHVR70hsaRA_7bEZfG1XtN2DxZGo+np9Ug@mail.gmail.com>
-Message-ID: <CAHk-=wg0+bWDKfApDHVR70hsaRA_7bEZfG1XtN2DxZGo+np9Ug@mail.gmail.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
 Subject: Re: [GIT PULL] KVM fixes for Linux 5.15-rc7
-To:     Paolo Bonzini <pbonzini@redhat.com>,
+Content-Language: en-US
+To:     Linus Torvalds <torvalds@linux-foundation.org>,
         Jim Mattson <jmattson@google.com>,
         Nathan Chancellor <nathan@kernel.org>,
         Nick Desaulniers <ndesaulniers@google.com>
 Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         KVM list <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+References: <20211018174137.579907-1-pbonzini@redhat.com>
+ <CAHk-=wg0+bWDKfApDHVR70hsaRA_7bEZfG1XtN2DxZGo+np9Ug@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <CAHk-=wg0+bWDKfApDHVR70hsaRA_7bEZfG1XtN2DxZGo+np9Ug@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 18, 2021 at 7:42 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> * avoid warning with -Wbitwise-instead-of-logical
+On 18/10/21 19:57, Linus Torvalds wrote:
+> The way to do a logical "or" (instead of a bitwise one on two boolean
+> expressions) is to use "||".
+> 
+> Instead, the code was changed to completely insane
+> 
+>     (int) boolexpr1 | (int) boolexpr2
+> 
+> thing, which is entirely illegible and pointless, and no sane person
+> should ever write code like that.
+> 
+> In other words, the*proper*  fix to a warning is to look at the code,
+> and*unsderstand*  the code and the warning, instead of some mindless
+> conversion to just avoid a warning.
 
-Christ. Please no.
+The code is not wrong, there is a comment explaining it:
 
-Guys, you can't just mindlessly shut off warnings without even
-thinking about the code.
+  	 * Use a bitwise-OR instead of a logical-OR to aggregate the reserved
+  	 * bits and EPT's invalid memtype/XWR checks to avoid an extra Jcc
+  	 * (this is extremely unlikely to be short-circuited as true).
 
-Apparently the compiler gives completely insane warning "fixes"
-suggestions, and somebody just completely mindlessly followed that
-compiler badness.
+Paolo
 
-The way to do a logical "or" (instead of a bitwise one on two boolean
-expressions) is to use "||".
-
-Instead, the code was changed to completely insane
-
-   (int) boolexpr1 | (int) boolexpr2
-
-thing, which is entirely illegible and pointless, and no sane person
-should ever write code like that.
-
-In other words, the *proper* fix to a warning is to look at the code,
-and *unsderstand* the code and the warning, instead of some mindless
-conversion to just avoid a warning.
-
-NEVER EVER do mindless changes to source code because the compiler
-tells you to. Apparently the clang people wrote a particularly bad
-warning "explanation", and that's on clang.
-
-I'm not going to pull this. The clang warning fix is wrong, and then
-another commit literally disables accounting for another non-fatal
-run-time warning.
-
-Again - warnings are not an excuse to just "mindlessly shut up the warning".
-
-They need some thought.
-
-None of this kind of "I'll do wrong things just to make the warning go
-away" garbage that this pull request has two very different examples
-of.
-
-I'm adding some clang people, because apparently that
-
-    note: cast one or both operands to int to silence this warning
-
-thing came from clang. Somebody in the clang community really needs to
-re-think their "informational" messages.
-
-Giving people those kinds of insane suggestions is a disservice to
-everybody. Clang should fix their stupid "note" before release.
-Please, guys.
-
-            Linus
