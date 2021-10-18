@@ -2,138 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5CBA5430E8D
+	by mail.lfdr.de (Postfix) with ESMTP id CB995430E8E
 	for <lists+kvm@lfdr.de>; Mon, 18 Oct 2021 06:14:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230023AbhJREQO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Oct 2021 00:16:14 -0400
-Received: from gandalf.ozlabs.org ([150.107.74.76]:56183 "EHLO
+        id S230047AbhJREQP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Oct 2021 00:16:15 -0400
+Received: from gandalf.ozlabs.org ([150.107.74.76]:51613 "EHLO
         gandalf.ozlabs.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229717AbhJREQN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S229905AbhJREQN (ORCPT <rfc822;kvm@vger.kernel.org>);
         Mon, 18 Oct 2021 00:16:13 -0400
 Received: by gandalf.ozlabs.org (Postfix, from userid 1007)
-        id 4HXk5j5s6Dz4xd8; Mon, 18 Oct 2021 15:14:01 +1100 (AEDT)
+        id 4HXk5j62wkz4xd9; Mon, 18 Oct 2021 15:14:01 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gibson.dropbear.id.au; s=201602; t=1634530441;
-        bh=LRKhCx62a8FylBa2igF2cBSiVauxjdJGZXJ54N9UUEI=;
+        bh=4MetBvlI1yBgJfQgm7BUePN3YwoW4eyxNbbP0ENobvI=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=CK3WSFHOUcDld4zE8yNAbqC4FyrTxzjVPfpA0zyCBUJMVp/le3OFTrYzrTlBoVQzh
-         fXlROTKB0lSqJV5mx/U5GpTOASEgdS9niggv8iq/2N2ypTus31h0JEGlksaBT41awn
-         zTaAZeSbIf9ckhrJ7VJNbj//fwPRZPbQN6A5//Zk=
-Date:   Mon, 18 Oct 2021 14:40:54 +1100
-From:   "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>
+        b=NjsMn+ipSdbXnOpa8y+a/46qJwRt12wAkdnosTD+WL3GE06JJJpZyTJqyG0WdfSYG
+         /maRtN6lNWDqx52u3l2aP2rlHr/pL93jgyspjb7kEnop7i1qIHHDTyjGJeML4Kdd89
+         YXucAAAUyt342YFNeLRS+E396JiuF7TCbXnqpKkI=
+Date:   Mon, 18 Oct 2021 14:50:54 +1100
+From:   David Gibson <david@gibson.dropbear.id.au>
 To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "hch@lst.de" <hch@lst.de>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        "parav@mellanox.com" <parav@mellanox.com>,
-        "lkml@metux.net" <lkml@metux.net>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "lushenming@huawei.com" <lushenming@huawei.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "corbet@lwn.net" <corbet@lwn.net>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "yi.l.liu@linux.intel.com" <yi.l.liu@linux.intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "dwmw2@infradead.org" <dwmw2@infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>
+Cc:     Liu Yi L <yi.l.liu@intel.com>, alex.williamson@redhat.com,
+        hch@lst.de, jasowang@redhat.com, joro@8bytes.org,
+        jean-philippe@linaro.org, kevin.tian@intel.com, parav@mellanox.com,
+        lkml@metux.net, pbonzini@redhat.com, lushenming@huawei.com,
+        eric.auger@redhat.com, corbet@lwn.net, ashok.raj@intel.com,
+        yi.l.liu@linux.intel.com, jun.j.tian@intel.com, hao.wu@intel.com,
+        dave.jiang@intel.com, jacob.jun.pan@linux.intel.com,
+        kwankhede@nvidia.com, robin.murphy@arm.com, kvm@vger.kernel.org,
+        iommu@lists.linux-foundation.org, dwmw2@infradead.org,
+        linux-kernel@vger.kernel.org, baolu.lu@linux.intel.com,
+        nicolinc@nvidia.com
 Subject: Re: [RFC 11/20] iommu/iommufd: Add IOMMU_IOASID_ALLOC/FREE
-Message-ID: <YWzsxlr10ejE2E7f@yekko>
-References: <BN9PR11MB543362CEBDAD02DA9F06D8ED8CA29@BN9PR11MB5433.namprd11.prod.outlook.com>
- <20210922140911.GT327412@nvidia.com>
- <YVaoamAaqayk1Hja@yekko>
- <20211001122505.GL964074@nvidia.com>
- <YVfeUkW7PWQeYFJQ@yekko>
- <20211002122542.GW964074@nvidia.com>
- <YWPNoknkNW55KQM4@yekko>
- <20211011171748.GA92207@nvidia.com>
- <YWezEY+CJBRY7uLj@yekko>
- <20211014150610.GS2744544@nvidia.com>
+Message-ID: <YWzvHsm7YMYS2sP3@yekko>
+References: <20210919063848.1476776-1-yi.l.liu@intel.com>
+ <20210919063848.1476776-12-yi.l.liu@intel.com>
+ <20210921174438.GW327412@nvidia.com>
+ <YVanJqG2pt6g+ROL@yekko>
+ <20211001122225.GK964074@nvidia.com>
+ <YWPTWdHhoI4k0Ksc@yekko>
+ <20211011184914.GQ2744544@nvidia.com>
+ <YWe3zS4lIn8cj6su@yekko>
+ <20211014145208.GR2744544@nvidia.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="NfLXu0kVKdtqKGuK"
+        protocol="application/pgp-signature"; boundary="a7l7VEHFVCCcxjvj"
 Content-Disposition: inline
-In-Reply-To: <20211014150610.GS2744544@nvidia.com>
+In-Reply-To: <20211014145208.GR2744544@nvidia.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---NfLXu0kVKdtqKGuK
+--a7l7VEHFVCCcxjvj
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 14, 2021 at 12:06:10PM -0300, Jason Gunthorpe wrote:
-> On Thu, Oct 14, 2021 at 03:33:21PM +1100, david@gibson.dropbear.id.au wro=
-te:
+On Thu, Oct 14, 2021 at 11:52:08AM -0300, Jason Gunthorpe wrote:
+> On Thu, Oct 14, 2021 at 03:53:33PM +1100, David Gibson wrote:
 >=20
-> > > If the HW can attach multiple non-overlapping IOAS's to the same
-> > > device then the HW is routing to the correct IOAS by using the address
-> > > bits. This is not much different from the prior discussion we had
-> > > where we were thinking of the PASID as an 80 bit address
+> > > My feeling is that qemu should be dealing with the host !=3D target
+> > > case, not the kernel.
+> > >=20
+> > > The kernel's job should be to expose the IOMMU HW it has, with all
+> > > features accessible, to userspace.
 > >=20
-> > Ah... that might be a workable approach.  And it even helps me get my
-> > head around multiple attachment which I was struggling with before.
-> >=20
-> > So, the rule would be that you can attach multiple IOASes to a device,
-> > as long as none of them overlap.  The non-overlapping could be because
-> > each IOAS covers a disjoint address range, or it could be because
-> > there's some attached information - such as a PASID - to disambiguate.
+> > See... to me this is contrary to the point we agreed on above.
 >=20
-> Right exactly - it is very parallel to PASID
+> I'm not thinking of these as exclusive ideas.
 >=20
-> And obviously HW support is required to have multiple page table
-> pointers per RID - which sounds like PPC does (high/low pointer?)
+> The IOCTL interface in iommu can quite happily expose:
+>  Create IOAS generically
+>  Manipulate IOAS generically
+>  Create IOAS with IOMMU driver specific attributes
+>  HW specific Manipulate IOAS
+>=20
+> IOCTL commands all together.
+>=20
+> So long as everything is focused on a generic in-kernel IOAS object it
+> is fine to have multiple ways in the uAPI to create and manipulate the
+> objects.
+>=20
+> When I speak about a generic interface I mean "Create IOAS
+> generically" - ie a set of IOCTLs that work on most IOMMU HW and can
+> be relied upon by things like DPDK/etc to always work and be portable.
+> This is why I like "hints" to provide some limited widely applicable
+> micro-optimization.
+>=20
+> When I said "expose the IOMMU HW it has with all features accessible"
+> I mean also providing "Create IOAS with IOMMU driver specific
+> attributes".
+>=20
+> These other IOCTLs would allow the IOMMU driver to expose every
+> configuration knob its HW has, in a natural HW centric language.
+> There is no pretense of genericness here, no crazy foo=3DA, foo=3DB hidden
+> device specific interface.
+>=20
+> Think of it as a high level/low level interface to the same thing.
 
-Hardware support is require *in the IOMMU*.  Nothing (beyond regular
-64-bit DMA support) is required in the endpoint devices.  That's not
-true of PASID.
+Ok, I see what you mean.
 
-> > What remains a question is where the disambiguating information comes
-> > from in each case: does it come from properties of the IOAS,
-> > propertues of the device, or from extra parameters supplied at attach
-> > time.  IIUC, the current draft suggests it always comes at attach time
-> > for the PASID information.  Obviously the more consistency we can have
-> > here the better.
+> > Those are certainly wrong, but they came about explicitly by *not*
+> > being generic rather than by being too generic.  So I'm really
+> > confused aso to what you're arguing for / against.
 >=20
-> From a generic view point I'd say all are fair game. It is up to the
-> IOMMU driver to take the requested set of IOAS's, the "at attachment"
-> information (like PASID) and decide what to do, or fail.
+> IMHO it is not having a PPC specific interface that was the problem,
+> it was making the PPC specific interface exclusive to the type 1
+> interface. If type 1 continued to work on PPC then DPDK/etc would
+> never learned PPC specific code.
 
-Ok, that's a model that makes sense to me.
+Ok, but the reason this happened is that the initial version of type 1
+*could not* be used on PPC.  The original Type 1 implicitly promised a
+"large" IOVA range beginning at IOVA 0 without any real way of
+specifying or discovering how large that range was.  Since ppc could
+typically only give a 2GiB range at IOVA 0, that wasn't usable.
 
-> > I can also see an additional problem in implementation, once we start
-> > looking at hot-adding devices to existing address spaces. =20
->=20
-> I won't pretend to guess how to implement this :) Just from a modeling
-> perspective is something that works logically. If the kernel
-> implementation is too hard then PPC should do one of the other ideas.
->=20
-> Personally I'd probably try for a nice multi-domain attachment model
-> like PASID and not try to create/destroy domains.
+That's why I say the problem was not making type1 generic enough.  I
+believe the current version of Type1 has addressed this - at least
+enough to be usable in common cases.  But by this time the ppc backend
+is already out there, so no-one's had the capacity to go back and make
+ppc work with Type1.
 
-I don't really follow what you mean by that.
+> For iommufd with the high/low interface each IOMMU HW should ask basic
+> questions:
+>=20
+>  - What should the generic high level interface do on this HW?
+>    For instance what should 'Create IOAS generically' do for PPC?
+>    It should not fail, it should create *something*
+>    What is the best thing for DPDK?
+>    I guess the 64 bit window is most broadly useful.
 
-> As I said in my last email I think it is up to each IOMMU HW driver to
-> make these decisions, the iommufd framework just provides a
-> standardized API toward the attaching driver that the IOMMU HW must
-> fit into.
+Right, which means the kernel must (at least in the common case) have
+the capcity to choose and report a non-zero base-IOVA.
+
+Hrm... which makes me think... if we allow this for the common
+kernel-managed case, do we even need to have capcity in the high-level
+interface for reporting IO holes?  If the kernel can choose a non-zero
+base, it could just choose on x86 to place it's advertised window
+above the IO hole.
+
+>  - How to accurately describe the HW in terms of standard IOAS objects
+>    and where to put HW specific structs to support this.
 >=20
-> Jason
+>    This is where PPC would decide how best to expose a control over
+>    its low/high window (eg 1,2,3 IOAS). Whatever the IOMMU driver
+>    wants, so long as it fits into the kernel IOAS model facing the
+>    connected device driver.
 >=20
+> QEMU would have IOMMU userspace drivers. One would be the "generic
+> driver" using only the high level generic interface. It should work as
+> best it can on all HW devices. This is the fallback path you talked
+> of.
+>=20
+> QEMU would also have HW specific IOMMU userspace drivers that know how
+> to operate the exact HW. eg these drivers would know how to use
+> userspace page tables, how to form IOPTEs and how to access the
+> special features.
+>=20
+> This is how QEMU could use an optimzed path with nested page tables,
+> for instance.
+
+The concept makes sense in general.  The devil's in the details, as usual.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -141,24 +172,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---NfLXu0kVKdtqKGuK
+--a7l7VEHFVCCcxjvj
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAmFs7MQACgkQbDjKyiDZ
-s5I36BAAtYQDHfUUrAAR+l1Nr+R/rx7GXp/8R6KR+CE1dfsCsiwzcMldNS97f68g
-KxmxUoteQOeNn6s92JZ3MjvQS73SBD0n58JnUmdbjK6KmKn1yURJ7c01qI9/u8mG
-f/F2nmTTtnbGNizIWVOcT3v+rVOpriok8+PVrzYLPZdwINIwGu9BvGTRX5rUH7dz
-ebxBx708ex+y8Xjgahp6lN6TcpH4kZMe+7EihSh+94g2qqrjF1O4NG1E+nj0KA9a
-AZohwPPqYfY2wq1ymxzEjbXHbfxoYMJGD0AdMGQoYeA4DYwokqUPcZbYCROl/EN2
-hIMMjGkSLshVpla4Gswb0hIzZNyj4y6OwlnUHaCt99H64n35A14TZP+nB792qRyo
-VdfYNa7bt2gyCVMJvIYjyIkT2GcsI6cUJY4xX6InPSU1cNwGH+hWiLyJ2uWz12zD
-bOItcIEZFWX240UW8q0SOqfC/Yv18Z+hHtMWmv+Blwjq7E7qDGQTp9EvOga/VqsQ
-bGlHugTZpZNnx0FsRQWva6RiyU+wvcQi49Uw565KotIqNkxE02PfcMOW4xTeKu39
-p4LEMCw9ZdiGNF/vjSbpTBW+m1JvLpILLAi/xyqymcFBZbwxpUn+nMl2RcDJy35C
-lBD9bu0MRYmWCcIm6B72rMnYR1+/zd/mVRZ2TdEJ3syDKgdGeAo=
-=y6hM
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAmFs7x4ACgkQbDjKyiDZ
+s5Jymg/+KRvVDzFvMbhDCTkJPaf2NZRQdvidTMzm7+ooHyhl+ffuWtYzaPvLOG/e
+s1GU9SaDYHIfJmjo1SucgKbmEt8mqxDaJuK+8Jc1lq8EIUxR9WN356MNSv4BtJ9d
+xFyUO7sPIG4Bei5yPvqkhI7UBgnihfSyDjwax+tcLvyH7d6Iltq7cc7mR+4c8pVv
+XRGpyHhKH2YtwswloQ1mQYnlEHGMRpg4CVpfmpFqpnbkZ9ePziK62j8bAFbq08ml
+aWBzHbnVHtIRdMShh0Sd9xZqbma9cVFTvTgenUM1T+b0iZw8WujA9SWrf0dpMDt8
+fZ0Jb8u3ohT9UjivfAVfNRGgUXCfwPVdJIVZNA/CAH3xVWAa8ISOmik3l9rcdOfm
+s5eTIAFpusZGHcYVRSc9OJtnrTAGwcxFHLfqri/TtfatoELFqdcY4uzPX9rtIdAz
+rxya6LN+CPypr+N8qK1BGSMAginSIUU9Rxc6ZWJseo0OCKx0mSxplpcUKEz3iAR4
++bA7TF/6JD193K4EGdgA7kgz6CYQhrV4zNMbbOtjrV0gS+ORbH2L8ozbrDbYLDaF
+TLSncL4HcLHvn3GxOJKi0NmmbpZtcBA7xBNeiBuyUxPJb0LzqWIKc+oHaLM/AlDV
+SkD3RKtcLXa+wa8J/LY7qrhZwsFGvWLjhZmX3nLXfiDj9A1Bc5I=
+=e3U1
 -----END PGP SIGNATURE-----
 
---NfLXu0kVKdtqKGuK--
+--a7l7VEHFVCCcxjvj--
