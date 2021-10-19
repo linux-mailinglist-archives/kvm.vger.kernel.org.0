@@ -2,85 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 67D6E433AE8
-	for <lists+kvm@lfdr.de>; Tue, 19 Oct 2021 17:42:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B0582433B0C
+	for <lists+kvm@lfdr.de>; Tue, 19 Oct 2021 17:48:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231848AbhJSPoU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Oct 2021 11:44:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53804 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231574AbhJSPoT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Oct 2021 11:44:19 -0400
-Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1B46C06161C
-        for <kvm@vger.kernel.org>; Tue, 19 Oct 2021 08:42:05 -0700 (PDT)
-Received: by mail-lj1-x22e.google.com with SMTP id u5so6937417ljo.8
-        for <kvm@vger.kernel.org>; Tue, 19 Oct 2021 08:42:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=+siEuSa+WJS75qSN0RpdHUMGuy5oBwzzmiWqMaEMuPs=;
-        b=pQERdD5nUQPjtLansM70NTxO+0b2qTozpDkpxrIOccRNdx92Apbk596hBAT6w3aMiG
-         u4j/LqsgHx8YgTX60We0/gkJTzZ6WzHCGuZs2AIO4ZYM/XeiHXPdeblO0YwKiGy5Qa/W
-         jkTA0pHMxDPi3SEKywafQl5fio6bLgWDzOFad8ZFYEcrDgR6XZFkKUCVvUH+SZPRGXdH
-         7TWAfXzqj+yCfoTC0lO4OhXcU8l+BpuPkkCNzd8szQroeryK67ZymNb1mRJ2zVeBeMyE
-         oACHdT8f8h8SltYC1ZEFCX4477F9/pEVnnqIpWr5Was1xLbtlG3k4et/GFW5yn+/rHSZ
-         rCqw==
+        id S229789AbhJSPuj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Oct 2021 11:50:39 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:28945 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229774AbhJSPui (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 19 Oct 2021 11:50:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1634658505;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=u3Piw9dqGW8KX5c4wzu0TReP8OMfYCDJCIB53OxyOgc=;
+        b=KrDUzLRECujoPmNJ2vdpP23kpboLgKBukDo0zXZSIdyy66llgJiqtlvAb+D+z/3/8mC04B
+        /mHoBwjyUR3f0hx4zTmVLG6nirLo4gUhB/r0MuLpLIeRJ6rjEw8cip9G4GkPi4IpXmzljr
+        NfPlOHyNeZ7JjTVgtdmXYvDHS/9/QXk=
+Received: from mail-oi1-f198.google.com (mail-oi1-f198.google.com
+ [209.85.167.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-442-5NcmcF5oNFC-4ksFDfjjlA-1; Tue, 19 Oct 2021 11:48:23 -0400
+X-MC-Unique: 5NcmcF5oNFC-4ksFDfjjlA-1
+Received: by mail-oi1-f198.google.com with SMTP id o11-20020aca5a0b000000b00291d010cda7so2083897oib.7
+        for <kvm@vger.kernel.org>; Tue, 19 Oct 2021 08:48:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=+siEuSa+WJS75qSN0RpdHUMGuy5oBwzzmiWqMaEMuPs=;
-        b=gR56IXQJ0Vc2cRXNgDVDMmqZ94bSGl3W8JtQD7kB2YQxgWjawUXE+05ej244xrjc5r
-         zWjqjMiDNa5ymad3f6dAiCLrRlD9XEMZNqUvO5BVAafYyqfRJ0iogK2nx8Tl+H0OYXXR
-         sTh9VXV5sr85MNHfdN0BUvNU/Y6h8rm/y2etttJ7pK0+3kA6stAmYSHs/n9qYRGCptQQ
-         OmONrCatBMyzCEv0yBya9rAakF71kn1uKuT0xfwMHWShykVlS66fFns6/37gyN23o/dw
-         dmIg84wzok0RHCce7L5XDywACASAEyu3Y+/ypReEiiMdCYnZhzDVVsXDcNmwe3hKXWoF
-         Ul6Q==
-X-Gm-Message-State: AOAM530GEAw/zWdiYZj+s53SIWWcLe+FORs93Jnp+f/XAKWa5JR9hAio
-        dks1GkVgqO25rF16ZryNhd0LMBUi5GGXWSh8toyzXQ==
-X-Google-Smtp-Source: ABdhPJycBomzQY6404BBSVeaKo0fPDsTR2GIxvbSVRXPqVQk7Srg23I+zHCL1LEnHBi2/zX21QLCOrfkMQRN/hgLcjo=
-X-Received: by 2002:a2e:6c0c:: with SMTP id h12mr7361810ljc.361.1634658124071;
- Tue, 19 Oct 2021 08:42:04 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=u3Piw9dqGW8KX5c4wzu0TReP8OMfYCDJCIB53OxyOgc=;
+        b=aL9zuY6hSgJkP36MHqdw/h16LiwRKK46WHZzK3dvZ5cQLs65LGaFxvpPBggdle5WVU
+         XAm/VQA3MIEZd2xa72S/hFmpbXuRlcVnN9cEfmc7IX2pIRDCKLUUjPuF0o1V2up12wIf
+         0ixb5S2y7frifjvV4mbJFGnIiCq7HAgpXx9Z4wWkrnOYNjoF5hSkQkM9dmHNZ0Kd4nZq
+         LdvE+VPdEuGVg1fpr32rNu13QGvJu9k0bL/lzdRspqE2vU414WggSuecYYStUCDRn3xe
+         ESyFZHzp4hoBZGJW0VsEoNYFoSB0LqYYyg7nDa3y7oiVHOBjzBq8u30781UbE51vmm1g
+         OQ3Q==
+X-Gm-Message-State: AOAM530smDVdzb9OpIPJ5V+H2nvwOJsoop6Kd7DnBfrpMyIobjXn24kg
+        68uFqpSTq1oJw+kzt+3IEKMDiDoSSa6PGuw7SDr1ipPkScVdQmz6ZrS0VJZME4sVUMBvFqfr2wH
+        XW2nQ+QegP+F3
+X-Received: by 2002:a05:6830:308a:: with SMTP id f10mr6082818ots.150.1634658502496;
+        Tue, 19 Oct 2021 08:48:22 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzsvt2knK92qkTY42CACssaCcc4yXHQw/N/K5pD6CeNVMYIgblNrRm1oMRU/lODA/PQz3J/Ag==
+X-Received: by 2002:a05:6830:308a:: with SMTP id f10mr6082810ots.150.1634658502306;
+        Tue, 19 Oct 2021 08:48:22 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id bk8sm3226393oib.57.2021.10.19.08.48.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Oct 2021 08:48:21 -0700 (PDT)
+Date:   Tue, 19 Oct 2021 09:48:20 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Yishai Hadas <yishaih@nvidia.com>
+Cc:     <bhelgaas@google.com>, <jgg@nvidia.com>, <saeedm@nvidia.com>,
+        <linux-pci@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <kuba@kernel.org>, <leonro@nvidia.com>,
+        <kwankhede@nvidia.com>, <mgurtovoy@nvidia.com>, <maorg@nvidia.com>
+Subject: Re: [PATCH V2 mlx5-next 08/14] vfio: Add a macro for
+ VFIO_DEVICE_STATE_ERROR
+Message-ID: <20211019094820.2e9bfc01.alex.williamson@redhat.com>
+In-Reply-To: <20211019105838.227569-9-yishaih@nvidia.com>
+References: <20211019105838.227569-1-yishaih@nvidia.com>
+        <20211019105838.227569-9-yishaih@nvidia.com>
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <20211019000459.3163029-1-jingzhangos@google.com> <f7aa03ab-2067-be7f-06c0-1aad96e460a4@redhat.com>
-In-Reply-To: <f7aa03ab-2067-be7f-06c0-1aad96e460a4@redhat.com>
-From:   David Matlack <dmatlack@google.com>
-Date:   Tue, 19 Oct 2021 08:41:37 -0700
-Message-ID: <CALzav=d-CnScgY4zonVXj1_6B48b_asf3PB1eEk1Ds0H6aKOog@mail.gmail.com>
-Subject: Re: [PATCH v1] KVM: stats: Decouple stats name string from its field
- name in structure
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
-        Oliver Upton <oupton@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 19, 2021 at 8:02 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 19/10/21 02:04, Jing Zhang wrote:
-> > There are situations we need to group some stats in a structure (like
-> > the VM/VCPU generic stats). Improve stats macros to decouple the
-> > exported stats name from its field name in C structure. This also
-> > removes the specific macros for VM/VCPU generic stats.
->
-> Do you have other uses in mind than generic stats?
+On Tue, 19 Oct 2021 13:58:32 +0300
+Yishai Hadas <yishaih@nvidia.com> wrote:
 
-Yeah we have stats internally (that are in our queue to send upstream
-:) which store stats in sub-structs so that we can compute the same
-stats in multiple ways (e.g. snapshot vs. cumulative). When Jing was
-upgrading these stats from our internal API to the fd-based API I
-suggested breaking out the name to keep the stat names consistent
-across the upgrade. Then we noticed this would also clean up the
-VM/VCPU_GENERIC stuff as well.
+> Add a macro for VFIO_DEVICE_STATE_ERROR to be used to set/check an error
+> state.
+> 
+> Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
+> ---
+>  include/uapi/linux/vfio.h | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> index 114ffcefe437..6d41a0f011db 100644
+> --- a/include/uapi/linux/vfio.h
+> +++ b/include/uapi/linux/vfio.h
+> @@ -631,6 +631,8 @@ struct vfio_device_migration_info {
+>  	__u64 data_size;
+>  };
+>  
+> +#define VFIO_DEVICE_STATE_ERROR (VFIO_DEVICE_STATE_SAVING | \
+> +				 VFIO_DEVICE_STATE_RESUMING)
 
+This should be with the other VFIO_DEVICE_STATE_foo #defines.  I'd
+probably put it between _RESUMING and _MASK.  Thanks,
 
-> I didn't like the
-> "generic" macros very much either, but not being able to use "#" at all
-> is also not nice.
->
-> Paolo
->
+Alex
+
+>  /*
+>   * The MSIX mappable capability informs that MSIX data of a BAR can be mmapped
+>   * which allows direct access to non-MSIX registers which happened to be within
+
