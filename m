@@ -2,94 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5DA50433903
-	for <lists+kvm@lfdr.de>; Tue, 19 Oct 2021 16:47:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7463C433997
+	for <lists+kvm@lfdr.de>; Tue, 19 Oct 2021 17:02:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232653AbhJSOt6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Oct 2021 10:49:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40074 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230464AbhJSOtq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Oct 2021 10:49:46 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54046C061776;
-        Tue, 19 Oct 2021 07:47:28 -0700 (PDT)
-Received: from zn.tnic (p200300ec2f12f600999171228a6b1e18.dip0.t-ipconnect.de [IPv6:2003:ec:2f12:f600:9991:7122:8a6b:1e18])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 52E231EC01A8;
-        Tue, 19 Oct 2021 16:47:26 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1634654846;
+        id S233169AbhJSPET (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Oct 2021 11:04:19 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:49303 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231250AbhJSPES (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 19 Oct 2021 11:04:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1634655725;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=0Z2IasPLEIyQ/8OC+77D3ZZ0oqt1dIqGErINkiovftc=;
-        b=MrvyHJ9936A+4bokpf5WDZ6JTZ0zKr3ZgLpA+nLq8oid42c2itGnE04Tj5VWA6DQyhfFis
-        LRzsM1hx5ve/IQZDBACckqZiq3/Q326OaxEYxtRxenN55L8R2aFhgsHrHgzH5cDgumdJJ5
-        5RIvmd1tiz5D1ndwHr/lGaeH5DnvexU=
-Date:   Tue, 19 Oct 2021 16:47:25 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH v6 09/42] x86/sev: Check SEV-SNP features support
-Message-ID: <YW7afYTDgZce/Rzr@zn.tnic>
-References: <20211008180453.462291-1-brijesh.singh@amd.com>
- <20211008180453.462291-10-brijesh.singh@amd.com>
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=jhxQbCvPt9k7qjV8cpAQkgXwZ1CfLLc9Rp47cIV8fMc=;
+        b=eLkuLh7LgT3/CW/XPbv7RvYuA0TNeV5r0lYO7PTuYyi+ukAfWyjxQ4QAgjwBKSIU4Zi77A
+        kzzKpIvhJAIRwfmbiglmIjyMZk73Ebq3X++dWrcozilqGYDxsMZT2hO/q9Z4717310/GMt
+        YpdNOAXhJKuLM0iRV/BniBpfJGGw3TM=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-105-GpcvmPqsMRKy7NJrerq1mg-1; Tue, 19 Oct 2021 11:02:03 -0400
+X-MC-Unique: GpcvmPqsMRKy7NJrerq1mg-1
+Received: by mail-wm1-f70.google.com with SMTP id n9-20020a1c7209000000b0030da7d466b8so1268444wmc.5
+        for <kvm@vger.kernel.org>; Tue, 19 Oct 2021 08:02:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=jhxQbCvPt9k7qjV8cpAQkgXwZ1CfLLc9Rp47cIV8fMc=;
+        b=oHtjJZkGiauTRv2tHQxGK+NDsLlpyrDlFAKG2zmiSmLS3+7sunYLuQ4TKI96pIb2yr
+         55daD/xK9vmVPuOErThzCSikfDvrSE5W2nMCMC832aI1g/wimB8YWrGXU3PyTZVGJHVn
+         /xxukg6aoXN0xCrZdTYOWAycutYsWaEdRW52jomn/YmonZil9vObhX46fcB+OysHf5Rw
+         r7p/Gm0vuLwtjLJ0sAsOd0F+I+uXVckMxIm7yRceQzrgzt1oamw69CIkQUYRfGG85DjQ
+         iYYvoQtA7bICzCnIPZ6DywdzX9c+sVlMrELs9vo1i22MqV1naDukEr4OjukYSimbKxPn
+         ffXQ==
+X-Gm-Message-State: AOAM5322hvBEQIeGgmWOlwmhez1a/M+v/q93bKtbuRuyVbKjhHLzKeSt
+        RMqClBZNtVOH02PdrvZpVe58S3AnAjqY1BfFDMsudismelcOyp5SCfVltIljYq2XyCgHAyIbE/N
+        hJQnm4TCjMak1
+X-Received: by 2002:a5d:6501:: with SMTP id x1mr43092280wru.77.1634655722241;
+        Tue, 19 Oct 2021 08:02:02 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzHgWKl7qyYHVtvsIGGKfTGDA74aQXfzBBZHNOVU1NZOwzuqKP3gXixuaOZtvUfNTwapsZn9Q==
+X-Received: by 2002:a5d:6501:: with SMTP id x1mr43092239wru.77.1634655721906;
+        Tue, 19 Oct 2021 08:02:01 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:8e02:b072:96b1:56d0? ([2001:b07:6468:f312:8e02:b072:96b1:56d0])
+        by smtp.gmail.com with ESMTPSA id n17sm15231642wrq.11.2021.10.19.08.02.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 19 Oct 2021 08:02:01 -0700 (PDT)
+Message-ID: <f7aa03ab-2067-be7f-06c0-1aad96e460a4@redhat.com>
+Date:   Tue, 19 Oct 2021 17:02:00 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20211008180453.462291-10-brijesh.singh@amd.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [PATCH v1] KVM: stats: Decouple stats name string from its field
+ name in structure
+Content-Language: en-US
+To:     Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
+        David Matlack <dmatlack@google.com>,
+        Oliver Upton <oupton@google.com>
+References: <20211019000459.3163029-1-jingzhangos@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20211019000459.3163029-1-jingzhangos@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 08, 2021 at 01:04:20PM -0500, Brijesh Singh wrote:
-> +static bool do_early_sev_setup(void)
->  {
->  	if (!sev_es_negotiate_protocol())
->  		sev_es_terminate(SEV_TERM_SET_GEN, GHCB_SEV_ES_PROT_UNSUPPORTED);
->  
-> +	/*
-> +	 * If SEV-SNP is enabled, then check if the hypervisor supports the SEV-SNP
-> +	 * features.
+On 19/10/21 02:04, Jing Zhang wrote:
+> There are situations we need to group some stats in a structure (like
+> the VM/VCPU generic stats). Improve stats macros to decouple the
+> exported stats name from its field name in C structure. This also
+> removes the specific macros for VM/VCPU generic stats.
 
-This and the other comment should say something along the lines of:
+Do you have other uses in mind than generic stats?  I didn't like the 
+"generic" macros very much either, but not being able to use "#" at all 
+is also not nice.
 
-"SNP is supported in v2 of the GHCB spec which mandates support for HV
-features."
+Paolo
 
-because it wasn't clear to me why we're enforcing that support here.
-
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
