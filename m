@@ -2,67 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 03E8C433EB0
-	for <lists+kvm@lfdr.de>; Tue, 19 Oct 2021 20:44:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9DE0D433ED7
+	for <lists+kvm@lfdr.de>; Tue, 19 Oct 2021 20:55:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234531AbhJSSqM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Oct 2021 14:46:12 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:55875 "EHLO
+        id S234613AbhJSS5b (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Oct 2021 14:57:31 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:51720 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233787AbhJSSqL (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 19 Oct 2021 14:46:11 -0400
+        by vger.kernel.org with ESMTP id S231355AbhJSS5a (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 19 Oct 2021 14:57:30 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634669038;
+        s=mimecast20190719; t=1634669717;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Sr+x84SCkmGLApJEjQsX0aDeUaBjlbrwfVOJ4N8OhpA=;
-        b=N8OW5jdH6bnDiG/2SH7s0CPZhFFy0SI0yd7LT+pU7m+zMa2W7Xoan0oBeOaLeLW4eRV6Ch
-        YShXHKgJISe6bygXxky0sOux+JNdqDCb1eip03lyq+QHhNrA9G8PABv/heKq8osoKr0GOh
-        d1oPsdCxZs8R92hD2QdPNgE6WCwq3Rc=
-Received: from mail-oi1-f198.google.com (mail-oi1-f198.google.com
- [209.85.167.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-44-oVAnC_-IP-izAiexbGRKDw-1; Tue, 19 Oct 2021 14:43:57 -0400
-X-MC-Unique: oVAnC_-IP-izAiexbGRKDw-1
-Received: by mail-oi1-f198.google.com with SMTP id o62-20020acaf041000000b00276562d5a75so2342928oih.13
-        for <kvm@vger.kernel.org>; Tue, 19 Oct 2021 11:43:56 -0700 (PDT)
+        bh=C9pInqT0x8tL+gZeRj+uARHfyBEVwwnUEmKq2gOLQEY=;
+        b=hY50/xoU1NjO0sJNrJ57cxo1XZOFcm2DWJldATI0/Sv1gZs34+admk90IXSemXjVsrBW5S
+        aa0JaGByHy56u0L1thiy2mKmGEIWkz7j9BUnqDzrQbFv20R7GQxRLSEhdVXFDiFN8BHnwi
+        UubDlnlVdGpOETgihHgsPn2qxKGOSgk=
+Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com
+ [209.85.210.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-316-GChjsJaBMMKzuyxuG6rl1A-1; Tue, 19 Oct 2021 14:55:15 -0400
+X-MC-Unique: GChjsJaBMMKzuyxuG6rl1A-1
+Received: by mail-ot1-f71.google.com with SMTP id b7-20020a0568301de700b0054e351e751aso2287706otj.11
+        for <kvm@vger.kernel.org>; Tue, 19 Oct 2021 11:55:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=Sr+x84SCkmGLApJEjQsX0aDeUaBjlbrwfVOJ4N8OhpA=;
-        b=XsElKfAr2rBnjvOxT6O4k3M8b5H516BeZoyHQSYmfB2alw+CSfdoUJ+CL3HmziED2J
-         8RIheHLjGTAWeKL0bqBbh2AzJlqkLLXwOT8kiFnbGcWo/TYtRlGB4mKWTCSntHN8ES/M
-         3UyEvjYCNb8KRHOtdnZeU19bPZ7UynYocrLBGuRf11s8nSiI7FEWn9ZQ49TLBivFKYnk
-         UQRPacYzgHMQ+iL1kU61j+e6HwQ/y4yJRu+Vw13fCXEPDACbVtaRV73D4alahIVgNacJ
-         DgaH568zL1Zjl9AWuwlfNeyav39PHM2Rz8VQZ8djnu4/NH3nHj9dgGlSFt/qD/iNjKtG
-         eL4Q==
-X-Gm-Message-State: AOAM530d8Sz03EqzJtEkkGKttO2J1MNt+DFrfvaKTtXAdvU09GbZjaav
-        HcBX7JiV6F77rm2RZ99ogVIToC4BXn6VNNvALksK0Rz0AcQrpGPyqfLFRJxxJLqsWmu9PwwPO7I
-        9RfPjKf5oySNr
-X-Received: by 2002:a05:6808:21a7:: with SMTP id be39mr5821691oib.145.1634669035224;
-        Tue, 19 Oct 2021 11:43:55 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzdPrscBK1YG1VH1rUMi0yLuvlurM9VfSCdKInuWJvERwiEMMvX78fAUQE+08Aj4iTiMq6yiQ==
-X-Received: by 2002:a05:6808:21a7:: with SMTP id be39mr5821661oib.145.1634669034900;
-        Tue, 19 Oct 2021 11:43:54 -0700 (PDT)
+        bh=C9pInqT0x8tL+gZeRj+uARHfyBEVwwnUEmKq2gOLQEY=;
+        b=hE8i6+wn7If93YnNH6mLZ1hKyTBS+mTZhOMzYdPvDSx3ROjg6qAdn0AajPocybsyU5
+         FThjR4d6HCygQ+iTnO/WonaMd1O/aMPfjOS9yFvzXql9Wf0zd5N8E9fxGHAIvWQ9mEtq
+         5rCQpt+mvmCsTTkL/Orc8Q1SDNwUhQjvnRXW5gR8d6Mfz54moeWya5e3teQaHUSeklBS
+         60Blx6iiOLwkEvM04wD4w5VtYvdvBY3cMxZHy0IvOWLaiUtIQMJLDnPlES78ulP5PXHS
+         2IqZd4+aNVDjwFelfOCWIzKGHN2pwQpewWlcRLkFkXsVzHxFRbj5+/s0cMsP7QqfLl13
+         p/ig==
+X-Gm-Message-State: AOAM533/iGCwDvu5D3JMbc1tHlmdPlsn4o5/AG8fHTGDt7+suRUdUx3v
+        LT+CIGUoq/IXDI7Ra0/mm/wXzkgbC+6DLO+D4JGKI9imAWNXGqZUONU6IhSBQATcitk/+lMEbQD
+        YIgjP14pEz4Kt
+X-Received: by 2002:a05:6830:3184:: with SMTP id p4mr6660767ots.219.1634669714999;
+        Tue, 19 Oct 2021 11:55:14 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyYuYWzej6WRwpFRe+xeU0VckgFTXZrx1wHyJQOQaSjSBmKomLO/QW64NjjAECvHkUqbcqg2A==
+X-Received: by 2002:a05:6830:3184:: with SMTP id p4mr6660750ots.219.1634669714770;
+        Tue, 19 Oct 2021 11:55:14 -0700 (PDT)
 Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id bb39sm4048561oib.28.2021.10.19.11.43.54
+        by smtp.gmail.com with ESMTPSA id l1sm2328995oic.30.2021.10.19.11.55.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Oct 2021 11:43:54 -0700 (PDT)
-Date:   Tue, 19 Oct 2021 12:43:52 -0600
+        Tue, 19 Oct 2021 11:55:14 -0700 (PDT)
+Date:   Tue, 19 Oct 2021 12:55:13 -0600
 From:   Alex Williamson <alex.williamson@redhat.com>
 To:     Yishai Hadas <yishaih@nvidia.com>
 Cc:     <bhelgaas@google.com>, <jgg@nvidia.com>, <saeedm@nvidia.com>,
         <linux-pci@vger.kernel.org>, <kvm@vger.kernel.org>,
         <netdev@vger.kernel.org>, <kuba@kernel.org>, <leonro@nvidia.com>,
         <kwankhede@nvidia.com>, <mgurtovoy@nvidia.com>, <maorg@nvidia.com>
-Subject: Re: [PATCH V2 mlx5-next 12/14] vfio/mlx5: Implement vfio_pci driver
- for mlx5 devices
-Message-ID: <20211019124352.74c3b6ba.alex.williamson@redhat.com>
-In-Reply-To: <20211019105838.227569-13-yishaih@nvidia.com>
+Subject: Re: [PATCH V2 mlx5-next 14/14] vfio/mlx5: Use its own PCI
+ reset_done error handler
+Message-ID: <20211019125513.4e522af9.alex.williamson@redhat.com>
+In-Reply-To: <20211019105838.227569-15-yishaih@nvidia.com>
 References: <20211019105838.227569-1-yishaih@nvidia.com>
-        <20211019105838.227569-13-yishaih@nvidia.com>
+        <20211019105838.227569-15-yishaih@nvidia.com>
 X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
@@ -71,483 +71,104 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 19 Oct 2021 13:58:36 +0300
+On Tue, 19 Oct 2021 13:58:38 +0300
 Yishai Hadas <yishaih@nvidia.com> wrote:
 
-> This patch adds support for vfio_pci driver for mlx5 devices.
-> 
-> It uses vfio_pci_core to register to the VFIO subsystem and then
-> implements the mlx5 specific logic in the migration area.
-> 
-> The migration implementation follows the definition from uapi/vfio.h and
-> uses the mlx5 VF->PF command channel to achieve it.
-> 
-> This patch implements the suspend/resume flows.
+> Register its own handler for pci_error_handlers.reset_done and update
+> state accordingly.
 > 
 > Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
 > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
 > ---
->  MAINTAINERS                    |   6 +
->  drivers/vfio/pci/Kconfig       |   3 +
->  drivers/vfio/pci/Makefile      |   2 +
->  drivers/vfio/pci/mlx5/Kconfig  |  10 +
->  drivers/vfio/pci/mlx5/Makefile |   4 +
->  drivers/vfio/pci/mlx5/main.c   | 696 +++++++++++++++++++++++++++++++++
->  6 files changed, 721 insertions(+)
->  create mode 100644 drivers/vfio/pci/mlx5/Kconfig
->  create mode 100644 drivers/vfio/pci/mlx5/Makefile
->  create mode 100644 drivers/vfio/pci/mlx5/main.c
+>  drivers/vfio/pci/mlx5/main.c | 33 ++++++++++++++++++++++++++++++++-
+>  1 file changed, 32 insertions(+), 1 deletion(-)
 > 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index abdcbcfef73d..e824bfab4a01 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -19699,6 +19699,12 @@ L:	kvm@vger.kernel.org
->  S:	Maintained
->  F:	drivers/vfio/platform/
->  
-> +VFIO MLX5 PCI DRIVER
-> +M:	Yishai Hadas <yishaih@nvidia.com>
-> +L:	kvm@vger.kernel.org
-> +S:	Maintained
-> +F:	drivers/vfio/pci/mlx5/
-> +
->  VGA_SWITCHEROO
->  R:	Lukas Wunner <lukas@wunner.de>
->  S:	Maintained
-> diff --git a/drivers/vfio/pci/Kconfig b/drivers/vfio/pci/Kconfig
-> index 860424ccda1b..187b9c259944 100644
-> --- a/drivers/vfio/pci/Kconfig
-> +++ b/drivers/vfio/pci/Kconfig
-> @@ -43,4 +43,7 @@ config VFIO_PCI_IGD
->  
->  	  To enable Intel IGD assignment through vfio-pci, say Y.
->  endif
-> +
-> +source "drivers/vfio/pci/mlx5/Kconfig"
-> +
->  endif
-> diff --git a/drivers/vfio/pci/Makefile b/drivers/vfio/pci/Makefile
-> index 349d68d242b4..ed9d6f2e0555 100644
-> --- a/drivers/vfio/pci/Makefile
-> +++ b/drivers/vfio/pci/Makefile
-> @@ -7,3 +7,5 @@ obj-$(CONFIG_VFIO_PCI_CORE) += vfio-pci-core.o
->  vfio-pci-y := vfio_pci.o
->  vfio-pci-$(CONFIG_VFIO_PCI_IGD) += vfio_pci_igd.o
->  obj-$(CONFIG_VFIO_PCI) += vfio-pci.o
-> +
-> +obj-$(CONFIG_MLX5_VFIO_PCI)           += mlx5/
-> diff --git a/drivers/vfio/pci/mlx5/Kconfig b/drivers/vfio/pci/mlx5/Kconfig
-> new file mode 100644
-> index 000000000000..119712656400
-> --- /dev/null
-> +++ b/drivers/vfio/pci/mlx5/Kconfig
-> @@ -0,0 +1,10 @@
-> +# SPDX-License-Identifier: GPL-2.0-only
-> +config MLX5_VFIO_PCI
-> +	tristate "VFIO support for MLX5 PCI devices"
-> +	depends on MLX5_CORE
-> +	select VFIO_PCI_CORE
-> +	help
-> +	  This provides a migration support for MLX5 devices using the VFIO
-
-s/ a//
-
-
-> +	  framework.
-> +
-> +	  If you don't know what to do here, say N.
-> diff --git a/drivers/vfio/pci/mlx5/Makefile b/drivers/vfio/pci/mlx5/Makefile
-> new file mode 100644
-> index 000000000000..689627da7ff5
-> --- /dev/null
-> +++ b/drivers/vfio/pci/mlx5/Makefile
-> @@ -0,0 +1,4 @@
-> +# SPDX-License-Identifier: GPL-2.0-only
-> +obj-$(CONFIG_MLX5_VFIO_PCI) += mlx5-vfio-pci.o
-> +mlx5-vfio-pci-y := main.o cmd.o
-> +
 > diff --git a/drivers/vfio/pci/mlx5/main.c b/drivers/vfio/pci/mlx5/main.c
-> new file mode 100644
-> index 000000000000..621b7fc60544
-> --- /dev/null
+> index 621b7fc60544..b759c6e153b6 100644
+> --- a/drivers/vfio/pci/mlx5/main.c
 > +++ b/drivers/vfio/pci/mlx5/main.c
-> @@ -0,0 +1,696 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * Copyright (c) 2021, NVIDIA CORPORATION & AFFILIATES. All rights reserved
-> + */
-> +
-> +#include <linux/device.h>
-> +#include <linux/eventfd.h>
-> +#include <linux/file.h>
-> +#include <linux/interrupt.h>
-> +#include <linux/iommu.h>
-> +#include <linux/module.h>
-> +#include <linux/mutex.h>
-> +#include <linux/notifier.h>
-> +#include <linux/pci.h>
-> +#include <linux/pm_runtime.h>
-> +#include <linux/types.h>
-> +#include <linux/uaccess.h>
-> +#include <linux/vfio.h>
-> +#include <linux/sched/mm.h>
-> +#include <linux/vfio_pci_core.h>
-> +
-> +#include "cmd.h"
-> +
-> +enum {
-> +	MLX5VF_PCI_FREEZED = 1 << 0,
-> +};
-> +
-> +enum {
-> +	MLX5VF_REGION_PENDING_BYTES = 1 << 0,
-> +	MLX5VF_REGION_DATA_SIZE = 1 << 1,
-> +};
-> +
-> +enum {
-> +	MLX5VF_SUPPORTED_DEVICE_STATES = VFIO_DEVICE_STATE_RUNNING |
-> +					 VFIO_DEVICE_STATE_SAVING |
-> +					 VFIO_DEVICE_STATE_RESUMING,
-> +};
-> +
-> +#define MLX5VF_MIG_REGION_DATA_SIZE SZ_128K
-> +/* Data section offset from migration region */
-> +#define MLX5VF_MIG_REGION_DATA_OFFSET                                          \
-> +	(sizeof(struct vfio_device_migration_info))
-> +
-> +#define VFIO_DEVICE_MIGRATION_OFFSET(x)                                        \
-> +	(offsetof(struct vfio_device_migration_info, x))
-> +
-> +struct mlx5vf_pci_migration_info {
-> +	u32 vfio_dev_state; /* VFIO_DEVICE_STATE_XXX */
-> +	u32 dev_state; /* device migration state */
-> +	u32 region_state; /* Use MLX5VF_REGION_XXX */
-> +	u16 vhca_id;
-> +	struct mlx5_vhca_state_data vhca_state_data;
-> +};
-> +
-> +struct mlx5vf_pci_core_device {
-> +	struct vfio_pci_core_device core_device;
-> +	u8 migrate_cap:1;
-> +	/* protect migartion state */
-
-s/migartion/migration/
-
-> +	struct mutex state_mutex;
-> +	struct mlx5vf_pci_migration_info vmig;
-> +};
-> +
-> +static int mlx5vf_pci_unquiesce_device(struct mlx5vf_pci_core_device *mvdev)
+> @@ -58,6 +58,7 @@ struct mlx5vf_pci_core_device {
+>  	/* protect migartion state */
+>  	struct mutex state_mutex;
+>  	struct mlx5vf_pci_migration_info vmig;
+> +	struct work_struct work;
+>  };
+>  
+>  static int mlx5vf_pci_unquiesce_device(struct mlx5vf_pci_core_device *mvdev)
+> @@ -615,6 +616,27 @@ static const struct vfio_device_ops mlx5vf_pci_ops = {
+>  	.match = vfio_pci_core_match,
+>  };
+>  
+> +static void mlx5vf_reset_work_handler(struct work_struct *work)
 > +{
-> +	return mlx5vf_cmd_resume_vhca(mvdev->core_device.pdev,
-> +				      mvdev->vmig.vhca_id,
-> +				      MLX5_RESUME_VHCA_IN_OP_MOD_RESUME_MASTER);
+> +	struct mlx5vf_pci_core_device *mvdev =
+> +		container_of(work, struct mlx5vf_pci_core_device, work);
+> +
+> +	mutex_lock(&mvdev->state_mutex);
+> +	mlx5vf_reset_mig_state(mvdev);
+
+I see this calls mlx5vf_reset_vhca_state() but how does that unfreeze
+and unquiesce the device as necessary to get back to _RUNNING?
+
+> +	mvdev->vmig.vfio_dev_state = VFIO_DEVICE_STATE_RUNNING;
+> +	mutex_unlock(&mvdev->state_mutex);
 > +}
 > +
-> +static int mlx5vf_pci_quiesce_device(struct mlx5vf_pci_core_device *mvdev)
+> +static void mlx5vf_pci_aer_reset_done(struct pci_dev *pdev)
 > +{
-> +	return mlx5vf_cmd_suspend_vhca(
-> +		mvdev->core_device.pdev, mvdev->vmig.vhca_id,
-> +		MLX5_SUSPEND_VHCA_IN_OP_MOD_SUSPEND_MASTER);
-> +}
+> +	struct mlx5vf_pci_core_device *mvdev = dev_get_drvdata(&pdev->dev);
 > +
-> +static int mlx5vf_pci_unfreeze_device(struct mlx5vf_pci_core_device *mvdev)
-> +{
-> +	int ret;
+> +	if (!mvdev->migrate_cap)
+> +		return;
 > +
-> +	ret = mlx5vf_cmd_resume_vhca(mvdev->core_device.pdev,
-> +				     mvdev->vmig.vhca_id,
-> +				     MLX5_RESUME_VHCA_IN_OP_MOD_RESUME_SLAVE);
-> +	if (ret)
-> +		return ret;
-> +
-> +	mvdev->vmig.dev_state &= ~MLX5VF_PCI_FREEZED;
-> +	return 0;
-> +}
-> +
-> +static int mlx5vf_pci_freeze_device(struct mlx5vf_pci_core_device *mvdev)
-> +{
-> +	int ret;
-> +
-> +	ret = mlx5vf_cmd_suspend_vhca(
-> +		mvdev->core_device.pdev, mvdev->vmig.vhca_id,
-> +		MLX5_SUSPEND_VHCA_IN_OP_MOD_SUSPEND_SLAVE);
-> +	if (ret)
-> +		return ret;
-> +
-> +	mvdev->vmig.dev_state |= MLX5VF_PCI_FREEZED;
-> +	return 0;
-> +}
-> +
-> +static int mlx5vf_pci_save_device_data(struct mlx5vf_pci_core_device *mvdev)
-> +{
-> +	u32 state_size = 0;
-> +	int ret;
-> +
-> +	if (!(mvdev->vmig.dev_state & MLX5VF_PCI_FREEZED))
-> +		return -EFAULT;
-> +
-> +	/* If we already read state no reason to re-read */
-> +	if (mvdev->vmig.vhca_state_data.state_size)
-> +		return 0;
-> +
-> +	ret = mlx5vf_cmd_query_vhca_migration_state(
-> +		mvdev->core_device.pdev, mvdev->vmig.vhca_id, &state_size);
-> +	if (ret)
-> +		return ret;
-> +
-> +	return mlx5vf_cmd_save_vhca_state(mvdev->core_device.pdev,
-> +					  mvdev->vmig.vhca_id, state_size,
-> +					  &mvdev->vmig.vhca_state_data);
-> +}
-> +
-> +static int mlx5vf_pci_new_write_window(struct mlx5vf_pci_core_device *mvdev)
-> +{
-> +	struct mlx5_vhca_state_data *state_data = &mvdev->vmig.vhca_state_data;
-> +	u32 num_pages_needed;
-> +	u64 allocated_ready;
-> +	u32 bytes_needed;
-> +
-> +	/* Check how many bytes are available from previous flows */
-> +	WARN_ON(state_data->num_pages * PAGE_SIZE <
-> +		state_data->win_start_offset);
-> +	allocated_ready = (state_data->num_pages * PAGE_SIZE) -
-> +			  state_data->win_start_offset;
-> +	WARN_ON(allocated_ready > MLX5VF_MIG_REGION_DATA_SIZE);
-> +
-> +	bytes_needed = MLX5VF_MIG_REGION_DATA_SIZE - allocated_ready;
-> +	if (!bytes_needed)
-> +		return 0;
-> +
-> +	num_pages_needed = DIV_ROUND_UP_ULL(bytes_needed, PAGE_SIZE);
-> +	return mlx5vf_add_migration_pages(state_data, num_pages_needed);
-> +}
-> +
-> +static ssize_t
-> +mlx5vf_pci_handle_migration_data_size(struct mlx5vf_pci_core_device *mvdev,
-> +				      char __user *buf, bool iswrite)
-> +{
-> +	struct mlx5vf_pci_migration_info *vmig = &mvdev->vmig;
-> +	u64 data_size;
-> +	int ret;
-> +
-> +	if (iswrite) {
-> +		/* data_size is writable only during resuming state */
-> +		if (vmig->vfio_dev_state != VFIO_DEVICE_STATE_RESUMING)
-> +			return -EINVAL;
-> +
-> +		ret = copy_from_user(&data_size, buf, sizeof(data_size));
-> +		if (ret)
-> +			return -EFAULT;
-> +
-> +		vmig->vhca_state_data.state_size += data_size;
-> +		vmig->vhca_state_data.win_start_offset += data_size;
-> +		ret = mlx5vf_pci_new_write_window(mvdev);
-> +		if (ret)
-> +			return ret;
-> +
-> +	} else {
-> +		if (vmig->vfio_dev_state != VFIO_DEVICE_STATE_SAVING)
-> +			return -EINVAL;
-> +
-> +		data_size = min_t(u64, MLX5VF_MIG_REGION_DATA_SIZE,
-> +				  vmig->vhca_state_data.state_size -
-> +				  vmig->vhca_state_data.win_start_offset);
-> +		ret = copy_to_user(buf, &data_size, sizeof(data_size));
-> +		if (ret)
-> +			return -EFAULT;
-> +	}
-> +
-> +	vmig->region_state |= MLX5VF_REGION_DATA_SIZE;
-> +	return sizeof(data_size);
-> +}
-> +
-> +static ssize_t
-> +mlx5vf_pci_handle_migration_data_offset(struct mlx5vf_pci_core_device *mvdev,
-> +					char __user *buf, bool iswrite)
-> +{
-> +	static const u64 data_offset = MLX5VF_MIG_REGION_DATA_OFFSET;
-> +	int ret;
-> +
-> +	/* RO field */
-> +	if (iswrite)
-> +		return -EFAULT;
-> +
-> +	ret = copy_to_user(buf, &data_offset, sizeof(data_offset));
-> +	if (ret)
-> +		return -EFAULT;
-> +
-> +	return sizeof(data_offset);
-> +}
-> +
-> +static ssize_t
-> +mlx5vf_pci_handle_migration_pending_bytes(struct mlx5vf_pci_core_device *mvdev,
-> +					  char __user *buf, bool iswrite)
-> +{
-> +	struct mlx5vf_pci_migration_info *vmig = &mvdev->vmig;
-> +	u64 pending_bytes;
-> +	int ret;
-> +
-> +	/* RO field */
-> +	if (iswrite)
-> +		return -EFAULT;
-> +
-> +	if (vmig->vfio_dev_state == (VFIO_DEVICE_STATE_SAVING |
-> +				     VFIO_DEVICE_STATE_RUNNING)) {
-> +		/* In pre-copy state we have no data to return for now,
-> +		 * return 0 pending bytes
-> +		 */
-> +		pending_bytes = 0;
-> +	} else {
-> +		if (!vmig->vhca_state_data.state_size)
-> +			return 0;
-> +		pending_bytes = vmig->vhca_state_data.state_size -
-> +				vmig->vhca_state_data.win_start_offset;
-> +	}
-> +
-> +	ret = copy_to_user(buf, &pending_bytes, sizeof(pending_bytes));
-> +	if (ret)
-> +		return -EFAULT;
-> +
-> +	/* Window moves forward once data from previous iteration was read */
-> +	if (vmig->region_state & MLX5VF_REGION_DATA_SIZE)
-> +		vmig->vhca_state_data.win_start_offset +=
-> +			min_t(u64, MLX5VF_MIG_REGION_DATA_SIZE, pending_bytes);
-> +
-> +	WARN_ON(vmig->vhca_state_data.win_start_offset >
-> +		vmig->vhca_state_data.state_size);
-> +
-> +	/* New iteration started */
-> +	vmig->region_state = MLX5VF_REGION_PENDING_BYTES;
-> +	return sizeof(pending_bytes);
-> +}
-> +
-> +static int mlx5vf_load_state(struct mlx5vf_pci_core_device *mvdev)
-> +{
-> +	if (!mvdev->vmig.vhca_state_data.state_size)
-> +		return 0;
-> +
-> +	return mlx5vf_cmd_load_vhca_state(mvdev->core_device.pdev,
-> +					  mvdev->vmig.vhca_id,
-> +					  &mvdev->vmig.vhca_state_data);
-> +}
-> +
-> +static void mlx5vf_reset_mig_state(struct mlx5vf_pci_core_device *mvdev)
-> +{
-> +	struct mlx5vf_pci_migration_info *vmig = &mvdev->vmig;
-> +
-> +	vmig->region_state = 0;
-> +	mlx5vf_reset_vhca_state(&vmig->vhca_state_data);
-> +}
-> +
-> +static int mlx5vf_pci_set_device_state(struct mlx5vf_pci_core_device *mvdev,
-> +				       u32 state)
-> +{
-> +	struct mlx5vf_pci_migration_info *vmig = &mvdev->vmig;
-> +	u32 old_state = vmig->vfio_dev_state;
-> +	int ret = 0;
-> +
-> +	if (old_state == VFIO_DEVICE_STATE_ERROR ||
-> +	    !VFIO_DEVICE_STATE_VALID(state) ||
-> +	    (state & ~MLX5VF_SUPPORTED_DEVICE_STATES))
-> +		return -EINVAL;
-> +
-> +	/* Running switches off */
-> +	if (((old_state ^ state) & VFIO_DEVICE_STATE_RUNNING) &&
-> +	    (old_state & VFIO_DEVICE_STATE_RUNNING)) {
-> +		ret = mlx5vf_pci_quiesce_device(mvdev);
-> +		if (ret)
-> +			return ret;
-> +		ret = mlx5vf_pci_freeze_device(mvdev);
-> +		if (ret) {
-> +			vmig->vfio_dev_state = VFIO_DEVICE_STATE_ERROR;
-> +			return ret;
-> +		}
-> +	}
-> +
-> +	/* Resuming switches off */
-> +	if (((old_state ^ state) & VFIO_DEVICE_STATE_RESUMING) &&
-> +	    (old_state & VFIO_DEVICE_STATE_RESUMING)) {
-> +		/* deserialize state into the device */
-> +		ret = mlx5vf_load_state(mvdev);
-> +		if (ret) {
-> +			vmig->vfio_dev_state = VFIO_DEVICE_STATE_ERROR;
-> +			return ret;
-> +		}
-> +	}
-> +
-> +	/* Resuming switches on */
-> +	if (((old_state ^ state) & VFIO_DEVICE_STATE_RESUMING) &&
-> +	    (state & VFIO_DEVICE_STATE_RESUMING)) {
-> +		mlx5vf_reset_mig_state(mvdev);
-> +		ret = mlx5vf_pci_new_write_window(mvdev);
-> +		if (ret)
-> +			return ret;
-> +	}
+> +	schedule_work(&mvdev->work);
 
-A couple nits here...
-
-Perhaps:
-
-	if ((old_state ^ state) & VFIO_DEVICE_STATE_RESUMING)) {
-		/* Resuming bit cleared */
-		if (old_state & VFIO_DEVICE_STATE_RESUMING) {
-			...
-		} else { /* Resuming bit set */
-			...
-		}
-	}
-
-Also
-
-	u32 flipped_bits = old_state ^ state;
-
-or similar would simplify all these cases slightly.
-
-
-> +
-> +	/* Saving switches on */
-> +	if (((old_state ^ state) & VFIO_DEVICE_STATE_SAVING) &&
-> +	    (state & VFIO_DEVICE_STATE_SAVING)) {
-> +		if (!(state & VFIO_DEVICE_STATE_RUNNING)) {
-> +			/* serialize post copy */
-> +			ret = mlx5vf_pci_save_device_data(mvdev);
-> +			if (ret)
-> +				return ret;
-> +		}
-> +	}
-
-This doesn't catch all the cases, and in fact misses the most expected
-case where userspace clears the _RUNNING bit while _SAVING is already
-enabled.  Does that mean this hasn't actually been tested with QEMU?
-
-It seems like there also needs to be a clause in the case where
-_RUNNING switches off to test if _SAVING is already set and has not
-toggled.
-
-
-> +
-> +	/* Running switches on */
-> +	if (((old_state ^ state) & VFIO_DEVICE_STATE_RUNNING) &&
-> +	    (state & VFIO_DEVICE_STATE_RUNNING)) {
-> +		ret = mlx5vf_pci_unfreeze_device(mvdev);
-> +		if (ret)
-> +			return ret;
-> +		ret = mlx5vf_pci_unquiesce_device(mvdev);
-> +		if (ret) {
-> +			vmig->vfio_dev_state = VFIO_DEVICE_STATE_ERROR;
-> +			return ret;
-> +		}
-> +	}
-
-Per previous discussion, I understand that freeze and quiesce are
-loosely stop-responding-to-dma and stop-sending-dma, respectively.
-Once we're quiesced and frozen, device state doesn't change.  What are
-the implications to userspace that we don't expose a quiesce state
-(yet)?  I'm wondering if this needs to be resolved before we introduce
-our first in-tree user of the uAPI (and before QEMU support becomes
-non-experimental).  Thanks,
+This seems troublesome, how long does userspace poll the device state
+after reset to get back to _RUNNING?  Seems we at least need a
+flush_work() call when userspace reads the device state.  Thanks,
 
 Alex
+
+> +}
+> +
+>  static int mlx5vf_pci_probe(struct pci_dev *pdev,
+>  			    const struct pci_device_id *id)
+>  {
+> @@ -634,6 +656,8 @@ static int mlx5vf_pci_probe(struct pci_dev *pdev,
+>  			if (MLX5_CAP_GEN(mdev, migration)) {
+>  				mvdev->migrate_cap = 1;
+>  				mutex_init(&mvdev->state_mutex);
+> +				INIT_WORK(&mvdev->work,
+> +					  mlx5vf_reset_work_handler);
+>  			}
+>  			mlx5_vf_put_core_dev(mdev);
+>  		}
+> @@ -656,6 +680,8 @@ static void mlx5vf_pci_remove(struct pci_dev *pdev)
+>  {
+>  	struct mlx5vf_pci_core_device *mvdev = dev_get_drvdata(&pdev->dev);
+>  
+> +	if (mvdev->migrate_cap)
+> +		cancel_work_sync(&mvdev->work);
+>  	vfio_pci_core_unregister_device(&mvdev->core_device);
+>  	vfio_pci_core_uninit_device(&mvdev->core_device);
+>  	kfree(mvdev);
+> @@ -668,12 +694,17 @@ static const struct pci_device_id mlx5vf_pci_table[] = {
+>  
+>  MODULE_DEVICE_TABLE(pci, mlx5vf_pci_table);
+>  
+> +const struct pci_error_handlers mlx5vf_err_handlers = {
+> +	.reset_done = mlx5vf_pci_aer_reset_done,
+> +	.error_detected = vfio_pci_aer_err_detected,
+> +};
+> +
+>  static struct pci_driver mlx5vf_pci_driver = {
+>  	.name = KBUILD_MODNAME,
+>  	.id_table = mlx5vf_pci_table,
+>  	.probe = mlx5vf_pci_probe,
+>  	.remove = mlx5vf_pci_remove,
+> -	.err_handler = &vfio_pci_core_err_handlers,
+> +	.err_handler = &mlx5vf_err_handlers,
+>  };
+>  
+>  static void __exit mlx5vf_pci_cleanup(void)
 
