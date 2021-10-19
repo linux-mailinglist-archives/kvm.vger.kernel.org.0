@@ -2,115 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0313C433CC8
-	for <lists+kvm@lfdr.de>; Tue, 19 Oct 2021 18:53:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A79B9433CCC
+	for <lists+kvm@lfdr.de>; Tue, 19 Oct 2021 18:53:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233737AbhJSQzu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Oct 2021 12:55:50 -0400
-Received: from mail-oi1-f173.google.com ([209.85.167.173]:39509 "EHLO
-        mail-oi1-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229774AbhJSQzt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Oct 2021 12:55:49 -0400
-Received: by mail-oi1-f173.google.com with SMTP id s9so3552502oiw.6;
-        Tue, 19 Oct 2021 09:53:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=fnwMHmBtcUTzeN7AT8ukQSoNU1knCjzi3Fwq9Ac0g90=;
-        b=HJdKu9Yc8oALg0EUXoUMBKenRfGSuc1q4BNOBnq1d3QPbXkCq0Q5jlBTo0ea8p8UZl
-         TFoRbrGnbWaGpIrHbQBqSuwUjDBjln3eaN2Tq7E0W56vbVBbTfmfC0AToRtbsfbJrN2f
-         TGQLAwhyx4BbOTgYtABGlXWrUetqHt59xqngUL10JUAD9n2+2D9oWEUJzviJL0Jxj5V5
-         1ehW808u32vCVZl2iVvCq3srHVgLn+AvHiMGVaozwkhe/dawpGSKvp7qDZAT2I5VNhxs
-         BJzngAMZ1t+SxOkjC/HJaDKF7a5CBdMUeB22usBCn/Xn19ZwnQcZOApGMc6tjISI+tdo
-         6Amw==
-X-Gm-Message-State: AOAM531GWuQFQ3L5WRDnGlhygdiI/0FEMysCTKio0KzcAOE7RqhVCKqw
-        nUgroemq5t+BnedFQmoE8w==
-X-Google-Smtp-Source: ABdhPJxG3M4MMDejwrse4k8mTAjT5I/40KR+eLLfq1+ZBF3yaKS308ugfGwsvK1xSATT6JQLbB2GBw==
-X-Received: by 2002:a05:6808:1185:: with SMTP id j5mr5157383oil.16.1634662416108;
-        Tue, 19 Oct 2021 09:53:36 -0700 (PDT)
-Received: from robh.at.kernel.org (66-90-148-213.dyn.grandenetworks.net. [66.90.148.213])
-        by smtp.gmail.com with ESMTPSA id l26sm3843004oti.45.2021.10.19.09.53.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Oct 2021 09:53:35 -0700 (PDT)
-Received: (nullmailer pid 427792 invoked by uid 1000);
-        Tue, 19 Oct 2021 16:53:33 -0000
-Date:   Tue, 19 Oct 2021 11:53:33 -0500
-From:   Rob Herring <robh@kernel.org>
-To:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-Cc:     Tony Luck <tony.luck@intel.com>,
-        Anton Vorontsov <anton@enomsg.org>,
-        Rob Herring <robh+dt@kernel.org>, bpf@vger.kernel.org,
-        Song Liu <songliubraving@fb.com>,
-        Martin KaFai Lau <kafai@fb.com>,
-        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-riscv@lists.infradead.org, kvm-riscv@lists.infradead.org,
-        netdev@vger.kernel.org, linux-gpio@vger.kernel.org,
-        linux-samsung-soc@vger.kernel.org, Chen-Yu Tsai <wens@csie.org>,
-        KP Singh <kpsingh@kernel.org>,
-        John Fastabend <john.fastabend@gmail.com>,
-        linux-fsdevel@vger.kernel.org, Anup Patel <anup.patel@wdc.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Bartosz Golaszewski <brgl@bgdev.pl>,
-        Shuah Khan <shuah@kernel.org>,
-        Colin Cross <ccross@android.com>, Alex Shi <alexs@kernel.org>,
-        Yonghong Song <yhs@fb.com>, Kees Cook <keescook@chromium.org>,
-        "J. Bruce Fields" <bfields@fieldses.org>, kvm@vger.kernel.org,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        sparmaintainer@unisys.com,
-        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-        Atish Patra <atish.patra@wdc.com>, devicetree@vger.kernel.org,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Jeff Layton <jlayton@kernel.org>
-Subject: Re: [PATCH v3 00/23] Fix some issues at documentation
-Message-ID: <YW74Dez4/3cIbe1Q@robh.at.kernel.org>
-References: <cover.1634630485.git.mchehab+huawei@kernel.org>
+        id S234549AbhJSQ4D (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Oct 2021 12:56:03 -0400
+Received: from mga12.intel.com ([192.55.52.136]:45765 "EHLO mga12.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S234509AbhJSQ4D (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Oct 2021 12:56:03 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10142"; a="208675114"
+X-IronPort-AV: E=Sophos;i="5.87,164,1631602800"; 
+   d="scan'208";a="208675114"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Oct 2021 09:53:44 -0700
+X-IronPort-AV: E=Sophos;i="5.87,164,1631602800"; 
+   d="scan'208";a="462833841"
+Received: from jacob-builder.jf.intel.com (HELO jacob-builder) ([10.7.199.155])
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Oct 2021 09:53:43 -0700
+Date:   Tue, 19 Oct 2021 09:57:34 -0700
+From:   Jacob Pan <jacob.jun.pan@linux.intel.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     "Liu, Yi L" <yi.l.liu@intel.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "hch@lst.de" <hch@lst.de>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "parav@mellanox.com" <parav@mellanox.com>,
+        "lkml@metux.net" <lkml@metux.net>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "lushenming@huawei.com" <lushenming@huawei.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "corbet@lwn.net" <corbet@lwn.net>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "yi.l.liu@linux.intel.com" <yi.l.liu@linux.intel.com>,
+        "Tian, Jun J" <jun.j.tian@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "dwmw2@infradead.org" <dwmw2@infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
+        "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        jacob.jun.pan@linux.intel.com
+Subject: Re: [RFC 01/20] iommu/iommufd: Add /dev/iommu core
+Message-ID: <20211019095734.2a3fb785@jacob-builder>
+In-Reply-To: <20211015111807.GD2744544@nvidia.com>
+References: <20210919063848.1476776-1-yi.l.liu@intel.com>
+        <20210919063848.1476776-2-yi.l.liu@intel.com>
+        <20210921154138.GM327412@nvidia.com>
+        <PH0PR11MB56583356619B3ECC23AB1BA8C3B99@PH0PR11MB5658.namprd11.prod.outlook.com>
+        <20211015111807.GD2744544@nvidia.com>
+Organization: OTC
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1634630485.git.mchehab+huawei@kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 19 Oct 2021 09:03:59 +0100, Mauro Carvalho Chehab wrote:
-> Hi Jon,
-> 
-> This series is against today's next (next-20211019) and addresses missing
-> links to Documentation/*.
-> 
-> The best would be to have the patches applied directly to the trees that
-> contain the patches that moved/renamed files, and then apply the
-> remaining ones either later during the merge window or just afterwards,
-> whatever works best for you.
-> 
-> Regards,
-> Mauro
-> 
-> Mauro Carvalho Chehab (23):
->   visorbus: fix a copyright symbol that was bad encoded
->   libbpf: update index.rst reference
->   docs: accounting: update delay-accounting.rst reference
->   MAINTAINERS: update arm,vic.yaml reference
->   MAINTAINERS: update aspeed,i2c.yaml reference
->   MAINTAINERS: update faraday,ftrtc010.yaml reference
->   MAINTAINERS: update ti,sci.yaml reference
->   MAINTAINERS: update intel,ixp46x-rng.yaml reference
->   MAINTAINERS: update nxp,imx8-jpeg.yaml reference
->   MAINTAINERS: update gemini.yaml reference
->   MAINTAINERS: update brcm,unimac-mdio.yaml reference
->   MAINTAINERS: update mtd-physmap.yaml reference
+Hi Jason,
 
-Applied patches 3-12.
+On Fri, 15 Oct 2021 08:18:07 -0300, Jason Gunthorpe <jgg@nvidia.com> wrote:
 
->   Documentation: update vcpu-requests.rst reference
->   bpftool: update bpftool-cgroup.rst reference
->   docs: translations: zn_CN: irq-affinity.rst: add a missing extension
->   docs: translations: zh_CN: memory-hotplug.rst: fix a typo
->   docs: fs: locks.rst: update comment about mandatory file locking
->   fs: remove a comment pointing to the removed mandatory-locking file
->   Documentation/process: fix a cross reference
->   dt-bindings: mfd: update x-powers,axp152.yaml reference
->   regulator: dt-bindings: update samsung,s2mpa01.yaml reference
->   regulator: dt-bindings: update samsung,s5m8767.yaml reference
->   dt-bindings: reserved-memory: ramoops: update ramoops.yaml references
+> On Fri, Oct 15, 2021 at 09:18:06AM +0000, Liu, Yi L wrote:
+> 
+> > >   Acquire from the xarray is
+> > >    rcu_lock()
+> > >    ioas = xa_load()
+> > >    if (ioas)
+> > >       if (down_read_trylock(&ioas->destroying_lock))  
+> > 
+> > all good suggestions, will refine accordingly. Here destroying_lock is a
+> > rw_semaphore. right? Since down_read_trylock() accepts a rwsem.  
+> 
+> Yes, you probably need a sleeping lock
+> 
+I am not following why we want a sleeping lock inside RCU protected
+section?
+
+For ioas, do we really care about the stale data to choose rw_lock vs RCU?
+Destroying can be kfree_rcu?
+> Jason
+
+
+Thanks,
+
+Jacob
