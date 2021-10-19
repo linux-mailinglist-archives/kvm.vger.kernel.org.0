@@ -2,56 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8389E43344B
-	for <lists+kvm@lfdr.de>; Tue, 19 Oct 2021 13:03:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1FF5B43344D
+	for <lists+kvm@lfdr.de>; Tue, 19 Oct 2021 13:03:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235438AbhJSLE3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Oct 2021 07:04:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45016 "EHLO
+        id S235326AbhJSLEf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Oct 2021 07:04:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45058 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235381AbhJSLEW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Oct 2021 07:04:22 -0400
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74811C061745;
-        Tue, 19 Oct 2021 04:02:10 -0700 (PDT)
-Received: by mail-pf1-x432.google.com with SMTP id v8so13153780pfu.11;
-        Tue, 19 Oct 2021 04:02:10 -0700 (PDT)
+        with ESMTP id S235444AbhJSLE3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Oct 2021 07:04:29 -0400
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE9EEC061746;
+        Tue, 19 Oct 2021 04:02:16 -0700 (PDT)
+Received: by mail-pj1-x1032.google.com with SMTP id ls18-20020a17090b351200b001a00250584aso1703205pjb.4;
+        Tue, 19 Oct 2021 04:02:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=HqMhy1gFJqYHe4rVLAgrJaAnwOJLwZUqxNuxtFFoDtY=;
-        b=UfVdgalT6/QdEQX8d/jg9GOqRzrWKnhsINKmRQVWsuZRfTK8VGqWFvWQwr/I4ys8X4
-         nRVaO0MR5dQEum0WRUnG00e0+FcsMfVuVhnB+1nx2Cz9UCDRDNfkvDBrnCUlQr/fbVuQ
-         AGXaNkahbdOQB8iizt/Vin5skU1SW1ktLJlK3VTweiI57dl02DBnNuDE4FJiX6IoKDE7
-         BTnFc+rwQs9Bi6j3Re+kPEekpR0QnfR3gJZPWdsMUGHgrio14vSmzt3d4xT6HHlmAgoP
-         Rxk7UcOjFV+UVL4R4yK6pOCjDneAbrn2zACH7wtbAWkJHTj2ZT/NlXsUJ2cM4u2gQn1I
-         Ox7A==
+        bh=6+dHCDTEpaqypxNMT0rcakQRNLfKZkzPn3pC3wuFQcc=;
+        b=lZUef7uP6DnHKHtQNFD//yOobud2THUXMHhReFuEJQcYd+0HOhZZLour/WAmoEof9Y
+         fsPxT9VE0Hd9oClD0utwcrT8LjAl7Ogo1Qgl4Lwt9u72WEtLdKS5N7VabcihnFCOSQPo
+         gGJUoLBDVetehQOiOqxbCxlFmaU55cmMWL61rVTQWF6xrKUGJHD3IPHc7XD48tg8sPLE
+         bgOexpKOBSDE3hx+FRR/74+uRlWVhJNPVUae6AqiHvLbYNIPE1gQmLugGDFeZrS+gcAf
+         1eKIcOoIMMJJwABe2lI8uL6NQJYuIZtxdmkRbR9NcD+plP4FfIkQYrvtauC705aKUh6c
+         66Gw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=HqMhy1gFJqYHe4rVLAgrJaAnwOJLwZUqxNuxtFFoDtY=;
-        b=buaETJcOcpTwLkkJP9UJZvhIUsVbRPw06MJBLK32sPeUn41Byji0zCXQPpV7KbAg6C
-         QdQzMnDEyBRxhTfF5AP5or6tdf6eYQMQAtFzL/AJj9XecsjUP/wyYdAQUoobwPn9x8ek
-         Qngy5Vn4Sxp+9LUt/VANvC3K1yS/AzNETp7akLWvcooB3BiD2FfCixNwbrJ0CIMcH2uA
-         ehQzDZ9+zfpyjjV0+DGj3s8bJHQ/owr1X+cDk6knuw7p3VQZnmZrlmJrXPIS4nOx9/Kg
-         kklJEQeRQZ85qs6d+wwlgjpbUi+hRILn1hFzgIgFs+OV0w136Rhkh2yhMgu+4t0uLSGV
-         ALug==
-X-Gm-Message-State: AOAM530SM5D00cH9cQz7u+IAvBxM5dQbjrSi2k/FZb6khtFXnz7qmkwz
-        f7dNKldNy1NwaXrtdwdrLOES4ISyqh8=
-X-Google-Smtp-Source: ABdhPJxgmyjoIGNkqJVbpW1c/q3fQdhlt0cooRb7ZJMmscHjxZfKh9syTYb1chwx5+jboX2ZTULJRA==
-X-Received: by 2002:a63:b50d:: with SMTP id y13mr28040336pge.286.1634641329694;
-        Tue, 19 Oct 2021 04:02:09 -0700 (PDT)
+        bh=6+dHCDTEpaqypxNMT0rcakQRNLfKZkzPn3pC3wuFQcc=;
+        b=TNlt3GXqIX+ttqGo3uDrksNr5GVkbG8Pb4G5n9zl0lYWfESR4V1QAdrHa7u/SyY+uL
+         3QUcElXzEBVfJDAcLa/DnZAaWfWOy89XYErO245THBy+byAfzl9eNM3IA7v5KnpanY1K
+         rp4JisRixoeGdhc6ykUoiotZtfvfhpxMj6hkGNRvVCJnkjwbiNv5wgSu7ViQMiLyR19d
+         3pCFG3Fan1V2mqO7JR7WxkF9ajTInyZ6u2WxJsE5cLzS6q4YqnnQ43o6Aa5ZpMORCyVd
+         MgTAZHUuuGVbz18KlmBexv9mVrx0PkrxGjmoSUFM3lW2m3e5Sah4uJ3tmb+SFcMy+D/z
+         NZVg==
+X-Gm-Message-State: AOAM533vUkCOYPC0iyT2lgoaK1vNxE5xgeOKT+1Dx8gNKkzwWpTDFj05
+        7cX0W0XvjNcYknsQcoOZ426UPL/nD1s=
+X-Google-Smtp-Source: ABdhPJwtN8VkQB3KsRA3kACXZEYdwRab04jxqJ8CX8CSk2Jg0mm/AyFNLVHgC0Hr0yY4VhKJLxcYBQ==
+X-Received: by 2002:a17:90b:1910:: with SMTP id mp16mr5702421pjb.30.1634641336151;
+        Tue, 19 Oct 2021 04:02:16 -0700 (PDT)
 Received: from localhost ([47.88.60.64])
-        by smtp.gmail.com with ESMTPSA id mu11sm3038559pjb.20.2021.10.19.04.02.08
+        by smtp.gmail.com with ESMTPSA id i124sm16462896pfc.153.2021.10.19.04.02.15
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 19 Oct 2021 04:02:09 -0700 (PDT)
+        Tue, 19 Oct 2021 04:02:15 -0700 (PDT)
 From:   Lai Jiangshan <jiangshanlai@gmail.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Lai Jiangshan <laijs@linux.alibaba.com>,
-        Junaid Shahid <junaids@google.com>,
         Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
@@ -60,9 +59,9 @@ Cc:     Lai Jiangshan <laijs@linux.alibaba.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>
-Subject: [PATCH 3/4] KVM: X86: Use smp_rmb() to pair with smp_wmb() in mmu_try_to_unsync_pages()
-Date:   Tue, 19 Oct 2021 19:01:53 +0800
-Message-Id: <20211019110154.4091-4-jiangshanlai@gmail.com>
+Subject: [PATCH 4/4] KVM: X86: Don't unload MMU in kvm_vcpu_flush_tlb_guest()
+Date:   Tue, 19 Oct 2021 19:01:54 +0800
+Message-Id: <20211019110154.4091-5-jiangshanlai@gmail.com>
 X-Mailer: git-send-email 2.19.1.6.gb485710b
 In-Reply-To: <20211019110154.4091-1-jiangshanlai@gmail.com>
 References: <20211019110154.4091-1-jiangshanlai@gmail.com>
@@ -74,94 +73,87 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Lai Jiangshan <laijs@linux.alibaba.com>
 
-The commit 578e1c4db2213 ("kvm: x86: Avoid taking MMU lock in
-kvm_mmu_sync_roots if no sync is needed") added smp_wmb() in
-mmu_try_to_unsync_pages(), but the corresponding smp_load_acquire()
-isn't used on the load of SPTE.W which is impossible since the load of
-SPTE.W is performed in the CPU's pagetable walking.
+kvm_mmu_unload() destroys all the PGD caches.  Use the lighter
+kvm_mmu_sync_roots() and kvm_mmu_sync_prev_roots() instead.
 
-This patch changes to use smp_rmb() instead.  This patch fixes nothing
-but just comments since smp_rmb() is NOP and compiler barrier() is not
-required since the load of SPTE.W is before VMEXIT.
-
-Cc: Junaid Shahid <junaids@google.com>
 Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
 ---
- arch/x86/kvm/mmu/mmu.c | 47 +++++++++++++++++++++++++++++-------------
- 1 file changed, 33 insertions(+), 14 deletions(-)
+ arch/x86/kvm/mmu.h     |  1 +
+ arch/x86/kvm/mmu/mmu.c | 16 ++++++++++++++++
+ arch/x86/kvm/x86.c     | 11 +++++------
+ 3 files changed, 22 insertions(+), 6 deletions(-)
 
+diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
+index 1ae70efedcf4..8e9dd63b68a9 100644
+--- a/arch/x86/kvm/mmu.h
++++ b/arch/x86/kvm/mmu.h
+@@ -79,6 +79,7 @@ int kvm_handle_page_fault(struct kvm_vcpu *vcpu, u64 error_code,
+ int kvm_mmu_load(struct kvm_vcpu *vcpu);
+ void kvm_mmu_unload(struct kvm_vcpu *vcpu);
+ void kvm_mmu_sync_roots(struct kvm_vcpu *vcpu);
++void kvm_mmu_sync_prev_roots(struct kvm_vcpu *vcpu);
+ 
+ static inline int kvm_mmu_reload(struct kvm_vcpu *vcpu)
+ {
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index c6ddb042b281..900c7a157c99 100644
+index 900c7a157c99..fb45eeb8dd22 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -2665,8 +2665,9 @@ int mmu_try_to_unsync_pages(struct kvm_vcpu *vcpu, struct kvm_memory_slot *slot,
- 	 *     (sp->unsync = true)
- 	 *
- 	 * The write barrier below ensures that 1.1 happens before 1.2 and thus
--	 * the situation in 2.4 does not arise. The implicit barrier in 2.2
--	 * pairs with this write barrier.
-+	 * the situation in 2.4 does not arise.  The implicit read barrier
-+	 * between 2.1's load of SPTE.W and 2.3 (as in is_unsync_root()) pairs
-+	 * with this write barrier.
- 	 */
- 	smp_wmb();
+@@ -3634,6 +3634,9 @@ static bool is_unsync_root(hpa_t root)
+ {
+ 	struct kvm_mmu_page *sp;
  
-@@ -3629,6 +3630,35 @@ static int mmu_alloc_special_roots(struct kvm_vcpu *vcpu)
- #endif
++	if (!VALID_PAGE(root))
++		return false;
++
+ 	/*
+ 	 * Even if another CPU was marking the SP as unsync-ed simultaneously,
+ 	 * any guest page table changes are not guaranteed to be visible anyway
+@@ -3706,6 +3709,19 @@ void kvm_mmu_sync_roots(struct kvm_vcpu *vcpu)
+ 	write_unlock(&vcpu->kvm->mmu_lock);
  }
  
-+static bool is_unsync_root(hpa_t root)
++void kvm_mmu_sync_prev_roots(struct kvm_vcpu *vcpu)
 +{
-+	struct kvm_mmu_page *sp;
++	unsigned long roots_to_free = 0;
++	int i;
 +
-+	/*
-+	 * Even if another CPU was marking the SP as unsync-ed simultaneously,
-+	 * any guest page table changes are not guaranteed to be visible anyway
-+	 * until this VCPU issues a TLB flush strictly after those changes are
-+	 * made.  We only need to ensure that the other CPU sets these flags
-+	 * before any actual changes to the page tables are made.  The comments
-+	 * in mmu_try_to_unsync_pages() describe what could go wrong if this
-+	 * requirement isn't satisfied.
-+	 *
-+	 * To pair with the smp_wmb() in mmu_try_to_unsync_pages() between the
-+	 * write to sp->unsync[_children] and the write to SPTE.W, a read
-+	 * barrier is needed after the CPU reads SPTE.W (or the read itself is
-+	 * an acquire operation) while doing page table walk and before the
-+	 * checks of sp->unsync[_children] here.  The CPU has already provided
-+	 * the needed semantic, but an NOP smp_rmb() here can provide symmetric
-+	 * pairing and richer information.
-+	 */
-+	smp_rmb();
-+	sp = to_shadow_page(root);
-+	if (sp->unsync || sp->unsync_children)
-+		return true;
++	for (i = 0; i < KVM_MMU_NUM_PREV_ROOTS; i++)
++		if (is_unsync_root(vcpu->arch.mmu->prev_roots[i].hpa))
++			roots_to_free |= KVM_MMU_ROOT_PREVIOUS(i);
 +
-+	return false;
++	/* sync prev_roots by simply freeing them */
++	kvm_mmu_free_roots(vcpu, vcpu->arch.mmu, roots_to_free);
 +}
 +
- void kvm_mmu_sync_roots(struct kvm_vcpu *vcpu)
+ static gpa_t nonpaging_gva_to_gpa(struct kvm_vcpu *vcpu, gpa_t vaddr,
+ 				  u32 access, struct x86_exception *exception)
  {
- 	int i;
-@@ -3646,18 +3676,7 @@ void kvm_mmu_sync_roots(struct kvm_vcpu *vcpu)
- 		hpa_t root = vcpu->arch.mmu->root_hpa;
- 		sp = to_shadow_page(root);
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 13df3ca88e09..1771cd4bb449 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -3251,15 +3251,14 @@ static void kvm_vcpu_flush_tlb_guest(struct kvm_vcpu *vcpu)
+ 	++vcpu->stat.tlb_flush;
  
--		/*
--		 * Even if another CPU was marking the SP as unsync-ed
--		 * simultaneously, any guest page table changes are not
--		 * guaranteed to be visible anyway until this VCPU issues a TLB
--		 * flush strictly after those changes are made. We only need to
--		 * ensure that the other CPU sets these flags before any actual
--		 * changes to the page tables are made. The comments in
--		 * mmu_try_to_unsync_pages() describe what could go wrong if
--		 * this requirement isn't satisfied.
--		 */
--		if (!smp_load_acquire(&sp->unsync) &&
--		    !smp_load_acquire(&sp->unsync_children))
-+		if (!is_unsync_root(root))
- 			return;
+ 	if (!tdp_enabled) {
+-               /*
++		/*
+ 		 * A TLB flush on behalf of the guest is equivalent to
+ 		 * INVPCID(all), toggling CR4.PGE, etc., which requires
+-		 * a forced sync of the shadow page tables.  Unload the
+-		 * entire MMU here and the subsequent load will sync the
+-		 * shadow page tables, and also flush the TLB.
++		 * a forced sync of the shadow page tables.  Ensure all the
++		 * roots are synced and the guest TLB in hardware is clean.
+ 		 */
+-		kvm_mmu_unload(vcpu);
+-		return;
++		kvm_mmu_sync_roots(vcpu);
++		kvm_mmu_sync_prev_roots(vcpu);
+ 	}
  
- 		write_lock(&vcpu->kvm->mmu_lock);
+ 	static_call(kvm_x86_tlb_flush_guest)(vcpu);
 -- 
 2.19.1.6.gb485710b
 
