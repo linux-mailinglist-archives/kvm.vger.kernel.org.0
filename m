@@ -2,98 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D541432F69
-	for <lists+kvm@lfdr.de>; Tue, 19 Oct 2021 09:29:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 79078433079
+	for <lists+kvm@lfdr.de>; Tue, 19 Oct 2021 10:05:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234369AbhJSHbd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Oct 2021 03:31:33 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:39101 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229551AbhJSHbc (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 19 Oct 2021 03:31:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634628559;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=yqVn5RwvdpeL/byQOIlSug5o1mDvU+SpBxf9v6lVTbw=;
-        b=fi0IVwkpTMkg1dc+JnTWH79jimmTKSpSBzK/wz3hl0IyWprDcZ8NaQBKbWFiie/GfcrXot
-        hhu3yWc8KAyAz4mbRyNWGVqxqmacl67mxMs7rg0JVVXC5oU6jm0ZaAwmGgi8qiV7PYPoHH
-        jGYG+tARlR2vM6mAczB5cbSZJQlUQqs=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-135-cKVnJ5a_NcSucRlFKutZ-g-1; Tue, 19 Oct 2021 03:29:18 -0400
-X-MC-Unique: cKVnJ5a_NcSucRlFKutZ-g-1
-Received: by mail-ed1-f69.google.com with SMTP id e14-20020a056402088e00b003db6ebb9526so16664603edy.22
-        for <kvm@vger.kernel.org>; Tue, 19 Oct 2021 00:29:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=yqVn5RwvdpeL/byQOIlSug5o1mDvU+SpBxf9v6lVTbw=;
-        b=U7rsyb3xpqdMYMqIHE86kcVtwzD3Ww9jXnupnItE4Q5J/8ITmi4LuWjXORwsgYhdwx
-         pchCDkxZ9oAxK25t50qz5Z5uR3CqjJyYCN/YYEL7DqwdUlwQos30cq+rzJh2OBdaLHLs
-         +9uRZWcpnfIdEK1nHiJFRpuNkEEdGnAemSzl9dgAWmzrrTHmBuHFK0V808xZW5yyNoBb
-         jhn93bFThpZHuTD7Cdt/pkNmBx3171nV58O+fKeW6vnd5xceTL/zomnFEJtKdWhNtCD8
-         Cywso21C9zY35FmY2K4Pl65jRHCI6Abu+54cuqtzYstw8eWgTSMExGNHHvUiWdm5KdZx
-         RkvQ==
-X-Gm-Message-State: AOAM533x+byTfcY6FKZhJj9zCtD4SVrpBk/gT6eJwmh534AlQSNEW2vL
-        ZdCFcjcRKhcBQjDglaEN2OLL36capBwh+0tyHzXKYUXu6foTy0tlFzKtTTLzeJOEiXNYdBmhrL9
-        AUqWyjfij/eXY
-X-Received: by 2002:a17:907:971e:: with SMTP id jg30mr36114062ejc.169.1634628557122;
-        Tue, 19 Oct 2021 00:29:17 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwNTjle6x1nbzF/SoF4SS95DKSy0DVA4VZCiNUpt/jVZ3v4C1arh0eLJse/qEuUVyGV+2jI1g==
-X-Received: by 2002:a17:907:971e:: with SMTP id jg30mr36114047ejc.169.1634628556918;
-        Tue, 19 Oct 2021 00:29:16 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.gmail.com with ESMTPSA id i10sm11036825edl.15.2021.10.19.00.29.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 19 Oct 2021 00:29:16 -0700 (PDT)
-Message-ID: <876df534-a280-dc26-6a70-a1464bacad5f@redhat.com>
-Date:   Tue, 19 Oct 2021 09:29:12 +0200
+        id S234758AbhJSIGo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Oct 2021 04:06:44 -0400
+Received: from mail.kernel.org ([198.145.29.99]:36330 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S234722AbhJSIGl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Oct 2021 04:06:41 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id E94EB61452;
+        Tue, 19 Oct 2021 08:04:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1634630668;
+        bh=Uvci5l/z6Xl7igGPEJw1tvb5zXG8EEBvSjZvZQvPw7o=;
+        h=From:To:Cc:Subject:Date:From;
+        b=rpKkaVAryy3dOHI5Z0AVHWDGL+qYu3wofMEsdn+Pc8CjxVWvhXVazy7gZrKiPAaDD
+         xNVXTC8q0dsZKNR3ih1oPwNBgr4zydsOmvnv3poIDksXNNKT3SfE6lRbc6lup8jshp
+         UFeWO8R7fla6iyuPrQH95m37/OifKGJ7dEFFb9jjachmzIGkjNuxHpa2sx0ZtXdKS1
+         AGVBuul1FLqAXwuvTgrPKfeB7WXkylEdnmiuXkM/w4yevSt2//z+WrduhEbO7W0aHm
+         qsWGPEPZWnGjrqUdazSHMDIBy5fUq5IJo3r1SYMCGrtFiTcQmrOZ5eRKUX3tYFWXRU
+         876wQqSSyZ5qw==
+Received: by mail.kernel.org with local (Exim 4.94.2)
+        (envelope-from <mchehab@kernel.org>)
+        id 1mck6j-001oIo-02; Tue, 19 Oct 2021 09:04:25 +0100
+From:   Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+To:     Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>
+Cc:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
+        linux-kernel@vger.kernel.org,
+        "J. Bruce Fields" <bfields@fieldses.org>,
+        Alex Shi <alexs@kernel.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Anton Vorontsov <anton@enomsg.org>,
+        Anup Patel <anup.patel@wdc.com>,
+        Atish Patra <atish.patra@wdc.com>,
+        Bartosz Golaszewski <brgl@bgdev.pl>,
+        Chen-Yu Tsai <wens@csie.org>, Colin Cross <ccross@android.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        John Fastabend <john.fastabend@gmail.com>,
+        KP Singh <kpsingh@kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Martin KaFai Lau <kafai@fb.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Song Liu <songliubraving@fb.com>,
+        Tony Luck <tony.luck@intel.com>, Yonghong Song <yhs@fb.com>,
+        bpf@vger.kernel.org, devicetree@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-gpio@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-riscv@lists.infradead.org,
+        linux-samsung-soc@vger.kernel.org, netdev@vger.kernel.org,
+        sparmaintainer@unisys.com
+Subject: [PATCH v3 00/23] Fix some issues at documentation
+Date:   Tue, 19 Oct 2021 09:03:59 +0100
+Message-Id: <cover.1634630485.git.mchehab+huawei@kernel.org>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [PATCH] KVM: Clear pv eoi pending bit only when it is set
-Content-Language: en-US
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Li RongQing <lirongqing@baidu.com>
-Cc:     seanjc@google.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, x86@kernel.org, hpa@zytor.com, kvm@vger.kernel.org
-References: <1634609144-28952-1-git-send-email-lirongqing@baidu.com>
- <87y26pwk96.fsf@vitty.brq.redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <87y26pwk96.fsf@vitty.brq.redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Sender: Mauro Carvalho Chehab <mchehab@kernel.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 19/10/21 09:23, Vitaly Kuznetsov wrote:
->>   
->> -static void pv_eoi_clr_pending(struct kvm_vcpu *vcpu)
->> +static void pv_eoi_clr_pending(struct kvm_vcpu *vcpu, bool pending)
-> Nitpick (and probably a matter of personal taste): pv_eoi_clr_pending()
-> has only one user and the change doesn't make its interface much nicer,
-> I'd suggest we just inline in instead. (we can probably do the same to
-> pv_eoi_get_pending()/pv_eoi_set_pending() too).
+Hi Jon,
 
-Alternatively, merge pv_eoi_get_pending and pv_eoi_clr_pending into a 
-single function pv_eoi_test_and_clear_pending, which returns the value 
-of the pending bit.
+This series is against today's next (next-20211019) and addresses missing
+links to Documentation/*.
 
-So the caller can do essentially:
+The best would be to have the patches applied directly to the trees that
+contain the patches that moved/renamed files, and then apply the
+remaining ones either later during the merge window or just afterwards,
+whatever works best for you.
 
--	pending = pv_eoi_get_pending(vcpu);
--	pv_eoi_clr_pending(vcpu);
--	if (pending)
-+	if (pv_eoi_test_and_clear_pending(vcpu))
-                 return;
+Regards,
+Mauro
 
+Mauro Carvalho Chehab (23):
+  visorbus: fix a copyright symbol that was bad encoded
+  libbpf: update index.rst reference
+  docs: accounting: update delay-accounting.rst reference
+  MAINTAINERS: update arm,vic.yaml reference
+  MAINTAINERS: update aspeed,i2c.yaml reference
+  MAINTAINERS: update faraday,ftrtc010.yaml reference
+  MAINTAINERS: update ti,sci.yaml reference
+  MAINTAINERS: update intel,ixp46x-rng.yaml reference
+  MAINTAINERS: update nxp,imx8-jpeg.yaml reference
+  MAINTAINERS: update gemini.yaml reference
+  MAINTAINERS: update brcm,unimac-mdio.yaml reference
+  MAINTAINERS: update mtd-physmap.yaml reference
+  Documentation: update vcpu-requests.rst reference
+  bpftool: update bpftool-cgroup.rst reference
+  docs: translations: zn_CN: irq-affinity.rst: add a missing extension
+  docs: translations: zh_CN: memory-hotplug.rst: fix a typo
+  docs: fs: locks.rst: update comment about mandatory file locking
+  fs: remove a comment pointing to the removed mandatory-locking file
+  Documentation/process: fix a cross reference
+  dt-bindings: mfd: update x-powers,axp152.yaml reference
+  regulator: dt-bindings: update samsung,s2mpa01.yaml reference
+  regulator: dt-bindings: update samsung,s5m8767.yaml reference
+  dt-bindings: reserved-memory: ramoops: update ramoops.yaml references
 
-Paolo
+ Documentation/admin-guide/ramoops.rst         |  2 +-
+ Documentation/admin-guide/sysctl/kernel.rst   |  2 +-
+ Documentation/bpf/index.rst                   |  2 +-
+ .../devicetree/bindings/gpio/gpio-axp209.txt  |  2 +-
+ .../bindings/regulator/samsung,s2mpa01.yaml   |  2 +-
+ .../bindings/regulator/samsung,s5m8767.yaml   |  2 +-
+ Documentation/filesystems/locks.rst           | 17 +++++-----------
+ Documentation/process/submitting-patches.rst  |  4 ++--
+ .../zh_CN/core-api/irq/irq-affinity.rst       |  2 +-
+ .../zh_CN/core-api/memory-hotplug.rst         |  2 +-
+ MAINTAINERS                                   | 20 +++++++++----------
+ arch/riscv/kvm/vcpu.c                         |  2 +-
+ drivers/visorbus/visorbus_main.c              |  2 +-
+ fs/locks.c                                    |  1 -
+ .../selftests/bpf/test_bpftool_synctypes.py   |  2 +-
+ 15 files changed, 28 insertions(+), 36 deletions(-)
+
+-- 
+2.31.1
+
 
