@@ -2,158 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1FF5B43344D
-	for <lists+kvm@lfdr.de>; Tue, 19 Oct 2021 13:03:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 02973433483
+	for <lists+kvm@lfdr.de>; Tue, 19 Oct 2021 13:16:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235326AbhJSLEf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Oct 2021 07:04:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45058 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235444AbhJSLE3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Oct 2021 07:04:29 -0400
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE9EEC061746;
-        Tue, 19 Oct 2021 04:02:16 -0700 (PDT)
-Received: by mail-pj1-x1032.google.com with SMTP id ls18-20020a17090b351200b001a00250584aso1703205pjb.4;
-        Tue, 19 Oct 2021 04:02:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=6+dHCDTEpaqypxNMT0rcakQRNLfKZkzPn3pC3wuFQcc=;
-        b=lZUef7uP6DnHKHtQNFD//yOobud2THUXMHhReFuEJQcYd+0HOhZZLour/WAmoEof9Y
-         fsPxT9VE0Hd9oClD0utwcrT8LjAl7Ogo1Qgl4Lwt9u72WEtLdKS5N7VabcihnFCOSQPo
-         gGJUoLBDVetehQOiOqxbCxlFmaU55cmMWL61rVTQWF6xrKUGJHD3IPHc7XD48tg8sPLE
-         bgOexpKOBSDE3hx+FRR/74+uRlWVhJNPVUae6AqiHvLbYNIPE1gQmLugGDFeZrS+gcAf
-         1eKIcOoIMMJJwABe2lI8uL6NQJYuIZtxdmkRbR9NcD+plP4FfIkQYrvtauC705aKUh6c
-         66Gw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=6+dHCDTEpaqypxNMT0rcakQRNLfKZkzPn3pC3wuFQcc=;
-        b=TNlt3GXqIX+ttqGo3uDrksNr5GVkbG8Pb4G5n9zl0lYWfESR4V1QAdrHa7u/SyY+uL
-         3QUcElXzEBVfJDAcLa/DnZAaWfWOy89XYErO245THBy+byAfzl9eNM3IA7v5KnpanY1K
-         rp4JisRixoeGdhc6ykUoiotZtfvfhpxMj6hkGNRvVCJnkjwbiNv5wgSu7ViQMiLyR19d
-         3pCFG3Fan1V2mqO7JR7WxkF9ajTInyZ6u2WxJsE5cLzS6q4YqnnQ43o6Aa5ZpMORCyVd
-         MgTAZHUuuGVbz18KlmBexv9mVrx0PkrxGjmoSUFM3lW2m3e5Sah4uJ3tmb+SFcMy+D/z
-         NZVg==
-X-Gm-Message-State: AOAM533vUkCOYPC0iyT2lgoaK1vNxE5xgeOKT+1Dx8gNKkzwWpTDFj05
-        7cX0W0XvjNcYknsQcoOZ426UPL/nD1s=
-X-Google-Smtp-Source: ABdhPJwtN8VkQB3KsRA3kACXZEYdwRab04jxqJ8CX8CSk2Jg0mm/AyFNLVHgC0Hr0yY4VhKJLxcYBQ==
-X-Received: by 2002:a17:90b:1910:: with SMTP id mp16mr5702421pjb.30.1634641336151;
-        Tue, 19 Oct 2021 04:02:16 -0700 (PDT)
-Received: from localhost ([47.88.60.64])
-        by smtp.gmail.com with ESMTPSA id i124sm16462896pfc.153.2021.10.19.04.02.15
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 19 Oct 2021 04:02:15 -0700 (PDT)
-From:   Lai Jiangshan <jiangshanlai@gmail.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Lai Jiangshan <laijs@linux.alibaba.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>
-Subject: [PATCH 4/4] KVM: X86: Don't unload MMU in kvm_vcpu_flush_tlb_guest()
-Date:   Tue, 19 Oct 2021 19:01:54 +0800
-Message-Id: <20211019110154.4091-5-jiangshanlai@gmail.com>
-X-Mailer: git-send-email 2.19.1.6.gb485710b
-In-Reply-To: <20211019110154.4091-1-jiangshanlai@gmail.com>
-References: <20211019110154.4091-1-jiangshanlai@gmail.com>
+        id S235421AbhJSLSv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Oct 2021 07:18:51 -0400
+Received: from mail-mw2nam10on2067.outbound.protection.outlook.com ([40.107.94.67]:48705
+        "EHLO NAM10-MW2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S235408AbhJSLSu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Oct 2021 07:18:50 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=d/tWaZoYn5PnscT2xfsi4t5ePe66bmgdGoz2DWs+0kvUMrWIPldaCWm1LYzbOeuKepfC2y685p1Nm1nLTPkPcoG+TXQM2/wX8r92ZP8Y1Bhby+ho3VwlrCTsYaYWwjjuzHTNGeoDpZBSZBJ/vt/Ld4/t6Z1J2ciIEl5dzWP1r+Fir5MNf6ZfzNwWwsn0pyUS4MC1T6We4JSPZh2rQYdwJ9mmAyI90hKKfncCZuaQXnGXEs51zqA295ZfDsqaAnwro++Imc8gM0Hnoz9BFZAyN7Vvy5v5IEvMpbCn5aBd/gvZwkpgKpG+0LbEgQ99FCiQM5iaGyl/foRiJs6jQIGJAQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ONXwRnj32xwddLxyDs1eWHgZCjZvUWBtUaTitu/W6Tw=;
+ b=Ft4neDbr9QgLJIwrkNMG1KflxbH0vc4+TWAhT3Z8cTQvMjicQLxLdi2FFDZkt3yg6AVe/Zl2fTnqefpKKCPnZNQSd1RAX0UTjAse3GwwwsrF/PQDUEetzdgJZIf8gzrg4eVUqdWG6kosjSdPAF5b7AsdGptwLE3x8WWVd6lq0VztIE3X6rDgZkEgHSH4vrqPI3Y7I4r8x7tCn5iCuU3wr5vytT4eelNXta0uFXr0vLD5RrX1Qo2nEAOW7eNbPePjG9lW6RspM6727TeBp6BO1s4rMr05JbC7dUL3HRo3nKf/rPzY5AOmDHPISKYQazpVDSqhcj3WOFMgk9qgxyCt+A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.112.34) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=nvidia.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ONXwRnj32xwddLxyDs1eWHgZCjZvUWBtUaTitu/W6Tw=;
+ b=kMlpaxApXtXCT1ETNPVCqElqatc0clC0sFdfkG2HhiEueqTYZDLhq3ofrrNdGeo/QzPf9P5UM6HAAiZMxTeCAuhMib9TQhge6MSR5VnHTZC+Gy3rA4yHqrB6vMrQsLWmf5JJBYMEGzipubt2wPZJUiNFET8MZ65lHsMeU+4+buJiGeeyA8JXLz+mCJhX5k+sSSc0daahZjwin1sGe3xijwvY87T/LYwuACiw+Bwj62eo2br0HFCp8KtY17mIc7sVhw23BEu68ox32SenXZ0D8XeSHYC+axu7wTbueETdlM63slsu6mWKfEn0ih5Dlpm6jcly4w9PEMqRj3KlqDMfSA==
+Received: from MW4PR03CA0222.namprd03.prod.outlook.com (2603:10b6:303:b9::17)
+ by BL0PR12MB2433.namprd12.prod.outlook.com (2603:10b6:207:4a::25) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4608.17; Tue, 19 Oct
+ 2021 11:16:37 +0000
+Received: from CO1NAM11FT049.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:303:b9:cafe::a0) by MW4PR03CA0222.outlook.office365.com
+ (2603:10b6:303:b9::17) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4608.16 via Frontend
+ Transport; Tue, 19 Oct 2021 11:16:36 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.34)
+ smtp.mailfrom=nvidia.com; vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.112.34 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.112.34; helo=mail.nvidia.com;
+Received: from mail.nvidia.com (216.228.112.34) by
+ CO1NAM11FT049.mail.protection.outlook.com (10.13.175.50) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.4608.15 via Frontend Transport; Tue, 19 Oct 2021 11:16:35 +0000
+Received: from [172.27.13.79] (172.20.187.6) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.18; Tue, 19 Oct
+ 2021 11:16:32 +0000
+Message-ID: <94e54e67-e578-3b25-0234-6ce072dc42cf@nvidia.com>
+Date:   Tue, 19 Oct 2021 14:16:29 +0300
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: [PATCH V2 mlx5-next 06/14] vdpa/mlx5: Use mlx5_vf_get_core_dev()
+ to get PF device
+Content-Language: en-US
+To:     Yishai Hadas <yishaih@nvidia.com>, <alex.williamson@redhat.com>,
+        <bhelgaas@google.com>, <jgg@nvidia.com>, <saeedm@nvidia.com>
+CC:     <linux-pci@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <kuba@kernel.org>, <leonro@nvidia.com>,
+        <kwankhede@nvidia.com>, <maorg@nvidia.com>
+References: <20211019105838.227569-1-yishaih@nvidia.com>
+ <20211019105838.227569-7-yishaih@nvidia.com>
+From:   Max Gurtovoy <mgurtovoy@nvidia.com>
+In-Reply-To: <20211019105838.227569-7-yishaih@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [172.20.187.6]
+X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 7a29b5e6-6129-4564-f238-08d992f1ea40
+X-MS-TrafficTypeDiagnostic: BL0PR12MB2433:
+X-Microsoft-Antispam-PRVS: <BL0PR12MB243382CBF75483FFA21BC405DEBD9@BL0PR12MB2433.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: hNiiGB2nlcTBDs+NvHSiRsuP3DqTr9OwwPuv3+0XhI0oxOSHcLzerydL+GpYUhxHV9gnMw2Ftk4pUdu6g6105EtdLLsEnP/Sup/TBhmZJp+atFwrNNFLSUDN5nDCCZvwIblR6kNUk3HvLfsAU8baYv3hWFOPmdl5IZr7BWVIISeiwZ/jWnEiVwI3p65zUf669EwjqWISD5tNWS0/rKfw+WVfeBap2YmqoZUriskt0YMgwNqPw+P5bYOXLgq63qch2gggkrPZlQOBxrhqW0o0mv9ZbcDwYlu7dCEqF8zhxmGiYgFUA3Kt6NBFx9MRixDB+7zESpaZOgconP1bGhIgdPH7Y2njJLxQ5wMgUzjbHbOW/RACLyGquKH5tIxmUrBaXKwu5P5x+RORI4+PN70Ksstb0goctheEpq6WNuPr3kbM+gIFBHlYwt0g/HsUcrLNUIv1ViaHbWzEf4wCLh3gjkh7fhUwVi2CNwOqSR+wp0x0I9ZoQlNUxMbEkWz5JoHJWWtjNVOSFYyHCd8CWXeAs6/nVVJ39hWu6lKYNWqpBQkHG9OOkn2vCshUk65IliQWZ8nTXAgWNRFLrkMHSj5v5dad7rKv+THud1UzTrWbG1RbwW73Vv3Mw6d56rIAjf4r38xJX71OK+4fsYMC1Pgmzvgh6qTWPTPyqP7QdkhZWLaG8oH91QvjLewT3rgbjwDEtKxyOWBc2ab6zS8qB1mMTWLU/8u6ctbORgN8/sPKvrQ=
+X-Forefront-Antispam-Report: CIP:216.228.112.34;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid03.nvidia.com;CAT:NONE;SFS:(4636009)(36840700001)(46966006)(82310400003)(6636002)(8936002)(16526019)(70206006)(36756003)(426003)(5660300002)(7636003)(86362001)(26005)(47076005)(31686004)(186003)(356005)(8676002)(4326008)(54906003)(316002)(16576012)(53546011)(336012)(31696002)(508600001)(110136005)(2906002)(70586007)(36860700001)(107886003)(2616005)(83380400001)(6666004)(43740500002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Oct 2021 11:16:35.9089
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7a29b5e6-6129-4564-f238-08d992f1ea40
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.34];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT049.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR12MB2433
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Lai Jiangshan <laijs@linux.alibaba.com>
 
-kvm_mmu_unload() destroys all the PGD caches.  Use the lighter
-kvm_mmu_sync_roots() and kvm_mmu_sync_prev_roots() instead.
+On 10/19/2021 1:58 PM, Yishai Hadas wrote:
+> Use mlx5_vf_get_core_dev() to get PF device instead of accessing
+> directly the PF data structure from the VF one.
+>
+> The mlx5_vf_get_core_dev() API in its turn uses the generic PCI API
+> (i.e. pci_iov_get_pf_drvdata) to get it.
+>
+> Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
+> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> ---
+>   drivers/vdpa/mlx5/net/mlx5_vnet.c | 27 +++++++++++++++++++++------
+>   1 file changed, 21 insertions(+), 6 deletions(-)
+>
+> diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/mlx5/net/mlx5_vnet.c
+> index 5c7d2a953dbd..97b8917bc34d 100644
+> --- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
+> +++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
+> @@ -1445,7 +1445,10 @@ static virtio_net_ctrl_ack handle_ctrl_mac(struct mlx5_vdpa_dev *mvdev, u8 cmd)
+>   	size_t read;
+>   	u8 mac[ETH_ALEN];
+>   
+> -	pfmdev = pci_get_drvdata(pci_physfn(mvdev->mdev->pdev));
+> +	pfmdev = mlx5_vf_get_core_dev(mvdev->mdev->pdev);
+> +	if (!pfmdev)
+> +		return status;
+> +
+>   	switch (cmd) {
 
-Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
----
- arch/x86/kvm/mmu.h     |  1 +
- arch/x86/kvm/mmu/mmu.c | 16 ++++++++++++++++
- arch/x86/kvm/x86.c     | 11 +++++------
- 3 files changed, 22 insertions(+), 6 deletions(-)
+Yishai/Jason,
 
-diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
-index 1ae70efedcf4..8e9dd63b68a9 100644
---- a/arch/x86/kvm/mmu.h
-+++ b/arch/x86/kvm/mmu.h
-@@ -79,6 +79,7 @@ int kvm_handle_page_fault(struct kvm_vcpu *vcpu, u64 error_code,
- int kvm_mmu_load(struct kvm_vcpu *vcpu);
- void kvm_mmu_unload(struct kvm_vcpu *vcpu);
- void kvm_mmu_sync_roots(struct kvm_vcpu *vcpu);
-+void kvm_mmu_sync_prev_roots(struct kvm_vcpu *vcpu);
- 
- static inline int kvm_mmu_reload(struct kvm_vcpu *vcpu)
- {
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 900c7a157c99..fb45eeb8dd22 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3634,6 +3634,9 @@ static bool is_unsync_root(hpa_t root)
- {
- 	struct kvm_mmu_page *sp;
- 
-+	if (!VALID_PAGE(root))
-+		return false;
-+
- 	/*
- 	 * Even if another CPU was marking the SP as unsync-ed simultaneously,
- 	 * any guest page table changes are not guaranteed to be visible anyway
-@@ -3706,6 +3709,19 @@ void kvm_mmu_sync_roots(struct kvm_vcpu *vcpu)
- 	write_unlock(&vcpu->kvm->mmu_lock);
- }
- 
-+void kvm_mmu_sync_prev_roots(struct kvm_vcpu *vcpu)
-+{
-+	unsigned long roots_to_free = 0;
-+	int i;
-+
-+	for (i = 0; i < KVM_MMU_NUM_PREV_ROOTS; i++)
-+		if (is_unsync_root(vcpu->arch.mmu->prev_roots[i].hpa))
-+			roots_to_free |= KVM_MMU_ROOT_PREVIOUS(i);
-+
-+	/* sync prev_roots by simply freeing them */
-+	kvm_mmu_free_roots(vcpu, vcpu->arch.mmu, roots_to_free);
-+}
-+
- static gpa_t nonpaging_gva_to_gpa(struct kvm_vcpu *vcpu, gpa_t vaddr,
- 				  u32 access, struct x86_exception *exception)
- {
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 13df3ca88e09..1771cd4bb449 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -3251,15 +3251,14 @@ static void kvm_vcpu_flush_tlb_guest(struct kvm_vcpu *vcpu)
- 	++vcpu->stat.tlb_flush;
- 
- 	if (!tdp_enabled) {
--               /*
-+		/*
- 		 * A TLB flush on behalf of the guest is equivalent to
- 		 * INVPCID(all), toggling CR4.PGE, etc., which requires
--		 * a forced sync of the shadow page tables.  Unload the
--		 * entire MMU here and the subsequent load will sync the
--		 * shadow page tables, and also flush the TLB.
-+		 * a forced sync of the shadow page tables.  Ensure all the
-+		 * roots are synced and the guest TLB in hardware is clean.
- 		 */
--		kvm_mmu_unload(vcpu);
--		return;
-+		kvm_mmu_sync_roots(vcpu);
-+		kvm_mmu_sync_prev_roots(vcpu);
- 	}
- 
- 	static_call(kvm_x86_tlb_flush_guest)(vcpu);
--- 
-2.19.1.6.gb485710b
+I think this patch breaks VPDA over SF.
+
+Did you verify it ?
+
+-Max.
 
