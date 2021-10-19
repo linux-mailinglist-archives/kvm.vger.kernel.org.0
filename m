@@ -2,161 +2,443 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7F20C433F36
-	for <lists+kvm@lfdr.de>; Tue, 19 Oct 2021 21:23:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C972D433F40
+	for <lists+kvm@lfdr.de>; Tue, 19 Oct 2021 21:28:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234643AbhJSTZp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Oct 2021 15:25:45 -0400
-Received: from mail-mw2nam12on2080.outbound.protection.outlook.com ([40.107.244.80]:26913
-        "EHLO NAM12-MW2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S230432AbhJSTZp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Oct 2021 15:25:45 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jITP9TEPH8bzEe0hqqDEXCwMXkdqyhplZMMaTHnNO+WOHh3Zhp9cqQ34g1TMGMagS5QH4PuJHB0sQp+hBGCs1Egyvc5N/8jZ3dN55uhgwUVFdguHq7mke3ITqkQ2TemzK8E2a/0cs8LKxxW6T80vxqyxTjja+JLmrIIVS5irRHsdmwD7rsZVQlfrbV16F6O55RN3E/B1ZCUJ6L+6aVQY+jx9kbYzFgwAsiKNM0oZ4QNs7kVPnCNb1Iy6JIf/Mlsltf4b7E9Zsl0XUX+8S6cUXva0Zo/DrHEaBY3gCkCGULUMLKKnGlw3WP/5KD2Tgn69m+ywgEwmlCR+/jQIaUc8EA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=dZiet93y2Ewa/PJvh+Wx/7C90B6eq0e4ydr6jOUOGdg=;
- b=L+LW0/h4sq5T62n3VDJhtHzG8TVysy3NbLLAe5L579Nul3RIaqls+k2qJWU4t8HsdLxhx/fpREf/UzNdG6ue4Vk5O9Adbf3dcnqGDz4T3Vxm7MTeoZ/Q0ANdiOUgd3W+PdNCgL8wDDDBXGlzcS1O3ZWQn0YPkNoQHnWJ93M4yWfqV+j3I8qv9KOsO03ulISylixnmaG9z43goLpzmFVKqVwb0bwhKd2tweV/xJq5xtXnOs3IQ3cZs/60WR9z0cgSorHlseYvw25TISQJfZxs18rTQZ5K7inWfLn1XLdJDiw1RPzgXhitzu1hVwPYw8fzI0cwh96yI7TnvUg93vLCxw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dZiet93y2Ewa/PJvh+Wx/7C90B6eq0e4ydr6jOUOGdg=;
- b=HgIz5sK9rdWW5VH9uwjvKDqaXpv/GR8Up1XHTXfvwgHpRE2lb9ScP8Wb88njlQK36LEZKWBF/arXEP55/WYQ5/Tp4Dhb97Oh9ttut23yvHdXs06HowhJoK+RBAUdRM4NsrD/uI56hCSpjI5osoHWhbENh646iriCRlmXjIG2ZupEYZPfgushxv2O9laiJqeXzpJAyQq7v40tyQOnknnYy/Xn4zEqtzSHCJov8LkYt3+5UmPWSKpXj+DzAIjWFArHYHFiB7Afyb+3PG/Yz3uHBVNmlyKw9OHSimBTeMKmfzo9Zv2nXL/iNph+yQp2Tyq6XOutzM3pTYuQ5A/ZcfIPVQ==
-Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=nvidia.com;
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
- by BL1PR12MB5142.namprd12.prod.outlook.com (2603:10b6:208:312::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4608.16; Tue, 19 Oct
- 2021 19:23:29 +0000
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::e8af:232:915e:2f95]) by BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::e8af:232:915e:2f95%8]) with mapi id 15.20.4628.015; Tue, 19 Oct 2021
- 19:23:29 +0000
-Date:   Tue, 19 Oct 2021 16:23:28 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Yishai Hadas <yishaih@nvidia.com>, bhelgaas@google.com,
-        saeedm@nvidia.com, linux-pci@vger.kernel.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, kuba@kernel.org, leonro@nvidia.com,
-        kwankhede@nvidia.com, mgurtovoy@nvidia.com, maorg@nvidia.com
-Subject: Re: [PATCH V2 mlx5-next 12/14] vfio/mlx5: Implement vfio_pci driver
- for mlx5 devices
-Message-ID: <20211019192328.GZ2744544@nvidia.com>
-References: <20211019105838.227569-1-yishaih@nvidia.com>
- <20211019105838.227569-13-yishaih@nvidia.com>
- <20211019124352.74c3b6ba.alex.williamson@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211019124352.74c3b6ba.alex.williamson@redhat.com>
-X-ClientProxiedBy: MN2PR01CA0064.prod.exchangelabs.com (2603:10b6:208:23f::33)
- To BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
+        id S234643AbhJSTan (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Oct 2021 15:30:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:20269 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231895AbhJSTam (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 19 Oct 2021 15:30:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1634671709;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=iP//MtWYfJqEQSepuUc31+soNh82uuGgfb5hSCUmJr8=;
+        b=BZwiGAwcR/BJzdVDJKFGVP/wsiNg2eKLMsnHMl05Rn9i1iTTrg1Z4hx0HB0prt8vc5MUEr
+        AqplGdXnx0T3rW/oYSIWizlsWAH2Y8QGVLumGrfjSxTdn6dRGdpCFcDdrmSS9IzIKcXROu
+        GjqSydC8uiyDY7OBBS0c/3GU1sEoEw0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-520-UIVLtKjkOomvu9hZh8djkQ-1; Tue, 19 Oct 2021 15:28:25 -0400
+X-MC-Unique: UIVLtKjkOomvu9hZh8djkQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 86906801FCE;
+        Tue, 19 Oct 2021 19:28:24 +0000 (UTC)
+Received: from starship (unknown [10.40.192.246])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A48235F4EE;
+        Tue, 19 Oct 2021 19:28:22 +0000 (UTC)
+Message-ID: <6eb45cc24c433f5620f08d7bcd0c9cc179b696e8.camel@redhat.com>
+Subject: Re: [PATCH] KVM: cleanup allocation of rmaps and page tracking data
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     seanjc@google.com, David Stevens <stevensd@chromium.org>
+Date:   Tue, 19 Oct 2021 22:28:21 +0300
+In-Reply-To: <20211018175333.582417-1-pbonzini@redhat.com>
+References: <20211018175333.582417-1-pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Received: from mlx.ziepe.ca (142.162.113.129) by MN2PR01CA0064.prod.exchangelabs.com (2603:10b6:208:23f::33) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4608.15 via Frontend Transport; Tue, 19 Oct 2021 19:23:29 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1mcuhs-00H5hn-5J; Tue, 19 Oct 2021 16:23:28 -0300
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: f827f130-aba6-493d-74f4-08d99335ee4a
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5142:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <BL1PR12MB514292C084C89DE39FAB649AC2BD9@BL1PR12MB5142.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: lxc5r8yHfsyzlGeCxLysQcQ0lIDIy3u/vKwlOsl8oCqvD7vuY+W8/ugUNztPQPDIpgiMw5FALVMFYSCgVu4kmkxD1iK5NsUYVmf96Mz7fNXfXfTC46t+XySv4Uk0j569z27QAGWYUZRVdh02b8XybOrYM2y523L9ei9bGR83XIrEcTqxI/y84Jw+h5LgzTN/EkPjYbVQxFowSut5PLv86rqAPdMHod2ZoLFEypmIjNAlP3D1pLkBGl348Rlzw3UoaFFDXTP1SVHQaTZcRhJuulbkdgfiiaavNMfTnUte3DYMnObCoQX6dJ6qFITeDgUlV/cxyhinOjtlOAJA0aDaRrGjpXuocR9XLck6nCmvEr1dmMOoiQ+CDTJ6wEqVE2O+XOI9/iim6cgaGY5DX30wxfOQz3cJFpGH567VbzNMqQBOh4MEeb/Gl9sx7jgOrj/4SaC55phlizg0ZaUAPaVvCPSuosU/m4EPjORW4QCEyRMt6nebXZGtFbT+osy1Dz3jXnycEg1TvGqlrcCFAW8Rl9yo7vqCUF2IAPGIYCwySPlNuvgy3WUy65o+H2MnRt7QfMHosC7BRBmWtn1ZEOjn2zLoge/EZey0VTdpf4cL+1U6uobIc6DHIghF6NWVEHUvtWG7GXyi7L+c0T33ZsWBOQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(4326008)(9786002)(9746002)(8676002)(107886003)(2616005)(1076003)(36756003)(26005)(86362001)(2906002)(66556008)(8936002)(316002)(66946007)(508600001)(186003)(6916009)(66476007)(426003)(33656002)(38100700002)(5660300002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?jaBmu1/6GtTY6QTMSqQ4WQNYrt6sHzQJUGp21b83C9JFtMIRmBhCs/VaaKOu?=
- =?us-ascii?Q?XfBzyXrXJZFwtPAv1vmMyxw0dGKC+gvXdzYF4LHmbnd461ZVjbjENSVBCuax?=
- =?us-ascii?Q?X9BkZ7b5k9F4UHLOM8F34gWt2YZf8qPGJIWAikzPTi+M6bdANh9/z3hi0JbE?=
- =?us-ascii?Q?0QNoOHMraAm6N4jSNVHbv7OpUb+8p/f62KWCuqvuy01m8mChbg3Elo29zhOT?=
- =?us-ascii?Q?uh/PkgX6wgrWSelazzDZ0jmnMUOjq16DsK9vU3TKr0k6yuAdin65Q0uxCXBL?=
- =?us-ascii?Q?MSDiIUz8+0VUKIy/gfiU0FwqSd3EqEXzHCISa8Fp6w04VtBSAd+5twedFhwc?=
- =?us-ascii?Q?SlBOY+8PCTmbWnCFiF5Vzr7q1cGc+sG9EYr9XhxvCiBd+ZcctuzyBm7t6tNi?=
- =?us-ascii?Q?R9bdGrF+swMURz5A/vUxH38VuuOR2sN7gTqgp26GjKnbQBjIgsvvVXU7FL+t?=
- =?us-ascii?Q?VuUgGLMaPRZL7O5GPfT8AeWtvAGxw3KNn4uRFL+Xsl1n2DzehJCV0JDHDWpC?=
- =?us-ascii?Q?8afY85nh4S+wCXV6XQZIN+804yNHTgJE5RMHbWEwBBFWk4A3T6CssodTNM9d?=
- =?us-ascii?Q?1QRfWIhpo0eGzR1kkRjp+pWP+u45Z4aTuyO6Orv8AdpHZzVfp62YvJI508nZ?=
- =?us-ascii?Q?0lkPIeUHCxgtBM6xshqrBdXREBmMc2ozJtKWGWQizNao89uHh5GfnlNXxdxj?=
- =?us-ascii?Q?IykOsPJMRmT9hLrI/blbi0hIp/l+E98d+elRHmrU4CjA3dXJIpS0PSTqoLXa?=
- =?us-ascii?Q?azI/aJWh+DQDh+QF9pBL4KqlO94gEFwl+S5L0qYaYpgCRTWRMWeimBKbISES?=
- =?us-ascii?Q?i5j3Plhaoezrl7rbHXCeDe3U3eLZ6RP7kjfoQzVtcecG20ltAK+s7oX1bbt1?=
- =?us-ascii?Q?sn2I8+6Xei5FAuyTaFu3CJLMi5U+mQJxQ/oL+DJMvl1eALg3EG7TGj2z+txw?=
- =?us-ascii?Q?7yLy9fmsVJ57Vyub4n4I0PKTvPLDIjZ07i5zdeCpfPK4i2UhwS55Ffvk02wP?=
- =?us-ascii?Q?cpIResESbLx972xnX3v9ULPr69Sm4sXgfCuwfrnA3/lkLKBGSJT7bnhNQHOC?=
- =?us-ascii?Q?9UE+AyNDJOuT46lLdR1MpChtrta4yoNpNtcqnjAQtU1lt+esL6LCjCfKztGq?=
- =?us-ascii?Q?VLeqe+xAxwYfcHFwACtMzguprxZPiM2Qgh+sAWfvN0UG/2DFUciFTbisBF7q?=
- =?us-ascii?Q?Fh4jExRUKQDmzszzZhx+gDlOeiVJ2tt50KkWzft4tYCuhfxgx+deuhp201F8?=
- =?us-ascii?Q?ZddMwJAjPyf8Axtxndi4doqn6LlYKc+nPl5U7FLdc7coRvVTcQb+E0nyuhtq?=
- =?us-ascii?Q?p8afwv9nYlbFbBCwM5LbQY4LKL94QwiqCstnYOK1ZS2NRg=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f827f130-aba6-493d-74f4-08d99335ee4a
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Oct 2021 19:23:29.1028
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: jgg@nvidia.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5142
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 19, 2021 at 12:43:52PM -0600, Alex Williamson wrote:
-> > +	/* Running switches on */
-> > +	if (((old_state ^ state) & VFIO_DEVICE_STATE_RUNNING) &&
-> > +	    (state & VFIO_DEVICE_STATE_RUNNING)) {
-> > +		ret = mlx5vf_pci_unfreeze_device(mvdev);
-> > +		if (ret)
-> > +			return ret;
-> > +		ret = mlx5vf_pci_unquiesce_device(mvdev);
-> > +		if (ret) {
-> > +			vmig->vfio_dev_state = VFIO_DEVICE_STATE_ERROR;
-> > +			return ret;
-> > +		}
-> > +	}
+On Mon, 2021-10-18 at 13:53 -0400, Paolo Bonzini wrote:
+> From: David Stevens <stevensd@chromium.org>
 > 
-> Per previous discussion, I understand that freeze and quiesce are
-> loosely stop-responding-to-dma and stop-sending-dma, respectively.
-> Once we're quiesced and frozen, device state doesn't change.  What are
-> the implications to userspace that we don't expose a quiesce state
-> (yet)?  I'm wondering if this needs to be resolved before we introduce
-> our first in-tree user of the uAPI (and before QEMU support becomes
-> non-experimental).  Thanks,
+> Unify the flags for rmaps and page tracking data, using a
+> single flag in struct kvm_arch and a single loop to go
+> over all the address spaces and memslots.  This avoids
+> code duplication between alloc_all_memslots_rmaps and
+> kvm_page_track_enable_mmu_write_tracking.
+> 
+> Signed-off-by: David Stevens <stevensd@chromium.org>
+> [This patch is the delta between David's v2 and v3, with conflicts
+>  fixed and my own commit message. - Paolo]
+> Co-developed-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  arch/x86/include/asm/kvm_host.h       | 17 ++----
+>  arch/x86/include/asm/kvm_page_track.h |  3 +-
+>  arch/x86/kvm/mmu.h                    | 16 ++++--
+>  arch/x86/kvm/mmu/mmu.c                | 78 +++++++++++++++++++++------
+>  arch/x86/kvm/mmu/page_track.c         | 59 ++++++--------------
+>  arch/x86/kvm/x86.c                    | 47 +---------------
+>  6 files changed, 97 insertions(+), 123 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 88f0326c184a..80f4b8a9233c 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1212,18 +1212,11 @@ struct kvm_arch {
+>  #endif /* CONFIG_X86_64 */
+>  
+>  	/*
+> -	 * If set, rmaps have been allocated for all memslots and should be
+> -	 * allocated for any newly created or modified memslots.
+> +	 * If set, at least one shadow root has been allocated. This flag
+> +	 * is used as one input when determining whether certain memslot
+> +	 * related allocations are necessary.
+>  	 */
+> -	bool memslots_have_rmaps;
+> -
+> -	/*
+> -	 * Set when the KVM mmu needs guest write access page tracking. If
+> -	 * set, the necessary gfn_track arrays have been allocated for
+> -	 * all memslots and should be allocated for any newly created or
+> -	 * modified memslots.
+> -	 */
+> -	bool memslots_mmu_write_tracking;
+> +	bool shadow_root_alloced;
+>  
+>  #if IS_ENABLED(CONFIG_HYPERV)
+>  	hpa_t	hv_root_tdp;
+> @@ -1946,7 +1939,7 @@ static inline int kvm_cpu_get_apicid(int mps_cpu)
+>  
+>  int kvm_cpu_dirty_log_size(void);
+>  
+> -int alloc_all_memslots_rmaps(struct kvm *kvm);
+> +int memslot_rmap_alloc(struct kvm_memory_slot *slot, unsigned long npages);
+>  
+>  #define KVM_CLOCK_VALID_FLAGS						\
+>  	(KVM_CLOCK_TSC_STABLE | KVM_CLOCK_REALTIME | KVM_CLOCK_HOST_TSC)
+> diff --git a/arch/x86/include/asm/kvm_page_track.h b/arch/x86/include/asm/kvm_page_track.h
+> index 79d84a94f8eb..9d4a3b1b25b9 100644
+> --- a/arch/x86/include/asm/kvm_page_track.h
+> +++ b/arch/x86/include/asm/kvm_page_track.h
+> @@ -49,7 +49,8 @@ struct kvm_page_track_notifier_node {
+>  int kvm_page_track_init(struct kvm *kvm);
+>  void kvm_page_track_cleanup(struct kvm *kvm);
+>  
+> -int kvm_page_track_enable_mmu_write_tracking(struct kvm *kvm);
+> +bool kvm_page_track_write_tracking_enabled(struct kvm *kvm);
+> +int kvm_page_track_write_tracking_alloc(struct kvm_memory_slot *slot);
+>  
+>  void kvm_page_track_free_memslot(struct kvm_memory_slot *slot);
+>  int kvm_page_track_create_memslot(struct kvm *kvm,
+> diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
+> index e53ef2ae958f..1ae70efedcf4 100644
+> --- a/arch/x86/kvm/mmu.h
+> +++ b/arch/x86/kvm/mmu.h
+> @@ -303,14 +303,20 @@ int kvm_arch_write_log_dirty(struct kvm_vcpu *vcpu);
+>  int kvm_mmu_post_init_vm(struct kvm *kvm);
+>  void kvm_mmu_pre_destroy_vm(struct kvm *kvm);
+>  
+> -static inline bool kvm_memslots_have_rmaps(struct kvm *kvm)
+> +static inline bool kvm_shadow_root_alloced(struct kvm *kvm)
+>  {
+>  	/*
+> -	 * Read memslot_have_rmaps before rmap pointers.  Hence, threads reading
+> -	 * memslots_have_rmaps in any lock context are guaranteed to see the
+> -	 * pointers.  Pairs with smp_store_release in alloc_all_memslots_rmaps.
+> +	 * Read shadow_root_alloced before related pointers. Hence, threads
+> +	 * reading shadow_root_alloced in any lock context are guaranteed to
+> +	 * see the pointers. Pairs with smp_store_release in
+> +	 * mmu_first_shadow_root_alloc.
+>  	 */
+> -	return smp_load_acquire(&kvm->arch.memslots_have_rmaps);
+> +	return smp_load_acquire(&kvm->arch.shadow_root_alloced);
+> +}
+> +
+> +static inline bool kvm_memslots_have_rmaps(struct kvm *kvm)
+> +{
+> +	return !kvm->arch.tdp_mmu_enabled || kvm_shadow_root_alloced(kvm);
+>  }
+Note that this breaks 32 bit build - kvm->arch.tdp_mmu_enabled is not defined.
 
-The prototype patch I saw added a 4th bit to the state which was
-   1 == 'not dma initiating'
-As you suggested I think a cap bit someplace should be defined if the
-driver supports the 4th bit.
+Best regards,
+	Maxim Levitsky
 
-Otherwise, I think it is backwards compatible, the new logic would be
-two ifs
 
- if ((flipped & STATE_NDMA) &&
-      (flipped & (STATE_NDMA | STATE_RUNNING)) == STATE_NDMA | STATE_RUNNING)
-      mlx5vf_pci _quiesce_device()
+>  
+>  static inline gfn_t gfn_to_index(gfn_t gfn, gfn_t base_gfn, int level)
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 29e7a4bb26e9..757e2a1ed149 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -3397,6 +3397,67 @@ static int mmu_alloc_direct_roots(struct kvm_vcpu *vcpu)
+>  	return r;
+>  }
+>  
+> +static int mmu_first_shadow_root_alloc(struct kvm *kvm)
+> +{
+> +	struct kvm_memslots *slots;
+> +	struct kvm_memory_slot *slot;
+> +	int r = 0, i;
+> +
+> +	/*
+> +	 * Check if this is the first shadow root being allocated before
+> +	 * taking the lock.
+> +	 */
+> +	if (kvm_shadow_root_alloced(kvm))
+> +		return 0;
+> +
+> +	mutex_lock(&kvm->slots_arch_lock);
+> +
+> +	/* Recheck, under the lock, whether this is the first shadow root. */
+> +	if (kvm_shadow_root_alloced(kvm))
+> +		goto out_unlock;
+> +
+> +	/*
+> +	 * Check if anything actually needs to be allocated, e.g. all metadata
+> +	 * will be allocated upfront if TDP is disabled.
+> +	 */
+> +	if (kvm_memslots_have_rmaps(kvm) &&
+> +	    kvm_page_track_write_tracking_enabled(kvm))
+> +		goto out_success;
+> +
+> +	for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
+> +		slots = __kvm_memslots(kvm, i);
+> +		kvm_for_each_memslot(slot, slots) {
+> +			/*
+> +			 * Both of these functions are no-ops if the target is
+> +			 * already allocated, so unconditionally calling both
+> +			 * is safe.  Intentionally do NOT free allocations on
+> +			 * failure to avoid having to track which allocations
+> +			 * were made now versus when the memslot was created.
+> +			 * The metadata is guaranteed to be freed when the slot
+> +			 * is freed, and will be kept/used if userspace retries
+> +			 * KVM_RUN instead of killing the VM.
+> +			 */
+> +			r = memslot_rmap_alloc(slot, slot->npages);
+> +			if (r)
+> +				goto out_unlock;
+> +			r = kvm_page_track_write_tracking_alloc(slot);
+> +			if (r)
+> +				goto out_unlock;
+> +		}
+> +	}
+> +
+> +	/*
+> +	 * Ensure that shadow_root_alloced becomes true strictly after
+> +	 * all the related pointers are set.
+> +	 */
+> +out_success:
+> +	smp_store_release(&kvm->arch.shadow_root_alloced, true);
+> +
+> +out_unlock:
+> +	mutex_unlock(&kvm->slots_arch_lock);
+> +	return r;
+> +}
+> +
+>  static int mmu_alloc_shadow_roots(struct kvm_vcpu *vcpu)
+>  {
+>  	struct kvm_mmu *mmu = vcpu->arch.mmu;
+> @@ -3427,11 +3488,7 @@ static int mmu_alloc_shadow_roots(struct kvm_vcpu *vcpu)
+>  		}
+>  	}
+>  
+> -	r = alloc_all_memslots_rmaps(vcpu->kvm);
+> -	if (r)
+> -		return r;
+> -
+> -	r = kvm_page_track_enable_mmu_write_tracking(vcpu->kvm);
+> +	r = mmu_first_shadow_root_alloc(vcpu->kvm);
+>  	if (r)
+>  		return r;
+>  
+> @@ -5604,16 +5661,7 @@ void kvm_mmu_init_vm(struct kvm *kvm)
+>  
+>  	spin_lock_init(&kvm->arch.mmu_unsync_pages_lock);
+>  
+> -	if (!kvm_mmu_init_tdp_mmu(kvm))
+> -		/*
+> -		 * No smp_load/store wrappers needed here as we are in
+> -		 * VM init and there cannot be any memslots / other threads
+> -		 * accessing this struct kvm yet.
+> -		 */
+> -		kvm->arch.memslots_have_rmaps = true;
+> -
+> -	if (!tdp_enabled)
+> -		kvm->arch.memslots_mmu_write_tracking = true;
+> +	kvm_mmu_init_tdp_mmu(kvm);
+>  
+>  	node->track_write = kvm_mmu_pte_write;
+>  	node->track_flush_slot = kvm_mmu_invalidate_zap_pages_in_memslot;
+> diff --git a/arch/x86/kvm/mmu/page_track.c b/arch/x86/kvm/mmu/page_track.c
+> index 357605809825..5e0684460930 100644
+> --- a/arch/x86/kvm/mmu/page_track.c
+> +++ b/arch/x86/kvm/mmu/page_track.c
+> @@ -19,14 +19,10 @@
+>  #include "mmu.h"
+>  #include "mmu_internal.h"
+>  
+> -static bool write_tracking_enabled(struct kvm *kvm)
+> +bool kvm_page_track_write_tracking_enabled(struct kvm *kvm)
+>  {
+> -	/*
+> -	 * Read memslots_mmu_write_tracking before gfn_track pointers. Pairs
+> -	 * with smp_store_release in kvm_page_track_enable_mmu_write_tracking.
+> -	 */
+>  	return IS_ENABLED(CONFIG_KVM_EXTERNAL_WRITE_TRACKING) ||
+> -	       smp_load_acquire(&kvm->arch.memslots_mmu_write_tracking);
+> +	       !tdp_enabled || kvm_shadow_root_alloced(kvm);
+>  }
+>  
+>  void kvm_page_track_free_memslot(struct kvm_memory_slot *slot)
+> @@ -46,7 +42,8 @@ int kvm_page_track_create_memslot(struct kvm *kvm,
+>  	int i;
+>  
+>  	for (i = 0; i < KVM_PAGE_TRACK_MAX; i++) {
+> -		if (i == KVM_PAGE_TRACK_WRITE && !write_tracking_enabled(kvm))
+> +		if (i == KVM_PAGE_TRACK_WRITE &&
+> +		    !kvm_page_track_write_tracking_enabled(kvm))
+>  			continue;
+>  
+>  		slot->arch.gfn_track[i] =
+> @@ -70,45 +67,18 @@ static inline bool page_track_mode_is_valid(enum kvm_page_track_mode mode)
+>  	return true;
+>  }
+>  
+> -int kvm_page_track_enable_mmu_write_tracking(struct kvm *kvm)
+> +int kvm_page_track_write_tracking_alloc(struct kvm_memory_slot *slot)
+>  {
+> -	struct kvm_memslots *slots;
+> -	struct kvm_memory_slot *slot;
+> -	unsigned short **gfn_track;
+> -	int i;
+> +	unsigned short *gfn_track;
+>  
+> -	if (write_tracking_enabled(kvm))
+> +	if (slot->arch.gfn_track[KVM_PAGE_TRACK_WRITE])
+>  		return 0;
+>  
+> -	mutex_lock(&kvm->slots_arch_lock);
+> -
+> -	if (write_tracking_enabled(kvm)) {
+> -		mutex_unlock(&kvm->slots_arch_lock);
+> -		return 0;
+> -	}
+> -
+> -	for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
+> -		slots = __kvm_memslots(kvm, i);
+> -		kvm_for_each_memslot(slot, slots) {
+> -			gfn_track = slot->arch.gfn_track + KVM_PAGE_TRACK_WRITE;
+> -			if (*gfn_track)
+> -				continue;
+> -
+> -			*gfn_track = vcalloc(slot->npages, sizeof(**gfn_track));
+> -			if (*gfn_track == NULL) {
+> -				mutex_unlock(&kvm->slots_arch_lock);
+> -				return -ENOMEM;
+> -			}
+> -		}
+> -	}
+> -
+> -	/*
+> -	 * Ensure that memslots_mmu_write_tracking becomes true strictly
+> -	 * after all the pointers are set.
+> -	 */
+> -	smp_store_release(&kvm->arch.memslots_mmu_write_tracking, true);
+> -	mutex_unlock(&kvm->slots_arch_lock);
+> +	gfn_track = vcalloc(slot->npages, sizeof(*gfn_track));
+> +	if (gfn_track == NULL)
+> +		return -ENOMEM;
+>  
+> +	slot->arch.gfn_track[KVM_PAGE_TRACK_WRITE] = gfn_track;
+>  	return 0;
+>  }
+>  
+> @@ -148,7 +118,7 @@ void kvm_slot_page_track_add_page(struct kvm *kvm,
+>  		return;
+>  
+>  	if (WARN_ON(mode == KVM_PAGE_TRACK_WRITE &&
+> -		    !write_tracking_enabled(kvm)))
+> +		    !kvm_page_track_write_tracking_enabled(kvm)))
+>  		return;
+>  
+>  	update_gfn_track(slot, gfn, mode, 1);
+> @@ -186,7 +156,7 @@ void kvm_slot_page_track_remove_page(struct kvm *kvm,
+>  		return;
+>  
+>  	if (WARN_ON(mode == KVM_PAGE_TRACK_WRITE &&
+> -		    !write_tracking_enabled(kvm)))
+> +		    !kvm_page_track_write_tracking_enabled(kvm)))
+>  		return;
+>  
+>  	update_gfn_track(slot, gfn, mode, -1);
+> @@ -214,7 +184,8 @@ bool kvm_slot_page_track_is_active(struct kvm_vcpu *vcpu,
+>  	if (!slot)
+>  		return false;
+>  
+> -	if (mode == KVM_PAGE_TRACK_WRITE && !write_tracking_enabled(vcpu->kvm))
+> +	if (mode == KVM_PAGE_TRACK_WRITE &&
+> +	    !kvm_page_track_write_tracking_enabled(vcpu->kvm))
+>  		return false;
+>  
+>  	index = gfn_to_index(gfn, slot->base_gfn, PG_LEVEL_4K);
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index fce4d2eb69e6..b515a3d85a46 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -11516,8 +11516,7 @@ void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *slot)
+>  	kvm_page_track_free_memslot(slot);
+>  }
+>  
+> -static int memslot_rmap_alloc(struct kvm_memory_slot *slot,
+> -			      unsigned long npages)
+> +int memslot_rmap_alloc(struct kvm_memory_slot *slot, unsigned long npages)
+>  {
+>  	const int sz = sizeof(*slot->arch.rmap[0]);
+>  	int i;
+> @@ -11539,50 +11538,6 @@ static int memslot_rmap_alloc(struct kvm_memory_slot *slot,
+>  	return 0;
+>  }
+>  
+> -int alloc_all_memslots_rmaps(struct kvm *kvm)
+> -{
+> -	struct kvm_memslots *slots;
+> -	struct kvm_memory_slot *slot;
+> -	int r, i;
+> -
+> -	/*
+> -	 * Check if memslots alreday have rmaps early before acquiring
+> -	 * the slots_arch_lock below.
+> -	 */
+> -	if (kvm_memslots_have_rmaps(kvm))
+> -		return 0;
+> -
+> -	mutex_lock(&kvm->slots_arch_lock);
+> -
+> -	/*
+> -	 * Read memslots_have_rmaps again, under the slots arch lock,
+> -	 * before allocating the rmaps
+> -	 */
+> -	if (kvm_memslots_have_rmaps(kvm)) {
+> -		mutex_unlock(&kvm->slots_arch_lock);
+> -		return 0;
+> -	}
+> -
+> -	for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
+> -		slots = __kvm_memslots(kvm, i);
+> -		kvm_for_each_memslot(slot, slots) {
+> -			r = memslot_rmap_alloc(slot, slot->npages);
+> -			if (r) {
+> -				mutex_unlock(&kvm->slots_arch_lock);
+> -				return r;
+> -			}
+> -		}
+> -	}
+> -
+> -	/*
+> -	 * Ensure that memslots_have_rmaps becomes true strictly after
+> -	 * all the rmap pointers are set.
+> -	 */
+> -	smp_store_release(&kvm->arch.memslots_have_rmaps, true);
+> -	mutex_unlock(&kvm->slots_arch_lock);
+> -	return 0;
+> -}
+> -
+>  static int kvm_alloc_memslot_metadata(struct kvm *kvm,
+>  				      struct kvm_memory_slot *slot,
+>  				      unsigned long npages)
 
- [..]
 
- if ((flipped == (STATE_NDMA)) &&
-      (flipped & (STATE_NDMA | STATE_RUNNING)) == STATE_RUNNING)
-      mlx5vf_pci_unquiesce_device()
-
-Sequenced before/after the other calls to quiesce_device
-
-So if userspace doesn't use it then the same driver behavior is kept,
-as it never sees STATE_NDMA flip
-
-Asking for STATE_NDMA !STATE_RUNNING is just ignored because !RUNNING
-already implies NDMA
-
-.. and some optimization of the logic to avoid duplicated work
-
-Jason
