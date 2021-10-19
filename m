@@ -2,53 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6A8AB4341B0
-	for <lists+kvm@lfdr.de>; Wed, 20 Oct 2021 00:53:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 471C24341B1
+	for <lists+kvm@lfdr.de>; Wed, 20 Oct 2021 00:54:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229888AbhJSW4J (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Oct 2021 18:56:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39064 "EHLO
+        id S229952AbhJSW4N (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Oct 2021 18:56:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39068 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229851AbhJSW4H (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Oct 2021 18:56:07 -0400
-Received: from mail-io1-xd4a.google.com (mail-io1-xd4a.google.com [IPv6:2607:f8b0:4864:20::d4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AA94C06161C
-        for <kvm@vger.kernel.org>; Tue, 19 Oct 2021 15:53:54 -0700 (PDT)
-Received: by mail-io1-xd4a.google.com with SMTP id l17-20020a05660227d100b005d6609eb90eso14393749ios.16
-        for <kvm@vger.kernel.org>; Tue, 19 Oct 2021 15:53:54 -0700 (PDT)
+        with ESMTP id S229881AbhJSW4I (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Oct 2021 18:56:08 -0400
+Received: from mail-io1-xd49.google.com (mail-io1-xd49.google.com [IPv6:2607:f8b0:4864:20::d49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B8D7C06161C
+        for <kvm@vger.kernel.org>; Tue, 19 Oct 2021 15:53:55 -0700 (PDT)
+Received: by mail-io1-xd49.google.com with SMTP id a1-20020a5d9801000000b005de11aa60b8so6083682iol.11
+        for <kvm@vger.kernel.org>; Tue, 19 Oct 2021 15:53:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=v7meaSIba9u+Tv41QNKjKlrW1J3eV+swPVowkDP8eKo=;
-        b=GwgMCdHxzOTmbE5ojZucnuabFbdaqtGAZkyuo+rsKzYjk4EtT3m6wn7ch4MfRYoGF5
-         bSelm3HTHDwCfoQAewgL+KocRw7WlMvJfxcmDbN0pW1wL2qs+LtXcBl961OwV7U/f9AG
-         WTTQ8Af0LUqjcCyNqdTqhjH41w1FutsBur++tBNUeGc9G5PUwdR07aZtj7RM1Qz8JzcQ
-         kb/UBO3tq6ykd+vd07fOBT9uSAje0zTZNfgaMZ5rH1Ydw1vxgqK8vh+95P69ofvLAr4x
-         wkoHy42JjbQikg8UNvmn7PDLewqD10lhbpSYxgQcn4FYWXxbNiki23N4Vn5rgZlGrjoO
-         998w==
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=OuQUWdMZ3wNkoC64jIPpxVoIWul9rt9StJF3Nf5qPz0=;
+        b=QmPZCZimqxlxKsACecjW9qd8vW36E58nMdROwlpio6g0BcqvjG3U2xVCPHZ/vaGP36
+         WQfIY+WIfc5MeJ6Q62eKlGfgkUPMcfpTA+fxwDpnbRgGg6VQzM4x478eO9/OYZCfc+XP
+         Kk0wxNH9HVkBF/PlX67ipPWydvgJLnKvNpqoUhnKWGZWeJ2UpxHhq1jB9naEo+ppdKke
+         QsCnCbolPStXI9YfdvlzQqdaTzWuX/4sFPFa2a1/tv7P1csW+Z3WIc4v5wTHnPuqnsP9
+         ZJ8LCXrLUZ3YC3wiWdudThZQN3DVuKcCaLxClqFKfZYr5IQGbv3GjwHgVSdjEzqiAyPE
+         lknw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=v7meaSIba9u+Tv41QNKjKlrW1J3eV+swPVowkDP8eKo=;
-        b=ypiPsqSs11GqkOvyBIK4lTpg4lYRajpnvueWwZcaYp1bgvVDn1rE3hcOQlj/WBU/x6
-         0tFSb2wtnP9vuqHwC8dDnVAc4ClGGp0z3BrA2CkoQoT+PWVlcJPH0G+5uMFXoarnp6Hr
-         wdZDhwpiOjrtxf9fn8Rg61QdHHXM60rOg4geA0+x51eyvjLsi4zShX57SywLRnjphDMa
-         Ji/8JXsn0tgrzJxRB+8SO1BooYRwyiaXVK1kRbTgIb58zRDfUuGgmz31MYEnX1DEnHUF
-         8spE0wRlVHXb1Cl9LVX+3ByewxPSDzkGjzAZizAYwVj6o3uyLE2w/H1/t1ocPJtunuXV
-         rfQA==
-X-Gm-Message-State: AOAM5305IzwkTLG8R0cbEoGFDcLAJq31bw4ooFgYwz6gFhWxnIHzhRfZ
-        W0X6gN99OGx1+yi2IYX1QtClDE9FulRm9Rq9fY8Nz/sZXAhlC9QXUoaadloih3EDWvH2sw1eIPj
-        NcbGdYFazlXKcC1P5RSUCicWDh9geX72LI+ScxVljGcR4yycDqw6YfGyxcw==
-X-Google-Smtp-Source: ABdhPJwgZn4A4BJidLhUsKshN1jNCddQupKVwDZMjigziBopnAfaR1ikytwqYIU6jZi4qjpo8+eByK5h1K0=
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=OuQUWdMZ3wNkoC64jIPpxVoIWul9rt9StJF3Nf5qPz0=;
+        b=uIvt4WMfPpBaHXzDGIvcPvX/muKGWgviJy0y6uwLe3msZXH8fQUn+Q2mwEmerlNTQH
+         MjvpQTqrIPtMlCChtBZpNrs7R+L0v+OuIUgSpt2tOOEIqZpmMooew68AUhQsDY+Vfkcr
+         fLHb2e6clcMnutm66hqn/PyJ9UxNoHGBTaArYiwl76RKE6N4DvfuUh1zkCqBb50iCldm
+         YQzhsn369/7li1ZPB9OX1322DdCpVPtyh3nuvCIWBQuVC7MwvltIcZLsuWZHAvJHMufX
+         L3x6bHjToF3vXUIH++XKbGGeIup+rx4lVcfR64/4rUqCbdTcaoFEyc4UOaD6gpkjUqFh
+         6Tzg==
+X-Gm-Message-State: AOAM530pS4zM3Tqsh6nSBrpQCEUkR4LAVM3sHPLFqJ0Cqbc+QmnzrzRh
+        yIyYLqxITm8eSVlRblWrDogD3ncXA8YXlNCfATT6blSNyF4mK35Tj+oVSGuMaIHzT5FMnWPlW4Y
+        YaDjj85+irxkm+HT8VWMqt2cNv8tLkehKcPtDP6SMjMeQSOkUIdj4pvNnpg==
+X-Google-Smtp-Source: ABdhPJyjS4UfVJezk3g+bb7CcEJolVI//NqMefaWO74xvZDR5q6Wr3Z1Z61lJ1KrNAzpMMhrUHxpK5EDfgw=
 X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a02:a38e:: with SMTP id y14mr6283087jak.8.1634684033646;
- Tue, 19 Oct 2021 15:53:53 -0700 (PDT)
-Date:   Tue, 19 Oct 2021 22:53:50 +0000
-Message-Id: <20211019225351.970397-1-oupton@google.com>
+ (user=oupton job=sendgmr) by 2002:a05:6602:13d3:: with SMTP id
+ o19mr20177645iov.18.1634684034807; Tue, 19 Oct 2021 15:53:54 -0700 (PDT)
+Date:   Tue, 19 Oct 2021 22:53:51 +0000
+In-Reply-To: <20211019225351.970397-1-oupton@google.com>
+Message-Id: <20211019225351.970397-2-oupton@google.com>
 Mime-Version: 1.0
+References: <20211019225351.970397-1-oupton@google.com>
 X-Mailer: git-send-email 2.33.0.1079.g6e70778dc9-goog
-Subject: [kvm-unit-tests PATCH 1/2] x86: Consistently use safe_halt() in place
- of inline assembly
+Subject: [kvm-unit-tests PATCH 2/2] git: Ignore patch files in the git tree
 From:   Oliver Upton <oupton@google.com>
 To:     kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -61,95 +64,23 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The safe_halt() library function simply performs an 'sti; hlt'
-instruction sequence. There are several places where bare inline
-assembly was used instead of this helper. Replace all open-coded
-implementations with the helper.
-
-No functional change intended.
-
 Signed-off-by: Oliver Upton <oupton@google.com>
 ---
- x86/svm_tests.c | 2 +-
- x86/vmexit.c    | 8 ++++----
- x86/vmx_tests.c | 4 ++--
- 3 files changed, 7 insertions(+), 7 deletions(-)
+ .gitignore | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/x86/svm_tests.c b/x86/svm_tests.c
-index 3344e28..afdd359 100644
---- a/x86/svm_tests.c
-+++ b/x86/svm_tests.c
-@@ -1302,7 +1302,7 @@ static void interrupt_test(struct svm_test *test)
-     timer_fired = false;
-     start = rdtsc();
-     apic_write(APIC_TMICT, 1000000);
--    asm volatile ("sti; hlt");
-+    safe_halt();
- 
-     report(rdtsc() - start > 10000 && timer_fired,
-           "direct interrupt + hlt");
-diff --git a/x86/vmexit.c b/x86/vmexit.c
-index 999babf..8cfb36b 100644
---- a/x86/vmexit.c
-+++ b/x86/vmexit.c
-@@ -103,7 +103,7 @@ static void self_ipi_sti_hlt(void)
- 	x = 0;
- 	irq_disable();
- 	apic_self_ipi(IPI_TEST_VECTOR);
--	asm volatile("sti; hlt");
-+	safe_halt();
- 	if (x != 1) printf("%d", x);
- }
- 
-@@ -135,7 +135,7 @@ static void self_ipi_tpr_sti_hlt(void)
- 	apic_set_tpr(0x0f);
- 	apic_self_ipi(IPI_TEST_VECTOR);
- 	apic_set_tpr(0x00);
--	asm volatile("sti; hlt");
-+	safe_halt();
- 	if (x != 1) printf("%d", x);
- }
- 
-@@ -155,7 +155,7 @@ static void x2apic_self_ipi_sti_hlt(void)
- {
- 	irq_disable();
- 	x2apic_self_ipi(IPI_TEST_VECTOR);
--	asm volatile("sti; hlt");
-+	safe_halt();
- }
- 
- static void x2apic_self_ipi_tpr(void)
-@@ -181,7 +181,7 @@ static void x2apic_self_ipi_tpr_sti_hlt(void)
- 	apic_set_tpr(0x0f);
- 	x2apic_self_ipi(IPI_TEST_VECTOR);
- 	apic_set_tpr(0x00);
--	asm volatile("sti; hlt");
-+	safe_halt();
- }
- 
- static void ipi(void)
-diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-index 3b97cfa..ac2b0b4 100644
---- a/x86/vmx_tests.c
-+++ b/x86/vmx_tests.c
-@@ -1674,7 +1674,7 @@ static void interrupt_main(void)
- 	start = rdtsc();
- 	apic_write(APIC_TMICT, 1000000);
- 
--	asm volatile ("sti; hlt");
-+	safe_halt();
- 
- 	report(rdtsc() - start > 1000000 && timer_fired,
- 	       "direct interrupt + hlt");
-@@ -1686,7 +1686,7 @@ static void interrupt_main(void)
- 	start = rdtsc();
- 	apic_write(APIC_TMICT, 1000000);
- 
--	asm volatile ("sti; hlt");
-+	safe_halt();
- 
- 	report(rdtsc() - start > 10000 && timer_fired,
- 	       "intercepted interrupt + hlt");
+diff --git a/.gitignore b/.gitignore
+index b3cf2cb..3d5be62 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -5,6 +5,7 @@ tags
+ *.o
+ *.flat
+ *.elf
++*.patch
+ .pc
+ patches
+ .stgit-*
 -- 
 2.33.0.1079.g6e70778dc9-goog
 
