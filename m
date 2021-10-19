@@ -2,135 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0092D433BFC
-	for <lists+kvm@lfdr.de>; Tue, 19 Oct 2021 18:22:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5761D433C04
+	for <lists+kvm@lfdr.de>; Tue, 19 Oct 2021 18:23:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231574AbhJSQYr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Oct 2021 12:24:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35002 "EHLO
+        id S233497AbhJSQZd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Oct 2021 12:25:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35198 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229789AbhJSQYq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Oct 2021 12:24:46 -0400
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A049C06161C
-        for <kvm@vger.kernel.org>; Tue, 19 Oct 2021 09:22:33 -0700 (PDT)
-Received: by mail-pf1-x449.google.com with SMTP id j22-20020a62b616000000b0044d091c3999so213339pff.16
-        for <kvm@vger.kernel.org>; Tue, 19 Oct 2021 09:22:33 -0700 (PDT)
+        with ESMTP id S229846AbhJSQZc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Oct 2021 12:25:32 -0400
+Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43511C061746
+        for <kvm@vger.kernel.org>; Tue, 19 Oct 2021 09:23:19 -0700 (PDT)
+Received: by mail-pg1-x530.google.com with SMTP id 75so19866891pga.3
+        for <kvm@vger.kernel.org>; Tue, 19 Oct 2021 09:23:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=L4yVHgikzDElyFY7TNwsQ5Dm/gZ+cmTLoOsmdWNx03Q=;
-        b=aoXMjZ980AD+ylhjlg8P2H0St1UJRq1NoGGOrvZb95GDGfuj5VdTEW/gFW0f10yyRw
-         0bSRCEhMVzNpJw5T/+h44l7DybmDayc//cQOkwU8k2BqdGcEKcYOrbUJJHBy48PX80gU
-         QfVOR7dTCVgv2ETYghwv/9W9WXktGx9hOsMNyBz8+TDfxx5gfP+nA2XPX7xyMdT4yROP
-         9rFaT6b8aYkDt4+ormjnF5Iqu2jMfIp8jaHTOu7lyDS2JaV6tBTLse8cyHvnsWHFrF59
-         3FppUw1aUu30phlNYAxV3TLK/5yapqUwynZ1MNZs4av0DGzsVdxAWJSOiD3wZMEkDKwr
-         gg5w==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=xPCNz7fYtKV1tSXpn8cPHZ9DQAOcY8mt7zL2GKr0oCg=;
+        b=C4DR8PewB52Vu23rnXrvECk1DGFOOD6r7dOnucz7osENb97w7cNhiDolrALkjdopOB
+         0bYD7vfw82zCtzwEOH6TREQq+G3zMDbX4eF5PQRGMKtMipwqO7XfEm/rZjqn4e4cgbuF
+         VsRqhzLbJuHCKySpKUqczcpD4+L658R9BlFYb5wGdHslgDjctadlrDUHGdqe0qXQIQuh
+         HnYDVA/yPlGQys9zmuFLSjiL9blPkJyhiPMOvPKztGp8W67O3VQ4rQYBAKyYPhn7kwn1
+         r0H3BIHy6eQiQT6f0jCyXcKKdXl8CXsSlVupj2b+NqywYIM2ehTgqj6HJUPiK7XY2wQ7
+         fRzg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=L4yVHgikzDElyFY7TNwsQ5Dm/gZ+cmTLoOsmdWNx03Q=;
-        b=ZTnuA+BbI3e4Q6jdaObojy2Kzdu0xGe7jFVRhbUdSfATaFGtDIZfSoUDoeBLWkObgF
-         C8wqs6JvkFkoy0vpuC3Q1PKSjR43jSd5IudvuHFABT+Ju8Bcv5KpTolF2BLLuSZbmR7E
-         Kz+sB3IKg0LYQW58uIchRy5HE+hnD/nGtUzMaBUp7vEhSnfoJ0wnO1rQzjNU45Oeosiq
-         DV3mkYYsKpruwhLeg20I7Q0sLPl8BCqmUnPaKLB3OgH/0Ricpk1kDGB5Fmwbxlr53SjQ
-         DxB5l3eMWTHIudqZ5lPd858VvLdMiURueZuQoFrr6tZ9gvVFtTNykQk0stvBQU4zGasH
-         +zfg==
-X-Gm-Message-State: AOAM530keoN28tIIQh/VvDQiRdPvxxHoU4EYdonyq1DVzJW15lL+jC6b
-        YmHfD1nAYt7eHPUea07qnGSFP36BE+kmBQ==
-X-Google-Smtp-Source: ABdhPJzNMGzZlMAulTGu8uFg4ygJNj3hXyiv6hCw7QH2UiDdTeeLUlt0coSArBXUBOHskxv3dr0qJuzb9T0yWQ==
-X-Received: from dmatlack-heavy.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
- (user=dmatlack job=sendgmr) by 2002:a17:90a:3ee4:: with SMTP id
- k91mr85591pjc.1.1634660552602; Tue, 19 Oct 2021 09:22:32 -0700 (PDT)
-Date:   Tue, 19 Oct 2021 16:22:23 +0000
-Message-Id: <20211019162223.3935109-1-dmatlack@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.33.0.1079.g6e70778dc9-goog
-Subject: [PATCH v2] KVM: x86/mmu: Rename slot_handle_leaf to slot_handle_level_4k
-From:   David Matlack <dmatlack@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, Ben Gardon <bgardon@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        David Matlack <dmatlack@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=xPCNz7fYtKV1tSXpn8cPHZ9DQAOcY8mt7zL2GKr0oCg=;
+        b=2TERoAo6frJzE9WVZTMWN6Z1ntlAKsk+GV5V5GOb2vQrjonweoP142FJwfgxC9OzKP
+         8V8jGXpwQ1/DyGaBToEF5ypTB+f8tC+14YnrBDSPXQrxWNozNGN5EYTeDvxieiVrKfqH
+         CaaRva3zf9XHdoiaF8ggar75JGVsMD0qPnQ4e5IPslfubKInBV45xN0FPhbjJ5TVJrVe
+         ZKAzqPBCy/l7GOkRHd33JBRWbnyHPK7AbMESmyk5tA5jiHjy/nXURV7K62L1YhmdXl2/
+         0arCp+7HUxJARdb74Q50DUBS//AcN/KP0vYi0wWP3m/zkJUDYkHb+aQXEH7G4k2Ofx4n
+         DgDQ==
+X-Gm-Message-State: AOAM531/7p5GhTVVAyMhxgf2Z9mlNX44ek+9O4qt1mKLnWQuvPNCuMeg
+        koQI3gn3i6fk7n/1x0ZigNBLYg==
+X-Google-Smtp-Source: ABdhPJykIdd8Sw9FfoQxMGxe2V3LHwmo39heoQy8bV8XbZ4e14z419jzM9fWjy1Z1Y60sXm/mcuXAQ==
+X-Received: by 2002:a05:6a00:1592:b0:44d:25e9:759e with SMTP id u18-20020a056a00159200b0044d25e9759emr724398pfk.19.1634660598457;
+        Tue, 19 Oct 2021 09:23:18 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id bt5sm3160437pjb.9.2021.10.19.09.23.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Oct 2021 09:23:17 -0700 (PDT)
+Date:   Tue, 19 Oct 2021 16:23:14 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Li Yu <liyu.yukiteru@bytedance.com>
+Cc:     pbonzini@redhat.com, Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: x86/mmu: Warn on nx_huge_pages for possible problems
+Message-ID: <YW7w8g+65PjGs2wc@google.com>
+References: <b2713829-1dad-de6b-5850-0c3a74e2f6f3@redhat.com>
+ <20211019141101.327397-1-liyu.yukiteru@bytedance.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211019141101.327397-1-liyu.yukiteru@bytedance.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-slot_handle_leaf is a misnomer because it only operates on 4K SPTEs
-whereas "leaf" is used to describe any valid terminal SPTE (4K or
-large page). Rename slot_handle_leaf to slot_handle_level_4k to
-avoid confusion.
+On Tue, Oct 19, 2021, Li Yu wrote:
+> Add warning when `nx_huge_pages` is enabled by `auto` for hint that
+> huge pages may be splited by kernel.
+> 
+> Add warning when CVE-2018-12207 may arise but `nx_huge_pages` is
+> disabled for hint that malicious guest may cause a CPU lookup.
 
-Making this change makes it more obvious there is a benign discrepency
-between the legacy MMU and the TDP MMU when it comes to dirty logging.
-The legacy MMU only iterates through 4K SPTEs when zapping for
-collapsing and when clearing D-bits. The TDP MMU, on the other hand,
-iterates through SPTEs on all levels.
+For the shortlog and changelog, "warning" is misleading.  A "warn" usually means
+a WARN with a backtrace.  This is really just an information message that happens
+to be displayed at level=warn, and that's an implementation detail.
 
-The TDP MMU behavior of zapping SPTEs at all levels is technically
-overkill for its current dirty logging implementation, which always
-demotes to 4k SPTES, but both the TDP MMU and legacy MMU zap if and only
-if the SPTE can be replaced by a larger page, i.e. will not spuriously
-zap 2m (or larger) SPTEs. Opportunistically add comments to explain this
-discrepency in the code.
+> Signed-off-by: Li Yu <liyu.yukiteru@bytedance.com>
+> ---
+>  arch/x86/kvm/mmu/mmu.c | 20 +++++++++++++++-----
+>  1 file changed, 15 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 1a64ba5b9437..32026592e566 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -6056,19 +6056,26 @@ static void __set_nx_huge_pages(bool val)
+>  	nx_huge_pages = itlb_multihit_kvm_mitigation = val;
+>  }
+>  
+> +#define ITLB_MULTIHIT_NX_ON  "iTLB multi-hit CPU bug present and cpu mitigations enabled, huge pages may be splited by kernel for security. See CVE-2018-12207 and https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/multihit.html for details.\n"
+                                                                                            ^                  ^^^^^^^
+											    |- guest           split
+> +#define ITLB_MULTIHIT_NX_OFF "iTLB multi-hit CPU bug present and cpu mitigations enabled, malicious guest may cause a CPU lookup. See CVE-2018-12207 and https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/multihit.html for details.\n"
+                                                                                    ^^^^^^^
+										    disabled
 
-Signed-off-by: David Matlack <dmatlack@google.com>
----
-v1: https://lore.kernel.org/kvm/20211011204418.162846-1-dmatlack@google.com/
-- Clarified that the TDP MMU does not perform spurious zaps in commit
-  message [Sean, Ben]
-- Use "legacy MMU" instead of "KVM" in comments to avoid comments
-  becoming stale in the future if the TDP MMU gets support for 2m dirty
-  logging [Sean]
+This is almost entirely redundant with the information that is displayed in
+/sys/devices/system/cpu/vulnerabilities/itlb_multihit and
+/sys/module/kvm/parameters/nx_huge_pages.  It also makes the below helper more
+than a bit messy.
 
- arch/x86/kvm/mmu/mmu.c | 18 +++++++++++++-----
- 1 file changed, 13 insertions(+), 5 deletions(-)
+I kind of agree with Paolo's feedback that KVM should log a message if the bug
+is present but the mitigation is off.  But if the admin explicitly turns off the
+mitigation, logging the message every time KVM is loaded is obnoxious.  IMO, if
+we want to display a message then we should do something similar to l1tf_mitigation
+and give the admin the option to suppress any logging.
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 24a9f4c3f5e7..fa918289c9e0 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -5382,8 +5382,8 @@ slot_handle_level(struct kvm *kvm, const struct kvm_memory_slot *memslot,
- }
- 
- static __always_inline bool
--slot_handle_leaf(struct kvm *kvm, const struct kvm_memory_slot *memslot,
--		 slot_level_handler fn, bool flush_on_yield)
-+slot_handle_level_4k(struct kvm *kvm, const struct kvm_memory_slot *memslot,
-+		     slot_level_handler fn, bool flush_on_yield)
- {
- 	return slot_handle_level(kvm, memslot, fn, PG_LEVEL_4K,
- 				 PG_LEVEL_4K, flush_on_yield);
-@@ -5772,7 +5772,12 @@ void kvm_mmu_zap_collapsible_sptes(struct kvm *kvm,
- 
- 	if (kvm_memslots_have_rmaps(kvm)) {
- 		write_lock(&kvm->mmu_lock);
--		flush = slot_handle_leaf(kvm, slot, kvm_mmu_zap_collapsible_spte, true);
-+		/*
-+		 * Zap only 4k SPTEs since the legacy MMU only supports dirty
-+		 * logging at a 4k granularity and never creates collapsible
-+		 * 2m SPTEs during dirty logging.
-+		 */
-+		flush = slot_handle_level_4k(kvm, slot, kvm_mmu_zap_collapsible_spte, true);
- 		if (flush)
- 			kvm_arch_flush_remote_tlbs_memslot(kvm, slot);
- 		write_unlock(&kvm->mmu_lock);
-@@ -5809,8 +5814,11 @@ void kvm_mmu_slot_leaf_clear_dirty(struct kvm *kvm,
- 
- 	if (kvm_memslots_have_rmaps(kvm)) {
- 		write_lock(&kvm->mmu_lock);
--		flush = slot_handle_leaf(kvm, memslot, __rmap_clear_dirty,
--					 false);
-+		/*
-+		 * Clear dirty bits only on 4k SPTEs since the legacy MMU only
-+		 * support dirty logging at a 4k granularity.
-+		 */
-+		flush = slot_handle_level_4k(kvm, memslot, __rmap_clear_dirty, false);
- 		write_unlock(&kvm->mmu_lock);
- 	}
- 
--- 
-2.33.0.1079.g6e70778dc9-goog
+Personally, I don't see much value in a message of any kind.  Anyone that is
+running untrusted guests should darn well do a lot of performance testing and
+risk analysis before touching the knob.  And any use case that cares enough about
+performance to explicitly turn off the mitigation should already know exactly how
+KVM' params affect performance.
 
+The L1D flushing messages are justified because a data leak is theoretically possible
+when SMT is enabled even when the kernel's default mitigation is enabled.  That's not
+the case here.
+
+>  static int set_nx_huge_pages(const char *val, const struct kernel_param *kp)
+>  {
+>  	bool old_val = nx_huge_pages;
+>  	bool new_val;
+>  
+>  	/* In "auto" mode deploy workaround only if CPU has the bug. */
+> -	if (sysfs_streq(val, "off"))
+> +	if (sysfs_streq(val, "off")) {
+>  		new_val = 0;
+> -	else if (sysfs_streq(val, "force"))
+> +		if (get_nx_auto_mode() && new_val != old_val)
+> +			pr_warn(ITLB_MULTIHIT_NX_OFF);
+> +	} else if (sysfs_streq(val, "force"))
+>  		new_val = 1;
+> -	else if (sysfs_streq(val, "auto"))
+> +	else if (sysfs_streq(val, "auto")) {
+>  		new_val = get_nx_auto_mode();
+> -	else if (strtobool(val, &new_val) < 0)
+> +		if (new_val && new_val != old_val)
+> +			pr_warn(ITLB_MULTIHIT_NX_ON);
+> +	} else if (strtobool(val, &new_val) < 0)
+
+All branches need braces if any branch has braces.
+
+>  		return -EINVAL;
+>  
+>  	__set_nx_huge_pages(new_val);
+> @@ -6095,8 +6102,11 @@ int kvm_mmu_module_init(void)
+>  {
+>  	int ret = -ENOMEM;
+>  
+> -	if (nx_huge_pages == -1)
+> +	if (nx_huge_pages == -1) {
+>  		__set_nx_huge_pages(get_nx_auto_mode());
+> +		if (is_nx_huge_page_enabled())
+> +			pr_warn_once(ITLB_MULTIHIT_NX_ON);
+> +	}
+>  
+>  	/*
+>  	 * MMU roles use union aliasing which is, generally speaking, an
+> -- 
+> 2.11.0
+> 
