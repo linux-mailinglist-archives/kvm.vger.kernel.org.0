@@ -2,50 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 841244330E1
-	for <lists+kvm@lfdr.de>; Tue, 19 Oct 2021 10:13:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7D4754330E4
+	for <lists+kvm@lfdr.de>; Tue, 19 Oct 2021 10:13:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231758AbhJSIPs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Oct 2021 04:15:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34394 "EHLO
+        id S234718AbhJSIPw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Oct 2021 04:15:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34406 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234573AbhJSIPr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Oct 2021 04:15:47 -0400
-Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A374C06161C;
-        Tue, 19 Oct 2021 01:13:34 -0700 (PDT)
-Received: by mail-pg1-x534.google.com with SMTP id r2so18626327pgl.10;
-        Tue, 19 Oct 2021 01:13:34 -0700 (PDT)
+        with ESMTP id S234691AbhJSIPt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Oct 2021 04:15:49 -0400
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3324AC06161C;
+        Tue, 19 Oct 2021 01:13:37 -0700 (PDT)
+Received: by mail-pj1-x102a.google.com with SMTP id oa12-20020a17090b1bcc00b0019f715462a8so2026215pjb.3;
+        Tue, 19 Oct 2021 01:13:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=9p5KOgAyYKQ6mv8A6+kG8/3gLf/WqhzHaO9t6Ws/o2I=;
-        b=F3wnNpf7rZTlFVmDHuUD26hwbDFFV1nH41Fx9vbTjORylmTM0ENedMOjhHi7PuaIV2
-         1CTDEL/201O3DAKe4ORMgwj5EuVT97rGR8rciYV/Fsk4LIyaKSkWt0r4YkgpjZDgQAOU
-         NbZUmUZ/Cpg65oDvLYB7yQQImimeZfzlCt2cvYl5Elak8L7OnfBZqdXRWLn742AD5XA4
-         5OSlQdOO+gsoqPXS6adkK55tp1MH4Agc/hb6PdYS6RkbM/NjCZB71Njzmh5sI8f0myOL
-         muPNBbtTO7dvhW5Y3hwl3qGKpZVHUPGlA3lKWY3cFimWw6za9ZwnMuyjCgpJJOjxNb7T
-         zMQQ==
+        bh=VL752dQ/ApTxdZicGQxzzNcLpxU27cNK3lNjF5txPOw=;
+        b=WgpKJtaTfoyGk4NrJi0/ACPr965uwGZK0C2I3opbI50uwNhUSv8EMjJHdr/R/Ypr0d
+         RosDVLkBc8aKr8F6caDHRuJtfUt/6/eWeNlSzXOBQGVsP9m6yEZ3xXkB5I05d/TwPLfi
+         kwXIgQ1WtOe/RA5rAVVPDZhX8S+5SOvJ1z8Qbn+z2W4qkDTn3DU5E2r1I3i2vRCHmlwg
+         ByPCmEYb4bAK8pz/rK9a6vhK3NhPM2b3n0k/v1SMHyvIpDWnzTava0NPWeoDd23o8Cuo
+         CJmC9+BqK7+N4E6paos5B3hDCFYLW88evhXBW6zIHwTUzPGFo/SWMqhuguQSaVajNiJU
+         SDWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=9p5KOgAyYKQ6mv8A6+kG8/3gLf/WqhzHaO9t6Ws/o2I=;
-        b=DyMJ0EhujLaYFSHZVEm/1QNm3dqZey6y6fC9nOp0cl/+J35WmMw4zqGP10tS2TcKtS
-         9qqtENmXwwC1HfZ6G6lQ6bfCq3CgI6VN1gTN5HVqmCUdwJdhxl650rPZXrO6sEC4V97P
-         MXOrGgjIqcjwGLYp/JZ1HoACJ0WToEO8/bY3h/zzlfq1fcSAqxDnEZCizBdsGQC6M7yY
-         fFAutu39S9XLILBcz9foWNT10sszeE/4xKDbA8D70OhOMdIHQTWJC0dtdAq/ISJmgzyd
-         CTx3o6Bodm9xBUHVRqyrJUnBfX1x8krQePMvx5vht489R9OOp90eyEbnBc1IJs1v0i7t
-         +pIw==
-X-Gm-Message-State: AOAM531Iav20H7W9XJyc+Muc73qQ9/XymaxpnWh/tQTVjgVlpQLDx9YK
-        3kwpiP/sqdr3ryJzhFinxFB4RW1BO3d61w==
-X-Google-Smtp-Source: ABdhPJy909ToRg1lkvio4YpUoGsjqsCeoJxqw05T3rY/CDAahY5PbeIMUXb/hcJn5xuwOlkg/Bhy1g==
-X-Received: by 2002:a63:7b1e:: with SMTP id w30mr8251228pgc.464.1634631213844;
-        Tue, 19 Oct 2021 01:13:33 -0700 (PDT)
+        bh=VL752dQ/ApTxdZicGQxzzNcLpxU27cNK3lNjF5txPOw=;
+        b=llyObr4o91NNLj+pY/qmLBCBHm/tRW9PiSeK+dYYhZ4CFsQ5qyy4eCETTBkkGGGWcx
+         qG0JcsQ6EEQGJWXG5L2R/36JeJhoQHEosG/HM3a7vS4Gy+9c/eQX/g0f1xqkBpNQuAZT
+         R0fMsQqO2U82LuCDOiDY5C2woZBPqqBjKt4kJM0TxzIy0OfwNhG226Zd2NsN0ZZTYgvA
+         7/dNtQr8A9MThH1OZHqNukV9PdD/m7NkJJxzl/G8Z6kNncfVDX/u59yR9nAtdNZA9N8J
+         1sPSHXT91Xc5+sfXQwqVMfMnk9yZUDU36VWoHd9jDk5/QYD/Eyrv6g6s82Jp8Ye5/BjY
+         S3LQ==
+X-Gm-Message-State: AOAM5338lRu7kDO2dTh2P10tk2FpLkQePnB1ESij5CaA+RaYnizWGmrx
+        D70Y3fylHnVBGNthEkRnbtglZbxjuq9SJw==
+X-Google-Smtp-Source: ABdhPJy6DCFdFFnNb4wPvjMEo8q12xi6dK403Ji6mA6X4dOS2YqjvAKt4Mu2492lgx703+8Ny3s7EQ==
+X-Received: by 2002:a17:902:bb94:b0:13c:9113:5652 with SMTP id m20-20020a170902bb9400b0013c91135652mr32687269pls.70.1634631216561;
+        Tue, 19 Oct 2021 01:13:36 -0700 (PDT)
 Received: from localhost.localdomain ([203.205.141.110])
-        by smtp.googlemail.com with ESMTPSA id f15sm3254064pfe.132.2021.10.19.01.13.31
+        by smtp.googlemail.com with ESMTPSA id f15sm3254064pfe.132.2021.10.19.01.13.34
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 19 Oct 2021 01:13:33 -0700 (PDT)
+        Tue, 19 Oct 2021 01:13:36 -0700 (PDT)
 From:   Wanpeng Li <kernellwp@gmail.com>
 X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
@@ -55,9 +55,9 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>
-Subject: [PATCH v3 2/3] KVM: vPMU: Fill get_msr MSR_CORE_PERF_GLOBAL_OVF_CTRL w/ 0
-Date:   Tue, 19 Oct 2021 01:12:39 -0700
-Message-Id: <1634631160-67276-2-git-send-email-wanpengli@tencent.com>
+Subject: [PATCH v3 3/3] KVM: vCPU kick tax cut for running vCPU
+Date:   Tue, 19 Oct 2021 01:12:40 -0700
+Message-Id: <1634631160-67276-3-git-send-email-wanpengli@tencent.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1634631160-67276-1-git-send-email-wanpengli@tencent.com>
 References: <1634631160-67276-1-git-send-email-wanpengli@tencent.com>
@@ -67,70 +67,69 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Wanpeng Li <wanpengli@tencent.com>
 
-SDM section 18.2.3 mentioned that:
+Sometimes a vCPU kick is following a pending request, even if @vcpu is 
+the running vCPU. It suffers from both rcuwait_wake_up() which has 
+rcu/memory barrier operations and cmpxchg(). Let's check vcpu->wait 
+before rcu_wait_wake_up() and whether @vcpu is the running vCPU before 
+cmpxchg() to tax cut this overhead.
 
-  "IA32_PERF_GLOBAL_OVF_CTL MSR allows software to clear overflow indicator(s) of
-   any general-purpose or fixed-function counters via a single WRMSR."
+We evaluate the kvm-unit-test/vmexit.flat on an Intel ICX box, most of the 
+scores can improve ~600 cpu cycles especially when APICv is disabled.
 
-It is R/W mentioned by SDM, we read this msr on bare-metal during perf testing,
-the value is always 0 for ICX/SKX boxes on hands. Let's fill get_msr
-MSR_CORE_PERF_GLOBAL_OVF_CTRL w/ 0 as hardware behavior and drop
-global_ovf_ctrl variable.
+tscdeadline_immed
+tscdeadline
+self_ipi_sti_nop
+..............
+x2apic_self_ipi_tpr_sti_hlt
 
-Tested-by: Like Xu <likexu@tencent.com>
+Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
 ---
-Btw, xen also fills get_msr MSR_CORE_PERF_GLOBAL_OVF_CTRL w/ 0.
+v2 -> v3:
+ * use kvm_arch_vcpu_get_wait()
 v1 -> v2:
- * drop 'u64 global_ovf_ctrl' directly
+ * move checking running vCPU logic to kvm_vcpu_kick
+ * check rcuwait_active(&vcpu->wait) etc
 
- arch/x86/include/asm/kvm_host.h | 1 -
- arch/x86/kvm/vmx/pmu_intel.c    | 6 ++----
- 2 files changed, 2 insertions(+), 5 deletions(-)
+ virt/kvm/kvm_main.c | 13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index f8f48a7ec577..7aaac918e992 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -499,7 +499,6 @@ struct kvm_pmu {
- 	u64 fixed_ctr_ctrl;
- 	u64 global_ctrl;
- 	u64 global_status;
--	u64 global_ovf_ctrl;
- 	u64 counter_bitmask[2];
- 	u64 global_ctrl_mask;
- 	u64 global_ovf_ctrl_mask;
-diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index 10cc4f65c4ef..b8e0d21b7c8a 100644
---- a/arch/x86/kvm/vmx/pmu_intel.c
-+++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -365,7 +365,7 @@ static int intel_pmu_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		msr_info->data = pmu->global_ctrl;
- 		return 0;
- 	case MSR_CORE_PERF_GLOBAL_OVF_CTRL:
--		msr_info->data = pmu->global_ovf_ctrl;
-+		msr_info->data = 0;
- 		return 0;
- 	default:
- 		if ((pmc = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0)) ||
-@@ -423,7 +423,6 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		if (!(data & pmu->global_ovf_ctrl_mask)) {
- 			if (!msr_info->host_initiated)
- 				pmu->global_status &= ~data;
--			pmu->global_ovf_ctrl = data;
- 			return 0;
- 		}
- 		break;
-@@ -588,8 +587,7 @@ static void intel_pmu_reset(struct kvm_vcpu *vcpu)
- 		pmc->counter = 0;
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 7851f3a1b5f7..1bc52eab0a7d 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -3314,8 +3314,15 @@ void kvm_vcpu_kick(struct kvm_vcpu *vcpu)
+ {
+ 	int me, cpu;
+ 
+-	if (kvm_vcpu_wake_up(vcpu))
+-		return;
++	me = get_cpu();
++
++	if (rcuwait_active(kvm_arch_vcpu_get_wait(vcpu)) && kvm_vcpu_wake_up(vcpu))
++		goto out;
++
++	if (vcpu == __this_cpu_read(kvm_running_vcpu)) {
++		WARN_ON_ONCE(vcpu->mode == IN_GUEST_MODE);
++		goto out;
++	}
+ 
+ 	/*
+ 	 * Note, the vCPU could get migrated to a different pCPU at any point
+@@ -3324,12 +3331,12 @@ void kvm_vcpu_kick(struct kvm_vcpu *vcpu)
+ 	 * IPI is to force the vCPU to leave IN_GUEST_MODE, and migrating the
+ 	 * vCPU also requires it to leave IN_GUEST_MODE.
+ 	 */
+-	me = get_cpu();
+ 	if (kvm_arch_vcpu_should_kick(vcpu)) {
+ 		cpu = READ_ONCE(vcpu->cpu);
+ 		if (cpu != me && (unsigned)cpu < nr_cpu_ids && cpu_online(cpu))
+ 			smp_send_reschedule(cpu);
  	}
- 
--	pmu->fixed_ctr_ctrl = pmu->global_ctrl = pmu->global_status =
--		pmu->global_ovf_ctrl = 0;
-+	pmu->fixed_ctr_ctrl = pmu->global_ctrl = pmu->global_status = 0;
- 
- 	intel_pmu_release_guest_lbr_event(vcpu);
++out:
+ 	put_cpu();
  }
+ EXPORT_SYMBOL_GPL(kvm_vcpu_kick);
 -- 
 2.25.1
 
