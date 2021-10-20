@@ -2,112 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 62FF84353F7
-	for <lists+kvm@lfdr.de>; Wed, 20 Oct 2021 21:42:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 091F0435423
+	for <lists+kvm@lfdr.de>; Wed, 20 Oct 2021 21:52:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231643AbhJTTo0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Oct 2021 15:44:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39596 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231592AbhJTToZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Oct 2021 15:44:25 -0400
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C895C06174E
-        for <kvm@vger.kernel.org>; Wed, 20 Oct 2021 12:42:11 -0700 (PDT)
-Received: by mail-pl1-x631.google.com with SMTP id v20so16862881plo.7
-        for <kvm@vger.kernel.org>; Wed, 20 Oct 2021 12:42:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=wpm3Gl8wXKPGXafIgFGP0xD6h/zadXUfu6GUjVrj6ns=;
-        b=acg+FfyUS0RRG91XmDNK9hsP2+A1X4msHJW9htVgi4KwyGHvgm+Agooulgt0iLmMbz
-         rbct5fnAphkQ/y2uOT5Z1Q9GnwNbVkE/uiNp1fYDMAKUJw/SHsgT5zj0a5JWFz/JJXBv
-         6bg1M5hK/hvlZmBXZwwSVJGtuB4y2VY6BV/plwRqiyOgN/lDzgNm4i6dlgUSk//Xi3xW
-         rgkZvwYT63T8EXp1eph1nZn6F+uirjFGAM0ZEc7DPfJmlcehlpg54aY9wdo9PL/9+s4n
-         BRP4QYLigPWg91zIFhOyWBu1q5lhskwgHHNT5ZSAXglNTNXO2QKcS95IEm1M8xUkHlc5
-         OMgw==
+        id S231604AbhJTTzK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Oct 2021 15:55:10 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:39685 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230484AbhJTTzJ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 20 Oct 2021 15:55:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1634759574;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=TAteW0jZ0sdNj3bdDG1k/ScxBVg5AqdPo8otMjjySxY=;
+        b=b8UCRTf5MwYPuBX5vgqnhaA3nL6fp+Du6VNkOdIfdp5gtootJyOBzCKfax9NNdWK+LBTeo
+        JYs0dBRGSCmXO5wPS9En/J0FXbKK449gHIjl5F7csN7nFHTZbAyElP59o7YYZRmkM2ZwHf
+        +q1VH+lDkWyyEl9uqkZeejG/PwrwoMs=
+Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com
+ [209.85.210.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-576-mSLyW0bPPbeXVcKCpddsPw-1; Wed, 20 Oct 2021 15:52:52 -0400
+X-MC-Unique: mSLyW0bPPbeXVcKCpddsPw-1
+Received: by mail-ot1-f71.google.com with SMTP id o23-20020a9d7197000000b0054e537c6628so4245369otj.14
+        for <kvm@vger.kernel.org>; Wed, 20 Oct 2021 12:52:52 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=wpm3Gl8wXKPGXafIgFGP0xD6h/zadXUfu6GUjVrj6ns=;
-        b=gT3W5HQc72MK7IbXJlwyh5q2cZoPKWMeIFSbLPJzK11XLC1wf6bcGH0pCm0QbXneSy
-         8dkGD3nREA4KbnCbhtcRS+YxPqExTKn16cr8ZG8YOHjEvMzWqyrungzFou4WpiAPQW6q
-         OLF6/OloSUE4OkMNGtDB8ADBBhpFltm0C5CHCPUAGyjNpcEgTwoWqpWBRW3aTYAmHI15
-         1kFSKPmz9Gr/RsbYu/Psk3kwcAu8FA2dy6GgTjJwVXqnjpWZKrGRqnjG6wdFS95eHtAX
-         leil3NSS/M5NrBtirVHTnCbyuCSUHdi6ffGSDAqq/KlYWipGkVT5YAjV3yKY+KMefcCy
-         MfYg==
-X-Gm-Message-State: AOAM533E00gYOmZbWZ2N6K7YSFTFstMRgvm1AYoiiLZK4NLfWR3hxhQ2
-        YUb/k5a5D+4ZxwA8ZDrS/DD8WA==
-X-Google-Smtp-Source: ABdhPJxy4kapndcHpucNwp6t7qxDpD1XglobjefCoqmc4trIw1WxM5NQumPUzkOK+VHDnc46UWVtpw==
-X-Received: by 2002:a17:90b:33c3:: with SMTP id lk3mr943772pjb.237.1634758930294;
-        Wed, 20 Oct 2021 12:42:10 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id nv5sm3583377pjb.10.2021.10.20.12.42.09
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=TAteW0jZ0sdNj3bdDG1k/ScxBVg5AqdPo8otMjjySxY=;
+        b=1tmOx20bmoWDJuWiC7nfccAsLXztMsZ6S7dnkjZxYkFEkPCQk7UMzf60STIqpBEztG
+         WXBwo/ntcaLlynga9oOIWT1mcZQZTn7VLwBhWEraII4Rab3TaGSMowPmO6zvzTAfyCM2
+         l9Mo/egsJ5juII1iE8EFxb2qgfOcBZF3wlyzQ7bbrlIYy2vFfzV7v4T53EFe4U13B4bK
+         d+g5jN8slxVgqsFQ6d2TMMXybWwjpsAhG9wR04cFbSbbg0caCb70sVJltq/FDanM2vx5
+         1E1evx24OIdnZz1FJoXBfUYe0ez0WsThqSBqus7GoylZb+McstUmfsSeqDqyxBiTjlQh
+         O7dw==
+X-Gm-Message-State: AOAM5328pr+wnPXMiw7XRJFPlw+0pkSen+d6CB2ws4QtStlrFIIjz71X
+        nCRyiTKcKEGjjHJnyIVSh++xLWk6DifWks0+RVHGenwU9JeDoKW5lJwOx4pEOKhvr2HtwjyeGvE
+        w0XU0GUotSoFA
+X-Received: by 2002:a05:6830:101:: with SMTP id i1mr1012112otp.107.1634759572082;
+        Wed, 20 Oct 2021 12:52:52 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwZlCUgEaIYe66/0c8z6HHUVNQU6iZcSCYu7Cq4OXr07UD4vmiW2VwnS7uAcCkU0oLkeEs1kw==
+X-Received: by 2002:a05:6830:101:: with SMTP id i1mr1012092otp.107.1634759571849;
+        Wed, 20 Oct 2021 12:52:51 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id e1sm680150oiw.16.2021.10.20.12.52.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Oct 2021 12:42:09 -0700 (PDT)
-Date:   Wed, 20 Oct 2021 19:42:05 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        wanpengli@tencent.com, stable@vger.kernel.org
-Subject: Re: [PATCH] KVM: x86: check for interrupts before deciding whether
- to exit the fast path
-Message-ID: <YXBxDYJcrx/C9QDS@google.com>
-References: <20211020145231.871299-1-pbonzini@redhat.com>
+        Wed, 20 Oct 2021 12:52:51 -0700 (PDT)
+Date:   Wed, 20 Oct 2021 13:52:50 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>,
+        "Tian, Kevin" <kevin.tian@intel.com>, Liu Yi L <yi.l.liu@intel.com>
+Subject: Re: [PATCH v3 0/5] Update vfio_group to use the modern cdev
+ lifecycle
+Message-ID: <20211020135250.76821d83.alex.williamson@redhat.com>
+In-Reply-To: <0-v3-2fdfe4ca2cc6+18c-vfio_group_cdev_jgg@nvidia.com>
+References: <0-v3-2fdfe4ca2cc6+18c-vfio_group_cdev_jgg@nvidia.com>
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211020145231.871299-1-pbonzini@redhat.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 20, 2021, Paolo Bonzini wrote:
-> The kvm_x86_sync_pir_to_irr callback can sometimes set KVM_REQ_EVENT.
-> If that happens exactly at the time that an exit is handled as
-> EXIT_FASTPATH_REENTER_GUEST, vcpu_enter_guest will go incorrectly
-> through the loop that calls kvm_x86_run, instead of processing
-> the request promptly.
+On Fri, 15 Oct 2021 08:40:49 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
+
+> These days drivers with state should use cdev_device_add() and
+> cdev_device_del() to manage the cdev and sysfs lifetime. This simple
+> pattern ties all the state (vfio, dev, and cdev) together in one memory
+> structure and uses container_of() to navigate between the layers.
 > 
-> Fixes: 379a3c8ee444 ("KVM: VMX: Optimize posted-interrupt delivery for timer fastpath")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
-
-Reviewed-by: Sean Christopherson <seanjc@google.com>
-
->  arch/x86/kvm/x86.c | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
+> This is a followup to the discussion here:
 > 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index fa48948b4934..b9b31e5f72b0 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -9781,14 +9781,14 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
->  		if (likely(exit_fastpath != EXIT_FASTPATH_REENTER_GUEST))
->  			break;
->  
-> -                if (unlikely(kvm_vcpu_exit_request(vcpu))) {
-> +		if (vcpu->arch.apicv_active)
-> +			static_call(kvm_x86_sync_pir_to_irr)(vcpu);
-> +
-> +		if (unlikely(kvm_vcpu_exit_request(vcpu))) {
->  			exit_fastpath = EXIT_FASTPATH_EXIT_HANDLED;
->  			break;
->  		}
-> -
-> -		if (vcpu->arch.apicv_active)
-> -			static_call(kvm_x86_sync_pir_to_irr)(vcpu);
-> -        }
-> +	}
-
-I think someone working on git has a meta-entry in the obfuscated C context.
-This is the most convoluted diff possible for a simple code move :-)
-
->  	/*
->  	 * Do this here before restoring debug registers on the host.  And
-> -- 
-> 2.27.0
+> https://lore.kernel.org/kvm/20210921155705.GN327412@nvidia.com/
 > 
+> This builds on Christoph's work to revise how the vfio_group works and is
+> against the latest VFIO tree.
+> 
+> This is on github: https://github.com/jgunthorpe/linux/commits/vfio_group_cdev
+> 
+> v3:
+>  - Streamline vfio_group_find_or_alloc()
+>  - Remove vfio_group_try_get() and just opencode the refcount_inc_not_zero
+> v2: https://lore.kernel.org/r/0-v2-fd9627d27b2b+26c-vfio_group_cdev_jgg@nvidia.com
+>  - Remove comment before iommu_group_unregister_notifier()
+>  - Add comment explaining what the WARN_ONs vfio_group_put() do
+>  - Fix error logic around vfio_create_group() in patch 3
+>  - Add horizontal whitespace
+>  - Clarify comment is refering to group->users
+> v1: https://lore.kernel.org/r/0-v1-fba989159158+2f9b-vfio_group_cdev_jgg@nvidia.com
+> 
+> Cc: Liu Yi L <yi.l.liu@intel.com>
+> Cc: "Tian, Kevin" <kevin.tian@intel.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> 
+> Jason Gunthorpe (5):
+>   vfio: Delete vfio_get/put_group from vfio_iommu_group_notifier()
+>   vfio: Do not open code the group list search in vfio_create_group()
+>   vfio: Don't leak a group reference if the group already exists
+>   vfio: Use a refcount_t instead of a kref in the vfio_group
+>   vfio: Use cdev_device_add() instead of device_create()
+> 
+>  drivers/vfio/vfio.c | 381 +++++++++++++++++---------------------------
+>  1 file changed, 149 insertions(+), 232 deletions(-)
+
+Applied to vfio next branch for v5.16.  Thanks,
+
+Alex
+
