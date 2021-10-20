@@ -2,111 +2,222 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F378B4343F7
-	for <lists+kvm@lfdr.de>; Wed, 20 Oct 2021 05:44:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E5B5443445D
+	for <lists+kvm@lfdr.de>; Wed, 20 Oct 2021 06:32:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229919AbhJTDqQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Oct 2021 23:46:16 -0400
-Received: from mx24.baidu.com ([111.206.215.185]:43088 "EHLO baidu.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S229635AbhJTDqP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Oct 2021 23:46:15 -0400
-Received: from BJHW-Mail-Ex14.internal.baidu.com (unknown [10.127.64.37])
-        by Forcepoint Email with ESMTPS id 4B7AB55964DAFEB04D2E;
-        Wed, 20 Oct 2021 11:43:59 +0800 (CST)
-Received: from BJHW-Mail-Ex15.internal.baidu.com (10.127.64.38) by
- BJHW-Mail-Ex14.internal.baidu.com (10.127.64.37) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2308.14; Wed, 20 Oct 2021 11:43:59 +0800
-Received: from BJHW-Mail-Ex15.internal.baidu.com ([100.100.100.38]) by
- BJHW-Mail-Ex15.internal.baidu.com ([100.100.100.38]) with mapi id
- 15.01.2308.014; Wed, 20 Oct 2021 11:43:59 +0800
-From:   "Li,Rongqing" <lirongqing@baidu.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-CC:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "seanjc@google.com" <seanjc@google.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>, "x86@kernel.org" <x86@kernel.org>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: =?gb2312?B?tPC4tDogW1BBVENIXSBLVk06IENsZWFyIHB2IGVvaSBwZW5kaW5nIGJpdCBv?=
- =?gb2312?Q?nly_when_it_is_set?=
-Thread-Topic: [PATCH] KVM: Clear pv eoi pending bit only when it is set
-Thread-Index: AQHXxI34DWGf3tlYw06xK547fXtZjqvZZTmAgAHZApA=
-Date:   Wed, 20 Oct 2021 03:43:58 +0000
-Message-ID: <d2d3fca1cca7438e97a0641fdd6befac@baidu.com>
-References: <1634609144-28952-1-git-send-email-lirongqing@baidu.com>
- <87y26pwk96.fsf@vitty.brq.redhat.com>
-In-Reply-To: <87y26pwk96.fsf@vitty.brq.redhat.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [172.22.206.4]
-x-baidu-bdmsfe-datecheck: 1_BJHW-Mail-Ex14_2021-10-20 11:43:59:179
-Content-Type: text/plain; charset="gb2312"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
+        id S229756AbhJTEek (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Oct 2021 00:34:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57026 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229503AbhJTEeh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Oct 2021 00:34:37 -0400
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79EA7C06161C
+        for <kvm@vger.kernel.org>; Tue, 19 Oct 2021 21:32:23 -0700 (PDT)
+Received: by mail-pj1-x1033.google.com with SMTP id oa4so1553967pjb.2
+        for <kvm@vger.kernel.org>; Tue, 19 Oct 2021 21:32:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=dvi61QFuvuShv+3C4W94ogPVceuR/aowJYZsiY4/3GI=;
+        b=D9r70ySclJHKVJ9bC4/FcPlel7f1QWFjuli76epDNbwmbz0PxfcHX+bRUCkRfLTatj
+         2K/XPWsh197AI8534C19FofjRsAD6EokQv7VtmvCphlBdY7cSazbSr008tq0vAKKCCTP
+         KqLzuffGvd0ExJUeO9DKqXNkujt0bBHSBPwjMv0VYMnJPVNgPAnQm8682SiZQc5tJRkZ
+         WyiKD/fXAdJAFdJnOPZTDwTkndx4n5MMfGUVziOeSDDnCGAUvTzaj7iHCf2Jur0VDz/H
+         IDcMdWigR6RBgRFS0lYrSgnLL44xY4IvKSE2mV5mLOcv0fo4+qLOdHswfK53xFg1Sfna
+         FPMA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=dvi61QFuvuShv+3C4W94ogPVceuR/aowJYZsiY4/3GI=;
+        b=G1nehBcIRyeNKHnNnU/SQF11BEvzjGrRRLbOt/7KFuPdFYeZ0ojMj4AcBaaFCQV+lZ
+         b0vycH7DMgZrWPStearde71wszo0UZCoSpgUZLp8xMMmDB0CDUlSTwAVplhDcJNaDotd
+         bSasUjjOTTV1GIL0TRDp1mnld/NVTounpTKm0gxoG9ewI1kLXsHyhiI5a2ss8tT6LwSU
+         7j4op2L/5fOP4i2gJfWN4bgNBE6KsRdtrO0ZlqufPTKUaw1SWdrO8NK0kgzNaVNST7sr
+         cyltdO0DRINr8/pdQts4xfpCitHewbuyK3sdsCQ2T7meFVFQjVoVl2C3gplY4QMzqZnH
+         4Zng==
+X-Gm-Message-State: AOAM530ZvwJ8MU78aN9DArPSiHe3Ef8YQ2UkyLiHbwYxxpdakhEUEpI+
+        SVul1f+hPeP3vjqhv5ypmp/pHw==
+X-Google-Smtp-Source: ABdhPJyCoNonj7i9wFbTo7ZEqVWDMc1CTUpPzabuuzyv/Gykgij5ZNgb52DYBeBkMiFXLwaPq3CmGA==
+X-Received: by 2002:a17:902:ab8c:b0:13a:22d1:88d with SMTP id f12-20020a170902ab8c00b0013a22d1088dmr36924331plr.33.1634704342883;
+        Tue, 19 Oct 2021 21:32:22 -0700 (PDT)
+Received: from n210-191-019.byted.org ([49.7.45.193])
+        by smtp.googlemail.com with ESMTPSA id f84sm788324pfa.25.2021.10.19.21.32.14
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 19 Oct 2021 21:32:22 -0700 (PDT)
+From:   Li Yu <liyu.yukiteru@bytedance.com>
+To:     pbonzini@redhat.com
+Cc:     liyu.yukiteru@bytedance.com, Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        "Paul E. McKenney" <paulmck@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        "Maciej W. Rozycki" <macro@orcam.me.uk>,
+        Muchun Song <songmuchun@bytedance.com>,
+        Viresh Kumar <viresh.kumar@linaro.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: [PATCH v3] KVM: x86/mmu: Warn on iTLB multi-hit for possible problems
+Date:   Wed, 20 Oct 2021 12:31:27 +0800
+Message-Id: <20211020043131.1222542-1-liyu.yukiteru@bytedance.com>
+X-Mailer: git-send-email 2.11.0
+In-Reply-To: <YW7w8g+65PjGs2wc@google.com>
+References: <YW7w8g+65PjGs2wc@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-DQoNCj4gLS0tLS3Tyrz+1K28/i0tLS0tDQo+ILeivP7IyzogVml0YWx5IEt1em5ldHNvdiA8dmt1
-em5ldHNAcmVkaGF0LmNvbT4NCj4gt6LLzcqxvOQ6IDIwMjHE6jEw1MIxOcjVIDE1OjI0DQo+IMrV
-vP7IyzogTGksUm9uZ3FpbmcgPGxpcm9uZ3FpbmdAYmFpZHUuY29tPg0KPiCzrcvNOiBMaSxSb25n
-cWluZyA8bGlyb25ncWluZ0BiYWlkdS5jb20+OyBwYm9uemluaUByZWRoYXQuY29tOw0KPiBzZWFu
-amNAZ29vZ2xlLmNvbTsgd2FucGVuZ2xpQHRlbmNlbnQuY29tOyBqbWF0dHNvbkBnb29nbGUuY29t
-Ow0KPiBqb3JvQDhieXRlcy5vcmc7IHRnbHhAbGludXRyb25peC5kZTsgbWluZ29AcmVkaGF0LmNv
-bTsgYnBAYWxpZW44LmRlOw0KPiB4ODZAa2VybmVsLm9yZzsgaHBhQHp5dG9yLmNvbTsga3ZtQHZn
-ZXIua2VybmVsLm9yZw0KPiDW98ziOiBSZTogW1BBVENIXSBLVk06IENsZWFyIHB2IGVvaSBwZW5k
-aW5nIGJpdCBvbmx5IHdoZW4gaXQgaXMgc2V0DQo+IA0KPiBMaSBSb25nUWluZyA8bGlyb25ncWlu
-Z0BiYWlkdS5jb20+IHdyaXRlczoNCj4gDQo+ID4gY2xlYXIgcHYgZW9pIHBlbmRpbmcgYml0IG9u
-bHkgd2hlbiBpdCBpcyBzZXQsIHRvIGF2b2lkIGNhbGxpbmcNCj4gPiBwdl9lb2lfcHV0X3VzZXIo
-KQ0KPiA+DQo+ID4gYW5kIHRoaXMgY2FuIHNwZWVkIHB2X2VvaV9jbHJfcGVuZGluZyBhYm91dCAz
-MDAgbnNlYyBvbiBBTUQgRVBZQyBtb3N0DQo+ID4gb2YgdGhlIHRpbWUNCj4gPg0KPiA+IFNpZ25l
-ZC1vZmYtYnk6IExpIFJvbmdRaW5nIDxsaXJvbmdxaW5nQGJhaWR1LmNvbT4NCj4gPiAtLS0NCj4g
-PiAgYXJjaC94ODYva3ZtL2xhcGljLmMgfCAgICA3ICsrKystLS0NCj4gPiAgMSBmaWxlcyBjaGFu
-Z2VkLCA0IGluc2VydGlvbnMoKyksIDMgZGVsZXRpb25zKC0pDQo+ID4NCj4gPiBkaWZmIC0tZ2l0
-IGEvYXJjaC94ODYva3ZtL2xhcGljLmMgYi9hcmNoL3g4Ni9rdm0vbGFwaWMuYyBpbmRleA0KPiA+
-IDc2ZmIwMDkuLmM0MzRmNzAgMTAwNjQ0DQo+ID4gLS0tIGEvYXJjaC94ODYva3ZtL2xhcGljLmMN
-Cj4gPiArKysgYi9hcmNoL3g4Ni9rdm0vbGFwaWMuYw0KPiA+IEBAIC02OTQsOSArNjk0LDkgQEAg
-c3RhdGljIHZvaWQgcHZfZW9pX3NldF9wZW5kaW5nKHN0cnVjdCBrdm1fdmNwdQ0KPiAqdmNwdSkN
-Cj4gPiAgCV9fc2V0X2JpdChLVk1fQVBJQ19QVl9FT0lfUEVORElORywgJnZjcHUtPmFyY2guYXBp
-Y19hdHRlbnRpb24pOyAgfQ0KPiA+DQo+ID4gLXN0YXRpYyB2b2lkIHB2X2VvaV9jbHJfcGVuZGlu
-ZyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpDQo+ID4gK3N0YXRpYyB2b2lkIHB2X2VvaV9jbHJfcGVu
-ZGluZyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIGJvb2wgcGVuZGluZykNCj4gDQo+IE5pdHBpY2sg
-KGFuZCBwcm9iYWJseSBhIG1hdHRlciBvZiBwZXJzb25hbCB0YXN0ZSk6IHB2X2VvaV9jbHJfcGVu
-ZGluZygpIGhhcyBvbmx5DQo+IG9uZSB1c2VyIGFuZCB0aGUgY2hhbmdlIGRvZXNuJ3QgbWFrZSBp
-dHMgaW50ZXJmYWNlIG11Y2ggbmljZXIsIEknZCBzdWdnZXN0IHdlDQo+IGp1c3QgaW5saW5lIGlu
-IGluc3RlYWQuICh3ZSBjYW4gcHJvYmFibHkgZG8gdGhlIHNhbWUgdG8NCj4gcHZfZW9pX2dldF9w
-ZW5kaW5nKCkvcHZfZW9pX3NldF9wZW5kaW5nKCkgdG9vKS4NCj4gDQo+ID4gIHsNCj4gPiAtCWlm
-IChwdl9lb2lfcHV0X3VzZXIodmNwdSwgS1ZNX1BWX0VPSV9ESVNBQkxFRCkgPCAwKSB7DQo+ID4g
-KwlpZiAocGVuZGluZyAmJiBwdl9lb2lfcHV0X3VzZXIodmNwdSwgS1ZNX1BWX0VPSV9ESVNBQkxF
-RCkgPCAwKSB7DQo+ID4gIAkJcHJpbnRrKEtFUk5fV0FSTklORyAiQ2FuJ3QgY2xlYXIgRU9JIE1T
-UiB2YWx1ZTogMHglbGx4XG4iLA0KPiA+ICAJCQkgICAodW5zaWduZWQgbG9uZyBsb25nKXZjcHUt
-PmFyY2gucHZfZW9pLm1zcl92YWwpOw0KPiA+ICAJCXJldHVybjsNCj4gPiBAQCAtMjY5Myw3ICsy
-NjkzLDggQEAgc3RhdGljIHZvaWQgYXBpY19zeW5jX3B2X2VvaV9mcm9tX2d1ZXN0KHN0cnVjdA0K
-PiBrdm1fdmNwdSAqdmNwdSwNCj4gPiAgCSAqIFdoaWxlIHRoaXMgbWlnaHQgbm90IGJlIGlkZWFs
-IGZyb20gcGVyZm9ybWFuY2UgcG9pbnQgb2YgdmlldywNCj4gPiAgCSAqIHRoaXMgbWFrZXMgc3Vy
-ZSBwdiBlb2kgaXMgb25seSBlbmFibGVkIHdoZW4gd2Uga25vdyBpdCdzIHNhZmUuDQo+ID4gIAkg
-Ki8NCj4gPiAtCXB2X2VvaV9jbHJfcGVuZGluZyh2Y3B1KTsNCj4gPiArCXB2X2VvaV9jbHJfcGVu
-ZGluZyh2Y3B1LCBwZW5kaW5nKTsNCj4gPiArDQo+ID4gIAlpZiAocGVuZGluZykNCj4gPiAgCQly
-ZXR1cm47DQo+ID4gIAl2ZWN0b3IgPSBhcGljX3NldF9lb2koYXBpYyk7DQo+IA0KPiBDb3VsZCB5
-b3UgcHJvYmFibHkgZWxhYm9yYXRlIGEgYml0IChwcm9iYWJseSBieSBlbmhhbmNpbmcgdGhlIGNv
-bW1lbnQgYWJvdmUNCj4gcHZfZW9pX2Nscl9wZW5kaW5nKCkpIHdoeSB0aGUgcmFjZSB3ZSBoYXZl
-IGhlcmUgKGV2ZW4gYmVmb3JlIHRoZQ0KPiBwYXRjaCkgZG9lc24ndCBtYXR0ZXI/IEFzIGZhciBh
-cyBJIHVuZGVyc3RhbmQgaXQsIHRoZSBndWVzdCBjYW4gY2hhbmdlIFBWIEVPSQ0KPiBzdGF0dXMg
-ZnJvbSBhIGRpZmZlcmVudCBDUFUgKGl0IHNob3VsZG4ndCBkbyBpdCBidXQgaXQgc3RpbGwgY2Fu
-KSBhdCBhbnkgdGltZTogZS5nLg0KPiBiZXR3ZWVuIHB2X2VvaV9nZXRfcGVuZGluZygpIGFuZCBw
-dl9lb2lfY2xyX3BlbmRpbmcoKSBidXQgYWxzbyByaWdodCBhZnRlciB3ZQ0KPiBkbyBwdl9lb2lf
-Y2xyX3BlbmRpbmcoKSBzbyB0aGUgcGF0Y2ggZG9lc24ndCByZWFsbHkgY2hhbmdlIG11Y2ggaW4g
-dGhpcyByZWdhcmQuDQo+IA0KDQpJcyBpdCByZWFzb25hYmxlIHRoYXQgdGhlIGd1ZXN0IGNoYW5n
-ZSBQViBFT0kgc3RhdHVzIGZyb20gYSBkaWZmZXJlbnQgQ1BVPyAgSSB0aGluayB0aGlzIGNhbiBs
-ZWFkIHRvIGd1ZXN0IGVycm9yIG9yIHN0dWNrDQoNCkFuZCBuZXcgZnVuY3Rpb24gcHZfZW9pX3Rl
-c3RfYW5kX2NsZWFyX3BlbmRpbmcgYW5kIGt2bV90ZXN0X2FuZF9jbGVhcl9iaXRfZ3Vlc3RfY2Fj
-aGVkIHNob3VsZCBiZSBhYmxlIHRvIGZpeCB0aGUgcmFjZQ0KDQpJIHdpbGwgc2VuZCBWMg0KDQpU
-aGFua3MNCg0KLUxpDQoNCg0KDQo+IC0tDQo+IFZpdGFseQ0KDQo=
+Warn for guest huge pages split if iTLB multi-hit bug is present
+and CPU mitigations is enabled.
+
+Warn for possible CPU lockup if iTLB multi-hit bug is present but
+CPU mitigations is disabled.
+
+Signed-off-by: Li Yu <liyu.yukiteru@bytedance.com>
+---
+ Documentation/admin-guide/hw-vuln/multihit.rst  |  8 +++--
+ Documentation/admin-guide/kernel-parameters.txt | 10 +++---
+ arch/x86/kvm/mmu/mmu.c                          | 48 +++++++++++++++++++++----
+ 3 files changed, 53 insertions(+), 13 deletions(-)
+
+diff --git a/Documentation/admin-guide/hw-vuln/multihit.rst b/Documentation/admin-guide/hw-vuln/multihit.rst
+index 140e4cec38c3..7b2cd027d759 100644
+--- a/Documentation/admin-guide/hw-vuln/multihit.rst
++++ b/Documentation/admin-guide/hw-vuln/multihit.rst
+@@ -129,19 +129,21 @@ boot time with the option "kvm.nx_huge_pages=".
+ 
+ The valid arguments for these options are:
+ 
+-  ==========  ================================================================
++  ==========  =================================================================
+   force       Mitigation is enabled. In this case, the mitigation implements
+               non-executable huge pages in Linux kernel KVM module. All huge
+               pages in the EPT are marked as non-executable.
+               If a guest attempts to execute in one of those pages, the page is
+               broken down into 4K pages, which are then marked executable.
+ 
+-  off	      Mitigation is disabled.
++  off         Mitigation is disabled.
++
++  off,nowarn  Same as 'off', but hypervisors will not warn when KVM is loaded.
+ 
+   auto        Enable mitigation only if the platform is affected and the kernel
+               was not booted with the "mitigations=off" command line parameter.
+ 	      This is the default option.
+-  ==========  ================================================================
++  ==========  =================================================================
+ 
+ 
+ Mitigation selection guide
+diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+index 43dc35fe5bc0..8f014cf462a3 100644
+--- a/Documentation/admin-guide/kernel-parameters.txt
++++ b/Documentation/admin-guide/kernel-parameters.txt
+@@ -2339,10 +2339,12 @@
+ 	kvm.nx_huge_pages=
+ 			[KVM] Controls the software workaround for the
+ 			X86_BUG_ITLB_MULTIHIT bug.
+-			force	: Always deploy workaround.
+-			off	: Never deploy workaround.
+-			auto    : Deploy workaround based on the presence of
+-				  X86_BUG_ITLB_MULTIHIT.
++			force	   : Always deploy workaround.
++			off	   : Never deploy workaround.
++			off,nowarn : Same as 'off', but hypervisors will not
++				     warn when KVM is loaded.
++			auto	   : Deploy workaround based on the presence of
++				     X86_BUG_ITLB_MULTIHIT and cpu mitigations.
+ 
+ 			Default is 'auto'.
+ 
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 1a64ba5b9437..b9dc68e3dc2c 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -6056,20 +6056,41 @@ static void __set_nx_huge_pages(bool val)
+ 	nx_huge_pages = itlb_multihit_kvm_mitigation = val;
+ }
+ 
++#define ITLB_MULTIHIT_NX_ON  "iTLB multi-hit CPU bug present and cpu mitigations enabled, guest huge pages may split by kernel for security. See CVE-2018-12207 and https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/multihit.html for details.\n"
++#define ITLB_MULTIHIT_NX_OFF "iTLB multi-hit CPU bug present but cpu mitigations disabled, malicious guest may cause a CPU lockup. See CVE-2018-12207 and https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/multihit.html for details.\n"
++
+ static int set_nx_huge_pages(const char *val, const struct kernel_param *kp)
+ {
+ 	bool old_val = nx_huge_pages;
+ 	bool new_val;
++	bool nowarn = false;
+ 
+ 	/* In "auto" mode deploy workaround only if CPU has the bug. */
+-	if (sysfs_streq(val, "off"))
++	if (sysfs_streq(val, "off")) {
++		new_val = 0;
++	} else if (sysfs_streq(val, "off,nowarn")) {
+ 		new_val = 0;
+-	else if (sysfs_streq(val, "force"))
++		nowarn = true;
++	} else if (sysfs_streq(val, "force")) {
++		/*
++		 * When `force` is set, admin should know that no matter whether
++		 * CPU has the bug or not, guest pages may split anyway. So warn
++		 * is not needed.
++		 */
+ 		new_val = 1;
+-	else if (sysfs_streq(val, "auto"))
++		nowarn = true;
++	} else if (sysfs_streq(val, "auto")) {
+ 		new_val = get_nx_auto_mode();
+-	else if (strtobool(val, &new_val) < 0)
++	} else if (strtobool(val, &new_val) < 0) {
+ 		return -EINVAL;
++	}
++
++	if (!nowarn && boot_cpu_has_bug(X86_BUG_ITLB_MULTIHIT)) {
++		if (new_val)
++			pr_warn_once(ITLB_MULTIHIT_NX_ON);
++		else
++			pr_warn_once(ITLB_MULTIHIT_NX_OFF);
++	}
+ 
+ 	__set_nx_huge_pages(new_val);
+ 
+@@ -6094,9 +6115,24 @@ static int set_nx_huge_pages(const char *val, const struct kernel_param *kp)
+ int kvm_mmu_module_init(void)
+ {
+ 	int ret = -ENOMEM;
++	bool mode;
+ 
+-	if (nx_huge_pages == -1)
+-		__set_nx_huge_pages(get_nx_auto_mode());
++	if (nx_huge_pages == -1) {
++		mode = get_nx_auto_mode();
++		if (boot_cpu_has_bug(X86_BUG_ITLB_MULTIHIT)) {
++			/*
++			 * Warn on the CPU multi-hit bug when `nx_huge_pages` is `auto`
++			 * by default. If cpu mitigations was enabled, warn that guest
++			 * huge pages may split, otherwise warn that the bug may cause
++			 * a CPU lockup because of a malicious guest.
++			 */
++			if (mode)
++				pr_warn_once(ITLB_MULTIHIT_NX_ON);
++			else
++				pr_warn_once(ITLB_MULTIHIT_NX_OFF);
++		}
++		__set_nx_huge_pages(mode);
++	}
+ 
+ 	/*
+ 	 * MMU roles use union aliasing which is, generally speaking, an
+-- 
+2.11.0
+
