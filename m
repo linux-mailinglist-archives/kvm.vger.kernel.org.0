@@ -2,197 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3F38B435618
-	for <lists+kvm@lfdr.de>; Thu, 21 Oct 2021 00:48:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 75202435639
+	for <lists+kvm@lfdr.de>; Thu, 21 Oct 2021 00:59:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230219AbhJTWuq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Oct 2021 18:50:46 -0400
-Received: from mail-dm6nam10on2073.outbound.protection.outlook.com ([40.107.93.73]:35637
-        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
+        id S231148AbhJTXBW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Oct 2021 19:01:22 -0400
+Received: from mail-mw2nam12on2060.outbound.protection.outlook.com ([40.107.244.60]:21504
+        "EHLO NAM12-MW2-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S229570AbhJTWup (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Oct 2021 18:50:45 -0400
+        id S229842AbhJTXBW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Oct 2021 19:01:22 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=F0cQXdErpPXpixwbjyKbi8ck+UWH8B9rGcL1J/dX+WT7K+92XNNGDxwPW7JjWCZ+x8uHo7VtmCmXla/scF1SJgraiiFI2z1QSxGYUX+VohjJZNgshES7KZvkY1ua3Y2jk05lz8QgslDnI8G+m2YvZ8F0uOBxaU0ltE4LyDndzzrnamBxwumZoBpnaPh1Hn4OcCfy0+FkOW0SgOgC9ZDxNcYlgx2JEwucyyvrHnD/EHZSf+GBKwwacntZGuICfUp2R2P/gGT76QQcTg23HxBElFIgBpDzuq5S/0kwLxdRzabmCznZpNyS+KAsSoELheLfoS4d3ILOSG/JfANDNvc8Sw==
+ b=eHAiUohTSEaEhmjzDqb5n71XoH1quwwpFZ+jRM3sGmlCrkiqZoNm4zB3T/1lij+oe3oM0urnv2yVR5NSB9FVFWVd+DgaL79J1cYHmjftwxT9kMgJRnz4vgsYbmglbEGc1y5b0TymuJ7bWChBz82GGiihGw0s+kpKs/mmLL2UbwYwKJlk9hlhvkdbmnnyjBYAfZu5tp+ARqyVjXfa8R0KnJ/j3T7Dyh5FVRio8Cg9t5VegICxikfDpmRDWY7H6JzfL0mp1T7KZ5dN6kYW1uOa06vH9cZlTfjKYL1wHSp+QMwwJzwlE6McBFabB1pZ6PW9dEQbVuhVA0tW6X0xy+fz9g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=6MRBuQUw+MiwNtx/pyd2IslHBxO+DIOutCOp8svui+0=;
- b=JULd2oZh8TGpRRWpr+E+6PxhJNKlA0Qawhyu9s+jmFLHnpH+VHF1VQb41s6yj9Ln2pVGSBTkvzbtulvPvNUo+dNt22zRshl1Gf6LUtxet/IxULc5X9mFqijOP5K0prCsoapQnyTegcu5ATsnDw+Fwd2WNLRq4vLpjiBTuPJf6B8aG+DYFh6ZNjcL2sVTMGPFiML2VTJIm3O+9GtLW955jzjJ7QniohsUqLKffQX/3+/C6BsChCQh/FSUu+iPQSnYMdEFuHr2vbtlw+yj0R9kBE7TqHm5x7NQ5jfohAqweMewZFgqLvC3zeG4X5p4ZCx8ZUapEv6pSGD3EKdtsbwwnw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
+ bh=j+VucUUc6QyYgXDe1gLQiAAn2bMcBp5yBVb5NIEOnDs=;
+ b=jDUTBaKs4I+W4OmVJo9H8VyCTzmKWLTr06QKc8w1Vn1C9SeGMgp0jyZQugD9j63lUHoDTQH2zDMOssZU3byo/bBnkUqeLjXhsijgZc64wWlBwxchbUeH9slRDL1Nmes5ZUO5iEc6LyHHGHFi0G1rms/wJT7hYm5ZVfBmX80MUFKlJVJp7DmDRZVLTkVNoQuvLakfvDYJsSoGsgvyInd4rqbyLuHX4VhdytvppbAcRU0opVLSgv5l/qRthxhVzIW5geISD64zmXaGxVrxeu/cZHGK+gyRoRqGwjRYYWtzigpp+tYejXprQ2h4/fb1S+Y0wkzngBDLTtSRZTQLyFkxTw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6MRBuQUw+MiwNtx/pyd2IslHBxO+DIOutCOp8svui+0=;
- b=WcCSobfCo1iCa1sFgPPdac5g2FubCTnaswp5bqMPPGlBNUOvVv8v+z4hIcHoJQ97Uwn2cWXVALa5AtuFZ+9TUN0aR0jjL+L7Y24Kypme+XPWh6/Led6EeRjNEtGXrwE2ckR5IeWUSnX75tQKIpggJbEPeSs8gpqLp6+qluS15gk82LICqbvfccAIryK4nrbtP0qnbap8xzznN5PZ5RKv7bLEHV5qJ483SYtUhVVS8A4B5uQxvReNBPIgVjnkorwuWPxS/8kKyeTG2+Z7agCnJBXsCKdaQylGUHOPeV7cWY6xAS/jhkhajNiA8nvRkYnll+BKsjGFkoyZAWM+GYsLBg==
-Authentication-Results: linux.ie; dkim=none (message not signed)
- header.d=none;linux.ie; dmarc=none action=none header.from=nvidia.com;
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
- by BL1PR12MB5378.namprd12.prod.outlook.com (2603:10b6:208:31d::16) with
+ bh=j+VucUUc6QyYgXDe1gLQiAAn2bMcBp5yBVb5NIEOnDs=;
+ b=ZqmOgBrEvW3jS+beeRdKoHrCgYmKA76B31MBgFT5m36nD+1rzCwH+I6W4WJqjYRo97KZlhH7VPi9xHbunadhLAi5WBk/uHv/IO9jYGmxnkq/KwrVx/ydEfcGFHva93OGxyI4FlVhET4CJ5sj4mn4xbFhf3/tglabkXPj3cLBKKs=
+Received: from MWHPR20CA0036.namprd20.prod.outlook.com (2603:10b6:300:ed::22)
+ by DM5PR12MB1641.namprd12.prod.outlook.com (2603:10b6:4:10::23) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4608.17; Wed, 20 Oct
- 2021 22:48:28 +0000
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::e8af:232:915e:2f95]) by BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::e8af:232:915e:2f95%8]) with mapi id 15.20.4628.016; Wed, 20 Oct 2021
- 22:48:28 +0000
-Date:   Wed, 20 Oct 2021 19:48:26 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     David Airlie <airlied@linux.ie>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        dri-devel@lists.freedesktop.org,
-        Eric Farman <farman@linux.ibm.com>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        intel-gfx@lists.freedesktop.org,
-        intel-gvt-dev@lists.freedesktop.org,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
-        linux-doc@vger.kernel.org, linux-s390@vger.kernel.org,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH v3 00/10] Move vfio_ccw to the new mdev API
-Message-ID: <20211020224826.GA21930@nvidia.com>
-References: <0-v3-57c1502c62fd+2190-ccw_mdev_jgg@nvidia.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0-v3-57c1502c62fd+2190-ccw_mdev_jgg@nvidia.com>
-X-ClientProxiedBy: BL1PR13CA0327.namprd13.prod.outlook.com
- (2603:10b6:208:2c1::32) To BL0PR12MB5506.namprd12.prod.outlook.com
- (2603:10b6:208:1cb::22)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4608.18; Wed, 20 Oct
+ 2021 22:59:04 +0000
+Received: from CO1NAM11FT024.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:300:ed:cafe::33) by MWHPR20CA0036.outlook.office365.com
+ (2603:10b6:300:ed::22) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4628.15 via Frontend
+ Transport; Wed, 20 Oct 2021 22:59:04 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; google.com; dkim=none (message not signed)
+ header.d=none;google.com; dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com;
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CO1NAM11FT024.mail.protection.outlook.com (10.13.174.162) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.4628.16 via Frontend Transport; Wed, 20 Oct 2021 22:59:01 +0000
+Received: from ashkalra_ubuntu_server.amd.com (10.180.168.240) by
+ SATLEXMB04.amd.com (10.181.40.145) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.15; Wed, 20 Oct 2021 17:59:00 -0500
+From:   Ashish Kalra <Ashish.Kalra@amd.com>
+To:     <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+CC:     <brijesh.singh@amd.com>, <jmattson@google.com>, <joro@8bytes.org>,
+        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <marcorr@google.com>, <masa.koz@kozuka.jp>, <pgonda@google.com>,
+        <thomas.lendacky@amd.com>, <vkuznets@redhat.com>,
+        <wanpengli@tencent.com>
+Subject: [PATCH 2/2] KVM: SEV: Flush cache on non-coherent systems before RECEIVE_UPDATE_DATA
+Date:   Wed, 20 Oct 2021 22:58:48 +0000
+Message-ID: <20210914210951.2994260-3-seanjc@google.com> (raw)
+X-Mailer: git-send-email 2.17.1
+References: <20210914210951.2994260-3-seanjc@google.com>
+In-Reply-To: <20210914210951.2994260-1-seanjc@google.com>
 MIME-Version: 1.0
-Received: from mlx.ziepe.ca (142.162.113.129) by BL1PR13CA0327.namprd13.prod.outlook.com (2603:10b6:208:2c1::32) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4628.16 via Frontend Transport; Wed, 20 Oct 2021 22:48:27 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1mdKNm-0005k7-K5; Wed, 20 Oct 2021 19:48:26 -0300
+Content-Type: text/plain
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: cde92296-29f4-4b41-e95b-08d9941bbb69
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5378:
-X-Microsoft-Antispam-PRVS: <BL1PR12MB5378398A9381E73A43FA1325C2BE9@BL1PR12MB5378.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-MS-Office365-Filtering-Correlation-Id: 49f63be8-9b5f-487c-75a0-08d9941d350f
+X-MS-TrafficTypeDiagnostic: DM5PR12MB1641:
+X-Microsoft-Antispam-PRVS: <DM5PR12MB1641B74E35F32EAF4DEDEE238EBE9@DM5PR12MB1641.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:4303;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: AsPNrd62FsqjO078p6s5/3dfJJzcJxPWQql5coCq5SJwJ6Ub86nQ2QW4ptLYMQRovPfWpgBTmC33tAc8IjlD559XgDf4WMYAx19yZjLKQ0BQ0LH7+9NysYBrVk6UVYlUnGQAQAnTfraGulVRWGseeLPZJy+jrCb0aW/g6TdpeRtxl7cRRiVcI7Uxt1zJSSD1OdskLC0Ki4j/oNvj9FaLCmoKofeZAQhllLZ9cd74vb/PgK8rN1syjvYTu3877C9quGMde0hyE5LxQB/WFfyWcQHOo013Ak62NnCRwxSTFm+ooQXbUdwJi8w5yEzcbeuL+hpg6t8nBjT3DgCoYtkdU1yzl1Di00ArsnDCnPTbCI0vH8QvoiiELcPSvLA7TwvmVDqEOsrxL9rymNeFJssuCuzCS66JZ9Mn1wRt8WofRYrXA0AAEEt3ktKw5HQigpK6hstZvHPvxd9YlJsVHPmFSvjmToqk7/CipA3tj2tLQoIiP7m5aH6RXVgAc9ekN/wFzD2HQyX311wDLyqgOzBSmUQJ+YJQZECZ/NCTo7/I1Tu4hPImhw4Z5cO+9nf3zLdZ5nYemKOMTAjcANL+Q4pRvuKTljyfkUDPXgb7guLjqtE/wB1/RwYiLGAs05/zSNsUFCJEzitGhWtEO/1uw5FLVPpuJKS6a4YA/mrKd/c7sAxNPTaprfDrw7cCNGOGhJMppjOsYhw4pyzRRmTxg1h56s+FWTlZschTNpcdjgSakEX8GqHtOCICeZtnLJYAb2ybE239jgOo+8ULTlaJVT04teuF+3KSskstLUs551jJ7QYW6OVt9VzlCUO0g0U8jOzj
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(966005)(186003)(1076003)(8676002)(26005)(316002)(5660300002)(8936002)(508600001)(66476007)(38100700002)(86362001)(33656002)(9786002)(921005)(9746002)(426003)(110136005)(36756003)(54906003)(7416002)(66946007)(2616005)(2906002)(4326008)(66556008)(83380400001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?zqm1kabHFmHkVwxGcFLqEMThXh8cT8NO2VggsE9tcRoOJbzwaSBgk0RcFZsp?=
- =?us-ascii?Q?VY2KEO4NbaAYjaD5ArPSMM2aj8M1F1hQrCI3HDPvZcReP0Z78R1mAufjTZoN?=
- =?us-ascii?Q?PKdKaHMyPpg7b46hLc6zlM1Jupoe++k+FtrynAqKUparhRob2j2wz+S5Llde?=
- =?us-ascii?Q?RHNs+JtD9HAnW3D9+IbWLHloEmlz+aCiH+9/npjIL6UZWHvtBIKHi13eJWyf?=
- =?us-ascii?Q?INgqp5ii0+WMNH32fiyVVtB+uJ3nubCP///LFOKkW4vLHALA9BirLTjAYqf0?=
- =?us-ascii?Q?hWuxf07z/3+Dbj+I4w9+O7ie5It1x8oojiBcOtyVDq4d+SlN2XX/sFtf6buq?=
- =?us-ascii?Q?LsgV2VVFcVBxiib2XyLuRFGxylfXPmYxozfvhhuCalwi2n1yPDNZ517V4r6I?=
- =?us-ascii?Q?M9HxKMLnwwkRIG4xbLT5MWCj1autQdsbt5Fjm1UfdidTl6aukuY/sxH80eIm?=
- =?us-ascii?Q?dWxfqGXwXUEGJ6hm3Wo/zVw2dvpb5lNLZJPYiGW7Ii2e8prGEhIAz9hgbxKU?=
- =?us-ascii?Q?4ofGYoI7xYjlHfSODo6ubGub6Tf+dnyuM0SSDTIjqmHECVz8AaoMKq167jeb?=
- =?us-ascii?Q?e1mhQYWaRcLUBg5BVp3Hm+9LPY6RvZ8aPLOslElN3kam//7iPI1B2U10ZoKZ?=
- =?us-ascii?Q?HIY42S+iyO0WOGrUy80ZaJE2hKVV/xrBMz5S1rTjU/+l3dCLStDZM03PqyZt?=
- =?us-ascii?Q?r+K27kBDP9400NI85PAUxaTD+zjnIlWPLvgGclo2sOKdy6at/9ZzKOa20mmt?=
- =?us-ascii?Q?diD5hspqeQtbGbJ+NRbMkKp7/chXVvS0Dywp9QMcETaqeA1NduTCmH7ndetc?=
- =?us-ascii?Q?8mNKoGaDmrYoKB18BrOBWALEnkIpNyNeraVfdpe7W8BrZtZciXL2YXdFM75+?=
- =?us-ascii?Q?S4v8tZJE0t73res7dKIOaoAT+dBrLWkB0hHeLnDwR9c1IMnivS0fCnlAM4yg?=
- =?us-ascii?Q?uiMzme+fmY4v+90z68NYbzLdExs3qn5krTmVbp/ifGghBGf+/vPhY2msvavi?=
- =?us-ascii?Q?tikI9LM5o6WyD+XEwshL2Rks2xe548phxpH6uzNTo33SxZ8L8U3RBjtwa5cd?=
- =?us-ascii?Q?uqS9Puboj42M1kmkRY3eUQPKxwrBBqgJi/gWTOU5XRm7QCK8xEI5fU60cYHx?=
- =?us-ascii?Q?XfxuhUlz+GoBcn2Pa7TGMaJpFfINXhAWDcyqYm+torjrgrUvpuTxKB9q4AGd?=
- =?us-ascii?Q?Kvnn3uTpXf4dxKV9gQeg8AxIGNpc0YGTVm9/6ljAuPBmTVIbHEj9oe2cbuK2?=
- =?us-ascii?Q?tDTM/WM5THxly+9WdXVHSmHX/h6j1G39XXGL6D22Rj9EWRqYBWH8uIQTlneQ?=
- =?us-ascii?Q?bNpZRheye7lG7WqZtCyv9Alx?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: cde92296-29f4-4b41-e95b-08d9941bbb69
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Oct 2021 22:48:28.3563
+X-Microsoft-Antispam-Message-Info: 8Q517ttm8mjJGeGqC5XbCwYvuuRTQ6M77Jru3ZTFi7qQ0iURpCS04w4lljGiDaCTK6sT+kAEzihbcR5uRcOqFFLPO9NruR85WTiOcifugBnATgmnQDx6BrL1elcGiTCKYxKCBHj9k77o0vOMu5lwqIPu/yU3REKAZ4pYQ/1p3n49kyY5blz7Q2bwSAuEJWi3LFTtLdBZu/RcOQP6Uphp5sPbEuq+cNzXbu0M43K236kxgWkqIm9v2D74VQPW+IM5pmwD/5c4K8bgTHikEuhR8ZLheqMcgBXAWtdN1XFQ+kv5O8IhYHAju5hHrOs7USpCEVIwshWiFZqb+b5GiMA+w54PXDnWtw8o8fTwBaXXe349pXWZXol7YSQW81bQ6ivIoVqcvKexkATIBjZRzdKvNScUyZtlMxxV/B+NPgPaCdazOXfJJ6MBrnhpRXmVeXudbq/HJeDwgPLUppge8Av8caerul0/XzB5HeHZHRpBcCHh83ZzD/fGRA4qDrJ1k9S2Q7XYx4uCO4N3ILKD4EUQKR8/wHp+0EsXlEQQwB/i8CyGZdES9gnjTY3wCSjm2NCq/G3TIF8EO7JWO+eS0xom0swN2YGNXy1pWVLKGTJwSBMJ9bmQhFgDf5OPhZ4wZUgviLz4lMCHcxk9zrK980j26Lejkx2ndnS2i+A8euejurGjQTh/1CHqapwag4v5+Cuwm993vINkEwDATXURVkHRMR++2xbqk9D9Xs1I1PPGwaI=
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(4636009)(36840700001)(46966006)(83380400001)(186003)(6666004)(7416002)(16526019)(54906003)(55446002)(8936002)(86362001)(110136005)(4326008)(508600001)(36860700001)(9686003)(426003)(1076003)(336012)(82310400003)(356005)(316002)(26005)(61793004)(70206006)(47076005)(5660300002)(81166007)(70586007)(2906002)(8676002)(4744005)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Oct 2021 22:59:01.3224
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: jgg@nvidia.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5378
+X-MS-Exchange-CrossTenant-Network-Message-Id: 49f63be8-9b5f-487c-75a0-08d9941d350f
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT024.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1641
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 01, 2021 at 02:52:41PM -0300, Jason Gunthorpe wrote:
-> This addresses Cornelia's remark on the earlier patch that ccw has a
-> confusing lifecycle. While it doesn't seem like the original attempt was
-> functionally wrong, the result can be made better with a lot of further
-> work.
-> 
-> Reorganize the driver so that the mdev owns the private memory and
-> controls the lifecycle, not the css_driver. The memory associated with the
-> css_driver lifecycle is only the mdev_parent/mdev_type registration.
-> 
-> Along the way we change when the sch is quiescent or not to be linked to
-> the open/close_device lifetime of the vfio_device, which is sort of what
-> it was tring to do already, just not completely.
-> 
-> The troublesome racey lifecycle of the css_driver callbacks is made clear
-> with simple vfio_device refcounting so a callback is only delivered into a
-> registered vfio_device and has obvious correctness.
-> 
-> Move the only per-css_driver state, the "available instance" counter, into
-> the core code and share that logic with many of the other drivers. The
-> value is kept in the mdev_type memory.
-> 
-> This is on github: https://github.com/jgunthorpe/linux/commits/vfio_ccw
-> 
-> v3:
->  - Rebase to Christoph's group work & rc3; use
->    vfio_register_emulated_iommu_dev()
->  - Remove GFP_DMA
->  - Order mdev_unregister_driver() symmetrically with init
->  - Rework what is considered a BROKEN event in fsm_close()
->  - NOP both CCW_EVENT_OPEN/CLOSE
->  - Documentation updates
->  - Remane goto label to err_init vfio_ccw_mdev_probe()
->  - Fix NULL pointer deref in mdev_device_create()
-> v2: https://lore.kernel.org/r/0-v2-7d3a384024cf+2060-ccw_mdev_jgg@nvidia.com
->  - Clean up the lifecycle in ccw with 7 new patches
->  - Rebase
-> v1: https://lore.kernel.org/all/7-v2-7667f42c9bad+935-vfio3_jgg@nvidia.com
-> 
-> Jason Gunthorpe (10):
->   vfio/ccw: Remove unneeded GFP_DMA
->   vfio/ccw: Use functions for alloc/free of the vfio_ccw_private
->   vfio/ccw: Pass vfio_ccw_private not mdev_device to various functions
->   vfio/ccw: Convert to use vfio_register_emulated_iommu_dev()
+From: Sean Christopherson <seanjc@google.com>
 
-IBM folks, what do you want to do with this? I would like to go ahead
-with these patches so we can get closer to unblocking some of the VFIO
-core work.
+Hello Paolo,
 
-These patches:
+I am adding a SEV migration test as part of the KVM SEV selftests.
 
->   vfio/ccw: Make the FSM complete and synchronize it to the mdev
->   vfio/mdev: Consolidate all the device_api sysfs into the core code
->   vfio/mdev: Add mdev available instance checking to the core
->   vfio/ccw: Remove private->mdev
->   vfio: Export vfio_device_try_get()
->   vfio/ccw: Move the lifecycle of the struct vfio_ccw_private to the
->     mdev
+And while testing SEV migration with this selftest, i observed
+cache coherency issues causing migration test failures, so really
+need this patch to be added.
 
-Where made to show how to structure this more cleanly as Cornelia
-asked but are not essential and IBMers could test and fix to get this
-cleanup when time permits..
-
-Thoughts?
-
-Thanks,
-Jason
+Tested-by: Ashish Kalra <ashish.kalra@amd.com>
