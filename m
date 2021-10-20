@@ -2,127 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 25890435241
-	for <lists+kvm@lfdr.de>; Wed, 20 Oct 2021 20:01:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9A3A4435247
+	for <lists+kvm@lfdr.de>; Wed, 20 Oct 2021 20:01:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231183AbhJTSDZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Oct 2021 14:03:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44382 "EHLO
+        id S231220AbhJTSDt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Oct 2021 14:03:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44480 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230245AbhJTSDY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Oct 2021 14:03:24 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3EB20C06161C;
-        Wed, 20 Oct 2021 11:01:10 -0700 (PDT)
-Received: from zn.tnic (p200300ec2f0db300f8abf0ed14d647a3.dip0.t-ipconnect.de [IPv6:2003:ec:2f0d:b300:f8ab:f0ed:14d6:47a3])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id A2FA61EC036B;
-        Wed, 20 Oct 2021 20:01:08 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1634752868;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=/4U7+bVpmBPJ7gV+r1bdTzVoBWatHcmArzH+WpFLVX0=;
-        b=LQb5wxNMBVSSlO4PGPVoSe/7fkJf0JVygFKVgj3YJxWvdH223GLeJBRVogaHJsXpgELkDZ
-        aR2X2C7ns1benSbZXA3zSmx/zXmFDxNO1jhKOrJ2xoKPbM5W4/RCaen8vWDcaktwbP3Uoo
-        bofa4W9GEGyxWkwSaRWxf1JrdO63uX8=
-Date:   Wed, 20 Oct 2021 20:01:07 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH v6 08/42] x86/sev-es: initialize sev_status/features
- within #VC handler
-Message-ID: <YXBZYws8NnxiQJD7@zn.tnic>
-References: <20211008180453.462291-1-brijesh.singh@amd.com>
- <20211008180453.462291-9-brijesh.singh@amd.com>
- <YW2EsxcqBucuyoal@zn.tnic>
- <20211018184003.3ob2uxcpd2rpee3s@amd.com>
- <YW3IdfMs61191qnU@zn.tnic>
- <20211020161023.hzbj53ehmzjrt4xd@amd.com>
+        with ESMTP id S230493AbhJTSDq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Oct 2021 14:03:46 -0400
+Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1065C06161C
+        for <kvm@vger.kernel.org>; Wed, 20 Oct 2021 11:01:31 -0700 (PDT)
+Received: by mail-pg1-x533.google.com with SMTP id m21so23173975pgu.13
+        for <kvm@vger.kernel.org>; Wed, 20 Oct 2021 11:01:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=fIOWvvheP/foSUqutVRe3v80PqQQZrCS1Qz2l94o6DY=;
+        b=DF0ITmidyypP/1vFAYw58HJ7juNe6ByTa05aBQzhbVBF3wjrgbJufReIpJaE5DaeU+
+         sSnSb9ab7k/L6mirv5iZI+3dYqaO6jnrzAb8Zr8KwGzuTiBNdd7RakdsnMNUNKGHkMlR
+         j/TKThhDTZE5N9jOJsDItUDnT8Td5jy9ygLHd0bZzYfaGOKQUt0t5O7Alue6wPpxIp7f
+         osEfl3xBlLFpnZHTcJ3OQGyBX1oSZMmu1JMbEDGlaXPcdB2+M6BUVMLRjQRiZP0FVBMG
+         PFl2dH3/tzOfbErFHmV3O7ZcMO8hyK+67uUFUFyHNhOGOJxMulG0YYMP7TZz5eeIN+zJ
+         9uew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=fIOWvvheP/foSUqutVRe3v80PqQQZrCS1Qz2l94o6DY=;
+        b=Q8AQfojn8/3qtIXHyE3yaLUxYLJenkUpgMf9TY8KIjTVJZA4e4Lh/mldXbhQ53gQSf
+         CJMi84iEQ4NFlAuV1A3scZco5bqBnJbLmcBK6mYvowBqEU7nTF5Ft9Ap9r3FlYpzcc5Z
+         3vaHOz283xbkpz9xXo3MVWXq4oOC9fNGR8TPMZygkoTzxLe/OekQObWbpvLjjsXkmVow
+         gGDO9KhWEcHDRcHQpsmqcGlncbBNqxYnKsTf8E0v5ld2U/jUwfJzy++fPJ3F9/q0DpOW
+         HBKGyfRcwo0RaNeVyh3VxTZyLQVMMd77hGKW2Mn/NDybPJoZ9wrFtAgDFx+4p45OJjvK
+         3tFw==
+X-Gm-Message-State: AOAM532ZM1I+YUHuphiTFej1bAFk41FUekvp72YPKakz6S9s0VezJNI4
+        oLa8Oy1qhXFnPMQhJQnm5QrSdmSBccTNhA==
+X-Google-Smtp-Source: ABdhPJy9ityxByz49mMnJdD7sPneMqKiAmnIK6wvAdMw6sq8mQOALH+wsjbwPf+zNciNz0XNQL9syQ==
+X-Received: by 2002:a63:3548:: with SMTP id c69mr579181pga.111.1634752891140;
+        Wed, 20 Oct 2021 11:01:31 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id y4sm3681593pfa.90.2021.10.20.11.01.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 Oct 2021 11:01:30 -0700 (PDT)
+Date:   Wed, 20 Oct 2021 18:01:26 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, zxwang42@gmail.com, marcorr@google.com,
+        jroedel@suse.de, varad.gautam@suse.com,
+        Jim Mattson <jmattson@google.com>
+Subject: Re: [PATCH kvm-unit-tests 2/2] replace tss_descr global with a
+ function
+Message-ID: <YXBZdoeeRqmqU76l@google.com>
+References: <20211020165333.953978-1-pbonzini@redhat.com>
+ <20211020165333.953978-3-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211020161023.hzbj53ehmzjrt4xd@amd.com>
+In-Reply-To: <20211020165333.953978-3-pbonzini@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 20, 2021 at 11:10:23AM -0500, Michael Roth wrote:
-> [Sorry for the wall of text, just trying to work through everything.]
++Jim again
 
-And I'm going to respond in a couple of mails just for my own sanity.
+On Wed, Oct 20, 2021, Paolo Bonzini wrote:
+> @@ -255,4 +255,16 @@ static inline void *get_idt_addr(idt_entry_t *entry)
+>  	return (void *)addr;
+>  }
+>  
+> +extern gdt_desc_entry_t *get_tss_descr(void);
+> +
+> +static inline unsigned long get_gdt_entry_base(gdt_desc_entry_t *entry)
 
-> I'm not sure if this is pertaining to using the CPUID table prior to
-> sme_enable(), or just the #VC-based SEV MSR read. The following comments
-> assume the former. If that assumption is wrong you can basically ignore
-> the rest of this email :)
+Bad naming again, base4 doesn't exist for segment descriptors.  It's a bit
+wordy, but maybe this?
 
-This is pertaining to me wanting to show you that the design of this SNP
-support needs to be sane and maintainable and every function needs to
-make sense not only now but in the future.
+static inline unsigned long get_system_desc_base(gdt_system_desc_entry_t *entry)
 
-In this particular example, we should set sev_status *once*, *before*
-anything accesses it so that it is prepared when something needs it. Not
-do a #VC and go, "oh, btw, is sev_status set? No? Ok, lemme set it."
-which basically means our design is seriously lacking.
-
-And I had suggested a similar thing for TDX and tglx was 100% right in
-shooting it down because we do properly designed things - not, get stuff
-in so that vendor is happy and then, once the vendor programmers have
-disappeared to do their next enablement task, the maintainers get to mop
-up and maintain it forever.
-
-Because this mopping up doesn't scale - trust me.
-
-> [The #VC-based SEV MSR read is not necessary for anything in sme_enable(),
-> it's simply a way to determine whether the guest is an SNP guest, without
-> any reliance on CPUID, which seemed useful in the context of doing some
-> additional sanity checks against the SNP CPUID table and determining that
-> it's appropriate to use it early on (rather than just trust that this is an
-> SNP guest by virtue of the CC blob being present, and then failing later
-> once sme_enable() checks for the SNP feature bits through the normal
-> mechanism, as was done in v5).]
-
-So you need to make up your mind here design-wise, what you wanna do.
-
-The proper thing to do would be, to detect *everything*, detect whether
-this is an SNP guest, yadda yadda, everything your code is going to need
-later on, and then be done with it.
-
-Then you continue with the boot and now your other code queries
-everything that has been detected up til now and uses it.
-
-End of mail 1.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+> +{
+> +	unsigned long base;
+> +	base = entry->base1 | ((u32)entry->base2 << 16) | ((u32)entry->base3 << 24);
+> +#ifdef __x86_64__
+> +	base |= (u64)entry->base4 << 32;
+> +#endif
+> +	return base;
+> +}
+> +
+>  #endif
