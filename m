@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E0C3B434E46
-	for <lists+kvm@lfdr.de>; Wed, 20 Oct 2021 16:52:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2DA30434E44
+	for <lists+kvm@lfdr.de>; Wed, 20 Oct 2021 16:52:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230191AbhJTOyx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Oct 2021 10:54:53 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:32518 "EHLO
+        id S230190AbhJTOyv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Oct 2021 10:54:51 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:32772 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230195AbhJTOyw (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 20 Oct 2021 10:54:52 -0400
+        by vger.kernel.org with ESMTP id S230024AbhJTOyu (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 20 Oct 2021 10:54:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634741557;
+        s=mimecast20190719; t=1634741556;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding;
-        bh=EOJKI5DiIEAdiCMwnSFoBtdcws6vk4gDTew6qqVUMsg=;
-        b=bLUWtWedDZmCbs4AvfzuhqN1thP/xQF6pet8Y537a0n5Ksyh61wRTtO+pjxnwEN3c5qfWa
-        BR/T+YS2P4K52qr6QgEpj9OtF7HQz7DkVrwXEhvP9iAuJTbdrujEpPlt4/FQjE2jnjooA8
-        f+P2j2cb6tDTNB2rs0CBPEeasLK2MHg=
+        bh=cwjsUEQDwBbKmSYjigmTSvrLl88NO9zDN0d6nZvJV+s=;
+        b=VAa6x/m22cjTs6Wf5yqpTzkt92UhNjloA8u2SzxMCcAa+POBJmC0clbasPnYlFnnv6t6vp
+        w77S0GNaHSbQ1/coB0S2yfcFBx72KyciOYkePXKXFX+kE0g2woBAgq6RmJw1Xa8bx3TT+G
+        Bg02RPnAWeBKdmSKkcRZ9f3WN5MOF9s=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-246-GpQSaoceMN-9MGXIiBQtjQ-1; Wed, 20 Oct 2021 10:52:34 -0400
-X-MC-Unique: GpQSaoceMN-9MGXIiBQtjQ-1
+ us-mta-123-jP0cnAsHN023n2-9t0xI9A-1; Wed, 20 Oct 2021 10:52:34 -0400
+X-MC-Unique: jP0cnAsHN023n2-9t0xI9A-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 081731926DAC;
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 821E979EE4;
         Wed, 20 Oct 2021 14:52:33 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8EBDC17155;
-        Wed, 20 Oct 2021 14:52:32 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2275F5C1D5;
+        Wed, 20 Oct 2021 14:52:33 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     wanpengli@tencent.com, seanjc@google.com, stable@vger.kernel.org
-Subject: [PATCH] KVM: nVMX: promptly process interrupts delivered while in guest mode
-Date:   Wed, 20 Oct 2021 10:52:30 -0400
-Message-Id: <20211020145231.871299-2-pbonzini@redhat.com>
+Cc:     wanpengli@tencent.com, seanjc@google.com
+Subject: [PATCH] KVM: Avoid atomic operations when kicking the running vCPU
+Date:   Wed, 20 Oct 2021 10:52:31 -0400
+Message-Id: <20211020145231.871299-3-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
@@ -45,48 +45,57 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Since commit c300ab9f08df ("KVM: x86: Replace late check_nested_events() hack with
-more precise fix") there is no longer the certainty that check_nested_events()
-tries to inject an external interrupt vmexit to L1 on every call to vcpu_enter_guest.
-Therefore, even in that case we need to set KVM_REQ_EVENT.  This ensures
-that inject_pending_event() is called, and from there kvm_check_nested_events().
+If we do have the vcpu mutex, as is the case if kvm_running_vcpu is set
+to the target vcpu of the kick, changes to vcpu->mode do not need atomic
+operations; cmpxchg is only needed _outside_ the mutex to ensure that
+the IN_GUEST_MODE->EXITING_GUEST_MODE change does not race with the vcpu
+thread going OUTSIDE_GUEST_MODE.
 
-Fixes: c300ab9f08df ("KVM: x86: Replace late check_nested_events() hack with more precise fix")
-Cc: stable@vger.kernel.org
+Use this to optimize the case of a vCPU sending an interrupt to itself.
+
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/kvm/vmx/vmx.c | 17 ++++++-----------
- 1 file changed, 6 insertions(+), 11 deletions(-)
+ virt/kvm/kvm_main.c | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 79d6af09dbf4..7567e1d15017 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -6331,18 +6331,13 @@ static int vmx_sync_pir_to_irr(struct kvm_vcpu *vcpu)
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 3f6d450355f0..9f45f26fce4f 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -3325,6 +3325,19 @@ void kvm_vcpu_kick(struct kvm_vcpu *vcpu)
+ 	if (kvm_vcpu_wake_up(vcpu))
+ 		return;
  
- 		/*
- 		 * If we are running L2 and L1 has a new pending interrupt
--		 * which can be injected, we should re-evaluate
--		 * what should be done with this new L1 interrupt.
--		 * If L1 intercepts external-interrupts, we should
--		 * exit from L2 to L1. Otherwise, interrupt should be
--		 * delivered directly to L2.
-+		 * which can be injected, this may cause a vmexit or it may
-+		 * be injected into L2.  Either way, this interrupt will be
-+		 * processed via KVM_REQ_EVENT, not RVI, because we do not use
-+		 * virtual interrupt delivery to inject L1 interrupts into L2.
- 		 */
--		if (is_guest_mode(vcpu) && max_irr_updated) {
--			if (nested_exit_on_intr(vcpu))
--				kvm_vcpu_exiting_guest_mode(vcpu);
--			else
--				kvm_make_request(KVM_REQ_EVENT, vcpu);
--		}
-+		if (is_guest_mode(vcpu) && max_irr_updated)
-+			kvm_make_request(KVM_REQ_EVENT, vcpu);
- 	} else {
- 		max_irr = kvm_lapic_find_highest_irr(vcpu);
++	me = get_cpu();
++	/*
++	 * The only state change done outside the vcpu mutex is IN_GUEST_MODE
++	 * to EXITING_GUEST_MODE.  Therefore the moderately expensive "should
++	 * kick" check does not need atomic operations if kvm_vcpu_kick is used
++	 * within the vCPU thread itself.
++	 */
++	if (vcpu == __this_cpu_read(kvm_running_vcpu)) {
++		if (vcpu->mode == IN_GUEST_MODE)
++			WRITE_ONCE(vcpu->mode, EXITING_GUEST_MODE);
++		goto out;
++	}
++
+ 	/*
+ 	 * Note, the vCPU could get migrated to a different pCPU at any point
+ 	 * after kvm_arch_vcpu_should_kick(), which could result in sending an
+@@ -3332,12 +3345,12 @@ void kvm_vcpu_kick(struct kvm_vcpu *vcpu)
+ 	 * IPI is to force the vCPU to leave IN_GUEST_MODE, and migrating the
+ 	 * vCPU also requires it to leave IN_GUEST_MODE.
+ 	 */
+-	me = get_cpu();
+ 	if (kvm_arch_vcpu_should_kick(vcpu)) {
+ 		cpu = READ_ONCE(vcpu->cpu);
+ 		if (cpu != me && (unsigned)cpu < nr_cpu_ids && cpu_online(cpu))
+ 			smp_send_reschedule(cpu);
  	}
++out:
+ 	put_cpu();
+ }
+ EXPORT_SYMBOL_GPL(kvm_vcpu_kick);
 -- 
 2.27.0
 
