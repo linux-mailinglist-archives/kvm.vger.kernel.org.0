@@ -2,165 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E883C4344EE
-	for <lists+kvm@lfdr.de>; Wed, 20 Oct 2021 08:08:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 82934434565
+	for <lists+kvm@lfdr.de>; Wed, 20 Oct 2021 08:47:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229864AbhJTGKr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Oct 2021 02:10:47 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:63792 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229809AbhJTGKj (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 20 Oct 2021 02:10:39 -0400
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 19K3GlLn014863;
-        Wed, 20 Oct 2021 02:08:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=hm7pxpcPCv47Cs95QUQBpva3Yx4/ZtHWVhsqmNZe7IE=;
- b=Kq8stTwgxQN5is3yYzR2C5NcrmKNHdjuD5Ww2Kw63kdtm9FFN16cS7ojtxYN3QCjXTEZ
- V3IntHxueOu/Z9ueYvVWokgOyKbLGm25TTQkaIpCkxCSD2+OHZqXs6Qv2CYp+dzRMZrp
- vwEQuiZCSgQCV9rC3g+8aWhOtouSNSSpZgaIxlZyzZPGdSAXOTvcLu1BonS7D8qpwwXM
- K5OEgtaOO4dcsZSz95dixvWisKl2Xx8LspUE0Sm+oJYOwLOlErTZ7vJ52PnrGJBXb0Nt
- 9WpYHvoICob+31qKbwtY9h058kYvMLhAyhftGr8A335ehW1RVoWCDk9fuZa95dIbw3hG ZQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3btb2qjtx3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 20 Oct 2021 02:08:25 -0400
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 19K60CfC023639;
-        Wed, 20 Oct 2021 02:08:25 -0400
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3btb2qjtw9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 20 Oct 2021 02:08:25 -0400
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 19K68DsZ015884;
-        Wed, 20 Oct 2021 06:08:23 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma04ams.nl.ibm.com with ESMTP id 3bqpcas319-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 20 Oct 2021 06:08:22 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 19K68JqM43712900
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 20 Oct 2021 06:08:19 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B965442049;
-        Wed, 20 Oct 2021 06:08:19 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DA0DF42045;
-        Wed, 20 Oct 2021 06:08:18 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.145.4.68])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 20 Oct 2021 06:08:18 +0000 (GMT)
-Date:   Wed, 20 Oct 2021 08:08:16 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Christian Borntraeger <borntraeger@de.ibm.com>
-Cc:     Halil Pasic <pasic@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Michael Mueller <mimu@linux.ibm.com>,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Pierre Morel <pmorel@linux.ibm.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Niklas Schnelle <schnelle@linux.ibm.com>, farman@linux.ibm.com,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH 1/3] KVM: s390: clear kicked_mask before sleeping again
-Message-ID: <20211020080816.69d26708@p-imbrenda>
-In-Reply-To: <1641267f-3a23-aba1-ab50-6f7c15e44528@de.ibm.com>
-References: <20211019175401.3757927-1-pasic@linux.ibm.com>
-        <20211019175401.3757927-2-pasic@linux.ibm.com>
-        <20211020073515.3ad4c377@p-imbrenda>
-        <1641267f-3a23-aba1-ab50-6f7c15e44528@de.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        id S229910AbhJTGte (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Oct 2021 02:49:34 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:39921 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229715AbhJTGtd (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 20 Oct 2021 02:49:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1634712439;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=zpOHrowC14jNMXm04zF+C/7tsopB9ZkqTu0bv9M163E=;
+        b=Xy4FpKVMmx6c6h838qQJMk82QXuaq7XeylrxQkl8QwO9V6D+ilqSglNc+nEMRhcy1Ir1Ru
+        FAmrs0A3b+bo6bvi2I9yU8QzqcL8yyi4WEoHKAVHWtXaqGi+PdcJzoOGNT1vI+cFij+ipF
+        6n49u728Fe775U1hXUBC4SrnAK+BWCs=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-30-O23RYGsaPNeogAoahnSesg-1; Wed, 20 Oct 2021 02:47:18 -0400
+X-MC-Unique: O23RYGsaPNeogAoahnSesg-1
+Received: by mail-ed1-f72.google.com with SMTP id d11-20020a50cd4b000000b003da63711a8aso19915020edj.20
+        for <kvm@vger.kernel.org>; Tue, 19 Oct 2021 23:47:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=zpOHrowC14jNMXm04zF+C/7tsopB9ZkqTu0bv9M163E=;
+        b=oEmgjY7t2c5ILi0KxzmR9IdaC3cQSCG3toUWBQV729JmAmDXp3c0tKjox9Fku+mDD2
+         sA1WI9UYqgg511+TXVUWoivLjMtRfb6i3yVEmxwiCYVMFBvVVsKbAKnOxhesEWNmZ8+f
+         VbdEmKRNlyY49Ln8mb8G7g82OY7WQbup9lV5bovHxd3KveVnduTkOjOGiyeoZxWcLDz/
+         Jl1kMHGmJhtpN1kxfjEpyVPBuMqkkZ0sohbLVn6+d5G3jKW3JmFNF5RmGf7VHyjpA/1P
+         EHZFceHHBD/oS8s/VrMjdLtTT0qhnY8B3wnLXKtg+WuFBy+82KzW5Svzj9QbKtD2vDoq
+         Jgfg==
+X-Gm-Message-State: AOAM533CMtBJhjJiAppJj9VuybhUdBo/WNIlXF6n56Exy027mBpXn/XY
+        urHS+vXjyGFQlhTE7+nX49MYKL99clf6N2yWnROivaxxAxsRBJfw4ZaIYT/9CG6k0eNKS2473fr
+        3SCC9ObQs6I7R
+X-Received: by 2002:a17:907:9694:: with SMTP id hd20mr44089864ejc.550.1634712437031;
+        Tue, 19 Oct 2021 23:47:17 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyy550E6eJ5oKImP0zF38zEk2QLC1XfY1OC8z/GQUXOlKzB6Aj88nUGOpCXToiit1gxihyeyg==
+X-Received: by 2002:a17:907:9694:: with SMTP id hd20mr44089826ejc.550.1634712436703;
+        Tue, 19 Oct 2021 23:47:16 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
+        by smtp.gmail.com with ESMTPSA id o3sm518528ejg.52.2021.10.19.23.47.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 19 Oct 2021 23:47:16 -0700 (PDT)
+Message-ID: <45fabf5a-96b5-49dc-0cba-55714ae3a4b5@redhat.com>
+Date:   Wed, 20 Oct 2021 08:47:11 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [PATCH v3 3/3] KVM: vCPU kick tax cut for running vCPU
+Content-Language: en-US
+To:     Wanpeng Li <kernellwp@gmail.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+References: <1634631160-67276-1-git-send-email-wanpengli@tencent.com>
+ <1634631160-67276-3-git-send-email-wanpengli@tencent.com>
+ <24e67e43-c50c-7e0f-305a-c7f6129f8d70@redhat.com>
+ <YW8BmRJHVvFscWTo@google.com>
+ <CANRm+CzuWnO8FZPTvvOtpxqc5h786o7THyebOFpVAp3BF1xQiw@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <CANRm+CzuWnO8FZPTvvOtpxqc5h786o7THyebOFpVAp3BF1xQiw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: doNjs0D7S2kippR5Tr8jzz6oxhMVU78g
-X-Proofpoint-ORIG-GUID: SwkD9A43gLhruvfonqeL2j53EprFmhR-
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
- definitions=2021-10-20_02,2021-10-19_01,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
- mlxlogscore=999 clxscore=1011 lowpriorityscore=0 suspectscore=0
- bulkscore=0 adultscore=0 impostorscore=0 spamscore=0 priorityscore=1501
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2109230001 definitions=main-2110200032
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 20 Oct 2021 08:03:40 +0200
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+On 20/10/21 04:49, Wanpeng Li wrote:
+>> The intent of the extra check was to avoid the locked instruction that comes with
+>> disabling preemption via rcu_read_lock().  But thinking more, the extra op should
+>> be little more than a basic arithmetic operation in the grand scheme on modern x86
+>> since the cache line is going to be locked and written no matter what, either
+>> immediately before or immediately after.
+>
+> I observe the main overhead of rcuwait_wake_up() is from rcu
+> operations, especially rcu_read_lock/unlock().
 
-> Am 20.10.21 um 07:35 schrieb Claudio Imbrenda:
-> > On Tue, 19 Oct 2021 19:53:59 +0200
-> > Halil Pasic <pasic@linux.ibm.com> wrote:
-> >   
-> >> The idea behind kicked mask is that we should not re-kick a vcpu that
-> >> is already in the "kick" process, i.e. that was kicked and is
-> >> is about to be dispatched if certain conditions are met.
-> >>
-> >> The problem with the current implementation is, that it assumes the
-> >> kicked vcpu is going to enter SIE shortly. But under certain
-> >> circumstances, the vcpu we just kicked will be deemed non-runnable and
-> >> will remain in wait state. This can happen, if the interrupt(s) this
-> >> vcpu got kicked to deal with got already cleared (because the interrupts
-> >> got delivered to another vcpu). In this case kvm_arch_vcpu_runnable()
-> >> would return false, and the vcpu would remain in kvm_vcpu_block(),
-> >> but this time with its kicked_mask bit set. So next time around we
-> >> wouldn't kick the vcpu form __airqs_kick_single_vcpu(), but would assume
-> >> that we just kicked it.
-> >>
-> >> Let us make sure the kicked_mask is cleared before we give up on
-> >> re-dispatching the vcpu.
-> >>
-> >> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
-> >> Reported-by: Matthew Rosato <mjrosato@linux.ibm.com>
-> >> Fixes: 9f30f6216378 ("KVM: s390: add gib_alert_irq_handler()")
-> >> ---
-> >>   arch/s390/kvm/kvm-s390.c | 1 +
-> >>   1 file changed, 1 insertion(+)
-> >>
-> >> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> >> index 6a6dd5e1daf6..1c97493d21e1 100644
-> >> --- a/arch/s390/kvm/kvm-s390.c
-> >> +++ b/arch/s390/kvm/kvm-s390.c
-> >> @@ -3363,6 +3363,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
-> >>   
-> >>   int kvm_arch_vcpu_runnable(struct kvm_vcpu *vcpu)
-> >>   {
-> >> +	clear_bit(vcpu->vcpu_idx, vcpu->kvm->arch.gisa_int.kicked_mask);  
-> > 
-> > so, you unconditionally clear the flag, before knowing if the vCPU is
-> > runnable?
-> > 
-> > from your description I would have expected to only clear the bit if
-> > the vCPU is not runnable.
-> > 
-> > would things break if we were to try to kick the vCPU again after
-> > clearing the bit, but before dispatching it?  
-> 
-> The whole logic is just an optimization to avoid unnecessary wakeups.
-> When the bit is set a wakup might be omitted.
-> I prefer to do an unneeded wakeup over not doing a wakeup so I think
-> over-clearing is safer.
-> In fact, getting rid of this micro-optimization would be a valid
-> alternative.
+Do you have CONFIG_PREEMPT_RCU set?  If so, maybe something like this would help:
 
-my only concern was if things would break in case we kick the vCPU
-again after clearing the bit; it seems nothing breaks, so I'm ok with it
+diff --git a/kernel/exit.c b/kernel/exit.c
+index fd1c04193e18..ca1e60a1234d 100644
+--- a/kernel/exit.c
++++ b/kernel/exit.c
+@@ -235,8 +235,6 @@ int rcuwait_wake_up(struct rcuwait *w)
+  	int ret = 0;
+  	struct task_struct *task;
+  
+-	rcu_read_lock();
+-
+  	/*
+  	 * Order condition vs @task, such that everything prior to the load
+  	 * of @task is visible. This is the condition as to why the user called
+@@ -250,6 +248,14 @@ int rcuwait_wake_up(struct rcuwait *w)
+  	 */
+  	smp_mb(); /* (B) */
+  
++#ifdef CONFIG_PREEMPT_RCU
++	/* The cost of rcu_read_lock() is nontrivial for preemptable RCU.  */
++	if (!rcuwait_active(w))
++		return ret;
++#endif
++
++	rcu_read_lock();
++
+  	task = rcu_dereference(w->task);
+  	if (task)
+  		ret = wake_up_process(task);
 
-> >   
-> >>   	return kvm_s390_vcpu_has_irq(vcpu, 0);
-> >>   }
-> >>     
-> >   
+(If you don't, rcu_read_lock is essentially preempt_disable() and it
+should not have a large overhead).  You still need the memory barrier
+though, in order to avoid missed wakeups; shameless plug for my
+article at https://lwn.net/Articles/847481/.
+
+Paolo
+
+>> So with Paolo's other comment, maybe just this?  And if this doesn't provide the
+>> desired performance boost, changes to the rcuwait behavior should go in separate
+>> patch.
+> Ok.
 
