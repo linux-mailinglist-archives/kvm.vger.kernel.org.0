@@ -2,109 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AB1FF43535C
-	for <lists+kvm@lfdr.de>; Wed, 20 Oct 2021 21:02:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E165543537A
+	for <lists+kvm@lfdr.de>; Wed, 20 Oct 2021 21:10:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231433AbhJTTEN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Oct 2021 15:04:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58632 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231312AbhJTTEL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Oct 2021 15:04:11 -0400
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E49DC06161C
-        for <kvm@vger.kernel.org>; Wed, 20 Oct 2021 12:01:57 -0700 (PDT)
-Received: by mail-pl1-x62a.google.com with SMTP id n11so16809206plf.4
-        for <kvm@vger.kernel.org>; Wed, 20 Oct 2021 12:01:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=DANx3HO6cgPisAl+CHhBZy+n2kHgp44pkICwDmul91Y=;
-        b=T2NpTM70PleU3Fgawia08s/phmB4W9mNfejNL2ZIBKiqj1LnIfPkJ+ajkOUm4p8Y7R
-         yJg0aSR2qHZf4XvVVbHhpfkkoD/wL+gJv6TazBaQGH9k1P9sdh7Pl231jNNfXqq0ruDH
-         wZMWuKyi7HsMW1lnaT5GRWpsVhH2KQWmRxtNTe79CVhjYrTnfcdej/kOgHttUwopLFE3
-         f/XdT1INFEaMarLdmGz6fIQddAsdZo37xruTpsVsMwQhmW9Z6C4rkSQBfx2bKTBKEmYQ
-         sCjar7V528p8iltu4Z7FeKclr2dmHxuvQ3iXKTSvd3/w+Om0wfpCOQ4/noJJP+52FLO7
-         B4Tw==
+        id S231406AbhJTTMY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Oct 2021 15:12:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:27088 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231503AbhJTTMX (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 20 Oct 2021 15:12:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1634757008;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=s2fYJih/CjPQFZXgwcNdDHbQM/nEhdW/92S3MPMWu2g=;
+        b=Y0mXkRdN+ntbJdC+ersZg7q6WNRA5Mz8w9on+oICIRjE/YFqLaNK1v2e2fDTx1YKb0z4eh
+        q386yMMdXPveAQBonmzUtbSPxnunGLfDLjhMnSxckVm2Rlysn82pa5We72eeF1EI4JU9BM
+        20Ok93NdaC5M5TVrjMKT9V3wrrHDv5o=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-338-7OI83h-ePvesvmMFejr8Bg-1; Wed, 20 Oct 2021 15:10:07 -0400
+X-MC-Unique: 7OI83h-ePvesvmMFejr8Bg-1
+Received: by mail-ed1-f71.google.com with SMTP id e14-20020a056402088e00b003db6ebb9526so21865977edy.22
+        for <kvm@vger.kernel.org>; Wed, 20 Oct 2021 12:10:07 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=DANx3HO6cgPisAl+CHhBZy+n2kHgp44pkICwDmul91Y=;
-        b=hSyVBruYdy+Zw2Lqn+SxDyQne1u0EztbY1jGIS0eA6y4Hc/4+qzbBu26Z007vHJzS4
-         vrglMI95QZWOjb9fYFrPP6xz7ry/HpkJXcOvVoVd7ZccuO9zkTgkZ49cqd7mqHOXCbYI
-         nfiupDSVqmBu8s7PaX2vGFvVu1R5RTohN4XNVOHF/ACR3XX8ZUwsOcE+8KJiFUgIDJMj
-         1IRa/yX17bo76UsXRfM84K5eCIWra9TGHtZMuaGWzs9fyVPbL4pB/K5zY95Qu4W+0t9z
-         yu/hhTjpWFDUfeaM0t+bIdLoCQbHzv0td0UReCPRjsrrIzEJ4zIttBorGFVyTJ/R0tzw
-         KTmw==
-X-Gm-Message-State: AOAM530Jw2tkR/MUukuf9VhPmDBuNNJC/E23mv4wEu6zYEPbeGm4QZHx
-        92VgsqDsrOm7E0H5yQEZKssR6w==
-X-Google-Smtp-Source: ABdhPJxTtZlD3tik07e31gwxjRrXsiDg7LAunZboxgnl2JeTj/bjMYSpzdfqi37yk9rhQ+Oc4bfF5g==
-X-Received: by 2002:a17:903:230f:b0:13f:cca9:bf2f with SMTP id d15-20020a170903230f00b0013fcca9bf2fmr821720plh.51.1634756516653;
-        Wed, 20 Oct 2021 12:01:56 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id j198sm3003802pgc.4.2021.10.20.12.01.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Oct 2021 12:01:55 -0700 (PDT)
-Date:   Wed, 20 Oct 2021 19:01:51 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5 01/13] KVM: x86: Cache total page count to avoid
- traversing the memslot array
-Message-ID: <YXBnn6ZaXbaqKvOo@google.com>
-References: <cover.1632171478.git.maciej.szmigiero@oracle.com>
- <d07f07cdd545ab1a495a9a0da06e43ad97c069a2.1632171479.git.maciej.szmigiero@oracle.com>
- <YW9Fi128rYxiF1v3@google.com>
- <e618edce-b310-6d9a-3860-d7f4d8c0d98f@maciej.szmigiero.name>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=s2fYJih/CjPQFZXgwcNdDHbQM/nEhdW/92S3MPMWu2g=;
+        b=asMn0D8IGiI3eVAzk8Qk474qskz+mgKqpJAFRRvjWlKxa6fNb2UVPjdImSsO75WCkn
+         4XqrFri7HOvAhbo4VZRSlrzpooGM8J1T39CMG+wex7YhZi6SqY+2gYb7mJSr8XpI5QN0
+         BcXH9BfG035qRESoa7k9iYNEN7aVHciUYsR5vYp6eBPcV1XI1tjMwRUjJJC7FQWVcjvA
+         3k5xJ2bNPtjKUVweNQoXt2YBFidhYm0HU92LQSNezvbGXDJnmUQ6CmKqT1K8MvXTtmhD
+         Ia3tlWl7vvqPuxXv0LC6wlVidzdz6CyKtvkAGYZ6KpyooMuhytW1fVAsvDAPl5zNjAon
+         DXKA==
+X-Gm-Message-State: AOAM532F0NHL0a2aFAhby0rfhlEdgbWWYwsMNIkiOxajKYDX5iGRIKzP
+        wm3WZiTeon7P6Md70bcBhzuZf6K/ZRI6xTrwTg7vfpU3ZNqeC+4ws/u5s3GACT4//FFvVe7I3hw
+        BEX6GHbl4wVaT
+X-Received: by 2002:a50:8dcb:: with SMTP id s11mr990175edh.143.1634757006336;
+        Wed, 20 Oct 2021 12:10:06 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwbNwwKaQjWB9PuJKQegHteG94LwYyrTJB23Og8QQRP2nLFTm7Zcw323Tlxaphpr4E/Us/5yA==
+X-Received: by 2002:a50:8dcb:: with SMTP id s11mr990150edh.143.1634757006074;
+        Wed, 20 Oct 2021 12:10:06 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id l10sm1666272edk.30.2021.10.20.12.10.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 20 Oct 2021 12:10:05 -0700 (PDT)
+Message-ID: <9e61972b-3eb9-9693-3eab-274676a78be8@redhat.com>
+Date:   Wed, 20 Oct 2021 21:10:03 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e618edce-b310-6d9a-3860-d7f4d8c0d98f@maciej.szmigiero.name>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [PATCH kvm-unit-tests 1/2] unify structs for GDT descriptors
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, zxwang42@gmail.com, marcorr@google.com,
+        jroedel@suse.de, varad.gautam@suse.com,
+        Jim Mattson <jmattson@google.com>
+References: <20211020165333.953978-1-pbonzini@redhat.com>
+ <20211020165333.953978-2-pbonzini@redhat.com> <YXBYzvnclL+HfIMr@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <YXBYzvnclL+HfIMr@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 20, 2021, Maciej S. Szmigiero wrote:
-> On 20.10.2021 00:24, Sean Christopherson wrote:
-> > E.g. the whole thing can be
-> > 
-> > 	if (!kvm->arch.n_requested_mmu_pages &&
-> > 	    (change == KVM_MR_CREATE || change == KVM_MR_DELETE)) {
-> > 		unsigned long nr_mmu_pages;
-> > 
-> > 		if (change == KVM_MR_CREATE) {
-> > 			kvm->arch.n_memslots_pages += new->npages;
-> > 		} else {
-> > 			WARN_ON(kvm->arch.n_memslots_pages < old->npages);
-> > 			kvm->arch.n_memslots_pages -= old->npages;
-> > 		}
-> > 
-> > 		nr_mmu_pages = (unsigned long)kvm->arch.n_memslots_pages;
-> > 		nr_mmu_pages *= (KVM_PERMILLE_MMU_PAGES / 1000);
-> 
-> The above line will set nr_mmu_pages to zero since KVM_PERMILLE_MMU_PAGES
-> is 20, so when integer-divided by 1000 will result in a multiplication
-> coefficient of zero.
+On 20/10/21 19:58, Sean Christopherson wrote:
+> Changelog says "unify struct", yet gdt_entry_t and gdt_desc_entry_t have fully
+> redundant information.  Apparently anonymous structs aren't a thing (or I'm just
+> doing it wrong), but even so, fully unifying this is not hugely problematic for
+> the sole consumer.
 
-Ugh, math.  And thus do_div() to avoid the whole 64-bit divide issue on 32-bit KVM.
-Bummer.
+Right, the unification is more between 32- and 64 bits.
+
+"Unifying" the reply to both patches, the best thing to do is:
+
+- always use gdt_entry_t as the argument
+
+- use your definition of gdt_desc_entry_t and call it 
+gdt_system_desc_entry_t.
+
+- read the type and, if needed, cast to gdt_system_desc_entry_t to "OR" 
+in the base4 field.
+
+Paolo
+
