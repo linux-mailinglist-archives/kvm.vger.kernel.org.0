@@ -2,19 +2,22 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2E8B1434B6F
-	for <lists+kvm@lfdr.de>; Wed, 20 Oct 2021 14:44:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DD068434B74
+	for <lists+kvm@lfdr.de>; Wed, 20 Oct 2021 14:44:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230183AbhJTMqt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Oct 2021 08:46:49 -0400
-Received: from 8bytes.org ([81.169.241.247]:33490 "EHLO theia.8bytes.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229998AbhJTMqt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Oct 2021 08:46:49 -0400
+        id S230235AbhJTMqy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Oct 2021 08:46:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55502 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230216AbhJTMqv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Oct 2021 08:46:51 -0400
+Received: from theia.8bytes.org (8bytes.org [IPv6:2a01:238:4383:600:38bc:a715:4b6d:a889])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16EA3C061749;
+        Wed, 20 Oct 2021 05:44:37 -0700 (PDT)
 Received: from cap.home.8bytes.org (p4ff2b5b0.dip0.t-ipconnect.de [79.242.181.176])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
         (No client certificate requested)
-        by theia.8bytes.org (Postfix) with ESMTPSA id 4B9F038F;
+        by theia.8bytes.org (Postfix) with ESMTPSA id ABBCC3C3;
         Wed, 20 Oct 2021 14:44:33 +0200 (CEST)
 From:   Joerg Roedel <joro@8bytes.org>
 To:     Paolo Bonzini <pbonzini@redhat.com>
@@ -26,9 +29,9 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         Brijesh Singh <brijesh.singh@amd.com>,
         Tom Lendacky <thomas.lendacky@amd.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, Joerg Roedel <jroedel@suse.de>
-Subject: [PATCH v5 2/6] KVM: SVM: Add helper to generate GHCB MSR verson info, and drop macro
-Date:   Wed, 20 Oct 2021 14:44:12 +0200
-Message-Id: <20211020124416.24523-3-joro@8bytes.org>
+Subject: [PATCH v5 3/6] KVM: SVM: Move kvm_emulate_ap_reset_hold() to AMD specific code
+Date:   Wed, 20 Oct 2021 14:44:13 +0200
+Message-Id: <20211020124416.24523-4-joro@8bytes.org>
 X-Mailer: git-send-email 2.33.1
 In-Reply-To: <20211020124416.24523-1-joro@8bytes.org>
 References: <20211020124416.24523-1-joro@8bytes.org>
@@ -38,103 +41,96 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Sean Christopherson <seanjc@google.com>
+From: Joerg Roedel <jroedel@suse.de>
 
-Convert the GHCB_MSR_SEV_INFO macro into a helper function, and have the
-helper hardcode the min/max versions instead of relying on the caller to
-do the same.  Under no circumstance should different pieces of KVM define
-different min/max versions.
+The function is only used by the kvm-amd module. Move it to the AMD
+specific part of the code and name it sev_emulate_ap_reset_hold().
 
-No functional change intended.
-
-Signed-off-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Joerg Roedel <jroedel@suse.de>
 ---
- arch/x86/include/asm/sev-common.h |  5 -----
- arch/x86/kvm/svm/sev.c            | 24 ++++++++++++++++++------
- arch/x86/kvm/svm/svm.h            |  5 -----
- 3 files changed, 18 insertions(+), 16 deletions(-)
+ arch/x86/include/asm/kvm_host.h |  2 +-
+ arch/x86/kvm/svm/sev.c          | 10 +++++++++-
+ arch/x86/kvm/x86.c              | 11 ++---------
+ 3 files changed, 12 insertions(+), 11 deletions(-)
 
-diff --git a/arch/x86/include/asm/sev-common.h b/arch/x86/include/asm/sev-common.h
-index 8540972cad04..886c36f0cb16 100644
---- a/arch/x86/include/asm/sev-common.h
-+++ b/arch/x86/include/asm/sev-common.h
-@@ -24,11 +24,6 @@
- #define GHCB_MSR_VER_MIN_MASK		0xffff
- #define GHCB_MSR_CBIT_POS		24
- #define GHCB_MSR_CBIT_MASK		0xff
--#define GHCB_MSR_SEV_INFO(_max, _min, _cbit)				\
--	((((_max) & GHCB_MSR_VER_MAX_MASK) << GHCB_MSR_VER_MAX_POS) |	\
--	 (((_min) & GHCB_MSR_VER_MIN_MASK) << GHCB_MSR_VER_MIN_POS) |	\
--	 (((_cbit) & GHCB_MSR_CBIT_MASK) << GHCB_MSR_CBIT_POS) |	\
--	 GHCB_MSR_SEV_INFO_RESP)
- #define GHCB_MSR_INFO(v)		((v) & 0xfffUL)
- #define GHCB_MSR_PROTO_MAX(v)		(((v) >> GHCB_MSR_VER_MAX_POS) & GHCB_MSR_VER_MAX_MASK)
- #define GHCB_MSR_PROTO_MIN(v)		(((v) >> GHCB_MSR_VER_MIN_POS) & GHCB_MSR_VER_MIN_MASK)
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 80f4b8a9233c..b67f550616cf 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1682,8 +1682,8 @@ int kvm_emulate_monitor(struct kvm_vcpu *vcpu);
+ int kvm_fast_pio(struct kvm_vcpu *vcpu, int size, unsigned short port, int in);
+ int kvm_emulate_cpuid(struct kvm_vcpu *vcpu);
+ int kvm_emulate_halt(struct kvm_vcpu *vcpu);
++int __kvm_vcpu_halt(struct kvm_vcpu *vcpu, int state, int reason);
+ int kvm_vcpu_halt(struct kvm_vcpu *vcpu);
+-int kvm_emulate_ap_reset_hold(struct kvm_vcpu *vcpu);
+ int kvm_emulate_wbinvd(struct kvm_vcpu *vcpu);
+ 
+ void kvm_get_segment(struct kvm_vcpu *vcpu, struct kvm_segment *var, int seg);
 diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 2e3ecab6f1c8..9fb4d8fad1f4 100644
+index 9fb4d8fad1f4..9afa71cb36e6 100644
 --- a/arch/x86/kvm/svm/sev.c
 +++ b/arch/x86/kvm/svm/sev.c
-@@ -2389,6 +2389,22 @@ static u64 ghcb_msr_cpuid_resp(u64 reg, u64 value)
+@@ -2405,6 +2405,14 @@ static u64 ghcb_msr_version_info(void)
  	return msr;
  }
  
-+/* The min/max GHCB version supported by KVM. */
-+#define GHCB_VERSION_MAX	1ULL
-+#define GHCB_VERSION_MIN	1ULL
-+
-+static u64 ghcb_msr_version_info(void)
++static int sev_emulate_ap_reset_hold(struct vcpu_svm *svm)
 +{
-+	u64 msr;
++	int ret = kvm_skip_emulated_instruction(&svm->vcpu);
 +
-+	msr  = GHCB_MSR_SEV_INFO_RESP;
-+	msr |= GHCB_VERSION_MAX << GHCB_MSR_VER_MAX_POS;
-+	msr |= GHCB_VERSION_MIN << GHCB_MSR_VER_MIN_POS;
-+	msr |= sev_enc_bit << GHCB_MSR_CBIT_POS;
-+
-+	return msr;
++	return __kvm_vcpu_halt(&svm->vcpu,
++			       KVM_MP_STATE_AP_RESET_HOLD, KVM_EXIT_AP_RESET_HOLD) && ret;
 +}
 +
  static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
  {
  	struct vmcb_control_area *control = &svm->vmcb->control;
-@@ -2403,9 +2419,7 @@ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
- 
- 	switch (ghcb_info) {
- 	case GHCB_MSR_SEV_INFO_REQ:
--		svm->vmcb->control.ghcb_gpa = GHCB_MSR_SEV_INFO(GHCB_VERSION_MAX,
--								GHCB_VERSION_MIN,
--								sev_enc_bit);
-+		control->ghcb_gpa = ghcb_msr_version_info();
+@@ -2536,7 +2544,7 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
+ 		ret = svm_invoke_exit_handler(vcpu, SVM_EXIT_IRET);
  		break;
- 	case GHCB_MSR_CPUID_REQ: {
- 		u64 cpuid_fn, cpuid_reg, cpuid_value;
-@@ -2621,9 +2635,7 @@ void sev_es_vcpu_reset(struct vcpu_svm *svm)
- 	 * Set the GHCB MSR value as per the GHCB specification when emulating
- 	 * vCPU RESET for an SEV-ES guest.
- 	 */
--	svm->vmcb->control.ghcb_gpa = GHCB_MSR_SEV_INFO(GHCB_VERSION_MAX,
--							GHCB_VERSION_MIN,
--							sev_enc_bit);
-+	svm->vmcb->control.ghcb_gpa = ghcb_msr_version_info();
+ 	case SVM_VMGEXIT_AP_HLT_LOOP:
+-		ret = kvm_emulate_ap_reset_hold(vcpu);
++		ret = sev_emulate_ap_reset_hold(svm);
+ 		break;
+ 	case SVM_VMGEXIT_AP_JUMP_TABLE: {
+ 		struct kvm_sev_info *sev = &to_kvm_svm(vcpu->kvm)->sev_info;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index c59b63c56af9..cc3a65d6821d 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -8651,7 +8651,7 @@ void kvm_arch_exit(void)
+ #endif
  }
  
- void sev_es_prepare_guest_switch(struct vcpu_svm *svm, unsigned int cpu)
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 0d7bbe548ac3..68e5f16a0554 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -544,11 +544,6 @@ void svm_vcpu_blocking(struct kvm_vcpu *vcpu);
- void svm_vcpu_unblocking(struct kvm_vcpu *vcpu);
+-static int __kvm_vcpu_halt(struct kvm_vcpu *vcpu, int state, int reason)
++int __kvm_vcpu_halt(struct kvm_vcpu *vcpu, int state, int reason)
+ {
+ 	++vcpu->stat.halt_exits;
+ 	if (lapic_in_kernel(vcpu)) {
+@@ -8662,6 +8662,7 @@ static int __kvm_vcpu_halt(struct kvm_vcpu *vcpu, int state, int reason)
+ 		return 0;
+ 	}
+ }
++EXPORT_SYMBOL_GPL(__kvm_vcpu_halt);
  
- /* sev.c */
--
--#define GHCB_VERSION_MAX	1ULL
--#define GHCB_VERSION_MIN	1ULL
--
--
- extern unsigned int max_sev_asid;
+ int kvm_vcpu_halt(struct kvm_vcpu *vcpu)
+ {
+@@ -8680,14 +8681,6 @@ int kvm_emulate_halt(struct kvm_vcpu *vcpu)
+ }
+ EXPORT_SYMBOL_GPL(kvm_emulate_halt);
  
- void sev_vm_destroy(struct kvm *kvm);
+-int kvm_emulate_ap_reset_hold(struct kvm_vcpu *vcpu)
+-{
+-	int ret = kvm_skip_emulated_instruction(vcpu);
+-
+-	return __kvm_vcpu_halt(vcpu, KVM_MP_STATE_AP_RESET_HOLD, KVM_EXIT_AP_RESET_HOLD) && ret;
+-}
+-EXPORT_SYMBOL_GPL(kvm_emulate_ap_reset_hold);
+-
+ #ifdef CONFIG_X86_64
+ static int kvm_pv_clock_pairing(struct kvm_vcpu *vcpu, gpa_t paddr,
+ 			        unsigned long clock_type)
 -- 
 2.33.1
 
