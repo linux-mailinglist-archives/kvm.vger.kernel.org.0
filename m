@@ -2,132 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 82934434565
-	for <lists+kvm@lfdr.de>; Wed, 20 Oct 2021 08:47:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CE0504345F2
+	for <lists+kvm@lfdr.de>; Wed, 20 Oct 2021 09:35:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229910AbhJTGte (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Oct 2021 02:49:34 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:39921 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229715AbhJTGtd (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 20 Oct 2021 02:49:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634712439;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=zpOHrowC14jNMXm04zF+C/7tsopB9ZkqTu0bv9M163E=;
-        b=Xy4FpKVMmx6c6h838qQJMk82QXuaq7XeylrxQkl8QwO9V6D+ilqSglNc+nEMRhcy1Ir1Ru
-        FAmrs0A3b+bo6bvi2I9yU8QzqcL8yyi4WEoHKAVHWtXaqGi+PdcJzoOGNT1vI+cFij+ipF
-        6n49u728Fe775U1hXUBC4SrnAK+BWCs=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-30-O23RYGsaPNeogAoahnSesg-1; Wed, 20 Oct 2021 02:47:18 -0400
-X-MC-Unique: O23RYGsaPNeogAoahnSesg-1
-Received: by mail-ed1-f72.google.com with SMTP id d11-20020a50cd4b000000b003da63711a8aso19915020edj.20
-        for <kvm@vger.kernel.org>; Tue, 19 Oct 2021 23:47:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=zpOHrowC14jNMXm04zF+C/7tsopB9ZkqTu0bv9M163E=;
-        b=oEmgjY7t2c5ILi0KxzmR9IdaC3cQSCG3toUWBQV729JmAmDXp3c0tKjox9Fku+mDD2
-         sA1WI9UYqgg511+TXVUWoivLjMtRfb6i3yVEmxwiCYVMFBvVVsKbAKnOxhesEWNmZ8+f
-         VbdEmKRNlyY49Ln8mb8G7g82OY7WQbup9lV5bovHxd3KveVnduTkOjOGiyeoZxWcLDz/
-         Jl1kMHGmJhtpN1kxfjEpyVPBuMqkkZ0sohbLVn6+d5G3jKW3JmFNF5RmGf7VHyjpA/1P
-         EHZFceHHBD/oS8s/VrMjdLtTT0qhnY8B3wnLXKtg+WuFBy+82KzW5Svzj9QbKtD2vDoq
-         Jgfg==
-X-Gm-Message-State: AOAM533CMtBJhjJiAppJj9VuybhUdBo/WNIlXF6n56Exy027mBpXn/XY
-        urHS+vXjyGFQlhTE7+nX49MYKL99clf6N2yWnROivaxxAxsRBJfw4ZaIYT/9CG6k0eNKS2473fr
-        3SCC9ObQs6I7R
-X-Received: by 2002:a17:907:9694:: with SMTP id hd20mr44089864ejc.550.1634712437031;
-        Tue, 19 Oct 2021 23:47:17 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyy550E6eJ5oKImP0zF38zEk2QLC1XfY1OC8z/GQUXOlKzB6Aj88nUGOpCXToiit1gxihyeyg==
-X-Received: by 2002:a17:907:9694:: with SMTP id hd20mr44089826ejc.550.1634712436703;
-        Tue, 19 Oct 2021 23:47:16 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.gmail.com with ESMTPSA id o3sm518528ejg.52.2021.10.19.23.47.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 19 Oct 2021 23:47:16 -0700 (PDT)
-Message-ID: <45fabf5a-96b5-49dc-0cba-55714ae3a4b5@redhat.com>
-Date:   Wed, 20 Oct 2021 08:47:11 +0200
+        id S229809AbhJTHhy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Oct 2021 03:37:54 -0400
+Received: from mail-dm6nam10on2070.outbound.protection.outlook.com ([40.107.93.70]:56128
+        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S229491AbhJTHhx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Oct 2021 03:37:53 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=TyuOnR3a3SQWLvCI/MOzC5p+/30ARWeSiJvXKLjCagTop8Bg8gxL3oovob06hOsvCpSbnZIOqTezABVN3L953FzBq6e8T1967QEng9kEp+HywDOtYmB89ySo8qNqBAdqM2Eno4wA3vNKk93zQ3Qgna7mZy81n1qExchjLSDLD8PI8PxHANwHXUrdC7MNbX1uNRTRKVdlB4+v5byj3HKRGpbOfBi+bk8r+YSPefbFHhykMqGst8nxws/LT07VLSH0wplv4scC7Vz8+lQ6DJi0z8etBUbzxshqHfHfX124teZgybLhRDtZ8gxHDHsvXG7MrDqA22eVschryUXkDKJAsg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=l8jGuxMyjyNQPAmfXwRcn0wgEI4hH0HIKPGw0V/kGQw=;
+ b=UiMllgNz6fwLTnGWvMQJYABPm6wpPwK0RvEa+nH8UyI/5RJSnPjwyrGO1XiG7eUIzZKUaQvomi+2PKuzlj/xNKo33dOsgyuHEKlIlVxKBHXf+JqUDch9QZEwgT/JdPYaIXL5ty9dIhAQRRAE35YQ4KM0hJuO73d8E34EMoR06h/uk3+HwpgnmJsQi/hbLBCPmP7U/c7iqsz27m48NJGKMwjuLYJccyQNML/YA/cB3AqAdAhcg1MV/j2ZWlPokecmFiOkLZcNdEfRhGoGt1y2TgM4b9D6vPWzkvd8gCSemFrKuFTRAWpr/cxhYkM8vrkCAklX3kittr6Ulxdd/hTbGw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.112.34) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=nvidia.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=l8jGuxMyjyNQPAmfXwRcn0wgEI4hH0HIKPGw0V/kGQw=;
+ b=TxCOlg8jG0h9kzcPODbF3euse2DfDXam9FDMoTwcvoEFQnJGHJZ0CR7x3+BoqWM1X8sxLP6dmBQoRdWagwWeljoU7sIW6yUj/FmW0BoeHeKmVal/EuJq9nOscUIjqPfqtB0WCGj4sZnpqTTvbOCh6ujblRwBMsI7EKyDc7axVMLVWAXEznYgFBIr8Xy/+F5/AQjvNMlQVslEFvNoFOgutWGmP6Zq6tSDmmstHbSjmW26ZAFqFItZZqFRN0N2DY0dmy9m4ZmmWUtroGexTs20mnTxlxEcR8TM/1ratch5TLOlpaeuwubcIuj8Jw6oVv97UnAkExVWINBHqxc0niAUNw==
+Received: from DM6PR14CA0058.namprd14.prod.outlook.com (2603:10b6:5:18f::35)
+ by DM8PR12MB5480.namprd12.prod.outlook.com (2603:10b6:8:24::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4628.15; Wed, 20 Oct
+ 2021 07:35:38 +0000
+Received: from DM6NAM11FT028.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:5:18f:cafe::7e) by DM6PR14CA0058.outlook.office365.com
+ (2603:10b6:5:18f::35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4608.15 via Frontend
+ Transport; Wed, 20 Oct 2021 07:35:38 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.34)
+ smtp.mailfrom=nvidia.com; vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.112.34 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.112.34; helo=mail.nvidia.com;
+Received: from mail.nvidia.com (216.228.112.34) by
+ DM6NAM11FT028.mail.protection.outlook.com (10.13.173.140) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.4628.16 via Frontend Transport; Wed, 20 Oct 2021 07:35:37 +0000
+Received: from [172.27.15.75] (172.20.187.6) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.18; Wed, 20 Oct
+ 2021 07:35:30 +0000
+Subject: Re: [PATCH V2 mlx5-next 08/14] vfio: Add a macro for
+ VFIO_DEVICE_STATE_ERROR
+To:     Alex Williamson <alex.williamson@redhat.com>
+CC:     <bhelgaas@google.com>, <jgg@nvidia.com>, <saeedm@nvidia.com>,
+        <linux-pci@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <kuba@kernel.org>, <leonro@nvidia.com>,
+        <kwankhede@nvidia.com>, <mgurtovoy@nvidia.com>, <maorg@nvidia.com>
+References: <20211019105838.227569-1-yishaih@nvidia.com>
+ <20211019105838.227569-9-yishaih@nvidia.com>
+ <20211019094820.2e9bfc01.alex.williamson@redhat.com>
+ <20211019095054.396b4f57.alex.williamson@redhat.com>
+From:   Yishai Hadas <yishaih@nvidia.com>
+Message-ID: <155bb1c0-359b-e8e9-97de-e0bc25196eb8@nvidia.com>
+Date:   Wed, 20 Oct 2021 10:35:27 +0300
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [PATCH v3 3/3] KVM: vCPU kick tax cut for running vCPU
-Content-Language: en-US
-To:     Wanpeng Li <kernellwp@gmail.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-References: <1634631160-67276-1-git-send-email-wanpengli@tencent.com>
- <1634631160-67276-3-git-send-email-wanpengli@tencent.com>
- <24e67e43-c50c-7e0f-305a-c7f6129f8d70@redhat.com>
- <YW8BmRJHVvFscWTo@google.com>
- <CANRm+CzuWnO8FZPTvvOtpxqc5h786o7THyebOFpVAp3BF1xQiw@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <CANRm+CzuWnO8FZPTvvOtpxqc5h786o7THyebOFpVAp3BF1xQiw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+In-Reply-To: <20211019095054.396b4f57.alex.williamson@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Originating-IP: [172.20.187.6]
+X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 50f5273f-2885-47cc-1d8c-08d9939c3620
+X-MS-TrafficTypeDiagnostic: DM8PR12MB5480:
+X-Microsoft-Antispam-PRVS: <DM8PR12MB54806037353A165618979974C3BE9@DM8PR12MB5480.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 8VznKQRd12+gTZbHu3cTAojnzcBBAfDBQwFELfwb3Cox4767adSwOBmtZy4tunDTLKA6B8i5H6AQYfAsfdu8j4PrDSh1UgzLg9hY4yBECvKccMZYUHBwwIt4gVlmtwyn8i2o5EksgnnCgxOa1GNLaZ+RGS13UXA4O/nrmQAPvVG53LAuXTJ/w5AMMn3E5eH++h/geew8xnAq9KKlvbB2KFMcR/R1KO+M9H3SsibAwOIQuZ8mD60U+0MOwieYKNFfy9MeB8uaoj8iYncHYV1215bj0mIiHpXfng74iCHaxqY9lc0hb6Y9wBD0GPi1yIZMLlV+54CPKZDWuS0eyOdI9jvFeeE8TwxeuiwgFHmiBZXtJ9h8mGDVSz7RqKKLVIlBpGhlr0z+oZbzcAEhWG71Jit5+d+iWoZjOiPlFsRoqNBpyn2uaeqTZpJDaGZkYgcM5zzrsMzjNqdTub1In/kALKzkNycPXsJ8VSy1tEcJ1ePmgIK3brCWYf8bJdbDkOfH05XXjEWUXvJK2jHgMyvJAoHSLlEjdZMaoJDyhR2Upw1PuQuV7fMJ8/Ic2FLUnFCgRUdJGDi2qalZnKffp2Wui59PTlyrHNxBDea6gcMyNuLLvY205zyOW72t09B78csuUdWGZjW+us4RMgXRSlGN2zP3djSG3Mpi3Ss6pxHwbW7JvcwlPM4e5dtdm21awYArbXWG8wKkkV7hp87a4ETffGdJPaVhHEeh1PbF97pKKHg=
+X-Forefront-Antispam-Report: CIP:216.228.112.34;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid03.nvidia.com;CAT:NONE;SFS:(4636009)(36840700001)(46966006)(508600001)(31696002)(8676002)(8936002)(53546011)(82310400003)(26005)(31686004)(2906002)(2616005)(36860700001)(356005)(5660300002)(36756003)(7636003)(83380400001)(54906003)(47076005)(426003)(6666004)(316002)(16576012)(336012)(86362001)(4326008)(107886003)(6916009)(16526019)(186003)(70206006)(70586007)(43740500002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Oct 2021 07:35:37.6644
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 50f5273f-2885-47cc-1d8c-08d9939c3620
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.34];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT028.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM8PR12MB5480
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 20/10/21 04:49, Wanpeng Li wrote:
->> The intent of the extra check was to avoid the locked instruction that comes with
->> disabling preemption via rcu_read_lock().  But thinking more, the extra op should
->> be little more than a basic arithmetic operation in the grand scheme on modern x86
->> since the cache line is going to be locked and written no matter what, either
->> immediately before or immediately after.
+On 10/19/2021 6:50 PM, Alex Williamson wrote:
+> On Tue, 19 Oct 2021 09:48:20 -0600
+> Alex Williamson <alex.williamson@redhat.com> wrote:
 >
-> I observe the main overhead of rcuwait_wake_up() is from rcu
-> operations, especially rcu_read_lock/unlock().
+>> On Tue, 19 Oct 2021 13:58:32 +0300
+>> Yishai Hadas <yishaih@nvidia.com> wrote:
+>>
+>>> Add a macro for VFIO_DEVICE_STATE_ERROR to be used to set/check an error
+>>> state.
+>>>
+>>> Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
+>>> ---
+>>>   include/uapi/linux/vfio.h | 2 ++
+>>>   1 file changed, 2 insertions(+)
+>>>
+>>> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+>>> index 114ffcefe437..6d41a0f011db 100644
+>>> --- a/include/uapi/linux/vfio.h
+>>> +++ b/include/uapi/linux/vfio.h
+>>> @@ -631,6 +631,8 @@ struct vfio_device_migration_info {
+>>>   	__u64 data_size;
+>>>   };
+>>>   
+>>> +#define VFIO_DEVICE_STATE_ERROR (VFIO_DEVICE_STATE_SAVING | \
+>>> +				 VFIO_DEVICE_STATE_RESUMING)
+>> This should be with the other VFIO_DEVICE_STATE_foo #defines.  I'd
+>> probably put it between _RESUMING and _MASK.  Thanks,
+> This should also update the existing macros that include _SAVING |
+> _RESUMING.  Thanks,
+>
+> Alex
+>
+Sure, will do as part of V3.
 
-Do you have CONFIG_PREEMPT_RCU set?  If so, maybe something like this would help:
-
-diff --git a/kernel/exit.c b/kernel/exit.c
-index fd1c04193e18..ca1e60a1234d 100644
---- a/kernel/exit.c
-+++ b/kernel/exit.c
-@@ -235,8 +235,6 @@ int rcuwait_wake_up(struct rcuwait *w)
-  	int ret = 0;
-  	struct task_struct *task;
-  
--	rcu_read_lock();
--
-  	/*
-  	 * Order condition vs @task, such that everything prior to the load
-  	 * of @task is visible. This is the condition as to why the user called
-@@ -250,6 +248,14 @@ int rcuwait_wake_up(struct rcuwait *w)
-  	 */
-  	smp_mb(); /* (B) */
-  
-+#ifdef CONFIG_PREEMPT_RCU
-+	/* The cost of rcu_read_lock() is nontrivial for preemptable RCU.  */
-+	if (!rcuwait_active(w))
-+		return ret;
-+#endif
-+
-+	rcu_read_lock();
-+
-  	task = rcu_dereference(w->task);
-  	if (task)
-  		ret = wake_up_process(task);
-
-(If you don't, rcu_read_lock is essentially preempt_disable() and it
-should not have a large overhead).  You still need the memory barrier
-though, in order to avoid missed wakeups; shameless plug for my
-article at https://lwn.net/Articles/847481/.
-
-Paolo
-
->> So with Paolo's other comment, maybe just this?  And if this doesn't provide the
->> desired performance boost, changes to the rcuwait behavior should go in separate
->> patch.
-> Ok.
+Yishai
 
