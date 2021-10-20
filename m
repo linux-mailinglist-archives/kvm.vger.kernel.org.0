@@ -2,201 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1708F4342B9
-	for <lists+kvm@lfdr.de>; Wed, 20 Oct 2021 03:06:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 24BD74342D5
+	for <lists+kvm@lfdr.de>; Wed, 20 Oct 2021 03:24:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230119AbhJTBI4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Oct 2021 21:08:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40282 "EHLO
+        id S229711AbhJTB0P (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Oct 2021 21:26:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44122 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230111AbhJTBIy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Oct 2021 21:08:54 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7611AC061769
-        for <kvm@vger.kernel.org>; Tue, 19 Oct 2021 18:06:40 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id i21-20020a253b15000000b005b9c0fbba45so28013572yba.20
-        for <kvm@vger.kernel.org>; Tue, 19 Oct 2021 18:06:40 -0700 (PDT)
+        with ESMTP id S229604AbhJTB0O (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Oct 2021 21:26:14 -0400
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F316BC061746
+        for <kvm@vger.kernel.org>; Tue, 19 Oct 2021 18:24:00 -0700 (PDT)
+Received: by mail-pl1-x634.google.com with SMTP id t11so14955170plq.11
+        for <kvm@vger.kernel.org>; Tue, 19 Oct 2021 18:24:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=+TeazuyIGE0b+xVHNR0aHwtN74RSpUoopfjfP6MomrY=;
-        b=Ln8iqKC9DJ6UxeW0FTwABMXFNb9SI/dNxEj49U66ZgqJiUdpdlszBjqOsIe5LM6Hhe
-         N8fmwL1E4t1wKXVNu+X2rL5qQlxFac7ii+2DXJtz3AHQPreEt0ZfavIo53RN4g4iodGr
-         dGqKJ+fD2ffzPucFA5+1MnbjI3XUoyPm6j6ZpghhH9MTOhEqaY2qhY/47w+gnz2bnvpD
-         zTg4vmJcDTYe6mU+2sct19CBk+1dCJdvqWcDu64IYkNR1ioJGhmIPkMRHqPcOGHnEhYs
-         RN/BPSsR+Su66Fro5mIb6ckbqynIRuAhAeZVl4pjzszwoNx1GX6uuz0LIJJdnqGhD8vM
-         um1g==
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=XBiL1+Vl4EIWz6otoAM83emtBnaUQE6re7Zy4F/Tl+c=;
+        b=jzeiEr+S9aqIMWjCIxkL3Vz/2qUZyF/ErkeZvyr/HpMW/YUa4nzLSMVZLl4Uk7RM9J
+         GFU9arnMgMlJUjmHO3BtrgTOlxkcsmXYfSw9e7G3jCYCxB5j9GiciLGHDPG2bfJIyLSF
+         d/4PzOVWxoNxMAFMp1rqcbEThM3R0+iTH6SLk=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=+TeazuyIGE0b+xVHNR0aHwtN74RSpUoopfjfP6MomrY=;
-        b=qYbMPTp10iBDgvqHug2W9ADxeGdlpU/tlqtkopIZxrTNG7IEhzXvImI71MB2a9VwdS
-         50enEMKld7D+9FdwNnX+eTX+IQ7NK7BYZuz044GJ5xZvtKvDruKVtZ94TlIVwITXIHni
-         OyWqZD4J/sttVsx2Nj0SZcfWsyyiL9ZYqYC5XSA3jHp0KJx+IeaacfLDlm74GaCQ0muk
-         7hQRDL4mwD7MpaR5s2Yp8bEMyqa7z5VnSBdku2NLxFejvSuogTSJpER6Fo8acpCm18tc
-         Ba3/7luBH9fA5LCJbaJPcl/Ol8XMlfwBv9aPgTpgWWNbOoXQDi0ZpmWSe9jZnUAijL07
-         Zbvg==
-X-Gm-Message-State: AOAM530NKYWA2Dkurf8KcEIyUwUmLUJEtE7O4WF9c9weldSlAITKudej
-        23xTzt8GPTroM1/TziPr9VWCh9Zs+HCzjaQh8FBYgSBjDQ9NyPH2T6jrPF+1EA3frUvwcCCXYQW
-        ZpXUKEB2POIWJokYJY85Lc+6UMy7LWvHyUP1iHrs+s9CNIlytcz2uKNbqVOvg
-X-Google-Smtp-Source: ABdhPJxu162vtC7B9MGQt8LGVxM3e9BPULyYSli1HTz1DxK0tlNmMIJncaUciQanDIMG/vnO2u1NatcQBfkI
-X-Received: from js-desktop.svl.corp.google.com ([2620:15c:2cd:202:25da:c6d7:bf2a:7102])
- (user=junaids job=sendgmr) by 2002:a25:14d6:: with SMTP id
- 205mr38996873ybu.93.1634691999579; Tue, 19 Oct 2021 18:06:39 -0700 (PDT)
-Date:   Tue, 19 Oct 2021 18:06:27 -0700
-Message-Id: <20211020010627.305925-1-junaids@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.33.0.1079.g6e70778dc9-goog
-Subject: [PATCH v3] kvm: x86: mmu: Make NX huge page recovery period configurable
-From:   Junaid Shahid <junaids@google.com>
-To:     kvm@vger.kernel.org, pbonzini@redhat.com
-Cc:     jmattson@google.com, seanjc@google.com, bgardon@google.com,
-        dmatlack@google.com
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=XBiL1+Vl4EIWz6otoAM83emtBnaUQE6re7Zy4F/Tl+c=;
+        b=Us9wPC+LFlA+mMggIT5aKx/DUPNwGe7WYKYjPrv3i6yA66dSbYFdereqQMwMeCGjIe
+         qHgV+rGiBbW/WZZZjmtEGTbMulq65Y2N9NnCxRmsaQgT3iG9HFz5HcY5axgHtqC9E8Ab
+         rORkiLWL2Im4fFTP2ucUUqoR9vDKSLYp65HvilnWTRoUMNQ0Yhmv3kcdpr+CXeXd+Ae3
+         D/nWwBLzefRqbX0c9TyYmYsT/+/0a/D0rle0IZysPf13QmqR2Xp3B5BPmbaUI2kOuSZB
+         04rLuzeyspHtC7izjjUyt7W7J9kKXMST4fdXlngONeo8Hfgnp4O7mFUAvQHbl0V3XrgS
+         l7+g==
+X-Gm-Message-State: AOAM530WPfADmPIIHub4Ra2Yo+KDGRGpMvzOMwkLRlu+rM7fb4BiYWgo
+        rgb/Xqdut59khU618Pd0tFLa5Q==
+X-Google-Smtp-Source: ABdhPJyHsTnt8CO2I4siTq9gz2mS3EIOy0HlQCeT4J7kNCw9lXcsEO8FgTyCvhnVA8pGiJR7+vBWjg==
+X-Received: by 2002:a17:90b:248:: with SMTP id fz8mr3702172pjb.157.1634693040458;
+        Tue, 19 Oct 2021 18:24:00 -0700 (PDT)
+Received: from google.com ([2409:10:2e40:5100:490f:f89:7449:e615])
+        by smtp.gmail.com with ESMTPSA id y1sm428665pfo.104.2021.10.19.18.23.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Oct 2021 18:23:59 -0700 (PDT)
+Date:   Wed, 20 Oct 2021 10:23:54 +0900
+From:   Sergey Senozhatsky <senozhatsky@chromium.org>
+To:     David Matlack <dmatlack@google.com>
+Cc:     Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Suleiman Souhlal <suleiman@google.com>,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCHV2 1/3] KVM: x86: introduce kvm_mmu_pte_prefetch structure
+Message-ID: <YW9vqgwU+/iVooXj@google.com>
+References: <20211019153214.109519-1-senozhatsky@chromium.org>
+ <20211019153214.109519-2-senozhatsky@chromium.org>
+ <CALzav=cLXXZYBSH6iJifkqVijLAU5EvgVg2W4HKhqke2JBa+yg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CALzav=cLXXZYBSH6iJifkqVijLAU5EvgVg2W4HKhqke2JBa+yg@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Currently, the NX huge page recovery thread wakes up every minute and
-zaps 1/nx_huge_pages_recovery_ratio of the total number of split NX
-huge pages at a time. This is intended to ensure that only a
-relatively small number of pages get zapped at a time. But for very
-large VMs (or more specifically, VMs with a large number of
-executable pages), a period of 1 minute could still result in this
-number being too high (unless the ratio is changed significantly,
-but that can result in split pages lingering on for too long).
+On (21/10/19 15:44), David Matlack wrote:
+> On Tue, Oct 19, 2021 at 8:32 AM Sergey Senozhatsky
+> <senozhatsky@chromium.org> wrote:
+> >
+> > kvm_mmu_pte_prefetch is a per-VCPU structure that holds a PTE
+> > prefetch pages array, lock and the number of PTE to prefetch.
+> >
+> > This is needed to turn PTE_PREFETCH_NUM into a tunable VM
+> > parameter.
+> >
+> > Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+> > ---
+> >  arch/x86/include/asm/kvm_host.h | 12 +++++++
+> >  arch/x86/kvm/mmu.h              |  4 +++
+> >  arch/x86/kvm/mmu/mmu.c          | 57 ++++++++++++++++++++++++++++++---
+> >  arch/x86/kvm/x86.c              |  9 +++++-
+> >  4 files changed, 77 insertions(+), 5 deletions(-)
+> >
+> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> > index 5271fce6cd65..11400bc3c70d 100644
+> > --- a/arch/x86/include/asm/kvm_host.h
+> > +++ b/arch/x86/include/asm/kvm_host.h
+> > @@ -607,6 +607,16 @@ struct kvm_vcpu_xen {
+> >         u64 runstate_times[4];
+> >  };
+> >
+> > +struct kvm_mmu_pte_prefetch {
+> > +       /*
+> > +        * This will be cast either to array of pointers to struct page,
+> > +        * or array of u64, or array of u32
+> > +        */
+> > +       void *ents;
+> > +       unsigned int num_ents;
+> > +       spinlock_t lock;
+> 
+> The spinlock is overkill. I'd suggest something like this:
+> - When VM-ioctl is invoked to update prefetch count, store it in
+> kvm_arch. No synchronization with vCPUs needed.
+> - When a vCPU takes a fault: Read the prefetch count from kvm_arch. If
+> different than count at last fault, re-allocate vCPU prefetch array.
+> (So you'll need to add prefetch array and count to kvm_vcpu_arch as
+> well.)
+> 
+> No extra locks are needed. vCPUs that fault after the VM-ioctl will
+> get the new prefetch count. We don't really care if a prefetch count
+> update races with a vCPU fault as long as vCPUs are careful to only
+> read the count once (i.e. use READ_ONCE(vcpu->kvm.prefetch_count)) and
+> use that. Assuming prefetch count ioctls are rare, the re-allocation
+> on the fault path will be rare as well.
 
-This change makes the period configurable instead of fixing it at
-1 minute. Users of large VMs can then adjust the period and/or the
-ratio to reduce the number of pages zapped at one time while still
-maintaining the same overall duration for cycling through the
-entire list. By default, KVM derives a period from the ratio such
-that the entire list can be zapped in 1 hour.
+So reallocation from the faul-path should happen before vCPU takes the
+mmu_lock? And READ_ONCE(prefetch_count) should also happen before vCPU
+takes mmu_lock, I assume, so we need to pass it as a parameter to all
+the functions that will access prefetch array.
 
-Signed-off-by: Junaid Shahid <junaids@google.com>
----
-v3:
- - Wake up the recovery thread if the new period is less than the old.
- 
-v2:
- - A configured period of 0 now automatically derives the actual period
-   from the ratio.
-    
- .../admin-guide/kernel-parameters.txt         | 10 ++++-
- arch/x86/kvm/mmu/mmu.c                        | 38 +++++++++++++------
- 2 files changed, 36 insertions(+), 12 deletions(-)
+> Note: You could apply this same approach to a module param, except
+> vCPUs would be reading the module param rather than vcpu->kvm during
+> each fault.
+> 
+> And the other alternative, like you suggested in the other patch, is
+> to use a vCPU ioctl. That would side-step the synchronization issue
+> because vCPU ioctls require the vCPU mutex. So the reallocation could
+> be done in the ioctl and not at fault time.
 
-diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-index 91ba391f9b32..dd47336a525f 100644
---- a/Documentation/admin-guide/kernel-parameters.txt
-+++ b/Documentation/admin-guide/kernel-parameters.txt
-@@ -2353,7 +2353,15 @@
- 			[KVM] Controls how many 4KiB pages are periodically zapped
- 			back to huge pages.  0 disables the recovery, otherwise if
- 			the value is N KVM will zap 1/Nth of the 4KiB pages every
--			minute.  The default is 60.
-+			period (see below).  The default is 60.
-+
-+	kvm.nx_huge_pages_recovery_period_ms=
-+			[KVM] Controls the time period at which KVM zaps 4KiB pages
-+			back to huge pages. If the value is a non-zero N, KVM will
-+			zap a portion (see ratio above) of the pages every N msecs.
-+			If the value is 0 (the default), KVM will pick a period based
-+			on the ratio such that the entire set of pages can be zapped
-+			in approximately 1 hour on average.
- 
- 	kvm-amd.nested=	[KVM,AMD] Allow nested virtualization in KVM/SVM.
- 			Default is 1 (enabled)
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 24a9f4c3f5e7..4ffabad29baf 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -58,6 +58,7 @@
- extern bool itlb_multihit_kvm_mitigation;
- 
- int __read_mostly nx_huge_pages = -1;
-+static uint __read_mostly nx_huge_pages_recovery_period_ms;
- #ifdef CONFIG_PREEMPT_RT
- /* Recovery can cause latency spikes, disable it for PREEMPT_RT.  */
- static uint __read_mostly nx_huge_pages_recovery_ratio = 0;
-@@ -66,23 +67,26 @@ static uint __read_mostly nx_huge_pages_recovery_ratio = 60;
- #endif
- 
- static int set_nx_huge_pages(const char *val, const struct kernel_param *kp);
--static int set_nx_huge_pages_recovery_ratio(const char *val, const struct kernel_param *kp);
-+static int set_nx_huge_pages_recovery_param(const char *val, const struct kernel_param *kp);
- 
- static const struct kernel_param_ops nx_huge_pages_ops = {
- 	.set = set_nx_huge_pages,
- 	.get = param_get_bool,
- };
- 
--static const struct kernel_param_ops nx_huge_pages_recovery_ratio_ops = {
--	.set = set_nx_huge_pages_recovery_ratio,
-+static const struct kernel_param_ops nx_huge_pages_recovery_param_ops = {
-+	.set = set_nx_huge_pages_recovery_param,
- 	.get = param_get_uint,
- };
- 
- module_param_cb(nx_huge_pages, &nx_huge_pages_ops, &nx_huge_pages, 0644);
- __MODULE_PARM_TYPE(nx_huge_pages, "bool");
--module_param_cb(nx_huge_pages_recovery_ratio, &nx_huge_pages_recovery_ratio_ops,
-+module_param_cb(nx_huge_pages_recovery_ratio, &nx_huge_pages_recovery_param_ops,
- 		&nx_huge_pages_recovery_ratio, 0644);
- __MODULE_PARM_TYPE(nx_huge_pages_recovery_ratio, "uint");
-+module_param_cb(nx_huge_pages_recovery_period_ms, &nx_huge_pages_recovery_param_ops,
-+		&nx_huge_pages_recovery_period_ms, 0644);
-+__MODULE_PARM_TYPE(nx_huge_pages_recovery_period_ms, "uint");
- 
- static bool __read_mostly force_flush_and_sync_on_reuse;
- module_param_named(flush_on_reuse, force_flush_and_sync_on_reuse, bool, 0644);
-@@ -6088,18 +6092,24 @@ void kvm_mmu_module_exit(void)
- 	mmu_audit_disable();
- }
- 
--static int set_nx_huge_pages_recovery_ratio(const char *val, const struct kernel_param *kp)
-+static int set_nx_huge_pages_recovery_param(const char *val, const struct kernel_param *kp)
- {
--	unsigned int old_val;
-+	bool was_recovery_enabled, is_recovery_enabled;
-+	uint old_period, new_period;
- 	int err;
- 
--	old_val = nx_huge_pages_recovery_ratio;
-+	was_recovery_enabled = nx_huge_pages_recovery_ratio;
-+	old_period = nx_huge_pages_recovery_period_ms;
-+
- 	err = param_set_uint(val, kp);
- 	if (err)
- 		return err;
- 
--	if (READ_ONCE(nx_huge_pages) &&
--	    !old_val && nx_huge_pages_recovery_ratio) {
-+	is_recovery_enabled = nx_huge_pages_recovery_ratio;
-+	new_period = nx_huge_pages_recovery_period_ms;
-+
-+	if (READ_ONCE(nx_huge_pages) && is_recovery_enabled &&
-+	    (!was_recovery_enabled || old_period > new_period)) {
- 		struct kvm *kvm;
- 
- 		mutex_lock(&kvm_lock);
-@@ -6162,8 +6172,14 @@ static void kvm_recover_nx_lpages(struct kvm *kvm)
- 
- static long get_nx_lpage_recovery_timeout(u64 start_time)
- {
--	return READ_ONCE(nx_huge_pages) && READ_ONCE(nx_huge_pages_recovery_ratio)
--		? start_time + 60 * HZ - get_jiffies_64()
-+	uint ratio = READ_ONCE(nx_huge_pages_recovery_ratio);
-+	uint period = READ_ONCE(nx_huge_pages_recovery_period_ms);
-+
-+	if (!period && ratio)
-+		period = 60 * 60 * 1000 / ratio;
-+
-+	return READ_ONCE(nx_huge_pages) && ratio
-+		? start_time + msecs_to_jiffies(period) - get_jiffies_64()
- 		: MAX_SCHEDULE_TIMEOUT;
- }
- 
--- 
-2.33.0.1079.g6e70778dc9-goog
+One more idea, wonder what do you think:
 
+There is an upper limit on the number of PTEs we prefault, which is 128 as of
+now, but I think 64 will be good enough, or maybe even 32. So we can always
+allocate MAX_PTE_PREFETCH_NUM arrays in vcpu->arch and ioctl() will change
+->num_ents only, which is always in (0, MAX_PTE_PREFETCH_NUM - 1] range. This
+way we never have to reallocate anything, we just adjust the "maximum index"
+value.
+
+> Taking a step back, can you say a bit more about your usecase?
+
+We are looking at various ways of reducing the number of vm-exits. There
+is only one VM running on the device (a pretty low-end laptop).
