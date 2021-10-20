@@ -2,71 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1949B434EAE
-	for <lists+kvm@lfdr.de>; Wed, 20 Oct 2021 17:10:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 85839434EB8
+	for <lists+kvm@lfdr.de>; Wed, 20 Oct 2021 17:11:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230242AbhJTPMv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Oct 2021 11:12:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:49108 "EHLO
+        id S230385AbhJTPNn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Oct 2021 11:13:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:32476 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229570AbhJTPMu (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 20 Oct 2021 11:12:50 -0400
+        by vger.kernel.org with ESMTP id S230349AbhJTPNm (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 20 Oct 2021 11:13:42 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634742635;
+        s=mimecast20190719; t=1634742687;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=mjiPTfW2gLGy0hlLQoZymCi13i6pwqBjAytBG2xMmKU=;
-        b=YiHvG5NtMOX+ihYX+ri8BY+w1klww0Ssky4U1h/FynilM2aNmD29eyzs+9dfxfKaYjWmAQ
-        1zBG+N//wwxVgw8qTp+lkxcGcwiCaDpplqUHOW9gBt478l1Xjohgs2oeIhcSJZ7fpPc9k4
-        Efqc5gSKinnahaRqJrE6ZVKhUFQ5a5g=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-496-XAbRhbHQNg26xASgf4sTBQ-1; Wed, 20 Oct 2021 11:10:32 -0400
-X-MC-Unique: XAbRhbHQNg26xASgf4sTBQ-1
-Received: by mail-ed1-f71.google.com with SMTP id g28-20020a50d0dc000000b003dae69dfe3aso21286436edf.7
-        for <kvm@vger.kernel.org>; Wed, 20 Oct 2021 08:10:32 -0700 (PDT)
+        bh=GOYfInL+R09Jr/3grGwySWrsCmTDAjA+a7Ga2IIQs4I=;
+        b=KBDMtUGw69eYnWvKyAB9E3UDuf0uqJZ2gTSF6mtjxW96IZmCoAeLiQWrNDAjAplON0lQYq
+        woKjTjE2jtkuu9CInwUPsvdO/Xv/bcJuBfSMqXLp3hu4RPFV3gKjB6SkDa4+QeO4eZ8v76
+        ta1aAZUAoKAyud3QCgsnBSgYe6elvRg=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-348-eUS2hm6QNoqIxJdRL5MM_A-1; Wed, 20 Oct 2021 11:11:25 -0400
+X-MC-Unique: eUS2hm6QNoqIxJdRL5MM_A-1
+Received: by mail-ed1-f72.google.com with SMTP id t18-20020a056402021200b003db9e6b0e57so21306835edv.10
+        for <kvm@vger.kernel.org>; Wed, 20 Oct 2021 08:11:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=mjiPTfW2gLGy0hlLQoZymCi13i6pwqBjAytBG2xMmKU=;
-        b=wrWGY+OU3pCvc1cuGE+ubid+iyldr96sCGBHSN7l+TwsoMUATpfomTDHfOs1wk/wRW
-         FkAhFHA9fWIldgblFnDTaWOjT1T2eNl+7YOiBUpDngpFiA/swB0ifWL9Cs+b+MQRTOfv
-         pXFlyeC2N9vPItFwXVV+II0tauEHGF4ctSZCvHx5GV8k4jV33I3jJkIJSlCMZNhNGIRg
-         v7vWoUajCdMKV/kJ/+/juC6NpVkXR0K/8d8mHKpELUUbGPwhzW5FYw9OiVnFhAH2+Syf
-         EJFaeMPDDs2Z+N6JDR/nweq4u6sBbuk5WGISyZN2KNfJqFBgYgmvDwdU0lo28Sc87GEW
-         HyoQ==
-X-Gm-Message-State: AOAM532jYyf/FKcY6QIzv5S+frQR1W3VTMMzzhzCZyXt2RV4lM4JtiL6
-        vNc7VaFQcoQ/SfF3jOedxQDUzZfkrYln8Id39WhuCMOyF8poE9o9QeDJa/PrPnFlaWm5FElmbom
-        Tl1YowWeWaryp
-X-Received: by 2002:a17:906:4e89:: with SMTP id v9mr157658eju.354.1634742631014;
-        Wed, 20 Oct 2021 08:10:31 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwOiI08Fc457AZgGg4vyem413WiqWwlWvwqbyzTXb+9Udsh3EHSyIQVD4+5piQwEsyTpoNqLw==
-X-Received: by 2002:a17:906:4e89:: with SMTP id v9mr157626eju.354.1634742630754;
-        Wed, 20 Oct 2021 08:10:30 -0700 (PDT)
+        bh=GOYfInL+R09Jr/3grGwySWrsCmTDAjA+a7Ga2IIQs4I=;
+        b=iZ05Id8OZPRSWUNBTk7geiH6eorvX36FUor5xZTAysAufm+xNiGOW0gqS9mmSnX9Lh
+         N9h1v9plIAP0CZTq9fzWQdDnIz6dzUKmMghXi1tCyogMj0BDZH3ECd46ms4UktKKAUgY
+         J7G2TV01BZsdZOt0LtGer5cWcTlzKir2iZH+GPv+1EUpAQUXgvJJFTOnvKuTwj8p2SHJ
+         jDXba8Twocr9RxNt/rXf0Gas2bin2GLSVDII6bVp/FvR3yNovXknx3uiZybrqqOD4B+I
+         lAQQ+Tth3k7sCVORwddqN/e4a9ayl0nMLQaOs7zIfZU3Mhjdev1pahsUyL8/pzlXBeS7
+         8epA==
+X-Gm-Message-State: AOAM5323PVDA3Do41G1HI0OcVGvnDUeBI7YOmZWsOsBFgWnDIXcZM+LZ
+        tRLbieIyK8TohUIV6/4aT2MDHxSVWg6wri6wRfP/D823oi6IB9A0IRLj6DseyqEwzvTHXIJwPEb
+        LeWesN8vLzJoj
+X-Received: by 2002:a17:906:9b46:: with SMTP id ep6mr189496ejc.226.1634742684665;
+        Wed, 20 Oct 2021 08:11:24 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwdeN5qQWOCw/apNli222nhXI/ouf8NYxOHZox6BRrfy9DcoMQO5en5TGPq0wDQ2cVjgc307Q==
+X-Received: by 2002:a17:906:9b46:: with SMTP id ep6mr189472ejc.226.1634742684420;
+        Wed, 20 Oct 2021 08:11:24 -0700 (PDT)
 Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id n6sm1320390eds.10.2021.10.20.08.10.29
+        by smtp.gmail.com with ESMTPSA id p26sm1311726edu.57.2021.10.20.08.11.21
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 20 Oct 2021 08:10:30 -0700 (PDT)
-Message-ID: <b2aebaba-92bc-865d-5d52-6810ba08ceaa@redhat.com>
-Date:   Wed, 20 Oct 2021 17:10:28 +0200
+        Wed, 20 Oct 2021 08:11:23 -0700 (PDT)
+Message-ID: <cbe5d411-ba9b-0600-2c69-1f73f1d941df@redhat.com>
+Date:   Wed, 20 Oct 2021 17:11:20 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.1.0
-Subject: Re: [PATCH v1 1/5] KVM: x86: nVMX: Add vmcs12 field existence bitmap
- in nested_vmx
+Subject: Re: [PATCH v1 2/5] KVM: x86: nVMX: Update VMCS12 fields existence
+ when nVMX MSRs are set
 Content-Language: en-US
 To:     Robert Hoo <robert.hu@linux.intel.com>, seanjc@google.com,
         vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
         joro@8bytes.org
 Cc:     kvm@vger.kernel.org, yu.c.zhang@linux.intel.com
 References: <1629192673-9911-1-git-send-email-robert.hu@linux.intel.com>
- <1629192673-9911-2-git-send-email-robert.hu@linux.intel.com>
+ <1629192673-9911-3-git-send-email-robert.hu@linux.intel.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <1629192673-9911-2-git-send-email-robert.hu@linux.intel.com>
+In-Reply-To: <1629192673-9911-3-git-send-email-robert.hu@linux.intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
@@ -74,57 +74,17 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 17/08/21 11:31, Robert Hoo wrote:
-> +#define FIELD_BIT_SET(name, bitmap) set_bit(f_pos(name), bitmap)
-> +#define FIELD64_BIT_SET(name, bitmap)	\
-> +	do {set_bit(f_pos(name), bitmap);	\
-> +	    set_bit(f_pos(name) + (sizeof(u32) / sizeof(u16)), bitmap);\
-> +	} while (0)
-> +
-> +#define FIELD_BIT_CLEAR(name, bitmap) clear_bit(f_pos(name), bitmap)
-> +#define FIELD64_BIT_CLEAR(name, bitmap)	\
-> +	do {clear_bit(f_pos(name), bitmap);	\
-> +	    clear_bit(f_pos(name) + (sizeof(u32) / sizeof(u16)), bitmap);\
-> +	} while (0)
-> +
-> +#define FIELD_BIT_CHANGE(name, bitmap) change_bit(f_pos(name), bitmap)
-> +#define FIELD64_BIT_CHANGE(name, bitmap)	\
-> +	do {change_bit(f_pos(name), bitmap);	\
-> +	    change_bit(f_pos(name) + (sizeof(u32) / sizeof(u16)), bitmap);\
-> +	} while (0)
-> +
-> +/*
+> +		vmcs12_field_update_by_vmexit_ctrl(vmx->nested.msrs.entry_ctls_high,
+> +				*highp, data >> 32,
+> +				vmx->nested.vmcs12_field_existence_bitmap);
+> +		break;
+> +	case MSR_IA32_VMX_TRUE_ENTRY_CTLS:
+> +		vmcs12_field_update_by_vmentry_ctrl(vmx->nested.msrs.exit_ctls_high,
+> +				*highp, data >> 32,
+> +				vmx->nested.vmcs12_field_existence_bitmap);
 
-Hi Robert,
-
-I'd rather not have FIELD_BIT_CHANGE, and instead have something like
-
-#define FIELD_BIT_ASSIGN(name, bitmap, value) \
-	if (value) \
-		FIELD_BIT_SET(name, bitmap); \
-	else
-		FIELD_BIT_CLEAR(name, bitmap);
-
-Also, these set_bit/clear_bit can use the non-atomic variants __set_bit 
-and __clear_bit, because the bitmaps are protected by the vCPU mutex.
-
-> +		FIELD64_BIT_CHANGE(posted_intr_desc_addr, bitmap);
-
-Many of the fields you mark as 64-bit are actually natural sized.
-
-> +	if ((old_val ^ new_val) &
-> +	    CPU_BASED_ACTIVATE_SECONDARY_CONTROLS) {
-> +		FIELD_BIT_CHANGE(secondary_vm_exec_control, bitmap);
-> +	}
-> +}
-
-If secondary controls are not available, you should treat the 
-corresponding MSR as if it was all zeroes.  Likewise if VMFUNC is disabled.
-
-> +	if ((old_val ^ new_val) & SECONDARY_EXEC_PAUSE_LOOP_EXITING) {
-> +		FIELD64_BIT_CHANGE(vmread_bitmap, bitmap);
-> +		FIELD64_BIT_CHANGE(vmwrite_bitmap, bitmap);
-
-This seems wrong.
+These two functions maybe could be merged into just one, since there are 
+going to be duplicate checks.
 
 Paolo
 
