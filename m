@@ -2,99 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A014434399
-	for <lists+kvm@lfdr.de>; Wed, 20 Oct 2021 04:49:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8565C4343EC
+	for <lists+kvm@lfdr.de>; Wed, 20 Oct 2021 05:38:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229678AbhJTCvk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Oct 2021 22:51:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34710 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229555AbhJTCvk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Oct 2021 22:51:40 -0400
-Received: from mail-oi1-x233.google.com (mail-oi1-x233.google.com [IPv6:2607:f8b0:4864:20::233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86480C06161C;
-        Tue, 19 Oct 2021 19:49:26 -0700 (PDT)
-Received: by mail-oi1-x233.google.com with SMTP id v77so7891867oie.1;
-        Tue, 19 Oct 2021 19:49:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=tZtjUsGVsJLS4CvCJymVm70tVuEVaZ7HK9v4ONvYgro=;
-        b=HYDe2nHsrKcit3rKbThWGTTOGMJf7R5JdSLMxBFEji2L0oT0iOyPxUAsP8ot90nFEX
-         rF+7KBxkXoEuL9A0xVvbSqbNHF8nRdurfv0rYCJWvOOhVRNJHlE6Ww+bASUqwuABrE9t
-         ICssh6v8x40A6p/a4WrCQ38XpqbO6X2TY9m8vK+FDTskA3pHn5+2cs+/Ll+t9l4XhBbj
-         JvYWePs9xn6pQAR68BhhRZ8NiizrXMt1AYRu3NwryaezMb5VyKRbVmnmmP5B1m1oO7fg
-         gYqvkt1VbWy9XSLuYysAwnrDPVEq7YGl/xflt3dAT4QgEO5lglpPhoFP5A0ZviZztRNB
-         Vatw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=tZtjUsGVsJLS4CvCJymVm70tVuEVaZ7HK9v4ONvYgro=;
-        b=ZP7coRAai3G+H/FpzSh0AJiDSedHMhngg88sh/W5xGxFXXAK0sE+vGXkHagao8tnIg
-         HVFlRNIyL0kHQ9xBs1QG+OoPbaZzQoWaOz4v/Jy+E+QqyNuh234mowkPyo6pEiVkY+V9
-         Iaqzk4KKVo20X92d56pLj8azduJz0Wy9asbKwUH1XQOG/VBntEO5f4m3bpBAHQgyKzMq
-         dATa3VLPoGDF6B+ST5igszkGfWfrBB9DK5QZdyAa5M84WG4dsQBZut7/WytaSGn3mFhE
-         8/TQ0+7FIprWdLmLx3eYB8U09WmfPEFDXxnxSlpuOW9KdGber/j8K9/CkN2e9/IZGou2
-         XMGQ==
-X-Gm-Message-State: AOAM530Tycs6DdVLu279pFjzVdNnNSK3UnlqjKAZRO0wMTpiTngMzz2y
-        f9CMJy9FUVLDvaQK0y5hBC9ewT/TvyGzF6+i594=
-X-Google-Smtp-Source: ABdhPJzttPSjDLjxxS0gL+1B5v44Q2oNpxWTf+tmUw99FoWBiGEmNJQ45p7McgbunGY3za6HcFsg0/NDL5bEEfhCTXM=
-X-Received: by 2002:aca:3f87:: with SMTP id m129mr6985212oia.5.1634698165919;
- Tue, 19 Oct 2021 19:49:25 -0700 (PDT)
+        id S229735AbhJTDit (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Oct 2021 23:38:49 -0400
+Received: from mx22.baidu.com ([220.181.50.185]:35014 "EHLO baidu.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S229555AbhJTDis (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Oct 2021 23:38:48 -0400
+Received: from BC-Mail-Ex16.internal.baidu.com (unknown [172.31.51.56])
+        by Forcepoint Email with ESMTPS id 6FC60B36E7AEADDC5996;
+        Wed, 20 Oct 2021 11:36:26 +0800 (CST)
+Received: from BJHW-Mail-Ex15.internal.baidu.com (10.127.64.38) by
+ BC-Mail-Ex16.internal.baidu.com (172.31.51.56) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2242.12; Wed, 20 Oct 2021 11:36:26 +0800
+Received: from BJHW-Mail-Ex15.internal.baidu.com ([100.100.100.38]) by
+ BJHW-Mail-Ex15.internal.baidu.com ([100.100.100.38]) with mapi id
+ 15.01.2308.014; Wed, 20 Oct 2021 11:36:26 +0800
+From:   "Li,Rongqing" <lirongqing@baidu.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+CC:     "seanjc@google.com" <seanjc@google.com>,
+        "wanpengli@tencent.com" <wanpengli@tencent.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>, "x86@kernel.org" <x86@kernel.org>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: =?utf-8?B?562U5aSNOiBbUEFUQ0hdIEtWTTogQ2xlYXIgcHYgZW9pIHBlbmRpbmcgYml0?=
+ =?utf-8?Q?_only_when_it_is_set?=
+Thread-Topic: [PATCH] KVM: Clear pv eoi pending bit only when it is set
+Thread-Index: AQHXxI34DWGf3tlYw06xK547fXtZjqvZZTmAgAABlACAAdXDEA==
+Date:   Wed, 20 Oct 2021 03:36:26 +0000
+Message-ID: <1b9c965dfbac457e8407f00e930f6449@baidu.com>
+References: <1634609144-28952-1-git-send-email-lirongqing@baidu.com>
+ <87y26pwk96.fsf@vitty.brq.redhat.com>
+ <876df534-a280-dc26-6a70-a1464bacad5f@redhat.com>
+In-Reply-To: <876df534-a280-dc26-6a70-a1464bacad5f@redhat.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [172.22.206.4]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <1634631160-67276-1-git-send-email-wanpengli@tencent.com>
- <1634631160-67276-3-git-send-email-wanpengli@tencent.com> <24e67e43-c50c-7e0f-305a-c7f6129f8d70@redhat.com>
- <YW8BmRJHVvFscWTo@google.com>
-In-Reply-To: <YW8BmRJHVvFscWTo@google.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Wed, 20 Oct 2021 10:49:14 +0800
-Message-ID: <CANRm+CzuWnO8FZPTvvOtpxqc5h786o7THyebOFpVAp3BF1xQiw@mail.gmail.com>
-Subject: Re: [PATCH v3 3/3] KVM: vCPU kick tax cut for running vCPU
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 20 Oct 2021 at 01:34, Sean Christopherson <seanjc@google.com> wrote:
->
-> On Tue, Oct 19, 2021, Paolo Bonzini wrote:
-> > On 19/10/21 10:12, Wanpeng Li wrote:
-> > > -   if (kvm_vcpu_wake_up(vcpu))
-> > > -           return;
-> > > +   me = get_cpu();
-> > > +
-> > > +   if (rcuwait_active(kvm_arch_vcpu_get_wait(vcpu)) && kvm_vcpu_wake_up(vcpu))
-> > > +           goto out;
-> >
-> > This is racy.  You are basically doing the same check that rcuwait_wake_up
-> > does, but without the memory barrier before.
->
-> I was worried that was the case[*], but I didn't have the two hours it would have
-> taken me to verify there was indeed a problem :-)
->
-> The intent of the extra check was to avoid the locked instruction that comes with
-> disabling preemption via rcu_read_lock().  But thinking more, the extra op should
-> be little more than a basic arithmetic operation in the grand scheme on modern x86
-> since the cache line is going to be locked and written no matter what, either
-> immediately before or immediately after.
-
-I observe the main overhead of rcuwait_wake_up() is from rcu
-operations, especially rcu_read_lock/unlock().
-
->
-> So with Paolo's other comment, maybe just this?  And if this doesn't provide the
-> desired performance boost, changes to the rcuwait behavior should go in separate
-> patch.
-
-Ok.
-
-    Wanpeng
+DQoNCj4gLS0tLS3pgq7ku7bljp/ku7YtLS0tLQ0KPiDlj5Hku7bkuro6IFBhb2xvIEJvbnppbmkg
+PHBib256aW5pQHJlZGhhdC5jb20+DQo+IOWPkemAgeaXtumXtDogMjAyMeW5tDEw5pyIMTnml6Ug
+MTU6MjkNCj4g5pS25Lu25Lq6OiBWaXRhbHkgS3V6bmV0c292IDx2a3V6bmV0c0ByZWRoYXQuY29t
+PjsgTGksUm9uZ3FpbmcNCj4gPGxpcm9uZ3FpbmdAYmFpZHUuY29tPg0KPiDmioTpgIE6IHNlYW5q
+Y0Bnb29nbGUuY29tOyB3YW5wZW5nbGlAdGVuY2VudC5jb207IGptYXR0c29uQGdvb2dsZS5jb207
+DQo+IGpvcm9AOGJ5dGVzLm9yZzsgdGdseEBsaW51dHJvbml4LmRlOyBtaW5nb0ByZWRoYXQuY29t
+OyBicEBhbGllbjguZGU7DQo+IHg4NkBrZXJuZWwub3JnOyBocGFAenl0b3IuY29tOyBrdm1Admdl
+ci5rZXJuZWwub3JnDQo+IOS4u+mimDogUmU6IFtQQVRDSF0gS1ZNOiBDbGVhciBwdiBlb2kgcGVu
+ZGluZyBiaXQgb25seSB3aGVuIGl0IGlzIHNldA0KPiANCj4gT24gMTkvMTAvMjEgMDk6MjMsIFZp
+dGFseSBLdXpuZXRzb3Ygd3JvdGU6DQo+ID4+DQo+ID4+IC1zdGF0aWMgdm9pZCBwdl9lb2lfY2xy
+X3BlbmRpbmcoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KQ0KPiA+PiArc3RhdGljIHZvaWQgcHZfZW9p
+X2Nscl9wZW5kaW5nKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgYm9vbCBwZW5kaW5nKQ0KPiA+IE5p
+dHBpY2sgKGFuZCBwcm9iYWJseSBhIG1hdHRlciBvZiBwZXJzb25hbCB0YXN0ZSk6DQo+ID4gcHZf
+ZW9pX2Nscl9wZW5kaW5nKCkgaGFzIG9ubHkgb25lIHVzZXIgYW5kIHRoZSBjaGFuZ2UgZG9lc24n
+dCBtYWtlIGl0cw0KPiA+IGludGVyZmFjZSBtdWNoIG5pY2VyLCBJJ2Qgc3VnZ2VzdCB3ZSBqdXN0
+IGlubGluZSBpbiBpbnN0ZWFkLiAod2UgY2FuDQo+ID4gcHJvYmFibHkgZG8gdGhlIHNhbWUgdG8N
+Cj4gPiBwdl9lb2lfZ2V0X3BlbmRpbmcoKS9wdl9lb2lfc2V0X3BlbmRpbmcoKSB0b28pLg0KPiAN
+Cj4gQWx0ZXJuYXRpdmVseSwgbWVyZ2UgcHZfZW9pX2dldF9wZW5kaW5nIGFuZCBwdl9lb2lfY2xy
+X3BlbmRpbmcgaW50byBhIHNpbmdsZQ0KPiBmdW5jdGlvbiBwdl9lb2lfdGVzdF9hbmRfY2xlYXJf
+cGVuZGluZywgd2hpY2ggcmV0dXJucyB0aGUgdmFsdWUgb2YgdGhlDQo+IHBlbmRpbmcgYml0Lg0K
+PiANCj4gU28gdGhlIGNhbGxlciBjYW4gZG8gZXNzZW50aWFsbHk6DQo+IA0KPiAtCXBlbmRpbmcg
+PSBwdl9lb2lfZ2V0X3BlbmRpbmcodmNwdSk7DQo+IC0JcHZfZW9pX2Nscl9wZW5kaW5nKHZjcHUp
+Ow0KPiAtCWlmIChwZW5kaW5nKQ0KPiArCWlmIChwdl9lb2lfdGVzdF9hbmRfY2xlYXJfcGVuZGlu
+Zyh2Y3B1KSkNCj4gICAgICAgICAgICAgICAgICByZXR1cm47DQo+IA0KPiANCg0KSXQgaXMgYmV0
+dGVyIHRvIGltcGxlbWVudCBwdl9lb2lfdGVzdF9hbmRfY2xlYXJfcGVuZGluZygpLCBhbmQgaXQg
+Y2FuIGZpeCB0aGUgcmFjZSB0aGF0IFZpdGFseSBzdWdnZXN0ZWQNCg0KQW5kIEkgd2lsbCB3cml0
+ZSBhIG5ldyBmdW5jdGlvbiBrdm1fdGVzdF9hbmRfY2xlYXJfYml0X2d1ZXN0X2NhY2hlZCwgdG8g
+YmUgY2FsbGVkIGluIHB2X2VvaV90ZXN0X2FuZF9jbGVhcl9wZW5kaW5nDQoNCkJvb2wga3ZtX3Rl
+c3RfYW5kX2NsZWFyX2JpdF9ndWVzdF9jYWNoZWTvvIhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHXvvIwg
+IHN0cnVjdCBnZm5fdG9faHZhX2NhY2hlICogZ2hj77yMIGxvbmcgbnLvvIkNCg0KLUxpIA0KDQo+
+IFBhb2xvDQoNCg==
