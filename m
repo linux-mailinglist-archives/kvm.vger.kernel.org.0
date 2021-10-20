@@ -2,127 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E728343493D
-	for <lists+kvm@lfdr.de>; Wed, 20 Oct 2021 12:45:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 69503434963
+	for <lists+kvm@lfdr.de>; Wed, 20 Oct 2021 12:51:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230192AbhJTKrg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Oct 2021 06:47:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:26740 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230174AbhJTKrf (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 20 Oct 2021 06:47:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634726721;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=8TU4HaAmyQ/Ik/9e81qaM8nooJ9cLvr8+ZGrMq2gdVQ=;
-        b=I4RmLdHbDDrg5Dk6hdnSkZ9WxZ03akG3VCR2xK5X4y5h9zYj2CbbCLcepd7nn2VJb9y9nb
-        0iQ2Y30Tg6ni+zQIy071w0rGGe2q4FPqExeVFkHi/Oz87AU3LRSEbepXRiszqDOb63xGZc
-        kYcSCK4p/a123Jadgt9Hl6cgMQjlGeY=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-139-_-guPv_FOCm9UL5sgSGcVw-1; Wed, 20 Oct 2021 06:45:20 -0400
-X-MC-Unique: _-guPv_FOCm9UL5sgSGcVw-1
-Received: by mail-ed1-f71.google.com with SMTP id u17-20020a50d511000000b003daa3828c13so20567511edi.12
-        for <kvm@vger.kernel.org>; Wed, 20 Oct 2021 03:45:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=8TU4HaAmyQ/Ik/9e81qaM8nooJ9cLvr8+ZGrMq2gdVQ=;
-        b=FG2KDFns5rPtVVz8efJH7wXbPDloVeS11geYMoYlapJ3Wauo0xPm/ynDrruYeGc5uW
-         +bpB5Cc0IjoexAkiX9UzwyVHOG9qN6g0FtuCf4FfJue9atuz4NmLhlyaYFTMM5/RE1yc
-         Gwwap/9MGVVnkpR7AogS45Np/sHN5UY1Xtg8TWRf9spae0PSLkMA/FYVXKoil8Qhr8Ue
-         HogmhTboSZQquHyBGvs3RqkaS7bghPr25nh2UqjKLQnH48/AOxjr1ntr/B4eTbbw4Yg9
-         AeK8tNvqL2HhzWO8i31vzw6LOIw1uOmtnMIZnSe27CfsEFiGpXy5nWmjDZ2o5v6TDz/T
-         fDTQ==
-X-Gm-Message-State: AOAM530Mvg2+mCUIuVX8x6SMAgh8iXF87BalhXi2q/B58Ir9+K/8Pjzi
-        pqKQzMOprFmDg7aPak1i2mvqoIe2UNFNd4ieASxrMSeDDdb9k0psuUHZzg1083ppGmWAXSnqsYt
-        MO6sUwa5DFwF5
-X-Received: by 2002:a17:907:961e:: with SMTP id gb30mr5554990ejc.484.1634726717690;
-        Wed, 20 Oct 2021 03:45:17 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzJHOcVyawEdwH5VDpLjOZaVqrj0rofKVGiRhw/MoVTAD7k0YlN4HzsPQss6+DpGt3FYpUgWw==
-X-Received: by 2002:a17:907:961e:: with SMTP id gb30mr5554850ejc.484.1634726716376;
-        Wed, 20 Oct 2021 03:45:16 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id b17sm954051edy.47.2021.10.20.03.45.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 20 Oct 2021 03:45:15 -0700 (PDT)
-Message-ID: <18aed000-47f7-1fb7-d898-55a94bb1ec74@redhat.com>
-Date:   Wed, 20 Oct 2021 12:45:14 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [PATCH v5] KVM: emulate: Don't inject #GP when emulating RDMPC if
- CR0.PE=0
-Content-Language: en-US
-To:     Wanpeng Li <kernellwp@gmail.com>, linux-kernel@vger.kernel.org,
+        id S229998AbhJTKyM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Oct 2021 06:54:12 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58042 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S229702AbhJTKyL (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 20 Oct 2021 06:54:11 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 19KAH8uW011881;
+        Wed, 20 Oct 2021 06:51:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=8uFtaHXBTC1MFnXYWRext/u9qbuOPGvrXl7JB9Mh2aw=;
+ b=r5GWfcdU8YGDyI4FYqlC14ifePocwOGGyovvao7OE5PmbSUMgNQyl9UakaDYA3JBlFdA
+ W96rDriRc7ZOVZKASXq+WbfAPSjnzNbb+mOjUHwKM/SPStezFyZNof6ge/YRC+0r8Omh
+ MGSwI04hlxCny27KatVNUNeq4vYekPsFX5TYMYFVeFLuzj4T1jZ/o+Gj/IyYIHiOhCme
+ ssAum7mvQkh5MKFBSLHtvUDcOqOjDv1EFtRrOtSGI1g0k+q3YPlSWSvQM010Ugpr9oJ+
+ weTfYh6FxKVBcsMk337Iv9lBuEc76lxqiCvhGKteyVQcywApCZXy8tC1PcviwWWEWACw hQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3btekqm211-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 20 Oct 2021 06:51:56 -0400
+Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 19KAlYqc021736;
+        Wed, 20 Oct 2021 06:51:56 -0400
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3btekqm20j-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 20 Oct 2021 06:51:55 -0400
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 19KAngE6021852;
+        Wed, 20 Oct 2021 10:51:54 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma06ams.nl.ibm.com with ESMTP id 3bqp0k3kdq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 20 Oct 2021 10:51:54 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 19KApons3736174
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 20 Oct 2021 10:51:51 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D07E152073;
+        Wed, 20 Oct 2021 10:51:50 +0000 (GMT)
+Received: from ant.fritz.box (unknown [9.145.151.144])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 0967652076;
+        Wed, 20 Oct 2021 10:51:50 +0000 (GMT)
+Subject: Re: [PATCH 3/3] KVM: s390: clear kicked_mask if not idle after set
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     David Hildenbrand <david@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Pierre Morel <pmorel@linux.ibm.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Niklas Schnelle <schnelle@linux.ibm.com>, farman@linux.ibm.com,
         kvm@vger.kernel.org
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-References: <1634724836-73721-1-git-send-email-wanpengli@tencent.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <1634724836-73721-1-git-send-email-wanpengli@tencent.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20211019175401.3757927-1-pasic@linux.ibm.com>
+ <20211019175401.3757927-4-pasic@linux.ibm.com>
+ <8cb919e7-e7ab-5ec1-591e-43f95f140d7b@linux.ibm.com>
+ <ae8b3b11-2eef-0712-faee-5e3467d3e985@de.ibm.com>
+From:   Michael Mueller <mimu@linux.ibm.com>
+Message-ID: <6ea9345d-9ca0-694b-3b9f-4702d1681bb8@linux.ibm.com>
+Date:   Wed, 20 Oct 2021 12:51:49 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.14.0
+MIME-Version: 1.0
+In-Reply-To: <ae8b3b11-2eef-0712-faee-5e3467d3e985@de.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: vgQ7j9bLWDI8nRaQmaPK2hBynFRieoO_
+X-Proofpoint-GUID: FrFFSg9whZXcSLij07jwdK8HZJgGeK_T
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
+ definitions=2021-10-20_04,2021-10-20_01,2020-04-07_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ lowpriorityscore=0 bulkscore=0 clxscore=1015 impostorscore=0
+ suspectscore=0 phishscore=0 mlxlogscore=999 mlxscore=0 adultscore=0
+ spamscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2109230001 definitions=main-2110200060
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 20/10/21 12:13, Wanpeng Li wrote:
-> From: Wanpeng Li <wanpengli@tencent.com>
-> 
-> SDM mentioned that, RDPMC:
-> 
->    IF (((CR4.PCE = 1) or (CPL = 0) or (CR0.PE = 0)) and (ECX indicates a supported counter))
->        THEN
->            EAX := counter[31:0];
->            EDX := ZeroExtend(counter[MSCB:32]);
->        ELSE (* ECX is not valid or CR4.PCE is 0 and CPL is 1, 2, or 3 and CR0.PE is 1 *)
->            #GP(0);
->    FI;
-> 
-> Let's add a comment why CR0.PE isn't tested since it's impossible for CPL to be >0 if
-> CR0.PE=0.
-> 
-> Reviewed-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> ---
-> v4 -> v5:
->   * just comments
-> v3 -> v4:
->   * add comments instead of pseudocode
-> v2 -> v3:
->   * add the missing 'S'
-> v1 -> v2:
->   * update patch description
-> 
->   arch/x86/kvm/emulate.c | 3 +++
->   1 file changed, 3 insertions(+)
-> 
-> diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-> index 9a144ca8e146..c289809beea3 100644
-> --- a/arch/x86/kvm/emulate.c
-> +++ b/arch/x86/kvm/emulate.c
-> @@ -4222,6 +4222,9 @@ static int check_rdpmc(struct x86_emulate_ctxt *ctxt)
->   	if (enable_vmware_backdoor && is_vmware_backdoor_pmc(rcx))
->   		return X86EMUL_CONTINUE;
->   
-> +	/*
-> +	 * It's impossible for CPL to be >0 if CR0.PE=0.
-> +	 */
->   	if ((!(cr4 & X86_CR4_PCE) && ctxt->ops->cpl(ctxt)) ||
->   	    ctxt->ops->check_pmc(ctxt, rcx))
->   		return emulate_gp(ctxt, 0);
-> 
 
-Queued, thanks (with a slightly more verbose comment).
+On 20.10.21 12:31, Christian Borntraeger wrote:
+> Am 20.10.21 um 11:48 schrieb Michael Mueller:
+>>
+>>
+>> On 19.10.21 19:54, Halil Pasic wrote:
+>>> The idea behind kicked mask is that we should not re-kick a vcpu
+>>> from __airqs_kick_single_vcpu() that is already in the middle of
+>>> being kicked by the same function.
+>>>
+>>> If however the vcpu that was idle before when the idle_mask was
+>>> examined, is not idle any more after the kicked_mask is set, that
+>>> means that we don't need to kick, and that we need to clear the
+>>> bit we just set because we may be beyond the point where it would
+>>> get cleared in the wake-up process. Since the time window is short,
+>>> this is probably more a theoretical than a practical thing: the race
+>>> window is small.
+>>>
+>>> To get things harmonized let us also move the clear from vcpu_pre_run()
+>>> to __unset_cpu_idle().
+>>>
+>>> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
+>>> Fixes: 9f30f6216378 ("KVM: s390: add gib_alert_irq_handler()")
+>>
+>> Before releasing something like this, where none of us is sure if
+>> it really saves cpu cost, I'd prefer to run some measurement with
+>> the whole kicked_mask logic removed and to compare the number of
+>> vcpu wake ups with the number of interrupts to be processed by
+>> the gib alert mechanism in a slightly over committed host while
+>> driving with Matthews test load.
+>
+> But I think patch 1 and 2 can go immediately as they measurably or
+> testable fix things. Correct?
 
-Paolo
+Yes
 
+>
+>> A similar run can be done with this code.
+>>
+>>> ---
+>>>   arch/s390/kvm/interrupt.c | 7 ++++++-
+>>>   arch/s390/kvm/kvm-s390.c  | 2 --
+>>>   2 files changed, 6 insertions(+), 3 deletions(-)
+>>>
+>>> diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
+>>> index 2245f4b8d362..3c80a2237ef5 100644
+>>> --- a/arch/s390/kvm/interrupt.c
+>>> +++ b/arch/s390/kvm/interrupt.c
+>>> @@ -426,6 +426,7 @@ static void __unset_cpu_idle(struct kvm_vcpu *vcpu)
+>>>   {
+>>>       kvm_s390_clear_cpuflags(vcpu, CPUSTAT_WAIT);
+>>>       clear_bit(vcpu->vcpu_idx, vcpu->kvm->arch.idle_mask);
+>>> +    clear_bit(vcpu->vcpu_idx, vcpu->kvm->arch.gisa_int.kicked_mask);
+>>>   }
+>>>   static void __reset_intercept_indicators(struct kvm_vcpu *vcpu)
+>>> @@ -3064,7 +3065,11 @@ static void __airqs_kick_single_vcpu(struct 
+>>> kvm *kvm, u8 deliverable_mask)
+>>>               /* lately kicked but not yet running */
+>>>               if (test_and_set_bit(vcpu_idx, gi->kicked_mask))
+>>>                   return;
+>>> -            kvm_s390_vcpu_wakeup(vcpu);
+>>> +            /* if meanwhile not idle: clear  and don't kick */
+>>> +            if (test_bit(vcpu_idx, kvm->arch.idle_mask))
+>>> +                kvm_s390_vcpu_wakeup(vcpu);
+>>> +            else
+>>> +                clear_bit(vcpu_idx, gi->kicked_mask);
+>>>               return;
+>>>           }
+>>>       }
+>>> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+>>> index 1c97493d21e1..6b779ef9f5fb 100644
+>>> --- a/arch/s390/kvm/kvm-s390.c
+>>> +++ b/arch/s390/kvm/kvm-s390.c
+>>> @@ -4067,8 +4067,6 @@ static int vcpu_pre_run(struct kvm_vcpu *vcpu)
+>>>           kvm_s390_patch_guest_per_regs(vcpu);
+>>>       }
+>>> -    clear_bit(vcpu->vcpu_idx, vcpu->kvm->arch.gisa_int.kicked_mask);
+>>> -
+>>>       vcpu->arch.sie_block->icptcode = 0;
+>>>       cpuflags = atomic_read(&vcpu->arch.sie_block->cpuflags);
+>>>       VCPU_EVENT(vcpu, 6, "entering sie flags %x", cpuflags);
+>>>
