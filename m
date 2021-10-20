@@ -2,115 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EDA6B435595
-	for <lists+kvm@lfdr.de>; Wed, 20 Oct 2021 23:53:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C14C14355A8
+	for <lists+kvm@lfdr.de>; Thu, 21 Oct 2021 00:01:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230288AbhJTVza (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Oct 2021 17:55:30 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:26141 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229695AbhJTVz3 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 20 Oct 2021 17:55:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634766794;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=U6rXNz3Z+PfqtejcB5UFQ+ZtQ0/yQs952Acpxd92MN0=;
-        b=IJnffwH6b39WktcDBVyg0dBSUAcESH8qRDSt8qdUAWHds5elGFqH0l+fIJiOcIQr4vNDFZ
-        h3D6//+riRIki6SiKPsIMlfQQ/o1M5Eg8LEBKFXmxFs7qgxVVP1nfPd5aK1W5rj4YuledT
-        BRaQfBwpwyqOj5Z5VxZrjwWUHlt3pR0=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-17-9r4usN5EPKeKm96x1a0tbA-1; Wed, 20 Oct 2021 17:53:13 -0400
-X-MC-Unique: 9r4usN5EPKeKm96x1a0tbA-1
-Received: by mail-ed1-f70.google.com with SMTP id t28-20020a508d5c000000b003dad7fc5caeso5138117edt.11
-        for <kvm@vger.kernel.org>; Wed, 20 Oct 2021 14:53:12 -0700 (PDT)
+        id S230089AbhJTWDt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Oct 2021 18:03:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42950 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229695AbhJTWDs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Oct 2021 18:03:48 -0400
+Received: from mail-oi1-x232.google.com (mail-oi1-x232.google.com [IPv6:2607:f8b0:4864:20::232])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7409CC06161C
+        for <kvm@vger.kernel.org>; Wed, 20 Oct 2021 15:01:33 -0700 (PDT)
+Received: by mail-oi1-x232.google.com with SMTP id g125so11374833oif.9
+        for <kvm@vger.kernel.org>; Wed, 20 Oct 2021 15:01:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=gcyALk5zVepRZxSWJAVnLRXnay+k2bDPuj2AKrn2YQI=;
+        b=JSkGk38iMrIpqwqYDwTm3nxTEQ1S5kwjkCR3dNSEwoysrxgW/3XEDz0CXmhQ+DSBmc
+         hbXtvl85lNZmlhJeFiX1aUEC/x0y/Kwmll6/A58osTtQ+LcD2aEf/JUCOUXEPwR5Jw0m
+         Mv4tT5L5ClJG8XDP1PtTQeqOe4vq39bUanmuWNGdSj5IXbP82ZT6VXeVpRPMOQPEFdkH
+         E/FzWicpW9Jrqnbj1WEOwxcbLPFNRFCG/Atr3ZHpjwhwTqvQL2SC3T9mwS+DntCHqZnk
+         JHvnj1o+sJY39xzmOIpRNGGKHZlCM1bpXu8E/RX0ncJJgqp8ei5VhqvTqAKmO5I9vjJQ
+         gUPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=U6rXNz3Z+PfqtejcB5UFQ+ZtQ0/yQs952Acpxd92MN0=;
-        b=oXYSb1Kj8XusVRXVgPbYAJE4bshHHAB8VttZuMtUX+ZDo95YktIY0RRNSea078WBBN
-         WXphVUP/uRv3nozJWM+P8UTxln9ND1lMZ9dP79QU0GveDEO3oYjgBWLHxdeamBLmm3SG
-         9JGknU6xRgbq75hgM5BOUKZd1Xz8Lj33G6obgjZhcCN5TXMjl9xtVf4P5tNYjHC5V9il
-         iJCQTtfrUp8TjibKzlWpGjP/A8NPYeWMvzPG+eMAbo4uYzxZy5XYhIrKt9+Yk6neOWB5
-         XAifu+SL6Htz0FB8FIBPTCLvnPfHAQQHuZXTHC8FM05jC2CytR2YWf3/x+ymCsuXvBD6
-         vReA==
-X-Gm-Message-State: AOAM533+jSoWH4NY7sF5QKnnvgjJ8UWCsXizC7wVk/tWEYsQAwcel25J
-        EJBlGGc0EYHDrUcpQPE2uC5C1ofVKqSn1PcloBqyAzisy2BSszYZw3gdkoOvU6Scu6Vju8wrVuZ
-        WOAcMW9lU3Edz
-X-Received: by 2002:a17:906:3947:: with SMTP id g7mr2363077eje.407.1634766792052;
-        Wed, 20 Oct 2021 14:53:12 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzv6J9Xym4EJh9Zs4yIfGXv7o5aqhc8Tu4ag+uUYOnXHogw0Sb2KCWiFg9yiSL18vtR6i3TvQ==
-X-Received: by 2002:a17:906:3947:: with SMTP id g7mr2363044eje.407.1634766791836;
-        Wed, 20 Oct 2021 14:53:11 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.gmail.com with ESMTPSA id m23sm1603818eja.6.2021.10.20.14.53.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 20 Oct 2021 14:53:11 -0700 (PDT)
-Message-ID: <32fd9317-9d11-22b7-ff25-25220dd9029e@redhat.com>
-Date:   Wed, 20 Oct 2021 23:53:09 +0200
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=gcyALk5zVepRZxSWJAVnLRXnay+k2bDPuj2AKrn2YQI=;
+        b=BVq+7TXJkHpsgYTrLRHlpT47pqmfgR0j3M5IdEVbu72GWPJ/bHUea/pmnfNhsYxf6x
+         wZNsjAtLX3KZ7ulQ5RueysZYC/mQFI2Xkq8fJRaHtNFshnjMTLoPqnvMniI7DYTXxY/X
+         fAPjxoCVRso3gBJWsS6R2dE/BAedoZGYt2UJf6O1vm9FhFrjOL7xkCurkZuYwBUftJhm
+         ponK894f4ejN4o3p8ySvt8yfw42NosHYQnjIfeoDufJyBU0s25GTFsHNuuxlYxmGd9em
+         WQqklXM53keXBT+p+tNyyqmQ8G8UllwK2g8hrk6P67SOpDHnN9B/1a8dZqF8QM1vlSbT
+         ZOLw==
+X-Gm-Message-State: AOAM533LEbjKIMV1NkW0SMkAnT8oQc35QlCRVF1ijHdDf975oE+z9OWv
+        YLKi/v/SNwqFLax7oRGU6QeK3sDG64OfcakL1b2Hxw==
+X-Google-Smtp-Source: ABdhPJy3Zgxr3goL6y95JyQ3EAm2H28IEv/cAiuUN/X8GBECBt3ASEjJk5wSXrmcJ2LzdCE7KXCbQwycN4tMvFaDU+E=
+X-Received: by 2002:aca:b686:: with SMTP id g128mr1632030oif.38.1634767292605;
+ Wed, 20 Oct 2021 15:01:32 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [PATCH 1/5 V10] KVM: SEV: Refactor out sev_es_state struct
-Content-Language: en-US
-To:     Tom Lendacky <thomas.lendacky@amd.com>,
-        Peter Gonda <pgonda@google.com>, kvm@vger.kernel.org
-Cc:     Marc Orr <marcorr@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        David Rientjes <rientjes@google.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
-References: <20211012204858.3614961-1-pgonda@google.com>
- <20211012204858.3614961-2-pgonda@google.com>
- <ee9cb472-75ba-2a1e-a88c-ecdb1f3de4d4@amd.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <ee9cb472-75ba-2a1e-a88c-ecdb1f3de4d4@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20211020192732.960782-1-pbonzini@redhat.com> <20211020192732.960782-3-pbonzini@redhat.com>
+ <CALMp9eTbehPFGb2UTDiV8Q7zo6O9_Dq39=V_DdcQKG3-ev1_8w@mail.gmail.com>
+ <0a87132a-f7ea-5483-dd9d-cb8c377af535@redhat.com> <CALMp9eRY_YYozTv0EZb5rbr27TJihaW3SpxV-Be=JJt2HYaTYQ@mail.gmail.com>
+ <9f5e4bae-1400-3c49-d889-66de805bc1c2@redhat.com>
+In-Reply-To: <9f5e4bae-1400-3c49-d889-66de805bc1c2@redhat.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Wed, 20 Oct 2021 15:01:21 -0700
+Message-ID: <CALMp9eTjE1zbrun-bMSZTTodo1AnUpPvfhYgMoTkbfdAQz7mZg@mail.gmail.com>
+Subject: Re: [PATCH v2 kvm-unit-tests 2/2] replace tss_descr global with a function
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, zxwang42@gmail.com, marcorr@google.com,
+        seanjc@google.com, jroedel@suse.de, varad.gautam@suse.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 15/10/21 23:12, Tom Lendacky wrote:
-> On 10/12/21 3:48 PM, Peter Gonda wrote:
->> Move SEV-ES vCPU metadata into new sev_es_state struct from vcpu_svm.
->>
->> Signed-off-by: Peter Gonda <pgonda@google.com>
->> Suggested-by: Tom Lendacky <thomas.lendacky@amd.com>
->> Cc: Marc Orr <marcorr@google.com>
->> Cc: Paolo Bonzini <pbonzini@redhat.com>
->> Cc: Sean Christopherson <seanjc@google.com>
->> Cc: David Rientjes <rientjes@google.com>
->> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
->> Cc: Brijesh Singh <brijesh.singh@amd.com>
->> Cc: Tom Lendacky <thomas.lendacky@amd.com>
->> Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
->> Cc: Wanpeng Li <wanpengli@tencent.com>
->> Cc: Jim Mattson <jmattson@google.com>
->> Cc: Joerg Roedel <joro@8bytes.org>
->> Cc: Thomas Gleixner <tglx@linutronix.de>
->> Cc: Ingo Molnar <mingo@redhat.com>
->> Cc: Borislav Petkov <bp@alien8.de>
->> Cc: "H. Peter Anvin" <hpa@zytor.com>
->> Cc: kvm@vger.kernel.org
->> Cc: linux-kernel@vger.kernel.org
-> 
-> Acked-by: Tom Lendacky <thomas.lendacky@amd.com>
+On Wed, Oct 20, 2021 at 2:31 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 20/10/21 23:18, Jim Mattson wrote:
+> >>>> -       vmcs_write(GUEST_LIMIT_TR, tss_descr.limit);
+> >>>> +       vmcs_write(GUEST_LIMIT_TR, 0x67);
+> >>> Isn't the limit still set to 0xFFFF in {cstart,cstart64}.S? And
+> >>> doesn't the VMware backdoor test assume there's room for an I/O
+> >>> permission bitmap?
+> >>>
+> >> Yes, but this is just for L2.  The host TR limit is restored to 0x67 on
+> >> every vmexit, and it seemed weird to run L1 and L2 with different limits.
+> > Perhaps you could change the limits in the GDT entries to match?
+>
+> So keep it 0x67 and adjust it to the size of the IOPM in the VMware
+> backdoor test?
 
-FWIW this series won't apply due to the string I/O fixes in 5.15, so 
-I've delayed it---but it's not lost.
-
-Paolo
-
+Right. That would seem to achieve the greatest consistency.
