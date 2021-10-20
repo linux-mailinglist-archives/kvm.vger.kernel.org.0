@@ -2,111 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 39941434879
-	for <lists+kvm@lfdr.de>; Wed, 20 Oct 2021 12:01:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A566D43487E
+	for <lists+kvm@lfdr.de>; Wed, 20 Oct 2021 12:03:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229919AbhJTKD7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Oct 2021 06:03:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46118 "EHLO
+        id S229998AbhJTKFN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Oct 2021 06:05:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46406 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229555AbhJTKD6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Oct 2021 06:03:58 -0400
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E58FC06161C;
-        Wed, 20 Oct 2021 03:01:44 -0700 (PDT)
-Received: by mail-pj1-x1029.google.com with SMTP id na16-20020a17090b4c1000b0019f5bb661f9so2122249pjb.0;
-        Wed, 20 Oct 2021 03:01:44 -0700 (PDT)
+        with ESMTP id S229555AbhJTKFM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Oct 2021 06:05:12 -0400
+Received: from mail-oo1-xc34.google.com (mail-oo1-xc34.google.com [IPv6:2607:f8b0:4864:20::c34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5313C06161C;
+        Wed, 20 Oct 2021 03:02:58 -0700 (PDT)
+Received: by mail-oo1-xc34.google.com with SMTP id c29-20020a4ad21d000000b002b6cf3f9aceso1235776oos.13;
+        Wed, 20 Oct 2021 03:02:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id;
-        bh=6kc/cN3ZuEGloIKQBOBsCOKny975VL/82QULHlwqbfs=;
-        b=NbSWq/oNPWWkRVOJbtosn48unWwHGDCRBANrCHcJGcxhCBgcMlJYowlheYyYqO57oO
-         Gn3yx7rEgDOmoUotHc26l9uoVKL++Xd8EtPS4/9hRDCgr8ilrFHLzG/VoQJYrXmx+PvU
-         3NuSL6SoqIXJx23NqTCKn4YTLUJnlX7hNtBkbhbdgaSuIHBSXQfBZIUTorM2l19Swtuj
-         kh2ii4Xm0NKW8KLf1U30r90WxxdJA7+ZuW4oyVIfrjlKBxlEcpSdNKRfjHJoZkl1ielf
-         83wKMNGUoniUW18kbePqyzXjEw5xkJ4lbsprvpay1516jjRMKDV0oamsOuRjeEK+9lVQ
-         z7Jw==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=qUJTqShsGPwl7ndAoWAVq9Gk5Jbt5mhhVB3uwCyyxmw=;
+        b=eor2xuFm2EF0fx2lJXIJmwz3ONgOBeUx6jgOf/00xLEzNXlwLAowEjoHCbRRqDVBWh
+         0Y6fJ63JkLsvC5iZTQwCMjPwgX29LgyRMSBuFJDzOdiwDh337xjT7WU87s3rHQ0oQyFS
+         +VzPHiUyHA8qqXLKtD67KTq7A1xRyl9z/SXT29NnQkiZFTtwMhyCFm4iXEErRDWL+xdf
+         8L5G5M9ZlTTEUrtEqTlcE6kVd0/wN0bTDxswQSx8ZtxvOdkkcevlgXwB8Jj6h6ORC49W
+         kJcxy/vLjZGXvvCHsRo15w/dPJvOnIls1BoYCj6Mmq2c6Ng0zPwHlh6Sv5DhKXIfa8Ns
+         evJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=6kc/cN3ZuEGloIKQBOBsCOKny975VL/82QULHlwqbfs=;
-        b=5oukIbray1CfyG/CscLypOVgcFQKNTz1ElMeD/EcnWw5P+8+P+Wc5IJRZYL6xVm+nE
-         QR6D4yYbyZc3lpqfDl6+VSKwgi3iqxfymaElJYZ/xXrL0C96PBEAknE6PW3oM8wD2Jgo
-         28/ojOUjJkuBHe882wIQiR/hwr8qHzLMDO+L6WSfeKG2nBdO8reH4sCfCJjM0JK4wSMG
-         XOnUjyLY6JfZ81MU8NSh29Ty/VLfAK86CfJdR3bhgTMi+e0SSzbS/ZDdVdQXPbAl9AXb
-         jdKRIISmDKvObcS6PoATLIS/flASWV92RsTucP8nllQ8ew52yN4JH4GrOwcGB4rHTpDl
-         Pyew==
-X-Gm-Message-State: AOAM531+8P6RsU75vQnxA9WzgpaK6OjkSGH77yrnG3DEsqbibZzUZW7G
-        TC5RFalfoygr2g9byb2M7lbcMb3Gkw6UbQ==
-X-Google-Smtp-Source: ABdhPJz3fq68DnUovXpQbEZOnr1UE1ptJqlAq3gkdrbEUTXglHNDN2LA4SEvlD8V0B6RHdJCiqcyJw==
-X-Received: by 2002:a17:90b:4c0d:: with SMTP id na13mr6120297pjb.232.1634724103566;
-        Wed, 20 Oct 2021 03:01:43 -0700 (PDT)
-Received: from localhost.localdomain ([203.205.141.113])
-        by smtp.googlemail.com with ESMTPSA id bb12sm5127129pjb.0.2021.10.20.03.01.41
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 20 Oct 2021 03:01:43 -0700 (PDT)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=qUJTqShsGPwl7ndAoWAVq9Gk5Jbt5mhhVB3uwCyyxmw=;
+        b=qedEpeDuSRX7v1NbWAZTPso+OaSwZsfd0AKM3uFihckZen1YnP5B5cCKJxkQpV/fxW
+         lDeHm7kLFUFqBoYXiCP3YjPXAiFG+jY0TdJtSZMEIbAAjGq5VrGOcZUruDXFznAol4oD
+         RDIn2cbmcXVheMBTicNdkhO7EpxQdz7MLpEH2KLLVW4PsVqxWy9TGP+yDgKfShUrqQgz
+         qIcTbpS2RzitmuqP9QxmcIB7nN2kn9n56Z2Y86obAkVcz27239UFVs9njKUSX06rtK7m
+         1kXMJNgTUjoJ16aMG1KaBvVFHIWUO2XZ7D2ippDpYYrbar8D6uJIFAoesRKZX0V7xpPh
+         DiLA==
+X-Gm-Message-State: AOAM533k/Dr6uOWvYU7eqJkk0A+//QSr8m3tlBsTVMiwsWl2hLWJ5nNA
+        HjeOAvS7t5ze1/CodbXl9Q89laMt0mdBLvrS1MxllR9wczB3Qw==
+X-Google-Smtp-Source: ABdhPJy3dHLwXgVZwvKpmHORofRsDU8YQRs5fmYzYeG/Run2arHde25eMDCEFG7IrQN2EXmStWxm0J+CKCpgOcjpjVs=
+X-Received: by 2002:a4a:d5c8:: with SMTP id a8mr8912756oot.18.1634724178311;
+ Wed, 20 Oct 2021 03:02:58 -0700 (PDT)
+MIME-Version: 1.0
+References: <1634631160-67276-1-git-send-email-wanpengli@tencent.com>
+ <1634631160-67276-3-git-send-email-wanpengli@tencent.com> <24e67e43-c50c-7e0f-305a-c7f6129f8d70@redhat.com>
+ <YW8BmRJHVvFscWTo@google.com> <CANRm+CzuWnO8FZPTvvOtpxqc5h786o7THyebOFpVAp3BF1xQiw@mail.gmail.com>
+ <45fabf5a-96b5-49dc-0cba-55714ae3a4b5@redhat.com>
+In-Reply-To: <45fabf5a-96b5-49dc-0cba-55714ae3a4b5@redhat.com>
 From:   Wanpeng Li <kernellwp@gmail.com>
-X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
+Date:   Wed, 20 Oct 2021 18:02:47 +0800
+Message-ID: <CANRm+CyPznw0O2qwnhhc=YEq+zSD3C7dqqG8-8XE6sLdhL7aXQ@mail.gmail.com>
+Subject: Re: [PATCH v3 3/3] KVM: vCPU kick tax cut for running vCPU
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>
-Subject: [PATCH v4] KVM: Avoid expensive "should kick" operation for running vCPU
-Date:   Wed, 20 Oct 2021 03:00:53 -0700
-Message-Id: <1634724053-73627-1-git-send-email-wanpengli@tencent.com>
-X-Mailer: git-send-email 2.7.4
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wanpeng Li <wanpengli@tencent.com>
+On Wed, 20 Oct 2021 at 14:47, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 20/10/21 04:49, Wanpeng Li wrote:
+> >> The intent of the extra check was to avoid the locked instruction that comes with
+> >> disabling preemption via rcu_read_lock().  But thinking more, the extra op should
+> >> be little more than a basic arithmetic operation in the grand scheme on modern x86
+> >> since the cache line is going to be locked and written no matter what, either
+> >> immediately before or immediately after.
+> >
+> > I observe the main overhead of rcuwait_wake_up() is from rcu
+> > operations, especially rcu_read_lock/unlock().
+>
+> Do you have CONFIG_PREEMPT_RCU set?  If so, maybe something like this would help:
 
-Avoid the moderately expensive "should kick" operation if this pCPU
-is currently running the target vCPU.
+Yes.
 
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
----
-v3 -> v4:
- * check running vCPU in a separate patch
-v2 -> v3:
- * use kvm_arch_vcpu_get_wait()
-v1 -> v2:
- * move checking running vCPU logic to kvm_vcpu_kick
- * check rcuwait_active(&vcpu->wait) etc
+>
+> diff --git a/kernel/exit.c b/kernel/exit.c
+> index fd1c04193e18..ca1e60a1234d 100644
+> --- a/kernel/exit.c
+> +++ b/kernel/exit.c
+> @@ -235,8 +235,6 @@ int rcuwait_wake_up(struct rcuwait *w)
+>         int ret = 0;
+>         struct task_struct *task;
+>
+> -       rcu_read_lock();
+> -
+>         /*
+>          * Order condition vs @task, such that everything prior to the load
+>          * of @task is visible. This is the condition as to why the user called
+> @@ -250,6 +248,14 @@ int rcuwait_wake_up(struct rcuwait *w)
+>          */
+>         smp_mb(); /* (B) */
+>
+> +#ifdef CONFIG_PREEMPT_RCU
+> +       /* The cost of rcu_read_lock() is nontrivial for preemptable RCU.  */
+> +       if (!rcuwait_active(w))
+> +               return ret;
+> +#endif
+> +
+> +       rcu_read_lock();
+> +
+>         task = rcu_dereference(w->task);
+>         if (task)
+>                 ret = wake_up_process(task);
+>
+> (If you don't, rcu_read_lock is essentially preempt_disable() and it
+> should not have a large overhead).  You still need the memory barrier
+> though, in order to avoid missed wakeups; shameless plug for my
+> article at https://lwn.net/Articles/847481/.
 
- virt/kvm/kvm_main.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+You are right, the cost of rcu_read_lock() for preemptable RCU
+introduces too much overhead, do you want to send a separate patch?
 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 7851f3a1b5f7..4a4684e55ef5 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -3325,11 +3325,22 @@ void kvm_vcpu_kick(struct kvm_vcpu *vcpu)
- 	 * vCPU also requires it to leave IN_GUEST_MODE.
- 	 */
- 	me = get_cpu();
-+
-+	/*
-+	 * avoid the moderately expensive "should kick" operation if this pCPU
-+	 * is currently running the target vcpu, in which case it's a KVM bug
-+	 * if the vCPU is in the inner run loop.
-+	 */
-+	if (vcpu == __this_cpu_read(kvm_running_vcpu) &&
-+	    !WARN_ON_ONCE(vcpu->mode == IN_GUEST_MODE))
-+		goto out;
-+
- 	if (kvm_arch_vcpu_should_kick(vcpu)) {
- 		cpu = READ_ONCE(vcpu->cpu);
- 		if (cpu != me && (unsigned)cpu < nr_cpu_ids && cpu_online(cpu))
- 			smp_send_reschedule(cpu);
- 	}
-+out:
- 	put_cpu();
- }
- EXPORT_SYMBOL_GPL(kvm_vcpu_kick);
--- 
-2.25.1
-
+    Wanpeng
