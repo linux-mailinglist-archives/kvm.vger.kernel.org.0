@@ -2,20 +2,20 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7305D4352D8
-	for <lists+kvm@lfdr.de>; Wed, 20 Oct 2021 20:42:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F17F14352DA
+	for <lists+kvm@lfdr.de>; Wed, 20 Oct 2021 20:42:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231377AbhJTSoU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Oct 2021 14:44:20 -0400
-Received: from vps-vb.mhejs.net ([37.28.154.113]:40920 "EHLO vps-vb.mhejs.net"
+        id S231359AbhJTSor (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Oct 2021 14:44:47 -0400
+Received: from vps-vb.mhejs.net ([37.28.154.113]:40950 "EHLO vps-vb.mhejs.net"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231180AbhJTSoS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Oct 2021 14:44:18 -0400
+        id S231271AbhJTSoq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Oct 2021 14:44:46 -0400
 Received: from MUA
         by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
         (Exim 4.94.2)
         (envelope-from <mail@maciej.szmigiero.name>)
-        id 1mdGXD-0002gH-9Z; Wed, 20 Oct 2021 20:41:55 +0200
+        id 1mdGXl-0002gu-8u; Wed, 20 Oct 2021 20:42:29 +0200
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
@@ -37,17 +37,17 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
 References: <cover.1632171478.git.maciej.szmigiero@oracle.com>
- <311810ebd1111bed50d931d424297384171afc36.1632171479.git.maciej.szmigiero@oracle.com>
- <YW9a2s8wHXzf8Xqw@google.com>
+ <555f58fdaec120aa7a6f6fbad06cca796a8c9168.1632171479.git.maciej.szmigiero@oracle.com>
+ <YW9mKTRBEABjGPp7@google.com>
 From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Subject: Re: [PATCH v5 07/13] KVM: Just resync arch fields when
- slots_arch_lock gets reacquired
-Message-ID: <b9ffb6cf-d59b-3bb5-a9b0-71e32c81135a@maciej.szmigiero.name>
-Date:   Wed, 20 Oct 2021 20:41:49 +0200
+Subject: Re: [PATCH v5 08/13] KVM: Resolve memslot ID via a hash table instead
+ of via a static array
+Message-ID: <1729cda2-83f0-ed03-c6b4-4418de80f933@maciej.szmigiero.name>
+Date:   Wed, 20 Oct 2021 20:42:23 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.13.0
 MIME-Version: 1.0
-In-Reply-To: <YW9a2s8wHXzf8Xqw@google.com>
+In-Reply-To: <YW9mKTRBEABjGPp7@google.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -55,113 +55,150 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 20.10.2021 01:55, Sean Christopherson wrote:
+On 20.10.2021 02:43, Sean Christopherson wrote:
 > On Mon, Sep 20, 2021, Maciej S. Szmigiero wrote:
->> From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
->>
->> There is no need to copy the whole memslot data after releasing
->> slots_arch_lock for a moment to install temporary memslots copy in
->> kvm_set_memslot() since this lock only protects the arch field of each
->> memslot.
->>
->> Just resync this particular field after reacquiring slots_arch_lock.
-> 
-> I assume this needed to avoid having a mess when introducing the r-b tree?  If so,
-> please call that out.  Iterating over the slots might actually be slower than the
-> full memcpy, i.e. as a standalone patch this may or may not be make sense.
-
-Yes, it's an intermediate state of the code to not break bisecting.
-The code changed by this patch is then completely replaced later by the
-patch 11 of this patchset.
-
-Will add a note about this to the commit message.
-
->> Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
 >> ---
->>   virt/kvm/kvm_main.c | 17 ++++++++++++-----
->>   1 file changed, 12 insertions(+), 5 deletions(-)
+>>   include/linux/kvm_host.h | 16 +++++------
+>>   virt/kvm/kvm_main.c      | 61 +++++++++++++++++++++++++++++++---------
+>>   2 files changed, 55 insertions(+), 22 deletions(-)
 >>
->> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
->> index 348fae880189..48d182840060 100644
->> --- a/virt/kvm/kvm_main.c
->> +++ b/virt/kvm/kvm_main.c
->> @@ -1482,6 +1482,15 @@ static void kvm_copy_memslots(struct kvm_memslots *to,
->>   	memcpy(to, from, kvm_memslots_size(from->used_slots));
->>   }
+>> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+>> index 8fd9644f40b2..d2acc00a6472 100644
+>> --- a/include/linux/kvm_host.h
+>> +++ b/include/linux/kvm_host.h
+>> @@ -29,6 +29,7 @@
+>>   #include <linux/refcount.h>
+>>   #include <linux/nospec.h>
+>>   #include <linux/notifier.h>
+>> +#include <linux/hashtable.h>
+>>   #include <asm/signal.h>
 >>   
->> +static void kvm_copy_memslots_arch(struct kvm_memslots *to,
->> +				   struct kvm_memslots *from)
->> +{
->> +	int i;
->> +
->> +	for (i = 0; i < from->used_slots; i++)
->> +		to->memslots[i].arch = from->memslots[i].arch;
+>>   #include <linux/kvm.h>
+>> @@ -426,6 +427,7 @@ static inline int kvm_vcpu_exiting_guest_mode(struct kvm_vcpu *vcpu)
+>>   #define KVM_MEM_MAX_NR_PAGES ((1UL << 31) - 1)
+>>   
+>>   struct kvm_memory_slot {
+>> +	struct hlist_node id_node;
+>>   	gfn_t base_gfn;
+>>   	unsigned long npages;
+>>   	unsigned long *dirty_bitmap;
+>> @@ -528,7 +530,7 @@ static inline int kvm_arch_vcpu_memslots_id(struct kvm_vcpu *vcpu)
+>>   struct kvm_memslots {
+>>   	u64 generation;
+>>   	/* The mapping table from slot id to the index in memslots[]. */
+>> -	short id_to_index[KVM_MEM_SLOTS_NUM];
+>> +	DECLARE_HASHTABLE(id_hash, 7);
 > 
-> This should probably be a memcpy(), I don't know what all shenanigans the compiler
-> can throw at us if it gets to copy a struct by value.
+> Can you add a comment explaining the rationale for size "7"?  Not necessarily the
+> justification in choosing "7", more so the tradeoffs between performance, memory,
+> etc... so that all your work/investigation isn't lost and doesn't have to be repeated
+> if someone wants to tweak this in the future.
 
-Normally, copy-assignment of a struct is a safe operation (this is purely
-an internal kernel struct, so there are no worries about padding leakage
-to the userspace), but can replace this with a memcpy().
+Will add such comment.
 
->> +}
->> +
->>   /*
->>    * Note, at a minimum, the current number of used slots must be allocated, even
->>    * when deleting a memslot, as we need a complete duplicate of the memslots for
+>>   	atomic_t last_used_slot;
+>>   	int used_slots;
+>>   	struct kvm_memory_slot memslots[];
+>> @@ -795,16 +797,14 @@ static inline struct kvm_memslots *kvm_vcpu_memslots(struct kvm_vcpu *vcpu)
+>>   static inline
+>>   struct kvm_memory_slot *id_to_memslot(struct kvm_memslots *slots, int id)
+>>   {
+>> -	int index = slots->id_to_index[id];
+>>   	struct kvm_memory_slot *slot;
+>>   
+>> -	if (index < 0)
+>> -		return NULL;
+>> -
+>> -	slot = &slots->memslots[index];
+>> +	hash_for_each_possible(slots->id_hash, slot, id_node, id) {
+>> +		if (slot->id == id)
+>> +			return slot;
 > 
-> There's an out-of-sight comment that's now stale, can you revert to the
-> pre-slots_arch_lock comment?
+> Hmm, related to the hash, it might be worth adding a stat here to count collisions.
+> Might be more pain than it's worth though since we don't have @kvm.
+
+It's a good idea if it turns out that it's worth optimizing the code
+further (by, for example, introducing a self-resizing hash table, which
+would bring a significant increase in complexity for rather uncertain
+gains).
+
+>> @@ -1274,30 +1275,46 @@ static inline int kvm_memslot_insert_back(struct kvm_memslots *slots)
+>>    * itself is not preserved in the array, i.e. not swapped at this time, only
+>>    * its new index into the array is tracked.  Returns the changed memslot's
+>>    * current index into the memslots array.
+>> + * The memslot at the returned index will not be in @slots->id_hash by then.
+>> + * @memslot is a detached struct with desired final data of the changed slot.
+>>    */
+>>   static inline int kvm_memslot_move_backward(struct kvm_memslots *slots,
+>>   					    struct kvm_memory_slot *memslot)
+>>   {
+>>   	struct kvm_memory_slot *mslots = slots->memslots;
+>> +	struct kvm_memory_slot *mmemslot = id_to_memslot(slots, memslot->id);
 > 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 48d182840060..ef3345428047 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -1555,9 +1555,10 @@ static int kvm_set_memslot(struct kvm *kvm,
->                  slot->flags |= KVM_MEMSLOT_INVALID;
+> My comment from v3 about the danger of "mmemslot" still stands.  FWIW, I dislike
+> "mslots" as well, but that predates me, and all of this will go away in the end :-)
+>
+> On Wed, May 19, 2021 at 3:31 PM Sean Christopherson <seanjc@google.com> wrote:
+>> On Sun, May 16, 2021, Maciej S. Szmigiero wrote:
+>>>        struct kvm_memory_slot *mslots = slots->memslots;
+>>> +     struct kvm_memory_slot *dmemslot = id_to_memslot(slots, memslot->id);
+>>
+>> I vote to call these local vars "old", or something along those lines.  dmemslot
+>> isn't too bad, but mmemslot in the helpers below is far too similar to memslot,
+>> and using the wrong will cause nasty explosions.
 > 
->                  /*
-> -                * We can re-use the memory from the old memslots.
-> -                * It will be overwritten with a copy of the new memslots
-> -                * after reacquiring the slots_arch_lock below.
-> +                * We can re-use the old memslots, the only difference from the
-> +                * newly installed memslots is the invalid flag, which will get
-> +                * dropped by update_memslots anyway.  We'll also revert to the
-> +                * old memslots if preparing the new memory region fails.
->                   */
->                  slots = install_new_memslots(kvm, as_id, slots);
+
+Will rename "mmemslot" to "oldslot" in kvm_memslot_move_backward(), too.
+  
+>>   	int i;
+>>   
+>> -	if (slots->id_to_index[memslot->id] == -1 || !slots->used_slots)
+>> +	if (!mmemslot || !slots->used_slots)
+>>   		return -1;
+>>   
+>> +	/*
+>> +	 * The loop below will (possibly) overwrite the target memslot with
+>> +	 * data of the next memslot, or a similar loop in
+>> +	 * kvm_memslot_move_forward() will overwrite it with data of the
+>> +	 * previous memslot.
+>> +	 * Then update_memslots() will unconditionally overwrite and re-add
+>> +	 * it to the hash table.
+>> +	 * That's why the memslot has to be first removed from the hash table
+>> +	 * here.
+>> +	 */
 > 
+> Is this reword accurate?
+> 
+> 	/*
+> 	 * Delete the slot from the hash table before sorting the remaining
+> 	 * slots, the slot's data may be overwritten when copying slots as part
+> 	 * of the sorting proccess.  update_memslots() will unconditionally
+> 	 * rewrite the entire slot and re-add it to the hash table.
+> 	 */
+
+It's accurate, will replace the comment with the proposed one.
+
+>> @@ -1369,6 +1391,9 @@ static inline int kvm_memslot_move_forward(struct kvm_memslots *slots,
+>>    * most likely to be referenced, sorting it to the front of the array was
+>>    * advantageous.  The current binary search starts from the middle of the array
+>>    * and uses an LRU pointer to improve performance for all memslots and GFNs.
+>> + *
+>> + * @memslot is a detached struct, not a part of the current or new memslot
+>> + * array.
+>>    */
+>>   static void update_memslots(struct kvm_memslots *slots,
+>>   			    struct kvm_memory_slot *memslot,
+>> @@ -1393,7 +1418,8 @@ static void update_memslots(struct kvm_memslots *slots,
+>>   		 * its index accordingly.
+>>   		 */
+>>   		slots->memslots[i] = *memslot;
+>> -		slots->id_to_index[memslot->id] = i;
+>> +		hash_add(slots->id_hash, &slots->memslots[i].id_node,
+>> +			 memslot->id);
+> 
+> Let this poke out past 80 chars, i.e. drop the newline.
 
 Will do.
-
->> @@ -1567,10 +1576,10 @@ static int kvm_set_memslot(struct kvm *kvm,
->>   		/*
->>   		 * The arch-specific fields of the memslots could have changed
->>   		 * between releasing the slots_arch_lock in
->> -		 * install_new_memslots and here, so get a fresh copy of the
->> -		 * slots.
->> +		 * install_new_memslots and here, so get a fresh copy of these
->> +		 * fields.
->>   		 */
->> -		kvm_copy_memslots(slots, __kvm_memslots(kvm, as_id));
->> +		kvm_copy_memslots_arch(slots, __kvm_memslots(kvm, as_id));
->>   	}
->>   
->>   	r = kvm_arch_prepare_memory_region(kvm, old, new, mem, change);
->> @@ -1587,8 +1596,6 @@ static int kvm_set_memslot(struct kvm *kvm,
->>   
->>   out_slots:
->>   	if (change == KVM_MR_DELETE || change == KVM_MR_MOVE) {
->> -		slot = id_to_memslot(slots, old->id);
->> -		slot->flags &= ~KVM_MEMSLOT_INVALID;
->>   		slots = install_new_memslots(kvm, as_id, slots);
->>   	} else {
-> 
-> The braces can be dropped since both branches are now single lines.
-> 
->>   		mutex_unlock(&kvm->slots_arch_lock);
-
-Will drop them.
 
 Thanks,
 Maciej
