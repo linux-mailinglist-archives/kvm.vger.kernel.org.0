@@ -2,158 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5489D43523C
-	for <lists+kvm@lfdr.de>; Wed, 20 Oct 2021 20:00:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 25890435241
+	for <lists+kvm@lfdr.de>; Wed, 20 Oct 2021 20:01:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231248AbhJTSCl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Oct 2021 14:02:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44198 "EHLO
+        id S231183AbhJTSDZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Oct 2021 14:03:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44382 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231238AbhJTSCi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Oct 2021 14:02:38 -0400
-Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4E05C06161C
-        for <kvm@vger.kernel.org>; Wed, 20 Oct 2021 11:00:23 -0700 (PDT)
-Received: by mail-lj1-x232.google.com with SMTP id 145so14022710ljj.1
-        for <kvm@vger.kernel.org>; Wed, 20 Oct 2021 11:00:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=uaajOdBb5o8GpJ5LszUoXImIH2hMWTsxvF1LpqVJ5wI=;
-        b=FL3zGsqGGGcSPxBpLLim2N19Dw7ix6ft2DMBMa/qJmXFXXXBFYeu4JJz8xE21yw/x8
-         MFkxdUZZVlskcpymml0yumXHglfUUHm8yNA6glZoqNjUa48ePxFsbJ24ZcGtj67yn2WE
-         QPaCZFF5VizJDFufnbJuVFCmJGCpd25nRrdlaWiwcvnilcOhgBQ4eJ41nqhMFFMuaf5R
-         zjFmLsWi5HVdn+eqMa2lLaZ2eDQ5kDkPc3WM1owk1b86txx1mPB/3kY3NSFP3TAKvPx/
-         HTHiVA6Ok64CuyFHLKIrkr7DlSrNQi27txeZaeKWGTw+tK98OrC3VSnHZnHKoAsdy4nf
-         1/fA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=uaajOdBb5o8GpJ5LszUoXImIH2hMWTsxvF1LpqVJ5wI=;
-        b=KCBgrlZqTu5UWbzGGriifecbMyNGhgwazd+opVv5GkBl6n1m9R0nLjftGZiH+MW3+b
-         P2xWebb8+eORlCb2sC2wXQLRuRmIylbiCN1aCoIHSSVw652H9k/VVmRuKObdRT8J2CJQ
-         mVL3cE2W9S19P/EsLcdj0aTWoauTKnE+sZE27eH80K9gvmawV94+aQMSm2ZuW1NdFWnt
-         ugmwynq0kVHdaVlKpRadp9ixro9OhV4i1mqsIfI90DnMrgMborS76jUNObMguD72bbOe
-         DsyCEkkIEu6BnRdXn7X29eZbsi7GjWzrDJpEhyECc1H09o+RlerTxuiKC5lyFUIvD13c
-         5evQ==
-X-Gm-Message-State: AOAM5300lhG7zo7PWFUMFuMQQiGH0zj1Q5cq3Tmit9GNVfUr2fLCIpDY
-        jHHQUcocmdz7/VPhnne3WctsAhJOoyu7wJY+BkA=
-X-Google-Smtp-Source: ABdhPJzqzRnhyAb5QSJ4tStu5d9VpPDPAO83af3DxfwLBze+gowerGVQUGaIUAfRyT+XYcNS+OlkOp4gtAbtNPUaKdk=
-X-Received: by 2002:a2e:a5c8:: with SMTP id n8mr528519ljp.307.1634752821985;
- Wed, 20 Oct 2021 11:00:21 -0700 (PDT)
-MIME-Version: 1.0
-References: <20211004204931.1537823-1-zxwang42@gmail.com> <20211004204931.1537823-18-zxwang42@gmail.com>
- <6a5a16f7-c350-a48d-c5e7-352455b57c09@suse.com> <CAEDJ5ZQbXK=Gtf_QH2PMNEOBo++7vsa84zZ3G8rzM=TH+JUrQQ@mail.gmail.com>
- <CAA03e5HL0aiByPGiO5mescTHNM=DT69Kx=ep=cS-De8u+tvaMA@mail.gmail.com> <32dba144-e0d4-6d91-5f79-6ed47fea6421@suse.com>
-In-Reply-To: <32dba144-e0d4-6d91-5f79-6ed47fea6421@suse.com>
-From:   Zixuan Wang <zxwang42@gmail.com>
-Date:   Wed, 20 Oct 2021 10:59:00 -0700
-Message-ID: <CAEDJ5ZSioZmtvdijTgZTsVAv0QpFwUzawYqF31ELLKZc0WXGPg@mail.gmail.com>
-Subject: Re: [kvm-unit-tests PATCH v3 17/17] x86 AMD SEV-ES: Add test cases
-To:     Varad Gautam <varad.gautam@suse.com>
-Cc:     Marc Orr <marcorr@google.com>, kvm list <kvm@vger.kernel.org>,
+        with ESMTP id S230245AbhJTSDY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Oct 2021 14:03:24 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3EB20C06161C;
+        Wed, 20 Oct 2021 11:01:10 -0700 (PDT)
+Received: from zn.tnic (p200300ec2f0db300f8abf0ed14d647a3.dip0.t-ipconnect.de [IPv6:2003:ec:2f0d:b300:f8ab:f0ed:14d6:47a3])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id A2FA61EC036B;
+        Wed, 20 Oct 2021 20:01:08 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1634752868;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=/4U7+bVpmBPJ7gV+r1bdTzVoBWatHcmArzH+WpFLVX0=;
+        b=LQb5wxNMBVSSlO4PGPVoSe/7fkJf0JVygFKVgj3YJxWvdH223GLeJBRVogaHJsXpgELkDZ
+        aR2X2C7ns1benSbZXA3zSmx/zXmFDxNO1jhKOrJ2xoKPbM5W4/RCaen8vWDcaktwbP3Uoo
+        bofa4W9GEGyxWkwSaRWxf1JrdO63uX8=
+Date:   Wed, 20 Oct 2021 20:01:07 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Michael Roth <michael.roth@amd.com>
+Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Andrew Jones <drjones@redhat.com>,
-        "Hyunwook (Wooky) Baek" <baekhw@google.com>,
-        Tom Roeder <tmroeder@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        David Rientjes <rientjes@google.com>,
         Sean Christopherson <seanjc@google.com>,
-        "Singh, Brijesh" <brijesh.singh@amd.com>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        Joerg Roedel <jroedel@suse.de>, bp@suse.de
-Content-Type: text/plain; charset="UTF-8"
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH v6 08/42] x86/sev-es: initialize sev_status/features
+ within #VC handler
+Message-ID: <YXBZYws8NnxiQJD7@zn.tnic>
+References: <20211008180453.462291-1-brijesh.singh@amd.com>
+ <20211008180453.462291-9-brijesh.singh@amd.com>
+ <YW2EsxcqBucuyoal@zn.tnic>
+ <20211018184003.3ob2uxcpd2rpee3s@amd.com>
+ <YW3IdfMs61191qnU@zn.tnic>
+ <20211020161023.hzbj53ehmzjrt4xd@amd.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20211020161023.hzbj53ehmzjrt4xd@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 19, 2021 at 9:44 AM Varad Gautam <varad.gautam@suse.com> wrote:
->
-> On 10/19/21 4:14 PM, Marc Orr wrote:
-> > On Mon, Oct 18, 2021 at 9:38 PM Zixuan Wang <zxwang42@gmail.com> wrote:
-> >>
-> >> On Mon, Oct 18, 2021 at 4:47 AM Varad Gautam <varad.gautam@suse.com> wrote:
-> >>>
-> >>> Hi Zixuan,
-> >>>
-> >>> On 10/4/21 10:49 PM, Zixuan Wang wrote:
-> >>>> From: Zixuan Wang <zixuanwang@google.com>
-> >>>>  int main(void)
-> >>>>  {
-> >>>>       int rtn;
-> >>>>       rtn = test_sev_activation();
-> >>>>       report(rtn == EXIT_SUCCESS, "SEV activation test.");
-> >>>> +     rtn = test_sev_es_activation();
-> >>>> +     report(rtn == EXIT_SUCCESS, "SEV-ES activation test.");
-> >>>> +     rtn = test_sev_es_msr();
-> >>>
-> >>> There is nothing SEV-ES specific about this function, it only wraps
-> >>> rdmsr/wrmsr, which are supposed to generate #VC exceptions on SEV-ES.
-> >>> Since the same scenario can be covered by running the msr testcase
-> >>> as a SEV-ES guest and observing if it crashes, does testing
-> >>> rdmsr/wrmsr one more time here gain us any new information?
-> >>>
-> >>> Also, the function gets called from main() even if
-> >>> test_sev_es_activation() failed or SEV-ES was inactive.
-> >>>
-> >>> Note: More broadly, what are you looking to test for here?
-> >>> 1. wrmsr/rdmsr correctness (rdmsr reads what wrmsr wrote)? or,
-> >>> 2. A #VC exception not causing a guest crash on SEV-ES?
-> >>>
-> >>> If you are looking to test 1., I suggest letting it be covered by
-> >>> the generic testcases for msr.
-> >>>
-> >>> If you are looking to test 2., perhaps a better test is to trigger
-> >>> all scenarios that would cause a #VC exception (eg. test_sev_es_vc_exit)
-> >>> and check that a SEV-ES guest survives.
-> >>>
-> >>> Regards,
-> >>> Varad
-> >>>
-> >>
-> >> Hi Varad,
-> >>
-> >> This test case does not bring any SEV-related functionality testing.
-> >> Instead, it is provided for development, i.e., one can check if SEV is
-> >> properly set up by monitoring if this test case runs fine without
-> >> crashes.
-> >>
-> >> Since this test case is causing some confusion and does not bring any
-> >> functionality testing, I can remove it from the next version. We can
-> >> still verify the SEV setup process by checking if an existing test
-> >> case (e.g., x86/msr.c) runs without crashes in a SEV guest.
-> >>
-> >> It's hard for me to develop a meaningful SEV test case, because I just
-> >> finished my Google internship and thus lost access to SEV-enabled
-> >> machines.
-> >
-> > Removing this test case is fine. Though, it is convenient. But I
-> > agree, it's redundant. Maybe we can tag any tests that are good to run
-> > under SEV and/or SEV-ES via the `groups` field in the
-> > x86/unittests.cfg file. The name `groups` is plural. So I assume that
-> > a test can be a member of multiple groups. But I see no examples.
-> >
->
-> Right, from a fleet owner perspective I can imagine the following scenarios
-> being relevant to test for a SEV* offering (and I guess hence make sense to
-> have a special test in kvm-unit-tests for):
-> - CPUID shows the right SEV level
-> - C-bit discovery
-> - GHCB validity (protocol version etc.)
->
-> Generic kvm behavior is better tested via the other dedicated tests, which,
-> after the EFI-fication should be no problem to fit into a test plan. The
-> SEV* implementation can then go through the whole battery of kvm-unit-tests
-> plus the SEV* ones.
->
-> Regards,
-> Varad
->
+On Wed, Oct 20, 2021 at 11:10:23AM -0500, Michael Roth wrote:
+> [Sorry for the wall of text, just trying to work through everything.]
 
-Thank you for the summary! I will put a brief description in the V4
-patchset about the future test cases, and a link to this discussion.
+And I'm going to respond in a couple of mails just for my own sanity.
 
-Best regards,
-ZIxuan
+> I'm not sure if this is pertaining to using the CPUID table prior to
+> sme_enable(), or just the #VC-based SEV MSR read. The following comments
+> assume the former. If that assumption is wrong you can basically ignore
+> the rest of this email :)
+
+This is pertaining to me wanting to show you that the design of this SNP
+support needs to be sane and maintainable and every function needs to
+make sense not only now but in the future.
+
+In this particular example, we should set sev_status *once*, *before*
+anything accesses it so that it is prepared when something needs it. Not
+do a #VC and go, "oh, btw, is sev_status set? No? Ok, lemme set it."
+which basically means our design is seriously lacking.
+
+And I had suggested a similar thing for TDX and tglx was 100% right in
+shooting it down because we do properly designed things - not, get stuff
+in so that vendor is happy and then, once the vendor programmers have
+disappeared to do their next enablement task, the maintainers get to mop
+up and maintain it forever.
+
+Because this mopping up doesn't scale - trust me.
+
+> [The #VC-based SEV MSR read is not necessary for anything in sme_enable(),
+> it's simply a way to determine whether the guest is an SNP guest, without
+> any reliance on CPUID, which seemed useful in the context of doing some
+> additional sanity checks against the SNP CPUID table and determining that
+> it's appropriate to use it early on (rather than just trust that this is an
+> SNP guest by virtue of the CC blob being present, and then failing later
+> once sme_enable() checks for the SNP feature bits through the normal
+> mechanism, as was done in v5).]
+
+So you need to make up your mind here design-wise, what you wanna do.
+
+The proper thing to do would be, to detect *everything*, detect whether
+this is an SNP guest, yadda yadda, everything your code is going to need
+later on, and then be done with it.
+
+Then you continue with the boot and now your other code queries
+everything that has been detected up til now and uses it.
+
+End of mail 1.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
