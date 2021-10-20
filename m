@@ -2,211 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D9E2E4354C2
-	for <lists+kvm@lfdr.de>; Wed, 20 Oct 2021 22:46:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B930E4354EA
+	for <lists+kvm@lfdr.de>; Wed, 20 Oct 2021 23:07:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230484AbhJTUsz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Oct 2021 16:48:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54236 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230343AbhJTUsy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Oct 2021 16:48:54 -0400
-Received: from mail-oo1-xc33.google.com (mail-oo1-xc33.google.com [IPv6:2607:f8b0:4864:20::c33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 704C1C061749
-        for <kvm@vger.kernel.org>; Wed, 20 Oct 2021 13:46:39 -0700 (PDT)
-Received: by mail-oo1-xc33.google.com with SMTP id n15-20020a4ad12f000000b002b6e3e5fd5dso2377384oor.1
-        for <kvm@vger.kernel.org>; Wed, 20 Oct 2021 13:46:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=1lkg4Nfx7G3x+RiY9KVOqV5F+nosxNjlybZ7kzex2gg=;
-        b=j/yPYwwSVLkRF7vaprNAxYVIqgcpK2ui2dz1MFVwHoTwCsTN9VBb3igIED3/XT/qGD
-         Hk4frXouwTKCAVH9bX3wBMlvJsZvlezi/nLet98ABAOKsLKNX+gKxcxndJ92oFpD0bVx
-         nv8JtmV0S8d9UsQUaOjuxE/o11P3755vJrbPx5mg1Z4pJp0AlymL7tQH50wWF/zMk2Lz
-         TDqRHwF0SSq7V/oAf6VxoqG/9gALzMYTp/7wWB6aJrJagKrLTOcUXlVo1aBvbnxOl1JE
-         ZHmykI4pxPVR6wJ8u6/d1u8UowHI8cbzC6aWrhAqspqxS+BrC+FF7zFj18w4woo0hr2a
-         SjEA==
+        id S230515AbhJTVJb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Oct 2021 17:09:31 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:57545 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229842AbhJTVJa (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 20 Oct 2021 17:09:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1634764035;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=LudZt1LikP2qvwJT5NV0ZH9XpRMU1nt0Zd6YW0CIgBk=;
+        b=hZkMnLikmnN1HWB9pbRldxVfAOYLTh8c57Bk8rFf/kETT/I75Q2KekZc5oYoH26aObBDSf
+        AZNrdcFUSQhCCGVFRGiPQrYCuWoEERQ/rQprqbRvGI6aht1nAm+/hE4HfDsBl45wbiHVZt
+        Y+VwWEkgJR0awESFGbzD9AqTI6ynjvk=
+Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com
+ [209.85.161.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-440-P9BMqc3zN2qM-8Y5faM54g-1; Wed, 20 Oct 2021 17:07:13 -0400
+X-MC-Unique: P9BMqc3zN2qM-8Y5faM54g-1
+Received: by mail-oo1-f70.google.com with SMTP id a27-20020a4ad1db000000b002b72037d144so3822236oos.6
+        for <kvm@vger.kernel.org>; Wed, 20 Oct 2021 14:07:13 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=1lkg4Nfx7G3x+RiY9KVOqV5F+nosxNjlybZ7kzex2gg=;
-        b=vRS/TktRlDa7wCT8+BzCa9d66l4G6P9WtqskExEv+8540pDuNgogUEm0Jtq9bLDMDR
-         3tiI1csAV32Cd8hZblQCN82fRCH7HoS3K7fggkXXu4x6YCNQZV3/XTt9/4cw1MVWqBts
-         vS0TBBzdSjgIroLhCARVBjxKrziZ4KC+QkoEWlVmcrSmw9KW5oO8r15EKuOiLTSnW2PJ
-         a5D2Ow8Iebl6Xjc8Pxje6Qt4g8OeoeuUAcStIbGORlOvB7DGdnMpx7lSpk5RGqeHfH25
-         areGN6oiVavVjI/g/SLaxwN883VAEWfJesINAmFlSd18AK+ngV4uXhtBzVcpAUKulX/w
-         m8Uw==
-X-Gm-Message-State: AOAM5306mgWZZfqIjgRAM2EaXM/vOhOxf9nh90IdJQGx+sFfK3qu1TDR
-        Pcj4nyfdtN9SuZdqzS0VCBMI4LEyYumCLMjB0bMQeQ==
-X-Google-Smtp-Source: ABdhPJzLhpoNHbE72QAO14tyQ5TkYF20ltjyRvtC/is93xRdGWf7OUh/ywqTdCdmUoNRL1H3wa4/Mfji6ELmeh/0ouA=
-X-Received: by 2002:a4a:d099:: with SMTP id i25mr1168740oor.86.1634762798487;
- Wed, 20 Oct 2021 13:46:38 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=LudZt1LikP2qvwJT5NV0ZH9XpRMU1nt0Zd6YW0CIgBk=;
+        b=a8FQercP4+zDq4AxoBOMug2kopbc2v8febZny8tnDoPRzeW2EtOqXAEh/SSmYpID1f
+         /Q7bQrdYBR8eCrIlqydVILEKLZDjFGXdjS2UGwOOVIy/UQy1I8YIR82Iz4ctsq6pMKIa
+         fxjxL2RnDbUhMfhzLzOdMd/b9VTCR49dOTa6UttzdlPL1tVBduuudOPa4nuz4zsnC4e9
+         VnlZ+771tzyFOjmmgcdYmV78ijkXMcCFyZLWWrmgzD18YyyPN731x3BNRGttaTdULvqW
+         LU05Hp2DtRnqxRw2hRy9UBoePQ4ZQm2h5m4B/af/bkzokRJp6AhSFsAp3xJn6DK75PMc
+         +Jrw==
+X-Gm-Message-State: AOAM533gZlbHsjK8RpyrbLooH0WkHB7bmevlA28b85LXYZiYRCl4mJj4
+        ipP4Uyz3E01LqJ+Lo2cMiEOiVfK42Xq3Np2n3DrhVIkaIIQgQPjsKeK60t40fH0VKVF7chCczfX
+        iNqHRdI7fr0Pq
+X-Received: by 2002:a05:6808:124b:: with SMTP id o11mr1433375oiv.1.1634764032656;
+        Wed, 20 Oct 2021 14:07:12 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwSqTE6Jsjle0a7eGnYIXixW4xhZALBq3/tyZIF8DSzw72ba7CeI6EE3sHXL8OySnKnEaUa6w==
+X-Received: by 2002:a05:6808:124b:: with SMTP id o11mr1433350oiv.1.1634764032381;
+        Wed, 20 Oct 2021 14:07:12 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id o21sm598520oou.21.2021.10.20.14.07.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 Oct 2021 14:07:12 -0700 (PDT)
+Date:   Wed, 20 Oct 2021 15:07:09 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Yishai Hadas <yishaih@nvidia.com>, bhelgaas@google.com,
+        saeedm@nvidia.com, linux-pci@vger.kernel.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, kuba@kernel.org, leonro@nvidia.com,
+        kwankhede@nvidia.com, mgurtovoy@nvidia.com, maorg@nvidia.com,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>
+Subject: Re: [PATCH V2 mlx5-next 12/14] vfio/mlx5: Implement vfio_pci driver
+ for mlx5 devices
+Message-ID: <20211020150709.7cff2066.alex.williamson@redhat.com>
+In-Reply-To: <20211020185919.GH2744544@nvidia.com>
+References: <20211019105838.227569-1-yishaih@nvidia.com>
+        <20211019105838.227569-13-yishaih@nvidia.com>
+        <20211019124352.74c3b6ba.alex.williamson@redhat.com>
+        <20211019192328.GZ2744544@nvidia.com>
+        <20211019145856.2fa7f7c8.alex.williamson@redhat.com>
+        <20211019230431.GA2744544@nvidia.com>
+        <5a496713-ae1d-11f2-1260-e4c1956e1eda@nvidia.com>
+        <20211020105230.524e2149.alex.williamson@redhat.com>
+        <20211020185919.GH2744544@nvidia.com>
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <20211020192732.960782-1-pbonzini@redhat.com> <20211020192732.960782-3-pbonzini@redhat.com>
-In-Reply-To: <20211020192732.960782-3-pbonzini@redhat.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Wed, 20 Oct 2021 13:46:27 -0700
-Message-ID: <CALMp9eTbehPFGb2UTDiV8Q7zo6O9_Dq39=V_DdcQKG3-ev1_8w@mail.gmail.com>
-Subject: Re: [PATCH v2 kvm-unit-tests 2/2] replace tss_descr global with a function
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, zxwang42@gmail.com, marcorr@google.com,
-        seanjc@google.com, jroedel@suse.de, varad.gautam@suse.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-+Aaron Lewis
+On Wed, 20 Oct 2021 15:59:19 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-On Wed, Oct 20, 2021 at 12:27 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> tss_descr is declared as a struct descriptor_table_ptr but it is actualy
-> pointing to an _entry_ in the GDT.  Also it is different per CPU, but
-> tss_descr does not recognize that.  Fix both by reusing the code
-> (already present e.g. in the vmware_backdoors test) that extracts
-> the base from the GDT entry; and also provide a helper to retrieve
-> the limit, which is needed in vmx.c.
->
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  lib/x86/desc.c         | 22 ++++++++++++++++++++++
->  lib/x86/desc.h         | 28 +++++++---------------------
->  x86/cstart64.S         |  1 -
->  x86/svm_tests.c        | 15 +++------------
->  x86/vmware_backdoors.c | 22 ++++++----------------
->  x86/vmx.c              |  9 +++++----
->  6 files changed, 43 insertions(+), 54 deletions(-)
->
-> diff --git a/lib/x86/desc.c b/lib/x86/desc.c
-> index 3d38565..cfda2b2 100644
-> --- a/lib/x86/desc.c
-> +++ b/lib/x86/desc.c
-> @@ -409,3 +409,25 @@ void __set_exception_jmpbuf(jmp_buf *addr)
->  {
->         exception_jmpbuf = addr;
->  }
-> +
-> +gdt_entry_t *get_tss_descr(void)
-> +{
-> +       struct descriptor_table_ptr gdt_ptr;
-> +       gdt_entry_t *gdt;
-> +
-> +       sgdt(&gdt_ptr);
-> +       gdt = (gdt_entry_t *)gdt_ptr.base;
-> +       return &gdt[str() / 8];
-> +}
-> +
-> +unsigned long get_gdt_entry_base(gdt_entry_t *entry)
-> +{
-> +       unsigned long base;
-> +       base = entry->base1 | ((u32)entry->base2 << 16) | ((u32)entry->base3 << 24);
-> +#ifdef __x86_64__
-> +       if (!entry->s) {
-> +           base |= (u64)((gdt_entry16_t *)entry)->base4 << 32;
-> +       }
-> +#endif
-> +       return base;
-> +}
-> diff --git a/lib/x86/desc.h b/lib/x86/desc.h
-> index 0af37e3..e8a6c21 100644
-> --- a/lib/x86/desc.h
-> +++ b/lib/x86/desc.h
-> @@ -185,31 +185,14 @@ typedef struct {
->  } __attribute__((__packed__)) gdt_entry_t;
->
->  #ifdef __x86_64__
-> -struct segment_desc64 {
-> -       uint16_t limit1;
-> -       uint16_t base1;
-> -       uint8_t  base2;
-> -       union {
-> -               uint16_t  type_limit_flags;      /* Type and limit flags */
-> -               struct {
-> -                       uint16_t type:4;
-> -                       uint16_t s:1;
-> -                       uint16_t dpl:2;
-> -                       uint16_t p:1;
-> -                       uint16_t limit:4;
-> -                       uint16_t avl:1;
-> -                       uint16_t l:1;
-> -                       uint16_t db:1;
-> -                       uint16_t g:1;
-> -               } __attribute__((__packed__));
-> -       } __attribute__((__packed__));
-> -       uint8_t  base3;
-> +typedef struct {
-> +       gdt_entry_t common;
->         uint32_t base4;
->         uint32_t zero;
+> On Wed, Oct 20, 2021 at 10:52:30AM -0600, Alex Williamson wrote:
+> 
+> > I'm wondering if we're imposing extra requirements on the !_RUNNING
+> > state that don't need to be there.  For example, if we can assume that
+> > all devices within a userspace context are !_RUNNING before any of the
+> > devices begin to retrieve final state, then clearing of the _RUNNING
+> > bit becomes the device quiesce point and the beginning of reading
+> > device data is the point at which the device state is frozen and
+> > serialized.  No new states required and essentially works with a slight
+> > rearrangement of the callbacks in this series.  Why can't we do that?  
+> 
+> It sounds worth checking carefully. I didn't come up with a major
+> counter scenario.
+> 
+> We would need to specifically define which user action triggers the
+> device to freeze and serialize. Reading pending_bytes I suppose?
 
-Technically, only bits 12:8 must be zero. The rest are ignored. See
-the APM, volume 2, figure 4-22. But, perhaps that's a bit too
-pedantic.
+The first read of pending_bytes after clearing the _RUNNING bit would
+be the logical place to do this since that's what we define as the start
+of the cycle for reading the device state.
 
-> -} __attribute__((__packed__));
-> +} __attribute__((__packed__)) gdt_entry16_t;
->  #endif
->
-> -#define DESC_BUSY ((uint64_t) 1 << 41)
-> +#define DESC_BUSY 2
->
->  extern idt_entry_t boot_idt[256];
->
-...
-> diff --git a/x86/vmx.c b/x86/vmx.c
-> index 20dc677..063f96a 100644
-> --- a/x86/vmx.c
-> +++ b/x86/vmx.c
-> @@ -75,7 +75,6 @@ union vmx_ept_vpid  ept_vpid;
->
->  extern struct descriptor_table_ptr gdt64_desc;
->  extern struct descriptor_table_ptr idt_descr;
-> -extern struct descriptor_table_ptr tss_descr;
->  extern void *vmx_return;
->  extern void *entry_sysenter;
->  extern void *guest_entry;
-> @@ -1275,7 +1274,7 @@ static void init_vmcs_host(void)
->         vmcs_write(HOST_SEL_FS, KERNEL_DS);
->         vmcs_write(HOST_SEL_GS, KERNEL_DS);
->         vmcs_write(HOST_SEL_TR, TSS_MAIN);
-> -       vmcs_write(HOST_BASE_TR, tss_descr.base);
-> +       vmcs_write(HOST_BASE_TR, get_gdt_entry_base(get_tss_descr()));
->         vmcs_write(HOST_BASE_GDTR, gdt64_desc.base);
->         vmcs_write(HOST_BASE_IDTR, idt_descr.base);
->         vmcs_write(HOST_BASE_FS, 0);
-> @@ -1291,6 +1290,8 @@ static void init_vmcs_host(void)
->
->  static void init_vmcs_guest(void)
->  {
-> +       gdt_entry_t *tss_descr = get_tss_descr();
-> +
->         /* 26.3 CHECKING AND LOADING GUEST STATE */
->         ulong guest_cr0, guest_cr4, guest_cr3;
->         /* 26.3.1.1 */
-> @@ -1331,7 +1332,7 @@ static void init_vmcs_guest(void)
->         vmcs_write(GUEST_BASE_DS, 0);
->         vmcs_write(GUEST_BASE_FS, 0);
->         vmcs_write(GUEST_BASE_GS, 0);
-> -       vmcs_write(GUEST_BASE_TR, tss_descr.base);
-> +       vmcs_write(GUEST_BASE_TR, get_gdt_entry_base(tss_descr));
->         vmcs_write(GUEST_BASE_LDTR, 0);
->
->         vmcs_write(GUEST_LIMIT_CS, 0xFFFFFFFF);
-> @@ -1341,7 +1342,7 @@ static void init_vmcs_guest(void)
->         vmcs_write(GUEST_LIMIT_FS, 0xFFFFFFFF);
->         vmcs_write(GUEST_LIMIT_GS, 0xFFFFFFFF);
->         vmcs_write(GUEST_LIMIT_LDTR, 0xffff);
-> -       vmcs_write(GUEST_LIMIT_TR, tss_descr.limit);
-> +       vmcs_write(GUEST_LIMIT_TR, 0x67);
+"Freezing" the device is a valid implementation, but I don't think it's
+strictly required per the uAPI.  For instance there's no requirement
+that pending_bytes is reduced by data_size on each iteratio; we
+specifically only define that the state is complete when the user reads
+a pending_bytes value of zero.  So a driver could restart the device
+state if the device continues to change (though it's debatable whether
+triggering an -errno on the next migration region access might be a
+more supportable approach to enforce that userspace has quiesced
+external access).
 
-Isn't the limit still set to 0xFFFF in {cstart,cstart64}.S? And
-doesn't the VMware backdoor test assume there's room for an I/O
-permission bitmap?
+> Since freeze is a device command we need to be able to report failure
+> and to move the state to error, that feels bad hidden inside reading
+> pending_bytes.
 
->         vmcs_write(GUEST_AR_CS, 0xa09b);
->         vmcs_write(GUEST_AR_DS, 0xc093);
-> --
-> 2.27.0
->
+That seems like the wrong model.  Reading pending_bytes can return
+-errno should an error occur during freeze/serialize, but device_state
+is never implicitly modified.  Upon encountering an error reading
+pending_bytes, userspace would abort the migration and move the
+device_state to a new value.  This is the point at which the driver
+would return another -errno to indicate an unrecoverable internal
+error, or honor the requested new state.
+
+> > Maybe a clarification of the uAPI spec is sufficient to achieve this,
+> > ex. !_RUNNING devices may still update their internal state machine
+> > based on external access.  Userspace is expected to quiesce all external
+> > access prior to initiating the retrieval of the final device state from
+> > the data section of the migration region.  Failure to do so may result
+> > in inconsistent device state or optionally the device driver may induce
+> > a fault if a quiescent state is not maintained.  
+> 
+> But on the other hand this seem so subtle and tricky way to design a
+> uAPI that devices and users are unlikely to implement it completely
+> correctly.
+
+I think it's only tricky if device_state is implicitly modified by
+other actions, stopping all devices before collecting the state of any
+of them seems like a reasonable requirement.  It's the same requirement
+we'd add with an NDMA bit.
+
+> IMHO the point of the state is to control the current behavior of the
+> device - yes we can control behavior on other operations, but it feels
+> obfuscated.
+
+It is, don't do that.  Fail the migration region operation, fail the
+next device state transition if the internal error is irrecoverable.
+ 
+> Especially when the userspace that needs to know about this isn't even
+> deployed yet, let's just do it cleanly?
+
+That's an option, but again I'm wondering if we're imposing a
+requirement on the !_RUNNING state that doesn't really exist and a
+clean solution exists already.  Thanks,
+
+Alex
+
