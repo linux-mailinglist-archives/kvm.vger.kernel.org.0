@@ -2,120 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C8C9D4351BB
-	for <lists+kvm@lfdr.de>; Wed, 20 Oct 2021 19:45:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 69FA4435222
+	for <lists+kvm@lfdr.de>; Wed, 20 Oct 2021 19:58:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231332AbhJTRrx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Oct 2021 13:47:53 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:27224 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231245AbhJTRrd (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 20 Oct 2021 13:47:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634751918;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=2hBP0Hfu21rfryuWwyspO9zl4oca+bH25WuLkT22wcc=;
-        b=OGvo1JYIZpHrjIM3pTANYfRJwuYAHN/ZdgKgUAR6XI4ggBJCMjoQdTrDDHGY2NPlVmlJH5
-        EQagJ7sd6Peg2AoxTZGwHaFVBp6dDn6YE/UTM7qNXwLWODzE4tOKpQP1ozO+4Q+yf0FA6q
-        npRYwH0EOiUFsN9neeyur89BHO8PUQU=
-Received: from mail-oi1-f200.google.com (mail-oi1-f200.google.com
- [209.85.167.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-114-pP5g0sDGOGmMFK9coVOmyQ-1; Wed, 20 Oct 2021 13:45:17 -0400
-X-MC-Unique: pP5g0sDGOGmMFK9coVOmyQ-1
-Received: by mail-oi1-f200.google.com with SMTP id q132-20020acac08a000000b00298e2159ac7so4085726oif.17
-        for <kvm@vger.kernel.org>; Wed, 20 Oct 2021 10:45:17 -0700 (PDT)
+        id S231147AbhJTSAR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Oct 2021 14:00:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43574 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230351AbhJTSAO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Oct 2021 14:00:14 -0400
+Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21A43C06161C
+        for <kvm@vger.kernel.org>; Wed, 20 Oct 2021 10:57:59 -0700 (PDT)
+Received: by mail-lj1-x229.google.com with SMTP id n7so197959ljp.5
+        for <kvm@vger.kernel.org>; Wed, 20 Oct 2021 10:57:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=lDwqq4V7Sn+tnjuS5kw3rvWzmCQKIuYIQkYA2weruRQ=;
+        b=cElocYEWXB8qPgApmmTyAN7cfkQVAaUBcgW9z4/JXYYQF4fgZnpYlmLoBzGPjwtonc
+         UIVnTrFJ6gPRez2lTjw4NPuoC79ovsjnOs32Eyt64yl+V/wXEseON6ieXzZ+5QXPappb
+         ySuiSBa5MSRnQtx+pkCSMoZZGGKAXdcl/h7ijr8MgadT+D0FrU8qyXIjOiEInOd7UxEA
+         tKbJvlPwBtGkp2A6q1DcLh7jvxu4Y6vM9eocFA/RF5Ep1Pr6NtsY/vALT7RJqB7P4GH8
+         0j7Hh4KUqy444dvxa4+U1Ge5np59P++6sg88/FNWDvMn0GDNmRTAgiS8yv/C5Q4sLcdp
+         BNIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=2hBP0Hfu21rfryuWwyspO9zl4oca+bH25WuLkT22wcc=;
-        b=gGXnUsivMn7SRD6hLWMjkLXtfCc5vuPopskz6yjK5XQWnvYUqUSiDIXYvpXNjDMpm2
-         aF3PFjM0X9kEdjE7jPO1FnR/l7xBntcVelzmowIlwz+OMZqMMMxag49Xu3Sr0bkY82mK
-         Ocfc4N0NpgHf9xjR9/Eg8jleSeouhgMnK+BW9KPUXvBBsBBle/cngt/R0AGfzEo03oX1
-         zPwxhM1ajFL9952gQJlxumnWmepbKi8ijVUQgjmxd0F7WIRLt/K4ExESE9AZx5Pv7TXX
-         e0REh2mWT8cNnXlQlBD9+icZvElN9Bin0Tnwya4YMBYcaXpNjid6j0y1qOXWMTPY0MVC
-         w5Nw==
-X-Gm-Message-State: AOAM530lw80wUuK26233CCpgGMzq7iAnSBHBeUdl4D5IQQEOmC5euPlJ
-        wws8+BeVLeCg87AO6lJJHvekl0QKtmB2hjwbpEzKlRvKvBVVej2O17/Q2v/L8z2RKmmXG9OlKlT
-        HtTHNhDT2rc1p
-X-Received: by 2002:aca:5f05:: with SMTP id t5mr764538oib.6.1634751916603;
-        Wed, 20 Oct 2021 10:45:16 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxKoHj9L/+cPOQcjxZIt11pD2g7gRAhKD9GAn7fGM9xPBRn3QxFkpALYapm7VHjLzF9mQtvwA==
-X-Received: by 2002:aca:5f05:: with SMTP id t5mr764508oib.6.1634751916398;
-        Wed, 20 Oct 2021 10:45:16 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id n187sm538797oif.52.2021.10.20.10.45.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Oct 2021 10:45:16 -0700 (PDT)
-Date:   Wed, 20 Oct 2021 11:45:14 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Yishai Hadas <yishaih@nvidia.com>, bhelgaas@google.com,
-        saeedm@nvidia.com, linux-pci@vger.kernel.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, kuba@kernel.org, leonro@nvidia.com,
-        kwankhede@nvidia.com, mgurtovoy@nvidia.com, maorg@nvidia.com
-Subject: Re: [PATCH V2 mlx5-next 14/14] vfio/mlx5: Use its own PCI
- reset_done error handler
-Message-ID: <20211020114514.560ce2fa.alex.williamson@redhat.com>
-In-Reply-To: <20211020164629.GG2744544@nvidia.com>
-References: <20211019105838.227569-1-yishaih@nvidia.com>
-        <20211019105838.227569-15-yishaih@nvidia.com>
-        <20211019125513.4e522af9.alex.williamson@redhat.com>
-        <20211019191025.GA4072278@nvidia.com>
-        <5cf3fb6c-2ca0-f54e-3a05-27762d29b8e2@nvidia.com>
-        <20211020164629.GG2744544@nvidia.com>
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=lDwqq4V7Sn+tnjuS5kw3rvWzmCQKIuYIQkYA2weruRQ=;
+        b=D1QYY7vDAnTWqgXmTcgtGOmqbhq4+EhAbodwjDeVfxIex6oTh5e7yHnFgquGHAc0BY
+         T7owxMSIBEs9LwI0t9D2/pdgQ2EK4LNZd80B9uyz7YaH8jBQgpuQMuaXfNQcwMBq/K5K
+         7cCiSltoN+RlLoeymsR9q5/hms7n5MGKhTtNgY6SfaVTssmjgqgRz1hx/e5PW5oyBJkd
+         MzYTS1A5QR2Cj62MX8uS27hcaRjrKcSBrSJRvhxhIdoGEpQ5iTdij7CTM/PEnkHBDdDJ
+         zqnqTejryM8Latb8Uubger5Srg666mkeim5f7pBB1IYcuHTjYbScgXjeewf6M3GRQXyb
+         oS5w==
+X-Gm-Message-State: AOAM530p2vbKf3Iabb4l2Bjm6rK/G5iMq3Db4jCnrsPSlbtkBweoY/z/
+        zot8LzLK0jcR6qohPj7ZAt7hulw1s4HFtXQ4bJQ=
+X-Google-Smtp-Source: ABdhPJyhcJqdt3rtgeLJVElachY0SP6KudCATDPSzpm6LMf6hdGirfLmDj4gkk9ueiE2KnTwYu8DliTA3uRcyotj8i8=
+X-Received: by 2002:a2e:a48d:: with SMTP id h13mr610850lji.36.1634752677394;
+ Wed, 20 Oct 2021 10:57:57 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20211004204931.1537823-1-zxwang42@gmail.com> <20211004204931.1537823-2-zxwang42@gmail.com>
+ <e1e6c07a-132d-ba11-cca2-282315b23eb3@redhat.com>
+In-Reply-To: <e1e6c07a-132d-ba11-cca2-282315b23eb3@redhat.com>
+From:   Zixuan Wang <zxwang42@gmail.com>
+Date:   Wed, 20 Oct 2021 10:56:00 -0700
+Message-ID: <CAEDJ5ZSZMdUC=B2y0ZsVe30G-xZUe+xW2dVhH5R9vdcVS45Ecg@mail.gmail.com>
+Subject: Re: [kvm-unit-tests PATCH v3 01/17] x86: Move IDT, GDT and TSS to desc.c
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, Andrew Jones <drjones@redhat.com>,
+        Marc Orr <marcorr@google.com>,
+        "Hyunwook (Wooky) Baek" <baekhw@google.com>,
+        Tom Roeder <tmroeder@google.com>, erdemaktas@google.com,
+        rientjes@google.com, seanjc@google.com,
+        "Singh, Brijesh" <brijesh.singh@amd.com>, Thomas.Lendacky@amd.com,
+        Varad Gautam <varad.gautam@suse.com>, jroedel@suse.de,
+        bp@suse.de
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 20 Oct 2021 13:46:29 -0300
-Jason Gunthorpe <jgg@nvidia.com> wrote:
+On Wed, Oct 20, 2021 at 8:26 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 04/10/21 22:49, Zixuan Wang wrote:
+> > +/* In gdt64, there are 16 entries before TSS entries */
+> > +#define GDT64_PRE_TSS_ENTRIES (16)
+> > +#define GDT64_TSS_OFFSET (GDT64_PRE_TSS_ENTRIES)
+>
+> No need to have both; in fact the definition can also be changed to
+> TSS_MAIN/8.
 
-> On Wed, Oct 20, 2021 at 11:46:07AM +0300, Yishai Hadas wrote:
-> 
-> > What is the expectation for a reasonable delay ? we may expect this system
-> > WQ to run only short tasks and be very responsive.  
-> 
-> If the expectation is that qemu will see the error return and the turn
-> around and issue FLR followed by another state operation then it does
-> seem strange that there would be a delay.
-> 
-> On the other hand, this doesn't seem that useful. If qemu tries to
-> migrate and the device fails then the migration operation is toast and
-> possibly the device is wrecked. It can't really issue a FLR without
-> coordinating with the VM, and it cannot resume the VM as the device is
-> now irrecoverably messed up.
-> 
-> If we look at this from a RAS perspective would would be useful here
-> is a way for qemu to request a fail safe migration data. This must
-> always be available and cannot fail.
-> 
-> When the failsafe is loaded into the device it would trigger the
-> device's built-in RAS features to co-ordinate with the VM driver and
-> recover. Perhaps qemu would also have to inject an AER or something.
-> 
-> Basically instead of the device starting in an "empty ready to use
-> state" it would start in a "failure detected, needs recovery" state.
+I did not realize there is a TSS_MAIN, I will update this part.
 
-The "fail-safe recovery state" is essentially the reset state of the
-device.  If a device enters an error state during migration, I would
-think the ultimate recovery procedure would be to abort the migration,
-send an AER to the VM, whereby the guest would trigger a reset, and
-the RAS capabilities of the guest would handle failing over to a
-multipath device, ejecting the failing device, etc.
+> tss_descr is completely broken in the current code, I'll send a patch to
+> fix it so you don't have to deal with it.
+>
+> Paolo
 
-However, regardless of the migration recovery strategy, userspace needs
-a means to get the device back into an initial state in a deterministic
-way without closing and re-opening the device (or polling for an
-arbitrary length of time).  That's the minimum viable product here.
-Thanks,
+I just noticed the new patchset to fix the tss_descr, I will build the
+V4 patchset based on that fix.
 
-Alex
-
+Best regards,
+Zixuan
