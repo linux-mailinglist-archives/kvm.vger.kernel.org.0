@@ -2,121 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A566D43487E
-	for <lists+kvm@lfdr.de>; Wed, 20 Oct 2021 12:03:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9AB994348C2
+	for <lists+kvm@lfdr.de>; Wed, 20 Oct 2021 12:14:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229998AbhJTKFN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Oct 2021 06:05:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46406 "EHLO
+        id S229998AbhJTKRC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Oct 2021 06:17:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49136 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229555AbhJTKFM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Oct 2021 06:05:12 -0400
-Received: from mail-oo1-xc34.google.com (mail-oo1-xc34.google.com [IPv6:2607:f8b0:4864:20::c34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5313C06161C;
-        Wed, 20 Oct 2021 03:02:58 -0700 (PDT)
-Received: by mail-oo1-xc34.google.com with SMTP id c29-20020a4ad21d000000b002b6cf3f9aceso1235776oos.13;
-        Wed, 20 Oct 2021 03:02:58 -0700 (PDT)
+        with ESMTP id S229702AbhJTKRB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Oct 2021 06:17:01 -0400
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A9C4C06161C;
+        Wed, 20 Oct 2021 03:14:47 -0700 (PDT)
+Received: by mail-pj1-x102f.google.com with SMTP id np13so2118972pjb.4;
+        Wed, 20 Oct 2021 03:14:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=qUJTqShsGPwl7ndAoWAVq9Gk5Jbt5mhhVB3uwCyyxmw=;
-        b=eor2xuFm2EF0fx2lJXIJmwz3ONgOBeUx6jgOf/00xLEzNXlwLAowEjoHCbRRqDVBWh
-         0Y6fJ63JkLsvC5iZTQwCMjPwgX29LgyRMSBuFJDzOdiwDh337xjT7WU87s3rHQ0oQyFS
-         +VzPHiUyHA8qqXLKtD67KTq7A1xRyl9z/SXT29NnQkiZFTtwMhyCFm4iXEErRDWL+xdf
-         8L5G5M9ZlTTEUrtEqTlcE6kVd0/wN0bTDxswQSx8ZtxvOdkkcevlgXwB8Jj6h6ORC49W
-         kJcxy/vLjZGXvvCHsRo15w/dPJvOnIls1BoYCj6Mmq2c6Ng0zPwHlh6Sv5DhKXIfa8Ns
-         evJw==
+        h=from:to:cc:subject:date:message-id;
+        bh=kwhgTQM7yJPqYSZytxRhjSzhbEEhPX7aZJHqv9N3EnM=;
+        b=mKlSDrWkaMBgDhNoMtyQvQ402sSzlosG74BkTOq+si0LQwmESj0dmcnFTdHYdKJm8f
+         qa1N9NwSOTns+q2m/BYvG1v9OZyR5E8210hsJYIX4+Uy4LOhJgYXSjM9vtWuep8Fcx+N
+         CBNzyQe2Obr5uvOjBMuSofZ5YABEILj0M89FJYCspmzsNQYuLby8iBwC/xFc7ifR+iV6
+         DvcuT6i9/zAurfK0ru0jVscumLYPWL+kcdAcGpHbukBgy72VLzl3h6MvmXrXxsMIJYOT
+         e7h/pOH01AXNS3SPUn8lSgIS3ZMUh5nP5763CJc5dcghr5ThBQ0UZH+cYnJ7AWEyYIGK
+         HXZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=qUJTqShsGPwl7ndAoWAVq9Gk5Jbt5mhhVB3uwCyyxmw=;
-        b=qedEpeDuSRX7v1NbWAZTPso+OaSwZsfd0AKM3uFihckZen1YnP5B5cCKJxkQpV/fxW
-         lDeHm7kLFUFqBoYXiCP3YjPXAiFG+jY0TdJtSZMEIbAAjGq5VrGOcZUruDXFznAol4oD
-         RDIn2cbmcXVheMBTicNdkhO7EpxQdz7MLpEH2KLLVW4PsVqxWy9TGP+yDgKfShUrqQgz
-         qIcTbpS2RzitmuqP9QxmcIB7nN2kn9n56Z2Y86obAkVcz27239UFVs9njKUSX06rtK7m
-         1kXMJNgTUjoJ16aMG1KaBvVFHIWUO2XZ7D2ippDpYYrbar8D6uJIFAoesRKZX0V7xpPh
-         DiLA==
-X-Gm-Message-State: AOAM533k/Dr6uOWvYU7eqJkk0A+//QSr8m3tlBsTVMiwsWl2hLWJ5nNA
-        HjeOAvS7t5ze1/CodbXl9Q89laMt0mdBLvrS1MxllR9wczB3Qw==
-X-Google-Smtp-Source: ABdhPJy3dHLwXgVZwvKpmHORofRsDU8YQRs5fmYzYeG/Run2arHde25eMDCEFG7IrQN2EXmStWxm0J+CKCpgOcjpjVs=
-X-Received: by 2002:a4a:d5c8:: with SMTP id a8mr8912756oot.18.1634724178311;
- Wed, 20 Oct 2021 03:02:58 -0700 (PDT)
-MIME-Version: 1.0
-References: <1634631160-67276-1-git-send-email-wanpengli@tencent.com>
- <1634631160-67276-3-git-send-email-wanpengli@tencent.com> <24e67e43-c50c-7e0f-305a-c7f6129f8d70@redhat.com>
- <YW8BmRJHVvFscWTo@google.com> <CANRm+CzuWnO8FZPTvvOtpxqc5h786o7THyebOFpVAp3BF1xQiw@mail.gmail.com>
- <45fabf5a-96b5-49dc-0cba-55714ae3a4b5@redhat.com>
-In-Reply-To: <45fabf5a-96b5-49dc-0cba-55714ae3a4b5@redhat.com>
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=kwhgTQM7yJPqYSZytxRhjSzhbEEhPX7aZJHqv9N3EnM=;
+        b=1cylSS0dg/bvKT+2Z3GJzGQ4bV6m3BXhYKVQtOkh3vCwcFv9Iexbzyp4ATElc66ESp
+         Pm6GudvHpzWbcnU/kku5yOUWwuOF46dhJ8pYfVpwWhsHw9vvxjpBGSlLWfWCDzbdyXa1
+         +t6k0vQJJtA2C1TzN/0AObGs25oc5Z1EH7zSfMImsdNeELiv6n6tmqpQOrFkeCCqLBxI
+         pj0Fzai9C85889Uh4BWuSJtqSOXly7fpMmJlCBcYZbiYakM2l1qwcNrWQouRIZD7CTwX
+         pPx2rv/rc5jZuXAHxq50sVBiZiicn+7k938GBtKhRlxxbscOoxMfG/WAu4QG4R7ciIVq
+         oHbg==
+X-Gm-Message-State: AOAM533XgiEN625KvaZ9LrFv/PZ8PBkyvypvVxSpHF6Cr/DfzzAx5aKD
+        Hv4FXH72dMpOQCVWvZcaypWmwfKEATaCZQ==
+X-Google-Smtp-Source: ABdhPJx+eqvLlSJuWiU/yf3YCYGMkodBNE6HENsOdJozwRx2RsZCR4Fc5Q6fXay8W1lUKbKPAQGF9w==
+X-Received: by 2002:a17:90a:5d89:: with SMTP id t9mr6088497pji.21.1634724886709;
+        Wed, 20 Oct 2021 03:14:46 -0700 (PDT)
+Received: from localhost.localdomain ([203.205.141.117])
+        by smtp.googlemail.com with ESMTPSA id y3sm1770692pge.44.2021.10.20.03.14.44
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 20 Oct 2021 03:14:46 -0700 (PDT)
 From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Wed, 20 Oct 2021 18:02:47 +0800
-Message-ID: <CANRm+CyPznw0O2qwnhhc=YEq+zSD3C7dqqG8-8XE6sLdhL7aXQ@mail.gmail.com>
-Subject: Re: [PATCH v3 3/3] KVM: vCPU kick tax cut for running vCPU
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH v5] KVM: emulate: Don't inject #GP when emulating RDMPC if CR0.PE=0
+Date:   Wed, 20 Oct 2021 03:13:56 -0700
+Message-Id: <1634724836-73721-1-git-send-email-wanpengli@tencent.com>
+X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 20 Oct 2021 at 14:47, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 20/10/21 04:49, Wanpeng Li wrote:
-> >> The intent of the extra check was to avoid the locked instruction that comes with
-> >> disabling preemption via rcu_read_lock().  But thinking more, the extra op should
-> >> be little more than a basic arithmetic operation in the grand scheme on modern x86
-> >> since the cache line is going to be locked and written no matter what, either
-> >> immediately before or immediately after.
-> >
-> > I observe the main overhead of rcuwait_wake_up() is from rcu
-> > operations, especially rcu_read_lock/unlock().
->
-> Do you have CONFIG_PREEMPT_RCU set?  If so, maybe something like this would help:
+From: Wanpeng Li <wanpengli@tencent.com>
 
-Yes.
+SDM mentioned that, RDPMC:
 
->
-> diff --git a/kernel/exit.c b/kernel/exit.c
-> index fd1c04193e18..ca1e60a1234d 100644
-> --- a/kernel/exit.c
-> +++ b/kernel/exit.c
-> @@ -235,8 +235,6 @@ int rcuwait_wake_up(struct rcuwait *w)
->         int ret = 0;
->         struct task_struct *task;
->
-> -       rcu_read_lock();
-> -
->         /*
->          * Order condition vs @task, such that everything prior to the load
->          * of @task is visible. This is the condition as to why the user called
-> @@ -250,6 +248,14 @@ int rcuwait_wake_up(struct rcuwait *w)
->          */
->         smp_mb(); /* (B) */
->
-> +#ifdef CONFIG_PREEMPT_RCU
-> +       /* The cost of rcu_read_lock() is nontrivial for preemptable RCU.  */
-> +       if (!rcuwait_active(w))
-> +               return ret;
-> +#endif
-> +
-> +       rcu_read_lock();
-> +
->         task = rcu_dereference(w->task);
->         if (task)
->                 ret = wake_up_process(task);
->
-> (If you don't, rcu_read_lock is essentially preempt_disable() and it
-> should not have a large overhead).  You still need the memory barrier
-> though, in order to avoid missed wakeups; shameless plug for my
-> article at https://lwn.net/Articles/847481/.
+  IF (((CR4.PCE = 1) or (CPL = 0) or (CR0.PE = 0)) and (ECX indicates a supported counter))
+      THEN
+          EAX := counter[31:0];
+          EDX := ZeroExtend(counter[MSCB:32]);
+      ELSE (* ECX is not valid or CR4.PCE is 0 and CPL is 1, 2, or 3 and CR0.PE is 1 *)
+          #GP(0);
+  FI;
 
-You are right, the cost of rcu_read_lock() for preemptable RCU
-introduces too much overhead, do you want to send a separate patch?
+Let's add a comment why CR0.PE isn't tested since it's impossible for CPL to be >0 if 
+CR0.PE=0.
 
-    Wanpeng
+Reviewed-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+---
+v4 -> v5:
+ * just comments
+v3 -> v4:
+ * add comments instead of pseudocode
+v2 -> v3:
+ * add the missing 'S'
+v1 -> v2:
+ * update patch description
+
+ arch/x86/kvm/emulate.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+index 9a144ca8e146..c289809beea3 100644
+--- a/arch/x86/kvm/emulate.c
++++ b/arch/x86/kvm/emulate.c
+@@ -4222,6 +4222,9 @@ static int check_rdpmc(struct x86_emulate_ctxt *ctxt)
+ 	if (enable_vmware_backdoor && is_vmware_backdoor_pmc(rcx))
+ 		return X86EMUL_CONTINUE;
+ 
++	/*
++	 * It's impossible for CPL to be >0 if CR0.PE=0.
++	 */
+ 	if ((!(cr4 & X86_CR4_PCE) && ctxt->ops->cpl(ctxt)) ||
+ 	    ctxt->ops->check_pmc(ctxt, rcx))
+ 		return emulate_gp(ctxt, 0);
+-- 
+2.25.1
+
