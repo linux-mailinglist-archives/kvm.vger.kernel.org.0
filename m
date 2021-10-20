@@ -2,48 +2,48 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5BFCB434ACB
-	for <lists+kvm@lfdr.de>; Wed, 20 Oct 2021 14:05:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E2201434ACA
+	for <lists+kvm@lfdr.de>; Wed, 20 Oct 2021 14:05:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230321AbhJTMHh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Oct 2021 08:07:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46224 "EHLO
+        id S229941AbhJTMHi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Oct 2021 08:07:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46312 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230137AbhJTMH1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Oct 2021 08:07:27 -0400
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6AB2C061746
-        for <kvm@vger.kernel.org>; Wed, 20 Oct 2021 05:05:12 -0700 (PDT)
-Received: by mail-pj1-x102a.google.com with SMTP id q2-20020a17090a2e0200b001a0fd4efd49so3693118pjd.1
-        for <kvm@vger.kernel.org>; Wed, 20 Oct 2021 05:05:12 -0700 (PDT)
+        with ESMTP id S230400AbhJTMHf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Oct 2021 08:07:35 -0400
+Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F1D5C061769
+        for <kvm@vger.kernel.org>; Wed, 20 Oct 2021 05:05:19 -0700 (PDT)
+Received: by mail-pg1-x532.google.com with SMTP id q5so22309285pgr.7
+        for <kvm@vger.kernel.org>; Wed, 20 Oct 2021 05:05:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=7bzPbU2Xaa8fmzxUh6rCSbTEYDD93djqUZnD3TW+SAs=;
-        b=UX+uqnX27wkcUQgZ7Np/jTXc2gdVOauvft2bDy1JTzrj3fz3ZiNp7p/BLL6K/zXTIw
-         R4Q5EID0HPrqtxjWoUKWlr3IayZYodQ+mwfmBI1Ehvyhu5BtHD03bI1iChvsTHq8wxSq
-         PhMLe2jeLzD9QSxuYYTqv4dIPnC124TCI+wow=
+        bh=W0/hAItlN4jumE3bXtgyJTFeomKZFRmDDJAfP2T9OV0=;
+        b=LiB0botG46s85lJShFIjIEdGtGJ/XTL2dN4M+c0BCZDWGdKgAAvj5HVDVxjwOga1Ct
+         J72JmsM5HiGYoSFvtIKkMbA5u1W/H/ajHQWlVRlzsUdJ9hApUlPml5WIgGNKdDTI38rW
+         AKhE/8iLPYbdrFNWW3SWe8NUzdkFajh/e1f/4=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=7bzPbU2Xaa8fmzxUh6rCSbTEYDD93djqUZnD3TW+SAs=;
-        b=wZPy5u3CZpGVvbv0cKyhStbOrP8BDcx8HUZ+w/v+5MAnU7KvDCxGSquumnJLcA/rWM
-         /12VAeHE2lTa3c2CjHpwor9EIsCTLLpeUrqCBOGOb9/CoUU9YlgjjFg/GDk/EulJt0RR
-         2Pa252z/9rZysPWyUDdZDf41VXx586RwhXNzDLjHdz+1u7GIKRoZdNBtlyDrBCEy6onh
-         xg2Jz7SgU4/My0hmeXe6wzQ33Wm7oJ33KGxS4aRnT2XW1TnbU9AFJXVJ3OrvxplpA6B2
-         Umcu4fc40Ng5gKurzP4ftIneUqexF0yxlBKWfsoKUI8Q18NVtO13esfofLG8Z+zdHRGm
-         zQ7g==
-X-Gm-Message-State: AOAM533JbB82O8bM8ST/GarEKoZn6YGUALcVAyB7rED1F28StA5/gIrH
-        1D1V97jPojRWeVRx1ECOKtag0Q==
-X-Google-Smtp-Source: ABdhPJw1+iL+I6HcYGcYZD7jYmOIU3e4eK8PQhco2KBIwknjmRZyUPYqWMY+ib0NNjlPhxwohXSeBQ==
-X-Received: by 2002:a17:902:8682:b0:13f:8e12:c977 with SMTP id g2-20020a170902868200b0013f8e12c977mr32473932plo.62.1634731512056;
-        Wed, 20 Oct 2021 05:05:12 -0700 (PDT)
+        bh=W0/hAItlN4jumE3bXtgyJTFeomKZFRmDDJAfP2T9OV0=;
+        b=krgBdqa3HxUPxR1OFyj2G0tuIAiL1vgO9DTA7D5SC2u5Dg7roGUbEJhmHhttlnjM8p
+         TTkf1WP5dmj/bu0HTvit0EwWrnCpTuhc37wckWKDT8+q1hs63h/scOFs4ZM7CjHULNOi
+         W9joyLTRoQsSpAFGY0yxk1tpRfyA4cpcHGgDIxKuVs6KBi4Ib/5NdOcUyZWeI4YufH+o
+         fSJjSqvzpdKhfi5/tuPPiwG2WV/8u6MZRYCq4rFsIarJuy/wqGU/dAft5ajZWdIuYeP1
+         trW0NCx+mruuEFd1wL3dsjElrf7fVpmEtmd2sslSuOtnv0r6Rav17OQlc0pllNAN6VgR
+         AN5Q==
+X-Gm-Message-State: AOAM533Rt66APFa8Pt+6564pz8AyLwdP6z1LL/lf3u1L8OFVD5f+Ur2e
+        BedgEpMYVYO+cJia0P/5Gz1jBQ==
+X-Google-Smtp-Source: ABdhPJyehwX66T1GfBbIRkPa96YkjVy5nacylS+1zw5CnZZj/eF0uf6zuqh5HuXXG90EGK3hkTbsiw==
+X-Received: by 2002:a62:3102:0:b0:44b:63db:fc88 with SMTP id x2-20020a623102000000b0044b63dbfc88mr6029199pfx.75.1634731519072;
+        Wed, 20 Oct 2021 05:05:19 -0700 (PDT)
 Received: from localhost ([2401:fa00:8f:203:e516:d575:e6f:a526])
-        by smtp.gmail.com with UTF8SMTPSA id n14sm2115748pgd.68.2021.10.20.05.05.07
+        by smtp.gmail.com with UTF8SMTPSA id a12sm5693553pjq.16.2021.10.20.05.05.14
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 20 Oct 2021 05:05:11 -0700 (PDT)
+        Wed, 20 Oct 2021 05:05:18 -0700 (PDT)
 From:   Hikaru Nishida <hikalium@chromium.org>
 To:     linux-kernel@vger.kernel.org, dme@dme.org, tglx@linutronix.de,
         mlevitsk@redhat.com, linux@roeck-us.net, pbonzini@redhat.com,
@@ -55,13 +55,12 @@ Cc:     suleiman@google.com, senozhatsky@google.com,
         "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>,
-        Jonathan Corbet <corbet@lwn.net>,
         Sean Christopherson <seanjc@google.com>,
         Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, x86@kernel.org
-Subject: [RFC PATCH v3 3/5] kvm/x86: virtual suspend time injection: Add common definitions
-Date:   Wed, 20 Oct 2021 21:04:28 +0900
-Message-Id: <20211020210348.RFC.v3.3.I6e8f979820f45e38370aa19180a33a8c046d0fa9@changeid>
+        x86@kernel.org
+Subject: [RFC PATCH v3 4/5] kvm/x86: virtual suspend time injection: Implement host side
+Date:   Wed, 20 Oct 2021 21:04:29 +0900
+Message-Id: <20211020210348.RFC.v3.4.I9c4e7c844507384b546e6d1ea1a5286996eed908@changeid>
 X-Mailer: git-send-email 2.33.0.1079.g6e70778dc9-goog
 In-Reply-To: <20211020120431.776494-1-hikalium@chromium.org>
 References: <20211020120431.776494-1-hikalium@chromium.org>
@@ -71,106 +70,449 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add definitions of MSR, KVM_FEATURE bit and a structure called
-kvm_suspend_time that are used by later patches to support the
-virtual suspend time injection mechanism.
+Add main logics that adjust the guest's clocks and notify about the
+suspension to the guest.
 
-Also add documentations for them.
+Adjustment flow:
+- Before going into suspend, KVM_REQ_SUSPEND_TIME_ADJ will be
+  requested for each vcpus through the PM notifier if the suspend time
+  injection is enabled for the kvm.
+- Before the first vmenter after the resume, each vcpu will check the
+  the request and do two kinds of adjustments.
+  - One is kvm-wide adjustment: kvm-clock will be adjusted to the value
+    before the suspend.
+  - Another is per-vcpu adjustment: tsc will be adjusted to the value
+    before the suspend.
+  - Those adjustments happen before the vcpu run: so the guest will not
+    observe the "rewinding" of the clocks.
+- After the adjustment is made, the guest will be notified about the
+  adjustment through HYPERVISOR_CALLBACK_VECTOR IRQ.
+    - It is guest's responsibility to adjust their CLOCK_BOOTTIME and
+      the wall clock to reflect the suspend.
+      This will be done in the later patch.
 
 Signed-off-by: Hikaru Nishida <hikalium@chromium.org>
 ---
 
 Changes in v3:
-- Moved the definition of struct kvm_suspend_time into this patch.
+- Used PM notifier instead of modifying timekeeping_resume()
+  - This avoids holding kvm_lock under interrupt disabled context.
+- Used KVM_REQ_* to make a request for vcpus.
+- Reused HYPERVISOR_CALLBACK_VECTOR IRQ instead of adding a new one.
+- Extracted arch-independent parts.
 
- Documentation/virt/kvm/cpuid.rst     |  3 +++
- Documentation/virt/kvm/msr.rst       | 30 ++++++++++++++++++++++++++++
- arch/x86/include/uapi/asm/kvm_para.h |  6 ++++++
- 3 files changed, 39 insertions(+)
+ arch/x86/include/asm/kvm_host.h |   2 +
+ arch/x86/kvm/Kconfig            |  13 ++++
+ arch/x86/kvm/cpuid.c            |   4 ++
+ arch/x86/kvm/x86.c              | 109 ++++++++++++++++++++++++++++++++
+ include/linux/kvm_host.h        |  48 ++++++++++++++
+ virt/kvm/kvm_main.c             |  88 ++++++++++++++++++++++++++
+ 6 files changed, 264 insertions(+)
 
-diff --git a/Documentation/virt/kvm/cpuid.rst b/Documentation/virt/kvm/cpuid.rst
-index bda3e3e737d7..f17b95b0d943 100644
---- a/Documentation/virt/kvm/cpuid.rst
-+++ b/Documentation/virt/kvm/cpuid.rst
-@@ -103,6 +103,9 @@ KVM_FEATURE_HC_MAP_GPA_RANGE       16          guest checks this feature bit bef
- KVM_FEATURE_MIGRATION_CONTROL      17          guest checks this feature bit before
-                                                using MSR_KVM_MIGRATION_CONTROL
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index f8f48a7ec577..bdff8f777632 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1085,6 +1085,8 @@ struct kvm_arch {
+ 	bool pause_in_guest;
+ 	bool cstate_in_guest;
  
-+KVM_FEATURE_HOST_SUSPEND_TIME      18          host suspend time information
-+                                               is available at msr 0x4b564d09.
++	u64 msr_suspend_time;
 +
- KVM_FEATURE_CLOCKSOURCE_STABLE_BIT 24          host will warn if no guest-side
-                                                per-cpu warps are expected in
-                                                kvmclock
-diff --git a/Documentation/virt/kvm/msr.rst b/Documentation/virt/kvm/msr.rst
-index 9315fc385fb0..40ec0fd263ac 100644
---- a/Documentation/virt/kvm/msr.rst
-+++ b/Documentation/virt/kvm/msr.rst
-@@ -389,3 +389,33 @@ data:
-         guest is communicating page encryption status to the host using the
-         ``KVM_HC_MAP_GPA_RANGE`` hypercall, it can set bit 0 in this MSR to
-         allow live migration of the guest.
-+
-+MSR_KVM_HOST_SUSPEND_TIME:
-+	0x4b564d09
-+
-+data:
-+	8-byte alignment physical address of a memory area which must be
-+	in guest RAM, plus an enable bit in bit 0. This memory is expected to
-+	hold a copy of the following structure::
-+
-+	 struct kvm_suspend_time {
-+		__u64   suspend_time_ns;
-+	 };
-+
-+	whose data will be filled in by the hypervisor.
-+	If the guest register this structure through the MSR write, the host
-+	will stop all the clocks visible to the guest (including TSCs) during
-+	the host's suspension and report the duration of suspend through this
-+	structure. The update will be notified through
-+	HYPERVISOR_CALLBACK_VECTOR IRQ. Fields have the following meanings:
-+
-+	suspend_time_ns:
-+		Total number of nanoseconds passed during the host's suspend
-+		while the VM is running. This value will be increasing
-+		monotonically and cumulative.
-+
-+	Note that although MSRs are per-CPU entities, the effect of this
-+	particular MSR is global.
-+
-+	Availability of this MSR must be checked via bit 18 in 0x4000001 cpuid
-+	leaf prior to usage.
-diff --git a/arch/x86/include/uapi/asm/kvm_para.h b/arch/x86/include/uapi/asm/kvm_para.h
-index 5146bbab84d4..ccea4e344f46 100644
---- a/arch/x86/include/uapi/asm/kvm_para.h
-+++ b/arch/x86/include/uapi/asm/kvm_para.h
-@@ -35,6 +35,7 @@
- #define KVM_FEATURE_MSI_EXT_DEST_ID	15
- #define KVM_FEATURE_HC_MAP_GPA_RANGE	16
- #define KVM_FEATURE_MIGRATION_CONTROL	17
-+#define KVM_FEATURE_HOST_SUSPEND_TIME	18
+ 	unsigned long irq_sources_bitmap;
+ 	s64 kvmclock_offset;
+ 	raw_spinlock_t tsc_write_lock;
+diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+index ac69894eab88..6d68a4d6be87 100644
+--- a/arch/x86/kvm/Kconfig
++++ b/arch/x86/kvm/Kconfig
+@@ -129,4 +129,17 @@ config KVM_MMU_AUDIT
+ 	 This option adds a R/W kVM module parameter 'mmu_audit', which allows
+ 	 auditing of KVM MMU events at runtime.
  
- #define KVM_HINTS_REALTIME      0
++config KVM_VIRT_SUSPEND_TIMING
++	bool "Host support for virtual suspend time injection"
++	depends on KVM=y && HAVE_KVM_PM_NOTIFIER
++	default n
++	help
++	 This option makes the host's suspension reflected on the guest's clocks.
++	 In other words, guest's CLOCK_MONOTONIC will stop and
++	 CLOCK_BOOTTIME keeps running during the host's suspension.
++	 This feature will only be effective when both guest and host support
++	 this feature. For the guest side, see KVM_VIRT_SUSPEND_TIMING_GUEST.
++
++	 If unsure, say N.
++
+ endif # VIRTUALIZATION
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 751aa85a3001..34a2fe147503 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -886,6 +886,10 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+ 			     (1 << KVM_FEATURE_PV_SCHED_YIELD) |
+ 			     (1 << KVM_FEATURE_ASYNC_PF_INT);
  
-@@ -57,6 +58,7 @@
- #define MSR_KVM_ASYNC_PF_INT	0x4b564d06
- #define MSR_KVM_ASYNC_PF_ACK	0x4b564d07
- #define MSR_KVM_MIGRATION_CONTROL	0x4b564d08
-+#define MSR_KVM_HOST_SUSPEND_TIME      0x4b564d09
++#ifdef CONFIG_KVM_VIRT_SUSPEND_TIMING
++		entry->eax |= (1 << KVM_FEATURE_HOST_SUSPEND_TIME);
++#endif
++
+ 		if (sched_info_on())
+ 			entry->eax |= (1 << KVM_FEATURE_STEAL_TIME);
  
- struct kvm_steal_time {
- 	__u64 steal;
-@@ -79,6 +81,10 @@ struct kvm_clock_pairing {
- 	__u32 pad[9];
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index aabd3a2ec1bc..b6d0d7f73196 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -1367,6 +1367,7 @@ static const u32 emulated_msrs_all[] = {
+ 
+ 	MSR_KVM_ASYNC_PF_EN, MSR_KVM_STEAL_TIME,
+ 	MSR_KVM_PV_EOI_EN, MSR_KVM_ASYNC_PF_INT, MSR_KVM_ASYNC_PF_ACK,
++	MSR_KVM_HOST_SUSPEND_TIME,
+ 
+ 	MSR_IA32_TSC_ADJUST,
+ 	MSR_IA32_TSC_DEADLINE,
+@@ -3467,6 +3468,19 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		vcpu->arch.msr_kvm_poll_control = data;
+ 		break;
+ 
++	case MSR_KVM_HOST_SUSPEND_TIME:
++		if (!guest_pv_has(vcpu, KVM_FEATURE_HOST_SUSPEND_TIME))
++			return 1;
++
++		if (!(data & KVM_MSR_ENABLED))
++			break;
++
++		if (kvm_init_suspend_time_ghc(vcpu->kvm, data & ~1ULL))
++			return 1;
++
++		vcpu->kvm->arch.msr_suspend_time = data;
++		break;
++
+ 	case MSR_IA32_MCG_CTL:
+ 	case MSR_IA32_MCG_STATUS:
+ 	case MSR_IA32_MC0_CTL ... MSR_IA32_MCx_CTL(KVM_MAX_MCE_BANKS) - 1:
+@@ -3785,6 +3799,12 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 
+ 		msr_info->data = vcpu->arch.msr_kvm_poll_control;
+ 		break;
++	case MSR_KVM_HOST_SUSPEND_TIME:
++		if (!guest_pv_has(vcpu, KVM_FEATURE_HOST_SUSPEND_TIME))
++			return 1;
++
++		msr_info->data = vcpu->kvm->arch.msr_suspend_time;
++		break;
+ 	case MSR_IA32_P5_MC_ADDR:
+ 	case MSR_IA32_P5_MC_TYPE:
+ 	case MSR_IA32_MCG_CAP:
+@@ -9392,6 +9412,93 @@ void __kvm_request_immediate_exit(struct kvm_vcpu *vcpu)
+ }
+ EXPORT_SYMBOL_GPL(__kvm_request_immediate_exit);
+ 
++#ifdef CONFIG_KVM_VIRT_SUSPEND_TIMING
++bool virt_suspend_time_enabled(struct kvm *kvm)
++{
++	return kvm->arch.msr_suspend_time & KVM_MSR_ENABLED;
++}
++
++/*
++ * Do per-vcpu suspend time adjustment (tsc) and
++ * make an interrupt to notify it.
++ */
++static void vcpu_do_suspend_time_adjustment(struct kvm_vcpu *vcpu,
++					    u64 total_ns)
++{
++	struct kvm_lapic_irq irq = {
++		.delivery_mode = APIC_DM_FIXED,
++		.vector = HYPERVISOR_CALLBACK_VECTOR
++	};
++	u64 last_suspend_duration = 0;
++	s64 adj;
++
++	spin_lock(&vcpu->suspend_time_ns_lock);
++	if (total_ns > vcpu->suspend_time_ns) {
++		last_suspend_duration = total_ns - vcpu->suspend_time_ns;
++		vcpu->suspend_time_ns = total_ns;
++	}
++	spin_unlock(&vcpu->suspend_time_ns_lock);
++
++	if (!last_suspend_duration) {
++		/* It looks like the suspend is not happened yet. Retry. */
++		kvm_make_request(KVM_REQ_SUSPEND_TIME_ADJ, vcpu);
++		return;
++	}
++
++	adj = __this_cpu_read(cpu_tsc_khz) *
++		(last_suspend_duration / 1000000);
++	adjust_tsc_offset_host(vcpu, -adj);
++	/*
++	 * This request should be processed before
++	 * the first vmenter after resume to avoid
++	 * an unadjusted TSC value is observed.
++	 */
++	kvm_make_request(KVM_REQ_MASTERCLOCK_UPDATE, vcpu);
++	kvm_write_suspend_time(vcpu->kvm);
++	if (!kvm_apic_set_irq(vcpu, &irq, NULL))
++		pr_err("kvm: failed to set suspend time irq\n");
++}
++
++/*
++ * Do kvm-wide suspend time adjustment (kvm-clock).
++ */
++static void kvm_do_suspend_time_adjustment(struct kvm *kvm, u64 total_ns)
++{
++	spin_lock(&kvm->suspend_time_ns_lock);
++	if (total_ns > kvm->suspend_time_ns) {
++		u64 last_suspend_duration = total_ns - kvm->suspend_time_ns;
++		/*
++		 * Move the offset of kvm_clock here as if it is stopped
++		 * during the suspension.
++		 */
++		kvm->arch.kvmclock_offset -= last_suspend_duration;
++
++		/* suspend_time is accumulated per VM. */
++		kvm->suspend_time_ns += last_suspend_duration;
++		/*
++		 * This adjustment will be reflected to the struct provided
++		 * from the guest via MSR_KVM_HOST_SUSPEND_TIME before
++		 * the notification interrupt is injected.
++		 */
++		kvm_make_all_cpus_request(kvm, KVM_REQ_CLOCK_UPDATE);
++	}
++	spin_unlock(&kvm->suspend_time_ns_lock);
++}
++
++static void kvm_adjust_suspend_time(struct kvm_vcpu *vcpu)
++{
++	u64 total_ns = kvm_total_suspend_time(vcpu->kvm);
++	/* Do kvm-wide adjustment (kvm-clock) */
++	kvm_do_suspend_time_adjustment(vcpu->kvm, total_ns);
++	/* Do per-vcpu adjustment (tsc) */
++	vcpu_do_suspend_time_adjustment(vcpu, total_ns);
++}
++#else
++static void kvm_adjust_suspend_time(struct kvm_vcpu *vcpu)
++{
++}
++#endif
++
+ /*
+  * Returns 1 to let vcpu_run() continue the guest execution loop without
+  * exiting to the userspace.  Otherwise, the value will be returned to the
+@@ -9421,6 +9528,8 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+ 			r = -EIO;
+ 			goto out;
+ 		}
++		if (kvm_check_request(KVM_REQ_SUSPEND_TIME_ADJ, vcpu))
++			kvm_adjust_suspend_time(vcpu);
+ 		if (kvm_check_request(KVM_REQ_GET_NESTED_STATE_PAGES, vcpu)) {
+ 			if (unlikely(!kvm_x86_ops.nested_ops->get_nested_state_pages(vcpu))) {
+ 				r = 0;
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 0f18df7fe874..ef93c067ceba 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -151,6 +151,7 @@ static inline bool is_error_page(struct page *page)
+ #define KVM_REQ_UNBLOCK           2
+ #define KVM_REQ_UNHALT            3
+ #define KVM_REQ_VM_BUGGED         (4 | KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
++#define KVM_REQ_SUSPEND_TIME_ADJ  5
+ #define KVM_REQUEST_ARCH_BASE     8
+ 
+ #define KVM_ARCH_REQ_FLAGS(nr, flags) ({ \
+@@ -336,6 +337,11 @@ struct kvm_vcpu {
+ 	} async_pf;
+ #endif
+ 
++#ifdef CONFIG_KVM_VIRT_SUSPEND_TIMING
++	u64 suspend_time_ns;
++	spinlock_t suspend_time_ns_lock;
++#endif
++
+ #ifdef CONFIG_HAVE_KVM_CPU_RELAX_INTERCEPT
+ 	/*
+ 	 * Cpu relax intercept or pause loop exit optimization
+@@ -623,6 +629,12 @@ struct kvm {
+ 	struct notifier_block pm_notifier;
+ #endif
+ 	char stats_id[KVM_STATS_NAME_SIZE];
++#ifdef CONFIG_KVM_VIRT_SUSPEND_TIMING
++	u64 suspend_time_ns;
++	spinlock_t suspend_time_ns_lock;
++	u64 base_offs_boot_ns;
++	struct gfn_to_hva_cache suspend_time_ghc;
++#endif
  };
  
-+struct kvm_suspend_time {
-+	__u64   suspend_time_ns;
-+};
+ #define kvm_err(fmt, ...) \
+@@ -1829,6 +1841,42 @@ static inline void kvm_handle_signal_exit(struct kvm_vcpu *vcpu)
+ }
+ #endif /* CONFIG_KVM_XFER_TO_GUEST_WORK */
+ 
++#ifdef CONFIG_KVM_VIRT_SUSPEND_TIMING
++bool virt_suspend_time_enabled(struct kvm *kvm);
++void kvm_write_suspend_time(struct kvm *kvm);
++int kvm_init_suspend_time_ghc(struct kvm *kvm, gpa_t gpa);
++static inline u64 kvm_total_suspend_time(struct kvm *kvm)
++{
++	return ktime_get_offs_boot_ns() - kvm->base_offs_boot_ns;
++}
 +
- #define KVM_STEAL_ALIGNMENT_BITS 5
- #define KVM_STEAL_VALID_BITS ((-1ULL << (KVM_STEAL_ALIGNMENT_BITS + 1)))
- #define KVM_STEAL_RESERVED_MASK (((1 << KVM_STEAL_ALIGNMENT_BITS) - 1 ) << 1)
++static inline u64 vcpu_suspend_time_injected(struct kvm_vcpu *vcpu)
++{
++	return vcpu->suspend_time_ns;
++}
++#else
++static inline bool virt_suspend_time_enabled(struct kvm *kvm)
++{
++	return 0;
++}
++static inline void kvm_write_suspend_time(struct kvm *kvm)
++{
++}
++static inline int kvm_init_suspend_time_ghc(struct kvm *kvm, gpa_t gpa)
++{
++	return 1;
++}
++static inline u64 kvm_total_suspend_time(struct kvm *kvm)
++{
++	return 0;
++}
++
++static inline u64 vcpu_suspend_time_injected(struct kvm_vcpu *vcpu)
++{
++	return 0;
++}
++#endif /* CONFIG_KVM_VIRT_SUSPEND_TIMING */
++
+ /*
+  * This defines how many reserved entries we want to keep before we
+  * kick the vcpu to the userspace to avoid dirty ring full.  This
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 7851f3a1b5f7..a4fedd2455d4 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -425,6 +425,11 @@ static void kvm_vcpu_init(struct kvm_vcpu *vcpu, struct kvm *kvm, unsigned id)
+ 	vcpu->ready = false;
+ 	preempt_notifier_init(&vcpu->preempt_notifier, &kvm_preempt_ops);
+ 	vcpu->last_used_slot = 0;
++
++#ifdef CONFIG_KVM_VIRT_SUSPEND_TIMING
++	vcpu->suspend_time_ns = kvm->suspend_time_ns;
++	spin_lock_init(&vcpu->suspend_time_ns_lock);
++#endif
+ }
+ 
+ void kvm_vcpu_destroy(struct kvm_vcpu *vcpu)
+@@ -812,12 +817,70 @@ static int kvm_init_mmu_notifier(struct kvm *kvm)
+ #endif /* CONFIG_MMU_NOTIFIER && KVM_ARCH_WANT_MMU_NOTIFIER */
+ 
+ #ifdef CONFIG_HAVE_KVM_PM_NOTIFIER
++static int kvm_suspend_notifier(struct kvm *kvm)
++{
++	struct kvm_vcpu *vcpu;
++	int i;
++
++	if (!virt_suspend_time_enabled(kvm))
++		return NOTIFY_DONE;
++
++	mutex_lock(&kvm->lock);
++	kvm_for_each_vcpu(i, vcpu, kvm)
++		kvm_make_request(KVM_REQ_SUSPEND_TIME_ADJ, vcpu);
++	mutex_unlock(&kvm->lock);
++
++	return NOTIFY_DONE;
++}
++
++static int kvm_resume_notifier(struct kvm *kvm)
++{
++	struct kvm_vcpu *vcpu;
++	int i;
++
++	if (!virt_suspend_time_enabled(kvm))
++		return NOTIFY_DONE;
++
++	mutex_lock(&kvm->lock);
++	kvm_for_each_vcpu(i, vcpu, kvm) {
++		/*
++		 * Clear KVM_REQ_SUSPEND_TIME_ADJ if the suspend injection is
++		 * not needed (e.g. suspend failure)
++		 * The following condition is also true when the adjustment is
++		 * already done and it is safe to clear the request again here.
++		 */
++		if (kvm_total_suspend_time(kvm) ==
++		    vcpu_suspend_time_injected(vcpu))
++			kvm_clear_request(KVM_REQ_SUSPEND_TIME_ADJ, vcpu);
++	}
++	mutex_unlock(&kvm->lock);
++
++	return NOTIFY_DONE;
++}
++
++static int kvm_pm_notifier(struct kvm *kvm, unsigned long state)
++{
++	switch (state) {
++	case PM_HIBERNATION_PREPARE:
++	case PM_SUSPEND_PREPARE:
++		return kvm_suspend_notifier(kvm);
++	case PM_POST_HIBERNATION:
++	case PM_POST_SUSPEND:
++		return kvm_resume_notifier(kvm);
++	}
++
++	return NOTIFY_DONE;
++}
++
+ static int kvm_pm_notifier_call(struct notifier_block *bl,
+ 				unsigned long state,
+ 				void *unused)
+ {
+ 	struct kvm *kvm = container_of(bl, struct kvm, pm_notifier);
+ 
++	if (kvm_pm_notifier(kvm, state) != NOTIFY_DONE)
++		return NOTIFY_BAD;
++
+ 	return kvm_arch_pm_notifier(kvm, state);
+ }
+ 
+@@ -843,6 +906,26 @@ static void kvm_destroy_pm_notifier(struct kvm *kvm)
+ }
+ #endif /* CONFIG_HAVE_KVM_PM_NOTIFIER */
+ 
++#ifdef CONFIG_KVM_VIRT_SUSPEND_TIMING
++void kvm_write_suspend_time(struct kvm *kvm)
++{
++	struct kvm_suspend_time st;
++
++	st.suspend_time_ns = kvm->suspend_time_ns;
++	kvm_write_guest_cached(kvm, &kvm->suspend_time_ghc, &st, sizeof(st));
++}
++
++int kvm_init_suspend_time_ghc(struct kvm *kvm, gpa_t gpa)
++{
++	if (kvm_gfn_to_hva_cache_init(kvm, &kvm->suspend_time_ghc, gpa,
++				      sizeof(struct kvm_suspend_time)))
++		return 1;
++
++	kvm_write_suspend_time(kvm);
++	return 0;
++}
++#endif
++
+ static struct kvm_memslots *kvm_alloc_memslots(void)
+ {
+ 	int i;
+@@ -1080,6 +1163,11 @@ static struct kvm *kvm_create_vm(unsigned long type)
+ 	if (r)
+ 		goto out_err_no_disable;
+ 
++#ifdef CONFIG_KVM_VIRT_SUSPEND_TIMING
++	spin_lock_init(&kvm->suspend_time_ns_lock);
++	kvm->base_offs_boot_ns = ktime_get_offs_boot_ns();
++#endif
++
+ #ifdef CONFIG_HAVE_KVM_IRQFD
+ 	INIT_HLIST_HEAD(&kvm->irq_ack_notifier_list);
+ #endif
 -- 
 2.33.0.1079.g6e70778dc9-goog
 
