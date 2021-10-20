@@ -2,190 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 063A543533A
-	for <lists+kvm@lfdr.de>; Wed, 20 Oct 2021 20:53:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E6F043534D
+	for <lists+kvm@lfdr.de>; Wed, 20 Oct 2021 20:57:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231392AbhJTSzm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Oct 2021 14:55:42 -0400
-Received: from mx0a-00069f02.pphosted.com ([205.220.165.32]:47202 "EHLO
-        mx0a-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230347AbhJTSzk (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 20 Oct 2021 14:55:40 -0400
-Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 19KHvn25019155;
-        Wed, 20 Oct 2021 18:53:08 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=corp-2021-07-09;
- bh=5HeKJwk4Xkm4yMC6JHnfuYkR3OZolfo170zV9C3tl1Y=;
- b=Bp64VMWrG3QkTaD9Gr03XJHgIA6Db9a+/Nhr5ha8One563AjmW7PbCJrSQM0ik9EXQYb
- FOHhmUIIpCKRR9Ay29OIXQwgA7AZtcKrl4kxxl7r7NPuYSxCwB9jnsPnBrlXYuUNf8Ov
- AY75iX5UsY7ZLtTr1vEzjq/IQn3hJH6tz3e4tm/efMTWf7Wx3/sk+Ylyp0GKvViTVfQl
- 7D0uTWldd8ofx7T1OZunt9HZfcOhVku+/b6INmSV+5kMXxIbJwZN/tOwnyPmuh3z6b9W
- QSg1XpcUaWPxA9HgNsF0o51lEIPgpYkfmSUcXuazsHCXUG5jkNc/WpeG7kOK9Gzbuv6O OA== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by mx0b-00069f02.pphosted.com with ESMTP id 3btqypgbmn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 20 Oct 2021 18:53:08 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.1.2/8.16.1.2) with SMTP id 19KIorMI120919;
-        Wed, 20 Oct 2021 18:53:06 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-        by aserp3030.oracle.com with ESMTP id 3bqmsgwr0q-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 20 Oct 2021 18:53:06 +0000
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 19KIr6ST134042;
-        Wed, 20 Oct 2021 18:53:06 GMT
-Received: from monad.us.oracle.com (dhcp-10-159-132-124.vpn.oracle.com [10.159.132.124])
-        by aserp3030.oracle.com with ESMTP id 3bqmsgwqxu-1;
-        Wed, 20 Oct 2021 18:53:06 +0000
-From:   Ankur Arora <ankur.a.arora@oracle.com>
-To:     linux-kernel@vger.kernel.org, linux-mm@kvack.org, x86@kernel.org
-Cc:     mingo@kernel.org, bp@alien8.de, luto@kernel.org,
-        akpm@linux-foundation.org, mike.kravetz@oracle.com,
-        jon.grimm@amd.com, kvm@vger.kernel.org, konrad.wilk@oracle.com,
-        boris.ostrovsky@oracle.com, Ankur Arora <ankur.a.arora@oracle.com>
-Subject: [PATCH v2 14/14] x86/cpu/intel: set X86_FEATURE_MOVNT_SLOW for Skylake
-Date:   Wed, 20 Oct 2021 11:52:55 -0700
-Message-Id: <20211020185255.19009-1-ankur.a.arora@oracle.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20211020170305.376118-1-ankur.a.arora@oracle.com>
-References: <20211020170305.376118-1-ankur.a.arora@oracle.com>
+        id S231434AbhJTS7j (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Oct 2021 14:59:39 -0400
+Received: from mail-dm6nam11on2052.outbound.protection.outlook.com ([40.107.223.52]:40375
+        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S230076AbhJTS7i (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Oct 2021 14:59:38 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=DR2Ju+mNaAulOoZVqA8FYU7+LmU5Ym+LFfa6fWGMFQl+riUvAc8j15a163CYYHGjYQT3Mah3Mk336tjiomuF1J5TnPocHVAhB37Er/Sv9viFK9vKbmnCrZVflznWmdoh6VgRlaiiMUlS50iGwugyWd4s2SHJZo3lJg2sspnUpGtIg3WuiwDFnpZrJPm8bobfdGs19WfluDV7LB2f3e3/94F07zsLAdnSF6ACilirSwzW3ibCIJmyqNchkxpM0VbMcpzs+RuO4wFohf6VfE6qaZhreU1307XQZcTjlA7MYV8mL2PEuOpXkAonvAOX4gTVYPYXx3f4/NA0nuYoxNM16w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ou6q5DX0fBbYxkn91N8uNybgyqU5RktsY1MNVUTy7Nk=;
+ b=fS3wjeAVrKPjKKj2CETn7fuMvAP1/txQJbLr/FrWdEuPWPvCdUg3FBra1XkKjEbDYOnPMkzfAFbKpqwQ0ahxsZhYtdV8Mm+cTSgPjWFEd2tv5cwNzwXkvPBjsXAK/PAL46vD3vpixCjC5dNNO16MAZ1p+/Y2ShR1CGOkKzaNEYOeO9c6scEOEd9l91kOKWPJrt6O8O7Nw4H+ozhwEDDmAQ16kykB5NO/P73uag9x/ENGWUAjXaQtMe3cKcR5mL53cGdZHwsWU0pnETK2E7+kHMBtBpjjHU38nBwBeOSvyZeCLRtRHWtxbU6nBTP0gbFICobsg/N2sWE6yR3CKgw5DA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ou6q5DX0fBbYxkn91N8uNybgyqU5RktsY1MNVUTy7Nk=;
+ b=LbwfPOtfWwy0FZJgW246A2/DrwXLFVZVvtWAZ68dtCtB2Vr25AU1oWWbGlLMGytMXyVw5uZdAoDAEKKIgXZTxeNL1nupvcUag9nnbKuLGVjoWopyZ707gdjqxnCAkY1E6ujr4VYZQyGXzldrEKgL94KpfAbV3shCKQhIWaQ52W6DMnDgKC/ee3QE9JYmal2NWV1vb8mYsoy7NRlcuF5b4MQzKoj0V9IBIRTNWAexAjRZ35Uun3gSrYjPFg3Afgd1waYfcV15LLn+KKTGD+LNZdCeyQyu6TlVDmqZz8ZMThKDP2GbSSpUDpspfTcZLtA5Q3nQBmMKmF7Hc/BVeL/XJg==
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=nvidia.com;
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
+ by BL1PR12MB5254.namprd12.prod.outlook.com (2603:10b6:208:31e::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4608.17; Wed, 20 Oct
+ 2021 18:57:22 +0000
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::e8af:232:915e:2f95]) by BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::e8af:232:915e:2f95%8]) with mapi id 15.20.4628.016; Wed, 20 Oct 2021
+ 18:57:22 +0000
+Date:   Wed, 20 Oct 2021 15:57:21 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Yishai Hadas <yishaih@nvidia.com>, bhelgaas@google.com,
+        saeedm@nvidia.com, linux-pci@vger.kernel.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, kuba@kernel.org, leonro@nvidia.com,
+        kwankhede@nvidia.com, mgurtovoy@nvidia.com, maorg@nvidia.com
+Subject: Re: [PATCH V2 mlx5-next 14/14] vfio/mlx5: Use its own PCI reset_done
+ error handler
+Message-ID: <20211020185721.GA334@nvidia.com>
+References: <20211019105838.227569-1-yishaih@nvidia.com>
+ <20211019105838.227569-15-yishaih@nvidia.com>
+ <20211019125513.4e522af9.alex.williamson@redhat.com>
+ <20211019191025.GA4072278@nvidia.com>
+ <5cf3fb6c-2ca0-f54e-3a05-27762d29b8e2@nvidia.com>
+ <20211020164629.GG2744544@nvidia.com>
+ <20211020114514.560ce2fa.alex.williamson@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211020114514.560ce2fa.alex.williamson@redhat.com>
+X-ClientProxiedBy: BL0PR0102CA0010.prod.exchangelabs.com
+ (2603:10b6:207:18::23) To BL0PR12MB5506.namprd12.prod.outlook.com
+ (2603:10b6:208:1cb::22)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-ORIG-GUID: Tq1cliHmJo0EStHyne1ildEXugGQmY-g
-X-Proofpoint-GUID: Tq1cliHmJo0EStHyne1ildEXugGQmY-g
+Received: from mlx.ziepe.ca (142.162.113.129) by BL0PR0102CA0010.prod.exchangelabs.com (2603:10b6:207:18::23) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4608.18 via Frontend Transport; Wed, 20 Oct 2021 18:57:22 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1mdGm9-0002A5-CS; Wed, 20 Oct 2021 15:57:21 -0300
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 3bd9ac66-3274-4c1d-22dd-08d993fb72e2
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5254:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <BL1PR12MB5254977C82C2270486CCB15FC2BE9@BL1PR12MB5254.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: mjG84jGD+Kqsr8ToaUF0ue7zo1hXOpjls64E31/2j0iletA8HxElzD0MXEVRJkti61m12PnJsBu4V71ZLL9n05b5b29tK4HKtgbH2dk4Q8rDqbAPLVpTotFT+GoCnKNC6JqDEK97fxbAntNMFK2cu/+iae5r0q8TfUoF7iEyhSP5sdccwq8oFyOPml6uLZnoh8Ll6y9aw0h3qxCmBsATyXlDuVyZpzZAKHO3SKgr1Xbl34qhn7APY7AZrEncxN8MyZ0akbNcU1HWPOdFfo1EeRkLRYt0wahvmc3kkM/3vKwVaisNuAWYlnrUvkQoQWKD/u74nAItKr1AoYV+C2MzjxWfu/L7c5qnuTKc1ZSxRFBY8E3PsWOo8GmX2hI/bXyhfvQgptrJxScxl13hNyu/9o8VXyNkxy4n44dT4yAbQK1Sf+/+rbo572y4FWDe3lo22qspCwGHM0PqWKuKv8R57AXEh6Ezl6KWX7D3cY8aNzh0dJxantoK7pN4e/bjacSYE5lP1sdP5n5laNFtuZA62TdcrICqQKub1r13mE8ChH5feVXjW46N/p/IIDqnZ9bRrICUUj/Ah0K21h24iBJZq+9nYY5ejx9r6GHr2g2XOIkc6S4u1ijqsvTo/yI7WDnYJa2inNP8XWWb5fNv1RwB2w==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(8676002)(26005)(38100700002)(66556008)(2616005)(66476007)(33656002)(6916009)(36756003)(4326008)(426003)(83380400001)(107886003)(9786002)(508600001)(186003)(2906002)(86362001)(9746002)(316002)(1076003)(5660300002)(8936002)(66946007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?yNEmwWs1miRbEXcyZ1VvYYgWOUWqxPDtSFjwrjoA467b0tljSJwWpCF1S92N?=
+ =?us-ascii?Q?uaQ9TpIeDZc/C9EBWlf0T7iwkTrGSuN0kB2fQ1h8kmWr6aNR+0lMttJ4rQ22?=
+ =?us-ascii?Q?/B1aD8Z2/35b6458ge5kRlsnpu1zgM/kDmL6gv8R7S1aIxGfE5Le6bNYbICV?=
+ =?us-ascii?Q?oH6y1770Z3POpBnAv/PwaLFItbMN/v8YqJJHO3BGq8GkNrfUvVjotCj6h5B8?=
+ =?us-ascii?Q?xORz+wTb/feNySc/6HcCgHpghlDq6/xG9WhhhCI05sfb3Hmg2dIi7aEAdHj8?=
+ =?us-ascii?Q?pEwsX45Qwi52L3ggDxp8aoNBDn+QZDyJqIuNAy8tJ7IGFOKP/pfHHu5wjR9I?=
+ =?us-ascii?Q?tDJAMJqpC30ijWV6DJ5TC5upjvAWtSSHqDNucAFt1/+k5NgcykcbhwDjUz9H?=
+ =?us-ascii?Q?F12JiuTuNz/0RdoNefMIMi8ZPNKBYAJvmRPaXkUkdUqxwcVRFPXojPwsFsNe?=
+ =?us-ascii?Q?QQV4GBxzJGQ4ef2SMfVX5lRmDVfnFqhjVmkiYyhQYw2dZO8eBp1A86z4c8+h?=
+ =?us-ascii?Q?rvImzcfrNYXv7aLEsWRPMKoqJbYAKKOoTk2HpsNfMub/AEnaTz6um84zmEVA?=
+ =?us-ascii?Q?C5xGHUfM6jeTY84ulww+mLlhKD436bvPaKKehX4134ecz9SdbrX3l1ox8Z0M?=
+ =?us-ascii?Q?pH4JFMAzcb2w4wsVn70v5yWc0re+eTK4U0hUUyyFJZCfchJmJdIijOKe9Zy+?=
+ =?us-ascii?Q?IGZSYeI2n7Ige+rYU7C3fN6auCGqEolvitIIw+Ng/aif//6cWzDcQnYkWHD7?=
+ =?us-ascii?Q?gcZt6mz+39Cj7bPuKh2vu1LMLp3LBgoco1m4+smEBVfoPKsMJLx+iNXxTmyR?=
+ =?us-ascii?Q?11LIrYo1DmMSlI5utAKxbI4Ww+4IX9TearShdKlE/CFm0pWpNk9EKQmnLz15?=
+ =?us-ascii?Q?Mwo6915A5tj7U5DfT9L71qOrKo22EqDWcS2K1K/CMa4w2iQNZjCMwqvLfX4N?=
+ =?us-ascii?Q?XkO1XLEq9C55fK+wh6OpLG0PKiR3RrmBqcDCUGKAoynqu9ITXH4LbL+dNyot?=
+ =?us-ascii?Q?7ndMBBGD/irOpYua7SbbH8Zbp3cBrVsIFPVjBlQoL83zFpogMMMjqen+13lX?=
+ =?us-ascii?Q?8lubUaDTeQwtPY8EVf1bWy9RXbXfgQX5jOfUw5Mx3bHO1QTxJ6NSquFcbOIm?=
+ =?us-ascii?Q?GvTtyj3idVGGj0uqZzwwWihyZ19C9I9MJIJs/4Iocotj5pZwOLPIsYdtBKPp?=
+ =?us-ascii?Q?kfVSjzvFL3xMMmfo9s1WbMxJWszPPUpRhzGNksWtoEKfoWlXzvX1s6WpsTfE?=
+ =?us-ascii?Q?VNpc0Li110ln5oBFTkipIqoGhgLMQW558iz3Jcuame1j3rrCUwnO8lexgIBJ?=
+ =?us-ascii?Q?ezgcU8zJlC4swQLg0xZgnWW2?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3bd9ac66-3274-4c1d-22dd-08d993fb72e2
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Oct 2021 18:57:22.5353
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: jgg@nvidia.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5254
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-System:           Oracle X8-2
-CPU:              2 nodes * 26 cores/node * 2 threads/core
-                  Intel Xeon Platinum 8270CL (Skylakex, 6:85:7)
-Memory:           3TB evenly split between nodes
-Microcode:        0x5002f01
-scaling_governor: performance
-L3 size:          36MB
-intel_pstate/no_turbo: 1
+On Wed, Oct 20, 2021 at 11:45:14AM -0600, Alex Williamson wrote:
+> On Wed, 20 Oct 2021 13:46:29 -0300
+> Jason Gunthorpe <jgg@nvidia.com> wrote:
+> 
+> > On Wed, Oct 20, 2021 at 11:46:07AM +0300, Yishai Hadas wrote:
+> > 
+> > > What is the expectation for a reasonable delay ? we may expect this system
+> > > WQ to run only short tasks and be very responsive.  
+> > 
+> > If the expectation is that qemu will see the error return and the turn
+> > around and issue FLR followed by another state operation then it does
+> > seem strange that there would be a delay.
+> > 
+> > On the other hand, this doesn't seem that useful. If qemu tries to
+> > migrate and the device fails then the migration operation is toast and
+> > possibly the device is wrecked. It can't really issue a FLR without
+> > coordinating with the VM, and it cannot resume the VM as the device is
+> > now irrecoverably messed up.
+> > 
+> > If we look at this from a RAS perspective would would be useful here
+> > is a way for qemu to request a fail safe migration data. This must
+> > always be available and cannot fail.
+> > 
+> > When the failsafe is loaded into the device it would trigger the
+> > device's built-in RAS features to co-ordinate with the VM driver and
+> > recover. Perhaps qemu would also have to inject an AER or something.
+> > 
+> > Basically instead of the device starting in an "empty ready to use
+> > state" it would start in a "failure detected, needs recovery" state.
+> 
+> The "fail-safe recovery state" is essentially the reset state of the
+> device.
 
-  $ for i in 2 8 32 128 512; do
-	perf bench mem memset -f x86-64-movnt -s ${i}MB
-  done
-  # Running 'mem/memset' benchmark:
-  # function 'x86-64-movnt' (movnt-based memset() in arch/x86/lib/memset_64.S)
-  # Copying 2MB bytes ...
-         6.361971 GB/sec
-  # Copying 8MB bytes ...
-         6.300403 GB/sec
-  # Copying 32MB bytes ...
-         6.288992 GB/sec
-  # Copying 128MB bytes ...
-         6.328793 GB/sec
-  # Copying 512MB bytes ...
-         6.324471 GB/sec
+This is only the case if qemu does work to isolate the recently FLR'd
+device from the VM until the VM acknowledges that it understands it is
+FLR'd.
 
- # Performance comparison of 'perf bench mem memset -l 1' for x86-64-stosb
- # (X86_FEATURE_ERMS) and x86-64-movnt:
+At least it would have to remove it from CPU access and the IOMMU, as
+though the memory enable bit was cleared.
 
-              x86-64-stosb (5 runs)     x86-64-movnt (5 runs)      speedup
-              -----------------------   -----------------------    -------
-     size            BW   (   pstdev)          BW   (   pstdev)
+Is it reasonable to do this using just qemu, AER and no device
+support?
 
-     16MB      20.38 GB/s ( +- 2.58%)     6.25 GB/s ( +- 0.41%)   -69.28%
-    128MB       6.52 GB/s ( +- 0.14%)     6.31 GB/s ( +- 0.47%)    -3.22%
-   1024MB       6.48 GB/s ( +- 0.31%)     6.24 GB/s ( +- 0.00%)    -3.70%
-   4096MB       6.51 GB/s ( +- 0.01%)     6.27 GB/s ( +- 0.42%)    -3.68%
+> If a device enters an error state during migration, I would
+> think the ultimate recovery procedure would be to abort the migration,
+> send an AER to the VM, whereby the guest would trigger a reset, and
+> the RAS capabilities of the guest would handle failing over to a
+> multipath device, ejecting the failing device, etc.
 
-Comparing perf stats for size=4096MB:
+Yes, this is my thinking, except I would not abort the migration but
+continue on to the new hypervisor and then do the RAS recovery with
+the new device.
 
-$ perf stat -r 5 --all-user -e ... perf bench mem memset -l 1 -s 4096MB -f x86-64-stosb
- # Running 'mem/memset' benchmark:
- # function 'x86-64-stosb' (movsb-based memset() in arch/x86/lib/memset_64.S)
- # Copying 4096MB bytes ...
-       6.516972 GB/sec       (+- 0.01%)
-
- Performance counter stats for 'perf bench mem memset -l 1 -s 4096MB -f x86-64-stosb' (5 runs):
-
-     3,357,373,317      cpu-cycles                #    1.133 GHz                      ( +-  0.01% )  (29.38%)
-       165,063,710      instructions              #    0.05  insn per cycle           ( +-  1.54% )  (35.29%)
-           358,997      cache-references          #    0.121 M/sec                    ( +-  0.89% )  (35.32%)
-           205,420      cache-misses              #   57.221 % of all cache refs      ( +-  3.61% )  (35.36%)
-         6,117,673      branch-instructions       #    2.065 M/sec                    ( +-  1.48% )  (35.38%)
-            58,309      branch-misses             #    0.95% of all branches          ( +-  1.30% )  (35.39%)
-        31,329,466      bus-cycles                #   10.575 M/sec                    ( +-  0.03% )  (23.56%)
-        68,543,766      L1-dcache-load-misses     #  157.03% of all L1-dcache accesses  ( +-  0.02% )  (23.53%)
-        43,648,909      L1-dcache-loads           #   14.734 M/sec                    ( +-  0.50% )  (23.50%)
-           137,498      LLC-loads                 #    0.046 M/sec                    ( +-  0.21% )  (23.49%)
-            12,308      LLC-load-misses           #    8.95% of all LL-cache accesses  ( +-  2.52% )  (23.49%)
-            26,335      LLC-stores                #    0.009 M/sec                    ( +-  5.65% )  (11.75%)
-            25,008      LLC-store-misses          #    0.008 M/sec                    ( +-  3.42% )  (11.75%)
-
-          2.962842 +- 0.000162 seconds time elapsed  ( +-  0.01% )
-
-$ perf stat -r 5 --all-user -e ... perf bench mem memset -l 1 -s 4096MB -f x86-64-movnt
- # Running 'mem/memset' benchmark:
- # function 'x86-64-movnt' (movnt-based memset() in arch/x86/lib/memset_64.S)
- # Copying 4096MB bytes ...
-       6.283420 GB/sec      (+- 0.01%)
-
-  Performance counter stats for 'perf bench mem memset -l 1 -s 4096MB -f x86-64-movnt' (5 runs):
-
-     4,462,272,094      cpu-cycles                #    1.322 GHz                      ( +-  0.30% )  (29.38%)
-     1,633,675,881      instructions              #    0.37  insn per cycle           ( +-  0.21% )  (35.28%)
-           283,627      cache-references          #    0.084 M/sec                    ( +-  0.58% )  (35.31%)
-            28,824      cache-misses              #   10.163 % of all cache refs      ( +- 20.67% )  (35.34%)
-       139,719,697      branch-instructions       #   41.407 M/sec                    ( +-  0.16% )  (35.35%)
-            58,062      branch-misses             #    0.04% of all branches          ( +-  1.49% )  (35.36%)
-        41,760,350      bus-cycles                #   12.376 M/sec                    ( +-  0.05% )  (23.55%)
-           303,300      L1-dcache-load-misses     #    0.69% of all L1-dcache accesses  ( +-  2.08% )  (23.53%)
-        43,769,498      L1-dcache-loads           #   12.972 M/sec                    ( +-  0.54% )  (23.52%)
-            99,570      LLC-loads                 #    0.030 M/sec                    ( +-  1.06% )  (23.52%)
-             1,966      LLC-load-misses           #    1.97% of all LL-cache accesses  ( +-  6.17% )  (23.52%)
-               129      LLC-stores                #    0.038 K/sec                    ( +- 27.85% )  (11.75%)
-                 7      LLC-store-misses          #    0.002 K/sec                    ( +- 47.82% )  (11.75%)
-
-           3.37465 +- 0.00474 seconds time elapsed  ( +-  0.14% )
-
-It's unclear if using MOVNT is a net negative on Skylake. For bulk stores
-MOVNT is slightly slower than REP;STOSB, but from the L1-dcache-load-misses
-stats (L1D.REPLACEMENT), it does elide the write-allocate and thus helps
-with cache efficiency.
-
-However, we err on the side of caution and mark Skylake
-X86_FEATURE_MOVNT_SLOW.
-
-Signed-off-by: Ankur Arora <ankur.a.arora@oracle.com>
----
- arch/x86/kernel/cpu/bugs.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
-
-diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
-index 4e1558d22a5f..222d6f095da1 100644
---- a/arch/x86/kernel/cpu/bugs.c
-+++ b/arch/x86/kernel/cpu/bugs.c
-@@ -96,6 +96,21 @@ void check_movnt_quirks(struct cpuinfo_x86 *c)
- 	 * to worry about any CONFIG_X86_32 families that don't
- 	 * support SSE2/MOVNT.
- 	 */
-+	if (c->x86_vendor == X86_VENDOR_INTEL) {
-+		if (c->x86 == 6) {
-+			switch (c->x86_model) {
-+			case INTEL_FAM6_SKYLAKE_L:
-+				fallthrough;
-+			case INTEL_FAM6_SKYLAKE:
-+				fallthrough;
-+			case INTEL_FAM6_SKYLAKE_X:
-+				set_cpu_cap(c, X86_FEATURE_MOVNT_SLOW);
-+				break;
-+			default:
-+				break;
-+			}
-+		}
-+	}
- #endif /* CONFIG_X86_64*/
- }
- 
--- 
-2.29.2
-
+Jason
