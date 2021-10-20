@@ -2,81 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0F486434DD0
-	for <lists+kvm@lfdr.de>; Wed, 20 Oct 2021 16:30:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7AF67434E43
+	for <lists+kvm@lfdr.de>; Wed, 20 Oct 2021 16:52:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230327AbhJTOc2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Oct 2021 10:32:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51532 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230378AbhJTOcS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Oct 2021 10:32:18 -0400
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 378ACC0613E5
-        for <kvm@vger.kernel.org>; Wed, 20 Oct 2021 07:29:30 -0700 (PDT)
-Received: by mail-pl1-x631.google.com with SMTP id w17so4423634plg.9
-        for <kvm@vger.kernel.org>; Wed, 20 Oct 2021 07:29:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=XgjWa6urh+2o4wqBD5gUfgDpjgp0SCvskomJgQmYY+0=;
-        b=ZSDO6CpOBnedFZe6DFUgjtyUK1MuJ5eE1NN4ZS0TVOkGRHpWKc2a4d/GJ5GoCygH4B
-         G19Wh+vwFfSvS/Dii+2/P7ebLqIlqTayyCTdyRcVKKqmuTYIM/1lJEcUIfhbrc4JMm6g
-         ZBEvoiE2wfWFJx8AM7EIqyLsFpjHUdsuo8VOjM4mUblUjA129GKFOSWt+3yXmjCBCOCv
-         ycPzv2wPbaTsvljugga8WJunvimLGcrD2+1SSxHQoaTJbs2FMtND4ZiyvczkY2SlipVT
-         Nra68u2y9R+snfbsjk2avm5dW4b6Xy/JS73pj+ibqtdqHmsgJHUrX5IIBMz/NlxiPQAZ
-         yYHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=XgjWa6urh+2o4wqBD5gUfgDpjgp0SCvskomJgQmYY+0=;
-        b=2TwbK5euch8CP8m8ffO7Kj7mA9wvlt2zqFdzHqyWbqyP1f5RnyuUJ9b78yR/2GM7VA
-         1GjmccbhkAlxoWxQskpmpkl+h+KaoWtJiF5vQNq5DX9prfRljqmyfiDTtRPM9FAIYAot
-         exYHwxANuPiTx4KmXAW5Srlz29+xKAVCH3aRbKoJJ8XWdHGhvdeLAqIUdDcNsRju0pS3
-         tnPFCyMfhgHAFw8AMc7RslqxxA2zgM4cV8H86zxqrMja9P6sPBKmyUqbL0CwLW+mAdJC
-         kP3xLp1PFrrkaHgywWSSABwcP8ZkmzWn0WjwkLuPdNDIU18RzEVtVT6NV9Af8YVUqTJs
-         EFKA==
-X-Gm-Message-State: AOAM532DgCu6w5Hj3W38KEwYHs3laEXhA4sxZhYH8d2tt9lljifs6Oyi
-        hYBTcqbd+PFIWPDG7gqE9VDQTYy77bnjKQ==
-X-Google-Smtp-Source: ABdhPJydu28OpbVkEA/WfwFuZQ8SyRqvPuLD1RDzpFZLwQNLnS7QNg/iWP42bkocOYE/dddoEWSm2Q==
-X-Received: by 2002:a17:90a:2a0d:: with SMTP id i13mr284267pjd.166.1634740169636;
-        Wed, 20 Oct 2021 07:29:29 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id i2sm2774356pjt.21.2021.10.20.07.29.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Oct 2021 07:29:29 -0700 (PDT)
-Date:   Wed, 20 Oct 2021 14:29:25 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Joerg Roedel <joro@8bytes.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>, x86@kernel.org,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Joerg Roedel <jroedel@suse.de>
-Subject: Re: [PATCH v5 3/6] KVM: SVM: Move kvm_emulate_ap_reset_hold() to AMD
- specific code
-Message-ID: <YXAnxXVxFrS41/ui@google.com>
-References: <20211020124416.24523-1-joro@8bytes.org>
- <20211020124416.24523-4-joro@8bytes.org>
+        id S230103AbhJTOyu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Oct 2021 10:54:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:32163 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229570AbhJTOyt (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 20 Oct 2021 10:54:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1634741555;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=/0QdtGs1Fi//iyAjGxBqoRG5ALBbtyYEvUdrZuMLfmw=;
+        b=YUrXM/D6FfWnzDFnfD2NGT9M9YBn5LPXvDCFT9vZ6CukkIuvC4PdUM3XmjWY5ufgYvlQJn
+        aMOUqiJ6LhjufojK/S6IPfbbEGA0H7vcKGl1HY6ioQk/WxpwEyrsQlflbVHHqM4EeLe2tm
+        4YysKj/FrkG7dykS2sd6ta/0mOdvCbs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-158-jlrZb7J6Na6JSbDYuZLiPg-1; Wed, 20 Oct 2021 10:52:33 -0400
+X-MC-Unique: jlrZb7J6Na6JSbDYuZLiPg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 74ABB8066F3;
+        Wed, 20 Oct 2021 14:52:32 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CAB6E5C1D5;
+        Wed, 20 Oct 2021 14:52:31 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     wanpengli@tencent.com, seanjc@google.com, stable@vger.kernel.org
+Subject: [PATCH] KVM: x86: check for interrupts before deciding whether to exit the fast path
+Date:   Wed, 20 Oct 2021 10:52:29 -0400
+Message-Id: <20211020145231.871299-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211020124416.24523-4-joro@8bytes.org>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 20, 2021, Joerg Roedel wrote:
-> From: Joerg Roedel <jroedel@suse.de>
-> 
-> The function is only used by the kvm-amd module. Move it to the AMD
-> specific part of the code and name it sev_emulate_ap_reset_hold().
-> 
-> Signed-off-by: Joerg Roedel <jroedel@suse.de>
-> ---
+The kvm_x86_sync_pir_to_irr callback can sometimes set KVM_REQ_EVENT.
+If that happens exactly at the time that an exit is handled as
+EXIT_FASTPATH_REENTER_GUEST, vcpu_enter_guest will go incorrectly
+through the loop that calls kvm_x86_run, instead of processing
+the request promptly.
 
-Reviewed-by: Sean Christopherson <seanjc@google.com>
+Fixes: 379a3c8ee444 ("KVM: VMX: Optimize posted-interrupt delivery for timer fastpath")
+Cc: stable@vger.kernel.org
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/x86/kvm/x86.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index fa48948b4934..b9b31e5f72b0 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -9781,14 +9781,14 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+ 		if (likely(exit_fastpath != EXIT_FASTPATH_REENTER_GUEST))
+ 			break;
+ 
+-                if (unlikely(kvm_vcpu_exit_request(vcpu))) {
++		if (vcpu->arch.apicv_active)
++			static_call(kvm_x86_sync_pir_to_irr)(vcpu);
++
++		if (unlikely(kvm_vcpu_exit_request(vcpu))) {
+ 			exit_fastpath = EXIT_FASTPATH_EXIT_HANDLED;
+ 			break;
+ 		}
+-
+-		if (vcpu->arch.apicv_active)
+-			static_call(kvm_x86_sync_pir_to_irr)(vcpu);
+-        }
++	}
+ 
+ 	/*
+ 	 * Do this here before restoring debug registers on the host.  And
+-- 
+2.27.0
+
