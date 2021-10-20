@@ -2,111 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E3A7F434E5E
-	for <lists+kvm@lfdr.de>; Wed, 20 Oct 2021 16:56:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1949B434EAE
+	for <lists+kvm@lfdr.de>; Wed, 20 Oct 2021 17:10:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230195AbhJTO6R (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Oct 2021 10:58:17 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:30540 "EHLO
+        id S230242AbhJTPMv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Oct 2021 11:12:51 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:49108 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229952AbhJTO6P (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 20 Oct 2021 10:58:15 -0400
+        by vger.kernel.org with ESMTP id S229570AbhJTPMu (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 20 Oct 2021 11:12:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634741760;
+        s=mimecast20190719; t=1634742635;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=DvkW/BJlHhRMHO63xOlv6FjfRFrkZksB/IOG7UE4hNA=;
-        b=g/ec2qizSJzT3ouRB5QJgL3vkFR94hhV1YIJfpFGl6zhMdV2wvkGxl5jmKT9hy0zR0af4B
-        xZfMTU6QNRZak75Q5t+zoEpoKguFHkZ+Bv34Jbw+YxhltFhA4jXu9MlVLbSSIC/P6/d6xy
-        MqfsYn1ZPDf1le1JAB+QWfzWYrhcDtQ=
+        bh=mjiPTfW2gLGy0hlLQoZymCi13i6pwqBjAytBG2xMmKU=;
+        b=YiHvG5NtMOX+ihYX+ri8BY+w1klww0Ssky4U1h/FynilM2aNmD29eyzs+9dfxfKaYjWmAQ
+        1zBG+N//wwxVgw8qTp+lkxcGcwiCaDpplqUHOW9gBt478l1Xjohgs2oeIhcSJZ7fpPc9k4
+        Efqc5gSKinnahaRqJrE6ZVKhUFQ5a5g=
 Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
  [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-482-7Jl5G5XMMyW0K5kFaOLihA-1; Wed, 20 Oct 2021 10:55:59 -0400
-X-MC-Unique: 7Jl5G5XMMyW0K5kFaOLihA-1
-Received: by mail-ed1-f71.google.com with SMTP id c25-20020a056402143900b003dc19782ea8so17790102edx.3
-        for <kvm@vger.kernel.org>; Wed, 20 Oct 2021 07:55:59 -0700 (PDT)
+ us-mta-496-XAbRhbHQNg26xASgf4sTBQ-1; Wed, 20 Oct 2021 11:10:32 -0400
+X-MC-Unique: XAbRhbHQNg26xASgf4sTBQ-1
+Received: by mail-ed1-f71.google.com with SMTP id g28-20020a50d0dc000000b003dae69dfe3aso21286436edf.7
+        for <kvm@vger.kernel.org>; Wed, 20 Oct 2021 08:10:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=DvkW/BJlHhRMHO63xOlv6FjfRFrkZksB/IOG7UE4hNA=;
-        b=HUDzI7lHY8AbMd99/Xy7+fg7DldUFBDXvnfJvfkC8p0GIPQ4Pk+mmbDXJsuhfFVam3
-         WOB2T+BFgbXcf760q+TZaK6/CkSwIdpFWsBjfCRD41t4yNmFxbyGO2GSXBm2vc5aJo37
-         ZPtwqLHU3HZYjQFDQvHe4dNgkZEwne4lUuX2fB2iEyKWM51VpYM+bBzyc87OAyEX97/5
-         akyDT3IQpZZbvD8lpHoRrVjkLk3MwzLmktdUuhshAdSU9WbtYQ8ZV3bCCHWdpJvyoel/
-         W45IMUrIe3eHhoRDm6FpAktJl84bj594lO+Xbo4RinBVnxwKqqKDJxFvFJv6eSKBR/G2
-         sBxA==
-X-Gm-Message-State: AOAM531KUrY9ubsbdgiBoq2CQa9zCiAFT4QBnMweSwGE6VAxc4HjMHhl
-        H2zs20wPlz5WnWFgrWne5/x1M0TffMapY1UHZMm4OmgGQf11H1+xlbPCxOOJDNSw/EL1xq7fpe6
-        7agkU/Wd93dY2
-X-Received: by 2002:a50:da42:: with SMTP id a2mr505701edk.361.1634741757715;
-        Wed, 20 Oct 2021 07:55:57 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw1++Z3/KHUmZ2PZcZLSOgJP0sE5Y2OiRPx35Tlh7QIfp4FNxn/cbmvY7EMfczpuCXhkDrFhQ==
-X-Received: by 2002:a50:da42:: with SMTP id a2mr505670edk.361.1634741757437;
-        Wed, 20 Oct 2021 07:55:57 -0700 (PDT)
+        bh=mjiPTfW2gLGy0hlLQoZymCi13i6pwqBjAytBG2xMmKU=;
+        b=wrWGY+OU3pCvc1cuGE+ubid+iyldr96sCGBHSN7l+TwsoMUATpfomTDHfOs1wk/wRW
+         FkAhFHA9fWIldgblFnDTaWOjT1T2eNl+7YOiBUpDngpFiA/swB0ifWL9Cs+b+MQRTOfv
+         pXFlyeC2N9vPItFwXVV+II0tauEHGF4ctSZCvHx5GV8k4jV33I3jJkIJSlCMZNhNGIRg
+         v7vWoUajCdMKV/kJ/+/juC6NpVkXR0K/8d8mHKpELUUbGPwhzW5FYw9OiVnFhAH2+Syf
+         EJFaeMPDDs2Z+N6JDR/nweq4u6sBbuk5WGISyZN2KNfJqFBgYgmvDwdU0lo28Sc87GEW
+         HyoQ==
+X-Gm-Message-State: AOAM532jYyf/FKcY6QIzv5S+frQR1W3VTMMzzhzCZyXt2RV4lM4JtiL6
+        vNc7VaFQcoQ/SfF3jOedxQDUzZfkrYln8Id39WhuCMOyF8poE9o9QeDJa/PrPnFlaWm5FElmbom
+        Tl1YowWeWaryp
+X-Received: by 2002:a17:906:4e89:: with SMTP id v9mr157658eju.354.1634742631014;
+        Wed, 20 Oct 2021 08:10:31 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwOiI08Fc457AZgGg4vyem413WiqWwlWvwqbyzTXb+9Udsh3EHSyIQVD4+5piQwEsyTpoNqLw==
+X-Received: by 2002:a17:906:4e89:: with SMTP id v9mr157626eju.354.1634742630754;
+        Wed, 20 Oct 2021 08:10:30 -0700 (PDT)
 Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id j3sm1152009ejy.65.2021.10.20.07.55.56
+        by smtp.gmail.com with ESMTPSA id n6sm1320390eds.10.2021.10.20.08.10.29
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 20 Oct 2021 07:55:56 -0700 (PDT)
-Message-ID: <842ca2d4-fa72-3814-6c52-e079f081ec5d@redhat.com>
-Date:   Wed, 20 Oct 2021 16:55:55 +0200
+        Wed, 20 Oct 2021 08:10:30 -0700 (PDT)
+Message-ID: <b2aebaba-92bc-865d-5d52-6810ba08ceaa@redhat.com>
+Date:   Wed, 20 Oct 2021 17:10:28 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.1.0
-Subject: Re: [PATCH 0/2] KVM: x86: Enhance vendor module error messages
+Subject: Re: [PATCH v1 1/5] KVM: x86: nVMX: Add vmcs12 field existence bitmap
+ in nested_vmx
 Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Paul Menzel <pmenzel@molgen.mpg.de>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>
-References: <20211018183929.897461-1-seanjc@google.com>
+To:     Robert Hoo <robert.hu@linux.intel.com>, seanjc@google.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org
+Cc:     kvm@vger.kernel.org, yu.c.zhang@linux.intel.com
+References: <1629192673-9911-1-git-send-email-robert.hu@linux.intel.com>
+ <1629192673-9911-2-git-send-email-robert.hu@linux.intel.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20211018183929.897461-1-seanjc@google.com>
+In-Reply-To: <1629192673-9911-2-git-send-email-robert.hu@linux.intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 18/10/21 20:39, Sean Christopherson wrote:
-> Paul Menzel encountered the bad userspace behavior of spamming KVM module
-> loading on all CPUs, which was mitigated by commit ef935c25fd64 ("kvm: x86:
-> Limit the number of "kvm: disabled by bios" messages"), except this time
-> userspace is extra "clever" and spams both kvm_intel and kvm_amd.  Because
-> the "already loaded the other module" message isn't ratelimited, the bogus
-> module load managed to spam the kernel log.
-> 
-> Patch 1 addresses another suggestion from Paul by incorporating the vendor
-> module name into the error messages.
-> 
-> Patch 2 addresses the original report by prioritizing the hardware/bios
-> support messages over the "already loaded" error.  In additional to
-> reducing spam, doing so also ensures consistent messaging if a vendor
-> module isn't supported regardless of what other modules may be loaded.
-> 
-> [*] https://lkml.kernel.org/r/20210818114956.7171-1-pmenzel@molgen.mpg.de
-> 
-> Sean Christopherson (2):
->    KVM: x86: Add vendor name to kvm_x86_ops, use it for error messages
->    KVM: x86: Defer "already loaded" check until after basic support
->      checks
-> 
->   arch/x86/include/asm/kvm_host.h |  2 ++
->   arch/x86/kvm/svm/svm.c          |  2 ++
->   arch/x86/kvm/vmx/vmx.c          |  2 ++
->   arch/x86/kvm/x86.c              | 17 +++++++++--------
->   4 files changed, 15 insertions(+), 8 deletions(-)
-> 
+On 17/08/21 11:31, Robert Hoo wrote:
+> +#define FIELD_BIT_SET(name, bitmap) set_bit(f_pos(name), bitmap)
+> +#define FIELD64_BIT_SET(name, bitmap)	\
+> +	do {set_bit(f_pos(name), bitmap);	\
+> +	    set_bit(f_pos(name) + (sizeof(u32) / sizeof(u16)), bitmap);\
+> +	} while (0)
+> +
+> +#define FIELD_BIT_CLEAR(name, bitmap) clear_bit(f_pos(name), bitmap)
+> +#define FIELD64_BIT_CLEAR(name, bitmap)	\
+> +	do {clear_bit(f_pos(name), bitmap);	\
+> +	    clear_bit(f_pos(name) + (sizeof(u32) / sizeof(u16)), bitmap);\
+> +	} while (0)
+> +
+> +#define FIELD_BIT_CHANGE(name, bitmap) change_bit(f_pos(name), bitmap)
+> +#define FIELD64_BIT_CHANGE(name, bitmap)	\
+> +	do {change_bit(f_pos(name), bitmap);	\
+> +	    change_bit(f_pos(name) + (sizeof(u32) / sizeof(u16)), bitmap);\
+> +	} while (0)
+> +
+> +/*
 
-Queued, thanks.  But I kept the ratelimiting; given the recent "clashes" 
-with the chief penguin, I am also ratelimiting the snark in the commit 
-messages.
+Hi Robert,
+
+I'd rather not have FIELD_BIT_CHANGE, and instead have something like
+
+#define FIELD_BIT_ASSIGN(name, bitmap, value) \
+	if (value) \
+		FIELD_BIT_SET(name, bitmap); \
+	else
+		FIELD_BIT_CLEAR(name, bitmap);
+
+Also, these set_bit/clear_bit can use the non-atomic variants __set_bit 
+and __clear_bit, because the bitmaps are protected by the vCPU mutex.
+
+> +		FIELD64_BIT_CHANGE(posted_intr_desc_addr, bitmap);
+
+Many of the fields you mark as 64-bit are actually natural sized.
+
+> +	if ((old_val ^ new_val) &
+> +	    CPU_BASED_ACTIVATE_SECONDARY_CONTROLS) {
+> +		FIELD_BIT_CHANGE(secondary_vm_exec_control, bitmap);
+> +	}
+> +}
+
+If secondary controls are not available, you should treat the 
+corresponding MSR as if it was all zeroes.  Likewise if VMFUNC is disabled.
+
+> +	if ((old_val ^ new_val) & SECONDARY_EXEC_PAUSE_LOOP_EXITING) {
+> +		FIELD64_BIT_CHANGE(vmread_bitmap, bitmap);
+> +		FIELD64_BIT_CHANGE(vmwrite_bitmap, bitmap);
+
+This seems wrong.
 
 Paolo
 
