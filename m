@@ -2,195 +2,225 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1F82E434641
-	for <lists+kvm@lfdr.de>; Wed, 20 Oct 2021 09:52:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E4261434660
+	for <lists+kvm@lfdr.de>; Wed, 20 Oct 2021 10:02:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229839AbhJTHyf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Oct 2021 03:54:35 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:24022 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S229503AbhJTHyd (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 20 Oct 2021 03:54:33 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 19K6iB6r011722;
-        Wed, 20 Oct 2021 03:52:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=q5de9NsjcUlxTjFhuifPOey8eSlbyYuWuXYhNSMUUTw=;
- b=RC0dnvNM+ygqj743dUDbp+h8zKn6PL5OGsLw9z3CCfWApBlQLq7DCeIsikbeOebFMrTb
- pUJO9uW3Q1auVg7x4YI3F1eT314B7py0fp2xjPe/qIa1SJ7NK7rc37SwbSaW62kCx34x
- zjJR2Zy+B+eznucqOXUrfjxz1FgnKrWrwfH+L5DUvXVWi+6R7dbJrGAdAvbM14wAl9fg
- Zz7B70JeWHoVhWLQwRn+cZYFq29Kznb56/NpVGLVBNo9kaLbTGSx1fbQbcEbGmyl47JF
- qsWNjVyLlmzK52wO6UrxElS6imQGDLDop2VYFilXa1sBFfWmEp5LVBvFAigajjZeCYUV Vw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3bt8erqbmk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 20 Oct 2021 03:52:17 -0400
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 19K7YRbP014719;
-        Wed, 20 Oct 2021 03:52:17 -0400
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3bt8erqbkv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 20 Oct 2021 03:52:16 -0400
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 19K7hVXT029439;
-        Wed, 20 Oct 2021 07:52:15 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma03fra.de.ibm.com with ESMTP id 3bqpc9qjc1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 20 Oct 2021 07:52:15 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 19K7kLHV49086834
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 20 Oct 2021 07:46:21 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C8E0642047;
-        Wed, 20 Oct 2021 07:52:11 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DA39C4204C;
-        Wed, 20 Oct 2021 07:52:10 +0000 (GMT)
-Received: from li-e979b1cc-23ba-11b2-a85c-dfd230f6cf82 (unknown [9.171.29.112])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with SMTP;
-        Wed, 20 Oct 2021 07:52:10 +0000 (GMT)
-Date:   Wed, 20 Oct 2021 09:52:08 +0200
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Christian Borntraeger <borntraeger@de.ibm.com>
-Cc:     Janosch Frank <frankja@linux.ibm.com>,
-        Michael Mueller <mimu@linux.ibm.com>,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        David Hildenbrand <david@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Pierre Morel <pmorel@linux.ibm.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Niklas Schnelle <schnelle@linux.ibm.com>, farman@linux.ibm.com,
-        kvm@vger.kernel.org, Halil Pasic <pasic@linux.ibm.com>
-Subject: Re: [PATCH 3/3] KVM: s390: clear kicked_mask if not idle after set
-Message-ID: <20211020095208.5e34679a.pasic@linux.ibm.com>
-In-Reply-To: <c5c84a99-c56a-2232-7574-a6d207d7c11f@de.ibm.com>
-References: <20211019175401.3757927-1-pasic@linux.ibm.com>
-        <20211019175401.3757927-4-pasic@linux.ibm.com>
-        <c5c84a99-c56a-2232-7574-a6d207d7c11f@de.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S229686AbhJTIEe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Oct 2021 04:04:34 -0400
+Received: from mail-dm6nam12on2079.outbound.protection.outlook.com ([40.107.243.79]:3619
+        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S229663AbhJTIDs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Oct 2021 04:03:48 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Z71pGGNTSX+3GD6YQPB7T9aaWEYCQvEa7xUC1AvsOYmiPVQqHB5KA0iKDgB+jCWQ4b/exn99X9ly79rjYlI9GjRwKdyNsYeeTMRsUeg0sZkoHJewX7ZvuV7EyRAUQbzqzlqB4Af9ja78FcViwKfqLOcFolOa7ewbxoDp36FCtSDcoNpIrolQI4HAECxR2mFgjeFViavOcFeHrDXrAGD/6c997Bky3WAvM0lJHHEvp3e3InssQn12uTlugVT1IwzakBgJ+UVUZV0R6PlEBRfZv5f03yw+vY9LGP2551RQX5QDyBq+jRSepx7CBTmrIfuc9GpDqTaFvXpR6jeChaeSKQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ulzNiQ/sv4sRvLSvlcCyESt9PglyDv9qxuuhHHx8bUk=;
+ b=YJA73Qb6FuIj7JkCEarSQX5+3cOL9hPdjuUKCQhaEg6V+Zu2S1PA3PUJfl3rc+smSabMACCqET8B8/H9qe6jGYFzHkEzOIla5fzrUJpxEHl02SJ2KZ1nEAx93BaKA1OKjNALdWQspvvO2+Qu5D5M75YT0/Qxfaml7yQgRec+7t5B66p6RM72KWI1PwftTwjJ8zDuYj0I/EeSP0BuvdSgoBhgRan689I3RY0lAT4sZ6Md5xAb+BZPi4CEMoDvuxF8eyIF2NRScSsl3IMH4ifkrKCCdw2n7OHzZyE2ch/HJuGLpLK/CxEKBUFbNMb/nHCdj9vVdCKLRCR7KJ20RVwhWA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.112.34) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=nvidia.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ulzNiQ/sv4sRvLSvlcCyESt9PglyDv9qxuuhHHx8bUk=;
+ b=tRt52xdInh+6L8IE96fxaX3uuUnzWWzWXVLLXShXDw8qC1BvPkOZqHd5+pCLIrSr1vjNzrwLSWgJPg5+cFuKm+58x/QsSCS5GxQ/xuRh8heR+rpn/7Klfj75yw7HvZpR++iqqlFJbc5LXC07VeOJSyaa13B2QEiMHDaRry0aw/6FD5p3d7Ffp1LT+ffmpos0viTke02eI5w7l3GHdGN2v53gL8YBt/L9Ht+lVVS1bKjl+vS+37sWG8ebEg+1M89Kdf8gn5sDO/EuUOL3VJG7MZQqNvjG3E6Fo6fRzW3jVpSp5rFSZb3lYQQ5fDS3eU3DTrs+N8FQPKSCP6uRS6FmXQ==
+Received: from DM5PR21CA0062.namprd21.prod.outlook.com (2603:10b6:3:129::24)
+ by BYAPR12MB3447.namprd12.prod.outlook.com (2603:10b6:a03:a9::25) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4608.17; Wed, 20 Oct
+ 2021 08:01:10 +0000
+Received: from DM6NAM11FT008.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:3:129:cafe::be) by DM5PR21CA0062.outlook.office365.com
+ (2603:10b6:3:129::24) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4649.1 via Frontend
+ Transport; Wed, 20 Oct 2021 08:01:10 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.34)
+ smtp.mailfrom=nvidia.com; vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.112.34 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.112.34; helo=mail.nvidia.com;
+Received: from mail.nvidia.com (216.228.112.34) by
+ DM6NAM11FT008.mail.protection.outlook.com (10.13.172.85) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.4628.16 via Frontend Transport; Wed, 20 Oct 2021 08:01:07 +0000
+Received: from [172.27.15.75] (172.20.187.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.18; Wed, 20 Oct
+ 2021 08:01:03 +0000
+Subject: Re: [PATCH V2 mlx5-next 12/14] vfio/mlx5: Implement vfio_pci driver
+ for mlx5 devices
+To:     Alex Williamson <alex.williamson@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>
+CC:     <bhelgaas@google.com>, <saeedm@nvidia.com>,
+        <linux-pci@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <kuba@kernel.org>, <leonro@nvidia.com>,
+        <kwankhede@nvidia.com>, <mgurtovoy@nvidia.com>, <maorg@nvidia.com>
+References: <20211019105838.227569-1-yishaih@nvidia.com>
+ <20211019105838.227569-13-yishaih@nvidia.com>
+ <20211019124352.74c3b6ba.alex.williamson@redhat.com>
+From:   Yishai Hadas <yishaih@nvidia.com>
+Message-ID: <d5ba3528-22db-e06b-80bb-0db40a71e67a@nvidia.com>
+Date:   Wed, 20 Oct 2021 11:01:01 +0300
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20211019124352.74c3b6ba.alex.williamson@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 6ymktboXP1mo8IuDPaF18MKXQ1kyE6PN
-X-Proofpoint-ORIG-GUID: ufZLra34ohiHToLeH_Ep1qbdjrpG8_w2
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
- definitions=2021-10-20_02,2021-10-19_01,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- priorityscore=1501 phishscore=0 clxscore=1015 suspectscore=0 adultscore=0
- malwarescore=0 mlxscore=0 bulkscore=0 mlxlogscore=999 spamscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2109230001 definitions=main-2110200040
+Content-Language: en-US
+X-Originating-IP: [172.20.187.5]
+X-ClientProxiedBy: HQMAIL111.nvidia.com (172.20.187.18) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: d9ec67d5-e3a4-4757-c163-08d9939fc602
+X-MS-TrafficTypeDiagnostic: BYAPR12MB3447:
+X-Microsoft-Antispam-PRVS: <BYAPR12MB3447D741EEA6E7B1D4208EB6C3BE9@BYAPR12MB3447.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: YzXa476lr9SjJIPX8/nKAmG/u7k0dtNOq2SxHVU0xpmlj0BsKyDtBsw4Gif4bNsRmYf1e42xJbXQosRm4/nOZhCk1VPqKlrEvC4PEM3MpQ2tYznBVgGhcVUogd8U1XKEphCgQynDZjKXnSnk7Ep3Z5u/v8plG+M7OjlyVYSIWxG4WmwQ7akLfdBelClb834uVLSebxvtlSqdzTnxN/Re+DbiqhlhMr8yUMpHpVASWpJbrtuPZY0vPCBHU+TnDZwmq1qfLArz4DtpRMQMNMHl8DvPD9X/NoY7vMn7fRuUjEZSV90/jt0S2KIWZW7J9kBqFGyTJH7lj5Q/XnVBlPN2UHuJe5qFgRHVWXOw7g4I0IaLRhMJrMa3XoJnC/ZQxqM1wXgb6867bRpUjKj7GYCNDA5SLsGQNaWH6JfPNEez60Z0hbSxM9j5kAcAa1BgXayaxin+f+UTPWWIpqLOfG8PcjjxsEW0D7QVcg5c23EgPu3PoD9Eblm7jHpZ5gAXgf3S8kgZFQRwrCFS3JXka0IyyPMCjHhJtSXQZ31bxXUEpzd8ZOAgATZQ+cKBZOIKLtaIMMFyNLuMssi3Ci3HgbYd+O1uk4Z8d7mvTT7YMVxFgfTGhbNVK8LDpncO1xeWfVja/rm/3wwBnytoaFov7elePIlHGgpPq0UqgLZfcB4iiYXFZiti4G67CXsSfa5LZVWx83MBZbEEYUsrqrY7cSvVo6p6IxAKhD+H/XisodhAUxo=
+X-Forefront-Antispam-Report: CIP:216.228.112.34;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid03.nvidia.com;CAT:NONE;SFS:(4636009)(46966006)(36840700001)(26005)(356005)(36860700001)(426003)(70206006)(70586007)(54906003)(16526019)(186003)(7636003)(53546011)(8936002)(336012)(107886003)(86362001)(5660300002)(2906002)(316002)(16576012)(82310400003)(6636002)(31696002)(47076005)(8676002)(110136005)(2616005)(31686004)(36756003)(508600001)(4326008)(43740500002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Oct 2021 08:01:07.6101
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: d9ec67d5-e3a4-4757-c163-08d9939fc602
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.34];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT008.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR12MB3447
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 19 Oct 2021 23:35:25 +0200
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+On 10/19/2021 9:43 PM, Alex Williamson wrote:
+>
+>> +
+>> +	/* Resuming switches off */
+>> +	if (((old_state ^ state) & VFIO_DEVICE_STATE_RESUMING) &&
+>> +	    (old_state & VFIO_DEVICE_STATE_RESUMING)) {
+>> +		/* deserialize state into the device */
+>> +		ret = mlx5vf_load_state(mvdev);
+>> +		if (ret) {
+>> +			vmig->vfio_dev_state = VFIO_DEVICE_STATE_ERROR;
+>> +			return ret;
+>> +		}
+>> +	}
+>> +
+>> +	/* Resuming switches on */
+>> +	if (((old_state ^ state) & VFIO_DEVICE_STATE_RESUMING) &&
+>> +	    (state & VFIO_DEVICE_STATE_RESUMING)) {
+>> +		mlx5vf_reset_mig_state(mvdev);
+>> +		ret = mlx5vf_pci_new_write_window(mvdev);
+>> +		if (ret)
+>> +			return ret;
+>> +	}
+> A couple nits here...
+>
+> Perhaps:
+>
+> 	if ((old_state ^ state) & VFIO_DEVICE_STATE_RESUMING)) {
+> 		/* Resuming bit cleared */
+> 		if (old_state & VFIO_DEVICE_STATE_RESUMING) {
+> 			...
+> 		} else { /* Resuming bit set */
+> 			...
+> 		}
+> 	}
 
-> > @@ -426,6 +426,7 @@ static void __unset_cpu_idle(struct kvm_vcpu *vcpu)
-> >   {
-> >   	kvm_s390_clear_cpuflags(vcpu, CPUSTAT_WAIT);
-> >   	clear_bit(vcpu->vcpu_idx, vcpu->kvm->arch.idle_mask);
-> > +	clear_bit(vcpu->vcpu_idx, vcpu->kvm->arch.gisa_int.kicked_mask);
+  I tried to avoid nested 'if's as of some previous notes.
 
-BTW, do you know are bit-ops garanteed to be serialized as seen by
-another cpu even when acting on a different byte? I mean
-could the kick_single_vcpu() set the clear of the kicked_mask bit but
-not see the clear of the idle mask?
+The 'resuming' two cases are handled already above so functional wise 
+the code covers this.
 
-If that is not true we may need some barriers, or possibly merging the
-two bitmasks like idle bit, kick bit alterating to ensure there
-absolutely ain't no race.
+Jason/Alex,
+
+Please recommend what is the preferred way, both options seems to be 
+fine for me.
+
+>
+> Also
+>
+> 	u32 flipped_bits = old_state ^ state;
+>
+> or similar would simplify all these cases slightly.
+>
+
+Sure, will use it in V3.
+
+>> +
+>> +	/* Saving switches on */
+>> +	if (((old_state ^ state) & VFIO_DEVICE_STATE_SAVING) &&
+>> +	    (state & VFIO_DEVICE_STATE_SAVING)) {
+>> +		if (!(state & VFIO_DEVICE_STATE_RUNNING)) {
+>> +			/* serialize post copy */
+>> +			ret = mlx5vf_pci_save_device_data(mvdev);
+>> +			if (ret)
+>> +				return ret;
+>> +		}
+>> +	}
+> This doesn't catch all the cases, and in fact misses the most expected
+> case where userspace clears the _RUNNING bit while _SAVING is already
+> enabled.  Does that mean this hasn't actually been tested with QEMU?
 
 
-> >   }
-> >   
-> >   static void __reset_intercept_indicators(struct kvm_vcpu *vcpu)
-> > @@ -3064,7 +3065,11 @@ static void __airqs_kick_single_vcpu(struct kvm *kvm, u8 deliverable_mask)
-> >   			/* lately kicked but not yet running */
-> >   			if (test_and_set_bit(vcpu_idx, gi->kicked_mask))
-> >   				return;
-> > -			kvm_s390_vcpu_wakeup(vcpu);
-> > +			/* if meanwhile not idle: clear  and don't kick */
-> > +			if (test_bit(vcpu_idx, kvm->arch.idle_mask))
-> > +				kvm_s390_vcpu_wakeup(vcpu);
-> > +			else
-> > +				clear_bit(vcpu_idx, gi->kicked_mask);  
-> 
-> I think this is now a bug. We should not return but continue in that case, no?
-> 
+I run QEMU with 'x-pre-copy-dirty-page-tracking=off' as current driver 
+doesn't support dirty-pages.
 
-I don't think so. The purpose of this function is to kick a *single* vcpu
-that can handle *some* of the I/O interrupts indicated by the
-deliverable_mask. The deliverable mask predates the check of the idle_mask.
-I believe if we selected a suitable vcpu, that was idle and before we
-actually do a wakeup on it we see that it isn't idle any more, I believe
-it is as good if not better as performing the wakeup (and a new wakeup()
-call is pointless: this vcpu either already got the the irqs it can get,
-or is about to enter SIE soon to do so. We just saved a pointless call
-to wakeup().
+As so, it seems that this flow wasn't triggered by QEMU in my save/load 
+test.
 
-> 
-> I think it might be safer to also clear kicked_mask in __set_cpu_idle
+> It seems like there also needs to be a clause in the case where
+> _RUNNING switches off to test if _SAVING is already set and has not
+> toggled.
+>
 
-It would not hurt, but my guess is that kvm_arch_vcpu_runnable() before
-we really decide to go to sleep:
+This can be achieved by adding the below to current code, this assumes 
+that we are fine with nested 'if's coding.
 
-void kvm_vcpu_block(struct kvm_vcpu *vcpu)                                      
-{ 
-[..]
-        for (;;) {                                                              
-                set_current_state(TASK_INTERRUPTIBLE);                          
-                                                                                
-                if (kvm_vcpu_check_block(vcpu) < 0)     <=== calls runnable()                        
-                        break;                                                  
-                                                                                
-                waited = true;                                                  
-                schedule();                                                     
-        } 
+Seems OK ?
 
->  From a CPUs perspective: We have been running and are on our way to become idle.
-> There is no way that someone kicked us for a wakeup. In other words as long as we
-> are running, there is no point in kicking us but when going idle we should get rid
-> of old kick_mask bit.
-> Doesnt this cover your scenario?
+@@ -269,6 +269,7 @@ static int mlx5vf_pci_set_device_state(struct 
+mlx5vf_pci_core_device *mvdev,
+  {
+         struct mlx5vf_pci_migration_info *vmig = &mvdev->vmig;
+         u32 old_state = vmig->vfio_dev_state;
++       u32 flipped_bits = old_state ^ state;
+         int ret = 0;
 
-In practice probably yes, in theory I don't think so. I hope this is
-more of a theoretical problem than a practical one anyway. But let me
-discuss the theory anyway.
+         if (old_state == VFIO_DEVICE_STATE_ERROR ||
+@@ -277,7 +278,7 @@ static int mlx5vf_pci_set_device_state(struct 
+mlx5vf_pci_core_device *mvdev,
+                 return -EINVAL;
 
-Under the assumption that an arbitrary amount of time can pass between 
-1) for_each_set_bit finds the vcpus bit in the idle mask set
-and
-2) test_and_set_bit(kicked_mask) that returns a false (bit was not set,
-and we did set it)
-then if we choose an absurdly large amount of time, it is possible that
-we are past a whole cycle: an __unset_cpu_ilde() and an __set_cpu_idle()
-but we didn't reach set_current_state(TASK_INTERRUPTIBLE). If
-we set the bit at a suitable place there we theoretically may end up
-in a situation where the wakeup is ineffective because the state didn't
-change yet, but the bit gets set. So we end up in a stable sleeps and
-does not want to get woken up state. If the clear in
-kvm_arch_vcpu_runnable() does not save us... It could be that, that
-clear alone is sufficient. Because, before we really go to sleep we kind
-of attempt to wake up, and this guy clears on every attempted wakeup. So
-the clear in kvm_arch_vcpu_runnable() may be the only clear we need. Or?
+         /* Running switches off */
+-       if (((old_state ^ state) & VFIO_DEVICE_STATE_RUNNING) &&
++       if ((flipped_bits & VFIO_DEVICE_STATE_RUNNING) &&
+             (old_state & VFIO_DEVICE_STATE_RUNNING)) {
+                 ret = mlx5vf_pci_quiesce_device(mvdev);
+                 if (ret)
+@@ -287,10 +288,18 @@ static int mlx5vf_pci_set_device_state(struct 
+mlx5vf_pci_core_device *mvdev,
+                         vmig->vfio_dev_state = VFIO_DEVICE_STATE_ERROR;
+                         return ret;
+                 }
++               if (state & VFIO_DEVICE_STATE_SAVING) {
++                       /* serialize post copy */
++                       ret = mlx5vf_pci_save_device_data(mvdev);
++                       if (ret) {
++                               vmig->vfio_dev_state = 
+VFIO_DEVICE_STATE_ERROR;
++                               return ret;
++                       }
++               }
+         }
 
-Anyway the scenario I described is very very far fetched I guess, but I
-prefer solutions that are theoretically race free over solutions that
-are practically race free if performance does not suffer.
 
-Regards,
-Halil
+Yishai
