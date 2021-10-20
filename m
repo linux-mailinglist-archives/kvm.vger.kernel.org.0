@@ -2,96 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0E378434789
-	for <lists+kvm@lfdr.de>; Wed, 20 Oct 2021 11:02:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CB6F84347B8
+	for <lists+kvm@lfdr.de>; Wed, 20 Oct 2021 11:17:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230089AbhJTJET (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Oct 2021 05:04:19 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60849 "EHLO
+        id S229627AbhJTJTR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Oct 2021 05:19:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26168 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229683AbhJTJET (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 20 Oct 2021 05:04:19 -0400
+        by vger.kernel.org with ESMTP id S229555AbhJTJTQ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 20 Oct 2021 05:19:16 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634720525;
+        s=mimecast20190719; t=1634721422;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=SbWAPvwrGsfmCsClvuclMH5ynxEMCyyHOSK+E2gdxng=;
-        b=bxq9Ja4unpCp8637cRdp8/rMbibH6H8Z3+ymZnBCofL24tYL6Gf9O9pCj7dfBc+Ap9apwV
-        inMZq30IBNp8wWB8Ft1FvJOfRfKKAFw7opb0b0TtSN7cU6J/vTaFjIN/IpNeFOBSPVMAVg
-        arSkqYbdhviGb8PoLX6BsJZx5L6XxgI=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-493-t65PqLmdOXyD3F7mh0MQqQ-1; Wed, 20 Oct 2021 05:02:03 -0400
-X-MC-Unique: t65PqLmdOXyD3F7mh0MQqQ-1
-Received: by mail-wm1-f71.google.com with SMTP id z137-20020a1c7e8f000000b0030cd1800d86so3843269wmc.2
-        for <kvm@vger.kernel.org>; Wed, 20 Oct 2021 02:02:03 -0700 (PDT)
+        bh=2cIO8Hc42HozvhMPklSUyUokIMVdEYaAydNCUHSDJDM=;
+        b=cI08faLXYvpVwbE3M8y0nM9Kp+wwtPcsiMAYQWJ2LKrEldd+vDy9VOU/3zQSFD0Mh9Z9Kf
+        A9nta9rCZip0mbpI8L6OmzM7sE9qShf7LP5YCl0vSWQKA0CdI2sRgPBrdXdvsrV12a7PxY
+        erIo8WYjCngPu0q4GKegzAuJK3Y1WUk=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-567-V5dKviO_PAyKD0jJlEK5OA-1; Wed, 20 Oct 2021 05:17:01 -0400
+X-MC-Unique: V5dKviO_PAyKD0jJlEK5OA-1
+Received: by mail-wm1-f72.google.com with SMTP id s22-20020a1ca916000000b0030dcdcd37c5so2299300wme.8
+        for <kvm@vger.kernel.org>; Wed, 20 Oct 2021 02:17:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=SbWAPvwrGsfmCsClvuclMH5ynxEMCyyHOSK+E2gdxng=;
-        b=dJgifBvZgl+2iE7FWUF4d9TPEMJKxW7ecjjGtn5/jStERR+FSGFMnqEP46j9KBGunp
-         IHIGqhvQNaQSYudkM70cUSGPP/mLaXx68qMZSEkFzAkzZWiaTZprKGvoTyA5acvrDHOR
-         xwVM5F3exfLzmgE4HCDuMe9PNmGa/3iwIMya+yoUwQ4L3rLFlcXqyVCPrDMdbFR5lQW6
-         pOKtnHC2jxOdxLVqHQ5L7W7TGMulyQza+t16Ow5kQmK8U2OLa0WjNtvHWv2+xFUvZPRK
-         U9/BgYf1kGO4sEyZcMn9PGO+k6UREBLfoFgTckHrxOeUj2Bk/XVzfTn+iBLcdZczVoPZ
-         I0TQ==
-X-Gm-Message-State: AOAM532tDmoX4nBVqbjEvqnoauKJ17L+T/FzAxDfyfzmeWBY9qZiMocE
-        GtH2Krj51+ruKw8FdkR9IIKZm8IJ+NF+Mw7/VuM+IYU4o5tYdpL+Cy+lJTuOycjUgQGY6KUTjJ7
-        8ds+1r0BMUEEt
-X-Received: by 2002:a05:600c:1c21:: with SMTP id j33mr12114366wms.163.1634720522363;
-        Wed, 20 Oct 2021 02:02:02 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwjy3kD0S8OJSLvBxmrKLVOrUQpa2awD73yfAecGZXNUjdxsBSEbtOPv88vEU6uxjfJUbLg5g==
-X-Received: by 2002:a05:600c:1c21:: with SMTP id j33mr12114340wms.163.1634720522117;
-        Wed, 20 Oct 2021 02:02:02 -0700 (PDT)
+        bh=2cIO8Hc42HozvhMPklSUyUokIMVdEYaAydNCUHSDJDM=;
+        b=CX1n0Doa/0lBtkORzWvGhY1adIClgyenqgokzkaE0AzLcCz9tXAVxGIstiUqJG5Y5u
+         Nnc4n4hfCQfqmhXOvA2SFO9I3XuAIShrdEbzzxnZbTu8xPGAHAefDJm5mWXlEN5DxrDW
+         gkwjK9X6Zstljgm0i0IBZ1ayO1hx4Sn7s/1+W8tqwSxfdEqHayR6u2NFJsByoQQ7RsaQ
+         goccs01JJ22zHQTzxeDaFmNq8oHkmviybczP0OJsS6raUV7D0xf3M15UTbNHgsVCOS4U
+         +LEqHQjLHpRWNUEDWoUpeaoTl+DkQu/oeBUDoXjllj3k7nH+m+6QpQ/bjsz4n9862rlY
+         eMCQ==
+X-Gm-Message-State: AOAM533Lvjzuf6hsCpmhEJVkEKZu8Eb3Z9Gu+0qalyf+pg6mePg0CQ2I
+        ip4FjL6gMk5xGO6Wg4YvwFShpbGoAflya65DIm+TZU+c2U+V9NAv+/sUzTL+wd7qOxlJ31XkIvY
+        xmbRhKUawN2Xh
+X-Received: by 2002:a5d:59a9:: with SMTP id p9mr52480061wrr.386.1634721420011;
+        Wed, 20 Oct 2021 02:17:00 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzZgR7JyfR+vXNM1CCUTVc7GHmmvM9/kVBj+rEYWhITsY5A109Mr5QMUx2eVTKjTAzooUSn6g==
+X-Received: by 2002:a5d:59a9:: with SMTP id p9mr52480035wrr.386.1634721419757;
+        Wed, 20 Oct 2021 02:16:59 -0700 (PDT)
 Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.gmail.com with ESMTPSA id s9sm4267578wmj.39.2021.10.20.02.02.00
+        by smtp.gmail.com with ESMTPSA id y8sm1358940wmi.43.2021.10.20.02.16.58
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 20 Oct 2021 02:02:01 -0700 (PDT)
-Message-ID: <ead08efc-ab79-7646-3d19-6d808097f688@redhat.com>
-Date:   Wed, 20 Oct 2021 11:01:58 +0200
+        Wed, 20 Oct 2021 02:16:59 -0700 (PDT)
+Message-ID: <d3705090-88bf-da34-1d87-6719433c56e8@redhat.com>
+Date:   Wed, 20 Oct 2021 11:16:57 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.1.0
-Subject: Re: [PATCH v4] KVM: emulate: Don't inject #GP when emulating RDMPC if
- CR0.PE=0
+Subject: Re: [PATCH v3] kvm: x86: mmu: Make NX huge page recovery period
+ configurable
 Content-Language: en-US
-To:     Wanpeng Li <kernellwp@gmail.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-References: <1634719951-73285-1-git-send-email-wanpengli@tencent.com>
+To:     Junaid Shahid <junaids@google.com>, kvm@vger.kernel.org
+Cc:     jmattson@google.com, seanjc@google.com, bgardon@google.com,
+        dmatlack@google.com
+References: <20211020010627.305925-1-junaids@google.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <1634719951-73285-1-git-send-email-wanpengli@tencent.com>
+In-Reply-To: <20211020010627.305925-1-junaids@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 20/10/21 10:52, Wanpeng Li wrote:
-> From: Wanpeng Li<wanpengli@tencent.com>
-> 
-> SDM mentioned that we should #GP for rdpmc if ECX is not valid or
-> (CR4.PCE is 0 and CPL is 1, 2, or 3 and CR0.PE is 1).
-> 
-> Let's add the CR0.PE is 1 checking to rdpmc emulate, though this isn't
-> strictly necessary since it's impossible for CPL to be >0 if CR0.PE=0.
-> 
-> Reviewed-by: Sean Christopherson<seanjc@google.com>
-> Signed-off-by: Wanpeng Li<wanpengli@tencent.com>
-> ---
-> v3 -> v4:
->   * add comments instead of pseudocode
+On 20/10/21 03:06, Junaid Shahid wrote:
+> +			If the value is 0 (the default), KVM will pick a period based
+> +			on the ratio such that the entire set of pages can be zapped
+> +			in approximately 1 hour on average.
 
-No, the commit message was fine.  What I meant is there's no need to 
-change the code.  Just add a comment about why CR0.PE isn't tested.
+"such that *a* page will be zapped after approximately 1 hour on average".
+The time needed to zap all the pages is actually infinite (ignoring the
+effect of rounding, of course), because the number of zapped pages decreases
+as the list becomes smaller.
+
+> +	if (!period && ratio)
+> +		period = 60 * 60 * 1000 / ratio;
+> +
+
+Let's also bound this to one second:
+
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index a43bcd478194..f9f228963088 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -6232,8 +6232,11 @@ static long get_nx_lpage_recovery_timeout(u64 start_time)
+  	uint ratio = READ_ONCE(nx_huge_pages_recovery_ratio);
+  	uint period = READ_ONCE(nx_huge_pages_recovery_period_ms);
+  
+-	if (!period && ratio)
++	if (!period && ratio) {
++		/* Make sure the period is not less than one second.  */
++		ratio = min(ratio, 3600u);
+  		period = 60 * 60 * 1000 / ratio;
++	}
+  
+  	return READ_ONCE(nx_huge_pages) && ratio
+  		? start_time + msecs_to_jiffies(period) - get_jiffies_64()
+
+Queued with this change, thanks.
 
 Paolo
 
