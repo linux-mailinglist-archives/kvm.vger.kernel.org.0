@@ -2,116 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C41FE4349C1
-	for <lists+kvm@lfdr.de>; Wed, 20 Oct 2021 13:07:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CF07B4349EA
+	for <lists+kvm@lfdr.de>; Wed, 20 Oct 2021 13:16:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230186AbhJTLJN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Oct 2021 07:09:13 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27722 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229864AbhJTLJM (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 20 Oct 2021 07:09:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634728018;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=8clfGjJTwttWCiDQZKtYU+5PDFlvzDwGeraH2AZ1ESc=;
-        b=C94FnU/SS0Wj4ix5CSzH0a/ln0RBr+XsYCBodahCdIsWPR2hUPoLxXwE0N2QD1tIvQkgOE
-        Hzd760oMT7sDvwZTGhMipna2z91sz47NVHoTu1IG7nSbbFuIVu3wtAb/22VxL9KkPyZ4H9
-        o2Q3XxXQnEbgU+VXx64j/kQWHw6AGsY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-517-evsykViCM7CgqIU9vSKmuw-1; Wed, 20 Oct 2021 07:06:52 -0400
-X-MC-Unique: evsykViCM7CgqIU9vSKmuw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 392D719251A2;
-        Wed, 20 Oct 2021 11:06:51 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3EB5960CC4;
-        Wed, 20 Oct 2021 11:06:39 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Davidlohr Bueso <dave@stgolabs.net>,
-        Oleg Nesterov <oleg@redhat.com>,
-        Ingo Molnar <mingo@kernel.org>,
-        "Paul E . McKenney" <paulmck@linux.vnet.ibm.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Wanpeng Li <wanpengli@tencent.com>
-Subject: [PATCH] rcuwait: do not enter RCU protection unless a wakeup is needed
-Date:   Wed, 20 Oct 2021 07:06:38 -0400
-Message-Id: <20211020110638.797389-1-pbonzini@redhat.com>
+        id S230090AbhJTLSO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Oct 2021 07:18:14 -0400
+Received: from mx22.baidu.com ([220.181.50.185]:41128 "EHLO baidu.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S229864AbhJTLSN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Oct 2021 07:18:13 -0400
+Received: from BC-Mail-Ex15.internal.baidu.com (unknown [172.31.51.55])
+        by Forcepoint Email with ESMTPS id 302AC272F5C1A60FEAE1;
+        Wed, 20 Oct 2021 19:15:52 +0800 (CST)
+Received: from BJHW-Mail-Ex15.internal.baidu.com (10.127.64.38) by
+ BC-Mail-Ex15.internal.baidu.com (172.31.51.55) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2242.12; Wed, 20 Oct 2021 19:15:51 +0800
+Received: from BJHW-Mail-Ex15.internal.baidu.com ([100.100.100.38]) by
+ BJHW-Mail-Ex15.internal.baidu.com ([100.100.100.38]) with mapi id
+ 15.01.2308.014; Wed, 20 Oct 2021 19:15:51 +0800
+From:   "Li,Rongqing" <lirongqing@baidu.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+CC:     "seanjc@google.com" <seanjc@google.com>,
+        "wanpengli@tencent.com" <wanpengli@tencent.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>, "x86@kernel.org" <x86@kernel.org>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: =?utf-8?B?562U5aSNOiBbUEFUQ0hdIEtWTTogQ2xlYXIgcHYgZW9pIHBlbmRpbmcgYml0?=
+ =?utf-8?Q?_only_when_it_is_set?=
+Thread-Topic: [PATCH] KVM: Clear pv eoi pending bit only when it is set
+Thread-Index: AQHXxI34DWGf3tlYw06xK547fXtZjqvZZTmAgAABlACAAdXDEIAAgECw
+Date:   Wed, 20 Oct 2021 11:15:51 +0000
+Message-ID: <a01726cd1d2f4014a801524de961a135@baidu.com>
+References: <1634609144-28952-1-git-send-email-lirongqing@baidu.com>
+ <87y26pwk96.fsf@vitty.brq.redhat.com>
+ <876df534-a280-dc26-6a70-a1464bacad5f@redhat.com> 
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [172.22.206.4]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In some cases, rcuwait_wake_up can be called even if the actual likelihood
-of a wakeup is very low.  If CONFIG_PREEMPT_RCU is active, the resulting
-rcu_read_lock/rcu_read_unlock pair can be relatively expensive, and in
-fact it is unnecessary when there is no w->task to keep alive: the
-memory barrier before the read is what matters in order to avoid missed
-wakeups.
-
-Therefore, do an early check of w->task right after the barrier, and skip
-rcu_read_lock/rcu_read_unlock unless there is someone waiting for a wakeup.
-
-Running kvm-unit-test/vmexit.flat with APICv disabled, most interrupt
-injection tests (tscdeadline*, self_ipi*, x2apic_self_ipi*) improve
-by around 600 cpu cycles.
-
-Cc: Davidlohr Bueso <dave@stgolabs.net>
-Cc: Oleg Nesterov <oleg@redhat.com>
-Cc: Ingo Molnar <mingo@kernel.org>
-Cc: Paul E. McKenney <paulmck@linux.vnet.ibm.com>
-Cc: Peter Zijlstra <peterz@infradead.org>
-Reported-by: Wanpeng Li <wanpengli@tencent.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- kernel/exit.c | 16 +++++++++++++---
- 1 file changed, 13 insertions(+), 3 deletions(-)
-
-diff --git a/kernel/exit.c b/kernel/exit.c
-index 91a43e57a32e..a38a08dbf85e 100644
---- a/kernel/exit.c
-+++ b/kernel/exit.c
-@@ -234,8 +234,6 @@ int rcuwait_wake_up(struct rcuwait *w)
- 	int ret = 0;
- 	struct task_struct *task;
- 
--	rcu_read_lock();
--
- 	/*
- 	 * Order condition vs @task, such that everything prior to the load
- 	 * of @task is visible. This is the condition as to why the user called
-@@ -245,10 +243,22 @@ int rcuwait_wake_up(struct rcuwait *w)
- 	 *    WAIT                WAKE
- 	 *    [S] tsk = current	  [S] cond = true
- 	 *        MB (A)	      MB (B)
--	 *    [L] cond		  [L] tsk
-+	 *    [L] cond		  [L] rcuwait_active(w)
-+	 *                            task = rcu_dereference(w->task)
- 	 */
- 	smp_mb(); /* (B) */
- 
-+#ifdef CONFIG_PREEMPT_RCU
-+	/*
-+	 * The cost of rcu_read_lock() dominates for preemptible RCU,
-+	 * avoid it if possible.
-+	 */
-+	if (!rcuwait_active(w))
-+		return ret;
-+#endif
-+
-+	rcu_read_lock();
-+
- 	task = rcu_dereference(w->task);
- 	if (task)
- 		ret = wake_up_process(task);
--- 
-2.27.0
-
+PiA+DQo+ID4gT24gMTkvMTAvMjEgMDk6MjMsIFZpdGFseSBLdXpuZXRzb3Ygd3JvdGU6DQo+ID4g
+Pj4NCj4gPiA+PiAtc3RhdGljIHZvaWQgcHZfZW9pX2Nscl9wZW5kaW5nKHN0cnVjdCBrdm1fdmNw
+dSAqdmNwdSkNCj4gPiA+PiArc3RhdGljIHZvaWQgcHZfZW9pX2Nscl9wZW5kaW5nKHN0cnVjdCBr
+dm1fdmNwdSAqdmNwdSwgYm9vbA0KPiA+ID4+ICtwZW5kaW5nKQ0KPiA+ID4gTml0cGljayAoYW5k
+IHByb2JhYmx5IGEgbWF0dGVyIG9mIHBlcnNvbmFsIHRhc3RlKToNCj4gPiA+IHB2X2VvaV9jbHJf
+cGVuZGluZygpIGhhcyBvbmx5IG9uZSB1c2VyIGFuZCB0aGUgY2hhbmdlIGRvZXNuJ3QgbWFrZQ0K
+PiA+ID4gaXRzIGludGVyZmFjZSBtdWNoIG5pY2VyLCBJJ2Qgc3VnZ2VzdCB3ZSBqdXN0IGlubGlu
+ZSBpbiBpbnN0ZWFkLiAod2UNCj4gPiA+IGNhbiBwcm9iYWJseSBkbyB0aGUgc2FtZSB0bw0KPiA+
+ID4gcHZfZW9pX2dldF9wZW5kaW5nKCkvcHZfZW9pX3NldF9wZW5kaW5nKCkgdG9vKS4NCj4gPg0K
+PiA+IEFsdGVybmF0aXZlbHksIG1lcmdlIHB2X2VvaV9nZXRfcGVuZGluZyBhbmQgcHZfZW9pX2Ns
+cl9wZW5kaW5nIGludG8gYQ0KPiA+IHNpbmdsZSBmdW5jdGlvbiBwdl9lb2lfdGVzdF9hbmRfY2xl
+YXJfcGVuZGluZywgd2hpY2ggcmV0dXJucyB0aGUgdmFsdWUNCj4gPiBvZiB0aGUgcGVuZGluZyBi
+aXQuDQo+ID4NCj4gPiBTbyB0aGUgY2FsbGVyIGNhbiBkbyBlc3NlbnRpYWxseToNCj4gPg0KPiA+
+IC0JcGVuZGluZyA9IHB2X2VvaV9nZXRfcGVuZGluZyh2Y3B1KTsNCj4gPiAtCXB2X2VvaV9jbHJf
+cGVuZGluZyh2Y3B1KTsNCj4gPiAtCWlmIChwZW5kaW5nKQ0KPiA+ICsJaWYgKHB2X2VvaV90ZXN0
+X2FuZF9jbGVhcl9wZW5kaW5nKHZjcHUpKQ0KPiA+ICAgICAgICAgICAgICAgICAgcmV0dXJuOw0K
+PiA+DQo+ID4NCj4gDQo+IEl0IGlzIGJldHRlciB0byBpbXBsZW1lbnQgcHZfZW9pX3Rlc3RfYW5k
+X2NsZWFyX3BlbmRpbmcoKSwgYW5kIGl0IGNhbiBmaXggdGhlDQo+IHJhY2UgdGhhdCBWaXRhbHkg
+c3VnZ2VzdGVkDQo+IA0KPiBBbmQgSSB3aWxsIHdyaXRlIGEgbmV3IGZ1bmN0aW9uIGt2bV90ZXN0
+X2FuZF9jbGVhcl9iaXRfZ3Vlc3RfY2FjaGVkLCB0byBiZQ0KPiBjYWxsZWQgaW4gcHZfZW9pX3Rl
+c3RfYW5kX2NsZWFyX3BlbmRpbmcNCj4gDQo+IEJvb2wga3ZtX3Rlc3RfYW5kX2NsZWFyX2JpdF9n
+dWVzdF9jYWNoZWTvvIhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHXvvIwgIHN0cnVjdA0KPiBnZm5fdG9f
+aHZhX2NhY2hlICogZ2hj77yMIGxvbmcgbnLvvIkNCj4gDQoNCmdmbl90b19odmFfY2FjaGUgaGFz
+IGh2YSh1c2VyIHNwYWNlIGFkZHJlc3MpLCBidXQgbm8gaHBhLCBhbmQgdGVzdF9hbmRfY2xlYXIo
+KSBjYW4gbm90IGJlIHVzZWQgdG8gdXNlciBzcGFjZSBhZGRyZXNzLiBTbyBrdm1fdGVzdF9hbmRf
+Y2xlYXJfYml0X2d1ZXN0X2NhY2hlZCBzZWVtcyBub3Qgd29yaw0KDQotTGkNCg0KPiAtTGkNCj4g
+DQo+ID4gUGFvbG8NCg0K
