@@ -2,110 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C131B435E0B
-	for <lists+kvm@lfdr.de>; Thu, 21 Oct 2021 11:34:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 45258435EBE
+	for <lists+kvm@lfdr.de>; Thu, 21 Oct 2021 12:10:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231394AbhJUJgg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Oct 2021 05:36:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57178 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231461AbhJUJgc (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 21 Oct 2021 05:36:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634808856;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=BgYp1wM9v5szx8eQy5srhotQAwAp3AJGV5n1/wdRCz0=;
-        b=TwnuhnSoQtn4OmWgHPfjambMExrD53Z1+Tbhj7WBVwPVmX61LWLm8w55O067XKooBGpWDu
-        By/+G76Ov2WaxlOdUck54R7docBljGFIL+svNSh7a1PHKxSfM7YWpDbJRgI6tJ5qWgEedd
-        ZWaxAnjvtCUCiPTFR8WaAhWWl5fFk+E=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-343-d2QqRd5lNGaafCMkpoMi7A-1; Thu, 21 Oct 2021 05:34:13 -0400
-X-MC-Unique: d2QqRd5lNGaafCMkpoMi7A-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 466F7362FA;
-        Thu, 21 Oct 2021 09:34:11 +0000 (UTC)
-Received: from localhost (unknown [10.39.193.9])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id CBD55E2CD;
-        Thu, 21 Oct 2021 09:34:02 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Alex Williamson <alex.williamson@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Yishai Hadas <yishaih@nvidia.com>, bhelgaas@google.com,
-        saeedm@nvidia.com, linux-pci@vger.kernel.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, kuba@kernel.org, leonro@nvidia.com,
-        kwankhede@nvidia.com, mgurtovoy@nvidia.com, maorg@nvidia.com,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Subject: Re: [PATCH V2 mlx5-next 12/14] vfio/mlx5: Implement vfio_pci driver
- for mlx5 devices
-In-Reply-To: <20211020150709.7cff2066.alex.williamson@redhat.com>
-Organization: Red Hat GmbH
-References: <20211019105838.227569-1-yishaih@nvidia.com>
- <20211019105838.227569-13-yishaih@nvidia.com>
- <20211019124352.74c3b6ba.alex.williamson@redhat.com>
- <20211019192328.GZ2744544@nvidia.com>
- <20211019145856.2fa7f7c8.alex.williamson@redhat.com>
- <20211019230431.GA2744544@nvidia.com>
- <5a496713-ae1d-11f2-1260-e4c1956e1eda@nvidia.com>
- <20211020105230.524e2149.alex.williamson@redhat.com>
- <20211020185919.GH2744544@nvidia.com>
- <20211020150709.7cff2066.alex.williamson@redhat.com>
-User-Agent: Notmuch/0.32.1 (https://notmuchmail.org)
-Date:   Thu, 21 Oct 2021 11:34:00 +0200
-Message-ID: <87o87isovr.fsf@redhat.com>
+        id S230134AbhJUKM1 convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Thu, 21 Oct 2021 06:12:27 -0400
+Received: from relay.rsaweb.co.za ([41.71.65.117]:38202 "EHLO
+        relay.rsaweb.co.za" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229567AbhJUKM0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Oct 2021 06:12:26 -0400
+X-Greylist: delayed 386 seconds by postgrey-1.27 at vger.kernel.org; Thu, 21 Oct 2021 06:12:26 EDT
+Received: from relay.rsaweb.co.za (localhost [127.0.0.1])
+        by relay.rsaweb.co.za (Postfix) with ESMTP id E2CFE3E2DCD
+        for <kvm@vger.kernel.org>; Thu, 21 Oct 2021 12:00:04 +0200 (SAST)
+Received: from mailnode2.rsaweb.co.za (unknown [41.74.182.203])
+        by relay.rsaweb.co.za (Postfix) with ESMTP
+        for <kvm@vger.kernel.org>; Thu, 21 Oct 2021 12:00:04 +0200 (SAST)
+Received: from zau.att.ne.jp (unknown [103.141.137.105])
+        (Authenticated sender: 1294325570giovanntest@mywebhosting.co.za)
+        by mailnode2.rsaweb.co.za (Postfix) with ESMTPA id 03402723A1
+        for <kvm@vger.kernel.org>; Wed, 20 Oct 2021 16:28:30 +0200 (SAST)
+Reply-To: mrjoesmith@specialautokins.com
+From:   Ana Mimi <kyoko@zau.att.ne.jp>
+To:     kvm@vger.kernel.org
+Subject: Greetings.....? okey
+Date:   20 Oct 2021 07:28:36 -0700
+Message-ID: <20211020072836.E19B0DF1A0DA2C84@zau.att.ne.jp>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Type: text/plain;
+        charset="utf-8"
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 20 2021, Alex Williamson <alex.williamson@redhat.com> wrote:
+Hello  , 
+How are you doing today, I do hope that my mail meets you
+and your household well and in good health? I wish to inform you
+that I have successfully claimed and moved my inheritance fund
+to Saudi-Arabia through the help of my new partner from Saudi-
+ Arabia. My Partner is currently busy with the investment
+project in Dubai and I also have a successful medical treatment
+in a Hospital in Hamburg, German. I am fully ok health wise and
+sound now. I still can`t forget all your effort to help move the
+fund despite it didn't working out, and my partner agreed to
+mapped out something for you as compensation for all your effort
+you put in to help me. I do leave behind the sum of $800.000 for
+you, do contact Mr Joe Smith so that she will transfer the money
+to you immediately. Below is Mr Joe Smith contact details 
 
-> On Wed, 20 Oct 2021 15:59:19 -0300
-> Jason Gunthorpe <jgg@nvidia.com> wrote:
->
->> On Wed, Oct 20, 2021 at 10:52:30AM -0600, Alex Williamson wrote:
->> 
->> > I'm wondering if we're imposing extra requirements on the !_RUNNING
->> > state that don't need to be there.  For example, if we can assume that
->> > all devices within a userspace context are !_RUNNING before any of the
->> > devices begin to retrieve final state, then clearing of the _RUNNING
->> > bit becomes the device quiesce point and the beginning of reading
->> > device data is the point at which the device state is frozen and
->> > serialized.  No new states required and essentially works with a slight
->> > rearrangement of the callbacks in this series.  Why can't we do that?  
->> 
->> It sounds worth checking carefully. I didn't come up with a major
->> counter scenario.
->> 
->> We would need to specifically define which user action triggers the
->> device to freeze and serialize. Reading pending_bytes I suppose?
->
-> The first read of pending_bytes after clearing the _RUNNING bit would
-> be the logical place to do this since that's what we define as the start
-> of the cycle for reading the device state.
->
-> "Freezing" the device is a valid implementation, but I don't think it's
-> strictly required per the uAPI.  For instance there's no requirement
-> that pending_bytes is reduced by data_size on each iteratio; we
-> specifically only define that the state is complete when the user reads
-> a pending_bytes value of zero.  So a driver could restart the device
-> state if the device continues to change (though it's debatable whether
-> triggering an -errno on the next migration region access might be a
-> more supportable approach to enforce that userspace has quiesced
-> external access).
+Name: Mr Joe Smith
+Address: Cotonou-Benin-Rep
+Email: mrjoesmiths@specialautokins.com
 
-Hm, not so sure. From my reading of the uAPI, transitioning from
-pre-copy to stop-and-copy (i.e. clearing _RUNNING) implies that we
-freeze the device (at least, that's how I interpret "On state transition
-from pre-copy to stop-and-copy, the driver must stop the device, save
-the device state and send it to the user application through the
-migration region.")
-
-Maybe the uAPI is simply not yet clear enough.
-
+Please contact me immediately if you receive the money.
+Thanks
+Yours Little
+Ana Mimi
