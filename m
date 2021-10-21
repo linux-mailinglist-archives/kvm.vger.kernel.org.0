@@ -2,205 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 016CA436CF9
-	for <lists+kvm@lfdr.de>; Thu, 21 Oct 2021 23:45:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 176B7436D06
+	for <lists+kvm@lfdr.de>; Thu, 21 Oct 2021 23:47:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232300AbhJUVr1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Oct 2021 17:47:27 -0400
-Received: from vps-vb.mhejs.net ([37.28.154.113]:56144 "EHLO vps-vb.mhejs.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231607AbhJUVrX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Oct 2021 17:47:23 -0400
-Received: from MUA
-        by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94.2)
-        (envelope-from <mail@maciej.szmigiero.name>)
-        id 1mdfrs-0005mC-Os; Thu, 21 Oct 2021 23:44:56 +0200
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <cover.1632171478.git.maciej.szmigiero@oracle.com>
- <062df8ac9eb280440a5f0c11159616b1bbb1c2c4.1632171479.git.maciej.szmigiero@oracle.com>
- <YXCqo6XXIkyOb4IE@google.com>
- <d5c4c7da-676c-9889-6aaf-d423d408dd2d@maciej.szmigiero.name>
- <YXGVwlNxaibZAnmC@google.com>
-From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Subject: Re: [PATCH v5 12/13] KVM: Optimize gfn lookup in kvm_zap_gfn_range()
-Message-ID: <284a4fcc-3618-4ba6-dfaa-ffc4039eefcc@maciej.szmigiero.name>
-Date:   Thu, 21 Oct 2021 23:44:50 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+        id S231440AbhJUVtu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Oct 2021 17:49:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:20455 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231138AbhJUVtt (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 21 Oct 2021 17:49:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1634852853;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=QX0K+ol2Lenj9SRy5tdw8mHtG1vzf/+KLfCSzAQPQCc=;
+        b=AcvFoXQJVjlFGjiW574jVmhaXUJS4qJczPZICVIS0snRwyb4a3NX2VhcsRSskCYooRtfk1
+        SsP4ntawcLyzzZnUQK4PZ2rJqWdXZyc+U3U60JOWsybbf6xaL0SeAahar1nTRAueqoJyR+
+        g/mbX+4QGNCSyaIvU6Qn5D/XMcUW884=
+Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com
+ [209.85.161.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-108-zZoXlAIXNVWoRGLoYrq8uA-1; Thu, 21 Oct 2021 17:47:31 -0400
+X-MC-Unique: zZoXlAIXNVWoRGLoYrq8uA-1
+Received: by mail-oo1-f70.google.com with SMTP id w1-20020a4a2741000000b002b6eb5b596cso945294oow.9
+        for <kvm@vger.kernel.org>; Thu, 21 Oct 2021 14:47:31 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=QX0K+ol2Lenj9SRy5tdw8mHtG1vzf/+KLfCSzAQPQCc=;
+        b=ryNh/T1X5oTDpGrEmpLr6DLEn8If+E0/bl5+kzttaopgBPWBkqDGbw2kiBpOntlH5D
+         6diPd+1pweJ61IZpBjgb5Qcqd7pnlXHk/SJx0ASN9L6cbuIb7RQ9HCaaQ5zg+hRqg/ix
+         Rx3/qMNLXVfuuDAfX51EC1YBoN0zREyV8wPMtBo7YCygsHUv0S5eOB2qOuc2pV0jIMnP
+         5KBGmC3S+NskISN5vBeIvhIKHM5xCBE/ouQ+E6x+sfByprIhq3W3HXyLzHQ/rw9dmQGH
+         bLD9T8NhCqgNr4tqPZvsM434+0q1jbE9nMX/lheNowKUq0/gYIo+Vr8ZIWhFrdM1JirN
+         RRqg==
+X-Gm-Message-State: AOAM532p+9vm0bMBahiXH7U1uY7vjRCtq/ySk7/fKKbzg1JWmfQOEQkn
+        UOIC1ZPB+RnH79aaz8H7eiv/FltL7BT0rPD6S7O5hEfUcNLOaCtr2RL4su1CsQBMu7AwFCDjaH1
+        RfRBEa/LyhnDk
+X-Received: by 2002:a9d:4b95:: with SMTP id k21mr6844956otf.345.1634852851213;
+        Thu, 21 Oct 2021 14:47:31 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyGtR3NFRWaPJeO+7/DPajK4J4hqs651VUuk49wM4FBsssY4SSkK+siLHZJ+Vceo3C1DN8erg==
+X-Received: by 2002:a9d:4b95:: with SMTP id k21mr6844926otf.345.1634852850828;
+        Thu, 21 Oct 2021 14:47:30 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id s18sm1307854otd.55.2021.10.21.14.47.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Oct 2021 14:47:30 -0700 (PDT)
+Date:   Thu, 21 Oct 2021 15:47:29 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>,
+        Yishai Hadas <yishaih@nvidia.com>, bhelgaas@google.com,
+        saeedm@nvidia.com, linux-pci@vger.kernel.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, kuba@kernel.org, leonro@nvidia.com,
+        kwankhede@nvidia.com, mgurtovoy@nvidia.com, maorg@nvidia.com,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: [PATCH V2 mlx5-next 12/14] vfio/mlx5: Implement vfio_pci driver
+ for mlx5 devices
+Message-ID: <20211021154729.0e166e67.alex.williamson@redhat.com>
+In-Reply-To: <87o87isovr.fsf@redhat.com>
+References: <20211019105838.227569-1-yishaih@nvidia.com>
+        <20211019105838.227569-13-yishaih@nvidia.com>
+        <20211019124352.74c3b6ba.alex.williamson@redhat.com>
+        <20211019192328.GZ2744544@nvidia.com>
+        <20211019145856.2fa7f7c8.alex.williamson@redhat.com>
+        <20211019230431.GA2744544@nvidia.com>
+        <5a496713-ae1d-11f2-1260-e4c1956e1eda@nvidia.com>
+        <20211020105230.524e2149.alex.williamson@redhat.com>
+        <20211020185919.GH2744544@nvidia.com>
+        <20211020150709.7cff2066.alex.williamson@redhat.com>
+        <87o87isovr.fsf@redhat.com>
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <YXGVwlNxaibZAnmC@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 21.10.2021 18:30, Sean Christopherson wrote:
-> On Thu, Oct 21, 2021, Maciej S. Szmigiero wrote:
->> On 21.10.2021 01:47, Sean Christopherson wrote:
->>> In this case, I would honestly just drop the helper.  It's really hard to express
->>> what this function does in a name that isn't absurdly long, and there's exactly
->>> one user at the end of the series.
->>
->> The "upper bound" is a common name for a binary search operation that
->> finds the first node that has its key strictly greater than the searched key.
-> 
-> Ah, that I did not know (obviously).  But I suspect that detail will be lost on
-> other readers as well, even if they are familiar with the terminology.
-> 
->> It can be integrated into its caller but I would leave a comment there
->> describing what kind of operation that block of code does to aid in
->> understanding the code.
-> 
-> Yeah, completely agree a comment would be wonderful.
+On Thu, 21 Oct 2021 11:34:00 +0200
+Cornelia Huck <cohuck@redhat.com> wrote:
 
-👍
+> On Wed, Oct 20 2021, Alex Williamson <alex.williamson@redhat.com> wrote:
+> 
+> > On Wed, 20 Oct 2021 15:59:19 -0300
+> > Jason Gunthorpe <jgg@nvidia.com> wrote:
+> >  
+> >> On Wed, Oct 20, 2021 at 10:52:30AM -0600, Alex Williamson wrote:
+> >>   
+> >> > I'm wondering if we're imposing extra requirements on the !_RUNNING
+> >> > state that don't need to be there.  For example, if we can assume that
+> >> > all devices within a userspace context are !_RUNNING before any of the
+> >> > devices begin to retrieve final state, then clearing of the _RUNNING
+> >> > bit becomes the device quiesce point and the beginning of reading
+> >> > device data is the point at which the device state is frozen and
+> >> > serialized.  No new states required and essentially works with a slight
+> >> > rearrangement of the callbacks in this series.  Why can't we do that?    
+> >> 
+> >> It sounds worth checking carefully. I didn't come up with a major
+> >> counter scenario.
+> >> 
+> >> We would need to specifically define which user action triggers the
+> >> device to freeze and serialize. Reading pending_bytes I suppose?  
+> >
+> > The first read of pending_bytes after clearing the _RUNNING bit would
+> > be the logical place to do this since that's what we define as the start
+> > of the cycle for reading the device state.
+> >
+> > "Freezing" the device is a valid implementation, but I don't think it's
+> > strictly required per the uAPI.  For instance there's no requirement
+> > that pending_bytes is reduced by data_size on each iteratio; we
+> > specifically only define that the state is complete when the user reads
+> > a pending_bytes value of zero.  So a driver could restart the device
+> > state if the device continues to change (though it's debatable whether
+> > triggering an -errno on the next migration region access might be a
+> > more supportable approach to enforce that userspace has quiesced
+> > external access).  
+> 
+> Hm, not so sure. From my reading of the uAPI, transitioning from
+> pre-copy to stop-and-copy (i.e. clearing _RUNNING) implies that we
+> freeze the device (at least, that's how I interpret "On state transition
+> from pre-copy to stop-and-copy, the driver must stop the device, save
+> the device state and send it to the user application through the
+> migration region.")
 
->> Although, to be honest, I don't quite get the reason for doing this
->> considering that you want to put a single "rb_next()" call into its own
->> helper for clarity below.
-> 
-> The goal is to make the macro itself easy to understand, even if the reader may
-> not understand the underlying details.  The bare rb_next() forces the reader to
-> pause to think about exactly what "node" is, and perhaps even dive into the code
-> for the other helpers.
-> 
-> With something like this, a reader that doesn't know the memslots details can
-> get a good idea of the basic gist of the macro without having to even know the
-> type of "node".  Obviously someone writing code will need to know the type, but
-> for readers bouncing around code it's a detail they don't need to know.
-> 
-> #define kvm_for_each_memslot_in_gfn_range(node, slots, start, end)	\
-> 	for (node = kvm_get_first_node(slots, start);			\
-> 	     !kvm_is_valid_node(slots, node, end);			\
-> 	     node = kvm_get_next_node(node))
-> 
-> Hmm, on that point, having the caller do
-> 
-> 	memslot = container_of(node, struct kvm_memory_slot, gfn_node[idx]);
-> 
-> is more than a bit odd, and as is the case with the bare rb_next(), bleeds
-> implementation details into code that really doesn't care about implementation
-> details.  Eww, and looking closer, the caller also needs to grab slots->node_idx.
-> 
-> So while I would love to avoid an opaque iterator, adding one would be a net
-> positive in this case.  E.g.
-> 
-> /* Iterator used for walking memslots that overlap a gfn range. */
-> struct kvm_memslot_iterator iter {
->          struct rb_node *node;
->          struct kvm_memory_slot *memslot;
->          struct kvm_memory_slots *slots;
-> 	gfn_t start;
-> 	gfn_t end;
-> }
-> 
-> static inline void kvm_memslot_iter_start(struct kvm_memslot_iter *iter,
-> 					  struct kvm_memslots *slots,
-> 					  gfn_t start, gfn_t end)
-> {
-> 	...
-> }
-> 
-> static inline bool kvm_memslot_iter_is_valid(struct kvm_memslot_iter *iter)
-> {
-> 	/*
-> 	 * If this slot starts beyond or at the end of the range so does
-> 	 * every next one
-> 	 */
-> 	return iter->node && iter->memslot->base_gfn < end;
-> }
-> 
-> static inline void kvm_memslot_iter_next(struct kvm_memslot_iter *iter)
-> {
-> 	iter->node = rb_next(iter->node);
-> 
-> 	if (!iter->node)
-> 		return;
-> 
-> 	iter->memslot = container_of(iter->node, struct kvm_memory_slot,
-> 				     gfn_node[iter->slots->node_idx]);
-> }
-> 
-> /* Iterate over each memslot *possibly* intersecting [start, end) range */
-> #define kvm_for_each_memslot_in_gfn_range(iter, node, slots, start, end) \
-> 	for (kvm_memslot_iter_start(iter, node, slots, start, end);	 \
-> 	     kvm_memslot_iter_is_valid(iter);				 \
-> 	     kvm_memslot_iter_next(node))				 \
-> 
+"[S]end it to the user application through the migration region" is
+certainly not something that's encompassed just by clearing the _RUNNING
+bit.  There's a sequence of operations there.  If the device is
+quiesced for outbound DMA and frozen from inbound DMA (or can
+reasonably expect no further inbound DMA) before the user reads the
+data, I think that meets the description.
 
-The iterator-based for_each implementation looks pretty nice (love the
-order and consistency that higher-level abstractions bring to code) -
-will change the code to use iterators instead.
+We can certainly clarify the spec in the process if we agree that we
+can do this without adding another state bit.
 
-It also solves the kvm_is_valid_node() naming issue below.
+I recall that we previously suggested a very strict interpretation of
+clearing the _RUNNING bit, but again I'm questioning if that's a real
+requirement or simply a nice-to-have feature for some undefined
+debugging capability.  In raising the p2p DMA issue, we can see that a
+hard stop independent of other devices is not really practical but I
+also don't see that introducing a new state bit solves this problem any
+more elegantly than proposed here.  Thanks,
 
-> Ugh, this got me looking at kvm_zap_gfn_range(), and that thing is trainwreck.
-> There are three calls kvm_flush_remote_tlbs_with_address(), two of which should
-> be unnecessary, but become necessary because the last one is broken.  *sigh*
-> 
-> That'd also be a good excuse to extract the rmap loop to a separate helper.  Then
-> you don't need to constantly juggle the 80 char limit and variable collisions
-> while you're modifying this mess.  I'll post the attached patches separately
-> since the first one (two?) should go into 5.15.  They're compile tested only
-> at this point, but hopefully I've had enough coffee and they're safe to base
-> this series on top (note, they're based on kvm/queue, commit 73f122c4f06f ("KVM:
-> cleanup allocation of rmaps and page tracking data").
+Alex
 
-All right, will make sure that a respin is based on a kvm tree with these
-commits in.
-
->>> The kvm_for_each_in_gfn prefix is _really_ confusing.  I get that these are all
->>> helpers for "kvm_for_each_memslot...", but it's hard not to think these are all
->>> iterators on their own.  I would gladly sacrifice namespacing for readability in
->>> this case.
->>
->> "kvm_for_each_memslot_in_gfn_range" was your proposed name here:
->> https://lore.kernel.org/kvm/YK6GWUP107i5KAJo@google.com/
->>
->> But no problem renaming it.
-> 
-> Oh, I was commenting on the inner helpers.  The macro name itself is great. ;-)
-> 
->>> @@ -882,12 +875,16 @@ struct rb_node *kvm_for_each_in_gfn_first(struct kvm_memslots *slots, gfn_t star
->>>    	return node;
->>>    }
->>>
->>> -static inline
->>> -bool kvm_for_each_in_gfn_no_more(struct kvm_memslots *slots, struct rb_node *node, gfn_t end)
->>> +static inline bool kvm_is_last_node(struct kvm_memslots *slots,
->>> +				    struct rb_node *node, gfn_t end)
->>
->> kvm_is_last_node() is a bit misleading since this function is supposed
->> to return true even on the last node, only returning false one node past
->> the last one (or when the tree runs out of nodes).
-> 
-> Good point.  I didn't love the name when I suggested either.  What about
-> kvm_is_valid_node()?
-
-kvm_is_valid_node() sounds a bit too generic for me, but since we rewrite
-the code to be iterator-based this issue goes away.
-
-Thanks,
-Maciej
