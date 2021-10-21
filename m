@@ -2,20 +2,20 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C37B54363E1
-	for <lists+kvm@lfdr.de>; Thu, 21 Oct 2021 16:15:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1AE404363E3
+	for <lists+kvm@lfdr.de>; Thu, 21 Oct 2021 16:16:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231452AbhJUORm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Oct 2021 10:17:42 -0400
-Received: from vps-vb.mhejs.net ([37.28.154.113]:34064 "EHLO vps-vb.mhejs.net"
+        id S230436AbhJUOS2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Oct 2021 10:18:28 -0400
+Received: from vps-vb.mhejs.net ([37.28.154.113]:34106 "EHLO vps-vb.mhejs.net"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231206AbhJUORl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Oct 2021 10:17:41 -0400
+        id S229878AbhJUOS1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Oct 2021 10:18:27 -0400
 Received: from MUA
         by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
         (Exim 4.94.2)
         (envelope-from <mail@maciej.szmigiero.name>)
-        id 1mdYqj-0004tH-RZ; Thu, 21 Oct 2021 16:15:17 +0200
+        id 1mdYrW-0004tt-K9; Thu, 21 Oct 2021 16:16:06 +0200
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
@@ -37,17 +37,16 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
 References: <cover.1632171478.git.maciej.szmigiero@oracle.com>
- <555f58fdaec120aa7a6f6fbad06cca796a8c9168.1632171479.git.maciej.szmigiero@oracle.com>
- <YXCak6WUfknV6qU5@google.com>
+ <062df8ac9eb280440a5f0c11159616b1bbb1c2c4.1632171479.git.maciej.szmigiero@oracle.com>
+ <YXCqo6XXIkyOb4IE@google.com>
 From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Subject: Re: [PATCH v5 08/13] KVM: Resolve memslot ID via a hash table instead
- of via a static array
-Message-ID: <139bdb6e-4f75-5f16-ae88-094709a6c42b@maciej.szmigiero.name>
-Date:   Thu, 21 Oct 2021 16:15:12 +0200
+Subject: Re: [PATCH v5 12/13] KVM: Optimize gfn lookup in kvm_zap_gfn_range()
+Message-ID: <d5c4c7da-676c-9889-6aaf-d423d408dd2d@maciej.szmigiero.name>
+Date:   Thu, 21 Oct 2021 16:16:00 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.13.0
 MIME-Version: 1.0
-In-Reply-To: <YXCak6WUfknV6qU5@google.com>
+In-Reply-To: <YXCqo6XXIkyOb4IE@google.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -55,176 +54,265 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 21.10.2021 00:39, Sean Christopherson wrote:
+On 21.10.2021 01:47, Sean Christopherson wrote:
 > On Mon, Sep 20, 2021, Maciej S. Szmigiero wrote:
->> @@ -1251,12 +1251,13 @@ static inline void kvm_memslot_delete(struct kvm_memslots *slots,
->>   	if (atomic_read(&slots->last_used_slot) >= slots->used_slots)
->>   		atomic_set(&slots->last_used_slot, 0);
+> 
+> Some mechanical comments while they're on my mind, I'll get back to a full review
+> tomorrow.
+> 
+>> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+>> index 6433efff447a..9ae5f7341cf5 100644
+>> --- a/include/linux/kvm_host.h
+>> +++ b/include/linux/kvm_host.h
+>> @@ -833,6 +833,75 @@ struct kvm_memory_slot *id_to_memslot(struct kvm_memslots *slots, int id)
+>>   	return NULL;
+>>   }
 >>   
->> -	for (i = slots->id_to_index[memslot->id]; i < slots->used_slots; i++) {
->> +	for (i = oldslot - mslots; i < slots->used_slots; i++) {
->> +		hash_del(&mslots[i].id_node);
->>   		mslots[i] = mslots[i + 1];
->> -		slots->id_to_index[mslots[i].id] = i;
->> +		hash_add(slots->id_hash, &mslots[i].id_node, mslots[i].id);
->>   	}
->> +	hash_del(&mslots[i].id_node);
->>   	mslots[i] = *memslot;
->> -	slots->id_to_index[memslot->id] = -1;
+>> +static inline
+>> +struct rb_node *kvm_memslots_gfn_upper_bound(struct kvm_memslots *slots, gfn_t gfn)
 > 
-> Aha!  This code has been bugging and I finally figured out why.  Fundamentally,
-> this is identical to kvm_memslot_move_backward(), the only difference being that
-> the _backward() variant has a second "stop" condition.
-> 
-> But yet this is subtly different in the hash manipulations because performs the
-> final node deletion (which is a random node, that may not be the target node!)
+> Function attributes should go on the same line as the function unless there's a
+> really good reason to do otherwise.
 
-Technically, it's not truly "random" node that's deleted since it's
-simply the one belonging to the last slot in the old array (which slot
-will now be moved to the second to last position in the array).
-But I get your overall point here.
+Here the reason was a long line length, which was 84 characters even with
+function attributes moved to a separate line.
 
-> outside of the loop, whereas _backward() deletes the target node before the loop.
-> 
-> I like the _backward() variant a lot more.  And if this code is converted to that
-> approach, i.e.
-> 
-> 	for (i = oldslot - mslots; i < slots->used_slots; i++) {
-> 		hash_del(&mslots[i + 1].id_node);
-> 		mslots[i] = mslots[i + 1];
-> 		hash_add(slots->id_hash, &mslots[i].id_node, mslots[i].id);
-> 	}
-> 
-> then all three loops fit a similar pattern and we can extract the node craziness
-> into a helper.  I know this mostly goes away in the end, but I think/hope it will
-> make the future patches easier to follow this there's only ever one "replace"
-> helper.
-> 
-> For convenience, with the s/mmemslot/oldslot and comment changes.
+include/linux/kvm_host.h contains a lot of helpers written in a similar
+style:
+> static inline gfn_t
+> hva_to_gfn_memslot(unsigned long hva, struct kvm_memory_slot *slot)
 
-The change in this patch was supposed to be minimally-invasive (since
-it's getting replaced by patch 11 anyway), but since you have already
-refactored it then I will update the patch with your proposed change.
+> In this case, I would honestly just drop the helper.  It's really hard to express
+> what this function does in a name that isn't absurdly long, and there's exactly
+> one user at the end of the series.
 
-Thanks,
-Maciej
+The "upper bound" is a common name for a binary search operation that
+finds the first node that has its key strictly greater than the searched key.
+
+It can be integrated into its caller but I would leave a comment there
+describing what kind of operation that block of code does to aid in
+understanding the code.
+
+Although, to be honest, I don't quite get the reason for doing this
+considering that you want to put a single "rb_next()" call into its own
+helper for clarity below.
+
+> https://lkml.kernel.org/r/20210930192417.1332877-1-keescook@chromium.org
+> 
+>> +{
+>> +	int idx = slots->node_idx;
+>> +	struct rb_node *node, *result = NULL;
+>> +
+>> +	for (node = slots->gfn_tree.rb_node; node; ) {
+>> +		struct kvm_memory_slot *slot;
+> 
+> My personal preference is to put declarations outside of the for loop.  I find it
+> easier to read, it's harder to have shadowing issues if all variables are declared
+> at the top, especially when using relatively generic names.
+
+Will do.
+
+>> +
+>> +		slot = container_of(node, struct kvm_memory_slot, gfn_node[idx]);
+>> +		if (gfn < slot->base_gfn) {
+>> +			result = node;
+>> +			node = node->rb_left;
+>> +		} else
+> 
+> Needs braces since the "if" has braces.
+
+Will add them.
+
+>> +			node = node->rb_right;
+>> +	}
+>> +
+>> +	return result;
+>> +}
+>> +
+>> +static inline
+>> +struct rb_node *kvm_for_each_in_gfn_first(struct kvm_memslots *slots, gfn_t start)
+> 
+> The kvm_for_each_in_gfn prefix is _really_ confusing.  I get that these are all
+> helpers for "kvm_for_each_memslot...", but it's hard not to think these are all
+> iterators on their own.  I would gladly sacrifice namespacing for readability in
+> this case.
+
+"kvm_for_each_memslot_in_gfn_range" was your proposed name here:
+https://lore.kernel.org/kvm/YK6GWUP107i5KAJo@google.com/
+
+But no problem renaming it.
+
+> I also wouldn't worry about capturing the details.  For most folks reading this
+> code, the important part is understanding the control flow of
+> kvm_for_each_memslot_in_gfn_range().  Capturing the under-the-hood details in the
+> name isn't a priority since anyone modifying this code is going to have to do a
+> lot of staring no matter what :-)
+
+It's even better if somebody modifying complex code has to read it carefully
+(within reason, obviously).
+
+>> +static inline
+>> +bool kvm_for_each_in_gfn_no_more(struct kvm_memslots *slots, struct rb_node *node, gfn_t end)
+>> +{
+>> +	struct kvm_memory_slot *memslot;
+>> +
+>> +	memslot = container_of(node, struct kvm_memory_slot, gfn_node[slots->node_idx]);
+>> +
+>> +	/*
+>> +	 * If this slot starts beyond or at the end of the range so does
+>> +	 * every next one
+>> +	 */
+>> +	return memslot->base_gfn >= end;
+>> +}
+>> +
+>> +/* Iterate over each memslot *possibly* intersecting [start, end) range */
+>> +#define kvm_for_each_memslot_in_gfn_range(node, slots, start, end)	\
+>> +	for (node = kvm_for_each_in_gfn_first(slots, start);		\
+>> +	     node && !kvm_for_each_in_gfn_no_more(slots, node, end);	\
+> 
+> I think it makes sense to move the NULL check into the validation helper?  We had
+> a similar case in KVM's legacy MMU where a "null" check was left to the caller,
+> and it ended up with a bunch of redundant and confusing code.  I don't see that
+> happening here, but at the same time it's odd for the validator to not sanity
+> check @node.
+>
+
+Will do.
+  
+>> +	     node = rb_next(node))					\
+> 
+> It's silly, but I'd add a wrapper for this one, just to make it easy to follow
+> the control flow.
+> 
+> Maybe this as delta?  I'm definitely not set on the names, was just trying to
+> find something that's short and to the point.
+
+Thanks for the proposed patch, I added some comments inline below.
 
 > ---
->   virt/kvm/kvm_main.c | 63 ++++++++++++++++++++++++++-------------------
->   1 file changed, 37 insertions(+), 26 deletions(-)
+>   include/linux/kvm_host.h | 60 +++++++++++++++++++++-------------------
+>   1 file changed, 31 insertions(+), 29 deletions(-)
 > 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 50597608d085..6f5298bc7710 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -1231,6 +1231,23 @@ static int kvm_alloc_dirty_bitmap(struct kvm_memory_slot *memslot)
->   	return 0;
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 9ae5f7341cf5..a88bd5d9e4aa 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -833,36 +833,29 @@ struct kvm_memory_slot *id_to_memslot(struct kvm_memslots *slots, int id)
+>   	return NULL;
 >   }
 > 
-> +static void kvm_memslot_replace(struct kvm_memslots *slots, int dst, int src)
+> -static inline
+> -struct rb_node *kvm_memslots_gfn_upper_bound(struct kvm_memslots *slots, gfn_t gfn)
+> +static inline struct rb_node *kvm_get_first_node(struct kvm_memslots *slots,
+> +						 gfn_t start)
+>   {
+> +	struct kvm_memory_slot *slot;
+> +	struct rb_node *node, *tmp;
+>   	int idx = slots->node_idx;
+> -	struct rb_node *node, *result = NULL;
+> -
+> -	for (node = slots->gfn_tree.rb_node; node; ) {
+> -		struct kvm_memory_slot *slot;
+> -
+> -		slot = container_of(node, struct kvm_memory_slot, gfn_node[idx]);
+> -		if (gfn < slot->base_gfn) {
+> -			result = node;
+> -			node = node->rb_left;
+> -		} else
+> -			node = node->rb_right;
+> -	}
+> -
+> -	return result;
+> -}
+> -
+> -static inline
+> -struct rb_node *kvm_for_each_in_gfn_first(struct kvm_memslots *slots, gfn_t start)
+> -{
+> -	struct rb_node *node;
+> 
+>   	/*
+>   	 * Find the slot with the lowest gfn that can possibly intersect with
+>   	 * the range, so we'll ideally have slot start <= range start
+>   	 */
+> -	node = kvm_memslots_gfn_upper_bound(slots, start);
+> +	node = NULL;
+> +	for (tmp = slots->gfn_tree.rb_node; tmp; ) {
+> +
+> +		slot = container_of(node, struct kvm_memory_slot, gfn_node[idx]);
+
+Here -------------------------------^ should be "tmp", not "node" since
+you renamed "node" into "tmp" and "result" into "node" while integrating
+this function into its caller.
+
+> +		if (gfn < slot->base_gfn) {
+> +			node = tmp;
+> +			tmp = tmp->rb_left;
+> +		} else {
+> +			tmp = tmp->rb_right;
+> +		}
+> +	}
+> +
+>   	if (node) {
+>   		struct rb_node *pnode;
+> 
+> @@ -882,12 +875,16 @@ struct rb_node *kvm_for_each_in_gfn_first(struct kvm_memslots *slots, gfn_t star
+>   	return node;
+>   }
+> 
+> -static inline
+> -bool kvm_for_each_in_gfn_no_more(struct kvm_memslots *slots, struct rb_node *node, gfn_t end)
+> +static inline bool kvm_is_last_node(struct kvm_memslots *slots,
+> +				    struct rb_node *node, gfn_t end)
+
+kvm_is_last_node() is a bit misleading since this function is supposed
+to return true even on the last node, only returning false one node past
+the last one (or when the tree runs out of nodes).
+
+>   {
+>   	struct kvm_memory_slot *memslot;
+> 
+> -	memslot = container_of(node, struct kvm_memory_slot, gfn_node[slots->node_idx]);
+> +	if (!node)
+> +		return true;
+> +
+> +	memslot = container_of(node, struct kvm_memory_slot,
+> +			       gfn_node[slots->node_idx]);
+
+You previously un-wrapped such lines, like for example in
+https://lore.kernel.org/kvm/YK2GjzkWvjBcCFxn@google.com/ :
+>> +		slot = container_of(node, struct kvm_memory_slot,
+>> +				    gfn_node[idxactive]);
+> 
+> With 'idx', this can go on a single line.  It runs over by two chars, but the 80
+> char limit is a soft limit, and IMO avoiding line breaks for things like this
+> improves readability.
+
+
+> 
+>   	/*
+>   	 * If this slot starts beyond or at the end of the range so does
+> @@ -896,11 +893,16 @@ bool kvm_for_each_in_gfn_no_more(struct kvm_memslots *slots, struct rb_node *nod
+>   	return memslot->base_gfn >= end;
+>   }
+> 
+> +static inline bool kvm_get_next_node(struct rb_node *node)
 > +{
-> +	struct kvm_memory_slot *mslots = slots->memslots;
-> +
-> +	/*
-> +	 * Remove the source from the hash list, copying the hlist_node data
-> +	 * would corrupt the list.
-> +	 */
-> +	hash_del(&mslots[src].id_node);
-> +
-> +	/* Copy the source *data*, not the pointer, to the destination. */
-> +	mslots[dst] = mslots[src];
-> +
-> +	/* Re-add the memslot to the list using the destination's node. */
-> +	hash_add(slots->id_hash, &mslots[dst].id_node, mslots[dst].id);
+> +	return rb_next(node)
 > +}
 > +
+>   /* Iterate over each memslot *possibly* intersecting [start, end) range */
+>   #define kvm_for_each_memslot_in_gfn_range(node, slots, start, end)	\
+> -	for (node = kvm_for_each_in_gfn_first(slots, start);		\
+> -	     node && !kvm_for_each_in_gfn_no_more(slots, node, end);	\
+> -	     node = rb_next(node))					\
+> +	for (node = kvm_get_first_node(slots, start);			\
+> +	     !kvm_is_last_node(slots, node, end);			\
+> +	     node = kvm_get_next_node(node))				\
+> 
 >   /*
->    * Delete a memslot by decrementing the number of used slots and shifting all
->    * other entries in the array forward one spot.
-> @@ -1251,12 +1268,16 @@ static inline void kvm_memslot_delete(struct kvm_memslots *slots,
->   	if (atomic_read(&slots->last_used_slot) >= slots->used_slots)
->   		atomic_set(&slots->last_used_slot, 0);
-> 
-> -	for (i = oldslot - mslots; i < slots->used_slots; i++) {
-> -		hash_del(&mslots[i].id_node);
-> -		mslots[i] = mslots[i + 1];
-> -		hash_add(slots->id_hash, &mslots[i].id_node, mslots[i].id);
-> -	}
-> -	hash_del(&mslots[i].id_node);
-> +	/*
-> +	 * Remove the to-be-deleted memslot from the list _before_ shifting
-> +	 * the trailing memslots forward, its data will be overwritten.
-> +	 * Defer the (somewhat pointless) copying of the memslot until after
-> +	 * the last slot has been shifted to avoid overwriting said last slot.
-> +	 */
-> +	hash_del(&oldslot->id_node);
-> +
-> +	for (i = oldslot - mslots; i < slots->used_slots; i++)
-> +		kvm_memslot_replace(slots, i, i + 1);
->   	mslots[i] = *memslot;
->   }
-> 
-> @@ -1282,39 +1303,32 @@ static inline int kvm_memslot_move_backward(struct kvm_memslots *slots,
->   					    struct kvm_memory_slot *memslot)
->   {
->   	struct kvm_memory_slot *mslots = slots->memslots;
-> -	struct kvm_memory_slot *mmemslot = id_to_memslot(slots, memslot->id);
-> +	struct kvm_memory_slot *oldslot = id_to_memslot(slots, memslot->id);
->   	int i;
-> 
-> -	if (!mmemslot || !slots->used_slots)
-> +	if (!oldslot || !slots->used_slots)
->   		return -1;
-> 
->   	/*
-> -	 * The loop below will (possibly) overwrite the target memslot with
-> -	 * data of the next memslot, or a similar loop in
-> -	 * kvm_memslot_move_forward() will overwrite it with data of the
-> -	 * previous memslot.
-> -	 * Then update_memslots() will unconditionally overwrite and re-add
-> -	 * it to the hash table.
-> -	 * That's why the memslot has to be first removed from the hash table
-> -	 * here.
-> +         * Delete the slot from the hash table before sorting the remaining
-> +         * slots, the slot's data may be overwritten when copying slots as part
-> +         * of the sorting proccess.  update_memslots() will unconditionally
-> +         * rewrite the entire slot and re-add it to the hash table.
->   	 */
-> -	hash_del(&mmemslot->id_node);
-> +	hash_del(&oldslot->id_node);
-> 
->   	/*
->   	 * Move the target memslot backward in the array by shifting existing
->   	 * memslots with a higher GFN (than the target memslot) towards the
->   	 * front of the array.
->   	 */
-> -	for (i = mmemslot - mslots; i < slots->used_slots - 1; i++) {
-> +	for (i = oldslot - mslots; i < slots->used_slots - 1; i++) {
->   		if (memslot->base_gfn > mslots[i + 1].base_gfn)
->   			break;
-> 
->   		WARN_ON_ONCE(memslot->base_gfn == mslots[i + 1].base_gfn);
-> 
-> -		/* Shift the next memslot forward one and update its index. */
-> -		hash_del(&mslots[i + 1].id_node);
-> -		mslots[i] = mslots[i + 1];
-> -		hash_add(slots->id_hash, &mslots[i].id_node, mslots[i].id);
-> +		kvm_memslot_replace(slots, i, i + 1);
->   	}
->   	return i;
->   }
-> @@ -1343,10 +1357,7 @@ static inline int kvm_memslot_move_forward(struct kvm_memslots *slots,
-> 
->   		WARN_ON_ONCE(memslot->base_gfn == mslots[i - 1].base_gfn);
-> 
-> -		/* Shift the next memslot back one and update its index. */
-> -		hash_del(&mslots[i - 1].id_node);
-> -		mslots[i] = mslots[i - 1];
-> -		hash_add(slots->id_hash, &mslots[i].id_node, mslots[i].id);
-> +		kvm_memslot_replace(slots, i, i - 1);
->   	}
->   	return i;
->   }
+>    * KVM_SET_USER_MEMORY_REGION ioctl allows the following operations:
 > --
 > 
 
+Thanks,
+Maciej
