@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F1C81436600
-	for <lists+kvm@lfdr.de>; Thu, 21 Oct 2021 17:23:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 086C8436605
+	for <lists+kvm@lfdr.de>; Thu, 21 Oct 2021 17:24:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231911AbhJUP0L (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Oct 2021 11:26:11 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:8522 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231624AbhJUP0K (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 21 Oct 2021 11:26:10 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 19LEBJ9o022350;
-        Thu, 21 Oct 2021 11:23:52 -0400
+        id S231945AbhJUP0Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Oct 2021 11:26:24 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57722 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S231949AbhJUP0R (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 21 Oct 2021 11:26:17 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 19LEBMdj003711;
+        Thu, 21 Oct 2021 11:23:55 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=QpuFna1xX5sy6xRT97SECUImIxZyeGI772b9K7FKfDc=;
- b=qX3ct10BTVqBYFax7V3cgxF+zs2x/I6kYfhlqcY74cT5hJB28Lo8LTuEZ8i93566pORi
- g8WIN6aLJ23yJ8DM3Bqdgiq75FksNyo8k/WcIykfiw1mwDZzMJ2QW95f+t0jGRorXnc6
- dMsUTwC7cu61jRtt7HV8irKE/ddROlak0ArMG7RokE2yCXPJWLUM8tmsKe8m2qwiNcrg
- 0xBfKtMAVpQ/Z8PYPeReb0uJk48ZY9TXxw5fINjLOQYSqe+4hv+tm/i+KH2xYYy9QGD+
- tPazHrA4of29XpMa1fhOhYzTMyDPXDyaqh5rCUSFJNpy+i4QESY9vgxQp6Z4zxNBzeDg ZA== 
+ bh=UjzL5IT9oscSWd5cGZj5JMb5Z95F8fJs2wvedapJfQc=;
+ b=S9OaIy84jUU+46+sCF010mOLugYqKO+BCUPBRKv14tlP/ODO85sBw6Ar0mLSD0HrvaJ7
+ /H4cLvEJMkxfSDDRt1077JUhrk43W+WX3B16Ch0+O1PNEdbbfhtYWh4eaVJdgYusegm1
+ d1VijbSOQTBmht8a3BpFgvMHVeGwFUDoHs4NPssg6Uc8XhoMaZCLYwt+v8gnwjwR5ibC
+ W84qC5XKanBbjM8MmMf6l7xmatrIMuMLrKHkZklSA4f7I68e8U0KbzhS2nveSuZigHAc
+ P3D10L6hPPg35WDDxbisSVH/P0RNUjSAcZ9ba0h2+kmq07Zx97LapIwIpjsH2XZ7M9eI wQ== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3bty9eqrxc-1
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3bu8kkksa5-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 21 Oct 2021 11:23:52 -0400
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 19LFChIn009134;
-        Thu, 21 Oct 2021 11:23:52 -0400
-Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3bty9eqrwn-1
+        Thu, 21 Oct 2021 11:23:55 -0400
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 19LFJG0E010601;
+        Thu, 21 Oct 2021 11:23:54 -0400
+Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com [169.63.121.186])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3bu8kkks9x-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 21 Oct 2021 11:23:52 -0400
-Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
-        by ppma05wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 19LF49bY028003;
-        Thu, 21 Oct 2021 15:23:50 GMT
-Received: from b03cxnp07029.gho.boulder.ibm.com (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
-        by ppma05wdc.us.ibm.com with ESMTP id 3bqpccyq6u-1
+        Thu, 21 Oct 2021 11:23:54 -0400
+Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
+        by ppma03wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 19LF47VX011122;
+        Thu, 21 Oct 2021 15:23:53 GMT
+Received: from b03cxnp07027.gho.boulder.ibm.com (b03cxnp07027.gho.boulder.ibm.com [9.17.130.14])
+        by ppma03wdc.us.ibm.com with ESMTP id 3bt4st18dc-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 21 Oct 2021 15:23:50 +0000
+        Thu, 21 Oct 2021 15:23:53 +0000
 Received: from b03ledav005.gho.boulder.ibm.com (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
-        by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 19LFNnvP27787606
+        by b03cxnp07027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 19LFNqvj36962664
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 21 Oct 2021 15:23:49 GMT
+        Thu, 21 Oct 2021 15:23:52 GMT
 Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5A291BE051;
+        by IMSVA (Postfix) with ESMTP id 7963DBE05D;
+        Thu, 21 Oct 2021 15:23:52 +0000 (GMT)
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DE429BE061;
         Thu, 21 Oct 2021 15:23:49 +0000 (GMT)
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E4E42BE05B;
-        Thu, 21 Oct 2021 15:23:44 +0000 (GMT)
 Received: from cpe-172-100-181-211.stny.res.rr.com.com (unknown [9.160.98.118])
         by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Thu, 21 Oct 2021 15:23:44 +0000 (GMT)
+        Thu, 21 Oct 2021 15:23:49 +0000 (GMT)
 From:   Tony Krowiak <akrowiak@linux.ibm.com>
 To:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org
@@ -62,287 +62,87 @@ Cc:     jjherne@linux.ibm.com, freude@linux.ibm.com,
         pasic@linux.ibm.com, alex.williamson@redhat.com,
         kwankhede@nvidia.com, fiuczy@linux.ibm.com,
         Tony Krowiak <akrowiak@linux.ibm.com>
-Subject: [PATCH v17 01/15] s390/vfio-ap: Set pqap hook when vfio_ap module is loaded
-Date:   Thu, 21 Oct 2021 11:23:18 -0400
-Message-Id: <20211021152332.70455-2-akrowiak@linux.ibm.com>
+Subject: [PATCH v17 02/15] s390/vfio-ap: use new AP bus interface to search for queue devices
+Date:   Thu, 21 Oct 2021 11:23:19 -0400
+Message-Id: <20211021152332.70455-3-akrowiak@linux.ibm.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20211021152332.70455-1-akrowiak@linux.ibm.com>
 References: <20211021152332.70455-1-akrowiak@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: basTLTTw5JCvrp3mfTGEeXXaLqKx3vxs
-X-Proofpoint-GUID: PZB5RJa2rrH50o1_ierJJzataucwyNwp
+X-Proofpoint-ORIG-GUID: pX1oti3Tt5i8CnabncTxV88lUVGY5YMT
+X-Proofpoint-GUID: pNwyOrjhPlYjK56ym30Pw7V8UIWJZJpm
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
  definitions=2021-10-21_04,2021-10-21_02,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 priorityscore=1501
- malwarescore=0 spamscore=0 phishscore=0 lowpriorityscore=0 mlxlogscore=999
- bulkscore=0 impostorscore=0 clxscore=1015 adultscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2109230001
- definitions=main-2110210079
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ bulkscore=0 malwarescore=0 spamscore=0 lowpriorityscore=0 impostorscore=0
+ clxscore=1015 mlxlogscore=999 suspectscore=0 mlxscore=0 phishscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2109230001 definitions=main-2110210079
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Rather than storing the function pointer to the PQAP(AQIC) instruction
-interception handler with the mediated device (struct ap_matrix_mdev) when
-the vfio_ap device driver is notified that the KVM point is being set,
-let's store it once in a global variable when the vfio_ap module is
-loaded.
-
-There are three reasons for doing this:
-
-1. The lifetime of the interception handler function coincides with the
-   lifetime of the vfio_ap module, so it makes little sense to tie it to
-   the mediated device and complete sense to tie it to the module in which
-   the function resides.
-
-2. The setting/clearing of the function pointer is protected by a mutex
-   lock. This increases the number of locks taken during
-   VFIO_GROUP_NOTIFY_SET_KVM notification and increases the complexity of
-   ensuring locking integrity and avoiding circular lock dependencies.
-
-3. The lock will only be taken for writing twice: When the vfio_ap module
-   is loaded; and, when the vfio_ap module is removed. As it stands now,
-   the lock is taken for writing whenever a guest is started or terminated.
+This patch refactors the vfio_ap device driver to use the AP bus's
+ap_get_qdev() function to retrieve the vfio_ap_queue struct containing
+information about a queue that is bound to the vfio_ap device driver.
+The bus's ap_get_qdev() function retrieves the queue device from a
+hashtable keyed by APQN. This is much more efficient than looping over
+the list of devices attached to the AP bus by several orders of
+magnitude.
 
 Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
+Reviewed-by: Jason J. Herne <jjherne@linux.ibm.com>
 ---
- arch/s390/include/asm/kvm_host.h      | 10 ++++--
- arch/s390/kvm/kvm-s390.c              |  1 -
- arch/s390/kvm/priv.c                  | 45 ++++++++++++++++++++++-----
- drivers/s390/crypto/vfio_ap_ops.c     | 27 ++++++++--------
- drivers/s390/crypto/vfio_ap_private.h |  1 -
- 5 files changed, 58 insertions(+), 26 deletions(-)
+ drivers/s390/crypto/vfio_ap_ops.c | 23 +++++++++--------------
+ 1 file changed, 9 insertions(+), 14 deletions(-)
 
-diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
-index a604d51acfc8..05569d077d7f 100644
---- a/arch/s390/include/asm/kvm_host.h
-+++ b/arch/s390/include/asm/kvm_host.h
-@@ -799,16 +799,17 @@ struct kvm_s390_cpu_model {
- 	unsigned short ibc;
- };
- 
--typedef int (*crypto_hook)(struct kvm_vcpu *vcpu);
-+struct kvm_s390_crypto_hook {
-+	int (*fcn)(struct kvm_vcpu *vcpu);
-+};
- 
- struct kvm_s390_crypto {
- 	struct kvm_s390_crypto_cb *crycb;
--	struct rw_semaphore pqap_hook_rwsem;
--	crypto_hook *pqap_hook;
- 	__u32 crycbd;
- 	__u8 aes_kw;
- 	__u8 dea_kw;
- 	__u8 apie;
-+	void *data;
- };
- 
- #define APCB0_MASK_SIZE 1
-@@ -998,6 +999,9 @@ extern char sie_exit;
- extern int kvm_s390_gisc_register(struct kvm *kvm, u32 gisc);
- extern int kvm_s390_gisc_unregister(struct kvm *kvm, u32 gisc);
- 
-+extern int kvm_s390_pqap_hook_register(struct kvm_s390_crypto_hook *hook);
-+extern int kvm_s390_pqap_hook_unregister(struct kvm_s390_crypto_hook *hook);
-+
- static inline void kvm_arch_hardware_disable(void) {}
- static inline void kvm_arch_sync_events(struct kvm *kvm) {}
- static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index 6a6dd5e1daf6..c91981599328 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -2649,7 +2649,6 @@ static void kvm_s390_crypto_init(struct kvm *kvm)
- {
- 	kvm->arch.crypto.crycb = &kvm->arch.sie_page2->crycb;
- 	kvm_s390_set_crycb_format(kvm);
--	init_rwsem(&kvm->arch.crypto.pqap_hook_rwsem);
- 
- 	if (!test_kvm_facility(kvm, 76))
- 		return;
-diff --git a/arch/s390/kvm/priv.c b/arch/s390/kvm/priv.c
-index 53da4ceb16a3..3d91ff934c0c 100644
---- a/arch/s390/kvm/priv.c
-+++ b/arch/s390/kvm/priv.c
-@@ -31,6 +31,39 @@
- #include "kvm-s390.h"
- #include "trace.h"
- 
-+DEFINE_MUTEX(pqap_hook_lock);
-+static struct kvm_s390_crypto_hook *pqap_hook;
-+
-+int kvm_s390_pqap_hook_register(struct kvm_s390_crypto_hook *hook)
-+{
-+	int ret = 0;
-+
-+	mutex_lock(&pqap_hook_lock);
-+	if (pqap_hook)
-+		ret = -EACCES;
-+	else
-+		pqap_hook = hook;
-+	mutex_unlock(&pqap_hook_lock);
-+
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(kvm_s390_pqap_hook_register);
-+
-+int kvm_s390_pqap_hook_unregister(struct kvm_s390_crypto_hook *hook)
-+{
-+	int ret = 0;
-+
-+	mutex_lock(&pqap_hook_lock);
-+	if (hook != pqap_hook)
-+		ret = -EACCES;
-+	else
-+		pqap_hook = NULL;
-+	mutex_unlock(&pqap_hook_lock);
-+
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(kvm_s390_pqap_hook_unregister);
-+
- static int handle_ri(struct kvm_vcpu *vcpu)
- {
- 	vcpu->stat.instruction_ri++;
-@@ -610,7 +643,6 @@ static int handle_io_inst(struct kvm_vcpu *vcpu)
- static int handle_pqap(struct kvm_vcpu *vcpu)
- {
- 	struct ap_queue_status status = {};
--	crypto_hook pqap_hook;
- 	unsigned long reg0;
- 	int ret;
- 	uint8_t fc;
-@@ -659,16 +691,15 @@ static int handle_pqap(struct kvm_vcpu *vcpu)
- 	 * hook function pointer in the kvm_s390_crypto structure. Lock the
- 	 * owner, retrieve the hook function pointer and call the hook.
- 	 */
--	down_read(&vcpu->kvm->arch.crypto.pqap_hook_rwsem);
--	if (vcpu->kvm->arch.crypto.pqap_hook) {
--		pqap_hook = *vcpu->kvm->arch.crypto.pqap_hook;
--		ret = pqap_hook(vcpu);
-+	mutex_lock(&pqap_hook_lock);
-+	if (pqap_hook) {
-+		ret = pqap_hook->fcn(vcpu);
- 		if (!ret && vcpu->run->s.regs.gprs[1] & 0x00ff0000)
- 			kvm_s390_set_psw_cc(vcpu, 3);
--		up_read(&vcpu->kvm->arch.crypto.pqap_hook_rwsem);
-+		mutex_unlock(&pqap_hook_lock);
- 		return ret;
- 	}
--	up_read(&vcpu->kvm->arch.crypto.pqap_hook_rwsem);
-+	mutex_unlock(&pqap_hook_lock);
- 	/*
- 	 * A vfio_driver must register a hook.
- 	 * No hook means no driver to enable the SIE CRYCB and no queues.
 diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
-index 94c1c9bd58ad..02275d246b39 100644
+index 02275d246b39..7a9d1b04ecd4 100644
 --- a/drivers/s390/crypto/vfio_ap_ops.c
 +++ b/drivers/s390/crypto/vfio_ap_ops.c
-@@ -293,13 +293,10 @@ static int handle_pqap(struct kvm_vcpu *vcpu)
- 	apqn = vcpu->run->s.regs.gprs[0] & 0xffff;
- 	mutex_lock(&matrix_dev->lock);
+@@ -28,13 +28,6 @@ static int vfio_ap_mdev_reset_queues(struct ap_matrix_mdev *matrix_mdev);
+ static struct vfio_ap_queue *vfio_ap_find_queue(int apqn);
+ static const struct vfio_device_ops vfio_ap_matrix_dev_ops;
  
--	if (!vcpu->kvm->arch.crypto.pqap_hook)
--		goto out_unlock;
--	matrix_mdev = container_of(vcpu->kvm->arch.crypto.pqap_hook,
--				   struct ap_matrix_mdev, pqap_hook);
-+	matrix_mdev = vcpu->kvm->arch.crypto.data;
- 
- 	/* If the there is no guest using the mdev, there is nothing to do */
--	if (!matrix_mdev->kvm)
-+	if (!matrix_mdev || !matrix_mdev->kvm)
- 		goto out_unlock;
- 
- 	q = vfio_ap_get_queue(matrix_mdev, apqn);
-@@ -348,7 +345,6 @@ static int vfio_ap_mdev_probe(struct mdev_device *mdev)
- 
- 	matrix_mdev->mdev = mdev;
- 	vfio_ap_matrix_init(&matrix_dev->info, &matrix_mdev->matrix);
--	matrix_mdev->pqap_hook = handle_pqap;
- 	mutex_lock(&matrix_dev->lock);
- 	list_add(&matrix_mdev->node, &matrix_dev->mdev_list);
- 	mutex_unlock(&matrix_dev->lock);
-@@ -1078,10 +1074,6 @@ static int vfio_ap_mdev_set_kvm(struct ap_matrix_mdev *matrix_mdev,
- 	struct ap_matrix_mdev *m;
- 
- 	if (kvm->arch.crypto.crycbd) {
--		down_write(&kvm->arch.crypto.pqap_hook_rwsem);
--		kvm->arch.crypto.pqap_hook = &matrix_mdev->pqap_hook;
--		up_write(&kvm->arch.crypto.pqap_hook_rwsem);
+-static int match_apqn(struct device *dev, const void *data)
+-{
+-	struct vfio_ap_queue *q = dev_get_drvdata(dev);
 -
- 		mutex_lock(&kvm->lock);
- 		mutex_lock(&matrix_dev->lock);
- 
-@@ -1095,6 +1087,7 @@ static int vfio_ap_mdev_set_kvm(struct ap_matrix_mdev *matrix_mdev,
- 
- 		kvm_get_kvm(kvm);
- 		matrix_mdev->kvm = kvm;
-+		kvm->arch.crypto.data = matrix_mdev;
- 		kvm_arch_crypto_set_masks(kvm,
- 					  matrix_mdev->matrix.apm,
- 					  matrix_mdev->matrix.aqm,
-@@ -1155,16 +1148,13 @@ static void vfio_ap_mdev_unset_kvm(struct ap_matrix_mdev *matrix_mdev,
- 				   struct kvm *kvm)
- {
- 	if (kvm && kvm->arch.crypto.crycbd) {
--		down_write(&kvm->arch.crypto.pqap_hook_rwsem);
--		kvm->arch.crypto.pqap_hook = NULL;
--		up_write(&kvm->arch.crypto.pqap_hook_rwsem);
+-	return (q->apqn == *(int *)(data)) ? 1 : 0;
+-}
 -
- 		mutex_lock(&kvm->lock);
- 		mutex_lock(&matrix_dev->lock);
+ /**
+  * vfio_ap_get_queue - retrieve a queue with a specific APQN from a list
+  * @matrix_mdev: the associated mediated matrix
+@@ -1183,15 +1176,17 @@ static int vfio_ap_mdev_group_notifier(struct notifier_block *nb,
  
- 		kvm_arch_crypto_clear_masks(kvm);
- 		vfio_ap_mdev_reset_queues(matrix_mdev);
- 		kvm_put_kvm(kvm);
-+		kvm->arch.crypto.data = NULL;
- 		matrix_mdev->kvm = NULL;
- 
- 		mutex_unlock(&kvm->lock);
-@@ -1391,12 +1381,20 @@ static const struct mdev_parent_ops vfio_ap_matrix_ops = {
- 	.supported_type_groups	= vfio_ap_mdev_type_groups,
- };
- 
-+static struct kvm_s390_crypto_hook pqap_hook = {
-+	.fcn = handle_pqap,
-+};
-+
- int vfio_ap_mdev_register(void)
+ static struct vfio_ap_queue *vfio_ap_find_queue(int apqn)
  {
- 	int ret;
+-	struct device *dev;
++	struct ap_queue *queue;
+ 	struct vfio_ap_queue *q = NULL;
  
- 	atomic_set(&matrix_dev->available_instances, MAX_ZDEV_ENTRIES_EXT);
- 
-+	ret = kvm_s390_pqap_hook_register(&pqap_hook);
-+	if (ret)
-+		return ret;
+-	dev = driver_find_device(&matrix_dev->vfio_ap_drv->driver, NULL,
+-				 &apqn, match_apqn);
+-	if (dev) {
+-		q = dev_get_drvdata(dev);
+-		put_device(dev);
+-	}
++	queue = ap_get_qdev(apqn);
++	if (!queue)
++		return NULL;
 +
- 	ret = mdev_register_driver(&vfio_ap_matrix_driver);
- 	if (ret)
- 		return ret;
-@@ -1413,6 +1411,7 @@ int vfio_ap_mdev_register(void)
++	if (queue->ap_dev.device.driver == &matrix_dev->vfio_ap_drv->driver)
++		q = dev_get_drvdata(&queue->ap_dev.device);
++
++	put_device(&queue->ap_dev.device);
  
- void vfio_ap_mdev_unregister(void)
- {
-+	WARN_ON(kvm_s390_pqap_hook_unregister(&pqap_hook));
- 	mdev_unregister_device(&matrix_dev->device);
- 	mdev_unregister_driver(&vfio_ap_matrix_driver);
+ 	return q;
  }
-diff --git a/drivers/s390/crypto/vfio_ap_private.h b/drivers/s390/crypto/vfio_ap_private.h
-index 648fcaf8104a..907f41160de7 100644
---- a/drivers/s390/crypto/vfio_ap_private.h
-+++ b/drivers/s390/crypto/vfio_ap_private.h
-@@ -97,7 +97,6 @@ struct ap_matrix_mdev {
- 	struct notifier_block group_notifier;
- 	struct notifier_block iommu_notifier;
- 	struct kvm *kvm;
--	crypto_hook pqap_hook;
- 	struct mdev_device *mdev;
- };
- 
 -- 
 2.31.1
 
