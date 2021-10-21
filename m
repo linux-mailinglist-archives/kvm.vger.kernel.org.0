@@ -2,92 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2C4384369AC
-	for <lists+kvm@lfdr.de>; Thu, 21 Oct 2021 19:47:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9587F4369B0
+	for <lists+kvm@lfdr.de>; Thu, 21 Oct 2021 19:48:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232495AbhJURuK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Oct 2021 13:50:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:59830 "EHLO
+        id S232449AbhJURuQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Oct 2021 13:50:16 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47886 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232335AbhJURt5 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 21 Oct 2021 13:49:57 -0400
+        by vger.kernel.org with ESMTP id S232435AbhJURuN (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 21 Oct 2021 13:50:13 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634838461;
+        s=mimecast20190719; t=1634838476;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=RBfAVrB74SlDq2h9NJPSX6K7Aqze9lO+g3JyEdnqq0o=;
-        b=E4hIKrS5rjh/W4UzlCxkmELBnpPg5xCrIbULgCbP99RIKUUknLCCgi4aJjpAQbI0ss84a1
-        qEr78jVzBFHCfDKsU/kVb1m8OYeS+MXhOhTYfwjY5z0EwonEnmXCMX9JhaZ9TQPZ/QShQ4
-        zthxJHXFBk/ton3KIcERmNKlEmyYGN0=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-51-0jiXHdslOV-Qw0PsdHL0IA-1; Thu, 21 Oct 2021 13:47:39 -0400
-X-MC-Unique: 0jiXHdslOV-Qw0PsdHL0IA-1
-Received: by mail-ed1-f70.google.com with SMTP id t18-20020a056402021200b003db9e6b0e57so1136440edv.10
-        for <kvm@vger.kernel.org>; Thu, 21 Oct 2021 10:47:39 -0700 (PDT)
+        bh=sdVy6FwDaq466AExZNtZZOl0E2m/+xf4V5tJYwOKByc=;
+        b=eugDPjAcOFmIxVsh4ad+0OdKhkR40/LvJTeI92IFk1pXjalZ2RP0xkxKAvn397qtP222t2
+        Qz76xSDgujap/RGCf22oabsaRZ8CONB3e2Tbw77TLgTeDR1C5+PoPNp7uUsAzzeLxO3VvH
+        FmU4u0Ghc36bQRFYU4zTe7ieDmPQNI8=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-267-Eii-Jdv6P-Sfw_8obDIS6Q-1; Thu, 21 Oct 2021 13:47:55 -0400
+X-MC-Unique: Eii-Jdv6P-Sfw_8obDIS6Q-1
+Received: by mail-wm1-f72.google.com with SMTP id o22-20020a1c7516000000b0030d6f9c7f5fso183564wmc.1
+        for <kvm@vger.kernel.org>; Thu, 21 Oct 2021 10:47:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:from:to:cc:references:in-reply-to
-         :content-transfer-encoding;
-        bh=RBfAVrB74SlDq2h9NJPSX6K7Aqze9lO+g3JyEdnqq0o=;
-        b=5xU2ZgzEI5sLY86nC/ab1b9C/W0xJ6ttJTOQzdVFxP7ujT2Q8GEQdftBqUOXTMa+Jx
-         w2AifIwLPHtjLiuyCFHrlfrKq8OSlNn8TilNtmC3CjZ03ymwzFR5B6C1IkxeFPZ7o/RY
-         KnUiROLL51yR01PTaYP1jk0y+MqvC8LCEiD3LYaCUkHoRUavm3BE6PsRAciZMme/OZgL
-         GmiKUsSP8QujDz3i7Z2pSOqKTZeqrmz/jYsB4dtthlM5u62P4VlFe3nsh7zYru8pt0FB
-         61tK5c5ZjMkth2GrnDotqsdO8BaQpmjhQIcvAcJOrwxTtl5l3CkwnDrSS/lGNnR2Kgfy
-         b9ZQ==
-X-Gm-Message-State: AOAM532jWpgaQD4awoiZ2Y9qlbOUY8M9JP7gFoQu79wxKJP9Wlhomv1z
-        VIV6zvXI5/2BZeiyKWUdl2RppAwYJt2+bPhEx/OwuhnxUIa8B0tIEULhewWDXqPEWLfaUehy3fP
-        PmZvPzBEa5ShK
-X-Received: by 2002:a05:6402:5209:: with SMTP id s9mr9387317edd.250.1634838458467;
-        Thu, 21 Oct 2021 10:47:38 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyozM7RYS3i1RxKK7/0nw1ZHM3yaMyHXPKQ7O7RuXaEgIeNvfeqoaeF55tmEtZS7kqr9HaGXA==
-X-Received: by 2002:a05:6402:5209:: with SMTP id s9mr9387290edd.250.1634838458241;
-        Thu, 21 Oct 2021 10:47:38 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.gmail.com with ESMTPSA id d18sm3286859ejo.80.2021.10.21.10.47.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 Oct 2021 10:47:37 -0700 (PDT)
-Message-ID: <435767c0-958d-f90f-d11a-cff42ab1205c@redhat.com>
-Date:   Thu, 21 Oct 2021 19:47:36 +0200
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=sdVy6FwDaq466AExZNtZZOl0E2m/+xf4V5tJYwOKByc=;
+        b=EFCwFs4TdOzGEmCGnR76fTMpJcZy6E2SAqT44LaCJArar2RdIdSsUiD7j30XNgDPO6
+         enGMpFS5GQDp4ffi1nD5ZJfKBjlAFv2cax2pkv5CVIMpwfCu0So2BaDgUHovUoHG7r/g
+         2akrztL84dYg26X9wv6HH8oXSvDMOXnTHPFQtXP88Gy5KKrv8YdLRAEF5KXmxZ7ZSRAF
+         mDczNPotoVHfublIzT6/qeH34oCHgjbZsVaQLe0gD+Acy0FhPdpmPfeImRAg8DrX5hWH
+         yMLyq/mEuQCnUlJXvZCKtsa3s3C4NoVJlm7ftoDthAMJc8O+z5JIINJHtO747WUErudX
+         uAMw==
+X-Gm-Message-State: AOAM531PD5vgguEVUIQvm8+0sGto4f3D/N0X5nhHghQor5FYfWoortiZ
+        3gTubwEfsANsyRJLlw+yDkTidnsQoLZx/AzmJmdQ95DGAkvinNI25KFFlGyOPfdW1kv+9Noail4
+        9PzUZcsCiiLYg
+X-Received: by 2002:a7b:cbd1:: with SMTP id n17mr23050389wmi.113.1634838473751;
+        Thu, 21 Oct 2021 10:47:53 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyrJOA3K2+jcEdUJkI5yUOvDRbh0LHvWJK/dSXnO5HgNUEG6KoK85UuOyllpMd1Zyh5XoN7lA==
+X-Received: by 2002:a7b:cbd1:: with SMTP id n17mr23050368wmi.113.1634838473557;
+        Thu, 21 Oct 2021 10:47:53 -0700 (PDT)
+Received: from work-vm (cpc109025-salf6-2-0-cust480.10-2.cable.virginm.net. [82.30.61.225])
+        by smtp.gmail.com with ESMTPSA id l40sm6144308wms.31.2021.10.21.10.47.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Oct 2021 10:47:52 -0700 (PDT)
+Date:   Thu, 21 Oct 2021 18:47:50 +0100
+From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To:     Borislav Petkov <bp@alien8.de>
+Cc:     Michael Roth <michael.roth@amd.com>,
+        Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH v6 08/42] x86/sev-es: initialize sev_status/features
+ within #VC handler
+Message-ID: <YXGnxs0hV3IKGDwP@work-vm>
+References: <20211008180453.462291-9-brijesh.singh@amd.com>
+ <YW2EsxcqBucuyoal@zn.tnic>
+ <20211018184003.3ob2uxcpd2rpee3s@amd.com>
+ <YW3IdfMs61191qnU@zn.tnic>
+ <20211020161023.hzbj53ehmzjrt4xd@amd.com>
+ <YXF9sCbPDsLwlm42@zn.tnic>
+ <YXGNmeR/C33HvaBi@work-vm>
+ <YXGbcqN2IRh9YJk9@zn.tnic>
+ <YXGflXdrAXH5fE5H@work-vm>
+ <YXGlPf5OTPzp09qr@zn.tnic>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [PATCH 0/8] KVM: SEV-ES: fixes for string I/O emulation
-Content-Language: en-US
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     fwilhelm@google.com, seanjc@google.com, oupton@google.com
-References: <20211013165616.19846-1-pbonzini@redhat.com>
-In-Reply-To: <20211013165616.19846-1-pbonzini@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YXGlPf5OTPzp09qr@zn.tnic>
+User-Agent: Mutt/2.0.7 (2021-05-04)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 13/10/21 18:56, Paolo Bonzini wrote:
-> This series, namely patches 1 and 8, fix two bugs in string I/O
-> emulation for SEV-ES:
+* Borislav Petkov (bp@alien8.de) wrote:
+> On Thu, Oct 21, 2021 at 06:12:53PM +0100, Dr. David Alan Gilbert wrote:
+> > OK, so that bit is 8...21 Eax ext2eax bit 6 page 1-109
+> > 
+> > then 2.1.5.3 CPUID policy enforcement shows 8...21 EAX as
+> > 'bitmask'
+> > 'bits set in the GuestVal must also be set in HostVal.
+> > This is often applied to feature fields where each bit indicates
+> > support for a feature'
+> > 
+> > So that's right isn't it?
 > 
-> - first, the length is completely off for "rep ins" and "rep outs"
->    operation of size > 1.  After setup_vmgexit_scratch, svm->ghcb_sa_len
->    is in bytes, but kvm_sev_es_string_io expects the number of PIO
->    operations.
+> Yap, AFAIRC, it would fail the check if:
 > 
-> - second, the size of the GHCB buffer can exceed the size of
->    vcpu->arch.pio_data.  If that happens, we need to go over the GHCB
->    buffer in multiple passes.
+> (GuestVal & HostVal) != GuestVal
 > 
-> The second bug was reported by Felix Wilhelm.  The first was found by
-> me by code inspection; on one hand it seems *too* egregious so I'll be
-> gladly proven wrong on this, on the other hand... I know I'm bad at code
-> review, but not _that_ bad.
+> and GuestVal is "the CPUID result value created by the hypervisor that
+> it wants to give to the guest". Let's say it clears bit 6 there.
+                                               ^^^^^^^
 
-Ping.
+> Then HostVal comes in which is "the actual CPUID result value specified
+> in this PPR" and there the guest catches the HV lying its *ss off.
+> 
+> :-)
 
-Paolo
+Hang on, I think it's perfectly fine for it to clear that bit - it just
+gets caught if it *sets* it (i.e. claims to be a chip unaffected by the
+bug).
+
+i.e. if guestval=0 then (GustVal & whatever) == GuestVal
+  fine
+
+?
+
+Dave
+
+> 
+> -- 
+> Regards/Gruss,
+>     Boris.
+> 
+> https://people.kernel.org/tglx/notes-about-netiquette
+> 
+-- 
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
