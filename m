@@ -2,200 +2,511 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6DC06436E56
-	for <lists+kvm@lfdr.de>; Fri, 22 Oct 2021 01:30:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B6462436E83
+	for <lists+kvm@lfdr.de>; Fri, 22 Oct 2021 01:49:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231691AbhJUXc5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Oct 2021 19:32:57 -0400
-Received: from mail-dm6nam11on2049.outbound.protection.outlook.com ([40.107.223.49]:44128
-        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S230500AbhJUXc4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Oct 2021 19:32:56 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fum4tDPa1VT/rGg+tfoGL1loNbgm9CgYi3uk935uslLVvaESXvy8q8EhGpmV/EfNeLlPJEtz/2ysFMdK6hVqVl9IqRh2CzBqL2uRiG/AbVvoNiSqeVl10wAMtBALY4WIGfl1BKLOJdSpYGMt4m6GfQmJV9h2+bU5a8TlqNd6fjyCqjRf5BvOpScVoRpKPgmeEQWr9Nc5hbgO86QdwABMVCgD2+F0PIlsVSovBllYyIju4rkRo+EdYjhaiOQPVVUs6IPNTS03dwcZRYcvf24KXFNheO3jNPn/OPgOGlJhT2sfLArmha1vZpHXEPs/igpH080pNczCvC2sRtR9q3W6Wg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Qb+qT1otgVwBCUEVAurEzIqCU+Lv4PtlTuiWolugM+M=;
- b=N7JAtf6wJo6MRAfRoBy0ywh55KKvm6SG7oVZsLfn+i+NIpglTlGTimmTXUvcQ36y7JM1PmcmctiXxEQm7yvTM2TtvJ+iqu6QReGy048EL8/2s8V1hVk7SBaLjTBuHLPJYjcD0g5TCzAJBVV7l24NIpIHHhTYjGPMNpuGgcusgZQRwy6puZfhNzf0I0RPnBUhpawgnRL+jCJ4CBdWWGETXNjezamJBwZKf3hjRCmphxMfmemsZdFtBxAp3IklvQDSzjx8KNdqPmGAyWN/PQWZUVy6oo37aRhUTnRZBKIA5P0VBGbUMWNLIrmCslEa2uTzkRwztRCGeQRqOz2ad4QmEQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Qb+qT1otgVwBCUEVAurEzIqCU+Lv4PtlTuiWolugM+M=;
- b=qjSX1ZXRKi7RfIUgOWYZgcsgrwchtRFnUGYSnNDEbbWCyk9u6APZ3jfvUsfP8SCyOcdVB4M4PWd/9wFYVfygPDrX/U7qv5y7wln4hJpo4YfjdhkwRxrZ1r6hX9p14wcoxryrM+lIwZLNgWt/n+aWrFLtdfkHIW+6Jf2EuYmAwBZfdf7LCCKiqezLgqFH46P0hmgDQThI5hpKcaWLbpzTQlTiQQIyOK3xDsOtu0ys3HID2WotSE71PMS3fmYu2WB9O8ChtjnX0LVRCFvi/4zvKgvrTn7X9lfO/r5r8xDR7u9DbqQmfAHx401pAgRIxoNQNLh26kO/ln0mIMfJLZlL/A==
-Authentication-Results: intel.com; dkim=none (message not signed)
- header.d=none;intel.com; dmarc=none action=none header.from=nvidia.com;
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
- by BL1PR12MB5270.namprd12.prod.outlook.com (2603:10b6:208:31e::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4628.15; Thu, 21 Oct
- 2021 23:30:38 +0000
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::e8af:232:915e:2f95]) by BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::e8af:232:915e:2f95%8]) with mapi id 15.20.4628.018; Thu, 21 Oct 2021
- 23:30:38 +0000
-Date:   Thu, 21 Oct 2021 20:30:36 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>, "hch@lst.de" <hch@lst.de>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        "parav@mellanox.com" <parav@mellanox.com>,
-        "lkml@metux.net" <lkml@metux.net>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "lushenming@huawei.com" <lushenming@huawei.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "corbet@lwn.net" <corbet@lwn.net>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "yi.l.liu@linux.intel.com" <yi.l.liu@linux.intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "dwmw2@infradead.org" <dwmw2@infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-        "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>
-Subject: Re: [RFC 10/20] iommu/iommufd: Add IOMMU_DEVICE_GET_INFO
-Message-ID: <20211021233036.GN2744544@nvidia.com>
-References: <20210922234954.GB964074@nvidia.com>
- <BN9PR11MB5433409DF766AAEF1BB2CF258CA39@BN9PR11MB5433.namprd11.prod.outlook.com>
- <BN9PR11MB54333BDB1E58387FD9999DF18CA39@BN9PR11MB5433.namprd11.prod.outlook.com>
- <20210923114219.GG964074@nvidia.com>
- <BN9PR11MB5433519229319BA951CA97638CAA9@BN9PR11MB5433.namprd11.prod.outlook.com>
- <20210930222355.GH964074@nvidia.com>
- <BN9PR11MB5433530032DC8400B71FCB788CB89@BN9PR11MB5433.namprd11.prod.outlook.com>
- <20211014154259.GT2744544@nvidia.com>
- <BN9PR11MB543327BB6D58AEF91AD2C9D18CB99@BN9PR11MB5433.namprd11.prod.outlook.com>
- <BL1PR11MB5429973588E4FBCEC8F519A88CBF9@BL1PR11MB5429.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BL1PR11MB5429973588E4FBCEC8F519A88CBF9@BL1PR11MB5429.namprd11.prod.outlook.com>
-X-ClientProxiedBy: MN2PR01CA0037.prod.exchangelabs.com (2603:10b6:208:23f::6)
- To BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
+        id S232072AbhJUXvt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Oct 2021 19:51:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55124 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230190AbhJUXvs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Oct 2021 19:51:48 -0400
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A2C4C061766
+        for <kvm@vger.kernel.org>; Thu, 21 Oct 2021 16:49:32 -0700 (PDT)
+Received: by mail-pf1-x42e.google.com with SMTP id c29so2087590pfp.2
+        for <kvm@vger.kernel.org>; Thu, 21 Oct 2021 16:49:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=/1H+jcVPKSKARzdz+R/78iA2RxwShhclkNFJ3/ve7h4=;
+        b=porF5ZgSA2DNDUlfP13HzB6vbzB1pg3xMoWRghS7QCrUkDK6slaBGJY2rr9gMuG37F
+         q1U5nujB3oUMNn1hO5gEe/1iQnAz1EsdtyDc1x9uIWT/ha4i/yrN6tQfG13U+7fn08qL
+         o04k3SNfcT+4LOPW5S1MNLaTW3ABCMY5/2jK6ogK6GrYTmhPzqkBSZvNVOS6cPmtALrU
+         PuT4uEern6DaBXG3UBfAFY1h9n8hFW2ri6Sq7kyfmyvtxQJCrzURruipD0uSzVMLjA2P
+         VUKMg5imIQYFJ/7coWSqGaWvSTCvkJ0l1VNmFcYVuB2hqZU2/UAxZbUCgeGKP3B+j8kj
+         QonA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=/1H+jcVPKSKARzdz+R/78iA2RxwShhclkNFJ3/ve7h4=;
+        b=YapyJpJJ8WQ0cIaUhepAFp+odMK9qnmogXn4ByoH92EO4B2edFJF1+PJKoLAs/PU2a
+         WC79F72TlET+TtRwCzUP+Y4c5FxaANgRvxy0BM7kCUqwqFYggHe/bLzoQ4CdQJV/jDEX
+         6ZIt4ppJGSroH27kwidXUm8e5wYJkGMNpM9M/gmTiEgzZgOZkbAl6pnC75RbinM+prHo
+         qEfeifKH0fL754/21G+y4RjQ2h5/2qZqftXQfYf0Dj239QZQG9z16wNG5I1Gyo5DeMlP
+         Z4FXJI/ZbKlLibaa+4YBiN2kJY170McnotKky41b056d+CQzvH6GTQB+nhYe+OO+Y+PH
+         5+VQ==
+X-Gm-Message-State: AOAM532ba28ytrX3qOj0wiCSHXUUAsfF+AtPzHX8uu43Ztg98L8WusBn
+        UAKtM+D6qHs4xgZtXM2TKc4dgA==
+X-Google-Smtp-Source: ABdhPJw8tNzyd+xgyc8VvSKrrw1705nYnOMLbXkILQ8x8gj7cTLG7Vz+j51lFy7/L+l4bpLwsBuHgg==
+X-Received: by 2002:a05:6a00:2389:b0:44d:6d57:a38e with SMTP id f9-20020a056a00238900b0044d6d57a38emr9200598pfc.50.1634860171646;
+        Thu, 21 Oct 2021 16:49:31 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id z19sm2956029pjq.9.2021.10.21.16.49.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Oct 2021 16:49:30 -0700 (PDT)
+Date:   Thu, 21 Oct 2021 23:49:26 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        fwilhelm@google.com, oupton@google.com
+Subject: Re: [PATCH 0/8] KVM: SEV-ES: fixes for string I/O emulation
+Message-ID: <YXH8hmB64gnwxIx6@google.com>
+References: <20211013165616.19846-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Received: from mlx.ziepe.ca (142.162.113.129) by MN2PR01CA0037.prod.exchangelabs.com (2603:10b6:208:23f::6) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4628.15 via Frontend Transport; Thu, 21 Oct 2021 23:30:37 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1mdhW8-000Sef-Js; Thu, 21 Oct 2021 20:30:36 -0300
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 1ece51d2-b68e-4640-460a-08d994eac9c3
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5270:
-X-Microsoft-Antispam-PRVS: <BL1PR12MB5270F1A592A17E144DDD28EBC2BF9@BL1PR12MB5270.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: uFuuIQ8lGtefoTz2OS+UbXODz9Q5McjpJifmUTy0Lpvs0Ju0INuy7ZbYToS2JeAxIaiQmoBgrjFBzInaREq9lxDZg139Bf7a26eEUfIumNHu0Cpc3WK0Cx1zBSarO6tZ7o90ldAsBM1babKwtTju8JkKcPNygHRCI7LsCjFCIT7l9lT4CifzUHFclixNVNfcVrpvpQ0GMpmIz3+WRcNDVNp8XVBlrAOfwpg2ZeRaaZYHzecj7gEgfF7HnBRpg36481DkR7PuXB0zvBD/VSmOgnoaLFqKRTrKqlwNuk/8jBCG9jpz8xMwcI/UYI/chuc6EBKlm7hA2XOFnAfsbq97ovq29ZTWUl/FPRrv24JaYluyFUCvXPJ9coSCOdXWYa8d4mI7Hj5MBfEipg7GEYcN1dPc//yDN8Zb4KTgmJ483UuiVO69x0ag9Xe8b+z87g/7f7VvFZik5M6LZ63Ic9b3vy2TEwT/i9MDm3pmcFVw9pT0MJhxqlJJq10FXnDjUBVNWcIleXbnnWK4iauW+txyWJpZL/fxuTSVLJxUf9w9HVZ9DmrNv5CvB02+7IxvYt7Dzg0aSS8K2dC7tHhKCMlcn+x1G8ixbIBxwBIKZaf4J++KocJHxvlH6rOrShtuCi0a88oIIXmH9YH3H1PCzSsxiw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(8936002)(186003)(1076003)(38100700002)(4326008)(36756003)(2906002)(26005)(9746002)(33656002)(426003)(2616005)(316002)(107886003)(86362001)(508600001)(8676002)(54906003)(5660300002)(66946007)(83380400001)(66556008)(9786002)(66476007)(7416002)(6916009);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?pppXH+4JniLnVQ+e9g81WPf6PXb5NWI81H0xQrYIDYnz1W9a8hEjlrkfWEKP?=
- =?us-ascii?Q?A3abSRBmfajUuUsAcDynFncMgNDaTpAr8WWu0+7S+Hzeyah3Yp1+kqF8/0Sh?=
- =?us-ascii?Q?8I3pqI4kR3+BEDWa6qvf1S3y3esGwBlFtoknxuy2cENbZukjmqaU4RxM5VhL?=
- =?us-ascii?Q?UYh5kWR4GGPO7TAlSzx+3Z8OqKWGixmokmEg2rq+VJaa2K8kgfIlJMK/4hbv?=
- =?us-ascii?Q?1l98ml9cXaH34rRZQnHw04DKbMOxX+67qFa13tqkEIMYAY4kTR4vY0HonLe+?=
- =?us-ascii?Q?OH0WFlH7WPGZ9TpTQZCoXgCtseKvK3zI3MW9TeEd5RA4c5C/EmMFJC+M2ZCt?=
- =?us-ascii?Q?0dMbZ2tr0A1MwT9o2CPXwphxAkE1tipvQ1fjEkTf6LvY696MiKJUJ5F6Ro9z?=
- =?us-ascii?Q?JkRxFudfbkP1vqCatdi68w6FHIbi6MYVwmBPZ5c/vJSXJyUfVqQ18Kk4J8aE?=
- =?us-ascii?Q?sJvKl5WzLrpYma1UCh9f22TZW3/+T9CFhWHawklAX2S7WLPVJ7B0GF6aqsZv?=
- =?us-ascii?Q?hA40atkUtFAJ1YSyfJg0TZPs4ZjQsZd7IjLxyPtJmGRidF9cSBB9Z9/IB3Vv?=
- =?us-ascii?Q?J+6xC0zuCWkfUcIqSZBoTtCLleNsWL57wB6f9tlXdOhHWJ4z3XxoAAoeOmJt?=
- =?us-ascii?Q?88DGUpDykGdf/CB2XCdphb+y9wfEWawyvgZKZoLKaInZ0l6t2wjdbodiI8d6?=
- =?us-ascii?Q?n+Zb3JYn0CosDSG1Ouz7i5nEDskcXQ7BQQistGX1YtwAyFNdV1ovZxajfYl5?=
- =?us-ascii?Q?OUr0syZTn4TDuNWasIg5UmSPpEm6zi3PbD+De4hIcK0bLoLwubX/AhaBivoN?=
- =?us-ascii?Q?j5oJPWOjHf3KYkTDrznNs4hbCo7avaBSHIKxAPw16X5c0HC/eSCl3E/1G9Ya?=
- =?us-ascii?Q?4ZUzBfzHx2A7tYLYxkmpdNLnKYPnFWB0Xkh8L7aR/1GGTk6HtcWqe/bkfPD4?=
- =?us-ascii?Q?dzAxWwwgM/XL3PJr3y++mRd+SaLE5HTttJt1bhgcFiGXRUbVUNCnUvOSW9nU?=
- =?us-ascii?Q?yfUxUhh+O738rEGjDaRkBXCNOwyThxhu83oOSYMVp3Q9ertz7QB+s/Uf4hHK?=
- =?us-ascii?Q?dDUuR3jCG8c/SvC0r6Cg7LXni+Pq7xgo0HGUnUTE1zu4hna96LCfROiZg2mg?=
- =?us-ascii?Q?VwCBhbO0cmPb41VNoco7d2bvc56mumx08fIk2AqsMfRcurYk4w0IuMM9XgDl?=
- =?us-ascii?Q?E5RLHQZBNqghQejtonUcFp9zBBemonQz9WFGXpMOeCO+qFqqcG21nIl9GNZR?=
- =?us-ascii?Q?zdOweeB64IZbtLSLiLogwsK1bRVx1TQdZviZJkcFmhp+yS5Ozm2n+6+Z1LQb?=
- =?us-ascii?Q?3in72SPpiNO0RY5M76HgJEPWQw3+FdGuAGnLK0VMe9BMJXCf/voDTp2PHECI?=
- =?us-ascii?Q?V7XtDbYc/rKGsCe1G4Fm/h6wVHOqxiuMzzW3QjrEGsAPH19rv9NRgwJqMOVS?=
- =?us-ascii?Q?sk7wlIEK1iM=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1ece51d2-b68e-4640-460a-08d994eac9c3
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Oct 2021 23:30:38.0968
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: jgg@nvidia.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5270
+Content-Type: multipart/mixed; boundary="kTbyx1pw6IySRUfp"
+Content-Disposition: inline
+In-Reply-To: <20211013165616.19846-1-pbonzini@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 21, 2021 at 02:26:00AM +0000, Tian, Kevin wrote:
 
-> But in reality only Intel integrated GPUs have this special no-snoop 
-> trick (fixed knowledge), with a dedicated IOMMU which doesn't
-> support enforce-snoop format at all. In this case there is no choice
-> that the user can further make. 
+--kTbyx1pw6IySRUfp
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-huh? That is not true at all. no-snoop is a PCIe spec behavior, any
-device can trigger it
+On Wed, Oct 13, 2021, Paolo Bonzini wrote:
+> Patches 2 to 7 are a bunch of cleanups to emulator_pio_in and
+> emulator_pio_in_out, so that the final SEV code is a little easier
+> to reason on.  Just a little, no big promises.
 
-What is true today is that only Intel GPU drivers are crazy enough to
-use it on Linux without platform support.
+IMO, this series goes in the wrong direction and doesn't make the mess any better,
+just different.
 
-> Also per Christoph's comment no-snoop is not an encouraged 
-> usage overall.
+The underlying issue is that kernel_pio() does the completely horrendous thing
+of consuming vcpu->arch.pio.  That leads to the juggling that this series tries
+to clean up, but it's essentially an impossible problem to solve because the
+approach itself is broken.
 
-I wouldn't say that, I think Christoph said using it without API
-support through the DMA layer is very wrong.
+The _only_ reason vcpu->arch.pio (the structure) exists is to snapshot a port I/O
+operation that didn't originate from the emulator before exiting to userspace,
+i.e. "fast" I/O and now SEV-ES.  Ignoring those two, all info comes from the
+emulator and a single flag or even the cui pointer would suffice.
 
-DMA layer support could be added if there was interest, all the pieces
-are there to do it.
+Ditto for pio_data, it's purely needed to let userspace read/write values, its
+use directly in any code except those specific paths is just bad code.
 
-> Given that I wonder whether the current vfio model better suites for
-> this corner case, i.e. just let the kernel to handle instead of
-> exposing it in uAPI. The simple policy (as vfio does) is to
-> automatically set enforce-snoop when the target IOMMU supports it,
-> otherwise enable vfio/kvm contract to handle no-snoop requirement.
+So instead of juggling vcpu->arch.pio.count in weird places, just don't set the
+damn thing in the first place.
 
-IMHO you need to model it as the KVM people said - if KVM can execute
-a real wbinvd in a VM then an ioctl shoudl be available to normal
-userspace to run the same instruction.
+Untested patches attached that frame in where I think we should go with this.
 
-So, figure out some rules to add a wbinvd ioctl to iommufd that makes
-some kind of sense and logically kvm is just triggering that ioctl,
-including whatever security model protects it.
+I'll be offline until Monday, apologies for the inconvenience.
 
-I have no idea what security model makes sense for wbinvd, that is the
-major question you have to answer.
+--kTbyx1pw6IySRUfp
+Content-Type: text/x-diff; charset=us-ascii
+Content-Disposition: attachment;
+	filename="0001-KVM-x86-Don-t-exit-to-userspace-when-SEV-ES-INS-is-s.patch"
 
-And obviously none of this should be hidden behind a private API to
-KVM.
+From 17384716129668b6636237b410a3885aaf32efb3 Mon Sep 17 00:00:00 2001
+From: Sean Christopherson <seanjc@google.com>
+Date: Thu, 21 Oct 2021 16:22:27 -0700
+Subject: [PATCH 1/6] KVM: x86: Don't exit to userspace when SEV-ES INS is
+ successful
 
-> I don't see any interest in implementing an Intel GPU driver fully
-> in userspace. If just talking about possibility, a separate uAPI can 
-> be still introduced to allow the userspace to issue wbinvd as Paolo
-> suggested.
-> 
-> One side-effect of doing so is that then we may have to support
-> multiple domains per IOAS when Intel GPU and other devices are
-> attached to the same IOAS.
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/x86.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I think we already said the IOAS should represent a single IO page
-table layout?
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index c59b63c56af9..c245edfd974c 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -12509,7 +12509,7 @@ static int kvm_sev_es_ins(struct kvm_vcpu *vcpu, unsigned int size,
+ 		vcpu->arch.complete_userspace_io = complete_sev_es_emulated_ins;
+ 	}
+ 
+-	return 0;
++	return ret;
+ }
+ 
+ int kvm_sev_es_string_io(struct kvm_vcpu *vcpu, unsigned int size,
+-- 
+2.33.0.1079.g6e70778dc9-goog
 
-So if there is a new for incompatible layouts then the IOAS should be
-duplicated.
 
-Otherwise, I also think the iommu core code should eventually learn to
-share the io page table across HW instances. Eg ARM has a similar
-efficiency issue if there are multiple SMMU HW blocks.
+--kTbyx1pw6IySRUfp
+Content-Type: text/x-diff; charset=us-ascii
+Content-Disposition: attachment;
+	filename="0002-KVM-x86-WARN-if-emulated-kernel-port-I-O-fails-after.patch"
 
-Jason
+From cdb6bceeceda3eb3bd3755b99f00d526e2b9045e Mon Sep 17 00:00:00 2001
+From: Sean Christopherson <seanjc@google.com>
+Date: Thu, 21 Oct 2021 15:40:36 -0700
+Subject: [PATCH 2/6] KVM: x86: WARN if emulated kernel port I/O fails after a
+ successful iteration
+
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/x86.c | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index c245edfd974c..13a21a05a75d 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -7046,7 +7046,7 @@ static int emulator_cmpxchg_emulated(struct x86_emulate_ctxt *ctxt,
+ 
+ static int kernel_pio(struct kvm_vcpu *vcpu, void *pd)
+ {
+-	int r = 0, i;
++	int r, i;
+ 
+ 	for (i = 0; i < vcpu->arch.pio.count; i++) {
+ 		if (vcpu->arch.pio.in)
+@@ -7056,11 +7056,17 @@ static int kernel_pio(struct kvm_vcpu *vcpu, void *pd)
+ 			r = kvm_io_bus_write(vcpu, KVM_PIO_BUS,
+ 					     vcpu->arch.pio.port, vcpu->arch.pio.size,
+ 					     pd);
+-		if (r)
+-			break;
++		if (r) {
++			/*
++			 * The port doesn't change on subsequent iterations and
++			 * the kernel I/O device should not disappear.
++			 */
++			WARN_ON_ONCE(i);
++			return r;
++		}
+ 		pd += vcpu->arch.pio.size;
+ 	}
+-	return r;
++	return 0;
+ }
+ 
+ static int emulator_pio_in_out(struct kvm_vcpu *vcpu, int size,
+-- 
+2.33.0.1079.g6e70778dc9-goog
+
+
+--kTbyx1pw6IySRUfp
+Content-Type: text/x-diff; charset=us-ascii
+Content-Disposition: attachment;
+	filename="0003-KVM-x86-Use-an-unsigned-int-when-emulating-string-po.patch"
+
+From b538f779f15ba63e5e32fd3cce6fae6e530cde40 Mon Sep 17 00:00:00 2001
+From: Sean Christopherson <seanjc@google.com>
+Date: Thu, 21 Oct 2021 16:45:21 -0700
+Subject: [PATCH 3/6] KVM: x86: Use an 'unsigned int' when emulating string
+ port I/O
+
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/x86.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 13a21a05a75d..a126b1129348 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -7046,7 +7046,8 @@ static int emulator_cmpxchg_emulated(struct x86_emulate_ctxt *ctxt,
+ 
+ static int kernel_pio(struct kvm_vcpu *vcpu, void *pd)
+ {
+-	int r, i;
++	unsigned int i;
++	int r;
+ 
+ 	for (i = 0; i < vcpu->arch.pio.count; i++) {
+ 		if (vcpu->arch.pio.in)
+-- 
+2.33.0.1079.g6e70778dc9-goog
+
+
+--kTbyx1pw6IySRUfp
+Content-Type: text/x-diff; charset=us-ascii
+Content-Disposition: attachment;
+	filename="0004-KVM-x86-Fill-kvm_pio_request-if-and-only-if-KVM-is-e.patch"
+
+From 21f4d5d9048e84d01137ba2a9fbb3d691141dc16 Mon Sep 17 00:00:00 2001
+From: Sean Christopherson <seanjc@google.com>
+Date: Thu, 21 Oct 2021 15:41:18 -0700
+Subject: [PATCH 4/6] KVM: x86: Fill kvm_pio_request if and only if KVM is
+ exiting to userspace
+
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/x86.c | 89 +++++++++++++++++++++++-----------------------
+ 1 file changed, 45 insertions(+), 44 deletions(-)
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index a126b1129348..a20a790ce586 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -7044,19 +7044,17 @@ static int emulator_cmpxchg_emulated(struct x86_emulate_ctxt *ctxt,
+ 	return emulator_write_emulated(ctxt, addr, new, bytes, exception);
+ }
+ 
+-static int kernel_pio(struct kvm_vcpu *vcpu, void *pd)
++static int kernel_pio(struct kvm_vcpu *vcpu, int size, unsigned short port,
++		      void *data, unsigned int count, bool in)
+ {
+ 	unsigned int i;
+ 	int r;
+ 
+-	for (i = 0; i < vcpu->arch.pio.count; i++) {
+-		if (vcpu->arch.pio.in)
+-			r = kvm_io_bus_read(vcpu, KVM_PIO_BUS, vcpu->arch.pio.port,
+-					    vcpu->arch.pio.size, pd);
++	for (i = 0; i < count; i++) {
++		if (in)
++			r = kvm_io_bus_read(vcpu, KVM_PIO_BUS, port, size, data);
+ 		else
+-			r = kvm_io_bus_write(vcpu, KVM_PIO_BUS,
+-					     vcpu->arch.pio.port, vcpu->arch.pio.size,
+-					     pd);
++			r = kvm_io_bus_write(vcpu, KVM_PIO_BUS, port, size, data);
+ 		if (r) {
+ 			/*
+ 			 * The port doesn't change on subsequent iterations and
+@@ -7065,24 +7063,33 @@ static int kernel_pio(struct kvm_vcpu *vcpu, void *pd)
+ 			WARN_ON_ONCE(i);
+ 			return r;
+ 		}
+-		pd += vcpu->arch.pio.size;
++		data += size;
+ 	}
+ 	return 0;
+ }
+ 
+ static int emulator_pio_in_out(struct kvm_vcpu *vcpu, int size,
+-			       unsigned short port, void *val,
++			       unsigned short port, void *data,
+ 			       unsigned int count, bool in)
+ {
++	if (!kernel_pio(vcpu, port, size, data, count, in))
++		return 1;
++
++	/*
++	 * I/O was not handled in kernel, forward the operation to userespace.
++	 * Snapshot the port, size, etc... in kernel memory as some callers,
++	 * e.g. "fast" port I/O and SEV-ES, don't flow through the emulator and
++	 * will have lost the original information when KVM regains control.
++	 * The info stored in the run page can't be trusted as userspace has
++	 * write access to the run page.
++	 */
+ 	vcpu->arch.pio.port = port;
+ 	vcpu->arch.pio.in = in;
+-	vcpu->arch.pio.count  = count;
++	vcpu->arch.pio.count = count;
+ 	vcpu->arch.pio.size = size;
+ 
+-	if (!kernel_pio(vcpu, vcpu->arch.pio_data)) {
+-		vcpu->arch.pio.count = 0;
+-		return 1;
+-	}
++	if (!in)
++		memcpy(vcpu->arch.pio_data, data, size * count);
+ 
+ 	vcpu->run->exit_reason = KVM_EXIT_IO;
+ 	vcpu->run->io.direction = in ? KVM_EXIT_IO_IN : KVM_EXIT_IO_OUT;
+@@ -7090,30 +7097,27 @@ static int emulator_pio_in_out(struct kvm_vcpu *vcpu, int size,
+ 	vcpu->run->io.data_offset = KVM_PIO_PAGE_OFFSET * PAGE_SIZE;
+ 	vcpu->run->io.count = count;
+ 	vcpu->run->io.port = port;
+-
+ 	return 0;
+ }
+ 
+ static int emulator_pio_in(struct kvm_vcpu *vcpu, int size,
+-			   unsigned short port, void *val, unsigned int count)
++			   unsigned short port, void *data, unsigned int count)
+ {
+-	int ret;
+-
+-	if (vcpu->arch.pio.count)
+-		goto data_avail;
+-
+-	memset(vcpu->arch.pio_data, 0, size * count);
+-
+-	ret = emulator_pio_in_out(vcpu, size, port, val, count, true);
+-	if (ret) {
+-data_avail:
+-		memcpy(val, vcpu->arch.pio_data, size * count);
+-		trace_kvm_pio(KVM_PIO_IN, port, size, count, vcpu->arch.pio_data);
++	if (vcpu->arch.pio.count) {
++		/*
++		 * Complete port I/O when re-emulating the instruction after
++		 * userspace has provided the requested data.
++		 *
++		 * FIXME: this will copy garbage if count > vcpu->arch.pio.count.
++		 */
+ 		vcpu->arch.pio.count = 0;
+-		return 1;
++		memcpy(data, vcpu->arch.pio_data, size * count);
++	} else if (!emulator_pio_in_out(vcpu, size, port, data, count, true)) {
++		return 0;
+ 	}
+ 
+-	return 0;
++	trace_kvm_pio(KVM_PIO_IN, port, size, count, data);
++	return 1;
+ }
+ 
+ static int emulator_pio_in_emulated(struct x86_emulate_ctxt *ctxt,
+@@ -7125,19 +7129,18 @@ static int emulator_pio_in_emulated(struct x86_emulate_ctxt *ctxt,
+ }
+ 
+ static int emulator_pio_out(struct kvm_vcpu *vcpu, int size,
+-			    unsigned short port, const void *val,
++			    unsigned short port, void *val,
+ 			    unsigned int count)
+ {
+-	memcpy(vcpu->arch.pio_data, val, size * count);
+-	trace_kvm_pio(KVM_PIO_OUT, port, size, count, vcpu->arch.pio_data);
+-	return emulator_pio_in_out(vcpu, size, port, (void *)val, count, false);
++	trace_kvm_pio(KVM_PIO_OUT, port, size, count, val);
++	return emulator_pio_in_out(vcpu, size, port, val, count, false);
+ }
+ 
+ static int emulator_pio_out_emulated(struct x86_emulate_ctxt *ctxt,
+ 				     int size, unsigned short port,
+-				     const void *val, unsigned int count)
++				     const void *data, unsigned int count)
+ {
+-	return emulator_pio_out(emul_to_vcpu(ctxt), size, port, val, count);
++	return emulator_pio_out(emul_to_vcpu(ctxt), size, port, (void *)data, count);
+ }
+ 
+ static unsigned long get_segment_base(struct kvm_vcpu *vcpu, int seg)
+@@ -12509,14 +12512,12 @@ static int kvm_sev_es_ins(struct kvm_vcpu *vcpu, unsigned int size,
+ 
+ 	ret = emulator_pio_in_emulated(vcpu->arch.emulate_ctxt, size, port,
+ 				       data, count);
+-	if (ret) {
+-		vcpu->arch.pio.count = 0;
+-	} else {
+-		vcpu->arch.guest_ins_data = data;
+-		vcpu->arch.complete_userspace_io = complete_sev_es_emulated_ins;
+-	}
++	if (ret)
++		return ret;
+ 
+-	return ret;
++	vcpu->arch.guest_ins_data = data;
++	vcpu->arch.complete_userspace_io = complete_sev_es_emulated_ins;
++	return 0;
+ }
+ 
+ int kvm_sev_es_string_io(struct kvm_vcpu *vcpu, unsigned int size,
+-- 
+2.33.0.1079.g6e70778dc9-goog
+
+
+--kTbyx1pw6IySRUfp
+Content-Type: text/x-diff; charset=us-ascii
+Content-Disposition: attachment;
+	filename="0005-KVM-x86-Stop-being-clever-and-use-a-completion-handl.patch"
+
+From b134b231b49563ae2fca54dbd4f85356b10aaf53 Mon Sep 17 00:00:00 2001
+From: Sean Christopherson <seanjc@google.com>
+Date: Thu, 21 Oct 2021 16:29:18 -0700
+Subject: [PATCH 5/6] KVM: x86: Stop being clever and use a "completion"
+ handler for SEV-ES OUTS
+
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/x86.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index a20a790ce586..fad2c7192aa3 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -12481,6 +12481,12 @@ int kvm_sev_es_mmio_read(struct kvm_vcpu *vcpu, gpa_t gpa, unsigned int bytes,
+ }
+ EXPORT_SYMBOL_GPL(kvm_sev_es_mmio_read);
+ 
++static int complete_sev_es_emulated_outs(struct kvm_vcpu *vcpu)
++{
++	vcpu->arch.pio.count = 0;
++	return 1;
++}
++
+ static int complete_sev_es_emulated_ins(struct kvm_vcpu *vcpu)
+ {
+ 	memcpy(vcpu->arch.guest_ins_data, vcpu->arch.pio_data,
+@@ -12500,8 +12506,7 @@ static int kvm_sev_es_outs(struct kvm_vcpu *vcpu, unsigned int size,
+ 	if (ret)
+ 		return ret;
+ 
+-	vcpu->arch.pio.count = 0;
+-
++	vcpu->arch.complete_userspace_io = complete_sev_es_emulated_outs;
+ 	return 0;
+ }
+ 
+-- 
+2.33.0.1079.g6e70778dc9-goog
+
+
+--kTbyx1pw6IySRUfp
+Content-Type: text/x-diff; charset=us-ascii
+Content-Disposition: attachment;
+	filename="0006-KVM-x86-Move-pointer-for-SEV-ES-fast-string-I-O-into.patch"
+
+From b0ac37af659b6ce4cb556adc3bda3752db129724 Mon Sep 17 00:00:00 2001
+From: Sean Christopherson <seanjc@google.com>
+Date: Thu, 21 Oct 2021 16:40:41 -0700
+Subject: [PATCH 6/6] KVM: x86: Move pointer for SEV-ES/fast string I/O into
+ kvm_pio_request
+
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/include/asm/kvm_host.h | 4 +++-
+ arch/x86/kvm/x86.c              | 4 ++--
+ 2 files changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 80f4b8a9233c..ae15a32cc9aa 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -385,6 +385,9 @@ struct kvm_pio_request {
+ 	int in;
+ 	int port;
+ 	int size;
++
++	/* Used to handle string I/O that doesn't originate in the emulator. */
++	void *string_data;
+ };
+ 
+ #define PT64_ROOT_MAX_LEVEL 5
+@@ -701,7 +704,6 @@ struct kvm_vcpu_arch {
+ 
+ 	struct kvm_pio_request pio;
+ 	void *pio_data;
+-	void *guest_ins_data;
+ 
+ 	u8 event_exit_inst_len;
+ 
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index fad2c7192aa3..c4fb8a332111 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -12489,7 +12489,7 @@ static int complete_sev_es_emulated_outs(struct kvm_vcpu *vcpu)
+ 
+ static int complete_sev_es_emulated_ins(struct kvm_vcpu *vcpu)
+ {
+-	memcpy(vcpu->arch.guest_ins_data, vcpu->arch.pio_data,
++	memcpy(vcpu->arch.pio.string_data, vcpu->arch.pio_data,
+ 	       vcpu->arch.pio.count * vcpu->arch.pio.size);
+ 	vcpu->arch.pio.count = 0;
+ 
+@@ -12520,7 +12520,7 @@ static int kvm_sev_es_ins(struct kvm_vcpu *vcpu, unsigned int size,
+ 	if (ret)
+ 		return ret;
+ 
+-	vcpu->arch.guest_ins_data = data;
++	vcpu->arch.string_data = data;
+ 	vcpu->arch.complete_userspace_io = complete_sev_es_emulated_ins;
+ 	return 0;
+ }
+-- 
+2.33.0.1079.g6e70778dc9-goog
+
+
+--kTbyx1pw6IySRUfp--
