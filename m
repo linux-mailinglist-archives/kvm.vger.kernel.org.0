@@ -2,317 +2,298 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1AE404363E3
-	for <lists+kvm@lfdr.de>; Thu, 21 Oct 2021 16:16:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C2D08436409
+	for <lists+kvm@lfdr.de>; Thu, 21 Oct 2021 16:22:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230436AbhJUOS2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Oct 2021 10:18:28 -0400
-Received: from vps-vb.mhejs.net ([37.28.154.113]:34106 "EHLO vps-vb.mhejs.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229878AbhJUOS1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Oct 2021 10:18:27 -0400
-Received: from MUA
-        by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94.2)
-        (envelope-from <mail@maciej.szmigiero.name>)
-        id 1mdYrW-0004tt-K9; Thu, 21 Oct 2021 16:16:06 +0200
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <cover.1632171478.git.maciej.szmigiero@oracle.com>
- <062df8ac9eb280440a5f0c11159616b1bbb1c2c4.1632171479.git.maciej.szmigiero@oracle.com>
- <YXCqo6XXIkyOb4IE@google.com>
-From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Subject: Re: [PATCH v5 12/13] KVM: Optimize gfn lookup in kvm_zap_gfn_range()
-Message-ID: <d5c4c7da-676c-9889-6aaf-d423d408dd2d@maciej.szmigiero.name>
-Date:   Thu, 21 Oct 2021 16:16:00 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+        id S231293AbhJUOZK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Oct 2021 10:25:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37792 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230283AbhJUOZJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Oct 2021 10:25:09 -0400
+Received: from mail-oi1-x236.google.com (mail-oi1-x236.google.com [IPv6:2607:f8b0:4864:20::236])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B5A2C0613B9
+        for <kvm@vger.kernel.org>; Thu, 21 Oct 2021 07:22:54 -0700 (PDT)
+Received: by mail-oi1-x236.google.com with SMTP id z126so1011394oiz.12
+        for <kvm@vger.kernel.org>; Thu, 21 Oct 2021 07:22:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=lryIt0qusZAixHtxWEAHB9bI3XGhlPYxhAGTdXgwNbE=;
+        b=o1O6A3A8T0toxDxwR1tIxfj1aKYHLbCTEvkTnwT9tXXQ8kA5lOenhTG0+GH0y/je4T
+         ETz5hgfh09jQAu1HTCjoV2JMJCnaMDyFt14FR+btKiX2GBBpKP4ar2btgsiw/NkD4fTg
+         9tVOSWW7rWeEwodWnetPpmdbSd7uNMbQIAFzMmddGRJbXN0Dtutu7y8Ij7NeCrCuCACg
+         PWuXV0iK8piDzf3QRp1cqENGSDAFKcBHRY1TwqjgZ4XUsgYWRCXknNnSzs/XWvwE1hLb
+         Xsj0iPJVGWYyRFzZCTdg8/TymrGW3UGEXDVKu2KrmoSQG85pyRu5fEYnVVyxoGrWUHfb
+         o21A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=lryIt0qusZAixHtxWEAHB9bI3XGhlPYxhAGTdXgwNbE=;
+        b=p02Y/ZN308Jevw2pwJqoh1dQ1liIHKY5AIsxV+sm+gGlgypTeG5uX/SEnFMMGHHf55
+         DlpF0p+PzXXzh6xj1bDuNnzEbLe2nfJWzm9qzps4ith3aA1KyzsHXqzg1EIIfJj6YNzd
+         Zcs+6ily0CRDci8xQDIWhWnO1JGdHcp2bAPw4X1IpYbQS9Rk5zMTmMwqjNHVQ4VIh5ID
+         hxwEdv6xVAGYXuR/dwkJZfYVbtbZ/wCCZdM/F+bTFgNkrwE4KBe09W9IwQp0YH8+mu7k
+         9KvNcaeqhP09SF1DzRNvLYxLH0lHFWUav5LmrbXOexrqqpOMBMj6nhRr7lgeU2YZPo2a
+         0bhA==
+X-Gm-Message-State: AOAM533q+UomRVlz2lO6uyxJY53F9ld3U/e5N7x3D9shyPYhD08KarGo
+        bUIJpc1JVwvzaDJxIlWJmWiq9cDy0YcItwNAHRVhtQ==
+X-Google-Smtp-Source: ABdhPJwavaEVfOCpNXpBt8lDnWa6Bi6oYgU4TKu7k5hH+JqcqiRLj6dphhna8fETToyw6p2grBBD+uPjNqD4/agTUCA=
+X-Received: by 2002:a05:6808:3c2:: with SMTP id o2mr4630131oie.15.1634826173072;
+ Thu, 21 Oct 2021 07:22:53 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <YXCqo6XXIkyOb4IE@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <20211004204931.1537823-1-zxwang42@gmail.com> <4d3b7ca8-2484-e45c-9551-c4f67fc88da6@redhat.com>
+In-Reply-To: <4d3b7ca8-2484-e45c-9551-c4f67fc88da6@redhat.com>
+From:   Marc Orr <marcorr@google.com>
+Date:   Thu, 21 Oct 2021 07:22:42 -0700
+Message-ID: <CAA03e5E9BSLsuv5XQiMZGAL+MOqcbyWok0p6Z7U3m14W0p9bsA@mail.gmail.com>
+Subject: Re: [kvm-unit-tests PATCH v3 00/17] x86_64 UEFI and AMD SEV/SEV-ES support
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Zixuan Wang <zxwang42@gmail.com>, kvm list <kvm@vger.kernel.org>,
+        Andrew Jones <drjones@redhat.com>,
+        "Hyunwook (Wooky) Baek" <baekhw@google.com>,
+        Tom Roeder <tmroeder@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        "Singh, Brijesh" <brijesh.singh@amd.com>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        Varad Gautam <varad.gautam@suse.com>,
+        Joerg Roedel <jroedel@suse.de>, bp@suse.de
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 21.10.2021 01:47, Sean Christopherson wrote:
-> On Mon, Sep 20, 2021, Maciej S. Szmigiero wrote:
-> 
-> Some mechanical comments while they're on my mind, I'll get back to a full review
-> tomorrow.
-> 
->> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
->> index 6433efff447a..9ae5f7341cf5 100644
->> --- a/include/linux/kvm_host.h
->> +++ b/include/linux/kvm_host.h
->> @@ -833,6 +833,75 @@ struct kvm_memory_slot *id_to_memslot(struct kvm_memslots *slots, int id)
->>   	return NULL;
->>   }
->>   
->> +static inline
->> +struct rb_node *kvm_memslots_gfn_upper_bound(struct kvm_memslots *slots, gfn_t gfn)
-> 
-> Function attributes should go on the same line as the function unless there's a
-> really good reason to do otherwise.
-
-Here the reason was a long line length, which was 84 characters even with
-function attributes moved to a separate line.
-
-include/linux/kvm_host.h contains a lot of helpers written in a similar
-style:
-> static inline gfn_t
-> hva_to_gfn_memslot(unsigned long hva, struct kvm_memory_slot *slot)
-
-> In this case, I would honestly just drop the helper.  It's really hard to express
-> what this function does in a name that isn't absurdly long, and there's exactly
-> one user at the end of the series.
-
-The "upper bound" is a common name for a binary search operation that
-finds the first node that has its key strictly greater than the searched key.
-
-It can be integrated into its caller but I would leave a comment there
-describing what kind of operation that block of code does to aid in
-understanding the code.
-
-Although, to be honest, I don't quite get the reason for doing this
-considering that you want to put a single "rb_next()" call into its own
-helper for clarity below.
-
-> https://lkml.kernel.org/r/20210930192417.1332877-1-keescook@chromium.org
-> 
->> +{
->> +	int idx = slots->node_idx;
->> +	struct rb_node *node, *result = NULL;
->> +
->> +	for (node = slots->gfn_tree.rb_node; node; ) {
->> +		struct kvm_memory_slot *slot;
-> 
-> My personal preference is to put declarations outside of the for loop.  I find it
-> easier to read, it's harder to have shadowing issues if all variables are declared
-> at the top, especially when using relatively generic names.
-
-Will do.
-
->> +
->> +		slot = container_of(node, struct kvm_memory_slot, gfn_node[idx]);
->> +		if (gfn < slot->base_gfn) {
->> +			result = node;
->> +			node = node->rb_left;
->> +		} else
-> 
-> Needs braces since the "if" has braces.
-
-Will add them.
-
->> +			node = node->rb_right;
->> +	}
->> +
->> +	return result;
->> +}
->> +
->> +static inline
->> +struct rb_node *kvm_for_each_in_gfn_first(struct kvm_memslots *slots, gfn_t start)
-> 
-> The kvm_for_each_in_gfn prefix is _really_ confusing.  I get that these are all
-> helpers for "kvm_for_each_memslot...", but it's hard not to think these are all
-> iterators on their own.  I would gladly sacrifice namespacing for readability in
-> this case.
-
-"kvm_for_each_memslot_in_gfn_range" was your proposed name here:
-https://lore.kernel.org/kvm/YK6GWUP107i5KAJo@google.com/
-
-But no problem renaming it.
-
-> I also wouldn't worry about capturing the details.  For most folks reading this
-> code, the important part is understanding the control flow of
-> kvm_for_each_memslot_in_gfn_range().  Capturing the under-the-hood details in the
-> name isn't a priority since anyone modifying this code is going to have to do a
-> lot of staring no matter what :-)
-
-It's even better if somebody modifying complex code has to read it carefully
-(within reason, obviously).
-
->> +static inline
->> +bool kvm_for_each_in_gfn_no_more(struct kvm_memslots *slots, struct rb_node *node, gfn_t end)
->> +{
->> +	struct kvm_memory_slot *memslot;
->> +
->> +	memslot = container_of(node, struct kvm_memory_slot, gfn_node[slots->node_idx]);
->> +
->> +	/*
->> +	 * If this slot starts beyond or at the end of the range so does
->> +	 * every next one
->> +	 */
->> +	return memslot->base_gfn >= end;
->> +}
->> +
->> +/* Iterate over each memslot *possibly* intersecting [start, end) range */
->> +#define kvm_for_each_memslot_in_gfn_range(node, slots, start, end)	\
->> +	for (node = kvm_for_each_in_gfn_first(slots, start);		\
->> +	     node && !kvm_for_each_in_gfn_no_more(slots, node, end);	\
-> 
-> I think it makes sense to move the NULL check into the validation helper?  We had
-> a similar case in KVM's legacy MMU where a "null" check was left to the caller,
-> and it ended up with a bunch of redundant and confusing code.  I don't see that
-> happening here, but at the same time it's odd for the validator to not sanity
-> check @node.
+On Thu, Oct 21, 2021 at 7:10 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
 >
+> On 04/10/21 22:49, Zixuan Wang wrote:
+> > Hello,
+>
+> WHOA IT WORKS! XD
+>
+> There are still a few rough edges around the build system (and in
+> general, the test harness is starting to really show its limits), but
+> this is awesome work.  Thanks Drew, Varad and Zixuan (in alphabetic and
+> temporal order) for the combined contribution!
+>
+> For now I've placed it at a 'uefi' branch on gitlab, while I'm waiting
+> for some reviews of my GDT cleanup work.  Any future improvements can be
+> done on top.
 
-Will do.
-  
->> +	     node = rb_next(node))					\
-> 
-> It's silly, but I'd add a wrapper for this one, just to make it easy to follow
-> the control flow.
-> 
-> Maybe this as delta?  I'm definitely not set on the names, was just trying to
-> find something that's short and to the point.
+Phenomenal! And +1 on thanking Drew, Varad, and Zixuan! (And thanks
+Paolo for reviewing, testing, and setting up a branch for this work
+:-).)
 
-Thanks for the proposed patch, I added some comments inline below.
+Zixuan has actually had a v4 ready to go since last week that
+incorporates Drew's last round of reviews, but we were holding off on
+posting it because we kept getting more comments and Zixuan wanted to
+incorporate all of the feedback :-).
 
-> ---
->   include/linux/kvm_host.h | 60 +++++++++++++++++++++-------------------
->   1 file changed, 31 insertions(+), 29 deletions(-)
-> 
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 9ae5f7341cf5..a88bd5d9e4aa 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -833,36 +833,29 @@ struct kvm_memory_slot *id_to_memslot(struct kvm_memslots *slots, int id)
->   	return NULL;
->   }
-> 
-> -static inline
-> -struct rb_node *kvm_memslots_gfn_upper_bound(struct kvm_memslots *slots, gfn_t gfn)
-> +static inline struct rb_node *kvm_get_first_node(struct kvm_memslots *slots,
-> +						 gfn_t start)
->   {
-> +	struct kvm_memory_slot *slot;
-> +	struct rb_node *node, *tmp;
->   	int idx = slots->node_idx;
-> -	struct rb_node *node, *result = NULL;
-> -
-> -	for (node = slots->gfn_tree.rb_node; node; ) {
-> -		struct kvm_memory_slot *slot;
-> -
-> -		slot = container_of(node, struct kvm_memory_slot, gfn_node[idx]);
-> -		if (gfn < slot->base_gfn) {
-> -			result = node;
-> -			node = node->rb_left;
-> -		} else
-> -			node = node->rb_right;
-> -	}
-> -
-> -	return result;
-> -}
-> -
-> -static inline
-> -struct rb_node *kvm_for_each_in_gfn_first(struct kvm_memslots *slots, gfn_t start)
-> -{
-> -	struct rb_node *node;
-> 
->   	/*
->   	 * Find the slot with the lowest gfn that can possibly intersect with
->   	 * the range, so we'll ideally have slot start <= range start
->   	 */
-> -	node = kvm_memslots_gfn_upper_bound(slots, start);
-> +	node = NULL;
-> +	for (tmp = slots->gfn_tree.rb_node; tmp; ) {
-> +
-> +		slot = container_of(node, struct kvm_memory_slot, gfn_node[idx]);
+Should we go ahead and post it to the list (and perhaps update the
+branch in the gitlab so everyone can work off of that)? Or would it be
+easier to wait for the GDT cleanup work to finalize, and then post it
+afterward?
 
-Here -------------------------------^ should be "tmp", not "node" since
-you renamed "node" into "tmp" and "result" into "node" while integrating
-this function into its caller.
-
-> +		if (gfn < slot->base_gfn) {
-> +			node = tmp;
-> +			tmp = tmp->rb_left;
-> +		} else {
-> +			tmp = tmp->rb_right;
-> +		}
-> +	}
-> +
->   	if (node) {
->   		struct rb_node *pnode;
-> 
-> @@ -882,12 +875,16 @@ struct rb_node *kvm_for_each_in_gfn_first(struct kvm_memslots *slots, gfn_t star
->   	return node;
->   }
-> 
-> -static inline
-> -bool kvm_for_each_in_gfn_no_more(struct kvm_memslots *slots, struct rb_node *node, gfn_t end)
-> +static inline bool kvm_is_last_node(struct kvm_memslots *slots,
-> +				    struct rb_node *node, gfn_t end)
-
-kvm_is_last_node() is a bit misleading since this function is supposed
-to return true even on the last node, only returning false one node past
-the last one (or when the tree runs out of nodes).
-
->   {
->   	struct kvm_memory_slot *memslot;
-> 
-> -	memslot = container_of(node, struct kvm_memory_slot, gfn_node[slots->node_idx]);
-> +	if (!node)
-> +		return true;
-> +
-> +	memslot = container_of(node, struct kvm_memory_slot,
-> +			       gfn_node[slots->node_idx]);
-
-You previously un-wrapped such lines, like for example in
-https://lore.kernel.org/kvm/YK2GjzkWvjBcCFxn@google.com/ :
->> +		slot = container_of(node, struct kvm_memory_slot,
->> +				    gfn_node[idxactive]);
-> 
-> With 'idx', this can go on a single line.  It runs over by two chars, but the 80
-> char limit is a soft limit, and IMO avoiding line breaks for things like this
-> improves readability.
-
-
-> 
->   	/*
->   	 * If this slot starts beyond or at the end of the range so does
-> @@ -896,11 +893,16 @@ bool kvm_for_each_in_gfn_no_more(struct kvm_memslots *slots, struct rb_node *nod
->   	return memslot->base_gfn >= end;
->   }
-> 
-> +static inline bool kvm_get_next_node(struct rb_node *node)
-> +{
-> +	return rb_next(node)
-> +}
-> +
->   /* Iterate over each memslot *possibly* intersecting [start, end) range */
->   #define kvm_for_each_memslot_in_gfn_range(node, slots, start, end)	\
-> -	for (node = kvm_for_each_in_gfn_first(slots, start);		\
-> -	     node && !kvm_for_each_in_gfn_no_more(slots, node, end);	\
-> -	     node = rb_next(node))					\
-> +	for (node = kvm_get_first_node(slots, start);			\
-> +	     !kvm_is_last_node(slots, node, end);			\
-> +	     node = kvm_get_next_node(node))				\
-> 
->   /*
->    * KVM_SET_USER_MEMORY_REGION ioctl allows the following operations:
-> --
-> 
-
-Thanks,
-Maciej
+>
+> Paolo
+>
+> > This patch series updates the x86_64 KVM-Unit-Tests to run under UEFI
+> > and culminates in enabling AMD SEV/SEV-ES. The patches are organized as
+> > four parts.
+> >
+> > The first part (patch 1) refactors the current Multiboot start-up code
+> > by converting assembly data structures into C. This enables the
+> > follow-up UEFI patches to reuse these data structures without redefining
+> > or duplicating them in assembly.
+> >
+> > The second part (patches 2-3) copies code from Varad's patch set [1]
+> > that builds EFI stubs without depending on GNU-EFI. Part 3 and 4 are
+> > built on top of this part.
+> >
+> > The third part (patches 4-11) enables the x86_64 test cases to run
+> > under UEFI. In particular, these patches allow the x86_64 test cases to
+> > be built as EFI executables and take full control of the guest VM. The
+> > efi_main() function sets up the KVM-Unit-Tests framework to run under
+> > UEFI and then launches the test cases' main() functions. To date, we
+> > have 38/43 test cases running with UEFI using this approach.
+> >
+> > The fourth part of the series (patches 12-17) focuses on SEV. In
+> > particular, these patches introduce SEV/SEV-ES set up code into the EFI
+> > set up process, including checking if SEV is supported, setting c-bits
+> > for page table entries, and (notably) reusing the UEFI #VC handler so
+> > that the set up process does not need to re-implement it (a test case
+> > can always implement a new #VC handler and load it after set up is
+> > finished). Using this approach, we are able to launch the x86_64 test
+> > cases under SEV-ES and exercise KVM's VMGEXIT handler.
+> >
+> > Note, a previous feedback [3] indicated that long-term we'd like to
+> > instrument KVM-Unit-Tests with it's own #VC handler. However, we still
+> > believe that the current approach is good as an intermediate solution,
+> > because it unlocks a lot of testing and we do not expect that testing
+> > to be inherently tied to the UEFI's #VC handler. Rather, test cases
+> > should be tied to the underlying GHCB spec implemented by an
+> > arbitrary #VC handler.
+> >
+> > See the Part 1 to Part 4 summaries, below, for a high-level breakdown
+> > of how the patches are organized.
+> >
+> > Part 1 Summary:
+> > Commit 1 refactors boot-related data structures from assembly to C.
+> >
+> > Part 2 Summary:
+> > Commits 2-3 copy code from Varad's patch set [1] that implements
+> > EFI-related helper functions to replace the GNU-EFI library.
+> >
+> > Part 3 Summary:
+> > Commits 4-5 introduce support to build test cases with EFI support.
+> >
+> > Commits 6-10 set up KVM-Unit-Tests to run under UEFI. In doing so, these
+> > patches incrementally enable most existing x86_64 test cases to run
+> > under UEFI.
+> >
+> > Commit 11 fixes several test cases that fail to compile with EFI due
+> > to UEFI's position independent code (PIC) requirement.
+> >
+> > Part 4 Summary:
+> > Commits 12-13 introduce support for SEV by adding code to set the SEV
+> > c-bit in page table entries.
+> >
+> > Commits 14-16 introduce support for SEV-ES by reusing the UEFI #VC
+> > handler in KVM-Unit-Tests. They also fix GDT and IDT issues that occur
+> > when reusing UEFI functions in KVM-Unit-Tests.
+> >
+> > Commit 17 adds additional test cases for SEV-ES.
+> >
+> > Changes V2 -> V3:
+> > V3 Patch #  Changes
+> > ----------  -------
+> >       01/17  (New patch) refactors assembly data structures in C
+> >       02/17  Adds a missing alignment attribute
+> >              Renames the file uefi.h to efi.h
+> >       03/17  Adds an SPDX header, fixes a comment style issue
+> >       06/17  Removes assembly data structure definitions
+> >       07/17  Removes assembly data structure definitions
+> >       12/17  Simplifies an if condition code
+> >       14/17  Simplifies an if condition code
+> >       15/17  Removes GDT copying for SEV-ES #VC handler
+> >
+> > Notes on page table set up code:
+> > Paolo suggested unifying  the page table definitions in cstart64.S and
+> > UEFI start-up code [5]. We tried but found it hard to implement due to
+> > the real/long mode issue: a page table set up function written in C is
+> > by default compiled to run in long mode. However, cstart64.S requires
+> > page table setup before entering long mode. Calling a long mode function
+> > from real/protected mode crashes the guest VM. Thus we chose not to
+> > implement this feature in this patch set. More details can be found in
+> > our off-list GitHub review [6].
+> >
+> > Changes V1 -> V2:
+> > 1. Merge Varad's patches [1] as the foundation of our V2 patch set [4].
+> > 2. Remove AMD SEV/SEV-ES config flags and macros (patches 11-17)
+> > 3. Drop one commit 'x86 UEFI: Move setjmp.h out of desc.h' because we do
+> > not link GNU-EFI library.
+> >
+> > Notes on authorships and attributions:
+> > The first two commits are from Varad's patch set [1], so they are
+> > tagged as 'From:' and 'Signed-off-by:' Varad. Commits 3-7 are from our
+> > V1 patch set [2], and since Varad implemented similar code [1], these
+> > commits are tagged as 'Co-developed-by:' and 'Signed-off-by:' Varad.
+> >
+> > Notes on patch sets merging strategy:
+> > We understand that the current merging strategy (reorganizing and
+> > squeezing Varad's patches into two) reduces Varad's authorships, and we
+> > hope the additional attribution tags make up for it. We see another
+> > approach which is to build our patch set on top of Varad's original
+> > patch set, but this creates some noise in the final patch set, e.g.,
+> > x86/cstart64.S is modified in Varad's part and later reverted in our
+> > part as we implement start up code in C. For the sake of the clarity of
+> > the code history, we believe the current approach is the best effort so
+> > far, and we are open to all kinds of opinions.
+> >
+> > [1] https://lore.kernel.org/kvm/20210819113400.26516-1-varad.gautam@suse.com/
+> > [2] https://lore.kernel.org/kvm/20210818000905.1111226-1-zixuanwang@google.com/
+> > [3] https://lore.kernel.org/kvm/YSA%2FsYhGgMU72tn+@google.com/
+> > [4] https://lore.kernel.org/kvm/20210827031222.2778522-1-zixuanwang@google.com/
+> > [5] https://lore.kernel.org/kvm/3fd467ae-63c9-adba-9d29-09b8a7beb92d@redhat.com/
+> > [6] https://github.com/marc-orr/KVM-Unit-Tests-dev-fork/pull/1
+> >
+> > Regards,
+> > Zixuan Wang
+> >
+> > Varad Gautam (2):
+> >    x86 UEFI: Copy code from Linux
+> >    x86 UEFI: Implement UEFI function calls
+> >
+> > Zixuan Wang (15):
+> >    x86: Move IDT, GDT and TSS to desc.c
+> >    x86 UEFI: Copy code from GNU-EFI
+> >    x86 UEFI: Boot from UEFI
+> >    x86 UEFI: Load IDT after UEFI boot up
+> >    x86 UEFI: Load GDT and TSS after UEFI boot up
+> >    x86 UEFI: Set up memory allocator
+> >    x86 UEFI: Set up RSDP after UEFI boot up
+> >    x86 UEFI: Set up page tables
+> >    x86 UEFI: Convert x86 test cases to PIC
+> >    x86 AMD SEV: Initial support
+> >    x86 AMD SEV: Page table with c-bit
+> >    x86 AMD SEV-ES: Check SEV-ES status
+> >    x86 AMD SEV-ES: Copy UEFI #VC IDT entry
+> >    x86 AMD SEV-ES: Set up GHCB page
+> >    x86 AMD SEV-ES: Add test cases
+> >
+> >   .gitignore                 |   3 +
+> >   Makefile                   |  29 +-
+> >   README.md                  |   6 +
+> >   configure                  |   6 +
+> >   lib/efi.c                  | 118 ++++++++
+> >   lib/efi.h                  |  22 ++
+> >   lib/linux/efi.h            | 539 +++++++++++++++++++++++++++++++++++++
+> >   lib/x86/acpi.c             |  38 ++-
+> >   lib/x86/acpi.h             |  11 +
+> >   lib/x86/amd_sev.c          | 174 ++++++++++++
+> >   lib/x86/amd_sev.h          |  63 +++++
+> >   lib/x86/asm/page.h         |  28 +-
+> >   lib/x86/asm/setup.h        |  35 +++
+> >   lib/x86/desc.c             |  46 +++-
+> >   lib/x86/desc.h             |   6 +-
+> >   lib/x86/setup.c            | 246 +++++++++++++++++
+> >   lib/x86/usermode.c         |   3 +-
+> >   lib/x86/vm.c               |  18 +-
+> >   x86/Makefile.common        |  68 +++--
+> >   x86/Makefile.i386          |   5 +-
+> >   x86/Makefile.x86_64        |  58 ++--
+> >   x86/access.c               |   9 +-
+> >   x86/amd_sev.c              |  94 +++++++
+> >   x86/cet.c                  |   8 +-
+> >   x86/cstart64.S             |  77 +-----
+> >   x86/efi/README.md          |  63 +++++
+> >   x86/efi/crt0-efi-x86_64.S  |  79 ++++++
+> >   x86/efi/efistart64.S       |  77 ++++++
+> >   x86/efi/elf_x86_64_efi.lds |  81 ++++++
+> >   x86/efi/reloc_x86_64.c     |  96 +++++++
+> >   x86/efi/run                |  63 +++++
+> >   x86/emulator.c             |   5 +-
+> >   x86/eventinj.c             |   6 +-
+> >   x86/run                    |  16 +-
+> >   x86/smap.c                 |   8 +-
+> >   x86/umip.c                 |  10 +-
+> >   x86/vmx.c                  |   8 +-
+> >   37 files changed, 2067 insertions(+), 155 deletions(-)
+> >   create mode 100644 lib/efi.c
+> >   create mode 100644 lib/efi.h
+> >   create mode 100644 lib/linux/efi.h
+> >   create mode 100644 lib/x86/amd_sev.c
+> >   create mode 100644 lib/x86/amd_sev.h
+> >   create mode 100644 lib/x86/asm/setup.h
+> >   create mode 100644 x86/amd_sev.c
+> >   create mode 100644 x86/efi/README.md
+> >   create mode 100644 x86/efi/crt0-efi-x86_64.S
+> >   create mode 100644 x86/efi/efistart64.S
+> >   create mode 100644 x86/efi/elf_x86_64_efi.lds
+> >   create mode 100644 x86/efi/reloc_x86_64.c
+> >   create mode 100755 x86/efi/run
+> >
+>
