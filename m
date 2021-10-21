@@ -2,103 +2,189 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7150B436927
-	for <lists+kvm@lfdr.de>; Thu, 21 Oct 2021 19:37:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4BB90436997
+	for <lists+kvm@lfdr.de>; Thu, 21 Oct 2021 19:45:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231319AbhJURjW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Oct 2021 13:39:22 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:57572 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231567AbhJURjV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Oct 2021 13:39:21 -0400
-Received: from zn.tnic (p200300ec2f1912009d2c3fdc96041a10.dip0.t-ipconnect.de [IPv6:2003:ec:2f19:1200:9d2c:3fdc:9604:1a10])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 8838A1EC0298;
-        Thu, 21 Oct 2021 19:37:03 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1634837823;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=00cbYgpw2dYSkF28MjWjljWuNsD4cmUAI68U4oIyQGk=;
-        b=D7PSMCkJQL+v+1ot4TxJ+1kfVS4aSDOp1t/3Qw7drrEY4xHhy8cXgf4p4PWGAEFQUcfMEM
-        BrHQk3X/xxlgVn8o+Ho9se8qQoRiD84RfQDQQ3aUXdbtb0MXUbHVtEBXogaegim8IH3/U+
-        eYTYjhcKwS9RFw0qUW7F9IQPdqpiYlM=
-Date:   Thu, 21 Oct 2021 19:37:01 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc:     Michael Roth <michael.roth@amd.com>,
-        Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        id S232509AbhJURre (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Oct 2021 13:47:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57116 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232521AbhJURqq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Oct 2021 13:46:46 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F9FCC0432C4
+        for <kvm@vger.kernel.org>; Thu, 21 Oct 2021 10:43:07 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id y41-20020a056a00182900b0044d43d31f20so811352pfa.11
+        for <kvm@vger.kernel.org>; Thu, 21 Oct 2021 10:43:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=iURUGf0w78yycZlu3miQkJiEIuDMDSn6yRxhCauMXZs=;
+        b=FYDdF7PwrythipcCGhs6ak63WyihVhH3l9X3Mdqn78QcJkg71mr/Yb5C5rXAxakXf+
+         XjQDJngrHupRI+gfUqt52vbengOSjCZlNM7D/0PW77dJpdQrUVjxZFTZz+8ynEzMmI11
+         lss2UFhFeBB+TubSLlFEIAfwE1fFnWDmRzLF31D2RW30W41849OY6XUO5eVcczFVfOwC
+         CuV+jHxy7l9mp4hg81m6Mdnm8Gy0/whoZnjhZcDsi+cJPxtuTXAcZ1ob0ZgXqAbd5Dhn
+         lOcCfc4rubjMWfsKNJ0OA1p8VDc86P3N+pWanZ8d/xJAW3uWEG/iIrLyXlFFlxIp4iy4
+         O+Tw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=iURUGf0w78yycZlu3miQkJiEIuDMDSn6yRxhCauMXZs=;
+        b=ImEmj+M/16ynZuuxJNKD7VXNG4PkKdVkr8KIzzthHpiAgTKy6jTaCyY8X/MLhssm7j
+         gP15DOVht27fFnpel/xPQfd5xClH18sqDXK2u72DZgnt/JrjHRmUjfWO7maZiG31qCxw
+         Lgao6Ko/QN1ZVikL2D6wQ3+81UxNxmrqFByuAAlTnskrt+NokMO15ocUqVWQxEY65kPO
+         xcSAmjWjMPGC29iBfIa/EDQ0b7yYyRLoG2G1NhePOCh4AFAHnFP1qpBE1E52dAe4yEtQ
+         U9Xv7udOi54i1vLHmEejrlmMBpRZBX5kdNiTOvrU7SOuVAdtnh2URiRWehZ2K6Fu8E5z
+         VZsg==
+X-Gm-Message-State: AOAM531Y+YDoclmaPFXjegYIQrbRvZbCEyMmrnoqkt2CyKkTrIJLUs1n
+        Dvx+sOsKrQ8zs/IOpSEu4O5D/FF0IyU0mKVUd4fjk2AYqsY4FuDv6BxTaGqnjB7sN1NTAkKltWm
+        8PMC5FAQtlU6BormG+05auFIYL0lG19mLAl0b8PmH6Zxh2e8aE2gNGV4sDQ==
+X-Google-Smtp-Source: ABdhPJyMsl4iJVNkTTIHy24KxkXOwmEW/9BwIrkTf9rMmQN6v8My2o0LjnHen5hB3Vit/wgdP/hgU7lPATE=
+X-Received: from pgonda1.kir.corp.google.com ([2620:15c:29:204:da2d:dcb2:6:add9])
+ (user=pgonda job=sendgmr) by 2002:a63:7b4a:: with SMTP id k10mr5515192pgn.301.1634838186675;
+ Thu, 21 Oct 2021 10:43:06 -0700 (PDT)
+Date:   Thu, 21 Oct 2021 10:42:58 -0700
+Message-Id: <20211021174303.385706-1-pgonda@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.0.1079.g6e70778dc9-goog
+Subject: [PATCH 0/5 V11] Add AMD SEV and SEV-ES intra host migration support
+From:   Peter Gonda <pgonda@google.com>
+To:     kvm@vger.kernel.org
+Cc:     Peter Gonda <pgonda@google.com>, Marc Orr <marcorr@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
         David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH v6 08/42] x86/sev-es: initialize sev_status/features
- within #VC handler
-Message-ID: <YXGlPf5OTPzp09qr@zn.tnic>
-References: <20211008180453.462291-1-brijesh.singh@amd.com>
- <20211008180453.462291-9-brijesh.singh@amd.com>
- <YW2EsxcqBucuyoal@zn.tnic>
- <20211018184003.3ob2uxcpd2rpee3s@amd.com>
- <YW3IdfMs61191qnU@zn.tnic>
- <20211020161023.hzbj53ehmzjrt4xd@amd.com>
- <YXF9sCbPDsLwlm42@zn.tnic>
- <YXGNmeR/C33HvaBi@work-vm>
- <YXGbcqN2IRh9YJk9@zn.tnic>
- <YXGflXdrAXH5fE5H@work-vm>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <YXGflXdrAXH5fE5H@work-vm>
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 21, 2021 at 06:12:53PM +0100, Dr. David Alan Gilbert wrote:
-> OK, so that bit is 8...21 Eax ext2eax bit 6 page 1-109
-> 
-> then 2.1.5.3 CPUID policy enforcement shows 8...21 EAX as
-> 'bitmask'
-> 'bits set in the GuestVal must also be set in HostVal.
-> This is often applied to feature fields where each bit indicates
-> support for a feature'
-> 
-> So that's right isn't it?
+Intra host migration provides a low-cost mechanism for userspace VMM
+upgrades.  It is an alternative to traditional (i.e., remote) live
+migration. Whereas remote migration handles moving a guest to a new host,
+intra host migration only handles moving a guest to a new userspace VMM
+within a host.  This can be used to update, rollback, change flags of the
+VMM, etc. The lower cost compared to live migration comes from the fact
+that the guest's memory does not need to be copied between processes. A
+handle to the guest memory simply gets passed to the new VMM, this could
+be done via /dev/shm with share=on or similar feature.
 
-Yap, AFAIRC, it would fail the check if:
+The guest state can be transferred from an old VMM to a new VMM as follows:
+1. Export guest state from KVM to the old user-space VMM via a getter
+user-space/kernel API 2. Transfer guest state from old VMM to new VMM via
+IPC communication 3. Import guest state into KVM from the new user-space
+VMM via a setter user-space/kernel API VMMs by exporting from KVM using
+getters, sending that data to the new VMM, then setting it again in KVM.
 
-(GuestVal & HostVal) != GuestVal
+In the common case for intra host migration, we can rely on the normal
+ioctls for passing data from one VMM to the next. SEV, SEV-ES, and other
+confidential compute environments make most of this information opaque, and
+render KVM ioctls such as "KVM_GET_REGS" irrelevant.  As a result, we need
+the ability to pass this opaque metadata from one VMM to the next. The
+easiest way to do this is to leave this data in the kernel, and transfer
+ownership of the metadata from one KVM VM (or vCPU) to the next. For
+example, we need to move the SEV enabled ASID, VMSAs, and GHCB metadata
+from one VMM to the next.  In general, we need to be able to hand off any
+data that would be unsafe/impossible for the kernel to hand directly to
+userspace (and cannot be reproduced using data that can be handed safely to
+userspace).
 
-and GuestVal is "the CPUID result value created by the hypervisor that
-it wants to give to the guest". Let's say it clears bit 6 there.
+V11
+ * Zero SEV-ES vCPU state on source.
+ * Rebase onto SEV-ES fixes.
 
-Then HostVal comes in which is "the actual CPUID result value specified
-in this PPR" and there the guest catches the HV lying its *ss off.
+V10
+ * Add new starting patch to refactor all SEV-ES related vCPU data into
+   for easier copying.
 
-:-)
+V9
+ * Fix sev_lock_vcpus_for_migration from unlocking the vCPU mutex it
+   failed to unlock.
+
+V8
+ * Update to require that @dst is not SEV or SEV-ES enabled.
+ * Address selftest feedback.
+
+V7
+ * Address selftest feedback.
+
+V6
+ * Add selftest.
+
+V5:
+ * Fix up locking scheme
+ * Address marcorr@ comments.
+
+V4:
+ * Move to seanjc@'s suggestion of source VM FD based single ioctl design.
+
+v3:
+ * Fix memory leak found by dan.carpenter@
+
+v2:
+ * Added marcorr@ reviewed by tag
+ * Renamed function introduced in 1/3
+ * Edited with seanjc@'s review comments
+ ** Cleaned up WARN usage
+ ** Userspace makes random token now
+ * Edited with brijesh.singh@'s review comments
+ ** Checks for different LAUNCH_* states in send function
+
+v1: https://lore.kernel.org/kvm/20210621163118.1040170-1-pgonda@google.com/
+
+base-commit: 9f1ee7b169af
+
+Cc: Marc Orr <marcorr@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Sean Christopherson <seanjc@google.com>
+Cc: David Rientjes <rientjes@google.com>
+Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Cc: Brijesh Singh <brijesh.singh@amd.com>
+Cc: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: Wanpeng Li <wanpengli@tencent.com>
+Cc: Jim Mattson <jmattson@google.com>
+Cc: Joerg Roedel <joro@8bytes.org>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: Borislav Petkov <bp@alien8.de>
+Cc: "H. Peter Anvin" <hpa@zytor.com>
+Cc: kvm@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+
+Peter Gonda (5):
+  Refactor out sev_es_state struct
+  KVM: SEV: Add support for SEV intra host migration
+  KVM: SEV: Add support for SEV-ES intra host migration
+  selftest: KVM: Add open sev dev helper
+  selftest: KVM: Add intra host migration tests
+
+ Documentation/virt/kvm/api.rst                |  15 +
+ arch/x86/include/asm/kvm_host.h               |   1 +
+ arch/x86/kvm/svm/sev.c                        | 268 +++++++++++++++---
+ arch/x86/kvm/svm/svm.c                        |   9 +-
+ arch/x86/kvm/svm/svm.h                        |  28 +-
+ arch/x86/kvm/x86.c                            |   6 +
+ include/uapi/linux/kvm.h                      |   1 +
+ tools/testing/selftests/kvm/Makefile          |   3 +-
+ .../testing/selftests/kvm/include/kvm_util.h  |   1 +
+ .../selftests/kvm/include/x86_64/svm_util.h   |   2 +
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  24 +-
+ tools/testing/selftests/kvm/lib/x86_64/svm.c  |  13 +
+ .../selftests/kvm/x86_64/sev_vm_tests.c       | 203 +++++++++++++
+ 13 files changed, 507 insertions(+), 67 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/sev_vm_tests.c
 
 -- 
-Regards/Gruss,
-    Boris.
+2.33.0.1079.g6e70778dc9-goog
 
-https://people.kernel.org/tglx/notes-about-netiquette
