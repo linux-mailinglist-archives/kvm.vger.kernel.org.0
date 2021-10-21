@@ -2,110 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 771FE436B92
-	for <lists+kvm@lfdr.de>; Thu, 21 Oct 2021 21:54:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E451A436BBE
+	for <lists+kvm@lfdr.de>; Thu, 21 Oct 2021 22:04:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231877AbhJUT4x (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Oct 2021 15:56:53 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:40563 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231984AbhJUT4v (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 21 Oct 2021 15:56:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634846072;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=XQQxB68/bqgix0H59OBXlceD3gg5Noo7Iow2EZ2n7yg=;
-        b=IPCHsUFujQzn7aTNpej8zRJrbF6mDzgwNsfjoDfb2TK+fkyyT9fGV1eleKlakTevTKD2zb
-        KI4+s6w2qQ7BG0ts9wCzy+aYyOTwOuh+15jk+mVw2G0L6jYT4/Q4dhu8I6EouOHmcUL6B6
-        +mk6avsUeX6oi2dvMWYeKfcGqYzuBaw=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-60-Bfu7W-zMMdqHEp9LS0wEWg-1; Thu, 21 Oct 2021 15:54:31 -0400
-X-MC-Unique: Bfu7W-zMMdqHEp9LS0wEWg-1
-Received: by mail-ed1-f69.google.com with SMTP id u10-20020a50d94a000000b003dc51565894so1423983edj.21
-        for <kvm@vger.kernel.org>; Thu, 21 Oct 2021 12:54:31 -0700 (PDT)
+        id S232013AbhJUUG7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Oct 2021 16:06:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32858 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231952AbhJUUG7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Oct 2021 16:06:59 -0400
+Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10B35C061764
+        for <kvm@vger.kernel.org>; Thu, 21 Oct 2021 13:04:43 -0700 (PDT)
+Received: by mail-pg1-x533.google.com with SMTP id m21so1257757pgu.13
+        for <kvm@vger.kernel.org>; Thu, 21 Oct 2021 13:04:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=BJdYaoVntWzrTJu7xhe7fmZqFzNwWeTLt9gWbNrG0tI=;
+        b=DyZK5UjsLM2sesHrMIFKiCLvbwjjm6pRQYaHN6kh2bjdpBd+o7evkX3d9O/HB2gCVy
+         9HS0r8ymYKhTg12KN8I4CrhlEfdKv4Xk3ALOHQ4mXeLFdHKKF+mUYFzEPXic2/yH4KVi
+         GzZ0x5/cF9q2KuyWxEkNaSc070B2tZ9WFJBm2oolGEsbcrdTtb/fnQYFp+UQqugJPxij
+         Ov2JgMaSOXUiH81fVFEKMW7mQWqRLHkh6qm7U7+SkK1mPCgCd04d+lxPNvXVHHt2g2Zl
+         Uq8MNQ8zSwMpdqGt7Nn/BOQsbipMtnMmbuRW9zbbDQGiS12bvzZfiCd+zwc53SUEULGQ
+         aGtg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=XQQxB68/bqgix0H59OBXlceD3gg5Noo7Iow2EZ2n7yg=;
-        b=JqJZuSxpwgXnzCvdZep85IEMcM/8Gh0Jv1vuI3oFmEuw8rgwsbF4M2J6jgRak3flpl
-         rl8rU5RWKIaqtRfA/HmFRnDicRuK2NpxC7pWKGkQwn729CQ5iwPiQrUnvr4MVZtwNcrv
-         LNcfHtKl6EFPas2JcLWRvqJmPWBu/FVsisCcLdxW28eNkvEJ61FR/xkabMpAUnGvHdI/
-         i2sSAFxmGFbSKhF2f4V5L0IZzbmn7D6qiRTzf90/zDFjgKBYHbjDwLaQ5ed2NLmGDx9L
-         NzhsiQTWsCWMrgvJ9ETv6f6pZ5/SahmmagTF3bosKdKAgajPWjMZJ7h8Sc/tjY2DFYnd
-         TNfA==
-X-Gm-Message-State: AOAM533sihQqOw+wjryXsXCgUwP4j4Gpw6+x0HhgY0EN1WBcZtXu/WK6
-        dDG5k3T57WFV7iIyhLHrYkP9kTgg7QUF8gdK29bMDd7OszxKB+LxORnbA2DcLFpy+LPzjAamb6M
-        tNWaKIyIYDdqF
-X-Received: by 2002:a05:6402:50c7:: with SMTP id h7mr10509070edb.191.1634846070222;
-        Thu, 21 Oct 2021 12:54:30 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzmJnU7g6ZVD24HMPBsZgL0Jyl+qXHtE9LJnZE9S9oVAH4QKW2i7BfFAIN7nIyagvTLyj43JA==
-X-Received: by 2002:a05:6402:50c7:: with SMTP id h7mr10509049edb.191.1634846070077;
-        Thu, 21 Oct 2021 12:54:30 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.gmail.com with ESMTPSA id t18sm3616082edd.18.2021.10.21.12.54.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 Oct 2021 12:54:29 -0700 (PDT)
-Message-ID: <7edcd370-41a5-f7e8-1ea9-a6073c97638d@redhat.com>
-Date:   Thu, 21 Oct 2021 21:54:26 +0200
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=BJdYaoVntWzrTJu7xhe7fmZqFzNwWeTLt9gWbNrG0tI=;
+        b=HlHp5FWI+wfDTvmC5ocn73klYuMJhagrihXNE9R84oSNTIPwrWbKSN01Mf0DYxgG1y
+         9hy4LiRUh+SFeCwc4/ZkTA1rvIWVzWYYPgkpowouGazR2ROCd6JOkXyUQciSmRV7G9Mr
+         C42VHRdV+jveqh8N/KVVhIJMCfCaPDtgQcKSHE2UEZrhZLTfBxeFHK9eYQEt3jThRuj7
+         j6Uz8YjZi0pxQzy0NwzVlkYFG3aFuNxP0anLIW2/xqCrLPBChLKU6xiR+6BrkfuFbs6b
+         XGhqj9Am2Bo+9F9P7nxlDgUEtb4FIBpTWdxqNQ7wLLkGEdK9yAR7J37jKt55VHBWebJw
+         m6Qg==
+X-Gm-Message-State: AOAM533MoLKC30NK3Moj62MudOXvSpBl8xIcLRKjrnt4z0PkFzbEd3D1
+        OSKSJ1qobhKXrt+WoSCgzDGe4Q==
+X-Google-Smtp-Source: ABdhPJyB+o2LF+Q8z+muxQ99/9OkhcI4FKylH+wkYoTPlnXf+riWGqXzgHGVhrTsmBfPFL1UGvcRWg==
+X-Received: by 2002:a05:6a00:24c1:b0:457:a10e:a0e with SMTP id d1-20020a056a0024c100b00457a10e0a0emr7511096pfv.63.1634846682353;
+        Thu, 21 Oct 2021 13:04:42 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id f21sm7567450pfc.203.2021.10.21.13.04.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Oct 2021 13:04:41 -0700 (PDT)
+Date:   Thu, 21 Oct 2021 20:04:38 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        fwilhelm@google.com, oupton@google.com
+Subject: Re: [PATCH 0/8] KVM: SEV-ES: fixes for string I/O emulation
+Message-ID: <YXHH1shFlGWyZqlw@google.com>
+References: <20211013165616.19846-1-pbonzini@redhat.com>
+ <435767c0-958d-f90f-d11a-cff42ab1205c@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [PATCH v2] selftests: kvm: fix mismatched fclose() after popen()
-Content-Language: en-US
-To:     Shuah Khan <skhan@linuxfoundation.org>, shuah@kernel.org
-Cc:     kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20211021175603.22391-1-skhan@linuxfoundation.org>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20211021175603.22391-1-skhan@linuxfoundation.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <435767c0-958d-f90f-d11a-cff42ab1205c@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 21/10/21 19:56, Shuah Khan wrote:
-> get_warnings_count() does fclose() using File * returned from popen().
-> Fix it to call pclose() as it should.
-> 
-> tools/testing/selftests/kvm/x86_64/mmio_warning_test
-> x86_64/mmio_warning_test.c: In function ‘get_warnings_count’:
-> x86_64/mmio_warning_test.c:87:9: warning: ‘fclose’ called on pointer returned from a mismatched allocation function [-Wmismatched-dealloc]
->     87 |         fclose(f);
->        |         ^~~~~~~~~
-> x86_64/mmio_warning_test.c:84:13: note: returned from ‘popen’
->     84 |         f = popen("dmesg | grep \"WARNING:\" | wc -l", "r");
->        |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> 
-> Signed-off-by: Shuah Khan <skhan@linuxfoundation.org>
-> ---
->   tools/testing/selftests/kvm/x86_64/mmio_warning_test.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/x86_64/mmio_warning_test.c b/tools/testing/selftests/kvm/x86_64/mmio_warning_test.c
-> index 8039e1eff938..9f55ccd169a1 100644
-> --- a/tools/testing/selftests/kvm/x86_64/mmio_warning_test.c
-> +++ b/tools/testing/selftests/kvm/x86_64/mmio_warning_test.c
-> @@ -84,7 +84,7 @@ int get_warnings_count(void)
->   	f = popen("dmesg | grep \"WARNING:\" | wc -l", "r");
->   	if (fscanf(f, "%d", &warnings) < 1)
->   		warnings = 0;
-> -	fclose(f);
-> +	pclose(f);
->   
->   	return warnings;
->   }
-> 
+On Thu, Oct 21, 2021, Paolo Bonzini wrote:
+> On 13/10/21 18:56, Paolo Bonzini wrote:
+> > This series, namely patches 1 and 8, fix two bugs in string I/O
+> > emulation for SEV-ES:
+> > 
+> > - first, the length is completely off for "rep ins" and "rep outs"
+> >    operation of size > 1.  After setup_vmgexit_scratch, svm->ghcb_sa_len
+> >    is in bytes, but kvm_sev_es_string_io expects the number of PIO
+> >    operations.
+> > 
+> > - second, the size of the GHCB buffer can exceed the size of
+> >    vcpu->arch.pio_data.  If that happens, we need to go over the GHCB
+> >    buffer in multiple passes.
+> > 
+> > The second bug was reported by Felix Wilhelm.  The first was found by
+> > me by code inspection; on one hand it seems *too* egregious so I'll be
+> > gladly proven wrong on this, on the other hand... I know I'm bad at code
+> > review, but not _that_ bad.
 
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-
-Thanks,
-
-Paolo
-
+String I/O was completely busted on the Linux guest side as well, I wouldn't be
+the least bit surprised if KVM were completely broken as well (reviewing now...).
