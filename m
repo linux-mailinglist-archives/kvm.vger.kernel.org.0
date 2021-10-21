@@ -2,70 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 083F6436211
-	for <lists+kvm@lfdr.de>; Thu, 21 Oct 2021 14:47:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2BF4A43625D
+	for <lists+kvm@lfdr.de>; Thu, 21 Oct 2021 15:08:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230323AbhJUMtv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Oct 2021 08:49:51 -0400
-Received: from mail.kernel.org ([198.145.29.99]:43698 "EHLO mail.kernel.org"
+        id S230438AbhJUNKu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Oct 2021 09:10:50 -0400
+Received: from mga18.intel.com ([134.134.136.126]:16751 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230190AbhJUMtu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Oct 2021 08:49:50 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 8B66760F56;
-        Thu, 21 Oct 2021 12:47:34 +0000 (UTC)
-Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <maz@kernel.org>)
-        id 1mdXTo-000hRj-AN; Thu, 21 Oct 2021 13:47:32 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        Ricardo Koller <ricarkol@google.com>
-Cc:     jingzhangos@google.com, maciej.szmigiero@oracle.com,
-        reijiw@google.com, oupton@google.com, drjones@redhat.com,
-        Paolo Bonzini <pbonzini@redhat.com>, pshier@google.com,
-        rananta@google.com
-Subject: Re: [PATCH v2 0/2] KVM: selftests: enable the memslot tests in ARM64
-Date:   Thu, 21 Oct 2021 13:47:28 +0100
-Message-Id: <163482044194.2203130.6587124513364503568.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210907180957.609966-1-ricarkol@google.com>
-References: <20210907180957.609966-1-ricarkol@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, ricarkol@google.com, jingzhangos@google.com, maciej.szmigiero@oracle.com, reijiw@google.com, oupton@google.com, drjones@redhat.com, pbonzini@redhat.com, pshier@google.com, rananta@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+        id S230285AbhJUNKt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Oct 2021 09:10:49 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10143"; a="215946240"
+X-IronPort-AV: E=Sophos;i="5.87,169,1631602800"; 
+   d="scan'208";a="215946240"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Oct 2021 06:08:27 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.87,169,1631602800"; 
+   d="scan'208";a="719492575"
+Received: from sqa-gate.sh.intel.com (HELO robert-ivt.tsp.org) ([10.239.48.212])
+  by fmsmga006.fm.intel.com with ESMTP; 21 Oct 2021 06:08:25 -0700
+Message-ID: <8887f54e9265c29c38b29d63c64dc029def07ecd.camel@linux.intel.com>
+Subject: Re: [PATCH v1 2/5] KVM: x86: nVMX: Update VMCS12 fields existence
+ when nVMX MSRs are set
+From:   Robert Hoo <robert.hu@linux.intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>, seanjc@google.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org
+Cc:     kvm@vger.kernel.org, yu.c.zhang@linux.intel.com
+Date:   Thu, 21 Oct 2021 21:08:23 +0800
+In-Reply-To: <cbe5d411-ba9b-0600-2c69-1f73f1d941df@redhat.com>
+References: <1629192673-9911-1-git-send-email-robert.hu@linux.intel.com>
+         <1629192673-9911-3-git-send-email-robert.hu@linux.intel.com>
+         <cbe5d411-ba9b-0600-2c69-1f73f1d941df@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-8.el7) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 7 Sep 2021 11:09:55 -0700, Ricardo Koller wrote:
-> Enable memslot_modification_stress_test and memslot_perf_test in ARM64
-> (second patch). memslot_modification_stress_test builds and runs in
-> aarch64 without any modification. memslot_perf_test needs some nits
-> regarding ucalls (first patch).
+On Wed, 2021-10-20 at 17:11 +0200, Paolo Bonzini wrote:
+> On 17/08/21 11:31, Robert Hoo wrote:
+> > +		vmcs12_field_update_by_vmexit_ctrl(vmx-
+> > >nested.msrs.entry_ctls_high,
+> > +				*highp, data >> 32,
+> > +				vmx-
+> > >nested.vmcs12_field_existence_bitmap);
+> > +		break;
+> > +	case MSR_IA32_VMX_TRUE_ENTRY_CTLS:
+> > +		vmcs12_field_update_by_vmentry_ctrl(vmx-
+> > >nested.msrs.exit_ctls_high,
+> > +				*highp, data >> 32,
+> > +				vmx-
+> > >nested.vmcs12_field_existence_bitmap);
 > 
-> Can anybody try these two tests in s390, please?
+> These two functions maybe could be merged into just one, since there
+> are 
+> going to be duplicate checks.
+
+Can I keep them? I think this is trivial, and separating them looks
+more clear, from logical perspective.:-)
+
+A summary question:
+am I going to send v2? since I'm not sure about Sean and Jim's decision
+on whether to implement the interaction with shadow VMCS (which will
+have to consume 8KiB more memory for each vmx).
+And, Jim mentioned they have some virtualizing shadow vmcs patches
+which is going to be sent to community. Should I wait for their
+patches?
 > 
-> [...]
-
-Applied to next, thanks!
-
-[1/2] KVM: selftests: make memslot_perf_test arch independent
-      commit: ffb4ce3c49366f02f1c064fbe2e66a96ab5f98b8
-[2/2] KVM: selftests: build the memslot tests for arm64
-      commit: 358928fd5264f069b9758f8b29297c7bff2a06de
-
-Cheers,
-
-	M.
--- 
-Without deviation from the norm, progress is not possible.
-
+> Paolo
+> 
 
