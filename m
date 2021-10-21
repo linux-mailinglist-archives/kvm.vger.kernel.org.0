@@ -2,44 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D7CE4360BB
-	for <lists+kvm@lfdr.de>; Thu, 21 Oct 2021 13:49:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9E31C4360BC
+	for <lists+kvm@lfdr.de>; Thu, 21 Oct 2021 13:49:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230327AbhJULvc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Oct 2021 07:51:32 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30873 "EHLO
+        id S230342AbhJULvd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Oct 2021 07:51:33 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:40510 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230231AbhJULvc (ORCPT
+        by vger.kernel.org with ESMTP id S230407AbhJULvc (ORCPT
         <rfc822;kvm@vger.kernel.org>); Thu, 21 Oct 2021 07:51:32 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
         s=mimecast20190719; t=1634816956;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=eqVRrmGmBcp5eJmDVwaXly4JMFwree0jbnxIoRxC58M=;
-        b=EZzrLsN9tY3hR+yvItwnD2HoKhjibuQpP3llRpepz91ltHh5OvG0jmviHUWG2eDtDu3DFV
-        I5TrAVDt0cLhiFXlJ+UGMWB4ugqohT+7ik3gLkGVYZCU0mO2uu/7/o+tVHo5c9HJpO7icG
-        w8CF1BYQSmESgiRb93WbK2kglnWBwf0=
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=csNBW+SL+Tkhi5Lrul1i7on2JECHfvEBYSvmf9oCWXQ=;
+        b=iSovEx1NjrMMwIjb2LAGMiqyAXcjb3dMjcc6yXckjr+n6MGDVr1apgiNk5bdHYqISkLOUy
+        Wpb6ecOT2ZhNuXA9KKtyMsYS41NaGmQzisC2MIBBUBdvJskwf+bM20tj8x+b8NYKCpj6qD
+        OWQe9V9LBSXETucdFWsKSIRybRW4nc8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-213-0fUBYPqVNh6KHMEWatwURw-1; Thu, 21 Oct 2021 07:49:12 -0400
-X-MC-Unique: 0fUBYPqVNh6KHMEWatwURw-1
+ us-mta-528-21U0T1K5PiOiap37fejEuQ-1; Thu, 21 Oct 2021 07:49:13 -0400
+X-MC-Unique: 21U0T1K5PiOiap37fejEuQ-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 31FB293C;
-        Thu, 21 Oct 2021 11:49:11 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0CB43806694;
+        Thu, 21 Oct 2021 11:49:12 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7858D5FC13;
-        Thu, 21 Oct 2021 11:49:10 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4B8A06788F;
+        Thu, 21 Oct 2021 11:49:11 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     kvm@vger.kernel.org
 Cc:     aaronlewis@google.com, jmattson@google.com, zxwang42@gmail.com,
         marcorr@google.com, seanjc@google.com, jroedel@suse.de,
         varad.gautam@suse.com
-Subject: [PATCH v3 kvm-unit-tests 0/8] x86: Move IDT, GDT and TSS to C code
-Date:   Thu, 21 Oct 2021 07:49:01 -0400
-Message-Id: <20211021114910.1347278-1-pbonzini@redhat.com>
+Subject: [PATCH kvm-unit-tests 1/9] x86: cleanup handling of 16-byte GDT descriptors
+Date:   Thu, 21 Oct 2021 07:49:02 -0400
+Message-Id: <20211021114910.1347278-2-pbonzini@redhat.com>
+In-Reply-To: <20211021114910.1347278-1-pbonzini@redhat.com>
+References: <20211021114910.1347278-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
@@ -47,56 +50,102 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Patches 1-4 clean up tss_descr; it is declared as a struct
-descriptor_table_ptr but it is actualy pointing to an _entry_ in the GDT.
-Also it is different per CPU, but tss_descr does not recognize that.
-Fix both by reusing the code (already present e.g. in the vmware_backdoors
-test) that extracts the base from the GDT entry; and also provide a
-helper to retrieve the limit, which is needed in vmx.c.
+Look them up using a gdt_entry_t pointer, so that the address of
+the descriptor is correct even for "odd" selectors (e.g. 0x98).
+Rename the struct from segment_desc64 to system_desc64,
+highlighting that it is only used in the case of S=0 (system
+descriptor).  Rename the "limit" bitfield to "limit2", matching
+the convention used for the various parts of the base field.
 
-Patches 5-9 move the IDT, GDT and TSS to C code.  This was originally done
-by Zixuan Wang for the UEFI port, which is 64-bit only.  The series extends
-this to 32-bit code for consistency and to avoid duplicating code between
-C and assembly.
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ lib/x86/desc.h         |  4 ++--
+ x86/svm_tests.c        | 12 ++++++------
+ x86/vmware_backdoors.c |  8 ++++----
+ 3 files changed, 12 insertions(+), 12 deletions(-)
 
-Paolo
-
-v2->v3: cleaned up handling of 16 byte descriptors (new patch 1)
-	get TR limit from GDT
-	rename high four bits of segment limit to "limit2"
-	included Zixuan's work to port GDT/TSS/IDT to C, extended to 32-bit
-
-Paolo Bonzini (8):
-  x86: cleanup handling of 16-byte GDT descriptors
-  x86: fix call to set_gdt_entry
-  unify field names and definitions for GDT descriptors
-  replace tss_descr global with a function
-  x86: Move IDT to desc.c
-  x86: unify name of 32-bit and 64-bit GDT
-  x86: get rid of ring0stacktop
-  x86: Move 32-bit GDT and TSS to desc.c
-
-Zixuan Wang (1):
-  x86: Move 64-bit GDT and TSS to desc.c
-
- lib/x86/asm/setup.h    |   6 +++
- lib/x86/desc.c         | 116 +++++++++++++++++++++++++++++++++++------
- lib/x86/desc.h         |  31 +++++------
- lib/x86/setup.c        |  49 +++++++++++++++++
- lib/x86/usermode.c     |   9 ++--
- x86/access.c           |  16 +++---
- x86/cstart.S           | 115 ++++++----------------------------------
- x86/cstart64.S         |  97 ++++------------------------------
- x86/smap.c             |   2 +-
- x86/svm_tests.c        |  15 ++----
- x86/taskswitch.c       |   4 +-
- x86/umip.c             |  19 ++++---
- x86/vmware_backdoors.c |  22 +++-----
- x86/vmx.c              |  17 +++---
- x86/vmx_tests.c        |   4 +-
- 15 files changed, 244 insertions(+), 278 deletions(-)
- create mode 100644 lib/x86/asm/setup.h
-
+diff --git a/lib/x86/desc.h b/lib/x86/desc.h
+index a6ffb38..1755486 100644
+--- a/lib/x86/desc.h
++++ b/lib/x86/desc.h
+@@ -172,7 +172,7 @@ typedef struct {
+ 	u8 base_high;
+ } gdt_entry_t;
+ 
+-struct segment_desc64 {
++struct system_desc64 {
+ 	uint16_t limit1;
+ 	uint16_t base1;
+ 	uint8_t  base2;
+@@ -183,7 +183,7 @@ struct segment_desc64 {
+ 			uint16_t s:1;
+ 			uint16_t dpl:2;
+ 			uint16_t p:1;
+-			uint16_t limit:4;
++			uint16_t limit2:4;
+ 			uint16_t avl:1;
+ 			uint16_t l:1;
+ 			uint16_t db:1;
+diff --git a/x86/svm_tests.c b/x86/svm_tests.c
+index afdd359..2fdb0dc 100644
+--- a/x86/svm_tests.c
++++ b/x86/svm_tests.c
+@@ -1876,22 +1876,22 @@ static bool reg_corruption_check(struct svm_test *test)
+ static void get_tss_entry(void *data)
+ {
+     struct descriptor_table_ptr gdt;
+-    struct segment_desc64 *gdt_table;
+-    struct segment_desc64 *tss_entry;
++    gdt_entry_t *gdt_table;
++    struct system_desc64 *tss_entry;
+     u16 tr = 0;
+ 
+     sgdt(&gdt);
+     tr = str();
+-    gdt_table = (struct segment_desc64 *) gdt.base;
+-    tss_entry = &gdt_table[tr / sizeof(struct segment_desc64)];
+-    *((struct segment_desc64 **)data) = tss_entry;
++    gdt_table = (gdt_entry_t *) gdt.base;
++    tss_entry = (struct system_desc64 *) &gdt_table[tr / 8];
++    *((struct system_desc64 **)data) = tss_entry;
+ }
+ 
+ static int orig_cpu_count;
+ 
+ static void init_startup_prepare(struct svm_test *test)
+ {
+-    struct segment_desc64 *tss_entry;
++    struct system_desc64 *tss_entry;
+     int i;
+ 
+     on_cpu(1, get_tss_entry, &tss_entry);
+diff --git a/x86/vmware_backdoors.c b/x86/vmware_backdoors.c
+index b4902a9..b1433cd 100644
+--- a/x86/vmware_backdoors.c
++++ b/x86/vmware_backdoors.c
+@@ -133,8 +133,8 @@ struct fault_test vmware_backdoor_tests[] = {
+ static void set_tss_ioperm(void)
+ {
+ 	struct descriptor_table_ptr gdt;
+-	struct segment_desc64 *gdt_table;
+-	struct segment_desc64 *tss_entry;
++	gdt_entry_t *gdt_table;
++	struct system_desc64 *tss_entry;
+ 	u16 tr = 0;
+ 	tss64_t *tss;
+ 	unsigned char *ioperm_bitmap;
+@@ -142,8 +142,8 @@ static void set_tss_ioperm(void)
+ 
+ 	sgdt(&gdt);
+ 	tr = str();
+-	gdt_table = (struct segment_desc64 *) gdt.base;
+-	tss_entry = &gdt_table[tr / sizeof(struct segment_desc64)];
++	gdt_table = (gdt_entry_t *) gdt.base;
++	tss_entry = (struct system_desc64 *) &gdt_table[tr / 8];
+ 	tss_base = ((uint64_t) tss_entry->base1 |
+ 			((uint64_t) tss_entry->base2 << 16) |
+ 			((uint64_t) tss_entry->base3 << 24) |
 -- 
 2.27.0
+
 
