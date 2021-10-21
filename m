@@ -2,96 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8745B43643A
-	for <lists+kvm@lfdr.de>; Thu, 21 Oct 2021 16:27:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 80F16436443
+	for <lists+kvm@lfdr.de>; Thu, 21 Oct 2021 16:28:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231814AbhJUO3p (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Oct 2021 10:29:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:43956 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231623AbhJUO3l (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 21 Oct 2021 10:29:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634826444;
+        id S231154AbhJUOa0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Oct 2021 10:30:26 -0400
+Received: from mail.skyhub.de ([5.9.137.197]:55022 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229878AbhJUOaZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Oct 2021 10:30:25 -0400
+Received: from zn.tnic (p200300ec2f1912003b8abe7004197216.dip0.t-ipconnect.de [IPv6:2003:ec:2f19:1200:3b8a:be70:419:7216])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id CD0101EC0554;
+        Thu, 21 Oct 2021 16:28:07 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1634826487;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=B7x2spmNSm74cr0wAgUB2pdUqCV5GYdCRbjeqGjf9Ms=;
-        b=BkQtBe50BVrnv62Cb63m1xjCI5pqVEv/sXvJlsr3jLubPZt9jvO/vq6hxrgPcLF0NgmaX9
-        T8CZa+fuHR21MM7im2zYppGC6aJfQ4V6ytE7qU1SblffNrA0OQfOc9T7TUH+N0KQ0wAnT5
-        wvZC5vDC2Yf2tAdXJO1GQY7gj1FkhBw=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-318-G0pSRvAPPMWHUhbHAibZ0Q-1; Thu, 21 Oct 2021 10:27:23 -0400
-X-MC-Unique: G0pSRvAPPMWHUhbHAibZ0Q-1
-Received: by mail-ed1-f72.google.com with SMTP id u23-20020a50a417000000b003db23c7e5e2so534046edb.8
-        for <kvm@vger.kernel.org>; Thu, 21 Oct 2021 07:27:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=B7x2spmNSm74cr0wAgUB2pdUqCV5GYdCRbjeqGjf9Ms=;
-        b=5yA0pJ12A6C3H7DDE4q9RuB6nihKL6CyxmE01+hvoio5bUt3vLBdtGsnUYyNTAWFoT
-         DPCkKRA5Iz7ZaFtkt9S89ecgg+WF8IhnVEGFcIipDK7MV6o04/GBOyVVgWtRvpnLGqiM
-         yfuEjLoP8d1o+x6wfpfup5EmHOkXGX0e27X8B8HsBZwF0TJzkZa0ZoacrZvhLZfjv5Tx
-         LACV5VLzYLOUPWSKnuUDmaQinNHQD48ZWyv0Cd/E8DSA1Zl3k1KcJVTEpI3Log+ZPXJu
-         RrWc/9KLNGDagLkrNoYJnrnY2pbi51/JVWsZydAqmdy59Sq/iqotxrABP9m7Efri2bz6
-         nKnQ==
-X-Gm-Message-State: AOAM533Mzqp3yNmpadh5mZ4YoiZHkvQtGZFZ4qIJd+O43Y0BEOds7uVF
-        KUqBJi14IZzlRmMroQ1IT3MXjedwddSS5t5xOAtqJMmn5JnPLw+cRyq8/znqrWerC7qggDPYpZA
-        tsqRlIFqhUMvn
-X-Received: by 2002:a17:907:2d14:: with SMTP id gs20mr7517802ejc.415.1634826442188;
-        Thu, 21 Oct 2021 07:27:22 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyBEDp+BTX2sdI3MFfnAek86kDPk4PYMovq2RqshGtA7ZCYyHKfNftXWE5Yf8mdUElhcjOeIw==
-X-Received: by 2002:a17:907:2d14:: with SMTP id gs20mr7517767ejc.415.1634826441967;
-        Thu, 21 Oct 2021 07:27:21 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.gmail.com with ESMTPSA id kw5sm2613320ejc.110.2021.10.21.07.27.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 Oct 2021 07:27:19 -0700 (PDT)
-Message-ID: <525709a4-be1f-8360-8546-ba22346d681f@redhat.com>
-Date:   Thu, 21 Oct 2021 16:27:18 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [kvm-unit-tests PATCH v3 00/17] x86_64 UEFI and AMD SEV/SEV-ES
- support
-Content-Language: en-US
-To:     Marc Orr <marcorr@google.com>
-Cc:     Zixuan Wang <zxwang42@gmail.com>, kvm list <kvm@vger.kernel.org>,
-        Andrew Jones <drjones@redhat.com>,
-        "Hyunwook (Wooky) Baek" <baekhw@google.com>,
-        Tom Roeder <tmroeder@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        David Rientjes <rientjes@google.com>,
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=rcU9vPUUzI5swHp7U/1X5pUaXTmEfV+1ihJzmOdAcOM=;
+        b=qMTa8TKwojdJWcWHU4iWnSB3q3yU5q61pMpG8GDVfyoMftwa8AJp8ju65Ond55BqBrHHZr
+        FaxndF/cbJqIyuqXkmPXxt8wD/vwcy/4fnPFK5VBwgfOiZMy6w8afPcPqpDhCVTNOfExBW
+        fnUfImp1INRySM74yPeOVphMoiw8cy0=
+Date:   Thu, 21 Oct 2021 16:28:07 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Michael Roth <michael.roth@amd.com>
+Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
-        "Singh, Brijesh" <brijesh.singh@amd.com>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        Varad Gautam <varad.gautam@suse.com>,
-        Joerg Roedel <jroedel@suse.de>, bp@suse.de
-References: <20211004204931.1537823-1-zxwang42@gmail.com>
- <4d3b7ca8-2484-e45c-9551-c4f67fc88da6@redhat.com>
- <CAA03e5E9BSLsuv5XQiMZGAL+MOqcbyWok0p6Z7U3m14W0p9bsA@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <CAA03e5E9BSLsuv5XQiMZGAL+MOqcbyWok0p6Z7U3m14W0p9bsA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH v6 08/42] x86/sev-es: initialize sev_status/features
+ within #VC handler
+Message-ID: <YXF4914AczWoN8TK@zn.tnic>
+References: <20211008180453.462291-1-brijesh.singh@amd.com>
+ <20211008180453.462291-9-brijesh.singh@amd.com>
+ <YW2EsxcqBucuyoal@zn.tnic>
+ <20211018184003.3ob2uxcpd2rpee3s@amd.com>
+ <YW3IdfMs61191qnU@zn.tnic>
+ <20211020161023.hzbj53ehmzjrt4xd@amd.com>
+ <YXBZYws8NnxiQJD7@zn.tnic>
+ <20211021003535.ic35p6nnxdmavw35@amd.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20211021003535.ic35p6nnxdmavw35@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 21/10/21 16:22, Marc Orr wrote:
-> Should we go ahead and post it to the list (and perhaps update the 
-> branch in the gitlab so everyone can work off of that)? Or would it
-> be easier to wait for the GDT cleanup work to finalize, and then post
-> it afterward?
+On Wed, Oct 20, 2021 at 07:35:35PM -0500, Michael Roth wrote:
+> Fortunately, all the code makes use of sev_status to get at the SEV MSR
+> bits, so breaking the appropriate bits out of sme_enable() into an earlier
+> sev_init() routine that's the exclusive writer of sev_status sounds like a
+> promising approach.
 
-I would say, just post it on top of the 'uefi' branch.  I'm not sure how 
-and when it will be merged in 'master', but for the next few weeks I 
-suppose it's okay if I get incremental patches, and either squash them 
-or commit them on top.
+Ack.
 
-Paolo
+> It makes sense to do it immediately after the first #VC handler is set
+> up, so CPUID is available, and since that's where SNP CPUID table
+> initialization would need to happen if it's to be made available in
+> #VC handler.
 
+Right, and you can do all your init/CPUID prep there.
+
+> It may even be similar enough between boot/compressed and run-time kernel
+> that it could be a shared routine in sev-shared.c.
+
+Uuh, bonus points! :-)
+
+> But then again it also sounds like the appropriate place to move the
+> snp_cpuid_init*() calls, and locating the cc_blob, and since there's
+> differences there it might make sense to keep the boot/compressed and
+> kernel proper sev_init() routines separate to avoid #ifdeffery).
+>
+> Not to get ahead of myself though. Just seems like a good starting point
+> for how to consolidate the various users.
+
+I like how you're thinking. :)
+
+> Got it, and my apologies if I've given you that impression as it's
+> certainly not my intent. (though I'm sure you've heard that before.)
+
+Nothing to apologize - all good.
+
+> Agreed, if we need to check SEV MSR early for the purposes of SNP it makes
+> sense to move the overall SEV feature detection code earlier as well. I
+> should have looked into that aspect more closely before introducing the
+> changes.
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
