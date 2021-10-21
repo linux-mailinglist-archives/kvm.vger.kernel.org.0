@@ -2,183 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E0B15436850
-	for <lists+kvm@lfdr.de>; Thu, 21 Oct 2021 18:48:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E8807436867
+	for <lists+kvm@lfdr.de>; Thu, 21 Oct 2021 18:53:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231520AbhJUQuq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Oct 2021 12:50:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29572 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232033AbhJUQup (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 21 Oct 2021 12:50:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634834909;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=VCfninvKWV47Xsp5RP9uGNnQM9wSoQBnNs6aRe8wJDY=;
-        b=TNNv8OEAK0ywbmQsRdJ68Km2fOXoAcbFYdWDP49DWxkQiEaswkqChlFEDbU27qltVwH94R
-        ytdkCdFPrHiN98AL0DF2XtaQ2Pb//s4AvGDQmBjuhwmrnwR1VGjSLCXBIW1tXcTlAdQo0A
-        TDQKCqtWp52lEZKVFIj4U+DbVKdkje0=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-569-k3Yyg9NYMRShPi_zTQMhHA-1; Thu, 21 Oct 2021 12:48:28 -0400
-X-MC-Unique: k3Yyg9NYMRShPi_zTQMhHA-1
-Received: by mail-ed1-f72.google.com with SMTP id c30-20020a50f61e000000b003daf3955d5aso264565edn.4
-        for <kvm@vger.kernel.org>; Thu, 21 Oct 2021 09:48:28 -0700 (PDT)
+        id S232102AbhJUQ4O (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Oct 2021 12:56:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45776 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232086AbhJUQ4N (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Oct 2021 12:56:13 -0400
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C707C061764
+        for <kvm@vger.kernel.org>; Thu, 21 Oct 2021 09:53:57 -0700 (PDT)
+Received: by mail-pj1-x1035.google.com with SMTP id a15-20020a17090a688f00b001a132a1679bso3625250pjd.0
+        for <kvm@vger.kernel.org>; Thu, 21 Oct 2021 09:53:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=kyOHgwN0DHuVRwh7hozPiSAKvYo27wrNY2DziVcXuFE=;
+        b=ObAEjndWCrMEZyDcTVCTq7+9Uy/48+jQNaX8SknrA4CnTIBbq/Nh43UtzV/JBv9SI1
+         cZgECuiRl0bVVDof23b0H25/Rgj0uAMfLoImvEpLLa0I/t1y5uSJQ4KXekkGRevsexwI
+         4gQ82uePuAHJAtMMlH8+Vyc3mfLITQKAyn4CqIT1okGvgyyknfhJ90wIEpPpMJIxR7z0
+         d+zMkW+1TGz6xtDwEUuzkndBtHOfZwwTMK/G8KEnCLN69dcNkkFBtErBRPszA7QoUhTy
+         Zg9Br0VEm/cg7dOagFsR3wvijJ1caSw83tVbqeUOHK8vMvd5ZD5S8pjV6TOZkJN9Kvrc
+         ++nw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=VCfninvKWV47Xsp5RP9uGNnQM9wSoQBnNs6aRe8wJDY=;
-        b=n0RWx7CTqE/2HKFnk8oj767xf4/hNvI0SIt56fsL0eFREOGjNxLy5QTm48Ft5qvs6I
-         +U8CG9DZJ4CstsWFXimRmOE7e6e9L1+Ws7VXmwZ063J/tSMoiPnb20YuQogAz0Lbt0P6
-         QTZu4YNvdxKGg6UiuGxEzHSsM/gJwqeK2OHqbkk0PxZw3A2eKaxczvyyq2mkMqQRSP54
-         SSy/PrTmKXVSCQ+u4cixQ5z0pxyoxZMNIK8TDUDAf7fwzJi64S4rD/cI989A8CLMQnND
-         z5PF9q2s08TCAMST3Yfo8WFmg93gCEXPtdXZaDoAqGX6dLb3dCBGyh1O/xrvPJ3re+RB
-         tK6Q==
-X-Gm-Message-State: AOAM531WH87+bxXdUPHKtIcjQ2ZUvNOoX350aEo9XK/Q8uyiX7NchA/u
-        tzZlTC++6iN9nc/dCriI2m1m4PINnY58g84/oKJzBuWVB58tW0ZfiJ9RXnOIoDiM2F56r921fib
-        CrCqsCkdsO3r4
-X-Received: by 2002:a05:6402:1d49:: with SMTP id dz9mr8906077edb.55.1634834907134;
-        Thu, 21 Oct 2021 09:48:27 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzfUh/gwLHsLAnloHareVcoBblGeHhzpVkYSFaPuXfPlmJE71AfB3siwZaeIXtqnPns26Vmdw==
-X-Received: by 2002:a05:6402:1d49:: with SMTP id dz9mr8906052edb.55.1634834906943;
-        Thu, 21 Oct 2021 09:48:26 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.gmail.com with ESMTPSA id b2sm3206364edv.73.2021.10.21.09.48.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 Oct 2021 09:48:26 -0700 (PDT)
-Message-ID: <71547952-c3e7-6683-5eea-70d3003d5224@redhat.com>
-Date:   Thu, 21 Oct 2021 18:48:24 +0200
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=kyOHgwN0DHuVRwh7hozPiSAKvYo27wrNY2DziVcXuFE=;
+        b=dps4zAe04uIdO7/DxMNHpPXoEvPUFgwxo8tl1E3gdFUqM56HMFzg5y4rD0/xHLRQjh
+         IhSW4w7NJrcid5COGWNShzy22U8TIq4mhTnBMC3edHo1RJ4TqDJEnam1MloTaZV8FPo2
+         m0rPO4SvaeerW3j7UGgp4OHYM7jKf8S7bBcWr1TR7EmiL94g2MgqB/SsBW5YP0M3sWXM
+         YWRx+LSc3fsM3UOWHsuc71OTwWRnUVCh96kpthGI4U6z2UP8o1OH1pnuvhz0nOPeqVAt
+         gaz0MhmGxpjDg7/t5zF+WtB9X9kLFiyFUt4VHQSAeunmswvaHtA8y19qjwkz1za9mVoU
+         sBjA==
+X-Gm-Message-State: AOAM533oeJzW76bFK3riz6uyWOagC6ex8t5yNUfButAmBJ7LVFytSMV7
+        65S68re0lqzOAyUtN7hYmYHwUg==
+X-Google-Smtp-Source: ABdhPJxK+lc6WPlEyEt5iufGm+pw8tpEBldLFqlqvq/OvNOKRuX56sHfdQ3bWP4qQH+grMC5q6JrxQ==
+X-Received: by 2002:a17:90b:4ad2:: with SMTP id mh18mr7793988pjb.18.1634835236588;
+        Thu, 21 Oct 2021 09:53:56 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id m186sm6803444pfb.165.2021.10.21.09.53.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Oct 2021 09:53:56 -0700 (PDT)
+Date:   Thu, 21 Oct 2021 16:53:52 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     David Matlack <dmatlack@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Ben Gardon <bgardon@google.com>,
+        Junaid Shahid <junaids@google.com>
+Subject: Re: [PATCH v2] KVM: x86/mmu: Rename slot_handle_leaf to
+ slot_handle_level_4k
+Message-ID: <YXGbIHAJSPgYh34g@google.com>
+References: <20211019162223.3935109-1-dmatlack@google.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [RFC 00/16] KVM: selftests: Add tests for SEV, SEV-ES, and
- SEV-SNP guests
-Content-Language: en-US
-To:     Michael Roth <michael.roth@amd.com>,
-        linux-kselftest@vger.kernel.org
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
-        Nathan Tempelman <natet@google.com>,
-        Marc Orr <marcorr@google.com>,
-        Steve Rutherford <srutherford@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Mingwei Zhang <mizhang@google.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Varad Gautam <varad.gautam@suse.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Ricardo Koller <ricarkol@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H . Peter Anvin" <hpa@zytor.com>
-References: <20211005234459.430873-1-michael.roth@amd.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20211005234459.430873-1-michael.roth@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211019162223.3935109-1-dmatlack@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 06/10/21 01:44, Michael Roth wrote:
-> These patches and are also available at:
+On Tue, Oct 19, 2021, David Matlack wrote:
+> slot_handle_leaf is a misnomer because it only operates on 4K SPTEs
+> whereas "leaf" is used to describe any valid terminal SPTE (4K or
+> large page). Rename slot_handle_leaf to slot_handle_level_4k to
+> avoid confusion.
 > 
->    https://github.com/mdroth/linux/commits/sev-selftests-rfc1
+> Making this change makes it more obvious there is a benign discrepency
+> between the legacy MMU and the TDP MMU when it comes to dirty logging.
+> The legacy MMU only iterates through 4K SPTEs when zapping for
+> collapsing and when clearing D-bits. The TDP MMU, on the other hand,
+> iterates through SPTEs on all levels.
 > 
-> They are based on top of v5 of Brijesh's SEV-SNP hypervisor patches[1]
-> to allow for SEV-SNP testing and provide some context for the overall
-> design, but the SEV/SEV-ES patches can be carved out into a separate
-> series as needed.
+> The TDP MMU behavior of zapping SPTEs at all levels is technically
+> overkill for its current dirty logging implementation, which always
+> demotes to 4k SPTES, but both the TDP MMU and legacy MMU zap if and only
+> if the SPTE can be replaced by a larger page, i.e. will not spuriously
+> zap 2m (or larger) SPTEs. Opportunistically add comments to explain this
+> discrepency in the code.
 > 
-> == OVERVIEW ==
-> 
-> This series introduces a set of memory encryption-related parameter/hooks
-> in the core kselftest library, then uses the hooks to implement a small
-> library for creating/managing SEV, SEV-ES, SEV-SNP guests. This library
-> is then used to implement a basic boot/memory test that's run for all
-> variants of SEV/SEV-ES/SEV-SNP guest types, as well as a set of SEV-SNP
-> tests that cover various permutations of pvalidate/page-state changes.
-> 
-> - Patches 1-7 implement SEV boot tests and should run against existing
->    kernels
-> - Patch 8 is a KVM changes that's required to allow SEV-ES/SEV-SNP
->    guests to boot with an externally generated page table, and is a
->    host kernel prequisite for the remaining patches in the series.
-> - Patches 9-12 extend the boot tests to cover SEV-ES
-> - Patches 13-16 extend the boot testst to cover SEV-SNP, and introduce
->    an additional test for page-state changes.
+> Signed-off-by: David Matlack <dmatlack@google.com>
+> ---
 
-Hi Mike,
-
-this SEV/SEV-ES testing (both your series and kvm-unit-tests) is good 
-stuff. :)  If you fix up patches 1-12, I will commit them pretty much 
-straight away.  The only thing that possibly needs some thought is the 
-integration with ucall.
-
-Thanks,
-
-Paolo
-
-> Any review/comments are greatly appreciated!
-> 
-> [1] https://lore.kernel.org/linux-mm/20210820155918.7518-1-brijesh.singh@amd.com/
-> 
-> ----------------------------------------------------------------
-> Michael Roth (16):
->        KVM: selftests: move vm_phy_pages_alloc() earlier in file
->        KVM: selftests: add hooks for managing encrypted guest memory
->        KVM: selftests: handle encryption bits in page tables
->        KVM: selftests: set CPUID before setting sregs in vcpu creation
->        KVM: selftests: add support for encrypted vm_vaddr_* allocations
->        KVM: selftests: add library for creating/interacting with SEV guests
->        KVM: selftests: add SEV boot tests
->        KVM: SVM: include CR3 in initial VMSA state for SEV-ES guests
->        KVM: selftests: account for error code in #VC exception frame
->        KVM: selftests: add support for creating SEV-ES guests
->        KVM: selftests: add library for handling SEV-ES-related exits
->        KVM: selftests: add SEV-ES boot tests
->        KVM: selftests: add support for creating SEV-SNP guests
->        KVM: selftests: add helpers for SEV-SNP-related instructions/exits
->        KVM: selftests: add SEV-SNP boot tests
->        KVM: selftests: add SEV-SNP tests for page-state changes
-> 
->   arch/x86/include/asm/kvm-x86-ops.h                 |   1 +
->   arch/x86/include/asm/kvm_host.h                    |   1 +
->   arch/x86/kvm/svm/svm.c                             |  22 ++
->   arch/x86/kvm/vmx/vmx.c                             |   8 +
->   arch/x86/kvm/x86.c                                 |   3 +-
->   tools/testing/selftests/kvm/.gitignore             |   2 +
->   tools/testing/selftests/kvm/Makefile               |   3 +
->   tools/testing/selftests/kvm/include/kvm_util.h     |   8 +
->   tools/testing/selftests/kvm/include/x86_64/sev.h   |  70 ++++
->   .../selftests/kvm/include/x86_64/sev_exitlib.h     |  20 ++
->   tools/testing/selftests/kvm/include/x86_64/svm.h   |  35 ++
->   .../selftests/kvm/include/x86_64/svm_util.h        |   2 +
->   tools/testing/selftests/kvm/lib/kvm_util.c         | 249 +++++++++-----
->   .../testing/selftests/kvm/lib/kvm_util_internal.h  |  10 +
->   tools/testing/selftests/kvm/lib/x86_64/handlers.S  |   4 +-
->   tools/testing/selftests/kvm/lib/x86_64/processor.c |  30 +-
->   tools/testing/selftests/kvm/lib/x86_64/sev.c       | 381 +++++++++++++++++++++
->   .../testing/selftests/kvm/lib/x86_64/sev_exitlib.c | 326 ++++++++++++++++++
->   .../selftests/kvm/x86_64/sev_all_boot_test.c       | 367 ++++++++++++++++++++
->   .../selftests/kvm/x86_64/sev_snp_psc_test.c        | 378 ++++++++++++++++++++
->   20 files changed, 1820 insertions(+), 100 deletions(-)
->   create mode 100644 tools/testing/selftests/kvm/include/x86_64/sev.h
->   create mode 100644 tools/testing/selftests/kvm/include/x86_64/sev_exitlib.h
->   create mode 100644 tools/testing/selftests/kvm/lib/x86_64/sev.c
->   create mode 100644 tools/testing/selftests/kvm/lib/x86_64/sev_exitlib.c
->   create mode 100644 tools/testing/selftests/kvm/x86_64/sev_all_boot_test.c
->   create mode 100644 tools/testing/selftests/kvm/x86_64/sev_snp_psc_test.c
-> 
-> 
-> 
-
+Reviewed-by: Sean Christopherson <seanjc@google.com>
