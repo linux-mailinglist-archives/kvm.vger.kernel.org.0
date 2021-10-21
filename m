@@ -2,86 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E451A436BBE
-	for <lists+kvm@lfdr.de>; Thu, 21 Oct 2021 22:04:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 48A2A436BC3
+	for <lists+kvm@lfdr.de>; Thu, 21 Oct 2021 22:08:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232013AbhJUUG7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Oct 2021 16:06:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32858 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231952AbhJUUG7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Oct 2021 16:06:59 -0400
-Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10B35C061764
-        for <kvm@vger.kernel.org>; Thu, 21 Oct 2021 13:04:43 -0700 (PDT)
-Received: by mail-pg1-x533.google.com with SMTP id m21so1257757pgu.13
-        for <kvm@vger.kernel.org>; Thu, 21 Oct 2021 13:04:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=BJdYaoVntWzrTJu7xhe7fmZqFzNwWeTLt9gWbNrG0tI=;
-        b=DyZK5UjsLM2sesHrMIFKiCLvbwjjm6pRQYaHN6kh2bjdpBd+o7evkX3d9O/HB2gCVy
-         9HS0r8ymYKhTg12KN8I4CrhlEfdKv4Xk3ALOHQ4mXeLFdHKKF+mUYFzEPXic2/yH4KVi
-         GzZ0x5/cF9q2KuyWxEkNaSc070B2tZ9WFJBm2oolGEsbcrdTtb/fnQYFp+UQqugJPxij
-         Ov2JgMaSOXUiH81fVFEKMW7mQWqRLHkh6qm7U7+SkK1mPCgCd04d+lxPNvXVHHt2g2Zl
-         Uq8MNQ8zSwMpdqGt7Nn/BOQsbipMtnMmbuRW9zbbDQGiS12bvzZfiCd+zwc53SUEULGQ
-         aGtg==
+        id S231852AbhJUUKs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Oct 2021 16:10:48 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39879 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231443AbhJUUKr (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 21 Oct 2021 16:10:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1634846910;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=mmsmJ/pPdiOUowj1+queJxhgagora/RkFzbUPsH0NgI=;
+        b=KF7xLlRfh0+1XiMicQskyfi8lPRjjmX3bc6Yxt71R7IwxpXkSYJR63wz5R3y4hGlS4dz8I
+        sKwcK7hPAbb8rj1h1gURqA/Ryd5QGMyzWhOSA6jqMpZug1S66TJHlxC/GX5ZmDxY5Zjt96
+        XuhI0Z1jShMVEa6ZsclaR3gxsSzZQz4=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-547-O1qVFk22NWm82Oe95bFTww-1; Thu, 21 Oct 2021 16:08:29 -0400
+X-MC-Unique: O1qVFk22NWm82Oe95bFTww-1
+Received: by mail-ed1-f71.google.com with SMTP id t28-20020a508d5c000000b003dad7fc5caeso1495657edt.11
+        for <kvm@vger.kernel.org>; Thu, 21 Oct 2021 13:08:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=BJdYaoVntWzrTJu7xhe7fmZqFzNwWeTLt9gWbNrG0tI=;
-        b=HlHp5FWI+wfDTvmC5ocn73klYuMJhagrihXNE9R84oSNTIPwrWbKSN01Mf0DYxgG1y
-         9hy4LiRUh+SFeCwc4/ZkTA1rvIWVzWYYPgkpowouGazR2ROCd6JOkXyUQciSmRV7G9Mr
-         C42VHRdV+jveqh8N/KVVhIJMCfCaPDtgQcKSHE2UEZrhZLTfBxeFHK9eYQEt3jThRuj7
-         j6Uz8YjZi0pxQzy0NwzVlkYFG3aFuNxP0anLIW2/xqCrLPBChLKU6xiR+6BrkfuFbs6b
-         XGhqj9Am2Bo+9F9P7nxlDgUEtb4FIBpTWdxqNQ7wLLkGEdK9yAR7J37jKt55VHBWebJw
-         m6Qg==
-X-Gm-Message-State: AOAM533MoLKC30NK3Moj62MudOXvSpBl8xIcLRKjrnt4z0PkFzbEd3D1
-        OSKSJ1qobhKXrt+WoSCgzDGe4Q==
-X-Google-Smtp-Source: ABdhPJyB+o2LF+Q8z+muxQ99/9OkhcI4FKylH+wkYoTPlnXf+riWGqXzgHGVhrTsmBfPFL1UGvcRWg==
-X-Received: by 2002:a05:6a00:24c1:b0:457:a10e:a0e with SMTP id d1-20020a056a0024c100b00457a10e0a0emr7511096pfv.63.1634846682353;
-        Thu, 21 Oct 2021 13:04:42 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id f21sm7567450pfc.203.2021.10.21.13.04.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Oct 2021 13:04:41 -0700 (PDT)
-Date:   Thu, 21 Oct 2021 20:04:38 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        fwilhelm@google.com, oupton@google.com
-Subject: Re: [PATCH 0/8] KVM: SEV-ES: fixes for string I/O emulation
-Message-ID: <YXHH1shFlGWyZqlw@google.com>
-References: <20211013165616.19846-1-pbonzini@redhat.com>
- <435767c0-958d-f90f-d11a-cff42ab1205c@redhat.com>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=mmsmJ/pPdiOUowj1+queJxhgagora/RkFzbUPsH0NgI=;
+        b=gK/IxtunNZ82crvvZM5LM5clEtSXtiLBuXT/r3vNX66nUAAsWEXjwHzBWegKAYIprx
+         OIUKvZumD3JZ/HYUdDmv/UR1+AyGm69tDbnLADZpzxdVK6JLjE5sCkT70IWfrp/vaMhZ
+         smaU6P1kgKuBkKGe1pLLKiZWzSuVfkhKyEqL2v/PTunbdbIw2Ml+1Y2D0Zg4kIrP2oFV
+         S19ryRZk7vdSbovD9mccA9lDo5LcNDyASUKIDo/v7p9LU5tdiIXMHk4rH23S6pO+VKP2
+         BnB0/A60aM03cMtRcWI0mwp9+aoGUabS+A0LgCRdANL2Bm64xXyw1Yx5Dqp+BRwbnp53
+         fQ1Q==
+X-Gm-Message-State: AOAM5338tD1JHjcANOJWSo07D01VUjXPWXVeIW7nXGfFR88R2Db9+Czm
+        7Oo5JEEBCZFAjWQUDp7AArpDZt/KZmCWuSx007P8hEcqA7WgmRRzbNsDwzwGgOOSiztA7ffIzsX
+        jUJpokJjb9b1C
+X-Received: by 2002:a50:d50c:: with SMTP id u12mr10692148edi.118.1634846907808;
+        Thu, 21 Oct 2021 13:08:27 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJydAHgKEPzldAxYQV/5QMlR58Wpb8Rnei/FqgARVPGBX6aLZzp3TxpCGsa/Joy8+cm0SIrRxg==
+X-Received: by 2002:a50:d50c:: with SMTP id u12mr10692122edi.118.1634846907625;
+        Thu, 21 Oct 2021 13:08:27 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
+        by smtp.gmail.com with ESMTPSA id p3sm2942149ejy.94.2021.10.21.13.08.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 21 Oct 2021 13:08:27 -0700 (PDT)
+Message-ID: <9eb83cdd-9314-0d1f-0d4b-0cf4432e1e84@redhat.com>
+Date:   Thu, 21 Oct 2021 22:08:25 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <435767c0-958d-f90f-d11a-cff42ab1205c@redhat.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: There is a null-ptr-deref bug in kvm_dirty_ring_get in
+ virt/kvm/dirty_ring.c
+Content-Language: en-US
+To:     butt3rflyh4ck <butterflyhuangxx@gmail.com>,
+        "Woodhouse, David" <dwmw@amazon.co.uk>
+Cc:     kvm@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
+References: <CAFcO6XOmoS7EacN_n6v4Txk7xL7iqRa2gABg3F7E3Naf5uG94g@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <CAFcO6XOmoS7EacN_n6v4Txk7xL7iqRa2gABg3F7E3Naf5uG94g@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 21, 2021, Paolo Bonzini wrote:
-> On 13/10/21 18:56, Paolo Bonzini wrote:
-> > This series, namely patches 1 and 8, fix two bugs in string I/O
-> > emulation for SEV-ES:
-> > 
-> > - first, the length is completely off for "rep ins" and "rep outs"
-> >    operation of size > 1.  After setup_vmgexit_scratch, svm->ghcb_sa_len
-> >    is in bytes, but kvm_sev_es_string_io expects the number of PIO
-> >    operations.
-> > 
-> > - second, the size of the GHCB buffer can exceed the size of
-> >    vcpu->arch.pio_data.  If that happens, we need to go over the GHCB
-> >    buffer in multiple passes.
-> > 
-> > The second bug was reported by Felix Wilhelm.  The first was found by
-> > me by code inspection; on one hand it seems *too* egregious so I'll be
-> > gladly proven wrong on this, on the other hand... I know I'm bad at code
-> > review, but not _that_ bad.
+On 18/10/21 19:14, butt3rflyh4ck wrote:
+> {
+> struct kvm_vcpu *vcpu = kvm_get_running_vcpu();  //-------> invoke
+> kvm_get_running_vcpu() to get a vcpu.
+> 
+> WARN_ON_ONCE(vcpu->kvm != kvm); [1]
+> 
+> return &vcpu->dirty_ring;
+> }
+> ```
+> but we had not called KVM_CREATE_VCPU ioctl to create a kvm_vcpu so
+> vcpu is NULL.
 
-String I/O was completely busted on the Linux guest side as well, I wouldn't be
-the least bit surprised if KVM were completely broken as well (reviewing now...).
+It's not just because there was no call to KVM_CREATE_VCPU; in general 
+kvm->dirty_ring_size only works if all writes are associated to a 
+specific vCPU, which is not the case for the one of 
+kvm_xen_shared_info_init.
+
+David, what do you think?  Making dirty-page ring buffer incompatible 
+with Xen is ugly and I'd rather avoid it; taking the mutex for vcpu 0 is 
+not an option because, as the reporter said, you might not have even 
+created a vCPU yet when you call KVM_XEN_HVM_SET_ATTR.  The remaining 
+option would be just "do not mark the page as dirty if the ring buffer 
+is active".  This is feasible because userspace itself has passed the 
+shared info gfn; but again, it's ugly...
+
+Paolo
+
