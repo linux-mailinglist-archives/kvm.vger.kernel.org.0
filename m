@@ -2,108 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7AEB143686C
-	for <lists+kvm@lfdr.de>; Thu, 21 Oct 2021 18:55:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 00DAB43688E
+	for <lists+kvm@lfdr.de>; Thu, 21 Oct 2021 19:01:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232116AbhJUQ5j (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Oct 2021 12:57:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46098 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231574AbhJUQ5f (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Oct 2021 12:57:35 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58085C061764;
-        Thu, 21 Oct 2021 09:55:19 -0700 (PDT)
-Received: from zn.tnic (p200300ec2f1912009d2c3fdc96041a10.dip0.t-ipconnect.de [IPv6:2003:ec:2f19:1200:9d2c:3fdc:9604:1a10])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id D38931EC01A2;
-        Thu, 21 Oct 2021 18:55:15 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1634835316;
+        id S231574AbhJURDX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Oct 2021 13:03:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:55223 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229968AbhJURDW (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 21 Oct 2021 13:03:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1634835666;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=NZC8US/Sv4tJlK40hZBif2dVgLRnPir3aaoTZ1GDAZU=;
-        b=WHEsNVOkCfiljBtHQ+4j3sgg9oxZ3XZ72tD3ReWZxsnZaE/K+hn3pPlrNc4ezF6zzThzeP
-        8uO+2w9FCg5R7ThkyJVSmryvGtbiYy6FJ/oU2mo0Q79kmHu9yDrhX6FkfpM7SaeFV28BYj
-        780hS9v0CwyRqL9Zmq9JMbWXRvTUsWM=
-Date:   Thu, 21 Oct 2021 18:55:14 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc:     Michael Roth <michael.roth@amd.com>,
-        Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH v6 08/42] x86/sev-es: initialize sev_status/features
- within #VC handler
-Message-ID: <YXGbcqN2IRh9YJk9@zn.tnic>
-References: <20211008180453.462291-1-brijesh.singh@amd.com>
- <20211008180453.462291-9-brijesh.singh@amd.com>
- <YW2EsxcqBucuyoal@zn.tnic>
- <20211018184003.3ob2uxcpd2rpee3s@amd.com>
- <YW3IdfMs61191qnU@zn.tnic>
- <20211020161023.hzbj53ehmzjrt4xd@amd.com>
- <YXF9sCbPDsLwlm42@zn.tnic>
- <YXGNmeR/C33HvaBi@work-vm>
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=C45rcZRW+kLqjdpIuOhUQvD5FAcBsxSwvOw5uYjICgo=;
+        b=XYUjqe38+vPZJ9NokFqSWpW7qWb27o1NKarW7suzJ9MfTudHjj0pT/tp8gdXQ/O9b6DtJV
+        F6ENg/hYkIodzHmTphqHrdAFwyRWV1hZTyYbbaX3lexKnGUBKURnZ4U6uS9GuKvv+mvYL0
+        S+5+QrxDeLU02VZ6n8+N7E8fnRIhWUI=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-88-QqeNudm4O7iDp4_6JnJVDw-1; Thu, 21 Oct 2021 13:01:05 -0400
+X-MC-Unique: QqeNudm4O7iDp4_6JnJVDw-1
+Received: by mail-ed1-f71.google.com with SMTP id h19-20020aa7de13000000b003db6ad5245bso1016616edv.9
+        for <kvm@vger.kernel.org>; Thu, 21 Oct 2021 10:01:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=C45rcZRW+kLqjdpIuOhUQvD5FAcBsxSwvOw5uYjICgo=;
+        b=WZB6117rN3r5REbiLIkOMelPkffrf6ytjxb7l+j0oL1qZNnB6gcMegz7gjUgd4IU4y
+         vCW4S+cCPVSp3xd0xnGRIVMgn3IRxXC4cDYlL/bS7kSvah9A0A4PQ0vi7VWyoX5PbUi6
+         W40fto+slqni/ytqueu5myo6GPWXp+sDCR8oa1QdiLlMqQe7vp5Xcww6BZUPMJ4e4Wo8
+         0WITCfgOfi/Y7NopuZ9fka+zLAdCu44UVEFqz9dtxHEL52GpZygnLWPTbh6hMgjIyPrf
+         NOSr/SeoRol5G7R+MDXBRkiNv4b3fV+c31gBpBomKH9H/rjr5Q111LlQbIZt2jKEboDF
+         LscQ==
+X-Gm-Message-State: AOAM531XyOzskC3JWWbxOMgtFq2YtCHQcPuAo5LcQUXacYbZivwq79BO
+        B9QACZhnTRfXMgofQofFMk2yyf9qN1GsY5jY3B/QTLD8Ail+yMEOYlAuUwyJhrNTmmIvHGcyULK
+        wfCiZb0T6K5gU
+X-Received: by 2002:a05:6402:4256:: with SMTP id g22mr9128964edb.399.1634835663940;
+        Thu, 21 Oct 2021 10:01:03 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxIDbn5BCIQe+EkVqvY9JP9XuhGRY7LsAzAyuI3Rha7kLn51b9yeCcCYREGW3hH7MObChkzhA==
+X-Received: by 2002:a05:6402:4256:: with SMTP id g22mr9128934edb.399.1634835663780;
+        Thu, 21 Oct 2021 10:01:03 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
+        by smtp.gmail.com with ESMTPSA id f7sm3069873edl.33.2021.10.21.10.01.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 21 Oct 2021 10:01:02 -0700 (PDT)
+Message-ID: <19578a3b-e624-4002-81b0-d0346abee2f7@redhat.com>
+Date:   Thu, 21 Oct 2021 19:01:01 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <YXGNmeR/C33HvaBi@work-vm>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [PATCH 2/2] KVM: SEV: Flush cache on non-coherent systems before
+ RECEIVE_UPDATE_DATA
+Content-Language: en-US
+To:     Ashish Kalra <Ashish.Kalra@amd.com>, seanjc@google.com
+Cc:     brijesh.singh@amd.com, jmattson@google.com, joro@8bytes.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        marcorr@google.com, masa.koz@kozuka.jp, pgonda@google.com,
+        thomas.lendacky@amd.com, vkuznets@redhat.com, wanpengli@tencent.com
+References: <20210914210951.2994260-3-seanjc@google.com>
+ <61709f42.1c69fb81.3b49.ecfeSMTPIN_ADDED_BROKEN@mx.google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <61709f42.1c69fb81.3b49.ecfeSMTPIN_ADDED_BROKEN@mx.google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 21, 2021 at 04:56:09PM +0100, Dr. David Alan Gilbert wrote:
-> I can imagine a malicious hypervisor trying to return different cpuid
-> answers to different threads or even the same thread at different times.
-
-Haha, I guess that will fail not because of SEV* but because of the
-kernel not really being able to handle heterogeneous CPUIDs.
-
-> Well, the spec (AMD 56860 SEV spec) says:
+On 21/10/21 00:58, Ashish Kalra wrote:
+> From: Sean Christopherson <seanjc@google.com>
 > 
->   'If firmware encounters a CPUID function that is in the standard or extended ranges, then the
-> firmware performs a check to ensure that the provided output would not lead to an insecure guest
-> state'
+> Hello Paolo,
 > 
-> so I take that 'firmware' to be the PSP; that wording doesn't say that
-> it checks that the CPUID is identical, just that it 'would not lead to
-> an insecure guest' - so a hypervisor could hide any 'no longer affected
-> by' flag for all the CPUs in it's migration pool and the firmware
-> shouldn't complain; so it should be OK to pessimise.
+> I am adding a SEV migration test as part of the KVM SEV selftests.
+> 
+> And while testing SEV migration with this selftest, i observed
+> cache coherency issues causing migration test failures, so really
+> need this patch to be added.
+> 
+> Tested-by: Ashish Kalra <ashish.kalra@amd.com>
+> 
 
-AFAIU this, I think this would depend on "[t]he policy used by the
-firmware to assess CPUID function output can be found in [PPR]."
+Queued for 5.15, thanks.
 
-So if the HV sets the "no longer affected by" flag but the firmware
-deems this set flag as insecure, I'm assuming the firmare will clear
-it when it returns the CPUID leafs. I guess I need to go find that
-policy...
+Paolo
 
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
