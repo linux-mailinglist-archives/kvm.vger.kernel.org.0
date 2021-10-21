@@ -2,181 +2,203 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 917CB4360E1
-	for <lists+kvm@lfdr.de>; Thu, 21 Oct 2021 13:57:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 490E043615D
+	for <lists+kvm@lfdr.de>; Thu, 21 Oct 2021 14:19:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230400AbhJUL7t (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Oct 2021 07:59:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59876 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230283AbhJUL7s (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Oct 2021 07:59:48 -0400
-Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71AA3C06161C;
-        Thu, 21 Oct 2021 04:57:32 -0700 (PDT)
-Received: by mail-pg1-x52d.google.com with SMTP id h193so89919pgc.1;
-        Thu, 21 Oct 2021 04:57:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=idIj9x5Y1snEOdYM83+I6n7R4t6XnyFXPq7fZJooAt0=;
-        b=QvnqmUW3vkYQDIvz4c0DkDquBfz0UXqjZUC0PwY4U8mXRpvcJ+SrK+3ui+5qMXR5nS
-         T88lojXXUAUuEtM2XKgqmwuKaPsSjqDf/OxyM+NZgN9M2pa9d8LlQ4qe6KlA1PB2oWTU
-         gEMfvIdPYfSzcBLsrxntIAPlht7kvi1XxsXuy6ks/zvRjrdk+BHTtE9uC7zhq6PCRgia
-         Y77EkhCkAPPCN1ptuF6l+zorCgwqHKs5KV6FLRDTvufFCWTt0EaGxf21EzB+fuAB70Jx
-         t+hHzP5Qd1TjFeRtbQBEPMHBikZemHsfLoL787dBzW4sWlwEhBJowuzcLmXcPu9qeaWo
-         +uXA==
+        id S231556AbhJUMVb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Oct 2021 08:21:31 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58295 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231748AbhJUMVS (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 21 Oct 2021 08:21:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1634818742;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Zd9X4kJySNLoJ8Ppj29kUsFq4oKh9GPumZUthxZxjSI=;
+        b=KxHG9mTqL3ahth9YT49iDupEMzxkqX2kpQiQQjvwDxoJffLgcn+YjVt7Mqd5eAbsdpgdze
+        pgPIoalUKQ63yVB04ysNg2RHehLQCeWRTCOPMDJE1faHiuUmzSiPrAGjv6V+3aiEBv0Zu2
+        M9taqOIVBOgvJMK9EFa0AZmZtQ/GgOQ=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-326-GhJOSjnwN3OUei1DyexUFw-1; Thu, 21 Oct 2021 08:18:23 -0400
+X-MC-Unique: GhJOSjnwN3OUei1DyexUFw-1
+Received: by mail-ed1-f70.google.com with SMTP id p20-20020a50cd94000000b003db23619472so81553edi.19
+        for <kvm@vger.kernel.org>; Thu, 21 Oct 2021 05:18:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=idIj9x5Y1snEOdYM83+I6n7R4t6XnyFXPq7fZJooAt0=;
-        b=ut/NSaQ0bhz2vzVRbhX3ZVs1C4qgX5dilPfNPmuWkrO3jpCpdOQ7CU/6tel9PzgyBj
-         Syd2Z9aBxB5hW6FNd3RI57echUHKgh1v5TULjl0PSvq9vThSKM/YV3xyIrd0P5sd3rwr
-         8eepTJVSkRpuSG6DYLQ/LDiIOR+XgH0ZZf7d5CSlEUrHybTl5UGS1+y+/Q2K7tCfpMHI
-         65+N3GcUgDHmIHYuHuvOL11L4gzHNR/BHmVIffNBxUE3MXg/vWeLodw62PuQiEnlP/JV
-         39pBisxiavaOYSvZ0iqY7RIztOl/8guwO5Y/6OpfTWtOmmy7BP+Z+TXv/70ErufjuQBm
-         MkpA==
-X-Gm-Message-State: AOAM533+wjrPb48xOB6dttp1R//0PExVFS8a8PcShYmdK5xvInSChQ5C
-        2MmyzVceNeT9YPMQL/gvoDY=
-X-Google-Smtp-Source: ABdhPJwu17uilS+pRVvSk89iNu6lAdgJwU8YwJMCdjTqkpEZIwNjHy9NHuJ4Lw3z8EjgYKkXVJnT1A==
-X-Received: by 2002:a63:7406:: with SMTP id p6mr4044865pgc.246.1634817451815;
-        Thu, 21 Oct 2021 04:57:31 -0700 (PDT)
-Received: from localhost.localdomain ([193.203.214.57])
-        by smtp.gmail.com with ESMTPSA id t3sm5082314pgo.51.2021.10.21.04.57.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Oct 2021 04:57:31 -0700 (PDT)
-From:   cgel.zte@gmail.com
-X-Google-Original-From: ran.jianping@zte.com.cn
-To:     anup@brainfault.org
-Cc:     anup.patel@wdc.com, aou@eecs.berkeley.edu, atish.patra@wdc.com,
-        cgel.zte@gmail.com, kvm-riscv@lists.infradead.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-riscv@lists.infradead.org, palmer@dabbelt.com,
-        paul.walmsley@sifive.com, ran.jianping@zte.com.cn,
-        zealci@zte.com.cn
-Subject: [PATCH] RISC-V:KVM: remove unneeded semicolon
-Date:   Thu, 21 Oct 2021 11:57:06 +0000
-Message-Id: <20211021115706.1060778-1-ran.jianping@zte.com.cn>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <CAAhSdy3DWOux6HiDU6fPazZUq=FOor8_ZEoqh6FBZru07NyxLQ@mail.gmail.com>
-References: <CAAhSdy3DWOux6HiDU6fPazZUq=FOor8_ZEoqh6FBZru07NyxLQ@mail.gmail.com>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=Zd9X4kJySNLoJ8Ppj29kUsFq4oKh9GPumZUthxZxjSI=;
+        b=CQyS7hCHbRbcAREL8W9NiZyDEYRJs/0cu9c6ovt6f39RvtEdPRHkIE/hTtuPXE13TB
+         nkkE5r8Esu1Rtqm3kqpga8SHX8mzjdYVOe0hx09Bp5W9Y8BCkkTyqA/KZcS0lPHbNmeE
+         WR3hJRbon5OaBgek1ZRRvUB92Qn0KBeN6S5E0PiWKPQAwGN9nSl6HyCBJVz/kw9zd6fh
+         6Yn859QvBaIhZxEmIIeD6ABHsGXzMQTecksWhHE2WtxCgcKNBMjd4pM1Pla9yw4Nj8QQ
+         7uJbpYnPxqCTkJqM+ebBrNaUJa13AdMop0Rzt5v0Nf0Jd/r9z+MkcuEl4zOTvY9UWkUT
+         /QTQ==
+X-Gm-Message-State: AOAM532EHCvhGAFhLzbyo5ETeP9fZyZTPb0vwevmVrDDkgESjJLpF5dV
+        dm8VxbULOnI9IKhmK7eYPs4s2XhZj99NTN7uTMxck3gva+FHESKH473FqQfe97OgZ84PEraxLj3
+        ssHEU/9EpnyvF
+X-Received: by 2002:a17:906:254b:: with SMTP id j11mr6808900ejb.513.1634818683363;
+        Thu, 21 Oct 2021 05:18:03 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJytEpmfnDKcxFNHgYn23PL49Reg55UlSfeSZvp3Cq+CrLLsTXfDXlrlbFs+daaWBI53MQvpGA==
+X-Received: by 2002:a17:906:254b:: with SMTP id j11mr6808878ejb.513.1634818683134;
+        Thu, 21 Oct 2021 05:18:03 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.gmail.com with ESMTPSA id q14sm2889195edj.42.2021.10.21.05.18.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 21 Oct 2021 05:18:02 -0700 (PDT)
+Message-ID: <1f0144a6-3eb5-ad58-e1c2-68c8fcc29841@redhat.com>
+Date:   Thu, 21 Oct 2021 14:18:00 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [kvm-unit-tests PATCH v3 05/17] x86 UEFI: Boot from UEFI
+Content-Language: en-US
+To:     Zixuan Wang <zxwang42@gmail.com>, kvm@vger.kernel.org,
+        drjones@redhat.com
+Cc:     marcorr@google.com, baekhw@google.com, tmroeder@google.com,
+        erdemaktas@google.com, rientjes@google.com, seanjc@google.com,
+        brijesh.singh@amd.com, Thomas.Lendacky@amd.com,
+        varad.gautam@suse.com, jroedel@suse.de, bp@suse.de
+References: <20211004204931.1537823-1-zxwang42@gmail.com>
+ <20211004204931.1537823-6-zxwang42@gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20211004204931.1537823-6-zxwang42@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: ran jianping <ran.jianping@zte.com.cn>
+On 04/10/21 22:49, Zixuan Wang wrote:
+> From: Zixuan Wang <zixuanwang@google.com>
+> 
+> This commit provides initial support for x86 test cases to boot from
+> UEFI:
+> 
+>     1. UEFI compiler flags are added to Makefile
+>     2. A new TARGET_EFI macro is added to turn on/off UEFI startup code
+>     3. Previous Multiboot setup code is refactored and updated for
+>        supporting UEFI, including the following changes:
+>        1. x86/efi/crt0-efi-x86_64.S: provides entry point and jumps to
+>           setup code in lib/efi.c.
+>        2. lib/efi.c: performs UEFI setup, calls arch-related setup
+>           functions, then jumps to test case main() function
+>        3. lib/x86/setup.c: provides arch-related setup under UEFI
+> 
+> To build test cases for UEFI, please first install the GNU-EFI library.
+> Check x86/efi/README.md for more details.
+> 
+> This commit is tested by a simple test calling report() and
+> report_summayr(). This commit does not include such a test to avoid
+> unnecessary files added into git history. To build and run this test in
+> UEFI (assuming file name is x86/dummy.c):
+> 
+>     ./configure --target-efi
+>     make x86/dummy.efi
+>     ./x86/efi/run ./x86/dummy.efi
+> 
+> To use the default Multiboot instead of UEFI:
+> 
+>     ./configure
+>     make x86/dummy.flat
+>     ./x86/run ./x86/dummy.flat
+> 
+> Some x86 test cases require additional fixes to work in UEFI, e.g.,
+> converting to position independent code (PIC), setting up page tables,
+> etc. This commit does not provide these fixes, so compiling and running
+> UEFI test cases other than x86/dummy.c may trigger compiler errors or
+> QEMU crashes. These test cases will be fixed by the follow-up commits in
+> this series.
+> 
+> The following code is ported from github.com/rhdrjones/kvm-unit-tests
+>     - ./configure: 'target-efi'-related code
+> 
+> See original code:
+>     - Repo: https://github.com/rhdrjones/kvm-unit-tests
+>     - Branch: target-efi
+> 
+> Co-developed-by: Varad Gautam <varad.gautam@suse.com>
+> Signed-off-by: Varad Gautam <varad.gautam@suse.com>
+> Signed-off-by: Zixuan Wang <zixuanwang@google.com>
 
- Elimate the following coccinelle check warning:
- ./arch/riscv/kvm/vcpu_sbi.c:169:2-3: Unneeded semicolon
- ./arch/riscv/kvm/vcpu_exit.c:397:2-3: Unneeded semicolon
- ./arch/riscv/kvm/vcpu_exit.c:687:2-3: Unneeded semicolon
- ./arch/riscv/kvm/vcpu_exit.c:645:2-3: Unneeded semicolon
- ./arch/riscv/kvm/vcpu.c:247:2-3: Unneeded semicolon
- ./arch/riscv/kvm/vcpu.c:284:2-3: Unneeded semicolon
- ./arch/riscv/kvm/vcpu_timer.c:123:2-3: Unneeded semicolon
- ./arch/riscv/kvm/vcpu_timer.c:170:2-3: Unneeded semicolon
+This is missing
 
-Reported-by: Zeal Robot <zealci@zte.com.cn>
-Signed-off-by: ran jianping <ran.jianping@zte.com.cn>
----
- arch/riscv/kvm/vcpu.c       | 4 ++--
- arch/riscv/kvm/vcpu_exit.c  | 6 +++---
- arch/riscv/kvm/vcpu_sbi.c   | 2 +-
- arch/riscv/kvm/vcpu_timer.c | 4 ++--
- 4 files changed, 8 insertions(+), 8 deletions(-)
+diff --git a/x86/Makefile.i386 b/x86/Makefile.i386
+index 340c561..7d19d55 100644
+--- a/x86/Makefile.i386
++++ b/x86/Makefile.i386
+@@ -2,6 +2,7 @@ cstart.o = $(TEST_DIR)/cstart.o
+  bits = 32
+  ldarch = elf32-i386
+  exe = flat
++bin = elf
+  COMMON_CFLAGS += -mno-sse -mno-sse2
 
-diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-index c44cabce7dd8..912928586df9 100644
---- a/arch/riscv/kvm/vcpu.c
-+++ b/arch/riscv/kvm/vcpu.c
-@@ -244,7 +244,7 @@ static int kvm_riscv_vcpu_get_reg_config(struct kvm_vcpu *vcpu,
- 		break;
- 	default:
- 		return -EINVAL;
--	};
-+	}
- 
- 	if (copy_to_user(uaddr, &reg_val, KVM_REG_SIZE(reg->id)))
- 		return -EFAULT;
-@@ -281,7 +281,7 @@ static int kvm_riscv_vcpu_set_reg_config(struct kvm_vcpu *vcpu,
- 		break;
- 	default:
- 		return -EINVAL;
--	};
-+	}
- 
- 	return 0;
- }
-diff --git a/arch/riscv/kvm/vcpu_exit.c b/arch/riscv/kvm/vcpu_exit.c
-index 13bbc3f73713..7f2d742ae4c6 100644
---- a/arch/riscv/kvm/vcpu_exit.c
-+++ b/arch/riscv/kvm/vcpu_exit.c
-@@ -394,7 +394,7 @@ static int emulate_store(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 		break;
- 	default:
- 		return -EOPNOTSUPP;
--	};
-+	}
- 
- 	/* Update MMIO details in kvm_run struct */
- 	run->mmio.is_write = true;
-@@ -642,7 +642,7 @@ int kvm_riscv_vcpu_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 		break;
- 	default:
- 		return -EOPNOTSUPP;
--	};
-+	}
- 
- done:
- 	/* Move to next instruction */
-@@ -684,7 +684,7 @@ int kvm_riscv_vcpu_exit(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 		break;
- 	default:
- 		break;
--	};
-+	}
- 
- 	/* Print details in-case of error */
- 	if (ret < 0) {
-diff --git a/arch/riscv/kvm/vcpu_sbi.c b/arch/riscv/kvm/vcpu_sbi.c
-index ebdcdbade9c6..eb3c045edf11 100644
---- a/arch/riscv/kvm/vcpu_sbi.c
-+++ b/arch/riscv/kvm/vcpu_sbi.c
-@@ -166,7 +166,7 @@ int kvm_riscv_vcpu_sbi_ecall(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 		/* Return error for unsupported SBI calls */
- 		cp->a0 = SBI_ERR_NOT_SUPPORTED;
- 		break;
--	};
-+	}
- 
- 	if (next_sepc)
- 		cp->sepc += 4;
-diff --git a/arch/riscv/kvm/vcpu_timer.c b/arch/riscv/kvm/vcpu_timer.c
-index ddd0ce727b83..5c4c37ff2d48 100644
---- a/arch/riscv/kvm/vcpu_timer.c
-+++ b/arch/riscv/kvm/vcpu_timer.c
-@@ -120,7 +120,7 @@ int kvm_riscv_vcpu_get_reg_timer(struct kvm_vcpu *vcpu,
- 		break;
- 	default:
- 		return -EINVAL;
--	};
-+	}
- 
- 	if (copy_to_user(uaddr, &reg_val, KVM_REG_SIZE(reg->id)))
- 		return -EFAULT;
-@@ -167,7 +167,7 @@ int kvm_riscv_vcpu_set_reg_timer(struct kvm_vcpu *vcpu,
- 	default:
- 		ret = -EINVAL;
- 		break;
--	};
-+	}
- 
- 	return ret;
- }
--- 
-2.25.1
+  cflatobjs += lib/x86/setjmp32.o lib/ldiv32.o
+
+for 32-bit tests to build; and also:
+
+diff --git a/configure b/configure
+index b6c09b3..6f4a8f0 100755
+--- a/configure
++++ b/configure
+@@ -265,6 +265,11 @@ if [ -f "$srcdir/$testdir/run" ]; then
+      ln -fs "$srcdir/$testdir/run" $testdir-run
+  fi
+
++testsubdir=$testdir
++if [ -n "$target_efi" ]; then
++    testsubdir=$testdir/efi
++fi
++
+  # check if uint32_t needs a long format modifier
+  cat << EOF > lib-test.c
+  __UINT32_TYPE__
+@@ -291,8 +301,11 @@ if test ! -e Makefile; then
+      ln -s "$srcdir/Makefile" .
+
+      echo "linking tests..."
+-    mkdir -p $testdir
++    mkdir -p $testsubdir
+      ln -sf "$srcdir/$testdir/run" $testdir/
++    if test "$testdir" != "$testsubdir"; then
++        ln -sf "$srcdir/$testsubdir/run" $testsubdir/
++    fi
+      ln -sf "$srcdir/$testdir/unittests.cfg" $testdir/
+      ln -sf "$srcdir/run_tests.sh"
+
+@@ -332,6 +345,7 @@ OBJDUMP=$cross_prefix$objdump
+  AR=$cross_prefix$ar
+  ADDR2LINE=$cross_prefix$addr2line
+  TEST_DIR=$testdir
++TEST_SUBDIR=$testsubdir
+  FIRMWARE=$firmware
+  ENDIAN=$endian
+  PRETTY_PRINT_STACKS=$pretty_print_stacks
+diff --git a/run_tests.sh b/run_tests.sh
+index 9f233c5..f61e005 100755
+--- a/run_tests.sh
++++ b/run_tests.sh
+@@ -31,7 +31,7 @@ specify the appropriate qemu binary for ARCH-run.
+  EOF
+  }
+
+-RUNTIME_arch_run="./$TEST_DIR/run"
++RUNTIME_arch_run="./$TEST_SUBDIR/run"
+  source scripts/runtime.bash
+
+  # require enhanced getopt
+
+
+As of this patch tests don't seem to work correctly, but at least the 
+build machinery works (they build and ./x86/efi/run starts them).
+
+./run_tests.sh does not work, either.
+
+Paolo
 
