@@ -2,194 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 913F6436574
-	for <lists+kvm@lfdr.de>; Thu, 21 Oct 2021 17:12:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3861C4365DF
+	for <lists+kvm@lfdr.de>; Thu, 21 Oct 2021 17:20:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232037AbhJUPPE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Oct 2021 11:15:04 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:60788 "EHLO
-        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231924AbhJUPO4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Oct 2021 11:14:56 -0400
-Date:   Thu, 21 Oct 2021 15:12:38 -0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1634829159;
-        h=from:from:sender:sender:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
+        id S231808AbhJUPWo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Oct 2021 11:22:44 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:37150 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231533AbhJUPWk (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 21 Oct 2021 11:22:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1634829623;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=gEny/5/aqNnXTXSVx5cZRgB+ia503beZnahJAVlS+E0=;
-        b=sUoddpBCYtYg4vtkKIRdwYZwOGKfDPV3SUNkNBKa7Rkpr9EEiTktAqp44IsFTMvl2t8rSe
-        uoNZ16+cJAeLEz2F+p2F8IeRAz15KIyE2W3TPzLKsiJAwn8TDPx9xC8Zq5JLbVrQi4LGzk
-        9OYm7XWZFOG9laEHqRqcF8HkVORFzJLyw38Vmeg3X+Beht2r5pKffYhmnLCrtHe7CkNti0
-        c3Kj+EUKbe0aceLCG8tplRFVilbzDRFnNl+nc7YOtPKF7vJ/LGzenS6HEq/j5qpmQS58l+
-        u/ad3Vh/HcDav5YRwtQEowdD812XGN3Rh6gAjvLXz5yowub15ymfuUirHPhJ5w==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1634829159;
-        h=from:from:sender:sender:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=gEny/5/aqNnXTXSVx5cZRgB+ia503beZnahJAVlS+E0=;
-        b=4Rxd8oh4Jb3mdw0bGu1DRcvd3RN4FGaAYf7AicLmbq/NMwi0XEhPjyWZyfIrMGOjjTwE8P
-        S7PWbW8FVTORUbAw==
-From:   "tip-bot2 for Thomas Gleixner" <tip-bot2@linutronix.de>
-Sender: tip-bot2@linutronix.de
-Reply-to: linux-kernel@vger.kernel.org
-To:     linux-tip-commits@vger.kernel.org
-Subject: [tip: x86/fpu] x86/fpu: Replace KVMs home brewed FPU copy to user
-Cc:     Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@suse.de>,
-        kvm@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org
-In-Reply-To: <20211015011539.244101845@linutronix.de>
-References: <20211015011539.244101845@linutronix.de>
+        bh=NOe3cFJFILZdz8eTftQ7v5VvvEiNDk+j+1cks9VzhR8=;
+        b=e2lR4AQyRbyJIaBoMllyvYOlZ0G+JXB8mG4LDSdW8OG9SLu8Va6z+cCkgkbPsp1sRKMBOx
+        y2D3aL6QKuBpqln2iC86lJXo8/23XJcgFqLy6fnOeYugNbX63SLVMXIZWTGniufq9Ek0fr
+        bR8uH06fso1AnMmwwi7UMV0iRJKhljM=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-597-TIIjVZ7MOzWMOopFcTmoAA-1; Thu, 21 Oct 2021 11:20:22 -0400
+X-MC-Unique: TIIjVZ7MOzWMOopFcTmoAA-1
+Received: by mail-ed1-f69.google.com with SMTP id h19-20020aa7de13000000b003db6ad5245bso715110edv.9
+        for <kvm@vger.kernel.org>; Thu, 21 Oct 2021 08:20:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=NOe3cFJFILZdz8eTftQ7v5VvvEiNDk+j+1cks9VzhR8=;
+        b=NRsNJJSo7r1BAOVlCHVXeiri74RJTATPwvI/4HQyNq7rIRUmb2Yffcd3iDxXIO850l
+         E/Kmvy1WpT2krKodtdqU272FRLmrlzVT+3p2gSSDxSOCfBvf2mB36AmJxq2Pzy1uF/7Y
+         S/mFu3TPhvXy6EuKWUlXj+G7mJgOVH1rJBE1ooNr4qqdhI0ac3xMXlS3sTFNA/j6IGi2
+         ZQiYG3lGprwI40u5uRglzauTLMenyMmfgXAnhbFst23+zMUFHN3Oq231nfcUnY3l3NAt
+         GLfdqW9s6ApW6/5qF8rqV7oXhl5WVOOgtNtXOl4zunoSpEnpC/c+96Xvp2Dp1Fo+YDI4
+         sukA==
+X-Gm-Message-State: AOAM531CgNj/edaagnV1rfORRUn5sqS2ZeLA4O7dpgqoGamOg9IFcEfR
+        CeR3/poUH8cO+ctLKn3i/PF2K1PbVdCnz0U8Cq1DEGFnBBMcOSDqfVmIbUk3OZHnx9i0vdcCUAM
+        H/WLfysAzMXiE
+X-Received: by 2002:a17:906:2310:: with SMTP id l16mr8121411eja.118.1634829621445;
+        Thu, 21 Oct 2021 08:20:21 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzjeZqyJXsmAoXhDVP1zKKfZ0Y7fUe4znDsFRJP/2IiYcz3JF2glaBceal0TUeS55/ECM+NVA==
+X-Received: by 2002:a17:906:2310:: with SMTP id l16mr8121368eja.118.1634829621264;
+        Thu, 21 Oct 2021 08:20:21 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
+        by smtp.gmail.com with ESMTPSA id a1sm3008008edu.43.2021.10.21.08.20.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 21 Oct 2021 08:20:20 -0700 (PDT)
+Message-ID: <811ec8ba-433e-b167-6a60-cf3b5ceabb63@redhat.com>
+Date:   Thu, 21 Oct 2021 17:20:18 +0200
 MIME-Version: 1.0
-Message-ID: <163482915831.25758.11984661683158416047.tip-bot2@tip-bot2>
-Robot-ID: <tip-bot2@linutronix.de>
-Robot-Unsubscribe: Contact <mailto:tglx@linutronix.de> to get blacklisted from these emails
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [RFC 01/16] KVM: selftests: move vm_phy_pages_alloc() earlier in
+ file
+Content-Language: en-US
+To:     Michael Roth <michael.roth@amd.com>,
+        Mingwei Zhang <mizhang@google.com>
+Cc:     linux-kselftest@vger.kernel.org, kvm <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>, x86@kernel.org,
+        Nathan Tempelman <natet@google.com>,
+        Marc Orr <marcorr@google.com>,
+        Steve Rutherford <srutherford@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Varad Gautam <varad.gautam@suse.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        Ricardo Koller <ricarkol@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H . Peter Anvin" <hpa@zytor.com>
+References: <20211005234459.430873-1-michael.roth@amd.com>
+ <20211005234459.430873-2-michael.roth@amd.com>
+ <CAL715WK2toExGW7GGWGQyzhqBijMEhQfhamyb9_eZkrU=+LKnQ@mail.gmail.com>
+ <20211021034529.gwv3hz5xhomtvnu7@amd.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20211021034529.gwv3hz5xhomtvnu7@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The following commit has been merged into the x86/fpu branch of tip:
+On 21/10/21 05:45, Michael Roth wrote:
+>> Why move the function implementation? Maybe just adding a declaration
+>> at the top of kvm_util.c should suffice.
+> At least from working on other projects I'd gotten the impression that
+> forward function declarations should be avoided if they can be solved by
+> moving the function above the caller. Certainly don't mind taking your
+> suggestion and dropping this patch if that's not the case here though.
 
-Commit-ID:     bf5d00470787067ff27593c6a097b5eb6e01168e
-Gitweb:        https://git.kernel.org/tip/bf5d00470787067ff27593c6a097b5eb6e01168e
-Author:        Thomas Gleixner <tglx@linutronix.de>
-AuthorDate:    Fri, 15 Oct 2021 03:16:17 +02:00
-Committer:     Borislav Petkov <bp@suse.de>
-CommitterDate: Wed, 20 Oct 2021 22:17:17 +02:00
+I don't mind moving the code, so the patch is fine.
 
-x86/fpu: Replace KVMs home brewed FPU copy to user
+Paolo
 
-Similar to the copy from user function the FPU core has this already
-implemented with all bells and whistles.
-
-Get rid of the duplicated code and use the core functionality.
-
-Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
-Signed-off-by: Borislav Petkov <bp@suse.de>
-Cc: kvm@vger.kernel.org
-Link: https://lkml.kernel.org/r/20211015011539.244101845@linutronix.de
----
- arch/x86/include/asm/fpu/api.h |  1 +-
- arch/x86/kernel/fpu/core.c     | 18 +++++++++++-
- arch/x86/kvm/x86.c             | 56 +--------------------------------
- 3 files changed, 22 insertions(+), 53 deletions(-)
-
-diff --git a/arch/x86/include/asm/fpu/api.h b/arch/x86/include/asm/fpu/api.h
-index 9263d70..5ac5e45 100644
---- a/arch/x86/include/asm/fpu/api.h
-+++ b/arch/x86/include/asm/fpu/api.h
-@@ -137,5 +137,6 @@ extern void fpu_init_fpstate_user(struct fpu *fpu);
- extern void fpu_swap_kvm_fpu(struct fpu *save, struct fpu *rstor, u64 restore_mask);
- 
- extern int fpu_copy_kvm_uabi_to_fpstate(struct fpu *fpu, const void *buf, u64 xcr0, u32 *pkru);
-+extern void fpu_copy_fpstate_to_kvm_uabi(struct fpu *fpu, void *buf, unsigned int size, u32 pkru);
- 
- #endif /* _ASM_X86_FPU_API_H */
-diff --git a/arch/x86/kernel/fpu/core.c b/arch/x86/kernel/fpu/core.c
-index 79f2e8d..ac540a7 100644
---- a/arch/x86/kernel/fpu/core.c
-+++ b/arch/x86/kernel/fpu/core.c
-@@ -184,6 +184,24 @@ void fpu_swap_kvm_fpu(struct fpu *save, struct fpu *rstor, u64 restore_mask)
- }
- EXPORT_SYMBOL_GPL(fpu_swap_kvm_fpu);
- 
-+void fpu_copy_fpstate_to_kvm_uabi(struct fpu *fpu, void *buf,
-+			       unsigned int size, u32 pkru)
-+{
-+	union fpregs_state *kstate = &fpu->state;
-+	union fpregs_state *ustate = buf;
-+	struct membuf mb = { .p = buf, .left = size };
-+
-+	if (cpu_feature_enabled(X86_FEATURE_XSAVE)) {
-+		__copy_xstate_to_uabi_buf(mb, &kstate->xsave, pkru,
-+					  XSTATE_COPY_XSAVE);
-+	} else {
-+		memcpy(&ustate->fxsave, &kstate->fxsave, sizeof(ustate->fxsave));
-+		/* Make it restorable on a XSAVE enabled host */
-+		ustate->xsave.header.xfeatures = XFEATURE_MASK_FPSSE;
-+	}
-+}
-+EXPORT_SYMBOL_GPL(fpu_copy_fpstate_to_kvm_uabi);
-+
- int fpu_copy_kvm_uabi_to_fpstate(struct fpu *fpu, const void *buf, u64 xcr0,
- 				 u32 *vpkru)
- {
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index cdc19b1..a18d467 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -4702,65 +4702,15 @@ static int kvm_vcpu_ioctl_x86_set_debugregs(struct kvm_vcpu *vcpu,
- 	return 0;
- }
- 
--static void fill_xsave(u8 *dest, struct kvm_vcpu *vcpu)
--{
--	struct xregs_state *xsave = &vcpu->arch.guest_fpu->state.xsave;
--	u64 xstate_bv = xsave->header.xfeatures;
--	u64 valid;
--
--	/*
--	 * Copy legacy XSAVE area, to avoid complications with CPUID
--	 * leaves 0 and 1 in the loop below.
--	 */
--	memcpy(dest, xsave, XSAVE_HDR_OFFSET);
--
--	/* Set XSTATE_BV */
--	xstate_bv &= vcpu->arch.guest_supported_xcr0 | XFEATURE_MASK_FPSSE;
--	*(u64 *)(dest + XSAVE_HDR_OFFSET) = xstate_bv;
--
--	/*
--	 * Copy each region from the possibly compacted offset to the
--	 * non-compacted offset.
--	 */
--	valid = xstate_bv & ~XFEATURE_MASK_FPSSE;
--	while (valid) {
--		u32 size, offset, ecx, edx;
--		u64 xfeature_mask = valid & -valid;
--		int xfeature_nr = fls64(xfeature_mask) - 1;
--		void *src;
--
--		cpuid_count(XSTATE_CPUID, xfeature_nr,
--			    &size, &offset, &ecx, &edx);
--
--		if (xfeature_nr == XFEATURE_PKRU) {
--			memcpy(dest + offset, &vcpu->arch.pkru,
--			       sizeof(vcpu->arch.pkru));
--		} else {
--			src = get_xsave_addr(xsave, xfeature_nr);
--			if (src)
--				memcpy(dest + offset, src, size);
--		}
--
--		valid -= xfeature_mask;
--	}
--}
--
- static void kvm_vcpu_ioctl_x86_get_xsave(struct kvm_vcpu *vcpu,
- 					 struct kvm_xsave *guest_xsave)
- {
- 	if (!vcpu->arch.guest_fpu)
- 		return;
- 
--	if (boot_cpu_has(X86_FEATURE_XSAVE)) {
--		memset(guest_xsave, 0, sizeof(struct kvm_xsave));
--		fill_xsave((u8 *) guest_xsave->region, vcpu);
--	} else {
--		memcpy(guest_xsave->region,
--			&vcpu->arch.guest_fpu->state.fxsave,
--			sizeof(struct fxregs_state));
--		*(u64 *)&guest_xsave->region[XSAVE_HDR_OFFSET / sizeof(u32)] =
--			XFEATURE_MASK_FPSSE;
--	}
-+	fpu_copy_fpstate_to_kvm_uabi(vcpu->arch.guest_fpu, guest_xsave->region,
-+				     sizeof(guest_xsave->region),
-+				     vcpu->arch.pkru);
- }
- 
- static int kvm_vcpu_ioctl_x86_set_xsave(struct kvm_vcpu *vcpu,
