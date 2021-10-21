@@ -2,110 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A259B43652C
-	for <lists+kvm@lfdr.de>; Thu, 21 Oct 2021 17:09:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 69608436542
+	for <lists+kvm@lfdr.de>; Thu, 21 Oct 2021 17:11:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230471AbhJUPML (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Oct 2021 11:12:11 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:58021 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231738AbhJUPMK (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 21 Oct 2021 11:12:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634828993;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=83A37QZOYVvxXVFXpAnu1+exjyyjf1N0SkLxb+/5xyI=;
-        b=LZ0+fkSoxTQgIsqnx41GVHHHTZPSafH9f06E5H8p/tXH5xrfpD0H/TRp7WulROwwsrCV8u
-        s4bo7+SfKKTSSY68DrQ3OAQa6uO+Txc29I/4xtYSneWfdiCRp9BuEkIoWDBuoByEnHK7uU
-        a2LYlOVUiep0ygklyaSgdNvjWWVNSe0=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-476-cG9q7u5ONn-Fe2gCmRzzlg-1; Thu, 21 Oct 2021 11:09:52 -0400
-X-MC-Unique: cG9q7u5ONn-Fe2gCmRzzlg-1
-Received: by mail-ed1-f71.google.com with SMTP id z1-20020a05640235c100b003dcf0fbfbd8so688059edc.6
-        for <kvm@vger.kernel.org>; Thu, 21 Oct 2021 08:09:51 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=83A37QZOYVvxXVFXpAnu1+exjyyjf1N0SkLxb+/5xyI=;
-        b=hhMdJwER9dUkq1DmPbX1+omWoc/ptH+OiL3ipbODdNy8+Sm3bKLSbtT24FfjPOSzeq
-         vQbkfwLTqQlAyG5OdCdSCMwNgtAu+yUyBWNMXVOoueIz6s9sTHdrqeIKerFl0vNmEdP1
-         Y1qk9GyrnAeD8TUJeAYbP12xHdcVUUygc0vdFieMdS99NfMU0NSrPLBDHr/Bh+Bsy8y7
-         k+22oGPCjKTMpeQLyveR5RXx2eKiOEh0SjK1y2oGBl77QHPjXkeUTNLce5m/Aaeji03j
-         wXH8VcWesWCeOYhKVuARl18F2n3mRhehbNbEDgEJaSUjezn8fuOf1YLLqn4rOTsGn+K/
-         nuDw==
-X-Gm-Message-State: AOAM530Wrn4DNIYUJ4V39NIRhiN656u7OoLb7uN8EygtLXhpUt/laLYM
-        CbiBiOrOceEyLGZFYhInXNXjvHxrcoXsZM2ZgoRD5cFc38s4JQeXd4DZ3ym2bbHSRuMdAq2W0PM
-        kq+dKMmROEroS
-X-Received: by 2002:a17:906:2f10:: with SMTP id v16mr7896380eji.434.1634828990613;
-        Thu, 21 Oct 2021 08:09:50 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz5osbNure7kSj2eOIIMK7ExqhTuzbJFqJ//gd+55tzrFkDqZraDqizfEQvo3PILlPFqdhHHw==
-X-Received: by 2002:a17:906:2f10:: with SMTP id v16mr7896361eji.434.1634828990358;
-        Thu, 21 Oct 2021 08:09:50 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.gmail.com with ESMTPSA id r16sm2615032ejj.89.2021.10.21.08.09.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 Oct 2021 08:09:49 -0700 (PDT)
-Message-ID: <347b2e6f-8075-b15e-7d53-a6050856754f@redhat.com>
-Date:   Thu, 21 Oct 2021 17:09:48 +0200
+        id S231731AbhJUPNu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Oct 2021 11:13:50 -0400
+Received: from mail.kernel.org ([198.145.29.99]:38402 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231641AbhJUPNs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Oct 2021 11:13:48 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 5916A611C7;
+        Thu, 21 Oct 2021 15:11:32 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1mdZj8-000jKD-64; Thu, 21 Oct 2021 16:11:30 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org
+Cc:     James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Quentin Perret <qperret@google.com>,
+        Will Deacon <will@kernel.org>, broonie@kernel.org,
+        kernel-team@android.com
+Subject: [PATCH 0/4] KVM: arm64: Stop mapping current thread_info at EL2
+Date:   Thu, 21 Oct 2021 16:11:20 +0100
+Message-Id: <20211021151124.3098113-1-maz@kernel.org>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [PATCH] KVM: MMU: Reset mmu->pkru_mask to avoid stale data
-Content-Language: en-US
-To:     Chenyi Qiang <chenyi.qiang@intel.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20211021071022.1140-1-chenyi.qiang@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20211021071022.1140-1-chenyi.qiang@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, qperret@google.com, will@kernel.org, broonie@kernel.org, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 21/10/21 09:10, Chenyi Qiang wrote:
-> When updating mmu->pkru_mask, the value can only be added but it isn't
-> reset in advance. This will make mmu->pkru_mask keep the stale data.
-> Fix this issue.
-> 
-> Fixes: commit 2d344105f57c ("KVM, pkeys: introduce pkru_mask to cache conditions")
-> Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
-> ---
->   arch/x86/kvm/mmu/mmu.c | 6 +++---
->   1 file changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index c6ddb042b281..fe73d7ee5492 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -4556,10 +4556,10 @@ static void update_pkru_bitmask(struct kvm_mmu *mmu)
->   	unsigned bit;
->   	bool wp;
->   
-> -	if (!is_cr4_pke(mmu)) {
-> -		mmu->pkru_mask = 0;
-> +	mmu->pkru_mask = 0;
-> +
-> +	if (!is_cr4_pke(mmu))
->   		return;
-> -	}
->   
->   	wp = is_cr0_wp(mmu);
->   
-> 
+It recently became apparent that we are mapping each vcpu thread's
+thread_info structure at EL2 for the sole purpose of checking on the
+TIF_FOREIGN_FPSTATE flag.
 
-Queued, thanks.
+Given that this looks like a slightly over-engineered way of sharing a
+single bit of information, let's move to a slightly more obvious
+implementation by maintaining a vcpu-private shadow flag that
+represents the same state.
 
-Paolo
+I also take this opportunity to add what looks like a missing, and
+nonetheless crucial piece of information to the FPSIMD code regarding
+the way KVM (ab)uses the TIF_FOREIGN_FPSTATE.
+
+Lightly tested on an A53 box with a bunch of paranoia instances
+running in both host and guests.
+
+Marc Zyngier (4):
+  KVM: arm64: Reorder vcpu flag definitions
+  KVM: arm64: Introduce flag shadowing TIF_FOREIGN_FPSTATE
+  KVM: arm64: Stop mapping current thread_info at EL2
+  arm64/fpsimd: Document the use of TIF_FOREIGN_FPSTATE by KVM
+
+ arch/arm64/include/asm/kvm_host.h       | 28 ++++++++++++-------------
+ arch/arm64/kernel/fpsimd.c              |  5 ++++-
+ arch/arm64/kvm/arm.c                    |  1 +
+ arch/arm64/kvm/fpsimd.c                 | 20 ++++++++----------
+ arch/arm64/kvm/hyp/include/hyp/switch.h |  3 +--
+ arch/arm64/kvm/hyp/nvhe/switch.c        |  1 -
+ arch/arm64/kvm/hyp/vhe/switch.c         |  1 -
+ 7 files changed, 29 insertions(+), 30 deletions(-)
+
+-- 
+2.30.2
 
