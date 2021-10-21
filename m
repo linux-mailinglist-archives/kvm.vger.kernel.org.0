@@ -2,57 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2DB3F4365FD
-	for <lists+kvm@lfdr.de>; Thu, 21 Oct 2021 17:23:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F1C81436600
+	for <lists+kvm@lfdr.de>; Thu, 21 Oct 2021 17:23:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231795AbhJUP0H (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Oct 2021 11:26:07 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:43276 "EHLO
+        id S231911AbhJUP0L (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Oct 2021 11:26:11 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:8522 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231239AbhJUP0G (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 21 Oct 2021 11:26:06 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 19LEfcme001118;
-        Thu, 21 Oct 2021 11:23:47 -0400
+        by vger.kernel.org with ESMTP id S231624AbhJUP0K (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 21 Oct 2021 11:26:10 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 19LEBJ9o022350;
+        Thu, 21 Oct 2021 11:23:52 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=UDbE79JaITCm5tr6sH9UXAbC21o1b3RXWKp7lvhSo2A=;
- b=pisH+Y7pt9QkuUOQ/9XbdHXrmmfe0ve4ZdkJajOOwbdchryoGAwjc+4lpuOt5c13Kb1X
- pYDKMw6GTnEau7APIfJIwlpvw23uVfSP6di61fcog5TjXciHDVfyVk4hnBhQ4r1LevJ9
- r60fxLCnEvCln/A00gV83v0+G3fWvNaJP9/mMQwhkXrsIvJk2i/+QCbiXY4rlX7gTt9K
- ySfEtnfP4Cl7Jf/iPjEanas1h1jQHd2DcIAL44juLTHRSbVMLIEj+mN6uK5OxM577a0i
- E84Z3MhCSKhgmpKs38p9B08n0pHoiGjuZ4HRshCQLv9DVHnJ0ls88Vu8YoOavRLBrVeV Ww== 
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=pp1;
+ bh=QpuFna1xX5sy6xRT97SECUImIxZyeGI772b9K7FKfDc=;
+ b=qX3ct10BTVqBYFax7V3cgxF+zs2x/I6kYfhlqcY74cT5hJB28Lo8LTuEZ8i93566pORi
+ g8WIN6aLJ23yJ8DM3Bqdgiq75FksNyo8k/WcIykfiw1mwDZzMJ2QW95f+t0jGRorXnc6
+ dMsUTwC7cu61jRtt7HV8irKE/ddROlak0ArMG7RokE2yCXPJWLUM8tmsKe8m2qwiNcrg
+ 0xBfKtMAVpQ/Z8PYPeReb0uJk48ZY9TXxw5fINjLOQYSqe+4hv+tm/i+KH2xYYy9QGD+
+ tPazHrA4of29XpMa1fhOhYzTMyDPXDyaqh5rCUSFJNpy+i4QESY9vgxQp6Z4zxNBzeDg ZA== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3bu7nedc45-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3bty9eqrxc-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 21 Oct 2021 11:23:47 -0400
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 19LENSrE001380;
-        Thu, 21 Oct 2021 11:23:47 -0400
+        Thu, 21 Oct 2021 11:23:52 -0400
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 19LFChIn009134;
+        Thu, 21 Oct 2021 11:23:52 -0400
 Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3bu7nedc3s-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3bty9eqrwn-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 21 Oct 2021 11:23:46 -0400
+        Thu, 21 Oct 2021 11:23:52 -0400
 Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
-        by ppma05wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 19LF4APZ028090;
-        Thu, 21 Oct 2021 15:23:45 GMT
-Received: from b03cxnp08026.gho.boulder.ibm.com (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
-        by ppma05wdc.us.ibm.com with ESMTP id 3bqpccyq5c-1
+        by ppma05wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 19LF49bY028003;
+        Thu, 21 Oct 2021 15:23:50 GMT
+Received: from b03cxnp07029.gho.boulder.ibm.com (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
+        by ppma05wdc.us.ibm.com with ESMTP id 3bqpccyq6u-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 21 Oct 2021 15:23:45 +0000
+        Thu, 21 Oct 2021 15:23:50 +0000
 Received: from b03ledav005.gho.boulder.ibm.com (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
-        by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 19LFNiX234603334
+        by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 19LFNnvP27787606
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 21 Oct 2021 15:23:44 GMT
+        Thu, 21 Oct 2021 15:23:49 GMT
 Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6FDCCBE061;
+        by IMSVA (Postfix) with ESMTP id 5A291BE051;
+        Thu, 21 Oct 2021 15:23:49 +0000 (GMT)
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E4E42BE05B;
         Thu, 21 Oct 2021 15:23:44 +0000 (GMT)
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4A89BBE05D;
-        Thu, 21 Oct 2021 15:23:42 +0000 (GMT)
 Received: from cpe-172-100-181-211.stny.res.rr.com.com (unknown [9.160.98.118])
         by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Thu, 21 Oct 2021 15:23:42 +0000 (GMT)
+        Thu, 21 Oct 2021 15:23:44 +0000 (GMT)
 From:   Tony Krowiak <akrowiak@linux.ibm.com>
 To:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org
@@ -61,185 +62,287 @@ Cc:     jjherne@linux.ibm.com, freude@linux.ibm.com,
         pasic@linux.ibm.com, alex.williamson@redhat.com,
         kwankhede@nvidia.com, fiuczy@linux.ibm.com,
         Tony Krowiak <akrowiak@linux.ibm.com>
-Subject: [PATCH v17 00/15] s390/vfio-ap: dynamic configuration support
-Date:   Thu, 21 Oct 2021 11:23:17 -0400
-Message-Id: <20211021152332.70455-1-akrowiak@linux.ibm.com>
+Subject: [PATCH v17 01/15] s390/vfio-ap: Set pqap hook when vfio_ap module is loaded
+Date:   Thu, 21 Oct 2021 11:23:18 -0400
+Message-Id: <20211021152332.70455-2-akrowiak@linux.ibm.com>
 X-Mailer: git-send-email 2.31.1
+In-Reply-To: <20211021152332.70455-1-akrowiak@linux.ibm.com>
+References: <20211021152332.70455-1-akrowiak@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: uuMO5yubFNvptv1sMbAbQHMKUr5bIH0r
-X-Proofpoint-GUID: sZBQoONvjwkEOxWq9gNhafbSYSBi0WmA
+X-Proofpoint-ORIG-GUID: basTLTTw5JCvrp3mfTGEeXXaLqKx3vxs
+X-Proofpoint-GUID: PZB5RJa2rrH50o1_ierJJzataucwyNwp
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
  definitions=2021-10-21_04,2021-10-21_02,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- suspectscore=0 bulkscore=0 spamscore=0 mlxlogscore=999 mlxscore=0
- clxscore=1011 priorityscore=1501 impostorscore=0 malwarescore=0
- phishscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2109230001 definitions=main-2110210079
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 priorityscore=1501
+ malwarescore=0 spamscore=0 phishscore=0 lowpriorityscore=0 mlxlogscore=999
+ bulkscore=0 impostorscore=0 clxscore=1015 adultscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2109230001
+ definitions=main-2110210079
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The current design for AP pass-through does not support making dynamic
-changes to the AP matrix of a running guest resulting in a few
-deficiencies this patch series is intended to mitigate:
+Rather than storing the function pointer to the PQAP(AQIC) instruction
+interception handler with the mediated device (struct ap_matrix_mdev) when
+the vfio_ap device driver is notified that the KVM point is being set,
+let's store it once in a global variable when the vfio_ap module is
+loaded.
 
-1. Adapters, domains and control domains can not be added to or removed
-    from a running guest. In order to modify a guest's AP configuration,
-    the guest must be terminated; only then can AP resources be assigned
-    to or unassigned from the guest's matrix mdev. The new AP
-    configuration becomes available to the guest when it is subsequently
-    restarted.
+There are three reasons for doing this:
 
-2. The AP bus's /sys/bus/ap/apmask and /sys/bus/ap/aqmask interfaces can
-    be modified by a root user without any restrictions. A change to
-    either mask can result in AP queue devices being unbound from the
-    vfio_ap device driver and bound to a zcrypt device driver even if a
-    guest is using the queues, thus giving the host access to the guest's
-    private crypto data and vice versa.
+1. The lifetime of the interception handler function coincides with the
+   lifetime of the vfio_ap module, so it makes little sense to tie it to
+   the mediated device and complete sense to tie it to the module in which
+   the function resides.
 
-3. The APQNs derived from the Cartesian product of the APIDs of the
-    adapters and APQIs of the domains assigned to a matrix mdev must
-    reference an AP queue device bound to the vfio_ap device driver. The
-    AP architecture allows assignment of AP resources that are not
-    available to the system, so this artificial restriction is not
-    compliant with the architecture.
+2. The setting/clearing of the function pointer is protected by a mutex
+   lock. This increases the number of locks taken during
+   VFIO_GROUP_NOTIFY_SET_KVM notification and increases the complexity of
+   ensuring locking integrity and avoiding circular lock dependencies.
 
-4. The AP configuration profile can be dynamically changed for the linux
-    host after a KVM guest is started. For example, a new domain can be
-    dynamically added to the configuration profile via the SE or an HMC
-    connected to a DPM enabled lpar. Likewise, AP adapters can be
-    dynamically configured (online state) and deconfigured (standby state)
-    using the SE, an SCLP command or an HMC connected to a DPM enabled
-    lpar. This can result in inadvertent sharing of AP queues between the
-    guest and host.
+3. The lock will only be taken for writing twice: When the vfio_ap module
+   is loaded; and, when the vfio_ap module is removed. As it stands now,
+   the lock is taken for writing whenever a guest is started or terminated.
 
-5. A root user can manually unbind an AP queue device representing a
-    queue in use by a KVM guest via the vfio_ap device driver's sysfs
-    unbind attribute. In this case, the guest will be using a queue that
-    is not bound to the driver which violates the device model.
+Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+---
+ arch/s390/include/asm/kvm_host.h      | 10 ++++--
+ arch/s390/kvm/kvm-s390.c              |  1 -
+ arch/s390/kvm/priv.c                  | 45 ++++++++++++++++++++++-----
+ drivers/s390/crypto/vfio_ap_ops.c     | 27 ++++++++--------
+ drivers/s390/crypto/vfio_ap_private.h |  1 -
+ 5 files changed, 58 insertions(+), 26 deletions(-)
 
-This patch series introduces the following changes to the current design
-to alleviate the shortcomings described above as well as to implement
-more of the AP architecture:
-
-1. A root user will be prevented from making edits to the AP bus's
-    /sys/bus/ap/apmask or /sys/bus/ap/aqmask if the change would transfer
-    ownership of an APQN from the vfio_ap device driver to a zcrypt driver
-    while the APQN is assigned to a matrix mdev.
-
-2. Allow a root user to hot plug/unplug AP adapters, domains and control
-    domains for a KVM guest using the matrix mdev via its sysfs
-    assign/unassign attributes.
-
-4. Allow assignment of an AP adapter or domain to a matrix mdev even if
-    it results in assignment of an APQN that does not reference an AP
-    queue device bound to the vfio_ap device driver, as long as the APQN
-    is not reserved for use by the default zcrypt drivers (also known as
-    over-provisioning of AP resources). Allowing over-provisioning of AP
-    resources better models the architecture which does not preclude
-    assigning AP resources that are not yet available in the system. Such
-    APQNs, however, will not be assigned to the guest using the matrix
-    mdev; only APQNs referencing AP queue devices bound to the vfio_ap
-    device driver will actually get assigned to the guest.
-
-5. Handle dynamic changes to the AP device model.
-
-1. Rationale for changes to AP bus's apmask/aqmask interfaces:
-----------------------------------------------------------
-Due to the extremely sensitive nature of cryptographic data, it is
-imperative that great care be taken to ensure that such data is secured.
-Allowing a root user, either inadvertently or maliciously, to configure
-these masks such that a queue is shared between the host and a guest is
-not only avoidable, it is advisable. It was suggested that this scenario
-is better handled in user space with management software, but that does
-not preclude a malicious administrator from using the sysfs interfaces
-to gain access to a guest's crypto data. It was also suggested that this
-scenario could be avoided by taking access to the adapter away from the
-guest and zeroing out the queues prior to the vfio_ap driver releasing the
-device; however, stealing an adapter in use from a guest as a by-product
-of an operation is bad and will likely cause problems for the guest
-unnecessarily. It was decided that the most effective solution with the
-least number of negative side effects is to prevent the situation at the
-source.
-
-2. Rationale for hot plug/unplug using matrix mdev sysfs interfaces:
-----------------------------------------------------------------
-Allowing a user to hot plug/unplug AP resources using the matrix mdev
-sysfs interfaces circumvents the need to terminate the guest in order to
-modify its AP configuration. Allowing dynamic configuration makes
-reconfiguring a guest's AP matrix much less disruptive.
-
-3. Rationale for allowing over-provisioning of AP resources:
------------------------------------------------------------
-Allowing assignment of AP resources to a matrix mdev and ultimately to a
-guest better models the AP architecture. The architecture does not
-preclude assignment of unavailable AP resources. If a queue subsequently
-becomes available while a guest using the matrix mdev to which its APQN
-is assigned, the guest will be given access to it. If an APQN
-is dynamically unassigned from the underlying host system, it will
-automatically become unavailable to the guest.
-
-Change log v16-v17:
-------------------
-* Introduced a new patch (patch 1) to remove the setting of the pqap hook
-  in the group notifier callback. It is now set when the vfio_ap device
-  driver is loaded.
-
-* Patch 6:
-    - Split the filtering of the APQNs and the control domains into
-      two functions and consolidated the vfio_ap_mdev_refresh_apcb and
-      vfio_ap_mdev_filter_apcb into one function named
-      vfio_ap_mdev_filter_matrix because the matrix is actually what is
-      being filtered.
-
-    - Removed ACK by Halil Pasic because of changes above; needs re-review.
-
-* Introduced a new patch (patch 8) to keep track of active guests.
-
-* Patch 9 (patch 8 in v16):
-    - Refactored locking to ensure KVM lock is taken before
-      matrix_dev->lock when hot plugging adapters, domains and
-      control domains.
-
-    - Removed ACK by Halil because of changes above; needs re-review.
-
-* Patch 14 (patch 13 in v16):
-    - This patch has been redesigned to ensure proper locking order (i.e.,
-      taking kvm->lock before matrix_dev->lock).
-
-    - Removed Halil's Removed-by because of changes above; needs re-review.
-
-Tony Krowiak (15):
-  s390/vfio-ap: Set pqap hook when vfio_ap module is loaded
-  s390/vfio-ap: use new AP bus interface to search for queue devices
-  s390/vfio-ap: move probe and remove callbacks to vfio_ap_ops.c
-  s390/vfio-ap: manage link between queue struct and matrix mdev
-  s390/vfio-ap: introduce shadow APCB
-  s390/vfio-ap: refresh guest's APCB by filtering APQNs assigned to mdev
-  s390/vfio-ap: allow assignment of unavailable AP queues to mdev device
-  s390/vfio-ap: keep track of active guests
-  s390/vfio-ap: allow hot plug/unplug of AP resources using mdev device
-  s390/vfio-ap: reset queues after adapter/domain unassignment
-  s390/ap: driver callback to indicate resource in use
-  s390/vfio-ap: implement in-use callback for vfio_ap driver
-  s390/vfio-ap: sysfs attribute to display the guest's matrix
-  s390/ap: notify drivers on config changed and scan complete callbacks
-  s390/vfio-ap: update docs to include dynamic config support
-
- Documentation/s390/vfio-ap.rst        |  492 ++++++---
- arch/s390/include/asm/kvm_host.h      |   10 +-
- arch/s390/kvm/kvm-s390.c              |    1 -
- arch/s390/kvm/priv.c                  |   45 +-
- drivers/s390/crypto/ap_bus.c          |  241 ++++-
- drivers/s390/crypto/ap_bus.h          |   16 +
- drivers/s390/crypto/vfio_ap_drv.c     |   52 +-
- drivers/s390/crypto/vfio_ap_ops.c     | 1379 ++++++++++++++++++-------
- drivers/s390/crypto/vfio_ap_private.h |   66 +-
- 9 files changed, 1714 insertions(+), 588 deletions(-)
-
+diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+index a604d51acfc8..05569d077d7f 100644
+--- a/arch/s390/include/asm/kvm_host.h
++++ b/arch/s390/include/asm/kvm_host.h
+@@ -799,16 +799,17 @@ struct kvm_s390_cpu_model {
+ 	unsigned short ibc;
+ };
+ 
+-typedef int (*crypto_hook)(struct kvm_vcpu *vcpu);
++struct kvm_s390_crypto_hook {
++	int (*fcn)(struct kvm_vcpu *vcpu);
++};
+ 
+ struct kvm_s390_crypto {
+ 	struct kvm_s390_crypto_cb *crycb;
+-	struct rw_semaphore pqap_hook_rwsem;
+-	crypto_hook *pqap_hook;
+ 	__u32 crycbd;
+ 	__u8 aes_kw;
+ 	__u8 dea_kw;
+ 	__u8 apie;
++	void *data;
+ };
+ 
+ #define APCB0_MASK_SIZE 1
+@@ -998,6 +999,9 @@ extern char sie_exit;
+ extern int kvm_s390_gisc_register(struct kvm *kvm, u32 gisc);
+ extern int kvm_s390_gisc_unregister(struct kvm *kvm, u32 gisc);
+ 
++extern int kvm_s390_pqap_hook_register(struct kvm_s390_crypto_hook *hook);
++extern int kvm_s390_pqap_hook_unregister(struct kvm_s390_crypto_hook *hook);
++
+ static inline void kvm_arch_hardware_disable(void) {}
+ static inline void kvm_arch_sync_events(struct kvm *kvm) {}
+ static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index 6a6dd5e1daf6..c91981599328 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -2649,7 +2649,6 @@ static void kvm_s390_crypto_init(struct kvm *kvm)
+ {
+ 	kvm->arch.crypto.crycb = &kvm->arch.sie_page2->crycb;
+ 	kvm_s390_set_crycb_format(kvm);
+-	init_rwsem(&kvm->arch.crypto.pqap_hook_rwsem);
+ 
+ 	if (!test_kvm_facility(kvm, 76))
+ 		return;
+diff --git a/arch/s390/kvm/priv.c b/arch/s390/kvm/priv.c
+index 53da4ceb16a3..3d91ff934c0c 100644
+--- a/arch/s390/kvm/priv.c
++++ b/arch/s390/kvm/priv.c
+@@ -31,6 +31,39 @@
+ #include "kvm-s390.h"
+ #include "trace.h"
+ 
++DEFINE_MUTEX(pqap_hook_lock);
++static struct kvm_s390_crypto_hook *pqap_hook;
++
++int kvm_s390_pqap_hook_register(struct kvm_s390_crypto_hook *hook)
++{
++	int ret = 0;
++
++	mutex_lock(&pqap_hook_lock);
++	if (pqap_hook)
++		ret = -EACCES;
++	else
++		pqap_hook = hook;
++	mutex_unlock(&pqap_hook_lock);
++
++	return ret;
++}
++EXPORT_SYMBOL_GPL(kvm_s390_pqap_hook_register);
++
++int kvm_s390_pqap_hook_unregister(struct kvm_s390_crypto_hook *hook)
++{
++	int ret = 0;
++
++	mutex_lock(&pqap_hook_lock);
++	if (hook != pqap_hook)
++		ret = -EACCES;
++	else
++		pqap_hook = NULL;
++	mutex_unlock(&pqap_hook_lock);
++
++	return ret;
++}
++EXPORT_SYMBOL_GPL(kvm_s390_pqap_hook_unregister);
++
+ static int handle_ri(struct kvm_vcpu *vcpu)
+ {
+ 	vcpu->stat.instruction_ri++;
+@@ -610,7 +643,6 @@ static int handle_io_inst(struct kvm_vcpu *vcpu)
+ static int handle_pqap(struct kvm_vcpu *vcpu)
+ {
+ 	struct ap_queue_status status = {};
+-	crypto_hook pqap_hook;
+ 	unsigned long reg0;
+ 	int ret;
+ 	uint8_t fc;
+@@ -659,16 +691,15 @@ static int handle_pqap(struct kvm_vcpu *vcpu)
+ 	 * hook function pointer in the kvm_s390_crypto structure. Lock the
+ 	 * owner, retrieve the hook function pointer and call the hook.
+ 	 */
+-	down_read(&vcpu->kvm->arch.crypto.pqap_hook_rwsem);
+-	if (vcpu->kvm->arch.crypto.pqap_hook) {
+-		pqap_hook = *vcpu->kvm->arch.crypto.pqap_hook;
+-		ret = pqap_hook(vcpu);
++	mutex_lock(&pqap_hook_lock);
++	if (pqap_hook) {
++		ret = pqap_hook->fcn(vcpu);
+ 		if (!ret && vcpu->run->s.regs.gprs[1] & 0x00ff0000)
+ 			kvm_s390_set_psw_cc(vcpu, 3);
+-		up_read(&vcpu->kvm->arch.crypto.pqap_hook_rwsem);
++		mutex_unlock(&pqap_hook_lock);
+ 		return ret;
+ 	}
+-	up_read(&vcpu->kvm->arch.crypto.pqap_hook_rwsem);
++	mutex_unlock(&pqap_hook_lock);
+ 	/*
+ 	 * A vfio_driver must register a hook.
+ 	 * No hook means no driver to enable the SIE CRYCB and no queues.
+diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
+index 94c1c9bd58ad..02275d246b39 100644
+--- a/drivers/s390/crypto/vfio_ap_ops.c
++++ b/drivers/s390/crypto/vfio_ap_ops.c
+@@ -293,13 +293,10 @@ static int handle_pqap(struct kvm_vcpu *vcpu)
+ 	apqn = vcpu->run->s.regs.gprs[0] & 0xffff;
+ 	mutex_lock(&matrix_dev->lock);
+ 
+-	if (!vcpu->kvm->arch.crypto.pqap_hook)
+-		goto out_unlock;
+-	matrix_mdev = container_of(vcpu->kvm->arch.crypto.pqap_hook,
+-				   struct ap_matrix_mdev, pqap_hook);
++	matrix_mdev = vcpu->kvm->arch.crypto.data;
+ 
+ 	/* If the there is no guest using the mdev, there is nothing to do */
+-	if (!matrix_mdev->kvm)
++	if (!matrix_mdev || !matrix_mdev->kvm)
+ 		goto out_unlock;
+ 
+ 	q = vfio_ap_get_queue(matrix_mdev, apqn);
+@@ -348,7 +345,6 @@ static int vfio_ap_mdev_probe(struct mdev_device *mdev)
+ 
+ 	matrix_mdev->mdev = mdev;
+ 	vfio_ap_matrix_init(&matrix_dev->info, &matrix_mdev->matrix);
+-	matrix_mdev->pqap_hook = handle_pqap;
+ 	mutex_lock(&matrix_dev->lock);
+ 	list_add(&matrix_mdev->node, &matrix_dev->mdev_list);
+ 	mutex_unlock(&matrix_dev->lock);
+@@ -1078,10 +1074,6 @@ static int vfio_ap_mdev_set_kvm(struct ap_matrix_mdev *matrix_mdev,
+ 	struct ap_matrix_mdev *m;
+ 
+ 	if (kvm->arch.crypto.crycbd) {
+-		down_write(&kvm->arch.crypto.pqap_hook_rwsem);
+-		kvm->arch.crypto.pqap_hook = &matrix_mdev->pqap_hook;
+-		up_write(&kvm->arch.crypto.pqap_hook_rwsem);
+-
+ 		mutex_lock(&kvm->lock);
+ 		mutex_lock(&matrix_dev->lock);
+ 
+@@ -1095,6 +1087,7 @@ static int vfio_ap_mdev_set_kvm(struct ap_matrix_mdev *matrix_mdev,
+ 
+ 		kvm_get_kvm(kvm);
+ 		matrix_mdev->kvm = kvm;
++		kvm->arch.crypto.data = matrix_mdev;
+ 		kvm_arch_crypto_set_masks(kvm,
+ 					  matrix_mdev->matrix.apm,
+ 					  matrix_mdev->matrix.aqm,
+@@ -1155,16 +1148,13 @@ static void vfio_ap_mdev_unset_kvm(struct ap_matrix_mdev *matrix_mdev,
+ 				   struct kvm *kvm)
+ {
+ 	if (kvm && kvm->arch.crypto.crycbd) {
+-		down_write(&kvm->arch.crypto.pqap_hook_rwsem);
+-		kvm->arch.crypto.pqap_hook = NULL;
+-		up_write(&kvm->arch.crypto.pqap_hook_rwsem);
+-
+ 		mutex_lock(&kvm->lock);
+ 		mutex_lock(&matrix_dev->lock);
+ 
+ 		kvm_arch_crypto_clear_masks(kvm);
+ 		vfio_ap_mdev_reset_queues(matrix_mdev);
+ 		kvm_put_kvm(kvm);
++		kvm->arch.crypto.data = NULL;
+ 		matrix_mdev->kvm = NULL;
+ 
+ 		mutex_unlock(&kvm->lock);
+@@ -1391,12 +1381,20 @@ static const struct mdev_parent_ops vfio_ap_matrix_ops = {
+ 	.supported_type_groups	= vfio_ap_mdev_type_groups,
+ };
+ 
++static struct kvm_s390_crypto_hook pqap_hook = {
++	.fcn = handle_pqap,
++};
++
+ int vfio_ap_mdev_register(void)
+ {
+ 	int ret;
+ 
+ 	atomic_set(&matrix_dev->available_instances, MAX_ZDEV_ENTRIES_EXT);
+ 
++	ret = kvm_s390_pqap_hook_register(&pqap_hook);
++	if (ret)
++		return ret;
++
+ 	ret = mdev_register_driver(&vfio_ap_matrix_driver);
+ 	if (ret)
+ 		return ret;
+@@ -1413,6 +1411,7 @@ int vfio_ap_mdev_register(void)
+ 
+ void vfio_ap_mdev_unregister(void)
+ {
++	WARN_ON(kvm_s390_pqap_hook_unregister(&pqap_hook));
+ 	mdev_unregister_device(&matrix_dev->device);
+ 	mdev_unregister_driver(&vfio_ap_matrix_driver);
+ }
+diff --git a/drivers/s390/crypto/vfio_ap_private.h b/drivers/s390/crypto/vfio_ap_private.h
+index 648fcaf8104a..907f41160de7 100644
+--- a/drivers/s390/crypto/vfio_ap_private.h
++++ b/drivers/s390/crypto/vfio_ap_private.h
+@@ -97,7 +97,6 @@ struct ap_matrix_mdev {
+ 	struct notifier_block group_notifier;
+ 	struct notifier_block iommu_notifier;
+ 	struct kvm *kvm;
+-	crypto_hook pqap_hook;
+ 	struct mdev_device *mdev;
+ };
+ 
 -- 
 2.31.1
 
