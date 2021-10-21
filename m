@@ -2,158 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D5A71436641
-	for <lists+kvm@lfdr.de>; Thu, 21 Oct 2021 17:29:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7BAD6436652
+	for <lists+kvm@lfdr.de>; Thu, 21 Oct 2021 17:32:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231875AbhJUPcG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Oct 2021 11:32:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56599 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231503AbhJUPcG (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 21 Oct 2021 11:32:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634830189;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+        id S231712AbhJUPeR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Oct 2021 11:34:17 -0400
+Received: from smtp-out2.suse.de ([195.135.220.29]:36064 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230000AbhJUPeP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Oct 2021 11:34:15 -0400
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id EB6B31FD50;
+        Thu, 21 Oct 2021 15:31:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1634830318; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=z7CxwAzzEIQOd3qBht/PpbJEZOuniLXSJ6BnX0TmD6o=;
-        b=PBRBFRZ5GbIYceOMDtzy9xEstNzJEhUJGWcZoabvcHGqpqDhyj3rqIVUm6PhgCsiBwlxh4
-        pcc+3TSdxEeu0SQpWyX5Ym5aC7AS93yV1S38S5VNBccvE6myEGh0e7+oZRHb4A2gS+iGny
-        PYVl5X7pIawWGgb5YUcl76N0v4aTYa4=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-187-wyWS_tVrMeG9xAjAhFTwKw-1; Thu, 21 Oct 2021 11:29:48 -0400
-X-MC-Unique: wyWS_tVrMeG9xAjAhFTwKw-1
-Received: by mail-ed1-f72.google.com with SMTP id t18-20020a056402021200b003db9e6b0e57so736007edv.10
-        for <kvm@vger.kernel.org>; Thu, 21 Oct 2021 08:29:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=z7CxwAzzEIQOd3qBht/PpbJEZOuniLXSJ6BnX0TmD6o=;
-        b=QyOnur1NawwCnqX+DPe4GhEPzxjla/3D+kw1uz9NDOyEXOFEUgvpUqZDef4AbCdh+Y
-         tRKTGwQNoQoRS0H/UvCuFeoJ1+QTI9+wfPcPD56In76oxfA+2OimMK+vNGEDcBxGQ80d
-         JUboSMPjVOVSjivCHh/AMNFTECpYX9sjdEkGjVkvzjJT9efFI9HPgswSDYayNXrwQW4d
-         l79I5x11O3ebgkapFZdwGbffGeKZ0yG3Hjxe6HKrKa2NR627CtzbVR7TEIR9DYoE50kq
-         fb1YF2Jy87FuMIcGnIMnE8eOBYFw59qh9BctgT1nbwiLp4Fn/uDw0VuTwozEMP9muLop
-         vvvw==
-X-Gm-Message-State: AOAM531PLfuruvf+cxdLPnKE3cX1GsR4kcGhVVrNDhZQvOi2h5+Y7QQP
-        JT8w/h6XW5r+rL4Q9/RqKqKHUBT2ZN2SQf7gPEAiDpnqGy4vw5S8CXaVEozlRUQkyBWuv9W/UYY
-        yHnC2Me0H+JF/
-X-Received: by 2002:a17:907:118d:: with SMTP id uz13mr8613422ejb.382.1634830187146;
-        Thu, 21 Oct 2021 08:29:47 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyLl4bnSu/ecyBFmCmqDwOSad1YN+gCMCGaznQPYg2lJHMHg0E2A02UlfEVzgzecmsH1Ik+Ww==
-X-Received: by 2002:a17:907:118d:: with SMTP id uz13mr8613378ejb.382.1634830186861;
-        Thu, 21 Oct 2021 08:29:46 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.gmail.com with ESMTPSA id ke12sm2681160ejc.32.2021.10.21.08.29.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 Oct 2021 08:29:45 -0700 (PDT)
-Message-ID: <545b753f-a11f-b6fb-2c33-49a99875d72f@redhat.com>
-Date:   Thu, 21 Oct 2021 17:29:39 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [RFC 04/16] KVM: selftests: set CPUID before setting sregs in
- vcpu creation
-Content-Language: en-US
-To:     Michael Roth <michael.roth@amd.com>,
-        linux-kselftest@vger.kernel.org
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
-        Nathan Tempelman <natet@google.com>,
-        Marc Orr <marcorr@google.com>,
-        Steve Rutherford <srutherford@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Mingwei Zhang <mizhang@google.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Varad Gautam <varad.gautam@suse.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Ricardo Koller <ricarkol@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>,
+        bh=nXPwudmomqzIqQrwGaXyiAXLub/qasPhIndmnj6Vycs=;
+        b=VNZ+cAUb1uxMz7nvY0ksOnREW+p6njGEeTVBlbXbCDFnkqveTJSin9Y0jtWrYLx52V8Hsd
+        k/1NG0JVRU1xEf1qr0yC9iZZ0SsJTR5JBxLZ0Plx/DUgzOHWWj34ansfUrGeJr+OTzZ3FF
+        nOpq7sl8Pgy2X6V1CznSwELhPAxN1jA=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1634830318;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=nXPwudmomqzIqQrwGaXyiAXLub/qasPhIndmnj6Vycs=;
+        b=mBodyqUoS7Pu4V3oQzCZ2VWqrdsSfmo3Yzqq5LMVVuFuTMBlnRZ7ntJOmxr0Qwx+GzniUB
+        Bu8rnHj+ti/obzCQ==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id D95AF13AE4;
+        Thu, 21 Oct 2021 15:31:58 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id YsmCNO6HcWFWWwAAMHmgww
+        (envelope-from <bp@suse.de>); Thu, 21 Oct 2021 15:31:58 +0000
+Date:   Thu, 21 Oct 2021 17:32:01 +0200
+From:   Borislav Petkov <bp@suse.de>
+To:     Stephen Rothwell <sfr@canb.auug.org.au>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>,
         Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H . Peter Anvin" <hpa@zytor.com>
-References: <20211005234459.430873-1-michael.roth@amd.com>
- <20211006203617.13045-1-michael.roth@amd.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20211006203617.13045-1-michael.roth@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Sean Christopherson <seanjc@google.com>
+Subject: Re: linux-next: manual merge of the kvm tree with the tip tree
+Message-ID: <YXGH8Y/flJWCCrbt@zn.tnic>
+References: <20211021133931.1a0e096b@canb.auug.org.au>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20211021133931.1a0e096b@canb.auug.org.au>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 06/10/21 22:36, Michael Roth wrote:
-> Recent kernels have checks to ensure the GPA values in special-purpose
-> registers like CR3 are within the maximum physical address range and
-> don't overlap with anything in the upper/reserved range. In the case of
-> SEV kselftest guests booting directly into 64-bit mode, CR3 needs to be
-> initialized to the GPA of the page table root, with the encryption bit
-> set. The kernel accounts for this encryption bit by removing it from
-> reserved bit range when the guest advertises the bit position via
-> KVM_SET_CPUID*, but kselftests currently call KVM_SET_SREGS as part of
-> vm_vcpu_add_default(), *prior* to vCPU creation, so there's no
-> opportunity to call KVM_SET_CPUID* in advance. As a result,
-> KVM_SET_SREGS will return an error in these cases.
+On Thu, Oct 21, 2021 at 01:39:31PM +1100, Stephen Rothwell wrote:
+> Hi all,
 > 
-> Address this by moving vcpu_set_cpuid() (which calls KVM_SET_CPUID*)
-> ahead of vcpu_setup() (which calls KVM_SET_SREGS).
+> Today's linux-next merge of the kvm tree got a conflict in:
 > 
-> While there, address a typo in the assertion that triggers when
-> KVM_SET_SREGS fails.
+>   arch/x86/kvm/x86.c
 > 
-> Suggested-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
-> ---
->   tools/testing/selftests/kvm/lib/kvm_util.c         | 2 +-
->   tools/testing/selftests/kvm/lib/x86_64/processor.c | 4 +---
->   2 files changed, 2 insertions(+), 4 deletions(-)
+> between commit:
 > 
-> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> index ef88fdc7e46b..646cffd86d09 100644
-> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> @@ -1906,7 +1906,7 @@ void vcpu_sregs_get(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_sregs *sregs)
->   void vcpu_sregs_set(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_sregs *sregs)
->   {
->   	int ret = _vcpu_sregs_set(vm, vcpuid, sregs);
-> -	TEST_ASSERT(ret == 0, "KVM_RUN IOCTL failed, "
-> +	TEST_ASSERT(ret == 0, "KVM_SET_SREGS IOCTL failed, "
->   		"rc: %i errno: %i", ret, errno);
->   }
+>   126fe0401883 ("x86/fpu: Cleanup xstate xcomp_bv initialization")
+> 
+> from the tip tree and commits:
+> 
+>   5ebbc470d7f3 ("KVM: x86: Remove defunct setting of CR0.ET for guests during vCPU create")
+>   e8f65b9bb483 ("KVM: x86: Remove defunct setting of XCR0 for guest during vCPU create")
+>   583d369b36a9 ("KVM: x86: Fold fx_init() into kvm_arch_vcpu_create()")
+> 
+> from the kvm tree.
+> 
+> I fixed it up (see below) and can carry the fix as necessary. This
+> is now fixed as far as linux-next is concerned, but any non trivial
+> conflicts should be mentioned to your upstream maintainer when your tree
+> is submitted for merging.  You may also want to consider cooperating
+> with the maintainer of the conflicting tree to minimise any particularly
+> complex conflicts.
+> 
+> -- 
+> Cheers,
+> Stephen Rothwell
+> 
+> diff --cc arch/x86/kvm/x86.c
+> index 04350680b649,3ea4f6ef2474..000000000000
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@@ -10615,10 -10687,10 +10590,9 @@@ int kvm_arch_vcpu_create(struct kvm_vcp
+>   		pr_err("kvm: failed to allocate vcpu's fpu\n");
+>   		goto free_user_fpu;
+>   	}
+>  -	fpstate_init(&vcpu->arch.guest_fpu->state);
+>  -	if (boot_cpu_has(X86_FEATURE_XSAVES))
+>  -		vcpu->arch.guest_fpu->state.xsave.header.xcomp_bv =
+>  -			host_xcr0 | XSTATE_COMPACTION_ENABLED;
+>  +
+>  +	fpu_init_fpstate_user(vcpu->arch.user_fpu);
+>  +	fpu_init_fpstate_user(vcpu->arch.guest_fpu);
+> - 	fx_init(vcpu);
 >   
-> diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> index 0bbd88fe1127..1ab4c20f5d12 100644
-> --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> @@ -660,6 +660,7 @@ void vm_vcpu_add_default(struct kvm_vm *vm, uint32_t vcpuid, void *guest_code)
->   
->   	/* Create VCPU */
->   	vm_vcpu_add(vm, vcpuid);
-> +	vcpu_set_cpuid(vm, vcpuid, kvm_get_supported_cpuid());
->   	vcpu_setup(vm, vcpuid);
->   
->   	/* Setup guest general purpose registers */
-> @@ -672,9 +673,6 @@ void vm_vcpu_add_default(struct kvm_vm *vm, uint32_t vcpuid, void *guest_code)
->   	/* Setup the MP state */
->   	mp_state.mp_state = 0;
->   	vcpu_set_mp_state(vm, vcpuid, &mp_state);
-> -
-> -	/* Setup supported CPUIDs */
-> -	vcpu_set_cpuid(vm, vcpuid, kvm_get_supported_cpuid());
->   }
->   
->   /*
-> 
+>   	vcpu->arch.maxphyaddr = cpuid_query_maxphyaddr(vcpu);
+>   	vcpu->arch.reserved_gpa_bits = kvm_vcpu_reserved_gpa_bits_raw(vcpu);
 
-Queued, thanks.
+LGTM too, thx Stephen!
 
-Paolo
+-- 
+Regards/Gruss,
+    Boris.
 
+SUSE Software Solutions Germany GmbH, GF: Felix Imendörffer, HRB 36809, AG Nürnberg
