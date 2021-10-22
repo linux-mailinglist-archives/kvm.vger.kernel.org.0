@@ -2,171 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BA38B4379BD
-	for <lists+kvm@lfdr.de>; Fri, 22 Oct 2021 17:18:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 13F354379DB
+	for <lists+kvm@lfdr.de>; Fri, 22 Oct 2021 17:25:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233304AbhJVPUe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Oct 2021 11:20:34 -0400
-Received: from new2-smtp.messagingengine.com ([66.111.4.224]:53455 "EHLO
-        new2-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232384AbhJVPUd (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 22 Oct 2021 11:20:33 -0400
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
-        by mailnew.nyi.internal (Postfix) with ESMTP id 66D0C580F92;
-        Fri, 22 Oct 2021 11:18:14 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute4.internal (MEProxy); Fri, 22 Oct 2021 11:18:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=stwcx.xyz; h=
-        date:from:to:cc:subject:message-id:references:mime-version
-        :content-type:in-reply-to; s=fm3; bh=46YpM5jZKwd3mcnLxsPVqOmlYwf
-        lxCO4p2fiY1KoOPc=; b=qm/JHEjUR81ScgvglY9ndyrWS6meTUz02OeqaWeuwnV
-        OkvwFVjW753vqgVHwr+I7OhJFw1cJfhfxlXXHEZA1I3RqDQ4tWjSZ/KlP3IYrvL0
-        DhrpBbN43xHgOaLUMJZJ0KuzMu+1fEEfTEsxbTqF7FaeyDyhTZQykIWjrUNSNGsi
-        uT4eqrJqDCpp6eFFpZLfBgwDAjZP5dfZhc0bJjgFC6dd8iUWmiYnKoe7178zU2qu
-        AG+l8dA1GcdlOAML1P8inXgr9ERXBCkHQGZ/6xCBd0shOkTY/7UQgld470E2Sthm
-        ui0lZ6XpYyrGFwS10FcCiQc9TKhxRpuKtn146Sp7MUA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-type:date:from:in-reply-to
-        :message-id:mime-version:references:subject:to:x-me-proxy
-        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; bh=46YpM5
-        jZKwd3mcnLxsPVqOmlYwflxCO4p2fiY1KoOPc=; b=ODoNLg6b9DxvKZ9suUSYH6
-        ibbkhO6J/bGRvsG2yv16q0+2KVopWvljS4+tT9yMqnb9aC2M7FVOqVuzMwi6DV4w
-        TYC4Gp/ORsQGrXg/Bx35p7J+SvPOBT/84L/GRvNabaIRP+cr3IDLB7HOV+R5SdTA
-        mSgcSov7Yc5r/dPNI3VIWe/I7caf2GraW1ukuxXF0alogK1ev4t4rZbDVbWNJEOA
-        frUsW+rLtY4rrheFi195Oav+vi68tM+LU2KSKKkjAbAZfd/PUKEdxNGtruwzZPRn
-        /HnDPeB/bWdUU1AS31twbQCi1oqH1TQwhdUVCuPuJt3zeuqZRSWsc1MslNArO6bQ
-        ==
-X-ME-Sender: <xms:NdZyYRpgEAo76-yfnDAaM3pmvgYYvRy5uQZRPPwY7hxaAdC1BfhxFw>
-    <xme:NdZyYTpjPmsAr-sXeGewqzvH3VcwRoQ-JkWIOUfyqVqW1OhExH8m6UUhyWwt93IXY
-    zZFW4t_5T5tY6_joMs>
-X-ME-Received: <xmr:NdZyYeOzjnNtXiGBb9iTlhifuZm69WxhizsDdtS7DK7kB1X74WcFtrRTV2kgVgXa6tNAJ1C9qLzSAYfy9X6ZGBv--bzWSHZ5w6OAAumuAgBo7g>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvtddrvddvkedgjedvucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    gfrhhlucfvnfffucdljedtmdenucfjughrpeffhffvuffkfhggtggujgesghdtroertddt
-    vdenucfhrhhomheprfgrthhrihgtkhcuhghilhhlihgrmhhsuceophgrthhrihgtkhessh
-    htfigtgidrgiihiieqnecuggftrfgrthhtvghrnhepfeeikedvjeejheetgeeggeefgeff
-    teeugfegtddvudeggfeugfefjedvuedvveevnecuvehluhhsthgvrhfuihiivgeptdenuc
-    frrghrrghmpehmrghilhhfrhhomhepphgrthhrihgtkhesshhtfigtgidrgiihii
-X-ME-Proxy: <xmx:NdZyYc71h11aRVJBMGfw2EO0jp91Y2LEb_hdTyTUPjoScQgPUwAZHA>
-    <xmx:NdZyYQ6B5nPy8TxGZY_MeQw4V0VyxFBsCDKZHYicXG6WSJGUG2ZCoQ>
-    <xmx:NdZyYUgj5g6TZgOd_k22lZJCcLgfLGG_GyhOP924D2D0nfpbD18H_g>
-    <xmx:NtZyYTJ4p4_qR52E2TPgLiaZIzg_pp3dv1yxYjVH1RdCC9E6t3S5IQ>
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 22 Oct 2021 11:18:12 -0400 (EDT)
-Date:   Fri, 22 Oct 2021 10:18:11 -0500
-From:   Patrick Williams <patrick@stwcx.xyz>
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     Zev Weiss <zev@bewilderbeest.net>, kvm@vger.kernel.org,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Jeremy Kerr <jk@codeconstruct.com.au>,
-        Rajat Jain <rajatja@google.com>,
-        Frank Rowand <frowand.list@gmail.com>,
-        Jianxiong Gao <jxgao@google.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        Saravana Kannan <saravanak@google.com>,
-        Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
-        openbmc@lists.ozlabs.org, devicetree@vger.kernel.org,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Bhaskar Chowdhury <unixbhaskar@gmail.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Andrew Jeffery <andrew@aj.id.au>,
-        Cornelia Huck <cohuck@redhat.com>,
-        linux-kernel@vger.kernel.org, Vinod Koul <vkoul@kernel.org>,
-        dmaengine@vger.kernel.org
-Subject: Re: [PATCH 4/5] driver core: inhibit automatic driver binding on
- reserved devices
-Message-ID: <YXLWMyleiTFDDZgm@heinlein>
-References: <20211022020032.26980-1-zev@bewilderbeest.net>
- <20211022020032.26980-5-zev@bewilderbeest.net>
- <YXJeYCFJ5DnBB63R@kroah.com>
- <YXJ3IPPkoLxqXiD3@hatter.bewilderbeest.net>
- <YXJ88eARBE3vU1aA@kroah.com>
+        id S233487AbhJVP1b (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Oct 2021 11:27:31 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44037 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233412AbhJVP1R (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 22 Oct 2021 11:27:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1634916299;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=WKn/MMnrjzSTMvrkCX2L7r2/M5K0U88gx7mskxYYYD8=;
+        b=PPxKsEu/pBMspA3dFpP/TF0u33zvmJHP7KyzDsBNjK+0O+7YsK52gwS1UJxTuyL/EX1S0t
+        ejj+9885F42Baxm9d0grs1cPd6nRM6F44HxFNfIW44KXwdoDk9Qcjo9p2AzYnRMzFyIbQY
+        AeFNY5Nt5grpxSYeOSKBWfDjfJkeDt4=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-555-Tg54rfouNtSUaN-wrWSZwA-1; Fri, 22 Oct 2021 11:24:55 -0400
+X-MC-Unique: Tg54rfouNtSUaN-wrWSZwA-1
+Received: by mail-ed1-f69.google.com with SMTP id f4-20020a50e084000000b003db585bc274so4010412edl.17
+        for <kvm@vger.kernel.org>; Fri, 22 Oct 2021 08:24:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=WKn/MMnrjzSTMvrkCX2L7r2/M5K0U88gx7mskxYYYD8=;
+        b=VIUOlsaM5WNRL3vKdcI0TrPB8VHowod+BxqpdCUFXrOfUtKJHz0jazWxcXpsi7iL+h
+         Mp4F1/K5crdjqpJxK/RgbwZOEut0acRVdZIeWNdw0QPP8dzsi6euLi1rU9QktHfOivkm
+         LrHeIU1+ryOts8o31j+gE3DtDB4CTxO4d/91rK1A0KYlsgZe36HLH6th3YZmOKNg1UuC
+         PBWeJr4dsoD2OkJwiiBJb2AcO/zV6aDWk3XkIiCU7JFk8vGYllT/b6qNE6nbFscmSTxw
+         Vm+/ULAxvz4PXzlWnOj1iqtB+3eozO4ddagjVAQeny66k/HLEEVOpXNDc5RGuvfUjqFy
+         PLJQ==
+X-Gm-Message-State: AOAM532rDw/Im0pbPpHU4aS+0DZZjJMwx+2PCzzT7SSWR8Yz9B+QSpe7
+        60OKWy3FrpUnh+QweekA3sLE3Gj/PN1zppNmK9tp/PHtvpfgWPg07wq2JdCniA6CSjF9RUXs1FT
+        mkbOzXPWEQDab
+X-Received: by 2002:a17:906:ca18:: with SMTP id jt24mr227111ejb.325.1634916294057;
+        Fri, 22 Oct 2021 08:24:54 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw1gMsV0VbjksXEJRF9KOJy6vrhOLALRqiJ74io2ME1xy22uV1bJNsaAASMo+PgzQ54ZbscQg==
+X-Received: by 2002:a17:906:ca18:: with SMTP id jt24mr227080ejb.325.1634916293883;
+        Fri, 22 Oct 2021 08:24:53 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id l23sm3922047ejn.15.2021.10.22.08.24.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 22 Oct 2021 08:24:53 -0700 (PDT)
+Message-ID: <44630562-a855-f3e2-a427-9f3da3abdd70@redhat.com>
+Date:   Fri, 22 Oct 2021 17:24:52 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="70daKchr0JYsGAyF"
-Content-Disposition: inline
-In-Reply-To: <YXJ88eARBE3vU1aA@kroah.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [PATCH v6 1/4] KVM: x86: Clarify the kvm_run.emulation_failure
+ structure layout
+Content-Language: en-US
+To:     David Edmondson <david.edmondson@oracle.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     linux-kernel@vger.kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>, x86@kernel.org,
+        Joerg Roedel <joro@8bytes.org>, Ingo Molnar <mingo@redhat.com>,
+        kvm@vger.kernel.org, Jim Mattson <jmattson@google.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        David Matlack <dmatlack@google.com>
+References: <20210920103737.2696756-1-david.edmondson@oracle.com>
+ <20210920103737.2696756-2-david.edmondson@oracle.com>
+ <YWYeJ9TtfRwBk/5D@google.com> <cunfst5ff37.fsf@oracle.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <cunfst5ff37.fsf@oracle.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 13/10/21 11:29, David Edmondson wrote:
+> On Tuesday, 2021-10-12 at 23:45:43 GMT, Sean Christopherson wrote:
+> 
+>> On Mon, Sep 20, 2021, David Edmondson wrote:
+>>> Until more flags for kvm_run.emulation_failure flags are defined, it
+>>> is undetermined whether new payload elements corresponding to those
+>>> flags will be additive or alternative. As a hint to userspace that an
+>>> alternative is possible, wrap the current payload elements in a union.
+>>>
+>>> Suggested-by: Sean Christopherson <seanjc@google.com>
+>>> Signed-off-by: David Edmondson <david.edmondson@oracle.com>
+>>> ---
+>>
+>> To complete the set... :-)
+>>
+>> Reviewed-by: Sean Christopherson <seanjc@google.com>
+> 
+> Thanks!
+> 
 
---70daKchr0JYsGAyF
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Queued, thanks!
 
-Hi Greg,
+Paolo
 
-On Fri, Oct 22, 2021 at 10:57:21AM +0200, Greg Kroah-Hartman wrote:
-> On Fri, Oct 22, 2021 at 01:32:32AM -0700, Zev Weiss wrote:
-> > On Thu, Oct 21, 2021 at 11:46:56PM PDT, Greg Kroah-Hartman wrote:
-> > > On Thu, Oct 21, 2021 at 07:00:31PM -0700, Zev Weiss wrote:
-
-> > So we want the kernel to be aware of the device's existence (so that we
-> > *can* bind a driver to it when needed), but we don't want it touching t=
-he
-> > device unless we really ask for it.
-> >=20
-> > Does that help clarify the motivation for wanting this functionality?
->=20
-> Sure, then just do this type of thing in the driver itself.  Do not have
-> any matching "ids" for this hardware it so that the bus will never call
-> the probe function for this hardware _until_ a manual write happens to
-> the driver's "bind" sysfs file.
-
-It sounds like you're suggesting a change to one particular driver to satis=
-fy
-this one particular case (and maybe I'm just not understanding your suggest=
-ion).
-For a BMC, this is a pretty regular situation and not just as one-off as Ze=
-v's
-example.
-
-Another good example is where a system can have optional riser cards with a
-whole tree of devices that might be on that riser card (and there might be
-different variants of a riser card that could go in the same slot).  Usually
-there is an EEPROM of some sort at a well-known address that can be parsed =
-to
-identify which kind of riser card it is and then the appropriate sub-device=
-s can
-be enumerated.  That EEPROM parsing is something that is currently done in
-userspace due to the complexity and often vendor-specific nature of it.
-
-Many of these devices require quite a bit more configuration information th=
-an
-can be passed along a `bind` call.  I believe it has been suggested previou=
-sly
-that this riser-card scenario could also be solved with dynamic loading of =
-DT
-snippets, but that support seems simple pretty far from being merged.
-
---=20
-Patrick Williams
-
---70daKchr0JYsGAyF
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCAAdFiEEBGD9ii4LE9cNbqJBqwNHzC0AwRkFAmFy1jEACgkQqwNHzC0A
-wRkFhg/9HGu2uiFP02YyeOYntJIcOruf1o1SzGDkH/cH9bsS/NmFUA76UFa42pJp
-O1Dkn1yXtjNdENw9UL7RU3kmCWHaEP2nBxP3F+3Gt/9uYZIxArNWBQUGMjELC+dn
-6wfQXoRPwPX+/Tzug7WAgwqsWP9KvdIzvIYf1GfKSlZGXxa2uuwJb4QFTLirrmiK
-zFn78+EB+4qSZEl3KucpA4UahfCobnPcz7a51DP2XSn70Qq2kTZfxn3Pjd4tYtAg
-N0YqDe32NnYHX1jAh/g/QXLv4BCOHh4x8IDWBaekoZ9dSg9CctAjct8L7+HxbdV6
-HWFwlDFm2GvLtv71WyKGqxRaeFfp2+BSZaedQXLM/1t3xY8lD3HOG0yFUxCweXZ9
-yFXrlql9NQ+KkoML3LbO+NUrzk3Iz3cJxSQ7s0G6/N57fI/dUsHVihJfABroBPhF
-xNFYGEsADyvcLFygWXCG3Z/hNa5RgJOhSxrijXTTimUmJg0/TZePrLGJQ6Iikehp
-D+5v6DOh/Itq/CaXhjpwitloV1yxQGnEM+72cIb7pjkjTqsuKXQwy8Gq4XQzXHLX
-YV9NM7xESn7QUuuED4KprEEKYMVu5vIFDNhgifBXd48GTEr1Ga8BbFDVfoUcPuya
-oQ707lRUwbiNx344LTJqBm/cotib5i5rIaMQAIAZtUecxdzQ9tk=
-=/Hnz
------END PGP SIGNATURE-----
-
---70daKchr0JYsGAyF--
