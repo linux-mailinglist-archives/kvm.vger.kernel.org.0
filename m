@@ -2,141 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4FED84374BD
-	for <lists+kvm@lfdr.de>; Fri, 22 Oct 2021 11:30:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E50C94374FF
+	for <lists+kvm@lfdr.de>; Fri, 22 Oct 2021 11:46:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232374AbhJVJdE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Oct 2021 05:33:04 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:48205 "EHLO
+        id S232377AbhJVJsl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Oct 2021 05:48:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:29826 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232180AbhJVJdD (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 22 Oct 2021 05:33:03 -0400
+        by vger.kernel.org with ESMTP id S231992AbhJVJsj (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 22 Oct 2021 05:48:39 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634895045;
+        s=mimecast20190719; t=1634895982;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Exmt4jTkemurDoyQgXRU8PvM8wbQD/c3j+4KTnsT5S0=;
-        b=bAt344ysr9WBGR1ZcgaripBh7WSBzaoqSOU8kU9PiTHOg+f13A8zotwszOWRV19cnb7PyB
-        2VTolI8jrO9WJD9/yO1ny9UBKC5WEhcUYY7F4iyr+tvYpXEXByMqvpKW2M0YbmfnVTJtYP
-        YflQCXelIdeksll81EVEQEOOXSFQNxU=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-596-hhv3Ek3BP5SntTO-2B40zQ-1; Fri, 22 Oct 2021 05:30:44 -0400
-X-MC-Unique: hhv3Ek3BP5SntTO-2B40zQ-1
-Received: by mail-wm1-f71.google.com with SMTP id 5-20020a1c0005000000b0032c9c156acbso731912wma.9
-        for <kvm@vger.kernel.org>; Fri, 22 Oct 2021 02:30:44 -0700 (PDT)
+        bh=q5FJnOMRZWvjOB3d1Ox+t5Wfgcuzi9WlMtPofRf2ri0=;
+        b=UioksrHGoCJ97LcJIBfeLW/GRD26j5Uqi2KlrDxKvru+fhxgYlXM091AQITOfz37Inux7M
+        uFKn/942Y+ZHE2Edo4tWAhATAh2ncETJgxWjE5MH2H43s8xQ+Dg42SOaUkxFjSBOAaxGrN
+        uvfI+p53wUoqZ8SREus3iS9Q5wS3dzI=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-314-xYjD1xVwOYOWQg40abSslg-1; Fri, 22 Oct 2021 05:46:20 -0400
+X-MC-Unique: xYjD1xVwOYOWQg40abSslg-1
+Received: by mail-ed1-f71.google.com with SMTP id s12-20020a50dacc000000b003dbf7a78e88so3190450edj.2
+        for <kvm@vger.kernel.org>; Fri, 22 Oct 2021 02:46:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Exmt4jTkemurDoyQgXRU8PvM8wbQD/c3j+4KTnsT5S0=;
-        b=lJfY1HQ3QJRWvVfYTkjqjKsv+yPLC37o0YEVu1e2RsPob4SxiYGRbCEQK80muhG5y3
-         sFrk9OXLT4q0aWurJUEkqNBQrOQxjmxM/yLx71SJ8r+/l3W06jrNKy5461CnddZzjIdt
-         yR0yFNH+UVHEjil2iaBS0lLvVaKXxdaMYdo0WV35v3QQqURLTgnm6Rsqf2tNqSLJZMiw
-         k7qP8b7w27+8WBsZUPScCm1PUOrkvTr6ITwCwsvUqOI5lD5+M9AaTnQ4Hl5+o/n1Dbyd
-         /NTTMa6grSEWigrSmN1U2b+iWVfjwF9RAPazN48R9qUF1zkaAN6zfAX1VABWgWPEoJVV
-         610A==
-X-Gm-Message-State: AOAM530mtCMSRu16ev3uJrVuWSLqBlqstAowsnJqYJgjJWMidWdDid2U
-        qDe+sAhLcGtdlh8q0aJ0En0y4A+TRPtZ1b0WRpOpAbG2xezN0sKQc7VYCBpzINNB1Cle4DsD4p6
-        c7xJcH4UrzLDM
-X-Received: by 2002:adf:e90b:: with SMTP id f11mr2694856wrm.181.1634895043223;
-        Fri, 22 Oct 2021 02:30:43 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJygejYN4wrbg0gCwYPCQWk12aliJB5cOOwmEtPe9Fbvdiu9h0LjGVc51OvnzWH3A2vl4yneaQ==
-X-Received: by 2002:adf:e90b:: with SMTP id f11mr2694835wrm.181.1634895043076;
-        Fri, 22 Oct 2021 02:30:43 -0700 (PDT)
-Received: from redhat.com ([2.55.24.172])
-        by smtp.gmail.com with ESMTPSA id l5sm7503858wru.24.2021.10.22.02.30.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Oct 2021 02:30:42 -0700 (PDT)
-Date:   Fri, 22 Oct 2021 05:30:37 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Max Gurtovoy <mgurtovoy@nvidia.com>
-Cc:     hch@infradead.org, virtualization@lists.linux-foundation.org,
-        kvm@vger.kernel.org, stefanha@redhat.com, israelr@nvidia.com,
-        nitzanc@nvidia.com, oren@nvidia.com, linux-block@vger.kernel.org,
-        axboe@kernel.dk
-Subject: Re: [PATCH v3 1/1] virtio-blk: add num_request_queues module
- parameter
-Message-ID: <20211022052950-mutt-send-email-mst@kernel.org>
-References: <20210902204622.54354-1-mgurtovoy@nvidia.com>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=q5FJnOMRZWvjOB3d1Ox+t5Wfgcuzi9WlMtPofRf2ri0=;
+        b=FKMxJgjRHBhNQW10uI9iX1LO0I2A9BlUG+0LTA9nRFuHuQDkOkRog+Vlf8E6Kx8Stw
+         yOr7fLxmR3eojTr/FRcxx446eeiF2tLkypO89rkQy4Bs4sB5lXV3R7N09pC9E5i3wulL
+         1BqvssQO1MzXaTEf0LeKLZfY2+ukIzPX95hCXRkDKJYEMP18cDkA9MAUca0Icx5pX2P3
+         E6Ln2iWVlB6KB9eFxgTW2cIElJw9iZlFcL00Fqz4qhVEVeXimlk3iqZ9x3znwvQ+Wmzy
+         8pY0y6MeACC3+h8dXsLhfug54aedMyCeZwSc0jHs0icTA5dxjpZtFx1KE8087qPk+E70
+         yFqQ==
+X-Gm-Message-State: AOAM531K1brBqy4LoQc8ExWlWvBeaJOjXRmyVL/Qe+5NCdDyTRT7T9oD
+        iMZtxI6uMty6iugQPRTY9pmlxu51oSjauoP587DvbRTABHzruDow9fAAe2fbJ7SeaUjOqwqslN2
+        Ig/nOGJgl45wL
+X-Received: by 2002:a17:906:9b88:: with SMTP id dd8mr14397082ejc.467.1634895979488;
+        Fri, 22 Oct 2021 02:46:19 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwbwGkiPtZVczfGl3NMgm/t64A/jGQwnkx+5JyzXgvZp3WDfg4w0m6tSBx9uT3j5lmZV9uahQ==
+X-Received: by 2002:a17:906:9b88:: with SMTP id dd8mr14397059ejc.467.1634895979202;
+        Fri, 22 Oct 2021 02:46:19 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id n23sm4235382edw.75.2021.10.22.02.46.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 22 Oct 2021 02:46:18 -0700 (PDT)
+Message-ID: <bebc39f8-0ebc-c8cb-413e-bb4e30397057@redhat.com>
+Date:   Fri, 22 Oct 2021 11:46:17 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210902204622.54354-1-mgurtovoy@nvidia.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [PATCH 0/2] KVM: some fixes about RDMSR/WRMSR instruction
+ emulation
+Content-Language: en-US
+To:     Hou Wenlong <houwenlong93@linux.alibaba.com>, kvm@vger.kernel.org
+References: <cover.1634870747.git.houwenlong93@linux.alibaba.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <cover.1634870747.git.houwenlong93@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 02, 2021 at 11:46:22PM +0300, Max Gurtovoy wrote:
-> Sometimes a user would like to control the amount of request queues to
-> be created for a block device. For example, for limiting the memory
-> footprint of virtio-blk devices.
+On 22/10/21 04:59, Hou Wenlong wrote:
+> When KVM_CAP_X86_USER_SPACE_MSR cap is enabled, userspace can control
+> MSR accesses. In normal scenario, RDMSR/WRMSR can be interceped, but
+> when kvm.force_emulation_prefix is enabled, RDMSR/WRMSR with kvm prefix
+> would trigger an UD and cause instruction emulation. If MSR accesses is
+> filtered, em_rdmsr()/em_wrmsr() returns X86EMUL_IO_NEEDED, but it is
+> ignored by x86_emulate_instruction(). Then guest continues execution,
+> but RIP has been updated to point to RDMSR/WRMSR in handle_ud(), so
+> RDMSR/WRMSR can be interceped and guest exits to userspace finnaly by
+> mistake. Such behaviour leads to two vm exits and wastes one instruction
+> emulation.
 > 
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-> Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
-> ---
-> 
-> changes from v2:
->  - renamed num_io_queues to num_request_queues (from Stefan)
->  - added Reviewed-by signatures (from Stefan and Christoph)
-> 
-> changes from v1:
->  - use param_set_uint_minmax (from Christoph)
->  - added "Should > 0" to module description
-> 
-> Note: This commit apply on top of Jens's branch for-5.15/drivers
-> 
-> ---
->  drivers/block/virtio_blk.c | 21 ++++++++++++++++++++-
->  1 file changed, 20 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> index 4b49df2dfd23..aaa2833a4734 100644
-> --- a/drivers/block/virtio_blk.c
-> +++ b/drivers/block/virtio_blk.c
-> @@ -24,6 +24,23 @@
->  /* The maximum number of sg elements that fit into a virtqueue */
->  #define VIRTIO_BLK_MAX_SG_ELEMS 32768
->  
-> +static int virtblk_queue_count_set(const char *val,
-> +		const struct kernel_param *kp)
-> +{
-> +	return param_set_uint_minmax(val, kp, 1, nr_cpu_ids);
-> +}
-> +
-> +static const struct kernel_param_ops queue_count_ops = {
-> +	.set = virtblk_queue_count_set,
-> +	.get = param_get_uint,
-> +};
-> +
-> +static unsigned int num_request_queues;
-> +module_param_cb(num_request_queues, &queue_count_ops, &num_request_queues,
-> +		0644);
-> +MODULE_PARM_DESC(num_request_queues,
-> +		 "Number of request queues to use for blk device. Should > 0");
-> +
->  static int major;
->  static DEFINE_IDA(vd_index_ida);
->  
+> After let x86_emulate_instruction() returns 0 for RDMSR/WRMSR emulation,
+> if it needs to exit to userspace, its complete_userspace_io callback
+> would call kvm_skip_instruction() to skip instruction. But for vmx,
+> VMX_EXIT_INSTRUCTION_LEN in vmcs is invalid for UD, it can't be used to
+> update RIP, kvm_emulate_instruction() should be used instead. As for
+> svm, nRIP in vmcb is 0 for UD, so kvm_emulate_instruction() is used.
+> But for nested svm, I'm not sure, since svm_check_intercept() would
+> change nRIP.
 
-I wasn't happy with the message here so I tweaked it.
+Hi, can you provide a testcase for this bug using the 
+tools/testing/selftests/kvm framework?
 
-Please look at it in linux-next and confirm. Thanks!
+Thanks,
 
-
-> @@ -501,7 +518,9 @@ static int init_vq(struct virtio_blk *vblk)
->  	if (err)
->  		num_vqs = 1;
->  
-> -	num_vqs = min_t(unsigned int, nr_cpu_ids, num_vqs);
-> +	num_vqs = min_t(unsigned int,
-> +			min_not_zero(num_request_queues, nr_cpu_ids),
-> +			num_vqs);
->  
->  	vblk->vqs = kmalloc_array(num_vqs, sizeof(*vblk->vqs), GFP_KERNEL);
->  	if (!vblk->vqs)
-> -- 
-> 2.18.1
+Paolo
 
