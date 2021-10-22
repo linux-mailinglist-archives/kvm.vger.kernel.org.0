@@ -2,141 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B86BF4373A4
-	for <lists+kvm@lfdr.de>; Fri, 22 Oct 2021 10:27:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 301244373AE
+	for <lists+kvm@lfdr.de>; Fri, 22 Oct 2021 10:32:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232272AbhJVI35 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Oct 2021 04:29:57 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:34178 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231984AbhJVI34 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 22 Oct 2021 04:29:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634891259;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=v3oZmb5X5Wiq6TAUc+R676kz52C0MZzlKXhj1RnIhDQ=;
-        b=BQOMWmjdwyeBf5iBflFBrpqycP/zYk68t3p0gvVxN7IO+ZBtJUNnAx7CpKScld5SLpldte
-        bX03mXe0/1f9YBwD3Jmp8pY1we7EAZLmXhOwjiKa9bfk4JW7mv/DRf7HdHMG/6ibmhfgAl
-        /YTUfgbMkwSA3XEj6rXsQRn1jvKItNM=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-270-XqfT97N7NXWBK-3xORFxGw-1; Fri, 22 Oct 2021 04:27:37 -0400
-X-MC-Unique: XqfT97N7NXWBK-3xORFxGw-1
-Received: by mail-ed1-f71.google.com with SMTP id u17-20020a50d511000000b003daa3828c13so2963744edi.12
-        for <kvm@vger.kernel.org>; Fri, 22 Oct 2021 01:27:37 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=v3oZmb5X5Wiq6TAUc+R676kz52C0MZzlKXhj1RnIhDQ=;
-        b=NVi0kcXQ+xM1OCU7VCpHZLIcx2weN5O2HD00UE2UTJrENVRV/HM/BmMzTp61xkeGsZ
-         ovub7Z5/zkdta6gNFK54EIUrZtk6QgTC3ZQrsKyruYlTlLAwkZI+93ICUzUNta5trCCC
-         kEO4rK0SUXJmcZ84KYpQP4/O7ZM3WR1gus6zGju78aTGMkuPy6yvLrzol6f5MAwHxmi6
-         3mNYAf3REL3NzzzWogHJIS7qwOS5L5nNwjvlGz3Vgj1rkVtj8StRaGPjHLMeYmurZpYS
-         oImwHFGOGcIPnsbsLi6JDGXmfdhjPhUtHVrGLfjp18467I87gsqBu4z2LxWPVeQtGOuY
-         S4LQ==
-X-Gm-Message-State: AOAM533jKZ1/invy35mrZ/21g0nQEfGr5JDQVonfnd03F7cgWs8BUA3j
-        71lMu+YBLdUjNZMVBooBpLF15O24s6lDK2d/w9wyn3b79ULYkB+AxfGfANhO/Kr12H9VIz0mOF6
-        iSDhF/bChtAXd
-X-Received: by 2002:a17:907:868c:: with SMTP id qa12mr13578206ejc.346.1634891256595;
-        Fri, 22 Oct 2021 01:27:36 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzPwRDKvf75gYruYmYeFWBYl4p46bdPXTTIyIva9IFWQeizVMcT9wTYm0zHNbHaMEGqt6llzg==
-X-Received: by 2002:a17:907:868c:: with SMTP id qa12mr13578194ejc.346.1634891256399;
-        Fri, 22 Oct 2021 01:27:36 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.gmail.com with ESMTPSA id d22sm3536082ejj.47.2021.10.22.01.27.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 22 Oct 2021 01:27:35 -0700 (PDT)
-Message-ID: <de8dbc64-ae2d-aa9f-a973-171feb5874d6@redhat.com>
-Date:   Fri, 22 Oct 2021 10:27:34 +0200
+        id S232263AbhJVIex (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Oct 2021 04:34:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58326 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231991AbhJVIew (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Oct 2021 04:34:52 -0400
+X-Greylist: delayed 23504 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 22 Oct 2021 01:32:35 PDT
+Received: from thorn.bewilderbeest.net (thorn.bewilderbeest.net [IPv6:2605:2700:0:5::4713:9cab])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15CADC061764;
+        Fri, 22 Oct 2021 01:32:35 -0700 (PDT)
+Received: from hatter.bewilderbeest.net (71-212-29-146.tukw.qwest.net [71.212.29.146])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: zev)
+        by thorn.bewilderbeest.net (Postfix) with ESMTPSA id 232EF3F5;
+        Fri, 22 Oct 2021 01:32:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bewilderbeest.net;
+        s=thorn; t=1634891554;
+        bh=lqkbfmixKdAIZ7NwTV3pl1HORUZPPAa/zIkOK6+t7Qk=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=d+0rlGtHbliW+JQVt48EXvy4ih5dfAUHhgt01WK90mdgJdnnPcQ3kB2PeuNRh8uQO
+         F41f+zSfFacuPovblAYpvxD6OjWmzOYPirEiAEf1JRZ/8a+q8L8RXIuiBEkKtibrda
+         //21v1EIHl5bio+r9+6Q1C83qvYMwareZ0BwmBGk=
+Date:   Fri, 22 Oct 2021 01:32:32 -0700
+From:   Zev Weiss <zev@bewilderbeest.net>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     Frank Rowand <frowand.list@gmail.com>,
+        Rob Herring <robh+dt@kernel.org>, openbmc@lists.ozlabs.org,
+        Jeremy Kerr <jk@codeconstruct.com.au>,
+        Joel Stanley <joel@jms.id.au>,
+        Andrew Jeffery <andrew@aj.id.au>, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Vinod Koul <vkoul@kernel.org>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Saravana Kannan <saravanak@google.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Bhaskar Chowdhury <unixbhaskar@gmail.com>,
+        Jianxiong Gao <jxgao@google.com>,
+        Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
+        Rajat Jain <rajatja@google.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        dmaengine@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH 4/5] driver core: inhibit automatic driver binding on
+ reserved devices
+Message-ID: <YXJ3IPPkoLxqXiD3@hatter.bewilderbeest.net>
+References: <20211022020032.26980-1-zev@bewilderbeest.net>
+ <20211022020032.26980-5-zev@bewilderbeest.net>
+ <YXJeYCFJ5DnBB63R@kroah.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [PATCH] KVM: x86: advertise absence of X86_BUG_NULL_SEG via CPUID
-Content-Language: en-US
-To:     Jim Mattson <jmattson@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        thomas.lendacky@amd.com, dgilbert@redhat.com
-References: <20211021211958.1531754-1-pbonzini@redhat.com>
- <CALMp9eR3bt5P_+ZTJqcckL1pbZCyS6dCNK8o2OQR-atU_A_jtQ@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <CALMp9eR3bt5P_+ZTJqcckL1pbZCyS6dCNK8o2OQR-atU_A_jtQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <YXJeYCFJ5DnBB63R@kroah.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 21/10/21 23:36, Jim Mattson wrote:
-> On Thu, Oct 21, 2021 at 2:20 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+On Thu, Oct 21, 2021 at 11:46:56PM PDT, Greg Kroah-Hartman wrote:
+>On Thu, Oct 21, 2021 at 07:00:31PM -0700, Zev Weiss wrote:
+>> Devices whose fwnodes are marked as reserved are instantiated, but
+>> will not have a driver bound to them unless userspace explicitly
+>> requests it by writing to a 'bind' sysfs file.  This is to enable
+>> devices that may require special (userspace-mediated) preparation
+>> before a driver can safely probe them.
 >>
->> Guests have X86_BUG_NULL_SEG if and only if the host have it.  Use
->> the info from static_cpu_has_bug to form the 0x80000021 CPUID leaf that
->> was defined for Zen3.  Userspace can then set the bit even on older
->> CPUs that do not have the bug, such as Zen2.
->>
->> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>> Signed-off-by: Zev Weiss <zev@bewilderbeest.net>
 >> ---
->>   arch/x86/kvm/cpuid.c | 17 ++++++++++++++++-
->>   1 file changed, 16 insertions(+), 1 deletion(-)
->>
->> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
->> index 2d70edb0f323..b51398e1727b 100644
->> --- a/arch/x86/kvm/cpuid.c
->> +++ b/arch/x86/kvm/cpuid.c
->> @@ -902,7 +902,13 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
->>                  entry->edx = 0;
->>                  break;
->>          case 0x80000000:
->> -               entry->eax = min(entry->eax, 0x8000001f);
->> +               entry->eax = min(entry->eax, 0x80000021);
->> +               /*
->> +                * X86_BUG_NULL_SEG is not reported in CPUID on Zen2; in
->> +                * that case, provide the CPUID leaf ourselves.
->> +                */
-> 
-> I think this is backwards. !X86_BUG_NULL_SEG isn't reported in CPUID on Zen2.
+>>  drivers/base/bus.c            |  2 +-
+>>  drivers/base/dd.c             | 13 ++++++++-----
+>>  drivers/dma/idxd/compat.c     |  3 +--
+>>  drivers/vfio/mdev/mdev_core.c |  2 +-
+>>  include/linux/device.h        | 14 +++++++++++++-
+>>  5 files changed, 24 insertions(+), 10 deletions(-)
+>
+>Ugh, no, I don't really want to add yet-another-state to the driver core
+>like this.  Why are these devices even in the kernel with a driver that
+>wants to bind to them registered if the driver somehow should NOT be
+>bound to it?  Shouldn't all of that logic be in the crazy driver itself
+>as that is a very rare and odd thing to do that the driver core should
+>not care about at all.
+>
+>And why does a device need userspace interaction at all?  Again, why
+>would the driver not know about this and handle it all directly?
+>
 
-Right I should use the name of the bit instead.
+Let me expand a bit more on the details of the specific situation I'm 
+dealing with...
 
->> +               if (!static_cpu_has_bug(X86_BUG_NULL_SEG))
->> +                       entry->eax = max(entry->eax, 0x80000021);
->>                  break;
->>          case 0x80000001:
->>                  cpuid_entry_override(entry, CPUID_8000_0001_EDX);
->> @@ -973,6 +979,15 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
->>                          entry->ebx &= ~GENMASK(11, 6);
->>                  }
->>                  break;
->> +       case 0x80000020:
->> +               entry->eax = entry->ebx = entry->ecx = entry->edx = 0;
->> +               break;
->> +       case 0x80000021:
->> +               entry->ebx = entry->ecx = entry->edx = 0;
->> +               entry->eax &= BIT(6);
-> 
-> While we're here, shouldn't bit 0 (Processor ignores nested data
-> breakpoints) and bit 2 (LFENCE is always dispatch serializing) also
-> match the hardware?
+On a server motherboard we've got a host CPU (Xeon, Epyc, POWER, etc.) 
+and a baseboard management controller, or BMC (typically an ARM SoC, an 
+ASPEED AST2500 in my case).  The host CPU's firmware (BIOS/UEFI, ME 
+firmware, etc.) lives in a SPI flash chip.  Because it's the host's 
+firmware, that flash chip is connected to and generally (by default) 
+under the control of the host CPU.  
 
-Yes, that makes sense.  Just wanted to gauge whether anybody thought it 
-a really bad idea.
+But we also want the BMC to be able to perform out-of-band updates to 
+the host's firmware, so the flash is *also* connected to the BMC.  
+There's an external mux (controlled by a GPIO output driven by the BMC) 
+that switches which processor (host or BMC) is actually driving the SPI 
+signals to the flash chip, but there's a bunch of other stuff that's 
+also required before the BMC can flip that switch and take control of 
+the SPI interface:
 
-Paolo
+  - the BMC needs to track (and potentially alter) the host's power state 
+    to ensure it's not running (in OpenBMC the existing logic for this is 
+    an entire non-trivial userspace daemon unto itself)
 
-> 
->> +               if (!static_cpu_has_bug(X86_BUG_NULL_SEG))
->> +                       entry->eax |= BIT(6);
->> +               break;
->>          /*Add support for Centaur's CPUID instruction*/
->>          case 0xC0000000:
->>                  /*Just support up to 0xC0000004 now*/
->> --
->> 2.27.0
->>
-> 
+  - it needs to twiddle some other GPIOs to put the ME into recovery mode
+
+  - it needs to exchange some IPMI messages with the ME to confirm it got 
+    into recovery mode
+
+(Some of the details here are specific to the particular motherboard I'm 
+working with, but I'd guess other systems probably have broadly similar 
+requirements.)
+
+The firmware flash (or at least the BMC's side of the mux in front of 
+it) is attached to a spi-nor controller that's well supported by an 
+existing MTD driver (aspeed-smc), but that driver can't safely probe the 
+chip until all the stuff described above has been done.  In particular, 
+this means we can't reasonably bind the driver to that device during the 
+normal device-discovery/driver-binding done in the BMC's boot process 
+(nor do we want to, as that would pull the rug out from under the 
+running host).  We basically only ever want to touch that SPI interface 
+when a user (sysadmin using the BMC, let's say) has explicitly initiated 
+an out-of-band firmware update.
+
+So we want the kernel to be aware of the device's existence (so that we 
+*can* bind a driver to it when needed), but we don't want it touching 
+the device unless we really ask for it.
+
+Does that help clarify the motivation for wanting this functionality?
+
+
+Thanks,
+Zev
 
