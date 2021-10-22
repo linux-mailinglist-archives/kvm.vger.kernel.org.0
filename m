@@ -2,142 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3B958437311
-	for <lists+kvm@lfdr.de>; Fri, 22 Oct 2021 09:49:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B86BF4373A4
+	for <lists+kvm@lfdr.de>; Fri, 22 Oct 2021 10:27:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232057AbhJVHvq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Oct 2021 03:51:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48614 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231941AbhJVHvp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Oct 2021 03:51:45 -0400
-Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C15EC061766
-        for <kvm@vger.kernel.org>; Fri, 22 Oct 2021 00:49:28 -0700 (PDT)
-Received: by mail-wr1-x42c.google.com with SMTP id v17so1606278wrv.9
-        for <kvm@vger.kernel.org>; Fri, 22 Oct 2021 00:49:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=l4ig/cSrg8mQN6aKAdfHWEATu5gWqjzgX7zon10Q9+E=;
-        b=XNhjtbDMlD0fLOkQBRfHMcymLt/KXEWZO0gzlFJJkY7tBULpUdJRS/3zpdmfMBLV4H
-         mDyJzKhY7XbOJxQruVq5kcUcL2jZDv1gnvQ9jlhLZbg5KSBTSxZeZvrngodKSZNSEl8T
-         Pf8RChum9PCyRSCLuC4ch1v42ocyebTEN4wJh8w08Ks8CqkjNEC8HhO8Cuuz4OWdpkPv
-         Ndv3qIL1U/ZUkmavejbqkHMkEQvYMfDd9YjvNpLjTz2JkhjTIni3XGjzgxXkPKZKg+Qy
-         kQmnSmqvnDz0Wh6heFLPsNne7vzaPPNcev9WX9RnAprj7p04Nm7y9wLDcgRl/bor6Ngj
-         L0nQ==
+        id S232272AbhJVI35 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Oct 2021 04:29:57 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:34178 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231984AbhJVI34 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 22 Oct 2021 04:29:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1634891259;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=v3oZmb5X5Wiq6TAUc+R676kz52C0MZzlKXhj1RnIhDQ=;
+        b=BQOMWmjdwyeBf5iBflFBrpqycP/zYk68t3p0gvVxN7IO+ZBtJUNnAx7CpKScld5SLpldte
+        bX03mXe0/1f9YBwD3Jmp8pY1we7EAZLmXhOwjiKa9bfk4JW7mv/DRf7HdHMG/6ibmhfgAl
+        /YTUfgbMkwSA3XEj6rXsQRn1jvKItNM=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-270-XqfT97N7NXWBK-3xORFxGw-1; Fri, 22 Oct 2021 04:27:37 -0400
+X-MC-Unique: XqfT97N7NXWBK-3xORFxGw-1
+Received: by mail-ed1-f71.google.com with SMTP id u17-20020a50d511000000b003daa3828c13so2963744edi.12
+        for <kvm@vger.kernel.org>; Fri, 22 Oct 2021 01:27:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=l4ig/cSrg8mQN6aKAdfHWEATu5gWqjzgX7zon10Q9+E=;
-        b=B1hSt23CwUQng+V9gT/7KdHC3xrafrYBnj0RQT6cvWGiDJ05/As/HZqSmeg2o2gJlD
-         Z8SWjrq74i5CNgGDNfo0cCD04VU63/Mqt86grcxi+xclsI0EsJTISIZus977Zph44upY
-         LCp024xQhbkImONkw1yUlXa0VfCOcHy5xuEwlV+5x4v6Yj99+oAdGJrGljeotm1Z1AcO
-         3p8gH7HeUSwdrFKOJBLJ/aGr8CIxwojagd8G/yis1Wa+BGz4Ctp6Betg5Qnml00aHG1F
-         /Zv+YC8mt/ND4xa7tQhltKB8mtWN5R1TDWeOsX4bayolJLlNl22hmJLvEYmGDswOJ4Pq
-         pnXg==
-X-Gm-Message-State: AOAM5308hvC4NtBT9hu6Xrpc66sroqlhKh0/WamzmSnHw5oBXiIDTAqB
-        K0iYPDWabaYFOiXYtQxzS6xStA==
-X-Google-Smtp-Source: ABdhPJxpO/NacPoc1tCOWgCvmhl6vzuBziA4+8Ev+IfkXnOna1GvDwP4ExJS99BeJ3odnzDfvvbRCQ==
-X-Received: by 2002:a5d:6d81:: with SMTP id l1mr13601357wrs.110.1634888966529;
-        Fri, 22 Oct 2021 00:49:26 -0700 (PDT)
-Received: from myrica (cpc92880-cmbg19-2-0-cust679.5-4.cable.virginm.net. [82.27.106.168])
-        by smtp.gmail.com with ESMTPSA id l2sm8802620wrs.90.2021.10.22.00.49.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Oct 2021 00:49:25 -0700 (PDT)
-Date:   Fri, 22 Oct 2021 08:49:03 +0100
-From:   Jean-Philippe Brucker <jean-philippe@linaro.org>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>, "hch@lst.de" <hch@lst.de>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "parav@mellanox.com" <parav@mellanox.com>,
-        "lkml@metux.net" <lkml@metux.net>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "lushenming@huawei.com" <lushenming@huawei.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "corbet@lwn.net" <corbet@lwn.net>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "yi.l.liu@linux.intel.com" <yi.l.liu@linux.intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "dwmw2@infradead.org" <dwmw2@infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-        "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>
-Subject: Re: [RFC 10/20] iommu/iommufd: Add IOMMU_DEVICE_GET_INFO
-Message-ID: <YXJs7+nQJ++EKIyT@myrica>
-References: <BN9PR11MB54333BDB1E58387FD9999DF18CA39@BN9PR11MB5433.namprd11.prod.outlook.com>
- <20210923114219.GG964074@nvidia.com>
- <BN9PR11MB5433519229319BA951CA97638CAA9@BN9PR11MB5433.namprd11.prod.outlook.com>
- <20210930222355.GH964074@nvidia.com>
- <BN9PR11MB5433530032DC8400B71FCB788CB89@BN9PR11MB5433.namprd11.prod.outlook.com>
- <20211014154259.GT2744544@nvidia.com>
- <BN9PR11MB543327BB6D58AEF91AD2C9D18CB99@BN9PR11MB5433.namprd11.prod.outlook.com>
- <BL1PR11MB5429973588E4FBCEC8F519A88CBF9@BL1PR11MB5429.namprd11.prod.outlook.com>
- <YXF/+jxRtjnlXU7w@myrica>
- <20211021232223.GM2744544@nvidia.com>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=v3oZmb5X5Wiq6TAUc+R676kz52C0MZzlKXhj1RnIhDQ=;
+        b=NVi0kcXQ+xM1OCU7VCpHZLIcx2weN5O2HD00UE2UTJrENVRV/HM/BmMzTp61xkeGsZ
+         ovub7Z5/zkdta6gNFK54EIUrZtk6QgTC3ZQrsKyruYlTlLAwkZI+93ICUzUNta5trCCC
+         kEO4rK0SUXJmcZ84KYpQP4/O7ZM3WR1gus6zGju78aTGMkuPy6yvLrzol6f5MAwHxmi6
+         3mNYAf3REL3NzzzWogHJIS7qwOS5L5nNwjvlGz3Vgj1rkVtj8StRaGPjHLMeYmurZpYS
+         oImwHFGOGcIPnsbsLi6JDGXmfdhjPhUtHVrGLfjp18467I87gsqBu4z2LxWPVeQtGOuY
+         S4LQ==
+X-Gm-Message-State: AOAM533jKZ1/invy35mrZ/21g0nQEfGr5JDQVonfnd03F7cgWs8BUA3j
+        71lMu+YBLdUjNZMVBooBpLF15O24s6lDK2d/w9wyn3b79ULYkB+AxfGfANhO/Kr12H9VIz0mOF6
+        iSDhF/bChtAXd
+X-Received: by 2002:a17:907:868c:: with SMTP id qa12mr13578206ejc.346.1634891256595;
+        Fri, 22 Oct 2021 01:27:36 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzPwRDKvf75gYruYmYeFWBYl4p46bdPXTTIyIva9IFWQeizVMcT9wTYm0zHNbHaMEGqt6llzg==
+X-Received: by 2002:a17:907:868c:: with SMTP id qa12mr13578194ejc.346.1634891256399;
+        Fri, 22 Oct 2021 01:27:36 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
+        by smtp.gmail.com with ESMTPSA id d22sm3536082ejj.47.2021.10.22.01.27.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 22 Oct 2021 01:27:35 -0700 (PDT)
+Message-ID: <de8dbc64-ae2d-aa9f-a973-171feb5874d6@redhat.com>
+Date:   Fri, 22 Oct 2021 10:27:34 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211021232223.GM2744544@nvidia.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [PATCH] KVM: x86: advertise absence of X86_BUG_NULL_SEG via CPUID
+Content-Language: en-US
+To:     Jim Mattson <jmattson@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        thomas.lendacky@amd.com, dgilbert@redhat.com
+References: <20211021211958.1531754-1-pbonzini@redhat.com>
+ <CALMp9eR3bt5P_+ZTJqcckL1pbZCyS6dCNK8o2OQR-atU_A_jtQ@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <CALMp9eR3bt5P_+ZTJqcckL1pbZCyS6dCNK8o2OQR-atU_A_jtQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 21, 2021 at 08:22:23PM -0300, Jason Gunthorpe wrote:
-> On Thu, Oct 21, 2021 at 03:58:02PM +0100, Jean-Philippe Brucker wrote:
-> > On Thu, Oct 21, 2021 at 02:26:00AM +0000, Tian, Kevin wrote:
-> > > > I'll leave it to Jean to confirm. If only coherent DMA can be used in
-> > > > the guest on other platforms, suppose VFIO should not blindly set
-> > > > IOMMU_CACHE and in concept it should deny assigning a non-coherent
-> > > > device since no co-ordination with guest exists today.
-> > > 
-> > > Jean, what's your opinion?
-> > 
-> > Yes a sanity check to prevent assigning non-coherent devices would be
-> > good, though I'm not particularly worried about non-coherent devices. PCIe
-> > on Arm should be coherent (according to the Base System Architecture). So
-> > vfio-pci devices should be coherent, but vfio-platform and mdev are
-> > case-by-case (hopefully all coherent since it concerns newer platforms).
-> > 
-> > More worrying, I thought we disabled No-Snoop for VFIO but I was wrong,
-> > it's left enabled. On Arm I don't think userspace can perform the right
-> > cache maintenance operations to maintain coherency with a device that
-> > issues No-Snoop writes. Userspace can issue clean+invalidate but not
-> > invalidate alone, so there is no equivalent to
-> > arch_sync_dma_for_cpu().
+On 21/10/21 23:36, Jim Mattson wrote:
+> On Thu, Oct 21, 2021 at 2:20 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>
+>> Guests have X86_BUG_NULL_SEG if and only if the host have it.  Use
+>> the info from static_cpu_has_bug to form the 0x80000021 CPUID leaf that
+>> was defined for Zen3.  Userspace can then set the bit even on older
+>> CPUs that do not have the bug, such as Zen2.
+>>
+>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>> ---
+>>   arch/x86/kvm/cpuid.c | 17 ++++++++++++++++-
+>>   1 file changed, 16 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+>> index 2d70edb0f323..b51398e1727b 100644
+>> --- a/arch/x86/kvm/cpuid.c
+>> +++ b/arch/x86/kvm/cpuid.c
+>> @@ -902,7 +902,13 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+>>                  entry->edx = 0;
+>>                  break;
+>>          case 0x80000000:
+>> -               entry->eax = min(entry->eax, 0x8000001f);
+>> +               entry->eax = min(entry->eax, 0x80000021);
+>> +               /*
+>> +                * X86_BUG_NULL_SEG is not reported in CPUID on Zen2; in
+>> +                * that case, provide the CPUID leaf ourselves.
+>> +                */
 > 
-> So what happens in a VM? Does a VM know that arch_sync_dma_for_cpu()
-> is not available?
+> I think this is backwards. !X86_BUG_NULL_SEG isn't reported in CPUID on Zen2.
 
-This would only affect userspace drivers, it's only host or guest
-userspace that cannot issue the maintenance operations. The VM can do
-arch_sync_dma_for_cpu()
+Right I should use the name of the bit instead.
 
-Thanks,
-Jean
+>> +               if (!static_cpu_has_bug(X86_BUG_NULL_SEG))
+>> +                       entry->eax = max(entry->eax, 0x80000021);
+>>                  break;
+>>          case 0x80000001:
+>>                  cpuid_entry_override(entry, CPUID_8000_0001_EDX);
+>> @@ -973,6 +979,15 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+>>                          entry->ebx &= ~GENMASK(11, 6);
+>>                  }
+>>                  break;
+>> +       case 0x80000020:
+>> +               entry->eax = entry->ebx = entry->ecx = entry->edx = 0;
+>> +               break;
+>> +       case 0x80000021:
+>> +               entry->ebx = entry->ecx = entry->edx = 0;
+>> +               entry->eax &= BIT(6);
+> 
+> While we're here, shouldn't bit 0 (Processor ignores nested data
+> breakpoints) and bit 2 (LFENCE is always dispatch serializing) also
+> match the hardware?
+
+Yes, that makes sense.  Just wanted to gauge whether anybody thought it 
+a really bad idea.
+
+Paolo
 
 > 
-> And how does this work with the nested IOMMU translation? I thought I
-> read in the SMMU spec that the io page table entries could control
-> cachability including in nesting cases?
+>> +               if (!static_cpu_has_bug(X86_BUG_NULL_SEG))
+>> +                       entry->eax |= BIT(6);
+>> +               break;
+>>          /*Add support for Centaur's CPUID instruction*/
+>>          case 0xC0000000:
+>>                  /*Just support up to 0xC0000004 now*/
+>> --
+>> 2.27.0
+>>
 > 
-> > I think the worse that can happen is the device owner shooting itself in
-> > the foot by using No-Snoop, but would it hurt to disable it?
-> 
-> No, the worst is the same as Intel - a driver running in the guest VM
-> assumes it can use arch_sync_dma_for_cpu() and acts accordingly,
-> resulting in a broken VM.
-> 
-> Jason
+
