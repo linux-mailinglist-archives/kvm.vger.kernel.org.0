@@ -2,85 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7665B437054
-	for <lists+kvm@lfdr.de>; Fri, 22 Oct 2021 05:01:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3A8E9437058
+	for <lists+kvm@lfdr.de>; Fri, 22 Oct 2021 05:04:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232785AbhJVDCU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Oct 2021 23:02:20 -0400
-Received: from out30-131.freemail.mail.aliyun.com ([115.124.30.131]:56893 "EHLO
-        out30-131.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232769AbhJVDCS (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 21 Oct 2021 23:02:18 -0400
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R141e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04400;MF=houwenlong93@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0UtCQfPR_1634871599;
-Received: from localhost(mailfrom:houwenlong93@linux.alibaba.com fp:SMTPD_---0UtCQfPR_1634871599)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Fri, 22 Oct 2021 10:59:59 +0800
-From:   Hou Wenlong <houwenlong93@linux.alibaba.com>
-To:     kvm@vger.kernel.org
+        id S232754AbhJVDFv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Oct 2021 23:05:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41932 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232695AbhJVDFu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Oct 2021 23:05:50 -0400
+Received: from mail-il1-x136.google.com (mail-il1-x136.google.com [IPv6:2607:f8b0:4864:20::136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A56B4C061764;
+        Thu, 21 Oct 2021 20:03:33 -0700 (PDT)
+Received: by mail-il1-x136.google.com with SMTP id y17so2796238ilb.9;
+        Thu, 21 Oct 2021 20:03:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=XK3a1LwqzUeACg4aXNx630V9gtFWyhO4gs8m0Vnr7Ls=;
+        b=fu6JyUIqLhrpitkAaY4qmPTW7IR37wQcNqhQZfBjIwh9vhX+7NJrPYD24B8ekLX+OT
+         F4BsT/30vU5QoNUENoTGq1CWSJKUJbZ2gGaHu/CQbzfKuigC7LzRL6aOeyV5ox5pWfMV
+         igDHdYTLqv2zGREhGnuEmCmQe90MXxTcgdyZMglzyM+O1ybUhtguxFpwW1wMLEG47fYC
+         wA164Xiq8F3jHm5upLyh672SJ19n+vxnixZyA5LBFxfsZ8tkY9nJCw0Ecb6uk1EU4V52
+         38c4E0gYBjBFYJHAJr6AF29DJZpbL8eGLOLivdKB+g03AVyG8zATwGGFvKFRPVlkFfii
+         k38A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=XK3a1LwqzUeACg4aXNx630V9gtFWyhO4gs8m0Vnr7Ls=;
+        b=LKXzYk34R7VAQWpQN1sO9/9FeMsslffR3IDVuVMHrG9LJEM+PwFDACSMS6pAxApukt
+         0I17ZbQM0TxbOCCq9URbDXbhC4MNOQoIIam27lDCh3AQuhnGPviM9R7YfMfZ6UDucHRA
+         +Tr8Bx9fn0Fy6U3eMmz84db+8jxaXDSBUb0M8bSQBT3xGFjy6UiNapyzq2PfIKkwfLBW
+         sfjrRjTS2zPf81V0zu9DzhWlM3L+tV/wfBmG72wq5674vTR78HIY+AvmiHrc3bCIEakk
+         IZCHG4FDTa+rhnCejn2ykoSSTfZdwksPsr6iWIFXlYUSufqbV3Qa/G8zT/JluVYTIhi5
+         zbuw==
+X-Gm-Message-State: AOAM531fxvBRTVTixLsDUhcqLhccDbhyl9Zf/4IrWZUBSaHZZa05eKqD
+        Zb2iUzsqgFzCEftHP9kh0jf//0uwcMyXRry8kOk=
+X-Google-Smtp-Source: ABdhPJz02azZOOkaFJCIcObCEOdOGg69b65VhU1I8rcmQuAkwMDKAF/8hy4Ve4MZXSCBT+vaD6JeyErBlMaljaV2pdY=
+X-Received: by 2002:a05:6e02:893:: with SMTP id z19mr6053922ils.224.1634871806321;
+ Thu, 21 Oct 2021 20:03:26 -0700 (PDT)
+MIME-Version: 1.0
+References: <20211022010005.1454978-1-seanjc@google.com> <20211022010005.1454978-2-seanjc@google.com>
+ <CAJhGHyCA-nfoJPmQxVWRtu+iJk3aj9ZdNH630RjrQJ_vYnZ3Gg@mail.gmail.com>
+In-Reply-To: <CAJhGHyCA-nfoJPmQxVWRtu+iJk3aj9ZdNH630RjrQJ_vYnZ3Gg@mail.gmail.com>
+From:   Lai Jiangshan <jiangshanlai+lkml@gmail.com>
+Date:   Fri, 22 Oct 2021 11:03:15 +0800
+Message-ID: <CAJhGHyDHwz-ADZdUUcFd+PswTKKQRi=UDkZGQVu1erRbDFMSKQ@mail.gmail.com>
+Subject: Re: [PATCH 1/3] KVM: x86/mmu: Drop a redundant, broken remote TLB flush
+To:     Sean Christopherson <seanjc@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        Alexander Graf <graf@amazon.com>, linux-kernel@vger.kernel.org
-Subject: [PATCH 2/2] KVM: X86: Exit to userspace if RDMSR/WRMSR emulation returns X86EMUL_IO_NEEDED
-Date:   Fri, 22 Oct 2021 10:59:57 +0800
-Message-Id: <e8ff17592ae36b015bbe7d052b642e21acbccc24.1634870747.git.houwenlong93@linux.alibaba.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <cover.1634870747.git.houwenlong93@linux.alibaba.com>
-References: <cover.1634870747.git.houwenlong93@linux.alibaba.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        LKML <linux-kernel@vger.kernel.org>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>,
+        Ben Gardon <bgardon@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In em_rdmsr()/em_wrmsr(), it returns X86EMUL_IO_NEEDED if MSR accesses
-needed to exit to userspace. However, x86_emulate_insn() doesn't return
-X86EMUL_*, so x86_emulate_instruction() doesn't directly act on
-X86EMUL_IO_NEEDED, it instead looks for other signals to differentiate
-between PIO, MMIO, etc... So RDMSR/WRMSR emulation won't exit to
-userspace now.
+On Fri, Oct 22, 2021 at 10:58 AM Lai Jiangshan
+<jiangshanlai+lkml@gmail.com> wrote:
+>
+> On Fri, Oct 22, 2021 at 9:01 AM Sean Christopherson <seanjc@google.com> wrote:
+> >
+> > A recent commit to fix the calls to kvm_flush_remote_tlbs_with_address()
+> > in kvm_zap_gfn_range() inadvertantly added yet another flush instead of
+> > fixing the existing flush.  Drop the redundant flush, and fix the params
+> > for the existing flush.
+> >
+> > Fixes: 2822da446640 ("KVM: x86/mmu: fix parameters to kvm_flush_remote_tlbs_with_address")
+> > Cc: Maxim Levitsky <mlevitsk@redhat.com>
+> > Cc: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > ---
+> >  arch/x86/kvm/mmu/mmu.c | 6 ++----
+> >  1 file changed, 2 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index c6ddb042b281..f82b192bba0b 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -5709,13 +5709,11 @@ void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
+> >                 for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++)
+> >                         flush = kvm_tdp_mmu_zap_gfn_range(kvm, i, gfn_start,
+> >                                                           gfn_end, flush);
+> > -               if (flush)
+> > -                       kvm_flush_remote_tlbs_with_address(kvm, gfn_start,
+> > -                                                          gfn_end - gfn_start);
+>
+> In the recent queue branch of kvm tree, there is the same "if (flush)" in
+> the previous "if (kvm_memslots_have_rmaps(kvm))" branch.  The "if (flush)"
+> branch needs to be removed too.
 
-The userspace_msr_exit_test testcase in seftests had tested RDMSR/WRMSR
-emulation with kvm.force_enable_prefix enabled and it was passed.
-Because x86_emulate_instruction() returns 1 and guest continues,
-but RIP has been updated to point to RDMSR/WRMSR. Then guest would
-execute RDMSR/WRMSR and exit to userspace by
-kvm_emulate_rdmsr()/kvm_emulate_wrmsr() finally. In such situation,
-instruction emulation didn't take effect but userspace exit information
-had been filled, which was inappropriate.
+Oh, it is in the patch 2. For patch 1 and 2:
 
-Since X86EMUL_IO_NEEDED path would provide a complete_userspace_io
-callback, x86_emulate_instruction() should return 0 if callback is
-not NULL. Then RDMSR/WRMSR instruction emulation can exit to userspace
-and skip RDMSR/WRMSR execution and inteception.
+Reviewed-by: Lai Jiangshan <jiangshanlai@gmail.com>
 
-Fixes: 1ae099540e8c7 ("KVM: x86: Allow deflecting unknown MSR accesses to user space")
-Signed-off-by: Hou Wenlong <houwenlong93@linux.alibaba.com>
----
- arch/x86/kvm/x86.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 3ea4f6ef2474..4e0dc5b06d03 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -7950,7 +7950,9 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
- 			writeback = false;
- 		r = 0;
- 		vcpu->arch.complete_userspace_io = complete_emulated_mmio;
--	} else if (r == EMULATION_RESTART)
-+	} else if (vcpu->arch.complete_userspace_io)
-+		r = 0;
-+	else if (r == EMULATION_RESTART)
- 		goto restart;
- 	else
- 		r = 1;
--- 
-2.31.1
-
+>
+> Reviewed-by: Lai Jiangshan <jiangshanlai@gmail.com>
+>
+> >         }
+> >
+> >         if (flush)
+> > -               kvm_flush_remote_tlbs_with_address(kvm, gfn_start, gfn_end);
+> > +               kvm_flush_remote_tlbs_with_address(kvm, gfn_start,
+> > +                                                  gfn_end - gfn_start);
+> >
+> >         kvm_dec_notifier_count(kvm, gfn_start, gfn_end);
+> >
+> > --
+> > 2.33.0.1079.g6e70778dc9-goog
+> >
