@@ -2,105 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 13F354379DB
-	for <lists+kvm@lfdr.de>; Fri, 22 Oct 2021 17:25:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A3543437A06
+	for <lists+kvm@lfdr.de>; Fri, 22 Oct 2021 17:36:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233487AbhJVP1b (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Oct 2021 11:27:31 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44037 "EHLO
+        id S233419AbhJVPip (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Oct 2021 11:38:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60910 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233412AbhJVP1R (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 22 Oct 2021 11:27:17 -0400
+        by vger.kernel.org with ESMTP id S233363AbhJVPio (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 22 Oct 2021 11:38:44 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634916299;
+        s=mimecast20190719; t=1634916986;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=WKn/MMnrjzSTMvrkCX2L7r2/M5K0U88gx7mskxYYYD8=;
-        b=PPxKsEu/pBMspA3dFpP/TF0u33zvmJHP7KyzDsBNjK+0O+7YsK52gwS1UJxTuyL/EX1S0t
-        ejj+9885F42Baxm9d0grs1cPd6nRM6F44HxFNfIW44KXwdoDk9Qcjo9p2AzYnRMzFyIbQY
-        AeFNY5Nt5grpxSYeOSKBWfDjfJkeDt4=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-555-Tg54rfouNtSUaN-wrWSZwA-1; Fri, 22 Oct 2021 11:24:55 -0400
-X-MC-Unique: Tg54rfouNtSUaN-wrWSZwA-1
-Received: by mail-ed1-f69.google.com with SMTP id f4-20020a50e084000000b003db585bc274so4010412edl.17
-        for <kvm@vger.kernel.org>; Fri, 22 Oct 2021 08:24:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=WKn/MMnrjzSTMvrkCX2L7r2/M5K0U88gx7mskxYYYD8=;
-        b=VIUOlsaM5WNRL3vKdcI0TrPB8VHowod+BxqpdCUFXrOfUtKJHz0jazWxcXpsi7iL+h
-         Mp4F1/K5crdjqpJxK/RgbwZOEut0acRVdZIeWNdw0QPP8dzsi6euLi1rU9QktHfOivkm
-         LrHeIU1+ryOts8o31j+gE3DtDB4CTxO4d/91rK1A0KYlsgZe36HLH6th3YZmOKNg1UuC
-         PBWeJr4dsoD2OkJwiiBJb2AcO/zV6aDWk3XkIiCU7JFk8vGYllT/b6qNE6nbFscmSTxw
-         Vm+/ULAxvz4PXzlWnOj1iqtB+3eozO4ddagjVAQeny66k/HLEEVOpXNDc5RGuvfUjqFy
-         PLJQ==
-X-Gm-Message-State: AOAM532rDw/Im0pbPpHU4aS+0DZZjJMwx+2PCzzT7SSWR8Yz9B+QSpe7
-        60OKWy3FrpUnh+QweekA3sLE3Gj/PN1zppNmK9tp/PHtvpfgWPg07wq2JdCniA6CSjF9RUXs1FT
-        mkbOzXPWEQDab
-X-Received: by 2002:a17:906:ca18:: with SMTP id jt24mr227111ejb.325.1634916294057;
-        Fri, 22 Oct 2021 08:24:54 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw1gMsV0VbjksXEJRF9KOJy6vrhOLALRqiJ74io2ME1xy22uV1bJNsaAASMo+PgzQ54ZbscQg==
-X-Received: by 2002:a17:906:ca18:: with SMTP id jt24mr227080ejb.325.1634916293883;
-        Fri, 22 Oct 2021 08:24:53 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id l23sm3922047ejn.15.2021.10.22.08.24.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 22 Oct 2021 08:24:53 -0700 (PDT)
-Message-ID: <44630562-a855-f3e2-a427-9f3da3abdd70@redhat.com>
-Date:   Fri, 22 Oct 2021 17:24:52 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [PATCH v6 1/4] KVM: x86: Clarify the kvm_run.emulation_failure
- structure layout
-Content-Language: en-US
-To:     David Edmondson <david.edmondson@oracle.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     linux-kernel@vger.kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>, x86@kernel.org,
-        Joerg Roedel <joro@8bytes.org>, Ingo Molnar <mingo@redhat.com>,
-        kvm@vger.kernel.org, Jim Mattson <jmattson@google.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        David Matlack <dmatlack@google.com>
-References: <20210920103737.2696756-1-david.edmondson@oracle.com>
- <20210920103737.2696756-2-david.edmondson@oracle.com>
- <YWYeJ9TtfRwBk/5D@google.com> <cunfst5ff37.fsf@oracle.com>
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=N4QDGFQMHWohd/KdxIYekf+yDmyllljs4b87acPJcHQ=;
+        b=f1uoCXwxt/TT/CDTJJYsBK2xhhHOtq/lDRbiCEtoJU/mGqk5lSXuwyLexBWkOEAvPKIQdh
+        2/s60w6NrrnWRbLW2zj+XPDO3NqnotNd2IOcWbiNjCvQtF3tD2tx09znFutUoMZWRfSWP7
+        NjW420vg+xA/wBYfMRhcnzaG0psaKQQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-447-Z776zpvDO8OXDzNri2iRsg-1; Fri, 22 Oct 2021 11:36:23 -0400
+X-MC-Unique: Z776zpvDO8OXDzNri2iRsg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 083908042E1;
+        Fri, 22 Oct 2021 15:36:22 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 8928E60C04;
+        Fri, 22 Oct 2021 15:36:21 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <cunfst5ff37.fsf@oracle.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     mlevitsk@redhat.com, seanjc@google.com
+Subject: [PATCH v2 00/13] fixes and cleanups for string I/O emulation
+Date:   Fri, 22 Oct 2021 11:36:03 -0400
+Message-Id: <20211022153616.1722429-1-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 13/10/21 11:29, David Edmondson wrote:
-> On Tuesday, 2021-10-12 at 23:45:43 GMT, Sean Christopherson wrote:
-> 
->> On Mon, Sep 20, 2021, David Edmondson wrote:
->>> Until more flags for kvm_run.emulation_failure flags are defined, it
->>> is undetermined whether new payload elements corresponding to those
->>> flags will be additive or alternative. As a hint to userspace that an
->>> alternative is possible, wrap the current payload elements in a union.
->>>
->>> Suggested-by: Sean Christopherson <seanjc@google.com>
->>> Signed-off-by: David Edmondson <david.edmondson@oracle.com>
->>> ---
->>
->> To complete the set... :-)
->>
->> Reviewed-by: Sean Christopherson <seanjc@google.com>
-> 
-> Thanks!
-> 
+This series is split in two parts:
 
-Queued, thanks!
+- patch 7 fixes a bug in string I/O emulation for SEV-ES, where
+  the size of the GHCB buffer can exceed the size of vcpu->arch.pio_data.
+  If that happens, we need to go over the GHCB buffer in multiple passes.
+  There are some preliminary cleanups in patches 1/3/6 too.
+
+- the other patches clean emulator_pio_in and emulator_pio_in_out.  The
+  first changes (patches 2/3/5) are more localized; they make the final
+  SEV code a little easier to follow, and they remove unnecessary
+  function arguments so that it is clearer which functions consume
+  vcpu->arch.pio and which don't.  Patches starting from 8 on, instead,
+  remove all usage of vcpu->arch.pio unless a userspace KVM_EXIT_IO is
+  required.  In the end, IN is split clearly into a function that
+  (if needed) fills in vcpu->arch.pio, and one that is intended for
+  completion callbacks and consumes it.
+
+Tested by booting a SEV-ES guest and with "regular" kvm-unit-tests.
 
 Paolo
+
+Paolo Bonzini (13):
+  KVM: SEV-ES: rename guest_ins_data to sev_pio_data
+  KVM: x86: leave vcpu->arch.pio.count alone in emulator_pio_in_out
+  KVM: SEV-ES: clean up kvm_sev_es_ins/outs
+  KVM: x86: split the two parts of emulator_pio_in
+  KVM: x86: remove unnecessary arguments from complete_emulator_pio_in
+  KVM: SEV-ES: keep INS functions together
+  KVM: SEV-ES: go over the sev_pio_data buffer in multiple passes if
+    needed
+  KVM: x86: inline kernel_pio into its sole caller
+  KVM: x86: move all vcpu->arch.pio* setup in emulator_pio_in_out
+  KVM: x86: wean in-kernel PIO from vcpu->arch.pio*
+  KVM: x86: wean fast IN from emulator_pio_in
+  KVM: x86: de-underscorify __emulator_pio_in
+  KVM: SEV-ES: reuse advance_sev_es_emulated_ins for OUT too
+
+ arch/x86/include/asm/kvm_host.h |   3 +-
+ arch/x86/kvm/trace.h            |   2 +-
+ arch/x86/kvm/x86.c              | 193 +++++++++++++++++++-------------
+ 3 files changed, 117 insertions(+), 81 deletions(-)
+
+-- 
+2.27.0
 
