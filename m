@@ -2,122 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A9A6143768C
-	for <lists+kvm@lfdr.de>; Fri, 22 Oct 2021 14:11:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1BFCE4376CE
+	for <lists+kvm@lfdr.de>; Fri, 22 Oct 2021 14:21:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231712AbhJVMOL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Oct 2021 08:14:11 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:14526 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230230AbhJVMOH (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 22 Oct 2021 08:14:07 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 19M9I7w3002492;
-        Fri, 22 Oct 2021 08:11:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=/l1fyHkMy1Qb5+XWNoEXx/Ur+bpaKZI2ollk5ADkAWY=;
- b=mV9uHxgV18YPcmfRbNZJDYJ/7BzcypHWxQ5mL2phXVVifkGLS1Du6CzzNg3p3YamLPRT
- qw0Ngsyj0jPiD8uk74DHvzbkDs1WZWgin3rFEX9aKLT02W2qyrcBWGUvI/4YIuwaZhdm
- VNzXzFFWN+i/BB/5SZTgV3osbs/cziAd0yILVkcxBYzrm7tVIf2rj1nB9ulrPfby/ax1
- W6C5LvWN1JtjJS4G5eQJ9Kn7m6xnfScMTl8Yy3ZbfsZuK81qB0YPixSueb1unkVIBaIg
- ubcU4LcfYceU9rstq8/noG+i1gEca3PnNMZe7lfC1rZIOh5bDwE1eiDTuMMrSMv2NbIM aQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3butj3b54a-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 22 Oct 2021 08:11:49 -0400
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 19MBjL0s006621;
-        Fri, 22 Oct 2021 08:11:49 -0400
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3butj3b53k-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 22 Oct 2021 08:11:49 -0400
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 19MC28gs018699;
-        Fri, 22 Oct 2021 12:11:47 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma03ams.nl.ibm.com with ESMTP id 3bqpcar7bq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 22 Oct 2021 12:11:46 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 19MCBhrb4588078
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 22 Oct 2021 12:11:43 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6930DAE057;
-        Fri, 22 Oct 2021 12:11:43 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D0B6EAE064;
-        Fri, 22 Oct 2021 12:11:42 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.145.10.134])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 22 Oct 2021 12:11:42 +0000 (GMT)
-Date:   Fri, 22 Oct 2021 14:11:40 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: s390: Fix handle_sske page fault handling
-Message-ID: <20211022141140.02da5325@p-imbrenda>
-In-Reply-To: <20211022112913.211986-1-scgl@linux.ibm.com>
-References: <20211022112913.211986-1-scgl@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        id S232057AbhJVMYK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Oct 2021 08:24:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53582 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230519AbhJVMYJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Oct 2021 08:24:09 -0400
+Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93C44C061766
+        for <kvm@vger.kernel.org>; Fri, 22 Oct 2021 05:21:51 -0700 (PDT)
+Received: by mail-ed1-x52a.google.com with SMTP id l13so1069045edi.8
+        for <kvm@vger.kernel.org>; Fri, 22 Oct 2021 05:21:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:reply-to:from:date:message-id:subject:to;
+        bh=EabbjzyBCsHP1Pqryzjhoy0dM3xlyxLmmpO8ACgMTo8=;
+        b=opUIgqVWyZcHOIldu+LgQVfQLu2JLSm4eq0yRYoR8X3EkJ0jJdtgK1LJrEC4fAYG/u
+         x5QndCavFk6KrgrLKL2M04eWhmo9Ht5gsCUOTzm6BFmYlOhPKCnfQmAWRcGWJ3Kgd+Po
+         dxnzE1GzD0Fe/zdoRYGanqsnNZ7HZwcDd5jvb2P53Z7ySB2eUUW5eKcCwJjvHcLwQW3D
+         hmZMQ0WQ67mADARNZlQPTMDFACAa1pT2f55C5E+z5xU/0SGGI05AA1ys/nk/8Z7QRecx
+         rbFLK51ODld/urTp+hjZ3tCNNEiv03NL8R5n8H4ZVv1sIR3Pcfr4FSd/aUugOrtvCJBK
+         4QUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
+         :subject:to;
+        bh=EabbjzyBCsHP1Pqryzjhoy0dM3xlyxLmmpO8ACgMTo8=;
+        b=w5Hzit7SG+NhnwF+P2ctIwqbZPryaaXtiJkxRU+RusVbklJJKIKkXXgi3BIzfd0hjU
+         2ZIMS8APWMQ/uo54nx5ODrPJsbu/KkBgGoLlBaxVaVpSXAdCSwZfqr10l2zDD8JAxIBG
+         BbGYtcmL8Jzup/DrmqzSR4Hwg6e6jjMz5gekuCBpsCyMkmOYP4BESvdeQSSVTB0SMmbr
+         nJVbg+2pWHogqmkF/aff4iK5ubZAdxbiaEDDmmbfs85jgLTOQeVaEC/W3ZtXTUKrx1v2
+         En6d7f6soaVmerHlywyF44iHBRUon5FwG4H+BVDB/cG3zZoPyFcOfQ/oICMvu6QtP4ax
+         6Pyw==
+X-Gm-Message-State: AOAM532Zg+7PIqXRtwbVwa5WxecHkY+sf+AzJ247Gu93JKzpa4CBUl4m
+        ETltk9K/TI57+a1deXHDofFDN/Mo/i+DeATDDSc=
+X-Google-Smtp-Source: ABdhPJy2Z+mCK6UsBedDHfuHLqHjOelryE6bx9xZ/OavTEghlxY+bPID2uQBe/oD5nVNF4jHf9BZTkpf3h9vpVXzB08=
+X-Received: by 2002:a17:907:1b0a:: with SMTP id mp10mr15488909ejc.29.1634905309828;
+ Fri, 22 Oct 2021 05:21:49 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 1mRHsr0H9bkcdCehY4RvNLo-5ECsuA3v
-X-Proofpoint-ORIG-GUID: nXqEN9du1qGzPAgEP4qgFHrEFZLHmmU6
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
- definitions=2021-10-22_03,2021-10-21_02,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 lowpriorityscore=0
- spamscore=0 priorityscore=1501 bulkscore=0 mlxlogscore=999 phishscore=0
- clxscore=1015 adultscore=0 suspectscore=0 malwarescore=0 impostorscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2109230001
- definitions=main-2110220068
+Received: by 2002:a17:907:7fa7:0:0:0:0 with HTTP; Fri, 22 Oct 2021 05:21:48
+ -0700 (PDT)
+Reply-To: bahadur.rayanby@gmail.com
+From:   Ryan Bahadur <dr.philposman7@gmail.com>
+Date:   Fri, 22 Oct 2021 05:21:48 -0700
+Message-ID: <CAMOT=VQ19xGMh1Soq8rNHNKaBCqZh03d0u+Nrf_Ou9bAtd-seQ@mail.gmail.com>
+Subject: CAN I TRUST YOU
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 22 Oct 2021 13:29:13 +0200
-Janis Schoetterl-Glausch <scgl@linux.ibm.com> wrote:
+-- 
+Greetings,
 
-> Retry if fixup_user_fault succeeds.
-> The same issue in handle_pfmf was fixed by
-> a11bdb1a6b78 (KVM: s390: Fix pfmf and conditional skey emulation).
-> 
-> Fixes: bd096f644319 ("KVM: s390: Add skey emulation fault handling")
-> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+Firstly, I apologize for encroaching into your privacy in this manner
+as it may seem unethical though it is a matter of great importance.
 
-with the description fixed as indicated by Christian:
+I am Mr.Ryan Bahadur, I work with Cayman National Bank (Cayman Islands).
 
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+I am contacting you because my status would not permit me to do this
+alone as it is concerning our customer and an investment placed under
+our bank's management over 5 years ago.
 
-> ---
->  arch/s390/kvm/priv.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/arch/s390/kvm/priv.c b/arch/s390/kvm/priv.c
-> index 53da4ceb16a3..417154b314a6 100644
-> --- a/arch/s390/kvm/priv.c
-> +++ b/arch/s390/kvm/priv.c
-> @@ -397,6 +397,8 @@ static int handle_sske(struct kvm_vcpu *vcpu)
->  		mmap_read_unlock(current->mm);
->  		if (rc == -EFAULT)
->  			return kvm_s390_inject_program_int(vcpu, PGM_ADDRESSING);
-> +		if (rc == -EAGAIN)
-> +			continue;
->  		if (rc < 0)
->  			return rc;
->  		start += PAGE_SIZE;
+I have a proposal I would love to discuss with you which will be very
+beneficial to both of us. It's regarding my late client who has a huge
+deposit with my bank.
 
+He is from your country and shares the same last name with you.
+
+I want to seek your consent to present you as the next of kin to my
+late client who died and left a huge deposit with my bank.
+
+I would respectfully request that you keep the contents of this mail
+confidential and respect the integrity of the information you come by
+as a result of this mail.
+
+Please kindly get back to me for more details if I can TRUST YOU.{
+bahadur.rayanby@gmail.com}
+
+Regards
+Mr.Ryan Bahadur
+Treasury and Deposit Management,
+Cayman National Bank Cayman Islands.
