@@ -2,92 +2,171 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4B9784379A6
-	for <lists+kvm@lfdr.de>; Fri, 22 Oct 2021 17:11:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BA38B4379BD
+	for <lists+kvm@lfdr.de>; Fri, 22 Oct 2021 17:18:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233328AbhJVPOG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Oct 2021 11:14:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:21442 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233186AbhJVPOF (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 22 Oct 2021 11:14:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634915507;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=WKiggae/426DturMbr/QSmFYLXEnY75fix64qeEqrqM=;
-        b=Q06cubTl1w9QOGr8RA+qcn1RVNS0RaTUtFdfSjLXgeiVPYxGROrmNMWeb0lTAvpBd5CL6B
-        gTx3+8G86N6QUjU/CUTZVvgnDm8T6oG5NFmVpa4maXFhCMjYAOpxCBzY+z4PXT+gMjCAEO
-        dArrf1JPS+O3PgCBhwaJV+PfGuDR63U=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-125-tTzDyA7JM1ScE_VpD6PhIQ-1; Fri, 22 Oct 2021 11:11:45 -0400
-X-MC-Unique: tTzDyA7JM1ScE_VpD6PhIQ-1
-Received: by mail-ed1-f70.google.com with SMTP id z20-20020a05640240d400b003dce046ab51so3979018edb.14
-        for <kvm@vger.kernel.org>; Fri, 22 Oct 2021 08:11:43 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=WKiggae/426DturMbr/QSmFYLXEnY75fix64qeEqrqM=;
-        b=vUBdndtLv1frwqZAEaIq/vflhawZMhQhKKEdVolLsM86sNTXwT6551+cuJqqZ/LoAc
-         6myuM0HSzhzxqzhICi5G50GsT04QV1Z4SqvJFkD9iwHRL9hy5SADgebuLyWZkLJw9lJ5
-         RDLR3jeKpMlDholV4L0cYmEqtufkXWkWiFsheBUwVgC9TkVHj4EuhD1+gz8WVSlD0y6j
-         p9vjr/S3MFG9+ZIbMNVHNW6RASftaVv5+TcLcsyDH/vndvn1gxrJtycTTJsfyk758ZBX
-         aUKMxotafX8mo+uhAdeOcOhHoDqJiVWg8hdbglz9qugqhxXBjqNmZC3foVcL2n+incXj
-         3kCA==
-X-Gm-Message-State: AOAM5305acP+YssYQYEC2Y6ymfiZZrH7BT6rCqPg9Aqd/hSNypv8tpE/
-        E7S4IT312LhI6iuSDSIWtoUVyWRiQj/5YPGhs/DfIAipVay14RAXTTYuBCNFZ9oplvY3Aha0j+d
-        Aen0OFL/hCVVR
-X-Received: by 2002:a17:906:7fd8:: with SMTP id r24mr238507ejs.80.1634915502303;
-        Fri, 22 Oct 2021 08:11:42 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzGXnOInftvuDRU3p7mAky5KKD18JBW8HqABTWuYZgHNmIhjubVpfsk1MkAGluhEzkPC1yOeQ==
-X-Received: by 2002:a17:906:7fd8:: with SMTP id r24mr238475ejs.80.1634915502059;
-        Fri, 22 Oct 2021 08:11:42 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id rv25sm3918677ejb.21.2021.10.22.08.11.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 22 Oct 2021 08:11:41 -0700 (PDT)
-Message-ID: <b4f98a3a-40e4-7a27-f240-54ed4874f154@redhat.com>
-Date:   Fri, 22 Oct 2021 17:11:40 +0200
+        id S233304AbhJVPUe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Oct 2021 11:20:34 -0400
+Received: from new2-smtp.messagingengine.com ([66.111.4.224]:53455 "EHLO
+        new2-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232384AbhJVPUd (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 22 Oct 2021 11:20:33 -0400
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+        by mailnew.nyi.internal (Postfix) with ESMTP id 66D0C580F92;
+        Fri, 22 Oct 2021 11:18:14 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute4.internal (MEProxy); Fri, 22 Oct 2021 11:18:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=stwcx.xyz; h=
+        date:from:to:cc:subject:message-id:references:mime-version
+        :content-type:in-reply-to; s=fm3; bh=46YpM5jZKwd3mcnLxsPVqOmlYwf
+        lxCO4p2fiY1KoOPc=; b=qm/JHEjUR81ScgvglY9ndyrWS6meTUz02OeqaWeuwnV
+        OkvwFVjW753vqgVHwr+I7OhJFw1cJfhfxlXXHEZA1I3RqDQ4tWjSZ/KlP3IYrvL0
+        DhrpBbN43xHgOaLUMJZJ0KuzMu+1fEEfTEsxbTqF7FaeyDyhTZQykIWjrUNSNGsi
+        uT4eqrJqDCpp6eFFpZLfBgwDAjZP5dfZhc0bJjgFC6dd8iUWmiYnKoe7178zU2qu
+        AG+l8dA1GcdlOAML1P8inXgr9ERXBCkHQGZ/6xCBd0shOkTY/7UQgld470E2Sthm
+        ui0lZ6XpYyrGFwS10FcCiQc9TKhxRpuKtn146Sp7MUA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:content-type:date:from:in-reply-to
+        :message-id:mime-version:references:subject:to:x-me-proxy
+        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; bh=46YpM5
+        jZKwd3mcnLxsPVqOmlYwflxCO4p2fiY1KoOPc=; b=ODoNLg6b9DxvKZ9suUSYH6
+        ibbkhO6J/bGRvsG2yv16q0+2KVopWvljS4+tT9yMqnb9aC2M7FVOqVuzMwi6DV4w
+        TYC4Gp/ORsQGrXg/Bx35p7J+SvPOBT/84L/GRvNabaIRP+cr3IDLB7HOV+R5SdTA
+        mSgcSov7Yc5r/dPNI3VIWe/I7caf2GraW1ukuxXF0alogK1ev4t4rZbDVbWNJEOA
+        frUsW+rLtY4rrheFi195Oav+vi68tM+LU2KSKKkjAbAZfd/PUKEdxNGtruwzZPRn
+        /HnDPeB/bWdUU1AS31twbQCi1oqH1TQwhdUVCuPuJt3zeuqZRSWsc1MslNArO6bQ
+        ==
+X-ME-Sender: <xms:NdZyYRpgEAo76-yfnDAaM3pmvgYYvRy5uQZRPPwY7hxaAdC1BfhxFw>
+    <xme:NdZyYTpjPmsAr-sXeGewqzvH3VcwRoQ-JkWIOUfyqVqW1OhExH8m6UUhyWwt93IXY
+    zZFW4t_5T5tY6_joMs>
+X-ME-Received: <xmr:NdZyYeOzjnNtXiGBb9iTlhifuZm69WxhizsDdtS7DK7kB1X74WcFtrRTV2kgVgXa6tNAJ1C9qLzSAYfy9X6ZGBv--bzWSHZ5w6OAAumuAgBo7g>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvtddrvddvkedgjedvucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    gfrhhlucfvnfffucdljedtmdenucfjughrpeffhffvuffkfhggtggujgesghdtroertddt
+    vdenucfhrhhomheprfgrthhrihgtkhcuhghilhhlihgrmhhsuceophgrthhrihgtkhessh
+    htfigtgidrgiihiieqnecuggftrfgrthhtvghrnhepfeeikedvjeejheetgeeggeefgeff
+    teeugfegtddvudeggfeugfefjedvuedvveevnecuvehluhhsthgvrhfuihiivgeptdenuc
+    frrghrrghmpehmrghilhhfrhhomhepphgrthhrihgtkhesshhtfigtgidrgiihii
+X-ME-Proxy: <xmx:NdZyYc71h11aRVJBMGfw2EO0jp91Y2LEb_hdTyTUPjoScQgPUwAZHA>
+    <xmx:NdZyYQ6B5nPy8TxGZY_MeQw4V0VyxFBsCDKZHYicXG6WSJGUG2ZCoQ>
+    <xmx:NdZyYUgj5g6TZgOd_k22lZJCcLgfLGG_GyhOP924D2D0nfpbD18H_g>
+    <xmx:NtZyYTJ4p4_qR52E2TPgLiaZIzg_pp3dv1yxYjVH1RdCC9E6t3S5IQ>
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 22 Oct 2021 11:18:12 -0400 (EDT)
+Date:   Fri, 22 Oct 2021 10:18:11 -0500
+From:   Patrick Williams <patrick@stwcx.xyz>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     Zev Weiss <zev@bewilderbeest.net>, kvm@vger.kernel.org,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Jeremy Kerr <jk@codeconstruct.com.au>,
+        Rajat Jain <rajatja@google.com>,
+        Frank Rowand <frowand.list@gmail.com>,
+        Jianxiong Gao <jxgao@google.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Saravana Kannan <saravanak@google.com>,
+        Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
+        openbmc@lists.ozlabs.org, devicetree@vger.kernel.org,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Bhaskar Chowdhury <unixbhaskar@gmail.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Andrew Jeffery <andrew@aj.id.au>,
+        Cornelia Huck <cohuck@redhat.com>,
+        linux-kernel@vger.kernel.org, Vinod Koul <vkoul@kernel.org>,
+        dmaengine@vger.kernel.org
+Subject: Re: [PATCH 4/5] driver core: inhibit automatic driver binding on
+ reserved devices
+Message-ID: <YXLWMyleiTFDDZgm@heinlein>
+References: <20211022020032.26980-1-zev@bewilderbeest.net>
+ <20211022020032.26980-5-zev@bewilderbeest.net>
+ <YXJeYCFJ5DnBB63R@kroah.com>
+ <YXJ3IPPkoLxqXiD3@hatter.bewilderbeest.net>
+ <YXJ88eARBE3vU1aA@kroah.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [PATCH 0/3] KVM: x86/mmu: Clean up kvm_zap_gfn_range()
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>,
-        "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>,
-        Ben Gardon <bgardon@google.com>
-References: <20211022010005.1454978-1-seanjc@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20211022010005.1454978-1-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="70daKchr0JYsGAyF"
+Content-Disposition: inline
+In-Reply-To: <YXJ88eARBE3vU1aA@kroah.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 22/10/21 03:00, Sean Christopherson wrote:
-> Fix overzealous flushing in kvm_zap_gfn_range(), and clean up the mess
-> that it's become by extracting the legacy MMU logic to a separate
-> helper.
-> 
-> Sean Christopherson (3):
->    KVM: x86/mmu: Drop a redundant, broken remote TLB flush
->    KVM: x86/mmu: Drop a redundant remote TLB flush in kvm_zap_gfn_range()
->    KVM: x86/mmu: Extract zapping of rmaps for gfn range to separate
->      helper
 
-Queued, with Cc: stable for patch 1.  (The other two patches depend on 
-it, so I don't feel like including it in 5.15-rc).
+--70daKchr0JYsGAyF
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Paolo
+Hi Greg,
 
+On Fri, Oct 22, 2021 at 10:57:21AM +0200, Greg Kroah-Hartman wrote:
+> On Fri, Oct 22, 2021 at 01:32:32AM -0700, Zev Weiss wrote:
+> > On Thu, Oct 21, 2021 at 11:46:56PM PDT, Greg Kroah-Hartman wrote:
+> > > On Thu, Oct 21, 2021 at 07:00:31PM -0700, Zev Weiss wrote:
+
+> > So we want the kernel to be aware of the device's existence (so that we
+> > *can* bind a driver to it when needed), but we don't want it touching t=
+he
+> > device unless we really ask for it.
+> >=20
+> > Does that help clarify the motivation for wanting this functionality?
+>=20
+> Sure, then just do this type of thing in the driver itself.  Do not have
+> any matching "ids" for this hardware it so that the bus will never call
+> the probe function for this hardware _until_ a manual write happens to
+> the driver's "bind" sysfs file.
+
+It sounds like you're suggesting a change to one particular driver to satis=
+fy
+this one particular case (and maybe I'm just not understanding your suggest=
+ion).
+For a BMC, this is a pretty regular situation and not just as one-off as Ze=
+v's
+example.
+
+Another good example is where a system can have optional riser cards with a
+whole tree of devices that might be on that riser card (and there might be
+different variants of a riser card that could go in the same slot).  Usually
+there is an EEPROM of some sort at a well-known address that can be parsed =
+to
+identify which kind of riser card it is and then the appropriate sub-device=
+s can
+be enumerated.  That EEPROM parsing is something that is currently done in
+userspace due to the complexity and often vendor-specific nature of it.
+
+Many of these devices require quite a bit more configuration information th=
+an
+can be passed along a `bind` call.  I believe it has been suggested previou=
+sly
+that this riser-card scenario could also be solved with dynamic loading of =
+DT
+snippets, but that support seems simple pretty far from being merged.
+
+--=20
+Patrick Williams
+
+--70daKchr0JYsGAyF
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCAAdFiEEBGD9ii4LE9cNbqJBqwNHzC0AwRkFAmFy1jEACgkQqwNHzC0A
+wRkFhg/9HGu2uiFP02YyeOYntJIcOruf1o1SzGDkH/cH9bsS/NmFUA76UFa42pJp
+O1Dkn1yXtjNdENw9UL7RU3kmCWHaEP2nBxP3F+3Gt/9uYZIxArNWBQUGMjELC+dn
+6wfQXoRPwPX+/Tzug7WAgwqsWP9KvdIzvIYf1GfKSlZGXxa2uuwJb4QFTLirrmiK
+zFn78+EB+4qSZEl3KucpA4UahfCobnPcz7a51DP2XSn70Qq2kTZfxn3Pjd4tYtAg
+N0YqDe32NnYHX1jAh/g/QXLv4BCOHh4x8IDWBaekoZ9dSg9CctAjct8L7+HxbdV6
+HWFwlDFm2GvLtv71WyKGqxRaeFfp2+BSZaedQXLM/1t3xY8lD3HOG0yFUxCweXZ9
+yFXrlql9NQ+KkoML3LbO+NUrzk3Iz3cJxSQ7s0G6/N57fI/dUsHVihJfABroBPhF
+xNFYGEsADyvcLFygWXCG3Z/hNa5RgJOhSxrijXTTimUmJg0/TZePrLGJQ6Iikehp
+D+5v6DOh/Itq/CaXhjpwitloV1yxQGnEM+72cIb7pjkjTqsuKXQwy8Gq4XQzXHLX
+YV9NM7xESn7QUuuED4KprEEKYMVu5vIFDNhgifBXd48GTEr1Ga8BbFDVfoUcPuya
+oQ707lRUwbiNx344LTJqBm/cotib5i5rIaMQAIAZtUecxdzQ9tk=
+=/Hnz
+-----END PGP SIGNATURE-----
+
+--70daKchr0JYsGAyF--
