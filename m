@@ -2,148 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4B7CB43741A
-	for <lists+kvm@lfdr.de>; Fri, 22 Oct 2021 10:57:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 12FBF437492
+	for <lists+kvm@lfdr.de>; Fri, 22 Oct 2021 11:16:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232453AbhJVI7l (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Oct 2021 04:59:41 -0400
-Received: from mail.kernel.org ([198.145.29.99]:57566 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232338AbhJVI7l (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Oct 2021 04:59:41 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 40B13603E9;
-        Fri, 22 Oct 2021 08:57:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1634893043;
-        bh=RFCDB+PAgD4OJ71NPOKLB8rC7qWzqFddQNvlx4Q8aoQ=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=x5/rQFGg7PVzqwbqY+l5wnhgJ0SPUebvudVOJsG6YeTjIjf46A9EOx9kqJc7GO2qz
-         /UCIoWRqgaDRhnCTqWfleZBkIu51uMUTGSgDM96auIlKJPb73RJjBlJA9xl1NGM69v
-         mF5Ic1kJTh2Z6wnxPuskl80+WJ1KFncrMmuhq+is=
-Date:   Fri, 22 Oct 2021 10:57:21 +0200
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Zev Weiss <zev@bewilderbeest.net>
-Cc:     Frank Rowand <frowand.list@gmail.com>,
-        Rob Herring <robh+dt@kernel.org>, openbmc@lists.ozlabs.org,
-        Jeremy Kerr <jk@codeconstruct.com.au>,
-        Joel Stanley <joel@jms.id.au>,
-        Andrew Jeffery <andrew@aj.id.au>, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Dave Jiang <dave.jiang@intel.com>,
-        Vinod Koul <vkoul@kernel.org>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Saravana Kannan <saravanak@google.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Bhaskar Chowdhury <unixbhaskar@gmail.com>,
-        Jianxiong Gao <jxgao@google.com>,
-        Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
-        Rajat Jain <rajatja@google.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        dmaengine@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH 4/5] driver core: inhibit automatic driver binding on
- reserved devices
-Message-ID: <YXJ88eARBE3vU1aA@kroah.com>
-References: <20211022020032.26980-1-zev@bewilderbeest.net>
- <20211022020032.26980-5-zev@bewilderbeest.net>
- <YXJeYCFJ5DnBB63R@kroah.com>
- <YXJ3IPPkoLxqXiD3@hatter.bewilderbeest.net>
+        id S232564AbhJVJSO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Oct 2021 05:18:14 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44159 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232570AbhJVJSN (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 22 Oct 2021 05:18:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1634894155;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=G3cW3zoVlu4oi/52XaFtkNhCU8dR251sfiAlQbdZmxw=;
+        b=VsBSEFrI65sryTfKimMmOuEcd8aQUYsvm93TygY6/ED2R/fJgiFd1kp48ysZFqyA9d4r3h
+        8FqIsd3/nGVK3KOUEDbUfKyEt2ObTJQcpTE+v/TCZWtIutcx3P+DDYFYXSBuxEpnWNhhje
+        Qmn1MvCqxFHQC33h7ylcvmWBK5ekeWo=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-157-zU-Re_52Nj-GJGTLC80Wcg-1; Fri, 22 Oct 2021 05:15:53 -0400
+X-MC-Unique: zU-Re_52Nj-GJGTLC80Wcg-1
+Received: by mail-wm1-f69.google.com with SMTP id k20-20020a7bc414000000b0030dcd454771so754919wmi.8
+        for <kvm@vger.kernel.org>; Fri, 22 Oct 2021 02:15:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=G3cW3zoVlu4oi/52XaFtkNhCU8dR251sfiAlQbdZmxw=;
+        b=qJpoEWrRFRAZIP5YlA15JmRs1XZ7CCjZEUA2PVadJgo+/TV0rFh/66wapRp6GbWVBx
+         8dQcRNlRrLEwdXOBts0ICuWHzwZqhVjD8N8qqdaS/gEmXU/7EyVt1W6xdyo6V4RxD18G
+         W+Qa8QzS+UbmaxeqsiUZ+cZa6vh5FJWG69Msj+JZSFxJx26aayNNyca4KYBfy9hWQjjG
+         svSQEBv54TZValdHjTanlF5/EZKW1OtKelB9iWDp38OK4SBQX/ZTsqOJDuXoLoDyQiI/
+         czn0WsmAaXzM34J6BRMHGPIRp6M5EAocY2uouwlsD7qiuglDkZkXyjoRBrmUI2AFVEtz
+         zp2w==
+X-Gm-Message-State: AOAM532YjUU1M1fGrZ6/tfT6DHb0YdUvHttazXvFvkJ/xXyLFN0g50za
+        wERkX64u1zXMWzuTg1aKm9nsNfCGejJ2GCXqy93fP6ZPH4JV8jNA12aAq5wpj0qgP5nx5jqD3tG
+        Wpx/HZhFIopnb
+X-Received: by 2002:adf:c986:: with SMTP id f6mr14715335wrh.216.1634894152797;
+        Fri, 22 Oct 2021 02:15:52 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy9UzrJ47jd8AVMlb0zsnyhbeLN4MbCsLDsxpH5rzw33A79i6LywRRy6NMmtWFyEM7afYZFuw==
+X-Received: by 2002:adf:c986:: with SMTP id f6mr14715317wrh.216.1634894152607;
+        Fri, 22 Oct 2021 02:15:52 -0700 (PDT)
+Received: from redhat.com ([2.55.24.172])
+        by smtp.gmail.com with ESMTPSA id q18sm10324419wmc.7.2021.10.22.02.15.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 22 Oct 2021 02:15:51 -0700 (PDT)
+Date:   Fri, 22 Oct 2021 05:15:47 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Max Gurtovoy <mgurtovoy@nvidia.com>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>, hch@infradead.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        israelr@nvidia.com, nitzanc@nvidia.com, oren@nvidia.com,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH v3 1/1] virtio-blk: avoid preallocating big SGL for data
+Message-ID: <20211022051343-mutt-send-email-mst@kernel.org>
+References: <20210901131434.31158-1-mgurtovoy@nvidia.com>
+ <YTYvOetMHvocg9UZ@stefanha-x1.localdomain>
+ <692f8e81-8585-1d39-e7a4-576ae01438a1@nvidia.com>
+ <YUCUF7co94CRGkGU@stefanha-x1.localdomain>
+ <56cf84e2-fec0-08e8-0a47-24bb1df71883@nvidia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YXJ3IPPkoLxqXiD3@hatter.bewilderbeest.net>
+In-Reply-To: <56cf84e2-fec0-08e8-0a47-24bb1df71883@nvidia.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 22, 2021 at 01:32:32AM -0700, Zev Weiss wrote:
-> On Thu, Oct 21, 2021 at 11:46:56PM PDT, Greg Kroah-Hartman wrote:
-> > On Thu, Oct 21, 2021 at 07:00:31PM -0700, Zev Weiss wrote:
-> > > Devices whose fwnodes are marked as reserved are instantiated, but
-> > > will not have a driver bound to them unless userspace explicitly
-> > > requests it by writing to a 'bind' sysfs file.  This is to enable
-> > > devices that may require special (userspace-mediated) preparation
-> > > before a driver can safely probe them.
+My tree is ok.
+Looks like your patch was developed on top of some other tree,
+not plan upstream linux, so git am fails. I applied it using
+patch and some manual tweaking, and it seems to work for
+me but please do test it in linux-next and confirm -
+will push to a linux-next branch in my tree soon.
+
+On Thu, Sep 23, 2021 at 04:40:56PM +0300, Max Gurtovoy wrote:
+> Hi MST/Jens,
+> 
+> Do we need more review here or are we ok with the code and the test matrix ?
+> 
+> If we're ok, we need to decide if this goes through virtio PR or block PR.
+> 
+> Cheers,
+> 
+> -Max.
+> 
+> On 9/14/2021 3:22 PM, Stefan Hajnoczi wrote:
+> > On Mon, Sep 13, 2021 at 05:50:21PM +0300, Max Gurtovoy wrote:
+> > > On 9/6/2021 6:09 PM, Stefan Hajnoczi wrote:
+> > > > On Wed, Sep 01, 2021 at 04:14:34PM +0300, Max Gurtovoy wrote:
+> > > > > No need to pre-allocate a big buffer for the IO SGL anymore. If a device
+> > > > > has lots of deep queues, preallocation for the sg list can consume
+> > > > > substantial amounts of memory. For HW virtio-blk device, nr_hw_queues
+> > > > > can be 64 or 128 and each queue's depth might be 128. This means the
+> > > > > resulting preallocation for the data SGLs is big.
+> > > > > 
+> > > > > Switch to runtime allocation for SGL for lists longer than 2 entries.
+> > > > > This is the approach used by NVMe drivers so it should be reasonable for
+> > > > > virtio block as well. Runtime SGL allocation has always been the case
+> > > > > for the legacy I/O path so this is nothing new.
+> > > > > 
+> > > > > The preallocated small SGL depends on SG_CHAIN so if the ARCH doesn't
+> > > > > support SG_CHAIN, use only runtime allocation for the SGL.
+> > > > > 
+> > > > > Re-organize the setup of the IO request to fit the new sg chain
+> > > > > mechanism.
+> > > > > 
+> > > > > No performance degradation was seen (fio libaio engine with 16 jobs and
+> > > > > 128 iodepth):
+> > > > > 
+> > > > > IO size      IOPs Rand Read (before/after)         IOPs Rand Write (before/after)
+> > > > > --------     ---------------------------------    ----------------------------------
+> > > > > 512B          318K/316K                                    329K/325K
+> > > > > 
+> > > > > 4KB           323K/321K                                    353K/349K
+> > > > > 
+> > > > > 16KB          199K/208K                                    250K/275K
+> > > > > 
+> > > > > 128KB         36K/36.1K                                    39.2K/41.7K
+> > > > I ran fio randread benchmarks with 4k, 16k, 64k, and 128k at iodepth 1,
+> > > > 8, and 64 on two vCPUs. The results look fine, there is no significant
+> > > > regression.
+> > > > 
+> > > > iodepth=1 and iodepth=64 are very consistent. For some reason the
+> > > > iodepth=8 has significant variance but I don't think it's the fault of
+> > > > this patch.
+> > > > 
+> > > > Fio results and the Jupyter notebook export are available here (check
+> > > > out benchmark.html to see the graphs):
+> > > > 
+> > > > https://gitlab.com/stefanha/virt-playbooks/-/tree/virtio-blk-sgl-allocation-benchmark/notebook
+> > > > 
+> > > > Guest:
+> > > > - Fedora 34
+> > > > - Linux v5.14
+> > > > - 2 vCPUs (pinned), 4 GB RAM (single host NUMA node)
+> > > > - 1 IOThread (pinned)
+> > > > - virtio-blk aio=native,cache=none,format=raw
+> > > > - QEMU 6.1.0
+> > > > 
+> > > > Host:
+> > > > - RHEL 8.3
+> > > > - Linux 4.18.0-240.22.1.el8_3.x86_64
+> > > > - Intel(R) Xeon(R) Silver 4214 CPU @ 2.20GHz
+> > > > - Intel Optane DC P4800X
+> > > > 
+> > > > Stefan
+> > > Thanks, Stefan.
 > > > 
-> > > Signed-off-by: Zev Weiss <zev@bewilderbeest.net>
-> > > ---
-> > >  drivers/base/bus.c            |  2 +-
-> > >  drivers/base/dd.c             | 13 ++++++++-----
-> > >  drivers/dma/idxd/compat.c     |  3 +--
-> > >  drivers/vfio/mdev/mdev_core.c |  2 +-
-> > >  include/linux/device.h        | 14 +++++++++++++-
-> > >  5 files changed, 24 insertions(+), 10 deletions(-)
+> > > Would you like me to add some of the results in my commit msg ? or Tested-By
+> > > sign ?
+> > Thanks, there's no need to change the commit description.
 > > 
-> > Ugh, no, I don't really want to add yet-another-state to the driver core
-> > like this.  Why are these devices even in the kernel with a driver that
-> > wants to bind to them registered if the driver somehow should NOT be
-> > bound to it?  Shouldn't all of that logic be in the crazy driver itself
-> > as that is a very rare and odd thing to do that the driver core should
-> > not care about at all.
-> > 
-> > And why does a device need userspace interaction at all?  Again, why
-> > would the driver not know about this and handle it all directly?
-> > 
-> 
-> Let me expand a bit more on the details of the specific situation I'm
-> dealing with...
-> 
-> On a server motherboard we've got a host CPU (Xeon, Epyc, POWER, etc.) and a
-> baseboard management controller, or BMC (typically an ARM SoC, an ASPEED
-> AST2500 in my case).  The host CPU's firmware (BIOS/UEFI, ME firmware, etc.)
-> lives in a SPI flash chip.  Because it's the host's firmware, that flash
-> chip is connected to and generally (by default) under the control of the
-> host CPU.
-> 
-> But we also want the BMC to be able to perform out-of-band updates to the
-> host's firmware, so the flash is *also* connected to the BMC.  There's an
-> external mux (controlled by a GPIO output driven by the BMC) that switches
-> which processor (host or BMC) is actually driving the SPI signals to the
-> flash chip, but there's a bunch of other stuff that's also required before
-> the BMC can flip that switch and take control of the SPI interface:
-> 
->  - the BMC needs to track (and potentially alter) the host's power state
-> to ensure it's not running (in OpenBMC the existing logic for this is    an
-> entire non-trivial userspace daemon unto itself)
-> 
->  - it needs to twiddle some other GPIOs to put the ME into recovery mode
-> 
->  - it needs to exchange some IPMI messages with the ME to confirm it got
-> into recovery mode
-> 
-> (Some of the details here are specific to the particular motherboard I'm
-> working with, but I'd guess other systems probably have broadly similar
-> requirements.)
-> 
-> The firmware flash (or at least the BMC's side of the mux in front of it) is
-> attached to a spi-nor controller that's well supported by an existing MTD
-> driver (aspeed-smc), but that driver can't safely probe the chip until all
-> the stuff described above has been done.  In particular, this means we can't
-> reasonably bind the driver to that device during the normal
-> device-discovery/driver-binding done in the BMC's boot process (nor do we
-> want to, as that would pull the rug out from under the running host).  We
-> basically only ever want to touch that SPI interface when a user (sysadmin
-> using the BMC, let's say) has explicitly initiated an out-of-band firmware
-> update.
-> 
-> So we want the kernel to be aware of the device's existence (so that we
-> *can* bind a driver to it when needed), but we don't want it touching the
-> device unless we really ask for it.
-> 
-> Does that help clarify the motivation for wanting this functionality?
+> > Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > Tested-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-Sure, then just do this type of thing in the driver itself.  Do not have
-any matching "ids" for this hardware it so that the bus will never call
-the probe function for this hardware _until_ a manual write happens to
-the driver's "bind" sysfs file.
-
-Then when userspace is done, do a "unbind" write.
-
-No driver core changes should be needed at all here.
-
-thanks,
-
-greg k-h
