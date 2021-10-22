@@ -2,76 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 38B8C4379A2
-	for <lists+kvm@lfdr.de>; Fri, 22 Oct 2021 17:10:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4B9784379A6
+	for <lists+kvm@lfdr.de>; Fri, 22 Oct 2021 17:11:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233345AbhJVPMb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Oct 2021 11:12:31 -0400
-Received: from out30-57.freemail.mail.aliyun.com ([115.124.30.57]:39218 "EHLO
-        out30-57.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233281AbhJVPM1 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 22 Oct 2021 11:12:27 -0400
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R551e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04423;MF=houwenlong93@linux.alibaba.com;NM=1;PH=DS;RN=2;SR=0;TI=SMTPD_---0UtHMhrZ_1634915407;
-Received: from localhost(mailfrom:houwenlong93@linux.alibaba.com fp:SMTPD_---0UtHMhrZ_1634915407)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Fri, 22 Oct 2021 23:10:08 +0800
-Date:   Fri, 22 Oct 2021 23:10:07 +0800
-From:   Hou Wenlong <houwenlong93@linux.alibaba.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH 0/2] KVM: some fixes about RDMSR/WRMSR instruction
- emulation
-Message-ID: <20211022151007.GB9730@k08j02272.eu95sqa>
-References: <cover.1634870747.git.houwenlong93@linux.alibaba.com>
- <bebc39f8-0ebc-c8cb-413e-bb4e30397057@redhat.com>
+        id S233328AbhJVPOG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Oct 2021 11:14:06 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:21442 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233186AbhJVPOF (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 22 Oct 2021 11:14:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1634915507;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=WKiggae/426DturMbr/QSmFYLXEnY75fix64qeEqrqM=;
+        b=Q06cubTl1w9QOGr8RA+qcn1RVNS0RaTUtFdfSjLXgeiVPYxGROrmNMWeb0lTAvpBd5CL6B
+        gTx3+8G86N6QUjU/CUTZVvgnDm8T6oG5NFmVpa4maXFhCMjYAOpxCBzY+z4PXT+gMjCAEO
+        dArrf1JPS+O3PgCBhwaJV+PfGuDR63U=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-125-tTzDyA7JM1ScE_VpD6PhIQ-1; Fri, 22 Oct 2021 11:11:45 -0400
+X-MC-Unique: tTzDyA7JM1ScE_VpD6PhIQ-1
+Received: by mail-ed1-f70.google.com with SMTP id z20-20020a05640240d400b003dce046ab51so3979018edb.14
+        for <kvm@vger.kernel.org>; Fri, 22 Oct 2021 08:11:43 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=WKiggae/426DturMbr/QSmFYLXEnY75fix64qeEqrqM=;
+        b=vUBdndtLv1frwqZAEaIq/vflhawZMhQhKKEdVolLsM86sNTXwT6551+cuJqqZ/LoAc
+         6myuM0HSzhzxqzhICi5G50GsT04QV1Z4SqvJFkD9iwHRL9hy5SADgebuLyWZkLJw9lJ5
+         RDLR3jeKpMlDholV4L0cYmEqtufkXWkWiFsheBUwVgC9TkVHj4EuhD1+gz8WVSlD0y6j
+         p9vjr/S3MFG9+ZIbMNVHNW6RASftaVv5+TcLcsyDH/vndvn1gxrJtycTTJsfyk758ZBX
+         aUKMxotafX8mo+uhAdeOcOhHoDqJiVWg8hdbglz9qugqhxXBjqNmZC3foVcL2n+incXj
+         3kCA==
+X-Gm-Message-State: AOAM5305acP+YssYQYEC2Y6ymfiZZrH7BT6rCqPg9Aqd/hSNypv8tpE/
+        E7S4IT312LhI6iuSDSIWtoUVyWRiQj/5YPGhs/DfIAipVay14RAXTTYuBCNFZ9oplvY3Aha0j+d
+        Aen0OFL/hCVVR
+X-Received: by 2002:a17:906:7fd8:: with SMTP id r24mr238507ejs.80.1634915502303;
+        Fri, 22 Oct 2021 08:11:42 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzGXnOInftvuDRU3p7mAky5KKD18JBW8HqABTWuYZgHNmIhjubVpfsk1MkAGluhEzkPC1yOeQ==
+X-Received: by 2002:a17:906:7fd8:: with SMTP id r24mr238475ejs.80.1634915502059;
+        Fri, 22 Oct 2021 08:11:42 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id rv25sm3918677ejb.21.2021.10.22.08.11.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 22 Oct 2021 08:11:41 -0700 (PDT)
+Message-ID: <b4f98a3a-40e4-7a27-f240-54ed4874f154@redhat.com>
+Date:   Fri, 22 Oct 2021 17:11:40 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <bebc39f8-0ebc-c8cb-413e-bb4e30397057@redhat.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [PATCH 0/3] KVM: x86/mmu: Clean up kvm_zap_gfn_range()
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>,
+        "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>,
+        Ben Gardon <bgardon@google.com>
+References: <20211022010005.1454978-1-seanjc@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20211022010005.1454978-1-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 22, 2021 at 11:46:17AM +0200, Paolo Bonzini wrote:
-> On 22/10/21 04:59, Hou Wenlong wrote:
-> >When KVM_CAP_X86_USER_SPACE_MSR cap is enabled, userspace can control
-> >MSR accesses. In normal scenario, RDMSR/WRMSR can be interceped, but
-> >when kvm.force_emulation_prefix is enabled, RDMSR/WRMSR with kvm prefix
-> >would trigger an UD and cause instruction emulation. If MSR accesses is
-> >filtered, em_rdmsr()/em_wrmsr() returns X86EMUL_IO_NEEDED, but it is
-> >ignored by x86_emulate_instruction(). Then guest continues execution,
-> >but RIP has been updated to point to RDMSR/WRMSR in handle_ud(), so
-> >RDMSR/WRMSR can be interceped and guest exits to userspace finnaly by
-> >mistake. Such behaviour leads to two vm exits and wastes one instruction
-> >emulation.
-> >
-> >After let x86_emulate_instruction() returns 0 for RDMSR/WRMSR emulation,
-> >if it needs to exit to userspace, its complete_userspace_io callback
-> >would call kvm_skip_instruction() to skip instruction. But for vmx,
-> >VMX_EXIT_INSTRUCTION_LEN in vmcs is invalid for UD, it can't be used to
-> >update RIP, kvm_emulate_instruction() should be used instead. As for
-> >svm, nRIP in vmcb is 0 for UD, so kvm_emulate_instruction() is used.
-> >But for nested svm, I'm not sure, since svm_check_intercept() would
-> >change nRIP.
+On 22/10/21 03:00, Sean Christopherson wrote:
+> Fix overzealous flushing in kvm_zap_gfn_range(), and clean up the mess
+> that it's become by extracting the legacy MMU logic to a separate
+> helper.
 > 
-> Hi, can you provide a testcase for this bug using the
-> tools/testing/selftests/kvm framework?
-> 
-> Thanks,
-> 
-> Paolo
-Hi, Paolo
+> Sean Christopherson (3):
+>    KVM: x86/mmu: Drop a redundant, broken remote TLB flush
+>    KVM: x86/mmu: Drop a redundant remote TLB flush in kvm_zap_gfn_range()
+>    KVM: x86/mmu: Extract zapping of rmaps for gfn range to separate
+>      helper
 
-There is already a testcase in kvm selftests
-(test_msr_filter_allow() in tools/testing/selftests/kvm/x86/userspace_msr_exit_test.c),
-which is mentioned in Patch 2.
+Queued, with Cc: stable for patch 1.  (The other two patches depend on 
+it, so I don't feel like including it in 5.15-rc).
 
-In that testcase, it tests MSR accesses emulation with
-kvm.force_emulation_prefix enabled, and it is passed. But I think
-the logic may be not right. As I explained in Patch 2,
-x86_emulate_instruction() ignored X86EMUL_IO_NEEDED, so guest would
-continue execution, but RIP had been updated to point to RDMSR/WRMSR
-in handle_ud(). Then RDMSR/WRMSR would be intercepted and guest could
-exit to userspace later. Although the final result seemed to be right,
-it wasted the instruction emulation in the first vm exit.
+Paolo
 
