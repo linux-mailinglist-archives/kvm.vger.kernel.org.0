@@ -2,106 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5C219438278
-	for <lists+kvm@lfdr.de>; Sat, 23 Oct 2021 10:56:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 983BE4382B0
+	for <lists+kvm@lfdr.de>; Sat, 23 Oct 2021 11:45:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230153AbhJWI7J (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 23 Oct 2021 04:59:09 -0400
-Received: from mail.kernel.org ([198.145.29.99]:53916 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229666AbhJWI7I (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 23 Oct 2021 04:59:08 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 9A1EB60FE3;
-        Sat, 23 Oct 2021 08:56:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1634979409;
-        bh=MQ6wVrxyRcZanowXUW3z8SklNft5GH7I+NPAlmFZ89U=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=lOgCEGtbsXU9ZmPHmlxnRHjXHmdadZCFqhdfjCjqh4b2K//kn9T1Ta5bkvrsjk8Jb
-         NJQXChCKVkfabcQNV5BPInS0yPuMdgsYBDItULN76AoDIYT/WA57772ivr4Pgu4oy5
-         1cud104Tcdd25BmP5ub1A5ZIQIXvmtr2eXrV8SMo=
-Date:   Sat, 23 Oct 2021 10:56:41 +0200
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Patrick Williams <patrick@stwcx.xyz>
-Cc:     Zev Weiss <zev@bewilderbeest.net>, kvm@vger.kernel.org,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Jeremy Kerr <jk@codeconstruct.com.au>,
-        Rajat Jain <rajatja@google.com>,
-        Frank Rowand <frowand.list@gmail.com>,
-        Jianxiong Gao <jxgao@google.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        Saravana Kannan <saravanak@google.com>,
-        Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
-        openbmc@lists.ozlabs.org, devicetree@vger.kernel.org,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Bhaskar Chowdhury <unixbhaskar@gmail.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Andrew Jeffery <andrew@aj.id.au>,
-        Cornelia Huck <cohuck@redhat.com>,
-        linux-kernel@vger.kernel.org, Vinod Koul <vkoul@kernel.org>,
-        dmaengine@vger.kernel.org
-Subject: Re: [PATCH 4/5] driver core: inhibit automatic driver binding on
- reserved devices
-Message-ID: <YXPOSZPA41f+EUvM@kroah.com>
-References: <20211022020032.26980-1-zev@bewilderbeest.net>
- <20211022020032.26980-5-zev@bewilderbeest.net>
- <YXJeYCFJ5DnBB63R@kroah.com>
- <YXJ3IPPkoLxqXiD3@hatter.bewilderbeest.net>
- <YXJ88eARBE3vU1aA@kroah.com>
- <YXLWMyleiTFDDZgm@heinlein>
+        id S230074AbhJWJrq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 23 Oct 2021 05:47:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53934 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230034AbhJWJrp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 23 Oct 2021 05:47:45 -0400
+Received: from mail-oo1-xc41.google.com (mail-oo1-xc41.google.com [IPv6:2607:f8b0:4864:20::c41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87D23C061764
+        for <kvm@vger.kernel.org>; Sat, 23 Oct 2021 02:45:26 -0700 (PDT)
+Received: by mail-oo1-xc41.google.com with SMTP id m37-20020a4a9528000000b002b83955f771so1315972ooi.7
+        for <kvm@vger.kernel.org>; Sat, 23 Oct 2021 02:45:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:reply-to:sender:from:date:message-id:subject:to;
+        bh=YXA6ubmxBM3AO934Ql+xSBBVvleUU47PEWiFVU0c5sY=;
+        b=mPVTYYQ+YvAREvBaa/tK7vkoHsA9OBsZdygTxt4AvkXbczd3aw7Sefh8pI5b/AMeNf
+         xjk9YgvYDUUhZC3uv6FV+7kwXkzVMrEdEbnc+JWYkSoJa72ttP1PAYgkGK8nwNHQHo1G
+         iZUH/FckkzO/gbs+xRU9iAu/cBNm1Cz4/ZKIaXDLSsAkjer9kf20tQgrfx96zDLideTh
+         x95PK4K6E3TbiFr5ttTrgWVtboycM4G3kznsnoJ1cg8sWjTgg9fXJyuBmRlF+4gOxrAl
+         u+YyqKS3qns/a/JvPkHsi0bzR4s9V2CZd/XN+ZA95BV/Oe9Jh9Wuy5TjYzVQ8brVHLrv
+         1XdQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:reply-to:sender:from:date
+         :message-id:subject:to;
+        bh=YXA6ubmxBM3AO934Ql+xSBBVvleUU47PEWiFVU0c5sY=;
+        b=B09cdrBdRZ2TxsW3zgwV9ztUsxiunfQnuwya3+pF6OXA9WOPm4XLrLLoO2Jd8FB+rZ
+         B3kSWfKF7sFfTw/PGXZuBEbAW3hrmIlHXzn0gfjjWFyW+4YVdGvJ2C0xNK9SelYygmXN
+         NEk5IOH5DxbTCKdvnkZMiQBvSzGSsBs9owYr8fNrv+pLAQ6a+bxL7YrwRjw24qwB4DXW
+         tpmYV8fwNiwnPTwJgZgayU40ifIEJ2y3lACixZ5oP/02+nxdn5sS9b8YaGf2+aFpgRtl
+         fINhjNIYL0LRPLhd33j+0MpWjP8Py+r+6SsiP8t2wI5trKB8d+Wac5UNxlXxW2yC1Ne5
+         o9dg==
+X-Gm-Message-State: AOAM533brQNhFFmrvIGKOn36fTAapiWouJIGTKit4BQTCthQeTBYS2+i
+        CDud6b4n7BSsARXY7jgAtj87ZrppYjgRBZgWkp4=
+X-Google-Smtp-Source: ABdhPJy9mkqoDEE3LONShFdRK10ninRiQc+RNNT/zlzRgabqr47eriI8O4AG+WX/TptBDzovWKc/NFbKJ5GGHj5v7Fg=
+X-Received: by 2002:a4a:d48c:: with SMTP id o12mr3740569oos.55.1634982325768;
+ Sat, 23 Oct 2021 02:45:25 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YXLWMyleiTFDDZgm@heinlein>
+Reply-To: zahirikeen@gmail.com
+Sender: aliwattara01@gmail.com
+Received: by 2002:a05:6820:1502:0:0:0:0 with HTTP; Sat, 23 Oct 2021 02:45:25
+ -0700 (PDT)
+From:   Zahiri Keen <zahirikeen2@gmail.com>
+Date:   Sat, 23 Oct 2021 11:45:25 +0200
+X-Google-Sender-Auth: JS-9JECEKSSsG-GvzNnlzbtb6NI
+Message-ID: <CAPCupSzH98Cr6geMkx4zp+5edMn+XqSCk8Y=7OSPFRwG5Z_0Xw@mail.gmail.com>
+Subject: Urgent Please.
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 22, 2021 at 10:18:11AM -0500, Patrick Williams wrote:
-> Hi Greg,
-> 
-> On Fri, Oct 22, 2021 at 10:57:21AM +0200, Greg Kroah-Hartman wrote:
-> > On Fri, Oct 22, 2021 at 01:32:32AM -0700, Zev Weiss wrote:
-> > > On Thu, Oct 21, 2021 at 11:46:56PM PDT, Greg Kroah-Hartman wrote:
-> > > > On Thu, Oct 21, 2021 at 07:00:31PM -0700, Zev Weiss wrote:
-> 
-> > > So we want the kernel to be aware of the device's existence (so that we
-> > > *can* bind a driver to it when needed), but we don't want it touching the
-> > > device unless we really ask for it.
-> > > 
-> > > Does that help clarify the motivation for wanting this functionality?
-> > 
-> > Sure, then just do this type of thing in the driver itself.  Do not have
-> > any matching "ids" for this hardware it so that the bus will never call
-> > the probe function for this hardware _until_ a manual write happens to
-> > the driver's "bind" sysfs file.
-> 
-> It sounds like you're suggesting a change to one particular driver to satisfy
-> this one particular case (and maybe I'm just not understanding your suggestion).
-> For a BMC, this is a pretty regular situation and not just as one-off as Zev's
-> example.
-> 
-> Another good example is where a system can have optional riser cards with a
-> whole tree of devices that might be on that riser card (and there might be
-> different variants of a riser card that could go in the same slot).  Usually
-> there is an EEPROM of some sort at a well-known address that can be parsed to
-> identify which kind of riser card it is and then the appropriate sub-devices can
-> be enumerated.  That EEPROM parsing is something that is currently done in
-> userspace due to the complexity and often vendor-specific nature of it.
-> 
-> Many of these devices require quite a bit more configuration information than
-> can be passed along a `bind` call.  I believe it has been suggested previously
-> that this riser-card scenario could also be solved with dynamic loading of DT
-> snippets, but that support seems simple pretty far from being merged.
+Greetings,
 
-Then work to get the DT code merged!  Do not try to create
-yet-another-way of doing things here if DT overlays is the correct
-solution here (and it seems like it is.)
+            I have a Mutual/Beneficial Business Project that would be
+beneficial to you. I only have two questions to ask of you, if you are
+interested.
 
-thanks,
+1. Can you handle this project?
+2. Can I give you this trust?
 
-greg k-h
+Please note that the deal requires high level of maturity, honesty and
+secrecy. This will involve moving some money from my office, on trust
+to your hands or bank account. Also note that i will do everything to
+make sure that the money is moved as a purely legitimate fund, so you
+will not be exposed to any risk.
+
+I request for your full co-operation. I will give you details and
+procedure when I receive your reply, to commence this transaction, I
+require you to immediately indicate your interest by a return reply. I
+will be waiting for your response in a timely manner.
+
+Contact  Email: zahirikeen@gmail.com
+Best Regard,
+Mr Zahiri Keen.
