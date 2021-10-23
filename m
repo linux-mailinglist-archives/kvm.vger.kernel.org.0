@@ -2,56 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 983BE4382B0
-	for <lists+kvm@lfdr.de>; Sat, 23 Oct 2021 11:45:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DA3D54383AD
+	for <lists+kvm@lfdr.de>; Sat, 23 Oct 2021 14:41:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230074AbhJWJrq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 23 Oct 2021 05:47:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53934 "EHLO
+        id S230327AbhJWMnS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 23 Oct 2021 08:43:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35532 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230034AbhJWJrp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 23 Oct 2021 05:47:45 -0400
-Received: from mail-oo1-xc41.google.com (mail-oo1-xc41.google.com [IPv6:2607:f8b0:4864:20::c41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87D23C061764
-        for <kvm@vger.kernel.org>; Sat, 23 Oct 2021 02:45:26 -0700 (PDT)
-Received: by mail-oo1-xc41.google.com with SMTP id m37-20020a4a9528000000b002b83955f771so1315972ooi.7
-        for <kvm@vger.kernel.org>; Sat, 23 Oct 2021 02:45:26 -0700 (PDT)
+        with ESMTP id S229699AbhJWMnR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 23 Oct 2021 08:43:17 -0400
+Received: from mail-io1-xd30.google.com (mail-io1-xd30.google.com [IPv6:2607:f8b0:4864:20::d30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7747AC061764
+        for <kvm@vger.kernel.org>; Sat, 23 Oct 2021 05:40:58 -0700 (PDT)
+Received: by mail-io1-xd30.google.com with SMTP id e144so8953510iof.3
+        for <kvm@vger.kernel.org>; Sat, 23 Oct 2021 05:40:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:reply-to:sender:from:date:message-id:subject:to;
-        bh=YXA6ubmxBM3AO934Ql+xSBBVvleUU47PEWiFVU0c5sY=;
-        b=mPVTYYQ+YvAREvBaa/tK7vkoHsA9OBsZdygTxt4AvkXbczd3aw7Sefh8pI5b/AMeNf
-         xjk9YgvYDUUhZC3uv6FV+7kwXkzVMrEdEbnc+JWYkSoJa72ttP1PAYgkGK8nwNHQHo1G
-         iZUH/FckkzO/gbs+xRU9iAu/cBNm1Cz4/ZKIaXDLSsAkjer9kf20tQgrfx96zDLideTh
-         x95PK4K6E3TbiFr5ttTrgWVtboycM4G3kznsnoJ1cg8sWjTgg9fXJyuBmRlF+4gOxrAl
-         u+YyqKS3qns/a/JvPkHsi0bzR4s9V2CZd/XN+ZA95BV/Oe9Jh9Wuy5TjYzVQ8brVHLrv
-         1XdQ==
+        h=mime-version:reply-to:from:date:message-id:subject:to;
+        bh=jfZ6y8fcGvAE1BlPR3wVs6P5tuC6lUydmPFOe3mAfpg=;
+        b=Ph7XIPrAQnjf877Lw93BUmT4y8P3wfduCjeQBIs7LZTGj2jRNhVzzjwo6mkD09a7WF
+         TJzDQzHNdjsVGaZYLOmn1NzaRcRmEJZyRzC/BqF7qzsYD+gZErhRjDRCW0OinoeDQuy5
+         Y/5D5WtOxkHmXeZhT4jJ6Q7g3DOyPlLEcisKgnVV/o2MYCNXvAycbVsp3KVZCMFEXBu9
+         6BWga0n3p/H2sWISxNO0ZnQSsQG0pYxVaTipu9onp8KDV7K7irG2T5nLNzfS5fzNNNVV
+         F5l2ClBLlqWKz3CFn2jlyhxUvHgw4sXSam7Fg1++XMBBK1Xdp28T1dSqqPyKbqYWdzRS
+         Vrdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:reply-to:sender:from:date
-         :message-id:subject:to;
-        bh=YXA6ubmxBM3AO934Ql+xSBBVvleUU47PEWiFVU0c5sY=;
-        b=B09cdrBdRZ2TxsW3zgwV9ztUsxiunfQnuwya3+pF6OXA9WOPm4XLrLLoO2Jd8FB+rZ
-         B3kSWfKF7sFfTw/PGXZuBEbAW3hrmIlHXzn0gfjjWFyW+4YVdGvJ2C0xNK9SelYygmXN
-         NEk5IOH5DxbTCKdvnkZMiQBvSzGSsBs9owYr8fNrv+pLAQ6a+bxL7YrwRjw24qwB4DXW
-         tpmYV8fwNiwnPTwJgZgayU40ifIEJ2y3lACixZ5oP/02+nxdn5sS9b8YaGf2+aFpgRtl
-         fINhjNIYL0LRPLhd33j+0MpWjP8Py+r+6SsiP8t2wI5trKB8d+Wac5UNxlXxW2yC1Ne5
-         o9dg==
-X-Gm-Message-State: AOAM533brQNhFFmrvIGKOn36fTAapiWouJIGTKit4BQTCthQeTBYS2+i
-        CDud6b4n7BSsARXY7jgAtj87ZrppYjgRBZgWkp4=
-X-Google-Smtp-Source: ABdhPJy9mkqoDEE3LONShFdRK10ninRiQc+RNNT/zlzRgabqr47eriI8O4AG+WX/TptBDzovWKc/NFbKJ5GGHj5v7Fg=
-X-Received: by 2002:a4a:d48c:: with SMTP id o12mr3740569oos.55.1634982325768;
- Sat, 23 Oct 2021 02:45:25 -0700 (PDT)
+        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
+         :subject:to;
+        bh=jfZ6y8fcGvAE1BlPR3wVs6P5tuC6lUydmPFOe3mAfpg=;
+        b=5+nl9XhfO0uYGLFvdRFXct7UH9OzNsbL40fpoir/cDbN9wJzcDeD7tfF3seerM67bN
+         qDy8gn17Wt1KW68z3ExjEjZoWKpxNGeplzFvv5IEoCtk/FA+v6sdmn4Jb4doaIR4pu3n
+         PgmXf/UOnZnntdcyyfhQ6IvxXJP7l/EPGkz0gDpBWEnF5yg6BBjDFMtAs9foQPI5W75X
+         1526BiHD8lT6hzQkCKgnDz24reeB59RmClmgyckfDrZs4/ZMiiEqHkZjoLPXQk6b8XsG
+         8KYpxruoUN4oZk9l1ITJ0M2uLGvglNAAp9H78ry8SUgWBoL1v5HfQUueY4OwYSpfQ/sl
+         Q4Xg==
+X-Gm-Message-State: AOAM53350ZWT/TEOTvZS5+I/HEiXt1Y/ybN4Sr5mHZNBXIsFKHDUx8at
+        kIuzAsr5ZrnhgEbvBt4URSfn4xqrB1l6k5rmU90=
+X-Google-Smtp-Source: ABdhPJyKukZKhOkFLLICOy6PN8xBd7xwUVmJSIa6b+T9lHNYOCVk41sF9uVXcpP5I+KZwPkzdw1PDKTvABBHu3Axyhs=
+X-Received: by 2002:a5d:8183:: with SMTP id u3mr3557767ion.67.1634992857798;
+ Sat, 23 Oct 2021 05:40:57 -0700 (PDT)
 MIME-Version: 1.0
-Reply-To: zahirikeen@gmail.com
-Sender: aliwattara01@gmail.com
-Received: by 2002:a05:6820:1502:0:0:0:0 with HTTP; Sat, 23 Oct 2021 02:45:25
+Received: by 2002:a4f:ca01:0:0:0:0:0 with HTTP; Sat, 23 Oct 2021 05:40:57
  -0700 (PDT)
-From:   Zahiri Keen <zahirikeen2@gmail.com>
-Date:   Sat, 23 Oct 2021 11:45:25 +0200
-X-Google-Sender-Auth: JS-9JECEKSSsG-GvzNnlzbtb6NI
-Message-ID: <CAPCupSzH98Cr6geMkx4zp+5edMn+XqSCk8Y=7OSPFRwG5Z_0Xw@mail.gmail.com>
-Subject: Urgent Please.
+Reply-To: mrmichelduku@outlook.com
+From:   mr michel <mrmichel2233@gmail.com>
+Date:   Sat, 23 Oct 2021 12:40:57 +0000
+Message-ID: <CALSo2Na3ehquaRGcPAtWXNcejJHfNjxFvF73nMM41r8JcYKnVA@mail.gmail.com>
+Subject: Please Respond Urgently
 To:     undisclosed-recipients:;
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
@@ -60,24 +58,13 @@ X-Mailing-List: kvm@vger.kernel.org
 
 Greetings,
 
-            I have a Mutual/Beneficial Business Project that would be
-beneficial to you. I only have two questions to ask of you, if you are
-interested.
+With due respect to your person, I make this contact with you as I
+believe that you can be of great assistance to me. I need your
+assistance in transferring the sum of $11.3million to your account
+Where this money can be shared between us.
 
-1. Can you handle this project?
-2. Can I give you this trust?
+By indicating your interest I will send you the full details on how
+the business will be executed.
 
-Please note that the deal requires high level of maturity, honesty and
-secrecy. This will involve moving some money from my office, on trust
-to your hands or bank account. Also note that i will do everything to
-make sure that the money is moved as a purely legitimate fund, so you
-will not be exposed to any risk.
-
-I request for your full co-operation. I will give you details and
-procedure when I receive your reply, to commence this transaction, I
-require you to immediately indicate your interest by a return reply. I
-will be waiting for your response in a timely manner.
-
-Contact  Email: zahirikeen@gmail.com
-Best Regard,
-Mr Zahiri Keen.
+Best Regards,
+Michel Duku.
