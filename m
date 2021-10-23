@@ -2,45 +2,45 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8C91A438500
-	for <lists+kvm@lfdr.de>; Sat, 23 Oct 2021 21:34:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1152143850C
+	for <lists+kvm@lfdr.de>; Sat, 23 Oct 2021 21:47:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231281AbhJWTgS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 23 Oct 2021 15:36:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39726 "EHLO
+        id S230366AbhJWTtx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 23 Oct 2021 15:49:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42688 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230142AbhJWTgR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 23 Oct 2021 15:36:17 -0400
+        with ESMTP id S229954AbhJWTtw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 23 Oct 2021 15:49:52 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB98CC061714;
-        Sat, 23 Oct 2021 12:33:58 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD28CC061714
+        for <kvm@vger.kernel.org>; Sat, 23 Oct 2021 12:47:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=MIME-Version:Content-Type:References:
-        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=FP1igdZubOueDpKQDfn29wr1f9ZoyROfQDGc2rVNauI=; b=pSYV34nno6suvgJobPKKHSNe0C
-        madJmN3aPHj6/lPW2Y7CoNOCboxPiPQCHBnygC0RaBzsyJ+UvflcrW0DWGnZ+Uw7WAwG36gOSNGu6
-        n4qXGS/D85IfIoMFx7qOcoRfa4tLLLnmHn067fHh1SX5My4N0rt16NqKeLH5sxiRDATNSTj+I4Mfz
-        EwpBriYMGzqK9eRHn2lqCHSByVrbzqhOX1vi8oCFIIvuUYnBkQWEshIrZ9pspWMk5rGr/JpU+/2+7
-        71+kZ/DcdXFTQCoJzCaFlT3IJqSb5yRndctqVKgG/SXlqwDrk3weOg66s6NK/2ZH/dpHWkcSH2A6x
-        He2sVIhA==;
-Received: from [2001:8b0:10b:1::3ae] (helo=u3832b3a9db3152.infradead.org)
+        d=infradead.org; s=bombadil.20210309; h=MIME-Version:Content-Type:Date:Cc:To:
+        From:Subject:Message-ID:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=ov1LnP55HkFWTthLAgmSfhwyHChVa74iv3PmdogRSz4=; b=HtJ1b3SDmq3tCz1PGlgX86Mx3u
+        RaUfCSWWyuMSfqp7KsFQBQCLBCNMKrIE+70Gz97AySQIxtrWQwZmTyLqhqGOnDNAk+pZb9DyfCcY0
+        WT+UY+E8DWjFYll5raGLHP9UbZj3nBt2WuesQdPst069uzQ8NDOalRER1PP57ya59OgdXknPjeIzA
+        WfU84mDNJBxNuRAeTR9DiWqLCKAw3i1OicmBgro/Z1BcdCwZu+GGsM3/tWaJaN0o8EhZHJ+NfZSXM
+        wY3tajHEVmH4LVAwGEOPOSfv2yhX91FfAiE58pMDd5QJ+KQ3KwOViib9kFJpJzj3QeCY0t6Jn1KsA
+        z4h45tzg==;
+Received: from [2001:8b0:10b:1::3ae] (helo=u3832b3a9db3152.ant.amazon.com)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1meMmC-00DBGr-KE; Sat, 23 Oct 2021 19:33:57 +0000
-Message-ID: <a836f7c1235079f666321e194fe6a6dcc894b197.camel@infradead.org>
-Subject: Re: [EXTERNAL] [PATCH 2/2] KVM: x86: disable interrupts while
- pvclock_gtod_sync_lock is taken
+        id 1meMzC-00DCIO-QN; Sat, 23 Oct 2021 19:47:23 +0000
+Message-ID: <168bf8c689561da904e48e2ff5ae4713eaef9e2d.camel@infradead.org>
+Subject: [PATCH] KVM: x86/xen: Fix kvm_xen_has_interrupt() sleeping in
+ kvm_vcpu_block()
 From:   David Woodhouse <dwmw2@infradead.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     mtosatti@redhat.com, vkuznets@redhat.com,
-        syzbot+b282b65c2c68492df769@syzkaller.appspotmail.com
-Date:   Sat, 23 Oct 2021 20:33:53 +0100
-In-Reply-To: <20210330165958.3094759-3-pbonzini@redhat.com>
-References: <20210330165958.3094759-1-pbonzini@redhat.com>
-         <20210330165958.3094759-3-pbonzini@redhat.com>
+To:     kvm <kvm@vger.kernel.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        JoergRoedel <joro@8bytes.org>, mtosatti <mtosatti@redhat.com>
+Date:   Sat, 23 Oct 2021 20:47:19 +0100
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-v+ZcfzCvQ+a1ciKLO7t6"
+        boundary="=-eiJdveazeHgHDsOQdl3f"
 User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
@@ -49,94 +49,92 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-v+ZcfzCvQ+a1ciKLO7t6
+--=-eiJdveazeHgHDsOQdl3f
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, 2021-03-30 at 12:59 -0400, Paolo Bonzini wrote:
-> pvclock_gtod_sync_lock can be taken with interrupts disabled if the
-> preempt notifier calls get_kvmclock_ns to update the Xen
-> runstate information:
->=20
->    spin_lock include/linux/spinlock.h:354 [inline]
->    get_kvmclock_ns+0x25/0x390 arch/x86/kvm/x86.c:2587
->    kvm_xen_update_runstate+0x3d/0x2c0 arch/x86/kvm/xen.c:69
->    kvm_xen_update_runstate_guest+0x74/0x320 arch/x86/kvm/xen.c:100
->    kvm_xen_runstate_set_preempted arch/x86/kvm/xen.h:96 [inline]
->    kvm_arch_vcpu_put+0x2d8/0x5a0 arch/x86/kvm/x86.c:4062
->=20
-> So change the users of the spinlock to spin_lock_irqsave and
-> spin_unlock_irqrestore.
+From: David Woodhouse <dwmw@amazon.co.uk>
 
-Apologies, I didn't spot this at the time. Looks sane enough (if we
-ignore the elephant in the room that kvm_xen_update_runstate_guest() is
-also writing to userspace with interrupts disabled on this preempted
-code path, but I have a fix for that in the works=C2=B9).
+In kvm_vcpu_block, the current task is set to TASK_INTERRUPTIBLE before
+making a final check whether the vCPU should be woken from HLT by any
+incoming interrupt.
 
-However, in 5.15-rc5 I'm still seeing the warning below when I run
-xen_shinfo_test. I confess I'm not entirely sure what it's telling me.
+This is a problem for the get_user() in __kvm_xen_has_interrupt(), which
+really shouldn't be sleeping when the task state has already been set.
+I think it's actually harmless as it would just manifest itself as a
+spurious wakeup, but it's causing a debug warning:
+
+[  230.963649] do not call blocking ops when !TASK_RUNNING; state=3D1 set a=
+t [<00000000b6bcdbc9>] prepare_to_swait_exclusive+0x30/0x80
+
+Fix the warning by turning it into an *explicit* spurious wakeup. When
+invoked with !task_is_running(current) (and we might as well add
+in_atomic() there while we're at it), just return 1 to indicate that
+an IRQ is pending, which will cause a wakeup and then something will
+call it again in a context that *can* sleep so it can fault the page
+back in.
+
+Cc: stable@vger.kernel.org
+Fixes: 40da8ccd724f ("KVM: x86/xen: Add event channel interrupt vector upca=
+ll")
+Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+
+---
+ arch/x86/kvm/xen.c | 27 ++++++++++++++++++++++-----
+ 1 file changed, 22 insertions(+), 5 deletions(-)
+
+diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+index 9ea9c3dabe37..8f62baebd028 100644
+--- a/arch/x86/kvm/xen.c
++++ b/arch/x86/kvm/xen.c
+@@ -190,6 +190,7 @@ void kvm_xen_update_runstate_guest(struct kvm_vcpu *v, =
+int state)
+=20
+ int __kvm_xen_has_interrupt(struct kvm_vcpu *v)
+ {
++	int err;
+ 	u8 rc =3D 0;
+=20
+ 	/*
+@@ -216,13 +217,29 @@ int __kvm_xen_has_interrupt(struct kvm_vcpu *v)
+ 	if (likely(slots->generation =3D=3D ghc->generation &&
+ 		   !kvm_is_error_hva(ghc->hva) && ghc->memslot)) {
+ 		/* Fast path */
+-		__get_user(rc, (u8 __user *)ghc->hva + offset);
+-	} else {
+-		/* Slow path */
+-		kvm_read_guest_offset_cached(v->kvm, ghc, &rc, offset,
+-					     sizeof(rc));
++		pagefault_disable();
++		err =3D __get_user(rc, (u8 __user *)ghc->hva + offset);
++		pagefault_enable();
++		if (!err)
++			return rc;
+ 	}
+=20
++	/* Slow path */
++
++	/*
++	 * This function gets called from kvm_vcpu_block() after setting the
++	 * task to TASK_INTERRUPTIBLE, to see if it needs to wake immediately
++	 * from a HLT. So we really mustn't sleep. If the page ended up absent
++	 * at that point, just return 1 in order to trigger an immediate wake,
++	 * and we'll end up getting called again from a context where we *can*
++	 * fault in the page and wait for it.
++	 */
++	if (in_atomic() || !task_is_running(current))
++		return 1;
++
++	kvm_read_guest_offset_cached(v->kvm, ghc, &rc, offset,
++				     sizeof(rc));
++
+ 	return rc;
+ }
+=20
 
 
-[   89.138354] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D
-[   89.138356] [ BUG: Invalid wait context ]
-[   89.138358] 5.15.0-rc5+ #834 Tainted: G S        I E   =20
-[   89.138360] -----------------------------
-[   89.138361] xen_shinfo_test/2575 is trying to lock:
-[   89.138363] ffffa34a0364efd8 (&kvm->arch.pvclock_gtod_sync_lock){....}-{=
-3:3}, at: get_kvmclock_ns+0x1f/0x130 [kvm]
-[   89.138442] other info that might help us debug this:
-[   89.138444] context-{5:5}
-[   89.138445] 4 locks held by xen_shinfo_test/2575:
-[   89.138447]  #0: ffff972bdc3b8108 (&vcpu->mutex){+.+.}-{4:4}, at: kvm_vc=
-pu_ioctl+0x77/0x6f0 [kvm]
-[   89.138483]  #1: ffffa34a03662e90 (&kvm->srcu){....}-{0:0}, at: kvm_arch=
-_vcpu_ioctl_run+0xdc/0x8b0 [kvm]
-[   89.138526]  #2: ffff97331fdbac98 (&rq->__lock){-.-.}-{2:2}, at: __sched=
-ule+0xff/0xbd0
-[   89.138534]  #3: ffffa34a03662e90 (&kvm->srcu){....}-{0:0}, at: kvm_arch=
-_vcpu_put+0x26/0x170 [kvm]
-[   89.138576] stack backtrace:
-[   89.138577] CPU: 27 PID: 2575 Comm: xen_shinfo_test Tainted: G S        =
-I E     5.15.0-rc5+ #834
-[   89.138580] Hardware name: Intel Corporation S2600CW/S2600CW, BIOS SE5C6=
-10.86B.01.01.0008.021120151325 02/11/2015
-[   89.138582] Call Trace:
-[   89.138585]  dump_stack_lvl+0x6a/0x9a
-[   89.138592]  __lock_acquire.cold+0x2ac/0x2d5
-[   89.138597]  ? __lock_acquire+0x578/0x1f80
-[   89.138604]  lock_acquire+0xc0/0x2d0
-[   89.138608]  ? get_kvmclock_ns+0x1f/0x130 [kvm]
-[   89.138648]  ? find_held_lock+0x2b/0x80
-[   89.138653]  _raw_spin_lock_irqsave+0x48/0x60
-[   89.138656]  ? get_kvmclock_ns+0x1f/0x130 [kvm]
-[   89.138695]  get_kvmclock_ns+0x1f/0x130 [kvm]
-[   89.138734]  kvm_xen_update_runstate+0x14/0x90 [kvm]
-[   89.138783]  kvm_xen_update_runstate_guest+0x15/0xd0 [kvm]
-[   89.138830]  kvm_arch_vcpu_put+0xe6/0x170 [kvm]
-[   89.138870]  kvm_sched_out+0x2f/0x40 [kvm]
-[   89.138900]  __schedule+0x5de/0xbd0
-[   89.138904]  ? kvm_mmu_topup_memory_cache+0x21/0x70 [kvm]
-[   89.138937]  __cond_resched+0x34/0x50
-[   89.138941]  kmem_cache_alloc+0x228/0x2e0
-[   89.138946]  kvm_mmu_topup_memory_cache+0x21/0x70 [kvm]
-[   89.138979]  mmu_topup_memory_caches+0x1d/0x70 [kvm]
-[   89.139024]  kvm_mmu_load+0x2d/0x750 [kvm]
-[   89.139070]  ? kvm_cpu_has_extint+0x15/0x90 [kvm]
-[   89.139113]  ? kvm_cpu_has_injectable_intr+0xe/0x50 [kvm]
-[   89.139155]  vcpu_enter_guest+0xc77/0x1210 [kvm]
-[   89.139195]  ? kvm_arch_vcpu_ioctl_run+0x146/0x8b0 [kvm]
-[   89.139235]  kvm_arch_vcpu_ioctl_run+0x146/0x8b0 [kvm]
-[   89.139274]  kvm_vcpu_ioctl+0x279/0x6f0 [kvm]
-[   89.139306]  ? find_held_lock+0x2b/0x80
-[   89.139312]  __x64_sys_ioctl+0x83/0xb0
-[   89.139316]  do_syscall_64+0x3b/0x90
-[   89.139320]  entry_SYSCALL_64_after_hwframe+0x44/0xae
 
-=C2=B9 https://git.infradead.org/users/dwmw2/linux.git/commitdiff/ec22c0825=
-8
-
---=-v+ZcfzCvQ+a1ciKLO7t6
+--=-eiJdveazeHgHDsOQdl3f
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -219,20 +217,20 @@ BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
 BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
 ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA4rtJSHkq7AnpxKUY8ZlYZjANBglghkgB
 ZQMEAgEFAKCCAe0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjEx
-MDIzMTkzMzUzWjAvBgkqhkiG9w0BCQQxIgQgpHxXM/FqEHG4vbhUuW//tlxofd/kFy+yyxRdkwwF
-LbQwgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
+MDIzMTk0NzE5WjAvBgkqhkiG9w0BCQQxIgQg3QC1NU2RT4uX832LhJ5mYYkgmwZWuvyxr7hPeROE
+htowgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
 TWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQx
 PTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
 aWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMIHABgsqhkiG9w0BCRACCzGBsKCBrTCBlzELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
 A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
 bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMA0GCSqGSIb3
-DQEBAQUABIIBAFtzCLY2kD1OMwrwCawY6jQ4vbt9dZt5CTmD5roSM8Z+Cw6KtTEhkD1FQsD9dj3F
-hm4YTLwtOEneBYtg6s39rUjfmKUaWvhrocl40llNr0jvKCRdzi4YdOoZ5B7Wrfl7ddoFdP0PWVbg
-90QuzcvX+1evSSB9mXyf2qgYYYUNy8GPq9ZFIx0foRLWUYKyL/lBHjtlJKHSd4uep8CUO1TvfFKs
-NmFkNv5RCzFdt5r/StO1luj0m2o5jNt/p2Td58jLbVVKuqMN3zVNQF1Yk/cNkDQOUJSNSCBFVJY9
-9yEoklvPnE1AmXtHwNe/kgXrAFQ+m8hNVBlJOuNlw8Z9E/CvniAAAAAAAAA=
+DQEBAQUABIIBAFYlELb2Z/1MNbvvgh0jaXvjx2gK21gU4rWB5IBO+N2KNtIRAvTcjlcCjRRIchN6
+9tkW18daoZ8oyRh1oXXrdlUvbabkCTtxZTabsp0rc2B5AwAwYjbBTyvcuOxCzfq/EcD3breMWJCx
+pnJzr6NadcGneyXzUsc4Kps8rhgXUYLgTUH6V6f4loB+VkdZFp5OxOEME+w9oDJbyod/lTmkPvXI
+tD0o/rANd2mjP+9pod5I+ZNs2RjKDbBrPq6LxEokccyTpDtA8hx5S9xgGPzhHztot9O8HnOtlAh0
+4zB+SscfPNTeBv2Rx34PM+lLpkpQRLU0q4vlE+TEoy2VPdoK5FcAAAAAAAA=
 
 
---=-v+ZcfzCvQ+a1ciKLO7t6--
+--=-eiJdveazeHgHDsOQdl3f--
 
