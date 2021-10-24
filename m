@@ -2,23 +2,23 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5676943874D
-	for <lists+kvm@lfdr.de>; Sun, 24 Oct 2021 10:19:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EE32643877A
+	for <lists+kvm@lfdr.de>; Sun, 24 Oct 2021 10:31:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231151AbhJXIO4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 24 Oct 2021 04:14:56 -0400
-Received: from mail-dm6nam10on2083.outbound.protection.outlook.com ([40.107.93.83]:39609
+        id S229886AbhJXIeA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 24 Oct 2021 04:34:00 -0400
+Received: from mail-dm6nam10on2079.outbound.protection.outlook.com ([40.107.93.79]:29536
         "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S229527AbhJXIOz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 24 Oct 2021 04:14:55 -0400
+        id S229638AbhJXId7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 24 Oct 2021 04:33:59 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=I8DDuIK1MraAse835ItGqr50FRrBkwYt9qs4kCE9dUhhVIgZvZABaRVJS9eXcD0Yo2h2XMeHqFs8apLUNNndB81f8I3BWfS0Wk3dEC5eJUvG4iukuDOa9sI1Hj+hEfaA/oEJo4cleG59NWCGPsEuauoCQ3uZGZQCpJvKaw/jxmBgOyEMQNt6UxerXHLVxsjFVWF/fdC+37e9/N4ZJD38N4iLC3mG+ANFIEjnsHUbXGjZfQN1cDCPZ05x59qevHXUh9uAKwZaQtxcWYSQDW6RtFY9IaDXT+p+i7easSPHzTM7uWaX/5I7pcs53EqaaURwNAO5MFOOe2ueMYDow2+8AQ==
+ b=QDjneWzs5u8f9N6qYEclibHh29X4vNOMncV8L18xhgDN2X9MWHlBParLvn+EbjZkYgqQu764C5lYtUpntTWQJRwuUzykwv+ukB6XvJedAmc52QQIZhFNbB1JzFwTCat95fZVPpA/LZ/nDEoThI6XPnhxqGUqNRjPYhC4K0Nh98hSFDwj7L6VOmWnUek/RXRVMMv/7hp0XpE7zJf5OxKohbUxzdTwYL9n6se89DrfOuaZPpNIg3oBt8A6E5bCe+JMGXAyQgFl2ioZo+/O1CRM4dl5DFlDu2jRPOtvyE9ZKM1wHBAsIeVfZrz8OWSRwASwob8AyO3xLW7sf/psmdmlsA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=uqt4nRThpsSXcj1pMLd3LXMv6JlccUAW8kEKf0FydYA=;
- b=d6bGImUZu5eg+WMl37Ect78mldK2zfauOSv+RJnHLniQ9YaaX7P50Fz4vNX+NmJr8gvR1K93wUiLCvGjOmkUo+VuyO1deSolQQUhr1QobuGmxqnJHXn8fp+QqMVTzQGAktdMatbqktABPk7bwZlN+9cqGtULej8Nx417OfKDR4WMuKXamRavCLvBP3P9Gh3Z0rUTWaUl3FYHiTvM02y29x4+pSmigtfV2tFUHKoRVRGwPxFg+1dqLlS69WPuh9XKxIAPUOQEdtxXaq+QacTc7FkLOAXoTYi77zkYWulyl6q/TNnGxHXMnF4InKQr3wW8/TuGfn1DEbg2g7sn6PGYSQ==
+ bh=y769OZ8LD/y216NOT+Iab2kGIgBuUiZo/YG+13mjcDQ=;
+ b=Jod9UFDDd5B6F4ZJvIeNUSUx+T5cnAV1mDd+OKq0aQofqN8Ig5d6lLfxfwNbTTH/ZLn8sn74ZQAvrugBR+hSVI3p6ZU1lXq4DGFtaQAXqbUQvCRqQgLdtoX96gmSoiNVx7PdNWJsQQaYThIQ3CYhdTckD7CwOagdWBPcOG0iqCsZripA8SdaIEi7OztYE0BcuM9GbbzeZPKXqLJQM1WLXHn9Nbn/P3k/BhcvJbiLPvTyu/04W8VbUKYrFi6B5UPaZSJhlY7ep2SibTO63nIEh2iLNpcs1HXon29h3tuapYzHPxc8XTl/ZQK5jCwUZQ03c3THqrtx6uE1p8uxy0meEw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  216.228.112.34) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
@@ -26,18 +26,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uqt4nRThpsSXcj1pMLd3LXMv6JlccUAW8kEKf0FydYA=;
- b=RlXwebrwMzlrTr7m0dnemPGOeV/4zT+3j/hRTRBLiFsNwRL4gWAzBWgjIrMvleHtKub55dzXO/9B4AI1ogHIPWkToRCSJERldfcn9Sgbua0xKL14Xf4uc2DrO1zw0QKGVj1J8pYp2XvpaOKQCaVeZz9ljp0yEWIrcbKhstH8vzAl91KcEeXxirMGeURVrTe2tdWOUeTQKbMhBQku/yFSyCWu99RASr5qz6NE04JU9CjgPgej/mURk4H/zaQ4RAaBxYl8M2KNBVEes2ZDwsaKVT90XJ7anIuM4RHqFs7gu7ZbMpMjRU59zD1NMjNQtb4zLQUvhvSrwoApoNv4iuAIyQ==
-Received: from BN6PR13CA0015.namprd13.prod.outlook.com (2603:10b6:404:10a::25)
- by DM6PR12MB4434.namprd12.prod.outlook.com (2603:10b6:5:2ad::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4628.16; Sun, 24 Oct
- 2021 08:12:34 +0000
-Received: from BN8NAM11FT049.eop-nam11.prod.protection.outlook.com
- (2603:10b6:404:10a:cafe::b3) by BN6PR13CA0015.outlook.office365.com
- (2603:10b6:404:10a::25) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4649.11 via Frontend
- Transport; Sun, 24 Oct 2021 08:12:34 +0000
+ bh=y769OZ8LD/y216NOT+Iab2kGIgBuUiZo/YG+13mjcDQ=;
+ b=m2CpoqzV/MrVx12SDPSEMjFteMNGD5sjBgJmfLFngHAgC9bMuVfvlOlHTOlek7XprzIIXFDBElPwD9ACz2Be5jVO7deFqWD9sCm2xZ1+9YpUvYtOPp0tunjn1y35uR3Gel1E7p/+J8qTHtsJ1SIyKyNfJduRG3B2H0Zy40XikJU46bENnrGNHGT2JAcFhDEsY7Qthnuyt+IysIDySwo+kZr+9UIiifd2pGtjLpVcook7sdj6iH3t83XPcbpAHwGmZPEzpXw7btXYqFn5VweiYBytTbncMVXOurzqCrepyKtUKmeQWbeMgYBtL98UB0Ozvf4LtaSjceNe90EjS0eRYQ==
+Received: from BN6PR1101CA0013.namprd11.prod.outlook.com
+ (2603:10b6:405:4a::23) by MW3PR12MB4393.namprd12.prod.outlook.com
+ (2603:10b6:303:2c::22) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4628.18; Sun, 24 Oct
+ 2021 08:31:35 +0000
+Received: from BN8NAM11FT011.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:405:4a:cafe::53) by BN6PR1101CA0013.outlook.office365.com
+ (2603:10b6:405:4a::23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4628.16 via Frontend
+ Transport; Sun, 24 Oct 2021 08:31:34 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.34)
  smtp.mailfrom=nvidia.com; redhat.com; dkim=none (message not signed)
  header.d=none;redhat.com; dmarc=pass action=none header.from=nvidia.com;
@@ -45,142 +45,212 @@ Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
  216.228.112.34 as permitted sender) receiver=protection.outlook.com;
  client-ip=216.228.112.34; helo=mail.nvidia.com;
 Received: from mail.nvidia.com (216.228.112.34) by
- BN8NAM11FT049.mail.protection.outlook.com (10.13.177.157) with Microsoft SMTP
+ BN8NAM11FT011.mail.protection.outlook.com (10.13.176.140) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.4628.16 via Frontend Transport; Sun, 24 Oct 2021 08:12:33 +0000
-Received: from [172.27.13.118] (172.20.187.6) by HQMAIL107.nvidia.com
+ 15.20.4628.16 via Frontend Transport; Sun, 24 Oct 2021 08:31:34 +0000
+Received: from HQMAIL105.nvidia.com (172.20.187.12) by HQMAIL107.nvidia.com
  (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.18; Sun, 24 Oct
- 2021 08:12:29 +0000
-Message-ID: <93c7838d-d942-010e-e1b2-bc052365f5b1@nvidia.com>
-Date:   Sun, 24 Oct 2021 11:12:26 +0300
+ 2021 08:31:33 +0000
+Received: from HQMAIL109.nvidia.com (172.20.187.15) by HQMAIL105.nvidia.com
+ (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1497.18; Sun, 24 Oct
+ 2021 08:31:33 +0000
+Received: from vdi.nvidia.com (172.20.187.6) by mail.nvidia.com
+ (172.20.187.15) with Microsoft SMTP Server id 15.0.1497.18 via Frontend
+ Transport; Sun, 24 Oct 2021 01:31:30 -0700
+From:   Yishai Hadas <yishaih@nvidia.com>
+To:     <alex.williamson@redhat.com>, <bhelgaas@google.com>,
+        <jgg@nvidia.com>, <saeedm@nvidia.com>
+CC:     <linux-pci@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <kuba@kernel.org>, <leonro@nvidia.com>,
+        <kwankhede@nvidia.com>, <mgurtovoy@nvidia.com>,
+        <yishaih@nvidia.com>, <maorg@nvidia.com>
+Subject: [PATCH V3 mlx5-next 00/13] Add mlx5 live migration driver
+Date:   Sun, 24 Oct 2021 11:30:06 +0300
+Message-ID: <20211024083019.232813-1-yishaih@nvidia.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [PATCH v3 1/1] virtio-blk: add num_request_queues module
- parameter
-Content-Language: en-US
-From:   Max Gurtovoy <mgurtovoy@nvidia.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-CC:     <hch@infradead.org>, <virtualization@lists.linux-foundation.org>,
-        <kvm@vger.kernel.org>, <stefanha@redhat.com>, <israelr@nvidia.com>,
-        <nitzanc@nvidia.com>, <oren@nvidia.com>,
-        <linux-block@vger.kernel.org>, <axboe@kernel.dk>
-References: <20210902204622.54354-1-mgurtovoy@nvidia.com>
- <20211022052950-mutt-send-email-mst@kernel.org>
- <19cbe00a-409c-fd4b-4466-6b9fe650229f@nvidia.com>
-In-Reply-To: <19cbe00a-409c-fd4b-4466-6b9fe650229f@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [172.20.187.6]
-X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
- HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: ebba4ada-4f5a-4364-c76f-08d996c60857
-X-MS-TrafficTypeDiagnostic: DM6PR12MB4434:
-X-Microsoft-Antispam-PRVS: <DM6PR12MB4434D441FFEA329E4E9F153CDE829@DM6PR12MB4434.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:6790;
+X-MS-Office365-Filtering-Correlation-Id: d9e4c036-f340-465a-96f7-08d996c8b070
+X-MS-TrafficTypeDiagnostic: MW3PR12MB4393:
+X-Microsoft-Antispam-PRVS: <MW3PR12MB4393B1E6CD5B1B47FBB8A673C3829@MW3PR12MB4393.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: oqVtpWA37mI1eT6YhnH1BDS8fl3qG/tSAE21uzCEnK5kt2trm+cvDVj8jxsuCkO1q5oplzh1fC5dmdH2c61Zf5FkBL2tha7iOo9OpI5+AWFDGmpapjpAuePV+pNtVCYxV4W/mOYFk/h/Pe6KHGw1jUth9LG+BWzmraBqN/m8It3MaCChvrbcej98un9H08M3gZIPsRm4ylJSBG0H73en4uHSmS1iDSwbOILmECTrBNxtBBn9OFte3BDrMJGFhByk809SoaV2JI4uiuH5vhxX7Oxqf6ctmpfo8iQ8xKTXVjQkTBayt0ZarQb8LFogwXAiz8bKL9/ZqPXyd7RNf+tu3oxtd5ba+4EdO/TZSCUTET7cuLQFBrNb4qJ9Lioz4yuiR4cjz8X8zwxPb7vCP3t+fxTDjrkABlIdT4oj2tMU0hocDOkW8cHfOV4fnCjq5B160emDRE9vvdXd+CTPKlwga0QqrlMMN0MC+Ng5b5xLz1QhK8hXobUsOw5sjHm86oiPG4MF0+3aVTPMwkZ2a8VGYraV8W/AE7v8HFAI+KkXaySkZ9pY8VON4/OK32ay9YEZI5H4/d8nZJe/+KZ3aIlkKtnog6MyvJAHsgaIBKOlv+p9uR9JtSYi1FhM4GlHAvnxZtXZcmvGGdlruIdMvgvmi+3lz/GhJZ+UM33xLs+TRa+gjz1S0uv9RyfyUHVD3e318nQRNZyhHM4bBowMw/drHKmnss4erOvvoQm3kFBLua4=
-X-Forefront-Antispam-Report: CIP:216.228.112.34;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid03.nvidia.com;CAT:NONE;SFS:(4636009)(46966006)(36840700001)(508600001)(82310400003)(6916009)(26005)(47076005)(16576012)(356005)(31686004)(186003)(7636003)(36756003)(31696002)(83380400001)(86362001)(8936002)(426003)(5660300002)(54906003)(8676002)(6666004)(70206006)(53546011)(2906002)(16526019)(336012)(316002)(70586007)(2616005)(36860700001)(4326008)(43740500002);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: 9R4Tg3BapM2WzA2l4JtxgndUuWSGwLfQlbiGnUhTmBIzYByU8Lqflk2Bi9ptRtbpsVvsayV2Tb4ZLg156nuteYZezvpYt7tLjfckWo/TCPy0Jb9zmzPXn4PbC7/bsYreErwaJU07b3tQCiXb6S1VHPfmBEjamXACaLGDa/qDQRWivI7bHcws1CGyI4Ux3fg8YkjoSzdMyCl1oADKaxP7o5c6DMvru6v+guq7kQqe9KhlZzOrGr/JqNL9mAItZn9oWIJfhjnC0rKHnlguyhib9hFKDA+g/qj6tgazrDXQx0zIm4DBaByQLbbEkjOZR/IyG9SykUxRQDIjE2vXUf+YMpm7GIZJ+nuZoQfVjYcRB1SzyooENE2c8SpgKmbIKeAURd60870bMDsTr+lqL4/Cj8NNsc3jip5jdpWhFWEDG2VUupV3ipLD6BTgg/FHLo8yyDh9Pmde/ECd4nZqpXpJwP7Mmedz+ccHSlJN8bH0w6p367rLXMesws+3egxqwA68NNlnKF32dUrnYFT+R+e3kbTurUbK7VwgQvnmOO9U/18jodlQ7ItWqjbtyfz4zVozpg0lgjjfQQLN0G9TkZuxGIVYjxMkpJHCIdPBc1cDLbryVPIQaGqyVXhvbCtOF37/VqleHEtYc8EMyLK+UessetoU94di0dI0J+KdLlDtlojK+/vtP3h08oWFnZNVklOuVzIAUM8mFcmKik6/4hw9rg==
+X-Forefront-Antispam-Report: CIP:216.228.112.34;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid03.nvidia.com;CAT:NONE;SFS:(4636009)(36840700001)(46966006)(356005)(5660300002)(83380400001)(8936002)(186003)(70206006)(70586007)(36906005)(8676002)(316002)(336012)(4326008)(508600001)(7636003)(2906002)(54906003)(110136005)(107886003)(426003)(6666004)(36756003)(86362001)(82310400003)(36860700001)(2616005)(1076003)(7696005)(26005)(6636002)(47076005);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Oct 2021 08:12:33.4658
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Oct 2021 08:31:34.5661
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: ebba4ada-4f5a-4364-c76f-08d996c60857
+X-MS-Exchange-CrossTenant-Network-Message-Id: d9e4c036-f340-465a-96f7-08d996c8b070
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.34];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT049.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT011.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4434
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR12MB4393
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+This series adds mlx5 live migration driver for VFs that are migrated
+capable.
 
-On 10/24/2021 10:19 AM, Max Gurtovoy wrote:
->
-> On 10/22/2021 12:30 PM, Michael S. Tsirkin wrote:
->> On Thu, Sep 02, 2021 at 11:46:22PM +0300, Max Gurtovoy wrote:
->>> Sometimes a user would like to control the amount of request queues to
->>> be created for a block device. For example, for limiting the memory
->>> footprint of virtio-blk devices.
->>>
->>> Reviewed-by: Christoph Hellwig <hch@lst.de>
->>> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
->>> Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
->>> ---
->>>
->>> changes from v2:
->>>   - renamed num_io_queues to num_request_queues (from Stefan)
->>>   - added Reviewed-by signatures (from Stefan and Christoph)
->>>
->>> changes from v1:
->>>   - use param_set_uint_minmax (from Christoph)
->>>   - added "Should > 0" to module description
->>>
->>> Note: This commit apply on top of Jens's branch for-5.15/drivers
->>>
->>> ---
->>>   drivers/block/virtio_blk.c | 21 ++++++++++++++++++++-
->>>   1 file changed, 20 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
->>> index 4b49df2dfd23..aaa2833a4734 100644
->>> --- a/drivers/block/virtio_blk.c
->>> +++ b/drivers/block/virtio_blk.c
->>> @@ -24,6 +24,23 @@
->>>   /* The maximum number of sg elements that fit into a virtqueue */
->>>   #define VIRTIO_BLK_MAX_SG_ELEMS 32768
->>>   +static int virtblk_queue_count_set(const char *val,
->>> +        const struct kernel_param *kp)
->>> +{
->>> +    return param_set_uint_minmax(val, kp, 1, nr_cpu_ids);
->>> +}
->>> +
+It uses vfio_pci_core to register to the VFIO subsystem and then
+implements the mlx5 specific logic in the migration area.
 
-BTW, I've noticed in your new message you allow setting 0 so you might 
-want to change the code to
+The migration implementation follows the definition from uapi/vfio.h and
+uses the mlx5 VF->PF command channel to achieve it.
 
-param_set_uint_minmax(val, kp, 0, nr_cpu_ids);
+As part of the migration process the VF doesn't ride on mlx5_core, the
+device is driving *two* different PCI devices, the PF owned by mlx5_core
+and the VF owned by the mlx5 vfio driver.
 
-to a case a user will load the module with num_request_queues=0.
+The mlx5_core of the PF is accessed only during the narrow window of the
+VF's ioctl that requires its services.
 
->>> +static const struct kernel_param_ops queue_count_ops = {
->>> +    .set = virtblk_queue_count_set,
->>> +    .get = param_get_uint,
->>> +};
->>> +
->>> +static unsigned int num_request_queues;
->>> +module_param_cb(num_request_queues, &queue_count_ops, 
->>> &num_request_queues,
->>> +        0644);
->>> +MODULE_PARM_DESC(num_request_queues,
->>> +         "Number of request queues to use for blk device. Should > 
->>> 0");
->>> +
->>>   static int major;
->>>   static DEFINE_IDA(vd_index_ida);
->> I wasn't happy with the message here so I tweaked it.
->>
->> Please look at it in linux-next and confirm. Thanks!
->
-> Looks good.
->
->
->>
->>
->>> @@ -501,7 +518,9 @@ static int init_vq(struct virtio_blk *vblk)
->>>       if (err)
->>>           num_vqs = 1;
->>>   -    num_vqs = min_t(unsigned int, nr_cpu_ids, num_vqs);
->>> +    num_vqs = min_t(unsigned int,
->>> +            min_not_zero(num_request_queues, nr_cpu_ids),
->>> +            num_vqs);
->>>         vblk->vqs = kmalloc_array(num_vqs, sizeof(*vblk->vqs), 
->>> GFP_KERNEL);
->>>       if (!vblk->vqs)
->>> -- 
->>> 2.18.1
+To let that work properly a new API was added in the PCI layer (i.e.
+pci_iov_get_pf_drvdata) that lets the VF access safely to the PF
+drvdata. It was used in this series as part of mlx5_core and mlx5_vdpa
+when a VF needed that functionality.
+
+In addition, mlx5_core was aligned with other drivers to disable SRIOV
+before PF has gone as part of the remove_one() call back.
+
+This enables proper usage of the above new PCI API and prevents some
+warning message that exists today when it's not done.
+
+The series also exposes from the PCI sub system an API named
+pci_iov_vf_id() to get the index of the VF. The PCI core uses this index
+internally, often called the vf_id, during the setup of the VF, eg
+pci_iov_add_virtfn().
+
+The returned VF index is needed by the mlx5 vfio driver for its internal
+operations to configure/control its VFs as part of the migration
+process.
+
+With the above functionality in place the driver implements the
+suspend/resume flows to work over QEMU.
+
+Changes from V2:
+vfio:
+- Put and use the new macro VFIO_DEVICE_STATE_SET_ERROR as Alex asked.
+vfio/mlx5:
+- Improve/fix state checking as was asked by Alex & Jason.
+- Let things be done in a deterministic way upon 'reset_done' following
+  the suggested algorithm by Jason.
+- Align with mlx5 latest specification when calling the SAVE command.
+- Fix some typos.
+vdpa/mlx5:
+- Drop the patch from the series based on the discussion in the mailing
+  list.
+
+Changes from V1:
+PCI/IOV:
+- Add actual interface in the subject as was asked by Bjorn and add
+  his Acked-by.
+- Move to check explicitly for !dev->is_virtfn as was asked by Alex.
+vfio:
+- Come with a separate patch for fixing the non-compiled
+  VFIO_DEVICE_STATE_SET_ERROR macro.
+- Expose vfio_pci_aer_err_detected() to be set by drivers on their own
+  pci error handles.
+- Add a macro for VFIO_DEVICE_STATE_ERROR in the uapi header file as was
+  suggested by Alex.
+vfio/mlx5:
+- Improve to use xor as part of checking the 'state' change command as
+  was suggested by Alex.
+- Set state to VFIO_DEVICE_STATE_ERROR when an error occurred instead of
+  VFIO_DEVICE_STATE_INVALID.
+- Improve state checking as was suggested by Jason.
+- Use its own PCI reset_done error handler as was suggested by Jason and
+  fix the locking scheme around the state mutex to work properly.
+
+Changes from V0:
+PCI/IOV:
+- Add an API (i.e. pci_iov_get_pf_drvdata()) that allows SRVIO VF
+  drivers to reach the drvdata of a PF.
+net/mlx5:
+- Add an extra patch to disable SRIOV before PF removal.
+- Adapt to use the above PCI/IOV API as part of mlx5_vf_get_core_dev().
+- Reuse the exported PCI/IOV virtfn index function call (i.e.
+  pci_iov_vf_id().
+vfio:
+- Add support in the pci_core to let a driver be notified when
+  'reset_done' to let it sets its internal state accordingly.
+- Add some helper stuff for 'invalid' state handling.
+vfio/mlx5:
+- Move to use the 'command mode' instead of the 'state machine'
+  scheme as was discussed in the mailing list.
+-Handle the RESET scenario when called by vfio_pci_core to sets
+ its internal state accordingly.
+- Set initial state as RUNNING.
+- Put the driver files as sub-folder under drivers/vfio/pci named mlx5
+  and update the MAINTAINER file as was asked.
+vdpa/mlx5:
+Add a new patch to use mlx5_vf_get_core_dev() to get the PF device.
+
+---------------------------------------------------------------
+Alex,
+
+This series touches our ethernet and RDMA drivers, so we will need to
+route the patches through separate shared branch (mlx5-next) in order to
+eliminate the chances of merge conflicts between different subsystems.
+
+Are you fine with taking this V3 series through mlx5-next and we'll send
+a PR to you to include ?
+
+Thanks,
+Yishai
+
+Jason Gunthorpe (2):
+  PCI/IOV: Add pci_iov_vf_id() to get VF index
+  PCI/IOV: Add pci_iov_get_pf_drvdata() to allow VF reaching the drvdata
+    of a PF
+
+Leon Romanovsky (1):
+  net/mlx5: Reuse exported virtfn index function call
+
+Yishai Hadas (10):
+  net/mlx5: Disable SRIOV before PF removal
+  net/mlx5: Expose APIs to get/put the mlx5 core device
+  vfio: Fix VFIO_DEVICE_STATE_SET_ERROR macro
+  vfio: Add a macro for VFIO_DEVICE_STATE_ERROR
+  vfio/pci_core: Make the region->release() function optional
+  net/mlx5: Introduce migration bits and structures
+  vfio/mlx5: Expose migration commands over mlx5 device
+  vfio/mlx5: Implement vfio_pci driver for mlx5 devices
+  vfio/pci: Expose vfio_pci_aer_err_detected()
+  vfio/mlx5: Use its own PCI reset_done error handler
+
+ MAINTAINERS                                   |   6 +
+ .../net/ethernet/mellanox/mlx5/core/main.c    |  44 ++
+ .../ethernet/mellanox/mlx5/core/mlx5_core.h   |   1 +
+ .../net/ethernet/mellanox/mlx5/core/sriov.c   |  17 +-
+ drivers/pci/iov.c                             |  43 +
+ drivers/vfio/pci/Kconfig                      |   3 +
+ drivers/vfio/pci/Makefile                     |   2 +
+ drivers/vfio/pci/mlx5/Kconfig                 |  10 +
+ drivers/vfio/pci/mlx5/Makefile                |   4 +
+ drivers/vfio/pci/mlx5/cmd.c                   | 354 +++++++++
+ drivers/vfio/pci/mlx5/cmd.h                   |  43 +
+ drivers/vfio/pci/mlx5/main.c                  | 746 ++++++++++++++++++
+ drivers/vfio/pci/vfio_pci_core.c              |   8 +-
+ include/linux/mlx5/driver.h                   |   3 +
+ include/linux/mlx5/mlx5_ifc.h                 | 147 +++-
+ include/linux/pci.h                           |  15 +-
+ include/linux/vfio_pci_core.h                 |   2 +
+ include/uapi/linux/vfio.h                     |   8 +-
+ 18 files changed, 1433 insertions(+), 23 deletions(-)
+ create mode 100644 drivers/vfio/pci/mlx5/Kconfig
+ create mode 100644 drivers/vfio/pci/mlx5/Makefile
+ create mode 100644 drivers/vfio/pci/mlx5/cmd.c
+ create mode 100644 drivers/vfio/pci/mlx5/cmd.h
+ create mode 100644 drivers/vfio/pci/mlx5/main.c
+
+-- 
+2.18.1
+
