@@ -2,208 +2,165 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4CA8E4387A1
-	for <lists+kvm@lfdr.de>; Sun, 24 Oct 2021 10:32:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A71264387B5
+	for <lists+kvm@lfdr.de>; Sun, 24 Oct 2021 10:48:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231994AbhJXIeq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 24 Oct 2021 04:34:46 -0400
-Received: from mail-bn8nam12on2064.outbound.protection.outlook.com ([40.107.237.64]:2241
-        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S231837AbhJXIel (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 24 Oct 2021 04:34:41 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Jbt6QkBRvvCDYkgJpYopV1OvRhZLVROVKJh5E5oau+koEFOOhLAHM0y8HEEeEeiHxANH7GAZdj2kRpJ0+L3QPvphvUtdAPGxgU0a3hbGr83WlWNeD/Ho2btYZ7aInveCGVjj+4zTDgVRK+F5MjITJscb/Z6j+Eoo2XIEAovp/AS+I34eEYz4IDm141gqgJQ2pADxIlIgvyTRYyvpUqjdiEgPRAH0VEwY9NOco+fLPlMDVaFJLnY8+F1oY1oAB8kIh8yApOtI4vyQWHN08+1ILt8riws3L+z9sCwrw4e15uEUdThtMIcAhICx06uLLIWEvsvxr8LIpFZjtHM/t9i/8Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=u3KOUx0jSz7QZczP3nf+xaTthk7sMn9JiO4/y8JK+/4=;
- b=k66Qw8zgxNP8zCYUgmJtRauBcxUamKrzYcDz5k2Gcegx394tqU+iFmuU1pUPMySzmtJv8oalTck7Q6C8Db0rlaFFC/3dM58G3EHD1xt74EhyEE6CwZ6ZHJuCVVjP/WRU9I8KpDnXCquA1Wen8wZmnSBkgSA64hzR3pXuCW3Btqr0r7nvEX4JMsg3hGFB//vyWL16sMp/o+jJXgLVb87XiGgcAvX9wA4GvvZzFTioTE2bIhppyLX7UIVEJI1vMOjdQ+yB/DbFQ1xmnLzgnV6Ew54HBfrd7VWkOMaqIsFX/3vJxRlNyurDNo1suG4KBkte3X8Muy7d50G8BgNWQN1Ajw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.112.32) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=nvidia.com; dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=u3KOUx0jSz7QZczP3nf+xaTthk7sMn9JiO4/y8JK+/4=;
- b=uMmGfyb88Lxy/GPGPdMF/WwDZjGC32p9BsOE2WnveERg2sHbz2Bb3/x8Z4A/bjMKkAGsJdr0rMXdLU/8FATRXFimgWQ6fAheTByKNkZdStK2gcCJssj7zGL96XhMsmEC7f+9bumhnjTxcH//RTnxY5BwdhmIHc1nv9J5zNxyzk0KlFqe5CepTuK0C7FmzOdUoSpj2+m5HdmFHHyr42k7imC/3jiHSFPzyqe5XXzub8dG1U0g9R2qKIPtYvF7gDw3F2MU35St6ahwC4A8BF4/4pzAhG4Q1X+c8QeCWq9izoNM6DD51tgnbjFVgSzGta2r1PMnDmR6W8dXa7FNZ/owHA==
-Received: from BN9PR03CA0274.namprd03.prod.outlook.com (2603:10b6:408:f5::9)
- by SA0PR12MB4557.namprd12.prod.outlook.com (2603:10b6:806:9d::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4628.18; Sun, 24 Oct
- 2021 08:32:19 +0000
-Received: from BN8NAM11FT052.eop-nam11.prod.protection.outlook.com
- (2603:10b6:408:f5:cafe::2a) by BN9PR03CA0274.outlook.office365.com
- (2603:10b6:408:f5::9) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4628.18 via Frontend
- Transport; Sun, 24 Oct 2021 08:32:19 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.32)
- smtp.mailfrom=nvidia.com; vger.kernel.org; dkim=none (message not signed)
- header.d=none;vger.kernel.org; dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.112.32 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.112.32; helo=mail.nvidia.com;
-Received: from mail.nvidia.com (216.228.112.32) by
- BN8NAM11FT052.mail.protection.outlook.com (10.13.177.210) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.4628.16 via Frontend Transport; Sun, 24 Oct 2021 08:32:18 +0000
-Received: from HQMAIL109.nvidia.com (172.20.187.15) by HQMAIL109.nvidia.com
- (172.20.187.15) with Microsoft SMTP Server (TLS) id 15.0.1497.18; Sun, 24 Oct
- 2021 01:32:16 -0700
-Received: from vdi.nvidia.com (172.20.187.6) by mail.nvidia.com
- (172.20.187.15) with Microsoft SMTP Server id 15.0.1497.18 via Frontend
- Transport; Sun, 24 Oct 2021 01:32:13 -0700
-From:   Yishai Hadas <yishaih@nvidia.com>
-To:     <alex.williamson@redhat.com>, <bhelgaas@google.com>,
-        <jgg@nvidia.com>, <saeedm@nvidia.com>
-CC:     <linux-pci@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <kuba@kernel.org>, <leonro@nvidia.com>,
-        <kwankhede@nvidia.com>, <mgurtovoy@nvidia.com>,
-        <yishaih@nvidia.com>, <maorg@nvidia.com>
-Subject: [PATCH V3 mlx5-next 13/13] vfio/mlx5: Use its own PCI reset_done error handler
-Date:   Sun, 24 Oct 2021 11:30:19 +0300
-Message-ID: <20211024083019.232813-14-yishaih@nvidia.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20211024083019.232813-1-yishaih@nvidia.com>
-References: <20211024083019.232813-1-yishaih@nvidia.com>
+        id S230227AbhJXIuv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 24 Oct 2021 04:50:51 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:52211 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229463AbhJXIut (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 24 Oct 2021 04:50:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1635065309;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=x+4gAu5mtq8yjhmzCHpAItde3uglak0uKi9++yZF6x4=;
+        b=NU1NhPVjznKa3hVuKbHqSxjVBaLgb/ixjh+DU5Qo2fY8HaZW+up8P2ToX7CZb+wo+f42NO
+        Vw0RILSZhiLwkBanbcwrerjZd16tCsa/D3RUsHdrj4SQs8refVfAoDI7FAXywwKe4kG8vv
+        7kL+nlY1xMxpNFk0comw84sm4WIEBfs=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-474-gPdOAiy-NJWnBgIDCotQsw-1; Sun, 24 Oct 2021 04:48:27 -0400
+X-MC-Unique: gPdOAiy-NJWnBgIDCotQsw-1
+Received: by mail-wr1-f71.google.com with SMTP id 10-20020a5d47aa000000b001610cbda93dso2101326wrb.23
+        for <kvm@vger.kernel.org>; Sun, 24 Oct 2021 01:48:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=x+4gAu5mtq8yjhmzCHpAItde3uglak0uKi9++yZF6x4=;
+        b=OAZlkY0v1f/ICavS+R15EAV9BnftQ4ytonz6WMqG1wna2QYp8O63y/kfY7kpoG8Xri
+         uBlYKO/1kN4qNdT5yvk3z5DaVrQBHum/gRU9PJIVWAKAWxVhvToZNKIPEV6ZEJilW0k4
+         2JY1iV8r/HkgAUpUMzcAEdlb646dSfVMAjefG8FD0931poY3I6OyGtXhw69iIqjor+Wo
+         qcEzDgx1b0XpkLUhpgCyy7/9aZ8M9b6oqR//qky/tKQ+LvxIIQlXi3CSgeHjcT+1jC+s
+         VTXT9idHt3/vZNt65fmqVJPygvwnnKSIxTLQC4Tvf1PcMc9mKo5YIcUJtEhCu1zqyZU+
+         8Iqw==
+X-Gm-Message-State: AOAM532qNQ0gGBUuj23Os+8eo+FCS2KJQUegIwxsd8CdoGJconabylan
+        XaC4agY+IHrkZJ5rG76xY2iROyloxJz/lEq8LahHfomPVluLtlOWupYvMtcg0UNx9QX3qX4AY/h
+        dOdKx7FjfsmHr
+X-Received: by 2002:adf:b353:: with SMTP id k19mr14156387wrd.325.1635065306735;
+        Sun, 24 Oct 2021 01:48:26 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwBXZ52beGBzMa+DgbJxq6cALSCJFAJyXJoIIqXck3s+fMgDLCqWgGSxucsWO8K8zFTKcOZdQ==
+X-Received: by 2002:adf:b353:: with SMTP id k19mr14156363wrd.325.1635065306517;
+        Sun, 24 Oct 2021 01:48:26 -0700 (PDT)
+Received: from redhat.com ([2a03:c5c0:107e:5d4f:9dc9:1a6d:9b57:401])
+        by smtp.gmail.com with ESMTPSA id a2sm12869839wru.82.2021.10.24.01.48.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 24 Oct 2021 01:48:25 -0700 (PDT)
+Date:   Sun, 24 Oct 2021 04:48:19 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Max Gurtovoy <mgurtovoy@nvidia.com>
+Cc:     hch@infradead.org, virtualization@lists.linux-foundation.org,
+        kvm@vger.kernel.org, stefanha@redhat.com, israelr@nvidia.com,
+        nitzanc@nvidia.com, oren@nvidia.com, linux-block@vger.kernel.org,
+        axboe@kernel.dk
+Subject: Re: [PATCH v3 1/1] virtio-blk: add num_request_queues module
+ parameter
+Message-ID: <20211024044727-mutt-send-email-mst@kernel.org>
+References: <20210902204622.54354-1-mgurtovoy@nvidia.com>
+ <20211022052950-mutt-send-email-mst@kernel.org>
+ <19cbe00a-409c-fd4b-4466-6b9fe650229f@nvidia.com>
+ <93c7838d-d942-010e-e1b2-bc052365f5b1@nvidia.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: a42e7dc8-e167-4755-d7ad-08d996c8cadc
-X-MS-TrafficTypeDiagnostic: SA0PR12MB4557:
-X-Microsoft-Antispam-PRVS: <SA0PR12MB45575F38ECFAAB578A5A64D2C3829@SA0PR12MB4557.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:6430;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: GQLOq7kvD7UzwGHgaReJB/QDL+y8JDN8OjF0Mvxwm4rz7MbgyLM2V+8lkTCs2ij00iL27BMr1ns7DeEeNERfvgkomfZOECdFgLZxr1D2ojTwmZE2M6JMNLm8WN9wcFSdBBcJ7/QAcgMMdp5HRjXJ3UknVoAJBRAVLCJ+ru58sTmOFKTHblaRZDe1WQAV3coBq2aopstbwF/TLTIgAFcWMqDtvQKdtkTTMaVyDGquBqcG6Ezolzzo4XcQd//q9IXnC/XcqmsYdrb5y3Q+GT71cXHf2Hd4qtcZjINmnTUwWQV5RXYRP3LrZEebDUnQbHvbwpRpfqBHxhsL9O5vxnprHIjGH1tzWaJRpgGQk7yspiOpDAT7fz59mOBCCZeeyRxxC5r9cay7MvYqKkCfiTLxrJT4n5O4QWiuVPgmTFD2J0x4TIJMUQsZUFUoP1VcU3zDWq3PyX1ImG0HYeLMiiqCfwbi70h5k+XOyU2MdHyiQiCHJR8RRL3qyxUu+bTIHKvejZL1E4J6EjoqBlmHFcc7X05hniLskB73/Jc4ZD0k6boCI9KWwmX+EuiGmJ5J4987AnpmNwvbVhTXKpaBqQRDO0GpSPDHyzaQb/XEnl5S3mAf9OQgLfON6MtBvznU1KlZQlTDr7FyHxNh+qnAVQwShY+odd2dGJo9sO2zQqaji/JEcjayVLPRaJnj9/ULdlgmgyC+ieIt8+awHbwhO7T2Sw==
-X-Forefront-Antispam-Report: CIP:216.228.112.32;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid01.nvidia.com;CAT:NONE;SFS:(4636009)(46966006)(36840700001)(8936002)(36756003)(70586007)(47076005)(82310400003)(107886003)(336012)(110136005)(4326008)(1076003)(356005)(83380400001)(186003)(36860700001)(8676002)(508600001)(54906003)(316002)(2616005)(5660300002)(7636003)(7696005)(426003)(86362001)(2906002)(26005)(70206006)(6636002);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Oct 2021 08:32:18.8403
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: a42e7dc8-e167-4755-d7ad-08d996c8cadc
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.32];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT052.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4557
+In-Reply-To: <93c7838d-d942-010e-e1b2-bc052365f5b1@nvidia.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Register its own handler for pci_error_handlers.reset_done and update
-state accordingly.
+On Sun, Oct 24, 2021 at 11:12:26AM +0300, Max Gurtovoy wrote:
+> 
+> On 10/24/2021 10:19 AM, Max Gurtovoy wrote:
+> > 
+> > On 10/22/2021 12:30 PM, Michael S. Tsirkin wrote:
+> > > On Thu, Sep 02, 2021 at 11:46:22PM +0300, Max Gurtovoy wrote:
+> > > > Sometimes a user would like to control the amount of request queues to
+> > > > be created for a block device. For example, for limiting the memory
+> > > > footprint of virtio-blk devices.
+> > > > 
+> > > > Reviewed-by: Christoph Hellwig <hch@lst.de>
+> > > > Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > > > Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
+> > > > ---
+> > > > 
+> > > > changes from v2:
+> > > >   - renamed num_io_queues to num_request_queues (from Stefan)
+> > > >   - added Reviewed-by signatures (from Stefan and Christoph)
+> > > > 
+> > > > changes from v1:
+> > > >   - use param_set_uint_minmax (from Christoph)
+> > > >   - added "Should > 0" to module description
+> > > > 
+> > > > Note: This commit apply on top of Jens's branch for-5.15/drivers
+> > > > 
+> > > > ---
+> > > >   drivers/block/virtio_blk.c | 21 ++++++++++++++++++++-
+> > > >   1 file changed, 20 insertions(+), 1 deletion(-)
+> > > > 
+> > > > diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> > > > index 4b49df2dfd23..aaa2833a4734 100644
+> > > > --- a/drivers/block/virtio_blk.c
+> > > > +++ b/drivers/block/virtio_blk.c
+> > > > @@ -24,6 +24,23 @@
+> > > >   /* The maximum number of sg elements that fit into a virtqueue */
+> > > >   #define VIRTIO_BLK_MAX_SG_ELEMS 32768
+> > > >   +static int virtblk_queue_count_set(const char *val,
+> > > > +        const struct kernel_param *kp)
+> > > > +{
+> > > > +    return param_set_uint_minmax(val, kp, 1, nr_cpu_ids);
+> > > > +}
+> > > > +
+> 
+> BTW, I've noticed in your new message you allow setting 0 so you might want
+> to change the code to
+> 
+> param_set_uint_minmax(val, kp, 0, nr_cpu_ids);
+> 
+> to a case a user will load the module with num_request_queues=0.
 
-Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
-Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
----
- drivers/vfio/pci/mlx5/main.c | 54 ++++++++++++++++++++++++++++++++++--
- 1 file changed, 52 insertions(+), 2 deletions(-)
+Oh. So as written the default forces 1 queue?
+Send a patch please!
 
-diff --git a/drivers/vfio/pci/mlx5/main.c b/drivers/vfio/pci/mlx5/main.c
-index 4b21b388dcc5..ca7e5692a7ff 100644
---- a/drivers/vfio/pci/mlx5/main.c
-+++ b/drivers/vfio/pci/mlx5/main.c
-@@ -55,8 +55,11 @@ struct mlx5vf_pci_migration_info {
- struct mlx5vf_pci_core_device {
- 	struct vfio_pci_core_device core_device;
- 	u8 migrate_cap:1;
-+	u8 defered_reset:1;
- 	/* protect migration state */
- 	struct mutex state_mutex;
-+	/* protect the reset_done flow */
-+	spinlock_t reset_lock;
- 	struct mlx5vf_pci_migration_info vmig;
- };
- 
-@@ -471,6 +474,47 @@ mlx5vf_pci_migration_data_rw(struct mlx5vf_pci_core_device *mvdev,
- 	return count;
- }
- 
-+/* This function is called in all state_mutex unlock cases to
-+ * handle a 'defered_reset' if exists.
-+ */
-+static void mlx5vf_state_mutex_unlock(struct mlx5vf_pci_core_device *mvdev)
-+{
-+again:
-+	spin_lock(&mvdev->reset_lock);
-+	if (mvdev->defered_reset) {
-+		mvdev->defered_reset = false;
-+		spin_unlock(&mvdev->reset_lock);
-+		mlx5vf_reset_mig_state(mvdev);
-+		mvdev->vmig.vfio_dev_state = VFIO_DEVICE_STATE_RUNNING;
-+		goto again;
-+	}
-+	spin_unlock(&mvdev->reset_lock);
-+	mutex_unlock(&mvdev->state_mutex);
-+}
-+
-+static void mlx5vf_pci_aer_reset_done(struct pci_dev *pdev)
-+{
-+	struct mlx5vf_pci_core_device *mvdev = dev_get_drvdata(&pdev->dev);
-+
-+	if (!mvdev->migrate_cap)
-+		return;
-+
-+	/* As the higher VFIO layers are holding locks across reset and using
-+	 * those same locks with the mm_lock we need to prevent ABBA deadlock
-+	 * with the state_mutex and mm_lock.
-+	 * In case the state_mutex was taken alreday we differ the cleanup work
-+	 * to the unlock flow of the other running context.
-+	 */
-+	spin_lock(&mvdev->reset_lock);
-+	mvdev->defered_reset = true;
-+	if (!mutex_trylock(&mvdev->state_mutex)) {
-+		spin_unlock(&mvdev->reset_lock);
-+		return;
-+	}
-+	spin_unlock(&mvdev->reset_lock);
-+	mlx5vf_state_mutex_unlock(mvdev);
-+}
-+
- static ssize_t mlx5vf_pci_mig_rw(struct vfio_pci_core_device *vdev,
- 				 char __user *buf, size_t count, loff_t *ppos,
- 				 bool iswrite)
-@@ -539,7 +583,7 @@ static ssize_t mlx5vf_pci_mig_rw(struct vfio_pci_core_device *vdev,
- 	}
- 
- end:
--	mutex_unlock(&mvdev->state_mutex);
-+	mlx5vf_state_mutex_unlock(mvdev);
- 	return ret;
- }
- 
-@@ -634,6 +678,7 @@ static int mlx5vf_pci_probe(struct pci_dev *pdev,
- 			if (MLX5_CAP_GEN(mdev, migration)) {
- 				mvdev->migrate_cap = 1;
- 				mutex_init(&mvdev->state_mutex);
-+				spin_lock_init(&mvdev->reset_lock);
- 			}
- 			mlx5_vf_put_core_dev(mdev);
- 		}
-@@ -668,12 +713,17 @@ static const struct pci_device_id mlx5vf_pci_table[] = {
- 
- MODULE_DEVICE_TABLE(pci, mlx5vf_pci_table);
- 
-+const struct pci_error_handlers mlx5vf_err_handlers = {
-+	.reset_done = mlx5vf_pci_aer_reset_done,
-+	.error_detected = vfio_pci_aer_err_detected,
-+};
-+
- static struct pci_driver mlx5vf_pci_driver = {
- 	.name = KBUILD_MODNAME,
- 	.id_table = mlx5vf_pci_table,
- 	.probe = mlx5vf_pci_probe,
- 	.remove = mlx5vf_pci_remove,
--	.err_handler = &vfio_pci_core_err_handlers,
-+	.err_handler = &mlx5vf_err_handlers,
- };
- 
- static void __exit mlx5vf_pci_cleanup(void)
--- 
-2.18.1
+> > > > +static const struct kernel_param_ops queue_count_ops = {
+> > > > +    .set = virtblk_queue_count_set,
+> > > > +    .get = param_get_uint,
+> > > > +};
+> > > > +
+> > > > +static unsigned int num_request_queues;
+> > > > +module_param_cb(num_request_queues, &queue_count_ops,
+> > > > &num_request_queues,
+> > > > +        0644);
+> > > > +MODULE_PARM_DESC(num_request_queues,
+> > > > +         "Number of request queues to use for blk device.
+> > > > Should > 0");
+> > > > +
+> > > >   static int major;
+> > > >   static DEFINE_IDA(vd_index_ida);
+> > > I wasn't happy with the message here so I tweaked it.
+> > > 
+> > > Please look at it in linux-next and confirm. Thanks!
+> > 
+> > Looks good.
+> > 
+> > 
+> > > 
+> > > 
+> > > > @@ -501,7 +518,9 @@ static int init_vq(struct virtio_blk *vblk)
+> > > >       if (err)
+> > > >           num_vqs = 1;
+> > > >   -    num_vqs = min_t(unsigned int, nr_cpu_ids, num_vqs);
+> > > > +    num_vqs = min_t(unsigned int,
+> > > > +            min_not_zero(num_request_queues, nr_cpu_ids),
+> > > > +            num_vqs);
+> > > >         vblk->vqs = kmalloc_array(num_vqs, sizeof(*vblk->vqs),
+> > > > GFP_KERNEL);
+> > > >       if (!vblk->vqs)
+> > > > -- 
+> > > > 2.18.1
 
