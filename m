@@ -2,69 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E66E9439EAD
-	for <lists+kvm@lfdr.de>; Mon, 25 Oct 2021 20:47:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 86261439F2A
+	for <lists+kvm@lfdr.de>; Mon, 25 Oct 2021 21:15:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233304AbhJYSt6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Oct 2021 14:49:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39474 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233224AbhJYSt6 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 25 Oct 2021 14:49:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635187654;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=6EW7txlh+uOUAxYxbDB9IshowiDOro3wjgqyCQ3sGxM=;
-        b=fJkbN3PJ9OiYS+XsKMr53TPqtJNGP9g5O4cpr6IMn1bjyUT8IutVcLmAVr2gGSEWBBwYrU
-        Oka0eVLXCRRwRHKHGUDEsUip1k1X9IvaXJmWyjcDTAAxbp2zGFS5UhjJG6qF5s5p0TI4Yu
-        RMn+ny0Dzzkp13Cf16IY5oGcQsnLvEM=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-235-SeEnAw3-NUqk9E-7fOemTw-1; Mon, 25 Oct 2021 14:47:33 -0400
-X-MC-Unique: SeEnAw3-NUqk9E-7fOemTw-1
-Received: by mail-wr1-f69.google.com with SMTP id d10-20020adffd8a000000b00167f0846597so2900888wrr.16
-        for <kvm@vger.kernel.org>; Mon, 25 Oct 2021 11:47:33 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=6EW7txlh+uOUAxYxbDB9IshowiDOro3wjgqyCQ3sGxM=;
-        b=BI7lBYlGEk2a2Un6WeAY5XxBQPVcpVmBAW7pJq8PFG36C6D/AKi+hfGQ5NLh0gdsYN
-         702ehHC02ysGrMgthgAlpYK4n5Yj/PhtPQm8D4OszUGvviIMqzznTR59TdIOzC/S+48X
-         U+mWjLBiLzHjEnMdyXk5dUu79ONLbai8pG+LQUTFZPofg+XkBrsayuDgpD7df4eXBnw7
-         XuADArPr/CmFIz+cCvSYMc1eikjNNzC2JgZ7FSD43K4MHriUCKRevbZB//3uNf3TFZlw
-         vmpvvfxxaWpf3IjZGxwS0cFSNqZGxpQNXAFbUImEnmY2chCoPKK9BirmJu3C6w2qxMp7
-         M/Zw==
-X-Gm-Message-State: AOAM531En7St6uhsuZI/rdvkiwEtrEZPbgzbXOC14KxbZhqsmoDvH7PE
-        r6p+5INctuLfEzbHm6Yo4gkmOPpST7/Ny3Bve3wDupzM5L57Yj+BtSDtpBtnExb7lcZCm/zeDMU
-        qL4nPPmSbWXT6
-X-Received: by 2002:a05:600c:4894:: with SMTP id j20mr18300686wmp.60.1635187652359;
-        Mon, 25 Oct 2021 11:47:32 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwi88GrvhJPJqUxL4ZtskRmjUnoxymkGeWDaizgJygyAfc7km4fzKFhWVkl7rV8mcptOfZ47Q==
-X-Received: by 2002:a05:600c:4894:: with SMTP id j20mr18300661wmp.60.1635187652104;
-        Mon, 25 Oct 2021 11:47:32 -0700 (PDT)
-Received: from work-vm (cpc109025-salf6-2-0-cust480.10-2.cable.virginm.net. [82.30.61.225])
-        by smtp.gmail.com with ESMTPSA id s11sm3916497wru.16.2021.10.25.11.47.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Oct 2021 11:47:31 -0700 (PDT)
-Date:   Mon, 25 Oct 2021 19:47:29 +0100
-From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Yishai Hadas <yishaih@nvidia.com>,
-        Jason Gunthorpe <jgg@nvidia.com>, bhelgaas@google.com,
+        id S234421AbhJYTR6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Oct 2021 15:17:58 -0400
+Received: from mail-mw2nam10on2040.outbound.protection.outlook.com ([40.107.94.40]:21655
+        "EHLO NAM10-MW2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S234168AbhJYTRf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Oct 2021 15:17:35 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=n2khnePs8luFPw1IhopokPGKLeto/B+2yzesGb6T3SG5/UubxmQwKYJ5JbuJaX5lPd0MFyg28zdKCZ/Bu9V3EAeQiGUJIiHvl9AgP6Gf2rLKUTh9ZsoyOZwLhT08ujY/JQ2ODlXn3HeheD9rL8DUGqAjRNb3YaEhIXJRpRhYMScov1+9gPuyW21fzP2G+ERgKWm1ZYKPSBLvOdhJhKhWHcqU6i16J2k9OlPyHbF0hKLCMZqMzTxMhdnPrs002pK74r1PhliZ8Caj2yyAquwddWT89r6EEhlZ6haiT9kjdYG9fzohtYckKGC2+z8YED0W7sHOPDhhdaqWHnuL6eJmMw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=AdRzcI5XXKHSpAaV0K3YiHxjUZ4msr6YNjRiLiNFTog=;
+ b=UOYo828eTQmD4lR/jneJUYs0jrJ86TEWqrORIemEAgGKkLNCH8UWQXT0TPCrfjnryz9MU8NerLMsdLfAsstGH/rBW6Q1KzpkRYjeQIf8VpMvHWgfkT78SVMBa7iEzf8Io/5Cdhp2MxqjGEfCr1/XyIxJT46nxgdM1mStFL32fIvjGo9pbCsgpB48AjsiS5EuDWDhGCOjxzFAVzO/HEiIzk71DH5blMAF/IdDdBfYJR0P20NLUVlBvhHqDW82Rbeaxsa35kBewly/v6XyxT0RxzZwn/8UVS8A4MN1Y+aMBG6Uow+dc7Le49uEMx6h3NiMTPBRsPyOhj5gWi60rS9XeA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=AdRzcI5XXKHSpAaV0K3YiHxjUZ4msr6YNjRiLiNFTog=;
+ b=bTgSnHu52TTJXFx3e6nogk6m3zt3xdZkSfCD53HsyplHgkERUPVsNB3eL9FnTbqYbBY7WM0WcCirYywdkLLecWYy4nrFbFBQNdFEze26SX9xH/5qnTmd7hPTFbgPb2nmTdTswOgZkCBpRiFEWMSv8yIy5lI4PuBw77inzoG7fP7AygTrpi9wEnQ0pWFrV/4uCZ3CdhfRUU7pc/itVXTYjUjnluaUp7ZHS9k+u4hh/8gmg99/trNNr1w5iqMF58l4QYLGcESGoykI9tklZtJ0NKkMHsF46E/ojpo1kgw25qAMhQo0tRpQTmXktouQoOq35epgYt39BmS3K8B96WATtA==
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=nvidia.com;
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
+ by BL1PR12MB5190.namprd12.prod.outlook.com (2603:10b6:208:31c::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4628.18; Mon, 25 Oct
+ 2021 19:15:11 +0000
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::e8af:232:915e:2f95]) by BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::e8af:232:915e:2f95%8]) with mapi id 15.20.4628.020; Mon, 25 Oct 2021
+ 19:15:11 +0000
+Date:   Mon, 25 Oct 2021 16:15:09 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Yishai Hadas <yishaih@nvidia.com>, bhelgaas@google.com,
         saeedm@nvidia.com, linux-pci@vger.kernel.org, kvm@vger.kernel.org,
         netdev@vger.kernel.org, kuba@kernel.org, leonro@nvidia.com,
         kwankhede@nvidia.com, mgurtovoy@nvidia.com, maorg@nvidia.com,
         Cornelia Huck <cohuck@redhat.com>
 Subject: Re: [PATCH V2 mlx5-next 12/14] vfio/mlx5: Implement vfio_pci driver
  for mlx5 devices
-Message-ID: <YXb7wejD1qckNrhC@work-vm>
-References: <20211019105838.227569-1-yishaih@nvidia.com>
- <20211019105838.227569-13-yishaih@nvidia.com>
+Message-ID: <20211025191509.GB2744544@nvidia.com>
+References: <20211019105838.227569-13-yishaih@nvidia.com>
  <20211019124352.74c3b6ba.alex.williamson@redhat.com>
  <20211019192328.GZ2744544@nvidia.com>
  <20211019145856.2fa7f7c8.alex.williamson@redhat.com>
@@ -73,189 +59,91 @@ References: <20211019105838.227569-1-yishaih@nvidia.com>
  <20211020105230.524e2149.alex.williamson@redhat.com>
  <YXbceaVo0q6hOesg@work-vm>
  <20211025115535.49978053.alex.williamson@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+ <YXb7wejD1qckNrhC@work-vm>
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20211025115535.49978053.alex.williamson@redhat.com>
-User-Agent: Mutt/2.0.7 (2021-05-04)
+In-Reply-To: <YXb7wejD1qckNrhC@work-vm>
+X-ClientProxiedBy: YT3PR01CA0085.CANPRD01.PROD.OUTLOOK.COM
+ (2603:10b6:b01:84::16) To BL0PR12MB5506.namprd12.prod.outlook.com
+ (2603:10b6:208:1cb::22)
+MIME-Version: 1.0
+Received: from mlx.ziepe.ca (206.223.160.26) by YT3PR01CA0085.CANPRD01.PROD.OUTLOOK.COM (2603:10b6:b01:84::16) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4628.16 via Frontend Transport; Mon, 25 Oct 2021 19:15:10 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1mf5R7-001pfr-DE; Mon, 25 Oct 2021 16:15:09 -0300
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 1f85461f-f930-4013-3712-08d997ebc3d9
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5190:
+X-Microsoft-Antispam-PRVS: <BL1PR12MB5190773F3101D0D3C251F65FC2839@BL1PR12MB5190.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 8dSmWnW4CJ2z79//nme4ba3i9bIaXgx8dIQ+YqLH+ZSnaQwOZBsTjcq3pTjWrmVdIA77huf5J9AKqoaSjEg1qdBZkN76f/2bqoT0LOt1AbCxfVKIxgqI0ywt4Yv/iNcfBXS/dMhTAWbd+UwYZVLfC8zkecC72YyeSPSsOoBXVkA3MWsnmzD94r3zDymofjI+fElsPH44txEjjwRwD13ZMtqz8ERsSdUBj/hDwAel9Edlci0E3cJHazoNJ0Mj7HohD18UJbvChT5mdkPvkauOQ4rVXSfYryRsd4nSZUoSMdDVvGRZPIpkHFasrNEB8GBPzHhtxBBvU1Xhvdr8Bbvz6aW9vB4bFXSJAFKgoxCTJ8CJ16rztuIG008eV7/YNkAvMotNuTxnz4RgGCdk8vHXwOBPU1TGjaAviXEsgvWF99X2yTZfePHyFQYGiEA18w68v7jsBOXNyH8LmDsTx7XJnRE7gopvCLOV4us/iuClyFoo1vs/yQkVQbzhzMjPZ9oBmICd/MFGi8Sq1mSQwlk/wEvUjmhu2Wn9ZA7E4szICwDtLOvnzAHi0+pqxhQCw10JSfcNVBZEwXf9ZYU2HQH0GmReD43Y+1WUvzCzpBi4Nl/gGDmRCIdi4vO88mlUMUe5wvmqsQFU4Moi9a6nqwFZbw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(38100700002)(8936002)(316002)(9746002)(8676002)(66946007)(54906003)(6916009)(66556008)(508600001)(9786002)(33656002)(66476007)(4326008)(186003)(36756003)(2906002)(426003)(26005)(2616005)(83380400001)(4744005)(86362001)(1076003)(5660300002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?mvaXTLWBIoZ8zgydsS5nlCCGCj9mSXMVWRj2Z7RRfhrzAbEPoPUxviGNBY8w?=
+ =?us-ascii?Q?K2kqlWfr2+yt7Z1TcnL5Xey0NeoTvKb/hFDH8O5VjqtYZJXQUA70xHXL5DCf?=
+ =?us-ascii?Q?iOw1fS3z/KrodY2ZCZWEm0SagBnHFgkFaGpJD/mgNwvJBU4/V31Yxejc68Ai?=
+ =?us-ascii?Q?eBxhO3dxl3cgP7+0ZAwr8E31v12MqwIa1Si5MnSL/lowVxUao/yDBsCm4qE4?=
+ =?us-ascii?Q?QdeZ9J4XPqXFq9fV619IbF2BxptOEqubPjW+bTYj6tWvINMQ5gywYSjeIsmz?=
+ =?us-ascii?Q?hsfqbP4yuWewCP0H6mAOAo0bub2O7+PSO/0YNlBxZ5eFg53IRXUg8OmW8N9z?=
+ =?us-ascii?Q?8Nmdnf+ro4i9A55ZemcWrX2a5AlPBomw0XdHWl3yodL5P9m01TGAX2pxJYqT?=
+ =?us-ascii?Q?HNlSedeBm8BQmg/nKqfSXT7MzK6Q6tAw/5ZOwgjo/u+cXQfAry/DeI9gVloH?=
+ =?us-ascii?Q?JP3bAbtOD2JhCYSIKjkUYQKn/RLLAKBrblt2ynb2wqy3KcXTCmYoqf7mXPIE?=
+ =?us-ascii?Q?89jvN9GUfXsNJPm9ddzzBHcpV/Z7HPtbm+nakFP0o1f262wV0f8Erwv+woI8?=
+ =?us-ascii?Q?iOPcJBziK0D+WRCJl219ZhWMfpTE92EteWPh0X9cN+X4ccI4SsUEjssZFd9R?=
+ =?us-ascii?Q?5sMUiSc+icP3uA0dd31wgq8lWBCAqFOzSQgCeLLP5pSti+T2EUiR9z48JWqZ?=
+ =?us-ascii?Q?R7r1ES5+HN9A+LC7E/ZFhYSZCyeR9gDIDe2jPXeSlGyP2LhYhjfum+d9dubC?=
+ =?us-ascii?Q?RpJLWWgRXLC05E6HiN1HHXqxHWAatdIXMk/pSgRGY8f0i3y4l50LsBNOuD89?=
+ =?us-ascii?Q?/9NEl7lA4Y0shTrtpsfZ2bkxpwFNxwEih8GCAcgMxmKAJb9iMTMRODfMqqTO?=
+ =?us-ascii?Q?To/SqzTvzqBaEpysWOCL3CgtVzg0AAN5y2wM9EnmCcWOZH5ve3NwBXZsT80H?=
+ =?us-ascii?Q?1iBPytBiuQGF1QPs0kF958d6M8Gt4qlba8VMW+CkcJgMPOFM8PT0FXvyfmgP?=
+ =?us-ascii?Q?0lT7AKLjqjjvZmCFx/xP4HxxSByWm76HrWugzKF1dpevp6Ut9L4zhSFFbB9/?=
+ =?us-ascii?Q?1ccihlXSjizsdf8sJ6BQxElepcIhzwkgCB8HlmJRNm04/EO7ViZAbk5yjsIy?=
+ =?us-ascii?Q?Ib3jVQyaw2jmj0nmXgeSP6s6gzRdR77nJDZivRie+g+gJzgNmz3d5QaJZjGI?=
+ =?us-ascii?Q?AB5RrIYf0EvJfpWZinoZRo6hloebhtQtDUgv8GOtKVvuPCG3fG3Fo2YeoL6P?=
+ =?us-ascii?Q?TCrNVVyngwaiOLXbb1jly15sMRZfZNo4YkOWLigrSdoMCHsSCJwHKH9EH1o8?=
+ =?us-ascii?Q?TMArWrZAFRILEhOyGgAbXj7cqEUwCvlbpKNVMLOyrWUACrbn+iPfhkvRE1JK?=
+ =?us-ascii?Q?+bi489xMBnjjMAiIs0WkquXeOMeQX5KMkSQMwq7W8W2WEL8Au4A7sZ3el6gK?=
+ =?us-ascii?Q?cKRfDnromFXeHA6UP6ITeLlrpc43muFX+ek7BWyPs0vi2aCXmrFeHdrFTGO6?=
+ =?us-ascii?Q?sF/e5dqY76KJldg5t91FsEf6nLHE0FRo6M2Ef6bsYJ/Poa7rImJJeujztV4O?=
+ =?us-ascii?Q?9DqkdeqPliPeS9mNhZU=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1f85461f-f930-4013-3712-08d997ebc3d9
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Oct 2021 19:15:11.0777
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: uOWlaZTSJv/AYlfZ+UyGZmeGTnIInKUqKdj+/TZQV8+c4Nm6NwCvV9y7QfUhVXFM
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5190
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-* Alex Williamson (alex.williamson@redhat.com) wrote:
-> On Mon, 25 Oct 2021 17:34:01 +0100
-> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> 
-> > * Alex Williamson (alex.williamson@redhat.com) wrote:
-> > > [Cc +dgilbert, +cohuck]
-> > > 
-> > > On Wed, 20 Oct 2021 11:28:04 +0300
-> > > Yishai Hadas <yishaih@nvidia.com> wrote:
-> > >   
-> > > > On 10/20/2021 2:04 AM, Jason Gunthorpe wrote:  
-> > > > > On Tue, Oct 19, 2021 at 02:58:56PM -0600, Alex Williamson wrote:    
-> > > > >> I think that gives us this table:
-> > > > >>
-> > > > >> |   NDMA   | RESUMING |  SAVING  |  RUNNING |
-> > > > >> +----------+----------+----------+----------+ ---
-> > > > >> |     X    |     0    |     0    |     0    |  ^
-> > > > >> +----------+----------+----------+----------+  |
-> > > > >> |     0    |     0    |     0    |     1    |  |
-> > > > >> +----------+----------+----------+----------+  |
-> > > > >> |     X    |     0    |     1    |     0    |
-> > > > >> +----------+----------+----------+----------+  NDMA value is either compatible
-> > > > >> |     0    |     0    |     1    |     1    |  to existing behavior or don't
-> > > > >> +----------+----------+----------+----------+  care due to redundancy vs
-> > > > >> |     X    |     1    |     0    |     0    |  !_RUNNING/INVALID/ERROR
-> > > > >> +----------+----------+----------+----------+
-> > > > >> |     X    |     1    |     0    |     1    |  |
-> > > > >> +----------+----------+----------+----------+  |
-> > > > >> |     X    |     1    |     1    |     0    |  |
-> > > > >> +----------+----------+----------+----------+  |
-> > > > >> |     X    |     1    |     1    |     1    |  v
-> > > > >> +----------+----------+----------+----------+ ---
-> > > > >> |     1    |     0    |     0    |     1    |  ^
-> > > > >> +----------+----------+----------+----------+  Desired new useful cases
-> > > > >> |     1    |     0    |     1    |     1    |  v
-> > > > >> +----------+----------+----------+----------+ ---
-> > > > >>
-> > > > >> Specifically, rows 1, 3, 5 with NDMA = 1 are valid states a user can
-> > > > >> set which are simply redundant to the NDMA = 0 cases.    
-> > > > > It seems right
-> > > > >    
-> > > > >> Row 6 remains invalid due to lack of support for pre-copy (_RESUMING
-> > > > >> | _RUNNING) and therefore cannot be set by userspace.  Rows 7 & 8
-> > > > >> are error states and cannot be set by userspace.    
-> > > > > I wonder, did Yishai's series capture this row 6 restriction? Yishai?    
-> > > > 
-> > > > 
-> > > > It seems so,  by using the below check which includes the 
-> > > > !VFIO_DEVICE_STATE_VALID clause.
-> > > > 
-> > > > if (old_state == VFIO_DEVICE_STATE_ERROR ||
-> > > >          !VFIO_DEVICE_STATE_VALID(state) ||
-> > > >          (state & ~MLX5VF_SUPPORTED_DEVICE_STATES))
-> > > >          return -EINVAL;
-> > > > 
-> > > > Which is:
-> > > > 
-> > > > #define VFIO_DEVICE_STATE_VALID(state) \
-> > > >      (state & VFIO_DEVICE_STATE_RESUMING ? \
-> > > >      (state & VFIO_DEVICE_STATE_MASK) == VFIO_DEVICE_STATE_RESUMING : 1)
-> > > >   
-> > > > >    
-> > > > >> Like other bits, setting the bit should be effective at the completion
-> > > > >> of writing device state.  Therefore the device would need to flush any
-> > > > >> outbound DMA queues before returning.    
-> > > > > Yes, the device commands are expected to achieve this.
-> > > > >    
-> > > > >> The question I was really trying to get to though is whether we have a
-> > > > >> supportable interface without such an extension.  There's currently
-> > > > >> only an experimental version of vfio migration support for PCI devices
-> > > > >> in QEMU (afaik),    
-> > > > > If I recall this only matters if you have a VM that is causing
-> > > > > migratable devices to interact with each other. So long as the devices
-> > > > > are only interacting with the CPU this extra step is not strictly
-> > > > > needed.
-> > > > >
-> > > > > So, single device cases can be fine as-is
-> > > > >
-> > > > > IMHO the multi-device case the VMM should probably demand this support
-> > > > > from the migration drivers, otherwise it cannot know if it is safe for
-> > > > > sure.
-> > > > >
-> > > > > A config option to override the block if the admin knows there is no
-> > > > > use case to cause devices to interact - eg two NVMe devices without
-> > > > > CMB do not have a useful interaction.
-> > > > >    
-> > > > >> so it seems like we could make use of the bus-master bit to fill
-> > > > >> this gap in QEMU currently, before we claim non-experimental
-> > > > >> support, but this new device agnostic extension would be required
-> > > > >> for non-PCI device support (and PCI support should adopt it as
-> > > > >> available).  Does that sound right?  Thanks,    
-> > > > > I don't think the bus master support is really a substitute, tripping
-> > > > > bus master will stop DMA but it will not do so in a clean way and is
-> > > > > likely to be non-transparent to the VM's driver.
-> > > > >
-> > > > > The single-device-assigned case is a cleaner restriction, IMHO.
-> > > > >
-> > > > > Alternatively we can add the 4th bit and insist that migration drivers
-> > > > > support all the states. I'm just unsure what other HW can do, I get
-> > > > > the feeling people have been designing to the migration description in
-> > > > > the header file for a while and this is a new idea.  
-> > > 
-> > > I'm wondering if we're imposing extra requirements on the !_RUNNING
-> > > state that don't need to be there.  For example, if we can assume that
-> > > all devices within a userspace context are !_RUNNING before any of the
-> > > devices begin to retrieve final state, then clearing of the _RUNNING
-> > > bit becomes the device quiesce point and the beginning of reading
-> > > device data is the point at which the device state is frozen and
-> > > serialized.  No new states required and essentially works with a slight
-> > > rearrangement of the callbacks in this series.  Why can't we do that?  
-> > 
-> > So without me actually understanding your bit encodings that closely, I
-> > think the problem is we have to asusme that any transition takes time.
-> > From the QEMU point of view I think the requirement is when we stop the
-> > machine (vm_stop_force_state(RUN_STATE_FINISH_MIGRATE) in
-> > migration_completion) that at the point that call returns (with no
-> > error) all devices are idle.  That means you need a way to command the
-> > device to go into the stopped state, and probably another to make sure
-> > it's got there.
-> 
-> In a way.  We're essentially recognizing that we cannot stop a single
-> device in isolation of others that might participate in peer-to-peer
-> DMA with that device, so we need to make a pass to quiesce each device
-> before we can ask the device to fully stop.  This new device state bit
-> is meant to be that quiescent point, devices can accept incoming DMA
-> but should cease to generate any.  Once all device are quiesced then we
-> can safely stop them.
+On Mon, Oct 25, 2021 at 07:47:29PM +0100, Dr. David Alan Gilbert wrote:
 
-It may need some further refinement; for example in that quiesed state
-do counters still tick? will a NIC still respond to packets that don't
-get forwarded to the host?
+> It may need some further refinement; for example in that quiesed state
+> do counters still tick? will a NIC still respond to packets that don't
+> get forwarded to the host?
 
-Note I still think you need a way to know when you have actually reached
-these states; setting a bit in a register is asking nicely for a device
-to go into a state - has it got there?
+At least for the mlx5 NIC the two states are 'able to issue outbound
+DMA' and 'all internal memories and state are frozen and unchanging'.
 
-> > Now, you could be a *little* more sloppy; you could allow a device carry
-> > on doing stuff purely with it's own internal state up until the point
-> > it needs to serialise; but that would have to be strictly internal state
-> > only - if it can change any other devices state (or issue an interrupt,
-> > change RAM etc) then you get into ordering issues on the serialisation
-> > of multiple devices.
-> 
-> Yep, that's the proposal that doesn't require a uAPI change, we loosen
-> the definition of stopped to mean the device can no longer generate DMA
-> or interrupts and all internal processing outside or responding to
-> incoming DMA should halt (essentially the same as the new quiescent
-> state above).  Once all devices are in this state, there should be no
-> incoming DMA and we can safely collect per device migration data.  If
-> state changes occur beyond the point in time where userspace has
-> initiated the collection of migration data, drivers have options for
-> generating errors when userspace consumes that data.
+The later means it should not respond/count/etc to network packets
+either.
 
-How do you know that last device has actually gone into that state?
-Also be careful; it feels much more delicate where something might
-accidentally start a transaction.
+Roughly it is
+ 'able to mutate external state' / 'able to mutate internal state'
 
-> AFAICT, the two approaches are equally valid.  If we modify the uAPI to
-> include this new quiescent state then userspace needs to make some hard
-> choices about what configurations they support without such a feature.
-> The majority of configurations are likely not exercising p2p between
-> assigned devices, but the hypervisor can't know that.  If we work
-> within the existing uAPI, well there aren't any open source driver
-> implementations yet anyway and any non-upstream implementations would
-> need to be updated for this clarification.  Existing userspace works
-> better with no change, so long as they already follow the guideline
-> that all devices in the userspace context must be stopped before the
-> migration data of any device can be considered valid.  Thanks,
+The invariant should be that successive calls to serialize the
+internal state while frozen should return the same serialization.
 
-Dave
+We may find that migratable PCI functions must have some limited
+functionality. Ie anything with a realtime compoment - for instance a
+sync-ethernet clock synchronization control loop, may become
+challenging to migrate without creating a serious functional
+distortion.
 
-> Alex
-> 
--- 
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-
+Jason
