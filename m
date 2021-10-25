@@ -2,62 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 36627439880
-	for <lists+kvm@lfdr.de>; Mon, 25 Oct 2021 16:26:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 01CB7439886
+	for <lists+kvm@lfdr.de>; Mon, 25 Oct 2021 16:26:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233538AbhJYO2i (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Oct 2021 10:28:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58071 "EHLO
+        id S233504AbhJYO2u (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Oct 2021 10:28:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:47053 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230325AbhJYO2g (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 25 Oct 2021 10:28:36 -0400
+        by vger.kernel.org with ESMTP id S233557AbhJYO2q (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 25 Oct 2021 10:28:46 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635171973;
+        s=mimecast20190719; t=1635171983;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=bye7ObUVwxXJ2WkSXV7ATW6vdQkdYkTKPDS9mWywO4k=;
-        b=VG20wsfW81XXPKqAw5GP7sPzbhA4Uz7GMRjfobhJBnMpVfvvUHWtqpsDWNV2Ht62lM784j
-        pmJYBcOfQP8oznAKfuriTSHgRiFZxel+Z5PdBLZkPiya2ceE8r5gdUcHnnS6TYFTDxslEe
-        4hEwvDnnw9gXIQwLAumNBYRTW6lPNLM=
+        bh=0JDFR/w0BO+fJnaqyJz0KqLIzoSXAKAPvBzPCJS8rh0=;
+        b=hbCJMtC+feXdD4DZpsFhxR0KHosx1zwzyF8Tv1JUfLQGhFPT6Sz9jaYEhXZ8ctLiBr5K/+
+        1Af4KNf2fipA4V/TwlqSvOhuL0s5hBfhvsM7MGI8li9fR49uEYSSeK/5IpxDydkWDJz9qy
+        I/Q+pHO5qIr6muF9tbKPliOWf9AUoz0=
 Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
  [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-405--0iQ1kxeNNm0MAl2Y0iKng-1; Mon, 25 Oct 2021 10:26:12 -0400
-X-MC-Unique: -0iQ1kxeNNm0MAl2Y0iKng-1
-Received: by mail-ed1-f69.google.com with SMTP id b17-20020a056402351100b003dd23c083b1so8208483edd.0
-        for <kvm@vger.kernel.org>; Mon, 25 Oct 2021 07:26:12 -0700 (PDT)
+ us-mta-350-ret85sfRNzGU9M_q7BAoPg-1; Mon, 25 Oct 2021 10:26:22 -0400
+X-MC-Unique: ret85sfRNzGU9M_q7BAoPg-1
+Received: by mail-ed1-f69.google.com with SMTP id r25-20020a05640216d900b003dca3501ab4so10032740edx.15
+        for <kvm@vger.kernel.org>; Mon, 25 Oct 2021 07:26:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=bye7ObUVwxXJ2WkSXV7ATW6vdQkdYkTKPDS9mWywO4k=;
-        b=yvPDLc7As5vIngPNA4CzoEA9fY75N0j9xCDa4R5dfejLKHD1IESTeFAb7KvPBaXc9y
-         Nvars22ok3y831G8/r2YSrZn+0rFvFsZQOROvuebiaMXZWPW0Yu86GmhbxY3Bl7q4d3h
-         dpQuAqPzf/hRqNa2RsQsDgXL8ntMEZpd6Csm8MwDKnJYN2KRcyYfM7G/rZFnYSfkditx
-         j2jn/O1toF0aEUFbl0kfGeUgDdIqipZmWFUuUxkMWt6AZl8aHH9nV5siCIi4mLeXGclb
-         rPwVgppZqRHeR1nBC6UUM5OssH9jYh/Tc4WoxA+Yp1pUEB3UX0NxYLyOM0PKP0Y/ShPe
-         MwlQ==
-X-Gm-Message-State: AOAM530PgWEyy1lken8yn6TDOjANxkqEyBG1txHYp0t/qcO0QliNUQJJ
-        K81uMMianMKg1rNE3txYxYID/fovsYi4K29Rkkq4a+GkkA3Vs+KTyHLb4WrLbqGpBw+BZnGS3S/
-        wY6+k0w7IkhwH
-X-Received: by 2002:a17:906:c0cf:: with SMTP id bn15mr21819149ejb.54.1635171971321;
-        Mon, 25 Oct 2021 07:26:11 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw1tQyM0wVdwMUOMrIgmjrbrmjI7F4R9FGcgAmNEuZGC3NNZA+IU7BqgOO63yxAXGZ3HmbepA==
-X-Received: by 2002:a17:906:c0cf:: with SMTP id bn15mr21819096ejb.54.1635171971137;
-        Mon, 25 Oct 2021 07:26:11 -0700 (PDT)
+        bh=0JDFR/w0BO+fJnaqyJz0KqLIzoSXAKAPvBzPCJS8rh0=;
+        b=plqVCxyhhsdzfam5Y72xMiEapmd+p6i+MdJXqO5zv6FeLxUY239G6xb02S15K4H9rd
+         ZlTIzfIzXHz6jnlUX0OtHMd5xJ+YXz8us57ASg/HjzA4fkGJfTGNWYOlivYd1qQvEXi5
+         D9FLrd3gKQSj66BSTSD2cqC7FvcVRONsoTxuvJuVZZf7mEdTSP9VmTQ5Gw/F4cBEu816
+         X8Noip/nBsab89a9JiOirWCHGT2I+6jUkNKsWmpQ80cqPnj1KNrJjKp+SBftzpoVxQDL
+         j3WCqK5RL0zCg7NbqMxw/mBT2GA3ffbsxognyB+WUSygfdZCFincGpiNGlcKwKNLCZJd
+         lvaQ==
+X-Gm-Message-State: AOAM531VODtSq4h7X9DMIjfNCfZh4/u5thzrR7pDLsLmbFnH7wIwkRxp
+        btbXyvEMlmAMB55UQHCMmsyGJnBjIkZSr/AQTzfb/G9KvpBNSbMPgwFmRc3+yqRzamj4GC0t5nO
+        BalW/oCryXyKp
+X-Received: by 2002:a50:d78c:: with SMTP id w12mr26913794edi.147.1635171980779;
+        Mon, 25 Oct 2021 07:26:20 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzKDlcJy9Ggfa6iOgv+1CVaZWvopovsowDbFDE9dApjZRuZhu/xUobrIcg2Oe5NEBC4id/OJQ==
+X-Received: by 2002:a50:d78c:: with SMTP id w12mr26913764edi.147.1635171980582;
+        Mon, 25 Oct 2021 07:26:20 -0700 (PDT)
 Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id g14sm5171403edp.31.2021.10.25.07.26.09
+        by smtp.gmail.com with ESMTPSA id hs28sm1430847ejc.111.2021.10.25.07.26.18
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 25 Oct 2021 07:26:10 -0700 (PDT)
-Message-ID: <0072221e-02e8-4d60-9b0f-80d8c423bf4e@redhat.com>
-Date:   Mon, 25 Oct 2021 16:26:08 +0200
+        Mon, 25 Oct 2021 07:26:19 -0700 (PDT)
+Message-ID: <0333be2a-76d8-657a-6c82-3bb5c9ff2e3b@redhat.com>
+Date:   Mon, 25 Oct 2021 16:26:17 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.1.0
-Subject: Re: [PATCH v2 16/43] KVM: Don't redo ktime_get() when calculating
- halt-polling stop/deadline
+Subject: Re: [PATCH v2 35/43] KVM: SVM: Signal AVIC doorbell iff vCPU is in
+ guest mode
 Content-Language: en-US
 To:     Sean Christopherson <seanjc@google.com>,
         Marc Zyngier <maz@kernel.org>,
@@ -89,9 +89,9 @@ Cc:     James Morse <james.morse@arm.com>,
         Oliver Upton <oupton@google.com>,
         Jing Zhang <jingzhangos@google.com>
 References: <20211009021236.4122790-1-seanjc@google.com>
- <20211009021236.4122790-17-seanjc@google.com>
+ <20211009021236.4122790-36-seanjc@google.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20211009021236.4122790-17-seanjc@google.com>
+In-Reply-To: <20211009021236.4122790-36-seanjc@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
@@ -99,23 +99,27 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 09/10/21 04:12, Sean Christopherson wrote:
-> Calculate the halt-polling "stop" time using "cur" instead of redoing
-> ktime_get().  In the happy case where hardware correctly predicts
-> do_halt_poll, "cur" is only a few cycles old.  And if the branch is
-> mispredicted, arguably that extra latency should count toward the
-> halt-polling time.
-> 
-> In all likelihood, the numbers involved are in the noise and either
-> approach is perfectly ok.
+> +	 */
+> +	if (vcpu->mode == IN_GUEST_MODE) {
+>   		int cpu = READ_ONCE(vcpu->cpu);
+>   
+>   		/*
+> @@ -687,8 +692,13 @@ int svm_deliver_avic_intr(struct kvm_vcpu *vcpu, int vec)
+>   		if (cpu != get_cpu())
+>   			wrmsrl(SVM_AVIC_DOORBELL, kvm_cpu_get_apicid(cpu));
+>   		put_cpu();
+> -	} else
+> +	} else {
+> +		/*
+> +		 * Wake the vCPU if it was blocking.  KVM will then detect the
+> +		 * pending IRQ when checking if the vCPU has a wake event.
+> +		 */
+>   		kvm_vcpu_wake_up(vcpu);
+> +	}
+>   
 
-Using "start" makes the change even more obvious, so:
-
-     Calculate the halt-polling "stop" time using "start" instead of redoing
-     ktime_get().  In practice, the numbers involved are in the noise (e.g.,
-     in the happy case where hardware correctly predicts do_halt_poll and
-     there are no interrupts, "start" is probably only a few cycles old)
-     and either approach is perfectly ok.  But it's more precise to count
-     any extra latency toward the halt-polling time.
+Does this still need to check the "running" flag?  That should be a 
+strict superset of vcpu->mode == IN_GUEST_MODE.
 
 Paolo
 
