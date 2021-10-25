@@ -2,157 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 454FB438EAC
-	for <lists+kvm@lfdr.de>; Mon, 25 Oct 2021 07:11:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C5B38438ED2
+	for <lists+kvm@lfdr.de>; Mon, 25 Oct 2021 07:29:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232362AbhJYFN6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Oct 2021 01:13:58 -0400
-Received: from gandalf.ozlabs.org ([150.107.74.76]:33803 "EHLO
+        id S229890AbhJYFbv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Oct 2021 01:31:51 -0400
+Received: from gandalf.ozlabs.org ([150.107.74.76]:48605 "EHLO
         gandalf.ozlabs.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230291AbhJYFN5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Oct 2021 01:13:57 -0400
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4Hd32r3QQQz4xZ0;
-        Mon, 25 Oct 2021 16:11:32 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-        s=201702; t=1635138694;
-        bh=dqey1eA2UwdztCXkBRMrK2SIQ19yGv/mM6F7haswWG0=;
-        h=Date:From:To:Cc:Subject:From;
-        b=uCG2vzS1gYLtqrvXZ1jIjfNXuFvgSWXtwFLRk/AnRQrlvhxU2gSCS1U075gNmAxBu
-         4LthcWUIPfXGU1d27zXmg5Rt0lHFA93I64wgxfDaDhUPxvzud3z3T9XLl2frhMn8ID
-         VO8CCCHsZo1EQt+j0n06b5BZ+igq4uj7Jsk9Z+Czm0emLH1nXP6F/x87ddKWmHbShC
-         Q3J59coD4AFvVnm4rsbAMd9YLnZwWOhDN0qu9R3ZtJ6D0B84SV/FlYElFqBvsSPsA6
-         eZ3zGgIG7PR0nsBGzlgQ4GZMkNryQa1397D52ADkK5Uzn+l3/vbgDxy3K16qiM+/Kb
-         JxgrGdF5f4O7A==
-Date:   Mon, 25 Oct 2021 16:11:31 +1100
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Peter Zijlstra <peterz@infradead.org>
-Cc:     Borislav Petkov <bp@suse.de>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Sean Christopherson <seanjc@google.com>
-Subject: linux-next: manual merge of the kvm tree with the tip tree
-Message-ID: <20211025161131.5f2a2459@canb.auug.org.au>
+        with ESMTP id S229735AbhJYFbt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Oct 2021 01:31:49 -0400
+Received: by gandalf.ozlabs.org (Postfix, from userid 1007)
+        id 4Hd3RV3yc5z4xZ1; Mon, 25 Oct 2021 16:29:26 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gibson.dropbear.id.au; s=201602; t=1635139766;
+        bh=6zAr2dccLE+Xq46zC4THi7D5zvFV8MFg187CSJj4PoU=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Soao14g4N+KZ/f9ElfqcTacz+edrkXvdUyuFDgkOIFFrK9kUH2lpbmN3vk8hW17/H
+         /q6A0UCMXTV3UhexzZ6bC1Lh9qDYDc6E15yfCAZayVk1HT/60wXMetI0KviTXKvKnr
+         Elq25upo6pL91ZXHBgCljcx5VZBkiMuPs8pKxLok=
+Date:   Mon, 25 Oct 2021 16:14:56 +1100
+From:   David Gibson <david@gibson.dropbear.id.au>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "hch@lst.de" <hch@lst.de>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+        "parav@mellanox.com" <parav@mellanox.com>,
+        "lkml@metux.net" <lkml@metux.net>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "lushenming@huawei.com" <lushenming@huawei.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "corbet@lwn.net" <corbet@lwn.net>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "yi.l.liu@linux.intel.com" <yi.l.liu@linux.intel.com>,
+        "Tian, Jun J" <jun.j.tian@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "dwmw2@infradead.org" <dwmw2@infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>
+Subject: Re: [RFC 13/20] iommu: Extend iommu_at[de]tach_device() for multiple
+ devices group
+Message-ID: <YXY9UIKDlQpNDGax@yekko>
+References: <20210919063848.1476776-1-yi.l.liu@intel.com>
+ <20210919063848.1476776-14-yi.l.liu@intel.com>
+ <YWe+88sfCbxgMYPN@yekko>
+ <BN9PR11MB54337A8E65C789D038D875C68CB89@BN9PR11MB5433.namprd11.prod.outlook.com>
+ <YWzwmAQDB9Qwu2uQ@yekko>
+ <20211018163238.GO2744544@nvidia.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/JzVuLz4fIkxGYvP21YSHyzC";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="yxRtDnBMBAGaMdJf"
+Content-Disposition: inline
+In-Reply-To: <20211018163238.GO2744544@nvidia.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---Sig_/JzVuLz4fIkxGYvP21YSHyzC
-Content-Type: text/plain; charset=US-ASCII
+
+--yxRtDnBMBAGaMdJf
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-Hi all,
+On Mon, Oct 18, 2021 at 01:32:38PM -0300, Jason Gunthorpe wrote:
+> On Mon, Oct 18, 2021 at 02:57:12PM +1100, David Gibson wrote:
+>=20
+> > The first user might read this.  Subsequent users are likely to just
+> > copy paste examples from earlier things without fully understanding
+> > them.  In general documenting restrictions somewhere is never as
+> > effective as making those restrictions part of the interface signature
+> > itself.
+>=20
+> I'd think this argument would hold more water if you could point to
+> someplace in existing userspace that cares about the VFIO grouping.
 
-Today's linux-next merge of the kvm tree got a conflict in:
+My whole point here is that the proposed semantics mean that we have
+weird side effects even if the app doesn't think it cares about
+groups.
 
-  arch/x86/kvm/x86.c
+e.g. App's input is a bunch of PCI addresses for NICs.  It attaches
+each one to a separate IOAS and bridges packets between them all.  As
+far as the app is concerned, it doesn't care about groups, as you say.
 
-between commits:
+Except that it breaks if any two of the devices are in the same group.
+Worse, it has a completely horrible failure mode: no syscall returns
+an, it just starts trying to do dma with device A, and the packets get
+written into the IOAS that belongs to device B instead.  Sounds like a
+complete nightmare to debug if you don't know about groups, because
+you never thought you cared.
 
-  d69c1382e1b7 ("x86/kvm: Convert FPU handling to a single swap buffer")
-  126fe0401883 ("x86/fpu: Cleanup xstate xcomp_bv initialization")
 
-from the tip tree and commits:
+And yes, for a simple bridge like this app, attaching all the devices
+to the same IOAS is a more likely setup.  But using an IOAS per device
+is a perfectly valid configuration as well, and with the current draft
+nothing will warn the app that this is a bad idea.
 
-  e8f65b9bb483 ("KVM: x86: Remove defunct setting of XCR0 for guest during =
-vCPU create")
-  583d369b36a9 ("KVM: x86: Fold fx_init() into kvm_arch_vcpu_create()")
-
-from the kvm tree.
-
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
+> From what I see the applications do what the admin tells them to do -
+> and if the admin says to use a certain VFIO device then that is
+> excatly what they do. I don't know of any applications that ask the
+> admin to tell them group information.
+>=20
+> What I see is aligning what the kernel provides to the APIs the
+> applications have already built.
+>=20
+> Jason
+>=20
 
 --=20
-Cheers,
-Stephen Rothwell
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-diff --cc arch/x86/kvm/x86.c
-index 5f1fc8224414,ac83d873d65b..000000000000
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@@ -10477,16 -10869,15 +10722,6 @@@ static int sync_regs(struct kvm_vcpu *v
-  	return 0;
-  }
- =20
-- static void fx_init(struct kvm_vcpu *vcpu)
- -void kvm_free_guest_fpu(struct kvm_vcpu *vcpu)
---{
-- 	/*
-- 	 * Ensure guest xcr0 is valid for loading
-- 	 */
-- 	vcpu->arch.xcr0 =3D XFEATURE_MASK_FP;
--=20
-- 	vcpu->arch.cr0 |=3D X86_CR0_ET;
- -	if (vcpu->arch.guest_fpu) {
- -		kmem_cache_free(x86_fpu_cache, vcpu->arch.guest_fpu);
- -		vcpu->arch.guest_fpu =3D NULL;
- -	}
---}
- -EXPORT_SYMBOL_GPL(kvm_free_guest_fpu);
---
-  int kvm_arch_vcpu_precreate(struct kvm *kvm, unsigned int id)
-  {
-  	if (kvm_check_tsc_unstable() && atomic_read(&kvm->online_vcpus) !=3D 0)
-@@@ -10543,13 -10934,24 +10778,11 @@@ int kvm_arch_vcpu_create(struct kvm_v=
-cp
-  	if (!alloc_emulate_ctxt(vcpu))
-  		goto free_wbinvd_dirty_mask;
- =20
- -	vcpu->arch.user_fpu =3D kmem_cache_zalloc(x86_fpu_cache,
- -						GFP_KERNEL_ACCOUNT);
- -	if (!vcpu->arch.user_fpu) {
- -		pr_err("kvm: failed to allocate userspace's fpu\n");
- -		goto free_emulate_ctxt;
- -	}
- -
- -	vcpu->arch.guest_fpu =3D kmem_cache_zalloc(x86_fpu_cache,
- -						 GFP_KERNEL_ACCOUNT);
- -	if (!vcpu->arch.guest_fpu) {
- +	if (!fpu_alloc_guest_fpstate(&vcpu->arch.guest_fpu)) {
-  		pr_err("kvm: failed to allocate vcpu's fpu\n");
- -		goto free_user_fpu;
- +		goto free_emulate_ctxt;
-  	}
- -	fpstate_init(&vcpu->arch.guest_fpu->state);
- -	if (boot_cpu_has(X86_FEATURE_XSAVES))
- -		vcpu->arch.guest_fpu->state.xsave.header.xcomp_bv =3D
- -			host_xcr0 | XSTATE_COMPACTION_ENABLED;
- =20
-- 	fx_init(vcpu);
--=20
-  	vcpu->arch.maxphyaddr =3D cpuid_query_maxphyaddr(vcpu);
-  	vcpu->arch.reserved_gpa_bits =3D kvm_vcpu_reserved_gpa_bits_raw(vcpu);
- =20
-
---Sig_/JzVuLz4fIkxGYvP21YSHyzC
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+--yxRtDnBMBAGaMdJf
+Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmF2PIMACgkQAVBC80lX
-0GxIXwgAhFRBBXN8TicCFlnXDTCCTcqH/BKGU6+GtJwpit1FKb3e9uRtqdBAEZ3T
-0xV57z2pG+PTEpsEHzkT2SHcm+EJUWHqyqNOiMD+ujwCDXJa6BmfopGhP4NmxLj0
-/V22naNz/KKf77bOMmaAcqhf1AFCf15cVjpjIjPtZnjai8XrB+IU3bpi4kRsF09p
-nc1uWEglXCDzfRJYYjsNrSZLs0LbzirFc2nqAS7sk+5pTVmK4pJXRKqI8G4AFz7n
-qulKjxAZwuWTzBR5C5HyhWaVU+lAQSqCZP2yjKUw2KKrrAoXSDbiQtLDQLSd0bmp
-MHJT0cbd8U9+vEXcu3ZtwzagJh5mJQ==
-=/qAC
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAmF2PVAACgkQbDjKyiDZ
+s5LUJhAAqfdhIEiSLBVFINn04mkXp8wdf6ByN7npipHdyHzSj76wY3CwovNLbLyM
+VVz+ua0VowY3482C4CbDxOEKQeYGIn5xD0nsr/gOl7PLm3uBsk4/NVXprgHblYFZ
+Xlb4YtykCSVsxn/QPLYNTX4xhcWL8gUC0FS5n9Ga4N9/8JeT93aWbRMDO+hTTTv0
+Enk/XhH3r4JtHXFUdr2CyU1MXmgJNd0J/Pz48U6OSqq/NP/vOhu9TnqYBLuNyV9J
+ktLJe/vccmavhgscTZRH8hRTCQNgzsYC0OggrREEujZzOV6+uNFr8wCG3GvbGS4h
+5+zL1kkHJ4KAIS38aQxylEOsbCIExyrSixQzdSorJWEGcNdDSy8cSmYeVzWoJMZX
+jEVcCWXFkWobgB9GynbW9nj5sKZUe/8O9eVDpd9g1UDIagzdmD2yNUdLDwrx++Ef
+YtJIFiYSHenbzzIfAoPcxCLLh7O/oXFTp654dODuIuZPfO2FLTdHNRznRn4r0aWW
+x6u4e9KgdC9A5yeN74/Ho0U5snn5PDDxLam/tNz7/xiUBaxgKp96NS5peNU0BMOL
+mI43kdEhXxrXlT3a4k+XZU+WHRTeFh69g9OyJqW6x1dkp5N/3DYgNF3nThc/x1s0
+6tZg+nTGqnEAMV0QYgbR/4H5El5fMHJekab+aaMO69Ny5NnU110=
+=Mlw2
 -----END PGP SIGNATURE-----
 
---Sig_/JzVuLz4fIkxGYvP21YSHyzC--
+--yxRtDnBMBAGaMdJf--
