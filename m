@@ -2,104 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BF7D6439A59
-	for <lists+kvm@lfdr.de>; Mon, 25 Oct 2021 17:22:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 88290439A9B
+	for <lists+kvm@lfdr.de>; Mon, 25 Oct 2021 17:39:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233713AbhJYPYY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Oct 2021 11:24:24 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60269 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229897AbhJYPYX (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 25 Oct 2021 11:24:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635175320;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=4XvEiZf2+PlOP4jQfZDuL7k1/1lBVAKJKfCdxPMRvMw=;
-        b=Wjc6niCZSAWEj4cVz2HCxAfFJ6RYENp2hp3iGU/BDSsFhzTCNoXM2Fv/05nxtiWAd958Zg
-        3pPk0Z25O4QpKbe7ur/vUAqHTWopL5SzJNkDzl0MBDdyy7YAbJLaxj08SxOr09MXaGc/Zr
-        RH11mjz4D5kl841kv0L4abU04coGBd4=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-559-24Z53SOGP4KHwbpxCGskCA-1; Mon, 25 Oct 2021 11:21:58 -0400
-X-MC-Unique: 24Z53SOGP4KHwbpxCGskCA-1
-Received: by mail-ed1-f71.google.com with SMTP id u10-20020a50d94a000000b003dc51565894so10208374edj.21
-        for <kvm@vger.kernel.org>; Mon, 25 Oct 2021 08:21:58 -0700 (PDT)
+        id S231359AbhJYPlx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Oct 2021 11:41:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56662 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230111AbhJYPlw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Oct 2021 11:41:52 -0400
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFFB6C061746
+        for <kvm@vger.kernel.org>; Mon, 25 Oct 2021 08:39:29 -0700 (PDT)
+Received: by mail-pl1-x62f.google.com with SMTP id i5so8198141pla.5
+        for <kvm@vger.kernel.org>; Mon, 25 Oct 2021 08:39:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=4JnvwWaRo4iE6zeN8DeflI8kuZhLv6TYtgEJ2sN18X0=;
+        b=rom/C+7mjkBstnMy4kARza9EAU5haDsedag9MF1Zu7WU30XMVtslLTmJS9nsVH/4aW
+         LNokxElJgsig45c3pYprJDavuno9wsjLPEDvcv2TmfyACdG1j+kqyg0m61VF0UlNa8tN
+         bNr/6RFoZUqOaFUtnGwIjrWXcjPhkjdNjwZvYIvi9+Paf91n/6uv1CtnXCGKqXzseRh9
+         e4FJz23pel7svPYBsPeOA6lQHq3pGX4Ey2yj9jakwJsv9q3O841Q2pye58s7OKYDA7SC
+         i55TfAFVvcdF4XpsBgH+W0sUNZPXciJE+DCU+NoWxrU1xv+JziMARtTkFyWDQnzWxNp6
+         URzA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=4XvEiZf2+PlOP4jQfZDuL7k1/1lBVAKJKfCdxPMRvMw=;
-        b=wThtf93KiFbU0KOK2giu41+CFZ+xldNjICYjVgY0JmnhU/JKa+jtJNioPYyY94P+Ck
-         xNlcqj1glhNKdC6hgQNXlcZ/aCT8NkWwaP7kHlCmDVUttIL2beXHhc+WU6hvEiAGwO44
-         F6Xbp1ZO90ufMrAj993ipvOAn+r3ygRhqcx2S2zCAEmmmeTa8++XNl67vXU1R0dsE/5I
-         MDVkWYMPTpY4y91GnUxV1zDC+7Sa3EvbdWUBqcVrvZyfU6a1RYrsqXFZ7YbeAzO57TYp
-         UM7Munys/JuBNRwdePTH2m+4q3kCJKFLMQ0LwdtrvljzvUJnB0ZnR7LU0CjGCnAQj6Wt
-         bsCg==
-X-Gm-Message-State: AOAM532x+lByUqvpr5m76cnc3o9y17GDeCA105ZsvVt2v1DoxZQ6xZGQ
-        9yAeqflhatqnu+edhuMq8j+OhQUcF+eyUtaj2qHQ8/pOh/hWCzQtumDjMPECIuRZ0cJmtcgzE4T
-        MGAi1a8jX4zhe
-X-Received: by 2002:a17:906:15d0:: with SMTP id l16mr23395540ejd.462.1635175317468;
-        Mon, 25 Oct 2021 08:21:57 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzF6LPnRTghCLifJUp2dbPdHn31IcztASGLIuIqGJjD3b3HXwvY7pD47zsSUkWHV1930VgzTA==
-X-Received: by 2002:a17:906:15d0:: with SMTP id l16mr23395507ejd.462.1635175317210;
-        Mon, 25 Oct 2021 08:21:57 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id cn2sm2671320edb.83.2021.10.25.08.21.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 25 Oct 2021 08:21:56 -0700 (PDT)
-Message-ID: <674bc620-f013-d826-a4d4-00a142755a9e@redhat.com>
-Date:   Mon, 25 Oct 2021 17:21:55 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [PATCH v2 0/4] KVM: x86: APICv cleanups
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Maxim Levitsky <mlevitsk@redhat.com>,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=4JnvwWaRo4iE6zeN8DeflI8kuZhLv6TYtgEJ2sN18X0=;
+        b=3x6MP+l2n6OVXnw/3OnagxS+fSsTsxe1my/6k2yke73XgCsVFnQoAMX9s22Z78oNxb
+         5Xndqpvuju0kDRX2P8IZQddTc0OBh4CZrgnIO0sFLc2fH8ScVpCHHkCH94AFYVKVWsKJ
+         ErqeW1VMfiMHkEN31tPiogrxutZdA4UvcMzW0xuc0LBodh5QpC3YGbV4W5tvwG3O0Lqp
+         sZsN7pNl30VuPYjjUeePEZlwk3aPXT01Mydv0o8d0YFIfZUCs6GNdeSMehhxe/IBmK0P
+         dk+upkSj/fiJxkFa0898VuMawZZ6ZGlHsqs8M+Q5PoObajZwynqgxIu6LCO9geqOh5Fg
+         D/RQ==
+X-Gm-Message-State: AOAM530gsxvnigPqvSjACxM+vHaFSNwT1id9HkJBwDFMEsJnl3G7+dlW
+        ithLceMATeDxOcWKKMWAD8GEzA==
+X-Google-Smtp-Source: ABdhPJz4HZ3w/aq90jYLL/t0p9f4pVly7t0P3O7N0DVqxyTCNjrxnpFqCJU0OLTcZE9ycxEHw7uDLw==
+X-Received: by 2002:a17:90a:c297:: with SMTP id f23mr24322651pjt.37.1635176369106;
+        Mon, 25 Oct 2021 08:39:29 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id om5sm19094195pjb.36.2021.10.25.08.39.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 Oct 2021 08:39:28 -0700 (PDT)
+Date:   Mon, 25 Oct 2021 15:39:24 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20211022004927.1448382-1-seanjc@google.com>
- <23d9b009-2b48-d93c-3c24-711c4757ca1b@redhat.com>
- <9c159d2f23dc3957a2fda0301b25fca67aa21b30.camel@redhat.com>
- <b931906f-b38e-1cb5-c797-65ef82c8b262@redhat.com>
- <YXbAxkf1W37m9eZp@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <YXbAxkf1W37m9eZp@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        linux-kernel@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>,
+        Ben Gardon <bgardon@google.com>
+Subject: Re: [PATCH 2/3] KVM: x86/mmu: Drop a redundant remote TLB flush in
+ kvm_zap_gfn_range()
+Message-ID: <YXbPrOXlSMJrVaqA@google.com>
+References: <20211022010005.1454978-1-seanjc@google.com>
+ <20211022010005.1454978-3-seanjc@google.com>
+ <ed34e089-5a35-2502-5a7d-ad8b1cf6957f@oracle.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ed34e089-5a35-2502-5a7d-ad8b1cf6957f@oracle.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 25/10/21 16:35, Sean Christopherson wrote:
->> So yeah, I think you're right.
-> Yep.  The alternative would be to explicitly check for a pending APICv update.
-> I don't have a strong opinion, I dislike both options equally:-)
+On Fri, Oct 22, 2021, Maciej S. Szmigiero wrote:
+> On 22.10.2021 03:00, Sean Christopherson wrote:
+> > Remove an unnecessary remote TLB flush in kvm_zap_gfn_range() now that
+> > said function holds mmu_lock for write for its entire duration.  The
+> > flush was added by the now-reverted commit to allow TDP MMU to flush while
+> > holding mmu_lock for read, as the transition from write=>read required
+> > dropping the lock and thus a pending flush needed to be serviced.
+> > 
+> > Fixes: 5a324c24b638 ("Revert "KVM: x86/mmu: Allow zap gfn range to operate under the mmu read lock"")
+> > Cc: Maxim Levitsky <mlevitsk@redhat.com>
+> > Cc: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
+> > Cc: Ben Gardon <bgardon@google.com>
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > ---
+> >   arch/x86/kvm/mmu/mmu.c | 3 ---
+> >   1 file changed, 3 deletions(-)
+> > 
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index f82b192bba0b..e8b8a665e2e9 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -5700,9 +5700,6 @@ void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
+> >   						end - 1, true, flush);
+> >   			}
+> >   		}
+> > -		if (flush)
+> > -			kvm_flush_remote_tlbs_with_address(kvm, gfn_start,
+> > -							   gfn_end - gfn_start);
+> >   	}
+> >   	if (is_tdp_mmu_enabled(kvm)) {
+> > 
+> 
+> Unfortunately, it seems that a pending flush from __kvm_zap_rmaps()
+> can be reset back to false by the following line:
+> > flush = kvm_tdp_mmu_zap_gfn_range(kvm, i, gfn_start, gfn_end, flush);
+> 
+> kvm_tdp_mmu_zap_gfn_range() calls __kvm_tdp_mmu_zap_gfn_range with
+> "can_yield" set to true, which passes it to zap_gfn_range, which has
+> this code:
+> > if (can_yield &&
+> >     tdp_mmu_iter_cond_resched(kvm, &iter, flush, shared)) {
+> >       flush = false;
+> >       continue;
+> > }
 
-No, checking for the update is worse and with this example, I can now 
-point my finger on why I preferred the VM check even before: because 
-even though the page fault path runs in vCPU context and uses a 
-vCPU-specific role, overall the page tables are still per-VM.
+That's working by design.  If the MMU (legacy or TDP) yields during zap, it _must_
+flush before dropping mmu_lock so that any SPTE modifications are guaranteed to be
+observed by all vCPUs.  Clearing "flush" is deliberate/correct as another is flush
+is needed if and only if additional SPTE modifications are made.
 
-Therefore it makes sense for the page fault path to synchronize with 
-whoever updates the flag and zaps the page, and not with the KVM_REQ_* 
-handler of the same vCPU.
 
-(Here goes the usual shameless plug of my lockless programming articles 
-on LWN---I think you're old enough to vaguely remember Jerry 
-Pournelle---and in particular the first one at 
-https://lwn.net/Articles/844224/).
+static inline bool tdp_mmu_iter_cond_resched(struct kvm *kvm,
+					     struct tdp_iter *iter, bool flush,
+					     bool shared)
+{
+	/* Ensure forward progress has been made before yielding. */
+	if (iter->next_last_level_gfn == iter->yielded_gfn)
+		return false;
 
-> Want me to type up a v3 comment?
+	if (need_resched() || rwlock_needbreak(&kvm->mmu_lock)) {
+		rcu_read_unlock();
 
-Yes, please do.
+		if (flush)
+			kvm_flush_remote_tlbs(kvm);  <------- ****** HERE ******
 
-Paolo
+		if (shared)
+			cond_resched_rwlock_read(&kvm->mmu_lock);
+		else
+			cond_resched_rwlock_write(&kvm->mmu_lock);
 
+		rcu_read_lock();
+
+		WARN_ON(iter->gfn > iter->next_last_level_gfn);
+
+		tdp_iter_restart(iter);
+
+		return true;
+	}
+
+	return false;
+}
