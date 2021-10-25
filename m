@@ -2,145 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C5B38438ED2
-	for <lists+kvm@lfdr.de>; Mon, 25 Oct 2021 07:29:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EBB43438ECC
+	for <lists+kvm@lfdr.de>; Mon, 25 Oct 2021 07:28:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229890AbhJYFbv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Oct 2021 01:31:51 -0400
-Received: from gandalf.ozlabs.org ([150.107.74.76]:48605 "EHLO
-        gandalf.ozlabs.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229735AbhJYFbt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Oct 2021 01:31:49 -0400
-Received: by gandalf.ozlabs.org (Postfix, from userid 1007)
-        id 4Hd3RV3yc5z4xZ1; Mon, 25 Oct 2021 16:29:26 +1100 (AEDT)
+        id S229678AbhJYFbG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Oct 2021 01:31:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57250 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229489AbhJYFbF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Oct 2021 01:31:05 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77849C061745
+        for <kvm@vger.kernel.org>; Sun, 24 Oct 2021 22:28:43 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id c140-20020a624e92000000b0044d3de98438so5816766pfb.14
+        for <kvm@vger.kernel.org>; Sun, 24 Oct 2021 22:28:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gibson.dropbear.id.au; s=201602; t=1635139766;
-        bh=6zAr2dccLE+Xq46zC4THi7D5zvFV8MFg187CSJj4PoU=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Soao14g4N+KZ/f9ElfqcTacz+edrkXvdUyuFDgkOIFFrK9kUH2lpbmN3vk8hW17/H
-         /q6A0UCMXTV3UhexzZ6bC1Lh9qDYDc6E15yfCAZayVk1HT/60wXMetI0KviTXKvKnr
-         Elq25upo6pL91ZXHBgCljcx5VZBkiMuPs8pKxLok=
-Date:   Mon, 25 Oct 2021 16:14:56 +1100
-From:   David Gibson <david@gibson.dropbear.id.au>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "hch@lst.de" <hch@lst.de>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        "parav@mellanox.com" <parav@mellanox.com>,
-        "lkml@metux.net" <lkml@metux.net>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "lushenming@huawei.com" <lushenming@huawei.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "corbet@lwn.net" <corbet@lwn.net>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "yi.l.liu@linux.intel.com" <yi.l.liu@linux.intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "dwmw2@infradead.org" <dwmw2@infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>
-Subject: Re: [RFC 13/20] iommu: Extend iommu_at[de]tach_device() for multiple
- devices group
-Message-ID: <YXY9UIKDlQpNDGax@yekko>
-References: <20210919063848.1476776-1-yi.l.liu@intel.com>
- <20210919063848.1476776-14-yi.l.liu@intel.com>
- <YWe+88sfCbxgMYPN@yekko>
- <BN9PR11MB54337A8E65C789D038D875C68CB89@BN9PR11MB5433.namprd11.prod.outlook.com>
- <YWzwmAQDB9Qwu2uQ@yekko>
- <20211018163238.GO2744544@nvidia.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="yxRtDnBMBAGaMdJf"
-Content-Disposition: inline
-In-Reply-To: <20211018163238.GO2744544@nvidia.com>
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=CTt27ibvZrCOrH5nDDNMkGDaa9yJWzJBxmtC5ngpNVI=;
+        b=rIF2Mkllp/lzbDfJItjQpWGe51YLIJTeNGeCWkCQ2z+OQUrU5bkwJ+EvgfmFK3vN1f
+         YjAWEL7CnWseYStBEda/XlDZzCgNFRyl4e6Hf4LO4cJULJ6Jlp1DQkJX2Di8sSc6XrDq
+         UOrIo2epZ4f9ePSIU7TgiA9wSAuprC5fjcnsV8i/wnzzKWHjQBrpO5wUlasY5RUHOc6t
+         1m/d1DjuKji8niu/wqfkJzj/0c1TOFg8bgUssy9ewRBnP5PI81OpcaT3wQMQvX3cqJPg
+         +IKT5PMQov3nWSXrc0Lu9gYo0+RlucbGhZ0yrHwjvc+UHuHnsvYIL8GwFKDxLav/4BQg
+         KwlA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=CTt27ibvZrCOrH5nDDNMkGDaa9yJWzJBxmtC5ngpNVI=;
+        b=g0bHv7wOIPAKN+izTAg8BJwozDdNjmXREQZMBAjGAu7/Gxh0TRIFuKYsaAXKtWhv0G
+         u5/Az21g70/6I5hZUalC/iLEPLpZKF0+IY7+TJOoTvyrZTAARIuEijyo/BmdCdkLPt3+
+         ZzGr7UFz/EkOf9k2yfJyddwCNUt4ic+PQu9oXBnaTa4juDQ54548Odzo5w0KFP5GYqva
+         sLEW9nGmQOaQc4GqPioJ7+3Ef4luDt5xGdi8sh8cU25J2zRCOW+gk2KrIKmrHGvFslz0
+         P/WDTJLHoD/Uh7XREIJ5AeWEgevFaQ1K2U46xVW5M5gCIZknK7ZXCYz6P5A7gq8LkAC6
+         j73Q==
+X-Gm-Message-State: AOAM5310dO3vQghYRnht66irelDy6CBZ5X6BtTiuwXPGQHvGYlzqRHsM
+        uO6uu0miaNlV8rr3IAnxeLECrKnoZs8t
+X-Google-Smtp-Source: ABdhPJzVOlb7myyniCYNrg52jYHLPd8SDPVNauBIpnSi4Y22dUcaPGXCPeKcVmxT8LDltKxk1pHVs+qukzAk
+X-Received: from marcorr-linuxworkstation.sea.corp.google.com
+ ([2620:15c:29:204:8bda:38c0:4ce3:e285]) (user=marcorr job=sendgmr) by
+ 2002:a05:6a00:22d4:b0:44d:1c39:a8d3 with SMTP id f20-20020a056a0022d400b0044d1c39a8d3mr16507565pfj.56.1635139722352;
+ Sun, 24 Oct 2021 22:28:42 -0700 (PDT)
+Date:   Sun, 24 Oct 2021 22:28:29 -0700
+Message-Id: <20211025052829.2062623-1-marcorr@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.0.1079.g6e70778dc9-goog
+Subject: [kvm-unit-tests PATCH] x86: SEV-ES: add port string IO test case
+From:   Marc Orr <marcorr@google.com>
+To:     pbonzini@redhat.com, kvm@vger.kernel.org, Thomas.Lendacky@amd.com,
+        zxwang42@gmail.com, fwilhelm@google.com, seanjc@google.com,
+        oupton@google.com, mlevitsk@redhat.com, pgonda@google.com,
+        drjones@redhat.com
+Cc:     Marc Orr <marcorr@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Add a test case to verify that string IO works as expected under SEV-ES.
+This test case is based on the `test_stringio()` test case in emulator.c.
+However, emulator.c does not currently run under UEFI.
 
---yxRtDnBMBAGaMdJf
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Only the first half of the test case, which processes a string from
+beginning to end, was taken for now. The second test case did not work
+and is thus left out of the amd_sev.c setup for now.
 
-On Mon, Oct 18, 2021 at 01:32:38PM -0300, Jason Gunthorpe wrote:
-> On Mon, Oct 18, 2021 at 02:57:12PM +1100, David Gibson wrote:
->=20
-> > The first user might read this.  Subsequent users are likely to just
-> > copy paste examples from earlier things without fully understanding
-> > them.  In general documenting restrictions somewhere is never as
-> > effective as making those restrictions part of the interface signature
-> > itself.
->=20
-> I'd think this argument would hold more water if you could point to
-> someplace in existing userspace that cares about the VFIO grouping.
+Also, the first test case was modified to do port IO at word granularity
+rather than byte granularity. The reason is to ensure that using the
+port IO size in a calculation within the kernel does not multiply or
+divide by 1. In particular, this tweak is useful to demonstrate that a
+recent KVM patch [1] does not behave correctly.
 
-My whole point here is that the proposed semantics mean that we have
-weird side effects even if the app doesn't think it cares about
-groups.
+* This patch is based on the `uefi` branch.
 
-e.g. App's input is a bunch of PCI addresses for NICs.  It attaches
-each one to a separate IOAS and bridges packets between them all.  As
-far as the app is concerned, it doesn't care about groups, as you say.
+[1] https://patchwork.kernel.org/project/kvm/patch/20211013165616.19846-2-pbonzini@redhat.com/
 
-Except that it breaks if any two of the devices are in the same group.
-Worse, it has a completely horrible failure mode: no syscall returns
-an, it just starts trying to do dma with device A, and the packets get
-written into the IOAS that belongs to device B instead.  Sounds like a
-complete nightmare to debug if you don't know about groups, because
-you never thought you cared.
+Signed-off-by: Marc Orr <marcorr@google.com>
+---
+ x86/amd_sev.c | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
 
+diff --git a/x86/amd_sev.c b/x86/amd_sev.c
+index 061c50514545..7757d4f85b7a 100644
+--- a/x86/amd_sev.c
++++ b/x86/amd_sev.c
+@@ -18,6 +18,10 @@
+ #define EXIT_SUCCESS 0
+ #define EXIT_FAILURE 1
+ 
++#define TESTDEV_IO_PORT 0xe0
++
++static char st1[] = "abcdefghijklmnop";
++
+ static int test_sev_activation(void)
+ {
+ 	struct cpuid cpuid_out;
+@@ -65,11 +69,29 @@ static void test_sev_es_activation(void)
+ 	}
+ }
+ 
++static void test_stringio(void)
++{
++	int st1_len = sizeof(st1) - 1;
++	u16 got;
++
++	asm volatile("cld \n\t"
++		     "movw %0, %%dx \n\t"
++		     "rep outsw \n\t"
++		     : : "i"((short)TESTDEV_IO_PORT),
++		         "S"(st1), "c"(st1_len / 2));
++
++	asm volatile("inw %1, %0\n\t" : "=a"(got) : "i"((short)TESTDEV_IO_PORT));
++
++	report((got & 0xff) == st1[sizeof(st1) - 3], "outsb nearly up");
++	report((got & 0xff00) >> 8 == st1[sizeof(st1) - 2], "outsb up");
++}
++
+ int main(void)
+ {
+ 	int rtn;
+ 	rtn = test_sev_activation();
+ 	report(rtn == EXIT_SUCCESS, "SEV activation test.");
+ 	test_sev_es_activation();
++	test_stringio();
+ 	return report_summary();
+ }
+-- 
+2.33.0.1079.g6e70778dc9-goog
 
-And yes, for a simple bridge like this app, attaching all the devices
-to the same IOAS is a more likely setup.  But using an IOAS per device
-is a perfectly valid configuration as well, and with the current draft
-nothing will warn the app that this is a bad idea.
-
-> From what I see the applications do what the admin tells them to do -
-> and if the admin says to use a certain VFIO device then that is
-> excatly what they do. I don't know of any applications that ask the
-> admin to tell them group information.
->=20
-> What I see is aligning what the kernel provides to the APIs the
-> applications have already built.
->=20
-> Jason
->=20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---yxRtDnBMBAGaMdJf
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAmF2PVAACgkQbDjKyiDZ
-s5LUJhAAqfdhIEiSLBVFINn04mkXp8wdf6ByN7npipHdyHzSj76wY3CwovNLbLyM
-VVz+ua0VowY3482C4CbDxOEKQeYGIn5xD0nsr/gOl7PLm3uBsk4/NVXprgHblYFZ
-Xlb4YtykCSVsxn/QPLYNTX4xhcWL8gUC0FS5n9Ga4N9/8JeT93aWbRMDO+hTTTv0
-Enk/XhH3r4JtHXFUdr2CyU1MXmgJNd0J/Pz48U6OSqq/NP/vOhu9TnqYBLuNyV9J
-ktLJe/vccmavhgscTZRH8hRTCQNgzsYC0OggrREEujZzOV6+uNFr8wCG3GvbGS4h
-5+zL1kkHJ4KAIS38aQxylEOsbCIExyrSixQzdSorJWEGcNdDSy8cSmYeVzWoJMZX
-jEVcCWXFkWobgB9GynbW9nj5sKZUe/8O9eVDpd9g1UDIagzdmD2yNUdLDwrx++Ef
-YtJIFiYSHenbzzIfAoPcxCLLh7O/oXFTp654dODuIuZPfO2FLTdHNRznRn4r0aWW
-x6u4e9KgdC9A5yeN74/Ho0U5snn5PDDxLam/tNz7/xiUBaxgKp96NS5peNU0BMOL
-mI43kdEhXxrXlT3a4k+XZU+WHRTeFh69g9OyJqW6x1dkp5N/3DYgNF3nThc/x1s0
-6tZg+nTGqnEAMV0QYgbR/4H5El5fMHJekab+aaMO69Ny5NnU110=
-=Mlw2
------END PGP SIGNATURE-----
-
---yxRtDnBMBAGaMdJf--
