@@ -2,110 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BA08343923F
-	for <lists+kvm@lfdr.de>; Mon, 25 Oct 2021 11:25:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C5C5C439398
+	for <lists+kvm@lfdr.de>; Mon, 25 Oct 2021 12:23:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232143AbhJYJ1q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Oct 2021 05:27:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54498 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230010AbhJYJ1q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Oct 2021 05:27:46 -0400
-Received: from mail-il1-x129.google.com (mail-il1-x129.google.com [IPv6:2607:f8b0:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55D9EC061745
-        for <kvm@vger.kernel.org>; Mon, 25 Oct 2021 02:25:24 -0700 (PDT)
-Received: by mail-il1-x129.google.com with SMTP id l13so555829ilh.3
-        for <kvm@vger.kernel.org>; Mon, 25 Oct 2021 02:25:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=+R7tv8qiGWmyQ39BNBDNWy3Y8nx1ucJhdbMLNxEg+wg=;
-        b=PXf3zbZyoJZHm/NdGg8YmWmsJKNaW8+GIVThMbUZEyMnP3BHhQhOgvvSYuFPgJRcT1
-         XkILQ3fYHga54Xa84NWrbB5PxWmKdSt7p30UW9PriGV76uXhau4WYuksgXetrV45qTLM
-         kYiX1nbkHezmmkgfm7lhzg4drTEkxHtxTbElEUSMphx7DhvQfTfrVOpYhdx7RJsloLug
-         dC1YiMeGvHMHsywHdYBUiJtenaUqHJp3yu2Sm6ykszmmklQDZmfYey3z6bkymnJfGi//
-         iUzWR3BJw6qZ3fH62SRGcGIFNcptSHVBfGwS2f+3/hMM8+T9fPnZ9SUkgP5DBS35jp4L
-         2FRg==
+        id S232805AbhJYK0J (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Oct 2021 06:26:09 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36586 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232340AbhJYK0I (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 25 Oct 2021 06:26:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1635157426;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=w2+eCOoraI98VwusL2Ww6vNBWcx0Cj4tYXoK77zGYfw=;
+        b=VgW1OFCZ1kokM2qVcjMqbEEwO0rVUbRYGlNDhdlaIVVjnzQ+fWRqe/twTCku1nSz0RkZoU
+        DVOVnVe+vMDzM4N84mMqPWvB7HuMPfAVif4QxYmvrWoRlJKt0bRSOucghYcvC5gR3JwzC9
+        IDKI0Y3qN71qCXygb4bVMT5Ptcil1Qk=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-243-HSZQHjfmM7Of8XiQuuhC6Q-1; Mon, 25 Oct 2021 06:23:45 -0400
+X-MC-Unique: HSZQHjfmM7Of8XiQuuhC6Q-1
+Received: by mail-ed1-f72.google.com with SMTP id u10-20020a50d94a000000b003dc51565894so9379159edj.21
+        for <kvm@vger.kernel.org>; Mon, 25 Oct 2021 03:23:44 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=+R7tv8qiGWmyQ39BNBDNWy3Y8nx1ucJhdbMLNxEg+wg=;
-        b=jIkoQlMMgQlIFYXFyiehI4/bPVWWpgR97q47ywGD2Zhf3xSoycmtmBx8A6UCzAEi3/
-         jdYvl5mazEky7t6yCboM3cIweZVGwmb1vJWEesxtePffAbNKS6fsrEkUGemM7oE48Mrs
-         hZyhv6K1riQOZ69Lr8ueMhXGMX2cvJV6axkcq5DCJ3oW/82GlguCO9kNBxk9Gd4NnsCQ
-         G5n2nzu7VB4klItTNlat55AAJMSJaxLcBdTee/Poe4Wi1njUDs14aC/2E9LV3K05nXJY
-         YdSq99yoW+F6PCLhpSGsONIPlPezi0q4LcmvlxMj/Yp6NtjHQe8rzlAkH6C/kO3EJP1U
-         guNA==
-X-Gm-Message-State: AOAM533Y4i+xfjxfCN6iW8oHh3PN6qIMdH5zU/fQ7Dpa40kq5vEHbhNR
-        hebAQ5Ya2HtBNWXtpqYq4gLJzPa5Erk0KwR6o08=
-X-Google-Smtp-Source: ABdhPJwCeauerAG2rJdX0ZvBFLfdAlHFIAsJgtVOqafxahv+gVplAmI+8ZUoN2FjqdC1Y2cAM3kb8RP1gtRCWlfQ/Zk=
-X-Received: by 2002:a05:6e02:168b:: with SMTP id f11mr8105908ila.260.1635153923810;
- Mon, 25 Oct 2021 02:25:23 -0700 (PDT)
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=w2+eCOoraI98VwusL2Ww6vNBWcx0Cj4tYXoK77zGYfw=;
+        b=MV3+0F926h6QMvyDzBc8LG+kR0erWYZCgJORyJsKUZ/pOovEcNqUwlF3Tn/a9Jk08r
+         G/wb1EYPeLdrzeoF7ff4Q5X4U9W5a/aXSTqgkjxBReUluHkixKhZFwHyAqBNgNwuiQ/L
+         bDjNeFHWqkfJ93wnA54x2n7CrH0V4PNeLbuyUVQRAkVKVobJ6AyBan1316fRj1VeQrsD
+         RkYhOWbEfdiyb7nfo7aeHoOnLNvPFqQpSrGJUqDwmrMDtN7b2M4a5jdS8eSwsRthD84E
+         B+pygHuBgO10INXkc1lCKiAxA+0uLPnWgfICfr48q5Wh9aTLBXvYECAix02rva0YPsLd
+         Tblg==
+X-Gm-Message-State: AOAM533zp9YYskUt7Kn7AIJ7zzyolPFWK7JSW1Nyj3hQDspD5sXjXzXa
+        MUHHvfNn4aeHZqyNBWvn9u6X6Qqi8k7rmHZ4GiSI7POLgkRVxcezVpHRoiD9BrKKZ0OQug7it0m
+        +DNCBkDajgB2E
+X-Received: by 2002:a17:906:5804:: with SMTP id m4mr21362705ejq.295.1635157423916;
+        Mon, 25 Oct 2021 03:23:43 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwKKQrfnnXWyBSPxyIBF3xNVjNaHailttWUMksBd7mrflUSeDxlk5gEmp3bCkXv8cU4nej1sw==
+X-Received: by 2002:a17:906:5804:: with SMTP id m4mr21362685ejq.295.1635157423687;
+        Mon, 25 Oct 2021 03:23:43 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
+        by smtp.gmail.com with ESMTPSA id s22sm1035093edq.56.2021.10.25.03.23.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 25 Oct 2021 03:23:43 -0700 (PDT)
+Message-ID: <09f4468b-0916-cf2c-1cef-46970a238ce4@redhat.com>
+Date:   Mon, 25 Oct 2021 12:23:42 +0200
 MIME-Version: 1.0
-References: <20211006173113.26445-1-alazar@bitdefender.com>
-In-Reply-To: <20211006173113.26445-1-alazar@bitdefender.com>
-From:   Mathieu Tarral <mathieu.tarral@gmail.com>
-Date:   Mon, 25 Oct 2021 11:25:12 +0200
-Message-ID: <CAPXUdKGnKNrGb3cOyFWSpgjVwT93GnvMtc+U1xEav5ew1h6GSw@mail.gmail.com>
-Subject: Re: [PATCH v12 00/77] VM introspection
-To:     =?UTF-8?Q?Adalbert_Laz=C4=83r?= <alazar@bitdefender.com>
-Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Mathieu Tarral <mathieu.tarral@protonmail.com>,
-        Tamas K Lengyel <tamas@tklengyel.com>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [PATCH] KVM: x86/xen: Fix runstate updates to be atomic when
+ preempting vCPU
+Content-Language: en-US
+To:     "Woodhouse, David" <dwmw@amazon.co.uk>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Cc:     "jmattson@google.com" <jmattson@google.com>,
+        "wanpengli@tencent.com" <wanpengli@tencent.com>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "mtosatti@redhat.com" <mtosatti@redhat.com>,
+        "joro@8bytes.org" <joro@8bytes.org>
+References: <3d2a13164cbc61142b16edba85960db9a381bebe.camel@amazon.co.uk>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <3d2a13164cbc61142b16edba85960db9a381bebe.camel@amazon.co.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Adalbert,
+On 23/10/21 21:47, Woodhouse, David wrote:
+> I almost switched to using a gfn_to_pfn_cache here and bailing out if
+> kvm_map_gfn() fails, like kvm_steal_time_set_preempted() does — but on
+> closer inspection it looks like kvm_map_gfn() will*always*  fail in
+> atomic context for a page in IOMEM, which means it will silently fail
+> to make the update every single time for such guests, AFAICT. So I
+> didn't do it that way after all. And will probably fix that one too.
 
-> The KVM introspection subsystem provides a facility for applications
-> running on the host or in a separate VM, to control the execution of
-> other VMs (pause, resume, shutdown), query the state of the vCPUs (GPRs,
-> MSRs etc.), alter the page access bits in the shadow page tables (only
-> for the hardware backed ones, eg. Intel's EPT) and receive notifications
-> when events of interest have taken place (shadow page table level faults,
-> key MSR writes, hypercalls etc.). Some notifications can be responded
-> to with an action (like preventing an MSR from being written), others
-> are mere informative (like breakpoint events which can be used for
-> execution tracing).  With few exceptions, all events are optional. An
-> application using this subsystem will explicitly register for them.
->
-> The use case that gave way for the creation of this subsystem is to
-> monitor the guest OS and as such the ABI/API is highly influenced by how
-> the guest software (kernel, applications) sees the world. For example,
-> some events provide information specific for the host CPU architecture
-> (eg. MSR_IA32_SYSENTER_EIP) merely because its leveraged by guest software
-> to implement a critical feature (fast system calls).
->
-> At the moment, the target audience for KVMI are security software authors
-> that wish to perform forensics on newly discovered threats (exploits)
-> or to implement another layer of security like preventing a large set
-> of kernel rootkits simply by "locking" the kernel image in the shadow
-> page tables (ie. enforce .text r-x, .rodata rw- etc.). It's the latter
-> case that made KVMI a separate subsystem, even though many of these
-> features are available in the device manager. The ability to build a
-> security application that does not interfere (in terms of performance)
-> with the guest software asks for a specialized interface that is designed
-> for minimum overhead.
+Not every single time, only if the cache is absent, stale or not 
+initialized.
 
-thank you for the effort of rebasing your code and submitting a new series here.
-I'm very enthousiast about the introspection features you are adding
-to KVM (and so is the KVM-VMI community in general).
+In the case of steal time, record_steal_time can update the cache 
+because it's never called from atomic context, while 
+kvm_steal_time_set_preempted is just advisory and therefore can fail 
+just fine.
 
-On a side note, working for the Hardware and Software Laboratory (LAM)
-at ANSSI (National Cybersecurity Agency of France),
-we are closely following these new introspection capabilities, and
-waiting to see when they will hit upstream to orient more
-research based on KVM.
+One possible solution (which I even have unfinished patches for) is to 
+put all the gfn_to_pfn_caches on a list, and refresh them when the MMU 
+notifier receives an invalidation.
 
-Best regards,
-Mathieu Tarral
+Paolo
+
