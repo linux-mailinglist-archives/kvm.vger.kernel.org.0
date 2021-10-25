@@ -2,142 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B12C1439C25
-	for <lists+kvm@lfdr.de>; Mon, 25 Oct 2021 18:56:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 41B31439D2A
+	for <lists+kvm@lfdr.de>; Mon, 25 Oct 2021 19:10:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234067AbhJYQ7E (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Oct 2021 12:59:04 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:60118 "EHLO
+        id S235041AbhJYRMo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Oct 2021 13:12:44 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:35504 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234047AbhJYQ7E (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 25 Oct 2021 12:59:04 -0400
+        by vger.kernel.org with ESMTP id S234713AbhJYRL7 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 25 Oct 2021 13:11:59 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635180999;
+        s=mimecast20190719; t=1635181776;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=gy/tPJm5wrnT5rvwJGt71DHUl6kk6qEeUFUy+P7Hr5k=;
-        b=TCfeuvv57LqKyzmYoWGiBfJ4CDJTKtn3OapcC/ewBQO+F/6nEgK24VC/K9Kuh2uc6YHKEl
-        pqhnyToR57DllhLS7lbO6HhQEvkQSSmEaSS0KihqhiC21o7OTioZiWKQoMI0YOUglaZOmi
-        H3POn3/nIoaf8JNuaaUBDLwJaUozDVU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-252-Kkp5gGrFMQyd3J0qOxa3PQ-1; Mon, 25 Oct 2021 12:56:35 -0400
-X-MC-Unique: Kkp5gGrFMQyd3J0qOxa3PQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5731318D6A2C;
-        Mon, 25 Oct 2021 16:56:33 +0000 (UTC)
-Received: from localhost (unknown [10.39.192.215])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CC9945D9D5;
-        Mon, 25 Oct 2021 16:56:13 +0000 (UTC)
-Date:   Mon, 25 Oct 2021 17:56:12 +0100
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Elena <elena.ufimtseva@oracle.com>
-Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org, mst@redhat.com,
-        john.g.johnson@oracle.com, dinechin@redhat.com, cohuck@redhat.com,
-        jasowang@redhat.com, felipe@nutanix.com, jag.raman@oracle.com,
-        eafanasova@gmail.com
-Subject: Re: MMIO/PIO dispatch file descriptors (ioregionfd) design discussion
-Message-ID: <YXbhrJDTBu6AQsuF@stefanha-x1.localdomain>
-References: <88ca79d2e378dcbfb3988b562ad2c16c4f929ac7.camel@gmail.com>
- <YWUeZVnTVI7M/Psr@heatpipe>
- <YXamUDa5j9uEALYr@stefanha-x1.localdomain>
- <20211025152122.GA25901@nuker>
+        bh=7VgV8J8M68X7FsFm+kLhyb9kPwgpFCC0ZlbVrVQHUVU=;
+        b=gbRxT/2AC1MPCApTA/BQDqg9IPNe2pBTLE76U5ycJcqzWg1rRbPbdR4D+jk7SfMUJet1Eg
+        /vFTj56peAZLbug5BNnI1tryIGLBdqqOY8bJhhVPR1DbuWUF8dP0VyYvZWPq/KiUbiVTFr
+        Ks3G7sJrF9JkhR85lCZZhfkXqOU4T9E=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-36-Q2Xfu4KzPsajdflWY_pOYQ-1; Mon, 25 Oct 2021 13:09:34 -0400
+X-MC-Unique: Q2Xfu4KzPsajdflWY_pOYQ-1
+Received: by mail-wr1-f72.google.com with SMTP id k2-20020adfc702000000b0016006b2da9bso3394308wrg.1
+        for <kvm@vger.kernel.org>; Mon, 25 Oct 2021 10:09:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=7VgV8J8M68X7FsFm+kLhyb9kPwgpFCC0ZlbVrVQHUVU=;
+        b=wsl7OHALoUEaBlFlx7vhvW82GnFi5z8AobR5hZ/g2DpnN4cV0yaC7/ea/fgWJe0b7t
+         NGxeBrAFrTrdUgpic6BmK4+lA/EzKUFVZ1lUPfi1Zitx0fpzPc9eVFUPshczfCEmS6Ly
+         oaiwWeA11j13TR5E+fdVZL7s+ZAp2venabWJJ4jetXCIgVj34lz1HTlq2zhf7QWBA9ea
+         8mvuM40ezw1DJoura5oEz2UBTEnGoJIaTKz/0JfHmh9yn4qp2920/bQqiAxsXWhKbLSy
+         2CliLRBOvMJJ7eBTspUtCUEWwxnILHQT3sVrKv8i3kzpd7GH/jcAmfw1tqqCbIVpwHow
+         nM8Q==
+X-Gm-Message-State: AOAM530e582ot5DG/fOmlzf8xx7Iz2LDvytqe4aiXNUhe0ydS36aw+hB
+        Jq/2FEdAbd7f46l/fpLljet/yMOW4HI3nofUjwvtljPVdhZBVWaVg0M4pbwJ4rIrzwXLAprIuKu
+        xHozHjpUW0sfK
+X-Received: by 2002:adf:d1c2:: with SMTP id b2mr25488474wrd.73.1635181773523;
+        Mon, 25 Oct 2021 10:09:33 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy7iBirqneThYpe55mmEY2fmAX0kuVQkYB48qDjmRaM0sTyADUamlOJtZRya6UOvDrPg3cmOQ==
+X-Received: by 2002:adf:d1c2:: with SMTP id b2mr25488431wrd.73.1635181773261;
+        Mon, 25 Oct 2021 10:09:33 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id g10sm20018005wmq.13.2021.10.25.10.09.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 25 Oct 2021 10:09:32 -0700 (PDT)
+Message-ID: <b7ce2d41-a14c-cd17-d60f-2962b3df8826@redhat.com>
+Date:   Mon, 25 Oct 2021 19:09:31 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="63SiROHZXyxNKkHV"
-Content-Disposition: inline
-In-Reply-To: <20211025152122.GA25901@nuker>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [kvm-unit-tests PATCH] x86: SEV-ES: add port string IO test case
+Content-Language: en-US
+To:     Marc Orr <marcorr@google.com>, kvm@vger.kernel.org,
+        Thomas.Lendacky@amd.com, zxwang42@gmail.com, fwilhelm@google.com,
+        seanjc@google.com, oupton@google.com, mlevitsk@redhat.com,
+        pgonda@google.com, drjones@redhat.com
+References: <20211025052829.2062623-1-marcorr@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20211025052829.2062623-1-marcorr@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 25/10/21 07:28, Marc Orr wrote:
+> Add a test case to verify that string IO works as expected under SEV-ES.
+> This test case is based on the `test_stringio()` test case in emulator.c.
+> However, emulator.c does not currently run under UEFI.
+> 
+> Only the first half of the test case, which processes a string from
+> beginning to end, was taken for now. The second test case did not work
+> and is thus left out of the amd_sev.c setup for now.
+> 
+> Also, the first test case was modified to do port IO at word granularity
+> rather than byte granularity. The reason is to ensure that using the
+> port IO size in a calculation within the kernel does not multiply or
+> divide by 1. In particular, this tweak is useful to demonstrate that a
+> recent KVM patch [1] does not behave correctly.
+> 
+> * This patch is based on the `uefi` branch.
+> 
+> [1] https://patchwork.kernel.org/project/kvm/patch/20211013165616.19846-2-pbonzini@redhat.com/
+> 
+> Signed-off-by: Marc Orr <marcorr@google.com>
+> ---
+>   x86/amd_sev.c | 22 ++++++++++++++++++++++
+>   1 file changed, 22 insertions(+)
+> 
+> diff --git a/x86/amd_sev.c b/x86/amd_sev.c
+> index 061c50514545..7757d4f85b7a 100644
+> --- a/x86/amd_sev.c
+> +++ b/x86/amd_sev.c
+> @@ -18,6 +18,10 @@
+>   #define EXIT_SUCCESS 0
+>   #define EXIT_FAILURE 1
+>   
+> +#define TESTDEV_IO_PORT 0xe0
+> +
+> +static char st1[] = "abcdefghijklmnop";
+> +
+>   static int test_sev_activation(void)
+>   {
+>   	struct cpuid cpuid_out;
+> @@ -65,11 +69,29 @@ static void test_sev_es_activation(void)
+>   	}
+>   }
+>   
+> +static void test_stringio(void)
+> +{
+> +	int st1_len = sizeof(st1) - 1;
+> +	u16 got;
+> +
+> +	asm volatile("cld \n\t"
+> +		     "movw %0, %%dx \n\t"
+> +		     "rep outsw \n\t"
+> +		     : : "i"((short)TESTDEV_IO_PORT),
+> +		         "S"(st1), "c"(st1_len / 2));
+> +
+> +	asm volatile("inw %1, %0\n\t" : "=a"(got) : "i"((short)TESTDEV_IO_PORT));
+> +
+> +	report((got & 0xff) == st1[sizeof(st1) - 3], "outsb nearly up");
+> +	report((got & 0xff00) >> 8 == st1[sizeof(st1) - 2], "outsb up");
+> +}
+> +
+>   int main(void)
+>   {
+>   	int rtn;
+>   	rtn = test_sev_activation();
+>   	report(rtn == EXIT_SUCCESS, "SEV activation test.");
+>   	test_sev_es_activation();
+> +	test_stringio();
+>   	return report_summary();
+>   }
+> 
 
---63SiROHZXyxNKkHV
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Applied to uefi branch, thanks (and tested both before and after the 
+patch I've sent with subject "[PATCH] KVM: SEV-ES: fix another issue 
+with string I/O VMGEXITs").
 
-On Mon, Oct 25, 2021 at 08:21:22AM -0700, Elena wrote:
-> On Mon, Oct 25, 2021 at 01:42:56PM +0100, Stefan Hajnoczi wrote:
-> > On Mon, Oct 11, 2021 at 10:34:29PM -0700, elena wrote:
-> > > On Wed, Nov 25, 2020 at 12:44:07PM -0800, Elena Afanasova wrote:
-> > > > Hello,
-> > > >
-> > >=20
-> > > Hi
-> > >=20
-> > > Sorry for top-posting, just wanted to provide a quik update.
-> > > We are currently working on the support for ioregionfd in Qemu and wi=
-ll
-> > > be posting the patches soon. Plus the KVM patches will be posted based
-> > > of the RFC v3 with some fixes if there are no objections from Elena's=
- side
-> > > who originally posted KVM RFC patchset.
-> >=20
-> > Hi Elena,
->=20
-> Hello Stefan.
->=20
-> > I'm curious what approach you want to propose for QEMU integration. A
-> > while back I thought about the QEMU API. It's possible to implement it
-> > along the lines of the memory_region_add_eventfd() API where each
-> > ioregionfd is explicitly added by device emulation code. An advantage of
-> > this approach is that a MemoryRegion can have multiple ioregionfds, but
-> > I'm not sure if that is a useful feature.
-> >
->=20
-> This is the approach that is currently in the works. Agree, I dont see
-> much of the application here at this point to have multiple ioregions
-> per MemoryRegion.
-> I added Memory API/eventfd approach to the vfio-user as well to try
-> things out.
->=20
-> > An alternative is to cover the entire MemoryRegion with one ioregionfd.
-> > That way the device emulation code can use ioregionfd without much fuss
-> > since there is a 1:1 mapping between MemoryRegions, which are already
-> > there in existing devices. There is no need to think deeply about which
-> > ioregionfds to create for a device.
-> >
-> > A new API called memory_region_set_aio_context(MemoryRegion *mr,
-> > AioContext *ctx) would cause ioregionfd (or a userspace fallback for
-> > non-KVM cases) to execute the MemoryRegion->read/write() accessors from
-> > the given AioContext. The details of ioregionfd are hidden behind the
-> > memory_region_set_aio_context() API, so the device emulation code
-> > doesn't need to know the capabilities of ioregionfd.
->=20
-> >=20
-> > The second approach seems promising if we want more devices to use
-> > ioregionfd inside QEMU because it requires less ioregionfd-specific
-> > code.
-> >=20
-> I like this approach as well.
-> As you have mentioned, the device emulation code with first approach
-> does have to how to handle the region accesses. The second approach will
-> make things more transparent. Let me see how can I modify what there is
-> there now and may ask further questions.
-
-Thanks, I look forward to patches you are working on!
-
-Stefan
-
---63SiROHZXyxNKkHV
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmF24awACgkQnKSrs4Gr
-c8hQAQf8DVrkwvoSkLStUhByGMfGnrHMpU8Sl0QH4rAmcfnvJ4RlKOLqN7uMAyjk
-fEx9R20fRPP7Pd2lgt/7EuKMfQhluh24RvWtnZRaMoj5h2JkrYKeASK606LE4rhB
-a0JYQZhcoqu07kAusyUEQ3KdAukHBLWaOG48LvrVSb4Bi1f6oijmsfJUlT242hgK
-i07Z5I6ePVQuld0lrh/i6SExErO6f2giwq2QmujQKWVDKku59PE0BR6YgCTVuEoL
-mKRKrq1+5W4bpOL5xaoM4xm2bWyy3EsFbPwJTyn0hVOyBgSxoaXpEYGtdsIvpWSF
-L48OwyICKrG4JauEyK8I9lSFc+KgCQ==
-=hHQl
------END PGP SIGNATURE-----
-
---63SiROHZXyxNKkHV--
+Paolo
 
