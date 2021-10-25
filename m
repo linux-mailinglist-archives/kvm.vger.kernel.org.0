@@ -2,55 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4C08D43974B
-	for <lists+kvm@lfdr.de>; Mon, 25 Oct 2021 15:13:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7C218439757
+	for <lists+kvm@lfdr.de>; Mon, 25 Oct 2021 15:18:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232010AbhJYNQQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Oct 2021 09:16:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51022 "EHLO
+        id S233443AbhJYNUq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Oct 2021 09:20:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52032 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229509AbhJYNQN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Oct 2021 09:16:13 -0400
+        with ESMTP id S233433AbhJYNUp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Oct 2021 09:20:45 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 446CCC061745
-        for <kvm@vger.kernel.org>; Mon, 25 Oct 2021 06:13:51 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 790CAC061745
+        for <kvm@vger.kernel.org>; Mon, 25 Oct 2021 06:18:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=MIME-Version:Content-Type:References:
         In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=HjVwHGPqIGNVySwprktyNyMb9jwq+v0vbufamqMq024=; b=N3eux5j9ubPsBgi/bdqKxmViBc
-        DXS7A3iNnagpRHMvYzzIxAkTY5wtPDnLPRJrVxIfYSnHvg7MjBR+YeKQnzBSiPGbcyKprnx2FsJKo
-        tIJIVguxnoNfJqkNqBnXSLhaGcHNTDs9ThKkp19tjP8GQccknqwoEUwPb9iJzM+B3Jro6idRnI5qA
-        rt3T9zebXhlK5gw2+TeTE89r75nZyGwdc5S96MC5L4HGoqv2PNKf9vHJJMi94eFNWpDAfIg5QIVWt
-        ZP8z65Mjwc2Q0D7k3G/n89t3Xw1TAdbkKJGuOqSLawuzLa9my4hfI/JCo67qbO64+MZcFdNiNvnVK
-        kQc8mReg==;
+        bh=9qSi+R/zHSqO6TCveasP8f+mOA7/nEo6fTefYgptI4s=; b=0fxBm0QAiXM14ExnkN1X8/SVbX
+        jdjMBeLLM1LY86btPf7MgQDtrmHQ831ikdk38jzPDjTQ1c2z3c68djBIYI87hPDNvSSEO+PZPknrd
+        nw8jLsE/BUMSY3h7w+ntJ/lysG75Q1atUV/XQ5OLQZwXzcc9MPzmyisqsPVLSA+uEL5WRjaaE0dB1
+        735SHEGDC8Lg4qHM/k/5h7skJDNKpX+cneJ9KRCw3Ajv1fiCSB3gfjvO/K1dplpDMuvjmgL90h/NJ
+        +XvX1VAEdw40eoC1g0hgFu4Q34V31bYpBxu2NqUnqHnnoW6Waqv3pRek8FDmFZyG1KsqC6y7QFu9e
+        YhcrL1tg==;
 Received: from [2001:8b0:10b:1::3ae] (helo=u3832b3a9db3152.ant.amazon.com)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1meznI-00GVHG-6L; Mon, 25 Oct 2021 13:13:40 +0000
-Message-ID: <9e8e6547db506e9a91d65d9b8d0c749c26f3de89.camel@infradead.org>
-Subject: Re: [EXTERNAL] [PATCH] KVM: x86/xen: Fix runstate updates to be
- atomic when preempting vCPU
+        id 1mezrg-00GVSv-66; Mon, 25 Oct 2021 13:18:12 +0000
+Message-ID: <3888d5a017454c8f64b035ecbf8cbb52ad3804c5.camel@infradead.org>
+Subject: Re: [PATCH] KVM: x86/xen: Fix kvm_xen_has_interrupt() sleeping in
+ kvm_vcpu_block()
 From:   David Woodhouse <dwmw2@infradead.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Raslan, KarimAllah" <karahmed@amazon.com>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        Ankur Arora <ankur.a.arora@oracle.com>
-Cc:     "jmattson@google.com" <jmattson@google.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "seanjc@google.com" <seanjc@google.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "mtosatti@redhat.com" <mtosatti@redhat.com>,
-        "joro@8bytes.org" <joro@8bytes.org>
-Date:   Mon, 25 Oct 2021 14:13:36 +0100
-In-Reply-To: <95bee081-c744-1586-d4df-0d1e04a8490f@redhat.com>
-References: <3d2a13164cbc61142b16edba85960db9a381bebe.camel@amazon.co.uk>
-         <09f4468b-0916-cf2c-1cef-46970a238ce4@redhat.com>
-         <a0906628f31e359deb9e9a6cdf15eb72920c5960.camel@infradead.org>
-         <2e7bcafe1077d31d8af6cc0cd120a613cc070cfb.camel@infradead.org>
-         <95bee081-c744-1586-d4df-0d1e04a8490f@redhat.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm <kvm@vger.kernel.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        JoergRoedel <joro@8bytes.org>, mtosatti <mtosatti@redhat.com>
+Date:   Mon, 25 Oct 2021 14:18:08 +0100
+In-Reply-To: <87ilxluywj.fsf@vitty.brq.redhat.com>
+References: <168bf8c689561da904e48e2ff5ae4713eaef9e2d.camel@infradead.org>
+         <87ilxluywj.fsf@vitty.brq.redhat.com>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-a5+1jCj89VkjUU5x0RLN"
+        boundary="=-bDOj4wiqPf57EZFUiXnj"
 User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
@@ -59,35 +51,26 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-a5+1jCj89VkjUU5x0RLN
+--=-bDOj4wiqPf57EZFUiXnj
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, 2021-10-25 at 14:22 +0200, Paolo Bonzini wrote:
-> On 25/10/21 14:19, David Woodhouse wrote:
-> > So, with a fixed version of kvm_map_gfn() I suppose I could do the
-> > same, but that's*two*  maps/unmaps for each interrupt? That's probably
-> > worse than just bouncing out and letting userspace do it!
+On Mon, 2021-10-25 at 13:28 +0200, Vitaly Kuznetsov wrote:
+> > +             pagefault_disable();
+> > +             err =3D __get_user(rc, (u8 __user *)ghc->hva + offset);
+> > +             pagefault_enable();
 >=20
->=20
->=20
-> Absolutely!  The fixed version of kvm_map_gfn should not do any
-> map/unmap, it should do it eagerly on MMU notifier operations.
+> This reminds me of copy_from_user_nofault() -- can we use it instead mayb=
+e?
 
-When you put it like that, it just seems so stunningly redundant :)
+That's a lot of extra out of line function calls and redundant (I
+believe) setup/checks, and would make the fast path fairly pointless
+for the purpose it was *originally* introduced, which was to optimise
+the case where we're entering the vCPU and just want to check
+vcpu_info->evtchn_upcall_pending with a simple (fault-handled)
+dereference.
 
-"When we get notified that the guest HVA has been mapped, we create our
-own kernel mapping of the same page. When we are notifed that the guest
-HVA gets unmapped, we tear down our kernel mapping of it."
-
-The really important part of that is the *synchronisation*, using the
-notifier to send a request to each vCPU to ensure that they aren't
-currently *using* the virtual address in question.
-
-If we can get that part right, then perhaps it shouldn't *matter*
-whether the HVA in question is a guest or a kernel one?
-
---=-a5+1jCj89VkjUU5x0RLN
+--=-bDOj4wiqPf57EZFUiXnj
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -170,20 +153,20 @@ BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
 BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
 ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA4rtJSHkq7AnpxKUY8ZlYZjANBglghkgB
 ZQMEAgEFAKCCAe0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjEx
-MDI1MTMxMzM2WjAvBgkqhkiG9w0BCQQxIgQgb7dbfqtlrsl1rx6BYu+ln6/tgxF0Sjsrgu824NUX
-SgIwgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
+MDI1MTMxODA4WjAvBgkqhkiG9w0BCQQxIgQgQBNudvxxyHujnhtzR/msvBlqMEHwZWPMSgw0munu
+vlwwgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
 TWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQx
 PTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
 aWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMIHABgsqhkiG9w0BCRACCzGBsKCBrTCBlzELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
 A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
 bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMA0GCSqGSIb3
-DQEBAQUABIIBACZTGvC1w0HePt37ulaf5JGsIH2QEI7MgCBtzmh758wRQh1EttCiHx0stpcQ7nG7
-y2yIYjgLf3dgiJyleIERktLP2+kPrUBrIowXdDTK3DfujwH+VQZCqsWGceCM9YsYVYs+63PQ8ajK
-Ofj1NjFGmwgPtD1Boge6J+4T63inq53TnzC1SNOzKlbqbXtO9/JW+NC1FhtMGCNh62Ak5CadQZ+3
-nDw0Y2/1lZL/DCm9StKv28xIf2iLHj15fK9PH/1OYRShd6PWhtw7X0jzL/oCavMOzReWy8a+5kWA
-vFNNB++5tG/jca5PJ+KfWonpOS2WdqAUzZbyCKSFiF06iv5KvpkAAAAAAAA=
+DQEBAQUABIIBAJ/sNM1jHVV22u3XEFrvIC2OUfA3l7sCUazAtV71gbpaO45zi4B2Xj1mz3huI7ve
+McUL9AMDy2t4CnTXCRMIJwNU+jkR2XEJ0b2tHs/bvxk/d3RUv4MgsN74psevHaSuoF6GXVPRj3M0
+pLBRE3yx4d40WE9QVj+bDTBOoRQWZZANfb9aC6ZVghgOg4FSwJWhPAvfGMx2v024jPEEvVyzL5Ol
+wNaTJNTrduWjJM+yZh21Wm37arkbXRzfvBDKShBV+76L8RzZ0y7qkZdbYUZVUhtn8Fy3Ev9AkkFe
+yCC9Zd8DkEmD05cbRdgJ0zz0wJPfZVEjRjutG5ZRzbNsrJbzD4IAAAAAAAA=
 
 
---=-a5+1jCj89VkjUU5x0RLN--
+--=-bDOj4wiqPf57EZFUiXnj--
 
