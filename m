@@ -2,160 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4CCA143946C
-	for <lists+kvm@lfdr.de>; Mon, 25 Oct 2021 13:04:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 74B3D4394D1
+	for <lists+kvm@lfdr.de>; Mon, 25 Oct 2021 13:28:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232816AbhJYLGg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Oct 2021 07:06:36 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:40432 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232394AbhJYLGf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Oct 2021 07:06:35 -0400
-Received: from zn.tnic (p200300ec2f0f4e0014f3333d144d8f4c.dip0.t-ipconnect.de [IPv6:2003:ec:2f0f:4e00:14f3:333d:144d:8f4c])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 16F671EC01A2;
-        Mon, 25 Oct 2021 13:04:12 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1635159852;
+        id S231168AbhJYLal (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Oct 2021 07:30:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42439 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229911AbhJYLaj (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 25 Oct 2021 07:30:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1635161297;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=7cmuTPU0DzQTCxQyPVEejLbQuN+VwiqGyI2YEU3p7AA=;
-        b=bsEi5PDRu9B//F2k3sBqf+iWQBeBiCnanLpmDuwuXJqZLC7yaGVSsuu9lgqvYe+bEmhhKl
-        23nleFXGRaeNDIG9j9g2r+JuV0yV/Ja9wO/CkPt1uczRzIiQf8sqHepd0ZEDL0DmsdIgj2
-        4Vzt5se9siIhk1/riS5dAv7DWDHpqdg=
-Date:   Mon, 25 Oct 2021 13:04:10 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+         in-reply-to:in-reply-to:references:references;
+        bh=Cxbzx2vp0ECnG7lbAcPeKc1WVzKcTdh4GtjEHB6J5cI=;
+        b=Meu2ON5nDcH78wxdIvDzMkO5YAhOGFpIqvc7MxhLylqT4aoxvCdNGHwtYRHRXjAFf6zfw3
+        Sgj1bm5BHsyf8ekA+AC3uOvc6/4wx0rcsT4790azHQCAuL/OonTe2Yk6rg/nd4Naq90C/f
+        l8G0zqmLaMVkVUNWhXB5q9ggQm6g+to=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-577-DcekAsJJOVSyUfRkF4ANtA-1; Mon, 25 Oct 2021 07:28:15 -0400
+X-MC-Unique: DcekAsJJOVSyUfRkF4ANtA-1
+Received: by mail-wm1-f72.google.com with SMTP id z137-20020a1c7e8f000000b0030cd1800d86so3548091wmc.2
+        for <kvm@vger.kernel.org>; Mon, 25 Oct 2021 04:28:15 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=Cxbzx2vp0ECnG7lbAcPeKc1WVzKcTdh4GtjEHB6J5cI=;
+        b=7vzqZkNmONmhXT9f6gq5acm0xaMMIm9JgAelHaIagLKCX+vbEtav2eWMOEFADZHaAd
+         e6HCGTw7PFdVsEhm4BRK5UxEjiZnhLZqIgk6pAhKNxCnI0z7keb8rHy3LR1FR2RGmNRR
+         yrf/Xk1rF/L5U4L353/SCCAlvMj9az2iR5W9q1J1Y86OZXETuPfS5ZXK9NbA+pXJwcFN
+         hs8LwgX03U29nvPWRQ1Dnv4VZnX+yr0Yt1R4lcFXiyhaG2vVVAAsUp8k405DEXMgXIsr
+         gdK/1LaCERY295iyqO3GhU71K/Tbe3EXqMaeYUtOWWf5SNo55u5ESZppmyzwDaOvjCEE
+         DbQA==
+X-Gm-Message-State: AOAM5302lC1Vg9leo5G4yu6SC5adKP9z4MAHihAqVd0hsavTNro681o6
+        8iKx4qNf6tA611edrpsW2re/f7FtwGpkOoKnZ8aYSC8rz4HKdkHz80NZ+Sqg4sQ+BOxj4xmUX3N
+        XaxtdKOjQrJFv
+X-Received: by 2002:a05:600c:4e91:: with SMTP id f17mr19264999wmq.180.1635161294831;
+        Mon, 25 Oct 2021 04:28:14 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzez3HAlAvqha0PDJuRBuvOQYpOcexqKELd/5VIieBm029qrHpSp1UWMeAvrG6sZI64D/GejA==
+X-Received: by 2002:a05:600c:4e91:: with SMTP id f17mr19264963wmq.180.1635161294552;
+        Mon, 25 Oct 2021 04:28:14 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id o194sm9479016wme.40.2021.10.25.04.28.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 Oct 2021 04:28:13 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     David Woodhouse <dwmw2@infradead.org>, kvm <kvm@vger.kernel.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH v6 08/42] x86/sev-es: initialize sev_status/features
- within #VC handler
-Message-ID: <YXaPKsicNYFZe84I@zn.tnic>
-References: <20211008180453.462291-1-brijesh.singh@amd.com>
- <20211008180453.462291-9-brijesh.singh@amd.com>
- <YW2EsxcqBucuyoal@zn.tnic>
- <20211018184003.3ob2uxcpd2rpee3s@amd.com>
- <YW3IdfMs61191qnU@zn.tnic>
- <20211020161023.hzbj53ehmzjrt4xd@amd.com>
- <YXF+WjMHW/dd0Wb6@zn.tnic>
- <20211021204149.pof2exhwkzy2zqrg@amd.com>
+        JoergRoedel <joro@8bytes.org>, mtosatti <mtosatti@redhat.com>
+Subject: Re: [PATCH] KVM: x86/xen: Fix kvm_xen_has_interrupt() sleeping in
+ kvm_vcpu_block()
+In-Reply-To: <168bf8c689561da904e48e2ff5ae4713eaef9e2d.camel@infradead.org>
+References: <168bf8c689561da904e48e2ff5ae4713eaef9e2d.camel@infradead.org>
+Date:   Mon, 25 Oct 2021 13:28:12 +0200
+Message-ID: <87ilxluywj.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20211021204149.pof2exhwkzy2zqrg@amd.com>
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 21, 2021 at 03:41:49PM -0500, Michael Roth wrote:
-> On Thu, Oct 21, 2021 at 04:51:06PM +0200, Borislav Petkov wrote:
-> > On Wed, Oct 20, 2021 at 11:10:23AM -0500, Michael Roth wrote:
-> > > The CPUID calls in snp_cpuid_init() weren't added specifically to induce
-> > > the #VC-based SEV MSR read, they were added only because I thought the
-> > > gist of your earlier suggestions were to do more validation against the
-> > > CPUID table advertised by EFI
-> > 
-> > Well, if EFI is providing us with the CPUID table, who verified it? The
-> > attestation process? Is it signed with the AMD platform key?
-> 
-> For CPUID table pages, the only thing that's assured/attested to by firmware
-> is that:
-> 
->  1) it is present at the expected guest physical address (that address
->     is generally baked into the EFI firmware, which *is* attested to)
->  2) its contents have been validated by the PSP against the current host
->     CPUID capabilities as defined by the AMD PPR (Publication #55898),
->     Section 2.1.5.3, "CPUID Policy Enforcement"
->  3) it is encrypted with the guest key
->  4) it is in a validated state at launch
-> 
-> The actual contents of the CPUID table are *not* attested to,
+David Woodhouse <dwmw2@infradead.org> writes:
 
-Why?
+> From: David Woodhouse <dwmw@amazon.co.uk>
+>
+> In kvm_vcpu_block, the current task is set to TASK_INTERRUPTIBLE before
+> making a final check whether the vCPU should be woken from HLT by any
+> incoming interrupt.
+>
+> This is a problem for the get_user() in __kvm_xen_has_interrupt(), which
+> really shouldn't be sleeping when the task state has already been set.
+> I think it's actually harmless as it would just manifest itself as a
+> spurious wakeup, but it's causing a debug warning:
+>
+> [  230.963649] do not call blocking ops when !TASK_RUNNING; state=1 set at [<00000000b6bcdbc9>] prepare_to_swait_exclusive+0x30/0x80
+>
+> Fix the warning by turning it into an *explicit* spurious wakeup. When
+> invoked with !task_is_running(current) (and we might as well add
+> in_atomic() there while we're at it), just return 1 to indicate that
+> an IRQ is pending, which will cause a wakeup and then something will
+> call it again in a context that *can* sleep so it can fault the page
+> back in.
+>
+> Cc: stable@vger.kernel.org
+> Fixes: 40da8ccd724f ("KVM: x86/xen: Add event channel interrupt vector upcall")
+> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+>
+> ---
+>  arch/x86/kvm/xen.c | 27 ++++++++++++++++++++++-----
+>  1 file changed, 22 insertions(+), 5 deletions(-)
+>
+> diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+> index 9ea9c3dabe37..8f62baebd028 100644
+> --- a/arch/x86/kvm/xen.c
+> +++ b/arch/x86/kvm/xen.c
+> @@ -190,6 +190,7 @@ void kvm_xen_update_runstate_guest(struct kvm_vcpu *v, int state)
+>  
+>  int __kvm_xen_has_interrupt(struct kvm_vcpu *v)
+>  {
+> +	int err;
+>  	u8 rc = 0;
+>  
+>  	/*
+> @@ -216,13 +217,29 @@ int __kvm_xen_has_interrupt(struct kvm_vcpu *v)
+>  	if (likely(slots->generation == ghc->generation &&
+>  		   !kvm_is_error_hva(ghc->hva) && ghc->memslot)) {
+>  		/* Fast path */
+> -		__get_user(rc, (u8 __user *)ghc->hva + offset);
+> -	} else {
+> -		/* Slow path */
+> -		kvm_read_guest_offset_cached(v->kvm, ghc, &rc, offset,
+> -					     sizeof(rc));
+> +		pagefault_disable();
+> +		err = __get_user(rc, (u8 __user *)ghc->hva + offset);
+> +		pagefault_enable();
 
-> so in theory it can still be manipulated by a malicious hypervisor as
-> part of the initial SNP_LAUNCH_UPDATE firmware commands that provides
-> the initial plain-text encoding of the CPUID table that is provided
-> to the PSP via SNP_LAUNCH_UPDATE. It's also not signed in any way
-> (apparently there were some security reasons for that decision, though
-> I don't know the full details).
+This reminds me of copy_from_user_nofault() -- can we use it instead maybe?
 
-So this sounds like an unnecessary complication. I'm sure there are
-reasons to do it this way but my simple thinking would simply want the
-CPUID page to be read-only and signed so that the guest can trust it
-unconditionally.
-
-> [A guest owner can still validate their CPUID values against known good
-> ones as part of their attestation flow, but that is not part of the
-> attestation report as reported by SNP firmware. (So long as there is some
-> care taken to ensure the source of the CPUID values visible to
-> userspace/guest attestion process are the same as what was used by the boot
-> stack: i.e. EFI/bootloader/kernel all use the CPUID page at that same
-> initial address, or in cases where a copy is used, that copy is placed in
-> encrypted/private/validated guest memory so it can't be tampered with during
-> boot.]
-
-This sounds like the good practices advice to guest owners would be,
-"Hey, I just booted your SNP guest but for full trust, you should go and
-verify the CPUID page's contents."
-
-"And if I were you, I wouldn't want to run any verification of CPUID
-pages' contents on the same guest because it itself hasn't been verified
-yet."
-
-It all sounds weird.
-
-> So, while it's more difficult to do, and the scope of influence is reduced,
-> there are still some games that can be played to mess with boot via
-> manipulation of the initial CPUID table values, so long as they are within
-> the constraints set by the CPUID enforcement policy defined in the PPR.
-> 
-> Unfortunately, the presence of the SEV/SEV-ES/SEV-SNP bits in 0x8000001F,
-> EAX, are not enforced by PSP. The only thing enforced there is that the
-> hypervisor cannot advertise bits that aren't supported by hardware. So
-> no matter how much the boot stack is trusted, the CPUID table does not
-> inherit that trust, and even values that we *know* should be true should be
-> verified rather than assumed.
-> 
-> But I think there are a couple approaches for verifying this is an SNP
-> guest that are robust against this sort of scenario. You've touched on
-> some of them in your other replies, so I'll respond there.
-
-Yah, I guess the kernel can do good enough verification and then the
-full thing needs to be done by the guest owner and in *some* userspace
-- not necessarily on the currently booted, unverified guest - but
-somewhere, where you have maximal flexibility.
-
-IMHO.
+> +		if (!err)
+> +			return rc;
+>  	}
+>  
+> +	/* Slow path */
+> +
+> +	/*
+> +	 * This function gets called from kvm_vcpu_block() after setting the
+> +	 * task to TASK_INTERRUPTIBLE, to see if it needs to wake immediately
+> +	 * from a HLT. So we really mustn't sleep. If the page ended up absent
+> +	 * at that point, just return 1 in order to trigger an immediate wake,
+> +	 * and we'll end up getting called again from a context where we *can*
+> +	 * fault in the page and wait for it.
+> +	 */
+> +	if (in_atomic() || !task_is_running(current))
+> +		return 1;
+> +
+> +	kvm_read_guest_offset_cached(v->kvm, ghc, &rc, offset,
+> +				     sizeof(rc));
+> +
+>  	return rc;
+>  }
+>  
+>
+>
 
 -- 
-Regards/Gruss,
-    Boris.
+Vitaly
 
-https://people.kernel.org/tglx/notes-about-netiquette
