@@ -2,149 +2,382 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 41B31439D2A
-	for <lists+kvm@lfdr.de>; Mon, 25 Oct 2021 19:10:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D92BA439D9F
+	for <lists+kvm@lfdr.de>; Mon, 25 Oct 2021 19:30:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235041AbhJYRMo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Oct 2021 13:12:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:35504 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234713AbhJYRL7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 25 Oct 2021 13:11:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635181776;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=7VgV8J8M68X7FsFm+kLhyb9kPwgpFCC0ZlbVrVQHUVU=;
-        b=gbRxT/2AC1MPCApTA/BQDqg9IPNe2pBTLE76U5ycJcqzWg1rRbPbdR4D+jk7SfMUJet1Eg
-        /vFTj56peAZLbug5BNnI1tryIGLBdqqOY8bJhhVPR1DbuWUF8dP0VyYvZWPq/KiUbiVTFr
-        Ks3G7sJrF9JkhR85lCZZhfkXqOU4T9E=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-36-Q2Xfu4KzPsajdflWY_pOYQ-1; Mon, 25 Oct 2021 13:09:34 -0400
-X-MC-Unique: Q2Xfu4KzPsajdflWY_pOYQ-1
-Received: by mail-wr1-f72.google.com with SMTP id k2-20020adfc702000000b0016006b2da9bso3394308wrg.1
-        for <kvm@vger.kernel.org>; Mon, 25 Oct 2021 10:09:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=7VgV8J8M68X7FsFm+kLhyb9kPwgpFCC0ZlbVrVQHUVU=;
-        b=wsl7OHALoUEaBlFlx7vhvW82GnFi5z8AobR5hZ/g2DpnN4cV0yaC7/ea/fgWJe0b7t
-         NGxeBrAFrTrdUgpic6BmK4+lA/EzKUFVZ1lUPfi1Zitx0fpzPc9eVFUPshczfCEmS6Ly
-         oaiwWeA11j13TR5E+fdVZL7s+ZAp2venabWJJ4jetXCIgVj34lz1HTlq2zhf7QWBA9ea
-         8mvuM40ezw1DJoura5oEz2UBTEnGoJIaTKz/0JfHmh9yn4qp2920/bQqiAxsXWhKbLSy
-         2CliLRBOvMJJ7eBTspUtCUEWwxnILHQT3sVrKv8i3kzpd7GH/jcAmfw1tqqCbIVpwHow
-         nM8Q==
-X-Gm-Message-State: AOAM530e582ot5DG/fOmlzf8xx7Iz2LDvytqe4aiXNUhe0ydS36aw+hB
-        Jq/2FEdAbd7f46l/fpLljet/yMOW4HI3nofUjwvtljPVdhZBVWaVg0M4pbwJ4rIrzwXLAprIuKu
-        xHozHjpUW0sfK
-X-Received: by 2002:adf:d1c2:: with SMTP id b2mr25488474wrd.73.1635181773523;
-        Mon, 25 Oct 2021 10:09:33 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy7iBirqneThYpe55mmEY2fmAX0kuVQkYB48qDjmRaM0sTyADUamlOJtZRya6UOvDrPg3cmOQ==
-X-Received: by 2002:adf:d1c2:: with SMTP id b2mr25488431wrd.73.1635181773261;
-        Mon, 25 Oct 2021 10:09:33 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id g10sm20018005wmq.13.2021.10.25.10.09.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 25 Oct 2021 10:09:32 -0700 (PDT)
-Message-ID: <b7ce2d41-a14c-cd17-d60f-2962b3df8826@redhat.com>
-Date:   Mon, 25 Oct 2021 19:09:31 +0200
+        id S233400AbhJYRdG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Oct 2021 13:33:06 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:2320 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231220AbhJYRdF (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 25 Oct 2021 13:33:05 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 19PFfHCX015524;
+        Mon, 25 Oct 2021 17:30:43 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=j6FaJOjQeIIGXKLgrZQ5x26V1ZQRvTnOuVDxp8xyLNQ=;
+ b=ZMayDffNHUeJGIO5GPR6GWAeBbIQ6DhOY2lTpR5aFJtNvJK2bI5UHU6MPQGF2M/Ylbiz
+ ewHjL7RV+WTpS9eVIpGFzNIgiM/uy6Qa0O3nKJzqjrvMhzrlFcbkES3m8E48YM40cGbU
+ gIWJymFFrv2tnH8T1Y9LDZ4jogioFz4DgMU498F/duXabuf1pBVoFlkToLo/bOGApp76
+ XrV2vm5xNSKd86qIiSVAduCg+XtRmA5ddzfB0VX6GOdVTQsz9JBH7dUc83xHNqsxwMbb
+ Sj+LgHbVuREnuT4O6aIltLgrOUGMji/J+kapU2RROBXiR2g6byfg930pA/sX5HRkpZMJ Rw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3bwsvdvjsb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 25 Oct 2021 17:30:42 +0000
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 19PHRfG1010026;
+        Mon, 25 Oct 2021 17:30:42 GMT
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3bwsvdvjrg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 25 Oct 2021 17:30:42 +0000
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 19PHTAXL005859;
+        Mon, 25 Oct 2021 17:30:39 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma04fra.de.ibm.com with ESMTP id 3bva1a7dsj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 25 Oct 2021 17:30:39 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 19PHUaXw59310578
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 25 Oct 2021 17:30:36 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2CFCB11C069;
+        Mon, 25 Oct 2021 17:30:36 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B1D6511C054;
+        Mon, 25 Oct 2021 17:30:35 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.145.0.93])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 25 Oct 2021 17:30:35 +0000 (GMT)
+Date:   Mon, 25 Oct 2021 19:17:22 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+Cc:     Thomas Huth <thuth@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH v3 1/2] s390x: Add specification
+ exception test
+Message-ID: <20211025191722.31cf7215@p-imbrenda>
+In-Reply-To: <20211022120156.281567-2-scgl@linux.ibm.com>
+References: <20211022120156.281567-1-scgl@linux.ibm.com>
+        <20211022120156.281567-2-scgl@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [kvm-unit-tests PATCH] x86: SEV-ES: add port string IO test case
-Content-Language: en-US
-To:     Marc Orr <marcorr@google.com>, kvm@vger.kernel.org,
-        Thomas.Lendacky@amd.com, zxwang42@gmail.com, fwilhelm@google.com,
-        seanjc@google.com, oupton@google.com, mlevitsk@redhat.com,
-        pgonda@google.com, drjones@redhat.com
-References: <20211025052829.2062623-1-marcorr@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20211025052829.2062623-1-marcorr@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: wntaKDy6gCAS2PlIcYeJ4TD6MP1s-qF_
+X-Proofpoint-GUID: cjuw1npjVV1hJBWEeyGyxANAXE0WNfm0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
+ definitions=2021-10-25_06,2021-10-25_02,2020-04-07_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ impostorscore=0 mlxscore=0 lowpriorityscore=0 adultscore=0 suspectscore=0
+ spamscore=0 malwarescore=0 phishscore=0 bulkscore=0 mlxlogscore=999
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2109230001 definitions=main-2110250099
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 25/10/21 07:28, Marc Orr wrote:
-> Add a test case to verify that string IO works as expected under SEV-ES.
-> This test case is based on the `test_stringio()` test case in emulator.c.
-> However, emulator.c does not currently run under UEFI.
+On Fri, 22 Oct 2021 14:01:55 +0200
+Janis Schoetterl-Glausch <scgl@linux.ibm.com> wrote:
+
+> Generate specification exceptions and check that they occur.
+> With the iterations argument one can check if specification
+> exception interpretation occurs, e.g. by using a high value and
+> checking that the debugfs counters are substantially lower.
+> The argument is also useful for estimating the performance benefit
+> of interpretation.
 > 
-> Only the first half of the test case, which processes a string from
-> beginning to end, was taken for now. The second test case did not work
-> and is thus left out of the amd_sev.c setup for now.
-> 
-> Also, the first test case was modified to do port IO at word granularity
-> rather than byte granularity. The reason is to ensure that using the
-> port IO size in a calculation within the kernel does not multiply or
-> divide by 1. In particular, this tweak is useful to demonstrate that a
-> recent KVM patch [1] does not behave correctly.
-> 
-> * This patch is based on the `uefi` branch.
-> 
-> [1] https://patchwork.kernel.org/project/kvm/patch/20211013165616.19846-2-pbonzini@redhat.com/
-> 
-> Signed-off-by: Marc Orr <marcorr@google.com>
+> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
 > ---
->   x86/amd_sev.c | 22 ++++++++++++++++++++++
->   1 file changed, 22 insertions(+)
+>  s390x/Makefile      |   1 +
+>  s390x/spec_ex.c     | 181 ++++++++++++++++++++++++++++++++++++++++++++
+>  s390x/unittests.cfg |   3 +
+>  3 files changed, 185 insertions(+)
+>  create mode 100644 s390x/spec_ex.c
 > 
-> diff --git a/x86/amd_sev.c b/x86/amd_sev.c
-> index 061c50514545..7757d4f85b7a 100644
-> --- a/x86/amd_sev.c
-> +++ b/x86/amd_sev.c
-> @@ -18,6 +18,10 @@
->   #define EXIT_SUCCESS 0
->   #define EXIT_FAILURE 1
->   
-> +#define TESTDEV_IO_PORT 0xe0
+> diff --git a/s390x/Makefile b/s390x/Makefile
+> index d18b08b..3e42784 100644
+> --- a/s390x/Makefile
+> +++ b/s390x/Makefile
+> @@ -24,6 +24,7 @@ tests += $(TEST_DIR)/mvpg.elf
+>  tests += $(TEST_DIR)/uv-host.elf
+>  tests += $(TEST_DIR)/edat.elf
+>  tests += $(TEST_DIR)/mvpg-sie.elf
+> +tests += $(TEST_DIR)/spec_ex.elf
+>  
+>  tests_binary = $(patsubst %.elf,%.bin,$(tests))
+>  ifneq ($(HOST_KEY_DOCUMENT),)
+> diff --git a/s390x/spec_ex.c b/s390x/spec_ex.c
+> new file mode 100644
+> index 0000000..ec3322a
+> --- /dev/null
+> +++ b/s390x/spec_ex.c
+> @@ -0,0 +1,181 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Copyright IBM Corp. 2021
+> + *
+> + * Specification exception test.
+> + * Tests that specification exceptions occur when expected.
+> + */
+> +#include <stdlib.h>
+> +#include <libcflat.h>
+> +#include <asm/interrupt.h>
+> +#include <asm/facility.h>
 > +
-> +static char st1[] = "abcdefghijklmnop";
+> +static struct lowcore *lc = (struct lowcore *) 0;
 > +
->   static int test_sev_activation(void)
->   {
->   	struct cpuid cpuid_out;
-> @@ -65,11 +69,29 @@ static void test_sev_es_activation(void)
->   	}
->   }
->   
-> +static void test_stringio(void)
+> +static bool expect_invalid_psw;
+> +static struct psw expected_psw;
+> +static struct psw fixup_psw;
+> +
+> +/* The standard program exception handler cannot deal with invalid old PSWs,
+> + * especially not invalid instruction addresses, as in that case one cannot
+> + * find the instruction following the faulting one from the old PSW.
+> + * The PSW to return to is set by load_psw.
+> + */
+> +static void fixup_invalid_psw(void)
 > +{
-> +	int st1_len = sizeof(st1) - 1;
-> +	u16 got;
-> +
-> +	asm volatile("cld \n\t"
-> +		     "movw %0, %%dx \n\t"
-> +		     "rep outsw \n\t"
-> +		     : : "i"((short)TESTDEV_IO_PORT),
-> +		         "S"(st1), "c"(st1_len / 2));
-> +
-> +	asm volatile("inw %1, %0\n\t" : "=a"(got) : "i"((short)TESTDEV_IO_PORT));
-> +
-> +	report((got & 0xff) == st1[sizeof(st1) - 3], "outsb nearly up");
-> +	report((got & 0xff00) >> 8 == st1[sizeof(st1) - 2], "outsb up");
+> +	if (expect_invalid_psw) {
+> +		report(expected_psw.mask == lc->pgm_old_psw.mask
+> +		       && expected_psw.addr == lc->pgm_old_psw.addr,
+> +		       "Invalid program new PSW as expected");
+> +		expect_invalid_psw = false;
+
+can you find a way to call report() where the test is
+triggered (psw_bit_12_is_1), instead of burying it here?
+
+maybe instead of calling report you can set a flag like
+"expected_psw_found" and then call report on it?
+
+> +	}
+> +	lc->pgm_old_psw = fixup_psw;
 > +}
 > +
->   int main(void)
->   {
->   	int rtn;
->   	rtn = test_sev_activation();
->   	report(rtn == EXIT_SUCCESS, "SEV activation test.");
->   	test_sev_es_activation();
-> +	test_stringio();
->   	return report_summary();
->   }
-> 
+> +/* Load possibly invalid psw, but setup fixup_psw before,
+> + * so that *fixup_invalid_psw() can bring us back onto the right track.
+> + */
+> +static void load_psw(struct psw psw)
+> +{
+> +	uint64_t scratch;
+> +
 
-Applied to uefi branch, thanks (and tested both before and after the 
-patch I've sent with subject "[PATCH] KVM: SEV-ES: fix another issue 
-with string I/O VMGEXITs").
+I understand why you are doing this, but I wonder if there is a "nicer"
+way to do it. What happens if you chose a nicer and unique name for the
+label and make it global?
 
-Paolo
+> +	fixup_psw.mask = extract_psw_mask();
+
+then you could add this here:
+	fixup_psw.addr = after_lpswe;
+
+> +	asm volatile (
+> +		"	larl	%[scratch],nop%=\n"
+> +		"	stg	%[scratch],%[addr]\n"
+	^ those two lines are no longer needed ^
+> +		"	lpswe	%[psw]\n"
+> +		"nop%=:	nop\n"
+	".global after_lpswe \n"
+	"after_lpswe:	nop"
+> +		: [scratch] "=&r"(scratch),
+> +		  [addr] "=&T"(fixup_psw.addr)
+> +		: [psw] "Q"(psw)
+> +		: "cc", "memory"
+> +	);
+> +}
+> +
+> +static void psw_bit_12_is_1(void)
+> +{
+> +	expected_psw.mask = 0x0008000000000000;
+> +	expected_psw.addr = 0x00000000deadbeee;
+> +	expect_invalid_psw = true;
+> +	load_psw(expected_psw);
+
+and here something like
+	report(expected_psw_found, "blah blah blah");
+
+> +}
+> +
+> +static void bad_alignment(void)
+> +{
+> +	uint32_t words[5] = {0, 0, 0};
+> +	uint32_t (*bad_aligned)[4];
+> +
+> +	register uint64_t r1 asm("6");
+> +	register uint64_t r2 asm("7");
+> +	if (((uintptr_t)&words[0]) & 0xf)
+> +		bad_aligned = (uint32_t (*)[4])&words[0];
+> +	else
+> +		bad_aligned = (uint32_t (*)[4])&words[1];
+
+this is a lot of work... can't you just declare it like:
+
+	uint32_t words[5] __attribute__((aligned(16)));
+and then just use
+	(words + 1) ?
+
+> +	asm volatile ("lpq %0,%2"
+> +		      : "=r"(r1), "=r"(r2)
+
+since you're ignoring the return value, can't you hardcode r6, and mark
+it (and r7) as clobbered? like:
+		"lpq 6, %[bad]"
+		: : [bad] "T"(words[1])
+		: "%r6", "%r7" 
+
+> +		      : "T"(*bad_aligned)
+> +	);
+> +}
+> +
+> +static void not_even(void)
+> +{
+> +	uint64_t quad[2];
+> +
+> +	register uint64_t r1 asm("7");
+> +	register uint64_t r2 asm("8");
+> +	asm volatile (".insn	rxy,0xe3000000008f,%0,%2" //lpq
+> %0,%2
+
+this is even uglier. I guess you had already tried this?
+
+		"lpq 7, %[good]"
+			: : [good] "T"(quad)
+			: "%r7", "%r8"
+
+if that doesn't work, then the same but with .insn
+
+> +		      : "=r"(r1), "=r"(r2)
+> +		      : "T"(quad)
+> +	);
+> +}
+> +
+> +struct spec_ex_trigger {
+> +	const char *name;
+> +	void (*func)(void);
+> +	void (*fixup)(void);
+> +};
+> +
+> +static const struct spec_ex_trigger spec_ex_triggers[] = {
+> +	{ "psw_bit_12_is_1", &psw_bit_12_is_1, &fixup_invalid_psw},
+> +	{ "bad_alignment", &bad_alignment, NULL},
+> +	{ "not_even", &not_even, NULL},
+> +	{ NULL, NULL, NULL},
+> +};
+> +
+
+this is a lot of infrastructure for 3 tests... (or even for 5 tests,
+since you will add the transactions in the next patch)
+
+are you planning to significantly extend this test in the future?
+
+> +struct args {
+> +	uint64_t iterations;
+> +};
+> +
+> +static void test_spec_ex(struct args *args,
+> +			 const struct spec_ex_trigger *trigger)
+> +{
+> +	uint16_t expected_pgm = PGM_INT_CODE_SPECIFICATION;
+> +	uint16_t pgm;
+> +	unsigned int i;
+> +
+> +	for (i = 0; i < args->iterations; i++) {
+> +		expect_pgm_int();
+> +		register_pgm_cleanup_func(trigger->fixup);
+> +		trigger->func();
+> +		register_pgm_cleanup_func(NULL);
+> +		pgm = clear_pgm_int();
+> +		if (pgm != expected_pgm) {
+> +			report_fail("Program interrupt: expected(%d)
+> == received(%d)",
+> +				    expected_pgm,
+> +				    pgm);
+> +			return;
+> +		}
+> +	}
+> +	report_pass("Program interrupt: always expected(%d) ==
+> received(%d)",
+> +		    expected_pgm,
+> +		    expected_pgm);
+> +}
+> +
+> +static struct args parse_args(int argc, char **argv)
+
+do we _really_ need commandline arguments?
+
+is it really so important to be able to control these parameters?
+
+can you find some values for the parameters so that the test works (as
+in, it actually tests what it's supposed to) and also so that the whole
+unit test ends in less than 30 seconds?
+
+> +{
+> +	struct args args = {
+> +		.iterations = 1,
+> +	};
+> +	unsigned int i;
+> +	long arg;
+> +	bool no_arg;
+> +	char *end;
+> +
+> +	for (i = 1; i < argc; i++) {
+> +		no_arg = true;
+> +		if (i < argc - 1) {
+> +			no_arg = *argv[i + 1] == '\0';
+> +			arg = strtol(argv[i + 1], &end, 10);
+> +			no_arg |= *end != '\0';
+> +			no_arg |= arg < 0;
+> +		}
+> +
+> +		if (!strcmp("--iterations", argv[i])) {
+> +			if (no_arg)
+> +				report_abort("--iterations needs a
+> positive parameter");
+> +			args.iterations = arg;
+> +			++i;
+> +		} else {
+> +			report_abort("Unsupported parameter '%s'",
+> +				     argv[i]);
+> +		}
+> +	}
+> +	return args;
+> +}
+> +
+> +int main(int argc, char **argv)
+> +{
+> +	unsigned int i;
+> +
+> +	struct args args = parse_args(argc, argv);
+> +
+> +	report_prefix_push("specification exception");
+> +	for (i = 0; spec_ex_triggers[i].name; i++) {
+> +		report_prefix_push(spec_ex_triggers[i].name);
+> +		test_spec_ex(&args, &spec_ex_triggers[i]);
+> +		report_prefix_pop();
+> +	}
+> +	report_prefix_pop();
+> +
+> +	return report_summary();
+> +}
+> diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
+> index 9e1802f..5f43d52 100644
+> --- a/s390x/unittests.cfg
+> +++ b/s390x/unittests.cfg
+> @@ -109,3 +109,6 @@ file = edat.elf
+>  
+>  [mvpg-sie]
+>  file = mvpg-sie.elf
+> +
+> +[spec_ex]
+> +file = spec_ex.elf
 
