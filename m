@@ -2,370 +2,262 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8C468439D9D
-	for <lists+kvm@lfdr.de>; Mon, 25 Oct 2021 19:30:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 45E96439DFC
+	for <lists+kvm@lfdr.de>; Mon, 25 Oct 2021 19:55:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232933AbhJYRdD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Oct 2021 13:33:03 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35716 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S231220AbhJYRdC (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 25 Oct 2021 13:33:02 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 19PHIDlS006427;
-        Mon, 25 Oct 2021 17:30:39 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=4vjo791HT9YOBZMCd63KusLtp4nxc2sEGUysFHt82U0=;
- b=CdLvFr3OlCdgG/DTlhVTL2AAg2jw1v07HkINNJzGiI6COw+Ix2Xwpnh9VHBMakzU4JNy
- PNrdRkNA86OcEDX+eSFkKQ5Rae1G8p2j8EhVKQPNUR+bJEB3q8bIXUn5gDNEjbVwKKlJ
- 8kpq8cbKIJMaYuBraCM5ryahQ/7DtCrByW2GSBIaNWzN03E7fnOUgXj4VZ05x+vA5wGc
- VLrohpmgf/Lzq+ujXEIR3N/j3WpAJOT4zmpamOo/F0M3Ed9mf8iZc7I/1CNhPI/m1SWY
- VtJu3JqVy/j5qjQDWEFdc/c9CWzrk7KsxIRMyVlxI1DIhpIh878L1t2j6RGEGl8ZEN7Q iA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3bwt36v89g-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 25 Oct 2021 17:30:39 +0000
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 19PHLRRf017787;
-        Mon, 25 Oct 2021 17:30:38 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3bwt36v88s-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 25 Oct 2021 17:30:38 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 19PHSo4C026282;
-        Mon, 25 Oct 2021 17:30:37 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma06ams.nl.ibm.com with ESMTP id 3bv9njh8pe-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 25 Oct 2021 17:30:36 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 19PHUXS362587174
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 25 Oct 2021 17:30:33 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 60DC811C052;
-        Mon, 25 Oct 2021 17:30:33 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0B18011C069;
-        Mon, 25 Oct 2021 17:30:33 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.145.0.93])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 25 Oct 2021 17:30:32 +0000 (GMT)
-Date:   Mon, 25 Oct 2021 19:30:12 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-Cc:     Thomas Huth <thuth@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH v3 2/2] s390x: Test specification
- exceptions during transaction
-Message-ID: <20211025193012.3be31938@p-imbrenda>
-In-Reply-To: <20211022120156.281567-3-scgl@linux.ibm.com>
-References: <20211022120156.281567-1-scgl@linux.ibm.com>
-        <20211022120156.281567-3-scgl@linux.ibm.com>
-Organization: IBM
+        id S234124AbhJYR6D (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Oct 2021 13:58:03 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30375 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233264AbhJYR6C (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 25 Oct 2021 13:58:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1635184539;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=8qY6kYMaRzmtdHH0RL+k6REiRSBMAcIJB16rtPRKrdY=;
+        b=jUOhTW6S6+3f1Vhu8q/A9lgcQA8MoY4ISHC4tge8juchyHZhQBKJei6PNX09RnW9YSHnKF
+        VoCyR3U2ZrWWjkGynM3qVCtKMC0pGry1r0HzLL5evTOxHOzv4GaRqAEWbVsmVb7oFJ7Lpz
+        9BPvTesu6UfwVry6CynCSMnFx9qNCPs=
+Received: from mail-oo1-f71.google.com (mail-oo1-f71.google.com
+ [209.85.161.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-183-UU-NrgGRMqWy0NXDOIH2Cg-1; Mon, 25 Oct 2021 13:55:38 -0400
+X-MC-Unique: UU-NrgGRMqWy0NXDOIH2Cg-1
+Received: by mail-oo1-f71.google.com with SMTP id c8-20020a4ad208000000b002b6b6df6b7fso4615914oos.13
+        for <kvm@vger.kernel.org>; Mon, 25 Oct 2021 10:55:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=8qY6kYMaRzmtdHH0RL+k6REiRSBMAcIJB16rtPRKrdY=;
+        b=vhLGmjOcYIKDDZxvgB+ZqbGGRBNPM3smBiqD1aUll6ldW9K6+fQwVGVaqngPlLjKW+
+         M+exZYFDQe2kHlYkd6UcSia8MHVKVbPtjEGjXfnRyxQBRKRH++TTQNGbCjOBiNM1TnO0
+         2cvT9mdg7EQdlBXFCmez/CDXvZm1Hsj3GfV1e8XfVBb912dMsaYD4Lnm7ZUaaXbIvBxC
+         uPOMS6WalYXpP6nvU+/F4x16wYOsSCzFc7mPT13JNuZNWK+6lNStawBLvLah37Zk5nI2
+         c2041UiDIKL8RUBRhqCp7qFckqy+b3NItFUALtLd0cEVbGJKKGDofnXARd0uYf26yo9F
+         1IFg==
+X-Gm-Message-State: AOAM531RaMio4CTUM+msX6WoIksBXaT2EYSqsmKk4e0p1WSzuzwaS7TQ
+        qkEXJyImi1DgqdQG2/5uKWrNfm6T1guyXHONezM/sUFS6s76g7vH7bU3/Pha4NSlPLrxUDpdqcd
+        V0ymD3OhAS68D
+X-Received: by 2002:aca:ebc7:: with SMTP id j190mr25018284oih.54.1635184537325;
+        Mon, 25 Oct 2021 10:55:37 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJza3ag4zLU44DqyofbOXz5RjsC33dhdXMswjGRPcIo0uz8OZsitNLScoOUBWWV6ICy50Tsk8Q==
+X-Received: by 2002:aca:ebc7:: with SMTP id j190mr25018241oih.54.1635184536961;
+        Mon, 25 Oct 2021 10:55:36 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id y123sm3783863oie.0.2021.10.25.10.55.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 Oct 2021 10:55:36 -0700 (PDT)
+Date:   Mon, 25 Oct 2021 11:55:35 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc:     Yishai Hadas <yishaih@nvidia.com>,
+        Jason Gunthorpe <jgg@nvidia.com>, bhelgaas@google.com,
+        saeedm@nvidia.com, linux-pci@vger.kernel.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, kuba@kernel.org, leonro@nvidia.com,
+        kwankhede@nvidia.com, mgurtovoy@nvidia.com, maorg@nvidia.com,
+        Cornelia Huck <cohuck@redhat.com>
+Subject: Re: [PATCH V2 mlx5-next 12/14] vfio/mlx5: Implement vfio_pci driver
+ for mlx5 devices
+Message-ID: <20211025115535.49978053.alex.williamson@redhat.com>
+In-Reply-To: <YXbceaVo0q6hOesg@work-vm>
+References: <20211019105838.227569-1-yishaih@nvidia.com>
+        <20211019105838.227569-13-yishaih@nvidia.com>
+        <20211019124352.74c3b6ba.alex.williamson@redhat.com>
+        <20211019192328.GZ2744544@nvidia.com>
+        <20211019145856.2fa7f7c8.alex.williamson@redhat.com>
+        <20211019230431.GA2744544@nvidia.com>
+        <5a496713-ae1d-11f2-1260-e4c1956e1eda@nvidia.com>
+        <20211020105230.524e2149.alex.williamson@redhat.com>
+        <YXbceaVo0q6hOesg@work-vm>
 X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 4NnW6SZ3BvROMq_y3msqjGZpmLGYIFcT
-X-Proofpoint-GUID: O9iBYCYZifwgVhsGpiE8uh_tTyrrjOkR
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
- definitions=2021-10-25_06,2021-10-25_02,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 bulkscore=0
- adultscore=0 mlxlogscore=999 impostorscore=0 lowpriorityscore=0
- priorityscore=1501 malwarescore=0 clxscore=1015 spamscore=0 suspectscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2109230001 definitions=main-2110250099
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 22 Oct 2021 14:01:56 +0200
-Janis Schoetterl-Glausch <scgl@linux.ibm.com> wrote:
+On Mon, 25 Oct 2021 17:34:01 +0100
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
 
-> Program interruptions during transactional execution cause other
-> interruption codes.
-> Check that we see the expected code for (some) specification exceptions.
-> 
-> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-> ---
->  lib/s390x/asm/arch_def.h |   1 +
->  s390x/spec_ex.c          | 172 +++++++++++++++++++++++++++++++++++++--
->  2 files changed, 168 insertions(+), 5 deletions(-)
-> 
-> diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
-> index 40626d7..f7fb467 100644
-> --- a/lib/s390x/asm/arch_def.h
-> +++ b/lib/s390x/asm/arch_def.h
-> @@ -55,6 +55,7 @@ struct psw {
->  #define PSW_MASK_BA			0x0000000080000000UL
->  #define PSW_MASK_64			(PSW_MASK_BA | PSW_MASK_EA)
->  
-> +#define CTL0_TRANSACT_EX_CTL		(63 -  8)
->  #define CTL0_LOW_ADDR_PROT		(63 - 35)
->  #define CTL0_EDAT			(63 - 40)
->  #define CTL0_IEP			(63 - 43)
-> diff --git a/s390x/spec_ex.c b/s390x/spec_ex.c
-> index ec3322a..f3628bd 100644
-> --- a/s390x/spec_ex.c
-> +++ b/s390x/spec_ex.c
-> @@ -4,9 +4,14 @@
->   *
->   * Specification exception test.
->   * Tests that specification exceptions occur when expected.
-> + * This includes specification exceptions occurring during transactional execution
-> + * as these result in another interruption code (the transactional-execution-aborted
-> + * bit is set).
->   */
->  #include <stdlib.h>
-> +#include <htmintrin.h>
->  #include <libcflat.h>
-> +#include <asm/barrier.h>
->  #include <asm/interrupt.h>
->  #include <asm/facility.h>
->  
-> @@ -92,18 +97,23 @@ static void not_even(void)
->  struct spec_ex_trigger {
->  	const char *name;
->  	void (*func)(void);
-> +	bool transactable;
->  	void (*fixup)(void);
->  };
->  
->  static const struct spec_ex_trigger spec_ex_triggers[] = {
-> -	{ "psw_bit_12_is_1", &psw_bit_12_is_1, &fixup_invalid_psw},
-> -	{ "bad_alignment", &bad_alignment, NULL},
-> -	{ "not_even", &not_even, NULL},
-> -	{ NULL, NULL, NULL},
-> +	{ "psw_bit_12_is_1", &psw_bit_12_is_1, false, &fixup_invalid_psw},
-> +	{ "bad_alignment", &bad_alignment, true, NULL},
-> +	{ "not_even", &not_even, true, NULL},
-> +	{ NULL, NULL, true, NULL},
->  };
->  
->  struct args {
->  	uint64_t iterations;
-> +	uint64_t max_retries;
-> +	uint64_t suppress_info;
-> +	uint64_t max_failures;
-> +	bool diagnose;
->  };
->  
->  static void test_spec_ex(struct args *args,
-> @@ -131,14 +141,132 @@ static void test_spec_ex(struct args *args,
->  		    expected_pgm);
->  }
->  
-> +#define TRANSACTION_COMPLETED 4
-> +#define TRANSACTION_MAX_RETRIES 5
-> +
-> +/* NULL must be passed to __builtin_tbegin via constant, forbid diagnose from
-> + * being NULL to keep things simple
-> + */
-> +static int __attribute__((nonnull))
-> +with_transaction(void (*trigger)(void), struct __htm_tdb *diagnose)
-> +{
-> +	int cc;
-> +
+> * Alex Williamson (alex.williamson@redhat.com) wrote:
+> > [Cc +dgilbert, +cohuck]
+> >=20
+> > On Wed, 20 Oct 2021 11:28:04 +0300
+> > Yishai Hadas <yishaih@nvidia.com> wrote:
+> >  =20
+> > > On 10/20/2021 2:04 AM, Jason Gunthorpe wrote: =20
+> > > > On Tue, Oct 19, 2021 at 02:58:56PM -0600, Alex Williamson wrote:   =
+=20
+> > > >> I think that gives us this table:
+> > > >>
+> > > >> |   NDMA   | RESUMING |  SAVING  |  RUNNING |
+> > > >> +----------+----------+----------+----------+ ---
+> > > >> |     X    |     0    |     0    |     0    |  ^
+> > > >> +----------+----------+----------+----------+  |
+> > > >> |     0    |     0    |     0    |     1    |  |
+> > > >> +----------+----------+----------+----------+  |
+> > > >> |     X    |     0    |     1    |     0    |
+> > > >> +----------+----------+----------+----------+  NDMA value is eithe=
+r compatible
+> > > >> |     0    |     0    |     1    |     1    |  to existing behavio=
+r or don't
+> > > >> +----------+----------+----------+----------+  care due to redunda=
+ncy vs
+> > > >> |     X    |     1    |     0    |     0    |  !_RUNNING/INVALID/E=
+RROR
+> > > >> +----------+----------+----------+----------+
+> > > >> |     X    |     1    |     0    |     1    |  |
+> > > >> +----------+----------+----------+----------+  |
+> > > >> |     X    |     1    |     1    |     0    |  |
+> > > >> +----------+----------+----------+----------+  |
+> > > >> |     X    |     1    |     1    |     1    |  v
+> > > >> +----------+----------+----------+----------+ ---
+> > > >> |     1    |     0    |     0    |     1    |  ^
+> > > >> +----------+----------+----------+----------+  Desired new useful =
+cases
+> > > >> |     1    |     0    |     1    |     1    |  v
+> > > >> +----------+----------+----------+----------+ ---
+> > > >>
+> > > >> Specifically, rows 1, 3, 5 with NDMA =3D 1 are valid states a user=
+ can
+> > > >> set which are simply redundant to the NDMA =3D 0 cases.   =20
+> > > > It seems right
+> > > >   =20
+> > > >> Row 6 remains invalid due to lack of support for pre-copy (_RESUMI=
+NG
+> > > >> | _RUNNING) and therefore cannot be set by userspace.  Rows 7 & 8
+> > > >> are error states and cannot be set by userspace.   =20
+> > > > I wonder, did Yishai's series capture this row 6 restriction? Yisha=
+i?   =20
+> > >=20
+> > >=20
+> > > It seems so,=C2=A0 by using the below check which includes the=20
+> > > !VFIO_DEVICE_STATE_VALID clause.
+> > >=20
+> > > if (old_state =3D=3D VFIO_DEVICE_STATE_ERROR ||
+> > >  =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 !VFIO_DEVICE_STATE_VALID(state=
+) ||
+> > >  =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 (state & ~MLX5VF_SUPPORTED_DEV=
+ICE_STATES))
+> > >  =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 return -EINVAL;
+> > >=20
+> > > Which is:
+> > >=20
+> > > #define VFIO_DEVICE_STATE_VALID(state) \
+> > >  =C2=A0=C2=A0=C2=A0 (state & VFIO_DEVICE_STATE_RESUMING ? \
+> > >  =C2=A0=C2=A0=C2=A0 (state & VFIO_DEVICE_STATE_MASK) =3D=3D VFIO_DEVI=
+CE_STATE_RESUMING : 1)
+> > >  =20
+> > > >   =20
+> > > >> Like other bits, setting the bit should be effective at the comple=
+tion
+> > > >> of writing device state.  Therefore the device would need to flush=
+ any
+> > > >> outbound DMA queues before returning.   =20
+> > > > Yes, the device commands are expected to achieve this.
+> > > >   =20
+> > > >> The question I was really trying to get to though is whether we ha=
+ve a
+> > > >> supportable interface without such an extension.  There's currently
+> > > >> only an experimental version of vfio migration support for PCI dev=
+ices
+> > > >> in QEMU (afaik),   =20
+> > > > If I recall this only matters if you have a VM that is causing
+> > > > migratable devices to interact with each other. So long as the devi=
+ces
+> > > > are only interacting with the CPU this extra step is not strictly
+> > > > needed.
+> > > >
+> > > > So, single device cases can be fine as-is
+> > > >
+> > > > IMHO the multi-device case the VMM should probably demand this supp=
+ort
+> > > > from the migration drivers, otherwise it cannot know if it is safe =
+for
+> > > > sure.
+> > > >
+> > > > A config option to override the block if the admin knows there is no
+> > > > use case to cause devices to interact - eg two NVMe devices without
+> > > > CMB do not have a useful interaction.
+> > > >   =20
+> > > >> so it seems like we could make use of the bus-master bit to fill
+> > > >> this gap in QEMU currently, before we claim non-experimental
+> > > >> support, but this new device agnostic extension would be required
+> > > >> for non-PCI device support (and PCI support should adopt it as
+> > > >> available).  Does that sound right?  Thanks,   =20
+> > > > I don't think the bus master support is really a substitute, trippi=
+ng
+> > > > bus master will stop DMA but it will not do so in a clean way and is
+> > > > likely to be non-transparent to the VM's driver.
+> > > >
+> > > > The single-device-assigned case is a cleaner restriction, IMHO.
+> > > >
+> > > > Alternatively we can add the 4th bit and insist that migration driv=
+ers
+> > > > support all the states. I'm just unsure what other HW can do, I get
+> > > > the feeling people have been designing to the migration description=
+ in
+> > > > the header file for a while and this is a new idea. =20
+> >=20
+> > I'm wondering if we're imposing extra requirements on the !_RUNNING
+> > state that don't need to be there.  For example, if we can assume that
+> > all devices within a userspace context are !_RUNNING before any of the
+> > devices begin to retrieve final state, then clearing of the _RUNNING
+> > bit becomes the device quiesce point and the beginning of reading
+> > device data is the point at which the device state is frozen and
+> > serialized.  No new states required and essentially works with a slight
+> > rearrangement of the callbacks in this series.  Why can't we do that? =
+=20
+>=20
+> So without me actually understanding your bit encodings that closely, I
+> think the problem is we have to asusme that any transition takes time.
+> From the QEMU point of view I think the requirement is when we stop the
+> machine (vm_stop_force_state(RUN_STATE_FINISH_MIGRATE) in
+> migration_completion) that at the point that call returns (with no
+> error) all devices are idle.  That means you need a way to command the
+> device to go into the stopped state, and probably another to make sure
+> it's got there.
 
-if you want to be extra sure, put an assert here (although I'm not sure
-how nonnull works, I have never seen it before)
+In a way.  We're essentially recognizing that we cannot stop a single
+device in isolation of others that might participate in peer-to-peer
+DMA with that device, so we need to make a pass to quiesce each device
+before we can ask the device to fully stop.  This new device state bit
+is meant to be that quiescent point, devices can accept incoming DMA
+but should cease to generate any.  Once all device are quiesced then we
+can safely stop them.
 
-> +	cc = __builtin_tbegin(diagnose);
-> +	if (cc == _HTM_TBEGIN_STARTED) {
-> +		trigger();
-> +		__builtin_tend();
-> +		return -TRANSACTION_COMPLETED;
-> +	} else {
-> +		return -cc;
-> +	}
-> +}
-> +
-> +static int retry_transaction(const struct spec_ex_trigger *trigger, unsigned int max_retries,
-> +			     struct __htm_tdb *tdb, uint16_t expected_pgm)
-> +{
-> +	int trans_result, i;
-> +	uint16_t pgm;
-> +
-> +	for (i = 0; i < max_retries; i++) {
-> +		expect_pgm_int();
-> +		trans_result = with_transaction(trigger->func, tdb);
-> +		if (trans_result == -_HTM_TBEGIN_TRANSIENT) {
-> +			mb();
-> +			pgm = lc->pgm_int_code;
-> +			if (pgm == 0)
-> +				continue;
-> +			else if (pgm == expected_pgm)
-> +				return 0;
-> +		}
-> +		return trans_result;
-> +	}
-> +	return -TRANSACTION_MAX_RETRIES;
+> Now, you could be a *little* more sloppy; you could allow a device carry
+> on doing stuff purely with it's own internal state up until the point
+> it needs to serialise; but that would have to be strictly internal state
+> only - if it can change any other devices state (or issue an interrupt,
+> change RAM etc) then you get into ordering issues on the serialisation
+> of multiple devices.
 
-so this means that a test will be considered failed if the transaction
-failed too many times?
+Yep, that's the proposal that doesn't require a uAPI change, we loosen
+the definition of stopped to mean the device can no longer generate DMA
+or interrupts and all internal processing outside or responding to
+incoming DMA should halt (essentially the same as the new quiescent
+state above).  Once all devices are in this state, there should be no
+incoming DMA and we can safely collect per device migration data.  If
+state changes occur beyond the point in time where userspace has
+initiated the collection of migration data, drivers have options for
+generating errors when userspace consumes that data.
 
-this means that could fail if the test is run on busy system, even if
-the host running the unit test is correct
+AFAICT, the two approaches are equally valid.  If we modify the uAPI to
+include this new quiescent state then userspace needs to make some hard
+choices about what configurations they support without such a feature.
+The majority of configurations are likely not exercising p2p between
+assigned devices, but the hypervisor can't know that.  If we work
+within the existing uAPI, well there aren't any open source driver
+implementations yet anyway and any non-upstream implementations would
+need to be updated for this clarification.  Existing userspace works
+better with no change, so long as they already follow the guideline
+that all devices in the userspace context must be stopped before the
+migration data of any device can be considered valid.  Thanks,
 
-also, do you really need to use negative values? it's probably easier
-to read if you stick to positive values, and less prone to mistakes if
-you accidentally forget a - somewhere.
-
-> +}
-> +
-> +static void test_spec_ex_trans(struct args *args, const struct spec_ex_trigger *trigger)
-> +{
-> +	const uint16_t expected_pgm = PGM_INT_CODE_SPECIFICATION
-> +			      | PGM_INT_CODE_TX_ABORTED_EVENT;
-> +	union {
-> +		struct __htm_tdb tdb;
-> +		uint64_t dwords[sizeof(struct __htm_tdb) / sizeof(uint64_t)];
-> +	} diag;
-> +	unsigned int i, failures = 0;
-> +	int trans_result;
-> +
-> +	if (!test_facility(73)) {
-> +		report_skip("transactional-execution facility not installed");
-> +		return;
-> +	}
-> +	ctl_set_bit(0, CTL0_TRANSACT_EX_CTL); /* enable transactional-exec */
-> +
-> +	for (i = 0; i < args->iterations && failures <= args->max_failures; i++) {
-> +		register_pgm_cleanup_func(trigger->fixup);
-> +		trans_result = retry_transaction(trigger, args->max_retries, &diag.tdb, expected_pgm);
-
-so you retry each iteration up to args->max_retries times, and if a
-transaction aborts too many times (maybe because the host system is
-very busy), then you consider it a fail
-
-> +		register_pgm_cleanup_func(NULL);
-> +		switch (trans_result) {
-> +		case 0:
-> +			continue;
-> +		case -_HTM_TBEGIN_INDETERMINATE:
-> +		case -_HTM_TBEGIN_PERSISTENT:
-> +			if (failures < args->suppress_info)
-> +				report_info("transaction failed with cc %d",
-> +					    -trans_result);
-> +			break;
-> +		case -_HTM_TBEGIN_TRANSIENT:
-> +			report_fail("Program interrupt: expected(%d) == received(%d)",
-> +				    expected_pgm,
-> +				    clear_pgm_int());
-> +			goto out;
-> +		case -TRANSACTION_COMPLETED:
-> +			report_fail("Transaction completed without exception");
-> +			goto out;
-> +		case -TRANSACTION_MAX_RETRIES:
-> +			if (failures < args->suppress_info)
-> +				report_info("Retried transaction %lu times without exception",
-> +					    args->max_retries);
-> +			break;
-> +		default:
-> +			report_fail("Invalid return transaction result");
-> +			goto out;
-> +		}
-> +
-> +		if (failures < args->suppress_info)
-> +			report_info("transaction abort code: %llu", diag.tdb.abort_code);
-> +		if (args->diagnose && failures < args->suppress_info) {
-> +			for (i = 0; i < 32; i++)
-> +				report_info("diag+%03d: %016lx", i*8, diag.dwords[i]);
-> +		}
-> +		++failures;
-> +	}
-> +	if (failures <= args->max_failures) {
-> +		report_pass(
-> +			"Program interrupt: always expected(%d) == received(%d), transaction failures: %u",
-> +			expected_pgm,
-> +			expected_pgm,
-> +			failures);
-> +	} else {
-> +		report_fail("Too many transaction failures: %u", failures);
-> +	}
-> +	if (failures > args->suppress_info)
-> +		report_info("Suppressed some transaction failure information messages");
-> +
-> +out:
-> +	ctl_clear_bit(0, CTL0_TRANSACT_EX_CTL);
-> +}
-> +
->  static struct args parse_args(int argc, char **argv)
->  {
->  	struct args args = {
->  		.iterations = 1,
-> +		.max_retries = 20,
-> +		.suppress_info = 20,
-> +		.diagnose = false
->  	};
->  	unsigned int i;
->  	long arg;
-> -	bool no_arg;
-> +	bool no_arg, max_failures = false;
->  	char *end;
->  
->  	for (i = 1; i < argc; i++) {
-> @@ -155,11 +283,35 @@ static struct args parse_args(int argc, char **argv)
-
-again, do we _really_ need all these parameters?
-
->  				report_abort("--iterations needs a positive parameter");
->  			args.iterations = arg;
->  			++i;
-> +		} else if (!strcmp("--max-retries", argv[i])) {
-> +			if (no_arg)
-> +				report_abort("--max-retries needs a positive parameter");
-> +			args.max_retries = arg;
-> +			++i;
-> +		} else if (!strcmp("--suppress-info", argv[i])) {
-> +			if (no_arg)
-> +				report_abort("--suppress-info needs a positive parameter");
-> +			args.suppress_info = arg;
-> +			++i;
-> +		} else if (!strcmp("--max-failures", argv[i])) {
-> +			if (no_arg)
-> +				report_abort("--max-failures needs a positive parameter");
-> +			args.max_failures = arg;
-> +			max_failures = true;
-> +			++i;
-> +		} else if (!strcmp("--diagnose", argv[i])) {
-> +			args.diagnose = true;
-> +		} else if (!strcmp("--no-diagnose", argv[i])) {
-> +			args.diagnose = false;
->  		} else {
->  			report_abort("Unsupported parameter '%s'",
->  				     argv[i]);
->  		}
->  	}
-> +
-> +	if (!max_failures)
-> +		args.max_failures = args.iterations / 1000;
-> +
->  	return args;
->  }
->  
-> @@ -177,5 +329,15 @@ int main(int argc, char **argv)
->  	}
->  	report_prefix_pop();
->  
-> +	report_prefix_push("specification exception during transaction");
-> +	for (i = 0; spec_ex_triggers[i].name; i++) {
-> +		if (spec_ex_triggers[i].transactable) {
-> +			report_prefix_push(spec_ex_triggers[i].name);
-> +			test_spec_ex_trans(&args, &spec_ex_triggers[i]);
-> +			report_prefix_pop();
-> +		}
-> +	}
-> +	report_prefix_pop();
-> +
->  	return report_summary();
->  }
+Alex
 
